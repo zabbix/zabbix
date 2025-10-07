@@ -45,7 +45,7 @@ int	create_pid_file(const char *pidfile)
 		close(fd);
 	}
 
-	mode_t	old_umask = umask(0666 & ~0640);
+	mode_t	old_umask = umask(0026);
 
 	/* open pid file */
 	fpid = fopen(pidfile, "w");

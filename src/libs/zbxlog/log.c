@@ -131,7 +131,7 @@ static void	rotate_log(const char *filename)
 		{
 			FILE	*log_file = NULL;
 #ifndef _WINDOWS
-			mode_t	old_umask = umask(0666 & ~0640);
+			mode_t	old_umask = umask(0026);
 #endif
 			log_file = fopen(filename, "w");
 #ifndef _WINDOWS
@@ -294,7 +294,12 @@ int	zbx_open_log(const zbx_config_log_t *log_file_cfg, int level, const char *sy
 		if (SUCCEED != zbx_mutex_create(&log_access, ZBX_MUTEX_LOG, error))
 			return FAIL;
 
-		if (NULL == (log_file = fopen(filename, "a+")))
+		mode_t	old_umask = umask(0026);
+
+		log_file = fopen(filename, "a+");
+		umask(old_umask);
+
+		if (NULL == log_file)
 		{
 			*error = zbx_dsprintf(*error, "unable to open log file [%s]: %s", filename,
 					zbx_strerror(errno));
@@ -369,7 +374,13 @@ void	zbx_log_impl(int level, const char *fmt, va_list args)
 		if (0 != get_config_log_file_size())
 			rotate_log(log_filename);
 
-		if (NULL != (log_file = fopen(log_filename, "a+")))
+
+		mode_t	old_umask = umask(0026);
+
+		log_file = fopen(log_filename, "a+");
+		umask(old_umask);
+
+		if (NULL != log_file)
 		{
 			long		milliseconds;
 			struct tm	tm;
