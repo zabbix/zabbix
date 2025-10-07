@@ -63,6 +63,8 @@ class CNumberParser extends CParser {
 	 */
 	private $suffix_multipliers = [];
 
+	private array $macro_parsers = [];
+
 	public function __construct(array $options = []) {
 		$this->options = array_replace($this->options, array_intersect_key($options, $this->options));
 
@@ -82,6 +84,16 @@ class CNumberParser extends CParser {
 			$this->suffixes .= $this->options['with_year'] ? ZBX_TIME_SUFFIXES_WITH_YEAR : ZBX_TIME_SUFFIXES;
 			$this->suffix_multipliers += ZBX_TIME_SUFFIX_MULTIPLIERS;
 		}
+
+		if ($this->options['usermacros']) {
+			$this->macro_parsers[] = new CUserMacroParser();
+			$this->macro_parsers[] = new CUserMacroFunctionParser();
+		}
+
+		if ($this->options['lldmacros']) {
+			$this->macro_parsers[] = new CLLDMacroParser();
+			$this->macro_parsers[] = new CLLDMacroFunctionParser();
+		}
 	}
 
 	/**
@@ -100,6 +112,13 @@ class CNumberParser extends CParser {
 		$this->number = null;
 		$this->suffix = null;
 
+		foreach ($this->macro_parsers as $parser) {
+			// API_FLOAT validator allows only if the whole source is a macro
+			if ($parser->parse($source) == self::PARSE_SUCCESS) {
+				return self::PARSE_SUCCESS;
+			}
+		}
+
 		$fragment = substr($source, $pos);
 
 		$pattern = $this->options['with_float'] ? ZBX_PREG_NUMBER : ZBX_PREG_INT;
@@ -108,13 +127,13 @@ class CNumberParser extends CParser {
 			: '/^'.$pattern.'/';
 
 		if (!preg_match($pattern, $fragment, $matches)) {
-			return $this->assertMacros($source) ? self::PARSE_SUCCESS : self::PARSE_FAIL;
+			return self::PARSE_FAIL;
 		}
 
 		$number = $this->options['with_float'] ? $matches['number'] : $matches['int'];
 
 		if ($number[0] === '-' && !$this->options['with_minus']) {
-			return $this->assertMacros($source) ? self::PARSE_SUCCESS : self::PARSE_FAIL;
+			return self::PARSE_FAIL;
 		}
 
 		$this->length = strlen($matches[0]);
@@ -124,28 +143,6 @@ class CNumberParser extends CParser {
 		$this->suffix = array_key_exists('suffix', $matches) ? $matches['suffix'] : null;
 
 		return ($pos + $this->length < strlen($source)) ? self::PARSE_SUCCESS_CONT : self::PARSE_SUCCESS;
-	}
-
-	private function assertMacros(string $source): bool {
-		$parsers = [];
-
-		if ($this->options['usermacros']) {
-			$parsers[] = new CUserMacroParser();
-			$parsers[] = new CUserMacroFunctionParser();
-		}
-
-		if ($this->options['lldmacros']) {
-			$parsers[] = new CLLDMacroParser();
-			$parsers[] = new CLLDMacroFunctionParser();
-		}
-
-		foreach ($parsers as $parser) {
-			if ($parser->parse($source) != self::PARSE_FAIL) {
-				return true;
-			}
-		}
-
-		return false;
 	}
 
 	/**
