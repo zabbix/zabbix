@@ -197,6 +197,12 @@ void	zbx_async_manager_interfaces_flush(zbx_async_manager_t *manager, zbx_hashse
 	zbx_hashset_clear(interfaces);
 }
 
+
+void	zbx_interface_status_clean_wrapper(void *data)
+{
+	zbx_interface_status_clean((zbx_interface_status_t *)data);
+}
+
 void	zbx_interface_status_clean(zbx_interface_status_t *interface_status)
 {
 	zbx_free(interface_status->key_orig);
