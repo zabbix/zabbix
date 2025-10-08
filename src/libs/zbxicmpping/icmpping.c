@@ -191,13 +191,13 @@ static int	get_fping_out(const char *fping, const char *address, char **out, cha
 
 	zabbix_log(LOG_LEVEL_DEBUG, "executing %s", tmp);
 
+	zbx_alarm_on(FPING_PIPE_TIMEOUT);
+
 	if (NULL == (f = popen(tmp, "r")))
 	{
 		zbx_strlcpy(error, zbx_strerror(errno), max_error_len);
 		goto out;
 	}
-
-	zbx_alarm_on(FPING_PIPE_TIMEOUT);
 
 	while (NULL != zbx_fgets(tmp, sizeof(tmp), f))
 	{
@@ -210,6 +210,8 @@ static int	get_fping_out(const char *fping, const char *address, char **out, cha
 	}
 
 	pclose(f);
+
+	zbx_alarm_off();
 
 	if (SUCCEED == zbx_alarm_timed_out())
 	{
@@ -227,8 +229,6 @@ static int	get_fping_out(const char *fping, const char *address, char **out, cha
 	*out = buffer;
 	ret = SUCCEED;
 out:
-	zbx_alarm_off();
-
 	if (0 > zbx_sigmask(SIG_SETMASK, &orig_mask, NULL))
 		zbx_error("cannot restore sigprocmask");
 
