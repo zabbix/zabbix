@@ -211,8 +211,6 @@ static int	get_fping_out(const char *fping, const char *address, char **out, cha
 
 	pclose(f);
 
-	zbx_alarm_off();
-
 	if (SUCCEED == zbx_alarm_timed_out())
 	{
 		zbx_free(buffer);
@@ -229,6 +227,8 @@ static int	get_fping_out(const char *fping, const char *address, char **out, cha
 	*out = buffer;
 	ret = SUCCEED;
 out:
+	zbx_alarm_off();
+
 	if (0 > zbx_sigmask(SIG_SETMASK, &orig_mask, NULL))
 		zbx_error("cannot restore sigprocmask");
 
