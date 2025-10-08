@@ -493,12 +493,15 @@ char	*zbx_user_macro_quote_context_dyn(const char *context, int force_quote, cha
  ******************************************************************************/
 int	zbx_is_user_macro(const char *str)
 {
-	int	macro_r, context_l, context_r;
+	int	macro_r, context_l, context_r, len = strlen(str);
+
+	if (3 > len)
+		return FAIL;
 
 	if (SUCCEED != zbx_user_macro_parse(str, &macro_r, &context_l, &context_r, NULL))
 		return FAIL;
 
-	if (macro_r != (int)strlen(str) - 1)
+	if (macro_r != len - 1)
 		return FAIL;
 
 	return SUCCEED;

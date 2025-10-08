@@ -5791,7 +5791,7 @@ static int	lld_interface_validate_fields(const zbx_lld_interface_t *interface, c
 		return FAIL;
 	}
 
-	if (NULL != interface->port && '\0' == *interface->port)
+	if ('\0' == *interface->port)
 	{
 		*error = zbx_strdcatf(*error, "Cannot %s \"%s\" interface on host \"%s\": "
 				"port cannot be empty.\n",
@@ -5813,7 +5813,7 @@ static int	lld_interface_validate_fields(const zbx_lld_interface_t *interface, c
 		return FAIL;
 	}
 
-	if (NULL == interface->dns || '\0' == *interface->dns)
+	if ('\0' == *interface->dns)
 	{
 		if (0 == interface->useip)
 		{
@@ -5848,7 +5848,7 @@ static int	lld_interface_validate_fields(const zbx_lld_interface_t *interface, c
 		}
 	}
 
-	if (NULL == interface->ip || '\0' == *interface->ip)
+	if ('\0' == *interface->ip)
 	{
 		if (0 != interface->useip)
 		{
