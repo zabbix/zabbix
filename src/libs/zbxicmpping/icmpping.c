@@ -132,6 +132,8 @@ static int	get_fping_out(const char *fping, const char *address, char **out, cha
 	char		filename[MAX_STRING_LEN];
 	mode_t		mode;
 
+#define FPING_PIPE_TIMEOUT	600
+
 	if (FAIL == zbx_validate_hostname(address) && FAIL == zbx_is_supported_ip(address))
 	{
 		zbx_strlcpy(error, "Invalid host name or IP address", max_error_len);
@@ -195,6 +197,8 @@ static int	get_fping_out(const char *fping, const char *address, char **out, cha
 		goto out;
 	}
 
+	zbx_alarm_on(FPING_PIPE_TIMEOUT);
+
 	while (NULL != zbx_fgets(tmp, sizeof(tmp), f))
 	{
 		len = strlen(tmp);
@@ -207,6 +211,13 @@ static int	get_fping_out(const char *fping, const char *address, char **out, cha
 
 	pclose(f);
 
+	if (SUCCEED == zbx_alarm_timed_out())
+	{
+		zbx_free(buffer);
+		zbx_strlcpy(error, "Timed out", max_error_len);
+		goto out;
+	}
+
 	if (NULL == buffer)
 	{
 		zbx_strlcpy(error, "Cannot obtain the program output", max_error_len);
@@ -216,6 +227,8 @@ static int	get_fping_out(const char *fping, const char *address, char **out, cha
 	*out = buffer;
 	ret = SUCCEED;
 out:
+	zbx_alarm_off();
+
 	if (0 > zbx_sigmask(SIG_SETMASK, &orig_mask, NULL))
 		zbx_error("cannot restore sigprocmask");
 
@@ -776,7 +789,10 @@ static int	fping_output_process(zbx_fping_resp *resp, zbx_fping_args *args)
 
 	if (NULL == zbx_fgets(resp->linebuf, (int)resp->linebuf_size, resp->input_pipe))
 	{
-		zbx_snprintf(resp->linebuf, resp->linebuf_size, "no output");
+		if (SUCCEED == zbx_alarm_timed_out())
+			zbx_snprintf(resp->linebuf, resp->linebuf_size, "timed out");
+		else
+			zbx_snprintf(resp->linebuf, resp->linebuf_size, "no output");
 	}
 	else if (NULL == strstr(resp->linebuf, " error:"))
 	{
@@ -788,6 +804,12 @@ static int	fping_output_process(zbx_fping_resp *resp, zbx_fping_args *args)
 
 		do
 		{
+			if (SUCCEED == zbx_alarm_timed_out())
+			{
+				ret = FAIL;
+				break;
+			}
+
 			zbx_rtrim(resp->linebuf, "\n");
 			line_process(resp, args);
 			ret = SUCCEED;
@@ -1132,6 +1154,8 @@ static int	hosts_ping(zbx_fping_host_t *hosts, int hosts_count, int requests_cou
 	if (0 > zbx_sigmask(SIG_BLOCK, &mask, &orig_mask))
 		zbx_error("cannot set sigprocmask to block the user signal");
 
+	zbx_alarm_on(FPING_PIPE_TIMEOUT);
+
 	if (NULL == (f = popen(linebuf, "r")))
 	{
 		zbx_snprintf(error, max_error_len, "%s: %s", linebuf, zbx_strerror(errno));
@@ -1165,6 +1189,8 @@ static int	hosts_ping(zbx_fping_host_t *hosts, int hosts_count, int requests_cou
 	}
 
 	rc = pclose(f);
+
+	zbx_alarm_off();
 
 	if (0 > zbx_sigmask(SIG_SETMASK, &orig_mask, NULL))
 		zbx_error("cannot restore sigprocmask");
