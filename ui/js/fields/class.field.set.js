@@ -136,7 +136,7 @@ class CFieldSet extends CField {
 		let result = {};
 
 		for (const field of Object.values(this.#fields)) {
-			if (field._field.hasAttribute('data-skip-from-submit')) {
+			if (field._field.hasAttribute('data-skip-from-submit') || field.isDisabled()) {
 				continue;
 			}
 
