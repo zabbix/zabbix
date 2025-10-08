@@ -191,8 +191,6 @@ static int	get_fping_out(const char *fping, const char *address, char **out, cha
 
 	zabbix_log(LOG_LEVEL_DEBUG, "executing %s", tmp);
 
-	zbx_alarm_on(FPING_PIPE_TIMEOUT);
-
 	if (NULL == (f = popen(tmp, "r")))
 	{
 		zbx_strlcpy(error, zbx_strerror(errno), max_error_len);
