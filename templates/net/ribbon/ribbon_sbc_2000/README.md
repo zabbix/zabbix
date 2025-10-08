@@ -7,9 +7,9 @@ The Ribbon Session Border Controller 2000 (SBC 2000) is an ideal security and in
 
 This template is designed for the effortless deployment of Ribbon SBC 2000 monitoring and doesn't require any external scripts.
 
-More details can be found in the official documentation:
-  - on [REST API Reference](https://publicdoc.rbbn.com/spaces/UXAPIDOC/pages/17400598/Configuration+Resources)
-  - on [REST API User's Guide](https://publicdoc.rbbn.com/spaces/UXAPIDOC/pages/387008766/REST+API+User+s+Guide)
+More details can be found in the official Ribbon documentation:
+- [REST API Reference](https://publicdoc.rbbn.com/spaces/UXAPIDOC/pages/17400598/Configuration+Resources)
+- [REST API User's Guide](https://publicdoc.rbbn.com/spaces/UXAPIDOC/pages/387008766/REST+API+User+s+Guide)
 
 ## Requirements
 
@@ -26,7 +26,7 @@ This template has been tested on:
 
 ## Setup
 
-1. Create a new user according [REST API - Requirements](https://publicdoc.rbbn.com/spaces/UXAPIDOC/pages/387008769/REST+API+-+Requirements)
+1. Create a new user according to [REST API requirements](https://publicdoc.rbbn.com/spaces/UXAPIDOC/pages/387008769/REST+API+-+Requirements)
 2. Create a new host
 3. Link the template to the host created earlier
 4. Set the host macros (on the host or template level) required for getting data:
@@ -47,46 +47,46 @@ This template has been tested on:
 |{$RIBBON.PASSWORD}|<p>Ribbon SBC user password.</p>||
 |{$RIBBON.URL}|<p>Ribbon SBC API IP.</p>||
 |{$RIBBON.PROXY}|<p>Sets the HTTP proxy value. If this macro is empty, then no proxy is used.</p>||
-|{$RIBBON.CPU.UTIL.CRIT}|<p>The threshold of the CPU usage in percent.</p>|`90`|
-|{$RIBBON.MEMORY.UTIL.CRIT}|<p>The threshold of the memory usage in percent.</p>|`90`|
-|{$RIBBON.INTERFACE.DISCOVERY.TYPE.MATCHES}|<p>Sets the regex string of interface type to be allowed in discovery.</p>|`.*`|
-|{$RIBBON.INTERFACE.DISCOVERY.TYPE.NOT_MATCHES}|<p>Sets the regex string of interface type to be ignored in discovery.</p>|`CHANGE_IF_NEEDED`|
-|{$RIBBON.INTERFACE.DISCOVERY.NAME.MATCHES}|<p>Sets the regex string of interface name to be allowed in discovery.</p>|`.*`|
-|{$RIBBON.INTERFACE.DISCOVERY.NAME.NOT_MATCHES}|<p>Sets the regex string of interface name to be ignored in discovery.</p>|`CHANGE_IF_NEEDED`|
-|{$RIBBON.DISK.DISCOVERY.TYPE.MATCHES}|<p>Sets the regex string of disk type to be allowed in discovery.</p>|`.*`|
-|{$RIBBON.DISK.DISCOVERY.TYPE.NOT_MATCHES}|<p>Sets the regex string of disk type to be ignored in discovery.</p>|`CHANGE_IF_NEEDED`|
-|{$RIBBON.DISK.DISCOVERY.NAME.MATCHES}|<p>Sets the regex string of disk name to be allowed in discovery.</p>|`.*`|
-|{$RIBBON.DISK.DISCOVERY.NAME.NOT_MATCHES}|<p>Sets the regex string of disk name to be ignored in discovery.</p>|`CHANGE_IF_NEEDED`|
+|{$RIBBON.CPU.UTIL.CRIT}|<p>The threshold of CPU usage in percent.</p>|`90`|
+|{$RIBBON.MEMORY.UTIL.CRIT}|<p>The threshold of memory usage in percent.</p>|`90`|
+|{$RIBBON.INTERFACE.DISCOVERY.TYPE.MATCHES}|<p>Sets the regex string of the interface type to be allowed in discovery.</p>|`.*`|
+|{$RIBBON.INTERFACE.DISCOVERY.TYPE.NOT_MATCHES}|<p>Sets the regex string of the interface type to be ignored in discovery.</p>|`CHANGE_IF_NEEDED`|
+|{$RIBBON.INTERFACE.DISCOVERY.NAME.MATCHES}|<p>Sets the regex string of the interface name to be allowed in discovery.</p>|`.*`|
+|{$RIBBON.INTERFACE.DISCOVERY.NAME.NOT_MATCHES}|<p>Sets the regex string of the interface name to be ignored in discovery.</p>|`CHANGE_IF_NEEDED`|
+|{$RIBBON.DISK.DISCOVERY.TYPE.MATCHES}|<p>Sets the regex string of the disk type to be allowed in discovery.</p>|`.*`|
+|{$RIBBON.DISK.DISCOVERY.TYPE.NOT_MATCHES}|<p>Sets the regex string of the disk type to be ignored in discovery.</p>|`CHANGE_IF_NEEDED`|
+|{$RIBBON.DISK.DISCOVERY.NAME.MATCHES}|<p>Sets the regex string of the disk name to be allowed in discovery.</p>|`.*`|
+|{$RIBBON.DISK.DISCOVERY.NAME.NOT_MATCHES}|<p>Sets the regex string of the disk name to be ignored in discovery.</p>|`CHANGE_IF_NEEDED`|
 |{$RIBBON.DISK.USED.MAX}|<p>The threshold of the disk usage in percent.</p>|`90`|
 
 ### Items
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Get system stats|<p>Gets the system statistic.</p>|Script|ribbon.system.stats.get|
-|Get interface|<p>Gets the system ethernet port statistic.</p>|Script|ribbon.net.if.get|
-|Get fan|<p>Gets the Fan.</p>|Script|ribbon.fan.get|
+|Get system stats|<p>Gets the system statistics.</p>|Script|ribbon.system.stats.get|
+|Get interface|<p>Gets the system ethernet port statistics.</p>|Script|ribbon.net.if.get|
+|Get fan|<p>Gets fan data.</p>|Script|ribbon.fan.get|
 |Get disk partition|<p>Gets the system disk partition.</p>|Script|ribbon.disk.get|
-|Get power supply|<p>Gets the PSU.</p>|Script|ribbon.psu.get|
+|Get power supply|<p>Gets PSU data.</p>|Script|ribbon.psu.get|
 |Node name|<p>Sets the DNS host name for the system.</p>|Dependent item|ribbon.system.node.name<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.system.NodeName`</p></li><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
 |Serial number|<p>Sets the serial number of the system.</p>|Dependent item|ribbon.system.serial.number<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.system.SerialNumber`</p></li><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
-|Status|<p>Indicates the hardware initialization state for this card.</p><p>Possible values:</p><p>- None</p><p>- Card Idle</p><p>- Card Detected</p><p>- Card Activating</p><p>- Card Activated</p><p>- Card RemoveRequested</p><p>- Card Removing</p><p>- Card Removed</p><p>- Card Downloading</p><p>- Card Failed</p><p>- Card DisabledLongLoop</p><p>- MAX</p>|Dependent item|ribbon.system.status<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.system.Status`</p></li><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
+|Status|<p>Indicates the hardware initialization state for this card.</p><p>Possible values:</p><p>- None</p><p>- Card Idle</p><p>- Card Detected</p><p>- Card Activating</p><p>- Card Activated</p><p>- Card Remove Requested</p><p>- Card Removing</p><p>- Card Removed</p><p>- Card Downloading</p><p>- Card Failed</p><p>- Card Disabled Long Loop</p><p>- MAX</p>|Dependent item|ribbon.system.status<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.system.Status`</p></li><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
 |Memory total|<p>Indicates the amount of RAM available in the system.</p>|Dependent item|ribbon.system.total.memory<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.system.TotalSystemMemory`</p></li><li><p>Custom multiplier: `1048576`</p></li><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
-|Software base version|<p>Base Software version.</p>|Dependent item|ribbon.system.software.base.version<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.system.rt_Software_Base_Version`</p></li><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
-|Software base build number|<p>Build Number identifies exact build machine, time and date. It should be reported whenever reporting any bug or crash related to current software.</p>|Dependent item|ribbon.system.software.base.build<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.system.rt_Software_Base_BuildNumber`</p></li><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
-|Number of call attempts|<p>Total number of call attempts system wide since system came up.</p>|Dependent item|ribbon.number.call.attempts<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.systemcallstats.rt_NumCallAttempts`</p></li></ul>|
-|Number of call failed|<p>Total number of failed calls system wide since system came up.</p>|Dependent item|ribbon.number.call.failed<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.systemcallstats.rt_NumCallFailed`</p></li></ul>|
-|Number of call succeeded|<p>Total number of successfull calls system wide since system came up.</p>|Dependent item|ribbon.number.call.succeeded<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.systemcallstats.rt_NumCallSucceeded`</p></li></ul>|
-|Number of call currently up|<p>Number of currently connected calls system wide.</p>|Dependent item|ribbon.number.call.currently<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.systemcallstats.rt_NumCallCurrentlyUp`</p></li></ul>|
-|CPU Load average 15m|<p>Average number of processes over the last fifteen minutes waiting to run because CPU is busy.</p>|Dependent item|ribbon.cpu.load.avg15<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.historicalstatistics.rt_CPULoadAverage15m`</p></li><li><p>Custom multiplier: `0.01`</p></li></ul>|
-|CPU Load average 1m|<p>Average number of processes over the last one minute waiting to run because CPU is busy.</p>|Dependent item|ribbon.cpu.load.avg1<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.historicalstatistics.rt_CPULoadAverage1m`</p></li><li><p>Custom multiplier: `0.01`</p></li></ul>|
-|CPU Load average 5m|<p>Average number of processes over the last five minutes waiting to run because CPU is busy.</p>|Dependent item|ribbon.cpu.load.avg5<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.historicalstatistics.rt_CPULoadAverage5m`</p></li><li><p>Custom multiplier: `0.01`</p></li></ul>|
-|CPU usage|<p>Average percent usage of the CPU.</p>|Dependent item|ribbon.cpu.usage<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.historicalstatistics.rt_CPUUsage`</p></li></ul>|
-|File descriptors usage|<p>Number of file descriptors used by the system.</p>|Dependent item|ribbon.fd.usage<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.historicalstatistics.rt_FDUsage`</p></li></ul>|
-|Memory usage|<p>Average percent usage of system memory.</p>|Dependent item|ribbon.memory.usage<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.historicalstatistics.rt_MemoryUsage`</p></li></ul>|
+|Software base version|<p>Base software version.</p>|Dependent item|ribbon.system.software.base.version<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.system.rt_Software_Base_Version`</p></li><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
+|Software base build number|<p>The exact build: machine, time, and date. It should be reported whenever reporting any bug or crash related to the current software.</p>|Dependent item|ribbon.system.software.base.build<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.system.rt_Software_Base_BuildNumber`</p></li><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
+|Number of call attempts|<p>Total number of call attempts system-wide since the system came up.</p>|Dependent item|ribbon.number.call.attempts<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.systemcallstats.rt_NumCallAttempts`</p></li></ul>|
+|Number of call failed|<p>Total number of failed calls system-wide since the system came up.</p>|Dependent item|ribbon.number.call.failed<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.systemcallstats.rt_NumCallFailed`</p></li></ul>|
+|Number of call succeeded|<p>Total number of successful calls system-wide since the system came up.</p>|Dependent item|ribbon.number.call.succeeded<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.systemcallstats.rt_NumCallSucceeded`</p></li></ul>|
+|Number of call currently up|<p>Number of currently connected calls system-wide.</p>|Dependent item|ribbon.number.call.currently<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.systemcallstats.rt_NumCallCurrentlyUp`</p></li></ul>|
+|CPU Load average 15m|<p>Average number of processes over the last fifteen minutes waiting to run because the CPU is busy.</p>|Dependent item|ribbon.cpu.load.avg15<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.historicalstatistics.rt_CPULoadAverage15m`</p></li><li><p>Custom multiplier: `0.01`</p></li></ul>|
+|CPU Load average 1m|<p>Average number of processes over the last minute waiting to run because the CPU is busy.</p>|Dependent item|ribbon.cpu.load.avg1<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.historicalstatistics.rt_CPULoadAverage1m`</p></li><li><p>Custom multiplier: `0.01`</p></li></ul>|
+|CPU Load average 5m|<p>Average number of processes over the last five minutes waiting to run because the CPU is busy.</p>|Dependent item|ribbon.cpu.load.avg5<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.historicalstatistics.rt_CPULoadAverage5m`</p></li><li><p>Custom multiplier: `0.01`</p></li></ul>|
+|CPU usage|<p>Average CPU usage in percent.</p>|Dependent item|ribbon.cpu.usage<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.historicalstatistics.rt_CPUUsage`</p></li></ul>|
+|File descriptor usage|<p>Number of file descriptors used by the system.</p>|Dependent item|ribbon.fd.usage<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.historicalstatistics.rt_FDUsage`</p></li></ul>|
+|Memory usage|<p>Average usage of system memory in percent.</p>|Dependent item|ribbon.memory.usage<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.historicalstatistics.rt_MemoryUsage`</p></li></ul>|
 |Temporary partition usage|<p>Percentage of the temporary partition used.</p>|Dependent item|ribbon.tmp.part.usage<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.historicalstatistics.rt_TmpPartUsage`</p></li></ul>|
-|ASM Operating System License Type|<p>The version of ASM Operating System that is licensed by the factory.</p><p>Possible values:</p><p>- Unknown</p><p>- Win2008R2</p><p>- Win2012R2</p><p>- Win2019</p>|Dependent item|ribbon.chassis.asm.license.type<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.chassis.AsmOsLicenseType`</p></li><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
-|Chassis Status|<p>Indicates the hardware initialization state for this card.</p><p>Possible values:</p><p>  - None</p><p>  - Card Idle</p><p>  - Card Detected</p><p>  - Card Activating</p><p>  - Card Activated</p><p>  - Card RemoveRequested</p><p>  - Card Removing</p><p>  - Card Removed</p><p>  - Card Downloading</p><p>  - Card Failed</p><p>  - Card DisabledLongLoop</p><p>  - MAX</p>|Dependent item|ribbon.chassis.status<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.chassis.rt_Status`</p></li><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
+|ASM Operating System License Type|<p>The ASM Operating System version that is licensed by the factory.</p><p>Possible values:</p><p>- Unknown</p><p>- Win2008R2</p><p>- Win2012R2</p><p>- Win2019</p>|Dependent item|ribbon.chassis.asm.license.type<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.chassis.AsmOsLicenseType`</p></li><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
+|Chassis Status|<p>Indicates the hardware initialization state for this card.</p><p>Possible values:</p><p>  - None</p><p>  - Card Idle</p><p>  - Card Detected</p><p>  - Card Activating</p><p>  - Card Activated</p><p>  - Card Remove Requested</p><p>  - Card Removing</p><p>  - Card Removed</p><p>  - Card Downloading</p><p>  - Card Failed</p><p>  - Card Disabled Long Loop</p><p>  - MAX</p>|Dependent item|ribbon.chassis.status<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.chassis.rt_Status`</p></li><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
 |Chassis board bottom temp1|<p>Indicates the temperature on the bottom of the main board in degrees Celsius.</p>|Dependent item|ribbon.chassis.board.bottom.temp1<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.chassis.rt_Chassis_BoardBottom_Temp1`</p></li></ul>|
 |Chassis board top temp2|<p>Indicates the temperature on the top of the main board in degrees Celsius.</p>|Dependent item|ribbon.chassis.board.top.temp2<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.chassis.rt_Chassis_BoardTop_Temp2`</p></li></ul>|
 |Chassis core switch temp|<p>Indicates the core switch temperature in degrees Celsius.</p>|Dependent item|ribbon.chassis.core.switch.temp<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.chassis.rt_Chassis_CoreSwitch_Temp`</p></li></ul>|
@@ -135,22 +135,22 @@ This template has been tested on:
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
 |Disk [{#DISK.NAME}]: Type|<p>Identifies the user-friendly physical device holding the partition.</p><p>Possible values:</p><p>- Configuration</p><p>- Logs</p><p>- Temp</p><p>- Core File</p><p>- ASM Module</p><p>- Software Update</p><p>- Internal Logs</p><p>- System</p><p>- Others</p><p>- Packet Capture Logs</p>|Dependent item|ribbon.disk.type[{#DISK.ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.{#DISK.ID}.rt_PartitionType`</p></li><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
-|Disk [{#DISK.NAME}]: Utilization|<p>Amount of memory used by this partition, expressed as percentage.</p>|Dependent item|ribbon.disk.usage.percent[{#DISK.ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.{#DISK.ID}.rt_CurrentUsage`</p></li></ul>|
+|Disk [{#DISK.NAME}]: Utilization|<p>Amount of memory used by this partition, expressed as a percentage.</p>|Dependent item|ribbon.disk.usage.percent[{#DISK.ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.{#DISK.ID}.rt_CurrentUsage`</p></li></ul>|
 |Disk [{#DISK.NAME}]: Size|<p>Specifies the maximum amount of memory, in bytes available in this partition.</p>|Dependent item|ribbon.disk.size.max[{#DISK.ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.{#DISK.ID}.rt_MaximumSize`</p></li><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
-|Disk [{#DISK.NAME}]: Available|<p>Amount of memory in bytes, available for use in the filesystem.</p>|Dependent item|ribbon.disk.size.available[{#DISK.ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.{#DISK.ID}.rt_MemoryAvailable`</p></li></ul>|
-|Disk [{#DISK.NAME}]: Used|<p>Amount of memory in bytes, used by the existing files in the filesystem.</p>|Dependent item|ribbon.disk.size.used[{#DISK.ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.{#DISK.ID}.rt_MemoryUsed`</p></li></ul>|
+|Disk [{#DISK.NAME}]: Available|<p>Amount of memory in bytes, available for use in the file system.</p>|Dependent item|ribbon.disk.size.available[{#DISK.ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.{#DISK.ID}.rt_MemoryAvailable`</p></li></ul>|
+|Disk [{#DISK.NAME}]: Used|<p>Amount of memory in bytes, used by the existing files in the file system.</p>|Dependent item|ribbon.disk.size.used[{#DISK.ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.{#DISK.ID}.rt_MemoryUsed`</p></li></ul>|
 
 ### Trigger prototypes for Disk partition discovery
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Ribbon: Disk [{#DISK.NAME}]: Disk space usage is high|<p>Disk space usage is bigger then the threshold.</p>|`min(/Ribbon SBC 2000 by HTTP/ribbon.disk.usage.percent[{#DISK.ID}],5m)>{$RIBBON.DISK.USED.MAX:"{#DISK.NAME}"}`|Average||
+|Ribbon: Disk [{#DISK.NAME}]: Disk space usage is high|<p>Disk space usage is larger than the threshold.</p>|`min(/Ribbon SBC 2000 by HTTP/ribbon.disk.usage.percent[{#DISK.ID}],5m)>{$RIBBON.DISK.USED.MAX:"{#DISK.NAME}"}`|Average||
 
 ### LLD rule Power supply discovery
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Power supply discovery|<p>Used for discovering power supply.</p>|Dependent item|ribbon.psu.discovery<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Power supply discovery|<p>Used for discovering the power supply.</p>|Dependent item|ribbon.psu.discovery<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 
 ### Item prototypes for Power supply discovery
 
@@ -171,7 +171,7 @@ This template has been tested on:
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Fan discovery|<p>Used for discovering fan.</p>|Dependent item|ribbon.fan.discovery<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Fan discovery|<p>Used for discovering fans.</p>|Dependent item|ribbon.fan.discovery<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 
 ### Item prototypes for Fan discovery
 
