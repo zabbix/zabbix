@@ -138,20 +138,21 @@ Note that session names are case-sensitive.
 <br>- `1` if the connection is alive;
 <br>- `0` if the connection is broken (returned if there was any error during the test, including authentication and configuration issues).
 
-`mysql.replication.discovery[<commonParams>,<version>]` — Returns replication information in LLD format.
-<br>Parameters:
-<br>`version` (optional) — MySQL server version*.
+`mysql.replication.discovery[<commonParams>]` — Returns replication information in LLD format*.
 
-`mysql.replication.get_slave_status[<commonParams>,<masterHost>,<version>]` — Returns the replication status.
+`mysql.replication.get_slave_status[<commonParams>,<masterHost>]` — Returns the replication status.
 <br>Parameters:
-<br>`masterHost` (optional) — The name of a master host.
-<br>`version` (optional) — MySQL server version*.
+<br>`masterHost` (optional) — The name of a master host*.
 
 `mysql.get_status_variables[<commonParams>]` — Returns values of global status variables.
 
 `mysql.version[<commonParams>]` — Returns the MySQL version.
 
-> \* Since MySQL v8.4, the query for obtaining replication status has changed. To handle this difference, the `<version>` must be specified in the `mysql.replication.*` keys, e.g., 8.5. If no version is specified, the query variant prior to MySQL v8.4 will be applied.
+\* In some MySQL server versions, the replication status query `SHOW SLAVE STATUS` is deprecated or has been fully replaced by `SHOW REPLICA STATUS`. The result key names have also changed — from `Master` to `Source` and from `Slave` to `Replica`.
+* the  old style terminology:	`"Master_Host": "myserver"` or `"Slave_IO_Running": "Yes"`
+* the new style, respectively:  `"Source_Host": "myserver"` or `"Replica_IO_Running": "Yes"`.  
+
+To maintain compatibility, the result set includes duplicated keys using both terminology styles.
 
 ## Custom queries
 

@@ -20,183 +20,165 @@ import (
 	"github.com/google/go-cmp/cmp"
 )
 
-func Test_getReplicationQuery(t *testing.T) {
+var (
+	oldStyleData = map[string]string{ //nolint:gochecknoglobals //readability
+		"Master_Host":           "mysql-8.3-master",
+		"Master_User":           "zbx_monitor",
+		"Master_Port":           "33061",
+		"Master_Log_File":       "",
+		"Read_Master_Log_Pos":   "4",
+		"Get_master_public_key": "0",
+		"SMTH_Master":           "0",
+
+		"Connect_Retry":        "60",
+		"Relay_Log_File":       "mysql-relay.000001",
+		"Relay_Log_Pos":        "4",
+		"Replicate_Rewrite_DB": "",
+
+		"Slave_IO_State":          "",
+		"Slave_SQL_Running_State": "",
+	}
+
+	newStyleData = map[string]string{ //nolint:gochecknoglobals //readability
+		"Source_Host":           "mysql-8.3-master",
+		"Source_User":           "zbx_monitor",
+		"Source_Port":           "33061",
+		"Source_Log_File":       "",
+		"Read_Source_Log_Pos":   "4",
+		"Get_Source_public_key": "0",
+		"SMTH_Source":           "0",
+
+		"Connect_Retry":        "60",
+		"Relay_Log_File":       "mysql-relay.000001",
+		"Relay_Log_Pos":        "4",
+		"Replicate_Rewrite_DB": "",
+
+		"Replica_IO_State":          "",
+		"Replica_SQL_Running_State": "",
+	}
+
+	duplicatedData = map[string]string{ //nolint:gochecknoglobals //readability
+		"Master_Host": "mysql-8.3-master", "Source_Host": "mysql-8.3-master",
+		"Master_User": "zbx_monitor", "Source_User": "zbx_monitor",
+		"Master_Port": "33061", "Source_Port": "33061",
+		"Master_Log_File": "", "Source_Log_File": "",
+		"Read_Master_Log_Pos": "4", "Read_Source_Log_Pos": "4",
+		"Get_master_public_key": "0", "Get_Source_public_key": "0",
+		"SMTH_Master": "0", "SMTH_Source": "0",
+
+		"Connect_Retry":        "60",
+		"Relay_Log_File":       "mysql-relay.000001",
+		"Relay_Log_Pos":        "4",
+		"Replicate_Rewrite_DB": "",
+
+		"Slave_IO_State": "", "Replica_IO_State": "",
+		"Slave_SQL_Running_State": "", "Replica_SQL_Running_State": "",
+	}
+)
+
+func Test_substituteKey(t *testing.T) {
 	t.Parallel()
 
 	type args = struct {
-		threshold string
-		vers      string
-	}
-
-	tests := []struct {
-		name    string
-		args    args
-		want    replicaQuery
-		wantErr bool
-	}{
-		{
-			"+equal",
-			args{"8.4", "8.4"},
-			replicaQueryNew,
-			false,
-		},
-		{
-			"+patchEqual",
-			args{"8.4", "8.4.0"},
-			replicaQueryNew,
-			false,
-		},
-		{
-			"+RcEqual",
-			args{"8.4.1-rc.2", "8.4.1-rc.2"},
-			replicaQueryNew,
-			false,
-		},
-		{
-			"+lower",
-			args{"8.4", "8.3"},
-			replicaQueryOld,
-			false,
-		},
-
-		{
-			"+emptyLower", //todo trim in function
-			args{"8.4", "  "},
-			replicaQueryOld,
-			false,
-		},
-		{
-			"+RcLower",
-			args{"8.4.1-rc.2", "8.4.1-rc.1"},
-			replicaQueryOld,
-			false,
-		},
-		{
-			"+majorLower",
-			args{"8.4", "7"},
-			replicaQueryOld,
-			false,
-		},
-		{
-			"+alphaLower",
-			args{"8.4.1", "8.4.1-alpha"},
-			replicaQueryOld,
-			false,
-		},
-		{
-			"+higher",
-			args{"8.4", "8.5"},
-			replicaQueryNew,
-			false,
-		},
-		{
-			"+majorHigher",
-			args{"8.4", "9"},
-			replicaQueryNew,
-			false,
-		},
-		{
-			"+rcMajorHigher",
-			args{"8.2.0-rc.1", "8.2"},
-			replicaQueryNew,
-			false,
-		},
-		{
-			"+alphaNumHigher",
-			args{"8.2.0-alpha", "8.2.0-alpha.1"},
-			replicaQueryNew,
-			false,
-		},
-		{
-			"+buildHigher",
-			args{"8.2.0+1234", "8.2.0+1235"},
-			replicaQueryNew,
-			false,
-		},
-		{
-			"-rubbish",
-			args{"8.4", "rubbish"},
-			"",
-			true,
-		},
-		{
-			"-withPrefix",
-			args{"8.4", "v8.5"},
-			"",
-			true,
-		},
-		{
-			"-alphaMinor", // Pre-release tags allowed only if all elements - x.y.z specified.
-			args{"8.4", "8.4-alpha"},
-			"",
-			true,
-		},
-		{
-			"-thresholdEmpty", // Pre-release tags allowed only if all elements - x.y.z specified.
-			args{" ", "8.4"},
-			"",
-			true,
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			t.Parallel()
-
-			got, err := getReplicationQuery(tt.args.threshold, tt.args.vers)
-			if tt.wantErr != (err != nil) {
-				t.Fatalf("getReplicationQuery() error = %v, wantErr %v", err, tt.wantErr)
-			}
-
-			if diff := cmp.Diff(tt.want, got); diff != "" {
-				t.Errorf("getReplicationQuery(): %s", diff)
-			}
-		})
-	}
-}
-
-func Test_getMasterHost(t *testing.T) {
-	t.Parallel()
-
-	type args = struct {
-		data []map[string]string
+		key   string
+		rules map[string]string
 	}
 
 	tests := []struct {
 		name string
 		args args
-		want []map[string]string
+		want string
 	}{
 		{
-			"+sourceHost",
+			"+substStart",
 			args{
-				[]map[string]string{
-					{"Source_Host": "123", "Source_User": "user"},
-				},
+				"Master_Host",
+				substituteRulesOld2New,
 			},
-			[]map[string]string{
-				{"Master_Host": "123"},
-			},
+			"Source_Host",
 		},
 		{
-			"+masterHost",
+			"+substEnd",
 			args{
-				[]map[string]string{
-					{"Master_Host": "123", "Source_User": "user"},
-				},
+				"SMTH_Master",
+				substituteRulesOld2New,
 			},
-			[]map[string]string{
-				{"Master_Host": "123"},
-			},
+			"SMTH_Source",
 		},
 		{
-			"+notFound",
+			"+substMId",
 			args{
-				[]map[string]string{
-					{"Fake_Host": "123", "Source_User": "user"},
+				"Read_Master_Log_Pos",
+				substituteRulesOld2New,
+			},
+			"Read_Source_Log_Pos",
+		},
+		{
+			"+substWhole",
+			args{
+				"Master",
+				substituteRulesOld2New,
+			},
+			"Source",
+		},
+		{
+			"+substWholeKey",
+			args{
+				"Get_master_public_key",
+				substituteRulesOld2New,
+			},
+			"Get_Source_public_key",
+		},
+		{
+			"+empty",
+			args{
+				"",
+				substituteRulesOld2New,
+			},
+			"", //nothing to substitute
+		},
+		{
+			"+noRules",
+			args{
+				"Smth_Master",
+				nil,
+			},
+			"Smth_Master", //no rules, stays intact
+		},
+		{
+			"+substMultiple",
+			args{
+				"Smth_Master_aa_Master",
+				substituteRulesOld2New,
+			},
+			"Smth_Source_aa_Source", //no rules, stays intact
+		},
+		{
+			"+spearatorWrong",
+			args{
+				"Smth-Master",
+				substituteRulesOld2New,
+			},
+			"Smth-Master", //no rules, stays intact
+		},
+		{
+			"+noSeparator",
+			args{
+				"aaMaster",
+				substituteRulesOld2New,
+			},
+			"aaMaster", //no rules, stays intact
+		},
+		{
+			"+doubleRulesNoCycle",
+			args{
+				"aa_Master",
+				map[string]string{
+					"Master": "Source",
+					"Source": "Master",
 				},
 			},
-			[]map[string]string{},
+			"aa_Source", //no rules, stays intact
 		},
 	}
 
@@ -204,10 +186,54 @@ func Test_getMasterHost(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
-			got := extractMasterHost(tt.args.data)
+			got := substituteKey(tt.args.key, tt.args.rules)
 
 			if diff := cmp.Diff(tt.want, got); diff != "" {
-				t.Errorf("extractMasterHost(): %s", diff)
+				t.Errorf("substituteKey(): %s", diff)
+			}
+		})
+	}
+}
+
+func Test_mergeKeysResult(t *testing.T) {
+	t.Parallel()
+
+	type args = struct {
+		initialData map[string]string
+		rules       map[string]string
+	}
+
+	tests := []struct {
+		name string
+		args args
+		want map[string]string
+	}{
+		{
+			"+old2new",
+			args{
+				oldStyleData,
+				substituteRulesOld2New,
+			},
+			duplicatedData,
+		},
+		{
+			"+new2old",
+			args{
+				newStyleData,
+				substituteRulesNew2Old,
+			},
+			duplicatedData,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
+			got := duplicate(tt.args.initialData, tt.args.rules)
+
+			if diff := cmp.Diff(tt.want, got); diff != "" {
+				t.Errorf("renameToNewStyle(): %s", diff)
 			}
 		})
 	}

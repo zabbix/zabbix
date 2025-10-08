@@ -39,27 +39,33 @@ const (
 	tlsCertParam    = "TLSCertFile"
 	tlsKeyParam     = "TLSKeyFile"
 	masterHostParam = "Master"
-	versionParam    = "Version"
 )
 
 var (
+	//nolint:gochecknoglobals // readability
 	uriDefaults = &uri.Defaults{Scheme: "tcp", Port: "3306"}
 
 	// Common params: [URI|Session][,User][,Password].
+	//nolint:gochecknoglobals //readability
 	paramURI = metric.NewConnParam(uriParam, "URI to connect or session name.").
-		WithDefault(uriDefaults.Scheme + "://localhost:" + uriDefaults.Port).WithSession().
+		WithDefault(uriDefaults.Scheme + "://localhost:" + uriDefaults.Port). //nolint:gci,gofmt //readablility
+		WithSession().
 		WithValidator(uri.URIValidator{Defaults: uriDefaults, AllowedSchemes: []string{"tcp", "unix"}})
+	//nolint:gochecknoglobals //readability
 	paramUsername = metric.NewConnParam("User", "MySQL user.").WithDefault("root")
+	//nolint:gochecknoglobals //readability
 	paramPassword = metric.NewConnParam("Password", "User's password.").WithDefault("")
-
+	//nolint:gochecknoglobals //readability
 	paramMasterHost = metric.NewParam(masterHostParam, "Master host.")
-	paramVersion    = metric.NewParam(versionParam, "Database server version.")
-
-	paramTLSConnect  = metric.NewSessionOnlyParam("TLSConnect", "DB connection encryption type.").WithDefault("")
-	paramTLSCaFile   = metric.NewSessionOnlyParam("TLSCAFile", "TLS ca file path.").WithDefault("")
+	//nolint:gochecknoglobals //readability
+	paramTLSConnect = metric.NewSessionOnlyParam("TLSConnect", "DB connection encryption type.").WithDefault("")
+	//nolint:gochecknoglobals //readability
+	paramTLSCaFile = metric.NewSessionOnlyParam("TLSCAFile", "TLS ca file path.").WithDefault("")
+	//nolint:gochecknoglobals //readability
 	paramTLSCertFile = metric.NewSessionOnlyParam("TLSCertFile", "TLS cert file path.").WithDefault("")
-	paramTLSKeyFile  = metric.NewSessionOnlyParam("TLSKeyFile", "TLS key file path.").WithDefault("")
-
+	//nolint:gochecknoglobals //readability
+	paramTLSKeyFile = metric.NewSessionOnlyParam("TLSKeyFile", "TLS key file path.").WithDefault("")
+	//nolint:gochecknoglobals //readability
 	metrics = metric.MetricSet{
 		keyCustomQuery: metric.New("Returns result of a custom query.",
 			[]*metric.Param{
@@ -91,14 +97,13 @@ var (
 		keyReplicationDiscovery: metric.New("Returns replication information in LLD format.",
 			[]*metric.Param{
 				paramURI, paramUsername, paramPassword,
-				paramVersion,
 				paramTLSConnect, paramTLSCaFile, paramTLSCertFile, paramTLSKeyFile,
 			}, false),
 
 		keyReplicationSlaveStatus: metric.New("Returns replication status.",
 			[]*metric.Param{
 				paramURI, paramUsername, paramPassword,
-				paramMasterHost, paramVersion,
+				paramMasterHost,
 				paramTLSConnect, paramTLSCaFile, paramTLSCertFile, paramTLSKeyFile,
 			}, false),
 
@@ -121,6 +126,7 @@ type handlerFunc func(
 	ctx context.Context, conn MyClient, params map[string]string, extraParams ...string,
 ) (res any, err error)
 
+//nolint:gochecknoinits
 func init() {
 	err := plugin.RegisterMetrics(&impl, pluginName, metrics.List()...)
 	if err != nil {

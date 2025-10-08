@@ -23,19 +23,12 @@ import (
 )
 
 func replicationSlaveStatusHandler(
-	ctx context.Context, conn MyClient, params map[string]string, _ ...string,
+	ctx context.Context,
+	conn MyClient,
+	params map[string]string,
+	_ ...string,
 ) (any, error) {
-	query, err := getReplicationQuery(versionThreshold, params[versionParam])
-	if err != nil {
-		return nil, errs.WrapConst(err, errGettingReplicationQuery)
-	}
-
-	rows, err := conn.Query(ctx, string(query))
-	if err != nil {
-		return nil, errs.WrapConst(err, zbxerr.ErrorCannotFetchData)
-	}
-
-	data, err := rows2data(rows)
+	data, err := querySlaveOrReplicaStatus(ctx, conn)
 	if err != nil {
 		return nil, errs.WrapConst(err, zbxerr.ErrorCannotFetchData)
 	}
@@ -44,18 +37,29 @@ func replicationSlaveStatusHandler(
 		return nil, errs.Wrap(zbxerr.ErrorEmptyResult, "replication is not configured")
 	}
 
+	isOldStyleKeys := isOldSyle(data)
+
 	if params[masterHostParam] != "" {
 		for _, m := range data {
-			if m[masterKey] == params[masterHostParam] ||
-				m[sourceKey] == params[masterHostParam] {
-				return parseResponse(m)
+			if m[masterKey] == params[masterHostParam] || m[sourceKey] == params[masterHostParam] {
+				switch isOldStyleKeys {
+				case true:
+					return parseResponse(duplicate(m, substituteRulesOld2New))
+				case false:
+					return parseResponse(duplicate(m, substituteRulesNew2Old))
+				}
 			}
 		}
 
 		return nil, errs.Wrapf(zbxerr.ErrorEmptyResult, "master host `%s` not found", params[masterHostParam])
 	}
 
-	return parseResponse(data)
+	// If no any host passed in the key's parameter, returns status records of all hosts.
+	if isOldStyleKeys {
+		return parseResponse(duplicateAll(data, substituteRulesOld2New))
+	}
+
+	return parseResponse(duplicateAll(data, substituteRulesNew2Old))
 }
 
 func parseResponse(data any) (any, error) {
