@@ -103,20 +103,23 @@ typedef struct
 }
 zbx_lld_rule_condition_t;
 
+ZBX_PTR_VECTOR_DECL(lld_rule_condition_ptr, zbx_lld_rule_condition_t*)
+ZBX_PTR_VECTOR_IMPL(lld_rule_condition_ptr, zbx_lld_rule_condition_t*)
+
 /* lld rule */
 typedef struct
 {
 	/* discovery rule source id */
-	zbx_uint64_t		templateid;
+	zbx_uint64_t				templateid;
 	/* discovery rule source conditions */
-	zbx_vector_ptr_t	conditions;
+	zbx_vector_lld_rule_condition_ptr_t	conditions;
 
 	/* discovery rule destination id */
-	zbx_uint64_t		itemid;
+	zbx_uint64_t				itemid;
 	/* the starting id to be used for destination condition ids */
-	zbx_uint64_t		conditionid;
+	zbx_uint64_t				conditionid;
 	/* discovery rule destination condition ids */
-	zbx_vector_uint64_t	conditionids;
+	zbx_vector_uint64_t			conditionids;
 }
 zbx_lld_rule_map_t;
 
@@ -541,7 +544,7 @@ static void	get_template_lld_rule_map(const zbx_vector_template_item_ptr_t *item
 		rule->templateid = item->templateid;
 		rule->conditionid = 0;
 		zbx_vector_uint64_create(&rule->conditionids);
-		zbx_vector_ptr_create(&rule->conditions);
+		zbx_vector_lld_rule_condition_ptr_create(&rule->conditions);
 
 		zbx_vector_lld_rule_map_ptr_append(rules, rule);
 
@@ -589,7 +592,7 @@ static void	get_template_lld_rule_map(const zbx_vector_template_item_ptr_t *item
 				condition->value_orig = NULL;
 				condition->op_orig = 0;
 
-				zbx_vector_ptr_append(&rule->conditions, condition);
+				zbx_vector_lld_rule_condition_ptr_append(&rule->conditions, condition);
 			}
 			else
 			{
@@ -610,7 +613,7 @@ static void	get_template_lld_rule_map(const zbx_vector_template_item_ptr_t *item
 					{
 						unsigned char	uchar_orig;
 
-						condition = (zbx_lld_rule_condition_t *)rule->conditions.values[index];
+						condition = rule->conditions.values[index];
 						ZBX_STR2UCHAR(uchar_orig, row[2]);
 
 						if (uchar_orig != condition->op)
@@ -761,8 +764,7 @@ static void	update_template_lld_rule_formulas(zbx_vector_template_item_ptr_t *it
 		for (j = 0; j < rule->conditions.values_num; j++)
 		{
 			zbx_uint64_t			id;
-			zbx_lld_rule_condition_t	*condition =
-					(zbx_lld_rule_condition_t *)rule->conditions.values[j];
+			zbx_lld_rule_condition_t	*condition = rule->conditions.values[j];
 
 			if (j < rule->conditionids.values_num)
 				id = rule->conditionids.values[j];
@@ -1164,7 +1166,7 @@ static void	save_template_lld_rules(zbx_vector_template_item_ptr_t *items, zbx_v
 
 			for (j = 0; j < rule->conditions.values_num; j++)
 			{
-				condition = (zbx_lld_rule_condition_t *)rule->conditions.values[j];
+				condition = rule->conditions.values[j];
 
 				zbx_db_insert_add_values(&db_insert, rule->conditionid, item->itemid,
 						(int)condition->op, condition->macro, condition->value);
@@ -1194,7 +1196,7 @@ static void	save_template_lld_rules(zbx_vector_template_item_ptr_t *items, zbx_v
 		{
 			const char	*d = "";
 
-			condition = (zbx_lld_rule_condition_t *)rule->conditions.values[j];
+			condition = rule->conditions.values[j];
 
 			if (0 == condition->upd_flags)
 				continue;
@@ -1250,7 +1252,7 @@ static void	save_template_lld_rules(zbx_vector_template_item_ptr_t *items, zbx_v
 		/* insert new rule conditions */
 		for (j = index; j < rule->conditions.values_num; j++)
 		{
-			condition = (zbx_lld_rule_condition_t *)rule->conditions.values[j];
+			condition = rule->conditions.values[j];
 
 			zbx_db_insert_add_values(&db_insert, rule->conditionid, rule->itemid,
 					(int)condition->op, condition->macro, condition->value);
@@ -1527,8 +1529,8 @@ static void	free_lld_rule_condition(zbx_lld_rule_condition_t *condition)
  ******************************************************************************/
 static void	free_lld_rule_map(zbx_lld_rule_map_t *rule)
 {
-	zbx_vector_ptr_clear_ext(&rule->conditions, (zbx_clean_func_t)free_lld_rule_condition);
-	zbx_vector_ptr_destroy(&rule->conditions);
+	zbx_vector_lld_rule_condition_ptr_clear_ext(&rule->conditions, free_lld_rule_condition);
+	zbx_vector_lld_rule_condition_ptr_destroy(&rule->conditions);
 
 	zbx_vector_uint64_destroy(&rule->conditionids);
 
