@@ -169,6 +169,11 @@ int	zbx_event_db_get_host(const zbx_db_event *event, zbx_dc_host_t *host, char *
  *                                                                            *
  * Purpose: retrieve discovered host value by event and field name            *
  *                                                                            *
+ * Parameters: event      - [IN]                                              *
+ *             replace_to - [IN/OUT] pointer to result buffer, can be         *
+ *                                   "(null)" if record is not found          *
+ *             fieldname  - [IN]                                              *
+ *                                                                            *
  * Return value: upon successful completion return SUCCEED                    *
  *               otherwise FAIL                                               *
  *                                                                            *

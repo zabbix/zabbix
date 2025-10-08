@@ -2141,7 +2141,7 @@ int	zbx_macro_message_common_resolv(zbx_macro_resolv_data_t *p, zbx_dc_um_handle
 			{
 				zbx_uint64_t	proxyid = 0;
 
-				ZBX_DBROW2UINT64(proxyid, *replace_to);
+				zbx_is_uint64(*replace_to, &proxyid);
 
 				if (0 == proxyid)
 					*replace_to = zbx_strdup(*replace_to, "");
@@ -2155,16 +2155,12 @@ int	zbx_macro_message_common_resolv(zbx_macro_resolv_data_t *p, zbx_dc_um_handle
 			{
 				zbx_uint64_t	proxyid = 0;
 
-				ZBX_DBROW2UINT64(proxyid, *replace_to);
+				zbx_is_uint64(*replace_to, &proxyid);
 
 				if (0 == proxyid)
-				{
 					*replace_to = zbx_strdup(*replace_to, "");
-				}
 				else
-				{
 					ret = zbx_db_get_proxy_value(proxyid, replace_to, "description");
-				}
 			}
 		}
 		else if (0 == strcmp(p->macro, MVAR_TIME))
