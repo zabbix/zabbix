@@ -304,7 +304,7 @@ class CControllerWidgetNavTreeView extends CControllerWidget {
 					// Recursively find all submaps in any depth and put them into an array.
 					$maps_to_process[$submap_element['sysmapid']] = false;
 
-					while (array_filter($maps_to_process, static fn ($item) => !$item)) {
+					while (array_filter($maps_to_process, static function ($item) {return !$item;})) {
 						foreach (array_keys($maps_to_process) as $linked_map) {
 							$maps_to_process[$linked_map] = true;
 
