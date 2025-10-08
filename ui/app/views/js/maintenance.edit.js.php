@@ -184,6 +184,9 @@ window.maintenance_edit = new class {
 
 	clone({rules, title, buttons}) {
 		document.getElementById('maintenanceid').remove();
+		const curl = new Curl('zabbix.php');
+		curl.setArgument('action', 'maintenance.create');
+		this.form_element.setAttribute('action', curl.getUrl());
 		this.form.reload(rules);
 
 		this._overlay.unsetLoading();
@@ -219,12 +222,7 @@ window.maintenance_edit = new class {
 				return;
 			}
 
-			const curl = new Curl('zabbix.php');
-			const action = fields.maintenanceid === undefined || fields.maintenanceid == 0
-				? 'maintenance.create'
-				: 'maintenance.update';
-
-			curl.setArgument('action', action);
+			const curl = new Curl(this.form_element.getAttribute('action'));
 
 			this.#post(curl.getUrl(), fields, (response) => {
 				overlayDialogueDestroy(this._overlay.dialogueid);
