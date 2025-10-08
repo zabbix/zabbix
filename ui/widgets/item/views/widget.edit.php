@@ -67,6 +67,13 @@ $form
 				getThresholdFieldsGroupView($data['fields'])->addRowClass('js-row-thresholds')
 			)
 			->addField(
+				(new CWidgetFieldRadioButtonListView($data['fields']['history']))->setFieldHint(
+					makeWarningIcon(
+						_('This setting applies only to numeric data. Non-numeric data will always be taken from history.')
+					)->setId('item-history-data-warning')
+				)
+			)
+			->addField(
 				(new CWidgetFieldSelectView($data['fields']['aggregate_function']))
 					->setFieldHint(
 						makeWarningIcon(_('With this setting only numeric items will be displayed.'))
@@ -79,13 +86,6 @@ $form
 					->setDateFormat(ZBX_FULL_DATE_TIME)
 					->setFromPlaceholder(_('YYYY-MM-DD hh:mm:ss'))
 					->setToPlaceholder(_('YYYY-MM-DD hh:mm:ss'))
-			)
-			->addField(
-				(new CWidgetFieldRadioButtonListView($data['fields']['history']))->setFieldHint(
-					makeWarningIcon(
-						_('This setting applies only to numeric data. Non-numeric data will always be taken from history.')
-					)->setId('item-history-data-warning')
-				)
 			)
 	)
 	->includeJsFile('widget.edit.js.php')
