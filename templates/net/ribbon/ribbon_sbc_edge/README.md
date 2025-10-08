@@ -1,11 +1,11 @@
 
-# Ribbon SBC 2000 by HTTP
+# Ribbon SBC Edge by HTTP
 
 ## Overview
 
-The Ribbon Session Border Controller 2000 (SBC 2000) is a security and interoperability solution for medium-sized businesses and large branch offices.
+The Ribbon Session Border Controller Edge (SBC Edge) is a security and interoperability solution for medium-sized businesses and large branch offices.
 
-This template is designed for the effortless deployment of Ribbon SBC 2000 monitoring and doesn't require any external scripts.
+This template is designed for the effortless deployment of Ribbon SBC Edge monitoring and doesn't require any external scripts.
 
 More details can be found in the official Ribbon documentation:
 - [REST API Reference](https://publicdoc.rbbn.com/spaces/UXAPIDOC/pages/17400598/Configuration+Resources)
@@ -96,9 +96,9 @@ This template has been tested on:
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Ribbon: System status - Card Failed|<p>The current system status - Card Failed.</p>|`last(/Ribbon SBC 2000 by HTTP/ribbon.system.status)=9`|Average||
-|Ribbon: High CPU utilization|<p>CPU utilization is too high. The system might be slow to respond.</p>|`min(/Ribbon SBC 2000 by HTTP/ribbon.cpu.usage,5m)>{$RIBBON.CPU.UTIL.CRIT}`|Average||
-|Ribbon: High memory utilization|<p>Memory utilization is too high. The system might be slow to respond.</p>|`min(/Ribbon SBC 2000 by HTTP/ribbon.memory.usage,5m)>{$RIBBON.MEMORY.UTIL.CRIT}`|Average||
+|Ribbon: System status - Card Failed|<p>The current system status - Card Failed.</p>|`last(/Ribbon SBC Edge by HTTP/ribbon.system.status)=9`|Average||
+|Ribbon: High CPU utilization|<p>CPU utilization is too high. The system might be slow to respond.</p>|`min(/Ribbon SBC Edge by HTTP/ribbon.cpu.usage,5m)>{$RIBBON.CPU.UTIL.CRIT}`|Average||
+|Ribbon: High memory utilization|<p>Memory utilization is too high. The system might be slow to respond.</p>|`min(/Ribbon SBC Edge by HTTP/ribbon.memory.usage,5m)>{$RIBBON.MEMORY.UTIL.CRIT}`|Average||
 
 ### LLD rule Network interface discovery
 
@@ -122,7 +122,7 @@ This template has been tested on:
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Ribbon: Interface [{#INTERFACE.NAME}]: Operational status is DOWN|<p>The operational status of the interface is down.</p>|`last(/Ribbon SBC 2000 by HTTP/ribbon.net.if.operator.state[{#INTERFACE.ID}])=1 and last(/Ribbon SBC 2000 by HTTP/ribbon.net.if.config.state[{#INTERFACE.ID}])=1`|Average||
+|Ribbon: Interface [{#INTERFACE.NAME}]: Operational status is DOWN|<p>The operational status of the interface is down.</p>|`last(/Ribbon SBC Edge by HTTP/ribbon.net.if.operator.state[{#INTERFACE.ID}])=1 and last(/Ribbon SBC Edge by HTTP/ribbon.net.if.config.state[{#INTERFACE.ID}])=1`|Average||
 
 ### LLD rule Disk partition discovery
 
@@ -144,7 +144,7 @@ This template has been tested on:
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Ribbon: Disk [{#DISK.NAME}]: Disk space usage is high|<p>Disk space usage is larger than the threshold.</p>|`min(/Ribbon SBC 2000 by HTTP/ribbon.disk.usage.percent[{#DISK.ID}],5m)>{$RIBBON.DISK.USED.MAX:"{#DISK.NAME}"}`|Average||
+|Ribbon: Disk [{#DISK.NAME}]: Disk space usage is high|<p>Disk space usage is larger than the threshold.</p>|`min(/Ribbon SBC Edge by HTTP/ribbon.disk.usage.percent[{#DISK.ID}],5m)>{$RIBBON.DISK.USED.MAX:"{#DISK.NAME}"}`|Average||
 
 ### LLD rule Power supply discovery
 
