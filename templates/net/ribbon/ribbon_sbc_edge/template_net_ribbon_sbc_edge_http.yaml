@@ -5,12 +5,12 @@ zabbix_export:
       name: 'Templates/Network devices'
   templates:
     - uuid: 6095f32a1e6f432a8a053e6245891632
-      template: 'Ribbon SBC 2000 by HTTP'
-      name: 'Ribbon SBC 2000 by HTTP'
+      template: 'Ribbon SBC Edge by HTTP'
+      name: 'Ribbon SBC Edge by HTTP'
       description: |
-        The Ribbon Session Border Controller 2000 (SBC 2000) is a security and interoperability solution for medium-sized businesses and large branch offices.
+        The Ribbon Session Border Controller Edge (SBC Edge) is a security and interoperability solution for medium-sized businesses and large branch offices.
         
-        This template is designed for the effortless deployment of Ribbon SBC 2000 monitoring and doesn't require any external scripts.
+        This template is designed for the effortless deployment of Ribbon SBC Edge monitoring and doesn't require any external scripts.
         
         More details can be found in the official Ribbon documentation:
         - REST API Reference: https://publicdoc.rbbn.com/spaces/UXAPIDOC/pages/17400598/Configuration+Resources
@@ -227,7 +227,7 @@ zabbix_export:
               value: cpu
           triggers:
             - uuid: 07f6e1ede4df44b88834391d527206ac
-              expression: 'min(/Ribbon SBC 2000 by HTTP/ribbon.cpu.usage,5m)>{$RIBBON.CPU.UTIL.CRIT}'
+              expression: 'min(/Ribbon SBC Edge by HTTP/ribbon.cpu.usage,5m)>{$RIBBON.CPU.UTIL.CRIT}'
               name: 'Ribbon: High CPU utilization'
               event_name: 'Ribbon: High CPU utilization (over {$RIBBON.CPU.UTIL.CRIT}% for 5m)'
               opdata: 'Current utilization: {ITEM.LASTVALUE}'
@@ -529,7 +529,7 @@ zabbix_export:
               value: memory
           triggers:
             - uuid: cd378b8df60c43d98e866f72c240b08e
-              expression: 'min(/Ribbon SBC 2000 by HTTP/ribbon.memory.usage,5m)>{$RIBBON.MEMORY.UTIL.CRIT}'
+              expression: 'min(/Ribbon SBC Edge by HTTP/ribbon.memory.usage,5m)>{$RIBBON.MEMORY.UTIL.CRIT}'
               name: 'Ribbon: High memory utilization'
               event_name: 'Ribbon: High memory utilization (over {$RIBBON.MEMORY.UTIL.CRIT}% for 5m)'
               opdata: 'Current utilization: {ITEM.LASTVALUE}'
@@ -1104,7 +1104,7 @@ zabbix_export:
               value: system
           triggers:
             - uuid: 01f76a527a4743618027c9dc972ce132
-              expression: 'last(/Ribbon SBC 2000 by HTTP/ribbon.system.status)=9'
+              expression: 'last(/Ribbon SBC Edge by HTTP/ribbon.system.status)=9'
               name: 'Ribbon: System status - Card Failed'
               priority: AVERAGE
               description: 'The current system status - Card Failed.'
@@ -1286,7 +1286,7 @@ zabbix_export:
                   value: '{#DISK.NAME}'
               trigger_prototypes:
                 - uuid: 1ef41f56bb1e42bf83fc14a98c60bdc3
-                  expression: 'min(/Ribbon SBC 2000 by HTTP/ribbon.disk.usage.percent[{#DISK.ID}],5m)>{$RIBBON.DISK.USED.MAX:"{#DISK.NAME}"}'
+                  expression: 'min(/Ribbon SBC Edge by HTTP/ribbon.disk.usage.percent[{#DISK.ID}],5m)>{$RIBBON.DISK.USED.MAX:"{#DISK.NAME}"}'
                   name: 'Ribbon: Disk [{#DISK.NAME}]: Disk space usage is high'
                   event_name: 'Ribbon: Disk [{#DISK.NAME}]: Disk space usage is high (more {$RIBBON.DISK.USED.MAX:"{#DISK.NAME}"}% for 5m)'
                   opdata: 'Current usage: {ITEM.LASTVALUE}'
@@ -1564,7 +1564,7 @@ zabbix_export:
                   value: '{#INTERFACE.NAME}'
           trigger_prototypes:
             - uuid: 131026a699674931b135604f1dea4b66
-              expression: 'last(/Ribbon SBC 2000 by HTTP/ribbon.net.if.operator.state[{#INTERFACE.ID}])=1 and last(/Ribbon SBC 2000 by HTTP/ribbon.net.if.config.state[{#INTERFACE.ID}])=1'
+              expression: 'last(/Ribbon SBC Edge by HTTP/ribbon.net.if.operator.state[{#INTERFACE.ID}])=1 and last(/Ribbon SBC Edge by HTTP/ribbon.net.if.config.state[{#INTERFACE.ID}])=1'
               name: 'Ribbon: Interface [{#INTERFACE.NAME}]: Operational status is DOWN'
               opdata: 'Current status: {ITEM.LASTVALUE1}'
               priority: AVERAGE
@@ -1799,7 +1799,7 @@ zabbix_export:
         - tag: target
           value: ribbon
         - tag: target
-          value: ribbon-sbc-2000
+          value: ribbon-sbc-edge
       macros:
         - macro: '{$RIBBON.CPU.UTIL.CRIT}'
           value: '90'
@@ -1867,7 +1867,7 @@ zabbix_export:
                     - type: ITEM
                       name: itemid.0
                       value:
-                        host: 'Ribbon SBC 2000 by HTTP'
+                        host: 'Ribbon SBC Edge by HTTP'
                         key: ribbon.cpu.usage
                     - type: INTEGER
                       name: scale_size
@@ -1920,7 +1920,7 @@ zabbix_export:
                     - type: ITEM
                       name: ds.0.itemids.0
                       value:
-                        host: 'Ribbon SBC 2000 by HTTP'
+                        host: 'Ribbon SBC Edge by HTTP'
                         key: ribbon.cpu.usage
                     - type: INTEGER
                       name: ds.1.axisy
@@ -1937,7 +1937,7 @@ zabbix_export:
                     - type: ITEM
                       name: ds.1.itemids.0
                       value:
-                        host: 'Ribbon SBC 2000 by HTTP'
+                        host: 'Ribbon SBC Edge by HTTP'
                         key: ribbon.memory.usage
                     - type: STRING
                       name: lefty_max
@@ -1984,7 +1984,7 @@ zabbix_export:
                     - type: ITEM
                       name: itemid.0
                       value:
-                        host: 'Ribbon SBC 2000 by HTTP'
+                        host: 'Ribbon SBC Edge by HTTP'
                         key: ribbon.chassis.status
                     - type: INTEGER
                       name: show.0
@@ -2014,7 +2014,7 @@ zabbix_export:
                     - type: ITEM
                       name: itemid.0
                       value:
-                        host: 'Ribbon SBC 2000 by HTTP'
+                        host: 'Ribbon SBC Edge by HTTP'
                         key: ribbon.memory.usage
                     - type: INTEGER
                       name: scale_size
@@ -2061,7 +2061,7 @@ zabbix_export:
                     - type: ITEM
                       name: itemid.0
                       value:
-                        host: 'Ribbon SBC 2000 by HTTP'
+                        host: 'Ribbon SBC Edge by HTTP'
                         key: ribbon.system.node.name
                     - type: INTEGER
                       name: show.0
@@ -2088,7 +2088,7 @@ zabbix_export:
                     - type: ITEM
                       name: itemid.0
                       value:
-                        host: 'Ribbon SBC 2000 by HTTP'
+                        host: 'Ribbon SBC Edge by HTTP'
                         key: ribbon.system.software.base.build
                     - type: INTEGER
                       name: show.0
@@ -2121,7 +2121,7 @@ zabbix_export:
                     - type: ITEM
                       name: ds.0.itemids.0
                       value:
-                        host: 'Ribbon SBC 2000 by HTTP'
+                        host: 'Ribbon SBC Edge by HTTP'
                         key: ribbon.number.call.attempts
                     - type: STRING
                       name: ds.1.color.0
@@ -2138,7 +2138,7 @@ zabbix_export:
                     - type: ITEM
                       name: ds.1.itemids.0
                       value:
-                        host: 'Ribbon SBC 2000 by HTTP'
+                        host: 'Ribbon SBC Edge by HTTP'
                         key: ribbon.number.call.currently
                     - type: STRING
                       name: ds.2.color.0
@@ -2155,7 +2155,7 @@ zabbix_export:
                     - type: ITEM
                       name: ds.2.itemids.0
                       value:
-                        host: 'Ribbon SBC 2000 by HTTP'
+                        host: 'Ribbon SBC Edge by HTTP'
                         key: ribbon.number.call.failed
                     - type: STRING
                       name: ds.3.color.0
@@ -2172,7 +2172,7 @@ zabbix_export:
                     - type: ITEM
                       name: ds.3.itemids.0
                       value:
-                        host: 'Ribbon SBC 2000 by HTTP'
+                        host: 'Ribbon SBC Edge by HTTP'
                         key: ribbon.number.call.succeeded
                     - type: INTEGER
                       name: legend_columns
@@ -2205,7 +2205,7 @@ zabbix_export:
                     - type: ITEM
                       name: itemid.0
                       value:
-                        host: 'Ribbon SBC 2000 by HTTP'
+                        host: 'Ribbon SBC Edge by HTTP'
                         key: ribbon.chassis.asm.license.type
                     - type: INTEGER
                       name: show.0
@@ -2231,7 +2231,7 @@ zabbix_export:
                     - type: ITEM
                       name: itemid.0
                       value:
-                        host: 'Ribbon SBC 2000 by HTTP'
+                        host: 'Ribbon SBC Edge by HTTP'
                         key: ribbon.system.serial.number
                     - type: INTEGER
                       name: show.0
@@ -2258,7 +2258,7 @@ zabbix_export:
                     - type: ITEM
                       name: itemid.0
                       value:
-                        host: 'Ribbon SBC 2000 by HTTP'
+                        host: 'Ribbon SBC Edge by HTTP'
                         key: ribbon.system.software.base.version
                     - type: INTEGER
                       name: show.0
@@ -2291,7 +2291,7 @@ zabbix_export:
                     - type: ITEM
                       name: ds.0.itemids.0
                       value:
-                        host: 'Ribbon SBC 2000 by HTTP'
+                        host: 'Ribbon SBC Edge by HTTP'
                         key: ribbon.chassis.board.bottom.temp1
                     - type: STRING
                       name: ds.1.color.0
@@ -2308,7 +2308,7 @@ zabbix_export:
                     - type: ITEM
                       name: ds.1.itemids.0
                       value:
-                        host: 'Ribbon SBC 2000 by HTTP'
+                        host: 'Ribbon SBC Edge by HTTP'
                         key: ribbon.chassis.board.top.temp2
                     - type: STRING
                       name: ds.2.color.0
@@ -2325,7 +2325,7 @@ zabbix_export:
                     - type: ITEM
                       name: ds.2.itemids.0
                       value:
-                        host: 'Ribbon SBC 2000 by HTTP'
+                        host: 'Ribbon SBC Edge by HTTP'
                         key: ribbon.chassis.core.switch.temp
                     - type: INTEGER
                       name: legend_columns
