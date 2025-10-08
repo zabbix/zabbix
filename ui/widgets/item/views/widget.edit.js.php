@@ -27,14 +27,22 @@ window.widget_form = new class extends CWidgetForm {
 	 */
 	#form;
 
+	/**
+	 * @type {Record<int, HTMLInputElement>}
+	 */
+	#show = {};
+
 	init({thresholds_colors}) {
 		this.#form = this.getForm();
 
-		this._show_description = document.getElementById(`show_${<?= Widget::SHOW_DESCRIPTION ?>}`);
-		this._show_value = document.getElementById(`show_${<?= Widget::SHOW_VALUE ?>}`);
-		this._show_time = document.getElementById(`show_${<?= Widget::SHOW_TIME ?>}`);
-		this._show_change_indicator = document.getElementById(`show_${<?= Widget::SHOW_CHANGE_INDICATOR ?>}`);
-		this._show_sparkline = document.getElementById(`show_${<?= Widget::SHOW_SPARKLINE ?>}`);
+		[<?= Widget::SHOW_DESCRIPTION ?>, <?= Widget::SHOW_VALUE ?>, <?= Widget::SHOW_TIME ?>,
+				<?= Widget::SHOW_CHANGE_INDICATOR ?>, <?= Widget::SHOW_SPARKLINE ?>]
+			.forEach(show_value => {
+				const checkbox = document.getElementById(`show_${show_value}`);
+				checkbox.addEventListener('change', () => this.updateForm());
+
+				this.#show[show_value] = checkbox;
+			});
 
 		this._units_show = document.getElementById('units_show');
 
@@ -47,14 +55,6 @@ window.widget_form = new class extends CWidgetForm {
 					}
 				});
 		});
-
-		const show = [this._show_description, this._show_value, this._show_time, this._show_change_indicator,
-			this._show_sparkline
-		];
-
-		for (const checkbox of show) {
-			checkbox.addEventListener('change', () => this.updateForm());
-		}
 
 		document.getElementById('units_show').addEventListener('change', () => this.updateForm());
 		document.getElementById('aggregate_function').addEventListener('change', () => this.updateForm());
@@ -80,61 +80,65 @@ window.widget_form = new class extends CWidgetForm {
 	}
 
 	updateForm() {
+		const show_description = this.#show[<?= Widget::SHOW_DESCRIPTION ?>].checked;
+		const show_value = this.#show[<?= Widget::SHOW_VALUE ?>].checked;
+		const show_time = this.#show[<?= Widget::SHOW_TIME ?>].checked;
+		const show_change_indicator = this.#show[<?= Widget::SHOW_CHANGE_INDICATOR ?>].checked;
+		const show_sparkline = this.#show[<?= Widget::SHOW_SPARKLINE ?>].checked;
+
 		const aggregate_function = document.getElementById('aggregate_function');
 
 		for (const element of this.#form.querySelectorAll('.fields-group-description')) {
-			element.style.display = this._show_description.checked ? '' : 'none';
+			element.style.display = show_description ? '' : 'none';
 
 			for (const input of element.querySelectorAll('input, textarea')) {
-				input.disabled = !this._show_description.checked;
+				input.disabled = !show_description;
 			}
 		}
 
 		for (const element of this.#form.querySelectorAll('.fields-group-value')) {
-			element.style.display = this._show_value.checked ? '' : 'none';
+			element.style.display = show_value ? '' : 'none';
 
 			for (const input of element.querySelectorAll('input')) {
-				input.disabled = !this._show_value.checked;
+				input.disabled = !show_value;
 			}
 		}
 
 		for (const element of this.#form.querySelectorAll(`#units, #units_pos, #units_size, #units_bold,
 			.${ZBX_STYLE_COLOR_PICKER}[color-field-name="units_color"]`
 		)) {
-			element.disabled = !this._show_value.checked || !document.getElementById('units_show').checked;
+			element.disabled = !show_value || !document.getElementById('units_show').checked;
 		}
 
 		for (const element of this.#form.querySelectorAll('.fields-group-time')) {
-			element.style.display = this._show_time.checked ? '' : 'none';
+			element.style.display = show_time ? '' : 'none';
 
 			for (const input of element.querySelectorAll('input')) {
-				input.disabled = !this._show_time.checked;
+				input.disabled = !show_time;
 			}
 		}
 
 		for (const element of this.#form.querySelectorAll('.fields-group-change-indicator')) {
-			element.style.display = this._show_change_indicator.checked ? '' : 'none';
+			element.style.display = show_change_indicator ? '' : 'none';
 
 			for (const input of element.querySelectorAll('input')) {
-				input.disabled = !this._show_change_indicator.checked;
+				input.disabled = !show_change_indicator;
 			}
 		}
 
 		for (const element of this.#form.querySelectorAll('.js-sparkline-row')) {
-			element.style.display = this._show_sparkline.checked ? '' : 'none';
+			element.style.display = show_sparkline ? '' : 'none';
 
 			for (const input of element.querySelectorAll('input')) {
-				input.disabled = !this._show_sparkline.checked;
+				input.disabled = !show_sparkline;
 			}
 		}
 
-		this.getField('sparkline[time_period]').disabled = !this._show_sparkline.checked;
+		this.getField('sparkline[time_period]').disabled = !show_sparkline;
 
-		this.getField('time_period').hidden = aggregate_function.value == <?= AGGREGATE_NONE ?>;
+		const aggregate_function_none = aggregate_function.value == <?= AGGREGATE_NONE ?>;
 
-		const aggregate_warning_functions = [<?= AGGREGATE_AVG ?>, <?= AGGREGATE_MIN ?>, <?= AGGREGATE_MAX ?>,
-			<?= AGGREGATE_SUM ?>
-		];
+		this.getField('time_period').hidden = aggregate_function_none;
 
 		const history_data_trends = document.querySelector('#history input[name="history"]:checked')
 			.value == <?= Widget::HISTORY_DATA_TRENDS ?>;
@@ -145,7 +149,7 @@ window.widget_form = new class extends CWidgetForm {
 			: 'none';
 
 		document.getElementById('item-aggregate-function-warning').style.display =
-				aggregate_warning_functions.includes(parseInt(aggregate_function.value)) && !this.#is_item_numeric
+			!aggregate_function_none && show_sparkline
 			? ''
 			: 'none';
 

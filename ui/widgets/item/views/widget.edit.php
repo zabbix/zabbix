@@ -25,6 +25,8 @@ use Widgets\Item\Widget;
 
 $form = new CWidgetFormView($data);
 
+$aggregate_function_field = $form->registerField(new CWidgetFieldSelectView($data['fields']['aggregate_function']));
+
 $form
 	->addField(
 		(new CWidgetFieldMultiSelectItemView($data['fields']['itemid']))
@@ -73,14 +75,15 @@ $form
 					)->setId('item-history-data-warning')
 				)
 			)
-			->addField(
-				(new CWidgetFieldSelectView($data['fields']['aggregate_function']))
-					->setFieldHint(
-						makeWarningIcon(_('With this setting only numeric items will be displayed.'))
-							->addStyle('display: none')
-							->setId('item-aggregate-function-warning')
-					)
-			)
+			->addItem([
+				$aggregate_function_field->getLabel(),
+				new CFormField([
+					$aggregate_function_field->getView(),
+					makeWarningIcon(_('With this setting only numeric items will be displayed.'))
+						->addStyle('display: none')
+						->setId('item-aggregate-function-warning')
+				]),
+			])
 			->addField(
 				(new CWidgetFieldTimePeriodView($data['fields']['time_period']))
 					->setDateFormat(ZBX_FULL_DATE_TIME)

@@ -340,7 +340,7 @@ window.tophosts_column_edit_form = new class {
 		}
 
 		const aggregate_function_warning = this.#form.querySelector('.js-aggregate-function-warning');
-		if (aggregate_function_warning) {
+		if (aggregate_function_warning !== null) {
 			const warning_show = aggregation_function_select.value !== <?= AGGREGATE_NONE ?> && display_sparkline;
 
 			aggregate_function_warning.style.display = warning_show ? '' : 'none';
