@@ -270,34 +270,15 @@ final class CSlaHelper {
 	public static function prepareSchedulePeriods(array $schedule): array {
 		$result = [];
 
-		$schedule_periods = [];
-
-		foreach ($schedule as $key => $value) {
-			if (strpos($key, 'schedule_enabled_') == 0 && $value == 1) {
-				$index = substr($key, strrpos($key, '_') + 1);
-
-				if ($schedule["schedule_period_$index"]) {
-					$schedule_periods[$index] = $schedule["schedule_period_$index"];
-				}
-			}
-		}
-
-		if (!$schedule) {
-			return [];
-		}
-
-		foreach ($schedule as $key => $value) {
-			$schedule_periods[substr($key, -1)] = $value;
-		}
-
 		foreach (range(0, 6) as $weekday) {
-			if (!array_key_exists($weekday, $schedule_periods)) {
+			if (!array_key_exists('schedule_enabled_'.$weekday, $schedule)
+					|| $schedule['schedule_enabled_'.$weekday] != 1
+					|| !array_key_exists('schedule_period_'.$weekday, $schedule)) {
 				continue;
 			}
 
-			$weekday_schedule_periods = trim($schedule_periods[$weekday]);
-
-			foreach (explode(',', $weekday_schedule_periods) as $schedule_period) {
+			foreach (explode(',', $schedule['schedule_period_'.$weekday]) as $schedule_period) {
+				$schedule_period = trim($schedule_period);
 				$period_time_parser = new CPeriodTimeParser();
 
 				if ($period_time_parser->parse($schedule_period) != CParser::PARSE_FAIL) {
