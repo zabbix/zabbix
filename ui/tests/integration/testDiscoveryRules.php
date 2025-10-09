@@ -534,24 +534,7 @@ class testDiscoveryRules extends CIntegrationTest {
 
 
 	/**
-	* Component configuration provider for agent related tests.
-	*
-	* @return array
-	*/
-	public function configurationProvider_checkDataCollection() {
-		return [
-			self::COMPONENT_SERVER => [
-				'UnavailableDelay' => 5,
-				'UnreachableDelay' => 1,
-				'DebugLevel' => 5,
-				'LogFileSize' => 0
-			]
-		];
-	}
-
-	/**
 	 * @depends testDiscoveryRules_opDelHostTags
-	 * @configurationDataProvider configurationProvider_checkDataCollection
 	 * @required-components server
 	 */
 	public function testDiscoveryRules_snmpErrorViaServer(): void  {
