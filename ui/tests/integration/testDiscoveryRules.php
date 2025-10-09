@@ -545,8 +545,8 @@ class testDiscoveryRules extends CIntegrationTest {
 				'UnreachableDelay' => 1,
 				'DebugLevel' => 5,
 				'LogFileSize' => 0
-			],
-		]
+			]
+		];
 	}
 
 	/**
