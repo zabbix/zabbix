@@ -23,6 +23,22 @@ final class CSlaHelper {
 	public const SCHEDULE_MODE_24X7		= 0;
 	public const SCHEDULE_MODE_CUSTOM 	= 1;
 
+	public static function validateCustomScheduleChecked(bool $schedule_mode, array $schedule): bool {
+		if ($schedule_mode == self::SCHEDULE_MODE_24X7) {
+			return true;
+		}
+
+		foreach (range(0, 6) as $weekday) {
+			if (array_key_exists('schedule_enabled_' . $weekday, $schedule)
+					&& $schedule['schedule_enabled_' . $weekday] == 1) {
+				return true;
+			}
+		}
+
+		info('Incorrect schedule: cannot be empty.');
+		return false;
+	}
+
 	/**
 	 * @return array
 	 */

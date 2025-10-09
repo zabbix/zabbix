@@ -47,9 +47,7 @@ class CControllerSlaCreate extends CController {
 			'timezone' => ['db sla.timezone',
 				'in' => array_merge([ZBX_DEFAULT_TIMEZONE], array_keys(CTimezoneHelper::getList()))],
 			'schedule_mode' => ['integer', 'in' => [CSlaHelper::SCHEDULE_MODE_24X7, CSlaHelper::SCHEDULE_MODE_CUSTOM]],
-			'schedule' => ['object', 'not_empty',
-				'fields' => $schedule_fields,
-				'messages' => ['not_empty' => _('At least one schedule must be added.')],
+			'schedule' => ['object', 'fields' => $schedule_fields,
 				'when' => ['schedule_mode', 'in' => [CSlaHelper::SCHEDULE_MODE_CUSTOM]]
 			],
 			'effective_date' => ['string', 'required', 'not_empty',
@@ -86,6 +84,9 @@ class CControllerSlaCreate extends CController {
 
 	protected function checkInput(): bool {
 		$ret = $this->validateInput(self::getValidationRules());
+		$ret = $ret && CSlaHelper::validateCustomScheduleChecked($this->getInput('schedule_mode'),
+			$this->getInput('schedule')
+		);
 
 		if (!$ret) {
 			$form_errors = $this->getValidationError();
