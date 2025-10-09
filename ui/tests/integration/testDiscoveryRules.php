@@ -28,7 +28,7 @@ class testDiscoveryRules extends CIntegrationTest {
 	const DISCOVERY_ACTION_NAME = 'Test discovery action';
 	const DISCOVERY_ACTION_NAME_ERR = 'Test discovery action with error';
 	const PROXY_NAME = 'Test proxy';
-	const SLEEP_TIME = 3;
+	const SLEEP_TIME = 1;
 	const MAX_ATTEMPTS_DISCOVERY = 60;
 
 	/* For tests with real SNMP agent */
