@@ -1105,12 +1105,12 @@ class CopyWidgetsDashboards {
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_GROUP,
 										'name' => 'groupids',
-										'value' => 50016
+										'value' => 4 // Zabbix servers.
 									],
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_HOST,
 										'name' => 'hostids',
-										'value' => 99133
+										'value' => 15001 // Template inheritance test host.
 									]
 								]
 							],
@@ -3116,12 +3116,12 @@ class CopyWidgetsDashboards {
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_GROUP,
 										'name' => 'groupids',
-										'value' => 50016 // Group in maintenance for Host availability widget.
+										'value' => 4 // Zabbix servers.
 									],
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_HOST,
 										'name' => 'hostids',
-										'value' => 99133 // Unknown host in maintenance.
+										'value' => 15001 // Template inheritance test host.
 									]
 								]
 							]

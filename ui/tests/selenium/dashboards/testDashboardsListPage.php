@@ -18,7 +18,7 @@ require_once __DIR__.'/../behaviors/CMessageBehavior.php';
 require_once __DIR__.'/../behaviors/CTableBehavior.php';
 
 /**
- * @dataSource TopHostsWidget, ItemValueWidget, DynamicItemWidgets, CopyWidgetsDashboards
+ * @dataSource TopHostsWidget, ItemValueWidget, DynamicItemWidgets, CopyWidgetsDashboards, HostAvailabilityWidget
  *
  * @backup dashboard, dashboard_user, dashboard_usrgrp
  */

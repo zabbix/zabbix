@@ -18,20 +18,17 @@ require_once __DIR__.'/../common/testWidgets.php';
 
 /**
  * @backup profiles
+ *
+ * @dataSource HostAvailabilityWidget
+ *
+ * @onBefore prepareData
  */
 class testDashboardHostAvailabilityWidget extends testWidgets {
 
-	/*
-	 * SQL query to get widget and widget_field tables to compare hash values, but without widget_fieldid
-	 * because it can change.
-	 */
-	private $sql = 'SELECT wf.widgetid, wf.type, wf.name, wf.value_int, wf.value_str, wf.value_groupid, wf.value_hostid,'.
-			' wf.value_itemid, wf.value_graphid, wf.value_sysmapid, w.widgetid, w.dashboard_pageid, w.type, w.name, w.x, w.y,'.
-			' w.width, w.height'.
-			' FROM widget_field wf'.
-			' INNER JOIN widget w'.
-			' ON w.widgetid=wf.widgetid ORDER BY wf.widgetid, wf.name, wf.value_int, wf.value_str, wf.value_groupid,'.
-			' wf.value_itemid, wf.value_graphid';
+	protected static $dashboardid;
+	public static function prepareData() {
+		self::$dashboardid = CDataHelper::get('HostAvailabilityWidget.dashboardid');
+	}
 
 	public static function getCreateWidgetData() {
 		return [
@@ -298,7 +295,7 @@ class testDashboardHostAvailabilityWidget extends testWidgets {
 	 * @dataProvider getCreateWidgetData
 	 */
 	public function testDashboardHostAvailabilityWidget_Create($data) {
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=1010');
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid);
 		$dashboard = CDashboardElement::find()->one();
 		$old_widget_count = $dashboard->getWidgets()->count();
 
@@ -321,6 +318,7 @@ class testDashboardHostAvailabilityWidget extends testWidgets {
 
 		// Check that widget has been added.
 		$this->checkRefreshInterval($data, $header);
+
 		// Verify widget content depending on the number of interfaces displayed (single or multiple)
 		$this->checkWidgetContent($data, $header);
 	}
@@ -511,7 +509,7 @@ class testDashboardHostAvailabilityWidget extends testWidgets {
 	 * @dataProvider getUpdateWidgetData
 	 */
 	public function testDashboardHostAvailabilityWidget_Update($data) {
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=1010');
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid);
 		$dashboard = CDashboardElement::find()->one();
 		$form = $dashboard->getWidget('Reference HA widget')->edit();
 
@@ -527,17 +525,19 @@ class testDashboardHostAvailabilityWidget extends testWidgets {
 
 		// Check that Dashboard has been saved and that widget has been added.
 		$this->checkDashboardUpdateMessage();
+
 		// Check that widget has been added.
 		$this->checkRefreshInterval($data, $header);
+
 		// Verify widget content depending on the number of interfaces displayed (single or multiple)
 		$this->checkWidgetContent($data, $header);
 	}
 
 	public function testDashboardHostAvailabilityWidget_SimpleUpdate() {
-		$initial_values = CDBHelper::getHash($this->sql);
+		$initial_values = CDBHelper::getHash(self::SQL);
 
 		// Open a dashboard widget and then save it without applying any changes
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=1010');
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid);
 		$dashboard = CDashboardElement::find()->one();
 		$form = $dashboard->getWidget('Reference HA widget')->edit();
 		$form->submit();
@@ -548,7 +548,7 @@ class testDashboardHostAvailabilityWidget extends testWidgets {
 
 		// Check that Dashboard has been saved and that there are no changes made to the widgets.
 		$this->checkDashboardUpdateMessage();
-		$this->assertEquals($initial_values, CDBHelper::getHash($this->sql));
+		$this->assertEquals($initial_values, CDBHelper::getHash(self::SQL));
 	}
 
 
@@ -589,9 +589,9 @@ class testDashboardHostAvailabilityWidget extends testWidgets {
 	 * @dataProvider getCancelData
 	 */
 	public function testDashboardHostAvailabilityWidget_Cancel($data) {
-		$old_hash = CDBHelper::getHash($this->sql);
+		$old_hash = CDBHelper::getHash(self::SQL);
 
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=1010');
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid);
 		$dashboard = CDashboardElement::find()->one();
 
 		// Start updating or creating a widget.
@@ -640,13 +640,13 @@ class testDashboardHostAvailabilityWidget extends testWidgets {
 		}
 
 		// Confirm that no changes were made to the widget.
-		$this->assertEquals($old_hash, CDBHelper::getHash($this->sql));
+		$this->assertEquals($old_hash, CDBHelper::getHash(self::SQL));
 	}
 
 	public function testDashboardHostAvailabilityWidget_Delete() {
 		$name = 'Reference HA widget to delete';
 
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=1010');
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid);
 		$dashboard = CDashboardElement::find()->one()->edit();
 		$widget = $dashboard->getWidget($name);
 		$dashboard->deleteWidget($name);
