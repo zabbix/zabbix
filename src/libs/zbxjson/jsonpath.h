@@ -97,12 +97,8 @@ typedef enum
 }
 zbx_json_path_expression_index_t;
 
-
 typedef struct zbx_jsonpath_token zbx_jsonpath_token;
-
 ZBX_PTR_VECTOR_DECL(jsonpath_token_ptr, zbx_jsonpath_token *)
-
-
 
 /* expression tokens in postfix notation */
 typedef struct

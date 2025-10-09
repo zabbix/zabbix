@@ -132,7 +132,7 @@ static int	smtp_readln(zbx_socket_t *s, const char **buf)
  *             also applied if the display name looks like a base64-encoded     *
  *             word.                                                            *
  *                                                                              *
- * Parameters: mailbox       - [IN] a null-terminated UTF-8 string              *
+ * Parameters: mailbox       - [IN] null-terminated UTF-8 string                *
  *             error         - [IN] pointer to string for reporting errors      *
  *             mailaddrs     - [OUT] array of mail addresses                    *
  *                                                                              *

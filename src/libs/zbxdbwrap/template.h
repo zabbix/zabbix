@@ -27,7 +27,6 @@ ZBX_PTR_VECTOR_DECL(lld_macro_ptr, zbx_template_lld_macro_t *)
 typedef struct _zbx_template_item_t zbx_template_item_t;
 ZBX_PTR_VECTOR_DECL(template_item_ptr, zbx_template_item_t *)
 
-
 struct _zbx_template_item_t
 {
 	zbx_uint64_t			itemid;

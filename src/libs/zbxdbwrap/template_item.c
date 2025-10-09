@@ -29,9 +29,6 @@
 #include "zbx_host_constants.h"
 #include "zbx_trigger_constants.h"
 
-
-
-
 struct _zbx_template_item_preproc_t
 {
 	zbx_uint64_t	item_preprocid;
@@ -504,14 +501,13 @@ static void	get_template_items(zbx_uint64_t hostid, const zbx_vector_uint64_t *t
 	zbx_vector_template_item_ptr_sort(items, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
 }
 
-
 /******************************************************************************
  *                                                                            *
  * Purpose: reads template lld rule conditions and host lld_rule identifiers  *
  *          from database                                                     *
  *                                                                            *
- * Parameters: items - [IN] the host items including lld rules                *
- *             rules - [OUT] the lld rule mapping                             *
+ * Parameters: items - [IN] host items including LLD rules                    *
+ *             rules - [OUT] LLD rule mapping                                 *
  *                                                                            *
  ******************************************************************************/
 static void	get_template_lld_rule_map(const zbx_vector_template_item_ptr_t *items,
@@ -659,7 +655,7 @@ static void	get_template_lld_rule_map(const zbx_vector_template_item_ptr_t *item
  *                                                                            *
  * Purpose: calculate identifiers for new item conditions                     *
  *                                                                            *
- * Parameters: rules - [IN] the lld rule mapping                              *
+ * Parameters: rules - [IN] LLD rule mapping                                  *
  *                                                                            *
  * Return value: The number of new item conditions to be inserted.            *
  *                                                                            *
@@ -718,12 +714,12 @@ static void	update_template_lld_formula(char **formula, zbx_uint64_t id_proto, z
 
 /******************************************************************************
  *                                                                            *
- * Purpose: translate template item condition identifiers in expression type  *
+ * Purpose: Translate template item condition identifiers in expression type  *
  *          discovery rule formulas to refer the host item condition          *
  *          identifiers instead.                                              *
  *                                                                            *
- * Parameters:  items  - [IN] the template items                              *
- *              rules  - [IN] the lld rule mapping                            *
+ * Parameters:  items  - [IN] template items                                  *
+ *              rules  - [IN] LLD rule mapping                                *
  *                                                                            *
  ******************************************************************************/
 static void	update_template_lld_rule_formulas(zbx_vector_template_item_ptr_t *items,
@@ -745,6 +741,7 @@ static void	update_template_lld_rule_formulas(zbx_vector_template_item_ptr_t *it
 		}
 
 		zbx_lld_rule_map_t	lrm_local;
+
 		lrm_local.templateid = item->templateid;
 
 		index = zbx_vector_lld_rule_map_ptr_bsearch(rules, &lrm_local, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
@@ -1104,11 +1101,11 @@ static void	save_template_items(zbx_uint64_t hostid, zbx_vector_template_item_pt
 
 /******************************************************************************
  *                                                                            *
- * Purpose: saves template lld rule item conditions to the target host in     *
+ * Purpose: saves template lld rule item conditions to target host in         *
  *          database                                                          *
  *                                                                            *
  * Parameters:  items              - [IN] template items                      *
- *              rules              - [IN] lld rule mapping                    *
+ *              rules              - [IN] LLD rule mapping                    *
  *              new_conditions     - [IN] number of new item conditions to be *
  *                                        inserted                            *
  *              audit_context_mode - [IN]                                     *
@@ -1520,13 +1517,6 @@ static void	free_lld_rule_condition(zbx_lld_rule_condition_t *condition)
 	zbx_free(condition);
 }
 
-/******************************************************************************
- *                                                                            *
- * Purpose: frees lld rule mapping                                            *
- *                                                                            *
- * Parameters:  item  - [IN] the lld rule mapping                             *
- *                                                                            *
- ******************************************************************************/
 static void	free_lld_rule_map(zbx_lld_rule_map_t *rule)
 {
 	zbx_vector_lld_rule_condition_ptr_clear_ext(&rule->conditions, free_lld_rule_condition);
@@ -1557,7 +1547,8 @@ static int	template_item_compare_func(const void *d1, const void *d2)
  *                                                                            *
  * Purpose: copy template item preprocessing options                          *
  *                                                                            *
- * Parameters: items       - [IN] vector of new/updated items                 *
+ * Parameters: items              - [IN] vector of new/updated items          *
+ *             audit_context_mode - [IN]                                      *
  *                                                                            *
  ******************************************************************************/
 static void	copy_template_items_preproc(const zbx_vector_template_item_ptr_t *items, int audit_context_mode)
@@ -1730,8 +1721,6 @@ static void	copy_template_items_preproc(const zbx_vector_template_item_ptr_t *it
 
 /******************************************************************************
  *                                                                            *
- * Purpose: copies template item tags                                         *
- *                                                                            *
  * Parameters:                                                                *
  *             items              - [IN] vector of new/updated items          *
  *             audit_context_mode - [IN]                                      *
@@ -1876,8 +1865,6 @@ static void	copy_template_item_tags(const zbx_vector_template_item_ptr_t *items,
 }
 
 /******************************************************************************
- *                                                                            *
- * Purpose: copies template item script parameters                            *
  *                                                                            *
  * Parameters:                                                                *
  *             items              - [IN] vector of new/updated items          *
@@ -2631,7 +2618,7 @@ static int	compare_template_items(const void *d1, const void *d2)
  *                                                                            *
  * Purpose: create dependent item index in master item data                   *
  *                                                                            *
- * Parameters: items       - [IN/OUT] the template items                      *
+ * Parameters: items - [IN/OUT] template items                                *
  *                                                                            *
  ******************************************************************************/
 static void	link_template_dependent_items(zbx_vector_template_item_ptr_t *items)

@@ -212,15 +212,15 @@ static int	zbx_vector_mpoint_ptr_search_fsname(const zbx_vector_mpoint_ptr_t *ve
 
 static int	vfs_fs_get_local(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	char				line[MAX_STRING_LEN], *p, *mntopts, *error;
-	FILE				*f;
-	zbx_uint64_t			total, not_used, used, itotal, inot_used, iused;
-	double				pfree, pused, ipfree, ipused;
-	struct zbx_json			j;
-	zbx_vector_mpoint_ptr_t		mpoints;
-	zbx_mpoint_t			*mpoint;
-	zbx_fsname_t			fsname;
-	int				ret = SYSINFO_RET_FAIL;
+	char			line[MAX_STRING_LEN], *p, *mntopts, *error;
+	FILE			*f;
+	zbx_uint64_t		total, not_used, used, itotal, inot_used, iused;
+	double			pfree, pused, ipfree, ipused;
+	struct zbx_json		j;
+	zbx_vector_mpoint_ptr_t	mpoints;
+	zbx_mpoint_t		*mpoint;
+	zbx_fsname_t		fsname;
+	int			ret = SYSINFO_RET_FAIL;
 
 	ZBX_UNUSED(request);
 

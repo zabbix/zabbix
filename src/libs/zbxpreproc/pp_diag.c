@@ -45,7 +45,7 @@ static void	diag_add_preproc_sequences(struct zbx_json *json, const char *field,
 	zbx_json_close(json);
 }
 
-void    zbx_pp_top_stats_free(zbx_pp_top_stats_t *pts)
+void	zbx_pp_top_stats_free(zbx_pp_top_stats_t *pts)
 {
 	zbx_free(pts);
 }

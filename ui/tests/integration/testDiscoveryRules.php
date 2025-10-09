@@ -532,7 +532,6 @@ class testDiscoveryRules extends CIntegrationTest {
 		]);
 	}
 
-
 	/**
 	 * @depends testDiscoveryRules_opDelHostTags
 	 * @required-components server

@@ -94,7 +94,7 @@ zbx_uint32_t	zbx_deserialize_uint31_compact(const unsigned char *ptr, zbx_uint32
 
 zbx_uint32_t	zbx_deserialize_vector_uint64_safe(const unsigned char *buffer, zbx_vector_uint64_t *vector_uint64)
 {
-	zbx_uint32_t value_len;
+	zbx_uint32_t	value_len;
 
 	memcpy(&value_len, buffer, sizeof(zbx_uint32_t));
 

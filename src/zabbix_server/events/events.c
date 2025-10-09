@@ -2619,7 +2619,7 @@ static void	event_problem_free(zbx_event_problem_t *problem)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: gets open problems created by the specified triggers              *
+ * Purpose: gets open problems created by specified triggers                  *
  *                                                                            *
  * Parameters: triggerids - [IN] trigger identifiers (sorted)                 *
  *             problems   - [OUT]                                             *
@@ -2815,8 +2815,6 @@ static int	match_tag(const char *name, const zbx_vector_tags_ptr_t *tags1, const
 }
 
 /******************************************************************************
- *                                                                            *
- * Purpose: processes trigger events                                          *
  *                                                                            *
  * Parameters: trigger_events - [IN] trigger events to process                *
  *             trigger_diff   - [IN] trigger changeset                        *
