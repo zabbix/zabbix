@@ -41,7 +41,7 @@ require_once dirname(__FILE__).'/testTriggerState.php';
 /* require_once dirname(__FILE__).'/testTlsRequest.php'; */
 require_once dirname(__FILE__).'/testActiveAvailability.php';
 require_once dirname(__FILE__).'/testEventsCauseAndSymptoms.php';
-require_once dirname(__FILE__).'/testDiscoveryRules.php';
+/* require_once dirname(__FILE__).'/testDiscoveryRules.php'; snmpsim does not work properly on new Debian */
 require_once dirname(__FILE__).'/testAutoregistration.php';
 require_once dirname(__FILE__).'/testAutoregistrationPSK.php';
 require_once dirname(__FILE__).'/testAutoregistrationHostMetaDataItem.php';
