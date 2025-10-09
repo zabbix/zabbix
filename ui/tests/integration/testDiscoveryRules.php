@@ -547,6 +547,7 @@ class testDiscoveryRules extends CIntegrationTest {
 				'LogFileSize' => 0
 			],
 		]
+	}
 
 	/**
 	 * @depends testDiscoveryRules_opDelHostTags
