@@ -104,10 +104,6 @@ class HostAvailabilityWidget {
 					'groupid' => $groupids['Group in maintenance for Host availability widget']
 				],
 				'status' => HOST_STATUS_MONITORED,
-				'maintenanceid' => $maintenanceid,
-				'maintenance_status' => 1,
-				'maintenance_type' => MAINTENANCE_TYPE_NORMAL,
-				'maintenance_from' => 1534971600,
 				'interfaces' => [
 					[
 						'type' => INTERFACE_TYPE_AGENT,
@@ -178,10 +174,6 @@ class HostAvailabilityWidget {
 				'groups' => [
 					'groupid' => $groupids['Group in maintenance for Host availability widget']
 				],
-				'maintenanceid' => $maintenanceid,
-				'maintenance_status' => 1,
-				'maintenance_type' => MAINTENANCE_TYPE_NORMAL,
-				'maintenance_from' => 1534971600,
 				'interfaces' => [
 					[
 						'type' => INTERFACE_TYPE_AGENT,
@@ -252,10 +244,6 @@ class HostAvailabilityWidget {
 				'groups' => [
 					'groupid' => $groupids['Group in maintenance for Host availability widget']
 				],
-				'maintenanceid' => $maintenanceid,
-				'maintenance_status' => 1,
-				'maintenance_type' => MAINTENANCE_TYPE_NORMAL,
-				'maintenance_from' => 1534971600,
 				'interfaces' => [
 					[
 						'type' => INTERFACE_TYPE_AGENT,
@@ -305,6 +293,23 @@ class HostAvailabilityWidget {
 		$interfaces = CDataHelper::getInterfaces($hosts);
 //		$interface_ids = $interfaces['ids']['Not available host'];
 //		$interface_id = $interfaces['ids']['Not available host']['zabbixzabbixzabbix1.com:10050'];
+
+		// Add hosts to maintenance.
+		$maintenace_hostids = [
+			$hosts['Not available host in maintenance'],
+			$hosts['Unknown host in maintenance'],
+			$hosts['Available host in maintenance']
+		];
+		foreach ($maintenace_hostids as $hostid) {
+			DBexecute('INSERT INTO maintenances_hosts (maintenance_hostid, maintenanceid, hostid) VALUES ('.zbx_dbstr($hostid).', '.
+				zbx_dbstr($maintenanceid).','.zbx_dbstr($hostid).')'
+			);
+
+			DBexecute('UPDATE hosts SET maintenanceid='.zbx_dbstr($maintenanceid).
+				', maintenance_status=1, maintenance_type='.MAINTENANCE_TYPE_NORMAL.', maintenance_from='.zbx_dbstr(1534971600).
+				' WHERE hostid='.zbx_dbstr($hostid)
+			);
+		}
 
 		$result = CDataHelper::call('dashboard.create', [
 			[
