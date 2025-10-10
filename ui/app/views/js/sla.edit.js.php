@@ -21,9 +21,7 @@
 
 window.sla_edit_popup = new class {
 
-	init({rules, slaid, service_tags, excluded_downtimes}) {
-		this.slaid = slaid;
-
+	init({rules, service_tags, excluded_downtimes}) {
 		this.overlay = overlays_stack.getById('sla.edit');
 		this.dialogue = this.overlay.$dialogue[0];
 		this.footer = this.overlay.$dialogue.$footer[0];
@@ -156,7 +154,7 @@ window.sla_edit_popup = new class {
 	}
 
 	clone({title, buttons, rules}) {
-		this.slaid = null;
+		document.getElementById('slaid').remove();
 
 		this.form.reload(rules);
 
@@ -174,7 +172,7 @@ window.sla_edit_popup = new class {
 		curl.setArgument('action', 'sla.delete');
 		curl.setArgument(CSRF_TOKEN_NAME, <?= json_encode(CCsrfTokenHelper::get('sla')) ?>);
 
-		this._post(curl.getUrl(), {slaids: [this.slaid]});
+		this._post(curl.getUrl(), {slaids: [this.form.findFieldByName('slaid').getValue()]});
 	}
 
 	submit() {
@@ -182,18 +180,6 @@ window.sla_edit_popup = new class {
 
 		const fields = this.form.getAllValues();
 		this.overlay.setLoading();
-
-		if (this.slaid !== null) {
-			fields.slaid = this.slaid;
-		}
-
-		Object.keys(fields.schedule).forEach(key => {
-			['schedule_enabled_', 'schedule_period_'].forEach(prefix => {
-				if (key.startsWith(prefix) && fields.schedule[key] === null) {
-					delete fields.schedule[key];
-				}
-			});
-		});
 
 		if ('service_tags' in fields) {
 			for (const key in fields.service_tags) {
@@ -206,7 +192,7 @@ window.sla_edit_popup = new class {
 		}
 
 		const curl = new Curl('zabbix.php');
-		curl.setArgument('action', this.slaid !== null ? 'sla.update' : 'sla.create');
+		curl.setArgument('action', 'slaid' in fields ? 'sla.update' : 'sla.create');
 
 		this.form.validateSubmit(fields)
 			.then((result) => {

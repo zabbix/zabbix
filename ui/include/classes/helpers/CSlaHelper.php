@@ -35,7 +35,7 @@ final class CSlaHelper {
 			}
 		}
 
-		info('Incorrect schedule: cannot be empty.');
+		info(_('Incorrect schedule: at least one period should be selected.'));
 		return false;
 	}
 

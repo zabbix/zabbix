@@ -307,7 +307,6 @@ $form
 		(new CScriptTag('
 			sla_edit_popup.init('.json_encode([
 				'rules' => $data['js_validation_rules'],
-				'slaid' => $data['slaid'],
 				'service_tags' => $data['form']['service_tags'],
 				'excluded_downtimes' => $data['form']['excluded_downtimes']
 			]).');
