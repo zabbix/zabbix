@@ -150,7 +150,10 @@ zabbix_export:
           type: DEPENDENT
           key: ribbon.chassis.type
           value_type: CHAR
-          description: 'Indicates whether the device is an SBC1000 or an SBC2000.'
+          description: |
+            Indicates the hardware or software platform type of the SBC system.
+            For hardware appliances, identifies whether the device is an SBC1000 or SBC2000.
+            For software-based deployments (SWe), indicates the virtual or software chassis type.
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -279,11 +282,11 @@ zabbix_export:
             			Ribbon.request.setProxy(Ribbon.params.proxy);
             		}
             
-            		Zabbix.log(4, '[ Ribbon SBC 2000 ] Sending request: ' + url);
+            		Zabbix.log(4, '[ Ribbon SBC Edge ] Sending request: ' + url);
             
             		response = Ribbon.request.get(Ribbon.params.url + url);
             
-            		Zabbix.log(4, '[ Ribbon SBC 2000  ] Received response with status code ' + Ribbon.request.getStatus() + ': ' + response);
+            		Zabbix.log(4, '[ Ribbon SBC Edge ] Received response with status code ' + Ribbon.request.getStatus() + ': ' + response);
             
             		if (Ribbon.request.getStatus() < 200 || Ribbon.request.getStatus() >= 300) {
             			throw 'Cannot connect to Ribbon SBC. Check debug log for more information.';
@@ -354,7 +357,7 @@ zabbix_export:
             	return JSON.stringify(result);
             }
             catch (error) {
-            	Zabbix.log(3, '[ Ribbon SBC 2000 ] ERROR: ' + error);
+            	Zabbix.log(3, '[ Ribbon SBC Edge ] ERROR: ' + error);
             	error_msg = 'Failed to get data from API:' + error;
             
             	return JSON.stringify({ 'error':  error_msg });
@@ -408,11 +411,11 @@ zabbix_export:
             			Ribbon.request.setProxy(Ribbon.params.proxy);
             		}
             
-            		Zabbix.log(4, '[ Ribbon SBC 2000 ] Sending request: ' + url);
+            		Zabbix.log(4, '[ Ribbon SBC Edge ] Sending request: ' + url);
             
             		response = Ribbon.request.get(Ribbon.params.url + url);
             
-            		Zabbix.log(4, '[ Ribbon SBC 2000  ] Received response with status code ' + Ribbon.request.getStatus() + ': ' + response);
+            		Zabbix.log(4, '[ Ribbon SBC Edge ] Received response with status code ' + Ribbon.request.getStatus() + ': ' + response);
             
             		if (Ribbon.request.getStatus() < 200 || Ribbon.request.getStatus() >= 300) {
             			throw 'Cannot connect to Ribbon SBC. Check debug log for more information.';
@@ -483,7 +486,7 @@ zabbix_export:
             	return JSON.stringify(result);
             }
             catch (error) {
-            	Zabbix.log(3, '[ Ribbon SBC 2000 ] ERROR: ' + error);
+            	Zabbix.log(3, '[ Ribbon SBC Edge ] ERROR: ' + error);
             	error_msg = 'Failed to get data from API:' + error;
             
             	return JSON.stringify({ 'error':  error_msg });
@@ -577,11 +580,11 @@ zabbix_export:
             			Ribbon.request.setProxy(Ribbon.params.proxy);
             		}
             
-            		Zabbix.log(4, '[ Ribbon SBC 2000 ] Sending request: ' + url);
+            		Zabbix.log(4, '[ Ribbon SBC Edge ] Sending request: ' + url);
             
             		response = Ribbon.request.get(Ribbon.params.url + url);
             
-            		Zabbix.log(4, '[ Ribbon SBC 2000  ] Received response with status code ' + Ribbon.request.getStatus() + ': ' + response);
+            		Zabbix.log(4, '[ Ribbon SBC Edge ] Received response with status code ' + Ribbon.request.getStatus() + ': ' + response);
             
             		if (Ribbon.request.getStatus() < 200 || Ribbon.request.getStatus() >= 300) {
             			throw 'Cannot connect to Ribbon SBC. Check debug log for more information.';
@@ -652,7 +655,7 @@ zabbix_export:
             	return JSON.stringify(result);
             }
             catch (error) {
-            	Zabbix.log(3, '[ Ribbon SBC 2000 ] ERROR: ' + error);
+            	Zabbix.log(3, '[ Ribbon SBC Edge ] ERROR: ' + error);
             	error_msg = 'Failed to get data from API:' + error;
             
             	return JSON.stringify({ 'error':  error_msg });
@@ -762,11 +765,11 @@ zabbix_export:
             			Ribbon.request.setProxy(Ribbon.params.proxy);
             		}
             
-            		Zabbix.log(4, '[ Ribbon SBC 2000 ] Sending request: ' + url);
+            		Zabbix.log(4, '[ Ribbon SBC Edge ] Sending request: ' + url);
             
             		response = Ribbon.request.get(Ribbon.params.url + url);
             
-            		Zabbix.log(4, '[ Ribbon SBC 2000  ] Received response with status code ' + Ribbon.request.getStatus() + ': ' + response);
+            		Zabbix.log(4, '[ Ribbon SBC Edge ] Received response with status code ' + Ribbon.request.getStatus() + ': ' + response);
             
             		if (Ribbon.request.getStatus() < 200 || Ribbon.request.getStatus() >= 300) {
             			throw 'Cannot connect to Ribbon SBC. Check debug log for more information.';
@@ -837,7 +840,7 @@ zabbix_export:
             	return JSON.stringify(result);
             }
             catch (error) {
-            	Zabbix.log(3, '[ Ribbon SBC 2000 ] ERROR: ' + error);
+            	Zabbix.log(3, '[ Ribbon SBC Edge ] ERROR: ' + error);
             	error_msg = 'Failed to get data from API:' + error;
             
             	return JSON.stringify({ 'error':  error_msg });
@@ -963,11 +966,11 @@ zabbix_export:
             			Ribbon.request.setProxy(Ribbon.params.proxy);
             		}
             
-            		Zabbix.log(4, '[ Ribbon SBC 2000 ] Sending request: ' + url);
+            		Zabbix.log(4, '[ Ribbon SBC Edge ] Sending request: ' + url);
             
             		response = Ribbon.request.get(Ribbon.params.url + url);
             
-            		Zabbix.log(4, '[ Ribbon SBC 2000  ] Received response with status code ' + Ribbon.request.getStatus() + ': ' + response);
+            		Zabbix.log(4, '[ Ribbon SBC Edge ] Received response with status code ' + Ribbon.request.getStatus() + ': ' + response);
             
             		if (Ribbon.request.getStatus() < 200 || Ribbon.request.getStatus() >= 300) {
             			throw 'Cannot connect to Ribbon SBC. Check debug log for more information.';
@@ -1037,7 +1040,7 @@ zabbix_export:
             	return JSON.stringify(result);
             }
             catch (error) {
-            	Zabbix.log(3, '[ Ribbon SBC 2000 ] ERROR: ' + error);
+            	Zabbix.log(3, '[ Ribbon SBC Edge ] ERROR: ' + error);
             	error_msg = 'Failed to get data from API:' + error;
             
             	return JSON.stringify({ 'error':  error_msg });
