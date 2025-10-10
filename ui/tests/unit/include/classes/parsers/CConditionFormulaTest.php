@@ -16,138 +16,191 @@
 
 use PHPUnit\Framework\TestCase;
 
-class CConditionFormulaTest extends TestCase {
+class CConditionFormulaParserTest extends TestCase {
 
 	/**
-	 * @var CConditionFormula
+	 * @var CConditionFormulaParser
 	 */
-	protected $conditionFormula;
+	protected $condition_formula_parser;
 
 	protected function setUp(): void {
-		$this->conditionFormula = new CConditionFormula();
+		$this->condition_formula_parser = new CConditionFormulaParser();
 	}
 
-	public function dataProviderParseValid() {
+	public function dataProvider() {
 		return [
-			['A'],
-			['A and B'],
-			['A or B'],
-			['(A)'],
-			['((A))'],
-			['A and (B and C)'],
-			['A and(B and C)'],
-			['(A and B)and C'],
-			['A and(not B and C)'],
-			['(  (   A    or   B   )   )   and    C'],
-			['A and not B'],
-			['not A and not B or C or not D and E'],
-			['(not A and not B) or C or (not D and E)'],
-			['(  (  not A  )  and   (   not B   )   )   or   C   or   (   (   (  not    D    and   E   ) ) )'],
-			['not (A and B)'],
-			['A and not(not B and C)'],
-			['A and not ( not B and C )'],
-			['A and not(not(not B and C))'],
-			['A and not ( not ( not B and C ) )']
-		];
-	}
-
-	/**
-	 * @dataProvider dataProviderParseValid
-	 *
-	 * @param $string
-	 */
-	public function testParseValid($string) {
-		$result = $this->conditionFormula->parse($string);
-
-		$this->assertSame(true, $result);
-	}
-
-	public function dataProviderParseInvalid() {
-		return [
-			['a'],
-			['A B'],
-			['A and'],
-			['A and or'],
-			['A an'],
-			['(A'],
-			['A)'],
-			['((A)'],
-			['(A))'],
-			['(A)B'],
-			['A and (B and C'],
-			['A andB'],
-			['AandB'],
-			['A and BandC'],
-			['A and (not B and A and not)'],
-			['A and (not B and A and not )'],
-			['A and (not B and A and NOT C  )'],
-			['A and (not B and A and not and not C)'],
-			['A and (not B and A and not not C)'],
-			['A andnot B'],
-			['A ornot B'],
-			['no A and B'],
-			['notA and B'],
-			['A not and B'],
-			['(A and B) not C'],
-			['(A and B)not C'],
-			['A AND B'],
-			['A and NOT B']
-		];
-	}
-
-	/**
-	 * @dataProvider dataProviderParseInvalid
-	 *
-	 * @param $string
-	 */
-	public function testParseInvalid($string) {
-		$result = $this->conditionFormula->parse($string);
-
-		$this->assertSame(false, $result);
-	}
-
-	public function dataProviderParseConstants() {
-		return [
-			['A', [
-				['value' => 'A', 'pos' => 0]
+			['', 0, [
+				'result' => CParser::PARSE_FAIL,
+				'match' => '',
+				'error' => 'expression is empty',
+				'constants' => []
 			]],
-			['A and B', [
-				['value' => 'A', 'pos' => 0],
-				['value' => 'B', 'pos' => 6]
+			['  )', 0, [
+				'result' => CParser::PARSE_FAIL,
+				'match' => '',
+				'error' => 'incorrect syntax near "  )"',
+				'constants' => []
 			]],
-			['A and B or C', [
-				['value' => 'A', 'pos' => 0],
-				['value' => 'B', 'pos' => 6],
-				['value' => 'C', 'pos' => 11]
+			['A or not ', 0, [
+				'result' => CParser::PARSE_SUCCESS_CONT,
+				'match' => 'A ',
+				'error' => 'incorrect syntax near " "',
+				'constants' => [
+					['value' => 'A', 'pos' => 0]
+				]
 			]],
-			['A and B or A', [
-				['value' => 'A', 'pos' => 0],
-				['value' => 'B', 'pos' => 6],
-				['value' => 'A', 'pos' => 11]
+			['A or (not C', 0, [
+				'result' => CParser::PARSE_SUCCESS_CONT,
+				'match' => 'A ',
+				'error' => 'incorrect syntax near "C"',
+				'constants' => [
+					['value' => 'A', 'pos' => 0]
+				]
 			]],
-			['A and not B or C', [
-				['value' => 'A', 'pos' => 0],
-				['value' => 'B', 'pos' => 10],
-				['value' => 'C', 'pos' => 15]
+			[' #A', 0, [
+				'result' => CParser::PARSE_FAIL,
+				'match' => '',
+				'error' => 'incorrect syntax near " #A"',
+				'constants' => []
 			]],
-			['A and NOT and B', [
-				['value' => 'A', 'pos' => 0],
-				['value' => 'NOT', 'pos' => 6],
-				['value' => 'B', 'pos' => 14]
+			['A', 0, [
+				'result' => CParser::PARSE_SUCCESS,
+				'match' => 'A',
+				'error' => '',
+				'constants' => [
+					['value' => 'A', 'pos' => 0]
+				]
+			]],
+			['A and B', 0, [
+				'result' => CParser::PARSE_SUCCESS,
+				'match' => 'A and B',
+				'error' => '',
+				'constants' => [
+					['value' => 'A', 'pos' => 0],
+					['value' => 'B', 'pos' => 6]
+				]
+			]],
+			['A or B', 0, [
+				'result' => CParser::PARSE_SUCCESS,
+				'match' => 'A or B',
+				'error' => '',
+				'constants' => [
+					['value' => 'A', 'pos' => 0],
+					['value' => 'B', 'pos' => 5]
+				]
+			]],
+			['   not A ', 0, [
+				'result' => CParser::PARSE_SUCCESS,
+				'match' => '   not A ',
+				'error' => '',
+				'constants' => [
+					['value' => 'A', 'pos' => 7]
+				]
+			]],
+			['(A)', 0, [
+				'result' => CParser::PARSE_SUCCESS,
+				'match' => '(A)',
+				'error' => '',
+				'constants' => [
+					['value' => 'A', 'pos' => 1]
+				]
+			]],
+			['((A))', 0, [
+				'result' => CParser::PARSE_SUCCESS,
+				'match' => '((A))',
+				'error' => '',
+				'constants' => [
+					['value' => 'A', 'pos' => 2]
+				]
+			]],
+			['  A and (not B or C  )and(  not D and not E)   ', 0, [
+				'result' => CParser::PARSE_SUCCESS,
+				'match' => '  A and (not B or C  )and(  not D and not E)   ',
+				'error' => '',
+				'constants' => [
+					['value' => 'A', 'pos' => 2],
+					['value' => 'B', 'pos' => 13],
+					['value' => 'C', 'pos' => 18],
+					['value' => 'D', 'pos' => 32],
+					['value' => 'E', 'pos' => 42]
+				]
+			]],
+			['   (  (   A    or   B   )   )   and not     C   ', 3, [
+				'result' => CParser::PARSE_SUCCESS,
+				'match' => '(  (   A    or   B   )   )   and not     C   ',
+				'error' => '',
+				'constants' => [
+					['value' => 'A', 'pos' => 10],
+					['value' => 'B', 'pos' => 20],
+					['value' => 'C', 'pos' => 44]
+				]
+			]],
+			['   (  (   A    or   B   )   )   and not     C   ', 4, [
+				'result' => CParser::PARSE_SUCCESS_CONT,
+				'match' => '  (   A    or   B   )   ',
+				'error' => 'incorrect syntax near " )   and not     C   "',
+				'constants' => [
+					['value' => 'A', 'pos' => 10],
+					['value' => 'B', 'pos' => 20]
+				]
+			]],
+			['((A or B))) and not C', 0, [
+				'result' => CParser::PARSE_SUCCESS_CONT,
+				'match' => '((A or B))',
+				'error' => 'incorrect syntax near ")) and not C"',
+				'constants' => [
+					['value' => 'A', 'pos' => 2],
+					['value' => 'B', 'pos' => 7]
+				]
+			]],
+			['A and B or A', 0, [
+				'result' => CParser::PARSE_SUCCESS,
+				'match' => 'A and B or A',
+				'error' => '',
+				'constants' => [
+					['value' => 'A', 'pos' => 0],
+					['value' => 'B', 'pos' => 6],
+					['value' => 'A', 'pos' => 11]
+				]
+			]],
+			['A and not B or C', 0, [
+				'result' => CParser::PARSE_SUCCESS,
+				'match' => 'A and not B or C',
+				'error' => '',
+				'constants' => [
+					['value' => 'A', 'pos' => 0],
+					['value' => 'B', 'pos' => 10],
+					['value' => 'C', 'pos' => 15]
+				]
+			]],
+			['A and NOT and B', 0, [
+				'result' => CParser::PARSE_SUCCESS,
+				'match' => 'A and NOT and B',
+				'error' => '',
+				'constants' => [
+					['value' => 'A', 'pos' => 0],
+					['value' => 'NOT', 'pos' => 6],
+					['value' => 'B', 'pos' => 14]
+				]
 			]]
 		];
 	}
 
 	/**
-	 * @dataProvider dataProviderParseConstants
+	 * @dataProvider dataProvider
 	 *
-	 * @param $string
-	 * @param $expectedConstants
+	 * @param string $formula
+	 * @param int    $pos
+	 * @param array  $expected
 	 */
-	public function testParseConstants($string, $expectedConstants) {
-		$result = $this->conditionFormula->parse($string);
+	public function testParseConstants(string $formula, int $pos, array $expected) {
+		$result = $this->condition_formula_parser->parse($formula, $pos);
 
-		$this->assertSame(true, $result);
-		$this->assertSame($expectedConstants, $this->conditionFormula->constants);
+		$this->assertSame($expected, [
+			'result' => $result,
+			'match' => $this->condition_formula_parser->getMatch(),
+			'error' => $this->condition_formula_parser->getError(),
+			'constants' => $this->condition_formula_parser->getConstants()
+		]);
 	}
 }
