@@ -90,7 +90,7 @@ This template has been tested on:
 |Chassis board bottom temp1|<p>Indicates the temperature on the bottom of the main board in degrees Celsius.</p>|Dependent item|ribbon.chassis.board.bottom.temp1<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.chassis.rt_Chassis_BoardBottom_Temp1`</p></li></ul>|
 |Chassis board top temp2|<p>Indicates the temperature on the top of the main board in degrees Celsius.</p>|Dependent item|ribbon.chassis.board.top.temp2<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.chassis.rt_Chassis_BoardTop_Temp2`</p></li></ul>|
 |Chassis core switch temp|<p>Indicates the core switch temperature in degrees Celsius.</p>|Dependent item|ribbon.chassis.core.switch.temp<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.chassis.rt_Chassis_CoreSwitch_Temp`</p></li></ul>|
-|Chassis type|<p>Indicates whether the device is an SBC1000 or an SBC2000.</p>|Dependent item|ribbon.chassis.type<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.chassis.rt_Chassis_Type`</p></li><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
+|Chassis type|<p>Indicates the hardware or software platform type of the SBC system.</p><p>For hardware appliances, identifies whether the device is an SBC1000 or SBC2000.</p><p>For software-based deployments (SWe), indicates the virtual or software chassis type.</p>|Dependent item|ribbon.chassis.type<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.chassis.rt_Chassis_Type`</p></li><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
 
 ### Triggers
 
