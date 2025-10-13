@@ -35,16 +35,13 @@ class testDashboardHostAvailabilityWidget extends testWidgets {
 			// #0 Create a Host availability widget with default values.
 			[
 				[
-					'fields' => [
-						'Type' => 'Host availability'
-					]
+					'fields' => []
 				]
 			],
 			// #1 Create a Host availability widget with default values for Zabbix agent interface.
 			[
 				[
 					'fields' => [
-						'Type' => 'Host availability',
 						'Name' => 'Single interface widget - default',
 						'Interface type' => 'Zabbix agent (passive checks)'
 					]
@@ -54,7 +51,6 @@ class testDashboardHostAvailabilityWidget extends testWidgets {
 			[
 				[
 					'fields' => [
-						'Type' => 'Host availability',
 						'Name' => 'Include hosts in maintenance',
 						'Refresh interval' => '1 minute',
 						'Host groups' => ['Group for Host availability widget', 'Group in maintenance for Host availability widget'],
@@ -74,7 +70,6 @@ class testDashboardHostAvailabilityWidget extends testWidgets {
 			[
 				[
 					'fields' => [
-						'Type' => 'Host availability',
 						'Name' => 'Dont include hosts in maintenance',
 						'Refresh interval' => '10 minutes',
 						'Host groups' => ['Group for Host availability widget', 'Group in maintenance for Host availability widget'],
@@ -94,7 +89,6 @@ class testDashboardHostAvailabilityWidget extends testWidgets {
 			[
 				[
 					'fields' => [
-						'Type' => 'Host availability',
 						'Name' => 'Host availability widget - IPMI with maintenance',
 						'Refresh interval' => '10 seconds',
 						'Interface type' => 'IPMI',
@@ -113,7 +107,6 @@ class testDashboardHostAvailabilityWidget extends testWidgets {
 			[
 				[
 					'fields' => [
-						'Type' => 'Host availability',
 						'Name' => 'Host availability widget - SNMP',
 						'Refresh interval' => '2 minutes',
 						'Interface type' => 'SNMP',
@@ -132,7 +125,6 @@ class testDashboardHostAvailabilityWidget extends testWidgets {
 			[
 				[
 					'fields' => [
-						'Type' => 'Host availability',
 						'Name' => 'Host availability widget - JMX',
 						'Refresh interval' => '10 minutes',
 						'Interface type' => 'JMX'
@@ -150,7 +142,6 @@ class testDashboardHostAvailabilityWidget extends testWidgets {
 			[
 				[
 					'fields' => [
-						'Type' => 'Host availability',
 						'Name' => 'All interfaces selected',
 						'Layout' => 'Vertical',
 						'Interface type' => ['Zabbix agent (passive checks)', 'SNMP', 'JMX', 'IPMI']
@@ -162,7 +153,6 @@ class testDashboardHostAvailabilityWidget extends testWidgets {
 			[
 				[
 					'fields' => [
-						'Type' => 'Host availability',
 						'Name' => 'HA widget - include hosts in maintenance SNMP + JMX + IPMI',
 						'Refresh interval' => '1 minute',
 						'Include hosts in maintenance' => true,
@@ -204,7 +194,6 @@ class testDashboardHostAvailabilityWidget extends testWidgets {
 			[
 				[
 					'fields' => [
-						'Type' => 'Host availability',
 						'Name' => 'Vertical HA widget - SNMP + JMX + IPMI',
 						'Refresh interval' => '10 minutes',
 						'Layout' => 'Vertical',
@@ -248,7 +237,6 @@ class testDashboardHostAvailabilityWidget extends testWidgets {
 			[
 				[
 					'fields' => [
-						'Type' => 'Host availability',
 						'Name' => 'Misconfiguration - zeros should be returned',
 						'Refresh interval' => '1 minute',
 						'Host groups' => ['Group to check Overview'],
@@ -302,6 +290,7 @@ class testDashboardHostAvailabilityWidget extends testWidgets {
 		// Add a widget.
 		$dialogue = $dashboard->edit()->addWidget();
 		$form = $dialogue->asForm();
+		$form->fill(['Type' => CFormElement::RELOADABLE_FILL('Host availability')]);
 		$form->fill($data['fields']);
 		COverlayDialogElement::find()->waitUntilReady()->one();
 		$form->submit();
@@ -348,7 +337,6 @@ class testDashboardHostAvailabilityWidget extends testWidgets {
 			[
 				[
 					'fields' => [
-						'Type' => 'Host availability',
 						'Name' => 'Return hosts in maintenance',
 						'Refresh interval' => '10 seconds',
 						'Host groups' => ['Group in maintenance for Host availability widget'],
@@ -368,7 +356,6 @@ class testDashboardHostAvailabilityWidget extends testWidgets {
 			[
 				[
 					'fields' => [
-						'Type' => 'Host availability',
 						'Name' => 'Layout is now vertical',
 						'Refresh interval' => '2 minutes',
 						'Layout' => 'Vertical',
@@ -387,7 +374,6 @@ class testDashboardHostAvailabilityWidget extends testWidgets {
 			[
 				[
 					'fields' => [
-						'Type' => 'Host availability',
 						'Name' => '',
 						'Refresh interval' => 'Default (15 minutes)',
 						'Interface type' => 'Zabbix agent (passive checks)'
@@ -398,7 +384,6 @@ class testDashboardHostAvailabilityWidget extends testWidgets {
 			[
 				[
 					'fields' => [
-						'Type' => 'Host availability',
 						'Name' => 'Show completely all hosts',
 						'Refresh interval' => 'No refresh',
 						'Interface type' => 'Zabbix agent (passive checks)',
@@ -410,7 +395,6 @@ class testDashboardHostAvailabilityWidget extends testWidgets {
 			[
 				[
 					'fields' => [
-						'Type' => 'Host availability',
 						'Name' => 'Show completely all hosts for Zabbix agent and SNMP',
 						'Refresh interval' => '10 seconds',
 						'Interface type' => ['Zabbix agent (passive checks)', 'SNMP'],
@@ -423,7 +407,6 @@ class testDashboardHostAvailabilityWidget extends testWidgets {
 			[
 				[
 					'fields' => [
-						'Type' => 'Host availability',
 						'Name' => 'Show hosts for Zabbix agent, SNMP and JMX',
 						'Refresh interval' => '2 minutes',
 						'Interface type' => ['Zabbix agent (passive checks)', 'SNMP', 'JMX']
@@ -435,7 +418,6 @@ class testDashboardHostAvailabilityWidget extends testWidgets {
 			[
 				[
 					'fields' => [
-						'Type' => 'Host availability',
 						'Name' => 'Show completely all hosts for all interfaces',
 						'Refresh interval' => '2 minutes',
 						'Interface type' => ['Zabbix agent (passive checks)', 'SNMP', 'JMX', 'IPMI'],
@@ -449,7 +431,6 @@ class testDashboardHostAvailabilityWidget extends testWidgets {
 			[
 				[
 					'fields' => [
-						'Type' => 'Host availability',
 						'Name' => 'Show all hosts for all interfaces of 2 groups',
 						'Refresh interval' => '10 minutes',
 						'Host groups' => ['Group for Host availability widget', 'Group in maintenance for Host availability widget'],
@@ -515,6 +496,7 @@ class testDashboardHostAvailabilityWidget extends testWidgets {
 
 		// Update the widget.
 		$header = ($data['fields']['Name'] === '') ? 'Host availability' : $data['fields']['Name'];
+		$form->fill(['Type' => CFormElement::RELOADABLE_FILL('Host availability')]);
 		$form->fill($data['fields']);
 		$form->submit();
 		$this->page->waitUntilReady();

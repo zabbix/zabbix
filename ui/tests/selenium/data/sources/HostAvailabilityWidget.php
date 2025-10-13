@@ -51,22 +51,16 @@ class HostAvailabilityWidget {
 						'useip' => INTERFACE_USE_DNS,
 						'main' => INTERFACE_PRIMARY,
 						'ip' => '127.0.0.1',
-						'dns' => 'zabbixzabbixzabbix1.com',
+						'dns' => 'zabbixzabbixzabbix.com',
 						'port' => '10050'
-//						'available' => 2,
-//						'error' => 'ERROR Agent',
-//						'errors_from' => 1534971600
 					],
 					[
 						'type' => INTERFACE_TYPE_SNMP,
 						'useip' => INTERFACE_USE_DNS,
 						'main' => INTERFACE_PRIMARY,
 						'ip' => '127.0.0.1',
-						'dns' => 'zabbixzabbixzabbix2.com',
+						'dns' => 'zabbixzabbixzabbix.com',
 						'port' => '10050',
-//						'available' => 2,
-//						'error' => 'ERROR SNMP',
-//						'errors_from' => 1534971600,
 						'details' => [
 							'version' => SNMP_V2C,
 							'bulk' => SNMP_BULK_ENABLED,
@@ -78,22 +72,16 @@ class HostAvailabilityWidget {
 						'useip' => INTERFACE_USE_DNS,
 						'main' => INTERFACE_PRIMARY,
 						'ip' => '127.0.0.1',
-						'dns' => 'zabbixzabbixzabbix3.com',
+						'dns' => 'zabbixzabbixzabbix.com',
 						'port' => '10050'
-//						'available' => 2,
-//						'error' => 'ERROR IPMI',
-//						'errors_from' => 1534971600
 					],
 					[
 						'type' => INTERFACE_TYPE_JMX,
 						'useip' => INTERFACE_USE_DNS,
 						'main' => INTERFACE_PRIMARY,
 						'ip' => '127.0.0.1',
-						'dns' => 'zabbixzabbixzabbix4.com',
+						'dns' => 'zabbixzabbixzabbix.com',
 						'port' => '10050'
-//						'available' => 2,
-//						'error' => 'ERROR JMX',
-//						'errors_from' => 1534971600
 					]
 				]
 			],
@@ -112,7 +100,6 @@ class HostAvailabilityWidget {
 						'ip' => '127.0.0.1',
 						'dns' => 'zabbixzabbixzabbix.com',
 						'port' => '10050'
-//						'available' => 2
 					],
 					[
 						'type' => INTERFACE_TYPE_SNMP,
@@ -121,7 +108,6 @@ class HostAvailabilityWidget {
 						'ip' => '127.0.0.1',
 						'dns' => 'zabbixzabbixzabbix.com',
 						'port' => '10050',
-//						'available' => 2,
 						'details' => [
 							'version' => SNMP_V2C,
 							'bulk' => SNMP_BULK_ENABLED,
@@ -135,7 +121,6 @@ class HostAvailabilityWidget {
 						'ip' => '127.0.0.1',
 						'dns' => 'zabbixzabbixzabbix.com',
 						'port' => '10050'
-//						'available' => 2
 					],
 					[
 						'type' => INTERFACE_TYPE_JMX,
@@ -144,7 +129,6 @@ class HostAvailabilityWidget {
 						'ip' => '127.0.0.1',
 						'dns' => 'zabbixzabbixzabbix.com',
 						'port' => '10050'
-//						'available' => 2
 					]
 				]
 			],
@@ -163,7 +147,6 @@ class HostAvailabilityWidget {
 						'ip' => '127.0.0.1',
 						'dns' => 'zabbixzabbixzabbix.com',
 						'port' => '10050'
-//						'available' => 0
 					]
 				]
 			],
@@ -182,7 +165,6 @@ class HostAvailabilityWidget {
 						'ip' => '127.0.0.1',
 						'dns' => 'zabbixzabbixzabbix.com',
 						'port' => '10050'
-//						'available' => 0
 					]
 				]
 			],
@@ -201,7 +183,6 @@ class HostAvailabilityWidget {
 						'ip' => '127.0.0.1',
 						'dns' => '',
 						'port' => '10050'
-//						'available' => 1
 					],
 					[
 						'type' => INTERFACE_TYPE_SNMP,
@@ -210,7 +191,6 @@ class HostAvailabilityWidget {
 						'ip' => '127.0.0.1',
 						'dns' => 'zabbixzabbixzabbix.com',
 						'port' => '10050',
-//						'available' => 1,
 						'details' => [
 							'version' => SNMP_V2C,
 							'bulk' => SNMP_BULK_ENABLED,
@@ -224,7 +204,6 @@ class HostAvailabilityWidget {
 						'ip' => '127.0.0.1',
 						'dns' => 'zabbixzabbixzabbix.com',
 						'port' => '10050'
-//						'available' => 1
 					],
 					[
 						'type' => INTERFACE_TYPE_JMX,
@@ -233,7 +212,6 @@ class HostAvailabilityWidget {
 						'ip' => '127.0.0.1',
 						'dns' => 'zabbixzabbixzabbix.com',
 						'port' => '10050'
-//						'available' => 1
 					]
 				]
 			],
@@ -252,7 +230,6 @@ class HostAvailabilityWidget {
 						'ip' => '127.0.0.1',
 						'dns' => '',
 						'port' => '10050'
-//						'available' => 1
 					],
 					[
 						'type' => INTERFACE_TYPE_SNMP,
@@ -261,7 +238,6 @@ class HostAvailabilityWidget {
 						'ip' => '127.0.0.1',
 						'dns' => '',
 						'port' => '10050',
-//						'available' => 1,
 						'details' => [
 							'version' => SNMP_V2C,
 							'bulk' => SNMP_BULK_ENABLED,
@@ -275,7 +251,6 @@ class HostAvailabilityWidget {
 						'ip' => '127.0.0.1',
 						'dns' => '',
 						'port' => '10050',
-//						'available' => 1
 					],
 					[
 						'type' => INTERFACE_TYPE_JMX,
@@ -284,15 +259,116 @@ class HostAvailabilityWidget {
 						'ip' => '127.0.0.1',
 						'dns' => '',
 						'port' => '10050'
-//						'available' => 1
 					]
 				]
 			]
 		]);
 		$hosts =  CDataHelper::getIds('host');
 		$interfaces = CDataHelper::getInterfaces($hosts);
-//		$interface_ids = $interfaces['ids']['Not available host'];
-//		$interface_id = $interfaces['ids']['Not available host']['zabbixzabbixzabbix1.com:10050'];
+
+		$data = [
+			$interfaces['default_interfaces']['Not available host'][1] => [
+					[
+						'available' => 2,
+						'error' => 'ERROR Agent'
+					]
+			],
+			$interfaces['default_interfaces']['Not available host'][2] => [
+					[
+						'available' => 2,
+						'error' => 'ERROR SMTP'
+					]
+			],
+			$interfaces['default_interfaces']['Not available host'][3] => [
+				[
+					'available' => 2,
+					'error' => 'ERROR IPMI'
+				]
+			],
+			$interfaces['default_interfaces']['Not available host'][4] => [
+				[
+					'available' => 2,
+					'error' => 'ERROR JMX'
+				]
+			],
+			$interfaces['default_interfaces']['Not available host in maintenance'][1] => [
+				[
+					'available' => 2
+				]
+			],
+			$interfaces['default_interfaces']['Not available host in maintenance'][2] => [
+				[
+					'available' => 2
+				]
+			],
+			$interfaces['default_interfaces']['Not available host in maintenance'][3] => [
+				[
+					'available' => 2
+				]
+			],
+			$interfaces['default_interfaces']['Not available host in maintenance'][4] => [
+				[
+					'available' => 2
+				]
+			],
+			$interfaces['default_interfaces']['Unknown host'][1] => [
+				[
+					'available' => 0
+				]
+			],
+			$interfaces['default_interfaces']['Unknown host in maintenance'][1] => [
+				[
+					'available' => 0
+				]
+			],
+			$interfaces['default_interfaces']['Available host'][1] => [
+				[
+					'available' => 1
+				]
+			],
+			$interfaces['default_interfaces']['Available host'][2] => [
+				[
+					'available' => 1
+				]
+			],
+			$interfaces['default_interfaces']['Available host'][3] => [
+				[
+					'available' => 1
+				]
+			],
+			$interfaces['default_interfaces']['Available host'][4] => [
+				[
+					'available' => 1
+				]
+			],
+			$interfaces['default_interfaces']['Available host in maintenance'][1] => [
+				[
+					'available' => 1
+				]
+			],
+			$interfaces['default_interfaces']['Available host in maintenance'][2] => [
+				[
+					'available' => 1
+				]
+			],
+			$interfaces['default_interfaces']['Available host in maintenance'][3] => [
+				[
+					'available' => 1
+				]
+			],
+			$interfaces['default_interfaces']['Available host in maintenance'][4] => [
+				[
+					'available' => 1
+				]
+			]
+		];
+		foreach ($data as $interfaceid => $values) {
+			foreach ($values as $value) {
+				$error = (array_key_exists('error', $value)) ? $value['error'] : '';
+				DBexecute('UPDATE interface SET available='.zbx_dbstr($value['available']).', error='.zbx_dbstr($error).
+					' WHERE interfaceid='.zbx_dbstr($interfaceid));
+			}
+		}
 
 		// Add hosts to maintenance.
 		$maintenace_hostids = [
