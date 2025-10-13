@@ -1,3 +1,15 @@
+Changes for 7.4.4rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 7.4.3
+
+7.4.3rc1 was released as 7.4.3 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 7.4.3rc1
 
 New features:
@@ -19,7 +31,6 @@ Bug fixes:
 ..F....... [ZBX-25103] replaced legacy hintbox generation for trigger operational data with current (dpankins)
 ..F....... [ZBX-25796] fixed confusing error message on item test timeout (isharha)
 A......... [ZBX-26419] improved performance of problem and event views by optimizing SQL queries to join only necessary triggers, eliminating redundant post-join filtering (vso)
-..F....... [ZBX-24885] fixed inconsistent tag display and unnecessary ellipsis on Latest data page (msnihach)
 ..F....... [ZBX-26337] removed unnecessary div elements for entries without problems in Item and Host navigator widgets (msnihach)
 .......PS. [ZBX-26873] fixed support for SSH item proxy through configurations in SSH configuration file (aetatsu)
 ...G...... [ZBX-19267] fixed wmi.get items sometimes incorrectly returning "Empty WMI search result" with Zabbix agent 2 (aetatsu)
@@ -429,6 +440,18 @@ A.F....PS. [ZBXNEXT-9564] implemented vault macro resolution on proxies (esekace
 ...G...... [ZBXNEXT-9508] added custom query path to MySQL and Oracle plugins for Zabbix agent 2 (esneiders)
 
 --------------------------------------------------------------------------------
+Changes for 7.2.14rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 7.2.13
+
+7.2.13rc1 was released as 7.2.13 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 7.2.13rc1
 
 New features:
@@ -529,6 +552,7 @@ New features:
 .........T [ZBXNEXT-9989] added supergroup topics support to Telegram media type, updated documentation (drasikhov)
 
 Bug fixes:
+A......... [ZBX-26988] fixed non-super admin user restriction working incorrectly for hostprototype.get api method (aluchko)
 .......PS. [ZBX-26537] fixed memory over-allocation in preprocessing manager (vso)
 ..F....... [ZBX-26422] added missing translation string for "Tags" label in "Tags" tab in configuration forms (solonkins)
 ..F....... [ZBX-21087] fixed not all aggregation functions working with foreach functions (aluchko)
@@ -674,6 +698,7 @@ New features:
 .........T [ZBXNEXT-9809] added refactored webhooks (abiba, aiantsen, drasikhov, egordymov, knaglis)
 
 Bug fixes:
+...G...... [ZBX-26987] added input parameter sanitization to prevent injection vulnerability for Zabbix agent 2 SMART plugin (lsurvilo)
 A.F....... [ZBX-26009] prevented reporting successful completion for several UI actions when database transaction commit fails; fixed inability to identify interruption of database connection when calling *.get API methods (vmaksimovs)
 ..F....... [ZBX-25717] fixed tag inheritance for discovered triggers (esekace)
 ..F....... [ZBX-24714] fixed broken custom on fail layout in item preprocessing form in some languages (agriscenko)
@@ -1025,6 +1050,18 @@ A.F....... [ZBX-23227] fixed issue where using an empty array or string value fo
 ....I..... [ZBX-23881] dropped preference list when searching for compiler (jxl)
 
 --------------------------------------------------------------------------------
+Changes for 7.0.20rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 7.0.19
+
+7.0.19rc1 was released as 7.0.19 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 7.0.19rc1
 
 New features:
@@ -1231,6 +1268,7 @@ New features:
 .........T [ZBXNEXT-9989] added supergroup topics support to Telegram media type, updated documentation (drasikhov)
 
 Bug fixes:
+A......... [ZBX-26988] fixed non-super admin user restriction working incorrectly for hostprototype.get api method (aluchko)
 .......PS. [ZBX-26537] fixed memory over-allocation in preprocessing manager (vso)
 ..F....... [ZBX-26422] added missing translation string for "Tags" label in "Tags" tab in configuration forms (solonkins)
 .......PS. [ZBX-26294] improved logic of SNMP cache cleanup (dgoloscapov)
@@ -1377,6 +1415,7 @@ New features:
 .........T [ZBXNEXT-9809] added refactored webhooks (abiba, aiantsen, drasikhov, egordymov, knaglis)
 
 Bug fixes:
+...G...... [ZBX-26987] added input parameter sanitization to prevent injection vulnerability for Zabbix agent 2 SMART plugin (lsurvilo)
 A.F....... [ZBX-26009] prevented reporting successful completion for several UI actions when database transaction commit fails; fixed inability to identify interruption of database connection when calling *.get API methods (vmaksimovs)
 ..F....... [ZBX-25717] fixed tag inheritance for discovered triggers (esekace)
 ..F....... [ZBX-24714] fixed broken custom on fail layout in item preprocessing form in some languages (agriscenko)
@@ -1756,6 +1795,7 @@ New features:
 .........T [ZBXNEXT-9341] added AssumeRole authentication to AWS templates (egordymov)
 
 Bug fixes:
+........S. [ZBX-26986] fixed secondary-order SQL injection in Zabbix server when deleting autoregistered host (wiper)
 A......... [ZBX-25610] removed reliability on "sysmapelementurlid", "sysmapurlid" in URLs for map.create and map.update (Ivo)
 .......PS. [ZBX-25625] fixed crash in browser item on invalid response (vso)
 .......PS. [ZBX-25624] fixed crash in browser item on empty response (vso)
@@ -4789,6 +4829,18 @@ A.F....PS. [ZBXNEXT-7402,ZBXNEXT-7413] added support for CyberArk Vault (acikuns
 ..F....... [ZBXNEXT-7138] added modal form for API tokens in User settings->API tokens and Administration->General->API tokens (epulke)
 
 --------------------------------------------------------------------------------
+Changes for 6.0.43rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 6.0.42
+
+6.0.42rc1 was released as 6.0.42 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 6.0.42rc1
 
 New features:
@@ -4836,6 +4888,7 @@ New features:
 .........T [ZBXNEXT-9703] updated existing Zabbix server/proxy health templates; added Zabbix server/proxy health templates by Zabbix agent passive/active (aiantsen)
 
 Bug fixes:
+...G...... [ZBX-26987] added input parameter sanitization to prevent injection vulnerability for Zabbix agent 2 SMART plugin (lsurvilo)
 .......PS. [ZBX-18703] fixed incorrect values returned by vmware.vm.vfs.fs.size item (MVekslers)
 A......... [ZBX-24383] fixed PHP fatal error when importing configuration from Zabbix 2.0 (Sasha)
 ........S. [ZBX-26038] added 10-second reconnect timeout for PostgreSQL read-only database (sboidenko)
@@ -5039,6 +5092,7 @@ New features:
 .........T [ZBXNEXT-9341] added assume role authorization in AWS templates (egordymov)
 
 Bug fixes:
+........S. [ZBX-26986] fixed secondary-order SQL injection in Zabbix server when deleting autoregistered host (wiper)
 A......... [ZBX-25610] removed reliability on "sysmapelementurlid", "sysmapurlid" in URLs for map.create and map.update (Ivo)
 .......PS. [ZBX-25626] added external data validation to prevent access to internal duktape properties through HttpRequest object (wiper)
 ........S. [ZBX-25629] fixed buffer over-read for broken UTF-8 mail data injection (sboidenko)

@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2025-09-11 18:41+0000\n"
+"PO-Revision-Date: 2025-09-18 18:30+0000\n"
 "Last-Translator: ERIC <eric78.zabbix@orange.fr>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: fr\n"
@@ -4126,7 +4126,7 @@ msgstr "Impossible de lire le YAML : %1$s."
 #: include/classes/server/CZabbixServer.php:511
 #, c-format
 msgid "Cannot read response from Zabbix server \"%1$s\"."
-msgstr ""
+msgstr "Impossible de lire la réponse du serveur Zabbix « %1$s »."
 
 #: include/classes/server/CZabbixServer.php:567
 #, c-format
@@ -18862,7 +18862,7 @@ msgstr "Temps de réponse"
 #: include/classes/server/CZabbixServer.php:507
 #, c-format
 msgid "Response timeout of %1$s exceeded when connecting to Zabbix server \"%2$s\"."
-msgstr ""
+msgstr "Délai de réponse de %1$s dépassé lors de la connexion au serveur Zabbix « %2$s »."
 
 #: app/controllers/CControllerMediatypeTestSend.php:182
 msgid "Response type: JSON"
