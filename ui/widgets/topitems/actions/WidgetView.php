@@ -94,6 +94,16 @@ class WidgetView extends CControllerDashboardWidgetView {
 			// Each column has different aggregation function and time period.
 			$db_values = self::getItemValues($db_column_items, $column);
 
+			if ($db_values && $column['aggregate_grouping'] === Widget::TOP_ITEMS_AGGREGATE_COMBINED
+					&& $column['combined_aggregate_function'] !== AGGREGATE_NONE) {
+				$itemids = array_column($db_column_items, 'itemid');
+				$itemid = array_shift($itemids);
+
+				$db_column_items[$itemid]['name'] = $column['combined_column_name'];
+
+				$db_column_items = [$itemid => $db_column_items[$itemid]];
+			}
+
 			if ($column['display'] == CWidgetFieldColumnsList::DISPLAY_SPARKLINE) {
 				$config = $column + ['contents_width' => $this->sparkline_max_samples];
 				$db_sparkline_values = self::getItemSparklineValues($db_column_items, $config);
@@ -293,17 +303,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 			$options['evaltype'] = $column['item_tags_evaltype'];
 		}
 
-		$items = API::Item()->get($options);
-
-		if ($items && $column['aggregate_grouping'] === Widget::TOP_ITEMS_AGGREGATE_COMBINED
-				&& $column['combined_aggregate_function'] !== AGGREGATE_NONE) {
-			$itemid = array_key_first($items);
-
-			$items = [$itemid => $items[$itemid]];
-			$items[$itemid]['name_resolved'] = $column['combined_column_name'];
-		}
-
-		return CArrayHelper::renameObjectsKeys($items, ['name_resolved' => 'name']);
+		return CArrayHelper::renameObjectsKeys(API::Item()->get($options), ['name_resolved' => 'name']);
 	}
 
 	private static function getItemValues(array $items, array $column): array {

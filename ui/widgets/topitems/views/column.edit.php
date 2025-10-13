@@ -297,13 +297,14 @@ $advanced_configuration->addItem([
 
 // Combined aggregation function.
 $advanced_configuration->addItem([
-	(new CLabel(_('Combined aggregation function'), 'combined_aggregate_function'))->addClass('js-combined-row'),
+	(new CLabel(_('Combined aggregation function'), 'combined_aggregate_function'))
+		->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK)
+		->addClass('js-combined-row'),
 	(new CFormField(
 		(new CSelect('combined_aggregate_function'))
 			->setId('combined_aggregate_function')
 			->setValue($data['combined_aggregate_function'])
 			->addOptions(CSelect::createOptionsFromArray([
-				AGGREGATE_NONE => CItemHelper::getAggregateFunctionName(AGGREGATE_NONE),
 				AGGREGATE_MIN => CItemHelper::getAggregateFunctionName(AGGREGATE_MIN),
 				AGGREGATE_MAX => CItemHelper::getAggregateFunctionName(AGGREGATE_MAX),
 				AGGREGATE_AVG => CItemHelper::getAggregateFunctionName(AGGREGATE_AVG),
