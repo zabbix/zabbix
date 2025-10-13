@@ -1,1 +1,0 @@
-...G...... [ZBX-25263] fixed Zabbix agent to attempt next refresh active checks in 60 seconds in case of connection errors (arimdjonoks)
