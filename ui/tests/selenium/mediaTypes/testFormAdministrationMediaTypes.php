@@ -895,7 +895,7 @@ class testFormAdministrationMediaTypes extends CWebTest {
 					]
 				]
 			],
-			// Offise365 relay email with all possible parameters defined.
+			// Office365 relay email with all possible parameters defined.
 			[
 				[
 					'mediatype_tab' => [
