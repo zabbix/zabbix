@@ -795,7 +795,7 @@ function makeTagHtml(array $tag, string $tag_value, string $hint_text): CSpan {
 		ZBX_TAG_OBJECT_HOST, ZBX_TAG_OBJECT_HOST_PROTOTYPE => _('Inherited and host tag'),
 		ZBX_TAG_OBJECT_ITEM, ZBX_TAG_OBJECT_ITEM_PROTOTYPE => _('Inherited and item tag'),
 		ZBX_TAG_OBJECT_TRIGGER, ZBX_TAG_OBJECT_TRIGGER_PROTOTYPE => _('Inherited and trigger tag'),
-		ZBX_TAG_OBJECT_HTTPTEST => _('Inherited and scenario tag')
+		ZBX_TAG_OBJECT_HTTPTEST => _('Inherited and web scenario tag')
 	};
 
 	return (new CSpan($tag_value))
