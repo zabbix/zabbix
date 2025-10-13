@@ -105,8 +105,27 @@ AS_HELP_STRING([--with-ssh@<:@=DIR@:>@],[use SSH package @<:@default=no@:>@, DIR
        fi
 
        if test "x$accept_ssh_version" == xno; then
-         found_ssh="no"
-         AC_MSG_RESULT(no)
+        m4_ifdef([PKG_PROG_PKG_CONFIG], [
+          PKG_PROG_PKG_CONFIG()
+          if test -z "$PKG_CONFIG"; then
+            AC_MSG_ERROR([pkg-config is required but not found. Please install pkg-config.])
+          fi
+        ], [
+          AC_MSG_WARN([pkg-config not found, skipping libssh detection via pkg-config])
+        ])
+
+        if test -n "$PKG_CONFIG"; then
+          SSH_CFLAGS=`$PKG_CONFIG --cflags libssh`
+          SSH_LDFLAGS=`$PKG_CONFIG --libs-only-L libssh`
+          SSH_LIBS=`$PKG_CONFIG --libs-only-l libssh`
+          SSH_VERSION=`$PKG_CONFIG --modversion libssh`
+
+          if ! $PKG_CONFIG --atleast-version=0.11.0 libssh; then
+             AC_MSG_ERROR([SSH version 0.11.0 or higher is required. Found version: $SSH_VERSION])
+          fi
+          accept_ssh_version="yes"
+          found_ssh="yes"
+        fi
        fi
      else # test "x$_libssh_dir" = "xno"; then
        if test -f $_libssh_dir/include/libssh/libssh_version.h; then
@@ -126,8 +145,8 @@ AS_HELP_STRING([--with-ssh@<:@=DIR@:>@],[use SSH package @<:@default=no@:>@, DIR
        fi
 
        if test "x$accept_ssh_version" == xno; then
-         found_ssh="no"
-         AC_MSG_RESULT(no)
+          found_ssh="no"
+          AC_MSG_RESULT(no)
        fi
      fi #if test "x$_libssh_dir" = "xno"; then
   fi # if test "x$want_ssh" != "xno"; then
