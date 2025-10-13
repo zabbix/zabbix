@@ -124,13 +124,6 @@ static ZBX_DC_CACHE	*cache = NULL;
 #define ZBX_STRUCT_REALLOC_STEP	8
 #define ZBX_STRING_REALLOC_STEP	ZBX_KIBIBYTE
 
-typedef enum
-{
-	ZBX_DC_SYNC_TREND_MODE_PARALLEL,
-	ZBX_DC_SYNC_TREND_MODE_FULL
-}
-zbx_dc_sync_trend_mode_t;
-
 typedef struct
 {
 	size_t	pvalue;
@@ -700,7 +693,8 @@ static void	dc_trends_fetch_and_update(ZBX_DC_TREND *trends, int trends_num, zbx
  * Purpose: flush trend to the database                                       *
  *                                                                            *
  ******************************************************************************/
-void	zbx_db_flush_trends(ZBX_DC_TREND *trends, int *trends_num, zbx_vector_uint64_pair_t *trends_diff)
+void	zbx_db_flush_trends(ZBX_DC_TREND *trends, int *trends_num, zbx_vector_uint64_pair_t *trends_diff,
+		zbx_dc_sync_trend_mode_t sync_trend_mode)
 {
 	int		num, clock, selects_num = 0, inserts_num = 0, upserts_num = 0, itemids_alloc, itemids_num = 0;
 	int		trends_to = *trends_num, i;
@@ -746,7 +740,7 @@ void	zbx_db_flush_trends(ZBX_DC_TREND *trends, int *trends_num, zbx_vector_uint6
 		}
 		else
 		{
-			if (NULL != trends_diff)
+			if (ZBX_DC_SYNC_TREND_MODE_NORMAL == sync_trend_mode)
 				uint64_array_add(&itemids, &itemids_alloc, &itemids_num, trend->itemid, 64);
 		}
 
@@ -785,27 +779,23 @@ void	zbx_db_flush_trends(ZBX_DC_TREND *trends, int *trends_num, zbx_vector_uint6
 
 	zbx_free(itemids);
 
-	/* if 'trends' is not a primary trends buffer */
-	if (NULL != trends_diff)
+	/* we update it too */
+	for (i = 0; i < trends_to; i++)
 	{
-		/* we update it too */
-		for (i = 0; i < trends_to; i++)
-		{
-			zbx_uint64_pair_t	pair;
+		zbx_uint64_pair_t	pair;
 
-			if (0 == trends[i].itemid)
-				continue;
+		if (0 == trends[i].itemid)
+			continue;
 
-			if (clock != trends[i].clock || value_type != trends[i].value_type)
-				continue;
+		if (clock != trends[i].clock || value_type != trends[i].value_type)
+			continue;
 
-			if (0 == trends[i].disable_from || trends[i].disable_from > clock)
-				continue;
+		if (0 == trends[i].disable_from || trends[i].disable_from > clock)
+			continue;
 
-			pair.first = trends[i].itemid;
-			pair.second = clock + SEC_PER_HOUR;
-			zbx_vector_uint64_pair_append(trends_diff, pair);
-		}
+		pair.first = trends[i].itemid;
+		pair.second = clock + SEC_PER_HOUR;
+		zbx_vector_uint64_pair_append(trends_diff, pair);
 	}
 
 	if (0 != inserts_num)
@@ -1731,20 +1721,29 @@ static void	DCsync_trends(int parallel_num, zbx_dc_sync_trend_mode_t sync_trend_
 
 	zbx_db_begin();
 
+	zbx_vector_uint64_pair_t	trends_diff;
+
+	zbx_vector_uint64_pair_create(&trends_diff);
+
 	while (trends_num > 0)
 	{
 		int	trends_num_last = trends_num;
 
 		zbx_log_sync_trends_cache_progress();
 
-		zbx_db_flush_trends(trends, &trends_num, NULL);
+		zbx_db_flush_trends(trends, &trends_num, &trends_diff, sync_trend_mode);
 
 		LOCK_TRENDS;
 		cache->trends_num -= trends_num_last - trends_num;
 		UNLOCK_TRENDS;
+
+		zbx_dc_update_trends(&trends_diff);
+		zbx_vector_uint64_pair_clear(&trends_diff);
 	}
 
 	zbx_db_commit();
+
+	zbx_vector_uint64_pair_destroy(&trends_diff);
 
 	if (ZBX_DC_SYNC_TREND_MODE_FULL == sync_trend_mode)
 	{
