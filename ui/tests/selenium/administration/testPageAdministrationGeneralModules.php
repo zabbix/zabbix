@@ -713,7 +713,7 @@ class testPageAdministrationGeneralModules extends CWebTest {
 		$this->query('link', $data['Name'])->waitUntilVisible()->one()->click();
 		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
 		$form = $dialog->asForm();
-		// Check value as every field in Module details form.
+		// Check value of every field in Module details form.
 		foreach ($data as $key => $value) {
 			$this->assertEquals($value, $form->getFieldContainer($key)->getText());
 		}
