@@ -1,6 +1,12 @@
 Changes for 8.0.0alpha1
 
 New features:
+.......PS. [ZBXNEXT-10068] added resolution of LLD macros in nested JSON when used in discovery prototypes (MVekslers)
+........S. [ZBXNEXT-10222] extended the housekeeper logic to delete associated events alongside problems when a trigger is removed (vso)
+.......PS. [ZBXNEXT-2352] improved SNMPv3 performance by reducing request count through caching of engine ID after initial discovery (vso)
+...G...... [ZBXNEXT-7744] added support of TLS to Redis plugin in Zabbix agent 2 (opucka)
+.........T [ZBXNEXT-10118] added OpenAI Platform by HTTP monitoring template (aiantsen)
+A......... [ZBXNEXT-10235] added strict validation for mediatype.get API method (aluchko)
 ..F....... [ZBXNEXT-8795] added inline validation for icon mapping form (talbergs)
 ..F....... [ZBXNEXT-9730] implemented inline form validation in service edit form (esekace)
 ..F....... [ZBXNEXT-8796] implemented inline validation in regex form (talbergs)
@@ -46,6 +52,24 @@ A......PS. [ZBXNEXT-10056] updated max supported MariaDB version to 11.8 (Sasha)
 .......PS. [ZBXNEXT-10079] updated minimal supported MySQL/Percona version to 8.4 (mprihodko)
 
 Bug fixes:
+...G...PS. [ZBX-25148] added adjustments for sequential data entries with the same timestamp (askolmeisters)
+.......PS. [ZBX-26893] fixed delay when executing tasks through Zabbix proxy such as test item, check now, remote command (vso)
+..F....... [ZBX-26501] changed the query responsible for retrieving macros from host, template and host prototype (rgontarski)
+..F....... [ZBX-25394] fixed unassigned proxy indication in Queue Details, extended coverage to proxies managed by proxy groups (dpankins)
+.......PS. [ZBX-26795] fixed unnecessary setting revision change (askolmeisters)
+...G...... [ZBX-25263] fixed Zabbix agent to attempt next refresh active checks in 60 seconds in case of connection errors (arimdjonoks)
+.......PS. [ZBX-26910] fixed Zabbix server compilation on osx or with custom library paths (vso)
+..F....... [ZBX-24046] fixed incorrect error message for field ldap_jit_interval in LDAP settings form (kkuzmina)
+..F....... [ZBX-25741] eliminated the difference in the host group lists via Select button ant via search typing (wczerneha)
+........S. [ZBX-26941] fixed duplicate entry error when new value arrive after Zabbix server finished syncing trends (vso)
+..F....... [ZBX-26776] fixed ability to change widget in pie chart data set (gberzina)
+.........T [ZBX-22625] fixed JavaScript in HPE Synergy by HTTP template (abrosimovs)
+...G...... [ZBX-24918] fixed crashes of Zabbix agent 2 for Windows related with PDH perf_counter (opucka)
+...G...... [ZBX-26755] fixed problem with mqtt plugin in Zabbix agent 2 not establishing connection if first call failed. (opucka)
+..F....... [ZBX-16162] fixed classic graphs rendering when throttling is used (Sasha)
+A......... [ZBX-25038] fixed SCIM error message by adding mention of requested endpoint to it (kkuzmina)
+.........T [ZBX-26851] changed macro names in MSSQL templates (sbelakovs)
+..F....... [ZBX-26882] fixed incorrect validation error when a new dataset is added in SVG graph widget (gklavins)
 ..F....... [ZBX-25103] replaced legacy hintbox generation for trigger operational data with current (dpankins)
 ..F....... [ZBX-25796] fixed confusing error message on item test timeout (isharha)
 A......... [ZBX-26419] improved performance of problem and event views by optimizing SQL queries to join only the necessary triggers, eliminating redundant post-join filtering (vso)
@@ -200,8 +224,27 @@ A......... [ZBX-26191] fixed inconsistent API and frontend validation for mainte
 Changes for 7.4.4rc1
 
 New features:
+...G...... [ZBXNEXT-7744] added support of TLS to Redis plugin in Zabbix agent 2 (opucka)
 
 Bug fixes:
+...G...PS. [ZBX-25148] added adjustments for sequential data entries with the same timestamp (askolmeisters)
+..F....... [ZBX-26501] changed the query responsible for retrieving macros from host, template and host prototype (rgontarski)
+..F....... [ZBX-25394] fixed unassigned proxy indication in Queue Details, extended coverage to proxies managed by proxy groups (dpankins)
+.......PS. [ZBX-26795] fixed unnecessary setting revision change (askolmeisters)
+...G...... [ZBX-25263] fixed Zabbix agent to attempt next refresh active checks in 60 seconds in case of connection errors (arimdjonoks)
+.......PS. [ZBX-26910] fixed Zabbix server compilation on osx or with custom library paths (vso)
+..F....... [ZBX-24046] fixed incorrect error message for field ldap_jit_interval in LDAP settings form (kkuzmina)
+..F....... [ZBX-25741] eliminated the difference in the host group lists via Select button ant via search typing (wczerneha)
+.......PS. [ZBX-26893] fixed delay when executing tasks through Zabbix proxy such as test item, check now, remote command (vso)
+........S. [ZBX-26941] fixed duplicate entry error when new value arrive after Zabbix server finished syncing trends (vso)
+..F....... [ZBX-26776] fixed ability to change widget in pie chart data set (gberzina)
+.........T [ZBX-22625] fixed JavaScript in HPE Synergy by HTTP template (abrosimovs)
+...G...... [ZBX-24918] fixed crashes of Zabbix agent 2 for Windows related with PDH perf_counter (opucka)
+...G...... [ZBX-26755] fixed problem with mqtt plugin in Zabbix agent 2 not establishing connection if first call failed. (opucka)
+..F....... [ZBX-16162] fixed classic graphs rendering when throttling is used (Sasha)
+A......... [ZBX-25038] fixed SCIM error message by adding mention of requested endpoint to it (kkuzmina)
+.........T [ZBX-26851] changed macro names in MSSQL templates (sbelakovs)
+..F....... [ZBX-26882] fixed incorrect validation error when a new dataset is added in SVG graph widget (gklavins)
 
 --------------------------------------------------------------------------------
 Changes for 7.4.3
@@ -1252,8 +1295,26 @@ A.F....... [ZBX-23227] fixed issue where using an empty array or string value fo
 Changes for 7.0.20rc1
 
 New features:
+...G...... [ZBXNEXT-7744] added support of TLS to Redis plugin in Zabbix agent 2 (opucka)
 
 Bug fixes:
+...G...PS. [ZBX-25148] added adjustments for sequential data entries with the same timestamp (askolmeisters)
+..F....... [ZBX-25394] fixed unassigned proxy indication in Queue Details, extended coverage to proxies managed by proxy groups (dpankins)
+...G...... [ZBX-25263] fixed Zabbix agent to attempt next refresh active checks in 60 seconds in case of connection errors (arimdjonoks)
+.......PS. [ZBX-26910] fixed Zabbix server and Zabbix proxy compilation on osx or with custom library paths (vso)
+..F....... [ZBX-25741] eliminated the difference in the host group lists via Select button ant via search typing (wczerneha)
+........S. [ZBX-26941] fixed duplicate entry error when new value arrive after Zabbix server finished syncing trends (vso)
+.......PS. [ZBX-26893] fixed delay when executing tasks through Zabbix proxy such as test item, check now, remote command (vso)
+..F....... [ZBX-26459] fixed host macros view to avoid displaying both macro types when switching quickly (gberzina)
+..F....... [ZBX-26776] fixed ability to change widget in pie chart data set (gberzina)
+.........T [ZBX-22625] fixed JavaScript in HPE Synergy by HTTP template (abrosimovs)
+..F....... [ZBX-26069] implemented the re-broadcast behavior for the widgets on forced update (ashubin, wczerneha)
+...G...... [ZBX-24918] fixed crashes of Zabbix agent 2 for Windows related with PDH perf_counter (opucka)
+...G...... [ZBX-26755] fixed problem with mqtt plugin in Zabbix agent 2 not establishing connection if first call failed. (opucka)
+..F....... [ZBX-16162] fixed classic graphs rendering when throttling is used (Sasha)
+..F....... [ZBX-24046] fixed incorrect error message for field ldap_jit_interval in LDAP settings form (kkuzmina)
+A......... [ZBX-25038] fixed SCIM error message by adding mention of requested endpoint to it (kkuzmina)
+.........T [ZBX-26851] changed macro names in MSSQL templates (sbelakovs)
 
 --------------------------------------------------------------------------------
 Changes for 7.0.19
@@ -5033,6 +5094,7 @@ Changes for 6.0.43rc1
 New features:
 
 Bug fixes:
+...G...... [ZBX-24918] fixed crashes of Zabbix agent 2 for Windows related with PDH perf_counter (opucka)
 
 --------------------------------------------------------------------------------
 Changes for 6.0.42

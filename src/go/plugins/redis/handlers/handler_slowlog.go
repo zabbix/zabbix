@@ -12,17 +12,19 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-package redis
+package handlers
 
 import (
 	"github.com/mediocregopher/radix/v3"
+	"golang.zabbix.com/agent2/plugins/redis/conn"
+	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/zbxerr"
 )
 
-type slowlog []interface{}
-type logItem = []interface{}
+type slowlog []any
+type logItem = []any
 
-// getLastSlowlogID gets the last log item ID from slowlog.
+// getLastSlowlogID gets the last log item ID from slowlog..
 func getLastSlowlogID(sl slowlog) (int64, error) {
 	if len(sl) == 0 {
 		return 0, nil
@@ -45,15 +47,16 @@ func getLastSlowlogID(sl slowlog) (int64, error) {
 	return id + 1, nil
 }
 
-// slowlogHandler gets an output of 'SLOWLOG GET 1' command and returns the last slowlog Id.
-func slowlogHandler(conn redisClient, _ map[string]string) (interface{}, error) {
-	var res []interface{}
+// SlowlogHandler gets an output of 'SLOWLOG GET 1' command and returns the last slowlog Id.
+func SlowlogHandler(redisClient conn.RedisClient, _ map[string]string) (any, error) {
+	var res []any
 
-	if err := conn.Query(radix.Cmd(&res, "SLOWLOG", "GET", "1")); err != nil {
-		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
+	err := redisClient.Query(radix.Cmd(&res, "SLOWLOG", "GET", "1"))
+	if err != nil {
+		return nil, errs.WrapConst(err, zbxerr.ErrorCannotFetchData)
 	}
 
-	lastID, err := getLastSlowlogID(slowlog(res))
+	lastID, err := getLastSlowlogID(res)
 
 	return lastID, err
 }
