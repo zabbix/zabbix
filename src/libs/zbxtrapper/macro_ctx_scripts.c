@@ -73,8 +73,8 @@ static void	resolve_user_macros(zbx_uint64_t userid, const char *m, zbx_user_nam
 		char **replace_to)
 {
 	/* use only one DB request for all occurrences of 5 macros */
-	if (NULL == *user_names)
-		zbx_db_get_user_names(userid, user_names);
+	if (NULL == *user_names && SUCCEED != zbx_db_get_user_names(userid, user_names))
+		return;
 
 	if (0 == strcmp(m, MVAR_USER_USERNAME) || 0 == strcmp(m, MVAR_USER_ALIAS))
 	{
