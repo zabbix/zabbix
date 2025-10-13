@@ -450,13 +450,8 @@ class testDashboardProblemsBySeverityWidget extends testWidgets {
 					]
 				]
 			],
-<<<<<<< HEAD
 			/*
-			 * #14 Totals: Create a widget with selected 'show suppressed problems and ''show operational data' option
-=======
-			/**
-			 * #14 Totals: Create a widget with selected 'show supprossed problems and ''show operational data' option
->>>>>>> 79c60984ebdc5ab66858961b0d0b6508f2832cb8
+			 * #14 Totals: Create a widget with selected 'show suppossed problems and ''show operational data' option
 			 * and removed 'show timeline' option.
 			 */
 			[
