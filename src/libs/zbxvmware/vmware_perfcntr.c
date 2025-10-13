@@ -468,6 +468,7 @@ int	vmware_service_get_perf_counters(zbx_vmware_service_t *service, CURL *easyha
 		if (NULL != group && NULL != key && NULL != rollup && NULL != counterid && NULL != unit)
 		{
 			counter = (zbx_vmware_counter_t *)zbx_malloc(NULL, sizeof(zbx_vmware_counter_t));
+			memset(counter, 0, sizeof(zbx_vmware_counter_t));
 			counter->path = zbx_dsprintf(NULL, "%s/%s[%s]", group, key, rollup);
 			ZBX_STR2UINT64(counter->id, counterid);
 			STR2UNIT(counter->unit, unit);
@@ -488,6 +489,7 @@ int	vmware_service_get_perf_counters(zbx_vmware_service_t *service, CURL *easyha
 				NULL != unit)
 		{
 			counter = (zbx_vmware_counter_t *)zbx_malloc(NULL, sizeof(zbx_vmware_counter_t));
+			memset(counter, 0, sizeof(zbx_vmware_counter_t));
 			counter->path = zbx_dsprintf(NULL, "%s/%s[%s,%s]", group, key, rollup, stats);
 			ZBX_STR2UINT64(counter->id, counterid);
 			STR2UNIT(counter->unit, unit);
