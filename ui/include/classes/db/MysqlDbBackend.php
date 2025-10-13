@@ -168,6 +168,7 @@ class MysqlDbBackend extends DbBackend {
 
 		return $resource;
 	}
+
 	private function setCharset($charset) {
 		global $DB;
 
@@ -180,6 +181,7 @@ class MysqlDbBackend extends DbBackend {
 
 		return true;
 	}
+
 	/**
 	 * Initialize connection.
 	 *
