@@ -2593,25 +2593,24 @@ function mergeRegularAndInheritedTags(array $objects, ?int $object_type = null):
 			}
 		}
 		else {
-			// Merge regular tags with inherited ones, removing duplicate tags and values.
+			// Merge own tags with inherited ones, avoiding duplicates.
 
-			if (!$object['inheritedTags']) {
-				$tags = $object['tags'];
-			}
-			elseif (!$object['tags']) {
-				$tags = $object['inheritedTags'];
-			}
-			else {
-				$tags = $object['tags'];
+			$tags = $object['tags'];
+
+			if ($object['inheritedTags']) {
+				$existing_tags = [];
+
+				foreach ($tags as $tag) {
+					$existing_tags[$tag['tag']][$tag['value']] = true;
+				}
 
 				foreach ($object['inheritedTags'] as $inherited_tag) {
-					foreach ($tags as $tag) {
-						if ($tag['tag'] === $inherited_tag['tag'] && $tag['value'] === $inherited_tag['value']) {
-							continue 2;
-						}
-					}
+					if (!array_key_exists($inherited_tag['tag'], $existing_tags)
+							|| !array_key_exists($inherited_tag['value'], $existing_tags[$inherited_tag['tag']])) {
+						$existing_tags[$inherited_tag['tag']][$inherited_tag['value']] = true;
 
-					$tags[] = $inherited_tag;
+						$tags[] = $inherited_tag;
+					}
 				}
 			}
 		}
