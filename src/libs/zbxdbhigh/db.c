@@ -368,6 +368,7 @@ void	zbx_user_names_clean(zbx_user_names_t **names)
 	zbx_free((*names)->name);
 	zbx_free((*names)->surname);
 	zbx_free((*names)->username);
+	zbx_free(*names);
 }
 
 /******************************************************************************
