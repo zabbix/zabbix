@@ -250,7 +250,7 @@ class HostAvailabilityWidget {
 						'main' => INTERFACE_PRIMARY,
 						'ip' => '127.0.0.1',
 						'dns' => '',
-						'port' => '10050',
+						'port' => '10050'
 					],
 					[
 						'type' => INTERFACE_TYPE_JMX,
