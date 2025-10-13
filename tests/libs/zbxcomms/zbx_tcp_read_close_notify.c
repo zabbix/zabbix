@@ -47,8 +47,7 @@ void	zbx_mock_test_entry(void **state)
 
 	if (SUCCEED == zbx_mock_parameter_exists("in.event_is_null"))
 	{
-		event = NULL;
-		result = zbx_tcp_read_close_notify(&s, timeout, &event);
+		result = zbx_tcp_read_close_notify(&s, timeout, NULL);
 	}
 	else
 	{
@@ -60,5 +59,4 @@ void	zbx_mock_test_entry(void **state)
 
 	zbx_vector_int32_clear(&read_return_seq);
 	zbx_vector_int32_destroy(&read_return_seq);
-
 }

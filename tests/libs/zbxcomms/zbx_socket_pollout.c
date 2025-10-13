@@ -53,5 +53,6 @@ void	zbx_mock_test_entry(void **state)
 
 		zbx_mock_assert_str_eq("error", exp_error, error);
 		zbx_free(error);
+		zbx_free(exp_error);
 	}
 }
