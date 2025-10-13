@@ -38,10 +38,6 @@
 #include "zbx_scripts_constants.h"
 #include "zbx_item_constants.h"
 
-#ifdef HAVE_NETSNMP
-#	include "zbxpoller.h"
-#endif
-
 /**************************************************************************************
  *                                                                                    *
  * Purpose: executes remote command task                                              *
