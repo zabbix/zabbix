@@ -15,8 +15,6 @@
 #ifndef ZBX_COMMS_COMMON
 #define ZBX_COMMS_COMMON
 
-#include "zbxmockdata.h"
-
 void	set_nonblocking_error(void);
 
 #endif

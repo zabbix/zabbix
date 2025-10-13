@@ -36,6 +36,7 @@ int __wrap_accept(int sockfd, struct sockaddr *addr, socklen_t *addrlen)
 	ZBX_UNUSED(addrlen);
 
 	accept_return++;
+
 	return accept_return;
 }
 
@@ -44,7 +45,7 @@ int	__wrap_fcntl (int fd, int cmd, ...)
 	ZBX_UNUSED(fd);
 	ZBX_UNUSED(cmd);
 
-	return SUCCEED;
+	return 0;
 }
 
 int	__wrap_getpeername(int fd, struct sockaddr *addr, socklen_t *len)
@@ -70,7 +71,7 @@ void	zbx_mock_test_entry(void **state)
 {
 	zbx_socket_t	s;
 	unsigned int	tls_accept = zbx_mock_get_parameter_uint32("in.tls_accept");
-	int		result, poll_timeout = zbx_mock_get_parameter_int("in.poll_timeout"),
+	int		poll_timeout = zbx_mock_get_parameter_int("in.poll_timeout"),
 			exp_result = zbx_mock_str_to_return_code(zbx_mock_get_parameter_string("out.result"));
 	char		*tls_listen = NULL;
 	const char	*unencrypted_allowed_ip,
@@ -88,7 +89,7 @@ void	zbx_mock_test_entry(void **state)
 	if (SUCCEED == zbx_mock_parameter_exists("in.accept_return"))
 		accept_return = zbx_mock_get_parameter_int("in.accept_return");
 	else
-		accept_return = SUCCEED;
+		accept_return = STDERR_FILENO + 1;
 
 	if (SUCCEED == zbx_mock_parameter_exists("in.unencrypted_allowed_ip"))
 		unencrypted_allowed_ip = zbx_mock_get_parameter_string("in.unencrypted_allowed_ip");
@@ -98,12 +99,12 @@ void	zbx_mock_test_entry(void **state)
 	if (SUCCEED == zbx_mock_parameter_exists("in.recv_return"))
 		recv_return = zbx_mock_get_parameter_int("in.recv_return");
 	else
-		recv_return = SUCCEED;
+		recv_return = 0;
 
 	mock_poll_set_mode_from_param(poll_mode);
 	set_nonblocking_error();
 
-	result = zbx_tcp_accept(&s, tls_accept, poll_timeout, tls_listen, unencrypted_allowed_ip);
+	int result = zbx_tcp_accept(&s, tls_accept, poll_timeout, tls_listen, unencrypted_allowed_ip);
 
 	zbx_mock_assert_int_eq("return value:", exp_result, result);
 }

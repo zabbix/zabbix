@@ -9,7 +9,7 @@ out:
 test case: "cannot wait for connection"
 in:
   timeout: 1
-  socket_had_blocking_error: yes
+  socket_had_blocking_error: true
   poll_mode: "MOCK_POLL_ERROR"
 out:
   result: FAIL

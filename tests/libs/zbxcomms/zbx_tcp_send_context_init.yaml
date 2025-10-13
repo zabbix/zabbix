@@ -1,5 +1,5 @@
 ---
-test case: "simple TCP, no protocol"
+test case: "default protocol (TCP)"
 in:
   data: "abc"
   len: 3

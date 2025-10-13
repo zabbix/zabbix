@@ -192,6 +192,8 @@ zbx_socket_pollout_LDFLAGS = @AGENT_LDFLAGS@ \
 
 zbx_socket_pollout_CFLAGS = $(COMMS_COMPILER_FLAGS)
 
+#zbx_tcp_write
+
 zbx_tcp_write_SOURCES = \
 	zbx_tcp_write.c \
 	zbx_comms_common.c \
@@ -209,6 +211,7 @@ zbx_tcp_write_LDFLAGS = @AGENT_LDFLAGS@ \
 
 zbx_tcp_write_CFLAGS = $(COMMS_COMPILER_FLAGS)
 
+#zbx_tcp_read_close_notify
 
 zbx_tcp_read_close_notify_SOURCES = \
 	zbx_tcp_read_close_notify.c \

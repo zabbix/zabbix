@@ -37,7 +37,7 @@ int __wrap_zbx_compress(const char *in, size_t size_in, char **out, size_t *size
 void	zbx_mock_test_entry(void **state)
 {
 	const char	*data = zbx_mock_get_parameter_string("in.data");
-	int		result, exp_result = zbx_mock_str_to_return_code(zbx_mock_get_parameter_string("out.result"));
+	int		exp_result = zbx_mock_str_to_return_code(zbx_mock_get_parameter_string("out.result"));
 	size_t		len = zbx_mock_get_parameter_uint64("in.len"),
 			reserved = zbx_mock_get_parameter_uint64("in.reserved");
 	unsigned char	flags = (unsigned char)zbx_mock_get_parameter_uint64("in.flags");
@@ -46,7 +46,7 @@ void	zbx_mock_test_entry(void **state)
 
 	zbx_tcp_send_context_t	context;
 
-	result = zbx_tcp_send_context_init(data, len, reserved, flags, &context);
+	int	result = zbx_tcp_send_context_init(data, len, reserved, flags, &context);
 
 	zbx_mock_assert_int_eq("return value", exp_result, result);
 

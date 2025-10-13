@@ -13,37 +13,37 @@ out:
 ---
 test case: "only POLLHUP"
 in:
-  revents: 16 # POLLHUP
+  revents: 16  # POLLHUP
 out:
   result: "connection error (POLLHUP)"
 ---
 test case: "only POLLNVAL"
 in:
-  revents: 32 # POLLNVAL
+  revents: 32  # POLLNVAL
 out:
   result: "connection error (POLLNVAL)"
 ---
 test case: "POLLERR + POLLHUP"
 in:
-  revents: 24   # 8 + 16
+  revents: 24  # 8 + 16
 out:
   result: "connection error (POLLERR,POLLHUP)"
 ---
 test case: "POLLERR + POLLNVAL"
 in:
-  revents: 40   # 8 + 32
+  revents: 40  # 8 + 32
 out:
   result: "connection error (POLLERR,POLLNVAL)"
 ---
 test case: "POLLHUP + POLLNVAL"
 in:
-  revents: 48   # 16 + 32
+  revents: 48  # 16 + 32
 out:
   result: "connection error (POLLHUP,POLLNVAL)"
 ---
 test case: "POLLERR + POLLHUP + POLLNVAL"
 in:
-  revents: 56   # 8 + 16 + 32
+  revents: 56  # 8 + 16 + 32
 out:
   result: "connection error (POLLERR,POLLHUP,POLLNVAL)"
 ...

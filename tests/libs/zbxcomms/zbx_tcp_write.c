@@ -25,7 +25,6 @@
 void	zbx_mock_test_entry(void **state)
 {
 	zbx_socket_t	s;
-	ssize_t		offset;
 	int		exp_offset = zbx_mock_get_parameter_int("out.result");
 	size_t		len = zbx_mock_get_parameter_uint64("in.len");
 	char		buf[ZBX_MAX_HOSTNAME_LEN];
@@ -36,7 +35,7 @@ void	zbx_mock_test_entry(void **state)
 	mock_poll_set_mode_from_param(zbx_mock_get_parameter_string("in.poll_mode"));
 	set_nonblocking_error();
 
-	offset = zbx_tcp_write(&s, buf, len, NULL);
+	ssize_t	offset = zbx_tcp_write(&s, buf, len, NULL);
 
 	zbx_mock_assert_int_eq("return value:", exp_offset, (int)offset);
 }

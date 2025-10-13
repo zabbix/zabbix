@@ -80,5 +80,4 @@ void	mock_poll_set_mode_from_param(const char *param);
 void	set_test_comms(int status);
 void	setup_read(zbx_vector_int32_t *v);
 
-
 #endif	/* ZABBIX_MOCK_DATA_H */

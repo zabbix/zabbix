@@ -303,9 +303,7 @@ ssize_t	__wrap_read(int fildes, void *buf, size_t nbyte)
 
 	if (SUCCEED == test_comms)
 	{
-		int ret;
-
-		ret = read_ret[read_iter];
+		int	ret = read_ret[read_iter];
 		read_iter++;
 
 		return ret;

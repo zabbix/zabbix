@@ -16,7 +16,7 @@ in:
   data_len: 5
   poll_mode: "MOCK_POLL_DEFAULT"
   sendto_return: -1
-  socket_had_blocking_error: yes
+  socket_had_blocking_error: true
 out:
   result: FAIL
 ---

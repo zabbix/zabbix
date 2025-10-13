@@ -28,7 +28,11 @@ ssize_t	__wrap_write(int fd, const void *buf, size_t n)
 	ZBX_UNUSED(buf);
 
 	if (SUCCEED == zbx_mock_parameter_exists("in.write_error"))
-		return FAIL;
+	{
+		errno = EPERM;
+
+		return -1;
+	}
 	else
 		return (ssize_t)n;
 }
@@ -40,6 +44,8 @@ int	__wrap_SSL_write(SSL *ssl, const void *buf, int num)
 
 	if (SUCCEED == zbx_mock_parameter_exists("in.ssl_write_error"))
 		return 0;
+	else if (SUCCEED == zbx_mock_parameter_exists("in.ssl_write_fail"))
+		return -1;
 	else
 		return num;
 }
@@ -47,7 +53,7 @@ int	__wrap_SSL_write(SSL *ssl, const void *buf, int num)
 void	set_nonblocking_error(void)
 {
 	if (SUCCEED == zbx_mock_parameter_exists("in.socket_had_blocking_error"))
-		errno = FAIL;
+		errno = EPERM;
 	else
 		errno = EINTR;
 }

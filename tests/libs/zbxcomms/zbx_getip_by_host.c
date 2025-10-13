@@ -24,7 +24,7 @@
 void	zbx_mock_test_entry(void **state)
 {
 	const char	*host = zbx_mock_get_parameter_string("in.host");
-	char		*ip = zbx_malloc(NULL, ZBX_MAX_HOSTNAME_LEN);
+	char		ip[ZBX_MAX_HOSTNAME_LEN];
 
 	ZBX_UNUSED(state);
 
@@ -33,8 +33,6 @@ void	zbx_mock_test_entry(void **state)
 	const char	*exp_v4 = zbx_mock_get_parameter_string("out.result_v4");
 	const char	*exp_v6 = zbx_mock_get_parameter_string("out.result_v6");
 
-	if (0 != strcmp(ip, exp_v4)  && 0 != strcmp(ip, exp_v6))
+	if (0 != strcmp(ip, exp_v4) && 0 != strcmp(ip, exp_v6))
 		fail_msg("Expected %s or %s, got %s", exp_v4, exp_v6, ip);
-
-	zbx_free(ip);
 }

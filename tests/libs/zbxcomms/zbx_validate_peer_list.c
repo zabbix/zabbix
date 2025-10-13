@@ -23,10 +23,9 @@
 
 void	zbx_mock_test_entry(void **state)
 {
-	int		result, exp_result = zbx_mock_str_to_return_code(zbx_mock_get_parameter_string("out.return"));
+	int		exp_result = zbx_mock_str_to_return_code(zbx_mock_get_parameter_string("out.return"));
 	int		ipv = zbx_mock_get_parameter_int("in.ipv");
 	const char	*peer_list = zbx_mock_get_parameter_string("in.list");
-	char		*error = NULL;
 
 	ZBX_UNUSED(state);
 
@@ -36,11 +35,12 @@ void	zbx_mock_test_entry(void **state)
 	if (ZBX_IPRANGE_V4 == ipv || ZBX_IPRANGE_V6 == ipv)
 #endif
 	{
-		result = zbx_validate_peer_list(peer_list, &error);
+		char	*error = NULL;
+
+		int	result = zbx_validate_peer_list(peer_list, &error);
 		zbx_mock_assert_int_eq("return value", exp_result, result);
+
+		if (NULL != error)
+			zbx_free(error);
 	}
-
-	if (NULL != error)
-		zbx_free(error);
-
 }

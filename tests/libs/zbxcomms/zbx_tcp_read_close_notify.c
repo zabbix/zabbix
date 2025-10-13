@@ -39,10 +39,17 @@ void	zbx_mock_test_entry(void **state)
 #endif
 
 	zbx_mock_extract_yaml_values_int32(zbx_mock_get_parameter_handle("in.read_return"), &read_return_seq);
+
+	if(5 < read_return_seq.values_num)
+		fail_msg("Too many elements in read_return_seq: %d (max 5)", read_return_seq.values_num);
+
 	setup_read(&read_return_seq);
 
 	if (SUCCEED == zbx_mock_parameter_exists("in.event_is_null"))
-		result = zbx_tcp_read_close_notify(&s, timeout, NULL);
+	{
+		event = NULL;
+		result = zbx_tcp_read_close_notify(&s, timeout, &event);
+	}
 	else
 	{
 		event = EV_TIMEOUT;

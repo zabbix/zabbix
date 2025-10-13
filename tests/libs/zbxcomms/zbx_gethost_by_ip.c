@@ -27,27 +27,29 @@ static int get_host_from_etc_hosts(const char *ip, char *hostname, size_t hostna
 {
 	int	fd = openat(AT_FDCWD, "/etc/hosts", O_RDONLY);
 
-	if (fd == -1)
+	if (-1 == fd)
 		return FAIL;
 
-	struct stat st;
+	struct	stat st;
 
-	if (fstat(fd, &st) == -1)
+	if (-1 == fstat(fd, &st))
 	{
 		close(fd);
+
 		return FAIL;
 	}
 
 	char *data = mmap(NULL, st.st_size, PROT_READ, MAP_PRIVATE, fd, 0);
 
-	if (data == MAP_FAILED)
+	if (MAP_FAILED == data)
 	{
 		close(fd);
+
 		return FAIL;
 	}
 
 	char	line[ZBX_MAX_HOSTNAME_LEN];
-	size_t i = 0;
+	size_t	i = 0;
 
 	for (off_t j = 0; j < st.st_size; j++)
 	{
@@ -68,6 +70,7 @@ static int get_host_from_etc_hosts(const char *ip, char *hostname, size_t hostna
 					zbx_strlcpy(hostname, name, hostnamelen);
 					munmap(data, st.st_size);
 					close(fd);
+
 					return SUCCEED;
 				}
 			}
@@ -80,14 +83,15 @@ static int get_host_from_etc_hosts(const char *ip, char *hostname, size_t hostna
 
 	munmap(data, st.st_size);
 	close(fd);
+
 	return FAIL;
 }
 
 void	zbx_mock_test_entry(void **state)
 {
 	const char	*ip = zbx_mock_get_parameter_string("in.ip");
-	char		*host = zbx_malloc(NULL, ZBX_MAX_HOSTNAME_LEN),
-			*exp_host = zbx_malloc(NULL, ZBX_MAX_HOSTNAME_LEN);
+	char		host[ZBX_MAX_HOSTNAME_LEN],
+			exp_host[ZBX_MAX_HOSTNAME_LEN];
 
 	ZBX_UNUSED(state);
 
@@ -97,7 +101,4 @@ void	zbx_mock_test_entry(void **state)
 		zbx_mock_assert_str_eq("return value", exp_host, host);
 	else
 		zbx_mock_assert_str_eq("ip not found, expect empty string", "", host);
-
-	zbx_free(host);
-	zbx_free(exp_host);
 }

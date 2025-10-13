@@ -6,7 +6,6 @@ in:
   written: 0
   written_header: 0
   header_len: 0
-  ssl_write_error: yes
 out:
   result: "SUCCEED"
 ---
@@ -17,7 +16,6 @@ in:
   written: 3
   written_header: 0
   header_len: 0
-  ssl_write_error: yes
 out:
   result: "SUCCEED"
 ---
@@ -28,7 +26,6 @@ in:
   written: 0
   written_header: 0
   header_len: 5
-  ssl_write_error: yes
 out:
   result: "SUCCEED"
 ---
@@ -39,18 +36,38 @@ in:
   written: 0
   written_header: 0
   header_len: 0
-  ssl_write_error: yes
 out:
   result: "SUCCEED"
 ---
-test case: "headrer_len > written_header"
+test case: "header_len > written_header"
 in:
   data: "abc"
   send_len: 3
   written: 0
   written_header: 0
   header_len: 5
-  ssl_write_error: yes
 out:
   result: "SUCCEED"
+---
+test case: "send_len > written - write fail"
+in:
+  data: "abc"
+  send_len: 3
+  written: 0
+  written_header: 0
+  header_len: 0
+  write_error: true
+out:
+  result: "FAIL"
+---
+test case: "header_len > written_header - write fail"
+in:
+  data: "abc"
+  send_len: 3
+  written: 0
+  written_header: 0
+  header_len: 5
+  write_error: true
+out:
+  result: "FAIL"
 ...

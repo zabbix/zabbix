@@ -42,7 +42,7 @@ void	zbx_mock_test_entry(void **state)
 {
 	zbx_socket_t	s;
 	const char	*data = zbx_mock_get_parameter_string("in.data");
-	int		result, timeout = zbx_mock_get_parameter_int("in.timeout"),
+	int		timeout = zbx_mock_get_parameter_int("in.timeout"),
 			exp_result = zbx_mock_str_to_return_code(zbx_mock_get_parameter_string("out.result"));
 	size_t		data_len = zbx_mock_get_parameter_uint64("in.data_len");
 
@@ -51,8 +51,7 @@ void	zbx_mock_test_entry(void **state)
 	mock_poll_set_mode_from_param(zbx_mock_get_parameter_string("in.poll_mode"));
 	set_nonblocking_error();
 
-	result = zbx_udp_send(&s, data, data_len, timeout);
+	int	result = zbx_udp_send(&s, data, data_len, timeout);
 
 	zbx_mock_assert_int_eq("return value:", exp_result, result);
-
 }
