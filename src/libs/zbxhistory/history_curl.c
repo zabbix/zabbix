@@ -24,7 +24,7 @@ size_t	history_curl_recv(void *ptr, size_t size, size_t nmemb, void *userdata)
 
 	zbx_httppage_t	*page = (zbx_httppage_t	*)userdata;
 
-	zbx_strncpy_alloc(&page->data, &page->alloc, &page->offset, ptr, r_size);
+	zbx_str_memcpy_alloc(&page->data, &page->alloc, &page->offset, ptr, r_size);
 
 	return r_size;
 }
