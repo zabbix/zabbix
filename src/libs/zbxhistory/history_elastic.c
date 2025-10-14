@@ -1099,7 +1099,7 @@ static int	history_elastic_get_info(void *data, zbx_history_provider_info_t *inf
 	}
 
 	if (SUCCEED != zbx_curl_setopt_https(handle, error))
-		goto out;
+		goto clean;
 
 	*errbuf = '\0';
 
