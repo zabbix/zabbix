@@ -32,8 +32,6 @@ typedef struct
 }
 zbx_jsonpath_context_t;
 
-typedef struct zbx_jsonpath_token zbx_jsonpath_token_t;
-
 typedef enum
 {
 	ZBX_JSONPATH_SEGMENT_UNKNOWN,
@@ -97,8 +95,15 @@ typedef enum
 }
 zbx_json_path_expression_index_t;
 
-typedef struct zbx_jsonpath_token zbx_jsonpath_token;
-ZBX_PTR_VECTOR_DECL(jsonpath_token_ptr, zbx_jsonpath_token *)
+typedef struct
+{
+	unsigned char	type;
+	char		*text;
+	zbx_jsonpath_t	*path;
+}
+zbx_jsonpath_token_t;
+
+ZBX_PTR_VECTOR_DECL(jsonpath_token_ptr, zbx_jsonpath_token_t *)
 
 /* expression tokens in postfix notation */
 typedef struct
@@ -173,13 +178,6 @@ typedef enum
 	ZBX_JSONPATH_TOKEN_OP_REGEXP
 }
 zbx_jsonpath_token_type_t;
-
-struct zbx_jsonpath_token
-{
-	unsigned char	type;
-	char		*text;
-	zbx_jsonpath_t	*path;
-};
 
 typedef struct
 {

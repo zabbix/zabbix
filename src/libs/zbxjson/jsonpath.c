@@ -26,7 +26,7 @@
 
 #define ZBX_VECTOR_ARRAY_RESERVE	3
 
-ZBX_PTR_VECTOR_IMPL(jsonpath_token_ptr, zbx_jsonpath_token *)
+ZBX_PTR_VECTOR_IMPL(jsonpath_token_ptr, zbx_jsonpath_token_t *)
 
 typedef struct
 {
