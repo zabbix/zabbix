@@ -58,6 +58,7 @@ typedef struct
 	char				*base_url;
 
 	zbx_vector_elastic_conn_ptr_t	conns;
+	CURLM				*mhandle;
 }
 zbx_history_elastic_data_t;
 
@@ -370,26 +371,19 @@ out:
  ************************************************************************************/
 static zbx_uint64_t	history_elastic_flush(void *data)
 {
-	zbx_history_elastic_data_t	*d = (zbx_history_elastic_data_t *)data;
 	struct curl_slist		*curl_headers = NULL;
+	zbx_history_elastic_data_t	*d = (zbx_history_elastic_data_t *)data;
 	int				i, running, previous, msgnum;
 	CURLMsg				*msg;
 	zbx_vector_ptr_t		retries;
 	CURLcode			err;
-	CURLM				*mhandle;
 	zbx_uint64_t			flush_err = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	if (NULL == (mhandle = curl_multi_init()))
-	{
-		zbx_error("Cannot initialize cURL multi session");
-		exit(EXIT_FAILURE);
-	}
-
 	for (i = 0; i < d->conns.values_num; i++)
 	{
-		curl_multi_add_handle(mhandle, d->conns.values[i]->handle);
+		curl_multi_add_handle(d->mhandle, d->conns.values[i]->handle);
 		d->conns.values[i]->status = FAIL;
 	}
 
@@ -422,15 +416,15 @@ try_again:
 		char			*error;
 		zbx_curl_response_t	*resp;
 
-		if (CURLM_OK != (code = curl_multi_perform(mhandle, &running)))
+		if (CURLM_OK != (code = curl_multi_perform(d->mhandle, &running)))
 		{
 			zabbix_log(LOG_LEVEL_ERR, "cannot perform on curl multi handle: %s", curl_multi_strerror(code));
 			break;
 		}
 
-		if (CURLM_OK != (code = zbx_curl_multi_wait(mhandle, ZBX_HISTORY_STORAGE_DOWN, &fds)))
+		if (CURLM_OK != (code = zbx_curl_multi_wait(d->mhandle, ZBX_HISTORY_STORAGE_DOWN, &fds)))
 		{
-			curl_multi_cleanup(mhandle);
+			curl_multi_cleanup(d->mhandle);
 
 			zabbix_log(LOG_LEVEL_ERR, "cannot wait on curl multi handle: %s", curl_multi_strerror(code));
 			break;
@@ -439,7 +433,7 @@ try_again:
 		if (previous == running)
 			continue;
 
-		while (NULL != (msg = curl_multi_info_read(mhandle, &msgnum)))
+		while (NULL != (msg = curl_multi_info_read(d->mhandle, &msgnum)))
 		{
 			/* If the error is due to malformed data, there is no sense on re-trying to send. */
 			/* That's why we actually check for transport and curl errors separately */
@@ -489,7 +483,7 @@ try_again:
 				/* problems with HTTP, we put the handle in a retry list and */
 				/* remove it from the current execution loop */
 				zbx_vector_ptr_append(&retries, msg->easy_handle);
-				curl_multi_remove_handle(mhandle, msg->easy_handle);
+				curl_multi_remove_handle(d->mhandle, msg->easy_handle);
 			}
 			else if (CURLE_OK == curl_easy_getinfo(msg->easy_handle, CURLINFO_PRIVATE, (char **)&resp)
 					&& SUCCEED == elastic_is_error_present(&resp->page, &error))
@@ -502,7 +496,7 @@ try_again:
 				/* became read-only), we put the handle in a retry list and */
 				/* remove it from the current execution loop */
 				zbx_vector_ptr_append(&retries, msg->easy_handle);
-				curl_multi_remove_handle(mhandle, msg->easy_handle);
+				curl_multi_remove_handle(d->mhandle, msg->easy_handle);
 			}
 			else
 			{
@@ -526,7 +520,7 @@ try_again:
 	if (0 < retries.values_num)
 	{
 		for (i = 0; i < retries.values_num; i++)
-			curl_multi_add_handle(mhandle, retries.values[i]);
+			curl_multi_add_handle(d->mhandle, retries.values[i]);
 
 		zbx_vector_ptr_clear(&retries);
 
@@ -544,8 +538,6 @@ clean:
 
 	zbx_vector_ptr_destroy(&retries);
 	zbx_vector_elastic_conn_ptr_clear_ext(&d->conns, elastic_conn_free);
-
-	curl_multi_cleanup(mhandle);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s(): ret:%lx", __func__, flush_err);
 
@@ -1212,6 +1204,12 @@ static void	*history_elastic_create_data(const zbx_history_option_t *options, in
 		return NULL;
 	}
 
+	if (NULL == (data->mhandle = curl_multi_init()))
+	{
+		*error = zbx_strdup(*error, "Cannot initialize cURL multi session");
+		return NULL;
+	}
+
 	data->base_url = zbx_strdup(NULL, value);
 	zbx_rtrim(data->base_url, "/");
 
@@ -1236,6 +1234,7 @@ static void	history_elastic_close(void *data)
 {
 	zbx_history_elastic_data_t	*d = (zbx_history_elastic_data_t *)data;
 
+	curl_multi_cleanup(d->mhandle);
 	zbx_vector_elastic_conn_ptr_destroy(&d->conns);
 
 	zbx_free(d->base_url);
