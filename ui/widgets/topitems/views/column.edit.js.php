@@ -261,7 +261,8 @@ window.topitems_column_edit_form = new class {
 
 		const item_aggregate_function_warning = this.#form.querySelector('.js-item-aggregate-function-warning');
 		if (item_aggregate_function_warning) {
-			const warning_show = item_aggregate_function !== <?= AGGREGATE_NONE ?> && display_sparkline;
+			const warning_show = display_value_as_numeric
+				&& item_aggregate_function !== <?= AGGREGATE_NONE ?> && display_sparkline;
 
 			item_aggregate_function_warning.style.display = warning_show ? '' : 'none';
 		}
