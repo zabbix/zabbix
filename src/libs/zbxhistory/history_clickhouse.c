@@ -398,7 +398,7 @@ static void	history_clickhouse_write(void *data, unsigned char value_type,
 		zbx_chrcpy_alloc(&buf, &buf_alloc, &buf_offset, '\n');
 
 		zbx_json_setempty(&row);
-		zbx_json_initarray(&row, 1024);
+		zbx_json_addarray(&row, NULL);
 	}
 	zbx_json_free(&row);
 
@@ -757,6 +757,9 @@ static int	history_clickhouse_parse_response(char *response, unsigned char value
 {
 	zbx_vector_history_record_t	records;
 	char				*start, *end;
+
+	if (NULL == response)
+		return 0;
 
 	zbx_vector_history_record_create(&records);
 
