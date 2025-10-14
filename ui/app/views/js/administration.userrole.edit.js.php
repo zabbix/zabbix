@@ -14,6 +14,9 @@
 **/
 
 
+/**
+ * @var CView $this
+ */
 ?>
 
 <script>
