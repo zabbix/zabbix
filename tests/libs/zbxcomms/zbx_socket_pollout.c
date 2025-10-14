@@ -49,7 +49,7 @@ void	zbx_mock_test_entry(void **state)
 
 	if (SUCCEED != result)
 	{
-		const char	*exp_error = zbx_strdup(NULL, zbx_mock_get_parameter_string("out.error"));
+		char	*exp_error = zbx_strdup(NULL, zbx_mock_get_parameter_string("out.error"));
 
 		zbx_mock_assert_str_eq("error", exp_error, error);
 		zbx_free(error);
