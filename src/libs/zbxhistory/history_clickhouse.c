@@ -69,6 +69,7 @@ static void	clickhouse_conn_free(zbx_clickhouse_conn_t *conn)
 	zbx_free(conn->buf);
 
 	zbx_free(conn->resp.page.data);
+	zbx_free(conn);
 }
 
 static void	history_clickhouse_data_free(zbx_clickhouse_data_t *data)
@@ -78,6 +79,9 @@ static void	history_clickhouse_data_free(zbx_clickhouse_data_t *data)
 	zbx_vector_clickhouse_conn_ptr_destroy(&data->conns);
 
 	curl_slist_free_all(data->curl_headers);
+
+	zbx_free(data->base_url);
+	zbx_free(data->db);
 
 	zbx_free(data);
 }
