@@ -2132,9 +2132,9 @@ class testDashboardWidgetCommunication extends testWidgetCommunication {
 						'Honeycomb re-broadcaster' => [
 							self::SECOND_HOST_NAME => 4
 						],
-						'Data overview host listener from honeycomb' => [
+						'Top item host listener from honeycomb' => [
 							'Hosts' => self::SECOND_HOST_NAME,
-							'Trapper item' => '4'
+							'Trapper item' => '4.00'
 						]
 					]
 				]
@@ -2147,9 +2147,9 @@ class testDashboardWidgetCommunication extends testWidgetCommunication {
 						'Honeycomb re-broadcaster' => [
 							self::THIRD_HOST_NAME => 5
 						],
-						'Data overview host listener from honeycomb' => [
+						'Top item host listener from honeycomb' => [
 							'Hosts' => self::THIRD_HOST_NAME,
-							'Trapper item' => '5'
+							'Trapper item' => '5.00'
 						]
 					]
 				]
