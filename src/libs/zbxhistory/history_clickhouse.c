@@ -562,6 +562,9 @@ static zbx_uint64_t	history_clickhouse_flush(void *data)
 		if (0 == retries.values_num)
 			break;
 
+		zabbix_log(LOG_LEVEL_ERR, "ClickHouse database is down: reconnecting in %d seconds",
+				ZBX_HISTORY_STORAGE_DOWN / 1000);
+
 		sleep(ZBX_HISTORY_STORAGE_DOWN / 1000);
 	}
 out:

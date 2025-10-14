@@ -524,6 +524,9 @@ try_again:
 
 		zbx_vector_ptr_clear(&retries);
 
+		zabbix_log(LOG_LEVEL_ERR, "ElasticSearch database is down: reconnecting in %d seconds",
+				ZBX_HISTORY_STORAGE_DOWN / 1000);
+
 		sleep(ZBX_HISTORY_STORAGE_DOWN / 1000);
 		goto try_again;
 	}
