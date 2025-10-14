@@ -1726,12 +1726,6 @@ class CEvent extends CApiService {
 	 * @return bool
 	 */
 	protected function isEventSuppressed(array $event): bool {
-		if (count($event['suppression_data']) === 0 && count($event['acknowledges']) !== 0
-				&& end($event['acknowledges'])['action'] !== ZBX_PROBLEM_UPDATE_UNSUPPRESS) {
-
-			return true;
-		}
-
 		foreach ($event['suppression_data'] as $suppression) {
 			if ($suppression['maintenanceid'] == 0) {
 				return true;
