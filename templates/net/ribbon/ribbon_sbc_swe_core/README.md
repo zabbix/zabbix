@@ -63,6 +63,7 @@ This template has been tested on:
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
 |Get data|<p>Gets the system information.</p>|Script|ribbon.system.data.get|
+|Get data check|<p>Check that the Ribbon metrics data has been received correctly.</p>|Dependent item|ribbon.system.data.get.check<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p><p>⛔️Custom on fail: Set value to</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
 |System name|<p>Name of the system.</p>|Dependent item|ribbon.system.name<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.admin[0].actualSystemName`</p></li><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
 |Management mode|<p>Management mode of the system. Possible value:</p><p>  - haMode1to1</p><p>  - haModeNto1</p>|Dependent item|ribbon.system.haMode<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.admin[0].haMode`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
 |System congestion level|<p>The current System congestion level.</p>|Dependent item|ribbon.system.congestion.level<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.CongestionStatus[0].systemCongestionMCLevel`</p></li><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
@@ -96,6 +97,12 @@ This template has been tested on:
 |Call statistics: HPC queue overflows|<p>The current number of HPC calls for which HPC call queuing attempts were unsuccessful because queues were full.</p>|Dependent item|ribbon.system.hpc.queue.overflows<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.callCountCurrentStatistics[0].hpcQueueOverflows`</p></li><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
 |Call statistics: HPC queue abandons|<p>The current number of HPC calls that were placed in HPC Call Queuing queues, but were subsequently abandoned before they could be completed.</p>|Dependent item|ribbon.system.hpc.queue.abandons<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.callCountCurrentStatistics[0].hpcQueueAbandons`</p></li><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
 |Call statistics: HPC queue timeouts|<p>The current number of HPC calls removed from HPC Call Queuing queues due to expiration of the queue timeout timer.</p>|Dependent item|ribbon.system.hpc.queue.timeouts<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.callCountCurrentStatistics[0].hpcQueueTimeouts`</p></li><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
+
+### Triggers
+
+|Name|Description|Expression|Severity|Dependencies and additional info|
+|----|-----------|----------|--------|--------------------------------|
+|Ribbon: Failed to get metrics data|<p>Failed to get API metrics for the Ribbon.</p>|`length(last(/Ribbon SBC SWe core by HTTP/ribbon.system.data.get.check))>0`|Warning||
 
 ### LLD rule Sync module discovery
 
@@ -205,6 +212,7 @@ This template has been tested on:
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
 |Get data|<p>Gets the server information.</p>|Script|ribbon.server.data.get|
+|Get data check|<p>Check that the Ribbon metrics data has been received correctly.</p>|Dependent item|ribbon.server.data.get.check<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p><p>⛔️Custom on fail: Set value to</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
 |Server name|<p>Identifies the server.</p>|Dependent item|ribbon.server.name<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.serverStatus[0].name`</p></li><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
 |Server hardware type|<p>Identifies the type of server module the indexed slot has been configured to accept. Server modules other than this type are rejected by the System Manager.</p>|Dependent item|ribbon.server.hw.type<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.serverStatus[0].hwType`</p></li><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
 |Server hardware sub type|<p>Identifies the type of server module the indexed slot has been configured to accept. Server modules other than this type are rejected by the System Manager.</p>|Dependent item|ribbon.server.hw.sub.type<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.serverStatus[0].hwSubType`</p></li><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
@@ -223,6 +231,7 @@ This template has been tested on:
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
+|Ribbon: Failed to get metrics data|<p>Failed to get API metrics for the Ribbon.</p>|`length(last(/Ribbon SBC SWe CE by HTTP/ribbon.server.data.get.check))>0`|Warning||
 |Ribbon: Role has been changed||`last(/Ribbon SBC SWe CE by HTTP/ribbon.server.role)<>last(/Ribbon SBC SWe CE by HTTP/ribbon.server.role,#2)`|Info|**Manual close**: Yes|
 |Ribbon: Application has been restarted||`last(/Ribbon SBC SWe CE by HTTP/ribbon.server.application.uptime)<10m`|Info|**Manual close**: Yes|
 |Ribbon: Sync status is not "Completed"||`last(/Ribbon SBC SWe CE by HTTP/ribbon.server.sync.status)<>"syncCompleted"`|Warning|**Manual close**: Yes|
@@ -274,11 +283,11 @@ This template has been tested on:
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Packet port [{#PORT}]: Negotiated speed|<p>The interface speed. Packet port speed is not negotiable. When statistics are generated for EMS, negotiatedSpeed will be displayed as integer value. </p><p>Possible values:</p><p>0 - speed10Mbps</p><p>1 - speed100Mbps</p><p>2 - speed1000Mbps</p><p>3 - speed10000Mbps</p><p>4 - unknown</p>|Dependent item|ribbon.packet.port.speed[{#PORT}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.packetPortStatus.["{#PORT}"].negotiatedSpeed`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
+|Packet port [{#PORT}]: Negotiated speed|<p>The interface speed. Packet port speed is not negotiable. When statistics are generated for EMS, negotiatedSpeed will be displayed as integer value.</p><p>Possible values:</p><p>0 - speed10Mbps</p><p>1 - speed100Mbps</p><p>2 - speed1000Mbps</p><p>3 - speed10000Mbps</p><p>4 - unknown</p>|Dependent item|ribbon.packet.port.speed[{#PORT}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.packetPortStatus.["{#PORT}"].negotiatedSpeed`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
 |Packet port [{#PORT}]: Bits received|<p>Actual Rx bandwidth in use on this port, bytes/sec.</p>|Dependent item|ribbon.packet.port.in[{#PORT}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.packetPortStatus.["{#PORT}"].rxActualBandwidth`</p></li></ul>|
 |Packet port [{#PORT}]: Bits sent|<p>Actual Tx bandwidth in use on this port, bytes/sec.</p>|Dependent item|ribbon.packet.port.out[{#PORT}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.packetPortStatus.["{#PORT}"].txActualBandwidth`</p></li></ul>|
 |Packet port [{#PORT}]: Utilization|<p>Percentage of maximum bandwidth allocated on this port.</p>|Dependent item|ribbon.packet.port.util[{#PORT}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.packetPortStatus.["{#PORT}"].bandwidthUsage`</p></li></ul>|
-|Packet port [{#PORT}]: Link state|<p>The state of the interface. When statistics are generated for EMS, linkState will be displayed as integer value. </p><p>Possible values:</p><p>0 - null</p><p>1 - admnDisabled</p><p>2 - admnEnabledPortDown</p><p>3 - admnEnabledPortUp</p><p>4 - admnDisabledNoLicense</p><p>5 - admnEnabledPortDownInvalidSfpWrongSpeed</p><p>6 - admnEnabledPortDownInvalidSfpNonSonus</p>|Dependent item|ribbon.packet.port.link.state[{#PORT}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.packetPortStatus.["{#PORT}"].linkState`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
+|Packet port [{#PORT}]: Link state|<p>The state of the interface. When statistics are generated for EMS, linkState will be displayed as integer value.</p><p>Possible values:</p><p>0 - null</p><p>1 - admnDisabled</p><p>2 - admnEnabledPortDown</p><p>3 - admnEnabledPortUp</p><p>4 - admnDisabledNoLicense</p><p>5 - admnEnabledPortDownInvalidSfpWrongSpeed</p><p>6 - admnEnabledPortDownInvalidSfpNonSonus</p>|Dependent item|ribbon.packet.port.link.state[{#PORT}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.packetPortStatus.["{#PORT}"].linkState`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
 
 ### Trigger prototypes for Packet port discovery
 
@@ -297,7 +306,7 @@ This template has been tested on:
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Management port [{#PORT}]: Negotiated speed|<p>The negotiated interface speed. When statistics are generated for EMS, negotiatedSpeed will be displayed as integer value. </p><p>Possible values:</p><p>0 - speed10Mbps</p><p>1 - speed100Mbps</p><p>2 - speed1000Mbps</p><p>3 - speed10000Mbps</p><p>4 - unknown</p>|Dependent item|ribbon.mgmt.port.speed[{#PORT}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.mgmtPortStatus.["{#PORT}"].negotiatedSpeed`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
+|Management port [{#PORT}]: Negotiated speed|<p>The negotiated interface speed. When statistics are generated for EMS, negotiatedSpeed will be displayed as integer value.</p><p>Possible values:</p><p>0 - speed10Mbps</p><p>1 - speed100Mbps</p><p>2 - speed1000Mbps</p><p>3 - speed10000Mbps</p><p>4 - unknown</p>|Dependent item|ribbon.mgmt.port.speed[{#PORT}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.mgmtPortStatus.["{#PORT}"].negotiatedSpeed`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
 |Management port [{#PORT}]: Link state|<p>The state of the interface.</p><p>Possible values:</p><p>0 - null</p><p>1 - admnDisabled</p><p>2 - admnEnabledPortDown</p><p>3 - admnEnabledPortUp</p><p>4 - admnDisabledNoLicense</p><p>5 - admnEnabledPortDownInvalidSfpWrongSpeed</p><p>6 - admnEnabledPortDownInvalidSfpNonSonus</p>|Dependent item|ribbon.mgmt.port.link.state[{#PORT}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.mgmtPortStatus.["{#PORT}"].linkState`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
 |Management port [{#PORT}]: Duplex mode|<p>The negotiated interface duplex mode.</p>|Dependent item|ribbon.mgmt.port.duplex.mode[{#PORT}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.mgmtPortStatus.["{#PORT}"].duplexMode`</p></li><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
 |Management port [{#PORT}]: Bits received|<p>Actual Rx bandwidth in use on this port, bytes/sec.</p>|Dependent item|ribbon.mgmt.port.in[{#PORT}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.mgmtPortStatus.["{#PORT}"].rxActualBandwidth`</p></li></ul>|

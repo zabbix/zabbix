@@ -308,6 +308,38 @@ zabbix_export:
           tags:
             - tag: component
               value: raw
+        - uuid: 48536769afc946aca214d49e7f2bebda
+          name: 'Get data check'
+          type: DEPENDENT
+          key: ribbon.server.data.get.check
+          delay: '0'
+          value_type: CHAR
+          trends: '0'
+          description: 'Check that the Ribbon metrics data has been received correctly.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.error
+              error_handler: CUSTOM_VALUE
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 3h
+          master_item:
+            key: ribbon.server.data.get
+          tags:
+            - tag: component
+              value: status
+          triggers:
+            - uuid: b71110508de943589a1576596d3927ac
+              expression: 'length(last(/Ribbon SBC SWe CE by HTTP/ribbon.server.data.get.check))>0'
+              name: 'Ribbon: Failed to get metrics data'
+              event_name: 'Ribbon: Failed to get API metrics for the Ribbon'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: WARNING
+              description: 'Failed to get API metrics for the Ribbon.'
+              tags:
+                - tag: scope
+                  value: availability
         - uuid: 92ceb828307d4c7998ecf2840eee9fb4
           name: 'Server hardware sub type'
           type: DEPENDENT
@@ -935,7 +967,7 @@ zabbix_export:
               key: 'ribbon.mgmt.port.speed[{#PORT}]'
               delay: '0'
               description: |
-                The negotiated interface speed. When statistics are generated for EMS, negotiatedSpeed will be displayed as integer value. 
+                The negotiated interface speed. When statistics are generated for EMS, negotiatedSpeed will be displayed as integer value.
                 Possible values:
                 0 - speed10Mbps
                 1 - speed100Mbps
@@ -1285,7 +1317,7 @@ zabbix_export:
               key: 'ribbon.packet.port.link.state[{#PORT}]'
               delay: '0'
               description: |
-                The state of the interface. When statistics are generated for EMS, linkState will be displayed as integer value. 
+                The state of the interface. When statistics are generated for EMS, linkState will be displayed as integer value.
                 Possible values:
                 0 - null
                 1 - admnDisabled
@@ -1362,7 +1394,7 @@ zabbix_export:
               key: 'ribbon.packet.port.speed[{#PORT}]'
               delay: '0'
               description: |
-                The interface speed. Packet port speed is not negotiable. When statistics are generated for EMS, negotiatedSpeed will be displayed as integer value. 
+                The interface speed. Packet port speed is not negotiable. When statistics are generated for EMS, negotiatedSpeed will be displayed as integer value.
                 Possible values:
                 0 - speed10Mbps
                 1 - speed100Mbps
@@ -2344,6 +2376,8 @@ zabbix_export:
             key: ribbon.system.data.get
           tags:
             - tag: component
+              value: calls
+            - tag: component
               value: system
         - uuid: 5ed0bad322164073aaf5db9b1791a3d8
           name: 'Call status: Attempts'
@@ -2361,6 +2395,8 @@ zabbix_export:
           master_item:
             key: ribbon.system.data.get
           tags:
+            - tag: component
+              value: calls
             - tag: component
               value: system
         - uuid: 6e5ec53168d14b3d951e48f7c0e28c2c
@@ -2380,6 +2416,8 @@ zabbix_export:
             key: ribbon.system.data.get
           tags:
             - tag: component
+              value: calls
+            - tag: component
               value: system
         - uuid: e3855ac0b82b4af6990b704eff03afbd
           name: 'Call statistics: Concurrent calls'
@@ -2397,6 +2435,8 @@ zabbix_export:
           master_item:
             key: ribbon.system.data.get
           tags:
+            - tag: component
+              value: calls
             - tag: component
               value: system
         - uuid: d1ff4e8e50fc44ebb52414e2c872c4ec
@@ -2416,6 +2456,8 @@ zabbix_export:
             key: ribbon.system.data.get
           tags:
             - tag: component
+              value: calls
+            - tag: component
               value: system
         - uuid: a6b366b5cdad4e41bdd4aacdfbf006c9
           name: 'Call statistics: NICE recorded calls'
@@ -2433,6 +2475,8 @@ zabbix_export:
           master_item:
             key: ribbon.system.data.get
           tags:
+            - tag: component
+              value: calls
             - tag: component
               value: system
         - uuid: c32af5bd2a62410eb15963aa81bbd0a9
@@ -2470,6 +2514,8 @@ zabbix_export:
             key: ribbon.system.data.get
           tags:
             - tag: component
+              value: calls
+            - tag: component
               value: system
         - uuid: 52684c20d4134677b946d2c901e0e1fd
           name: 'Call statistics: SRTP calls'
@@ -2487,6 +2533,8 @@ zabbix_export:
           master_item:
             key: ribbon.system.data.get
           tags:
+            - tag: component
+              value: calls
             - tag: component
               value: system
         - uuid: a6909ad4316642b6ba038de1dd678f56
@@ -2506,6 +2554,8 @@ zabbix_export:
             key: ribbon.system.data.get
           tags:
             - tag: component
+              value: calls
+            - tag: component
               value: system
         - uuid: 2be5c70ea19744159c89e3bec6975f37
           name: 'Call status: Total'
@@ -2523,6 +2573,8 @@ zabbix_export:
           master_item:
             key: ribbon.system.data.get
           tags:
+            - tag: component
+              value: calls
             - tag: component
               value: system
         - uuid: 1645dc510644472180fbd4bd49765cb7
@@ -2542,6 +2594,8 @@ zabbix_export:
             key: ribbon.system.data.get
           tags:
             - tag: component
+              value: calls
+            - tag: component
               value: system
         - uuid: 9ff0738420f94ef19f633f2216813c77
           name: 'Call status: Updates'
@@ -2560,6 +2614,8 @@ zabbix_export:
             key: ribbon.system.data.get
           tags:
             - tag: component
+              value: calls
+            - tag: component
               value: system
         - uuid: a639e7401f4e440ebc48495d1ed276b7
           name: 'Call statistics: Video calls'
@@ -2577,6 +2633,8 @@ zabbix_export:
           master_item:
             key: ribbon.system.data.get
           tags:
+            - tag: component
+              value: calls
             - tag: component
               value: system
         - uuid: 55cd46b62b16462d97200cac6dee8e3d
@@ -2751,6 +2809,38 @@ zabbix_export:
           tags:
             - tag: component
               value: raw
+        - uuid: f3d28176e1234b99aadb19c81b83850a
+          name: 'Get data check'
+          type: DEPENDENT
+          key: ribbon.system.data.get.check
+          delay: '0'
+          value_type: CHAR
+          trends: '0'
+          description: 'Check that the Ribbon metrics data has been received correctly.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.error
+              error_handler: CUSTOM_VALUE
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 3h
+          master_item:
+            key: ribbon.system.data.get
+          tags:
+            - tag: component
+              value: status
+          triggers:
+            - uuid: 50ed5b65a1b048c99c9f5f5101630fe6
+              expression: 'length(last(/Ribbon SBC SWe core by HTTP/ribbon.system.data.get.check))>0'
+              name: 'Ribbon: Failed to get metrics data'
+              event_name: 'Ribbon: Failed to get API metrics for the Ribbon'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: WARNING
+              description: 'Failed to get API metrics for the Ribbon.'
+              tags:
+                - tag: scope
+                  value: availability
         - uuid: ea77f9d8f1ba4a9fbe40549ce0d17091
           name: 'DSP congestion level'
           type: DEPENDENT
@@ -2786,6 +2876,8 @@ zabbix_export:
             key: ribbon.system.data.get
           tags:
             - tag: component
+              value: calls
+            - tag: component
               value: system
         - uuid: eb174749ba8e4f74abdd4fb60627f761
           name: 'Call status: Emergency stable'
@@ -2803,6 +2895,8 @@ zabbix_export:
           master_item:
             key: ribbon.system.data.get
           tags:
+            - tag: component
+              value: calls
             - tag: component
               value: system
         - uuid: 0209ccef35384da29d1bb002788a3fa8
@@ -2857,6 +2951,8 @@ zabbix_export:
             key: ribbon.system.data.get
           tags:
             - tag: component
+              value: calls
+            - tag: component
               value: system
         - uuid: 220d681a8be3491aa96c0d4bcb90c101
           name: 'Call statistics: HPC queue attempts'
@@ -2874,6 +2970,8 @@ zabbix_export:
           master_item:
             key: ribbon.system.data.get
           tags:
+            - tag: component
+              value: calls
             - tag: component
               value: system
         - uuid: e1ef92e48d6a4f048624f9ad26f06fa8
@@ -2893,6 +2991,8 @@ zabbix_export:
             key: ribbon.system.data.get
           tags:
             - tag: component
+              value: calls
+            - tag: component
               value: system
         - uuid: 4f2b31343898463d847d3ddefcadb3ee
           name: 'Call statistics: HPC queue timeouts'
@@ -2910,6 +3010,8 @@ zabbix_export:
           master_item:
             key: ribbon.system.data.get
           tags:
+            - tag: component
+              value: calls
             - tag: component
               value: system
         - uuid: a5cf7bc5ff094df69ecae1c97c627171
@@ -2967,6 +3069,8 @@ zabbix_export:
             key: ribbon.system.data.get
           tags:
             - tag: component
+              value: calls
+            - tag: component
               value: system
         - uuid: 7e8c3eaf11124075aa9ecfdf08c4a2cd
           name: 'Call status: Signalling stable'
@@ -2984,6 +3088,8 @@ zabbix_export:
           master_item:
             key: ribbon.system.data.get
           tags:
+            - tag: component
+              value: calls
             - tag: component
               value: system
         - uuid: cb23fde59fb34988aba1132eaace6df6
@@ -3003,6 +3109,8 @@ zabbix_export:
             key: ribbon.system.data.get
           tags:
             - tag: component
+              value: calls
+            - tag: component
               value: system
         - uuid: acb2541b36294604b5c6bb260cccdd09
           name: 'Call statistics: MRF sessions'
@@ -3020,6 +3128,8 @@ zabbix_export:
           master_item:
             key: ribbon.system.data.get
           tags:
+            - tag: component
+              value: calls
             - tag: component
               value: system
         - uuid: 5856ac0adb1d4d7fb2aee5c3f41af29a
@@ -3039,6 +3149,8 @@ zabbix_export:
             key: ribbon.system.data.get
           tags:
             - tag: component
+              value: calls
+            - tag: component
               value: system
         - uuid: d546591b91314e35b4823af140a25c52
           name: 'Call statistics: SOSBC sessions'
@@ -3057,6 +3169,8 @@ zabbix_export:
             key: ribbon.system.data.get
           tags:
             - tag: component
+              value: calls
+            - tag: component
               value: system
         - uuid: 3f72e3c4ad8c44398a70975456b27b25
           name: 'Call statistics: WebSocket sessions'
@@ -3074,6 +3188,8 @@ zabbix_export:
           master_item:
             key: ribbon.system.data.get
           tags:
+            - tag: component
+              value: calls
             - tag: component
               value: system
       discovery_rules:
