@@ -1538,9 +1538,8 @@ static void	process_history_data_by_keys(zbx_socket_t *sock, zbx_client_item_val
 			else
 			{
 				item_timestamp_t	it = {.itemid = items[i].itemid, .ts = values[i].ts};
-				item_timestamp_t	*entry;
 
-				while (NULL != (entry = zbx_hashset_search(&timestamps, &it)))
+				while (NULL != zbx_hashset_search(&timestamps, &it))
 				{
 					/* Triplet (itemid, timestamp seconds, timestamp nanoseconds) is not unique. */
 					/* Try again with next nanosecond.*/
