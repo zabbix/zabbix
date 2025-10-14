@@ -14,24 +14,29 @@
 **/
 
 
+/**
+ * @var CView $this
+ */
 ?>
 
-window.monitoring_dashboard_list = new class {
-	#csrf_token;
+<script>
+	const view = new class {
+		#csrf_token;
 
-	init({csrf_token}) {
-		this.#csrf_token = csrf_token;
-		this.#initEvents();
-	}
+		init({csrf_token}) {
+			this.#csrf_token = csrf_token;
+			this.#initEvents();
+		}
 
-	#initEvents () {
-		document.getElementById('dashboard_import').addEventListener('click', () => this.#import());
-	}
+		#initEvents () {
+			document.getElementById('dashboard_import').addEventListener('click', () => this.#import());
+		}
 
-	#import() {
-		return PopUp('popup.import',
-			{rules_preset: 'dashboard', _csrf_token: this.#csrf_token},
-			{dialogueid: 'popup_import', dialogue_class: 'modal-popup-generic'}
-		)
-	}
-};
+		#import() {
+			return PopUp('popup.import',
+				{rules_preset: 'dashboard', '<?= CSRF_TOKEN_NAME ?>': this.#csrf_token},
+				{dialogueid: 'popup_import', dialogue_class: 'modal-popup-generic'}
+			)
+		}
+	};
+</script>

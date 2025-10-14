@@ -19,6 +19,8 @@
  * @var array $data
  */
 
+$this->includeJsFile('monitoring.dashboard.list.js.php');
+
 if ($data['uncheck']) {
 	uncheckTableRows('dashboard');
 }
@@ -141,11 +143,12 @@ $form->addItem([
 	], 'dashboard')
 ]);
 
-$script = new CScriptTag($this->readJsFile('monitoring.dashboard.list.js.php').
-	'window.monitoring_dashboard_list.init('.json_encode(['csrf_token' => CCsrfTokenHelper::get('import')]).')'
-);
-
 $html_page
 	->addItem($form)
-	->addItem($script)
+	->show();
+
+(new CScriptTag('
+	view.init('.json_encode(['csrf_token' => CCsrfTokenHelper::get('import')]).');
+'))
+	->setOnDocumentReady()
 	->show();
