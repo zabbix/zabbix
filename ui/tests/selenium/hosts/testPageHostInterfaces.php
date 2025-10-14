@@ -29,6 +29,7 @@ class testPageHostInterfaces extends CWebTest {
 	const GREY = 'rgba(235, 235, 235, 1)';
 
 	public static function prepareInterfacesData() {
+		CDataHelper::get('HostAvailabilityWidget.hostids');
 		$interfaces = [
 			[
 				'type' => 1,
