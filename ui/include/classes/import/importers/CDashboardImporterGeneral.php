@@ -52,6 +52,7 @@ abstract class CDashboardImporterGeneral extends CImporter {
 						}
 
 						break;
+
 					case ZBX_WIDGET_FIELD_TYPE_HOST:
 						$host_name = $field['value']['host'];
 
@@ -258,10 +259,8 @@ abstract class CDashboardImporterGeneral extends CImporter {
 						break;
 				}
 			}
-
 			unset($field);
 		}
-
 		unset($widget);
 
 		return $widgets;

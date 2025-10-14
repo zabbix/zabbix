@@ -55,8 +55,10 @@ class CControllerPopupImportCompare extends CController {
 		switch ($this->getInput('rules_preset', '')) {
 			case 'template':
 				return ($user_type === USER_TYPE_ZABBIX_ADMIN || $user_type === USER_TYPE_SUPER_ADMIN);
+
 			case 'dashboard':
 				return $this->checkAccess(CRoleHelper::ACTIONS_EDIT_DASHBOARDS);
+
 			default:
 				return false;
 		}
@@ -102,6 +104,7 @@ class CControllerPopupImportCompare extends CController {
 				$rules['templateLinkage'] = ['createMissing' => true, 'deleteMissing' => false];
 				$rules['valueMaps'] = ['updateExisting' => true, 'createMissing' => true, 'deleteMissing' => false];
 				break;
+
 			case 'dashboard':
 				$returnMissingObjects = true;
 				break;

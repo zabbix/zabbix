@@ -51,6 +51,7 @@ class CControllerPopupImport extends CController {
 
 			case 'mediatype':
 				return $user_type === USER_TYPE_SUPER_ADMIN;
+
 			case 'dashboard':
 				return $this->checkAccess(CRoleHelper::ACTIONS_EDIT_DASHBOARDS);
 		}
@@ -123,6 +124,7 @@ class CControllerPopupImport extends CController {
 					];
 				}
 				break;
+
 			case 'dashboard':
 				$rules = [
 					'dashboards' => ['updateExisting' => true, 'createMissing' => true]

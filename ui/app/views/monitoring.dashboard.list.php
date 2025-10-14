@@ -39,16 +39,7 @@ $nav_items = [
 
 if ($data['allowed_edit']) {
 	$nav_items[] = (new CSimpleButton(_('Import')))
-		->onClick(
-			'return PopUp("popup.import", {
-				rules_preset: "dashboard", '.
-				CSRF_TOKEN_NAME.': "'.CCsrfTokenHelper::get('import').
-			'"}, {
-				dialogueid: "popup_import",
-				dialogue_class: "modal-popup-generic"
-			});'
-		)
-		->removeId();
+		->setId('dashboard_import');
 }
 
 $nav_items[] = get_icon('kioskmode', ['mode' => $web_layout_mode]);
@@ -150,6 +141,11 @@ $form->addItem([
 	], 'dashboard')
 ]);
 
+$script = new CScriptTag($this->readJsFile('monitoring.dashboard.list.js.php').
+	'window.monitoring_dashboard_list.init('.json_encode(['csrf_token' => CCsrfTokenHelper::get('import')]).')'
+);
+
 $html_page
 	->addItem($form)
+	->addItem($script)
 	->show();

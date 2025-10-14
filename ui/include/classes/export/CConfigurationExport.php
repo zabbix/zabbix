@@ -549,6 +549,7 @@ class CConfigurationExport {
 						case ZBX_WIDGET_FIELD_TYPE_GROUP:
 							$hostgroupids[$field['value']] = true;
 							break;
+
 						case ZBX_WIDGET_FIELD_TYPE_HOST:
 							$hostids[$field['value']] = true;
 							break;
@@ -610,6 +611,7 @@ class CConfigurationExport {
 						case ZBX_WIDGET_FIELD_TYPE_GROUP:
 							$field['value'] = $host_groups[$field['value']];
 							break;
+
 						case ZBX_WIDGET_FIELD_TYPE_HOST:
 							$field['value'] = $hosts[$field['value']];
 							break;
