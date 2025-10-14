@@ -1362,12 +1362,9 @@ static int	check_dhost_ip_condition(const zbx_vector_db_event_t *esc_events, zbx
 	zbx_db_row_t		row;
 	int			objects[2] = {EVENT_OBJECT_DHOST, EVENT_OBJECT_DSERVICE};
 	zbx_vector_uint64_t	objectids[2];
-	zbx_uint64_t		condition_value;
 
 	if (ZBX_CONDITION_OPERATOR_EQUAL != condition->op && ZBX_CONDITION_OPERATOR_NOT_EQUAL != condition->op)
 		return NOTSUPPORTED;
-
-	ZBX_STR2UINT64(condition_value, condition->value);
 
 	zbx_vector_uint64_create(&objectids[0]);
 	zbx_vector_uint64_create(&objectids[1]);
