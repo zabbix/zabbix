@@ -27,6 +27,28 @@ class Actions {
 	 * @return array
 	 */
 	public static function load() {
+		// Create hostgroups for hosts.
+		CDataHelper::call('hostgroup.create', [
+			['name' => 'Host group for Actions related test data']
+		]);
+		$groupids = CDataHelper::getIds('name');
+
+		// Create hosts that will be used for action conditions.
+		$hosts = CDataHelper::createHosts([
+			[
+				'host' => 'Host for action condition operator NOT EQUAL',
+				'groups' => [
+					'groupid' => $groupids['Host group for Actions related test data']
+				]
+			],
+			[
+				'host' => 'Host for action condition operator EQUAL',
+				'groups' => [
+					'groupid' => $groupids['Host group for Actions related test data']
+				]
+			]
+		]);
+
 		CDataHelper::call('proxy.create',
 			[
 				[
@@ -213,12 +235,12 @@ class Actions {
 						[
 							'conditiontype' => ZBX_CONDITION_TYPE_HOST,
 							'operator' => CONDITION_OPERATOR_NOT_EQUAL,
-							'value' => 10084 // ЗАББИКС Сервер.
+							'value' => $hosts['hostids']['Host for action condition operator NOT EQUAL']
 						],
 						[
 							'conditiontype' => ZBX_CONDITION_TYPE_HOST,
 							'operator' => CONDITION_OPERATOR_EQUAL,
-							'value' => 99134 // Available host.
+							'value' => $hosts['hostids']['Host for action condition operator EQUAL']
 						],
 						[
 							'conditiontype' => ZBX_CONDITION_TYPE_HOST_GROUP,

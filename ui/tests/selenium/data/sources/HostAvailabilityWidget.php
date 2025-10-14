@@ -276,7 +276,7 @@ class HostAvailabilityWidget {
 			$interfaces['default_interfaces']['Not available host'][2] => [
 					[
 						'available' => 2,
-						'error' => 'ERROR SMTP'
+						'error' => 'ERROR SNMP'
 					]
 			],
 			$interfaces['default_interfaces']['Not available host'][3] => [
