@@ -79,7 +79,7 @@ $form
 				$aggregate_function_field->getLabel(),
 				new CFormField([
 					$aggregate_function_field->getView(),
-					makeWarningIcon(_('With this setting only numeric items will be displayed.'))
+					makeWarningIcon(_('Item aggregation function does not affect the sparkline.'))
 						->addStyle('display: none')
 						->setId('item-aggregate-function-warning')
 				]),
