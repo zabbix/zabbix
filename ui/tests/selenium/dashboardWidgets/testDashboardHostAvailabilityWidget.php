@@ -26,6 +26,7 @@ require_once __DIR__.'/../common/testWidgets.php';
 class testDashboardHostAvailabilityWidget extends testWidgets {
 
 	protected static $dashboardid;
+
 	public static function prepareData() {
 		self::$dashboardid = CDataHelper::get('HostAvailabilityWidget.dashboardid');
 	}

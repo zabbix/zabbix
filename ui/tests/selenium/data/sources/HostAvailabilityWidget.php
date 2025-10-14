@@ -263,8 +263,8 @@ class HostAvailabilityWidget {
 				]
 			]
 		]);
-		$hosts =  CDataHelper::getIds('host');
-		$interfaces = CDataHelper::getInterfaces($hosts);
+		$hostids =  CDataHelper::getIds('host');
+		$interfaces = CDataHelper::getInterfaces($hostids);
 
 		$data = [
 			$interfaces['default_interfaces']['Not available host'][1] => [
@@ -372,9 +372,9 @@ class HostAvailabilityWidget {
 
 		// Add hosts to maintenance.
 		$maintenace_hostids = [
-			$hosts['Not available host in maintenance'],
-			$hosts['Unknown host in maintenance'],
-			$hosts['Available host in maintenance']
+			$hostids['Not available host in maintenance'],
+			$hostids['Unknown host in maintenance'],
+			$hostids['Available host in maintenance']
 		];
 		foreach ($maintenace_hostids as $hostid) {
 			DBexecute('INSERT INTO maintenances_hosts (maintenance_hostid, maintenanceid, hostid) VALUES ('.zbx_dbstr($hostid).', '.
@@ -431,7 +431,8 @@ class HostAvailabilityWidget {
 		return [
 			'maintenanceid' => $maintenanceid,
 			'groupids' => $groupids,
-			'dashboardid' => $dashboardid
+			'dashboardid' => $dashboardid,
+			'hostids' => $hostids
 		];
 	}
 }
