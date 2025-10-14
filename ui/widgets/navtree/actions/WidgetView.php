@@ -475,7 +475,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 			}
 
 			foreach ($problems[$severity] as $key => $problem) {
-				if (($map['show_unack'] == EXTACK_OPTION_UNACK && $problem['acknowledged'] == ZBX_ACKNOWLEDGE_PROBLEM)
+				if (($map['show_unack'] == EXTACK_OPTION_UNACK && $problem['acknowledged'] == EVENT_ACKNOWLEDGED)
 						|| ($map['show_suppressed'] == ZBX_PROBLEM_SUPPRESSED_FALSE
 							&& $problem['suppressed'] == ZBX_PROBLEM_SUPPRESSED_TRUE)) {
 					unset($problems[$severity][$key]);
