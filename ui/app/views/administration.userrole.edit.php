@@ -19,6 +19,8 @@
  * @var array $data
  */
 
+$this->includeJsFile('administration.userrole.edit.js.php');
+
 $html_page = (new CHtmlPage())
 	->setTitle(_('User roles'))
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::USERS_USERROLE_EDIT));
@@ -26,12 +28,6 @@ $html_page = (new CHtmlPage())
 $csrf_token = CCsrfTokenHelper::get('userrole');
 
 $form = (new CForm())
-	->setAction((new CUrl('zabbix.php'))
-		->setArgument('action', ($data['roleid'] == 0) ? 'userrole.create' : 'userrole.update')
-		->getUrl()
-	)
-	->addVar('action', ($data['roleid'] == 0) ? 'userrole.create' : 'userrole.update')
-	->setAttribute('onsubmit', 'window.userrole_edit.submit(event);')
 	->addItem((new CVar('form_refresh', $data['form_refresh'] + 1))->removeId())
 	->addItem((new CVar(CSRF_TOKEN_NAME, $csrf_token))->removeId())
 	->setId('userrole-form')
@@ -412,7 +408,6 @@ if ($data['roleid'] !== null) {
 				->setArgument('roleids', [$data['roleid']])
 				->setArgument(CSRF_TOKEN_NAME, $csrf_token)
 			)
-			->onClick('window.userrole_edit.delete()')
 			->setId('delete')
 			->setEnabled(!$data['readonly']),
 		$cancel_button
@@ -439,12 +434,13 @@ $html_page
 	->addItem($form)
 	->show();
 
-(new CScriptTag($this->readJsFile('administration.userrole.edit.js.php') .
-	'window.userrole_edit.init('.json_encode([
+(new CScriptTag(
+	'view.init('.json_encode([
 		'rules' => $data['js_validation_rules'],
+		'roleid' => $data['roleid'],
 		'rules_create' => $data['js_validation_rules_create'],
 		'readonly' => $data['readonly']
-	]).');
-'))
+	]).');'
+))
 	->setOnDocumentReady()
 	->show();
