@@ -373,7 +373,7 @@ static zbx_uint64_t	history_elastic_flush(void *data)
 {
 	struct curl_slist		*curl_headers = NULL;
 	zbx_history_elastic_data_t	*d = (zbx_history_elastic_data_t *)data;
-	int				i, running, previous, msgnum;
+	int				i, running, previous = 0, msgnum;
 	CURLMsg				*msg;
 	zbx_vector_ptr_t		retries;
 	CURLcode			err;
@@ -385,6 +385,7 @@ static zbx_uint64_t	history_elastic_flush(void *data)
 	{
 		curl_multi_add_handle(d->mhandle, d->conns.values[i]->handle);
 		d->conns.values[i]->status = FAIL;
+		previous++;
 	}
 
 	zbx_vector_ptr_create(&retries);
@@ -407,8 +408,6 @@ static zbx_uint64_t	history_elastic_flush(void *data)
 	}
 
 try_again:
-	previous = 0;
-
 	do
 	{
 		int			fds;
