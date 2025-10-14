@@ -1194,25 +1194,25 @@ out:
 static void	*history_elastic_create_data(const zbx_history_option_t *options, int options_num, char **error)
 {
 	zbx_history_elastic_data_t	*data;
-	const char		*value;
-
-	data = (zbx_history_elastic_data_t *)zbx_malloc(NULL, sizeof(zbx_history_elastic_data_t));
-	memset(data, 0, sizeof(zbx_history_elastic_data_t));
+	const char			*value;
+	CURLM				*mhandle;
 
 	if (NULL == (value = history_option_value(options, options_num, HISTORY_PROVIDER_OPTION_URL)))
 	{
-		zbx_free(data);
 		*error = zbx_strdup(*error, "missing \"url\" option for ElasticSearch history backend");
-
 		return NULL;
 	}
 
-	if (NULL == (data->mhandle = curl_multi_init()))
+	if (NULL == (mhandle = curl_multi_init()))
 	{
 		*error = zbx_strdup(*error, "Cannot initialize cURL multi session");
 		return NULL;
 	}
 
+	data = (zbx_history_elastic_data_t *)zbx_malloc(NULL, sizeof(zbx_history_elastic_data_t));
+	memset(data, 0, sizeof(zbx_history_elastic_data_t));
+
+	data->mhandle = mhandle;
 	data->base_url = zbx_strdup(NULL, value);
 	zbx_rtrim(data->base_url, "/");
 

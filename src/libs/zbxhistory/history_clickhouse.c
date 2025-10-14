@@ -56,6 +56,8 @@ typedef struct
 
 	zbx_vector_clickhouse_conn_ptr_t	conns;
 	zbx_vector_clickhouse_conn_ptr_t	active_conns;
+
+	CURLM					*mhandle;
 }
 zbx_clickhouse_data_t;
 
@@ -79,6 +81,8 @@ static void	history_clickhouse_data_free(zbx_clickhouse_data_t *data)
 	zbx_vector_clickhouse_conn_ptr_destroy(&data->conns);
 
 	curl_slist_free_all(data->curl_headers);
+
+	curl_multi_cleanup(data->mhandle);
 
 	zbx_free(data->base_url);
 	zbx_free(data->db);
@@ -188,6 +192,7 @@ static void	*history_clickhouse_create_data(const zbx_history_option_t *options,
 {
 	zbx_clickhouse_data_t	*data;
 	const char		*url, *username, *password, *db;
+	CURLM			*mhandle;
 
 	if (NULL == (url = history_option_value(options, options_num, HISTORY_PROVIDER_OPTION_URL)))
 	{
@@ -216,9 +221,16 @@ static void	*history_clickhouse_create_data(const zbx_history_option_t *options,
 		return NULL;
 	}
 
-	data = (zbx_clickhouse_data_t *)zbx_malloc(NULL, sizeof(zbx_clickhouse_data_t));
+	if (NULL == (mhandle = curl_multi_init()))
+	{
+		*error = zbx_strdup(*error, "Cannot initialize cURL multi session");
+		return NULL;
+	}
 
+	data = (zbx_clickhouse_data_t *)zbx_malloc(NULL, sizeof(zbx_clickhouse_data_t));
 	memset(data, 0, sizeof(zbx_clickhouse_data_t));
+
+	data->mhandle = mhandle;
 
 	zbx_vector_clickhouse_conn_ptr_create(&data->conns);
 	zbx_vector_clickhouse_conn_ptr_create(&data->active_conns);
@@ -526,7 +538,6 @@ static zbx_uint64_t	history_clickhouse_flush(void *data)
 {
 	zbx_clickhouse_data_t	*d = (zbx_clickhouse_data_t *)data;
 	zbx_vector_ptr_t		retries;
-	CURLM				*mhandle;
 	zbx_uint64_t			flush_err = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() active connections:%d", __func__, d->active_conns.values_num);
@@ -535,14 +546,6 @@ static zbx_uint64_t	history_clickhouse_flush(void *data)
 
 	if (0 == d->active_conns.values_num)
 		goto out;
-
-	if (NULL == (mhandle = curl_multi_init()))
-	{
-		zbx_error("Cannot initialize cURL multi session");
-		flush_err = (1 << (ITEM_VALUE_TYPE_COUNT + 1)) - 1;
-
-		goto out;
-	}
 
 	for (int i = 0; i < d->active_conns.values_num; i++)
 	{
@@ -557,11 +560,11 @@ static zbx_uint64_t	history_clickhouse_flush(void *data)
 	while (1)
 	{
 		for (int i = 0; i < retries.values_num; i++)
-			curl_multi_add_handle(mhandle, retries.values[i]);
+			curl_multi_add_handle(d->mhandle, retries.values[i]);
 
 		zbx_vector_ptr_clear(&retries);
 
-		history_clickhouse_flush_conns(mhandle, &retries);
+		history_clickhouse_flush_conns(d->mhandle, &retries);
 
 		if (0 == retries.values_num)
 			break;
@@ -579,7 +582,7 @@ out:
 		if (SUCCEED != conn->status)
 			flush_err |= history_make_flush_error(ZBX_HISTORY_FLUSH_FAIL, conn->value_type);
 
-		curl_multi_remove_handle(mhandle, conn->handle);
+		curl_multi_remove_handle(d->mhandle, conn->handle);
 		curl_easy_setopt(conn->handle, CURLOPT_POSTFIELDS, NULL);
 
 		zbx_free(conn->buf);
@@ -591,7 +594,6 @@ out:
 
 	zbx_vector_clickhouse_conn_ptr_clear(&d->active_conns);
 
-	curl_multi_cleanup(mhandle);
 	zbx_vector_ptr_destroy(&retries);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s(): ret:%lx", __func__, flush_err);
