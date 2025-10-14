@@ -274,11 +274,12 @@ class CItemHelper extends CItemGeneralHelper {
 	 * @param array  $values    Item values
 	 * @param int    $function  Aggregation function
 	 *
-	 * @return float|int
+	 * @return float|int|null
 	 */
-	public static function getAggregatedValue(array $values, int $function): float|int {
+	public static function getAggregatedValue(array $values, int $function): float|int|null {
+		$values = array_filter($values);
 		if (!$values) {
-			return 0;
+			return null;
 		}
 
 		return match ($function) {

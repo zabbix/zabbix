@@ -94,14 +94,9 @@ class WidgetView extends CControllerDashboardWidgetView {
 			// Each column has different aggregation function and time period.
 			$db_values = self::getItemValues($db_column_items, $column);
 
-			if ($db_values && $column['aggregate_grouping'] === Widget::TOP_ITEMS_AGGREGATE_COMBINED
+			if ($column['aggregate_grouping'] === Widget::TOP_ITEMS_AGGREGATE_COMBINED
 					&& $column['combined_aggregate_function'] !== AGGREGATE_NONE) {
-				$itemids = array_column($db_column_items, 'itemid');
-				$itemid = array_shift($itemids);
-
-				$db_column_items[$itemid]['name'] = $column['combined_column_name'];
-
-				$db_column_items = [$itemid => $db_column_items[$itemid]];
+				[$db_column_items, $db_values] = self::getCombinedItemValues($db_column_items, $db_values, $column);
 			}
 
 			if ($column['display'] == CWidgetFieldColumnsList::DISPLAY_SPARKLINE) {
@@ -326,18 +321,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 				$column['time_period']['to_ts']
 			);
 
-			if ($values && $column['aggregate_grouping'] === Widget::TOP_ITEMS_AGGREGATE_COMBINED
-					&& $column['combined_aggregate_function'] !== AGGREGATE_NONE) {
-				$itemid = array_key_first($values);
-				$values = array_column($values, 'value');
-
-				$result += [
-					$itemid => CItemHelper::getAggregatedValue($values, $column['combined_aggregate_function'])
-				];
-			}
-			else {
-				$result += array_column($values, 'value', 'itemid');
-			}
+			$result += array_column($values, 'value', 'itemid');
 		}
 		else {
 			$items_by_source = ['history' => [], 'trends' => []];
@@ -361,6 +345,37 @@ class WidgetView extends CControllerDashboardWidgetView {
 		}
 
 		return $result;
+	}
+
+	private static function getCombinedItemValues(array $db_column_items, array $db_values, array $column): array {
+		if (!$db_column_items || !$db_values) {
+			return [$db_column_items, $db_values];
+		}
+
+		$host_itemids = $host_values = [];
+
+		foreach ($db_column_items as $itemid => $db_column_item) {
+			$hostid = $db_column_item['hostid'];
+
+			$host_itemids[$hostid][] = $itemid;
+			$host_values[$hostid][] = $db_values[$itemid] ?? null;
+		}
+
+		foreach ($host_values as $hostid => $values) {
+			$itemid = array_shift($host_itemids[$hostid]);
+
+			foreach ($host_itemids[$hostid] as $host_itemid) {
+				unset($db_column_items[$host_itemid], $db_values[$host_itemid]);
+			}
+
+			$db_values[$itemid] = CItemHelper::getAggregatedValue($values,
+				$column['combined_aggregate_function']
+			);
+
+			$db_column_items[$itemid]['name'] = $column['combined_column_name'];
+		}
+
+		return [$db_column_items, $db_values];
 	}
 
 	/**
