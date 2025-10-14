@@ -875,7 +875,7 @@ static int	clickhouse_conn_post(zbx_clickhouse_conn_t *conn, CURLM *mhandle, str
 		sleep(ZBX_HISTORY_STORAGE_DOWN / 1000);
 	}
 
-	zabbix_log(LOG_LEVEL_TRACE, "result: %s", conn->resp.page.data);
+	zabbix_log(LOG_LEVEL_TRACE, "result: %s", ZBX_NULL2STR(conn->resp.page.data));
 
 	ret = SUCCEED;
 out:
@@ -914,6 +914,17 @@ static int	history_clickhouse_fetch(void *data, zbx_uint64_t itemid, unsigned ch
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() start:" ZBX_FS_TIME_T " end:" ZBX_FS_TIME_T " count:%d", __func__,
 			start, end, count);
+
+	if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_DEBUG))
+	{
+		char	start_str[32], end_str[32];
+
+		strftime(start_str, sizeof(start_str), "%Y-%m-%d %H:%M:%S", localtime(&start));
+		strftime(end_str, sizeof(end_str), "%Y-%m-%d %H:%M:%S", localtime(&end));
+
+		zabbix_log(LOG_LEVEL_DEBUG, "In %s() window:(%s, %s] age: %s count:%d", __func__, start_str, end_str,
+				zbx_age2str(end - start), count);
+	}
 
 	conn = history_clickhouse_get_conn(d, value_type);
 
