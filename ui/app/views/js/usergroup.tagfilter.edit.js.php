@@ -131,8 +131,6 @@ window.tag_filter_edit = new class {
 		fields.new_tag_tag_filters = Object.values(fields.new_tag_tag_filters)
 			.filter(tag => tag.tag !== '' || tag.value !== '');
 
-		const url = new URL(this.form_element.getAttribute('action'), location.href);
-
 		this.form.validateSubmit(fields)
 			.then((result) => {
 				this.overlay.unsetLoading();
@@ -140,7 +138,10 @@ window.tag_filter_edit = new class {
 					return;
 				}
 
-				fetch(url, {
+				var curl = new Curl('zabbix.php');
+				curl.setArgument('action', 'usergroup.tagfilter.check');
+
+				fetch(curl.getUrl(), {
 					method: 'POST',
 					headers: {'Content-Type': 'application/json'},
 					body: JSON.stringify(fields)

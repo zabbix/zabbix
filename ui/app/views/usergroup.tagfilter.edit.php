@@ -21,11 +21,6 @@
 
 $form = (new CForm())
 	->addItem((new CVar(CSRF_TOKEN_NAME, CCsrfTokenHelper::get('tagfilter')))->removeId())
-	->setAction((new CUrl('zabbix.php'))
-		->setArgument('action', 'usergroup.tagfilter.check')
-		->getUrl()
-	)
-	->setAttribute('onsubmit', 'window.tag_filter_edit.submit();')
 	->setId('tag-filter-add-form')
 	->setName('tag-filter-add-form');
 

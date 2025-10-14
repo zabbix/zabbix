@@ -79,7 +79,7 @@ class CControllerUsergroupEdit extends CController {
 		$db_defaults = DB::getDefaults('usrgrp');
 		$mfa_config_status = CAuthenticationHelper::get(CAuthenticationHelper::MFA_STATUS);
 		$data = [
-			'usrgrpid' => 0,
+			'usrgrpid' => null,
 			'name' => $db_defaults['name'],
 			'gui_access' => $db_defaults['gui_access'],
 			'userdirectoryid' => 0,
@@ -164,7 +164,7 @@ class CControllerUsergroupEdit extends CController {
 		$data['mfas'] = array_column($mfas, 'name', 'mfaid');
 		$data['mfa_config_status'] = $mfa_config_status;
 
-		$data['js_validation_rules'] = $data['usrgrpid'] == 0
+		$data['js_validation_rules'] = $data['usrgrpid'] == null
 			? CControllerUsergroupCreate::getValidationRules()
 			: CControllerUsergroupUpdate::getValidationRules();
 		$data['js_validation_rules'] = (new CFormValidator($data['js_validation_rules']))->getRules();

@@ -19,6 +19,8 @@
  * @var array $data
  */
 
+$this->includeJsFile('usergroup.edit.js.php');
+
 $html_page = (new CHtmlPage())
 	->setTitle(_('User groups'))
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::USERS_USERGROUP_EDIT));
@@ -26,18 +28,13 @@ $html_page = (new CHtmlPage())
 $csrf_token = CCsrfTokenHelper::get('usergroup');
 
 $form = (new CForm())
-	->setAction((new CUrl('zabbix.php'))
-		->setArgument('action', ($data['usrgrpid'] == 0) ? 'usergroup.create' : 'usergroup.update')
-		->getUrl()
-	)
-	->setAttribute('onsubmit', 'window.usergroup_edit.submit(event);')
 	->addItem((new CVar('form_refresh', $data['form_refresh'] + 1))->removeId())
 	->addItem((new CVar(CSRF_TOKEN_NAME, $csrf_token))->removeId())
 	->setId('user-group-form')
 	->setName('user_group_form')
 	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID);
 
-if ($data['usrgrpid'] != 0) {
+if ($data['usrgrpid'] != null) {
 	$form->addVar('usrgrpid', $data['usrgrpid']);
 }
 
@@ -360,21 +357,23 @@ else {
 	));
 }
 
-$form
-	->addItem($tabs)
-	->addItem(
-		(new CScriptTag($this->readJsFile('usergroup.edit.js.php') .
-			'window.usergroup_edit.init('.json_encode([
-				'rules' => $data['js_validation_rules'],
-				'templategroup_rights' => $data['templategroup_rights'],
-				'hostgroup_rights' => $data['hostgroup_rights'],
-				'tag_filters' => $data['tag_filters'],
-				'can_update_group' => $data['can_update_group'],
-				'ldap_status' => array_key_exists('ldap_status', $data) ? $data['ldap_status'] : 0,
-				'mfa_status' => $data['mfa_config_status']
-			]).');'))->setOnDocumentReady()
-	);
+$form->addItem($tabs);
 
 $html_page
 	->addItem($form)
+	->show();
+
+(new CScriptTag(
+	'view.init('.json_encode([
+		'rules' => $data['js_validation_rules'],
+		'usrgrpid' => $data['usrgrpid'],
+		'templategroup_rights' => $data['templategroup_rights'],
+		'hostgroup_rights' => $data['hostgroup_rights'],
+		'tag_filters' => $data['tag_filters'],
+		'can_update_group' => $data['can_update_group'],
+		'ldap_status' => array_key_exists('ldap_status', $data) ? $data['ldap_status'] : 0,
+		'mfa_status' => $data['mfa_config_status']
+	]).');'
+))
+	->setOnDocumentReady()
 	->show();
