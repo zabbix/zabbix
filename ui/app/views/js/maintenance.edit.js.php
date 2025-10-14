@@ -27,12 +27,13 @@ window.maintenance_edit = new class {
 	 */
 	form;
 
-	init({rules, timeperiods, tags, allowed_edit}) {
+	init({rules, maintenanceid, timeperiods, tags, allowed_edit}) {
 		this._overlay = overlays_stack.getById('maintenance.edit');
 		this._dialogue = this._overlay.$dialogue[0];
 		this.form_element = this._overlay.$dialogue.$body[0].querySelector('form');
 		this.form = new CForm(this.form_element, rules);
 		this._allowed_edit = allowed_edit;
+		this._maintenanceid = maintenanceid;
 
 		const return_url = new URL('zabbix.php', location.href);
 
@@ -184,9 +185,7 @@ window.maintenance_edit = new class {
 
 	clone({rules, title, buttons}) {
 		document.getElementById('maintenanceid').remove();
-		const curl = new Curl('zabbix.php');
-		curl.setArgument('action', 'maintenance.create');
-		this.form_element.setAttribute('action', curl.getUrl());
+		this._maintenanceid = null;
 		this.form.reload(rules);
 
 		this._overlay.unsetLoading();
@@ -195,9 +194,9 @@ window.maintenance_edit = new class {
 		this._overlay.containFocus();
 	}
 
-	delete(maintenanceid) {
+	delete() {
 		const post_data = {
-			maintenanceids: [maintenanceid],
+			maintenanceids: [this._maintenanceid],
 			[CSRF_TOKEN_NAME]: <?= json_encode(CCsrfTokenHelper::get('maintenance')) ?>
 		};
 
@@ -222,7 +221,9 @@ window.maintenance_edit = new class {
 				return;
 			}
 
-			const curl = new Curl(this.form_element.getAttribute('action'));
+			const curl = new Curl('zabbix.php');
+
+			curl.setArgument('action', this._maintenanceid ? 'maintenance.update' : 'maintenance.create');
 
 			this.#post(curl.getUrl(), fields, (response) => {
 				overlayDialogueDestroy(this._overlay.dialogueid);

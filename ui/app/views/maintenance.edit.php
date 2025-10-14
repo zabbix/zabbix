@@ -23,10 +23,6 @@ $form = (new CForm())
 	->addItem((new CVar(CSRF_TOKEN_NAME, CCsrfTokenHelper::get('maintenance')))->removeId())
 	->setId('maintenance-form')
 	->setName('maintenance_form')
-	->setAction((new CUrl('zabbix.php'))
-		->setArgument('action', $data['maintenanceid'] === null ? 'maintenance.create' : 'maintenance.update')
-		->getUrl()
-	)
 	->addVar('maintenanceid', $data['maintenanceid'])
 	->addItem(getMessages())
 	->addStyle('display: none;');
@@ -286,7 +282,7 @@ if ($data['maintenanceid'] !== null) {
 			'keepOpen' => true,
 			'isSubmit' => false,
 			'enabled' => $data['allowed_edit'],
-			'action' => 'maintenance_edit.delete('.json_encode($data['maintenanceid']).');'
+			'action' => 'maintenance_edit.delete();'
 		]
 	];
 }
@@ -315,7 +311,8 @@ $output = [
 			'timeperiods' => $data['timeperiods'],
 			'tags' => $data['tags'],
 			'allowed_edit' => $data['allowed_edit'],
-			'rules' => $data['js_validation_rules']
+			'rules' => $data['js_validation_rules'],
+			'maintenanceid' => $data['maintenanceid']
 		]).');'
 ];
 
