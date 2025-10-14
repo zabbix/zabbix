@@ -2799,7 +2799,7 @@ zbx_escalation_diff_t;
 ZBX_PTR_VECTOR_DECL(escalation_diff_ptr, zbx_escalation_diff_t*)
 ZBX_PTR_VECTOR_IMPL(escalation_diff_ptr, zbx_escalation_diff_t*)
 
-static void	zbx_escalation_diff_free(zbx_escalation_diff_t *ed)
+static void	escalation_diff_free(zbx_escalation_diff_t *ed)
 {
 	zbx_free(ed);
 }
@@ -3464,7 +3464,7 @@ static int	process_db_escalations(int now, int *nextcheck, zbx_vector_db_escalat
 out:
 	zbx_dc_close_user_macros(um_handle);
 
-	zbx_vector_escalation_diff_ptr_clear_ext(&diffs, zbx_escalation_diff_free);
+	zbx_vector_escalation_diff_ptr_clear_ext(&diffs, escalation_diff_free);
 	zbx_vector_escalation_diff_ptr_destroy(&diffs);
 
 	zbx_vector_db_action_ptr_clear_ext(&actions, free_db_action);
