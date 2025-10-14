@@ -700,7 +700,7 @@ class CFormValidator {
 			unset($data[$field]);
 		}
 
-		$field_exists = $rules['type'] == 'file'
+		$field_exists = $rules['type'] === 'file'
 			? array_key_exists($field, $files)
 			: array_key_exists($field, $data);
 

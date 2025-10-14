@@ -944,6 +944,13 @@ function objectToSearchParams(object) {
 	return combine(object);
 }
 
+/**
+ * Convert nested data object into Form data object.
+ *
+ * @param {Object|Array} object
+ *
+ * @returns {FormData}
+ */
 function objectToFormData(object) {
 	const combine = (data, form_data = new FormData(), name_prefix = '') => {
 		if (Array.isArray(data)) {
