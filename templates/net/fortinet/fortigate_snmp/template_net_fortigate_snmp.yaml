@@ -1706,6 +1706,9 @@ zabbix_export:
                   parameters:
                     - '1.3.6.1.2.1.2.2.1.19.{#SNMPINDEX}'
                     - '0'
+                - type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
               master_item:
                 key: net.if.walk
               tags:
