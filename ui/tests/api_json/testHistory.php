@@ -151,6 +151,40 @@ class testHistory extends CAPITest {
 				'expected_result' => '3',
 				'expected_error' => false
 			],
+			// Get count of values of item of value_type == ITEM_VALUE_TYPE_BIN ('history' => 5).
+			[
+				'api_request' => [
+					'history' => 5,
+					'maxValueSize' => 2,
+					'itemids' => ['158741']
+				],
+				'expected_result' => [
+					[
+						'itemid' => '158741',
+						'clock' => '1549351002',
+						'ns' => '164888032',
+						'value' => 'YQ=='
+					],
+				],
+				'expected_error' => false
+			],
+			// Get count of values of item of value_type == ITEM_VALUE_TYPE_JSON ('history' => 6).
+			[
+				'api_request' => [
+					'history' => 6,
+					'maxValueSize' => 10,
+					'itemids' => ['158742']
+				],
+				'expected_result' => [
+					[
+						'itemid' => '158742',
+						'clock' => '1549351003',
+						'ns' => '354370019',
+						'value' => '{"name":"a'
+					],
+				],
+				'expected_error' => false
+			],
 			// Get number of history records filtering records by itemid.
 			[
 				'api_request' => [
@@ -276,6 +310,7 @@ class testHistory extends CAPITest {
 
 	public static function history_clear_data() {
 		$binary_itemid = 158740;
+		$json_itemid = 158742;
 
 		return [
 			[
@@ -287,6 +322,13 @@ class testHistory extends CAPITest {
 				'api_request' => [$binary_itemid],
 				'expected_result' => [
 					'itemids' => [$binary_itemid]
+				],
+				'expected_error' => false
+			],
+			[
+				'api_request' => [$json_itemid],
+				'expected_result' => [
+					'itemids' => [$json_itemid]
 				],
 				'expected_error' => false
 			]
