@@ -74,6 +74,7 @@ class CHistory extends CApiService {
 	 *                                                         be matched to the corresponding property given in the
 	 *                                                         sortfield parameter.
 	 * @param int    $options['limit']                         Limit the number of records returned.
+	 * @param int    $options['maxValueSize']                  Limit the length of value to be returned.
 	 * @param bool   $options['editable']                      If set to true return only objects that the user has
 	 *                                                         write permissions to.
 	 *
@@ -116,6 +117,10 @@ class CHistory extends CApiService {
 			'sortfield' =>				['type' => API_STRINGS_UTF8, 'flags' => API_NORMALIZE, 'in' => implode(',', $this->sortColumns), 'uniq' => true, 'default' => []],
 			'sortorder' =>				['type' => API_SORTORDER, 'default' => []],
 			'limit' =>					['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'in' => '1:'.ZBX_MAX_INT32, 'default' => null],
+			'maxValueSize' =>			['type' => API_MULTIPLE, 'rules' => [
+											['if' => ['field' => 'history', 'in' => implode(',', [ITEM_VALUE_TYPE_BINARY, ITEM_VALUE_TYPE_JSON])], 'flags' => API_ALLOW_NULL, 'type' => API_INT32, 'in' => '1:'.(128 * ZBX_MEBIBYTE), 'default' => (64 * ZBX_KIBIBYTE)],
+											['else' => true, 'type' => API_UNEXPECTED],
+			]],
 			// flags
 			'editable' =>				['type' => API_BOOLEAN, 'default' => false]
 		]];
@@ -153,12 +158,21 @@ class CHistory extends CApiService {
 				break;
 		}
 
-		if (!$options['countOutput'] && $options['history'] == ITEM_VALUE_TYPE_BINARY
-				&& $this->outputIsRequested('value', $options['output'])) {
-			foreach ($result as &$row) {
-				$row['value'] = base64_encode($row['value']);
+		if (!$options['countOutput'] && $this->outputIsRequested('value', $options['output'])) {
+			if ($options['history'] == ITEM_VALUE_TYPE_BINARY) {
+				foreach ($result as &$row) {
+					$row['value'] = mb_strcut($row['value'], 0, $options['maxValueSize']);
+					$row['value'] = base64_encode($row['value']);
+				}
+				unset($row);
 			}
-			unset($row);
+
+			if ($options['history'] == ITEM_VALUE_TYPE_JSON) {
+				foreach ($result as &$row) {
+					$row['value'] = mb_substr($row['value'], 0, $options['maxValueSize']);
+				}
+				unset($row);
+			}
 		}
 
 		return $result;
