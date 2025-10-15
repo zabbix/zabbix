@@ -15,16 +15,16 @@
 
 
 /**
- * A class to perform operations with colors.
+ * A helper class to perform operations with colors.
  */
 class CColorHelper {
 
 	/**
-	 * Interpolate between two colors
+	 * Interpolate two colors.
 	 *
-	 * @param string $color1    Hex color
-	 * @param string $color2    Hex color
-	 * @param float  $position  Value between 0 and 1
+	 * @param string $color1    Hex color.
+	 * @param string $color2    Hex color.
+	 * @param float  $position  Value between 0 and 1.
 	 *
 	 * @return string
 	 */
