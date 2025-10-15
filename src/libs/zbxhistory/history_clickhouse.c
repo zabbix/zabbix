@@ -690,6 +690,108 @@ static int	history_clickhouse_parse_log_value(const struct zbx_json_parse *jp, c
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: parse numeric value (float or uint64) from JSON row               *
+ *                                                                            *
+ * Parameters:                                                                *
+ *     jp         - [IN] row with data as JSON array of values                *
+ *     p          - [IN] pointer to current position in JSON data             *
+ *     value_type - [IN] value type (ITEM_VALUE_TYPE_FLOAT or                 *
+ *                       ITEM_VALUE_TYPE_UINT64)                              *
+ *     record     - [OUT] history record structure to fill                    *
+ *                                                                            *
+ * Return value: SUCCEED - value parsed successfully                          *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+static int	history_clickhouse_parse_numeric_value(const struct zbx_json_parse *jp, const char *p,
+		unsigned char value_type, zbx_history_record_t *record)
+{
+	char	buf[MAX_ID_LEN + 1];
+
+	if (NULL == zbx_json_next_value(jp, p, buf, sizeof(buf), NULL))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "cannot parse value from row \"%s\"", jp->start);
+		return FAIL;
+	}
+
+	switch (value_type)
+	{
+		case ITEM_VALUE_TYPE_FLOAT:
+			if (FAIL == zbx_is_double(buf, &record->value.dbl))
+			{
+				zabbix_log(LOG_LEVEL_WARNING, "cannot parse floating value \"%s\"", buf);
+				return FAIL;
+			}
+			break;
+		case ITEM_VALUE_TYPE_UINT64:
+			if (FAIL == zbx_is_uint64(buf, &record->value.ui64))
+			{
+				zabbix_log(LOG_LEVEL_WARNING, "cannot parse unsigned 64-bit value \"%s\"", buf);
+				return FAIL;
+			}
+			break;
+		default:
+			THIS_SHOULD_NEVER_HAPPEN;
+			return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: parse non-numeric value (str, text or log) from JSON row          *
+ *                                                                            *
+ * Parameters:                                                                *
+ *     jp         - [IN] row with data as JSON array of values                *
+ *     p          - [IN] pointer to current position in JSON data             *
+ *     value_type - [IN] value type                                           *
+ *     record     - [OUT] history record structure to fill                    *
+ *                                                                            *
+ * Return value: SUCCEED - value parsed successfully                          *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+static int	history_clickhouse_parse_value(const struct zbx_json_parse *jp, const char *p,
+		unsigned char value_type, zbx_history_record_t *record)
+{
+	char	*buf = NULL;
+	size_t	buf_alloc = 0;
+
+	if (NULL == (p = zbx_json_next_value_dyn(jp, p, &buf, &buf_alloc, NULL)))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "cannot parse value from row \"%s\"", jp->start);
+		return FAIL;
+	}
+
+	switch (value_type)
+	{
+		case ITEM_VALUE_TYPE_STR:
+		case ITEM_VALUE_TYPE_TEXT:
+			record->value.str = buf;
+			break;
+		case ITEM_VALUE_TYPE_LOG:
+			record->value.log = (zbx_log_value_t *)zbx_malloc(NULL, sizeof(zbx_log_value_t));
+			record->value.log->value = buf;
+			record->value.log->source = NULL;
+
+			if (FAIL == history_clickhouse_parse_log_value(jp, p, record->value.log))
+			{
+				zbx_history_record_clear(record, ITEM_VALUE_TYPE_LOG);
+				return FAIL;
+			}
+			break;
+		default:
+			zbx_free(buf);
+			THIS_SHOULD_NEVER_HAPPEN;
+			return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: parse single row of ClickHouse response and add to records vector *
  *                                                                            *
  * Parameters:                                                                *
@@ -701,10 +803,9 @@ static int	history_clickhouse_parse_log_value(const struct zbx_json_parse *jp, c
 static void	history_clickhouse_parse_row(const struct zbx_json_parse *jp, unsigned char value_type,
 		zbx_vector_history_record_t *records)
 {
-	char			timestamp[MAX_ID_LEN * 2], *ptr, *buf = NULL;
+	char			timestamp[MAX_ID_LEN * 2], *ptr;
 	const char		*p;
 	zbx_history_record_t	record;
-	size_t			buf_alloc = 0;
 
 	if (NULL == (p = zbx_json_next_value(jp, NULL, timestamp, sizeof(timestamp), NULL)))
 	{
@@ -732,51 +833,17 @@ static void	history_clickhouse_parse_row(const struct zbx_json_parse *jp, unsign
 		return;
 	}
 
-	if (NULL == (p = zbx_json_next_value_dyn(jp, p, &buf, &buf_alloc, NULL)))
-	{
-		zabbix_log(LOG_LEVEL_WARNING, "cannot parse value from row \"%s\"", jp->start);
-		return;
-	}
-
 	switch (value_type)
 	{
 		case ITEM_VALUE_TYPE_FLOAT:
-			if (FAIL == zbx_is_double(buf, &record.value.dbl))
-			{
-				zabbix_log(LOG_LEVEL_WARNING, "cannot parse floating value \"%s\"", buf);
-				zbx_free(buf);
-				return;
-			}
-			zbx_free(buf);
-			break;
 		case ITEM_VALUE_TYPE_UINT64:
-			if (FAIL == zbx_is_uint64(buf, &record.value.ui64))
-			{
-				zabbix_log(LOG_LEVEL_WARNING, "cannot parse unsigned 64-bit value \"%s\"", buf);
-				zbx_free(buf);
+			if (FAIL == history_clickhouse_parse_numeric_value(jp, p, value_type, &record))
 				return;
-			}
-			zbx_free(buf);
-			break;
-		case ITEM_VALUE_TYPE_STR:
-		case ITEM_VALUE_TYPE_TEXT:
-			record.value.str = buf;
-			break;
-		case ITEM_VALUE_TYPE_LOG:
-			record.value.log = (zbx_log_value_t *)zbx_malloc(NULL, sizeof(zbx_log_value_t));
-			record.value.log->value = buf;
-			record.value.log->source = NULL;
-
-			if (FAIL == history_clickhouse_parse_log_value(jp, p, record.value.log))
-			{
-				zbx_history_record_clear(&record, ITEM_VALUE_TYPE_LOG);
-				return;
-			}
 			break;
 		default:
-			zbx_free(buf);
-			THIS_SHOULD_NEVER_HAPPEN;
-			return;
+			if (FAIL == history_clickhouse_parse_value(jp, p, value_type, &record))
+				return;
+			break;
 	}
 
 	zbx_vector_history_record_append(records, record);
@@ -1051,7 +1118,6 @@ static int	history_clickhouse_get_info(void *data, zbx_history_provider_info_t *
 		*error = zbx_dsprintf(NULL, "empty version data received from ClickHouse");
 		goto out;
 	}
-
 
 	zbx_rtrim(conn->resp.page.data, "\n\r");
 	if (4 != sscanf(conn->resp.page.data, "%d.%d.%d.%d", &v1, &v2, &v3, &v4))
