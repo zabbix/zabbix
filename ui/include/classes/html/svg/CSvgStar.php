@@ -17,11 +17,11 @@
 class CSvgStar extends CSvgPolygon {
 
 	public function __construct($x, $y, $size, $points_count = 5) {
-		$radius_outer = $size / 2;            // star fits in size × size
-		$radius_inner = $radius_outer * 0.5;  // inner radius
+		$radius_outer = $size / 2;          // Star fits in size × size.
+		$radius_inner = $radius_outer / 2;  // Inner radius.
 
 		$points = [];
-		$angle_step = M_PI / $points_count;  // half-step for alternating outer/inner points
+		$angle_step = M_PI / $points_count;  // Half-step for alternating outer/inner points.
 
 		for ($i = 0; $i < 2 * $points_count; $i++) {
 			$r = $i % 2 === 0 ? $radius_outer : $radius_inner;
