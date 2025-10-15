@@ -4,8 +4,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2024-09-02 19:59+0000\n"
-"Last-Translator: Simon Schoenmackers <zabbix-translations@schnmckrs.de>\n"
+"PO-Revision-Date: 2025-09-18 16:00+0000\n"
+"Last-Translator: Justin <info@jstorfinger.de>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: de\n"
 "MIME-Version: 1.0\n"
@@ -19,7 +19,7 @@ msgstr ""
 #: include/classes/validators/CFormValidator.php:1397
 #: include/classes/validators/CFormValidator.php:1442 jsLoader.php:439
 msgid " or "
-msgstr ""
+msgstr "oder"
 
 #: app/controllers/CControllerSlaReportList.php:182
 #, c-format
@@ -300,6 +300,24 @@ msgstr "php-Klasse %1$s muss das Modul %2$s unter %3$s erweitern."
 msgid "%1$s: %2$s"
 msgstr "%1$s: %2$s"
 
+#: include/classes/server/CZabbixServer.php:740
+#: include/classes/setup/CSetupWizard.php:1459
+#, c-format
+msgid "%1$s: %2$s."
+msgstr ""
+
+#: include/classes/server/CZabbixServer.php:746
+#: include/classes/setup/CSetupWizard.php:1465
+#, c-format
+msgid "%1$s: file is not readable."
+msgstr ""
+
+#: include/classes/server/CZabbixServer.php:743
+#: include/classes/setup/CSetupWizard.php:1462
+#, c-format
+msgid "%1$s: invalid path or file not found."
+msgstr ""
+
 #: include/classes/graph/CSvgGraph.php:1418
 #, c-format
 msgid "%1$sth percentile: %2$s"
@@ -379,7 +397,7 @@ msgstr "1 Minute"
 
 #: app/views/host.wizard.edit.php:861
 msgid "1. Install Java Gateway on the same machine running Zabbix server by following the instructions in"
-msgstr ""
+msgstr "1. Installieren Sie mit folgender Anleitung das Java-Gateway auf der Maschine wo Zabbix Server läuft"
 
 #: app/views/administration.queue.overview.php:48
 #: app/views/administration.queue.overview.proxy.php:48
@@ -393,7 +411,7 @@ msgstr "12 Stunden"
 
 #: app/views/host.wizard.edit.php:867
 msgid "2. Configure your Java application to support remote JMX monitoring. For example:"
-msgstr ""
+msgstr "2. Konfigurieren Sie Ihre Java-Anwendung so, dass die Remote-JMX-Überwachung unterstützt wird. Beispiel:"
 
 #: tests/selenium/modules/clock32/includes/WidgetForm.php:115
 #: widgets/clock/includes/WidgetForm.php:115
@@ -458,17 +476,17 @@ msgstr "A"
 
 #: app/views/js/host.wizard.edit.js.php:1143
 msgid "A few more steps"
-msgstr ""
+msgstr "Einige weitere Schritte"
 
 #: include/classes/helpers/CItemGeneralHelper.php:356
 #: include/classes/helpers/CItemGeneralHelper.php:399
 #: include/classes/helpers/CItemGeneralHelper.php:407
 msgid "A floating point value is expected."
-msgstr ""
+msgstr "Es wird ein Fließkommawert erwartet."
 
 #: app/views/host.wizard.edit.php:139
 msgid "A template is a set of predefined configurations (metrics to be collected, conditions for generating alerts, etc.) designed for your monitoring target."
-msgstr ""
+msgstr "Ein Template ist ein Satz von vordefinierten Konfigurationen (Metriken die gesammelt werden, Bedingungen zum erstellen von Alarmen, usw) die für Ihr Überwachungsziel generiert wurden."
 
 #: widgets/svggraph/includes/CWidgetFieldOverrideView.php:199
 msgid "ADD OVERRIDE"
@@ -727,7 +745,7 @@ msgstr[1] "Aktionen deaktiviert"
 
 #: app/controllers/CControllerPopup.php:42
 msgid "Action edit"
-msgstr ""
+msgstr "Aktion bearbeiten"
 
 #: app/controllers/CControllerActionEnable.php:84
 msgid "Action enabled"
@@ -992,7 +1010,7 @@ msgstr "Neues Widget hinzufügen"
 
 #: widgets/navtree/Widget.php:34
 msgid "Add child element"
-msgstr ""
+msgstr "Untergeordnetes Element hinzufügen"
 
 #: widgets/navtree/Widget.php:39
 msgid "Add child elements"
@@ -1020,7 +1038,7 @@ msgstr "Host hinzufügen"
 
 #: app/views/host.wizard.edit.php:571 app/views/js/host.wizard.edit.js.php:1133
 msgid "Add host interface"
-msgstr ""
+msgstr "Neue Hostschnittstelle hinzufügen"
 
 #: include/actions.inc.php:653 include/actions.inc.php:871
 msgid "Add host tags"
@@ -1140,7 +1158,7 @@ msgstr "Weitere Regeln"
 
 #: app/views/host.wizard.edit.php:521 app/views/host.wizard.edit.php:544
 msgid "Additionally, make sure to complete the agent installation as described in this step, then return to this screen to continue to the next step."
-msgstr ""
+msgstr "Stellen sie zusätzlich sicher, dass Sie die Agenteninstallation wie in diesem Schritt beschrieben abschließen und dann zu diesem Bildschirm zurückkehren, um mit dem nächsten Schritt fortzufahren."
 
 #: app/controllers/CControllerProxyCreate.php:82
 #: app/controllers/CControllerProxyUpdate.php:76
@@ -1222,7 +1240,7 @@ msgstr "Agent (passiv)"
 
 #: app/views/host.wizard.edit.php:597
 msgid "Agent address"
-msgstr ""
+msgstr "Agent Adresse"
 
 #: include/classes/data/CItemData.php:911
 msgid "Agent availability check. Returns nothing - unavailable; 1 - available"
@@ -1242,7 +1260,7 @@ msgstr "Betreuer Rechnername. Gibt String zurück"
 
 #: app/views/js/host.wizard.edit.js.php:96
 msgid "Agent interface"
-msgstr ""
+msgstr "Agent Schnittstelle"
 
 #: include/views/inventory.host.view.php:64
 msgid "Agent interfaces"
@@ -1250,11 +1268,11 @@ msgstr "Agent-Schnittstellen"
 
 #: app/views/host.wizard.edit.php:163 app/views/js/host.wizard.edit.js.php:1788
 msgid "Agent mode"
-msgstr ""
+msgstr "Agent Modus"
 
 #: app/views/host.wizard.edit.php:603
 msgid "Agent port"
-msgstr ""
+msgstr "Agent Port"
 
 #: include/classes/data/CItemData.php:919
 msgid "Agent variant check. Returns 1 - for Zabbix agent; 2 - for Zabbix agent 2"
@@ -1262,11 +1280,11 @@ msgstr "Prüfung der Agentenvariante. Gibt 1 zurück - für den Zabbix-Agenten; 
 
 #: app/views/host.wizard.edit.php:158 app/views/js/host.wizard.edit.js.php:1781
 msgid "Agent-based"
-msgstr ""
+msgstr "Agent-basiert"
 
 #: app/views/host.wizard.edit.php:159 app/views/js/host.wizard.edit.js.php:1782
 msgid "Agentless"
-msgstr ""
+msgstr "Agentlos"
 
 #: widgets/svggraph/includes/CWidgetFieldDataSetView.php:417
 msgid "Aggregate"
@@ -1355,7 +1373,7 @@ msgstr "Alle"
 #: app/views/mediatype.list.php:79 app/views/mediatype.list.php:81
 #: app/views/mediatype.list.php:90 app/views/popup.operation.edit.php:160
 msgid "All available"
-msgstr ""
+msgstr "Alle verfügbaren"
 
 #: app/views/monitoring.dashboard.view.php:189
 msgid "All dashboards"
@@ -1445,7 +1463,7 @@ msgstr "Alternativ können Sie es manuell installieren:"
 #: include/views/monitoring.sysmap.edit.php:269
 #: include/views/monitoring.sysmap.edit.php:276
 msgid "Always"
-msgstr ""
+msgstr "Immer"
 
 #: include/classes/data/CItemData.php:2317
 msgid "Amount of guest physical memory that is swapped out to the swap space, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
@@ -1458,12 +1476,12 @@ msgstr "Menge des physischen Arbeitsspeichers des Hosts, die für die Sicherung 
 #: include/classes/api/services/CItemGeneral.php:1913
 #, c-format
 msgid "An LLD rule prototype with key \"%1$s\" already exists on the host \"%2$s\"."
-msgstr ""
+msgstr "Ein LLD-Regel-Prototyp mit dem Schlüssel \"%1$s\" existiert bereits auf dem Host \"%2$s\"."
 
 #: include/classes/api/services/CItemGeneral.php:1912
 #, c-format
 msgid "An LLD rule prototype with key \"%1$s\" already exists on the template \"%2$s\"."
-msgstr ""
+msgstr "Ein LLD-Regel-Prototyp mit dem Schlüssel \"%1$s\" existiert bereits in der Vorlage \"%2$s\"."
 
 #: include/classes/api/services/CItemGeneral.php:1781
 #, c-format
@@ -1479,7 +1497,7 @@ msgstr "Ein LLD-Regel mit dem Schlüssel \"%1$s\" existiert bereits in der Vorla
 #: include/classes/validators/CFormValidator.php:1103
 #: include/classes/validators/CFormValidator.php:1150 jsLoader.php:419
 msgid "An array is expected."
-msgstr ""
+msgstr "Ein Array wird erwartet."
 
 #: include/classes/api/services/CItemGeneral.php:1775
 #, c-format
@@ -1589,7 +1607,7 @@ msgstr "Alle vorhandenen Vorlagenentitäten, die in der Importdatei nicht vorhan
 
 #: app/views/host.wizard.edit.php:148
 msgid "Apache, AWS, MySQL, etc."
-msgstr ""
+msgstr "Apache, AWS, MySQL usw."
 
 # Achtung: Hier ist NICHT die Zabbix "item application" gemeint.
 #: include/classes/core/CJsonRpc.php:225
@@ -1642,7 +1660,7 @@ msgstr "Arc Hintergrund"
 
 #: widgets/gauge/includes/WidgetForm.php:305
 msgid "Arc size"
-msgstr ""
+msgstr "Bogengröße"
 
 #: app/views/popup.tabfilter.edit.php:76
 msgid "Are you sure you want to delete this filter?"
@@ -1915,23 +1933,23 @@ msgstr "Autorisierung"
 
 #: app/views/oauth.edit.php:167 app/views/oauth.edit.php:182
 msgid "Authorization code"
-msgstr ""
+msgstr "Autorisierungscode"
 
 #: app/views/oauth.edit.php:136
 msgid "Authorization endpoint"
-msgstr ""
+msgstr "Autorisierungs-Endpunkt"
 
 #: app/views/oauth.edit.php:148
 msgid "Authorization parameters"
-msgstr ""
+msgstr "Autorisierungs-Parameter"
 
 #: app/views/oauth.edit.php:137
 msgid "Authorization server URL for requesting user authorization."
-msgstr ""
+msgstr "URL des Autorisierungsservers zum Anfragen der Benutzerautorisierung."
 
 #: app/views/oauth.edit.php:189
 msgid "Authorization server URL to exchange the authorization code for an access token."
-msgstr ""
+msgstr "URL des Autorisierungsservers zum Austausch des Autorisierungscodes gegen ein Zugriffstoken."
 
 #: widgets/piechart/includes/WidgetForm.php:154
 #: widgets/tophosts/views/column.edit.php:204
@@ -1952,7 +1970,7 @@ msgstr "Automatisch"
 #: include/views/monitoring.sysmap.edit.php:270
 #: include/views/monitoring.sysmap.edit.php:277
 msgid "Auto hide"
-msgstr ""
+msgstr "Automatisch ausblenden"
 
 #: app/views/administration.user.edit.php:294
 msgid "Auto-login"
@@ -2047,7 +2065,7 @@ msgstr "Vermeiden Sie leicht zu erratende Passwörter"
 
 #: app/views/host.wizard.edit.php:473
 msgid "Avoid including sensitive data."
-msgstr ""
+msgstr "Vermeiden Sie die Angabe sensibler Daten."
 
 #: jsLoader.php:172
 msgid "Awaiting data"
@@ -2082,7 +2100,7 @@ msgstr "Hintergrundbild"
 
 #: include/views/monitoring.sysmap.edit.php:123
 msgid "Background scale"
-msgstr ""
+msgstr "Hintergrundskala"
 
 #: widgets/svggraph/includes/CWidgetFieldDataSetView.php:286
 #: widgets/svggraph/includes/CWidgetFieldOverrideView.php:176
@@ -2218,11 +2236,11 @@ msgstr "Rahmenbreite"
 
 #: include/classes/api/services/CHost.php:1445
 msgid "Both \"tls_connect\" and \"tls_accept\" fields must be specified when changing settings of connection encryption."
-msgstr ""
+msgstr "Zum Ändern der TLS Verschlüsselung Einstellung, müssen beide Werte \"tls_connect\" und \"tls_accept\" angegeben werden."
 
 #: include/classes/api/services/CHost.php:1452
 msgid "Both \"tls_psk_identity\" and \"tls_psk\" fields must be specified when changing the PSK for connection encryption."
-msgstr ""
+msgstr "Zum Ändern der TLS-PSK Verschlüsselung Einstellung, müssen beide Werte \"tls_psk_identity\" und \"tls_psk\" angegeben werden."
 
 #: app/controllers/CControllerUserUpdateGeneral.php:105
 msgid "Both passwords must be equal."
@@ -2245,7 +2263,7 @@ msgstr "Untere N"
 
 #: app/views/host.wizard.edit.php:429
 msgid "Brackets to specify IPv6 addresses"
-msgstr ""
+msgstr "Klammern zur Angabe von IPv6-Adressen"
 
 #: jsLoader.php:266
 msgid "Bring forward"
@@ -2348,7 +2366,7 @@ msgstr "CUID erwartet"
 
 #: app/controllers/CControllerOauthAuthorize.php:135
 msgid "CURL Error"
-msgstr ""
+msgstr "CURL-Fehler"
 
 #: include/items.inc.php:100 include/views/configuration.graph.edit.php:180
 #: include/views/configuration.graph.edit.php:275
@@ -2405,7 +2423,7 @@ msgstr "Abbrechen"
 
 #: app/views/host.wizard.edit.php:1042
 msgid "Cancel Host Wizard?"
-msgstr ""
+msgstr "Host-Assistent abbrechen?"
 
 #: app/controllers/CControllerTokenCreate.php:65
 #: app/controllers/CControllerTokenCreate.php:135
@@ -2436,7 +2454,7 @@ msgstr "Übersichtsseite kann nicht hinzugefügt werden: Es wurde die maximale A
 
 #: host_discovery_prototypes.php:518
 msgid "Cannot add discovery prototype"
-msgstr ""
+msgstr "Kann den Suchlauf-Prototypen nicht hinzufügen"
 
 #: host_discovery.php:540
 msgid "Cannot add discovery rule"
@@ -2701,7 +2719,7 @@ msgstr ""
 #: app/controllers/CControllerCopyCreate.php:161
 msgid "Cannot copy item"
 msgid_plural "Cannot copy items"
-msgstr[0] "Kann Datenpunkt nicht kopieren"
+msgstr[0] "Kann Elemente nicht kopieren"
 msgstr[1] ""
 
 #: include/classes/api/services/CDiscoveryRule.php:3643
@@ -2904,17 +2922,15 @@ msgstr[0] "Kann Diagramm nicht löschen"
 msgstr[1] "Kann Diagramm nicht löschen"
 
 #: graphs.php:273 graphs.php:317
-#, fuzzy
 msgid "Cannot delete graph prototype"
 msgid_plural "Cannot delete graph prototypes"
-msgstr[0] "Kann Diagramm nicht löschen"
+msgstr[0] "Der Diagramm-Prototyp kann nicht gelöscht werden"
 msgstr[1] "Kann Diagramm nicht löschen"
 
 #: app/controllers/CControllerHostMassDelete.php:76
-#, fuzzy
 msgid "Cannot delete host"
 msgid_plural "Cannot delete hosts"
-msgstr[0] "Kann Host nicht löschen"
+msgstr[0] "Der Host kann nicht gelöscht werden"
 msgstr[1] "Kann Host nicht löschen"
 
 #: include/classes/api/services/CHost.php:1631
@@ -3305,7 +3321,7 @@ msgstr[1] ""
 #: host_discovery_prototypes.php:585
 msgid "Cannot enable discovery prototype"
 msgid_plural "Cannot enable discovery prototypes"
-msgstr[0] ""
+msgstr[0] "Kann den Suchlauf-Prototypen nicht aktivieren"
 msgstr[1] ""
 
 #: app/controllers/CControllerDiscoveryEnable.php:76 host_discovery.php:583
@@ -3598,6 +3614,10 @@ msgstr "Keine Wertezuordnung \"%1$s\" gefunden, für Datenpunktvorlage \"%2$s\" 
 #: include/classes/import/CConfigurationImport.php:1243
 #, c-format
 msgid "Cannot find value map \"%1$s\" used for item prototype \"%2$s\" of discovery rule prototype \"%3$s\" on \"%4$s\"."
+msgstr ""
+
+#: app/views/oauth.authorize.php:33
+msgid "Cannot get authentication tokens"
 msgstr ""
 
 #: app/views/oauth.edit.php:230
@@ -4130,6 +4150,11 @@ msgstr "Kann XML nicht lesen: %1$s."
 #, c-format
 msgid "Cannot read YAML: %1$s."
 msgstr "YAML kann nicht gelesen werden: %1$s."
+
+#: include/classes/server/CZabbixServer.php:511
+#, c-format
+msgid "Cannot read response from Zabbix server \"%1$s\"."
+msgstr ""
 
 #: include/classes/server/CZabbixServer.php:567
 #, c-format
@@ -12237,6 +12262,10 @@ msgstr "Internet Explorer"
 msgid "Interval"
 msgstr "Intervall"
 
+#: widgets/itemcard/includes/CWidgetFieldItemSectionsView.php:76
+msgid "Interval and storage"
+msgstr ""
+
 #: include/classes/api/services/CRole.php:731
 #, c-format
 msgid "Invalid API method \"%2$s\" for user role \"%1$s\"."
@@ -16917,6 +16946,10 @@ msgstr "PHP-ctype-Erweiterung (PHP Konfigurations-Parameter--enable-ctype) fehlt
 msgid "PHP curl"
 msgstr ""
 
+#: include/classes/setup/CFrontendSetup.php:733
+msgid "PHP curl extension is missing or outdated."
+msgstr ""
+
 #: include/classes/setup/CFrontendSetup.php:691
 msgid "PHP curl extension missing."
 msgstr ""
@@ -18887,6 +18920,11 @@ msgstr "Rückmeldungscode"
 #: httpdetails.php:149 include/classes/screens/CScreenHttpTestDetails.php:83
 msgid "Response time"
 msgstr "Antwortzeit"
+
+#: include/classes/server/CZabbixServer.php:507
+#, c-format
+msgid "Response timeout of %1$s exceeded when connecting to Zabbix server \"%2$s\"."
+msgstr ""
 
 #: app/controllers/CControllerMediatypeTestSend.php:182
 msgid "Response type: JSON"
@@ -26474,6 +26512,10 @@ msgstr "Beschreibung"
 #: include/classes/validators/CApiInputValidator.php:1985
 msgid "directory cannot be empty"
 msgstr "Verzeichnis darf nicht leer sein"
+
+#: include/views/configuration.host.discovery.list.php:340
+msgid "discovery rule"
+msgstr ""
 
 #: app/controllers/CControllerItemMassCheckNow.php:138
 #: include/classes/api/services/CTask.php:562
