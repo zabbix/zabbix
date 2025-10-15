@@ -497,7 +497,7 @@ static int	history_clickhouse_flush_conns(CURLM *mhandle, char **error)
 			/* remove it from the current execution loop */
 			zbx_vector_ptr_append(&retries, msg->easy_handle);
 
-			if (CURLE_OK != (code = curl_multi_remove_handle(mhandle, msg->easy_handle)))
+			if (CURLM_OK != (code = curl_multi_remove_handle(mhandle, msg->easy_handle)))
 			{
 				zabbix_log(LOG_LEVEL_WARNING, "cannot remove handle from curl curl handle: %s",
 							curl_multi_strerror(code));
@@ -536,7 +536,7 @@ static int	history_clickhouse_flush_conns(CURLM *mhandle, char **error)
 
 	for (int i = 0; i < retries.values_num; i++)
 	{
-		if (CURLE_OK != (code = curl_multi_add_handle(mhandle, retries.values[i])))
+		if (CURLM_OK != (code = curl_multi_add_handle(mhandle, retries.values[i])))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "cannot add handle to curl multi handle: %s",
 						curl_multi_strerror(code));
@@ -574,7 +574,7 @@ static zbx_uint64_t	history_clickhouse_flush(void *data)
 	{
 		zbx_clickhouse_conn_t	*conn = d->active_conns.values[i];
 
-		if (CURLE_OK != (code = curl_multi_add_handle(d->mhandle, conn->handle)))
+		if (CURLM_OK != (code = curl_multi_add_handle(d->mhandle, conn->handle)))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "cannot add handle to curl multi handle: %s",
 						curl_multi_strerror(code));
@@ -618,7 +618,7 @@ out:
 		if (SUCCEED != conn->status)
 			flush_err |= history_make_flush_error(ZBX_HISTORY_FLUSH_FAIL, conn->value_type);
 
-		if (CURLE_OK != (code = curl_multi_remove_handle(d->mhandle, conn->handle)))
+		if (CURLM_OK != (code = curl_multi_remove_handle(d->mhandle, conn->handle)))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "cannot remove handle from curl multi handle: %s",
 					curl_multi_strerror(code));
@@ -877,7 +877,7 @@ static int	clickhouse_conn_post(zbx_clickhouse_conn_t *conn, CURLM *mhandle, str
 	}
 	*conn->resp.errbuf = '\0';
 
-	if (CURLE_OK != (code = curl_multi_add_handle(mhandle, conn->handle)))
+	if (CURLM_OK != (code = curl_multi_add_handle(mhandle, conn->handle)))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot add handle to curl multi handle: %s", curl_multi_strerror(code));
 	}
@@ -912,7 +912,7 @@ static int	clickhouse_conn_post(zbx_clickhouse_conn_t *conn, CURLM *mhandle, str
 
 	ret = SUCCEED;
 out:
-	if (CURLE_OK != (code = curl_multi_remove_handle(mhandle, conn->handle)))
+	if (CURLM_OK != (code = curl_multi_remove_handle(mhandle, conn->handle)))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot remove handle from curl multi handle: %s",
 					curl_multi_strerror(code));
