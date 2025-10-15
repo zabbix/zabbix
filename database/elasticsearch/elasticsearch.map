@@ -151,4 +151,27 @@
    }
 }
 
+# json mapping
 
+{
+   "settings": {
+      "index": {
+         "number_of_replicas": 1,
+         "number_of_shards": 5
+      }
+   },
+   "mappings": {
+      "properties": {
+         "itemid": {
+            "type": "long"
+         },
+         "clock": {
+            "format": "epoch_second",
+            "type": "date"
+         },
+         "value": {
+            "type": "object"
+         }
+      }
+   }
+}
