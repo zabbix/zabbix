@@ -362,8 +362,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 			[
 				[
 					'db' => 'SELECT * FROM images',
-					'link' => 'zabbix.php?action=image.edit&imageid=1',
-					'return_button' => true
+					'link' => 'zabbix.php?action=image.edit&imageid=1'
 				]
 			],
 			// #32 Image create.
@@ -371,7 +370,10 @@ class testPermissionsWithoutCSRF extends CWebTest {
 				[
 					'db' => 'SELECT * FROM images',
 					'link' => 'zabbix.php?action=image.edit&imagetype=1',
-					'return_button' => true
+					'fields' => [
+						'id:name' => 'CSRF image test name',
+						'id:image' => PHPUNIT_BASEDIR.'/ui/tests/images/image.png'
+					]
 				]
 			],
 			// #33 Icon map update.
@@ -405,7 +407,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 					'db' => 'SELECT * FROM regexps',
 					'link' => 'zabbix.php?action=regex.edit',
 					'fields' => [
-						'id:name' => 'CSRF test name',
+						'id:name' => 'CSRF regex test name',
 						'id:expressions_0_expression' => 'abc'
 					]
 				]
