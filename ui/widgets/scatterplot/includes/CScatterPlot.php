@@ -99,7 +99,7 @@ class CScatterPlot extends CSvg {
 	 *
 	 * @var int
 	 */
-	private int $max_y_axis_width = 120;
+	private int $max_yaxis_width = 120;
 
 	private int $cell_height_min = 30;
 
@@ -108,7 +108,7 @@ class CScatterPlot extends CSvg {
 	 *
 	 * @var int
 	 */
-	private int $x_axis_height = 20;
+	private int $xaxis_height = 20;
 
 	/**
 	 * SVG default size.
@@ -329,7 +329,7 @@ class CScatterPlot extends CSvg {
 					$approx_width = max($approx_width, imageTextSize(11, 0, $value)['width']);
 				}
 
-				$this->offset_left = min($this->max_y_axis_width,
+				$this->offset_left = min($this->max_yaxis_width,
 					max($this->offset_left, self::SVG_GRAPH_Y_AXIS_LABEL_MARGIN_OUTER + $approx_width)
 				);
 			}
@@ -484,7 +484,7 @@ class CScatterPlot extends CSvg {
 		$this->addItem(
 			(new CSvgGraphAxis($grid_values,GRAPH_YAXIS_SIDE_BOTTOM))
 				->setPosition($this->canvas_x, $this->canvas_y + $this->canvas_height)
-				->setSize($this->canvas_width, $this->x_axis_height)
+				->setSize($this->canvas_width, $this->xaxis_height)
 				->setLineColor('#'.$this->graph_theme['gridcolor'])
 				->setTextColor('#'.$this->graph_theme['textcolor'])
 		);
