@@ -373,7 +373,7 @@ static zbx_uint64_t	history_elastic_flush(void *data)
 {
 	struct curl_slist		*curl_headers = NULL;
 	zbx_history_elastic_data_t	*d = (zbx_history_elastic_data_t *)data;
-	int				i, running, previous = 0, msgnum;
+	int				i, running, previous = 0, msgnum, attempts_num = 0;
 	CURLMsg				*msg;
 	zbx_vector_ptr_t		retries;
 	CURLcode			err;
@@ -408,6 +408,8 @@ static zbx_uint64_t	history_elastic_flush(void *data)
 	}
 
 try_again:
+	attempts_num++;
+
 	do
 	{
 		int			fds;
@@ -421,7 +423,7 @@ try_again:
 			break;
 		}
 
-		if (CURLM_OK != (code = zbx_curl_multi_wait(d->mhandle, ZBX_HISTORY_STORAGE_DOWN, &fds)))
+		if (CURLM_OK != (code = zbx_curl_multi_wait(d->mhandle, ZBX_HISTORY_STORAGE_TIMEOUT_MS, &fds)))
 		{
 			curl_multi_cleanup(d->mhandle);
 
@@ -513,9 +515,9 @@ try_again:
 	}
 	while (running);
 
-	/* We check if we have handles to retry. If yes, we put them back in the multi */
+	/* We check if we have handles to retry. If yes, we put them back in the multi     */
 	/* handle and go to the beginning of the do while() for try sending the data again */
-	/* after sleeping for ZBX_HISTORY_STORAGE_DOWN / 1000 (seconds) */
+	/* after sleeping for ZBX_HISTORY_STORAGE_DOWN_DELAY                               */
 	if (0 < retries.values_num)
 	{
 		for (i = 0; i < retries.values_num; i++)
@@ -524,11 +526,14 @@ try_again:
 		zbx_vector_ptr_clear(&retries);
 
 		zabbix_log(LOG_LEVEL_ERR, "ElasticSearch database is down: reconnecting in %d seconds",
-				ZBX_HISTORY_STORAGE_DOWN / 1000);
+				ZBX_HISTORY_STORAGE_DOWN_DELAY);
 
-		sleep(ZBX_HISTORY_STORAGE_DOWN / 1000);
+		sleep(ZBX_HISTORY_STORAGE_DOWN_DELAY);
 		goto try_again;
 	}
+
+	if (1 < attempts_num)
+		zabbix_log(LOG_LEVEL_ERR, "ElasticSearch database connection re-established");
 clean:
 	for (i = 0; i < d->conns.values_num; i++)
 	{

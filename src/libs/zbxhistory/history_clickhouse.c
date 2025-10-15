@@ -461,7 +461,7 @@ static int	history_clickhouse_flush_conns(CURLM *mhandle, char **error)
 			break;
 		}
 
-		if (CURLM_OK != (code = zbx_curl_multi_wait(mhandle, ZBX_HISTORY_STORAGE_DOWN, NULL)))
+		if (CURLM_OK != (code = zbx_curl_multi_wait(mhandle, ZBX_HISTORY_STORAGE_TIMEOUT_MS, NULL)))
 		{
 			*error = zbx_dsprintf(NULL, "cannot wait on curl multi handle: %s", curl_multi_strerror(code));
 			break;
@@ -550,7 +550,8 @@ static int	history_clickhouse_flush_conns(CURLM *mhandle, char **error)
 static zbx_uint64_t	history_clickhouse_flush(void *data)
 {
 	zbx_clickhouse_data_t	*d = (zbx_clickhouse_data_t *)data;
-	zbx_uint64_t			flush_err = 0;
+	zbx_uint64_t		flush_err = 0;
+	int			attempts_num = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() active connections:%d", __func__, d->active_conns.values_num);
 
@@ -572,6 +573,7 @@ static zbx_uint64_t	history_clickhouse_flush(void *data)
 		char	*error = NULL;
 		int	retries_num;
 
+		attempts_num++;
 		retries_num = history_clickhouse_flush_conns(d->mhandle, &error);
 
 		if (NULL != error)
@@ -584,10 +586,14 @@ static zbx_uint64_t	history_clickhouse_flush(void *data)
 			break;
 
 		zabbix_log(LOG_LEVEL_ERR, "ClickHouse database is down: reconnecting in %d seconds",
-				ZBX_HISTORY_STORAGE_DOWN / 1000);
+				ZBX_HISTORY_STORAGE_DOWN_DELAY);
 
-		sleep(ZBX_HISTORY_STORAGE_DOWN / 1000);
+		sleep(ZBX_HISTORY_STORAGE_DOWN_DELAY);
 	}
+
+	if (1 < attempts_num)
+		zabbix_log(LOG_LEVEL_ERR, "ClickHouse database connection re-established");
+
 out:
 	for (int i = 0; i < d->active_conns.values_num; i++)
 	{
@@ -822,7 +828,7 @@ static int	clickhouse_conn_post(zbx_clickhouse_conn_t *conn, CURLM *mhandle, str
 		const char *url, const char *data, char **error)
 {
 	CURLcode	err;
-	int		ret = FAIL;
+	int		ret = FAIL, attempts_num = 0;
 
 	zabbix_log(LOG_LEVEL_TRACE, "In %s() data:%s", data, __func__);
 
@@ -855,6 +861,7 @@ static int	clickhouse_conn_post(zbx_clickhouse_conn_t *conn, CURLM *mhandle, str
 		char	*errmsg = NULL;
 		int	retries_num;
 
+		attempts_num++;
 		retries_num = history_clickhouse_flush_conns(mhandle, &errmsg);
 
 		if (NULL != errmsg)
@@ -867,10 +874,13 @@ static int	clickhouse_conn_post(zbx_clickhouse_conn_t *conn, CURLM *mhandle, str
 			break;
 
 		zabbix_log(LOG_LEVEL_ERR, "ClickHouse database is down: reconnecting in %d seconds",
-				ZBX_HISTORY_STORAGE_DOWN / 1000);
+				ZBX_HISTORY_STORAGE_DOWN_DELAY);
 
-		sleep(ZBX_HISTORY_STORAGE_DOWN / 1000);
+		sleep(ZBX_HISTORY_STORAGE_DOWN_DELAY);
 	}
+
+	if (1 < attempts_num)
+		zabbix_log(LOG_LEVEL_ERR, "ClickHouse database connection re-established");
 
 	zabbix_log(LOG_LEVEL_TRACE, "result: %s", ZBX_NULL2STR(conn->resp.page.data));
 

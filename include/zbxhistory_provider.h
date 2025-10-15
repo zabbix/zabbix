@@ -268,7 +268,8 @@ zbx_history_provider_info_t	*zbx_history_provider_get_info(void *data, char *err
  ******************************************************************************/
 void	zbx_history_provider_free_info(zbx_history_provider_info_t *info);
 
-#define		ZBX_HISTORY_STORAGE_DOWN	10000
+#define		ZBX_HISTORY_STORAGE_TIMEOUT_MS	(SEC_PER_MIN * 1000)
+#define		ZBX_HISTORY_STORAGE_DOWN_DELAY	10
 
 #define HISTORY_FLUSH_RET_FAIL_ALL	((UINT64_C(1) << (ITEM_VALUE_TYPE_COUNT + 1)) - 1)
 
