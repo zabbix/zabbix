@@ -102,7 +102,7 @@ class CControllerScriptUserInputCheck extends CController {
 				return false;
 			}
 
-			if (!preg_match(CRegexHelper::preparePattern($manualinput_validator), trim($manualinput))) {
+			if (!CRegexHelper::test($manualinput_validator, trim($manualinput))) {
 				error(_s('Incorrect value for field "%1$s": %2$s.', 'manualinput',
 					_s('input does not match the provided pattern: %1$s', $manualinput_validator)
 				));

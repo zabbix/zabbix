@@ -47,9 +47,11 @@ class CRegexValidatorTest extends CValidatorTest
 			[[], 1.2],
 			[[], '[(]'],
 			[[], '[\(]'],
-			[[], '[\\(]'],
 			[[], '[)]'],
 			[[], '[\)]'],
+			[[], '\\\\[(]'],
+			[[], '\\\\(abc)'],
+			[[], '\\\\\(abc'],
 			[[], '(?:194 Temperature[^(\n]+|Airflow_Temperature[^(\n]+|Drive Temperature:|Temperature:) +([0-9]+)'],
 			[[], '[(] [)] ([(]|[)]) [[[((]'],
 			[[], '[-]'],
@@ -84,7 +86,7 @@ class CRegexValidatorTest extends CValidatorTest
 			[
 				['messageRegex' => 'Incorrect regular expression "%1$s": "%2$s".'],
 				'asd(',
-				'Incorrect regular expression "asd(": "No ending matching delimiter \')\' found".'
+				'Incorrect regular expression "asd(": "Compilation failed: missing closing parenthesis at offset 4".'
 			],
 			[
 				['messageRegex' => 'Incorrect regular expression "%1$s": "%2$s".'],
@@ -94,7 +96,7 @@ class CRegexValidatorTest extends CValidatorTest
 			[
 				['messageRegex' => 'Incorrect regular expression "%1$s": "%2$s".'],
 				'[+-(]',
-				'Incorrect regular expression "[+-(]": "Compilation failed: range out of order in character class at offset 4".'
+				'Incorrect regular expression "[+-(]": "Compilation failed: range out of order in character class at offset 3".'
 			]
 		];
 	}

@@ -138,7 +138,7 @@ class CControllerValueMapCheck extends CController {
 
 					return false;
 				}
-				elseif (@preg_match('/'.str_replace('/', '\/', $value).'/', '') === false) {
+				elseif (!CRegexValidator::isValidExpression($value)) {
 					error(_s('Incorrect value for field "%1$s": %2$s.', _('Value'), _('invalid regular expression')));
 
 					return false;

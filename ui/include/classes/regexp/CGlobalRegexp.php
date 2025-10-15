@@ -128,37 +128,11 @@ class CGlobalRegexp {
 		return $result;
 	}
 
-	/**
-	 * Matches expression as regular expression.
-	 *
-	 * @param array $expression
-	 * @param string $string
-	 *
-	 * @return bool
-	 */
-	private static function _matchRegular(array $expression, $string) {
-		$pattern = self::buildRegularExpression($expression);
+	private static function _matchRegular(array $expression, string $string): bool {
+		$expected = $expression['expression_type'] == EXPRESSION_TYPE_TRUE;
+		$modifiers = 'm'.($expression['case_sensitive'] ? '' : 'i');
 
-		$expectedResult = ($expression['expression_type'] == EXPRESSION_TYPE_TRUE);
-
-		return preg_match($pattern, $string) == $expectedResult;
-	}
-
-	/**
-	 * Combines regular expression provided as definition array into a string.
-	 *
-	 * @param array $expression
-	 *
-	 * @return string
-	 */
-	private static function buildRegularExpression(array $expression) {
-		$pattern = CRegexHelper::preparePattern($expression['expression']).'m';
-
-		if (!$expression['case_sensitive']) {
-			$pattern .= 'i';
-		}
-
-		return $pattern;
+		return CRegexHelper::test($expression['expression'], $string, $modifiers) == $expected;
 	}
 
 	/**

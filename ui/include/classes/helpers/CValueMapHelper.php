@@ -118,8 +118,8 @@ class CValueMapHelper {
 				break;
 
 			case VALUEMAP_MAPPING_TYPE_REGEXP:
-				$result = (!$match_numeric
-					&& @preg_match('/'.str_replace('/', '\/', $mapping['value']).'/', $value) == 1);
+				$result = !$match_numeric && CRegexValidator::isValidExpression($mapping['value'])
+					&& CRegexHelper::test($mapping['value'], $value);
 
 				break;
 

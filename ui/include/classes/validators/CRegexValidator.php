@@ -45,7 +45,7 @@ class CRegexValidator extends CValidator
 			$this->error($error);
 		}
 		else {
-			self::isValidPattern((string) $value, $error);
+			self::isValidExpression((string) $value, $error);
 
 			if ($error !== '') {
 				$this->error($this->messageRegex, $value, str_replace('preg_match(): ', '', $error));
@@ -55,14 +55,14 @@ class CRegexValidator extends CValidator
 		return $error === '';
 	}
 
-	public static function isValidPattern(string $expression, ?string &$error = null): bool {
+	public static function isValidExpression(string $expression, ?string &$error = null): bool {
 		$error = '';
 
 		set_error_handler(static function (int $foo, string $errstr) use (&$error) {
 			$error = $errstr;
 		});
 
-		preg_match(CRegexHelper::preparePattern($expression), '');
+		CRegexHelper::test($expression, '');
 
 		restore_error_handler();
 
