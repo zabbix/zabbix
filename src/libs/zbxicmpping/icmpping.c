@@ -818,7 +818,7 @@ static int	hosts_ping(zbx_fping_host_t *hosts, int hosts_count, int requests_cou
 	sigset_t	mask, orig_mask;
 	zbx_fping_args	fping_args;
 	zbx_fping_resp	fping_resp;
-	mode_t		old_umask = 0;
+	mode_t		old_umask = 0026;
 
 #ifdef HAVE_IPV6
 	int		family;
