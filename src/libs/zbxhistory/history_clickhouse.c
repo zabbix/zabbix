@@ -223,7 +223,7 @@ static void	*history_clickhouse_create_data(const zbx_history_option_t *options,
 
 	if (NULL == (mhandle = curl_multi_init()))
 	{
-		*error = zbx_strdup(*error, "Cannot initialize cURL multi session");
+		*error = zbx_strdup(*error, "Cannot initialize curl multi session");
 		return NULL;
 	}
 
@@ -273,7 +273,7 @@ static int	history_clickhouse_conn_init(zbx_clickhouse_conn_t *conn, struct curl
 
 	if (NULL == (conn->handle = curl_easy_init()))
 	{
-		*error = zbx_strdup(NULL, "cannot initialize cURL session");
+		*error = zbx_strdup(NULL, "cannot initialize curl session");
 		return FAIL;
 	}
 
@@ -285,7 +285,7 @@ static int	history_clickhouse_conn_init(zbx_clickhouse_conn_t *conn, struct curl
 		CURLE_OK != (err = curl_easy_setopt(conn->handle, opt = CURLOPT_ACCEPT_ENCODING, "")) ||
 		CURLE_OK != (err = curl_easy_setopt(conn->handle, opt = CURLOPT_PRIVATE, conn)))
 	{
-		*error = zbx_dsprintf(NULL, "cannot set cURL option %d: %s", (int)opt, curl_easy_strerror(err));
+		*error = zbx_dsprintf(NULL, "cannot set curl option %d: %s", (int)opt, curl_easy_strerror(err));
 		return FAIL;
 	}
 
@@ -386,7 +386,7 @@ static void	history_clickhouse_write(void *data, unsigned char value_type,
 
 	if (CURLE_OK != err)
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "cannot write data to ClickHouse: cannot set cURL option %d: %s",
+		zabbix_log(LOG_LEVEL_WARNING, "cannot write data to ClickHouse: cannot set curl option %d: %s",
 				(int)CURLOPT_URL, curl_easy_strerror(err));
 		return;
 	}
@@ -414,7 +414,7 @@ static void	history_clickhouse_write(void *data, unsigned char value_type,
 	if (CURLE_OK != (err = curl_easy_setopt(conn->handle, CURLOPT_POSTFIELDS, buf)))
 	{
 		zbx_free(buf);
-		zabbix_log(LOG_LEVEL_WARNING, "cannot write data to ClickHouse: cannot set cURL option %d: %s",
+		zabbix_log(LOG_LEVEL_WARNING, "cannot write data to ClickHouse: cannot set curl option %d: %s",
 				(int)CURLOPT_URL, curl_easy_strerror(err));
 		return;
 	}
@@ -434,7 +434,7 @@ static void	history_clickhouse_write(void *data, unsigned char value_type,
  * Purpose: flush active ClickHouse connections                               *
  *                                                                            *
  * Parameters:                                                                *
- *     mhandle - [IN] cURL multi handle                                       *
+ *     mhandle - [IN] curl multi handle                                       *
  *     retries - [OUT] vector of handles to retry (optional)                  *
  *     error   - [OUT] error message                                          *
  *                                                                            *
@@ -496,7 +496,12 @@ static int	history_clickhouse_flush_conns(CURLM *mhandle, char **error)
 			/* problems with HTTP, we put the handle in a retry list and */
 			/* remove it from the current execution loop */
 			zbx_vector_ptr_append(&retries, msg->easy_handle);
-			curl_multi_remove_handle(mhandle, msg->easy_handle);
+
+			if (CURLE_OK != (code = curl_multi_remove_handle(mhandle, msg->easy_handle)))
+			{
+				zabbix_log(LOG_LEVEL_WARNING, "cannot remove handle from curl curl handle: %s",
+							curl_multi_strerror(code));
+			}
 		}
 		else
 		{
@@ -530,7 +535,13 @@ static int	history_clickhouse_flush_conns(CURLM *mhandle, char **error)
 	int	retries_num = retries.values_num;
 
 	for (int i = 0; i < retries.values_num; i++)
-		curl_multi_add_handle(mhandle, retries.values[i]);
+	{
+		if (CURLE_OK != (code = curl_multi_add_handle(mhandle, retries.values[i])))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "cannot add handle to curl multi handle: %s",
+						curl_multi_strerror(code));
+		}
+	}
 
 	zbx_vector_ptr_destroy(&retries);
 
@@ -552,6 +563,7 @@ static zbx_uint64_t	history_clickhouse_flush(void *data)
 	zbx_clickhouse_data_t	*d = (zbx_clickhouse_data_t *)data;
 	zbx_uint64_t		flush_err = 0;
 	int			attempts_num = 0;
+	CURLMcode		code;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() active connections:%d", __func__, d->active_conns.values_num);
 
@@ -562,7 +574,11 @@ static zbx_uint64_t	history_clickhouse_flush(void *data)
 	{
 		zbx_clickhouse_conn_t	*conn = d->active_conns.values[i];
 
-		curl_multi_add_handle(d->mhandle, conn->handle);
+		if (CURLE_OK != (code = curl_multi_add_handle(d->mhandle, conn->handle)))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "cannot add handle to curl multi handle: %s",
+						curl_multi_strerror(code));
+		}
 
 		zabbix_log(LOG_LEVEL_TRACE, "posting history to ClickHouse for value_type %d: %s", conn->value_type,
 				conn->buf);
@@ -602,7 +618,12 @@ out:
 		if (SUCCEED != conn->status)
 			flush_err |= history_make_flush_error(ZBX_HISTORY_FLUSH_FAIL, conn->value_type);
 
-		curl_multi_remove_handle(d->mhandle, conn->handle);
+		if (CURLE_OK != (code = curl_multi_remove_handle(d->mhandle, conn->handle)))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "cannot remove handle from curl multi handle: %s",
+					curl_multi_strerror(code));
+		}
+
 		curl_easy_setopt(conn->handle, CURLOPT_POSTFIELDS, NULL);
 
 		zbx_free(conn->buf);
@@ -828,6 +849,7 @@ static int	clickhouse_conn_post(zbx_clickhouse_conn_t *conn, CURLM *mhandle, str
 		const char *url, const char *data, char **error)
 {
 	CURLcode	err;
+	CURLMcode	code;
 	int		ret = FAIL, attempts_num = 0;
 
 	zabbix_log(LOG_LEVEL_TRACE, "In %s() data:%s", data, __func__);
@@ -854,7 +876,10 @@ static int	clickhouse_conn_post(zbx_clickhouse_conn_t *conn, CURLM *mhandle, str
 	}
 	*conn->resp.errbuf = '\0';
 
-	curl_multi_add_handle(mhandle, conn->handle);
+	if (CURLE_OK != (code = curl_multi_add_handle(mhandle, conn->handle)))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "cannot add handle to curl multi handle: %s", curl_multi_strerror(code));
+	}
 
 	while (1)
 	{
@@ -886,7 +911,11 @@ static int	clickhouse_conn_post(zbx_clickhouse_conn_t *conn, CURLM *mhandle, str
 
 	ret = SUCCEED;
 out:
-	curl_multi_remove_handle(mhandle, conn->handle);
+	if (CURLE_OK != (code = curl_multi_remove_handle(mhandle, conn->handle)))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "cannot remove handle from curl multi handle: %s",
+					curl_multi_strerror(code));
+	}
 
 	zabbix_log(LOG_LEVEL_TRACE, "End of %s() ret:%s", __func__, zbx_result_string(ret));
 
