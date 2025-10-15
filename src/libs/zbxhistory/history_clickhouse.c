@@ -178,45 +178,6 @@ static char	*history_clickhouse_make_url(const char *base_url, const char *usern
 
 /******************************************************************************
  *                                                                            *
- * Purpose: escape database identifier by wrapping it in backticks and        *
- *          doubling any backticks within the identifier                      *
- *                                                                            *
- * Parameters: str - [IN] string to escape                                    *
- *                                                                            *
- * Return value: dynamically allocated escaped string                         *
- *                                                                            *
- ******************************************************************************/
-static char	*history_clickhouse_escape_dyn(const char *str)
-{
-	size_t	len = 2;
-	char	*out, *dst;
-
-	for (const char *ptr = str; '\0' != *ptr; ptr++)
-	{
-		if ('`' == *ptr)
-			len++;
-		len++;
-	}
-
-	dst = out = (char *)zbx_malloc(NULL, len + 1);
-	*out++ = '`';
-
-	for (const char *ptr = str; '\0' != *ptr; ptr++)
-	{
-		if ('`' == *ptr)
-			*out++ = '`';
-
-		*out++ = *ptr;
-	}
-
-	*out++ = '`';
-	*out = '\0';
-
-	return dst;
-}
-
-/******************************************************************************
- *                                                                            *
  * Purpose: create and initialize ClickHouse data structure                   *
  *                                                                            *
  * Parameters:                                                                *
@@ -275,7 +236,7 @@ static void	*history_clickhouse_create_data(const zbx_history_option_t *options,
 	zbx_vector_clickhouse_conn_ptr_create(&data->active_conns);
 
 	data->base_url = history_clickhouse_make_url(url, username, password);
-	data->db = history_clickhouse_escape_dyn(db);
+	zbx_url_encode(db, &data->db);
 
 	data->curl_headers = curl_slist_append(data->curl_headers, "Content-Type: text/plain");
 
@@ -415,12 +376,11 @@ static void	history_clickhouse_write(void *data, unsigned char value_type,
 		return;
 	}
 
-	query = zbx_dsprintf(NULL, "INSERT INTO %s.%s FORMAT JSONCompactEachRow", d->db,
-			clickhouse_history_tables[value_type]);
+	query = zbx_dsprintf(NULL, "INSERT INTO %s FORMAT JSONCompactEachRow", clickhouse_history_tables[value_type]);
 	zbx_url_encode(query, &query_enc);
 	zbx_free(query);
 
-	zbx_snprintf_alloc(&url, &url_alloc, &url_offset, "%s?query=%s", d->base_url, query_enc);
+	zbx_snprintf_alloc(&url, &url_alloc, &url_offset, "%s?database=%s&query=%s", d->base_url, d->db, query_enc);
 	zbx_free(query_enc);
 
 	err = curl_easy_setopt(conn->handle, CURLOPT_URL, url);
@@ -967,14 +927,15 @@ static int	history_clickhouse_fetch(void *data, zbx_uint64_t itemid, unsigned ch
 
 	conn = history_clickhouse_get_conn(d, value_type);
 
-	zbx_snprintf_alloc(&url, &url_alloc, &url_offset, "%s?date_time_output_format=unix_timestamp", d->base_url);
+	zbx_snprintf_alloc(&url, &url_alloc, &url_offset, "%s?database=%s&date_time_output_format=unix_timestamp",
+			d->base_url, d->db);
 
 	zbx_strcpy_alloc(&query, &query_alloc, &query_offset, "select timestamp,value");
 	if (ITEM_VALUE_TYPE_LOG == value_type)
 		zbx_strcpy_alloc(&query, &query_alloc, &query_offset, ",source,severity,logeventid,log_time");
 
-	zbx_snprintf_alloc(&query, &query_alloc, &query_offset, " from %s.%s where itemid=" ZBX_FS_UI64,
-			d->db, clickhouse_history_tables[value_type], itemid);
+	zbx_snprintf_alloc(&query, &query_alloc, &query_offset, " from %s where itemid=" ZBX_FS_UI64,
+			clickhouse_history_tables[value_type], itemid);
 
 	if (0 != start)
 	{
