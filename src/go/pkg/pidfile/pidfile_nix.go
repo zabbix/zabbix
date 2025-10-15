@@ -35,6 +35,8 @@ func createPidFile(pid int, path string) (file *os.File, err error) {
 		Len:    0,
 		Pid:    int32(pid),
 	}
+
+	//nolint:gosec //group read access is intentional
 	if file, err = os.OpenFile(path, os.O_WRONLY|os.O_CREATE|syscall.O_CLOEXEC, 0640); nil != err {
 		return nil, fmt.Errorf("cannot open PID file [%s]: %s", path, err.Error())
 	}
