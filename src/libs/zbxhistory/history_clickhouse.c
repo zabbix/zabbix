@@ -774,6 +774,7 @@ static void	history_clickhouse_parse_row(const struct zbx_json_parse *jp, unsign
 			}
 			break;
 		default:
+			zbx_free(buf);
 			THIS_SHOULD_NEVER_HAPPEN;
 			return;
 	}
