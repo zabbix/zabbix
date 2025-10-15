@@ -238,8 +238,6 @@ static void	*history_clickhouse_create_data(const zbx_history_option_t *options,
 	data->base_url = history_clickhouse_make_url(url, username, password);
 	zbx_url_encode(db, &data->db);
 
-	data->curl_headers = curl_slist_append(data->curl_headers, "Content-Type: text/plain");
-
 	return (void *)data;
 }
 
