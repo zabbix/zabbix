@@ -356,45 +356,72 @@ zbx_uint64_t	history_options_type_mask(zbx_history_option_t *options, int option
  * Parameters:                                                                *
  *     options                   - [IN/OUT] vector of history options         *
  *     config_source_ip          - [IN] source IP address from configuration  *
- *                                      (optional) *
+ *                                      (optional)                            *
  *     config_ssl_ca_location    - [IN] SSL CA certificate location from      *
  *                                      configuration (optional)              *
  *     config_ssl_cert_location  - [IN] SSL certificate location from         *
  *                                      configuration (optional)              *
  *     config_ssl_key_location   - [IN] SSL key location from configuration   *
  *                                      (optional)                            *
+ *     error                     - [OUT] error message                        *
+ *                                                                            *
+ * Return value: SUCCEED - common parameters were added successfully          *
+ *               FAIL    - parameter conflict                                 *
  *                                                                            *
  ******************************************************************************/
-void	history_options_add_common_params(zbx_vector_history_option_t *options, const char *config_source_ip,
+int	history_options_add_common_params(zbx_vector_history_option_t *options, const char *config_source_ip,
 		const char *config_ssl_ca_location, const char *config_ssl_cert_location,
-		const char *config_ssl_key_location)
+		const char *config_ssl_key_location, char **error)
 {
-	if (NULL!= config_source_ip && NULL == history_option_value(options->values, options->values_num,
-			HISTORY_PROVIDER_OPTION_SOURCE_IP))
+	if (NULL != history_option_value(options->values, options->values_num, HISTORY_PROVIDER_OPTION_SOURCE_IP))
+	{
+		*error = zbx_strdup(NULL, "invalid configuration: cannot override SourceIP parameter");
+		return FAIL;
+	}
+
+	if (NULL != config_source_ip)
 	{
 		zbx_vector_history_option_append(options, history_option_str(HISTORY_PROVIDER_OPTION_SOURCE_IP,
 				config_source_ip));
 	}
 
-	if (NULL != config_ssl_ca_location && NULL == history_option_value(options->values, options->values_num,
-			HISTORY_PROVIDER_OPTION_SSL_CA_LOCATION))
+	if (NULL != history_option_value(options->values, options->values_num, HISTORY_PROVIDER_OPTION_SSL_CA_LOCATION))
+	{
+		*error = zbx_strdup(NULL, "invalid configuration: cannot override SSLCALocation parameter");
+		return FAIL;
+	}
+
+	if (NULL != config_ssl_ca_location)
 	{
 		zbx_vector_history_option_append(options, history_option_str(HISTORY_PROVIDER_OPTION_SSL_CA_LOCATION,
 				config_ssl_ca_location));
 	}
 
-	if (NULL != config_ssl_cert_location && NULL == history_option_value(options->values, options->values_num,
+	if (NULL != history_option_value(options->values, options->values_num,
 			HISTORY_PROVIDER_OPTION_SSL_CERT_LOCATION))
+	{
+		*error = zbx_strdup(NULL, "invalid configuration: cannot override SSLCertLocation parameter");
+		return FAIL;
+	}
+
+	if (NULL != config_ssl_cert_location)
 	{
 		zbx_vector_history_option_append(options, history_option_str(HISTORY_PROVIDER_OPTION_SSL_CERT_LOCATION,
 				config_ssl_cert_location));
 	}
 
-	if (NULL != config_ssl_key_location && NULL == history_option_value(options->values, options->values_num,
+	if (NULL != history_option_value(options->values, options->values_num,
 			HISTORY_PROVIDER_OPTION_SSL_KEY_LOCATION))
+	{
+		*error = zbx_strdup(NULL, "invalid configuration: cannot override SSLKeyLocation parameter");
+		return FAIL;
+	}
+
+	if (NULL != config_ssl_key_location)
 	{
 		zbx_vector_history_option_append(options, history_option_str(HISTORY_PROVIDER_OPTION_SSL_KEY_LOCATION,
 				config_ssl_key_location));
 	}
 
+	return SUCCEED;
 }
