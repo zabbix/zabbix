@@ -178,6 +178,45 @@ static char	*history_clickhouse_make_url(const char *base_url, const char *usern
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: escape database identifier by wrapping it in backticks and        *
+ *          doubling any backticks within the identifier                      *
+ *                                                                            *
+ * Parameters: str - [IN] string to escape                                    *
+ *                                                                            *
+ * Return value: dynamically allocated escaped string                         *
+ *                                                                            *
+ ******************************************************************************/
+static char	*history_clickhouse_escape_dyn(const char *str)
+{
+	size_t	len = 2;
+	char	*out, *dst;
+
+	for (const char *ptr = str; '\0' != *ptr; ptr++)
+	{
+		if ('`' == *ptr)
+			len++;
+		len++;
+	}
+
+	dst = out = (char *)zbx_malloc(NULL, len + 1);
+	*out++ = '`';
+
+	for (const char *ptr = str; '\0' != *ptr; ptr++)
+	{
+		if ('`' == *ptr)
+			*out++ = '`';
+
+		*out++ = *ptr;
+	}
+
+	*out++ = '`';
+	*out = '\0';
+
+	return dst;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: create and initialize ClickHouse data structure                   *
  *                                                                            *
  * Parameters:                                                                *
@@ -236,7 +275,7 @@ static void	*history_clickhouse_create_data(const zbx_history_option_t *options,
 	zbx_vector_clickhouse_conn_ptr_create(&data->active_conns);
 
 	data->base_url = history_clickhouse_make_url(url, username, password);
-	data->db = zbx_strdup(NULL, db);
+	data->db = history_clickhouse_escape_dyn(db);
 
 	data->curl_headers = curl_slist_append(data->curl_headers, "Content-Type: text/plain");
 
