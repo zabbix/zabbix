@@ -51,7 +51,7 @@
 
 				type_input.value &= ~<?= ZBX_PROPERTY_OWN ?>;
 				type_input.setAttribute('data-skip-from-submit', '');
-				type_input.closest('tr').querySelectorAll('textarea')
+				type_input.closest('tr').querySelectorAll('textarea, input[name$="[automatic]"]')
 					.forEach((node) => node.setAttribute('data-skip-from-submit', ''));
 			});
 		}

@@ -77,7 +77,7 @@ class CControllerTriggerEdit extends CController {
 				'selectDiscoveryRule' => ['itemid', 'name', 'templateid'],
 				'selectDiscoveryData' => ['parent_triggerid', 'disable_source'],
 				'selectDependencies' => ['triggerid'],
-				'selectTags' => ['tag', 'value'],
+				'selectTags' => ['tag', 'value', 'automatic'],
 				'editable' => true
 			];
 
@@ -148,7 +148,8 @@ class CControllerTriggerEdit extends CController {
 
 				$tags[] = [
 					'tag' => $tag['tag'],
-					'value' => $tag['value']
+					'value' => $tag['value'],
+					'automatic' => $tag['automatic']
 				];
 			}
 
@@ -200,7 +201,7 @@ class CControllerTriggerEdit extends CController {
 			$data['tags'][] = ['tag' => '', 'value' => ''];
 		}
 		else {
-			CArrayHelper::sort($data['tags'], ['tag', 'value']);
+			CArrayHelper::sort($data['tags'], [['field' => 'automatic', 'order' => ZBX_SORT_DOWN], 'tag', 'value']);
 			$data['tags'] = array_values($data['tags']);
 		}
 

@@ -1194,7 +1194,7 @@ abstract class CTriggerGeneral extends CApiService {
 
 				// Discovered fields, except status, cannot be updated.
 				$update_discovered_validator = new CUpdateDiscoveredValidator([
-					'allowed' => ['triggerid', 'status'],
+					'allowed' => ['triggerid', 'status', 'tags'],
 					'messageAllowedField' => _('Cannot update "%2$s" for a discovered trigger "%1$s".')
 				]);
 				break;
@@ -1376,7 +1376,7 @@ abstract class CTriggerGeneral extends CApiService {
 		}
 
 		$options = [
-			'output' => ['triggertagid', 'triggerid', 'tag', 'value'],
+			'output' => ['triggertagid', 'triggerid', 'tag', 'value', 'automatic'],
 			'filter' => ['triggerid' => $triggerids]
 		];
 		$db_tags = DBselect(DB::makeSql('trigger_tag', $options));
@@ -1819,6 +1819,10 @@ abstract class CTriggerGeneral extends CApiService {
 						}
 					}
 				}
+
+				$tags_delete = array_filter($tags_delete,
+					static fn(array $tag) => $tag['automatic'] == ZBX_TAG_MANUAL
+				);
 
 				foreach ($tags_delete as $tag_delete) {
 					$del_triggertagids[] = $tag_delete['triggertagid'];
