@@ -19,6 +19,7 @@ class CFieldFile extends CField {
 		super.init();
 
 		this._field.addEventListener('input', () => this.onBlur());
+		this._field.addEventListener('cancel', () => this.onBlur());
 	}
 
 	getName() {
