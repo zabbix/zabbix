@@ -172,7 +172,7 @@ class CScreenHistory extends CScreenBase {
 
 			/**
 			 * View type: As plain text.
-			 * Item type: numeric (unsigned, char), float, text, log.
+			 * Item type: numeric (unsigned, char), float, text, log, JSON.
 			 */
 			if ($this->plaintext) {
 				if (!$numeric_items && $this->filter !== ''
@@ -194,6 +194,7 @@ class CScreenHistory extends CScreenBase {
 				foreach ($items_by_type as $value_type => $itemids) {
 					$options['history'] = $value_type;
 					$options['itemids'] = $itemids;
+					$options['maxValueSize'] = null;
 
 					$item_data = API::History()->get($options);
 
@@ -384,7 +385,7 @@ class CScreenHistory extends CScreenBase {
 			}
 			/**
 			 * View type: 500 latest values.
-			 * Item type: numeric (unsigned, char), float.
+			 * Item type: numeric (unsigned, char), float, JSON.
 			 */
 			elseif ($this->action === HISTORY_LATEST) {
 				$history_table = (new CTableInfo())
@@ -422,6 +423,14 @@ class CScreenHistory extends CScreenBase {
 						$value = formatFloat($value, ['decimals' => ZBX_UNITS_ROUNDOFF_UNSUFFIXED]);
 					}
 
+					if ($item['value_type'] == ITEM_VALUE_TYPE_JSON) {
+						json_decode($value);
+
+						if (json_last_error() !== JSON_ERROR_NONE) {
+							$value .= '...';
+						}
+					}
+
 					$value = $item['value_type'] == ITEM_VALUE_TYPE_BINARY
 						? italic(_('binary value'))->addClass(ZBX_STYLE_GREY)
 						: zbx_nl2br(CValueMapHelper::applyValueMap($item['value_type'], $value, $item['valuemap']));
@@ -437,7 +446,7 @@ class CScreenHistory extends CScreenBase {
 			}
 			/**
 			 * View type: Values.
-			 * Item type: numeric (unsigned, char), float.
+			 * Item type: numeric (unsigned, char), float, JSON.
 			 */
 			else {
 				CArrayHelper::sort($items, [
@@ -510,6 +519,14 @@ class CScreenHistory extends CScreenBase {
 
 						if ($item['value_type'] == ITEM_VALUE_TYPE_FLOAT) {
 							$value = formatFloat($value, ['decimals' => ZBX_UNITS_ROUNDOFF_UNSUFFIXED]);
+						}
+
+						if ($item['value_type'] == ITEM_VALUE_TYPE_JSON) {
+							json_decode($value);
+
+							if (json_last_error() !== JSON_ERROR_NONE) {
+								$value .= '...';
+							}
 						}
 
 						$value = $item['value_type'] == ITEM_VALUE_TYPE_BINARY
