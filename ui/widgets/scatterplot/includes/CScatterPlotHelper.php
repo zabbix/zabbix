@@ -764,16 +764,16 @@ class CScatterPlotHelper {
 	}
 
 	private static function calculateInterpolationPosition(array $threshold_1, array $threshold_2, float $x,
-				float $y): float {
-		// Vector from threshold_1 to threshold_2
+			float $y): float {
+		// Vector from threshold_1 to threshold_2.
 		$vx = $threshold_2['x'] - $threshold_1['x'];
 		$vy = $threshold_2['y'] - $threshold_1['y'];
 
-		// Vector from threshold_1 to current point
+		// Vector from threshold_1 to current point.
 		$wx = $x - $threshold_1['x'];
 		$wy = $y - $threshold_1['y'];
 
-		// Dot product and magnitude squared of v
+		// Dot product and magnitude squared of v.
 		$dot_product = $wx * $vx + $wy * $vy;
 		$magnitude_square = $vx * $vx + $vy * $vy;
 
@@ -781,7 +781,7 @@ class CScatterPlotHelper {
 			return 0.0;
 		}
 
-		// Projection factor = (w·v) / |v|^2
+		// Projection factor = (w·v) / |v|^2.
 		return $dot_product / $magnitude_square;
 	}
 
