@@ -397,7 +397,6 @@ int	zbx_event_db_get_drule(const zbx_db_event *event, char **replace_to, const c
  *                                   "(null)" if record is not found          *
  *             fieldname  - [IN]                                              *
  *                                                                            *
- *                                                                            *
  * Return value: upon successful completion return SUCCEED                    *
  *               otherwise FAIL                                               *
  *                                                                            *
