@@ -1716,7 +1716,7 @@ class WidgetCommunication {
 								'type' => 'itemnavigator',
 								'name' => 'Item navigator listener',
 								'x' => 21,
-								'y' => 12,
+								'y' => 16,
 								'width' => 16,
 								'height' => 3,
 								'fields' => [
@@ -2912,8 +2912,8 @@ class WidgetCommunication {
 								]
 							],
 							[
-								'type' => 'dataover',
-								'name' => 'Data overview host listener from honeycomb',
+								'type' => 'topitems',
+								'name' => 'Top item host listener from honeycomb',
 								'x' => 36,
 								'y' => 12,
 								'width' => 18,
@@ -2943,6 +2943,11 @@ class WidgetCommunication {
 										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'rf_rate',
 										'value' => 0
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'columns.0.items.0',
+										'value' => 'Trapper item'
 									]
 								]
 							],
@@ -3041,8 +3046,8 @@ class WidgetCommunication {
 									],
 																		[
 										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
-										'name' => 'style',
-										'value' => STYLE_TOP
+										'name' => 'layout',
+										'value' => 1
 									],
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
