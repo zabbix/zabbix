@@ -1046,6 +1046,13 @@ static int	history_clickhouse_get_info(void *data, zbx_history_provider_info_t *
 
 	memset(info, 0, sizeof(zbx_history_provider_info_t));
 
+	if (NULL == conn->resp.page.data)
+	{
+		*error = zbx_dsprintf(NULL, "empty version data received from ClickHouse");
+		goto out;
+	}
+
+
 	zbx_rtrim(conn->resp.page.data, "\n\r");
 	if (4 != sscanf(conn->resp.page.data, "%d.%d.%d.%d", &v1, &v2, &v3, &v4))
 	{
