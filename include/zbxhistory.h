@@ -39,7 +39,9 @@ void	zbx_history_value2variant(const zbx_history_value_t *value, unsigned char v
 #define zbx_history_record_vector_create(vector)	zbx_vector_history_record_create(vector)
 
 int	zbx_history_init(const char *config_history_storage_url, const char *config_history_storage_opts,
-		int config_history_storage_pipelines, char **providers, int config_log_slow_queries, char **error);
+		int config_history_storage_pipelines, char **providers, int config_log_slow_queries,
+		const char *config_source_ip, const char *config_ssl_ca_location, const char *config_ssl_cert_location,
+		const char *config_ssl_key_location, char **error);
 
 void	zbx_history_destroy(void);
 

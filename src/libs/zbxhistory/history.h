@@ -22,16 +22,6 @@
 #define HISTORY_PROVIDER_ELASTIC	"elastic"
 #define HISTORY_PROVIDER_CLICKHOUSE	"clickhouse"
 
-#define HISTORY_PROVIDER_OPTION_NAME			"name"
-#define HISTORY_PROVIDER_OPTION_PATH			"path"
-#define HISTORY_PROVIDER_OPTION_LOG_SLOW_QUERIES	"log_slow_queries"
-#define HISTORY_PROVIDER_OPTION_URL			"url"
-#define HISTORY_PROVIDER_OPTION_USERNAME		"username"
-#define HISTORY_PROVIDER_OPTION_PASSWORD		"password"
-#define HISTORY_PROVIDER_OPTION_DB			"db"
-#define HISTORY_PROVIDER_OPTION_TYPES			"types"
-#define HISTORY_PROVIDER_OPTION_DATE_INDEX		"date_index"
-
 typedef struct
 {
 	zbx_history_provider_write_t		write;

@@ -19,6 +19,25 @@
 #include "zbxtypes.h"
 #include "zbxalgo.h"
 
+#define HISTORY_PROVIDER_OPTION_NAME			"name"
+#define HISTORY_PROVIDER_OPTION_PATH			"path"
+#define HISTORY_PROVIDER_OPTION_LOG_SLOW_QUERIES	"log_slow_queries"
+#define HISTORY_PROVIDER_OPTION_URL			"url"
+#define HISTORY_PROVIDER_OPTION_USERNAME		"username"
+#define HISTORY_PROVIDER_OPTION_PASSWORD		"password"
+#define HISTORY_PROVIDER_OPTION_DB			"db"
+#define HISTORY_PROVIDER_OPTION_TYPES			"types"
+#define HISTORY_PROVIDER_OPTION_DATE_INDEX		"date_index"
+#define HISTORY_PROVIDER_OPTION_SOURCE_IP		"source_ip"
+#define HISTORY_PROVIDER_OPTION_SSL_CERT_FILE		"ssl_cert_file"
+#define HISTORY_PROVIDER_OPTION_SSL_KEY_FILE		"ssl_key_file"
+#define HISTORY_PROVIDER_OPTION_SSL_KEY_PASSWORD	"ssl_key_password"
+#define HISTORY_PROVIDER_OPTION_SSL_VERIFY_PEER		"ssl_verify_peer"
+#define HISTORY_PROVIDER_OPTION_SSL_VERIFY_HOST		"ssl_verify_host"
+#define HISTORY_PROVIDER_OPTION_SSL_CA_LOCATION		"ssl_ca_location"
+#define HISTORY_PROVIDER_OPTION_SSL_CERT_LOCATION	"ssl_cert_location"
+#define HISTORY_PROVIDER_OPTION_SSL_KEY_LOCATION 	"ssl_key_location"
+
 ZBX_VECTOR_DECL(history_option, zbx_history_option_t)
 
 zbx_history_option_t	history_option_str(const char *name, const char *value);
@@ -29,6 +48,10 @@ int	history_provider_parse_options(const char *conf, char **name, zbx_vector_his
 		char **error);
 void	history_options_clear(zbx_history_option_t *options, int options_num);
 zbx_uint64_t	history_options_type_mask(zbx_history_option_t *options, int options_num, const char **value_types);
+
+void	history_options_add_common_params(zbx_vector_history_option_t *options, const char *config_source_ip,
+		const char *config_ssl_ca_location, const char *config_ssl_cert_location,
+		const char *config_ssl_key_location);
 
 #endif
 

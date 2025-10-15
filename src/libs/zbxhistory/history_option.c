@@ -307,7 +307,7 @@ int	history_provider_parse_options(const char *conf, char **name, zbx_vector_his
 		}
 		zbx_vector_history_option_clear(options);
 
-		*error = zbx_dsprintf(NULL, "cannot fond mandatory option \"%s\" in history provider configuration"
+		*error = zbx_dsprintf(NULL, "cannot find mandatory option \"%s\" in history provider configuration"
 				" \"%s\"", ZBX_HISTORY_OPTION_VALUE_TYPES, conf);
 
 		return FAIL;
@@ -346,4 +346,55 @@ zbx_uint64_t	history_options_type_mask(zbx_history_option_t *options, int option
 	}
 
 	return mask;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: add SSL configuration parameters to history provider options if   *
+ *          they are not already present                                      *
+ *                                                                            *
+ * Parameters:                                                                *
+ *     options                   - [IN/OUT] vector of history options         *
+ *     config_source_ip          - [IN] source IP address from configuration  *
+ *                                      (optional) *
+ *     config_ssl_ca_location    - [IN] SSL CA certificate location from      *
+ *                                      configuration (optional)              *
+ *     config_ssl_cert_location  - [IN] SSL certificate location from         *
+ *                                      configuration (optional)              *
+ *     config_ssl_key_location   - [IN] SSL key location from configuration   *
+ *                                      (optional)                            *
+ *                                                                            *
+ ******************************************************************************/
+void	history_options_add_common_params(zbx_vector_history_option_t *options, const char *config_source_ip,
+		const char *config_ssl_ca_location, const char *config_ssl_cert_location,
+		const char *config_ssl_key_location)
+{
+	if (NULL!= config_source_ip && NULL == history_option_value(options->values, options->values_num,
+			HISTORY_PROVIDER_OPTION_SOURCE_IP))
+	{
+		zbx_vector_history_option_append(options, history_option_str(HISTORY_PROVIDER_OPTION_SOURCE_IP,
+				config_source_ip));
+	}
+
+	if (NULL != config_ssl_ca_location && NULL == history_option_value(options->values, options->values_num,
+			HISTORY_PROVIDER_OPTION_SSL_CA_LOCATION))
+	{
+		zbx_vector_history_option_append(options, history_option_str(HISTORY_PROVIDER_OPTION_SSL_CA_LOCATION,
+				config_ssl_ca_location));
+	}
+
+	if (NULL != config_ssl_cert_location && NULL == history_option_value(options->values, options->values_num,
+			HISTORY_PROVIDER_OPTION_SSL_CERT_LOCATION))
+	{
+		zbx_vector_history_option_append(options, history_option_str(HISTORY_PROVIDER_OPTION_SSL_CERT_LOCATION,
+				config_ssl_cert_location));
+	}
+
+	if (NULL != config_ssl_key_location && NULL == history_option_value(options->values, options->values_num,
+			HISTORY_PROVIDER_OPTION_SSL_KEY_LOCATION))
+	{
+		zbx_vector_history_option_append(options, history_option_str(HISTORY_PROVIDER_OPTION_SSL_KEY_LOCATION,
+				config_ssl_key_location));
+	}
+
 }

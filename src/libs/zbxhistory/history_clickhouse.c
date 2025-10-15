@@ -29,6 +29,7 @@
 #include "zbxexpr.h"
 #include "zbxjson.h"
 #include "zbxtypes.h"
+#include "zbxhttp.h"
 
 typedef void (*write_value_t)(zbx_json_t *row, const zbx_history_value_t *value);
 
@@ -47,6 +48,13 @@ zbx_clickhouse_conn_t;
 ZBX_PTR_VECTOR_DECL(clickhouse_conn_ptr, zbx_clickhouse_conn_t *)
 ZBX_PTR_VECTOR_IMPL(clickhouse_conn_ptr, zbx_clickhouse_conn_t *)
 
+typedef enum
+{
+	CLICKHOUSE_RETRIES_OFF,
+	CLICKHOUSE_RETRIES_ON
+}
+zbx_clickhouse_retries_t;
+
 typedef struct
 {
 	char					*base_url;
@@ -58,6 +66,18 @@ typedef struct
 	zbx_vector_clickhouse_conn_ptr_t	active_conns;
 
 	CURLM					*mhandle;
+
+	int					ssl_verify_peer;
+	int					ssl_verify_host;
+
+	const char				*ssl_cert_file;
+	const char				*ssl_key_file;
+	const char				*ssl_key_password;
+
+	const char				*source_ip;
+	const char				*ssl_ca_location;
+	const char				*ssl_cert_location;
+	const char				*ssl_key_location;
 }
 zbx_clickhouse_data_t;
 
@@ -191,7 +211,7 @@ static char	*history_clickhouse_make_url(const char *base_url, const char *usern
 static void	*history_clickhouse_create_data(const zbx_history_option_t *options, int options_num, char **error)
 {
 	zbx_clickhouse_data_t	*data;
-	const char		*url, *username, *password, *db;
+	const char		*url, *username, *password, *db, *value;
 	CURLM			*mhandle;
 
 	if (NULL == (url = history_option_value(options, options_num, HISTORY_PROVIDER_OPTION_URL)))
@@ -230,6 +250,23 @@ static void	*history_clickhouse_create_data(const zbx_history_option_t *options,
 	data = (zbx_clickhouse_data_t *)zbx_malloc(NULL, sizeof(zbx_clickhouse_data_t));
 	memset(data, 0, sizeof(zbx_clickhouse_data_t));
 
+	data->ssl_cert_file = history_option_value(options, options_num, HISTORY_PROVIDER_OPTION_SSL_CERT_FILE);
+	data->ssl_key_file = history_option_value(options, options_num, HISTORY_PROVIDER_OPTION_SSL_KEY_FILE);
+	data->ssl_key_password = history_option_value(options, options_num, HISTORY_PROVIDER_OPTION_SSL_KEY_PASSWORD);
+	data->ssl_ca_location = history_option_value(options, options_num, HISTORY_PROVIDER_OPTION_SSL_CA_LOCATION);
+	data->ssl_cert_location = history_option_value(options, options_num, HISTORY_PROVIDER_OPTION_SSL_CERT_LOCATION);
+	data->ssl_key_location = history_option_value(options, options_num, HISTORY_PROVIDER_OPTION_SSL_KEY_LOCATION);
+
+	if (NULL != (value = history_option_value(options, options_num, HISTORY_PROVIDER_OPTION_SSL_VERIFY_PEER)))
+		data->ssl_verify_peer = atoi(value);
+	else
+		data->ssl_verify_peer = 1;
+
+	if (NULL != (value = history_option_value(options, options_num, HISTORY_PROVIDER_OPTION_SSL_VERIFY_HOST)))
+		data->ssl_verify_host = atoi(value);
+	else
+		data->ssl_verify_host = 1;
+
 	data->mhandle = mhandle;
 
 	zbx_vector_clickhouse_conn_ptr_create(&data->conns);
@@ -266,7 +303,7 @@ static void	history_clickhouse_close(void *data)
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-static int	history_clickhouse_conn_init(zbx_clickhouse_conn_t *conn, struct curl_slist *headers, char **error)
+static int	history_clickhouse_conn_init(zbx_clickhouse_conn_t *conn, zbx_clickhouse_data_t *d, char **error)
 {
 	CURLoption	opt;
 	CURLcode	err;
@@ -278,7 +315,7 @@ static int	history_clickhouse_conn_init(zbx_clickhouse_conn_t *conn, struct curl
 	}
 
 	if (CURLE_OK != (err = curl_easy_setopt(conn->handle, opt = CURLOPT_POST, 1L)) ||
-		CURLE_OK != (err = curl_easy_setopt(conn->handle, CURLOPT_HTTPHEADER, headers)) ||
+		CURLE_OK != (err = curl_easy_setopt(conn->handle, CURLOPT_HTTPHEADER, d->curl_headers)) ||
 		CURLE_OK != (err = curl_easy_setopt(conn->handle, opt = CURLOPT_WRITEFUNCTION, history_curl_recv)) ||
 		CURLE_OK != (err = curl_easy_setopt(conn->handle, opt = CURLOPT_WRITEDATA, &conn->resp.page)) ||
 		CURLE_OK != (err = curl_easy_setopt(conn->handle, opt = CURLOPT_ERRORBUFFER, conn->resp.errbuf)) ||
@@ -291,6 +328,14 @@ static int	history_clickhouse_conn_init(zbx_clickhouse_conn_t *conn, struct curl
 
 	if (SUCCEED != zbx_curl_setopt_https(conn->handle, error))
 		return FAIL;
+
+	if (SUCCEED != zbx_http_prepare_ssl(conn->handle, d->ssl_cert_file, d->ssl_key_file, d->ssl_key_password,
+			d->ssl_verify_peer, d->ssl_verify_host, d->source_ip, d->ssl_ca_location, d->ssl_cert_location,
+			d->ssl_key_location, error))
+	{
+		return FAIL;
+	}
+
 
 	return SUCCEED;
 }
@@ -366,7 +411,7 @@ static void	history_clickhouse_write(void *data, unsigned char value_type,
 	conn->status = FAIL;
 	zbx_vector_clickhouse_conn_ptr_append(&d->active_conns, conn);
 
-	if (NULL == conn->handle && SUCCEED != history_clickhouse_conn_init(conn, d->curl_headers, &error))
+	if (NULL == conn->handle && SUCCEED != history_clickhouse_conn_init(conn, d, &error))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot write data to ClickHouse: %s", error);
 		zbx_free(error);
@@ -484,7 +529,7 @@ static int	history_clickhouse_flush_conns(CURLM *mhandle, char **error)
 		{
 			if ('\0' != *conn->resp.errbuf)
 			{
-				*error = zbx_dsprintf(NULL, "cannot query data to ClickHouse: %s", conn->resp.errbuf);
+				*error = zbx_dsprintf(NULL, "cannot send query to ClickHouse: %s", conn->resp.errbuf);
 			}
 			else
 			{
@@ -902,19 +947,22 @@ static int	history_clickhouse_parse_response(char *response, unsigned char value
  *                                                                            *
  * Purpose: send POST request to ClickHouse                                   *
  *                                                                            *
- * Parameters: conn    - [IN] ClickHouse connection                           *
- *             mhandle - [IN] CURL multi handle                               *
- *             headers - [IN] HTTP headers for the request                    *
- *             url     - [IN] URL for the request                             *
- *             data    - [IN] POST data to send                               *
+ * Parameters: conn       - [IN] ClickHouse connection                        *
+ *             mhandle    - [IN] CURL multi handle                            *
+ *             headers    - [IN] HTTP headers for the request                 *
+ *             url        - [IN] URL for the request                          *
+ *             data       - [IN] POST data to send                            *
+ *             retry_mode - [IN] enable/disable retries:                      *
+ *                               CLICKHOUSE_RETRIES_ON                        *
+ *                               CLICKHOUSE_RETRIES_OFF                       *
  *             error   - [OUT] error message                                  *
  *                                                                            *
  * Return value: SUCCEED - request sent successfully                          *
  *               FAIL    - an error occurred                                  *
  *                                                                            *
  ******************************************************************************/
-static int	clickhouse_conn_post(zbx_clickhouse_conn_t *conn, CURLM *mhandle, struct curl_slist *headers,
-		const char *url, const char *data, char **error)
+static int	clickhouse_conn_post(zbx_clickhouse_conn_t *conn, zbx_clickhouse_data_t *d,
+		const char *url, const char *data, zbx_clickhouse_retries_t retry_mode, char **error)
 {
 	CURLcode	err;
 	CURLMcode	code;
@@ -922,7 +970,7 @@ static int	clickhouse_conn_post(zbx_clickhouse_conn_t *conn, CURLM *mhandle, str
 
 	zabbix_log(LOG_LEVEL_TRACE, "In %s() data:%s", data, __func__);
 
-	if (NULL == conn->handle && SUCCEED != history_clickhouse_conn_init(conn, headers, error))
+	if (NULL == conn->handle && SUCCEED != history_clickhouse_conn_init(conn, d, error))
 		return FAIL;
 
 	if (CURLE_OK != (err = curl_easy_setopt(conn->handle, CURLOPT_URL, url)))
@@ -944,7 +992,7 @@ static int	clickhouse_conn_post(zbx_clickhouse_conn_t *conn, CURLM *mhandle, str
 	}
 	*conn->resp.errbuf = '\0';
 
-	if (CURLM_OK != (code = curl_multi_add_handle(mhandle, conn->handle)))
+	if (CURLM_OK != (code = curl_multi_add_handle(d->mhandle, conn->handle)))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot add handle to curl multi handle: %s", curl_multi_strerror(code));
 	}
@@ -955,7 +1003,7 @@ static int	clickhouse_conn_post(zbx_clickhouse_conn_t *conn, CURLM *mhandle, str
 		int	retries_num;
 
 		attempts_num++;
-		retries_num = history_clickhouse_flush_conns(mhandle, &errmsg);
+		retries_num = history_clickhouse_flush_conns(d->mhandle, &errmsg);
 
 		if (NULL != errmsg)
 		{
@@ -963,7 +1011,7 @@ static int	clickhouse_conn_post(zbx_clickhouse_conn_t *conn, CURLM *mhandle, str
 			zbx_free(errmsg);
 		}
 
-		if (0 == retries_num)
+		if (0 == retries_num || CLICKHOUSE_RETRIES_OFF == retry_mode)
 			break;
 
 		zabbix_log(LOG_LEVEL_ERR, "ClickHouse database is down: reconnecting in %d seconds",
@@ -979,7 +1027,7 @@ static int	clickhouse_conn_post(zbx_clickhouse_conn_t *conn, CURLM *mhandle, str
 
 	ret = SUCCEED;
 out:
-	if (CURLM_OK != (code = curl_multi_remove_handle(mhandle, conn->handle)))
+	if (CURLM_OK != (code = curl_multi_remove_handle(d->mhandle, conn->handle)))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot remove handle from curl multi handle: %s",
 					curl_multi_strerror(code));
@@ -1063,7 +1111,7 @@ static int	history_clickhouse_fetch(void *data, zbx_uint64_t itemid, unsigned ch
 
 	zabbix_log(LOG_LEVEL_DEBUG, "query: %s", query);
 
-	if (SUCCEED != clickhouse_conn_post(conn, d->mhandle, d->curl_headers, url, query, &errmsg))
+	if (SUCCEED != clickhouse_conn_post(conn, d, url, query, CLICKHOUSE_RETRIES_ON, &errmsg))
 	{
 		*error = zbx_dsprintf(NULL, "cannot fetch history from ClickHouse: %s", errmsg);
 		zbx_free(errmsg);
@@ -1108,7 +1156,7 @@ static int	history_clickhouse_get_info(void *data, zbx_history_provider_info_t *
 
 	/* value type is used only for flush operations */
 	conn = history_clickhouse_get_conn(d, ITEM_VALUE_TYPE_NONE);
-	if (FAIL == clickhouse_conn_post(conn, d->mhandle, d->curl_headers, d->base_url, "select version()", error))
+	if (FAIL == clickhouse_conn_post(conn, d, d->base_url, "select version()", CLICKHOUSE_RETRIES_OFF, error))
 		goto out;
 
 	memset(info, 0, sizeof(zbx_history_provider_info_t));

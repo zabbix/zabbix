@@ -170,6 +170,13 @@ static int	history_manager_register_provider(zbx_history_manager_t *manager, con
 	registry->name = zbx_strdup(NULL, name);
 	registry->traits = 0;
 
+	if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_DEBUG))
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "registered history provider \"%s\":", name);
+		for (int i = 0; i < options->values_num; i++)
+			zabbix_log(LOG_LEVEL_DEBUG, "  %s: %s", options->values[i].name, options->values[i].value);
+	}
+
 	zbx_vector_history_option_create(&registry->options);
 	zbx_vector_history_option_append_array(&registry->options, options->values, options->values_num);
 	zbx_vector_history_option_clear(options);
@@ -305,6 +312,10 @@ static void	history_manager_map_value_types(zbx_history_manager_t *manager, int 
  *             providers                  - [IN] array of history provider     *
  *                                               configuration strings         *
  *             config_log_slow_queries    - [IN] slow query logging flag       *
+ *             config_source_ip           - [IN] source IP address             *
+ *             config_ssl_ca_location     - [IN] SSL CA certificate location   *
+ *             config_ssl_cert_location   - [IN] SSL certificate location      *
+ *             config_ssl_key_location    - [IN] SSL key location              *
  *             error                      - [OUT] error message                *
  *                                                                             *
  * Return value: SUCCEED - manager initialized successfully                    *
@@ -318,7 +329,9 @@ static void	history_manager_map_value_types(zbx_history_manager_t *manager, int 
  *******************************************************************************/
 static int	history_manager_init(zbx_history_manager_t *manager, const char *config_history_storage_url,
 		const char *config_history_storage_opts, int config_history_storage_pipelines,
-		char **providers, int config_log_slow_queries, char **error)
+		char **providers, int config_log_slow_queries, const char *config_source_ip,
+		const char *config_ssl_ca_location, const char *config_ssl_cert_location,
+		const char *config_ssl_key_location, char **error)
 {
 	zbx_vector_history_option_t	options;
 	int				ret = FAIL, index;
@@ -374,6 +387,9 @@ static int	history_manager_init(zbx_history_manager_t *manager, const char *conf
 				goto out;
 			}
 			value_type_mask |= mask;
+
+			history_options_add_common_params(&options, config_source_ip, config_ssl_ca_location,
+					config_ssl_cert_location, config_ssl_key_location);
 
 			index = history_manager_register_provider(manager, name, &options);
 			history_manager_map_value_types(manager, index, mask);
@@ -553,10 +569,13 @@ out:
  *                                                                                  *
  ************************************************************************************/
 int	zbx_history_init(const char *config_history_storage_url, const char *config_history_storage_opts,
-		int config_history_storage_pipelines, char **providers, int config_log_slow_queries, char **error)
+		int config_history_storage_pipelines, char **providers, int config_log_slow_queries,
+		const char *config_source_ip, const char *config_ssl_ca_location, const char *config_ssl_cert_location,
+		const char *config_ssl_key_location, char **error)
 {
 	return history_manager_init(&history_manager, config_history_storage_url, config_history_storage_opts,
-			config_history_storage_pipelines, providers, config_log_slow_queries, error);
+			config_history_storage_pipelines, providers, config_log_slow_queries, config_source_ip,
+			config_ssl_ca_location, config_ssl_cert_location, config_ssl_key_location, error);
 }
 
 /************************************************************************************
