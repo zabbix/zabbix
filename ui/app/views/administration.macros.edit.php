@@ -16,6 +16,7 @@
 
 /**
  * @var CView $this
+ * @var array $data
  */
 
 $this->includeJsFile('administration.macros.edit.js.php');
@@ -33,21 +34,27 @@ $table = (new CTable())
 		(new CTableColumn(_('Value')))->addClass('table-col-value'),
 		(new CTableColumn(_('Description')))->addClass('table-col-description'),
 		(new CTableColumn())->addClass('table-col-action')
-	]);
+	])
+	->setAttribute('data-field-type', 'set')
+	->setAttribute('data-field-name', 'macros');
 
 foreach ($data['macros'] as $i => $macro) {
 	$macro_input = (new CTextAreaFlexible('macros['.$i.'][macro]', $macro['macro']))
 		->addClass('macro')
 		->setWidth(ZBX_TEXTAREA_MACRO_WIDTH)
 		->setAttribute('placeholder', '{$MACRO}')
-		->disableSpellcheck();
+		->disableSpellcheck()
+		->setErrorContainer('macro_'.$i.'_error_container')
+		->setErrorLabel(_('Macro'));
 
 	if ($i == 0) {
 		$macro_input->setAttribute('autofocus', 'autofocus');
 	}
 
 	$value = array_key_exists('value', $macro) ? $macro['value'] : null;
-	$macro_value = new CMacroValue($macro['type'], 'macros['.$i.']', $value);
+	$macro_value = (new CMacroValue($macro['type'], 'macros['.$i.']', $value))
+		->setErrorContainer('macro_'.$i.'_error_container')
+		->setErrorLabel(_('Value'));
 
 	if ($macro['type'] == ZBX_MACRO_TYPE_SECRET) {
 		$macro_value->addRevertButton();
@@ -59,7 +66,9 @@ foreach ($data['macros'] as $i => $macro) {
 	$description_input = (new CTextAreaFlexible('macros['.$i.'][description]', $macro['description']))
 		->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH)
 		->setMaxlength(DB::getFieldLength('globalmacro', 'description'))
-		->setAttribute('placeholder', _('description'));
+		->setAttribute('placeholder', _('description'))
+		->setErrorContainer('macro_'.$i.'_error_container')
+		->setErrorLabel(_('Description'));
 
 	$button_cell = [
 		(new CButton('macros['.$i.'][remove]', _('Remove')))
@@ -70,12 +79,20 @@ foreach ($data['macros'] as $i => $macro) {
 		$button_cell[] = new CVar('macros['.$i.'][globalmacroid]', $macro['globalmacroid']);
 	}
 
-	$table->addRow([
-		(new CCol($macro_input))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
-		(new CCol($macro_value))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
-		(new CCol($description_input))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
-		(new CCol($button_cell))->addClass(ZBX_STYLE_NOWRAP)
-	], 'form_row');
+	$table
+		->addRow([
+			(new CCol($macro_input))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
+			(new CCol($macro_value))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
+			(new CCol($description_input))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
+			(new CCol($button_cell))->addClass(ZBX_STYLE_NOWRAP)
+		], 'form_row')
+		->addRow(
+			(new CCol())
+				->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT)
+				->addClass(ZBX_STYLE_ERROR_CONTAINER)
+				->setId('macro_'.$i.'_error_container')
+				->setColSpan(4)
+		);
 }
 
 $table->setFooter(new CCol(

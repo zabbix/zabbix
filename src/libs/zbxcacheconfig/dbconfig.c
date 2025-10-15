@@ -3501,7 +3501,7 @@ static void	DCsync_items(zbx_dbsync_t *sync, zbx_uint64_t revision, zbx_synced_n
 
 		/* SNMP trap items for current server/proxy */
 
-		if (ITEM_TYPE_SNMPTRAP == item->type && 0 == host->proxyid)
+		if (ITEM_TYPE_SNMPTRAP == item->type)
 		{
 			interface_snmpitem = (ZBX_DC_INTERFACE_ITEM *)DCfind_id(&config->interface_snmpitems,
 					item->interfaceid, sizeof(ZBX_DC_INTERFACE_ITEM), &found);
@@ -8863,6 +8863,8 @@ void	zbx_free_configuration_cache(void)
 	zbx_hashset_destroy(&config_private.item_tag_links);
 	memset(&config_private, 0, sizeof(config_private));
 
+	zbx_dbsync_env_destroy();
+
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
@@ -9546,10 +9548,10 @@ static void	DCget_item(zbx_dc_item_t *dst_item, const ZBX_DC_ITEM *src_item)
 			zbx_vector_ptr_pair_create(&dst_item->script_params);
 			for (i = 0; i < src_item->itemtype.browseritem->params.values_num; i++)
 			{
-				zbx_dc_item_param_t	*params =
-						(zbx_dc_item_param_t*)(src_item->itemtype.browseritem->params.values[i]);
+				zbx_dc_item_param_t	*params;
 				zbx_ptr_pair_t	pair;
 
+				params = (zbx_dc_item_param_t*)src_item->itemtype.browseritem->params.values[i];
 				pair.first = zbx_strdup(NULL, params->name);
 				pair.second = zbx_strdup(NULL, params->value);
 				zbx_vector_ptr_pair_append(&dst_item->script_params, pair);
@@ -9827,6 +9829,30 @@ void	zbx_dc_config_get_items_by_itemids(zbx_dc_item_t *items, const zbx_uint64_t
 	}
 
 	UNLOCK_CACHE;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: find host identifier referenced by item or lld-rule.              *
+ *                                                                            *
+ * Parameters: hostids - [OUT] vector with found host identifier. Caller      *
+ *                             should pass empty vector.                      *
+ *             itemid  - [IN]  item identifier                                *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_dc_config_get_hostid_by_itemid(zbx_vector_uint64_t *hostids, zbx_uint64_t itemid)
+{
+	if (0 == hostids->values_num)
+	{
+		const ZBX_DC_ITEM	*dc_item;
+
+		RDLOCK_CACHE;
+
+		if (NULL != (dc_item = (ZBX_DC_ITEM *)zbx_hashset_search(&config->items, &itemid)))
+			zbx_vector_uint64_append(hostids, dc_item->hostid);
+
+		UNLOCK_CACHE;
+	}
 }
 
 int	zbx_dc_config_get_active_items_count_by_hostid(zbx_uint64_t hostid)
@@ -11623,6 +11649,9 @@ size_t	zbx_dc_config_get_snmp_items_by_interfaceid(zbx_uint64_t interfaceid, zbx
 		goto unlock;
 
 	if (HOST_STATUS_MONITORED != dc_host->status)
+		goto unlock;
+
+	if (dc_host->proxyid != 0)
 		goto unlock;
 
 	if (NULL == (dc_interface_snmpitem = (const ZBX_DC_INTERFACE_ITEM *)zbx_hashset_search(
