@@ -142,14 +142,14 @@ Note that session names are case-sensitive.
 
 `mysql.replication.get_slave_status[<commonParams>,<masterHost>]` — Returns the replication status.
 <br>Parameters:
-<br>`masterHost` (optional) — The name of a master host*.
+<br>`masterHost` (optional) — The name of the master host*.
 
 `mysql.get_status_variables[<commonParams>]` — Returns values of global status variables.
 
 `mysql.version[<commonParams>]` — Returns the MySQL version.
 
 \* In some MySQL server versions, the replication status query `SHOW SLAVE STATUS` is deprecated or has been fully replaced by `SHOW REPLICA STATUS`. The result key names have also changed — from `Master` to `Source` and from `Slave` to `Replica`.
-* the  old style terminology:	`"Master_Host": "myserver"` or `"Slave_IO_Running": "Yes"`
+* the old style terminology:	`"Master_Host": "myserver"` or `"Slave_IO_Running": "Yes"`
 * the new style, respectively:  `"Source_Host": "myserver"` or `"Replica_IO_Running": "Yes"`.  
 
 To maintain compatibility, the result set includes duplicated keys using both terminology styles.
