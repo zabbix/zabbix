@@ -18,6 +18,7 @@
 #include "zbxpreprocbase.h"
 #include "zbxtime.h"
 #include "zbxvariant.h"
+#include "zbxdbhigh.h"
 #include "zbx_item_constants.h"
 
 /******************************************************************************
