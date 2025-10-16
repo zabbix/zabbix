@@ -63,7 +63,7 @@ test case: "port out of range"
 in:
   ipv: "ipv4"
   ip: "0.0.0.0"
-  port: 65537
+  port: 100000  # invalid port
   timeout: 1
   backlog_size: 1
 out:

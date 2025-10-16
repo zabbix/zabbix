@@ -42,8 +42,8 @@ void	zbx_mock_test_entry(void **state)
 	mock_poll_set_mode_from_param(zbx_mock_get_parameter_string("in.poll_mode"));
 	set_nonblocking_error();
 
-	/* NULL used for timeout - poll() is wrapped for tests */
-	int	result = zbx_socket_pollout(&s, NULL, &error);
+	/* 0 used for timeout - poll() is wrapped for tests */
+	int	result = zbx_socket_pollout(&s, 0, &error);
 
 	zbx_mock_assert_int_eq("return value", exp_result, result);
 
