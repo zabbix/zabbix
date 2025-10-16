@@ -357,6 +357,7 @@ zbx_uint64_t	history_options_type_mask(zbx_history_option_t *options, int option
  *     options                   - [IN/OUT] vector of history options         *
  *     config_source_ip          - [IN] source IP address from configuration  *
  *                                      (optional)                            *
+ *     config_log_slow_queries   - [IN] slow query logging limit              *
  *     config_ssl_ca_location    - [IN] SSL CA certificate location from      *
  *                                      configuration (optional)              *
  *     config_ssl_cert_location  - [IN] SSL certificate location from         *
@@ -370,9 +371,22 @@ zbx_uint64_t	history_options_type_mask(zbx_history_option_t *options, int option
  *                                                                            *
  ******************************************************************************/
 int	history_options_add_common_params(zbx_vector_history_option_t *options, const char *config_source_ip,
-		const char *config_ssl_ca_location, const char *config_ssl_cert_location,
+		int config_log_slow_queries, const char *config_ssl_ca_location, const char *config_ssl_cert_location,
 		const char *config_ssl_key_location, char **error)
 {
+	if (NULL != history_option_value(options->values, options->values_num,
+			HISTORY_PROVIDER_OPTION_LOG_SLOW_QUERIES))
+	{
+		*error = zbx_strdup(NULL, "invalid configuration: cannot override LogSlowQueries parameter");
+		return FAIL;
+	}
+
+	if (0 != config_log_slow_queries)
+	{
+		zbx_vector_history_option_append(options, history_option_int(HISTORY_PROVIDER_OPTION_LOG_SLOW_QUERIES,
+				config_log_slow_queries));
+	}
+
 	if (NULL != history_option_value(options->values, options->values_num, HISTORY_PROVIDER_OPTION_SOURCE_IP))
 	{
 		*error = zbx_strdup(NULL, "invalid configuration: cannot override SourceIP parameter");

@@ -67,6 +67,7 @@ typedef struct
 
 	CURLM					*mhandle;
 
+	int					log_slow_queries;
 	int					ssl_verify_peer;
 	int					ssl_verify_host;
 
@@ -266,6 +267,9 @@ static void	*history_clickhouse_create_data(const zbx_history_option_t *options,
 		data->ssl_verify_host = atoi(value);
 	else
 		data->ssl_verify_host = 1;
+
+	if (NULL != (value = history_option_value(options, options_num, HISTORY_PROVIDER_OPTION_LOG_SLOW_QUERIES)))
+		data->log_slow_queries = atoi(value);
 
 	data->mhandle = mhandle;
 
@@ -479,7 +483,7 @@ static void	history_clickhouse_write(void *data, unsigned char value_type,
  * Purpose: flush active ClickHouse connections                               *
  *                                                                            *
  * Parameters:                                                                *
- *     mhandle - [IN] curl multi handle                                       *
+ *     d       - [IN] clickhouse data                                         *
  *     retries - [OUT] vector of handles to retry (optional)                  *
  *     error   - [OUT] error message                                          *
  *                                                                            *
@@ -487,35 +491,51 @@ static void	history_clickhouse_write(void *data, unsigned char value_type,
  *               be readded to the multi handle.                              *
  *                                                                            *
  ******************************************************************************/
-static int	history_clickhouse_flush_conns(CURLM *mhandle, char **error)
+static int	history_clickhouse_flush_conns(zbx_clickhouse_data_t *d, char **error)
 {
 	CURLMcode		code;
 	int 			running = 0;
 	CURLMsg			*msg;
-	int			msg_num;
+	int			msg_num, long_query_limit;
 	zbx_vector_ptr_t	retries;
+	double			ts_now, ts_last;
 
 	zbx_vector_ptr_create(&retries);
 
+	if (0 == (long_query_limit = d->log_slow_queries))
+		long_query_limit = ZBX_HISTORY_STORAGE_DOWN_DELAY;
+
+	ts_last = zbx_time();
+
 	do
 	{
-		if (CURLM_OK != (code = curl_multi_perform(mhandle, &running)))
+		if (CURLM_OK != (code = curl_multi_perform(d->mhandle, &running)))
 		{
 			*error = zbx_dsprintf(NULL, "cannot perform on curl multi handle: %s",
 					curl_multi_strerror(code));
 			break;
 		}
 
-		if (CURLM_OK != (code = zbx_curl_multi_wait(mhandle, ZBX_HISTORY_STORAGE_TIMEOUT_MS, NULL)))
+		if (CURLM_OK != (code = zbx_curl_multi_wait(d->mhandle, ZBX_HISTORY_STORAGE_TIMEOUT_MS, NULL)))
 		{
 			*error = zbx_dsprintf(NULL, "cannot wait on curl multi handle: %s", curl_multi_strerror(code));
 			break;
 		}
 
+		if (0 == running)
+			break;
+
+		ts_now = zbx_time();
+		if (ts_now - ts_last >= long_query_limit)
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "waiting for ClickHouse response " ZBX_FS_DBL "sec",
+					ts_now - ts_last);
+			ts_last = ts_now;
+		}
 	}
 	while (0 != running);
 
-	while (NULL != (msg = curl_multi_info_read(mhandle, &msg_num)))
+	while (NULL != (msg = curl_multi_info_read(d->mhandle, &msg_num)))
 	{
 		zbx_clickhouse_conn_t	*conn = NULL;
 
@@ -542,7 +562,7 @@ static int	history_clickhouse_flush_conns(CURLM *mhandle, char **error)
 			/* remove it from the current execution loop */
 			zbx_vector_ptr_append(&retries, msg->easy_handle);
 
-			if (CURLM_OK != (code = curl_multi_remove_handle(mhandle, msg->easy_handle)))
+			if (CURLM_OK != (code = curl_multi_remove_handle(d->mhandle, msg->easy_handle)))
 			{
 				zabbix_log(LOG_LEVEL_WARNING, "cannot remove handle from curl curl handle: %s",
 							curl_multi_strerror(code));
@@ -581,7 +601,7 @@ static int	history_clickhouse_flush_conns(CURLM *mhandle, char **error)
 
 	for (int i = 0; i < retries.values_num; i++)
 	{
-		if (CURLM_OK != (code = curl_multi_add_handle(mhandle, retries.values[i])))
+		if (CURLM_OK != (code = curl_multi_add_handle(d->mhandle, retries.values[i])))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "cannot add handle to curl multi handle: %s",
 						curl_multi_strerror(code));
@@ -590,7 +610,7 @@ static int	history_clickhouse_flush_conns(CURLM *mhandle, char **error)
 
 	zbx_vector_ptr_destroy(&retries);
 
-	return retries_num;
+	return retries_num + running;
 }
 
 /******************************************************************************
@@ -635,7 +655,7 @@ static zbx_uint64_t	history_clickhouse_flush(void *data)
 		int	retries_num;
 
 		attempts_num++;
-		retries_num = history_clickhouse_flush_conns(d->mhandle, &error);
+		retries_num = history_clickhouse_flush_conns(d, &error);
 
 		if (NULL != error)
 		{
@@ -1003,7 +1023,7 @@ static int	clickhouse_conn_post(zbx_clickhouse_conn_t *conn, zbx_clickhouse_data
 		int	retries_num;
 
 		attempts_num++;
-		retries_num = history_clickhouse_flush_conns(d->mhandle, &errmsg);
+		retries_num = history_clickhouse_flush_conns(d, &errmsg);
 
 		if (NULL != errmsg)
 		{

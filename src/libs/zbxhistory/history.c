@@ -389,8 +389,8 @@ static int	history_manager_init(zbx_history_manager_t *manager, const char *conf
 			value_type_mask |= mask;
 
 			if (FAIL == history_options_add_common_params(&options, config_source_ip,
-					config_ssl_ca_location, config_ssl_cert_location, config_ssl_key_location,
-					error))
+					config_log_slow_queries, config_ssl_ca_location, config_ssl_cert_location,
+					config_ssl_key_location, error))
 			{
 				zbx_free(name);
 				goto out;

@@ -50,7 +50,7 @@ void	history_options_clear(zbx_history_option_t *options, int options_num);
 zbx_uint64_t	history_options_type_mask(zbx_history_option_t *options, int options_num, const char **value_types);
 
 int	history_options_add_common_params(zbx_vector_history_option_t *options, const char *config_source_ip,
-		const char *config_ssl_ca_location, const char *config_ssl_cert_location,
+		int config_log_slow_queries, const char *config_ssl_ca_location, const char *config_ssl_cert_location,
 		const char *config_ssl_key_location, char **error);
 
 #endif
