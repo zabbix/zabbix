@@ -32,15 +32,10 @@ void	zbx_mock_test_entry(void **state)
 
 	ZBX_UNUSED(state);
 
-	result = zbx_tcp_listen(&s, listen_ip, listen_port, timeout, config_tcp_max_backlog_size);
-
-
 #ifdef HAVE_IPV6
 	if (0 == strcmp(ipv, "ipv6"))
 	{
 		result = zbx_tcp_listen(&s, listen_ip, listen_port, timeout, config_tcp_max_backlog_size);
-		printf("Error is: %s\n", zbx_socket_strerror());
-		printf("Errno is: %d\n", errno);
 		zbx_mock_assert_int_eq("return value:", exp_result, result);
 	}
 #endif

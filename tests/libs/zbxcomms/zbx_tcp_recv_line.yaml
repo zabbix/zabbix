@@ -3,25 +3,27 @@ test case: "line in buffer with newlines"
 in:
   buf_stat: "line1\nline2\n"
   mode: buffer contains next line
-  read_return: [0, 1]
+  read_return: [0]
 out:
-  result: ["line1", "line2", "line3"]
+  result:
+   - line1
+   - line2
 ---
 test case: "first read without next line ptr"
 in:
   buf_stat: "line1\nline2\nline3\n"
-  mode: buffer not contains next line
   next_line_is_null: true
-  read_return: [0, 1]
+  read_return: [5]
 out:
-  result: ["line1", "line2", "line3" ]
+  result:
+   - line1
 ---
-test case: "incomplete line without newline"
+test case: "incomplete read"
 in:
   buf_stat: "line1"
-  mode: buffer not contains next line
   next_line_is_null: true
-  read_return: [0, 1]
+  read_return: [3]
 out:
-  result: [line1]
+  result:
+   - lin
 ...

@@ -1,5 +1,5 @@
 ---
-test case: "localhost IPv4"
+test case: "localhost"
 in:
   host: "localhost"
 out:

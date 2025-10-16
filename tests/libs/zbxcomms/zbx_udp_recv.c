@@ -34,7 +34,6 @@ ssize_t	__wrap_recvfrom(int fd, void *__restrict buf, size_t n, int flags, __SOC
 	ZBX_UNUSED(fd);
 	ZBX_UNUSED(buf);
 	ZBX_UNUSED(n);
-	ZBX_UNUSED(fd);
 	ZBX_UNUSED(flags);
 	ZBX_UNUSED(addr);
 	ZBX_UNUSED(addr_len);
@@ -49,8 +48,7 @@ ssize_t	__wrap_recvfrom(int fd, void *__restrict buf, size_t n, int flags, __SOC
 void	zbx_mock_test_entry(void **state)
 {
 	zbx_socket_t		s;
-	int			timeout = zbx_mock_get_parameter_int("in.timeout"),
-				exp_result = zbx_mock_str_to_return_code(zbx_mock_get_parameter_string("out.result"));
+	int			exp_result = zbx_mock_str_to_return_code(zbx_mock_get_parameter_string("out.result"));
 	zbx_vector_int32_t	recvfrom_return_seq;
 
 	ZBX_UNUSED(state);
@@ -61,13 +59,14 @@ void	zbx_mock_test_entry(void **state)
 	if (2 > recvfrom_return_seq.values_num)
 		fail_msg("Too many elements in recvfrom_return_seq: %d (max 2)", recvfrom_return_seq.values_num);
 
-	for (int i = 0; recvfrom_return_seq.values_num > i; i++)
+	for (int i = 0; i < recvfrom_return_seq.values_num; i++)
 		recvfrom_return[i] = recvfrom_return_seq.values[i];
 
 	mock_poll_set_mode_from_param(zbx_mock_get_parameter_string("in.poll_mode"));
 	set_nonblocking_error();
 
-	int	result = zbx_udp_recv(&s, timeout);
+	/* NULL used for timeout - poll() is wrapped for tests */
+	int	result = zbx_udp_recv(&s, NULL);
 
 	zbx_mock_assert_int_eq("return value:", exp_result, result);
 

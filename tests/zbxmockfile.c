@@ -245,6 +245,12 @@ int	__wrap_poll(struct pollfd *pds, int nfds, int timeout)
 	}
 }
 
+#undef MOCK_POLL_DEFAULT
+#undef MOCK_POLL_TIMEOUT
+#undef MOCK_POLL_ERROR
+#undef MOCK_POLL_REVENTS_ERROR
+#undef MOCK_POLL_SOCKET_BLOCKING_ERROR
+
 static const char	*frag_data = NULL;
 static const char	*frag_pos = NULL;
 static size_t		frag_sz = 0;

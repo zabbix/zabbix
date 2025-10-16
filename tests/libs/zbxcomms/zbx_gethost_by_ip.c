@@ -63,16 +63,16 @@ static int get_host_from_etc_hosts(const char *ip, char *hostname, size_t hostna
 
 			char	file_ip[ZBX_MAX_HOSTNAME_LEN], name[ZBX_MAX_HOSTNAME_LEN];
 
-			if (2 == sscanf(line, "%s %s", file_ip, name))
-			{
-				if (0 == strcmp(ip, file_ip))
-				{
-					zbx_strlcpy(hostname, name, hostnamelen);
-					munmap(data, st.st_size);
-					close(fd);
+			if (2 != sscanf(line, "%s %s", file_ip, name))
+				continue;
 
-					return SUCCEED;
-				}
+			if (0 == strcmp(ip, file_ip))
+			{
+				zbx_strlcpy(hostname, name, hostnamelen);
+				munmap(data, st.st_size);
+				close(fd);
+
+				return SUCCEED;
 			}
 		}
 		else

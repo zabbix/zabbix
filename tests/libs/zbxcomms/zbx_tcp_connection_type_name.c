@@ -22,9 +22,9 @@
 
 void	zbx_mock_test_entry(void **state)
 {
-	const char	*result ,*type_in = zbx_mock_get_parameter_string("in.type"),
+	const char	*type_in = zbx_mock_get_parameter_string("in.type"),
 			*type_out = zbx_mock_get_parameter_string("out.type");
-	unsigned int	type;
+	unsigned int	type = 0;
 
 	ZBX_UNUSED(state);
 
@@ -34,10 +34,8 @@ void	zbx_mock_test_entry(void **state)
 		type = ZBX_TCP_SEC_TLS_CERT;
 	else if (SUCCEED == strcmp("ZBX_TCP_SEC_TLS_PSK", type_in))
 		type = ZBX_TCP_SEC_TLS_PSK;
-	else
-		type = ZBX_MAX_UINT32_LEN;
 
-	result = zbx_tcp_connection_type_name(type);
+	const char	*result = zbx_tcp_connection_type_name(type);
 
 	zbx_mock_assert_str_eq("return value", type_out, result);
 }

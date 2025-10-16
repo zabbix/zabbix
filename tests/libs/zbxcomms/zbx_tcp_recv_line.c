@@ -43,7 +43,7 @@ void	zbx_mock_test_entry(void **state)
 
 	zbx_mock_extract_yaml_values_int32(zbx_mock_get_parameter_handle("in.read_return"), &read_return_seq);
 
-	if(5 < read_return_seq.values_num)
+	if (5 < read_return_seq.values_num)
 		fail_msg("Too many elements in read_return_seq: %d (max 5)", read_return_seq.values_num);
 
 	setup_read(&read_return_seq);
@@ -64,7 +64,11 @@ void	zbx_mock_test_entry(void **state)
 
 	zbx_mock_extract_yaml_values_str("out.result", &exp_result_v);
 
-	for (int i = 0; exp_result_v.values_num < i; i++)
+	if (exp_result_v.values_num != result_v.values_num)
+		fail_msg("Different number of elements in result vectors: expected %d, actual %d",
+				exp_result_v.values_num, result_v.values_num);
+
+	for (int i = 0; i < exp_result_v.values_num; i++)
 	{
 		if (0 != strcmp(exp_result_v.values[i], result_v.values[i]))
 		{

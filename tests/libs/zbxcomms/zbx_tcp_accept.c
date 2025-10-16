@@ -25,11 +25,11 @@
 static int	accept_return, recv_return;
 
 int	__wrap_accept(int sockfd, struct sockaddr *addr, socklen_t *addrlen);
-int	__wrap_fcntl (int __fd, int __cmd, ...);
+int	__wrap_fcntl(int __fd, int __cmd, ...);
 int	__wrap_getpeername(int fd, struct sockaddr *addr, socklen_t *len);
-ssize_t	__wrap_recv (int d, void *buf, size_t n, int flags);
+ssize_t	__wrap_recv(int d, void *buf, size_t n, int flags);
 
-int __wrap_accept(int sockfd, struct sockaddr *addr, socklen_t *addrlen)
+int	__wrap_accept(int sockfd, struct sockaddr *addr, socklen_t *addrlen)
 {
 	ZBX_UNUSED(sockfd);
 	ZBX_UNUSED(addr);
@@ -40,7 +40,7 @@ int __wrap_accept(int sockfd, struct sockaddr *addr, socklen_t *addrlen)
 	return accept_return;
 }
 
-int	__wrap_fcntl (int fd, int cmd, ...)
+int	__wrap_fcntl(int fd, int cmd, ...)
 {
 	ZBX_UNUSED(fd);
 	ZBX_UNUSED(cmd);
@@ -54,10 +54,10 @@ int	__wrap_getpeername(int fd, struct sockaddr *addr, socklen_t *len)
 	ZBX_UNUSED(addr);
 	ZBX_UNUSED(len);
 
-	return SUCCEED;
+	return 0;
 }
 
-ssize_t	__wrap_recv (int d, void *buf, size_t n, int flags)
+ssize_t	__wrap_recv(int d, void *buf, size_t n, int flags)
 {
 	ZBX_UNUSED(d);
 	ZBX_UNUSED(buf);
@@ -71,8 +71,7 @@ void	zbx_mock_test_entry(void **state)
 {
 	zbx_socket_t	s;
 	unsigned int	tls_accept = zbx_mock_get_parameter_uint32("in.tls_accept");
-	int		poll_timeout = zbx_mock_get_parameter_int("in.poll_timeout"),
-			exp_result = zbx_mock_str_to_return_code(zbx_mock_get_parameter_string("out.result"));
+	int		exp_result = zbx_mock_str_to_return_code(zbx_mock_get_parameter_string("out.result"));
 	char		*tls_listen = NULL;
 	const char	*unencrypted_allowed_ip,
 			*poll_mode = zbx_mock_get_parameter_string("in.poll_mode");
@@ -104,7 +103,8 @@ void	zbx_mock_test_entry(void **state)
 	mock_poll_set_mode_from_param(poll_mode);
 	set_nonblocking_error();
 
-	int result = zbx_tcp_accept(&s, tls_accept, poll_timeout, tls_listen, unencrypted_allowed_ip);
+	/* NULL used for timeout - poll() is wrapped for tests */
+	int	result = zbx_tcp_accept(&s, tls_accept, NULL, tls_listen, unencrypted_allowed_ip);
 
 	zbx_mock_assert_int_eq("return value:", exp_result, result);
 }

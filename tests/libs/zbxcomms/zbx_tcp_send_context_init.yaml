@@ -1,8 +1,8 @@
 ---
 test case: "default protocol (TCP)"
 in:
-  data: "abc"
-  len: 3
+  data: '!#$%&()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_`abcdefghijklmnopqrstuvwxyz{|}~'
+  len: 94
   reserved: 0
   flags: 0
 out:
@@ -10,17 +10,17 @@ out:
 ---
 test case: "with protocol"
 in:
-  data: "abc"
-  len: 3
-  reserved: 3
+  data: '!#$%&()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_`abcdefghijklmnopqrstuvwxyz{|}~'
+  len: 94
+  reserved: 94
   flags: 1   # ZBX_TCP_PROTOCOL
 out:
   result: "SUCCEED"
 ---
 test case: "force compression"
 in:
-  data: "aaaaaaaaaa"
-  len: 10
+  data: '!#$%&()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_`abcdefghijklmnopqrstuvwxyz{|}~'
+  len: 94
   reserved: 0
   flags: 3   # ZBX_TCP_PROTOCOL | ZBX_TCP_COMPRESS
   compress_result: "SUCCEED"
@@ -39,7 +39,7 @@ out:
 ---
 test case: "len > MAX"
 in:
-  data: "A"
+  data: "ABCD"
   len: 17179869185
   reserved: 0
   flags: 1
@@ -57,7 +57,7 @@ out:
 ---
 test case: "large message, with LARGE flag"
 in:
-  data: "AAAA"
+  data: "ABCDABCDABCDA"
   len: 5000000000
   reserved: 5000000000
   flags: 5   # ZBX_TCP_PROTOCOL | ZBX_TCP_LARGE

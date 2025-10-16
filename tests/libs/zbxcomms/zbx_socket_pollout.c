@@ -33,8 +33,7 @@ int	__wrap_zbx_ts_check_deadline(const zbx_timespec_t *deadline)
 
 void	zbx_mock_test_entry(void **state)
 {
-	int		timeout = zbx_mock_get_parameter_int("in.timeout"),
-			exp_result = zbx_mock_str_to_return_code(zbx_mock_get_parameter_string("out.result"));
+	int		exp_result = zbx_mock_str_to_return_code(zbx_mock_get_parameter_string("out.result"));
 	zbx_socket_t	s;
 	char		*error;
 
@@ -43,7 +42,8 @@ void	zbx_mock_test_entry(void **state)
 	mock_poll_set_mode_from_param(zbx_mock_get_parameter_string("in.poll_mode"));
 	set_nonblocking_error();
 
-	int	result = zbx_socket_pollout(&s, timeout, &error);
+	/* NULL used for timeout - poll() is wrapped for tests */
+	int	result = zbx_socket_pollout(&s, NULL, &error);
 
 	zbx_mock_assert_int_eq("return value", exp_result, result);
 

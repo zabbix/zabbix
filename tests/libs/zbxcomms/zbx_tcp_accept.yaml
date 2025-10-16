@@ -2,7 +2,6 @@
 test case: "unencrypted | poll=no error"
 in:
   tls_accept: 1  # ZBX_TCP_SEC_UNENCRYPTED
-  poll_timeout: 10
   num_socks: 1
   poll_mode: "MOCK_POLL_TIMEOUT"
   accept_return: -1
@@ -12,7 +11,6 @@ out:
 test case: "unencrypted | poll=error"
 in:
   tls_accept: 1  # ZBX_TCP_SEC_UNENCRYPTED
-  poll_timeout: 10
   num_socks: 1
   poll_mode: "MOCK_POLL_SOCKET_BLOCKING_ERROR"
 out:
@@ -21,7 +19,6 @@ out:
 test case: "unencrypted | accept failed"
 in:
   tls_accept: 1  # ZBX_TCP_SEC_UNENCRYPTED
-  poll_timeout: 10
   num_socks: 0
   poll_mode: "MOCK_POLL_DEFAULT"
   accept_return: -1
