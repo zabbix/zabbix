@@ -37,6 +37,7 @@ zabbix_export:
           type: SNMP_AGENT
           snmp_oid: 'get[1.3.6.1.4.1.11256.1.12.1.23.0]'
           key: 'asq.alarm.stateful.tcp[snsASQStatsStatefulTcpConn.0]'
+          delay: '{$SNS.SNMP.INTERVAL}'
           description: |
             MIB: STORMSHIELD-ASQ-STATS-MIB
             ASQ stateful TCP connection count.
@@ -48,6 +49,7 @@ zabbix_export:
           type: SNMP_AGENT
           snmp_oid: 'get[1.3.6.1.4.1.11256.1.12.1.33.0]'
           key: 'asq.alarm.stateful.udp[snsASQStatsStatefulUdpConn.0]'
+          delay: '{$SNS.SNMP.INTERVAL}'
           description: |
             MIB: STORMSHIELD-ASQ-STATS-MIB
             ASQ stateful UDP connection count.
@@ -59,6 +61,7 @@ zabbix_export:
           type: SNMP_AGENT
           snmp_oid: 'get[1.3.6.1.4.1.11256.1.12.1.12.0]'
           key: 'asq.alarm.stateful[snsASQStatsStatefulMajorAlarm.0]'
+          delay: '{$SNS.SNMP.INTERVAL}'
           description: |
             MIB: STORMSHIELD-ASQ-STATS-MIB
             ASQ major alarm count.
@@ -70,6 +73,7 @@ zabbix_export:
           type: SNMP_AGENT
           snmp_oid: 'get[1.3.6.1.4.1.11256.1.12.1.11.0]'
           key: 'asq.alarm.stateful[snsASQStatsStatefulMinorAlarm.0]'
+          delay: '{$SNS.SNMP.INTERVAL}'
           value_type: CHAR
           trends: '0'
           description: |
@@ -83,6 +87,7 @@ zabbix_export:
           type: SNMP_AGENT
           snmp_oid: 'get[1.3.6.1.4.1.11256.1.11.6.0]'
           key: 'ha.links.faulty[snsNbFaultyHALinks.0]'
+          delay: '{$SNS.SNMP.INTERVAL}'
           description: |
             MIB: STORMSHIELD-HA-MIB
             Number of faulty HA links.
@@ -104,6 +109,7 @@ zabbix_export:
           type: SNMP_AGENT
           snmp_oid: 'get[1.3.6.1.4.1.11256.1.11.3.0]'
           key: 'ha.node.active[snsNbActiveNode.0]'
+          delay: '{$SNS.SNMP.INTERVAL}'
           description: |
             MIB: STORMSHIELD-HA-MIB
             Number of active firewalls.
@@ -115,6 +121,7 @@ zabbix_export:
           type: SNMP_AGENT
           snmp_oid: 'get[1.3.6.1.4.1.11256.1.11.1.0]'
           key: 'ha.node.count[snsNbNode.0]'
+          delay: '{$SNS.SNMP.INTERVAL}'
           description: |
             MIB: STORMSHIELD-HA-MIB
             Number of firewalls in the HA cluster.
@@ -126,6 +133,7 @@ zabbix_export:
           type: SNMP_AGENT
           snmp_oid: 'get[1.3.6.1.4.1.11256.1.11.2.0]'
           key: 'ha.node.dead[snsNbDeadNode.0]'
+          delay: '{$SNS.SNMP.INTERVAL}'
           description: |
             MIB: STORMSHIELD-HA-MIB
             Number of firewalls registered in the HA cluster but not replying.
@@ -137,12 +145,13 @@ zabbix_export:
           type: SNMP_AGENT
           snmp_oid: 'get[1.3.6.1.4.1.11256.1.11.8.0]'
           key: 'ha.sync.status[snsHASyncStatus.0]'
+          delay: '{$SNS.SNMP.INTERVAL}'
           description: |
             MIB: STORMSHIELD-HA-MIB
             Firewall configuration synchronization status:
               1: Synced, 
               0: Not synced, 
-              -1: Unknown / Error.
+              -1: Unknown/Error.
           valuemap:
             name: 'STORMSHIELD-HA-MIB::snsHASyncStatus'
           tags:
@@ -154,7 +163,7 @@ zabbix_export:
               name: 'SNS: HA synchronization error'
               event_name: 'SNS: HA synchronization error'
               priority: AVERAGE
-              description: 'The cluster HA is not synchronised properly.'
+              description: 'The cluster HA is not synchronized properly.'
               tags:
                 - tag: scope
                   value: availability
@@ -176,6 +185,7 @@ zabbix_export:
           type: SNMP_AGENT
           snmp_oid: 'get[1.3.6.1.4.1.2021.4.14.0]'
           key: 'host.memory.buffer[memBuffer.0]'
+          delay: '{$SNS.SNMP.INTERVAL}'
           value_type: FLOAT
           units: B
           description: |
@@ -193,6 +203,7 @@ zabbix_export:
           type: SNMP_AGENT
           snmp_oid: 'get[1.3.6.1.4.1.2021.4.15.0]'
           key: 'host.memory.cached[memCached.0]'
+          delay: '{$SNS.SNMP.INTERVAL}'
           value_type: FLOAT
           units: B
           description: |
@@ -210,6 +221,7 @@ zabbix_export:
           type: SNMP_AGENT
           snmp_oid: 'get[1.3.6.1.4.1.2021.4.6.0]'
           key: 'host.memory.free[memAvailReal.0]'
+          delay: '{$SNS.SNMP.INTERVAL}'
           value_type: FLOAT
           units: B
           description: |
@@ -227,6 +239,7 @@ zabbix_export:
           type: SNMP_AGENT
           snmp_oid: 'get[1.3.6.1.4.1.2021.4.5.0]'
           key: 'host.memory.total[memTotalReal.0]'
+          delay: '{$SNS.SNMP.INTERVAL}'
           units: B
           description: |
             MIB: UCD-SNMP-MIB
@@ -357,6 +370,7 @@ zabbix_export:
           type: SNMP_AGENT
           snmp_oid: 'get[1.3.6.1.4.1.11256.1.13.1.1.0]'
           key: 'ipsec.policies.in[snsIPSECStatsSPDIn.0]'
+          delay: '{$SNS.SNMP.INTERVAL}'
           description: |
             MIB: STORMSHIELD-IPSEC-STATS-MIB
             Number of incoming security policies.
@@ -370,6 +384,7 @@ zabbix_export:
           type: SNMP_AGENT
           snmp_oid: 'get[1.3.6.1.4.1.11256.1.13.1.2.0]'
           key: 'ipsec.policies.out[snsIPSECStatsSPDOut.0]'
+          delay: '{$SNS.SNMP.INTERVAL}'
           description: |
             MIB: STORMSHIELD-IPSEC-STATS-MIB
             Number of outgoing security policies.
@@ -383,6 +398,7 @@ zabbix_export:
           type: SNMP_AGENT
           snmp_oid: 'get[1.3.6.1.4.1.11256.1.8.1.1.3.1]'
           key: 'policy.filter[snsPolicySlotName]'
+          delay: '{$SNS.SNMP.INTERVAL}'
           value_type: CHAR
           trends: '0'
           description: |
@@ -404,6 +420,7 @@ zabbix_export:
           type: SNMP_AGENT
           snmp_oid: 'get[1.3.6.1.4.1.11256.1.8.1.1.3.2]'
           key: 'policy.ipsec[snsPolicySlotNameIPsec]'
+          delay: '{$SNS.SNMP.INTERVAL}'
           value_type: CHAR
           trends: '0'
           description: |
@@ -425,6 +442,7 @@ zabbix_export:
           type: SNMP_AGENT
           snmp_oid: 'get[1.3.6.1.4.1.11256.1.0.1.0]'
           key: 'property.hardware.model[snsModel.0]'
+          delay: '{$SNS.SNMP.INTERVAL}'
           value_type: CHAR
           trends: '0'
           description: |
@@ -442,6 +460,7 @@ zabbix_export:
           type: SNMP_AGENT
           snmp_oid: 'get[1.3.6.1.4.1.11256.1.18.4.0]'
           key: 'property.hardware.name[snsSystemName.0]'
+          delay: '{$SNS.SNMP.INTERVAL}'
           value_type: CHAR
           trends: '0'
           description: |
@@ -468,6 +487,7 @@ zabbix_export:
           type: SNMP_AGENT
           snmp_oid: 'get[1.3.6.1.4.1.11256.1.18.16.0]'
           key: 'property.hardware.node_name[snsSystemNodeName.0]'
+          delay: '{$SNS.SNMP.INTERVAL}'
           value_type: CHAR
           trends: '0'
           description: |
@@ -485,6 +505,7 @@ zabbix_export:
           type: SNMP_AGENT
           snmp_oid: 'get[1.3.6.1.4.1.11256.1.0.3.0]'
           key: 'property.hardware.serial[snsSerialNumber.0]'
+          delay: '{$SNS.SNMP.INTERVAL}'
           value_type: CHAR
           trends: '0'
           description: |
@@ -509,6 +530,7 @@ zabbix_export:
           type: SNMP_AGENT
           snmp_oid: 'get[1.3.6.1.4.1.11256.1.0.2.0]'
           key: 'property.hardware.version[snsVersion.0]'
+          delay: '{$SNS.SNMP.INTERVAL}'
           value_type: CHAR
           trends: '0'
           description: |
@@ -537,6 +559,7 @@ zabbix_export:
           type: SNMP_AGENT
           snmp_oid: 'walk[1.3.6.1.4.1.11256.1.10.7.1]'
           key: sns.cpu.temp.walk
+          delay: '{$SNS.SNMP.INTERVAL}'
           history: '0'
           value_type: TEXT
           trends: '0'
@@ -549,6 +572,7 @@ zabbix_export:
           type: SNMP_AGENT
           snmp_oid: 'walk[1.3.6.1.2.1.25.3.3.1]'
           key: sns.cpu.usage.walk
+          delay: '{$SNS.SNMP.INTERVAL}'
           history: '0'
           value_type: TEXT
           trends: '0'
@@ -561,6 +585,7 @@ zabbix_export:
           type: SNMP_AGENT
           snmp_oid: 'walk[1.3.6.1.4.1.11256.1.10.5.1]'
           key: sns.disk.walk
+          delay: '{$SNS.SNMP.INTERVAL}'
           history: '0'
           value_type: TEXT
           trends: '0'
@@ -573,6 +598,7 @@ zabbix_export:
           type: SNMP_AGENT
           snmp_oid: 'walk[1.3.6.1.4.1.11256.1.10.9.1]'
           key: sns.fan.walk
+          delay: '{$SNS.SNMP.INTERVAL}'
           history: '0'
           value_type: TEXT
           trends: '0'
@@ -585,6 +611,7 @@ zabbix_export:
           type: SNMP_AGENT
           snmp_oid: 'walk[1.3.6.1.4.1.11256.1.11.7.1]'
           key: sns.ha.members.walk
+          delay: '{$SNS.SNMP.INTERVAL}'
           history: '0'
           value_type: TEXT
           trends: '0'
@@ -597,10 +624,11 @@ zabbix_export:
           type: SNMP_AGENT
           snmp_oid: 'walk[1.3.6.1.4.1.11256.1.16.2.1]'
           key: sns.health.walk
+          delay: '{$SNS.SNMP.INTERVAL}'
           history: '0'
           value_type: TEXT
           trends: '0'
-          description: 'Used for discovering Health status from the Stormshield MIB.'
+          description: 'Used for discovering health status from the Stormshield MIB.'
           tags:
             - tag: component
               value: raw
@@ -609,6 +637,7 @@ zabbix_export:
           type: SNMP_AGENT
           snmp_oid: 'walk[1.3.6.1.4.1.11256.1.10.10.1]'
           key: sns.memory.util.walk
+          delay: '{$SNS.SNMP.INTERVAL}'
           history: '0'
           value_type: TEXT
           trends: '0'
@@ -621,6 +650,7 @@ zabbix_export:
           type: SNMP_AGENT
           snmp_oid: 'walk[1.3.6.1.4.1.11256.1.4.1.1]'
           key: sns.net.if.walk
+          delay: '{$SNS.SNMP.INTERVAL}'
           history: '0'
           value_type: TEXT
           trends: '0'
@@ -633,6 +663,7 @@ zabbix_export:
           type: SNMP_AGENT
           snmp_oid: 'walk[1.3.6.1.4.1.11256.1.10.6.1]'
           key: sns.psu.walk
+          delay: '{$SNS.SNMP.INTERVAL}'
           history: '0'
           value_type: TEXT
           trends: '0'
@@ -645,18 +676,20 @@ zabbix_export:
           type: SNMP_AGENT
           snmp_oid: 'walk[1.3.6.1.2.1.25.2.3.1.2,1.3.6.1.2.1.25.2.3.1.3,1.3.6.1.2.1.25.2.3.1.5,1.3.6.1.2.1.25.2.3.1.6]'
           key: sns.storage.walk
+          delay: '{$SNS.SNMP.INTERVAL}'
           history: '0'
           value_type: TEXT
           trends: '0'
-          description: 'Used for discovering the storages from the HOST-RESOURCES-MIB.'
+          description: 'Used for discovering storage from the HOST-RESOURCES-MIB.'
           tags:
             - tag: component
               value: raw
         - uuid: 5d468c2d00d84fb39ba8f03e6c89c7a5
-          name: 'SNMP walk auto-update'
+          name: 'SNMP walk autoupdate'
           type: SNMP_AGENT
           snmp_oid: 'walk[1.3.6.1.4.1.11256.1.9.1.1]'
           key: sns.update.auto.walk
+          delay: '{$SNS.SNMP.INTERVAL}'
           history: '0'
           value_type: TEXT
           trends: '0'
@@ -669,6 +702,7 @@ zabbix_export:
           type: SNMP_AGENT
           snmp_oid: 'get[1.3.6.1.4.1.11256.1.10.1.0]'
           key: 'system.date[snsDate.0]'
+          delay: '{$SNS.SNMP.INTERVAL}'
           value_type: CHAR
           trends: '0'
           description: |
@@ -682,6 +716,7 @@ zabbix_export:
           type: SNMP_AGENT
           snmp_oid: 'get[1.3.6.1.4.1.11256.1.10.2.0]'
           key: 'system.hardware.uptime[snsUptime.0]'
+          delay: '{$SNS.SNMP.INTERVAL}'
           value_type: FLOAT
           units: uptime
           description: |
@@ -719,7 +754,7 @@ zabbix_export:
                 - tag: scope
                   value: notice
         - uuid: 97be1dab5f934083bcc112c7ca5ab440
-          name: 'ASQ connections memory utilization'
+          name: 'ASQ connection memory utilization'
           type: DEPENDENT
           key: 'system.memory.conn[snsMemConn.0]'
           delay: '0'
@@ -763,7 +798,7 @@ zabbix_export:
             - tag: component
               value: memory
         - uuid: 442f3113a21d4041964eeb3a37c9db94
-          name: 'Etherstate connections memory utilization'
+          name: 'Etherstate connection memory utilization'
           type: DEPENDENT
           key: 'system.memory.ether[snsMemEther.0]'
           delay: '0'
@@ -814,7 +849,7 @@ zabbix_export:
           units: '%'
           description: |
             MIB: STORMSHIELD-SYSTEM-MONITOR-MIB
-            Protected Host memory utilization percentage.
+            Protected host memory utilization percentage.
             
             Warning: This OID might not be functional for SNS versions lower than 5.0.
           preprocessing:
@@ -921,6 +956,7 @@ zabbix_export:
           type: SNMP_AGENT
           snmp_oid: 'get[1.3.6.1.4.1.11256.1.13.2.4.0]'
           key: 'vpn.tunnel.dead[snsIPSECStatsSADDead.0]'
+          delay: '{$SNS.SNMP.INTERVAL}'
           description: |
             MIB: STORMSHIELD-IPSEC-STATS-MIB
             Number of dead security associations.
@@ -932,6 +968,7 @@ zabbix_export:
           type: SNMP_AGENT
           snmp_oid: 'get[1.3.6.1.4.1.11256.1.13.2.3.0]'
           key: 'vpn.tunnel.dying[snsIPSECStatsSADDying.0]'
+          delay: '{$SNS.SNMP.INTERVAL}'
           description: |
             MIB: STORMSHIELD-IPSEC-STATS-MIB
             Number of security associations at end of life.
@@ -943,6 +980,7 @@ zabbix_export:
           type: SNMP_AGENT
           snmp_oid: 'get[1.3.6.1.4.1.11256.1.13.2.2.0]'
           key: 'vpn.tunnel.mature[snsIPSECStatsSADMature.0]'
+          delay: '{$SNS.SNMP.INTERVAL}'
           description: |
             MIB: STORMSHIELD-IPSEC-STATS-MIB
             Number of established security associations.
@@ -954,7 +992,7 @@ zabbix_export:
           type: INTERNAL
           key: 'zabbix[host,snmp,available]'
           description: |
-            Availability of SNMP checks on the host. The value of this item corresponds to availability icons in the host list.
+            Availability of SNMP checks on the host. The value of this item corresponds to the availability icons in the host list.
             Possible values:
             0 - not available
             1 - available
@@ -1041,10 +1079,8 @@ zabbix_export:
               units: '%'
               description: |
                 MIB: HOST-RESOURCES-MIB
-                The average percentage of time that this processor
-                was not idle over the last minute.
-                Implementations may approximate this one minute
-                smoothing period if necessary.
+                The average percentage of time that this processor was not idle over the last minute.
+                Implementations may approximate this one minute smoothing period if necessary.
                 Note that cpu 196608 = cpu 0, 196609 = 1, ...
               preprocessing:
                 - type: SNMP_WALK_VALUE
@@ -1137,7 +1173,7 @@ zabbix_export:
               trends: '0'
               description: |
                 MIB: STORMSHIELD-SYSTEM-MONITOR-MIB
-                Metric that shows if the disk a member of a RAID array.
+                Indicates whether the disk is part of a RAID array.
               valuemap:
                 name: 'STORMSHIELD-SYSTEM-MONITOR-MIB::snsDiskEntryIsRaid'
               preprocessing:
@@ -1160,7 +1196,7 @@ zabbix_export:
               delay: '0'
               description: |
                 MIB: STORMSHIELD-SYSTEM-MONITOR-MIB
-                Result of the smart info tests.
+                Result of the SMART diagnostic tests.
               valuemap:
                 name: 'STORMSHIELD-SYSTEM-MONITOR-MIB::snsDiskEntrySmartResult'
               preprocessing:
@@ -1261,7 +1297,7 @@ zabbix_export:
               units: '!rpm'
               description: |
                 MIB: STORMSHIELD-SYSTEM-MONITOR-MIB
-                Speed of the Fan.
+                Speed of the fan.
               preprocessing:
                 - type: SNMP_WALK_VALUE
                   parameters:
@@ -1279,7 +1315,7 @@ zabbix_export:
               delay: '0'
               description: |
                 MIB: STORMSHIELD-SYSTEM-MONITOR-MIB
-                Status of the Fan.
+                Status of the fan.
               valuemap:
                 name: 'STORMSHIELD-SYSTEM-MONITOR-MIB::snsFanStatus'
               preprocessing:
@@ -1329,7 +1365,7 @@ zabbix_export:
               delay: '0'
               description: |
                 MIB: STORMSHIELD-HA-MIB
-                Metric that shows if the firewall is active.
+                Indicates whether the firewall is active.
               preprocessing:
                 - type: SNMP_WALK_VALUE
                   parameters:
@@ -1457,7 +1493,7 @@ zabbix_export:
               trends: '0'
               description: |
                 MIB: STORMSHIELD-HA-MIB
-                Firewall serial.
+                Firewall serial number.
               preprocessing:
                 - type: SNMP_WALK_VALUE
                   parameters:
@@ -1479,11 +1515,11 @@ zabbix_export:
               description: |
                 MIB: STORMSHIELD-HA-MIB
                 HA status forced:
-                  -2: Unknown forced status,
-                  -1: No peer found,
-                  0: No forced status,
-                  1: Forced active,
-                  2: Forced passive.
+                  -2: Unknown forced status
+                  -1: No peer found
+                  0: No forced status
+                  1: Forced active
+                  2: Forced passive
               valuemap:
                 name: 'STORMSHIELD-HA-MIB::snsHAStatusForced'
               preprocessing:
@@ -1544,7 +1580,7 @@ zabbix_export:
               delay: '0'
               description: |
                 MIB: STORMSHIELD-HEALTH-MONITOR-MIB
-                Stormshield Firewall certificates current health status.
+                Current health status of Stormshield Firewall.
               valuemap:
                 name: 'STORMSHIELD-HEALTH-MONITOR-MIB::*'
               preprocessing:
@@ -1579,9 +1615,9 @@ zabbix_export:
               description: |
                 MIB: STORMSHIELD-HEALTH-MONITOR-MIB
                 Current health status of Stormshield Firewall CPU:
-                  - `Good if CPU load <= 90%
-                  - `Minor` if CPU load > 90% during a time lower than 5 minutes
-                  - `Major` if CPU load > 90% during a time higher than 5 minutes.
+                  - `Good` if CPU load is 90% or lower
+                  - `Minor` if CPU load is above 90% for less than 5 minutes
+                  - `Major` if CPU load is above 90% for more than 5 minutes
               valuemap:
                 name: 'STORMSHIELD-HEALTH-MONITOR-MIB::*'
               preprocessing:
@@ -1616,9 +1652,9 @@ zabbix_export:
               description: |
                 MIB: STORMSHIELD-HEALTH-MONITOR-MIB
                 Current health status of Stormshield Firewall CPU temperature:
-                  - `Good` if CPU temperature is at least 20°C below max temperature
-                  - `Minor` if CPU temperature is 20°C, or less, below max temperature
-                  - `Major` if CPU temperature is 5°C below max temperature.
+                  - `Good`; at least 20°C below max temperature
+                  - `Minor`; less than 20°C below max temperature
+                  - `Major`; 5°C below max temperature
               valuemap:
                 name: 'STORMSHIELD-HEALTH-MONITOR-MIB::*'
               preprocessing:
@@ -1647,11 +1683,11 @@ zabbix_export:
                   value: health
               trigger_prototypes:
                 - uuid: d2480be0a3d44a89bc27f3560bbe1e77
-                  expression: 'find(/Stormshield SNS by SNMP/health.cpu.temperature[snsCpuTempHealth.{#SNMPINDEX}],,"like","Major")=1'
+                  expression: 'last(/Stormshield SNS by SNMP/health.cpu.temperature[snsCpuTempHealth.{#SNMPINDEX}])=5'
                   name: 'SNS: Health status firewall [{#HEALTH_ID}]: CPU is overheating'
                   event_name: 'SNS: The CPU is overheating'
                   priority: HIGH
-                  description: 'The CPU does not work correctly and has raised an alarm.'
+                  description: 'The CPU is not working correctly and has raised an alarm.'
                   tags:
                     - tag: scope
                       value: availability
@@ -1697,9 +1733,9 @@ zabbix_export:
               description: |
                 MIB: STORMSHIELD-HEALTH-MONITOR-MIB
                 Current health status of Stormshield Firewall disk:
-                  - `Good` if the disks work correctly
-                  - `Minor` if the disks do not work correctly
-                  - `Major` if the disks do not work correctly and has raised an alarm.
+                  - `Good` if the disks are working correctly
+                  - `Minor` if the disks are not working correctly
+                  - `Major` if the disks are not working correctly and have raised an alarm
               valuemap:
                 name: 'STORMSHIELD-HEALTH-MONITOR-MIB::*'
               preprocessing:
@@ -1728,11 +1764,11 @@ zabbix_export:
                   value: health
               trigger_prototypes:
                 - uuid: f9403a9d6f354c32ae42c719e8f2f4df
-                  expression: 'find(/Stormshield SNS by SNMP/health.disk.status[snsDiskHealth.{#SNMPINDEX}],,"like","Major")=1'
+                  expression: 'last(/Stormshield SNS by SNMP/health.disk.status[snsDiskHealth.{#SNMPINDEX}])=5'
                   name: 'SNS: Health status firewall [{#HEALTH_ID}]: The disk is not working correctly'
                   event_name: 'SNS: The disk is not working correctly'
                   priority: HIGH
-                  description: 'The disks does not work correctly and has raised an alarm.'
+                  description: 'The disks are not working correctly and have raised an alarm.'
                   tags:
                     - tag: scope
                       value: availability
@@ -1744,9 +1780,9 @@ zabbix_export:
               description: |
                 MIB: STORMSHIELD-HEALTH-MONITOR-MIB
                 Current health status of Stormshield Firewall fans:
-                  - `Good` if the fans work correctly
-                  - `Minor` if the fans do not work correctly
-                  - `Major` if the fans do not work correctly and have raised an alarm.
+                  - `Good` if the fans are working correctly
+                  - `Minor` if the fans are not working correctly
+                  - `Major` if the fans are not working correctly and have raised an alarm
               valuemap:
                 name: 'STORMSHIELD-HEALTH-MONITOR-MIB::*'
               preprocessing:
@@ -1775,11 +1811,11 @@ zabbix_export:
                   value: health
               trigger_prototypes:
                 - uuid: 925e62403192466b9e5d79340fff7f18
-                  expression: 'find(/Stormshield SNS by SNMP/health.fan.status[snsFanHealth.{#SNMPINDEX}],,"like","Major")=1'
+                  expression: 'last(/Stormshield SNS by SNMP/health.fan.status[snsFanHealth.{#SNMPINDEX}])=5'
                   name: 'SNS: Health status firewall [{#HEALTH_ID}]: The fan is not working correctly'
                   event_name: 'SNS: The fan is not working correctly'
                   priority: AVERAGE
-                  description: 'The fans do not work correctly and have raised an alarm.'
+                  description: 'The fans are not working correctly and have raised an alarm.'
                   tags:
                     - tag: scope
                       value: availability
@@ -1791,9 +1827,9 @@ zabbix_export:
               description: |
                 MIB: STORMSHIELD-HEALTH-MONITOR-MIB
                 Current health status of Stormshield Firewall HA link:
-                  - `Good` if the HA link works correctly
-                  - `Minor` if the HA link does not work correctly (may be down)
-                  - `Major` if the HA link does not work (down).
+                  - `Good` if the HA link is working correctly
+                  - `Minor` if the HA link is not working correctly (may be down)
+                  - `Major` if the HA link is not working (is down)
               valuemap:
                 name: 'STORMSHIELD-HEALTH-MONITOR-MIB::*'
               preprocessing:
@@ -1822,11 +1858,11 @@ zabbix_export:
                   value: health
               trigger_prototypes:
                 - uuid: a8a3b2d803b64242a68c5dd66fdc7b38
-                  expression: 'find(/Stormshield SNS by SNMP/health.ha.link.status[snsHaLinkHealth.{#SNMPINDEX}],,"like","Major")=1'
+                  expression: 'last(/Stormshield SNS by SNMP/health.ha.link.status[snsHaLinkHealth.{#SNMPINDEX}])=5'
                   name: 'SNS: Health status firewall [{#HEALTH_ID}]: HA link is down'
                   event_name: 'SNS: HA link is down'
                   priority: HIGH
-                  description: 'The HA link does not work (down).'
+                  description: 'The HA link is not working (is down).'
                   tags:
                     - tag: scope
                       value: availability
@@ -1839,8 +1875,8 @@ zabbix_export:
                 MIB: STORMSHIELD-HEALTH-MONITOR-MIB
                 Current status of Stormshield Firewall HA mode:
                   - `None` if HA is not active
-                  - `Active` if the firewall is the active one
-                  - `Passive` if the firewall is the passive one.
+                  - `Active` if the firewall is the active status
+                  - `Passive` if the firewall is the passive status
               valuemap:
                 name: 'STORMSHIELD-HEALTH-MONITOR-MIB::*'
               preprocessing:
@@ -1852,9 +1888,13 @@ zabbix_export:
                   parameters:
                     - |
                       const idx = {
-                      	'none': 1,
-                      	'passive': 2,
+                      	'n/a': 1,
+                      	'none': 2,
                       	'active': 3,
+                      	'passive': 4,
+                      	'major': 5,
+                      	'minor': 6,
+                      	'good': 7
                       };
                       
                       return typeof idx[value.toLowerCase()] === 'undefined' ? 0 : idx[value.toLowerCase()];
@@ -1871,9 +1911,9 @@ zabbix_export:
               description: |
                 MIB: STORMSHIELD-HEALTH-MONITOR-MIB
                 Current health status of Stormshield Firewall memory:
-                  - `Good` if memory load <= 80%
-                  - `Minor` if memory load > 80% during a time lower than 15 minutes
-                  - `Major` if memory load > 80% during a time higher than 15 minutes.
+                  - `Good` if memory load is 80% or lower
+                  - `Minor` if memory load is above 80% for less than 15 minutes
+                  - `Major` if memory load is above 80% for more than 15 minutes
               valuemap:
                 name: 'STORMSHIELD-HEALTH-MONITOR-MIB::*'
               preprocessing:
@@ -1908,9 +1948,9 @@ zabbix_export:
               description: |
                 MIB: STORMSHIELD-HEALTH-MONITOR-MIB
                 Current health status of Stormshield Firewall Admin Password:
-                  - `Good` if the date on which the admin password was last changed is less than a year ago
-                  - `Minor` if the date on which the admin password was last changed is more than a year ago
-                  - `Major` if the admin password is the default password.
+                  - `Good` if the date when the admin password was last changed is less than a year ago
+                  - `Minor` if the date when the admin password was last changed is more than a year ago
+                  - `Major` if the admin password is the default password
               valuemap:
                 name: 'STORMSHIELD-HEALTH-MONITOR-MIB::*'
               preprocessing:
@@ -1939,11 +1979,11 @@ zabbix_export:
                   value: health
               trigger_prototypes:
                 - uuid: 1eb323d145f246b48b0ca194b29f3638
-                  expression: 'find(/Stormshield SNS by SNMP/health.password.status[snsPasswdHealth.{#SNMPINDEX}],,"like","Major")=1'
+                  expression: 'last(/Stormshield SNS by SNMP/health.password.status[snsPasswdHealth.{#SNMPINDEX}])=5'
                   name: 'SNS: Health status firewall [{#HEALTH_ID}]: Admin password is not secured'
                   event_name: 'SNS: Admin password is not secured'
                   priority: HIGH
-                  description: 'The admin password is the default password, please change it.'
+                  description: 'The admin password is the default password; please change it.'
                   tags:
                     - tag: scope
                       value: notice
@@ -1955,9 +1995,9 @@ zabbix_export:
               description: |
                 MIB: STORMSHIELD-HEALTH-MONITOR-MIB
                 Current health status of Stormshield Firewall power supply:
-                  - `Good` if the power supply works correctly
-                  - `Minor` if the power supply does not work correctly
-                  - `Major` if the power supply does not work correctly and has raised an alarm.
+                  - `Good` if the power supply is working correctly
+                  - `Minor` if the power supply is not working correctly
+                  - `Major` if the power supply is not working correctly and has raised an alarm.
               valuemap:
                 name: 'STORMSHIELD-HEALTH-MONITOR-MIB::*'
               preprocessing:
@@ -1986,11 +2026,11 @@ zabbix_export:
                   value: health
               trigger_prototypes:
                 - uuid: 816a07c6a4ca4da7990a5d345a17a4cb
-                  expression: 'find(/Stormshield SNS by SNMP/health.power.status[snsPowerSupplyHealth.{#SNMPINDEX}],,"like","Major")=1'
+                  expression: 'last(/Stormshield SNS by SNMP/health.power.status[snsPowerSupplyHealth.{#SNMPINDEX}])=5'
                   name: 'SNS: Health status firewall [{#HEALTH_ID}]: The power supply is not working correctly'
                   event_name: 'SNS: The power supply is not working correctly'
                   priority: HIGH
-                  description: 'The power supply does not work correctly and has raised an alarm.'
+                  description: 'The power supply is not working correctly and has raised an alarm.'
                   tags:
                     - tag: scope
                       value: availability
@@ -2001,10 +2041,10 @@ zabbix_export:
               delay: '0'
               description: |
                 MIB: STORMSHIELD-HEALTH-MONITOR-MIB
-                Current health status of Stormshield Firewall raid:
-                  - `Good` if the raid works in optimal mode
-                  - `Minor` if the raid does not work in optimal mode
-                  - `Major` if the raid does not work in optimal mode and has raised an alarm.
+                Current health status of Stormshield Firewall RAID:
+                  - `Good` if the RAID is working in optimal mode
+                  - `Minor` if the RAID is not working in optimal mode
+                  - `Major` if the RAID is not working in optimal mode and has raised an alarm
               valuemap:
                 name: 'STORMSHIELD-HEALTH-MONITOR-MIB::*'
               preprocessing:
@@ -2033,11 +2073,11 @@ zabbix_export:
                   value: health
               trigger_prototypes:
                 - uuid: 305c5ab2338349efad3bedcda622922d
-                  expression: 'find(/Stormshield SNS by SNMP/health.raid.status[snsRaidHealth.{#SNMPINDEX}],,"like","Major")=1'
+                  expression: 'last(/Stormshield SNS by SNMP/health.raid.status[snsRaidHealth.{#SNMPINDEX}])=5'
                   name: 'SNS: Health status firewall [{#HEALTH_ID}]: The RAID is not working correctly'
                   event_name: 'SNS: The RAID is not working correctly'
                   priority: AVERAGE
-                  description: 'The raid does not work in optimal mode and has raised an alarm.'
+                  description: 'The RAID is not working in optimal mode and has raised an alarm.'
                   tags:
                     - tag: scope
                       value: availability
@@ -2391,7 +2431,7 @@ zabbix_export:
               delay: '0'
               description: |
                 MIB: STORMSHIELD-IF-MIB
-                Metric that shows if the interface is protected.
+                Indicates whether the interface is protected.
               preprocessing:
                 - type: SNMP_WALK_VALUE
                   parameters:
@@ -2514,7 +2554,7 @@ zabbix_export:
           type: DEPENDENT
           key: psu.discovery
           delay: '0'
-          description: 'Used for discovering power supply from the Stormshield MIB.'
+          description: 'Used for discovering power supplies from the Stormshield MIB.'
           item_prototypes:
             - uuid: df7dd3abb56542dcb9e94bf05ab49bea
               name: 'PSU [{#POWER_ID}]: Power status'
@@ -2523,7 +2563,7 @@ zabbix_export:
               delay: '0'
               description: |
                 MIB: STORMSHIELD-SYSTEM-MONITOR-MIB
-                Metric that shows if the power supply is powered by electricity.
+                Indicates whether the power supply is powered by electricity.
               valuemap:
                 name: 'STORMSHIELD-SYSTEM-MONITOR-MIB::snsPowerSupplyPowered'
               preprocessing:
@@ -2543,7 +2583,7 @@ zabbix_export:
               delay: '0'
               description: |
                 MIB: STORMSHIELD-SYSTEM-MONITOR-MIB
-                Metric that shows what is the status of the power supply.
+                Indicates the status of the power supply.
               valuemap:
                 name: 'STORMSHIELD-SYSTEM-MONITOR-MIB::snsPowerSupplyStatus'
               preprocessing:
@@ -2601,7 +2641,7 @@ zabbix_export:
                 value: '{$SNS.STORAGE.TYPE.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: D
-          description: 'Used for discovering storages from the Stormshield MIB.'
+          description: 'Used for discovering storage from the Stormshield MIB.'
           item_prototypes:
             - uuid: 78657f8ffd554090bb46d55cdf06c730
               name: 'Storage [{#STORAGE_DESCR}]: Storage size'
@@ -2655,7 +2695,7 @@ zabbix_export:
               key: 'host.storage.utilization[.{#SNMPINDEX}]'
               units: '%'
               params: '(last(//host.storage.used[hrStorageUseddata.{#SNMPINDEX}])/last(//host.storage.size[hrStorageSizedata.{#SNMPINDEX}]))*100'
-              description: 'Memory utilization in % for /data.'
+              description: 'Memory utilization in %.'
               tags:
                 - tag: component
                   value: storage
@@ -2686,14 +2726,14 @@ zabbix_export:
               parameters:
                 - 1h
         - uuid: 53f93c7ce4d940609334343031dc7705
-          name: 'Auto-update discovery'
+          name: 'Autoupdate discovery'
           type: DEPENDENT
           key: update.auto.discovery
           delay: '0'
           description: 'Used for discovering updates from the Stormshield MIB.'
           item_prototypes:
             - uuid: 1ca1980a3dc7400b98235b18ecb4fc9c
-              name: 'Auto-update [{#UPDATE_NAME}]: Last update date'
+              name: 'Autoupdate [{#UPDATE_NAME}]: Last update date'
               type: DEPENDENT
               key: 'system.update.last[snsAutoupdateLast.{#SNMPINDEX}]'
               delay: '0'
@@ -2716,7 +2756,7 @@ zabbix_export:
                 - tag: component
                   value: system
             - uuid: 144fdb66d21647b99ca67908c5b240cd
-              name: 'Auto-update [{#UPDATE_NAME}]: Update state'
+              name: 'Autoupdate [{#UPDATE_NAME}]: Update state'
               type: DEPENDENT
               key: 'system.update.state[snsAutoupdateState.{#SNMPINDEX}]'
               delay: '0'
@@ -2754,11 +2794,11 @@ zabbix_export:
                   value: system
               trigger_prototypes:
                 - uuid: 7226b9ba8d3947a59bf0d709b843b472
-                  expression: '(find(/Stormshield SNS by SNMP/system.update.state[snsAutoupdateState.{#SNMPINDEX}],,"like","Failed")=1) or (find(/Stormshield SNS by SNMP/system.update.state[snsAutoupdateState.{#SNMPINDEX}],,"like","Broken")=1)'
-                  name: 'SNS: Auto-update [{#UPDATE_NAME}]: Not up to date'
-                  event_name: 'SNS: Auto-update not up to date'
+                  expression: '(last(/Stormshield SNS by SNMP/system.update.state[snsAutoupdateState.{#SNMPINDEX}])=4) or (last(/Stormshield SNS by SNMP/system.update.state[snsAutoupdateState.{#SNMPINDEX}])=5)'
+                  name: 'SNS: Autoupdate [{#UPDATE_NAME}]: Not up to date'
+                  event_name: 'SNS: Autoupdate not up to date'
                   priority: INFO
-                  description: 'The auto-update is not up to date (never started or more than a year ago).'
+                  description: 'The autoupdate is not up to date (never started or started more than a year ago).'
                   tags:
                     - tag: scope
                       value: notice
@@ -2796,10 +2836,10 @@ zabbix_export:
           description: 'Threshold of CPU utilization for Warning trigger in %.'
         - macro: '{$SNS.DISK.FREE.CRIT}'
           value: '10'
-          description: 'Threshold of disk free space for Critical trigger in %.'
+          description: 'Threshold of free disk space for Critical trigger in %.'
         - macro: '{$SNS.DISK.FREE.WARN}'
           value: '20'
-          description: 'Threshold of disk free space for Warning trigger in %.'
+          description: 'Threshold of free disk space for Warning trigger in %.'
         - macro: '{$SNS.ICMP.LOSS.WARN}'
           value: '20'
           description: 'Threshold of ICMP packet loss for Warning trigger in %.'
@@ -2808,28 +2848,31 @@ zabbix_export:
           description: 'Threshold of average ICMP response time for Warning trigger in seconds.'
         - macro: '{$SNS.MEMORY.UTIL.MAX}'
           value: '90'
-          description: 'Threshold of memory utilization for trigger in %.'
+          description: 'Threshold for memory utilization trigger in %.'
         - macro: '{$SNS.NET.IF.IFNAME.MATCHES}'
           value: '.*'
-          description: 'Sets the regex string of network interface names to allow in discovery.'
+          description: 'Sets regex string of network interface names to allow in discovery.'
         - macro: '{$SNS.NET.IF.IFNAME.NOT_MATCHES}'
           value: ^(sslvpn|ipsec)
-          description: 'Sets the regex string of network interface names to ignore in discovery.'
+          description: 'Sets regex string of network interface names to ignore in discovery.'
+        - macro: '{$SNS.SNMP.INTERVAL}'
+          value: 1m
+          description: 'Time interval for SNMP agent items.'
         - macro: '{$SNS.SNMP.TIMEOUT}'
           value: 5m
-          description: 'The time interval for SNMP availability trigger.'
+          description: 'Time interval for SNMP availability trigger.'
         - macro: '{$SNS.STORAGE.DESCR.MATCHES}'
           value: ^(/data|/log)$
-          description: 'Sets the regex string of storage descriptions to allow in discovery.'
+          description: 'Sets regex string of storage descriptions to allow in discovery.'
         - macro: '{$SNS.STORAGE.DESCR.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'Sets the regex string of storage descriptions to ignore in discovery.'
+          description: 'Sets regex string of storage descriptions to ignore in discovery.'
         - macro: '{$SNS.STORAGE.TYPE.MATCHES}'
           value: .1.3.6.1.2.1.25.2.1.4
-          description: 'Sets the regex string of storage types to allow in discovery.'
+          description: 'Sets regex string of storage types to allow in discovery.'
         - macro: '{$SNS.STORAGE.TYPE.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'Sets the regex string of storage types to ignore in discovery.'
+          description: 'Sets regex string of storage types to ignore in discovery.'
       dashboards:
         - uuid: 68b246ab40c24a9f9057d58bcea37cac
           name: Main
@@ -4662,7 +4705,7 @@ zabbix_export:
                     - type: INTEGER
                       name: secondary_label_units_show
                       value: '0'
-            - name: Auto-update
+            - name: Autoupdate
               widgets:
                 - type: honeycomb
                   name: 'Update state'
@@ -4671,10 +4714,10 @@ zabbix_export:
                   fields:
                     - type: STRING
                       name: items.0
-                      value: 'Auto-update*: Update state'
+                      value: 'Autoupdate*: Update state'
                     - type: STRING
                       name: primary_label
-                      value: '{{ITEM.NAME}.regsub("Auto-update\s\[(.+)\].*", \1)}'
+                      value: '{{ITEM.NAME}.regsub("Autoupdate\s\[(.+)\].*", \1)}'
                     - type: INTEGER
                       name: primary_label_size_type
                       value: '1'
@@ -4713,10 +4756,10 @@ zabbix_export:
                   fields:
                     - type: STRING
                       name: items.0
-                      value: 'Auto-update*: Last update date'
+                      value: 'Autoupdate*: Last update date'
                     - type: STRING
                       name: primary_label
-                      value: '{{ITEM.NAME}.regsub("Auto-update\s\[(.+)\].*", \1)}'
+                      value: '{{ITEM.NAME}.regsub("Autoupdate\s\[(.+)\].*", \1)}'
                     - type: INTEGER
                       name: primary_label_size_type
                       value: '1'
