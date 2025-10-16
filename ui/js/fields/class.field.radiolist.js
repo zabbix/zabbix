@@ -43,7 +43,7 @@ class CFieldRadioList extends CField {
 	}
 
 	isDisabled() {
-		return this._hidden_element === null && [...this._radiobuttons].some(radio => radio.disabled);
+		return this._hidden_element === null && [...this._radiobuttons].every(radio => radio.disabled);
 	}
 
 	updateState() {
