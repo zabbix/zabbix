@@ -1197,8 +1197,13 @@ AC_ARG_ENABLE(static-libs,[  --enable-static-libs    Build statically linked bin
   *) AC_MSG_ERROR([bad value ${enableval} for --enable-static-libs]) ;;
 esac])
 
-if test "x#static_linking" = "xyes" && test "x$static_linking_libs" = "xyes"; then
+if test "x$static_linking" = "xyes" && test "x$static_linking_libs" = "xyes"; then
   AC_MSG_ERROR([cannot use --static and --static-libs at the same time])
+fi
+
+AM_CONDITIONAL(STATIC_LINKING, test "x$static_linking" = "xyes" || test "x$static_linking_libs" = "xyes")
+if test "x$static_linking" = "xyes" || test "x$static_linking_libs" = "xyes"; then
+	AC_DEFINE(STATIC_LINKING,1,[Text])
 fi
 
 AC_ARG_ENABLE(server,[  --enable-server         Turn on build of Zabbix server],
