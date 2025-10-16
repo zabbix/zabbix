@@ -83,6 +83,15 @@ class testFormUser extends CWebTest {
 				]
 			]
 		]);
+
+		CDataHelper::call('dashboard.create', [
+			[
+				'name' => 'Testing share dashboard',
+				'userid' => '9',
+				'private' => 0,
+				'pages' => [[]]
+			]
+		]);
 	}
 
 	public function getLayoutData() {
@@ -207,6 +216,7 @@ class testFormUser extends CWebTest {
 			}
 
 			$form->query('button:Change password')->one()->click();
+			$form->waitUntilReloaded();
 			$this->assertFalse($form->query('button:Change password')->one(false)->isValid());
 		}
 

@@ -1517,6 +1517,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 								zbx_config_enable_remote_commands,
 								zbx_get_value_internal_ext_proxy,
 								config_ssh_key_location, config_webdriver_url,
+								.trapper_process_request_func_cb =
 								trapper_process_request_proxy,
 								zbx_autoreg_update_host_proxy};
 	zbx_thread_proxy_housekeeper_args	housekeeper_args = {zbx_config_timeout, config_housekeeping_frequency,
