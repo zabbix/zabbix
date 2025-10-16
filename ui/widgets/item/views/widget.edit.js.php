@@ -148,8 +148,15 @@ window.widget_form = new class extends CWidgetForm {
 			? ''
 			: 'none';
 
-		document.getElementById('item-aggregate-function-warning').style.display =
-			!aggregate_function_none && show_sparkline
+		const show_numeric_warning = !aggregate_function_none && !this.#is_item_numeric;
+
+		document.getElementById('item-aggregate-function-warning').style.display = show_numeric_warning
+				&& !show_sparkline
+			? ''
+			: 'none';
+
+		document.getElementById('item-aggregate-function-sparkline-warning').style.display = show_numeric_warning
+				&& show_sparkline
 			? ''
 			: 'none';
 

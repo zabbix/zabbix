@@ -27,6 +27,17 @@ $form = new CWidgetFormView($data);
 
 $aggregate_function_field = $form->registerField(new CWidgetFieldSelectView($data['fields']['aggregate_function']));
 
+$aggregate_function_warning = makeWarningIcon(_('With this setting only numeric items will be displayed.'))
+	->addStyle('display: none')
+	->setId('item-aggregate-function-warning');
+
+$aggregate_function_sparkline_warning = makeWarningIcon([
+	_('With this setting only numeric items will be displayed.'),
+	(new CDiv())->addItem(_('Item aggregation function does not affect the sparkline.'))
+])
+	->addStyle('display: none')
+	->setId('item-aggregate-function-sparkline-warning');
+
 $form
 	->addField(
 		(new CWidgetFieldMultiSelectItemView($data['fields']['itemid']))
@@ -79,9 +90,8 @@ $form
 				$aggregate_function_field->getLabel(),
 				new CFormField([
 					$aggregate_function_field->getView(),
-					makeWarningIcon(_('Item aggregation function does not affect the sparkline.'))
-						->addStyle('display: none')
-						->setId('item-aggregate-function-warning')
+					$aggregate_function_warning,
+					$aggregate_function_sparkline_warning
 				]),
 			])
 			->addField(
