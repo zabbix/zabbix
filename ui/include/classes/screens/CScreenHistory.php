@@ -194,7 +194,10 @@ class CScreenHistory extends CScreenBase {
 				foreach ($items_by_type as $value_type => $itemids) {
 					$options['history'] = $value_type;
 					$options['itemids'] = $itemids;
-					$options['maxValueSize'] = null;
+
+					if ($value_type == ITEM_VALUE_TYPE_BINARY || $value_type == ITEM_VALUE_TYPE_JSON) {
+						$options['maxValueSize'] = null;
+					}
 
 					$item_data = API::History()->get($options);
 
