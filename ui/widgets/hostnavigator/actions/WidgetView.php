@@ -23,6 +23,7 @@ use API,
 	CProfile,
 	CSeverityHelper,
 	CTagHelper;
+
 use Widgets\HostNavigator\Includes\{
 	CWidgetFieldHostGrouping,
 	WidgetForm

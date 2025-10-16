@@ -23,6 +23,7 @@ use API,
 	CProfile,
 	CSeverityHelper,
 	CTagHelper;
+
 use Widgets\ItemNavigator\Includes\{
 	CWidgetFieldItemGrouping,
 	WidgetForm
