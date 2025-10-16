@@ -1,6 +1,6 @@
 #!/bin/bash
 
-. clickhouse.sh
+. ./clickhouse.sh
 
 echo "DROP TABLE IF EXISTS $CH_DB.history_log" | curl $CH_URL --data-binary @-
 
@@ -10,9 +10,9 @@ CREATE TABLE $CH_DB.history_log
  	itemid UInt64,
  	value String,
  	source String,
- 	severity int,
- 	logeventid int,
- 	log_time int,
+ 	severity Int32,
+ 	logeventid Int32,
+ 	log_time Int64,
  	timestamp DateTime64(9)
 )
 ENGINE = MergeTree()

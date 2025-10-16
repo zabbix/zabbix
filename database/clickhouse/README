@@ -4,8 +4,11 @@ This collection of scripts facilitates the migration of Zabbix history data
 from MySQL or PostgreSQL to ClickHouse.
 
 Scripts Overview
+clickhouse.sh - helper script, not to be used directly
 
 Schema Creation Scripts:
+- history_all.sh - invokes all history schema creation scripts
+
 - history_schema.sh
 - history_log_schema.sh
 - history_str_schema.sh
