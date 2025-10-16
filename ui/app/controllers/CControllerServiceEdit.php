@@ -133,7 +133,9 @@ class CControllerServiceEdit extends CController {
 				];
 			}
 
-			foreach (makeTags($problem_tags, true, 'serviceid') as $serviceid => $tags) {
+			CTagHelper::orderTags($problem_tags);
+
+			foreach (CTagHelper::getTagsHtml($problem_tags, ZBX_TAG_OBJECT_SERVICE) as $serviceid => $tags) {
 				$children_problem_tags_html[$serviceid] = implode('', $tags);
 			}
 		}

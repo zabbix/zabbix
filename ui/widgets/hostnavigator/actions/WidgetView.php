@@ -21,8 +21,8 @@ use API,
 	CControllerDashboardWidgetView,
 	CControllerResponseData,
 	CProfile,
-	CSeverityHelper;
-
+	CSeverityHelper,
+	CTagHelper;
 use Widgets\HostNavigator\Includes\{
 	CWidgetFieldHostGrouping,
 	WidgetForm
@@ -203,7 +203,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 		if ($group_by_severity || $is_show_in_maintenance_on || $tags_to_keep || $group_by_host_groups) {
 			if ($tags_to_keep) {
-				$hosts = mergeRegularAndInheritedTags($hosts);
+				CTagHelper::mergeOwnAndInheritedTags($hosts);
 			}
 
 			foreach ($hosts as &$host) {

@@ -754,8 +754,6 @@ else {
 
 	$httpTests = API::HttpTest()->get($options);
 
-	$httpTests = mergeRegularAndInheritedTags($httpTests, ZBX_TAG_OBJECT_HTTPTEST);
-
 	$dbHttpTests = DBselect(
 		'SELECT ht.httptestid,ht.name,ht.delay,ht.status,ht.hostid,ht.templateid,h.name AS hostname,ht.retries,'.
 			'ht.authentication,ht.http_proxy'.
@@ -789,6 +787,9 @@ else {
 		(new CUrl('httpconf.php'))->setArgument('context', $data['context'])
 	);
 
+	CTagHelper::mergeOwnAndInheritedTags($http_tests, true);
+	CTagHelper::orderTags($http_tests);
+
 	// Get the error column data only for hosts.
 	if ($data['context'] === 'host') {
 		$httpTestsLastData = Manager::HttpTest()->getLastData(array_keys($http_tests));
@@ -821,7 +822,7 @@ else {
 	$data['httpTestsLastData'] = $httpTestsLastData;
 	$data['allowed_ui_conf_templates'] = CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES);
 
-	$data['tags'] = makeTags($data['http_tests'], true, 'httptestid', ZBX_TAG_COUNT_DEFAULT);
+	$data['tags'] = CTagHelper::getTagsHtml($data['http_tests'], ZBX_TAG_OBJECT_HTTPTEST);
 
 	if (!$data['filter']['tags']) {
 		$data['filter']['tags'] = [[

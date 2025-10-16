@@ -144,9 +144,12 @@ class CControllerItemList extends CControllerItem {
 		}
 
 		if ($items) {
+			CTagHelper::mergeOwnAndInheritedTags($items, true);
+			CTagHelper::orderTags($items, $filter['filter_tags']);
+
 			$data['items'] = $items;
 			$data['parent_templates'] = getItemParentTemplates($items, ZBX_FLAG_DISCOVERY_NORMAL);
-			$data['tags'] = makeTags($items, true, 'itemid', ZBX_TAG_COUNT_DEFAULT, $filter['filter_tags']);
+			$data['tags'] = CTagHelper::getTagsHtml($items, ZBX_TAG_OBJECT_ITEM);
 		}
 
 		$response = new CControllerResponseData($data);
@@ -655,8 +658,6 @@ class CControllerItemList extends CControllerItem {
 		}
 
 		$items = API::Item()->get($options);
-
-		$items = mergeRegularAndInheritedTags($items, ZBX_TAG_OBJECT_ITEM);
 
 		return expandItemNamesWithMasterItems($items, 'items');
 	}

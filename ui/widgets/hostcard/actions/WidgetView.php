@@ -19,7 +19,8 @@ namespace Widgets\HostCard\Actions;
 use API,
 	CArrayHelper,
 	CControllerDashboardWidgetView,
-	CControllerResponseData;
+	CControllerResponseData,
+	CTagHelper;
 
 use Widgets\HostCard\Includes\CWidgetFieldHostSections;
 
@@ -253,7 +254,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 		}
 
 		if (in_array(CWidgetFieldHostSections::SECTION_TAGS, $this->fields_values['sections'])) {
-			[$host] = mergeRegularAndInheritedTags([$host]);
+			CTagHelper::mergeOwnAndInheritedTagsForObject($host);
 
 			CArrayHelper::sort($host['tags'], ['tag', 'value']);
 		}

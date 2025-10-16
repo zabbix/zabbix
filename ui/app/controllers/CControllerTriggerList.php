@@ -252,7 +252,8 @@ class CControllerTriggerList extends CController {
 				'nopermissions' => true
 			]);
 
-			$triggers = mergeRegularAndInheritedTags($triggers, ZBX_TAG_OBJECT_TRIGGER);
+			CTagHelper::mergeOwnAndInheritedTags($triggers, true);
+			CTagHelper::orderTags($triggers, $filter_tags);
 
 			foreach ($triggers as &$trigger) {
 				CArrayHelper::sort($trigger['hosts'], ['name']);
@@ -413,7 +414,7 @@ class CControllerTriggerList extends CController {
 			'parent_templates' => getTriggerParentTemplates($triggers, ZBX_FLAG_DISCOVERY_NORMAL),
 			'paging' => $paging,
 			'dep_triggers' => $dep_triggers,
-			'tags' => makeTags($triggers, true, 'triggerid', ZBX_TAG_COUNT_DEFAULT, $filter_tags),
+			'tags' => CTagHelper::getTagsHtml($triggers, ZBX_TAG_OBJECT_TRIGGER),
 			'allowed_ui_conf_templates' => CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES)
 		];
 

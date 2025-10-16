@@ -1109,14 +1109,23 @@ class CScreenProblem extends CScreenBase {
 				]));
 			}
 
-			$tags = $this->data['filter']['show_tags']
-				? makeTags($data['problems'] + $symptom_data['problems'], true, 'eventid',
-					$this->data['filter']['show_tags'], array_key_exists('tags', $this->data['filter'])
-						? $this->data['filter']['tags']
-						: [],
-					null, $this->data['filter']['tag_name_format'], $this->data['filter']['tag_priority']
-				)
-				: [];
+			$tags = [];
+
+			if ($this->data['filter']['show_tags']) {
+				$filter_tags = array_key_exists('tags', $this->data['filter']) ? $this->data['filter']['tags'] : [];
+
+				CTagHelper::orderTags($data['problems'], $filter_tags, $this->data['filter']['tag_priority']);
+				CTagHelper::orderTags($symptom_data['problems'], $filter_tags, $this->data['filter']['tag_priority']);
+
+				$object_type = $this->data['filter']['show'] == TRIGGERS_OPTION_ALL
+					? ZBX_TAG_OBJECT_EVENT
+					: ZBX_TAG_OBJECT_PROBLEM;
+
+				$tags = CTagHelper::getTagsHtml($data['problems'] + $symptom_data['problems'], $object_type, [
+					'show_tags_limit' => $this->data['filter']['show_tags'],
+					'tag_name_format' => $this->data['filter']['tag_name_format']
+				]);
+			}
 
 			$triggers_hosts = $data['problems'] ? makeTriggersHostsList($triggers_hosts) : [];
 
@@ -1189,8 +1198,10 @@ class CScreenProblem extends CScreenBase {
 			_('Tags')
 		]);
 
-		// Make tags from all events.
-		$tags = makeTags($data['problems'] + $symptom_data['problems'], false);
+		CTagHelper::orderTags($data['problems']);
+		CTagHelper::orderTags($symptom_data['problems']);
+
+		$tags = CTagHelper::getTagsRaw($data['problems'] + $symptom_data['problems']);
 
 		// Get cause event names for symptoms.
 		$causes = [];

@@ -85,6 +85,9 @@ class CControllerLatestViewRefresh extends CControllerLatestView {
 
 			$this->extendData($prepared_data);
 
+			CTagHelper::mergeOwnAndInheritedTags($prepared_data['items']);
+			CTagHelper::orderTags($prepared_data['items'], $filter['tags'], $filter['tag_priority']);
+
 			// make response
 			$data = [
 				'results' => [
@@ -101,10 +104,12 @@ class CControllerLatestViewRefresh extends CControllerLatestView {
 						'hk_history' => CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY),
 						'hk_history_global' => CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY_GLOBAL)
 					],
-					'tags' => makeTags($prepared_data['items'], true, 'itemid', (int) $filter['show_tags'],
-						$filter['tags'], array_key_exists('tags', $subfilters_fields) ? $subfilters_fields['tags'] : [],
-						(int) $filter['tag_name_format'], $filter['tag_priority']
-					)
+					'tags' => CTagHelper::getTagsHtml($prepared_data['items'], ZBX_TAG_OBJECT_ITEM, [
+						'show_tags_limit' => (int) $filter['show_tags'],
+						'tag_name_format' => (int) $filter['tag_name_format'],
+						'subfilter_tags' =>
+							array_key_exists('tags', $subfilters_fields) ? $subfilters_fields['tags'] : []
+					])
 				] + $prepared_data,
 				'subfilters' => $subfilters,
 				'subfilters_expanded' => array_flip($this->getInput('subfilters_expanded', []))

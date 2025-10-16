@@ -187,7 +187,8 @@ class CControllerTemplateList extends CController {
 			$filter['tags'] = [['tag' => '', 'value' => '', 'operator' => TAG_OPERATOR_LIKE]];
 		}
 
-		$templates = mergeRegularAndInheritedTags($templates, ZBX_TAG_OBJECT_TEMPLATE);
+		CTagHelper::mergeOwnAndInheritedTags($templates, true);
+		CTagHelper::orderTags($templates, $filter['tags']);
 
 		$data = [
 			'action' => $this->getAction(),
@@ -199,7 +200,7 @@ class CControllerTemplateList extends CController {
 			'editable_hosts' => $editable_hosts,
 			'profileIdx' => 'web.templates.filter',
 			'active_tab' => CProfile::get('web.templates.filter.active', 1),
-			'tags' => makeTags($templates, true, 'templateid', ZBX_TAG_COUNT_DEFAULT, $filter['tags']),
+			'tags' => CTagHelper::getTagsHtml($templates, ZBX_TAG_OBJECT_TEMPLATE),
 			'config' => [
 				'max_in_table' => CSettingsHelper::get(CSettingsHelper::MAX_IN_TABLE)
 			],

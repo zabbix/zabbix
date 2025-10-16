@@ -84,10 +84,10 @@ class CScreenHttpTest extends CScreenBase {
 		$httptests = resolveHttpTestMacros($httptests, true, false);
 		order_result($httptests, $sort_field, $sort_order);
 
-		$httptests = mergeRegularAndInheritedTags($httptests);
-		$tags = makeTags($httptests, true, 'httptestid', ZBX_TAG_COUNT_DEFAULT,
-			array_key_exists('tags', $this->data) ? $this->data['tags'] : []
-		);
+		CTagHelper::mergeOwnAndInheritedTags($httptests);
+		CTagHelper::orderTags($httptests, array_key_exists('tags', $this->data) ? $this->data['tags'] : []);
+
+		$tags = CTagHelper::getTagsHtml($httptests, ZBX_TAG_OBJECT_HTTPTEST);
 
 		// Fetch the latest results of the web scenario.
 		$last_httptest_data = Manager::HttpTest()->getLastData(array_keys($httptests));

@@ -28,6 +28,7 @@ use API,
 	CSettingsHelper,
 	CSimpleIntervalParser,
 	CSvgGraph,
+	CTagHelper,
 	CUpdateIntervalParser,
 	CWebUser,
 	Manager;
@@ -200,7 +201,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 		}
 
 		if (in_array(CWidgetFieldItemSections::SECTION_TAGS, $this->fields_values['sections'])) {
-			[$item] = mergeRegularAndInheritedTags([$item]);
+			CTagHelper::mergeOwnAndInheritedTagsForObject($item);
 
 			CArrayHelper::sort($item['tags'], ['tag', 'value']);
 		}

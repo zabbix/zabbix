@@ -105,8 +105,11 @@ class CControllerItemPrototypeList extends CControllerItemPrototype {
 				->setArgument('context', $data['context'])
 		);
 		$data['parent_templates'] = getItemParentTemplates($data['items'], ZBX_FLAG_DISCOVERY_PROTOTYPE);
-		$data['items'] = mergeRegularAndInheritedTags($data['items'], ZBX_TAG_OBJECT_ITEM_PROTOTYPE);
-		$data['tags'] = makeTags($data['items'], true, 'itemid', ZBX_TAG_COUNT_DEFAULT);
+
+		CTagHelper::mergeOwnAndInheritedTags($data['items'], true);
+		CTagHelper::orderTags($data['items']);
+
+		$data['tags'] = CTagHelper::getTagsHtml($data['items'], ZBX_TAG_OBJECT_ITEM_PROTOTYPE);
 
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Configuration of item prototypes'));

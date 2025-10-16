@@ -695,8 +695,10 @@ else {
 		]);
 	}
 
-	$data['hostPrototypes'] = mergeRegularAndInheritedTags($data['hostPrototypes'], ZBX_TAG_OBJECT_HOST_PROTOTYPE);
-	$data['tags'] = makeTags($data['hostPrototypes'], true, 'hostid');
+	CTagHelper::mergeOwnAndInheritedTags($data['hostPrototypes'], true);
+	CTagHelper::orderTags($data['hostPrototypes']);
+
+	$data['tags'] = CTagHelper::getTagsHtml($data['hostPrototypes'], ZBX_TAG_OBJECT_HOST_PROTOTYPE);
 	$data['allowed_ui_conf_templates'] = CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES);
 
 	// render view

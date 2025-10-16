@@ -21,8 +21,8 @@ use API,
 	CControllerDashboardWidgetView,
 	CControllerResponseData,
 	CProfile,
-	CSeverityHelper;
-
+	CSeverityHelper,
+	CTagHelper;
 use Widgets\ItemNavigator\Includes\{
 	CWidgetFieldItemGrouping,
 	WidgetForm
@@ -159,7 +159,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 		$hosts = [];
 
 		if ($host_tags_to_keep) {
-			$db_hosts = mergeRegularAndInheritedTags($db_hosts);
+			CTagHelper::mergeOwnAndInheritedTags($db_hosts);
 		}
 
 		foreach ($db_hosts as $hostid => $host) {
@@ -236,7 +236,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 			}
 
 			if ($item_tags_to_keep) {
-				$items = mergeRegularAndInheritedTags($items);
+				CTagHelper::mergeOwnAndInheritedTags($items);
 			}
 
 			foreach ($items as $key => &$item) {

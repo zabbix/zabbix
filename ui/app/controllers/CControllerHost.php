@@ -166,6 +166,9 @@ abstract class CControllerHost extends CController {
 		// Re-sort the results again.
 		CArrayHelper::sort($hosts, [['field' => $filter['sort'], 'order' => $filter['sortorder']]]);
 
+		CTagHelper::mergeOwnAndInheritedTags($hosts);
+		CTagHelper::orderTags($hosts, $filter['tags']);
+
 		$interfaceids = [];
 		$hostids = [];
 
@@ -278,8 +281,7 @@ abstract class CControllerHost extends CController {
 			]);
 		}
 
-		$hosts = mergeRegularAndInheritedTags($hosts);
-		$tags = makeTags($hosts, true, 'hostid', ZBX_TAG_COUNT_DEFAULT, $filter['tags']);
+		$tags = CTagHelper::getTagsHtml($hosts, ZBX_TAG_OBJECT_HOST);
 
 		foreach ($hosts as &$host) {
 			$host['tags'] = $tags[$host['hostid']];
