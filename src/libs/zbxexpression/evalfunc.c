@@ -2546,6 +2546,12 @@ static int	evaluate_TREND(zbx_variant_t *value, const zbx_dc_evaluate_item_t *it
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
+	if (SUCCEED != zbx_history_requires_trends(item->value_type))
+	{
+		*error = zbx_strdup(*error, "history storage provider does not support trend functions");
+		goto out;
+	}
+
 	param_count = zbx_function_param_parse_count(parameters);
 
 	if (0 != strcmp(func, "stl") && 1 != param_count)

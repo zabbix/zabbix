@@ -215,6 +215,12 @@ int	zbx_baseline_get_data(zbx_uint64_t itemid, unsigned char value_type, time_t 
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
+	if (SUCCEED != zbx_history_requires_trends(value_type))
+	{
+		*error = zbx_strdup(*error, "history storage provider does not support trend functions");
+		goto out;
+	}
+
 	switch (value_type)
 	{
 		case ITEM_VALUE_TYPE_FLOAT:
