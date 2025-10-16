@@ -1428,7 +1428,6 @@ int	main(int argc, char **argv)
 		printf("Validating configuration file \"%s\"\n", config_file);
 
 	zbx_load_config(&t);
-	printf("PORT IS %d\n", zbx_config_listen_port);
 
 	if (ZBX_TASK_TEST_CONFIG == t.task)
 	{
