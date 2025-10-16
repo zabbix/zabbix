@@ -48,7 +48,7 @@ out:
 ---
 test case: "reserved > MAX"
 in:
-  data: "A"
+  data: "ABCD"
   len: 1
   reserved: 17179869185
   flags: 1

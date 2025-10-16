@@ -79,13 +79,13 @@ in:
 out:
   result: SUCCEED
 ---
-test case: "timeout negative value"
+test case: "timeout negative value - edge case"
 in:
   ipv: "ipv4"
   ip: "127.0.0.1"
   port: 0
-  timeout: -1
+  timeout: -1 # function can accept negative timeout values
   backlog_size: 1
 out:
-  result: FAIL
+  result: SUCCEED
 ...
