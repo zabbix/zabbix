@@ -27,15 +27,6 @@
 #	include "zbx_dbversion_constants.h"
 #endif
 
-#define ZBX_MAX_SQL_SIZE	262144 * 1024	/* 256KB */
-
-#ifndef ZBX_MAX_OVERFLOW_SQL_SIZE
-#	define ZBX_MAX_OVERFLOW_SQL_SIZE	ZBX_MAX_SQL_SIZE
-#elif 0 != ZBX_MAX_OVERFLOW_SQL_SIZE && \
-	(1024 > ZBX_MAX_OVERFLOW_SQL_SIZE || ZBX_MAX_OVERFLOW_SQL_SIZE > ZBX_MAX_SQL_SIZE)
-#error ZBX_MAX_OVERFLOW_SQL_SIZE is out of range
-#endif
-
 ZBX_CONST_PTR_VECTOR_IMPL(const_db_field_ptr, const zbx_db_field_t *)
 ZBX_PTR_VECTOR_IMPL(db_value_ptr, zbx_db_value_t *)
 
