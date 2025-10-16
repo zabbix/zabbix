@@ -119,7 +119,7 @@ class CHistory extends CApiService {
 			'limit' =>					['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'in' => '1:'.ZBX_MAX_INT32, 'default' => null],
 			'maxValueSize' =>			['type' => API_MULTIPLE, 'rules' => [
 											['if' => ['field' => 'history', 'in' => implode(',', [ITEM_VALUE_TYPE_BINARY, ITEM_VALUE_TYPE_JSON])], 'flags' => API_ALLOW_NULL, 'type' => API_INT32, 'in' => '1:'.(128 * ZBX_MEBIBYTE), 'default' => (64 * ZBX_KIBIBYTE)],
-											['else' => true, 'type' => API_UNEXPECTED],
+											['else' => true, 'type' => API_UNEXPECTED]
 			]],
 			// flags
 			'editable' =>				['type' => API_BOOLEAN, 'default' => false]

@@ -1045,10 +1045,10 @@ class testItem extends CAPITest {
 			[
 				'request_data' => [
 					'item' => 'testItem_Update:httpagent.json.type',
-					'key_' => 'httpagent.json.type.updated',
+					'key_' => 'httpagent.json.type.updated'
 				],
 				'expected_error' => null
-			],
+			]
 		];
 	}
 

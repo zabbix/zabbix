@@ -164,7 +164,7 @@ class testHistory extends CAPITest {
 						'clock' => '1549351002',
 						'ns' => '164888032',
 						'value' => 'YQ=='
-					],
+					]
 				],
 				'expected_error' => false
 			],
@@ -181,7 +181,7 @@ class testHistory extends CAPITest {
 						'clock' => '1549351003',
 						'ns' => '354370019',
 						'value' => '{"name":"a'
-					],
+					]
 				],
 				'expected_error' => false
 			],
