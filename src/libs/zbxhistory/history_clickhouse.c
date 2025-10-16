@@ -1122,7 +1122,7 @@ static int	history_clickhouse_fetch(void *data, zbx_uint64_t itemid, unsigned ch
 				end + 1);
 	}
 
-	zbx_strcpy_alloc(&query, &query_alloc, &query_offset, " order by itemid,timestamp desc");
+	zbx_strcpy_alloc(&query, &query_alloc, &query_offset, " order by timestamp desc");
 
 	if (0 != count)
 		zbx_snprintf_alloc(&query, &query_alloc, &query_offset, " LIMIT %d", count);
