@@ -1217,8 +1217,8 @@ zbx_history_provider_t	*history_clickhouse_open(const zbx_history_option_t *opti
 	provider = (zbx_history_provider_t *)zbx_malloc(NULL, sizeof(zbx_history_provider_t));
 
 	provider->name = zbx_strdup(NULL, HISTORY_PROVIDER_CLICKHOUSE);
-	/* TODO: remove ZBX_HISTORY_TRAIT_REQUIRES_TRENDS if frontend can fetch aggregated data */
-	provider->traits = ZBX_HISTORY_TRAIT_REQUIRES_TRENDS | ZBX_HISTORY_TRAIT_TYPES_NOBIN;
+
+	provider->traits = ZBX_HISTORY_TRAIT_TYPES_NOBIN;
 	provider->impl.write = history_clickhouse_write;
 	provider->impl.flush = history_clickhouse_flush;
 	provider->impl.fetch = history_clickhouse_fetch;
