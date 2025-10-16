@@ -76,6 +76,18 @@ form.dashboard-widget-scatterplot {
 				grid-column-start: 5;
 			}
 
+			.table-tags {
+				width: 453px;
+
+				.table-tags-input {
+					width: 130px;
+				}
+
+				z-select {
+					min-width: 120px;
+				}
+			}
+
 			.marker-config {
 				display: flex;
 				justify-content: space-between;

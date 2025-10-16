@@ -68,7 +68,9 @@ class CWidgetFieldTagsView extends CWidgetFieldView {
 
 	public function getTemplates(): array {
 		return [
-			new CTemplateTag(zbx_formatDomId($this->field->getName()).'-row-tmpl', $this->getRowTemplate(CWidgetFieldTags::DEFAULT_TAG))
+			new CTemplateTag(zbx_formatDomId($this->field->getName()).'-row-tmpl',
+				$this->getRowTemplate(CWidgetFieldTags::DEFAULT_TAG)
+			)
 		];
 	}
 
@@ -77,7 +79,7 @@ class CWidgetFieldTagsView extends CWidgetFieldView {
 
 		return (new CRow([
 			(new CTextBox($this->field->getName().'['.$row_num.'][tag]', $tag['tag']))
-				->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
+				->addClass('table-tags-input')
 				->setAriaRequired($this->isRequired())
 				->setEnabled(!$this->isDisabled() || $row_num === '#{rowNum}')
 				->setAttribute('placeholder', _('tag')),
@@ -91,11 +93,12 @@ class CWidgetFieldTagsView extends CWidgetFieldView {
 					TAG_OPERATOR_NOT_LIKE => _('Does not contain')
 				]))
 				->setValue($tag['operator'])
-				->setFocusableElementId(zbx_formatDomId($this->field->getName()).'-'.$row_num.'-operator-select')
+				->setWidthAuto()
+				->setFocusableElementId($id.'-'.$row_num.'-operator-select')
 				->setId($id.'_'.$row_num.'_operator')
 				->setDisabled($this->isDisabled() && $row_num !== '#{rowNum}'),
 			(new CTextBox($this->field->getName().'['.$row_num.'][value]', $tag['value']))
-				->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
+				->addClass('table-tags-input')
 				->setAriaRequired($this->isRequired())
 				->setId($id.'_'.$row_num.'_value')
 				->setEnabled(!$this->isDisabled() || $row_num === '#{rowNum}')

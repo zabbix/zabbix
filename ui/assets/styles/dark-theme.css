@@ -2287,6 +2287,10 @@ button {
   .dashboard-widget-form .form-field-show-header {
     position: absolute;
     right: 5px; }
+  .dashboard-widget-form .table-tags .table-tags-input {
+    width: 150px; }
+  .dashboard-widget-form .table-tags z-select {
+    min-width: 140px; }
   .dashboard-widget-form .table-tags tr:last-of-type td {
     padding-bottom: 0;
     line-height: 1.4; }
@@ -5789,6 +5793,12 @@ form.dashboard-widget-scatterplot {
     padding-top: 0; }
     form.dashboard-widget-scatterplot .dataset-body .form-grid:first-child {
       grid-column-start: 5; }
+    form.dashboard-widget-scatterplot .dataset-body .form-grid .table-tags {
+      width: 453px; }
+      form.dashboard-widget-scatterplot .dataset-body .form-grid .table-tags .table-tags-input {
+        width: 130px; }
+      form.dashboard-widget-scatterplot .dataset-body .form-grid .table-tags z-select {
+        min-width: 120px; }
     form.dashboard-widget-scatterplot .dataset-body .form-grid .marker-config {
       display: flex;
       justify-content: space-between;
