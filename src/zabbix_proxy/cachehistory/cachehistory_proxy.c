@@ -308,7 +308,7 @@ static void	proxy_prepare_history(zbx_dc_history_t *history, int history_num, zb
 			diff->flags |= ZBX_FLAGS_ITEM_DIFF_UPDATE_STATE | ZBX_FLAGS_ITEM_DIFF_UPDATE_ERROR;
 		}
 		else if (ITEM_STATE_NOTSUPPORTED == h->state &&
-				0 != strcmp(ZBX_NULL2EMPTY_STR(items[i].error), h->value.err))
+				0 != memcmp(items[i].error_hash, h->value.error_hash, sizeof(items[i].error_hash)))
 		{
 			diff->error = h->value.err;
 			diff->flags |= ZBX_FLAGS_ITEM_DIFF_UPDATE_ERROR;

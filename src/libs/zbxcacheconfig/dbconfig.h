@@ -277,6 +277,7 @@ zbx_dc_item_tag_t;
 
 ZBX_VECTOR_DECL(dc_item_tag, zbx_dc_item_tag_t)
 
+#define ZBX_SHA512_BINARY_LENGTH 64
 typedef struct
 {
 	zbx_uint64_t		itemid;
@@ -286,7 +287,7 @@ typedef struct
 	zbx_uint64_t		valuemapid;
 	const char		*key;
 	const char		*port;
-	const char		*error;
+	char			error_hash[ZBX_SHA512_BINARY_LENGTH];
 	const char		*delay;
 	const char		*delay_ex;
 	const char		*history_period;

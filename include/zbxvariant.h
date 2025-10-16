@@ -16,6 +16,7 @@
 #define ZABBIX_ZBXVARIANT_H
 
 #include "zbxalgo.h"
+#include "zbxdbhigh.h"
 
 #define ZBX_INFINITY	(1.0 / 0.0)	/* "Positive infinity" value used as a fatal error code */
 #define ZBX_UNKNOWN	(-1.0 / 0.0)	/* "Negative infinity" value used as a code for "Unknown" */
@@ -92,6 +93,7 @@ typedef union
 	zbx_uint64_t	ui64;
 	char		*str;
 	char		*err;
+	char		error_hash[ZBX_SHA512_BINARY_LENGTH];
 	zbx_log_value_t	*log;
 }
 zbx_history_value_t;
