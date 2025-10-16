@@ -2977,12 +2977,6 @@ zabbix_export:
                         host: 'Stormshield SNS by SNMP'
                         key: host.memory.utilization
                     - type: STRING
-                      name: max
-                      value: '100'
-                    - type: STRING
-                      name: min
-                      value: '0'
-                    - type: STRING
                       name: thresholds.0.color
                       value: 0EC9AC
                     - type: STRING
@@ -3779,12 +3773,6 @@ zabbix_export:
                       value:
                         host: 'Stormshield SNS by SNMP'
                         key: host.memory.utilization
-                    - type: STRING
-                      name: max
-                      value: '100'
-                    - type: STRING
-                      name: min
-                      value: '0'
                     - type: STRING
                       name: thresholds.0.color
                       value: 0EC9AC
