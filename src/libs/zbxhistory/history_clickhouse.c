@@ -468,6 +468,12 @@ static void	history_clickhouse_write(void *data, unsigned char value_type,
 		return;
 	}
 
+	if (NULL != conn->buf)
+	{
+		THIS_SHOULD_NEVER_HAPPEN_MSG("ClickHouse connection buffer has not been freed before write");
+		zbx_free(conn->buf);
+	}
+
 	conn->buf = buf;
 
 	if (0 != conn->resp.page.alloc)
