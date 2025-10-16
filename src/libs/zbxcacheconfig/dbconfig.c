@@ -4111,7 +4111,7 @@ static void	DCsync_triggers(zbx_dbsync_t *sync, zbx_uint64_t revision)
 	while (SUCCEED == (ret = zbx_dbsync_next(sync, &rowid, &row, &tag)))
 	{
 		unsigned char	modified = 0, status, recovery_mode, timer;
-	
+
 		/* removed rows will be always added at the end */
 		if (ZBX_DBSYNC_ROW_REMOVE == tag)
 			break;
