@@ -429,8 +429,6 @@ class HostAvailabilityWidget {
 		$dashboardid = $result['dashboardids'][0];
 
 		return [
-			'maintenanceid' => $maintenanceid,
-			'groupids' => $groupids,
 			'dashboardid' => $dashboardid,
 			'hostids' => $hostids
 		];
