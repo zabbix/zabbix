@@ -35,30 +35,20 @@ var chkbxRange = {
 		this.resetOtherPage();
 
 		// initialize checkboxes
-		var chkboxes = jQuery('.list-table tbody input[type=checkbox]:not(:disabled)');
-		if (chkboxes.length > 0) {
-			for (var i = 0; i < chkboxes.length; i++) {
-				this.implement(chkboxes[i]);
-			}
-		}
+		const checkboxes = Array.from(
+			document.querySelectorAll('.list-table tbody input[type="checkbox"]:not(:disabled)')
+		);
+
+		checkboxes.forEach(checkbox => this.implement(checkbox));
 
 		// load selected checkboxes from session storage or cache
 		if (this.pageGoName != null) {
-			const selected_ids = this.getSelectedIds();
+			const object_ids = new Set(Object.keys(this.getSelectedIds()));
 
-			// check if checkboxes should be selected from session storage
-			if (!jQuery.isEmptyObject(selected_ids)) {
-				var objectIds = Object.keys(selected_ids);
-			}
-			// no checkboxes selected, check browser cache if checkboxes are still checked and update state
-			else {
-				var checkedFromCache = jQuery('main .list-table tbody input[type=checkbox]:checked:not(:disabled)');
-				var objectIds = jQuery.map(checkedFromCache, jQuery.proxy(function(checkbox) {
-					return this.getObjectIdFromName(checkbox.name);
-				}, this));
-			}
+			checkboxes.filter(checkbox => checkbox.checked)
+				.forEach(checkbox => object_ids.add(this.getObjectIdFromName(checkbox.name)));
 
-			this.checkObjects(this.pageGoName, objectIds, true);
+			this.checkObjects(this.pageGoName, [...object_ids], true);
 			this.update(this.pageGoName);
 		}
 
@@ -157,7 +147,7 @@ var chkbxRange = {
 	/**
 	 * Returns the checkboxes in an object group.
 	 *
-	 * @param string object
+	 * @param {string} object
 	 *
 	 * @returns {Array}
 	 */
