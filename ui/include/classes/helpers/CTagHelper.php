@@ -48,7 +48,7 @@ class CTagHelper {
 				$object['tags'][] = [
 					'tag' => $tag,
 					'value' => $value
-				] + $add_tag_type ? ['type' => $type] : [];
+				] + ($add_tag_type ? ['type' => $type] : []);
 			}
 		}
 	}
