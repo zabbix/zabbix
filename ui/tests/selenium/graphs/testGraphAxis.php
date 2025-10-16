@@ -157,10 +157,7 @@ class testGraphAxis extends CWebTest {
 		}
 
 		$form->fill($data['settings']);
-		$form->submit();
-
-		// Wait for successful user update message to be visible before attempting to open the hosts view.
-		CMessageElement::find()->waitUntilVisible();
+		$form->submit()->waitUntilStalled();
 
 		// Go to Graphs and set time period.
 		$this->page->open('zabbix.php?action=host.view')->waitUntilReady();

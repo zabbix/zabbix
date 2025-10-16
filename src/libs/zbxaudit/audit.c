@@ -500,7 +500,7 @@ void	zbx_audit_update_json_append_string_secret(const zbx_uint64_t id, const int
 		exit(EXIT_FAILURE);
 	}
 
-	append_str_json(&((*found_audit_entry)->details_json), audit_op, key, ZBX_MACRO_SECRET_MASK);
+	append_str_json(&((*found_audit_entry)->details_json), audit_op, key, ZBX_SECRET_MASK);
 }
 
 void	zbx_audit_update_json_append_uint64(const zbx_uint64_t id, const int id_table, const char *audit_op,
