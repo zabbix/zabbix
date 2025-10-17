@@ -32,22 +32,9 @@ func replicationDiscoveryHandler(
 		return nil, errs.WrapConst(err, zbxerr.ErrorCannotFetchData)
 	}
 
-	var discovered map[string]string
-
-	res := make([]map[string]string, 0)
-	isOldStyleKeys := isOldSyle(data)
-
-	// Always returns both key names — 'Source' and 'Master'.
-	for _, row := range data {
-		switch isOldStyleKeys {
-		case true:
-			discovered = duplicate(map[string]string{masterKey: row[masterKey]}, substituteRulesOld2New)
-		case false:
-			discovered = duplicate(map[string]string{sourceKey: row[sourceKey]}, substituteRulesNew2Old)
-		}
-
-		res = append(res, discovered)
+	if isOldSyle(data) {
+		return parseResponse(duplicateByKey(data, masterKey, substituteRulesOld2New))
 	}
 
-	return parseResponse(res)
+	return parseResponse(duplicateByKey(data, sourceKey, substituteRulesNew2Old))
 }

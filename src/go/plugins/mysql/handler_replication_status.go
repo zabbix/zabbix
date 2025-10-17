@@ -37,17 +37,15 @@ func replicationSlaveStatusHandler(
 		return nil, errs.Wrap(zbxerr.ErrorEmptyResult, "replication is not configured")
 	}
 
-	isOldStyleKeys := isOldSyle(data)
+	rule := substituteRulesNew2Old
+	if isOldSyle(data) {
+		rule = substituteRulesOld2New
+	}
 
 	if params[masterHostParam] != "" {
 		for _, m := range data {
 			if m[masterKey] == params[masterHostParam] || m[sourceKey] == params[masterHostParam] {
-				switch isOldStyleKeys {
-				case true:
-					return parseResponse(duplicate(m, substituteRulesOld2New))
-				case false:
-					return parseResponse(duplicate(m, substituteRulesNew2Old))
-				}
+				return parseResponse(duplicate(m, rule))
 			}
 		}
 
@@ -55,11 +53,7 @@ func replicationSlaveStatusHandler(
 	}
 
 	// If no any host passed in the key's parameter, returns status records of all hosts.
-	if isOldStyleKeys {
-		return parseResponse(duplicateAll(data, substituteRulesOld2New))
-	}
-
-	return parseResponse(duplicateAll(data, substituteRulesNew2Old))
+	return parseResponse(duplicateAll(data, rule))
 }
 
 func parseResponse(data any) (any, error) {

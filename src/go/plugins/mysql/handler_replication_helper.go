@@ -146,6 +146,17 @@ func duplicateAll(keyValueRows []map[string]string, rules substituteRules) []map
 	return result
 }
 
+// duplicateByKey function creates a new maps slice containing maps with only records with key/value passed by 'key'.
+func duplicateByKey(keyValueRows []map[string]string, key string, rules substituteRules) []map[string]string {
+	res := make([]map[string]string, 0)
+
+	for _, row := range keyValueRows {
+		res = append(res, duplicate(map[string]string{key: row[key]}, rules))
+	}
+
+	return res
+}
+
 // isOldSyle returns true if the result is based of the old style query. All results in the array are always based
 // on the same style.
 func isOldSyle(keyValueRows []map[string]string) bool {
