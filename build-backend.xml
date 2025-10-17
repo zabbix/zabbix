@@ -202,7 +202,7 @@
 			</exec>
 			<mkdir dir="tests_results/@{conf-name}"/>
 			<exec executable="tests/tests_run.pl" failonerror="off" output="tests_results/@{conf-name}/output.xml">
-				<arg line="-x @{conf-name}"/>
+				<arg line="-x @{conf-name} -s zbx_tcp_listen"/>
 			</exec>
 		</sequential>
 	</macrodef>
@@ -214,7 +214,7 @@
 		<property name="cmocka-1-default" value="CONFIG_SITE='share/config.site.d/gcc-debug' -q ${ZBX_BASE_FLAGS} --enable-ipv6 --with-mysql --with-openipmi --with-openssl --with-iconv"/>
 		<property name="cmocka-2-agent-only" value="CONFIG_SITE='share/config.site.d/gcc-debug' -q --enable-agent"/>
 		<property name="cmocka-3-server-only" value="CONFIG_SITE='share/config.site.d/gcc-debug' -q --enable-server --with-mysql --with-libcurl"/>
-		<property name="cmocka-4-proxy-only" value="CONFIG_SITE='share/config.site.d/gcc-debug' -q --enable-proxy --with-sqlite3 --with-libcurl"/>
+		<property name="cmocka-4-proxy-only" value="CONFIG_SITE='share/config.site.d/clang-debug-sanitize' -q --enable-proxy --with-sqlite3 --with-libcurl"/>
 		<property name="cmocka-5-sanitizer" value="CONFIG_SITE='share/config.site.d/clang-debug-sanitize' -q ${ZBX_BASE_FLAGS} --with-openssl --with-openipmi --enable-ipv6 --with-mysql --with-iconv"/>
 
 	</target>
