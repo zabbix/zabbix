@@ -2200,12 +2200,12 @@ button {
   background-color: #e79e0b;
   border-color: #e79e0b; }
 
-.overlay-dialogue.modal-widget-configuration {
+.overlay-dialogue.modal.modal-widget-configuration {
   --modal-width: auto;
   --modal-max-width: calc(100vw - 20px);
   --modal-min-width: 650px;
   box-sizing: border-box; }
-  .overlay-dialogue.modal-widget-configuration .overlay-dialogue-body {
+  .overlay-dialogue.modal.modal-widget-configuration .overlay-dialogue-body {
     overflow-x: auto; }
 
 .dashboard-widget-form {
@@ -5627,7 +5627,7 @@ div.dashboard-widget-problemsbysv .list-table tr[data-hostgroupid] {
 form.dashboard-widget-svggraph {
   max-width: 1330px;
   min-width: 1120px;
-  width: 100vw; }
+  width: min(100vw - 42px, calc(var(--modal-max-width) - 22px)); }
   form.dashboard-widget-svggraph .graph-widget-config-tabs {
     grid-column: 1 / -1; }
   form.dashboard-widget-svggraph .graph-widget-config-tabs > .tabs-nav {
