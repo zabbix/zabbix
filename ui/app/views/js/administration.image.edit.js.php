@@ -25,12 +25,10 @@
 		form_element = null;
 		rules = null;
 
-		init({rules, imageid, imagetype}) {
+		init({rules}) {
 			this.form_element = document.getElementById('image-form');
 			this.form = new CForm(this.form_element, rules);
 			this.rules = rules;
-			this.imageid = imageid;
-			this.imagetype = imagetype;
 			this.#initEvents();
 		}
 
@@ -72,7 +70,12 @@
 					}
 
 					const curl = new Curl('zabbix.php');
-					curl.setArgument('action', this.imageid ? 'image.update' : 'image.create');
+
+					const action = document.getElementById('imageid') !== null
+						? 'image.update'
+						: 'image.create';
+
+					curl.setArgument('action', action);
 
 					fetch(curl.getUrl(), {
 						method: 'POST',
@@ -109,11 +112,12 @@
 		delete() {
 			if (window.confirm('<?=_('Delete selected image?') ?>')) {
 				this.#setLoadingStatus(['delete']);
+				const fields = this.form.getAllValues();
 
 				const curl = new Curl('zabbix.php');
 				curl.setArgument('action', 'image.delete');
-				curl.setArgument('imageid', this.imageid);
-				curl.setArgument('imagetype', this.imagetype)
+				curl.setArgument('imageid', fields.imageid);
+				curl.setArgument('imagetype', fields.imagetype);
 				curl.setArgument(CSRF_TOKEN_NAME, <?= json_encode(CCsrfTokenHelper::get('image')) ?>);
 
 				redirect(curl.getUrl(), 'post', 'action', undefined, true);

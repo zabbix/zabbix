@@ -32,11 +32,8 @@ $form = (new CForm())
 	->setName($data['form_name'])
 	->addItem((new CVar(CSRF_TOKEN_NAME, CCsrfTokenHelper::get('image')))->removeId())
 	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)
-	->addVar('imagetype', $data['imagetype']);
-
-if ($data['imageid'] != null) {
-	$form->addVar('imageid', $data['imageid']);
-}
+	->addVar('imagetype', $data['imagetype'])
+	->addVar('imageid', $data['imageid']);
 
 $form_list = (new CFormList('imageFormList'))
 	->addRow(
@@ -100,9 +97,7 @@ $html_page->addItem($form->addItem($tab_view))->show();
 
 (new CScriptTag('
 	view.init('.json_encode([
-		'rules' => $data['js_validation_rules'],
-		'imageid' => $data['imageid'],
-		'imagetype' => $data['imagetype']
+		'rules' => $data['js_validation_rules']
 	]).');
 '))
 	->show();
