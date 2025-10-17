@@ -22,11 +22,9 @@
 <script>
 	const view = new class {
 
-		init({rules, usrgrpid, templategroup_rights, hostgroup_rights, tag_filters, ldap_status, mfa_status,
-				can_update_group}) {
+		init({rules, templategroup_rights, hostgroup_rights, tag_filters, ldap_status, mfa_status, can_update_group}) {
 			this.form_element = document.getElementById('user-group-form');
 			this.form = new CForm(this.form_element, rules);
-			this.usrgrpid = usrgrpid;
 			this.tag_filters = tag_filters;
 			this.templategroup_rights = templategroup_rights;
 			this.can_update_group = can_update_group;
@@ -344,7 +342,12 @@
 					}
 
 					var curl = new Curl('zabbix.php');
-					curl.setArgument('action', this.usrgrpid ? 'usergroup.update' : 'usergroup.create');
+
+					const action = document.getElementById('usrgrpid') !== null
+						? 'usergroup.update'
+						: 'usergroup.create';
+
+					curl.setArgument('action', action);
 
 					fetch(curl.getUrl(), {
 						method: 'POST',

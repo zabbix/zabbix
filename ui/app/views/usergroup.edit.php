@@ -32,11 +32,8 @@ $form = (new CForm())
 	->addItem((new CVar(CSRF_TOKEN_NAME, $csrf_token))->removeId())
 	->setId('user-group-form')
 	->setName('user_group_form')
-	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID);
-
-if ($data['usrgrpid'] != null) {
-	$form->addVar('usrgrpid', $data['usrgrpid']);
-}
+	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)
+	->addVar('usrgrpid', $data['usrgrpid']);
 
 $form_grid = (new CFormGrid())
 	->addItem([
@@ -366,7 +363,6 @@ $html_page
 (new CScriptTag(
 	'view.init('.json_encode([
 		'rules' => $data['js_validation_rules'],
-		'usrgrpid' => $data['usrgrpid'],
 		'templategroup_rights' => $data['templategroup_rights'],
 		'hostgroup_rights' => $data['hostgroup_rights'],
 		'tag_filters' => $data['tag_filters'],
