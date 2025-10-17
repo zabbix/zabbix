@@ -424,7 +424,6 @@ static void	DCinventory_value_free(zbx_inventory_value_t *inventory_value)
 static void	dc_history_set_error(zbx_dc_history_t *hdata, char *errmsg)
 {
 	zbx_dc_history_clean_value(hdata);
-	zbx_sha512_hash(errmsg, hdata->value.error_hash);
 	hdata->value.err = errmsg;
 	hdata->state = ITEM_STATE_NOTSUPPORTED;
 	hdata->flags |= ZBX_DC_FLAG_UNDEF;
@@ -594,6 +593,7 @@ static zbx_item_diff_t	*calculate_item_update(zbx_history_sync_item_t *item, con
 {
 	zbx_uint64_t	flags = 0;
 	const char	*item_error = NULL;
+	char		error_hash[ZBX_SHA512_BINARY_LENGTH];
 	zbx_item_diff_t	*diff;
 
 	if (0 != (ZBX_DC_FLAG_META & h->flags))
@@ -620,7 +620,9 @@ static zbx_item_diff_t	*calculate_item_update(zbx_history_sync_item_t *item, con
 						NULL, NULL, NULL, 0, 0, NULL, 0, NULL, 0, NULL, NULL, h->value.err);
 			}
 
-			if (0 != memcmp(item->error_hash, h->value.error_hash, sizeof(item->error_hash)))
+			zbx_sha512_hash(h->value.err, error_hash);
+
+			if (0 != memcmp(item->error_hash, error_hash, sizeof(error_hash)))
 				item_error = h->value.err;
 		}
 		else
@@ -637,15 +639,19 @@ static zbx_item_diff_t	*calculate_item_update(zbx_history_sync_item_t *item, con
 			}
 
 			item_error = "";
+			zbx_sha512_hash(item_error, error_hash);
 		}
 	}
-	else if (ITEM_STATE_NOTSUPPORTED == h->state && 0 != memcmp(item->error_hash, h->value.error_hash,
-			sizeof(item->error_hash)))
+	else if (ITEM_STATE_NOTSUPPORTED == h->state)
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "error reason for \"%s:%s\" changed: %s", item->host.host,
-				item->key_orig, h->value.err);
+		zbx_sha512_hash(h->value.err, error_hash);
+		if (0 != memcmp(item->error_hash, error_hash, sizeof(item->error_hash)))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "error reason for \"%s:%s\" changed: %s", item->host.host,
+					item->key_orig, h->value.err);
 
-		item_error = h->value.err;
+			item_error = h->value.err;
+		}
 	}
 
 	if (NULL != item_error)
@@ -673,7 +679,7 @@ static zbx_item_diff_t	*calculate_item_update(zbx_history_sync_item_t *item, con
 	if (0 != (ZBX_FLAGS_ITEM_DIFF_UPDATE_ERROR & flags))
 	{
 		diff->error = item_error;
-		memcpy(diff->error_hash, h->value.error_hash, sizeof(diff->error_hash));
+		memcpy(diff->error_hash, error_hash, sizeof(diff->error_hash));
 	}
 
 	return diff;

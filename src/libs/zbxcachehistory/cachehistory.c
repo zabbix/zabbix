@@ -3047,7 +3047,6 @@ static void	hc_copy_history_data(zbx_dc_history_t *history, zbx_uint64_t itemid,
 
 	if (ITEM_STATE_NOTSUPPORTED == data->state)
 	{
-		zbx_sha512_hash(data->value.str, history->value.error_hash);
 		history->value.err = zbx_strdup(NULL, data->value.str);
 		history->flags |= ZBX_DC_FLAG_UNDEF;
 		return;

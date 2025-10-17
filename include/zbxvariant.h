@@ -93,7 +93,6 @@ typedef union
 	zbx_uint64_t	ui64;
 	char		*str;
 	char		*err;
-	char		error_hash[ZBX_SHA512_BINARY_LENGTH];
 	zbx_log_value_t	*log;
 }
 zbx_history_value_t;
