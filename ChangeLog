@@ -3,6 +3,7 @@ Changes for 6.0.43rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-22157] added Map navigation tree widget problem filtering using Problem display and Show suppressed problems filter of map settings (dfofanovs)
 ...G...... [ZBX-24918] fixed crashes of Zabbix agent 2 for Windows related with PDH perf_counter (opucka)
 
 --------------------------------------------------------------------------------
