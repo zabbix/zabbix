@@ -575,7 +575,7 @@ class testInheritanceHostPrototype extends CLegacyWebTest {
 		$form->selectTab('Macros');
 		$this->assertMacros($macros);
 
-		// Check that inherited macros field are not editabble.
+		// Check that inherited macros field are not editable.
 		$fields = $this->getMacros();
 		foreach ($fields as $i => $field) {
 			$this->assertFalse($this->query('id:macros_'.$i.'_macro')->one()->isEnabled());
