@@ -12,9 +12,9 @@ Zabbix version: 7.0 and higher.
 ## Tested versions
 
 This template has been tested on:
-- MySQL 5.7, 8.0
-- Percona 8.0
-- MariaDB 10.4, 10.6.8
+- MySQL 5.7, 8.0, 9.4
+- Percona 8.4
+- MariaDB 10.6
 
 ## Configuration
 
@@ -187,26 +187,26 @@ EOF
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Replication discovery|<p>If "show slave status" returns Master_Host, "Replication: *" items are created.</p>|Zabbix agent (active)|mysql.replication.discovery["{$MYSQL.HOST}","{$MYSQL.PORT}"]<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
+|Replication discovery|<p>If "show replica status" returns Master_Host, "Replication: *" items are created.</p>|Zabbix agent (active)|mysql.replication.discovery["{$MYSQL.HOST}","{$MYSQL.PORT}"]<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
 
 ### Item prototypes for Replication discovery
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Replication Slave status {#MASTER_HOST}|<p>The item gets status information on the essential parameters of the slave threads.</p>|Zabbix agent (active)|mysql.slave_status["{$MYSQL.HOST}","{$MYSQL.PORT}","{#MASTER_HOST}"]|
-|Replication Slave SQL Running State {#MASTER_HOST}|<p>This shows the state of the SQL driver threads.</p>|Dependent item|mysql.slave_sql_running_state["{#MASTER_HOST}"]<p>**Preprocessing**</p><ul><li><p>XML XPath: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
-|Replication Seconds Behind Master {#MASTER_HOST}|<p>The number of seconds that the slave SQL thread is behind processing the master binary log.</p><p>A high number (or an increasing one) can indicate that the slave is unable to handle events</p><p>from the master in a timely fashion.</p>|Dependent item|mysql.seconds_behind_master["{#MASTER_HOST}"]<p>**Preprocessing**</p><ul><li><p>XML XPath: `/resultset/row/field[@name='Seconds_Behind_Master']/text()`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li><li><p>Does not match regular expression: `null`</p><p>⛔️Custom on fail: Set error to: `Replication is not performed.`</p></li></ul>|
-|Replication Slave IO Running {#MASTER_HOST}|<p>Whether the I/O thread for reading the master's binary log is running.</p><p>Normally, you want this to be Yes unless you have not yet started replication or have</p><p>explicitly stopped it with STOP SLAVE.</p>|Dependent item|mysql.slave_io_running["{#MASTER_HOST}"]<p>**Preprocessing**</p><ul><li><p>XML XPath: `/resultset/row/field[@name='Slave_IO_Running']/text()`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
-|Replication Slave SQL Running {#MASTER_HOST}|<p>Whether the SQL thread for executing events in the relay log is running.</p><p>As with the I/O thread, this should normally be Yes.</p>|Dependent item|mysql.slave_sql_running["{#MASTER_HOST}"]<p>**Preprocessing**</p><ul><li><p>XML XPath: `/resultset/row/field[@name='Slave_SQL_Running']/text()`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Replication {#REPLICA.NAME} status|<p>The item gets status information on the essential parameters of the {#REPLICA.KEY} threads.</p>|Zabbix agent (active)|mysql.slave_status["{$MYSQL.HOST}","{$MYSQL.PORT}","{#REPLICA.KEY}"]|
+|Replication {#REPLICA.NAME} SQL Running State|<p>This shows the state of the SQL driver threads.</p>|Dependent item|mysql.slave_sql_running_state["{#MASTER_HOST}"]<p>**Preprocessing**</p><ul><li><p>XML XPath: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+|Replication Seconds Behind {#SOURCE.NAME}|<p>The number of seconds that the {#REPLICA.KEY} SQL thread is behind processing the {#SOURCE.KEY} binary log.</p><p>A high number (or an increasing one) can indicate that the {#REPLICA.KEY} is unable to handle events</p><p>from the {#SOURCE.KEY} in a timely fashion.</p>|Dependent item|mysql.seconds_behind_master["{#REPLICA.KEY}"]<p>**Preprocessing**</p><ul><li><p>XML XPath: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li><li><p>Does not match regular expression: `null`</p><p>⛔️Custom on fail: Set error to: `Replication is not performed.`</p></li></ul>|
+|Replication {#REPLICA.NAME} IO Running|<p>Whether the I/O thread for reading the {#SOURCE.KEY}'s binary log is running.</p><p>Normally, you want this to be `Yes` unless you have not yet started replication or have</p><p>explicitly stopped it with `stop {#REPLICA.KEY}`.</p>|Dependent item|mysql.slave_io_running["{#REPLICA.KEY}"]<p>**Preprocessing**</p><ul><li><p>XML XPath: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Replication {#REPLICA.NAME} SQL Running|<p>Whether the SQL thread for executing events in the relay log is running.</p><p>As with the I/O thread, this should normally be Yes.</p>|Dependent item|mysql.slave_sql_running["{#REPLICA.KEY}"]<p>**Preprocessing**</p><ul><li><p>XML XPath: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 
 ### Trigger prototypes for Replication discovery
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|MySQL: Replication lag is too high|<p>Replication delay is too long.</p>|`min(/MySQL by Zabbix agent active/mysql.seconds_behind_master["{#MASTER_HOST}"],5m)>{$MYSQL.REPL_LAG.MAX.WARN}`|Warning||
-|MySQL: The slave I/O thread is not running|<p>Whether the I/O thread for reading the master's binary log is running.</p>|`count(/MySQL by Zabbix agent active/mysql.slave_io_running["{#MASTER_HOST}"],#1,"eq","No")=1`|Average||
-|MySQL: The slave I/O thread is not connected to a replication master|<p>Whether the slave I/O thread is connected to the master.</p>|`count(/MySQL by Zabbix agent active/mysql.slave_io_running["{#MASTER_HOST}"],#1,"ne","Yes")=1`|Warning|**Depends on**:<br><ul><li>MySQL: The slave I/O thread is not running</li></ul>|
-|MySQL: The SQL thread is not running|<p>Whether the SQL thread for executing events in the relay log is running.</p>|`count(/MySQL by Zabbix agent active/mysql.slave_sql_running["{#MASTER_HOST}"],#1,"eq","No")=1`|Warning|**Depends on**:<br><ul><li>MySQL: The slave I/O thread is not running</li></ul>|
+|MySQL: Replication lag is too high|<p>Replication delay is too long.</p>|`min(/MySQL by Zabbix agent active/mysql.seconds_behind_master["{#REPLICA.KEY}"],5m)>{$MYSQL.REPL_LAG.MAX.WARN}`|Warning||
+|MySQL: The {#REPLICA.KEY} I/O thread is not running|<p>Whether the I/O thread for reading the {#SOURCE.KEY}'s binary log is running.</p>|`count(/MySQL by Zabbix agent active/mysql.slave_io_running["{#REPLICA.KEY}"],#1,"eq","No")=1`|Average||
+|MySQL: The {#REPLICA.KEY} I/O thread is not connected to a replication {#SOURCE.KEY}|<p>Whether the {#REPLICA.KEY} I/O thread is connected to the {#SOURCE.KEY}.</p>|`count(/MySQL by Zabbix agent active/mysql.slave_io_running["{#REPLICA.KEY}"],#1,"ne","Yes")=1`|Warning|**Depends on**:<br><ul><li>MySQL: The {#REPLICA.KEY} I/O thread is not running</li></ul>|
+|MySQL: The SQL thread is not running|<p>Whether the SQL thread for executing events in the relay log is running.</p>|`count(/MySQL by Zabbix agent active/mysql.slave_sql_running["{#REPLICA.KEY}"],#1,"eq","No")=1`|Warning|**Depends on**:<br><ul><li>MySQL: The {#REPLICA.KEY} I/O thread is not running</li></ul>|
 
 ### LLD rule MariaDB discovery
 
