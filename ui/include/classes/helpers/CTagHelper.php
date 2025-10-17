@@ -102,9 +102,7 @@ class CTagHelper {
 				continue;
 			}
 
-			foreach ($filter_tags[$tag['tag']] as $filter_tag_i) {
-				$filter_tag = $filter_tags[$filter_tag_i];
-
+			foreach ($filter_tags[$tag['tag']] as $filter_tag) {
 				if (($filter_tag['operator'] == TAG_OPERATOR_LIKE
 						&& ($filter_tag['value'] === '' || stripos($tag['value'], $filter_tag['value']) !== false))
 						|| ($filter_tag['operator'] == TAG_OPERATOR_EQUAL && $tag['value'] === $filter_tag['value'])) {
@@ -174,7 +172,7 @@ class CTagHelper {
 			}
 
 			$html_elements[$objectid][] = (new CButtonIcon(ZBX_ICON_MORE))
-				->setHint($all_tag_html_elements, ZBX_STYLE_HINTBOX_WRAP);
+				->setHint($all_tag_html_elements, ZBX_STYLE_HINTBOX_WRAP.' '.ZBX_STYLE_TAGS_WRAPPER);
 		}
 
 		return $html_elements;
