@@ -114,7 +114,9 @@ class testDashboardTopHostsWidget extends testWidgets {
 		CDataHelper::addItemData(self::$top_hosts_itemids['top_hosts_text2'],  '2.00');
 		CDataHelper::addItemData(self::$top_hosts_itemids['top_hosts_trap_log'], 'Logs for text item');
 		CDataHelper::addItemData(self::$top_hosts_itemids['top_hosts_trap_char'], 'characters_here');
+	}
 
+	public static function prepareSparklineData() {
 		CDataHelper::call('hostgroup.create', [
 			['name' => 'Host group for sparkline tests']
 		]);
@@ -3288,6 +3290,8 @@ class testDashboardTopHostsWidget extends testWidgets {
 
 	/**
 	 * Check widget bars, indicators and sparkline with screenshots.
+	 *
+	 * @onBeforeOnce prepareSparklineData
 	 *
 	 * @dataProvider getScreenshotsData
 	 */
