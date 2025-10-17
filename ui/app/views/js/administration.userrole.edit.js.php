@@ -23,10 +23,9 @@
 
 	const view = new class {
 
-		init({rules, roleid, rules_create, readonly}) {
+		init({rules, rules_create, readonly}) {
 			this.form_element = document.getElementById('userrole-form');
 			this.form = new CForm(this.form_element, rules);
-			this.roleid = roleid;
 			this.readonly = readonly;
 
 			const usertype_select = document.getElementById('user-type');
@@ -295,7 +294,6 @@
 			const update_button = document.getElementById('update');
 			update_button.textContent = <?= json_encode(_('Add')) ?>;
 			update_button.setAttribute('id', 'add');
-			this.roleid = null;
 
 			document.getElementById('name').focus();
 			this.#removePopupMessages();
@@ -316,7 +314,12 @@
 					}
 
 					var curl = new Curl('zabbix.php');
-					curl.setArgument('action', this.roleid ? 'userrole.update' : 'userrole.create');
+
+					const action = document.getElementById('roleid') !== null
+						? 'userrole.update'
+						: 'userrole.create';
+
+					curl.setArgument('action', action);
 
 					fetch(curl.getUrl(), {
 						method: 'POST',

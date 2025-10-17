@@ -32,11 +32,8 @@ $form = (new CForm())
 	->addItem((new CVar(CSRF_TOKEN_NAME, $csrf_token))->removeId())
 	->setId('userrole-form')
 	->setName('user_role_form')
-	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID);
-
-if ($data['roleid'] !== null) {
-	$form->addVar('roleid', $data['roleid']);
-}
+	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)
+	->addVar('roleid', $data['roleid']);
 
 $form_container = new CDiv();
 
@@ -437,7 +434,6 @@ $html_page
 (new CScriptTag(
 	'view.init('.json_encode([
 		'rules' => $data['js_validation_rules'],
-		'roleid' => $data['roleid'],
 		'rules_create' => $data['js_validation_rules_create'],
 		'readonly' => $data['readonly']
 	]).');'
