@@ -1,0 +1,1 @@
+.......PS. [ZBX-24504] improved prometheus to json preprocessing step performance when reused with similar parameters in dependent items (wiper)

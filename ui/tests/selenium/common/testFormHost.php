@@ -1990,10 +1990,16 @@ class testFormHost extends CWebTest {
 		$interfaces_form->fill($interface);
 
 		if (in_array($data['action'], ['Clone', 'Delete'])) {
-			$form_type->query('button', $data['action'])->one()->click();
-		}
-		if ($data['action'] === 'Delete') {
-			$this->page->dismissAlert();
+			$button = $form_type->query('button', $data['action'])->one();
+			$button->click();
+
+			if ($data['action'] === 'Delete') {
+				$this->page->dismissAlert();
+			}
+			else {
+				$button->waitUntilNotVisible();
+				$form->waitUntilStalled();
+			}
 		}
 
 		$this->page->waitUntilReady();
