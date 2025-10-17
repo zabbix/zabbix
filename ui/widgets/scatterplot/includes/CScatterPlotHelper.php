@@ -72,7 +72,7 @@ class CScatterPlotHelper {
 		// Find what data source (history or trends) will be used for each metric.
 		self::getGraphDataSource($metrics, $errors, $options['data_source'], $width);
 		// Load aggregated Data for each dataset.
-		self::getMetricsAggregatedData($metrics, $width, $options['grouped_thresholds'], $options['interpolation']);
+		self::getMetricsAggregatedData($metrics, $options['grouped_thresholds'], $options['interpolation']);
 
 		$legend = self::getLegend($metrics, $options['legend']);
 
@@ -591,7 +591,7 @@ class CScatterPlotHelper {
 	/**
 	 * Select aggregated data to show in scatter plot for each metric and adjust color base on the thresholds.
 	 */
-	private static function getMetricsAggregatedData(array &$metrics, int $width, array $grouped_thresholds,
+	private static function getMetricsAggregatedData(array &$metrics, array $grouped_thresholds,
 			bool $interpolation): void {
 		foreach ($metrics as &$metric) {
 			$aggregate_interval = timeUnitToSeconds($metric['options']['aggregate_interval'], true);
