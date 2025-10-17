@@ -272,23 +272,15 @@ function makeValueCell(array $column, array $item_value, bool $text_wordbreak = 
 			}
 
 			$cell = new CCol();
-
-			$formatted_value = zbx_nl2br($item_value['value']);
-
-			foreach ($formatted_value as $value) {
-				json_decode($value);
-
-				if (json_last_error() !== JSON_ERROR_NONE) {
-					$formatted_value[] = HELLIP();
-				}
-			}
+			$formatted_value = zbx_nl2br(CTextHelper::trimWithEllipsis($item_value['value'], (64 * ZBX_KIBIBYTE)));
+			$hintbox_value = zbx_nl2br(CTextHelper::trimWithEllipsis($item_value['value'], ZBX_HINTBOX_CONTENT_LIMIT));
 
 			switch ($column['display']) {
 				case CWidgetFieldColumnsList::DISPLAY_AS_IS:
 					$cell
 						->addItem(
 							(new CPre($formatted_value))->setHint(
-								(new CDiv(CTextHelper::trimWithEllipsis($formatted_value[0], ZBX_HINTBOX_CONTENT_LIMIT)))
+								(new CDiv($hintbox_value))
 									->addClass(ZBX_STYLE_HINTBOX_RAW_DATA)
 									->addClass(ZBX_STYLE_HINTBOX_WRAP)
 							)
