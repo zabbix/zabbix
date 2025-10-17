@@ -136,8 +136,6 @@
 #define ZBX_DSERVICE_VALUE_LEN		255
 #define ZBX_MAX_DISCOVERED_VALUE_SIZE	(ZBX_DSERVICE_VALUE_LEN * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1)
 
-#define ZBX_SHA512_BINARY_LENGTH 64
-
 typedef zbx_uint64_t	(*zbx_dc_get_nextid_func_t)(const char *table_name, int num);
 
 #ifdef HAVE_ORACLE
