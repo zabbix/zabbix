@@ -449,7 +449,7 @@ function makeSectionLatestData(array $item, string $context): CDiv {
 				$last_value_column_value = (new CSpan(formatHistoryValue($item_value['value'], $item, false)))
 					->addClass(ZBX_STYLE_CURSOR_POINTER)
 					->setHint(
-						(new CDiv(mb_substr($item_value['value'], 0, ZBX_HINTBOX_CONTENT_LIMIT)))
+						(new CDiv(CTextHelper::trimWithEllipsis($item_value['value'], ZBX_HINTBOX_CONTENT_LIMIT)))
 							->addClass(ZBX_STYLE_HINTBOX_RAW_DATA)
 							->addClass(ZBX_STYLE_HINTBOX_WRAP),
 						'', true, '', 0

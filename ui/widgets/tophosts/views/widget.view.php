@@ -248,7 +248,8 @@ function createNonBinaryShowButton(string $column_name): CButton {
 }
 
 function createTextColumn(string $formatted_value, string $hint_value, string $color, bool $raw_data = false): CCol {
-	$hint = (new CDiv($hint_value))->addClass(ZBX_STYLE_HINTBOX_WRAP);
+	$hint = (new CDiv(CTextHelper::trimWithEllipsis($hint_value, ZBX_HINTBOX_CONTENT_LIMIT)))
+		->addClass(ZBX_STYLE_HINTBOX_WRAP);
 
 	if ($raw_data) {
 		$hint->addClass(ZBX_STYLE_HINTBOX_RAW_DATA);
