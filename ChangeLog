@@ -1,9 +1,19 @@
 Changes for 7.4.4rc1
 
 New features:
+.........T [ZBXNEXT-10245] added Stormshield SNS by SNMP template (knaglis)
+A......PS. [ZBXNEXT-10219] updated maximum supported PostgreSQL version to 18 (mprihodko)
 ...G...... [ZBXNEXT-7744] added support of TLS to Redis plugin in Zabbix agent 2 (opucka)
 
 Bug fixes:
+..F....... [ZBX-22157] added Map navigation tree widget problem filtering using Problem display and Show suppressed problems filter of map settings (dfofanovs)
+A......... [ZBX-27059] fixed conditions for the check "Cannot delete default MFA method" (dpankins)
+.......PS. [ZBX-26818] fixed crash on \"cannot get secrets for path\" error due to missing lock when using shared memory (vso)
+..F....... [ZBX-26548] fixed checkbox state for host object lists (gklavins, wczerneha)
+.......PS. [ZBX-24504] improved prometheus to json preprocessing step performance when reused with similar parameters in dependent items (wiper)
+..F....... [ZBX-26069] implemented the re-broadcast behavior for the widgets on forced update (ashubin, wczerneha)
+..F....... [ZBX-25743] fixed the broken item selection list in Firefox (gklavins, wczerneha)
+..F....... [ZBX-27055] fixed multiple confirmation requests when a popup was opened from another popup (averza)
 ...G...PS. [ZBX-25148] added adjustments for sequential data entries with the same timestamp (askolmeisters)
 ..F....... [ZBX-26501] changed the query responsible for retrieving macros from host, template and host prototype (rgontarski)
 ..F....... [ZBX-25394] fixed unassigned proxy indication in Queue Details, extended coverage to proxies managed by proxy groups (dpankins)
@@ -1072,9 +1082,15 @@ A.F....... [ZBX-23227] fixed issue where using an empty array or string value fo
 Changes for 7.0.20rc1
 
 New features:
+.........T [ZBXNEXT-10245] added Stormshield SNS by SNMP template (knaglis)
+A......PS. [ZBXNEXT-10219] updated maximum supported PostgreSQL version to 18 (mprihodko)
 ...G...... [ZBXNEXT-7744] added support of TLS to Redis plugin in Zabbix agent 2 (opucka)
 
 Bug fixes:
+..F....... [ZBX-22157] added Map navigation tree widget problem filtering using Problem display and Show suppressed problems filter of map settings (dfofanovs)
+A......... [ZBX-27059] fixed conditions for the check "Cannot delete default MFA method" (dpankins)
+.......PS. [ZBX-24504] improved prometheus to json preprocessing step performance when reused with similar parameters in dependent items (wiper)
+..F....... [ZBX-25743] fixed the broken item selection list in Firefox (gklavins, wczerneha)
 ...G...PS. [ZBX-25148] added adjustments for sequential data entries with the same timestamp (askolmeisters)
 ..F....... [ZBX-25394] fixed unassigned proxy indication in Queue Details, extended coverage to proxies managed by proxy groups (dpankins)
 ...G...... [ZBX-25263] fixed Zabbix agent to attempt next refresh active checks in 60 seconds in case of connection errors (arimdjonoks)
@@ -4871,6 +4887,7 @@ Changes for 6.0.43rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-22157] added Map navigation tree widget problem filtering using Problem display and Show suppressed problems filter of map settings (dfofanovs)
 ...G...... [ZBX-24918] fixed crashes of Zabbix agent 2 for Windows related with PDH perf_counter (opucka)
 
 --------------------------------------------------------------------------------
