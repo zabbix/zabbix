@@ -229,6 +229,10 @@ class CScatterPlotHelper {
 				? CColorPicker::getColorVariations($data_set['color'])
 				: CColorPicker::getPaletteColors($data_set['color_palette'], count($items_by_hosts));
 
+			$data_set = array_diff_key($data_set, array_flip(['x_axis_itemids, y_axis_itemids', 'x_axis_references',
+				'y_axis_references'
+			]));
+
 			foreach ($items_by_hosts as $items_by_host) {
 				if (!array_key_exists('x_axis_items', $items_by_host)
 						|| !array_key_exists('y_axis_items', $items_by_host)) {
@@ -243,8 +247,6 @@ class CScatterPlotHelper {
 					'options' => $data_set
 				];
 			}
-
-			unset($data_set['x_axis_itemids'], $data_set['y_axis_itemids']);
 		}
 	}
 
@@ -364,6 +366,10 @@ class CScatterPlotHelper {
 					}
 				}
 			}
+
+			$data_set = array_diff_key($data_set, array_flip(['x_axis_items', 'y_axis_items', 'x_axis_references',
+				'y_axis_references', 'hostgroupids', 'hosts', 'host_tags', 'host_tags_evaltype', 'color_palette'
+			]));
 
 			if ($result['x_axis_itemids'] && $result['y_axis_itemids']) {
 				$data_set['color'] = '#'.$data_set['color'];
@@ -610,8 +616,10 @@ class CScatterPlotHelper {
 				continue;
 			}
 
+			$metric_points = [];
+
 			foreach (['x_axis', 'y_axis'] as $axis) {
-				$metric_points = [];
+				$axis_points = [];
 
 				foreach ($result[$axis] as $points) {
 					usort($points['data'],
@@ -621,25 +629,25 @@ class CScatterPlotHelper {
 					);
 
 					foreach ($points['data'] as $point) {
-						$metric_points[$point['tick']][] = $point;
+						$axis_points[$point['tick']][] = $point;
 					}
 				}
 
 				switch ($metric['options']['aggregate_function']) {
 					case AGGREGATE_MIN:
-						foreach ($metric_points as $tick => $points) {
-							$metric['points'][$tick][$axis] = min(array_column($points, 'value'));
+						foreach ($axis_points as $tick => $points) {
+							$metric_points[$tick][$axis] = min(array_column($points, 'value'));
 						}
 						break;
 
 					case AGGREGATE_MAX:
-						foreach ($metric_points as $tick => $points) {
-							$metric['points'][$tick][$axis] = max(array_column($points, 'value'));
+						foreach ($axis_points as $tick => $points) {
+							$metric_points[$tick][$axis] = max(array_column($points, 'value'));
 						}
 						break;
 
 					case AGGREGATE_AVG:
-						foreach ($metric_points as $tick => $points) {
+						foreach ($axis_points as $tick => $points) {
 							$value_sum = 0;
 							$num_sum = 0;
 
@@ -648,24 +656,24 @@ class CScatterPlotHelper {
 								$num_sum += $point['num'];
 							}
 
-							$metric['points'][$tick][$axis] = $value_sum / $num_sum;
+							$metric_points[$tick][$axis] = $value_sum / $num_sum;
 						}
 						break;
 
 					case AGGREGATE_COUNT:
 					case AGGREGATE_SUM:
-						foreach ($metric_points as $tick => $points) {
+						foreach ($axis_points as $tick => $points) {
 							$value = array_sum(array_column($points, 'value'));
 
 							if ($metric['options']['aggregate_function'] == AGGREGATE_SUM || $value !== 0) {
-								$metric['points'][$tick][$axis] = $value;
+								$metric_points[$tick][$axis] = $value;
 							}
 						}
 						break;
 
 					case AGGREGATE_FIRST:
 					case AGGREGATE_LAST:
-						foreach ($metric_points as $tick => $points) {
+						foreach ($axis_points as $tick => $points) {
 							usort($points, static fn(array $point_a, array $point_b): int =>
 								[$point_a['clock'], $point_a['ns']] <=> [$point_b['clock'], $point_b['ns']]);
 
@@ -673,26 +681,31 @@ class CScatterPlotHelper {
 								? $points[0]
 								: $points[count($points) - 1];
 
-							$metric['points'][$tick][$axis] = $point['value'];
+							$metric_points[$tick][$axis] = $point['value'];
 						}
 						break;
 				}
 			}
 
-			foreach ($metric['points'] as $tick => &$point) {
-				if (array_key_exists('x_axis',$point) && array_key_exists('y_axis', $point)) {
-					$point['color'] = self::calculatePointColorByThresholds($metric['options']['color'],
-						$point['x_axis'], $point['y_axis'], $metric['x_units'], $metric['y_units'], $grouped_thresholds,
-						$interpolation
-					);
-				}
-				else {
-					unset($metric['points'][$tick]);
-				}
+			$metric_points = array_filter($metric_points,
+				static fn ($point) => array_key_exists('x_axis', $point) && array_key_exists('y_axis', $point)
+			);
+
+			if (!$metric_points) {
+				continue;
+			}
+
+			foreach ($metric_points as &$point) {
+				$point['color'] = self::calculatePointColorByThresholds($metric['options']['color'],
+					$point['x_axis'], $point['y_axis'], $metric['x_units'], $metric['y_units'], $grouped_thresholds,
+					$interpolation
+				);
 			}
 			unset($point);
 
-			ksort($metric['points'], SORT_NUMERIC);
+			ksort($metric_points, SORT_NUMERIC);
+
+			$metric['points'] = $metric_points;
 		}
 		unset($metric);
 	}
