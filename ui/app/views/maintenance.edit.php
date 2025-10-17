@@ -311,8 +311,7 @@ $output = [
 			'timeperiods' => $data['timeperiods'],
 			'tags' => $data['tags'],
 			'allowed_edit' => $data['allowed_edit'],
-			'rules' => $data['js_validation_rules'],
-			'maintenanceid' => $data['maintenanceid']
+			'rules' => $data['js_validation_rules']
 		]).');'
 ];
 
