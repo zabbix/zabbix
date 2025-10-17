@@ -85,9 +85,6 @@ class CControllerLatestViewRefresh extends CControllerLatestView {
 
 			$this->extendData($prepared_data);
 
-			CTagHelper::mergeOwnAndInheritedTags($prepared_data['items']);
-			CTagHelper::orderTags($prepared_data['items'], $filter['tags'], $filter['tag_priority']);
-
 			// make response
 			$data = [
 				'results' => [

@@ -124,6 +124,9 @@ abstract class CControllerLatest extends CController {
 				'preservekeys' => true
 			]), ['name_resolved' => 'name']);
 
+			CTagHelper::mergeOwnAndInheritedTags($items);
+			CTagHelper::orderTags($items, $filter['tags'], $filter['tag_priority']);
+
 			// If user role checkbox 'Invoke "Execute now" on read-only hosts' is ON, read-write items are the same.
 			$items_rw = $items;
 
