@@ -23,6 +23,7 @@
 #include <sys/mman.h>
 #include <sys/stat.h>
 
+#ifndef _WINDOWS
 static int get_host_from_etc_hosts(const char *ip, char *hostname, size_t hostnamelen)
 {
 	int	fd = openat(AT_FDCWD, "/etc/hosts", O_RDONLY);
@@ -86,6 +87,7 @@ static int get_host_from_etc_hosts(const char *ip, char *hostname, size_t hostna
 
 	return FAIL;
 }
+#endif
 
 void	zbx_mock_test_entry(void **state)
 {

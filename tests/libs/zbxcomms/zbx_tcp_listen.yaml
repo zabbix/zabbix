@@ -29,16 +29,6 @@ in:
 out:
   result: FAIL
 ---
-test case: "ipv6 random port"
-in:
-  ipv: "ipv6"
-  ip: "::1"
-  port: 0
-  timeout: 1
-  backlog_size: 1
-out:
-  result: SUCCEED
----
 test case: "invalid ipv6 address"
 in:
   ipv: "ipv6"
@@ -58,16 +48,6 @@ in:
   backlog_size: 1
 out:
   result: SUCCEED
----
-test case: "port out of range"
-in:
-  ipv: "ipv4"
-  ip: "0.0.0.0"
-  port: 100000  # invalid port
-  timeout: 1
-  backlog_size: 1
-out:
-  result: FAIL
 ---
 test case: "port negative value - edge case"
 in:

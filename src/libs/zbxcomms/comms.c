@@ -1352,6 +1352,13 @@ static int	tcp_err_in_use(void)
  *                                                                            *
  * Purpose: creates socket for listening                                      *
  *                                                                            *
+ * Parameters: s           - [OUT] socket structure                           *
+ *             listen_ip   - [IN]  IP address or comma-separated list of      *
+ *                                 addresses to listen on                     *
+ *             listen_port - [IN]  TCP port number (1024 - 32767)             *
+ *             timeout     - [IN]  socket timeout in seconds (1 - 30)         *
+ *             config_tcp_max_backlog_size - [IN]  maximum listen backlog     *
+ *                                                                            *
  * Return value: SUCCEED - success                                            *
  *               FAIL - error occurred                                        *
  *                                                                            *
