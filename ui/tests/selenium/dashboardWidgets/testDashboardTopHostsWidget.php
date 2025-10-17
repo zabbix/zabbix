@@ -287,7 +287,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 	}
 
 	public function testDashboardTopHostsWidget_Layout() {
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardids[self::DASHBOARD_SCREENSHOTS]);
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardids[self::DASHBOARD_CREATE]);
 		$dialog = CDashboardElement::find()->one()->edit()->addWidget();
 		$form = $dialog->asForm();
 		$this->assertEquals('Add widget', $dialog->getTitle());
