@@ -42,6 +42,5 @@ void	zbx_mock_test_entry(void **state)
 		zbx_mock_assert_int_eq("return value:", exp_result, result);
 	}
 
-
 	zbx_tcp_unlisten(&s);
 }
