@@ -1,1 +1,1 @@
-...G...... [ZBXNEXT-10012] added mysql version param to replication keys for Zabbix agent 2 MySQL plugin (lsurvilo)
+...G...... [ZBXNEXT-10012] added both SHOW SLAVE STATUS and SHOW REPLICA STATUS for Zabbix agent 2 MySQL plugin (lsurvilo)
