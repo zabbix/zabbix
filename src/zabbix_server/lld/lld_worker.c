@@ -119,11 +119,9 @@ static void	lld_process_task(const zbx_ipc_message_t *message)
 		/* with successful LLD processing LLD error will be set to empty string */
 		if (NULL != error)
 		{
-			char	error_hash[64];
+			zbx_sha512_hash(error, diff.error_hash);
 
-			zbx_sha512_hash(error, error_hash);
-
-			if (0 != memcmp(item.error_hash, error_hash, sizeof(error_hash)))
+			if (0 != memcmp(item.error_hash, diff.error_hash, sizeof(item.error_hash)))
 			{
 				diff.error = error;
 				diff.flags |= ZBX_FLAGS_ITEM_DIFF_UPDATE_ERROR;
