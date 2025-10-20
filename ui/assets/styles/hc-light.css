@@ -5695,13 +5695,12 @@ div.dashboard-widget-problemsbysv .by-severity-widget > div {
 
 form.dashboard-widget-scatterplot {
   max-width: 1330px;
-  min-width: 1120px;
-  width: 100vw; }
-  form.dashboard-widget-scatterplot .graph-widget-config-tabs {
+  width: min(100vw - 42px, calc(var(--modal-max-width) - 22px)); }
+  form.dashboard-widget-scatterplot .scatter-plot-widget-config-tabs {
     grid-column: 1 / -1; }
-  form.dashboard-widget-scatterplot .graph-widget-config-tabs > .tabs-nav {
+  form.dashboard-widget-scatterplot .scatter-plot-config-tabs > .tabs-nav {
     border-top: 1px solid #9f9f9f; }
-  form.dashboard-widget-scatterplot .graph-widget-config-tabs .ui-tabs-nav {
+  form.dashboard-widget-scatterplot .scatter-plot-config-tabs .ui-tabs-nav {
     position: sticky;
     top: 0;
     background: #f3f3f3;

@@ -695,6 +695,8 @@ window.widget_form = new class extends CWidgetForm {
 		// Legend tab.
 		const show_legend = document.getElementById('legend').checked;
 
+		document.getElementById('legend_aggregation').disabled = !show_legend;
+
 		for (const input of this._form.querySelectorAll('[name=legend_lines_mode]')) {
 			input.disabled = !show_legend;
 		}

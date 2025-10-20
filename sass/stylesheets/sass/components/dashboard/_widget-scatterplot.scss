@@ -2,14 +2,13 @@
 
 form.dashboard-widget-scatterplot {
 	max-width: 1330px;
-	min-width: 1120px;
-	width: 100vw;
+	width: unquote("min(100vw - 42px, calc(var(--modal-max-width) - 22px))");
 
-	.graph-widget-config-tabs {
+	.scatter-plot-widget-config-tabs {
 		grid-column: 1 / -1;
 	}
 
-	.graph-widget-config-tabs {
+	.scatter-plot-config-tabs {
 		> .tabs-nav {
 			border-top: 1px solid $ui-border-color;
 		}

@@ -48,7 +48,6 @@ class CScatterPlotHelper {
 	 *                                                                based on the value of the metric.
 	 *                        bool    $options['interpolation']       Apply interpolation to threshold color.
 	 *                        array   $options['legend']              Options for graph legend.
-	 *                        int     $options['legend_lines']        Number of lines in the legend.
 	 *
 	 * @param int   $width
 	 * @param int   $height
@@ -65,7 +64,7 @@ class CScatterPlotHelper {
 		self::getMetricsPattern($metrics, $options['data_sets'], $options['templateid'], $options['override_hostid']);
 		self::getMetricsItems($metrics, $options['data_sets'], $options['templateid'], $options['override_hostid']);
 		self::sortByDataset($metrics);
-		self::setMetricNames($metrics);
+		self::setMetricNames($metrics, $options['legend']);
 		self::applyUnits($metrics, $options['axes']);
 		// Apply time periods for each $metric, based on graph/dashboard time as well as metric level time shifts.
 		self::getTimePeriods($metrics, $options['time_period']);
@@ -561,16 +560,18 @@ class CScatterPlotHelper {
 	/**
 	 * Set metric names from X axis and Y axis items and aggregation function used.
 	 */
-	private static function setMetricNames(array &$metrics): void {
+	private static function setMetricNames(array &$metrics, array $legend_options): void {
 		foreach ($metrics as &$metric) {
-			$aggregation_name = CItemHelper::getAggregateFunctionName($metric['options']['aggregate_function']);
+			$aggregation_name = $legend_options['show_aggregation']
+				? CItemHelper::getAggregateFunctionName($metric['options']['aggregate_function']).'('
+				: '';
 
 			foreach (['x_axis_items', 'y_axis_items'] as $axis) {
-				$name = $aggregation_name.'(';
+				$name = $aggregation_name;
 
 				$count = 0;
 
-				foreach ($metric[$axis] as &$item) {
+				foreach ($metric[$axis] as $item) {
 					if ($count > 0) {
 						$name .= ', ';
 					}
@@ -581,7 +582,13 @@ class CScatterPlotHelper {
 				}
 				unset($item);
 
-				$name .= ')';
+				if ($legend_options['show_aggregation']) {
+					$name .= ')';
+				}
+				elseif ($count > 1) {
+					$name = '('.$name.')';
+				}
+
 				$metric[$axis.'_name'] = $name;
 			}
 		}
