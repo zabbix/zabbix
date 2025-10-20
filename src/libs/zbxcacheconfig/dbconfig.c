@@ -3471,7 +3471,7 @@ static void	DCsync_items(zbx_dbsync_t *sync, zbx_uint64_t revision, zbx_synced_n
 			item->state = (unsigned char)atoi(row[12]);
 			ZBX_STR2UINT64(item->lastlogsize, row[20]);
 			item->mtime = atoi(row[21]);
-			dc_strpool_replace(found, &item->error, row[27]);
+			zbx_sha512_hash(row[27], item->error_hash);
 			item->data_expected_from = now;
 			item->location = ZBX_LOC_NOWHERE;
 			item->poller_type = ZBX_NO_POLLER;
@@ -3743,7 +3743,6 @@ static void	DCsync_items(zbx_dbsync_t *sync, zbx_uint64_t revision, zbx_synced_n
 			zbx_binary_heap_remove_direct(&config->queues[item->poller_type], item->itemid);
 
 		dc_strpool_release(item->key);
-		dc_strpool_release(item->error);
 		dc_strpool_release(item->delay);
 		dc_strpool_release(item->history_period);
 
@@ -9465,10 +9464,7 @@ static void	DCget_item(zbx_dc_item_t *dst_item, const ZBX_DC_ITEM *src_item)
 
 	dst_item->delay = zbx_strdup(NULL, src_item->delay);	/* not used, should be initialized */
 
-	if ('\0' != *src_item->error)
-		dst_item->error = zbx_strdup(NULL, src_item->error);
-	else
-		dst_item->error = NULL;
+	memcpy(dst_item->error_hash, src_item->error_hash, sizeof(dst_item->error_hash));
 
 	switch (src_item->value_type)
 	{
@@ -9713,7 +9709,6 @@ void	zbx_dc_config_clean_items(zbx_dc_item_t *items, int *errcodes, size_t num)
 		}
 
 		zbx_free(items[i].delay);
-		zbx_free(items[i].error);
 	}
 }
 
@@ -14813,7 +14808,7 @@ void	zbx_dc_config_items_apply_changes(const zbx_vector_item_diff_ptr_t *item_di
 			dc_item->mtime = diff->mtime;
 
 		if (0 != (ZBX_FLAGS_ITEM_DIFF_UPDATE_ERROR & diff->flags))
-			dc_strpool_replace(1, &dc_item->error, diff->error);
+			memcpy(dc_item->error_hash, diff->error_hash, sizeof(dc_item->error_hash));
 
 		if (0 != (ZBX_FLAGS_ITEM_DIFF_UPDATE_STATE & diff->flags))
 			dc_item->state = diff->state;
