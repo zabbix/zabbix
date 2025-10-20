@@ -442,12 +442,14 @@ window.widget_form = new class extends CWidgetForm {
 		const row = target.closest('.single-item-table-row');
 		const row_index = row.rowIndex;
 
-		const itemid_input = row.querySelector('input[name$="[itemids][]"');
+		const key = this._getItemListTableKey(target);
+
+		const itemid_input = row.querySelector(`input[name$="${key}][]"]`);
 
 		if (itemid_input.value !== '0') {
 			const excludeids = [];
 
-			for (const input of dataset.querySelectorAll('.single-item-table-row input[name$="[itemids][]"]')) {
+			for (const input of dataset.querySelectorAll(`.single-item-table-row input[name$="${key}][]"]`)) {
 				if (input.value !== '0') {
 					excludeids.push(input.value);
 				}
@@ -459,8 +461,8 @@ window.widget_form = new class extends CWidgetForm {
 					srcfld1: 'itemid',
 					srcfld2: 'name',
 					dstfrm: this._form.id,
-					dstfld1: `items_${dataset_index}_${row_index}_itemid`,
-					dstfld2: `items_${dataset_index}_${row_index}_name`,
+					dstfld1: `${key}_${dataset_index}_${row_index}_itemid`,
+					dstfld2: `${key}_${dataset_index}_${row_index}_name`,
 					numeric: 1,
 					writeonly: 1,
 					with_webitems: 1,
@@ -475,8 +477,8 @@ window.widget_form = new class extends CWidgetForm {
 					srcfld1: 'itemid',
 					srcfld2: 'name',
 					dstfrm: this._form.id,
-					dstfld1: `items_${dataset_index}_${row_index}_itemid`,
-					dstfld2: `items_${dataset_index}_${row_index}_name`,
+					dstfld1: `${key}_${dataset_index}_${row_index}_itemid`,
+					dstfld2: `${key}_${dataset_index}_${row_index}_name`,
 					numeric: 1,
 					writeonly: 1,
 					with_webitems: 1,
@@ -489,7 +491,9 @@ window.widget_form = new class extends CWidgetForm {
 		else {
 			const exclude_typed_references = [];
 
-			for (const input of dataset.querySelectorAll('.single-item-table-row input[name$="[references][]"]')) {
+			const reference_key = key === 'x_axis_itemids' ? 'x_axis_references' : 'y_axis_references';
+
+			for (const input of dataset.querySelectorAll(`.single-item-table-row input[name$="${reference_key}][]"]`)) {
 				if (input.value !== '') {
 					exclude_typed_references.push(input.value);
 				}
@@ -544,7 +548,7 @@ window.widget_form = new class extends CWidgetForm {
 			else {
 				const name_col = row.querySelector('.table-col-name');
 				const name_col_link = name_col.querySelector('a');
-				const references_input = row.querySelector('input[name$="[references][]"');
+				const references_input = row.querySelector('input[name$="references][]"');
 
 				name_col.classList.remove('unavailable-widget');
 				name_col_link.textContent = e.detail.name;
