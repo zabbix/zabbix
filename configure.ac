@@ -1203,7 +1203,7 @@ fi
 
 AM_CONDITIONAL(STATIC_LINKING, test "x$static_linking" = "xyes" || test "x$static_linking_libs" = "xyes")
 if test "x$static_linking" = "xyes" || test "x$static_linking_libs" = "xyes"; then
-	AC_DEFINE(STATIC_LINKING,1,[Text])
+	AC_DEFINE(STATIC_LINKING,1,[Define to 1 if libraries are linked statically.])
 fi
 
 AC_ARG_ENABLE(server,[  --enable-server         Turn on build of Zabbix server],
