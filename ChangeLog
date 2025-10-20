@@ -7,6 +7,7 @@ A......PS. [ZBXNEXT-10219] updated maximum supported PostgreSQL version to 18 (m
 ...G...... [ZBXNEXT-7744] added support of TLS to Redis plugin in Zabbix agent 2 (opucka)
 
 Bug fixes:
+........S. [ZBX-27111] fixed new timer being allocated each time trigger value is updated (vso)
 .........T [ZBX-26544] added a preprocessing step to the "Outbound packets discarded" item in "FortiGate by SNMP" template (aiantsen)
 ..F....... [ZBX-22157] added Map navigation tree widget problem filtering using Problem display and Show suppressed problems filter of map settings (dfofanovs)
 A......... [ZBX-27059] fixed conditions for the check "Cannot delete default MFA method" (dpankins)
@@ -1092,6 +1093,7 @@ A......PS. [ZBXNEXT-10219] updated maximum supported PostgreSQL version to 18 (m
 ...G...... [ZBXNEXT-7744] added support of TLS to Redis plugin in Zabbix agent 2 (opucka)
 
 Bug fixes:
+........S. [ZBX-27111] fixed new timer being allocated each time trigger value is updated (vso)
 .........T [ZBX-26544] added a preprocessing step to the "Outbound packets discarded" item in "FortiGate by SNMP" template (aiantsen)
 ..F....... [ZBX-22157] added Map navigation tree widget problem filtering using Problem display and Show suppressed problems filter of map settings (dfofanovs)
 A......... [ZBX-27059] fixed conditions for the check "Cannot delete default MFA method" (dpankins)
