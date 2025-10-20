@@ -149,7 +149,12 @@ class CWidgetFieldDataSet extends CWidgetField {
 			return $captions;
 		}
 
-		foreach ($hostgroups as $hostgroup) {
+		foreach ($hostgroupids as $hostgroupid) {
+			$hostgroup = array_key_exists($hostgroupid, $hostgroups) ? $hostgroups[$hostgroupid] : [
+				'groupid' => $hostgroupid,
+				'name' => _('Inaccessible group')
+			];
+
 			$captions[ZBX_WIDGET_FIELD_TYPE_GROUP][$hostgroup['groupid']] = [
 				'id' => $hostgroup['groupid'],
 				'name' => $hostgroup['name']
@@ -160,15 +165,17 @@ class CWidgetFieldDataSet extends CWidgetField {
 	}
 
 	public function validate(bool $strict = false): array {
-		$errors = [];
+		if (!$strict) {
+			return [];
+		}
 
 		$validation_rules = $this->getValidationRules($strict);
 		$value = $this->getValue();
 		$label = $this->getErrorLabel();
 
-		if (!count($value)) {
+		if (!$value) {
 			if (!CApiInputValidator::validate($validation_rules, $value, $label, $error)) {
-				$errors[] = $error;
+				return [$error];
 			}
 		}
 		else {
@@ -199,14 +206,19 @@ class CWidgetFieldDataSet extends CWidgetField {
 			}
 
 			if (!CApiInputValidator::validate($validation_rules_by_type, $data, $label.'/'.($index + 1), $error)) {
-				$errors[] = $error;
-				break;
+				return [$error];
 			}
 
 			if ($data['dataset_type'] == self::DATASET_TYPE_SINGLE_ITEM) {
 				foreach (['x_axis', 'y_axis'] as $key) {
 					foreach ($data[$key.'_itemids'] as $i => &$item_spec) {
 						if ($item_spec == 0) {
+							if ($data[$key.'_references'][$i] === '') {
+								return [_s('Invalid parameter "%1$s": %2$s.', $label.'/'.($index + 1),
+									_('referred widget is unavailable')
+								)];
+							}
+
 							$item_spec = [CWidgetField::FOREIGN_REFERENCE_KEY => $data[$key.'_references'][$i]];
 						}
 					}
@@ -223,10 +235,8 @@ class CWidgetFieldDataSet extends CWidgetField {
 
 				$override_host_field->setValue($data['override_hostid']);
 
-				$errors = $override_host_field->validate($strict);
-
-				if ($errors) {
-					break;
+				if ($errors = $override_host_field->validate($strict)) {
+					return $errors;
 				}
 
 				$data['override_hostid'] = $override_host_field->getValue();
@@ -234,12 +244,9 @@ class CWidgetFieldDataSet extends CWidgetField {
 		}
 		unset($data);
 
-		if (!$errors) {
+		$this->setValue($value);
 
-			$this->setValue($value);
-		}
-
-		return $errors;
+		return [];
 	}
 
 	public function toApi(array &$widget_fields = []): void {
