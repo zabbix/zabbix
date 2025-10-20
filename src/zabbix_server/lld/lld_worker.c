@@ -30,6 +30,7 @@
 #include "zbxdb.h"
 #include "zbxdbhigh.h"
 #include "zbxalgo.h"
+#include "zbxhash.h"
 
 typedef struct
 {
@@ -144,10 +145,15 @@ static void	lld_flush_value(zbx_lld_value_t *lld_value, unsigned char state, con
 	}
 
 	/* with successful LLD processing LLD error will be set to empty string */
-	if (NULL != error && 0 != strcmp(error, ZBX_NULL2EMPTY_STR(lld_value->item.error)))
+	if (NULL != error)
 	{
-		diff.error = error;
-		diff.flags |= ZBX_FLAGS_ITEM_DIFF_UPDATE_ERROR;
+		zbx_sha512_hash(error, diff.error_hash);
+
+		if (0 != memcmp(lld_value->item.error_hash, diff.error_hash, sizeof(lld_value->item.error_hash)))
+		{
+			diff.error = error;
+			diff.flags |= ZBX_FLAGS_ITEM_DIFF_UPDATE_ERROR;
+		}
 	}
 
 	if (0 != lld_value->meta)
