@@ -33,6 +33,9 @@ void	zbx_mock_test_entry(void **state)
 	ZBX_UNUSED(state);
 
 #ifndef HAVE_IPV6
+	if (0 == strcmp(ipv, "ipv6"))
+		skip();
+
 	if (0 == strcmp(ipv, "ipv4"))
 #else
 	if (0 == strcmp(ipv, "ipv4") || 0 == strcmp(ipv, "ipv6"))
@@ -42,6 +45,6 @@ void	zbx_mock_test_entry(void **state)
 
 		zbx_mock_assert_int_eq("return value:", exp_result, result);
 	}
-	zbx_mock_assert_int_eq("NEAR: zbx_tcp_unlisten", SUCCEED, FAIL);
+
 	zbx_tcp_unlisten(&s);
 }
