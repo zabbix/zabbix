@@ -87,7 +87,7 @@ window.item_edit_form = new class {
 		}
 
 		this.footer = this.overlay.$dialogue.$footer[0];
-		this.tags_table = document.getElementById('tagsFormList').querySelector('[data-field-name="tags"]');
+		this.tags_table = this.form_element.querySelector('[data-field-name="tags"]');
 
 		ZABBIX.PopupManager.setReturnUrl(return_url);
 

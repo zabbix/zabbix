@@ -30,7 +30,7 @@ window.template_edit_popup = new class {
 		this.linked_templateids = this.#getLinkedTemplates();
 		this.all_templateids = null;
 		this.show_inherited_tags = false;
-		this.tags_table = document.getElementById('tagsFormList').querySelector('[data-field-name="tags"]');
+		this.tags_table = this.form_element.querySelector('[data-field-name="tags"]');
 		this.show_inherited_macros = false;
 
 		const return_url = new URL('zabbix.php', location.href);

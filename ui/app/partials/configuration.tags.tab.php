@@ -25,9 +25,6 @@ if (!$data['readonly']) {
 	$this->includeJsFile('configuration.tags.tab.js.php');
 }
 
-// form list
-$form_grid = (new CFormGrid())->setId('tagsFormList');
-
 $on_change = null;
 $show_inherited_tags_id = 'show_inherited_tags';
 
@@ -61,7 +58,7 @@ switch ($data['source']) {
 		break;
 }
 
-$form_grid->addItem(
+$form_grid = (new CFormGrid())->addItem(
 	new CFormField(
 		(new CRadioButtonList($show_inherited_tags_id, (int) $data['show_inherited_tags']))
 			->addValue($btn_labels[0], 0, null, $on_change)

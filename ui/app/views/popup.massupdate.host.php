@@ -203,10 +203,7 @@ $inventory_tab->addRow(
 		->setModern(true)
 );
 
-$tags_tab = new CFormList('tagsFormList');
-
-// append tags table to form list
-$tags_tab->addRow(
+$tags_tab = (new CFormList())->addRow(
 	(new CVisibilityBox('visible[tags]', 'tags-field', _('Original')))->setLabel(_('Tags')),
 	(new CDiv([
 		(new CRadioButtonList('mass_update_tags', ZBX_ACTION_ADD))
