@@ -87,6 +87,8 @@ static zbx_ds_dcheck_t	*dcheck_clone_get(zbx_dc_dcheck_t *dcheck, zbx_vector_ds_
 			zbx_dc_expand_user_and_func_macros(um_handle_secure, &dcheck_ptr->snmpv3_contextname, NULL,
 					0, NULL);
 		}
+
+		zbx_dc_close_user_macros(um_handle);
 	}
 
 	zbx_vector_ds_dcheck_ptr_append(ds_dchecks_common, ds_dcheck);
@@ -170,6 +172,7 @@ static zbx_uint64_t	process_checks(const zbx_dc_drule_t *drule, int unique, zbx_
 		}
 
 		ds_dcheck_common = dcheck_clone_get(dcheck, ds_dchecks_common);
+
 		checks_count += process_check_range(drule, ds_dcheck_common, ipranges, tasks);
 	}
 
