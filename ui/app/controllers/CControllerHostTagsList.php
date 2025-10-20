@@ -25,14 +25,21 @@ class CControllerHostTagsList extends CController {
 
 	protected function checkInput(): bool {
 		$fields = [
-			'source' =>					'required|string|in '.implode(',', ['template', 'host', 'host_prototype']),
+			'source' =>					'string|in '.implode(',', ['template', 'host', 'host_prototype']),
 			'hostid' =>					'db hosts.hostid',
+			'parent_discoveryid' =>		'db items.itemid',
 			'templateids' =>			'array',
 			'show_inherited_tags' =>	'in 0,1',
 			'tags' =>					'array'
 		];
 
 		$ret = $this->validateInput($fields);
+
+		if ($ret && !array_intersect_key($this->getInputAll(), array_flip(['source', 'hostid', 'parent_discoveryid']))) {
+			error(_('Incorrect input parameters.'));
+
+			$ret = false;
+		}
 
 		if (!$ret) {
 			$this->setResponse(
@@ -48,23 +55,57 @@ class CControllerHostTagsList extends CController {
 	}
 
 	protected function checkPermissions(): bool {
-		if (!$this->hasInput('hostid')) {
-			return true;
+		if ($this->hasInput('parent_discoveryid')) {
+			$db_lld_rules = API::DiscoveryRule()->get([
+				'output' => [],
+				'selectHosts' => ['status'],
+				'itemids' => $this->getInput('parent_discoveryid'),
+				'editable' => true
+			]);
+
+			return $db_lld_rules
+				&& (($db_lld_rules[0]['hosts'][0]['status'] == HOST_STATUS_TEMPLATE
+						&& $this->checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES))
+					|| $this->checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS));
 		}
 
-		return (bool) match ($this->getInput('source')) {
-			'host' => API::Host()->get([
+		if ($this->hasInput('hostid')) {
+			$hostid = $this->getInput('hostid');
+
+			$db_templates = API::Template()->get([
 				'output' => [],
-				'hostids' => [$this->getInput('hostid')]
-			]),
-			'host_prototype' => API::HostPrototype()->get([
+				'templateids' => [$hostid]
+			]);
+
+			if ($db_templates) {
+				return $this->checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES);
+			}
+
+			$db_hosts = API::Host()->get([
 				'output' => [],
-				'hostids' => [$this->getInput('hostid')]
-			]),
-			'template' => API::Template()->get([
+				'hostids' => [$hostid]
+			]);
+
+			if ($db_hosts) {
+				return $this->checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS);
+			}
+
+			$db_host_prototypes = API::HostPrototype()->get([
 				'output' => [],
-				'templateids' => [$this->getInput('hostid')]
-			])
+				'selectParentHost' => ['status'],
+				'hostids' => [$hostid]
+			]);
+
+			return $db_host_prototypes
+				&& (($db_host_prototypes[0]['parentHost']['status'] == HOST_STATUS_TEMPLATE
+						&& $this->checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES))
+					|| $this->checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS));
+		}
+
+		return match ($this->getInput('source')) {
+			'template' => $this->checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES),
+			'host' => $this->checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS),
+			'host_prototype' => false
 		};
 	}
 

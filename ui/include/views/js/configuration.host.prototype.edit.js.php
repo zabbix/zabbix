@@ -146,6 +146,7 @@
 			const data = {
 				source: 'host_prototype',
 				hostid: fields.hostid,
+				parent_discoveryid: fields.parent_discoveryid,
 				templateids: this.getAllTemplates(),
 				show_inherited_tags: fields.show_inherited_tags,
 				tags: fields.tags
