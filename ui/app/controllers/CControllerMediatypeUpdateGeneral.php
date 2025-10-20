@@ -25,7 +25,7 @@ abstract class CControllerMediatypeUpdateGeneral extends CController {
 		return $this->checkAccess(CRoleHelper::UI_ADMINISTRATION_MEDIA_TYPES);
 	}
 
-	final protected function processMediatypeData(&$mediatype): void {
+	final protected function processMediatypeData(array &$mediatype): void {
 		if ($mediatype['type'] == MEDIA_TYPE_EMAIL) {
 			if ($mediatype['provider'] === CMediatypeHelper::EMAIL_PROVIDER_SMTP) {
 				if ($mediatype['smtp_authentication'] == SMTP_AUTHENTICATION_PASSWORD) {

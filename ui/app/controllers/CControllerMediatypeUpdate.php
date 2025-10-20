@@ -244,7 +244,7 @@ class CControllerMediatypeUpdate extends CControllerMediatypeUpdateGeneral {
 			],
 			'maxattempts' => ['db media_type.maxattempts', 'min' => 1, 'max' => 100],
 			'attempt_interval' => ['db media_type.attempt_interval', 'required', 'not_empty',
-				'use' => [CTimeUnitValidator::class, ['min' => 0, 'max' => SEC_PER_HOUR]],
+				'use' => [CTimeUnitValidator::class, ['min' => 0, 'max' => SEC_PER_HOUR]]
 			]
 		]];
 	}
