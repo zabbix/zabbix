@@ -384,7 +384,8 @@ static void	async_timeout_timer(evutil_socket_t fd, short events, void *arg)
 
 			ares_timeout(poller_config->channel, &tv, &tv_next);
 
-			zabbix_log(LOG_LEVEL_DEBUG, "next timer sec:%ld usec:%ld", tv_next.tv_sec, tv_next.tv_usec);
+			zabbix_log(LOG_LEVEL_DEBUG, "next timer sec:%ld usec:%ld", (long)tv_next.tv_sec,
+					(long)tv_next.tv_usec);
 		}
 
 		evtimer_add(poller_config->async_timeout_timer, &tv_next);
@@ -840,6 +841,8 @@ ZBX_THREAD_ENTRY(zbx_async_poller_thread, args)
 #endif
 	}
 
+	zbx_setproctitle("%s #%d [terminating]", get_process_type_string(process_type), process_num);
+
 	async_poller_destroy(&poller_config);
 
 #ifdef HAVE_NETSNMP
@@ -850,7 +853,6 @@ ZBX_THREAD_ENTRY(zbx_async_poller_thread, args)
 
 	zbx_setproctitle("%s #%d [terminated]", get_process_type_string(process_type), process_num);
 
-	while (1)
-		zbx_sleep(SEC_PER_MIN);
+	exit(EXIT_SUCCESS);
 #undef STAT_INTERVAL
 }

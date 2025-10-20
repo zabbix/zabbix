@@ -435,7 +435,7 @@ class testInheritanceHostPrototype extends CLegacyWebTest {
 	 */
 	public function testInheritanceHostPrototype_Clone($data) {
 		$this->selectHostPrototypeForUpdate('host', $data);
-		$this->zbxTestClickWait('clone');
+		$this->query('button:Clone')->waitUntilVisible()->one()->click()->waitUntilNotVisible();
 
 		if (array_key_exists('cloned_name', $data)) {
 			$this->zbxTestInputTypeOverwrite('host', $data['cloned_name']);
@@ -575,7 +575,7 @@ class testInheritanceHostPrototype extends CLegacyWebTest {
 		$form->selectTab('Macros');
 		$this->assertMacros($macros);
 
-		// Check that inherited macros field are not editabble.
+		// Check that inherited macros field are not editable.
 		$fields = $this->getMacros();
 		foreach ($fields as $i => $field) {
 			$this->assertFalse($this->query('id:macros_'.$i.'_macro')->one()->isEnabled());

@@ -774,6 +774,25 @@ textarea.has-error {
 	}
 
 	&.compact-view {
+		td {
+			&.na-bg,
+			&.normal-bg,
+			&.info-bg,
+			&.warning-bg,
+			&.average-bg,
+			&.high-bg,
+			&.disaster-bg {
+				&::before {
+					font-size: 22px;
+					padding-top: 0;
+					padding-bottom: 0;
+				}
+			}
+		}
+	}
+
+	&.compact-view,
+	&.has-highlighted-rows {
 		.flh-na-bg,
 		.flh-info-bg,
 		.flh-warning-bg,
@@ -797,9 +816,6 @@ textarea.has-error {
 			&.disaster-bg {
 				&::before {
 					box-shadow: inset 0 -1px 0 0 $table-border-color;
-					font-size: 22px;
-					padding-top: 0;
-					padding-bottom: 0;
 				}
 			}
 		}

@@ -81,8 +81,8 @@ class CControllerHostWizardGet extends CController {
 
 		if ($this->hasInput('hostid')) {
 			$hosts = API::Host()->get([
-				'output' => ['hostid', 'name', 'ipmi_authtype', 'ipmi_privilege', 'ipmi_username', 'ipmi_password',
-					'tls_connect', 'tls_accept'
+				'output' => ['hostid', 'host', 'name', 'ipmi_authtype', 'ipmi_privilege', 'ipmi_username',
+					'ipmi_password', 'tls_connect', 'tls_accept'
 				],
 				'selectHostGroups' => ['groupid'],
 				'selectInterfaces' => ['type', 'ip', 'dns', 'port', 'useip', 'details'],
