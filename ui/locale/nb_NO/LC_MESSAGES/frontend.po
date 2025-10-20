@@ -303,6 +303,24 @@ msgstr ""
 msgid "%1$s: %2$s"
 msgstr ""
 
+#: include/classes/server/CZabbixServer.php:740
+#: include/classes/setup/CSetupWizard.php:1459
+#, c-format
+msgid "%1$s: %2$s."
+msgstr ""
+
+#: include/classes/server/CZabbixServer.php:746
+#: include/classes/setup/CSetupWizard.php:1465
+#, c-format
+msgid "%1$s: file is not readable."
+msgstr ""
+
+#: include/classes/server/CZabbixServer.php:743
+#: include/classes/setup/CSetupWizard.php:1462
+#, c-format
+msgid "%1$s: invalid path or file not found."
+msgstr ""
+
 #: include/classes/graph/CSvgGraph.php:1418
 #, c-format
 msgid "%1$sth percentile: %2$s"
@@ -4138,6 +4156,11 @@ msgstr "Kan ikke lese XML: %1$s."
 #: include/classes/import/readers/CYamlImportReader.php:55
 #, c-format
 msgid "Cannot read YAML: %1$s."
+msgstr ""
+
+#: include/classes/server/CZabbixServer.php:511
+#, c-format
+msgid "Cannot read response from Zabbix server \"%1$s\"."
 msgstr ""
 
 #: include/classes/server/CZabbixServer.php:567
@@ -18875,6 +18898,11 @@ msgstr "Svarskode"
 #: httpdetails.php:149 include/classes/screens/CScreenHttpTestDetails.php:83
 msgid "Response time"
 msgstr "Responstid"
+
+#: include/classes/server/CZabbixServer.php:507
+#, c-format
+msgid "Response timeout of %1$s exceeded when connecting to Zabbix server \"%2$s\"."
+msgstr ""
 
 #: app/controllers/CControllerMediatypeTestSend.php:182
 msgid "Response type: JSON"
