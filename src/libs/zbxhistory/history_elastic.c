@@ -35,7 +35,7 @@
 #define		ZBX_IDX_JSON_ALLOCATE		256
 #define		ZBX_JSON_ALLOCATE		2048
 
-const char	*value_type_str[] = {"dbl", "str", "log", "uint", "text", "json"};
+const char	*value_type_str[] = {"dbl", "str", "log", "uint", "text", "bin", "json"};
 
 static zbx_uint32_t	ZBX_ELASTIC_SVERSION = ZBX_DBVERSION_UNDEFINED;
 
@@ -1032,28 +1032,17 @@ static int	elastic_add_values(zbx_history_iface_t *hist, const zbx_vector_dc_his
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	zbx_json_init(&json_idx, ZBX_IDX_JSON_ALLOCATE);
-	zabbix_log(LOG_LEVEL_INFORMATION, "BADGER 1");
 	zbx_json_addobject(&json_idx, "index");
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "BADGER 2");
-
-	zabbix_log(LOG_LEVEL_INFORMATION, "BADGER 2: ->%s<-", value_type_str[hist->value_type] );
 	zbx_json_addstring(&json_idx, "_index", value_type_str[hist->value_type], ZBX_JSON_TYPE_STRING);
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "BADGER 3");
 	if (1 == config_history_storage_pipelines)
 	{
-
-		zabbix_log(LOG_LEVEL_INFORMATION, "BADGER 4");
-		zabbix_log(LOG_LEVEL_INFORMATION, "BADGER 4: ->%s<-", value_type_str[hist->value_type]);
 		zbx_snprintf(pipeline, sizeof(pipeline), "%s-pipeline", value_type_str[hist->value_type]);
 
-		zabbix_log(LOG_LEVEL_INFORMATION, "BADGER 5");
-		zabbix_log(LOG_LEVEL_INFORMATION, "BADGER 5: ->%s<-", pipeline);
 		zbx_json_addstring(&json_idx, "pipeline", pipeline, ZBX_JSON_TYPE_STRING);
 	}
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "BADGER 6");
 	zbx_json_close(&json_idx);
 	zbx_json_close(&json_idx);
 
@@ -1066,11 +1055,8 @@ static int	elastic_add_values(zbx_history_iface_t *hist, const zbx_vector_dc_his
 
 		zbx_json_init(&json, ZBX_JSON_ALLOCATE);
 
-		zabbix_log(LOG_LEVEL_INFORMATION, "BADGER 7");
 		zbx_json_adduint64(&json, "itemid", h->itemid);
 
-		zabbix_log(LOG_LEVEL_INFORMATION, "BADGER 8");
-		zabbix_log(LOG_LEVEL_INFORMATION, "BADGER 8: ->%s<-", history_value2str(h));
 		zbx_json_addstring(&json, "value", history_value2str(h), ZBX_JSON_TYPE_STRING);
 
 		if (ITEM_VALUE_TYPE_LOG == h->value_type)
@@ -1079,15 +1065,12 @@ static int	elastic_add_values(zbx_history_iface_t *hist, const zbx_vector_dc_his
 
 			log = h->value.log;
 
-			zabbix_log(LOG_LEVEL_INFORMATION, "BADGER 9");
-			zabbix_log(LOG_LEVEL_INFORMATION, "BADGER 9: %s", ZBX_NULL2EMPTY_STR(log->source));
 			zbx_json_adduint64(&json, "timestamp", log->timestamp);
 			zbx_json_addstring(&json, "source", ZBX_NULL2EMPTY_STR(log->source), ZBX_JSON_TYPE_STRING);
 			zbx_json_adduint64(&json, "severity", log->severity);
 			zbx_json_adduint64(&json, "logeventid", log->logeventid);
 		}
 
-		zabbix_log(LOG_LEVEL_INFORMATION, "BADGER 10");
 		zbx_json_adduint64(&json, "clock", h->ts.sec);
 		zbx_json_adduint64(&json, "ns", h->ts.ns);
 		zbx_json_adduint64(&json, "ttl", h->ttl);
