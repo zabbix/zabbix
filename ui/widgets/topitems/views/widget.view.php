@@ -140,7 +140,7 @@ function makeTableCellViewsNumeric(array $cell, array $data, $formatted_value, b
 	if ($value !== '') {
 		$value_cell->setHint(
 			(new CDiv(CTextHelper::trimWithEllipsis($value, ZBX_HINTBOX_CONTENT_LIMIT)))
-				->addClass(ZBX_STYLE_HINTBOX_WRAP), '', false
+				->addClass(ZBX_STYLE_HINTBOX_WRAP)
 		);
 	}
 
