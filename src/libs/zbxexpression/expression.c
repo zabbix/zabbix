@@ -602,7 +602,9 @@ int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const zbx_db_eve
 	zbx_token_search_t		token_search = ZBX_TOKEN_SEARCH_BASIC;
 	char				*expression = NULL, *user_username = NULL, *user_name = NULL,
 					*user_surname = NULL;
-	unsigned char			macro_env;
+#ifndef ZBX_DEBUG
+	unsigned char			macro_env = ZBX_MACRO_ENV_DEFAULT;
+#endif
 	zbx_dc_um_handle_t		*um_handle;
 	zbx_db_event			*cause_event = NULL, *cause_recovery_event = NULL;
 
@@ -636,9 +638,10 @@ int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const zbx_db_eve
 	if (SUCCEED != zbx_token_find(*data, pos, &token, token_search))
 		goto out;
 
-
 	um_handle = zbx_dc_open_user_macros();
+#ifndef ZBX_DEBUG
 	macro_env = zbx_dc_get_user_macro_env(um_handle);
+#endif
 	zbx_vector_uint64_create(&hostids);
 
 	data_alloc = data_len = strlen(*data) + 1;
