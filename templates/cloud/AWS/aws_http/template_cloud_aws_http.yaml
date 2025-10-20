@@ -171,7 +171,7 @@ zabbix_export:
         See the section below for a list of macros used for LLD filters.
       vendor:
         name: Zabbix
-        version: 7.4-0
+        version: 7.4-1
       groups:
         - name: Templates/Cloud
       items:
@@ -1394,6 +1394,7 @@ zabbix_export:
             type: LIST
             priority: '6'
             label: 'Authorization method'
+            description: 'Authorization method.'
             required: 'YES'
             options:
               - value: access_key
@@ -2151,7 +2152,7 @@ zabbix_export:
         * [DescribeLoadBalancers API method](https://docs.aws.amazon.com/elasticloadbalancing/latest/APIReference/API_DescribeLoadBalancers.html)
       vendor:
         name: Zabbix
-        version: 7.4-4
+        version: 7.4-5
       groups:
         - name: Templates/Cloud
       discovery_rules:
@@ -4777,6 +4778,7 @@ zabbix_export:
             type: LIST
             priority: '1'
             label: 'Authorization method'
+            description: 'Authorization method.'
             required: 'YES'
             options:
               - value: access_key
@@ -5282,7 +5284,7 @@ zabbix_export:
         * [Describe AWS Cost Explore API actions](https://docs.aws.amazon.com/aws-cost-management/latest/APIReference/API_Operations.html)
       vendor:
         name: Zabbix
-        version: 7.4-4
+        version: 7.4-5
       groups:
         - name: Templates/Cloud
       items:
@@ -6105,6 +6107,7 @@ zabbix_export:
             type: LIST
             priority: '1'
             label: 'Authorization method'
+            description: 'Authorization method.'
             required: 'YES'
             options:
               - value: access_key
@@ -9458,7 +9461,7 @@ zabbix_export:
         Refer to the Macros section for a list of macros used for LLD filters.
       vendor:
         name: Zabbix
-        version: 7.4-4
+        version: 7.4-5
       groups:
         - name: Templates/Cloud
       items:
@@ -11548,6 +11551,7 @@ zabbix_export:
             type: LIST
             priority: '1'
             label: 'Authorization method'
+            description: 'Authorization method.'
             required: 'YES'
             options:
               - value: access_key
@@ -12027,7 +12031,7 @@ zabbix_export:
         Refer to the Macros section for a list of macros used for LLD filters.
       vendor:
         name: Zabbix
-        version: 7.4-4
+        version: 7.4-5
       groups:
         - name: Templates/Cloud
       items:
@@ -14255,6 +14259,7 @@ zabbix_export:
             type: LIST
             priority: '1'
             label: 'Authorization method'
+            description: 'Authorization method.'
             required: 'YES'
             options:
               - value: access_key
@@ -14751,7 +14756,7 @@ zabbix_export:
         See the section below for a list of macros used for LLD filters.
       vendor:
         name: Zabbix
-        version: 7.4-3
+        version: 7.4-4
       groups:
         - name: Templates/Cloud
       items:
@@ -17172,6 +17177,7 @@ zabbix_export:
             type: LIST
             priority: '1'
             label: 'Authorization method'
+            description: 'Authorization method.'
             required: 'YES'
             options:
               - value: access_key
@@ -17835,7 +17841,7 @@ zabbix_export:
         See the section below for a list of macros used for LLD filters.
       vendor:
         name: Zabbix
-        version: 7.4-3
+        version: 7.4-4
       groups:
         - name: Templates/Cloud
       items:
@@ -19986,6 +19992,7 @@ zabbix_export:
             type: LIST
             priority: '1'
             label: 'Authorization method'
+            description: 'Authorization method.'
             required: 'YES'
             options:
               - value: access_key
@@ -20530,7 +20537,7 @@ zabbix_export:
         See the section below for a list of macros used for LLD filters.
       vendor:
         name: Zabbix
-        version: 7.4-3
+        version: 7.4-4
       groups:
         - name: Templates/Cloud
       items:
@@ -21551,6 +21558,7 @@ zabbix_export:
             type: LIST
             priority: '1'
             label: 'Authorization method'
+            description: 'Authorization method.'
             required: 'YES'
             options:
               - value: access_key
@@ -21947,7 +21955,7 @@ zabbix_export:
         Also, see the Macros section for a list of macros used for LLD filters.
       vendor:
         name: Zabbix
-        version: 7.4-3
+        version: 7.4-4
       groups:
         - name: Templates/Cloud
       items:
@@ -25226,6 +25234,7 @@ zabbix_export:
             type: LIST
             priority: '1'
             label: 'Authorization method'
+            description: 'Authorization method.'
             required: 'YES'
             options:
               - value: access_key
@@ -25581,7 +25590,7 @@ zabbix_export:
         Also, see the Macros section for a list of macros used for LLD filters.
       vendor:
         name: Zabbix
-        version: 7.4-3
+        version: 7.4-4
       groups:
         - name: Templates/Cloud
       items:
@@ -27405,6 +27414,7 @@ zabbix_export:
             type: LIST
             priority: '1'
             label: 'Authorization method'
+            description: 'Authorization method.'
             required: 'YES'
             options:
               - value: access_key
