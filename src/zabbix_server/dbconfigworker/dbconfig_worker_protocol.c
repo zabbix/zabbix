@@ -34,5 +34,5 @@ void	zbx_dbconfig_worker_deserialize_ids(const unsigned char *data, zbx_uint32_t
 		zbx_vector_uint64_t *ids)
 {
 	if (0 != size)
-		(void)zbx_deserialize_vector_uint64_safe(data, ids);
+		(void)zbx_deserialize_vector_uint64(data, ids);
 }

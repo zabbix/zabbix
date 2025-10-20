@@ -107,18 +107,7 @@
 		value_len + sizeof(zbx_uint32_t)					\
 	)
 
-zbx_uint32_t	zbx_deserialize_vector_uint64_safe(const unsigned char *buffer, zbx_vector_uint64_t *vector_uint64);
-
-#define zbx_deserialize_vector_uint64X(buffer, vector_uint64, value_len)			\
-	(										\
-		memcpy(&value_len, buffer, sizeof(zbx_uint32_t)),			\
-		0 < value_len ? 							\
-			zbx_vector_uint64_append_array(vector_uint64,			\
-				(const zbx_uint64_t *)(buffer + sizeof(zbx_uint32_t)),	\
-				(int)(value_len / sizeof(zbx_uint64_t)))		\
-		: (void)0,								\
-		value_len + sizeof(zbx_uint32_t)					\
-	)
+zbx_uint32_t	zbx_deserialize_vector_uint64(const unsigned char *buffer, zbx_vector_uint64_t *vector_uint64);
 
 #define zbx_deserialize_value(buffer, value) \
 	(memcpy(value, buffer, sizeof(*value)), sizeof(*value))

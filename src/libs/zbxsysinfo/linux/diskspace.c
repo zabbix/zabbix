@@ -187,7 +187,7 @@ int	vfs_fs_discovery(AGENT_REQUEST *request, AGENT_RESULT *result)
 ZBX_PTR_VECTOR_DECL(mpoint_ptr, zbx_mpoint_t *)
 ZBX_PTR_VECTOR_IMPL(mpoint_ptr, zbx_mpoint_t *)
 
-static int	mpoint_ptr_ifsname_compare(const zbx_mpoint_t *m1, const zbx_fsname_t *f2)
+static int	mpoint_ptr_fsname_compare(const zbx_mpoint_t *m1, const zbx_fsname_t *f2)
 {
 	int	res;
 
@@ -203,7 +203,7 @@ static int	zbx_vector_mpoint_ptr_search_fsname(const zbx_vector_mpoint_ptr_t *ve
 
 	for (index = 0; index < vector->values_num; index++)
 	{
-		if (0 == mpoint_ptr_ifsname_compare(vector->values[index], value))
+		if (0 == mpoint_ptr_fsname_compare(vector->values[index], value))
 			return index;
 	}
 

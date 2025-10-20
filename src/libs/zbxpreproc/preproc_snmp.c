@@ -970,7 +970,6 @@ int	item_preproc_snmp_walk_to_json(zbx_variant_t *value, const char *params, cha
 			snmp_walk_json_output_obj_compare_func, snmp_walk_json_output_obj_clear_wrapper,
 			ZBX_DEFAULT_MEM_MALLOC_FUNC, ZBX_DEFAULT_MEM_REALLOC_FUNC, ZBX_DEFAULT_MEM_FREE_FUNC);
 
-
 	if ('\0' == *(data = value->data.str))
 	{
 		result = zbx_strdup(NULL, "[]");

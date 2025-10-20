@@ -66,7 +66,7 @@ void	zbx_connector_deserialize_object(const unsigned char *data, zbx_uint32_t si
 		data += zbx_deserialize_value(data, &connector_object.ts.ns);
 		data += zbx_deserialize_str(data, &connector_object.str, deserialize_str_len);
 		zbx_vector_uint64_create(&connector_object.ids);
-		data += zbx_deserialize_vector_uint64_safe(data, &connector_object.ids);
+		data += zbx_deserialize_vector_uint64(data, &connector_object.ids);
 
 		zbx_vector_connector_object_append(connector_objects, connector_object);
 	}
