@@ -722,7 +722,7 @@ char	*zbx_sanitize_proxyconfig_json(char *jbuffer)
 	{
 		char			*str = NULL;
 		size_t			str_alloc = 0, str_offset = 0;
-		zbx_jsonobj_t		*data_obj;
+		const zbx_jsonobj_t	*data_obj;
 
 		zbx_jsonobj_remove_value(&jobj, "macro.secrets");
 

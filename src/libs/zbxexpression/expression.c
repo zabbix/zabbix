@@ -602,7 +602,7 @@ int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const zbx_db_eve
 	zbx_token_search_t		token_search = ZBX_TOKEN_SEARCH_BASIC;
 	char				*expression = NULL, *user_username = NULL, *user_name = NULL,
 					*user_surname = NULL;
-	unsigned char			macro_env = ZBX_MACRO_ENV_DEFAULT;
+	unsigned char			macro_env;
 	zbx_dc_um_handle_t		*um_handle;
 	zbx_db_event			*cause_event = NULL, *cause_recovery_event = NULL;
 
