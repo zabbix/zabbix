@@ -35,6 +35,7 @@
 #define		ZBX_IDX_JSON_ALLOCATE		256
 #define		ZBX_JSON_ALLOCATE		2048
 
+/* bin is not used for elastic, but is needed for mapping consistency */
 const char	*value_type_str[] = {"dbl", "str", "log", "uint", "text", "bin", "json"};
 
 static zbx_uint32_t	ZBX_ELASTIC_SVERSION = ZBX_DBVERSION_UNDEFINED;
