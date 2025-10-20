@@ -30,22 +30,24 @@ $form = new CWidgetFormView($data);
 
 $form_tabs = (new CTabView())
 	->addTab('data_set', _('Data set'), getDatasetTab($form, $data['fields']),
-		TAB_INDICATOR_GRAPH_DATASET
+		TAB_INDICATOR_SCATTER_PLOT_DATASET
 	)
 	->addTab('displaying_options', _('Displaying options'), getDisplayOptionsTab($form, $data['fields']),
-		TAB_INDICATOR_GRAPH_DISPLAY_OPTIONS
+		TAB_INDICATOR_SCATTER_PLOT_DISPLAY_OPTIONS
 	)
 	->addTab('time_period', _('Time period'), getTimePeriodTab($form, $data['fields']),
-		TAB_INDICATOR_GRAPH_TIME_PERIOD
+		TAB_INDICATOR_SCATTER_PLOT_TIME_PERIOD
 	)
 	->addTab('axes', _('Axes'), getAxesTab($form, $data['fields']),
-		TAB_INDICATOR_GRAPH_AXES
+		TAB_INDICATOR_SCATTER_PLOT_AXES
 	)
 	->addTab('legend_tab', _('Legend'), getLegendTab($form, $data['fields']),
-		TAB_INDICATOR_GRAPH_LEGEND
+		TAB_INDICATOR_SCATTER_PLOT_LEGEND
 	)
-	->addTab('thesholds_tab', _('Thresholds'), getThresholdsTab($form, $data['fields']), )
-	->addClass('graph-widget-config-tabs')
+	->addTab('thresholds_tab', _('Thresholds'), getThresholdsTab($form, $data['fields']),
+		TAB_INDICATOR_SCATTER_PLOT_THRESHOLDS
+	)
+	->addClass('scatter-plot-widget-config-tabs')
 	->setSelected(0);
 
 $form
