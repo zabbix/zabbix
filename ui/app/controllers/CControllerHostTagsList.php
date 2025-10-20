@@ -112,7 +112,6 @@ class CControllerHostTagsList extends CController {
 	private function getInheritedTagTemplates(array $templateids): array {
 		$inherited_tag_templates = [];
 
-
 		self::addTemplateTags($inherited_tag_templates, $templateids);
 		self::addTemplateData($inherited_tag_templates);
 
@@ -187,7 +186,7 @@ class CControllerHostTagsList extends CController {
 		unset($tag_templates);
 	}
 
-	private static function getMergedOwnAndInheritedTags(array &$tag_values, array $inherited_tag_templates): array {
+	private static function getMergedOwnAndInheritedTags(array $tag_values, array $inherited_tag_templates): array {
 		$tags = [];
 
 		foreach ($tag_values as $tag => $values) {
