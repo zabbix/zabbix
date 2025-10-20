@@ -764,7 +764,8 @@ else {
 	$http_tests = [];
 	while ($dbHttpTest = DBfetch($dbHttpTests)) {
 		$http_tests[$dbHttpTest['httptestid']] = $dbHttpTest + [
-			'tags' => $httpTests[$dbHttpTest['httptestid']]['tags']
+			'tags' => $httpTests[$dbHttpTest['httptestid']]['tags'],
+			'inheritedTags' => $httpTests[$dbHttpTest['httptestid']]['inheritedTags']
 		];
 	}
 
