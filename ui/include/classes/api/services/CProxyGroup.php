@@ -414,6 +414,24 @@ class CProxyGroup extends CApiService {
 
 		self::checkUsedInProxies($db_proxy_groups);
 		self::checkUsedInHosts($db_proxy_groups);
+		self::checkUsedInActions($db_proxy_groups);
+	}
+
+	private static function checkUsedInActions(array $db_proxy_groups): void {
+		$db_actions = DBfetchArray(DBselect(
+			'SELECT a.name,c.value AS proxyid'.
+			' FROM actions a,conditions c'.
+			' WHERE a.actionid=c.actionid'.
+			' AND c.conditiontype='.ZBX_CONDITION_TYPE_PROXY_GROUP.
+			' AND '.dbConditionString('c.value', array_keys($db_proxy_groups)),
+			1
+		));
+
+		if ($db_actions) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Proxy group "%1$s" is used by action "%2$s".',
+				$db_proxy_groups[$db_actions[0]['proxyid']]['name'], $db_actions[0]['name']
+			));
+		}
 	}
 
 	/**
