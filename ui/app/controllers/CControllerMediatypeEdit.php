@@ -183,6 +183,8 @@ class CControllerMediatypeEdit extends CController {
 			: CControllerMediatypeUpdate::getValidationRules();
 
 		$data['js_validation_rules'] = (new CFormValidator($data['js_validation_rules']))->getRules();
+		$data['js_clone_validation_rules'] = (new CFormValidator(CControllerMediatypeCreate::getValidationRules()))
+			->getRules();
 
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Configuration of media types'));

@@ -117,12 +117,11 @@ window.mediatype_edit_popup = new class {
 			oauth.tokens_status = fields.tokens_status;
 
 			let data = {
-				update: fields.tokens_status == 0 ? 0 : 1,
+				update: 'client_id' in fields ? 1 : 0,
 				advanced_form: fields.provider == <?= CMediatypeHelper::EMAIL_PROVIDER_SMTP ?> ? 1 : 0
 			};
 
 			if ('mediatypeid' in fields) {
-				// TODO why is this passed: not used in backend to resuse secret
 				data.mediatypeid = fields.mediatypeid;
 			}
 
@@ -132,7 +131,7 @@ window.mediatype_edit_popup = new class {
 		});
 	}
 
-	clone({title, buttons}) {
+	clone({rules, title, buttons}) {
 		this.mediatypeid = null;
 		document.getElementById('mediatypeid').remove();
 		this.#setOAuth();
@@ -142,6 +141,7 @@ window.mediatype_edit_popup = new class {
 		this.overlay.unsetLoading();
 		this.overlay.recoverFocus();
 		this.overlay.containFocus();
+		this.form.reload(rules);
 	}
 
 	delete() {
@@ -221,18 +221,26 @@ window.mediatype_edit_popup = new class {
 			delete oauth.message;
 		}
 
-		for (const [name, value] of Object.entries(oauth)) {
-			const input = document.createElement('input');
+		const oauth_fields = ['tokens_status', 'redirection_url', 'client_id', 'client_secret', 'authorization_url',
+			'token_url', 'access_token', 'access_token_updated', 'access_expires_in', 'refresh_token'
+		];
 
-			input.name = name;
-			input.type = 'hidden';
-			input.value = value;
-			input.setAttribute('data-error-container', 'oauth_error_container')
+		oauth_fields.forEach((field) => {
+			if (field in oauth) {
+				const input = document.createElement('input');
 
-			status_container.append(input);
-		}
+				input.name = field;
+				input.type = 'hidden';
+				input.value = oauth[field];
+				input.setAttribute('data-field-type', 'hidden');
+				input.setAttribute('data-error-container', 'oauth_error_container');
+
+				status_container.append(input);
+			}
+		});
 
 		this.form.discoverAllFields();
+		document.getElementById('oauth_error_container').innerHTML = '';
 	}
 
 	/**

@@ -584,6 +584,7 @@ if ($data['mediatypeid']) {
 			'keepOpen' => true,
 			'isSubmit' => false,
 			'action' => 'mediatype_edit_popup.clone('.json_encode([
+					'rules' => $data['js_clone_validation_rules'],
 					'title' => _('New media type'),
 					'buttons' => [
 						[

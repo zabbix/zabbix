@@ -18,7 +18,7 @@ class CControllerMediatypeCreate extends CControllerMediatypeUpdateGeneral {
 
 	public static function getValidationRules(): array {
 		$api_uniq = [
-			['mediatype.get', ['name' => '{name}'], 'mediatypeid']
+			'mediatype.get', ['name' => '{name}']
 		];
 
 		return ['object', 'api_uniq' => $api_uniq, 'fields' => [
