@@ -1,6 +1,8 @@
 Changes for 8.0.0alpha1
 
 New features:
+..F....... [ZBXNEXT-8790] implemented inline validation in maintenance form (talbergs)
+A.......S. [ZBXNEXT-10271] updated maximum supported TimescaleDB version to 2.22 (mprihodko)
 .........T [ZBXNEXT-10245] added Stormshield SNS by SNMP template (knaglis)
 A......PS. [ZBXNEXT-10219] updated maximum supported PostgreSQL version to 18 (mprihodko)
 .......PS. [ZBXNEXT-10068] added resolution of LLD macros in nested JSON when used in discovery prototypes (MVekslers)
@@ -54,6 +56,7 @@ A......PS. [ZBXNEXT-10056] updated max supported MariaDB version to 11.8 (Sasha)
 .......PS. [ZBXNEXT-10079] updated minimal supported MySQL/Percona version to 8.4 (mprihodko)
 
 Bug fixes:
+.........T [ZBX-26544] added a preprocessing step to the "Outbound packets discarded" item in "FortiGate by SNMP" template (aiantsen)
 ..F....... [ZBX-22157] added Map navigation tree widget problem filtering using Problem display and Show suppressed problems filter of map settings (dfofanovs)
 A......... [ZBX-27059] fixed conditions for the check "Cannot delete default MFA method" (dpankins)
 .......PS. [ZBX-26818] fixed crash on \"cannot get secrets for path\" error due to missing lock when using shared memory (vso)
@@ -234,11 +237,13 @@ A......... [ZBX-26191] fixed inconsistent API and frontend validation for mainte
 Changes for 7.4.4rc1
 
 New features:
+A.......S. [ZBXNEXT-10271] updated maximum supported TimescaleDB version to 2.22 (mprihodko)
 .........T [ZBXNEXT-10245] added Stormshield SNS by SNMP template (knaglis)
 A......PS. [ZBXNEXT-10219] updated maximum supported PostgreSQL version to 18 (mprihodko)
 ...G...... [ZBXNEXT-7744] added support of TLS to Redis plugin in Zabbix agent 2 (opucka)
 
 Bug fixes:
+.........T [ZBX-26544] added a preprocessing step to the "Outbound packets discarded" item in "FortiGate by SNMP" template (aiantsen)
 ..F....... [ZBX-22157] added Map navigation tree widget problem filtering using Problem display and Show suppressed problems filter of map settings (dfofanovs)
 A......... [ZBX-27059] fixed conditions for the check "Cannot delete default MFA method" (dpankins)
 .......PS. [ZBX-26818] fixed crash on \"cannot get secrets for path\" error due to missing lock when using shared memory (vso)
@@ -705,6 +710,8 @@ A.F....PS. [ZBXNEXT-9564] implemented vault macro resolution on proxies (esekace
 Changes for 7.2.14rc1
 
 New features:
+A......PS. [ZBXNEXT-10219] updated maximum supported PostgreSQL version to 18 (mprihodko)
+A.......S. [ZBXNEXT-10271] updated maximum supported TimescaleDB version to 2.22 (mprihodko)
 
 Bug fixes:
 
@@ -1315,11 +1322,13 @@ A.F....... [ZBX-23227] fixed issue where using an empty array or string value fo
 Changes for 7.0.20rc1
 
 New features:
+A.......S. [ZBXNEXT-10271] updated maximum supported TimescaleDB version to 2.22 (mprihodko)
 .........T [ZBXNEXT-10245] added Stormshield SNS by SNMP template (knaglis)
 A......PS. [ZBXNEXT-10219] updated maximum supported PostgreSQL version to 18 (mprihodko)
 ...G...... [ZBXNEXT-7744] added support of TLS to Redis plugin in Zabbix agent 2 (opucka)
 
 Bug fixes:
+.........T [ZBX-26544] added a preprocessing step to the "Outbound packets discarded" item in "FortiGate by SNMP" template (aiantsen)
 ..F....... [ZBX-22157] added Map navigation tree widget problem filtering using Problem display and Show suppressed problems filter of map settings (dfofanovs)
 A......... [ZBX-27059] fixed conditions for the check "Cannot delete default MFA method" (dpankins)
 .......PS. [ZBX-24504] improved prometheus to json preprocessing step performance when reused with similar parameters in dependent items (wiper)
@@ -5118,6 +5127,8 @@ A.F....PS. [ZBXNEXT-7402,ZBXNEXT-7413] added support for CyberArk Vault (acikuns
 Changes for 6.0.43rc1
 
 New features:
+A......PS. [ZBXNEXT-10219] updated maximum supported PostgreSQL version to 18 (mprihodko)
+A.......S. [ZBXNEXT-10271] updated maximum supported TimescaleDB version to 2.22 (mprihodko)
 
 Bug fixes:
 ..F....... [ZBX-22157] added Map navigation tree widget problem filtering using Problem display and Show suppressed problems filter of map settings (dfofanovs)
