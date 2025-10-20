@@ -81,7 +81,7 @@ zabbix_export:
         Note: You can use the `Monitoring of full backup`, `Monitoring of log backup`, and `Monitoring of differential backup` host wizard configuration fields to disable backup age triggers. If set to unselected state, the trigger expression for the backup age will not fire.
       vendor:
         name: Zabbix
-        version: 8.0-1
+        version: 8.0-2
       groups:
         - name: Templates/Databases
       items:
@@ -4180,6 +4180,7 @@ zabbix_export:
             type: TEXT
             priority: '3'
             label: 'MSSQL password'
+            description: 'Password for MSSQL.'
             required: 'YES'
         - macro: '{$MSSQL.PERCENT_COMPILATIONS.MAX}'
           value: '10'
@@ -4254,6 +4255,7 @@ zabbix_export:
             type: TEXT
             priority: '2'
             label: 'MSSQL user'
+            description: 'User for MSSQL.'
             required: 'YES'
         - macro: '{$MSSQL.WORKTABLES_FROM_CACHE_RATIO.MIN.CRIT}'
           value: '90'
