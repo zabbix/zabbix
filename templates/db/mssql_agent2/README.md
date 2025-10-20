@@ -34,6 +34,8 @@ Grant this user read permissions to the `sysjobschedules`, `sysjobhistory`, and 
 For example, using T-SQL commands:
 
 ```sql
+GRANT VIEW ANY DEFINITION TO zbx_monitor;
+GRANT VIEW SERVER STATE TO zbx_monitor;
 GRANT SELECT ON OBJECT::msdb.dbo.sysjobs TO zbx_monitor;
 GRANT SELECT ON OBJECT::msdb.dbo.sysjobservers TO zbx_monitor;
 GRANT SELECT ON OBJECT::msdb.dbo.sysjobactivity TO zbx_monitor;
