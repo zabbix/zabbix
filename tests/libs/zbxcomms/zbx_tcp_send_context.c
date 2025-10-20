@@ -22,7 +22,7 @@
 
 void	zbx_mock_test_entry(void **state)
 {
-	int		result, exp_result = zbx_mock_str_to_return_code(zbx_mock_get_parameter_string("out.result"));
+	int		exp_result = zbx_mock_str_to_return_code(zbx_mock_get_parameter_string("out.result"));
 	short		events;
 
 	zbx_tcp_send_context_t	context;
@@ -42,7 +42,7 @@ void	zbx_mock_test_entry(void **state)
 	context.data = zbx_mock_get_parameter_string("in.data");
 	context.send_len = zbx_mock_get_parameter_uint64("in.send_len");
 
-	result = zbx_tcp_send_context(&s, &context, &events);
+	int	result = zbx_tcp_send_context(&s, &context, &events);
 
 	zbx_mock_assert_int_eq("return value", exp_result, result);
 }
