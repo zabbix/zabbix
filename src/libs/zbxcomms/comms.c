@@ -286,7 +286,6 @@ int	zbx_inet_ntop(struct sockaddr *ai_addr, char *ip, socklen_t len)
 	return FAIL;
 }
 
-
 /******************************************************************************
  *                                                                            *
  * Purpose: retrieve IP address by host name                                  *
