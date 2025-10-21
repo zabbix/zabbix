@@ -151,7 +151,7 @@ class testHistory extends CAPITest {
 				'expected_result' => '3',
 				'expected_error' => false
 			],
-			// Get count of values of item of value_type == ITEM_VALUE_TYPE_BIN ('history' => 5).
+			// Get value of a certain length of value of item of value_type == ITEM_VALUE_TYPE_BIN ('history' => 5).
 			[
 				'api_request' => [
 					'history' => 5,
@@ -168,7 +168,7 @@ class testHistory extends CAPITest {
 				],
 				'expected_error' => false
 			],
-			// Get count of values of item of value_type == ITEM_VALUE_TYPE_JSON ('history' => 6).
+			// Get value of a certain length of value of item of value_type == ITEM_VALUE_TYPE_JSON ('history' => 6).
 			[
 				'api_request' => [
 					'history' => 6,
