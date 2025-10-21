@@ -228,9 +228,10 @@ static void	elastic_log_error(CURL *handle, CURLcode error, const char *errbuf)
 
 /************************************************************************************
  *                                                                                  *
- * Purpose: closes connection and releases allocated resources                      *
+ * Purpose: removes easy handle from cURL multi session and frees allocated         *
+ *          resources                                                               *
  *                                                                                  *
- * Parameters:  hist - [IN] the history storage interface                           *
+ * Parameters:  hist - [IN] history storage interface                               *
  *                                                                                  *
  ************************************************************************************/
 static void	elastic_close(zbx_history_iface_t *hist)
@@ -347,8 +348,7 @@ static void	elastic_writer_init(void)
 
 /************************************************************************************
  *                                                                                  *
- * Purpose: releases initialized elastic writer by freeing allocated resources and  *
- *          setting its state to uninitialized.                                     *
+ * Purpose: releases elastic writer handle resources, but not cURL multi session    *
  *                                                                                  *
  ************************************************************************************/
 static void	elastic_writer_release(void)
@@ -358,12 +358,7 @@ static void	elastic_writer_release(void)
 	for (i = 0; i < writer.ifaces.values_num; i++)
 		elastic_close((zbx_history_iface_t *)writer.ifaces.values[i]);
 
-	curl_multi_cleanup(writer.handle);
-	writer.handle = NULL;
-
-	zbx_vector_ptr_destroy(&writer.ifaces);
-
-	writer.initialized = 0;
+	zbx_vector_ptr_clear(&writer.ifaces);
 }
 
 /************************************************************************************
@@ -604,9 +599,9 @@ end:
 
 /************************************************************************************
  *                                                                                  *
- * Purpose: destroys history storage interface                                      *
+ * Purpose: destroys history storage interface and shuts down cURL multi session    *
  *                                                                                  *
- * Parameters:  hist - [IN] the history storage interface                           *
+ * Parameters:  hist - [IN] history storage interface                               *
  *                                                                                  *
  ************************************************************************************/
 static void	elastic_destroy(zbx_history_iface_t *hist)
@@ -614,6 +609,12 @@ static void	elastic_destroy(zbx_history_iface_t *hist)
 	zbx_elastic_data_t	*data = hist->data.elastic_data;
 
 	elastic_close(hist);
+
+	if (0 != writer.initialized)
+	{
+		curl_multi_cleanup(writer.handle);
+		writer.initialized = 0;
+	}
 
 	zbx_free(data->base_url);
 	zbx_free(data);
@@ -654,8 +655,8 @@ static int	elastic_get_values_for_period(zbx_history_iface_t *hist, zbx_uint64_t
 	{
 		char	start_str[32], end_str[32];
 
-		strftime(start_str, sizeof(start_str), "%Y-%m-%d %H:%M:%S", localtime(&start));
-		strftime(end_str, sizeof(end_str), "%Y-%m-%d %H:%M:%S", localtime(&end));
+		strftime(start_str, sizeof(start_str), "%Y-%m-%d %H:%M:%S", zbx_localtime(&start, NULL));
+		strftime(end_str, sizeof(end_str), "%Y-%m-%d %H:%M:%S", zbx_localtime(&end, NULL));
 
 		zabbix_log(LOG_LEVEL_DEBUG, "In %s() window:(%s, %s] age: %s count:%d", __func__, start_str, end_str,
 				zbx_age2str(end - start), *count);

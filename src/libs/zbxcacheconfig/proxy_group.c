@@ -25,6 +25,7 @@
 #include "zbxpgservice.h"
 #include "zbxtime.h"
 #include "zbxversion.h"
+#include "zbxip.h"
 
 ZBX_PTR_VECTOR_IMPL(pg_proxy_ptr, zbx_pg_proxy_t *)
 ZBX_PTR_VECTOR_IMPL(pg_group_ptr, zbx_pg_group_t *)
@@ -514,7 +515,10 @@ int	dc_get_host_redirect(const char *host, const zbx_tls_conn_attr_t *attr, zbx_
 	}
 
 	if ('\0' != *local_port)
-		zbx_snprintf(redirect->address, sizeof(redirect->address), "%s:%s", proxy->local_address, local_port);
+	{
+		zbx_join_hostport(redirect->address, sizeof(redirect->address), proxy->local_address,
+				(unsigned short)atoi(local_port));
+	}
 	else
 		zbx_strlcpy(redirect->address, proxy->local_address, sizeof(redirect->address));
 
@@ -679,4 +683,3 @@ zbx_uint64_t	zbx_dc_get_proxy_groupid(zbx_uint64_t proxyid)
 
 	return proxy_groupid;
 }
-

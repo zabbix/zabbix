@@ -45,11 +45,11 @@ the following steps:
 
 1. Log into your administrator account in Oracle Cloud Console.
 
-2. Create a new user that will be used by Zabbix for monitoring.
+2. Create a new user that will be used by Zabbix for monitoring. Optionally, create a new group and assign the monitoring user to this group.
 
-3. Create a new security policy and assign a previously created user to it.
+3. Create a new security policy and assign a previously created user or group to it.
 
-4. This policy will contain a set of rules that will give monitoring user access to specific resources in your
+4. This policy will contain a set of rules that will give monitoring user/group access to specific resources in your
 OCI. Make sure to add the following rules to the policy:
   
     ```
@@ -63,9 +63,14 @@ OCI. Make sure to add the following rules to the policy:
     Allow group 'zabbix_api' to read buckets in tenancy
     Allow group 'zabbix_api' to read autonomous-databases in tenancy
     ```
-  
-    In this example, `zabbix_api` is the name of the previously created monitoring user. Rename it to your
-monitoring user's name.
+    In the example above, the name of the monitoring group is `zabbix_api`. In your setup, replace it with the
+name of your monitoring user/group.
+    
+    In some cases, these rules might not be enough for the monitoring user to be able to access all resources in your
+environment. To fix that, replace the previous rules with this single rule:
+    ```
+    Allow group 'zabbix_api' to read all-resources in tenancy
+    ```
 
 5. Generate an API key pair for your monitoring user - open your monitoring user profile and on the left side,
 press `API keys` and then, `Add API key` (if generating a new key pair, do not forget to save the private key).

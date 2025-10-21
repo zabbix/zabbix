@@ -560,9 +560,10 @@ class testDashboardItemHistoryWidget extends testWidgets {
 		// Check parameter 'Override host' true/false state.
 		$host_selector = $dashboard->getControls()->query('class:multiselect-control')->asMultiselect()->one();
 		$this->assertTrue($host_selector->isVisible());
-		$dashboard->getWidget(self::DEFAULT_WIDGET)->edit();
-		$this->assertEquals('Edit widget', $dialog->getTitle());
-		$form->fill(['Override host' => ''])->submit();
+		$widget_form = $dashboard->getWidget(self::DEFAULT_WIDGET)->edit();
+		$overlay = COverlayDialogElement::get('Edit widget');
+		$widget_form->fill(['Override host' => ''])->submit();
+		$overlay->ensureNotPresent();
 		$dashboard->save();
 		$this->assertFalse($host_selector->isVisible());
 	}
@@ -2068,6 +2069,7 @@ class testDashboardItemHistoryWidget extends testWidgets {
 				? '1 minute'
 				: $data['fields']['Refresh interval'];
 			$this->assertEquals($refresh, $widget->getRefreshInterval());
+			CPopupMenuElement::find()->one()->close();
 
 			// Check new widget form fields and values in frontend.
 			$saved_form = $widget->edit();

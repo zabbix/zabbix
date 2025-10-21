@@ -166,23 +166,25 @@ $house_keeper_tab = (new CFormList())
 	);
 
 	if ($data['db_extension'] === ZBX_DB_EXTENSION_TIMESCALEDB) {
+		$timescaledb_label = _('Unsupported TimescaleDB time-series database extension for PostgreSQL is used.');
+
 		switch ($data['extension_err_code']) {
 			case ZBX_EXT_ERR_UNDEFINED:
-				$timescaledb_error = _('Unable to retrieve TimescaleDB compression support status.');
+				$timescaledb_error = _('Unable to retrieve compression support status of TimescaleDB time-series database extension for PostgreSQL.');
 				break;
 
 			case ZBX_TIMESCALEDB_VERSION_FAILED_TO_RETRIEVE:
 				$timescaledb_error = _('Compression is not supported.').' '.
-					_('Unable to retrieve TimescaleDB version.');
+					_('Unable to retrieve version of TimescaleDB time-series database extension for PostgreSQL.');
 				break;
 
 			case ZBX_TIMESCALEDB_VERSION_LOWER_THAN_MINIMUM:
-				$timescaledb_error = _('Compression is not supported.').' '.
-					_s('Minimum required TimescaleDB version is %1$s.', $data['timescaledb_min_version']);
+				$timescaledb_error = _('Compression is not supported.').' '.$timescaledb_label.' '.
+					_s('Minimum required version is %1$s.', $data['timescaledb_min_version']);
 				break;
 
 			case ZBX_TIMESCALEDB_VERSION_NOT_SUPPORTED:
-				$timescaledb_error = _s('Unsupported TimescaleDB version. Should be at least %1$s.',
+				$timescaledb_error = $timescaledb_label.' '._s('Should be at least %1$s.',
 					$data['timescaledb_min_supported_version']
 				);
 
@@ -192,13 +194,14 @@ $house_keeper_tab = (new CFormList())
 				break;
 
 			case ZBX_TIMESCALEDB_VERSION_HIGHER_THAN_MAXIMUM:
-				$timescaledb_error = _s('Unsupported TimescaleDB version. Should not be higher than %1$s.',
+				$timescaledb_error = $timescaledb_label.' '._s('Should not be higher than %1$s.',
 					$data['timescaledb_max_version']
 				);
 				break;
 
 			case ZBX_TIMESCALEDB_LICENSE_NOT_COMMUNITY:
-				$timescaledb_error = _('Detected TimescaleDB license does not support compression. Compression is supported in TimescaleDB Community Edition.');
+				$timescaledb_error = $timescaledb_label.' '.
+					_('Detected license does not support compression. Compression is supported in TimescaleDB Community Edition.');
 				break;
 
 			case ZBX_EXT_SUCCEED:

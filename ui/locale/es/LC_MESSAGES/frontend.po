@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2025-05-02 18:02+0000\n"
+"PO-Revision-Date: 2025-10-03 11:20+0000\n"
 "Last-Translator: Vicente Salvador <vicentesalvadorcubedo@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: es\n"
@@ -3758,6 +3758,11 @@ msgstr "No se pudo leer el XML: %1$s."
 msgid "Cannot read YAML: %1$s."
 msgstr "No se puede leer YAML: %1$s."
 
+#: include/classes/server/CZabbixServer.php:502
+#, c-format
+msgid "Cannot read response from Zabbix server \"%1$s\"."
+msgstr "No se puede leer la  respuesta del servidor Zabbix \"%1$s\"."
+
 #: include/classes/server/CZabbixServer.php:567
 #, c-format
 msgid "Cannot read the response, check connection with the Zabbix server \"%1$s\"."
@@ -5352,7 +5357,7 @@ msgstr "Crear regla de descubrimiento dependiente"
 
 #: jsLoader.php:352
 msgid "Create dependent item"
-msgstr "Crear elemento dependiente"
+msgstr "Crear métrica dependiente"
 
 #: app/views/trigger.prototype.list.php:181
 #: include/views/configuration.host.prototype.list.php:200
@@ -5446,7 +5451,7 @@ msgstr "Crear asignación de iconos"
 
 #: include/views/configuration.item.list.php:40
 msgid "Create item"
-msgstr "Crear monitor"
+msgstr "Crear métrica"
 
 #: include/views/configuration.item.list.php:48
 msgid "Create item (select host first)"
@@ -5539,7 +5544,7 @@ msgstr "Crear iniciador (seleccione primero la plantilla)"
 
 #: app/views/trigger.prototype.list.php:42 jsLoader.php:351
 msgid "Create trigger prototype"
-msgstr "Crear prototipo de disparador"
+msgstr "Crear prototipo de iniciador"
 
 #: app/views/js/trigger.prototype.list.js.php:127
 msgid "Create triggers from selected prototype as disabled?"
@@ -6687,7 +6692,7 @@ msgstr "Dependiente"
 
 #: include/items.inc.php:102
 msgid "Dependent item"
-msgstr "Elemento dependiente"
+msgstr "Métrica dependiente"
 
 #: app/views/popup.generic.php:364 app/views/trigger.list.php:266
 #: app/views/trigger.prototype.list.php:94 include/triggers.inc.php:2013
@@ -6783,6 +6788,10 @@ msgstr "Detalles del escenario web"
 #: app/views/administration.housekeeping.edit.php:206
 msgid "Detected TimescaleDB license does not support compression. Compression is supported in TimescaleDB Community Edition."
 msgstr "La licencia de TimescaleDB detectada no admite la compresión. La compresión es compatible con TimescaleDB Community Edition."
+
+#: app/views/administration.housekeeping.edit.php:204
+msgid "Detected license does not support compression. Compression is supported in TimescaleDB Community Edition."
+msgstr "La licencia detectada no admite la compresión. TimescaleDB Community Edition admite la compresión."
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1130
 msgid "Detection period"
@@ -7279,7 +7288,7 @@ msgstr "Mostrar acciones"
 
 #: app/partials/monitoring.latest.view.html.php:309
 msgid "Display graph"
-msgstr "Mostrar gráfica"
+msgstr "Mostrar gráfico"
 
 #: widgets/itemhistory/views/column.edit.php:241
 msgid "Display local time"
@@ -11919,11 +11928,11 @@ msgstr "Italiano (it_IT)"
 #: widgets/item/includes/WidgetForm.php:122
 #: widgets/tophosts/views/column.edit.php:120
 msgid "Item"
-msgstr "Monitor"
+msgstr "Métrica"
 
 #: items.php:667
 msgid "Item added"
-msgstr "Monitor añadido"
+msgstr "Métrica añadida"
 
 #: app/views/popup.itemtestedit.view.php:433
 msgid "Item contains user-defined macros with secret values. Values of these macros should be entered manually."
@@ -12243,7 +12252,7 @@ msgstr "Kerberos"
 #: include/views/configuration.item.prototype.edit.php:121
 #: include/views/configuration.item.prototype.list.php:68 items.php:44
 msgid "Key"
-msgstr "Monitor"
+msgstr "Clave"
 
 #: app/views/administration.script.edit.php:172
 #: include/views/js/common.item.edit.js.php:56
@@ -13187,7 +13196,7 @@ msgstr "Máscara"
 #: include/views/configuration.item.list.php:343
 #: include/views/configuration.item.prototype.list.php:217
 msgid "Mass update"
-msgstr "Actualizar masivamente"
+msgstr "Modificar masivamente"
 
 #: include/views/js/monitoring.sysmaps.js.php:636
 msgid "Mass update elements"
@@ -13293,6 +13302,11 @@ msgstr "Número máximo de filas"
 #, c-format
 msgid "Maximum required %1$s database version is %2$s."
 msgstr "La versión máxima requerida de la base de datos de %1$s es %2$s."
+
+#: app/partials/administration.system.info.php:221
+#, c-format
+msgid "Maximum required version is %1$s."
+msgstr "La versión máxima requerida es %1$s."
 
 #: app/controllers/CControllerTimeSelectorUpdate.php:136
 #: include/classes/mvc/CController.php:320
@@ -13629,6 +13643,12 @@ msgstr "El límite mínimo requerido en el tiempo de análisis de entrada para s
 msgid "Minimum required size of PHP post is %1$s (configuration option \"post_max_size\")."
 msgstr "El tamaño mínimo requerido de una publicación PHP es %1$s (opción de configuración \"post_max_size\")."
 
+#: app/partials/administration.system.info.php:212
+#: app/views/administration.housekeeping.edit.php:183
+#, c-format
+msgid "Minimum required version is %1$s."
+msgstr "La versión mínima requerida es %1$s."
+
 #: app/views/monitoring.map.view.php:48
 #: include/views/monitoring.sysmap.edit.php:276
 msgid "Minimum severity"
@@ -13856,6 +13876,16 @@ msgstr "Múltiple"
 #: include/triggers.inc.php:611
 msgid "Multiple PROBLEM events"
 msgstr "Múltiples eventos PROBLEMA"
+
+#: app/partials/administration.system.info.php:235
+#, c-format
+msgid "Must be at least %1$s."
+msgstr "Debe ser al menos %1$s."
+
+#: app/partials/administration.system.info.php:254
+#, c-format
+msgid "Must not be higher than %1$s."
+msgstr "No debe ser mayor que %1$s."
 
 #: jsLoader.php:284
 msgid "Mute"
@@ -14597,6 +14627,66 @@ msgstr "Sin permisos para acceder al sistema."
 #, c-format
 msgid "No permissions to call \"%1$s.%2$s\"."
 msgstr "No hay permisos para llamar a \"%1$s.%2$s\"."
+
+#: include/classes/api/services/CConfiguration.php:312
+msgid "No permissions to import discovery rules."
+msgstr "No hay permisos para importar reglas de descubrimiento."
+
+#: include/classes/api/services/CConfiguration.php:313
+msgid "No permissions to import graphs."
+msgstr "No hay permisos para importar gráficos."
+
+#: include/classes/api/services/CConfiguration.php:314
+msgid "No permissions to import host groups."
+msgstr "No hay permisos para importar grupos de equipos."
+
+#: include/classes/api/services/CConfiguration.php:316
+msgid "No permissions to import hosts."
+msgstr "No hay permisos para importar equipos."
+
+#: include/classes/api/services/CConfiguration.php:318
+msgid "No permissions to import images."
+msgstr "No hay permisos para importar imágenes."
+
+#: include/classes/api/services/CConfiguration.php:319
+msgid "No permissions to import items."
+msgstr "No hay permisos para importar métricas."
+
+#: include/classes/api/services/CConfiguration.php:320
+msgid "No permissions to import maps."
+msgstr "No hay permisos para importar mapas."
+
+#: include/classes/api/services/CConfiguration.php:321
+msgid "No permissions to import media types."
+msgstr "No hay permisos para importar tipos de medios."
+
+#: include/classes/api/services/CConfiguration.php:324
+msgid "No permissions to import template dashboards."
+msgstr "No hay permisos para importar plantillas de paneles."
+
+#: include/classes/api/services/CConfiguration.php:315
+msgid "No permissions to import template groups."
+msgstr "No hay permisos para importar grupos de plantillas."
+
+#: include/classes/api/services/CConfiguration.php:322
+msgid "No permissions to import template links."
+msgstr "No hay permisos para importar enlaces de plantillas."
+
+#: include/classes/api/services/CConfiguration.php:323
+msgid "No permissions to import templates."
+msgstr "No hay permisos para importar plantillas."
+
+#: include/classes/api/services/CConfiguration.php:325
+msgid "No permissions to import triggers."
+msgstr "No hay permisos para importar iniciadores."
+
+#: include/classes/api/services/CConfiguration.php:326
+msgid "No permissions to import value maps."
+msgstr "No hay permisos para importar mapas de valores."
+
+#: include/classes/api/services/CConfiguration.php:317
+msgid "No permissions to import web scenarios."
+msgstr "No hay permisos para importar escenarios web."
 
 #: app/controllers/CControllerChartsView.php:133
 #: app/controllers/CControllerDashboardPrint.php:99
@@ -15653,25 +15743,25 @@ msgstr "Anulado por"
 #: include/views/configuration.item.edit.php:867
 #: include/views/configuration.item.prototype.edit.php:821
 msgid "Override"
-msgstr "Anular"
+msgstr "Especificar"
 
 #: include/classes/widgets/fields/CWidgetFieldMultiSelectOverrideHost.php:30
 msgid "Override host"
-msgstr "Reemplazar equipo"
+msgstr "Especificar equipo"
 
 #: app/partials/administration.system.info.php:210
 #: app/views/administration.housekeeping.edit.php:129
 msgid "Override item history period"
-msgstr "Anular periodo de histórico de elementos"
+msgstr "Especificar periodo de histórico de métricas"
 
 #: app/partials/administration.system.info.php:224
 #: app/views/administration.housekeeping.edit.php:155
 msgid "Override item trend period"
-msgstr "Anular periodo de tendencias de elementos"
+msgstr "Especificar periodo de tendencias de métricas"
 
 #: app/views/popup.tabfilter.edit.php:40
 msgid "Override time period selector"
-msgstr "Anular selector de período de tiempo"
+msgstr "Especificar selector de período de tiempo"
 
 #: app/controllers/CControllerPopupLldOverride.php:90
 #, c-format
@@ -17104,7 +17194,7 @@ msgstr "Actualizar"
 #: app/views/administration.proxy.list.php:206
 #: app/views/popup.proxy.edit.php:334
 msgid "Refresh configuration"
-msgstr "Configuración de recarga"
+msgstr "Actualizar configuración"
 
 #: app/views/js/administration.proxy.list.js.php:98
 msgid "Refresh configuration of the selected proxies?"
@@ -17625,6 +17715,11 @@ msgstr "Código de respuesta"
 #: httpdetails.php:149 include/classes/screens/CScreenHttpTestDetails.php:83
 msgid "Response time"
 msgstr "Tiempo de respuesta"
+
+#: include/classes/server/CZabbixServer.php:498
+#, c-format
+msgid "Response timeout of %1$s exceeded when connecting to Zabbix server \"%2$s\"."
+msgstr "Se ha excedido el tiempo de espera de %1$s al conectarse al servidor Zabbix \"%2$s\"."
 
 #: app/controllers/CControllerMediatypeTestSend.php:182
 msgid "Response type: JSON"
@@ -18919,6 +19014,18 @@ msgstr "Corto"
 msgid "Shortened"
 msgstr "Acortado"
 
+#: app/partials/administration.system.info.php:243
+#: app/views/administration.housekeeping.edit.php:187
+#, c-format
+msgid "Should be at least %1$s."
+msgstr "Debería ser al menos %1$s."
+
+#: app/partials/administration.system.info.php:262
+#: app/views/administration.housekeeping.edit.php:197
+#, c-format
+msgid "Should not be higher than %1$s."
+msgstr "No debe ser mayor que %1$s."
+
 #: app/partials/monitoring.problem.filter.php:27
 #: app/views/monitoring.charts.view.php:80
 #: app/views/monitoring.dashboard.list.php:64
@@ -20067,7 +20174,7 @@ msgstr "Tablero de plantilla"
 
 #: app/views/popup.import.php:37
 msgid "Template dashboards"
-msgstr "Tableros de plantilla"
+msgstr "Plantillas de tablero"
 
 #: app/controllers/CControllerTemplateDelete.php:133
 msgid "Template deleted"
@@ -20432,6 +20539,10 @@ msgstr "El número de procesos. Devuelve un número entero"
 #, c-format
 msgid "The parameter \"%1$s\" is missing from the user attributes."
 msgstr "Falta el parámetro \"%1$s\" en los atributos del usuario."
+
+#: app/views/popup.ldap.edit.php:101
+msgid "The previous password was cleared due to a host change. Please enter the new password."
+msgstr "La contraseña anterior se borró debido a un cambio de equipo. Ingrese la nueva contraseña."
 
 #: include/classes/core/CJsonRpc.php:206
 msgid "The received JSON is not a valid JSON-RPC request."
@@ -21482,6 +21593,14 @@ msgstr "No se puede recuperar el estado de soporte de compresión de TimescaleDB
 msgid "Unable to retrieve TimescaleDB version."
 msgstr "No se puede recuperar la versión de TimescaleDB."
 
+#: app/views/administration.housekeeping.edit.php:173
+msgid "Unable to retrieve compression support status of TimescaleDB time-series database extension for PostgreSQL."
+msgstr "No se puede recuperar el estado de soporte de compresión de la extensión de base de datos de series de tiempo TimescaleDB para PostgreSQL."
+
+#: app/views/administration.housekeeping.edit.php:178
+msgid "Unable to retrieve version of TimescaleDB time-series database extension for PostgreSQL."
+msgstr "No se puede recuperar la versión de la extensión de base de datos de series temporales TimescaleDB para PostgreSQL."
+
 #: include/views/mfa.login.php:65
 #, c-format
 msgid "Unable to scan? You can use %1$s secret key to manually configure your authenticator app:"
@@ -21760,6 +21879,11 @@ msgstr "Versión del servidor de base de datos %1$s no compatible. Debe ser al m
 msgid "Unsupported %1$s database server version. Must not be higher than %2$s."
 msgstr "Versión del servidor de base de datos %1$s no compatible. No debe ser superior a %2$s."
 
+#: app/partials/administration.system.info.php:206
+#: app/views/administration.housekeeping.edit.php:169
+msgid "Unsupported TimescaleDB time-series database extension for PostgreSQL is used."
+msgstr "Se utiliza la extensión de base de datos de series temporales TimescaleDB no compatible con PostgreSQL."
+
 #: app/views/administration.housekeeping.edit.php:190
 #, c-format
 msgid "Unsupported TimescaleDB version. Should be at least %1$s."
@@ -21907,16 +22031,16 @@ msgstr "Actualizado"
 #: widgets/problems/includes/WidgetProblems.php:473
 #: widgets/tophosts/views/column.edit.php:305
 msgid "Update"
-msgstr "Actualizar"
+msgstr "Modificar"
 
 #: widgets/tophosts/views/column.edit.php:300
 msgid "Update column"
-msgstr "Actualizar columna"
+msgstr "Modificar columna"
 
 #: app/partials/massupdate.macros.tab.php:87
 #: app/partials/massupdate.valuemaps.tab.php:34 app/views/popup.import.php:142
 msgid "Update existing"
-msgstr "Actualizar existentes"
+msgstr "Modificar existentes"
 
 #: app/controllers/CControllerPopupLldOperation.php:152
 #: app/controllers/CControllerPopupLldOperation.php:207
@@ -23173,6 +23297,11 @@ msgstr "Advertencia"
 #: include/func.inc.php:1775 jsLoader.php:216
 msgid "Warning message"
 msgstr "Mensaje de advertencia"
+
+#: app/partials/administration.system.info.php:243
+#: app/partials/administration.system.info.php:262
+msgid "Warning!"
+msgstr "¡Advertencia!"
 
 #: app/partials/administration.system.info.php:198
 msgid "Warning! Support for Oracle DB is deprecated since Zabbix 7.0 and will be removed in future versions."
@@ -24490,12 +24619,12 @@ msgstr "No se puede realizar la solicitud de API de desplazamiento, los datos po
 #: include/classes/validators/CApiInputValidator.php:3536
 #, c-format
 msgid "cannot update readonly parameter \"%1$s\" of discovered object"
-msgstr "no se puede actualizar el parámetro de solo lectura \"%1$s\" del objeto descubierto"
+msgstr "no se puede modificar el parámetro de solo lectura \"%1$s\" del objeto descubierto"
 
 #: include/classes/validators/CApiInputValidator.php:3530
 #, c-format
 msgid "cannot update readonly parameter \"%1$s\" of inherited object"
-msgstr "no se puede actualizar el parámetro de solo lectura \"%1$s\" del objeto heredado"
+msgstr "no se puede modificar el parámetro de solo lectura \"%1$s\" del objeto heredado"
 
 #: include/classes/api/services/CUserGroup.php:501
 #: include/classes/api/services/CUser.php:451
@@ -24504,7 +24633,7 @@ msgstr "no se puede actualizar el parámetro de solo lectura \"%1$s\" del objeto
 #: include/classes/api/services/CUser.php:1066
 #, c-format
 msgid "cannot update readonly parameter \"%1$s\" of provisioned user"
-msgstr "no se puede actualizar el parámetro de solo lectura \"%1$s\" del usuario aprovisionado."
+msgstr "no se puede modificar el parámetro de solo lectura \"%1$s\" del usuario aprovisionado."
 
 #: app/controllers/CControllerPopupTriggerExpr.php:491
 msgid "cbrt() - Cube root"

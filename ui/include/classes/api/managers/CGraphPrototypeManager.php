@@ -63,7 +63,6 @@ class CGraphPrototypeManager {
 			CGraphManager::delete($del_discovered_graphids);
 		}
 
-		DB::delete('graphs_items', ['graphid' => $del_graphids]);
 		DB::delete('graphs', ['graphid' => $del_graphids]);
 	}
 }

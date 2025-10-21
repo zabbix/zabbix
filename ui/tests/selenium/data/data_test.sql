@@ -769,10 +769,6 @@ INSERT INTO users_groups (id, usrgrpid, userid) VALUES (60, 7, 40);
 INSERT INTO users (userid, username, passwd, autologin, autologout, lang, refresh, roleid, theme, attempt_failed, attempt_clock, rows_per_page) VALUES (50, 'user-zabbix', '$2y$10$MZQTU3/7XsECy1DbQqvn/eaoPoMDgMYJ7Ml1wYon1dC0NfwM9E3zu', 0, 0, 'en_US', 30, 1, 'default', 0, 0, 50);
 INSERT INTO users_groups (id, usrgrpid, userid) VALUES (70, 7, 50);
 
--- testPageDashboard Favorites
-INSERT INTO profiles (profileid,userid,idx,value_id,value_str,source,type) VALUES (1,1,'web.favorite.sysmapids',1,'','sysmapid',1);
-INSERT INTO profiles (profileid,userid,idx,value_id,value_str,source,type) VALUES (2,1,'web.favorite.graphids',42258,'','itemid',1);
-
 -- testFormAdministrationUserGroups
 INSERT INTO usrgrp (usrgrpid, name) VALUES (130, 'Selenium user group');
 INSERT INTO usrgrp (usrgrpid, name) VALUES (140, 'Selenium user group in scripts');
@@ -1293,10 +1289,6 @@ INSERT INTO triggers (triggerid, description, expression, status, value, priorit
 INSERT INTO functions (functionid, itemid, triggerid, name, parameter) VALUES (100070, 99097, 100069, 'last', '$');
 INSERT INTO trigger_discovery (triggerid, parent_triggerid) VALUES (100069, 100068);
 
--- testFormAdministrationMediaTypes
-INSERT INTO media_type (mediatypeid, type, name, exec_path, status, script, description) VALUES (100, 1, 'Test script', 'Selenium test script', 1, '', '');
-INSERT INTO media_type_param (mediatype_paramid, mediatypeid, name, value, sortorder) VALUES (1012, 100, '', '{ALERT.SUBJECT}', 0);
-
 -- testFormUser
 INSERT INTO sysmaps (sysmapid, name, width, height, backgroundid, label_type, label_location, highlight, expandproblem, markelements, show_unack, userid, private) VALUES (10, 'Public map with image', 800, 600, NULL, 0, 0, 1, 1, 1, 2, 1, 0);
 INSERT INTO sysmaps_elements (selementid, sysmapid, elementid, elementtype, iconid_off, iconid_on, label, label_location, x, y, iconid_disabled, iconid_maintenance) VALUES (10,10,0,4,7,NULL,'Test phone icon',0,151,101,NULL,NULL);
@@ -1371,23 +1363,6 @@ INSERT INTO dashboard_page (dashboard_pageid, dashboardid) VALUES (156700, 1020)
 INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (100003, 156700, 'trigover', 'Group to check Overview', 0, 0, 12, 7);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (1345, 100003, 0, 'style', 1);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_groupid) VALUES (1346, 100003, 2, 'groupids', 0, 50011);
-
--- Dashboard for sharing testing
-INSERT INTO dashboard (dashboardid, name, userid, private) VALUES (1210, 'Testing share dashboard', 9, 0);
-INSERT INTO dashboard_page (dashboard_pageid, dashboardid) VALUES (133456, 1210);
-INSERT INTO dashboard (dashboardid, name, userid, private) VALUES (1220, 'Dashboard for Admin share testing', 1, 1);
-INSERT INTO dashboard_page (dashboard_pageid, dashboardid) VALUES (14345, 1220);
-INSERT INTO dashboard_user (dashboard_userid, dashboardid, userid, permission) VALUES (1, 1220, 9, 2);
-
--- testProblemsBySeverityWidget
-INSERT INTO dashboard (dashboardid, name, userid, private) VALUES (1040, 'Dashboard for Problems by severity', 1, 1);
-INSERT INTO dashboard_page (dashboard_pageid, dashboardid) VALUES (115690, 1040);
-INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (100006, 115690, 'problemsbysv', 'Reference widget', 0, 0, 12, 5);
-INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (100007, 115690, 'problemsbysv', 'Reference PBS widget to delete', 12, 0, 6, 3);
-INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (100009, 115690, 'problemsbysv', 'Totals reference PBS widget to delete',18, 0, 6, 3);
-INSERT INTO widget_field (widgetid, widget_fieldid, type, name, value_str) VALUES (100006, 8013999, 1, 'reference', 'QWCBA');
-INSERT INTO widget_field (widgetid, widget_fieldid, type, name, value_int) VALUES (100009, 8013799, 0, 'show_type', 1);
-INSERT INTO widget_field (widgetid, widget_fieldid, type, name, value_int) VALUES (100009, 8013899, 0, 'layout', 1);
 
 -- testFormItemTest
 INSERT INTO hosts (hostid, host, name, status, description) VALUES (99136, 'Test item host', 'Test item host', 0, 'Test item host for testing items');

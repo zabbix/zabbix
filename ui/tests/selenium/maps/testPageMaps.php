@@ -292,6 +292,10 @@ class testPageMaps extends CWebTest {
 						'Name' => ''
 					],
 					'expected' => [
+						'1st host for widgets map',
+						'1st hostgroup for widgets map',
+						'2nd host for widgets map',
+						'2nd hostgroup for widgets map',
 						self::SYSMAP_NAME_LOW_NUMBER,
 						self::SYSMAP_NAME_HIGH_NUMBER,
 						self::SYSMAP_FIRST_A,
@@ -331,6 +335,10 @@ class testPageMaps extends CWebTest {
 						'Name' => ' '
 					],
 					'expected' => [
+						'1st host for widgets map',
+						'1st hostgroup for widgets map',
+						'2nd host for widgets map',
+						'2nd hostgroup for widgets map',
 						self::SYSMAP_NAME_LOW_NUMBER,
 						self::SYSMAP_NAME_HIGH_NUMBER,
 						self::SYSMAP_FIRST_A,
@@ -485,7 +493,9 @@ class testPageMaps extends CWebTest {
 
 		// Fill filter fields if such present in data provider.
 		$form->fill(CTestArrayHelper::get($data, 'filter'));
+		$table = $this->getTable();
 		$form->submit();
+		$table->waitUntilReloaded();
 		$this->page->waitUntilReady();
 
 		// Check that expected maps are returned in the list.

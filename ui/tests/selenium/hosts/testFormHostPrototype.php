@@ -868,7 +868,9 @@ class testFormHostPrototype extends CLegacyWebTest {
 
 		$this->zbxTestLogin('host_prototypes.php?parent_discoveryid='.self::DISCOVERY_RULE_ID.'&context=host');
 		$this->zbxTestClickLinkTextWait($hostname);
-		$this->zbxTestClickWait('clone');
+		$form = $this->query('id:host-prototype-form')->asForm()->waitUntilVisible()->one();
+		$this->query('button:Clone')->waitUntilClickable()->one()->click();
+		$form->waitUntilStalled();
 
 		// Change name and visible name.
 		$this->zbxTestInputTypeOverwrite('host', $data['name']);

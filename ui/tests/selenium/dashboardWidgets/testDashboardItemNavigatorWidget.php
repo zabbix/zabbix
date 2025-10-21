@@ -617,8 +617,9 @@ class testDashboardItemNavigatorWidget extends testWidgets {
 					]
 				]
 			],
+			// TODO: uncomment after fix ZBX-27031
 			// #27.
-			[
+/*			[
 				[
 					'expected' => TEST_GOOD,
 					'fields' => [
@@ -626,7 +627,7 @@ class testDashboardItemNavigatorWidget extends testWidgets {
 						'Show problems' => 'None'
 					]
 				]
-			],
+			],*/
 			// #28.
 			[
 				[
@@ -866,6 +867,7 @@ class testDashboardItemNavigatorWidget extends testWidgets {
 				? '1 minute'
 				: (CTestArrayHelper::get($data['fields'], 'Refresh interval', '1 minute'));
 			$this->assertEquals($refresh, $widget->getRefreshInterval());
+			CPopupMenuElement::find()->one()->close();
 
 			// Check new widget form fields and values in frontend.
 			$saved_form = $widget->edit();

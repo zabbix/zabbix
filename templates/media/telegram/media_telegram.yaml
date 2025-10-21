@@ -446,11 +446,17 @@ zabbix_export:
         		{
         			api_token: {type: 'string'},
         			api_chat_id: {type: 'string'},
-        			alert_message: {type: 'string'},
-        			event_tags: {type: 'array', tags: true, default: {}}
+        			alert_message: {type: 'string'}
         		},
         		this.params
         	);
+        
+        	if (CParamValidator.inArray(this.params.event_source, ['0', '3', '4'])) {
+        		CParamValidator.validate({
+        			event_tags: {type: 'array', macro: 'EVENT.TAGSJSON', tags: true, default: {}}
+        		}, this.params);
+        	}
+        
         	this.params.url = 'https://api.telegram.org/bot';
         	this.data = {
         		disable_web_page_preview: true,
@@ -555,7 +561,7 @@ zabbix_export:
         
         3. Create a Zabbix user and add media:
         - To create a new user, go to the "Users" → "Users" section, click the "Create user" button in the top right corner. In the "User" tab, fill in all required fields (marked with red asterisks).
-        - Make sure this user has access to all hosts for which you would like problem notifications to be sent to Zammad.
+        - Make sure this user has access to all hosts for which you would like problem notifications to be sent to Telegram.
         - In the "Media" tab, click "Add" and select the type "Telegram" from the drop-down list.
         - In the "Send to" field, specify the Telegram user chat ID or group ID that you retrieved during Telegram setup. To send notifications to a specific topic within a supergroup, specify the topic ID after the semicolon delimiter in the format "<group_id>:<topic_id>", for example: "-1001234567890:2", "@MyGroupName:2".
         

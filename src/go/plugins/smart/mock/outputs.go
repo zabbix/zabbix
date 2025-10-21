@@ -58,6 +58,9 @@ var (
 	//go:embed outputs/all_disc_info_sda.json
 	OutputAllDiscInfoSDA []byte
 
+	//go:embed outputs/all_disc_info_by_id.json
+	OutputAllDiscInfoByID []byte
+
 	//go:embed outputs/all_disc_info_mac.json
 	OutputAllDiscInfoMac []byte
 )

@@ -190,7 +190,7 @@ int	ssh_run(zbx_dc_item_t *item, AGENT_RESULT *result, const char *encoding, con
 {
 	ssh_session	session;
 	ssh_channel	channel;
-	ssh_key 	privkey = NULL, pubkey = NULL;
+	ssh_key		privkey = NULL, pubkey = NULL;
 	int		rc, userauth, ret = NOTSUPPORTED;
 	char		*output, *publickey = NULL, *privatekey = NULL, *buffer = NULL, *err_msg = NULL;
 	char		tmp_buf[DATA_BUFFER_SIZE], userauthlist[64];
@@ -198,8 +198,6 @@ int	ssh_run(zbx_dc_item_t *item, AGENT_RESULT *result, const char *encoding, con
 	zbx_timespec_t	deadline;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
-
-	ZBX_UNUSED(config_source_ip);
 
 	/* initializes an SSH session object */
 	if (NULL == (session = ssh_new()))
@@ -212,10 +210,13 @@ int	ssh_run(zbx_dc_item_t *item, AGENT_RESULT *result, const char *encoding, con
 
 	zbx_ts_get_deadline(&deadline, 0 == timeout ? SEC_PER_YEAR : timeout);
 
-	/* set blocking mode on session */
-	ssh_set_blocking(session, 0);
+	if (NULL != config_source_ip && 0 != ssh_options_set(session, SSH_OPTIONS_BINDADDR, config_source_ip))
+	{
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot set SSH address binding: %s",
+				ssh_get_error(session)));
+		goto session_free;
+	}
 
-	/* create a session instance and start it up */
 	if (0 != ssh_options_set(session, SSH_OPTIONS_HOST, item->interface.addr) ||
 			0 != ssh_options_set(session, SSH_OPTIONS_PORT, &item->interface.port) ||
 			0 != ssh_options_set(session, SSH_OPTIONS_USER, item->username))
@@ -224,6 +225,8 @@ int	ssh_run(zbx_dc_item_t *item, AGENT_RESULT *result, const char *encoding, con
 				ssh_get_error(session)));
 		goto session_free;
 	}
+
+	ssh_set_blocking(session, 0);
 
 	if (0 < strlen(options))
 	{

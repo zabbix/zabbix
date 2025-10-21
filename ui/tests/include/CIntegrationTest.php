@@ -407,10 +407,14 @@ class CIntegrationTest extends CAPITest {
 		}
 
 		$failed_pids = [];
+		$failed_kills = [];
 
 		foreach ($child_pids as $child_pid) {
 			if (ctype_digit($child_pid) && posix_kill($child_pid, 0)) {
-				posix_kill($child_pid, SIGKILL);
+				if (!posix_kill($child_pid, SIGKILL)) {
+					$error_code = posix_get_last_error();
+					$failed_kills[] = ' - '.$child_pid.' ('.$error_code.') '.posix_strerror($error_code);
+				}
 				$failed_pids[] = $child_pid;
 			}
 		}
@@ -420,9 +424,12 @@ class CIntegrationTest extends CAPITest {
 		}
 
 		$log = CLogHelper::readLog(self::getLogPath($component), false, true);
+		$failed_kills = $failed_kills
+			? "\n".'The following processes could not be terminated using SIGKILL:'."\n".implode("\n", $failed_kills)
+			: '';
 
 		throw new Exception('Multiple child processes for component "'.$component.'" did not stop gracefully:'."\n".
-			implode(', ', $failed_pids)."\n".
+			implode(', ', $failed_pids).$failed_kills."\n".
 			'Log file contents: '."\n".$log."\n");
 	}
 

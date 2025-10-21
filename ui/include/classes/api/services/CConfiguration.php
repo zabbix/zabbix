@@ -25,6 +25,76 @@ class CConfiguration extends CApiService {
 		'importcompare' => ['min_user_type' => USER_TYPE_ZABBIX_USER]
 	];
 
+	private const IMPORT_ACCESS_RULES = [
+		'discoveryRules' => [
+			'createMissing' => CDiscoveryRule::ACCESS_RULES['create'],
+			'updateExisting' => CDiscoveryRule::ACCESS_RULES['update'],
+			'deleteMissing' => CDiscoveryRule::ACCESS_RULES['delete']
+		],
+		'graphs' => [
+			'createMissing' => CGraph::ACCESS_RULES['create'],
+			'updateExisting' => CGraph::ACCESS_RULES['update'],
+			'deleteMissing' => CGraph::ACCESS_RULES['delete']
+		],
+		'host_groups' => [
+			'createMissing' => CHostGroup::ACCESS_RULES['create'],
+			'updateExisting' => CHostGroup::ACCESS_RULES['update']
+		],
+		'template_groups' => [
+			'createMissing' => CTemplateGroup::ACCESS_RULES['create'],
+			'updateExisting' => CTemplateGroup::ACCESS_RULES['update']
+		],
+		'hosts' => [
+			'createMissing' => CHost::ACCESS_RULES['create'],
+			'updateExisting' => CHost::ACCESS_RULES['update']
+		],
+		'httptests' => [
+			'createMissing' => CHttpTest::ACCESS_RULES['create'],
+			'updateExisting' => CHttpTest::ACCESS_RULES['update'],
+			'deleteMissing' => CHttpTest::ACCESS_RULES['delete']
+		],
+		'images' => [
+			'createMissing' => CImage::ACCESS_RULES['create'],
+			'updateExisting' => CImage::ACCESS_RULES['update']
+		],
+		'items' => [
+			'createMissing' => CItem::ACCESS_RULES['create'],
+			'updateExisting' => CItem::ACCESS_RULES['update'],
+			'deleteMissing' => CItem::ACCESS_RULES['delete']
+		],
+		'maps' => [
+			'createMissing' => CMap::ACCESS_RULES['create'],
+			'updateExisting' => CMap::ACCESS_RULES['update']
+		],
+		'mediaTypes' => [
+			'createMissing' => CMediatype::ACCESS_RULES['create'],
+			'updateExisting' => CMediatype::ACCESS_RULES['update']
+		],
+		'templateLinkage' => [
+			'createMissing' => CHostGeneral::ACCESS_RULES['massadd'],
+			'deleteMissing' => CHostGeneral::ACCESS_RULES['update']
+		],
+		'templates' => [
+			'createMissing' => CTemplate::ACCESS_RULES['create'],
+			'updateExisting' => CTemplate::ACCESS_RULES['update']
+		],
+		'templateDashboards' => [
+			'createMissing' => CTemplateDashboard::ACCESS_RULES['create'],
+			'updateExisting' => CTemplateDashboard::ACCESS_RULES['update'],
+			'deleteMissing' => CTemplateDashboard::ACCESS_RULES['delete']
+		],
+		'triggers' => [
+			'createMissing' => CTrigger::ACCESS_RULES['create'],
+			'updateExisting' => CTrigger::ACCESS_RULES['update'],
+			'deleteMissing' => CTrigger::ACCESS_RULES['delete']
+		],
+		'valueMaps' => [
+			'createMissing' => CValueMap::ACCESS_RULES['create'],
+			'updateExisting' => CValueMap::ACCESS_RULES['update'],
+			'deleteMissing' => CValueMap::ACCESS_RULES['delete']
+		]
+	];
+
 	/**
 	 * @param array $params
 	 *
@@ -202,19 +272,15 @@ class CConfiguration extends CApiService {
 				]]
 			]]
 		]];
+
 		if (!CApiInputValidator::validate($api_input_rules, $params, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
+		self::checkAffectedApiAccess($params);
+
 		if (mb_substr($params['source'], 0, 1) === pack('H*', 'EFBBBF')) {
 			$params['source'] = mb_substr($params['source'], 1);
-		}
-
-		if (array_key_exists('maps', $params['rules']) && !self::checkAccess(CRoleHelper::ACTIONS_EDIT_MAPS)
-				&& ($params['rules']['maps']['createMissing'] || $params['rules']['maps']['updateExisting'])) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.', 'rules',
-				_('no permissions to create and edit maps')
-			));
 		}
 
 		if ($params['format'] === CImportReaderFactory::XML) {
@@ -228,6 +294,39 @@ class CConfiguration extends CApiService {
 
 			if ($xml_reader['result'] == CFrontendSetup::CHECK_FATAL) {
 				self::exception(ZBX_API_ERROR_INTERNAL, $xml_reader['error']);
+			}
+		}
+	}
+
+	private static function checkAffectedApiAccess(array $params): void {
+		foreach ($params['rules'] as $object_tag => $changes_requested) {
+			$access_rules = self::IMPORT_ACCESS_RULES[$object_tag];
+
+			foreach (['createMissing', 'updateExisting', 'deleteMissing'] as $option) {
+				if (array_key_exists($option, $changes_requested) && $changes_requested[$option]
+						&& (self::$userData['type'] < $access_rules[$option]['min_user_type']
+							|| (array_key_exists('action', $access_rules[$option])
+								&& !self::checkAccess($access_rules[$option]['action'])))) {
+					self::exception(ZBX_API_ERROR_PERMISSIONS,
+						match ($object_tag) {
+							'discoveryRules' => _('No permissions to import discovery rules.'),
+							'graphs' => _('No permissions to import graphs.'),
+							'host_groups' => _('No permissions to import host groups.'),
+							'template_groups' => _('No permissions to import template groups.'),
+							'hosts' => _('No permissions to import hosts.'),
+							'httptests' => _('No permissions to import web scenarios.'),
+							'images' => _('No permissions to import images.'),
+							'items' => _('No permissions to import items.'),
+							'maps' => _('No permissions to import maps.'),
+							'mediaTypes' => _('No permissions to import media types.'),
+							'templateLinkage' => _('No permissions to import template links.'),
+							'templates' => _('No permissions to import templates.'),
+							'templateDashboards' => _('No permissions to import template dashboards.'),
+							'triggers' => _('No permissions to import triggers.'),
+							'valueMaps' => _('No permissions to import value maps.')
+						}
+					);
+				}
 			}
 		}
 	}

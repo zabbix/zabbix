@@ -22,6 +22,7 @@
 #include "json_parser.h"
 #include "jsonobj.h"
 #include "zbxalgo.h"
+#define ZBX_VECTOR_ARRAY_RESERVE	3
 
 typedef struct
 {
@@ -113,6 +114,7 @@ static void	zbx_vector_jsonobj_ref_add_object(zbx_vector_jsonobj_ref_t *refs, co
 	ref.external = 1;
 
 	ref.value = value;
+	zbx_vector_jsonobj_ref_reserve(refs, ZBX_VECTOR_ARRAY_RESERVE);
 	zbx_vector_jsonobj_ref_append(refs, ref);
 }
 
@@ -140,6 +142,7 @@ static void	zbx_vector_jsonobj_ref_add_string(zbx_vector_jsonobj_ref_t *refs, co
 	jsonobj_init(ref.value, ZBX_JSON_TYPE_STRING);
 	jsonobj_set_string(ref.value, zbx_strdup(NULL, str));
 
+	zbx_vector_jsonobj_ref_reserve(refs, ZBX_VECTOR_ARRAY_RESERVE);
 	zbx_vector_jsonobj_ref_append(refs, ref);
 }
 
@@ -3020,6 +3023,8 @@ static void	jsonobj_index_add_element(zbx_hashset_t *index, const char *name, zb
 	ref.name = zbx_strdup(NULL, name);
 	ref.value = obj;
 	ref.external = 0;
+
+	zbx_vector_jsonobj_ref_reserve(&el->objects, ZBX_VECTOR_ARRAY_RESERVE);
 	zbx_vector_jsonobj_ref_append(&el->objects, ref);
 }
 

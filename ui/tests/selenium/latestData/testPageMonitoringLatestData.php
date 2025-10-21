@@ -418,7 +418,7 @@ class testPageMonitoringLatestData extends CWebTest {
 					],
 					'Show tags' => '2',
 					'result' => [
-						['Name' => 'tag_item_1', 'Tags' => 'component: name:tag_item_1tag: filtering_value']
+						['Name' => 'tag_item_1', 'Tags' => "component: name:tag_item_1\ntag: filtering_value"]
 					]
 				]
 			],
@@ -431,7 +431,7 @@ class testPageMonitoringLatestData extends CWebTest {
 					'Show tags' => '3',
 					'Tags name' => 'Full',
 					'result' => [
-						['Name' => 'tag_item_1', 'Tags' => 'component: name:tag_item_1tag: filtering_valuetag_number: 0']
+						['Name' => 'tag_item_1', 'Tags' => "component: name:tag_item_1\ntag: filtering_value\ntag_number: 0"]
 					]
 				]
 			],
@@ -443,7 +443,7 @@ class testPageMonitoringLatestData extends CWebTest {
 					],
 					'Tags name' => 'Shortened',
 					'result' => [
-						['Name' => 'tag_item_1', 'Tags' => 'com: name:tag_item_1tag: filtering_valuetag: 0']
+						['Name' => 'tag_item_1', 'Tags' => "com: name:tag_item_1\ntag: filtering_value\ntag: 0"]
 					]
 				]
 			],
@@ -455,7 +455,7 @@ class testPageMonitoringLatestData extends CWebTest {
 					],
 					'Tags name' => 'None',
 					'result' => [
-						['Name' => 'tag_item_1', 'Tags' => 'name:tag_item_1filtering_value0']
+						['Name' => 'tag_item_1', 'Tags' => "name:tag_item_1\nfiltering_value\n0"]
 					]
 				]
 			],
@@ -467,7 +467,7 @@ class testPageMonitoringLatestData extends CWebTest {
 						'Tag display priority' => 'tag_'
 					],
 					'result' => [
-						['Name' => 'tag_item_1', 'Tags' => 'component: name:tag_item_1tag: filtering_valuetag_number: 0']
+						['Name' => 'tag_item_1', 'Tags' => "component: name:tag_item_1\ntag: filtering_value\ntag_number: 0"]
 					]
 				]
 			],
@@ -479,7 +479,7 @@ class testPageMonitoringLatestData extends CWebTest {
 						'Tag display priority' => 'tag_number,tag,component'
 					],
 					'result' => [
-						['Name' => 'tag_item_1', 'Tags' => 'tag_number: 0tag: filtering_valuecomponent: name:tag_item_1']
+						['Name' => 'tag_item_1', 'Tags' => "tag_number: 0\ntag: filtering_value\ncomponent: name:tag_item_1"]
 					]
 				]
 			],
@@ -491,7 +491,7 @@ class testPageMonitoringLatestData extends CWebTest {
 						'Tag display priority' => 'tag'
 					],
 					'result' => [
-						['Name' => 'tag_item_1', 'Tags' => 'tag: filtering_valuecomponent: name:tag_item_1tag_number: 0']
+						['Name' => 'tag_item_1', 'Tags' => "tag: filtering_value\ncomponent: name:tag_item_1\ntag_number: 0"]
 					]
 				]
 			]

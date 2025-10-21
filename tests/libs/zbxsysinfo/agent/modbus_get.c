@@ -16,6 +16,7 @@
 #include "zbxmockassert.h"
 #include "zbxmockutil.h"
 #include "../../../../src/libs/zbxsysinfo/agent/modbtype.h"
+#include "zbxstr.h"
 #include <modbus.h>
 
 modbus_t	*__wrap_modbus_new_rtu(char *port, int baudrate,

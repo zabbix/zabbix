@@ -110,7 +110,7 @@ Default is 10050.
 .IP "\fB\-I\fR, \fB\-\-source\-address\fR \fIIP\-address\fR"
 Specify source IP address.
 .IP "\fB\-t\fR, \fB\-\-timeout\fR \fIseconds\fR"
-Specify timeout. Valid range: 1\-30 seconds (default: 30)
+Specify timeout. Valid range: 1\-600 seconds (default: 30)
 .IP "\fB\-k\fR, \fB\-\-key\fR \fIitem\-key\fR"
 Specify key of item to retrieve value for.
 .IP "\fB\-P\fR, \fB\-\-protocol\fR \fIvalue\fR"

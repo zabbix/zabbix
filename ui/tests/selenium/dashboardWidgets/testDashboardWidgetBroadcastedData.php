@@ -304,7 +304,7 @@ class testDashboardWidgetBroadcastedData extends testWidgetCommunication {
 			]
 		]);
 
-		// Make all old listener widgets on the page to listen the corresponding custom proadcaster widget.
+		// Make all old listener widgets on the page to listen the corresponding custom broadcaster widget.
 		foreach (array_keys($pageids) as $page_name) {
 			// Create the broadcaster reference using the type of broadcasted data and pre-defined reference id.
 			if ($used_pages[$page_name] === 'groupids') {
@@ -421,6 +421,8 @@ class testDashboardWidgetBroadcastedData extends testWidgetCommunication {
 					'","from_ts":'.$from_unixtime.',"to_ts":'.$to_unixtime.'}';
 		}
 
+		$dashboard->waitUntilReady();
+
 		// Get the feedback value from the textarea, remove the timestamp and compare with the expected string.
 		$this->assertEquals($expected, substr($feedback_field->getValue(), 11));
 
@@ -517,7 +519,7 @@ class testDashboardWidgetBroadcastedData extends testWidgetCommunication {
 			$this->assertEquals($expected_text, substr($value, 11));
 		}
 
-		// Check that no feedback was send to the custom broadcaster thom the listeners.
+		// Check that no feedback was send to the custom broadcaster from the listeners.
 		if (array_key_exists('broadcaster', $data)) {
 			$value = $dashboard->getWidget($data['broadcaster'])->query('name:feedbacks')->one()->getValue();
 			$this->assertEquals('', $value);
@@ -656,6 +658,7 @@ class testDashboardWidgetBroadcastedData extends testWidgetCommunication {
 
 		// Select an element on the broadcaster widget to trigger a broadcast.
 		$this->getWidgetElement($data['select_element'], $broadcaster)->click();
+		$dashboard->waitUntilReady();
 
 		// Check the broadcasted value on the listener.
 		$selected_entity = CTestArrayHelper::get($data, 'selected_entity', $data['select_element']);

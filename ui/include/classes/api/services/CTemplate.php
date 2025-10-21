@@ -633,9 +633,7 @@ class CTemplate extends CHostGeneral {
 		}
 
 		// delete host from maps
-		if (!empty($templateids)) {
-			DB::delete('sysmaps_elements', ['elementtype' => SYSMAP_ELEMENT_TYPE_HOST, 'elementid' => $templateids]);
-		}
+		DB::delete('sysmaps_elements', ['elementtype' => SYSMAP_ELEMENT_TYPE_HOST, 'elementid' => $templateids]);
 
 		// delete web scenarios
 		$db_httptests = DB::select('httptest', [
@@ -707,7 +705,6 @@ class CTemplate extends CHostGeneral {
 		}
 
 		self::deleteHgSets($db_templates);
-		DB::delete('hosts_groups', ['hostid' => $templateids]);
 
 		// Finally delete the template.
 		DB::delete('host_tag', ['hostid' => $templateids]);

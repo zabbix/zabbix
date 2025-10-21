@@ -53,6 +53,7 @@ zbx_time_unit_t;
 
 double		zbx_time(void);
 void		zbx_timespec(zbx_timespec_t *ts);
+void		zbx_timespec_normalize(zbx_timespec_t *ts);
 double		zbx_current_time(void);
 int		zbx_is_leap_year(int year);
 void		zbx_get_time(struct tm *tm, long *milliseconds, zbx_timezone_t *tz);

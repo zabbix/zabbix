@@ -1923,13 +1923,7 @@ class CItem extends CItemGeneral {
 
 		self::clearHistoryAndTrends($del_itemids);
 
-		DB::delete('graphs_items', ['itemid' => $del_itemids]);
-		DB::delete('widget_field', ['value_itemid' => $del_itemids]);
-		DB::delete('item_discovery', ['itemid' => $del_itemids]);
-		DB::delete('item_parameter', ['itemid' => $del_itemids]);
 		DB::delete('item_preproc', ['itemid' => $del_itemids]);
-		DB::delete('item_rtdata', ['itemid' => $del_itemids]);
-		DB::delete('item_rtname', ['itemid' => $del_itemids]);
 		DB::delete('item_tag', ['itemid' => $del_itemids]);
 		DB::update('items', [
 			'values' => ['templateid' => 0, 'master_itemid' => 0],

@@ -13,7 +13,6 @@
 **/
 
 #include "zbxexpression.h"
-#include "macrofunc.h"
 #include "expression.h"
 
 #include "zbxexpr.h"
@@ -527,8 +526,10 @@ int	zbx_substitute_lld_macros(char **data, const struct zbx_json_parse *jp_row,
 	size_t		i;
 	zbx_token_t	token;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() data:'%s'", __func__, *data);
-
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+#ifdef ZBX_DEBUG
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() data:'%s'", __func__, *data);
+#endif
 	while (SUCCEED == ret && SUCCEED == zbx_token_find(*data, pos, &token, ZBX_TOKEN_SEARCH_EXPRESSION_MACRO))
 	{
 		for (i = prev_token_loc_r + 1; i < token.loc.l; i++)
@@ -564,7 +565,7 @@ int	zbx_substitute_lld_macros(char **data, const struct zbx_json_parse *jp_row,
 					break;
 				case ZBX_TOKEN_USER_FUNC_MACRO:
 				case ZBX_TOKEN_FUNC_MACRO:
-					if (NULL != (m_ptr = func_get_macro_from_func(*data, &token.data.func_macro,
+					if (NULL != (m_ptr = zbx_get_macro_from_func(*data, &token.data.func_macro,
 							NULL)))
 					{
 						ret = substitute_func_macro(data, &token, jp_row, lld_macro_paths,
@@ -586,7 +587,10 @@ int	zbx_substitute_lld_macros(char **data, const struct zbx_json_parse *jp_row,
 		pos++;
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s data:'%s'", __func__, zbx_result_string(ret), *data);
+#ifdef ZBX_DEBUG
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() result:'%s'", __func__, *data);
+#endif
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
 }

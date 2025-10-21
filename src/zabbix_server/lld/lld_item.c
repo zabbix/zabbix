@@ -284,22 +284,6 @@ static void	zbx_item_discovery_free(zbx_item_discovery_t *data)
 	zbx_free(data);
 }
 
-static void	add_batch_select_condition(char **sql, size_t *sql_alloc, size_t *sql_offset, const char* column,
-		const zbx_vector_uint64_t *itemids, int *index)
-{
-#define ZBX_LLD_ITEMS_BATCH_SIZE	1000
-	int	new_index = *index + ZBX_LLD_ITEMS_BATCH_SIZE;
-#undef ZBX_LLD_ITEMS_BATCH_SIZE
-
-	if (new_index > itemids->values_num)
-		new_index = itemids->values_num;
-
-	zbx_db_add_condition_alloc(sql, sql_alloc, sql_offset, column,
-			itemids->values + *index, new_index - *index);
-
-	*index = new_index;
-}
-
 /******************************************************************************
  *                                                                            *
  * Purpose: Retrieves existing items for the specified item prototypes.       *
@@ -2776,7 +2760,7 @@ static void	lld_item_prepare_update(const zbx_lld_item_prototype_t *item_prototy
 		d = ",";
 		zbx_audit_item_update_json_update_password(ZBX_AUDIT_LLD_CONTEXT, item->itemid,
 				(int)ZBX_FLAG_DISCOVERY_CREATED, (0 == strcmp("", item->password_orig) ? "" :
-				ZBX_MACRO_SECRET_MASK), (0 == strcmp("", item->password) ? "" : ZBX_MACRO_SECRET_MASK));
+				ZBX_SECRET_MASK), (0 == strcmp("", item->password) ? "" : ZBX_SECRET_MASK));
 		zbx_free(value_esc);
 	}
 	if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_PUBLICKEY))
@@ -2964,8 +2948,8 @@ static void	lld_item_prepare_update(const zbx_lld_item_prototype_t *item_prototy
 		d = ",";
 		zbx_audit_item_update_json_update_ssl_key_password(ZBX_AUDIT_LLD_CONTEXT, item->itemid,
 				(int)ZBX_FLAG_DISCOVERY_CREATED, (0 == strcmp("", item->ssl_key_password_orig) ?
-				"" : ZBX_MACRO_SECRET_MASK), (0 == strcmp("", item->ssl_key_password) ? "" :
-				ZBX_MACRO_SECRET_MASK));
+				"" : ZBX_SECRET_MASK), (0 == strcmp("", item->ssl_key_password) ? "" :
+				ZBX_SECRET_MASK));
 		zbx_free(value_esc);
 	}
 	if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_VERIFY_PEER))

@@ -90,7 +90,7 @@ class CCheckboxListElement extends CElement {
 	 * @return $this
 	 */
 	public function uncheck($labels) {
-		return $this->set($labels, true);
+		return $this->set($labels, false);
 	}
 
 	/**

@@ -37,7 +37,7 @@ class CControllerPopupItemTestGetValue extends CControllerPopupItemTest {
 			'ipmi_sensor'			=> 'string',
 			'item_type'				=> 'required|int32',
 			'jmx_endpoint'			=> 'string',
-			'macros'				=> 'array',
+			'macros'				=> 'string',
 			'output_format'			=> 'in '.implode(',', [HTTPCHECK_STORE_RAW, HTTPCHECK_STORE_JSON]),
 			'params_ap'				=> 'string',
 			'params_es'				=> 'string',

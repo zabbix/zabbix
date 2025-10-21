@@ -20,15 +20,17 @@ import (
 	"golang.zabbix.com/sdk/plugin"
 )
 
-type Options struct {
+var _ plugin.Configurator = (*Plugin)(nil)
+
+type options struct {
 	Timeout int `conf:"optional,range=1:30"`
 	// Sessions stores pre-defined named sets of connections settings.
-	Sessions map[string]Session `conf:"optional"`
+	Sessions map[string]session `conf:"optional"`
 	// Default stores default connection parameter values from configuration file
-	Default *Session `conf:"optional"`
+	Default *session `conf:"optional"`
 }
 
-type Session struct {
+type session struct {
 	URL         string `conf:"name=Url,optional"`
 	Topic       string `conf:"optional"`
 	Password    string `conf:"optional"`
@@ -38,8 +40,10 @@ type Session struct {
 	TLSKeyFile  string `conf:"name=TLSKeyFile,optional"`
 }
 
-func (p *Plugin) Configure(global *plugin.GlobalOptions, options interface{}) {
-	if err := conf.UnmarshalStrict(options, &p.options); err != nil {
+// Configure implements plugin.Configurator methods.
+func (p *Plugin) Configure(global *plugin.GlobalOptions, options any) {
+	err := conf.UnmarshalStrict(options, &p.options)
+	if err != nil {
 		p.Warningf("cannot unmarshal configuration options: %s", err)
 	}
 
@@ -48,10 +52,11 @@ func (p *Plugin) Configure(global *plugin.GlobalOptions, options interface{}) {
 	}
 }
 
-func (p *Plugin) Validate(options interface{}) error {
-	var o Options
+// Validate implements plugin.Configurator methods.
+func (*Plugin) Validate(opts any) error {
+	var o options
 
-	err := conf.UnmarshalStrict(options, &o)
+	err := conf.UnmarshalStrict(opts, &o)
 	if err != nil {
 		return errs.Wrap(err, "plugin config validation failed")
 	}

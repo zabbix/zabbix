@@ -86,11 +86,19 @@ window.template_edit_popup = new class {
 	}
 
 	#initMacrosTab() {
-		this.macros_manager = new HostMacrosManager({
-			container: $('#template_macros_container .table-forms-td-right')
-		});
-
 		const show_inherited_macros_element = document.getElementById('show_inherited_template_macros');
+		const container = $('#template_macros_container .table-forms-td-right');
+
+		this.macros_manager = new HostMacrosManager({container});
+
+		container
+			.bind('loader.start', () => show_inherited_macros_element.querySelectorAll('input')
+				.forEach(radio_input => radio_input.setAttribute('readonly', 'readonly'))
+			)
+			.bind('loader.stop', () => show_inherited_macros_element.querySelectorAll('input')
+				.forEach(radio_input => radio_input.removeAttribute('readonly'))
+			);
+
 		this.show_inherited_macros = show_inherited_macros_element.querySelector('input:checked').value == 1;
 
 		this.macros_manager.initMacroTable(this.show_inherited_macros);

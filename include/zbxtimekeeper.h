@@ -68,7 +68,7 @@ zbx_timekeeper_t	*zbx_timekeeper_create_ext(int units_num, zbx_timekeeper_sync_t
 zbx_timekeeper_t	*zbx_timekeeper_create(int units_num, zbx_timekeeper_sync_t *sync);
 void	zbx_timekeeper_free(zbx_timekeeper_t *timekeeper);
 
-void	zbx_timekeeper_update(zbx_timekeeper_t *timekeeper, int index, unsigned char state);
+zbx_uint64_t		zbx_timekeeper_update(zbx_timekeeper_t *timekeeper, int index, unsigned char state);
 void	zbx_timekeeper_collect(zbx_timekeeper_t *timekeeper);
 
 int	zbx_timekeeper_get_stat(zbx_timekeeper_t *timekeeper, int unit_index, int count, unsigned char aggr_func,
