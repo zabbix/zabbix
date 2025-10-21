@@ -333,7 +333,7 @@ class testLowLevelDiscovery extends CWebTest {
 					'fields' => ['URL', 'Query fields', 'Request type', 'Request body type', 'Request body', 'Headers',
 							'Required status codes', 'Follow redirects', 'Retrieve mode', 'HTTP proxy', 'HTTP authentication',
 							'SSL verify peer', 'SSL verify host', 'SSL certificate file', 'SSL key file', 'SSL key password',
-							'Host interface', 'Update interval', 'Custom intervals', 'Timeout', 'Enable trapping'
+							'Host interface', 'Update interval', 'Custom intervals', 'Timeout', 'Enable trapping', 'Convert to JSON'
 					]
 				]
 			],
@@ -2277,7 +2277,7 @@ class testLowLevelDiscovery extends CWebTest {
 						'Name' => 'Empty parameters in Browser item',
 						'Type' => 'Browser',
 						'Key' => 'browser_check[2]',
-						'Script' => 'test sript'
+						'Script' => 'test script'
 					],
 					'Parameters' => [
 						['Name' => '', 'Value' => 'value_1']
@@ -2293,7 +2293,7 @@ class testLowLevelDiscovery extends CWebTest {
 						'Name' => 'Identical parameters in Browser item',
 						'Type' => 'Browser',
 						'Key' => 'browser_check[2]',
-						'Script' => 'test sript'
+						'Script' => 'test script'
 					],
 					'Parameters' => [
 						['Name' => 'test_name', 'Value' => 'value_1'],
@@ -2309,7 +2309,7 @@ class testLowLevelDiscovery extends CWebTest {
 						'Name' => 'Browser item',
 						'Type' => 'Browser',
 						'Key' => 'browser_check[3]',
-						'Script' => 'test sript'
+						'Script' => 'test script'
 					],
 					'Parameters' => [
 						['Name' => 'param_1', 'Value' => 'value_1']
@@ -2686,7 +2686,7 @@ class testLowLevelDiscovery extends CWebTest {
 		$form->query('button:Clone')->waitUntilClickable()->one()->click();
 		$form->invalidate();
 		$this->assertEquals(['Add', 'Test', 'Cancel'], $form->query('xpath:.//div[@class="form-actions"]/button')
-				->all()->filter(CElementFilter::CLICKABLE)->asText()
+				->waitUntilVisible()->all()->filter(CElementFilter::CLICKABLE)->asText()
 		);
 
 		if (CTestArrayHelper::get($data, 'fields')) {

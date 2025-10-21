@@ -109,7 +109,7 @@ static void	pg_update_proxy_rtdata(zbx_pg_service_t *pgs, zbx_ipc_message_t *mes
 
 	ptr += zbx_deserialize_value(ptr, &proxyid);
 	ptr += zbx_deserialize_value(ptr, &lastaccess);
-	ptr += zbx_deserialize_value(ptr, &version);
+	(void)zbx_deserialize_value(ptr, &version);
 
 	pg_cache_lock(pgs->cache);
 
@@ -360,6 +360,10 @@ static void	*pg_service_entry(void *data)
 	zbx_timespec_t		timeout = {1, 0};
 	zbx_ipc_client_t	*client;
 	zbx_ipc_message_t	*message;
+	int			err;
+
+	if (0 != (err = zbx_init_thread_signal_handler()))
+		zabbix_log(LOG_LEVEL_WARNING, "cannot block signals: %s", zbx_strerror(err));
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 

@@ -308,19 +308,19 @@ zbx_vmware_datastore_t	*vmware_service_create_datastore(const zbx_vmware_service
 	{
 		if (NULL != (value = zbx_xml_doc_read_value(doc, ZBX_XPATH_DATASTORE_SUMMARY("capacity"))))
 		{
-			zbx_is_uint64(value, &capacity);
+			(void)zbx_is_uint64(value, &capacity);
 			zbx_free(value);
 		}
 
 		if (NULL != (value = zbx_xml_doc_read_value(doc, ZBX_XPATH_DATASTORE_SUMMARY("freeSpace"))))
 		{
-			zbx_is_uint64(value, &free_space);
+			(void)zbx_is_uint64(value, &free_space);
 			zbx_free(value);
 		}
 
 		if (NULL != (value = zbx_xml_doc_read_value(doc, ZBX_XPATH_DATASTORE_SUMMARY("uncommitted"))))
 		{
-			zbx_is_uint64(value, &uncommitted);
+			(void)zbx_is_uint64(value, &uncommitted);
 			zbx_free(value);
 		}
 	}

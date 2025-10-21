@@ -37,6 +37,10 @@ class CControllerTemplateGroupEdit extends CController{
 	}
 
 	protected function checkPermissions(): bool {
+		if ($this->getInput('groupid', 0) == 0 && $this->getUserType() != USER_TYPE_SUPER_ADMIN) {
+			return false;
+		}
+
 		if (!$this->checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATE_GROUPS)) {
 			return false;
 		}
@@ -53,10 +57,15 @@ class CControllerTemplateGroupEdit extends CController{
 	}
 
 	protected function doAction(): void {
+		$js_validation_rules = $this->hasInput('groupid')
+			? CControllerTemplateGroupUpdate::getValidationRules()
+			: CControllerTemplateGroupCreate::getValidationRules();
+
 		$data = [
 			'groupid' => null,
 			'name' => '',
-			'subgroups' => 0
+			'subgroups' => 0,
+			'js_validation_rules' => (new CFormValidator($js_validation_rules))->getRules()
 		];
 
 		if ($this->getInput('groupid', 0)) {

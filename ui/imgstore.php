@@ -27,8 +27,8 @@ $fields = [
 	'css' =>			[T_ZBX_INT, O_OPT, P_SYS, null,				null],
 	'imageid' =>		[T_ZBX_STR, O_OPT, P_SYS, null,				null],
 	'iconid' =>			[T_ZBX_INT, O_OPT, P_SYS, DB_ID,				null],
-	'width' =>			[T_ZBX_INT, O_OPT, P_SYS, BETWEEN(1, 2000),	null],
-	'height' =>			[T_ZBX_INT, O_OPT, P_SYS, BETWEEN(1, 2000),	null],
+	'width' =>			[T_ZBX_INT, O_OPT, P_SYS, BETWEEN(1, 200),	null],
+	'height' =>			[T_ZBX_INT, O_OPT, P_SYS, BETWEEN(1, 200),	null],
 	'unavailable' =>	[T_ZBX_INT, O_OPT, null, IN([0, 1]),		null]
 ];
 check_fields($fields);
@@ -51,10 +51,6 @@ if (isset($_REQUEST['css'])) {
 	foreach ($images as $image) {
 		$image['image'] = base64_decode($image['image']);
 		$ico = imagecreatefromstring($image['image']);
-
-		if ($resize) {
-			$ico = imageThumb($ico, $width, $height);
-		}
 		$w = imagesx($ico);
 		$h = imagesy($ico);
 

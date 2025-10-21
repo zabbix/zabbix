@@ -373,7 +373,7 @@ class testFormHostPrototype extends CLegacyWebTest {
 			case 'clone':
 				$clone_prototype = 'Host prototype {#1}';
 				$this->zbxTestClickLinkTextWait($clone_prototype);
-				$this->zbxTestClickWait('clone');
+				$this->query('button:Clone')->waitUntilClickable()->one()->click()->waitUntilNotVisible();
 				break;
 		}
 
@@ -414,8 +414,7 @@ class testFormHostPrototype extends CLegacyWebTest {
 		}
 
 		// Check the results in frontend.
-		$this->zbxTestWaitUntilMessageTextPresent('msg-bad', $data['error']);
-		$this->zbxTestTextPresentInMessageDetails($data['error_message']);
+		$this->assertMessage(TEST_BAD, $data['error'], $data['error_message']);
 
 		$this->assertEquals($old_hash, CDBHelper::getHash($sql_hash));
 	}
@@ -869,7 +868,9 @@ class testFormHostPrototype extends CLegacyWebTest {
 
 		$this->zbxTestLogin('host_prototypes.php?parent_discoveryid='.self::DISCOVERY_RULE_ID.'&context=host');
 		$this->zbxTestClickLinkTextWait($hostname);
-		$this->zbxTestClickWait('clone');
+		$form = $this->query('id:host-prototype-form')->asForm()->waitUntilVisible()->one();
+		$this->query('button:Clone')->waitUntilClickable()->one()->click();
+		$form->waitUntilStalled();
 
 		// Change name and visible name.
 		$this->zbxTestInputTypeOverwrite('host', $data['name']);

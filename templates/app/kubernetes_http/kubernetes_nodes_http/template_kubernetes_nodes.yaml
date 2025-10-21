@@ -37,7 +37,7 @@ zabbix_export:
         
         Get the generated service account token using the command
         
-        `kubectl get secret zabbix-service-account -n monitoring -o jsonpath={.data.token} | base64 -d`
+        `kubectl get secret zabbix-zabbix-helm-chart -n monitoring -o jsonpath={.data.token} | base64 -d`
         
         Then set it to the field: `API Authorization Token`.
         
@@ -52,7 +52,7 @@ zabbix_export:
         
         Get the generated service account token using the command
         
-        `kubectl get secret zabbix-service-account -n monitoring -o jsonpath={.data.token} | base64 -d`
+        `kubectl get secret zabbix-zabbix-helm-chart -n monitoring -o jsonpath={.data.token} | base64 -d`
         
         Then set it to the field: `API Authorization Token`.
         
@@ -92,7 +92,7 @@ zabbix_export:
         **Note**, the discovered nodes will be created as separate hosts in Zabbix with the Linux template automatically assigned to them.
       vendor:
         name: Zabbix
-        version: 8.0-0
+        version: 8.0-1
       groups:
         - name: Templates/Applications
       items:
@@ -1329,7 +1329,7 @@ zabbix_export:
               filter:
                 conditions:
                   - macro: '{#ENDPOINT}'
-                    value: 'zabbix-agent.*'
+                    value: 'zabbix-helm-chart-agent.*'
               operations:
                 - operationobject: HOST_PROTOTYPE
                   operator: REGEXP
@@ -1715,7 +1715,7 @@ zabbix_export:
             label: 'Node Labels Filter'
             description: 'Labels to filter nodes.'
         - macro: '{$KUBE.NODES.ENDPOINT.NAME}'
-          value: zabbix-zabbix-helm-chrt-agent
+          value: zabbix-zabbix-helm-chart-agent
           description: 'Kubernetes nodes endpoint name. See "kubectl -n monitoring get ep".'
           config:
             type: TEXT

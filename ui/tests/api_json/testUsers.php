@@ -1698,7 +1698,7 @@ class testUsers extends CAPITest {
 					],
 					'theme' => ''
 				],
-				'expected_error' => 'Invalid parameter "/1/theme": value must be one of "default", "blue-theme", "dark-theme", "hc-light", "hc-dark".'
+				'expected_error' => 'Invalid parameter "/1/theme": value must be one of "default", "blue-theme", "blue-classic-theme", "dark-theme", "dark-classic-theme", "hc-light", "hc-dark".'
 			],
 			[
 				'user' => [
@@ -1709,7 +1709,7 @@ class testUsers extends CAPITest {
 					],
 					'theme' => 'classic'
 				],
-				'expected_error' => 'Invalid parameter "/1/theme": value must be one of "default", "blue-theme", "dark-theme", "hc-light", "hc-dark".'
+				'expected_error' => 'Invalid parameter "/1/theme": value must be one of "default", "blue-theme", "blue-classic-theme", "dark-theme", "dark-classic-theme", "hc-light", "hc-dark".'
 			],
 			[
 				'user' => [
@@ -1720,7 +1720,7 @@ class testUsers extends CAPITest {
 					],
 					'theme' => 'originalblue'
 				],
-				'expected_error' => 'Invalid parameter "/1/theme": value must be one of "default", "blue-theme", "dark-theme", "hc-light", "hc-dark".'
+				'expected_error' => 'Invalid parameter "/1/theme": value must be one of "default", "blue-theme", "blue-classic-theme", "dark-theme", "dark-classic-theme", "hc-light", "hc-dark".'
 			],
 			// Check user properties, type.
 			[

@@ -15,69 +15,80 @@
 package redis
 
 import (
-	"reflect"
 	"testing"
 
+	"github.com/google/go-cmp/cmp"
 	"golang.zabbix.com/sdk/plugin"
 )
 
+//nolint:tparallel // due to plugin being a global variable, cannot test in parallel.
 func TestPlugin_Start(t *testing.T) {
 	t.Run("Connection manager must be initialized", func(t *testing.T) {
+		t.Parallel()
+
 		impl.Start()
+
 		if impl.connMgr == nil {
 			t.Error("Connection manager is not initialized")
 		}
 	})
 }
 
+//nolint:tparallel,paralleltest // due to plugin being a global variable, cannot test in parallel.
 func TestPlugin_Export(t *testing.T) {
 	type args struct {
-		key    string
-		params []string
-		ctx    plugin.ContextProvider
+		key       string
+		rawParams []string
+		ctx       plugin.ContextProvider
 	}
-
-	impl.Configure(&plugin.GlobalOptions{}, nil)
 
 	tests := []struct {
-		name       string
-		p          *Plugin
-		args       args
-		wantResult interface{}
-		wantErr    bool
+		name    string
+		p       *Plugin
+		args    args
+		want    any
+		wantErr bool
 	}{
 		{
-			name:       "Too many parameters",
-			p:          &impl,
-			args:       args{keyPing, []string{"localhost", "sEcReT", "param1", "param2"}, nil},
-			wantResult: nil,
-			wantErr:    true,
+			name:    "-tooManyParameters",
+			p:       &impl,
+			args:    args{keyPing, []string{"localhost", "sEcReT", "param1", "param2"}, nil},
+			want:    nil,
+			wantErr: true,
 		},
 		{
-			name:       "Must fail if server is not working",
-			p:          &impl,
-			args:       args{keySlowlog, []string{"tcp://127.0.0.1:1"}, nil},
-			wantResult: nil,
-			wantErr:    true,
+			name:    "-noServer",
+			p:       &impl,
+			args:    args{keySlowlog, []string{"tcp://127.0.0.1:1"}, nil},
+			want:    nil,
+			wantErr: true,
 		},
 	}
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			gotResult, err := tt.p.Export(tt.args.key, tt.args.params, tt.args.ctx)
+			t.Parallel()
+
+			got, err := tt.p.Export(tt.args.key, tt.args.rawParams, tt.args.ctx)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("Plugin.Export() error = %v, wantErr %v", err, tt.wantErr)
-				return
+				t.Fatalf("Plugin.Export() error = %v, wantErr %v", err, tt.wantErr)
 			}
-			if !reflect.DeepEqual(gotResult, tt.wantResult) {
-				t.Errorf("Plugin.Export() = %v, want %v", gotResult, tt.wantResult)
+
+			diff := cmp.Diff(tt.want, got)
+			if diff != "" {
+				t.Fatalf("Plugin.Export() = %s", diff)
 			}
 		})
 	}
 }
 
+//nolint:tparallel // due to plugin being a global variable, cannot test in parallel.
 func TestPlugin_Stop(t *testing.T) {
 	t.Run("Connection manager must be deinitialized", func(t *testing.T) {
+		t.Parallel()
+
 		impl.Stop()
+
 		if impl.connMgr != nil {
 			t.Error("Connection manager is not deinitialized")
 		}

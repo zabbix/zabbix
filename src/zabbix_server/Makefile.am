@@ -39,6 +39,7 @@ zabbix_server_SOURCES = \
 
 zabbix_server_LDADD = \
 	cachehistory/libzbxcachehistory_server.a \
+	$(top_builddir)/src/libs/zbxcalc/libzbxcalc.a \
 	$(top_builddir)/src/libs/zbxdbsyncer/libzbxdbsyncer.a \
 	$(top_builddir)/src/libs/zbxpinger/libzbxpinger.a \
 	dbconfig/libzbxdbconfig.a \
@@ -180,7 +181,8 @@ zabbix_server_CFLAGS = \
 	-DDEFAULT_ALERT_SCRIPTS_PATH="\"$(ALERT_SCRIPTS_PATH)\"" \
 	-DDEFAULT_LOAD_MODULE_PATH="\"$(LOAD_MODULE_PATH)\"" \
 	$(TLS_CFLAGS) \
-	$(ARES_CFLAGS)
+	$(ARES_CFLAGS) \
+	$(LIBEVENT_CFLAGS)
 
 install-data-hook:
 	$(MKDIR_P) "$(DESTDIR)$(SERVER_CONFIG_FILE).d"

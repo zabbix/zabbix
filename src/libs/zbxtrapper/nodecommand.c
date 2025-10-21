@@ -16,7 +16,6 @@
 
 #include "zbxtrapper.h"
 
-#include "zbxexpression.h"
 #include "zbxscripts.h"
 #include "audit/zbxaudit.h"
 #include "zbxevent.h"
@@ -92,8 +91,6 @@ static int	execute_remote_script(const zbx_script_t *script, const zbx_dc_host_t
 		int config_trapper_timeout, char **info, char *error, size_t max_error_len)
 {
 	zbx_uint64_t	taskid;
-	zbx_db_result_t	result = NULL;
-	zbx_db_row_t	row;
 
 	if (0 == host->proxyid)
 	{
@@ -108,8 +105,15 @@ static int	execute_remote_script(const zbx_script_t *script, const zbx_dc_host_t
 		return FAIL;
 	}
 
-	for (int time_start = time(NULL); config_trapper_timeout > time(NULL) - time_start; sleep(1))
+	for (int time_start = time(NULL), i = 0; config_trapper_timeout > time(NULL) - time_start; i++)
 	{
+		zbx_db_result_t	result;
+		zbx_db_row_t	row;
+		int		sleep_ms = 3 > i ? 500 : 1000;
+		struct timespec	poll_delay = {.tv_sec = sleep_ms / 1000, .tv_nsec = sleep_ms % 1000 * 1000000};
+
+		nanosleep(&poll_delay, NULL);
+
 		result = zbx_db_select(
 				"select tr.status,tr.info"
 				" from task t"
@@ -355,7 +359,7 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64
 		zbx_get_config_forks_f get_config_forks, unsigned char program_type,
 		char **result, char **debug)
 {
-	int			ret = FAIL, scope = 0, macro_type;
+	int			ret = FAIL, scope = 0, macro_scope_type;
 	zbx_dc_host_t		host;
 	zbx_script_t		script;
 	zbx_uint64_t		usrgrpid, groupid;
@@ -364,7 +368,7 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64
 	zbx_vector_ptr_pair_t	webhook_params;
 	char			*tz = NULL, *webhook_params_json = NULL, error[MAX_STRING_LEN];
 	zbx_db_event		*problem_event = NULL, *recovery_event = NULL;
-	zbx_dc_um_handle_t	*um_handle = NULL;
+	zbx_dc_um_handle_t	*um_handle_unmasked = NULL, *um_handle_masked = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() scriptid:" ZBX_FS_UI64 " hostid:" ZBX_FS_UI64 " eventid:" ZBX_FS_UI64
 			" userid:" ZBX_FS_UI64 " clientip:%s, manualinput:%s",
@@ -575,24 +579,23 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64
 	}
 
 	if (0 != hostid)	/* script on host */
-		macro_type = ZBX_MACRO_TYPE_SCRIPT;
+		macro_scope_type = ZBX_SCRIPT_SCOPE_HOST;
 	else
-		macro_type = (NULL != recovery_event) ? ZBX_MACRO_TYPE_SCRIPT_RECOVERY : ZBX_MACRO_TYPE_SCRIPT_NORMAL;
+		macro_scope_type = ZBX_SCRIPT_SCOPE_EVENT;
 
-	um_handle = zbx_dc_open_user_macros();
+	um_handle_masked = zbx_dc_open_user_macros_masked();
+	um_handle_unmasked = zbx_dc_open_user_macros_secure();
 
 	if (ZBX_SCRIPT_TYPE_WEBHOOK != script.type)
 	{
-		if (SUCCEED != zbx_substitute_simple_macros_unmasked(NULL, problem_event, recovery_event, &user->userid,
-				NULL, &host, NULL, NULL, NULL, NULL, NULL, tz, &script.command, macro_type, error,
-				sizeof(error)))
+		if (SUCCEED != substitute_script_macros(&script.command, error, sizeof(error), macro_scope_type,
+				um_handle_unmasked, problem_event, recovery_event, &user->userid, &host, tz))
 		{
 			goto fail;
 		}
 
-		if (SUCCEED != zbx_substitute_simple_macros(NULL, problem_event, recovery_event, &user->userid, NULL,
-				&host, NULL, NULL, NULL, NULL, NULL, tz, &script.command_orig, macro_type, error,
-				sizeof(error)))
+		if (SUCCEED != substitute_script_macros(&script.command_orig, error, sizeof(error), macro_scope_type,
+				um_handle_masked, problem_event, recovery_event, &user->userid, &host, tz))
 		{
 			THIS_SHOULD_NEVER_HAPPEN;
 			goto fail;
@@ -602,10 +605,9 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64
 	{
 		for (int i = 0; i < webhook_params.values_num; i++)
 		{
-			if (SUCCEED != zbx_substitute_simple_macros_unmasked(NULL, problem_event, recovery_event,
-					&user->userid, NULL, &host, NULL, NULL, NULL, NULL, NULL, tz,
-					(char **)&webhook_params.values[i].second, macro_type, error,
-					sizeof(error)))
+			if (SUCCEED != substitute_script_macros((char **)&webhook_params.values[i].second, error,
+					sizeof(error), macro_scope_type, um_handle_unmasked, problem_event,
+					recovery_event, &user->userid, &host, tz))
 			{
 				goto fail;
 			}
@@ -647,8 +649,10 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64
 		ZBX_UNUSED(audit_res);
 	}
 fail:
-	if (NULL != um_handle)
-		zbx_dc_close_user_macros(um_handle);
+	if (NULL != um_handle_unmasked)
+		zbx_dc_close_user_macros(um_handle_unmasked);
+	if (NULL != um_handle_masked)
+		zbx_dc_close_user_macros(um_handle_masked);
 
 	if (SUCCEED != ret)
 		*result = zbx_strdup(*result, error);

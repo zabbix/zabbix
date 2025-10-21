@@ -57,6 +57,7 @@ zbx_pp_history_t	*zbx_pp_history_cache_history_acquire(zbx_pp_history_cache_t *h
 void			zbx_pp_history_cache_history_set_and_release(zbx_pp_history_cache_t *history_cache,
 				zbx_pp_history_t *history_in, zbx_pp_history_t *history_out);
 zbx_uint64_t		zbx_pp_history_cache_history_size(zbx_pp_history_cache_t *history_cache);
+void	zbx_pp_history_free_unique(const zbx_pp_history_t *history_in, zbx_pp_history_t *history_out);
 
 typedef enum
 {

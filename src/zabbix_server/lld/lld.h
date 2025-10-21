@@ -243,8 +243,10 @@ typedef struct
 	int					evaltype;
 	int					item_flags;
 
+#define ZBX_LLD_ITEM_PROTOTYPE_MACRO_PATH_COLS_NUM	2
+#define ZBX_LLD_ITEM_PROTOTYPE_FILTERS_COLS_NUM		3
 	zbx_sync_rowset_t			macro_paths;
-	zbx_sync_rowset_t                       filters;
+	zbx_sync_rowset_t			filters;
 	zbx_sync_rowset_t			overrides;
 }
 zbx_lld_item_prototype_t;
@@ -557,7 +559,7 @@ void	lld_rule_get_prototype_overrides(zbx_vector_lld_item_prototype_ptr_t *item_
 		zbx_vector_uint64_t *protoids);
 void	lld_rule_fetch_override_data(zbx_vector_lld_override_data_ptr_t *overrides);
 void	lld_override_dump(zbx_sync_rowset_t *rowset);
-void	lld_rule_process_nested_rule(zbx_uint64_t hostid, zbx_uint64_t itemid, const zbx_lld_row_t *lld_row);
+void	lld_rule_process_nested_rule(zbx_uint64_t itemid, const zbx_lld_row_t *lld_row);
 
 void	lld_rule_macro_paths_make(zbx_vector_lld_item_full_ptr_t *items);
 void	lld_rule_filters_make(zbx_vector_lld_item_full_ptr_t *items, char **info);

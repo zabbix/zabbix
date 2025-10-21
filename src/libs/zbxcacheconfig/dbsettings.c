@@ -23,6 +23,14 @@
 #include "zbxalgo.h"
 #include "zbxstr.h"
 
+#define UPDATE_REVISION(revision, name, format, target, source)							\
+	do													\
+	{													\
+		zabbix_log(LOG_LEVEL_TRACE, "setting %s changed: " format " -> " format, name, target, source); \
+		get_dc_config()->revision.settings_table = revision;						\
+	}													\
+	while(0)
+
 typedef struct
 {
 	zbx_db_value_t	value;
@@ -290,19 +298,19 @@ static int	setup_entry_table(zbx_dbsync_t *sync, zbx_setting_value_t *values)
 				break;
 			case ZBX_SETTING_TYPE_USRGRPID:
 				values[index].value.ui64 = 0;
-				zbx_is_uint64(row[4], &values[index].value.ui64);
+				(void)zbx_is_uint64(row[4], &values[index].value.ui64);
 				break;
 			case ZBX_SETTING_TYPE_HOSTGROUPID:
 				values[index].value.ui64 = 0;
-				zbx_is_uint64(row[5], &values[index].value.ui64);
+				(void)zbx_is_uint64(row[5], &values[index].value.ui64);
 				break;
 			case ZBX_SETTING_TYPE_USRDIRID:
 				values[index].value.ui64 = 0;
-				zbx_is_uint64(row[6], &values[index].value.ui64);
+				(void)zbx_is_uint64(row[6], &values[index].value.ui64);
 				break;
 			case ZBX_SETTING_TYPE_MFAID:
 				values[index].value.ui64 = 0;
-				zbx_is_uint64(row[7], &values[index].value.ui64);
+				(void)zbx_is_uint64(row[7], &values[index].value.ui64);
 				break;
 			default:
 				zabbix_log(LOG_LEVEL_CRIT, "Unknown setting type %d", entry->type);
@@ -387,7 +395,7 @@ static int	setting_get_uint64(const zbx_setting_value_t *values, const char *nam
 			if (NULL == e->default_value)
 				*value = 0;
 			else
-				ret = ZBX_STR2UINT64(*value, e->default_value);
+				ret = zbx_is_uint64(e->default_value, value);
 
 			if (SUCCEED == ret)
 			{
@@ -411,12 +419,10 @@ static void	store_int_setting(const zbx_setting_value_t *values, const char *nam
 
 	if (SUCCEED == setting_get_int(values, name, defaults_log_level, &value_int))
 	{
-		zbx_dc_config_t	*config = get_dc_config();
-
 		if (*target != value_int)
 		{
+			UPDATE_REVISION(revision, name, "%d", *target, value_int);
 			*target = value_int;
-			config->revision.settings_table = revision;
 		}
 	}
 }
@@ -428,12 +434,10 @@ static void	store_uint64_setting(const zbx_setting_value_t *values, const char *
 
 	if (SUCCEED == setting_get_uint64(values, name, defaults_log_level, &value_uint64))
 	{
-		zbx_dc_config_t	*config = get_dc_config();
-
 		if (*target != value_uint64)
 		{
+			UPDATE_REVISION(revision, name, ZBX_FS_UI64, *target, value_uint64);
 			*target = value_uint64;
-			config->revision.settings_table = revision;
 		}
 	}
 }
@@ -445,12 +449,10 @@ static void	store_str_setting(const zbx_setting_value_t *values, const char *nam
 
 	if (SUCCEED == setting_get_str(values, name, defaults_log_level, &value_str))
 	{
-		zbx_dc_config_t	*config = get_dc_config();
-
 		if (NULL == *target || 0 != strcmp(*target, value_str))
 		{
+			UPDATE_REVISION(revision, name, "%s", *target, value_str);
 			dc_strpool_replace(found, target, value_str);
-			config->revision.settings_table = revision;
 		}
 	}
 }
@@ -475,10 +477,8 @@ static int	store_hk_setting(const zbx_setting_value_t *values, const char *name,
 
 	if (*value != value_int)
 	{
-		zbx_dc_config_t	*config = get_dc_config();
-
+		UPDATE_REVISION(revision, name, "%d", *value, value_int);
 		*value = value_int;
-		config->revision.settings_table = revision;
 	}
 
 	return SUCCEED;
@@ -515,8 +515,8 @@ static void	store_settings(const zbx_setting_value_t *values, int found, zbx_uin
 
 	if (config->config->db.history_compress_older != value_int)
 	{
+		UPDATE_REVISION(revision, "compress_older", "%d", config->config->db.history_compress_older, value_int);
 		config->config->db.history_compress_older = value_int;
-		config->revision.settings_table = revision;
 	}
 
 	store_int_setting(values, "compression_status", defaults_log_level,
@@ -533,11 +533,12 @@ static void	store_settings(const zbx_setting_value_t *values, int found, zbx_uin
 
 	if (config->config->discovery_groupid != value_uint64)
 	{
+		UPDATE_REVISION(revision, "discovery_groupid", ZBX_FS_UI64, config->config->discovery_groupid,
+				value_uint64);
 		config->config->discovery_groupid = value_uint64;
-		config->revision.settings_table = revision;
 	}
 
-	/* housekeeper audit */
+	/* housekeeper settings for audit */
 
 	if (SUCCEED != setting_get_int(values, "hk_audit_mode", defaults_log_level, &value_int))
 		value_int = ZBX_HK_OPTION_DISABLED;
@@ -550,13 +551,22 @@ static void	store_settings(const zbx_setting_value_t *values, int found, zbx_uin
 		value_int = ZBX_HK_OPTION_DISABLED;
 	}
 
+#ifdef HAVE_POSTGRESQL
+	if (ZBX_HK_MODE_DISABLED != value_int &&
+			0 == zbx_strcmp_null(config->config->db.extension, ZBX_DB_EXTENSION_TIMESCALEDB))
+	{
+		if (ZBX_HK_MODE_PARTITION != value_int)
+			value_int = ZBX_HK_MODE_PARTITION;
+	}
+#endif
+
 	if (config->config->hk.audit_mode != value_int)
 	{
+		UPDATE_REVISION(revision, "hk_audit_mode", "%d", config->config->hk.audit_mode, value_int);
 		config->config->hk.audit_mode = value_int;
-		config->revision.settings_table = revision;
 	}
 
-	/* housekeeper events */
+	/* housekeeper settings for events */
 
 	if (SUCCEED != setting_get_int(values, "hk_events_mode", defaults_log_level, &value_int))
 		value_int = ZBX_HK_OPTION_DISABLED;
@@ -580,44 +590,56 @@ static void	store_settings(const zbx_setting_value_t *values, int found, zbx_uin
 
 	if (config->config->hk.events_mode != value_int)
 	{
+		UPDATE_REVISION(revision, "hk_events_mode", "%d", config->config->hk.events_mode, value_int);
 		config->config->hk.events_mode = value_int;
-		config->revision.settings_table = revision;
 	}
 
-	/* housekeeper history */
-
-	store_int_setting(values, "hk_history_mode", defaults_log_level, &config->config->hk.history_mode, revision);
+	/* housekeeper settings for history data */
 
 	if (SUCCEED != setting_get_int(values, "hk_history_global", defaults_log_level, &value_int))
 		value_int = ZBX_HK_OPTION_DISABLED;
 
-	if (ZBX_HK_OPTION_ENABLED == value_int &&
+	if (config->config->hk.history_global != value_int)
+	{
+		UPDATE_REVISION(revision, "hk_history_global", "%d", config->config->hk.history_global, value_int);
+		config->config->hk.history_global = value_int;
+	}
+
+	if (SUCCEED != setting_get_int(values, "hk_history_mode", defaults_log_level, &value_int))
+		value_int = ZBX_HK_OPTION_DISABLED;
+
+	if (ZBX_HK_OPTION_ENABLED == config->config->hk.history_global &&
 			SUCCEED != store_hk_setting(values, "hk_history", 0, ZBX_HK_HISTORY_MIN, defaults_log_level,
 					&config->config->hk.history, revision))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "history data housekeeping will be disabled and all items will"
 				" store their history due to invalid global override settings");
 
-		if (ZBX_HK_MODE_DISABLED != config->config->hk.history_mode)
-		{
-			config->config->hk.history_mode = ZBX_HK_MODE_DISABLED;
-			config->revision.settings_table = revision;
-		}
+		value_int = ZBX_HK_MODE_DISABLED;
 
 		if (1 != config->config->hk.history)
 		{
+			UPDATE_REVISION(revision, "hk_history", "%d", config->config->hk.history, 1);
 			config->config->hk.history = 1;	/* just enough to make 0 == items[i].history condition fail */
-			config->revision.settings_table = revision;
 		}
 	}
 
-	if (config->config->hk.history_global != value_int)
+#ifdef HAVE_POSTGRESQL
+	if (ZBX_HK_MODE_DISABLED != value_int &&
+			ZBX_HK_OPTION_ENABLED == config->config->hk.history_global &&
+			0 == zbx_strcmp_null(config->config->db.extension, ZBX_DB_EXTENSION_TIMESCALEDB))
 	{
-		config->config->hk.history_global = value_int;
-		config->revision.settings_table = revision;
+		value_int = ZBX_HK_MODE_PARTITION;
+	}
+#endif
+
+	if (config->config->hk.history_mode != value_int)
+	{
+		UPDATE_REVISION(revision, "hk_history_mode", "%d", config->config->hk.history_mode, value_int);
+		config->config->hk.history_mode = value_int;
 	}
 
-	/* housekeeper services */
+	/* housekeeper settings for services */
 
 	if (SUCCEED != setting_get_int(values, "hk_services_mode", defaults_log_level, &value_int))
 		value_int = ZBX_HK_OPTION_DISABLED;
@@ -632,11 +654,11 @@ static void	store_settings(const zbx_setting_value_t *values, int found, zbx_uin
 
 	if (config->config->hk.services_mode != value_int)
 	{
+		UPDATE_REVISION(revision, "hk_services_mode", "%d", config->config->hk.services_mode, value_int);
 		config->config->hk.services_mode = value_int;
-		config->revision.settings_table = revision;
 	}
 
-	/* housekeeper sessions */
+	/* housekeeper settings for user sessions data */
 
 	if (SUCCEED != setting_get_int(values, "hk_sessions_mode", defaults_log_level, &value_int))
 		value_int = ZBX_HK_OPTION_DISABLED;
@@ -652,15 +674,22 @@ static void	store_settings(const zbx_setting_value_t *values, int found, zbx_uin
 
 	if (config->config->hk.sessions_mode != value_int)
 	{
+		UPDATE_REVISION(revision, "hk_sessions_mode", "%d", config->config->hk.sessions_mode, value_int);
 		config->config->hk.sessions_mode = value_int;
-		config->revision.settings_table = revision;
 	}
 
-	/* housekeeper trends */
-
-	store_int_setting(values, "hk_trends_mode", defaults_log_level, &config->config->hk.trends_mode, revision);
+	/* housekeeper settings for trends */
 
 	if (SUCCEED != setting_get_int(values, "hk_trends_global", defaults_log_level, &value_int))
+		value_int = ZBX_HK_OPTION_DISABLED;
+
+	if (config->config->hk.trends_global != value_int)
+	{
+		UPDATE_REVISION(revision, "hk_trends_global", "%d", config->config->hk.trends_global, value_int);
+		config->config->hk.trends_global = value_int;
+	}
+
+	if (SUCCEED != setting_get_int(values, "hk_trends_mode", defaults_log_level, &value_int))
 		value_int = ZBX_HK_OPTION_DISABLED;
 
 	if (ZBX_HK_OPTION_ENABLED == value_int &&
@@ -671,22 +700,27 @@ static void	store_settings(const zbx_setting_value_t *values, int found, zbx_uin
 				" will store their history due to invalid global override settings");
 
 		if (ZBX_HK_MODE_DISABLED != config->config->hk.trends_mode)
-		{
-			config->config->hk.trends_mode = ZBX_HK_MODE_DISABLED;
-			config->revision.settings_table = revision;
-		}
+			value_int = ZBX_HK_MODE_DISABLED;
 
 		if (1 != config->config->hk.trends)
 		{
+			UPDATE_REVISION(revision, "hk_trends", "%d", config->config->hk.trends, 1);
 			config->config->hk.trends = 1;	/* just enough to make 0 == items[i].trends condition fail */
-			config->revision.settings_table = revision;
 		}
 	}
 
-	if (config->config->hk.trends_global != value_int)
+#ifdef HAVE_POSTGRESQL
+	if (ZBX_HK_MODE_DISABLED != value_int && ZBX_HK_OPTION_ENABLED == config->config->hk.trends_global &&
+			0 == zbx_strcmp_null(config->config->db.extension, ZBX_DB_EXTENSION_TIMESCALEDB))
 	{
-		config->config->hk.trends_global = value_int;
-		config->revision.settings_table = revision;
+		value_int = ZBX_HK_MODE_PARTITION;
+	}
+#endif
+
+	if (config->config->hk.trends_mode != value_int)
+	{
+		UPDATE_REVISION(revision, "hk_trends_mode", "%d", config->config->hk.trends_mode, value_int);
+		config->config->hk.trends_mode = value_int;
 	}
 
 	store_str_setting(values, "severity_name_0", found, defaults_log_level, &config->config->severity_name[0],
@@ -727,44 +761,6 @@ static void	store_settings(const zbx_setting_value_t *values, int found, zbx_uin
 
 	store_int_setting(values, "proxy_secrets_provider", defaults_log_level, &config->config->proxy_secrets_provider,
 			revision);
-
-	/*
-	 * Final checks
-	 */
-
-#ifdef HAVE_POSTGRESQL
-	if (ZBX_HK_MODE_DISABLED != config->config->hk.audit_mode &&
-			0 == zbx_strcmp_null(config->config->db.extension, ZBX_DB_EXTENSION_TIMESCALEDB))
-	{
-		if (ZBX_HK_MODE_PARTITION != config->config->hk.audit_mode)
-		{
-			config->config->hk.audit_mode = ZBX_HK_MODE_PARTITION;
-			config->revision.settings_table = revision;
-		}
-	}
-
-	if (ZBX_HK_MODE_DISABLED != config->config->hk.history_mode &&
-			ZBX_HK_OPTION_ENABLED == config->config->hk.history_global &&
-			0 == zbx_strcmp_null(config->config->db.extension, ZBX_DB_EXTENSION_TIMESCALEDB))
-	{
-		if (ZBX_HK_MODE_PARTITION != config->config->hk.history_mode)
-		{
-			config->config->hk.history_mode = ZBX_HK_MODE_PARTITION;
-			config->revision.settings_table = revision;
-		}
-	}
-
-	if (ZBX_HK_MODE_DISABLED != config->config->hk.trends_mode &&
-			ZBX_HK_OPTION_ENABLED == config->config->hk.trends_global &&
-			0 == zbx_strcmp_null(config->config->db.extension, ZBX_DB_EXTENSION_TIMESCALEDB))
-	{
-		if (ZBX_HK_MODE_PARTITION != config->config->hk.trends_mode)
-		{
-			config->config->hk.trends_mode = ZBX_HK_MODE_PARTITION;
-			config->revision.settings_table = revision;
-		}
-	}
-#endif
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }

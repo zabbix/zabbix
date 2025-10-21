@@ -66,7 +66,7 @@ For more details, please see: [Enable NETCONF Service over SSH](https://www.juni
 |----|-----------|-------|
 |{$JUNIPER.MX.NETCONF.USERNAME}|<p>Juniper NETCONF username.</p>||
 |{$JUNIPER.MX.NETCONF.PASSWORD}|<p>Juniper NETCONF password.</p>||
-|{$JUNIPER.MX.NETCONF.IP}|<p>The IP address of the Juniper MX device.</p>|`<SET JUNIPER MX IP NETCONF>`|
+|{$JUNIPER.MX.NETCONF.IP}|<p>The IP address of the Juniper MX device.</p>||
 |{$JUNIPER.MX.NETCONF.PORT}|<p>The NETCONF port of the Juniper MX device.</p>|`830`|
 |{$JUNIPER.MX.NETCONF.TIMEOUT}|<p>SSH response timeout.</p>|`15s`|
 |{$JUNIPER.MX.NETCONF.RESPONSE_TIME.MAX.WARN}|<p>The maximum Juniper NETCONF response time expressed in seconds, for a trigger expression.</p>|`10`|

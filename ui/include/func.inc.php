@@ -750,9 +750,10 @@ function convertUnitsRaw(array $options): array {
  * @param string $time       Decimal integer with optional time suffix.
  * @param bool   $with_year  Additionally parse year suffixes.
  *
- * @return int|null  Decimal integer seconds or null on error.
+ * @return int|float|null  Decimal integer seconds or null on error. Returns a floating-point number if the resulting
+ *                         value exceeds PHP_INT_MAX.
  */
-function timeUnitToSeconds($time, $with_year = false) {
+function timeUnitToSeconds($time, $with_year = false): int|float|null {
 	$suffixes = $with_year ? ZBX_TIME_SUFFIXES_WITH_YEAR : ZBX_TIME_SUFFIXES;
 
 	if (!preg_match('/^'.ZBX_PREG_INT.'(?<suffix>['.$suffixes.'])?$/', $time, $matches)) {
@@ -1308,7 +1309,7 @@ function make_sorting_header($obj, $tabfield, $sortField, $sortOrder, $link = nu
 /**
  * Format floating-point number in the best possible way for displaying.
  *
- * @param float $number   Valid number in decimal or scientific notation.
+ * @param float $number   Valid floating point number.
  * @param array $options  Formatting options.
  *
  * $options = [
@@ -1324,14 +1325,6 @@ function make_sorting_header($obj, $tabfield, $sortField, $sortOrder, $link = nu
  * @return string
  */
 function formatFloat(float $number, array $options = []): string {
-	if ($number == INF) {
-		return _('Infinity');
-	}
-
-	if ($number == -INF) {
-		return '-'._('Infinity');
-	}
-
 	$defaults = [
 		'precision' => ZBX_FLOAT_DIG,
 		'decimals' => 0,
@@ -1348,75 +1341,75 @@ function formatFloat(float $number, array $options = []): string {
 		'zero_as_zero' => $zero_as_zero
 	] = $options + $defaults;
 
-	if ($zero_as_zero && $number == 0) {
-		return '0';
-	}
+	$round_fn = static function (float $mantissa, int $exponent, int $decimals): array {
+		$mantissa_rounded = abs(round($mantissa, $decimals));
 
-	$number_original = $number;
-
-	$exponent = (int) explode('E', sprintf('%.'.($precision - 1).'E', $number))[1];
-
-	if ($exponent < 0) {
-		for ($i = 1; $i >= 0; $i--) {
-			$round_precision = $decimals - $exponent - $i;
-
-			// PHP rounding bug when precision is set more than 294.
-			if ($round_precision > 294) {
-				$decimal_shift = pow(10, $round_precision - 294);
-				$test = round($number * $decimal_shift, 294) / $decimal_shift;
-			}
-			else {
-				$test = round($number, $round_precision);
-			}
-
-			$test_number = sprintf('%.'.($precision - 1).'E', $test);
-			$test_digits = $precision == 1
-				? 1
-				: strlen(rtrim(explode('E', $test_number)[0], '0')) - ($test_number[0] === '-' ? 2 : 1);
-
-			if (!$small_scientific || $test_digits - $exponent < $precision) {
-				break;
-			}
-		}
-		$number = $test_number;
-		$digits = $test_digits;
-	}
-	else {
-		if ($exponent >= $precision) {
-			if ($exponent >= min(PHP_FLOAT_DIG, $precision + 3)
-					|| round($number, $precision - $exponent - 1) != $number) {
-				$number = round($number, $decimals - $exponent);
-			}
-		}
-		else {
-			$number = round($number, min($decimals, $precision - $exponent - 1));
+		if ($mantissa_rounded >= 10) {
+			$mantissa_rounded = 1;
+			$exponent++;
+			$decimals++;
 		}
 
-		$number = sprintf('%.'.($precision - 1).'E', $number);
-		$digits = $precision == 1 ? 1 : strlen(rtrim(explode('E', $number)[0], '0')) - ($number[0] === '-' ? 2 : 1);
-	}
+		$digits = $decimals >= 0
+			? rtrim(str_replace('.', '', sprintf('%.'.$decimals.'F', $mantissa_rounded)), '0')
+			: '';
+
+		return [$digits, $exponent, $mantissa_rounded == abs($mantissa)];
+	};
+
+	$format_fn = static function (string $sign, string $integer, string $fraction, ?int $exponent = null)
+			use ($decimals, $decimals_exact): string {
+		if ($decimals_exact) {
+			$fraction = str_pad($fraction, $decimals, '0');
+		}
+
+		return $sign.$integer.($fraction !== '' ? '.'.$fraction : '').
+			($exponent !== null ? 'E'.($exponent >= 0 ? '+' : '').$exponent : '');
+	};
 
 	if ($zero_as_zero && $number == 0) {
 		return '0';
 	}
-
-	$exponent = (int) explode('E', sprintf('%.'.($precision - 1).'E', $number))[1];
-
-	if ($exponent < 0) {
-		if (!$small_scientific
-				|| $digits - $exponent <= ($decimals_exact ? min($decimals + 1, $precision) : $precision)) {
-			return number_format($number, $decimals_exact ? $decimals : $digits - $exponent - 1, '.', '');
-		}
-		else {
-			return sprintf('%.'.($decimals_exact ? $decimals : min($digits - 1, $decimals)).'E', $number);
-		}
+	elseif ($number == INF) {
+		return _('Infinity');
 	}
-	elseif ($exponent >= min(PHP_FLOAT_DIG, $precision + 3)
-			|| ($exponent >= $precision && $number != $number_original)) {
-		return sprintf('%.'.($decimals_exact ? $decimals : min($digits - 1, $decimals)).'E', $number);
+	elseif ($number == -INF) {
+		return '-'._('Infinity');
+	}
+
+	$sign = $number < 0 ? '-' : '';
+
+	[$mantissa, $exponent] = explode('E', sprintf('%.'.(PHP_FLOAT_DIG - 1).'E', $number));
+
+	$mantissa = (float) $mantissa;
+	$exponent = (int) $exponent;
+
+	[$digits_dec, $exponent_dec, $precise_dec] = $round_fn($mantissa, $exponent,
+		$exponent >= 0
+			? min($exponent + $decimals, $precision - 1)
+			: ($decimals_exact
+				? $exponent + $decimals
+				: $decimals - 1
+			)
+	);
+
+	[$digits_sci, $exponent_sci] = $round_fn($mantissa, $exponent, $decimals);
+
+	if ($exponent_dec >= ($precise_dec ? min(PHP_FLOAT_DIG, $precision + 3) : $precision)
+			|| $small_scientific && (
+				$decimals_exact && $exponent_sci < -1 && -$exponent_sci + strlen($digits_sci) > $decimals + 1
+					|| !$decimals_exact && -$exponent_sci + strlen($digits_sci) > min(PHP_FLOAT_DIG, $precision + 3))) {
+		return $format_fn($sign, $digits_sci[0], substr($digits_sci, 1), $exponent_sci);
+	}
+	elseif ($exponent_dec >= 0) {
+		return $format_fn($sign, str_pad(substr($digits_dec, 0, $exponent_dec + 1), $exponent_dec + 1, '0'),
+			substr($digits_dec, $exponent_dec + 1)
+		);
 	}
 	else {
-		return number_format($number, $decimals_exact ? $decimals : max(0, min($digits - $exponent - 1, $decimals)), '.', '');
+		return $digits_dec !== ''
+			? $format_fn($sign, '0', str_repeat('0', -$exponent_dec - 1).$digits_dec)
+			: $format_fn('', '0', '');
 	}
 }
 
@@ -2537,18 +2530,6 @@ function getTileProviders(): array {
 			'geomaps_tile_url' => 'https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png',
 			'geomaps_max_zoom' => '17',
 			'geomaps_attribution' => 'Map data: &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, <a href="http://viewfinderpanoramas.org">SRTM</a> | Map style: &copy; <a href="https://opentopomap.org">OpenTopoMap</a> (<a href="https://creativecommons.org/licenses/by-sa/3.0/">CC-BY-SA</a>)'
-		],
-		'Stamen.TonerLite' => [
-			'name' => 'Stamen Toner Lite',
-			'geomaps_tile_url' => 'https://stamen-tiles-{s}.a.ssl.fastly.net/toner-lite/{z}/{x}/{y}{r}.png',
-			'geomaps_max_zoom' => '20',
-			'geomaps_attribution' => 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-		],
-		'Stamen.Terrain' => [
-			'name' => 'Stamen Terrain',
-			'geomaps_tile_url' => 'https://stamen-tiles-{s}.a.ssl.fastly.net/terrain/{z}/{x}/{y}{r}.png',
-			'geomaps_max_zoom' => '18',
-			'geomaps_attribution' => 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
 		],
 		'USGS.USTopo' => [
 			'name' => 'USGS US Topo',

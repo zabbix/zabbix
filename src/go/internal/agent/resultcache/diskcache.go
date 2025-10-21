@@ -26,10 +26,10 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 	"golang.zabbix.com/agent2/internal/agent"
 	"golang.zabbix.com/agent2/internal/monitor"
-	"golang.zabbix.com/agent2/pkg/itemutil"
 	"golang.zabbix.com/agent2/pkg/version"
 	"golang.zabbix.com/sdk/log"
 	"golang.zabbix.com/sdk/plugin"
+	"golang.zabbix.com/sdk/plugin/itemutil"
 )
 
 const (

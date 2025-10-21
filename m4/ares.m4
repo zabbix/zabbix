@@ -77,8 +77,20 @@ AS_HELP_STRING([--with-ares@<:@=ARG@:>@], [use c-ares library @<:@default=no@:>@
 			ARES_LDFLAGS="-L/usr/pkg/lib"
 			found_ares="yes"
 		else
-			found_ares="no"
-			AC_MSG_RESULT(no)
+			m4_ifdef([PKG_PROG_PKG_CONFIG], [
+				PKG_PROG_PKG_CONFIG()
+				if test -z "$PKG_CONFIG"; then
+					AC_MSG_ERROR([pkg-config is required but not found. Please install pkg-config.])
+				fi
+			], [
+				AC_MSG_WARN([pkg-config not found, skipping c-ares detection via pkg-config])
+			])
+
+			if test -n "$PKG_CONFIG"; then
+				ARES_CFLAGS=`$PKG_CONFIG --cflags libcares`
+				ARES_LDFLAGS=`$PKG_CONFIG --libs-only-L libcares`
+				found_ares="yes"
+			fi
 		fi
 
 		if test "x$found_ares" = "xyes"; then

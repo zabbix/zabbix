@@ -295,6 +295,12 @@ class testDashboardGraphWidget extends testWidgets {
 				$this->page->getDriver()->executeScript('arguments[0].style.borderRadius=0;', [$button]);
 			}
 
+			// TODO: unstable screenshot on Jenkins. Remove border radius from Aggregate field segment.
+			if ($tab === 'Data set') {
+				$segment = $form->getField('Aggregate')->query('xpath:.//label[text()="Data set"]')->one();
+				$this->page->getDriver()->executeScript('arguments[0].style.borderRadius=0;', [$segment]);
+			}
+
 			$this->page->removeFocus();
 			sleep(1);
 			$this->assertScreenshotExcept($overlay, $add_button, 'tab_'.$tab);

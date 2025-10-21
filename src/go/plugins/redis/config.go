@@ -20,18 +20,9 @@ import (
 	"golang.zabbix.com/sdk/plugin"
 )
 
-type Session struct {
-	// URI is a connection string consisting of a network scheme, a "host:port" address or a path to a Unix-socket.
-	URI string `conf:"name=Uri,optional"`
+var _ plugin.Configurator = (*Plugin)(nil)
 
-	// Password to send to a protected Redis server.
-	Password string `conf:"optional"`
-
-	// User to send to a protected Redis server.
-	User string `conf:"optional"`
-}
-
-type PluginOptions struct {
+type pluginOptions struct {
 	// Timeout is the maximum time for waiting when a request has to be done. Default value equals the global timeout.
 	Timeout int `conf:"optional,range=1:30"`
 
@@ -39,16 +30,17 @@ type PluginOptions struct {
 	KeepAlive int `conf:"optional,range=60:900,default=300"`
 
 	// Sessions stores pre-defined named sets of connections settings.
-	Sessions map[string]Session `conf:"optional"`
+	Sessions map[string]session `conf:"optional"`
 
 	// Default stores default connection parameter values from configuration file
-	Default Session `conf:"optional"`
+	Default session `conf:"optional"`
 }
 
 // Configure implements the Configurator interface.
 // Initializes configuration structures.
-func (p *Plugin) Configure(global *plugin.GlobalOptions, options interface{}) {
-	if err := conf.UnmarshalStrict(options, &p.options); err != nil {
+func (p *Plugin) Configure(global *plugin.GlobalOptions, options any) {
+	err := conf.UnmarshalStrict(options, &p.options)
+	if err != nil {
 		p.Errf("cannot unmarshal configuration options: %s", err)
 	}
 
@@ -59,16 +51,34 @@ func (p *Plugin) Configure(global *plugin.GlobalOptions, options interface{}) {
 
 // Validate implements the Configurator interface.
 // Returns an error if validation of a plugin's configuration is failed.
-func (p *Plugin) Validate(options interface{}) error {
+func (*Plugin) Validate(options any) error {
 	var (
-		opts PluginOptions
-		err  error
+		opts pluginOptions
 	)
 
-	err = conf.UnmarshalStrict(options, &opts)
+	err := conf.UnmarshalStrict(options, &opts)
 	if err != nil {
 		return errs.Wrap(err, "plugin config validation failed")
 	}
 
-	return err
+	err = opts.Default.runSourceConsistencyValidation()
+	if err != nil {
+		return errs.Wrap(err, "invalid 'Default' configuration")
+	}
+
+	// Reuse the existing resolver to validate the default configuration's TLSConnect value.
+	// This keeps all validation and resolution logic centralized within a single function, albeit with a double check.
+	_, err = opts.Default.resolveTLSConnect(&opts.Default)
+	if err != nil {
+		return errs.Wrap(err, "invalid 'Default' configuration")
+	}
+
+	for sessionName, s := range opts.Sessions {
+		err = s.validateSession(&opts.Default)
+		if err != nil {
+			return errs.Wrap(err, "invalid session '"+sessionName+"' configuration")
+		}
+	}
+
+	return nil
 }

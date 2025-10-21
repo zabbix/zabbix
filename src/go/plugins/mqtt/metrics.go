@@ -20,15 +20,17 @@ import (
 	"golang.zabbix.com/sdk/metric"
 	"golang.zabbix.com/sdk/plugin"
 	"golang.zabbix.com/sdk/uri"
+	"golang.zabbix.com/sdk/zbxsync"
 )
 
 const (
 	keyGet = "mqtt.get"
 )
 
-var uriDefaults = &uri.Defaults{Scheme: "tcp", Port: "1883"}
-
+//nolint:gochecknoglobals // global runtime constants.
 var (
+	uriDefaults = &uri.Defaults{Scheme: "tcp", Port: "1883"}
+
 	paramURI = metric.NewConnParam("URL", "URL to connect or session name.").
 			WithDefault(uriDefaults.Scheme + "://localhost:" + uriDefaults.Port).WithSession().
 			WithValidator(uri.URIValidator{Defaults: uriDefaults, AllowedSchemes: []string{"tcp", "tls", "ws"}})
@@ -40,7 +42,7 @@ var (
 	paramTLSKeyFile  = metric.NewSessionOnlyParam("TLSKeyFile", "TLS key file path.").WithDefault("")
 )
 
-var metrics = metric.MetricSet{
+var metrics = metric.MetricSet{ //nolint:gochecknoglobals // used as a static const.
 	keyGet: metric.New(
 		"Subscribe to MQTT topics for published messages.",
 		[]*metric.Param{
@@ -50,9 +52,10 @@ var metrics = metric.MetricSet{
 	),
 }
 
+//nolint:gochecknoinits //legacy implementation
 func init() {
 	impl.manager = watch.NewManager(&impl)
-	impl.mqttClients = make(map[broker]*mqttClient)
+	impl.mqttClients = zbxsync.SyncMap[broker, *mqttClient]{}
 
 	err := plugin.RegisterMetrics(&impl, pluginName, metrics.List()...)
 	if err != nil {

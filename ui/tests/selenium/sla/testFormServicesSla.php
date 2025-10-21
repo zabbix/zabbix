@@ -920,7 +920,7 @@ class testFormServicesSla extends CWebTest {
 			'Effective date' => '2022-09-10',
 			'id:service_tags_0_tag' => 'tag',
 			'id:service_tags_0_value' => 'value',
-			'Description' => 'SLA descruption',
+			'Description' => 'SLA description',
 			'Enabled' => false
 		];
 		$old_hash = CDBHelper::getHash(self::$sla_sql);

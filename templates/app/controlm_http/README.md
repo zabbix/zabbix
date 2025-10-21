@@ -45,8 +45,8 @@ For example, `https://monitored.controlm.instance:8443/automation-api`.
 
 |Name|Description|Default|
 |----|-----------|-------|
-|{$API.URI.ENDPOINT}|<p>The API endpoint is a URI - for example, `https://monitored.controlm.instance:8443/automation-api`.</p>|`<set the api uri endpoint here>`|
-|{$API.TOKEN}|<p>A token to use for API connections.</p>|`<set the token here>`|
+|{$API.URI.ENDPOINT}|<p>The API endpoint is a URI - for example, `https://monitored.controlm.instance:8443/automation-api`.</p>||
+|{$API.TOKEN}|<p>A token to use for API connections.</p>||
 
 ### Items
 
@@ -141,9 +141,9 @@ For example, `https://monitored.controlm.instance:8443/automation-api`.
 
 |Name|Description|Default|
 |----|-----------|-------|
-|{$SERVER.NAME}|<p>The name of the Control-M server.</p>|`<set the server name here>`|
-|{$API.URI.ENDPOINT}|<p>The API endpoint is a URI - for example, `https://monitored.controlm.instance:8443/automation-api`.</p>|`<set the api uri endpoint here>`|
-|{$API.TOKEN}|<p>A token to use for API connections.</p>|`<set the token here>`|
+|{$SERVER.NAME}|<p>The name of the Control-M server.</p>||
+|{$API.URI.ENDPOINT}|<p>The API endpoint is a URI - for example, `https://monitored.controlm.instance:8443/automation-api`.</p>||
+|{$API.TOKEN}|<p>A token to use for API connections.</p>||
 
 ### Items
 

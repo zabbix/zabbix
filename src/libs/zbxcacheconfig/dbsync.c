@@ -263,6 +263,11 @@ void	zbx_dbsync_env_init(zbx_dc_config_t *cache)
 	zbx_hashset_create(&dbsync_env.changelog, 100, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 }
 
+void	zbx_dbsync_env_destroy(void)
+{
+	zbx_hashset_destroy(&dbsync_env.changelog);
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: remove old (1h+) changelog records from database and cache using  *
@@ -951,7 +956,7 @@ int	zbx_dbsync_compare_autoreg_host(zbx_dbsync_t *sync)
 	zbx_dcsync_sql_start(sync);
 
 	if (NULL == (sync->dbresult = zbx_db_select(
-			"select host,listen_ip,listen_dns,host_metadata,flags,listen_port"
+			"select host,listen_ip,listen_dns,host_metadata,flags,listen_port,tls_accepted"
 			" from autoreg_host"
 			" where proxyid is null")))
 	{

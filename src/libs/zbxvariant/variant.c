@@ -686,6 +686,47 @@ int	zbx_variant_compare(const zbx_variant_t *value1, const zbx_variant_t *value2
 	return variant_compare_str(value1, value2);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: check if two variant values are exactly the same                  *
+ *                                                                            *
+ * Parameters: value1 - [IN] first value                                      *
+ *             value2 - [IN] second value                                     *
+ *                                                                            *
+ * Return value: SUCCEED - values are exactly the same                        *
+ *               FAIL    - values are different                               *
+ *                                                                            *
+ * Comments: This function checks if two variants are of the same type and    *
+ *           have identical content. For string, error, binary, and vector    *
+ *           types, it checks if they point to the same memory location.      *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_variant_same(const zbx_variant_t *value1, const zbx_variant_t *value2)
+{
+	if (value1->type != value2->type)
+		return FAIL;
+
+	switch (value1->type)
+	{
+		case ZBX_VARIANT_NONE:
+			return SUCCEED;
+		case ZBX_VARIANT_UI64:
+			return value1->data.ui64 == value2->data.ui64 ? SUCCEED : FAIL;
+		case ZBX_VARIANT_DBL:
+			return zbx_double_compare(value1->data.dbl, value2->data.dbl);
+		case ZBX_VARIANT_STR:
+		case ZBX_VARIANT_ERR:
+			return value1->data.str == value2->data.str ? SUCCEED : FAIL;
+		case ZBX_VARIANT_BIN:
+			return value1->data.bin == value2->data.bin ? SUCCEED : FAIL;
+		case ZBX_VARIANT_VECTOR:
+			return value1->data.vector == value2->data.vector ? SUCCEED : FAIL;
+		default:
+			THIS_SHOULD_NEVER_HAPPEN;
+			return FAIL;
+	}
+}
+
 int	zbx_vector_var_get_type(zbx_vector_var_t *v)
 {
 	int	i, type = ITEM_VALUE_TYPE_NONE;

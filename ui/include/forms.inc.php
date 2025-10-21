@@ -245,6 +245,7 @@ JAVASCRIPT;
 		$data['http_proxy'] = $data['item']['http_proxy'];
 		$data['headers'] = $data['item']['headers'];
 		$data['retrieve_mode'] = $data['item']['retrieve_mode'];
+		$data['output_format'] = $data['item']['output_format'];
 		$data['request_method'] = $data['item']['request_method'];
 		$data['allow_traps'] = $data['item']['allow_traps'];
 		$data['ssl_cert_file'] = $data['item']['ssl_cert_file'];
@@ -1196,6 +1197,10 @@ function renderTagTable(array $tags, $readonly = false, array $options = []) {
 
 	if (array_key_exists('field_name', $options)) {
 		$row_options['field_name'] = $options['field_name'];
+	}
+
+	if (array_key_exists('has_inline_validation', $options)) {
+		$row_options['has_inline_validation'] = $options['has_inline_validation'];
 	}
 
 	foreach ($tags as $index => $tag) {

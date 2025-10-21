@@ -335,13 +335,14 @@ class testDashboardGeomapWidgetScreenshots extends CWebTest {
 			$id = $widget.' '.$data['Tile provider'];
 			$element = $this->query("xpath://div[".CXPathHelper::fromClass('dashboard-grid-widget')."]//h4[text()=".
 					CXPathHelper::escapeQuotes($widget)."]/../..")->waitUntilVisible()->one();
+			// TODO: unstable screenshot on Jenkins. Remove border radius from zoom in element.
+			if ($widget === 'Geomap for screenshots, 10') {
+				$this->page->getDriver()->executeScript('arguments[0].style.borderRadius=0;',
+						[$element->query('class:leaflet-control-zoom-in')->one()]
+				);
+			}
 
 			$count = count($this->errors);
-			/*
-			 * Zoom in and zoom out icons in the geomap widget are not centred on reference screenshots due to script
-			 * execution in the assertScreenshotExcept() method for text and image rendering. This is expected beahavior
-			 * and can only be reproduced by running a test.
-			 */
 			$this->assertScreenshot($element, $id);
 
 			if ($count !== count($this->errors)) {

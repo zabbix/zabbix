@@ -81,7 +81,7 @@ class testFormTotp extends CWebTest {
 	 */
 	protected function testTotpLayout() {
 		// Container of most elements.
-		$container = $this->page->query('class:signin-container')->one();
+		$container = $this->query('class:signin-container')->waitUntilVisible()->one();
 
 		// Assert Zabbix logo.
 		$this->assertTrue($container->query('class:zabbix-logo')->one()->isVisible());
@@ -245,12 +245,12 @@ class testFormTotp extends CWebTest {
 	protected function testTotpBlocking() {
 		// Open the form.
 		$this->userLogin();
-		$form = $this->page->query('class:signin-container')->asForm()->one();
+		$form = $this->query('class:signin-container')->waitUntilVisible()->asForm()->one();
 
 		// Enter the incorrect TOTP several times to get blocked.
 		for ($i = 1; $i <= self::BLOCK_COUNT; $i++) {
 			$form->getField('id:verification_code')->fill('999999');
-			$form->query('button:Sign in')->one()->click();
+			$form->query('button:Sign in')->one()->click()->waitUntilStalled();
 
 			if ($i !== self::BLOCK_COUNT) {
 				// Validate the validation error message first n-1 times.

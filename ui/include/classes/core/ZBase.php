@@ -373,7 +373,9 @@ class ZBase {
 	public static function getThemes() {
 		return [
 			'blue-theme' => _('Blue'),
+			'blue-classic-theme' => _('Blue (classic)'),
 			'dark-theme' => _('Dark'),
+			'dark-classic-theme' => _('Dark (classic)'),
 			'hc-light' => _('High-contrast light'),
 			'hc-dark' => _('High-contrast dark')
 		];
@@ -381,7 +383,7 @@ class ZBase {
 
 	public static function getColorScheme(string $theme): string {
 		return match ($theme) {
-			'dark-theme', 'hc-dark' => ZBX_COLOR_SCHEME_DARK,
+			'dark-theme', 'hc-dark', 'dark-classic-theme' => ZBX_COLOR_SCHEME_DARK,
 			default => ZBX_COLOR_SCHEME_LIGHT
 		};
 	}
@@ -569,7 +571,10 @@ class ZBase {
 			throw new Exception(_('Session initialization error.'));
 		}
 
-		CSessionHelper::set('sessionid', CWebUser::$data['sessionid']);
+		if (CSessionHelper::get('sessionid') !== CWebUser::$data['sessionid']) {
+			CSessionHelper::unset(['saml_data']);
+			CSessionHelper::set('sessionid', CWebUser::$data['sessionid']);
+		}
 
 		if (CWebUser::isAutologinEnabled()) {
 			$session->lifetime = time() + SEC_PER_MONTH;

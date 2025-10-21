@@ -45,7 +45,7 @@ This template has been tested on:
 |Name|Description|Default|
 |----|-----------|-------|
 |{$NOMAD.ENDPOINT.API.URL}|<p>API endpoint URL for one of the Nomad cluster members.</p>|`http://localhost:4646`|
-|{$NOMAD.TOKEN}|<p>Nomad authentication token.</p>|`<PUT YOUR AUTH TOKEN>`|
+|{$NOMAD.TOKEN}|<p>Nomad authentication token.</p>||
 |{$NOMAD.DATA.TIMEOUT}|<p>Response timeout for an API.</p>|`15s`|
 |{$NOMAD.HTTP.PROXY}|<p>Sets the HTTP proxy for script and HTTP agent items. If this parameter is empty, then no proxy is used.</p>||
 |{$NOMAD.API.RESPONSE.SUCCESS}|<p>HTTP API successful response code. Availability triggers threshold. Change, if needed.</p>|`200`|
@@ -143,7 +143,7 @@ This template has been tested on:
 |----|-----------|-------|
 |{$NOMAD.CLIENT.API.SCHEME}|<p>Nomad client API scheme.</p>|`http`|
 |{$NOMAD.CLIENT.API.PORT}|<p>Nomad client API port.</p>|`4646`|
-|{$NOMAD.TOKEN}|<p>Nomad authentication token.</p>|`<PUT YOUR AUTH TOKEN>`|
+|{$NOMAD.TOKEN}|<p>Nomad authentication token.</p>||
 |{$NOMAD.DATA.TIMEOUT}|<p>Response timeout for an API.</p>|`15s`|
 |{$NOMAD.HTTP.PROXY}|<p>Sets the HTTP proxy for HTTP agent item. If this parameter is empty, then no proxy is used.</p>||
 |{$NOMAD.API.RESPONSE.SUCCESS}|<p>HTTP API successful response code. Availability triggers threshold. Change, if needed.</p>|`200`|
@@ -338,7 +338,7 @@ This template has been tested on:
 |----|-----------|-------|
 |{$NOMAD.SERVER.API.SCHEME}|<p>Nomad SERVER API scheme.</p>|`http`|
 |{$NOMAD.SERVER.API.PORT}|<p>Nomad SERVER API port.</p>|`4646`|
-|{$NOMAD.TOKEN}|<p>Nomad authentication token.</p>|`<PUT YOUR AUTH TOKEN>`|
+|{$NOMAD.TOKEN}|<p>Nomad authentication token.</p>||
 |{$NOMAD.DATA.TIMEOUT}|<p>Response timeout for an API.</p>|`15s`|
 |{$NOMAD.HTTP.PROXY}|<p>Sets the HTTP proxy for HTTP agent item. If this parameter is empty, then no proxy is used.</p>||
 |{$NOMAD.API.RESPONSE.SUCCESS}|<p>HTTP API successful response code. Availability triggers threshold. Change, if needed.</p>|`200`|

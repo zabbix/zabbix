@@ -20,6 +20,10 @@ use Zabbix\Core\CWidget;
 
 class Widget extends CWidget {
 
+	// Clustering options.
+	public const CLUSTERING_MODE_AUTO = 0;
+	public const CLUSTERING_MODE_MANUAL = 1;
+
 	public function getDefaultName(): string {
 		return _('Geomap');
 	}

@@ -176,10 +176,10 @@ static void	DCdump_autoreg_hosts(void)
 	while (NULL != (autoreg_host = (ZBX_DC_AUTOREG_HOST *)zbx_hashset_iter_next(&iter)))
 	{
 		zabbix_log(LOG_LEVEL_TRACE, " host:'%s' listen_ip:'%s' listen_dns:'%s' host_metadata:'%s' flags:%d"
-				" timestamp:%d listen_port:%u",
+				" timestamp:%d listen_port:%u connection_type:%u",
 				autoreg_host->host, autoreg_host->listen_ip, autoreg_host->listen_dns,
 				autoreg_host->host_metadata, autoreg_host->flags, autoreg_host->timestamp,
-				autoreg_host->listen_port);
+				autoreg_host->listen_port, autoreg_host->connection_type);
 	}
 
 	zabbix_log(LOG_LEVEL_TRACE, "End of %s()", __func__);
@@ -632,7 +632,7 @@ static void	DCdump_items(void)
 				item->itemid, item->hostid, item->key, item->revision);
 		zabbix_log(LOG_LEVEL_TRACE, "  type:%u value_type:%u", item->type, item->value_type);
 		zabbix_log(LOG_LEVEL_TRACE, "  interfaceid:" ZBX_FS_UI64, item->interfaceid);
-		zabbix_log(LOG_LEVEL_TRACE, "  state:%u error:'%s'", item->state, item->error);
+		zabbix_log(LOG_LEVEL_TRACE, "  state:%u", item->state);
 		zabbix_log(LOG_LEVEL_TRACE, "  flags:%x status:%u", item->flags, item->status);
 		zabbix_log(LOG_LEVEL_TRACE, "  valuemapid:" ZBX_FS_UI64, item->valuemapid);
 		zabbix_log(LOG_LEVEL_TRACE, "  lastlogsize:" ZBX_FS_UI64 " mtime:%d", item->lastlogsize, item->mtime);

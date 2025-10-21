@@ -1552,6 +1552,10 @@ class C80XmlValidator extends CXmlValidatorGeneral {
 															['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_STRING, 'default' => CXmlConstantValue::GET, 'in' => $this->ITEM_REQUEST_METHOD],
 															['else' => true, 'type' => XML_IGNORE_TAG]
 							]],
+							'output_format' =>			['type' => XML_MULTIPLE, 'rules' => [
+															['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_STRING, 'default' => CXmlConstantValue::OUTPUT_FORMAT_RAW, 'in' => [CXmlConstantValue::OUTPUT_FORMAT_RAW => CXmlConstantName::RAW, CXmlConstantValue::OUTPUT_FORMAT_JSON => CXmlConstantName::JSON]],
+															['else' => true, 'type' => XML_IGNORE_TAG]
+							]],
 							'ssl_cert_file' =>			['type' => XML_MULTIPLE, 'rules' => [
 															['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_STRING, 'default' => ''],
 															['else' => true, 'type' => XML_IGNORE_TAG]
@@ -2779,6 +2783,10 @@ class C80XmlValidator extends CXmlValidatorGeneral {
 							]],
 							'request_method' =>			['type' => XML_MULTIPLE, 'rules' => [
 															['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_STRING, 'default' => CXmlConstantValue::GET, 'in' => $this->ITEM_REQUEST_METHOD],
+															['else' => true, 'type' => XML_IGNORE_TAG]
+							]],
+							'output_format' =>			['type' => XML_MULTIPLE, 'rules' => [
+															['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_STRING, 'default' => CXmlConstantValue::OUTPUT_FORMAT_RAW, 'in' => [CXmlConstantValue::OUTPUT_FORMAT_RAW => CXmlConstantName::RAW, CXmlConstantValue::OUTPUT_FORMAT_JSON => CXmlConstantName::JSON]],
 															['else' => true, 'type' => XML_IGNORE_TAG]
 							]],
 							'ssl_cert_file' =>			['type' => XML_MULTIPLE, 'rules' => [

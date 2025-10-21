@@ -3162,7 +3162,9 @@ abstract class testFormPreprocessing extends CWebTest {
 		}
 		else {
 			if (array_key_exists('inline_errors', $data) && !$lld) {
-				COverlayDialogElement::find(0)->waitUntilReady();
+				$overlay = COverlayDialogElement::find(0)->waitUntilReady()->one();
+				$overlay->getFooter()->query('button:Add')->one()->waitUntilClassesNotPresent('is-loading');
+
 				$this->assertInlineError($form, $data['inline_errors']);
 			}
 			else {
@@ -4126,7 +4128,7 @@ abstract class testFormPreprocessing extends CWebTest {
 						'type' => 'JavaScript',
 						'parameters' => [
 							[
-								'selector' => 'xpath:.//div[@class="multilineinput-control"]/input[@type="text"]',
+								'selector' => 'xpath:.//div[@class="multilineinput-control has-error"]/input[@type="text"]',
 								'placeholder' => 'script'
 							]
 						],

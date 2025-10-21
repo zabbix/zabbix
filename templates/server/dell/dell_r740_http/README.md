@@ -37,9 +37,9 @@ This template has been tested on:
 
 |Name|Description|Default|
 |----|-----------|-------|
-|{$DELL.HTTP.API.URL}|<p>The Dell iDRAC Redfish API URL in the format `<scheme>://<host>:<port>`.</p>|`<Put your URL here>`|
-|{$DELL.HTTP.API.USER}|<p>The Dell iDRAC username.</p>|`<Put your username here>`|
-|{$DELL.HTTP.API.PASSWORD}|<p>The Dell iDRAC user password.</p>|`<Put your password here>`|
+|{$DELL.HTTP.API.URL}|<p>The Dell iDRAC Redfish API URL in the format `<scheme>://<host>:<port>`.</p>||
+|{$DELL.HTTP.API.USER}|<p>The Dell iDRAC username.</p>||
+|{$DELL.HTTP.API.PASSWORD}|<p>The Dell iDRAC user password.</p>||
 |{$DELL.HTTP.PROXY}|<p>Set an HTTP proxy for Redfish API requests if needed.</p>||
 |{$DELL.HTTP.RETURN.CODE.OK}|<p>Set the HTTP return code that represents an OK response from the API. The default is "200", but can vary, for example, if a proxy is used.</p>|`200`|
 |{$DELL.HTTP.REQUEST.TIMEOUT}|<p>Set the timeout for HTTP requests.</p>|`10s`|

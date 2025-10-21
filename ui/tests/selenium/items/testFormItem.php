@@ -31,10 +31,15 @@ use Facebook\WebDriver\WebDriverBy;
 class testFormItem extends CLegacyWebTest {
 
 	/**
-	 * Attach MessageBehavior to the test.
+	 * Attach MessageBehavior and TableBehavior to the test.
+	 *
+	 * @return array
 	 */
 	public function getBehaviors() {
-		return [CMessageBehavior::class];
+		return [
+			CMessageBehavior::class,
+			CTableBehavior::class
+		];
 	}
 
 	/**
@@ -1001,8 +1006,10 @@ class testFormItem extends CLegacyWebTest {
 		// Open hosts page.
 		$this->zbxTestLogin(self::HOST_LIST_PAGE);
 		// Find filter form and filter necessary host.
+		$table = $this->getTable();
 		$this->query('name:zbx_filter')->asForm()->waitUntilReady()->one()->fill(['Name' => $this->host]);
 		$this->query('button:Apply')->one()->waitUntilClickable()->click();
+		$table->waitUntilReloaded();
 		// Find Items link in host row and click it.
 		$this->query('xpath://table[@class="list-table"]')->asTable()->one()->findRow('Name', $this->host)
 				->getColumn('Items')->query('link:Items')->one()->click();
@@ -2095,8 +2102,9 @@ class testFormItem extends CLegacyWebTest {
 					$this->zbxTestInputType('delay_flex_'.$itemCount.'_delay', $period['flexDelay']);
 				}
 				$itemCount ++;
+				// Unstable test on Jenkins, added hoverMouse()
 				$form->query("xpath://div[@id='js-item-flex-intervals-field']//button[@class='btn-link element-table-add']")
-						->one()->click();
+						->one()->hoverMouse()->click();
 
 				$this->zbxTestAssertVisibleId('delay_flex_'.$itemCount.'_delay');
 				$this->zbxTestAssertVisibleId('delay_flex_'.$itemCount.'_period');
@@ -2271,6 +2279,7 @@ class testFormItem extends CLegacyWebTest {
 		$this->zbxTestInputType('hk_trends', '455d');
 
 		$this->zbxTestClickWait('update');
+		$this->assertMessage(TEST_GOOD, 'Configuration updated');
 
 		$this->zbxTestOpen(self::HOST_LIST_PAGE);
 		$this->filterEntriesAndOpenItems();
@@ -2305,8 +2314,8 @@ class testFormItem extends CLegacyWebTest {
 	private function filterEntriesAndOpenItems() {
 		$form = $this->query('name:zbx_filter')->asForm()->waitUntilReady()->one();
 		$form->fill(['Name' => $this->host]);
+		$table = $this->query('xpath://table[@class="list-table"]')->asTable()->one();
 		$this->query('button:Apply')->one()->waitUntilClickable()->click();
-		$this->query('xpath://table[@class="list-table"]')->asTable()->one()->findRow('Name', $this->host)
-				->getColumn('Items')->query('link:Items')->one()->click();
+		$table->waitUntilReloaded()->findRow('Name', $this->host)->getColumn('Items')->query('link:Items')->one()->click();
 	}
 }

@@ -18,6 +18,8 @@
 #include "zbxalgo.h"
 #include "zbxtime.h"
 
+#define ZBX_IPC_PATH_MAX	sizeof(((struct sockaddr_un *)0)->sun_path)
+
 #define ZBX_IPC_SOCKET_BUFFER_SIZE	4096
 
 #define ZBX_IPC_RECV_IMMEDIATE	0
@@ -25,6 +27,8 @@
 #define ZBX_IPC_RECV_TIMEOUT	2
 
 #define ZBX_IPC_WAIT_FOREVER	-1
+
+#define ZBX_IPC_HEADER_SIZE	(int)(sizeof(zbx_uint32_t) * 2)
 
 typedef struct
 {

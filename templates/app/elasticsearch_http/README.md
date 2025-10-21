@@ -35,7 +35,7 @@ This template has been tested on:
 |----|-----------|-------|
 |{$ELASTICSEARCH.USERNAME}|<p>The username of the Elasticsearch.</p>||
 |{$ELASTICSEARCH.PASSWORD}|<p>The password of the Elasticsearch.</p>||
-|{$ELASTICSEARCH.HOST}|<p>The hostname or IP address of the Elasticsearch host.</p>|`<SET ELASTICSEARCH HOST>`|
+|{$ELASTICSEARCH.HOST}|<p>The hostname or IP address of the Elasticsearch host.</p>||
 |{$ELASTICSEARCH.PORT}|<p>The port of the Elasticsearch host.</p>|`9200`|
 |{$ELASTICSEARCH.SCHEME}|<p>The scheme of the Elasticsearch (http/https).</p>|`http`|
 |{$ELASTICSEARCH.RESPONSE_TIME.MAX.WARN}|<p>The ES cluster maximum response time in seconds for trigger expression.</p>|`10s`|
@@ -45,6 +45,7 @@ This template has been tested on:
 |{$ELASTICSEARCH.FLUSH_LATENCY.MAX.WARN}|<p>Maximum of flush latency in milliseconds for trigger expression.</p>|`100`|
 |{$ELASTICSEARCH.HEAP_USED.MAX.WARN}|<p>The maximum percent in the use of JVM heap for warning trigger expression.</p>|`85`|
 |{$ELASTICSEARCH.HEAP_USED.MAX.CRIT}|<p>The maximum percent in the use of JVM heap for critically trigger expression.</p>|`95`|
+|{$ELASTICSEARCH.SINGLE.NODE.JVM.SPACE.MIN}|<p>Minimum free space available to JVM in single node instance in bytes for trigger expression.</p>|`10G`|
 
 ### Items
 
@@ -88,7 +89,8 @@ This template has been tested on:
 |Elasticsearch: Cluster has the initializing shards|<p>The cluster has the initializing shards longer than 10 minutes.</p>|`min(/Elasticsearch Cluster by HTTP/es.cluster.initializing_shards,10m)>0`|Average||
 |Elasticsearch: Cluster has the unassigned shards|<p>The cluster has the unassigned shards longer than 10 minutes.</p>|`min(/Elasticsearch Cluster by HTTP/es.cluster.unassigned_shards,10m)>0`|Average||
 |Elasticsearch: Cluster has been restarted|<p>Uptime is less than 10 minutes.</p>|`last(/Elasticsearch Cluster by HTTP/es.nodes.jvm.max_uptime)<10m`|Info|**Manual close**: Yes|
-|Elasticsearch: Cluster does not have enough space for resharding|<p>There is not enough disk space for index resharding.</p>|`(last(/Elasticsearch Cluster by HTTP/es.nodes.fs.total_in_bytes)-last(/Elasticsearch Cluster by HTTP/es.nodes.fs.available_in_bytes))/(last(/Elasticsearch Cluster by HTTP/es.cluster.number_of_data_nodes)-1)>last(/Elasticsearch Cluster by HTTP/es.nodes.fs.available_in_bytes)`|High||
+|Elasticsearch: Cluster does not have enough space for resharding|<p>There is not enough disk space for index resharding.</p>|`((last(/Elasticsearch Cluster by HTTP/es.nodes.fs.total_in_bytes) - last(/Elasticsearch Cluster by HTTP/es.nodes.fs.available_in_bytes)) / (last(/Elasticsearch Cluster by HTTP/es.cluster.number_of_data_nodes) - (last(/Elasticsearch Cluster by HTTP/es.cluster.number_of_data_nodes) >= 2)) > last(/Elasticsearch Cluster by HTTP/es.nodes.fs.available_in_bytes)) and (last(/Elasticsearch Cluster by HTTP/es.cluster.number_of_data_nodes) > 1)`|High||
+|Elasticsearch: Cluster does not have enough space (single node)|<p>The total number of bytes available to JVM in the file store is less than `{$ELASTICSEARCH.SINGLE.NODE.JVM.SPACE.MIN}`.<br>This is the actual amount of free disk space the selected Elasticsearch node can use.</p>|`(last(/Elasticsearch Cluster by HTTP/es.nodes.fs.available_in_bytes) < {$ELASTICSEARCH.SINGLE.NODE.JVM.SPACE.MIN}) and last(/Elasticsearch Cluster by HTTP/es.cluster.number_of_data_nodes) = 1`|High||
 |Elasticsearch: Cluster has only two master nodes|<p>The cluster has only two nodes with a master role and will be unavailable if one of them breaks.</p>|`last(/Elasticsearch Cluster by HTTP/es.nodes.count.master)=2`|Disaster||
 
 ### LLD rule Cluster nodes discovery

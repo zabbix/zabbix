@@ -91,10 +91,11 @@ class SVGMapShape {
 			}
 		];
 
-		mapping.forEach((map) => {
-			const color = `#${options[map.key].toString().trim()}`;
+		mapping.forEach(({ key, value }) => {
+			const raw_color = options[key]?.trim();
+			const color = raw_color ? `#${raw_color}` : null;
 
-			attributes[map.value] = isColorHex(color) ? color : 'none';
+			attributes[value] = isColorHex(color) ? color : 'none';
 		});
 
 		if (options.border_width !== undefined) {

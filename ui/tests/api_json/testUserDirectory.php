@@ -658,6 +658,12 @@ uwMrOBKatg7CZ1Uenv1K3ioD5w==
 				],
 				'expected_error' => 'No permissions to referred object or it does not exist!'
 			],
+			'Test host changes requires bind_password when db bind_password is not empty' => [
+				'userdirectories' => [
+					['userdirectoryid' => 'API LDAP #4', 'host' => 'test.host.com']
+				],
+				'expected_error' => 'Invalid parameter "/1": the parameter "bind_password" is missing.'
+			],
 			'Test idp_type change' => [
 				'userdirectories' => [
 					['userdirectoryid' => 'LDAP #1', 'idp_type' => IDP_TYPE_SAML]
@@ -1236,6 +1242,15 @@ uwMrOBKatg7CZ1Uenv1K3ioD5w==
 						]
 					]
 				]
+			],
+			[
+				'name' => 'API LDAP #4',
+				'idp_type' => IDP_TYPE_LDAP,
+				'host' => 'ldap.forumsys.com',
+				'port' => 389,
+				'base_dn' => 'dc=example,dc=com',
+				'search_attribute' => 'uid',
+				'bind_password' => 'test_password'
 			],
 			[
 				'name' => 'API SAML',

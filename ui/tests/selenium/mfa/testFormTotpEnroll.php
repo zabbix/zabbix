@@ -41,7 +41,7 @@ class testFormTotpEnroll extends testFormTotp {
 		$this->userLogin();
 
 		// Container of most elements.
-		$container = $this->page->query('class:signin-container')->one();
+		$container = $this->query('class:signin-container')->waitUntilVisible()->one();
 
 		// Assert title.
 		$this->assertTrue($container->query('xpath:.//div[text()="Scan this QR code"]')->one()->isVisible());
@@ -109,7 +109,7 @@ class testFormTotpEnroll extends testFormTotp {
 		$totp_code_length = CTestArrayHelper::get($data, 'mfa_data.code_length', self::DEFAULT_TOTP_CODE_LENGTH);
 
 		// Get elements.
-		$form = $this->page->query('class:signin-container')->asForm()->one();
+		$form = $this->query('class:signin-container')->waitUntilVisible()->asForm()->one();
 
 		// Assert the QR code and get the secret.
 		$totp_secret = $this->validateQrCodeAndExtractSecret($totp_name, self::USER_NAME, $totp_algo,
@@ -128,7 +128,7 @@ class testFormTotpEnroll extends testFormTotp {
 		$totp = CTestArrayHelper::get($data, 'totp_pre', '').$totp.CTestArrayHelper::get($data, 'totp_after', '');
 
 		$form->getField('id:verification_code')->fill($totp);
-		$form->query('button:Sign in')->one()->click();
+		$form->query('button:Sign in')->one()->hoverMouse()->click();
 
 		// Validate a successful login or an expected error.
 		$this->page->waitUntilReady();
@@ -152,7 +152,7 @@ class testFormTotpEnroll extends testFormTotp {
 		// Reset TOTP secret to make sure the user has not already been enrolled.
 		$this->resetTotpConfiguration();
 
-		// Open the the enroll form and get the secret.
+		// Open the enroll form and get the secret.
 		$this->userLogin();
 		$old_totp_secret = $this->validateQrCodeAndExtractSecret();
 
@@ -175,7 +175,7 @@ class testFormTotpEnroll extends testFormTotp {
 
 		// Log in and enroll, check that login successful.
 		$this->userLogin();
-		$form = $this->page->query('class:signin-container')->asForm()->one();
+		$form = $this->query('class:signin-container')->waitUntilVisible()->asForm()->one();
 		$this->performEnroll($form);
 		$this->page->assertUserIsLoggedIn();
 		$this->page->logout();
@@ -230,16 +230,15 @@ class testFormTotpEnroll extends testFormTotp {
 	public function testFormTotpEnroll_Screenshot() {
 		$this->resetTotpConfiguration();
 		$this->userLogin();
+		$form = $this->query('class:signin-container')->waitUntilVisible()->one();
+		$skip_fields = [
+			// Hide the QR code.
+			$this->page->query('class:qr-code')->one(),
+			// Hide the secret string. It does not have a good selector, sadly.
+			$this->page->query('xpath://form/div[last()]')->one()
+		];
 		$this->page->removeFocus();
-		$this->assertScreenshotExcept($this->page->query('class:signin-container')->one(),
-			[
-				// Hide the QR code.
-				$this->page->query('class:qr-code')->one(),
-				// Hide the secret string. It does not have a good selector, sadly.
-				$this->page->query('xpath://form/div[last()]')->one()
-			],
-			'TOTP enroll form'
-		);
+		$this->assertScreenshotExcept($form, $skip_fields, 'TOTP enroll form');
 	}
 
 	/**

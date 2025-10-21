@@ -19,7 +19,7 @@ import (
 	"strings"
 
 	"golang.zabbix.com/agent2/internal/agent"
-	"golang.zabbix.com/agent2/pkg/itemutil"
+	"golang.zabbix.com/sdk/plugin/itemutil"
 )
 
 type keyAlias struct {
@@ -33,7 +33,9 @@ type Manager struct {
 func (m *Manager) addAliases(aliases []string) (err error) {
 	for _, data := range aliases {
 		var name, key string
-		if name, key, err = itemutil.ParseAlias(data); err != nil {
+		name, key, err = itemutil.ParseAlias(data)
+
+		if err != nil {
 			return fmt.Errorf("cannot add alias \"%s\": %s", data, err)
 		}
 		for _, existingAlias := range m.aliases {

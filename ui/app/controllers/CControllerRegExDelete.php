@@ -16,9 +16,9 @@
 
 class CControllerRegExDelete extends CController {
 
-	protected function checkInput() {
+	protected function checkInput(): bool {
 		$fields = [
-			'regexids' => 'required|array_db regexps.regexpid'
+			'regexpids' => 'required|array_db regexps.regexpid'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -30,28 +30,26 @@ class CControllerRegExDelete extends CController {
 		return $ret;
 	}
 
-	protected function checkPermissions() {
+	protected function checkPermissions(): bool {
 		return $this->checkAccess(CRoleHelper::UI_ADMINISTRATION_GENERAL);
 	}
 
-	protected function doAction() {
-		$regexids = $this->getinput('regexids');
+	protected function doAction(): void {
+		$regexpids = $this->getinput('regexpids');
 
-		$result = API::Regexp()->delete($regexids);
+		$result = API::Regexp()->delete($regexpids);
 
-		$response = new CControllerResponseRedirect(
-			(new CUrl('zabbix.php'))->setArgument('action', 'regex.list')
-		);
+		$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))->setArgument('action', 'regex.list'));
 
 		if ($result) {
 			$response->setFormData(['uncheck' => '1']);
 			CMessageHelper::setSuccessTitle(_n('Regular expression deleted', 'Regular expressions deleted',
-				count($regexids)
+				count($regexpids)
 			));
 		}
 		else {
 			CMessageHelper::setErrorTitle(_n('Cannot delete regular expression', 'Cannot delete regular expressions',
-				count($regexids)
+				count($regexpids)
 			));
 		}
 

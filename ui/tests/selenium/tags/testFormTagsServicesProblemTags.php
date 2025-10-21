@@ -119,7 +119,9 @@ class testFormTagsServicesProblemTags extends testFormTags {
 							'value' => 'value1'
 						]
 					],
-					'error_details' => 'Invalid parameter "/1/problem_tags/1/tag": cannot be empty.'
+					'inline_error' => [
+						'id:problem_tags_0_tag' => 'This field cannot be empty.'
+					]
 				]
 			],
 			[
@@ -140,7 +142,9 @@ class testFormTagsServicesProblemTags extends testFormTags {
 							'value' => 'value'
 						]
 					],
-					'error_details' => 'Invalid parameter "/1/problem_tags/2": value (tag, value)=(tag, value) already exists.'
+					'inline_error' => [
+						'id:problem_tags_1_tag' => 'Tag name and value combination is not unique.'
+					]
 				]
 			],
 			[
@@ -200,7 +204,9 @@ class testFormTagsServicesProblemTags extends testFormTags {
 							'value' => 'value1'
 						]
 					],
-					'error_details'=>'Invalid parameter "/1/problem_tags/1/tag": cannot be empty.'
+					'inline_error' => [
+						'id:problem_tags_0_tag' => 'This field cannot be empty.'
+					]
 				]
 			],
 			[
@@ -215,8 +221,9 @@ class testFormTagsServicesProblemTags extends testFormTags {
 							'value' => 'problem update'
 						]
 					],
-					'error_details' => 'Invalid parameter "/1/problem_tags/2": value (tag, value)=(problem action,'.
-							' problem update) already exists.'
+					'inline_error' => [
+						'id:problem_tags_1_tag' => 'Tag name and value combination is not unique.'
+					]
 				]
 			],
 			[
@@ -231,8 +238,9 @@ class testFormTagsServicesProblemTags extends testFormTags {
 							'value' => ''
 						]
 					],
-					'error_details' => 'Invalid parameter "/1/problem_tags/3": value (tag, value)'.
-							'=(problem tag without value, ) already exists.'
+					'inline_error' => [
+						'id:problem_tags_2_tag' => 'Tag name and value combination is not unique.'
+					]
 				]
 			],
 			[

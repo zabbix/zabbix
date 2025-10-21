@@ -221,6 +221,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 					'show_lines' => $this->fields_values['show_lines'],
 					'show_tags' => $this->fields_values['show_tags'],
 					'show_timeline' => $this->fields_values['show_timeline'],
+					'highlight_row' => $this->fields_values['highlight_row'],
 					'tags' => $this->fields_values['tags'],
 					'tag_name_format' => $this->fields_values['tag_name_format'],
 					'tag_priority' => $this->fields_values['tag_priority'],

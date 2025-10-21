@@ -229,11 +229,13 @@ func (c *Connector) refreshActiveChecks() bool {
 		if c.configRevision == 0 {
 			log.Errf("[%d] cannot parse list of active checks from [%s]: data array is missing", c.clientID,
 				c.address.Get())
+
+			return false
 		} else {
 			parseSuccess = true
 		}
 
-		return false
+		return true
 	}
 
 	c.configRevision = response.ConfigRevision

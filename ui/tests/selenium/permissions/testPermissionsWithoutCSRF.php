@@ -106,7 +106,10 @@ class testPermissionsWithoutCSRF extends CWebTest {
 			[
 				[
 					'db' => 'SELECT * FROM hstgrp',
-					'link' => 'zabbix.php?action=popup&popup=hostgroup.edit'
+					'link' => 'zabbix.php?action=popup&popup=hostgroup.edit',
+					'fields' => [
+						'id:name' => 'CSRF validation host group create'
+					]
 				]
 			],
 			// #3 Host group update.
@@ -120,7 +123,10 @@ class testPermissionsWithoutCSRF extends CWebTest {
 			[
 				[
 					'db' => 'SELECT * FROM hstgrp',
-					'link' => 'zabbix.php?action=popup&popup=templategroup.edit'
+					'link' => 'zabbix.php?action=popup&popup=templategroup.edit',
+					'fields' => [
+						'id:name' => 'CSRF validation template group create'
+					]
 				]
 			],
 			// #5 Template group update.
@@ -270,7 +276,17 @@ class testPermissionsWithoutCSRF extends CWebTest {
 				[
 					'db' => 'SELECT * FROM maintenances',
 					'link' => 'zabbix.php?action=maintenance.list',
-					'overlay' => 'create'
+					'overlay' => 'create',
+					'fields' => [
+						'id:name' => 'CSRF maintenance test name',
+						'xpath://div[@id="groupids_"]/..' => 'Zabbix servers'
+					],
+					'secondary_dialog' => [
+						'field' => 'id:timeperiods',
+						'fill' => [
+							'Period type' => 'One time only'
+						]
+					]
 				]
 			],
 			// #21 Maintenance update.
@@ -372,8 +388,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 			[
 				[
 					'db' => 'SELECT * FROM icon_map',
-					'link' => 'zabbix.php?action=iconmap.edit&iconmapid=101',
-					'return_button' => true
+					'link' => 'zabbix.php?action=iconmap.edit&iconmapid=101'
 				]
 			],
 			// #34 Icon map create.
@@ -381,15 +396,17 @@ class testPermissionsWithoutCSRF extends CWebTest {
 				[
 					'db' => 'SELECT * FROM icon_map',
 					'link' => 'zabbix.php?action=iconmap.edit',
-					'return_button' => true
+					'fields' => [
+						'id:name' => 'CSRF icon test name',
+						'id:mappings_0_expression' => 'CSRF_test'
+					]
 				]
 			],
 			// #35 Regular expression update.
 			[
 				[
 					'db' => 'SELECT * FROM regexps',
-					'link' => 'zabbix.php?action=regex.edit&regexid=2',
-					'return_button' => true
+					'link' => 'zabbix.php?action=regex.edit&regexpid=2'
 				]
 			],
 			// #36 Regular expression create.
@@ -397,15 +414,17 @@ class testPermissionsWithoutCSRF extends CWebTest {
 				[
 					'db' => 'SELECT * FROM regexps',
 					'link' => 'zabbix.php?action=regex.edit',
-					'return_button' => true
+					'fields' => [
+						'id:name' => 'CSRF test name',
+						'id:expressions_0_expression' => 'abc'
+					]
 				]
 			],
 			// #37 Macros update.
 			[
 				[
 					'db' => 'SELECT * FROM globalmacro',
-					'link' => 'zabbix.php?action=macros.edit',
-					'return_button' => true
+					'link' => 'zabbix.php?action=macros.edit'
 				]
 			],
 			// #38 Trigger displaying options update.
@@ -613,7 +632,10 @@ class testPermissionsWithoutCSRF extends CWebTest {
 				[
 					'db' => 'SELECT * FROM services',
 					'link' => 'zabbix.php?action=service.list.edit',
-					'overlay' => 'create'
+					'overlay' => 'create',
+					'fields' => [
+						'id:name' => 'CSRF service create'
+					]
 				]
 			],
 			// #64 Service update.
@@ -710,6 +732,16 @@ class testPermissionsWithoutCSRF extends CWebTest {
 			foreach ($data['fields'] as $field => $value) {
 				$this->query($field)->one()->detect()->fill($value);
 			}
+		}
+
+		// Fill in mandatory fields in a secondary form if it contains fields that are required for form submission.
+		if (array_key_exists('secondary_dialog', $data)) {
+			$this->query($data['secondary_dialog']['field'])->one()->query('button:Add')->one()->click();
+
+			$secondary_form = COverlayDialogElement::find()->waitUntilReady()->all()->last()->asForm();
+			$secondary_form->fill($data['secondary_dialog']['fill']);
+			$secondary_form->submit();
+			$secondary_form->waitUntilNotVisible();
 		}
 
 		// Delete hidden input with CSRF token.

@@ -16,11 +16,11 @@
 
 #include "zbxhistory.h"
 #include "zbxcachevalue.h"
-#include "zbxexpression.h"
 #include "zbxdb.h"
 #include "zbxdbhigh.h"
 #include "zbxtime.h"
 #include "zbxcacheconfig.h"
+#include "zbxcalc.h"
 
 /******************************************************************************
  *                                                                            *

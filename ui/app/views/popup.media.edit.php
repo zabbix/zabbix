@@ -97,10 +97,13 @@ $form_grid = (new CFormGrid())
 				),
 			(new CTemplateTag('sendto-emails-row-tmpl'))->addItem(
 				(new CRow([
-					(new CTextBox('sendto_emails[#{rowNum}]', '#{email}'))
+					(new CTextBox('sendto_emails[#{rowNum}]', '#{email}',
+						$data['provisioned'] == CUser::PROVISION_STATUS_YES
+					))
 						->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 						->setAriaRequired(),
 					(new CButtonLink(_('Remove')))->addClass('element-table-remove')
+						->setEnabled($data['provisioned'] == CUser::PROVISION_STATUS_NO)
 				]))->addClass('form_row')
 			)
 		]))->addClass('js-field-sendto-emails')

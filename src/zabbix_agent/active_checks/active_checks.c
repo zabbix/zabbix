@@ -745,14 +745,6 @@ static int	parse_list_of_commands(char *str, int config_timeout)
 				continue;
 			}
 
-			if (SUCCEED != zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_WAIT, tmp, sizeof(tmp), NULL) ||
-					'\0' == *tmp)
-			{
-				zabbix_log(LOG_LEVEL_WARNING, "cannot retrieve value of tag \"%s\"",
-						ZBX_PROTO_TAG_WAIT);
-				continue;
-			}
-
 			if (SUCCEED != zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_TIMEOUT, tmp, sizeof(tmp), NULL) ||
 				'\0' == *tmp)
 			{
@@ -773,20 +765,25 @@ static int	parse_list_of_commands(char *str, int config_timeout)
 				continue;
 			}
 
-			if (0 == atoi(tmp))
-			{
-				zbx_snprintf_alloc(&key, &key_alloc, &offset, "system.run[%s,nowait]",
-						cmd);
-			}
-			else
-				zbx_snprintf_alloc(&key, &key_alloc, &offset, "system.run[%s,wait]",cmd);
-
 			if (SUCCEED != zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_ID, tmp, sizeof(tmp), NULL) ||
 							SUCCEED != zbx_is_uint64(tmp, &command_id))
 			{
 				zabbix_log(LOG_LEVEL_WARNING, "cannot retrieve value of tag \"%s\"", ZBX_PROTO_TAG_ID);
 				continue;
 			}
+
+			if (SUCCEED != zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_WAIT, tmp, sizeof(tmp), NULL) ||
+					'\0' == *tmp)
+			{
+				zabbix_log(LOG_LEVEL_WARNING, "cannot retrieve value of tag \"%s\"",
+						ZBX_PROTO_TAG_WAIT);
+				continue;
+			}
+
+			if (0 == atoi(tmp))
+				zbx_snprintf_alloc(&key, &key_alloc, &offset, "system.run[%s,nowait]", cmd);
+			else
+				zbx_snprintf_alloc(&key, &key_alloc, &offset, "system.run[%s,wait]", cmd);
 
 			add_command(key, command_id, timeout);
 		}
@@ -866,14 +863,14 @@ static void	process_config_item(struct zbx_json *json, const char *config, size_
 	zbx_free_agent_result(&result);
 }
 
-/******************************************************************************
- *                                                                            *
- * Purpose: retrieves list of active checks from Zabbix server                *
- *                                                                            *
- * Return value: returns SUCCEED on successful parsing,                       *
- *               FAIL on other cases                                          *
- *                                                                            *
- ******************************************************************************/
+/*******************************************************************************
+ *                                                                             *
+ * Purpose: retrieves list of active checks from Zabbix server                 *
+ *                                                                             *
+ * Return value: returns SUCCEED on successful parsing,                        *
+ *               FAIL, CONNECT_ERROR, SEND_ERROR and RECV_ERROR on other cases *
+ *                                                                             *
+ *******************************************************************************/
 static int	refresh_active_checks(zbx_vector_addr_ptr_t *addrs, const zbx_config_tls_t *config_tls,
 		zbx_uint32_t *config_revision_local, int config_timeout, const char *config_source_ip,
 		const char *config_listen_ip, int config_listen_port, const char *config_hostname,
@@ -1993,14 +1990,17 @@ ZBX_THREAD_ENTRY(active_checks_thread, args)
 		{
 			zbx_setproctitle("active checks #%d [getting list of active checks]", process_num);
 
-			if (FAIL == refresh_active_checks(&activechk_args.addrs, activechks_args_in->zbx_config_tls,
+			/* refresh_active_checks() can return SUCCEED, FAIL, CONNECT_ERROR, SEND_ERROR and RECV_ERROR */
+			if (SUCCEED != refresh_active_checks(&activechk_args.addrs, activechks_args_in->zbx_config_tls,
 					&config_revision_local, activechks_args_in->config_timeout,
 					activechks_args_in->config_source_ip, activechks_args_in->config_listen_ip,
 					activechks_args_in->config_listen_port, config_hostname,
 					activechks_args_in->config_host_metadata,
 					activechks_args_in->config_host_metadata_item,
 					activechks_args_in->config_host_interface,
-					activechks_args_in->config_host_interface_item, activechks_args_in->config_buffer_send, activechks_args_in->config_buffer_size))
+					activechks_args_in->config_host_interface_item,
+					activechks_args_in->config_buffer_send,
+					activechks_args_in->config_buffer_size))
 			{
 				nextrefresh = time(NULL) + 60;
 			}
