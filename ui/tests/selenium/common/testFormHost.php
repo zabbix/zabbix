@@ -323,7 +323,7 @@ class testFormHost extends CWebTest {
 		$hint->one()->query('xpath:.//button[@class="btn-overlay-close"]')->one()->click();
 		$hint->waitUntilNotPresent();
 
-		// Check the value of the "Monitored by" field and the present/absence of the corresponding mulitselect.
+		// Check the value of the "Monitored by" field and the present/absence of the corresponding multiselect.
 		$monitored_by = $form->getField('Monitored by');
 		$this->assertEquals('Proxy', $monitored_by->getValue());
 		$this->assertEquals(['Test Host Proxy'], $monitored_by->query('xpath:./../following-sibling::div')->asMultiselect()->one()->getValue());
@@ -1998,6 +1998,7 @@ class testFormHost extends CWebTest {
 			}
 			else {
 				$button->waitUntilNotVisible();
+				$form->waitUntilStalled();
 			}
 		}
 
@@ -2005,7 +2006,7 @@ class testFormHost extends CWebTest {
 
 		// Check that the host creation page is open after cloning.
 		if ($data['action'] === 'Clone') {
-			$form_type->waitUntilStalled()->invalidate();
+			$form_type->invalidate();
 			$id = CDBHelper::getValue('SELECT hostid FROM hosts WHERE host='.zbx_dbstr($host));
 			$expected_url = PHPUNIT_URL.'zabbix.php?action=host.edit&hostid='.$id.'&clone=1';
 
