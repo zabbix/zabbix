@@ -165,8 +165,8 @@ AS_HELP_STRING([--with-libcurl@<:@=DIR@:>@],[use cURL package @<:@default=no@:>@
 											;;
 											esac
 										fi
-										test -z "${LIBCURL_LIBS##*$_lib_i*}" && LIBCURL_LIBS=`echo "$LIBCURL_LIBS"|sed "s|$_lib_i||g"`
-										test -z "${LIBCURL_LIBS##*$i*}" || LIBCURL_LIBS="$LIBCURL_LIBS $i"
+										test -z "${LIBCURL_LIBS##*$_lib_i*}" && LIBCURL_LIBS=`echo "$LIBCURL_LIBS"|sed -E "s| ?$_lib_i([ \n])|\1|"`
+										LIBCURL_LIBS="$LIBCURL_LIBS $i"
 									],[
 										AC_MSG_ERROR([static library $_lib_name required for linking libcurl not found])
 									])
