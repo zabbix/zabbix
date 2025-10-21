@@ -343,7 +343,7 @@ void	jsonobj_clear_ref_vector(zbx_vector_jsonobj_ref_t *refs)
  * Purpose: get json value by name                                            *
  *                                                                            *
  ******************************************************************************/
-const zbx_jsonobj_t	*zbx_jsonobj_get_value(const zbx_jsonobj_t *obj, const char *name)
+zbx_jsonobj_t	*zbx_jsonobj_get_value(const zbx_jsonobj_t *obj, const char *name)
 {
 	zbx_jsonobj_el_t	el_local, *el;
 
