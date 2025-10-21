@@ -57,7 +57,6 @@ zbx_clickhouse_retries_t;
 
 typedef struct
 {
-	char					*base_url;
 	char					*db;
 
 	struct curl_slist			*curl_headers;
@@ -71,6 +70,9 @@ typedef struct
 	int					ssl_verify_peer;
 	int					ssl_verify_host;
 
+	const char				*base_url;
+	const char				*username;
+	const char				*password;
 	const char				*ssl_cert_file;
 	const char				*ssl_key_file;
 	const char				*ssl_key_password;
@@ -105,7 +107,6 @@ static void	history_clickhouse_data_free(zbx_clickhouse_data_t *data)
 
 	curl_multi_cleanup(data->mhandle);
 
-	zbx_free(data->base_url);
 	zbx_free(data->db);
 
 	zbx_free(data);
@@ -165,47 +166,6 @@ static void	history_clickhouse_release_conn(zbx_clickhouse_data_t *data, zbx_cli
 	zbx_vector_clickhouse_conn_ptr_append(&data->conns, conn);
 }
 
-
-/******************************************************************************
- *                                                                            *
- * Purpose: create full URL for ClickHouse connection                         *
- *                                                                            *
- * Parameters:                                                                *
- *     base_url - [IN] base URL for ClickHouse connection                     *
- *     username - [IN] username for authentication (optional)                 *
- *     password - [IN] password for authentication (optional)                 *
- *                                                                            *
- * Return value: dynamically allocated string containing full URL             *
- *                                                                            *
- ******************************************************************************/
-static char	*history_clickhouse_make_url(const char *base_url, const char *username, const char *password)
-{
-	char		*url = NULL, *username_enc = NULL, *password_enc = NULL;
-	size_t		url_alloc = 0, url_offset = 0;
-	const char	*ptr;
-
-	if (NULL != username)
-		zbx_url_encode(username, &username_enc);
-	if (NULL != password)
-		zbx_url_encode(password, &password_enc);
-
-	ptr = strstr(base_url, "//");
-
-	if (NULL != ptr)
-		zbx_strncpy_alloc(&url, &url_alloc, &url_offset, base_url, ptr - base_url + 2);
-
-	if (NULL != username_enc)
-		zbx_snprintf_alloc(&url, &url_alloc, &url_offset, "%s:%s@", username_enc, password_enc);
-
-	if (NULL != ptr)
-		zbx_strcpy_alloc(&url, &url_alloc, &url_offset, ptr + 2);
-
-	zbx_free(username_enc);
-	zbx_free(password_enc);
-
-	return url;
-}
-
 /******************************************************************************
  *                                                                            *
  * Purpose: create and initialize ClickHouse data structure                   *
@@ -253,6 +213,9 @@ static void	*history_clickhouse_create_data(const zbx_history_option_t *options,
 	data = (zbx_clickhouse_data_t *)zbx_malloc(NULL, sizeof(zbx_clickhouse_data_t));
 	memset(data, 0, sizeof(zbx_clickhouse_data_t));
 
+	data->username = username;
+	data->password = password;
+
 	data->ssl_cert_file = history_option_value(options, options_num, HISTORY_PROVIDER_OPTION_SSL_CERT_FILE);
 	data->ssl_key_file = history_option_value(options, options_num, HISTORY_PROVIDER_OPTION_SSL_KEY_FILE);
 	data->ssl_key_password = history_option_value(options, options_num, HISTORY_PROVIDER_OPTION_SSL_KEY_PASSWORD);
@@ -276,7 +239,7 @@ static void	*history_clickhouse_create_data(const zbx_history_option_t *options,
 	zbx_vector_clickhouse_conn_ptr_create(&data->conns);
 	zbx_vector_clickhouse_conn_ptr_create(&data->active_conns);
 
-	data->base_url = history_clickhouse_make_url(url, username, password);
+	data->base_url = url;
 	zbx_url_encode(db, &data->db);
 
 	return (void *)data;
@@ -331,6 +294,9 @@ static int	history_clickhouse_conn_init(zbx_clickhouse_conn_t *conn, zbx_clickho
 	}
 
 	if (SUCCEED != zbx_curl_setopt_https(conn->handle, error))
+		return FAIL;
+
+	if (SUCCEED != zbx_http_prepare_auth(conn->handle, CURLAUTH_BASIC, d->username, d->password, NULL, error))
 		return FAIL;
 
 	if (SUCCEED != zbx_http_prepare_ssl(conn->handle, d->ssl_cert_file, d->ssl_key_file, d->ssl_key_password,
