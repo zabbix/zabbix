@@ -153,6 +153,12 @@ static const char	*help_message[] = {
 	"      " ZBX_PROXY_CONFIG_CACHE_RELOAD "[=name] Reload configuration cache on proxy by its name,",
 	"                                        comma-separated list can be used to pass multiple names.",
 	"                                        All proxies will be reloaded if no names were specified.",
+	"      " ZBX_DBPOOL_STATUS "                    Display database connection pool status",
+	"      " ZBX_DBPOOL_SET_IDLE_TIMEOUT "=seconds",
+	"       "      "                           Set the idle timeout for connections in the database pool",
+	"      " ZBX_DBPOOL_SET_MAX_IDLE "=num     Set the maximum number of idle connections retained in",
+	"      "      "                              the database pool",
+	"      " ZBX_DBPOOL_SET_MAX_OPEN "=num     Set the maximum number of open connections in the database pool",
 	"",
 	"      Log level control targets:",
 	"        process-type              All processes of specified type",
@@ -2144,14 +2150,6 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 		zabbix_log(LOG_LEVEL_CRIT, "cannot obtain HA status: %s", error);
 		zbx_free(error);
 	}
-
-	if (SUCCEED != zbx_db_init(&error))
-	{
-		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize database: %s", error);
-		zbx_free(error);
-		exit(EXIT_FAILURE);
-	}
-
 out:
 	zbx_unset_exit_on_terminate();
 
@@ -2241,6 +2239,14 @@ static void	server_teardown(zbx_rtc_t *rtc, zbx_socket_t *listen_sock)
 #ifdef HAVE_PTHREAD_PROCESS_SHARED
 	zbx_locks_enable();
 #endif
+	/* re-initialize database before re-starting HA manager */
+	if (SUCCEED != zbx_db_init(&error))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize database: %s", error);
+		zbx_free(error);
+		exit(EXIT_FAILURE);
+	}
+
 	ha_config->ha_node_name =	CONFIG_HA_NODE_NAME;
 	ha_config->ha_node_address =	CONFIG_NODE_ADDRESS;
 	ha_config->default_node_ip =	zbx_config_listen_ip;
@@ -2464,6 +2470,13 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 			config_ssl_cert_location, config_ssl_key_location, &error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize database credentials from vault: %s", error);
+		zbx_free(error);
+		exit(EXIT_FAILURE);
+	}
+
+	if (SUCCEED != zbx_db_library_init(&error))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize database library: %s", error);
 		zbx_free(error);
 		exit(EXIT_FAILURE);
 	}

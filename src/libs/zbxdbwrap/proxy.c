@@ -884,6 +884,14 @@ static void	log_client_timediff(int level, struct zbx_json_parse *jp, const zbx_
 	}
 }
 
+static void	adjust_time(zbx_timespec_t *unique_shift, zbx_agent_value_t *av)
+{
+	av->ts.sec += unique_shift->sec;
+	av->ts.ns = unique_shift->ns++;
+
+	zbx_timespec_normalize(unique_shift);
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: parses agent value from history data json row                     *
@@ -911,27 +919,20 @@ static int	parse_history_data_row_value(const struct zbx_json_parse *jp_row, zbx
 		if (FAIL == zbx_is_uint31(tmp, &av->ts.sec))
 			goto out;
 
-		if (SUCCEED == zbx_json_value_by_name_dyn(jp_row, ZBX_PROTO_TAG_NS, &tmp, &tmp_alloc, NULL))
-		{
-			if (FAIL == zbx_is_uint_n_range(tmp, tmp_alloc, &av->ts.ns, sizeof(av->ts.ns),
-				0LL, 999999999LL))
-			{
-				goto out;
-			}
-		}
-		else
+		if (FAIL == zbx_json_value_by_name_dyn(jp_row, ZBX_PROTO_TAG_NS, &tmp, &tmp_alloc, NULL))
 		{
 			/* ensure unique value timestamp (clock, ns) if only clock is available */
-
-			av->ts.sec += unique_shift->sec;
-			av->ts.ns = unique_shift->ns++;
-
-			if (unique_shift->ns > 999999999)
-			{
-				unique_shift->sec++;
-				unique_shift->ns = 0;
-			}
+			adjust_time(unique_shift, av);
 		}
+		else if (SUCCEED == zbx_is_uint_n_range(tmp, tmp_alloc, &av->ts.ns, sizeof(av->ts.ns), 0LL,
+				999999999LL))
+		{
+			/* adjust ns for older systems where sometimes ns == 0 */
+			if (av->ts.ns == 0)
+				adjust_time(unique_shift, av);
+		}
+		else
+			goto out;
 	}
 	else
 		zbx_timespec(&av->ts);
@@ -1445,6 +1446,34 @@ static int	sender_item_validator(zbx_history_recv_item_t *item, zbx_socket_t *so
 	return rights->value;
 }
 
+typedef struct
+{
+	zbx_uint64_t	itemid;
+	zbx_timespec_t	ts;
+}
+item_timestamp_t;
+
+static zbx_hash_t	item_timestamp_hash(const void *data)
+{
+	const item_timestamp_t	*p = (const item_timestamp_t *)data;
+
+	zbx_hash_t hash = ZBX_DEFAULT_UINT64_HASH_FUNC(&p->itemid);
+
+	return ZBX_DEFAULT_PTR_HASH_ALGO(&p->ts, sizeof(zbx_timespec_t), hash);
+}
+
+static int	item_timestamp_compare(const void *d1, const void *d2)
+{
+	const item_timestamp_t	*p1 = (const item_timestamp_t *)d1;
+	const item_timestamp_t	*p2 = (const item_timestamp_t *)d2;
+
+	ZBX_RETURN_IF_NOT_EQUAL(p1->itemid, p2->itemid);
+	ZBX_RETURN_IF_NOT_EQUAL(p1->ts.sec, p2->ts.sec);
+	ZBX_RETURN_IF_NOT_EQUAL(p1->ts.ns, p2->ts.ns);
+
+	return 0;
+}
+
 static void	process_history_data_by_keys(zbx_socket_t *sock, zbx_client_item_validator_t validator_func,
 		void *validator_args, char **info, struct zbx_json_parse *jp_data, const char *token)
 {
@@ -1460,11 +1489,21 @@ static void	process_history_data_by_keys(zbx_socket_t *sock, zbx_client_item_val
 	int			errcodes[ZBX_HISTORY_VALUES_MAX];
 	double			sec;
 
+	/* hashset to ensure that triplets (itemid, timestamp seconds, timestamp nanoseconds) are unique */
+	zbx_hashset_t		timestamps;
+	int			timestamps_collision_num = 0;
+
+	/* Try to achieve uniqueness of triplets (itemid, timestamp seconds, timestamp nanoseconds) for up to */
+	/* N=1000 history records. Therefore, set a limit up to N*(N-1)/2 = 1000*(1000-1)/2 = ~ 500000 collisions. */
+#define TIMESTAMPS_COLLISIONS_MAX	500000
+
 	sec = zbx_time();
 
 	items = (zbx_history_recv_item_t *)zbx_malloc(NULL, sizeof(zbx_history_recv_item_t) * ZBX_HISTORY_VALUES_MAX);
 	hostkeys = (zbx_host_key_t *)zbx_malloc(NULL, sizeof(zbx_host_key_t) * ZBX_HISTORY_VALUES_MAX);
 	memset(hostkeys, 0, sizeof(zbx_host_key_t) * ZBX_HISTORY_VALUES_MAX);
+
+	zbx_hashset_create(&timestamps, ZBX_HISTORY_VALUES_MAX, item_timestamp_hash, item_timestamp_compare);
 
 	while (SUCCEED == parse_history_data(jp_data, &pnext, values, hostkeys, &values_num, &read_num,
 			&unique_shift) && 0 != values_num)
@@ -1513,6 +1552,28 @@ static void	process_history_data_by_keys(zbx_socket_t *sock, zbx_client_item_val
 
 				errcodes[i] = FAIL;
 			}
+			else
+			{
+				item_timestamp_t	it = {.itemid = items[i].itemid, .ts = values[i].ts};
+
+				while (NULL != zbx_hashset_search(&timestamps, &it))
+				{
+					/* Triplet (itemid, timestamp seconds, timestamp nanoseconds) is not unique. */
+					/* Try again with next nanosecond.*/
+					values[i].ts.ns++;
+					zbx_timespec_normalize(&values[i].ts);
+					it.ts = values[i].ts;
+					timestamps_collision_num++;
+				}
+
+				if (TIMESTAMPS_COLLISIONS_MAX < timestamps_collision_num)
+				{
+					timestamps_collision_num = 0;
+					zbx_hashset_clear(&timestamps);
+				}
+
+				zbx_hashset_insert(&timestamps, &it, sizeof(item_timestamp_t));
+			}
 
 			if (NULL != session)
 				session->last_id = values[i].id;
@@ -1533,11 +1594,13 @@ static void	process_history_data_by_keys(zbx_socket_t *sock, zbx_client_item_val
 		zbx_free(hostkeys[i].key);
 	}
 
+	zbx_hashset_destroy(&timestamps);
 	zbx_free(hostkeys);
 	zbx_free(items);
 
 	*info = zbx_dsprintf(*info, "processed: %d; failed: %d; total: %d; seconds spent: " ZBX_FS_DBL,
 			processed_num, total_num - processed_num, total_num, zbx_time() - sec);
+#undef TIMESTAMPS_COLLISIONS_MAX
 }
 
 /******************************************************************************
