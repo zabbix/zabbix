@@ -23,8 +23,8 @@
 
 void	zbx_mock_test_entry(void **state)
 {
-	short	revents = (short)zbx_mock_get_parameter_int("in.revents");
-	char	*exp_result = zbx_strdup(NULL, zbx_mock_get_parameter_string("out.result"));
+	short		revents = (short)zbx_mock_get_parameter_int("in.revents");
+	const char	*exp_result = zbx_mock_get_parameter_string("out.result");
 
 	ZBX_UNUSED(state);
 
@@ -32,6 +32,5 @@ void	zbx_mock_test_entry(void **state)
 
 	zbx_mock_assert_str_eq("return value", exp_result, result);
 
-	zbx_free(exp_result);
 	zbx_free(result);
 }

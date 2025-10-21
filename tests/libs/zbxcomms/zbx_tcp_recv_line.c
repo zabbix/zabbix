@@ -65,8 +65,10 @@ void	zbx_mock_test_entry(void **state)
 	zbx_mock_extract_yaml_values_str("out.result", &exp_result_v);
 
 	if (exp_result_v.values_num != result_v.values_num)
+	{
 		fail_msg("Different number of elements in result vectors: expected %d, actual %d",
 				exp_result_v.values_num, result_v.values_num);
+	}
 
 	for (int i = 0; i < exp_result_v.values_num; i++)
 	{
