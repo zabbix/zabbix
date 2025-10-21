@@ -213,6 +213,9 @@ class testHistory extends CAPITest {
 				'api_request' => [
 					'countOutput' => true,
 					'history' => 1,
+					'filter' => [
+						'itemid' => ['133760']
+					],
 					'search' => [
 						'value' => '1'
 					]
