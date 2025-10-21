@@ -35,7 +35,6 @@ class testDashboardFavoriteMapsWidget extends CWebTest {
 	}
 
 	const MAP_NAME = 'Test map for favourite widget';
-	const TEST_MAPS = 'Test maps in widget';
 	const EDIT_WIDGET = 'Widget for update';
 	const DELETE_WIDGET = 'Favorite maps widget to delete';
 	const CANCEL_WIDGET = 'Widget for testing cancel button';
@@ -66,17 +65,9 @@ class testDashboardFavoriteMapsWidget extends CWebTest {
 						'widgets' => [
 							[
 								'type' => 'favmaps',
-								'name' => self::TEST_MAPS,
-								'x' => 0,
-								'y' => 0,
-								'width' => 12,
-								'height' => 4
-							],
-							[
-								'type' => 'favmaps',
 								'name' => self::EDIT_WIDGET,
 								'x' => 0,
-								'y' => 15,
+								'y' => 0,
 								'width' => 12,
 								'height' => 4
 							],
@@ -143,7 +134,7 @@ class testDashboardFavoriteMapsWidget extends CWebTest {
 
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=' .
 			self::$dashboardid)->waitUntilReady();
-		$widget = CDashboardElement::find()->one()->getWidget(self::TEST_MAPS)->waitUntilReady()->getContent();
+		$widget = CDashboardElement::find()->one()->getWidget(self::EDIT_WIDGET)->waitUntilReady()->getContent();
 
 		$this->assertEquals('zabbix.php?action=map.view&sysmapid='.self::$mapid,
 				$widget->query('link', self::MAP_NAME)->one()->getAttribute('href')
@@ -159,7 +150,7 @@ class testDashboardFavoriteMapsWidget extends CWebTest {
 
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=' .
 		self::$dashboardid)->waitUntilReady();
-		$widget = CDashboardElement::find()->one()->getWidget(self::TEST_MAPS)->getContent();
+		$widget = CDashboardElement::find()->one()->getWidget(self::EDIT_WIDGET)->getContent();
 
 		foreach ($favorite_maps as $map) {
 			// Added variable due to External Hook.
@@ -285,10 +276,10 @@ class testDashboardFavoriteMapsWidget extends CWebTest {
 
 		public function testDashboardFavoriteMapsWidget_SimpleUpdate() {
 		$old_hash = CDBHelper::getHash(self::SQL);
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.
-			self::$dashboardid)->waitUntilReady();
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid)->waitUntilReady();
 		$dashboard = CDashboardElement::find()->one();
-		$dashboard->getWidget(self::EDIT_WIDGET)->edit()->submit();
+		$form = $dashboard->getWidget(self::EDIT_WIDGET)->edit();
+		$form->submit()->waitUntilStalled();
 		$dashboard->save();
 		$this->page->waitUntilReady();
 		$this->assertMessage(TEST_GOOD, 'Dashboard updated');
