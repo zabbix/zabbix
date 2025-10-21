@@ -21,6 +21,7 @@ class CTimeUnitValidator extends CValidator {
 	protected bool $usermacros = false;
 	protected bool $lldmacros = false;
 	protected bool $accept_zero = false;
+	protected bool $with_year = false;
 
 	public function __construct(array $options = []) {
 		if (array_key_exists('min', $options)) {
@@ -33,6 +34,10 @@ class CTimeUnitValidator extends CValidator {
 
 		if (array_key_exists('accept_zero', $options)) {
 			$this->accept_zero = (bool) $options['accept_zero'];
+		}
+
+		if (array_key_exists('with_year', $options)) {
+			$this->with_year = (bool) $options['with_year'];
 		}
 
 		if (array_key_exists('lldmacros', $options)) {
@@ -50,7 +55,7 @@ class CTimeUnitValidator extends CValidator {
 		}
 
 		$interval_parser = new CSimpleIntervalParser(['usermacros' => $this->usermacros,
-			'lldmacros' => $this->lldmacros
+			'lldmacros' => $this->lldmacros, 'with_year' =>  $this->with_year
 		]);
 		$result = $interval_parser->parse($value);
 
@@ -64,7 +69,7 @@ class CTimeUnitValidator extends CValidator {
 			return true;
 		}
 
-		$seconds = timeUnitToSeconds($value, false);
+		$seconds = timeUnitToSeconds($value, $this->with_year);
 
 		if ($seconds > $this->max || $seconds < $this->min) {
 			$this->setError(_s('value must be one of %1$s', $this->min.'-'.$this->max));

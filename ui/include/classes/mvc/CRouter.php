@@ -114,7 +114,7 @@ class CRouter {
 		'geomaps.edit'								=> [CControllerGeomapsEdit::class,									'layout.htmlpage',		'administration.geomaps.edit'],
 		'geomaps.update'							=> [CControllerGeomapsUpdate::class,								'layout.json',			null],
 		'gui.edit'									=> [CControllerGuiEdit::class,										'layout.htmlpage',		'administration.gui.edit'],
-		'gui.update'								=> [CControllerGuiUpdate::class,									null,					null],
+		'gui.update'								=> [CControllerGuiUpdate::class, 									'layout.json',			null],
 		'graph.edit'								=> [CControllerGraphEdit::class,									'layout.json',			'graph.edit'],
 		'graph.create'								=> [CControllerGraphCreate::class,									'layout.json',			null],
 		'graph.delete'								=> [CControllerGraphDelete::class,									'layout.json',			null],

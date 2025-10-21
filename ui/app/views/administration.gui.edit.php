@@ -151,12 +151,16 @@ $form = (new CForm())
 	->addItem((new CVar(CSRF_TOKEN_NAME, CCsrfTokenHelper::get('gui')))->removeId())
 	->setId('gui-form')
 	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)
-	->setAction((new CUrl('zabbix.php'))
-		->setArgument('action', 'gui.update')
-		->getUrl()
-	)
 	->addItem($gui_view);
 
 $html_page
 	->addItem($form)
+	->show();
+
+(new CScriptTag(
+	'view.init('.json_encode([
+		'rules' => $data['js_validation_rules'],
+		'default_values' => $data['default_values']
+	]).')'))
+	->setOnDocumentReady()
 	->show();

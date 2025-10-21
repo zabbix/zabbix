@@ -591,6 +591,26 @@ $translate_strings = [
 		'Palette %1$d' => _('Palette %1$d'),
 		'Solid color' => _('Solid color'),
 		'Use default' => _('Use default')
+	],
+	'administration.audit.settings.edit.js.php' => [
+		'Reset all fields to default values?' => _('Reset all fields to default values?'),
+		'Reset confirmation' => _('Reset confirmation'),
+		'Reset defaults' => _('Reset defaults')
+	],
+	'administration.gui.edit.js.php' => [
+		'Reset all fields to default values?' => _('Reset all fields to default values?'),
+		'Reset confirmation' => _('Reset confirmation'),
+		'Reset defaults' => _('Reset defaults')
+	],
+	'administration.housekeeping.edit.js.php' => [
+		'Reset all fields to default values?' => _('Reset all fields to default values?'),
+		'Reset confirmation' => _('Reset confirmation'),
+		'Reset defaults' => _('Reset defaults')
+	],
+	'administration.timeouts.edit.js.php' => [
+		'Reset all fields to default values?' => _('Reset all fields to default values?'),
+		'Reset confirmation' => _('Reset confirmation'),
+		'Reset defaults' => _('Reset defaults')
 	]
 ];
 
@@ -727,7 +747,12 @@ if (empty($_GET['files'])) {
 		'class.widget-field-event.js',
 		'class.widget-form.js',
 		'class.widget-form-event.js',
-		'class.widget-select.popup.js'
+		'class.widget-select.popup.js',
+
+		'administration.audit.settings.edit.js.php',
+		'administration.gui.edit.js.php',
+		'administration.housekeeping.edit.js.php',
+		'administration.timeouts.edit.js.php'
 	];
 
 	if (CCookieHelper::has(ZBX_SESSION_NAME)) {

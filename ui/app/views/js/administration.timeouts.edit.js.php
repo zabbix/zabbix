@@ -36,19 +36,17 @@ const view = new class {
 
 	#resetDefaults(reset_button) {
 		overlayDialogue({
-			title: <?= json_encode(_('Reset confirmation')) ?>,
-			content: document.createElement('span').innerText = <?= json_encode(
-				_('Reset all fields to default values?')
-			) ?>,
+			title: t('Reset confirmation'),
+			content: document.createElement('span').innerText = t('Reset all fields to default values?'),
 			buttons: [
 				{
-					title: <?= json_encode(_('Cancel')) ?>,
+					title: t('Cancel'),
 					cancel: true,
 					class: '<?= ZBX_STYLE_BTN_ALT ?>',
 					action: () => {}
 				},
 				{
-					title: <?= json_encode(_('Reset defaults')) ?>,
+					title: t('Reset defaults'),
 					focused: true,
 					action: () => {
 						clearMessages();
@@ -124,7 +122,7 @@ const view = new class {
 			messages = exception.error.messages;
 		}
 		else {
-			messages = [<?= json_encode(_('Unexpected server error.')) ?>];
+			messages = [t('Unexpected server error.')];
 		}
 
 		addMessage(makeMessageBox('bad', messages, title)[0]);
