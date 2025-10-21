@@ -39,6 +39,7 @@ $house_keeper_tab = (new CFormList())
 		new CLabel(_('Enable internal housekeeping'), 'hk_events_mode'),
 		(new CCheckBox('hk_events_mode'))
 			->setChecked($data['hk_events_mode'] == 1)
+			->setUncheckedValue(0)
 			->setAttribute('autofocus', 'autofocus')
 	)
 	->addRow(
@@ -91,7 +92,9 @@ $house_keeper_tab = (new CFormList())
 	->addRow((new CTag('h4', true, _('Services')))->addClass('input-section-header'))
 	->addRow(
 		new CLabel(_('Enable internal housekeeping'), 'hk_services_mode'),
-		(new CCheckBox('hk_services_mode'))->setChecked($data['hk_services_mode'] == 1)
+		(new CCheckBox('hk_services_mode'))
+			->setChecked($data['hk_services_mode'] == 1)
+			->setUncheckedValue(0)
 	)
 	->addRow(
 		(new CLabel(_('Data storage period'), 'hk_services'))
@@ -104,7 +107,9 @@ $house_keeper_tab = (new CFormList())
 	->addRow((new CTag('h4', true, _('User sessions')))->addClass('input-section-header'))
 	->addRow(
 		new CLabel(_('Enable internal housekeeping'), 'hk_sessions_mode'),
-		(new CCheckBox('hk_sessions_mode'))->setChecked($data['hk_sessions_mode'] == 1)
+		(new CCheckBox('hk_sessions_mode'))
+			->setChecked($data['hk_sessions_mode'] == 1)
+			->setUncheckedValue(0)
 	)
 	->addRow(
 		(new CLabel(_('Data storage period'), 'hk_sessions'))
@@ -117,7 +122,9 @@ $house_keeper_tab = (new CFormList())
 	->addRow((new CTag('h4', true, _('History')))->addClass('input-section-header'))
 	->addRow(
 		new CLabel(_('Enable internal housekeeping'), 'hk_history_mode'),
-		(new CCheckBox('hk_history_mode'))->setChecked($data['hk_history_mode'] == 1)
+		(new CCheckBox('hk_history_mode'))
+			->setChecked($data['hk_history_mode'] == 1)
+			->setUncheckedValue(0)
 	)
 	->addRow(
 		new CLabel([
@@ -130,7 +137,9 @@ $house_keeper_tab = (new CFormList())
 					->addClass('js-hk-history-warning')
 				: null
 		], 'hk_history_global'),
-		(new CCheckBox('hk_history_global'))->setChecked($data['hk_history_global'] == 1),
+		(new CCheckBox('hk_history_global'))
+			->setChecked($data['hk_history_global'] == 1)
+			->setUncheckedValue(0),
 	)
 	->addRow(
 		(new CLabel(_('Data storage period'), 'hk_history'))
@@ -143,7 +152,9 @@ $house_keeper_tab = (new CFormList())
 	->addRow((new CTag('h4', true, _('Trends')))->addClass('input-section-header'))
 	->addRow(
 		new CLabel(_('Enable internal housekeeping'), 'hk_trends_mode'),
-		(new CCheckBox('hk_trends_mode'))->setChecked($data['hk_trends_mode'] == 1)
+		(new CCheckBox('hk_trends_mode'))
+			->setChecked($data['hk_trends_mode'] == 1)
+			->setUncheckedValue(0)
 	)
 	->addRow(
 		new CLabel([
@@ -154,7 +165,9 @@ $house_keeper_tab = (new CFormList())
 					->addClass('js-hk-trends-warning')
 				: null
 		], 'hk_trends_global'),
-		(new CCheckBox('hk_trends_global'))->setChecked($data['hk_trends_global'] == 1)
+		(new CCheckBox('hk_trends_global'))
+			->setChecked($data['hk_trends_global'] == 1)
+			->setUncheckedValue(0)
 	)
 	->addRow(
 		(new CLabel(_('Data storage period'), 'hk_trends'))
@@ -215,6 +228,7 @@ $house_keeper_tab = (new CFormList())
 			->setChecked($data['compression_availability'] && $data['compression_status'] == 1
 				|| $data['compression_not_detected']
 			)
+			->setUncheckedValue(0)
 			->setEnabled($data['compression_availability']);
 
 		$house_keeper_tab
@@ -255,4 +269,12 @@ $form->addItem(
 
 $html_page
 	->addItem($form)
+	->show();
+
+(new CScriptTag(
+	'view.init('.json_encode([
+		'rules' => $data['js_validation_rules'],
+		'default_values' => $data['default_values']
+]).')'))
+	->setOnDocumentReady()
 	->show();

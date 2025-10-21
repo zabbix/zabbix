@@ -151,7 +151,7 @@ class CRouter {
 		'hostgroup.update'							=> [CControllerHostGroupUpdate::class,								'layout.json',			null],
 		'hostmacros.list'							=> [CControllerHostMacrosList::class,								'layout.json',			'hostmacros.list'],
 		'housekeeping.edit'							=> [CControllerHousekeepingEdit::class,								'layout.htmlpage',		'administration.housekeeping.edit'],
-		'housekeeping.update'						=> [CControllerHousekeepingUpdate::class,							null,					null],
+		'housekeeping.update'						=> [CControllerHousekeepingUpdate::class, 							'layout.json',			null],
 		'iconmap.create'							=> [CControllerIconMapCreate::class,								'layout.json',			null],
 		'iconmap.delete'							=> [CControllerIconMapDelete::class,								null,					null],
 		'iconmap.edit'								=> [CControllerIconMapEdit::class,									'layout.htmlpage',		'administration.iconmap.edit'],

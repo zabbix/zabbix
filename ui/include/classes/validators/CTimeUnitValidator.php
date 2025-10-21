@@ -20,6 +20,7 @@ class CTimeUnitValidator extends CValidator {
 	protected int $min = 0;
 	protected bool $usermacros = false;
 	protected bool $lldmacros = false;
+	protected bool $accept_zero = false;
 
 	public function __construct(array $options = []) {
 		if (array_key_exists('min', $options)) {
@@ -28,6 +29,10 @@ class CTimeUnitValidator extends CValidator {
 
 		if (array_key_exists('max', $options)) {
 			$this->max = (int) $options['max'];
+		}
+
+		if (array_key_exists('accept_zero', $options)) {
+			$this->accept_zero = (bool) $options['accept_zero'];
 		}
 
 		if (array_key_exists('lldmacros', $options)) {
@@ -40,6 +45,10 @@ class CTimeUnitValidator extends CValidator {
 	}
 
 	public function validate($value) {
+		if ($this->accept_zero && $value === '0') {
+			return true;
+		}
+
 		$interval_parser = new CSimpleIntervalParser(['usermacros' => $this->usermacros,
 			'lldmacros' => $this->lldmacros
 		]);
