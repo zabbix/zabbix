@@ -12,35 +12,37 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-package redis
+package handlers
 
 import (
 	"encoding/json"
-	"fmt"
 	"strings"
 
 	"github.com/mediocregopher/radix/v3"
+	"golang.zabbix.com/agent2/plugins/redis/conn"
+	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/zbxerr"
 )
 
 const globChars = "*?[]!"
 
-// configHandler gets an output of 'CONFIG GET [pattern]' command and returns it in JSON format or as a single-value.
-func configHandler(conn redisClient, params map[string]string) (interface{}, error) {
+// ConfigHandler gets an output of 'CONFIG GET [pattern]' command and returns it in JSON format or as a single-value.
+func ConfigHandler(redisClient conn.RedisClient, params map[string]string) (any, error) {
 	var res map[string]string
 
-	if err := conn.Query(radix.Cmd(&res, "CONFIG", "GET", params["Pattern"])); err != nil {
-		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
+	err := redisClient.Query(radix.Cmd(&res, "CONFIG", "GET", params["Pattern"]))
+	if err != nil {
+		return nil, errs.WrapConst(err, zbxerr.ErrorCannotFetchData)
 	}
 
 	if len(res) == 0 {
-		return nil, fmt.Errorf("no config parameter found for pattern %q", params["Pattern"])
+		return nil, errs.New("no config parameter found for pattern " + params["Pattern"])
 	}
 
 	if strings.ContainsAny(params["Pattern"], globChars) {
 		jsonRes, err := json.Marshal(res)
 		if err != nil {
-			return nil, zbxerr.ErrorCannotMarshalJSON.Wrap(err)
+			return nil, errs.WrapConst(err, zbxerr.ErrorCannotMarshalJSON)
 		}
 
 		return string(jsonRes), nil

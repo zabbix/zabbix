@@ -17,53 +17,51 @@
 class CControllerMaintenanceTimePeriodEdit extends CController {
 
 	protected function init() {
+		$this->setInputValidationMethod(self::INPUT_VALIDATION_FORM);
 		$this->disableCsrfValidation();
 	}
 
+	private static function getValidationRules(): array {
+		return ['object', 'fields' => [
+			'edit' => ['integer', 'in' => [1]],
+			'row_index' => ['integer', 'required'],
+			'timeperiod_type' => ['db timeperiods.timeperiod_type', 'required',
+				'in' => [TIMEPERIOD_TYPE_ONETIME, TIMEPERIOD_TYPE_DAILY, TIMEPERIOD_TYPE_WEEKLY, TIMEPERIOD_TYPE_MONTHLY],
+				'when' => ['edit', 'in' => [1]]
+			],
+			'every' => ['db timeperiods.every', 'required', 'when' => ['edit', 'in' => [1]]],
+			'month' => ['db timeperiods.month', 'required',
+				'when' => [['edit', 'in' => [1]], ['timeperiod_type', 'in' => [TIMEPERIOD_TYPE_MONTHLY]]]
+			],
+			'dayofweek' => ['db timeperiods.dayofweek', 'required',
+				'when' => [['edit', 'in' => [1]], ['timeperiod_type', 'in' => [TIMEPERIOD_TYPE_WEEKLY, TIMEPERIOD_TYPE_MONTHLY]]]
+			],
+			'day' => ['db timeperiods.day', 'required',
+				'when' => [['edit', 'in' => [1]], ['timeperiod_type', 'in' => [TIMEPERIOD_TYPE_MONTHLY]]]
+			],
+			'start_time' => ['db timeperiods.start_time', 'required',
+				'when' => [['edit', 'in' => [1]], ['timeperiod_type', 'in' => [TIMEPERIOD_TYPE_DAILY, TIMEPERIOD_TYPE_WEEKLY, TIMEPERIOD_TYPE_MONTHLY]]]
+			],
+			'period' => ['db timeperiods.period', 'required', 'when' => ['edit', 'in' => [1]]],
+			'start_date' => ['db timeperiods.start_date', 'required',
+				'when' => [['edit', 'in' => [1]], ['timeperiod_type', 'in' => [TIMEPERIOD_TYPE_ONETIME]]]
+			]
+		]];
+	}
+
 	protected function checkInput(): bool {
-		$fields = [
-			'edit' => 				'in 1',
-			'row_index' =>			'required|int32',
-			'timeperiod_type' => 	'in '.implode(',', [TIMEPERIOD_TYPE_ONETIME, TIMEPERIOD_TYPE_DAILY, TIMEPERIOD_TYPE_WEEKLY, TIMEPERIOD_TYPE_MONTHLY]),
-			'every' =>				'int32',
-			'month' =>				'int32',
-			'dayofweek' =>			'int32',
-			'day' =>				'int32',
-			'start_time' =>			'int32',
-			'period' =>				'int32',
-			'start_date' =>			'int32'
-		];
-
-		$ret = $this->validateInput($fields);
-
-		if ($ret && $this->hasInput('edit')) {
-			$fields = [
-				'timeperiod_type' =>	'required',
-				'every' =>				'required',
-				'month' =>				'required',
-				'dayofweek' =>			'required',
-				'day' =>				'required',
-				'start_time' =>			'required',
-				'period' =>				'required',
-				'start_date' =>			'required'
-			];
-
-			$validator = new CNewValidator(array_intersect_key($this->getInputAll(), $fields), $fields);
-
-			foreach ($validator->getAllErrors() as $error) {
-				error($error);
-			}
-
-			$ret = !$validator->isErrorFatal() && !$validator->isError();
-		}
+		$ret = $this->validateInput(self::getValidationRules());
 
 		if (!$ret) {
+			$form_errors = $this->getValidationError();
+			$response = $form_errors
+				? ['form_errors' => $form_errors]
+				: ['error' => [
+					'messages' => array_column(get_and_clear_messages(), 'message')
+				]];
+
 			$this->setResponse(
-				(new CControllerResponseData(['main_block' => json_encode([
-					'error' => [
-						'messages' => array_column(get_and_clear_messages(), 'message')
-					]
-				])]))->disableView()
+				(new CControllerResponseData(['main_block' => json_encode($response)]))->disableView()
 			);
 		}
 
@@ -130,13 +128,16 @@ class CControllerMaintenanceTimePeriodEdit extends CController {
 
 			$form['period_days'] = floor($this->getInput('period') / SEC_PER_DAY);
 			$form['period_hours'] = floor(($this->getInput('period') % SEC_PER_DAY) / SEC_PER_HOUR);
-			$form['period_minutes']= floor((($this->getInput('period') % SEC_PER_DAY) % SEC_PER_HOUR) / SEC_PER_MIN);
+			$form['period_minutes'] = floor((($this->getInput('period') % SEC_PER_DAY) % SEC_PER_HOUR) / SEC_PER_MIN);
 		}
 
 		$data = [
 			'title' => $this->hasInput('edit') ? _('Maintenance period') : _('New maintenance period'),
 			'is_edit' => $this->hasInput('edit'),
 			'row_index' => $this->getInput('row_index'),
+			'js_validation_rules' => (new CFormValidator(
+				CControllerMaintenanceTimePeriodCheck::getValidationRules()
+			))->getRules(),
 			'form' => $form,
 			'user' => [
 				'debug_mode' => $this->getDebugMode()

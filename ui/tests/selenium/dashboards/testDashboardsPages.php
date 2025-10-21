@@ -472,7 +472,7 @@ class testDashboardsPages extends CWebTest {
 		$next_page = $this->query(self::NEXT_BUTTON)->one();
 		$tab = $this->query('class:selected-tab')->one();
 
-		// If next page button exists and enabled press next tab buttun until the required tab is selected.
+		// If next page button exists and enabled press next tab button until the required tab is selected.
 		if ($next_page->isClickable()) {
 			while ($tab->getText() !== $title && $next_page->isClickable()) {
 				$next_page->click();

@@ -190,7 +190,7 @@ class testFormUserLdapMediaJit extends CWebTest {
 			$this->assertTrue($row->query('button:Edit')->one()->isClickable());
 		}
 
-		// Check the pressence and amount of hintboxes in media table for disabled media.
+		// Check the presence and amount of hintboxes in media table for disabled media.
 		$media_with_hints = ['MantisBT', 'OTRS CE', 'Rocket.Chat', 'Zendesk'];
 
 		foreach ($media_with_hints as $media_type) {
