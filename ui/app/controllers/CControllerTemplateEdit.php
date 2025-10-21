@@ -231,10 +231,10 @@ class CControllerTemplateEdit extends CController {
 
 				$data['valuemaps'] = array_values($data['dbTemplate']['valuemaps']);
 
-				$data['vendor'] = array_filter([
-					'name' => $data['dbTemplate']['vendor_name'],
-					'version' => $data['dbTemplate']['vendor_version']
-				], 'strlen');
+				$data['vendor'] = $this->prepareVendorData([
+					'name' => $data['dbTemplate']['vendor_name'] ?? '',
+					'version' => $data['dbTemplate']['vendor_version'] ?? ''
+				]);
 
 				foreach ($data['dbTemplate']['parentTemplates'] as $parentTemplate) {
 					$data['original_templates'][$parentTemplate['templateid']] = $parentTemplate['templateid'];
@@ -386,5 +386,22 @@ class CControllerTemplateEdit extends CController {
 			'vendor' => [],
 			'clone' => false
 		];
+	}
+
+	private function prepareVendorData(array $vendor_data): array {
+		$all_empty = true;
+
+		foreach ($vendor_data as $data) {
+			if ($data !== '') {
+				$all_empty = false;
+				break;
+			}
+		}
+
+		if ($all_empty) {
+			return [];
+		}
+
+		return $vendor_data;
 	}
 }

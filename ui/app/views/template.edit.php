@@ -149,8 +149,8 @@ if ($data['vendor']) {
 	$template_tab->addItem([
 		new CLabel(_('Vendor and version')),
 		new CFormField(implode(', ', [
-			array_key_exists('name', $data['vendor']) ? $data['vendor']['name'] : '',
-			array_key_exists('version', $data['vendor']) ? $data['vendor']['version'] : ''
+			$data['vendor']['name'],
+			$data['vendor']['version']
 		]))
 	]);
 }
