@@ -86,6 +86,7 @@ window.widget_form = new class extends CWidgetForm {
 		const show_change_indicator = this.#show[<?= Widget::SHOW_CHANGE_INDICATOR ?>].checked;
 		const show_sparkline = this.#show[<?= Widget::SHOW_SPARKLINE ?>].checked;
 
+		/** @type {HTMLSelectElement} */
 		const aggregate_function = document.getElementById('aggregate_function');
 
 		for (const element of this.#form.querySelectorAll('.fields-group-description')) {
@@ -148,17 +149,29 @@ window.widget_form = new class extends CWidgetForm {
 			? ''
 			: 'none';
 
-		const show_numeric_warning = !aggregate_function_none && !this.#is_item_numeric;
+		/** @type {HTMLButtonElement} */
+		const aggregate_function_warning = document.getElementById('item-aggregate-function-warning');
+		const aggregate_warning_functions = [<?= AGGREGATE_AVG ?>, <?= AGGREGATE_MIN ?>, <?= AGGREGATE_MAX ?>,
+			<?= AGGREGATE_SUM ?>
+		];
 
-		document.getElementById('item-aggregate-function-warning').style.display = show_numeric_warning
-				&& !show_sparkline
-			? ''
-			: 'none';
+		const show_numeric_warning = aggregate_warning_functions.includes(parseInt(aggregate_function.value))
+				&& !this.#is_item_numeric;
+		const show_sparkline_warning = !aggregate_function_none && show_sparkline;
 
-		document.getElementById('item-aggregate-function-sparkline-warning').style.display = show_numeric_warning
-				&& show_sparkline
-			? ''
-			: 'none';
+		if (show_numeric_warning || show_sparkline_warning) {
+			const numeric_warning = aggregate_function_warning.getAttribute('data-warning');
+			const sparkline_warning = aggregate_function_warning.getAttribute('data-sparkline-warning');
+
+			aggregate_function_warning.setAttribute('data-hintbox-contents', show_sparkline_warning
+				? (show_numeric_warning ? `${numeric_warning}<br>${sparkline_warning}` : sparkline_warning)
+				: numeric_warning);
+
+			aggregate_function_warning.style.display = '';
+		}
+		else {
+			aggregate_function_warning.style.display = 'none';
+		}
 
 		document.getElementById('item-thresholds-warning').style.display = this.#is_item_numeric ? 'none' : '';
 	}
