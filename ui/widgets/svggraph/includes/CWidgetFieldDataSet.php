@@ -91,6 +91,14 @@ class CWidgetFieldDataSet extends CWidgetField {
 				$data_set['itemids'] = array_values($data_set['itemids']);
 			}
 
+			if (array_key_exists('item_tags', $data_set)) {
+				foreach ($data_set['item_tags'] as $tag_index => $tag) {
+					if ($tag['tag'] === '' && $tag['value'] === '') {
+						unset($data_set['item_tags'][$tag_index]);
+					}
+				}
+			}
+
 			$data_sets[] = $data_set + self::getDefaults();
 		}
 
