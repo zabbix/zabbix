@@ -505,6 +505,10 @@ static zbx_uint64_t	history_manager_get_provider_value_types(zbx_history_manager
  * Comments: The default SQL provider information is not returned since it    *
  *           has been already handled during main DB version checks.          *
  *                                                                            *
+ *           Note that this function is called before forking processes, so   *
+ *           any handles that are not safe to be forked must be freed before  *
+ *           returning.                                                       *
+ *                                                                            *
  ******************************************************************************/
 static int	history_manager_get_info(zbx_history_manager_t *manager, zbx_history_provider_info_t **info,
 		int *info_num, char **error)
