@@ -786,11 +786,26 @@ class testProxyGroup extends CAPITest {
 	}
 
 	/**
+	 * Data provider for proxygroup.delete. Array contains invalid proxy group that are not possible to delete.
+	 *
+	 * @return array
+	 */
+	public static function getProxyGroupDeleteDataInvalid(): array {
+		return [
+			// Check if deleted proxy group used in actions.
+			'Test proxygroup.delete: used in action' => [
+				'proxyids' => ['used_in_action'],
+				'expected_error' => 'Proxy group "API test proxy group - used in action" is used by action "API test proxy group - discovery action".'
+			]
+		];
+	}
+
+	/**
 	 * Data provider for proxygroup.delete.
 	 *
 	 * @return array
 	 */
-	public static function getProxyGroupDeleteData(): array {
+	public static function getProxyGroupDeleteDataValid(): array {
 		return [
 			'Test proxygroup.delete: delete single' => [
 				'proxygroup' => ['state_offline'],
@@ -810,7 +825,8 @@ class testProxyGroup extends CAPITest {
 	/**
 	 * Test proxygroup.delete method.
 	 *
-	 * @dataProvider getProxyGroupDeleteData
+	 * @dataProvider getProxyGroupDeleteDataInvalid
+	 * @dataProvider getProxyGroupDeleteDataValid
 	 */
 	public function testProxyGroup_Delete(array $proxy_groupids, ?string $expected_error): void {
 		// Replace ID placeholders with real IDs.
