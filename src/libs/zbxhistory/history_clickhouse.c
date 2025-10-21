@@ -486,6 +486,33 @@ static void	history_clickhouse_write(void *data, unsigned char value_type,
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: append formatted error message to existing error string,          *
+ *          separating multiple errors with commas                            *
+ *                                                                            *
+ * Parameters: err    - [IN/OUT] pointer to error string (can be NULL)        *
+ *             format - [IN] format string for error message                  *
+ *             ...    - [IN] variable arguments for format string             *
+ *                                                                            *
+ ******************************************************************************/
+static void	history_clickhouse_add_error(char **err, const char *format, ...)
+{
+	va_list	args;
+	char	*str = NULL;
+	size_t	str_len = 0, str_offset = 0;
+
+	if (0 != *err)
+		zbx_strcpy_alloc(&str, &str_len, &str_offset, ", ");
+
+	va_start(args, format);
+	zbx_vsnprintf_alloc(&str, &str_len, &str_offset, format, args);
+	va_end(args);
+
+	*err = zbx_strdcat(*err, str);
+	zbx_free(str);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: flush active ClickHouse connections                               *
  *                                                                            *
  * Parameters:                                                                *
@@ -548,7 +575,7 @@ static int	history_clickhouse_flush_conns(zbx_clickhouse_data_t *d, CURLM *mhand
 
 		if (CURLE_OK != curl_easy_getinfo(msg->easy_handle, CURLINFO_PRIVATE, (char **)&conn) || NULL == conn)
 		{
-			*error = zbx_dsprintf(NULL, "cannot obtain internal ClickHouse data conn");
+			history_clickhouse_add_error(error, "cannot obtain internal ClickHouse data conn");
 			break;
 		}
 
@@ -556,11 +583,12 @@ static int	history_clickhouse_flush_conns(zbx_clickhouse_data_t *d, CURLM *mhand
 		{
 			if ('\0' != *conn->resp.errbuf)
 			{
-				*error = zbx_dsprintf(NULL, "cannot send query to ClickHouse: %s", conn->resp.errbuf);
+				history_clickhouse_add_error(error, "cannot send query to ClickHouse: %s",
+						conn->resp.errbuf);
 			}
 			else
 			{
-				*error = zbx_dsprintf(NULL, "cannot send query to ClickHouse: %s",
+				history_clickhouse_add_error(error, "cannot send query to ClickHouse: %s",
 						curl_easy_strerror(msg->data.result));
 			}
 
@@ -582,7 +610,7 @@ static int	history_clickhouse_flush_conns(zbx_clickhouse_data_t *d, CURLM *mhand
 
 			if (CURLE_OK != (err = curl_easy_getinfo(msg->easy_handle, CURLINFO_RESPONSE_CODE, &status)))
 			{
-				*error = zbx_dsprintf(NULL, "cannot obtain HTTP response code: %s",
+				history_clickhouse_add_error(error, "cannot obtain HTTP response code: %s",
 						curl_easy_strerror(err));
 				continue;
 			}
@@ -593,12 +621,14 @@ static int	history_clickhouse_flush_conns(zbx_clickhouse_data_t *d, CURLM *mhand
 			}
 			else
 			{
-				*error = zbx_dsprintf(NULL, "cannot send query to ClickHouse, HTTP response code: %ld",
+				history_clickhouse_add_error(error, "cannot send query to ClickHouse,"
+						" HTTP response code: %ld",
 						status);
 
 				if (NULL != conn->resp.page.data)
 				{
-					*error = zbx_strdcatf(*error, ", ClickHouse error: %s", conn->resp.page.data);
+					history_clickhouse_add_error(error, ", ClickHouse error: %s",
+							conn->resp.page.data);
 				}
 			}
 		}
