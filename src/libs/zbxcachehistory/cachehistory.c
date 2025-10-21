@@ -2075,6 +2075,7 @@ void	zbx_sync_history_cache(const zbx_events_funcs_t *events_cbs, zbx_ipc_async_
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() history_num:%d", __func__, cache->history_num);
 
+	/* zbx_sync_history_cache_server or zbx_sync_history_cache_proxy */
 	sync_history_cache_cb(events_cbs, rtc, stats);
 }
 
