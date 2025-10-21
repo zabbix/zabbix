@@ -75,7 +75,7 @@ const view = new class {
 			});
 		}
 
-		document.getElementById('resetDefaults').addEventListener('click', (e) => this.#resetDefaults());
+		document.getElementById('resetDefaults').addEventListener('click', (e) => this.#resetDefaults(e.target));
 
 		this.#checkVisibilityHistoryWarning();
 		this.#checkVisibilityTrendsWarning();
@@ -109,7 +109,7 @@ const view = new class {
 		}
 	}
 
-	#resetDefaults() {
+	#resetDefaults(reset_button) {
 		overlayDialogue({
 			title: <?= json_encode(_('Reset confirmation')) ?>,
 			content: $('<span>').text(<?= json_encode(_('Reset all fields to default values?')) ?>),
@@ -146,7 +146,8 @@ const view = new class {
 				}
 			]
 		}, {
-			position: Overlay.prototype.POSITION_CENTER
+			position: Overlay.prototype.POSITION_CENTER,
+			trigger_element: reset_button
 		});
 	}
 

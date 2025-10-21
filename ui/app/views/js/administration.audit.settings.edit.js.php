@@ -32,7 +32,7 @@ const view = new class {
 
 	#initEvents() {
 		this.form_element.addEventListener('submit', (e) => this.#submit(e));
-		document.getElementById('resetDefaults').addEventListener('click', (e) => this.#resetDefaults());
+		document.getElementById('resetDefaults').addEventListener('click', (e) => this.#resetDefaults(e.target));
 
 		document.getElementById('auditlog_enabled').addEventListener('change', (e) => {
 			document.getElementById('auditlog_mode').disabled = !e.target.checked;
@@ -43,7 +43,7 @@ const view = new class {
 		});
 	}
 
-	#resetDefaults() {
+	#resetDefaults(reset_button) {
 		overlayDialogue({
 			title: <?= json_encode(_('Reset confirmation')) ?>,
 			content: $('<span>').text(<?= json_encode(_('Reset all fields to default values?')) ?>),
@@ -78,7 +78,8 @@ const view = new class {
 				}
 			]
 		}, {
-			position: Overlay.prototype.POSITION_CENTER
+			position: Overlay.prototype.POSITION_CENTER,
+			trigger_element: reset_button
 		});
 	}
 

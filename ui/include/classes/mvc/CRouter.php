@@ -347,7 +347,7 @@ class CRouter {
 		'templategroup.list'						=> [CControllerTemplateGroupList::class,							'layout.htmlpage',		'configuration.templategroup.list'],
 		'templategroup.update'						=> [CControllerTemplateGroupUpdate::class,							'layout.json',			null],
 		'timeouts.edit'								=> [CControllerTimeoutsEdit::class,									'layout.htmlpage',		'administration.timeouts.edit'],
-		'timeouts.update'							=> [CControllerTimeoutsUpdate::class,								null,					null],
+		'timeouts.update'							=> [CControllerTimeoutsUpdate::class, 								'layout.json',			null],
 		'timeselector.calc'							=> [CControllerTimeSelectorCalc::class,								'layout.json',			null],
 		'timeselector.update'						=> [CControllerTimeSelectorUpdate::class,							'layout.json',			null],
 		'token.create'								=> [CControllerTokenCreate::class,									'layout.json',			null],
