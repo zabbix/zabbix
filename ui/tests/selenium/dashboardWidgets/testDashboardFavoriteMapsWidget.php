@@ -35,13 +35,13 @@ class testDashboardFavoriteMapsWidget extends CWebTest {
 	}
 
 	const MAP_NAME = 'Test map for favourite widget';
+	const TEST_MAPS = 'Test maps in widget';
 	const EDIT_WIDGET = 'Widget for update';
 	const DELETE_WIDGET = 'Favorite maps widget to delete';
 	const CANCEL_WIDGET = 'Widget for testing cancel button';
 
 	protected static $dashboardid;
 	protected static $mapid;
-	protected static $update_widget;
 
 	/**
 	 * SQL query to get widget and widget_field tables to compare hash values, but without widget_fieldid
@@ -66,6 +66,7 @@ class testDashboardFavoriteMapsWidget extends CWebTest {
 						'widgets' => [
 							[
 								'type' => 'favmaps',
+								'name' => self::TEST_MAPS,
 								'x' => 0,
 								'y' => 0,
 								'width' => 12,
@@ -100,7 +101,6 @@ class testDashboardFavoriteMapsWidget extends CWebTest {
 				]
 			]
 		]);
-		self::$update_widget = 'Favorite maps';
 		self::$dashboardid = $dashboards['dashboardids'][0];
 
 		// Create host for map.
@@ -143,7 +143,7 @@ class testDashboardFavoriteMapsWidget extends CWebTest {
 
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=' .
 			self::$dashboardid)->waitUntilReady();
-		$widget = CDashboardElement::find()->one()->getWidget('Favorite maps')->waitUntilReady()->getContent();
+		$widget = CDashboardElement::find()->one()->getWidget(self::TEST_MAPS)->waitUntilReady()->getContent();
 
 		$this->assertEquals('zabbix.php?action=map.view&sysmapid='.self::$mapid,
 				$widget->query('link', self::MAP_NAME)->one()->getAttribute('href')
@@ -159,7 +159,7 @@ class testDashboardFavoriteMapsWidget extends CWebTest {
 
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=' .
 		self::$dashboardid)->waitUntilReady();
-		$widget = CDashboardElement::find()->one()->getWidget('Favorite maps')->getContent();
+		$widget = CDashboardElement::find()->one()->getWidget(self::TEST_MAPS)->getContent();
 
 		foreach ($favorite_maps as $map) {
 			// Added variable due to External Hook.
@@ -288,7 +288,7 @@ class testDashboardFavoriteMapsWidget extends CWebTest {
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.
 			self::$dashboardid)->waitUntilReady();
 		$dashboard = CDashboardElement::find()->one();
-		$dashboard->getWidget(self::$update_widget)->edit()->submit();
+		$dashboard->getWidget(self::EDIT_WIDGET)->edit()->submit();
 		$dashboard->save();
 		$this->page->waitUntilReady();
 		$this->assertMessage(TEST_GOOD, 'Dashboard updated');
@@ -446,9 +446,9 @@ class testDashboardFavoriteMapsWidget extends CWebTest {
 		$form->fill($data['fields']);
 		$values = $form->getFields()->asValues();
 		$form->submit();
+		$form->waitUntilStalled();
 		$this->page->waitUntilReady();
-		$dashboard->save();
-		$this->page->waitUntilReady();
+		$dashboard->save()->waitUntilReady();
 		$this->assertMessage(TEST_GOOD, 'Dashboard updated');
 
 		// Trim leading/trailing spaces from expected results if necessary.
@@ -472,6 +472,7 @@ class testDashboardFavoriteMapsWidget extends CWebTest {
 			? '15 minutes'
 			: CTestArrayHelper::get($data['fields'], 'Refresh interval');
 		$this->assertEquals($refresh, $widget->getRefreshInterval());
+		CPopupMenuElement::find()->one()->close();
 
 		// Check new widget form fields and values in frontend.
 		$saved_form = $widget->edit();
@@ -481,6 +482,5 @@ class testDashboardFavoriteMapsWidget extends CWebTest {
 		$dashboard->save();
 		$this->page->waitUntilReady();
 		$this->assertMessage(TEST_GOOD, 'Dashboard updated');
-
 	}
 }
