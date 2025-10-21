@@ -210,9 +210,9 @@ class testDashboardGaugeWidget extends testWidgets {
 			'Max' => ['value' => 100, 'maxlength' => 255, 'enabled' => true, 'visible' => true],
 
 			// Colors.
-			self::PATH_TO_COLOR_PICKER.'"value_arc_color"]' => ['color' => '', 'enabled' => true, 'visible' => true],
-			self::PATH_TO_COLOR_PICKER.'"empty_color"]' => ['color' => '', 'enabled' => true, 'visible' => true],
-			self::PATH_TO_COLOR_PICKER.'"bg_color"]' => ['color' => '', 'enabled' => true, 'visible' => true],
+			self::PATH_TO_COLOR_PICKER.'"value_arc_color"]' => ['value' => '', 'enabled' => true, 'visible' => true],
+			self::PATH_TO_COLOR_PICKER.'"empty_color"]' => ['value' => '', 'enabled' => true, 'visible' => true],
+			self::PATH_TO_COLOR_PICKER.'"bg_color"]' => ['value' => '', 'enabled' => true, 'visible' => true],
 
 			// Show.
 			'id:show_1' => ['value' => true, 'enabled' => true, 'visible' => true], // Show Description.
@@ -228,13 +228,13 @@ class testDashboardGaugeWidget extends testWidgets {
 			'id:desc_size' => ['value' => '15', 'maxlength' => 3, 'enabled' => true, 'visible' => false],
 			'id:desc_v_pos' => ['value' => 'Bottom', 'enabled' => true, 'labels' => ['Top', 'Bottom'], 'visible' => false],
 			'id:desc_bold' => ['value' => false, 'enabled' => true, 'visible' => false],
-			self::PATH_TO_COLOR_PICKER.'"desc_color"]' => ['color' => '', 'enabled' => true, 'visible' => false],
+			self::PATH_TO_COLOR_PICKER.'"desc_color"]' => ['value' => '', 'enabled' => true, 'visible' => false],
 
 			// Value.
 			'id:decimal_places' => ['value' => 2, 'maxlength' => 2, 'enabled' => true, 'visible' => false],
 			'id:value_bold' => ['value' => false, 'enabled' => true, 'visible' => false],
 			'id:value_size' => ['value' => 25, 'maxlength' => 3, 'enabled' => true, 'visible' => false],
-			self::PATH_TO_COLOR_PICKER.'"value_color"]' => ['color' => '', 'enabled' => true, 'visible' => false],
+			self::PATH_TO_COLOR_PICKER.'"value_color"]' => ['value' => '', 'enabled' => true, 'visible' => false],
 
 			// Value arc.
 			'id:value_arc_size' => ['value' => 20, 'maxlength' => 3, 'enabled' => true, 'visible' => false],
@@ -245,10 +245,10 @@ class testDashboardGaugeWidget extends testWidgets {
 			'id:units_size' => ['value' => 25, 'maxlength' => 3, 'enabled' => true, 'visible' => false],
 			'id:units_pos' => ['value' => 'After value', 'enabled' => true, 'visible' => false],
 			'id:units_bold' => ['value' => false, 'enabled' => true, 'visible' => false],
-			self::PATH_TO_COLOR_PICKER.'"units_color"]'=> ['color' => '', 'enabled' => true, 'visible' => false],
+			self::PATH_TO_COLOR_PICKER.'"units_color"]'=> ['value' => '', 'enabled' => true, 'visible' => false],
 
 			// Needle.
-			self::PATH_TO_COLOR_PICKER.'"needle_color"]' => ['color' => '', 'enabled' => false, 'visible' => false],
+			self::PATH_TO_COLOR_PICKER.'"needle_color"]' => ['value' => '', 'enabled' => false, 'visible' => false],
 
 			// Scale.
 			'id:scale_show_units' => ['value' => true, 'enabled' => true, 'visible' => false],

@@ -32,15 +32,15 @@ class CColorPickerElement extends CElement {
 	 * @return type
 	 */
 	public function getInput() {
-		return $this->query('xpath:.//input')->one();
+		return $this->query('xpath:./input')->one();
 	}
 
 	/**
 	 * Overwrite input value.
 	 *
-	 * @inheritdoc
+	 * @param string|int|null $color	color code or palette number as a 'palette:number' pattern
 	 *
-	 * @param string $color		color code
+	 * @return $this
 	 */
 	public function overwrite($color) {
 		$overlay = $this->open();
@@ -59,8 +59,8 @@ class CColorPickerElement extends CElement {
 			}
 
 			if ($name === 'Palette') {
-				$overlay->query('xpath:.//input[@id="color-picker-palette-input-'.
-						str_replace('palette:', '', $color).'"]')->one()->click();
+				$palette_number = substr($color, strlen('palette:'));
+				$overlay->query('xpath:.//input[@id="color-picker-palette-input-'.$palette_number.'"]')->one()->click();
 			}
 			else {
 				$overlay->query('class:color-picker-input')->waitUntilVisible()->one()->overwrite($color);
@@ -90,17 +90,11 @@ class CColorPickerElement extends CElement {
 	}
 
 	/**
-	 * Check element value.
-	 *
-	 * @param mixed $expected    expected value of the element
-	 *
-	 * @return boolean
-	 *
-	 * @throws Exception
+	 * @inheritdoc
 	 */
 	public function checkValue($expected, $raise_exception = true) {
 		if (is_string($expected) && str_starts_with($expected, 'palette:')) {
-			$expected = str_replace('palette:', '', $expected);
+			$expected = substr($expected, strlen('palette:'));
 		}
 
 		return parent::checkValue($expected, $raise_exception);
@@ -128,7 +122,6 @@ class CColorPickerElement extends CElement {
 
 	/**
 	 * Press Escape key to close color picker.
-	 *
 	 */
 	public static function close() {
 		CElementQuery::getPage()->pressKey(WebDriverKeys::ESCAPE);
@@ -145,7 +138,7 @@ class CColorPickerElement extends CElement {
 	}
 
 	/**
-	 * Check if color-picker dialog can be submitted
+	 * Check if color-picker dialog can be submitted.
 	 *
 	 * @param boolean	$submitable		should dialog submission be disabled or not
 	 *
