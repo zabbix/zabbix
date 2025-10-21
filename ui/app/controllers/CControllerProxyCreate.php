@@ -189,6 +189,9 @@ class CControllerProxyCreate extends CController {
 			}
 
 			$this->clone_proxy = $this->clone_proxy[0];
+			$this->clone_proxy['tls_psk_identity'] = $this->clone_proxy['tls_psk_identity']
+				?: $this->getInput('tls_psk_identity', '');
+			$this->clone_proxy['tls_psk'] = $this->clone_proxy['tls_psk'] ?: $this->getInput('tls_psk', '');
 		}
 
 		return true;
