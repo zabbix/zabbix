@@ -110,7 +110,7 @@ zbx_uint32_t	zbx_deserialize_vector_uint64(const unsigned char *buffer, zbx_vect
 		{
 			zbx_uint64_t	value;
 
-			memcpy(&value, src + i * (int)sizeof(zbx_uint64_t), sizeof(zbx_uint64_t));
+			src += zbx_deserialize_uint64(src, &value);
 			zbx_vector_uint64_append(vector_uint64, value);
 		}
 	}
