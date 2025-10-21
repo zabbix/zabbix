@@ -19,62 +19,159 @@
  */
 ?>
 
-<script type="text/javascript">
-	$(document).ready(function() {
-		var $form = $('form#audit-settings');
+<script>
+const view = new class {
+	init({rules, default_values}) {
+		this.form_element = document.getElementById('audit-settings');
+		this.form = new CForm(this.form_element, rules);
+		this.rules = rules;
+		this.default_values = default_values;
 
-		$form.on('submit', function() {
-			$form.trimValues(['#hk_audit']);
+		this.#initEvents();
+	}
+
+	#initEvents() {
+		this.form_element.addEventListener('submit', (e) => this.#submit(e));
+		document.getElementById('resetDefaults').addEventListener('click', (e) => this.#resetDefaults());
+
+		document.getElementById('auditlog_enabled').addEventListener('change', (e) => {
+			document.getElementById('auditlog_mode').disabled = !e.target.checked;
 		});
 
-		$('#auditlog_enabled').change(function() {
-			$('#auditlog_mode').prop('disabled', !this.checked);
+		document.getElementById('hk_audit_mode').addEventListener('change', (e) => {
+			document.getElementById('hk_audit').disabled = !e.target.checked;
 		});
+	}
 
-		$('#hk_audit_mode').change(function() {
-			$('#hk_audit').prop('disabled', !this.checked);
-		});
+	#resetDefaults() {
+		overlayDialogue({
+			title: <?= json_encode(_('Reset confirmation')) ?>,
+			content: $('<span>').text(<?= json_encode(_('Reset all fields to default values?')) ?>),
+			buttons: [
+				{
+					title: <?= json_encode(_('Cancel')) ?>,
+					cancel: true,
+					class: '<?= ZBX_STYLE_BTN_ALT ?>',
+					action: () => {}
+				},
+				{
+					title: <?= json_encode(_('Reset defaults')) ?>,
+					focused: true,
+					action: () => {
+						clearMessages();
 
-		$("#resetDefaults").click(function() {
-			overlayDialogue({
-				title: <?= json_encode(_('Reset confirmation')) ?>,
-				content: $('<span>').text(<?= json_encode(_('Reset all fields to default values?')) ?>),
-				buttons: [
-					{
-						title: <?= json_encode(_('Cancel')) ?>,
-						cancel: true,
-						class: '<?= ZBX_STYLE_BTN_ALT ?>',
-						action: function() {}
-					},
-					{
-						title: <?= json_encode(_('Reset defaults')) ?>,
-						focused: true,
-						action: function() {
-							$('main')
-								.prev('.msg-bad')
-								.remove();
+						Object.entries(this.default_values).forEach(([key, value]) => {
+							const input = document.getElementById(key);
+							if (input) {
+								if (input.getAttribute('type') === 'checkbox') {
+									input.checked = value;
+									input.dispatchEvent(new Event('change'));
+								}
+								else {
+									input.value = value;
+								}
+							}
+						});
 
-							$('#auditlog_enabled')
-								.prop('checked',
-									<?= json_encode((bool) CSettingsSchema::getDefault('auditlog_enabled')) ?>
-								)
-								.change();
-							$('#auditlog_mode').prop('checked',
-								<?= json_encode((bool) CSettingsSchema::getDefault('auditlog_mode')) ?>
-							);
-							$('#hk_audit_mode')
-								.prop('checked',
-									<?= json_encode((bool) CSettingsSchema::getDefault('hk_audit_mode')) ?>
-								)
-								.change();
-							$('#hk_audit').val("<?= CSettingsSchema::getDefault('hk_audit') ?>");
-						}
+						this.form.reload(this.rules);
 					}
-				]
-			}, {
-				position: Overlay.prototype.POSITION_CENTER,
-				trigger_element: this
-			});
+				}
+			]
+		}, {
+			position: Overlay.prototype.POSITION_CENTER
 		});
-	});
+	}
+
+	#submit(e) {
+		e.preventDefault();
+		this.#setLoadingStatus(['update'])
+		clearMessages();
+		const fields = this.form.getAllValues();
+
+		this.form.validateSubmit(fields)
+			.then((result) => {
+				if (!result) {
+					this.#unsetLoadingStatus();
+					return;
+				}
+
+				const curl = new Curl('zabbix.php');
+				curl.setArgument('action', 'audit.settings.update');
+
+				fetch(curl.getUrl(), {
+					method: 'POST',
+					headers: {'Content-Type': 'application/json'},
+					body: JSON.stringify(fields)
+				})
+					.then((response) => response.json())
+					.then((response) => {
+						if ('error' in response) {
+							throw {error: response.error};
+						}
+
+						if ('form_errors' in response) {
+							this.form.setErrors(response.form_errors, true, true);
+							this.form.renderErrors();
+							return;
+						}
+
+						if ('success' in response) {
+							postMessageOk(response.success.title);
+
+							if ('messages' in response.success) {
+								postMessageDetails('success', response.success.messages);
+							}
+
+							location.href = new URL(response.success.redirect, location.href).href;
+						}
+					})
+					.catch((exception) => this.#ajaxExceptionHandler(exception))
+					.finally(() => this.#unsetLoadingStatus());
+			});
+	}
+
+	#ajaxExceptionHandler(exception) {
+		let title, messages;
+
+		if (typeof exception === 'object' && 'error' in exception) {
+			title = exception.error.title;
+			messages = exception.error.messages;
+		}
+		else {
+			messages = [<?= json_encode(_('Unexpected server error.')) ?>];
+		}
+
+		addMessage(makeMessageBox('bad', messages, title)[0]);
+	}
+
+	#setLoadingStatus(loading_ids) {
+		this.form_element.classList.add('is-loading', 'is-loading-fadein');
+		[
+			document.getElementById('update'),
+			document.getElementById('resetDefaults')
+		].forEach(button => {
+			if (button) {
+				button.setAttribute('disabled', 'disabled');
+
+				if (loading_ids.includes(button.id)) {
+					button.classList.add('is-loading');
+				}
+			}
+		});
+	}
+
+	#unsetLoadingStatus() {
+		[
+			document.getElementById('update'),
+			document.getElementById('resetDefaults')
+		].forEach(button => {
+			if (button) {
+				button.classList.remove('is-loading');
+				button.removeAttribute('disabled');
+			}
+		});
+
+		this.form_element.classList.remove('is-loading', 'is-loading-fadein');
+	}
+};
 </script>

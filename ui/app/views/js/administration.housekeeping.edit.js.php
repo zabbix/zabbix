@@ -118,8 +118,7 @@ const view = new class {
 					title: <?= json_encode(_('Cancel')) ?>,
 					cancel: true,
 					class: '<?= ZBX_STYLE_BTN_ALT ?>',
-					action: function () {
-					}
+					action: () => {}
 				},
 				{
 					title: <?= json_encode(_('Reset defaults')) ?>,

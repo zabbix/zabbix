@@ -27,10 +27,6 @@ $html_page = (new CHtmlPage())
 $form = (new CForm())
 	->addItem((new CVar(CSRF_TOKEN_NAME, CCsrfTokenHelper::get('housekeeping')))->removeId())
 	->setId('housekeeping-form')
-	->setAction((new CUrl('zabbix.php'))
-		->setArgument('action', 'housekeeping.update')
-		->getUrl()
-	)
 	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID);
 
 $house_keeper_tab = (new CFormList())
