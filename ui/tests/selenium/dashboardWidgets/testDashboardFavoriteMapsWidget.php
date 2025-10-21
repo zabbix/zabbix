@@ -196,7 +196,7 @@ class testDashboardFavoriteMapsWidget extends CWebTest {
 		]);
 
 		// Check available options for "Refresh interval".
-		$this->assertEquals(['Default (15 minutes)', 'No refresh', '10 seconds', '30 seconds','1 minute', '2 minutes', 
+		$this->assertEquals(['Default (15 minutes)', 'No refresh', '10 seconds', '30 seconds','1 minute', '2 minutes',
 				'10 minutes', '15 minutes'], $form->getField('Refresh interval')->asDropdown()->getOptions()->asText()
 		);
 
