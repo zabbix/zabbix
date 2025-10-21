@@ -117,20 +117,8 @@ int	zbx_discovery_async_check_http(CURLM *curl_mhandle, const char *config_sourc
 		goto fail;
 	}
 
-#if LIBCURL_VERSION_NUM >= 0x071304
-	/* CURLOPT_PROTOCOLS is supported starting with version 7.19.4 (0x071304) */
-	/* CURLOPT_PROTOCOLS was deprecated in favor of CURLOPT_PROTOCOLS_STR starting with version 7.85.0 (0x075500) */
-#	if LIBCURL_VERSION_NUM >= 0x075500
-	if (CURLE_OK != (err = curl_easy_setopt(http_ctx->easyhandle, CURLOPT_PROTOCOLS_STR, "HTTP,HTTPS")))
-#	else
-	if (CURLE_OK != (err = curl_easy_setopt(http_ctx->easyhandle, CURLOPT_PROTOCOLS,
-			CURLPROTO_HTTP | CURLPROTO_HTTPS)))
-#	endif
-	{
-		*error = zbx_dsprintf(*error, "cannot set allowed protocols: %s", curl_easy_strerror(err));
+	if (SUCCEED != zbx_curl_setopt_https(http_ctx->easyhandle, error))
 		goto fail;
-	}
-#endif
 
 	if (CURLE_OK != (err = curl_easy_setopt(http_ctx->easyhandle, CURLOPT_PRIVATE, http_ctx)))
 	{
