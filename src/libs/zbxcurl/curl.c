@@ -237,6 +237,7 @@ int	zbx_curl_setopt_https(CURL *easyhandle, char **error)
 #	define CURLPROTO_HTTP		(1<<0)
 #	define CURLPROTO_HTTPS		(1<<1)
 #endif
+
 	/* CURLOPT_PROTOCOLS (181L) is supported starting with version 7.19.4 (0x071304) */
 	if (libcurl_version_num() >= 0x071304)
 	{
