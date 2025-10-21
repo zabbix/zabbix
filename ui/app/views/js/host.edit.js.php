@@ -311,7 +311,6 @@ window.host_edit_popup = {
 
 		const data = {
 			source: 'host',
-			hostid: fields.hostid,
 			templateids: this.getAllTemplates(),
 			show_inherited_tags: fields.host_show_inherited_tags,
 			tags: fields.tags

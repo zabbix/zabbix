@@ -47,14 +47,12 @@ $form = (new CForm('post', $url))
 	->setName('hostPrototypeForm')
 	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)
 	->addVar('form', getRequest('form', 1))
+	->addVar('parent_discoveryid', $data['discovery_rule']['itemid'])
 	->addVar('tls_accept', $parent_host['tls_accept'])
 	->addvar('context', $data['context']);
 
 if ($host_prototype['hostid'] != 0) {
 	$form->addVar('hostid', $host_prototype['hostid']);
-}
-else {
-	$form->addVar('parent_discoveryid', $data['discovery_rule']['itemid']);
 }
 
 $host_tab = new CFormList('hostlist');

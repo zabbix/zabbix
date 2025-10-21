@@ -134,7 +134,6 @@ window.template_edit_popup = new class {
 
 		const data = {
 			source: 'template',
-			hostid: fields.hostid,
 			templateids: this.#getAllTemplates(),
 			show_inherited_tags: fields.template_show_inherited_tags,
 			tags: fields.tags
