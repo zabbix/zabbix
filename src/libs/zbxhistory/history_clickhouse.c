@@ -345,6 +345,34 @@ static void	history_clickhouse_write_text(zbx_json_t *row, const zbx_history_val
 	zbx_json_addstring(row, NULL, value->str, ZBX_JSON_TYPE_STRING);
 }
 
+static int	history_clickhouse_write_value(zbx_json_t *row, const zbx_history_value_t *value,
+		zbx_item_value_type_t value_type)
+{
+	switch (value_type)
+	{
+		case ITEM_VALUE_TYPE_FLOAT:
+			history_clickhouse_write_dbl(row, value);
+			break;
+		case ITEM_VALUE_TYPE_STR:
+			history_clickhouse_write_str(row, value);
+			break;
+		case ITEM_VALUE_TYPE_LOG:
+			history_clickhouse_write_log(row, value);
+			break;
+		case ITEM_VALUE_TYPE_UINT64:
+			history_clickhouse_write_uint(row, value);
+			break;
+		case ITEM_VALUE_TYPE_TEXT:
+			history_clickhouse_write_text(row, value);
+			break;
+		default:
+			THIS_SHOULD_NEVER_HAPPEN_MSG("unexpected value type %u", (unsigned char)value_type);
+			return FAIL;
+	}
+
+	return SUCCEED;
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: write history data to ClickHouse                                  *
@@ -361,21 +389,12 @@ static void	history_clickhouse_write_text(zbx_json_t *row, const zbx_history_val
 static void	history_clickhouse_write(void *data, unsigned char value_type,
 		const zbx_history_entry_t * const *entries, int entries_num)
 {
-	static write_value_t	write_funcs[] = {
-					history_clickhouse_write_dbl,
-					history_clickhouse_write_str,
-					history_clickhouse_write_log,
-					history_clickhouse_write_uint,
-					history_clickhouse_write_text
-				};
-
 	zbx_clickhouse_data_t	*d = (zbx_clickhouse_data_t *)data;
 	zbx_clickhouse_conn_t	*conn;
-	char			*error = NULL, *url = NULL, *query, *query_enc = NULL, *buf = NULL;
-	size_t			url_alloc = 0, url_offset = 0, buf_alloc = 0, buf_offset = 0;
+	char			*error = NULL, url[MAX_STRING_LEN], *buf = NULL;
+	size_t			buf_alloc = 0, buf_offset = 0;
 	CURLcode		err;
 	zbx_json_t		row;
-	write_value_t		write_value = write_funcs[value_type];
 
 	conn = history_clickhouse_get_conn(d, value_type);
 	conn->status = FAIL;
@@ -389,15 +408,11 @@ static void	history_clickhouse_write(void *data, unsigned char value_type,
 		return;
 	}
 
-	query = zbx_dsprintf(NULL, "INSERT INTO %s FORMAT JSONCompactEachRow", clickhouse_history_tables[value_type]);
-	zbx_url_encode(query, &query_enc);
-	zbx_free(query);
-
-	zbx_snprintf_alloc(&url, &url_alloc, &url_offset, "%s?database=%s&query=%s", d->base_url, d->db, query_enc);
-	zbx_free(query_enc);
+	zbx_snprintf(url, sizeof(url), "%s?database=%s"
+			"&query=INSERT%%20INTO%%20%s%%20FORMAT%%20JSONCompactEachRow", d->base_url, d->db,
+			clickhouse_history_tables[value_type]);
 
 	err = curl_easy_setopt(conn->handle, CURLOPT_URL, url);
-	zbx_free(url);
 
 	if (CURLE_OK != err)
 	{
@@ -413,8 +428,8 @@ static void	history_clickhouse_write(void *data, unsigned char value_type,
 		char	timestamp[MAX_ID_LEN * 2];
 
 		zbx_json_adduint64(&row, NULL, entries[i]->itemid);
-		write_value(&row, &entries[i]->value);
-
+		history_clickhouse_write_value(&row, &entries[i]->value, (zbx_item_value_type_t)value_type);
+		
 		zbx_snprintf(timestamp, sizeof(timestamp), "%d.%09d", entries[i]->ts.sec, entries[i]->ts.ns);
 		zbx_json_addstring(&row, NULL, timestamp, ZBX_JSON_TYPE_STRING);
 

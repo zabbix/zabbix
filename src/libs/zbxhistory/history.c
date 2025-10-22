@@ -704,6 +704,7 @@ static void 	history_session_write(zbx_history_session_t *session, unsigned char
 	if (NULL == (provider = history_session_get_provider(session, value_type)))
 		return;
 
+	/* history_sql_write() or history_clickhouse_write() or history_elastic_write() */
 	provider->impl.write(provider->data, value_type, entries, entries_num);
 }
 
