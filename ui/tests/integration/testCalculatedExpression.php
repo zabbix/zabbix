@@ -129,12 +129,10 @@ class testCalculatedExpression extends CIntegrationTest {
 		return $response['result']['itemids'][0];
 	}
 
-
 	private function sendSequence($n, $itemkey)
 	{
 		for ($i = 1; $i <= $n; $i++) {
 			$this->sendSenderValue(self::HOST_NAME, $itemkey, $i);
-			sleep(2);
 		}
 	}
 
@@ -142,7 +140,6 @@ class testCalculatedExpression extends CIntegrationTest {
 	{
 		for ($i = 1; $i <= $n; $i++) {
 			$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_KEY_2, $i * 10);
-			sleep(2);
 		}
 	}
 
@@ -171,7 +168,7 @@ class testCalculatedExpression extends CIntegrationTest {
 		$formula = 'max(/' . self::HOST_NAME . '/' . self::TRAPPER_ITEM_KEY . ',#4)';
 		$itemid = $this->createCalculatedItemWithFormula($formula, 'max4');
 		self::$itemIds = array_merge(self::$itemIds, [$itemid]);
-		$this->sendSequence(5); // last 4 are 2,3,4,5 -> max = 5
+		$this->sendSequence(5, self::TRAPPER_ITEM_KEY); // last 4 are 2,3,4,5 -> max = 5
 		$this->assertEquals('5', $this->getItemLastValue($itemid));
 	}
 
@@ -180,7 +177,7 @@ class testCalculatedExpression extends CIntegrationTest {
 		$formula = 'min(/' . self::HOST_NAME . '/' . self::TRAPPER_ITEM_KEY . ',#3)';
 		$itemid = $this->createCalculatedItemWithFormula($formula, 'min3');
 		self::$itemIds = array_merge(self::$itemIds, [$itemid]);
-		$this->sendSequence(5); // last 3 are 3,4,5 -> min = 3
+		$this->sendSequence(5, self::TRAPPER_ITEM_KEY); // last 3 are 3,4,5 -> min = 3
 		$this->assertEquals('3', $this->getItemLastValue($itemid));
 	}
 
@@ -189,7 +186,7 @@ class testCalculatedExpression extends CIntegrationTest {
 		$formula = 'last(/' . self::HOST_NAME . '/' . self::TRAPPER_ITEM_KEY . ',#1)';
 		$itemid = $this->createCalculatedItemWithFormula($formula, 'last1');
 		self::$itemIds = array_merge(self::$itemIds, [$itemid]);
-		$this->sendSequence(3); // last = 3
+		$this->sendSequence(3, self::TRAPPER_ITEM_KEY); // last = 3
 		$this->assertEquals('3', $this->getItemLastValue($itemid));
 	}
 
@@ -198,7 +195,7 @@ class testCalculatedExpression extends CIntegrationTest {
 		$formula = '(avg(/' . self::HOST_NAME . '/' . self::TRAPPER_ITEM_KEY . ',#5) * 2) + 1';
 		$itemid = $this->createCalculatedItemWithFormula($formula, 'avg5_mul2');
 		self::$itemIds = array_merge(self::$itemIds, [$itemid]);
-		$this->sendSequence(5); // last5:1,2,3,4,5 avg=3
+		$this->sendSequence(5, self::TRAPPER_ITEM_KEY); // last5:1,2,3,4,5 avg=3
 		$this->assertEquals('7', $this->getItemLastValue($itemid));
 	}
 
@@ -208,7 +205,7 @@ class testCalculatedExpression extends CIntegrationTest {
 		$formula = 'sum(/' . self::HOST_NAME . '/' . self::TRAPPER_ITEM_KEY . ',#5) - avg(/' . self::HOST_NAME . '/' . self::TRAPPER_ITEM_KEY . ',#5)';
 		$itemid = $this->createCalculatedItemWithFormula($formula, 'sum_minus_avg5');
 		self::$itemIds = array_merge(self::$itemIds, [$itemid]);
-		$this->sendSequence(5); // sum=15 avg=3 -> 12
+		$this->sendSequence(5, self::TRAPPER_ITEM_KEY); // sum=15 avg=3 -> 12
 		$this->assertEquals('12', $this->getItemLastValue($itemid));
 	}
 
@@ -218,7 +215,7 @@ class testCalculatedExpression extends CIntegrationTest {
 		$formula = 'avg(/' . self::HOST_NAME . '/' . self::TRAPPER_ITEM_KEY . ',#1) + avg(/' . self::HOST_NAME . '/' . self::TRAPPER_ITEM_KEY_2 . ',#1)';
 		$itemid = $this->createCalculatedItemWithFormula($formula, 'multi_avg');
 		self::$itemIds = array_merge(self::$itemIds, [$itemid]);
-		$this->sendSequence(3);
+		$this->sendSequence(3, self::TRAPPER_ITEM_KEY);
 		$this->sendToSecondSequence(3);
 		// last values: 3 and 30 -> sum = 33
 		$this->assertEquals('33', $this->getItemLastValue($itemid));
@@ -226,7 +223,7 @@ class testCalculatedExpression extends CIntegrationTest {
 
 	public function testCalculatedExpression_ItemCount_TagFilter(){
 
-		// Create a calculated item using item_count with a tag filter
+		//Create a calculated item using item_count with a tag filter
 		$formula = 'item_count(/test_calc/*?[tag="env:prod"])';
 
 		$response = $this->call('item.create', [
@@ -246,49 +243,121 @@ class testCalculatedExpression extends CIntegrationTest {
 		$this->assertEquals('2', $this->getItemLastValue($calcItemId));
 	}
 
-	public function testCalculatedExpression_BucketPercentile() {
-		// Create a histogram bucket item (simulate with a trapper item for test, but real use needs histogram type)
-		$response = $this->call('item.create', [
-			'hostid'    => self::$hostid,
-			'name'      => self::TRAPPER_ITEM_KEY . '.bucket',
-			'key_'      => self::TRAPPER_ITEM_KEY . '.bucket',
-			'type'      => ITEM_TYPE_TRAPPER,
-			'value_type'=> ITEM_VALUE_TYPE_TEXT
-		]);
-		$itemid = $response['result']['itemids'][0];
-		self::$itemIds = array_merge(self::$itemIds, [$itemid]);
+	public function testCalculatedExpression_HistogramQuantile() {
+
+		// Create a histogram bucket item (simulate with a trapper item for test)
+		foreach ([0.1, 0.5, 1, 2, 'Inf'] as $le) {
+			$response = $this->call('item.create', [
+				'hostid'	=> self::$hostid,
+				'name'		=> "bucket[$le]",
+				'key_'		=> self::TRAPPER_ITEM_KEY . ".bucket[$le]",
+				'type'		=> ITEM_TYPE_TRAPPER,
+				'value_type'	=> ITEM_VALUE_TYPE_UINT64
+			]);
+			$itemid = $response['result']['itemids'][0];
+			$this->assertEquals(1, count($response['result']['itemids']));
+			self::$itemIds = array_merge(self::$itemIds, [$itemid]);
+		}
+
+		$formula = 'histogram_quantile(0.25,' .
+			'0.1,last(/' . self::HOST_NAME . '/' . self::TRAPPER_ITEM_KEY . '.bucket[0.1]),' .
+			'0.5,last(/' . self::HOST_NAME . '/' . self::TRAPPER_ITEM_KEY . '.bucket[0.5]),' .
+			'1.0,last(/' . self::HOST_NAME . '/' . self::TRAPPER_ITEM_KEY . '.bucket[1]),' .
+			'2.0,last(/' . self::HOST_NAME . '/' . self::TRAPPER_ITEM_KEY . '.bucket[2]),' .
+			'"+Inf",last(/' . self::HOST_NAME . '/' . self::TRAPPER_ITEM_KEY . '.bucket[Inf])' .
+		')';
 
 		// Create a calculated item using bucket_percentile
-		$formula = 'bucket_percentile(/' . self::HOST_NAME . '/' . self::TRAPPER_ITEM_KEY . '.bucket,1h,90)';
 		$response = $this->call('item.create', [
-			'name'      => self::CALCULATED_ITEM_KEY . '.bucket_percentile',
-			'key_'      => self::CALCULATED_ITEM_KEY . '.bucket_percentile',
-			'type'      => ITEM_TYPE_CALCULATED,
-			'params'    => $formula,
-			'hostid'    => self::$hostid,
-			'delay'     => '1s',
-			'value_type'=> ITEM_VALUE_TYPE_UINT64
+			'name'		=> self::CALCULATED_ITEM_KEY . '.histogram_quantile',
+			'key_'		=> self::CALCULATED_ITEM_KEY . '.histogram_quantile',
+			'type'		=> ITEM_TYPE_CALCULATED,
+			'params'	=> $formula,
+			'hostid'	=> self::$hostid,
+			'delay'		=> '1s',
+			'value_type'	=> ITEM_VALUE_TYPE_FLOAT
 		]);
 		$calcItemId = $response['result']['itemids'][0];
+		$this->assertEquals(1, count($response['result']['itemids']));
 		self::$itemIds = array_merge(self::$itemIds, [$calcItemId]);
 
-		sleep(20);
-		// Send values to the bucket item (simulate histogram bucket values)
-		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_KEY . '.bucket[1.0]', '{"0.1":5,"0.5":20,"1":40,"2":10}');
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, "In zbx_substitute_item_key_params(): data:test.calc.calculated.histogram_quantile", true, 120);
 
-		sleep(20); // wait for calculated item to process
-		// The calculated item should return a percentile value (for test, just assert it's numeric)
+		// Send values to the bucket item (simulate histogram bucket values)
+		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_KEY . '.bucket[0.1]', 10);
+		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_KEY . '.bucket[0.5]', 25);
+		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_KEY . '.bucket[1]', 30);
+		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_KEY . '.bucket[2]',  32);
+		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_KEY . '.bucket[Inf]',  35);
+
+		//wait for calculated item to process
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, "zbx_expression_eval_execute() expression:'histogram_quantile(0.25,0.1,last(0),0.5,last(1),1.0,last(2),2.0,last(3),\"+Inf\",last(4))'", true, 120);
+
+		/* histogram_quantile(0.25, ...) calculates the 25th percentile (quantile φ=0.25) from the histogram buckets. */
+		/* Bucket boundaries and cumulative counts: */
+		/*   0.1: 10 */
+		/*   0.5: 25 */
+		/*   1.0: 30 */
+		/*   2.0: 32 */
+		/*   +Inf: 35 */
+		/* Total count = 35, so the quantile position is 0.25 * 35 = 8.75. */
+		/* The 25th percentile falls within the first bucket (0.1), and Zabbix interpolates the value as 0.0875. */
+		$this->assertEqualsWithDelta(0.0875, (float)$this->getItemLastValue($calcItemId), 0.0001);
+	}
+
+	public function testCalculatedExpression_CountForeach() {
+		/* Create several trapper items simulating disk usage for different filesystems. */
+		foreach ( ['fs1', 'fs2', 'fs3', 'fs4'] as $i => $fs) {
+			$response = $this->call('item.create', [
+				'hostid'	=> self::$hostid,
+				'name'		=> "disk.pused[$fs]",
+				'key_'		=> self::TRAPPER_ITEM_KEY . ".disk.pused[$fs]",
+				'type'		=> ITEM_TYPE_TRAPPER,
+				'value_type'	=> ITEM_VALUE_TYPE_FLOAT
+			]);
+			$itemid = $response['result']['itemids'][0];
+			$this->assertEquals(1, count($response['result']['itemids']));
+			self::$itemIds = array_merge(self::$itemIds, [$itemid]);
+		}
+
+		$formula = 'count(last_foreach(/*/test.calc.trapper.disk.pused[*]),"gt",95)';
+
+		$response = $this->call('item.create', [
+			'name'		=> self::CALCULATED_ITEM_KEY . '.count_disk_pused_gt_95',
+			'key_'		=> self::CALCULATED_ITEM_KEY . '.count_disk_pused_gt_95',
+			'type'		=> ITEM_TYPE_CALCULATED,
+			'params'	=> $formula,
+			'hostid'	=> self::$hostid,
+			'delay'		=> '1s',
+			'value_type'	=> ITEM_VALUE_TYPE_UINT64
+		]);
+		$calcItemId = $response['result']['itemids'][0];
+		$this->assertEquals(1, count($response['result']['itemids']));
+		self::$itemIds = array_merge(self::$itemIds, [$calcItemId]);
+
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, "In zbx_substitute_item_key_params(): data:test.calc.calculated.count_disk_pused_gt_95", true, 120);
+
+		/* Send values to the trapper items: fs1=90, fs2=96, fs3=97, fs4=80 */
+		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_KEY . '.disk.pused[fs1]', 90);
+		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_KEY . '.disk.pused[fs2]', 96);
+		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_KEY . '.disk.pused[fs3]', 97);
+		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_KEY . '.disk.pused[fs4]', 80);
+
+		/* Wait for calculated item to process. */
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, "zbx_expression_eval_execute() expression:'count(last_foreach(0),\"gt\",95)'", true, 120);
+
+		// We have 4 items: [90, 96, 97, 80]. The formula counts how many have last value greater than 95. So expected result is 2.
 		$this->assertEquals('2', $this->getItemLastValue($calcItemId));
 	}
 
 	public static function clearData(): void {
 
-		// if (!empty(self::$itemIds)) {
-		// 	CDataHelper::call('item.delete', self::$itemIds);
-		// 	self::$itemIds = [];
-		// }
+		if (!empty(self::$itemIds)) {
+			CDataHelper::call('item.delete', self::$itemIds);
+			self::$itemIds = [];
+		}
 
-	 	// CDataHelper::call('host.delete', [self::$hostid]);
+	 	CDataHelper::call('host.delete', [self::$hostid]);
 	}
 }
 
