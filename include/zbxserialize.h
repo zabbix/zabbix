@@ -115,8 +115,7 @@
 			int	num = (int)((value_len) / sizeof(zbx_uint64_t));			\
 			zbx_vector_uint64_reserve((vector_uint64), (vector_uint64)->values_num + num);	\
 			memcpy((vector_uint64)->values + (vector_uint64)->values_num,			\
-				(const void *)((buffer) + sizeof(zbx_uint32_t)),			\
-				(value_len));								\
+				((buffer) + sizeof(zbx_uint32_t)), (value_len));			\
 				(vector_uint64)->values_num += num;					\
 		}											\
 		(value_len) + sizeof(zbx_uint32_t);							\
