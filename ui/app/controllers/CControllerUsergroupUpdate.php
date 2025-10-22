@@ -97,7 +97,7 @@ class CControllerUsergroupUpdate extends CControllerUsergroupUpdateGeneral {
 		$user_group = [];
 		$this->getInputs($user_group, ['usrgrpid']);
 
-		if ($this->processUserGroupInputData($user_group) === false) {
+		if ($this->processUserGroupInputData($user_group) == false) {
 			$this->setErrorResponse();
 
 			return;

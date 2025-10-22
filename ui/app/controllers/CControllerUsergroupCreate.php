@@ -88,7 +88,7 @@ class CControllerUsergroupCreate extends CControllerUsergroupUpdateGeneral {
 		$this->loadDbGroups();
 		$user_group = [];
 
-		if ($this->processUserGroupInputData($user_group) === false) {
+		if ($this->processUserGroupInputData($user_group) == false) {
 			$this->setErrorResponse();
 
 			return;

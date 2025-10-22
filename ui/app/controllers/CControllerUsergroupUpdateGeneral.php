@@ -57,7 +57,7 @@ abstract class CControllerUsergroupUpdateGeneral extends CController {
 		return $tag_filters;
 	}
 
-	protected function processUserGroupInputData(array &$user_group): void {
+	protected function processUserGroupInputData(array &$user_group): bool {
 		$user_group['users'] = zbx_toObject($this->getInput('userids', []), 'userid');
 		$this->getInputs($user_group, ['users_status', 'gui_access', 'debug_mode', 'userdirectoryid', 'mfaid',
 			'name', 'hostgroup_rights', 'templategroup_rights'
@@ -65,7 +65,9 @@ abstract class CControllerUsergroupUpdateGeneral extends CController {
 
 		if (!$this->checkGroupsExist($user_group['hostgroup_rights'],$this->db_hostgroups)
 				|| !$this->checkGroupsExist($user_group['templategroup_rights'], $this->db_templategroups)) {
-			$this->setErrorResponse();
+			CMessageHelper::addError(_('No permissions to referred object or it does not exist!'));
+
+			return false;
 		}
 		$user_group['hostgroup_rights'] = $this->processRights($user_group['hostgroup_rights']);
 		$user_group['templategroup_rights'] = $this->processRights($user_group['templategroup_rights']);
@@ -79,6 +81,8 @@ abstract class CControllerUsergroupUpdateGeneral extends CController {
 		elseif (array_key_exists('mfaid', $user_group)) {
 			$user_group['mfa_status'] = GROUP_MFA_ENABLED;
 		}
+
+		return true;
 	}
 
 	private function checkGroupsExist(array $groups, $db_groups): bool {
