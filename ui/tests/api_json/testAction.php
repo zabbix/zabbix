@@ -161,11 +161,6 @@ class testAction extends CAPITest {
 								'conditiontype' => ZBX_CONDITION_TYPE_PROXY,
 								'operator' => CONDITION_OPERATOR_EQUAL,
 								'value' => ':proxy:del.p1'
-							],
-							[
-								'conditiontype' => ZBX_CONDITION_TYPE_PROXY_GROUP,
-								'operator' => CONDITION_OPERATOR_EQUAL,
-								'value' => ':proxy_group:del.p1'
 							]
 						]
 					],
