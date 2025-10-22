@@ -20,6 +20,7 @@ class CControllerUsergroupTagFilterCheck extends CController {
 	 * @var array  Host group data from database.
 	 */
 	private $host_groups = [];
+	private $host_group_ids = [];
 
 	protected function init(): void {
 		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
@@ -29,7 +30,7 @@ class CControllerUsergroupTagFilterCheck extends CController {
 
 	public static function getValidationRules(): array {
 		return ['object', 'fields' => [
-			'groupid' => ['db hosts_groups.groupid'],
+			'groupid' => ['db tag_filter.groupid'],
 			'new_tag_groups' => ['array', 'required', 'not_empty', 'field' => ['db hstgrp.groupid']],
 			'new_tag_filter_type' => ['boolean'],
 			'new_tag_tag_filters' => ['objects', 'required', 'not_empty',
@@ -43,7 +44,7 @@ class CControllerUsergroupTagFilterCheck extends CController {
 			],
 			'tag_filters' => ['objects',
 				'fields' => [
-					'groupid' => ['db hosts_groups.groupid'],
+					'groupid' => ['db tag_filter.groupid'],
 					'name' => ['string'],
 					'tags' => ['objects',
 						'uniq' => ['tag', 'value'],
@@ -59,7 +60,6 @@ class CControllerUsergroupTagFilterCheck extends CController {
 	}
 
 	protected function checkInput(): bool {
-
 		$ret = $this->validateInput($this->getValidationRules()) && $this->validateHostGroups();
 
 		if (!$ret) {
@@ -90,9 +90,10 @@ class CControllerUsergroupTagFilterCheck extends CController {
 		]);
 
 		$this->host_groups = $db_hostgroups ?: $this->host_groups;
+		$this->host_group_ids = array_column($this->host_groups, 'groupid');
 
-		foreach($host_groups as $groupid) {
-			if (!in_array($groupid, array_column($this->host_groups, 'groupid'))) {
+		foreach ($host_groups as $groupid) {
+			if (!in_array($groupid, $this->host_group_ids)) {
 				error(_('No permissions to referred object or it does not exist!'));
 
 				return false;
@@ -176,7 +177,7 @@ class CControllerUsergroupTagFilterCheck extends CController {
 				}
 			}
 			else {
-				$key = array_search($groupid, array_column($this->host_groups, 'groupid'));
+				$key = array_search($groupid, $this->host_group_ids);
 				$name = $key !== false ? $this->host_groups[$key]['name'] : '';
 
 				$data['tag_filters'][$groupid] = [

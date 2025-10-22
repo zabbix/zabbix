@@ -28,7 +28,6 @@ $html_page = (new CHtmlPage())
 $csrf_token = CCsrfTokenHelper::get('usergroup');
 
 $form = (new CForm())
-	->addItem((new CVar('form_refresh', $data['form_refresh'] + 1))->removeId())
 	->addItem((new CVar(CSRF_TOKEN_NAME, $csrf_token))->removeId())
 	->setId('user-group-form')
 	->setName('user_group_form')
@@ -320,11 +319,8 @@ $tabs = (new CTabView())
 	->addTab('host_permissions_tab', _('Host permissions'), $host_permissions_form_grid,
 		TAB_INDICATOR_HOST_PERMISSIONS
 	)
-	->addTab('tag_filter_tab', _('Problem tag filter'), $tag_filter_form_grid, TAB_INDICATOR_TAG_FILTER);
-
-if ($data['form_refresh'] == 0) {
-	$tabs->setSelected(0);
-}
+	->addTab('tag_filter_tab', _('Problem tag filter'), $tag_filter_form_grid, TAB_INDICATOR_TAG_FILTER)
+	->setSelected(0);
 
 $cancel_button = (new CRedirectButton(_('Cancel'), (new CUrl('zabbix.php'))
 	->setArgument('action', 'usergroup.list')

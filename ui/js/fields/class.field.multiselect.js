@@ -67,7 +67,7 @@ class CFieldMultiselect extends CField {
 		return $(this._field).multiSelect('getOption', 'name').replace(/\[\]$/, '');
 	}
 
-	getDirectName() {
+	_getDirectName() {
 		const name_parts = this.getName().replace(/]$/, '').split(/\]\[|\[/);
 
 		return name_parts[name_parts.length - 1];
@@ -81,16 +81,16 @@ class CFieldMultiselect extends CField {
 		const return_id = $(this._field).multiSelect('getOption', 'selectedLimit') == 1;
 		const values = $(this._field).multiSelect('getOption', 'addNew')
 			? {
-				[this.getDirectName()]: return_id ? null : [],
-				[this.getDirectName() + '_new']: return_id ? null : []
+				[this._getDirectName()]: return_id ? null : [],
+				[this._getDirectName() + '_new']: return_id ? null : []
 			}
 			: {
-				[this.getDirectName()]: return_id ? null : []
+				[this._getDirectName()]: return_id ? null : []
 			};
 
 		if ($(this._field).multiSelect('getOption', 'disabled') === false) {
 			$(this._field).multiSelect('getData').forEach((value) => {
-				const field_name = value.isNew ? this.getDirectName() + '_new' : this.getDirectName();
+				const field_name = value.isNew ? this._getDirectName() + '_new' : this._getDirectName();
 
 				if (!return_id) {
 					values[field_name].push(value.id);

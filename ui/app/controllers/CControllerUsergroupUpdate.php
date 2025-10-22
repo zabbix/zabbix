@@ -46,14 +46,14 @@ class CControllerUsergroupUpdate extends CControllerUsergroupUpdateGeneral {
 			'mfaid' => ['integer',
 				'when' => ['can_update_group', 'in' => [1]]
 			],
-			'users_status' => ['db usrgrp.users_status'],
-			'debug_mode' => ['db usrgrp.debug_mode'],
+			'users_status' => ['db usrgrp.users_status', 'in' => [GROUP_STATUS_ENABLED, GROUP_STATUS_DISABLED]],
+			'debug_mode' => ['db usrgrp.debug_mode', 'in' => [GROUP_DEBUG_MODE_DISABLED, GROUP_DEBUG_MODE_ENABLED]],
 			'templategroup_rights' => ['objects', 'fields' => [
-				'groupids' => ['array', 'field' => ['db rights.groupid']],
+				'groupids' => ['array', 'required', 'not_empty', 'field' => ['db rights.groupid']],
 				'permission' => ['integer', 'required', 'in' => [PERM_DENY, PERM_READ, PERM_READ_WRITE]]
 			]],
 			'hostgroup_rights' => ['objects', 'fields' => [
-				'groupids' => ['array', 'field' => ['db rights.groupid']],
+				'groupids' => ['array', 'required', 'not_empty', 'field' => ['db rights.groupid']],
 				'permission' => ['integer', 'required', 'in' => [PERM_DENY, PERM_READ, PERM_READ_WRITE]]
 			]],
 			'tag_filters' => ['objects',

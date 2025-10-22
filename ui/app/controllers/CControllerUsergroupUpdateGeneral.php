@@ -22,10 +22,7 @@ abstract class CControllerUsergroupUpdateGeneral extends CController {
 	protected array $db_hostgroups;
 	protected array $db_templategroups;
 
-	abstract protected function setErrorResponse(?array $form_errors = null): void;
-
-	protected function loadDbGroups(): void
-	{
+	final protected function loadDbGroups(): void {
 		$this->db_hostgroups = API::HostGroup()->get([
 			'output' => ['groupid', 'name']
 		]);
@@ -34,7 +31,7 @@ abstract class CControllerUsergroupUpdateGeneral extends CController {
 		]);
 	}
 
-	protected function processTagFilters(array $input_tag_filters): array {
+	private static function processTagFilters(array $input_tag_filters): array {
 		$tag_filters = [];
 
 		foreach ($input_tag_filters as $hostgroup) {
@@ -52,26 +49,27 @@ abstract class CControllerUsergroupUpdateGeneral extends CController {
 		return $tag_filters;
 	}
 
-	protected function processUserGroupInputData(array &$user_group): bool {
-		$user_group['users'] = zbx_toObject($this->getInput('userids', []), 'userid');
+	final protected function processUserGroupInputData(array &$user_group): bool {
+		$user_group['users'] = array_map(static fn($userid) => ['userid' => $userid], $this->getInput('userids', []));
 		$this->getInputs($user_group, ['users_status', 'gui_access', 'debug_mode', 'userdirectoryid', 'mfaid',
 			'name', 'hostgroup_rights', 'templategroup_rights', 'tag_filters'
 		]);
 
-		if (!$this->checkGroupsExist($user_group['hostgroup_rights'], $this->db_hostgroups, true)
-				|| !$this->checkGroupsExist($user_group['templategroup_rights'], $this->db_templategroups, true)
-				|| !$this->checkGroupsExist($user_group['tag_filters'], $this->db_hostgroups, false)) {
+		if (!self::checkGroupsExist($user_group['hostgroup_rights'], $this->db_hostgroups, true)
+				|| !self::checkGroupsExist($user_group['templategroup_rights'], $this->db_templategroups, true)
+				|| !self::checkGroupsExist($user_group['tag_filters'], $this->db_hostgroups, false)) {
 			CMessageHelper::addError(_('No permissions to referred object or it does not exist!'));
 
 			return false;
 		}
-		$user_group['hostgroup_rights'] = $this->processRights($user_group['hostgroup_rights']);
-		$user_group['templategroup_rights'] = $this->processRights($user_group['templategroup_rights']);
-		$user_group['tag_filters'] = $this->processTagFilters($user_group['tag_filters']);
+
+		$user_group['hostgroup_rights'] = self::processRights($user_group['hostgroup_rights']);
+		$user_group['templategroup_rights'] = self::processRights($user_group['templategroup_rights']);
+		$user_group['tag_filters'] = self::processTagFilters($user_group['tag_filters']);
 
 		if (array_key_exists('mfaid', $user_group) && $user_group['mfaid'] == -1) {
 			$user_group['mfa_status'] = GROUP_MFA_DISABLED;
-			$user_group['mfaid'] = 0;
+			unset($user_group['mfaid']);
 		}
 		elseif (array_key_exists('mfaid', $user_group)) {
 			$user_group['mfa_status'] = GROUP_MFA_ENABLED;
@@ -80,7 +78,7 @@ abstract class CControllerUsergroupUpdateGeneral extends CController {
 		return true;
 	}
 
-	private function checkGroupsExist(array $groups, array $db_groups, bool $multi): bool {
+	private static function checkGroupsExist(array $groups, array $db_groups, bool $multi): bool {
 		if ($multi) {
 			$groupids = array_merge(...array_values(array_column($groups, 'groupids')));
 		}
@@ -97,7 +95,7 @@ abstract class CControllerUsergroupUpdateGeneral extends CController {
 		return true;
 	}
 
-	private function processRights(array $rights): array {
+	private static function processRights(array $rights): array {
 		$processed_rights = [];
 
 		foreach ($rights as $right) {

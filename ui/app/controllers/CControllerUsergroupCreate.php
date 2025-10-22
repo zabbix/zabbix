@@ -41,11 +41,11 @@ class CControllerUsergroupCreate extends CControllerUsergroupUpdateGeneral {
 			'users_status' => ['db usrgrp.users_status'],
 			'debug_mode' => ['db usrgrp.debug_mode'],
 			'templategroup_rights' => ['objects', 'fields' => [
-				'groupids' => ['array', 'field' => ['db rights.groupid']],
+				'groupids' => ['array', 'required', 'not_empty', 'field' => ['db rights.groupid']],
 				'permission' => ['integer', 'required', 'in' => [PERM_DENY, PERM_READ, PERM_READ_WRITE]]
 			]],
 			'hostgroup_rights' => ['objects', 'fields' => [
-				'groupids' => ['array', 'field' => ['db rights.groupid']],
+				'groupids' => ['array', 'required', 'not_empty', 'field' => ['db rights.groupid']],
 				'permission' => ['integer', 'required', 'in' => [PERM_DENY, PERM_READ, PERM_READ_WRITE]]
 			]],
 			'tag_filters' => ['objects',

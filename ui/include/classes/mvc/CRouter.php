@@ -394,7 +394,7 @@ class CRouter {
 		'usergroup.tagfilter.edit'					=> [CControllerUsergroupTagFilterEdit::class,						'layout.json',			'usergroup.tagfilter.edit'],
 		'usergroup.tagfilter.check'					=> [CControllerUsergroupTagFilterCheck::class,						'layout.json',			null],
 		'usergroup.tagfilter.list'					=> [CControllerUsergroupTagFilterList::class,						'layout.json',			'usergroup.tagfilter.list'],
-		'usergroup.update'							=> [CControllerUsergroupUpdate::class,								'layout.json',			null,					null],
+		'usergroup.update'							=> [CControllerUsergroupUpdate::class,								'layout.json',			null],
 		'userprofile.edit'							=> [CControllerUserProfileEdit::class,								'layout.htmlpage',		'userprofile.edit'],
 		'userprofile.update'						=> [CControllerUserProfileUpdate::class,							null,					null],
 		'userprofile.notification.edit'				=> [CControllerUserProfileNotificationEdit::class,					'layout.htmlpage',		'userprofile.notification.edit'],

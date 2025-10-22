@@ -21,11 +21,11 @@ class CControllerUsergroupEdit extends CController {
 	 */
 	private $user_group = [];
 
-	protected function init() {
+	protected function init(): void {
 		$this->disableCsrfValidation();
 	}
 
-	protected function checkInput() {
+	protected function checkInput(): bool {
 		$fields = [
 			'usrgrpid' =>				'db usrgrp.usrgrpid',
 			'name' =>					'db usrgrp.name',
@@ -37,8 +37,7 @@ class CControllerUsergroupEdit extends CController {
 			'hostgroup_right' =>		'array',
 			'ms_templategroup_right' =>	'array',
 			'templategroup_right' =>	'array',
-			'tag_filters' =>			'array',
-			'form_refresh' =>			'int32'
+			'tag_filters' =>			'array'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -50,7 +49,7 @@ class CControllerUsergroupEdit extends CController {
 		return $ret;
 	}
 
-	protected function checkPermissions() {
+	protected function checkPermissions(): bool {
 		if (!$this->checkAccess(CRoleHelper::UI_ADMINISTRATION_USER_GROUPS)) {
 			return false;
 		}
@@ -75,7 +74,7 @@ class CControllerUsergroupEdit extends CController {
 		return true;
 	}
 
-	protected function doAction() {
+	protected function doAction(): void {
 		$db_defaults = DB::getDefaults('usrgrp');
 		$mfa_config_status = CAuthenticationHelper::get(CAuthenticationHelper::MFA_STATUS);
 		$data = [
@@ -85,7 +84,6 @@ class CControllerUsergroupEdit extends CController {
 			'userdirectoryid' => 0,
 			'users_status' => $db_defaults['users_status'],
 			'debug_mode' => $db_defaults['debug_mode'],
-			'form_refresh' => 0,
 			'group_mfa_status' => $mfa_config_status ? GROUP_MFA_ENABLED : GROUP_MFA_DISABLED,
 			'mfaid' => 0
 		];
@@ -101,7 +99,7 @@ class CControllerUsergroupEdit extends CController {
 			$data['mfaid'] = $this->user_group['mfaid'];
 		}
 
-		$this->getInputs($data, ['name', 'gui_access', 'users_status', 'debug_mode', 'form_refresh']);
+		$this->getInputs($data, ['name', 'gui_access', 'users_status', 'debug_mode']);
 
 		$host_groups = API::HostGroup()->get([
 			'output' => ['groupid', 'name']
@@ -164,7 +162,7 @@ class CControllerUsergroupEdit extends CController {
 		$data['mfas'] = array_column($mfas, 'name', 'mfaid');
 		$data['mfa_config_status'] = $mfa_config_status;
 
-		$data['js_validation_rules'] = $data['usrgrpid'] == null
+		$data['js_validation_rules'] = $data['usrgrpid'] === null
 			? CControllerUsergroupCreate::getValidationRules()
 			: CControllerUsergroupUpdate::getValidationRules();
 		$data['js_validation_rules'] = (new CFormValidator($data['js_validation_rules']))->getRules();
@@ -299,17 +297,12 @@ class CControllerUsergroupEdit extends CController {
 		return $sorted_group_rights;
 	}
 
-	/**
-	 * Returns all needed users formatted for multiselector.
-	 *
-	 * @return array
-	 */
-	private function getUsersMs() {
+	private function getUsersMs(): array {
 		$options = [
 			'output' => ['userid', 'username', 'name', 'surname', 'userdirectoryid']
 		];
 
-		if ($this->hasInput('usrgrpid') && !$this->hasInput('form_refresh')) {
+		if ($this->hasInput('usrgrpid')) {
 			$options['usrgrpids'] = $this->getInput('usrgrpid');
 		}
 		else {
