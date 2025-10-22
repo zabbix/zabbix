@@ -381,7 +381,7 @@
 				});
 		}
 
-		#ajaxExceptionHandler (exception) {
+		#ajaxExceptionHandler(exception) {
 			let title, messages;
 
 			if (typeof exception === 'object' && 'error' in exception) {
@@ -389,12 +389,10 @@
 				messages = exception.error.messages;
 			}
 			else {
-				messages = [<?= json_encode(_('Unexpected server error.')) ?>];
+				messages = [t('Unexpected server error.')];
 			}
 
-			const message_box = makeMessageBox('bad', messages, title)[0];
-
-			this.form_element.parentNode.insertBefore(message_box, this.form_element);
+			addMessage(makeMessageBox('bad', messages, title)[0]);
 		}
 	};
 </script>
