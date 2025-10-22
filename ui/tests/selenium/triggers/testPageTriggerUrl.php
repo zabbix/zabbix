@@ -25,18 +25,54 @@ require_once __DIR__.'/../../include/CWebTest.php';
  */
 class testPageTriggerUrl extends CWebTest {
 
-	private static $custom_name = 'URL name for menu';
+	protected static $custom_name = 'URL name for menu';
+	protected static $dashboardid;
 
 	/**
 	 * Add URL name for trigger.
 	 */
 	public function prepareTriggerData() {
-		$response = CDataHelper::call('trigger.update', [
+		CDataHelper::call('trigger.update', [
 			[
 				'triggerid' => '100032',
 				'url_name' => 'URL name for menu'
 			]
 		]);
+
+		$response = CDataHelper::call('dashboard.create', [
+			[
+				'name' => 'Dashboard for Trigger overview widget',
+				'userid' => '1',
+				'private' => 1,
+				'pages' => [
+					[
+						'widgets' => [
+							[
+								'type' => 'trigover',
+								'name' => 'Group to check Overview',
+								'x' => 0,
+								'y' => 0,
+								'width' => 36,
+								'height' => 12,
+								'fields' => [
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'style',
+										'value' => 1
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_GROUP,
+										'name' => '*',
+										'value' => 50011 // 'Group to check Overview'.
+									]
+								]
+							]
+						]
+					]
+				]
+			]
+		]);
+		self::$dashboardid = $response['dashboardids'][0];
 	}
 
 	public function getTriggerLinkData() {
@@ -112,7 +148,7 @@ class testPageTriggerUrl extends CWebTest {
 		unset($data['links']['Mark as cause']);
 		unset($data['links']['Mark selected as symptoms']);
 
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=1020');
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid);
 		$dashboard = CDashboardElement::find()->one();
 		$widget = $dashboard->getWidget('Group to check Overview');
 
