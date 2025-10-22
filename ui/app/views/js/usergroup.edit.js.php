@@ -87,6 +87,12 @@
 				}
 			})
 
+			const delete_btn = document.getElementById('delete');
+
+			if (delete_btn) {
+				delete_btn.addEventListener('click', () => this.#delete());
+			}
+
 			this.#setMultiselectDisabling('userids', true);
 			this.#setMultiselectDisabling('ms_hostgroup');
 			this.#setMultiselectDisabling('ms_templategroup');
@@ -331,6 +337,7 @@
 
 		submit (e) {
 			e.preventDefault();
+			this.#setLoadingStatus(['add', 'update'])
 			clearMessages();
 			const fields = this.form.getAllValues();
 			const url = new URL(this.form_element.getAttribute('action'), location.href);
@@ -338,6 +345,7 @@
 			this.form.validateSubmit(fields)
 				.then((result) => {
 					if (!result) {
+						this.#unsetLoadingStatus();
 						return;
 					}
 
@@ -377,8 +385,23 @@
 								location.href = new URL(response.success.redirect, location.href).href;
 							}
 						})
-						.catch((exception) => this.#ajaxExceptionHandler(exception));
+						.catch((exception) => this.#ajaxExceptionHandler(exception))
+						.finally(() => this.#unsetLoadingStatus())
 				});
+		}
+
+		#delete() {
+			if (window.confirm(t('Delete selected group?'))) {
+				this.#setLoadingStatus(['delete']);
+				const fields = this.form.getAllValues();
+
+				const curl = new Curl('zabbix.php');
+				curl.setArgument('action', 'usergroup.delete');
+				curl.setArgument('usrgrpids', [fields.usrgrpid]);
+				curl.setArgument(CSRF_TOKEN_NAME, <?= json_encode(CCsrfTokenHelper::get('usergroup')) ?>);
+
+				redirect(curl.getUrl(), 'post', 'action', undefined, true);
+			}
 		}
 
 		#ajaxExceptionHandler(exception) {
@@ -394,5 +417,38 @@
 
 			addMessage(makeMessageBox('bad', messages, title)[0]);
 		}
+
+		#setLoadingStatus(loading_ids) {
+			this.form_element.classList.add('is-loading', 'is-loading-fadein');
+			[
+				document.getElementById('add'),
+				document.getElementById('update'),
+				document.getElementById('delete')
+			].forEach(button => {
+				if (button) {
+					button.setAttribute('disabled', 'disabled');
+
+					if (loading_ids.includes(button.id)) {
+						button.classList.add('is-loading');
+					}
+				}
+			});
+		}
+
+		#unsetLoadingStatus() {
+			[
+				document.getElementById('add'),
+				document.getElementById('update'),
+				document.getElementById('delete')
+			].forEach(button => {
+				if (button) {
+					button.classList.remove('is-loading');
+					button.removeAttribute('disabled');
+				}
+			});
+
+			this.form_element.classList.remove('is-loading', 'is-loading-fadein');
+		}
+
 	};
 </script>

@@ -335,20 +335,14 @@ if ($data['usrgrpid'] != 0) {
 	$tabs->setFooter(makeFormFooter(
 		new CSubmit('update', _('Update')),
 		[
-			(new CRedirectButton(_('Delete'),
-				(new CUrl('zabbix.php'))
-					->setArgument('action', 'usergroup.delete')
-					->setArgument('usrgrpids', [$data['usrgrpid']])
-					->setArgument(CSRF_TOKEN_NAME, $csrf_token),
-				_('Delete selected group?')
-			))->setId('delete'),
+			(new CSimpleButton(_('Delete')))->setId('delete'),
 			$cancel_button
 		]
 	));
 }
 else {
 	$tabs->setFooter(makeFormFooter(
-		new CSubmit(null, _('Add')),
+		new CSubmit('add', _('Add')),
 		[
 			$cancel_button
 		]

@@ -591,6 +591,9 @@ $translate_strings = [
 		'Palette %1$d' => _('Palette %1$d'),
 		'Solid color' => _('Solid color'),
 		'Use default' => _('Use default')
+	],
+	'usergroup.edit.js.php' => [
+		'Delete selected group?' => _('Delete selected group?')
 	]
 ];
 
@@ -727,7 +730,9 @@ if (empty($_GET['files'])) {
 		'class.widget-field-event.js',
 		'class.widget-form.js',
 		'class.widget-form-event.js',
-		'class.widget-select.popup.js'
+		'class.widget-select.popup.js',
+
+		'usergroup.edit.js.php'
 	];
 
 	if (CCookieHelper::has(ZBX_SESSION_NAME)) {
