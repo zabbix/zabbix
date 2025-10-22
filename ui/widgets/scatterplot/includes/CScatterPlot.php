@@ -341,7 +341,7 @@ class CScatterPlot extends CSvg {
 		$this->canvas_width = max(0, $this->width - $this->offset_left - $this->offset_right);
 		$this->canvas_x = $this->offset_left;
 
-		$rows_min = (int) max(1, floor($this->canvas_width / 100));
+		$rows_min = (int) max(1, floor($this->canvas_width / 150));
 		$rows_max = (int) max(1, floor($this->canvas_width / 100));
 
 		$result = calculateGraphScaleExtremes($this->x_min, $this->x_max, $this->x_units, $calc_power,
