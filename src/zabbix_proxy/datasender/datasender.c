@@ -31,6 +31,9 @@
 #include "zbxcacheconfig.h"
 #include "zbxdb.h"
 #include "zbxdbhigh.h"
+#include "zbxrtc.h"
+#include "zbx_rtc_constants.h"
+#include "zbxipcservice.h"
 
 #define ZBX_DATASENDER_AVAILABILITY		0x0001
 #define ZBX_DATASENDER_HISTORY			0x0002
@@ -78,10 +81,10 @@ static void	get_hist_upload_state(const char *buffer, int *state)
  *          data and sends 'proxy data' request                               *
  *                                                                            *
  ******************************************************************************/
-static int	proxy_data_sender(int *more, int now, int *hist_upload_state, const zbx_thread_info_t *info,
-		zbx_thread_datasender_args *args)
+static int	proxy_data_sender(int *more, int now, int *hist_upload_state, int *new_tasks,
+		const zbx_thread_info_t *info, zbx_thread_datasender_args *args, int *task_timestamp)
 {
-	static int		data_timestamp = 0, task_timestamp = 0, upload_state = SUCCEED;
+	static int		data_timestamp = 0, upload_state = SUCCEED;
 
 	zbx_socket_t		sock;
 	struct zbx_json		j;
@@ -134,9 +137,9 @@ static int	proxy_data_sender(int *more, int now, int *hist_upload_state, const z
 
 	zbx_vector_tm_task_create(&tasks);
 
-	if (SUCCEED == upload_state && ZBX_TASK_UPDATE_FREQUENCY <= now - task_timestamp)
+	if (SUCCEED == upload_state && ZBX_TASK_UPDATE_FREQUENCY <= now - *task_timestamp)
 	{
-		task_timestamp = now;
+		*task_timestamp = now;
 
 		zbx_tm_get_remote_tasks(&tasks, 0, 0);
 
@@ -158,7 +161,7 @@ static int	proxy_data_sender(int *more, int now, int *hist_upload_state, const z
 		time_t	time_connect;
 
 		if (ZBX_PROXY_DATA_MORE == more_history || ZBX_PROXY_DATA_MORE == more_discovery ||
-				ZBX_PROXY_DATA_MORE == more_areg)
+				ZBX_PROXY_DATA_MORE == more_areg || ZBX_PROXY_UPLOAD_DISABLED == *hist_upload_state)
 		{
 			zbx_json_adduint64(&j, ZBX_PROTO_TAG_MORE, ZBX_PROXY_DATA_MORE);
 			*more = ZBX_PROXY_DATA_MORE;
@@ -237,6 +240,7 @@ static int	proxy_data_sender(int *more, int now, int *hist_upload_state, const z
 				if (0 != (flags & ZBX_DATASENDER_TASKS_RECV))
 				{
 					zbx_tm_json_deserialize_tasks(&jp_tasks, &tasks);
+					*new_tasks += tasks.values_num;
 					zbx_tm_save_tasks(&tasks);
 				}
 
@@ -294,6 +298,9 @@ ZBX_THREAD_ENTRY(datasender_thread, args)
 	unsigned char			process_type = info->process_type;
 	int				server_num = info->server_num;
 	int				process_num = info->process_num;
+	int				task_timestamp = 0;
+	zbx_ipc_async_socket_t		rtc;
+	zbx_uint32_t			rtc_msgs[] = {ZBX_RTC_TASK_MANAGER_NOTIFY};
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(info->program_type),
 			server_num, get_process_type_string(process_type), process_num);
@@ -305,6 +312,8 @@ ZBX_THREAD_ENTRY(datasender_thread, args)
 			zbx_dc_get_psk_by_identity);
 #endif
 	zbx_setproctitle("%s [connecting to the database]", get_process_type_string(process_type));
+
+	zbx_rtc_subscribe(process_type, process_num, rtc_msgs, 1, SEC_PER_MIN, &rtc);
 
 	zbx_db_connect(ZBX_DB_CONNECT_NORMAL);
 
@@ -318,24 +327,49 @@ ZBX_THREAD_ENTRY(datasender_thread, args)
 
 		records = 0;
 		time_start = time_now;
+		int	new_tasks = 0;
 
 		do
 		{
-			records += proxy_data_sender(&more, (int)time_now, &hist_upload_state, info,
-					datasender_args_in);
+			records += proxy_data_sender(&more, (int)time_now, &hist_upload_state, &new_tasks, info,
+					datasender_args_in, &task_timestamp);
 
 			time_now = zbx_time();
 			time_diff = time_now - time_start;
 		}
 		while (ZBX_PROXY_DATA_MORE == more && time_diff < SEC_PER_MIN && ZBX_IS_RUNNING());
 
+		if (0 != new_tasks)
+		{
+			zbx_rtc_notify_generic(&rtc, ZBX_PROCESS_TYPE_TASKMANAGER, 1, ZBX_RTC_TASK_MANAGER_NOTIFY,
+					NULL, 0);
+		}
+
 		zbx_setproctitle("%s [sent %d values in " ZBX_FS_DBL " sec, idle %d sec]",
 				get_process_type_string(process_type), records, time_diff,
 				ZBX_PROXY_DATA_MORE != more ? ZBX_TASK_UPDATE_FREQUENCY : 0);
 
 		if (ZBX_PROXY_DATA_MORE != more)
-			zbx_sleep_loop(info, ZBX_TASK_UPDATE_FREQUENCY);
+		{
+			zbx_uint32_t	rtc_cmd;
+			unsigned char	*rtc_data = NULL;
+			int		sleeptime = ZBX_TASK_UPDATE_FREQUENCY;
 
+			while (SUCCEED == zbx_rtc_wait(&rtc, info, &rtc_cmd, &rtc_data, sleeptime) && 0 != rtc_cmd)
+			{
+				sleeptime = 0;
+				task_timestamp = 0;
+
+				switch (rtc_cmd)
+				{
+					case ZBX_RTC_SHUTDOWN:
+						zbx_set_exiting_with_succeed();
+						ZBX_FALLTHROUGH;
+					default:
+						break;
+				}
+			}
+		}
 	}
 
 	zbx_setproctitle("%s #%d [terminated]", get_process_type_string(process_type), process_num);

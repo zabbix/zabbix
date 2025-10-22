@@ -531,7 +531,7 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 					]
 				]
 			],
-			// #16 Invalid zero values in Moths (Months not supported).
+			// #16 Invalid zero values in Months (Months not supported).
 			[
 				[
 					'expected' => TEST_BAD,

@@ -306,6 +306,7 @@ class testPageAdministrationMediaTypes extends CWebTest {
 	public function testPageAdministrationMediaTypes_Filter($data) {
 		$this->page->login()->open('zabbix.php?action=mediatype.list');
 		$this->query('button:Reset')->waitUntilClickable()->one()->click();
+		$table = $this->query('class:list-table')->asTable()->one();
 
 		$form = $this->query('name:zbx_filter')->asForm()->one();
 		$form->fill($data['filter']);
@@ -333,6 +334,7 @@ class testPageAdministrationMediaTypes extends CWebTest {
 			$this->assertEquals(CDBHelper::getColumn($sql, 'name'), explode(', ', $actions));
 		}
 		else {
+			$table->waitUntilReloaded();
 			$this->assertTableDataColumn(CTestArrayHelper::get($data, 'result', []));
 		}
 	}
@@ -353,7 +355,7 @@ class testPageAdministrationMediaTypes extends CWebTest {
 			$row->query('link', $old_status)->one()->click();
 			$this->page->waitUntilReady();
 
-			// Check result on fronted.
+			// Check result on frontend.
 			$this->assertMessage(TEST_GOOD, 'Media type '.lcfirst($new_status));
 			CMessageElement::find()->one()->close();
 

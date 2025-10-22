@@ -79,7 +79,7 @@ class testPageServicesSlaReport extends testSlaReport {
 			'buttons' => ['Filter', 'Reset', 'Cancel'],
 			'check_row' => [
 				'Name' => 'Simple actions service',
-				'Tags' => 'problem: falsetest: test789',
+				'Tags' => "problem: false\ntest: test789",
 				'Problem tags' => 'problem: true'
 			]
 		];
@@ -1406,8 +1406,11 @@ class testPageServicesSlaReport extends testSlaReport {
 		// Usage of Select mode is required as in Type mode a service that contains the name of required service is chosen.
 		CMultiselectElement::setDefaultFillMode(CMultiselectElement::MODE_SELECT);
 		$filter_form->query('button:Reset')->one()->click();
+		$table = $this->getTable();
 		$filter_form->fill($filter_data);
 		$filter_form->submit();
+		$table->waitUntilReloaded();
+
 		CMultiselectElement::setDefaultFillMode(CMultiselectElement::MODE_TYPE);
 	}
 
@@ -1448,13 +1451,12 @@ class testPageServicesSlaReport extends testSlaReport {
 
 			return;
 		}
-		$table = $this->query('class:list-table')->asTable()->one();
 
 		if (array_key_exists('Service', $data['fields'])) {
 			$this->assertTableDataColumn($data['expected_periods'], self::$period_headers[$data['reporting_period']]);
 		}
 		else {
-			$headers = $table->getHeadersText();
+			$headers = $this->getTable()->getHeadersText();
 
 			unset($headers[0], $headers[1]);
 			$this->assertEquals($data['expected_periods'], array_values($headers));
