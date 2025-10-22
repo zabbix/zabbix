@@ -3378,7 +3378,7 @@ class CAction extends CApiService {
 
 			foreach ($action['filter']['conditions'] as $condition) {
 				if ($condition['conditiontype'] == ZBX_CONDITION_TYPE_PROXY_GROUP) {
-					$proxy_groupids[] = $condition['value'];
+					$proxy_groupids[$condition['value']] = true;
 				}
 			}
 		}
@@ -3387,7 +3387,7 @@ class CAction extends CApiService {
 			return;
 		}
 
-		$proxy_groupids = array_keys(array_flip($proxy_groupids));
+		$proxy_groupids = array_keys($proxy_groupids);
 
 		$count = API::ProxyGroup()->get([
 			'countOutput' => true,
