@@ -91,29 +91,3 @@ zbx_uint32_t	zbx_deserialize_uint31_compact(const unsigned char *ptr, zbx_uint32
 		return pos;
 	}
 }
-
-zbx_uint32_t	zbx_deserialize_vector_uint64(const unsigned char *buffer, zbx_vector_uint64_t *vector_uint64)
-{
-	zbx_uint32_t	value_len;
-
-	memcpy(&value_len, buffer, sizeof(zbx_uint32_t));
-
-	if (value_len > 0 && value_len % sizeof(zbx_uint64_t) == 0)
-	{
-		int			num = (int)value_len / (int)sizeof(zbx_uint64_t);
-		const unsigned char	*src = buffer + sizeof(zbx_uint32_t);
-
-		if (vector_uint64->values_alloc < vector_uint64->values_num + num)
-			zbx_vector_uint64_reserve(vector_uint64, (size_t)(vector_uint64->values_num + num));
-
-		for (int i = 0; i < num; i++)
-		{
-			zbx_uint64_t	value;
-
-			src += zbx_deserialize_uint64(src, &value);
-			zbx_vector_uint64_append(vector_uint64, value);
-		}
-	}
-
-	return value_len + (zbx_uint32_t)sizeof(zbx_uint32_t);
-}
