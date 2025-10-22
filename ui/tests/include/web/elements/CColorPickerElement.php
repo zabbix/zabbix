@@ -32,7 +32,7 @@ class CColorPickerElement extends CElement {
 	 * @return type
 	 */
 	public function getInput() {
-		return $this->query('xpath:./input')->one();
+		return $this->query('xpath:.//input')->one();
 	}
 
 	/**
@@ -79,7 +79,15 @@ class CColorPickerElement extends CElement {
 	 * @inheritdoc
 	 */
 	public function isEnabled($enabled = true) {
-		return $this->getInput()->isEnabled($enabled);
+		$input = $this->query('xpath:.//input')->one();
+		$button = $this->query('xpath:./button')->one();
+		$color_picker = $this->query('xpath://z-color-picker')->one();
+
+		$is_enabled = $button->isEnabled($enabled)
+				&& $color_picker->isEnabled($enabled)
+				&& $input->isEnabled($enabled);
+
+		return $is_enabled === $enabled;
 	}
 
 	/**
