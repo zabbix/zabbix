@@ -505,7 +505,7 @@ static void	history_clickhouse_add_error(char **err, const char *format, ...)
 static int	history_clickhouse_flush_conns(zbx_clickhouse_data_t *d, CURLM *mhandle, char **error)
 {
 	CURLMcode		code;
-	int 			running = 0;
+	int			running = 0;
 	CURLMsg			*msg;
 	int			msg_num, long_query_limit;
 	zbx_vector_ptr_t	retries;
