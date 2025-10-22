@@ -27,7 +27,9 @@
 
 		// the chkbxRange.init() method must be called after the inserted post scripts and initializing cookies
 		cookie.init();
-		chkbxRange.init();
+		// Timeout is added to reliably restore checkbox states, when using Back and Forward navigation
+		// in different browsers.
+		setTimeout(() => chkbxRange.init());
 	});
 
 	/**

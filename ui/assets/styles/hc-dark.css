@@ -2385,6 +2385,13 @@ div[data-field-type="set"].has-error {
   color: #000000 !important;
   -webkit-text-fill-color: #000000 !important; }
 
+.checkbox-list.has-error [type="checkbox"] + label span {
+  border: 1px solid #ff5e5e;
+  color: #000000 !important; }
+.checkbox-list.has-error [type="checkbox"]:checked + label span::after {
+  border-left-color: #ff5e5e;
+  border-bottom-color: #ff5e5e; }
+
 .checkbox-radio[type="checkbox"].has-error + label span {
   border: 1px solid #ff5e5e;
   color: #000000 !important; }
