@@ -401,7 +401,7 @@ class testFormGroups extends CWebTest {
 	 * Update group without changing data.
 	 *
 	 * @param string  $name        group name to be opened for check
-	 * @param bollean $discovered  discovered host group or not
+	 * @param boolean $discovered  discovered host group or not
 	 */
 	public function simpleUpdate($name, $discovered = false) {
 		$old_hash = CDBHelper::getHash(self::GROUPS_SQL);

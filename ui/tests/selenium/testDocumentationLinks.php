@@ -303,7 +303,7 @@ class testDocumentationLinks extends CWebTest {
 					'doc_link' => '/en/manual/web_interface/frontend_sections/monitoring/latest_data'
 				]
 			],
-			// #17 Speccific item graph from latest data view.
+			// #17 Specific item graph from latest data view.
 			[
 				[
 					'url' => 'history.php?action=showgraph&itemids%5B%5D=42237',

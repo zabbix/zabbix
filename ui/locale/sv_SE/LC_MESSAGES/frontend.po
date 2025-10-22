@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2025-09-07 17:06+0000\n"
+"PO-Revision-Date: 2025-10-06 12:01+0000\n"
 "Last-Translator: Daniel Nylander <zabbix@danielnylander.se>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: sv_SE\n"
@@ -3758,6 +3758,11 @@ msgstr "Det går inte att läsa XML: %1$s."
 msgid "Cannot read YAML: %1$s."
 msgstr "Det går inte att läsa YAML: %1$s."
 
+#: include/classes/server/CZabbixServer.php:502
+#, c-format
+msgid "Cannot read response from Zabbix server \"%1$s\"."
+msgstr "Kan inte läsa svaret från Zabbix-servern \"%1$s\"."
+
 #: include/classes/server/CZabbixServer.php:567
 #, c-format
 msgid "Cannot read the response, check connection with the Zabbix server \"%1$s\"."
@@ -6786,7 +6791,7 @@ msgstr "Upptäckt TimescaleDB-licens stöder inte komprimering. Komprimering st�
 
 #: app/views/administration.housekeeping.edit.php:204
 msgid "Detected license does not support compression. Compression is supported in TimescaleDB Community Edition."
-msgstr ""
+msgstr "Den upptäckta licensen stöder inte komprimering. Komprimering stöds i TimescaleDB Community Edition."
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1130
 msgid "Detection period"
@@ -13301,7 +13306,7 @@ msgstr "Högsta erforderliga %1$s databasversion är %2$s."
 #: app/partials/administration.system.info.php:221
 #, c-format
 msgid "Maximum required version is %1$s."
-msgstr ""
+msgstr "Högsta versionen som krävs är %1$s."
 
 #: app/controllers/CControllerTimeSelectorUpdate.php:136
 #: include/classes/mvc/CController.php:320
@@ -13642,7 +13647,7 @@ msgstr "Minsta storlek som krävs för PHP-postning är %1$s (konfigurationsalte
 #: app/views/administration.housekeeping.edit.php:183
 #, c-format
 msgid "Minimum required version is %1$s."
-msgstr ""
+msgstr "Minsta versionen som krävs är %1$s."
 
 #: app/views/monitoring.map.view.php:48
 #: include/views/monitoring.sysmap.edit.php:276
@@ -13875,12 +13880,12 @@ msgstr "Flera PROBLEM-händelser"
 #: app/partials/administration.system.info.php:235
 #, c-format
 msgid "Must be at least %1$s."
-msgstr ""
+msgstr "Måste vara minst %1$s."
 
 #: app/partials/administration.system.info.php:254
 #, c-format
 msgid "Must not be higher than %1$s."
-msgstr ""
+msgstr "Får inte vara högre än %1$s."
 
 #: jsLoader.php:284
 msgid "Mute"
@@ -14625,63 +14630,63 @@ msgstr "Ingen behörighet att anropa \"%1$s.%2$s\"."
 
 #: include/classes/api/services/CConfiguration.php:312
 msgid "No permissions to import discovery rules."
-msgstr ""
+msgstr "Inga behörigheter för att importera upptäcktsregler."
 
 #: include/classes/api/services/CConfiguration.php:313
 msgid "No permissions to import graphs."
-msgstr ""
+msgstr "Inga behörigheter för att importera grafer."
 
 #: include/classes/api/services/CConfiguration.php:314
 msgid "No permissions to import host groups."
-msgstr ""
+msgstr "Inga behörigheter för att importera värdgrupper."
 
 #: include/classes/api/services/CConfiguration.php:316
 msgid "No permissions to import hosts."
-msgstr ""
+msgstr "Inga behörigheter för att importera värdar."
 
 #: include/classes/api/services/CConfiguration.php:318
 msgid "No permissions to import images."
-msgstr ""
+msgstr "Inga behörigheter för att importera bilder."
 
 #: include/classes/api/services/CConfiguration.php:319
 msgid "No permissions to import items."
-msgstr ""
+msgstr "Inga behörigheter för att importera objekt."
 
 #: include/classes/api/services/CConfiguration.php:320
 msgid "No permissions to import maps."
-msgstr ""
+msgstr "Inga behörigheter för att importera kartor."
 
 #: include/classes/api/services/CConfiguration.php:321
 msgid "No permissions to import media types."
-msgstr ""
+msgstr "Inga behörigheter för att importera mediatyper."
 
 #: include/classes/api/services/CConfiguration.php:324
 msgid "No permissions to import template dashboards."
-msgstr ""
+msgstr "Inga behörigheter för att importera mallar för kontrollpaneler."
 
 #: include/classes/api/services/CConfiguration.php:315
 msgid "No permissions to import template groups."
-msgstr ""
+msgstr "Inga behörigheter för att importera mallgrupper."
 
 #: include/classes/api/services/CConfiguration.php:322
 msgid "No permissions to import template links."
-msgstr ""
+msgstr "Inga behörigheter för att importera mallänkar."
 
 #: include/classes/api/services/CConfiguration.php:323
 msgid "No permissions to import templates."
-msgstr ""
+msgstr "Inga behörigheter för att importera mallar."
 
 #: include/classes/api/services/CConfiguration.php:325
 msgid "No permissions to import triggers."
-msgstr ""
+msgstr "Inga behörigheter för att importera utlösare."
 
 #: include/classes/api/services/CConfiguration.php:326
 msgid "No permissions to import value maps."
-msgstr ""
+msgstr "Inga behörigheter för att importera värdekartor."
 
 #: include/classes/api/services/CConfiguration.php:317
 msgid "No permissions to import web scenarios."
-msgstr ""
+msgstr "Inga behörigheter för att importera webbscenarior."
 
 #: app/controllers/CControllerChartsView.php:133
 #: app/controllers/CControllerDashboardPrint.php:99
@@ -17711,6 +17716,11 @@ msgstr "Svarskod"
 msgid "Response time"
 msgstr "Svarstid"
 
+#: include/classes/server/CZabbixServer.php:498
+#, c-format
+msgid "Response timeout of %1$s exceeded when connecting to Zabbix server \"%2$s\"."
+msgstr "Svarstidsgränsen överstegs för %1$s vid anslutning till Zabbix-servern \"%2$s\"."
+
 #: app/controllers/CControllerMediatypeTestSend.php:182
 msgid "Response type: JSON"
 msgstr "Typ av svar: JSON"
@@ -19008,13 +19018,13 @@ msgstr "Förkortad"
 #: app/views/administration.housekeeping.edit.php:187
 #, c-format
 msgid "Should be at least %1$s."
-msgstr ""
+msgstr "Bör vara minst %1$s."
 
 #: app/partials/administration.system.info.php:262
 #: app/views/administration.housekeeping.edit.php:197
 #, c-format
 msgid "Should not be higher than %1$s."
-msgstr ""
+msgstr "Bör inte vara högre än %1$s."
 
 #: app/partials/monitoring.problem.filter.php:27
 #: app/views/monitoring.charts.view.php:80
@@ -20532,7 +20542,7 @@ msgstr "Parametern \"%1$s\" saknas i användarattributen."
 
 #: app/views/popup.ldap.edit.php:101
 msgid "The previous password was cleared due to a host change. Please enter the new password."
-msgstr ""
+msgstr "Det tidigare lösenordet raderades på grund av ett värdbyte. Ange det nya lösenordet."
 
 #: include/classes/core/CJsonRpc.php:206
 msgid "The received JSON is not a valid JSON-RPC request."
@@ -21585,11 +21595,11 @@ msgstr "Det gick inte att hämta TimescaleDB-versionen."
 
 #: app/views/administration.housekeeping.edit.php:173
 msgid "Unable to retrieve compression support status of TimescaleDB time-series database extension for PostgreSQL."
-msgstr ""
+msgstr "Det går inte att hämta status för komprimeringsstödet för databasutökningen TimescaleDB för PostgreSQL."
 
 #: app/views/administration.housekeeping.edit.php:178
 msgid "Unable to retrieve version of TimescaleDB time-series database extension for PostgreSQL."
-msgstr ""
+msgstr "Det går inte att hämta versionen för databasutökningen TimescaleDB för PostgreSQL."
 
 #: include/views/mfa.login.php:65
 #, c-format
@@ -21872,7 +21882,7 @@ msgstr "Version av databasserver som inte stöds %1$s. Får inte vara högre än
 #: app/partials/administration.system.info.php:206
 #: app/views/administration.housekeeping.edit.php:169
 msgid "Unsupported TimescaleDB time-series database extension for PostgreSQL is used."
-msgstr ""
+msgstr "Databasutökningen TimescaleDB för PostgreSQL används fast den inte stöds."
 
 #: app/views/administration.housekeeping.edit.php:190
 #, c-format
