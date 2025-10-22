@@ -357,7 +357,7 @@ class testCalculatedExpression extends CIntegrationTest {
 			self::$itemIds = [];
 		}
 
-	 	CDataHelper::call('host.delete', [self::$hostid]);
+		CDataHelper::call('host.delete', [self::$hostid]);
 	}
 }
 
