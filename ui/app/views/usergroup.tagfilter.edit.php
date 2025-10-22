@@ -81,21 +81,28 @@ $form_grid
 		->setId('tag-list-form-field')
 	]);
 
-$tag_filter_row_template = (new CTemplateTag('tag-filter-row-template'))->addItem(
+$tag_filter_row_template = (new CTemplateTag('tag-filter-row-template'))->addItem([
 	(new CRow([
 		(new CTextBox('new_tag_tag_filters[#{rowid}][tag]', '#{tag}', false,
 			DB::getFieldLength('tag_filter', 'tag')
 		))
 			->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
-			->setAttribute('placeholder', _('tag')),
+			->setAttribute('placeholder', _('tag'))
+			->setErrorContainer('new-tag-tag-filters-#{rowid}-error-container'),
 		(new CTextBox('new_tag_tag_filters[#{rowid}][value]', '#{value}', false,
 			DB::getFieldLength('tag_filter', 'value')
 		))
 			->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
-			->setAttribute('placeholder', _('value')),
+			->setAttribute('placeholder', _('value'))
+			->setErrorContainer('new-tag-tag-filters-#{rowid}-error-container'),
 		(new CButtonLink(_('Remove')))->addClass('js-remove-table-row')
-	]))->addClass('form_row')
-);
+	]))->addClass('form_row'),
+	(new CRow([
+		(new CCol((new CDiv())->setId('new-tag-tag-filters-#{rowid}-error-container')))
+			->addClass(ZBX_STYLE_ERROR_CONTAINER)
+			->setColSpan(3)
+	]))->addClass('error-container-row')
+]);
 
 $form_grid->addItem($tag_filter_row_template);
 
