@@ -118,7 +118,7 @@ class CControllerUsergroupCreate extends CControllerUsergroupUpdateGeneral {
 		$response = $form_errors
 			? ['form_errors' => $form_errors]
 			: ['error' => [
-				'title' => _('Cannot create user group'),
+				'title' => _('Cannot add user group'),
 				'messages' => array_column(get_and_clear_messages(), 'message')
 			]];
 
