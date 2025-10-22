@@ -169,10 +169,11 @@ class testHistory extends CAPITest {
 				'expected_error' => false
 			],
 			// Get value of a certain length of value of item of value_type == ITEM_VALUE_TYPE_JSON ('history' => 6).
+			// JSON formatting differs: PostgreSQL (JSONB), MySQL (LONGTEXT).
 			[
 				'api_request' => [
 					'history' => 6,
-					'maxValueSize' => 10,
+					'maxValueSize' => 6,
 					'itemids' => ['158742']
 				],
 				'expected_result' => [
@@ -180,7 +181,7 @@ class testHistory extends CAPITest {
 						'itemid' => '158742',
 						'clock' => '1549351003',
 						'ns' => '354370019',
-						'value' => '{"name":"a'
+						'value' => '{"name'
 					]
 				],
 				'expected_error' => false

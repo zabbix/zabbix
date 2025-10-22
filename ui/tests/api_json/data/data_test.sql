@@ -883,4 +883,4 @@ INSERT INTO history_bin (itemid, clock, value, ns) VALUES
 -- test history json value type
 INSERT INTO items (itemid, hostid, name, type, key_, value_type, history, status, master_itemid, templateid, params,query_fields, description, posts, headers) VALUES (158742, 120005, 'item7', 2, 'item7', 6, '90d', 0, NULL, NULL, '','', '', '', '');
 INSERT INTO history_json (itemid, clock, value, ns) VALUES
-(158742, 1549351003, '{"name":"aб"}', 354370019);
+(158742, 1549351003, '{"nameж":"a"}', 354370019);
