@@ -22,6 +22,7 @@ require_once dirname(__FILE__) . '/../include/CIntegrationTest.php';
  * @required-components server
  * @configurationDataProvider serverConfigurationProvider
  * @backup hosts,items,item_rtdata,triggers,actions,operations,graphs
+ * @onAfter clearData
  *
  */
 class testNestedLLD extends CIntegrationTest{
@@ -35,6 +36,8 @@ class testNestedLLD extends CIntegrationTest{
 	const AUTOREG_ACTION_NAME = 'lld.action.autoreg';
 	const AGENT_AUTOREG_NAME = 'agent.autoreg';
 	const HOST_METADATA = 'host_lld_autoreg';
+	const HOSTNAME_TEST_MACRO = "host_test_macro_in_nested_json";
+	const LLDRULE_KEY_ROOT = 'lld.test.macros.rule.root';
 
 	private static $hostid_item_types;
 	private static $lld_ruleid_main;
@@ -43,6 +46,11 @@ class testNestedLLD extends CIntegrationTest{
 	private static $templateid_item_types;
 	private static $item_protoid_item_types;
 	private static $autoreg_actionid;
+	private static $hostid_macros;
+	private static $lld_ruleid_macros_root;
+	private static $lld_item_protoid_macros_root;
+	private static $lld_item_protoid_macros_1st_level;
+	private static $lld_drule_protoid_macros_1st_level;
 
 	private static $trapper_data_nested1 = [
 		[
@@ -399,6 +407,81 @@ class testNestedLLD extends CIntegrationTest{
 				'useip' => INTERFACE_USE_IP
 			]
 		]);
+
+		/* for nested macro testing ZBXNEXT-10068 */
+		$response = $this->call('host.create', [
+			'host' => self::HOSTNAME_TEST_MACRO,
+			'interfaces' => [],
+			'groups' => [
+				['groupid' => 4] // 'Zabbix servers'
+			]
+		]);
+		$this->assertArrayHasKey('hostids', $response['result']);
+		$this->assertArrayHasKey(0, $response['result']['hostids']);
+		self::$hostid_macros = $response['result']['hostids'][0];
+
+		$response = $this->call('discoveryrule.create', [
+			'name' => 'Root level discovery rule',
+			'key_' => self::LLDRULE_KEY_ROOT,
+			'hostid' => self::$hostid_macros,
+			'type' => ITEM_TYPE_TRAPPER,
+			'lld_macro_paths' => [
+				[
+					'lld_macro' => '{#L0}',
+					'path' => '$.db_name'
+				]
+			]
+		]);
+		$this->assertArrayHasKey('itemids', $response['result']);
+		$this->assertArrayHasKey(0, $response['result']['itemids']);
+		self::$lld_ruleid_macros_root = $response['result']['itemids'][0];
+
+		$response = $this->call('itemprototype.create', [
+			'name' => 'Root level item prototype',
+			'key_' => 'trap0[{#L0}]',
+			'hostid' => self::$hostid_macros,
+			'type' => ITEM_TYPE_TRAPPER,
+			'value_type' => ITEM_VALUE_TYPE_UINT64,
+			'ruleid' => self::$lld_ruleid_macros_root
+		]);
+		$this->assertArrayHasKey('itemids', $response['result']);
+		self::$lld_item_protoid_macros_root = $response['result']['itemids'][0];
+
+
+		$response = $this->call('discoveryruleprototype.create', [
+			'name' => '1-st level discovery rule',
+			'key_' => 'lld_trap[{#L0}]',
+			'hostid' => self::$hostid_macros,
+			'type' => ITEM_TYPE_NESTED,
+			'ruleid' => self::$lld_ruleid_macros_root,
+			'lld_macro_paths' => [
+				[
+					'lld_macro' => '{#L1}',
+					'path' => '$.{#L0}'
+				]
+			],
+			'preprocessing' => [
+				[
+					'type' => ZBX_PREPROC_JSONPATH,
+					'params' => '$.ts_data',
+					'error_handler' => 0
+				]
+			]
+		]);
+		$this->assertArrayHasKey('itemids', $response['result']);
+		$this->assertArrayHasKey(0, $response['result']['itemids']);
+		self::$lld_drule_protoid_macros_1st_level = $response['result']['itemids'][0];
+
+		$response = $this->call('itemprototype.create', [
+			'name' => '1-st level item prototype',
+			'key_' => 'trap1[{#L0},{#L1}]',
+			'hostid' => self::$hostid_macros,
+			'type' => ITEM_TYPE_TRAPPER,
+			'value_type' => ITEM_VALUE_TYPE_UINT64,
+			'ruleid' => self::$lld_drule_protoid_macros_1st_level
+		]);
+		$this->assertArrayHasKey('itemids', $response['result']);
+		self::$lld_item_protoid_macros_1st_level = $response['result']['itemids'][0];
 
 		return true;
 	}
@@ -2394,5 +2477,129 @@ class testNestedLLD extends CIntegrationTest{
 			'template level tags were not found in a problem');
 
 		$this->assertEquals($expected_tag, $response['result'][0]['tags'][0]);
+	}
+
+	/**
+	 * Test nested low level discovery macros.
+	 *
+	 * This test is based on ZBXNEXT-10068.
+	 *
+	 * A discovery prototype having
+	 *     name: 1-st level discovery rule
+	 *     tag:  lld_trap[{#L0}]
+	 * is created and tested with no filters and overrides.
+	 */
+	public function testNestedLLD_testNestedLLDMacros() {
+		// a helper function to get and test items
+		$itemsTest = function(int $hostid, array $expected_item_keys): array {
+			$response = $this->call('item.get', [
+				'hostids' => [$hostid],
+				'selectTags' => 'extend'
+			]);
+			$this->assertArrayHasKey('result', $response);
+			$items = [];
+			foreach ($response['result'] as $item) {
+				$this->assertArrayHasKey('key_', $item, 'Missing key_ in item: ' . json_encode($item));
+				$items[$item['key_']] = $item;
+			}
+			// check for missing expected keys
+			foreach ($expected_item_keys as $key) {
+				$this->assertArrayHasKey($key, $items, "Missing expected item with key: '" . $key . "', items: '" . json_encode($items) . "'");
+			}
+			// check for unexpected keys
+			foreach (array_keys($items) as $item_key) {
+				$this->assertContains($item_key, $expected_item_keys, "Unexpected item with key: '" . $item_key . "', items: '" . json_encode($items) . "'");
+			}
+			return $items;
+		};
+
+		$trapper_value = [
+			"data" => [
+				[
+					"db_name" => "db1",
+					"ts_data" => [
+						["db1" => "1MB"],
+						["db1" => "1GB"],
+						["db1" => "1TB"],
+						["db2" => "2MB"],
+						["db2" => "2GB"],
+						["db2" => "2TB"],
+						["common" => "5GB"]
+					]
+				]
+			]
+		];
+
+		// After sending the trapper value the 1-st time,
+		// discovery rule is expected to be created out of discovery prototype with:
+		// 'name' => '1-st level discovery rule',
+		// 'key_' => 'lld_trap[{#L0}]'.
+		$this->sendSenderValue(self::HOSTNAME_TEST_MACRO, self::LLDRULE_KEY_ROOT, $trapper_value);
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of lld_process_discovery_rule', true, 10, 1, true);
+		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
+
+		$response = $this->call('discoveryrule.get', [
+			'hostids' => [
+				self::$hostid_macros
+			]
+		]);
+		$this->assertArrayHasKey('result', $response);
+		$this->assertArrayHasKey(0, $response['result']);
+
+		$discovery_rules = [];
+		foreach ($response['result'] as $rule) {
+			$this->assertArrayHasKey('key_', $rule, 'Missing key_ in discovery rule: ' . json_encode($rule));
+			$discovery_rules[$rule['key_']] = $rule;
+		}
+
+		$expected_rule_keys = [
+			'lld.test.macros.rule.root',	// created using API
+			'lld_trap[db1]'			// discovered by LLD
+		];
+		// check for missing expected keys
+		foreach ($expected_rule_keys as $key) {
+			$this->assertArrayHasKey($key, $discovery_rules, "Missing expected discovery rule with key: '" . $key . "', discovery rules: '" . json_encode($discovery_rules) . "'");
+		}
+		// check for unexpected keys
+		foreach (array_keys($discovery_rules) as $key) {
+			$this->assertContains($key, $expected_rule_keys, "Unexpected discovery rule with key: '" . $key . "', discovery rules: '" . json_encode($discovery_rules) . "'");
+		}
+
+		// After sending the trapper value the 2-nd time,
+		// items are expected to be created out of item prototypes.
+		$this->sendSenderValue(self::HOSTNAME_TEST_MACRO, self::LLDRULE_KEY_ROOT, $trapper_value);
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of lld_process_discovery_rule', true, 10, 1, true);
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of lld_process_discovery_rule', true, 10, 1, true);
+		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
+
+		/* if macros are resolved correctly then items with the following keys should be discovered */
+		$expected_item_keys = [
+			'trap0[db1]',
+			'trap1[db1,1MB]',
+			'trap1[db1,1GB]',
+			'trap1[db1,1TB]'
+		];
+
+		$itemsTest(self::$hostid_macros, $expected_item_keys);
+	}
+
+	/**
+	 * Delete data objects created for this test suite
+	 *
+	 */
+	public static function clearData(): void {
+		try {
+			/* Nested LLD test */
+			CDataHelper::call('itemprototype.delete', [self::$lld_item_protoid_macros_1st_level]);
+			CDataHelper::call('discoveryruleprototype.delete', [self::$lld_drule_protoid_macros_1st_level]);
+			CDataHelper::call('itemprototype.delete', [self::$lld_item_protoid_macros_root]);
+			CDataHelper::call('discoveryrule.delete', [self::$lld_ruleid_macros_root]);
+			CDataHelper::call('host.delete', [self::$hostid_macros]);
+		} catch (Exception $e) {
+			/* This should never happen. */
+			printf("Test cleanup failed.\nMessage: %s\nFile: %s\nLine: %d\nException code: %s\nTrace:\n%s\n",
+				$e->getMessage(), $e->getFile(), $e->getLine(), $e->getCode(), $e->getTraceAsString()
+			);
+		}
 	}
 }

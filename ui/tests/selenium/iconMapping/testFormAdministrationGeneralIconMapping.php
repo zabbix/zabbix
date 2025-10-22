@@ -748,8 +748,7 @@ class testFormAdministrationGeneralIconMapping extends CLegacyWebTest {
 		$this->zbxTestClickXpath('//button[@value="Add"]');
 		$this->zbxTestWaitForPageToLoad();
 		$form = $this->query('id:iconmap')->asForm()->one();
-		$form->query('xpath:.//button[@value="Add"]')->one()->waitUntilClassesNotPresent('is-loading');
-		$this->page->removeFocus();
+		$form->query('xpath:.//tr[@id="iconmap-list-footer"]//button')->one()->waitUntilClassesNotPresent('is-loading');
 
 		// Check the results in frontend.
 		$this->assertInlineError($form, $data['error']);
