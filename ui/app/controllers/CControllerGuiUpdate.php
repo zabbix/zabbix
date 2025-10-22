@@ -38,7 +38,7 @@ class CControllerGuiUpdate extends CController {
 				'length' => CSettingsSchema::getFieldLength('work_period'),
 				'use' => [CTimePeriodsParser::class, ['usermacros' => true]]
 			],
-			'show_technical_errors' => ['boolean'],
+			'show_technical_errors' => ['integer', 'required', 'in' => [0, 1]],
 			'history_period' => ['string', 'required', 'not_empty',
 				'use' => [CTimeUnitValidator::class, ['min' => SEC_PER_DAY, 'max' => 7 * SEC_PER_DAY]]
 			],

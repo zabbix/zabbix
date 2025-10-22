@@ -607,6 +607,11 @@ $translate_strings = [
 		'Reset confirmation' => _('Reset confirmation'),
 		'Reset defaults' => _('Reset defaults')
 	],
+	'administration.miscconfig.edit.js.php' => [
+		'Reset all fields to default values?' => _('Reset all fields to default values?'),
+		'Reset confirmation' => _('Reset confirmation'),
+		'Reset defaults' => _('Reset defaults')
+	],
 	'administration.timeouts.edit.js.php' => [
 		'Reset all fields to default values?' => _('Reset all fields to default values?'),
 		'Reset confirmation' => _('Reset confirmation'),
@@ -752,6 +757,7 @@ if (empty($_GET['files'])) {
 		'administration.audit.settings.edit.js.php',
 		'administration.gui.edit.js.php',
 		'administration.housekeeping.edit.js.php',
+		'administration.miscconfig.edit.js.php',
 		'administration.timeouts.edit.js.php'
 	];
 

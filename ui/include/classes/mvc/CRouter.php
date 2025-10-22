@@ -208,7 +208,7 @@ class CRouter {
 		'mfa.edit'									=> [CControllerMfaEdit::class,										'layout.json',			'mfa.edit'],
 		'mfa.check'									=> [CControllerMfaCheck::class,										'layout.json',			null],
 		'miscconfig.edit'							=> [CControllerMiscConfigEdit::class,								'layout.htmlpage',		'administration.miscconfig.edit'],
-		'miscconfig.update'							=> [CControllerMiscConfigUpdate::class,								null,					null],
+		'miscconfig.update'							=> [CControllerMiscConfigUpdate::class, 							'layout.json',			null],
 		'module.disable'							=> [CControllerModuleDisable::class,								'layout.json',			null],
 		'module.edit'								=> [CControllerModuleEdit::class,									'layout.json',			'module.edit'],
 		'module.enable'								=> [CControllerModuleEnable::class,									'layout.json',			null],
