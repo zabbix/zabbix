@@ -151,6 +151,15 @@ window.tag_filter_edit = new class {
 						if ('error' in response) {
 							throw {error: response.error};
 						}
+
+						if ('form_errors' in response) {
+							this.form.setErrors(response.form_errors, true, true);
+							this.form.renderErrors();
+							this.overlay.unsetLoading();
+
+							return;
+						}
+
 						overlayDialogueDestroy(this.overlay.dialogueid);
 
 						this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response}));
