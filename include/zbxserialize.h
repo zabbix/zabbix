@@ -16,7 +16,6 @@
 #define ZABBIX_SERIALIZE_H
 
 #include "zbxcommon.h"
-#include "zbxalgo.h"
 
 #define zbx_serialize_prepare_str(len, str)					\
 	do									\
