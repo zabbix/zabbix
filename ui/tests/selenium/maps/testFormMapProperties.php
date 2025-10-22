@@ -66,7 +66,6 @@ class testFormMapProperties extends CWebTest {
 				]
 			]
 		]);
-
 		$mapping_ids = CDataHelper::getIds('name');
 
 		CDataHelper::call('image.create', [
@@ -79,7 +78,6 @@ class testFormMapProperties extends CWebTest {
 					'rvOu867zrvOu867zrvOu867zrvugNJxGmwt/UO4QAAAABJRU5ErkJggg=='
 			]
 		]);
-
 		$background_ids = CDataHelper::getIds('name');
 
 		CDataHelper::call('map.create', [
@@ -313,7 +311,6 @@ class testFormMapProperties extends CWebTest {
 				'maxlength' => '2048'
 			]
 		];
-
 		foreach ($inputs as $field => $attributes) {
 			$this->assertTrue($form->getField($field)->isAttributePresent($attributes));
 		}
@@ -338,6 +335,12 @@ class testFormMapProperties extends CWebTest {
 			'Problem display' => ['All', 'Separated', 'Unacknowledged only'],
 			'xpath://z-select[@name="urls[0][elementtype]"]' => ['Host', 'Host group', 'Image', 'Map', 'Trigger']
 		];
+		foreach ($dropdowns as $field => $options) {
+			$this->assertEquals($options, $form->getField($field)->getOptions()->asText());
+		}
+
+		$form->getField('Advanced labels')->check();
+		$this->assertTrue($form->getField('Map element label type')->isVisible(false));
 
 		$dropdowns_advanced_labels = [
 			'Host group label type' => ['Label', 'Element name', 'Status only', 'Nothing', 'Custom label'],
@@ -346,15 +349,6 @@ class testFormMapProperties extends CWebTest {
 			'Map label type' => ['Label', 'Element name', 'Status only', 'Nothing', 'Custom label'],
 			'Image label type' => ['Label', 'Element name', 'Nothing', 'Custom label']
 		];
-
-		foreach ($dropdowns as $field => $options) {
-			($field == 'xpath://z-select[@name="urls[0][elementtype]"]')
-				? $this->assertEquals($options, $form->getField($field)->asDropdown()->getOptions()->asText())
-				: $this->assertEquals($options, $form->getField($field)->getOptions()->asText());
-		}
-
-		$form->getField('Advanced labels')->check();
-
 		foreach ($dropdowns_advanced_labels as $field => $options) {
 			$this->assertEquals($options, $form->getField($field)->getOptions()->asText());
 		}
@@ -368,19 +362,19 @@ class testFormMapProperties extends CWebTest {
 			'Image label type' => 'Custom label'
 		]);
 
-		$custom_label_xpath = [
+		$textarea_xpath = [
 			'xpath://textarea[@name="label_string_hostgroup"]',
 			'xpath://textarea[@name="label_string_host"]',
 			'xpath://textarea[@name="label_string_trigger"]',
 			'xpath://textarea[@name="label_string_map"]',
 			'xpath://textarea[@name="label_string_image"]'
 		];
-
-		foreach($custom_label_xpath as $xpath) {
-			$field = $form->getField($xpath);
+		foreach ($textarea_xpath as $textarea) {
+			$field = $form->getField($textarea);
 			$this->assertEquals('', $field->getValue());
-			$this->assertEquals('false', $field->getAttribute('spellcheck'));
-			$this->assertEquals(255, $field->getAttribute('maxlength'));
+			foreach (['rows' => 7, 'maxlength' => 255, 'spellcheck' => 'false'] as $attribute => $value) {
+				$this->assertEquals($value, $field->getAttribute($attribute));
+			}
 		}
 
 		// Check radio buttons.
@@ -392,20 +386,9 @@ class testFormMapProperties extends CWebTest {
 			],
 			'Minimum severity' => ['Not classified', 'Information', 'Warning', 'Average', 'High', 'Disaster']
 		];
-
 		foreach ($radiobuttons as $field => $options) {
 			$this->assertEquals($options, $form->getField($field)->getLabels()->asText());
 		}
-
-		// Check custom label attributes and values.
-		$form->fill([
-			'Host group label type' => 'Custom label',
-			'Host label type' => 'Custom label',
-			'Trigger label type' => 'Custom label',
-			'Map label type' => 'Custom label',
-			'Image label type' => 'Custom label'
-			]
-		);
 
 		// Check link to mappings.
 		$mappings_url = $form->query('link:show icon mappings')->one();
@@ -420,7 +403,7 @@ class testFormMapProperties extends CWebTest {
 		$this->assertEquals(['Name', 'URL', 'Element', 'Action'], $url_table->getHeadersText());
 
 		foreach (['Add', 'Remove'] as $button) {
-			$this->assertTrue($url_table->query('button:'.$button)->one()->isClickable());
+			$this->assertTrue($url_table->query('button', $button)->one()->isClickable());
 		}
 
 		foreach (['id:add', 'id:cancel'] as $button) {
@@ -448,7 +431,7 @@ class testFormMapProperties extends CWebTest {
 			// Add user group / user to check remove and hidden radio buttons.
 			$button_add->click();
 			$name = ($label === 'List of user group shares') ? 'Internal' : 'Admin';
-			COverlayDialogElement::find()->one()->waitUntilReady()->query('link:'.$name)->one()->click();
+			COverlayDialogElement::find()->one()->waitUntilReady()->query('link', $name)->one()->click();
 			COverlayDialogElement::ensureNotPresent();
 
 			$this->assertTrue($table_element->query('button:Remove')->one()->isClickable());
@@ -2221,54 +2204,52 @@ class testFormMapProperties extends CWebTest {
 	public function testFormMapProperties_Clone() {
 		// Expected parameters of the cloned map.
 		$data = [
-			'result' => [
-				'Owner' => ['Admin (Zabbix Administrator)'],
-				'Name' => self::CLONED_MAP,
-				'Width' => '1000',
-				'Height' => '1000',
-				'Background image' => self::BACKGROUND_IMAGE,
-				'Automatic icon mapping' => self::ICON_MAPPING,
-				'Icon highlight' => true,
-				'Mark elements on trigger status change' => true,
-				'Display problems' => 'Number of problems and expand most critical one',
-				'Advanced labels' => true,
-				'Host group label type' => 'Custom label',
-				'Host label type' => 'Custom label',
-				'Trigger label type' => 'Status only',
-				'Map label type' => 'Element name',
-				'Image label type' => 'Label',
-				'id:label_string_host' => STRING_255,
-				'id:label_string_hostgroup' => 'Host group label 📰📰📰',
-				'Map element label location' => 'Top',
-				'Problem display' => 'Separated',
-				'Minimum severity' => 'High',
-				'Show suppressed problems' => true,
-				'URLs' => [
-					[
-						'Name' => '1 Host URL 📰📰📰',
-						'URL' => 'test 📰📰📰',
-						'Element' => 'Host'
-					],
-					[
-						'Name' => '2 Image URL',
-						'URL' => 'test',
-						'Element' => 'Image'
-					],
-					[
-						'Name' => '3 Trigger URL',
-						'URL' => 'test',
-						'Element' => 'Trigger'
-					],
-					[
-						'Name' => '4 Host group - xss',
-						'URL' => self::XSS_EXAMPLE,
-						'Element' => 'Host group'
-					],
-					[
-						'Name' => STRING_255,
-						'URL' => STRING_2048,
-						'Element' => 'Map'
-					]
+			'Owner' => ['Admin (Zabbix Administrator)'],
+			'Name' => self::CLONED_MAP,
+			'Width' => '1000',
+			'Height' => '1000',
+			'Background image' => self::BACKGROUND_IMAGE,
+			'Automatic icon mapping' => self::ICON_MAPPING,
+			'Icon highlight' => true,
+			'Mark elements on trigger status change' => true,
+			'Display problems' => 'Number of problems and expand most critical one',
+			'Advanced labels' => true,
+			'Host group label type' => 'Custom label',
+			'Host label type' => 'Custom label',
+			'Trigger label type' => 'Status only',
+			'Map label type' => 'Element name',
+			'Image label type' => 'Label',
+			'id:label_string_host' => STRING_255,
+			'id:label_string_hostgroup' => 'Host group label 📰📰📰',
+			'Map element label location' => 'Top',
+			'Problem display' => 'Separated',
+			'Minimum severity' => 'High',
+			'Show suppressed problems' => true,
+			'URLs' => [
+				[
+					'Name' => '1 Host URL 📰📰📰',
+					'URL' => 'test 📰📰📰',
+					'Element' => 'Host'
+				],
+				[
+					'Name' => '2 Image URL',
+					'URL' => 'test',
+					'Element' => 'Image'
+				],
+				[
+					'Name' => '3 Trigger URL',
+					'URL' => 'test',
+					'Element' => 'Trigger'
+				],
+				[
+					'Name' => '4 Host group - xss',
+					'URL' => self::XSS_EXAMPLE,
+					'Element' => 'Host group'
+				],
+				[
+					'Name' => STRING_255,
+					'URL' => STRING_2048,
+					'Element' => 'Map'
 				]
 			]
 		];
@@ -2285,7 +2266,7 @@ class testFormMapProperties extends CWebTest {
 
 		// Re-open cloned map and check configuration.
 		$table->findRow('Name', self::CLONED_MAP)->query('link:Properties')->one()->click();
-		$this->query('id:sysmap-form')->waitUntilPresent()->asForm()->one()->checkValue($data['result']);
+		$form->checkValue($data);
 
 		// Check that cloned map is present in the database.
 		$this->assertEquals(1, CDBHelper::getCount('SELECT sysmapid FROM sysmaps WHERE name=\''.self::CLONED_MAP.'\''));
@@ -2300,7 +2281,7 @@ class testFormMapProperties extends CWebTest {
 		$this->page->waitUntilReady();
 		$this->assertMessage(TEST_GOOD, 'Network map deleted');
 
-		// Check the pressence of the map in the list and database.
+		// Check the presence of the map in the list and database.
 		$this->assertFalse($table->findRow('Name', self::MAP_CLONE, true)->isPresent());
 		$this->assertEquals(0, CDBHelper::getCount('SELECT sysmapid FROM sysmaps WHERE name=\''.self::MAP_CLONE.'\''));
 	}
