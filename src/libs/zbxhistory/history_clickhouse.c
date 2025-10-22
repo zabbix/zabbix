@@ -522,14 +522,15 @@ static int	history_clickhouse_flush_conns(zbx_clickhouse_data_t *d, CURLM *mhand
 	{
 		if (CURLM_OK != (code = curl_multi_perform(mhandle, &running)))
 		{
-			*error = zbx_dsprintf(NULL, "cannot perform on curl multi handle: %s",
+			*error = zbx_dsprintf(*error, "cannot perform on curl multi handle: %s",
 					curl_multi_strerror(code));
 			break;
 		}
 
 		if (CURLM_OK != (code = zbx_curl_multi_wait(mhandle, ZBX_HISTORY_STORAGE_TIMEOUT_MS, NULL)))
 		{
-			*error = zbx_dsprintf(NULL, "cannot wait on curl multi handle: %s", curl_multi_strerror(code));
+			*error = zbx_dsprintf(*error, "cannot wait on curl multi handle: %s",
+					curl_multi_strerror(code));
 			break;
 		}
 
@@ -577,38 +578,38 @@ static int	history_clickhouse_flush_conns(zbx_clickhouse_data_t *d, CURLM *mhand
 			if (CURLM_OK != (code = curl_multi_remove_handle(mhandle, msg->easy_handle)))
 			{
 				zabbix_log(LOG_LEVEL_WARNING, "cannot remove handle from curl curl handle: %s",
-							curl_multi_strerror(code));
+						curl_multi_strerror(code));
 			}
+
+			continue;
 		}
-		else
+
+		long		status;
+		CURLcode	err;
+
+		if (CURLE_OK != (err = curl_easy_getinfo(msg->easy_handle, CURLINFO_RESPONSE_CODE, &status)))
 		{
-			long 		status;
-			CURLcode	err;
-
-			if (CURLE_OK != (err = curl_easy_getinfo(msg->easy_handle, CURLINFO_RESPONSE_CODE, &status)))
-			{
-				history_clickhouse_add_error(error, "cannot obtain HTTP response code: %s",
-						curl_easy_strerror(err));
-				continue;
-			}
-
-			if (400 > status)
-			{
-				conn->status = SUCCEED;
-			}
-			else
-			{
-				history_clickhouse_add_error(error, "cannot send query to ClickHouse,"
-						" HTTP response code: %ld",
-						status);
-
-				if (NULL != conn->resp.page.data)
-				{
-					history_clickhouse_add_error(error, ", ClickHouse error: %s",
-							conn->resp.page.data);
-				}
-			}
+			history_clickhouse_add_error(error, "cannot obtain HTTP response code: %s",
+					curl_easy_strerror(err));
+			continue;
 		}
+
+		if (400 <= status)
+		{
+			history_clickhouse_add_error(error, "cannot send query to ClickHouse,"
+				" HTTP response code: %ld",
+				status);
+
+			if (NULL != conn->resp.page.data)
+			{
+				history_clickhouse_add_error(error, ", ClickHouse error: %s",
+						conn->resp.page.data);
+			}
+
+			continue;
+		}
+
+		conn->status = SUCCEED;
 	}
 
 	int	retries_num = retries.values_num;
