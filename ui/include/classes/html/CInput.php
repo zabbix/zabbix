@@ -77,7 +77,7 @@ class CInput extends CTag {
 	 *
 	 * @return static
 	 */
-	public function setErrorContainer(?string $container_id): self {
+	public function setErrorContainer(?string $container_id): static {
 		$this->setAttribute('data-error-container', $container_id);
 
 		return $this;
@@ -90,7 +90,7 @@ class CInput extends CTag {
 	 *
 	 * @return static
 	 */
-	public function setErrorLabel(?string $label): self {
+	public function setErrorLabel(?string $label): static {
 		$this->setAttribute('data-error-label', $label);
 
 		return $this;
