@@ -359,7 +359,7 @@ class CRouter {
 		'token.update'								=> [CControllerTokenUpdate::class,									'layout.json',			null],
 		'toptriggers.list'							=> [CControllerTopTriggersList::class,								'layout.htmlpage',		'reports.toptriggers.list'],
 		'trigdisplay.edit'							=> [CControllerTrigDisplayEdit::class,								'layout.htmlpage',		'administration.trigdisplay.edit'],
-		'trigdisplay.update'						=> [CControllerTrigDisplayUpdate::class,							null,					null],
+		'trigdisplay.update'						=> [CControllerTrigDisplayUpdate::class, 							'layout.json',			null],
 		'trigger.create'							=> [CControllerTriggerCreate::class,								'layout.json',			null],
 		'trigger.delete'							=> [CControllerTriggerDelete::class,								'layout.json',			null],
 		'trigger.disable'							=> [CControllerTriggerDisable::class,								'layout.json',			null],

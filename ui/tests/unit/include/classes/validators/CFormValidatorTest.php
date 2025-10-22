@@ -816,6 +816,14 @@ class CFormValidatorTest extends TestCase {
 				]],
 				null,
 				'[RULES ERROR] Only fields defined prior to this can be used for "when" checks (Path: /dns)'
+			],
+			[
+				['object', 'fields' => [
+					'color' => ['string', 'rgb']
+				]],
+				['type' => 'object', 'fields' => [
+					'color' => [['type' => 'string', 'regex' => '/^[A-F0-9]{6}$/']]
+				]]
 			]
 		];
 	}

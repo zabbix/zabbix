@@ -171,6 +171,13 @@ class CFormValidator {
 
 					$result['not_in'] = self::parseIn(substr($value, 7));
 				}
+				elseif ($value === 'rgb') {
+					if (array_key_exists('regex', $result)) {
+						throw new Exception('[RULES ERROR] Rule "regex" is specified multiple times (Path: '.$rule_path.')');
+					}
+
+					$result['regex'] = '/^[A-F0-9]{6}$/';
+				}
 				else {
 					throw new Exception('[RULES ERROR] Unknown rule "'.$value.'" (Path: '.$rule_path.')');
 				}

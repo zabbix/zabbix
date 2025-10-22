@@ -176,6 +176,7 @@ $available_js = [
 	'class.field.set.js' => 'fields/',
 	'class.field.textarea.js' => 'fields/',
 	'class.field.textbox.js' => 'fields/',
+	'class.field.zcolorpicker.js' => 'fields/',
 	'class.field.zselect.js' => 'fields/'
 ];
 
@@ -280,6 +281,7 @@ $translate_strings = [
 	'functions.js' => [
 		'Close' => _('Close'),
 		'Details' => _('Details'),
+		'Info message' => _('Info message'),
 		'S_YEAR_SHORT' => _x('y', 'year short'),
 		'S_MONTH_SHORT' => _x('M', 'month short'),
 		'S_DAY_SHORT' => _x('d', 'day short'),
@@ -616,6 +618,11 @@ $translate_strings = [
 		'Reset all fields to default values?' => _('Reset all fields to default values?'),
 		'Reset confirmation' => _('Reset confirmation'),
 		'Reset defaults' => _('Reset defaults')
+	],
+	'administration.trigdisplay.edit.js.php' => [
+		'Reset all fields to default values?' => _('Reset all fields to default values?'),
+		'Reset confirmation' => _('Reset confirmation'),
+		'Reset defaults' => _('Reset defaults')
 	]
 ];
 
@@ -653,6 +660,7 @@ if (empty($_GET['files'])) {
 		'class.field.set.js',
 		'class.field.textarea.js',
 		'class.field.textbox.js',
+		'class.field.zcolorpicker.js',
 		'class.field.zselect.js',
 		'class.form.js',
 		'class.form.validator.js',
@@ -758,7 +766,8 @@ if (empty($_GET['files'])) {
 		'administration.gui.edit.js.php',
 		'administration.housekeeping.edit.js.php',
 		'administration.miscconfig.edit.js.php',
-		'administration.timeouts.edit.js.php'
+		'administration.timeouts.edit.js.php',
+		'administration.trigdisplay.edit.js.php',
 	];
 
 	if (CCookieHelper::has(ZBX_SESSION_NAME)) {
