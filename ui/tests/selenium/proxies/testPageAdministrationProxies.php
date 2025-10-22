@@ -308,10 +308,12 @@ class testPageAdministrationProxies extends CWebTest {
 
 		// Reset filter in case if some filtering remained before ongoing test case.
 		$form->query('button:Reset')->one()->click();
+		$table = $this->getTable();
 
 		// Fill filter form with data.
 		$form->fill($data['filter']);
 		$form->submit();
+		$table->waitUntilReloaded();
 		$this->page->waitUntilReady();
 
 		// Check filtered result.

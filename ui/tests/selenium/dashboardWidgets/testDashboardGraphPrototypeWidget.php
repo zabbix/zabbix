@@ -231,13 +231,9 @@ class testDashboardGraphPrototypeWidget extends testWidgets {
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::SCREENSHOT_DASHBOARD_ID);
 		$dashboard = CDashboardElement::find()->one();
 		$form = $dashboard->edit()->addWidget()->asForm();
-		if ($form->getField('Type')->getText() !== 'Graph prototype') {
-			$form->fill(['Type' => 'Graph prototype']);
-			$form->waitUntilReloaded();
-		}
+		$form->fill(['Type' => CFormElement::RELOADABLE_FILL('Graph prototype')]);
 		$this->page->removeFocus();
-		sleep(1);
-		$dialog = COverlayDialogElement::find()->one();
+		$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
 		$this->assertScreenshot($dialog);
 		$dialog->close();
 	}
