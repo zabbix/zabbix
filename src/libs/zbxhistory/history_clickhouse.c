@@ -37,8 +37,7 @@ typedef struct
 {
 	unsigned char		value_type;
 	int			status;
-	char			*post_url;
-	char			*buf;
+	char			*post_data;
 	CURL			*handle;
 
 	zbx_curl_response_t	resp;
@@ -90,8 +89,7 @@ static char	*clickhouse_history_tables[] = {"history", "history_str", "history_l
 static void	clickhouse_conn_free(zbx_clickhouse_conn_t *conn)
 {
 	curl_easy_cleanup(conn->handle);
-	zbx_free(conn->post_url);
-	zbx_free(conn->buf);
+	zbx_free(conn->post_data);
 
 	zbx_free(conn->resp.page.data);
 	zbx_free(conn);
@@ -447,13 +445,13 @@ static void	history_clickhouse_write(void *data, unsigned char value_type,
 		return;
 	}
 
-	if (NULL != conn->buf)
+	if (NULL != conn->post_data)
 	{
 		THIS_SHOULD_NEVER_HAPPEN_MSG("ClickHouse connection buffer has not been freed before write");
-		zbx_free(conn->buf);
+		zbx_free(conn->post_data);
 	}
 
-	conn->buf = post_data;
+	conn->post_data = post_data;
 
 	if (0 != conn->resp.page.alloc)
 	{
@@ -662,7 +660,7 @@ static zbx_uint64_t	history_clickhouse_flush(void *data)
 		}
 
 		zabbix_log(LOG_LEVEL_TRACE, "posting history to ClickHouse for value_type %d: %s", conn->value_type,
-				conn->buf);
+				conn->post_data);
 	}
 
 	while (1)
@@ -707,7 +705,7 @@ out:
 
 		curl_easy_setopt(conn->handle, CURLOPT_POSTFIELDS, NULL);
 
-		zbx_free(conn->buf);
+		zbx_free(conn->post_data);
 		zbx_free(conn->resp.page.data);
 		conn->resp.page.alloc = 0;
 
