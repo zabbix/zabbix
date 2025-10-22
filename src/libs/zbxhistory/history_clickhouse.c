@@ -429,7 +429,7 @@ static void	history_clickhouse_write(void *data, unsigned char value_type,
 
 		zbx_json_adduint64(&row, NULL, entries[i]->itemid);
 		history_clickhouse_write_value(&row, &entries[i]->value, (zbx_item_value_type_t)value_type);
-		
+
 		zbx_snprintf(timestamp, sizeof(timestamp), "%d.%09d", entries[i]->ts.sec, entries[i]->ts.ns);
 		zbx_json_addstring(&row, NULL, timestamp, ZBX_JSON_TYPE_STRING);
 
