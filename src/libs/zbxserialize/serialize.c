@@ -14,8 +14,6 @@
 
 #include "zbxserialize.h"
 
-#include "zbxalgo.h"
-
 /******************************************************************************
  *                                                                            *
  * Purpose: serialize 31 bit unsigned integer into utf-8 like byte stream     *
