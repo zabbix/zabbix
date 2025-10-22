@@ -2404,6 +2404,13 @@ div[data-field-type="set"].has-error {
   color: #ffffff;
   -webkit-text-fill-color: #ffffff; }
 
+.checkbox-list.has-error [type="checkbox"] + label span {
+  border: 1px solid #ad1f1f;
+  color: #ffffff; }
+.checkbox-list.has-error [type="checkbox"]:checked + label span::after {
+  border-left-color: #ad1f1f;
+  border-bottom-color: #ad1f1f; }
+
 .checkbox-radio[type="checkbox"].has-error + label span {
   border: 1px solid #ad1f1f;
   color: #ffffff; }
