@@ -30,15 +30,22 @@ class CControllerUsergroupUpdate extends CControllerUsergroupUpdateGeneral {
 			'usrgrpid' => ['db usrgrp.usrgrpid', 'required'],
 			'userids' => ['array', 'field' => ['db users_groups.userid']],
 			'name' => ['db usrgrp.name', 'required', 'not_empty'],
+			'can_update_group' => ['boolean'],
 			'gui_access' => ['integer', 'required',
 				'in' => [GROUP_GUI_ACCESS_SYSTEM, GROUP_GUI_ACCESS_INTERNAL, GROUP_GUI_ACCESS_LDAP,
 					GROUP_GUI_ACCESS_DISABLED
-				]
+				],
+				'when' => ['can_update_group', 'in' => [1]]
 			],
 			'userdirectoryid' => ['db userdirectory.userdirectoryid',
-				'when' => ['gui_access', 'in' => [GROUP_GUI_ACCESS_SYSTEM, GROUP_GUI_ACCESS_LDAP]]
+				'when' => [
+					['can_update_group', 'in' => [1]],
+					['gui_access', 'in' => [GROUP_GUI_ACCESS_SYSTEM, GROUP_GUI_ACCESS_LDAP]]
+				]
 			],
-			'mfaid' => ['integer'],
+			'mfaid' => ['integer',
+				'when' => ['can_update_group', 'in' => [1]]
+			],
 			'users_status' => ['db usrgrp.users_status'],
 			'debug_mode' => ['db usrgrp.debug_mode'],
 			'templategroup_rights' => ['objects', 'fields' => [

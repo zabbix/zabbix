@@ -33,7 +33,8 @@ $form = (new CForm())
 	->setId('user-group-form')
 	->setName('user_group_form')
 	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)
-	->addVar('usrgrpid', $data['usrgrpid']);
+	->addVar('usrgrpid', $data['usrgrpid'])
+	->addVar('can_update_group', $data['can_update_group'] ? 1 : 0);
 
 $form_grid = (new CFormGrid())
 	->addItem([
