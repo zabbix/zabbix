@@ -100,7 +100,7 @@ void	zbx_mock_test_entry(void **state)
 	else
 		recv_return = 0;
 
-	mock_poll_set_mode_from_param(poll_mode);
+	zbx_comms_mock_poll_set_mode_from_param(poll_mode);
 	set_nonblocking_error();
 
 	/* 0 used for timeout - poll() is wrapped for tests */

@@ -34,7 +34,7 @@ void	zbx_mock_test_entry(void **state)
 	ZBX_UNUSED(state);
 
 	set_nonblocking_error();
-	set_test_comms(SUCCEED);
+	zbx_comms_set_test_comms(SUCCEED);
 	memset(&s, 0, sizeof(s));
 
 	zbx_vector_str_create(&exp_result_v);
@@ -46,7 +46,7 @@ void	zbx_mock_test_entry(void **state)
 	if (5 < read_return_seq.values_num)
 		fail_msg("Too many elements in read_return_seq: %d (max 5)", read_return_seq.values_num);
 
-	setup_read(&read_return_seq);
+	zbx_comms_setup_read(&read_return_seq);
 
 	zbx_strlcpy(s.buf_stat, buf_stat, ZBX_STAT_BUF_LEN - 1);
 	s.buffer = s.buf_stat;

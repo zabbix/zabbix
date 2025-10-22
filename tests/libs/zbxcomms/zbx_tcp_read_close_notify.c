@@ -31,7 +31,7 @@ void	zbx_mock_test_entry(void **state)
 
 	ZBX_UNUSED(state);
 
-	set_test_comms(SUCCEED);
+	zbx_comms_set_test_comms(SUCCEED);
 	zbx_vector_int32_create(&read_return_seq);
 
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
@@ -43,7 +43,7 @@ void	zbx_mock_test_entry(void **state)
 	if (5 < read_return_seq.values_num)
 		fail_msg("Too many elements in read_return_seq: %d (max 5)", read_return_seq.values_num);
 
-	setup_read(&read_return_seq);
+	zbx_comms_setup_read(&read_return_seq);
 
 	if (SUCCEED == zbx_mock_parameter_exists("in.event_is_null"))
 	{

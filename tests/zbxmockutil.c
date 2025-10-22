@@ -485,7 +485,7 @@ void	zbx_mock_extract_yaml_values_str(const char *path, zbx_vector_str_t *values
 
 /******************************************************************************
  *                                                                            *
- * Parameters: hdata  - [IN]  data handle                                    *
+ * Parameters: hdata  - [IN]  data handle                                     *
  *             values - [OUT]                                                 *
  *                                                                            *
  ******************************************************************************/
@@ -507,7 +507,7 @@ void	zbx_mock_extract_yaml_values_ptr(zbx_mock_handle_t hdata, zbx_vector_ptr_t 
 
 /******************************************************************************
  *                                                                            *
- * Parameters: hdata  - [IN]  data handle                                    *
+ * Parameters: hdata  - [IN]  data handle                                     *
  *             values - [OUT]                                                 *
  *                                                                            *
  ******************************************************************************/
@@ -529,7 +529,7 @@ void	zbx_mock_extract_yaml_values_uint64(zbx_mock_handle_t hdata, zbx_vector_uin
 
 /******************************************************************************
  *                                                                            *
- * Parameters: hdata  - [IN]  data handle                                    *
+ * Parameters: hdata  - [IN]  data handle                                     *
  *             values - [OUT]                                                 *
  *                                                                            *
  ******************************************************************************/

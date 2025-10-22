@@ -62,7 +62,7 @@ void	zbx_mock_test_entry(void **state)
 	for (int i = 0; i < recvfrom_return_seq.values_num; i++)
 		recvfrom_return[i] = recvfrom_return_seq.values[i];
 
-	mock_poll_set_mode_from_param(zbx_mock_get_parameter_string("in.poll_mode"));
+	zbx_comms_mock_poll_set_mode_from_param(zbx_mock_get_parameter_string("in.poll_mode"));
 	set_nonblocking_error();
 
 	/* 0 used for timeout - poll() is wrapped for tests */

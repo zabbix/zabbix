@@ -844,7 +844,9 @@ ssize_t	zbx_tcp_write(zbx_socket_t *s, const char *buf, size_t len, short *event
  *                                                                            *
  * Parameters: data     - [IN] pointer to data to send                        *
  *             len      - [IN] length of data to send                         *
- *             reserved - [IN] size of uncompressed data (if compression)     *
+ *             reserved - [IN] original size of the uncompressed data.        *
+ *                             If zero, compression will be applied when      *
+ *                             requested by flags.                            *
  *             flags    - [IN] protocol and compression flags                 *
  *             context  - [OUT] pointer to send context structure             *
  *                                                                            *
@@ -947,8 +949,8 @@ void	zbx_tcp_send_context_clear(zbx_tcp_send_context_t *state)
  * Purpose: send data                                                         *
  *                                                                            *
  * Parameters: s       - [IN/OUT]                                             *
- *             context - [IN/OUT] pointer to send context structure           *
- *             event   - [OUT]    pointer to event flag (optional)            *
+ *             context - [IN/OUT]                                             *
+ *             event   - [OUT]    event flag (optional)                       *
  *                                                                            *
  *                                                                            *
  * Return value: SUCCEED - success                                            *
@@ -2902,6 +2904,7 @@ int	zbx_udp_connect(zbx_socket_t *s, const char *source_ip, const char *ip, unsi
  *             data     - [IN]     pointer to data to send                    *
  *             data_len - [IN]     length of data to send                     *
  *             timeout  - [IN]     maximum time to wait for send (seconds)    *
+ *                                 range: 0 - INT_MAX                         *
  *                                                                            *
  * Return value: SUCCEED - data sent successfully                             *
  *               FAIL    - an error occurred                                  *
@@ -2973,7 +2976,8 @@ int	zbx_udp_send(zbx_socket_t *s, const char *data, size_t data_len, int timeout
  * Purpose: receive data from UDP socket                                      *
  *                                                                            *
  * Parameters: s       - [IN/OUT]                                             *
- *             timeout - [IN] maximum time to wait for data (milliseconds)    *
+ *             timeout - [IN] maximum time to wait for data (seconds)         *
+ *                            range: 0 - INT_MAX                              *
  *                                                                            *
  * Return value: SUCCEED - data received successfully                         *
  *               FAIL    - an error occurred                                  *

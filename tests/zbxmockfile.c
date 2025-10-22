@@ -206,7 +206,7 @@ int	__wrap_connect(int socket, void *addr, socklen_t address_len)
 
 static int	g_mock_poll_mode = MOCK_POLL_DEFAULT;
 
-void	mock_poll_set_mode_from_param(const char *param)
+void	zbx_comms_mock_poll_set_mode_from_param(const char *param)
 {
 	if (0 == strcmp(param, "MOCK_POLL_TIMEOUT"))
 		g_mock_poll_mode = MOCK_POLL_TIMEOUT;
@@ -254,9 +254,9 @@ int	__wrap_poll(struct pollfd *pds, int nfds, int timeout)
 static const char	*frag_data = NULL;
 static const char	*frag_pos = NULL;
 static size_t		frag_sz = 0;
-static int		test_comms = FAIL;
-static int		read_iter = 0;
-static int		read_ret[5];
+static int		zbx_comms_test_comms = FAIL;
+static int		zbx_comms_read_iter = 0;
+static int		zbx_comms_read_ret[5];
 
 static int	next_fragment(void)
 {
@@ -307,10 +307,10 @@ ssize_t	__wrap_read(int fildes, void *buf, size_t nbyte)
 
 	ZBX_UNUSED(fildes);
 
-	if (SUCCEED == test_comms)
+	if (SUCCEED == zbx_comms_test_comms)
 	{
-		int	ret = read_ret[read_iter];
-		read_iter++;
+		int	ret = zbx_comms_read_ret[zbx_comms_read_iter];
+		zbx_comms_read_iter++;
 
 		return ret;
 	}
@@ -333,15 +333,15 @@ ssize_t	__wrap_read(int fildes, void *buf, size_t nbyte)
 	return mv_len;
 }
 
-void	set_test_comms(int status)
+void	zbx_comms_set_test_comms(int status)
 {
-	test_comms = status;
+	zbx_comms_test_comms = status;
 }
 
-void	setup_read(zbx_vector_int32_t *v)
+void	zbx_comms_setup_read(zbx_vector_int32_t *v)
 {
 	for (int i = 0; i < v->values_num; i++)
-		read_ret[i] = v->values[i];
+		zbx_comms_read_ret[i] = v->values[i];
 }
 
 off_t	__wrap_lseek(int fd, off_t offset, int whence)

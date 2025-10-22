@@ -39,7 +39,7 @@ void	zbx_mock_test_entry(void **state)
 
 	ZBX_UNUSED(state);
 
-	mock_poll_set_mode_from_param(zbx_mock_get_parameter_string("in.poll_mode"));
+	zbx_comms_mock_poll_set_mode_from_param(zbx_mock_get_parameter_string("in.poll_mode"));
 	set_nonblocking_error();
 
 	/* 0 used for timeout - poll() is wrapped for tests */
