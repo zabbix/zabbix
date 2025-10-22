@@ -391,10 +391,10 @@ static void	history_clickhouse_write(void *data, unsigned char value_type,
 {
 	zbx_clickhouse_data_t	*d = (zbx_clickhouse_data_t *)data;
 	zbx_clickhouse_conn_t	*conn;
-	char			*error = NULL, url[MAX_STRING_LEN], *buf = NULL;
-	size_t			buf_alloc = 0, buf_offset = 0;
+	char			*error = NULL, url[MAX_STRING_LEN], *post_data = NULL;
+	size_t			post_data_alloc = 0, post_data_offset = 0;
 	CURLcode		err;
-	zbx_json_t		row;
+	zbx_json_t		json_array;
 
 	conn = history_clickhouse_get_conn(d, value_type);
 	conn->status = FAIL;
@@ -419,29 +419,29 @@ static void	history_clickhouse_write(void *data, unsigned char value_type,
 		return;
 	}
 
-	zbx_json_initarray(&row, 1024);
+	zbx_json_initarray(&json_array, 1024);
 
 	for (int i = 0; i < entries_num; i++)
 	{
 		char	timestamp[MAX_ID_LEN * 2];
 
-		zbx_json_adduint64(&row, NULL, entries[i]->itemid);
-		history_clickhouse_write_value(&row, &entries[i]->value, (zbx_item_value_type_t)value_type);
+		zbx_json_adduint64(&json_array, NULL, entries[i]->itemid);
+		history_clickhouse_write_value(&json_array, &entries[i]->value, (zbx_item_value_type_t)value_type);
 
 		zbx_snprintf(timestamp, sizeof(timestamp), "%d.%09d", entries[i]->ts.sec, entries[i]->ts.ns);
-		zbx_json_addstring(&row, NULL, timestamp, ZBX_JSON_TYPE_STRING);
+		zbx_json_addstring(&json_array, NULL, timestamp, ZBX_JSON_TYPE_STRING);
 
-		zbx_strcpy_alloc(&buf, &buf_alloc, &buf_offset, row.buffer);
-		zbx_chrcpy_alloc(&buf, &buf_alloc, &buf_offset, '\n');
+		zbx_strcpy_alloc(&post_data, &post_data_alloc, &post_data_offset, json_array.buffer);
+		zbx_chrcpy_alloc(&post_data, &post_data_alloc, &post_data_offset, '\n');
 
-		zbx_json_setempty(&row);
-		zbx_json_addarray(&row, NULL);
+		zbx_json_setempty(&json_array);
+		zbx_json_addarray(&json_array, NULL);
 	}
-	zbx_json_free(&row);
+	zbx_json_free(&json_array);
 
-	if (CURLE_OK != (err = curl_easy_setopt(conn->handle, CURLOPT_POSTFIELDS, buf)))
+	if (CURLE_OK != (err = curl_easy_setopt(conn->handle, CURLOPT_POSTFIELDS, post_data)))
 	{
-		zbx_free(buf);
+		zbx_free(post_data);
 		zabbix_log(LOG_LEVEL_WARNING, "cannot write data to ClickHouse: cannot set curl option %d: %s",
 				(int)CURLOPT_URL, curl_easy_strerror(err));
 		return;
@@ -453,7 +453,7 @@ static void	history_clickhouse_write(void *data, unsigned char value_type,
 		zbx_free(conn->buf);
 	}
 
-	conn->buf = buf;
+	conn->buf = post_data;
 
 	if (0 != conn->resp.page.alloc)
 	{
