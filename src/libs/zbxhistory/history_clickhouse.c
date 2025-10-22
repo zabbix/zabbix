@@ -412,9 +412,7 @@ static void	history_clickhouse_write(void *data, unsigned char value_type,
 			"&query=INSERT%%20INTO%%20%s%%20FORMAT%%20JSONCompactEachRow", d->base_url, d->db,
 			clickhouse_history_tables[value_type]);
 
-	err = curl_easy_setopt(conn->handle, CURLOPT_URL, url);
-
-	if (CURLE_OK != err)
+	if (CURLE_OK != (err = curl_easy_setopt(conn->handle, CURLOPT_URL, url)))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot write data to ClickHouse: cannot set curl option %d: %s",
 				(int)CURLOPT_URL, curl_easy_strerror(err));
