@@ -15,6 +15,7 @@
 #include "async_http.h"
 #include "zbxcommon.h"
 #include "zbxsysinc.h"
+#include "zbxcurl.h"
 #include "zbxip.h"
 #include "zbx_discoverer_constants.h"
 #ifdef HAVE_LIBCURL
