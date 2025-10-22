@@ -109,10 +109,7 @@ class testCalculatedExpression extends CIntegrationTest {
 		self::$itemIds = array_merge(self::$itemIds, $response['result']['itemids']);
 	}
 
-
-	/**
-	 * Helper: create calculated item with given formula and return its itemid
-	 */
+	// create calculated item with given formula and return its itemid
 	private function createCalculatedItemWithFormula($formula, $keySuffix)
 	{
 		$response = $this->call('item.create', [
