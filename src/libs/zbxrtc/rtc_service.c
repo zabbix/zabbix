@@ -474,9 +474,7 @@ static void	rtc_process_request(zbx_rtc_t *rtc, zbx_uint32_t code, const unsigne
 			zbx_rtc_notify(rtc, ZBX_PROCESS_TYPE_SNMP_POLLER, 0, ZBX_RTC_SNMP_CACHE_RELOAD, NULL, 0);
 			zbx_rtc_notify(rtc, ZBX_PROCESS_TYPE_POLLER, 0, ZBX_RTC_SNMP_CACHE_RELOAD, NULL, 0);
 			zbx_rtc_notify(rtc, ZBX_PROCESS_TYPE_UNREACHABLE, 0, ZBX_RTC_SNMP_CACHE_RELOAD, NULL, 0);
-			zbx_rtc_notify(rtc, ZBX_PROCESS_TYPE_TRAPPER, 0, ZBX_RTC_SNMP_CACHE_RELOAD, NULL, 0);
 			zbx_rtc_notify(rtc, ZBX_PROCESS_TYPE_DISCOVERYMANAGER, 0, ZBX_RTC_SNMP_CACHE_RELOAD, NULL, 0);
-			zbx_rtc_notify(rtc, ZBX_PROCESS_TYPE_TASKMANAGER, 0, ZBX_RTC_SNMP_CACHE_RELOAD, NULL, 0);
 #else
 			*result = zbx_strdup(NULL, "Invalid runtime control option: no SNMP support enabled\n");
 #endif

@@ -250,7 +250,7 @@ func run() error {
 			return errs.Wrap(err, "cannot send remote command")
 		}
 
-		fmt.Fprintf(os.Stderr, "%s\n", reply)
+		fmt.Fprintf(os.Stdout, "%s\n", reply)
 
 		return nil
 	}
@@ -835,7 +835,8 @@ func waitStop() error {
 
 	for {
 		select {
-		case <-sigs:
+		case sig := <-sigs:
+			log.Debugf("syscall signal '%s' received", getSignalName(sig))
 			sendServiceStop()
 
 			return nil
@@ -854,5 +855,16 @@ func waitStop() error {
 				return nil
 			}
 		}
+	}
+}
+
+func getSignalName(sig os.Signal) string {
+	switch sig {
+	case syscall.SIGINT:
+		return "SIGINT"
+	case syscall.SIGTERM:
+		return "SIGTERM"
+	default:
+		return "unknown"
 	}
 }

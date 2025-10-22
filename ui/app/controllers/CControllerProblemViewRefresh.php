@@ -19,10 +19,6 @@
  */
 class CControllerProblemViewRefresh extends CControllerProblemView {
 
-	protected function init(): void {
-		$this->disableCsrfValidation();
-	}
-
 	protected function checkInput(): bool {
 		$fields = [
 			'action' =>					'string',
@@ -48,7 +44,7 @@ class CControllerProblemViewRefresh extends CControllerProblemView {
 			'compact_view' =>			'in 0,1',
 			'show_timeline' =>			'in '.ZBX_TIMELINE_OFF.','.ZBX_TIMELINE_ON,
 			'details' =>				'in 0,1',
-			'highlight_row' =>			'in 0,1',
+			'highlight_row' =>			'in '.ZBX_HIGHLIGHT_OFF.','.ZBX_HIGHLIGHT_ON,
 			'show_opdata' =>			'in '.OPERATIONAL_DATA_SHOW_NONE.','.OPERATIONAL_DATA_SHOW_SEPARATELY.','.OPERATIONAL_DATA_SHOW_WITH_PROBLEM,
 			'tag_name_format' =>		'in '.TAG_NAME_FULL.','.TAG_NAME_SHORTENED.','.TAG_NAME_NONE,
 			'tag_priority' =>			'string',
@@ -65,10 +61,6 @@ class CControllerProblemViewRefresh extends CControllerProblemView {
 		}
 
 		return $ret;
-	}
-
-	protected function checkPermissions(): bool {
-		return $this->getUserType() >= USER_TYPE_ZABBIX_USER;
 	}
 
 	protected function doAction(): void {
@@ -133,7 +125,7 @@ class CControllerProblemViewRefresh extends CControllerProblemView {
 				'compact_view' => $this->getInput('compact_view', 0),
 				'show_timeline' => $this->getInput('show_timeline', ZBX_TIMELINE_OFF),
 				'details' => $this->getInput('details', 0),
-				'highlight_row' => $this->getInput('highlight_row', 0),
+				'highlight_row' => $this->getInput('highlight_row', ZBX_HIGHLIGHT_OFF),
 				'show_opdata' => $this->getInput('show_opdata', OPERATIONAL_DATA_SHOW_NONE),
 				'age_state' => $this->getInput('age_state', 0),
 				'age' => $this->getInput('age_state', 0) ? $this->getInput('age', 14) : null,

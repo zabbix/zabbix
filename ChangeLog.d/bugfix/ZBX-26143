@@ -1,1 +1,0 @@
-...G...... [ZBX-26143] fixed duplicated address issue after redirection and disabled history upload on Agent connection failure until the connection is re-established (sboidenko)

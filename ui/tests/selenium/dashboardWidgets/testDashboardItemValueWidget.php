@@ -1598,6 +1598,7 @@ class testDashboardItemValueWidget extends testWidgets {
 				? '1 minute'
 				: (CTestArrayHelper::get($data['fields'], 'Refresh interval', '1 minute'));
 			$this->assertEquals($refresh, $widget->getRefreshInterval());
+			CPopupMenuElement::find()->one()->close();
 
 			// Check new widget form fields and values in frontend.
 			$saved_form = $widget->edit();
@@ -3006,9 +3007,8 @@ class testDashboardItemValueWidget extends testWidgets {
 		// Close the hint-box.
 		$hint->query('xpath:.//button[@class="btn-overlay-close"]')->one()->click()->waitUntilNotVisible();
 
-		$dashboard->edit()->getWidget($data['Name'])->edit();
-		$form->fill(['Advanced configuration' => true, 'Aggregation function' => 'not used']);
-		$form->submit();
+		$widget_form = $dashboard->edit()->getWidget($data['Name'])->edit();
+		$widget_form->fill(['Advanced configuration' => true, 'Aggregation function' => 'not used'])->submit();
 		COverlayDialogElement::ensureNotPresent();
 		$dashboard->waitUntilReady();
 		$this->assertFalse($dashboard->query($time_icon)->one(false)->isValid());

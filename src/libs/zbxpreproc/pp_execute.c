@@ -1070,8 +1070,7 @@ int	pp_execute_step(zbx_pp_context_t *ctx, zbx_pp_cache_t *cache, zbx_dc_um_shar
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() step:%d params:'%s' value:'%.*s' cache:%p", __func__,
 			step->type, step->params, PP_VALUE_LOG_LIMIT, zbx_variant_value_desc(value), (void *)cache);
 
-	params = zbx_strdup(NULL, step->params);
-
+	params = step->params;
 	if (NULL != um_handle)
 	{
 		if (NULL != strstr(params, "{$"))
@@ -1079,6 +1078,7 @@ int	pp_execute_step(zbx_pp_context_t *ctx, zbx_pp_cache_t *cache, zbx_dc_um_shar
 			unsigned char	env = ZBX_PREPROC_SCRIPT == step->type ? ZBX_MACRO_ENV_SECURE :
 					ZBX_MACRO_ENV_NONSECURE;
 
+			params = zbx_strdup(NULL, step->params);
 			zbx_dc_expand_user_and_func_macros_from_cache(um_handle->um_cache, &params, &hostid, 1, env);
 			user_macros = 1;
 		}
@@ -1176,7 +1176,8 @@ int	pp_execute_step(zbx_pp_context_t *ctx, zbx_pp_cache_t *cache, zbx_dc_um_shar
 			ret = FAIL;
 		}
 out:
-	zbx_free(params);
+	if (params != step->params)
+		zbx_free(params);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() ret:%s value:%.*s", __func__, zbx_result_string(ret),
 			PP_VALUE_LOG_LIMIT, zbx_variant_value_desc(value));

@@ -164,7 +164,7 @@ class testFormAdministrationGeneralAutoregistration extends CWebTest {
 			$this->query('id:ui-id-2')->one()->click();
 		}
 
-		// Reset filter to delete deependencies from previous tests.
+		// Reset filter to delete dependencies from previous tests.
 		$this->query('button:Reset')->waitUntilClickable()->one()->click();
 		$this->page->waitUntilReady();
 		$rows = $this->query('class:list-table')->asTable()->one()->getRows();
@@ -339,7 +339,7 @@ class testFormAdministrationGeneralAutoregistration extends CWebTest {
 
 		// Modify existing PSK values.
 		if (array_key_exists('change_psk', $data)) {
-			$form->query('button:Change PSK')->one()->click();
+			$form->query('button:Change PSK')->one()->click()->waitUntilStalled();
 			// Check that PSK values are empty.
 			$this->assertEquals('', $form->getField('PSK identity')->getValue());
 			$this->assertEquals('', $form->getField('PSK')->getValue());
