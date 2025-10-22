@@ -13,7 +13,7 @@
 **/
 
 
-class CFieldTextarea extends CField {
+class CFieldZTextareaFlexible extends CField {
 
 	init() {
 		super.init();
@@ -31,7 +31,7 @@ class CFieldTextarea extends CField {
 			return null;
 		}
 
-		return this._field.value.replace(/\r?\n/g, '\r\n');
+		return this._field.value.replace(/\r?\n/g, ' ');
 	}
 
 	getValueTrimmed() {
@@ -50,6 +50,17 @@ class CFieldTextarea extends CField {
 	}
 
 	_appendErrorHint(error_hint) {
-		this._field.parentNode.insertBefore(error_hint, this._field.nextSibling);
+		console.log(error_hint)
+		if (this.#isFlexible()) {
+			this._field.closest('.' + ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT).appendChild(error_hint);
+		}
+		else {
+			this._field.parentNode.insertBefore(error_hint, this._field.nextSibling);
+		}
+	}
+
+	#isFlexible() {
+		return this._field.classList.contains(ZBX_STYLE_Z_TEXTAREA_FLEXIBLE)
+			&& this._field.closest('.' + ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT);
 	}
 }

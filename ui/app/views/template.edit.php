@@ -196,7 +196,7 @@ if (!$data['readonly']) {
 		->addItem(
 			(new CRow([
 				(new CCol([
-					(new CTextAreaFlexible('macros[#{rowNum}][macro]', '', ['add_post_js' => false]))
+					(new CTextAreaFlexible('macros[#{rowNum}][macro]', ''))
 						->setErrorContainer('macros_#{rowNum}_error_container')
 						->setErrorLabel(_('Macro'))
 						->addClass('macro')
@@ -210,7 +210,7 @@ if (!$data['readonly']) {
 						->setErrorLabel(_('Value'))
 				))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
 				(new CCol(
-					(new CTextAreaFlexible('macros[#{rowNum}][description]', '', ['add_post_js' => false]))
+					(new CTextAreaFlexible('macros[#{rowNum}][description]', ''))
 						->setErrorContainer('macros_#{rowNum}_error_container')
 						->setMaxlength(DB::getFieldLength('globalmacro', 'description'))
 						->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH)
@@ -237,7 +237,7 @@ if (!$data['readonly']) {
 		->addItem(
 			(new CRow([
 				(new CCol([
-					(new CTextAreaFlexible('macros[#{rowNum}][macro]', '', ['add_post_js' => false]))
+					(new CTextAreaFlexible('macros[#{rowNum}][macro]', ''))
 						->setErrorContainer('macros_#{rowNum}_error_container')
 						->setErrorLabel(_('Macro'))
 						->addClass('macro')
@@ -274,7 +274,7 @@ if (!$data['readonly']) {
 		->addItem(
 			(new CRow([
 				(new CCol(
-					(new CTextAreaFlexible('macros[#{rowNum}][description]', '', ['add_post_js' => false]))
+					(new CTextAreaFlexible('macros[#{rowNum}][description]', ''))
 						->setMaxlength(DB::getFieldLength('globalmacro', 'description'))
 						->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 						->setAttribute('placeholder', _('description'))

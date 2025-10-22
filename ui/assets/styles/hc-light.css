@@ -4576,6 +4576,49 @@ z-sparkline {
     bottom: 0;
     left: 0; }
 
+z-textarea-flexible {
+  display: inline-block; }
+  z-textarea-flexible textarea {
+    margin: 0;
+    padding: 4px 5px;
+    min-height: 24px;
+    overflow: hidden;
+    resize: none;
+    font-family: var(--font-stack);
+    font-size: 1em;
+    vertical-align: top;
+    word-break: break-word;
+    width: 100%;
+    height: 24px;
+    line-height: 14px;
+    white-space: break-spaces; }
+    z-textarea-flexible textarea[readonly]:focus {
+      border-color: #000000; }
+
+.macro-input-group z-textarea-flexible {
+  flex: 1; }
+  .macro-input-group z-textarea-flexible textarea {
+    border-right: 0; }
+    .macro-input-group z-textarea-flexible textarea:focus + .btn-undo {
+      border-color: #000000; }
+
+.modal-popup-medium z-textarea-flexible textarea,
+.modal-popup-large z-textarea-flexible textarea,
+.modal-popup-static z-textarea-flexible textarea,
+.modal-popup-preprocessing z-textarea-flexible textarea {
+  overflow-y: auto; }
+
+.textarea-flexible-container td {
+  line-height: 22px; }
+  .textarea-flexible-container td.textarea-flexible-parent {
+    vertical-align: top; }
+  .textarea-flexible-container td.macro-textarea-parent textarea {
+    float: left; }
+  .textarea-flexible-container td.macro-textarea-parent span {
+    margin-left: 10px; }
+  .textarea-flexible-container td button {
+    line-height: normal; }
+
 .widget-field-sparkline {
   display: grid;
   grid-template-columns: minmax(100px, max-content) 1fr minmax(95px, max-content) max-content;
@@ -6951,7 +6994,7 @@ input[type="text"], input[type="password"], input[type="search"], input[type="nu
 
 .multiselect, .z-select .focusable,
 z-select .focusable, .z-select .list,
-z-select .list, input[type="text"], input[type="password"], input[type="search"], input[type="number"], input[type="email"], input[type="time"], input[type="file"], textarea, select {
+z-select .list, z-textarea-flexible textarea, input[type="text"], input[type="password"], input[type="search"], input[type="number"], input[type="email"], input[type="time"], input[type="file"], textarea, select {
   background-color: #ffffff;
   border: 1px solid #888888;
   box-sizing: border-box;
@@ -7077,14 +7120,14 @@ z-select .list, input[type="text"], input[type="password"], input[type="search"]
   box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5); }
 
 .multiselect[aria-readonly], .z-select[readonly] .focusable,
-z-select[readonly] .focusable, input[readonly], textarea[readonly] {
+z-select[readonly] .focusable, z-textarea-flexible textarea[readonly], input[readonly], textarea[readonly] {
   color: #000000;
   -webkit-text-fill-color: #000000;
   background-color: #f0f0f0;
   border-color: #9f9f9f; }
 
 .multiselect[aria-disabled], .radio-list-control input[type="radio"][readonly] + label, .radio-list-control input[type="radio"][disabled] + label, .z-select[disabled] .focusable,
-z-select[disabled] .focusable, input[disabled], textarea[disabled], select option[disabled], select[disabled], select[readonly], .checkbox-radio[readonly] span, .checkbox-radio[readonly] + label span, .checkbox-radio[disabled] + label span {
+z-select[disabled] .focusable, z-textarea-flexible textarea[disabled], input[disabled], textarea[disabled], select option[disabled], select[disabled], select[readonly], .checkbox-radio[readonly] span, .checkbox-radio[readonly] + label span, .checkbox-radio[disabled] + label span {
   color: #9f9f9f;
   -webkit-text-fill-color: #9f9f9f;
   background-color: #f0f0f0;
@@ -7518,26 +7561,6 @@ z-select[disabled] .focusable, input[disabled], textarea[disabled], select optio
     color: #333333;
     float: left;
     line-height: 24px; }
-
-.textarea-flexible-container td {
-  line-height: 22px; }
-  .textarea-flexible-container td.textarea-flexible-parent {
-    vertical-align: top; }
-  .textarea-flexible-container td.macro-textarea-parent textarea {
-    float: left; }
-  .textarea-flexible-container td.macro-textarea-parent span {
-    margin-left: 10px; }
-  .textarea-flexible-container td button {
-    line-height: normal; }
-
-.textarea-flexible {
-  min-height: 24px;
-  overflow: hidden;
-  resize: none;
-  word-break: break-word;
-  height: 24px;
-  line-height: 14px;
-  white-space: break-spaces; }
 
 .overlay-dialogue-body {
   margin: 0 0 25px;
@@ -8096,7 +8119,7 @@ span.is-loading {
 
 .dashboard-grid-widget-contents, output .msg-details ul, .multiselect-available, .z-select .focusable,
 z-select .focusable, .z-select .list,
-z-select .list, div.dashboard-widget-item .dashboard-grid-widget-body a, .modal-popup-host-wizard .templates-card-list .template-info, textarea, select, .setup-right-body, .menu-popup, .overlay-dialogue.modal .overlay-dialogue-body, .overlay-dialogue .hintbox-wrap,
+z-select .list, z-textarea-flexible textarea, div.dashboard-widget-item .dashboard-grid-widget-body a, .modal-popup-host-wizard .templates-card-list .template-info, textarea, select, .setup-right-body, .menu-popup, .overlay-dialogue.modal .overlay-dialogue-body, .overlay-dialogue .hintbox-wrap,
 .overlay-dialogue .hintbox-wrap-horizontal, .overlay-dialogue .maps-container, .notif-body, .debug-output, .overlay-descr, .import-compare .toc,
 .import-compare .diff {
   scrollbar-width: thin; }
@@ -8735,12 +8758,6 @@ z-select.z-select-host-interface li[disabled] .description:not(:empty) {
   top: 0;
   background: #f3f3f3;
   z-index: 3; }
-.modal-popup-medium .textarea-flexible,
-.modal-popup-large .textarea-flexible,
-.modal-popup-static .textarea-flexible,
-.modal-popup-preprocessing .textarea-flexible {
-  max-height: 200px;
-  overflow-y: auto; }
 
 .global-macro-table .table-col-value,
 .global-macro-table .table-col-template-value,

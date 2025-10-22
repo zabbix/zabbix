@@ -104,14 +104,7 @@ window.service_edit_popup = new class {
 				const $tags = $panel.find('.tags-table');
 
 				$tags
-					.dynamicRows({template: '#tag-row-tmpl', allow_empty: true, remove_next_sibling: true})
-					.on('afteradd.dynamicRows', () => {
-						$tags
-							.find('.<?= ZBX_STYLE_TEXTAREA_FLEXIBLE ?>')
-							.textareaFlexible();
-					})
-					.find('.<?= ZBX_STYLE_TEXTAREA_FLEXIBLE ?>')
-					.textareaFlexible();
+					.dynamicRows({template: '#tag-row-tmpl', allow_empty: true, remove_next_sibling: true});
 
 					tabs.off('tabscreate tabsactivate', initialize_tags);
 			}

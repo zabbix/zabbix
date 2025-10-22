@@ -175,8 +175,6 @@
 			$curr_control.replaceWith($textarea);
 
 			$textarea[0].dispatchEvent(new Event('input', {bubbles: true}));
-
-			$('.textarea-flexible', $container).textareaFlexible();
 		}
 	}
 
@@ -192,7 +190,6 @@
 				$('.dropdown-value', $(this))
 					.off('change', inputDropdownValueChangeEventHandle)
 					.on('change', inputDropdownValueChangeEventHandle);
-				$('.textarea-flexible', $(this)).textareaFlexible();
 			});
 		}
 	};

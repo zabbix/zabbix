@@ -126,8 +126,6 @@ window.operation_popup = new class {
 
 		optags.forEach((optag) => {
 			tags_table.rows[tags_table.rows.length - 1].insertAdjacentHTML('beforebegin', template.evaluate(optag));
-
-			$(`#operation_optag_${optag.row_index}_tag, #operation_optag_${optag.row_index}_value`).textareaFlexible();
 		});
 	}
 

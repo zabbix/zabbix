@@ -737,6 +737,4 @@ jQuery(document).ready(function($) {
 			itemGetValueTest(overlays_stack.getById('item-test'));
 		});
 	<?php endif ?>
-
-	$('#preprocessing-test-form .<?= ZBX_STYLE_TEXTAREA_FLEXIBLE ?>').textareaFlexible();
 });

@@ -79,6 +79,7 @@ $browser-sprite: '../img/browser-sprite.png?20220722';
 @import "components/z-color-picker";
 @import "components/z-select";
 @import "components/z-sparkline";
+@import "components/z-textarea-flexible";
 
 @import "components/dashboard/widget-field-sparkline";
 
@@ -2171,40 +2172,6 @@ div {
 	}
 }
 
-// Flexible textarea.
-.textarea-flexible-container {
-	td {
-		line-height: 22px;
-
-		&.textarea-flexible-parent {
-			vertical-align: top;
-		}
-
-		&.macro-textarea-parent {
-			textarea {
-				float: left;
-			}
-			span {
-				margin-left: 10px;
-			}
-		}
-
-		button {
-			line-height: normal;
-		}
-	}
-}
-
-.textarea-flexible {
-	min-height: 24px;
-	overflow: hidden;
-	resize: none;
-	word-break: break-word;
-	height: 24px;
-	line-height: 14px;
-	white-space: break-spaces;
-}
-
 .overlay-dialogue-body {
 	margin: 0 0 25px;
 	white-space: nowrap;
@@ -3997,11 +3964,6 @@ z-select {
 		top: 0;
 		background: $header-bg-color;
 		z-index: 3;
-	}
-
-	.textarea-flexible {
-		max-height: 200px;
-		overflow-y: auto;
 	}
 }
 

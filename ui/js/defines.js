@@ -50,6 +50,7 @@ const ZBX_STYLE_FORMATED_TEXT = 'formated-text';
 const ZBX_STYLE_TEXTAREA_FLEXIBLE = 'textarea-flexible';
 const ZBX_STYLE_TEXTAREA_FLEXIBLE_CONTAINER = 'textarea-flexible-container';
 const ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT = 'textarea-flexible-parent';
+const ZBX_STYLE_Z_TEXTAREA_FLEXIBLE = 'z-textarea-flexible';
 
 const ZBX_STYLE_COLOR_PICKER = 'color-picker';
 

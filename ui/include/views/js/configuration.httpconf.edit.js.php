@@ -80,8 +80,6 @@
 				template: '#variable-row-tmpl',
 				rows: variables
 			});
-
-			this.#initTextareaFlexible($variables);
 		}
 
 		#initHeaders(headers) {
@@ -105,17 +103,6 @@
 						}
 					});
 				});
-
-			this.#initTextareaFlexible($headers);
-		}
-
-		#initTextareaFlexible($element) {
-			$element
-				.on('afteradd.dynamicRows', (e) => {
-					jQuery('.<?= ZBX_STYLE_TEXTAREA_FLEXIBLE ?>', e.target).textareaFlexible();
-				})
-				.find('.<?= ZBX_STYLE_TEXTAREA_FLEXIBLE ?>')
-				.textareaFlexible();
 		}
 
 		#initSteps(steps) {

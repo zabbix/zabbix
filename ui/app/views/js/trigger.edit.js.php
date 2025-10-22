@@ -56,7 +56,6 @@ window.trigger_edit_popup = new class {
 
 		this.#initActions();
 		this.#initPopupListeners();
-		this.#initTriggersTab();
 		this.#changeRecoveryMode();
 		this.#changeCorrelationMode();
 
@@ -72,7 +71,6 @@ window.trigger_edit_popup = new class {
 			this.name.addEventListener(event_type,
 				(e) => {
 					this.form_element.querySelector('#event_name').placeholder = e.target.value;
-					$(this.form_element.querySelector('#event_name')).textareaFlexible('updateHeight');
 				}
 			);
 			this.name.dispatchEvent(new Event('input'));
@@ -242,15 +240,6 @@ window.trigger_edit_popup = new class {
 				callback: () => ZABBIX.EventHub.unsubscribeAll(subscriptions)
 			})
 		);
-	}
-
-	#initTriggersTab() {
-		$('#tabs').on('tabsactivate', (event, ui) => {
-			if (ui.newPanel.is('#triggersTab')) {
-				ui.newPanel.find('.<?= ZBX_STYLE_TEXTAREA_FLEXIBLE ?>').textareaFlexible();
-			}
-		});
-		$('#triggersTab .<?= ZBX_STYLE_TEXTAREA_FLEXIBLE ?>').textareaFlexible();
 	}
 
 	#addDepTrigger(button) {

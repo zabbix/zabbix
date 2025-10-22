@@ -1027,7 +1027,6 @@ function getTriggerMassupdateFormData() {
  * @param int        $tag['automatic']                    (optional) Tag automatic flag.
  * @param array      $tag['parent_templates']             (optional) List of templates that tags are inherited from.
  * @param array      $options
- * @param bool       $options['add_post_js']              (optional) Parameter passed to CTextAreaFlexible.
  * @param bool       $options['show_inherited_tags']      (optional) Render row in inherited tag mode. This enables usage of $tag['type'].
  * @param bool       $options['with_automatic']           (optional) Render row with 'automatic' input. This enables usage of $tag['automatic'].
  * @param string     $options['field_name']               (optional) Re-define default field name.
@@ -1051,7 +1050,7 @@ function renderTagTableRow($index, array $tag, array $options = []) {
 		$tag['automatic'] = ZBX_TAG_MANUAL;
 	}
 
-	$textarea_options = array_intersect_key($options, array_flip(['readonly', 'add_post_js']));
+	$textarea_options = array_intersect_key($options, array_flip(['readonly']));
 
 	$tag += [
 		'type' => ZBX_PROPERTY_OWN,

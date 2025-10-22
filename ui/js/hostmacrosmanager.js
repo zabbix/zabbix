@@ -21,7 +21,6 @@ class HostMacrosManager {
 	static ZBX_MACRO_TYPE_TEXT = 0;
 	static ZBX_MACRO_TYPE_SECRET = 1;
 	static ZBX_MACRO_TYPE_VAULT = 2;
-	static ZBX_STYLE_TEXTAREA_FLEXIBLE = 'textarea-flexible';
 	static DISCOVERY_STATE_AUTOMATIC = 0x1;
 	static DISCOVERY_STATE_CONVERTING = 0x2;
 	static DISCOVERY_STATE_MANUAL = 0x3;
@@ -72,10 +71,7 @@ class HostMacrosManager {
 					this.$container.append(response.body);
 
 					// Initialize macros.
-					if (this.readonly) {
-						$('.' + HostMacrosManager.ZBX_STYLE_TEXTAREA_FLEXIBLE, this.getMacroTable()).textareaFlexible();
-					}
-					else {
+					if (!this.readonly) {
 						this.initMacroTable(show_inherited_macros);
 					}
 
@@ -258,7 +254,7 @@ class HostMacrosManager {
 	}
 
 	initMacroFields($parent) {
-		$('.'+HostMacrosManager.ZBX_STYLE_TEXTAREA_FLEXIBLE, $parent).not('.initialized-field')
+		$(ZBX_STYLE_Z_TEXTAREA_FLEXIBLE + ' textarea', $parent).not('.initialized-field')
 				.each((index, textarea) => {
 			const $textarea = $(textarea);
 
@@ -266,14 +262,11 @@ class HostMacrosManager {
 				$textarea.on('change keydown', (e) => {
 					if (e.type === 'change' || e.which === 13) {
 						this.macroToUpperCase($textarea);
-						$textarea.textareaFlexible();
 					}
 				});
 			}
 
-			$textarea
-				.addClass('initialized-field')
-				.textareaFlexible();
+			$textarea.addClass('initialized-field');
 		});
 	}
 
