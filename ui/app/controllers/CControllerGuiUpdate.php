@@ -22,14 +22,13 @@ class CControllerGuiUpdate extends CController {
 	}
 
 	public static function getValidationRules(): array {
-		$themes = array_keys(APP::getThemes());
 		$timezones = array_keys(CTimezoneHelper::getList());
 		$timezones[] = ZBX_DEFAULT_TIMEZONE;
 
 		return ['object', 'fields' => [
 			'default_lang' => ['string', 'required', 'in' => array_keys(getLocales())],
 			'default_timezone' => ['string', 'required', 'in' => $timezones],
-			'default_theme' => ['string', 'required', 'in' => $themes],
+			'default_theme' => ['string', 'required', 'in' => array_keys(APP::getThemes())],
 			'search_limit' => ['integer', 'required', 'min' => 1, 'max' => 999999],
 			'max_overview_table_size' => ['integer', 'required', 'min' => 5, 'max' => 999999],
 			'max_in_table' => ['integer', 'required', 'min' => 1, 'max' => 99999],
@@ -55,7 +54,7 @@ class CControllerGuiUpdate extends CController {
 		]];
 	}
 
-	protected function checkInput() {
+	protected function checkInput(): bool {
 		$ret = $this->validateInput(self::getValidationRules());
 
 		if (!$ret) {
@@ -75,11 +74,11 @@ class CControllerGuiUpdate extends CController {
 		return $ret;
 	}
 
-	protected function checkPermissions() {
+	protected function checkPermissions(): bool {
 		return $this->checkAccess(CRoleHelper::UI_ADMINISTRATION_GENERAL);
 	}
 
-	protected function doAction() {
+	protected function doAction(): void {
 		$result = API::Settings()->update($this->getInputAll());
 
 		$output = [];

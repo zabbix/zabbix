@@ -28,6 +28,15 @@ class CControllerAuditSettingsEdit extends CController {
 		return $this->checkAccess(CRoleHelper::UI_ADMINISTRATION_AUDIT_LOG);
 	}
 
+	private function getDefaultValues(): array {
+		return [
+			'auditlog_enabled' => CSettingsSchema::getDefault('auditlog_enabled'),
+			'auditlog_mode' => CSettingsSchema::getDefault('auditlog_mode'),
+			'hk_audit_mode' => CSettingsSchema::getDefault('hk_audit_mode'),
+			'hk_audit' => CSettingsSchema::getDefault('hk_audit')
+		];
+	}
+
 	protected function doAction(): void {
 		$data = [
 			'auditlog_enabled' => CSettingsHelper::get(CSettingsHelper::AUDITLOG_ENABLED),
@@ -44,14 +53,5 @@ class CControllerAuditSettingsEdit extends CController {
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Configuration of audit log'));
 		$this->setResponse($response);
-	}
-
-	private function getDefaultValues(): array {
-		return [
-			'auditlog_enabled' => CSettingsSchema::getDefault('auditlog_enabled'),
-			'auditlog_mode' => CSettingsSchema::getDefault('auditlog_mode'),
-			'hk_audit_mode' => CSettingsSchema::getDefault('hk_audit_mode'),
-			'hk_audit' => CSettingsSchema::getDefault('hk_audit')
-		];
 	}
 }

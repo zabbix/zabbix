@@ -70,7 +70,7 @@ class CControllerTimeoutsUpdate extends CController {
 			],
 			'report_test_timeout' => ['string', 'required', 'not_empty',
 				'use' => [CTimeUnitValidator::class, ['min' => 1, 'max' => 300]]
-			],
+			]
 		]];
 	}
 

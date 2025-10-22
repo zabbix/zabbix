@@ -767,7 +767,7 @@ if (empty($_GET['files'])) {
 		'administration.housekeeping.edit.js.php',
 		'administration.miscconfig.edit.js.php',
 		'administration.timeouts.edit.js.php',
-		'administration.trigdisplay.edit.js.php',
+		'administration.trigdisplay.edit.js.php'
 	];
 
 	if (CCookieHelper::has(ZBX_SESSION_NAME)) {
