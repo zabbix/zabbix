@@ -174,7 +174,7 @@ class testFormMaintenance extends CLegacyWebTest {
 			[
 				['fields' => ['Period type' => 'Monthly', 'Date' => 'Day of week']],
 				4
-			],
+			]
 		];
 	}
 
