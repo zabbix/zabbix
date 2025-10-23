@@ -454,6 +454,36 @@ class testDashboardTopHostsWidget extends testWidgets {
 			}
 		}
 
+		// Check hintbox message when "Aggregation function≠not used" and sparkline is selected.
+		$warning_visibility = [
+				'not used' => false,
+				'min' => true,
+				'max' => true,
+				'avg' => true,
+				'count' => true,
+				'sum' => true,
+				'first' => true,
+				'last' => true
+		];
+
+		foreach ($warning_visibility as $option => $visible) {
+			$column_form->fill(['Aggregation function' => $option]);
+			$warning_button = $column_form->getFieldContainer('Aggregation function')->query('xpath:.//button[@data-hintbox]')->one();
+			$this->assertTrue($warning_button->isVisible($visible));
+
+			if ($visible) {
+				$warning_button->click();
+
+				// Check hintbox text.
+				$hint_text = 'Item aggregation function does not affect the sparkline.';
+				$hint_dialog = $this->query('xpath://div[@class="overlay-dialogue wordbreak"]')->waitUntilVisible()->one();
+				$this->assertEquals($hint_text, $hint_dialog->getText());
+
+				// Close the hintbox.
+				$hint_dialog->query('xpath:.//button[@class="btn-overlay-close"]')->one()->click()->waitUntilNotPresent();
+			}
+		}
+
 		// Check Display item value as and color Thresholds/Highlights tables dependency.
 		foreach (['Numeric', 'Text', 'Binary'] as $display) {
 			$column_form->fill(['Display item value as' => $display]);

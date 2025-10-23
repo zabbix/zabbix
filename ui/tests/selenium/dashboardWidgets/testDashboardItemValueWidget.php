@@ -336,10 +336,10 @@ class testDashboardItemValueWidget extends testWidgets {
 						'min' => true,
 						'max' => true,
 						'avg' => true,
-						'count' => false,
+						'count' => true,
 						'sum' => true,
-						'first' => false,
-						'last' => false
+						'first' => true,
+						'last' => true
 					],
 					'History data' => [
 						'Auto' => false,
@@ -349,12 +349,22 @@ class testDashboardItemValueWidget extends testWidgets {
 				];
 
 				foreach ($warning_visibility as $warning_label => $options) {
-					$hint_text = ($warning_label === 'History data')
-						? 'This setting applies only to numeric data. Non-numeric data will always be taken from history.'
-						: 'With this setting only numeric items will be displayed.';
-					$warning_button = $form->getLabel($warning_label)->query('xpath:.//button[@data-hintbox]')->one();
+					if ($warning_label === 'History data') {
+						$hint_text = 'This setting applies only to numeric data. Non-numeric data will always be taken from history.';
+						$warning_button = $form->getLabel($warning_label)->query('xpath:.//button[@data-hintbox]')->one();
+					}
+					if ($warning_label === 'Aggregation function') {
+						$warning_button = $form->getFieldContainer($warning_label)->query('xpath:.//button[@data-hintbox]')->one();
+					}
 
 					foreach ($options as $option => $visible) {
+						if ($warning_label === 'Aggregation function') {
+							$hint_text = in_array($option, ['count', 'first', 'last'])
+								? 'Item aggregation function does not affect the sparkline.'
+								: "With this setting only numeric items will be displayed.\n".
+									"Item aggregation function does not affect the sparkline.";
+						}
+
 						$form->fill([$warning_label => $option]);
 						$this->assertTrue($warning_button->isVisible($visible));
 
@@ -2402,19 +2412,26 @@ class testDashboardItemValueWidget extends testWidgets {
 		$form->fill(['Type' => CFormElement::RELOADABLE_FILL('Item value')]);
 		$form->fill($data['fields']);
 
+		if ($data['label'] === 'Aggregation function') {
+			$element = $form->getFieldContainer($data['label']);
+		}
+		else {
+			$element = $form->getLabel($data['label']);
+		}
+
 		if ($data['numeric'] === true || array_key_exists('any_type_of_information', $data)) {
 			// Check that warning item is not displayed.
 			$form->query($data['selector'])->one()->waitUntilNotVisible();
 
 			// Check that info icon is not displayed.
-			$this->assertFalse($form->getLabel($data['label'])->query($info)->one()->isVisible());
+			$this->assertFalse($element->query($info)->one()->isVisible());
 		}
 		else {
 			// Check that warning item is displayed.
 			$form->query($data['selector'])->one()->waitUntilVisible();
 
 			// Check that info icon is displayed.
-			$this->assertTrue($form->getLabel($data['label'])->query($info)->one()->isVisible());
+			$this->assertTrue($element->query($info)->one()->isVisible());
 
 			// Check hint-box.
 			$form->query($data['selector'])->one()->click();
