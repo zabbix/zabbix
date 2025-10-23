@@ -97,6 +97,13 @@ window.mediatype_message_popup = new class {
 		})
 			.then((response) => response.json())
 			.then((response) => {
+				if (overlays_stack.getById(this.overlay.dialogueid) === undefined) {
+					resolve(false);
+				}
+
+				return response;
+			})
+			.then((response) => {
 				if ('error' in response) {
 					throw {error: response.error};
 				}
@@ -118,7 +125,7 @@ window.mediatype_message_popup = new class {
 					messages = exception.error.messages;
 				}
 				else {
-					messages = [<?= json_encode(_('Unexpected server error.')) ?>];
+					messages = [t('Unexpected server error.')];
 				}
 
 				const message_box = makeMessageBox('bad', messages, title)[0];
