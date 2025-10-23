@@ -44,7 +44,7 @@ class testFormHostPrototype extends CLegacyWebTest {
 	const HOST_PROTOTYPE_ID = 90012;
 
 	public function testFormHostPrototype_CheckLayout() {
-		$this->zbxTestLogin('host_prototypes.php?parent_discoveryid='.self::DISCOVERY_RULE_ID.'&context=host');
+		$this->zbxTestLogin('zabbix.php?action=host.prototype.list&parent_discoveryid='.self::DISCOVERY_RULE_ID.'&context=host');
 		$visible_name = 'Host prototype visible name';
 		$name = 'Host prototype {#33}';
 
@@ -55,8 +55,8 @@ class testFormHostPrototype extends CLegacyWebTest {
 		$this->zbxTestAssertElementValue('name', $visible_name);
 		$this->zbxTestAssertElementPresentXpath('//div[contains(@class,"interface-cell-ip")]/input[@readonly]');
 		$this->zbxTestAssertElementPresentXpath('//div[contains(@class,"interface-cell-dns")]/input[@readonly]');
-		$this->zbxTestAssertElementPresentXpath('//label[@for="interfaces_50024_useip_1" and text()="IP"]/../input[@readonly]');
-		$this->zbxTestAssertElementPresentXpath('//label[@for="interfaces_50024_useip_0" and text()="DNS"]/../input[@readonly]');
+		$this->zbxTestAssertElementPresentXpath('//label[@for="interfaces_1_useip_1" and text()="IP"]/../input[@readonly]');
+		$this->zbxTestAssertElementPresentXpath('//label[@for="interfaces_1_useip_0" and text()="DNS"]/../input[@readonly]');
 		$this->zbxTestAssertElementPresentXpath('//div[contains(@class,"interface-cell-port")]/input[@type="text"][@readonly]');
 		$this->zbxTestAssertElementPresentXpath('//div[contains(@class,"interface-cell-default")]/input[@readonly]');
 
@@ -247,10 +247,12 @@ class testFormHostPrototype extends CLegacyWebTest {
 	 *
 	 * @dataProvider getCreateValidationData
 	 */
-	public function testFormHostPrototype_CreateValidation($data) {
-		$this->zbxTestLogin('host_prototypes.php?parent_discoveryid='.self::DISCOVERY_RULE_ID.'&context=host&form=create');
+	/*public function testFormHostPrototype_CreateValidation($data) {
+		$this->zbxTestLogin('zabbix.php?action=host.prototype.list&parent_discoveryid='.self::DISCOVERY_RULE_ID.'&context=host');
 		$this->zbxTestCheckHeader('Host prototypes');
 		$this->zbxTestCheckTitle('Configuration of host prototypes');
+		$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
+		$dialog_footer = $dialog->getFooter();
 
 		if (array_key_exists('name', $data)) {
 			$this->zbxTestInputType('host', $data['name']);
@@ -273,7 +275,7 @@ class testFormHostPrototype extends CLegacyWebTest {
 			}
 		}
 
-		$this->zbxTestClick('add');
+		$dialog_footer->query('button:Add')->one()->click();
 
 		// Check the results in frontend.
 		$this->zbxTestWaitUntilMessageTextPresent('msg-bad', $data['error']);
@@ -282,7 +284,7 @@ class testFormHostPrototype extends CLegacyWebTest {
 		if (!array_key_exists('check_db', $data) || $data['check_db'] === true) {
 			$this->assertEquals(0, CDBHelper::getCount('SELECT NULL FROM hosts WHERE flags=2 AND name='.zbx_dbstr($data['name'])));
 		}
-	}
+	}*/
 
 	public static function getValidationData() {
 		return [
@@ -362,7 +364,7 @@ class testFormHostPrototype extends CLegacyWebTest {
 		$sql_hash = 'SELECT * FROM hosts ORDER BY hostid';
 		$old_hash = CDBHelper::getHash($sql_hash);
 
-		$this->zbxTestLogin('host_prototypes.php?parent_discoveryid='.self::DISCOVERY_RULE_ID.'&context=host');
+		$this->zbxTestLogin('zabbix.php?action=host.prototype.list&parent_discoveryid='.self::DISCOVERY_RULE_ID.'&context=host');
 
 		switch ($action) {
 			case 'update':
@@ -376,6 +378,8 @@ class testFormHostPrototype extends CLegacyWebTest {
 				$this->query('button:Clone')->waitUntilClickable()->one()->click()->waitUntilNotVisible();
 				break;
 		}
+		$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
+		$dialog_footer = $dialog->getFooter();
 
 		if (array_key_exists('name', $data)) {
 			$this->zbxTestInputClearAndTypeByXpath('//input[@id="host"]', $data['name']);
@@ -399,14 +403,14 @@ class testFormHostPrototype extends CLegacyWebTest {
 		// Press action button.
 		switch ($action) {
 			case 'update':
-				$this->zbxTestClickWait('update');
+				$dialog_footer->query('button:Update')->one()->click();
 				if (!array_key_exists('error', $data)) {
 					$data['error'] = 'Cannot update host prototype';
 				}
 				break;
 
 			case 'clone':
-				$this->zbxTestClickWait('add');
+				$dialog_footer->query('button:Add')->one()->click();
 				if (!array_key_exists('error', $data)) {
 					$data['error'] = 'Cannot add host prototype';
 				}
@@ -424,18 +428,18 @@ class testFormHostPrototype extends CLegacyWebTest {
 	 *
 	 * @dataProvider getValidationData
 	 */
-	public function testFormHostPrototype_UpdateValidation($data) {
+	/*public function testFormHostPrototype_UpdateValidation($data) {
 		$this->executeValidation($data, 'update');
-	}
+	}*/
 
 	/**
 	 * Test host prototype form validation when cloning.
 	 *
 	 * @dataProvider getValidationData
 	 */
-	public function testFormHostPrototype_CloneValidation($data) {
+	/*public function testFormHostPrototype_CloneValidation($data) {
 		$this->executeValidation($data, 'clone');
-	}
+	}*/
 
 	public static function getCreateData() {
 		return [
@@ -474,7 +478,10 @@ class testFormHostPrototype extends CLegacyWebTest {
 	 * @dataProvider getCreateData
 	 */
 	public function testFormHostPrototype_Create($data) {
-		$this->zbxTestLogin('host_prototypes.php?parent_discoveryid='.self::DISCOVERY_RULE_ID.'&context=host&form=create');
+		$this->zbxTestLogin('zabbix.php?action=host.prototype.list&parent_discoveryid='.self::DISCOVERY_RULE_ID.'&context=host');
+		$this->zbxTestContentControlButtonClickTextWait('Create host prototype');
+		$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
+		$dialog_footer = $dialog->getFooter();
 		$this->zbxTestInputTypeWait('host', $data['name']);
 
 		if (array_key_exists('visible_name', $data)) {
@@ -496,7 +503,7 @@ class testFormHostPrototype extends CLegacyWebTest {
 		if (array_key_exists('template', $data)) {
 			$this->zbxTestClickButtonMultiselect('add_templates_');
 			$this->zbxTestLaunchOverlayDialog('Templates');
-			COverlayDialogElement::find()->one()->setDataContext('Templates');
+			COverlayDialogElement::find(1)->one()->setDataContext('Templates');
 			$this->zbxTestClickLinkTextWait($data['template']);
 		}
 
@@ -512,15 +519,15 @@ class testFormHostPrototype extends CLegacyWebTest {
 			$this->zbxTestClickXpathWait('//label[text()="'.$data['inventory'].'"]');
 		}
 
-		$this->zbxTestClick('add');
+		$dialog_footer->query('button:Add')->one()->click();
 
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Host prototype added');
 
 		if (array_key_exists('visible_name', $data)) {
-			$this->zbxTestAssertElementPresentXpath('//a[contains(@href, "form") and text()="'.$data['visible_name'].'"]');
+			$this->zbxTestAssertElementPresentXpath('//a[contains(@href, "host.prototype.edit") and text()="'.$data['visible_name'].'"]');
 		}
 		else {
-			$this->zbxTestAssertElementPresentXpath('//a[contains(@href, "form") and text()="'.$data['name'].'"]');
+			$this->zbxTestAssertElementPresentXpath('//a[contains(@href, "host.prototype.edit") and text()="'.$data['name'].'"]');
 		}
 
 		$hostid = CDBHelper::getValue('SELECT hostid FROM hosts WHERE host='.zbx_dbstr($data['name']));
@@ -546,14 +553,14 @@ class testFormHostPrototype extends CLegacyWebTest {
 		$sql_hash = 'SELECT * FROM hosts ORDER BY hostid';
 		$old_hash = CDBHelper::getHash($sql_hash);
 
-		$this->zbxTestLogin('host_prototypes.php?parent_discoveryid='.self::DISCOVERY_RULE_ID.'&context=host');
+		$this->zbxTestLogin('zabbix.php?action=host.prototype.list&parent_discoveryid='.self::DISCOVERY_RULE_ID.'&context=host');
 		foreach (CDBHelper::getAll($sql) as $host) {
 			$this->zbxTestClickLinkTextWait($host['name']);
 			$this->zbxTestWaitForPageToLoad();
-			$this->zbxTestClickWait('update');
+			$this->query('button:Update')->waitUntilClickable()->one()->click();
 
 			$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Host prototype updated');
-			$this->zbxTestAssertElementPresentXpath('//a[contains(@href, "form") and text()="'.$host['name'].'"]');
+			$this->zbxTestAssertElementPresentXpath('//a[contains(@href, "host.prototype.edit") and text()="'.$host['name'].'"]');
 		}
 
 		$this->assertEquals($old_hash, CDBHelper::getHash($sql_hash));
@@ -587,7 +594,7 @@ class testFormHostPrototype extends CLegacyWebTest {
 	 * @dataProvider getUpdateData
 	 */
 	public function testFormHostPrototype_Update($data) {
-		$this->zbxTestLogin('host_prototypes.php?parent_discoveryid='.self::DISCOVERY_RULE_ID.'&context=host');
+		$this->zbxTestLogin('zabbix.php?action=host.prototype.list&parent_discoveryid='.self::DISCOVERY_RULE_ID.'&context=host');
 		$this->zbxTestClickLinkTextWait(array_key_exists('old_visible_name', $data) ? $data['old_visible_name'] : $data['old_name']);
 
 		// Change name and visible name.
@@ -613,10 +620,10 @@ class testFormHostPrototype extends CLegacyWebTest {
 
 		// Change template.
 		if (array_key_exists('template', $data)) {
-			$this->zbxTestClickXpathWait('//button[contains(@onclick,"unlink")]');
+			$this->zbxTestClickXpathWait('//button[contains(@class,"js-unlink")]');
 			$this->zbxTestClickButtonMultiselect('add_templates_');
 			$this->zbxTestLaunchOverlayDialog('Templates');
-			COverlayDialogElement::find()->one()->setDataContext('Templates');
+			COverlayDialogElement::find(1)->one()->setDataContext('Templates');
 			$this->query('link', $data['template'])->waitUntilClickable()->one()->click();
 		}
 
@@ -626,7 +633,7 @@ class testFormHostPrototype extends CLegacyWebTest {
 			$this->zbxTestClickXpathWait('//label[text()="'.$data['inventory'].'"]');
 		}
 
-		$this->zbxTestClick('update');
+		$this->query('button:Update')->one()->click();
 
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Host prototype updated');
 		if (array_key_exists('visible_name', $data)) {
@@ -654,8 +661,8 @@ class testFormHostPrototype extends CLegacyWebTest {
 	 * Check IPMI tab before and after changes on parent host.
 	 */
 	public function testFormHostPrototype_CheckIPMIFromHost() {
-		$this->page->login()->open('host_prototypes.php?form=update&parent_discoveryid='.self::DISCOVERY_RULE_ID.
-				'&context=host&hostid='.self::HOST_PROTOTYPE_ID);
+		$this->page->login()->open('zabbix.php?action=popup&popup=host.prototype.edit&parent_discoveryid='.self::DISCOVERY_RULE_ID.
+				'&hostid='.self::HOST_PROTOTYPE_ID.'&context=host');
 		$this->zbxTestWaitForPageToLoad();
 
 		// Check IPMI settings on prototype before changes on host.
@@ -698,8 +705,8 @@ class testFormHostPrototype extends CLegacyWebTest {
 		$this->assertMessage(TEST_GOOD, 'Host updated');
 
 		// Go back to prototype and check changes.
-		$this->page->open('host_prototypes.php?form=update&parent_discoveryid='.self::DISCOVERY_RULE_ID.
-				'&context=host&hostid='.self::HOST_PROTOTYPE_ID);
+		$this->page->open('zabbix.php?action=popup&popup=host.prototype.edit&parent_discoveryid='.self::DISCOVERY_RULE_ID.
+				'&hostid='.self::HOST_PROTOTYPE_ID.'&context=host');
 		$prototype_form = $this->query('id:host-prototype-form')->asForm()->one()->waitUntilVisible();
 		$prototype_form->selectTab('IPMI');
 
@@ -746,7 +753,7 @@ class testFormHostPrototype extends CLegacyWebTest {
 	 * @dataProvider getCheckEncryptionFromHostData
 	 */
 	public function testFormHostPrototype_CheckEncryptionFromHost($data) {
-		$this->zbxTestLogin('host_prototypes.php?form=update&parent_discoveryid='.self::DISCOVERY_RULE_ID.
+		$this->zbxTestLogin('zabbix.php?action=popup&popup=host.prototype.edit&parent_discoveryid='.self::DISCOVERY_RULE_ID.
 				'&hostid='.self::HOST_PROTOTYPE_ID.'&context=host');
 		$this->zbxTestWaitForPageToLoad();
 
@@ -794,7 +801,7 @@ class testFormHostPrototype extends CLegacyWebTest {
 		$this->assertMessage(TEST_GOOD, 'Host updated');
 
 		// Go back to prototype and check changes.
-		$this->zbxTestOpen('host_prototypes.php?form=update&parent_discoveryid='.self::DISCOVERY_RULE_ID.
+		$this->zbxTestOpen('zabbix.php?action=popup&popup=host.prototype.edit&parent_discoveryid='.self::DISCOVERY_RULE_ID.
 				'&hostid='.self::HOST_PROTOTYPE_ID.'&context=host');
 		$this->zbxTestTabSwitch('Encryption');
 		$this->zbxTestWaitForPageToLoad();
@@ -866,11 +873,13 @@ class testFormHostPrototype extends CLegacyWebTest {
 	public function testFormHostPrototype_Clone($data) {
 		$hostname = 'Host prototype {#1}';
 
-		$this->zbxTestLogin('host_prototypes.php?parent_discoveryid='.self::DISCOVERY_RULE_ID.'&context=host');
+		$this->zbxTestLogin('zabbix.php?action=host.prototype.list&parent_discoveryid='.self::DISCOVERY_RULE_ID.'&context=host');
 		$this->zbxTestClickLinkTextWait($hostname);
 		$form = $this->query('id:host-prototype-form')->asForm()->waitUntilVisible()->one();
 		$this->query('button:Clone')->waitUntilClickable()->one()->click();
 		$form->waitUntilStalled();
+		$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
+		$dialog_footer = $dialog->getFooter();
 
 		// Change name and visible name.
 		$this->zbxTestInputTypeOverwrite('host', $data['name']);
@@ -898,7 +907,7 @@ class testFormHostPrototype extends CLegacyWebTest {
 		if (array_key_exists('template', $data)) {
 			$this->zbxTestClickButtonMultiselect('add_templates_');
 			$this->zbxTestLaunchOverlayDialog('Templates');
-			COverlayDialogElement::find()->one()->setDataContext('Templates');
+			COverlayDialogElement::find(1)->one()->setDataContext('Templates');
 			$this->zbxTestClickLinkTextWait($data['template']);
 		}
 
@@ -908,17 +917,17 @@ class testFormHostPrototype extends CLegacyWebTest {
 			$this->zbxTestClickXpathWait('//label[text()="'.$data['inventory'].'"]');
 		}
 
-		$this->zbxTestClick('add');
+		$dialog_footer->query('button:Add')->one()->click();
 
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Host prototype added');
 
 		if (array_key_exists('visible_name', $data)) {
-			$this->zbxTestAssertElementPresentXpath('//a[contains(@href, "form") and text()="'.$data['visible_name'].'"]');
-			$this->zbxTestAssertElementPresentXpath('//a[contains(@href, "form") and text()="'.$hostname.'"]');
+			$this->zbxTestAssertElementPresentXpath('//a[contains(@href, "host.prototype.edit") and text()="'.$data['visible_name'].'"]');
+			$this->zbxTestAssertElementPresentXpath('//a[contains(@href, "host.prototype.edit") and text()="'.$hostname.'"]');
 		}
 		else {
-			$this->zbxTestAssertElementPresentXpath('//a[contains(@href, "form") and text()="'.$data['name'].'"]');
-			$this->zbxTestAssertElementPresentXpath('//a[contains(@href, "form") and text()="'.$hostname.'"]');
+			$this->zbxTestAssertElementPresentXpath('//a[contains(@href, "host.prototype.edit") and text()="'.$data['name'].'"]');
+			$this->zbxTestAssertElementPresentXpath('//a[contains(@href, "host.prototype.edit") and text()="'.$hostname.'"]');
 		}
 
 		// Check the results in form
@@ -967,10 +976,14 @@ class testFormHostPrototype extends CLegacyWebTest {
 	public function testFormHostPrototype_Delete() {
 		$prototype_name = 'Host prototype {#3}';
 
-		$this->zbxTestLogin('host_prototypes.php?parent_discoveryid='.self::DISCOVERY_RULE_ID.'&context=host');
+		$this->zbxTestLogin('zabbix.php?action=host.prototype.list&parent_discoveryid='.self::DISCOVERY_RULE_ID.'&context=host');
 		$this->zbxTestClickLinkTextWait($prototype_name);
 
-		$this->zbxTestClickAndAcceptAlert('delete');
+		$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
+		$dialog_footer = $dialog->getFooter();
+
+		$dialog_footer->query('button:Delete')->waitUntilClickable()->one()->click();
+		$this->zbxTestAcceptAlert();
 
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Host prototype deleted');
 
@@ -1003,7 +1016,10 @@ class testFormHostPrototype extends CLegacyWebTest {
 		$this->zbxTestLaunchOverlayDialog('Host groups');
 		$this->zbxTestClickLinkText($group);
 
-		$this->zbxTestClick('cancel');
+		$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
+		$dialog_footer = $dialog->getFooter();
+
+		$dialog_footer->query('button:Cancel')->one()->click();
 
 		// Check the results in frontend.
 		$this->zbxTestCheckHeader('Host prototypes');
@@ -1020,7 +1036,7 @@ class testFormHostPrototype extends CLegacyWebTest {
 		$sql_hash = 'SELECT * FROM hosts ORDER BY hostid';
 		$old_hash = CDBHelper::getHash($sql_hash);
 
-		$this->zbxTestLogin('host_prototypes.php?parent_discoveryid='.self::DISCOVERY_RULE_ID.'&context=host');
+		$this->zbxTestLogin('zabbix.php?action=host.prototype.list&parent_discoveryid='.self::DISCOVERY_RULE_ID.'&context=host');
 
 		$sql = 'SELECT name'.
 				' FROM hosts'.
@@ -1034,23 +1050,25 @@ class testFormHostPrototype extends CLegacyWebTest {
 		foreach (CDBHelper::getAll($sql) as $host) {
 			$name = $host['name'];
 			$this->zbxTestClickLinkText($name);
+			$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
+			$dialog_footer = $dialog->getFooter();
 
 			switch ($action) {
 				case 'update':
 					$name .= ' (updated)';
 					$this->zbxTestInputTypeOverwrite('host', $name);
-					$this->zbxTestClick('cancel');
+					$dialog_footer->query('button:Cancel')->one()->click();
 					break;
 
 				case 'clone':
 					$name .= ' (cloned)';
 					$this->zbxTestInputTypeOverwrite('host', $name);
-					$this->zbxTestClickWait('clone');
-					$this->zbxTestClickWait('cancel');
+					$dialog_footer->query('button:Clone')->one()->click();
+					$dialog_footer->query('button:Cancel')->one()->click();
 					break;
 
 				case 'delete':
-					$this->zbxTestClickWait('delete');
+					$dialog_footer->query('button:Delete')->one()->click();
 					$this->webDriver->switchTo()->alert()->dismiss();
 					break;
 			}

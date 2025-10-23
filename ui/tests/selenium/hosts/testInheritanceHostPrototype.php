@@ -75,17 +75,24 @@ class testInheritanceHostPrototype extends CLegacyWebTest {
 						' AND name='.zbx_dbstr($data['discovery']).
 				')'
 		);
-		$this->zbxTestAssertElementPresentXpath('//ul[@id="interfaces_'.$interface.'_useip"]//input[@value="0"][@readonly]');
-		$this->zbxTestAssertElementPresentXpath('//ul[@id="interfaces_'.$interface.'_useip"]//input[@value="1"][@readonly]');
+
+		$form = COverlayDialogElement::find()->one()->asForm();
+
+		$this->zbxTestAssertElementPresentXpath('//ul[@id="interfaces_1_useip"]//input[@value="1"][@readonly]');
+		$this->zbxTestAssertElementPresentXpath('//ul[@id="interfaces_1_useip"]//input[@value="0"][@readonly]');
 		$this->zbxTestAssertElementPresentXpath('//div[contains(@class,"interface-cell-port")]/input[@type="text"][@readonly]');
 
 		$monitored_by = $this->query('id:monitored_by')->asSegmentedRadio()->one();
 		$this->assertFalse($monitored_by->isEnabled());
 		$this->assertEquals('Server', $monitored_by->getSelected());
 
-		// Check layout at Groups tab.
 		$this->zbxTestAssertElementPresentXpath('//div[@id="group_links_"]//ul[@class="multiselect-list"][@aria-readonly="true"]');
-		$this->zbxTestAssertElementPresentXpath('//button[@class="btn-grey"][@disabled]');
+
+		foreach (['Templates', 'Host groups'] as $multiselect) {
+			$this->assertFalse($form->getField($multiselect)->query('button:Select')->one()->isEnabled());
+		}
+
+//		$this->zbxTestAssertElementPresentXpath('//button[@class="btn-grey"][@disabled]');
 		$this->zbxTestAssertElementPresentXpath('//input[@name="group_prototypes[0][name]"][@readonly]');
 
 		// Check layout at IPMI tab.
@@ -532,8 +539,8 @@ class testInheritanceHostPrototype extends CLegacyWebTest {
 			);
 		}
 
-		$this->zbxTestLogin('host_prototypes.php?form=update&context=host&parent_discoveryid='.$discovery_id.'&hostid='.
-				$host_prototype
+		$this->zbxTestLogin('zabbix.php?action=popup&popup=host.prototype.edit&parent_discoveryid='.$discovery_id.'&hostid='.
+				$host_prototype.'&context=host'
 		);
 	}
 
