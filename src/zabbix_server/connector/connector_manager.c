@@ -89,6 +89,11 @@ static void	connector_clear(zbx_connector_t *connector)
 	zbx_hashset_destroy(&connector->data_point_links);
 }
 
+static void	connector_clear_wrapper(void *data)
+{
+	connector_clear((zbx_connector_t*)data);
+}
+
 static void	data_point_link_clean(zbx_data_point_link_t *data_point_link)
 {
 	zbx_vector_connector_data_point_clear_ext(&data_point_link->connector_data_points,
@@ -115,7 +120,7 @@ static void	connector_init_manager(zbx_connector_manager_t *manager, int worker_
 			(size_t)manager->worker_fork_count, sizeof(zbx_connector_worker_t));
 
 	zbx_hashset_create_ext(&manager->connectors, 0, ZBX_DEFAULT_UINT64_HASH_FUNC,
-			ZBX_DEFAULT_UINT64_COMPARE_FUNC, (zbx_clean_func_t)connector_clear,
+			ZBX_DEFAULT_UINT64_COMPARE_FUNC, connector_clear_wrapper,
 			ZBX_DEFAULT_MEM_MALLOC_FUNC, ZBX_DEFAULT_MEM_REALLOC_FUNC, ZBX_DEFAULT_MEM_FREE_FUNC);
 	zbx_hashset_iter_reset(&manager->connectors, &manager->iter);
 

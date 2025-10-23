@@ -26,6 +26,11 @@ ZBX_PTR_VECTOR_IMPL(am_db_mediatype_ptr, zbx_am_db_mediatype_t *)
 ZBX_PTR_VECTOR_IMPL(am_db_alert_ptr, zbx_am_db_alert_t *)
 ZBX_PTR_VECTOR_IMPL(am_result_ptr, zbx_am_result_t *)
 
+void	zbx_am_source_stats_free(zbx_am_source_stats_t	*as)
+{
+	zbx_free(as);
+}
+
 void	zbx_am_db_mediatype_clear(zbx_am_db_mediatype_t *mediatype)
 {
 	zbx_free(mediatype->name);

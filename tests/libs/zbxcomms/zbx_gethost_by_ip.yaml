@@ -1,0 +1,21 @@
+---
+test case: "localhost"
+in:
+  ip: "127.0.0.1"
+---
+test case: "empty ip"
+in:
+  ip: ""
+---
+test case: "wrong ip"
+in:
+  ip: "999.999.999.999"
+---
+test case: "truncated ip"
+in:
+  ip: "1"
+---
+test case: "corrupted"
+in:
+  ip: "ABC"
+...
