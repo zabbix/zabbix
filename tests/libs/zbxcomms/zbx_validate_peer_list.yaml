@@ -1,0 +1,93 @@
+---
+test case: "Empty string"
+in:
+  list: ""
+  ipv: 0
+out:
+  return: SUCCEED
+---
+test case: "IPv4 single address"
+in:
+  list: "127.0.0.1"
+  ipv: 0
+out:
+  return: SUCCEED
+---
+test case: "IPv6 single address"
+in:
+  list: "2001:db8::1"
+  ipv: 1
+out:
+  return: SUCCEED
+---
+test case: "Valid hostname"
+in:
+  list: "example.com"
+  ipv: 0
+out:
+  return: SUCCEED
+---
+test case: "Valid CIDR IPv4"
+in:
+  list: "10.0.0.0/8"
+  ipv: 0
+out:
+  return: SUCCEED
+---
+test case: "Valid CIDR IPv6"
+in:
+  list: "2001:db8::/64"
+  ipv: 1
+out:
+  return: SUCCEED
+---
+test case: "Multiple valid entries"
+in:
+  list: "127.0.0.1,10.0.0.0/24,example.com"
+  ipv: 0
+out:
+  return: SUCCEED
+---
+test case: "Multiple valid entries IPv6"
+in:
+  list: "2001:db8::1,example.org,10.1.2.3/16"
+  ipv: 1
+out:
+  return: SUCCEED
+---
+test case: "Invalid CIDR mask IPv4"
+in:
+  list: "192.168.1.1/99"
+  ipv: 0
+out:
+  return: FAIL
+---
+test case: "Invalid CIDR mask IPv6"
+in:
+  list: "2001:db8::1/129"
+  ipv: 1
+out:
+  return: FAIL
+---
+test case: "Invalid hostname characters"
+in:
+  list:  |
+   !"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_`abcdefghijklmnopqrstuvwxyz{|}
+  ipv: 0
+out:
+  return: FAIL
+---
+test case: "CIDR without IP"
+in:
+  list: "/24"
+  ipv: 0
+out:
+  return: FAIL
+---
+test case: "Hostname with double dot"
+in:
+  list: "example..com"
+  ipv: 0
+out:
+  return: FAIL
+...
