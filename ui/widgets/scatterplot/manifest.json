@@ -6,7 +6,7 @@
 	"namespace": "ScatterPlot",
 	"version": "1.0",
 	"author": "Zabbix",
-	"description": "Displays data of relationships between two different metrics",
+	"description": "Displays data of relationships between two different metrics.",
 	"url": "web_interface/frontend_sections/dashboards/widgets/scatter_plot",
 	"widget": {
 		"js_class": "CWidgetScatterPlot",
