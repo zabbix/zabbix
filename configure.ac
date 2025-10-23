@@ -1153,6 +1153,7 @@ dnl *****************************************************************
 AC_ARG_ENABLE(static,[  --enable-static         Build statically linked binaries],
 [case "${enableval}" in
   yes)
+    enable_static=yes
     LDFLAGS="${LDFLAGS} -static"
     AC_MSG_CHECKING(if static linking is possible)
     AC_LINK_IFELSE([AC_LANG_PROGRAM(,)],
@@ -1171,7 +1172,7 @@ esac])
 AC_ARG_ENABLE(static-libs,[  --enable-static-libs    Build statically linked binaries with selected libs from default folders],
 [case "${enableval}" in
   yes)
-    static_linking_libs=yes
+    enable_static_libs=yes
     saved_LIBS="$LIBS"
     LIBS="${saved_LIBS} -Wl,-bstatic -Wl,-bdynamic"
     AC_MSG_CHECKING([if libs static linking with "-Wl,-b" is possible])
@@ -1192,18 +1193,24 @@ AC_ARG_ENABLE(static-libs,[  --enable-static-libs    Build statically linked bin
           static_linking_support=no])
           LIBS="$saved_LIBS"
     fi
+
+    if test "x$static_linking_support" = "xno"; then
+      AC_MSG_ERROR([static linking with selected libs is not possible on this system])
+    fi
     ;;
   no) ;;
   *) AC_MSG_ERROR([bad value ${enableval} for --enable-static-libs]) ;;
 esac])
 
-if test "x$static_linking" = "xyes" && test "x$static_linking_libs" = "xyes"; then
-  AC_MSG_ERROR([cannot use --static and --static-libs at the same time])
+if test "x$enable_static" = "xyes" && test "x$enable_static_libs" = "xyes"; then
+  AC_MSG_ERROR([cannot use --enable-static and --enable-static-libs at the same time])
 fi
 
-AM_CONDITIONAL(STATIC_LINKING, test "x$static_linking" = "xyes" || test "x$static_linking_libs" = "xyes")
-if test "x$static_linking" = "xyes" || test "x$static_linking_libs" = "xyes"; then
-	AC_DEFINE(STATIC_LINKING,1,[Define to 1 if libraries are linked statically.])
+if test "x$static_linking" = "xyes" \
+    || test "x$static_linking_support" = "x-Wl,-b" \
+    || test "x$static_linking_support" = "x-Wl,-B" ;
+then
+  AC_DEFINE(STATIC_LINKING,1,[Define to 1 if libraries are linked statically.])
 fi
 
 AC_ARG_ENABLE(server,[  --enable-server         Turn on build of Zabbix server],

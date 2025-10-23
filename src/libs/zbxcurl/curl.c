@@ -56,18 +56,18 @@ CURLMcode	zbx_curl_multi_wait(CURLM *multi_handle, int timeout_ms, int *numfds)
 	static void		*handle;
 	static CURLMcode	(*fptr)(CURLM *, struct curl_waitfd *, unsigned int, int, int *) = NULL;
 
-#if !defined _WINDOWS && !defined STATIC_LINKING
-	/* this check must be performed before calling this function */
-	if (SUCCEED != zbx_curl_good_for_elasticsearch(NULL))
-	{
-		zabbix_log(LOG_LEVEL_CRIT, "zbx_curl_multi_wait() should never be called when using cURL library"
-				" < 7.28.0 (using version %s)", libcurl_version_str());
-		THIS_SHOULD_NEVER_HAPPEN;
-		exit(EXIT_FAILURE);
-	}
-
 	if (NULL == fptr)
 	{
+		/* this check must be performed before calling this function */
+		if (SUCCEED != zbx_curl_good_for_elasticsearch(NULL))
+		{
+			zabbix_log(LOG_LEVEL_CRIT, "zbx_curl_multi_wait() should never be called when using"
+					" cURL library < 7.28.0 (using version %s)", libcurl_version_str());
+			THIS_SHOULD_NEVER_HAPPEN;
+			exit(EXIT_FAILURE);
+		}
+
+#if !defined(_WINDOWS) && !defined(STATIC_LINKING)
 		if (NULL == (handle = dlopen(NULL, RTLD_LAZY | RTLD_NOLOAD)))
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "cannot dlopen() Zabbix binary: %s", dlerror());
@@ -81,18 +81,10 @@ CURLMcode	zbx_curl_multi_wait(CURLM *multi_handle, int timeout_ms, int *numfds)
 			dlclose(handle);
 			exit(EXIT_FAILURE);
 		}
-	}
-#elif LIBCURL_VERSION_NUM < 0x071c00
-	zabbix_log(LOG_LEVEL_CRIT, "zbx_curl_multi_wait() should never be called when using cURL library"
-			" < 7.28.0 (using version %s)", libcurl_version_str());
-	THIS_SHOULD_NEVER_HAPPEN;
-	exit(EXIT_FAILURE);
-#else
-	if (NULL == fptr)
-	{
+#elif LIBCURL_VERSION_NUM >= 0x071c00
 		fptr = curl_multi_wait;
-	}
 #endif
+	}
 
 	return fptr(multi_handle, NULL, 0, timeout_ms, numfds);
 }
@@ -152,7 +144,6 @@ const char	*zbx_curl_content_type(CURL *easyhandle)
 	unsigned int		origin;
 	CURLHcode		h;
 
-#if !defined _WINDOWS && !defined STATIC_LINKING
 	if (libcurl_version_num() < 0x075300)
 	{
 		return get_content_type(easyhandle);
@@ -160,6 +151,7 @@ const char	*zbx_curl_content_type(CURL *easyhandle)
 
 	if (NULL == fptr)
 	{
+#if !defined(_WINDOWS) && !defined(STATIC_LINKING)
 		if (NULL == (handle = dlopen(NULL, RTLD_LAZY | RTLD_NOLOAD)))
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "cannot dlopen() Zabbix binary: %s", dlerror());
@@ -173,15 +165,10 @@ const char	*zbx_curl_content_type(CURL *easyhandle)
 			dlclose(handle);
 			exit(EXIT_FAILURE);
 		}
-	}
-#elif LIBCURL_VERSION_NUM < 0x075300
-	return get_content_type(easyhandle);
-#else
-	if (NULL == fptr)
-	{
+#elif LIBCURL_VERSION_NUM >= 0x075300
 		fptr = curl_easy_header;
-	}
 #endif
+	}
 
 	origin = CURLH_HEADER | CURLH_TRAILER | CURLH_CONNECT | CURLH_1XX;
 
