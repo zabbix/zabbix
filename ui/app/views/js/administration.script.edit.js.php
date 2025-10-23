@@ -28,7 +28,8 @@ window.script_edit_popup = new class {
 		this.form = new CForm(this.form_element, rules);
 		this.script = script;
 		this.scriptid = script.scriptid;
-		this.menu_path_value = '';
+		this.saved_scope_value = script.scope;
+		this.saved_menu_path_value = '';
 
 		const return_url = new URL('zabbix.php', location.href);
 		return_url.searchParams.set('action', 'script.list');
@@ -66,12 +67,14 @@ window.script_edit_popup = new class {
 					}
 
 					if (is_scope_action) {
-						this.menu_path_value = this.form.findFieldByName('menu_path').getValue();
+						this.saved_menu_path_value = this.form.findFieldByName('menu_path').getValue();
 						this.form_element.querySelector('[name="menu_path"]').value = '';
 					}
-					else if (this.menu_path_value !== '') {
-						this.form_element.querySelector('[name="menu_path"]').value = this.menu_path_value;
+					else if (this.saved_scope_value == <?= ZBX_SCRIPT_SCOPE_ACTION ?>) {
+						this.form_element.querySelector('[name="menu_path"]').value = this.saved_menu_path_value;
 					}
+
+					this.saved_scope_value = this.form.findFieldByName('scope').getValue();
 				}
 				else if (e.target.name === 'type') {
 					const command_ipmi = document.getElementById('commandipmi');
