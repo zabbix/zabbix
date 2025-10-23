@@ -578,7 +578,7 @@ class testPageAdministrationGeneralModules extends CWebTest {
 
 		// Sort column contents ascending.
 		usort($all_modules, function($a, $b) {
-			return strcmp($a['Name'], $b['Name']);
+			return strnatcasecmp($a['Name'], $b['Name']);
 		});
 
 		// Check parameters of modules in the modules table.
