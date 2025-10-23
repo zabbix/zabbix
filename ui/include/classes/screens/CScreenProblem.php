@@ -1201,7 +1201,7 @@ class CScreenProblem extends CScreenBase {
 		CTagHelper::orderTags($data['problems']);
 		CTagHelper::orderTags($symptom_data['problems']);
 
-		$tags = CTagHelper::getTagsRaw($data['problems'] + $symptom_data['problems']);
+		$tags = CTagHelper::getTagsRaw($data['problems'] + $symptom_data['problems'], ZBX_TAG_OBJECT_PROBLEM);
 
 		// Get cause event names for symptoms.
 		$causes = [];
