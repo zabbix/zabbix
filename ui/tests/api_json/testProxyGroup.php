@@ -157,7 +157,7 @@ class testProxyGroup extends CAPITest {
 			'used_in_action' => [
 				'name' => 'API test proxy group - used in action',
 				'operating_mode' => PROXY_OPERATING_MODE_ACTIVE
-			],
+			]
 		];
 
 		$db_proxies = CDataHelper::call('proxy.create', array_values($proxies));
