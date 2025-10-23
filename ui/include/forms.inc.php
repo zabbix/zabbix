@@ -381,7 +381,7 @@ function getItemPreprocessing(array $preprocessing, $readonly, array $types) {
 			$opt_group = new CSelectOptionGroup($group['label']);
 
 			foreach ($group['types'] as $type => $label) {
-				$opt_group->addOption((new CSelectOption($type, $label)));
+				$opt_group->addOption(new CSelectOption($type, $label));
 			}
 
 			$preproc_types_select->addOptionGroup($opt_group);
