@@ -5797,7 +5797,6 @@ form.dashboard-widget-scatterplot {
     form.dashboard-widget-scatterplot .dataset-body .form-grid:first-child {
       grid-column-start: 5; }
     form.dashboard-widget-scatterplot .dataset-body .form-grid .table-tags {
-      min-width: 385px;
       max-width: 453px; }
       form.dashboard-widget-scatterplot .dataset-body .form-grid .table-tags .table-tags-input {
         min-width: 100px;
