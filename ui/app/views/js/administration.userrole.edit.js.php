@@ -296,14 +296,14 @@
 			update_button.setAttribute('id', 'add');
 
 			document.getElementById('name').focus();
-			this.#removePopupMessages();
+			clearMessages();
 			this.form.reload(rules);
 		}
 
 		submit(e) {
 			e.preventDefault();
-			this.#removePopupMessages();
 			this.#setLoadingStatus(['add', 'update']);
+			clearMessages();
 			const fields = this.form.getAllValues();
 
 			this.form.validateSubmit(fields)
@@ -362,14 +362,6 @@
 			}
 		}
 
-		#removePopupMessages() {
-			for (const el of this.form_element.parentNode.children) {
-				if (el.matches('.msg-good, .msg-bad, .msg-warning')) {
-					el.parentNode.removeChild(el);
-				}
-			}
-		}
-
 		#ajaxExceptionHandler (exception) {
 			let title, messages;
 
@@ -378,11 +370,10 @@
 				messages = exception.error.messages;
 			}
 			else {
-				messages = [<?= json_encode(_('Unexpected server error.')) ?>];
+				messages = [t('Unexpected server error.')];
 			}
 
-			const message_box = makeMessageBox('bad', messages, title)[0];
-			this.form_element.parentNode.insertBefore(message_box, this.form_element);
+			addMessage(makeMessageBox('bad', messages, title)[0]);
 		}
 
 		#setLoadingStatus(loading_ids) {
