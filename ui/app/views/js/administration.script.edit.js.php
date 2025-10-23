@@ -52,8 +52,8 @@ window.script_edit_popup = new class {
 	}
 
 	#initActions(rules) {
-		this.form_element.querySelectorAll('#scope, #type, #hgstype-select, #manualinput, #manualinput_validator_type' +
-				' ,#enable_confirmation, #confirmation').forEach(
+		this.form_element.querySelectorAll('#scope, #type, #authtype, #hgstype-select, #manualinput,' +
+				' #manualinput_validator_type ,#enable_confirmation, #confirmation').forEach(
 			node => node.addEventListener('change', (e) => {
 				if (e.target.name === 'scope') {
 					const is_scope_action =
@@ -155,12 +155,14 @@ window.script_edit_popup = new class {
 
 	#updateForm() {
 		const data = this.form.getAllValues();
-		const is_scope_manual = data.scope == <?= ZBX_SCRIPT_SCOPE_HOST ?> || data.scope == <?= ZBX_SCRIPT_SCOPE_EVENT ?>;
+		const is_scope_manual = data.scope == <?= ZBX_SCRIPT_SCOPE_HOST ?>
+			|| data.scope == <?= ZBX_SCRIPT_SCOPE_EVENT ?>;
 
 		const is_enable_user_input = data.manualinput == 1;
 		const is_enable_confirmation = data.enable_confirmation == 1;
 		// manualinput_validator_type radio might be disabled. In this case it's field return value as null.
-		const input_type_value = this.form_element.querySelector('input[name="manualinput_validator_type"]:checked').value;
+		const input_type_value =
+			this.form_element.querySelector('input[name="manualinput_validator_type"]:checked').value;
 		const is_input_type_string = input_type_value == <?= ZBX_SCRIPT_MANUALINPUT_TYPE_STRING ?>;
 		const is_input_type_list = input_type_value == <?= ZBX_SCRIPT_MANUALINPUT_TYPE_LIST ?>;
 
@@ -232,17 +234,18 @@ window.script_edit_popup = new class {
 
 		// Advanced configuration
 
-		this.form_element.querySelectorAll('label[for=manualinput_default_value], label[for=manualinput_validator]').forEach(
-			node => node.style.display = is_input_type_string ? '' : 'none'
-		);
+		this.form_element.querySelectorAll('label[for=manualinput_default_value], label[for=manualinput_validator]')
+			.forEach(
+				node => node.style.display = is_input_type_string ? '' : 'none'
+			);
 
 		this.form_element.querySelectorAll('#manualinput_default_value, #manualinput_validator').forEach(
 			node => node.parentNode.style.display = is_input_type_string ? '' : 'none'
 		);
 
 		this.form_element.querySelector('label[for=dropdown_options]').style.display = is_input_type_list ? '' : 'none';
-		this.form_element.querySelector('#dropdown_options').parentNode.style.display = is_input_type_list ? '' : 'none';
-
+		this.form_element.querySelector('#dropdown_options').parentNode.style.display = is_input_type_list
+			? '' : 'none';
 
 		this.form_element.querySelectorAll('#manualinput_prompt, input[name=manualinput_validator_type],' +
 				' #manualinput_default_value, #manualinput_validator, #dropdown_options, #test_user_input').forEach(
@@ -269,7 +272,7 @@ window.script_edit_popup = new class {
 	 * @param {object} parameter  The parameter object.
 	 */
 	#addParameter(parameter) {
-		const template = new Template(this.form_element.querySelector('#script-parameter-template').innerHTML);
+		const template = new Template(document.getElementById('script-parameter-template').innerHTML);
 		const parameters_table_element = this.form_element.querySelector('#parameters-table tbody');
 		let row_index = 0;
 
