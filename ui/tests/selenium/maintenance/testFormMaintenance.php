@@ -166,24 +166,16 @@ class testFormMaintenance extends CLegacyWebTest {
 
 		$periods = [
 			[
-				'fields' => [
-					'Period type' => 'One time only'
-				],
+				'fields' => ['Period type' => 'One time only'],
 			],
 			[
-				'fields' => [
-					'Period type' => 'Daily'
-				],
+				'fields' => ['Period type' => 'Daily'],
 			],
 			[
-				'fields' => [
-					'Period type' => 'Weekly'
-				],
+				'fields' => ['Period type' => 'Weekly'],
 			],
 			[
-				'fields' => [
-					'Period type' => 'Monthly'
-				],
+				'fields' => ['Period type' => 'Monthly'],
 			],
 			[
 				'fields' => [
