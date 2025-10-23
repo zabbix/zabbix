@@ -74,6 +74,7 @@ class testPageAdministrationGeneralModules extends CWebTest {
 		'Problem hosts' => 'Displays the problem count by host group and the highest problem severity within a group.',
 		'Problems' => 'Displays currently open problems with quick access links to the problem details.',
 		'Problems by severity' => 'Displays the problem count by severity.',
+		'Scatter plot' => 'Displays data of relationships between two different metrics.',
 		'SLA report' => 'Displays SLA reports.',
 		'System information' => 'Displays the current status and system statistics of the Zabbix server and its '.
 				'associated components.',
