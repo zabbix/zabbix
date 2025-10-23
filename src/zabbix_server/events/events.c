@@ -2608,7 +2608,7 @@ static void	get_open_problems(const zbx_vector_uint64_t *triggerids, zbx_vector_
 
 	if (0 != problems->values_num)
 	{
-		zbx_vector_ptr_sort(problems, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
+		zbx_vector_event_problem_ptr_sort(problems, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
 		zbx_vector_uint64_sort(&eventids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 		sql_offset = 0;
