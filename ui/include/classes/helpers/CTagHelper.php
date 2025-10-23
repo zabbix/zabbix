@@ -151,13 +151,13 @@ class CTagHelper {
 					continue;
 				}
 
+				$html_elements[$objectid][] = self::getTagHtml($tag, $object_type, $options);
+
 				$show_tags_count++;
 
-				if ($show_tags_count > $options['show_tags_limit']) {
+				if ($show_tags_count >= $options['show_tags_limit']) {
 					break;
 				}
-
-				$html_elements[$objectid][] = self::getTagHtml($tag, $object_type, $options);
 			}
 
 			if (count($object['tags']) <= $show_tags_count) {
