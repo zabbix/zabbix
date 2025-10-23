@@ -740,9 +740,9 @@ int	zbx_tcp_connect(zbx_socket_t *s, const char *source_ip, const char *ip, unsi
  * Purpose: write data to TCP socket (with optional TLS support)              *
  *                                                                            *
  * Parameters: s    - [IN]                                                    *
- *             buf  - [IN] pointer to data buffer to send                     *
+ *             buf  - [IN] data buffer to send                                *
  *             len  - [IN] length of data to send                             *
- *             event- [OUT] pointer to event flag                             *
+ *             event- [OUT] event flag                                        *
  *                                                                            *
  * Return value: number of bytes written, or ZBX_PROTO_ERROR on failure       *
  *                                                                            *
@@ -842,9 +842,9 @@ ssize_t	zbx_tcp_write(zbx_socket_t *s, const char *buf, size_t len, short *event
  *                                                                            *
  * Purpose: initialize TCP send context for sending data over socket          *
  *                                                                            *
- * Parameters: data     - [IN] pointer to data to send                        *
+ * Parameters: data     - [IN] data to send                                   *
  *             len      - [IN] length of data to send                         *
- *             reserved - [IN] original size of the uncompressed data.        *
+ *             reserved - [IN] Original size of the uncompressed data.        *
  *                             If zero, compression will be applied when      *
  *                             requested by flags.                            *
  *             flags    - [IN] protocol and compression flags                 *
@@ -950,7 +950,7 @@ void	zbx_tcp_send_context_clear(zbx_tcp_send_context_t *state)
  *                                                                            *
  * Parameters: s       - [IN/OUT]                                             *
  *             context - [IN/OUT]                                             *
- *             event   - [OUT]    event flag (optional)                       *
+ *             event   - [OUT] event flag (optional)                          *
  *                                                                            *
  *                                                                            *
  * Return value: SUCCEED - success                                            *
@@ -1067,8 +1067,8 @@ void	zbx_tcp_close(zbx_socket_t *s)
  *                                                                            *
  * Parameters: addr          - [IN] address or hostname                       *
  *             family        - [OUT] address family                           *
- *             error         - [OUT] error string                             *
- *             max_error_len - [IN] error string length                       *
+ *             error         - [OUT]                                          *
+ *             max_error_len - [IN]                                           *
  *                                                                            *
  * Return value: SUCCEED - success                                            *
  *               FAIL - an error occurred                                     *
@@ -2901,10 +2901,10 @@ int	zbx_udp_connect(zbx_socket_t *s, const char *source_ip, const char *ip, unsi
  * Purpose: send data over UDP socket                                         *
  *                                                                            *
  * Parameters: s        - [IN/OUT]                                            *
- *             data     - [IN]     pointer to data to send                    *
- *             data_len - [IN]     length of data to send                     *
- *             timeout  - [IN]     maximum time to wait for send (seconds)    *
- *                                 range: 0 - INT_MAX                         *
+ *             data     - [IN] data to send                                   *
+ *             data_len - [IN] length of data to send                         *
+ *             timeout  - [IN] maximum time to wait for send (seconds)        *
+ *                               range: 0 - INT_MAX                           *
  *                                                                            *
  * Return value: SUCCEED - data sent successfully                             *
  *               FAIL    - an error occurred                                  *
