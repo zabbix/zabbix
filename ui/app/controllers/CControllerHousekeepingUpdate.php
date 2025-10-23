@@ -23,7 +23,7 @@ class CControllerHousekeepingUpdate extends CController {
 
 	public static function getValidationRules(): array {
 		return ['object', 'fields' => [
-			'hk_events_mode' => ['integer', 'required', 'in' => [0, 1]],
+			'hk_events_mode' => ['boolean', 'required'],
 			'hk_events_trigger' => ['string', 'required', 'not_empty',
 				'when' => ['hk_events_mode', 'in' => [1]],
 				'use' => [CTimeUnitValidator::class, ['min' => SEC_PER_DAY, 'max' => 25 * SEC_PER_YEAR]]
@@ -44,33 +44,33 @@ class CControllerHousekeepingUpdate extends CController {
 				'when' => ['hk_events_mode', 'in' => [1]],
 				'use' => [CTimeUnitValidator::class, ['min' => SEC_PER_DAY, 'max' => 25 * SEC_PER_YEAR]]
 			],
-			'hk_services_mode' => ['integer', 'required', 'in' => [0, 1]],
+			'hk_services_mode' => ['boolean', 'required'],
 			'hk_services' => ['string', 'required', 'not_empty',
 				'when' => ['hk_services_mode', 'in' => [1]],
 				'use' => [CTimeUnitValidator::class, ['min' => SEC_PER_DAY, 'max' => 25 * SEC_PER_YEAR]]
 			],
-			'hk_sessions_mode' => ['integer', 'required', 'in' => [0, 1]],
+			'hk_sessions_mode' => ['boolean', 'required'],
 			'hk_sessions' => ['string', 'required', 'not_empty',
 				'when' => ['hk_sessions_mode', 'in' => [1]],
 				'use' => [CTimeUnitValidator::class, ['min' => SEC_PER_DAY, 'max' => 25 * SEC_PER_YEAR]]
 			],
-			'hk_history_mode' => ['integer', 'required', 'in' => [0, 1]],
-			'hk_history_global' => ['integer', 'required', 'in' => [0, 1]],
+			'hk_history_mode' => ['boolean', 'required'],
+			'hk_history_global' => ['boolean', 'required'],
 			'hk_history' => ['string', 'required', 'not_empty',
 				'when' => ['hk_history_global', 'in' => [1]],
 				'use' => [CTimeUnitValidator::class,
 					['min' => SEC_PER_HOUR, 'max' => 25 * SEC_PER_YEAR, 'allow_zero' => true]
 				]
 			],
-			'hk_trends_mode' => ['integer', 'required', 'in' => [0, 1]],
-			'hk_trends_global' => ['integer', 'required', 'in' => [0, 1]],
+			'hk_trends_mode' => ['boolean', 'required'],
+			'hk_trends_global' => ['boolean', 'required'],
 			'hk_trends' => ['string', 'required', 'not_empty',
 				'when' => ['hk_trends_global', 'in' => [1]],
 				'use' => [CTimeUnitValidator::class,
 					['min' => SEC_PER_DAY, 'max' => 25 * SEC_PER_YEAR, 'allow_zero' => true]
 				]
 			],
-			'compression_status' => ['integer', 'required', 'in' => [0, 1]],
+			'compression_status' => ['boolean', 'required'],
 			'compress_older' => ['string', 'required', 'not_empty',
 				'when' => ['compression_status', 'in' => [1]],
 				'use' => [CTimeUnitValidator::class, ['min' => 7 * SEC_PER_DAY, 'max' => 25 * SEC_PER_YEAR]]

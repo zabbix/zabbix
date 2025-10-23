@@ -99,7 +99,6 @@ class CFormValidator {
 					}
 
 					$result['type'] = 'integer';
-					$result['in'] = [0, 1];
 				}
 				elseif (strncmp($value, 'db ', 3) === 0) {
 					if (array_key_exists('type', $result)) {
@@ -365,13 +364,14 @@ class CFormValidator {
 		/*
 		 * Boolean rules are converted to 'integers' at this point but it may have some special conditions.
 		 *
-		 * If boolean is defined with 'required', the only allowed value remains '1' ('selected/checked/marked' if we
-		 * think about it as checkbox). It also comes with default 'custom' error message.
+		 * If boolean is defined with 'in', then we assume that is checked value.
+		 * It also comes with default 'custom' error message.
 		 */
-		if (in_array('boolean', $rules, true) && array_key_exists('required', $result)) {
-			$result['in'] = [1];
-
-			if (!array_key_exists('messages', $result) || !array_key_exists('in', $result['messages'])) {
+		if (in_array('boolean', $rules, true)) {
+			if (!array_key_exists('in', $result)) {
+				$result['in'] = [0, 1];
+			}
+			elseif (!array_key_exists('messages', $result) || !array_key_exists('in', $result['messages'])) {
 				$result['messages']['in'] = _('Must be selected.');
 			}
 		}

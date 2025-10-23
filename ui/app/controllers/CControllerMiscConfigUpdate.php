@@ -37,17 +37,17 @@ class CControllerMiscConfigUpdate extends CController {
 			'proxy_secrets_provider' => ['integer', 'required',
 				'in' => [ZBX_PROXY_SECRETS_PROVIDER_SERVER, ZBX_PROXY_SECRETS_PROVIDER_PROXY]
 			],
-			'validate_uri_schemes' => ['integer', 'required', 'in' => [0, 1]],
+			'validate_uri_schemes' => ['boolean', 'required'],
 			'uri_valid_schemes' => ['string', 'required',
 				'length' => CSettingsSchema::getFieldLength('uri_valid_schemes'),
 				'when' => ['validate_uri_schemes', 'in' => [1]]
 			],
-			'x_frame_header_enabled' => ['integer', 'required', 'in' => [0, 1]],
+			'x_frame_header_enabled' => ['boolean', 'required'],
 			'x_frame_options' => ['string', 'required',
 				'length' => CSettingsSchema::getFieldLength('x_frame_options'),
 				'when' => ['x_frame_header_enabled', 'in' => [1]]
 			],
-			'iframe_sandboxing_enabled' => ['integer', 'required', 'in' => [0, 1]],
+			'iframe_sandboxing_enabled' => ['boolean', 'required'],
 			'iframe_sandboxing_exceptions' => ['string', 'required',
 				'length' => CSettingsSchema::getFieldLength('iframe_sandboxing_exceptions'),
 				'when' => ['iframe_sandboxing_enabled', 'in' => [1]]

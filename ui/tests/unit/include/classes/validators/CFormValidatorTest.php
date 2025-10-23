@@ -754,13 +754,12 @@ class CFormValidatorTest extends TestCase {
 			],
 			[
 				['object', 'fields' => [
-					'value' => ['boolean', 'required']
+					'value' => ['boolean', 'in' => [1]]
 				]],
 				['type' => 'object', 'fields' => [
 					'value' => [[
 						'type' => 'integer',
 						'in' => [1],
-						'required' => true,
 						'messages' => ['in' => 'Must be selected.']
 					]]
 				]]

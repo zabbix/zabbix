@@ -38,10 +38,10 @@ class CControllerTrigDisplayUpdate extends CController {
 			'ok_ack_color' => ['string', 'required', 'rgb',
 				'when' => ['custom_color', 'in' => [EVENT_CUSTOM_COLOR_ENABLED]]
 			],
-			'problem_unack_style' => ['integer', 'required', 'in' => [0,1]],
-			'problem_ack_style' => ['integer', 'required', 'in' => [0,1]],
-			'ok_unack_style' => ['integer', 'required', 'in' => [0,1]],
-			'ok_ack_style' => ['integer', 'required', 'in' => [0,1]],
+			'problem_unack_style' => ['boolean', 'required'],
+			'problem_ack_style' => ['boolean', 'required'],
+			'ok_unack_style' => ['boolean', 'required'],
+			'ok_ack_style' => ['boolean', 'required'],
 			'ok_period' => ['string', 'required', 'not_empty',
 				'use' => [CTimeUnitValidator::class, ['min' => 0, 'max' => SEC_PER_DAY]]
 			],

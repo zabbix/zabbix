@@ -23,9 +23,9 @@ class CControllerAuditSettingsUpdate extends CController {
 
 	public static function getValidationRules(): array {
 		return ['object', 'fields' => [
-			'auditlog_enabled' => ['integer', 'required', 'in' => [0, 1]],
-			'auditlog_mode' => ['integer', 'required', 'in' => [0, 1]],
-			'hk_audit_mode' => ['integer', 'required', 'in' => [0, 1]],
+			'auditlog_enabled' => ['boolean', 'required'],
+			'auditlog_mode' => ['boolean', 'required'],
+			'hk_audit_mode' => ['boolean', 'required'],
 			'hk_audit' => ['string', 'required', 'not_empty',
 				'when' => ['hk_audit_mode', 'in' => [1]],
 				'use' => [CTimeUnitValidator::class, ['min' => SEC_PER_DAY, 'max' => 25 * SEC_PER_YEAR]]
