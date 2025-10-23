@@ -172,7 +172,7 @@ window.sla_edit_popup = new class {
 		curl.setArgument('action', 'sla.delete');
 		curl.setArgument(CSRF_TOKEN_NAME, <?= json_encode(CCsrfTokenHelper::get('sla')) ?>);
 
-		this._post(curl.getUrl(), {slaids: [this.form.findFieldByName('slaid').getValue()]});
+		this._post(curl.getUrl(), {slaids: [document.getElementById('slaid').value]});
 	}
 
 	submit() {

@@ -23,19 +23,9 @@ $form = (new CForm('post'))
 	->addItem((new CVar(CSRF_TOKEN_NAME, CCsrfTokenHelper::get('sla')))->removeId())
 	->setId('sla-form')
 	->setName('sla_form')
-	->setAction((new CUrl('zabbix.php'))
-		->setArgument('action', $data['form_action'])
-		->getUrl()
-	)
+	->addVar('slaid', $data['slaid'])
 	->addItem(getMessages())
 	->addStyle('display: none;');
-
-if ($data['slaid'] !== null) {
-	$form->addItem(
-		(new CInput('hidden', 'slaid', $data['slaid']))
-			->setAttribute('data-field-type', 'hidden')
-	);
-}
 
 // Enable form submitting on Enter.
 $form->addItem((new CSubmitButton())->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN));
