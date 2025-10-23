@@ -188,10 +188,9 @@ static int	zbx_socket_peer_ip_save(zbx_socket_t *s)
  * Purpose: retrieve host name by IP address                                  *
  *                                                                            *
  * Parameters: ip      - [IN] IP address to resolve                           *
- *             host    - [OUT] buffer to store resolved host name             *
+ *             host    - [OUT] Buffer to store resolved host name.            *
+ *                             On failure set to empty string.                *
  *             hostlen - [IN] size of host buffer                             *
- *                                                                            *
- * Return value: none (host will be set to empty string on failure)           *
  *                                                                            *
  ******************************************************************************/
 void	zbx_gethost_by_ip(const char *ip, char *host, size_t hostlen)
@@ -290,11 +289,10 @@ int	zbx_inet_ntop(struct sockaddr *ai_addr, char *ip, socklen_t len)
  *                                                                            *
  * Purpose: retrieve IP address by host name                                  *
  *                                                                            *
- * Parameters: host - [IN] hostname to resolve                                *
- *             ip   - [OUT] buffer to store resolved IP address               *
- *             iplen- [IN] size of ip buffer                                  *
- *                                                                            *
- * Return value: none (ip will be set to empty string on failure)             *
+ * Parameters: host  - [IN] hostname to resolve                               *
+ *             ip    - [OUT] Buffer to store resolved IP address.             *
+ *                           On failure set to empty string.                  *
+ *             iplen - [IN] size of ip buffer                                 *
  *                                                                            *
  ******************************************************************************/
 void	zbx_getip_by_host(const char *host, char *ip, size_t iplen)
@@ -519,9 +517,9 @@ int	zbx_socket_pollout(zbx_socket_t *s, int timeout, char **error)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: initiate connection to specified address with optional            *
+ * Purpose: initiate connection to specified address                          *
  *                                                                            *
- * Parameters: s           - [IN]                                             *
+ * Parameters: s           - [IN/OUT]                                         *
  *             type        - [IN] TCP or UDP                                  *
  *             source_ip   - [IN]                                             *
  *             ip          - [IN]                                             *
@@ -659,7 +657,7 @@ int	zbx_socket_tls_connect(zbx_socket_t *s, unsigned int tls_connect, const char
  *                                                                            *
  * Purpose: connect socket of specified type to external host                 *
  *                                                                            *
- * Parameters: s           - [IN]                                             *
+ * Parameters: s           - [IN/OUT]                                         *
  *             type        - [IN] TCP or UDP                                  *
  *             source_ip   - [IN]                                             *
  *             ip          - [IN]                                             *
@@ -1065,7 +1063,7 @@ void	zbx_tcp_close(zbx_socket_t *s)
 
 /******************************************************************************
  *                                                                            *
- * Parameters: addr          - [IN] address or hostname                       *
+ * Parameters: addr          - [IN] IP address or hostname                    *
  *             family        - [OUT] address family                           *
  *             error         - [OUT]                                          *
  *             max_error_len - [IN]                                           *
@@ -1075,7 +1073,7 @@ void	zbx_tcp_close(zbx_socket_t *s)
  *                                                                            *
  ******************************************************************************/
 #ifdef HAVE_IPV6
-int	get_address_family(const char *addr, int *family, char *error, int max_error_len)
+int	zbx_get_address_family(const char *addr, int *family, char *error, int max_error_len)
 {
 	struct addrinfo	hints, *ai = NULL;
 	int		err, res = FAIL;
@@ -2768,7 +2766,7 @@ int	zbx_validate_peer_list(const char *peer_list, char **error)
  *                                                                            *
  * Purpose: check if connection initiator is in list of peers                 *
  *                                                                            *
- * Parameters: s         - [IN]                                               *
+ * Parameters: peer_info - [IN]                                               *
  *             peer_list - [IN] Comma-delimited list of allowed peers.        *
  *                              NULL not allowed. Empty string results in     *
  *                              return value FAIL.                            *
