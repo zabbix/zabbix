@@ -163,7 +163,7 @@ class testFormMaintenance extends CLegacyWebTest {
 		$this->query('button:Create maintenance period')->one()->waitUntilClickable()->click();
 
 		$form = COverlayDialogElement::find()->waitUntilReady()->asForm()->one();
-		
+
 		$periods = [
 			[
 				'fields' => [
@@ -192,7 +192,7 @@ class testFormMaintenance extends CLegacyWebTest {
 				]
 			]
 		];
-			
+
 		foreach ($periods as $index => $period) {
 			$form->query('button:Add')->one()->waitUntilClickable()->click();
 			$period_overlay = COverlayDialogElement::find()->waitUntilReady()->all()->last();
@@ -207,7 +207,7 @@ class testFormMaintenance extends CLegacyWebTest {
 		$this->query('button:Cancel')->one()->click();
 		COverlayDialogElement::ensureNotPresent();
 	}
-	
+
 	/**
 	 * Changes not preserve when close edit form using cancel button.
 	 *
