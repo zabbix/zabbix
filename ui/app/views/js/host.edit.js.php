@@ -34,7 +34,7 @@ window.host_edit_popup = {
 		this.initial_proxy_groupid = proxy_groupid;
 		this.all_templateids = null;
 		this.show_inherited_tags = false;
-		this.tags_table = this.form_element.querySelector('[data-field-name="tags"]');
+		this.tags_table = this.form_element.querySelector('.tags-table');
 		this.show_inherited_macros = false;
 
 		const return_url = new URL('zabbix.php', location.href);
