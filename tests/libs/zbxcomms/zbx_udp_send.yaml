@@ -1,7 +1,6 @@
 ---
 test case: "no errors"
 in:
-  timeout: 1
   data: data
   data_len: 5
   poll_mode: "MOCK_POLL_DEFAULT"
@@ -11,7 +10,6 @@ out:
 ---
 test case: "socket blocking error"
 in:
-  timeout: 1
   data: data
   data_len: 5
   poll_mode: "MOCK_POLL_DEFAULT"
@@ -22,7 +20,6 @@ out:
 ---
 test case: "poll error"
 in:
-  timeout: 1
   data: data
   data_len: 5
   poll_mode: "MOCK_POLL_SOCKET_BLOCKING_ERROR"
@@ -32,7 +29,6 @@ out:
 ---
 test case: "revents error"
 in:
-  timeout: 1
   data: data
   data_len: 5
   poll_mode: "MOCK_POLL_REVENTS_ERROR"
