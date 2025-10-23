@@ -229,8 +229,8 @@ static void	setopt_error(const char *option, CURLcode err, char **error)
 int	zbx_curl_setopt_https(CURL *easyhandle, char **error)
 {
 	CURLcode	err;
-	static char	curlopt_protocols_str[11] = {0};
-	static int	curlopt_protocols = 0;
+	static char	*protocols_str;
+	static long	protocols = 0;
 
 /* added in 7.19.4 (0x071304), deprecated since 7.85.0 */
 #if LIBCURL_VERSION_NUM < 0x071304
@@ -241,17 +241,17 @@ int	zbx_curl_setopt_https(CURL *easyhandle, char **error)
 	/* CURLOPT_PROTOCOLS (181L) is supported starting with version 7.19.4 (0x071304) */
 	if (libcurl_version_num() >= 0x071304)
 	{
-		if (0 == curlopt_protocols)
+		if (0 == protocols)
 		{
 			if (SUCCEED == zbx_curl_protocol("HTTPS", NULL))
 			{
-				zbx_strlcpy(curlopt_protocols_str, "HTTP,HTTPS", sizeof(curlopt_protocols_str));
-				curlopt_protocols = CURLPROTO_HTTP | CURLPROTO_HTTPS;
+				protocols_str = "HTTP,HTTPS";
+				protocols = CURLPROTO_HTTP | CURLPROTO_HTTPS;
 			}
 			else
 			{
-				zbx_strlcpy(curlopt_protocols_str, "HTTP", sizeof(curlopt_protocols_str));
-				curlopt_protocols = CURLPROTO_HTTP;
+				protocols_str = "HTTP";
+				protocols = CURLPROTO_HTTP;
 			}
 		}
 
@@ -259,18 +259,18 @@ int	zbx_curl_setopt_https(CURL *easyhandle, char **error)
 		if (libcurl_version_num() >= 0x075500)
 		{
 			if (CURLE_OK != (err = curl_easy_setopt(easyhandle,
-					CURLOPT_PROTOCOLS_STR, curlopt_protocols_str)))
+					CURLOPT_PROTOCOLS_STR, protocols_str)))
 			{
-				setopt_error(curlopt_protocols_str, err, error);
+				setopt_error(protocols_str, err, error);
 				return FAIL;
 			}
 		}
 		else
 		{
 			/* 181L is CURLOPT_PROTOCOLS, remove when cURL requirement will become >= 7.85.0 */
-			if (CURLE_OK != (err = curl_easy_setopt(easyhandle, 181L, curlopt_protocols)))
+			if (CURLE_OK != (err = curl_easy_setopt(easyhandle, 181L, protocols)))
 			{
-				setopt_error(curlopt_protocols_str, err, error);
+				setopt_error(protocols_str, err, error);
 				return FAIL;
 			}
 		}
@@ -282,8 +282,8 @@ int	zbx_curl_setopt_https(CURL *easyhandle, char **error)
 int	zbx_curl_setopt_smtps(CURL *easyhandle, char **error)
 {
 	CURLcode	err;
-	static char	curlopt_protocols_str[11] = {0};
-	static int	curlopt_protocols = 0;
+	static char	*protocols_str;
+	static long	protocols = 0;
 
 /* added in 7.20.0 (0x071400), deprecated since 7.85.0 */
 #if LIBCURL_VERSION_NUM < 0x071400
@@ -294,17 +294,17 @@ int	zbx_curl_setopt_smtps(CURL *easyhandle, char **error)
 	/* CURLOPT_PROTOCOLS (181L) is supported starting with version 7.19.4 (0x071304) */
 	if (libcurl_version_num() >= 0x071304)
 	{
-		if (0 == curlopt_protocols)
+		if (0 == protocols)
 		{
 			if (SUCCEED == zbx_curl_protocol("SMTPS", NULL))
 			{
-				zbx_strlcpy(curlopt_protocols_str, "SMTP,SMTPS", sizeof(curlopt_protocols_str));
-				curlopt_protocols = CURLPROTO_SMTP | CURLPROTO_SMTPS;
+				protocols_str = "SMTP,SMTPS";
+				protocols = CURLPROTO_SMTP | CURLPROTO_SMTPS;
 			}
 			else
 			{
-				zbx_strlcpy(curlopt_protocols_str, "SMTP", sizeof(curlopt_protocols_str));
-				curlopt_protocols = CURLPROTO_SMTP;
+				protocols_str = "SMTP";
+				protocols = CURLPROTO_SMTP;
 			}
 		}
 
@@ -312,18 +312,18 @@ int	zbx_curl_setopt_smtps(CURL *easyhandle, char **error)
 		if (libcurl_version_num() >= 0x075500)
 		{
 			if (CURLE_OK != (err = curl_easy_setopt(easyhandle,
-					CURLOPT_PROTOCOLS_STR, curlopt_protocols_str)))
+					CURLOPT_PROTOCOLS_STR, protocols_str)))
 			{
-				setopt_error(curlopt_protocols_str, err, error);
+				setopt_error(protocols_str, err, error);
 				return FAIL;
 			}
 		}
 		else
 		{
 			/* 181L is CURLOPT_PROTOCOLS, remove when cURL requirement will become >= 7.85.0 */
-			if (CURLE_OK != (err = curl_easy_setopt(easyhandle, 181L, curlopt_protocols)))
+			if (CURLE_OK != (err = curl_easy_setopt(easyhandle, 181L, protocols)))
 			{
-				setopt_error(curlopt_protocols_str, err, error);
+				setopt_error(protocols_str, err, error);
 				return FAIL;
 			}
 		}
