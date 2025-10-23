@@ -100,7 +100,7 @@ class testDashboardsListPage extends CWebTest {
 					'fields' => [
 						'Show' => 'All'
 					],
-					'result_count' => 26
+					'result_count' => 25
 				]
 			],
 			[
@@ -108,7 +108,7 @@ class testDashboardsListPage extends CWebTest {
 					'fields' => [
 						'Show' => 'Created by me'
 					],
-					'result_count' => 25
+					'result_count' => 24
 				]
 			],
 			[
