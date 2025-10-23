@@ -1,31 +1,87 @@
+Changes for 7.0.20rc1
+
+New features:
+A.......S. [ZBXNEXT-10271] updated maximum supported TimescaleDB version to 2.22 (mprihodko)
+.........T [ZBXNEXT-10245] added Stormshield SNS by SNMP template (knaglis)
+A......PS. [ZBXNEXT-10219] updated maximum supported PostgreSQL version to 18 (mprihodko)
+...G...... [ZBXNEXT-7744] added TLS support for Zabbix agent 2 Redis plugin (opucka)
+
+Bug fixes:
+.......PS. [ZBX-27113] improved performance and memory usage by not storing item unsupported error in configuration cache (vso)
+........S. [ZBX-27111] fixed new timer being allocated each time trigger value is updated (vso)
+.........T [ZBX-26544] added preprocessing step to "Outbound packets discarded" item in FortiGate by SNMP template (aiantsen)
+..F....... [ZBX-22157] added Map navigation tree widget problem filtering using "Problem display" and "Show suppressed problems" filters of map settings (dfofanovs)
+A......... [ZBX-27059] fixed conditions for "Cannot delete default MFA method" check (dpankins)
+.......PS. [ZBX-24504] improved Prometheus to JSON preprocessing step performance when reused with similar parameters in dependent items (wiper)
+..F....... [ZBX-25743] fixed broken item selection list in Firefox (gklavins, wczerneha)
+...G...PS. [ZBX-25148] added adjustments for sequential data entries with the same timestamp (askolmeisters)
+..F....... [ZBX-25394] fixed unassigned proxy indication on Queue details page; extended coverage to proxies managed by proxy groups (dpankins)
+...G...... [ZBX-25263] fixed Zabbix agent to attempt next refresh of active checks in 60 seconds in case of connection errors (arimdjonoks)
+.......PS. [ZBX-26910] fixed Zabbix server and Zabbix proxy compilation on macOS or with custom library paths (vso)
+..F....... [ZBX-25741] eliminated difference in host group lists via "Select" button and via search typing (wczerneha)
+........S. [ZBX-26941] fixed duplicate entry error when new value arrive after Zabbix server finished syncing trends (vso)
+.......PS. [ZBX-26893] fixed delay when executing tasks through Zabbix proxy such as test item, check now, remote command (vso)
+..F....... [ZBX-26459] fixed Host macros view to avoid displaying both macro types when switching quickly (gberzina)
+..F....... [ZBX-26776] fixed ability to change widget in Pie chart widget data set (gberzina)
+.........T [ZBX-22625] fixed JavaScript in HPE Synergy by HTTP template (abrosimovs)
+..F....... [ZBX-26069] implemented re-broadcast behavior for widgets on forced update (ashubin, wczerneha)
+...G...... [ZBX-24918] fixed crashes of Zabbix agent 2 for Windows related to PDH perf_counter (opucka)
+...G...... [ZBX-26755] fixed problem with Zabbix agent 2 MQTT plugin not establishing connection if first call failed (opucka)
+..F....... [ZBX-16162] fixed classic graphs rendering when throttling is used (Sasha)
+..F....... [ZBX-24046] fixed incorrect error message for ldap_jit_interval field in LDAP settings form (kkuzmina)
+A......... [ZBX-25038] fixed SCIM error message by adding mention of requested endpoint to it (kkuzmina)
+.........T [ZBX-26851] changed macro names in MSSQL templates (sbelakovs)
+
+--------------------------------------------------------------------------------
+Changes for 7.0.19
+
+7.0.19rc1 was released as 7.0.19 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 7.0.19rc1
 
 New features:
+..F....... [ZBXNEXT-10143] added "Highlight whole row" feature in non-compact mode in Problems (ashubin)
+.........T [ZBXNEXT-10106] extended preprocessor throughput monitoring in Zabbix server/proxy health templates (aiantsen)
+.........T [ZBXNEXT-9819] added new template Vyatta Virtual Router by SNMP (knaglis)
+...G...... [ZBXNEXT-9933] added TNS name support for Zabbix agent 2 Oracle plugin (lsurvilo)
 .........T [ZBXNEXT-10107] improved device coverage in Huawei OceanStor Dorado by SNMP template (abrosimovs)
 .........T [ZBXNEXT-10123] added Aruba CX 8300s by SNMP template (akotsegubov)
-.........T [ZBXNEXT-10152] added a new macro for disk discovery type selection in both SMART by Zabbix agent 2 templates (knaglis)
+.........T [ZBXNEXT-10152] added new macro for disk discovery type selection in both SMART by Zabbix agent 2 templates (knaglis)
 A......... [ZBXNEXT-10027] prepared for removal of TimescaleDB API call deprecated since TimescaleDB 2.18.0 (jfreibergs)
 .........T [ZBXNEXT-10017] added Ciena 3906 by SNMP template (akotsegubov)
-.........T [ZBXNEXT-9255] updated Meraki templates to handle the rate limit on API requests (aiantsen)
+.........T [ZBXNEXT-9255] updated Meraki templates to handle rate limit on API requests (aiantsen)
 ...G.J.... [ZBXNEXT-9902] changed timeout range for Zabbix JS and Zabbix get utilities (askolmeisters)
-.......PS. [ZBXNEXT-10077] updated maximal supported MariaDB version to 12.0 (mprihodko)
+.......PS. [ZBXNEXT-10077] updated maximum supported MariaDB version to 12.0 (mprihodko)
 
 Bug fixes:
-..F....... [ZBX-20964] removed the Problems link in the Monitoring Hosts page for user who does not have access (msnihach)
-........S. [ZBX-26621] added TLS host parameters update in autoregistration mode (vsmelovs)
-..F....... [ZBX-26440] fixed inability to update JMX endpoint field in item, item prototype and LLD forms (kkuzmina)
+A......... [ZBX-26419] improved performance of problem and event views by optimizing SQL queries to join only necessary triggers, eliminating redundant post-join filtering (vso)
+..F....... [ZBX-25796] fixed confusing error message on item test timeout (isharha)
+..F....... [ZBX-26337] removed unnecessary div elements for entries without problems in Item and Host navigator widgets (msnihach)
+.......PS. [ZBX-26873] fixed support for SSH item proxy through configurations in SSH configuration file (aetatsu)
+...G...... [ZBX-19267] fixed wmi.get items sometimes incorrectly returning "Empty WMI search result" with Zabbix agent 2 (aetatsu)
+........S. [ZBX-20207] fixed unexpected interface connection mode change during autoregistration (vso)
+.........T [ZBX-25448] fixed token-based authentication method in FortiGate by HTTP template (egordymov)
+...G...... [ZBX-26847] explicitly defined Oracle connection timezone in Zabbix agent 2 (opucka)
+..F....... [ZBX-26472] fixed clearing of elements when imported file contains no background image or icon map (rgontarski)
+..F....... [ZBX-26694] fixed media type test parameter maxlength (gberzina)
+........S. [ZBX-26416] fixed SNMP trap item processing issue after monitored host changes (sboidenko)
+..F....... [ZBX-26801] fixed ability to select discovered items when editing graph items (gberzina)
+..F....... [ZBX-20964] removed Problems link in Monitoring hosts page for user who does not have access (msnihach)
+........S. [ZBX-26621] added TLS host parameter update in autoregistration mode (vsmelovs)
+..F....... [ZBX-26440] fixed inability to update JMX endpoint field in item, item prototype, and LLD forms (kkuzmina)
 ..F....... [ZBX-25041] improved configuration form validation in Graph and Pie chart widgets when referenced item widget is unavailable (isharha)
 ..F....... [ZBX-24720] fixed LDAP media type mapping "When active" field trimming (dpankins)
 .......PS. [ZBX-26892] fixed VMware Event Collector hangs in case of network errors (MVekslers)
 ...G...... [ZBX-26920] fixed wrong time in Zabbix agent for Windows (sboidenko)
-..F....... [ZBX-25669] added trigger version check after upgrading to a newer version (aluchko)
-..F....... [ZBX-22786] fixed trends graph line colors issue with PHP 8.1 (isharha)
-..F....... [ZBX-26044] fixed Honeycomb widget to not display disabled items (rgontarski)
+..F....... [ZBX-25669] added trigger version check after upgrading to newer version (aluchko)
+..F....... [ZBX-22786] fixed trends graph line color issue with PHP 8.1 (isharha)
+..F....... [ZBX-26044] fixed Honeycomb widget not to display disabled items (rgontarski)
 ..F....... [ZBX-25540] fixed inconsistent link styling for dependent trigger prototypes (rgontarski)
 ..F....... [ZBX-26482] fixed TypeError after deleting datasets in Graph and Pie chart widgets (isharha)
 A.F....... [ZBX-26202] fixed inability to create "Execute now" tasks for users of Admin user type (jfreibergs)
 A......... [ZBX-24603] fixed MFA TOTP secrets not being deleted when deleting users from MFA-enabled user groups (agriscenko, jfreibergs)
-..F.....S. [ZBX-25739] fixed timeleft() function to return 1.7976931348623157E+308 instead of making item unsupported in the case of the infinite time (arimdjonoks, averza)
+..F.....S. [ZBX-25739] fixed timeleft() function to return 1.7976931348623157E+308 instead of making item unsupported in case of infinite time (arimdjonoks, averza)
 ........S. [ZBX-26863] fixed duplicate host creation in network discovery with multiple checks for hosts found on several IP addresses when uniqueness criteria is not set to IP address (aetatsu)
 ..F....... [ZBX-24885] fixed inconsistent tag display and unnecessary ellipsis on Latest data page (msnihach)
 ..F....... [ZBX-21975] fixed user autologout not removing user SAML authentication data (gcalenko)
@@ -33,8 +89,8 @@ A......... [ZBX-24603] fixed MFA TOTP secrets not being deleted when deleting us
 .......... [ZBX-26879] removed unused ListenBacklog parameter from Zabbix sender (rtrizna)
 ..F....... [ZBX-26463] fixed issues with maximum length when creating group in host/template edit form (gberzina)
 ..F....... [ZBX-25103] replaced legacy hintbox generation for trigger operational data with current (dpankins)
-A......... [ZBX-26025] fixed validation error for default input string value in Scripts advanced configuration (kkuzmina)
-..F....... [ZBX-25972] optimized the items page performance on hosts with a large number of elements (msnihach)
+A......... [ZBX-26025] fixed validation error for default input string value in advanced script configuration (kkuzmina)
+..F....... [ZBX-25972] optimized Items page performance on hosts with large number of elements (msnihach)
 
 --------------------------------------------------------------------------------
 Changes for 7.0.18
@@ -188,6 +244,7 @@ New features:
 .........T [ZBXNEXT-9989] added supergroup topics support to Telegram media type, updated documentation (drasikhov)
 
 Bug fixes:
+A......... [ZBX-26988] fixed non-super admin user restriction working incorrectly for hostprototype.get api method (aluchko)
 .......PS. [ZBX-26537] fixed memory over-allocation in preprocessing manager (vso)
 ..F....... [ZBX-26422] added missing translation string for "Tags" label in "Tags" tab in configuration forms (solonkins)
 .......PS. [ZBX-26294] improved logic of SNMP cache cleanup (dgoloscapov)
@@ -334,6 +391,7 @@ New features:
 .........T [ZBXNEXT-9809] added refactored webhooks (abiba, aiantsen, drasikhov, egordymov, knaglis)
 
 Bug fixes:
+...G...... [ZBX-26987] added input parameter sanitization to prevent injection vulnerability for Zabbix agent 2 SMART plugin (lsurvilo)
 A.F....... [ZBX-26009] prevented reporting successful completion for several UI actions when database transaction commit fails; fixed inability to identify interruption of database connection when calling *.get API methods (vmaksimovs)
 ..F....... [ZBX-25717] fixed tag inheritance for discovered triggers (esekace)
 ..F....... [ZBX-24714] fixed broken custom on fail layout in item preprocessing form in some languages (agriscenko)
@@ -713,6 +771,7 @@ New features:
 .........T [ZBXNEXT-9341] added AssumeRole authentication to AWS templates (egordymov)
 
 Bug fixes:
+........S. [ZBX-26986] fixed secondary-order SQL injection in Zabbix server when deleting autoregistered host (wiper)
 A......... [ZBX-25610] removed reliability on "sysmapelementurlid", "sysmapurlid" in URLs for map.create and map.update (Ivo)
 .......PS. [ZBX-25625] fixed crash in browser item on invalid response (vso)
 .......PS. [ZBX-25624] fixed crash in browser item on empty response (vso)
@@ -3746,14 +3805,31 @@ A.F....PS. [ZBXNEXT-7402,ZBXNEXT-7413] added support for CyberArk Vault (acikuns
 ..F....... [ZBXNEXT-7138] added modal form for API tokens in User settings->API tokens and Administration->General->API tokens (epulke)
 
 --------------------------------------------------------------------------------
+Changes for 6.0.43rc1
+
+New features:
+A......PS. [ZBXNEXT-10219] updated maximum supported PostgreSQL version to 18 (mprihodko)
+A.......S. [ZBXNEXT-10271] updated maximum supported TimescaleDB version to 2.22 (mprihodko)
+
+Bug fixes:
+..F....... [ZBX-22157] added Map navigation tree widget problem filtering using Problem display and Show suppressed problems filter of map settings (dfofanovs)
+...G...... [ZBX-24918] fixed crashes of Zabbix agent 2 for Windows related with PDH perf_counter (opucka)
+
+--------------------------------------------------------------------------------
+Changes for 6.0.42
+
+6.0.42rc1 was released as 6.0.42 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 6.0.42rc1
 
 New features:
-.......PS. [ZBXNEXT-10077] updated maximal supported MariaDB version to 12.0 (mprihodko)
+.......PS. [ZBXNEXT-10077] updated maximum supported MariaDB version to 12.0 (mprihodko)
 
 Bug fixes:
+...G...... [ZBX-19267] fixed wmi.get items sometimes incorrectly returning "Empty WMI search result" with Zabbix agent 2 (aetatsu)
 ...G...... [ZBX-26920] fixed wrong time in Zabbix agent for Windows (sboidenko)
-..F....... [ZBX-22786] fixed trends graph line colors issue with PHP 8.1 (isharha)
+..F....... [ZBX-22786] fixed trends graph line color issue with PHP 8.1 (isharha)
 ..F....... [ZBX-21975] fixed user autologout not removing user SAML authentication data (gcalenko)
 
 --------------------------------------------------------------------------------
@@ -3792,6 +3868,7 @@ New features:
 .........T [ZBXNEXT-9703] updated existing Zabbix server/proxy health templates; added Zabbix server/proxy health templates by Zabbix agent passive/active (aiantsen)
 
 Bug fixes:
+...G...... [ZBX-26987] added input parameter sanitization to prevent injection vulnerability for Zabbix agent 2 SMART plugin (lsurvilo)
 .......PS. [ZBX-18703] fixed incorrect values returned by vmware.vm.vfs.fs.size item (MVekslers)
 A......... [ZBX-24383] fixed PHP fatal error when importing configuration from Zabbix 2.0 (Sasha)
 ........S. [ZBX-26038] added 10-second reconnect timeout for PostgreSQL read-only database (sboidenko)
@@ -3995,6 +4072,7 @@ New features:
 .........T [ZBXNEXT-9341] added assume role authorization in AWS templates (egordymov)
 
 Bug fixes:
+........S. [ZBX-26986] fixed secondary-order SQL injection in Zabbix server when deleting autoregistered host (wiper)
 A......... [ZBX-25610] removed reliability on "sysmapelementurlid", "sysmapurlid" in URLs for map.create and map.update (Ivo)
 .......PS. [ZBX-25626] added external data validation to prevent access to internal duktape properties through HttpRequest object (wiper)
 ........S. [ZBX-25629] fixed buffer over-read for broken UTF-8 mail data injection (sboidenko)
