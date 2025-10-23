@@ -1394,7 +1394,7 @@ zabbix_export:
             type: LIST
             priority: '6'
             label: 'Authorization method'
-            description: 'Authorization method.'
+            description: 'Authorization method used to access AWS.'
             required: 'YES'
             options:
               - value: access_key
@@ -4776,7 +4776,7 @@ zabbix_export:
             type: LIST
             priority: '1'
             label: 'Authorization method'
-            description: 'Authorization method.'
+            description: 'Authorization method used to access AWS.'
             required: 'YES'
             options:
               - value: access_key
@@ -6105,7 +6105,7 @@ zabbix_export:
             type: LIST
             priority: '1'
             label: 'Authorization method'
-            description: 'Authorization method.'
+            description: 'Authorization method used to access AWS.'
             required: 'YES'
             options:
               - value: access_key
@@ -6393,7 +6393,7 @@ zabbix_export:
         For more information about manage access keys, see [official documentation](https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html#access-keys-and-secret-access-keys)
       vendor:
         name: Zabbix
-        version: 8.0-2
+        version: 8.0-3
       groups:
         - name: Templates/Cloud
       items:
@@ -9086,7 +9086,7 @@ zabbix_export:
             type: LIST
             priority: '1'
             label: 'Authorization method'
-            description: 'Authorization method.'
+            description: 'Authorization method used to access AWS.'
             required: 'YES'
             options:
               - value: access_key
@@ -11545,7 +11545,7 @@ zabbix_export:
             type: LIST
             priority: '1'
             label: 'Authorization method'
-            description: 'Authorization method.'
+            description: 'Authorization method used to access AWS.'
             required: 'YES'
             options:
               - value: access_key
@@ -14251,7 +14251,7 @@ zabbix_export:
             type: LIST
             priority: '1'
             label: 'Authorization method'
-            description: 'Authorization method.'
+            description: 'Authorization method used to access AWS.'
             required: 'YES'
             options:
               - value: access_key
@@ -17167,7 +17167,7 @@ zabbix_export:
             type: LIST
             priority: '1'
             label: 'Authorization method'
-            description: 'Authorization method.'
+            description: 'Authorization method used to access AWS.'
             required: 'YES'
             options:
               - value: access_key
@@ -19980,7 +19980,7 @@ zabbix_export:
             type: LIST
             priority: '1'
             label: 'Authorization method'
-            description: 'Authorization method.'
+            description: 'Authorization method used to access AWS.'
             required: 'YES'
             options:
               - value: access_key
@@ -21544,7 +21544,7 @@ zabbix_export:
             type: LIST
             priority: '1'
             label: 'Authorization method'
-            description: 'Authorization method.'
+            description: 'Authorization method used to access AWS.'
             required: 'YES'
             options:
               - value: access_key
@@ -25218,7 +25218,7 @@ zabbix_export:
             type: LIST
             priority: '1'
             label: 'Authorization method'
-            description: 'Authorization method.'
+            description: 'Authorization method used to access AWS.'
             required: 'YES'
             options:
               - value: access_key
@@ -27396,7 +27396,7 @@ zabbix_export:
             type: LIST
             priority: '1'
             label: 'Authorization method'
-            description: 'Authorization method.'
+            description: 'Authorization method used to access AWS.'
             required: 'YES'
             options:
               - value: access_key

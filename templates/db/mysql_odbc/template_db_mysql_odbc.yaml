@@ -1395,7 +1395,7 @@ zabbix_export:
             type: TEXT
             priority: '3'
             label: 'MySQL password'
-            description: 'Password for MySQL.'
+            description: 'Password for the MySQL user used in the ODBC data source connection.'
             required: 'YES'
         - macro: '{$MYSQL.REPL_LAG.MAX.WARN}'
           value: 30m
@@ -1422,7 +1422,7 @@ zabbix_export:
             type: TEXT
             priority: '2'
             label: 'MySQL user'
-            description: 'User for MySQL.'
+            description: 'Username for MySQL used in the ODBC data source connection.'
             required: 'YES'
       dashboards:
         - uuid: d56c53704c264552a09cf3e59a1835f3
