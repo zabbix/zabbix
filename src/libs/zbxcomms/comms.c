@@ -523,7 +523,7 @@ int	zbx_socket_pollout(zbx_socket_t *s, int timeout, char **error)
  *                                                                            *
  * Parameters: s           - [IN]                                             *
  *             type        - [IN] TCP or UDP                                  *
- *             source_ip   - [IN] source IP address                           *
+ *             source_ip   - [IN]                                             *
  *             ip          - [IN]                                             *
  *             port        - [IN]                                             *
  *             timeout     - [IN]                                             *
@@ -661,7 +661,7 @@ int	zbx_socket_tls_connect(zbx_socket_t *s, unsigned int tls_connect, const char
  *                                                                            *
  * Parameters: s           - [IN]                                             *
  *             type        - [IN] TCP or UDP                                  *
- *             source_ip   - [IN] source ip address                           *
+ *             source_ip   - [IN]                                             *
  *             ip          - [IN]                                             *
  *             port        - [IN]                                             *
  *             timeout     - [IN]                                             *
@@ -848,7 +848,7 @@ ssize_t	zbx_tcp_write(zbx_socket_t *s, const char *buf, size_t len, short *event
  *                             If zero, compression will be applied when      *
  *                             requested by flags.                            *
  *             flags    - [IN] protocol and compression flags                 *
- *             context  - [OUT] pointer to send context structure             *
+ *             context  - [OUT] send context                                  *
  *                                                                            *
  * Return value: SUCCEED - context initialized successfully                   *
  *               FAIL    - an error occurred                                  *
@@ -1399,12 +1399,12 @@ static int	tcp_err_in_use(void)
  *                                                                            *
  * Parameters:                                                                *
  *     s                           - [OUT]                                    *
- *     listen_ip                   - [IN]  IP address or comma-separated list *
- *                                         of addresses to listen on          *
- *     listen_port                 - [IN]  TCP port number (1024 - 32767)     *
- *     timeout                     - [IN]  socket timeout in seconds (1 - 30) *
- *     config_tcp_max_backlog_size - [IN]  maximum number of pending          *
- *                                         connections in TCP queue           *
+ *     listen_ip                   - [IN] IP address or comma-separated list  *
+ *                                        of addresses to listen on           *
+ *     listen_port                 - [IN] TCP port number (1024 - 32767)      *
+ *     timeout                     - [IN] socket timeout in seconds (1 - 30)  *
+ *     config_tcp_max_backlog_size - [IN] maximum number of pending           *
+ *                                        connections in TCP queue            *
  *                                                                            *
  * Return value: SUCCEED - success                                            *
  *               FAIL - error occurred                                        *
@@ -2025,9 +2025,9 @@ ssize_t	zbx_tcp_read(zbx_socket_t *s, char *buf, size_t len, short *events)
  * Purpose: read TLS close_notify alert from TCP socket                       *
  *                                                                            *
  * Parameters: s       - [IN/OUT]                                             *
- *             timeout - [IN]     maximum time to wait for close_notify (sec) *
- *                                (range 0-1000)                              *
- *             events  - [OUT]    pointer to event flag (optional)            *
+ *             timeout - [IN] maximum time to wait for close_notify (sec)     *
+ *                             (range 0-1000)                                 *
+ *             events  - [OUT] event flag (optional)                          *
  *                                                                            *
  * Return value: number of bytes read (0 if not TLS)                          *
  *               ZBX_PROTO_ERROR - an error occurred                          *
