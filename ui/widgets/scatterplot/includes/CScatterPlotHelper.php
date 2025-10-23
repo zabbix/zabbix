@@ -775,7 +775,10 @@ class CScatterPlotHelper {
 				'y' => array_key_exists($y_key, $current) ? $current[$y_key] : $value_y
 			];
 
-			$position = self::calculateInterpolationPosition($prev_threshold, $current_threshold, $value_x, $value_y);
+			$x = min($current_threshold['x'], $value_x);
+			$y = min($current_threshold['y'], $value_y);
+
+			$position = self::calculateInterpolationPosition($prev_threshold, $current_threshold, $x, $y);
 
 			return CColorHelper::interpolateColor($prev['color'], $current['color'], $position);
 		}
