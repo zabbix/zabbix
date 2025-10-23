@@ -153,10 +153,36 @@ class testFormMaintenance extends CLegacyWebTest {
 		$this->assertEquals(3, CDBHelper::getCount('SELECT NULL FROM maintenance_tag WHERE value='.zbx_dbstr($value)));
 	}
 
+	public function maintenancePeriodsProvider() {
+		return [
+			[
+				['fields' => ['Period type' => 'One time only']],
+				0
+			],
+			[
+				['fields' => ['Period type' => 'Daily']],
+				1
+			],
+			[
+				['fields' => ['Period type' => 'Weekly']],
+				2
+			],
+			[
+				['fields' => ['Period type' => 'Monthly']],
+				3
+			],
+			[
+				['fields' => ['Period type' => 'Monthly', 'Date' => 'Day of week']],
+				4
+			],
+		];
+	}
+
 	/**
 	 * Check screenshots of period form.
+	 * @dataProvider maintenancePeriodsProvider
 	 */
-	public function testFormMaintenance_Screenshot() {
+	public function testFormMaintenance_Screenshot($period, $index) {
 		$this->page->login()->open('zabbix.php?action=maintenance.list')->waitUntilReady();
 		$this->page->assertTitle('Configuration of maintenance periods');
 		$this->page->assertHeader('Maintenance periods');
@@ -164,37 +190,14 @@ class testFormMaintenance extends CLegacyWebTest {
 
 		$form = COverlayDialogElement::find()->waitUntilReady()->asForm()->one();
 
-		$periods = [
-			[
-				'fields' => ['Period type' => 'One time only'],
-			],
-			[
-				'fields' => ['Period type' => 'Daily'],
-			],
-			[
-				'fields' => ['Period type' => 'Weekly'],
-			],
-			[
-				'fields' => ['Period type' => 'Monthly'],
-			],
-			[
-				'fields' => [
-					'Period type' => 'Monthly',
-					'Date' => 'Day of week'
-				]
-			]
-		];
-
-		foreach ($periods as $index => $period) {
-			$form->query('button:Add')->one()->waitUntilClickable()->click();
-			$period_overlay = COverlayDialogElement::find()->waitUntilReady()->all()->last();
-			$period_overlay->asForm()->fill($period['fields']);
-			$this->page->removeFocus();
-			$screenshotName = 'maintenance_period_' . $index;
-			$this->assertScreenshot($period_overlay, $screenshotName);
-			$period_overlay->query('button:Cancel')->one()->click();
-			$period_overlay->waitUntilNotPresent();
-		}
+		$form->query('button:Add')->one()->waitUntilClickable()->click();
+		$period_overlay = COverlayDialogElement::find()->waitUntilReady()->all()->last();
+		$period_overlay->asForm()->fill($period['fields']);
+		$this->page->removeFocus();
+		$screenshotName = 'maintenance_period_' . $index;
+		$this->assertScreenshot($period_overlay, $screenshotName);
+		$period_overlay->query('button:Cancel')->one()->click();
+		$period_overlay->waitUntilNotPresent();
 
 		$this->query('button:Cancel')->one()->click();
 		COverlayDialogElement::ensureNotPresent();
