@@ -429,7 +429,8 @@ static void	history_clickhouse_write(void *data, unsigned char value_type,
 		zbx_snprintf(timestamp, sizeof(timestamp), "%d.%09d", entries[i]->ts.sec, entries[i]->ts.ns);
 		zbx_json_addstring(&json_array, NULL, timestamp, ZBX_JSON_TYPE_STRING);
 
-		zbx_strcpy_alloc(&post_data, &post_data_alloc, &post_data_offset, json_array.buffer);
+		zbx_str_memcpy_alloc(&post_data, &post_data_alloc, &post_data_offset, json_array.buffer,
+				json_array.buffer_size);
 		zbx_chrcpy_alloc(&post_data, &post_data_alloc, &post_data_offset, '\n');
 
 		zbx_json_setempty(&json_array);
