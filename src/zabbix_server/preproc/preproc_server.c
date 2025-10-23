@@ -22,10 +22,10 @@
 
 int	preproc_prepare_value_server(const zbx_variant_t *value, const zbx_pp_value_opt_t *value_opt)
 {
-	if (ZBX_VARIANT_NONE == value->type && 0 == (value_opt->flags & ZBX_PP_VALUE_OPT_META))
+	if (ZBX_VARIANT_NONE == value->type && 0 == (value_opt->flags & ZBX_PP_VALUE_OPT_META) &&
+			0 == (value->flags & ZBX_VARIANT_FLAG_CHANGED))
 	{
-		if (0 == (value->flags & ZBX_VARIANT_FLAG_CHANGED))
-			return FAIL;
+		return FAIL;
 	}
 
 	return SUCCEED;
