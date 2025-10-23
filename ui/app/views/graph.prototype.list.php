@@ -145,16 +145,17 @@ foreach ($data['graphs'] as $graph) {
 	]);
 }
 
-$buttons = [
+$buttons = new CActionButtonList('action', 'group_graphid', [
 	'graph.massdelete' => [
 		'content' => (new CSimpleButton(_('Delete')))
 			->addClass(ZBX_STYLE_BTN_ALT)
 			->addClass('js-no-chkbxrange')
 			->setId('js-massdelete-graph-prototype')
 	]
-];
+], 'graph_prototypes_'.$data['parent_discoveryid']);
 
-$graphs_form->addItem([$graphs_table, new CActionButtonList('action', 'group_graphid', $buttons, 'graph_prototypes')]);
+$graphs_form->addItem([$graphs_table, $buttons]);
+
 $html_page
 	->addItem($graphs_form)
 	->show();

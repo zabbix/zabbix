@@ -2265,12 +2265,12 @@ button {
   background-color: #e79e0b;
   border-color: #e79e0b; }
 
-.overlay-dialogue.modal-widget-configuration {
+.overlay-dialogue.modal.modal-widget-configuration {
   --modal-width: auto;
   --modal-max-width: calc(100vw - 20px);
   --modal-min-width: 650px;
   box-sizing: border-box; }
-  .overlay-dialogue.modal-widget-configuration .overlay-dialogue-body {
+  .overlay-dialogue.modal.modal-widget-configuration .overlay-dialogue-body {
     overflow-x: auto; }
 
 .dashboard-widget-form {
@@ -2456,6 +2456,13 @@ div[data-field-type="set"].has-error {
   background-color: #ff5555;
   color: #454545;
   -webkit-text-fill-color: #454545; }
+
+.checkbox-list.has-error [type="checkbox"] + label span {
+  border: 1px solid #ff5555;
+  color: #ffffff; }
+.checkbox-list.has-error [type="checkbox"]:checked + label span::after {
+  border-left-color: #ff5555;
+  border-bottom-color: #ff5555; }
 
 .checkbox-radio[type="checkbox"].has-error + label span {
   border: 1px solid #ff5555;
@@ -5602,7 +5609,7 @@ div.dashboard-widget-navtree .treeview {
 form.dashboard-widget-piechart {
   max-width: 1330px;
   min-width: 1120px;
-  width: 100vw; }
+  width: min(100vw - 42px, calc(var(--modal-max-width) - 22px)); }
   form.dashboard-widget-piechart .pie-chart-widget-config-tabs {
     grid-column: 1 / -1; }
   form.dashboard-widget-piechart .pie-chart-widget-config-tabs > .tabs-nav {
@@ -5739,7 +5746,7 @@ div.dashboard-widget-problemsbysv .list-table tr[data-hostgroupid] {
 form.dashboard-widget-svggraph {
   max-width: 1330px;
   min-width: 1120px;
-  width: 100vw; }
+  width: min(100vw - 42px, calc(var(--modal-max-width) - 22px)); }
   form.dashboard-widget-svggraph .graph-widget-config-tabs {
     grid-column: 1 / -1; }
   form.dashboard-widget-svggraph .graph-widget-config-tabs > .tabs-nav {

@@ -12,24 +12,9 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-package redis
+#ifndef ZABBIX_TRIGGER_HOUSEKEEPER_H
+#define ZABBIX_TRIGGER_HOUSEKEEPER_H
 
-import (
-	"github.com/mediocregopher/radix/v3"
-)
+int	zbx_housekeep_problems_events(const char *query, int config_max_hk_delete, int events_mode, int *more);
 
-const (
-	pingFailed = 0
-	pingOk     = 1
-)
-
-// pingHandler executes 'PING' command and returns pingOk if a connection is alive or pingFailed otherwise.
-func pingHandler(conn redisClient, _ map[string]string) (interface{}, error) {
-	var res string
-
-	if _ = conn.Query(radix.Cmd(&res, "PING")); res != "PONG" {
-		return pingFailed, nil
-	}
-
-	return pingOk, nil
-}
+#endif

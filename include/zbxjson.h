@@ -228,6 +228,12 @@
 #define ZBX_PROTO_TAG_LEASE_DURATION		"lease_duration"
 #define ZBX_PROTO_TAG_PREPROC			"preproc"
 #define ZBX_PROTO_TAG_PROXY_SECRETS_PROVIDER	"proxy_secrets_provider"
+#define ZBX_PROTO_TAG_WAIT_TIME			"wait_time"
+#define ZBX_PROTO_TAG_IDLE_TIME			"idle_time"
+#define ZBX_PROTO_TAG_CONN_PROVIDED		"connections_provided"
+#define ZBX_PROTO_TAG_IDLE_TIMEOUT		"idle_timeout"
+#define ZBX_PROTO_TAG_MAX_IDLE			"max_idle"
+#define ZBX_PROTO_TAG_MAX_OPEN			"max_open"
 
 #define ZBX_PROTO_VALUE_FAILED		"failed"
 #define ZBX_PROTO_VALUE_SUCCESS		"success"
