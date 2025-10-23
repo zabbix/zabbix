@@ -17,6 +17,8 @@
 
 #include "zbxthreads.h"
 
+#define ZBX_FPING_MIN_TIMEOUT	50
+
 typedef struct
 {
 	int	config_timeout;
