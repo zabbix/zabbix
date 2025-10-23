@@ -148,6 +148,13 @@ window.tag_filter_edit = new class {
 				})
 					.then((response) => response.json())
 					.then((response) => {
+						if (overlays_stack.getById(this.overlay.dialogueid) === undefined) {
+							resolve(false);
+						}
+
+						return response;
+					})
+					.then((response) => {
 						if ('error' in response) {
 							throw {error: response.error};
 						}
