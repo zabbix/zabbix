@@ -1366,6 +1366,21 @@ static void	db_event_ptr_clean(zbx_db_event **event)
 		zbx_db_free_event(*event);
 }
 
+static void	vector_uint64_create_rem_wrap(void *ptr)
+{
+	zbx_vector_uint64_create((zbx_vector_uint64_t *)ptr);
+}
+
+static void	vector_uint64_destroy_rem_wrap(void *ptr)
+{
+	zbx_vector_uint64_destroy((zbx_vector_uint64_t *)ptr);
+}
+
+static void	db_event_ptr_clean_rem_wrap(void *ptr)
+{
+	db_event_ptr_clean((zbx_db_event **)ptr);
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: common macro resolver for messages and scripts                    *
@@ -1439,10 +1454,10 @@ int	zbx_macro_message_common_resolv(zbx_macro_resolv_data_t *p, zbx_dc_um_handle
 		else if (0 == strncmp(p->macro, MVAR_EVENT_CAUSE, ZBX_CONST_STRLEN(MVAR_EVENT_CAUSE)))
 		{
 			zbx_db_event	**cause_event = (zbx_db_event **)zbx_expr_rem(&event->eventid,
-					sizeof(zbx_db_event *), NULL, (zbx_rem_destroy_func_t)db_event_ptr_clean);
+					sizeof(zbx_db_event *), NULL, db_event_ptr_clean_rem_wrap);
 			zbx_db_event	**cause_recovery_event =
 					(zbx_db_event **)zbx_expr_rem(cause_event,
-					sizeof(zbx_db_event *), NULL, (zbx_rem_destroy_func_t)db_event_ptr_clean);
+					sizeof(zbx_db_event *), NULL, db_event_ptr_clean_rem_wrap);
 
 			ret = get_event_cause_value(p->macro, replace_to, um_handle, event, cause_event,
 					cause_recovery_event, userid, tz, error, maxerrlen);
@@ -2285,8 +2300,8 @@ int	zbx_macro_message_common_resolv(zbx_macro_resolv_data_t *p, zbx_dc_um_handle
 		if (SUCCEED == zbx_token_is_user_macro(p->macro, &p->token))
 		{
 			zbx_vector_uint64_t	*item_hosts = zbx_expr_rem(&c_event->objectid,
-					sizeof(zbx_vector_uint64_t), (zbx_rem_create_func_t)zbx_vector_uint64_create,
-					(zbx_rem_destroy_func_t)zbx_vector_uint64_destroy);
+					sizeof(zbx_vector_uint64_t), vector_uint64_create_rem_wrap,
+					vector_uint64_destroy_rem_wrap);
 
 			zbx_dc_config_get_hostid_by_itemid(item_hosts, c_event->objectid);
 			zbx_dc_get_user_macro(um_handle, p->macro, item_hosts->values, item_hosts->values_num,
@@ -2442,8 +2457,8 @@ int	zbx_macro_message_common_resolv(zbx_macro_resolv_data_t *p, zbx_dc_um_handle
 		if (SUCCEED == zbx_token_is_user_macro(p->macro, &p->token))
 		{
 			zbx_vector_uint64_t	*item_hosts = zbx_expr_rem(&c_event->objectid,
-					sizeof(zbx_vector_uint64_t), (zbx_rem_create_func_t)zbx_vector_uint64_create,
-					(zbx_rem_destroy_func_t)zbx_vector_uint64_destroy);
+					sizeof(zbx_vector_uint64_t), vector_uint64_create_rem_wrap,
+					vector_uint64_destroy_rem_wrap);
 
 			zbx_dc_config_get_hostid_by_itemid(item_hosts, c_event->objectid);
 			zbx_dc_get_user_macro(um_handle, p->macro, item_hosts->values, item_hosts->values_num,
