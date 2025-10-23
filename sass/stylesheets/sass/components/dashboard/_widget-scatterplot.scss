@@ -57,9 +57,14 @@ form.dashboard-widget-scatterplot {
 			grid-template-columns: auto 1fr;
 			gap: 10px;
 
-			label {
+			> label {
+				display: inline-block;
 				text-align: right;
+				min-width: 80px;
+				max-width: 120px;
 				line-height: 24px;
+
+				@extend %overflow-ellipsis;
 			}
 		}
 	}
@@ -68,18 +73,29 @@ form.dashboard-widget-scatterplot {
 		.form-grid {
 			grid-template-columns: auto 1fr;
 			grid-auto-rows: auto;
-
 			padding-top: 0;
+
+			> label {
+				display: inline-block;
+				text-align: right;
+				min-width: 80px;
+				max-width: 120px;
+
+				@extend %overflow-ellipsis;
+			}
 
 			&:first-child {
 				grid-column-start: 5;
 			}
 
 			.table-tags {
-				width: 453px;
+				min-width: 385px;
+				max-width: 453px;
 
 				.table-tags-input {
-					width: 130px;
+					min-width: 100px;
+					max-width: 130px;
+					width: 100%;
 				}
 
 				z-select {
@@ -89,7 +105,6 @@ form.dashboard-widget-scatterplot {
 
 			.marker-config {
 				display: flex;
-				justify-content: space-between;
 				gap: 10px;
 				line-height: 24px;
 
@@ -105,12 +120,6 @@ form.dashboard-widget-scatterplot {
 							color: $font-color;
 						}
 					}
-				}
-
-				.marker-size {
-					display: flex;
-					gap: 10px;
-					line-height: 24px;
 				}
 			}
 		}

@@ -435,20 +435,15 @@ class CWidgetFieldDataSetView extends CWidgetFieldView {
 					(new CFormGrid())
 						->addItem([
 							new CLabel(_('Marker'), $field_name.'_'.$row_num.'_marker'),
-							(new CDiv([
-								new CFormField($marker_radio),
-								(new CDiv([
-									new CLabel(_('Marker size'), $field_name.'_'.$row_num.'_marker_size'),
-									new CFormField(
-										(new CRadioButtonList($field_name.'['.$row_num.'][marker_size]',
-											(int) $value['marker_size'])
-										)
-											->addValue(_('Small'), CWidgetFieldDataSet::DATASET_MARKER_SIZE_SMALL)
-											->addValue(_('Medium'), CWidgetFieldDataSet::DATASET_MARKER_SIZE_MEDIUM)
-											->addValue(_('Large'), CWidgetFieldDataSet::DATASET_MARKER_SIZE_LARGE)
-											->setModern()
-									)
-								]))->addClass('marker-size')
+							(new CFormField([
+								$marker_radio,
+								(new CRadioButtonList($field_name.'['.$row_num.'][marker_size]',
+									(int) $value['marker_size'])
+								)
+									->addValue(_('Small'), CWidgetFieldDataSet::DATASET_MARKER_SIZE_SMALL)
+									->addValue(_('Medium'), CWidgetFieldDataSet::DATASET_MARKER_SIZE_MEDIUM)
+									->addValue(_('Large'), CWidgetFieldDataSet::DATASET_MARKER_SIZE_LARGE)
+									->setModern()
 							]))->addClass('marker-config')
 						])
 						->addItem([
