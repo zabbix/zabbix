@@ -419,7 +419,7 @@ class CProxyGroup extends CApiService {
 
 	private static function checkUsedInActions(array $db_proxy_groups): void {
 		$proxy_groupids = array_keys($db_proxy_groups);
-	
+
 		$row = DBfetch(DBselect(
 			'SELECT a.name,c.value AS proxy_groupid'.
 			' FROM conditions c'.
