@@ -1043,7 +1043,9 @@ class CScreenProblem extends CScreenBase {
 				$header[] = $header_clock;
 			}
 
-			$table = (new CTableInfo())->setPageNavigation($paging);
+			$table = (new CTableInfo())
+				->setPageNavigation($paging)
+				->addClass($this->data['filter']['highlight_row'] == ZBX_HIGHLIGHT_ON ? 'has-highlighted-rows' : null);
 
 			// Create table.
 			if ($this->data['filter']['compact_view']) {
@@ -1666,13 +1668,15 @@ class CScreenProblem extends CScreenBase {
 					: zbx_date2age($problem['clock']),
 				$problem_update_link,
 				makeEventActionsIcons($problem['eventid'], $data['actions'], $data['users'], $is_acknowledged),
-				$data['filter']['show_tags'] ? (new CDiv($data['tags'][$problem['eventid']]))->addClass(ZBX_STYLE_TAGS_WRAPPER) : null
+				$data['filter']['show_tags']
+					? (new CDiv($data['tags'][$problem['eventid']]))->addClass(ZBX_STYLE_TAGS_WRAPPER)
+					: null
 			]);
 
 			// Add table row.
-			$table->addRow($row, ($data['filter']['highlight_row'] && $value == TRIGGER_VALUE_TRUE)
-					? self::getSeverityFlhStyle($problem['severity'])
-					: null
+			$table->addRow($row, $data['filter']['highlight_row'] == ZBX_HIGHLIGHT_ON && $value == TRIGGER_VALUE_TRUE
+				? CSeverityHelper::getSeverityFlhStyle($problem['severity'])
+				: null
 			);
 
 			if ($problem['cause_eventid'] == 0 && $problem['symptoms']) {
@@ -1821,7 +1825,9 @@ class CScreenProblem extends CScreenBase {
 						? _('binary value')
 						: $last_value['value']
 				))
-					->setHint($hint_table);
+					->addClass('hint-item')
+					->setAttribute('data-hintbox', '1')
+					->addClass(ZBX_STYLE_NO_INDENT);
 				$latest_values[] = ', ';
 			}
 			else {
@@ -1833,36 +1839,13 @@ class CScreenProblem extends CScreenBase {
 
 		if ($html) {
 			array_pop($latest_values);
-
+			array_unshift($latest_values, (new CDiv())
+				->addClass('main-hint')
+				->setHint($hint_table)
+			);
 			return $latest_values;
 		}
 
 		return implode(', ', $latest_values);
-	}
-
-	/**
-	 * Get trigger severity full line height css style name.
-	 *
-	 * @param int $severity  Trigger severity.
-	 *
-	 * @return string|null
-	 */
-	private static function getSeverityFlhStyle($severity) {
-		switch ($severity) {
-			case TRIGGER_SEVERITY_DISASTER:
-				return ZBX_STYLE_FLH_DISASTER_BG;
-			case TRIGGER_SEVERITY_HIGH:
-				return ZBX_STYLE_FLH_HIGH_BG;
-			case TRIGGER_SEVERITY_AVERAGE:
-				return ZBX_STYLE_FLH_AVERAGE_BG;
-			case TRIGGER_SEVERITY_WARNING:
-				return ZBX_STYLE_FLH_WARNING_BG;
-			case TRIGGER_SEVERITY_INFORMATION:
-				return ZBX_STYLE_FLH_INFO_BG;
-			case TRIGGER_SEVERITY_NOT_CLASSIFIED:
-				return ZBX_STYLE_FLH_NA_BG;
-			default:
-				return null;
-		}
 	}
 }

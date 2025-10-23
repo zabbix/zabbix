@@ -69,6 +69,10 @@ AS_HELP_STRING([--with-zlib@<:@=DIR@:>@], [use zlib from given base install dire
 		ZLIB_CFLAGS="-I/usr/pkg/include"
 		ZLIB_LDFLAGS="-L/usr/pkg/lib"
 		found_zlib="yes"
+	elif test -f /opt/homebrew/opt/zlib/include/zlib.h; then
+		ZLIB_CFLAGS="-I/opt/homebrew/opt/zlib/include"
+		ZLIB_LDFLAGS="-L/opt/homebrew/opt/zlib/lib"
+		found_zlib="yes"
 	else
 		found_zlib="no"
 		AC_MSG_RESULT(no)

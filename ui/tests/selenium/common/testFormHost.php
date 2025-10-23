@@ -323,7 +323,7 @@ class testFormHost extends CWebTest {
 		$hint->one()->query('xpath:.//button[@class="btn-overlay-close"]')->one()->click();
 		$hint->waitUntilNotPresent();
 
-		// Check the value of the "Monitored by" field and the present/absence of the corresponding mulitselect.
+		// Check the value of the "Monitored by" field and the present/absence of the corresponding multiselect.
 		$monitored_by = $form->getField('Monitored by');
 		$this->assertEquals('Proxy', $monitored_by->getValue());
 		$this->assertEquals(['Test Host Proxy'], $monitored_by->query('xpath:./../following-sibling::div')->asMultiselect()->one()->getValue());

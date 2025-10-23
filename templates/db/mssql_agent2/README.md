@@ -97,7 +97,7 @@ Note: Since version 7.0.6, you can also connect to the MSSQL instance using its 
 |{$MSSQL.BACKUP_LOG.WARN}|<p>The maximum of days without a log backup - for the Warning trigger expression.</p>|`4h`|
 |{$MSSQL.JOB.MATCHES}|<p>This macro is used in job discovery. It can be overridden on the host or linked template level.</p>|`.*`|
 |{$MSSQL.JOB.NOT_MATCHES}|<p>This macro is used in job discovery. It can be overridden on the host or linked template level.</p>|`CHANGE_IF_NEEDED`|
-|{$MSSQL.BACKUP_DURATION.WARN}|<p>The maximum job duration - for the Warning trigger expression.</p>|`1h`|
+|{$MSSQL.JOB_DURATION.WARN}|<p>The maximum job duration - for the Warning trigger expression.</p>|`1h`|
 |{$MSSQL.BACKUP_FULL.USED}|<p>The flag for checking the age of a full backup. If set to a value other than "1", the trigger expression for the full backup age will not fire. Can be used with context for database name.</p>|`1`|
 |{$MSSQL.BACKUP_LOG.USED}|<p>The flag for checking the age of a log backup. If set to a value other than "1", the trigger expression for the log backup age will not fire. Can be used with context for database name.</p>|`1`|
 |{$MSSQL.BACKUP_DIFF.USED}|<p>The flag for checking the age of a differential backup. If set to a value other than "1", the trigger expression for the differential backup age will not fire. Can be used with context for database name.</p>|`1`|
@@ -448,7 +448,7 @@ Note: Since version 7.0.6, you can also connect to the MSSQL instance using its 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
 |MSSQL: Job '{#JOBNAME}': Failed to run|<p>The last run of the job has failed.</p>|`last(/MSSQL by Zabbix agent 2/mssql.job.runstatus["{#JOBNAME}"])=0`|Warning|**Manual close**: Yes|
-|MSSQL: Job '{#JOBNAME}': Job duration is high|<p>The job is taking too long.</p>|`last(/MSSQL by Zabbix agent 2/mssql.job.run_duration["{#JOBNAME}"])>{$MSSQL.BACKUP_DURATION.WARN:"{#JOBNAME}"}`|Warning|**Manual close**: Yes|
+|MSSQL: Job '{#JOBNAME}': Job duration is high|<p>The job is taking too long.</p>|`last(/MSSQL by Zabbix agent 2/mssql.job.run_duration["{#JOBNAME}"])>{$MSSQL.JOB_DURATION.WARN:"{#JOBNAME}"}`|Warning|**Manual close**: Yes|
 
 ## Feedback
 

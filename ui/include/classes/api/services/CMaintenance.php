@@ -100,8 +100,8 @@ class CMaintenance extends CApiService {
 			}
 
 			$permission_condition = $options['editable']
-				? ' AND (p.permission IS NULL OR p.permission < '.PERM_READ_WRITE.')'
-				: ' AND p.permission IS NULL';
+				? ' AND (p.hgsetid IS NULL OR p.permission < '.PERM_READ_WRITE.')'
+				: ' AND p.hgsetid IS NULL';
 
 			$sqlParts['where'][] = 'NOT EXISTS ('.
 				'SELECT NULL'.

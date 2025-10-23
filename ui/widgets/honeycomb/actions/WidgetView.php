@@ -120,7 +120,8 @@ class WidgetView extends CControllerDashboardWidgetView {
 				$search_field => in_array('*', $this->fields_values['items'], true)
 					? null
 					: $this->fields_values['items']
-			]
+			],
+			'filter' => ['status' => ITEM_STATUS_ACTIVE]
 		];
 
 		$db_items = API::Item()->get($options);

@@ -252,7 +252,7 @@ class testPSKEncryption extends CWebTest {
 
 	public static function getUpdateSameObjectData() {
 		return [
-			'Same utoregistration identity, new PSK' => [
+			'Same autoregistration identity, new PSK' => [
 				[
 					'object' => 'configuration',
 					'url' => 'zabbix.php?action=autoreg.edit',

@@ -40,8 +40,10 @@ class CWidgetTopHosts extends CWidget {
 
 		this.#table_body.addEventListener('click', e => this.#onTableBodyClick(e));
 
-		if (!this.hasEverUpdated() && this.isReferred()) {
-			this.#selected_hostid = this.#getDefaultSelectable();
+		if (this.isReferred() && (this.isFieldsReferredDataUpdated() || !this.hasEverUpdated())) {
+			if (this.#selected_hostid === null || !this.#hasSelectable()) {
+				this.#selected_hostid = this.#getDefaultSelectable();
+			}
 
 			if (this.#selected_hostid !== null) {
 				this.#selectHost();
@@ -70,6 +72,10 @@ class CWidgetTopHosts extends CWidget {
 		const row = this.#table_body.querySelector('[data-hostid]');
 
 		return row !== null ? row.dataset.hostid : null;
+	}
+
+	#hasSelectable() {
+		return this.#table_body.querySelector(`[data-hostid="${this.#selected_hostid}"]`) !== null;
 	}
 
 	#selectHost() {

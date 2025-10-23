@@ -128,7 +128,7 @@ class testFormTotpEnroll extends testFormTotp {
 		$totp = CTestArrayHelper::get($data, 'totp_pre', '').$totp.CTestArrayHelper::get($data, 'totp_after', '');
 
 		$form->getField('id:verification_code')->fill($totp);
-		$form->query('button:Sign in')->one()->click();
+		$form->query('button:Sign in')->one()->hoverMouse()->click();
 
 		// Validate a successful login or an expected error.
 		$this->page->waitUntilReady();
@@ -152,7 +152,7 @@ class testFormTotpEnroll extends testFormTotp {
 		// Reset TOTP secret to make sure the user has not already been enrolled.
 		$this->resetTotpConfiguration();
 
-		// Open the the enroll form and get the secret.
+		// Open the enroll form and get the secret.
 		$this->userLogin();
 		$old_totp_secret = $this->validateQrCodeAndExtractSecret();
 

@@ -152,9 +152,10 @@ class CProblem extends CApiService {
 					' JOIN items i1 ON f1.itemid=i1.itemid'.
 					' JOIN host_hgset hh1 ON i1.hostid=hh1.hostid'.
 					' LEFT JOIN permission pp1 ON hh1.hgsetid=pp1.hgsetid'.
-						' AND pp1.ugsetid=pp.ugsetid'.
-					' WHERE p.objectid=f1.triggerid'.
-						' AND pp1.permission IS NULL'.
+						' AND pp1.ugsetid='.self::$userData['ugsetid'].
+					' WHERE f.triggerid=f1.triggerid'.
+						' AND i.itemid!=f1.itemid'.
+						' AND pp1.hgsetid IS NULL'.
 				')';
 
 				if ($options['source'] == EVENT_SOURCE_TRIGGERS) {

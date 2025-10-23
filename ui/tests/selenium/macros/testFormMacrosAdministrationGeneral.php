@@ -821,7 +821,7 @@ class testFormMacrosAdministrationGeneral extends testFormMacros {
 			$this->assertEquals('New_macro_value', $value_field->getValue());
 		}
 
-		// Press revert button amd save the changes and make sure that changes were reverted.
+		// Press revert button and save the changes and make sure that changes were reverted.
 		$value_field->getRevertButton()->click();
 		$this->query('button:Update')->one()->click();
 		// Check that no macro value changes took place.
@@ -932,6 +932,7 @@ class testFormMacrosAdministrationGeneral extends testFormMacros {
 		// Change Vault in settings to correct one and create macros with this Vault.
 		$this->page->open('zabbix.php?action=miscconfig.edit')->waitUntilReady();
 		$setting_form->fill(['Vault provider'=> 'HashiCorp Vault'])->submit();
+		$this->assertMessage(TEST_GOOD, 'Configuration updated');
 		$this->page->open('zabbix.php?action=macros.edit')->waitUntilReady();
 		$this->fillMacros([$hashicorp['fields']]);
 		$this->query('button:Update')->one()->click();

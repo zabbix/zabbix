@@ -440,6 +440,7 @@ class testFormUserPermissions extends CWebTest {
 			]
 		]);
 		$this->query('button:Update')->one()->click();
+		$this->assertMessage(TEST_GOOD, 'User group updated');
 
 		$this->page->open('zabbix.php?action=user.edit&userid=2')->waitUntilReady();
 		$this->query('xpath://form[@name="user_form"]')->waitUntilPresent()->one()->asForm()->selectTab('Permissions');
