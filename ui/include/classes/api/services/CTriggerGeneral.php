@@ -598,9 +598,12 @@ abstract class CTriggerGeneral extends CApiService {
 	 * @throws APIException
 	 */
 	private static function validateUuid(array $triggers, array $descriptions): void {
+		$triggers_validate_indexes = [];
+
 		foreach ($descriptions as $_triggers) {
 			foreach ($_triggers as $_trigger) {
 				$triggers[$_trigger['index']]['host_status'] = $_trigger['host']['status'];
+				$triggers_validate_indexes[] = $_trigger['index'];
 			}
 		}
 
@@ -612,16 +615,10 @@ abstract class CTriggerGeneral extends CApiService {
 			]]
 		]];
 
-		foreach ($triggers as $trigger) {
-			if (!array_key_exists('uuid', $trigger)) {
-				continue;
-			}
+		$triggers = array_intersect_key($triggers, array_flip($triggers_validate_indexes));
 
-			$trigger_uuid = [$trigger];
-
-			if (!CApiInputValidator::validate($api_input_rules, $trigger_uuid, '/', $error)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, $error);
-			}
+		if (!CApiInputValidator::validate($api_input_rules, $triggers, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 	}
 
