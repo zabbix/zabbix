@@ -29,7 +29,7 @@ class CPeriodTimeRangeValidator extends CValidator {
 		foreach (explode(',', $value) as $schedule_period) {
 			$schedule_period = trim($schedule_period);
 
-			if ($this->period_time_parser->parse($schedule_period) == $this->period_time_parser::PARSE_FAIL) {
+			if ($this->period_time_parser->parse($schedule_period) !== $this->period_time_parser::PARSE_SUCCESS) {
 				$this->setError(_('comma separated list of time periods is expected'));
 
 				return false;
