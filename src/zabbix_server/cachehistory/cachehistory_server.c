@@ -271,6 +271,11 @@ zbx_trigger_func_position_t;
 ZBX_PTR_VECTOR_DECL(trigger_func_position, zbx_trigger_func_position_t *)
 ZBX_PTR_VECTOR_IMPL(trigger_func_position, zbx_trigger_func_position_t *)
 
+static void	free_trigger_func_position(zbx_trigger_func_position_t *tfp)
+{
+	zbx_free(tfp);
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: triggers links with functions.                                    *
@@ -378,8 +383,7 @@ static void	determine_items_in_expressions(zbx_vector_dc_trigger_t *trigger_orde
 	zbx_free(errcodes);
 	zbx_free(functions);
 out:
-	zbx_vector_trigger_func_position_clear_ext(&triggers_func_pos,
-			(zbx_trigger_func_position_free_func_t)zbx_ptr_free);
+	zbx_vector_trigger_func_position_clear_ext(&triggers_func_pos, free_trigger_func_position);
 	zbx_vector_trigger_func_position_destroy(&triggers_func_pos);
 
 	zbx_vector_uint64_clear(&functionids);
