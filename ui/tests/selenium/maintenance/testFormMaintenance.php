@@ -154,6 +154,61 @@ class testFormMaintenance extends CLegacyWebTest {
 	}
 
 	/**
+	 * Check screenshots of period form.
+	 */
+	public function testFormMaintenance_Screenshot() {
+		$this->page->login()->open('zabbix.php?action=maintenance.list')->waitUntilReady();
+		$this->page->assertTitle('Configuration of maintenance periods');
+		$this->page->assertHeader('Maintenance periods');
+		$this->query('button:Create maintenance period')->one()->waitUntilClickable()->click();
+
+		$form = COverlayDialogElement::find()->waitUntilReady()->asForm()->one();
+		
+		$periods = [
+			[
+				'fields' => [
+					'Period type' => 'One time only'
+				],
+			],
+			[
+				'fields' => [
+					'Period type' => 'Daily'
+				],
+			],
+			[
+				'fields' => [
+					'Period type' => 'Weekly'
+				],
+			],
+			[
+				'fields' => [
+					'Period type' => 'Monthly'
+				],
+			],
+			[
+				'fields' => [
+					'Period type' => 'Monthly',
+					'Date' => 'Day of week'
+				]
+			]
+		];
+			
+		foreach ($periods as $index => $period) {
+			$form->query('button:Add')->one()->waitUntilClickable()->click();
+			$period_overlay = COverlayDialogElement::find()->waitUntilReady()->all()->last();
+			$period_overlay->asForm()->fill($period['fields']);
+			$this->page->removeFocus();
+			$screenshotName = 'maintenance_period_' . $index;
+			$this->assertScreenshot($period_overlay, $screenshotName);
+			$period_overlay->query('button:Cancel')->one()->click();
+			$period_overlay->waitUntilNotPresent();
+		}
+
+		$this->query('button:Cancel')->one()->click();
+		COverlayDialogElement::ensureNotPresent();
+	}
+	
+	/**
 	 * Changes not preserve when close edit form using cancel button.
 	 *
 	 * @depends testFormMaintenance_Create
