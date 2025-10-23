@@ -113,7 +113,7 @@ window.tag_filter_edit = new class {
 	#toggleTagList() {
 		const tag_list_radio = this.form_element.querySelector('[name="new_tag_filter_type"]:checked').value;
 		const tags = document.getElementById('tag-list-form-field');
-		const tags_label = this.form_element.querySelector("label[for='new_tag_tag_filters']");
+		const tags_label = this.form_element.querySelector("label[for='new_tag_filters']");
 		const show_tags = tag_list_radio == '<?= TAG_FILTER_LIST ?>';
 
 		tags.style.display = show_tags ? '' : 'none';
@@ -128,7 +128,7 @@ window.tag_filter_edit = new class {
 		fields.tag_filters = this.tag_filters;
 		fields.groupid = this.groupid;
 
-		fields.new_tag_tag_filters = Object.values(fields.new_tag_tag_filters)
+		fields.new_tag_filters = Object.values(fields.new_tag_filters)
 			.filter(tag => tag.tag !== '' || tag.value !== '');
 
 		this.form.validateSubmit(fields)

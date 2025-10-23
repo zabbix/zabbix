@@ -39,7 +39,7 @@ $new_tag_filter_table = (new CTable())
 			->addItem(new CCol((new CButtonLink(_('Add')))->addClass('js-add-tag-filter-row')))
 	)
 	->setAttribute('data-field-type', 'set')
-	->setAttribute('data-field-name', 'new_tag_tag_filters');
+	->setAttribute('data-field-name', 'new_tag_filters');
 
 $form_grid
 	->addItem([
@@ -74,7 +74,7 @@ $form_grid
 		)
 	])
 	->addItem([
-		(new CLabel(_('Tags'), 'new_tag_tag_filters'))->setAsteriskMark(),
+		(new CLabel(_('Tags'), 'new_tag_filters'))->setAsteriskMark(),
 		(new CFormField(
 			(new CDiv($new_tag_filter_table))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 		))
@@ -83,22 +83,22 @@ $form_grid
 
 $tag_filter_row_template = (new CTemplateTag('tag-filter-row-template'))->addItem([
 	(new CRow([
-		(new CTextBox('new_tag_tag_filters[#{rowid}][tag]', '#{tag}', false,
+		(new CTextBox('new_tag_filters[#{rowid}][tag]', '#{tag}', false,
 			DB::getFieldLength('tag_filter', 'tag')
 		))
 			->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
 			->setAttribute('placeholder', _('tag'))
-			->setErrorContainer('new-tag-tag-filters-#{rowid}-error-container'),
-		(new CTextBox('new_tag_tag_filters[#{rowid}][value]', '#{value}', false,
+			->setErrorContainer('new-tag-filters-#{rowid}-error-container'),
+		(new CTextBox('new_tag_filters[#{rowid}][value]', '#{value}', false,
 			DB::getFieldLength('tag_filter', 'value')
 		))
 			->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
 			->setAttribute('placeholder', _('value'))
-			->setErrorContainer('new-tag-tag-filters-#{rowid}-error-container'),
+			->setErrorContainer('new-tag-filters-#{rowid}-error-container'),
 		(new CButtonLink(_('Remove')))->addClass('js-remove-table-row')
 	]))->addClass('form_row'),
 	(new CRow([
-		(new CCol((new CDiv())->setId('new-tag-tag-filters-#{rowid}-error-container')))
+		(new CCol((new CDiv())->setId('new-tag-filters-#{rowid}-error-container')))
 			->addClass(ZBX_STYLE_ERROR_CONTAINER)
 			->setColSpan(3)
 	]))->addClass('error-container-row')

@@ -33,7 +33,7 @@ class CControllerUsergroupTagFilterCheck extends CController {
 			'groupid' => ['db tag_filter.groupid'],
 			'new_tag_groups' => ['array', 'required', 'not_empty', 'field' => ['db hstgrp.groupid']],
 			'new_tag_filter_type' => ['boolean'],
-			'new_tag_tag_filters' => ['objects', 'required', 'not_empty',
+			'new_tag_filters' => ['objects', 'required', 'not_empty',
 				'uniq' => ['tag', 'value'],
 				'messages' => ['uniq' => _('Tag name and value combination is not unique.')],
 				'fields' => [
@@ -112,7 +112,7 @@ class CControllerUsergroupTagFilterCheck extends CController {
 		$filter_type = $this->getInput('new_tag_filter_type', TAG_FILTER_ALL);
 		$opened_groupid = $this->getInput('groupid');
 		$groupids = $this->getInput('new_tag_groups', []);
-		$new_tag_filters = $this->getInput('new_tag_tag_filters', []);
+		$new_tag_filters = $this->getInput('new_tag_filters', []);
 
 		if (array_key_exists($opened_groupid, $data['tag_filters'])) {
 			unset($data['tag_filters'][$opened_groupid]);
