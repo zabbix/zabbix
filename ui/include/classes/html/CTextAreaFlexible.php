@@ -35,7 +35,7 @@ class CTextAreaFlexible extends CTag {
 	 * @param bool   $options['readonly']     (optional)
 	 */
 
-	public function __construct(string $name = 'textarea-flexible', $value = '', array $options = []) {
+	public function __construct(string $name, $value = '', array $options = []) {
 		parent::__construct('z-textarea-flexible', true);
 
 		$this

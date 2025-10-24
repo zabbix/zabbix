@@ -4677,30 +4677,6 @@ z-textarea-flexible {
     z-textarea-flexible textarea[readonly]:focus {
       border-color: #768d99; }
 
-.macro-input-group z-textarea-flexible {
-  flex: 1; }
-  .macro-input-group z-textarea-flexible textarea {
-    border-right: 0; }
-    .macro-input-group z-textarea-flexible textarea:focus + .btn-undo {
-      border-color: #768d99; }
-
-.modal-popup-medium z-textarea-flexible textarea,
-.modal-popup-large z-textarea-flexible textarea,
-.modal-popup-static z-textarea-flexible textarea,
-.modal-popup-preprocessing z-textarea-flexible textarea {
-  overflow-y: auto; }
-
-.textarea-flexible-container td {
-  line-height: 22px; }
-  .textarea-flexible-container td.textarea-flexible-parent {
-    vertical-align: top; }
-  .textarea-flexible-container td.macro-textarea-parent textarea {
-    float: left; }
-  .textarea-flexible-container td.macro-textarea-parent span {
-    margin-left: 10px; }
-  .textarea-flexible-container td button {
-    line-height: normal; }
-
 .widget-field-sparkline {
   display: grid;
   grid-template-columns: minmax(100px, max-content) 1fr minmax(95px, max-content) max-content;
@@ -7613,6 +7589,17 @@ z-select[disabled] .focusable, z-textarea-flexible textarea[disabled], input[dis
     float: left;
     line-height: 24px; }
 
+.textarea-flexible-container td {
+  line-height: 22px; }
+  .textarea-flexible-container td.textarea-flexible-parent {
+    vertical-align: top; }
+  .textarea-flexible-container td.macro-textarea-parent textarea {
+    float: left; }
+  .textarea-flexible-container td.macro-textarea-parent span {
+    margin-left: 10px; }
+  .textarea-flexible-container td button {
+    line-height: normal; }
+
 .overlay-dialogue-body {
   margin: 0 0 25px;
   white-space: nowrap; }
@@ -8594,6 +8581,12 @@ svg {
       border-color: #768d99; }
     .macro-input-group .btn-undo.is-focused {
       border-color: #768d99; }
+  .macro-input-group z-textarea-flexible {
+    flex: 1; }
+    .macro-input-group z-textarea-flexible textarea {
+      border-right: 0; }
+      .macro-input-group z-textarea-flexible textarea:focus + .btn-undo {
+        border-color: #768d99; }
 
 .input-secret {
   position: relative;
@@ -8812,6 +8805,11 @@ z-select.z-select-host-interface li[disabled] .description:not(:empty) {
   top: 0;
   background: #2b2b2b;
   z-index: 3; }
+.modal-popup-medium z-textarea-flexible textarea,
+.modal-popup-large z-textarea-flexible textarea,
+.modal-popup-static z-textarea-flexible textarea,
+.modal-popup-preprocessing z-textarea-flexible textarea {
+  overflow-y: auto; }
 
 .global-macro-table .table-col-value,
 .global-macro-table .table-col-template-value,

@@ -31,7 +31,7 @@ class CFieldZTextareaFlexible extends CField {
 			return null;
 		}
 
-		return this._field.value.replace(/\r?\n/g, ' ');
+		return this._field.value.replace(/\r?\n/g, '\r\n');
 	}
 
 	getValueTrimmed() {
@@ -50,7 +50,6 @@ class CFieldZTextareaFlexible extends CField {
 	}
 
 	_appendErrorHint(error_hint) {
-		console.log(error_hint)
 		if (this.#isFlexible()) {
 			this._field.closest('.' + ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT).appendChild(error_hint);
 		}

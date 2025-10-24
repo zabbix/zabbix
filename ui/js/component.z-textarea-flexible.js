@@ -116,18 +116,15 @@ class ZTextareaFlexible extends HTMLElement {
 			textareaKeydown: e => {
 				if (e.key === 'Enter') {
 					e.preventDefault();
-
-					this.closest('form').dispatchEvent(new SubmitEvent('submit', {
-						bubbles: true,
-						cancelable: true,
-						submitter: this
-					}));
-
-					return false;
 				}
 			},
 
 			textareaBlur: () => {
+				if (this.#textarea.classList.contains('macro')) {
+					this.#macroToUpperCase();
+				}
+
+				this.#updateHeight();
 				this.dispatchEvent(new Event('blur', { bubbles: true }));
 			},
 
@@ -165,8 +162,6 @@ class ZTextareaFlexible extends HTMLElement {
 	#updateHeight() {
 		const computed_style = getComputedStyle(this.#textarea);
 
-		this.#textarea.style.overflowY = 'hidden';
-
 		const saved_value = this.#textarea.value;
 		if (!saved_value && this.#textarea.placeholder) {
 			this.#textarea.value = this.#textarea.placeholder;
@@ -186,8 +181,6 @@ class ZTextareaFlexible extends HTMLElement {
 	}
 
 	#initVisibilityWatch() {
-		if (this.#intersection_observer) return;
-
 		this.#intersection_observer = new IntersectionObserver(entries => {
 			if (entries.some(e => e.isIntersecting)) {
 				requestAnimationFrame(() => this.#updateHeight());
@@ -196,6 +189,18 @@ class ZTextareaFlexible extends HTMLElement {
 		});
 
 		this.#intersection_observer.observe(this);
+	}
+
+	#macroToUpperCase() {
+		const end = this.#textarea.value.indexOf(':');
+
+		if (end === -1) {
+			this.#textarea.value = this.#textarea.value.toUpperCase();
+		} else {
+			const macro_part = this.#textarea.value.substring(0, end);
+			const context_part = this.#textarea.value.substring(end);
+			this.#textarea.value = macro_part.toUpperCase() + context_part;
+		}
 	}
 
 	get width() {

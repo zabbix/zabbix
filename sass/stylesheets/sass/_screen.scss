@@ -2172,6 +2172,30 @@ div {
 	}
 }
 
+// Flexible textarea.
+.textarea-flexible-container {
+	td {
+		line-height: 22px;
+
+		&.textarea-flexible-parent {
+			vertical-align: top;
+		}
+
+		&.macro-textarea-parent {
+			textarea {
+				float: left;
+			}
+			span {
+				margin-left: 10px;
+			}
+		}
+
+		button {
+			line-height: normal;
+		}
+	}
+}
+
 .overlay-dialogue-body {
 	margin: 0 0 25px;
 	white-space: nowrap;
@@ -3594,6 +3618,20 @@ svg {
 			border-color: $form-focus-border-color;
 		}
 	}
+
+	z-textarea-flexible {
+		flex: 1;
+
+		textarea {
+			border-right: 0;
+
+			&:focus {
+				+ .btn-undo {
+					border-color: $form-focus-border-color;
+				}
+			}
+		}
+	}
 }
 
 .input-secret {
@@ -3964,6 +4002,12 @@ z-select {
 		top: 0;
 		background: $header-bg-color;
 		z-index: 3;
+	}
+
+	z-textarea-flexible {
+		textarea {
+			overflow-y: auto;
+		}
 	}
 }
 

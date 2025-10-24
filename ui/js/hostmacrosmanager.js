@@ -129,9 +129,6 @@ class HostMacrosManager {
 				template: show_inherited_macros ? '#macro-row-tmpl-inherited' : '#macro-row-tmpl',
 				allow_empty: true,
 			})
-			.on('click', 'button.element-table-add', () => {
-				this.initMacroFields($parent);
-			})
 			.on('click', 'button.element-table-change', (e) => {
 				const macro_num = e.target.id.split('_')[1];
 				const inherited_type = $('#macros_' + macro_num + '_inherited_type').val();
@@ -249,25 +246,6 @@ class HostMacrosManager {
 			.on('afteradd.dynamicRows', function() {
 				$('.macro-input-group').macroValue();
 			});
-
-		this.initMacroFields($parent);
-	}
-
-	initMacroFields($parent) {
-		$(ZBX_STYLE_Z_TEXTAREA_FLEXIBLE + ' textarea', $parent).not('.initialized-field')
-				.each((index, textarea) => {
-			const $textarea = $(textarea);
-
-			if ($textarea.hasClass('macro')) {
-				$textarea.on('change keydown', (e) => {
-					if (e.type === 'change' || e.which === 13) {
-						this.macroToUpperCase($textarea);
-					}
-				});
-			}
-
-			$textarea.addClass('initialized-field');
-		});
 	}
 
 	getMacroTable() {
@@ -283,21 +261,6 @@ class HostMacrosManager {
 
 	loaderStop() {
 		this.$preloader.remove();
-	}
-
-	macroToUpperCase($element) {
-		var macro = $element.val(),
-			end = macro.indexOf(':');
-
-		if (end == -1) {
-			$element.val(macro.toUpperCase());
-		}
-		else {
-			var macro_part = macro.substr(0, end),
-				context_part = macro.substr(end, macro.length);
-
-			$element.val(macro_part.toUpperCase() + context_part);
-		}
 	}
 
 	getManualDiscoveryState() {
