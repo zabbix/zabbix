@@ -169,9 +169,6 @@ char	*zbx_fgets(char *buffer, int size, FILE *fp)
 	{
 		errno = 0;
 		s = fgets(buffer, size, fp);
-
-		if (SUCCEED == zbx_alarm_timed_out())
-			return NULL;
 	}
 	while (EINTR == errno && NULL == s);
 
