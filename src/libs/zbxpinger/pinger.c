@@ -576,7 +576,7 @@ static void	add_pinger_host(zbx_vector_fping_host_t *hosts, char *addr)
 
 static int	process_pinger_hosts(zbx_hashset_t *pinger_items, int process_num, int process_type)
 {
-	int				ping_result, processed_num = 0, i, min_delay_ms, total_pinger_timeout_ms,
+	int				ping_result, processed_num = 0, i, max_delay_ms, total_pinger_timeout_ms,
 					effective_timeout, item_delay_ms, min_possible_time;
 	char				error[ZBX_ITEM_ERROR_LEN_MAX];
 	zbx_vector_fping_host_t		hosts;
@@ -592,42 +592,42 @@ static int	process_pinger_hosts(zbx_hashset_t *pinger_items, int process_num, in
 	zbx_hashset_iter_reset(pinger_items, &iter);
 	while (NULL != (pinger = (zbx_pinger_t *)zbx_hashset_iter_next(&iter)) && ZBX_IS_RUNNING())
 	{
-		/* Find minimum delay among all items in this pinger group */
-		min_delay_ms = INT_MAX;
+		/* Find maximum delay among all items in pinger group */
+		max_delay_ms = ZBX_FPING_MIN_TIMEOUT;
 
 		for (i = 0; i < pinger->items.values_num; i++)
 		{
 			item_delay_ms = pinger->items.values[i].item_delay * 1000;
 
-			if (item_delay_ms < min_delay_ms)
-				min_delay_ms = item_delay_ms;
+			if (item_delay_ms > max_delay_ms)
+				max_delay_ms = item_delay_ms;
 		}
 
 		total_pinger_timeout_ms = pinger->count * pinger->timeout;
 		effective_timeout = pinger->timeout;
 
-		if (total_pinger_timeout_ms > min_delay_ms)
+		if (total_pinger_timeout_ms > max_delay_ms)
 		{
 			/* Adjust per-packet timeout to fit within item update interval */
-			effective_timeout = min_delay_ms / pinger->count;
+			effective_timeout = max_delay_ms / pinger->count;
 
 			if (effective_timeout < ZBX_FPING_MIN_TIMEOUT)
 			{
 				effective_timeout = ZBX_FPING_MIN_TIMEOUT;
 				min_possible_time = pinger->count * ZBX_FPING_MIN_TIMEOUT;
 
-				if (min_possible_time > min_delay_ms)
+				if (min_possible_time > max_delay_ms)
 				{
 					zabbix_log(LOG_LEVEL_WARNING, "item update interval %d ms is too short for %d "
 							"pings with minimum timeout %d ms (minimum required: %d ms)",
-							min_delay_ms, pinger->count, ZBX_FPING_MIN_TIMEOUT,
+							max_delay_ms, pinger->count, ZBX_FPING_MIN_TIMEOUT,
 							min_possible_time);
 				}
 			}
 
-			zabbix_log(LOG_LEVEL_DEBUG, "adjusting ping timeout from %d ms to %d ms (total timeout %d "
-					"ms > min item delay %d ms, count=%d)", pinger->timeout, effective_timeout,
-					total_pinger_timeout_ms, min_delay_ms, pinger->count);
+			zabbix_log(LOG_LEVEL_DEBUG, "adjusting ping timeout from %d ms to %d ms (total timeout %d ms > "
+					"max item update interval in pinger group %d ms, count=%d)", pinger->timeout,
+					effective_timeout, total_pinger_timeout_ms, max_delay_ms, pinger->count);
 		}
 
 		for (i = 0; i < pinger->items.values_num; i++)
