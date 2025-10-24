@@ -125,17 +125,17 @@ class CScatterPlotMetricPoint extends CSvgGroup {
 			);
 	}
 
-	private static function createMarker(int $marker_type, int $size): array {
+	public static function createMarker(int $marker_type, int $size, int $cx = 0, int $cy = 0): array {
 		switch ($marker_type) {
 			case self::MARKER_TYPE_ELLIPSIS:
 				return [
-					new CSvgCircle(0, 0, $size + 4),
-					new CSvgCircle(0, 0, $size)
+					new CSvgCircle($cx, $cy, $size + 4),
+					new CSvgCircle($cx, $cy, $size)
 				];
 
 			case self::MARKER_TYPE_SQUARE:
-				$empty_coordinates = 0 - ($size + 4) / 2;
-				$zero_coordinates = 0 - ($size / 2);
+				$empty_coordinates = $cx - ($size + 4) / 2;
+				$zero_coordinates = $cy - ($size / 2);
 
 				return [
 					new CSvgRect($empty_coordinates, $empty_coordinates, $size + 4, $size + 4),
@@ -144,26 +144,26 @@ class CScatterPlotMetricPoint extends CSvgGroup {
 
 			case self::MARKER_TYPE_TRIANGLE:
 				return [
-					new CSvgTriangle(0, 0, $size + 4, $size + 4),
-					new CSvgTriangle(0, 0, $size, $size)
+					new CSvgTriangle($cx, $cy, $size + 4, $size + 4),
+					new CSvgTriangle($cx, $cy, $size, $size)
 				];
 
 			case self::MARKER_TYPE_DIAMOND:
 				return [
-					new CSvgDiamond(0, 0, $size + 4),
-					new CSvgDiamond(0, 0, $size)
+					new CSvgDiamond($cx, $cy, $size + 4),
+					new CSvgDiamond($cx, $cy, $size)
 				];
 
 			case self::MARKER_TYPE_STAR:
 				return [
-					new CSvgStar(0, 0, $size + 4),
-					new CSvgStar(0, 0, $size)
+					new CSvgStar($cx, $cy, $size + 4),
+					new CSvgStar($cx, $cy, $size)
 				];
 
 			case self::MARKER_TYPE_CROSS:
 				return [
-					new CSvgCross(0, 0, $size + 4),
-					new CSvgCross(0, 0, $size)
+					new CSvgCross($cx, $cy, $size + 4),
+					new CSvgCross($cx, $cy, $size)
 				];
 		}
 

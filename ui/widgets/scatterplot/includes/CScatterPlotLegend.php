@@ -16,7 +16,7 @@
 namespace Widgets\ScatterPlot\Includes;
 
 use CDiv,
-	CIcon;
+	CSvg;
 
 class CScatterPlotLegend extends CDiv {
 
@@ -79,11 +79,14 @@ class CScatterPlotLegend extends CDiv {
 
 	private function draw(): void {
 		foreach ($this->legend_items as $item) {
-			$icon_class = CScatterPlotMetricPoint::MARKER_ICONS[$item['marker']];
+			$icon_class = CScatterPlotMetricPoint::createMarker($item['marker'], 10, 7, 7);
 
 			$this->addItem(
 				(new CDiv([
-					(new CIcon($icon_class))->addStyle('color: '.$item['color'].';'),
+					(new CSvg())
+						->setSize(16, 16)
+						->addItem($icon_class[1])
+						->addStyle('fill: '.$item['color'].';'.' stroke: '.$item['color'].'; vertical-align: middle;'),
 					$item['name']
 				]))->addClass(self::ZBX_STYLE_SCATTER_PLOT_LEGEND_ITEM)
 			);

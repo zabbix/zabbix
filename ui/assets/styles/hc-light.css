@@ -1506,7 +1506,7 @@ button {
 .problem-icon-list .problem-icon-list-item::before {
   font-size: 16px; }
 
-.zi-arrow-down-small::before, .zi-arrow-up-small::before, .zi-chevron-down-small::before, .zi-copy::before, .zi-help-small::before, .zi-help-filled-small::before, .zi-i-negative::before, .zi-i-positive::before, .zi-i-warning::before, .zi-link-external-small::before, .zi-plus-small::before, .zi-remove-small::before, .zi-tree-top-bottom-small::before, .zi-tree-top-right-small::before, .zi-tree-top-right-bottom-small::before, .zi-user-filled-small::before, .zi-wrench-alt-small::before, form.dashboard-widget-scatterplot .dataset-body .form-grid .marker-config .radio-list-control .icon::before, div.dashboard-widget-scatterplot .svg-graph-legend .scatter-plot-legend-item .icon::before, .overlay-dialogue .overlay-dialogue-header .btn-overlay-close::before, .svg-graph-hintbox li .svg-graph-hintbox-icon-color::before {
+.zi-arrow-down-small::before, .zi-arrow-up-small::before, .zi-chevron-down-small::before, .zi-copy::before, .zi-help-small::before, .zi-help-filled-small::before, .zi-i-negative::before, .zi-i-positive::before, .zi-i-warning::before, .zi-link-external-small::before, .zi-plus-small::before, .zi-remove-small::before, .zi-tree-top-bottom-small::before, .zi-tree-top-right-small::before, .zi-tree-top-right-bottom-small::before, .zi-user-filled-small::before, .zi-wrench-alt-small::before, form.dashboard-widget-scatterplot .dataset-body .form-grid .marker-config .radio-list-control .icon::before, .overlay-dialogue .overlay-dialogue-header .btn-overlay-close::before, .svg-graph-hintbox li .svg-graph-hintbox-icon-color::before {
   font-size: 12px; }
 
 .btn-overlay-close::before, .zi-remove-smaller::before {
@@ -5851,14 +5851,12 @@ form.dashboard-widget-scatterplot {
 
 div.dashboard-widget-scatterplot {
   overflow-x: hidden; }
-  div.dashboard-widget-scatterplot .svg-graph-legend .scatter-plot-legend-item {
-    min-width: 100%;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap; }
-    div.dashboard-widget-scatterplot .svg-graph-legend .scatter-plot-legend-item .icon {
-      height: 18px;
-      margin-right: 2px; }
+
+.svg-graph-legend .scatter-plot-legend-item {
+  min-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap; }
 
 form.dashboard-widget-svggraph {
   max-width: 1330px;

@@ -282,20 +282,14 @@ form.dashboard-widget-scatterplot {
 
 div.dashboard-widget-scatterplot {
 	overflow-x: hidden;
+}
 
-	.svg-graph-legend {
-		.scatter-plot-legend-item {
-			min-width: 100%;
-			overflow: hidden;
-			text-overflow: ellipsis;
-			white-space: nowrap;
-
-			.icon {
-				@extend %icon-small;
-
-				height: 18px;
-				margin-right: 2px;
-			}
-		}
+// Only for scatter plot image download functionality.
+.svg-graph-legend {
+	.scatter-plot-legend-item {
+		min-width: 100%;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
 	}
 }
