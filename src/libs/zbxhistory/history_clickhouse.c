@@ -335,7 +335,10 @@ static void	history_clickhouse_write_log(zbx_json_t *row, const zbx_history_valu
 
 static void	history_clickhouse_write_uint(zbx_json_t *row, const zbx_history_value_t *value)
 {
-	zbx_json_adduint64(row, NULL, value->ui64);
+	char	buffer[MAX_ID_LEN];
+
+	zbx_snprintf(buffer, sizeof(buffer), ZBX_FS_UI64, value->ui64);
+	zbx_json_addraw(row, NULL, buffer);
 }
 
 static void	history_clickhouse_write_text(zbx_json_t *row, const zbx_history_value_t *value)
@@ -423,11 +426,15 @@ static void	history_clickhouse_write(void *data, unsigned char value_type,
 	{
 		char	timestamp[MAX_ID_LEN * 2];
 
-		zbx_json_adduint64(&json_array, NULL, entries[i]->itemid);
+		char	buffer[MAX_ID_LEN];
+
+		zbx_snprintf(buffer, sizeof(buffer), ZBX_FS_UI64, entries[i]->itemid);
+		zbx_json_addraw(&json_array, NULL, buffer);
+
 		history_clickhouse_write_value(&json_array, &entries[i]->value, (zbx_item_value_type_t)value_type);
 
-		zbx_snprintf(timestamp, sizeof(timestamp), "%d.%09d", entries[i]->ts.sec, entries[i]->ts.ns);
-		zbx_json_addstring(&json_array, NULL, timestamp, ZBX_JSON_TYPE_STRING);
+		zbx_snprintf(timestamp, sizeof(timestamp), "\"%d.%09d\"", entries[i]->ts.sec, entries[i]->ts.ns);
+		zbx_json_addraw(&json_array, NULL, timestamp);
 
 		zbx_str_memcpy_alloc(&post_data, &post_data_alloc, &post_data_offset, json_array.buffer,
 				json_array.buffer_size);
