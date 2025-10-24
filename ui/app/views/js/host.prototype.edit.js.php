@@ -81,10 +81,10 @@ window.host_prototype_edit_popup = new class {
 						action
 					},
 					callback: ({event, data}) => {
-						const is_confirmed = data.action_parameters.clone == 1 || this.#isConfirmed();
-						if (!is_confirmed) {
+						const can_proceed = data.action_parameters.clone == 1 || this.#isConfirmed();
+
+						if (!can_proceed) {
 							event.preventDefault();
-							this.overlay.unsetLoading();
 						}
 					}
 				})
