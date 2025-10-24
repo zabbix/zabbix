@@ -58,7 +58,7 @@ class CWidgetFieldTagsView extends CWidgetFieldView {
 		return '
 			CWidgetForm.addField(
 				new CWidgetFieldTags('.json_encode([
-					'name' => zbx_formatDomId($this->field->getName()),
+					'name' => $this->field->getName(),
 					'form_name' => $this->form_name,
 					'field_id' => zbx_formatDomId($this->field->getName())
 				]).')

@@ -405,6 +405,9 @@ A......... [ZBX-26078] fixed filtering by inherited tags with negative operators
 ...G...PS. [ZBX-25708] moved include section in *.conf files from the middle to the end (yurii)
 ........S. [ZBX-16925] fixed housekeeper behavior that blocked history sync and caused deadlocks when deleting events (vso)
 .........T [ZBX-25196] fixed an issue with JavaScript in AWS ECS templates (egordymov)
+.......... [ZBX-27061] moved OpenSSL directory to system-protected path on build server (yurii)
+A.F....... [ZBX-27062] updated LDAP bind password to reset on LDAP host change (aluchko)
+..F....... [ZBX-27063] fixed permission check for Problems view refresh (gberzina)
 
 --------------------------------------------------------------------------------
 Changes for 7.4.1
@@ -492,6 +495,7 @@ A......... [ZBX-26191] fixed inconsistent API and frontend validation for mainte
 ..F....... [ZBX-26518] fixed visual artifacts on webkit-based browsers when scrolling the page while editing a widget (averza)
 ........S. [ZBX-25413] fixed race condition that could lead to user macro changes not be synced with Zabbix proxy (vso)
 ...G...... [ZBX-26187] fixed response to wmi.getall from Zabbix agent 2 does not return array-type values (mprihodko)
+A......... [ZBX-27060] fixed scope of information available via user.get (jfreibergs)
 
 --------------------------------------------------------------------------------
 Changes for 7.4.0
@@ -759,6 +763,9 @@ Bug fixes:
 ..F....... [ZBX-26606] fixed user macros not working in testing dialog (gklavins)
 ...G...... [ZBX-26697] fixed memory error in sender when trying to read invalid response (dgoloscapov)
 ........S. [ZBX-26661] fixed deadlock on autoreg_host table (vso)
+.......... [ZBX-27061] moved OpenSSL directory to system-protected path on build server (yurii)
+A.F....... [ZBX-27062] updated LDAP bind password to reset on LDAP host change (aluchko)
+..F....... [ZBX-27063] fixed permission check for Problems view refresh (gberzina)
 
 --------------------------------------------------------------------------------
 Changes for 7.2.11
@@ -795,6 +802,7 @@ Bug fixes:
 ..F....... [ZBX-24047] fixed value mapping update error when mapping name contains quotes (isharha)
 ..F....... [ZBX-26454] set a readonly property for the "Allowed Hosts" input for discovered items (msnihach)
 ........S. [ZBX-25413] fixed race condition that could lead to user macro changes not be synced with Zabbix proxy (vso)
+A......... [ZBX-27060] fixed scope of information available via user.get (jfreibergs)
 
 --------------------------------------------------------------------------------
 Changes for 7.2.10
@@ -1474,6 +1482,9 @@ A......... [ZBX-26078] fixed filtering by inherited tags with negative operators
 ..F....... [ZBX-26159] fixed log[] item with 'numeric' type of information unexpected changing to 'log' type (aluchko)
 ..F....... [ZBX-26374] added updates for displaying the relevant monitoring data or "no permissions" notification for the Classic Graph widget (msnihach)
 .....J.... [ZBX-26220] fixed scheduled report creation with IPv6 address in Zabbix frontend URL (vsmelovs)
+.......... [ZBX-27061] moved OpenSSL directory to system-protected path on build server (yurii)
+A.F....... [ZBX-27062] updated LDAP bind password to reset on LDAP host change (aluchko)
+..F....... [ZBX-27063] fixed permission check for Problems view refresh (gberzina)
 
 --------------------------------------------------------------------------------
 Changes for 7.0.17
@@ -1539,6 +1550,7 @@ A......... [ZBX-26436] prevented redundant row locks in the database when deleti
 ..F....... [ZBX-26454] set a readonly property for the "Allowed Hosts" input for discovered items (msnihach)
 ........S. [ZBX-26486] fixed errors in Zabbix server log on second and subsequent server starts with TimescaleDB (mprihodko)
 ........S. [ZBX-25413] fixed race condition that could lead to user macro changes not be synced with Zabbix proxy (vso)
+A......... [ZBX-27060] fixed scope of information available via user.get (jfreibergs)
 
 --------------------------------------------------------------------------------
 Changes for 7.0.16
@@ -5178,6 +5190,10 @@ Bug fixes:
 ...G...... [ZBX-26344] refactored zbxcmd execute to avoid Windows syscalls in Zabbix agent 2 (esneiders)
 .......PS. [ZBX-26433] fixed values outside of history storage period causing trigger to cache all values in storage period (vso)
 ...G...... [ZBX-26244] fixed Zabbix agent 2 memory leak related to traffic compression (MVekslers)
+A......... [ZBX-27060] fixed scope of information available via user.get (jfreibergs)
+.......... [ZBX-27061] moved OpenSSL directory to system-protected path on build server (yurii)
+A.F....... [ZBX-27062] updated LDAP bind password to reset on LDAP host change (aluchko)
+..F....... [ZBX-27063] fixed permission check for Problems view refresh (gberzina)
 
 --------------------------------------------------------------------------------
 Changes for 6.0.40
