@@ -1452,7 +1452,7 @@ abstract class CHostBase extends CApiService {
 		}
 	}
 
-	private static function deleteHostTemplateCache(array $del_template_host_links,
+	protected static function deleteHostTemplateCache(array $del_template_host_links,
 			array $ins_template_host_links): void {
 		self::loadAncestorLinks($del_template_host_links, $template_hosts, $vertices, $ins_template_host_links);
 

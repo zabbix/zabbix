@@ -826,6 +826,7 @@ class CTemplate extends CHostGeneral {
 		}
 
 		self::deleteHgSets($db_templates);
+		self::deleteLinkedHostTemplateCache($templateids);
 
 		DB::delete('host_tag', ['hostid' => $templateids]);
 		DB::delete('hosts', ['hostid' => $templateids]);
@@ -833,6 +834,25 @@ class CTemplate extends CHostGeneral {
 		self::addAuditLog(CAudit::ACTION_DELETE, CAudit::RESOURCE_TEMPLATE, $db_templates);
 
 		return ['templateids' => $templateids];
+	}
+
+	private static function deleteLinkedHostTemplateCache(array $templateids): void {
+		$resource = DBselect(
+			'SELECT ht.templateid,ht.hostid'.
+			' FROM hosts_templates ht,hosts h'.
+			' WHERE ht.hostid=h.hostid'.
+				' AND '.dbConditionId('ht.templateid', $templateids)
+		);
+
+		$del_template_host_links = [];
+
+		while ($row = DBfetch($resource)) {
+			$del_template_host_links[$row['templateid']][$row['hostid']] = [];
+		}
+
+		if ($del_template_host_links) {
+			self::deleteHostTemplateCache($del_template_host_links, []);
+		}
 	}
 
 	/**
