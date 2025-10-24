@@ -347,7 +347,7 @@ zabbix_export:
               parameters:
                 - '-1'
               error_handler: CUSTOM_VALUE
-              error_handler_params: 'Could not get a data.'
+              error_handler_params: 'Could not get data.'
           timeout: 10s
           url: '{$NEXTCLOUD.SCHEMA}://{$NEXTCLOUD.ADDRESS}/ocs/v2.php/apps/serverinfo/api/v1/info'
           query_fields:
@@ -896,7 +896,6 @@ zabbix_export:
               name: 'User "{#NEXTCLOUD.USER}": Status'
               type: DEPENDENT
               key: 'nextcloud.user.enabled[{#NEXTCLOUD.USER}]'
-              value_type: CHAR
               description: 'User account status.'
               valuemap:
                 name: 'User status'
@@ -905,6 +904,7 @@ zabbix_export:
                   parameters:
                     - $.ocs.data.enabled
                   error_handler: DISCARD_VALUE
+                - type: BOOL_TO_DECIMAL
                 - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1h
@@ -939,16 +939,12 @@ zabbix_export:
                   parameters:
                     - '-1'
                   error_handler: CUSTOM_VALUE
-                  error_handler_params: 'Could not get a data.'
+                  error_handler_params: 'Could not get data.'
               timeout: 10s
               url: '{$NEXTCLOUD.SCHEMA}://{$NEXTCLOUD.ADDRESS}/ocs/v1.php/cloud/users/{#NEXTCLOUD.USER}'
               query_fields:
                 - name: format
                   value: json
-                - name: skipApps
-                  value: 'false'
-                - name: skipUpdate
-                  value: 'false'
               status_codes: '200,401'
               http_proxy: '{$NEXTCLOUD.PROXY}'
               headers:
