@@ -31,6 +31,7 @@
 #include "zbxtypes.h"
 #include "zbxhttp.h"
 #include "zbxdb.h"
+#include "zbxcrypto.h"
 
 typedef void (*write_value_t)(zbx_json_t *row, const zbx_history_value_t *value);
 
@@ -313,70 +314,68 @@ static int	history_clickhouse_conn_init(zbx_clickhouse_conn_t *conn, zbx_clickho
 	return SUCCEED;
 }
 
-/******************************************************************************
- *                                                                            *
- * json writers for different value types                                     *
- *                                                                            *
- ******************************************************************************/
-
-static void	history_clickhouse_write_dbl(zbx_json_t *row, const zbx_history_value_t *value)
+static int	encode_leb128(zbx_uint64_t value, unsigned char *out)
 {
-	zbx_json_adddouble(row, NULL, value->dbl);
-}
+	int	len = 0;
 
-static void	history_clickhouse_write_str(zbx_json_t *row, const zbx_history_value_t *value)
-{
-	zbx_json_addstring(row, NULL, value->str, ZBX_JSON_TYPE_STRING);
-}
-
-static void	history_clickhouse_write_log(zbx_json_t *row, const zbx_history_value_t *value)
-{
-	zbx_json_addstring(row, NULL, value->log->value, ZBX_JSON_TYPE_STRING);
-	zbx_json_addstring(row, NULL, value->log->source, ZBX_JSON_TYPE_STRING);
-	zbx_json_addint64(row, NULL, value->log->severity);
-	zbx_json_addint64(row, NULL, value->log->logeventid);
-	zbx_json_addint64(row, NULL, value->log->timestamp);
-}
-
-static void	history_clickhouse_write_uint(zbx_json_t *row, const zbx_history_value_t *value)
-{
-	char	buffer[MAX_ID_LEN];
-
-	zbx_snprintf(buffer, sizeof(buffer), ZBX_FS_UI64, value->ui64);
-	zbx_json_addraw(row, NULL, buffer);
-}
-
-static void	history_clickhouse_write_text(zbx_json_t *row, const zbx_history_value_t *value)
-{
-	zbx_json_addstring(row, NULL, value->str, ZBX_JSON_TYPE_STRING);
-}
-
-static int	history_clickhouse_write_value(zbx_json_t *row, const zbx_history_value_t *value,
-		zbx_item_value_type_t value_type)
-{
-	switch (value_type)
+	do
 	{
-		case ITEM_VALUE_TYPE_FLOAT:
-			history_clickhouse_write_dbl(row, value);
-			break;
-		case ITEM_VALUE_TYPE_STR:
-			history_clickhouse_write_str(row, value);
-			break;
-		case ITEM_VALUE_TYPE_LOG:
-			history_clickhouse_write_log(row, value);
-			break;
-		case ITEM_VALUE_TYPE_UINT64:
-			history_clickhouse_write_uint(row, value);
-			break;
-		case ITEM_VALUE_TYPE_TEXT:
-			history_clickhouse_write_text(row, value);
-			break;
-		default:
-			THIS_SHOULD_NEVER_HAPPEN_MSG("unexpected value type %u", (unsigned char)value_type);
-			return FAIL;
-	}
+		unsigned char	byte = value & 0x7f;
 
-	return SUCCEED;
+		value >>= 7;
+
+		if (0 != value)
+			byte |= 0x80;
+
+		out[len++] = byte;
+	}
+	while (0 != value);
+
+	return len;
+}
+
+static void	history_clickhouse_write_text(const char *str, char **post_data, size_t *post_data_alloc, 
+		size_t *post_data_offset)
+{
+	zbx_uint64_t	leb_len, len;
+	unsigned char	leb[10];
+
+	if (NULL != str)
+		len = strlen(str);
+	else
+		len = 0;
+
+	leb_len = encode_leb128(len, leb);
+	zbx_str_memcpy_alloc(post_data, post_data_alloc, post_data_offset, (const char *)leb, leb_len);
+
+	if (0 != len)
+		zbx_str_memcpy_alloc(post_data, post_data_alloc, post_data_offset, str, len);
+}
+
+static void	history_clickhouse_write_uint64(zbx_uint64_t ui64, char **post_data, size_t *post_data_alloc, 
+		size_t *post_data_offset)
+{
+	zbx_uint64_t	number = zbx_htole_uint64(ui64);
+
+	zbx_str_memcpy_alloc(post_data, post_data_alloc, post_data_offset, (const char *)&number, sizeof(number));
+}
+
+static void	history_clickhouse_write_dbl(double dbl, char **post_data, size_t *post_data_alloc, 
+		size_t *post_data_offset)
+{
+	zbx_uint64_t	number;
+
+	memcpy(&number, &dbl, sizeof(number));
+
+	history_clickhouse_write_uint64(number, post_data, post_data_alloc, post_data_offset);
+}
+
+static void	history_clickhouse_write_uint32(zbx_uint32_t ui32, char **post_data, size_t *post_data_alloc, 
+		size_t *post_data_offset)
+{
+	zbx_uint32_t	number = zbx_htole_uint32(ui32);
+
+	zbx_str_memcpy_alloc(post_data, post_data_alloc, post_data_offset, (const char *)&number, sizeof(number));
 }
 
 /******************************************************************************
@@ -400,7 +399,6 @@ static void	history_clickhouse_write(void *data, unsigned char value_type,
 	char			*error = NULL, url[MAX_STRING_LEN], *post_data = NULL;
 	size_t			post_data_alloc = 0, post_data_offset = 0;
 	CURLcode		err;
-	zbx_json_t		json_array;
 
 	conn = history_clickhouse_get_conn(d, value_type);
 	conn->status = FAIL;
@@ -415,8 +413,8 @@ static void	history_clickhouse_write(void *data, unsigned char value_type,
 	}
 
 	zbx_snprintf(url, sizeof(url), "%s?database=%s"
-			"&query=INSERT%%20INTO%%20%s%%20FORMAT%%20JSONCompactEachRow", d->base_url, d->db,
-			clickhouse_history_tables[value_type]);
+		"&query=INSERT%%20INTO%%20%s%%20FORMAT%%20RowBinary", d->base_url, d->db,
+		clickhouse_history_tables[value_type]);
 
 	if (CURLE_OK != (err = curl_easy_setopt(conn->handle, CURLOPT_URL, url)))
 	{
@@ -425,30 +423,58 @@ static void	history_clickhouse_write(void *data, unsigned char value_type,
 		return;
 	}
 
-	zbx_json_initarray(&json_array, 1024);
+	post_data_alloc = entries_num * (sizeof(zbx_uint64_t) * 3) + 8;
+	post_data = zbx_malloc(NULL, post_data_alloc);
 
 	for (int i = 0; i < entries_num; i++)
 	{
-		char	timestamp[MAX_ID_LEN * 2];
+		const zbx_history_entry_t	*entry = entries[i];
 
-		char	buffer[MAX_ID_LEN];
+		history_clickhouse_write_uint64(entry->itemid, &post_data, &post_data_alloc, &post_data_offset);
 
-		zbx_snprintf(buffer, sizeof(buffer), ZBX_FS_UI64, entries[i]->itemid);
-		zbx_json_addraw(&json_array, NULL, buffer);
+		switch (value_type)
+		{
+			case ITEM_VALUE_TYPE_FLOAT:
+				history_clickhouse_write_dbl(entry->value.dbl, &post_data, &post_data_alloc,
+						&post_data_offset);
+				break;
+			case ITEM_VALUE_TYPE_STR:
+			case ITEM_VALUE_TYPE_TEXT:
+				history_clickhouse_write_text(entry->value.str, &post_data, &post_data_alloc,
+						&post_data_offset);
+				break;
+			case ITEM_VALUE_TYPE_LOG:
+				history_clickhouse_write_text(entry->value.log->value, &post_data, &post_data_alloc,
+						&post_data_offset);
+				history_clickhouse_write_text(entry->value.log->source, &post_data, &post_data_alloc,
+						&post_data_offset);
+				history_clickhouse_write_uint32((zbx_uint32_t)entry->value.log->severity, &post_data,
+						&post_data_alloc, &post_data_offset);
+				history_clickhouse_write_uint32((zbx_uint32_t)entry->value.log->logeventid, &post_data,
+						&post_data_alloc, &post_data_offset);
+				history_clickhouse_write_uint64(entry->value.log->timestamp, &post_data,
+						&post_data_alloc, &post_data_offset);
+				break;
+			case ITEM_VALUE_TYPE_UINT64:
+				history_clickhouse_write_uint64(entry->value.ui64, &post_data, &post_data_alloc,
+						&post_data_offset);
+				break;
+			default:
+				THIS_SHOULD_NEVER_HAPPEN_MSG("unexpected value type %u", (unsigned char)value_type);
+				break;
+		}
 
-		history_clickhouse_write_value(&json_array, &entries[i]->value, (zbx_item_value_type_t)value_type);
-
-		zbx_snprintf(timestamp, sizeof(timestamp), "\"%d.%09d\"", entries[i]->ts.sec, entries[i]->ts.ns);
-		zbx_json_addraw(&json_array, NULL, timestamp);
-
-		zbx_str_memcpy_alloc(&post_data, &post_data_alloc, &post_data_offset, json_array.buffer,
-				json_array.buffer_size);
-		zbx_chrcpy_alloc(&post_data, &post_data_alloc, &post_data_offset, '\n');
-
-		zbx_json_setempty(&json_array);
-		zbx_json_addarray(&json_array, NULL);
+		history_clickhouse_write_uint64((zbx_uint64_t)entry->ts.sec * 1000000000ULL + entry->ts.ns,
+				&post_data, &post_data_alloc, &post_data_offset);
 	}
-	zbx_json_free(&json_array);
+
+	if (CURLE_OK != (err = curl_easy_setopt(conn->handle, CURLOPT_POSTFIELDSIZE, post_data_offset)))
+	{
+		zbx_free(post_data);
+		zabbix_log(LOG_LEVEL_WARNING, "cannot write data to ClickHouse: cannot set curl option %d: %s",
+				(int)CURLOPT_URL, curl_easy_strerror(err));
+		return;
+	}
 
 	if (CURLE_OK != (err = curl_easy_setopt(conn->handle, CURLOPT_POSTFIELDS, post_data)))
 	{
