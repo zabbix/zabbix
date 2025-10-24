@@ -147,7 +147,12 @@ class testFormGroups extends CWebTest {
 			// TODO: temporarily commented out due webdriver issue #351858989, alert is not displayed while leaving page during test execution
 //			$this->page->acceptAlert();
 //			$this->page->waitUntilReady();
-			$this->page->assertHeader('Host prototypes');
+
+			// Since the form is opened in a dialog, the actual page and it's header doesn't change.
+			$header = ($this->link === 'zabbix.php?action=search&search='.self::DISCOVERED_GROUP)
+				? 'Search: Group created from host prototype 1'
+				: 'Host groups';
+			$this->page->assertHeader($header);
 			$this->query('id:host')->one()->checkValue(self::HOST_PROTOTYPE);
 
 			return;
