@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2025-09-12 10:46+0000\n"
+"PO-Revision-Date: 2025-09-27 16:25+0000\n"
 "Last-Translator: Daniel Nylander <zabbix@danielnylander.se>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: sv_SE\n"
@@ -299,6 +299,24 @@ msgstr "klassen %1$s.php måste utvidga %2$s för modulen som finns på %3$s."
 #, c-format
 msgid "%1$s: %2$s"
 msgstr "%1$s: %2$s"
+
+#: include/classes/server/CZabbixServer.php:740
+#: include/classes/setup/CSetupWizard.php:1459
+#, c-format
+msgid "%1$s: %2$s."
+msgstr ""
+
+#: include/classes/server/CZabbixServer.php:746
+#: include/classes/setup/CSetupWizard.php:1465
+#, c-format
+msgid "%1$s: file is not readable."
+msgstr ""
+
+#: include/classes/server/CZabbixServer.php:743
+#: include/classes/setup/CSetupWizard.php:1462
+#, c-format
+msgid "%1$s: invalid path or file not found."
+msgstr ""
 
 #: include/classes/graph/CSvgGraph.php:1418
 #, c-format
@@ -4126,7 +4144,7 @@ msgstr "Det går inte att läsa YAML: %1$s."
 #: include/classes/server/CZabbixServer.php:511
 #, c-format
 msgid "Cannot read response from Zabbix server \"%1$s\"."
-msgstr ""
+msgstr "Kan inte läsa svaret från Zabbix-servern \"%1$s\"."
 
 #: include/classes/server/CZabbixServer.php:567
 #, c-format
@@ -18862,7 +18880,7 @@ msgstr "Svarstid"
 #: include/classes/server/CZabbixServer.php:507
 #, c-format
 msgid "Response timeout of %1$s exceeded when connecting to Zabbix server \"%2$s\"."
-msgstr ""
+msgstr "Svarstidsgränsen överstegs för %1$s vid anslutning till Zabbix-servern \"%2$s\"."
 
 #: app/controllers/CControllerMediatypeTestSend.php:182
 msgid "Response type: JSON"

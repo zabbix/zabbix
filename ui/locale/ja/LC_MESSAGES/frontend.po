@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2025-09-12 04:39+0000\n"
+"PO-Revision-Date: 2025-10-12 12:46+0000\n"
 "Last-Translator: Eiji Kawakita <age@cyber.email.ne.jp>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
@@ -284,6 +284,24 @@ msgstr "%1$s.phpクラスは、%3$sにあるモジュールの%2$sを拡張し�
 #, c-format
 msgid "%1$s: %2$s"
 msgstr "%1$s: %2$s"
+
+#: include/classes/server/CZabbixServer.php:740
+#: include/classes/setup/CSetupWizard.php:1459
+#, c-format
+msgid "%1$s: %2$s."
+msgstr "%1$s: %2$s."
+
+#: include/classes/server/CZabbixServer.php:746
+#: include/classes/setup/CSetupWizard.php:1465
+#, c-format
+msgid "%1$s: file is not readable."
+msgstr "%1$s: ファイルは読み取りできません。"
+
+#: include/classes/server/CZabbixServer.php:743
+#: include/classes/setup/CSetupWizard.php:1462
+#, c-format
+msgid "%1$s: invalid path or file not found."
+msgstr "%1$s: 無効なパスであるかファイルが見つかりません。"
 
 #: include/classes/graph/CSvgGraph.php:1418
 #, c-format
@@ -18698,7 +18716,7 @@ msgstr "レスポンスタイム"
 #: include/classes/server/CZabbixServer.php:507
 #, c-format
 msgid "Response timeout of %1$s exceeded when connecting to Zabbix server \"%2$s\"."
-msgstr ""
+msgstr "Zabbix サーバー \"%2$s\" への接続時に、%1$s の応答タイムアウトが発生しました。"
 
 #: app/controllers/CControllerMediatypeTestSend.php:182
 msgid "Response type: JSON"
