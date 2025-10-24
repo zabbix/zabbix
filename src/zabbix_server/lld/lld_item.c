@@ -17,7 +17,6 @@
 #include "lld_audit.h"
 
 #include "zbx_item_constants.h"
-#include "zbxexpression.h"
 #include "zbxregexp.h"
 #include "zbxprometheus.h"
 #include "zbxxml.h"

@@ -12,8 +12,6 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-#include "zbxexpression.h"
-
 #include "zbxdbwrap.h"
 #include "zbxdbhigh.h"
 #include "zbx_expression_constants.h"
