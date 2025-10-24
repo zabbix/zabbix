@@ -1085,7 +1085,7 @@ static int	clickhouse_conn_post(zbx_clickhouse_conn_t *conn, zbx_clickhouse_data
 		*error = zbx_dsprintf(NULL, "cannot set URL option: %s", curl_easy_strerror(err));
 		goto out;
 	}
-	
+
 	if (CURLE_OK != (err = curl_easy_setopt(conn->handle, CURLOPT_POSTFIELDSIZE, strlen(data))))
 	{
 		*error = zbx_dsprintf(NULL, "cannot set CURLOPT_POSTFIELDSIZE option: %s", curl_easy_strerror(err));
