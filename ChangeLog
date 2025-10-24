@@ -1,6 +1,8 @@
 Changes for 8.0.0alpha1
 
 New features:
+..F.I..... [ZBXNEXT-9424] implemented Scatter plot widget (dfofanovs)
+...G...... [ZBXNEXT-10012] added both SHOW SLAVE STATUS and SHOW REPLICA STATUS for Zabbix agent 2 MySQL plugin (lsurvilo)
 ..F....... [ZBXNEXT-8790] implemented inline validation in maintenance form (talbergs)
 A.......S. [ZBXNEXT-10271] updated maximum supported TimescaleDB version to 2.22 (mprihodko)
 .........T [ZBXNEXT-10245] added Stormshield SNS by SNMP template (knaglis)
@@ -56,6 +58,7 @@ A......PS. [ZBXNEXT-10056] updated max supported MariaDB version to 11.8 (Sasha)
 .......PS. [ZBXNEXT-10079] updated minimal supported MySQL/Percona version to 8.4 (mprihodko)
 
 Bug fixes:
+..F....... [ZBX-26665] fixed widget configuration form layout on narrow screens (averza)
 .......PS. [ZBX-27113] improved performance and memory usage by not storing item unsupported error in configuration cache (vso)
 ........S. [ZBX-27111] fixed new timer being allocated each time trigger value is updated (vso)
 .........T [ZBX-26544] added a preprocessing step to the "Outbound packets discarded" item in "FortiGate by SNMP" template (aiantsen)
