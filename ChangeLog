@@ -48,6 +48,10 @@ Bug fixes:
 ...G...... [ZBX-26344] refactored zbxcmd execute to avoid Windows syscalls in Zabbix agent 2 (esneiders)
 .......PS. [ZBX-26433] fixed values outside of history storage period causing trigger to cache all values in storage period (vso)
 ...G...... [ZBX-26244] fixed Zabbix agent 2 memory leak related to traffic compression (MVekslers)
+A......... [ZBX-27060] fixed scope of information available via user.get (jfreibergs)
+.......... [ZBX-27061] moved OpenSSL directory to system-protected path on build server (yurii)
+A.F....... [ZBX-27062] updated LDAP bind password to reset on LDAP host change (aluchko)
+..F....... [ZBX-27063] fixed permission check for Problems view refresh (gberzina)
 
 --------------------------------------------------------------------------------
 Changes for 6.0.40
