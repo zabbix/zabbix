@@ -277,8 +277,8 @@ class CConfigurationImport {
 					$recovery_expression = $trigger['recovery_expression'];
 
 					$triggers_refs[$description][$expression][$recovery_expression] = array_key_exists('uuid', $trigger)
-						? ['uuid' => $trigger['uuid'], 'host' => [$host => true]]
-						: ['host' => [$host => true]];
+						? ['uuid' => $trigger['uuid']]
+						: [];
 
 					if (array_key_exists('dependencies', $trigger)) {
 						foreach ($trigger['dependencies'] as $dependency) {
@@ -442,8 +442,8 @@ class CConfigurationImport {
 		foreach ($this->getFormattedTriggers() as $trigger) {
 			$triggers_refs[$trigger['description']][$trigger['expression']][$trigger['recovery_expression']] =
 				array_key_exists('uuid', $trigger)
-					? ['uuid' => $trigger['uuid'], 'host' => $trigger['host']]
-					: ['host' => $trigger['host']];
+					? ['uuid' => $trigger['uuid']]
+					: [];
 
 			if (array_key_exists('dependencies', $trigger)) {
 				foreach ($trigger['dependencies'] as $dependency) {
@@ -1862,17 +1862,19 @@ class CConfigurationImport {
 
 		$triggers_to_process_dependencies = [];
 
-		foreach ($this->getFormattedTriggers() as $trigger) {
-			$hostids = $this->extractHostids($trigger);
+		$triggers = $this->getFormattedTriggers();
 
-			if (!$hostids) {
-				continue;
-			}
+		$trigger_hostids = $this->getHostidsByTriggerIndex($triggers);
 
+		if (!$trigger_hostids) {
+			return;
+		}
+
+		foreach ($triggers as $i => $trigger) {
 			$triggerid = null;
 			$is_template_trigger = false;
 
-			foreach ($hostids as $hostid) {
+			foreach ($trigger_hostids[$i] as $hostid) {
 				if ($this->importedObjectContainer->isTemplateProcessed($hostid)) {
 					$is_template_trigger = true;
 				}
@@ -1896,8 +1898,6 @@ class CConfigurationImport {
 					$trigger['recovery_expression']
 				);
 			}
-
-			unset($trigger['host']);
 
 			if ($triggerid !== null) {
 				if ($this->options['triggers']['updateExisting']) {
@@ -1932,22 +1932,36 @@ class CConfigurationImport {
 		$this->processTriggerDependencies($triggers_to_process_dependencies);
 	}
 
-	private function extractHostids(array $trigger): array {
-		$hosts = CConfigurationImport::extractHosts($trigger);
+	private function getHostidsByTriggerIndex(array $triggers): array {
+		$host_trigger_indexes = [];
 
-		$hostids = [];
+		foreach ($triggers as $i => $trigger) {
+			$hosts = array_flip(CConfigurationImport::extractHosts($trigger));
 
-		foreach (array_unique($hosts) as $host) {
+			if (!$hosts) {
+				return [];
+			}
+
+			foreach (array_keys($hosts) as $host) {
+				$host_trigger_indexes[$host][] = $i;
+			}
+		}
+
+		$trigger_hostids = [];
+
+		foreach ($host_trigger_indexes as $host => $trigger_indexes) {
 			$hostid = $this->referencer->findTemplateidOrHostidByHost($host);
 
 			if ($hostid === null) {
 				return [];
 			}
 
-			$hostids[] = $hostid;
+			foreach ($trigger_indexes as $i) {
+				$trigger_hostids[$i][] = $hostid;
+			}
 		}
 
-		return $hostids;
+		return $trigger_hostids;
 	}
 
 	public static function extractHosts(array $trigger): array {

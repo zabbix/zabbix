@@ -284,7 +284,6 @@ class CImportDataAdapter {
 						foreach ($host['items'] as $item) {
 							if (array_key_exists('triggers', $item)) {
 								foreach ($item['triggers'] as $trigger) {
-									$trigger['host'] = [$host['name'] => true];
 									$triggers[] = $this->renameTriggerFields($trigger);
 								}
 							}
@@ -300,7 +299,6 @@ class CImportDataAdapter {
 					unset($trigger['uuid']);
 				}
 
-				$trigger['host'] = array_flip(CConfigurationImport::extractHosts($trigger));
 				$triggers[] = $this->renameTriggerFields($trigger);
 			}
 		}
