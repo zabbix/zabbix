@@ -177,15 +177,13 @@ class CScatterPlotHelper {
 						$options['hostids'] = $data_set['override_hostid'];
 					}
 					else {
-						$tags = $data_set['host_tags'];
-
 						$hosts = API::Host()->get([
 							'output' => [],
 							'search' => [
 								'name' => self::processPattern($data_set['hosts'])
 							],
-							'evaltype' => $tags ? $data_set['host_tags_evaltype'] : null,
-							'tags' => $tags ?: null,
+							'evaltype' => $data_set['host_tags_evaltype'],
+							'tags' => $data_set['host_tags'] ?: null,
 							'groupids' => $data_set['hostgroupids'] ?: null,
 							'searchWildcardsEnabled' => true,
 							'searchByAny' => true,
