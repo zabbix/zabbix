@@ -226,7 +226,7 @@ $form->addItem([
 (new CScriptTag(
 	'view.init('.json_encode([
 		'context' => $data['context'],
-		'parent_discoveryid' => $data['parent_discoveryid'],
+		'parent_discoveryid' => $data['parent_discoveryid']
 	]).');'
 ))
 	->setOnDocumentReady()

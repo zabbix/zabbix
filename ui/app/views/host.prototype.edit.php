@@ -684,7 +684,7 @@ else {
 			'keepOpen' => true,
 			'isSubmit' => true,
 			'action' => 'host_prototype_edit_popup.submit();',
-			'enabled' => !$data['is_discovered_prototype'],
+			'enabled' => !$data['is_discovered_prototype']
 		],
 		[
 			'title' => _('Clone'),
@@ -692,7 +692,7 @@ else {
 			'keepOpen' => true,
 			'isSubmit' => false,
 			'action' => 'host_prototype_edit_popup.clone();',
-			'enabled' => !$data['is_discovered_prototype'],
+			'enabled' => !$data['is_discovered_prototype']
 		],
 		[
 			'title' => _('Delete'),

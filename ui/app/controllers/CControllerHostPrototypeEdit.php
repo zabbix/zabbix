@@ -44,7 +44,7 @@ class CControllerHostPrototypeEdit extends CController {
 			'interfaces' =>				'array',
 			'inventory_mode' =>			'db host_inventory.inventory_mode| in '.implode(',', [HOST_INVENTORY_DISABLED, HOST_INVENTORY_MANUAL, HOST_INVENTORY_AUTOMATIC]),
 			'show_inherited_macros' =>	'in 0,1',
-			'clone' =>					'in 1',
+			'clone' =>					'in 1'
 		];
 
 		$ret = $this->validateInput($fields);
