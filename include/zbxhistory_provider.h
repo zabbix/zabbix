@@ -31,6 +31,7 @@
 
 #define ZBX_HISTORY_TRAIT_REQUIRES_TRENDS	0x10000000
 #define ZBX_HISTORY_TRAIT_REQUIRES_HOUSEKEEPING	0x20000000
+#define ZBX_HISTORY_TRAIT_REQUIRES_PRECACHING	0x40000000
 
 /* reserved bits */
 #define ZBX_HISTORY_TRAIT_MAX_BITS		48
@@ -107,6 +108,35 @@ typedef struct
 	int			ttl;
 }
 zbx_history_entry_t;
+
+typedef enum
+{
+	ZBX_VALUE_UNKNOWN,
+	ZBX_VALUE_NONE,
+	ZBX_VALUE_SECONDS,
+	ZBX_VALUE_NVALUES,
+	ZBX_VALUE_NODATA,
+}
+zbx_value_type_t;
+
+typedef struct
+{
+	int			value;
+	zbx_value_type_t	type;
+	int			timeshift;
+}
+zbx_history_range_t;
+
+typedef struct
+{
+	zbx_uint64_t			itemid;
+	int				index;
+	const zbx_history_range_t	*range;
+	zbx_vector_history_record_t	rows;
+}
+zbx_item_history_t;
+
+ZBX_VECTOR_DECL(item_history, zbx_item_history_t)
 
 typedef struct
 {
@@ -363,7 +393,31 @@ typedef zbx_uint64_t(*zbx_history_provider_flush_t)(void *data);
  *                                                                            *
  ******************************************************************************/
 typedef int (*zbx_history_provider_fetch_t)(void *data, zbx_uint64_t itemid, unsigned char value_type, time_t start,
-		time_t end, int count, zbx_history_record_t **values, char **error);
+		time_t end, int count, zbx_history_record_t **rows, char **error);
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: fetch batch of history data from the storage provider             *
+ *                                                                            *
+ * Parameters:                                                                *
+ *     data       - [IN] history provider internal data                       *
+ *     results    - [IN/OUT] vector of result batch containing itemids on     *
+ *                      input and filled history records on output            *
+ *     value_type - [IN] type of values to fetch                              *
+ *     start      - [IN] start timestamp of the requested period              *
+ *                       (greater than)                                       *
+ *     error      - [OUT] error message in case of failure                    *
+ *                                                                            *
+ * Return value: SUCCEED - data fetched successfully                          *
+ *               FAIL    - an error occurred during data retrieval            *
+ *                                                                            *
+ * Comments: This function retrieves history data for a specific item within  *
+ *           the given time range. It should allocate memory for the values   *
+ *           array and set the error message if the operation fails.          *
+ *                                                                            *
+ ******************************************************************************/
+typedef int (*zbx_history_provider_fetch_batch_t)(void *data, zbx_vector_item_history_t *results,
+		unsigned char value_type, time_t start, char **error);
 
 /******************************************************************************
  *                                                                            *

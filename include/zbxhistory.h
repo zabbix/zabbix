@@ -62,8 +62,10 @@ void	zbx_dc_history_shallow_free(zbx_dc_history_t *dc_history);
 int	zbx_history_add_values(const zbx_vector_dc_history_ptr_t *history, zbx_uint64_t *flush_err);
 int	zbx_history_get_values(zbx_uint64_t itemid, int value_type, int start, int count, int end,
 		zbx_vector_history_record_t *values);
+void	zbx_history_get_batch(zbx_vector_item_history_t *results, int value_type, int start);
 
 int	zbx_history_requires_trends(int value_type);
+zbx_uint64_t	zbx_history_get_precache_flags(void);
 int	zbx_history_check_version(int config_allow_unsupported_db_versions, unsigned char program_type);
 
 #define ZBX_HISTORY_FLUSH_SUCCEED		0
@@ -80,5 +82,7 @@ int	zbx_history_check_version(int config_allow_unsupported_db_versions, unsigned
 
 void	zbx_history_record_copy(zbx_history_record_t *dst, const zbx_history_record_t *src, int value_type);
 int	zbx_history_get_flush_error(zbx_uint64_t error_mask, unsigned char value_type);
+
+int	zbx_item_history_compare_by_itemid(const void *d1, const void *d2);
 
 #endif

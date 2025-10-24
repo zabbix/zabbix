@@ -27,6 +27,7 @@ typedef struct
 	zbx_history_provider_write_t		write;
 	zbx_history_provider_flush_t		flush;
 	zbx_history_provider_fetch_t		fetch;
+	zbx_history_provider_fetch_batch_t	fetch_batch;
 	zbx_history_provider_close_t		close;
 	zbx_history_provider_get_info_t		get_info;
 }

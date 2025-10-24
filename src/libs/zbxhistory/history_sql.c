@@ -666,6 +666,18 @@ static int	history_sql_fetch(void *data, zbx_uint64_t itemid, unsigned char valu
 	return result.values_num;
 }
 
+static int	history_sql_fetch_batch(void *data, zbx_vector_item_history_t *results, unsigned char value_type,
+		time_t start, char **error)
+{
+	ZBX_UNUSED(data);
+	ZBX_UNUSED(results);
+	ZBX_UNUSED(value_type);
+	ZBX_UNUSED(start);
+
+	*error = zbx_strdup(NULL, "batch fetching not supported for SQL history storage provider");
+	return FAIL;
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: retrieve information about the SQL history storage provider       *
@@ -733,6 +745,7 @@ zbx_history_provider_t	*history_sql_open(const zbx_history_option_t *options, in
 	provider->impl.write = history_sql_write;
 	provider->impl.flush = history_sql_flush;
 	provider->impl.fetch = history_sql_fetch;
+	provider->impl.fetch_batch = history_sql_fetch_batch;
 	provider->impl.close = history_sql_close;
 	provider->impl.get_info = history_sql_get_info;
 

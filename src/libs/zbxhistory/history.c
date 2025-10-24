@@ -30,8 +30,8 @@
 #include "zbxjson.h"
 
 ZBX_VECTOR_IMPL(history_record, zbx_history_record_t)
-
 ZBX_PTR_VECTOR_IMPL(dc_history_ptr, zbx_dc_history_t *)
+ZBX_VECTOR_IMPL(item_history, zbx_item_history_t)
 
 void	zbx_dc_history_shallow_free(zbx_dc_history_t *dc_history)
 {
@@ -80,6 +80,8 @@ struct zbx_history_manager
 	/* One provider per index is opened during initialization, more can be opened   */
 	/* as necessary later.                                                          */
 	zbx_vector_history_provider_ptr_t	*providers;
+
+	zbx_uint64_t				precache_flags;
 };
 
 static zbx_history_manager_t        history_manager;
@@ -448,12 +450,18 @@ static int	history_manager_init(zbx_history_manager_t *manager, const char *conf
 			goto out;
 		}
 
-		if (0 == ((UINT64_C(1) << value_type) & manager->providers[index].values[0]->traits))
+		zbx_uint64_t	traits = manager->providers[index].values[0]->traits;
+		zbx_uint64_t	type_mask = UINT64_C(1) << value_type;
+
+		if (0 == (traits & type_mask))
 		{
 			*error = zbx_dsprintf(NULL, "history provider \"%s\" does not support value type %s",
 					manager->registry.values[index]->name, history_value_type_desc(value_type));
 			goto out;
 		}
+
+		if (0 != (traits & ZBX_HISTORY_TRAIT_REQUIRES_PRECACHING))
+			manager->precache_flags |= type_mask;
 	}
 
 	ret = SUCCEED;
@@ -855,6 +863,29 @@ static int	history_session_fetch(zbx_history_session_t *session, zbx_uint64_t it
 	return ret;
 }
 
+static void	history_session_fetch_batch(zbx_history_session_t *session, zbx_vector_item_history_t *results,
+		unsigned char value_type, time_t start)
+{
+	zbx_history_provider_t	*provider;
+	char			*error = NULL;
+
+	if (NULL == session->manager)
+	{
+		THIS_SHOULD_NEVER_HAPPEN_MSG("fetching data from uninitialized history session");
+		return;
+	}
+
+	if (NULL == (provider = history_session_get_provider(session, value_type)))
+		return;
+
+	if (FAIL == provider->impl.fetch_batch(provider->data, results, value_type, start,  &error))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "Failed to fetch batch data from %s: %s",
+				provider->name, error);
+		zbx_free(error);
+	}
+}
+
 /*******************************************************************************
  *                                                                             *
  * Purpose: add history values to the history storage                          *
@@ -975,6 +1006,43 @@ int	zbx_history_get_values(zbx_uint64_t itemid, int value_type, int start, int c
 	return ret;
 }
 
+void	zbx_history_get_batch(zbx_vector_item_history_t *results, int value_type, int start)
+{
+	zbx_history_session_t	session;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() items:%d value_type:%d start:%d",
+			__func__, results->values_num, value_type, start);
+
+	history_manager_init_session(&history_manager, &session);
+
+	history_session_fetch_batch(&session, results, value_type, start);
+
+	if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_TRACE))
+	{
+		char	buffer[MAX_STRING_LEN];
+
+		for (int i = 0; i < results->values_num; i++)
+		{
+			zbx_item_history_t	*hist = &results->values[i];
+
+			zabbix_log(LOG_LEVEL_TRACE, "  itemid:" ZBX_FS_UI64, hist->itemid);
+
+			for (int j = 0; j < hist->rows.values_num; j++)
+			{
+				zbx_history_record_t	*h = &hist->rows.values[j];
+
+				zbx_history_value2str(buffer, sizeof(buffer), &h->value, value_type);
+				zabbix_log(LOG_LEVEL_TRACE, "    %d.%09d %s", h->timestamp.sec, h->timestamp.ns,
+						buffer);
+			}
+		}
+	}
+
+	history_session_clear(&session);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__ );
+}
+
 /************************************************************************************
  *                                                                                  *
  * Purpose: checks if the value type requires trends data calculations              *
@@ -1014,6 +1082,21 @@ int	zbx_history_requires_housekeeping(int value_type)
 	traits = history_manager_get_provider_traits(&history_manager, value_type);
 
 	return 0 != (traits & ZBX_HISTORY_TRAIT_REQUIRES_HOUSEKEEPING) ? SUCCEED : FAIL;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: check if value type requires external housekeeping                *
+ *                                                                            *
+ * Parameters: value_type - [IN] the value type                               *
+ *                                                                            *
+ * Return value: SUCCEED - housekeeping required                              *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+zbx_uint64_t	zbx_history_get_precache_flags(void)
+{
+	return history_manager.precache_flags;
 }
 
 /******************************************************************************
@@ -1412,4 +1495,18 @@ const char	*history_value_type_desc(unsigned char value_type)
 		return "Unknown";
 
 	return value_types_str[value_type];
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: compare two item history structures by item identifier            *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_item_history_compare_by_itemid(const void *d1, const void *d2)
+{
+	const zbx_item_history_t	*h1 = (const zbx_item_history_t *)d1;
+	const zbx_item_history_t	*h2 = (const zbx_item_history_t *)d2;
+
+	ZBX_RETURN_IF_NOT_EQUAL(h1->itemid, h2->itemid);
+	return 0;
 }

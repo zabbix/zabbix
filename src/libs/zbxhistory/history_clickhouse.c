@@ -30,6 +30,7 @@
 #include "zbxjson.h"
 #include "zbxtypes.h"
 #include "zbxhttp.h"
+#include "zbxdb.h"
 
 typedef void (*write_value_t)(zbx_json_t *row, const zbx_history_value_t *value);
 
@@ -57,6 +58,7 @@ zbx_clickhouse_retries_t;
 typedef struct
 {
 	char					*db;
+	char					*fetch_url;
 
 	struct curl_slist			*curl_headers;
 
@@ -106,6 +108,7 @@ static void	history_clickhouse_data_free(zbx_clickhouse_data_t *data)
 	curl_multi_cleanup(data->mhandle);
 
 	zbx_free(data->db);
+	zbx_free(data->fetch_url);
 
 	zbx_free(data);
 }
@@ -238,6 +241,8 @@ static void	*history_clickhouse_create_data(const zbx_history_option_t *options,
 	zbx_vector_clickhouse_conn_ptr_create(&data->active_conns);
 
 	data->base_url = url;
+	data->fetch_url = zbx_dsprintf(NULL, "%s?database=%s&date_time_output_format=unix_timestamp", url, db);
+
 	zbx_url_encode(db, &data->db);
 
 	return (void *)data;
@@ -737,11 +742,11 @@ out:
  *     p   - [IN] pointer to current position in JSON data                    *
  *     log - [OUT] log value structure to fill                                *
  *                                                                            *
- * Return value: SUCCEED - log value parsed successfully                      *
- *               FAIL    - otherwise                                          *
+ * Return value: pointer to next position in JSON data or NULL on failure     *
  *                                                                            *
  ******************************************************************************/
-static int	history_clickhouse_parse_log_value(const struct zbx_json_parse *jp, const char *p, zbx_log_value_t *log)
+static const char	*history_clickhouse_parse_log_value(const struct zbx_json_parse *jp, const char *p,
+		zbx_log_value_t *log)
 {
 	char	buf[MAX_ID_LEN] = {0};
 	size_t	source_alloc = 0;
@@ -749,31 +754,31 @@ static int	history_clickhouse_parse_log_value(const struct zbx_json_parse *jp, c
 	if (NULL == (p = zbx_json_next_value_dyn(jp, p, &log->source, &source_alloc, NULL)))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot parse log source from row \"%s\"", jp->start);
-		return FAIL;
+		return NULL;
 	}
 
 	if (NULL == (p = zbx_json_next_value(jp, p, buf, sizeof(buf), NULL)))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot parse log severity from row \"%s\"", jp->start);
-		return FAIL;
+		return NULL;
 	}
 	log->severity = atoi(buf);
 
 	if (NULL == (p = zbx_json_next_value(jp, p, buf, sizeof(buf), NULL)))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot parse log eventid from row \"%s\"", jp->start);
-		return FAIL;
+		return NULL;
 	}
 	log->logeventid = atoi(buf);
 
 	if (NULL == (p = zbx_json_next_value(jp, p, buf, sizeof(buf), NULL)))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot parse log timestamp from row \"%s\"", jp->start);
-		return FAIL;
+		return NULL;
 	}
 	log->timestamp = atoi(buf);
 
-	return SUCCEED;
+	return p;
 }
 
 /******************************************************************************
@@ -787,19 +792,18 @@ static int	history_clickhouse_parse_log_value(const struct zbx_json_parse *jp, c
  *                       ITEM_VALUE_TYPE_UINT64)                              *
  *     record     - [OUT] history record structure to fill                    *
  *                                                                            *
- * Return value: SUCCEED - value parsed successfully                          *
- *               FAIL    - otherwise                                          *
+ * Return value: pointer to next position in JSON data or NULL on failure     *
  *                                                                            *
  ******************************************************************************/
-static int	history_clickhouse_parse_numeric_value(const struct zbx_json_parse *jp, const char *p,
+static const char 	*history_clickhouse_parse_numeric_value(const struct zbx_json_parse *jp, const char *p,
 		unsigned char value_type, zbx_history_record_t *record)
 {
 	char	buf[MAX_ID_LEN + 1];
 
-	if (NULL == zbx_json_next_value(jp, p, buf, sizeof(buf), NULL))
+	if (NULL == (p = zbx_json_next_value(jp, p, buf, sizeof(buf), NULL)))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot parse value from row \"%s\"", jp->start);
-		return FAIL;
+		return NULL;
 	}
 
 	switch (value_type)
@@ -808,22 +812,22 @@ static int	history_clickhouse_parse_numeric_value(const struct zbx_json_parse *j
 			if (FAIL == zbx_is_double(buf, &record->value.dbl))
 			{
 				zabbix_log(LOG_LEVEL_WARNING, "cannot parse floating value \"%s\"", buf);
-				return FAIL;
+				return NULL;
 			}
 			break;
 		case ITEM_VALUE_TYPE_UINT64:
 			if (FAIL == zbx_is_uint64(buf, &record->value.ui64))
 			{
 				zabbix_log(LOG_LEVEL_WARNING, "cannot parse unsigned 64-bit value \"%s\"", buf);
-				return FAIL;
+				return NULL;
 			}
 			break;
 		default:
 			THIS_SHOULD_NEVER_HAPPEN;
-			return FAIL;
+			return NULL;
 	}
 
-	return SUCCEED;
+	return p;
 }
 
 /******************************************************************************
@@ -836,11 +840,10 @@ static int	history_clickhouse_parse_numeric_value(const struct zbx_json_parse *j
  *     value_type - [IN] value type                                           *
  *     record     - [OUT] history record structure to fill                    *
  *                                                                            *
- * Return value: SUCCEED - value parsed successfully                          *
- *               FAIL    - otherwise                                          *
+ * Return value: pointer to next position in JSON data or NULL on failure     *
  *                                                                            *
  ******************************************************************************/
-static int	history_clickhouse_parse_value(const struct zbx_json_parse *jp, const char *p,
+static const char	*history_clickhouse_parse_value(const struct zbx_json_parse *jp, const char *p,
 		unsigned char value_type, zbx_history_record_t *record)
 {
 	char	*buf = NULL;
@@ -849,7 +852,7 @@ static int	history_clickhouse_parse_value(const struct zbx_json_parse *jp, const
 	if (NULL == (p = zbx_json_next_value_dyn(jp, p, &buf, &buf_alloc, NULL)))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot parse value from row \"%s\"", jp->start);
-		return FAIL;
+		return NULL;
 	}
 
 	switch (value_type)
@@ -863,20 +866,52 @@ static int	history_clickhouse_parse_value(const struct zbx_json_parse *jp, const
 			record->value.log->value = buf;
 			record->value.log->source = NULL;
 
-			if (FAIL == history_clickhouse_parse_log_value(jp, p, record->value.log))
+			if (NULL == (p = history_clickhouse_parse_log_value(jp, p, record->value.log)))
 			{
 				zbx_history_record_clear(record, ITEM_VALUE_TYPE_LOG);
-				return FAIL;
+				return NULL;
 			}
 			break;
 		default:
 			zbx_free(buf);
 			THIS_SHOULD_NEVER_HAPPEN;
-			return FAIL;
+			return NULL;
 	}
 
-	return SUCCEED;
+	return p;
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: parse item identifier from JSON row                               *
+ *                                                                            *
+ * Parameters: jp     - [IN] row with data as JSON array of values            *
+ *             p      - [IN] pointer to current position in JSON data         *
+ *             itemid - [OUT] parsed item identifier                          *
+ *                                                                            *
+ * Return value: pointer to next position in JSON data or NULL on failure     *
+ *                                                                            *
+ ******************************************************************************/
+static const char	*history_clickhouse_parse_itemid(const struct zbx_json_parse *jp, const char *p,
+		zbx_uint64_t *itemid)
+{
+	char		buf[MAX_ID_LEN + 1];
+
+	if (NULL == (p = zbx_json_next_value(jp, NULL, buf, sizeof(buf), NULL)))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "cannot parse itemid from row \"%s\"", jp->start);
+		return NULL;
+	}
+
+	if (SUCCEED != zbx_is_uint64(buf, itemid))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "invalid itemid starting with \"%s\"", jp->start);
+		return NULL;
+	}
+
+	return p;
+}
+
 
 /******************************************************************************
  *                                                                            *
@@ -884,57 +919,54 @@ static int	history_clickhouse_parse_value(const struct zbx_json_parse *jp, const
  *                                                                            *
  * Parameters:                                                                *
  *     jp         - [IN] row with log data as JSON array of values            *
+ *     p          - [IN] pointer to current position in JSON data             *
  *     value_type - [IN] value type (ITEM_VALUE_TYPE_*)                       *
  *     records    - [OUT] vector to store parsed history records              *
  *                                                                            *
+ * Return value: pointer to next position in JSON data or NULL on failure     *
+ *                                                                            *
  ******************************************************************************/
-static void	history_clickhouse_parse_row(const struct zbx_json_parse *jp, unsigned char value_type,
-		zbx_vector_history_record_t *records)
+static const char	*history_clickhouse_parse_row(const struct zbx_json_parse *jp, const char *p,
+		unsigned char value_type, zbx_history_record_t *record)
 {
-	char			timestamp[MAX_ID_LEN * 2], *ptr;
-	const char		*p;
-	zbx_history_record_t	record;
+	char	timestamp[MAX_ID_LEN * 2], *ptr;
 
-	if (NULL == (p = zbx_json_next_value(jp, NULL, timestamp, sizeof(timestamp), NULL)))
+	if (NULL == (p = zbx_json_next_value(jp, p, timestamp, sizeof(timestamp), NULL)))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot parse timestamp from row \"%s\"", jp->start);
-		return;
+		return NULL;
 	}
 
 	if (NULL == (ptr = strchr(timestamp, '.')))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "invalid timestamp format \"%s\"", timestamp);
-		return;
+		return NULL;
 	}
 
 	*ptr++ = '\0';
 
-	if (FAIL == zbx_is_uint32(timestamp, &record.timestamp.sec))
+	if (FAIL == zbx_is_uint32(timestamp, &record->timestamp.sec))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "invalid timestamp seconds value \"%s\"", timestamp);
-		return;
+		return NULL;
 	}
 
-	if (FAIL == zbx_is_uint32(ptr, &record.timestamp.ns))
+	if (FAIL == zbx_is_uint32(ptr, &record->timestamp.ns))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "invalid timestamp nanoseconds value \"%s\"", ptr);
-		return;
+		return NULL;
 	}
 
 	switch (value_type)
 	{
 		case ITEM_VALUE_TYPE_FLOAT:
 		case ITEM_VALUE_TYPE_UINT64:
-			if (FAIL == history_clickhouse_parse_numeric_value(jp, p, value_type, &record))
-				return;
-			break;
+			return history_clickhouse_parse_numeric_value(jp, p, value_type, record);
 		default:
-			if (FAIL == history_clickhouse_parse_value(jp, p, value_type, &record))
-				return;
-			break;
+			return history_clickhouse_parse_value(jp, p, value_type, record);
 	}
 
-	zbx_vector_history_record_append(records, record);
+	return NULL;
 }
 
 /******************************************************************************
@@ -970,7 +1002,13 @@ static int	history_clickhouse_parse_response(char *response, unsigned char value
 		if ('\0' != *start)
 		{
 			if (FAIL != zbx_json_open(start, &jp))
-				history_clickhouse_parse_row(&jp, value_type, &records);
+			{
+				const char		*p = NULL;
+				zbx_history_record_t	record = {0};
+
+				if (NULL != history_clickhouse_parse_row(&jp, p, value_type, &record))
+					zbx_vector_history_record_append(&records, record);
+			}
 			else
 				zabbix_log(LOG_LEVEL_WARNING, "cannot parse row: %s", start);
 		}
@@ -1104,8 +1142,8 @@ static int	history_clickhouse_fetch(void *data, zbx_uint64_t itemid, unsigned ch
 	zbx_clickhouse_data_t	*d = (zbx_clickhouse_data_t *)data;
 	zbx_clickhouse_conn_t	*conn;
 	int			ret = FAIL;
-	char			*query = NULL, *url = NULL, *errmsg = NULL;
-	size_t			query_alloc = 0, query_offset = 0, url_alloc = 0, url_offset = 0;
+	char			*query = NULL, *errmsg = NULL;
+	size_t			query_alloc = 0, query_offset = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() start:" ZBX_FS_TIME_T " end:" ZBX_FS_TIME_T " count:%d", __func__,
 			start, end, count);
@@ -1122,9 +1160,6 @@ static int	history_clickhouse_fetch(void *data, zbx_uint64_t itemid, unsigned ch
 	}
 
 	conn = history_clickhouse_get_conn(d, value_type);
-
-	zbx_snprintf_alloc(&url, &url_alloc, &url_offset, "%s?database=%s&date_time_output_format=unix_timestamp",
-			d->base_url, d->db);
 
 	zbx_strcpy_alloc(&query, &query_alloc, &query_offset, "select timestamp,value");
 	if (ITEM_VALUE_TYPE_LOG == value_type)
@@ -1154,7 +1189,7 @@ static int	history_clickhouse_fetch(void *data, zbx_uint64_t itemid, unsigned ch
 
 	zabbix_log(LOG_LEVEL_DEBUG, "query: %s", query);
 
-	if (SUCCEED != clickhouse_conn_post(conn, d, d->mhandle, url, query, CLICKHOUSE_RETRIES_ON, &errmsg))
+	if (SUCCEED != clickhouse_conn_post(conn, d, d->mhandle, d->fetch_url, query, CLICKHOUSE_RETRIES_ON, &errmsg))
 	{
 		*error = zbx_dsprintf(NULL, "cannot fetch history from ClickHouse: %s", errmsg);
 		zbx_free(errmsg);
@@ -1164,10 +1199,153 @@ static int	history_clickhouse_fetch(void *data, zbx_uint64_t itemid, unsigned ch
 	ret = history_clickhouse_parse_response(conn->resp.page.data, value_type, values);
 out:
 	zbx_free(query);
-	zbx_free(url);
 	history_clickhouse_release_conn(d, conn);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() values_num:%d", __func__, ret);
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: parse ClickHouse batch response and populate item history results *
+ *                                                                            *
+ * Parameters:                                                                *
+ *     response   - [IN] ClickHouse response as string                        *
+ *     value_type - [IN] value type (ITEM_VALUE_TYPE_*)                       *
+ *     results    - [IN/OUT] vector of item history structures to fill        *
+ *                                                                            *
+ * Return value: number of items with history data received                   *
+ *                                                                            *
+ ******************************************************************************/
+static int	history_clickhouse_parse_batch_response(char *response, unsigned char value_type,
+		zbx_vector_item_history_t *results)
+{
+	char			*start, *end;
+	zbx_item_history_t	*hist = NULL;
+	int			batches_num = 0;
+
+	if (NULL == response)
+		return 0;
+
+	for (start = response;; start = end + 1)
+	{
+		struct zbx_json_parse	jp;
+
+		if (NULL != (end = strchr(start, '\n')))
+			*end = '\0';
+
+		if ('\0' != *start)
+		{
+			if (FAIL != zbx_json_open(start, &jp))
+			{
+				const char		*p = NULL;
+				zbx_uint64_t		itemid;
+				zbx_history_record_t	record;
+
+				if (NULL != (p = history_clickhouse_parse_itemid(&jp, p, &itemid)) &&
+						NULL != history_clickhouse_parse_row(&jp, p, value_type, &record))
+				{
+
+					if (NULL == hist || hist->itemid != itemid)
+					{
+						int			index;
+						zbx_item_history_t	hist_local;
+
+						hist_local.itemid = itemid;
+
+						index = zbx_vector_item_history_bsearch(results, hist_local,
+								zbx_item_history_compare_by_itemid);
+
+						if (FAIL != index)
+						{
+							batches_num++;
+							hist = &results->values[index];
+						}
+						else
+						{
+							THIS_SHOULD_NEVER_HAPPEN;
+							zbx_history_record_clear(&record, value_type);
+							continue;
+						}
+					}
+
+					zbx_vector_history_record_append(&hist->rows, record);
+				}
+			}
+			else
+				zabbix_log(LOG_LEVEL_WARNING, "cannot parse row: %s", start);
+		}
+
+		if (NULL == end)
+			break;
+
+		*end = '\n';
+	}
+
+	return batches_num;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: fetch history data for multiple items from ClickHouse             *
+ *                                                                            *
+ * Parameters:                                                                *
+ *     data       - [IN] internal ClickHouse data                             *
+ *     results    - [IN/OUT] vector of item history structures to fill        *
+ *     value_type - [IN] value type (ITEM_VALUE_TYPE_*)                       *
+ *     start      - [IN] period start time                                    *
+ *     error      - [OUT] error message                                       *
+ *                                                                            *
+ * Return value: number of fetched batches or FAIL                            *
+ *                                                                            *
+ ******************************************************************************/
+static int	history_clickhouse_fetch_batch(void *data, zbx_vector_item_history_t *results,
+		unsigned char value_type, time_t start, char **error)
+{
+	zbx_clickhouse_data_t	*d = (zbx_clickhouse_data_t *)data;
+	char			*sql = NULL, *errmsg = NULL;
+	size_t			sql_alloc = 0, sql_offset = 0;
+	zbx_vector_uint64_t	itemids;
+	zbx_clickhouse_conn_t	*conn;
+	int			ret = FAIL;
+
+	zbx_vector_uint64_create(&itemids);
+	for (int i = 0; i < results->values_num; i++)
+		zbx_vector_uint64_append(&itemids, results->values[i].itemid);
+
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "select itemid,timestamp,value");
+	if (ITEM_VALUE_TYPE_LOG == value_type)
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ",source,severity,logeventid,log_time");
+
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " from %s where",
+			clickhouse_history_tables[value_type]);
+
+	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "itemid", itemids.values, itemids.values_num);
+	zbx_vector_uint64_destroy(&itemids);
+
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " and timestamp>='" ZBX_FS_TIME_T ".0'", start + 1);
+
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " order by itemid,timestamp desc"
+			" format JSONCompactEachRow");
+
+	zabbix_log(LOG_LEVEL_DEBUG, "batch query: %s", sql);
+
+	conn = history_clickhouse_get_conn(d, value_type);
+
+	if (SUCCEED != clickhouse_conn_post(conn, d, d->mhandle, d->fetch_url, sql, CLICKHOUSE_RETRIES_ON, &errmsg))
+	{
+		*error = zbx_dsprintf(NULL, "cannot fetch history batch from ClickHouse: %s", errmsg);
+		zbx_free(errmsg);
+		goto out;
+	}
+
+	ret = history_clickhouse_parse_batch_response(conn->resp.page.data, value_type, results);
+out:
+	zbx_free(sql);
+	history_clickhouse_release_conn(d, conn);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() batches_num:%d", __func__, ret);
 
 	return ret;
 }
@@ -1286,10 +1464,11 @@ zbx_history_provider_t	*history_clickhouse_open(const zbx_history_option_t *opti
 
 	provider->name = zbx_strdup(NULL, HISTORY_PROVIDER_CLICKHOUSE);
 
-	provider->traits = ZBX_HISTORY_TRAIT_TYPES_NOBIN;
+	provider->traits = ZBX_HISTORY_TRAIT_TYPES_NOBIN | ZBX_HISTORY_TRAIT_REQUIRES_PRECACHING;
 	provider->impl.write = history_clickhouse_write;
 	provider->impl.flush = history_clickhouse_flush;
 	provider->impl.fetch = history_clickhouse_fetch;
+	provider->impl.fetch_batch = history_clickhouse_fetch_batch;
 	provider->impl.close = history_clickhouse_close;
 	provider->impl.get_info = history_clickhouse_get_info;
 	provider->data = data;

@@ -120,4 +120,17 @@ void	zbx_vc_flush_stats(void);
 
 void	zbx_vc_add_new_items(const zbx_vector_uint64_pair_t *items);
 
+typedef struct
+{
+	zbx_uint64_t			itemid;
+	unsigned char			value_type;
+	int				ts_end;
+	const zbx_history_range_t	*range;
+}
+zbx_vc_query_t;
+
+ZBX_VECTOR_DECL(vc_query, zbx_vc_query_t)
+
+void	zbx_vc_precache_queries(zbx_vector_vc_query_t *queries);
+
 #endif

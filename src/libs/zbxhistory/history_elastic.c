@@ -976,6 +976,19 @@ static int	history_elastic_fetch(void *data, zbx_uint64_t itemid, unsigned char 
 	return ret;
 }
 
+static int	history_elastic_fetch_batch(void *data, zbx_vector_item_history_t *results,
+		unsigned char value_type, time_t start, char **error)
+{
+	ZBX_UNUSED(data);
+	ZBX_UNUSED(results);
+	ZBX_UNUSED(value_type);
+	ZBX_UNUSED(start);
+
+	*error = zbx_strdup(NULL, "batch fetching not supported for ElasticSearch history storage provider");
+	return FAIL;
+}
+
+
 /******************************************************************************
  *                                                                            *
  * Purpose: write history data to Elasticsearch storage                       *
@@ -1287,6 +1300,7 @@ zbx_history_provider_t *history_elastic_open(const zbx_history_option_t *options
 	provider->impl.write = history_elastic_write;
 	provider->impl.flush = history_elastic_flush;
 	provider->impl.fetch = history_elastic_fetch;
+	provider->impl.fetch_batch = history_elastic_fetch_batch;
 	provider->impl.close = history_elastic_close;
 	provider->impl.get_info = history_elastic_get_info;
 
