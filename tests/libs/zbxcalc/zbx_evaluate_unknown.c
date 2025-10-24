@@ -16,7 +16,6 @@
 #include "zbxmockdata.h"
 #include "zbxmockutil.h"
 
-#include "zbxexpression.h"
 #include "zbxalgo.h"
 #include "zbxnum.h"
 #include "zbxcalc.h"
