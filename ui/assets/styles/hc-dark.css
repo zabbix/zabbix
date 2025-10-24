@@ -5705,6 +5705,7 @@ div.dashboard-widget-problemsbysv .by-severity-widget > div {
 
 form.dashboard-widget-scatterplot {
   max-width: 1330px;
+  min-width: 1120px;
   width: min(100vw - 42px, calc(var(--modal-max-width) - 22px)); }
   form.dashboard-widget-scatterplot .scatter-plot-widget-config-tabs {
     grid-column: 1 / -1; }
@@ -5855,11 +5856,23 @@ form.dashboard-widget-scatterplot {
 div.dashboard-widget-scatterplot {
   overflow-x: hidden; }
 
-.svg-graph-legend .scatter-plot-legend-item {
-  min-width: 100%;
+.svg-scatter-plot-legend {
+  position: relative;
+  top: 4px;
+  box-sizing: border-box;
+  display: grid;
+  grid-template-columns: repeat(var(--columns, 4), auto);
+  grid-gap: 0 10px;
+  justify-content: start;
+  max-height: calc(var(--lines) * 18px);
+  margin: 0 10px;
   overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap; }
+  line-height: 18px; }
+  .svg-scatter-plot-legend .svg-scatter-plot-legend-item {
+    min-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap; }
 
 form.dashboard-widget-svggraph {
   max-width: 1330px;

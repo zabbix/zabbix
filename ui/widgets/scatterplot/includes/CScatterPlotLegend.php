@@ -23,9 +23,8 @@ class CScatterPlotLegend extends CDiv {
 	// Legend single line height is 18px. Value should be synchronized with $svg-legend-line-height in scss.
 	private const LINE_HEIGHT = 18;
 
-	private const ZBX_STYLE_CLASS = 'svg-graph-legend';
-
-	private const ZBX_STYLE_SCATTER_PLOT_LEGEND_ITEM = 'scatter-plot-legend-item';
+	private const ZBX_STYLE_CLASS = 'svg-scatter-plot-legend';
+	private const ZBX_STYLE_SCATTER_PLOT_LEGEND_ITEM = 'svg-scatter-plot-legend-item';
 
 	private array $legend_items;
 

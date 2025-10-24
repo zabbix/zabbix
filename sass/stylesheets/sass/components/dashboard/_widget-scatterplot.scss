@@ -2,7 +2,8 @@
 
 form.dashboard-widget-scatterplot {
 	max-width: 1330px;
-	width: unquote("min(100vw - 42px, calc(var(--modal-max-width) - 22px))");
+	min-width: 1120px;
+	width: #{"min(100vw - 42px, calc(var(--modal-max-width) - 22px))"};
 
 	.scatter-plot-widget-config-tabs {
 		grid-column: 1 / -1;
@@ -284,9 +285,22 @@ div.dashboard-widget-scatterplot {
 	overflow-x: hidden;
 }
 
-// Only for scatter plot image download functionality.
-.svg-graph-legend {
-	.scatter-plot-legend-item {
+.svg-scatter-plot-legend {
+	$svg-legend-line-height: 18px;
+
+	position: relative;
+	top: 4px;
+	box-sizing: border-box;
+	display: grid;
+	grid-template-columns: repeat(var(--columns, 4), auto);
+	grid-gap: 0 10px;
+	justify-content: start;
+	max-height: calc(var(--lines) * #{$svg-legend-line-height});
+	margin: 0 10px;
+	overflow: hidden;
+	line-height: $svg-legend-line-height;
+
+	.svg-scatter-plot-legend-item {
 		min-width: 100%;
 		overflow: hidden;
 		text-overflow: ellipsis;

@@ -580,7 +580,6 @@ class CScatterPlotHelper {
 
 					$count++;
 				}
-				unset($item);
 
 				if ($legend_options['show_aggregation']) {
 					$name .= ')';
