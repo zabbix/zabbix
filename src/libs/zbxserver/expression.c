@@ -4286,7 +4286,7 @@ static int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const DB_
 			}
 			else if	(0 == strcmp(m, MVAR_HOST_DNS))
 			{
-				if (INTERFACE_TYPE_UNKNOWN != c_interface->type)
+				if (INTERFACE_TYPE_UNKNOWN != dc_item->interface.type)
 				{
 					replace_to = zbx_strdup(replace_to, c_interface->dns_orig);
 				}
