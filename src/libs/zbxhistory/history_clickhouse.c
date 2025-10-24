@@ -334,7 +334,7 @@ static int	encode_leb128(zbx_uint64_t value, unsigned char *out)
 	return len;
 }
 
-static void	history_clickhouse_write_text(const char *str, char **post_data, size_t *post_data_alloc, 
+static void	history_clickhouse_write_text(const char *str, char **post_data, size_t *post_data_alloc,
 		size_t *post_data_offset)
 {
 	zbx_uint64_t	leb_len, len;
@@ -352,7 +352,7 @@ static void	history_clickhouse_write_text(const char *str, char **post_data, siz
 		zbx_str_memcpy_alloc(post_data, post_data_alloc, post_data_offset, str, len);
 }
 
-static void	history_clickhouse_write_uint64(zbx_uint64_t ui64, char **post_data, size_t *post_data_alloc, 
+static void	history_clickhouse_write_uint64(zbx_uint64_t ui64, char **post_data, size_t *post_data_alloc,
 		size_t *post_data_offset)
 {
 	zbx_uint64_t	number = zbx_htole_uint64(ui64);
@@ -360,7 +360,7 @@ static void	history_clickhouse_write_uint64(zbx_uint64_t ui64, char **post_data,
 	zbx_str_memcpy_alloc(post_data, post_data_alloc, post_data_offset, (const char *)&number, sizeof(number));
 }
 
-static void	history_clickhouse_write_dbl(double dbl, char **post_data, size_t *post_data_alloc, 
+static void	history_clickhouse_write_dbl(double dbl, char **post_data, size_t *post_data_alloc,
 		size_t *post_data_offset)
 {
 	zbx_uint64_t	number;
@@ -370,7 +370,7 @@ static void	history_clickhouse_write_dbl(double dbl, char **post_data, size_t *p
 	history_clickhouse_write_uint64(number, post_data, post_data_alloc, post_data_offset);
 }
 
-static void	history_clickhouse_write_uint32(zbx_uint32_t ui32, char **post_data, size_t *post_data_alloc, 
+static void	history_clickhouse_write_uint32(zbx_uint32_t ui32, char **post_data, size_t *post_data_alloc,
 		size_t *post_data_offset)
 {
 	zbx_uint32_t	number = zbx_htole_uint32(ui32);
