@@ -31,6 +31,8 @@
 #include "zbxalgo.h"
 #include "zbxexpr.h"
 
+#define ZBX_FPING_MIN_TIMEOUT	50
+
 typedef struct
 {
 	zbx_uint64_t		itemid;
