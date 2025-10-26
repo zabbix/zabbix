@@ -2524,6 +2524,27 @@ static int	vc_query_compare_by_timestamp_desc(const void *d1, const void *d2)
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: check if item history data is cached                              *
+ *                                                                            *
+ * Parameters: item - [IN] the item                                           *
+ *                                                                            *
+ * Return value: SUCCEED - item history data is cached                        *
+ *               FAIL    - item history data is not cached                    *
+ *                                                                            *
+ ******************************************************************************/
+static int	vc_query_item_cached(zbx_vc_item_t *item)
+{
+	if (0 != item->db_cached_from)
+		return SUCCEED;
+
+	if (ZBX_ITEM_STATUS_CACHED_ALL == item->status)
+		return SUCCEED;
+
+	return FAIL;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: precache history data for count-based range                       *
  *                                                                            *
  * Parameters: item      - [IN/OUT] the item                                  *
@@ -2602,8 +2623,7 @@ static void	vc_precache_item(zbx_item_history_t *hist, unsigned char value_type,
 
 	item = (zbx_vc_item_t *)zbx_hashset_insert(&vc_cache->items, &item_local, sizeof(item_local));
 
-	/* check if the item was just cached */
-	if (0 != item->db_cached_from)
+	if (SUCCEED == vc_query_item_cached(item))
 		return;
 
 	zbx_vector_history_record_sort(&hist->rows, (zbx_compare_func_t)zbx_history_record_compare_asc_func);
@@ -2789,7 +2809,7 @@ void	zbx_vc_precache_queries(zbx_vector_vc_query_t *queries)
 
 		/* check if the item was not added before */
 		if (NULL == (item = (zbx_vc_item_t *)zbx_hashset_search(&vc_cache->items, &query->itemid)) ||
-				0 == item->db_cached_from)
+				SUCCEED != vc_query_item_cached(item))
 		{
 			zbx_vector_vc_query_append_ptr(&uncached_queries[query->value_type], query);
 			uncached_num++;
