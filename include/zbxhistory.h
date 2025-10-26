@@ -84,5 +84,6 @@ void	zbx_history_record_copy(zbx_history_record_t *dst, const zbx_history_record
 int	zbx_history_get_flush_error(zbx_uint64_t error_mask, unsigned char value_type);
 
 int	zbx_item_history_compare_by_itemid(const void *d1, const void *d2);
+int	zbx_item_history_compare_by_index_desc(const void *d1, const void *d2);
 
 #endif

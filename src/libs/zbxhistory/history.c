@@ -1510,3 +1510,17 @@ int	zbx_item_history_compare_by_itemid(const void *d1, const void *d2)
 	ZBX_RETURN_IF_NOT_EQUAL(h1->itemid, h2->itemid);
 	return 0;
 }
+
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: compare two item history structures by item identifier            *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_item_history_compare_by_index_desc(const void *d1, const void *d2)
+{
+	const zbx_item_history_t	*h1 = (const zbx_item_history_t *)d1;
+	const zbx_item_history_t	*h2 = (const zbx_item_history_t *)d2;
+
+	return h2->index - h1->index;
+}
