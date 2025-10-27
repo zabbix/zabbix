@@ -270,12 +270,10 @@ class CTagHelper {
 		}
 	}
 
-	public static function getTagsRaw(array $objects, int $object_type): array {
+	public static function getTagsRaw(array $objects): array {
 		$tags = [];
-		$id_field_name = self::getIdFieldName($object_type);
 
-		foreach ($objects as $object) {
-			$objectid = $object[$id_field_name];
+		foreach ($objects as $objectid => $object) {
 			$tags[$objectid] = [];
 
 			if (!$object['tags']) {

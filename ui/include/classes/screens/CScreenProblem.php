@@ -1175,11 +1175,9 @@ class CScreenProblem extends CScreenBase {
 			return $this->getOutput($form->addItem([$table, $footer]), false, $this->data);
 		}
 
-		/*
-		 * Search limit performs +1 selection to know if limit was exceeded, this will assure that CSV has
-		 * "search_limit" records at most.
-		 */
-		array_splice($data['problems'], $this->data['limit']);
+		if (count($data['problems']) > $this->data['limit']) {
+			array_pop($data['problems']);
+		}
 
 		$csv = [];
 
@@ -1201,7 +1199,7 @@ class CScreenProblem extends CScreenBase {
 		CTagHelper::orderTags($data['problems']);
 		CTagHelper::orderTags($symptom_data['problems']);
 
-		$tags = CTagHelper::getTagsRaw($data['problems'] + $symptom_data['problems'], ZBX_TAG_OBJECT_PROBLEM);
+		$tags = CTagHelper::getTagsRaw($data['problems'] + $symptom_data['problems']);
 
 		// Get cause event names for symptoms.
 		$causes = [];
