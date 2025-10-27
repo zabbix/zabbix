@@ -30,6 +30,7 @@
 #include "zbxipcservice.h"
 #include "zbxlog.h"
 #include "zbxhistory.h"
+#include "zbxcurl.h"
 
 static sigset_t			orig_mask;
 
@@ -296,8 +297,8 @@ ZBX_THREAD_ENTRY(zbx_dbsyncer_thread, args)
 		zbx_export_deinit(problems_export);
 
 	zbx_ipc_async_socket_close(&rtc);
-
 	zbx_free(stats);
+	zbx_curl_cleanup();
 
 	exit(EXIT_SUCCESS);
 #undef STAT_INTERVAL

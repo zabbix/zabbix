@@ -1971,6 +1971,7 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 				zbx_dc_update_maintenances(MAINTENANCE_TIMER_PENDING);
 
 				zbx_db_close();
+				zbx_curl_cleanup();
 				break;
 			case ZBX_PROCESS_TYPE_POLLER:
 				poller_args.poller_type = ZBX_POLLER_TYPE_NORMAL;
