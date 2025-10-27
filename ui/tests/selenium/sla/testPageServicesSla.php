@@ -490,11 +490,20 @@ class testPageServicesSla extends CWebTest {
 					]
 				]
 			],
-			// Multiple spaces in search field Name.
+			// Multiple spaces between words in search field Name.
 			[
 				[
 					'filter' => [
 						'Name' => '   spaces   '
+					],
+					'expected' => ['Multiple spaces in SLA name']
+				]
+			],
+			// Multiple spaces in search field Name.
+			[
+				[
+					'filter' => [
+						'Name' => '   '
 					],
 					'expected' => ['Multiple spaces in SLA name']
 				]

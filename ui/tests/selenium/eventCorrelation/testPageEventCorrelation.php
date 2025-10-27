@@ -46,6 +46,8 @@ class testPageEventCorrelation extends CWebTest {
 	const EVENT_OLD_VALUE = 'Old event tag value';
 	const EVENT_NEW_VALUE = 'New event tag value';
 	const MULTIPLE_CONDITIONS = 'Conditions';
+	const EVENT_WITH_SEVERAL_SPACES = '📌€√Σnt correlation for   filter   and deletion';
+	const EVENT_WITHOUT_SEVERAL_SPACES = '📌€√Σnt correlation for filter and deletion';
 
 	public function prepareEventData() {
 		CDataHelper::call('correlation.create', [
@@ -223,7 +225,7 @@ class testPageEventCorrelation extends CWebTest {
 				]
 			],
 			[
-				'name' => '📌€√Σnt correlation for   filter   and deletion',
+				'name' => self::EVENT_WITH_SEVERAL_SPACES,
 				'filter' => [
 					'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
 					'conditions' => [
@@ -300,7 +302,7 @@ class testPageEventCorrelation extends CWebTest {
 						'Status' => 'Enabled'
 					],
 					[
-						'Name' => '📌€√Σnt correlation for filter and deletion',
+						'Name' => self::EVENT_WITHOUT_SEVERAL_SPACES,
 						'Conditions' => 'Old event tag name equals tag for filter',
 						'Operations' => 'Close old events',
 						'Status' => 'Enabled'
@@ -385,7 +387,7 @@ class testPageEventCorrelation extends CWebTest {
 						'Name' => '€√Σnt'
 					],
 					'expected' => [
-						'📌€√Σnt correlation for filter and deletion'
+						self::EVENT_WITHOUT_SEVERAL_SPACES
 					]
 				]
 			],
@@ -425,7 +427,7 @@ class testPageEventCorrelation extends CWebTest {
 						self::EVENT_PAIR,
 						self::EVENT_NEW_VALUE,
 						self::EVENT_OLD_VALUE,
-						'📌€√Σnt correlation for filter and deletion'
+						self::EVENT_WITHOUT_SEVERAL_SPACES
 					]
 				]
 			],
@@ -458,7 +460,7 @@ class testPageEventCorrelation extends CWebTest {
 					'filter' => [
 						'Name' => '   '
 					],
-					'expected' => ['📌€√Σnt correlation for filter and deletion']
+					'expected' => [self::EVENT_WITHOUT_SEVERAL_SPACES]
 				]
 			],
 			// Search should not be case sensitive.
@@ -493,7 +495,7 @@ class testPageEventCorrelation extends CWebTest {
 						self::EVENT_PAIR,
 						self::EVENT_NEW_VALUE,
 						self::EVENT_OLD_VALUE,
-						'📌€√Σnt correlation for filter and deletion'
+						self::EVENT_WITHOUT_SEVERAL_SPACES
 					]
 				]
 			],
@@ -506,7 +508,7 @@ class testPageEventCorrelation extends CWebTest {
 					],
 					'expected' => [
 						self::EVENT_NEW_OPERATIONS,
-						'📌€√Σnt correlation for filter and deletion'
+						self::EVENT_WITHOUT_SEVERAL_SPACES
 					]
 				]
 			],
@@ -590,7 +592,7 @@ class testPageEventCorrelation extends CWebTest {
 				[
 					'sort_field' => 'Name',
 					'expected' => [
-						'📌€√Σnt correlation for filter and deletion',
+						self::EVENT_WITHOUT_SEVERAL_SPACES,
 						self::EVENT_OLD_VALUE,
 						self::EVENT_NEW_VALUE,
 						self::EVENT_PAIR,
@@ -657,7 +659,7 @@ class testPageEventCorrelation extends CWebTest {
 			[
 				[
 					'action' => 'Disable',
-					'name' => '📌€√Σnt correlation for filter and deletion'
+					'name' => self::EVENT_WITHOUT_SEVERAL_SPACES
 				]
 			],
 			[
@@ -668,7 +670,7 @@ class testPageEventCorrelation extends CWebTest {
 			[
 				[
 					'action' => 'Delete',
-					'name' => '📌€√Σnt correlation for filter and deletion'
+					'name' => self::EVENT_WITHOUT_SEVERAL_SPACES
 				]
 			]
 		];
@@ -707,7 +709,7 @@ class testPageEventCorrelation extends CWebTest {
 				[
 					'link_button' => true,
 					'action' => 'Disable',
-					'name' => '📌€√Σnt correlation for   filter   and deletion'
+					'name' => self::EVENT_WITH_SEVERAL_SPACES
 				]
 			],
 			[
@@ -815,7 +817,7 @@ class testPageEventCorrelation extends CWebTest {
 	}
 
 	public function testPageEventCorrelation_Delete() {
-		$this->deleteAction(['📌€√Σnt correlation for filter and deletion']);
+		$this->deleteAction([self::EVENT_WITHOUT_SEVERAL_SPACES]);
 	}
 
 	public function testPageEventCorrelation_MassDelete() {

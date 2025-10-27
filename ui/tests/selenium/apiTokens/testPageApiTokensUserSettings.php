@@ -27,14 +27,14 @@ class testPageApiTokensUserSettings extends testPageApiTokens {
 	public static $timestamp;
 
 	const STATUS_CHANGE_TOKEN = 'Expired token for admin';
-	const DELETE_TOKEN = 'Future t oken for admin';
+	const DELETE_TOKEN = 'Future token for admin';
 
 	public static function prepareTokenData() {
 		self::$timestamp = time() + 172800;
 
 		$response = CDataHelper::call('token.create', [
 			[
-				'name' => 'Future t   oken   for admin',
+				'name' => 'Future token for admin',
 				'userid' => 1,
 				'description' => 'admin token to be used in update scenarios',
 				'status' => '0',
@@ -55,6 +55,13 @@ class testPageApiTokensUserSettings extends testPageApiTokens {
 			],
 			[
 				'name' => 'Token that will expire in 2 days',
+				'userid' => 1,
+				'description' => 'admin token created for filter-create user',
+				'status' => '1',
+				'expires_at' => self::$timestamp
+			],
+			[
+				'name' => 'Checking     sp    aces in names',
 				'userid' => 1,
 				'description' => 'admin token created for filter-create user',
 				'status' => '1',
@@ -80,7 +87,13 @@ class testPageApiTokensUserSettings extends testPageApiTokens {
 				'Created at' => '2021-01-01 00:00:01',
 				'Last accessed at' => '2021-01-01 00:00:04',
 				'Status' => 'Disabled'
-
+			],
+			[
+				'Name' => 'Checking sp aces in names',
+				'Expires at' => date('Y-m-d H:i:s', self::$timestamp),
+				'Created at' => '2021-01-01 00:00:01',
+				'Last accessed at' => '2021-01-01 00:00:05',
+				'Status' => 'Disabled'
 			],
 			[
 				'Name' => 'Expired token for admin',
@@ -88,10 +101,9 @@ class testPageApiTokensUserSettings extends testPageApiTokens {
 				'Created at' => '2021-01-01 00:00:01',
 				'Last accessed at' => '2021-01-01 00:00:03',
 				'Status' => 'Enabled'
-
 			],
 			[
-				'Name' => 'Future t oken for admin',
+				'Name' => 'Future token for admin',
 				'Expires at' => date('Y-m-d H:i:s', self::$timestamp + 864000),
 				'Created at' => '2021-01-01 00:00:01',
 				'Last accessed at' => '2021-01-01 00:00:02',
@@ -104,7 +116,6 @@ class testPageApiTokensUserSettings extends testPageApiTokens {
 				'Created at' => '2021-01-01 00:00:01',
 				'Last accessed at' => '2021-01-01 00:00:05',
 				'Status' => 'Disabled'
-
 			]
 		];
 
@@ -136,7 +147,7 @@ class testPageApiTokensUserSettings extends testPageApiTokens {
 					],
 					'expected' => [
 						'Expired token for admin',
-						'Future t oken for admin'
+						'Future token for admin'
 					]
 				]
 			],
@@ -147,18 +158,44 @@ class testPageApiTokensUserSettings extends testPageApiTokens {
 						'Name' => 'ken fo'
 					],
 					'expected' => [
-						'Expired token for admin'
+						'Expired token for admin',
+						'Future token for admin'
 					]
 				]
 			],
 			// Filter by name with trailing and leading spaces.
+			// TODO Uncomment the below data provider once ZBX-18995 is fixed.
+//			[
+//				[
+//					'filter' => [
+//						'Name' => '   oken   '
+//					],
+//					'expected' => [
+//						'Expired token for admin',
+//						'Future token for admin',
+//						'Token that will expire in 2 days'
+//					]
+//				]
+//			],
+			// Several empty spaces between words in filter field "Name".
 			[
 				[
-				'filter' => [
-						'Name' => '   oken   '
+					'filter' => [
+						'Name' => '     sp    '
 					],
 					'expected' => [
-						'Future t oken for admin'
+						'Checking sp aces in names'
+					]
+				]
+			],
+			// Several empty spaces between words in filter field "Name".
+			[
+				[
+					'filter' => [
+						'Name' => '    '
+					],
+					'expected' => [
+						'Checking sp aces in names'
 					]
 				]
 			],
@@ -179,7 +216,7 @@ class testPageApiTokensUserSettings extends testPageApiTokens {
 					],
 					'expected' => [
 						'Expired token for admin',
-						'Future t oken for admin'
+						'Future token for admin'
 					]
 				]
 			],
@@ -191,6 +228,7 @@ class testPageApiTokensUserSettings extends testPageApiTokens {
 					],
 					'expected' => [
 						'Aktīvs токен - 頑張って',
+						'Checking sp aces in names',
 						'Token that will expire in 2 days'
 					]
 				]
@@ -201,7 +239,8 @@ class testPageApiTokensUserSettings extends testPageApiTokens {
 					'filter' => [],
 					'Expires in less than' => 12,
 					'expected' => [
-						'Future t oken for admin',
+						'Checking sp aces in names',
+						'Future token for admin',
 						'Token that will expire in 2 days'
 					]
 				]
@@ -212,6 +251,7 @@ class testPageApiTokensUserSettings extends testPageApiTokens {
 					'filter' => [],
 					'Expires in less than' => 2,
 					'expected' => [
+						'Checking sp aces in names',
 						'Token that will expire in 2 days'
 					]
 				]
@@ -232,7 +272,7 @@ class testPageApiTokensUserSettings extends testPageApiTokens {
 					],
 					'Expires in less than' => 12,
 					'expected' => [
-						'Future t oken for admin'
+						'Future token for admin'
 					]
 				]
 			]
@@ -253,7 +293,7 @@ class testPageApiTokensUserSettings extends testPageApiTokens {
 					'sort_field' => 'Name',
 					'expected' => [
 						'Token that will expire in 2 days',
-						'Future t oken for admin',
+						'Future token for admin',
 						'Expired token for admin',
 						'Aktīvs токен - 頑張って'
 					]

@@ -403,11 +403,22 @@ class testPageServicesServices extends CWebTest {
 					]
 				]
 			],
-			// Multiple spaces in the filter.
+			// Multiple spaces between words in the filter.
 			[
 				[
 					'filter' => [
 						'Name' => '   spaces   '
+					],
+					'result' => [
+						'Multiple spaces in service name'
+					]
+				]
+			],
+			// Multiple spaces in the filter.
+			[
+				[
+					'filter' => [
+						'Name' => '   '
 					],
 					'result' => [
 						'Multiple spaces in service name'

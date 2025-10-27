@@ -21,7 +21,7 @@ require_once __DIR__.'/../behaviors/CTagBehavior.php';
 use Facebook\WebDriver\WebDriverBy;
 
 /**
- * @onBefore createNewTrigger
+ * @onBefore prepareTriggerData
  *
  * @backup triggers
  */
@@ -39,7 +39,7 @@ class testPageTriggers extends CLegacyWebTest {
 		];
 	}
 
-	public static function createNewTrigger() {
+	public static function prepareTriggerData() {
 		CDataHelper::call('trigger.create', [
 			[
 				'description' => 'Multiple   spaces   in trigger name',

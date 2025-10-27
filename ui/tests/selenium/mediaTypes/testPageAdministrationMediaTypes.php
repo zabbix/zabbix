@@ -241,6 +241,15 @@ class testPageAdministrationMediaTypes extends CWebTest {
 					'result' => ['Jira Service Management']
 				]
 			],
+			// Filter with several empty space.
+			[
+				[
+					'filter' => [
+						'Name' => '   '
+					],
+					'result' => ['Multiple spaces in webhook 123']
+				]
+			],
 			// Filter by status.
 			[
 				[
