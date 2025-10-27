@@ -478,6 +478,11 @@ class testDashboardItemValueWidget extends testWidgets {
 						$form->fill([$config => $state]);
 
 						foreach ($elements as $element) {
+							// TODO: remove if statement when DEV-4512 is fixed.
+							if (str_contains($element, self::PATH_TO_COLOR_PICKER)) {
+								$element .= '/input';
+							}
+
 							$this->assertTrue($form->getField($element)->isEnabled($state));
 						}
 					}
