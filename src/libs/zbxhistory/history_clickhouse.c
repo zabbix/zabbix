@@ -32,6 +32,7 @@
 #include "zbxhttp.h"
 #include "zbxdb.h"
 #include "zbxcrypto.h"
+#include "zbxcacheconfig.h"
 
 typedef void (*write_value_t)(zbx_json_t *row, const zbx_history_value_t *value);
 
@@ -1202,6 +1203,7 @@ static int	history_clickhouse_fetch(void *data, zbx_uint64_t itemid, unsigned ch
 
 	if (0 != start)
 	{
+		zbx_recalc_time_period(&start, ZBX_RECALC_TIME_PERIOD_HISTORY);
 		zbx_snprintf_alloc(&query, &query_alloc, &query_offset, " and timestamp>='" ZBX_FS_TIME_T ".0'",
 				start + 1);
 	}
