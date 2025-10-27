@@ -1046,10 +1046,11 @@ class testFormHostPrototype extends CLegacyWebTest {
 		$this->zbxTestClickLinkTextWait('Host prototypes');
 		$this->zbxTestContentControlButtonClickTextWait('Create host prototype');
 
-		$this->zbxTestInputType('host', $name);
+		$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
+		$this->zbxTestInputTypeWait('host', $name);
 		$this->zbxTestClickButtonMultiselect('group_links_');
 		$this->zbxTestLaunchOverlayDialog('Host groups');
-		$this->zbxTestClickLinkText($group);
+		$this->zbxTestClickLinkTextWait($group);
 
 		COverlayDialogElement::find()->waitUntilReady()->one()->getFooter()->query('button:Cancel')->one()->click();
 
