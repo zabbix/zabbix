@@ -371,6 +371,92 @@ out:
 	return SUCCEED;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: read history data for multiple items from database                *
+ *                                                                            *
+ * Parameters: results    - [IN/OUT] vector of item history structures        *
+ *             value_type - [IN] the value type (see ITEM_VALUE_TYPE_* )      *
+ *             time_from  - [IN] the start timestamp                          *
+ *                                                                            *
+ * Return value: SUCCEED - the history data were read successfully            *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+static int	db_read_batch(zbx_vector_item_history_t *results, unsigned char value_type, int time_from)
+{
+	char			*sql = NULL;
+	size_t			sql_alloc = 0, sql_offset = 0;
+	zbx_db_result_t		result;
+	zbx_db_row_t		row;
+	zbx_vc_history_table_t	*table = &vc_history_tables[value_type];
+	zbx_vector_uint64_t	itemids;
+	zbx_item_history_t	*hist = NULL;
+
+	zbx_vector_uint64_create(&itemids);
+	for (int i = 0; i < results->values_num; i++)
+		zbx_vector_uint64_append(&itemids, results->values[i].itemid);
+
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+			"select itemid,clock,ns,%s"
+			" from %s"
+			" where",
+			table->fields, table->name);
+
+	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "itemid", itemids.values, itemids.values_num);
+	zbx_vector_uint64_destroy(&itemids);
+
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " and clock>" ZBX_FS_TIME_T " order by itemid,clock,ns desc",
+				(zbx_fs_time_t)time_from);
+
+	result = zbx_db_select("%s", sql);
+
+	zbx_free(sql);
+
+	if (NULL == result)
+		goto out;
+
+	while (NULL != (row = zbx_db_fetch(result)))
+	{
+		zbx_uint64_t	itemid;
+		zbx_history_record_t	record;
+
+		ZBX_STR2UINT64(itemid, row[0]);
+
+		if (NULL == hist || hist->itemid != itemid)
+		{
+			int			index;
+			zbx_item_history_t	hist_local;
+
+			hist_local.itemid = itemid;
+
+			index = zbx_vector_item_history_bsearch(results, hist_local,
+					zbx_item_history_compare_by_itemid);
+
+			if (FAIL != index)
+			{
+				hist = &results->values[index];
+			}
+			else
+			{
+				THIS_SHOULD_NEVER_HAPPEN;
+				continue;
+			}
+		}
+
+
+		record.timestamp.sec = atoi(row[1]);
+		record.timestamp.ns = atoi(row[2]);
+		table->rtov(&record.value, row + 3);
+
+		zbx_vector_history_record_append_ptr(&hist->rows, &record);
+	}
+	zbx_db_free_result(result);
+out:
+	return SUCCEED;
+}
+
+
 /************************************************************************************
  *                                                                                  *
  * Purpose: reads item history data from database                                   *
@@ -666,16 +752,27 @@ static int	history_sql_fetch(void *data, zbx_uint64_t itemid, unsigned char valu
 	return result.values_num;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: fetch history data for multiple items from SQL database           *
+ *                                                                            *
+ * Parameters: data       - [IN] history provider data                        *
+ *             results    - [IN/OUT] vector of item history structures        *
+ *             value_type - [IN] the item value type                          *
+ *             start      - [IN] the period start timestamp                   *
+ *             error      - [OUT] error message                               *
+ *                                                                            *
+ * Return value: SUCCEED - history data fetched successfully                  *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
 static int	history_sql_fetch_batch(void *data, zbx_vector_item_history_t *results, unsigned char value_type,
 		time_t start, char **error)
 {
 	ZBX_UNUSED(data);
-	ZBX_UNUSED(results);
-	ZBX_UNUSED(value_type);
-	ZBX_UNUSED(start);
+	ZBX_UNUSED(error);
 
-	*error = zbx_strdup(NULL, "batch fetching not supported for SQL history storage provider");
-	return FAIL;
+	return db_read_batch(results, value_type, (int)start);
 }
 
 /******************************************************************************
@@ -741,7 +838,8 @@ zbx_history_provider_t	*history_sql_open(const zbx_history_option_t *options, in
 
 	provider->name = zbx_strdup(NULL, HISTORY_PROVIDER_SQL);
 	provider->traits = ZBX_HISTORY_TRAIT_REQUIRES_TRENDS | ZBX_HISTORY_TRAIT_REQUIRES_HOUSEKEEPING |
-			ZBX_HISTORY_TRAIT_TYPES_ALL | ZBX_HISTORY_TRAIT_DEFAULT_PROVIDER;
+			ZBX_HISTORY_TRAIT_TYPES_ALL | ZBX_HISTORY_TRAIT_DEFAULT_PROVIDER |
+			ZBX_HISTORY_TRAIT_REQUIRES_PRECACHING;
 	provider->impl.write = history_sql_write;
 	provider->impl.flush = history_sql_flush;
 	provider->impl.fetch = history_sql_fetch;
