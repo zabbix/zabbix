@@ -671,7 +671,8 @@ class testMultiselectsWithoutData extends testMultiselectDialogs {
 				[
 					'object' => 'host prototype',
 					'url' => 'zabbix.php?action=host.prototype.list&context=host&parent_discoveryid=',
-					'form' => 'id:host-prototype-form'
+					'form' => 'id:host-prototype-form',
+					'overlay_form' => true
 				]
 			],
 			// Template objects.
@@ -753,7 +754,8 @@ class testMultiselectsWithoutData extends testMultiselectDialogs {
 				[
 					'object' => 'host prototype',
 					'url' => 'zabbix.php?action=host.prototype.list&context=template&parent_discoveryid=',
-					'form' => 'id:host-prototype-form'
+					'form' => 'id:host-prototype-form',
+					'overlay_form' => true
 				]
 			]
 		];
