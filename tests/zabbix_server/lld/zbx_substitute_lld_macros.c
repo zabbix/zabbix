@@ -15,7 +15,6 @@
 #include "zbxcommon.h"
 
 #include "zbxjson.h"
-#include "zbxexpression.h"
 
 #include "zbxmocktest.h"
 #include "zbxmockdata.h"

@@ -12,18 +12,27 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-#ifndef ZABBIX_EXPRESSION_H
-#define ZABBIX_EXPRESSION_H
+#include "zbxmocktest.h"
+#include "zbxmockdata.h"
+#include "zbxmockassert.h"
+#include "zbxmockutil.h"
 
-#include "zbxdbhigh.h"
-#include "zbxcacheconfig.h"
-#include "zbxjson.h"
+#include "zbxcommon.h"
+#include "zbxcomms.h"
 
-int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const zbx_db_event *event,
-		const zbx_db_event *r_event, const zbx_uint64_t *userid, const zbx_uint64_t *hostid,
-		const zbx_dc_host_t *dc_host, const zbx_dc_item_t *dc_item, const zbx_db_alert *alert,
-		const zbx_db_acknowledge *ack, const zbx_service_alarm_t *service_alarm, const zbx_db_service *service,
-		const char *tz, zbx_history_recv_item_t *history_data_item, char **data, int macro_type, char *error,
-		int maxerrlen);
 
-#endif
+void	zbx_mock_test_entry(void **state)
+{
+	const char	*host = zbx_mock_get_parameter_string("in.host");
+	char		ip[ZBX_MAX_HOSTNAME_LEN];
+
+	ZBX_UNUSED(state);
+
+	zbx_getip_by_host(host, ip, ZBX_MAX_HOSTNAME_LEN);
+
+	const char	*exp_v4 = zbx_mock_get_parameter_string("out.result_v4");
+	const char	*exp_v6 = zbx_mock_get_parameter_string("out.result_v6");
+
+	if (0 != strcmp(ip, exp_v4) && 0 != strcmp(ip, exp_v6))
+		fail_msg("Expected %s or %s, got %s", exp_v4, exp_v6, ip);
+}
