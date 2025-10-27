@@ -27,10 +27,11 @@
 #include "zbxprof.h"
 #include "zbxtime.h"
 #include "zbxcachehistory.h"
+#include "zbxdb.h"
+#include "zbxlog.h"
 
 ZBX_PTR_VECTOR_IMPL(rtc_sub, zbx_rtc_sub_t *)
 ZBX_PTR_VECTOR_IMPL(rtc_hook, zbx_rtc_hook_t *)
-
 
 static int	zbx_json_getuint64(const char *tag, const struct zbx_json_parse *jp, zbx_uint64_t *itemid,
 		char **error)
@@ -227,8 +228,8 @@ static void	rtc_process_profiler_option(zbx_uint32_t code, const char *data, cha
  *                                                                            *
  * Purpose: process diaginfo runtime control option                           *
  *                                                                            *
- * Parameters: data   - [IN] the runtime control parameter (optional)         *
- *             result - [OUT] the runtime control result                      *
+ * Parameters: data   - [IN] runtime control parameter (optional)             *
+ *             result - [OUT] runtime control result                          *
  *                                                                            *
  ******************************************************************************/
 static void	rtc_process_diaginfo(const char *data, char **result)
@@ -269,6 +270,263 @@ static void	rtc_process_diaginfo(const char *data, char **result)
 	}
 
 	zbx_diag_log_info(scope, result);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: process db_status runtime control option                          *
+ *                                                                            *
+ * Parameters: result - [OUT] runtime control result                          *
+ *                                                                            *
+ ******************************************************************************/
+static void	rtc_process_db_status(char **result)
+{
+	size_t				result_alloc = 0, result_offset = 0;
+	zbx_dbconn_pool_config_t	cfg;
+	zbx_dbconn_pool_stats_t		stats;
+
+	zbx_dbconn_pool_get_config(&cfg);
+	zbx_dbconn_pool_get_stats(&stats);
+
+	zbx_strlog_alloc(LOG_LEVEL_INFORMATION, result, &result_alloc, &result_offset,
+			"database connection pool configuration");
+	zbx_strlog_alloc(LOG_LEVEL_INFORMATION, result, &result_alloc, &result_offset,
+			"  %30s: %d", "maximum idle connection limit", cfg.max_idle);
+	zbx_strlog_alloc(LOG_LEVEL_INFORMATION, result, &result_alloc, &result_offset,
+			"  %30s: %d", "maximum connection limit", cfg.max_open);
+	zbx_strlog_alloc(LOG_LEVEL_INFORMATION, result, &result_alloc, &result_offset,
+			"  %30s: %d", "idle timeout", cfg.idle_timeout);
+
+	zbx_strlog_alloc(LOG_LEVEL_INFORMATION, result, &result_alloc, &result_offset,
+			"database connection pool statistics");
+	zbx_strlog_alloc(LOG_LEVEL_INFORMATION, result, &result_alloc, &result_offset,
+			"  %30s: " ZBX_FS_UI64, "provided connections", stats.provided_num);
+	zbx_strlog_alloc(LOG_LEVEL_INFORMATION, result, &result_alloc, &result_offset,
+			"  %30s: %.3f" , "total wait time", stats.time_wait);
+	zbx_strlog_alloc(LOG_LEVEL_INFORMATION, result, &result_alloc, &result_offset,
+			"  %30s: %.3f" , "total idle time", stats.time_idle);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: process dbpool_set_max_idle runtime control option                *
+ *                                                                            *
+ * Parameters: data   - [IN] runtime control parameter                        *
+ *             limit  - [OUT] new maximum idle connection limit               *
+ *             error  - [OUT] error message                                   *
+ *                                                                            *
+ ******************************************************************************/
+static int	rtc_db_set_max_idle(const char *data, int *limit, char **error)
+{
+	struct zbx_json_parse		jp;
+	char				buf[MAX_STRING_LEN];
+	zbx_dbconn_pool_config_t	cfg;
+
+	if (FAIL == zbx_json_open(data, &jp) ||
+			SUCCEED != zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_MAX_IDLE, buf, sizeof(buf), NULL) ||
+			SUCCEED != zbx_is_int(buf, limit))
+	{
+		*error = zbx_dsprintf(NULL, "invalid parameters \"%s\"", data);
+		return FAIL;
+	}
+
+	zbx_dbconn_pool_get_config(&cfg);
+
+	if (cfg.max_open < *limit)
+	{
+		*error = zbx_dsprintf(NULL, "maximum idle connection limit %d cannot be higher than maximum connection"
+				" limit %d", *limit, cfg.max_open);
+		return FAIL;
+	}
+
+	if (DBPOOL_MINIMUM_MAX_IDLE > *limit)
+	{
+		*error = zbx_dsprintf(NULL, "maximum idle connection limit must be at least %d",
+				DBPOOL_MINIMUM_MAX_IDLE);
+		return FAIL;
+	}
+
+	if (DBPOOL_MAXIMUM_MAX_IDLE < *limit)
+	{
+		*error = zbx_dsprintf(NULL, "maximum idle connection limit must be less than or equal to %d",
+				DBPOOL_MAXIMUM_MAX_IDLE);
+		return FAIL;
+	}
+
+	cfg.max_idle = *limit;
+
+	return zbx_dbconn_pool_flush_config(&cfg, error);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: process dbpool_set_max_idle runtime control option                *
+ *                                                                            *
+ * Parameters: data   - [IN] runtime control parameter                        *
+ *             result - [OUT] runtime control result                          *
+ *                                                                            *
+ ******************************************************************************/
+static void	rtc_process_db_set_max_idle(const char *data, char **result)
+{
+	size_t	result_alloc = 0, result_offset = 0;
+	char	*error = NULL;
+	int	limit;
+
+	if (SUCCEED != rtc_db_set_max_idle(data, &limit, &error))
+	{
+		zbx_strlog_alloc(LOG_LEVEL_ERR, result, &result_alloc, &result_offset,
+				"cannot set maximum idle connection limit: %s", error);
+		zbx_free(error);
+		return;
+	}
+
+	zbx_strlog_alloc(LOG_LEVEL_INFORMATION, result, &result_alloc, &result_offset,
+			"updated maximum idle connection limit to %d", limit);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: process dbpool_set_max_open runtime control option                *
+ *                                                                            *
+ * Parameters: data   - [IN] runtime control parameter                        *
+ *             limit  - [OUT] new maximum connection limit                    *
+ *             error  - [OUT] error message                                   *
+ *                                                                            *
+ ******************************************************************************/
+static int	rtc_db_set_max_open(const char *data, int *limit, char **error)
+{
+	struct zbx_json_parse		jp;
+	char				buf[MAX_STRING_LEN];
+	zbx_dbconn_pool_config_t	cfg;
+
+	if (FAIL == zbx_json_open(data, &jp) ||
+			SUCCEED != zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_MAX_OPEN, buf, sizeof(buf), NULL) ||
+			SUCCEED != zbx_is_int(buf, limit))
+	{
+		*error = zbx_dsprintf(NULL, "invalid parameters \"%s\"", data);
+		return FAIL;
+	}
+
+	zbx_dbconn_pool_get_config(&cfg);
+
+	if (cfg.max_idle > *limit)
+	{
+		*error = zbx_dsprintf(NULL, "maximum open connection limit %d cannot be lower than maximum idle"
+				" connection limit %d", *limit, cfg.max_idle);
+		return FAIL;
+	}
+
+	if (DBPOOL_MINIMUM_MAX_OPEN > *limit)
+	{
+		*error = zbx_dsprintf(NULL, "maximum open connection limit must be at least %d",
+				DBPOOL_MINIMUM_MAX_OPEN);
+		return FAIL;
+	}
+
+	if (DBPOOL_MAXIMUM_MAX_OPEN < *limit)
+	{
+		*error = zbx_dsprintf(NULL, "maximum open connection limit must be less than or equal to %d",
+				DBPOOL_MAXIMUM_MAX_OPEN);
+		return FAIL;
+	}
+
+	cfg.max_open = *limit;
+
+	return zbx_dbconn_pool_flush_config(&cfg, error);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: process dbpool_set_max_open runtime control option                *
+ *                                                                            *
+ * Parameters: data   - [IN] runtime control parameter                        *
+ *             result - [OUT] runtime control result                          *
+ *                                                                            *
+ ******************************************************************************/
+static void	rtc_process_db_set_max_open(const char *data, char **result)
+{
+	size_t	result_alloc = 0, result_offset = 0;
+	char	*error = NULL;
+	int	limit;
+
+	if (SUCCEED != rtc_db_set_max_open(data, &limit, &error))
+	{
+		zbx_strlog_alloc(LOG_LEVEL_ERR, result, &result_alloc, &result_offset,
+				"cannot set maximum open connection limit: %s", error);
+		zbx_free(error);
+		return;
+	}
+
+	zbx_strlog_alloc(LOG_LEVEL_INFORMATION, result, &result_alloc, &result_offset,
+			"updated maximum open connection limit to %d", limit);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: process db_set_idle_timeout runtime control option                *
+ *                                                                            *
+ * Parameters: data    - [IN] runtime control parameter                       *
+ *             timeout - [OUT] new idle timeout                               *
+ *             error   - [OUT] error message                                  *
+ *                                                                            *
+ ******************************************************************************/
+static int	rtc_db_set_idle_timeout(const char *data, int *timeout, char **error)
+{
+	struct zbx_json_parse		jp;
+	char				buf[MAX_STRING_LEN];
+	zbx_dbconn_pool_config_t	cfg;
+
+	if (FAIL == zbx_json_open(data, &jp) ||
+			SUCCEED != zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_IDLE_TIMEOUT, buf, sizeof(buf), NULL) ||
+			SUCCEED != zbx_is_int(buf, timeout))
+	{
+		*error = zbx_dsprintf(NULL, "invalid parameters \"%s\"", data);
+		return FAIL;
+	}
+
+	if (DBPOOL_MINIMUM_IDLE_TIMEOUT > *timeout)
+	{
+		*error = zbx_dsprintf(NULL, "idle timeout must be at least %d seconds", DBPOOL_MINIMUM_IDLE_TIMEOUT);
+		return FAIL;
+	}
+
+	if (DBPOOL_MAXIMUM_IDLE_TIMEOUT < *timeout)
+	{
+		*error = zbx_dsprintf(NULL, "idle timeout must be less than or equal to %d seconds",
+				DBPOOL_MAXIMUM_IDLE_TIMEOUT);
+		return FAIL;
+	}
+
+	zbx_dbconn_pool_get_config(&cfg);
+	cfg.idle_timeout = *timeout;
+
+	return zbx_dbconn_pool_flush_config(&cfg, error);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: process db_set_idle_timeout runtime control option                *
+ *                                                                            *
+ * Parameters: data   - [IN] runtime control parameter (optional)             *
+ *             result - [OUT] runtime control result                          *
+ *                                                                            *
+ ******************************************************************************/
+static void	rtc_process_db_set_idle_timeout(const char *data, char **result)
+{
+	size_t	result_alloc = 0, result_offset = 0;
+	char	*error = NULL;
+	int	timeout;
+
+	if (SUCCEED != rtc_db_set_idle_timeout(data, &timeout, &error))
+	{
+		zbx_strlog_alloc(LOG_LEVEL_ERR, result, &result_alloc, &result_offset,
+				"cannot set database connection idle timeout: %s", error);
+		zbx_free(error);
+		return;
+	}
+
+	zbx_strlog_alloc(LOG_LEVEL_INFORMATION, result, &result_alloc, &result_offset,
+			"updated database connection idle timeout to %d", timeout);
 }
 
 /******************************************************************************
@@ -477,12 +735,43 @@ static void	rtc_subscribe_service(zbx_rtc_t *rtc, const unsigned char *data)
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: unsubscribe service from RTC notifications                        *
+ *                                                                            *
+ ******************************************************************************/
+static void	rtc_unsubscribe_service(zbx_rtc_t *rtc, const unsigned char *data)
+{
+	char		*service;
+	zbx_uint32_t	service_len;
+
+	(void)zbx_deserialize_str(data, &service, service_len);
+
+	for (int i = 0; i < rtc->subs.values_num; i++)
+	{
+		zbx_rtc_sub_t	*sub = rtc->subs.values[i];
+
+		if (ZBX_RTC_SUB_SERVICE == sub->type && 0 == strcmp(sub->source.service, service))
+		{
+			zbx_free(sub->source.service);
+			zbx_vector_uint32_destroy(&sub->msgs);
+			zbx_free(sub);
+			zbx_vector_rtc_sub_remove_noorder(&rtc->subs, i);
+
+			break;
+		}
+
+	}
+
+	zbx_free(service);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: process runtime control option                                    *
  *                                                                            *
- * Parameters: rtc    - [IN] the RTC service                                  *
- *             code   - [IN] the request code                                 *
- *             data   - [IN] the runtime control parameter (optional)         *
- *             result - [OUT] the runtime control result                      *
+ * Parameters: rtc    - [IN] RTC service                                      *
+ *             code   - [IN] request code                                     *
+ *             data   - [IN] runtime control parameter (optional)             *
+ *             result - [OUT] runtime control result                          *
  *                                                                            *
  ******************************************************************************/
 static void	rtc_process_request(zbx_rtc_t *rtc, zbx_uint32_t code, const unsigned char *data,
@@ -516,9 +805,7 @@ static void	rtc_process_request(zbx_rtc_t *rtc, zbx_uint32_t code, const unsigne
 			zbx_rtc_notify(rtc, ZBX_PROCESS_TYPE_SNMP_POLLER, 0, ZBX_RTC_SNMP_CACHE_RELOAD, NULL, 0);
 			zbx_rtc_notify(rtc, ZBX_PROCESS_TYPE_POLLER, 0, ZBX_RTC_SNMP_CACHE_RELOAD, NULL, 0);
 			zbx_rtc_notify(rtc, ZBX_PROCESS_TYPE_UNREACHABLE, 0, ZBX_RTC_SNMP_CACHE_RELOAD, NULL, 0);
-			zbx_rtc_notify(rtc, ZBX_PROCESS_TYPE_TRAPPER, 0, ZBX_RTC_SNMP_CACHE_RELOAD, NULL, 0);
 			zbx_rtc_notify(rtc, ZBX_PROCESS_TYPE_DISCOVERYMANAGER, 0, ZBX_RTC_SNMP_CACHE_RELOAD, NULL, 0);
-			zbx_rtc_notify(rtc, ZBX_PROCESS_TYPE_TASKMANAGER, 0, ZBX_RTC_SNMP_CACHE_RELOAD, NULL, 0);
 #else
 			*result = zbx_strdup(NULL, "Invalid runtime control option: no SNMP support enabled\n");
 #endif
@@ -537,6 +824,18 @@ static void	rtc_process_request(zbx_rtc_t *rtc, zbx_uint32_t code, const unsigne
 			return;
 		case ZBX_RTC_HISTORY_CACHE_CLEAR:
 			rtc_history_cache_clear((const char *)data, result);
+			return;
+		case ZBX_RTC_DBPOOL_STATUS:
+			rtc_process_db_status(result);
+			return;
+		case ZBX_RTC_DBPOOL_SET_MAX_IDLE:
+			rtc_process_db_set_max_idle((const char *)data, result);
+			return;
+		case ZBX_RTC_DBPOOL_SET_MAX_OPEN:
+			rtc_process_db_set_max_open((const char *)data, result);
+			return;
+		case ZBX_RTC_DBPOOL_SET_IDLE_TIMEOUT:
+			rtc_process_db_set_idle_timeout((const char *)data, result);
 			return;
 		default:
 			*result = zbx_strdup(*result, "Unknown runtime control option\n");
@@ -642,6 +941,9 @@ void	zbx_rtc_dispatch(zbx_rtc_t *rtc, zbx_ipc_client_t *client, zbx_ipc_message_
 			break;
 		case ZBX_RTC_SUBSCRIBE_SERVICE:
 			rtc_subscribe_service(rtc, message->data);
+			break;
+		case ZBX_RTC_UNSUBSCRIBE_SERVICE:
+			rtc_unsubscribe_service(rtc, message->data);
 			break;
 		case ZBX_RTC_CONFIG_CACHE_RELOAD_WAIT:
 			rtc_add_control_hook(rtc, client, ZBX_RTC_CONFIG_SYNC_NOTIFY);

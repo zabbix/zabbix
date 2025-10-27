@@ -26,6 +26,11 @@ ZBX_PTR_VECTOR_IMPL(am_db_mediatype_ptr, zbx_am_db_mediatype_t *)
 ZBX_PTR_VECTOR_IMPL(am_db_alert_ptr, zbx_am_db_alert_t *)
 ZBX_PTR_VECTOR_IMPL(am_result_ptr, zbx_am_result_t *)
 
+void	zbx_am_source_stats_free(zbx_am_source_stats_t	*as)
+{
+	zbx_free(as);
+}
+
 void	zbx_am_db_mediatype_clear(zbx_am_db_mediatype_t *mediatype)
 {
 	zbx_free(mediatype->name);
@@ -240,7 +245,7 @@ void	zbx_alerter_deserialize_email(const unsigned char *data, zbx_uint64_t *aler
 	data += zbx_deserialize_str(data, password, len);
 	data += zbx_deserialize_value(data, message_format);
 	data += zbx_deserialize_str(data, expression, len);
-	data += zbx_deserialize_str(data, recovery_expression, len);
+	(void)zbx_deserialize_str(data, recovery_expression, len);
 }
 
 zbx_uint32_t	zbx_alerter_serialize_sms(unsigned char **data, zbx_uint64_t alertid,  const char *sendto,

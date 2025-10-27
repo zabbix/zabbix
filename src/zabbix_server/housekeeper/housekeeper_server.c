@@ -30,6 +30,7 @@
 #include "zbxdb.h"
 #include "zbxipcservice.h"
 #include "zbxstr.h"
+#include "trigger_housekeeper.h"
 
 #ifdef HAVE_POSTGRESQL
 #include "zbxjson.h"
@@ -72,6 +73,7 @@ typedef struct
 
 	/* a reference to the settings value specifying number of seconds the records must be kept */
 	int		*phistory;
+	char		*fk_table;
 }
 zbx_hk_rule_t;
 
@@ -112,6 +114,11 @@ zbx_hk_delete_queue_t;
 
 ZBX_PTR_VECTOR_DECL(hk_delete_queue_ptr, zbx_hk_delete_queue_t *)
 ZBX_PTR_VECTOR_IMPL(hk_delete_queue_ptr, zbx_hk_delete_queue_t *)
+
+static void	hk_delete_queue_free(zbx_hk_delete_queue_t *hdq)
+{
+	zbx_free(hdq);
+}
 
 /* this structure is used to remove old records from history (trends) tables */
 typedef struct
@@ -527,16 +534,14 @@ static void	hk_history_delete_queue_prepare_all(zbx_hk_history_rule_t *rules, in
 
 /******************************************************************************
  *                                                                            *
- * Purpose: clears the history housekeeping delete queue                      *
+ * Purpose: clears history housekeeping delete queue                          *
  *                                                                            *
- * Parameters: rule - [IN/OUT] history housekeeping rule                      *
- *             now  - [IN] current timestamp                                  *
+ * Parameters: rule - [IN] history housekeeping rule                          *
  *                                                                            *
  ******************************************************************************/
 static void	hk_history_delete_queue_clear(zbx_hk_history_rule_t *rule)
 {
-	zbx_vector_hk_delete_queue_ptr_clear_ext(&rule->delete_queue,
-			(zbx_hk_delete_queue_ptr_free_func_t)zbx_ptr_free);
+	zbx_vector_hk_delete_queue_ptr_clear_ext(&rule->delete_queue, hk_delete_queue_free);
 }
 
 /******************************************************************************
@@ -833,6 +838,18 @@ static int	housekeeping_process_rule(int now, int config_max_hk_delete, zbx_hk_r
 					break;
 			}
 
+			zbx_db_begin();
+
+			if (NULL != rule->fk_table && 0 == id_field_str_type)
+			{
+				sql_offset = 0;
+				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "delete from %s where",
+						rule->fk_table);
+				zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, rule->field_name,
+						ids_uint64.values, ids_uint64.values_num);
+				zbx_db_execute("%s", sql);
+			}
+
 			sql_offset = 0;
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "delete from %s where", rule->table);
 
@@ -853,6 +870,9 @@ static int	housekeeping_process_rule(int now, int config_max_hk_delete, zbx_hk_r
 				zbx_vector_uint64_clear(&ids_uint64);
 			else
 				zbx_vector_str_clear_ext(&ids_str, zbx_str_free);
+
+			if (ZBX_DB_OK != zbx_db_commit())
+				break;
 
 			if (ZBX_DB_OK > ret)
 				break;
@@ -987,6 +1007,40 @@ static int	hk_table_cleanup(const char *table, const char *field, zbx_uint64_t f
 	return ZBX_DB_OK <= ret ? ret : 0;
 }
 
+static int	housekeep_events_by_triggerid(zbx_uint64_t triggerid, int config_max_hk_delete, int events_mode,
+		int *more)
+{
+	char	query[MAX_STRING_LEN];
+	int	deleted = 0;
+
+	if (SUCCEED == zbx_dc_config_trigger_exists(triggerid))
+	{
+		*more = 1;
+		return 0;
+	}
+
+	zbx_snprintf(query, sizeof(query), "select eventid"
+			" from events"
+			" where source=%d"
+				" and object=%d"
+				" and objectid=" ZBX_FS_UI64 " order by eventid",
+			EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER, triggerid);
+
+	deleted = zbx_housekeep_problems_events(query, config_max_hk_delete, events_mode, more);
+
+	zbx_snprintf(query, sizeof(query), "select eventid"
+			" from events"
+			" where source=%d"
+				" and object=%d"
+				" and objectid=" ZBX_FS_UI64 " order by eventid",
+				EVENT_SOURCE_INTERNAL, EVENT_OBJECT_TRIGGER, triggerid);
+
+	deleted += zbx_housekeep_problems_events(query, config_max_hk_delete, events_mode, more);
+
+	return deleted;
+}
+
+
 /******************************************************************************
  *                                                                            *
  * Purpose: remove deleted items/triggers data                                *
@@ -1055,8 +1109,8 @@ static int	housekeeping_cleanup(int config_max_hk_delete)
 
 			if (0 == strcmp(row[2], "triggerid"))
 			{
-				deleted += hk_problem_cleanup(table_name, EVENT_SOURCE_INTERNAL, EVENT_OBJECT_TRIGGER,
-						objectid, config_max_hk_delete, &more);
+				deleted += housekeep_events_by_triggerid(objectid, config_max_hk_delete,
+						cfg.hk.events_mode, &more);
 			}
 			else if (0 == strcmp(row[2], "itemid"))
 			{
@@ -1124,7 +1178,7 @@ static int	housekeeping_sessions(int now, int config_max_hk_delete)
 static int	housekeeping_services(int now, int config_max_hk_delete)
 {
 	static zbx_hk_rule_t	rule = {"service_alarms", "servicealarmid", "", HK_MIN_CLOCK_UNDEFINED,
-			&cfg.hk.services_mode, &cfg.hk.services};
+			&cfg.hk.services_mode, &cfg.hk.services, NULL};
 
 	if (ZBX_HK_OPTION_ENABLED == cfg.hk.services_mode)
 		return housekeeping_process_rule(now, config_max_hk_delete, &rule);
@@ -1135,7 +1189,7 @@ static int	housekeeping_services(int now, int config_max_hk_delete)
 static int	housekeeping_audit(int now, int config_max_hk_delete)
 {
 	static zbx_hk_rule_t	rule = {"auditlog", "auditid", "", HK_MIN_CLOCK_UNDEFINED, &cfg.hk.audit_mode,
-			&cfg.hk.audit};
+			&cfg.hk.audit, NULL};
 
 	if (ZBX_HK_MODE_DISABLED != cfg.hk.audit_mode)
 		return housekeeping_process_rule(now, config_max_hk_delete, &rule);
@@ -1224,8 +1278,8 @@ static int	housekeeping_events(int now, int config_max_hk_delete)
 					")" \
 					" and not exists(" \
 						"select null" \
-						" from problem" \
-						" where events.eventid=problem.r_eventid" \
+						" from event_recovery" \
+						" where events.eventid=event_recovery.r_eventid" \
 					")"
 #define ZBX_HK_TRIGGER_EVENT_RULE	" and not exists(" \
 						"select null" \
@@ -1237,28 +1291,32 @@ static int	housekeeping_events(int now, int config_max_hk_delete)
 		{"events", "eventid", "events.source=" ZBX_STR(EVENT_SOURCE_TRIGGERS)
 			" and events.object=" ZBX_STR(EVENT_OBJECT_TRIGGER)
 			ZBX_HK_EVENT_RULE ZBX_HK_TRIGGER_EVENT_RULE, HK_MIN_CLOCK_ALWAYS_RECHECK,
-			&cfg.hk.events_mode, &cfg.hk.events_trigger},
+			&cfg.hk.events_mode, &cfg.hk.events_trigger, "event_recovery"},
 		{"events", "eventid", "events.source=" ZBX_STR(EVENT_SOURCE_INTERNAL)
 			" and events.object=" ZBX_STR(EVENT_OBJECT_TRIGGER)
-			ZBX_HK_EVENT_RULE, HK_MIN_CLOCK_ALWAYS_RECHECK, &cfg.hk.events_mode, &cfg.hk.events_internal},
+			ZBX_HK_EVENT_RULE, HK_MIN_CLOCK_ALWAYS_RECHECK, &cfg.hk.events_mode, &cfg.hk.events_internal,
+			"event_recovery"},
 		{"events", "eventid", "events.source=" ZBX_STR(EVENT_SOURCE_INTERNAL)
 			" and events.object=" ZBX_STR(EVENT_OBJECT_ITEM)
-			ZBX_HK_EVENT_RULE, HK_MIN_CLOCK_ALWAYS_RECHECK, &cfg.hk.events_mode, &cfg.hk.events_internal},
+			ZBX_HK_EVENT_RULE, HK_MIN_CLOCK_ALWAYS_RECHECK, &cfg.hk.events_mode, &cfg.hk.events_internal,
+			"event_recovery"},
 		{"events", "eventid", "events.source=" ZBX_STR(EVENT_SOURCE_INTERNAL)
 			" and events.object=" ZBX_STR(EVENT_OBJECT_LLDRULE)
-			ZBX_HK_EVENT_RULE, HK_MIN_CLOCK_ALWAYS_RECHECK, &cfg.hk.events_mode, &cfg.hk.events_internal},
+			ZBX_HK_EVENT_RULE, HK_MIN_CLOCK_ALWAYS_RECHECK, &cfg.hk.events_mode, &cfg.hk.events_internal,
+			"event_recovery"},
 		{"events", "eventid", "events.source=" ZBX_STR(EVENT_SOURCE_DISCOVERY)
 			" and events.object=" ZBX_STR(EVENT_OBJECT_DHOST), HK_MIN_CLOCK_UNDEFINED, &cfg.hk.events_mode,
-			&cfg.hk.events_discovery},
+			&cfg.hk.events_discovery, NULL},
 		{"events", "eventid", "events.source=" ZBX_STR(EVENT_SOURCE_DISCOVERY)
 			" and events.object=" ZBX_STR(EVENT_OBJECT_DSERVICE), HK_MIN_CLOCK_UNDEFINED,
-			&cfg.hk.events_mode, &cfg.hk.events_discovery},
+			&cfg.hk.events_mode, &cfg.hk.events_discovery, NULL},
 		{"events", "eventid", "events.source=" ZBX_STR(EVENT_SOURCE_AUTOREGISTRATION)
 			" and events.object=" ZBX_STR(EVENT_OBJECT_ZABBIX_ACTIVE), HK_MIN_CLOCK_UNDEFINED,
-			&cfg.hk.events_mode, &cfg.hk.events_autoreg},
+			&cfg.hk.events_mode, &cfg.hk.events_autoreg, NULL},
 		{"events", "eventid", "events.source=" ZBX_STR(EVENT_SOURCE_SERVICE)
 			" and events.object=" ZBX_STR(EVENT_OBJECT_SERVICE)
-			ZBX_HK_EVENT_RULE, HK_MIN_CLOCK_ALWAYS_RECHECK, &cfg.hk.events_mode, &cfg.hk.events_service},
+			ZBX_HK_EVENT_RULE, HK_MIN_CLOCK_ALWAYS_RECHECK, &cfg.hk.events_mode, &cfg.hk.events_service,
+			"event_recovery"},
 		{0}
 	};
 

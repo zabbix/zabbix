@@ -408,10 +408,14 @@ class CIntegrationTest extends CAPITest {
 		}
 
 		$failed_pids = [];
+		$failed_kills = [];
 
 		foreach ($child_pids as $child_pid) {
 			if (ctype_digit($child_pid) && posix_kill($child_pid, 0)) {
-				posix_kill($child_pid, SIGKILL);
+				if (!posix_kill($child_pid, SIGKILL)) {
+					$error_code = posix_get_last_error();
+					$failed_kills[] = ' - '.$child_pid.' ('.$error_code.') '.posix_strerror($error_code);
+				}
 				$failed_pids[] = $child_pid;
 			}
 		}
@@ -421,9 +425,12 @@ class CIntegrationTest extends CAPITest {
 		}
 
 		$log = CLogHelper::readLog(self::getLogPath($component), false, true);
+		$failed_kills = $failed_kills
+			? "\n".'The following processes could not be terminated using SIGKILL:'."\n".implode("\n", $failed_kills)
+			: '';
 
 		throw new Exception('Multiple child processes for component "'.$component.'" did not stop gracefully:'."\n".
-			implode(', ', $failed_pids)."\n".
+			implode(', ', $failed_pids).$failed_kills."\n".
 			'Log file contents: '."\n".$log."\n");
 	}
 
@@ -616,8 +623,15 @@ class CIntegrationTest extends CAPITest {
 			$bin_path = PHPUNIT_BINARY_DIR.'zabbix_'.$component;
 		}
 
-		self::executeCommand($bin_path, ['-c', $config], $background);
-		self::waitForStartup($component, $waitLogLineOverride, $skip_pid);
+		if (defined('PHPUNIT_SERVER_GDBSERVER_DEBUG') && $component === self::COMPONENT_SERVER) {
+			fwrite(STDERR, "Starting server debug session: ".PHPUNIT_SERVER_GDBSERVER_DEBUG." $bin_path\n");
+			self::executeCommand(PHPUNIT_SERVER_GDBSERVER_DEBUG, [$bin_path, '-f', '-c', $config], true);
+			fwrite(STDOUT, "Press ENTER to continue ...");
+			fgets(STDIN);
+		} else {
+			self::executeCommand($bin_path, ['-c', $config], $background);
+			self::waitForStartup($component, $waitLogLineOverride, $skip_pid);
+		}
 	}
 
 	/**

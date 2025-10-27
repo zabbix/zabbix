@@ -1,0 +1,52 @@
+#!/bin/bash
+
+if [ -z "$CC" ]
+then
+	CC=clang
+fi
+
+
+if [ -z "$CFLAGS" ]
+then
+	CFLAGS="-std=gnu99"
+	CFLAGS+=" -O0 -ggdb3"
+	CFLAGS+=" -Wall"
+	CFLAGS+=" -Wextra"
+	CFLAGS+=" -Winit-self"
+	CFLAGS+=" -Wmissing-declarations"
+	CFLAGS+=" -Wmissing-prototypes"
+	CFLAGS+=" -Wmissing-field-initializers"
+	CFLAGS+=" -Wredundant-decls"
+	CFLAGS+=" -Wdangling-else"
+	CFLAGS+=" -Wshadow"
+	CFLAGS+=" -Wnested-externs"
+	CFLAGS+=" -Wunused"
+	CFLAGS+=" -Wunused-parameter"
+	CFLAGS+=" -Wfloat-conversion"
+	CFLAGS+=" -Wincompatible-pointer-types"
+	CFLAGS+=" -Wnull-dereference"
+	CFLAGS+=" -Wpointer-arith"
+	CFLAGS+=" -Wno-null-pointer-subtraction"
+	CFLAGS+=" -Wno-overlength-strings"
+	CFLAGS+=" -Wunreachable-code"
+	CFLAGS+=" -Wformat"
+	CFLAGS+=" -Wformat-extra-args"
+	CFLAGS+=" -Wold-style-definition"
+	CFLAGS+=" -Wunused-result"
+	CFLAGS+=" -Wmisleading-indentation"
+	CFLAGS+=" -Wimplicit-function-declaration"
+	CFLAGS+=" -Wendif-labels"
+	CFLAGS+=" -Winvalid-pch"
+	CFLAGS+=" -Wformat-security"
+	CFLAGS+=" -Wcast-function-type"
+	CFLAGS+=" -fstrict-aliasing"
+
+
+	# flags for clang
+	CFLAGS+=" -Wno-uninitialized"
+
+
+	# flags for 'all build'
+	CFLAGS+=" -Wcast-align"
+
+fi

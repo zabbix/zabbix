@@ -1,0 +1,389 @@
+$theme-name: 'dark-classic';
+
+// Notification & Alert.
+$red: #e45959;
+$lighter-red: #433131;
+
+$error: #ff5555;
+$error-focus: #ff9b9b;
+
+$dark-yellow: #e99003;
+$yellow: #a78820;
+$lighter-yellow: #2f280a;
+
+$green: #59db8f;
+$lighter-green: #32453a;
+
+$blue: #429ae3;
+
+$disabled-bg-color: #2b2b2b;
+$disabled-item-color: #808080;
+$disabled-item-bg-color: #383838;
+
+$progress-complete-color: #69818d;
+$progress-current-color: #4f4f4f;
+$progress-default-color: #3d3d3d;
+
+// Layout
+$header-bg-color: #2b2b2b;
+
+$sidebar-color: #9c9c9c;
+$sidebar-bg-color: #454545;
+
+// Main
+$font-color: #f2f2f2;
+$font-selected-color: #f2f2f2;
+$font-alt-color: #737373;
+$body-bg-color: #0e1012;
+$overlay-bg-color: #000000;
+$overlay-border-color: #383838;
+
+// Main menu
+$menu-main-color: #f2f2f2;
+
+$menu-main-hover-bg-color: #0e0e0e;
+
+$menu-main-selected-bg-color: #202020;
+$menu-main-selected-border-color: #c5c5c5;
+
+$menu-main-expanded-bg-color: #0d0d0d;
+
+$menu-main-submenu-color: #f2f2f2;
+$menu-main-submenu-bg-color: #2b2b2b;
+$menu-main-submenu-border-color: #0d0f11;
+$menu-main-submenu-hover-bg-color: #0e0e0e;
+$menu-main-submenu-selected-bg-color: #1c1c1c;
+$menu-main-submenu-selected-border-color: #c5c5c5;
+$menu-main-submenu-next-level-bg: #454545 !default;
+$menu-main-submenu-next-level-shadow: rgba(#2b2b2b, .35) !default;
+
+// UI
+$ui-bg-color: #2b2b2b;
+$ui-bg-selected-color: #4f4f4f;
+$ui-hover-bg-color: #383838;
+$ui-border-color: #303030;
+$ui-placeholder-background-color: darken($ui-hover-bg-color, 15%);
+$ui-highlighted-parent-background-color: darken($ui-hover-bg-color, 10%);
+
+$action-hover-color: #454545;
+$action-border-color: #383838;
+$action-shadow-color: rgba(0, 0, 0, .5);
+
+$table-border-color: #383838;
+
+$ui-tab-bg-selected-color: #69808d;
+
+// Forms
+$form-font-color: #e1e3ed;
+$form-bg-color: #383838;
+$form-dark-bg-color: #383838;
+$form-darker-bg-color: #383838;
+$form-border-color: #4f4f4f;
+$form-focus-border-color: #768d99;
+$form-fields-group-border-color: #383838;
+$form-field-hint-color: #737373;
+$form-radio-selected-color: #69818d;
+$form-description-border-color: #69818d;
+
+$form-disabled-font-color: #525252;
+$form-disabled-bg-color: #2b2b2b;
+$form-disabled-border-color: #3d3d3d;
+
+$form-search-icon-color: #b1b1b1;
+
+$scrollbar-track-color: #1f1f1f;
+$scrollbar-thumb-color: #383838;
+
+$input-disabled-placeholder-color: #404040;
+
+$form-radio-list-checked-color: $action-hover-color;
+
+// Search form
+$form-search-bg-color: #191919;
+
+// Buttons
+$btn-color: #f2f2f2;
+$btn-bg-color: #69808d;
+$btn-hover-bg-color: #5e737e;
+
+$btn-alt-color: #768d99;
+$btn-alt-bg-color: transparent;
+
+$btn-form-hover-bg-color: #414141;
+
+$btn-disabled-color: #525252;
+$btn-disabled-bg-color: transparent;
+$btn-disabled-border-color: #3d3d3d;
+
+$btn-back-map-background-color: rgba(0, 0, 0, .8);
+$btn-back-text-color: #ffffff;
+$btn-back-background-hover: #768d99;
+
+// Links
+$link-color: #4796c4;
+$link-hover-color: #4796c4;
+$link-active-color: #4796c4;
+$link-visited-color: #4796c4;
+
+// Icons
+$icon-color: #69808d;
+
+$btn-icon-color: $icon-color;
+$btn-icon-hover-color: lighten($icon-color, 20%);
+$btn-icon-disabled-color: darken($icon-color, 20%);
+
+// Error messages
+$msg-bad-btn-color: $font-color;
+
+// Analog clock
+$clock-face-color: #383838;
+$clock-hand-color: #f2f2f2;
+$clock-hand-sec-color: #69808d;
+$clock-lines-color: #4f4f4f;
+
+// Gauge arcs
+$gauge-empty-color: #383838;
+$gauge-fill-color: #69808d;
+$gauge-needle-fill-color: #f2f2f2;
+$gauge-needle-stroke-color: #f2f2f2;
+
+// Pie chart.
+$pie-chart-arc-no-data-color: #383838;
+
+// Honeycomb.
+$honeycomb-cell-color: #3d5059;
+$honeycomb-no-data-cell-color: #383838;
+$honeycomb-label-color: #eeeeee;
+$honeycomb-no-data-label-color: #eeeeee;
+
+// Map.
+$map-hover-fill-color: #3a3a3a;
+$map-selected-fill-color: #4a4a4a;
+$map-selected-stroke-color: #383838;
+
+// Geomap.
+$geomap-marker-hover-fill: #3a3a3a;
+$geomap-marker-selected-fill: #4a4a4a;
+$geomap-marker-selected-stroke: #383838;
+
+// Statuses
+$problem-unack-fg-color: #ff3333;
+$problem-ack-fg-color: #ff3333;
+$ok-unack-fg-color: #00ff00;
+$ok-ack-fg-color: #00ff00;
+
+$status-border-color: rgba(#2b2b2b, .2);
+$status-disabled-border-color: rgba(#f2f2f2, .2);
+
+$status-grey-border-color: #3d3d3d;
+
+// Multiselect
+$multiselect-selected-bg-color: #696969;
+
+// List table.
+$compact-view-color: #000000;
+$compact-view-tag-color: #ffffff;
+$compact-view-tag-bg-color: $ui-bg-selected-color;
+
+// Import compare.
+$toc-title-color: #f2f2f2;
+$toc-title-bg-color: #4f4f4f;
+
+// Important! @import string should come after variables
+@import 'screen';
+
+[theme="dark-classic-theme"] {
+	--font-stack: Arial, Tahoma, Verdana, sans-serif;
+}
+
+.timeline-axis {
+	border-right-color: darken(desaturate($btn-bg-color, 4%), 18%) !important;
+
+	&::before {
+		background-color: darken(desaturate($btn-bg-color, 4%), 18%) !important;
+	}
+}
+
+.sidebar {
+	&.is-compact:not(.is-opened) {
+		.form-search {
+			.search-icon {
+				opacity: .75;
+			}
+		}
+	}
+}
+
+// Tables.
+.list-table {
+	thead th {
+		border-color: lighten($table-border-color, 3%);
+	}
+
+	&.compact-view {
+		tr {
+			&:hover {
+				td {
+					&.na-bg,
+					&.info-bg,
+					&.warning-bg,
+					&.average-bg,
+					&.high-bg,
+					&.disaster-bg {
+						color: #000000;
+					}
+				}
+			}
+
+			&[class*='flh-'] {
+				td {
+					box-shadow: inset 0 -1px 0 0 rgba(0, 0, 0, .1);
+				}
+			}
+		}
+
+		td {
+			&.na-bg,
+			&.info-bg,
+			&.warning-bg,
+			&.average-bg,
+			&.high-bg,
+			&.disaster-bg {
+				color: #000000;
+				box-shadow: inset 0 -1px 0 0 rgba(0, 0, 0, .1);
+			}
+		}
+	}
+
+	&.sticky-footer {
+		tfoot tr:first-of-type td {
+			border-color: lighten($table-border-color, 3%);
+		}
+	}
+}
+
+.dashboard-navigation-tabs {
+	.sortable {
+		li div:hover,
+		li.sortable-item-dragging div {
+			border: 1px solid transparent;
+		}
+	}
+}
+
+// Dashboard, widgets and iterators.
+// To maintain code clarity:
+//   - Do not mix rules for dashboard view mode and dashboard edit mode.
+//   - Do not mix rules for widgets and iterators.
+
+.dashboard-grid-widget {
+	&.dashboard-grid-widget-hidden-header {
+		&.dashboard-grid-widget-focus {
+			.dashboard-grid-widget-header {
+				box-shadow: 0 -6px 8px -2px rgba(0, 0, 0, .5);
+			}
+		}
+	}
+}
+
+.dashboard-grid-iterator {
+	&.dashboard-grid-iterator-focus {
+		.dashboard-grid-iterator-header {
+			box-shadow: 0 -6px 8px -2px rgba(0, 0, 0, .5);
+		}
+	}
+}
+
+.dashboard.dashboard-is-edit-mode {
+	.dashboard-grid-widget {
+		&.ui-draggable-dragging {
+			&.dashboard-grid-widget-hidden-header {
+				.dashboard-grid-widget-header {
+					box-shadow: 0 -6px 8px -2px rgba(0, 0, 0, .5);
+				}
+			}
+		}
+
+		&.ui-resizable-resizing,
+		&.ui-draggable-dragging {
+			&::before {
+				box-shadow: 0 4px 20px 2px rgba(0, 0, 0, .5);
+			}
+
+			.dashboard-grid-widget-header {
+				border-color: $ui-border-color;
+			}
+
+			.dashboard-grid-widget-contents {
+				border-color: $ui-border-color;
+			}
+		}
+	}
+
+	.dashboard-grid-iterator {
+		&.ui-draggable-dragging {
+			.dashboard-grid-iterator-header {
+				box-shadow: 0 -6px 8px -2px rgba(0, 0, 0, .5);
+			}
+		}
+
+		&.ui-resizable-resizing,
+		&.ui-draggable-dragging {
+			&::before {
+				box-shadow: 0 4px 20px 2px rgba(0, 0, 0, .5);
+			}
+
+			.dashboard-grid-iterator-header {
+				border-color: $ui-border-color;
+			}
+
+			.dashboard-grid-iterator-contents {
+				.dashboard-grid-widget {
+					.dashboard-grid-widget-header {
+						border-color: $ui-border-color;
+					}
+
+					.dashboard-grid-widget-contents {
+						border-color: $ui-border-color;
+					}
+				}
+
+				.dashboard-grid-iterator-placeholder > div {
+					border-color: $ui-border-color;
+				}
+			}
+
+			.dashboard-grid-iterator-mask {
+				border: 0;
+			}
+		}
+	}
+
+	.dashboard-grid-widget-placeholder > div {
+		background-color: darken($ui-bg-color, 3%);
+	}
+}
+
+.time-quick {
+	li {
+		a {
+			&:focus {
+				color: $white;
+			}
+		}
+	}
+}
+
+.totals-list {
+	color: darken($font-color, 85%);
+}
+
+.breadcrumbs {
+	&>::after {
+		content: " /";
+	}
+
+	&>:last-child::after {
+		content: "";
+	}
+}

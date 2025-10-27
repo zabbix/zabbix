@@ -14,7 +14,6 @@
 
 #include "zbxpreproc.h"
 #include "zbxdiag.h"
-#include "zbxalgo.h"
 #include "zbxtime.h"
 #include "zbxjson.h"
 
@@ -44,6 +43,11 @@ static void	diag_add_preproc_sequences(struct zbx_json *json, const char *field,
 	}
 
 	zbx_json_close(json);
+}
+
+void	zbx_pp_top_stats_free(zbx_pp_top_stats_t *pts)
+{
+	zbx_free(pts);
 }
 
 /******************************************************************************
@@ -78,12 +82,13 @@ int	zbx_diag_add_preproc_info(const struct zbx_json_parse *jp, struct zbx_json *
 		if (0 != (fields & ZBX_DIAG_PREPROC_SIMPLE))
 		{
 			zbx_uint64_t	preproc_num, pending_num, finished_num, sequences_num, queued_num, queued_sz,
-					direct_num, direct_sz, history_sz;
+					direct_num, direct_sz, history_sz, finished_peak_num, pending_peak_num,
+					processed_num;
 
 			time1 = zbx_time();
 			if (FAIL == (ret = zbx_preprocessor_get_diag_stats(&preproc_num, &pending_num, &finished_num,
 					&sequences_num, &queued_num, &queued_sz, &direct_num, &direct_sz,
-					&history_sz, error)))
+					&history_sz, &finished_peak_num, &pending_peak_num, &processed_num, error)))
 			{
 				goto out;
 			}
@@ -97,11 +102,14 @@ int	zbx_diag_add_preproc_info(const struct zbx_json_parse *jp, struct zbx_json *
 				zbx_json_adduint64(json, "pending tasks", pending_num);
 				zbx_json_adduint64(json, "finished tasks", finished_num);
 				zbx_json_adduint64(json, "task sequences", sequences_num);
+				zbx_json_adduint64(json, "finished count", processed_num);
 				zbx_json_adduint64(json, "queued count", queued_num);
 				zbx_json_adduint64(json, "queued size", queued_sz);
 				zbx_json_adduint64(json, "direct count", direct_num);
 				zbx_json_adduint64(json, "direct size", direct_sz);
 				zbx_json_adduint64(json, "history size", history_sz);
+				zbx_json_adduint64(json, "pending tasks peak", pending_peak_num);
+				zbx_json_adduint64(json, "finished tasks peak", finished_peak_num);
 			}
 		}
 
@@ -170,8 +178,7 @@ int	zbx_diag_add_preproc_info(const struct zbx_json_parse *jp, struct zbx_json *
 
 				diag_add_preproc_sequences(json, map->name, name, &stats);
 
-				zbx_vector_pp_top_stats_ptr_clear_ext(&stats,
-						(zbx_pp_top_stats_ptr_free_func_t)(zbx_ptr_free));
+				zbx_vector_pp_top_stats_ptr_clear_ext(&stats, zbx_pp_top_stats_free);
 				zbx_vector_pp_top_stats_ptr_destroy(&stats);
 			}
 

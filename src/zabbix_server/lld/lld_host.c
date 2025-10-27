@@ -16,7 +16,6 @@
 
 #include "../db_lengths_constants.h"
 
-#include "zbxexpression.h"
 #include "zbx_availability_constants.h"
 #include "audit/zbxaudit.h"
 #include "audit/zbxaudit_host.h"
@@ -6446,7 +6445,7 @@ static void	lld_host_process_nested_lld_rules(const zbx_vector_lld_host_ptr_t *h
 
 		ZBX_STR2UINT64(itemid, row[1]);
 
-		lld_rule_process_nested_rule(host_local.hostid, itemid, hosts->values[index]->lld_row);
+		lld_rule_process_nested_rule(itemid, hosts->values[index]->lld_row);
 	}
 	zbx_db_free_result(result);
 out:

@@ -18,7 +18,6 @@
 #include "zbxcacheconfig.h"
 #include "zbxicmpping.h"
 #include "zbxdiscovery.h"
-#include "zbxexpression.h"
 #include "zbxself.h"
 #include "zbxrtc.h"
 #include "zbxnix.h"
@@ -41,6 +40,7 @@
 #include "zbxipcservice.h"
 #include "zbxstr.h"
 #include "zbxthreads.h"
+#include "zbxcalc.h"
 
 #ifdef HAVE_NETSNMP
 #	include "zbxpoller.h"
@@ -297,16 +297,32 @@ static int	process_services(void *handle, zbx_uint64_t druleid, zbx_db_dhost *dh
 		zbx_discovery_update_service_down_func_t discovery_update_service_down_cb,
 		zbx_discovery_find_host_func_t discovery_find_host_cb)
 {
-	int			host_status = -1;
-	zbx_vector_uint64_t	dserviceids;
+	int				host_status = -1, unique_index;
+	zbx_vector_uint64_t		dserviceids;
+	zbx_discoverer_dservice_t	unique_service;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	zbx_vector_uint64_create(&dserviceids);
+	unique_service.dcheckid = unique_dcheckid;
+
+	if (FAIL != (unique_index = zbx_vector_discoverer_services_ptr_search(services, &unique_service,
+			ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
+	{
+		zbx_discoverer_dservice_t	*service = services->values[unique_index];
+
+		host_status = service->status;
+		discovery_update_service_cb(handle, druleid, service->dcheckid, unique_dcheckid, dhost,
+				ip, dns, service->port, service->status, service->value, now, &dserviceids,
+				add_event_cb);
+	}
 
 	for (int i = 0; i < services->values_num; i++)
 	{
-		zbx_discoverer_dservice_t	*service = (zbx_discoverer_dservice_t *)services->values[i];
+		if (i == unique_index)
+			continue;
+
+		zbx_discoverer_dservice_t	*service = services->values[i];
 
 		if ((-1 == host_status || DOBJECT_STATUS_UP == service->status) && host_status != service->status)
 			host_status = service->status;
@@ -314,7 +330,6 @@ static int	process_services(void *handle, zbx_uint64_t druleid, zbx_db_dhost *dh
 		discovery_update_service_cb(handle, druleid, service->dcheckid, unique_dcheckid, dhost,
 				ip, dns, service->port, service->status, service->value, now, &dserviceids,
 				add_event_cb);
-
 	}
 
 	if (0 == services->values_num)
@@ -1211,25 +1226,16 @@ int	dcheck_is_async(zbx_ds_dcheck_t *ds_dcheck)
 static void	*discoverer_worker_entry(void *net_check_worker)
 {
 	int			err;
-	sigset_t		mask;
 	zbx_discoverer_worker_t	*worker = (zbx_discoverer_worker_t*)net_check_worker;
 	zbx_discoverer_queue_t	*queue = worker->queue;
 
+	log_worker_id = worker->worker_id;
+
+	if (0 != (err = zbx_init_thread_signal_handler()))
+		zabbix_log(LOG_LEVEL_WARNING, "cannot block signals: %s", zbx_strerror(err));
+
 	zabbix_log(LOG_LEVEL_INFORMATION, "thread started [%s #%d]",
 			get_process_type_string(ZBX_PROCESS_TYPE_DISCOVERER), worker->worker_id);
-
-	log_worker_id = worker->worker_id;
-	sigemptyset(&mask);
-	sigaddset(&mask, SIGQUIT);
-	sigaddset(&mask, SIGALRM);
-	sigaddset(&mask, SIGTERM);
-	sigaddset(&mask, SIGUSR1);
-	sigaddset(&mask, SIGUSR2);
-	sigaddset(&mask, SIGHUP);
-	sigaddset(&mask, SIGINT);
-
-	if (0 > (err = pthread_sigmask(SIG_BLOCK, &mask, NULL)))
-		zabbix_log(LOG_LEVEL_WARNING, "cannot block the signals: %s", zbx_strerror(err));
 
 	zbx_init_icmpping_env(get_process_type_string(ZBX_PROCESS_TYPE_DISCOVERER), worker->worker_id);
 	worker->stop = 0;
@@ -1499,6 +1505,9 @@ static int	discoverer_manager_init(zbx_discoverer_manager_t *manager, zbx_thread
 	manager->workers_num = args_in->workers_num;
 	manager->workers = (zbx_discoverer_worker_t*)zbx_calloc(NULL, (size_t)args_in->workers_num,
 			sizeof(zbx_discoverer_worker_t));
+	sigset_t	orig_mask;
+
+	zbx_block_thread_signals(&orig_mask);
 
 	for (i = 0; i < args_in->workers_num; i++)
 	{
@@ -1545,6 +1554,8 @@ out:
 		zbx_timekeeper_free(manager->timekeeper);
 		discoverer_libs_destroy();
 	}
+
+	zbx_unblock_signals(&orig_mask);
 
 	return ret;
 
@@ -1855,6 +1866,10 @@ ZBX_THREAD_ENTRY(zbx_discoverer_thread, args)
 	}
 
 	zbx_setproctitle("%s #%d [terminating]", get_process_type_string(info->process_type), info->process_num);
+
+	/* on normal exit the shutdown message already has been processed and no more messages will be sent */
+	if (SUCCEED != ZBX_EXIT_STATUS())
+		zbx_rtc_unsubscribe_service(discoverer_args_in->config_timeout, ZBX_IPC_SERVICE_DISCOVERER);
 
 	zbx_vector_uint64_pair_destroy(&revisions);
 	zbx_vector_uint64_destroy(&del_druleids);

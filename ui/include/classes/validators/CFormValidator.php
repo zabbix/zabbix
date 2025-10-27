@@ -132,6 +132,31 @@ class CFormValidator {
 							throw new Exception('[RULES ERROR] Unknown field type in db schema (Path: '.$rule_path.')');
 					}
 				}
+				elseif (strncmp($value, 'setting ', 8) === 0) {
+					if (array_key_exists('type', $result)) {
+						throw new Exception('[RULES ERROR] Rule "type" is specified multiple times (Path: '.$rule_path.')');
+					}
+
+					$db_field = substr($value, 8);
+
+					if (CSettingsSchema::getDbType($db_field) & DB::FIELD_TYPE_CHAR) {
+						if (array_key_exists('length', $result)) {
+							throw new Exception('[RULES ERROR] Rule "length" is specified multiple times (Path: '.$rule_path.')');
+						}
+
+						$result['type'] = 'string';
+						$result['length'] = CSettingsSchema::getFieldLength($db_field);
+					}
+					elseif (CSettingsSchema::getDbType($db_field) & (DB::FIELD_TYPE_ID)) {
+						$result['type'] = 'id';
+					}
+					elseif (CSettingsSchema::getDbType($db_field) & (DB::FIELD_TYPE_INT)) {
+						$result['type'] = 'integer';
+					}
+					else {
+						throw new Exception('[RULES ERROR] Unknown field type in db schema (Path: '.$rule_path.')');
+					}
+				}
 				elseif (strncmp($value, 'in ', 3) === 0) {
 					if (array_key_exists('in', $result) || array_key_exists('not_in', $result)) {
 						throw new Exception('[RULES ERROR] Rule "in" or "not_in" is specified multiple times (Path: '.$rule_path.')');
@@ -230,6 +255,9 @@ class CFormValidator {
 						}
 
 						foreach ($value as &$api_uniq_check) {
+							if (count(explode('.', $api_uniq_check[0])) !== 2) {
+								throw new Exception('[RULES ERROR] Rule "'.$key.'" should contain a valid API call (Path: '.$rule_path.', API call:'.$api_uniq_check[0].')');
+							}
 							$api_uniq_check += [1 => [], 2 => null, 3 => null];
 						}
 						unset($api_uniq_check);
@@ -1216,9 +1244,43 @@ class CFormValidator {
 		return true;
 	}
 
+	/**
+	 * Check via API if item exists, excluding provided id. Used for unique checks
+	 *
+	 * @param string $api
+	 * @param array $options
+	 * @param string|null $exclude_primary_id
+	 * @return bool
+	 */
+	public static function existsAPIObject(string $api, array $options, ?string $exclude_primary_id = null): bool {
+		$options['preservekeys'] = true;
+		$auth = [
+			'type' => CJsonRpc::AUTH_TYPE_COOKIE,
+			'auth' => CWebUser::$data['sessionid']
+		];
+
+		$response = API::getWrapper()->getClient()->callMethod($api, 'get', $options, $auth);
+
+		if ($response->errorCode) {
+			throw new Exception($response->errorMessage);
+		}
+
+		$result = $response->data;
+
+		if ($result) {
+			$matches = array_diff(array_keys($result), [$exclude_primary_id]);
+
+			if (count($matches) > 0) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
 	private function validateApiUniq(array $check, string &$path, ?string &$error = null): bool {
 		[$method, $parameters, $exclude_id] = $check;
-		[$api, $method] = explode('.', $method);
+		[$api] = explode('.', $method);
 
 		$field_path = null;
 
@@ -1243,34 +1305,17 @@ class CFormValidator {
 			return true;
 		}
 
-		$parameters = [
-			'output' => [],
-			'filter' => $parameters,
-			'preservekeys' => true
-		];
-
-		$auth = [
-			'type' => CJsonRpc::AUTH_TYPE_COOKIE,
-			'auth' => CWebUser::$data['sessionid']
-		];
-
-		$response = API::getWrapper()->getClient()->callMethod($api, $method, $parameters, $auth);
-
-		if ($response->errorCode) {
-			throw new Exception($response->errorMessage);
-		}
-
-		$result = $response->data;
-
 		if ($exclude_id !== null) {
 			$exclude_id_field_data = $this->getWhenFieldValue($exclude_id, $path);
 
-			if ($exclude_id_field_data['type'] === 'id') {
-				unset($result[$exclude_id_field_data['value']]);
-			}
+			$exclude_id = $exclude_id_field_data['type'] === 'id' ? $exclude_id_field_data['value'] : null;
 		}
 
-		if (count($result)) {
+		$parameters = [
+			'filter' => $parameters
+		];
+
+		if (self::existsAPIObject($api, $parameters, $exclude_id)) {
 			$error = _('This object already exists.');
 
 			if ($path === '') {

@@ -75,6 +75,7 @@ typedef struct
 	char		error[ZBX_INTERFACE_ERROR_LEN_MAX];
 	int		errors_from;
 	int		version;
+	zbx_uint64_t	revision;
 }
 zbx_dc_interface_t;
 
@@ -203,7 +204,7 @@ typedef struct
 	char			ssl_key_file_orig[ZBX_ITEM_SSL_KEY_FILE_LEN_MAX], *ssl_key_file;
 	char			ssl_key_password_orig[ZBX_ITEM_SSL_KEY_PASSWORD_LEN_MAX], *ssl_key_password;
 	zbx_vector_ptr_pair_t 	script_params;
-	char			*error;
+	char			error_hash[ZBX_SHA512_BINARY_LENGTH];
 	unsigned char		*formula_bin;
 	int			snmp_max_repetitions;
 	unsigned char		preprocessing;
@@ -232,7 +233,7 @@ typedef struct
 	zbx_uint64_t		valuemapid;
 	char			key_orig[ZBX_ITEM_KEY_LEN * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1];
 	char			*units;
-	char			*error;
+	char			error_hash[ZBX_SHA512_BINARY_LENGTH];
 	char			*history_period, *trends_period;
 	int			mtime;
 	int			history_sec;
@@ -387,6 +388,8 @@ typedef struct
 #endif
 	char				allowed_addresses[ZBX_HOST_PROXY_ADDRESS_LEN_MAX];
 	time_t				last_version_error_time;
+
+	int				pending_history;
 }
 zbx_dc_proxy_t;
 
@@ -429,16 +432,6 @@ typedef struct
 zbx_host_key_t;
 
 ZBX_VECTOR_DECL(host_key, zbx_host_key_t)
-
-/* type of value in settings table */
-#define ZBX_SETTING_TYPE_STR			1
-#define ZBX_SETTING_TYPE_INT			2
-#define ZBX_SETTING_TYPE_USRGRPID		3
-#define ZBX_SETTING_TYPE_HOSTGROUPID		4
-#define ZBX_SETTING_TYPE_USRDIRID		5
-#define ZBX_SETTING_TYPE_MFAID			6
-
-#define ZBX_SETTING_TYPE_MAX			7
 
 typedef struct
 {
@@ -853,6 +846,7 @@ void	zbx_dc_config_get_hosts_by_itemids(zbx_dc_host_t *hosts, const zbx_uint64_t
 void	zbx_dc_config_get_hosts_by_hostids(zbx_dc_host_t *hosts, const zbx_uint64_t *hostids, int *errcodes, int num);
 void	zbx_dc_config_get_items_by_keys(zbx_dc_item_t *items, zbx_host_key_t *keys, int *errcodes, size_t num);
 void	zbx_dc_config_get_items_by_itemids(zbx_dc_item_t *items, const zbx_uint64_t *itemids, int *errcodes, size_t num);
+void	zbx_dc_config_get_hostid_by_itemid(zbx_vector_uint64_t *hostids, zbx_uint64_t itemid);
 
 void	zbx_dc_config_history_sync_get_items_by_itemids(zbx_history_sync_item_t *items, const zbx_uint64_t *itemids,
 		int *errcodes, size_t num, unsigned int mode);
@@ -946,7 +940,8 @@ int	zbx_dc_config_get_snmp_interfaceids_by_addr(const char *addr, zbx_uint64_t *
 size_t	zbx_dc_config_get_snmp_items_by_interfaceid(zbx_uint64_t interfaceid, zbx_dc_item_t **items);
 
 void	zbx_dc_config_update_autoreg_host(const char *host, const char *listen_ip, const char *listen_dns,
-		unsigned short listen_port, const char *host_metadata, zbx_conn_flags_t flags, int now);
+		unsigned short listen_port, const char *host_metadata, zbx_conn_flags_t flags,
+		unsigned int connection_type, int now);
 void	zbx_dc_config_delete_autoreg_host(const zbx_vector_str_t *autoreg_hosts);
 
 #define ZBX_HK_OPTION_DISABLED		0
@@ -999,15 +994,27 @@ void	zbx_dc_requeue_proxy(zbx_uint64_t proxyid, unsigned char update_nextcheck, 
 		int proxyconfig_frequency, int proxydata_frequency);
 int	zbx_dc_check_host_conn_permissions(const char *host, const zbx_socket_t *sock, zbx_uint64_t *hostid,
 		unsigned char *status, unsigned char *monitored_by, zbx_uint64_t *revision,
-		zbx_comms_redirect_t *redirect, char **error);
+		zbx_comms_redirect_t *redirect, int change_flags, char **error);
+
+#define	ZBX_AUTOREG_NO_CHANGES			0x00
+#define	ZBX_AUTOREG_NOT_FOUND			0x01
+#define	ZBX_AUTOREG_CHANGED_HOST_METADATA	0x02
+#define	ZBX_AUTOREG_CHANGED_FLAGS		0x04
+#define	ZBX_AUTOREG_CHANGED_INTERFACE_IP	0x08
+#define	ZBX_AUTOREG_CHANGED_INTERFACE_DNS	0x10
+#define	ZBX_AUTOREG_CHANGED_HEARTBEAT		0x20
+#define	ZBX_AUTOREG_CHANGED_CONNECTION_TYPE	0x40
 int	zbx_dc_is_autoreg_host_changed(const char *host, unsigned short port, const char *host_metadata,
-		zbx_conn_flags_t flag, const char *interface, int now);
+		zbx_conn_flags_t flag, const char *interface, unsigned int connection_type, int now);
 
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 size_t	zbx_dc_get_psk_by_identity(const unsigned char *psk_identity, unsigned char *psk_buf, unsigned int *psk_usage);
 #endif
 void	zbx_dc_get_autoregistration_psk(char *psk_identity_buf, size_t psk_identity_buf_len,
 		unsigned char *psk_buf, size_t psk_buf_len);
+
+#define ZBX_PROXY_PENDING_HISTORY_NO	0
+#define ZBX_PROXY_PENDING_HISTORY_YES	1
 
 #define ZBX_MACRO_ENV_SECURE	0
 #define ZBX_MACRO_ENV_NONSECURE	1
@@ -1581,6 +1588,7 @@ int	zbx_dc_sync_lock(void);
 void	zbx_dc_sync_unlock(void);
 
 int	zbx_dc_get_proxy_version(zbx_uint64_t proxyid);
+void	zbx_dc_update_proxy_pending_history(zbx_dc_proxy_t *proxy, int flag);
 
 int	zbx_macro_field_params_resolv(zbx_macro_resolv_data_t *p, va_list args, char **replace_to, char **data,
 		char *error, size_t maxerrlen);
@@ -1593,5 +1601,7 @@ int	zbx_macro_query_filter_resolv(zbx_macro_resolv_data_t *p, va_list args, char
 
 int	zbx_item_key_subst_cb(const char *data, int level, int num, int quoted, char **param, va_list args);
 int	zbx_snmp_oid_subst_cb(const char *data, int level, int num, int quoted, char **param, va_list args);
+
+zbx_uint64_t	zbx_dc_get_cache_size(void);
 
 #endif

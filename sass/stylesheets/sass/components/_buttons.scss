@@ -3,7 +3,7 @@
 	min-width: 24px;
 	height: 24px;
 	padding: 0 11px;
-	font-family: $font-stack;
+	font-family: var(--font-stack);
 	font-size: $font-form-size;
 	line-height: 22px;
 	text-align: center;
@@ -335,6 +335,7 @@ button {
 	height: auto;
 	outline: none;
 	border: none;
+	box-sizing: content-box;
 
 	&:hover {
 		text-decoration: underline;

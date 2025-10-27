@@ -5,6 +5,7 @@ noinst_LIBRARIES = libzbxtrapper.a
 libzbxtrapper_a_SOURCES = \
 	active.c \
 	active.h \
+	macro_ctx_scripts.c \
 	trapper_auth.c \
 	nodecommand.c \
 	nodecommand.h \
@@ -18,4 +19,5 @@ libzbxtrapper_a_SOURCES = \
 libzbxtrapper_a_CFLAGS = \
 	$(LIBXML2_CFLAGS) \
 	$(TLS_CFLAGS) \
-	$(ARES_CFLAGS)
+	$(ARES_CFLAGS) \
+	$(LIBEVENT_CFLAGS)

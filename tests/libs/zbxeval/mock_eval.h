@@ -17,6 +17,8 @@
 #ifndef ZABBIX_MOCK_EXPRESSION_EVAL_H
 #define ZABBIX_MOCK_EXPRESSION_EVAL_H
 
+#include "zbxcacheconfig.h"
+
 zbx_uint64_t	mock_eval_read_rules(const char *path);
 void	mock_eval_read_values(zbx_eval_context_t *ctx, const char *path);
 

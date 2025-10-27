@@ -548,11 +548,11 @@ class testTemplateInheritance extends CLegacyWebTest {
 	 */
 	private function filterEntriesAndOpenObjects($host, $column, $objects) {
 		$this->query('button:Reset')->one()->click();
+		$table = $this->query('xpath://table[@class="list-table"]')->asTable()->one();
 		$filter = $this->query('name:zbx_filter')->asForm()->waitUntilReady()->one();
 		$filter->fill(['Name' => $host]);
 		$this->query('button:Apply')->one()->waitUntilClickable()->click();
-
-		$this->query('xpath://table[@class="list-table"]')->asTable()->one()->findRow('Name', $host)
-				->getColumn($column)->query('link', $objects)->one()->click();
+		$table->waitUntilReloaded();
+		$table->findRow('Name', $host)->getColumn($column)->query('link', $objects)->one()->click();
 	}
 }

@@ -29,13 +29,14 @@
 #include "zbx_item_constants.h"
 #include "zbx_host_constants.h"
 #include "zbx_trigger_constants.h"
-#include "zbxexpression.h"
 #include "zbxeval.h"
 #include "zbxnum.h"
 #include "zbxstr.h"
 #include "zbxvariant.h"
 #include "zbxescalations.h"
 #include "zbxprof.h"
+#include "zbxcalc.h"
+#include "zbxhash.h"
 
 /******************************************************************************
  *                                                                            *
@@ -58,7 +59,7 @@ static void	DBmass_update_trends(const ZBX_DC_TREND *trends, int trends_num,
 		qsort(trends_tmp, trends_num, sizeof(ZBX_DC_TREND), zbx_trend_compare);
 
 		while (0 < trends_num)
-			zbx_db_flush_trends(trends_tmp, &trends_num, trends_diff);
+			zbx_db_flush_trends(trends_tmp, &trends_num, trends_diff, ZBX_DC_SYNC_TREND_MODE_NORMAL);
 
 		zbx_free(trends_tmp);
 	}
@@ -206,6 +207,7 @@ static int	process_trigger(zbx_dc_trigger_t *trigger, zbx_add_event_func_t add_e
 
 		if (0 != (event_flags & ZBX_FLAGS_TRIGGER_CREATE_INTERNAL_EVENT))
 		{
+			/* zbx_add_event() */
 			add_event_cb(EVENT_SOURCE_INTERNAL, EVENT_OBJECT_TRIGGER, trigger->triggerid,
 					&trigger->timespec, new_state, NULL, trigger->expression,
 					trigger->recovery_expression, 0, 0, &trigger->tags, 0, NULL, 0, NULL, NULL,
@@ -256,6 +258,139 @@ static void	process_triggers(zbx_vector_dc_trigger_t *triggers, zbx_add_event_fu
 	zbx_vector_trigger_diff_ptr_sort(trigger_diff, zbx_trigger_diff_compare_func);
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+}
+
+typedef struct
+{
+	zbx_dc_trigger_t	*trigger;
+	int			start_index;
+	int			count;
+}
+zbx_trigger_func_position_t;
+
+ZBX_PTR_VECTOR_DECL(trigger_func_position, zbx_trigger_func_position_t *)
+ZBX_PTR_VECTOR_IMPL(trigger_func_position, zbx_trigger_func_position_t *)
+
+static void	free_trigger_func_position(zbx_trigger_func_position_t *tfp)
+{
+	zbx_free(tfp);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: triggers links with functions.                                    *
+ *                                                                            *
+ * Parameters: triggers_func_pos - [IN/OUT] pointer to the list of triggers   *
+ *                                          with functions position in        *
+ *                                          functionids array                 *
+ *             functionids       - [IN/OUT] array of function IDs             *
+ *             trigger_order     - [IN] array of triggers                     *
+ *                                                                            *
+ ******************************************************************************/
+static void	zbx_link_triggers_with_functions(zbx_vector_trigger_func_position_t *triggers_func_pos,
+		zbx_vector_uint64_t *functionids, zbx_vector_dc_trigger_t *trigger_order)
+{
+	zbx_vector_uint64_t	funcids;
+	zbx_dc_trigger_t	*tr;
+	int			i;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() trigger_order_num:%d", __func__, trigger_order->values_num);
+
+	zbx_vector_uint64_create(&funcids);
+	zbx_vector_uint64_reserve(&funcids, functionids->values_num);
+
+	for (i = 0; i < trigger_order->values_num; i++)
+	{
+		zbx_trigger_func_position_t	*tr_func_pos;
+
+		tr = trigger_order->values[i];
+
+		if (NULL != tr->new_error)
+			continue;
+
+		zbx_eval_get_functionids(tr->eval_ctx, &funcids);
+
+		tr_func_pos = (zbx_trigger_func_position_t *)zbx_malloc(NULL, sizeof(zbx_trigger_func_position_t));
+		tr_func_pos->trigger = tr;
+		tr_func_pos->start_index = functionids->values_num;
+		tr_func_pos->count = funcids.values_num;
+
+		zbx_vector_uint64_append_array(functionids, funcids.values, funcids.values_num);
+		zbx_vector_trigger_func_position_append(triggers_func_pos, tr_func_pos);
+
+		zbx_vector_uint64_clear(&funcids);
+	}
+
+	zbx_vector_uint64_destroy(&funcids);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() triggers_func_pos_num:%d", __func__, triggers_func_pos->values_num);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: mark triggers that use one of the items in problem expression     *
+ *          with ZBX_DC_TRIGGER_PROBLEM_EXPRESSION flag.                      *
+ *                                                                            *
+ * Parameters: trigger_order - [IN/OUT] pointer to the list of triggers       *
+ *             itemids       - [IN] array of item IDs                         *
+ *             item_num      - [IN] number of items                           *
+ *                                                                            *
+ ******************************************************************************/
+static void	determine_items_in_expressions(zbx_vector_dc_trigger_t *trigger_order, const zbx_uint64_t *itemids,
+		int item_num)
+{
+	zbx_vector_trigger_func_position_t	triggers_func_pos;
+	zbx_vector_uint64_t			functionids, itemids_sorted;
+	zbx_dc_function_t			*functions = NULL;
+	int					*errcodes = NULL, t, f;
+
+	zbx_vector_uint64_create(&itemids_sorted);
+	zbx_vector_uint64_append_array(&itemids_sorted, itemids, item_num);
+
+	zbx_vector_trigger_func_position_create(&triggers_func_pos);
+	zbx_vector_trigger_func_position_reserve(&triggers_func_pos, trigger_order->values_num);
+
+	zbx_vector_uint64_create(&functionids);
+	zbx_vector_uint64_reserve(&functionids, item_num);
+
+	zbx_link_triggers_with_functions(&triggers_func_pos, &functionids, trigger_order);
+
+	if (0 == functionids.values_num)
+		goto out;
+
+	functions = (zbx_dc_function_t *)zbx_malloc(functions, sizeof(zbx_dc_function_t) * functionids.values_num);
+	errcodes = (int *)zbx_malloc(errcodes, sizeof(int) * functionids.values_num);
+
+	zbx_dc_config_history_sync_get_functions_by_functionids(functions, functionids.values, errcodes,
+			(size_t)functionids.values_num);
+
+	for (t = 0; t < triggers_func_pos.values_num; t++)
+	{
+		zbx_trigger_func_position_t	*func_pos = triggers_func_pos.values[t];
+
+		for (f = func_pos->start_index; f < func_pos->start_index + func_pos->count; f++)
+		{
+			if (SUCCEED == errcodes[f] && FAIL != zbx_vector_uint64_bsearch(&itemids_sorted,
+					functions[f].itemid, ZBX_DEFAULT_UINT64_COMPARE_FUNC))
+			{
+				func_pos->trigger->flags |= ZBX_DC_TRIGGER_PROBLEM_EXPRESSION;
+				break;
+			}
+		}
+	}
+
+	zbx_dc_config_clean_functions(functions, errcodes, functionids.values_num);
+	zbx_free(errcodes);
+	zbx_free(functions);
+out:
+	zbx_vector_trigger_func_position_clear_ext(&triggers_func_pos, free_trigger_func_position);
+	zbx_vector_trigger_func_position_destroy(&triggers_func_pos);
+
+	zbx_vector_uint64_clear(&functionids);
+	zbx_vector_uint64_destroy(&functionids);
+
+	zbx_vector_uint64_clear(&itemids_sorted);
+	zbx_vector_uint64_destroy(&itemids_sorted);
 }
 
 /******************************************************************************
@@ -326,7 +461,7 @@ static void	recalculate_triggers(const zbx_dc_history_t *history, int history_nu
 		zbx_dc_config_history_sync_get_triggers_by_itemids(trigger_info, trigger_order, itemids, timespecs,
 				item_num);
 		prepare_triggers(trigger_order->values, trigger_order->values_num);
-		zbx_determine_items_in_expressions(trigger_order, itemids, item_num);
+		determine_items_in_expressions(trigger_order, itemids, item_num);
 	}
 
 	if (0 != timers_num)
@@ -592,6 +727,7 @@ static zbx_item_diff_t	*calculate_item_update(zbx_history_sync_item_t *item, con
 {
 	zbx_uint64_t	flags = 0;
 	const char	*item_error = NULL;
+	char		error_hash[ZBX_SHA512_BINARY_LENGTH];
 	zbx_item_diff_t	*diff;
 
 	if (0 != (ZBX_DC_FLAG_META & h->flags))
@@ -618,7 +754,9 @@ static zbx_item_diff_t	*calculate_item_update(zbx_history_sync_item_t *item, con
 						NULL, NULL, NULL, 0, 0, NULL, 0, NULL, 0, NULL, NULL, h->value.err);
 			}
 
-			if (0 != strcmp(ZBX_NULL2EMPTY_STR(item->error), h->value.err))
+			zbx_sha512_hash(h->value.err, error_hash);
+
+			if (0 != memcmp(item->error_hash, error_hash, sizeof(error_hash)))
 				item_error = h->value.err;
 		}
 		else
@@ -635,14 +773,19 @@ static zbx_item_diff_t	*calculate_item_update(zbx_history_sync_item_t *item, con
 			}
 
 			item_error = "";
+			zbx_sha512_hash(item_error, error_hash);
 		}
 	}
-	else if (ITEM_STATE_NOTSUPPORTED == h->state && 0 != strcmp(ZBX_NULL2EMPTY_STR(item->error), h->value.err))
+	else if (ITEM_STATE_NOTSUPPORTED == h->state)
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "error reason for \"%s:%s\" changed: %s", item->host.host,
-				item->key_orig, h->value.err);
+		zbx_sha512_hash(h->value.err, error_hash);
+		if (0 != memcmp(item->error_hash, error_hash, sizeof(item->error_hash)))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "error reason for \"%s:%s\" changed: %s", item->host.host,
+					item->key_orig, h->value.err);
 
-		item_error = h->value.err;
+			item_error = h->value.err;
+		}
 	}
 
 	if (NULL != item_error)
@@ -668,7 +811,10 @@ static zbx_item_diff_t	*calculate_item_update(zbx_history_sync_item_t *item, con
 	}
 
 	if (0 != (ZBX_FLAGS_ITEM_DIFF_UPDATE_ERROR & flags))
+	{
 		diff->error = item_error;
+		memcpy(diff->error_hash, error_hash, sizeof(diff->error_hash));
+	}
 
 	return diff;
 }
@@ -1731,18 +1877,21 @@ void	zbx_sync_history_cache_server(const zbx_events_funcs_t *events_cbs, zbx_ipc
  * Purpose: check status of a history cache usage, enqueue/dequeue proxy      *
  *          from priority list and accordingly enable or disable wait mode    *
  *                                                                            *
- * Parameters: proxyid   - [IN] the proxyid                                   *
+ * Parameters: proxyid           - [IN] the proxyid                           *
+ *             pending_history   - [IN] the "more" flag presence              *
  *                                                                            *
  * Return value: SUCCEED - proxy can be processed now                         *
  *               FAIL    - proxy cannot be processed now, it got enqueued     *
  *                                                                            *
  ******************************************************************************/
-int	zbx_hc_check_proxy(zbx_uint64_t proxyid)
+int	zbx_hc_check_proxy(zbx_uint64_t proxyid, int pending_history)
 {
-	double	hc_pused;
-	int	ret;
+	double				hc_pused;
+	int				ret, stats_retrieved = FAIL;
+	zbx_vector_uint64_pair_t	items;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() proxyid:"ZBX_FS_UI64, __func__, proxyid);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() proxyid:"ZBX_FS_UI64" pending_history:%i",
+			__func__, proxyid, pending_history);
 
 	zbx_dbcache_lock();
 
@@ -1784,14 +1933,32 @@ int	zbx_hc_check_proxy(zbx_uint64_t proxyid)
 
 	if (0 == zbx_hc_proxyqueue_peek())
 	{
-		ret = SUCCEED;
+		if (60 < hc_pused && ZBX_PROXY_PENDING_HISTORY_YES == pending_history)
+		{
+			if (SUCCEED == (stats_retrieved = zbx_hc_check_high_usage_timer()))
+			{
+				zbx_vector_uint64_pair_create(&items);
+				zbx_hc_get_items_unlocked(&items);
+			}
+
+			ret = FAIL;
+		}
+		else
+			ret = SUCCEED;
+
 		goto out;
 	}
 
 	ret = zbx_hc_proxyqueue_dequeue(proxyid);
-
 out:
 	zbx_dbcache_unlock();
+
+	if (SUCCEED == stats_retrieved)
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "Detected heavy usage of history cache (more than 60%% space used).");
+		zbx_hc_log_high_cache_usage(&items);
+		zbx_vector_uint64_pair_destroy(&items);
+	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 

@@ -15,6 +15,8 @@
 #ifndef DC_ITEM_POLLER_TYPE_UPDATE_TEST_H
 #define DC_ITEM_POLLER_TYPE_UPDATE_TEST_H
 
+#include "../../src/libs/zbxcacheconfig/dbconfig.h"
+
 void	DCitem_poller_type_update_test(ZBX_DC_ITEM *dc_item, const ZBX_DC_HOST *dc_host, int flags);
 void	init_test_configuration_cache(zbx_get_config_forks_f get_config_forks);
 

@@ -36,6 +36,10 @@ class testPermissionsWithoutCSRF extends CWebTest {
 		'details' => 'You are logged in as "Admin". You have no permissions to access this page.'
 	];
 
+	const ACCESS_DENIED_WITHOUT_HTML = '{"error":{"title":"Access denied","messages":["You are logged in as \"Admin\".'.
+			' You have no permissions to access this page.","If you think this message is wrong, please consult your'.
+			' administrators about getting the necessary permissions."]}}';
+
 	/**
 	 * Attach MessageBehavior to the test.
 	 *
@@ -102,7 +106,10 @@ class testPermissionsWithoutCSRF extends CWebTest {
 			[
 				[
 					'db' => 'SELECT * FROM hstgrp',
-					'link' => 'zabbix.php?action=popup&popup=hostgroup.edit'
+					'link' => 'zabbix.php?action=popup&popup=hostgroup.edit',
+					'fields' => [
+						'id:name' => 'CSRF validation host group create'
+					]
 				]
 			],
 			// #3 Host group update.
@@ -116,7 +123,10 @@ class testPermissionsWithoutCSRF extends CWebTest {
 			[
 				[
 					'db' => 'SELECT * FROM hstgrp',
-					'link' => 'zabbix.php?action=popup&popup=templategroup.edit'
+					'link' => 'zabbix.php?action=popup&popup=templategroup.edit',
+					'fields' => [
+						'id:name' => 'CSRF validation template group create'
+					]
 				]
 			],
 			// #5 Template group update.
@@ -266,7 +276,17 @@ class testPermissionsWithoutCSRF extends CWebTest {
 				[
 					'db' => 'SELECT * FROM maintenances',
 					'link' => 'zabbix.php?action=maintenance.list',
-					'overlay' => 'create'
+					'overlay' => 'create',
+					'fields' => [
+						'id:name' => 'CSRF maintenance test name',
+						'xpath://div[@id="groupids_"]/..' => 'Zabbix servers'
+					],
+					'secondary_dialog' => [
+						'field' => 'id:timeperiods',
+						'fill' => [
+							'Period type' => 'One time only'
+						]
+					]
 				]
 			],
 			// #21 Maintenance update.
@@ -337,8 +357,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 			[
 				[
 					'db' => 'SELECT * FROM autoreg_host',
-					'link' => 'zabbix.php?action=autoreg.edit',
-					'return_button' => true
+					'link' => 'zabbix.php?action=autoreg.edit'
 				]
 			],
 			// #30 Housekeeping update.
@@ -369,8 +388,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 			[
 				[
 					'db' => 'SELECT * FROM icon_map',
-					'link' => 'zabbix.php?action=iconmap.edit&iconmapid=101',
-					'return_button' => true
+					'link' => 'zabbix.php?action=iconmap.edit&iconmapid=101'
 				]
 			],
 			// #34 Icon map create.
@@ -378,15 +396,17 @@ class testPermissionsWithoutCSRF extends CWebTest {
 				[
 					'db' => 'SELECT * FROM icon_map',
 					'link' => 'zabbix.php?action=iconmap.edit',
-					'return_button' => true
+					'fields' => [
+						'id:name' => 'CSRF icon test name',
+						'id:mappings_0_expression' => 'CSRF_test'
+					]
 				]
 			],
 			// #35 Regular expression update.
 			[
 				[
 					'db' => 'SELECT * FROM regexps',
-					'link' => 'zabbix.php?action=regex.edit&regexid=2',
-					'return_button' => true
+					'link' => 'zabbix.php?action=regex.edit&regexpid=2'
 				]
 			],
 			// #36 Regular expression create.
@@ -394,15 +414,17 @@ class testPermissionsWithoutCSRF extends CWebTest {
 				[
 					'db' => 'SELECT * FROM regexps',
 					'link' => 'zabbix.php?action=regex.edit',
-					'return_button' => true
+					'fields' => [
+						'id:name' => 'CSRF test name',
+						'id:expressions_0_expression' => 'abc'
+					]
 				]
 			],
 			// #37 Macros update.
 			[
 				[
 					'db' => 'SELECT * FROM globalmacro',
-					'link' => 'zabbix.php?action=macros.edit',
-					'return_button' => true
+					'link' => 'zabbix.php?action=macros.edit'
 				]
 			],
 			// #38 Trigger displaying options update.
@@ -442,7 +464,10 @@ class testPermissionsWithoutCSRF extends CWebTest {
 				[
 					'db' => 'SELECT * FROM hosts',
 					'link' => 'zabbix.php?action=proxy.list',
-					'overlay' => 'update'
+					'overlay' => 'update',
+					'fields' => [
+						'id:name' => 'CSRF validation proxy update'
+					]
 				]
 			],
 			// #43 Proxy create.
@@ -450,7 +475,10 @@ class testPermissionsWithoutCSRF extends CWebTest {
 				[
 					'db' => 'SELECT * FROM hosts',
 					'link' => 'zabbix.php?action=proxy.list',
-					'overlay' => 'create'
+					'overlay' => 'create',
+					'fields' => [
+						'id:name' => 'CSRF validation proxy create'
+					]
 				]
 			],
 			// #44 Authentication update.
@@ -610,7 +638,10 @@ class testPermissionsWithoutCSRF extends CWebTest {
 				[
 					'db' => 'SELECT * FROM services',
 					'link' => 'zabbix.php?action=service.list.edit',
-					'overlay' => 'create'
+					'overlay' => 'create',
+					'fields' => [
+						'id:name' => 'CSRF service create'
+					]
 				]
 			],
 			// #64 Service update.
@@ -641,8 +672,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 			[
 				[
 					'db' => 'SELECT * FROM settings',
-					'link' => 'zabbix.php?action=geomaps.edit',
-					'return_button' => true
+					'link' => 'zabbix.php?action=geomaps.edit'
 				]
 			],
 			// #68 Module update.
@@ -708,6 +738,16 @@ class testPermissionsWithoutCSRF extends CWebTest {
 			foreach ($data['fields'] as $field => $value) {
 				$this->query($field)->one()->detect()->fill($value);
 			}
+		}
+
+		// Fill in mandatory fields in a secondary form if it contains fields that are required for form submission.
+		if (array_key_exists('secondary_dialog', $data)) {
+			$this->query($data['secondary_dialog']['field'])->one()->query('button:Add')->one()->click();
+
+			$secondary_form = COverlayDialogElement::find()->waitUntilReady()->all()->last()->asForm();
+			$secondary_form->fill($data['secondary_dialog']['fill']);
+			$secondary_form->submit();
+			$secondary_form->waitUntilNotVisible();
 		}
 
 		// Delete hidden input with CSRF token.
@@ -824,8 +864,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 					'db' => 'SELECT * FROM settings',
 					'link' => 'zabbix.php?_csrf_token=12345abcd&tls_accept=1&tls_in_none=1&tls_psk_identity=&tls_psk='.
 							'&action=autoreg.update',
-					'error' => self::ACCESS_DENIED,
-					'return_button' => true
+					'error' => self::ACCESS_DENIED_WITHOUT_HTML
 				]
 			]
 		];
@@ -834,6 +873,10 @@ class testPermissionsWithoutCSRF extends CWebTest {
 	/**
 	 * Test function for checking the "GET" form (direct url), with the different types of CSRF tokens.
 	 *
+	 *  TODO: The ignoreBrowserErrors is added to ignore error in  #4 test case when opening page without html
+	 *  favicon.ico - Failed to load resource: the server responded with a status of 404 (Not Found)
+	 *
+	 * @ignoreBrowserErrors
 	 * @dataProvider getCheckTokenData
 	 */
 	public function testPermissionsWithoutCSRF_CheckToken($data) {
@@ -851,8 +894,13 @@ class testPermissionsWithoutCSRF extends CWebTest {
 		}
 
 		// Check the error message depending on case.
-		$this->assertMessage(TEST_BAD, $data['error']['message'], $data['error']['details']);
-		$this->checkReturnButton($data);
+		if ($data['error'] === self::ACCESS_DENIED_WITHOUT_HTML) {
+			$this->assertTrue(strstr($this->page->getSource(), $data['error']) !== false, '"'.$data['error'].'" must exist.');
+		}
+		else {
+			$this->assertMessage(TEST_BAD, $data['error']['message'], $data['error']['details']);
+			$this->checkReturnButton($data);
+		}
 
 		// Compare db hashes to check that form didn't make any changes.
 		$this->assertEquals($old_hash, CDBHelper::getHash($data['db']));

@@ -12,7 +12,7 @@ Zabbix version: 8.0 and higher.
 ## Tested versions
 
 This template has been tested on:
-- FortiGate v7.4.0
+- FortiGate v7.6.4
 
 ## Configuration
 
@@ -29,9 +29,14 @@ This template has been tested on:
 7. Put the API token into `{$FGATE.API.TOKEN}` macro.
 8. Set your FortiGate GUI IP/FQDN as `{$FGATE.API.FQDN}` macro value.
 9. If FortiGate GUI uses HTTPS, put **https** value into `{$FGATE.SCHEME}` macro and **443** into `{$FGATE.API.PORT}` macro.
-10. If FortiGate GUI port differs from the standard one, specify it in `{$FGATE.API.PORT}` macro. 
+10. If FortiGate GUI port differs from the standard one, specify it in `{$FGATE.API.PORT}` macro.
 
->Please, refer to the [vendor documentation](https://docs.fortinet.com/document/fortigate/7.4.0/administration-guide/399023/rest-api-administrator) about the FortiGate REST API Authentication.
+NOTE: Starting from template version '8.0-2', the API token is used in the request header. For older template versions (where the API token is passed in the URL query parameter), when using FortiGate v7.4.5+, you must enable the following global setting:
+[Using APIs](https://docs.fortinet.com/document/fortigate/7.6.4/administration-guide/940602/using-apis)
+
+For added security, it is strongly recommended to use the latest template version, which passes the API token in the request header instead of the URL parameter.
+
+>Please, refer to the [vendor documentation](https://docs.fortinet.com/document/fortigate/7.6.4/administration-guide/399023/rest-api-administrator) about the FortiGate REST API Authentication.
 
 ### Macros used
 

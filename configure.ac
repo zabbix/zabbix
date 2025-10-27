@@ -2054,9 +2054,7 @@ if test "x$agent2" = "xyes"; then
 		\${abs_top_builddir}/src/libs/zbxcrypto/libzbxcrypto.a \
 		\${abs_top_builddir}/src/libs/zbxexec/libzbxexec.a \
 		\${abs_top_builddir}/src/libs/zbxhash/libzbxhash.a \
-		\${abs_top_builddir}/src/libs/zbxhttp/libzbxhttp.a \
 		\${abs_top_builddir}/src/libs/zbxjson/libzbxjson.a \
-		\${abs_top_builddir}/src/libs/zbxmutexs/libzbxmutexs.a \
 		\${abs_top_builddir}/src/libs/zbxprof/libzbxprof.a \
 		\${abs_top_builddir}/src/libs/zbxnix/libzbxnix.a \
 		\${abs_top_builddir}/src/libs/zbxregexp/libzbxregexp.a \
@@ -2067,15 +2065,12 @@ if test "x$agent2" = "xyes"; then
 		\${abs_top_builddir}/src/libs/zbxexpr/libzbxexpr.a \
 		\${abs_top_builddir}/src/libs/zbxtime/libzbxtime.a \
 		\${abs_top_builddir}/src/libs/zbxip/libzbxip.a \
-		\${abs_top_builddir}/src/libs/zbxsysinfo/"$ARCH"/libspechostnamesysinfo.a \
 		\${abs_top_builddir}/src/libs/zbxsysinfo/"$ARCH"/libspecsysinfo.a \
 		\${abs_top_builddir}/src/libs/zbxsysinfo/alias/libalias.a \
-		\${abs_top_builddir}/src/libs/zbxsysinfo/common/libcommonsysinfo.a \
 		\${abs_top_builddir}/src/libs/zbxsysinfo/libzbxagent2sysinfo.a \
 		\${abs_top_builddir}/src/libs/zbxsysinfo/simple/libsimplesysinfo.a \
 		\${abs_top_builddir}/src/libs/zbxthreads/libzbxthreads.a \
 		\${abs_top_builddir}/src/libs/zbxvariant/libzbxvariant.a \
-		\${abs_top_builddir}/src/libs/zbxxml/libzbxxml.a \
 		\${abs_top_builddir}/src/zabbix_agent/logfiles/libzbxlogfiles.a \
 		\${abs_top_builddir}/src/zabbix_agent/active_checks/libzbxactive_checks.a \
 		\${abs_top_builddir}/src/zabbix_agent/metrics/libzbxmetrics.a \
@@ -2176,6 +2171,7 @@ AC_CONFIG_FILES([
 	src/libs/zbxcomms/Makefile
 	src/libs/zbxcommshigh/Makefile
 	src/libs/zbxcompress/Makefile
+	src/libs/zbxcalc/Makefile
 	src/libs/zbxcfg/Makefile
 	src/libs/zbxcrypto/Makefile
 	src/libs/zbxcurl/Makefile
@@ -2229,7 +2225,6 @@ AC_CONFIG_FILES([
 	src/libs/zbxrtc/Makefile
 	src/libs/zbxself/Makefile
 	src/libs/zbxserialize/Makefile
-	src/libs/zbxexpression/Makefile
 	src/libs/zbxscripts/Makefile
 	src/libs/zbxservice/Makefile
 	src/libs/zbxshmem/Makefile

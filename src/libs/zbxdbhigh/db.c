@@ -326,15 +326,13 @@ const char	*zbx_user_string(zbx_uint64_t userid)
  *                                                                            *
  * Purpose: get user username, name and surname                               *
  *                                                                            *
- * Parameters: userid     - [IN] user id                                      *
- *             username   - [OUT] user alias                                  *
- *             name       - [OUT] user name                                   *
- *             surname    - [OUT] user surname                                *
+ * Parameters: userid  - [IN] user id                                         *
+ *             names   - [OUT] user names                                     *
  *                                                                            *
  * Return value: SUCCEED or FAIL                                              *
  *                                                                            *
  ******************************************************************************/
-int	zbx_db_get_user_names(zbx_uint64_t userid, char **username, char **name, char **surname)
+int	zbx_db_get_user_names(zbx_uint64_t userid, zbx_user_names_t **names)
 {
 	int		ret = FAIL;
 	zbx_db_result_t	result;
@@ -351,15 +349,26 @@ int	zbx_db_get_user_names(zbx_uint64_t userid, char **username, char **name, cha
 	if (NULL == (row = zbx_db_fetch(result)))
 		goto out;
 
-	*username = zbx_strdup(NULL, row[0]);
-	*name = zbx_strdup(NULL, row[1]);
-	*surname = zbx_strdup(NULL, row[2]);
+	*names = zbx_malloc(*names, sizeof(zbx_user_names_t));
+
+	(*names)->userid = userid;
+	(*names)->username = zbx_strdup(NULL, row[0]);
+	(*names)->name = zbx_strdup(NULL, row[1]);
+	(*names)->surname = zbx_strdup(NULL, row[2]);
 
 	ret = SUCCEED;
 out:
 	zbx_db_free_result(result);
 
 	return ret;
+}
+
+void	zbx_user_names_clean(zbx_user_names_t **names)
+{
+	zbx_free((*names)->name);
+	zbx_free((*names)->surname);
+	zbx_free((*names)->username);
+	zbx_free(*names);
 }
 
 /******************************************************************************

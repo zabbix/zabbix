@@ -30,12 +30,12 @@ import (
 	"golang.zabbix.com/agent2/internal/agent/resultcache"
 	"golang.zabbix.com/agent2/internal/monitor"
 	"golang.zabbix.com/agent2/pkg/glexpr"
-	"golang.zabbix.com/agent2/pkg/itemutil"
 	"golang.zabbix.com/agent2/plugins/external"
 	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/log"
 	"golang.zabbix.com/sdk/plugin"
 	"golang.zabbix.com/sdk/plugin/comms"
+	"golang.zabbix.com/sdk/plugin/itemutil"
 )
 
 const (
@@ -260,9 +260,8 @@ func ParseItemTimeoutAny(timeoutIn any) (int, error) {
 // processUpdateRequest processes client update request. It's being used for multiple requests
 // (active checks on a server) and also for direct requests (single passive and internal checks).
 func (m *Manager) processUpdateRequestRun(update *updateRequest) {
-	var c *client
-	var ok bool
-	if c, ok = m.clients[update.clientID]; !ok {
+	c, ok := m.clients[update.clientID]
+	if !ok {
 		if len(update.requests) == 0 {
 			log.Debugf(
 				"[%d] skipping empty update for unregistered client",
@@ -285,7 +284,9 @@ func (m *Manager) processUpdateRequestRun(update *updateRequest) {
 		var p *pluginAgent
 
 		r.Key = m.aliases.Get(r.Key)
-		if key, params, err = itemutil.ParseKey(r.Key); err == nil {
+		key, params, err = itemutil.ParseKey(r.Key)
+
+		if err == nil { //nolint:nestif
 			p, ok = m.plugins[key]
 			if ok && update.clientID != agent.LocalChecksClientID {
 				ok = keyaccess.CheckRules(key, params)

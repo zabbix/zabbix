@@ -113,6 +113,7 @@ typedef struct
 	zbx_hc_proxyqueue_t	proxyqueue;
 	int			processing_num;
 	double			last_error_ts;
+	double			last_warning_ts;
 	int			refcount;
 }
 ZBX_DC_CACHE;
@@ -123,13 +124,6 @@ static ZBX_DC_CACHE	*cache = NULL;
 #define ZBX_MAX_VALUES_LOCAL	256
 #define ZBX_STRUCT_REALLOC_STEP	8
 #define ZBX_STRING_REALLOC_STEP	ZBX_KIBIBYTE
-
-typedef enum
-{
-	ZBX_DC_SYNC_TREND_MODE_PARALLEL,
-	ZBX_DC_SYNC_TREND_MODE_FULL
-}
-zbx_dc_sync_trend_mode_t;
 
 typedef struct
 {
@@ -700,7 +694,8 @@ static void	dc_trends_fetch_and_update(ZBX_DC_TREND *trends, int trends_num, zbx
  * Purpose: flush trend to the database                                       *
  *                                                                            *
  ******************************************************************************/
-void	zbx_db_flush_trends(ZBX_DC_TREND *trends, int *trends_num, zbx_vector_uint64_pair_t *trends_diff)
+void	zbx_db_flush_trends(ZBX_DC_TREND *trends, int *trends_num, zbx_vector_uint64_pair_t *trends_diff,
+		zbx_dc_sync_trend_mode_t sync_trend_mode)
 {
 	int		num, clock, selects_num = 0, inserts_num = 0, upserts_num = 0, itemids_alloc, itemids_num = 0;
 	int		trends_to = *trends_num, i;
@@ -740,10 +735,15 @@ void	zbx_db_flush_trends(ZBX_DC_TREND *trends, int *trends_num, zbx_vector_uint6
 		inserts_num++;
 
 		if (0 != trend->disable_from)
-			continue;
-
-		if (NULL != trends_diff)
-			uint64_array_add(&itemids, &itemids_alloc, &itemids_num, trend->itemid, 64);
+		{
+			if (clock >= trend->disable_from)
+				continue;
+		}
+		else
+		{
+			if (ZBX_DC_SYNC_TREND_MODE_NORMAL == sync_trend_mode)
+				uint64_array_add(&itemids, &itemids_alloc, &itemids_num, trend->itemid, 64);
+		}
 
 		selects_num++;
 		if (ZBX_HC_SYNC_MAX == selects_num)
@@ -780,27 +780,23 @@ void	zbx_db_flush_trends(ZBX_DC_TREND *trends, int *trends_num, zbx_vector_uint6
 
 	zbx_free(itemids);
 
-	/* if 'trends' is not a primary trends buffer */
-	if (NULL != trends_diff)
+	/* we update it too */
+	for (i = 0; i < trends_to; i++)
 	{
-		/* we update it too */
-		for (i = 0; i < trends_to; i++)
-		{
-			zbx_uint64_pair_t	pair;
+		zbx_uint64_pair_t	pair;
 
-			if (0 == trends[i].itemid)
-				continue;
+		if (0 == trends[i].itemid)
+			continue;
 
-			if (clock != trends[i].clock || value_type != trends[i].value_type)
-				continue;
+		if (clock != trends[i].clock || value_type != trends[i].value_type)
+			continue;
 
-			if (0 == trends[i].disable_from || trends[i].disable_from > clock)
-				continue;
+		if (0 == trends[i].disable_from || trends[i].disable_from > clock)
+			continue;
 
-			pair.first = trends[i].itemid;
-			pair.second = clock + SEC_PER_HOUR;
-			zbx_vector_uint64_pair_append(trends_diff, pair);
-		}
+		pair.first = trends[i].itemid;
+		pair.second = clock + SEC_PER_HOUR;
+		zbx_vector_uint64_pair_append(trends_diff, pair);
 	}
 
 	if (0 != inserts_num)
@@ -1030,6 +1026,11 @@ static void	zbx_host_info_clean(zbx_host_info_t *host_info)
 	zbx_vector_ptr_destroy(&host_info->groups);
 }
 
+static void	zbx_host_info_clean_wrapper(void *data)
+{
+	zbx_host_info_clean((zbx_host_info_t*)data);
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: get hosts groups names                                            *
@@ -1215,6 +1216,11 @@ static void	zbx_item_info_clean(zbx_item_info_t *item_info)
 	zbx_vector_tags_ptr_clear_ext(&item_info->item_tags, zbx_free_tag);
 	zbx_vector_tags_ptr_destroy(&item_info->item_tags);
 	zbx_free(item_info->name);
+}
+
+static void	zbx_item_info_clean_wrapper(void *data)
+{
+	zbx_item_info_clean((zbx_item_info_t*)data);
 }
 
 /******************************************************************************
@@ -1512,7 +1518,7 @@ void	zbx_dc_export_history_and_trends(const zbx_dc_history_t *history, int histo
 	zbx_vector_uint64_create(&hostids);
 	zbx_vector_uint64_create(&item_info_ids);
 	zbx_hashset_create_ext(&items_info, itemids->values_num, ZBX_DEFAULT_UINT64_HASH_FUNC,
-			ZBX_DEFAULT_UINT64_COMPARE_FUNC, (zbx_clean_func_t)zbx_item_info_clean,
+			ZBX_DEFAULT_UINT64_COMPARE_FUNC, zbx_item_info_clean_wrapper,
 			ZBX_DEFAULT_MEM_MALLOC_FUNC, ZBX_DEFAULT_MEM_REALLOC_FUNC, ZBX_DEFAULT_MEM_FREE_FUNC);
 
 	for (i = 0; i < history_num; i++)
@@ -1609,7 +1615,7 @@ void	zbx_dc_export_history_and_trends(const zbx_dc_history_t *history, int histo
 	zbx_vector_uint64_uniq(&hostids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 	zbx_hashset_create_ext(&hosts_info, hostids.values_num, ZBX_DEFAULT_UINT64_HASH_FUNC,
-			ZBX_DEFAULT_UINT64_COMPARE_FUNC, (zbx_clean_func_t)zbx_host_info_clean,
+			ZBX_DEFAULT_UINT64_COMPARE_FUNC, zbx_host_info_clean_wrapper,
 			ZBX_DEFAULT_MEM_MALLOC_FUNC, ZBX_DEFAULT_MEM_REALLOC_FUNC, ZBX_DEFAULT_MEM_FREE_FUNC);
 
 	db_get_hosts_info_by_hostid(&hosts_info, &hostids);
@@ -1726,20 +1732,29 @@ static void	DCsync_trends(int parallel_num, zbx_dc_sync_trend_mode_t sync_trend_
 
 	zbx_db_begin();
 
+	zbx_vector_uint64_pair_t	trends_diff;
+
+	zbx_vector_uint64_pair_create(&trends_diff);
+
 	while (trends_num > 0)
 	{
 		int	trends_num_last = trends_num;
 
 		zbx_log_sync_trends_cache_progress();
 
-		zbx_db_flush_trends(trends, &trends_num, NULL);
+		zbx_db_flush_trends(trends, &trends_num, &trends_diff, sync_trend_mode);
 
 		LOCK_TRENDS;
 		cache->trends_num -= trends_num_last - trends_num;
 		UNLOCK_TRENDS;
+
+		zbx_dc_update_trends(&trends_diff);
+		zbx_vector_uint64_pair_clear(&trends_diff);
 	}
 
 	zbx_db_commit();
+
+	zbx_vector_uint64_pair_destroy(&trends_diff);
 
 	if (ZBX_DC_SYNC_TREND_MODE_FULL == sync_trend_mode)
 	{
@@ -2582,26 +2597,27 @@ void	zbx_dc_add_history_variant(zbx_uint64_t itemid, unsigned char value_type, u
 
 size_t	zbx_dc_flush_history(void)
 {
-	int	processing_num;
+	LOCK_CACHE;
 
 	if (0 == item_values_num)
+	{
+		UNLOCK_CACHE;
 		return 0;
-
-	LOCK_CACHE;
+	}
 
 	hc_add_item_values(item_values, item_values_num);
 
 	cache->history_num += item_values_num;
-	processing_num = cache->processing_num;
 
-	UNLOCK_CACHE;
-
-	zbx_vps_monitor_add_collected((zbx_uint64_t)item_values_num);
-
+	int	processing_num = cache->processing_num;
 	size_t	count = item_values_num;
 
 	item_values_num = 0;
 	string_values_offset = 0;
+
+	UNLOCK_CACHE;
+
+	zbx_vps_monitor_add_collected((zbx_uint64_t)count);
 
 	if (0 != processing_num)
 		return 0;
@@ -3001,22 +3017,36 @@ static int	diag_compare_pair_second_desc(const void *d1, const void *d2)
  * Purpose: log history cache full message and top values                     *
  *                                                                            *
  ******************************************************************************/
-static void	hc_print_history_cache_full(zbx_vector_uint64_pair_t *items)
+static void	hc_log_history_cache_usage(zbx_vector_uint64_pair_t *items)
+{
+	const char	*log_msg = "History cache is full. Sleeping for 1 second.";
+	double		time_now = zbx_time();
+
+	if (SEC_PER_MIN > time_now - cache->last_error_ts)
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "%s", log_msg);
+		return;
+	}
+
+	cache->last_error_ts = time_now;
+
+	zabbix_log(LOG_LEVEL_WARNING, "%s", log_msg);
+	zbx_hc_log_high_cache_usage(items);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: log items with highest number of values in history cache when     *
+ *          cache usage is high                                               *
+ *                                                                            *
+ * Parameters: items - [IN] vector of itemid/value count pairs                *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_hc_log_high_cache_usage(zbx_vector_uint64_pair_t *items)
 {
 	int	limit;
 	char	*str = NULL;
 	size_t	str_alloc = 0, str_offset = 0;
-	double	time_now = zbx_time();
-
-	if (SEC_PER_MIN > time_now - cache->last_error_ts)
-	{
-		zabbix_log(LOG_LEVEL_DEBUG, "History cache is full. Sleeping for 1 second.");
-		return;
-	}
-
-	zabbix_log(LOG_LEVEL_WARNING, "History cache is full. Sleeping for 1 second.");
-
-	cache->last_error_ts = time_now;
 
 	zbx_vector_uint64_pair_sort(items, diag_compare_pair_second_desc);
 
@@ -3090,7 +3120,7 @@ static void	hc_add_item_values(dc_item_value_t *values, int values_num)
 
 				UNLOCK_CACHE;
 
-				hc_print_history_cache_full(&items);
+				hc_log_history_cache_usage(&items);
 
 				zbx_vector_uint64_pair_destroy(&items);
 				sleep(1);
@@ -3457,6 +3487,7 @@ int	zbx_init_database_cache(zbx_get_program_type_f get_program_type,
 	cache->history_num_total = 0;
 	cache->history_progress_ts = 0;
 	cache->last_error_ts = 0;
+	cache->last_warning_ts = 0;
 	cache->trends_progress_ts = 0;
 
 	cache->db_trigger_queue_lock = 1;
@@ -3691,6 +3722,19 @@ static void	hc_get_items(zbx_vector_uint64_pair_t *items)
 	}
 }
 
+int	zbx_hc_check_high_usage_timer(void)
+{
+	double	now = zbx_time();
+
+	if (SEC_PER_MIN <= now - cache->last_warning_ts)
+	{
+		cache->last_warning_ts = now;
+		return SUCCEED;
+	}
+
+	return FAIL;
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: get statistics of cached items                                    *
@@ -3703,6 +3747,11 @@ void	zbx_hc_get_items(zbx_vector_uint64_pair_t *items)
 	hc_get_items(items);
 
 	UNLOCK_CACHE;
+}
+
+void	zbx_hc_get_items_unlocked(zbx_vector_uint64_pair_t *items)
+{
+	hc_get_items(items);
 }
 
 void	zbx_hc_acquire(void)

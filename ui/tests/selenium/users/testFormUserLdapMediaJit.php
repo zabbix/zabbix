@@ -190,7 +190,7 @@ class testFormUserLdapMediaJit extends CWebTest {
 			$this->assertTrue($row->query('button:Edit')->one()->isClickable());
 		}
 
-		// Check the pressence and amount of hintboxes in media table for disabled media.
+		// Check the presence and amount of hintboxes in media table for disabled media.
 		$media_with_hints = ['MantisBT', 'OTRS CE', 'Rocket.Chat', 'Zendesk'];
 
 		foreach ($media_with_hints as $media_type) {
@@ -897,20 +897,23 @@ class testFormUserLdapMediaJit extends CWebTest {
 
 		// Open media mapping to update.
 		$form = $this->openLdapForm();
-		$table = $form->query('id:ldap-servers')->asTable()->one();
+		$table = $form->query('id:ldap-servers')->waitUntilVisible()->asTable()->one();
 		$table->query('link:'.self::LDAP_SERVER_NAME)->one()->click();
 		$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
 
 		foreach ($data['media_types'] as $media_type) {
-			$media_table = $dialog->query('id:ldap-media-type-mapping-table')->asTable()->one();
+			$media_table = $dialog->query('id:ldap-media-type-mapping-table')->waitUntilVisible()->asTable()->one();
 			$media_table->query('link', $media_type['name'])->one()->click();
-			$media_form = COverlayDialogElement::find()->all()->last()->asForm();
+			$media_dialog = COverlayDialogElement::find()->all()->last()->waitUntilReady();
+			$media_form = $media_dialog->asForm();
 			$media_form->fill($media_type['update']);
 			$media_form->submit();
+			$media_dialog->waitUntilNotPresent();
 		}
 
 		$dialog->query('button:Update')->one()->click();
-		$form->submit();
+		$form->submit()->waitUntilStalled();
+		$this->page->waitUntilReady();
 
 		// Check that no changes are present until user is provisioned.
 		$this->page->open('zabbix.php?action=user.list')->waitUntilReady();
@@ -1250,7 +1253,8 @@ class testFormUserLdapMediaJit extends CWebTest {
 		$media_mapping_form->fill($data['mapping']);
 		$media_mapping_form->submit()->waitUntilNotVisible();
 		$dialog->query('button:Update')->one()->click();
-		$form->submit();
+		$form->submit()->waitUntilStalled();
+		$this->page->waitUntilReady();
 
 		// Log in as LDAP user to check that media mapping was processed correctly.
 		$this->page->userLogin(PHPUNIT_LDAP_USERNAME, PHPUNIT_LDAP_USER_PASSWORD);
@@ -1306,11 +1310,12 @@ class testFormUserLdapMediaJit extends CWebTest {
 		$media_table = $dialog->query('id:ldap-media-type-mapping-table')->asTable()->one();
 		$media_table->findRow('Name', self::MEDIA_MAPPING_REMOVE, true)->query('button:Remove')->one()->click();
 		$dialog->query('button:Update')->one()->click();
-		$form->submit();
+		$form->submit()->waitUntilStalled();
+		$this->page->waitUntilReady();
 
 		// Check that media is not present for LDAP provisioned user.
 		$this->page->open('zabbix.php?action=user.list')->waitUntilReady();
-		$this->query('link:'.PHPUNIT_LDAP_USERNAME)->one()->click();
+		$this->query('link:'.PHPUNIT_LDAP_USERNAME)->waitUntilClickable()->one()->click();
 		$user_media_table = $this->getUserMediaTable();
 		$this->assertFalse($user_media_table->findRow('Type', 'MS Teams Workflow', true)->isPresent());
 	}
@@ -1378,8 +1383,8 @@ class testFormUserLdapMediaJit extends CWebTest {
 	 * @return CFormElement
 	 */
 	protected function openLdapForm() {
-		$this->page->login()->open('zabbix.php?action=authentication.edit');
-		$form = $this->query('id:authentication-form')->asForm()->one();
+		$this->page->login()->open('zabbix.php?action=authentication.edit')->waitUntilReady();
+		$form = $this->query('id:authentication-form')->waitUntilVisible()->asForm()->one();
 		$form->selectTab('LDAP settings');
 
 		return $form;

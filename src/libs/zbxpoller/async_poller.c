@@ -91,8 +91,8 @@ static void	process_async_result(zbx_dc_item_context_t *item, zbx_poller_config_
 	{
 		if (ZBX_IS_RUNNING())
 		{
-			zbx_preprocess_item_value(item->itemid, item->hostid, item->value_type, item->flags,
-					item->preprocessing, &item->result, &timespec, ITEM_STATE_NORMAL, NULL);
+			zbx_preprocess_item_value(item->itemid, item->value_type, item->flags, item->preprocessing,
+					&item->result, &timespec, ITEM_STATE_NORMAL, NULL);
 		}
 	}
 	else
@@ -101,9 +101,9 @@ static void	process_async_result(zbx_dc_item_context_t *item, zbx_poller_config_
 		{
 			if (NOTSUPPORTED == item->ret || AGENT_ERROR == item->ret || CONFIG_ERROR == item->ret)
 			{
-				zbx_preprocess_item_value(item->itemid, item->hostid, item->value_type, item->flags,
-					item->preprocessing, NULL, &timespec, ITEM_STATE_NOTSUPPORTED,
-					item->result.msg);
+				zbx_preprocess_item_value(item->itemid, item->value_type, item->flags,
+						item->preprocessing, NULL, &timespec, ITEM_STATE_NOTSUPPORTED,
+						item->result.msg);
 			}
 		}
 
@@ -180,9 +180,8 @@ static void	process_httpagent_result(CURL *easy_handle, CURLcode err, void *arg)
 		out = NULL;
 		if (ZBX_IS_RUNNING())
 		{
-			zbx_preprocess_item_value(item_context->itemid, item_context->hostid, item_context->value_type,
-					item_context->flags, item_context->preprocessing, &result,
-					&timespec, ITEM_STATE_NORMAL, NULL);
+			zbx_preprocess_item_value(item_context->itemid, item_context->value_type, item_context->flags,
+					item_context->preprocessing, &result, &timespec, ITEM_STATE_NORMAL, NULL);
 		}
 	}
 	else
@@ -190,9 +189,9 @@ static void	process_httpagent_result(CURL *easy_handle, CURLcode err, void *arg)
 		SET_MSG_RESULT(&result, error);
 		if (ZBX_IS_RUNNING())
 		{
-			zbx_preprocess_item_value(item_context->itemid, item_context->hostid, item_context->value_type,
-					item_context->flags, item_context->preprocessing, NULL, &timespec,
-					ITEM_STATE_NOTSUPPORTED, result.msg);
+			zbx_preprocess_item_value(item_context->itemid, item_context->value_type, item_context->flags,
+					item_context->preprocessing, NULL, &timespec, ITEM_STATE_NOTSUPPORTED,
+					result.msg);
 		}
 	}
 
@@ -324,9 +323,8 @@ static void	async_initiate_queued_checks(zbx_poller_config_t *poller_config, con
 			{
 				if (ZBX_IS_RUNNING())
 				{
-					zbx_preprocess_item_value(items[i].itemid,
-							items[i].host.hostid, items[i].value_type,
-							items[i].flags, items[i].preprocessing, NULL, &timespec,
+					zbx_preprocess_item_value(items[i].itemid, items[i].value_type, items[i].flags,
+							items[i].preprocessing, NULL, &timespec,
 							ITEM_STATE_NOTSUPPORTED, results[i].msg);
 				}
 
@@ -384,7 +382,8 @@ static void	async_timeout_timer(evutil_socket_t fd, short events, void *arg)
 
 			ares_timeout(poller_config->channel, &tv, &tv_next);
 
-			zabbix_log(LOG_LEVEL_DEBUG, "next timer sec:%ld usec:%ld", tv_next.tv_sec, tv_next.tv_usec);
+			zabbix_log(LOG_LEVEL_DEBUG, "next timer sec:%ld usec:%ld", (long)tv_next.tv_sec,
+					(long)tv_next.tv_usec);
 		}
 
 		evtimer_add(poller_config->async_timeout_timer, &tv_next);
@@ -426,6 +425,11 @@ static void	fd_event_clean(zbx_fd_event *fd_event)
 	event_free(fd_event->event);
 }
 
+static void	fd_event_clean_wrapper(void *data)
+{
+	fd_event_clean((zbx_fd_event*)data);
+}
+
 static void	async_poller_init(zbx_poller_config_t *poller_config, zbx_thread_poller_args *poller_args_in,
 		int process_num)
 {
@@ -435,11 +439,11 @@ static void	async_poller_init(zbx_poller_config_t *poller_config, zbx_thread_pol
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	zbx_hashset_create_ext(&poller_config->interfaces, 100, ZBX_DEFAULT_UINT64_HASH_FUNC,
-			ZBX_DEFAULT_UINT64_COMPARE_FUNC, (zbx_clean_func_t)zbx_interface_status_clean,
+			ZBX_DEFAULT_UINT64_COMPARE_FUNC, zbx_interface_status_clean_wrapper,
 			ZBX_DEFAULT_MEM_MALLOC_FUNC, ZBX_DEFAULT_MEM_REALLOC_FUNC, ZBX_DEFAULT_MEM_FREE_FUNC);
 
 	zbx_hashset_create_ext(&poller_config->fd_events, 100, fd_event_hash_func,
-			fd_event_compare_func, (zbx_clean_func_t)fd_event_clean,
+			fd_event_compare_func, fd_event_clean_wrapper,
 			ZBX_DEFAULT_MEM_MALLOC_FUNC, ZBX_DEFAULT_MEM_REALLOC_FUNC, ZBX_DEFAULT_MEM_FREE_FUNC);
 
 	if (NULL == (poller_config->base = event_base_new()))
@@ -840,6 +844,8 @@ ZBX_THREAD_ENTRY(zbx_async_poller_thread, args)
 #endif
 	}
 
+	zbx_setproctitle("%s #%d [terminating]", get_process_type_string(process_type), process_num);
+
 	async_poller_destroy(&poller_config);
 
 #ifdef HAVE_NETSNMP
@@ -850,7 +856,6 @@ ZBX_THREAD_ENTRY(zbx_async_poller_thread, args)
 
 	zbx_setproctitle("%s #%d [terminated]", get_process_type_string(process_type), process_num);
 
-	while (1)
-		zbx_sleep(SEC_PER_MIN);
+	exit(EXIT_SUCCESS);
 #undef STAT_INTERVAL
 }

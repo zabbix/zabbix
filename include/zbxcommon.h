@@ -353,16 +353,17 @@ zbx_user_permission_t;
 #	define MIN(a, b) ((a) < (b) ? (a) : (b))
 #endif
 
-#define zbx_calloc(old, nmemb, size)	zbx_calloc2(__FILE__, __LINE__, old, nmemb, size)
-#define zbx_malloc(old, size)		zbx_malloc2(__FILE__, __LINE__, old, size)
-#define zbx_realloc(src, size)		zbx_realloc2(__FILE__, __LINE__, src, size)
+#define zbx_calloc(old, nmemb, size)	\
+		zbx_calloc2(__FILE__, __LINE__, old, nmemb, size, calloc(MAX(nmemb, 1), MAX(size, 1)))
+#define zbx_malloc(old, size)		zbx_malloc2(__FILE__, __LINE__, old, size, malloc(MAX(size, 1)))
+#define zbx_realloc(src, size)		zbx_realloc2(__FILE__, __LINE__, size, realloc(src, MAX(size, 1)))
 #define zbx_strdup(old, str)		zbx_strdup2(__FILE__, __LINE__, old, str)
 
 #define ZBX_STRDUP(var, str)	(var = zbx_strdup(var, str))
 
-void	*zbx_calloc2(const char *filename, int line, void *old, size_t nmemb, size_t size);
-void	*zbx_malloc2(const char *filename, int line, void *old, size_t size);
-void	*zbx_realloc2(const char *filename, int line, void *old, size_t size);
+void	*zbx_calloc2(const char *filename, int line, void *old, size_t nmemb, size_t size, void *new_ptr);
+void	*zbx_malloc2(const char *filename, int line, void *old, size_t size, void *new_ptr);
+void	*zbx_realloc2(const char *filename, int line, size_t size, void *new_ptr);
 char	*zbx_strdup2(const char *filename, int line, char *old, const char *str);
 
 void	*zbx_guaranteed_memset(void *v, int c, size_t n);
@@ -709,6 +710,8 @@ int	zbx_alarm_timed_out(void);
 #define ZBX_PREPROC_FAIL_DISCARD_VALUE	1
 #define ZBX_PREPROC_FAIL_SET_VALUE	2
 #define ZBX_PREPROC_FAIL_SET_ERROR	3
+
+#define ZBX_SHA512_BINARY_LENGTH 64
 
 /* includes terminating '\0' */
 #define CUID_LEN	26

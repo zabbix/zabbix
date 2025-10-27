@@ -35,32 +35,34 @@ class CFieldSet extends CField {
 		this.#discoverAllFields();
 
 		const observer = new MutationObserver(observations => {
-			/*
-			 * Observer is launched also when error message node is added (because childList is observer).
-			 * This must be skipped.
-			 */
-			const skip = observations.some((obs) => {
-				return obs.type === 'childList'
-						&& [...obs.addedNodes, ...obs.removedNodes]
-								.filter((n) => n.nodeType == Node.ELEMENT_NODE)
-								.every((n) => n.classList.contains('error') || n.classList.contains('error-list'));
-			});
+			let node_change = false;
+			let attribute_change = false;
 
-			let force_validate = Object.values(this.#fields).length == 0;
+			for (const obs of observations) {
+				if (obs.type === 'childList') {
+					node_change = [...obs.addedNodes, ...obs.removedNodes]
+						.some(node => {
+							const is_field = '[data-field-type]:not([data-temp-field])';
 
-			// Later discovered fields are automatically made changed to allow it to show errors immediately.
-			this.#discoverAllFields();
+							return node.nodeType == Node.ELEMENT_NODE
+								&& (node.matches(is_field) || node.querySelector(is_field));
+						});
 
-			// Validate anyway if there were no fields and now some are made.
-			force_validate = force_validate && Object.values(this.#fields).length != 0;
+					if (node_change) {
+						break;
+					}
+				}
+				else if (obs.type === 'attributes') {
+					attribute_change = attribute_change || obs.attributeName === 'data-skip-from-submit';
+				}
+			}
 
-			// Validate anyway if some of field has received or lost 'data-skip-from-submit' attribute.
-			force_validate = force_validate
-				|| observations.some(obs => obs.type === 'attributes' && obs.attributeName === 'data-skip-from-submit');
+			if (node_change) {
+				this.#discoverAllFields();
+			}
 
-			if (force_validate || !skip) {
-				this.#on_blur_debounce && clearTimeout(this.#on_blur_debounce);
-				this.#on_blur_debounce = setTimeout(() => this.onBlur(), 50);
+			if (node_change || attribute_change) {
+				this.onBlur();
 			}
 		});
 

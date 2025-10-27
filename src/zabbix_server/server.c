@@ -153,6 +153,12 @@ static const char	*help_message[] = {
 	"      " ZBX_PROXY_CONFIG_CACHE_RELOAD "[=name] Reload configuration cache on proxy by its name,",
 	"                                        comma-separated list can be used to pass multiple names.",
 	"                                        All proxies will be reloaded if no names were specified.",
+	"      " ZBX_DBPOOL_STATUS "                    Display database connection pool status",
+	"      " ZBX_DBPOOL_SET_IDLE_TIMEOUT "=seconds",
+	"       "      "                           Set the idle timeout for connections in the database pool",
+	"      " ZBX_DBPOOL_SET_MAX_IDLE "=num     Set the maximum number of idle connections retained in",
+	"      "      "                              the database pool",
+	"      " ZBX_DBPOOL_SET_MAX_OPEN "=num     Set the maximum number of open connections in the database pool",
 	"",
 	"      Log level control targets:",
 	"        process-type              All processes of specified type",
@@ -1213,7 +1219,7 @@ static void	zbx_on_exit(int ret, void *on_exit_args)
 	if (NULL != zbx_threads)
 	{
 		/* wait for all child processes to exit */
-		zbx_threads_kill_and_wait(zbx_threads, threads_flags, zbx_threads_num);
+		zbx_threads_kill_and_wait(zbx_threads, threads_flags, zbx_threads_num, ret);
 
 		zbx_free(zbx_threads);
 		zbx_free(threads_flags);
@@ -1916,7 +1922,7 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 		switch (thread_args.info.process_type)
 		{
 			case ZBX_PROCESS_TYPE_SERVICEMAN:
-				threads_flags[i] = ZBX_THREAD_PRIORITY_SECOND;
+				threads_flags[i] = ZBX_THREAD_PRIORITY_WORKER;
 				thread_args.args = &service_manager_args;
 				zbx_thread_start(service_manager_thread, &thread_args, &zbx_threads[i]);
 				break;
@@ -1997,12 +2003,12 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 				zbx_thread_start(zbx_httppoller_thread, &thread_args, &zbx_threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_DISCOVERYMANAGER:
-				threads_flags[i] = ZBX_THREAD_PRIORITY_FIRST;
+				threads_flags[i] = ZBX_THREAD_PRIORITY_COLLECTOR;
 				thread_args.args = &discoverer_args;
 				zbx_thread_start(zbx_discoverer_thread, &thread_args, &zbx_threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_HISTSYNCER:
-				threads_flags[i] = ZBX_THREAD_PRIORITY_FIRST;
+				threads_flags[i] = ZBX_THREAD_PRIORITY_SYNCER;
 				thread_args.args = &dbsyncer_args;
 				zbx_thread_start(zbx_dbsyncer_thread, &thread_args, &zbx_threads[i]);
 				break;
@@ -2035,7 +2041,7 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 				zbx_thread_start(taskmanager_thread, &thread_args, &zbx_threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_PREPROCMAN:
-				threads_flags[i] = ZBX_THREAD_PRIORITY_FIRST;
+				threads_flags[i] = ZBX_THREAD_PRIORITY_COLLECTOR;
 				thread_args.args = &preproc_man_args;
 				zbx_thread_start(zbx_pp_manager_thread, &thread_args, &zbx_threads[i]);
 				break;
@@ -2069,11 +2075,11 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 				zbx_thread_start(zbx_poller_thread, &thread_args, &zbx_threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_AVAILMAN:
-				threads_flags[i] = ZBX_THREAD_PRIORITY_FIRST;
+				threads_flags[i] = ZBX_THREAD_PRIORITY_SYNCER;
 				zbx_thread_start(zbx_availability_manager_thread, &thread_args, &zbx_threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_CONNECTORMANAGER:
-				threads_flags[i] = ZBX_THREAD_PRIORITY_SECOND;
+				threads_flags[i] = ZBX_THREAD_PRIORITY_WORKER;
 				thread_args.args = &connector_manager_args;
 				zbx_thread_start(connector_manager_thread, &thread_args, &zbx_threads[i]);
 				break;
@@ -2082,7 +2088,7 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 				zbx_thread_start(connector_worker_thread, &thread_args, &zbx_threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_DBCONFIGWORKER:
-				threads_flags[i] = ZBX_THREAD_PRIORITY_SECOND;
+				threads_flags[i] = ZBX_THREAD_PRIORITY_WORKER;
 				zbx_thread_start(zbx_dbconfig_worker_thread, &thread_args, &zbx_threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_REPORTMANAGER:
@@ -2103,16 +2109,19 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 				zbx_thread_start(zbx_poller_thread, &thread_args, &zbx_threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_HTTPAGENT_POLLER:
+				threads_flags[i] = ZBX_THREAD_PRIORITY_COLLECTOR;
 				poller_args.poller_type = ZBX_POLLER_TYPE_HTTPAGENT;
 				thread_args.args = &poller_args;
 				zbx_thread_start(zbx_async_poller_thread, &thread_args, &zbx_threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_AGENT_POLLER:
+				threads_flags[i] = ZBX_THREAD_PRIORITY_COLLECTOR;
 				poller_args.poller_type = ZBX_POLLER_TYPE_AGENT;
 				thread_args.args = &poller_args;
 				zbx_thread_start(zbx_async_poller_thread, &thread_args, &zbx_threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_SNMP_POLLER:
+				threads_flags[i] = ZBX_THREAD_PRIORITY_COLLECTOR;
 				poller_args.poller_type = ZBX_POLLER_TYPE_SNMP;
 				thread_args.args = &poller_args;
 				zbx_thread_start(zbx_async_poller_thread, &thread_args, &zbx_threads[i]);
@@ -2141,14 +2150,6 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 		zabbix_log(LOG_LEVEL_CRIT, "cannot obtain HA status: %s", error);
 		zbx_free(error);
 	}
-
-	if (SUCCEED != zbx_db_init(&error))
-	{
-		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize database: %s", error);
-		zbx_free(error);
-		exit(EXIT_FAILURE);
-	}
-
 out:
 	zbx_unset_exit_on_terminate();
 
@@ -2238,6 +2239,14 @@ static void	server_teardown(zbx_rtc_t *rtc, zbx_socket_t *listen_sock)
 #ifdef HAVE_PTHREAD_PROCESS_SHARED
 	zbx_locks_enable();
 #endif
+	/* re-initialize database before re-starting HA manager */
+	if (SUCCEED != zbx_db_init(&error))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize database: %s", error);
+		zbx_free(error);
+		exit(EXIT_FAILURE);
+	}
+
 	ha_config->ha_node_name =	CONFIG_HA_NODE_NAME;
 	ha_config->ha_node_address =	CONFIG_NODE_ADDRESS;
 	ha_config->default_node_ip =	zbx_config_listen_ip;
@@ -2461,6 +2470,13 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 			config_ssl_cert_location, config_ssl_key_location, &error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize database credentials from vault: %s", error);
+		zbx_free(error);
+		exit(EXIT_FAILURE);
+	}
+
+	if (SUCCEED != zbx_db_library_init(&error))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize database library: %s", error);
 		zbx_free(error);
 		exit(EXIT_FAILURE);
 	}
@@ -2710,7 +2726,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 
 		if (0 < (pid = waitpid((pid_t)-1, &i, WNOHANG)))
 		{
-			if (SUCCEED == zbx_is_child_pid(pid, zbx_threads, zbx_threads_num))
+			if (SUCCEED == zbx_child_cleanup(pid, zbx_threads, zbx_threads_num))
 			{
 				zbx_set_exiting_with_fail();
 				break;
