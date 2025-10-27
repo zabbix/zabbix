@@ -464,7 +464,10 @@ class testPermissionsWithoutCSRF extends CWebTest {
 				[
 					'db' => 'SELECT * FROM hosts',
 					'link' => 'zabbix.php?action=proxy.list',
-					'overlay' => 'update'
+					'overlay' => 'update',
+					'fields' => [
+						'id:name' => 'CSRF validation proxy update'
+					]
 				]
 			],
 			// #43 Proxy create.
@@ -472,7 +475,10 @@ class testPermissionsWithoutCSRF extends CWebTest {
 				[
 					'db' => 'SELECT * FROM hosts',
 					'link' => 'zabbix.php?action=proxy.list',
-					'overlay' => 'create'
+					'overlay' => 'create',
+					'fields' => [
+						'id:name' => 'CSRF validation proxy create'
+					]
 				]
 			],
 			// #44 Authentication update.
