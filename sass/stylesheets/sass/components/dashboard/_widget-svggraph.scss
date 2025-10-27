@@ -3,7 +3,7 @@
 form.dashboard-widget-svggraph {
 	max-width: 1330px;
 	min-width: 1120px;
-	width: 100vw;
+	width: #{"min(100vw - 42px, calc(var(--modal-max-width) - 22px))"};
 
 	.graph-widget-config-tabs {
 		grid-column: 1 / -1;

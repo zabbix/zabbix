@@ -276,7 +276,17 @@ class testPermissionsWithoutCSRF extends CWebTest {
 				[
 					'db' => 'SELECT * FROM maintenances',
 					'link' => 'zabbix.php?action=maintenance.list',
-					'overlay' => 'create'
+					'overlay' => 'create',
+					'fields' => [
+						'id:name' => 'CSRF maintenance test name',
+						'xpath://div[@id="groupids_"]/..' => 'Zabbix servers'
+					],
+					'secondary_dialog' => [
+						'field' => 'id:timeperiods',
+						'fill' => [
+							'Period type' => 'One time only'
+						]
+					]
 				]
 			],
 			// #21 Maintenance update.
@@ -728,6 +738,16 @@ class testPermissionsWithoutCSRF extends CWebTest {
 			foreach ($data['fields'] as $field => $value) {
 				$this->query($field)->one()->detect()->fill($value);
 			}
+		}
+
+		// Fill in mandatory fields in a secondary form if it contains fields that are required for form submission.
+		if (array_key_exists('secondary_dialog', $data)) {
+			$this->query($data['secondary_dialog']['field'])->one()->query('button:Add')->one()->click();
+
+			$secondary_form = COverlayDialogElement::find()->waitUntilReady()->all()->last()->asForm();
+			$secondary_form->fill($data['secondary_dialog']['fill']);
+			$secondary_form->submit();
+			$secondary_form->waitUntilNotVisible();
 		}
 
 		// Delete hidden input with CSRF token.
