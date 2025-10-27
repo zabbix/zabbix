@@ -94,7 +94,7 @@ class testFormMapProperties extends CWebTest {
 				'width' => 800,
 				'height' => 600,
 				'highlight' => SYSMAP_HIGHLIGHT_OFF,
-				'label_type' => MAP_LABEL_TYPE_LABEL,
+				'label_type' => MAP_LABEL_TYPE_LABEL
 			],
 			[
 				'name' => self::MAP_UPDATE,
