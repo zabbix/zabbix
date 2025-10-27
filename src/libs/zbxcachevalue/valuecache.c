@@ -2779,6 +2779,26 @@ out:
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: log uncached queries for debugging                                *
+ *                                                                            *
+ * Parameters: queries - [IN] vector of uncached history queries              *
+ *                                                                            *
+ ******************************************************************************/
+static void	vc_precache_log_uncached_queries(zbx_vector_vc_query_t *queries)
+{
+	zabbix_log(LOG_LEVEL_TRACE, "Uncached queries (%d):", queries->values_num);
+
+	for (int i = 0; i < queries->values_num; i++)
+	{
+		zbx_vc_query_t	 *query = &queries->values[i];
+
+		zabbix_log(LOG_LEVEL_TRACE, "  itemid:" ZBX_FS_UI64 ", timestamp %d, range:(type:%d value:%d)",
+				query->itemid, query->ts_end, query->range->type, query->range->value);
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: precache history data for multiple item history queries           *
  *                                                                            *
  * Parameters: queries - [IN] vector of history queries                       *
@@ -2837,6 +2857,9 @@ void	zbx_vc_precache_queries(zbx_vector_vc_query_t *queries)
 
 		if (FAIL == vc_precache_query_windows(&uncached_queries[i], VC_PRECACHE_WINDOW2))
 			goto out;
+
+		if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_TRACE))
+			vc_precache_log_uncached_queries(&uncached_queries[i]);
 	}
 out:
 	for (size_t i = 0; i < ARRSIZE(uncached_queries); i++)
