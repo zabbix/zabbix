@@ -1016,20 +1016,9 @@ class CApiInputValidator {
 				$value = (float) $number_parser->getMatch();
 			}
 			else {
-				$macro_parsers = [];
-				if ($flags & API_ALLOW_USER_MACRO) {
-					$macro_parsers[] = new CUserMacroParser();
-					$macro_parsers[] = new CUserMacroFunctionParser();
-				}
-				if ($flags & API_ALLOW_LLD_MACRO) {
-					$macro_parsers[] = new CLLDMacroParser();
-					$macro_parsers[] = new CLLDMacroFunctionParser();
-				}
 
-				foreach ($macro_parsers as $macro_parser) {
-					if ($macro_parser->parse($data) == CParser::PARSE_SUCCESS) {
-						return true;
-					}
+				if (self::checkMacrosSyntax($data, $flags)) {
+					return true;
 				}
 
 				$value = NAN;
@@ -2871,20 +2860,8 @@ class CApiInputValidator {
 			return false;
 		}
 
-		$macro_parsers = [];
-		if ($flags & API_ALLOW_USER_MACRO) {
-			$macro_parsers[] = new CUserMacroParser();
-			$macro_parsers[] = new CUserMacroFunctionParser();
-		}
-		if ($flags & API_ALLOW_LLD_MACRO) {
-			$macro_parsers[] = new CLLDMacroParser();
-			$macro_parsers[] = new CLLDMacroFunctionParser();
-		}
-
-		foreach ($macro_parsers as $macro_parser) {
-			if ($macro_parser->parse($data) == CParser::PARSE_SUCCESS) {
-				return true;
-			}
+		if (self::checkMacrosSyntax($data, $flags)) {
+			return true;
 		}
 
 		if (!self::validateInt32(['in' => ZBX_MIN_PORT_NUMBER.':'.ZBX_MAX_PORT_NUMBER], $data, $path, $error)) {
@@ -4143,9 +4120,18 @@ class CApiInputValidator {
 				}
 
 				$api_input_rules = ['type' => API_OBJECT, 'fields' => [
-					'1' =>	['type' => API_FLOAT, 'flags' => API_REQUIRED | API_ALLOW_NULL | ($flags & API_ALLOW_USER_MACRO) | ($flags & API_ALLOW_LLD_MACRO)],
-					'2' =>	['type' => API_FLOAT, 'flags' => API_REQUIRED | API_ALLOW_NULL | ($flags & API_ALLOW_USER_MACRO) | ($flags & API_ALLOW_LLD_MACRO), 'compare' => ['operator' => '>', 'field' => '1']]
-				]];
+						'1' => ['type' => API_FLOAT, 'flags' => API_REQUIRED | API_ALLOW_NULL | ($flags & API_ALLOW_USER_MACRO) | ($flags & API_ALLOW_LLD_MACRO)],
+						'2' => ['type' => API_FLOAT, 'flags' => API_REQUIRED | API_ALLOW_NULL | ($flags & API_ALLOW_USER_MACRO) | ($flags & API_ALLOW_LLD_MACRO), 'compare' => ['operator' => '>', 'field' => '1']]
+					]
+				];
+
+				foreach ($params as $param) {
+					if ($param !== null && self::checkMacrosSyntax($param, $flags)) {
+						unset($api_input_rules['fields']['2']['compare']);
+						break;
+					}
+				}
+
 				break;
 
 			case ZBX_PREPROC_VALIDATE_REGEX:
@@ -4354,5 +4340,25 @@ class CApiInputValidator {
 		}
 
 		return self::validateUserMacro($rule, $data, $path, $error);
+	}
+
+	private static function checkMacrosSyntax(string $string, int $flags): bool {
+		$macro_parsers = [];
+		if ($flags & API_ALLOW_USER_MACRO) {
+			$macro_parsers[] = new CUserMacroParser();
+			$macro_parsers[] = new CUserMacroFunctionParser();
+		}
+		if ($flags & API_ALLOW_LLD_MACRO) {
+			$macro_parsers[] = new CLLDMacroParser();
+			$macro_parsers[] = new CLLDMacroFunctionParser();
+		}
+
+		foreach ($macro_parsers as $macro_parser) {
+			if ($macro_parser->parse($string) == CParser::PARSE_SUCCESS) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 }
