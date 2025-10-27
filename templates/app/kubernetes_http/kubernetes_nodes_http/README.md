@@ -11,8 +11,8 @@ Change the values according to the environment in the file $HOME/zabbix_values.y
 
 For example:
 
- -  ## Enables use of **Zabbix proxy**
-    enabled: false
+Enables use of **Zabbix proxy**
+`enabled: false`
 
 Set the `{$KUBE.API.URL}` such as `<scheme>://<host>:<port>`.
 
@@ -26,7 +26,7 @@ Get the generated service account token using the command:
 
 Then set it to the macro `{$KUBE.API.TOKEN}`.
 
-Set up the macros to filter the metrics of discovered nodes
+Set up the macros to filter the metrics of discovered nodes.
 
 
 ## Requirements
@@ -48,7 +48,7 @@ Install the [Zabbix Helm Chart](https://git.zabbix.com/projects/ZT/repos/kuberne
 
 Set the `{$KUBE.API.URL}` such as `<scheme>://<host>:<port>`.
 
-Get the generated service account token using the command
+Get the generated service account token using the command:
 
 `kubectl get secret zabbix-zabbix-helm-chart -n monitoring -o jsonpath={.data.token} | base64 -d`
 
