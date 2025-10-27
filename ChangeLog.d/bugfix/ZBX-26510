@@ -1,1 +1,0 @@
-.......PS. [ZBX-26510] fixed timeouts during script execution on Zabbix agent on action operation or manual action by trying passive interface if exists (vso)

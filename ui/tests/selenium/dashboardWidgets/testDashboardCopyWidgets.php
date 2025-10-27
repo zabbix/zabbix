@@ -706,7 +706,7 @@ class testDashboardCopyWidgets extends CWebTest {
 		$inaccessible_xpath = 'xpath:.//div[contains(@class, "dashboard-widget-inaccessible")]';
 		$count = $dashboard->query($inaccessible_xpath)->waitUntilVisible()->count();
 
-		// Template dashbards are always in edit mode, so entering edit mode is only required for regular dashboards.
+		// Template dashboard are always in edit mode, so entering edit mode is only required for regular dashboards.
 		if(!array_key_exists('template', $data)) {
 			$dashboard->edit();
 		}
@@ -752,6 +752,8 @@ class testDashboardCopyWidgets extends CWebTest {
 		if ($this->page->isAlertPresent()) {
 			$this->page->acceptAlert();
 		}
+		// TODO: unstable test on Jenkins, appears js error 34749:5 Uncaught
+		CDashboardElement::find()->waitUntilReady();
 	}
 
 	/**

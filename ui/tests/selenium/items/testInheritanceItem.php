@@ -62,8 +62,8 @@ class testInheritanceItem extends CLegacyWebTest {
 		$this->query('link:'.CDBHelper::getValue('SELECT name from items WHERE itemid='.$data['itemid']))->one()->click();
 		COverlayDialogElement::find()->one()->waitUntilready()->getFooter()->query('button:Update')->one()->click();
 		COverlayDialogElement::ensureNotPresent();
+		$this->assertMessage(TEST_GOOD, 'Item updated');
 		$this->zbxTestCheckTitle('Configuration of items');
-		$this->zbxTestTextPresent('Item updated');
 
 		$this->assertEquals($oldHashItems, CDBHelper::getHash($sqlItems));
 	}
