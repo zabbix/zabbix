@@ -13,6 +13,8 @@
 **/
 
 #include "dbupgrade.h"
+
+#include "zbxdb.h"
 #include "zbxdbschema.h"
 #include "zbxdb.h"
 
@@ -68,6 +70,20 @@ static int	DBpatch_7050006(void)
 
 static int	DBpatch_7050007(void)
 {
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > zbx_db_execute("insert into module (moduleid,id,relative_path,status,config) values"
+		" (" ZBX_FS_UI64 ",'scatterplot','widgets/scatterplot',%d,'[]')", zbx_db_get_maxid("module"), 1))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+static int	DBpatch_7050008(void)
+{
 	int		i;
 	const char	*values[] = {
 			"web.hosts.host_prototypes.php.sort", "web.hosts.host.prototype.list.sort",
@@ -102,5 +118,6 @@ DBPATCH_ADD(7050004, 0, 1)
 DBPATCH_ADD(7050005, 0, 1)
 DBPATCH_ADD(7050006, 0, 1)
 DBPATCH_ADD(7050007, 0, 1)
+DBPATCH_ADD(7050008, 0, 1)
 
 DBPATCH_END()

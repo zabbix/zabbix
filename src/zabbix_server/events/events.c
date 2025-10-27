@@ -17,7 +17,6 @@
 #include "../db_lengths_constants.h"
 #include "../actions/actions.h"
 
-#include "zbxexpression.h"
 #include "zbxexport.h"
 #include "zbxservice.h"
 #include "zbxnum.h"
@@ -454,8 +453,13 @@ zbx_db_event	*zbx_add_event(unsigned char source, unsigned char object, zbx_uint
 		zbx_substitute_macros(&event->trigger.correlation_tag, err, sizeof(err), &macro_trigger_tag_resolv,
 				um_handle, event, NULL);
 
-		zbx_substitute_simple_macros(NULL, event, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
-				&event->name, ZBX_MACRO_TYPE_EVENT_NAME, err, sizeof(err));
+		zbx_token_search_t	search_token = ZBX_TOKEN_SEARCH_REFERENCES;
+
+		if (EVENT_SOURCE_TRIGGERS == event->source)
+			search_token |= ZBX_TOKEN_SEARCH_EXPRESSION_MACRO;
+
+		zbx_substitute_macros_ext_search(search_token, &event->name, err, sizeof(err),
+				&zbx_macro_event_name_resolv, um_handle, event, NULL);
 
 		zbx_vector_tags_ptr_create(&event->tags);
 

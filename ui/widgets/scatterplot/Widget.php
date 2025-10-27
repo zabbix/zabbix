@@ -1,3 +1,4 @@
+<?php declare(strict_types = 0);
 /*
 ** Copyright (C) 2001-2025 Zabbix SIA
 **
@@ -12,18 +13,23 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-#ifndef ZABBIX_EXPRESSION_H
-#define ZABBIX_EXPRESSION_H
 
-#include "zbxdbhigh.h"
-#include "zbxcacheconfig.h"
-#include "zbxjson.h"
+namespace Widgets\ScatterPlot;
 
-int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const zbx_db_event *event,
-		const zbx_db_event *r_event, const zbx_uint64_t *userid, const zbx_uint64_t *hostid,
-		const zbx_dc_host_t *dc_host, const zbx_dc_item_t *dc_item, const zbx_db_alert *alert,
-		const zbx_db_acknowledge *ack, const zbx_service_alarm_t *service_alarm, const zbx_db_service *service,
-		const char *tz, zbx_history_recv_item_t *history_data_item, char **data, int macro_type, char *error,
-		int maxerrlen);
+use Zabbix\Core\CWidget;
 
-#endif
+class Widget extends CWidget {
+
+	public function getDefaultName(): string {
+		return _('Scatter plot');
+	}
+
+	public function getTranslationStrings(): array {
+		return [
+			'class.widget.js' => [
+				'Actions' => _('Actions'),
+				'Download image' => _('Download image')
+			]
+		];
+	}
+}
