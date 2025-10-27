@@ -1114,14 +1114,17 @@ class CScreenProblem extends CScreenBase {
 			if ($this->data['filter']['show_tags']) {
 				$filter_tags = array_key_exists('tags', $this->data['filter']) ? $this->data['filter']['tags'] : [];
 
-				CTagHelper::orderTags($data['problems'], $filter_tags, $this->data['filter']['tag_priority']);
-				CTagHelper::orderTags($symptom_data['problems'], $filter_tags, $this->data['filter']['tag_priority']);
+				CTagHelper::orderTags($data['problems']);
+				CTagHelper::orderTags($symptom_data['problems']);
 
 				$object_type = $this->data['filter']['show'] == TRIGGERS_OPTION_ALL
 					? ZBX_TAG_OBJECT_EVENT
 					: ZBX_TAG_OBJECT_PROBLEM;
 
 				$tags = CTagHelper::getTagsHtml($data['problems'] + $symptom_data['problems'], $object_type, [
+					'filter_tags' =>
+						array_key_exists('tags', $this->data['filter']) ? $this->data['filter']['tags'] : [],
+					'tag_priority' => $this->data['filter']['tag_priority'],
 					'show_tags_limit' => $this->data['filter']['show_tags'],
 					'tag_name_format' => $this->data['filter']['tag_name_format']
 				]);

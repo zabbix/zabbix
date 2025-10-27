@@ -145,11 +145,12 @@ class CControllerItemList extends CControllerItem {
 
 		if ($items) {
 			CTagHelper::mergeOwnAndInheritedTags($items, true);
-			CTagHelper::orderTags($items, $filter['filter_tags']);
+			CTagHelper::orderTags($items);
 
 			$data['items'] = $items;
 			$data['parent_templates'] = getItemParentTemplates($items, ZBX_FLAG_DISCOVERY_NORMAL);
-			$data['tags'] = CTagHelper::getTagsHtml($items, ZBX_TAG_OBJECT_ITEM);
+			$data['tags'] =
+				CTagHelper::getTagsHtml($items, ZBX_TAG_OBJECT_ITEM, ['filter_tags' => $filter['filter_tags']]);
 		}
 
 		$response = new CControllerResponseData($data);

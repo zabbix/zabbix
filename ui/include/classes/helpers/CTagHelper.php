@@ -63,80 +63,31 @@ class CTagHelper {
 		unset($object);
 	}
 
-	public static function getFilterTagsIndexedByTag(array $filter_tags): array {
-		$filter_tags_by_tag = [];
-
-		foreach ($filter_tags as $filter_tag) {
-			$filter_tags_by_tag[$filter_tag['tag']][] = $filter_tag;
-		}
-
-		return $filter_tags_by_tag;
-	}
-
-	public static function getPriorityTags(string $tag_priority): array {
-		if ($tag_priority === '') {
-			return [];
-		}
-
-		return array_map('trim', explode(',', $tag_priority));
-	}
-
 	public static function orderTagsForObject(array &$object, array $filter_tags = [],
 			array $priority_tags = []): void {
 		CArrayHelper::sort($object['tags'], ['tag', 'value']);
 
 		if ($filter_tags) {
-			self::orderByFilterTagsFirst($object, $filter_tags);
+			self::orderByFilterTagsFirst($object['tags'], $filter_tags);
 		}
 
 		if ($priority_tags) {
-			self::orderByPriorityTagsFirst($object, $priority_tags);
+			self::orderByPriorityTagsFirst($object['tags'], $priority_tags);
 		}
-	}
-
-	private static function orderByFilterTagsFirst(array &$object, array $filter_tags): void {
-		$first_tags = [];
-
-		foreach ($object['tags'] as $tag_i => $tag) {
-			if (!array_key_exists($tag['tag'], $filter_tags)) {
-				continue;
-			}
-
-			foreach ($filter_tags[$tag['tag']] as $filter_tag) {
-				if (($filter_tag['operator'] == TAG_OPERATOR_LIKE
-						&& ($filter_tag['value'] === '' || stripos($tag['value'], $filter_tag['value']) !== false))
-						|| ($filter_tag['operator'] == TAG_OPERATOR_EQUAL && $tag['value'] === $filter_tag['value'])) {
-					$first_tags[] = $tag;
-					unset($object['tags'][$tag_i]);
-					break;
-				}
-			}
-		}
-
-		$object['tags'] = array_merge($first_tags, $object['tags']);
-	}
-
-	private static function orderByPriorityTagsFirst(array &$object, array $priority_tags): void {
-		$first_tags = [];
-
-		foreach ($object['tags'] as $i => $tag) {
-			if (in_array($tag['tag'], $priority_tags)) {
-				$first_tags[] = $tag;
-				unset($object['tags'][$i]);
-			}
-		}
-
-		$object['tags'] = array_merge($first_tags, $object['tags']);
 	}
 
 	public static function getTagsHtml(array $objects, int $object_type, array $options = []): array {
 		$options += [
+			'filter_tags' => [],
+			'tag_priority' => '',
 			'show_tags_limit' => ZBX_TAG_COUNT_DEFAULT,
 			'tag_name_format' => TAG_NAME_FULL,
 			'subfilter_tags' => null
 		];
 
 		$id_field_name = self::getIdFieldName($object_type);
+		$filter_tags = self::getFilterTagsIndexedByTag($options['filter_tags']);
+		$priority_tags = self::getPriorityTags($options['tag_priority']);
 
 		$html_elements = [];
 
@@ -147,7 +98,8 @@ class CTagHelper {
 			$show_tags_count = 0;
 
 			if ($options['show_tags_limit'] != SHOW_TAGS_NONE) {
-				foreach ($object['tags'] as $tag) {
+
+				foreach (self::getOrderedTags($object['tags'], $filter_tags, $priority_tags) as $tag) {
 					if (self::getTagString($tag, $options['tag_name_format']) === '') {
 						continue;
 					}
@@ -191,6 +143,71 @@ class CTagHelper {
 			ZBX_TAG_OBJECT_SERVICE  => 'serviceid',
 			ZBX_TAG_OBJECT_HOST_GROUP => 'groupid'
 		};
+	}
+
+	private static function getFilterTagsIndexedByTag(array $filter_tags): array {
+		$filter_tags_by_tag = [];
+
+		foreach ($filter_tags as $filter_tag) {
+			$filter_tags_by_tag[$filter_tag['tag']][] = $filter_tag;
+		}
+
+		return $filter_tags_by_tag;
+	}
+
+	private static function getPriorityTags(string $tag_priority): array {
+		if ($tag_priority === '') {
+			return [];
+		}
+
+		return array_map('trim', explode(',', $tag_priority));
+	}
+
+	private static function getOrderedTags(array $tags, array $filter_tags, array $priority_tags): array {
+		if ($filter_tags) {
+			self::orderByFilterTagsFirst($tags, $filter_tags);
+		}
+
+		if ($priority_tags) {
+			self::orderByPriorityTagsFirst($tags, $priority_tags);
+		}
+
+		return $tags;
+	}
+
+	private static function orderByFilterTagsFirst(array &$tags, array $filter_tags): void {
+		$first_tags = [];
+
+		foreach ($tags as $tag_i => $tag) {
+			if (!array_key_exists($tag['tag'], $filter_tags)) {
+				continue;
+			}
+
+			foreach ($filter_tags[$tag['tag']] as $filter_tag) {
+				if (($filter_tag['operator'] == TAG_OPERATOR_LIKE
+						&& ($filter_tag['value'] === '' || stripos($tag['value'], $filter_tag['value']) !== false))
+						|| ($filter_tag['operator'] == TAG_OPERATOR_EQUAL && $tag['value'] === $filter_tag['value'])) {
+					$first_tags[] = $tag;
+					unset($tags[$tag_i]);
+					break;
+				}
+			}
+		}
+
+		$tags = array_merge($first_tags, $tags);
+	}
+
+	private static function orderByPriorityTagsFirst(array &$tags, array $priority_tags): void {
+		$first_tags = [];
+
+		foreach ($tags as $i => $tag) {
+			if (in_array($tag['tag'], $priority_tags)) {
+				$first_tags[] = $tag;
+				unset($tags[$i]);
+			}
+		}
+
+		$tags = array_merge($first_tags, $tags);
 	}
 
 	private static function getTagHtml(array $tag, int $object_type, array $options): CTag {

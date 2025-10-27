@@ -409,7 +409,7 @@ class CControllerHostList extends CController {
 		}
 
 		CTagHelper::mergeOwnAndInheritedTags($hosts, true);
-		CTagHelper::orderTags($hosts, $filter['tags']);
+		CTagHelper::orderTags($hosts);
 
 		$data = [
 			'action' => $this->getAction(),
@@ -428,7 +428,7 @@ class CControllerHostList extends CController {
 			'proxy_groups_ms' => $proxy_groups_ms,
 			'profileIdx' => 'web.hosts.filter',
 			'active_tab' => CProfile::get('web.hosts.filter.active', 1),
-			'tags' => CTagHelper::getTagsHtml($hosts, ZBX_TAG_OBJECT_HOST),
+			'tags' => CTagHelper::getTagsHtml($hosts, ZBX_TAG_OBJECT_HOST, ['filter_tags' => $filter['tags']]),
 			'config' => [
 				'max_in_table' => CSettingsHelper::get(CSettingsHelper::MAX_IN_TABLE)
 			],

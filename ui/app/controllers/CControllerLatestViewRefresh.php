@@ -102,6 +102,8 @@ class CControllerLatestViewRefresh extends CControllerLatestView {
 						'hk_history_global' => CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY_GLOBAL)
 					],
 					'tags' => CTagHelper::getTagsHtml($prepared_data['items'], ZBX_TAG_OBJECT_ITEM, [
+						'filter_tags' => $filter['tags'],
+						'tag_priority' => $filter['tag_priority'],
 						'show_tags_limit' => (int) $filter['show_tags'],
 						'tag_name_format' => (int) $filter['tag_name_format'],
 						'subfilter_tags' =>
