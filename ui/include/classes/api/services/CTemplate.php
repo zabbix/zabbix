@@ -851,7 +851,7 @@ class CTemplate extends CHostGeneral {
 		}
 
 		if ($del_template_host_links) {
-			self::deleteHostTemplateCache($del_template_host_links, []);
+			self::deleteHostTemplateCache($del_template_host_links);
 		}
 	}
 
