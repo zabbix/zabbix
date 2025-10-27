@@ -19,7 +19,6 @@ require_once __DIR__.'/../behaviors/CTableBehavior.php';
 require_once __DIR__.'/../behaviors/CMessageBehavior.php';
 require_once __DIR__.'/../common/testWidgets.php';
 
-
 /**
  * @dataSource AllItemValueTypes
  *
