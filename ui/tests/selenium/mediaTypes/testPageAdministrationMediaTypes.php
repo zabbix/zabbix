@@ -236,6 +236,14 @@ class testPageAdministrationMediaTypes extends CWebTest {
 			[
 				[
 					'filter' => [
+						'Name' => '   '
+					],
+					'result' => ['Multiple spaces in webhook 123']
+				]
+			],
+			[
+				[
+					'filter' => [
 						'Name' => 'a S'
 					],
 					'result' => ['Jira Service Management']

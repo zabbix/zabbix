@@ -78,7 +78,7 @@ class testPageAlertsScripts extends CWebTest {
 				'description' => 'This command reload cache.'
 			],
 			[
-				'name' => 'I love   Zabbix   UI',
+				'name' => 'Multiple   spaces   in script name',
 				'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
 				'scope' => ZBX_SCRIPT_SCOPE_ACTION,
 				'command' => '1-2-3-4 spaces',
@@ -142,7 +142,7 @@ class testPageAlertsScripts extends CWebTest {
 						'Host access' => 'Read'
 					],
 					[
-						'Name' => 'I love Zabbix UI',
+						'Name' => 'Multiple spaces in script name',
 						'Scope' => 'Action operation',
 						'Count' => '',
 						'Used in actions' => '',
@@ -349,7 +349,7 @@ class testPageAlertsScripts extends CWebTest {
 					'expected' => [
 						self::$custom_script,
 						'Detect operating system',
-						'I love Zabbix UI',
+						'Multiple spaces in script name',
 						self::$script_scope_event,
 						self::HOST_GROUP_SCRIPT,
 						self::$script_for_filter,
@@ -364,7 +364,7 @@ class testPageAlertsScripts extends CWebTest {
 						'Name' => '   Zabbix   '
 					],
 					'expected' => [
-						'I love Zabbix UI'
+						'Multiple spaces in script name'
 					]
 				]
 			],
@@ -418,7 +418,7 @@ class testPageAlertsScripts extends CWebTest {
 					],
 					'expected' => [
 						self::$custom_script,
-						'I love Zabbix UI',
+						'Multiple spaces in script name',
 						'Reboot',
 						self::HOST_GROUP_SCRIPT,
 						'Selenium script'
@@ -496,7 +496,7 @@ class testPageAlertsScripts extends CWebTest {
 					'expected' => [
 						self::$custom_script,
 						'Detect operating system',
-						'I love Zabbix UI',
+						'Multiple spaces in script name',
 						self::$script_scope_event,
 						'Ping',
 						'Reboot',
@@ -544,7 +544,7 @@ class testPageAlertsScripts extends CWebTest {
 						'Reboot',
 						'Ping',
 						self::$script_scope_event,
-						'I love Zabbix UI',
+						'Multiple spaces in script name',
 						'Detect operating system',
 						self::$custom_script
 					]

@@ -322,6 +322,14 @@ class testPageNetworkDiscovery extends CWebTest {
 			[
 				[
 					'filter' => [
+						'Name' => '   '
+					],
+					'expected' => ['Multiple spaces in discovery rule name']
+				]
+			],
+			[
+				[
+					'filter' => [
 						'Name' => '/, >, ;....'
 					],
 					'expected' => []

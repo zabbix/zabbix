@@ -19,12 +19,12 @@ require_once __DIR__.'/../../include/CLegacyWebTest.php';
 /**
  * @backup items
  *
- * @onBefore createNewItem
+ * @onBefore prepareItemData
  */
 class testPageItems extends CLegacyWebTest {
 
-	public static function createNewItem() {
-		$hostid = CDBHelper::getValue("SELECT hostid FROM hosts WHERE host LIKE 'Host for trigger tags filtering'");
+	public static function prepareItemData() {
+		$hostid = CDBHelper::getValue("SELECT hostid FROM hosts WHERE host='Host for trigger tags filtering'");
 		CDataHelper::call('item.create', [
 			[
 				'hostid' => $hostid,

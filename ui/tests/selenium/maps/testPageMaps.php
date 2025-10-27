@@ -51,6 +51,7 @@ class testPageMaps extends CWebTest {
 	const SYSMAP_LOW_HEIGHT = 'Map with lowest height';
 	const SYSMAP_HIGH_HEIGHT = 'Map with highest height';
 	const SYSMAP_SPACES_NAME = 'Map to check that   there   is no trim for spaces';
+	const SYSMAP_NO_SAPCE_NAME = 'Map to check that there is no trim for spaces';
 	protected static $sysmapids;
 
 	public function prepareMapsData() {
@@ -106,7 +107,7 @@ class testPageMaps extends CWebTest {
 				'height' => 1000
 			],
 			[
-				'name' => 'Map to check that   there   is no trim for spaces',
+				'name' => self::SYSMAP_SPACES_NAME,
 				'width' => 600,
 				'height' => 600
 			]
@@ -170,7 +171,7 @@ class testPageMaps extends CWebTest {
 						'Height' => '1000'
 					],
 					[
-						'Name' => 'Map to check that there is no trim for spaces',
+						'Name' => self::SYSMAP_NO_SAPCE_NAME,
 						'Width' => '600',
 						'Height' => '600'
 					]
@@ -205,9 +206,7 @@ class testPageMaps extends CWebTest {
 		// Check links for created maps.
 		foreach (self::$sysmapids as $name => $id) {
 			// Frontend does not display more than one space in labels.
-			$no_spaces = ($name === 'Map to check that   there   is no trim for spaces')
-					? 'Map to check that there is no trim for spaces'
-					: $name;
+			$no_spaces = ($name === self::SYSMAP_SPACES_NAME) ? self::SYSMAP_NO_SAPCE_NAME : $name;
 
 			$row = $this->getTable()->findRow('Name', $name);
 			$this->assertEquals('sysmaps.php?form=update&sysmapid='.$id, $row->getColumn('Actions')
@@ -309,7 +308,7 @@ class testPageMaps extends CWebTest {
 						'Map for testing feedback',
 						'Map for widget communication test',
 						'Map for widget copies',
-						'Map to check that there is no trim for spaces',
+						self::SYSMAP_NO_SAPCE_NAME,
 						self::SYSMAP_HIGH_HEIGHT,
 						self::SYSMAP_HIGH_WIDTH,
 						'Map with icon mapping',
@@ -352,7 +351,7 @@ class testPageMaps extends CWebTest {
 						'Map for testing feedback',
 						'Map for widget communication test',
 						'Map for widget copies',
-						'Map to check that there is no trim for spaces',
+						self::SYSMAP_NO_SAPCE_NAME,
 						self::SYSMAP_HIGH_HEIGHT,
 						self::SYSMAP_HIGH_WIDTH,
 						'Map with icon mapping',
@@ -373,7 +372,7 @@ class testPageMaps extends CWebTest {
 					'filter' => [
 						'Name' => 'there   '
 					],
-					'expected' => ['Map to check that there is no trim for spaces']
+					'expected' => [self::SYSMAP_NO_SAPCE_NAME]
 				]
 			],
 			// #4 View results if request has leading spaces.
@@ -382,7 +381,7 @@ class testPageMaps extends CWebTest {
 					'filter' => [
 						'Name' => '   there'
 					],
-					'expected' => ['Map to check that there is no trim for spaces']
+					'expected' => [self::SYSMAP_NO_SAPCE_NAME]
 				]
 			],
 			// #5 View results with request that has spaces separating the words.
@@ -392,7 +391,7 @@ class testPageMaps extends CWebTest {
 						'Name' => self::SYSMAP_SPACES_NAME
 					],
 					'expected' => [
-						'Map to check that there is no trim for spaces'
+						self::SYSMAP_NO_SAPCE_NAME
 					]
 				]
 			],
