@@ -359,8 +359,7 @@ window.host_edit_popup = {
 				});
 
 				this.form.validateChanges(fields, true);
-			},
-			source: 'host'
+			}
 		});
 
 		$('#host-tabs', this.form_element).on('tabscreate tabsactivate', (e, ui) => {

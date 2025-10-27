@@ -541,13 +541,11 @@ abstract class testFormMacros extends CLegacyWebTest {
 	 * @param int        $lld_id	    points to LLD rule id where host prototype belongs
 	 */
 	public function checkMacros($data, $host_type, $name = null, $update = false, $is_prototype = false, $lld_id = null) {
-		$inline_validation = in_array($host_type, ['host', 'template']);
+		$inline_validation = in_array($host_type, ['host', 'template', 'host prototype']);
 
 		if ($data['expected'] === TEST_BAD) {
 			$old_hash = $this->getHash();
 		}
-
-		$form_type = ($host_type === 'host prototype') ? 'hostPrototype' : $host_type.'s';
 
 		if ($update) {
 			if ($host_type === 'host') {
@@ -565,12 +563,10 @@ abstract class testFormMacros extends CLegacyWebTest {
 			else {
 				$id = CDBHelper::getValue('SELECT hostid FROM hosts WHERE host='.zbx_dbstr($name));
 
-				$this->page->login()->open(
-					$is_prototype
-						? 'host_prototypes.php?form=update&context=host&parent_discoveryid='.$lld_id.'&hostid='.$id
-						: 'host_prototypes.php?form=update&host_prototypeid='.$id.'&groupid=0'
+				$this->page->login()->open('zabbix.php?action=popup&popup=host.prototype.edit&context=host&parent_discoveryid='.
+						$lld_id.'&hostid='.$id
 				);
-				$form = $this->query('name:'.$form_type.'Form')->waitUntilPresent()->asForm()->one();
+				$form = COverlayDialogElement::find()->waitUntilReady()->asForm()->one();
 			}
 		}
 		else {
@@ -585,12 +581,9 @@ abstract class testFormMacros extends CLegacyWebTest {
 				$form = COverlayDialogElement::find()->asForm()->one()->waitUntilVisible();
 			}
 			else {
-				$this->page->login()->open(
-					$is_prototype
-						? 'host_prototypes.php?form=create&context=host&parent_discoveryid='.$lld_id
-						: 'host_prototypes.php?form=create'
-				);
-				$form = $this->query('name:'.$form_type.'Form')->waitUntilPresent()->asForm()->one();
+				$this->page->login()->open('zabbix.php?action=host.prototype.list&context=host&parent_discoveryid='.$lld_id);
+				$this->query('button:Create host prototype')->one()->click();
+				$form = COverlayDialogElement::find()->waitUntilReady()->asForm()->one();
 			}
 
 			$name = $is_prototype ? $data['Name'].' {#KEY}' : $data['Name'];
@@ -602,12 +595,7 @@ abstract class testFormMacros extends CLegacyWebTest {
 					$group_field => $group_name
 			];
 
-			if ($is_prototype) {
-				$form->asForm(['normalized' => true])->fill($general_data);
-			}
-			else {
-				$form->asGridForm(['normalized' => true])->fill($general_data);
-			}
+			$form->asGridForm(['normalized' => true])->fill($general_data);
 		}
 
 		$form->selectTab('Macros');
@@ -633,18 +621,16 @@ abstract class testFormMacros extends CLegacyWebTest {
 		$object = $is_prototype ? 'host prototype' : $host_type;
 		switch ($data['expected']) {
 			case TEST_GOOD:
-				if ($host_type === 'host' || $host_type === 'template') {
-					COverlayDialogElement::ensureNotPresent();
-				}
+				COverlayDialogElement::ensureNotPresent();
+				$this->page->waitUntilReady();
 
 				$this->assertMessage(TEST_GOOD, $update ? ucfirst($object).' updated' : ucfirst($object).' added');
 				$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM hosts WHERE host='.zbx_dbstr($name)));
 
 				// Check the results in form.
-				$this->checkMacrosFields($name, $is_prototype, $lld_id, $form_type, $host_type, $data);
+				$this->checkMacrosFields($name, $is_prototype, $lld_id, $host_type, $data);
 
 				break;
-
 			case TEST_BAD:
 				if ($inline_validation && array_key_exists('inline_error', $data)) {
 					$this->assertInlineError($form, $data['inline_error']);
@@ -656,10 +642,9 @@ abstract class testFormMacros extends CLegacyWebTest {
 				// Check that DB hash is not changed.
 				$this->assertEquals($old_hash, CDBHelper::getHash(self::SQL_HOSTS));
 
-				if ($host_type === 'host' || $host_type === 'template') {
-					COverlayDialogElement::find()->one()->close();
-					COverlayDialogElement::ensureNotPresent();
-				}
+				COverlayDialogElement::find()->one()->close();
+				COverlayDialogElement::ensureNotPresent();
+
 				break;
 		}
 	}
@@ -673,8 +658,6 @@ abstract class testFormMacros extends CLegacyWebTest {
 	 * @param int $lld_id			points to LLD rule id where host prototype belongs
 	 */
 	protected function checkRemoveAll($name, $host_type, $is_prototype = false, $lld_id = null) {
-		$form_type = ($host_type === 'host prototype') ? 'hostPrototype' : $host_type.'s';
-
 		if ($host_type === 'host') {
 			$this->page->login()->open('zabbix.php?action=host.view')->waitUntilReady();
 			$column = $this->query('xpath://table[@class="list-table"]')->asTable()->one()->findRow('Name', $name)->getColumn('Name');
@@ -690,13 +673,11 @@ abstract class testFormMacros extends CLegacyWebTest {
 		else {
 			$id = CDBHelper::getValue('SELECT hostid FROM hosts WHERE host='.zbx_dbstr($name));
 
-			$this->page->login()->open(
-				$is_prototype
-					? 'host_prototypes.php?form=update&context=host&parent_discoveryid='.$lld_id.'&hostid='.$id
-					: 'host_prototypes.php?form=update&host_prototypeid='.$id.'&groupid=0'
+			$this->page->login()->open('zabbix.php?action=host.prototype.list&context=host&parent_discoveryid='.$lld_id.
+					'&hostid='.$id
 			);
-
-			$form = $this->query('name:'.$form_type.'Form')->waitUntilPresent()->asForm()->one();
+			$this->query('link', $name)->one()->click();
+			$form = COverlayDialogElement::find()->waitUntilVisible()->asForm()->one();
 		}
 
 		$form->selectTab('Macros');
@@ -711,7 +692,7 @@ abstract class testFormMacros extends CLegacyWebTest {
 		$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM hosts WHERE host='.zbx_dbstr($name)));
 
 		// Check the results in form.
-		$this->checkMacrosFields($name, $is_prototype, $lld_id, $form_type, $host_type, null);
+		$this->checkMacrosFields($name, $is_prototype, $lld_id, $host_type, null);
 	}
 
 	public static function getCheckInheritedMacrosData() {
@@ -783,11 +764,10 @@ abstract class testFormMacros extends CLegacyWebTest {
 	 * @param int $lld_id			points to LLD rule id where host prototype belongs
 	 */
 	protected function checkChangeInheritedMacros($data, $host_type, $is_prototype = false, $lld_id = null) {
-		$form_type = ($host_type === 'host prototype') ? 'hostPrototype' : $host_type.'s';
-
 		if ($is_prototype) {
-			$this->page->login()->open('host_prototypes.php?form=create&context=host&parent_discoveryid='.$lld_id);
-			$form = $this->query('name:'.$form_type.'Form')->waitUntilPresent()->asForm(['normalized' => true])->one();
+			$this->page->login()->open('zabbix.php?action=host.prototype.list&context=host&parent_discoveryid='.$lld_id);
+			$this->query('button:Create host prototype')->one()->waitUntilClickable()->click();
+			$form = COverlayDialogElement::find()->asForm()->one()->waitUntilVisible();
 			$name = 'Host prototype with edited global {#MACRO} '.time();
 			$form->fill(['Host name' => $name]);
 			$form->fill(['Host groups' => 'Zabbix servers']);
@@ -798,14 +778,10 @@ abstract class testFormMacros extends CLegacyWebTest {
 				$this->query('button:Create host')->one()->waitUntilClickable()->click();
 				$form = COverlayDialogElement::find()->asForm()->one()->waitUntilVisible();
 			}
-			else if ($host_type === 'template') {
+			else {
 				$this->page->login()->open('zabbix.php?action=template.list')->waitUntilReady();
 				$this->query('button:Create template')->one()->click();
 				$form = COverlayDialogElement::find()->asForm()->one()->waitUntilVisible();
-			}
-			else {
-				$this->page->login()->open('host_prototypes.php?form=create');
-				$form = $this->query('name:'.$form_type.'Form')->waitUntilPresent()->asForm()->one();
 			}
 
 			$name = $host_type.' with edited global macro '.time();
@@ -975,12 +951,9 @@ abstract class testFormMacros extends CLegacyWebTest {
 			$form = COverlayDialogElement::find()->asForm()->one()->waitUntilVisible();
 		}
 		else {
-			$this->page->open(
-				$is_prototype
-					? 'host_prototypes.php?form=update&context=host&parent_discoveryid='.$lld_id.'&hostid='.$id
-					: 'host_prototypes.php?form=update&'.$host_type.'id='.$id.'&groupid=0'
-			);
-			$form->invalidate();
+			$this->page->open('zabbix.php?action=host.prototype.list&context=host&parent_discoveryid='.$lld_id.'&hostid='.$id);
+			$this->query('link', $name)->one()->click();
+			$form = COverlayDialogElement::find()->asForm()->one()->waitUntilVisible();
 		}
 
 		$form->selectTab('Macros');
@@ -1116,14 +1089,11 @@ abstract class testFormMacros extends CLegacyWebTest {
 			$form = COverlayDialogElement::find()->asForm()->one()->waitUntilVisible();
 		}
 		else {
-			$link = $is_prototype
-				? 'host_prototypes.php?form=update&context=host&parent_discoveryid='.$lld_id.'&hostid='.$id
-				: 'host_prototypes.php?form=update&'.$host_type.'id='.$id.'&groupid=0';
-
-			$this->page->login()->open($link);
-
-			$form_type = ($host_type === 'host prototype') ? 'hostPrototype' : $host_type.'s';
-			$form = $this->query('name:'.$form_type.'Form')->waitUntilPresent()->asForm()->one();
+			$this->page->login()->open('zabbix.php?action=host.prototype.list&context=host&parent_discoveryid='.$lld_id.
+					'&hostid='.$id
+			);
+			$this->query('link', $name)->one()->click();
+			$form = COverlayDialogElement::find()->asForm()->one()->waitUntilVisible();
 		}
 
 		$form->selectTab('Macros');
@@ -1278,7 +1248,9 @@ abstract class testFormMacros extends CLegacyWebTest {
 			$form = COverlayDialogElement::find()->asForm()->one()->waitUntilVisible();
 		}
 		else {
-			$this->page->open($link);
+			$this->page->open('zabbix.php?action=host.prototype.list&context=host&parent_discoveryid='.$lld_id.'&hostid='.$id);
+			$this->query('link', $name)->one()->click();
+			COverlayDialogElement::find()->waitUntilReady();
 		}
 
 		$form->invalidate();
@@ -1322,11 +1294,10 @@ abstract class testFormMacros extends CLegacyWebTest {
 	 * @param string     $name			  name of host where changes are made
 	 * @param boolean    $is_prototype    defines is it prototype or not
 	 * @param int        $lld_id		  points to LLD rule id where host prototype belongs
-	 * @param string     $form_type		  string used in form selector
 	 * @param string     $host_type		  string defining is it host, template or host prototype
 	 * @param array	     $data			  given data provider
 	 */
-	private function checkMacrosFields($name, $is_prototype, $lld_id, $form_type, $host_type, $data = null) {
+	private function checkMacrosFields($name, $is_prototype, $lld_id, $host_type, $data = null) {
 		$id = CDBHelper::getValue('SELECT hostid FROM hosts WHERE host='.zbx_dbstr($name));
 
 		if ($host_type === 'host') {
@@ -1343,12 +1314,9 @@ abstract class testFormMacros extends CLegacyWebTest {
 			$form = COverlayDialogElement::find()->asForm()->one()->waitUntilVisible();
 		}
 		else {
-			$this->page->open(
-				$is_prototype
-					? 'host_prototypes.php?form=update&context=host&parent_discoveryid='.$lld_id.'&hostid='.$id
-					: 'host_prototypes.php?form=update&'.$host_type.'id='.$id.'&groupid=0'
-			);
-			$form = $this->query('name:'.$form_type.'Form')->waitUntilPresent()->asForm()->one();
+			$this->page->open('zabbix.php?action=host.prototype.list&context=host&parent_discoveryid='.$lld_id.'&hostid='.$id);
+			$this->query('link', $name)->one()->click();
+			$form = COverlayDialogElement::find()->waitUntilReady()->asForm()->one();
 		}
 
 		$form->selectTab('Macros');
@@ -2281,7 +2249,7 @@ abstract class testFormMacros extends CLegacyWebTest {
 	 * @param string $name		source name
 	 */
 	public function createVaultMacros($data, $url, $source, $name = null) {
-		$inline_valiation = (in_array($source, ['hosts', 'templates']));
+		$inline_valiation = (in_array($source, ['hosts', 'templates', 'host-prototype']));
 
 		$this->selectVault($data['vault']);
 		$form = $this->openMacrosTab($url, $source, true, $name);
@@ -2534,21 +2502,11 @@ abstract class testFormMacros extends CLegacyWebTest {
 
 		$this->fillMacros([$hashicorp['fields']]);
 
-		if (in_array($source, ['hosts', 'templates'])) {
-			$form->getField(array_key_first($hashicorp['inline_error']))->click();
-			$this->page->removeFocus();
-			$this->assertInlineError($form, $hashicorp['inline_error']);
-		}
-		else {
-			$form->submit();
-			$this->assertMessage(TEST_BAD, 'Cannot update '.$this->vault_object, $hashicorp['error']);
-			CMessageElement::find()->one()->close();
-		}
+		$form->getField(array_key_first($hashicorp['inline_error']))->click();
+		$this->page->removeFocus();
+		$this->assertInlineError($form, $hashicorp['inline_error']);
 
-		// Hosts and templates in edit view opens in overlay and need to be closed manually.
-		if (in_array($source, ['hosts', 'templates'])) {
-			COverlayDialogElement::find()->one()->close();
-		}
+		COverlayDialogElement::find()->one()->close();
 
 		// Change Vault in settings to correct one.
 		$this->page->open('zabbix.php?action=miscconfig.edit')->waitUntilReady();
