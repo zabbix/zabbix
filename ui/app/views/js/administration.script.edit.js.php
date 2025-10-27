@@ -338,13 +338,6 @@ window.script_edit_popup = new class {
 	submit() {
 		this.#clearMessages();
 		const fields = this.form.getAllValues();
-
-		for (let key in fields) {
-			if (typeof fields[key] === 'string' && key !== 'confirmation') {
-				fields[key] = fields[key].trim();
-			}
-		}
-
 		const curl = new Curl('zabbix.php');
 
 		curl.setArgument('action', this.scriptid === null ? 'script.create' : 'script.update');

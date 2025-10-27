@@ -410,7 +410,9 @@ $form_grid
 			new CFormField([
 				(new CTextBox('confirmation', $data['form']['confirmation'], false,
 					DB::getFieldLength('scripts', 'confirmation')
-				))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+				))
+					->setAttribute('data-notrim', '')
+					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 				NBSP(),
 				(new CButton('test_confirmation', _('Test confirmation')))->addClass(ZBX_STYLE_BTN_GREY)
 			])
