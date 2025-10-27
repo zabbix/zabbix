@@ -141,6 +141,7 @@ class CUser extends CApiService {
 							' SELECT NULL'.
 							' FROM users_groups ug0'.
 							' WHERE ug0.userid='.self::$userData['userid'].
+							' LIMIT 1'.
 						')'.
 						' AND u.userid='.self::$userData['userid'].
 					')'.
@@ -155,6 +156,7 @@ class CUser extends CApiService {
 									' FROM users_groups ug2'.
 									' WHERE ug2.userid='.self::$userData['userid'].
 								')'.
+							' LIMIT 1'.
 						')'.
 					')';
 			}
