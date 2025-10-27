@@ -2563,7 +2563,7 @@ div[data-field-type="set"].has-error {
   .list-table tbody tr:not(.hover-nobg):not(.row-selected):hover {
     background-color: #383838; }
   .list-table tbody tr.row-selected {
-    background-color: #2f280a; }
+    background-color: #252525; }
   .list-table tbody th.table-info,
   .list-table tbody td.table-info {
     color: #737373; }
@@ -8019,7 +8019,7 @@ z-select[disabled] .focusable, input[disabled], textarea[disabled], select optio
   overflow-y: auto;
   padding: 10px;
   margin: 10px;
-  background-color: #2f280a;
+  background-color: #252525;
   border: 1px solid #303030; }
 
 .overlay-descr {
@@ -8211,7 +8211,7 @@ z-select[disabled] .focusable, input[disabled], textarea[disabled], select optio
 .navigation-tree .navigation-tree-node-is-selected > .navigation-tree-node-info, .navigation-tree .navigation-tree-node-is-selected > .navigation-tree-node-info:hover, div.dashboard-widget-itemhistory .list-table tr.selected td,
 div.dashboard-widget-itemhistory .list-table td.selected, div.dashboard-widget-itemhistory .list-table tr.selected td:hover,
 div.dashboard-widget-itemhistory .list-table td.selected:hover, div.dashboard-widget-navtree .navtree .tree .tree-item.selected > .tree-row, div.dashboard-widget-navtree .navtree .tree .tree-item.selected > .tree-row:hover, .drag-drop-area {
-  background-color: #2f280a; }
+  background-color: #252525; }
 
 @keyframes is-loading-kf {
   to {
