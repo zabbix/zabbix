@@ -16,6 +16,7 @@
 
 #include "zbxdb.h"
 #include "zbxdbschema.h"
+#include "zbxdb.h"
 
 /*
  * 8.0 development database patches
@@ -81,6 +82,28 @@ static int	DBpatch_7050007(void)
 	return SUCCEED;
 }
 
+static int	DBpatch_7050008(void)
+{
+	int		i;
+	const char	*values[] = {
+			"web.hosts.host_prototypes.php.sort", "web.hosts.host.prototype.list.sort",
+			"web.hosts.host_prototypes.php.sortorder", "web.hosts.host.prototype.list.sortorder",
+			"web.templates.host_prototypes.php.sort", "web.templates.host.prototype.list.sort",
+			"web.templates.host_prototypes.php.sortorder", "web.templates.host.prototype.list.sortorder"
+		};
+
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	for (i = 0; i < (int)ARRSIZE(values); i += 2)
+	{
+		if (ZBX_DB_OK > zbx_db_execute("update profiles set idx='%s' where idx='%s'", values[i + 1], values[i]))
+			return FAIL;
+	}
+
+	return SUCCEED;
+}
+
 #endif
 
 DBPATCH_START(7050)
@@ -95,5 +118,6 @@ DBPATCH_ADD(7050004, 0, 1)
 DBPATCH_ADD(7050005, 0, 1)
 DBPATCH_ADD(7050006, 0, 1)
 DBPATCH_ADD(7050007, 0, 1)
+DBPATCH_ADD(7050008, 0, 1)
 
 DBPATCH_END()
