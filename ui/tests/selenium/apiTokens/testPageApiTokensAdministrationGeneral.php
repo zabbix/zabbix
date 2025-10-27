@@ -117,7 +117,6 @@ class testPageApiTokensAdministrationGeneral extends testPageApiTokens {
 				'Created by user' => 'Admin (Zabbix Administrator)',
 				'Last accessed at' => '2021-01-01 00:00:04',
 				'Status' => 'Disabled'
-
 			],
 			[
 				'Name' => 'Admin: expired token for admin',
@@ -127,7 +126,6 @@ class testPageApiTokensAdministrationGeneral extends testPageApiTokens {
 				'Created by user' => 'Admin (Zabbix Administrator)',
 				'Last accessed at' => '2021-01-01 00:00:03',
 				'Status' => 'Enabled'
-
 			],
 			[
 				'Name' => 'Admin: future token for admin',
@@ -137,7 +135,6 @@ class testPageApiTokensAdministrationGeneral extends testPageApiTokens {
 				'Created by user' => 'Admin (Zabbix Administrator)',
 				'Last accessed at' => '2021-01-01 00:00:02',
 				'Status' => 'Enabled'
-
 			],
 			[
 				'Name' => 'Admin: token for filter-create',
@@ -147,7 +144,6 @@ class testPageApiTokensAdministrationGeneral extends testPageApiTokens {
 				'Created by user' => 'Admin (Zabbix Administrator)',
 				'Last accessed at' => '2021-01-01 00:00:05',
 				'Status' => 'Disabled'
-
 			],
 			[
 				'Name' => 'Checking sp aces in names',
@@ -164,7 +160,6 @@ class testPageApiTokensAdministrationGeneral extends testPageApiTokens {
 				'Created by user' => 'filter-create',
 				'Last accessed at' => '2021-01-01 00:00:08',
 				'Status' => 'Disabled'
-
 			],
 			[
 				'Name' => 'filter-create: expired token for filter-create',
@@ -174,7 +169,6 @@ class testPageApiTokensAdministrationGeneral extends testPageApiTokens {
 				'Created by user' => 'filter-create',
 				'Last accessed at' => '2021-01-01 00:00:07',
 				'Status' => 'Enabled'
-
 			],
 			[
 				'Name' => 'filter-create: future token for filter-create',
@@ -184,7 +178,6 @@ class testPageApiTokensAdministrationGeneral extends testPageApiTokens {
 				'Created by user' => 'filter-create',
 				'Last accessed at' => '2021-01-01 00:00:06',
 				'Status' => 'Enabled'
-
 			],
 			[
 				'Name' => 'filter-create: token for Admin',
@@ -194,7 +187,6 @@ class testPageApiTokensAdministrationGeneral extends testPageApiTokens {
 				'Created by user' => 'filter-create',
 				'Last accessed at' => '2021-01-01 00:00:09',
 				'Status' => 'Disabled'
-
 			]
 		];
 

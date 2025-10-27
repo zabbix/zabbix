@@ -588,7 +588,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 			[
 				[
 					'filter' => [
-						'Name' => '   ',
+						'Name' => '   '
 					],
 					'expected' => ['Multiple spaces in LLD name']
 				]
