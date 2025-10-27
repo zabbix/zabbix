@@ -155,7 +155,7 @@ class testPageProblems extends CWebTest {
 			[
 				'description' => 'Multiple   spaces   in problem name',
 				'expression' => 'last(/Host for Problems Page/trap)=150',
-				'priority' => TRIGGER_SEVERITY_NOT_CLASSIFIED,
+				'priority' => TRIGGER_SEVERITY_NOT_CLASSIFIED
 			]
 		]);
 
