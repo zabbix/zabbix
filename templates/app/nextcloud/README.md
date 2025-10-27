@@ -15,7 +15,7 @@ Zabbix version: 8.0 and higher.
 ## Tested versions
 
 This template has been tested on:
-- Nextcloud ver. 32.0.0
+- Nextcloud ver. 27.0.1, 32.0.0
 
 ## Configuration
 
