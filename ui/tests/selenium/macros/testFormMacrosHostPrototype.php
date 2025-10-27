@@ -252,7 +252,7 @@ class testFormMacrosHostPrototype extends testFormMacros {
 	 */
 	public function testFormMacrosHostPrototype_RemoveInheritedMacro($data) {
 		$this->checkRemoveInheritedMacros($data, 'host prototype', self::$inherited_macros_prototypeid,
-				true, self::$lldid
+				true, self::$lldid, 'Host prototype for Inherited {#MACROS} removing'
 		);
 	}
 
