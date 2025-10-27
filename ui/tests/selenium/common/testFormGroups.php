@@ -144,6 +144,7 @@ class testFormGroups extends CWebTest {
 			$this->assertTrue($form->getField('Group name')->isAttributePresent('readonly'));
 			$this->assertEquals(self::LLD, $form->getField('Discovered by')->query('tag:a')->one()->getText());
 			$form->query('link', self::LLD)->one()->click();
+			COverlayDialogElement::find()->waitUntilReady();
 			// TODO: temporarily commented out due webdriver issue #351858989, alert is not displayed while leaving page during test execution
 //			$this->page->acceptAlert();
 //			$this->page->waitUntilReady();

@@ -670,7 +670,7 @@ class testMultiselectsWithoutData extends testMultiselectDialogs {
 			[
 				[
 					'object' => 'host prototype',
-					'url' => 'host_prototypes.php?context=host&parent_discoveryid=',
+					'url' => 'zabbix.php?action=host.prototype.list&context=host&parent_discoveryid=',
 					'form' => 'id:host-prototype-form'
 				]
 			],
@@ -752,7 +752,7 @@ class testMultiselectsWithoutData extends testMultiselectDialogs {
 			[
 				[
 					'object' => 'host prototype',
-					'url' => 'host_prototypes.php?context=template&parent_discoveryid=',
+					'url' => 'zabbix.php?action=host.prototype.list&context=template&parent_discoveryid=',
 					'form' => 'id:host-prototype-form'
 				]
 			]
@@ -818,7 +818,7 @@ class testMultiselectsWithoutData extends testMultiselectDialogs {
 				break;
 
 			case 'host prototype':
-				$form = $this->query($data['form'])->asForm(['normalized' => true])->one();
+				$form = $this->query($data['form'])->asForm()->one();
 				$this->checkMultiselectDialogs($form, [self::TEMPLATES_MULTISELECT]);
 				break;
 		}
