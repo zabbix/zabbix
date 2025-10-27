@@ -400,17 +400,17 @@ static void	history_clickhouse_write(void *data, unsigned char value_type,
 	char			*error = NULL, url[MAX_STRING_LEN], *post_data = NULL;
 	size_t			post_data_alloc = 0, post_data_offset = 0;
 	CURLcode		err;
+	int			ret = FAIL;
 
 	conn = history_clickhouse_get_conn(d, value_type);
 	conn->status = FAIL;
-	zbx_vector_clickhouse_conn_ptr_append(&d->active_conns, conn);
 
 	if (NULL == conn->handle && SUCCEED != history_clickhouse_conn_init(conn, d, &error))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot write data to ClickHouse: %s", error);
 		zbx_free(error);
 
-		return;
+		goto out;
 	}
 
 	zbx_snprintf(url, sizeof(url), "%s?database=%s"
@@ -421,7 +421,7 @@ static void	history_clickhouse_write(void *data, unsigned char value_type,
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot write data to ClickHouse: cannot set curl option %d: %s",
 				(int)CURLOPT_URL, curl_easy_strerror(err));
-		return;
+		goto out;
 	}
 
 	post_data_alloc = entries_num * (sizeof(zbx_uint64_t) * 3) + 8;
@@ -474,7 +474,7 @@ static void	history_clickhouse_write(void *data, unsigned char value_type,
 		zbx_free(post_data);
 		zabbix_log(LOG_LEVEL_WARNING, "cannot write data to ClickHouse: cannot set curl option %d: %s",
 				(int)CURLOPT_URL, curl_easy_strerror(err));
-		return;
+		goto out;
 	}
 
 	if (CURLE_OK != (err = curl_easy_setopt(conn->handle, CURLOPT_POSTFIELDS, post_data)))
@@ -482,7 +482,7 @@ static void	history_clickhouse_write(void *data, unsigned char value_type,
 		zbx_free(post_data);
 		zabbix_log(LOG_LEVEL_WARNING, "cannot write data to ClickHouse: cannot set curl option %d: %s",
 				(int)CURLOPT_URL, curl_easy_strerror(err));
-		return;
+		goto out;
 	}
 
 	if (NULL != conn->post_data)
@@ -499,6 +499,14 @@ static void	history_clickhouse_write(void *data, unsigned char value_type,
 		*conn->resp.page.data = '\0';
 	}
 	*conn->resp.errbuf = '\0';
+
+	ret = SUCCEED;
+out:
+	if (SUCCEED == ret)
+		zbx_vector_clickhouse_conn_ptr_append(&d->active_conns, conn);
+	else
+		history_clickhouse_release_conn(d, conn);
+
 }
 
 /******************************************************************************
@@ -1079,24 +1087,24 @@ static int	clickhouse_conn_post(zbx_clickhouse_conn_t *conn, zbx_clickhouse_data
 	zabbix_log(LOG_LEVEL_TRACE, "In %s() data:%s", data, __func__);
 
 	if (NULL == conn->handle && SUCCEED != history_clickhouse_conn_init(conn, d, error))
-		return FAIL;
+		goto out;
 
 	if (CURLE_OK != (err = curl_easy_setopt(conn->handle, CURLOPT_URL, url)))
 	{
 		*error = zbx_dsprintf(NULL, "cannot set URL option: %s", curl_easy_strerror(err));
-		goto out;
+		goto cleanup;
 	}
 
 	if (CURLE_OK != (err = curl_easy_setopt(conn->handle, CURLOPT_POSTFIELDSIZE, strlen(data))))
 	{
 		*error = zbx_dsprintf(NULL, "cannot set CURLOPT_POSTFIELDSIZE option: %s", curl_easy_strerror(err));
-		goto out;
+		goto cleanup;
 	}
 
 	if (CURLE_OK != (err = curl_easy_setopt(conn->handle, CURLOPT_POSTFIELDS, data)))
 	{
 		*error = zbx_dsprintf(NULL, "cannot set POSTFIELDS option: %s", curl_easy_strerror(err));
-		goto out;
+		goto cleanup;
 	}
 
 	if (0 != conn->resp.page.alloc)
@@ -1140,13 +1148,13 @@ static int	clickhouse_conn_post(zbx_clickhouse_conn_t *conn, zbx_clickhouse_data
 	zabbix_log(LOG_LEVEL_TRACE, "result: %s", ZBX_NULL2STR(conn->resp.page.data));
 
 	ret = SUCCEED;
-out:
+cleanup:
 	if (CURLM_OK != (code = curl_multi_remove_handle(mhandle, conn->handle)))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot remove handle from curl multi handle: %s",
 					curl_multi_strerror(code));
 	}
-
+out:
 	zabbix_log(LOG_LEVEL_TRACE, "End of %s() ret:%s", __func__, zbx_result_string(ret));
 
 	return ret;
