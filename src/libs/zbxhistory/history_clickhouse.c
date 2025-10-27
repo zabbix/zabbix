@@ -1476,20 +1476,10 @@ out:
  ******************************************************************************/
 zbx_history_provider_t	*history_clickhouse_open(const zbx_history_option_t *options, int options_num, char **error)
 {
-	static int		initialized = 0;
 	zbx_history_provider_t	*provider;
 	void			*data;
 
-	if (0 == initialized)
-	{
-		if (0 != curl_global_init(CURL_GLOBAL_ALL))
-		{
-			*error = zbx_strdup(*error, "cannot initialize cURL library");
-			return NULL;
-		}
-
-		initialized = 1;
-	}
+	zbx_curl_init();
 
 	if (NULL == (data = history_clickhouse_create_data(options, options_num, error)))
 		return NULL;

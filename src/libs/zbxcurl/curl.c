@@ -406,4 +406,57 @@ int	zbx_curl_has_multi_wait(char **error)
 
 	return SUCCEED;
 }
+
+static int	curl_initialized = 0;
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: initialize cURL library global state                              *
+ *                                                                            *
+ * Comments: Safe to call multiple times.                                     *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_curl_init(void)
+{
+	if (0 == curl_initialized)
+	{
+		CURLcode	err;
+
+		if (CURLE_OK != (err = curl_global_init(CURL_GLOBAL_ALL)))
+		{
+			zabbix_log(LOG_LEVEL_ERR, "cannot initialize cURL: %s", curl_easy_strerror(err));
+
+			exit(EXIT_FAILURE);
+		}
+
+		curl_initialized = 1;
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: cleanup cURL library global state                                 *
+ *                                                                            *
+ * Comments: Safe to call without initialization.                             *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_curl_cleanup(void)
+{
+	if (0 != curl_initialized)
+	{
+		curl_global_cleanup();
+		curl_initialized = 0;
+	}
+}
+
+#else
+
+void	zbx_curl_init(void)
+{
+}
+
+void	zbx_curl_cleanup(void)
+{
+}
+
 #endif /* HAVE_LIBCURL */

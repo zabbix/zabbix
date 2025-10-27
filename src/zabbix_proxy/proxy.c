@@ -73,6 +73,7 @@
 #include "zbxstr.h"
 #include "zbxtime.h"
 #include "zbxbincommon.h"
+#include "zbxcurl.h"
 
 #ifdef HAVE_OPENIPMI
 #include "zbxipmi.h"
@@ -1903,6 +1904,9 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		rtc_process_request_func = rtc_process_request_ex_proxy;
 
 	zbx_set_child_pids(zbx_threads, zbx_threads_num);
+
+	/* cleanup curl before forking to avoid issues with forked initialized state */
+	zbx_curl_cleanup();
 
 	for (i = 0; i < zbx_threads_num; i++)
 	{

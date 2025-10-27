@@ -35,6 +35,7 @@
 #include "zbxrtc.h"
 #include "zbxpreprocbase.h"
 #include "zbx_rtc_constants.h"
+#include "zbxcurl.h"
 
 #ifdef HAVE_LIBXML2
 #	include <libxml/xpath.h>
@@ -70,30 +71,6 @@ static void	pp_xml_destroy(void)
 {
 #ifdef HAVE_LIBXML2
 	xmlCleanupParser();
-#endif
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: initialize curl library, called before creating worker threads    *
- *                                                                            *
- ******************************************************************************/
-static void	pp_curl_init(void)
-{
-#ifdef HAVE_LIBCURL
-	curl_global_init(CURL_GLOBAL_DEFAULT);
-#endif
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: release curl library resources                                    *
- *                                                                            *
- ******************************************************************************/
-static void	pp_curl_destroy(void)
-{
-#ifdef HAVE_LIBCURL
-	curl_global_cleanup();
 #endif
 }
 
@@ -136,7 +113,7 @@ static zbx_pp_manager_t	*zbx_pp_manager_create(int workers_num, zbx_pp_finished_
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() workers:%d", __func__, workers_num);
 
 	pp_xml_init();
-	pp_curl_init();
+	zbx_curl_init();
 #ifdef HAVE_NETSNMP
 	preproc_init_snmp();
 #endif
@@ -259,7 +236,7 @@ static void	zbx_pp_manager_free(zbx_pp_manager_t *manager)
 #ifdef HAVE_NETSNMP
 	preproc_shutdown_snmp();
 #endif
-	pp_curl_destroy();
+	zbx_curl_cleanup();
 	pp_xml_destroy();
 
 	zbx_ipc_async_socket_close(&manager->rtc);

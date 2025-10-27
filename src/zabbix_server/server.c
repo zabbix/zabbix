@@ -1904,6 +1904,9 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 
 	zbx_set_exit_on_terminate();
 
+	/* cleanup curl before forking to avoid issues with forked initialized state */
+	zbx_curl_cleanup();
+
 	thread_args.info.program_type = zbx_program_type;
 
 	zbx_set_child_pids(zbx_threads, zbx_threads_num);

@@ -78,4 +78,7 @@ int	zbx_curl_has_multi_wait(char **error);
 
 #endif /* HAVE_LIBCURL */
 
+void	zbx_curl_init(void);
+void	zbx_curl_cleanup(void);
+
 #endif /* ZABBIX_CURL_H */
