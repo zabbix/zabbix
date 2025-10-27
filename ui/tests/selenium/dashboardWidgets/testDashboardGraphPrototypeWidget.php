@@ -19,6 +19,7 @@ require_once __DIR__.'/../behaviors/CTableBehavior.php';
 require_once __DIR__.'/../behaviors/CMessageBehavior.php';
 require_once __DIR__.'/../common/testWidgets.php';
 
+
 /**
  * @dataSource AllItemValueTypes
  *
@@ -39,9 +40,6 @@ class testDashboardGraphPrototypeWidget extends testWidgets {
 			CTableBehavior::class
 		];
 	}
-
-	const DASHBOARD_ID = 1400;
-	const SCREENSHOT_DASHBOARD_ID = 1410;
 
 	protected static $previous_widget_name = 'Graph prototype widget for update';
 	protected static $dashboardid;
