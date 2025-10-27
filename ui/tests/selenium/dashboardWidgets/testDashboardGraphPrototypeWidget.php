@@ -22,6 +22,8 @@ require_once __DIR__.'/../common/testWidgets.php';
 /**
  * @dataSource AllItemValueTypes
  *
+ * @onBefore prepareData
+ *
  * @backup widget, profiles
  */
 class testDashboardGraphPrototypeWidget extends testWidgets {
@@ -41,7 +43,71 @@ class testDashboardGraphPrototypeWidget extends testWidgets {
 	const DASHBOARD_ID = 1400;
 	const SCREENSHOT_DASHBOARD_ID = 1410;
 
-	private static $previous_widget_name = 'Graph prototype widget for update';
+	protected static $previous_widget_name = 'Graph prototype widget for update';
+	protected static $dashboardid;
+
+	public static function prepareData() {
+		CDataHelper::call('dashboard.create', [
+			[
+				'name' => 'Dashboard for Graph Prototype widget',
+				'userid' => '1',
+				'private' => 1,
+				'pages' => [
+					[
+						'widgets' => [
+							[
+								'type' => 'graphprototype',
+								'name' => 'Graph prototype widget for update',
+								'x' => 0,
+								'y' => 0,
+								'width' => 48,
+								'height' => 5,
+								'fields' => [
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_GRAPH_PROTOTYPE,
+										'name' => 'graphid.0',
+										'value' => 600003 // testFormGraphPrototype4.
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'reference',
+										'value' => 'RZALA'
+									]
+								]
+							],
+							[
+								'type' => 'graphprototype',
+								'name' => 'Graph prototype widget for delete',
+								'x' => 0,
+								'y' => 5,
+								'width' => 48,
+								'height' => 5,
+								'fields' => [
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_GRAPH_PROTOTYPE,
+										'name' => 'graphid.0',
+										'value' => 600002 // testFormGraphPrototype3.
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'reference',
+										'value' => 'MJHNB'
+									]
+								]
+							]
+						]
+					]
+				]
+			],
+			[
+				'name' => 'Dashboard for Sceenshoting Graph Prototype widgets',
+				'userid' => '1',
+				'private' => 1,
+				'pages' => [[]]
+			]
+		]);
+		self::$dashboardid = CDataHelper::getIds('name');
+	}
 
 	public static function getWidgetData() {
 		return [
@@ -205,7 +271,9 @@ class testDashboardGraphPrototypeWidget extends testWidgets {
 	public function testDashboardGraphPrototypeWidget_Delete() {
 		$name = 'Graph prototype widget for delete';
 
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::DASHBOARD_ID);
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.
+				self::$dashboardid['Dashboard for Graph Prototype widget']
+		);
 		$dashboard = CDashboardElement::find()->one();
 		$widget = $dashboard->edit()->getWidget($name);
 		$this->assertTrue($widget->isEditable());
@@ -228,7 +296,9 @@ class testDashboardGraphPrototypeWidget extends testWidgets {
 	 * Test for comparing widgets form screenshot.
 	 */
 	public function testDashboardGraphPrototypeWidget_FormScreenshot() {
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::SCREENSHOT_DASHBOARD_ID);
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.
+				self::$dashboardid['Dashboard for Sceenshoting Graph Prototype widgets']
+		);
 		$dashboard = CDashboardElement::find()->one();
 		$form = $dashboard->edit()->addWidget()->asForm();
 		$form->fill(['Type' => CFormElement::RELOADABLE_FILL('Graph prototype')]);
@@ -317,7 +387,9 @@ class testDashboardGraphPrototypeWidget extends testWidgets {
 	 * @dataProvider getWidgetScreenshotData
 	 */
 	public function testDashboardGraphPrototypeWidget_GridScreenshots($data) {
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::SCREENSHOT_DASHBOARD_ID);
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.
+				self::$dashboardid['Dashboard for Sceenshoting Graph Prototype widgets']
+		);
 		$dashboard = CDashboardElement::find()->one();
 		$form = $dashboard->edit()->addWidget()->asForm();
 		$widget = [
@@ -344,7 +416,9 @@ class testDashboardGraphPrototypeWidget extends testWidgets {
 	}
 
 	private function checkGraphPrototypeWidget($data, $update = false) {
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::DASHBOARD_ID);
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.
+				self::$dashboardid['Dashboard for Graph Prototype widget']
+		);
 		$dashboard = CDashboardElement::find()->one();
 		$old_widget_count = $dashboard->getWidgets()->count();
 
@@ -396,7 +470,7 @@ class testDashboardGraphPrototypeWidget extends testWidgets {
 						'SELECT NULL'.
 						' FROM dashboard_page dp'.
 						' WHERE w.dashboard_pageid=dp.dashboard_pageid'.
-							' AND dp.dashboardid='.self::DASHBOARD_ID.
+							' AND dp.dashboardid='.self::$dashboardid['Dashboard for Graph Prototype widget'].
 							' AND w.name ='.zbx_dbstr($db_name).
 					')'
 				);
@@ -444,7 +518,9 @@ class testDashboardGraphPrototypeWidget extends testWidgets {
 	 */
 	private function checkDataUnchanged($action, $update = false, $changes = false) {
 		$initial_values = CDBHelper::getHash(self::SQL);
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::DASHBOARD_ID);
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.
+				self::$dashboardid['Dashboard for Graph Prototype widget']
+		);
 		$dashboard = CDashboardElement::find()->one();
 
 		$form = $update
@@ -496,7 +572,7 @@ class testDashboardGraphPrototypeWidget extends testWidgets {
 	 * Test function for assuring that binary items are not available in Graph prototype widget.
 	 */
 	public function testDashboardGraphPrototypeWidget_CheckAvailableItems() {
-		$url = 'zabbix.php?action=dashboard.view&dashboardid='.self::DASHBOARD_ID;
+		$url = 'zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid['Dashboard for Graph Prototype widget'];
 		$this->checkAvailableItems($url, 'Graph prototype');
 	}
 }
