@@ -146,17 +146,19 @@ class CTagHelper {
 
 			$show_tags_count = 0;
 
-			foreach ($object['tags'] as $tag) {
-				if (self::getTagString($tag, $options['tag_name_format']) === '') {
-					continue;
-				}
+			if ($options['show_tags_limit'] != SHOW_TAGS_NONE) {
+				foreach ($object['tags'] as $tag) {
+					if (self::getTagString($tag, $options['tag_name_format']) === '') {
+						continue;
+					}
 
-				$html_elements[$objectid][] = self::getTagHtml($tag, $object_type, $options);
+					$html_elements[$objectid][] = self::getTagHtml($tag, $object_type, $options);
 
-				$show_tags_count++;
+					$show_tags_count++;
 
-				if ($show_tags_count >= $options['show_tags_limit']) {
-					break;
+					if ($show_tags_count == $options['show_tags_limit']) {
+						break;
+					}
 				}
 			}
 
