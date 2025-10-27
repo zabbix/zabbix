@@ -2512,6 +2512,13 @@ int	zbx_vc_add_values(zbx_vector_dc_history_ptr_t *history, zbx_uint64_t *flush_
 
 #define VC_PRECACHE_MIN_QUERIES	5
 
+typedef enum
+{
+	VC_PRECACHE_QUERY,
+	VC_PRECACHE_RANGE,
+}
+zbx_vc_precache_mode_t;
+
 static int	vc_query_compare_by_timestamp_desc(const void *d1, const void *d2)
 {
 	const zbx_vc_query_t	*q1 = (const zbx_vc_query_t *)d1;
@@ -2604,13 +2611,15 @@ static void	vc_item_precache_seconds(zbx_vc_item_t *item, zbx_vector_history_rec
  * Parameters: hist       - [IN] item history data                            *
  *             value_type - [IN] item value type                              *
  *             ts_start   - [IN] history start timestamp                      *
+ *             range_type - [IN] range type                                   *
  *                                                                            *
  * Comments: For count based requests only the required number of values will *
  *           be cached. For time based requests all fetched values will be    *
  *           cached.                                                          *
  *                                                                            *
  ******************************************************************************/
-static void	vc_precache_item(zbx_item_history_t *hist, unsigned char value_type, int ts_start)
+static void	vc_precache_item(zbx_item_history_t *hist, unsigned char value_type, int ts_start,
+		zbx_value_type_t range_type)
 {
 	zbx_vc_item_t	*item;
 
@@ -2628,7 +2637,7 @@ static void	vc_precache_item(zbx_item_history_t *hist, unsigned char value_type,
 
 	zbx_vector_history_record_sort(&hist->rows, (zbx_compare_func_t)zbx_history_record_compare_asc_func);
 
-	switch (hist->range->type)
+	switch (range_type)
 	{
 		case ZBX_VALUE_SECONDS:
 			vc_item_precache_seconds(item, &hist->rows, ts_start);
@@ -2652,6 +2661,7 @@ static void	vc_precache_item(zbx_item_history_t *hist, unsigned char value_type,
  *             window     - [IN/OUT] vector of query indices to precache      *
  *             value_type - [IN] item value type                              *
  *             ts_start   - [IN] window start timestamp                       *
+ *             mode       - [IN] precache mode (QUERY or RANGE)               *
  *                                                                            *
  * Return value: SUCCEED - queries were precached successfully                *
  *               FAIL    - value cache is full                                *
@@ -2661,7 +2671,7 @@ static void	vc_precache_item(zbx_item_history_t *hist, unsigned char value_type,
  *                                                                            *
  ******************************************************************************/
 static int	vc_precache_window(zbx_vector_vc_query_t *queries, zbx_vector_int32_t *window,
-		unsigned char value_type, int ts_start)
+		unsigned char value_type, int ts_start, zbx_vc_precache_mode_t mode)
 {
 	zbx_vector_item_history_t	results;
 
@@ -2699,7 +2709,15 @@ static int	vc_precache_window(zbx_vector_vc_query_t *queries, zbx_vector_int32_t
 
 		if (1 < hist->rows.values_num)
 		{
-			vc_precache_item(hist, value_type, ts_start);
+			vc_precache_item(hist, value_type, ts_start, hist->range->type);
+			zbx_vector_vc_query_remove(queries, hist->index);
+		}
+		else if (VC_PRECACHE_RANGE == mode)
+		{
+			zabbix_log(LOG_LEVEL_TRACE, "insufficient values for itemid:" ZBX_FS_UI64 " pre-caching",
+					hist->itemid);
+
+			vc_precache_item(hist, value_type, ts_start, ZBX_VALUE_SECONDS);
 			zbx_vector_vc_query_remove(queries, hist->index);
 		}
 	}
@@ -2724,12 +2742,13 @@ out:
  *                        descending order by origin timestamp - oldest data  *
  *                        queries at the end                                  *
  *             interval - [IN] time window interval in seconds                *
+ *             mode     - [IN] precache mode (QUERY or RANGE)                 *
  *                                                                            *
  * Return value: SUCCEED - queries were precached successfully                *
  *               FAIL    - value cache is full                                *
  *                                                                            *
  ******************************************************************************/
-static int	vc_precache_query_windows(zbx_vector_vc_query_t *queries, int interval)
+static int	vc_precache_query_windows(zbx_vector_vc_query_t *queries, int interval, zbx_vc_precache_mode_t mode)
 {
 	zbx_vector_int32_t	window;
 	int			ret = FAIL, ts_start;
@@ -2760,14 +2779,14 @@ static int	vc_precache_query_windows(zbx_vector_vc_query_t *queries, int interva
 			continue;
 		}
 
-		if (FAIL == vc_precache_window(queries, &window, value_type, ts_start - interval))
+		if (FAIL == vc_precache_window(queries, &window, value_type, ts_start - interval, mode))
 			goto out;
 
 		ts_start = query->ts_end;
 		zbx_vector_int32_append(&window, i);
 	}
 
-	if (FAIL == vc_precache_window(queries, &window, value_type, ts_start - interval))
+	if (FAIL == vc_precache_window(queries, &window, value_type, ts_start - interval, mode))
 		goto out;
 
 	ret = SUCCEED;
@@ -2775,26 +2794,6 @@ out:
 	zbx_vector_int32_destroy(&window);
 
 	return ret;
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: log uncached queries for debugging                                *
- *                                                                            *
- * Parameters: queries - [IN] vector of uncached history queries              *
- *                                                                            *
- ******************************************************************************/
-static void	vc_precache_log_uncached_queries(zbx_vector_vc_query_t *queries)
-{
-	zabbix_log(LOG_LEVEL_TRACE, "Uncached queries (%d):", queries->values_num);
-
-	for (int i = 0; i < queries->values_num; i++)
-	{
-		zbx_vc_query_t	 *query = &queries->values[i];
-
-		zabbix_log(LOG_LEVEL_TRACE, "  itemid:" ZBX_FS_UI64 ", timestamp %d, range:(type:%d value:%d)",
-				query->itemid, query->ts_end, query->range->type, query->range->value);
-	}
 }
 
 /******************************************************************************
@@ -2852,14 +2851,11 @@ void	zbx_vc_precache_queries(zbx_vector_vc_query_t *queries)
 
 		zbx_vector_vc_query_sort(&uncached_queries[i], vc_query_compare_by_timestamp_desc);
 
-		if (FAIL == vc_precache_query_windows(&uncached_queries[i], VC_PRECACHE_WINDOW1))
+		if (FAIL == vc_precache_query_windows(&uncached_queries[i], VC_PRECACHE_WINDOW1, VC_PRECACHE_QUERY))
 			goto out;
 
-		if (FAIL == vc_precache_query_windows(&uncached_queries[i], VC_PRECACHE_WINDOW2))
+		if (FAIL == vc_precache_query_windows(&uncached_queries[i], VC_PRECACHE_WINDOW2, VC_PRECACHE_RANGE))
 			goto out;
-
-		if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_TRACE))
-			vc_precache_log_uncached_queries(&uncached_queries[i]);
 	}
 out:
 	for (size_t i = 0; i < ARRSIZE(uncached_queries); i++)
