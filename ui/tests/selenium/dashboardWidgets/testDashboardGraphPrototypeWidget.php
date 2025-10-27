@@ -40,9 +40,6 @@ class testDashboardGraphPrototypeWidget extends testWidgets {
 		];
 	}
 
-	const DASHBOARD_ID = 1400;
-	const SCREENSHOT_DASHBOARD_ID = 1410;
-
 	protected static $previous_widget_name = 'Graph prototype widget for update';
 	protected static $dashboardid;
 
@@ -415,7 +412,7 @@ class testDashboardGraphPrototypeWidget extends testWidgets {
 		$this->assertScreenshot($screenshot_area, $data['screenshot_id']);
 	}
 
-	private function checkGraphPrototypeWidget($data, $update = false) {
+	protected function checkGraphPrototypeWidget($data, $update = false) {
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.
 				self::$dashboardid['Dashboard for Graph Prototype widget']
 		);
@@ -516,7 +513,7 @@ class testDashboardGraphPrototypeWidget extends testWidgets {
 	 * @param boolean $update	is this updating of existing widget
 	 * @param boolean $changes	are there any changes made in widget form
 	 */
-	private function checkDataUnchanged($action, $update = false, $changes = false) {
+	protected function checkDataUnchanged($action, $update = false, $changes = false) {
 		$initial_values = CDBHelper::getHash(self::SQL);
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.
 				self::$dashboardid['Dashboard for Graph Prototype widget']
