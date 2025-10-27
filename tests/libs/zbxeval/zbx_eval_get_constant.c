@@ -14,10 +14,11 @@
 
 #include "zbxcommon.h"
 
-#include "zbxexpression.h"
 #include "zbxmocktest.h"
 #include "zbxmockdata.h"
 #include "zbxmockassert.h"
+
+#include "zbxcacheconfig.h"
 
 void	zbx_mock_test_entry(void **state)
 {

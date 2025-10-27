@@ -431,18 +431,17 @@ class CMfa extends CApiService {
 		}
 
 		self::checkDeleteDefaultMfa($db_mfas);
-		self::cehckMfaUsedByUserGroup($db_mfas);
+		self::checkMfaUsedByUserGroup($db_mfas);
 	}
 
 	private static function checkDeleteDefaultMfa(array $db_mfas): void {
 		if (in_array(CAuthenticationHelper::get(CAuthenticationHelper::MFAID), array_keys($db_mfas))
-				&& CAuthenticationHelper::get(CAuthenticationHelper::MFA_STATUS) == MFA_ENABLED
-				&& !self::checkOtherMfaExists(array_keys($db_mfas))) {
+				&& CAuthenticationHelper::get(CAuthenticationHelper::MFA_STATUS) == MFA_ENABLED) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot delete default MFA method.'));
 		}
 	}
 
-	private static function cehckMfaUsedByUserGroup(array $db_mfas) {
+	private static function checkMfaUsedByUserGroup(array $db_mfas): void {
 		$db_groups = API::UserGroup()->get([
 			'output' => ['name', 'mfaid'],
 			'mfaids' => array_keys($db_mfas),

@@ -17,44 +17,28 @@
 #include "zbxmockassert.h"
 #include "zbxmockutil.h"
 
-#include "zbxexpression.h"
 #include "zbxcachevalue.h"
 #include "mocks/valuecache/valuecache_mock.h"
 #include "../../../src/libs/zbxcalc/anomalystl.h"
+#include "zbxcacheconfig.h"
 
-int	__wrap_substitute_simple_macros(zbx_uint64_t *actionid, const zbx_db_event *event, const zbx_db_event *r_event,
-		zbx_uint64_t *userid, const zbx_uint64_t *hostid, const zbx_dc_host_t *dc_host,
-		const zbx_dc_item_t *dc_item, zbx_db_alert *alert, const zbx_db_acknowledge *ack,
-		const zbx_service_alarm_t *service_alarm, const zbx_db_service *service, const char *tz, char **data,
-		int macro_type, char *error, int maxerrlen);
+int	__wrap_zbx_substitute_macros_args(zbx_token_search_t search, char **data, char *error, size_t maxerrlen,
+		zbx_macro_resolv_func_t resolver, va_list args);
 
-int	__wrap_zbx_dc_get_data_expected_from(zbx_uint64_t itemid, int *seconds);
-
-int	__wrap_substitute_simple_macros(zbx_uint64_t *actionid, const zbx_db_event *event, const zbx_db_event *r_event,
-		zbx_uint64_t *userid, const zbx_uint64_t *hostid, const zbx_dc_host_t *dc_host,
-		const zbx_dc_item_t *dc_item, zbx_db_alert *alert, const zbx_db_acknowledge *ack,
-		const zbx_service_alarm_t *service_alarm, const zbx_db_service *service, const char *tz, char **data,
-		int macro_type, char *error, int maxerrlen)
+int	__wrap_zbx_substitute_macros_args(zbx_token_search_t search, char **data, char *error, size_t maxerrlen,
+		zbx_macro_resolv_func_t resolver, va_list args)
 {
-	ZBX_UNUSED(actionid);
-	ZBX_UNUSED(event);
-	ZBX_UNUSED(r_event);
-	ZBX_UNUSED(userid);
-	ZBX_UNUSED(hostid);
-	ZBX_UNUSED(dc_host);
-	ZBX_UNUSED(dc_item);
-	ZBX_UNUSED(alert);
-	ZBX_UNUSED(ack);
-	ZBX_UNUSED(tz);
+	ZBX_UNUSED(search);
 	ZBX_UNUSED(data);
-	ZBX_UNUSED(macro_type);
 	ZBX_UNUSED(error);
 	ZBX_UNUSED(maxerrlen);
-	ZBX_UNUSED(service_alarm);
-	ZBX_UNUSED(service);
+	ZBX_UNUSED(resolver);
+	ZBX_UNUSED(args);
 
 	return SUCCEED;
 }
+
+int	__wrap_zbx_dc_get_data_expected_from(zbx_uint64_t itemid, int *seconds);
 
 int	__wrap_zbx_dc_get_data_expected_from(zbx_uint64_t itemid, int *seconds)
 {
