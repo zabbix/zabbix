@@ -121,7 +121,7 @@ const char	*zbx_macro_in_list(const char *str, zbx_strloc_t strloc, const char *
  * Comments: allocates memory                                                 *
  *                                                                            *
  ******************************************************************************/
-char	*zbx_get_macro_from_func(const char *str, zbx_token_func_macro_t *fm, int *N_functionid)
+char	*zbx_get_macro_from_func(const char *str, const zbx_token_func_macro_t *fm, int *N_functionid)
 {
 	const char	*ptr_l = str + fm->macro.l, *ptr_r;
 	char		*ptr = NULL;

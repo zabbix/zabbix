@@ -65,10 +65,7 @@ static void	dc_get_history_sync_item(zbx_history_sync_item_t *dst_item, const ZB
 	dst_item->lastlogsize = src_item->lastlogsize;
 	dst_item->mtime = src_item->mtime;
 
-	if ('\0' != *src_item->error)
-		dst_item->error = zbx_strdup(NULL, src_item->error);
-	else
-		dst_item->error = NULL;
+	memcpy(dst_item->error_hash, src_item->error_hash, sizeof(dst_item->error_hash));
 
 	dst_item->inventory_link = src_item->inventory_link;
 	dst_item->valuemapid = src_item->valuemapid;
@@ -231,7 +228,6 @@ void	zbx_dc_config_clean_history_sync_items(zbx_history_sync_item_t *items, int 
 		if (ITEM_VALUE_TYPE_FLOAT == items[i].value_type || ITEM_VALUE_TYPE_UINT64 == items[i].value_type)
 			zbx_free(items[i].units);
 
-		zbx_free(items[i].error);
 		zbx_free(items[i].history_period);
 		zbx_free(items[i].trends_period);
 	}
@@ -558,6 +554,8 @@ static void	dc_get_history_recv_item(zbx_history_recv_item_t *dst_item, const ZB
 	const ZBX_DC_LOGITEM	*logitem;
 	const ZBX_DC_TRAPITEM	*trapitem;
 	const ZBX_DC_HTTPITEM	*httpitem;
+
+	dst_item->preprocessing = zbx_dc_item_requires_preprocessing(src_item);
 
 	dst_item->type = src_item->type;
 	dst_item->value_type = src_item->value_type;

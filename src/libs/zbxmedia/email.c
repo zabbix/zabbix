@@ -18,6 +18,7 @@
 #include "zbxcomms.h"
 #include "zbxcrypto.h"
 #include "zbxalgo.h"
+#include "zbxtime.h"
 #include "zbxcurl.h"
 #include "zbxip.h"
 
@@ -323,7 +324,7 @@ static char	*smtp_prepare_payload(zbx_vector_ptr_t *from_mails, zbx_vector_ptr_t
 	/* prepare date */
 
 	time(&email_time);
-	local_time = localtime(&email_time);
+	local_time = zbx_localtime(&email_time, NULL);
 	strftime(str_time, MAX_STRING_LEN, "%a, %d %b %Y %H:%M:%S %z", local_time);
 
 	for (i = 0; i < from_mails->values_num; i++)
