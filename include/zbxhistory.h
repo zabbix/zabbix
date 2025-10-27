@@ -64,8 +64,8 @@ int	zbx_history_get_values(zbx_uint64_t itemid, int value_type, int start, int c
 		zbx_vector_history_record_t *values);
 void	zbx_history_get_batch(zbx_vector_item_history_t *results, int value_type, int start);
 
-int	zbx_history_requires_trends(int value_type);
 zbx_uint64_t	zbx_history_get_precache_flags(void);
+zbx_uint64_t	zbx_history_get_trends_flags(void);
 int	zbx_history_check_version(int config_allow_unsupported_db_versions, unsigned char program_type);
 
 #define ZBX_HISTORY_FLUSH_SUCCEED		0

@@ -7573,6 +7573,7 @@ static void	dc_add_new_items_to_trends(const zbx_vector_dc_item_ptr_t *items)
 	{
 		zbx_vector_uint64_t	itemids;
 		int			i;
+		zbx_uint64_t		trends_flags = zbx_history_get_trends_flags();
 
 		zbx_vector_uint64_create(&itemids);
 		zbx_vector_uint64_reserve(&itemids, (size_t)items->values_num);
@@ -7582,6 +7583,9 @@ static void	dc_add_new_items_to_trends(const zbx_vector_dc_item_ptr_t *items)
 			ZBX_DC_ITEM	*item = items->values[i];
 
 			if (ITEM_VALUE_TYPE_FLOAT != item->value_type && ITEM_VALUE_TYPE_UINT64 != item->value_type)
+				continue;
+
+			if (0 == (trends_flags & (__UINT64_C(1) << item->value_type)))
 				continue;
 
 			ZBX_DC_NUMITEM	*numitem;

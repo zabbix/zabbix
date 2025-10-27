@@ -2678,7 +2678,7 @@ static int	evaluate_TREND(zbx_variant_t *value, const zbx_dc_evaluate_item_t *it
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	if (SUCCEED != zbx_history_requires_trends(item->value_type))
+	if (0 == (zbx_history_get_trends_flags() & (__UINT64_C(1) << item->value_type)))
 	{
 		*error = zbx_strdup(*error, "history storage provider does not support trend functions");
 		goto out;

@@ -46,6 +46,7 @@
 #include "zbxrtc.h"
 #include "zbx_rtc_constants.h"
 #include "zbxserialize.h"
+#include "zbxcurl.h"
 
 #define CONFIG_ESCALATOR_FREQUENCY	3
 

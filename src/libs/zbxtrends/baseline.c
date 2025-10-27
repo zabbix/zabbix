@@ -215,7 +215,7 @@ int	zbx_baseline_get_data(zbx_uint64_t itemid, unsigned char value_type, time_t 
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	if (SUCCEED != zbx_history_requires_trends(value_type))
+	if (0 == (zbx_history_get_trends_flags() & (__UINT64_C(1) << value_type)))
 	{
 		*error = zbx_strdup(*error, "history storage provider does not support trend functions");
 		goto out;

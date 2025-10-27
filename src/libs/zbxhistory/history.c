@@ -82,6 +82,7 @@ struct zbx_history_manager
 	zbx_vector_history_provider_ptr_t	*providers;
 
 	zbx_uint64_t				precache_flags;
+	zbx_uint64_t				trends_flags;
 };
 
 static zbx_history_manager_t        history_manager;
@@ -462,6 +463,10 @@ static int	history_manager_init(zbx_history_manager_t *manager, const char *conf
 
 		if (0 != (traits & ZBX_HISTORY_TRAIT_REQUIRES_PRECACHING))
 			manager->precache_flags |= type_mask;
+
+		if (0 != (traits & ZBX_HISTORY_TRAIT_REQUIRES_TRENDS))
+			manager->trends_flags |= type_mask;
+
 	}
 
 	ret = SUCCEED;
@@ -1043,28 +1048,6 @@ void	zbx_history_get_batch(zbx_vector_item_history_t *results, int value_type, i
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__ );
 }
 
-/************************************************************************************
- *                                                                                  *
- * Purpose: checks if the value type requires trends data calculations              *
- *                                                                                  *
- * Parameters: value_type - [IN] the value type                                     *
- *                                                                                  *
- * Return value: SUCCEED - trends must be calculated for this value type            *
- *               FAIL - otherwise                                                   *
- *                                                                                  *
- * Comments: This function is used to check if the trends must be calculated for    *
- *           the specified value type based on the history storage used.            *
- *                                                                                  *
- ************************************************************************************/
-int	zbx_history_requires_trends(int value_type)
-{
-	zbx_uint64_t	traits;
-
-	traits = history_manager_get_provider_traits(&history_manager, value_type);
-
-	return 0 != (traits & ZBX_HISTORY_TRAIT_REQUIRES_TRENDS) ? SUCCEED : FAIL;
-}
-
 /******************************************************************************
  *                                                                            *
  * Purpose: check if value type requires external housekeeping                *
@@ -1086,12 +1069,11 @@ int	zbx_history_requires_housekeeping(int value_type)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: check if value type requires external housekeeping                *
+ * Purpose: get precaching flags for all value types                          *
  *                                                                            *
- * Parameters: value_type - [IN] the value type                               *
  *                                                                            *
- * Return value: SUCCEED - housekeeping required                              *
- *               FAIL    - otherwise                                          *
+ * Return value: precaching flags, with 1 << value_type bits set for value    *
+ *               types supporting precaching                                  *
  *                                                                            *
  ******************************************************************************/
 zbx_uint64_t	zbx_history_get_precache_flags(void)
@@ -1099,6 +1081,20 @@ zbx_uint64_t	zbx_history_get_precache_flags(void)
 	return history_manager.precache_flags;
 }
 
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: get trends flags for all value types                              *
+ *                                                                            *
+ *                                                                            *
+ * Return value: trends flags, with 1 << value_type bits set for value        *
+ *               types requiring trends                                       *
+ *                                                                            *
+ ******************************************************************************/
+zbx_uint64_t	zbx_history_get_trends_flags(void)
+{
+	return history_manager.trends_flags;
+}
 /******************************************************************************
  *                                                                            *
  * Purpose: frees history log and all resources allocated for it              *

@@ -852,8 +852,7 @@ static void	DCadd_trend(const zbx_dc_history_t *history, ZBX_DC_TREND **trends, 
 
 	trend = DCget_trend(history->entry.itemid);
 
-	if (trend->num > 0 && (trend->clock != hour || trend->value_type != history->entry.value_type) &&
-			SUCCEED == zbx_history_requires_trends(trend->value_type))
+	if (trend->num > 0 && (trend->clock != hour || trend->value_type != history->entry.value_type))
 	{
 		DCflush_trend(trend, trends, trends_alloc, trends_num);
 	}
@@ -951,7 +950,7 @@ void	zbx_dc_mass_update_trends(const zbx_dc_history_t *history, int history_num,
 			}
 			else
 			{
-				if (SUCCEED == zbx_history_requires_trends(trend->value_type) && 0 != trend->num)
+				if (0 != trend->num)
 					DCflush_trend(trend, trends, &trends_alloc, trends_num);
 
 				/* trend is missing an hour, check if it should be cleared from cache */
@@ -1694,8 +1693,7 @@ static void	DCsync_trends(int parallel_num, zbx_dc_sync_trend_mode_t sync_trend_
 
 	while (NULL != (trend = (ZBX_DC_TREND *)zbx_hashset_iter_next(&iter)))
 	{
-		if (SUCCEED == zbx_history_requires_trends(trend->value_type) && trend->clock >= compression_age &&
-				0 != trend->num)
+		if (trend->clock >= compression_age && 0 != trend->num)
 		{
 			if (ZBX_DC_SYNC_TREND_MODE_PARALLEL == sync_trend_mode)
 			{

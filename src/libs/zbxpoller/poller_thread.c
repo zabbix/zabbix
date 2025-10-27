@@ -63,6 +63,7 @@
 #include "zbx_expression_constants.h"
 #include "zbxinterface.h"
 #include "zbxxml.h"
+#include "zbxcurl.h"
 
 void	zbx_free_agent_result_ptr(AGENT_RESULT *result)
 {

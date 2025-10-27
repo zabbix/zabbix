@@ -53,6 +53,7 @@
 #ifdef HAVE_NETSNMP
 #	include "zbxipcservice.h"
 #endif
+#include "zbxcurl.h"
 
 #define ZBX_MAX_SECTION_ENTRIES		4
 #define ZBX_MAX_ENTRY_ATTRIBUTES	3
