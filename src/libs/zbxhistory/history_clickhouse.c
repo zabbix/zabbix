@@ -714,7 +714,7 @@ static zbx_uint64_t	history_clickhouse_flush(void *data)
 
 		if (NULL != error)
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "failed to post data to ClickHouse: %s", error);
+			zabbix_log(LOG_LEVEL_WARNING, "failed to upload data to ClickHouse: %s", error);
 			zbx_free(error);
 		}
 
