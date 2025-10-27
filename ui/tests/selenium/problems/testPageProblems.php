@@ -1123,7 +1123,7 @@ class testPageProblems extends CWebTest {
 						'Acknowledgement status' => 'Unacknowledged',
 						'Host inventory' => [
 							'action' => USER_ACTION_UPDATE, 'index' => 0,
-							'field' => 'Location latitude', 'value' => '56.95387'
+							'field' => 'Location latitude', 'value' => '56.97612'
 						],
 						'Show tags' => 3,
 						'id:tag_name_format_0' => 'Shortened',
@@ -1986,6 +1986,10 @@ class testPageProblems extends CWebTest {
 		$this->assertEquals($data_in_column, $opdata_column->getText());
 
 		if (array_key_exists('screen_name', $data)) {
+			// Remove time from table column - column width varies depending on time text, causing unstable screenshots.
+			CElementQuery::getDriver()->executeScript("arguments[0].textContent = '';",
+					[$table->findRow('Problem', $problem_name)->getColumn('Time')]
+			);
 			$this->assertScreenshot($opdata_column, $data['screen_name']);
 		}
 

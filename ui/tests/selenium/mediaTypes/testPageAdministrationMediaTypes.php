@@ -332,7 +332,7 @@ class testPageAdministrationMediaTypes extends CWebTest {
 			$row->query('link', $old_status)->one()->click();
 			$this->page->waitUntilReady();
 
-			// Check result on fronted.
+			// Check result on frontend.
 			$this->assertMessage(TEST_GOOD, 'Media type '.lcfirst($new_status));
 			CMessageElement::find()->one()->close();
 

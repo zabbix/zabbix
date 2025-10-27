@@ -83,6 +83,15 @@ class testFormUser extends CWebTest {
 				]
 			]
 		]);
+
+		CDataHelper::call('dashboard.create', [
+			[
+				'name' => 'Testing share dashboard',
+				'userid' => '9',
+				'private' => 0,
+				'pages' => [[]]
+			]
+		]);
 	}
 
 	public function getLayoutData() {
@@ -799,7 +808,7 @@ class testFormUser extends CWebTest {
 					'role' => 'Guest role'
 				]
 			],
-			// Creating a user with optional parameters specified (including autologout) using Cyrillic charatcers.
+			// Creating a user with optional parameters specified (including autologout) using Cyrillic characters.
 			[
 				[
 					'expected' => TEST_GOOD,

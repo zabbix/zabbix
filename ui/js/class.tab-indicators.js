@@ -56,6 +56,7 @@ class TabIndicators {
 		const MEDIA_TYPE = document.querySelector('#media-type-form');
 		const PIE_CHART = document.querySelector('form.dashboard-widget-piechart');
 		const PROXY = document.querySelector('#proxy-form');
+		const SCATTER_PLOT = document.querySelector('form.dashboard-widget-scatterplot');
 		const SERVICE = document.querySelector('#service-form');
 		const SLA = document.querySelector('#sla-form');
 		const TEMPLATE = document.querySelector('#templates-form');
@@ -95,6 +96,8 @@ class TabIndicators {
 				return PIE_CHART;
 			case !!PROXY:
 				return PROXY;
+			case !!SCATTER_PLOT:
+				return SCATTER_PLOT;
 			case !!SERVICE:
 				return SERVICE;
 			case !!SLA:
@@ -250,6 +253,18 @@ class TabIndicatorFactory {
 				return new ProxyTimeoutsTabIndicatorItem;
 			case 'Saml':
 				return new SamlTabIndicatorItem;
+			case 'ScatterPlotAxes':
+				return new ScatterPlotAxesTabIndicatorItem;
+			case 'ScatterPlotDataset':
+				return new ScatterPlotDatasetTabIndicatorItem;
+			case 'ScatterPlotLegend':
+				return new ScatterPlotLegendTabIndicatorItem;
+			case 'ScatterPlotDisplayOptions':
+				return new ScatterPlotDisplayOptionsTabIndicatorItem;
+			case 'ScatterPlotTimePeriod':
+				return new ScatterPlotTimePeriodTabIndicatorItem;
+			case 'ScatterPlotThresholds':
+				return new ScatterPlotThresholdsTabIndicatorItem;
 			case 'Sharing':
 				return new SharingTabIndicatorItem;
 			case 'ExcludedDowntimes':
@@ -361,9 +376,7 @@ class HostMacrosTabIndicatorItem extends TabIndicatorItem {
 	}
 
 	getValue() {
-		let macros = [...document.forms['host-form'].querySelectorAll('#tbl_macros .form_row')];
-
-		return macros
+		return [...document.querySelectorAll('#tbl_macros .form_row')]
 			.filter((row) => {
 				const macro = row.querySelector('textarea[name$="[macro]"]');
 				const inherited_type = row.querySelector('input[name$="[inherited_type]"]');
@@ -405,15 +418,13 @@ class HostPrototypeMacrosTabIndicatorItem extends TabIndicatorItem {
 	}
 
 	getValue() {
-		let macros = [...document.forms['host-prototype-form'].querySelectorAll('#tbl_macros .form_row')];
-
-		return macros
+		return [...document.querySelectorAll('#tbl_macros .form_row')]
 			.filter((row) => {
 				const macro = row.querySelector('textarea[name$="[macro]"]');
 				const inherited_type = row.querySelector('input[name$="[inherited_type]"]');
-				const inherited = HostPrototypeMacrosTabIndicatorItem.ZBX_PROPERTY_INHERITED;
 
-				if (inherited_type !== null && parseInt(inherited_type.value, 10) == inherited) {
+				if (inherited_type !== null
+						&& parseInt(inherited_type.value, 10) == HostMacrosTabIndicatorItem.ZBX_PROPERTY_INHERITED) {
 					return false;
 				}
 
@@ -449,15 +460,13 @@ class TemplateMacrosTabIndicatorItem extends TabIndicatorItem {
 	}
 
 	getValue() {
-		let macros = [...document.forms['templates-form'].querySelectorAll('#tbl_macros .form_row')];
-
-		return macros
+		return [...document.querySelectorAll('#tbl_macros .form_row')]
 			.filter((row) => {
 				const macro = row.querySelector('textarea[name$="[macro]"]');
 				const inherited_type = row.querySelector('input[name$="[inherited_type]"]');
-				const inherited = TemplateMacrosTabIndicatorItem.ZBX_PROPERTY_INHERITED;
 
-				if (inherited_type !== null && parseInt(inherited_type.value, 10) == inherited) {
+				if (inherited_type !== null
+						&& parseInt(inherited_type.value, 10) == HostMacrosTabIndicatorItem.ZBX_PROPERTY_INHERITED) {
 					return false;
 				}
 
@@ -1835,6 +1844,207 @@ class PieLegendTabIndicatorItem extends TabIndicatorItem {
 		if (legend_columns !== null
 				&& legend_columns.value != PieLegendTabIndicatorItem.PIE_CHART_LEGEND_COLUMNS_MAX) {
 			return true;
+		}
+
+		return false;
+	}
+
+	initObserver() {
+		document.getElementById('tabs').addEventListener(TAB_INDICATOR_UPDATE_EVENT, () => {
+			this.addAttributes();
+		});
+	}
+}
+
+class ScatterPlotAxesTabIndicatorItem extends TabIndicatorItem {
+
+	static SCATTER_PLOT_AXIS_UNITS_AUTO = 0;
+
+	constructor() {
+		super(TAB_INDICATOR_TYPE_MARK);
+	}
+
+	getValue() {
+		for (const checkbox of document.querySelectorAll('#x_axis, #y_axis')) {
+			if (!checkbox.checked) {
+				return true;
+			}
+		}
+
+		for (const input of document.querySelectorAll('#x_axis_min, #y_axis_min, #x_axis_max, #y_axis_max')) {
+			if (!input.disabled && input.value !== '') {
+				return true;
+			}
+		}
+
+		for (const input of document.querySelectorAll('#x_axis_units, #y_axis_units')) {
+			if (!input.disabled && input.value != ScatterPlotAxesTabIndicatorItem.SCATTER_PLOT_AXIS_UNITS_AUTO) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	initObserver() {
+		document.getElementById('tabs').addEventListener(TAB_INDICATOR_UPDATE_EVENT, () => {
+			this.addAttributes();
+		});
+	}
+}
+
+class ScatterPlotDatasetTabIndicatorItem extends TabIndicatorItem {
+
+	constructor() {
+		super(TAB_INDICATOR_TYPE_COUNT);
+	}
+
+	getValue() {
+		return document
+			.querySelectorAll('#data_set .list-accordion-item')
+			.length;
+	}
+
+	initObserver() {
+		const target_node = document.querySelector('#data_set');
+
+		if (target_node !== null) {
+			const observer = new MutationObserver(() => {
+				this.addAttributes();
+			});
+
+			observer.observe(target_node, {
+				childList: true,
+				subtree: true
+			});
+		}
+	}
+}
+
+class ScatterPlotDisplayOptionsTabIndicatorItem extends TabIndicatorItem {
+
+	constructor() {
+		super(TAB_INDICATOR_TYPE_MARK);
+	}
+
+	getValue() {
+		const names = ['source'];
+
+		for (const name of names) {
+			const elem = document.querySelector("[name='" + name + "']:checked");
+			if (elem !== null && elem.value > 0) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	initObserver() {
+		document.getElementById('tabs').addEventListener(TAB_INDICATOR_UPDATE_EVENT, () => {
+			this.addAttributes();
+		});
+	}
+}
+
+class ScatterPlotTimePeriodTabIndicatorItem extends TabIndicatorItem {
+
+	constructor() {
+		super(TAB_INDICATOR_TYPE_MARK);
+	}
+
+	getValue() {
+		const element = document.querySelector('input[name="time_period[data_source]"]');
+
+		if (element !== null) {
+			return !element.checked;
+		}
+
+		return false;
+	}
+
+	initObserver() {
+		document.getElementById('tabs').addEventListener(TAB_INDICATOR_UPDATE_EVENT, () => {
+			this.addAttributes();
+		});
+	}
+}
+
+class ScatterPlotLegendTabIndicatorItem extends TabIndicatorItem {
+
+	static SCATTER_PLOT_LEGEND_LINES_MIN = 1;
+	static SCATTER_PLOT_LEGEND_COLUMNS_MAX = 4;
+	static SCATTER_PLOT_LEGEND_LINES_MODE_FIXED = 0;
+
+	constructor() {
+		super(TAB_INDICATOR_TYPE_MARK);
+	}
+
+	getValue() {
+		const legend = document.getElementById('legend');
+
+		if (legend !== null && !legend.checked) {
+			return true;
+		}
+
+		const legend_aggregation = document.getElementById('legend_aggregation');
+
+		if (legend_aggregation !== null && legend_aggregation.checked) {
+			return true;
+		}
+
+		const legend_lines_mode = document.querySelector('[name="legend_lines_mode"]:checked');
+
+		if (legend_lines_mode !== null
+				&& legend_lines_mode.value != ScatterPlotLegendTabIndicatorItem.SCATTER_PLOT_LEGEND_LINES_MODE_FIXED) {
+			return true;
+		}
+
+		const legend_lines = document.getElementById('legend_lines');
+
+		if (legend_lines !== null
+				&& legend_lines.value != ScatterPlotLegendTabIndicatorItem.SCATTER_PLOT_LEGEND_LINES_MIN) {
+			return true;
+		}
+
+		const legend_columns = document.getElementById('legend_columns');
+
+		if (legend_columns !== null
+				&& legend_columns.value != ScatterPlotLegendTabIndicatorItem.SCATTER_PLOT_LEGEND_COLUMNS_MAX) {
+			return true;
+		}
+
+		return false;
+	}
+
+	initObserver() {
+		document.getElementById('tabs').addEventListener(TAB_INDICATOR_UPDATE_EVENT, () => {
+			this.addAttributes();
+		});
+	}
+}
+
+class ScatterPlotThresholdsTabIndicatorItem extends TabIndicatorItem {
+
+	constructor() {
+		super(TAB_INDICATOR_TYPE_MARK);
+	}
+
+	getValue() {
+		const interpolation = document.getElementById('interpolation');
+
+		if (interpolation !== null && interpolation.checked) {
+			return true;
+		}
+
+		const thresholds_table = document.getElementById('thresholds-table');
+
+		if (thresholds_table !== null) {
+			for (const input of thresholds_table.querySelectorAll('input[name$="_axis_threshold]"]')) {
+				if (input.value !== '') {
+					return true;
+				}
+			}
 		}
 
 		return false;

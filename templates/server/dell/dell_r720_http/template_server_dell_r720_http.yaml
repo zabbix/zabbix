@@ -34,7 +34,7 @@ zabbix_export:
         > NOTE! If you are experiencing timeouts on some of the items that are executing requests, adjust the `{$DELL.HTTP.REQUEST.TIMEOUT}` macro accordingly.
       vendor:
         name: Zabbix
-        version: 8.0-1
+        version: 8.0-2
       groups:
         - name: 'Templates/Server hardware'
       items:
@@ -2901,12 +2901,6 @@ zabbix_export:
                       value:
                         host: 'DELL PowerEdge R720 by HTTP'
                         key: dell.server.util.cpu
-                    - type: STRING
-                      name: max
-                      value: '100'
-                    - type: STRING
-                      name: min
-                      value: '0'
                     - type: INTEGER
                       name: rf_rate
                       value: '30'
@@ -2967,12 +2961,6 @@ zabbix_export:
                       value:
                         host: 'DELL PowerEdge R720 by HTTP'
                         key: dell.server.util.mem
-                    - type: STRING
-                      name: max
-                      value: '100'
-                    - type: STRING
-                      name: min
-                      value: '0'
                     - type: INTEGER
                       name: rf_rate
                       value: '30'
@@ -3033,12 +3021,6 @@ zabbix_export:
                       value:
                         host: 'DELL PowerEdge R720 by HTTP'
                         key: dell.server.util.io
-                    - type: STRING
-                      name: max
-                      value: '100'
-                    - type: STRING
-                      name: min
-                      value: '0'
                     - type: INTEGER
                       name: rf_rate
                       value: '30'
@@ -3099,12 +3081,6 @@ zabbix_export:
                       value:
                         host: 'DELL PowerEdge R720 by HTTP'
                         key: dell.server.util.sys
-                    - type: STRING
-                      name: max
-                      value: '100'
-                    - type: STRING
-                      name: min
-                      value: '0'
                     - type: INTEGER
                       name: rf_rate
                       value: '30'

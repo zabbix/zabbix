@@ -32,6 +32,7 @@
 #include "zbxpreproc.h"
 #include "zbxinterface.h"
 #include "zbxtimekeeper.h"
+#include "zbxdb.h"
 
 static int	compare_interfaces(const void *p1, const void *p2)
 {
@@ -1061,6 +1062,40 @@ int	get_value_internal(const zbx_dc_item_t *item, AGENT_RESULT *result, const zb
 			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid third parameter."));
 			goto out;
 		}
+	}
+	else if (0 == strcmp(tmp, "db"))
+	{
+		if (2 != nparams)
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid number of parameters."));
+			goto out;
+		}
+
+		tmp1 = get_rparam(&request, 1);
+		if (0 != strcmp(tmp1, "pool"))
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
+			goto out;
+		}
+
+		zbx_dbconn_pool_stats_t		stats;
+		zbx_dbconn_pool_config_t	config;
+		struct zbx_json			j;
+
+		zbx_dbconn_pool_get_stats(&stats);
+		zbx_dbconn_pool_get_config(&config);
+
+		zbx_json_init(&j, 512);
+
+		zbx_json_adddouble(&j, ZBX_PROTO_TAG_WAIT_TIME, stats.time_wait);
+		zbx_json_adddouble(&j, ZBX_PROTO_TAG_IDLE_TIME, stats.time_idle);
+		zbx_json_adduint64(&j, ZBX_PROTO_TAG_CONN_PROVIDED, stats.provided_num);
+		zbx_json_addint64(&j, ZBX_PROTO_TAG_MAX_OPEN, config.max_open);
+		zbx_json_addint64(&j, ZBX_PROTO_TAG_MAX_IDLE, config.max_idle);
+		zbx_json_addint64(&j, ZBX_PROTO_TAG_IDLE_TIMEOUT, config.idle_timeout);
+
+		SET_TEXT_RESULT(result, zbx_strdup(NULL, j.buffer));
+		zbx_json_free(&j);
 	}
 	else
 	{

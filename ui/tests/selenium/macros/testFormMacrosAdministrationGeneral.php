@@ -117,6 +117,7 @@ class testFormMacrosAdministrationGeneral extends testFormMacros {
 		}
 
 		$this->page->waitUntilReady();
+		$this->assertMessage(TEST_GOOD, 'Macros updated');
 
 		$this->zbxTestCheckHeader('Macros');
 		$this->zbxTestTextPresent(['Macro', 'Value', 'Description']);

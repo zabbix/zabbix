@@ -54,6 +54,15 @@ class testPageUsers extends CLegacyWebTest {
 				]
 			]
 		]);
+
+		CDataHelper::call('dashboard.create', [
+			[
+				'name' => 'Testing share dashboard',
+				'userid' => '9',
+				'private' => 0,
+				'pages' => [[]]
+			]
+		]);
 	}
 
 	public static function allUsers() {

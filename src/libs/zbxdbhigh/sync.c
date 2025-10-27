@@ -467,9 +467,9 @@ static void	sync_list_flush(zbx_sync_list_t *sync_list, zbx_sync_rowset_t *dst)
  *             src - [IN] source rowset                                       *
  *                                                                            *
  * Comments: The merge operation modifies the destination rows as follows:    *
- *           - unmodified rows have flags set to ZBX_SYNC_ROW_NONE                *
- *           - rows marked for deletion have flags set to ZBX_SYNC_ROW_DELETE     *
- *           - new rows (to be inserted) have flags set to ZBX_SYNC_ROW_INSERT,   *
+ *           - unmodified rows have flags set to ZBX_SYNC_ROW_NONE            *
+ *           - rows marked for deletion have flags set to ZBX_SYNC_ROW_DELETE *
+ *           - new rows (to be inserted) have flags set to ZBX_SYNC_ROW_INSERT,*
  *             rowid 0, and column values copied from source                  *
  *           - updated rows have flags set as a bitset indicating which       *
  *             columns were modified. Modified column values are copied       *

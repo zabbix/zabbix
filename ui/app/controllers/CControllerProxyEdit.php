@@ -151,7 +151,7 @@ class CControllerProxyEdit extends CController {
 					'tls_connect' => (int) DB::getDefault('proxy', 'tls_connect'),
 					'tls_accept' => (int) DB::getDefault('proxy', 'tls_connect'),
 					'tls_psk_identity' => DB::getDefault('proxy', 'tls_psk_identity'),
-					'tls_psk' => DB::getDefault('proxy', 'tls_psk_identity'),
+					'tls_psk' => DB::getDefault('proxy', 'tls_psk'),
 					'tls_issuer' => DB::getDefault('proxy', 'tls_issuer'),
 					'tls_subject' => DB::getDefault('proxy', 'tls_subject'),
 					'custom_timeouts' => (int) DB::getDefault('proxy', 'custom_timeouts'),
@@ -172,6 +172,16 @@ class CControllerProxyEdit extends CController {
 		$data['user'] = [
 			'debug_mode' => $this->getDebugMode(),
 			'can_edit_global_timeouts' => $this->checkAccess(CRoleHelper::UI_ADMINISTRATION_GENERAL)
+		];
+
+		$create_rules = (new CFormValidator(CControllerProxyCreate::getValidationRules()))->getRules();
+		$rules = $this->hasInput('proxyid')
+			? (new CFormValidator(CControllerProxyUpdate::getValidationRules()))->getRules()
+			: $create_rules;
+
+		$data += [
+			'js_validation_rules' => $rules,
+			'js_clone_validation_rules' => $create_rules
 		];
 
 		$this->setResponse(new CControllerResponseData($data));

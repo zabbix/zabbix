@@ -19,7 +19,6 @@
 #include "zbxmockassert.h"
 #include "zbxmockutil.h"
 
-#include "zbxexpression.h"
 #include "zbxlog.h"
 #include "../../../src/libs/zbxcalc/eval.h"
 

@@ -17,7 +17,6 @@
 #include "../db_lengths_constants.h"
 #include "../server_constants.h"
 
-#include "zbxexpression.h"
 #include "audit/zbxaudit.h"
 #include "audit/zbxaudit_trigger.h"
 #include "zbxnum.h"

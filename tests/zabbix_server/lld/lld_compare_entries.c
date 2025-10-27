@@ -43,10 +43,10 @@ void	zbx_mock_test_entry(void **state)
 
 	zbx_vector_lld_macro_path_ptr_create(&macro_paths);
 
-	zbx_hashset_create_ext(&entries1, 0, lld_entry_hash, lld_entry_compare, (zbx_clean_func_t)lld_entry_clear,
+	zbx_hashset_create_ext(&entries1, 0, lld_entry_hash, lld_entry_compare, lld_entry_clear_wrapper,
 			ZBX_DEFAULT_MEM_MALLOC_FUNC, ZBX_DEFAULT_MEM_REALLOC_FUNC, ZBX_DEFAULT_MEM_FREE_FUNC);
 
-	zbx_hashset_create_ext(&entries2, 0, lld_entry_hash, lld_entry_compare, (zbx_clean_func_t)lld_entry_clear,
+	zbx_hashset_create_ext(&entries2, 0, lld_entry_hash, lld_entry_compare, lld_entry_clear_wrapper,
 			ZBX_DEFAULT_MEM_MALLOC_FUNC, ZBX_DEFAULT_MEM_REALLOC_FUNC, ZBX_DEFAULT_MEM_FREE_FUNC);
 
 	if (SUCCEED != lld_extract_entries(&entries1, NULL, &obj1, &macro_paths, &error))

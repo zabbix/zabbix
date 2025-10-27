@@ -39,7 +39,7 @@ class CControllerAutoregUpdate extends CController {
 			],
 			'tls_psk' => [
 				['db config_autoreg_tls.tls_psk',
-					'regex' => '/^(.{2}){1,}$/',
+					'regex' => ZBX_TLS_PSK_PATTERN,
 					'messages' => ['regex' => _('PSK must be an even number of characters.')]
 				],
 				['db config_autoreg_tls.tls_psk',

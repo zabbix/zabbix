@@ -117,6 +117,11 @@ int	zbx_get_active_agent_availability(zbx_uint64_t hostid)
 	return status;
 }
 
+void	zbx_proxy_hostdata_free(zbx_proxy_hostdata_t *ph)
+{
+	zbx_free(ph);
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: initializes interface availability data                           *

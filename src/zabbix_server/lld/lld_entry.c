@@ -159,6 +159,11 @@ void	lld_entry_clear(zbx_lld_entry_t *entry)
 	zbx_vector_lld_macro_destroy(&entry->macros);
 }
 
+void	lld_entry_clear_wrapper(void *data)
+{
+	lld_entry_clear((zbx_lld_entry_t*)data);
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: lld_entry_get_macro                                              *
@@ -168,7 +173,7 @@ void	lld_entry_clear(zbx_lld_entry_t *entry)
  * Return value: macro value if found, NULL otherwise                         *
  *                                                                            *
  ******************************************************************************/
-const char        *lld_entry_get_macro(const zbx_lld_entry_t *entry, const char *macro)
+const char	*lld_entry_get_macro(const zbx_lld_entry_t *entry, const char *macro)
 {
 	int			i;
 	zbx_lld_macro_t 	lld_macro = {.macro = (char *)macro};

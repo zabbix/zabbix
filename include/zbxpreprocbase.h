@@ -123,6 +123,7 @@ typedef struct
 }
 zbx_pp_item_t;
 
+void	zbx_pp_item_clear_wrapper(void *data);
 void	zbx_pp_item_clear(zbx_pp_item_t *item);
 
 #endif

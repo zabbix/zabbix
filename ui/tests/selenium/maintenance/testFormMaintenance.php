@@ -267,7 +267,7 @@ class testFormMaintenance extends CLegacyWebTest {
 			],
 			[
 				'action' => USER_ACTION_UPDATE,
-				'index' => 1,
+				'index' => 2,
 				'tag' => 'Tag',
 				'value' => 'B1'
 			]

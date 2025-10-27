@@ -8,6 +8,7 @@ libzbxdb_a_SOURCES = \
 	dbmisc.c \
 	dbinsert.c \
 	dbversion.c \
+	dbpool.c \
 	dbconn_compat.c
 
 libzbxdb_a_CFLAGS = $(DB_CFLAGS)

@@ -144,10 +144,16 @@ class testFormGroups extends CWebTest {
 			$this->assertTrue($form->getField('Group name')->isAttributePresent('readonly'));
 			$this->assertEquals(self::LLD, $form->getField('Discovered by')->query('tag:a')->one()->getText());
 			$form->query('link', self::LLD)->one()->click();
+			COverlayDialogElement::find()->waitUntilReady();
 			// TODO: temporarily commented out due webdriver issue #351858989, alert is not displayed while leaving page during test execution
 //			$this->page->acceptAlert();
 //			$this->page->waitUntilReady();
-			$this->page->assertHeader('Host prototypes');
+
+			// Since the form is opened in a dialog, the actual page and it's header doesn't change.
+			$header = ($this->link === 'zabbix.php?action=search&search='.self::DISCOVERED_GROUP)
+				? 'Search: Group created from host prototype 1'
+				: 'Host groups';
+			$this->page->assertHeader($header);
 			$this->query('id:host')->one()->checkValue(self::HOST_PROTOTYPE);
 
 			return;
@@ -353,7 +359,7 @@ class testFormGroups extends CWebTest {
 	 * Update group without changing data.
 	 *
 	 * @param string  $name        group name to be opened for check
-	 * @param bollean $discovered  discovered host group or not
+	 * @param boolean $discovered  discovered host group or not
 	 */
 	public function simpleUpdate($name, $discovered = false) {
 		$old_hash = CDBHelper::getHash(self::GROUPS_SQL);

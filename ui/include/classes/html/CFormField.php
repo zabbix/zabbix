@@ -28,7 +28,7 @@ class CFormField extends CTag {
 	public const ZBX_STYLE_FORM_FIELD_FLUID    = 'field-fluid';
 
 	/**
-	 * @param CTag|CTag[]|null $items
+	 * @param CTag|CTag[]|CPartial|null $items
 	 */
 	public function __construct($items = null) {
 		parent::__construct('div', true);

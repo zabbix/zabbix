@@ -16,7 +16,6 @@
 
 #include "../db_lengths_constants.h"
 
-#include "zbxexpression.h"
 #include "zbx_availability_constants.h"
 #include "audit/zbxaudit.h"
 #include "audit/zbxaudit_host.h"
