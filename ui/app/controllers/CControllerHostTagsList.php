@@ -70,7 +70,7 @@ class CControllerHostTagsList extends CController {
 			}
 
 			$db_host_prototypes = API::HostPrototype()->get([
-				'output' => ['templateid'],
+				'output' => ['templateid', 'flags'],
 				'hostids' => [$hostid]
 			]);
 
@@ -91,7 +91,9 @@ class CControllerHostTagsList extends CController {
 			'tags' => [],
 			'has_inline_validation' => true,
 			'with_automatic' => $this->host !== null && $this->host['flags'] & ZBX_FLAG_DISCOVERY_CREATED,
-			'readonly' => $this->host_prototype !== null && $this->host_prototype['templateid'] != 0
+			'readonly' => $this->host_prototype !== null
+				&& ($this->host_prototype['templateid'] != 0
+					|| $this->host_prototype['flags'] & ZBX_FLAG_DISCOVERY_CREATED)
 		];
 		$this->getInputs($data, ['source', 'show_inherited_tags', 'tags']);
 
