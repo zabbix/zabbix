@@ -149,7 +149,7 @@ class testPageApiTokensAdministrationGeneral extends testPageApiTokens {
 				'Name' => 'Checking sp aces in names',
 				'Expires at' => date('Y-m-d H:i:s', self::$timestamp),
 				'Created at' => '2021-01-01 00:00:01',
-				'Last accessed at' => '2021-01-01 00:00:10',
+				'Last accessed at' => '2021-01-01 00:00:06',
 				'Status' => 'Disabled'
 			],
 			[

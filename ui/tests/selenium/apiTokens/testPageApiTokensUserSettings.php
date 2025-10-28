@@ -104,7 +104,7 @@ class testPageApiTokensUserSettings extends testPageApiTokens {
 				'Status' => 'Enabled'
 			],
 			[
-				'Name' => 'Future t oken for admin',
+				'Name' => 'Future token for admin',
 				'Expires at' => date('Y-m-d H:i:s', self::$timestamp + 864000),
 				'Created at' => '2021-01-01 00:00:01',
 				'Last accessed at' => '2021-01-01 00:00:02',
