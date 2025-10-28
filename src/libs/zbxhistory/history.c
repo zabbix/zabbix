@@ -83,6 +83,7 @@ struct zbx_history_manager
 
 	zbx_uint64_t				precache_flags;
 	zbx_uint64_t				trends_flags;
+	zbx_uint64_t				housekeep_flags;
 };
 
 static zbx_history_manager_t        history_manager;
@@ -260,41 +261,6 @@ static zbx_history_provider_t	*history_manager_get_provider(zbx_history_manager_
 	return provider;
 }
 
-/*******************************************************************************
- *                                                                             *
- * Purpose: retrieve traits of a registered history provider for a specific    *
- *          value type                                                         *
- *                                                                             *
- * Parameters: manager    - [IN] history manager                               *
- *             value_type - [IN] item value type                               *
- *                                                                             *
- * Return value: Provider traits as a bitmask                                  *
- *                                                                             *
- * Comments: Returns 0 if the value type is unsupported or provider is not     *
- *           registered                                                        *
- *                                                                             *
- *******************************************************************************/
-static zbx_uint64_t	history_manager_get_provider_traits(zbx_history_manager_t *manager, unsigned char value_type)
-{
-	int	index;
-
-	if (ITEM_VALUE_TYPE_BIN < value_type)
-	{
-		THIS_SHOULD_NEVER_HAPPEN_MSG("Unsupported value type %d", value_type);
-		return 0;
-	}
-
-	index = manager->type_index[value_type];
-
-	if (index >= manager->registry.values_num)
-	{
-		THIS_SHOULD_NEVER_HAPPEN_MSG("Unregistered history provider for value type %d", value_type);
-		return 0;
-	}
-
-	return manager->registry.values[index]->traits;
-}
-
 static void	history_manager_map_value_types(zbx_history_manager_t *manager, int index, zbx_uint64_t type_mask)
 {
 	for (int i = 0; i < ITEM_VALUE_TYPE_COUNT; i++)
@@ -466,6 +432,9 @@ static int	history_manager_init(zbx_history_manager_t *manager, const char *conf
 
 		if (0 != (traits & ZBX_HISTORY_TRAIT_REQUIRES_TRENDS))
 			manager->trends_flags |= type_mask;
+
+		if (0 != (traits & ZBX_HISTORY_TRAIT_REQUIRES_HOUSEKEEPING))
+			manager->housekeep_flags |= type_mask;
 
 	}
 
@@ -1050,25 +1019,6 @@ void	zbx_history_get_batch(zbx_vector_item_history_t *results, int value_type, i
 
 /******************************************************************************
  *                                                                            *
- * Purpose: check if value type requires external housekeeping                *
- *                                                                            *
- * Parameters: value_type - [IN] the value type                               *
- *                                                                            *
- * Return value: SUCCEED - housekeeping required                              *
- *               FAIL    - otherwise                                          *
- *                                                                            *
- ******************************************************************************/
-int	zbx_history_requires_housekeeping(int value_type)
-{
-	zbx_uint64_t	traits;
-
-	traits = history_manager_get_provider_traits(&history_manager, value_type);
-
-	return 0 != (traits & ZBX_HISTORY_TRAIT_REQUIRES_HOUSEKEEPING) ? SUCCEED : FAIL;
-}
-
-/******************************************************************************
- *                                                                            *
  * Purpose: get precaching flags for all value types                          *
  *                                                                            *
  *                                                                            *
@@ -1080,7 +1030,6 @@ zbx_uint64_t	zbx_history_get_precache_flags(void)
 {
 	return history_manager.precache_flags;
 }
-
 
 /******************************************************************************
  *                                                                            *
@@ -1095,6 +1044,21 @@ zbx_uint64_t	zbx_history_get_trends_flags(void)
 {
 	return history_manager.trends_flags;
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: get housekeeping flags for all value types                        *
+ *                                                                            *
+ *                                                                            *
+ * Return value: trends flags, with 1 << value_type bits set for value        *
+ *               types requiring trends                                       *
+ *                                                                            *
+ ******************************************************************************/
+zbx_uint64_t	zbx_history_get_housekeep_flags(void)
+{
+	return history_manager.housekeep_flags;
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: frees history log and all resources allocated for it              *

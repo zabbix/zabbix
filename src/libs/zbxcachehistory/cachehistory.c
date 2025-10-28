@@ -918,7 +918,7 @@ void	zbx_dc_mass_update_trends(const zbx_dc_history_t *history, int history_num,
 		if (0 != (ZBX_DC_FLAGS_NOT_FOR_TRENDS & h->flags))
 			continue;
 
-		if (0 == (trends_flags & (__UINT64_C(1) << h->entry.value_type)))
+		if (FAIL == ZBX_HISTORY_CHECK_TYPE_FLAGS(trends_flags, h->entry.value_type))
 			continue;
 
 		DCadd_trend(h, trends, &trends_alloc, trends_num);

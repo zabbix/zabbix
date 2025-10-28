@@ -31,6 +31,7 @@
 #include "zbxipcservice.h"
 #include "zbxstr.h"
 #include "trigger_housekeeper.h"
+#include "zbxhistory.h"
 
 #ifdef HAVE_POSTGRESQL
 #include "zbxjson.h"
@@ -1423,6 +1424,28 @@ static int	get_housekeeping_period(double time_slept)
 		return (int)time_slept;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: refresh housekeeping configuration and adjust housekeeping rules  *
+ *          based on history provider capabilities                            *
+ *                                                                            *
+ * Parameters: flags - [IN] configuration flags specifying which settings     *
+ *                          to refresh                                        *
+ *                                                                            *
+ ******************************************************************************/
+static void	housekeeping_refresh_config(zbx_uint64_t flags)
+{
+	zbx_uint64_t	hk_flags = zbx_history_get_housekeep_flags();
+
+	zbx_config_get(&cfg, flags);
+
+	for (int i = 0; i < ITEM_VALUE_TYPE_BIN; i++)
+	{
+		if (SUCCEED == ZBX_HISTORY_CHECK_TYPE_FLAGS(hk_flags, i))
+			*hk_history_rules[i].poption = ZBX_HK_MODE_DISABLED;
+	}
+}
+
 ZBX_THREAD_ENTRY(housekeeper_thread, args)
 {
 	zbx_thread_housekeeper_args	*housekeeper_args_in = (zbx_thread_housekeeper_args *)
@@ -1470,7 +1493,7 @@ ZBX_THREAD_ENTRY(housekeeper_thread, args)
 
 	if (0 < tsdb_version)
 	{
-		zbx_config_get(&cfg, ZBX_CONFIG_FLAGS_HOUSEKEEPER);
+		housekeeping_refresh_config(ZBX_CONFIG_FLAGS_HOUSEKEEPER);
 		hk_tsdb_check_config();
 	}
 #endif
@@ -1527,7 +1550,7 @@ ZBX_THREAD_ENTRY(housekeeper_thread, args)
 		zbx_setproctitle("%s [connecting to the database]", get_process_type_string(process_type));
 		zbx_db_connect(ZBX_DB_CONNECT_NORMAL);
 
-		zbx_config_get(&cfg, ZBX_CONFIG_FLAGS_HOUSEKEEPER | ZBX_CONFIG_FLAGS_DB_EXTENSION);
+		housekeeping_refresh_config(ZBX_CONFIG_FLAGS_HOUSEKEEPER | ZBX_CONFIG_FLAGS_DB_EXTENSION);
 
 		if (0 == strcmp(cfg.db.extension, ZBX_DB_EXTENSION_TIMESCALEDB))
 		{
