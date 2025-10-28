@@ -141,6 +141,10 @@ class CTemplateDashboard extends CDashboardGeneral {
 						? dbConditionId('d.templateid', $templateids_without_hosts)
 						: dbConditionId('d.templateid', $templateids_of_accessible_hosts, true);
 
+					if ($templateids_without_hosts === [] && $options['templateids'] !== null) {
+						$templateids_condition .= ' AND '.dbConditionId('d.templateid', $options['templateids']);
+					}
+
 					$sql_parts['where']['templateids'] = '('.
 						dbConditionId('d.templateid', $templateids_of_accessible_hosts).
 						' OR ('.$templateids_condition.

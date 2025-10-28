@@ -1,0 +1,1 @@
+A......... [ZBX-26951] fixed dashboard template get to filter by provided templateids when using accessible hosts to find dashboard templates without hosts (gberzina)
