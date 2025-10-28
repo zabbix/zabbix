@@ -262,7 +262,7 @@ class HostAvailabilityWidget {
 				]
 			]
 		]);
-		$hostids =  CDataHelper::getIds('host');
+		$hostids = CDataHelper::getIds('host');
 		$interfaces = CDataHelper::getInterfaces($hostids);
 
 		$data = [
