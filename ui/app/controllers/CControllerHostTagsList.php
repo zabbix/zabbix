@@ -18,6 +18,9 @@ require 'include/forms.inc.php';
 
 class CControllerHostTagsList extends CController {
 
+	private ?array $host = null;
+	private ?array $host_prototype = null;
+
 	protected function init(): void {
 		$this->disableCsrfValidation();
 		$this->setPostContentType(static::POST_CONTENT_TYPE_JSON);
@@ -26,6 +29,7 @@ class CControllerHostTagsList extends CController {
 	protected function checkInput(): bool {
 		$fields = [
 			'source' =>					'required|string|in '.implode(',', ['template', 'host', 'host_prototype']),
+			'hostid' =>					'db hosts.hostid',
 			'templateids' =>			'array',
 			'show_inherited_tags' =>	'in 0,1',
 			'tags' =>					'array'
@@ -47,6 +51,36 @@ class CControllerHostTagsList extends CController {
 	}
 
 	protected function checkPermissions(): bool {
+		if ($this->hasInput('hostid')) {
+			$hostid = $this->getInput('hostid', 0);
+
+			if ($hostid == 0) {
+				return false;
+			}
+
+			$db_hosts = API::Host()->get([
+				'output' => ['flags'],
+				'hostids' => [$hostid]
+			]);
+
+			if ($db_hosts) {
+				$this->host = $db_hosts[0];
+
+				return $this->checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS);
+			}
+
+			$db_host_prototypes = API::HostPrototype()->get([
+				'output' => ['templateid'],
+				'hostids' => [$hostid]
+			]);
+
+			if (!$db_host_prototypes) {
+				return false;
+			}
+
+			$this->host_prototype = $db_host_prototypes[0];
+		}
+
 		return $this->checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES)
 			|| $this->checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS);
 	}
@@ -55,7 +89,9 @@ class CControllerHostTagsList extends CController {
 		$data = [
 			'show_inherited_tags' => 0,
 			'tags' => [],
-			'has_inline_validation' => true
+			'has_inline_validation' => true,
+			'with_automatic' => $this->host !== null && $this->host['flags'] & ZBX_FLAG_DISCOVERY_CREATED,
+			'readonly' => $this->host_prototype !== null && $this->host_prototype['templateid'] != 0
 		];
 		$this->getInputs($data, ['source', 'show_inherited_tags', 'tags']);
 
@@ -85,7 +121,15 @@ class CControllerHostTagsList extends CController {
 		$tag_values = [];
 
 		foreach ($tags as $tag) {
-			$tag_values[$tag['tag']][$tag['value']] = true;
+			$tag += ['automatic' => ZBX_TAG_MANUAL];
+
+			if (array_key_exists($tag['tag'], $tag_values)
+					&& array_key_exists($tag['value'], $tag_values[$tag['tag']])
+					&& $tag['automatic'] == ZBX_TAG_MANUAL) {
+				continue;
+			}
+
+			$tag_values[$tag['tag']][$tag['value']] = $tag['automatic'];
 		}
 
 		return $tag_values;
@@ -172,13 +216,14 @@ class CControllerHostTagsList extends CController {
 		$tags = [];
 
 		foreach ($tag_values as $tag => $values) {
-			foreach ($values as $value => $true) {
+			foreach ($values as $value => $automatic) {
 				$inherited_tags_exists = array_key_exists($tag, $inherited_tag_templates)
 					&& array_key_exists($value, $inherited_tag_templates[$tag]);
 
 				$tags[] = [
 					'tag' => $tag,
 					'value' => $value,
+					'automatic' => $automatic,
 					'type' => $inherited_tags_exists ? ZBX_PROPERTY_BOTH : ZBX_PROPERTY_OWN
 				] + ($inherited_tags_exists ? ['parent_templates' => $inherited_tag_templates[$tag][$value]] : []);
 

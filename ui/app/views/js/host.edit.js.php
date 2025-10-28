@@ -300,7 +300,7 @@ window.host_edit_popup = {
 
 		fields.tags = Object.values(fields.tags).reduce((tags, tag) => {
 			if (!('type' in tag) || (tag.type & <?= ZBX_PROPERTY_OWN ?>)) {
-				tags.push({tag: tag.tag.trim(), value: tag.value.trim()});
+				tags.push({tag: tag.tag.trim(), value: tag.value.trim(), automatic: tag.automatic});
 			}
 
 			return tags;
@@ -311,6 +311,7 @@ window.host_edit_popup = {
 
 		const data = {
 			source: 'host',
+			hostid: fields.hostid,
 			templateids: this.getAllTemplates(),
 			show_inherited_tags: fields.host_show_inherited_tags,
 			tags: fields.tags
