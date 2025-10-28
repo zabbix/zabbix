@@ -44,6 +44,83 @@ class testDashboardGraphPrototypeWidget extends testWidgets {
 	protected static $dashboardid;
 
 	public static function prepareData() {
+		$hostgroupid = CDataHelper::call('hostgroup.create', [
+			['name' => 'Group for Graph Prototype widget']
+		])['groupids'][0];
+
+		$hosts = CDataHelper::createHosts([
+			[
+				'host' => 'Host for Graph Prototype widget',
+				'groups' => [
+					['groupid' => $hostgroupid]
+				],
+				'items' => [
+					[
+						'name' => 'Item for Graph Prototype widget',
+						'key_' => 'graph[1]',
+						'type' => ITEM_TYPE_TRAPPER,
+						'value_type' => ITEM_VALUE_TYPE_FLOAT
+					]
+				]
+			]
+		]);
+		$itemids = CDataHelper::getIds('name');
+
+		$discoveryruleid = CDataHelper::call('discoveryrule.create', [
+			[
+				'hostid' => $hosts['hostids']['Host for Graph Prototype widget'],
+				'name' => 'Discovery rule for Graph Prototype widget',
+				'key_' => 'discovery.prototype.widget[1]',
+				'type' => ITEM_TYPE_TRAPPER
+			]
+		])['itemids'][0];
+
+		CDataHelper::call('itemprototype.create', [
+			[
+				'name' => 'Item prototype for Graph Prototype widget',
+				'key_' => 'grpah.prototype[{#ID}]',
+				'hostid' => $hosts['hostids']['Host for Graph Prototype widget'],
+				'ruleid' => $discoveryruleid,
+				'type' => ITEM_TYPE_TRAPPER,
+				'value_type' => ITEM_VALUE_TYPE_FLOAT
+			]
+		]);
+		$prototype_itemids = CDataHelper::getIds('name');
+
+		CDataHelper::call('graphprototype.create', [
+			[
+				'name' => 'First Graph prototype for widget',
+				'width' => 900,
+				'height' => 200,
+				'gitems' => [
+					[
+						'itemid' => $itemids[ 'Item for Graph Prototype widget'],
+						'color' => '00FFFF'
+					],
+					[
+						'itemid' => $prototype_itemids['Item prototype for Graph Prototype widget'],
+						'color' => 'BF00FF'
+					]
+				]
+			],
+			[
+				'name' => 'Second Graph prototype for widget',
+				'width' => 900,
+				'height' => 200,
+				'gitems' => [
+					[
+						'itemid' => $itemids[ 'Item for Graph Prototype widget'],
+						'color' => 'E6EE9C'
+					],
+					[
+						'itemid' => $prototype_itemids['Item prototype for Graph Prototype widget'],
+						'color' => 'F9A825'
+					]
+				]
+			]
+		]);
+		$graph_prototypeids = CDataHelper::getIds('name');
+
 		CDataHelper::call('dashboard.create', [
 			[
 				'name' => 'Dashboard for Graph Prototype widget',
@@ -63,7 +140,7 @@ class testDashboardGraphPrototypeWidget extends testWidgets {
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_GRAPH_PROTOTYPE,
 										'name' => 'graphid.0',
-										'value' => 600003 // testFormGraphPrototype4.
+										'value' => $graph_prototypeids['First Graph prototype for widget']
 									],
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
@@ -83,7 +160,7 @@ class testDashboardGraphPrototypeWidget extends testWidgets {
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_GRAPH_PROTOTYPE,
 										'name' => 'graphid.0',
-										'value' => 600002 // testFormGraphPrototype3.
+										'value' => $graph_prototypeids['Second Graph prototype for widget']
 									],
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
@@ -112,12 +189,11 @@ class testDashboardGraphPrototypeWidget extends testWidgets {
 				[
 					'expected' => TEST_GOOD,
 					'fields' => [
-						'Type' => 'Graph prototype',
 						'Graph prototype' => [
-							'values' => 'testFormGraphPrototype1',
+							'values' => 'First Graph prototype for widget',
 							'context' => [
-								'values' => 'Simple form test host',
-								'context' => 'Zabbix servers'
+								'values' => 'Host for Graph Prototype widget',
+								'context' => 'Group for Graph Prototype widget'
 							]
 						]
 					]
@@ -127,14 +203,13 @@ class testDashboardGraphPrototypeWidget extends testWidgets {
 				[
 					'expected' => TEST_GOOD,
 					'fields' => [
-						'Type' => 'Graph prototype',
-						'Name' => 'Simple graph prototype'.microtime(),
+						'Name' => 'Host for Graph Prototype widget '.microtime(),
 						'Source' => 'Simple graph prototype',
 						'Item prototype' => [
-							'values' => 'testFormItemPrototype1',
+							'values' => 'Item prototype for Graph Prototype widget',
 							'context' => [
-								'values' => 'Simple form test host',
-								'context' => 'Zabbix servers'
+								'values' => 'Host for Graph Prototype widget',
+								'context' => 'Group for Graph Prototype widget'
 							]
 						]
 					],
@@ -145,11 +220,10 @@ class testDashboardGraphPrototypeWidget extends testWidgets {
 				[
 					'expected' => TEST_GOOD,
 					'fields' => [
-						'Type' => 'Graph prototype',
-						'Name' => 'Graph prototype widget with all possible fields filled'.microtime(),
+						'Name' => 'Graph prototype widget with all possible fields filled '.microtime(),
 						'Refresh interval' => 'No refresh',
 						'Source' => 'Simple graph prototype',
-						'Item prototype' => 'testFormItemPrototype2',
+						'Item prototype' => 'Item prototype for Graph Prototype widget',
 						'Show legend' => true,
 						'Override host' => 'Dashboard',
 						'Columns' => '3',
@@ -161,7 +235,6 @@ class testDashboardGraphPrototypeWidget extends testWidgets {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Type' => 'Graph prototype',
 						'Source' => 'Graph prototype'
 					],
 					'error' => ['Invalid parameter "Graph prototype": cannot be empty.']
@@ -171,7 +244,6 @@ class testDashboardGraphPrototypeWidget extends testWidgets {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Type' => 'Graph prototype',
 						'Source' => 'Simple graph prototype'
 					],
 					'error' => ['Invalid parameter "Item prototype": cannot be empty.']
@@ -181,9 +253,8 @@ class testDashboardGraphPrototypeWidget extends testWidgets {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Type' => 'Graph prototype',
 						'Source' => 'Graph prototype',
-						'Graph prototype' => 'testFormGraphPrototype1',
+						'Graph prototype' => 'Second Graph prototype for widget',
 						'Columns' => '0',
 						'Rows' => '0'
 					],
@@ -197,9 +268,8 @@ class testDashboardGraphPrototypeWidget extends testWidgets {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Type' => 'Graph prototype',
 						'Source' => 'Graph prototype',
-						'Graph prototype' => 'testFormGraphPrototype1',
+						'Graph prototype' => 'First Graph prototype for widget',
 						'Columns' => '73',
 						'Rows' => '65'
 					],
@@ -391,16 +461,15 @@ class testDashboardGraphPrototypeWidget extends testWidgets {
 		$form = $dashboard->edit()->addWidget()->asForm();
 		$widget = [
 			'Name' => 'Screenshot Widget',
-			'Graph prototype' => 'testFormGraphPrototype1'
+			'Graph prototype' => 'Second Graph prototype for widget'
 		];
-		if ($form->getField('Type')->getText() !== 'Graph prototype') {
-			$form->fill(['Type' => 'Graph prototype']);
-			$form->waitUntilReloaded();
-		}
+		$form->fill(['Type' => CFormElement::RELOADABLE_FILL('Graph prototype')]);
 		$form->fill($widget);
+
 		if (array_key_exists('fields', $data)){
 			$form->fill($data['fields']);
 		}
+
 		$form->submit();
 		COverlayDialogElement::ensureNotPresent();
 		$dashboard->waitUntilReady()->getWidget($widget['Name']);
@@ -428,7 +497,9 @@ class testDashboardGraphPrototypeWidget extends testWidgets {
 			$form->query('xpath:.//input[@id="show_header"]')->asCheckbox()->one()->fill($data['show_header']);
 		}
 
+		$form->fill(['Type' => CFormElement::RELOADABLE_FILL('Graph prototype')]);
 		$form->fill($data['fields']);
+
 		// After changing "Source", the overlay is reloaded.
 		COverlayDialogElement::find()->one()->waitUntilReady();
 
@@ -536,7 +607,7 @@ class testDashboardGraphPrototypeWidget extends testWidgets {
 					'Name' => 'Name for Cancelling',
 					'Refresh interval' => 'No refresh',
 					'Source' => 'Simple graph prototype',
-					'Item prototype' => 'testFormItemPrototype2',
+					'Item prototype' => 'Item prototype for Graph Prototype widget',
 					'Show legend' => false,
 					'Override host' => 'Dashboard',
 					'Columns' => '3',
@@ -552,6 +623,7 @@ class testDashboardGraphPrototypeWidget extends testWidgets {
 		}
 
 		$dashboard->save();
+
 		// Check that Dashboard has been saved and that there are no changes made to the widgets.
 		$this->assertMessage(TEST_GOOD, 'Dashboard updated');
 
