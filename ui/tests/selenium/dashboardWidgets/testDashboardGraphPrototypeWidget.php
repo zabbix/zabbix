@@ -63,12 +63,12 @@ class testDashboardGraphPrototypeWidget extends testWidgets {
 					]
 				]
 			]
-		]);
+		])['hostids'];
 		$itemids = CDataHelper::getIds('name');
 
 		$discoveryruleid = CDataHelper::call('discoveryrule.create', [
 			[
-				'hostid' => $hosts['hostids']['Host for Graph Prototype widget'],
+				'hostid' => $hosts['Host for Graph Prototype widget'],
 				'name' => 'Discovery rule for Graph Prototype widget',
 				'key_' => 'discovery.prototype.widget[1]',
 				'type' => ITEM_TYPE_TRAPPER
@@ -79,7 +79,7 @@ class testDashboardGraphPrototypeWidget extends testWidgets {
 			[
 				'name' => 'Item prototype for Graph Prototype widget',
 				'key_' => 'grpah.prototype[{#ID}]',
-				'hostid' => $hosts['hostids']['Host for Graph Prototype widget'],
+				'hostid' => $hosts['Host for Graph Prototype widget'],
 				'ruleid' => $discoveryruleid,
 				'type' => ITEM_TYPE_TRAPPER,
 				'value_type' => ITEM_VALUE_TYPE_FLOAT
