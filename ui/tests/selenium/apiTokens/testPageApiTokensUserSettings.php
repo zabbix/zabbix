@@ -293,7 +293,7 @@ class testPageApiTokensUserSettings extends testPageApiTokens {
 					'sort_field' => 'Name',
 					'expected' => [
 						'Token that will expire in 2 days',
-						'Future t oken for admin',
+						'Future token for admin',
 						'Expired token for admin',
 						'Aktīvs токен - 頑張って'
 					]

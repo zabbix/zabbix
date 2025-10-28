@@ -137,19 +137,19 @@ class testPageApiTokensAdministrationGeneral extends testPageApiTokens {
 				'Status' => 'Enabled'
 			],
 			[
-				'Name' => 'Checking sp aces in names',
-				'Expires at' => date('Y-m-d H:i:s', self::$timestamp),
-				'Created at' => '2021-01-01 00:00:01',
-				'Last accessed at' => '2021-01-01 00:00:10',
-				'Status' => 'Disabled'
-			],
-			[
 				'Name' => 'Admin: token for filter-create',
 				'User' => 'filter-create',
 				'Expires at' => date('Y-m-d H:i:s', self::$timestamp),
 				'Created at' => '2021-01-01 00:00:01',
 				'Created by user' => 'Admin (Zabbix Administrator)',
 				'Last accessed at' => '2021-01-01 00:00:05',
+				'Status' => 'Disabled'
+			],
+			[
+				'Name' => 'Checking sp aces in names',
+				'Expires at' => date('Y-m-d H:i:s', self::$timestamp),
+				'Created at' => '2021-01-01 00:00:01',
+				'Last accessed at' => '2021-01-01 00:00:10',
 				'Status' => 'Disabled'
 			],
 			[
