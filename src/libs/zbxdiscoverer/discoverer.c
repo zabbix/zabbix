@@ -18,7 +18,6 @@
 #include "zbxcacheconfig.h"
 #include "zbxicmpping.h"
 #include "zbxdiscovery.h"
-#include "zbxexpression.h"
 #include "zbxself.h"
 #include "zbxrtc.h"
 #include "zbxnix.h"
@@ -41,6 +40,7 @@
 #include "zbxipcservice.h"
 #include "zbxstr.h"
 #include "zbxthreads.h"
+#include "zbxcalc.h"
 
 #ifdef HAVE_NETSNMP
 #	include "zbxpoller.h"

@@ -13,7 +13,6 @@
 **/
 
 #include "lld.h"
-#include "zbxexpression.h"
 
 #include "zbxdbwrap.h"
 #include "audit/zbxaudit.h"
@@ -23,6 +22,7 @@
 #include "zbxalgo.h"
 #include "zbxdb.h"
 #include "zbxdbhigh.h"
+#include "zbxexpr.h"
 
 typedef struct
 {

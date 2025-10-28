@@ -12,10 +12,11 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
+#include "zbxcalc.h"
+
 #include "eval.h"
 
 #include "zbx_discoverer_constants.h"
-#include "zbxexpression.h"
 
 const char	*zbx_dservice_type_string(zbx_dservice_type_t service)
 {

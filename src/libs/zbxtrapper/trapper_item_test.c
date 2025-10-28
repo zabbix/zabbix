@@ -13,7 +13,6 @@
 **/
 
 #include "trapper_item_test.h"
-#include "zbxexpression.h"
 
 #include "zbxdb.h"
 #include "zbxtrapper.h"
@@ -34,6 +33,7 @@
 #include "zbxsysinfo.h"
 #include "zbx_item_constants.h"
 #include "zbxalgo.h"
+#include "zbxexpr.h"
 
 static void	dump_item(const zbx_dc_item_t *item)
 {

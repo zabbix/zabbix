@@ -68,13 +68,15 @@ class CControllerValidateApiExists extends CController {
 		try {
 			foreach ($this->getInput('validations') as $validation) {
 				$object_exists = CFormValidator::existsAPIObject($validation['api'], $validation['options'],
-					array_key_exists('exclude_id', $validation) ? $validation['exclude_id'] : null);
+					array_key_exists('exclude_id', $validation) ? $validation['exclude_id'] : null
+				);
 
 				if ($object_exists) {
 					$errors[] = [
 						'field' => $validation['field'],
-						'message' => array_key_exists('error_msg', $validation) ? $validation['error_msg']:
-							_('This object already exists.')
+						'message' => array_key_exists('error_msg', $validation)
+							? $validation['error_msg']
+							: _('This object already exists.')
 					];
 				}
 			}

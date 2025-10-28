@@ -21,7 +21,6 @@
 #include "zbxregexp.h"
 #include "zbxstr.h"
 #include "zbxjson.h"
-#include "zbxexpression.h"
 #include "zbxalgo.h"
 #include "zbxdb.h"
 #include "zbxparam.h"

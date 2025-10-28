@@ -24,7 +24,9 @@ $form = (new CForm('post'))
 	->setId('proxy-form')
 	->setName('proxy_form')
 	->addStyle('display: none;')
-	->addItem(getMessages());
+	->addItem(getMessages())
+	->addVar('update_psk', '0')
+	->addVar('proxyid', $data['proxyid']);
 
 // Enable form submitting on Enter.
 $form->addItem((new CSubmitButton())->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN));
@@ -36,20 +38,39 @@ $local_address = (new CTable())
 	->addRow([
 		(new CTextBox('local_address', $data['form']['local_address'], false,
 			DB::getFieldLength('proxy', 'local_address')
-		))->setWidth(336),
+		))
+			->setWidth(336)
+			->setErrorLabel(_('Address'))
+			->setErrorContainer('local-address-port-error-container'),
 		(new CTextBox('local_port', $data['form']['local_port'], false, DB::getFieldLength('proxy', 'local_port')))
 			->setWidth(ZBX_TEXTAREA_INTERFACE_PORT_WIDTH)
+			->setErrorLabel(_('Port'))
+			->setErrorContainer('local-address-port-error-container')
 			->setAriaRequired()
-	]);
+	])
+	->addRow(
+		(new CCol())
+			->setId('local-address-port-error-container')
+			->addClass(ZBX_STYLE_ERROR_CONTAINER)
+	);
 $interface = (new CTable())
 	->setHeader([_('Address'), _('Port')])
 	->addRow([
 		(new CTextBox('address', $data['form']['address'], false, DB::getFieldLength('proxy', 'address')))
-			->setWidth(336),
+			->setWidth(336)
+			->setErrorLabel(_('Address'))
+			->setErrorContainer('address-port-error-container'),
 		(new CTextBox('port', $data['form']['port'], false, DB::getFieldLength('proxy', 'port')))
 			->setWidth(ZBX_TEXTAREA_INTERFACE_PORT_WIDTH)
+			->setErrorLabel(_('Port'))
+			->setErrorContainer('address-port-error-container')
 			->setAriaRequired()
-	]);
+	])
+	->addRow(
+		(new CCol())
+			->setId('address-port-error-container')
+			->addClass(ZBX_STYLE_ERROR_CONTAINER)
+	);
 
 $proxy_tab = (new CFormGrid())
 	->addItem([
@@ -362,6 +383,7 @@ $form
 	->addItem(
 		(new CScriptTag('
 			proxy_edit_popup.init('.json_encode([
+				'rules' => $data['js_validation_rules'],
 				'proxyid' => $data['proxyid']
 			]).');
 		'))->setOnDocumentReady()
@@ -406,7 +428,8 @@ if ($data['proxyid'] !== null) {
 						'cancel' => true,
 						'action' => ''
 					]
-				]
+				],
+				'rules' => $data['js_clone_validation_rules']
 			]).');'
 		],
 		[

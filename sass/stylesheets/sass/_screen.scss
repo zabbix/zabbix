@@ -100,6 +100,7 @@ $browser-sprite: '../img/browser-sprite.png?20220722';
 @import "components/dashboard/widget-problemhosts";
 @import "components/dashboard/widget-problems";
 @import "components/dashboard/widget-problemsbysv";
+@import "components/dashboard/widget-scatterplot";
 @import "components/dashboard/widget-svggraph";
 @import "components/dashboard/widget-tophosts";
 @import "components/dashboard/widget-topitems";
@@ -2500,6 +2501,17 @@ div {
 
 	li {
 		padding-left: 23px;
+
+		.svg-graph-hintbox-icon-color {
+			@extend %icon-small;
+
+			display: inline-block;
+			float: left;
+			width: 12px;
+			height: 12px;
+			margin-left: -20px;
+			margin-top: -1px;
+		}
 
 		.svg-graph-hintbox-item-color,
 		.svg-graph-hintbox-trigger-color {

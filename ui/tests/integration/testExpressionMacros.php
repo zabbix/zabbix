@@ -3440,8 +3440,8 @@ const SUBJECT_INTERNAL = "Internal";
 
 		$this->startComponent(self::COMPONENT_AGENT);
 		// "In ..." is not a mistake here and "End ..." should not be used here because result of
-		// substitute_macros_args() can contain secret data and must not be logged.
-		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, "In substitute_macros_args() data:'Autoregistration'", true, 120);
+		// zbx_substitute_macros_args() can contain secret data and must not be logged.
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, "In zbx_substitute_macros_args() data:'Autoregistration'", true, 120);
 
 		$response = $this->call('alert.get', [
 			'hostids' => [self::$host_id],
