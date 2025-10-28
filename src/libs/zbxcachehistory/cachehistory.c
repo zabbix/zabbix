@@ -899,6 +899,7 @@ void	zbx_dc_mass_update_trends(const zbx_dc_history_t *history, int history_num,
 	zbx_timespec_t		ts;
 	int			trends_alloc = 0, i, hour, seconds;
 	zbx_vector_uint64_t	del_itemids;
+	zbx_uint64_t		trends_flags = zbx_history_get_trends_flags();
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -915,6 +916,9 @@ void	zbx_dc_mass_update_trends(const zbx_dc_history_t *history, int history_num,
 		const zbx_dc_history_t	*h = &history[i];
 
 		if (0 != (ZBX_DC_FLAGS_NOT_FOR_TRENDS & h->flags))
+			continue;
+
+		if (0 == (trends_flags & (__UINT64_C(1) << h->entry.value_type)))
 			continue;
 
 		DCadd_trend(h, trends, &trends_alloc, trends_num);
