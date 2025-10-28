@@ -169,7 +169,7 @@ class testPagesWithoutData extends CWebTest {
 			// #9 Host prototypes table.
 			[
 				[
-					'url' => 'host_prototypes.php?context=host&parent_discoveryid='
+					'url' => 'zabbix.php?action=host.prototype.list&context=host&parent_discoveryid='
 				]
 			],
 			// #10 LLD rule prototypes table.
@@ -244,7 +244,7 @@ class testPagesWithoutData extends CWebTest {
 			// #21 Host prototypes table.
 			[
 				[
-					'url' => 'host_prototypes.php?context=template&parent_discoveryid='
+					'url' => 'zabbix.php?action=host.prototype.list&context=template&parent_discoveryid='
 				]
 			],
 			// #22 LLD rule prototypes table.

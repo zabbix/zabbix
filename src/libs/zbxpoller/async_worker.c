@@ -20,11 +20,13 @@
 #include "zbxtime.h"
 #include "zbxthreads.h"
 #include "zbxcacheconfig.h"
-#include "zbxexpression.h"
 #include "zbx_availability_constants.h"
 #include "zbxpoller.h"
 #include "zbxavailability.h"
 #include "zbxinterface.h"
+#include "zbxnix.h"
+#include "zbxregexp.h"
+#include "zbxexpr.h"
 
 #define ASYNC_WORKER_INIT_NONE		0x00
 #define ASYNC_WORKER_INIT_THREAD	0x01
@@ -132,27 +134,19 @@ static void	*async_worker_entry(void *args)
 	zbx_async_worker_t		*worker = (zbx_async_worker_t *)args;
 	zbx_async_queue_t		*queue = worker->queue;
 	char				*error = NULL;
-	sigset_t			mask;
 	int				err;
 	zbx_vector_interface_status_t	interfaces;
 	zbx_vector_uint64_t		itemids;
 	zbx_vector_int32_t		errcodes;
 	zbx_vector_int32_t		lastclocks;
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "thread started");
-
-	sigemptyset(&mask);
-	sigaddset(&mask, SIGTERM);
-	sigaddset(&mask, SIGUSR1);
-	sigaddset(&mask, SIGUSR2);
-	sigaddset(&mask, SIGHUP);
-	sigaddset(&mask, SIGQUIT);
-	sigaddset(&mask, SIGINT);
-
-	if (0 != (err = pthread_sigmask(SIG_BLOCK, &mask, NULL)))
+	if (0 != (err = zbx_init_thread_signal_handler()))
 		zabbix_log(LOG_LEVEL_WARNING, "cannot block signals: %s", zbx_strerror(err));
 
+	zabbix_log(LOG_LEVEL_INFORMATION, "thread started");
 	worker->stop = 0;
+
+	zbx_init_regexp_env();
 
 	async_task_queue_lock(queue);
 	async_task_queue_register_worker(queue);
@@ -254,6 +248,9 @@ static void	*async_worker_entry(void *args)
 				worker->async_notify_cb(worker->finished_data);
 		}
 
+		if (1 == worker->stop)
+			break;
+
 		if (SUCCEED != async_task_queue_wait(queue, &error))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "%s", error);
@@ -273,6 +270,8 @@ static void	*async_worker_entry(void *args)
 	zbx_vector_uint64_destroy(&itemids);
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "thread stopped");
+
+	zbx_deinit_regexp_env();
 
 	return NULL;
 }

@@ -16,6 +16,7 @@
 
 require_once __DIR__.'/../../include/CLegacyWebTest.php';
 require_once __DIR__.'/../behaviors/CMacrosBehavior.php';
+require_once __DIR__.'/../behaviors/CMessageBehavior.php';
 
 /**
  * Test the creation of inheritance of new objects on a previously linked template.
@@ -25,12 +26,15 @@ require_once __DIR__.'/../behaviors/CMacrosBehavior.php';
 class testInheritanceHostPrototype extends CLegacyWebTest {
 
 	/**
-	 * Attach MacrosBehavior to the test.
+	 * Attach MacrosBehavior and MessageBehavior to the test.
 	 *
 	 * @return array
 	 */
 	public function getBehaviors() {
-		return [CMacrosBehavior::class];
+		return [
+			CMacrosBehavior::class,
+			CMessageBehavior::class
+		];
 	}
 
 	public static function getLayoutData() {
@@ -75,17 +79,23 @@ class testInheritanceHostPrototype extends CLegacyWebTest {
 						' AND name='.zbx_dbstr($data['discovery']).
 				')'
 		);
-		$this->zbxTestAssertElementPresentXpath('//ul[@id="interfaces_'.$interface.'_useip"]//input[@value="0"][@readonly]');
-		$this->zbxTestAssertElementPresentXpath('//ul[@id="interfaces_'.$interface.'_useip"]//input[@value="1"][@readonly]');
+
+		$form = COverlayDialogElement::find()->one()->asForm();
+
+		$this->zbxTestAssertElementPresentXpath('//ul[@id="interfaces_1_useip"]//input[@value="1"][@readonly]');
+		$this->zbxTestAssertElementPresentXpath('//ul[@id="interfaces_1_useip"]//input[@value="0"][@readonly]');
 		$this->zbxTestAssertElementPresentXpath('//div[contains(@class,"interface-cell-port")]/input[@type="text"][@readonly]');
 
 		$monitored_by = $this->query('id:monitored_by')->asSegmentedRadio()->one();
 		$this->assertFalse($monitored_by->isEnabled());
 		$this->assertEquals('Server', $monitored_by->getSelected());
 
-		// Check layout at Groups tab.
 		$this->zbxTestAssertElementPresentXpath('//div[@id="group_links_"]//ul[@class="multiselect-list"][@aria-readonly="true"]');
-		$this->zbxTestAssertElementPresentXpath('//button[@class="btn-grey"][@disabled]');
+
+		foreach (['Templates', 'Host groups'] as $multiselect) {
+			$this->assertFalse($form->getField($multiselect)->query('button:Select')->one()->isEnabled());
+		}
+
 		$this->zbxTestAssertElementPresentXpath('//input[@name="group_prototypes[0][name]"][@readonly]');
 
 		// Check layout at IPMI tab.
@@ -98,7 +108,7 @@ class testInheritanceHostPrototype extends CLegacyWebTest {
 		// Check layout at Macros tab.
 		$this->zbxTestTabSwitch('Macros');
 		$this->zbxTestAssertElementPresentXpath('//input[@id="show_inherited_macros_0"]');
-		$this->zbxTestAssertElementPresentXpath('//li[@id="macros_container"]/div[text()="No macros found."]');
+		$this->zbxTestAssertElementPresentXpath('//div[@id="macros_container" and text()="No macros found."]');
 		$this->zbxTestClickXpath('//label[@for="show_inherited_macros_1"]');
 		$this->zbxTestWaitForPageToLoad();
 
@@ -118,7 +128,7 @@ class testInheritanceHostPrototype extends CLegacyWebTest {
 		// Write macros rows from Frontend to array.
 		$table = $this->query('id:tbl_macros')->waitUntilVisible()->asTable()->one();
 		$count = $table->getRows()->count() - 1;
-		for ($i = 0; $i < $count; $i += 2) {
+		for ($i = 0; $i < $count; $i += 3) {
 			$macro = [];
 			$row = $table->getRow($i);
 			$macro['macro'] = $row->query('xpath:./td[1]/textarea')->one()->getValue();
@@ -152,7 +162,7 @@ class testInheritanceHostPrototype extends CLegacyWebTest {
 			$this->zbxTestAssertElementPresentXpath('//input[@id="'.$id.'"][@readonly]');
 		}
 
-		$this->zbxTestAssertAttribute('//button[@id="delete"]', 'disabled');
+		$this->assertFalse(COverlayDialogElement::find()->one()->getFooter()->query('button:Delete')->one()->isEnabled());
 	}
 
 	public static function getCreateData() {
@@ -279,7 +289,12 @@ class testInheritanceHostPrototype extends CLegacyWebTest {
 
 		$old_host = CDBHelper::getHash($sql);
 		$this->selectHostPrototypeForUpdate($data['update'], $data);
-		$this->zbxTestClickWait('update');
+
+		$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
+		$dialog->getFooter()->query('button:Update')->one()->click();
+		$dialog->ensureNotPresent();
+		$this->page->waitUntilReady();
+
 		$this->zbxTestCheckTitle('Configuration of host prototypes');
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Host prototype updated');
 		$this->assertEquals($old_host, CDBHelper::getHash($sql));
@@ -347,7 +362,7 @@ class testInheritanceHostPrototype extends CLegacyWebTest {
 			foreach ($data['templates'] as $template) {
 				$this->zbxTestClickButtonMultiselect('add_templates_');
 				$this->zbxTestLaunchOverlayDialog('Templates');
-				COverlayDialogElement::find()->one()->setDataContext('Templates');
+				COverlayDialogElement::find(1)->one()->setDataContext('Templates');
 				$this->zbxTestClickLinkTextWait($template['name']);
 				$this->zbxTestWaitForPageToLoad();
 			}
@@ -359,7 +374,10 @@ class testInheritanceHostPrototype extends CLegacyWebTest {
 			$this->zbxTestClickXpathWait('//label[text()="'.$data['host_inventory'].'"]');
 		}
 
-		$this->zbxTestClick('update');
+		$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
+		$dialog->getFooter()->query('button:Update')->one()->click();
+		$dialog->ensureNotPresent();
+
 		// Check the results in frontend.
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Host prototype updated');
 		$this->zbxTestCheckTitle('Configuration of host prototypes');
@@ -379,8 +397,9 @@ class testInheritanceHostPrototype extends CLegacyWebTest {
 					'host_prototype' => 'Host prototype for Clone {#TEST}',
 					'discovery' => 'Discovery rule for host prototype test',
 					'cloned_name' => 'Cloned host prototype without macro',
-					'error' => 'Cannot add host prototype',
-					'error_detail' => 'Invalid parameter "/1/host": must contain at least one low-level discovery macro.'
+					'error_inline' => [
+						'id:host' => 'This field must contain at least one low-level discovery macro.'
+					]
 				]
 			],
 			[
@@ -389,8 +408,9 @@ class testInheritanceHostPrototype extends CLegacyWebTest {
 					'host_prototype' => 'Host prototype for Clone {#TEST}',
 					'discovery' => 'Discovery rule for host prototype test',
 					'cloned_name' => ' ',
-					'error' => 'Page received incorrect data',
-					'error_detail' => 'Incorrect value for field "Host name": cannot be empty.'
+					'error_inline' => [
+						'id:host' => 'This field cannot be empty.'
+					]
 				]
 			],
 			[
@@ -398,8 +418,9 @@ class testInheritanceHostPrototype extends CLegacyWebTest {
 					'host' => 'Host for inheritance host prototype tests',
 					'host_prototype' => 'Host prototype for Clone {#TEST}',
 					'discovery' => 'Discovery rule for host prototype test',
-					'error' => 'Cannot add host prototype',
-					'error_detail' => 'Host prototype with host name "Host prototype for Clone {#TEST}" already exists in discovery rule "Discovery rule for host prototype test".'
+					'error_inline' => [
+						'id:host' => 'This object already exists.'
+					]
 				]
 			],
 			[
@@ -435,7 +456,7 @@ class testInheritanceHostPrototype extends CLegacyWebTest {
 	 */
 	public function testInheritanceHostPrototype_Clone($data) {
 		$this->selectHostPrototypeForUpdate('host', $data);
-		$this->zbxTestClickWait('clone');
+		$this->query('button:Clone')->waitUntilVisible()->one()->click()->waitUntilNotVisible();
 
 		if (array_key_exists('cloned_name', $data)) {
 			$this->zbxTestInputTypeOverwrite('host', $data['cloned_name']);
@@ -465,7 +486,7 @@ class testInheritanceHostPrototype extends CLegacyWebTest {
 		if (array_key_exists('template', $data)) {
 			$this->zbxTestClickButtonMultiselect('add_templates_');
 			$this->zbxTestLaunchOverlayDialog('Templates');
-			COverlayDialogElement::find()->waitUntilReady()->one()->setDataContext('Templates');
+			COverlayDialogElement::find(1)->waitUntilReady()->one()->setDataContext('Templates');
 			$this->zbxTestClickLinkTextWait($data['template']);
 		}
 
@@ -475,11 +496,11 @@ class testInheritanceHostPrototype extends CLegacyWebTest {
 			$this->zbxTestClickXpathWait('//label[text()="'.$data['inventory'].'"]');
 		}
 
-		$this->zbxTestClick('add');
+		$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
+		$dialog->getFooter()->query('button:Add')->one()->click();
 
-		if (array_key_exists('error', $data)) {
-			$this->zbxTestWaitUntilMessageTextPresent('msg-bad', $data['error']);
-			$this->zbxTestTextPresent($data['error_detail']);
+		if (array_key_exists('error_inline', $data)) {
+			$this->assertInlineError($dialog->waitUntilReady()->asForm(), $data['error_inline']);
 		}
 		else {
 			$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Host prototype added');
@@ -532,8 +553,8 @@ class testInheritanceHostPrototype extends CLegacyWebTest {
 			);
 		}
 
-		$this->zbxTestLogin('host_prototypes.php?form=update&context=host&parent_discoveryid='.$discovery_id.'&hostid='.
-				$host_prototype
+		$this->zbxTestLogin('zabbix.php?action=popup&popup=host.prototype.edit&parent_discoveryid='.$discovery_id.'&hostid='.
+				$host_prototype.'&context=host'
 		);
 	}
 
@@ -561,21 +582,27 @@ class testInheritanceHostPrototype extends CLegacyWebTest {
 			]
 		];
 		// Edit host prototype on template and add macros.
-		$this->page->login()->open('host_prototypes.php?form=update&context=host&parent_discoveryid='
-			.$template_lld_id.'&hostid='.$template_prototype_id);
+		$this->page->login()->open('zabbix.php?action=popup&popup=host.prototype.edit&parent_discoveryid='.
+				$template_lld_id.'&hostid='.$template_prototype_id.'&context=host'
+		);
 
-		$form = $this->query('name:hostPrototypeForm')->waitUntilPresent()->asForm()->one();
+		$dialog = COverlayDialogElement::find()->one();
+		$form = $dialog->asForm();
 		$form->selectTab('Macros');
 		$this->fillMacros($macros);
 		$form->submit();
 
+		$dialog->ensureNotPresent();
+		$this->page->waitUntilReady();
+
 		// Open host prototype inherited from template on host and check inherited macros.
-		$this->page->open('host_prototypes.php?form=update&context=host&parent_discoveryid='
-			.$host_lld_id.'&hostid='.$host_prototype_id);
+		$this->page->open('zabbix.php?action=popup&popup=host.prototype.edit&parent_discoveryid='.
+				$host_lld_id.'&hostid='.$host_prototype_id.'&context=host'
+		);
 		$form->selectTab('Macros');
 		$this->assertMacros($macros);
 
-		// Check that inherited macros field are not editabble.
+		// Check that inherited macros field are not editable.
 		$fields = $this->getMacros();
 		foreach ($fields as $i => $field) {
 			$this->assertFalse($this->query('id:macros_'.$i.'_macro')->one()->isEnabled());
@@ -615,7 +642,7 @@ class testInheritanceHostPrototype extends CLegacyWebTest {
 				(array_key_exists('error', $data) ? ' NOT' : '').' NULL AND name='.zbx_dbstr($data['discovery'])
 		);
 
-		$this->zbxTestLogin('host_prototypes.php?context=host&parent_discoveryid='.$discovery_id);
+		$this->zbxTestLogin('zabbix.php?action=host.prototype.list&parent_discoveryid='.$discovery_id.'&context=host');
 		$this->zbxTestCheckboxSelect('all_hosts');
 		$this->zbxTestClickButtonText('Delete');
 		$this->zbxTestAcceptAlert();

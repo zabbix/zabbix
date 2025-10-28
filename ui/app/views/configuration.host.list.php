@@ -262,8 +262,9 @@ foreach ($data['hosts'] as $host) {
 		if ($host['discoveryRule']) {
 			if ($host['is_discovery_rule_editable']) {
 				$description[] = (new CLink($host['discoveryRule']['name'],
-					(new CUrl('host_prototypes.php'))
-						->setArgument('form', 'update')
+					(new CUrl('zabbix.php'))
+						->setArgument('action', 'popup')
+						->setArgument('popup', 'host.prototype.edit')
 						->setArgument('parent_discoveryid', $host['discoveryRule']['itemid'])
 						->setArgument('hostid', $host['discoveryData']['parent_hostid'])
 						->setArgument('context', 'host')
@@ -563,7 +564,7 @@ foreach ($data['hosts'] as $host) {
 		getHostAvailabilityTable($host['interfaces']),
 		$encryption,
 		makeInformationList($info_icons),
-		$data['tags'][$host['hostid']]
+		(new CDiv($data['tags'][$host['hostid']]))->addClass(ZBX_STYLE_TAGS_WRAPPER)
 	]);
 }
 

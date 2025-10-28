@@ -30,7 +30,7 @@ This template works with standalone and cluster instances. Metrics are collected
 
 |Name|Description|Default|
 |----|-----------|-------|
-|{$IGNITE.PASSWORD}||`<secret>`|
+|{$IGNITE.PASSWORD}|||
 |{$IGNITE.USER}||`zabbix`|
 |{$IGNITE.LLD.FILTER.THREAD.POOL.MATCHES}|<p>Filter of discoverable thread pools.</p>|`.*`|
 |{$IGNITE.LLD.FILTER.THREAD.POOL.NOT_MATCHES}|<p>Filter to exclude discovered thread pools.</p>|`Macro too long. Please see the template.`|

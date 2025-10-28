@@ -512,7 +512,16 @@ typedef struct
 
 /* events callbacks end */
 
-int	zbx_db_get_user_names(zbx_uint64_t userid, char **username, char **name, char **surname);
+typedef struct
+{
+	zbx_uint64_t	userid;
+	char		*username;
+	char		*name;
+	char		*surname;
+} zbx_user_names_t;
+
+int	zbx_db_get_user_names(zbx_uint64_t userid, zbx_user_names_t **names);
+void	zbx_user_names_clean(zbx_user_names_t **names);
 char	*zbx_db_get_unique_hostname_by_sample(const char *host_name_sample, const char *field_name);
 
 typedef enum
@@ -566,6 +575,7 @@ typedef struct
 	unsigned char	state;
 	int		mtime;
 	const char	*error;
+	char		error_hash[ZBX_SHA512_BINARY_LENGTH];
 
 	zbx_uint64_t	flags;
 #define ZBX_FLAGS_ITEM_DIFF_UNSET			__UINT64_C(0x0000)
@@ -595,7 +605,7 @@ typedef struct
 	time_t				lastaccess;
 	time_t				last_version_error_time;
 	int				proxy_delay;
-	int				more_data;
+	int				pending_history;
 	zbx_proxy_suppress_t		nodata_win;
 
 #define ZBX_FLAGS_PROXY_DIFF_UNSET				__UINT64_C(0x0000)
@@ -605,6 +615,7 @@ typedef struct
 #define ZBX_FLAGS_PROXY_DIFF_UPDATE_PROXYDELAY			__UINT64_C(0x0010)
 #define ZBX_FLAGS_PROXY_DIFF_UPDATE_SUPPRESS_WIN		__UINT64_C(0x0020)
 #define ZBX_FLAGS_PROXY_DIFF_UPDATE_CONFIG			__UINT64_C(0x0080)
+#define ZBX_FLAGS_PROXY_DIFF_UPDATE_PENDING_HISTORY		__UINT64_C(0x0100)
 #define ZBX_FLAGS_PROXY_DIFF_UPDATE (			\
 		ZBX_FLAGS_PROXY_DIFF_UPDATE_VERSION |	\
 		ZBX_FLAGS_PROXY_DIFF_UPDATE_LASTACCESS)

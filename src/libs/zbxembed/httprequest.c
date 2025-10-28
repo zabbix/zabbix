@@ -668,6 +668,11 @@ static void	cached_headers_free(zbx_cached_header_t *header)
 	zbx_free(header);
 }
 
+static void	cached_headers_free_wrapper(void *data)
+{
+	cached_headers_free((zbx_cached_header_t*)data);
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: retrieve headers from request in form of arrays                   *
@@ -744,7 +749,7 @@ static duk_ret_t	get_headers_as_arrays(duk_context *ctx, zbx_es_httprequest_t *r
 	}
 
 out:
-	zbx_vector_ptr_clear_ext(&headers, (zbx_mem_free_func_t)cached_headers_free);
+	zbx_vector_ptr_clear_ext(&headers, cached_headers_free_wrapper);
 	zbx_vector_ptr_destroy(&headers);
 	return 1;
 }
@@ -815,7 +820,7 @@ static duk_ret_t	es_httprequest_set_httpauth(duk_context *ctx)
 		goto out;
 	}
 
-	ZBX_CURL_SETOPT(ctx, request->handle, CURLOPT_HTTPAUTH, mask, err);
+	ZBX_CURL_SETOPT(ctx, request->handle, CURLOPT_HTTPAUTH, (long)mask, err);
 
 	if (NULL != username)
 		ZBX_CURL_SETOPT(ctx, request->handle, CURLOPT_USERNAME, username, err);
@@ -874,7 +879,7 @@ static int	es_httprequest_create_prototype(duk_context *ctx, const char *obj_nam
 	duk_push_c_function(ctx, es_httprequest_ctor, 0);
 	duk_push_object(ctx);
 
-	duk_put_function_list(ctx, -1, methods);
+	es_put_function_list(ctx, -1, methods);
 
 	if (1 != duk_put_prop_string(ctx, -2, "prototype"))
 		return FAIL;

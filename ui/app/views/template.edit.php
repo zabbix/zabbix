@@ -128,6 +128,7 @@ $template_tab
 				'new_item_name' => 'template_groups_new[]',
 				'object_name' => 'templateGroup',
 				'add_new' => (CWebUser::$data['type'] == USER_TYPE_SUPER_ADMIN),
+				'maxlength' => DB::getFieldLength('hstgrp', 'name'),
 				'data' => $data['groups_ms'],
 				'popup' => [
 					'parameters' => [
@@ -186,8 +187,7 @@ $macros_tab = (new CFormList('macrosFormList'))
 	)
 	->addRow(null, new CPartial($macros_tmpl, [
 		'macros' => $data['macros'],
-		'readonly' => $data['readonly'],
-		'has_inline_validation' => true
+		'readonly' => $data['readonly']
 	]), 'template_macros_container');
 
 if (!$data['readonly']) {

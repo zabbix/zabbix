@@ -61,7 +61,7 @@ static void	autoreg_process_hosts_server(zbx_vector_autoreg_host_ptr_t *autoreg_
 	sql_offset = 0;
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
 			"select h.host,h.hostid,h.proxyid,a.host_metadata,a.listen_ip,a.listen_dns,"
-				"a.listen_port,a.flags,a.proxyid,h.monitored_by,h.proxy_groupid"
+				"a.listen_port,a.flags,a.proxyid,h.monitored_by,h.proxy_groupid,a.tls_accepted"
 			" from hosts h"
 			" left join autoreg_host a"
 				" on a.host=h.host"
@@ -87,6 +87,9 @@ static void	autoreg_process_hosts_server(zbx_vector_autoreg_host_ptr_t *autoreg_
 
 			if (0 != strcmp(autoreg_host->host_metadata, row[3]) ||
 					autoreg_host->flag != atoi(row[7]))
+				break;
+
+			if (autoreg_host->connection_type != (unsigned int)atoi(row[11]))
 				break;
 
 			/* process with autoregistration if the connection type was forced and */
@@ -275,7 +278,7 @@ void	zbx_autoreg_flush_hosts_server(zbx_vector_autoreg_host_ptr_t *autoreg_hosts
 			zbx_db_insert_add_values(&db_insert, autoreg_host->autoreg_hostid, proxyid,
 					autoreg_host->host, autoreg_host->ip, autoreg_host->dns,
 					(int)autoreg_host->port, (int)autoreg_host->connection_type,
-					autoreg_host->host_metadata, autoreg_host->flag);
+					autoreg_host->host_metadata, (int)autoreg_host->flag);
 		}
 		else
 		{
