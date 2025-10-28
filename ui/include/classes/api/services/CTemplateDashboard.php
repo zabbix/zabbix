@@ -84,10 +84,8 @@ class CTemplateDashboard extends CDashboardGeneral {
 				return $options['countOutput'] ? '0' : [];
 			}
 
-			$sql_parts['from'][] = 'host_hgset hh';
-			$sql_parts['from'][] = 'permission p';
-			$sql_parts['where'][] = 'd.templateid=hh.hostid';
-			$sql_parts['where'][] = 'hh.hgsetid=p.hgsetid';
+			$sql_parts['join']['hh'] = ['table' => 'host_hgset', 'on' => ['templateid' => 'hostid']];
+			$sql_parts['join']['p'] = ['table' => 'permission', 'using' => 'hgsetid', 'left_table' => 'hh'];
 			$sql_parts['where'][] = 'p.ugsetid='.self::$userData['ugsetid'];
 
 			if ($options['editable']) {
@@ -122,7 +120,7 @@ class CTemplateDashboard extends CDashboardGeneral {
 		$sql_parts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sql_parts);
 		$sql_parts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sql_parts);
 
-		$result = DBselect(self::createSelectQueryFromParts($sql_parts), $options['limit']);
+		$result = DBselect($this->createSelectQueryFromParts($sql_parts), $options['limit']);
 
 		$db_dashboards = [];
 

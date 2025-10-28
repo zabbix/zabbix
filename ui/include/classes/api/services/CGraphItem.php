@@ -67,12 +67,9 @@ class CGraphItem extends CApiService {
 				return $options['countOutput'] ? '0' : [];
 			}
 
-			$sqlParts['from'][] = 'items i';
-			$sqlParts['from'][] = 'host_hgset hh';
-			$sqlParts['from'][] = 'permission p';
-			$sqlParts['where'][] = 'gi.itemid=i.itemid';
-			$sqlParts['where'][] = 'i.hostid=hh.hostid';
-			$sqlParts['where'][] = 'hh.hgsetid=p.hgsetid';
+			$sqlParts['join']['i'] = ['table' => 'items', 'using' => 'itemid'];
+			$sqlParts['join']['hh'] = ['table' => 'host_hgset', 'using' => 'hostid', 'left_table' => 'i'];
+			$sqlParts['join']['p'] = ['table' => 'permission', 'using' => 'hgsetid', 'left_table' => 'hh'];
 			$sqlParts['where'][] = 'p.ugsetid='.self::$userData['ugsetid'];
 
 			if ($options['editable']) {
@@ -95,8 +92,7 @@ class CGraphItem extends CApiService {
 		if (!is_null($options['graphids'])) {
 			zbx_value2array($options['graphids']);
 
-			$sqlParts['from']['graphs'] = 'graphs g';
-			$sqlParts['where']['gig'] = 'gi.graphid=g.graphid';
+			$sqlParts['join']['g'] = ['table' => 'graphs', 'using' => 'graphid'];
 			$sqlParts['where'][] = dbConditionInt('g.graphid', $options['graphids']);
 		}
 
@@ -119,7 +115,7 @@ class CGraphItem extends CApiService {
 
 		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$sqlParts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
-		$dbRes = DBselect(self::createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
+		$dbRes = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 		while ($gitem = DBfetch($dbRes)) {
 			if ($options['countOutput']) {
 				$result = $gitem['rowscount'];

@@ -314,7 +314,7 @@ class CHostDashboard extends CApiService {
 
 		$sql_parts = $this->applyQueryOutputOptions('dashboard', 'd', $td_options, $sql_parts);
 
-		return self::createSelectQueryFromParts($sql_parts);
+		return $this->createSelectQueryFromParts($sql_parts);
 	}
 
 	private static function sortObjects(array &$result, array $sortfield, $sortorder): void {

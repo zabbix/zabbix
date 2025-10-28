@@ -137,8 +137,7 @@ class CHostPrototype extends CHostBase {
 
 		if ((!$options['countOutput'] && $this->outputIsRequested('inventory_mode', $options['output']))
 				|| ($options['filter'] && array_key_exists('inventory_mode', $options['filter']))) {
-			$sqlParts['left_join'][] = ['alias' => 'hinv', 'table' => 'host_inventory', 'using' => 'hostid'];
-			$sqlParts['left_table'] = ['alias' => $this->tableAlias, 'table' => $this->tableName];
+			$sqlParts['join']['hinv'] = ['type' => 'left', 'table' => 'host_inventory', 'using' => 'hostid'];
 		}
 
 		return $sqlParts;
@@ -154,14 +153,10 @@ class CHostPrototype extends CHostBase {
 				$sqlParts['where'][] = '1=0';
 			}
 			else {
-				$sqlParts['from']['hd'] = 'host_discovery hd';
-				$sqlParts['from'][] = 'items i';
-				$sqlParts['from'][] = 'host_hgset hh';
-				$sqlParts['from'][] = 'permission p';
-				$sqlParts['where']['h-hd'] = 'h.hostid=hd.hostid';
-				$sqlParts['where'][] = 'hd.lldruleid=i.itemid';
-				$sqlParts['where'][] = 'i.hostid=hh.hostid';
-				$sqlParts['where'][] = 'hh.hgsetid=p.hgsetid';
+				$sqlParts['join']['hd'] = ['table' => 'host_discovery', 'using' => 'hostid'];
+				$sqlParts['join']['i'] = ['table' => 'items', 'on' => ['lldruleid' => 'itemid'], 'left_table' => 'hd'];
+				$sqlParts['join']['hh'] = ['table' => 'host_hgset', 'using' => 'hostid', 'left_table' => 'i'];
+				$sqlParts['join']['p'] = ['table' => 'permission', 'using' => 'hgsetid', 'left_table' => 'hh'];
 				$sqlParts['where'][] = 'p.ugsetid='.self::$userData['ugsetid'];
 
 				if ($options['editable']) {
@@ -172,8 +167,7 @@ class CHostPrototype extends CHostBase {
 
 		// discoveryids
 		if ($options['discoveryids'] !== null) {
-			$sqlParts['from']['hd'] = 'host_discovery hd';
-			$sqlParts['where']['h-hd'] = 'h.hostid=hd.hostid';
+			$sqlParts['join']['hd'] = ['table' => 'host_discovery', 'using' => 'hostid'];
 			$sqlParts['where'][] = dbConditionId('hd.lldruleid', (array) $options['discoveryids']);
 
 			if ($options['groupCount']) {

@@ -145,8 +145,7 @@ class CUser extends CApiService {
 
 		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
 			if (!$options['editable']) {
-				$sql_parts['from']['users_groups'] = 'users_groups ug';
-				$sql_parts['where']['uug'] = 'u.userid=ug.userid';
+				$sql_parts['join']['ug'] = ['table' => 'users_groups', 'using' => 'userid'];
 				$sql_parts['where'][] = 'ug.usrgrpid IN ('.
 					' SELECT uug.usrgrpid'.
 					' FROM users_groups uug'.
@@ -163,15 +162,13 @@ class CUser extends CApiService {
 		}
 
 		if ($options['usrgrpids'] !== null) {
-			$sql_parts['from']['users_groups'] = 'users_groups ug';
+			$sql_parts['join']['ug'] = ['table' => 'users_groups', 'using' => 'userid'];
 			$sql_parts['where'][] = dbConditionId('ug.usrgrpid', $options['usrgrpids']);
-			$sql_parts['where']['uug'] = 'u.userid=ug.userid';
 		}
 
 		if ($options['mediaids'] !== null) {
-			$sql_parts['from']['media'] = 'media m';
+			$sql_parts['join']['m'] = ['table' => 'media', 'using' => 'userid'];
 			$sql_parts['where'][] = dbConditionId('m.mediaid', $options['mediaids']);
-			$sql_parts['where']['mu'] = 'm.userid=u.userid';
 
 			if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
 				$sql_parts['where']['userid'] = 'u.userid='.self::$userData['userid'];
@@ -179,9 +176,8 @@ class CUser extends CApiService {
 		}
 
 		if ($options['mediatypeids'] !== null) {
-			$sql_parts['from']['media'] = 'media m';
+			$sql_parts['join']['m'] = ['table' => 'media', 'using' => 'userid'];
 			$sql_parts['where'][] = dbConditionId('m.mediatypeid', $options['mediatypeids']);
-			$sql_parts['where']['mu'] = 'm.userid=u.userid';
 
 			if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
 				$sql_parts['where']['userid'] = 'u.userid='.self::$userData['userid'];
@@ -282,7 +278,7 @@ class CUser extends CApiService {
 
 		$sql_parts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sql_parts);
 		$sql_parts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sql_parts);
-		$resource = DBselect(self::createSelectQueryFromParts($sql_parts), $sql_parts['limit']);
+		$resource = DBselect($this->createSelectQueryFromParts($sql_parts), $sql_parts['limit']);
 
 		if ($options['countOutput']) {
 			return DBfetch($resource)['rowscount'];

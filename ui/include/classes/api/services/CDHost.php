@@ -118,9 +118,8 @@ class CDHost extends CApiService {
 		if (!is_null($options['dserviceids'])) {
 			zbx_value2array($options['dserviceids']);
 
-			$sqlParts['from']['dservices'] = 'dservices ds';
+			$sqlParts['join']['ds'] = ['table' => 'dservices', 'using' => 'dhostid'];
 			$sqlParts['where'][] = dbConditionInt('ds.dserviceid', $options['dserviceids']);
-			$sqlParts['where']['dhds'] = 'dh.dhostid=ds.dhostid';
 
 			if ($options['groupCount']) {
 				$sqlParts['group']['dserviceids'] = 'ds.dserviceid';
@@ -145,7 +144,7 @@ class CDHost extends CApiService {
 
 		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$sqlParts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
-		$res = DBselect(self::createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
+		$res = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 		while ($dhost = DBfetch($res)) {
 			if ($options['countOutput']) {
 				if ($options['groupCount']) {

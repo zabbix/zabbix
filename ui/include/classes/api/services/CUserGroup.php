@@ -141,9 +141,8 @@ class CUserGroup extends CApiService {
 		if (!is_null($options['userids'])) {
 			zbx_value2array($options['userids']);
 
-			$sqlParts['from']['users_groups'] = 'users_groups ug';
+			$sqlParts['join']['ug'] = ['table' => 'users_groups', 'using' => 'usrgrpid'];
 			$sqlParts['where'][] = dbConditionInt('ug.userid', $options['userids']);
-			$sqlParts['where']['gug'] = 'g.usrgrpid=ug.usrgrpid';
 		}
 
 		if (array_key_exists('mfaids', $options) && $options['mfaids'] !== null) {
@@ -178,7 +177,7 @@ class CUserGroup extends CApiService {
 
 		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$sqlParts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
-		$res = DBselect(self::createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
+		$res = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 		while ($usrgrp = DBfetch($res)) {
 			if ($options['countOutput']) {
 				$result = $usrgrp['rowscount'];

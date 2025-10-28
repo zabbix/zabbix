@@ -135,10 +135,8 @@ class CDService extends CApiService {
 		if (!is_null($options['druleids'])) {
 			zbx_value2array($options['druleids']);
 
-			$sqlParts['from']['dhosts'] = 'dhosts dh';
-
+			$sqlParts['join']['dh'] = ['table' => 'dhosts', 'using' => 'dhostid'];
 			$sqlParts['where']['druleid'] = dbConditionInt('dh.druleid', $options['druleids']);
-			$sqlParts['where']['dhds'] = 'dh.dhostid=ds.dhostid';
 
 			if ($options['groupCount']) {
 				$sqlParts['group']['druleid'] = 'dh.druleid';
@@ -163,7 +161,7 @@ class CDService extends CApiService {
 
 		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$sqlParts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
-		$res = DBselect(self::createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
+		$res = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 		while ($dservice = DBfetch($res)) {
 			if ($options['countOutput']) {
 				if ($options['groupCount']) {

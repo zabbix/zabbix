@@ -91,7 +91,7 @@ class CReport extends CApiService {
 				: '(r.active_till=0 OR r.active_till>='.time().')';
 		}
 
-		$result = DBselect(self::createSelectQueryFromParts($sql_parts), $options['limit']);
+		$result = DBselect($this->createSelectQueryFromParts($sql_parts), $options['limit']);
 
 		$db_reports = [];
 		while ($row = DBfetch($result)) {

@@ -372,7 +372,7 @@ class CApiService {
 	protected function createSelectQuery($tableName, array $options) {
 		$sqlParts = $this->createSelectQueryParts($tableName, $this->tableAlias(), $options);
 
-		return self::createSelectQueryFromParts($sqlParts);
+		return $this->createSelectQueryFromParts($sqlParts);
 	}
 
 	/**
@@ -416,20 +416,24 @@ class CApiService {
 	 *
 	 * @return string
 	 */
-	protected static function dbDistinct(array $sql_parts) {
+	protected function dbDistinct(array $sql_parts) {
 		if (preg_grep('/^COUNT\(/', $sql_parts['select'])) {
 			return '';
 		}
 
 		$count = count($sql_parts['from']);
 
-		if ($count == 1 && array_key_exists('left_join', $sql_parts)) {
-			foreach ($sql_parts['left_join'] as $left_join) {
-				$r_table = DB::getSchema($left_join['table']);
+		if ($count == 1 && array_key_exists('join', $sql_parts)) {
+			foreach ($sql_parts['join'] as $join) {
+				$r_table = DB::getSchema($join['table']);
+				$r_table_key = explode(',', $r_table['key']);
+				sort($r_table_key);
 
-				// Increase count when table linked by non-unique column.
-				if ((array_key_exists('using', $left_join) && $left_join['using'] !== $r_table['key'])
-						|| (!array_key_exists('using', $left_join) && $left_join['use_distinct'])) {
+				$r_table_fields = array_key_exists('using', $join) ? (array) $join['using'] : $join['on'];
+				sort($r_table_fields);
+
+				// Increase count when table linked by non-unique column(s).
+				if ($r_table_key !== $r_table_fields) {
 					$count++;
 					break;
 				}
@@ -446,23 +450,28 @@ class CApiService {
 	 *
 	 * @return string			The resulting SQL query
 	 */
-	protected static function createSelectQueryFromParts(array $sqlParts) {
-		$sql_left_join = '';
-		if (array_key_exists('left_join', $sqlParts)) {
-			$l_table = DB::getSchema($sqlParts['left_table']['table']);
+	protected function createSelectQueryFromParts(array $sqlParts) {
+		$sql_join = '';
 
-			foreach ($sqlParts['left_join'] as $left_join) {
-				$sql_left_join .= ' LEFT JOIN '.$left_join['table'].' '.$left_join['alias'].' ON ';
-				$sql_left_join .= array_key_exists('condition', $left_join)
-					? $left_join['condition']
-					: $sqlParts['left_table']['alias'].'.'.$l_table['key'].'='.
-						$left_join['alias'].'.'.$left_join['using'];
+		if (array_key_exists('join', $sqlParts)) {
+			foreach ($sqlParts['join'] as $r_alias => $join) {
+				$l_alias = array_key_exists('left_table', $join) ? $join['left_table'] : $this->tableAlias();
+
+				if (array_key_exists('type', $join) && $join['type'] === 'left') {
+					$sql_join .= ' LEFT';
+				}
+				$sql_join .= ' JOIN '.$join['table'].' '.$r_alias.' ON ';
+				if (array_key_exists('using', $join)) {
+					foreach ((array) $join['using'] as $field) {
+						$sql_join .= $l_alias.'.'.$field.'='.$r_alias.'.'.$field;
+					}
+				}
+				else {
+					foreach ($join['on'] as $l_field => $r_field) {
+						$sql_join .= $l_alias.'.'.$l_field.'='.$r_alias.'.'.$r_field;
+					}
+				}
 			}
-
-			// Moving a left table to the end.
-			$table_id = $sqlParts['left_table']['table'].' '.$sqlParts['left_table']['alias'];
-			unset($sqlParts['from'][array_search($table_id, $sqlParts['from'])]);
-			$sqlParts['from'][] = $table_id;
 		}
 
 		$sqlSelect = implode(',', array_unique($sqlParts['select']));
@@ -471,9 +480,9 @@ class CApiService {
 		$sqlGroup = empty($sqlParts['group']) ? '' : ' GROUP BY '.implode(',', array_unique($sqlParts['group']));
 		$sqlOrder = empty($sqlParts['order']) ? '' : ' ORDER BY '.implode(',', array_unique($sqlParts['order']));
 
-		return 'SELECT'.self::dbDistinct($sqlParts).' '.$sqlSelect.
+		return 'SELECT'.$this->dbDistinct($sqlParts).' '.$sqlSelect.
 				' FROM '.$sqlFrom.
-				$sql_left_join.
+				$sql_join.
 				$sqlWhere.
 				$sqlGroup.
 				$sqlOrder;
@@ -498,8 +507,7 @@ class CApiService {
 
 		if (array_key_exists('countOutput', $options) && $options['countOutput']
 				&& !$this->requiresPostSqlFiltering($options)) {
-			$has_joins = count($sql_parts['from']) > 1
-				|| (array_key_exists('left_join', $sql_parts) && $sql_parts['left_join']);
+			$has_joins = count($sql_parts['from']) > 1 || (array_key_exists('join', $sql_parts) && $sql_parts['join']);
 
 			if ($pk_composite && $has_joins) {
 				throw new Exception('Joins with composite primary keys are not supported in this API version.');
@@ -665,7 +673,7 @@ class CApiService {
 	 */
 	protected function applyQuerySortField($sortfield, $sortorder, $alias, array $sqlParts) {
 		// add sort field to select if distinct is used
-		if ((count($sqlParts['from']) > 1 || (isset($sqlParts['left_join']) && count($sqlParts['left_join'])))
+		if ((count($sqlParts['from']) > 1 || (array_key_exists('join', $sqlParts) && $sqlParts['join']))
 				&& !str_in_array($alias.'.'.$sortfield, $sqlParts['select'])
 				&& !str_in_array($alias.'.*', $sqlParts['select'])) {
 

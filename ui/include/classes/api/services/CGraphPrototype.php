@@ -97,14 +97,10 @@ class CGraphPrototype extends CGraphGeneral {
 				return $options['countOutput'] ? '0' : [];
 			}
 
-			$sqlParts['from']['graphs_items'] = 'graphs_items gi';
-			$sqlParts['from']['items'] = 'items i';
-			$sqlParts['from'][] = 'host_hgset hh';
-			$sqlParts['from'][] = 'permission p';
-			$sqlParts['where']['gig'] = 'gi.graphid=g.graphid';
-			$sqlParts['where']['igi'] = 'i.itemid=gi.itemid';
-			$sqlParts['where'][] = 'i.hostid=hh.hostid';
-			$sqlParts['where'][] = 'hh.hgsetid=p.hgsetid';
+			$sqlParts['join']['gi'] = ['table' => 'graphs_items', 'using' => 'graphid'];
+			$sqlParts['join']['i'] = ['table' => 'items', 'using' => 'itemid', 'left_table' => 'gi'];
+			$sqlParts['join']['hh'] = ['table' => 'host_hgset', 'using' => 'hostid', 'left_table' => 'i'];
+			$sqlParts['join']['p'] = ['table' => 'permission', 'using' => 'hgsetid', 'left_table' => 'hh'];
 			$sqlParts['where'][] = 'p.ugsetid='.self::$userData['ugsetid'];
 
 			if ($options['editable']) {
@@ -127,14 +123,10 @@ class CGraphPrototype extends CGraphGeneral {
 		if (!is_null($options['groupids'])) {
 			zbx_value2array($options['groupids']);
 
-			$sqlParts['from']['graphs_items'] = 'graphs_items gi';
-			$sqlParts['from']['items'] = 'items i';
-			$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
+			$sqlParts['join']['gi'] = ['table' => 'graphs_items', 'using' => 'graphid'];
+			$sqlParts['join']['i'] = ['table' => 'items', 'using' => 'itemid', 'left_table' => 'gi'];
+			$sqlParts['join']['hg'] = ['table' => 'hosts_groups', 'using' => 'hostid', 'left_table' => 'i'];
 			$sqlParts['where'][] = dbConditionInt('hg.groupid', $options['groupids']);
-			$sqlParts['where'][] = 'hg.hostid=i.hostid';
-			$sqlParts['where']['gig'] = 'gi.graphid=g.graphid';
-			$sqlParts['where']['igi'] = 'i.itemid=gi.itemid';
-			$sqlParts['where']['hgi'] = 'hg.hostid=i.hostid';
 
 			if ($options['groupCount']) {
 				$sqlParts['group']['hg'] = 'hg.groupid';
@@ -158,12 +150,10 @@ class CGraphPrototype extends CGraphGeneral {
 		if (!is_null($options['hostids'])) {
 			zbx_value2array($options['hostids']);
 
-			$sqlParts['from']['graphs_items'] = 'graphs_items gi';
-			$sqlParts['from']['items'] = 'items i';
+			$sqlParts['join']['gi'] = ['table' => 'graphs_items', 'using' => 'graphid'];
+			$sqlParts['join']['i'] = ['table' => 'items', 'using' => 'itemid', 'left_table' => 'gi'];
 			$sqlParts['where'][] = dbConditionInt('i.hostid', $options['hostids']);
 			$sqlParts['where'][] = dbConditionInt('i.flags', (array) ZBX_FLAG_DISCOVERY_PROTOTYPE);
-			$sqlParts['where']['gig'] = 'gi.graphid=g.graphid';
-			$sqlParts['where']['igi'] = 'i.itemid=gi.itemid';
 
 			if ($options['groupCount']) {
 				$sqlParts['group']['i'] = 'i.hostid';
@@ -181,8 +171,7 @@ class CGraphPrototype extends CGraphGeneral {
 		if (!is_null($options['itemids'])) {
 			zbx_value2array($options['itemids']);
 
-			$sqlParts['from']['graphs_items'] = 'graphs_items gi';
-			$sqlParts['where']['gig'] = 'gi.graphid=g.graphid';
+			$sqlParts['join']['gi'] = ['table' => 'graphs_items', 'using' => 'graphid'];
 			$sqlParts['where'][] = dbConditionInt('gi.itemid', $options['itemids']);
 
 			if ($options['groupCount']) {
@@ -194,10 +183,8 @@ class CGraphPrototype extends CGraphGeneral {
 		if (!is_null($options['discoveryids'])) {
 			zbx_value2array($options['discoveryids']);
 
-			$sqlParts['from']['graphs_items'] = 'graphs_items gi';
-			$sqlParts['from']['item_discovery'] = 'item_discovery id';
-			$sqlParts['where']['gig'] = 'gi.graphid=g.graphid';
-			$sqlParts['where']['giid'] = 'gi.itemid=id.itemid';
+			$sqlParts['join']['gi'] = ['table' => 'graphs_items', 'using' => 'graphid'];
+			$sqlParts['join']['id'] = ['table' => 'item_discovery', 'using' => 'itemid', 'left_table' => 'gi'];
 			$sqlParts['where'][] = dbConditionId('id.lldruleid', $options['discoveryids']);
 
 			if ($options['groupCount']) {
@@ -207,12 +194,9 @@ class CGraphPrototype extends CGraphGeneral {
 
 		// templated
 		if (!is_null($options['templated'])) {
-			$sqlParts['from']['graphs_items'] = 'graphs_items gi';
-			$sqlParts['from']['items'] = 'items i';
-			$sqlParts['from']['hosts'] = 'hosts h';
-			$sqlParts['where']['igi'] = 'i.itemid=gi.itemid';
-			$sqlParts['where']['ggi'] = 'g.graphid=gi.graphid';
-			$sqlParts['where']['hi'] = 'h.hostid=i.hostid';
+			$sqlParts['join']['gi'] = ['table' => 'graphs_items', 'using' => 'graphid'];
+			$sqlParts['join']['i'] = ['table' => 'items', 'using' => 'itemid', 'left_table' => 'gi'];
+			$sqlParts['join']['h'] = ['table' => 'hosts', 'using' => 'hostid', 'left_table' => 'i'];
 
 			if ($options['templated']) {
 				$sqlParts['where'][] = 'h.status='.HOST_STATUS_TEMPLATE;
@@ -244,22 +228,17 @@ class CGraphPrototype extends CGraphGeneral {
 			if (isset($options['filter']['host'])) {
 				zbx_value2array($options['filter']['host']);
 
-				$sqlParts['from']['graphs_items'] = 'graphs_items gi';
-				$sqlParts['from']['items'] = 'items i';
-				$sqlParts['from']['hosts'] = 'hosts h';
-				$sqlParts['where']['gig'] = 'gi.graphid=g.graphid';
-				$sqlParts['where']['igi'] = 'i.itemid=gi.itemid';
-				$sqlParts['where']['hi'] = 'h.hostid=i.hostid';
+				$sqlParts['join']['gi'] = ['table' => 'graphs_items', 'using' => 'graphid'];
+				$sqlParts['join']['i'] = ['table' => 'items', 'using' => 'itemid', 'left_table' => 'gi'];
+				$sqlParts['join']['h'] = ['table' => 'hosts', 'using' => 'hostid', 'left_table' => 'i'];
 				$sqlParts['where']['host'] = dbConditionString('h.host', $options['filter']['host']);
 			}
 
 			if (isset($options['filter']['hostid'])) {
 				zbx_value2array($options['filter']['hostid']);
 
-				$sqlParts['from']['graphs_items'] = 'graphs_items gi';
-				$sqlParts['from']['items'] = 'items i';
-				$sqlParts['where']['gig'] = 'gi.graphid=g.graphid';
-				$sqlParts['where']['igi'] = 'i.itemid=gi.itemid';
+				$sqlParts['join']['gi'] = ['table' => 'graphs_items', 'using' => 'graphid'];
+				$sqlParts['join']['i'] = ['table' => 'items', 'using' => 'itemid', 'left_table' => 'gi'];
 				$sqlParts['where']['hostid'] = dbConditionInt('i.hostid', $options['filter']['hostid']);
 			}
 		}
@@ -271,7 +250,7 @@ class CGraphPrototype extends CGraphGeneral {
 
 		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$sqlParts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
-		$dbRes = DBselect(self::createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
+		$dbRes = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 		while ($graph = DBfetch($dbRes)) {
 			if ($options['countOutput']) {
 				if ($options['groupCount']) {

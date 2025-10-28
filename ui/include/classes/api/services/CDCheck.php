@@ -90,12 +90,9 @@ class CDCheck extends CApiService {
 		if (!is_null($options['dserviceids'])) {
 			zbx_value2array($options['dserviceids']);
 
-			$sqlParts['from']['dhosts'] = 'dhosts dh';
-			$sqlParts['from']['dservices'] = 'dservices ds';
-
+			$sqlParts['join']['dh'] = ['table' => 'dhosts', 'using' => 'druleid'];
+			$sqlParts['join']['ds'] = ['table' => 'dservices', 'using' => 'dhostid', 'left_table' => 'dh'];
 			$sqlParts['where']['ds'] = dbConditionInt('ds.dserviceid', $options['dserviceids']);
-			$sqlParts['where']['dcdh'] = 'dc.druleid=dh.druleid';
-			$sqlParts['where']['dhds'] = 'dh.dhostid=ds.dhostid';
 
 			if ($options['groupCount']) {
 				$sqlParts['group']['dserviceid'] = 'ds.dserviceid';
@@ -120,7 +117,7 @@ class CDCheck extends CApiService {
 
 		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$sqlParts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
-		$res = DBselect(self::createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
+		$res = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 		while ($dcheck = DBfetch($res)) {
 			if ($options['countOutput']) {
 				if ($options['groupCount']) {

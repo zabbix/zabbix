@@ -95,9 +95,8 @@ class CIconMap extends CApiService {
 		if (!is_null($options['sysmapids'])) {
 			zbx_value2array($options['sysmapids']);
 
-			$sqlParts['from']['sysmaps'] = 'sysmaps s';
+			$sqlParts['join']['s'] = ['table' => 'sysmaps', 'using' => 'iconmapid'];
 			$sqlParts['where'][] = dbConditionInt('s.sysmapid', $options['sysmapids']);
-			$sqlParts['where']['ims'] = 'im.iconmapid=s.iconmapid';
 		}
 
 		// filter
@@ -116,7 +115,7 @@ class CIconMap extends CApiService {
 
 		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$sqlParts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
-		$dbRes = DBselect(self::createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
+		$dbRes = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 		while ($iconMap = DBfetch($dbRes)) {
 			if ($options['countOutput']) {
 				$result = $iconMap['rowscount'];

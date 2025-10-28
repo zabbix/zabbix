@@ -96,10 +96,8 @@ class CHostInterface extends CApiService {
 				return $options['countOutput'] ? '0' : [];
 			}
 
-			$sqlParts['from'][] = 'host_hgset hh';
-			$sqlParts['from'][] = 'permission p';
-			$sqlParts['where'][] = 'hi.hostid=hh.hostid';
-			$sqlParts['where'][] = 'hh.hgsetid=p.hgsetid';
+			$sqlParts['join']['hh'] = ['table' => 'host_hgset', 'using' => 'hostid'];
+			$sqlParts['join']['p'] = ['table' => 'permission', 'using' => 'hgsetid', 'left_table' => 'hh'];
 			$sqlParts['where'][] = 'p.ugsetid='.self::$userData['ugsetid'];
 
 			if ($options['editable']) {
@@ -127,20 +125,17 @@ class CHostInterface extends CApiService {
 		if (!is_null($options['itemids'])) {
 			zbx_value2array($options['itemids']);
 
-			$sqlParts['from']['items'] = 'items i';
+			$sqlParts['join']['i'] = ['table' => 'items', 'using' => 'interfaceid'];
 			$sqlParts['where'][] = dbConditionInt('i.itemid', $options['itemids']);
-			$sqlParts['where']['hi'] = 'hi.interfaceid=i.interfaceid';
 		}
 
 		// triggerids
 		if (!is_null($options['triggerids'])) {
 			zbx_value2array($options['triggerids']);
 
-			$sqlParts['from']['functions'] = 'functions f';
-			$sqlParts['from']['items'] = 'items i';
+			$sqlParts['join']['i'] = ['table' => 'items', 'using' => 'interfaceid'];
+			$sql_parts['join']['f'] = ['table' => 'functions', 'using' => 'itemid', 'left_table' => 'i'];
 			$sqlParts['where'][] = dbConditionInt('f.triggerid', $options['triggerids']);
-			$sqlParts['where']['hi'] = 'hi.hostid=i.hostid';
-			$sqlParts['where']['fi'] = 'f.itemid=i.itemid';
 		}
 
 		// search
@@ -159,13 +154,12 @@ class CHostInterface extends CApiService {
 		}
 
 		if (!$options['countOutput'] && $this->outputIsRequested('details', $options['output'])) {
-			$sqlParts['left_join'][] = ['alias' => 'his', 'table' => 'interface_snmp', 'using' => 'interfaceid'];
-			$sqlParts['left_table'] = ['alias' => $this->tableAlias, 'table' => $this->tableName];
+			$sqlParts['join']['his'] = ['type' => 'left', 'table' => 'interface_snmp', 'using' => 'interfaceid'];
 		}
 
 		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$sqlParts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
-		$res = DBselect(self::createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
+		$res = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 		while ($interface = DBfetch($res)) {
 			if ($options['countOutput']) {
 				if ($options['groupCount']) {

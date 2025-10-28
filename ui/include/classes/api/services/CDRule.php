@@ -89,9 +89,8 @@ class CDRule extends CApiService {
 		if (!is_null($options['dhostids'])) {
 			zbx_value2array($options['dhostids']);
 
-			$sqlParts['from']['dhosts'] = 'dhosts dh';
+			$sqlParts['join']['dh'] = ['table' => 'dhosts', 'using' => 'druleid'];
 			$sqlParts['where']['dhostid'] = dbConditionInt('dh.dhostid', $options['dhostids']);
-			$sqlParts['where']['dhdr'] = 'dh.druleid=dr.druleid';
 
 			if ($options['groupCount']) {
 				$sqlParts['group']['dhostid'] = 'dh.dhostid';
@@ -102,12 +101,9 @@ class CDRule extends CApiService {
 		if (!is_null($options['dserviceids'])) {
 			zbx_value2array($options['dserviceids']);
 
-			$sqlParts['from']['dhosts'] = 'dhosts dh';
-			$sqlParts['from']['dservices'] = 'dservices ds';
-
+			$sqlParts['join']['dh'] = ['table' => 'dhosts', 'using' => 'druleid'];
+			$sqlParts['join']['ds'] = ['table' => 'dservices', 'using' => 'dhostid', 'left_table' => 'dh'];
 			$sqlParts['where']['dserviceid'] = dbConditionInt('ds.dserviceid', $options['dserviceids']);
-			$sqlParts['where']['dhdr'] = 'dh.druleid=dr.druleid';
-			$sqlParts['where']['dhds'] = 'dh.dhostid=ds.dhostid';
 
 			if ($options['groupCount']) {
 				$sqlParts['group']['dserviceid'] = 'ds.dserviceid';
@@ -141,7 +137,7 @@ class CDRule extends CApiService {
 
 		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$sqlParts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
-		$dbRes = DBselect(self::createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
+		$dbRes = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 
 		while ($drule = DBfetch($dbRes)) {
 			if ($options['countOutput']) {
