@@ -744,7 +744,8 @@ class testFormHostPrototype extends CLegacyWebTest {
 
 		// Go back to prototype and check changes.
 		$this->page->open('zabbix.php?action=popup&popup=host.prototype.edit&parent_discoveryid='.self::DISCOVERY_RULE_ID.
-				'&hostid='.self::HOST_PROTOTYPE_ID.'&context=host');
+				'&hostid='.self::HOST_PROTOTYPE_ID.'&context=host'
+		);
 		$prototype_form = $this->query('id:host-prototype-form')->asForm()->one()->waitUntilVisible();
 		$prototype_form->selectTab('IPMI');
 
@@ -792,7 +793,8 @@ class testFormHostPrototype extends CLegacyWebTest {
 	 */
 	public function testFormHostPrototype_CheckEncryptionFromHost($data) {
 		$this->zbxTestLogin('zabbix.php?action=popup&popup=host.prototype.edit&parent_discoveryid='.self::DISCOVERY_RULE_ID.
-				'&hostid='.self::HOST_PROTOTYPE_ID.'&context=host');
+				'&hostid='.self::HOST_PROTOTYPE_ID.'&context=host'
+		);
 		$this->zbxTestWaitForPageToLoad();
 
 		// Check Encryption settings on prototype before changes on host.
@@ -840,7 +842,8 @@ class testFormHostPrototype extends CLegacyWebTest {
 
 		// Go back to prototype and check changes.
 		$this->zbxTestOpen('zabbix.php?action=popup&popup=host.prototype.edit&parent_discoveryid='.self::DISCOVERY_RULE_ID.
-				'&hostid='.self::HOST_PROTOTYPE_ID.'&context=host');
+				'&hostid='.self::HOST_PROTOTYPE_ID.'&context=host'
+		);
 		$this->zbxTestTabSwitch('Encryption');
 		$this->zbxTestWaitForPageToLoad();
 
@@ -1046,7 +1049,7 @@ class testFormHostPrototype extends CLegacyWebTest {
 		$this->zbxTestClickLinkTextWait('Host prototypes');
 		$this->zbxTestContentControlButtonClickTextWait('Create host prototype');
 
-		$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
+		COverlayDialogElement::find()->waitUntilReady()->one();
 		$this->zbxTestInputTypeWait('host', $name);
 		$this->zbxTestClickButtonMultiselect('group_links_');
 		$this->zbxTestLaunchOverlayDialog('Host groups');

@@ -5772,13 +5772,13 @@ form.dashboard-widget-scatterplot {
   width: min(100vw - 42px, calc(var(--modal-max-width) - 22px)); }
   form.dashboard-widget-scatterplot .scatter-plot-widget-config-tabs {
     grid-column: 1 / -1; }
-  form.dashboard-widget-scatterplot .scatter-plot-config-tabs > .tabs-nav {
-    border-top: 1px solid #dfe4e7; }
-  form.dashboard-widget-scatterplot .scatter-plot-config-tabs .ui-tabs-nav {
-    position: sticky;
-    top: 0;
-    background: #ffffff;
-    z-index: 3; }
+    form.dashboard-widget-scatterplot .scatter-plot-widget-config-tabs > .tabs-nav {
+      border-top: 1px solid #dfe4e7; }
+    form.dashboard-widget-scatterplot .scatter-plot-widget-config-tabs .ui-tabs-nav {
+      position: sticky;
+      top: 0;
+      background: #ffffff;
+      z-index: 3; }
   form.dashboard-widget-scatterplot .thresholds-tab-grid {
     display: grid;
     gap: 10px; }

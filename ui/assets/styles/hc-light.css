@@ -5727,13 +5727,13 @@ form.dashboard-widget-scatterplot {
   width: min(100vw - 42px, calc(var(--modal-max-width) - 22px)); }
   form.dashboard-widget-scatterplot .scatter-plot-widget-config-tabs {
     grid-column: 1 / -1; }
-  form.dashboard-widget-scatterplot .scatter-plot-config-tabs > .tabs-nav {
-    border-top: 1px solid #9f9f9f; }
-  form.dashboard-widget-scatterplot .scatter-plot-config-tabs .ui-tabs-nav {
-    position: sticky;
-    top: 0;
-    background: #f3f3f3;
-    z-index: 3; }
+    form.dashboard-widget-scatterplot .scatter-plot-widget-config-tabs > .tabs-nav {
+      border-top: 1px solid #9f9f9f; }
+    form.dashboard-widget-scatterplot .scatter-plot-widget-config-tabs .ui-tabs-nav {
+      position: sticky;
+      top: 0;
+      background: #f3f3f3;
+      z-index: 3; }
   form.dashboard-widget-scatterplot .thresholds-tab-grid {
     display: grid;
     gap: 10px; }
