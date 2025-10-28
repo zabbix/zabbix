@@ -82,14 +82,13 @@ class testZBX6663 extends CLegacyWebTest {
 					'checkbox' => 'triggers'
 				]
 			],
-			// TODO: uncomment test case once issue ZBX-26548 is resolved
-/*			[
+			[
 				[
 					'host' => 'Host ZBX6663',
 					'discoveryRule' => 'Graph prototypes',
 					'checkbox' => 'graphs'
 				]
-			],*/
+			],
 			[
 				[
 					'host' => 'Host ZBX6663',
@@ -139,14 +138,13 @@ class testZBX6663 extends CLegacyWebTest {
 					'checkbox' => 'triggers'
 				]
 			],
-			// TODO: uncomment test case once issue ZBX-26548 is resolved
-/*			[
+			[
 				[
 					'template' => 'Template ZBX6663 First',
 					'discoveryRule' => 'Graph prototypes',
 					'checkbox' => 'graphs'
 				]
-			],*/
+			],
 			[
 				[
 					'template' => 'Template ZBX6663 First',
@@ -172,7 +170,7 @@ class testZBX6663 extends CLegacyWebTest {
 			$table = $this->query('xpath://table[@class="list-table"]')->asTable()->one();
 			$form->fill(['Name' => $zbx_data['host']]);
 			$this->query('button:Apply')->one()->waitUntilClickable()->click();
-			$table->waitUntilRelaoded();
+			$table->waitUntilReloaded();
 
 			if (isset($zbx_data['discoveryRule'])) {
 				$this->query('xpath://table[@class="list-table"]')->asTable()->one()->findRow('Name', $zbx_data['host'])
