@@ -1,6 +1,9 @@
 Changes for 8.0.0alpha1
 
 New features:
+..F....... [ZBXNEXT-9752] added inline validation for images form (gberzina)
+..F....... [ZBXNEXT-9848] moved host prototypes to MVC framework, refactored edit form to modal window and added inline validation (Ivo)
+..F....... [ZBXNEXT-9755] implemented inline form validation for Proxy form (msnihach)
 ..F.I..... [ZBXNEXT-9424] implemented Scatter plot widget (dfofanovs)
 ...G...... [ZBXNEXT-10012] added both SHOW SLAVE STATUS and SHOW REPLICA STATUS for Zabbix agent 2 MySQL plugin (lsurvilo)
 ..F....... [ZBXNEXT-8790] implemented inline validation in maintenance form (talbergs)
