@@ -23,7 +23,7 @@ class HostAvailabilityWidget {
 		$groupids = CDataHelper::getIds('name');
 
 		// Create maintenance for host group.
-		$maintenances = CDataHelper::call('maintenance.create', [
+		$maintenanceid = CDataHelper::call('maintenance.create', [
 			[
 				'name' => 'Maintenance for Host availability widget',
 				'maintenance_type' => MAINTENANCE_TYPE_NORMAL,
@@ -33,8 +33,7 @@ class HostAvailabilityWidget {
 				'groups' => [['groupid' => $groupids['Group in maintenance for Host availability widget']]],
 				'timeperiods' => [[]]
 			]
-		]);
-		$maintenanceid = $maintenances['maintenanceids'][0];
+		])['maintenanceids'][0];
 
 		// Create hosts with interfaces.
 		CDataHelper::createHosts([
@@ -366,7 +365,8 @@ class HostAvailabilityWidget {
 			foreach ($values as $value) {
 				$error = (array_key_exists('error', $value)) ? $value['error'] : '';
 				DBexecute('UPDATE interface SET available='.zbx_dbstr($value['available']).', error='.zbx_dbstr($error).
-					' WHERE interfaceid='.zbx_dbstr($interfaceid));
+						' WHERE interfaceid='.zbx_dbstr($interfaceid)
+				);
 			}
 		}
 
@@ -377,17 +377,17 @@ class HostAvailabilityWidget {
 			$hostids['Available host in maintenance']
 		];
 		foreach ($maintenace_hostids as $hostid) {
-			DBexecute('INSERT INTO maintenances_hosts (maintenance_hostid, maintenanceid, hostid) VALUES ('.zbx_dbstr($hostid).', '.
-				zbx_dbstr($maintenanceid).','.zbx_dbstr($hostid).')'
+			DBexecute('INSERT INTO maintenances_hosts (maintenance_hostid, maintenanceid, hostid) VALUES ('.
+					zbx_dbstr($hostid).', '.zbx_dbstr($maintenanceid).','.zbx_dbstr($hostid).')'
 			);
 
 			DBexecute('UPDATE hosts SET maintenanceid='.zbx_dbstr($maintenanceid).
-				', maintenance_status=1, maintenance_type='.MAINTENANCE_TYPE_NORMAL.', maintenance_from='.zbx_dbstr(1534971600).
-				' WHERE hostid='.zbx_dbstr($hostid)
+					', maintenance_status=1, maintenance_type='.MAINTENANCE_TYPE_NORMAL.', maintenance_from='.
+					zbx_dbstr(1534971600).' WHERE hostid='.zbx_dbstr($hostid)
 			);
 		}
 
-		$result = CDataHelper::call('dashboard.create', [
+		$dashboardid = CDataHelper::call('dashboard.create', [
 			[
 				'name' => 'Dashboard for Host availability widget',
 				'pages' => [
@@ -425,8 +425,7 @@ class HostAvailabilityWidget {
 					]
 				]
 			]
-		]);
-		$dashboardid = $result['dashboardids'][0];
+		])['dashboardids'][0];
 
 		return [
 			'dashboardid' => $dashboardid,
