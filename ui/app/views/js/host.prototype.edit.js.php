@@ -39,6 +39,7 @@ window.host_prototype_edit_popup = new class {
 		this.add_interface_btn = this.form_element.querySelector('.add-interface');
 		this.all_templateids = null;
 		this.show_inherited_tags = false;
+		this.tags_table = this.form_element.querySelector('.tags-table');
 		this.show_inherited_macros = false;
 		this.parent_hostid = parent_hostid;
 
@@ -359,7 +360,7 @@ window.host_prototype_edit_popup = new class {
 			this.show_inherited_tags = e.target.value == 1;
 			this.all_templateids = this.#getAllTemplates();
 
-			this.#updateTagsList(this.form_element.querySelector('.tags-table'));
+			this.#updateTagsList();
 		});
 
 		const observer = new IntersectionObserver(entries => {
@@ -369,7 +370,7 @@ window.host_prototype_edit_popup = new class {
 				if (this.all_templateids === null || this.all_templateids.xor(templateids).length > 0) {
 					this.all_templateids = templateids;
 
-					this.#updateTagsList(this.form_element.querySelector('.tags-table'));
+					this.#updateTagsList();
 				}
 			}
 		});
@@ -377,7 +378,7 @@ window.host_prototype_edit_popup = new class {
 		observer.observe(document.getElementById('tags-tab'));
 	}
 
-	#updateTagsList(table) {
+	#updateTagsList() {
 		const fields = getFormFields(this.form_element);
 
 		fields.tags = Object.values(fields.tags).reduce((tags, tag) => {
@@ -405,37 +406,21 @@ window.host_prototype_edit_popup = new class {
 		})
 			.then(response => response.json())
 			.then(response => {
-				const div = document.createElement('div');
+				this.tags_table.innerHTML = response.body;
 
-				div.innerHTML = response.body;
+				const $tags_table = jQuery(this.tags_table);
 
-				const new_table = div.firstChild;
-
-				table.replaceWith(new_table);
-				this.#initTagsTableEvents(new_table);
-			});
-	}
-
-	#initTagsTableEvents(table) {
-		const $table = jQuery(table);
-
-		$table
-			.dynamicRows({template: '#tag-row-tmpl', allow_empty: true})
-			.on('afteradd.dynamicRows', () => {
-				$('.<?= ZBX_STYLE_TEXTAREA_FLEXIBLE ?>', $table).textareaFlexible();
+				$tags_table.data('dynamicRows').counter = this.tags_table.querySelectorAll('tr.form_row').length;
+				$tags_table.find(`.${ZBX_STYLE_TEXTAREA_FLEXIBLE}`).textareaFlexible();
 			})
-			.find('.<?= ZBX_STYLE_TEXTAREA_FLEXIBLE ?>')
-			.textareaFlexible();
-
-		table.addEventListener('click', e => {
-			const target = e.target;
-
-			if (target.matches('.element-table-disable')) {
-				const type_input = target.closest('.form_row').querySelector('input[name$="[type]"]');
-
-				type_input.value &= ~<?= ZBX_PROPERTY_OWN ?>;
-			}
-		});
+			.catch((message) => {
+				this.form.addGeneralErrors({[t('Unexpected server error.')]: message});
+				this.form.renderErrors();
+				throw message;
+			})
+			.finally(() => {
+				this.overlay.unsetLoading();
+			});
 	}
 
 	/**
