@@ -139,7 +139,6 @@ class CControllerTriggerPrototypeList extends CController {
 		order_result($data['triggers'], $sort_field, $sort_order);
 
 		CTagHelper::mergeOwnAndInheritedTags($data['triggers'], true);
-		CTagHelper::orderTags($data['triggers']);
 
 		$data['tags'] = CTagHelper::getTagsHtml($data['triggers'], ZBX_TAG_OBJECT_TRIGGER_PROTOTYPE);
 

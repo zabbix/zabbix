@@ -85,7 +85,6 @@ class CScreenHttpTest extends CScreenBase {
 		order_result($httptests, $sort_field, $sort_order);
 
 		CTagHelper::mergeOwnAndInheritedTags($httptests);
-		CTagHelper::orderTags($httptests);
 
 		$tags = CTagHelper::getTagsHtml($httptests, ZBX_TAG_OBJECT_HTTPTEST, [
 			'filter_tags' => array_key_exists('tags', $this->data) ? $this->data['tags'] : []

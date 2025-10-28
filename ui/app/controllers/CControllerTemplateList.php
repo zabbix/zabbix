@@ -188,7 +188,6 @@ class CControllerTemplateList extends CController {
 		}
 
 		CTagHelper::mergeOwnAndInheritedTags($templates, true);
-		CTagHelper::orderTags($templates);
 
 		$data = [
 			'action' => $this->getAction(),

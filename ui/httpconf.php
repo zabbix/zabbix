@@ -789,7 +789,6 @@ else {
 	);
 
 	CTagHelper::mergeOwnAndInheritedTags($http_tests, true);
-	CTagHelper::orderTags($http_tests);
 
 	// Get the error column data only for hosts.
 	if ($data['context'] === 'host') {

@@ -150,7 +150,6 @@ class CControllerHostPrototypeList extends CController {
 		}
 
 		CTagHelper::mergeOwnAndInheritedTags($data['host_prototypes'], true);
-		CTagHelper::orderTags($data['host_prototypes']);
 
 		$data += [
 			'tags' => CTagHelper::getTagsHtml($data['host_prototypes'], ZBX_TAG_OBJECT_HOST_PROTOTYPE),

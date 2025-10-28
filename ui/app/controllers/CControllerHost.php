@@ -167,7 +167,6 @@ abstract class CControllerHost extends CController {
 		CArrayHelper::sort($hosts, [['field' => $filter['sort'], 'order' => $filter['sortorder']]]);
 
 		CTagHelper::mergeOwnAndInheritedTags($hosts);
-		CTagHelper::orderTags($hosts);
 
 		$interfaceids = [];
 		$hostids = [];

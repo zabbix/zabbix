@@ -409,7 +409,6 @@ class CControllerHostList extends CController {
 		}
 
 		CTagHelper::mergeOwnAndInheritedTags($hosts, true);
-		CTagHelper::orderTags($hosts);
 
 		$data = [
 			'action' => $this->getAction(),

@@ -207,9 +207,6 @@ class WidgetView extends CControllerDashboardWidgetView {
 			}
 
 			if ($this->fields_values['show_tags']) {
-				CTagHelper::orderTags($data['problems']);
-				CTagHelper::orderTags($symptom_data['problems']);
-
 				$object_type = $this->fields_values['show'] == TRIGGERS_OPTION_ALL
 					? ZBX_TAG_OBJECT_EVENT
 					: ZBX_TAG_OBJECT_PROBLEM;

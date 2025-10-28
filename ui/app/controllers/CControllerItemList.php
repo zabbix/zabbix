@@ -145,7 +145,6 @@ class CControllerItemList extends CControllerItem {
 
 		if ($items) {
 			CTagHelper::mergeOwnAndInheritedTags($items, true);
-			CTagHelper::orderTags($items);
 
 			$data['items'] = $items;
 			$data['parent_templates'] = getItemParentTemplates($items, ZBX_FLAG_DISCOVERY_NORMAL);

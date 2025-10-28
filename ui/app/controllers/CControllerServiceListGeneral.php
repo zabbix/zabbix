@@ -80,8 +80,6 @@ abstract class CControllerServiceListGeneral extends CController {
 	 */
 	protected function doAction(): void {
 		if ($this->service !== null) {
-			CTagHelper::orderTagsForObject($this->service);
-
 			$this->service['tags'] = CTagHelper::getTagsHtml([$this->service], ZBX_TAG_OBJECT_SERVICE);
 			$this->service['parents'] = API::Service()->get([
 				'output' => ['serviceid', 'name'],

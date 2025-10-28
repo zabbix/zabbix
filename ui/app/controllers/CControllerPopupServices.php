@@ -82,9 +82,6 @@ class CControllerPopupServices extends CController {
 			];
 		}
 
-		CTagHelper::orderTags($tags);
-		CTagHelper::orderTags($problem_tags);
-
 		$problem_tags_html = [];
 
 		foreach (CTagHelper::getTagsHtml($problem_tags, ZBX_TAG_OBJECT_SERVICE) as $serviceid => $service_tags) {

@@ -168,8 +168,6 @@ function make_event_details(array $event, array $allowed) {
 		}
 	}
 
-	CTagHelper::orderTagsForObject($event);
-
 	$tags = CTagHelper::getTagsHtml([$event], ZBX_TAG_OBJECT_EVENT);
 
 	$table

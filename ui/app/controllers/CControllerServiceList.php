@@ -139,8 +139,6 @@ class CControllerServiceList extends CControllerServiceListGeneral {
 
 		self::extendProblemEvents($data['services']);
 
-		CTagHelper::orderTags($data['services']);
-
 		$data['tags'] =
 			CTagHelper::getTagsHtml($data['services'], ZBX_TAG_OBJECT_SERVICE, ['filter_tags' => $filter['tags']]);
 

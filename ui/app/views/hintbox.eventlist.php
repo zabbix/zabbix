@@ -80,8 +80,6 @@ if (array_key_exists('problems', $data)) {
 	$today = strtotime('today');
 
 	if ($data['problems'] && $data['show_tags'] != SHOW_TAGS_NONE) {
-		CTagHelper::orderTags($data['problems']);
-
 		$tags = CTagHelper::getTagsHtml($data['problems'], ZBX_TAG_OBJECT_EVENT, [
 			'filter_tags' => $data['filter_tags'],
 			'tag_priority' => $data['tag_priority'],

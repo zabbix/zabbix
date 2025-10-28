@@ -253,7 +253,6 @@ class CControllerTriggerList extends CController {
 			]);
 
 			CTagHelper::mergeOwnAndInheritedTags($triggers, true);
-			CTagHelper::orderTags($triggers);
 
 			foreach ($triggers as &$trigger) {
 				CArrayHelper::sort($trigger['hosts'], ['name']);

@@ -53,29 +53,6 @@ class CTagHelper {
 		}
 	}
 
-	public static function orderTags(array &$objects, array $filter_tags = [], string $tag_priority = ''): void {
-		$filter_tags = self::getFilterTagsIndexedByTag($filter_tags);
-		$priority_tags = self::getPriorityTags($tag_priority);
-
-		foreach ($objects as &$object) {
-			self::orderTagsForObject($object, $filter_tags, $priority_tags);
-		}
-		unset($object);
-	}
-
-	public static function orderTagsForObject(array &$object, array $filter_tags = [],
-			array $priority_tags = []): void {
-		CArrayHelper::sort($object['tags'], ['tag', 'value']);
-
-		if ($filter_tags) {
-			self::orderByFilterTagsFirst($object['tags'], $filter_tags);
-		}
-
-		if ($priority_tags) {
-			self::orderByPriorityTagsFirst($object['tags'], $priority_tags);
-		}
-	}
-
 	public static function getTagsHtml(array $objects, int $object_type, array $options = []): array {
 		$options += [
 			'filter_tags' => [],
@@ -84,6 +61,10 @@ class CTagHelper {
 			'tag_name_format' => TAG_NAME_FULL,
 			'subfilter_tags' => null
 		];
+
+		if ($options['show_tags_limit'] == SHOW_TAGS_NONE) {
+			return [];
+		}
 
 		$id_field_name = self::getIdFieldName($object_type);
 		$filter_tags = self::getFilterTagsIndexedByTag($options['filter_tags']);
@@ -97,20 +78,19 @@ class CTagHelper {
 
 			$show_tags_count = 0;
 
-			if ($options['show_tags_limit'] != SHOW_TAGS_NONE) {
+			CArrayHelper::sort($object['tags'], ['tag', 'value']);
 
-				foreach (self::getOrderedTags($object['tags'], $filter_tags, $priority_tags) as $tag) {
-					if (self::getTagString($tag, $options['tag_name_format']) === '') {
-						continue;
-					}
+			foreach (self::getReorderedTags($object['tags'], $filter_tags, $priority_tags) as $tag) {
+				if (self::getTagString($tag, $options['tag_name_format']) === '') {
+					continue;
+				}
 
-					$html_elements[$objectid][] = self::getTagHtml($tag, $object_type, $options);
+				$html_elements[$objectid][] = self::getTagHtml($tag, $object_type, $options);
 
-					$show_tags_count++;
+				$show_tags_count++;
 
-					if ($show_tags_count == $options['show_tags_limit']) {
-						break;
-					}
+				if ($show_tags_count == $options['show_tags_limit']) {
+					break;
 				}
 			}
 
@@ -163,7 +143,7 @@ class CTagHelper {
 		return array_map('trim', explode(',', $tag_priority));
 	}
 
-	private static function getOrderedTags(array $tags, array $filter_tags, array $priority_tags): array {
+	private static function getReorderedTags(array $tags, array $filter_tags, array $priority_tags): array {
 		if ($filter_tags) {
 			self::orderByFilterTagsFirst($tags, $filter_tags);
 		}
