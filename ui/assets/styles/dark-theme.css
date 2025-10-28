@@ -4849,7 +4849,7 @@ div.dashboard-widget-navtree .treeview {
 form.dashboard-widget-piechart {
   max-width: 1330px;
   min-width: 1120px;
-  width: min(100vw - 42px, 100vw - 22px); }
+  width: calc(100vw - 42px); }
   form.dashboard-widget-piechart .pie-chart-widget-config-tabs {
     grid-column: 1 / -1; }
   form.dashboard-widget-piechart .pie-chart-widget-config-tabs > .tabs-nav {
@@ -4986,7 +4986,7 @@ div.dashboard-widget-problemsbysv .list-table tr[data-hostgroupid] {
 form.dashboard-widget-svggraph {
   max-width: 1330px;
   min-width: 1120px;
-  width: min(100vw - 42px, 100vw - 22px); }
+  width: calc(100vw - 42px); }
   form.dashboard-widget-svggraph .svg-graph-preview,
   form.dashboard-widget-svggraph .graph-widget-config-tabs {
     grid-column: 1 / -1; }

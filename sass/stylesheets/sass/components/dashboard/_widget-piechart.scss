@@ -3,7 +3,7 @@
 form.dashboard-widget-piechart {
 	max-width: 1330px;
 	min-width: 1120px;
-	width: #{"min(100vw - 42px, 100vw - 22px)"};
+	width: calc(100vw - 42px);
 
 	.pie-chart-widget-config-tabs {
 		grid-column: 1 / -1;
