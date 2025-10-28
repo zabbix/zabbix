@@ -22,7 +22,7 @@ require_once __DIR__.'/../../include/helpers/CDataHelper.php';
 use Facebook\WebDriver\WebDriverKeys;
 
 /**
- * @backup role, module, users, report, services
+ * @backup role, module, users, report, services, usrgrp, hosts, dashboard
  * @dataSource ExecuteNowAction
  * @onBefore prepareUserData, prepareReportData, prepareServiceData, prepareCauseAndSymptomData
  */
@@ -68,6 +68,27 @@ class testUserRolesPermissions extends CWebTest {
 	 * @var integer
 	 */
 	protected static $reportid;
+
+	/**
+	 * Id of created template group.
+	 *
+	 * @var integer
+	 */
+	protected static $template_groupid;
+
+	/**
+	 * Id of created template.
+	 *
+	 * @var integer
+	 */
+	protected static $templateid;
+
+	/**
+	 * Id of created host.
+	 *
+	 * @var integer
+	 */
+	protected static $hostid;
 
 	/**
 	 * Function used to create user.
@@ -151,6 +172,45 @@ class testUserRolesPermissions extends CWebTest {
 		]);
 		$this->assertArrayHasKey('reportids', $response);
 		self::$reportid = $response['reportids'][0];
+
+		$response = CDataHelper::call('templategroup.create', [
+			[
+				'name' => 'Template group for dashboard access testing'
+			]
+		]);
+		self::$template_groupid = $response['groupids'][0];
+
+		$response = CDataHelper::call('template.create', [
+			'host' => 'Template with host dashboard',
+			'groups' => ['groupid' => self::$template_groupid]
+		]);
+		self::$templateid = $response['templateids'][0];
+
+		$response = CDataHelper::call('templatedashboard.create', [
+			[
+				'templateid' => self::$templateid,
+				'name' => 'Check user group access',
+				'pages' => [[]]
+			]
+		]);
+		self::$template_dashboardid = $response['dashboardids'][0];
+
+		$response = CDataHelper::call('host.create', [
+			[
+				'host' => 'Check dashboard access',
+				'groups' => [
+					[
+						'groupid' => 4 // Zabbix servers.
+					]
+				],
+				'templates' => [
+					[
+						'templateid' => self::$templateid
+					]
+				]
+			]
+		]);
+		self::$hostid = $response['hostids'][0];
 	}
 
 	public function prepareServiceData() {
@@ -1463,6 +1523,10 @@ class testUserRolesPermissions extends CWebTest {
 		$this->page->open('zabbix.php?action=dashboard.view')->waitUntilReady();
 		$this->changeRoleRule(['Dashboards' => false]);
 		$this->checkLinks(['zabbix.php?action=dashboard.view'], 'Problems');
+	}
+
+	public function testUserRolesPermissions_DashboardByUserGroup() {
+
 	}
 
 	public static function getRoleServiceData() {
