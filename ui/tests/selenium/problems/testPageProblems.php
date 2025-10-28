@@ -261,7 +261,7 @@ class testPageProblems extends CWebTest {
 			'Compact view' => ['value' => false],
 			'Show details' => ['value' => false],
 			'Show timeline' => ['value' => true],
-			'Highlight whole row' => ['value' => false, 'enabled' => false]
+			'Highlight whole row' => ['value' => false, 'enabled' => true]
 		];
 
 		foreach ($fields_values as $label => $attributes) {
@@ -404,7 +404,7 @@ class testPageProblems extends CWebTest {
 			foreach (['Show operational data', 'Show details', 'Show timeline'] as $field) {
 				$this->assertTrue($filter_form->getField($field)->isEnabled(!$state));
 			}
-			$this->assertTrue($filter_form->getField('Highlight whole row')->isEnabled($state));
+			$this->assertTrue($filter_form->getField('Highlight whole row')->isEnabled());
 		}
 
 		$this->assertEquals(3, $filter_tab->query('button', ['Save as', 'Apply', 'Reset'])
@@ -1123,7 +1123,7 @@ class testPageProblems extends CWebTest {
 						'Acknowledgement status' => 'Unacknowledged',
 						'Host inventory' => [
 							'action' => USER_ACTION_UPDATE, 'index' => 0,
-							'field' => 'Location latitude', 'value' => '56.95387'
+							'field' => 'Location latitude', 'value' => '56.97612'
 						],
 						'Show tags' => 3,
 						'id:tag_name_format_0' => 'Shortened',
@@ -1985,10 +1985,13 @@ class testPageProblems extends CWebTest {
 
 		$this->assertEquals($data_in_column, $opdata_column->getText());
 
-		// TODO: uncomment the lines below and add new screenshot references after ZBX-25103 is fixed.
-//		if (array_key_exists('screen_name', $data)) {
-//			$this->assertScreenshot($opdata_column, $data['screen_name']);
-//		}
+		if (array_key_exists('screen_name', $data)) {
+			// Remove time from table column - column width varies depending on time text, causing unstable screenshots.
+			CElementQuery::getDriver()->executeScript("arguments[0].textContent = '';",
+					[$table->findRow('Problem', $problem_name)->getColumn('Time')]
+			);
+			$this->assertScreenshot($opdata_column, $data['screen_name']);
+		}
 
 		// Check data in popup.
 		foreach ($data['popup rows'] as $i => $popup_row) {

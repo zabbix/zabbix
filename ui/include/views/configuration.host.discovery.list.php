@@ -235,6 +235,7 @@ $discoveryTable = (new CTableInfo())
 
 $update_interval_parser = new CUpdateIntervalParser(['usermacros' => true]);
 $csrf_token = CCsrfTokenHelper::get('host_discovery.php');
+$current_time = time();
 
 foreach ($data['discoveries'] as $discovery) {
 	// description
@@ -321,12 +322,23 @@ foreach ($data['discoveries'] as $discovery) {
 		$discovery['delay'] = $update_interval_parser->getDelay();
 	}
 
+	$disable_source = $discovery['status'] == ITEM_STATUS_DISABLED && $discovery['discoveryData']
+		? $discovery['discoveryData']['disable_source']
+		: '';
+
 	// info
 	if ($data['context'] === 'host') {
 		$info_icons = [];
 
 		if ($discovery['status'] == ITEM_STATUS_ACTIVE && $discovery['error'] !== '') {
 			$info_icons[] = makeErrorIcon($discovery['error']);
+		}
+
+		if ($discovery['discoveryData'] && $discovery['discoveryData']['status'] == ZBX_LLD_STATUS_LOST) {
+			$info_icons[] = getLldLostEntityIndicator($current_time, $discovery['discoveryData']['ts_delete'],
+				$discovery['discoveryData']['ts_disable'], $disable_source,
+				$discovery['status'] == ITEM_STATUS_DISABLED, _('discovery rule')
+			);
 		}
 	}
 
@@ -345,6 +357,7 @@ foreach ($data['discoveries'] as $discovery) {
 		->getUrl();
 
 	$host = new CLink($discovery['hosts'][0]['name'], $host_url);
+	$disabled_by_lld = $disable_source == ZBX_DISABLE_SOURCE_LLD;
 
 	$discoveryTable->addRow([
 		$checkbox,
@@ -379,7 +392,8 @@ foreach ($data['discoveries'] as $discovery) {
 		],
 		[
 			new CLink(_('Host prototypes'),
-				(new CUrl('host_prototypes.php'))
+				(new CUrl('zabbix.php'))
+					->setArgument('action', 'host.prototype.list')
 					->setArgument('parent_discoveryid', $discovery['itemid'])
 					->setArgument('context', $data['context'])
 			),
@@ -396,7 +410,10 @@ foreach ($data['discoveries'] as $discovery) {
 		(new CDiv($discovery['key_']))->addClass(ZBX_STYLE_WORDWRAP),
 		$discovery['delay'],
 		item_type2str($discovery['type']),
-		$status,
+		[
+			$status,
+			$disabled_by_lld ? makeDescriptionIcon(_('Disabled automatically by an LLD rule.')) : null
+		],
 		($data['context'] === 'host') ? makeInformationList($info_icons) : null
 	]);
 }

@@ -407,7 +407,9 @@ $mediatype_form_grid
 $message_template = (new CTemplateTag('message-templates-row-tmpl'))
 	->addItem(
 		(new CRow([
-			new CCol('#{message_type_name}'),
+			(new CCol('#{message_type_name}'))
+				->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS)
+				->addStyle('max-width: '.ZBX_TEXTAREA_SMALL_WIDTH.'px;'),
 			(new CCol([
 				new CSpan('#{message}'),
 				new CInput('hidden', 'message_templates[#{message_type}][eventsource]', '#{eventsource}'),
@@ -428,7 +430,7 @@ $message_template = (new CTemplateTag('message-templates-row-tmpl'))
 $message_templates_form_grid = (new CFormGrid())
 	->setId('messageTemplatesFormlist')
 	->addItem([
-		(new CLabel(_('Message templates')))->addClass(ZBX_STYLE_WORDBREAK),
+		(new CLabel(_('Message templates'))),
 		(new CFormField(
 			(new CTable())
 				->addStyle('width: 100%;')

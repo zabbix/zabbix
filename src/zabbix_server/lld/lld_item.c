@@ -17,7 +17,6 @@
 #include "lld_audit.h"
 
 #include "zbx_item_constants.h"
-#include "zbxexpression.h"
 #include "zbxregexp.h"
 #include "zbxprometheus.h"
 #include "zbxxml.h"
@@ -1272,6 +1271,9 @@ static int	lld_items_preproc_step_validate(const zbx_lld_item_preproc_t * pp, zb
 		case ZBX_PREPROC_JSONPATH:
 			/* break; is not missing here */
 		case ZBX_PREPROC_ERROR_FIELD_JSON:
+			if (0 != (ZBX_FLAG_DISCOVERY_PROTOTYPE & item->item_flags))
+				break;
+
 			if (FAIL == (ret = zbx_jsonpath_compile(pp->params, &jsonpath)))
 				zbx_strlcpy(err, zbx_json_strerror(), sizeof(err));
 			else
@@ -4383,8 +4385,8 @@ static void	lld_item_prototypes_get(zbx_uint64_t lld_ruleid, zbx_vector_lld_item
 		zbx_hashset_create(&item_prototype->item_index, 0, lld_item_ref_key_hash_func,
 				lld_item_ref_key_compare_func);
 
-		zbx_sync_rowset_init(&item_prototype->macro_paths, 2);
-		zbx_sync_rowset_init(&item_prototype->filters, 3);
+		zbx_sync_rowset_init(&item_prototype->macro_paths, ZBX_LLD_ITEM_PROTOTYPE_MACRO_PATH_COLS_NUM);
+		zbx_sync_rowset_init(&item_prototype->filters, ZBX_LLD_ITEM_PROTOTYPE_FILTERS_COLS_NUM);
 		zbx_sync_rowset_init(&item_prototype->overrides, 5);
 
 		zbx_vector_lld_item_prototype_ptr_append(item_prototypes, item_prototype);

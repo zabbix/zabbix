@@ -367,7 +367,7 @@ class testLowLevelDiscoveryDisabledObjects extends CWebTest {
 
 		// Make previously created LLD rule a discovered LLD rule.
 		foreach ($discovered_lldids['itemids'] as $t => $discovered_lldid) {
-			DBExecute('UPDATE items SET flags=5 WHERE itemid='.$discovered_lldid);
+			DBExecute('UPDATE items SET flags=5, status='.$statuses[$t]['status'].' WHERE itemid='.$discovered_lldid);
 			DBexecute('INSERT INTO item_discovery (itemdiscoveryid, itemid, parent_itemid) values ('.
 					$discovered_lldid.', '.$discovered_lldid.', '.$lld_rule_protototypes['itemids'][$t].');'
 			);
@@ -407,15 +407,14 @@ class testLowLevelDiscoveryDisabledObjects extends CWebTest {
 					'object' => 'graph',
 					'url' => 'zabbix.php?action=graph.list&context=host&filter_set=1&filter_hostids%5B%5D='
 				]
+			],
+			// #4.
+			[
+				[
+					'object' => 'discovery rule',
+					'url' => 'host_discovery.php?context=host&filter_set=1&filter_key=Discovered&filter_hostids%5B%5D='
+				]
 			]
-			// TODO: Uncomment the below case when ZBX-26644 if fixed.
-//			// #4.
-//			[
-//				[
-//					'object' => 'lld_rule',
-//					'url' => 'host_discovery.php?context=host&filter_set=1&filter_hostids%5B%5D='
-//				]
-//			]
 		];
 	}
 
