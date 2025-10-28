@@ -39,7 +39,7 @@ class testPageTriggerUrl extends CWebTest {
 			]
 		]);
 
-		$response = CDataHelper::call('dashboard.create', [
+		self::$dashboardid = CDataHelper::call('dashboard.create', [
 			[
 				'name' => 'Dashboard for Trigger overview widget',
 				'userid' => '1',
@@ -71,8 +71,7 @@ class testPageTriggerUrl extends CWebTest {
 					]
 				]
 			]
-		]);
-		self::$dashboardid = $response['dashboardids'][0];
+		])['dashboardids'][0];
 	}
 
 	public function getTriggerLinkData() {
