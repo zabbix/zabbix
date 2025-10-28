@@ -506,7 +506,6 @@ out:
 		zbx_vector_clickhouse_conn_ptr_append(&d->active_conns, conn);
 	else
 		history_clickhouse_release_conn(d, conn);
-
 }
 
 /******************************************************************************
@@ -563,6 +562,8 @@ static int	history_clickhouse_flush_conns(zbx_clickhouse_data_t *d, CURLM *mhand
 
 	if (0 == (long_query_limit = d->log_slow_queries))
 		long_query_limit = ZBX_HISTORY_STORAGE_DOWN_DELAY;
+	else
+		long_query_limit /= 1000;
 
 	ts_last = zbx_time();
 
