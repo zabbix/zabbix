@@ -36,7 +36,7 @@ int	__wrap_substitute_simple_macros(zbx_uint64_t *actionid, const zbx_db_event *
 		const zbx_service_alarm_t *service_alarm, const zbx_db_service *service, const char *tz, char **data,
 		int macro_type, char *error, int maxerrlen);
 
-int __wrap_zbx_dc_get_data_expected_from(zbx_uint64_t itemid, int *seconds);
+int	__wrap_zbx_dc_get_data_expected_from(zbx_uint64_t itemid, int *seconds);
 
 int	__wrap_zbx_baseline_get_data(uint64_t itemid, unsigned char value_type, time_t now, const char *period,
 			int season_num, zbx_time_unit_t season_unit, int skip, zbx_vector_dbl_t *values,
@@ -76,9 +76,6 @@ int __wrap_zbx_dc_get_data_expected_from(zbx_uint64_t itemid, int *seconds)
 	*seconds = zbx_vcmock_get_ts().sec - 600;
 	return SUCCEED;
 }
-
-// zbx_vector_dbl_t	baseline_get_data_values;
-// zbx_vector_uint64_t	baseline_get_data_index;
 
 int	__wrap_zbx_baseline_get_data(uint64_t itemid, unsigned char value_type, time_t now, const char *period,
 		int season_num, zbx_time_unit_t season_unit, int skip, zbx_vector_dbl_t *baseline_get_data_values,
