@@ -22,7 +22,12 @@
  */
 
 use Widgets\Clock\Widget;
-use Widgets\Clock\Includes\WidgetForm;
+
+const CLOCK_CLASSES = [
+	Widget::SHOW_DATE => 'clock-date',
+	Widget::SHOW_TIME => 'clock-time',
+	Widget::SHOW_TIMEZONE => 'clock-time-zone'
+];
 
 $view = new CWidgetView($data);
 
@@ -39,35 +44,19 @@ else {
 			foreach ($clock_data['show'] as $show) {
 				$div = new CDiv();
 
-				switch ($show) {
-					case Widget::SHOW_DATE:
-						$div->addClass('clock-date');
-						$styles = $data['styles']['date'];
-						break;
+				if (array_key_exists($show, CLOCK_CLASSES)) {
+					$div->addClass(CLOCK_CLASSES[$show]);
 
-					case Widget::SHOW_TIME:
-						$div->addClass('clock-time');
-						$styles = $data['styles']['time'];
-						break;
+					if ($show == Widget::SHOW_TIMEZONE && $clock_data['tzone_format'] == Widget::TIMEZONE_FULL) {
+						$div->addItem([new CSpan(), new CSpan()]);
+					}
 
-					case Widget::SHOW_TIMEZONE:
-						$div->addClass('clock-time-zone');
-						$styles = $data['styles']['timezone'];
-						break;
-
-					default:
-						$styles = null;
-				}
-
-				if ($styles !== null) {
-					$div->addStyle(sprintf('--widget-clock-font: %1$s;', number_format($styles['size'] / 100, 2)));
-
-					if ($styles['bold']) {
+					if ($data['styles'][$show]['bold']) {
 						$div->addClass('bold');
 					}
 
-					if ($styles['color'] !== '') {
-						$div->addStyle(sprintf('color: #%1$s;', $styles['color']));
+					if ($data['styles'][$show]['color'] !== '') {
+						$div->addStyle(sprintf('color: #%1$s;', $data['styles'][$show]['color']));
 					}
 				}
 
@@ -75,14 +64,9 @@ else {
 			}
 		}
 		else {
-			$font_size = array_key_exists('time', $data['styles'])
-				? $data['styles']['time']['size']
-				: WidgetForm::DEFAULT_TIME_SIZE;
-
 			$rows[] = (new CDiv())
 				->addItem(_('No data'))
-				->addClass('clock-disabled')
-				->addStyle(sprintf('--widget-clock-font: %1$s;', number_format($font_size / 100, 2)));
+				->addClass('clock-disabled');
 		}
 
 		$body = (new CDiv($rows))->addClass('clock-digital');
@@ -96,6 +80,8 @@ else {
 	}
 
 	$view->setVar('clock_data', $data['clock_data']);
+	$view->setVar('styles', $data['styles']);
+	$view->setVar('classes', CLOCK_CLASSES);
 }
 
 $view

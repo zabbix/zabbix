@@ -14,10 +14,10 @@
 **/
 
 
-require_once dirname(__FILE__).'/../../include/CWebTest.php';
-require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
-require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
-require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
+require_once __DIR__.'/../../include/CWebTest.php';
+require_once __DIR__.'/../behaviors/CMessageBehavior.php';
+require_once __DIR__.'/../behaviors/CTableBehavior.php';
+require_once __DIR__.'/../../include/helpers/CDataHelper.php';
 
 use Facebook\WebDriver\WebDriverKeys;
 
@@ -47,6 +47,13 @@ class testUserRolesPermissions extends CWebTest {
 	 */
 	protected static $super_roleid;
 	protected static $super_roleid2;
+
+	/**
+	 * Id of created dashboard.
+	 *
+	 * @var integer
+	 */
+	protected static $dashboardid;
 
 	/**
 	 * Id of user that created for future checks.
@@ -113,6 +120,22 @@ class testUserRolesPermissions extends CWebTest {
 	 * Scheduled report.
 	 */
 	public function prepareReportData() {
+		$response = CDataHelper::call('dashboard.create', [
+			[
+				'name' => 'Dashboard for Admin share testing',
+				'userid' => '1',
+				'private' => 1,
+				'pages' => [[]],
+				'users' => [
+					[
+						'userid' => '9',
+						'permission' => 2
+					]
+				]
+			]
+		]);
+		self::$dashboardid = $response['dashboardids'][0];
+
 		$response = CDataHelper::call('report.create', [
 			[
 				'userid' => self::$super_user,
@@ -273,6 +296,7 @@ class testUserRolesPermissions extends CWebTest {
 			// Dashboard creation/edit.
 			[
 				[
+					'replace_link' => true,
 					'page_buttons' => [
 						'Create dashboard',
 						'Delete'
@@ -281,7 +305,7 @@ class testUserRolesPermissions extends CWebTest {
 						'Edit dashboard'
 					],
 					'list_link' => 'zabbix.php?action=dashboard.list',
-					'action_link' => 'zabbix.php?action=dashboard.view&dashboardid=1220',
+					'action_link' => 'zabbix.php?action=dashboard.view&dashboardid=',
 					'action' => 'Create and edit dashboards',
 					'check_links' => ['zabbix.php?action=dashboard.view&new=1']
 				]
@@ -289,7 +313,7 @@ class testUserRolesPermissions extends CWebTest {
 			// Manage scheduled reports.
 			[
 				[
-					'report' => true,
+					'replace_link' => true,
 					'page_buttons' => [
 						'Create report',
 						'Enable',
@@ -304,6 +328,7 @@ class testUserRolesPermissions extends CWebTest {
 						'Cancel'
 					],
 					'list_link' => 'zabbix.php?action=scheduledreport.list',
+					'action_link' => 'zabbix.php?action=scheduledreport.edit&reportid=',
 					'action' => 'Manage scheduled reports',
 					'check_links' => ['zabbix.php?action=scheduledreport.edit']
 				]
@@ -327,8 +352,13 @@ class testUserRolesPermissions extends CWebTest {
 				$this->assertTrue($this->query('button', $button)->one()->isEnabled($action_status));
 			}
 
-			$this->page->open(array_key_exists('report', $data) ? 'zabbix.php?action=scheduledreport.edit&reportid='.
-					self::$reportid : $data['action_link'])->waitUntilReady();
+			$entity_id = (array_key_exists('replace_link', $data) && $data['action'] === 'Manage scheduled reports')
+				? self::$reportid
+				: self::$dashboardid;
+
+			$this->page->open(array_key_exists('replace_link', $data)
+				? $data['action_link'].$entity_id
+				: $data['action_link'])->waitUntilReady();
 
 			foreach ($data['form_button'] as $text) {
 				$this->assertTrue($this->query('button', $text)->one()->isEnabled(($text === 'Cancel') ? true : $action_status));

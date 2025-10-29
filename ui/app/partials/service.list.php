@@ -104,7 +104,7 @@ foreach ($data['services'] as $serviceid => $service) {
 			->addClass(CSeverityHelper::getStyle((int) $service['status'])),
 		$root_cause,
 		zbx_date2str(DATE_FORMAT, $service['created_at']),
-		$data['tags'][$serviceid]
+		(new CDiv($data['tags'][$serviceid]))->addClass(ZBX_STYLE_TAGS_WRAPPER)
 	])));
 }
 

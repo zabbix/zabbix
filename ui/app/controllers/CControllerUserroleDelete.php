@@ -41,9 +41,10 @@ class CControllerUserroleDelete extends CController {
 
 		$deleted = count($roleids);
 
-		$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
-			->setArgument('action', 'userrole.list')
-			->setArgument('page', CPagerHelper::loadPage('userrole.list', null))
+		$response = new CControllerResponseRedirect(
+			(new CUrl('zabbix.php'))
+				->setArgument('action', 'userrole.list')
+				->setArgument('page', CPagerHelper::loadPage('userrole.list', null))
 		);
 
 		if ($result) {

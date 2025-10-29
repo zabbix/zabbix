@@ -124,13 +124,13 @@ abstract class CControllerItemPrototype extends CController {
 
 		$delay_flex = $this->getInput('delay_flex', []);
 
-		if ($delay_flex && !isValidCustomIntervals($delay_flex)) {
+		if ($delay_flex && !isValidCustomIntervals($delay_flex, true)) {
 			$ret = false;
 		}
 
 		$simple_interval_parser = new CSimpleIntervalParser([
 			'usermacros' => true,
-			'lldmacros' => false
+			'lldmacros' => true
 		]);
 
 		if (!in_array($type, [ITEM_TYPE_TRAPPER, ITEM_TYPE_SNMPTRAP, ITEM_TYPE_DEPENDENT])

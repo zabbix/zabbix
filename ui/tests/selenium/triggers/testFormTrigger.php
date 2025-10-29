@@ -14,8 +14,8 @@
 **/
 
 
-require_once dirname(__FILE__).'/../../include/CLegacyWebTest.php';
-require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
+require_once __DIR__.'/../../include/CLegacyWebTest.php';
+require_once __DIR__.'/../behaviors/CMessageBehavior.php';
 
 use Facebook\WebDriver\WebDriverBy;
 use Facebook\WebDriver\WebDriverKeys;
@@ -1391,8 +1391,8 @@ class testFormTrigger extends CLegacyWebTest {
 	 * @param string $name name of a host or template where triggers are opened
 	 */
 	private function filterEntriesAndOpenTriggers($name, $form) {
-		$table = $this->query('xpath://table[@class="list-table"]')->asTable()->one();
 		$this->query('button:Reset')->one()->click();
+		$table = $this->query('xpath://table[@class="list-table"]')->asTable()->one();
 		$form->fill(['Name' => $name]);
 		$this->query('button:Apply')->one()->waitUntilClickable()->click();
 		$table->waitUntilReloaded();

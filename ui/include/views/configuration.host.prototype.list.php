@@ -179,7 +179,7 @@ foreach ($this->data['hostPrototypes'] as $hostPrototype) {
 		$hostTemplates,
 		$status,
 		$discover,
-		$data['tags'][$hostPrototype['hostid']]
+		(new CDiv($data['tags'][$hostPrototype['hostid']]))->addClass(ZBX_STYLE_TAGS_WRAPPER)
 	]);
 }
 

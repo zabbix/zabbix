@@ -14,10 +14,10 @@
 **/
 
 
-require_once dirname(__FILE__).'/../../include/CWebTest.php';
-require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
-require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
-require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
+require_once __DIR__.'/../../include/CWebTest.php';
+require_once __DIR__.'/../../include/helpers/CDataHelper.php';
+require_once __DIR__.'/../behaviors/CMessageBehavior.php';
+require_once __DIR__.'/../behaviors/CTableBehavior.php';
 
 /**
  * @dataSource ExecuteNowAction, LoginUsers, ScheduledReports, UserPermissions
@@ -290,8 +290,10 @@ class testPageUserRoles extends CWebTest {
 	 */
 	public function testPageUserRoles_Filter($data) {
 		$this->page->login()->open('zabbix.php?action=userrole.list');
+		$table = $this->getTable();
 		$form = $this->query('name:zbx_filter')->waitUntilPresent()->asForm()->one();
 		$form->fill(['Name' => $data['name']])->submit();
+		$table->waitUntilReloaded();
 		$this->assertTableDataColumn($data['result'], 'Name');
 	}
 

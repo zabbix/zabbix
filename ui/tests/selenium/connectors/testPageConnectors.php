@@ -14,9 +14,9 @@
 **/
 
 
-require_once dirname(__FILE__).'/../../include/CWebTest.php';
-require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
-require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
+require_once __DIR__.'/../../include/CWebTest.php';
+require_once __DIR__.'/../behaviors/CMessageBehavior.php';
+require_once __DIR__.'/../behaviors/CTableBehavior.php';
 
 /**
  * @backup connector, profiles
@@ -204,6 +204,10 @@ class testPageConnectors extends CWebTest {
 
 		// Check Connectors table content.
 		$this->assertTableHasData($connectors_data);
+
+		// Check that the filter is still expanded after page refresh.
+		$this->page->refresh()->waitUntilReady();
+		$this->assertTrue($filter->isExpanded());
 	}
 
 	public function getFilterData() {
@@ -400,10 +404,12 @@ class testPageConnectors extends CWebTest {
 	public function  testPageConnectors_Filter($data) {
 		$this->page->login()->open('zabbix.php?action=connector.list');
 		$form = $this->query('name:zbx_filter')->asForm()->waitUntilVisible()->one();
+		$table = $this->getTable();
 
 		// Fill filter fields if such present in data provider.
 		$form->fill(CTestArrayHelper::get($data, 'filter'));
 		$form->submit();
+		$table->waitUntilReloaded();
 		$this->page->waitUntilReady();
 
 		// Check that expected Connectors are returned in the list.

@@ -991,15 +991,12 @@ static void	add_sentusers_msg_esc_cancel(zbx_user_msg_t **user_msg, zbx_uint64_t
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 			"select userid,mediatypeid,subject,message,esc_step"
 			" from alerts"
-			" where alertid in (select max(alertid)"
-				" from alerts"
-				" where actionid=" ZBX_FS_UI64
-					" and mediatypeid is not null"
-					" and alerttype=%d"
-					" and acknowledgeid is null"
-					" and eventid=" ZBX_FS_UI64
-					" group by userid,mediatypeid,esc_step)"
-			" order by userid,mediatypeid,esc_step desc",
+			" where actionid=" ZBX_FS_UI64
+				" and mediatypeid is not null"
+				" and alerttype=%d"
+				" and acknowledgeid is null"
+				" and eventid=" ZBX_FS_UI64
+				" order by userid,mediatypeid,esc_step desc",
 			actionid, ALERT_TYPE_MESSAGE, event->eventid);
 
 	result = zbx_db_select("%s", sql);
@@ -2891,7 +2888,10 @@ static void	get_services_rootcause_eventids(const zbx_vector_uint64_t *serviceid
 
 	zbx_ipc_message_init(&response);
 	zbx_service_send(ZBX_IPC_SERVICE_SERVICE_ROOTCAUSE, data, (zbx_uint32_t)data_offset, &response);
-	zbx_service_deserialize_rootcause(response.data, (zbx_uint32_t)response.size, services);
+
+	if (NULL != response.data)
+		zbx_service_deserialize_rootcause(response.data, (zbx_uint32_t)response.size, services);
+
 	zbx_ipc_message_clean(&response);
 
 	zbx_free(data);
@@ -3835,7 +3835,7 @@ ZBX_THREAD_ENTRY(escalator_thread, args)
 			{
 				case ZBX_RTC_SHUTDOWN:
 					zbx_set_exiting_with_succeed();
-					break;
+					goto out;
 				case ZBX_RTC_ESCALATOR_NOTIFY:
 					deserialize_escalationids(&escalationids, rtc_data);
 					zbx_free(rtc_data);
@@ -3853,8 +3853,11 @@ ZBX_THREAD_ENTRY(escalator_thread, args)
 #		undef STAT_INTERVAL
 	}
 
+out:
+	zbx_ipc_async_socket_close(&rtc);
 	zbx_vector_uint64_destroy(&escalationids);
 	notify_alerter(ALERTER_CLOSE);
+	zbx_db_close();
 
 	zbx_setproctitle("%s #%d [terminated]", get_process_type_string(process_type), process_num);
 

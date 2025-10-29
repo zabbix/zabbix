@@ -603,11 +603,20 @@ ZABBIX.apps.map = (function($) {
 						can_remove = false,
 						can_reorder = false;
 
+					if (typeof item_data.id === 'undefined' && target.closest('.sysmap_shape').length) {
+						item_data = {
+							id: target.closest('.sysmap_shape').attr('data-id'),
+							type: target.closest('.sysmap_shape').attr('data-type')
+						}
+					}
+
 					if (typeof item_data.id === 'undefined') {
 						that.clearSelection();
 					}
 					else if (item_data.type && typeof that.selection[item_data.type][item_data.id] === 'undefined') {
+						that.clearSelection();
 						that.selectElements([item_data], false, true);
+						that.toggleForm();
 					}
 
 					can_copy = (that.selection.count.shapes > 0 || that.selection.count.selements > 0);

@@ -154,46 +154,18 @@ class WidgetView extends CControllerDashboardWidgetView {
 	}
 
 	private function configureHostTime(): array {
-		$items = [];
+		if ($this->isTemplateDashboard() && !$this->fields_values['override_hostid']) {
+			return ['is_enabled' => false];
+		}
+
 		$clock = ['is_enabled' => true];
 
-		if ($this->isTemplateDashboard()) {
-			if ($this->fields_values['override_hostid']) {
-				$template_items = API::Item()->get([
-					'output' => ['key_'],
-					'itemids' => $this->fields_values['itemid'],
-					'webitems' => true
-				]);
-
-				if ($template_items) {
-					$items = API::Item()->get([
-						'output' => ['itemid', 'value_type'],
-						'selectHosts' => ['name'],
-						'hostids' => $this->fields_values['override_hostid'],
-						'filter' => [
-							'key_' => $template_items[0]['key_']
-						],
-						'webitems' => true
-					]);
-				}
-			}
-			// Editing template dashboard?
-			else {
-				$clock['is_enabled'] = false;
-			}
-		}
-		else {
-			$items = API::Item()->get([
-				'output' => ['itemid', 'value_type'],
-				'selectHosts' => ['name'],
-				'itemids' => $this->fields_values['itemid'],
-				'webitems' => true
-			]);
-		}
-
-		if (!$clock['is_enabled']) {
-			return $clock;
-		}
+		$items = API::Item()->get([
+			'output' => ['itemid', 'value_type'],
+			'selectHosts' => ['name'],
+			'itemids' => $this->fields_values['itemid'],
+			'webitems' => true
+		]);
 
 		if ($items) {
 			$item = $items[0];
@@ -273,24 +245,21 @@ class WidgetView extends CControllerDashboardWidgetView {
 			$show = $this->fields_values['show'];
 
 			if (in_array(Widget::SHOW_DATE, $show)) {
-				$cells['date'] = [
-					'size' => $this->fields_values['date_size'],
+				$cells[Widget::SHOW_DATE] = [
 					'bold' => ($this->fields_values['date_bold'] == 1),
 					'color' => $this->fields_values['date_color']
 				];
 			}
 
 			if (in_array(Widget::SHOW_TIME, $show)) {
-				$cells['time'] = [
-					'size' => $this->fields_values['time_size'],
+				$cells[Widget::SHOW_TIME] = [
 					'bold' => ($this->fields_values['time_bold'] == 1),
 					'color' => $this->fields_values['time_color']
 				];
 			}
 
 			if (in_array(Widget::SHOW_TIMEZONE, $show)) {
-				$cells['timezone'] = [
-					'size' => $this->fields_values['tzone_size'],
+				$cells[Widget::SHOW_TIMEZONE] = [
 					'bold' => ($this->fields_values['tzone_bold'] == 1),
 					'color' => $this->fields_values['tzone_color']
 				];

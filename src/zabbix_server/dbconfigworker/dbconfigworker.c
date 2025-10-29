@@ -24,6 +24,8 @@
 #include "zbxcacheconfig.h"
 #include "zbxalgo.h"
 #include "zbxdbhigh.h"
+#include "zbxrtc.h"
+#include "zbx_rtc_constants.h"
 
 static void	dbsync_item_rtname(zbx_vector_uint64_t *hostids, int *processed_num, int *updated_num,
 		int *macro_used)
@@ -156,6 +158,9 @@ ZBX_THREAD_ENTRY(zbx_dbconfig_worker_thread, args)
 		exit(EXIT_FAILURE);
 	}
 
+	zbx_rtc_subscribe_service(ZBX_PROCESS_TYPE_DBCONFIGWORKER, 0, NULL, 0, SEC_PER_MIN,
+			ZBX_IPC_SERVICE_DBCONFIG_WORKER);
+
 	zbx_setproctitle("%s #%d started", get_process_type_string(process_type), process_num);
 
 	zbx_vector_uint64_create(&hostids);
@@ -175,6 +180,11 @@ ZBX_THREAD_ENTRY(zbx_dbconfig_worker_thread, args)
 			{
 				case ZBX_IPC_DBCONFIG_WORKER_REQUEST:
 					zbx_dbconfig_worker_deserialize_ids(message->data, message->size, &hostids);
+					break;
+				case ZBX_RTC_SHUTDOWN:
+					zabbix_log(LOG_LEVEL_DEBUG, "shutdown message received, terminating...");
+					timeout.sec = 0;
+					timeout.ns = 1e8;
 					break;
 				default:
 					THIS_SHOULD_NEVER_HAPPEN;
@@ -214,6 +224,9 @@ ZBX_THREAD_ENTRY(zbx_dbconfig_worker_thread, args)
 
 	zbx_vector_uint64_destroy(&hostids);
 	zbx_ipc_service_close(&service);
+	zbx_db_close();
+
+	zbx_setproctitle("%s #%d [terminated]", get_process_type_string(process_type), process_num);
 
 	exit(EXIT_SUCCESS);
 #undef ZBX_DBCONFIG_WORKER_DELAY

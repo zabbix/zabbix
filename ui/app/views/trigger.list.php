@@ -260,7 +260,7 @@ foreach ($data['triggers'] as $tnum => $trigger) {
 		->addClass('js-trigger-edit')
 		->setAttribute('data-triggerid', $triggerid)
 		->setAttribute('data-hostid', $data['single_selected_hostid'])
-		->addClass(ZBX_STYLE_WORDBREAK);
+		->addClass(ZBX_STYLE_WORDWRAP);
 
 	if ($trigger['dependencies']) {
 		$description[] = [BR(), bold(_('Depends on').':')];
@@ -363,7 +363,7 @@ foreach ($data['triggers'] as $tnum => $trigger) {
 			$disabled_by_lld ? makeDescriptionIcon(_('Disabled automatically by an LLD rule.')) : null
 		]))->addClass(ZBX_STYLE_NOWRAP),
 		$data['show_info_column'] ? makeInformationList($info_icons) : null,
-		$data['tags'][$triggerid]
+		(new CDiv($data['tags'][$triggerid]))->addClass(ZBX_STYLE_TAGS_WRAPPER)
 	]);
 }
 

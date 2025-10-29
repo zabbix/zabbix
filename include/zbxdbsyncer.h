@@ -24,6 +24,7 @@ typedef struct
 	int				config_histsyncer_frequency;
 	int				config_timeout;
 	int				config_history_storage_pipelines;
+	int				config_syncer_num;
 }
 zbx_thread_dbsyncer_args;
 

@@ -54,23 +54,12 @@ $formula = (new CTextBox('formula', $data['formula'], false, DB::getFieldLength(
 	->setAttribute('placeholder', 'A or (B and C) ...');
 
 $condition_hidden_data = (new CCol([
-	(new CButtonLink(_('Remove')))
-		->addClass('js-remove-condition'),
-	(new CInput('hidden'))
-		->setAttribute('value', '#{conditiontype}')
-		->setName('conditions[#{row_index}][conditiontype]'),
-	(new CInput('hidden'))
-		->setAttribute('value', '#{operator}')
-		->setName('conditions[#{row_index}][operator]'),
-	(new CInput('hidden'))
-		->setAttribute('value', '#{value}')
-		->setName('conditions[#{row_index}][value]'),
-	(new CInput('hidden'))
-		->setAttribute('value', '#{value2}')
-		->setName('conditions[#{row_index}][value2]'),
-	(new CInput('hidden'))
-		->setAttribute('value', '#{label}')
-		->setName('conditions[#{row_index}][formulaid]')
+	(new CButtonLink(_('Remove')))->addClass('js-remove-condition'),
+	new CInput('hidden', 'conditions[#{row_index}][conditiontype]', '#{conditiontype}'),
+	new CInput('hidden', 'conditions[#{row_index}][operator]', '#{operator}'),
+	new CInput('hidden', 'conditions[#{row_index}][value]', '#{value}'),
+	new CInput('hidden', 'conditions[#{row_index}][value2]', '#{value2}'),
+	new CInput('hidden', 'conditions[#{row_index}][formulaid]', '#{label}')
 ]));
 
 $condition_suppressed_template = (new CTemplateTag('condition-suppressed-row-tmpl'))->addItem(

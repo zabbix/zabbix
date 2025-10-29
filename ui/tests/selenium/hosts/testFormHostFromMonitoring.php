@@ -14,7 +14,7 @@
 **/
 
 
-require_once dirname(__FILE__).'/../common/testFormHost.php';
+require_once __DIR__.'/../common/testFormHost.php';
 
 /**
  * @dataSource DiscoveredHosts, Proxies

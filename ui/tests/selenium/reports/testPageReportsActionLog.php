@@ -14,8 +14,8 @@
 **/
 
 
-require_once dirname(__FILE__).'/../../include/CWebTest.php';
-require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
+require_once __DIR__.'/../../include/CWebTest.php';
+require_once __DIR__.'/../behaviors/CTableBehavior.php';
 
 /**
  * @backup alerts
@@ -162,7 +162,7 @@ class testPageReportsActionLog extends CWebTest {
 			[
 				[
 					'fields' => [
-						'Media types' => ['Github']
+						'Media types' => ['GitHub']
 					],
 					'result' => []
 				]
@@ -673,8 +673,9 @@ class testPageReportsActionLog extends CWebTest {
 			if ($filter_tab->exists()) {
 				$filter_tab->one()->click();
 			}
-
+			$table = $this->getTable();
 			$form->fill($data['fields'])->submit();
+			$table->waitUntilReloaded();
 		}
 
 		$this->page->waitUntilReady();

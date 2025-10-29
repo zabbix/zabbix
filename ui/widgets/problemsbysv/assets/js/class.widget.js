@@ -70,8 +70,10 @@ class CWidgetProblemsBySv extends CWidget {
 
 		this.#table_body.addEventListener('click', e => this.#onTableBodyClick(e));
 
-		if (!this.hasEverUpdated() && this.isReferred()) {
-			this.#selected_hostgroupid = this.#getDefaultSelectable();
+		if (this.isReferred() && (this.isFieldsReferredDataUpdated() || !this.hasEverUpdated())) {
+			if (this.#selected_hostgroupid === null || !this.#hasSelectable()) {
+				this.#selected_hostgroupid = this.#getDefaultSelectable();
+			}
 
 			if (this.#selected_hostgroupid !== null) {
 				this.#select();
@@ -87,6 +89,10 @@ class CWidgetProblemsBySv extends CWidget {
 		const row = this.#table_body.querySelector('[data-hostgroupid]');
 
 		return row !== null ? row.dataset.hostgroupid : null;
+	}
+
+	#hasSelectable() {
+		return this.#table_body.querySelector(`[data-hostgroupid="${this.#selected_hostgroupid}"]`) !== null;
 	}
 
 	#select() {

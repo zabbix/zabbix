@@ -14,8 +14,8 @@
 **/
 
 
-require_once dirname(__FILE__).'/../../include/CWebTest.php';
-require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
+require_once __DIR__.'/../../include/CWebTest.php';
+require_once __DIR__.'/../behaviors/CMessageBehavior.php';
 
 /**
  * Base class for "Hosts and Problems filter save" function tests.
@@ -46,9 +46,11 @@ class testFormFilter extends CWebTest {
 			case TEST_GOOD:
 				$table = $this->query($table_selector)->asTable()->waitUntilReady()->one();
 				$rows = $table->getRows();
+
+				// If rows are expected, info rows, like date indication row in Problems page, should not be counted.
 				$filtered_rows_count = ($rows->count() === 1 && $rows->asText() === ['No data found'])
 					? 0
-					: $rows->count();
+					: $rows->filter(CElementFilter::CLASSES_NOT_PRESENT, ['hover-nobg'])->count();
 
 				// Checking that data exists after saving filter.
 				if (array_key_exists('filter_form', $data)) {

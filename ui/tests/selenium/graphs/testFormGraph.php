@@ -14,7 +14,7 @@
 **/
 
 
-require_once dirname(__FILE__).'/../common/testFormGraphs.php';
+require_once __DIR__.'/../common/testFormGraphs.php';
 
 /**
  * @backup graphs

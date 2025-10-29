@@ -99,7 +99,7 @@ Also, see the Macros section for a list of macros used to set trigger values.
 |TiDB: Too few keep alive operations|<p>Indicates whether the TiDB process still exists. If the number of times for tidb_monitor_keep_alive_total increases less than 10 per minute, the TiDB process might already exit and an alert is triggered.</p>|`max(/TiDB by HTTP/tidb.monitor_keep_alive.rate,5m)<{$TIDB.MONITOR_KEEP_ALIVE.MAX.WARN}`|Average||
 |TiDB: Heap memory usage is too high||`min(/TiDB by HTTP/tidb.heap_bytes,5m)>{$TIDB.HEAP.USAGE.MAX.WARN}`|Warning||
 |TiDB: Current number of open files is too high|<p>Heavy file descriptor usage (i.e., near the process's file descriptor limit) indicates a potential file descriptor exhaustion issue.</p>|`min(/TiDB by HTTP/tidb.process_open_fds,5m)/last(/TiDB by HTTP/tidb.process_max_fds)*100>{$TIDB.OPEN.FDS.MAX.WARN}`|Warning||
-|TiDB: has been restarted|<p>Uptime is less than 10 minutes.</p>|`last(/TiDB by HTTP/tidb.uptime)<10m`|Info|**Manual close**: Yes|
+|TiDB: Instance has been restarted|<p>Uptime is less than 10 minutes.</p>|`last(/TiDB by HTTP/tidb.uptime)<10m`|Info|**Manual close**: Yes|
 |TiDB: Version has changed|<p>TiDB version has changed. Acknowledge to close the problem manually.</p>|`last(/TiDB by HTTP/tidb.version,#1)<>last(/TiDB by HTTP/tidb.version,#2) and length(last(/TiDB by HTTP/tidb.version))>0`|Info|**Manual close**: Yes|
 |TiDB: Too many time jump backs||`min(/TiDB by HTTP/tidb.monitor_time_jump_back.rate,5m)>{$TIDB.TIME_JUMP_BACK.MAX.WARN}`|Warning||
 |TiDB: There are panicked TiDB threads|<p>When a panic occurs, an alert is triggered. The thread is often recovered, otherwise, TiDB will frequently restart.</p>|`last(/TiDB by HTTP/tidb.tidb_server_panic_total.rate)>0`|Average||

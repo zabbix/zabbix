@@ -152,9 +152,10 @@ class CProblem extends CApiService {
 					' JOIN items i1 ON f1.itemid=i1.itemid'.
 					' JOIN host_hgset hh1 ON i1.hostid=hh1.hostid'.
 					' LEFT JOIN permission pp1 ON hh1.hgsetid=pp1.hgsetid'.
-						' AND pp1.ugsetid=pp.ugsetid'.
-					' WHERE p.objectid=f1.triggerid'.
-						' AND pp1.permission IS NULL'.
+						' AND pp1.ugsetid='.self::$userData['ugsetid'].
+					' WHERE f.triggerid=f1.triggerid'.
+						' AND i.itemid!=f1.itemid'.
+						' AND pp1.hgsetid IS NULL'.
 				')';
 
 				if ($options['source'] == EVENT_SOURCE_TRIGGERS) {
@@ -383,9 +384,8 @@ class CProblem extends CApiService {
 		}
 
 		if ($tag_conditions) {
-			$sql_parts['from']['pt'] = 'problem_tag pt';
-			$sql_parts['where']['p-pt'] = 'p.eventid=pt.eventid';
-
+			$sql_parts['left_join'][] = ['alias' => 'pt', 'table' => 'problem_tag', 'using' => 'eventid'];
+			$sql_parts['left_table'] = ['alias' => 'p', 'table' => 'problem'];
 			if ($full_access_groupids || count($tag_conditions) > 1) {
 				foreach ($tag_conditions as &$tag_condition) {
 					$tag_condition = '('.$tag_condition.')';

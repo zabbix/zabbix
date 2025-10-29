@@ -14,8 +14,8 @@
 **/
 
 
-require_once dirname(__FILE__).'/../../include/CWebTest.php';
-require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
+require_once __DIR__.'/../../include/CWebTest.php';
+require_once __DIR__.'/../behaviors/CTableBehavior.php';
 
 /**
  * @backup hosts
@@ -104,6 +104,10 @@ class testPageMonitoringWebDetails extends CWebTest {
 			$filter_tab->expand($status);
 			$this->assertTrue($filter_tab->isExpanded($status));
 		}
+
+		// Check that the filter is still expanded after page refresh.
+		$this->page->refresh()->waitUntilReady();
+		$this->assertTrue($filter_tab->isExpanded());
 	}
 
 	public function getCheckFiltersData() {

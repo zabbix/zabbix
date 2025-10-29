@@ -35,8 +35,6 @@
 
 ZBX_PTR_VECTOR_IMPL(am_source_stats_ptr, zbx_am_source_stats_t *)
 
-static zbx_es_t	es_engine;
-
 /******************************************************************************
  *                                                                            *
  * Purpose: executes script alert type                                        *
@@ -287,14 +285,14 @@ static void	alerter_process_webhook(zbx_ipc_socket_t *socket, zbx_ipc_message_t 
 {
 	char		*script_bin = NULL, *params = NULL, *error = NULL, *output = NULL;
 	int		script_bin_sz, ret, timeout;
+	zbx_es_t	es_engine;
 	unsigned char	debug;
 
 	zbx_alerter_deserialize_webhook(ipc_message->data, &script_bin, &script_bin_sz, &timeout, &params, &debug);
 
-	if (SUCCEED != (ret = zbx_es_is_env_initialized(&es_engine)))
-		ret = zbx_es_init_env(&es_engine, config_source_ip, &error);
+	zbx_es_init(&es_engine);
 
-	if (SUCCEED == ret)
+	if (SUCCEED == (ret = zbx_es_init_env(&es_engine, config_source_ip, &error)))
 	{
 		zbx_es_set_timeout(&es_engine, timeout);
 
@@ -312,20 +310,10 @@ static void	alerter_process_webhook(zbx_ipc_socket_t *socket, zbx_ipc_message_t 
 	else
 		alerter_send_result(socket, output, ret, error, NULL);
 
-	if (SUCCEED == zbx_es_fatal_error(&es_engine))
-	{
-		char	*errmsg = NULL;
-		if (SUCCEED != zbx_es_destroy_env(&es_engine, &errmsg))
-		{
-			zabbix_log(LOG_LEVEL_WARNING,
-					"Cannot destroy embedded scripting engine environment: %s", errmsg);
-			zbx_free(errmsg);
-		}
-	}
-
 	zbx_free(output);
 	zbx_free(error);
 	zbx_free(params);
+	zbx_es_destroy(&es_engine);
 	zbx_free(script_bin);
 }
 
@@ -353,8 +341,6 @@ ZBX_THREAD_ENTRY(zbx_alerter_thread, args)
 	zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
 
 	zbx_setproctitle("%s [connecting to the database]", get_process_type_string(process_type));
-
-	zbx_es_init(&es_engine);
 
 	zbx_ipc_message_init(&message);
 

@@ -6,4 +6,6 @@ libzbxscripts_a_SOURCES = \
 	scripts.c
 
 libzbxscripts_a_CFLAGS = \
-	$(TLS_CFLAGS)
+	$(TLS_CFLAGS) \
+	$(ARES_CFLAGS) \
+	$(LIBEVENT_CFLAGS)

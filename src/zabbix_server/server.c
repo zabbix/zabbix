@@ -1552,6 +1552,7 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 							config_java_gateway_port, config_externalscripts,
 							config_enable_global_scripts, zbx_get_value_internal_ext_server,
 							config_ssh_key_location, config_webdriver_url,
+							.trapper_process_request_func_cb =
 							zbx_trapper_process_request_server,
 							zbx_autoreg_update_host_server};
 	zbx_thread_escalator_args	escalator_args = {zbx_config_tls, get_zbx_program_type, zbx_config_timeout,
@@ -1609,7 +1610,8 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 	zbx_thread_lld_manager_args	lld_manager_args = {get_config_forks};
 	zbx_thread_connector_manager_args	connector_manager_args = {get_config_forks};
 	zbx_thread_dbsyncer_args		dbsyncer_args = {&events_cbs, config_histsyncer_frequency,
-								zbx_config_timeout, config_history_storage_pipelines};
+								zbx_config_timeout, config_history_storage_pipelines,
+								get_config_forks(ZBX_PROCESS_TYPE_HISTSYNCER)};
 	zbx_thread_vmware_args			vmware_args = {zbx_config_source_ip, config_vmware_frequency,
 								config_vmware_perf_frequency, config_vmware_timeout};
 	zbx_thread_timer_args		timer_args = {get_config_forks};
@@ -2530,6 +2532,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 
 		zbx_vault_renew_token(&zbx_config_vault, zbx_config_source_ip, config_ssl_ca_location,
 				config_ssl_cert_location, config_ssl_key_location);
+
+		__zbx_update_env(zbx_time());
 	}
 
 	zbx_log_exit_signal();

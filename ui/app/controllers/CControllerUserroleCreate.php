@@ -105,7 +105,9 @@ class CControllerUserroleCreate extends CControllerUserroleEditGeneral {
 		if (!$ret) {
 			switch ($error) {
 				case self::VALIDATION_ERROR:
-					$response = new CControllerResponseRedirect('zabbix.php?action=userrole.edit');
+					$response = new CControllerResponseRedirect(
+						(new CUrl('zabbix.php'))->setArgument('action', 'userrole.edit')
+					);
 					$response->setFormData($this->getInputAll());
 					CMessageHelper::setErrorTitle(_('Cannot create user role'));
 					$this->setResponse($response);

@@ -61,17 +61,12 @@ catch (Throwable $e) {
 	$json_data = json_decode($data, true);
 
 	if (array_key_exists('id', $json_data)) {
-		$user_type = CUser::$userData === null ? USER_TYPE_ZABBIX_USER : CUser::$userData['type'];
-		$data = ($e instanceof DBException && $user_type != USER_TYPE_SUPER_ADMIN && $e->getCode() != DB::INIT_ERROR)
-			? _('System error occurred. Please contact Zabbix administrator.')
-			: $e->getMessage();
-
 		echo json_encode([
 			'jsonrpc' => '2.0',
 			'error' => [
 				'code' => -32603,
 				'message' => _('Internal error.'),
-				'data' => $data
+				'data' => $e->getMessage()
 			],
 			'id' => $json_data['id']
 		]);

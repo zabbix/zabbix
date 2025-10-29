@@ -116,7 +116,7 @@ int	pb_free_space(zbx_pb_t *pb, size_t size)
 {
 	int	ret = SUCCEED;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() size:" ZBX_FS_SIZE_T, __func__, size);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() size:" ZBX_FS_SIZE_T, __func__, (zbx_fs_size_t)size);
 
 	ssize_t	size_left = (ssize_t)size;
 
@@ -736,7 +736,7 @@ void	zbx_pb_init(void)
 
 	pb_init_state(pb_data);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s(): state:%d", __func__, pb_data->state);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s(): state:%u", __func__, pb_data->state);
 }
 
 /******************************************************************************

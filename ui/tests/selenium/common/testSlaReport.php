@@ -14,9 +14,9 @@
 **/
 
 
-require_once dirname(__FILE__).'/../../include/CWebTest.php';
-require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
-require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
+require_once __DIR__.'/../../include/CWebTest.php';
+require_once __DIR__.'/../behaviors/CMessageBehavior.php';
+require_once __DIR__.'/../behaviors/CTableBehavior.php';
 
 class testSlaReport extends CWebTest {
 
@@ -473,7 +473,7 @@ class testSlaReport extends CWebTest {
 							implode(', ', $reference_uptime)
 					);
 
-					// Calculate the error budet based on the actual uptime and compare with actual error budget.
+					// Calculate the error budget based on the actual uptime and compare with actual error budget.
 					$uptime_seconds = 0;
 					foreach (explode(' ', $uptime) as $time_unit) {
 						$uptime_seconds = $uptime_seconds + timeUnitToSeconds($time_unit);

@@ -70,6 +70,7 @@ switch ($data['type']) {
 					new CFormField([
 						new CVar('parameters['.$i.'][name]', $parameter['name']),
 						(new CTextBox('parameters['.$i.'][value]', $parameter['value']))
+							->setAttribute('maxlength', DB::getFieldLength('media_type_param', 'value'))
 							->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
 					])
 				]);

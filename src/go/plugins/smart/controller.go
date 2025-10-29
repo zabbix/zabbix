@@ -86,14 +86,25 @@ func (s *SmartCtl) Execute(args ...string) ([]byte, error) {
 		CombinedOutput()
 	if err != nil {
 		exitErr := &exec.ExitError{}
-		if errors.As(err, &exitErr) {
-			return nil, errs.Wrapf(err, "%q", strings.TrimSuffix(string(out), "\n"))
+		if !errors.As(err, &exitErr) {
+			return nil, errs.Wrap(
+				err,
+				"failed to get combined output of stdout and stderr for smartctl process",
+			)
 		}
 
-		return nil, errs.Wrap(
-			err,
-			"failed to get combined output of stdout and stderr for smartctl process",
-		)
+		failing, ferr := failExistStatus(exitErr)
+		if ferr != nil {
+			return nil, errs.Wrapf(
+				err,
+				"failed to get combined output of stdout and stderr for smartctl process, %s",
+				ferr.Error(),
+			)
+		}
+
+		if failing {
+			return nil, errs.Wrapf(err, "%q", strings.TrimSuffix(string(out), "\n"))
+		}
 	}
 
 	s.logr.Debugf(
@@ -101,4 +112,16 @@ func (s *SmartCtl) Execute(args ...string) ([]byte, error) {
 	)
 
 	return out, nil
+}
+
+func failExistStatus(e *exec.ExitError) (bool, error) {
+	// exit codes taken from smartctl documentation
+	switch e.ExitCode() {
+	case 1, 2, 4, 8:
+		return true, nil
+	case 0, 16, 32, 64, 128:
+		return false, nil
+	default:
+		return true, errs.Errorf("unknown status code %d ", e.ExitCode())
+	}
 }

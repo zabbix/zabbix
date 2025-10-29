@@ -33,11 +33,13 @@ int	zbx_es_init_env(zbx_es_t *es, const char *config_source_ip, char **error);
 int	zbx_es_destroy_env(zbx_es_t *es, char **error);
 int	zbx_es_is_env_initialized(zbx_es_t *es);
 int	zbx_es_init_browser_env(zbx_es_t *es, const char *endpoint, char **error);
+int	zbx_es_globals_make_readonly(zbx_es_t *es, char **error);
 
 int		zbx_es_fatal_error(zbx_es_t *es);
 int		zbx_es_compile(zbx_es_t *es, const char *script, char **code, int *size, char **error);
 int		zbx_es_execute(zbx_es_t *es, const char *script, const char *code, int size, const char *param,
 		char **script_ret, char **error);
+size_t		zbx_es_total_alloc(const zbx_es_t *es);
 void		zbx_es_set_timeout(zbx_es_t *es, int timeout);
 void		zbx_es_debug_enable(zbx_es_t *es);
 void		zbx_es_debug_disable(zbx_es_t *es);

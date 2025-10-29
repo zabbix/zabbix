@@ -71,8 +71,8 @@ static int	tcpsvc_send_context_init(const unsigned char svc_type, unsigned char 
 	return SUCCEED;
 }
 
-static int	tcpsvc_task_process(short event, void *data, int *fd, struct evutil_addrinfo **current_ai,
-			const char *addr, char *dnserr, struct event *timeout_event)
+static int	tcpsvc_task_process(short event, void *data, int *fd, zbx_vector_address_t *addresses,
+		const char *reverse_dns, char *dnserr, struct event *timeout_event)
 {
 #	define	SET_RESULT_SUCCEED								\
 		SET_UI64_RESULT(&tcpsvc_context->item.result, 1);				\
@@ -98,7 +98,6 @@ static int	tcpsvc_task_process(short event, void *data, int *fd, struct evutil_a
 
 	ZBX_UNUSED(dnserr);
 	ZBX_UNUSED(timeout_event);
-	ZBX_UNUSED(current_ai);
 
 	if (NULL != poller_config && ZBX_PROCESS_STATE_IDLE == poller_config->state)
 	{
@@ -107,13 +106,14 @@ static int	tcpsvc_task_process(short event, void *data, int *fd, struct evutil_a
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() step '%s' event:%d itemid:" ZBX_FS_UI64 " addr:%s", __func__,
-				get_tcpsvc_step_string(tcpsvc_context->step), event, tcpsvc_context->item.itemid, addr);
+				get_tcpsvc_step_string(tcpsvc_context->step), event, tcpsvc_context->item.itemid,
+				0 != addresses->values_num ? addresses->values[0].ip : "");
 
 
 	if (ZABBIX_ASYNC_STEP_REVERSE_DNS == tcpsvc_context->rdns_step)
 	{
-		if (NULL != addr)
-			tcpsvc_context->reverse_dns = zbx_strdup(NULL, addr);
+		if (NULL != reverse_dns)
+			tcpsvc_context->reverse_dns = zbx_strdup(NULL, reverse_dns);
 
 		goto stop;
 	}
@@ -133,8 +133,8 @@ static int	tcpsvc_task_process(short event, void *data, int *fd, struct evutil_a
 					tcpsvc_context->item.itemid);
 
 			if (SUCCEED != zbx_socket_connect(&tcpsvc_context->s, SOCK_STREAM,
-					tcpsvc_context->config_source_ip, addr, tcpsvc_context->item.interface.port,
-					tcpsvc_context->config_timeout))
+					tcpsvc_context->config_source_ip, addresses->values[0].ip,
+					tcpsvc_context->item.interface.port, tcpsvc_context->config_timeout))
 			{
 				tcpsvc_context->item.ret = NETWORK_ERROR;
 				SET_MSG_RESULT(&tcpsvc_context->item.result, zbx_dsprintf(NULL, "net.tcp.service check"
@@ -350,7 +350,7 @@ int	zbx_async_check_tcpsvc(zbx_dc_item_t *item, unsigned char svc_type, AGENT_RE
 	if (SUCCEED == (ret = tcpsvc_send_context_init(tcpsvc_context->svc_type, ZBX_TCP_PROTOCOL,
 			&tcpsvc_context->tcp_send_context, result)))
 	{
-		zbx_async_poller_add_task(base, dnsbase, tcpsvc_context->item.interface.addr, tcpsvc_context,
+		zbx_async_poller_add_task(base, NULL, dnsbase, tcpsvc_context->item.interface.addr, tcpsvc_context,
 				item->timeout + 1, tcpsvc_task_process, clear_cb);
 	}
 	else

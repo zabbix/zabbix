@@ -418,6 +418,42 @@ const char	*zbx_variant_type_desc(const zbx_variant_t *value)
 	return zbx_get_variant_type_desc(value->type);
 }
 
+zbx_uint64_t	zbx_variant_size(const zbx_variant_t *value)
+{
+	zbx_uint64_t	size = 0;
+	zbx_uint32_t	size32;
+
+	switch (value->type)
+	{
+		case ZBX_VARIANT_STR:
+			size = strlen(value->data.str) + 1;
+			break;
+		case ZBX_VARIANT_BIN:
+			memcpy(&size32, value->data.bin, sizeof(size32));
+			size = size32;
+			break;
+		case ZBX_VARIANT_ERR:
+			size = strlen(value->data.err);
+			break;
+		case ZBX_VARIANT_VECTOR:
+			if (NULL != value->data.vector)
+			{
+				int	i;
+
+				size += sizeof(zbx_vector_var_t);
+				for (i = 0; i < value->data.vector->values_num; i++)
+					size += zbx_variant_size(&value->data.vector->values[i]);
+
+				size += sizeof(zbx_variant_t) * (value->data.vector->values_alloc - i);
+			}
+			break;
+		default:
+			break;
+	}
+
+	return size + sizeof(zbx_variant_t);
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: compares two variant values when at least one is empty (having    *

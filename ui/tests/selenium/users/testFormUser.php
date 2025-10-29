@@ -14,7 +14,7 @@
 **/
 
 
-require_once dirname(__FILE__) . '/../../include/CWebTest.php';
+require_once __DIR__ . '/../../include/CWebTest.php';
 
 /**
  * @backup users
@@ -81,6 +81,15 @@ class testFormUser extends CWebTest {
 						'usrgrpid' => $usergrpids['Zabbix LDAP']
 					]
 				]
+			]
+		]);
+
+		CDataHelper::call('dashboard.create', [
+			[
+				'name' => 'Testing share dashboard',
+				'userid' => '9',
+				'private' => 0,
+				'pages' => [[]]
 			]
 		]);
 	}
@@ -207,6 +216,7 @@ class testFormUser extends CWebTest {
 			}
 
 			$form->query('button:Change password')->one()->click();
+			$form->waitUntilReloaded();
 			$this->assertFalse($form->query('button:Change password')->one(false)->isValid());
 		}
 
@@ -798,7 +808,7 @@ class testFormUser extends CWebTest {
 					'role' => 'Guest role'
 				]
 			],
-			// Creating a user with optional parameters specified (including autologout) using Cyrillic charatcers.
+			// Creating a user with optional parameters specified (including autologout) using Cyrillic characters.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -902,7 +912,7 @@ class testFormUser extends CWebTest {
 
 		if (array_key_exists('role', $data)) {
 			$form->selectTab('Permissions');
-			$form->fill(['Role' => $data['role']]);
+			$form->fill(['Role' => $data['role']])->waitUntilStalled();
 		}
 
 		$form->submit();
@@ -1566,7 +1576,7 @@ class testFormUser extends CWebTest {
 			$this->page->logout();
 
 			// Attempt to sign in with old password.
-			$this->page->userLogin($data['username'], $data['old_password']);
+			$this->page->userLogin($data['username'], $data['old_password'], TEST_BAD);
 			$message = $this->query('class:red')->one()->getText();
 			$this->assertEquals($message, $data['error_message']);
 

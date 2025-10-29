@@ -14,9 +14,9 @@
 **/
 
 
-require_once dirname(__FILE__).'/../../include/CLegacyWebTest.php';
-require_once dirname(__FILE__).'/../../../include/items.inc.php';
-require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
+require_once __DIR__.'/../../include/CLegacyWebTest.php';
+require_once __DIR__.'/../../../include/items.inc.php';
+require_once __DIR__.'/../behaviors/CMessageBehavior.php';
 
 define('LONG_KEY', substr(STRING_6000, 0, 2038).'[{#MACRO}]');
 
@@ -1041,13 +1041,15 @@ class testFormTriggerPrototype extends CLegacyWebTest {
 		}
 
 		if (isset($data['constructor'])) {
-			$this->zbxTestClickButtonText('Expression constructor');
+			$button = $this->query('button:Expression constructor')->one()->click();
+
 			$constructor = $data['constructor'];
 			if (isset($constructor['errors']) && !array_key_exists('elementError', $constructor)) {
 				$this->assertMessage(TEST_BAD, $constructor['errors']['header'], $constructor['errors']['details']);
 				COverlayDialogElement::find()->one()->close();
 			}
 			else {
+				$button->waitUntilNotVisible();
 				$this->query('xpath://*[@id="expression-table"]/div[1]')->waitUntilVisible()->one();
 				$this->zbxTestAssertElementPresentXpath("//button[@name='test_expression']");
 				$this->zbxTestAssertVisibleXpath("//div[@id='expression-row']//button[@id='and_expression']");
@@ -1224,10 +1226,12 @@ class testFormTriggerPrototype extends CLegacyWebTest {
 	 * @param string $name name of a host or template where triggers are opened
 	 */
 	private function filterEntriesAndOpenDiscovery($name, $form) {
+		$table = $this->query('xpath://table[@class="list-table"]')->asTable()->one();
 		$this->query('button:Reset')->one()->click();
 		$form->fill(['Name' => $name]);
 		$this->query('button:Apply')->one()->waitUntilClickable()->click();
-		$this->query('xpath://table[@class="list-table"]')->asTable()->one()->findRow('Name', $name)
-				->getColumn('Discovery')->query('link:Discovery')->one()->click();
+		$form->waitUntilStalled();
+		$table->waitUntilReloaded();
+		$table->findRow('Name', $name)->getColumn('Discovery')->query('link:Discovery')->one()->click();
 	}
 }

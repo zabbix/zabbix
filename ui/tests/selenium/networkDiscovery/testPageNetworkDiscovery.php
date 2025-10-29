@@ -14,9 +14,9 @@
 **/
 
 
-require_once dirname(__FILE__).'/../../include/CWebTest.php';
-require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
-require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
+require_once __DIR__.'/../../include/CWebTest.php';
+require_once __DIR__.'/../behaviors/CMessageBehavior.php';
+require_once __DIR__.'/../behaviors/CTableBehavior.php';
 
 /**
  * @backup drules
@@ -333,9 +333,11 @@ class testPageNetworkDiscovery extends CWebTest {
 	 */
 	public function testPageNetworkDiscovery_CheckFilter($data) {
 		$this->page->login()->open('zabbix.php?action=discovery.list&sort=name&sortorder=DESC');
+		$table = $this->query('class:list-table')->asTable()->one();
 		$form = $this->query('name:zbx_filter')->asForm()->waitUntilVisible()->one();
 		$form->fill(CTestArrayHelper::get($data, 'filter'));
 		$form->submit();
+		$table->waitUntilReloaded();
 		$this->page->waitUntilReady();
 		$this->assertTableDataColumn(CTestArrayHelper::get($data, 'expected'));
 		$this->assertTableStats(count($data['expected']));
@@ -346,7 +348,7 @@ class testPageNetworkDiscovery extends CWebTest {
 	 * Check Network Discovery pages reset buttons functionality.
 	 */
 	public function testPageNetworkDiscovery_ResetButton() {
-		$this->page->login()->open('zabbix.php?action=discovery.list&sort=name&sortorder=DESC');
+		$this->page->login()->open('zabbix.php?action=discovery.list&sort=name&sortorder=DESC&filter_rst=1');
 		$form = $this->query('name:zbx_filter')->asForm()->waitUntilVisible()->one();
 		$table = $this->query('class:list-table')->asTable()->one();
 
@@ -358,6 +360,8 @@ class testPageNetworkDiscovery extends CWebTest {
 		// Filling fields with needed discovery rules information.
 		$form->fill(['id:filter_name' => 'External network']);
 		$form->submit();
+		$table->waitUntilReloaded();
+		$this->page->waitUntilReady();
 
 		// Check that filtered count matches expected.
 		$this->assertEquals(1, $table->getRows()->count());
@@ -566,7 +570,8 @@ class testPageNetworkDiscovery extends CWebTest {
 					],
 					'single' => true,
 					'action' => 'Delete',
-					'error' => 'Discovery rule "Discovery rule for deleting, used in Action" is used in "Action with discovery rule" action.'
+					'error' => 'Cannot delete discovery rule "Discovery rule for deleting, used in Action": '.
+							'action "Action with discovery rule" uses this discovery rule.'
 				]
 			],
 			// Delete action for discovery rule check which is used in action.
@@ -577,7 +582,9 @@ class testPageNetworkDiscovery extends CWebTest {
 					],
 					'single' => true,
 					'action' => 'Delete',
-					'error' => 'Discovery rule "Discovery rule for deleting, check used in Action" is used in "Action with discovery check" action.'
+					'error' => 'Cannot delete discovery check "Telnet (15)" of discovery rule '.
+							'"Discovery rule for deleting, check used in Action"'.
+							': action "Action with discovery check" uses this discovery check.'
 				]
 			]
 		];
@@ -588,7 +595,8 @@ class testPageNetworkDiscovery extends CWebTest {
 	 */
 	public function testPageNetworkDiscovery_Actions($data) {
 		$old_hash = CDBHelper::getHash(self::SQL);
-		$this->page->login()->open('zabbix.php?action=discovery.list&sort=name&sortorder=DESC');
+		// Added &filter_rst=1 in case testPageNetworkDiscovery_ResetButton test fails midway.
+		$this->page->login()->open('zabbix.php?action=discovery.list&sort=name&sortorder=DESC&filter_rst=1');
 		$table = $this->query('class:list-table')->asTable()->one();
 		$count = CDBHelper::getCount(self::SQL);
 

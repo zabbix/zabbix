@@ -127,7 +127,7 @@ int	zbx_agent_get_value(const zbx_dc_item_t *item, const char *config_source_ip,
 			ret = TIMEOUT_ERROR;
 		}
 		else
-			ret = NETWORK_ERROR;
+			ret = GATEWAY_ERROR;
 
 		zbx_json_free(&j);
 	}

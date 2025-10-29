@@ -13,8 +13,8 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-require_once dirname(__FILE__).'/../common/testPageApiTokens.php';
-require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
+require_once __DIR__.'/../common/testPageApiTokens.php';
+require_once __DIR__.'/../../include/helpers/CDataHelper.php';
 
 /**
  * @backup token

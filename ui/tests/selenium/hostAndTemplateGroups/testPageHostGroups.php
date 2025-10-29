@@ -14,9 +14,9 @@
 **/
 
 
-require_once dirname(__FILE__).'/../common/testPageGroups.php';
-require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
-require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
+require_once __DIR__.'/../common/testPageGroups.php';
+require_once __DIR__.'/../behaviors/CMessageBehavior.php';
+require_once __DIR__.'/../behaviors/CTableBehavior.php';
 
 /**
  * @backup hosts
@@ -542,7 +542,7 @@ class testPageHostGroups extends testPageGroups {
 		$this->page->login()->open($this->link)->waitUntilReady();
 
 		// Locate the table cell that corresponds to the desired hostgroup name.
-		$table_cell = $this->query('link', $data['name'])->one()->parents('class:wordbreak')->one();
+		$table_cell = $this->query('link', $data['name'])->one()->parents('class:nowrap')->one();
 
 		foreach ($data['links'] as $lld_name) {
 			$link = $table_cell->query('link', $lld_name)->one();

@@ -14,10 +14,13 @@
 **/
 
 
-require_once dirname(__FILE__).'/../common/testCalculatedFormula.php';
+require_once __DIR__.'/../common/testCalculatedFormula.php';
 
 /**
  * @backup items
+ *
+ * TODO: remove ignoreBrowserErrors after DEV-4233
+ * @ignoreBrowserErrors
  */
 class testFormulaCalculatedItem extends testCalculatedFormula {
 

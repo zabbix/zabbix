@@ -91,7 +91,7 @@ class CControllerTemplateMassupdate extends CControllerPopupMassupdateAbstract {
 				}
 			);
 
-			$result = true;
+			$result = false;
 
 			try {
 				DBstart();
@@ -157,7 +157,9 @@ class CControllerTemplateMassupdate extends CControllerPopupMassupdateAbstract {
 							}
 
 							if ($ins_groups) {
-								if (!$result = API::TemplateGroup()->create($ins_groups)) {
+								$result = API::TemplateGroup()->create($ins_groups);
+
+								if (!$result) {
 									throw new Exception();
 								}
 
@@ -333,7 +335,9 @@ class CControllerTemplateMassupdate extends CControllerPopupMassupdateAbstract {
 				}
 				unset($template);
 
-				if (!API::Template()->update($templates)) {
+				$result = (bool) API::Template()->update($templates);
+
+				if (!$result) {
 					throw new Exception();
 				}
 
@@ -349,7 +353,7 @@ class CControllerTemplateMassupdate extends CControllerPopupMassupdateAbstract {
 				);
 			}
 
-			DBend($result);
+			$result = DBend($result);
 
 			if ($result) {
 				$output = [

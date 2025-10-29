@@ -14,7 +14,7 @@
 **/
 
 
-require_once dirname(__FILE__).'/../common/testFormGraphs.php';
+require_once __DIR__.'/../common/testFormGraphs.php';
 
 /**
  * @backup graphs
@@ -191,7 +191,7 @@ class testFormGraphPrototype extends testFormGraphs {
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Name' => 'Exploded graph prototype duplicated Graph sum type',
-						'Graph type' => 'Exploded'
+						'Graph type' => CFormElement::RELOADABLE_FILL('Exploded')
 					],
 					'items' => [
 						[
@@ -233,7 +233,7 @@ class testFormGraphPrototype extends testFormGraphs {
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Name' => 'Exploded graph prototype duplicated Graph sum type mixed',
-						'Graph type' => 'Exploded'
+						'Graph type' => CFormElement::RELOADABLE_FILL('Exploded')
 					],
 					'items' => [
 						[

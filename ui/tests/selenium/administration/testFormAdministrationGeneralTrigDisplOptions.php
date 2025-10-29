@@ -14,7 +14,7 @@
 **/
 
 
-require_once dirname(__FILE__).'/../common/testFormAdministrationGeneral.php';
+require_once __DIR__.'/../common/testFormAdministrationGeneral.php';
 
 /**
  * @backup config
@@ -530,7 +530,7 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 					]
 				]
 			],
-			// #16 Invalid zero values in Moths (Months not supported).
+			// #16 Invalid zero values in Months (Months not supported).
 			[
 				[
 					'expected' => TEST_BAD,

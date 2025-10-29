@@ -810,7 +810,9 @@ abstract class CControllerPopupItemTest extends CController {
 	 */
 	protected function resolvePreprocessingStepMacros(array $steps) {
 		// Resolve macros used in parameter fields.
-		$macros_posted = $this->getInput('macros', []);
+		$macros_posted = $this->hasInput('macros')
+			? json_decode($this->getInput('macros'), true)
+			: [];
 		$macros_types = ($this->test_type == self::ZBX_TEST_TYPE_ITEM_PROTOTYPE)
 			? ['usermacros' => true, 'lldmacros' => true]
 			: ['usermacros' => true];
@@ -972,7 +974,9 @@ abstract class CControllerPopupItemTest extends CController {
 	 */
 	protected function resolveItemPropertyMacros(array $inputs) {
 		// Resolve macros used in parameter fields.
-		$macros_posted = $this->getInput('macros', []);
+		$macros_posted = $this->hasInput('macros')
+			? json_decode($this->getInput('macros'), true)
+			: [];
 
 		foreach (array_keys($this->macros_by_item_props) as $field) {
 			if (!array_key_exists($field, $inputs)) {

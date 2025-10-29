@@ -121,9 +121,7 @@ class CScreenDiscovery extends CScreenBase {
 		];
 
 		foreach ($services as $name => $foo) {
-			$header[] = (new CSpan($name))
-				->addClass(ZBX_STYLE_TEXT_VERTICAL)
-				->setTitle($name);
+			$header[] = (new CVertical($name))->setTitle($name);
 		}
 
 		// create table

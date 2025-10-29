@@ -17,8 +17,6 @@
 
 #include "zbxcacheconfig.h"
 
-void	scriptitem_es_engine_init(void);
-void	scriptitem_es_engine_destroy(void);
 int	get_value_script(zbx_dc_item_t *item, const char *config_source_ip, AGENT_RESULT *result);
 
 #endif

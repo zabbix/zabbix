@@ -14,10 +14,10 @@
 **/
 
 
-require_once dirname(__FILE__) . '/../../include/CWebTest.php';
-require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
-require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
-require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
+require_once __DIR__ . '/../../include/CWebTest.php';
+require_once __DIR__.'/../behaviors/CMessageBehavior.php';
+require_once __DIR__.'/../behaviors/CTableBehavior.php';
+require_once __DIR__.'/../../include/helpers/CDataHelper.php';
 
 /**
  * Test for checking Proxies page.
@@ -284,10 +284,12 @@ class testPageAdministrationProxies extends CWebTest {
 
 		// Reset filter in case if some filtering remained before ongoing test case.
 		$form->query('button:Reset')->one()->click();
+		$table = $this->getTable();
 
 		// Fill filter form with data.
 		$form->fill($data['filter']);
 		$form->submit();
+		$table->waitUntilReloaded();
 		$this->page->waitUntilReady();
 
 		// Check filtered result.

@@ -63,7 +63,7 @@ class CControllerPopupTokenEdit extends CController {
 			]);
 
 			if (!$tokens) {
-				access_deny(ACCESS_DENY_PAGE);
+				throw new CAccessDeniedException();
 			}
 
 			$data = $tokens[0];

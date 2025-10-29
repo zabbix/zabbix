@@ -243,9 +243,10 @@ class CEvent extends CApiService {
 					' JOIN items i1 ON f1.itemid=i1.itemid'.
 					' JOIN host_hgset hh1 ON i1.hostid=hh1.hostid'.
 					' LEFT JOIN permission p1 ON p1.hgsetid=hh1.hgsetid'.
-						' AND p1.ugsetid=p.ugsetid'.
-					' WHERE e.objectid=f1.triggerid'.
-						' AND p1.permission IS NULL'.
+						' AND p1.ugsetid='.self::$userData['ugsetid'].
+					' WHERE f.triggerid=f1.triggerid'.
+						' AND i.itemid!=f1.itemid'.
+						' AND p1.hgsetid IS NULL'.
 				')';
 
 				if ($options['source'] == EVENT_SOURCE_TRIGGERS) {
@@ -558,14 +559,15 @@ class CEvent extends CApiService {
 
 		if ($tag_conditions) {
 			if ($value == TRIGGER_VALUE_TRUE) {
-				$sql_parts['from']['et'] = 'event_tag et';
-				$sql_parts['where']['e-et'] = 'e.eventid=et.eventid';
+				$sql_parts['left_join'][] = ['alias' => 'et', 'table' => 'event_tag', 'using' => 'eventid'];
+				$sql_parts['left_table'] = ['alias' => 'e', 'table' => 'events'];
 			}
 			else {
 				$sql_parts['from']['er'] = 'event_recovery er';
-				$sql_parts['from']['et'] = 'event_tag et';
 				$sql_parts['where']['e-er'] = 'e.eventid=er.r_eventid';
-				$sql_parts['where']['er-et'] = 'er.eventid=et.eventid';
+
+				$sql_parts['left_join'][] = ['alias' => 'et', 'table' => 'event_tag', 'using' => 'eventid'];
+				$sql_parts['left_table'] = ['alias' => 'er', 'table' => 'event_recovery'];
 			}
 
 			if ($full_access_groupids || count($tag_conditions) > 1) {

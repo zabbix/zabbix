@@ -14,7 +14,7 @@
 **/
 
 
-require_once dirname(__FILE__).'/../common/testMultiselectDialogs.php';
+require_once __DIR__.'/../common/testMultiselectDialogs.php';
 
 /**
  * Test for checking empty multiselects' overlays.
@@ -27,7 +27,7 @@ class testMultiselectsWithoutData extends testMultiselectDialogs {
 
 	const EMPTY_HOST = 'Empty host for multiselects test';
 	const EMPTY_LLD_HOST = 'Host with empty LLD';
-	const EMPTY_TEMPLATE = 'Empty template for multiselects test';
+	const EMPTY_TEMPLATE = 'A-Empty template for multiselects test';
 	const EMPTY_LLD_TEMPLATE = 'Template with empty LLD';
 	const SCRIPT = 'Script for Actions';
 	const TEMPLATES_MULTISELECT = ['Templates' => ['title' => 'Templates', 'empty' => true, 'filter' => ['Template group' => '']]];
@@ -759,6 +759,9 @@ class testMultiselectsWithoutData extends testMultiselectDialogs {
 	 * Test function for checking the cases where no any item available for creating the entity like trigger, graph, etc.
 	 *
 	 * @dataProvider getCheckEmptyItemsData
+	 *
+	 * TODO: remove ignoreBrowserErrors after DEV-4233
+	 * @ignoreBrowserErrors
 	 */
 	public function testMultiselectsWithoutData_CheckEmptyItems($data) {
 		$context_host = str_contains($data['url'], 'context=host');

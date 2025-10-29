@@ -14,13 +14,16 @@
 **/
 
 
-require_once dirname(__FILE__).'/../../include/CLegacyWebTest.php';
-require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
+require_once __DIR__.'/../../include/CLegacyWebTest.php';
+require_once __DIR__.'/../behaviors/CMessageBehavior.php';
 
 /**
  * Test the creation of inheritance of new objects on a previously linked template.
  *
  * @backup items
+ *
+ * TODO: remove ignoreBrowserErrors after DEV-4233
+ * @ignoreBrowserErrors
  */
 class testInheritanceItemPrototype extends CLegacyWebTest {
 	private $templateid = 15000;	// 'Inheritance test template'
@@ -62,8 +65,8 @@ class testInheritanceItemPrototype extends CLegacyWebTest {
 		$this->query('link:'.CDBHelper::getValue('SELECT name from items WHERE itemid='.$data['itemid']))->one()->click();
 		COverlayDialogElement::find()->one()->waitUntilready()->getFooter()->query('button:Update')->one()->click();
 		COverlayDialogElement::ensureNotPresent();
+		$this->assertMessage(TEST_GOOD, 'Item prototype updated');
 		$this->zbxTestCheckTitle('Configuration of item prototypes');
-		$this->zbxTestTextPresent('Item prototype updated');
 
 		$this->assertEquals($oldHashItems, CDBHelper::getHash($sqlItems));
 	}
@@ -111,7 +114,7 @@ class testInheritanceItemPrototype extends CLegacyWebTest {
 		switch ($data['expected']) {
 			case TEST_GOOD:
 				COverlayDialogElement::ensureNotPresent();
-				$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Item prototype added');
+				$this->assertMessage(TEST_GOOD, 'Item prototype added');
 				$this->zbxTestTextPresent($data['name']);
 
 				$itemId = 0;

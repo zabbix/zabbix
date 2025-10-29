@@ -272,12 +272,6 @@ var hintBox = {
 					return;
 				}
 
-				const offset = $target.offset(),
-					w = jQuery(window);
-
-				// Emulate a click on the left middle point of the target.
-				e.clientX = offset.left - w.scrollLeft();
-				e.clientY = offset.top - w.scrollTop() + ($target.height() / 2);
 				e.preventDefault();
 			}
 
@@ -647,9 +641,23 @@ var hintBox = {
 			css.height = Math.ceil(parseFloat(hint_computed_style.height));
 
 			// Event coordinates relative to host.
-			if ((target.event_x === null || target.event_x === undefined) && e.clientX !== undefined) {
-				target.event_x = e.clientX - host_rect.left + host_x_min;
-				target.event_y = e.clientY - host_rect.top + host_y_min;
+			if (target.event_x === undefined) {
+				let client_x, client_y;
+
+				if (e.clientX !== undefined) {
+					client_x = e.clientX;
+					client_y = e.clientY;
+				}
+				else {
+					const $target = jQuery(target);
+					const offset = $target.offset();
+
+					client_x = offset.left;
+					client_y = offset.top + $target.height() / 2;
+				}
+
+				target.event_x = client_x - host_rect.left + host_x_min;
+				target.event_y = client_y - host_rect.top + host_y_min;
 			}
 
 			css.left = target.event_x + event_offset + hint_rect.width <= host_x_max
@@ -691,8 +699,8 @@ var hintBox = {
 	},
 
 	deleteHint: function(target, do_focus_target = true) {
-		target.event_x = null;
-		target.event_y = null;
+		delete target.event_x;
+		delete target.event_y;
 
 		if (typeof target.hintboxid !== 'undefined') {
 			jQuery(target).removeAttr('data-expanded');

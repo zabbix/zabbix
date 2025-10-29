@@ -217,9 +217,9 @@ class testHostConnMacroValidation extends CIntegrationTest {
 					'esc_step_from' => 1,
 					'esc_step_to' => 2,
 					'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
-					'opcommand_grp' => [
+					'opcommand_hst' => [
 						[
-							'groupid' => 4
+							'hostid' => self::$hostid
 						]
 					],
 					'opcommand' => [
@@ -255,9 +255,9 @@ class testHostConnMacroValidation extends CIntegrationTest {
 					'esc_step_from' => 1,
 					'esc_step_to' => 2,
 					'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
-					'opcommand_grp' => [
+					'opcommand_hst' => [
 						[
-							'groupid' => 4
+							'hostid' => self::$hostid
 						]
 					],
 					'opcommand' => [
@@ -322,9 +322,9 @@ class testHostConnMacroValidation extends CIntegrationTest {
 			'operations' => [
 				[
 					'operationtype' => OPERATION_TYPE_COMMAND,
-					'opcommand_grp' => [
+					'opcommand_hst' => [
 						[
-							'groupid' => 4
+							'hostid' => self::$hostid
 						]
 					],
 					'opcommand' => [
@@ -765,23 +765,6 @@ class testHostConnMacroValidation extends CIntegrationTest {
 		$data = explode("\n", $log);
 		$synced_ifs = preg_grep("/interfaceid:[0-9]+ hostid:[0-9]+ ip:'' dns:'zabbix.com' /", $data);
 		$this->assertCount(8, $synced_ifs);
-	}
-
-	/**
-	 * Test injection via running an action operation for discovery.
-	 *
-	 * @required-components server, agent
-	 * @configurationDataProvider defaultConfigurationProvider
-	 */
-	public function testHostConnMacroValidation_testInvalidMacroDruleAction() {
-		CDataHelper::call('host.delete', [self::$hostid]);
-		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
-
-		$response = $this->callUntilDataIsPresent('alert.get', [
-			'actionids' => [self::$trigger_actionid_neg]
-		], 30, 2);
-		$this->assertArrayHasKey(0, $response['result']);
-		$this->assertEquals("Invalid macro '{HOST.CONN}' value", $response['result'][0]['error']);
 	}
 
 	/**

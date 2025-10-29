@@ -14,11 +14,11 @@
 **/
 
 
-require_once dirname(__FILE__).'/../../include/CLegacyWebTest.php';
-require_once dirname(__FILE__).'/../../../include/items.inc.php';
-require_once dirname(__FILE__).'/../../../include/classes/api/services/CItemGeneral.php';
-require_once dirname(__FILE__).'/../../../include/classes/api/services/CItemPrototype.php';
-require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
+require_once __DIR__.'/../../include/CLegacyWebTest.php';
+require_once __DIR__.'/../../../include/items.inc.php';
+require_once __DIR__.'/../../../include/classes/api/services/CItemGeneral.php';
+require_once __DIR__.'/../../../include/classes/api/services/CItemPrototype.php';
+require_once __DIR__.'/../behaviors/CMessageBehavior.php';
 
 use Facebook\WebDriver\WebDriverBy;
 
@@ -2191,7 +2191,6 @@ class testFormItemPrototype extends CLegacyWebTest {
 		$this->zbxTestContentControlButtonClickTextWait('Create item prototype');
 		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
 		$form = $dialog->asForm();
-		$dialog_footer = $dialog->getFooter();
 
 		if (isset($data['type'])) {
 			$type = $data['type'];
@@ -2210,7 +2209,6 @@ class testFormItemPrototype extends CLegacyWebTest {
 			}
 			$this->zbxTestAssertElementValue('name', $data['name']);
 		}
-		$name = $this->zbxTestGetValue("//input[@id='name']");
 
 		if (isset($data['key'])) {
 			$this->zbxTestInputTypeOverwrite('key', $data['key']);
@@ -2219,7 +2217,6 @@ class testFormItemPrototype extends CLegacyWebTest {
 			}
 			$this->zbxTestAssertElementValue('key', $data['key']);
 		}
-		$key = $this->zbxTestGetValue("//input[@id='key']");
 
 		if (isset($data['username'])) {
 			$this->zbxTestInputType('username', $data['username']);
@@ -2451,9 +2448,10 @@ class testFormItemPrototype extends CLegacyWebTest {
 	 */
 	private function filterEntriesAndOpenDiscovery($name) {
 		$form = $this->query('name:zbx_filter')->asForm()->waitUntilReady()->one();
+		$table = $this->query('xpath:(//table[@class="list-table"])[1]')->asTable()->one();
 		$form->fill(['Name' => $name]);
 		$this->query('button:Apply')->one()->waitUntilClickable()->click();
-		$this->query('xpath://table[@class="list-table"]')->asTable()->one()->findRow('Name', $name)
-				->getColumn('Discovery')->query('link:Discovery')->one()->click();
+		$table->waitUntilReloaded();
+		$table->findRow('Name', $name)->getColumn('Discovery')->query('link:Discovery')->one()->click();
 	}
 }

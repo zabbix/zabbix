@@ -16,8 +16,6 @@ libzbxexpression_a_SOURCES = \
 	funcparam.c \
 	funcparam.h \
 	lldfunc.c \
-	macrofunc.c \
-	macrofunc.h \
 	expression_names.c \
 	triggerfunc.c
 

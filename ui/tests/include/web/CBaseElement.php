@@ -118,6 +118,13 @@ abstract class CBaseElement extends RemoteWebElement {
 	/**
 	 * @inheritdoc
 	 */
+	public function doubleClick() {
+		return $this->executeStaleSafe(__FUNCTION__);
+	}
+
+	/**
+	 * @inheritdoc
+	 */
 	public function getAttribute($attribute_name) {
 		return $this->executeStaleSafe(__FUNCTION__, [$attribute_name]);
 	}

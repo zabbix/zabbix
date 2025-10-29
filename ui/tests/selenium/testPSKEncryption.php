@@ -14,7 +14,7 @@
 **/
 
 
-require_once dirname(__FILE__).'/../include/CWebTest.php';
+require_once __DIR__.'/../include/CWebTest.php';
 
 /**
  * @backup config, config_autoreg_tls
@@ -252,7 +252,7 @@ class testPSKEncryption extends CWebTest {
 
 	public static function getUpdateSameObjectData() {
 		return [
-			'Same utoregistration identity, new PSK' => [
+			'Same autoregistration identity, new PSK' => [
 				[
 					'object' => 'configuration',
 					'url' => 'zabbix.php?action=autoreg.edit',

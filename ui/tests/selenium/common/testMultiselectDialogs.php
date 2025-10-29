@@ -14,7 +14,7 @@
 **/
 
 
-require_once dirname(__FILE__) . '/../../include/CWebTest.php';
+require_once __DIR__ . '/../../include/CWebTest.php';
 
 class testMultiselectDialogs extends CWebTest {
 
@@ -71,7 +71,7 @@ class testMultiselectDialogs extends CWebTest {
 	}
 
 	/**
-	 * Function for asserting additional filter in multeselect's overlay.
+	 * Function for asserting additional filter in multiselect's overlay.
 	 *
 	 * @param COverlayDialogElement    $dialog    dialog form where checks are performed
 	 * @param string                   $title     title of a dialog

@@ -44,9 +44,7 @@ class CControllerHousekeepingUpdate extends CController {
 			switch ($this->getValidationError()) {
 				case self::VALIDATION_ERROR:
 					$response = new CControllerResponseRedirect(
-						(new CUrl('zabbix.php'))
-							->setArgument('action', 'housekeeping.edit')
-							->getUrl()
+						(new CUrl('zabbix.php'))->setArgument('action', 'housekeeping.edit')
 					);
 					$response->setFormData($this->getInputAll() + [
 						'hk_events_mode' => '0',

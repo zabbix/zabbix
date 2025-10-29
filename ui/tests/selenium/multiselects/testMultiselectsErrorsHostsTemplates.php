@@ -14,7 +14,7 @@
 **/
 
 
-require_once dirname(__FILE__).'/../common/testMultiselectDialogs.php';
+require_once __DIR__.'/../common/testMultiselectDialogs.php';
 
 /**
  * Test for assuring that bug from ZBX-23302 is not reproducing, respectively

@@ -18,18 +18,35 @@ package zbxcmd
 
 import (
 	"bytes"
+	"context"
 	"errors"
-	"fmt"
 	"os/exec"
 	"strings"
 	"syscall"
 	"time"
 
+	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/log"
 )
 
-func execute(s string, timeout time.Duration, path string, strict bool) (string, error) {
-	cmd := exec.Command("sh", "-c", s)
+// ZBXExec holds wrapper for os.exec.
+//
+//nolint:ireturn
+type ZBXExec struct {
+}
+
+// InitExecutor initialized empty ZBXExec will allow support of different shells in the future.
+//
+//nolint:ireturn
+func InitExecutor() (Executor, error) {
+	return &ZBXExec{}, nil
+}
+
+func (*ZBXExec) execute(s string, timeout time.Duration, path string, strict bool) (string, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+	defer cancel()
+
+	cmd := exec.CommandContext(ctx, "sh", "-c", s)
 	cmd.Dir = path
 
 	var b bytes.Buffer
@@ -39,44 +56,38 @@ func execute(s string, timeout time.Duration, path string, strict bool) (string,
 	cmd.SysProcAttr = &syscall.SysProcAttr{Setpgid: true}
 
 	err := cmd.Start()
-
 	if err != nil {
-		return "", fmt.Errorf("Cannot execute command: %s", err)
+		return "", errs.Errorf("cannot execute command: %s", err)
 	}
-
-	t := time.AfterFunc(timeout, func() {
-		errKill := syscall.Kill(-cmd.Process.Pid, syscall.SIGTERM)
-		if errKill != nil {
-			log.Warningf("failed to kill [%s]: %s", s, errKill)
-		}
-	})
 
 	werr := cmd.Wait()
 
-	if !t.Stop() {
-		return "", fmt.Errorf("Timeout while executing a shell script.")
+	// we need to check context error so we can inform the user if timeout was reached and Zabbix agent2
+	// terminated the command
+	if errors.Is(ctx.Err(), context.DeadlineExceeded) {
+		return "", errs.Errorf("command execution failed: %s", ctx.Err())
 	}
 
 	// we need to check error after t.Stop so we can inform the user if timeout was reached and Zabbix agent2 terminated the command
 	if strict && werr != nil && !errors.Is(werr, syscall.ECHILD) {
 		log.Debugf("Command [%s] execution failed: %s\n%s", s, werr, b.String())
 
-		return "", fmt.Errorf("Command execution failed: %w", werr)
+		return "", errs.Errorf("command execution failed: %s", werr.Error())
 	}
 
 	if MaxExecuteOutputLenB <= len(b.String()) {
-		return "", fmt.Errorf("Command output exceeded limit of %d KB", MaxExecuteOutputLenB/1024)
+		return "", errs.Errorf("command output exceeded limit of %d KB", MaxExecuteOutputLenB/1024)
 	}
 
 	return strings.TrimRight(b.String(), " \t\r\n"), nil
 }
 
-func ExecuteBackground(s string) error {
+func (*ZBXExec) executeBackground(s string) error {
 	cmd := exec.Command("sh", "-c", s)
-	err := cmd.Start()
 
+	err := cmd.Start()
 	if err != nil {
-		return fmt.Errorf("Cannot execute command: %s", err)
+		return errs.Wrap(err, "cannot execute command")
 	}
 
 	go cmd.Wait()

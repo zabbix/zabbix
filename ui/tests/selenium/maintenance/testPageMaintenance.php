@@ -14,9 +14,9 @@
 **/
 
 
-require_once dirname(__FILE__).'/../../include/CWebTest.php';
-require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
-require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
+require_once __DIR__.'/../../include/CWebTest.php';
+require_once __DIR__.'/../behaviors/CMessageBehavior.php';
+require_once __DIR__.'/../behaviors/CTableBehavior.php';
 
 /**
  * @backup maintenances
@@ -489,7 +489,7 @@ class testPageMaintenance extends CWebTest {
 
 		// Fill filter fields if such present in data provider.
 		$form->fill(CTestArrayHelper::get($data, 'filter'));
-		$form->submit();
+		$form->submit()->waitUntilStalled();
 		$this->page->waitUntilReady();
 
 		// Check that expected maintenances are returned in the list.

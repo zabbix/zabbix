@@ -1,1 +1,0 @@
-...G...... [ZBX-25962] fixed incorrect serialization of complex objects leading to crashes in wmi.getall (dgoloscapov)

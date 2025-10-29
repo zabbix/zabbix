@@ -48,9 +48,10 @@ class CControllerTokenDisable extends CController {
 
 		$result = API::Token()->update($tokens);
 		$updated = count($tokens);
-		$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
-			->setArgument('action', $this->getInput('action_src'))
-			->setArgument('page', CPagerHelper::loadPage($this->getInput('action_src'), null))
+		$response = new CControllerResponseRedirect(
+			(new CUrl('zabbix.php'))
+				->setArgument('action', $this->getInput('action_src'))
+				->setArgument('page', CPagerHelper::loadPage($this->getInput('action_src'), null))
 		);
 
 		if ($result) {

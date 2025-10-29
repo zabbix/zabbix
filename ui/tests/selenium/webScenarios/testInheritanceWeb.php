@@ -13,8 +13,8 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-require_once dirname(__FILE__).'/../../include/CLegacyWebTest.php';
-require_once dirname(__FILE__).'/../../../include/items.inc.php';
+require_once __DIR__.'/../../include/CLegacyWebTest.php';
+require_once __DIR__.'/../../../include/items.inc.php';
 
 use Facebook\WebDriver\WebDriverBy;
 
@@ -27,6 +27,16 @@ class testInheritanceWeb extends CLegacyWebTest {
 
 	private $hostid = 15001;		// 'Template inheritance test host'
 	private $host = 'Template inheritance test host';
+
+	/**
+	 * Attach MessageBehavior to the test.
+	 *
+	 * @return array
+	 */
+	public function getBehaviors() {
+		return [CMessageBehavior::class];
+	}
+
 
 	public static function update() {
 		return CDBHelper::getDataProvider(
@@ -55,7 +65,7 @@ class testInheritanceWeb extends CLegacyWebTest {
 				$data['httptestid']);
 		$this->zbxTestClickWait('update');
 		$this->zbxTestCheckTitle('Configuration of web monitoring');
-		$this->zbxTestTextPresent('Web scenario updated');
+		$this->assertMessage(TEST_GOOD, 'Web scenario updated');
 
 		$this->assertEquals($oldHashHttpTests, CDBHelper::getHash($sqlHttpTests));
 		$this->assertEquals($oldHashHttpSteps, CDBHelper::getHash($sqlHttpSteps));

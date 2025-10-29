@@ -14,16 +14,16 @@
 **/
 
 
-require_once dirname(__FILE__).'/../../include/CWebTest.php';
-require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
-require_once dirname(__FILE__).'/../behaviors/CTagBehavior.php';
+require_once __DIR__.'/../../include/CWebTest.php';
+require_once __DIR__.'/../behaviors/CTableBehavior.php';
+require_once __DIR__.'/../behaviors/CTagBehavior.php';
 
 /**
  * @backup profiles
  *
  * @onBefore prepareProblemsData
  *
- * @dataSource UserPermissions
+ * @dataSource UserPermissions, WidgetCommunication
  */
 class testPageProblems extends CWebTest {
 
@@ -42,6 +42,7 @@ class testPageProblems extends CWebTest {
 		];
 	}
 
+	const URL = 'zabbix.php?action=problem.view&filter_reset=1';
 	protected static $time;
 
 	public function prepareProblemsData() {
@@ -111,7 +112,7 @@ class testPageProblems extends CWebTest {
 				'description' => 'Filled opdata with macros',
 				'expression' => 'last(/Host for Problems Page/trap)=0',
 				'priority' => TRIGGER_SEVERITY_AVERAGE,
-				'opdata' => 'Operational data - {ITEM.LASTVALUE}, {ITEM.LASTVALUE1}, {ITEM.LASTVALUE2}'
+				'opdata' => 'Operational data - ({ITEM.LASTVALUE}),{ITEM.LASTVALUE1}, [{ITEM.LASTVALUE2}]'
 			],
 			[
 				'description' => 'Symbols in Item metric',
@@ -200,7 +201,7 @@ class testPageProblems extends CWebTest {
 	}
 
 	public function testPageProblems_Layout() {
-		$this->page->login()->open('zabbix.php?action=problem.view&filter_reset=1');
+		$this->page->login()->open(self::URL);
 		$this->page->assertTitle('Problems');
 		$this->page->assertHeader('Problems');
 
@@ -260,7 +261,7 @@ class testPageProblems extends CWebTest {
 			'Compact view' => ['value' => false],
 			'Show details' => ['value' => false],
 			'Show timeline' => ['value' => true],
-			'Highlight whole row' => ['value' => false, 'enabled' => false]
+			'Highlight whole row' => ['value' => false, 'enabled' => true]
 		];
 
 		foreach ($fields_values as $label => $attributes) {
@@ -403,7 +404,7 @@ class testPageProblems extends CWebTest {
 			foreach (['Show operational data', 'Show details', 'Show timeline'] as $field) {
 				$this->assertTrue($filter_form->getField($field)->isEnabled(!$state));
 			}
-			$this->assertTrue($filter_form->getField('Highlight whole row')->isEnabled($state));
+			$this->assertTrue($filter_form->getField('Highlight whole row')->isEnabled());
 		}
 
 		$this->assertEquals(3, $filter_tab->query('button', ['Save as', 'Apply', 'Reset'])
@@ -650,7 +651,7 @@ class testPageProblems extends CWebTest {
 							'Host' => 'ЗАББИКС Сервер',
 							'Problem' => 'Test trigger to check tag filter on problem page',
 							'Update' => 'Update',
-							'Tags' => 'DatabaseService: abcservice: abcdef'
+							'Tags' => "Database\nService: abc\nservice: abcdef"
 						]
 					]
 				]
@@ -703,7 +704,7 @@ class testPageProblems extends CWebTest {
 							'Host' => 'ЗАББИКС Сервер',
 							'Problem' => 'Test trigger to check tag filter on problem page',
 							'Update' => 'Update',
-							'Tags' => 'DatabaseService: abcservice: abcdef'
+							'Tags' => "Database\nService: abc\nservice: abcdef"
 						]
 					]
 				]
@@ -725,7 +726,7 @@ class testPageProblems extends CWebTest {
 							'Host' => 'ЗАББИКС Сервер',
 							'Problem' => 'Test trigger to check tag filter on problem page',
 							'Update' => 'Update',
-							'Tags' => 'service: abcdefDatabaseService: abc'
+							'Tags' => "service: abcdef\nDatabase\nService: abc"
 						]
 					]
 				]
@@ -928,6 +929,9 @@ class testPageProblems extends CWebTest {
 						['Problem' => 'Symbols in Item metric'],
 						['Problem' => 'No operational data popup'],
 						['Problem' => 'Trigger for Age problem'],
+						['Problem' => 'trigger on host 3'],
+						['Problem' => 'trigger on host 2'],
+						['Problem' => 'trigger on host 1'],
 						['Problem' => 'Trigger for tag permissions Oracle'],
 						['Problem' => 'Trigger for tag permissions MySQL'],
 						['Problem' => 'Trigger for Age problem 1 day'],
@@ -1119,7 +1123,7 @@ class testPageProblems extends CWebTest {
 						'Acknowledgement status' => 'Unacknowledged',
 						'Host inventory' => [
 							'action' => USER_ACTION_UPDATE, 'index' => 0,
-							'field' => 'Location latitude', 'value' => '56.95387'
+							'field' => 'Location latitude', 'value' => '56.97612'
 						],
 						'Show tags' => 3,
 						'id:tag_name_format_0' => 'Shortened',
@@ -1148,14 +1152,14 @@ class testPageProblems extends CWebTest {
 							'Operational data' => '*UNKNOWN*',
 							'Update' => 'Update',
 							'Actions' => '',
-							'Tags' => 'TagSer: abcDat'
+							'Tags' => "Tag\nSer: abc\nDat"
 						]
 					],
 					'check_tags' => [
 						'Tag' => 'Tag4',
 						'Ser: abc' => 'Service: abc',
 						'Dat' => 'Database',
-						'...' => 'DatabaseService: abcservice: abcdefTag4Tag5: 5'
+						'...' => "Database\nService: abc\nservice: abcdef\nTag4\nTag5: 5"
 					]
 				]
 			],
@@ -1171,13 +1175,13 @@ class testPageProblems extends CWebTest {
 					'result' => [
 						[
 							'Problem' => 'Test trigger to check tag filter on problem page',
-							'Tags' => 'DatabaseService: abc'
+							'Tags' => "Database\nService: abc"
 						]
 					],
 					'check_tags' => [
 						'Database' => 'Database',
 						'Service: abc' => 'Service: abc',
-						'...' => 'DatabaseService: abcservice: abcdefTag4Tag5: 5'
+						'...' => "Database\nService: abc\nservice: abcdef\nTag4\nTag5: 5"
 					]
 				]
 			],
@@ -1198,7 +1202,7 @@ class testPageProblems extends CWebTest {
 					],
 					'check_tags' => [
 						'abc' => 'Service: abc',
-						'...' => 'DatabaseService: abcservice: abcdefTag4Tag5: 5'
+						'...' => "Database\nService: abc\nservice: abcdef\nTag4\nTag5: 5"
 					]
 				]
 			],
@@ -1228,19 +1232,19 @@ class testPageProblems extends CWebTest {
 					'result' => [
 						[
 							'Problem' => 'Fourth test trigger with tag priority',
-							'Tags' => 'Delta: tEta: eGamma: g'
+							'Tags' => "Delta: t\nEta: e\nGamma: g"
 						],
 						[
 							'Problem' => 'Third test trigger with tag priority',
-							'Tags' => 'Kappa: kAlpha: aIota: i'
+							'Tags' => "Kappa: k\nAlpha: a\nIota: i"
 						],
 						[
 							'Problem' => 'Second test trigger with tag priority',
-							'Tags' => 'Beta: bEpsilon: eEta: e'
+							'Tags' => "Beta: b\nEpsilon: e\nEta: e"
 						],
 						[
 							'Problem' => 'First test trigger with tag priority',
-							'Tags' => 'Alpha: aBeta: bDelta: d'
+							'Tags' => "Alpha: a\nBeta: b\nDelta: d"
 						]
 					]
 				]
@@ -1256,19 +1260,19 @@ class testPageProblems extends CWebTest {
 					'result' => [
 						[
 							'Problem' => 'Fourth test trigger with tag priority',
-							'Tags' => 'Delta: tEta: eGamma: g'
+							'Tags' => "Delta: t\nEta: e\nGamma: g"
 						],
 						[
 							'Problem' => 'Third test trigger with tag priority',
-							'Tags' => 'Kappa: kAlpha: aIota: i'
+							'Tags' => "Kappa: k\nAlpha: a\nIota: i"
 						],
 						[
 							'Problem' => 'Second test trigger with tag priority',
-							'Tags' => 'Beta: bEpsilon: eEta: e'
+							'Tags' => "Beta: b\nEpsilon: e\nEta: e"
 						],
 						[
 							'Problem' => 'First test trigger with tag priority',
-							'Tags' => 'Beta: bAlpha: aDelta: d'
+							'Tags' => "Beta: b\nAlpha: a\nDelta: d"
 						]
 					]
 				]
@@ -1284,19 +1288,19 @@ class testPageProblems extends CWebTest {
 					'result' => [
 						[
 							'Problem' => 'Fourth test trigger with tag priority',
-							'Tags' => 'Gamma: gDelta: tEta: e'
+							'Tags' => "Gamma: g\nDelta: t\nEta: e"
 						],
 						[
 							'Problem' => 'Third test trigger with tag priority',
-							'Tags' => 'Kappa: kAlpha: aIota: i'
+							'Tags' => "Kappa: k\nAlpha: a\nIota: i"
 						],
 						[
 							'Problem' => 'Second test trigger with tag priority',
-							'Tags' => 'Beta: bEpsilon: eEta: e'
+							'Tags' => "Beta: b\nEpsilon: e\nEta: e"
 						],
 						[
 							'Problem' => 'First test trigger with tag priority',
-							'Tags' => 'Gamma: gBeta: bAlpha: a'
+							'Tags' => "Gamma: g\nBeta: b\nAlpha: a"
 						]
 					]
 				]
@@ -1385,6 +1389,9 @@ class testPageProblems extends CWebTest {
 						['Problem' => 'Symbols in Item metric'],
 						['Problem' => 'No operational data popup'],
 						['Problem' => 'Trigger for Age problem'],
+						['Problem' => 'trigger on host 3'],
+						['Problem' => 'trigger on host 2'],
+						['Problem' => 'trigger on host 1'],
 						['Problem' => 'Trigger for tag permissions Oracle'],
 						['Problem' => 'Trigger for tag permissions MySQL'],
 						['Problem' => 'Trigger for Age problem 1 day'],
@@ -1419,6 +1426,9 @@ class testPageProblems extends CWebTest {
 						['Problem' => 'Symbols in Item metric'],
 						['Problem' => 'No operational data popup'],
 						['Problem' => 'Trigger for Age problem'],
+						['Problem' => 'trigger on host 3'],
+						['Problem' => 'trigger on host 2'],
+						['Problem' => 'trigger on host 1'],
 						['Problem' => 'Trigger for tag permissions Oracle'],
 						['Problem' => 'Trigger for tag permissions MySQL'],
 						['Problem' => 'Trigger for Age problem 1 day']
@@ -1444,6 +1454,9 @@ class testPageProblems extends CWebTest {
 						['Problem' => 'Symbols in Item metric'],
 						['Problem' => 'No operational data popup'],
 						['Problem' => 'Trigger for Age problem'],
+						['Problem' => 'trigger on host 3'],
+						['Problem' => 'trigger on host 2'],
+						['Problem' => 'trigger on host 1'],
 						['Problem' => 'Trigger for tag permissions Oracle'],
 						['Problem' => 'Trigger for tag permissions MySQL']
 					]
@@ -1473,6 +1486,7 @@ class testPageProblems extends CWebTest {
 						'Show timeline' => false
 					],
 					'result' => [
+						['Problem' => 'trigger on host 2'],
 						['Problem' => 'Test trigger with tag'],
 						['Problem' => 'Fourth test trigger with tag priority'],
 						['Problem' => 'Third test trigger with tag priority'],
@@ -1796,7 +1810,8 @@ class testPageProblems extends CWebTest {
 			],
 			'Macro expansion and operational text' => [
 				[
-					'custom data' => 'Operational data - 150, 150, *UNKNOWN*',
+					'custom data' => 'Operational data - (150),150, [*UNKNOWN*]',
+					'screen_name' => 'operational data separately',
 					'filter' => [
 						'Problem' => 'Filled opdata with macros',
 						'Show operational data' => 'Separately'
@@ -1888,10 +1903,11 @@ class testPageProblems extends CWebTest {
 			],
 			'Filled opdata with macros' => [
 				[
-					'custom data' => 'Operational data - 150, 150, *UNKNOWN*',
+					'custom data' => 'Operational data - (150),150, [*UNKNOWN*]',
+					'screen_name' => 'operational data with problem name',
 					'filter' => [
 						'Problem' => 'Filled opdata with macros',
-						'Show operational data' => 'Separately'
+						'Show operational data' => 'With problem name'
 					],
 					'popup rows' => [
 						[
@@ -1903,8 +1919,19 @@ class testPageProblems extends CWebTest {
 					]
 				]
 			],
-			'Operational data with problem name, no popup' => [
+			'Problem name contains operational data, no popup' => [
 				[
+					'custom data' => 'No popup "],*,a[x=": "],*,a[x="/\|\'/æ㓴🍭🍭',
+					'filter' => [
+						'Problem' => 'No operational data popup',
+						'Show operational data' => 'With problem name'
+					],
+					'popup rows' => []
+				]
+			],
+			'Problem name without operational data, no popup' => [
+				[
+					'custom data' => '',
 					'filter' => [
 						'Problem' => 'Two trigger expressions',
 						'Show operational data' => 'With problem name'
@@ -1912,7 +1939,7 @@ class testPageProblems extends CWebTest {
 					'popup rows' => []
 				]
 			],
-			'No popup in operaional data column' => [
+			'No popup in operational data column' => [
 				[
 					'custom data' => 'No popup "],*,a[x=": "],*,a[x="/\|\'/æ㓴🍭🍭',
 					'filter' => [
@@ -1929,7 +1956,7 @@ class testPageProblems extends CWebTest {
 	 * @dataProvider getFilterForOperationalData
 	 */
 	public function testPageProblems_OperationalData($data){
-		$this->page->login()->open('zabbix.php?action=problem.view&filter_reset=1&sort=clock&sortorder=ASC');
+		$this->page->login()->open(self::URL.'&sort=clock&sortorder=ASC');
 		$form = CFilterElement::find()->one()->getForm();
 		$table = $this->query('class:list-table')->asTable()->waitUntilPresent()->one();
 
@@ -1937,8 +1964,10 @@ class testPageProblems extends CWebTest {
 		$table->waitUntilReloaded();
 
 		$column = ($data['filter']['Show operational data'] === 'With problem name') ? 'Problem' : 'Operational data';
-		$opdata_column = $table->findRow('Problem', CTestArrayHelper::get($data, 'Problem',
-				$data['filter']['Problem']))->getColumn($column);
+		$problem_name = ($data['filter']['Show operational data'] === 'With problem name' && $data['custom data'] !== '')
+			? $data['filter']['Problem'].' ('.$data['custom data'].')'
+			: $data['filter']['Problem'];
+		$opdata_column = $table->findRow('Problem', $problem_name)->getColumn($column);
 
 		// Collect metrics from all items in trigger expression.
 		$metrics = [];
@@ -1950,10 +1979,15 @@ class testPageProblems extends CWebTest {
 		$data_in_column = CTestArrayHelper::get($data, 'custom data', implode(', ', $metrics));
 		if ($data['filter']['Show operational data'] === 'With problem name') {
 			$data_in_column = ($data_in_column === '')
-					? $data['filter']['Problem']
-					: $data['filter']['Problem'].' ('.$data_in_column.')';
+				? $data['filter']['Problem']
+				: $data['filter']['Problem'].' ('.$data_in_column.')';
 		}
+
 		$this->assertEquals($data_in_column, $opdata_column->getText());
+
+		if (array_key_exists('screen_name', $data)) {
+			$this->assertScreenshot($opdata_column, $data['screen_name']);
+		}
 
 		// Check data in popup.
 		foreach ($data['popup rows'] as $i => $popup_row) {
@@ -1961,6 +1995,7 @@ class testPageProblems extends CWebTest {
 			$opdata_column->query('link', $metric_in_column)->waitUntilClickable()->one()->click();
 			$popup = $this->query('css:.overlay-dialogue.wordbreak')->asOverlayDialog()->one()->waitUntilVisible();
 			$popup_table = $popup->asTable();
+
 			// Check expected popup rows number.
 			$this->assertEquals(count($data['popup rows']), $popup_table->getRows()->count());
 
@@ -1978,7 +2013,7 @@ class testPageProblems extends CWebTest {
 	}
 
 	public function testPageProblems_ResetButton() {
-		$this->page->login()->open('zabbix.php?action=problem.view&filter_reset=1');
+		$this->page->login()->open(self::URL);
 		$form = $this->query('name:zbx_filter')->asForm()->waitUntilVisible()->one();
 		$table = $this->query('class:list-table')->asTable()->one();
 

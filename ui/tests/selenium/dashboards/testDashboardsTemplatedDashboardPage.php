@@ -14,9 +14,9 @@
 **/
 
 
-require_once dirname(__FILE__) . '/../../include/CWebTest.php';
-require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
-require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
+require_once __DIR__ . '/../../include/CWebTest.php';
+require_once __DIR__.'/../../include/helpers/CDataHelper.php';
+require_once __DIR__.'/../behaviors/CTableBehavior.php';
 
 /**
  * @backup dashboard
@@ -26,12 +26,12 @@ require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
 class testDashboardsTemplatedDashboardPage extends CWebTest {
 
 	/**
-	 * Attach TableBehavior to the test.
+	 * Attach TableBehavior, CMessageBehavior to the test.
 	 *
 	 * @return array
 	 */
 	public function getBehaviors() {
-		return [CTableBehavior::class];
+		return [CTableBehavior::class, CMessageBehavior::class];
 	}
 
 	const TEMPLATEID = 99022;	// ID of the template for with a list of dashboards.
@@ -126,7 +126,7 @@ class testDashboardsTemplatedDashboardPage extends CWebTest {
 
 		$this->query('button:Delete')->one()->waitUntilClickable()->click();
 		$this->page->acceptAlert();
-		$this->page->waitUntilReady();
+		$this->assertMessage(TEST_GOOD, 'Dashboards deleted');
 
 		// Check that dashboards were deleted and that other dashboards are still there.
 		$remaining_dashboards = array_diff(self::DASHBOARDS, self::DASHBOARDS_2_DELETE);

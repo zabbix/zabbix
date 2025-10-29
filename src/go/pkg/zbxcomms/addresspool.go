@@ -90,7 +90,7 @@ func (a *addressPool) reset() {
 	a.nextAddress()
 }
 
-func (a *addressPool) addRedirect(addr string, revision uint64) bool {
+func (a *addressPool) addRedirect(address string, revision uint64) bool {
 	a.mu.Lock()
 	defer a.mu.Unlock()
 
@@ -109,7 +109,7 @@ func (a *addressPool) addRedirect(addr string, revision uint64) bool {
 	}
 
 	a.pool = append(a.pool[:1], a.pool...)
-	a.pool[0].addr = addr
+	a.pool[0].addr = address
 	a.pool[0].revision = revision
 
 	return true

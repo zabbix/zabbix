@@ -157,7 +157,7 @@ class CHostPrototype extends CHostBase {
 
 		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
 			if (self::$userData['ugsetid'] == 0) {
-				$sql_parts['where'][] = '1=0';
+				$sqlParts['where'][] = '1=0';
 			}
 			else {
 				$sqlParts['from'][] = 'host_hgset hh';
@@ -2536,13 +2536,11 @@ class CHostPrototype extends CHostBase {
 				' AND '.dbConditionId('hd.parent_hostid', $hostids)
 		), 'hostid');
 
-		CHost::deleteForce($discovered_hosts);
+		if ($discovered_hosts) {
+			CHost::deleteForce($discovered_hosts);
+		}
 
-		DB::delete('interface', ['hostid' => $hostids]);
-		DB::delete('hosts_templates', ['hostid' => $hostids]);
 		DB::delete('host_tag', ['hostid' => $hostids]);
-		DB::delete('hostmacro', ['hostid' => $hostids]);
-		DB::delete('host_inventory', ['hostid' => $hostids]);
 		DB::update('hosts', [
 			'values' => ['templateid' => 0],
 			'where' => ['hostid' => $hostids]

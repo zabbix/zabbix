@@ -18,8 +18,8 @@
 #include "zbxip.h"
 #include "zbx_discoverer_constants.h"
 #ifdef HAVE_LIBCURL
-static int	http_task_process(short event, void *data, int *fd, struct evutil_addrinfo **current_ai,
-		const char *addr, char *dnserr, struct event *timeout_event)
+static int	http_task_process(short event, void *data, int *fd, zbx_vector_address_t *addresses,
+		const char *reverse_dns, char *dnserr, struct event *timeout_event)
 {
 	int					 task_ret = ZBX_ASYNC_TASK_STOP;
 	zbx_discovery_async_http_context_t	*http_context = (zbx_discovery_async_http_context_t *)data;
@@ -27,12 +27,12 @@ static int	http_task_process(short event, void *data, int *fd, struct evutil_add
 	ZBX_UNUSED(fd);
 	ZBX_UNUSED(dnserr);
 	ZBX_UNUSED(timeout_event);
-	ZBX_UNUSED(current_ai);
+	ZBX_UNUSED(addresses);
 
 	if (ZBX_ASYNC_HTTP_STEP_RDNS == http_context->step)
 	{
-		if (NULL != addr)
-			http_context->reverse_dns = zbx_strdup(NULL, addr);
+		if (NULL != reverse_dns)
+			http_context->reverse_dns = zbx_strdup(NULL, reverse_dns);
 
 		goto stop;
 	}
@@ -69,7 +69,7 @@ void	process_http_response(CURL *easy_handle, CURLcode err, void *arg)
 	else
 	{
 		http_context->res = SUCCEED;
-		zbx_async_poller_add_task(poller_config->base, poller_config->dnsbase,
+		zbx_async_poller_add_task(poller_config->base, NULL, poller_config->dnsbase,
 				http_context->async_result->dresult->ip, http_context, http_context->config_timeout,
 				http_task_process, process_http_result);
 	}

@@ -14,7 +14,7 @@
 **/
 
 
-require_once dirname(__FILE__).'/../common/testPagePrototypes.php';
+require_once __DIR__.'/../common/testPagePrototypes.php';
 
 /**
  * @backup hosts
@@ -181,6 +181,9 @@ class testPageItemPrototypesTemplate extends testPagePrototypes {
 	 * Dependent items has empty update interval column.
 	 *
 	 * @dataProvider getItemPrototypesNotDisplayedValuesData
+	 *
+	 * TODO: remove ignoreBrowserErrors after DEV-4233
+	 * @ignoreBrowserErrors
 	 */
 	public function testPageItemPrototypesTemplate_NotDisplayedValues($data) {
 		$this->page->login()->open($this->link.'parent_discoveryid='.self::$host_druleid)->waitUntilReady();

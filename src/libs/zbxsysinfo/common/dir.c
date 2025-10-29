@@ -940,8 +940,9 @@ static int	vfs_dir_info(AGENT_REQUEST *request, AGENT_RESULT *result, HANDLE tim
 
 		do
 		{
-			char	*path;
-			int	match;
+			char		*path;
+			int		match;
+			time_t		file_ft;
 
 			if (0 == wcscmp(data.cFileName, L".") || 0 == wcscmp(data.cFileName, L".."))
 				continue;
@@ -968,7 +969,9 @@ static int	vfs_dir_info(AGENT_REQUEST *request, AGENT_RESULT *result, HANDLE tim
 			if (max_size < DW2UI64(data.nFileSizeHigh, data.nFileSizeLow))
 				match = 0;
 
-			if (min_time >= FT2UT(data.ftLastWriteTime))
+			file_ft = FT2UT(data.ftLastWriteTime);
+
+			if (0 <= file_ft && min_time > file_ft)
 				match = 0;
 
 			if (max_time < FT2UT(data.ftLastWriteTime))
@@ -1135,7 +1138,7 @@ static int	vfs_dir_info(AGENT_REQUEST *request, AGENT_RESULT *result, int count_
 						(S_ISFIFO(status.st_mode) && 0 != (types & ZBX_FT_FIFO))) &&
 						(min_size <= (zbx_uint64_t)status.st_size
 								&& (zbx_uint64_t)status.st_size <= max_size) &&
-						(min_time < status.st_mtime &&
+						(min_time <= status.st_mtime &&
 								status.st_mtime <= max_time))
 				{
 					EVALUATE_DIR_ENTITY()

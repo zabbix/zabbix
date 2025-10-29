@@ -14,7 +14,7 @@
 **/
 
 
-require_once dirname(__FILE__).'/../common/testFormGroups.php';
+require_once __DIR__.'/../common/testFormGroups.php';
 
 /**
  * @backup hosts

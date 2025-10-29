@@ -1,0 +1,71 @@
+---
+test case: "1. IPv4 simple"
+in:
+  host: "127.0.0.1"
+  port: 80
+out:
+  hostport: "127.0.0.1:80"
+---
+test case: "2. IPv6 full"
+in:
+  host: "2001:0db8:85a3:0000:0000:8a2e:0370:7334"
+  port: 443
+out:
+  hostport: "[2001:0db8:85a3:0000:0000:8a2e:0370:7334]:443"
+---
+test case: "3. IPv6 compressed"
+in:
+  host: "2001:db8::1"
+  port: 8080
+out:
+  hostport: "[2001:db8::1]:8080"
+---
+test case: "4. Domain name"
+in:
+  host: "example.com"
+  port: 8080
+out:
+  hostport: "example.com:8080"
+---
+test case: "5. IPv6 localhost"
+in:
+  host: "::1"
+  port: 22
+out:
+  hostport: "[::1]:22"
+---
+test case: "6. IPv4 broadcast"
+in:
+  host: "255.255.255.255"
+  port: 65535
+out:
+  hostport: "255.255.255.255:65535"
+---
+test case: "7. Empty host"
+in:
+  host: ""
+  port: 123
+out:
+  hostport: ":123"
+---
+test case: "8. IPv6 with interface"
+in:
+  host: "fe80::1%eth0"
+  port: 161
+out:
+  hostport: "[fe80::1%eth0]:161"
+---
+test case: "9. Mixed characters in host"
+in:
+  host: "[abcd]:1234"
+  port: 9999
+out:
+  hostport: "[[abcd]:1234]:9999"
+---
+test case: "10. Incorrect host"
+in:
+  host: "scheme:path:without:authority"
+  port: 80
+out:
+  hostport: "[scheme:path:without:authority]:80"
+...

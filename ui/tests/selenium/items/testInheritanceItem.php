@@ -14,14 +14,17 @@
 **/
 
 
-require_once dirname(__FILE__).'/../../include/CLegacyWebTest.php';
-require_once dirname(__FILE__).'/../../../include/items.inc.php';
-require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
+require_once __DIR__.'/../../include/CLegacyWebTest.php';
+require_once __DIR__.'/../../../include/items.inc.php';
+require_once __DIR__.'/../behaviors/CMessageBehavior.php';
 
 /**
  * Test the creation of inheritance of new objects on a previously linked template.
  *
  * @backup items
+ *
+ * TODO: remove ignoreBrowserErrors after DEV-4233
+ * @ignoreBrowserErrors
  */
 class testInheritanceItem extends CLegacyWebTest {
 	private $templateid = 15000;	// 'Inheritance test template'
@@ -59,8 +62,8 @@ class testInheritanceItem extends CLegacyWebTest {
 		$this->query('link:'.CDBHelper::getValue('SELECT name from items WHERE itemid='.$data['itemid']))->one()->click();
 		COverlayDialogElement::find()->one()->waitUntilready()->getFooter()->query('button:Update')->one()->click();
 		COverlayDialogElement::ensureNotPresent();
+		$this->assertMessage(TEST_GOOD, 'Item updated');
 		$this->zbxTestCheckTitle('Configuration of items');
-		$this->zbxTestTextPresent('Item updated');
 
 		$this->assertEquals($oldHashItems, CDBHelper::getHash($sqlItems));
 	}

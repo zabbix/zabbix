@@ -45,7 +45,7 @@ static int	is_valid_base64_char(const char c)
  *                                                                                               *
  *          Note, that pcre regexp matching cannot be used, because it would exceed max          *
  *          stack frame limit when recursively checking long strings,                            *
- *          (check compute_recursion_limit() for more details).                                  *
+ *          (check compute_match_recursion_limit() for more details).                            *
  *                                                                                               *
  * Parameters: p_str - [IN] string to validate                                                   *
  *                                                                                               *

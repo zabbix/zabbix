@@ -13,7 +13,7 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-require_once dirname(__FILE__).'/../common/testFormTags.php';
+require_once __DIR__.'/../common/testFormTags.php';
 
 /**
  * @dataSource EntitiesTags

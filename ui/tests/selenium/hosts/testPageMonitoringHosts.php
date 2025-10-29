@@ -14,15 +14,15 @@
 **/
 
 
-require_once dirname(__FILE__).'/../../include/CWebTest.php';
-require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
-require_once dirname(__FILE__).'/../behaviors/CTagBehavior.php';
-require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
+require_once __DIR__.'/../../include/CWebTest.php';
+require_once __DIR__.'/../behaviors/CTableBehavior.php';
+require_once __DIR__.'/../behaviors/CTagBehavior.php';
+require_once __DIR__.'/../../include/helpers/CDataHelper.php';
 
 /**
  * @backup profiles
  *
- * @dataSource TagFilter, UserPermissions
+ * @dataSource TagFilter, UserPermissions, WidgetCommunication, DynamicItemWidgets
  */
 class testPageMonitoringHosts extends CWebTest {
 
@@ -185,6 +185,7 @@ class testPageMonitoringHosts extends CWebTest {
 					],
 					'expected' => [
 						'1_Host_to_check_Monitoring_Overview',
+						'2nd host for widgets',
 						'ЗАББИКС Сервер'
 					]
 				]
@@ -198,7 +199,8 @@ class testPageMonitoringHosts extends CWebTest {
 						]
 					],
 					'expected' => [
-						'1_Host_to_check_Monitoring_Overview'
+						'1_Host_to_check_Monitoring_Overview',
+						'3rd host for widgets'
 					]
 				]
 			],
@@ -211,6 +213,7 @@ class testPageMonitoringHosts extends CWebTest {
 						]
 					],
 					'expected' => [
+						'1st host for widgets',
 						'1_Host_to_check_Monitoring_Overview'
 					]
 				]
@@ -332,7 +335,10 @@ class testPageMonitoringHosts extends CWebTest {
 						]
 					],
 					'expected' => [
+						'1st host for widgets',
 						'1_Host_to_check_Monitoring_Overview',
+						'2nd host for widgets',
+						'3rd host for widgets',
 						'3_Host_to_check_Monitoring_Overview',
 						'4_Host_to_check_Monitoring_Overview',
 						'Host for tag permissions',
@@ -925,29 +931,20 @@ class testPageMonitoringHosts extends CWebTest {
 	 * Check enabled links and that correct host is displayed.
 	 */
 	public function testPageMonitoringHosts_EnabledLinks($data) {
-		$this->page->login()->open('zabbix.php?action=host.view&filter_reset=1');
-		$form = $this->query('name:zbx_filter')->waitUntilPresent()->asForm()->one();
+		$this->page->login()->open('zabbix.php?action=host.view&filter_reset=1')->waitUntilReady();
 		switch ($data['name']) {
 			case 'Dynamic widgets H1':
 			case 'Host ZBX6663':
 			case 'Available host':
+			case 'Empty host':
 				$this->selectLink($data['name'], $data['link_name'], $data['page_header']);
-				$this->page->waitUntilReady();
-				$filter_form = $this->query('name:zbx_filter')->waitUntilPresent()->asForm()->one();
+				$filter_form = $this->query('name:zbx_filter')->waitUntilVisible()->asForm()->one();
 				$filter_form->checkValue(['Hosts' => $data['name']]);
 				$this->query('button:Reset')->one()->click();
+				$this->page->waitUntilReady();
 				break;
 			case 'ЗАББИКС Сервер':
 				$this->selectLink($data['name'], $data['link_name'], $data['page_header']);
-				break;
-			case 'Empty host':
-				$this->page->waitUntilReady();
-				$this->query('xpath://td/a[text()="'.$data['name'].'"]/following::td/a[text()="'.$data['link_name'].'"]')
-					->one()->click();
-				$this->page->waitUntilReady();
-				$this->page->assertHeader($data['page_header']);
-				$form->checkValue(['Hosts' => $data['name']]);
-				$this->query('button:Reset')->one()->click();
 				break;
 		}
 	}
@@ -1146,15 +1143,15 @@ class testPageMonitoringHosts extends CWebTest {
 	 * @param string $page_header	Page header name
 	 */
 	private function selectLink($host_name, $column, $page_header) {
-		$this->page->waitUntilReady();
-		$this->query('class:list-table')->asTable()->one()->findRow('Name', $host_name)->query('link', $column)->one()->click();
+		$this->query('class:list-table')->asTable()->one()->findRow('Name', $host_name)->query('link', $column)
+				->waitUntilClickable()->one()->click();
 		$this->page->waitUntilReady();
 		if ($page_header !== null) {
 			$this->page->assertHeader($page_header);
 		}
 		if ($host_name === 'Dynamic widgets H1' && $this->query('xpath://li[@aria-labelledby="ui-id-2"'.
 				' and @aria-selected="false"]')->exists()) {
-			$this->query('id:ui-id-2')->one()->click();
+			$this->query('id:ui-id-2')->waitUntilClickable()->one()->click();
 		}
 		if ($host_name === 'ЗАББИКС Сервер' && $column === 'Dashboards') {
 			$this->assertEquals('ЗАББИКС Сервер', $this->query('xpath://ul[@class="breadcrumbs"]/li[2]')->one()->getText());

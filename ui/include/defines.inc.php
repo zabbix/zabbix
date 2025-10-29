@@ -13,8 +13,8 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-define('ZABBIX_VERSION',		'7.0.10rc1');
-define('ZABBIX_API_VERSION',	'7.0.10');
+define('ZABBIX_VERSION',		'7.0.20');
+define('ZABBIX_API_VERSION',	'7.0.20');
 define('ZABBIX_EXPORT_VERSION',	'7.0');
 
 define('ZABBIX_DB_VERSION',		7000000);
@@ -1413,6 +1413,9 @@ define('ZBX_FUNCTION_TYPE_OPERATOR',	5);
 define('ZBX_FUNCTION_TYPE_PREDICTION',	6);
 define('ZBX_FUNCTION_TYPE_STRING',		7);
 
+define('ZBX_HIGHLIGHT_OFF',	0);
+define('ZBX_HIGHLIGHT_ON',	1);
+
 define('ZBX_TIMELINE_OFF',	0);
 define('ZBX_TIMELINE_ON',	1);
 
@@ -1645,6 +1648,7 @@ if (!defined('JSON_ERROR_SYNTAX')) {
 
 // API errors
 define('ZBX_API_ERROR_INTERNAL',	111);
+define('ZBX_API_ERROR_DB',			112);
 define('ZBX_API_ERROR_PARAMETERS',	100);
 define('ZBX_API_ERROR_NO_ENTITY',	101);
 define('ZBX_API_ERROR_PERMISSIONS',	120);
@@ -2188,8 +2192,8 @@ define('ZBX_STYLE_TABLE_INITIAL_WIDTH', 'table-initial-width');
 define('ZBX_STYLE_TABLE_STATS', 'table-stats');
 define('ZBX_STYLE_TABS_NAV', 'tabs-nav');
 define('ZBX_STYLE_TAG', 'tag');
+define('ZBX_STYLE_TAGS_WRAPPER', 'tags-wrapper');
 define('ZBX_STYLE_TEXT_PLACEHOLDER', 'text-placeholder');
-define('ZBX_STYLE_TEXT_VERTICAL', 'text-vertical');
 define('ZBX_STYLE_TEXTAREA_FLEXIBLE', 'textarea-flexible');
 define('ZBX_STYLE_TEXTAREA_FLEXIBLE_CONTAINER', 'textarea-flexible-container');
 define('ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT', 'textarea-flexible-parent');
