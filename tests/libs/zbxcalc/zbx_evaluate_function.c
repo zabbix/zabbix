@@ -28,6 +28,7 @@
 #include "zbxnum.h"
 
 #include "mocks/valuecache/valuecache_mock.h"
+#include "../../../src/libs/zbxtrends/trends.h"
 
 int	__wrap_substitute_simple_macros(zbx_uint64_t *actionid, const zbx_db_event *event, const zbx_db_event *r_event,
 		zbx_uint64_t *userid, const zbx_uint64_t *hostid, const zbx_dc_host_t *dc_host,
@@ -36,6 +37,12 @@ int	__wrap_substitute_simple_macros(zbx_uint64_t *actionid, const zbx_db_event *
 		int macro_type, char *error, int maxerrlen);
 
 int __wrap_zbx_dc_get_data_expected_from(zbx_uint64_t itemid, int *seconds);
+
+int	__wrap_zbx_baseline_get_data(uint64_t itemid, unsigned char value_type, time_t now, const char *period,
+			int season_num, zbx_time_unit_t season_unit, int skip, zbx_vector_dbl_t *values,
+			zbx_vector_uint64_t *index, char **error);
+
+void	__wrap_zbx_recalc_time_period(time_t *ts_from, int table_group);
 
 int	__wrap_substitute_simple_macros(zbx_uint64_t *actionid, const zbx_db_event *event, const zbx_db_event *r_event,
 		zbx_uint64_t *userid, const zbx_uint64_t *hostid, const zbx_dc_host_t *dc_host,
@@ -70,6 +77,34 @@ int __wrap_zbx_dc_get_data_expected_from(zbx_uint64_t itemid, int *seconds)
 	return SUCCEED;
 }
 
+// zbx_vector_dbl_t	baseline_get_data_values;
+// zbx_vector_uint64_t	baseline_get_data_index;
+
+int	__wrap_zbx_baseline_get_data(uint64_t itemid, unsigned char value_type, time_t now, const char *period,
+		int season_num, zbx_time_unit_t season_unit, int skip, zbx_vector_dbl_t *baseline_get_data_values,
+		zbx_vector_uint64_t *baseline_get_data_index, char **error)
+{
+	ZBX_UNUSED(itemid);
+	ZBX_UNUSED(value_type);
+	ZBX_UNUSED(now);
+	ZBX_UNUSED(period);
+	ZBX_UNUSED(season_num);
+	ZBX_UNUSED(season_unit);
+	ZBX_UNUSED(error);
+	ZBX_UNUSED(skip);
+
+	zbx_mock_extract_yaml_values_dbl(zbx_mock_get_parameter_handle("in.baseline_values"), baseline_get_data_values);
+	zbx_mock_extract_yaml_values_dbl(zbx_mock_get_parameter_handle("in.baseline_index"), baseline_get_data_index);
+
+	return SUCCEED;
+}
+
+void	__wrap_zbx_recalc_time_period(time_t *ts_from, int table_group)
+{
+	ZBX_UNUSED(table_group);
+	ZBX_UNUSED(ts_from);
+}
+
 void	zbx_mock_test_entry(void **state)
 {
 	int			err, expected_ret, returned_ret;
@@ -82,6 +117,8 @@ void	zbx_mock_test_entry(void **state)
 	zbx_variant_t		returned_value;
 	zbx_dc_evaluate_item_t	evaluate_item;
 
+	ZBX_UNUSED(state);
+
 	zbx_update_epsilon_to_float_precision();
 
 	err = zbx_vc_init(get_zbx_config_value_cache_size(), &error);
@@ -90,6 +127,8 @@ void	zbx_mock_test_entry(void **state)
 	zbx_vc_enable();
 
 	zbx_vcmock_ds_init();
+
+	zbx_mockdb_init();
 
 	memset(&item, 0, sizeof(zbx_dc_item_t));
 
@@ -162,5 +201,5 @@ void	zbx_mock_test_entry(void **state)
 
 	zbx_vcmock_ds_destroy();
 
-	ZBX_UNUSED(state);
+	zbx_mockdb_destroy();
 }

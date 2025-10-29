@@ -1,0 +1,33 @@
+---
+test case: macro inside function
+in:
+  lld: '{"disk":"sda"}'
+  data: 'strlen({#DISK}) > 0'
+  macros:
+    - { macro: '{#DISK}', path: $.disk }
+out:
+  data: 'strlen("sda") > 0'
+  return: SUCCEED
+---
+test case: item query with lld macro
+in:
+  lld: '{"ifname":"eth0"}'
+  data: 'last(/host/net.if.discovery[{#IFNAME}])'
+  macros:
+    - { macro: '{#IFNAME}', path: $.ifname }
+out:
+  data: 'last(/host/net.if.discovery[eth0])'
+  return: SUCCEED
+---
+test case: item query with lld macro and filter
+in:
+  lld: '{"ifname":"eth0"}'
+  data:  'mad(bucket_rate_foreach(/*/some.zabbix.key[{#LLDMACRO}]?[group="{HOSTGROUPLLD}"],1d))'
+  macros:
+    - { macro: '{#LLDMACRO}', path: $.ifname }
+out:
+  data: 'mad(bucket_rate_foreach(/*/some.zabbix.key[eth0]?[group="{HOSTGROUPLLD}"],1d))'
+  return: SUCCEED
+
+
+

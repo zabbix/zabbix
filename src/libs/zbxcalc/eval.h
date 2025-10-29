@@ -54,4 +54,12 @@ int	zbx_execute_count_with_pattern(char *pattern, unsigned char value_type, zbx_
 
 const char	*zbx_type_string(zbx_value_type_t type);
 
+void do_trace(char *file, int line);
+
+#define TRACE() do { \
+do_trace(__FILE__, __LINE__); \
+} while (0)
+
+void trace_report(void);
+
 #endif
