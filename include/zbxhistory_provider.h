@@ -140,6 +140,15 @@ ZBX_VECTOR_DECL(item_history, zbx_item_history_t)
 
 typedef struct
 {
+	unsigned char	value_type;
+	time_t		ttl;
+}
+zbx_history_provider_value_type_info_t;
+
+ZBX_VECTOR_DECL(history_provider_value_type_info, zbx_history_provider_value_type_info_t)
+
+typedef struct
+{
 	char		*database;
 
 	zbx_uint32_t	current_version;
@@ -152,7 +161,7 @@ typedef struct
 	char		*friendly_max_version;
 	char		*friendly_min_supported_version;
 
-	zbx_uint64_t	flags;
+	zbx_vector_history_provider_value_type_info_t	value_types;
 }
 zbx_history_provider_info_t;
 

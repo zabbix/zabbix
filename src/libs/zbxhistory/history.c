@@ -19,6 +19,7 @@
 #include "history_sql.h"
 #include "history_elastic.h"
 #include "history_clickhouse.h"
+#include "zbxhistory_provider.h"
 
 #include "zbxdb.h"
 #include "zbxdbhigh.h"
@@ -32,6 +33,7 @@
 ZBX_VECTOR_IMPL(history_record, zbx_history_record_t)
 ZBX_PTR_VECTOR_IMPL(dc_history_ptr, zbx_dc_history_t *)
 ZBX_VECTOR_IMPL(item_history, zbx_item_history_t)
+ZBX_VECTOR_IMPL(history_provider_value_type_info, zbx_history_provider_value_type_info_t)
 
 void	zbx_dc_history_shallow_free(zbx_dc_history_t *dc_history)
 {
@@ -97,6 +99,7 @@ static void	history_session_clear(zbx_history_session_t *session);
  *******************************************************************************/
 static void	history_provider_info_clear(zbx_history_provider_info_t *info)
 {
+	zbx_vector_history_provider_value_type_info_destroy(&info->value_types);
 	zbx_free(info->database);
 	zbx_free(info->friendly_current_version);
 	zbx_free(info->friendly_min_version);
@@ -304,7 +307,6 @@ static int	history_manager_init(zbx_history_manager_t *manager, const char *conf
 {
 	zbx_vector_history_option_t	options;
 	int				ret = FAIL, index;
-	const char			*value_types[] = {"dbl", "str", "log", "uint", "text", "bin"};
 	zbx_uint64_t			value_type_mask = 0, mask;
 
 	memset(manager, 0, sizeof(zbx_history_manager_t));
@@ -328,7 +330,7 @@ static int	history_manager_init(zbx_history_manager_t *manager, const char *conf
 							config_history_storage_pipelines));
 		}
 
-		mask = history_options_type_mask(options.values, options.values_num, value_types);
+		mask = history_options_type_mask(options.values, options.values_num);
 		value_type_mask |= mask;
 
 		index = history_manager_register_provider(manager, HISTORY_PROVIDER_ELASTIC, &options);
@@ -347,7 +349,7 @@ static int	history_manager_init(zbx_history_manager_t *manager, const char *conf
 			if (SUCCEED != history_provider_parse_options(*provider, &name, &options, error))
 				goto out;
 
-			mask = history_options_type_mask(options.values, options.values_num, value_types);
+			mask = history_options_type_mask(options.values, options.values_num);
 			if (0 != (value_type_mask & mask))
 			{
 				zbx_free(name);
@@ -527,7 +529,6 @@ static int	history_manager_get_info(zbx_history_manager_t *manager, zbx_history_
 			goto out;
 		}
 
-		mi.flags = history_manager_get_provider_value_types(manager, i);
 		zbx_vector_history_provider_info_append(&custom, mi);
 	}
 
@@ -1323,7 +1324,28 @@ static void	history_add_version_info(struct zbx_json *json, zbx_history_provider
 				ZBX_JSON_TYPE_STRING);
 	}
 
-	zbx_json_addint64(json, "value_types", info->flags);
+	if (0 != info->value_types.values_num)
+	{
+		zbx_json_addarray(json, "value_types");
+
+		for (int i = 0; i < info->value_types.values_num; i++)
+		{
+			zbx_history_provider_value_type_info_t	*type_info = &info->value_types.values[i];
+
+			zbx_json_addobject(json, NULL);
+
+			zbx_json_addstring(json, "type", history_value_type_str(type_info->value_type),
+					ZBX_JSON_TYPE_STRING);
+
+			if (0 != type_info->ttl)
+				zbx_json_adduint64(json, "ttl", (zbx_uint64_t)type_info->ttl);
+
+			zbx_json_close(json);
+		}
+
+		zbx_json_close(json);
+	}
+
 	zbx_json_close(json);
 
 	zbx_json_close(json);
@@ -1459,6 +1481,25 @@ const char	*history_value_type_desc(unsigned char value_type)
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: get description of history value type                             *
+ *                                                                            *
+ * Parameters: value_type - [IN] the history value type                       *
+ *                                                                            *
+ * Return value: description of the history value type                        *
+ *                                                                            *
+ ******************************************************************************/
+const char	*history_value_type_str(unsigned char value_type)
+{
+	static char	*value_types_str[] = {"float", "str", "log", "uint", "text", "bin"};
+
+	if (value_type >= ARRSIZE(value_types_str))
+		return "unknown";
+
+	return value_types_str[value_type];
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: compare two item history structures by item identifier            *
  *                                                                            *
  ******************************************************************************/
@@ -1484,3 +1525,4 @@ int	zbx_item_history_compare_by_index_desc(const void *d1, const void *d2)
 
 	return h2->index - h1->index;
 }
+

@@ -47,7 +47,7 @@ const char	*history_option_value(const zbx_history_option_t *options, int option
 int	history_provider_parse_options(const char *conf, char **name, zbx_vector_history_option_t *options,
 		char **error);
 void	history_options_clear(zbx_history_option_t *options, int options_num);
-zbx_uint64_t	history_options_type_mask(zbx_history_option_t *options, int options_num, const char **value_types);
+zbx_uint64_t	history_options_type_mask(zbx_history_option_t *options, int options_num);
 
 int	history_options_add_common_params(zbx_vector_history_option_t *options, const char *config_source_ip,
 		int config_log_slow_queries, const char *config_ssl_ca_location, const char *config_ssl_cert_location,

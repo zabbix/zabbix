@@ -328,8 +328,20 @@ void	history_options_clear(zbx_history_option_t *options, int options_num)
 	}
 }
 
-zbx_uint64_t	history_options_type_mask(zbx_history_option_t *options, int options_num, const char **value_types)
+/******************************************************************************
+ *                                                                            *
+ * Purpose: convert value types option string to bitmask                      *
+ *                                                                            *
+ * Parameters: options     - [IN] array of history options                    *
+ *             options_num - [IN] number of options in the array              *
+ *                                                                            *
+ * Return value: bitmask representing supported value types                   *
+ *                                                                            *
+ ******************************************************************************/
+zbx_uint64_t	history_options_type_mask(zbx_history_option_t *options, int options_num)
 {
+	static const char	*value_types[ITEM_VALUE_TYPE_COUNT] = {"dbl", "str", "log", "uint", "text", "bin"};
+
 	zbx_uint64_t	mask = 0;
 	const char	*types;
 
@@ -341,6 +353,9 @@ zbx_uint64_t	history_options_type_mask(zbx_history_option_t *options, int option
 
 	for (int i = 0; i < ITEM_VALUE_TYPE_COUNT; i++)
 	{
+		if (NULL == value_types[i])
+			continue;
+
 		if (SUCCEED == zbx_str_in_list(types, value_types[i], ','))
 			mask |= (__UINT64_C(1) << i);
 	}

@@ -73,6 +73,8 @@ typedef struct
 	int					ssl_verify_peer;
 	int					ssl_verify_host;
 
+	zbx_uint64_t				value_type_flags;
+
 	const char				*base_url;
 	const char				*username;
 	const char				*password;
@@ -244,6 +246,8 @@ static void	*history_clickhouse_create_data(const zbx_history_option_t *options,
 
 	data->base_url = url;
 	data->fetch_url = zbx_dsprintf(NULL, "%s?database=%s&date_time_output_format=unix_timestamp", url, db);
+
+	data->value_type_flags = history_options_type_mask(options, options_num);
 
 	zbx_url_encode(db, &data->db);
 
@@ -1130,11 +1134,17 @@ static int	clickhouse_conn_post(zbx_clickhouse_conn_t *conn, zbx_clickhouse_data
 
 		if (NULL != errmsg)
 		{
+			if (CLICKHOUSE_RETRIES_OFF == retry_mode)
+			{
+				*error = errmsg;
+				goto cleanup;
+			}
+
 			zabbix_log(LOG_LEVEL_WARNING, "failed to fetch data from ClickHouse: %s", errmsg);
 			zbx_free(errmsg);
 		}
 
-		if (0 == retries_num || CLICKHOUSE_RETRIES_OFF == retry_mode)
+		if (0 == retries_num)
 			break;
 
 		zabbix_log(LOG_LEVEL_ERR, "ClickHouse database is down: reconnecting in %d seconds",
@@ -1393,6 +1403,61 @@ out:
 	return ret;
 }
 
+static void	history_clickhouse_add_value_type_info(zbx_history_provider_info_t *info, unsigned char value_type,
+		const char *schema)
+{
+	zbx_history_provider_value_type_info_t	vti = {.value_type = value_type};
+	char					*ttl = NULL;
+
+	if (SUCCEED == zbx_mregexp_sub(schema, "TTL +timestamp +\\+ +toIntervalSecond\\((\\d+)\\)", "\\1",
+			ZBX_REGEXP_GROUP_CHECK_DISABLE, &ttl) && NULL != ttl)
+	{
+		vti.ttl = (time_t)atol(ttl);
+		zbx_free(ttl);
+	}
+
+	zbx_vector_history_provider_value_type_info_append(&info->value_types, vti);
+}
+
+static void	history_clickhouse_get_value_type_data(zbx_clickhouse_data_t *d, CURLM *mhandle,
+		zbx_clickhouse_conn_t *conn, zbx_history_provider_info_t *info)
+{
+	char	*error = NULL;
+	char	*sql = NULL;
+	size_t	sql_alloc = 0, sql_offset;
+
+	zbx_vector_history_provider_value_type_info_reserve(&info->value_types, ITEM_VALUE_TYPE_COUNT);
+
+	for (int i = 0; i < ITEM_VALUE_TYPE_BIN; i++)
+	{
+		if (FAIL == ZBX_HISTORY_CHECK_TYPE_FLAGS(d->value_type_flags, i))
+			continue;
+
+		sql_offset = 0;
+
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "show create table %s", clickhouse_history_tables[i]);
+
+		if (FAIL == clickhouse_conn_post(conn, d, mhandle, d->fetch_url, sql, CLICKHOUSE_RETRIES_OFF, &error))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "cannot get TTL information for table %s from ClickHouse: %s",
+					clickhouse_history_tables[i], error);
+			zbx_free(error);
+			continue;
+		}
+
+		if (NULL == conn->resp.page.data)
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "cannot get TTL information for table %s:"
+					" empty response received from ClickHouse", clickhouse_history_tables[i]);
+			continue;
+		}
+
+		history_clickhouse_add_value_type_info(info, i, conn->resp.page.data);
+	}
+
+	zbx_free(sql);
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: retrieve information about ClickHouse history module              *
@@ -1460,6 +1525,9 @@ static int	history_clickhouse_get_info(void *data, zbx_history_provider_info_t *
 	info->friendly_min_version = zbx_strdup(NULL, HISTORY_CLICKHOUSE_MIN_VERSION_STR);
 	info->friendly_max_version = zbx_strdup(NULL, HISTORY_CLICKHOUSE_MAX_VERSION_STR);
 	info->friendly_min_supported_version = zbx_strdup(NULL, HISTORY_CLICKHOUSE_MIN_VERSION_STR);
+
+	zbx_vector_history_provider_value_type_info_create(&info->value_types);
+	history_clickhouse_get_value_type_data(d, mhandle, conn, info);
 
 	ret = SUCCEED;
 out:

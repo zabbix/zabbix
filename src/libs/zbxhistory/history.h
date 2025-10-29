@@ -45,5 +45,6 @@ zbx_history_provider_t;
 zbx_uint64_t	history_make_flush_error(int ret, unsigned char value_type);
 
 const char	*history_value_type_desc(unsigned char value_type);
+const char	*history_value_type_str(unsigned char value_type);
 
 #endif
