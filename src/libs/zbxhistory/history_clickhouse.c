@@ -596,7 +596,7 @@ static int	history_clickhouse_flush_conns(zbx_clickhouse_data_t *d, CURLM *mhand
 	CURLMcode		code;
 	int			running = 0;
 	CURLMsg			*msg;
-	int			msg_num, long_query_limit;
+	int			msg_num, long_query_limit, retries_num;
 	zbx_vector_ptr_t	retries;
 	double			ts_now, ts_last;
 
@@ -611,18 +611,22 @@ static int	history_clickhouse_flush_conns(zbx_clickhouse_data_t *d, CURLM *mhand
 
 	do
 	{
+		/* curl_multi_perform/curl_multi_wait failures are indication of internal libcurl errors  */
+		/* or system resource exhaustion - in both cases state of multi handle could be corrupted */
+		/* and better to fail the whole batch                                                     */
+
 		if (CURLM_OK != (code = curl_multi_perform(mhandle, &running)))
 		{
 			*error = zbx_dsprintf(*error, "cannot perform on curl multi handle: %s",
 					curl_multi_strerror(code));
-			break;
+			goto out;
 		}
 
 		if (CURLM_OK != (code = zbx_curl_multi_wait(mhandle, ZBX_HISTORY_STORAGE_TIMEOUT_MS, NULL)))
 		{
 			*error = zbx_dsprintf(*error, "cannot wait on curl multi handle: %s",
 					curl_multi_strerror(code));
-			break;
+			goto out;
 		}
 
 		if (0 == running)
@@ -702,8 +706,8 @@ static int	history_clickhouse_flush_conns(zbx_clickhouse_data_t *d, CURLM *mhand
 
 		conn->status = SUCCEED;
 	}
-
-	int	retries_num = retries.values_num;
+out:
+	retries_num = retries.values_num;
 
 	for (int i = 0; i < retries.values_num; i++)
 	{
@@ -716,7 +720,7 @@ static int	history_clickhouse_flush_conns(zbx_clickhouse_data_t *d, CURLM *mhand
 
 	zbx_vector_ptr_destroy(&retries);
 
-	return retries_num + running;
+	return retries_num;
 }
 
 /******************************************************************************
@@ -1171,15 +1175,20 @@ static int	clickhouse_conn_post(zbx_clickhouse_conn_t *conn, zbx_clickhouse_data
 		attempts_num++;
 		retries_num = history_clickhouse_flush_conns(d, mhandle, &errmsg);
 
-		if (NULL != errmsg)
+		if (FAIL == conn->status)
 		{
 			if (CLICKHOUSE_RETRIES_OFF == retry_mode)
 			{
-				*error = errmsg;
+				if (NULL != errmsg)
+					*error = errmsg;
+				else
+					*error = zbx_strdup(NULL, "unknown error");
+
 				goto cleanup;
 			}
 
-			zabbix_log(LOG_LEVEL_WARNING, "failed to fetch data from ClickHouse: %s", errmsg);
+			zabbix_log(LOG_LEVEL_WARNING, "failed to fetch data from ClickHouse: %s",
+					NULL == errmsg ? "unknown error" : errmsg);
 			zbx_free(errmsg);
 		}
 
