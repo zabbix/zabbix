@@ -1409,10 +1409,27 @@ static void	history_clickhouse_add_value_type_info(zbx_history_provider_info_t *
 	zbx_history_provider_value_type_info_t	vti = {.value_type = value_type};
 	char					*ttl = NULL;
 
-	if (SUCCEED == zbx_mregexp_sub(schema, "TTL +timestamp +\\+ +toIntervalSecond\\((\\d+)\\)", "\\1",
+	if (SUCCEED == zbx_mregexp_sub(schema, "TTL +timestamp +\\+ +toInterval(\\w+)\\((\\d+)\\)", "\\1:\\2",
 			ZBX_REGEXP_GROUP_CHECK_DISABLE, &ttl) && NULL != ttl)
 	{
-		vti.ttl = (time_t)atol(ttl);
+		char	*value;
+
+		if (NULL != (value = strchr(ttl, ':')))
+		{
+			*value++ = '\0';
+			vti.ttl = (time_t)atol(value);
+
+			if (0 == strcmp(ttl, "Day"))
+				vti.ttl *= SEC_PER_DAY;
+			else if (0 == strcmp(ttl, "Week"))
+				vti.ttl *= SEC_PER_WEEK;
+			else if (0 == strcmp(ttl, "Month"))
+				vti.ttl *= SEC_PER_MONTH;
+			else if (0 == strcmp(ttl, "Quarter"))
+				vti.ttl *= SEC_PER_MONTH * 3;
+			else if (0 == strcmp(ttl, "Year"))
+				vti.ttl *= SEC_PER_YEAR;
+		}
 		zbx_free(ttl);
 	}
 

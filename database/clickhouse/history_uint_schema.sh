@@ -13,8 +13,9 @@ CREATE TABLE $CH_DB.history_uint
 	value UInt64
 )
 ENGINE = MergeTree()
+PARTITION BY toDate(timestamp)
 PRIMARY KEY (itemid, timestamp)
-TTL toDateTime(timestamp) + INTERVAL $CH_TTL
+TTL timestamp + toIntervalSecond($CH_TTL)
 EOF
 
 

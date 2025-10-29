@@ -12,8 +12,9 @@ CREATE TABLE IF NOT EXISTS $CH_DB.history_text
 	value String
 )
 ENGINE = MergeTree()
+PARTITION BY toDate(timestamp)
 PRIMARY KEY (itemid, timestamp)
-TTL toDateTime(timestamp) + INTERVAL $CH_TTL
+TTL timestamp + toIntervalSecond($CH_TTL)
 EOF
 
 
