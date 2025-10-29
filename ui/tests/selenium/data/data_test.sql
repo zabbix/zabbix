@@ -1287,13 +1287,6 @@ INSERT INTO interface (type, ip, dns, useip, port, main, hostid, interfaceid) VA
 INSERT INTO hostmacro (hostmacroid, hostid, macro, value, description) VALUES (90106, 99016, '{$TEMPLATE_MACRO_FOR_REMOVE1}', '', '');
 INSERT INTO hostmacro (hostmacroid, hostid, macro, value, description) VALUES (90107, 99016, '{$TEMPLATE_MACRO_FOR_REMOVE2}', '', '');
 
--- testPageTriggerUrl
-INSERT INTO dashboard (dashboardid, name, userid, private) VALUES (1020, 'Dashboard for Trigger overview widget', 1, 1);
-INSERT INTO dashboard_page (dashboard_pageid, dashboardid) VALUES (156700, 1020);
-INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (100003, 156700, 'trigover', 'Group to check Overview', 0, 0, 12, 7);
-INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (1345, 100003, 0, 'style', 1);
-INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_groupid) VALUES (1346, 100003, 2, 'groupids', 0, 50011);
-
 -- testFormItemTest
 INSERT INTO hosts (hostid, host, name, status, description) VALUES (99136, 'Test item host', 'Test item host', 0, 'Test item host for testing items');
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (100999, 99136, 4);
@@ -1337,11 +1330,6 @@ INSERT INTO media_type_param (mediatype_paramid, mediatypeid, name, value) VALUE
 INSERT INTO media_type (mediatypeid, type, name, status, script, show_event_menu, event_menu_name, event_menu_url, description) VALUES (103, 4, 'Webhook to delete', 0, 'return 0;', 1, 'Unique webhook url', 'zabbix.php?action=mediatype.list&ddreset={EVENT.TAGS.webhook}', 'Webhook media type to be deleted');
 INSERT INTO media_type_param (mediatype_paramid, mediatypeid, name, value) VALUES (1010, 103, 'Parameter name to be deleted', 'Parameter value to be deleted');
 INSERT INTO media_type_param (mediatype_paramid, mediatypeid, name, value) VALUES (1011, 103, '2nd parameter name to be deleted', '2nd parameter value to be deleted');
-
--- testPageProblems_ProblemLinks
-INSERT INTO media_type (mediatypeid, type, name, status, script, show_event_menu, event_menu_name, event_menu_url, description) VALUES (104, 4, 'URL test webhook', 0, 'return 0;', 1, 'Webhook url for all', 'zabbix.php?action=mediatype.edit&mediatypeid=101', 'Webhook media type for URL test');
-INSERT INTO event_tag (eventtagid, eventid, tag, value) VALUES (201, 9003, 'webhook', '1');
-INSERT INTO problem_tag (problemtagid, eventid, tag, value) VALUES (201, 9003, 'webhook', '1');
 
 -- Dashboard for Graph Prototype widget
 INSERT INTO dashboard (dashboardid, name, userid, private) VALUES (1400, 'Dashboard for Graph Prototype widget', 1, 1);
