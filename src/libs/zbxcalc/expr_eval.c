@@ -35,48 +35,6 @@
 #include "zbxdbwrap.h"
 #include "zbx_expression_constants.h"
 
-#define MAX_TRACE_POINTS 10000
-
-typedef struct {
-    int hit;
-    const char *file;
-    int line;
-} trace_entry_t;
-
-static trace_entry_t trace_hits[MAX_TRACE_POINTS];
-static int trace_count = 0;
-
-void do_trace(char *file, int line)
-{
-    int idx = trace_count++;
-    if (idx < MAX_TRACE_POINTS) {
-        trace_hits[idx].hit = 1;
-        trace_hits[idx].file = file;
-        trace_hits[idx].line = line;
-	zabbix_log(LOG_LEVEL_INFORMATION," - %s:%d was hit\n",
-                       trace_hits[idx].file, trace_hits[idx].line);
-    }
-}
-
-
-__attribute__((destructor))
-static void trace_report_auto(void)
-{
-    trace_report();
-}
-
-
-void trace_report(void)
-{
-    zabbix_log(LOG_LEVEL_INFORMATION, "\nTRACE REPORT:\n");
-    for (int i = 0; i < trace_count; ++i) {
-        if (trace_hits[i].hit)
-            zabbix_log(LOG_LEVEL_INFORMATION," - %s:%d was hit\n",
-                       trace_hits[i].file, trace_hits[i].line);
-    }
-}
-
-
 #define ZBX_ITEM_QUERY_UNSET		0x0000
 
 #define ZBX_ITEM_QUERY_HOST_SELF	0x0001
@@ -115,18 +73,18 @@ ZBX_PTR_VECTOR_IMPL(expression_item_ptr, zbx_expression_item_t *)
 ZBX_PTR_VECTOR_IMPL(expression_query_ptr, zbx_expression_query_t *)
 
 static void	expression_query_free_one(zbx_expression_query_one_t *query)
-{ TRACE();
+{
 	zbx_free(query);
 }
 
 static void	expression_query_free_many(zbx_expression_query_many_t *query)
-{ TRACE();
+{
 	zbx_vector_uint64_destroy(&query->itemids);
 	zbx_free(query);
 }
 
 static void	expression_query_free(zbx_expression_query_t *query)
-{ TRACE();
+{
 	zbx_eval_clear_query(&query->ref);
 
 	if (ZBX_ITEM_QUERY_ERROR == query->flags)
@@ -146,7 +104,7 @@ static void	expression_query_free(zbx_expression_query_t *query)
  ******************************************************************************/
 static int	test_key_param_wildcard_cb(const char *data, int key_type, int level, int num, int quoted,
 		void *cb_data, char **param)
-{ TRACE();
+{
 	ZBX_UNUSED(key_type);
 	ZBX_UNUSED(num);
 	ZBX_UNUSED(quoted);
@@ -156,7 +114,7 @@ static int	test_key_param_wildcard_cb(const char *data, int key_type, int level,
 		return SUCCEED;
 
 	if ('*' == data[0] && '\0' == data[1])
-	{ TRACE();
+	{
 		*(int *)cb_data = 1;
 		return FAIL;
 	}
@@ -174,7 +132,7 @@ static int	test_key_param_wildcard_cb(const char *data, int key_type, int level,
  *                                                                            *
  ******************************************************************************/
 static zbx_expression_query_t*	expression_create_query(const char *itemquery)
-{ TRACE();
+{
 	zbx_expression_query_t	*query;
 
 	query = (zbx_expression_query_t *)zbx_malloc(NULL, sizeof(zbx_expression_query_t));
@@ -183,7 +141,7 @@ static zbx_expression_query_t*	expression_create_query(const char *itemquery)
 	query->flags = ZBX_ITEM_QUERY_UNSET;
 
 	if (0 != zbx_eval_parse_query(itemquery, strlen(itemquery), &query->ref))
-	{ TRACE();
+	{
 		if (NULL == query->ref.host)
 			query->flags |= ZBX_ITEM_QUERY_HOST_SELF;
 		else if ('*' == *query->ref.host)
@@ -195,11 +153,11 @@ static zbx_expression_query_t*	expression_create_query(const char *itemquery)
 			query->flags |= ZBX_ITEM_QUERY_FILTER;
 
 		if ('*' == *query->ref.key)
-		{ TRACE();
+		{
 			query->flags |= ZBX_ITEM_QUERY_KEY_ANY;
 		}
 		else if (NULL != strchr(query->ref.key, '*'))
-		{ TRACE();
+		{
 			int	wildcard = 0;
 
 			zbx_replace_key_params_dyn(&query->ref.key, ZBX_KEY_TYPE_ITEM, test_key_param_wildcard_cb,
@@ -218,7 +176,7 @@ static zbx_expression_query_t*	expression_create_query(const char *itemquery)
 }
 
 static void	expression_group_free(zbx_expression_group_t *group)
-{ TRACE();
+{
 	zbx_free(group->name);
 	zbx_vector_uint64_destroy(&group->hostids);
 	zbx_free(group);
@@ -237,11 +195,11 @@ static void	expression_group_free(zbx_expression_group_t *group)
  *                                                                            *
  ******************************************************************************/
 static zbx_expression_group_t	*expression_get_group(zbx_expression_eval_t *eval, const char *name)
-{ TRACE();
+{
 	zbx_expression_group_t	*group;
 
 	for (int i = 0; i < eval->groups.values_num; i++)
-	{ TRACE();
+	{
 		group = eval->groups.values[i];
 
 		if (0 == strcmp(group->name, name))
@@ -270,11 +228,11 @@ static zbx_expression_group_t	*expression_get_group(zbx_expression_eval_t *eval,
  *                                                                            *
  ******************************************************************************/
 static zbx_expression_item_t	*expression_get_item(zbx_expression_eval_t *eval, zbx_uint64_t itemid)
-{ TRACE();
+{
 	zbx_expression_item_t	*item;
 
 	for (int i = 0; i < eval->itemtags.values_num; i++)
-	{ TRACE();
+	{
 		item = eval->itemtags.values[i];
 
 		if (item->itemid == itemid)
@@ -291,7 +249,7 @@ static zbx_expression_item_t	*expression_get_item(zbx_expression_eval_t *eval, z
 }
 
 static void	expression_item_free(zbx_expression_item_t *item)
-{ TRACE();
+{
 	zbx_vector_item_tag_clear_ext(&item->tags, zbx_free_item_tag);
 	zbx_vector_item_tag_destroy(&item->tags);
 	zbx_free(item);
@@ -306,7 +264,7 @@ static void	expression_item_free(zbx_expression_item_t *item)
  *                                                                            *
  ******************************************************************************/
 static void	expression_init_query_one(zbx_expression_eval_t *eval, zbx_expression_query_t *query)
-{ TRACE();
+{
 	zbx_expression_query_one_t	*data;
 
 	data = (zbx_expression_query_one_t *)zbx_malloc(NULL, sizeof(zbx_expression_query_one_t));
@@ -322,7 +280,7 @@ static void	expression_init_query_one(zbx_expression_eval_t *eval, zbx_expressio
  ******************************************************************************/
 static int	replace_key_param_wildcard_cb(const char *data, int key_type, int level, int num, int quoted,
 		void *cb_data, char **param)
-{ TRACE();
+{
 	char	*tmp;
 
 	ZBX_UNUSED(key_type);
@@ -333,7 +291,7 @@ static int	replace_key_param_wildcard_cb(const char *data, int key_type, int lev
 		return SUCCEED;
 
 	if ('*' == data[0] && '\0' == data[1])
-	{ TRACE();
+	{
 		*param = zbx_strdup(NULL, "%");
 		return SUCCEED;
 	}
@@ -348,7 +306,7 @@ static int	replace_key_param_wildcard_cb(const char *data, int key_type, int lev
 
 	/* escaping cannot result in unquotable parameter */
 	if (FAIL == zbx_quote_key_param(param, quoted))
-	{ TRACE();
+	{
 		THIS_SHOULD_NEVER_HAPPEN;
 		zbx_free(*param);
 	}
@@ -365,7 +323,7 @@ static int	replace_key_param_wildcard_cb(const char *data, int key_type, int lev
  *                                                                            *
  ******************************************************************************/
 static int	expression_match_item_key(const char *item_key, const AGENT_REQUEST *pattern)
-{ TRACE();
+{
 	AGENT_REQUEST	key;
 	int		i, ret = FAIL;
 
@@ -381,7 +339,7 @@ static int	expression_match_item_key(const char *item_key, const AGENT_REQUEST *
 		goto out;
 
 	for (i = 0; i < key.nparam; i++)
-	{ TRACE();
+	{
 		if (0 == strcmp(pattern->params[i], "*"))
 			continue;
 
@@ -412,7 +370,7 @@ zbx_expression_eval_many_t;
  * Parameters: eval            - [IN] evaluation data                         *
  *             query           - [IN] expression item query                   *
  *             groups          - [IN] groups in filter template               *
- *             filter_template - [IN] group filter template with { TRACE();index}      *
+ *             filter_template - [IN] group filter template with {index}      *
  *                                    placeholders referring to a group in    *
  *                                    groups vector                           *
  *             itemhosts       - [out] itemid+hostid pairs matching query     *
@@ -420,7 +378,7 @@ zbx_expression_eval_many_t;
  ******************************************************************************/
 static void	expression_get_item_candidates(zbx_expression_eval_t *eval, const zbx_expression_query_t *query,
 		const zbx_vector_str_t *groups, const char *filter_template, zbx_vector_uint64_pair_t *itemhosts)
-{ TRACE();
+{
 	zbx_db_result_t	result;
 	zbx_db_row_t	row;
 	char		*sql = NULL, *esc, *clause = "where";
@@ -430,10 +388,10 @@ static void	expression_get_item_candidates(zbx_expression_eval_t *eval, const zb
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "select i.itemid,i.hostid");
 
 	if (0 != (query->flags & ZBX_ITEM_QUERY_KEY_SOME))
-	{ TRACE();
+	{
 		zbx_init_agent_request(&pattern);
 		if (SUCCEED != zbx_parse_item_key(query->ref.key, &pattern))
-		{ TRACE();
+		{
 			THIS_SHOULD_NEVER_HAPPEN;
 			zbx_free(sql);
 			return;
@@ -445,7 +403,7 @@ static void	expression_get_item_candidates(zbx_expression_eval_t *eval, const zb
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " from items i");
 
 	if (0 != (query->flags & ZBX_ITEM_QUERY_HOST_ONE))
-	{ TRACE();
+	{
 		esc = zbx_db_dyn_escape_string(query->ref.host);
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, ",hosts h"
 				" where h.hostid=i.hostid"
@@ -454,14 +412,14 @@ static void	expression_get_item_candidates(zbx_expression_eval_t *eval, const zb
 		clause = "and";
 	}
 	else if (0 != (query->flags & ZBX_ITEM_QUERY_HOST_SELF))
-	{ TRACE();
+	{
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " where i.hostid=" ZBX_FS_UI64,
 				eval->hostid);
 		clause = "and";
 	}
 
 	if (0 != (query->flags & ZBX_ITEM_QUERY_KEY_SOME))
-	{ TRACE();
+	{
 		char	*key;
 
 		key = zbx_strdup(NULL, query->ref.key);
@@ -474,7 +432,7 @@ static void	expression_get_item_candidates(zbx_expression_eval_t *eval, const zb
 		clause = "and";
 	}
 	else if (0 != (query->flags & ZBX_ITEM_QUERY_KEY_ONE))
-	{ TRACE();
+	{
 		esc = zbx_db_dyn_escape_string(query->ref.key);
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " %s i.key_='%s'", clause, esc);
 		zbx_free(esc);
@@ -482,7 +440,7 @@ static void	expression_get_item_candidates(zbx_expression_eval_t *eval, const zb
 	}
 
 	if (0 != (query->flags & ZBX_ITEM_QUERY_FILTER) && NULL != filter_template && '\0' != *filter_template)
-	{ TRACE();
+	{
 		zbx_uint64_t		index;
 		int			pos = 0, last_pos = 0;
 		zbx_token_t		token;
@@ -491,13 +449,13 @@ static void	expression_get_item_candidates(zbx_expression_eval_t *eval, const zb
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " %s ", clause);
 
 		for (; SUCCEED == zbx_token_find(filter_template, pos, &token, ZBX_TOKEN_SEARCH_FUNCTIONID); pos++)
-		{ TRACE();
+		{
 			if (ZBX_TOKEN_OBJECTID != token.type)
 				continue;
 
 			if (SUCCEED != zbx_is_uint64_n(filter_template + token.loc.l + 1, token.loc.r - token.loc.l - 1,
 					&index) && (int)index < groups->values_num)
-			{ TRACE();
+			{
 				continue;
 			}
 
@@ -510,7 +468,7 @@ static void	expression_get_item_candidates(zbx_expression_eval_t *eval, const zb
 				sql_offset--;
 
 			if (0 < group->hostids.values_num)
-			{ TRACE();
+			{
 				zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "i.hostid",
 						group->hostids.values, group->hostids.values_num);
 			}
@@ -528,12 +486,12 @@ static void	expression_get_item_candidates(zbx_expression_eval_t *eval, const zb
 	result = zbx_db_select("%s", sql);
 
 	while (NULL != (row = zbx_db_fetch(result)))
-	{ TRACE();
+	{
 		zbx_uint64_pair_t	pair;
 
 		if (0 == (query->flags & ZBX_ITEM_QUERY_KEY_SOME) ||
 				(NULL != pattern.key && SUCCEED == expression_match_item_key(row[2], &pattern)))
-		{ TRACE();
+		{
 			ZBX_STR2UINT64(pair.first, row[0]);
 			ZBX_STR2UINT64(pair.second, row[1]);
 			zbx_vector_uint64_pair_append(itemhosts, pair);
@@ -559,13 +517,13 @@ static void	expression_get_item_candidates(zbx_expression_eval_t *eval, const zb
  *                                                                            *
  ******************************************************************************/
 static int	expression_item_check_tag(zbx_expression_item_t *item, const char *tag)
-{ TRACE();
+{
 	int		i;
 	size_t		taglen;
 	const char	*value;
 
 	if (NULL != (value = strchr(tag, ':')))
-	{ TRACE();
+	{
 		taglen = (value - tag);
 		value++;
 	}
@@ -573,7 +531,7 @@ static int	expression_item_check_tag(zbx_expression_item_t *item, const char *ta
 		taglen = strlen(tag);
 
 	for (i = 0; i < item->tags.values_num; i++)
-	{ TRACE();
+	{
 		zbx_item_tag_t	*itemtag = item->tags.values[i];
 
 		if (taglen != strlen(itemtag->tag.tag) || 0 != memcmp(tag, itemtag->tag.tag, taglen))
@@ -611,26 +569,26 @@ static int	expression_item_check_tag(zbx_expression_item_t *item, const char *ta
  ******************************************************************************/
 static int	eval_function_filter(const char *name, size_t len, int args_num, zbx_variant_t *args, void *data,
 		const zbx_timespec_t *ts, zbx_variant_t *value, char **error)
-{ TRACE();
+{
 	zbx_expression_eval_many_t	*many = (zbx_expression_eval_many_t *)data;
 
 	ZBX_UNUSED(ts);
 	ZBX_UNUSED(len);
 
 	if (1 != args_num)
-	{ TRACE();
+	{
 		*error = zbx_strdup(NULL, "invalid number of arguments");
 		return FAIL;
 	}
 
 	if (ZBX_VARIANT_STR != args[0].type)
-	{ TRACE();
+	{
 		*error = zbx_strdup(NULL, "invalid argument flags");
 		return FAIL;
 	}
 
 	if (0 == strncmp(name, "group", ZBX_CONST_STRLEN("group")))
-	{ TRACE();
+	{
 		zbx_expression_group_t *group;
 
 		group = expression_get_group(many->eval, args[0].data.str);
@@ -643,7 +601,7 @@ static int	eval_function_filter(const char *name, size_t len, int args_num, zbx_
 		return SUCCEED;
 	}
 	else if (0 == strncmp(name, "tag", ZBX_CONST_STRLEN("tag")))
-	{ TRACE();
+	{
 		zbx_expression_item_t	*item;
 
 		item = expression_get_item(many->eval, many->itemid);
@@ -656,7 +614,7 @@ static int	eval_function_filter(const char *name, size_t len, int args_num, zbx_
 		return SUCCEED;
 	}
 	else
-	{ TRACE();
+	{
 		*error = zbx_strdup(NULL, "unknown function");
 		return FAIL;
 	}
@@ -671,7 +629,7 @@ static int	eval_function_filter(const char *name, size_t len, int args_num, zbx_
  *                                                                            *
  ******************************************************************************/
 static void	expression_init_query_many(zbx_expression_eval_t *eval, zbx_expression_query_t *query)
-{ TRACE();
+{
 	zbx_expression_query_many_t	*data;
 	char				*error = NULL, *errmsg = NULL, *filter_template = NULL;
 	int				i, ret = FAIL;
@@ -690,16 +648,16 @@ static void	expression_init_query_many(zbx_expression_eval_t *eval, zbx_expressi
 	zbx_vector_str_create(&groups);
 
 	if (ZBX_ITEM_QUERY_ITEM_ANY == (query->flags & ZBX_ITEM_QUERY_ITEM_ANY))
-	{ TRACE();
+	{
 		error = zbx_strdup(NULL, "item query must have at least a host or an item key defined");
 		goto out;
 	}
 
 	if (0 != (query->flags & ZBX_ITEM_QUERY_FILTER))
-	{ TRACE();
+	{
 		if (SUCCEED != zbx_eval_parse_expression(&ctx, query->ref.filter, ZBX_EVAL_PARSE_QUERY_EXPRESSION,
 				&errmsg))
-		{ TRACE();
+		{
 			error = zbx_dsprintf(NULL, "failed to parse item query filter: %s", errmsg);
 			zbx_free(errmsg);
 			goto out;
@@ -708,7 +666,7 @@ static void	expression_init_query_many(zbx_expression_eval_t *eval, zbx_expressi
 		zbx_eval_prepare_filter(&ctx);
 
 		if (FAIL == zbx_eval_get_group_filter(&ctx, &groups, &filter_template, &errmsg))
-		{ TRACE();
+		{
 			error = zbx_dsprintf(NULL, "failed to extract groups from item filter: %s", errmsg);
 			zbx_free(errmsg);
 			goto out;
@@ -718,27 +676,27 @@ static void	expression_init_query_many(zbx_expression_eval_t *eval, zbx_expressi
 	expression_get_item_candidates(eval, query, &groups, filter_template, &itemhosts);
 
 	if (0 != (query->flags & ZBX_ITEM_QUERY_FILTER))
-	{ TRACE();
+	{
 		zbx_expression_eval_many_t	eval_data;
 		zbx_variant_t		filter_value;
 
 		eval_data.eval = eval;
 
 		for (i = 0; i < itemhosts.values_num; i++)
-		{ TRACE();
+		{
 			eval_data.itemid = itemhosts.values[i].first;
 			eval_data.hostid = itemhosts.values[i].second;
 
 			if (SUCCEED != zbx_eval_execute_ext(&ctx, NULL, eval_function_filter, NULL,
 					(void *)&eval_data, &filter_value, &errmsg))
-			{ TRACE();
+			{
 				zabbix_log(LOG_LEVEL_DEBUG, "failed to evaluate item query filter: %s", errmsg);
 				zbx_free(errmsg);
 				continue;
 			}
 
 			if (SUCCEED != zbx_variant_convert(&filter_value, ZBX_VARIANT_DBL))
-			{ TRACE();
+			{
 				zabbix_log(LOG_LEVEL_DEBUG, "unexpected item query filter evaluation result:"
 						" value:\"%s\" of type \"%s\"", zbx_variant_value_desc(&filter_value),
 						zbx_variant_type_desc(&filter_value));
@@ -752,13 +710,13 @@ static void	expression_init_query_many(zbx_expression_eval_t *eval, zbx_expressi
 		}
 	}
 	else
-	{ TRACE();
+	{
 		for (i = 0; i < itemhosts.values_num; i++)
 			zbx_vector_uint64_append(&itemids, itemhosts.values[i].first);
 	}
 
 	if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_DEBUG))
-	{ TRACE();
+	{
 		for (i = 0; i < itemids.values_num; i++)
 			zabbix_log(LOG_LEVEL_DEBUG, "%s() itemid:" ZBX_FS_UI64, __func__, itemids.values[i]);
 	}
@@ -774,7 +732,7 @@ out:
 		zbx_eval_clear(&ctx);
 
 	if (SUCCEED != ret)
-	{ TRACE();
+	{
 		query->error = error;
 		query->flags = ZBX_ITEM_QUERY_ERROR;
 		zbx_vector_uint64_destroy(&itemids);
@@ -798,7 +756,7 @@ out:
  *                                                                            *
  ******************************************************************************/
 static void	expression_cache_dcitems_hk(zbx_expression_eval_t *eval)
-{ TRACE();
+{
 	int	i;
 
 	eval->hostkeys = (zbx_host_key_t *)zbx_malloc(NULL, sizeof(zbx_host_key_t) * eval->one_num);
@@ -806,7 +764,7 @@ static void	expression_cache_dcitems_hk(zbx_expression_eval_t *eval)
 	eval->errcodes_hk = (int *)zbx_malloc(NULL, sizeof(int) * eval->one_num);
 
 	for (i = 0; i < eval->queries.values_num; i++)
-	{ TRACE();
+	{
 		zbx_expression_query_t	*query = eval->queries.values[i];
 		zbx_expression_query_one_t	*data;
 
@@ -828,7 +786,7 @@ static void	expression_cache_dcitems_hk(zbx_expression_eval_t *eval)
  *                                                                            *
  ******************************************************************************/
 static	int	compare_dcitems_by_itemid(const void *d1, const void *d2)
-{ TRACE();
+{
 	zbx_dc_item_t	*dci1 = *(zbx_dc_item_t * const *)d1;
 	zbx_dc_item_t	*dci2 = *(zbx_dc_item_t * const *)d2;
 
@@ -838,7 +796,7 @@ static	int	compare_dcitems_by_itemid(const void *d1, const void *d2)
 }
 
 static int	expression_find_dcitem_by_itemid(const void *d1, const void *d2)
-{ TRACE();
+{
 	zbx_uint64_t		itemid = **(zbx_uint64_t * const *)d1;
 	zbx_dc_item_t		*dci = *(zbx_dc_item_t * const *)d2;
 
@@ -855,16 +813,16 @@ static int	expression_find_dcitem_by_itemid(const void *d1, const void *d2)
  *                                                                            *
  ******************************************************************************/
 static void	expression_cache_dcitems(zbx_expression_eval_t *eval)
-{ TRACE();
+{
 	int			i, j;
 	zbx_vector_uint64_t	itemids;
 
 	zbx_vector_uint64_create(&itemids);
 
 	if (0 != eval->one_num)
-	{ TRACE();
+	{
 		for (i = 0; i < eval->one_num; i++)
-		{ TRACE();
+		{
 			if (SUCCEED != eval->errcodes_hk[i])
 				continue;
 
@@ -875,7 +833,7 @@ static void	expression_cache_dcitems(zbx_expression_eval_t *eval)
 	}
 
 	for (i = 0; i < eval->queries.values_num; i++)
-	{ TRACE();
+	{
 		zbx_expression_query_t	*query = eval->queries.values[i];
 		zbx_expression_query_many_t	*data;
 
@@ -892,10 +850,10 @@ static void	expression_cache_dcitems(zbx_expression_eval_t *eval)
 	zbx_vector_uint64_uniq(&itemids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 	for (i = 0; i < itemids.values_num;)
-	{ TRACE();
+	{
 		if (FAIL != zbx_vector_ptr_bsearch((const zbx_vector_ptr_t *)&eval->dcitem_refs, &itemids.values[i],
 				expression_find_dcitem_by_itemid))
-		{ TRACE();
+		{
 			zbx_vector_uint64_remove(&itemids, i);
 			continue;
 		}
@@ -903,7 +861,7 @@ static void	expression_cache_dcitems(zbx_expression_eval_t *eval)
 	}
 
 	if (0 != (eval->dcitems_num = itemids.values_num))
-	{ TRACE();
+	{
 		zbx_vector_uint64_sort(&itemids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 		eval->dcitems = (zbx_dc_item_t *)zbx_malloc(NULL, sizeof(zbx_dc_item_t) * itemids.values_num);
@@ -912,7 +870,7 @@ static void	expression_cache_dcitems(zbx_expression_eval_t *eval)
 		zbx_dc_config_get_items_by_itemids(eval->dcitems, itemids.values, eval->errcodes, itemids.values_num);
 
 		for (i = 0; i < itemids.values_num; i++)
-		{ TRACE();
+		{
 			if (SUCCEED != eval->errcodes[i])
 				continue;
 
@@ -936,7 +894,7 @@ static void	expression_cache_dcitems(zbx_expression_eval_t *eval)
  *                                                                            *
  ******************************************************************************/
 int	zbx_evaluable_for_notsupported(const char *fn)
-{ TRACE();
+{
 	/* function nodata() are exceptions,                   */
 	/* and should be evaluated for NOTSUPPORTED items, too */
 
@@ -967,7 +925,7 @@ int	zbx_evaluable_for_notsupported(const char *fn)
 static int	expression_eval_one(zbx_expression_eval_t *eval, zbx_expression_query_t *query, const char *name,
 		size_t len, int args_num, zbx_variant_t *args, const zbx_timespec_t *ts, zbx_variant_t *value,
 		char **error)
-{ TRACE();
+{
 	char				func_name[MAX_STRING_LEN], *params = NULL;
 	size_t				params_alloc = 0, params_offset = 0;
 	zbx_dc_item_t			*item;
@@ -982,7 +940,7 @@ static int	expression_eval_one(zbx_expression_eval_t *eval, zbx_expression_query
 	data = (zbx_expression_query_one_t *)query->data;
 
 	if (SUCCEED != eval->errcodes_hk[data->dcitem_hk_index])
-	{ TRACE();
+	{
 		*error = zbx_dsprintf(NULL, "item \"/%s/%s\" does not exist",
 				eval->hostkeys[data->dcitem_hk_index].host, eval->hostkeys[data->dcitem_hk_index].key);
 		goto out;
@@ -993,14 +951,14 @@ static int	expression_eval_one(zbx_expression_eval_t *eval, zbx_expression_query
 	/* do not evaluate if the item is disabled or belongs to a disabled host */
 
 	if (ITEM_STATUS_ACTIVE != item->status)
-	{ TRACE();
+	{
 		*error = zbx_dsprintf(NULL, "item \"/%s/%s\" is disabled", eval->hostkeys[data->dcitem_hk_index].host,
 				eval->hostkeys[data->dcitem_hk_index].key);
 		goto out;
 	}
 
 	if (HOST_STATUS_MONITORED != item->host.status)
-	{ TRACE();
+	{
 		*error = zbx_dsprintf(NULL, "host \"%s\" is not monitored", eval->hostkeys[data->dcitem_hk_index].host);
 		goto out;
 	}
@@ -1015,7 +973,7 @@ static int	expression_eval_one(zbx_expression_eval_t *eval, zbx_expression_query
 	/*   - other functions. Result of evaluation is ZBX_UNKNOWN.     */
 
 	if (ITEM_STATE_NOTSUPPORTED == item->state && FAIL == zbx_evaluable_for_notsupported(func_name))
-	{ TRACE();
+	{
 		/* compose and store 'unknown' message for future use */
 		*error = zbx_dsprintf(NULL, "item \"/%s/%s\" is not supported",
 				eval->hostkeys[data->dcitem_hk_index].host, eval->hostkeys[data->dcitem_hk_index].key);
@@ -1029,18 +987,18 @@ static int	expression_eval_one(zbx_expression_eval_t *eval, zbx_expression_query
 	evaluate_item.key_orig = item->key_orig;
 
 	if (0 == args_num)
-	{ TRACE();
+	{
 		ret = zbx_evaluate_function(value, &evaluate_item, func_name, "", ts, error);
 		goto out;
 	}
 
 	for (i = 0; i < args_num; i++)
-	{ TRACE();
+	{
 		if (0 != i)
 			zbx_chrcpy_alloc(&params, &params_alloc, &params_offset, ',');
 
 		switch (args[i].type)
-		{ TRACE();
+		{
 			case ZBX_VARIANT_DBL:
 				zbx_snprintf_alloc(&params, &params_alloc, &params_offset, ZBX_FS_DBL64,
 						args[i].data.dbl);
@@ -1087,7 +1045,7 @@ out:
 #define MATCH_STRING(x, name, len)	ZBX_CONST_STRLEN(x) == len && 0 == memcmp(name, x, len)
 
 static int	get_function_by_name(const char *name, size_t len)
-{ TRACE();
+{
 
 	if (MATCH_STRING("avg_foreach", name, len))
 		return ZBX_VALUE_FUNC_AVG;
@@ -1133,11 +1091,11 @@ static int	get_function_by_name(const char *name, size_t len)
  *                                                                            *
  ******************************************************************************/
 static void	evaluate_history_func_min(zbx_vector_history_record_t *values, int value_type, double *result)
-{ TRACE();
+{
 	int	i;
 
 	if (ITEM_VALUE_TYPE_UINT64 == value_type)
-	{ TRACE();
+	{
 		*result = (double)values->values[0].value.ui64;
 
 		for (i = 1; i < values->values_num; i++)
@@ -1145,7 +1103,7 @@ static void	evaluate_history_func_min(zbx_vector_history_record_t *values, int v
 				*result = (double)values->values[i].value.ui64;
 	}
 	else
-	{ TRACE();
+	{
 		*result = values->values[0].value.dbl;
 
 		for (i = 1; i < values->values_num; i++)
@@ -1165,11 +1123,11 @@ static void	evaluate_history_func_min(zbx_vector_history_record_t *values, int v
  *                                                                            *
  ******************************************************************************/
 static void	evaluate_history_func_max(zbx_vector_history_record_t *values, int value_type, double *result)
-{ TRACE();
+{
 	int	i;
 
 	if (ITEM_VALUE_TYPE_UINT64 == value_type)
-	{ TRACE();
+	{
 		*result = (double)values->values[0].value.ui64;
 
 		for (i = 1; i < values->values_num; i++)
@@ -1177,7 +1135,7 @@ static void	evaluate_history_func_max(zbx_vector_history_record_t *values, int v
 				*result = (double)values->values[i].value.ui64;
 	}
 	else
-	{ TRACE();
+	{
 		*result = values->values[0].value.dbl;
 
 		for (i = 1; i < values->values_num; i++)
@@ -1197,18 +1155,18 @@ static void	evaluate_history_func_max(zbx_vector_history_record_t *values, int v
  *                                                                            *
  ******************************************************************************/
 static void	evaluate_history_func_sum(zbx_vector_history_record_t *values, int value_type, double *result)
-{ TRACE();
+{
 	int	i;
 
 	*result = 0;
 
 	if (ITEM_VALUE_TYPE_UINT64 == value_type)
-	{ TRACE();
+	{
 		for (i = 0; i < values->values_num; i++)
 			*result += (double)values->values[i].value.ui64;
 	}
 	else
-	{ TRACE();
+	{
 		for (i = 0; i < values->values_num; i++)
 			*result += values->values[i].value.dbl;
 	}
@@ -1225,7 +1183,7 @@ static void	evaluate_history_func_sum(zbx_vector_history_record_t *values, int v
  *                                                                            *
  ******************************************************************************/
 static void	evaluate_history_func_avg(zbx_vector_history_record_t *values, int value_type, double *result)
-{ TRACE();
+{
 	evaluate_history_func_sum(values, value_type, result);
 	*result /= values->values_num;
 }
@@ -1241,7 +1199,7 @@ static void	evaluate_history_func_avg(zbx_vector_history_record_t *values, int v
  *                                                                            *
  ******************************************************************************/
 static void	evaluate_history_func_count(zbx_vector_history_record_t *values, double *result)
-{ TRACE();
+{
 	*result = (double)values->values_num;
 }
 
@@ -1255,7 +1213,7 @@ static void	evaluate_history_func_count(zbx_vector_history_record_t *values, dou
  *                                                                            *
  ******************************************************************************/
 static void	evaluate_history_func_last(zbx_vector_history_record_t *values, int value_type, double *result)
-{ TRACE();
+{
 	if (ITEM_VALUE_TYPE_UINT64 == value_type)
 		*result = (double)values->values[0].value.ui64;
 	else
@@ -1273,11 +1231,11 @@ static void	evaluate_history_func_last(zbx_vector_history_record_t *values, int 
  ******************************************************************************/
 static void	var_vector_append_history_record(zbx_vector_history_record_t *values, int value_type,
 		zbx_vector_var_t *results_vector)
-{ TRACE();
+{
 	zbx_variant_t	result;
 
 	switch (value_type)
-	{ TRACE();
+	{
 		case ITEM_VALUE_TYPE_UINT64:
 			zbx_variant_set_ui64(&result, values->values[0].value.ui64);
 			break;
@@ -1319,9 +1277,9 @@ static void	var_vector_append_history_record(zbx_vector_history_record_t *values
  ******************************************************************************/
 static void	evaluate_history_func(zbx_vector_history_record_t *values, int value_type, int func,
 		double *result)
-{ TRACE();
+{
 	switch (func)
-	{ TRACE();
+	{
 		case ZBX_VALUE_FUNC_MIN:
 			evaluate_history_func_min(values, value_type, result);
 			break;
@@ -1354,12 +1312,12 @@ static void	evaluate_history_func(zbx_vector_history_record_t *values, int value
  *                                                                            *
  ******************************************************************************/
 static zbx_dc_item_t	*get_dcitem(zbx_vector_dc_item_t *dcitem_refs, zbx_uint64_t itemid)
-{ TRACE();
+{
 	int	index;
 
 	if (FAIL == (index = zbx_vector_ptr_bsearch((const zbx_vector_ptr_t *)dcitem_refs, &itemid,
 			expression_find_dcitem_by_itemid)))
-	{ TRACE();
+	{
 		return NULL;
 	}
 
@@ -1382,7 +1340,7 @@ static zbx_dc_item_t	*get_dcitem(zbx_vector_dc_item_t *dcitem_refs, zbx_uint64_t
  ******************************************************************************/
 static void	expression_eval_exists(zbx_expression_eval_t *eval, zbx_expression_query_t *query, int item_func,
 		zbx_variant_t *value)
-{ TRACE();
+{
 	zbx_expression_query_many_t	*data;
 	int				i;
 	zbx_vector_var_t		*results;
@@ -1393,7 +1351,7 @@ static void	expression_eval_exists(zbx_expression_eval_t *eval, zbx_expression_q
 	data = (zbx_expression_query_many_t *)query->data;
 
 	for (i = 0; i < data->itemids.values_num; i++)
-	{ TRACE();
+	{
 		zbx_dc_item_t	*dcitem;
 		zbx_variant_t	v;
 
@@ -1412,11 +1370,11 @@ static void	expression_eval_exists(zbx_expression_eval_t *eval, zbx_expression_q
 	}
 
 	if (ZBX_ITEM_FUNC_EXISTS == item_func)
-	{ TRACE();
+	{
 		zbx_variant_set_vector(value, results);
 	}
 	else
-	{ TRACE();
+	{
 		zbx_variant_set_ui64(value, (zbx_uint64_t)results->values_num);
 		zbx_vector_var_destroy(results);
 		zbx_free(results);
@@ -1444,7 +1402,7 @@ static void	expression_eval_exists(zbx_expression_eval_t *eval, zbx_expression_q
 static int	expression_eval_bucket_rate(zbx_expression_eval_t *eval, zbx_expression_query_t *query,
 		int args_num, zbx_variant_t *args, const zbx_timespec_t *ts, int item_func, zbx_variant_t *value,
 		char **error)
-{ TRACE();
+{
 	zbx_expression_query_many_t	*data;
 	int				i, pos, ret = FAIL;
 	zbx_vector_var_t		*results = NULL;
@@ -1454,23 +1412,23 @@ static int	expression_eval_bucket_rate(zbx_expression_eval_t *eval, zbx_expressi
 							"bucket_percentile" : "bucket_rate_foreach");
 
 	if (1 > args_num || 2 < args_num || (ZBX_ITEM_FUNC_BPERCENTL == item_func && 2 != args_num))
-	{ TRACE();
+	{
 		*error = zbx_strdup(NULL, "invalid number of function parameters");
 		goto err;
 	}
 
 	if (ZBX_VARIANT_STR == args[0].type)
-	{ TRACE();
+	{
 		param = zbx_strdup(NULL, args[0].data.str);
 	}
 	else
-	{ TRACE();
+	{
 		zbx_variant_t	arg;
 
 		zbx_variant_copy(&arg, &args[0]);
 
 		if (SUCCEED != zbx_variant_convert(&arg, ZBX_VARIANT_STR))
-		{ TRACE();
+		{
 			zbx_variant_clear(&arg);
 			*error = zbx_strdup(NULL, "invalid second parameter");
 			goto err;
@@ -1481,19 +1439,19 @@ static int	expression_eval_bucket_rate(zbx_expression_eval_t *eval, zbx_expressi
 	}
 
 	if (ZBX_ITEM_FUNC_BPERCENTL == item_func)
-	{ TRACE();
+	{
 		if (ZBX_VARIANT_DBL == args[1].type)
-		{ TRACE();
+		{
 			percentage = args[1].data.dbl;
 		}
 		else
-		{ TRACE();
+		{
 			zbx_variant_t	val_copy;
 
 			zbx_variant_copy(&val_copy, &args[1]);
 
 			if (SUCCEED != zbx_variant_convert(&val_copy, ZBX_VARIANT_DBL))
-			{ TRACE();
+			{
 				zbx_variant_clear(&val_copy);
 				*error = zbx_strdup(NULL, "invalid third parameter");
 				goto err;
@@ -1503,7 +1461,7 @@ static int	expression_eval_bucket_rate(zbx_expression_eval_t *eval, zbx_expressi
 		}
 
 		if (100 < percentage || 0 > percentage)
-		{ TRACE();
+		{
 			*error = zbx_strdup(NULL, "invalid value of percentile");
 			goto err;
 		}
@@ -1511,31 +1469,31 @@ static int	expression_eval_bucket_rate(zbx_expression_eval_t *eval, zbx_expressi
 		pos = 1;
 	}
 	else if (2 == args_num)
-	{ TRACE();
+	{
 		if (ZBX_VARIANT_STR == args[1].type)
-		{ TRACE();
+		{
 			if (SUCCEED != zbx_is_ushort(args[1].data.str, &pos) || 0 >= pos)
-			{ TRACE();
+			{
 				*error = zbx_strdup(NULL, "invalid third parameter");
 				goto err;
 			}
 		}
 		else if (ZBX_VARIANT_UI64 == args[1].type)
-		{ TRACE();
+		{
 			if (0 >= (pos = (int)args[1].data.ui64))
-			{ TRACE();
+			{
 				*error = zbx_strdup(NULL, "invalid third parameter");
 				goto err;
 			}
 		}
 		else
-		{ TRACE();
+		{
 			*error = zbx_strdup(NULL, "invalid third parameter");
 			goto err;
 		}
 	}
 	else
-	{ TRACE();
+	{
 		pos = 1;
 	}
 
@@ -1544,7 +1502,7 @@ static int	expression_eval_bucket_rate(zbx_expression_eval_t *eval, zbx_expressi
 	zbx_vector_var_create(results);
 
 	for (i = 0; i < data->itemids.values_num; i++)
-	{ TRACE();
+	{
 		zbx_dc_item_t	*dcitem;
 		zbx_variant_t	rate, le_var;
 		double		le;
@@ -1585,22 +1543,22 @@ static int	expression_eval_bucket_rate(zbx_expression_eval_t *eval, zbx_expressi
 	}
 
 	if (ZBX_MIXVALUE_FUNC_BRATE == item_func)
-	{ TRACE();
+	{
 		zbx_variant_set_vector(value, results);
 		results = NULL;
 		ret = SUCCEED;
 	}
 	else if (ZBX_ITEM_FUNC_BPERCENTL == item_func)
-	{ TRACE();
+	{
 		zbx_vector_dbl_t	results_tmp;
 
 		zbx_vector_dbl_create(&results_tmp);
 
 		if (SUCCEED == (ret = zbx_eval_var_vector_to_dbl(results, &results_tmp, error)))
-		{ TRACE();
+		{
 			if (SUCCEED == (ret = zbx_eval_calc_histogram_quantile(percentage / 100, &results_tmp,
 					log_fn, &result, error)))
-			{ TRACE();
+			{
 				zbx_variant_set_dbl(value, result);
 			}
 			else
@@ -1615,7 +1573,7 @@ err:
 	zbx_free(param);
 
 	if (NULL != results)
-	{ TRACE();
+	{
 		zbx_vector_var_destroy(results);
 		zbx_free(results);
 	}
@@ -1625,7 +1583,7 @@ err:
 
 static int	evaluate_count_many(char *operator, char *pattern, zbx_dc_item_t *dcitem, int seconds, int count,
 		const zbx_timespec_t *ts, zbx_vector_var_t *results_vector, char **error)
-{ TRACE();
+{
 	int				ret = FAIL;
 	zbx_eval_count_pattern_data_t	pdata;
 	zbx_vector_history_record_t	values;
@@ -1636,13 +1594,13 @@ static int	evaluate_count_many(char *operator, char *pattern, zbx_dc_item_t *dci
 		goto out;
 
 	if (SUCCEED == zbx_vc_get_values(dcitem->itemid, dcitem->value_type, &values, seconds, count, ts))
-	{ TRACE();
+	{
 		zbx_variant_t	v;
 		int		result = 0;
 
 		if (FAIL == zbx_execute_count_with_pattern(pattern, dcitem->value_type, &pdata, &values,
 				ZBX_MAX_UINT31_1, &result, error))
-		{ TRACE();
+		{
 			goto out;
 		}
 
@@ -1680,7 +1638,7 @@ out:
 static int	expression_eval_many(zbx_expression_eval_t *eval, zbx_expression_query_t *query, const char *name,
 		size_t len, int args_num, zbx_variant_t *args, const zbx_timespec_t *ts, zbx_variant_t *value,
 		char **error)
-{ TRACE();
+{
 	zbx_expression_query_many_t	*data;
 	int				ret = FAIL, item_func, count, i;
 	time_t				seconds;
@@ -1698,11 +1656,11 @@ static int	expression_eval_many(zbx_expression_eval_t *eval, zbx_expression_quer
 	item_func = get_function_by_name(name, len);
 
 	switch (item_func)
-	{ TRACE();
+	{
 		case ZBX_ITEM_FUNC_EXISTS:
 		case ZBX_ITEM_FUNC_ITEMCOUNT:
 			if (0 != args_num)
-			{ TRACE();
+			{
 				*error = zbx_strdup(NULL, "invalid number of function parameters");
 				goto out;
 			}
@@ -1714,11 +1672,11 @@ static int	expression_eval_many(zbx_expression_eval_t *eval, zbx_expression_quer
 			count = 1;
 
 			if (1 == args_num && ZBX_VARIANT_STR == args[0].type)
-			{ TRACE();
+			{
 				int	tmp;
 
 				if (FAIL == zbx_is_time_suffix(args[0].data.str, &tmp, ZBX_LENGTH_UNLIMITED))
-				{ TRACE();
+				{
 					*error = zbx_strdup(NULL, "invalid second parameter");
 					goto out;
 				}
@@ -1734,24 +1692,24 @@ static int	expression_eval_many(zbx_expression_eval_t *eval, zbx_expression_quer
 		case ZBX_VALUE_FUNC_MAX:
 		case ZBX_VALUE_FUNC_SUM:
 			if (args_num >= 2)
-			{ TRACE();
+			{
 				*error = zbx_strdup(NULL, "invalid number of function parameters");
 				goto out;
 			}
 			ZBX_FALLTHROUGH;
 		case ZBX_VALUE_FUNC_COUNT:
 			if (1 > args_num)
-			{ TRACE();
+			{
 				*error = zbx_strdup(NULL, "invalid number of function parameters");
 				goto out;
 			}
 
 			if (ZBX_VARIANT_STR == args[0].type)
-			{ TRACE();
+			{
 				int	tmp;
 
 				if (FAIL == zbx_is_time_suffix(args[0].data.str, &tmp, ZBX_LENGTH_UNLIMITED))
-				{ TRACE();
+				{
 					*error = zbx_strdup(NULL, "invalid second parameter");
 					goto out;
 				}
@@ -1759,9 +1717,9 @@ static int	expression_eval_many(zbx_expression_eval_t *eval, zbx_expression_quer
 				seconds = tmp;
 			}
 			else
-			{ TRACE();
+			{
 				if (SUCCEED != zbx_variant_convert(&args[0], ZBX_VARIANT_DBL))
-				{ TRACE();
+				{
 					*error = zbx_strdup(NULL, "invalid second parameter");
 					goto out;
 				}
@@ -1771,11 +1729,11 @@ static int	expression_eval_many(zbx_expression_eval_t *eval, zbx_expression_quer
 			count = 0;
 
 			if (2 <= args_num)
-			{ TRACE();
+			{
 				if (ZBX_VARIANT_NONE != args[1].type)
-				{ TRACE();
+				{
 					if (SUCCEED != zbx_variant_convert(&args[1], ZBX_VARIANT_STR))
-					{ TRACE();
+					{
 						*error = zbx_strdup(NULL, "invalid third parameter");
 						goto out;
 					}
@@ -1784,9 +1742,9 @@ static int	expression_eval_many(zbx_expression_eval_t *eval, zbx_expression_quer
 				}
 
 				if (args_num == 3 && ZBX_VARIANT_NONE != args[2].type)
-				{ TRACE();
+				{
 					if (SUCCEED != zbx_variant_convert(&args[2], ZBX_VARIANT_STR))
-					{ TRACE();
+					{
 						*error = zbx_strdup(NULL, "invalid fourth parameter");
 						goto out;
 					}
@@ -1809,7 +1767,7 @@ static int	expression_eval_many(zbx_expression_eval_t *eval, zbx_expression_quer
 	zbx_vector_var_create(results_var_vector);
 
 	for (i = 0; i < data->itemids.values_num; i++)
-	{ TRACE();
+	{
 		zbx_dc_item_t			*dcitem;
 
 		if (NULL == (dcitem = get_dcitem(&eval->dcitem_refs, data->itemids.values[i])))
@@ -1828,31 +1786,31 @@ static int	expression_eval_many(zbx_expression_eval_t *eval, zbx_expression_quer
 			continue;
 
 		if (ZBX_VALUE_FUNC_COUNT == item_func)
-		{ TRACE();
+		{
 			if (FAIL == (ret = evaluate_count_many(operator, pattern, dcitem, seconds, count, ts,
 					results_var_vector, error)))
-			{ TRACE();
+			{
 				zbx_vector_var_destroy(results_var_vector);
 				zbx_free(results_var_vector);
 				goto out;
 			}
 		}
 		else
-		{ TRACE();
+		{
 			zbx_vector_history_record_t	values;
 
 			zbx_history_record_vector_create(&values);
 
 			if (SUCCEED == zbx_vc_get_values(dcitem->itemid, dcitem->value_type, &values, seconds, count,
 					ts) && 0 < values.values_num)
-			{ TRACE();
+			{
 				if (ZBX_VALUE_FUNC_LAST == item_func)
-				{ TRACE();
+				{
 					var_vector_append_history_record(&values, dcitem->value_type,
 							results_var_vector);
 				}
 				else
-				{ TRACE();
+				{
 					zbx_variant_t	v;
 
 					evaluate_history_func(&values, dcitem->value_type, item_func, &result);
@@ -1894,7 +1852,7 @@ out:
  ******************************************************************************/
 static int	eval_function_history(const char *name, size_t len, int args_num, zbx_variant_t *args, void *data,
 		const zbx_timespec_t *ts, zbx_variant_t *value, char **error)
-{ TRACE();
+{
 	int			ret = FAIL;
 	zbx_expression_eval_t	*eval;
 	zbx_expression_query_t	*query;
@@ -1905,13 +1863,13 @@ static int	eval_function_history(const char *name, size_t len, int args_num, zbx
 	zbx_variant_set_none(value);
 
 	if (0 == args_num)
-	{ TRACE();
+	{
 		*error = zbx_strdup(NULL, "Cannot evaluate function: invalid number of arguments");
 		goto out;
 	}
 
 	if (len >= MAX_STRING_LEN)
-	{ TRACE();
+	{
 		*error = zbx_strdup(NULL, "Cannot evaluate function: name too long");
 		goto out;
 	}
@@ -1922,27 +1880,27 @@ static int	eval_function_history(const char *name, size_t len, int args_num, zbx
 	query = eval->queries.values[(int) args[0].data.ui64];
 
 	if (ZBX_ITEM_QUERY_ERROR == query->flags)
-	{ TRACE();
+	{
 		*error = zbx_dsprintf(NULL, "Cannot evaluate function: %s", query->error);
 		goto out;
 	}
 
 	if (0 == (query->flags & ZBX_ITEM_QUERY_MANY))
-	{ TRACE();
+	{
 		ret = expression_eval_one(eval, query, name, len, args_num - 1, args + 1, ts, value, &errmsg);
 	}
 	else if (ZBX_EXPRESSION_AGGREGATE == eval->mode)
-	{ TRACE();
+	{
 		ret = expression_eval_many(eval, query, name, len, args_num - 1, args + 1, ts, value, &errmsg);
 	}
 	else
-	{ TRACE();
+	{
 		errmsg = zbx_strdup(NULL, "aggregate queries are not supported");
 		ret = FAIL;
 	}
 
 	if (SUCCEED != ret)
-	{ TRACE();
+	{
 		*error = zbx_dsprintf(NULL, "Cannot evaluate function: %s", errmsg);
 		zbx_free(errmsg);
 	}
@@ -1975,36 +1933,36 @@ out:
  ******************************************************************************/
 static int	eval_function_common(const char *name, size_t len, int args_num, zbx_variant_t *args, void *data,
 		const zbx_timespec_t *ts, zbx_variant_t *value, char **error)
-{ TRACE();
+{
 	ZBX_UNUSED(data);
 	ZBX_UNUSED(ts);
 	ZBX_UNUSED(value);
 
 	if (SUCCEED != zbx_is_trigger_function(name, len))
-	{ TRACE();
+	{
 		*error = zbx_strdup(NULL, "Cannot evaluate formula: unsupported function");
 		return FAIL;
 	}
 
 	if (0 == args_num)
-	{ TRACE();
+	{
 		*error = zbx_strdup(NULL, "Cannot evaluate function: invalid number of arguments");
 		return FAIL;
 	}
 
 	if (ZBX_VARIANT_STR == args[0].type)
-	{ TRACE();
+	{
 		zbx_item_query_t query;
 
 		if (0 != zbx_eval_parse_query(args[0].data.str, strlen(args[0].data.str), &query))
-		{ TRACE();
+		{
 			zbx_eval_clear_query(&query);
 			*error = zbx_strdup(NULL, "Cannot evaluate function: quoted item query argument");
 			return FAIL;
 		}
 	}
 	else if (ZBX_VARIANT_VECTOR == args[0].type)
-	{ TRACE();
+	{
 		return SUCCEED;
 	}
 
@@ -2025,7 +1983,7 @@ static int	eval_function_common(const char *name, size_t len, int args_num, zbx_
  *                                                                            *
  ******************************************************************************/
 void	zbx_expression_eval_init(zbx_expression_eval_t *eval, int mode, zbx_eval_context_t *ctx)
-{ TRACE();
+{
 	int			i;
 	zbx_expression_query_t	*query;
 	zbx_vector_str_t	filters;
@@ -2048,12 +2006,12 @@ void	zbx_expression_eval_init(zbx_expression_eval_t *eval, int mode, zbx_eval_co
 	eval->hostid = 0;
 
 	for (i = 0; i < filters.values_num; i++)
-	{ TRACE();
+	{
 		query = expression_create_query(filters.values[i]);
 		zbx_vector_expression_query_ptr_append(&eval->queries, query);
 
 		if (ZBX_ITEM_QUERY_UNSET == query->flags)
-		{ TRACE();
+		{
 			query->error = zbx_strdup(NULL, "invalid item query filter");
 			query->flags = ZBX_ITEM_QUERY_ERROR;
 		}
@@ -2073,9 +2031,9 @@ void	zbx_expression_eval_init(zbx_expression_eval_t *eval, int mode, zbx_eval_co
  *                                                                            *
  ******************************************************************************/
 void	zbx_expression_eval_clear(zbx_expression_eval_t *eval)
-{ TRACE();
+{
 	if (0 != eval->one_num)
-	{ TRACE();
+	{
 		zbx_dc_config_clean_items(eval->dcitems_hk, eval->errcodes_hk, eval->one_num);
 		zbx_free(eval->dcitems_hk);
 		zbx_free(eval->errcodes_hk);
@@ -2083,7 +2041,7 @@ void	zbx_expression_eval_clear(zbx_expression_eval_t *eval)
 	}
 
 	if (0 != eval->dcitems_num)
-	{ TRACE();
+	{
 		zbx_dc_config_clean_items(eval->dcitems, eval->errcodes, eval->dcitems_num);
 		zbx_free(eval->dcitems);
 		zbx_free(eval->errcodes);
@@ -2105,7 +2063,7 @@ void	zbx_expression_eval_clear(zbx_expression_eval_t *eval)
 *                                                                             *
 * Purpose: resolve calculated item formula with an empty(default host) and    *
 *          macro host references, like:                                       *
-*          ( two forward slashes , { TRACE();HOST.HOST}) to host names.                *
+*          ( two forward slashes , {HOST.HOST}) to host names.                *
 *                                                                             *
 * Parameters: eval - [IN] evaluation expression                               *
 *             item - [IN] calculated item which defines the evaluation        *
@@ -2113,13 +2071,13 @@ void	zbx_expression_eval_clear(zbx_expression_eval_t *eval)
 *                                                                             *
 *******************************************************************************/
 void	zbx_expression_eval_resolve_item_hosts(zbx_expression_eval_t *eval, const zbx_dc_item_t *item)
-{ TRACE();
+{
 	int	i;
 
 	eval->hostid = item->host.hostid;
 
 	for (i = 0; i < eval->queries.values_num; i++)
-	{ TRACE();
+	{
 		zbx_expression_query_t	*query = eval->queries.values[i];
 
 		if (0 != (ZBX_ITEM_QUERY_HOST_SELF & query->flags) || 0 == strcmp(query->ref.host, "{HOST.HOST}"))
@@ -2136,11 +2094,11 @@ void	zbx_expression_eval_resolve_item_hosts(zbx_expression_eval_t *eval, const z
  *                                                                            *
  ******************************************************************************/
 void	zbx_expression_eval_resolve_filter_macros(zbx_expression_eval_t *eval, const zbx_dc_item_t *item)
-{ TRACE();
+{
 	zbx_dc_um_handle_t	*um_handle = zbx_dc_open_user_macros();
 
 	for (int i = 0; i < eval->queries.values_num; i++)
-	{ TRACE();
+	{
 		zbx_expression_query_t	*query = eval->queries.values[i];
 
 		zbx_substitute_macros(&query->ref.filter, NULL, 0, zbx_macro_query_filter_resolv, item);
@@ -2160,7 +2118,7 @@ ZBX_PTR_VECTOR_DECL(macro_index, zbx_macro_index_t *)
 ZBX_PTR_VECTOR_IMPL(macro_index, zbx_macro_index_t *)
 
 static int	macro_index_compare(const void *d1, const void *d2)
-{ TRACE();
+{
 	const int	*i1 = *(const int * const *)d1;
 	const int	*i2 = *(const int * const *)d2;
 
@@ -2168,7 +2126,7 @@ static int	macro_index_compare(const void *d1, const void *d2)
 }
 
 static void	macro_index_free(zbx_macro_index_t *index)
-{ TRACE();
+{
 	zbx_free(index->macro);
 	zbx_free(index);
 }
@@ -2178,12 +2136,12 @@ typedef int (*resolv_func_t)(uint64_t itemid, char **replace_to);
 static int	resolve_expression_query_macro(const zbx_db_trigger *trigger, resolv_func_t resolv_func,
 		const char *name, int func_num, zbx_expression_query_t *query, char **entity,
 		zbx_vector_macro_index_t *indices)
-{ TRACE();
+{
 	int			id;
 	zbx_macro_index_t	*index;
 
 	if (FAIL == (id = zbx_vector_ptr_search((const zbx_vector_ptr_t *)indices, &func_num, macro_index_compare)))
-	{ TRACE();
+	{
 		index = (zbx_macro_index_t *)zbx_malloc(NULL, sizeof(zbx_macro_index_t));
 		index->num = func_num;
 		index->macro = NULL;
@@ -2191,7 +2149,7 @@ static int	resolve_expression_query_macro(const zbx_db_trigger *trigger, resolv_
 		uint64_t	itemid;
 
 		if (SUCCEED == zbx_db_trigger_get_itemid(trigger, func_num, &itemid))
-		{ TRACE();
+		{
 			resolv_func(itemid, &index->macro);
 		}
 
@@ -2201,7 +2159,7 @@ static int	resolve_expression_query_macro(const zbx_db_trigger *trigger, resolv_
 		index = indices->values[id];
 
 	if (NULL == index->macro)
-	{ TRACE();
+	{
 		query->flags = ZBX_ITEM_QUERY_ERROR;
 		query->error = zbx_dsprintf(NULL, "invalid %s \"%s\"", name, ZBX_NULL2EMPTY_STR(*entity));
 		return FAIL;
@@ -2221,7 +2179,7 @@ static int	resolve_expression_query_macro(const zbx_db_trigger *trigger, resolv_
  *                                                                            *
  ******************************************************************************/
 static int	expr_macro_index(const char *macro)
-{ TRACE();
+{
 	/* macros that are supported in expression macro */
 	static const char	*expr_macros[] = {MVAR_HOST_HOST, MVAR_HOSTNAME, MVAR_ITEM_KEY, NULL};
 
@@ -2249,14 +2207,14 @@ static int	expr_macro_index(const char *macro)
 *                                                                             *
 *******************************************************************************/
 void	zbx_expression_eval_resolve_trigger_hosts_items(zbx_expression_eval_t *eval, const zbx_db_trigger *trigger)
-{ TRACE();
+{
 	zbx_vector_macro_index_t	hosts, item_keys;
 
 	zbx_vector_macro_index_create(&hosts);
 	zbx_vector_macro_index_create(&item_keys);
 
 	for (int i = 0; i < eval->queries.values_num; i++)
-	{ TRACE();
+	{
 		int			func_num;
 		zbx_expression_query_t	*query = eval->queries.values[i];
 
@@ -2271,7 +2229,7 @@ void	zbx_expression_eval_resolve_trigger_hosts_items(zbx_expression_eval_t *eval
 
 		if (-1 != func_num && FAIL == resolve_expression_query_macro(trigger, &zbx_dc_get_host_host, "host",
 				func_num, query, &query->ref.host, &hosts))
-		{ TRACE();
+		{
 			continue;
 		}
 
@@ -2279,7 +2237,7 @@ void	zbx_expression_eval_resolve_trigger_hosts_items(zbx_expression_eval_t *eval
 
 		if (0 != (ZBX_ITEM_QUERY_KEY_ONE & query->flags) &&
 				-1 != (func_num = expr_macro_index(query->ref.key)))
-		{ TRACE();
+		{
 			resolve_expression_query_macro(trigger, &zbx_dc_get_item_key, "item key", func_num, query,
 					&query->ref.key, &item_keys);
 		}
@@ -2306,13 +2264,13 @@ void	zbx_expression_eval_resolve_trigger_hosts_items(zbx_expression_eval_t *eval
  ******************************************************************************/
 int	zbx_expression_eval_execute(zbx_expression_eval_t *eval, const zbx_timespec_t *ts, zbx_variant_t *value,
 		char **error)
-{ TRACE();
+{
 	int	i, ret;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_DEBUG))
-	{ TRACE();
+	{
 		char	*expression = NULL;
 
 		zbx_eval_compose_expression(eval->ctx, &expression);
@@ -2321,11 +2279,11 @@ int	zbx_expression_eval_execute(zbx_expression_eval_t *eval, const zbx_timespec_
 	}
 
 	for (i = 0; i < eval->queries.values_num; i++)
-	{ TRACE();
+	{
 		zbx_expression_query_t	*query = eval->queries.values[i];
 
 		if (ZBX_ITEM_QUERY_ERROR != query->flags)
-		{ TRACE();
+		{
 			if (0 != (query->flags & ZBX_ITEM_QUERY_MANY))
 				expression_init_query_many(eval, query);
 			else
