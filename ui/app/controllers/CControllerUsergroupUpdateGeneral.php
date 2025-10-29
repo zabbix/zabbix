@@ -49,12 +49,17 @@ abstract class CControllerUsergroupUpdateGeneral extends CController {
 		return $tag_filters;
 	}
 
-	final protected function processUserGroupInputData(array &$user_group): bool {
+	protected function getUserGroupInputData(): array {
+		$user_group = [];
 		$user_group['users'] = array_map(static fn($userid) => ['userid' => $userid], $this->getInput('userids', []));
 		$this->getInputs($user_group, ['users_status', 'gui_access', 'debug_mode', 'userdirectoryid', 'mfaid',
 			'name', 'hostgroup_rights', 'templategroup_rights', 'tag_filters'
 		]);
 
+		return $user_group;
+	}
+
+	final protected function processUserGroupInputData(array &$user_group): bool {
 		if (!self::checkGroupsExist($user_group['hostgroup_rights'], $this->db_hostgroups, true)
 				|| !self::checkGroupsExist($user_group['templategroup_rights'], $this->db_templategroups, true)
 				|| !self::checkGroupsExist($user_group['tag_filters'], $this->db_hostgroups, false)) {

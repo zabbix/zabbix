@@ -86,7 +86,7 @@ class CControllerUsergroupCreate extends CControllerUsergroupUpdateGeneral {
 
 	protected function doAction(): void {
 		$this->loadDbGroups();
-		$user_group = [];
+		$user_group = $this->getUserGroupInputData();
 
 		if (!$this->processUserGroupInputData($user_group)) {
 			$this->setErrorResponse();

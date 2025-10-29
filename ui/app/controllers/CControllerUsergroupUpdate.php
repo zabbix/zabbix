@@ -92,10 +92,16 @@ class CControllerUsergroupUpdate extends CControllerUsergroupUpdateGeneral {
 		return $this->checkAccess(CRoleHelper::UI_ADMINISTRATION_USER_GROUPS);
 	}
 
+	final protected function getUserGroupInputData(): array {
+		$user_group = parent::getUserGroupInputData();
+		$this->getInputs($user_group, ['usrgrpid']);
+
+		return $user_group;
+	}
+
 	protected function doAction(): void {
 		$this->loadDbGroups();
-		$user_group = [];
-		$this->getInputs($user_group, ['usrgrpid']);
+		$user_group = $this->getUserGroupInputData();
 
 		if (!$this->processUserGroupInputData($user_group)) {
 			$this->setErrorResponse();
