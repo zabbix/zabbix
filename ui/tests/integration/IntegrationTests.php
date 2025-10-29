@@ -24,6 +24,7 @@ require_once dirname(__FILE__).'/testGoAgentDataCollection.php';
 require_once dirname(__FILE__).'/testItemState.php';
 require_once dirname(__FILE__).'/testValuemaps.php';
 require_once dirname(__FILE__).'/testTriggerLinking.php';
+require_once dirname(__FILE__).'/testTagInheritance.php';
 require_once dirname(__FILE__).'/testGraphLinking.php';
 require_once dirname(__FILE__).'/testEscalations.php';
 require_once dirname(__FILE__).'/testAlertingForServices.php';
@@ -41,7 +42,7 @@ require_once dirname(__FILE__).'/testTriggerState.php';
 /* require_once dirname(__FILE__).'/testTlsRequest.php'; */
 require_once dirname(__FILE__).'/testActiveAvailability.php';
 require_once dirname(__FILE__).'/testEventsCauseAndSymptoms.php';
-require_once dirname(__FILE__).'/testDiscoveryRules.php';
+/* require_once dirname(__FILE__).'/testDiscoveryRules.php'; snmpsim does not work properly on new Debian */
 require_once dirname(__FILE__).'/testAutoregistration.php';
 require_once dirname(__FILE__).'/testAutoregistrationPSK.php';
 require_once dirname(__FILE__).'/testAutoregistrationHostMetaDataItem.php';
@@ -72,7 +73,7 @@ class IntegrationTests {
 		if  (substr(getenv('DB'), 0, 4) === "tsdb" ) {
 			$suite->addTestSuite('testTimescaleDb');
 		}
-		$suite->addTestSuite('testDiscoveryRules');
+		/*$suite->addTestSuite('testDiscoveryRules'); */
 		$suite->addTestSuite('testAutoregistration');
 		$suite->addTestSuite('testAutoregistrationPSK');
 		$suite->addTestSuite('testAutoregistrationHostMetaDataItem');
@@ -84,6 +85,7 @@ class IntegrationTests {
 		$suite->addTestSuite('testItemState');
 		$suite->addTestSuite('testValuemaps');
 		$suite->addTestSuite('testTriggerLinking');
+		$suite->addTestSuite('testTagInheritance');
 		$suite->addTestSuite('testGraphLinking');
 		$suite->addTestSuite('testEscalations');
 		$suite->addTestSuite('testAlertingForServices');
