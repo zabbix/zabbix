@@ -56,6 +56,7 @@ require_once __DIR__.'/dashboards/testDashboardsListPage.php';
 require_once __DIR__.'/dashboards/testDashboardsPages.php';
 require_once __DIR__.'/dashboards/testDashboardsTemplatedDashboardForm.php';
 require_once __DIR__.'/dashboards/testDashboardsTemplatedDashboardPage.php';
+require_once __DIR__.'/dashboards/testDashboardsUserPermissions.php';
 require_once __DIR__.'/dashboards/testDashboardsViewMode.php';
 require_once __DIR__.'/dashboards/testDashboardsWidgetsPage.php';
 
@@ -404,6 +405,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testDashboardsPages');
 		$suite->addTestSuite('testDashboardsTemplatedDashboardForm');
 		$suite->addTestSuite('testDashboardsTemplatedDashboardPage');
+		$suite->addTestSuite('testDashboardsUserPermissions');
 		$suite->addTestSuite('testDashboardsViewMode');
 		$suite->addTestSuite('testDashboardsWidgetsPage');
 
