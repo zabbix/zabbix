@@ -202,6 +202,7 @@ lld_compare_entries_CFLAGS = \
 
 zbx_substitute_lld_macros_SOURCES = \
 	zbx_substitute_lld_macros.c \
+	lld_common.c \
 	../../../src/zabbix_server/lld/lld_common.c \
 	../../../src/zabbix_server/lld/lld_graph.c \
 	../../../src/zabbix_server/lld/lld_audit.c \
@@ -230,6 +231,7 @@ zbx_substitute_lld_macros_CFLAGS = \
 
 zbx_substitute_macros_in_json_pairs_SOURCES = \
 	zbx_substitute_macros_in_json_pairs.c \
+	lld_common.c \
 	../../../src/zabbix_server/lld/lld_common.c \
 	../../../src/zabbix_server/lld/lld_graph.c \
 	../../../src/zabbix_server/lld/lld_audit.c \
@@ -259,6 +261,7 @@ zbx_substitute_macros_in_json_pairs_CFLAGS = \
 
 zbx_substitute_expression_lld_macros_SOURCES = \
 	zbx_substitute_expression_lld_macros.c \
+	lld_common.c \
 	../../../src/zabbix_server/lld/lld_common.c \
 	../../../src/zabbix_server/lld/lld_graph.c \
 	../../../src/zabbix_server/lld/lld_audit.c \

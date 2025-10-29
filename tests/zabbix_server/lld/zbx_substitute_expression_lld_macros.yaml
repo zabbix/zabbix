@@ -19,7 +19,7 @@ out:
   data: 'last(/host/net.if.discovery[eth0])'
   return: SUCCEED
 ---
-test case: item query with lld macro and filter
+test case: item query with lld macro and filter mad(bucket_rate_foreach(/*/some.zabbix.key[{#LLDMACRO}]?[group="{HOSTGROUPLLD}"],1d))
 in:
   lld: '{"ifname":"eth0"}'
   data:  'mad(bucket_rate_foreach(/*/some.zabbix.key[{#LLDMACRO}]?[group="{HOSTGROUPLLD}"],1d))'
@@ -28,6 +28,14 @@ in:
 out:
   data: 'mad(bucket_rate_foreach(/*/some.zabbix.key[eth0]?[group="{HOSTGROUPLLD}"],1d))'
   return: SUCCEED
-
-
-
+---
+test case: item query with lld macro and filter stddevpop(exists_foreach(/*/some.zabbix.key[{#LLDMACRO}]?[group="{HOSTGROUPLLD}"],1d))
+in:
+  lld: '{"ifname":"eth0"}'
+  data:  'stddevpop(exists_foreach(/*/some.zabbix.key[{#LLDMACRO}]?[group="{HOSTGROUPLLD}"],1d))'
+  macros:
+    - { macro: '{#LLDMACRO}', path: $.ifname }
+out:
+  data: 'stddevpop(exists_foreach(/*/some.zabbix.key[eth0]?[group="{HOSTGROUPLLD}"],1d))'
+  return: SUCCEED
+...

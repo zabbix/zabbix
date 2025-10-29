@@ -527,7 +527,6 @@ void	zbx_mock_extract_yaml_values_uint64(zbx_mock_handle_t hdata, zbx_vector_uin
 	}
 }
 
-
 /******************************************************************************
  *                                                                            *
  * Parameters: path   - [IN]  YAML path                                       *
