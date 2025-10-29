@@ -181,7 +181,7 @@ static void	history_clickhouse_release_conn(zbx_clickhouse_data_t *data, zbx_cli
  *     options_num - [IN] number of configuration options                     *
  *                                                                            *
  ******************************************************************************/
-static void	*history_clickhouse_validate_options(const zbx_history_option_t *options, int options_num)
+static void	history_clickhouse_validate_options(const zbx_history_option_t *options, int options_num)
 {
 	const char	*supported_options = "name,log_slow_queries,url,username,password,db,types,source_ip,"
 				"ssl_cert_file,ssl_key_file,ssl_key_password,ssl_verify_peer,ssl_verify_host,"
@@ -739,6 +739,7 @@ static zbx_uint64_t	history_clickhouse_flush(void *data)
 	zbx_uint64_t		flush_err = 0;
 	int			attempts_num = 0;
 	CURLMcode		code;
+	CURLcode		err;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() active connections:%d", __func__, d->active_conns.values_num);
 
@@ -799,8 +800,8 @@ out:
 					curl_multi_strerror(code));
 		}
 
-		if (CURLM_OK != (code = curl_easy_setopt(conn->handle, CURLOPT_POSTFIELDSIZE, 0)))
-			zabbix_log(LOG_LEVEL_WARNING, "cannot remove post fields: %s", curl_multi_strerror(code));
+		if (CURLM_OK != (err = curl_easy_setopt(conn->handle, CURLOPT_POSTFIELDSIZE, 0)))
+			zabbix_log(LOG_LEVEL_WARNING, "cannot remove post fields: %s", curl_easy_strerror(err));
 
 		zbx_free(conn->post_data);
 		zbx_free(conn->resp.page.data);
@@ -1132,7 +1133,7 @@ static int	clickhouse_conn_post(zbx_clickhouse_conn_t *conn, zbx_clickhouse_data
 	CURLMcode	code;
 	int		ret = FAIL, attempts_num = 0;
 
-	zabbix_log(LOG_LEVEL_TRACE, "In %s() data:%s", data, __func__);
+	zabbix_log(LOG_LEVEL_TRACE, "In %s() data:%s", __func__, data);
 
 	if (NULL == conn->handle && SUCCEED != history_clickhouse_conn_init(conn, d, error))
 		goto out;
@@ -1410,6 +1411,18 @@ static int	history_clickhouse_fetch_batch(void *data, zbx_vector_item_history_t 
 	zbx_vector_uint64_t	itemids;
 	zbx_clickhouse_conn_t	*conn;
 	int			ret = FAIL;
+
+	if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_DEBUG))
+	{
+		char	start_str[32], end_str[32];
+		time_t	end = time(NULL);
+
+		strftime(start_str, sizeof(start_str), "%Y-%m-%d %H:%M:%S", localtime(&start));
+		strftime(end_str, sizeof(end_str), "%Y-%m-%d %H:%M:%S", localtime(&end));
+
+		zabbix_log(LOG_LEVEL_DEBUG, "In %s() window:(%s, %s] age: %s count:%d", __func__, start_str, end_str,
+				zbx_age2str(end - start), 0);
+	}
 
 	zbx_vector_uint64_create(&itemids);
 	for (int i = 0; i < results->values_num; i++)

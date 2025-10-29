@@ -178,12 +178,11 @@ static void	populate_function_items(const zbx_vector_uint64_t *functionids, zbx_
 	zbx_dc_function_t	*functions = NULL;
 	int			*errcodes = NULL;
 	zbx_ifunc_t		ifunc_local;
-	zbx_func_t		*func, func_local;
+	zbx_func_t		*func, func_local = {0};
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() functionids_num:%d", __func__, functionids->values_num);
 
 	zbx_variant_set_none(&func_local.value);
-	func_local.error = NULL;
 	func_local.range.type = ZBX_VALUE_UNKNOWN;
 
 	functions = (zbx_dc_function_t *)zbx_malloc(functions, sizeof(zbx_dc_function_t) * functionids->values_num);
@@ -532,7 +531,6 @@ static void	evaluate_item_functions(zbx_hashset_t *funcs, const zbx_vector_uint6
 	while (NULL != (func = (zbx_func_t *)zbx_hashset_iter_next(&iter)))
 	{
 		int				ret;
-		const zbx_history_sync_item_t	*item;
 
 		/* skip functions with errors */
 		if (NULL != func->error || ZBX_VARIANT_NONE != func->value.type)
@@ -545,8 +543,8 @@ static void	evaluate_item_functions(zbx_hashset_t *funcs, const zbx_vector_uint6
 		{
 			/* compose and store error message for future use */
 			zbx_variant_set_error(&func->value,
-					zbx_eval_format_function_error(func->function, item->host.host,
-							item->key_orig, func->parameter, error));
+					zbx_eval_format_function_error(func->function, func->item.host,
+						func->item.key_orig, func->parameter, error));
 			zbx_free(error);
 		}
 	}
