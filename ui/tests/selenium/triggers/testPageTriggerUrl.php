@@ -64,6 +64,11 @@ class testPageTriggerUrl extends CWebTest {
 										'type' => ZBX_WIDGET_FIELD_TYPE_GROUP,
 										'name' => 'groupids',
 										'value' => 50011 // 'Group to check Overview'.
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'layout',
+										'value' => 1
 									]
 								]
 							]
