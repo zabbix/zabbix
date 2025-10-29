@@ -2,14 +2,14 @@
 
 . ./clickhouse.sh
 
-echo "DROP TABLE IF EXISTS $CH_DB.history" | curl $CH_URL --data-binary @-
+echo "DROP TABLE IF EXISTS $CH_DB.history_text" | curl $CH_URL --data-binary @-
 
 cat << EOF | curl $CH_URL --data-binary @-
 CREATE TABLE IF NOT EXISTS $CH_DB.history_text
 (
- 	itemid UInt64,
- 	value Float64,
- 	timestamp DateTime64(9)
+	itemid UInt64,
+	timestamp DateTime64(9),
+	value String
 )
 ENGINE = MergeTree()
 PRIMARY KEY (itemid, timestamp)

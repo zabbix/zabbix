@@ -432,6 +432,8 @@ static void	history_clickhouse_write(void *data, unsigned char value_type,
 		const zbx_history_entry_t	*entry = entries[i];
 
 		history_clickhouse_write_uint64(entry->itemid, &post_data, &post_data_alloc, &post_data_offset);
+		history_clickhouse_write_uint64((zbx_uint64_t)entry->ts.sec * 1000000000ULL + entry->ts.ns,
+				&post_data, &post_data_alloc, &post_data_offset);
 
 		switch (value_type)
 		{
@@ -464,9 +466,6 @@ static void	history_clickhouse_write(void *data, unsigned char value_type,
 				THIS_SHOULD_NEVER_HAPPEN_MSG("unexpected value type %u", (unsigned char)value_type);
 				break;
 		}
-
-		history_clickhouse_write_uint64((zbx_uint64_t)entry->ts.sec * 1000000000ULL + entry->ts.ns,
-				&post_data, &post_data_alloc, &post_data_offset);
 	}
 
 	if (CURLE_OK != (err = curl_easy_setopt(conn->handle, CURLOPT_POSTFIELDSIZE, post_data_offset)))
