@@ -214,6 +214,12 @@ static void	*history_clickhouse_create_data(const zbx_history_option_t *options,
 	zbx_clickhouse_data_t	*data;
 	const char		*url, *username, *password, *db, *value;
 
+	if (sizeof(zbx_uint64_t) != sizeof(double))
+	{
+		*error = zbx_dsprintf(NULL, "unsupported size of double:" ZBX_FS_SIZE_T, sizeof(double));
+		return NULL;
+	}
+
 	if (NULL == (url = history_option_value(options, options_num, HISTORY_PROVIDER_OPTION_URL)))
 	{
 		*error = zbx_dsprintf(NULL, "missing \"%s\" option", HISTORY_PROVIDER_OPTION_URL);
