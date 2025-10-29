@@ -171,6 +171,32 @@ static void	history_clickhouse_release_conn(zbx_clickhouse_data_t *data, zbx_cli
 	zbx_vector_clickhouse_conn_ptr_append(&data->conns, conn);
 }
 
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: validate configuration options for ClickHouse history provider    *
+ *                                                                            *
+ * Parameters:                                                                *
+ *     options     - [IN] configuration options                               *
+ *     options_num - [IN] number of configuration options                     *
+ *                                                                            *
+ ******************************************************************************/
+static void	*history_clickhouse_validate_options(const zbx_history_option_t *options, int options_num)
+{
+	const char	*supported_options = "name,log_slow_queries,url,username,password,db,types,source_ip,"
+				"ssl_cert_file,ssl_key_file,ssl_key_password,ssl_verify_peer,ssl_verify_host,"
+				"ssl_ca_location,ssl_cert_location,ssl_key_location";
+
+	for (int i = 0; i < options_num; i++)
+	{
+		if (SUCCEED != zbx_str_in_list(supported_options, options[i].name, ','))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "Unsupported ClickHouse history provider option: %s=%s",
+					options[i].name, options[i].value);
+		}
+	}
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: create and initialize ClickHouse data structure                   *
@@ -1581,6 +1607,8 @@ zbx_history_provider_t	*history_clickhouse_open(const zbx_history_option_t *opti
 	void			*data;
 
 	zbx_curl_init();
+
+	history_clickhouse_validate_options(options, options_num);
 
 	if (NULL == (data = history_clickhouse_create_data(options, options_num, error)))
 		return NULL;
