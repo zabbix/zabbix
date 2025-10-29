@@ -272,7 +272,6 @@ do									\
 }									\
 while (0)
 
-
 /* AR_META is always excluded */
 #define ZBX_UNSET_RESULT_EXCLUDING(res, exc_type)				\
 										\
@@ -290,7 +289,6 @@ do										\
 while (0)
 
 #define	zbx_init_agent_result(result)	{memset((result), 0, sizeof(AGENT_RESULT));}
-
 
 #define	zbx_free_agent_result(result)		\
 {						\

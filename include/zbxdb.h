@@ -63,7 +63,7 @@ typedef struct
 }
 zbx_db_config_t;
 
-#define ZBX_MAX_SQL_SIZE	256 * 1024 * 1024	/* 256MB */
+#define ZBX_MAX_SQL_SIZE	256 * 1024	/* 256KB */
 
 #ifndef ZBX_MAX_OVERFLOW_SQL_SIZE
 #	define ZBX_MAX_OVERFLOW_SQL_SIZE	ZBX_MAX_SQL_SIZE
@@ -71,7 +71,6 @@ zbx_db_config_t;
 	(1024 > ZBX_MAX_OVERFLOW_SQL_SIZE || ZBX_MAX_OVERFLOW_SQL_SIZE > ZBX_MAX_SQL_SIZE)
 #error ZBX_MAX_OVERFLOW_SQL_SIZE is out of range
 #endif
-
 
 #ifdef HAVE_SQLITE3
 	/* we have to put double % here for sprintf */

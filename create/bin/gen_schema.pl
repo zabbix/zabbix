@@ -109,7 +109,7 @@ my %postgresql = (
 	"t_time"	=>	"integer",
 	"t_varchar"	=>	"varchar",
 	"t_cuid"	=>	"varchar(25)",
-	"t_json"	=>	"jsonb"
+	"t_json"	=>	"jsonb",
 );
 
 my %sqlite3 = (

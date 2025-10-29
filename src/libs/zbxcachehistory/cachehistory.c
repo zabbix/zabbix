@@ -66,7 +66,7 @@ static zbx_sync_history_cache_f	sync_history_cache_cb = NULL;
 
 #define ZBX_TRENDS_CLEANUP_TIME	(SEC_PER_MIN * 55)
 
-/* the maximum number of characters for history cache values (except binary) */
+/* the maximum number of characters for history cache values (except binary and JSON) */
 #define ZBX_HISTORY_VALUE_LEN		(1024 * 64)
 
 typedef struct
@@ -2618,9 +2618,8 @@ void	zbx_dc_add_history_variant(zbx_uint64_t itemid, unsigned char value_type, u
 			{
 				if (ZBX_HISTORY_JSON_VALUE_LEN < strlen(value->data.json))
 				{
-					dc_local_add_history_notsupported(itemid, &ts,
-							"JSON is too large. ", lastlogsize, mtime,
-							value_flags);
+					dc_local_add_history_notsupported(itemid, &ts, "JSON is too large. ",
+							lastlogsize, mtime, value_flags);
 					return;
 				}
 

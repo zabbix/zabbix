@@ -216,9 +216,9 @@ void	zbx_db_insert_add_values_dyn(zbx_db_insert_t *db_insert, zbx_db_value_t **v
 
 		switch (field->type)
 		{
-			case ZBX_TYPE_LONGTEXT:
 			case ZBX_TYPE_CHAR:
 			case ZBX_TYPE_TEXT:
+			case ZBX_TYPE_LONGTEXT:
 			case ZBX_TYPE_CUID:
 			case ZBX_TYPE_BLOB:
 			case ZBX_TYPE_JSON:
@@ -439,11 +439,11 @@ int	zbx_db_insert_execute(zbx_db_insert_t *db_insert)
 	{
 		switch (field->type)
 		{
-			case ZBX_TYPE_BLOB:
-			case ZBX_TYPE_JSON:
 			case ZBX_TYPE_TEXT:
 			case ZBX_TYPE_LONGTEXT:
 			case ZBX_TYPE_CUID:
+			case ZBX_TYPE_BLOB:
+			case ZBX_TYPE_JSON:
 				if (FAIL != zbx_vector_const_db_field_ptr_search(&db_insert->fields, field,
 						ZBX_DEFAULT_PTR_COMPARE_FUNC))
 				{
