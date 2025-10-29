@@ -55,6 +55,8 @@ typedef struct
 	unsigned char			log_slow_queries;
 	unsigned char			pipelines;
 
+	zbx_uint64_t			value_type_flags;
+
 	char				*base_url;
 
 	zbx_vector_elastic_conn_ptr_t	conns;
@@ -1067,6 +1069,29 @@ static void	history_elastic_write(void *data, unsigned char value_type,
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: populate value type information for ElasticSearch provider        *
+ *                                                                            *
+ * Parameters:                                                                *
+ *     d    - [IN] ElasticSearch history data structure                       *
+ *     info - [OUT] history provider information structure                    *
+ *                                                                            *
+ ******************************************************************************/
+static void	history_elastic_get_value_type_data(zbx_history_elastic_data_t *d, zbx_history_provider_info_t *info)
+{
+	zbx_vector_history_provider_value_type_info_reserve(&info->value_types, ITEM_VALUE_TYPE_COUNT);
+
+	for (int i = 0; i < ITEM_VALUE_TYPE_BIN; i++)
+	{
+		if (FAIL == ZBX_HISTORY_CHECK_TYPE_FLAGS(d->value_type_flags, i))
+			continue;
+
+		zbx_history_provider_value_type_info_t	vti = {.value_type = i};
+
+		zbx_vector_history_provider_value_type_info_append(&info->value_types, vti);
+	}
+}
 
 /************************************************************************************
  *                                                                                  *
@@ -1182,6 +1207,9 @@ out:
 	info->friendly_max_version = zbx_strdup(NULL, ZBX_ELASTIC_MAX_VERSION_STR);
 	info->friendly_min_supported_version = zbx_strdup(NULL, ZBX_ELASTIC_MIN_VERSION_STR);
 
+	zbx_vector_history_provider_value_type_info_create(&info->value_types);
+	history_elastic_get_value_type_data(d, info);
+
 	zbx_free(page.data);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s version:%lu", __func__, zbx_result_string(ret),
@@ -1240,6 +1268,8 @@ static void	*history_elastic_create_data(const zbx_history_option_t *options, in
 		data->log_slow_queries = atoi(value);
 
 	zbx_vector_elastic_conn_ptr_create(&data->conns);
+
+	data->value_type_flags = history_options_type_mask(options, options_num);
 
 	return (void *)data;
 }
