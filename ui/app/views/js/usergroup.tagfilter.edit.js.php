@@ -133,8 +133,8 @@ window.tag_filter_edit = new class {
 
 		this.form.validateSubmit(fields)
 			.then((result) => {
-				this.overlay.unsetLoading();
 				if (!result) {
+					this.overlay.unsetLoading();
 					return;
 				}
 
