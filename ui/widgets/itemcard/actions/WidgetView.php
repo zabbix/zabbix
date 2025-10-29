@@ -28,6 +28,7 @@ use API,
 	CSettingsHelper,
 	CSimpleIntervalParser,
 	CSvgGraph,
+	CTagHelper,
 	CUpdateIntervalParser,
 	CWebUser,
 	Manager;
@@ -104,7 +105,8 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 		if (in_array(CWidgetFieldItemSections::SECTION_TAGS, $this->fields_values['sections'])) {
 			$options += [
-				'selectTags' => ['tag', 'value']
+				'selectTags' => ['tag', 'value'],
+				'selectInheritedTags' => ['tag', 'value']
 			];
 		}
 
@@ -199,7 +201,9 @@ class WidgetView extends CControllerDashboardWidgetView {
 		}
 
 		if (in_array(CWidgetFieldItemSections::SECTION_TAGS, $this->fields_values['sections'])) {
-			$item['tags'] = CItemHelper::addInheritedTags($item, $item['tags']);
+			CTagHelper::mergeOwnAndInheritedTagsForObject($item);
+
+			CArrayHelper::sort($item['tags'], ['tag', 'value']);
 		}
 
 		return $item;

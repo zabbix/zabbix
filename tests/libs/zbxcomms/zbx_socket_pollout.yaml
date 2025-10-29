@@ -1,0 +1,22 @@
+---
+test case: "default"
+in:
+  poll_mode: "MOCK_POLL_DEFAULT"
+out:
+  result: SUCCEED
+---
+test case: "cannot wait for connection"
+in:
+  socket_had_blocking_error: true
+  poll_mode: "MOCK_POLL_ERROR"
+out:
+  result: FAIL
+  error: "cannot wait for connection"
+---
+test case: "revents error"
+in:
+  poll_mode: "MOCK_POLL_REVENTS_ERROR"
+out:
+  result: "FAIL"
+  error: "connection error (POLLERR)"
+...
