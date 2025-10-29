@@ -305,8 +305,15 @@ static int	history_clickhouse_conn_init(zbx_clickhouse_conn_t *conn, zbx_clickho
 	if (SUCCEED != zbx_curl_setopt_https(conn->handle, error))
 		return FAIL;
 
-	if (SUCCEED != zbx_http_prepare_auth(conn->handle, CURLAUTH_BASIC, d->username, d->password, NULL, error))
-		return FAIL;
+	/* either username and password both has been set or both are NULL */
+	if (NULL != d->username)
+	{
+		if (SUCCEED != zbx_http_prepare_auth(conn->handle, CURLAUTH_BASIC, d->username, d->password, NULL,
+				error))
+		{
+			return FAIL;
+		}
+	}
 
 	if (SUCCEED != zbx_http_prepare_ssl(conn->handle, d->ssl_cert_file, d->ssl_key_file, d->ssl_key_password,
 			d->ssl_verify_peer, d->ssl_verify_host, d->source_ip, d->ssl_ca_location, d->ssl_cert_location,

@@ -338,7 +338,7 @@ void	history_options_clear(zbx_history_option_t *options, int options_num)
  * Return value: bitmask representing supported value types                   *
  *                                                                            *
  ******************************************************************************/
-zbx_uint64_t	history_options_type_mask(zbx_history_option_t *options, int options_num)
+zbx_uint64_t	history_options_type_mask(const zbx_history_option_t *options, int options_num)
 {
 	static const char	*value_types[ITEM_VALUE_TYPE_COUNT] = {"dbl", "str", "log", "uint", "text", "bin"};
 

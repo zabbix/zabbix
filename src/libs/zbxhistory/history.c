@@ -450,30 +450,6 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: get the value types supported by a specific history provider      *
- *                                                                            *
- * Parameters:                                                                *
- *     manager - [IN] history manager                                         *
- *     index   - [IN] history provider index in registry                      *
- *                                                                            *
- * Return value: A bit mask representing the supported value types            *
- *                                                                            *
- ******************************************************************************/
-static zbx_uint64_t	history_manager_get_provider_value_types(zbx_history_manager_t *manager, int index)
-{
-	zbx_uint64_t	flags = 0;
-
-	for (int i = 0; i < ITEM_VALUE_TYPE_COUNT; i++)
-	{
-		if (manager->type_index[i] == index)
-			flags |= (UINT64_C(1) << i);
-	}
-
-	return flags;
-}
-
-/******************************************************************************
- *                                                                            *
  * Purpose: retrieve information about all registered custom history          *
  *          providers                                                         *
  *                                                                            *
