@@ -58,7 +58,7 @@ class CControllerOauthAuthorize extends CController {
 			return false;
 		}
 
-		$mandatory_all = array_flip(['client_id', 'redirection_url', 'token_url']);
+		$mandatory_all = array_flip(['client_id', 'redirection_url', 'token_url', 'signature']);
 		$result = !array_diff_key($mandatory_all, $state);
 
 		$mandatory_one = array_flip(['mediatypeid', 'client_secret']);
@@ -66,6 +66,18 @@ class CControllerOauthAuthorize extends CController {
 
 		if (!$result) {
 			error(_('Invalid request.'), true);
+		}
+
+		if (array_key_exists('signature', $state)) {
+			$sign = $state;
+			unset($sign['signature']);
+			$sign = base64_encode(CEncryptHelper::sign(json_encode($sign)));
+
+			if (!CEncryptHelper::checkSign($sign, $state['signature'])) {
+				error(_('Invalid request.'), true);
+
+				return false;
+			}
 		}
 
 		return $result;
