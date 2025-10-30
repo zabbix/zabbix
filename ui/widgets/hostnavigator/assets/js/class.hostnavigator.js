@@ -163,7 +163,7 @@ class CHostNavigator {
 				const properties = {
 					id: nodes[i].hostid,
 					name: nodes[i].name,
-					level: this.#config.group_by?.length || 0,
+					level: this.#config.group_by?.length || 0
 				}
 
 				if (nodes[i].problem_count !== undefined) {
