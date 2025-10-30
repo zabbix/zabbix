@@ -1335,50 +1335,47 @@ static int	history_clickhouse_parse_batch_response(char *response, unsigned char
 	{
 		struct zbx_json_parse	jp;
 
+		if ('\0' == *start)
+			break;
+
 		if (NULL != (end = strchr(start, '\n')))
 			*end = '\0';
 
-		if ('\0' != *start)
+		if (FAIL != zbx_json_open(start, &jp))
 		{
-			if (FAIL != zbx_json_open(start, &jp))
+			const char		*p = NULL;
+			zbx_uint64_t		itemid;
+			zbx_history_record_t	record;
+
+			if (NULL != (p = history_clickhouse_parse_itemid(&jp, p, &itemid)) &&
+					NULL != history_clickhouse_parse_row(&jp, p, value_type, &record))
 			{
-				const char		*p = NULL;
-				zbx_uint64_t		itemid;
-				zbx_history_record_t	record;
-
-				if (NULL != (p = history_clickhouse_parse_itemid(&jp, p, &itemid)) &&
-						NULL != history_clickhouse_parse_row(&jp, p, value_type, &record))
+				if (NULL == hist || hist->itemid != itemid)
 				{
+					int			index;
+					zbx_item_history_t	hist_local;
 
-					if (NULL == hist || hist->itemid != itemid)
+					hist_local.itemid = itemid;
+
+					index = zbx_vector_item_history_bsearch(results, hist_local,
+							zbx_item_history_compare_by_itemid);
+
+					if (FAIL == index)
 					{
-						int			index;
-						zbx_item_history_t	hist_local;
-
-						hist_local.itemid = itemid;
-
-						index = zbx_vector_item_history_bsearch(results, hist_local,
-								zbx_item_history_compare_by_itemid);
-
-						if (FAIL != index)
-						{
-							batches_num++;
-							hist = &results->values[index];
-						}
-						else
-						{
-							THIS_SHOULD_NEVER_HAPPEN;
-							zbx_history_record_clear(&record, value_type);
-							continue;
-						}
+						THIS_SHOULD_NEVER_HAPPEN;
+						zbx_history_record_clear(&record, value_type);
+						break;
 					}
 
-					zbx_vector_history_record_append(&hist->rows, record);
+					hist = &results->values[index];
+					batches_num++;
 				}
+
+				zbx_vector_history_record_append(&hist->rows, record);
 			}
-			else
-				zabbix_log(LOG_LEVEL_WARNING, "cannot parse row: %s", start);
 		}
+		else
+			zabbix_log(LOG_LEVEL_WARNING, "cannot parse row: %s", start);
 
 		if (NULL == end)
 			break;
