@@ -4900,13 +4900,7 @@ in:
   history:
   - itemid: 1
     value type: ITEM_VALUE_TYPE_FLOAT
-    data:
-    - value: 1.7
-      ts: 2021-03-25 10:01:00.000000000 +00:00
-    - value: 1.8
-      ts: 2021-03-25 10:02:00.000000000 +00:00
-    - value: 1.9
-      ts: 2021-03-25 10:03:00.000000000 +00:00
+    data: []
   time: 2021-03-25 10:07:00.000000000 +00:00
   function: baselinedev
   params: '1h:now/h,"d",10'
@@ -4921,13 +4915,7 @@ in:
   history:
   - itemid: 1
     value type: ITEM_VALUE_TYPE_FLOAT
-    data:
-    - value: 1.7
-      ts: 2021-03-25 10:01:00.000000000 +00:00
-    - value: 1.8
-      ts: 2021-03-25 10:02:00.000000000 +00:00
-    - value: 1.9
-      ts: 2021-03-25 10:03:00.000000000 +00:00
+    data: []
   time: 2021-03-25 10:07:00.000000000 +00:00
   function: baselinedev
   params: '"d",10'
@@ -4941,13 +4929,7 @@ in:
   history:
   - itemid: 1
     value type: ITEM_VALUE_TYPE_FLOAT
-    data:
-    - value: 0.0
-      ts: 2021-03-25 10:01:00.000000000 +00:00
-    - value: 0.0
-      ts: 2021-03-25 10:02:00.000000000 +00:00
-    - value: 0.0
-      ts: 2021-03-25 10:03:00.000000000 +00:00
+    data: []
   time: 2021-03-25 10:07:00.000000000 +00:00
   function: baselineSomething
   params: '1h:now/h,"d",10'
@@ -4961,13 +4943,7 @@ in:
   history:
   - itemid: 1
     value type: ITEM_VALUE_TYPE_FLOAT
-    data:
-    - value: 2.0
-      ts: 2021-03-25 10:01:00.000000000 +00:00
-    - value: 2.5
-      ts: 2021-03-25 10:02:00.000000000 +00:00
-    - value: 3.0
-      ts: 2021-03-25 10:03:00.000000000 +00:00
+    data: []
   time: 2021-03-25 10:07:00.000000000 +00:00
   function: baselinewma
   params: '1h:now/h,"d",3'
@@ -4982,13 +4958,7 @@ in:
   history:
   - itemid: 1
     value type: ITEM_VALUE_TYPE_FLOAT
-    data:
-    - value: 1.7
-      ts: 2021-03-25 10:01:00.000000000 +00:00
-    - value: 1.8
-      ts: 2021-03-25 10:02:00.000000000 +00:00
-    - value: 1.9
-      ts: 2021-03-25 10:03:00.000000000 +00:00
+    data: []
   time: 2021-03-25 10:07:00.000000000 +00:00
   function: trendcount
   params: '1h:now/h'
@@ -5004,13 +4974,7 @@ in:
   history:
   - itemid: 1
     value type: ITEM_VALUE_TYPE_FLOAT
-    data:
-    - value: 1.7
-      ts: 2021-03-25 10:01:00.000000000 +00:00
-    - value: 1.8
-      ts: 2021-03-25 10:02:00.000000000 +00:00
-    - value: 1.9
-      ts: 2021-03-25 10:03:00.000000000 +00:00
+    data: []
   time: 2021-03-25 10:07:00.000000000 +00:00
   function: trendmax
   params: '1h:now/h'
@@ -5026,13 +4990,7 @@ in:
   history:
   - itemid: 1
     value type: ITEM_VALUE_TYPE_FLOAT
-    data:
-    - value: 1.7
-      ts: 2021-03-25 10:01:00.000000000 +00:00
-    - value: 1.8
-      ts: 2021-03-25 10:02:00.000000000 +00:00
-    - value: 1.9
-      ts: 2021-03-25 10:03:00.000000000 +00:00
+    data: []
   time: 2021-03-25 10:07:00.000000000 +00:00
   function: trendmin
   params: '1h:now/h'
@@ -5088,9 +5046,7 @@ in:
   history:
   - itemid: 1
     value type: ITEM_VALUE_TYPE_FLOAT
-    data:
-    - value: 1.0
-      ts: 2021-03-25 10:07:00.000000000 +00:00
+    data: []
   time: 2021-03-25 10:07:00.000000000 +00:00
   function: trendstl
   params: '10h:now/h,2h,2h'
@@ -5124,9 +5080,7 @@ in:
   history:
   - itemid: 1
     value type: ITEM_VALUE_TYPE_FLOAT
-    data:
-    - value: 1.0
-      ts: 2021-03-25 10:07:00.000000000 +00:00
+    data: []
   time: 2021-03-25 10:07:00.000000000 +00:00
   function: trendstl
   params: '10h:now/h,2h,2h, 2.0, "mad"'

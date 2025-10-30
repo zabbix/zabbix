@@ -20,7 +20,6 @@
 #include "zbxmockutil.h"
 
 #include "zbxjson.h"
-#include "zbxexpression.h"
 
 #include "../../../src/zabbix_server/lld/lld.h"
 #include "../../../src/zabbix_server/lld/lld_entry.c"
