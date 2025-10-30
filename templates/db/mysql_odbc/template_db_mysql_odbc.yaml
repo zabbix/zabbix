@@ -69,12 +69,8 @@ zabbix_export:
             - type: JAVASCRIPT
               parameters:
                 - |
-                  var result = [{
-                  	"replica_key": "replica",
-                  	"replica_name": "Replica",
-                  	"source_key": "source",
-                  	"source_name": "Source"
-                  }];
+                  var result = [];
+                  
                   if (value === "deprecated") {
                   	result = [{
                   		"replica_key": "slave",
@@ -85,14 +81,20 @@ zabbix_export:
                   } else {
                   	try {
                   		value = JSON.parse(value);
-                  		if (value.length === 0) {
-                  			result = [];
+                  		if (value.length > 0) {
+                  			result = [{
+                  				"replica_key": "replica",
+                  				"replica_name": "Replica",
+                  				"source_key": "source",
+                  				"source_name": "Source"
+                  			}];
                   		}
                   	}
                   	catch (error) {
                   		Zabbix.log(3, "MySQL replica status ERROR: " + error);
                   	}
                   }
+                  
                   return JSON.stringify(result);
           tags:
             - tag: component
@@ -1281,6 +1283,15 @@ zabbix_export:
                   parameters:
                     - $.first()
                   error_handler: DISCARD_VALUE
+                - type: JAVASCRIPT
+                  parameters:
+                    - |
+                      if (value.indexOf("Source_Host") !== 0) {
+                      	value = value.replace(/Source/g, "Master");
+                      	value = value.replace(/Replica_/g, "Slave_");
+                      }
+                      
+                      return value;
               tags:
                 - tag: component
                   value: raw
@@ -1294,7 +1305,7 @@ zabbix_export:
               preprocessing:
                 - type: JSONPATH
                   parameters:
-                    - '$.Seconds_Behind_{#SOURCE.NAME}'
+                    - $.Seconds_Behind_Master
                 - type: MATCHES_REGEX
                   parameters:
                     - \d+
@@ -1329,7 +1340,7 @@ zabbix_export:
               preprocessing:
                 - type: JSONPATH
                   parameters:
-                    - '$.{#REPLICA.NAME}_IO_Running'
+                    - $.Slave_IO_Running
                 - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1h
@@ -1371,7 +1382,7 @@ zabbix_export:
               preprocessing:
                 - type: JSONPATH
                   parameters:
-                    - '$.{#REPLICA.NAME}_SQL_Running'
+                    - $.Slave_SQL_Running
                 - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1h
@@ -1403,7 +1414,7 @@ zabbix_export:
               preprocessing:
                 - type: JSONPATH
                   parameters:
-                    - '$.{#REPLICA.NAME}_SQL_Running_State'
+                    - $.Slave_SQL_Running_State
                 - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 6h

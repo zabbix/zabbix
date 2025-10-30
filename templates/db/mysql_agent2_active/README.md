@@ -14,7 +14,7 @@ Zabbix version: 7.0 and higher.
 This template has been tested on:
 - MySQL 5.7, 8.0, 9.4
 - Percona 8.4
-- MariaDB 10.6
+- MariaDB 10.6, 11.8
 
 ## Configuration
 
@@ -47,7 +47,7 @@ For more information about MySQL Unix socket file, see the MySQL documentation h
 Leave macros {$MYSQL.USER} and {$MYSQL.PASSWORD} empty if you use a session name. Set the user name and password in the Plugins.Mysql.<...> section of your Zabbix agent 2 configuration file.
 For more information about configuring the Zabbix MySQL plugin, see the documentation https://git.zabbix.com/projects/ZBX/repos/zabbix/browse/src/go/plugins/mysql/README.md.
 
-**NOTE:** In order to use this template for monitoring MySQL version 8.4 and later, Zabbix agent 2 version 7.0.20 and later should be used.
+**NOTE:** In order to use this template for monitoring MySQL version 8.4 and later, Zabbix agent 2 version 7.0.21 and later should be used.
 
 ### Macros used
 

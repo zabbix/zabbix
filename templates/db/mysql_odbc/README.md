@@ -14,7 +14,7 @@ Zabbix version: 7.0 and higher.
 This template has been tested on:
 - MySQL 5.7, 8.0, 9.4
 - Percona 8.4
-- MariaDB 10.6
+- MariaDB 10.6, 11.8
 
 ## Configuration
 
@@ -153,11 +153,11 @@ For more information please read the MariaDB documentation https://mariadb.com/d
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Replication {#REPLICA.NAME} status|<p>Gets status information on the essential parameters of the {#REPLICA.KEY} threads.</p>|Database monitor|db.odbc.get["get_{#REPLICA.KEY}_status","{$MYSQL.DSN}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.first()`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|Replication {#REPLICA.NAME} SQL Running State|<p>Shows the state of the SQL driver threads.</p>|Dependent item|mysql.slave_sql_running_state["{#REPLICA.KEY}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.{#REPLICA.NAME}_SQL_Running_State`</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
-|Replication Seconds Behind {#SOURCE.NAME}|<p>The number of seconds the {#REPLICA.KEY} SQL thread has been behind processing the {#SOURCE.KEY} binary log. A high number (or an increasing one) can indicate that the {#REPLICA.KEY} is unable to handle events from the {#SOURCE.KEY} in a timely fashion.</p>|Dependent item|mysql.seconds_behind_master["{#REPLICA.KEY}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.Seconds_Behind_{#SOURCE.NAME}`</p></li><li><p>Matches regular expression: `\d+`</p><p>⛔️Custom on fail: Set error to: `Replication is not performed.`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
-|Replication {#REPLICA.NAME} IO Running|<p>Whether the I/O thread for reading the {#SOURCE.KEY}'s binary log is running. Normally, you want this to be `Yes` unless you have not yet started a replication or have explicitly stopped it with `stop {#REPLICA.KEY}`.</p>|Dependent item|mysql.slave_io_running["{#REPLICA.KEY}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.{#REPLICA.NAME}_IO_Running`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
-|Replication {#REPLICA.NAME} SQL Running|<p>Whether the SQL thread for executing events in the relay log is running.</p><p>As with the I/O thread, this should normally be `Yes`.</p>|Dependent item|mysql.slave_sql_running["{#REPLICA.KEY}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.{#REPLICA.NAME}_SQL_Running`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Replication {#REPLICA.NAME} status|<p>Gets status information on the essential parameters of the {#REPLICA.KEY} threads.</p>|Database monitor|db.odbc.get["get_{#REPLICA.KEY}_status","{$MYSQL.DSN}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.first()`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
+|Replication {#REPLICA.NAME} SQL Running State|<p>Shows the state of the SQL driver threads.</p>|Dependent item|mysql.slave_sql_running_state["{#REPLICA.KEY}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.Slave_SQL_Running_State`</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+|Replication Seconds Behind {#SOURCE.NAME}|<p>The number of seconds the {#REPLICA.KEY} SQL thread has been behind processing the {#SOURCE.KEY} binary log. A high number (or an increasing one) can indicate that the {#REPLICA.KEY} is unable to handle events from the {#SOURCE.KEY} in a timely fashion.</p>|Dependent item|mysql.seconds_behind_master["{#REPLICA.KEY}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.Seconds_Behind_Master`</p></li><li><p>Matches regular expression: `\d+`</p><p>⛔️Custom on fail: Set error to: `Replication is not performed.`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Replication {#REPLICA.NAME} IO Running|<p>Whether the I/O thread for reading the {#SOURCE.KEY}'s binary log is running. Normally, you want this to be `Yes` unless you have not yet started a replication or have explicitly stopped it with `stop {#REPLICA.KEY}`.</p>|Dependent item|mysql.slave_io_running["{#REPLICA.KEY}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.Slave_IO_Running`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Replication {#REPLICA.NAME} SQL Running|<p>Whether the SQL thread for executing events in the relay log is running.</p><p>As with the I/O thread, this should normally be `Yes`.</p>|Dependent item|mysql.slave_sql_running["{#REPLICA.KEY}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.Slave_SQL_Running`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 
 ### Trigger prototypes for Replication discovery
 
