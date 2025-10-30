@@ -153,6 +153,7 @@ static zbx_clickhouse_conn_t	*history_clickhouse_get_conn(zbx_clickhouse_data_t 
 	}
 
 	conn->value_type = value_type;
+	conn->status = FAIL;
 
 	return conn;
 }
@@ -446,7 +447,6 @@ static void	history_clickhouse_write(void *data, unsigned char value_type,
 	int			ret = FAIL;
 
 	conn = history_clickhouse_get_conn(d, value_type);
-	conn->status = FAIL;
 
 	if (NULL == conn->handle && SUCCEED != history_clickhouse_conn_init(conn, d, &error))
 	{
@@ -1132,6 +1132,7 @@ static int	clickhouse_conn_post(zbx_clickhouse_conn_t *conn, zbx_clickhouse_data
 	CURLcode	err;
 	CURLMcode	code;
 	int		ret = FAIL, attempts_num = 0;
+	char		*errmsg = NULL;
 
 	zabbix_log(LOG_LEVEL_TRACE, "In %s() data:%s", __func__, data);
 
@@ -1141,19 +1142,19 @@ static int	clickhouse_conn_post(zbx_clickhouse_conn_t *conn, zbx_clickhouse_data
 	if (CURLE_OK != (err = curl_easy_setopt(conn->handle, CURLOPT_URL, url)))
 	{
 		*error = zbx_dsprintf(NULL, "cannot set URL option: %s", curl_easy_strerror(err));
-		goto cleanup;
+		goto out;
 	}
 
 	if (CURLE_OK != (err = curl_easy_setopt(conn->handle, CURLOPT_POSTFIELDSIZE, strlen(data))))
 	{
 		*error = zbx_dsprintf(NULL, "cannot set CURLOPT_POSTFIELDSIZE option: %s", curl_easy_strerror(err));
-		goto cleanup;
+		goto out;
 	}
 
 	if (CURLE_OK != (err = curl_easy_setopt(conn->handle, CURLOPT_POSTFIELDS, data)))
 	{
 		*error = zbx_dsprintf(NULL, "cannot set POSTFIELDS option: %s", curl_easy_strerror(err));
-		goto cleanup;
+		goto out;
 	}
 
 	if (0 != conn->resp.page.alloc)
@@ -1170,31 +1171,24 @@ static int	clickhouse_conn_post(zbx_clickhouse_conn_t *conn, zbx_clickhouse_data
 
 	while (1)
 	{
-		char	*errmsg = NULL;
 		int	retries_num;
 
 		attempts_num++;
 		retries_num = history_clickhouse_flush_conns(d, mhandle, &errmsg);
 
-		if (FAIL == conn->status)
-		{
-			if (CLICKHOUSE_RETRIES_OFF == retry_mode)
-			{
-				if (NULL != errmsg)
-					*error = errmsg;
-				else
-					*error = zbx_strdup(NULL, "unknown error");
+		if (CLICKHOUSE_RETRIES_OFF == retry_mode)
+			retries_num = 0;
 
-				goto cleanup;
-			}
-
-			zabbix_log(LOG_LEVEL_WARNING, "failed to fetch data from ClickHouse: %s",
-					NULL == errmsg ? "unknown error" : errmsg);
-			zbx_free(errmsg);
-		}
+		if (FAIL == conn->status && NULL == errmsg)
+			errmsg = zbx_strdup(NULL, "unknown error");
 
 		if (0 == retries_num)
 			break;
+
+		if (NULL != errmsg)
+			zabbix_log(LOG_LEVEL_WARNING, "failed to fetch data from ClickHouse: %s", errmsg);
+
+		zbx_free(errmsg);
 
 		zabbix_log(LOG_LEVEL_ERR, "ClickHouse database is down: reconnecting in %d seconds",
 				ZBX_HISTORY_STORAGE_DOWN_DELAY);
@@ -1202,13 +1196,20 @@ static int	clickhouse_conn_post(zbx_clickhouse_conn_t *conn, zbx_clickhouse_data
 		sleep(ZBX_HISTORY_STORAGE_DOWN_DELAY);
 	}
 
-	if (1 < attempts_num)
-		zabbix_log(LOG_LEVEL_ERR, "ClickHouse database connection re-established");
+	if (NULL != errmsg)
+	{
+		*error = errmsg;
+	}
+	else
+	{
+		if (1 < attempts_num)
+			zabbix_log(LOG_LEVEL_ERR, "ClickHouse database connection re-established");
 
-	zabbix_log(LOG_LEVEL_TRACE, "result: %s", ZBX_NULL2STR(conn->resp.page.data));
+		zabbix_log(LOG_LEVEL_TRACE, "result: %s", ZBX_NULL2STR(conn->resp.page.data));
 
-	ret = SUCCEED;
-cleanup:
+		ret = SUCCEED;
+	}
+
 	if (CURLM_OK != (code = curl_multi_remove_handle(mhandle, conn->handle)))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot remove handle from curl multi handle: %s",
