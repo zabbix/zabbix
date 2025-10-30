@@ -16,6 +16,7 @@
 #include "zbxmockdata.h"
 #include "zbxmockassert.h"
 #include "zbxmockutil.h"
+#include "zbxmockdb.h"
 
 #include "zbxcachevalue.h"
 #include "zbxvariant.h"
@@ -29,6 +30,9 @@
 #include "mocks/valuecache/valuecache_mock.h"
 #include "../../../src/libs/zbxtrends/trends.h"
 
+int	__wrap_zbx_substitute_macros_args(zbx_token_search_t search, char **data, char *error, size_t maxerrlen,
+		zbx_macro_resolv_func_t resolver, va_list args);
+
 int	__wrap_zbx_dc_get_data_expected_from(zbx_uint64_t itemid, int *seconds);
 
 int	__wrap_zbx_baseline_get_data(uint64_t itemid, unsigned char value_type, time_t now, const char *period,
@@ -36,8 +40,6 @@ int	__wrap_zbx_baseline_get_data(uint64_t itemid, unsigned char value_type, time
 			zbx_vector_uint64_t *index, char **error);
 
 void	__wrap_zbx_recalc_time_period(time_t *ts_from, int table_group);
-int	__wrap_zbx_substitute_macros_args(zbx_token_search_t search, char **data, char *error, size_t maxerrlen,
-		zbx_macro_resolv_func_t resolver, va_list args);
 
 int	__wrap_zbx_substitute_macros_args(zbx_token_search_t search, char **data, char *error, size_t maxerrlen,
 		zbx_macro_resolv_func_t resolver, va_list args)
@@ -52,9 +54,7 @@ int	__wrap_zbx_substitute_macros_args(zbx_token_search_t search, char **data, ch
 	return SUCCEED;
 }
 
-int __wrap_zbx_dc_get_data_expected_from(zbx_uint64_t itemid, int *seconds);
-
-int __wrap_zbx_dc_get_data_expected_from(zbx_uint64_t itemid, int *seconds)
+int	__wrap_zbx_dc_get_data_expected_from(zbx_uint64_t itemid, int *seconds)
 {
 	ZBX_UNUSED(itemid);
 	*seconds = zbx_vcmock_get_ts().sec - 600;
@@ -75,7 +75,7 @@ int	__wrap_zbx_baseline_get_data(uint64_t itemid, unsigned char value_type, time
 	ZBX_UNUSED(skip);
 
 	zbx_mock_extract_yaml_values_dbl(zbx_mock_get_parameter_handle("in.baseline_values"), baseline_get_data_values);
-	zbx_mock_extract_yaml_values_dbl(zbx_mock_get_parameter_handle("in.baseline_index"), baseline_get_data_index);
+	zbx_mock_extract_yaml_values_uint64(zbx_mock_get_parameter_handle("in.baseline_index"), baseline_get_data_index);
 
 	return SUCCEED;
 }

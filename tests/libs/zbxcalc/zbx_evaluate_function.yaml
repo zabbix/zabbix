@@ -4924,7 +4924,7 @@ in:
 out:
   return: FAIL
 ---
-test case: Evaluate baselinedev unknown function
+test case: Evaluate baseline unknown function
 in:
   history:
   - itemid: 1
@@ -4938,7 +4938,7 @@ in:
 out:
   return: FAIL
 ---
-test case: Evaluate baselinedev '1h:now/h,"d",10'
+test case: Evaluate baselinewma '1h:now/h,"d",10'
 in:
   history:
   - itemid: 1
@@ -4951,7 +4951,7 @@ in:
   baseline_index: [0, 1, 2]
 out:
   return: SUCCEED
-  value: 2.500000
+  value: 2.333333
 ---
 test case: Evaluate trendcount
 in:

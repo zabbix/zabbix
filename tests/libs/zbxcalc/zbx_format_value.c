@@ -16,22 +16,27 @@
 #include "zbxmockdata.h"
 #include "zbxmockassert.h"
 #include "zbxmockutil.h"
+#include "zbxmockdb.h"
 
 #include "zbxcalc.h"
 
 void	zbx_mock_test_entry(void **state)
 {
-	char		*value = zbx_strdup(NULL, zbx_mock_get_parameter_string("in.value"));
-	size_t		max_len = zbx_mock_get_parameter_uint64("in.max_len");
+	const char	*in_value = zbx_mock_get_parameter_string("in.value");
 	zbx_uint64_t	valuemapid = zbx_mock_get_parameter_uint64("in.valuemapid");
 	const char	*units = zbx_mock_get_parameter_string("in.units");
 	unsigned char	value_type = (unsigned char)zbx_mock_get_parameter_uint64("in.value_type");
+
 	ZBX_UNUSED(state);
 
 	if (ITEM_VALUE_TYPE_STR == value_type || ITEM_VALUE_TYPE_UINT64 == value_type)
 		zbx_mockdb_init();
 
-	zbx_format_value(value, max_len, valuemapid, units, value_type);
+	char	*value = (char *)zbx_malloc(NULL, MAX_STRING_LEN);
+
+	zbx_strlcpy(value, in_value, MAX_STRING_LEN);
+
+	zbx_format_value(value, MAX_STRING_LEN, valuemapid, units, value_type);
 
 	zbx_mock_assert_str_eq("Formatted value mismatch", zbx_mock_get_parameter_string("out.value"), value);
 

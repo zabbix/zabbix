@@ -18,6 +18,7 @@
 #include "zbxmockdata.h"
 #include "zbxmockassert.h"
 #include "zbxmockutil.h"
+#include "zbxmockdb.h"
 
 #include "../../../src/zabbix_server/lld/lld.h"
 #include "../../../src/zabbix_server/lld/lld_entry.c"
@@ -31,7 +32,7 @@ void	zbx_mock_test_entry(void **state)
 	zbx_vector_lld_macro_path_ptr_t	macros;
 	zbx_jsonobj_t			obj;
 	zbx_lld_entry_t			entry;
-	int				max_error_len = ZBX_MAX_B64_LEN;
+	int				max_error_len = MAX_STRING_LEN;
 
 	ZBX_UNUSED(state);
 
@@ -51,4 +52,11 @@ void	zbx_mock_test_entry(void **state)
 
 	zbx_mock_assert_result_eq("return value", result, SUCCEED);
 	zbx_mock_assert_str_eq("data", expected_data, data);
+
+	zbx_vector_lld_macro_path_ptr_clear_ext(&macros, zbx_lld_macro_path_free);
+	zbx_vector_lld_macro_path_ptr_destroy(&macros);
+	zbx_jsonobj_clear(&obj);
+	lld_entry_clear(&entry);
+
+	zbx_free(data);
 }
