@@ -144,9 +144,12 @@ class CControllerItemList extends CControllerItem {
 		}
 
 		if ($items) {
+			CTagHelper::mergeOwnAndInheritedTags($items, true);
+
 			$data['items'] = $items;
 			$data['parent_templates'] = getItemParentTemplates($items, ZBX_FLAG_DISCOVERY_NORMAL);
-			$data['tags'] = makeTags($items, true, 'itemid', ZBX_TAG_COUNT_DEFAULT, $filter['filter_tags']);
+			$data['tags'] =
+				CTagHelper::getTagsHtml($items, ZBX_TAG_OBJECT_ITEM, ['filter_tags' => $filter['filter_tags']]);
 		}
 
 		$response = new CControllerResponseData($data);
@@ -550,9 +553,11 @@ class CControllerItemList extends CControllerItem {
 			'selectDiscoveryRule' => API_OUTPUT_EXTEND,
 			'selectDiscoveryData' => ['status', 'ts_delete', 'ts_disable', 'disable_source'],
 			'selectTags' => ['tag', 'value'],
+			'selectInheritedTags' => ['tag', 'value'],
 			'sortfield' => $input['sort'],
 			'evaltype' => $input['filter_evaltype'],
-			'tags' => $input['filter_tags'],
+			'tags' => $input['filter_tags'] ?: null,
+			'inheritedTags' => true,
 			'limit' => CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1
 		];
 

@@ -1030,6 +1030,11 @@ static void	zbx_host_info_clean(zbx_host_info_t *host_info)
 	zbx_vector_ptr_destroy(&host_info->groups);
 }
 
+static void	zbx_host_info_clean_wrapper(void *data)
+{
+	zbx_host_info_clean((zbx_host_info_t*)data);
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: get hosts groups names                                            *
@@ -1215,6 +1220,11 @@ static void	zbx_item_info_clean(zbx_item_info_t *item_info)
 	zbx_vector_tags_ptr_clear_ext(&item_info->item_tags, zbx_free_tag);
 	zbx_vector_tags_ptr_destroy(&item_info->item_tags);
 	zbx_free(item_info->name);
+}
+
+static void	zbx_item_info_clean_wrapper(void *data)
+{
+	zbx_item_info_clean((zbx_item_info_t*)data);
 }
 
 /******************************************************************************
@@ -1517,7 +1527,7 @@ void	zbx_dc_export_history_and_trends(const zbx_dc_history_t *history, int histo
 	zbx_vector_uint64_create(&hostids);
 	zbx_vector_uint64_create(&item_info_ids);
 	zbx_hashset_create_ext(&items_info, itemids->values_num, ZBX_DEFAULT_UINT64_HASH_FUNC,
-			ZBX_DEFAULT_UINT64_COMPARE_FUNC, (zbx_clean_func_t)zbx_item_info_clean,
+			ZBX_DEFAULT_UINT64_COMPARE_FUNC, zbx_item_info_clean_wrapper,
 			ZBX_DEFAULT_MEM_MALLOC_FUNC, ZBX_DEFAULT_MEM_REALLOC_FUNC, ZBX_DEFAULT_MEM_FREE_FUNC);
 
 	for (i = 0; i < history_num; i++)
@@ -1614,7 +1624,7 @@ void	zbx_dc_export_history_and_trends(const zbx_dc_history_t *history, int histo
 	zbx_vector_uint64_uniq(&hostids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 	zbx_hashset_create_ext(&hosts_info, hostids.values_num, ZBX_DEFAULT_UINT64_HASH_FUNC,
-			ZBX_DEFAULT_UINT64_COMPARE_FUNC, (zbx_clean_func_t)zbx_host_info_clean,
+			ZBX_DEFAULT_UINT64_COMPARE_FUNC, zbx_host_info_clean_wrapper,
 			ZBX_DEFAULT_MEM_MALLOC_FUNC, ZBX_DEFAULT_MEM_REALLOC_FUNC, ZBX_DEFAULT_MEM_FREE_FUNC);
 
 	db_get_hosts_info_by_hostid(&hosts_info, &hostids);

@@ -7831,6 +7831,25 @@ return [
 			]
 		]
 	],
+	'host_template_cache' => [
+		'key' => 'hostid,link_hostid',
+		'fields' => [
+			'hostid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'hosts',
+				'ref_field' => 'hostid'
+			],
+			'link_hostid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'hosts',
+				'ref_field' => 'hostid'
+			]
+		]
+	],
 	'config_autoreg_tls' => [
 		'key' => 'autoreg_tlsid',
 		'fields' => [
@@ -8469,6 +8488,25 @@ return [
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 255,
 				'default' => ''
+			]
+		]
+	],
+	'item_template_cache' => [
+		'key' => 'itemid,link_hostid',
+		'fields' => [
+			'itemid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'items',
+				'ref_field' => 'itemid'
+			],
+			'link_hostid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'hosts',
+				'ref_field' => 'hostid'
 			]
 		]
 	],
