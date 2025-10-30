@@ -1296,11 +1296,10 @@ static int	history_clickhouse_fetch(void *data, zbx_uint64_t itemid, unsigned ch
 	{
 		*error = zbx_dsprintf(NULL, "cannot fetch history from ClickHouse: %s", errmsg);
 		zbx_free(errmsg);
-		goto out;
 	}
+	else
+		ret = history_clickhouse_parse_response(conn->resp.page.data, value_type, values);
 
-	ret = history_clickhouse_parse_response(conn->resp.page.data, value_type, values);
-out:
 	zbx_free(query);
 	history_clickhouse_release_conn(d, conn);
 
