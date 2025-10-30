@@ -22,8 +22,8 @@ This template has been tested on:
 
 ## Setup
 
-1. Create an admin token on the [OpenAI Platform](https://platform.openai.com/settings/organization/admin-keys) page.
-2. Enter the admin token into the `{$OPENAI.API.TOKEN}` macro.
+1. Create an API token (admin key) on the [OpenAI Platform](https://platform.openai.com/settings/organization/admin-keys) page.
+2. Enter the API token into the `{$OPENAI.API.TOKEN}` macro.
 
 ### Macros used
 
@@ -38,7 +38,6 @@ This template has been tested on:
 |{$OPENAI.MODEL.NAME.MATCHES}|<p>This macro is used in OpenAI Platform model discovery. Can be overridden on the host or linked template level.</p>|`.*`|
 |{$OPENAI.MODEL.NAME.NOT_MATCHES}|<p>This macro is used in OpenAI Platform model discovery. Can be overridden on the host or linked template level.</p>|`CHANGE_IF_NEEDED`|
 |{$OPENAI.DATA.TIMEOUT}|<p>Response timeout for an API.</p>|`15s`|
-|{$OPENAI.API.USER.AGENT}|<p>User-Agent used for requests to OpenAI API.</p>|`ZabbixServer/1.0 Zabbix`|
 |{$OPENAI.HTTP_PROXY}|<p>HTTP proxy for API requests. You can specify it using the format [protocol://][username[:password]@]proxy.example.com[:port]. See the documentation at https://www.zabbix.com/documentation/8.0/manual/config/items/itemtypes/http</p>||
 
 ### Items
@@ -73,39 +72,39 @@ This template has been tested on:
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|[{#NAME}]: Get expense data|<p>Item for gathering expense data for the {#NAME} project.</p>|Dependent item|openai.expenses.get[{#ID}]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1d`</p></li><li><p>JSON Path: `$.costs[0].results..[?(@.project_id == '{#ID}')]`</p><p>⛔️Custom on fail: Set value to: `{}`</p></li></ul>|
-|[{#NAME}]: Daily expenses|<p>Amount of expenses for the past day.</p>|Dependent item|openai.expenses.amount[{#ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$..amount.value.sum()`</p><p>⛔️Custom on fail: Set value to: `0`</p></li></ul>|
-|[{#NAME}]: Get completion data|<p>Item for gathering completion data for the {#NAME} project.</p>|Dependent item|openai.completions.get[{#ID}]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li><li><p>JSON Path: `$.completions..results..[?(@.project_id == '{#ID}')]`</p><p>⛔️Custom on fail: Set value to: `{}`</p></li></ul>|
-|[{#NAME}]: Input tokens|<p>Total number of input tokens received by all models in the project.</p>|Dependent item|openai.tokens.input[{#ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$..input_tokens.sum()`</p><p>⛔️Custom on fail: Set value to: `0`</p></li></ul>|
-|[{#NAME}]: Output tokens|<p>Total number of output tokens sent by all models in the project.</p>|Dependent item|openai.tokens.output[{#ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$..output_tokens.sum()`</p><p>⛔️Custom on fail: Set value to: `0`</p></li></ul>|
-|[{#NAME}]: Input cached tokens|<p>Total number of input cached tokens sent by all models in the project.</p>|Dependent item|openai.tokens.input_cached[{#ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$..input_cached_tokens.sum()`</p><p>⛔️Custom on fail: Set value to: `0`</p></li></ul>|
-|[{#NAME}]: Input audio tokens|<p>Total number of input audio tokens sent by all models in the project.</p>|Dependent item|openai.tokens.input_audio[{#ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$..input_audio_tokens.sum()`</p><p>⛔️Custom on fail: Set value to: `0`</p></li></ul>|
-|[{#NAME}]: Output audio tokens|<p>Total number of output audio tokens sent by all models in the project.</p>|Dependent item|openai.tokens.output_audio[{#ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$..output_audio_tokens.sum()`</p><p>⛔️Custom on fail: Set value to: `0`</p></li></ul>|
-|[{#NAME}]: Model request number|<p>Total number of requests to all models in the project.</p>|Dependent item|openai.requests.number[{#ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$..num_model_requests.sum()`</p><p>⛔️Custom on fail: Set value to: `0`</p></li></ul>|
+|[{#ID}]: Get expense data|<p>Item for gathering expense data for the {#NAME} project.</p>|Dependent item|openai.expenses.get[{#ID}]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1d`</p></li><li><p>JSON Path: `$.costs[0].results..[?(@.project_id == '{#ID}')]`</p><p>⛔️Custom on fail: Set value to: `{}`</p></li></ul>|
+|[{#ID}]: Daily expenses|<p>Amount of expenses for the past day.</p>|Dependent item|openai.expenses.amount[{#ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$..amount.value.sum()`</p><p>⛔️Custom on fail: Set value to: `0`</p></li></ul>|
+|[{#ID}]: Get completion data|<p>Item for gathering completion data for the {#NAME} project.</p>|Dependent item|openai.completions.get[{#ID}]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li><li><p>JSON Path: `$.completions..results..[?(@.project_id == '{#ID}')]`</p><p>⛔️Custom on fail: Set value to: `{}`</p></li></ul>|
+|[{#ID}]: Input tokens|<p>Total number of input tokens received by all models in the project.</p>|Dependent item|openai.tokens.input[{#ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$..input_tokens.sum()`</p><p>⛔️Custom on fail: Set value to: `0`</p></li></ul>|
+|[{#ID}]: Output tokens|<p>Total number of output tokens sent by all models in the project.</p>|Dependent item|openai.tokens.output[{#ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$..output_tokens.sum()`</p><p>⛔️Custom on fail: Set value to: `0`</p></li></ul>|
+|[{#ID}]: Input cached tokens|<p>Total number of input cached tokens sent by all models in the project.</p>|Dependent item|openai.tokens.input_cached[{#ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$..input_cached_tokens.sum()`</p><p>⛔️Custom on fail: Set value to: `0`</p></li></ul>|
+|[{#ID}]: Input audio tokens|<p>Total number of input audio tokens sent by all models in the project.</p>|Dependent item|openai.tokens.input_audio[{#ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$..input_audio_tokens.sum()`</p><p>⛔️Custom on fail: Set value to: `0`</p></li></ul>|
+|[{#ID}]: Output audio tokens|<p>Total number of output audio tokens sent by all models in the project.</p>|Dependent item|openai.tokens.output_audio[{#ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$..output_audio_tokens.sum()`</p><p>⛔️Custom on fail: Set value to: `0`</p></li></ul>|
+|[{#ID}]: Model request number|<p>Total number of requests to all models in the project.</p>|Dependent item|openai.requests.number[{#ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$..num_model_requests.sum()`</p><p>⛔️Custom on fail: Set value to: `0`</p></li></ul>|
 
 ### Trigger prototypes for Project discovery
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|OpenAI Platform: [{#NAME}]: Daily expenses exceeded|<p>The daily expense limit is higher than the maximum.</p>|`last(/OpenAI Platform by HTTP/openai.expenses.amount[{#ID}])>{$OPENAI.EXPENSES.MAX:"{#NAME}"}`|Warning|**Manual close**: Yes|
+|OpenAI Platform: [{#ID}]: Daily expenses exceeded|<p>The daily expense limit is higher than the maximum.</p>|`last(/OpenAI Platform by HTTP/openai.expenses.amount[{#ID}])>{$OPENAI.EXPENSES.MAX:"{#NAME}"}`|Warning|**Manual close**: Yes|
 
-### LLD rule [{#NAME}]: Model discovery
-
-|Name|Description|Type|Key and additional info|
-|----|-----------|----|-----------------------|
-|[{#NAME}]: Model discovery|<p>Used for discovering models used in the {#NAME} project on the OpenAI Platform.</p>|Dependent item|openai.model.discovery[{#ID}]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li><li><p>JSON Path: `$.completions..results[?(@.project_id == '{#ID}')]`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-
-### Item prototypes for [{#NAME}]: Model discovery
+### LLD rule [{#ID}]: Model discovery
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|[{#NAME}/{#MODEL}]: Get model data|<p>Item for gathering data of the {#MODEL} model.</p>|Dependent item|openai.model.get[{#ID},{#MODEL}]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Set value to: `{}`</p></li></ul>|
-|[{#NAME}/{#MODEL}]: Input tokens|<p>Total number of input tokens received by the model {#MODEL} in the {#NAME} project.</p>|Dependent item|openai.tokens.input[{#ID},{#MODEL}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.input_tokens`</p><p>⛔️Custom on fail: Set value to: `0`</p></li></ul>|
-|[{#NAME}/{#MODEL}]: Output tokens|<p>Total number of output tokens sent by the model {#MODEL} in the {#NAME} project.</p>|Dependent item|openai.tokens.output[{#ID},{#MODEL}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.output_tokens`</p><p>⛔️Custom on fail: Set value to: `0`</p></li></ul>|
-|[{#NAME}/{#MODEL}]: Input cached tokens|<p>Total number of input cached tokens sent by the model {#MODEL} in the {#NAME} project.</p>|Dependent item|openai.tokens.input_cached[{#ID},{#MODEL}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.input_cached_tokens`</p><p>⛔️Custom on fail: Set value to: `0`</p></li></ul>|
-|[{#NAME}/{#MODEL}]: Input audio tokens|<p>Total number of input audio tokens sent by the model {#MODEL} in the {#NAME} project.</p>|Dependent item|openai.tokens.input_audio[{#ID},{#MODEL}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.input_audio_tokens`</p><p>⛔️Custom on fail: Set value to: `0`</p></li></ul>|
-|[{#NAME}/{#MODEL}]: Output audio tokens|<p>Total number of output audio tokens sent by the model {#MODEL} in the {#NAME} project.</p>|Dependent item|openai.tokens.output_audio[{#ID},{#MODEL}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.output_audio_tokens`</p><p>⛔️Custom on fail: Set value to: `0`</p></li></ul>|
-|[{#NAME}/{#MODEL}]: Model request number|<p>Total number of requests to the model {#MODEL} in the {#NAME} project.</p>|Dependent item|openai.requests.number[{#ID},{#MODEL}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.num_model_requests`</p><p>⛔️Custom on fail: Set value to: `0`</p></li></ul>|
+|[{#ID}]: Model discovery|<p>Used for discovering models used in the {#NAME} project on the OpenAI Platform.</p>|Dependent item|openai.model.discovery[{#ID}]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li><li><p>JSON Path: `$.completions..results[?(@.project_id == '{#ID}')]`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+
+### Item prototypes for [{#ID}]: Model discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|[{#ID}/{#MODEL}]: Get model data|<p>Item for gathering data of the {#MODEL} model.</p>|Dependent item|openai.model.get[{#ID},{#MODEL}]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Set value to: `{}`</p></li></ul>|
+|[{#ID}/{#MODEL}]: Input tokens|<p>Total number of input tokens received by the model {#MODEL} in the {#NAME} project.</p>|Dependent item|openai.tokens.input[{#ID},{#MODEL}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.input_tokens`</p><p>⛔️Custom on fail: Set value to: `0`</p></li></ul>|
+|[{#ID}/{#MODEL}]: Output tokens|<p>Total number of output tokens sent by the model {#MODEL} in the {#NAME} project.</p>|Dependent item|openai.tokens.output[{#ID},{#MODEL}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.output_tokens`</p><p>⛔️Custom on fail: Set value to: `0`</p></li></ul>|
+|[{#ID}/{#MODEL}]: Input cached tokens|<p>Total number of input cached tokens sent by the model {#MODEL} in the {#NAME} project.</p>|Dependent item|openai.tokens.input_cached[{#ID},{#MODEL}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.input_cached_tokens`</p><p>⛔️Custom on fail: Set value to: `0`</p></li></ul>|
+|[{#ID}/{#MODEL}]: Input audio tokens|<p>Total number of input audio tokens sent by the model {#MODEL} in the {#NAME} project.</p>|Dependent item|openai.tokens.input_audio[{#ID},{#MODEL}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.input_audio_tokens`</p><p>⛔️Custom on fail: Set value to: `0`</p></li></ul>|
+|[{#ID}/{#MODEL}]: Output audio tokens|<p>Total number of output audio tokens sent by the model {#MODEL} in the {#NAME} project.</p>|Dependent item|openai.tokens.output_audio[{#ID},{#MODEL}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.output_audio_tokens`</p><p>⛔️Custom on fail: Set value to: `0`</p></li></ul>|
+|[{#ID}/{#MODEL}]: Model request number|<p>Total number of requests to the model {#MODEL} in the {#NAME} project.</p>|Dependent item|openai.requests.number[{#ID},{#MODEL}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.num_model_requests`</p><p>⛔️Custom on fail: Set value to: `0`</p></li></ul>|
 
 ## Feedback
 

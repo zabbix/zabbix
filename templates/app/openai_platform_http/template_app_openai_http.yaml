@@ -11,8 +11,8 @@ zabbix_export:
         Monitoring OpenAI Platform data from https://platform.openai.com.
         
         Setup:
-        1. Create an admin token on https://platform.openai.com/settings/organization/admin-keys.
-        2. Enter the admin token into the {$OPENAI.API.TOKEN} macro.
+        1. Create an API token (admin key) on https://platform.openai.com/settings/organization/admin-keys.
+        2. Enter the API token into the {$OPENAI.API.TOKEN} macro.
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback.
         
@@ -31,7 +31,7 @@ zabbix_export:
         2. Enter the admin token into the `API token` field.
       vendor:
         name: Zabbix
-        version: 8.0-1
+        version: 8.0-2
       groups:
         - name: Templates/Applications
       items:
@@ -77,7 +77,7 @@ zabbix_export:
             
             	setParams: function (params, required) {
             		required = required || [];
-            		required.concat(['api_url', 'api_token', 'user_agent']).forEach(function (field) {
+            		required.concat(['api_url', 'api_token']).forEach(function (field) {
             			if (typeof params !== 'object' || typeof params[field] === 'undefined'
             				|| params[field] === '') {
             				throw 'Required parameter is not set: "' + field + '".';
@@ -92,21 +92,22 @@ zabbix_export:
             	},
             
             	apiRequest: function (uri, params) {
-            		var final_data = [];
+            		var final_data = [],
+            			page_cursors = [undefined];
             
-            		function fetchPage(page_cursor) {
+            		while (page_cursors.length > 0) {
+            			var page_cursor = page_cursors.pop();
             			var request = new HttpRequest(),
             				response;
             
             			var queryString = Object.keys(params).map(function(key) {
             				return encodeURIComponent(key) + '=' + encodeURIComponent(params[key]);
             			}).join('&');
-            		
+            
             			if (typeof page_cursor !== 'undefined') {
             				queryString += '&' + ((page_cursor.indexOf('page') !== -1) ? 'page' : 'after') + '=' + encodeURIComponent(page_cursor);
             			}
             
-            			request.addHeader('User-Agent: ' + OpenAI.params.user_agent);
             			request.addHeader('Content-Type: application/json');
             			request.addHeader('Authorization: Bearer ' + OpenAI.params.api_token);
             
@@ -115,7 +116,7 @@ zabbix_export:
             				Zabbix.log(4, '[ OpenAI API ] Using HTTP proxy: ' + OpenAI.params.http_proxy);
             			}
             
-            			url = uri + '?' + queryString;
+            			var url = uri + '?' + queryString;
             
             			Zabbix.log(4, '[ OpenAI API ] Sending request: ' + url);
             
@@ -128,7 +129,7 @@ zabbix_export:
             			}
             
             			Object.keys(request.getHeaders()).forEach(function(key) {
-            				if (key.indexOf('openai') == 0) {
+            				if (key.indexOf('openai') === 0) {
             					OpenAI.headers[key] = request.getHeaders()[key];
             				}
             			});
@@ -142,18 +143,14 @@ zabbix_export:
             
             			final_data = final_data.concat(response.data || []);
             
-            			if (response.has_more && response.next_page) {
-            				fetchPage(response.next_page);
+            			if (response.next_page) {
+            				page_cursors.push(response.next_page);
             			}
             
-            			if (response.has_more && response.last_id) {
-            				fetchPage(response.last_id);
+            			if (response.last_id) {
+            				page_cursors.push(response.last_id);
             			}
-            
-            			delete request;
             		}
-            
-            		fetchPage();
             
             		return final_data;
             	},
@@ -193,8 +190,6 @@ zabbix_export:
               value: '{$OPENAI.TOKEN}'
             - name: api_url
               value: '{$OPENAI.API.URL}'
-            - name: user_agent
-              value: '{$OPENAI.API.USER.AGENT}'
           tags:
             - tag: component
               value: raw
@@ -240,7 +235,7 @@ zabbix_export:
             
             	setParams: function (params, required) {
             		required = required || [];
-            		required.concat(['api_url', 'api_token', 'user_agent']).forEach(function (field) {
+            		required.concat(['api_url', 'api_token']).forEach(function (field) {
             			if (typeof params !== 'object' || typeof params[field] === 'undefined'
             				|| params[field] === '') {
             				throw 'Required parameter is not set: "' + field + '".';
@@ -255,21 +250,22 @@ zabbix_export:
             	},
             
             	apiRequest: function (uri, params) {
-            		var final_data = [];
+            		var final_data = [],
+            			page_cursors = [undefined];
             
-            		function fetchPage(page_cursor) {
+            		while (page_cursors.length > 0) {
+            			var page_cursor = page_cursors.pop();
             			var request = new HttpRequest(),
             				response;
             
             			var queryString = Object.keys(params).map(function(key) {
             				return encodeURIComponent(key) + '=' + encodeURIComponent(params[key]);
             			}).join('&');
-            		
+            
             			if (typeof page_cursor !== 'undefined') {
             				queryString += '&' + ((page_cursor.indexOf('page') !== -1) ? 'page' : 'after') + '=' + encodeURIComponent(page_cursor);
             			}
             
-            			request.addHeader('User-Agent: ' + OpenAI.params.user_agent);
             			request.addHeader('Content-Type: application/json');
             			request.addHeader('Authorization: Bearer ' + OpenAI.params.api_token);
             
@@ -278,7 +274,7 @@ zabbix_export:
             				Zabbix.log(4, '[ OpenAI API ] Using HTTP proxy: ' + OpenAI.params.http_proxy);
             			}
             
-            			url = uri + '?' + queryString;
+            			var url = uri + '?' + queryString;
             
             			Zabbix.log(4, '[ OpenAI API ] Sending request: ' + url);
             
@@ -291,7 +287,7 @@ zabbix_export:
             			}
             
             			Object.keys(request.getHeaders()).forEach(function(key) {
-            				if (key.indexOf('openai') == 0) {
+            				if (key.indexOf('openai') === 0) {
             					OpenAI.headers[key] = request.getHeaders()[key];
             				}
             			});
@@ -305,18 +301,14 @@ zabbix_export:
             
             			final_data = final_data.concat(response.data || []);
             
-            			if (response.has_more && response.next_page) {
-            				fetchPage(response.next_page);
+            			if (response.next_page) {
+            				page_cursors.push(response.next_page);
             			}
             
-            			if (response.has_more && response.last_id) {
-            				fetchPage(response.last_id);
+            			if (response.last_id) {
+            				page_cursors.push(response.last_id);
             			}
-            
-            			delete request;
             		}
-            
-            		fetchPage();
             
             		return final_data;
             	},
@@ -352,8 +344,6 @@ zabbix_export:
               value: '{$OPENAI.TOKEN}'
             - name: api_url
               value: '{$OPENAI.API.URL}'
-            - name: user_agent
-              value: '{$OPENAI.API.USER.AGENT}'
           tags:
             - tag: component
               value: raw
@@ -431,7 +421,7 @@ zabbix_export:
             
             	setParams: function (params, required) {
             		required = required || [];
-            		required.concat(['api_url', 'api_token', 'user_agent']).forEach(function (field) {
+            		required.concat(['api_url', 'api_token']).forEach(function (field) {
             			if (typeof params !== 'object' || typeof params[field] === 'undefined'
             				|| params[field] === '') {
             				throw 'Required parameter is not set: "' + field + '".';
@@ -446,21 +436,22 @@ zabbix_export:
             	},
             
             	apiRequest: function (uri, params) {
-            		var final_data = [];
+            		var final_data = [],
+            			page_cursors = [undefined];
             
-            		function fetchPage(page_cursor) {
+            		while (page_cursors.length > 0) {
+            			var page_cursor = page_cursors.pop();
             			var request = new HttpRequest(),
             				response;
             
             			var queryString = Object.keys(params).map(function(key) {
             				return encodeURIComponent(key) + '=' + encodeURIComponent(params[key]);
             			}).join('&');
-            		
+            
             			if (typeof page_cursor !== 'undefined') {
             				queryString += '&' + ((page_cursor.indexOf('page') !== -1) ? 'page' : 'after') + '=' + encodeURIComponent(page_cursor);
             			}
             
-            			request.addHeader('User-Agent: ' + OpenAI.params.user_agent);
             			request.addHeader('Content-Type: application/json');
             			request.addHeader('Authorization: Bearer ' + OpenAI.params.api_token);
             
@@ -469,7 +460,7 @@ zabbix_export:
             				Zabbix.log(4, '[ OpenAI API ] Using HTTP proxy: ' + OpenAI.params.http_proxy);
             			}
             
-            			url = uri + '?' + queryString;
+            			var url = uri + '?' + queryString;
             
             			Zabbix.log(4, '[ OpenAI API ] Sending request: ' + url);
             
@@ -482,7 +473,7 @@ zabbix_export:
             			}
             
             			Object.keys(request.getHeaders()).forEach(function(key) {
-            				if (key.indexOf('openai') == 0) {
+            				if (key.indexOf('openai') === 0) {
             					OpenAI.headers[key] = request.getHeaders()[key];
             				}
             			});
@@ -496,18 +487,14 @@ zabbix_export:
             
             			final_data = final_data.concat(response.data || []);
             
-            			if (response.has_more && response.next_page) {
-            				fetchPage(response.next_page);
+            			if (response.next_page) {
+            				page_cursors.push(response.next_page);
             			}
             
-            			if (response.has_more && response.last_id) {
-            				fetchPage(response.last_id);
+            			if (response.last_id) {
+            				page_cursors.push(response.last_id);
             			}
-            
-            			delete request;
             		}
-            
-            		fetchPage();
             
             		return final_data;
             	},
@@ -536,8 +523,6 @@ zabbix_export:
               value: '{$OPENAI.TOKEN}'
             - name: api_url
               value: '{$OPENAI.API.URL}'
-            - name: user_agent
-              value: '{$OPENAI.API.USER.AGENT}'
           tags:
             - tag: component
               value: raw
@@ -562,7 +547,7 @@ zabbix_export:
               value: system
       discovery_rules:
         - uuid: 5ad946dd847944a294a56ed0a244a219
-          name: '[{#NAME}]: Model discovery'
+          name: '[{#ID}]: Model discovery'
           type: DEPENDENT
           key: 'openai.model.discovery[{#ID}]'
           filter:
@@ -579,7 +564,7 @@ zabbix_export:
           description: 'Used for discovering models used in the {#NAME} project on the OpenAI Platform.'
           item_prototypes:
             - uuid: 03057358da3f42c9bce9b3f9814e108a
-              name: '[{#NAME}/{#MODEL}]: Get model data'
+              name: '[{#ID}/{#MODEL}]: Get model data'
               type: DEPENDENT
               key: 'openai.model.get[{#ID},{#MODEL}]'
               history: '0'
@@ -601,8 +586,10 @@ zabbix_export:
                   value: raw
                 - tag: model
                   value: '{#MODEL}'
+                - tag: project
+                  value: '{#ID}'
             - uuid: 635d12e823b547169da209e7aaa3ec79
-              name: '[{#NAME}/{#MODEL}]: Model request number'
+              name: '[{#ID}/{#MODEL}]: Model request number'
               type: DEPENDENT
               key: 'openai.requests.number[{#ID},{#MODEL}]'
               description: 'Total number of requests to the model {#MODEL} in the {#NAME} project.'
@@ -621,8 +608,10 @@ zabbix_export:
                   value: model
                 - tag: model
                   value: '{#MODEL}'
+                - tag: project
+                  value: '{#ID}'
             - uuid: 58083a34c49a4a5298f75717085969a2
-              name: '[{#NAME}/{#MODEL}]: Input tokens'
+              name: '[{#ID}/{#MODEL}]: Input tokens'
               type: DEPENDENT
               key: 'openai.tokens.input[{#ID},{#MODEL}]'
               description: 'Total number of input tokens received by the model {#MODEL} in the {#NAME} project.'
@@ -641,8 +630,10 @@ zabbix_export:
                   value: model
                 - tag: model
                   value: '{#MODEL}'
+                - tag: project
+                  value: '{#ID}'
             - uuid: 8210adc308084ac08a9550e89b73d663
-              name: '[{#NAME}/{#MODEL}]: Input audio tokens'
+              name: '[{#ID}/{#MODEL}]: Input audio tokens'
               type: DEPENDENT
               key: 'openai.tokens.input_audio[{#ID},{#MODEL}]'
               description: 'Total number of input audio tokens sent by the model {#MODEL} in the {#NAME} project.'
@@ -661,8 +652,10 @@ zabbix_export:
                   value: model
                 - tag: model
                   value: '{#MODEL}'
+                - tag: project
+                  value: '{#ID}'
             - uuid: d4fa2aa80bb647b8a2b79f556004af7c
-              name: '[{#NAME}/{#MODEL}]: Input cached tokens'
+              name: '[{#ID}/{#MODEL}]: Input cached tokens'
               type: DEPENDENT
               key: 'openai.tokens.input_cached[{#ID},{#MODEL}]'
               description: 'Total number of input cached tokens sent by the model {#MODEL} in the {#NAME} project.'
@@ -681,8 +674,10 @@ zabbix_export:
                   value: model
                 - tag: model
                   value: '{#MODEL}'
+                - tag: project
+                  value: '{#ID}'
             - uuid: e56e31c7988041a9b4506ffba4e6fa52
-              name: '[{#NAME}/{#MODEL}]: Output tokens'
+              name: '[{#ID}/{#MODEL}]: Output tokens'
               type: DEPENDENT
               key: 'openai.tokens.output[{#ID},{#MODEL}]'
               description: 'Total number of output tokens sent by the model {#MODEL} in the {#NAME} project.'
@@ -701,8 +696,10 @@ zabbix_export:
                   value: model
                 - tag: model
                   value: '{#MODEL}'
+                - tag: project
+                  value: '{#ID}'
             - uuid: 0dc8c1eaa9314927b7108cc93c854521
-              name: '[{#NAME}/{#MODEL}]: Output audio tokens'
+              name: '[{#ID}/{#MODEL}]: Output audio tokens'
               type: DEPENDENT
               key: 'openai.tokens.output_audio[{#ID},{#MODEL}]'
               description: 'Total number of output audio tokens sent by the model {#MODEL} in the {#NAME} project.'
@@ -721,9 +718,11 @@ zabbix_export:
                   value: model
                 - tag: model
                   value: '{#MODEL}'
+                - tag: project
+                  value: '{#ID}'
           graph_prototypes:
             - uuid: d992c2b6fef4446591d7014cabc94dea
-              name: '[{#NAME}/{#MODEL}]: Tokens statistics'
+              name: '[{#ID}/{#MODEL}]: Tokens statistics'
               graph_items:
                 - color: 199C0D
                   item:
@@ -779,7 +778,7 @@ zabbix_export:
           description: 'Used for discovering projects on the OpenAI Platform.'
           item_prototypes:
             - uuid: 93782ec08c734abd9a8bb7c6e8c157ab
-              name: '[{#NAME}]: Get completion data'
+              name: '[{#ID}]: Get completion data'
               type: DEPENDENT
               key: 'openai.completions.get[{#ID}]'
               history: '0'
@@ -802,7 +801,7 @@ zabbix_export:
                 - tag: project
                   value: '{#NAME}'
             - uuid: 8c51d3b0157f476eb4a62c036473438b
-              name: '[{#NAME}]: Daily expenses'
+              name: '[{#ID}]: Daily expenses'
               type: DEPENDENT
               key: 'openai.expenses.amount[{#ID}]'
               value_type: FLOAT
@@ -826,8 +825,8 @@ zabbix_export:
               trigger_prototypes:
                 - uuid: 406d38421362474d98fac3e3bc4d41b1
                   expression: 'last(/OpenAI Platform by HTTP/openai.expenses.amount[{#ID}])>{$OPENAI.EXPENSES.MAX:"{#NAME}"}'
-                  name: 'OpenAI Platform: [{#NAME}]: Daily expenses exceeded'
-                  event_name: 'OpenAI Platform: [{#NAME}]: Daily expenses exceeded (>{$OPENAI.EXPENSES.MAX:"{#NAME}"})'
+                  name: 'OpenAI Platform: [{#ID}]: Daily expenses exceeded'
+                  event_name: 'OpenAI Platform: [{#ID}]: Daily expenses exceeded (>{$OPENAI.EXPENSES.MAX:"{#NAME}"})'
                   opdata: 'Expenses for the past day: {ITEM.LASTVALUE1}'
                   priority: WARNING
                   description: 'The daily expense limit is higher than the maximum.'
@@ -836,7 +835,7 @@ zabbix_export:
                     - tag: scope
                       value: performance
             - uuid: c6e74fff343c4c0fbfee1704ba794d40
-              name: '[{#NAME}]: Get expense data'
+              name: '[{#ID}]: Get expense data'
               type: DEPENDENT
               key: 'openai.expenses.get[{#ID}]'
               history: '0'
@@ -859,7 +858,7 @@ zabbix_export:
                 - tag: project
                   value: '{#NAME}'
             - uuid: 797302910c5b4f238d77aaa3a22551f3
-              name: '[{#NAME}]: Model request number'
+              name: '[{#ID}]: Model request number'
               type: DEPENDENT
               key: 'openai.requests.number[{#ID}]'
               description: 'Total number of requests to all models in the project.'
@@ -879,7 +878,7 @@ zabbix_export:
                 - tag: project
                   value: '{#NAME}'
             - uuid: 67ffcc8be80641acbe6556381d540fba
-              name: '[{#NAME}]: Input tokens'
+              name: '[{#ID}]: Input tokens'
               type: DEPENDENT
               key: 'openai.tokens.input[{#ID}]'
               description: 'Total number of input tokens received by all models in the project.'
@@ -899,7 +898,7 @@ zabbix_export:
                 - tag: project
                   value: '{#NAME}'
             - uuid: f4edc1c6e7354760b5cd7dc53697be30
-              name: '[{#NAME}]: Input audio tokens'
+              name: '[{#ID}]: Input audio tokens'
               type: DEPENDENT
               key: 'openai.tokens.input_audio[{#ID}]'
               description: 'Total number of input audio tokens sent by all models in the project.'
@@ -919,7 +918,7 @@ zabbix_export:
                 - tag: project
                   value: '{#NAME}'
             - uuid: fc03925deb5d40efbd443160d60e616a
-              name: '[{#NAME}]: Input cached tokens'
+              name: '[{#ID}]: Input cached tokens'
               type: DEPENDENT
               key: 'openai.tokens.input_cached[{#ID}]'
               description: 'Total number of input cached tokens sent by all models in the project.'
@@ -939,7 +938,7 @@ zabbix_export:
                 - tag: project
                   value: '{#NAME}'
             - uuid: b4502508f47f40318cb56631002d801d
-              name: '[{#NAME}]: Output tokens'
+              name: '[{#ID}]: Output tokens'
               type: DEPENDENT
               key: 'openai.tokens.output[{#ID}]'
               description: 'Total number of output tokens sent by all models in the project.'
@@ -959,7 +958,7 @@ zabbix_export:
                 - tag: project
                   value: '{#NAME}'
             - uuid: 8db5eb1f3c39437db160e02047da5ede
-              name: '[{#NAME}]: Output audio tokens'
+              name: '[{#ID}]: Output audio tokens'
               type: DEPENDENT
               key: 'openai.tokens.output_audio[{#ID}]'
               description: 'Total number of output audio tokens sent by all models in the project.'
@@ -980,7 +979,7 @@ zabbix_export:
                   value: '{#NAME}'
           graph_prototypes:
             - uuid: ee1bb621d8294ea88db88de69f6066ca
-              name: '[{#NAME}]: Daily expenses'
+              name: '[{#ID}]: Daily expenses'
               graph_items:
                 - drawtype: GRADIENT_LINE
                   color: 199C0D
@@ -988,7 +987,7 @@ zabbix_export:
                     host: 'OpenAI Platform by HTTP'
                     key: 'openai.expenses.amount[{#ID}]'
             - uuid: d0d0638efe8144a39a81e3026559bcd3
-              name: '[{#NAME}]: Tokens statistics'
+              name: '[{#ID}]: Tokens statistics'
               graph_items:
                 - color: 199C0D
                   item:
@@ -1044,15 +1043,6 @@ zabbix_export:
             priority: '1'
             label: 'API URL'
             description: 'OpenAI API URL.'
-        - macro: '{$OPENAI.API.USER.AGENT}'
-          value: 'ZabbixServer/1.0 Zabbix'
-          description: 'User-Agent used for requests to OpenAI API.'
-          config:
-            type: TEXT
-            priority: '10'
-            section_name: Other
-            label: 'User-Agent of API requests'
-            description: 'User-Agent used for requests to OpenAI API.'
         - macro: '{$OPENAI.DATA.TIMEOUT}'
           value: 15s
           description: 'Response timeout for an API.'
@@ -1075,7 +1065,7 @@ zabbix_export:
           description: 'HTTP proxy for API requests. You can specify it using the format [protocol://][username[:password]@]proxy.example.com[:port]. See the documentation at https://www.zabbix.com/documentation/8.0/manual/config/items/itemtypes/http'
           config:
             type: TEXT
-            priority: '11'
+            priority: '10'
             section_name: Other
             label: 'HTTP proxy for API requests'
             description: 'HTTP proxy for API requests. You can specify it using the format [protocol://][username[:password]@]proxy.example.com[:port]. See the documentation at https://www.zabbix.com/documentation/8.0/manual/config/items/itemtypes/http'
@@ -1087,7 +1077,7 @@ zabbix_export:
             priority: '7'
             section_name: Filters
             label: 'Model discovery macro (include)'
-            description: 'This macro is used in model discovery. Can be overridden on the host or linked template level.'
+            description: 'Set the regex string to discover models based on their names.'
         - macro: '{$OPENAI.MODEL.NAME.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
           description: 'This macro is used in OpenAI Platform model discovery. Can be overridden on the host or linked template level.'
@@ -1096,7 +1086,7 @@ zabbix_export:
             priority: '8'
             section_name: Filters
             label: 'Model discovery macro (exclude)'
-            description: 'This macro is used in model discovery. Can be overridden on the host or linked template level.'
+            description: 'Set the regex string to exclude models from discovery based on their names.'
         - macro: '{$OPENAI.PROJECT.NAME.MATCHES}'
           value: '.*'
           description: 'This macro is used in OpenAI Platform project discovery. Can be overridden on the host or linked template level.'
@@ -1105,7 +1095,7 @@ zabbix_export:
             priority: '5'
             section_name: Filters
             label: 'Project discovery macro (include)'
-            description: 'This macro is used in project discovery. Can be overridden on the host or linked template level.'
+            description: 'Set the regex string to discover projects based on their names.'
         - macro: '{$OPENAI.PROJECT.NAME.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
           description: 'This macro is used in OpenAI Platform project discovery. Can be overridden on the host or linked template level.'
@@ -1114,7 +1104,7 @@ zabbix_export:
             priority: '6'
             section_name: Filters
             label: 'Project discovery macro (exclude)'
-            description: 'This macro is used in project discovery. Can be overridden on the host or linked template level.'
+            description: 'Set the regex string to exclude projects from discovery based on their names.'
         - macro: '{$OPENAI.TOKEN}'
           type: SECRET_TEXT
           description: 'OpenAI API token.'
