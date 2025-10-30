@@ -523,7 +523,7 @@ class testDashboardsUserPermissions extends CWebTest {
 
 			if ($data['edit']) {
 				$this->addClockWidget('global');
-				// Check successfull message after dashboard update.
+				// Check success message after dashboard update.
 				$this->page->waitUntilReady();
 				$this->assertMessage(TEST_GOOD, 'Dashboard updated');
 			}
