@@ -75,7 +75,8 @@ int	__wrap_zbx_baseline_get_data(uint64_t itemid, unsigned char value_type, time
 	ZBX_UNUSED(skip);
 
 	zbx_mock_extract_yaml_values_dbl(zbx_mock_get_parameter_handle("in.baseline_values"), baseline_get_data_values);
-	zbx_mock_extract_yaml_values_uint64(zbx_mock_get_parameter_handle("in.baseline_index"), baseline_get_data_index);
+	zbx_mock_extract_yaml_values_uint64(zbx_mock_get_parameter_handle("in.baseline_index"),
+			baseline_get_data_index);
 
 	return SUCCEED;
 }
