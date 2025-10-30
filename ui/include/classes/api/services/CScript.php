@@ -514,7 +514,8 @@ class CScript extends CApiService {
 						continue;
 					}
 
-					if (!CRegexHelper::test($script['manualinput_validator'], $script['manualinput_default_value'])) {
+					if (!preg_match('/'.CRegexHelper::handleSlashEscaping($script['manualinput_validator']).'/',
+							$script['manualinput_default_value'])) {
 						self::exception(ZBX_API_ERROR_PARAMETERS,
 							_s('Invalid parameter "%1$s": %2$s.', '/'.($index + 1).'/manualinput_default_value',
 								_s('input does not match the provided pattern: %1$s', $script['manualinput_validator'])

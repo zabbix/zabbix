@@ -2159,7 +2159,7 @@ class CApiInputValidator {
 			return true;
 		}
 
-		if (!CRegexValidator::isValidExpression($data)) {
+		if (!(new CRegexValidator)->validate($data)) {
 			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('invalid regular expression'));
 
 			return false;

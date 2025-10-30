@@ -13,22 +13,22 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-class CRegexValidator extends CValidator
-{
+
+class CRegexValidator extends CValidator {
 
 	/**
 	 * Error message if the is not a string.
 	 *
 	 * @var string
 	 */
-	public $messageInvalid;
+	public $messageInvalid = '';
 
 	/**
 	 * Error message if the value is invalid
 	 *
 	 * @var string
 	 */
-	public $messageRegex;
+	public $messageRegex = '';
 
 	/**
 	 * Check if regular expression is valid
@@ -37,34 +37,27 @@ class CRegexValidator extends CValidator
 	 *
 	 * @return bool
 	 */
-	public function validate($value): bool {
+	public function validate($value) {
 		if (!is_string($value) && !is_numeric($value)) {
-			$error = $this->messageInvalid;
-
-			$this->error($error);
-		}
-		else {
-			self::isValidExpression((string) $value, $error);
-
-			if ($error !== '') {
-				$this->error($this->messageRegex, $value, str_replace('preg_match(): ', '', $error));
-			}
+			$this->error($this->messageInvalid);
+			return false;
 		}
 
-		return $error === '';
-	}
-
-	public static function isValidExpression(string $expression, ?string &$error = null): bool {
 		$error = '';
 
-		set_error_handler(static function (int $foo, string $errstr) use (&$error) {
+		set_error_handler(function ($errno, $errstr) use (&$error) {
 			$error = $errstr;
 		});
 
-		CRegexHelper::test($expression, '');
+		preg_match('/'.CRegexHelper::handleSlashEscaping($value).'/', '');
 
 		restore_error_handler();
 
-		return $error === '';
+		if ($error !== '') {
+			$this->error($this->messageRegex, $value, str_replace('preg_match(): ', '', $error));
+			return false;
+		}
+
+		return true;
 	}
 }
