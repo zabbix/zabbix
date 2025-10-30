@@ -164,7 +164,10 @@ class CHostNavigator {
 					id: nodes[i].hostid,
 					name: nodes[i].name,
 					level: this.#config.group_by?.length || 0,
-					problem_count: nodes[i].problem_count
+				}
+
+				if (nodes[i].problem_count !== undefined) {
+					properties.problem_count = nodes[i].problem_count
 				}
 
 				if (nodes[i].maintenanceid !== undefined) {
