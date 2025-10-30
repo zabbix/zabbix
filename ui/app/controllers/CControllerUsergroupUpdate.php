@@ -100,14 +100,8 @@ class CControllerUsergroupUpdate extends CControllerUsergroupUpdateGeneral {
 	}
 
 	protected function doAction(): void {
-		$this->loadDbGroups();
 		$user_group = $this->getUserGroupInputData();
-
-		if (!$this->processUserGroupInputData($user_group)) {
-			$this->setErrorResponse();
-
-			return;
-		}
+		self::processUserGroupInputData($user_group);
 
 		$result = (bool) API::UserGroup()->update($user_group);
 
