@@ -110,7 +110,7 @@ class CHtmlPage {
 					->addItem($this->kiosk_mode_controls)
 					->addItem(
 						get_icon('kioskmode', ['mode' => ZBX_LAYOUT_KIOSKMODE])
-							->setAttribute('aria-label', _('Leave kiosk mode'))
+							->setAttribute('aria-label', _('Exit full screen mode'))
 					)
 			);
 		}

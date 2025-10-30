@@ -39,8 +39,10 @@ class CSectionCollapsible extends CSection {
 		$toggle = $this->is_expanded
 			? (new CButtonIcon(ZBX_ICON_CHEVRON_UP))
 				->setAttribute('aria-label', _('Collapse section'))
+				->setAttribute('aria-expanded', 'true')
 			: (new CButtonIcon(ZBX_ICON_CHEVRON_DOWN))
-				->setAttribute('aria-label', _('Expand section'));
+				->setAttribute('aria-label', _('Expand section'))
+				->setAttribute('aria-expanded', 'false');
 
 		$toggle
 			->addClass(self::ZBX_STYLE_TOGGLE)

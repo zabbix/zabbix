@@ -329,12 +329,14 @@ class CTabFilter extends CDiv {
 		return [
 			(new CButtonIcon(ZBX_ICON_CHEVRON_LEFT))
 				->addClass('js-btn-time-left')
+				->setAttribute('aria-label', _('Move time range backward'))
 				->setEnabled($enabled),
 			(new CSimpleButton(_('Zoom out')))
 				->addClass(ZBX_STYLE_BTN_TIME_ZOOMOUT)
 				->setEnabled($enabled),
 			(new CButtonIcon(ZBX_ICON_CHEVRON_RIGHT))
 				->addClass('js-btn-time-right')
+				->setAttribute('aria-label', _('Move time range forward'))
 				->setEnabled($enabled),
 			(new CListItem(
 				(new CLink(relativeDateToText($data['from'], $data['to'])))

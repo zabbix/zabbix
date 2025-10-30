@@ -333,7 +333,9 @@ $translate_strings = [
 	'main.js' => [
 		'S_EXPAND' => _('Expand'),
 		'S_COLLAPSE' => _('Collapse'),
-		'S_CLOSE' => _('Close')
+		'S_CLOSE' => _('Close'),
+		'S_EXPAND_SECTION' => _('Expand section'),
+		'S_COLLAPSE_SECTION' => _('Collapse section')
 	],
 	'hostinterfacemanager.js' => [
 		'Agent' => _('Agent'),

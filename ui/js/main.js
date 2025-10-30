@@ -408,8 +408,9 @@ var hintBox = {
 			attrs = {'data-hintboxid': hintboxid},
 			dynamicid = $(target).attr('aria-describedby');
 
-		if (dynamicid) {
+		if (dynamicid && !isStatic) {
 			attrs['id'] = dynamicid;
+			attrs['role'] = 'tooltip';
 		}
 
 		var box = jQuery('<div>', attrs).addClass('overlay-dialogue wordbreak'),
@@ -816,7 +817,8 @@ function toggleSection(id, profile_idx) {
 
 	toggle.classList.toggle(ZBX_ICON_CHEVRON_DOWN, !is_collapsed);
 	toggle.classList.toggle(ZBX_ICON_CHEVRON_UP, is_collapsed);
-	toggle.setAttribute('title', is_collapsed ? t('S_COLLAPSE') : t('S_EXPAND'));
+	toggle.setAttribute('aria-label', is_collapsed ? t('S_COLLAPSE_SECTION') : t('S_EXPAND_SECTION'));
+	toggle.setAttribute('aria-expanded', is_collapsed ? 'true' : 'false');
 
 	if (profile_idx !== '') {
 		updateUserProfile(profile_idx, is_collapsed ? '1' : '0', []);
