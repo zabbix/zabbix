@@ -473,7 +473,7 @@ class testDashboardGraphPrototypeWidget extends testWidgets {
 		$form->submit();
 		COverlayDialogElement::ensureNotPresent();
 		$dashboard->waitUntilReady()->getWidget($widget['Name']);
-		$dashboard->save();
+		$dashboard->save()->waitUntilReady();
 		$this->page->removeFocus();
 		sleep(1);
 		$screenshot_area = $this->query('class:dashboard-grid')->one();
@@ -513,68 +513,72 @@ class testDashboardGraphPrototypeWidget extends testWidgets {
 		$values = $form->getFields()->filter(CElementFilter::VISIBLE)->asValues();
 		$form->submit();
 
-		switch ($data['expected']) {
-			case TEST_GOOD:
-				COverlayDialogElement::ensureNotPresent();
-				// Introduce name for finding saved widget in DB.
-				$db_name = CTestArrayHelper::get($data, 'fields.Name', $update ? self::$previous_widget_name : '');
-
-				// Make sure that the widget is present before saving the dashboard.
-				if (!array_key_exists('Name', $data['fields'])) {
-					$data['fields']['Name'] = $update
-							? self::$previous_widget_name
-							: $data['fields'][$type]['context']['values'].': '.$data['fields'][$type]['values'];
-				}
-				$dashboard->getWidget($data['fields']['Name']);
-				$dashboard->save();
-
-				// Check that Dashboard has been saved and that widget has been added.
-				$this->assertMessage($data['expected'], 'Dashboard updated');
-				$this->assertEquals($old_widget_count + ($update ? 0 : 1), $dashboard->getWidgets()->count());
-
-				// Check that widget is saved in DB.
-				$db_count = CDBHelper::getCount('SELECT * FROM widget w'.
-					' WHERE EXISTS ('.
-						'SELECT NULL'.
-						' FROM dashboard_page dp'.
-						' WHERE w.dashboard_pageid=dp.dashboard_pageid'.
-							' AND dp.dashboardid='.self::$dashboardid['Dashboard for Graph Prototype widget'].
-							' AND w.name ='.zbx_dbstr($db_name).
-					')'
-				);
-
-				$this->assertEquals(1, $db_count);
-
-				// Verify widget content
-				$widget = $dashboard->getWidget($data['fields']['Name']);
-				$this->assertTrue($widget->getContent()->isValid());
-
-				// Compare placeholders count in data and created widget.
-				$expected_placeholders_count =
-						(CTestArrayHelper::get($data['fields'], 'Columns') && CTestArrayHelper::get($data['fields'], 'Rows'))
-						? $data['fields']['Columns'] * $data['fields']['Rows']
-						: 2;
-				$placeholders_count = $widget->query('class:dashboard-grid-iterator-placeholder')->count();
-				$this->assertEquals($expected_placeholders_count, $placeholders_count);
-				// Check Dynamic item setting on Dashboard.
-				if (CTestArrayHelper::get($data['fields'], 'Override host')) {
-					$this->assertTrue($dashboard->getControls()->query('xpath://form[@aria-label = '.
-						'"Main filter"]')->one()->isPresent());
-				}
-				// Check widget form fields and values.
-				$this->assertEquals($values, $widget->edit()->getFields()->filter(CElementFilter::VISIBLE)->asValues());
-
-				// Write widget name to variable to use it in next Update test case.
-				if ($update) {
-					self::$previous_widget_name = CTestArrayHelper::get($data, 'fields.Name', 'Graph prototype widget for update');
-				}
-				break;
-			case TEST_BAD:
-				$this->assertMessage($data['expected'], null, $data['error']);
-				break;
+		if ($data['expected'] === TEST_BAD) {
+			$this->assertMessage($data['expected'], null, $data['error']);
+			COverlayDialogElement::find()->one()->close();
 		}
+		else {
+			COverlayDialogElement::ensureNotPresent();
 
-		COverlayDialogElement::find()->one()->close();
+			// Introduce name for finding saved widget in DB.
+			$db_name = CTestArrayHelper::get($data, 'fields.Name', $update ? self::$previous_widget_name : '');
+
+			// Make sure that the widget is present before saving the dashboard.
+			if (!array_key_exists('Name', $data['fields'])) {
+				$data['fields']['Name'] = $update
+					? self::$previous_widget_name
+					: $data['fields'][$type]['context']['values'].': '.$data['fields'][$type]['values'];
+			}
+			$dashboard->getWidget($data['fields']['Name']);
+			$dashboard->save()->waitUntilReady();
+
+			// Check that Dashboard has been saved and that widget has been added.
+			$this->assertMessage($data['expected'], 'Dashboard updated');
+			$this->assertEquals($old_widget_count + ($update ? 0 : 1), $dashboard->getWidgets()->count());
+
+			// Check that widget is saved in DB.
+			$db_count = CDBHelper::getCount('SELECT * FROM widget w'.
+				' WHERE EXISTS ('.
+					'SELECT NULL'.
+					' FROM dashboard_page dp'.
+					' WHERE w.dashboard_pageid=dp.dashboard_pageid'.
+						' AND dp.dashboardid='.self::$dashboardid['Dashboard for Graph Prototype widget'].
+						' AND w.name ='.zbx_dbstr($db_name).
+				')'
+			);
+
+			$this->assertEquals(1, $db_count);
+
+			// Verify widget content
+			$widget = $dashboard->getWidget($data['fields']['Name']);
+			$this->assertTrue($widget->getContent()->isValid());
+
+			// Compare placeholders count in data and created widget.
+			$expected_placeholders_count = (CTestArrayHelper::get($data['fields'], 'Columns') && CTestArrayHelper::get($data['fields'], 'Rows'))
+				? $data['fields']['Columns'] * $data['fields']['Rows']
+				: 2;
+
+			$placeholders_count = $widget->query('class:dashboard-grid-iterator-placeholder')->count();
+			$this->assertEquals($expected_placeholders_count, $placeholders_count);
+
+			// Check Dynamic item setting on Dashboard.
+			if (CTestArrayHelper::get($data['fields'], 'Override host')) {
+				$this->assertTrue($dashboard->getControls()->query('xpath://form[@aria-label = '.
+					'"Main filter"]')->one()->isPresent());
+			}
+
+			// Check widget form fields and values.
+			$this->assertEquals($values, $widget->edit()->getFields()->filter(CElementFilter::VISIBLE)->asValues());
+
+			// Write widget name to variable to use it in next Update test case.
+			if ($update) {
+				self::$previous_widget_name = CTestArrayHelper::get($data, 'fields.Name', 'Graph prototype widget for update');
+			}
+
+			// Close widget window and cancel editing the dashboard.
+			COverlayDialogElement::find()->one()->close();
+			$dashboard->cancelEditing();
+		}
 	}
 
 	/**
@@ -622,7 +626,7 @@ class testDashboardGraphPrototypeWidget extends testWidgets {
 			$dashboard->getWidget(self::$previous_widget_name);
 		}
 
-		$dashboard->save();
+		$dashboard->save()->waitUntilReady();
 
 		// Check that Dashboard has been saved and that there are no changes made to the widgets.
 		$this->assertMessage(TEST_GOOD, 'Dashboard updated');
