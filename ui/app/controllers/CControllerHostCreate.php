@@ -249,7 +249,7 @@ class CControllerHostCreate extends CControllerHostUpdateGeneral {
 	}
 
 	protected function checkInput(): bool {
-		$ret = $this->validateInput($this->getValidationRules()) && $this->validateInputExtended();
+		$ret = $this->validateInput($this->getValidationRules());
 
 		if (!$ret) {
 			$form_errors = $this->getValidationError();
@@ -477,23 +477,5 @@ class CControllerHostCreate extends CControllerHostUpdateGeneral {
 			&& CTriggerHelper::cloneHostTriggers($src_hostid, $dst_host['hostid'])
 			&& CGraphHelper::cloneHostGraphs($src_hostid, $dst_host['hostid'])
 			&& CLldRuleHelper::cloneHostItems($src_hostid, $dst_host);
-	}
-
-	protected function validateInputExtended(): bool {
-		$groupids = $this->getInput('groups', []);
-		$result = !$groupids ? 0 : API::HostGroup()->get([
-			'groupids' => $groupids,
-			'countOutput' => true,
-		]);
-
-		if ($result != count($groupids)) {
-			$this->addFormError('/groups',
-				_('Host group does not exist, or you have no permissions to it.'), CFormValidator::ERROR_LEVEL_PRIMARY
-			);
-
-			return false;
-		}
-
-		return true;
 	}
 }
