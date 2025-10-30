@@ -1544,9 +1544,9 @@ static void	history_clickhouse_get_value_type_data(zbx_clickhouse_data_t *d, CUR
  ******************************************************************************/
 static int	history_clickhouse_get_info(void *data, zbx_history_provider_info_t *info, char **error)
 {
-#define HISTORY_CLICKHOUSE_MIN_VERSION			24000000
+#define HISTORY_CLICKHOUSE_MIN_VERSION			25000000
 #define HISTORY_CLICKHOUSE_MIN_VERSION_STR		"24.x.x.x"
-#define HISTORY_CLICKHOUSE_MAX_VERSION			24999999
+#define HISTORY_CLICKHOUSE_MAX_VERSION			54999999
 #define HISTORY_CLICKHOUSE_MAX_VERSION_STR		"25.x.x.x"
 
 	zbx_clickhouse_data_t	*d = (zbx_clickhouse_data_t *)data;
