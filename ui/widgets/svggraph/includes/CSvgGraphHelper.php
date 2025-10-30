@@ -154,8 +154,8 @@ class CSvgGraphHelper {
 			$resolve_macros = $templateid === '' || $override_hostid !== '';
 
 			$options = [
-				'output' => ['itemid', 'hostid', 'type', 'master_itemid', 'delay', 'history', 'trends', 'units',
-					'value_type', 'key_'
+				'output' => ['itemid', 'hostid', 'type', 'key_', 'master_itemid', 'delay', 'history', 'trends', 'units',
+					'value_type'
 				],
 				'selectPreprocessing' => ['type', 'params'],
 				'selectHosts' => ['name'],
@@ -299,8 +299,8 @@ class CSvgGraphHelper {
 			$resolve_macros = $templateid === '' || $override_hostid !== '';
 
 			$db_items = API::Item()->get([
-				'output' => ['itemid', 'hostid', 'type', 'master_itemid', 'delay',
-					$resolve_macros ? 'name_resolved' : 'name', 'history', 'trends', 'units', 'value_type', 'key_'
+				'output' => ['itemid', 'hostid', 'type', 'key_', 'master_itemid', 'delay',
+					$resolve_macros ? 'name_resolved' : 'name', 'history', 'trends', 'units', 'value_type'
 				],
 				'selectPreprocessing' => ['type', 'params'],
 				'selectHosts' => ['name'],
