@@ -302,7 +302,10 @@ class CControllerItemUpdate extends CControllerItem {
 				'messages' => ['uniq' => _('Tag name and value combination is not unique.')],
 				'fields' => [
 					'value' => ['db item_tag.value'],
-					'tag' => ['db item_tag.tag', 'required', 'not_empty', 'when' => ['value', 'not_empty']]
+					'tag' => [
+						['db item_tag.tag'],
+						['db item_tag.tag', 'required', 'not_empty', 'when' => ['value', 'not_empty']]
+					]
 				]
 			],
 			'preprocessing' => CItemGeneralHelper::getPreprocessingValidationRules(allow_lld_macro: false)

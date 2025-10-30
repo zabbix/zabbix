@@ -120,7 +120,10 @@ class CControllerItemPrototypeUpdate extends CControllerItemPrototype {
 			'parameters' => ['objects', 'uniq' => ['name'],
 				'fields' => [
 					'value' => ['db item_parameter.value'],
-					'name' => ['db item_parameter.name', 'required', 'not_empty', 'when' => ['value', 'not_empty']],
+					'name' => [
+						['db item_parameter.name'],
+						['db item_parameter.name', 'required', 'not_empty', 'when' => ['value', 'not_empty']]
+					],
 					'sortorder' => ['integer']
 				],
 				'when' => ['type', 'in' => [ITEM_TYPE_SCRIPT, ITEM_TYPE_BROWSER]]
@@ -301,7 +304,10 @@ class CControllerItemPrototypeUpdate extends CControllerItemPrototype {
 				'messages' => ['uniq' => _('Tag name and value combination is not unique.')],
 				'fields' => [
 					'value' => ['db item_tag.value'],
-					'tag' => ['db item_tag.tag', 'required', 'not_empty', 'when' => ['value', 'not_empty']]
+					'tag' => [
+						['db item_tag.tag'],
+						['db item_tag.tag', 'required', 'not_empty', 'when' => ['value', 'not_empty']]
+					]
 				]
 			],
 			'discover' => ['db items.discover', 'in' => [ZBX_PROTOTYPE_DISCOVER, ZBX_PROTOTYPE_NO_DISCOVER]],

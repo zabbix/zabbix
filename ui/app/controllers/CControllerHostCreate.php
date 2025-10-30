@@ -129,7 +129,10 @@ class CControllerHostCreate extends CControllerHostUpdateGeneral {
 				'messages' => ['uniq' => _('Tag name and value combination is not unique.')],
 				'fields' => [
 					'value' => ['db host_tag.value'],
-					'tag' => ['db host_tag.tag', 'required', 'not_empty', 'when' => ['value', 'not_empty']]
+					'tag' => [
+						['db host_tag.tag'],
+						['db host_tag.tag', 'required', 'not_empty', 'when' => ['value', 'not_empty']]
+					]
 				]
 			],
 			'templates' => ['array', 'field' => ['db hosts.hostid']],
