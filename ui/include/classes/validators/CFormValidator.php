@@ -270,7 +270,7 @@ class CFormValidator {
 							throw new Exception('[RULES ERROR] Rule "'.$key.'" is specified multiple times (Path: '.$rule_path.')');
 						}
 
-						if (!CRegexValidator::isValidExpression($value)) {
+						if (preg_match($value, '') === false) {
 							throw new Exception('[RULES ERROR] Rule "'.$key.'" contains invalid regex (Path: '.$rule_path.')');
 						}
 
@@ -467,10 +467,9 @@ class CFormValidator {
 			else {
 				switch ($key) {
 					case 'regex':
-						if (!CRegexValidator::isValidExpression($value)) {
+						if (preg_match($value, '') === false) {
 							throw new Exception('[RULES ERROR] Rule "'.$key.'" contains invalid regex (Path: '.$rule_path.')');
 						}
-
 						$result[$key] = $value;
 						break;
 

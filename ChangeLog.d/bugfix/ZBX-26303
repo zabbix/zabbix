@@ -1,1 +1,1 @@
-A.F....... [ZBX-26303] fixed regular expressions using parenthesis inside a character class being reported as invalid (jfreibergs)
+A.F....... [ZBX-26303] fixed escaping of special characters in regular expressions (jfreibergs, Sasha)

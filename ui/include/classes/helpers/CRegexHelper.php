@@ -40,26 +40,31 @@ class CRegexHelper {
 		];
 	}
 
-	public static function test(string $expression, string $value, ?string $modifiers = ''): bool {
-		$escaped_expression = '';
+	/**
+	 * Escape slashes in the regular expression based on preceding backslashes.
+	 *
+	 * @param string $regex
+	 *
+	 * @return string
+	 */
+	public static function handleSlashEscaping(string $regex): string {
+		$formatted_regex = '';
 		$backslash_count = 0;
 
-		for ($i = 0; isset($expression[$i]); $i++) {
-			if ($expression[$i] === '\\') {
+		for ($p = 0; isset($regex[$p]); $p++) {
+			if ($regex[$p] === '\\') {
 				$backslash_count++;
 			}
 			else {
-				if ($expression[$i] === '/' && $backslash_count % 2 == 0) {
-					$escaped_expression .= '\\';
+				if ($regex[$p] === '/' && $backslash_count % 2 == 0) {
+					$formatted_regex .= '\\';
 				}
-
 				$backslash_count = 0;
 			}
 
-			$escaped_expression .= $expression[$i];
+			$formatted_regex .= $regex[$p];
 		}
 
-		return preg_match('/'.$escaped_expression.'/'.$modifiers, $value) === 1;
+		return $formatted_regex;
 	}
 }
-

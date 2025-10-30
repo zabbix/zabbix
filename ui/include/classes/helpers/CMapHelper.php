@@ -417,8 +417,8 @@ class CMapHelper {
 
 						if (in_array($value_type, [ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_TEXT])) {
 							foreach ($link['highlights'] as $highlight) {
-								if (CRegexValidator::isValidExpression($highlight['pattern'])
-										&& CRegexHelper::test($highlight['pattern'], $item_value)) {
+								if (@preg_match('/'.CRegexHelper::handleSlashEscaping($highlight['pattern']).'/',
+										$item_value)) {
 									$link['color'] = $highlight['color'];
 									$link['drawtype'] = $highlight['drawtype'];
 

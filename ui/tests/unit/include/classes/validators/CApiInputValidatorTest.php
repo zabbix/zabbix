@@ -3822,6 +3822,24 @@ uwMrOBKatg7CZ1Uenv1K3ioD5w==
 				'/'
 			],
 			[
+				['type' => API_REGEX],
+				'/',
+				'/1/expression',
+				'/'
+			],
+			[
+				['type' => API_REGEX],
+				'[(]',
+				'/1/expression',
+				'[(]'
+			],
+			[
+				['type' => API_REGEX],
+				'[\\/]',
+				'/1/expression',
+				'[\\/]'
+			],
+			[
 				['type' => API_REGEX, 'length' => 8],
 				'/test/i',
 				'/1/expression',
