@@ -707,7 +707,7 @@ static int	history_clickhouse_flush_conns(zbx_clickhouse_data_t *d, CURLM *mhand
 		conn->status = SUCCEED;
 	}
 out:
-	retries_num = retries.values_num;
+	retries_num = 0;
 
 	for (int i = 0; i < retries.values_num; i++)
 	{
@@ -716,6 +716,7 @@ out:
 			zabbix_log(LOG_LEVEL_WARNING, "cannot add handle to curl multi handle: %s",
 						curl_multi_strerror(code));
 		}
+		else retries_num++;
 	}
 
 	zbx_vector_ptr_destroy(&retries);
