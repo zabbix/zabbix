@@ -37,7 +37,9 @@ window.host_prototype_edit_popup = new class {
 		this.parent_is_template = parent_is_template;
 		this.readonly = readonly;
 		this.add_interface_btn = this.form_element.querySelector('.add-interface');
-		this.macros_templateids = null;
+		this.all_templateids = null;
+		this.show_inherited_tags = false;
+		this.tags_table = this.form_element.querySelector('.tags-table');
 		this.show_inherited_macros = false;
 		this.parent_hostid = parent_hostid;
 
@@ -52,6 +54,7 @@ window.host_prototype_edit_popup = new class {
 		}
 
 		this.#initHostTab();
+		this.#initTagsTab();
 		this.#initMacrosTab();
 
 		this.initial_form_fields = getFormFields(this.form_element);
@@ -348,6 +351,82 @@ window.host_prototype_edit_popup = new class {
 		return this.#getLinkedTemplates().concat(this.#getNewTemplates());
 	}
 
+	#initTagsTab() {
+		const show_inherited_tags_element = document.getElementById('show_inherited_tags');
+
+		this.show_inherited_tags = show_inherited_tags_element.querySelector('input:checked').value == 1;
+
+		show_inherited_tags_element.addEventListener('change', e => {
+			this.show_inherited_tags = e.target.value == 1;
+			this.all_templateids = this.#getAllTemplates();
+
+			this.#updateTagsList();
+		});
+
+		const observer = new IntersectionObserver(entries => {
+			if (entries[0].isIntersecting && this.show_inherited_tags) {
+				const templateids = this.#getAllTemplates();
+
+				if (this.all_templateids === null || this.all_templateids.xor(templateids).length > 0) {
+					this.all_templateids = templateids;
+
+					this.#updateTagsList();
+				}
+			}
+		});
+
+		observer.observe(document.getElementById('tags-tab'));
+	}
+
+	#updateTagsList() {
+		const fields = getFormFields(this.form_element);
+
+		fields.tags = Object.values(fields.tags).reduce((tags, tag) => {
+			if (!('type' in tag) || (tag.type & <?= ZBX_PROPERTY_OWN ?>)) {
+				tags.push({tag: tag.tag.trim(), value: tag.value.trim()});
+			}
+
+			return tags;
+		}, []);
+
+		const url = new URL('zabbix.php', location.href);
+		url.searchParams.set('action', 'host.tags.list');
+
+		const data = {
+			source: 'host_prototype',
+			hostid: fields.hostid,
+			templateids: this.#getAllTemplates(),
+			show_inherited_tags: fields.show_inherited_tags,
+			tags: fields.tags
+		}
+
+		fetch(url, {
+			method: 'POST',
+			headers: {'Content-Type': 'application/json'},
+			body: JSON.stringify(data)
+		})
+			.then(response => response.json())
+			.then(response => {
+				this.tags_table.innerHTML = response.body;
+
+				const $tags_table = jQuery(this.tags_table);
+
+				if (!this.readonly) {
+					$tags_table.data('dynamicRows').counter = this.tags_table.querySelectorAll('tr.form_row').length;
+				}
+
+				$tags_table.find(`.${ZBX_STYLE_TEXTAREA_FLEXIBLE}`).textareaFlexible();
+			})
+			.catch((message) => {
+				this.form.addGeneralErrors({[t('Unexpected server error.')]: message});
+				this.form.renderErrors();
+				throw message;
+			})
+			.finally(() => {
+				this.overlay.unsetLoading();
+			});
+	}
+
 	/**
 	 * Set up of macros functionality.
 	 */
@@ -382,8 +461,8 @@ window.host_prototype_edit_popup = new class {
 
 				const templateids = this.#getAllTemplates();
 
-				if (this.macros_templateids ===  null || this.macros_templateids.xor(templateids).length > 0) {
-					this.macros_templateids = templateids;
+				if (this.all_templateids === null || this.all_templateids.xor(templateids).length > 0) {
+					this.all_templateids = templateids;
 
 					this.macros_manager.load(this.show_inherited_macros, templateids);
 				}
@@ -393,9 +472,9 @@ window.host_prototype_edit_popup = new class {
 
 		show_inherited_macros_element.addEventListener('change', e => {
 			this.show_inherited_macros = e.target.value == 1;
-			this.macros_templateids = this.#getAllTemplates();
+			this.all_templateids = this.#getAllTemplates();
 
-			this.macros_manager.load(this.show_inherited_macros, this.macros_templateids);
+			this.macros_manager.load(this.show_inherited_macros, this.all_templateids);
 		});
 	}
 

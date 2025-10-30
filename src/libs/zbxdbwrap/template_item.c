@@ -16,6 +16,7 @@
 #include "zbxdbwrap.h"
 
 #include "template.h"
+#include "tag_cache.h"
 
 #include "zbxcacheconfig.h"
 #include "zbxdb.h"
@@ -787,6 +788,7 @@ static void	update_template_lld_rule_formulas(zbx_vector_template_item_ptr_t *it
  *             db_insert_items    - [IN] prepared item bulk insert            *
  *             db_insert_irtdata  - [IN] prepared item discovery bulk insert  *
  *             audit_context_mode - [IN]                                      *
+ *             new_itemids        - [OUT]                                     *
  *             sql                - [IN/OUT] sql buffer pointer used for      *
  *                                           update operations                *
  *             sql_alloc          - [IN/OUT] sql buffer already allocated     *
@@ -797,7 +799,8 @@ static void	update_template_lld_rule_formulas(zbx_vector_template_item_ptr_t *it
  ******************************************************************************/
 static void	save_template_item(zbx_uint64_t hostid, zbx_uint64_t *itemid, zbx_template_item_t *item,
 		zbx_db_insert_t *db_insert_items, zbx_db_insert_t *db_insert_irtdata,
-		zbx_db_insert_t *db_insert_irtname, int audit_context_mode, char **sql, size_t *sql_alloc,
+		zbx_db_insert_t *db_insert_irtname, int audit_context_mode,
+		zbx_vector_uint64_t *new_itemids, char **sql, size_t *sql_alloc,
 		size_t *sql_offset)
 {
 	int			i;
@@ -951,6 +954,8 @@ static void	save_template_item(zbx_uint64_t hostid, zbx_uint64_t *itemid, zbx_te
 	}
 	else
 	{
+		zbx_vector_uint64_append(new_itemids, *itemid);
+
 		zbx_db_insert_add_values(db_insert_items, *itemid, item->name, item->key_, hostid, (int)item->type,
 				(int)item->value_type, item->delay, item->history, item->trends,
 				(int)item->status, item->trapper_hosts, item->units, item->formula, item->logtimefmt,
@@ -989,7 +994,7 @@ dependent:
 
 		dependent->master_itemid = item->itemid;
 		save_template_item(hostid, itemid, dependent, db_insert_items, db_insert_irtdata, db_insert_irtname,
-				audit_context_mode, sql, sql_alloc, sql_offset);
+				audit_context_mode, new_itemids, sql, sql_alloc, sql_offset);
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
@@ -1013,12 +1018,13 @@ static void	save_template_items(zbx_uint64_t hostid, zbx_vector_template_item_pt
 	zbx_uint64_t		itemid = 0;
 	zbx_db_insert_t		db_insert_items, db_insert_irtdata, db_insert_irtname;
 	zbx_template_item_t	*item;
-	zbx_vector_uint64_t	itemids_value_type_diff;
+	zbx_vector_uint64_t	itemids_value_type_diff, new_itemids;
 
 	if (0 == items->values_num)
 		return;
 
 	zbx_vector_uint64_create(&itemids_value_type_diff);
+	zbx_vector_uint64_create(&new_itemids);
 
 	for (i = 0; i < items->values_num; i++)
 	{
@@ -1071,7 +1077,8 @@ static void	save_template_items(zbx_uint64_t hostid, zbx_vector_template_item_pt
 		if (0 == item->master_itemid)
 		{
 			save_template_item(hostid, &itemid, item, &db_insert_items, &db_insert_irtdata,
-					&db_insert_irtname, audit_context_mode, &sql, &sql_alloc, &sql_offset);
+					&db_insert_irtname, audit_context_mode, &new_itemids, &sql, &sql_alloc,
+					&sql_offset);
 		}
 	}
 
@@ -1084,6 +1091,8 @@ static void	save_template_items(zbx_uint64_t hostid, zbx_vector_template_item_pt
 		zbx_db_insert_clean(&db_insert_irtname);
 		zbx_db_insert_execute(&db_insert_irtdata);
 		zbx_db_insert_clean(&db_insert_irtdata);
+
+		zbx_db_save_item_template_cache(hostid, &new_itemids);
 	}
 
 	if (0 != upd_items)
@@ -1096,6 +1105,8 @@ static void	save_template_items(zbx_uint64_t hostid, zbx_vector_template_item_pt
 	}
 
 	zbx_vector_uint64_destroy(&itemids_value_type_diff);
+
+	zbx_vector_uint64_destroy(&new_itemids);
 	zbx_vector_template_item_ptr_sort(items, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
 }
 

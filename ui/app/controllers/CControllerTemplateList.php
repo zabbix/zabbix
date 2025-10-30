@@ -112,7 +112,8 @@ class CControllerTemplateList extends CController {
 		$templates = API::Template()->get([
 			'output' => ['templateid', $sort_field],
 			'evaltype' => $filter['evaltype'],
-			'tags' => $filter['tags'],
+			'tags' => $filter['tags'] ?: null,
+			'inheritedTags' => true,
 			'search' => array_filter([
 				'name' => $filter['name'],
 				'vendor_name' => $filter['vendor_name'],
@@ -139,6 +140,7 @@ class CControllerTemplateList extends CController {
 			'selectDashboards' => API_OUTPUT_COUNT,
 			'selectHttpTests' => API_OUTPUT_COUNT,
 			'selectTags' => ['tag', 'value'],
+			'selectInheritedTags' => ['tag', 'value'],
 			'templateids' => array_column($templates, 'templateid'),
 			'editable' => true,
 			'preservekeys' => true
@@ -185,6 +187,8 @@ class CControllerTemplateList extends CController {
 			$filter['tags'] = [['tag' => '', 'value' => '', 'operator' => TAG_OPERATOR_LIKE]];
 		}
 
+		CTagHelper::mergeOwnAndInheritedTags($templates, true);
+
 		$data = [
 			'action' => $this->getAction(),
 			'templates' => $templates,
@@ -195,7 +199,7 @@ class CControllerTemplateList extends CController {
 			'editable_hosts' => $editable_hosts,
 			'profileIdx' => 'web.templates.filter',
 			'active_tab' => CProfile::get('web.templates.filter.active', 1),
-			'tags' => makeTags($templates, true, 'templateid', ZBX_TAG_COUNT_DEFAULT, $filter['tags']),
+			'tags' => CTagHelper::getTagsHtml($templates, ZBX_TAG_OBJECT_TEMPLATE, ['filter_tags' => $filter['tags']]),
 			'config' => [
 				'max_in_table' => CSettingsHelper::get(CSettingsHelper::MAX_IN_TABLE)
 			],

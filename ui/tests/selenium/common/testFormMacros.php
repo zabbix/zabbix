@@ -128,7 +128,6 @@ abstract class testFormMacros extends CLegacyWebTest {
 							'macro' => '{MACRO}'
 						]
 					],
-					'error' => 'Invalid parameter "/1/macros/1/macro": incorrect syntax near "MACRO}".',
 					'inline_error' => [
 						'id:macros_0_macro' => 'Macro: Expected user macro format is "{$MACRO}".'
 					]
@@ -145,7 +144,6 @@ abstract class testFormMacros extends CLegacyWebTest {
 							'macro' => '{$$MACRO}'
 						]
 					],
-					'error' => 'Invalid parameter "/1/macros/1/macro": incorrect syntax near "$MACRO}".',
 					'inline_error' => [
 						'id:macros_0_macro' => 'Macro: Expected user macro format is "{$MACRO}".'
 					]
@@ -162,7 +160,6 @@ abstract class testFormMacros extends CLegacyWebTest {
 							'macro' => '{$MAC%^}'
 						]
 					],
-					'error' => 'Invalid parameter "/1/macros/1/macro": incorrect syntax near "%^}".',
 					'inline_error' => [
 						'id:macros_0_macro' => 'Macro: Expected user macro format is "{$MACRO}".'
 					]
@@ -179,7 +176,6 @@ abstract class testFormMacros extends CLegacyWebTest {
 							'macro' => '{#LLD_MACRO}'
 						]
 					],
-					'error' => 'Invalid parameter "/1/macros/1/macro": incorrect syntax near "#LLD_MACRO}".',
 					'inline_error' => [
 						'id:macros_0_macro' => 'Macro: Expected user macro format is "{$MACRO}".'
 					]
@@ -198,7 +194,6 @@ abstract class testFormMacros extends CLegacyWebTest {
 							'description' => 'Macro Description'
 						]
 					],
-					'error' => 'Invalid parameter "/1/macros/1/macro": cannot be empty.',
 					'inline_error' => [
 						'id:macros_0_macro' => 'Macro: This field cannot be empty.'
 					]
@@ -222,7 +217,6 @@ abstract class testFormMacros extends CLegacyWebTest {
 							'description' => 'Macro Description_2'
 						]
 					],
-					'error' => 'Invalid parameter "/1/macros/2": value (macro)=({$MACRO}) already exists.',
 					'inline_error' => [
 						'id:macros_1_macro' => 'Macro name is not unique.'
 					]
@@ -246,7 +240,6 @@ abstract class testFormMacros extends CLegacyWebTest {
 							'description' => 'Macro Description_2'
 						]
 					],
-					'error' => 'Invalid parameter "/1/macros/2": value (macro)=({$MACRO:regex:"^[0-9].*$"}) already exists.',
 					'inline_error' => [
 						'id:macros_1_macro' => 'Macro name is not unique.'
 					]
@@ -376,7 +369,6 @@ abstract class testFormMacros extends CLegacyWebTest {
 							'macro' => '{MACRO}'
 						]
 					],
-					'error' => 'Invalid parameter "/1/macros/1/macro": incorrect syntax near "MACRO}".',
 					'inline_error' => [
 						'id:macros_0_macro' => 'Macro: Expected user macro format is "{$MACRO}".'
 					]
@@ -395,7 +387,6 @@ abstract class testFormMacros extends CLegacyWebTest {
 							'description' => 'Macro Description'
 						]
 					],
-					'error' => 'Invalid parameter "/1/macros/1/macro": cannot be empty.',
 					'inline_error' => [
 						'id:macros_0_macro' => 'Macro: This field cannot be empty.'
 					]
@@ -412,7 +403,6 @@ abstract class testFormMacros extends CLegacyWebTest {
 							'macro' => '{$$MACRO}'
 						]
 					],
-					'error' => 'Invalid parameter "/1/macros/1/macro": incorrect syntax near "$MACRO}',
 					'inline_error' => [
 						'id:macros_0_macro' => 'Macro: Expected user macro format is "{$MACRO}".'
 					]
@@ -429,7 +419,6 @@ abstract class testFormMacros extends CLegacyWebTest {
 							'macro' => '{$MAC%^}'
 						]
 					],
-					'error' => 'Invalid parameter "/1/macros/1/macro": incorrect syntax near "%^}".',
 					'inline_error' => [
 						'id:macros_0_macro' => 'Macro: Expected user macro format is "{$MACRO}".'
 					]
@@ -446,7 +435,6 @@ abstract class testFormMacros extends CLegacyWebTest {
 							'macro' => '{#LLD_MACRO}'
 						]
 					],
-					'error' => 'Invalid parameter "/1/macros/1/macro": incorrect syntax near "#LLD_MACRO}".',
 					'inline_error' => [
 						'id:macros_0_macro' => 'Macro: Expected user macro format is "{$MACRO}".'
 					]
@@ -472,7 +460,6 @@ abstract class testFormMacros extends CLegacyWebTest {
 							'description' => 'Macro Description_2'
 						]
 					],
-					'error' => 'Invalid parameter "/1/macros/2": value (macro)=({$MACRO}) already exists.',
 					'inline_error' => [
 						'id:macros_1_macro' => 'Macro name is not unique.'
 					]
@@ -498,7 +485,6 @@ abstract class testFormMacros extends CLegacyWebTest {
 							'description' => 'Macro Description_2'
 						]
 					],
-					'error' => 'Invalid parameter "/1/macros/2": value (macro)=({$M:regex:"[a-z]"}) already exists.',
 					'inline_error' => [
 						'id:macros_1_macro' => 'Macro name is not unique.'
 					]
@@ -541,8 +527,6 @@ abstract class testFormMacros extends CLegacyWebTest {
 	 * @param int        $lld_id	    points to LLD rule id where host prototype belongs
 	 */
 	public function checkMacros($data, $host_type, $name = null, $update = false, $is_prototype = false, $lld_id = null) {
-		$inline_validation = in_array($host_type, ['host', 'template', 'host prototype']);
-
 		if ($data['expected'] === TEST_BAD) {
 			$old_hash = $this->getHash();
 		}
@@ -611,7 +595,7 @@ abstract class testFormMacros extends CLegacyWebTest {
 
 		$this->fillMacros($data['macros']);
 
-		if ($inline_validation && $data['expected'] === TEST_BAD && array_key_exists('inline_error', $data)) {
+		if ($data['expected'] === TEST_BAD && array_key_exists('inline_error', $data)) {
 			$this->page->removeFocus();
 		}
 		else {
@@ -632,7 +616,7 @@ abstract class testFormMacros extends CLegacyWebTest {
 
 				break;
 			case TEST_BAD:
-				if ($inline_validation && array_key_exists('inline_error', $data)) {
+				if (array_key_exists('inline_error', $data)) {
 					$this->assertInlineError($form, $data['inline_error']);
 				}
 				else {
@@ -2249,13 +2233,11 @@ abstract class testFormMacros extends CLegacyWebTest {
 	 * @param string $name		source name
 	 */
 	public function createVaultMacros($data, $url, $source, $name = null) {
-		$inline_valiation = (in_array($source, ['hosts', 'templates', 'host-prototype']));
-
 		$this->selectVault($data['vault']);
 		$form = $this->openMacrosTab($url, $source, true, $name);
 		$this->fillMacros([$data['macro_fields']]);
 
-		if ($inline_valiation && $data['expected'] == TEST_BAD) {
+		if ($data['expected'] == TEST_BAD) {
 			$this->page->removeFocus();
 		}
 		else {
@@ -2263,24 +2245,19 @@ abstract class testFormMacros extends CLegacyWebTest {
 		}
 
 		if ($data['expected'] == TEST_BAD) {
-			if ($inline_valiation) {
-				$inline_error = [];
-				$key = array_key_first($data['inline_error']);
+			$inline_error = [];
+			$key = array_key_first($data['inline_error']);
 
-				if (str_contains($key, '{index}')) {
-					// Index of last macro is by 1 less than the count of macros.
-					$new_key = str_replace('{index}', count($this->getMacros()) - 1, $key);
-					$inline_error[$new_key] = $data['inline_error'][$key];
-				}
-				else {
-					$inline_error = $data['inline_error'];
-				}
-
-				$this->assertInlineError($form, $inline_error);
+			if (str_contains($key, '{index}')) {
+				// Index of last macro is by 1 less than the count of macros.
+				$new_key = str_replace('{index}', count($this->getMacros()) - 1, $key);
+				$inline_error[$new_key] = $data['inline_error'][$key];
 			}
 			else {
-				$this->assertMessage($data['expected'], $data['title'], $data['message']);
+				$inline_error = $data['inline_error'];
 			}
+
+			$this->assertInlineError($form, $inline_error);
 		}
 		else {
 			if (in_array($source, ['hosts', 'templates'])) {
@@ -2476,7 +2453,6 @@ abstract class testFormMacros extends CLegacyWebTest {
 				],
 				'description' => 'HashiCorp vault description'
 			],
-			'error' => 'Invalid parameter "/1/macros/1/value": incorrect syntax near "secret/path:key".',
 			'inline_error' => [
 				'id:macros_0_value' => 'Value: Incorrect syntax near "secret/path:key".'
 			]
