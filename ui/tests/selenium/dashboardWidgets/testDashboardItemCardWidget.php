@@ -83,7 +83,7 @@ class testDashboardItemCardWidget extends testWidgets {
 	 *
 	 * @var integer
 	 */
-	protected static $template_id;
+	protected static $templateid;
 
 	/**
 	 * Created LLD rule id.
@@ -102,7 +102,7 @@ class testDashboardItemCardWidget extends testWidgets {
 	const HOST_NAME = 'Host for Item Card widget';
 
 	public static function prepareItemCardWidgetData() {
-		self::$template_id = CDataHelper::createTemplates([
+		self::$templateid = CDataHelper::createTemplates([
 			[
 				'host' => 'Template for item card widget',
 				'groups' => ['groupid' => 1], // Templates.
@@ -117,7 +117,7 @@ class testDashboardItemCardWidget extends testWidgets {
 					]
 				]
 			]
-		]);
+		])['templateids']['Template for item card widget'];
 
 		self::$host_ids = CDataHelper::createHosts([
 			[
@@ -163,7 +163,7 @@ class testDashboardItemCardWidget extends testWidgets {
 						'port' => 426
 					]
 				],
-				'templates' => [['templateid' => self::$template_id['templateids']['Template for item card widget']]],
+				'templates' => [['templateid' => self::$templateid]],
 				'items' => [
 					[
 						'name' => STRING_255,
@@ -567,36 +567,6 @@ class testDashboardItemCardWidget extends testWidgets {
 										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'sections.3',
 										'value' => 7
-									],
-									[
-										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
-										'name' => 'sections.4',
-										'value' => 0
-									],
-									[
-										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
-										'name' => 'sections.5',
-										'value' => 1
-									],
-									[
-										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
-										'name' => 'sections.6',
-										'value' => 3
-									],
-									[
-										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
-										'name' => 'sections.7',
-										'value' => 5
-									],
-									[
-										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
-										'name' => 'sections.8',
-										'value' => 8
-									],
-									[
-										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
-										'name' => 'sections.9',
-										'value' => 9
 									],
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_ITEM,
@@ -1023,16 +993,13 @@ class testDashboardItemCardWidget extends testWidgets {
 		$this->assertEquals(255, $form->getField('Name')->getAttribute('maxlength'));
 
 		// Check placeholder for Name, Item and Override host fields.
-		foreach (['Name', 'id:itemid_ms', 'id:override_hostid_ms'] as $field) {
-			if ($field === 'Name') {
-				$this->assertEquals('default', $form->getField($field)->getAttribute('placeholder'));
-			}
-			else {
-				$this->assertEquals('type here to search', $form->query($field)->one()->getAttribute('placeholder'));
-			}
+		$this->assertEquals('default', $form->getField('Name')->getAttribute('placeholder'));
+
+		foreach (['id:itemid_ms', 'id:override_hostid_ms'] as $field) {
+			$this->assertEquals('type here to search', $form->query($field)->one()->getAttribute('placeholder'));
 		}
 
-		foreach (['Type', 'Show header', 'Name', 'Refresh interval', 'Item', "Show", 'Override host'] as $label) {
+		foreach (['Type', 'Show header', 'Name', 'Refresh interval', 'Item', 'Show', 'Override host'] as $label) {
 			$this->assertTrue($form->getField($label)->isVisible(true));
 		}
 
@@ -1073,16 +1040,16 @@ class testDashboardItemCardWidget extends testWidgets {
 				else {
 					// Сheck overlay dialog title and close it.
 					$dialog_title = ($item === 'Item') ? 'Items' : $item;
-					$dialog = COverlayDialogElement::find()->all()->last();
-					$this->assertEquals($dialog_title, $dialog->waitUntilReady()->getTitle());
+					$dialog = COverlayDialogElement::find(1)->waitUntilReady()->one();
+					$this->assertEquals($dialog_title, $dialog->getTitle());
 					$dialog->close(true);
 				}
 			}
 
 			$selector_title = ($label === 'Item') ? 'Items' : 'Widget';
 			$field->query('button:Select')->waitUntilCLickable()->one()->click();
-			$selector_dialog = COverlayDialogElement::find()->all()->last();
-			$this->assertEquals($selector_title, $selector_dialog->waitUntilReady()->getTitle());
+			$selector_dialog = COverlayDialogElement::find(1)->waitUntilReady()->one();
+			$this->assertEquals($selector_title, $selector_dialog->getTitle());
 			$selector_dialog->close(true);
 		}
 
@@ -1113,7 +1080,7 @@ class testDashboardItemCardWidget extends testWidgets {
 			$this->assertEquals($rows[$i], $dropdown->getText());
 			$this->assertEquals(array_keys($option_states), $options->asText());
 
-			// IF option is selected in the dropdown, it appears in the list as enabled.
+			// If option is selected in the dropdown, it appears in the list as enabled.
 			$reference_options = array_merge($option_states, [$rows[$i] => true]);
 
 			// If option does not have a "disabled" attribute, then it is considered enabled.
@@ -1126,7 +1093,7 @@ class testDashboardItemCardWidget extends testWidgets {
 			$i++;
 		}
 
-		// Check Sparkline section is not visible in case user was no select "Latest data" option as "Show" section.
+		// Check Sparkline section is not visible in case user did not select "Latest data" in "Show" field.
 		$this->assertFalse($form->query('class', 'js-sparkline-row')->one()->isVisible());
 
 		// Clear all default options.
@@ -1190,7 +1157,9 @@ class testDashboardItemCardWidget extends testWidgets {
 								case 'Custom':
 									foreach (['sparkline_time_period_from', 'sparkline_time_period_to'] as $field) {
 										$this->assertTrue($form->query('id', $field)->one()->isVisible());
-										$this->assertTrue($form->query('xpath:.//label[@for="'.$field.'"]')->one()->hasClass('form-label-asterisk'));
+										$this->assertTrue($form->query('xpath:.//label[@for="'.$field.'"]')->one()
+												->hasClass('form-label-asterisk')
+										);
 
 										// Check that user may open a calendar.
 										$calendar = $form->query('xpath:.//button[@id="'.$field.'_calendar"]')->one();
@@ -1246,7 +1215,7 @@ class testDashboardItemCardWidget extends testWidgets {
 					'fields' => [
 						'Item' => STRING_255
 					],
-					"Show" => [
+					'Show' => [
 						['action' => USER_ACTION_UPDATE, 'index' => 0, 'section' => 'Latest data']
 					],
 					'Sparkline' => [
@@ -1267,7 +1236,7 @@ class testDashboardItemCardWidget extends testWidgets {
 						'Name' => 'Selected more than 731 day for graph filter.',
 						'Item' => 'Item for item card widget'
 					],
-					"Show" => [
+					'Show' => [
 						['action' => USER_ACTION_UPDATE, 'index' => 0, 'section' => 'Latest data']
 					],
 					'Sparkline' => [
@@ -1287,7 +1256,7 @@ class testDashboardItemCardWidget extends testWidgets {
 						'Name' => 'Empty widget value',
 						'Item' => 'Item for item card widget'
 					],
-					"Show" => [
+					'Show' => [
 						['action' => USER_ACTION_UPDATE, 'index' => 0, 'section' => 'Latest data']
 					],
 					'Sparkline' => [
@@ -1298,7 +1267,7 @@ class testDashboardItemCardWidget extends testWidgets {
 					]
 				]
 			],
-			// #4. Check invalid values ​​for Sparkline vidth and fill fields.
+			// #4. Check invalid values ​​for Sparkline width and fill fields.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1308,7 +1277,7 @@ class testDashboardItemCardWidget extends testWidgets {
 						'Refresh interval' => 'No refresh',
 						'Item' => 'Item for item card widget'
 					],
-					"Show" => [
+					'Show' => [
 						['action' => USER_ACTION_UPDATE, 'index' => 0, 'section' => 'Latest data']
 					],
 					'Sparkline' => [
@@ -1329,7 +1298,7 @@ class testDashboardItemCardWidget extends testWidgets {
 						'Name' => 'A time is expected',
 						'Item' => 'Item for item card widget'
 					],
-					"Show" => [
+					'Show' => [
 						['action' => USER_ACTION_UPDATE, 'index' => 0, 'section' => 'Latest data']
 					],
 					'Sparkline' => [
@@ -1347,13 +1316,13 @@ class testDashboardItemCardWidget extends testWidgets {
 			[
 				[
 					'fields' => [
-						'Show header' => false,
+						'Show header' => true,
 						'Name' => '  Trimmed name_3  ',
 						'Refresh interval' => 'No refresh',
 						'Item' => 'Item for item card widget'
 					],
 					// Select Latest data in the first element, then delete elements 3-5, then select all elements.
-					"Show" => [
+					'Show' => [
 						['action' => USER_ACTION_UPDATE, 'index' => 0, 'section' => 'Latest data'],
 						['action' => USER_ACTION_REMOVE, 'index' => 3],
 						['action' => USER_ACTION_REMOVE, 'index' => 2],
@@ -1381,7 +1350,7 @@ class testDashboardItemCardWidget extends testWidgets {
 						'Refresh interval' => '10 seconds',
 						'Item' => 'Item for item card widget'
 					],
-					"Show" => [
+					'Show' => [
 						['action' => USER_ACTION_REMOVE, 'index' => 3],
 						['action' => USER_ACTION_REMOVE, 'index' => 2],
 						['action' => USER_ACTION_REMOVE, 'index' => 1],
@@ -1397,10 +1366,10 @@ class testDashboardItemCardWidget extends testWidgets {
 						'Refresh interval' => '30 seconds',
 						'Item' => '<img src=\"x\" onerror=\"alert("ERROR");\"/>'
 					],
-					"Show" => [
+					'Show' => [
 						['action' => USER_ACTION_UPDATE, 'index' => 0, 'section' => 'Description'],
-						['action' => USER_ACTION_REMOVE, 'index' => 1],
-						['action' => USER_ACTION_REMOVE, 'index' => 1],
+						['action' => USER_ACTION_REMOVE, 'index' => 3],
+						['action' => USER_ACTION_REMOVE, 'index' => 2],
 						['action' => USER_ACTION_REMOVE, 'index' => 1]
 					]
 				]
@@ -1413,9 +1382,9 @@ class testDashboardItemCardWidget extends testWidgets {
 						'Refresh interval' => '1 minute',
 						'Item' => '105\'; --DROP TABLE Users'
 					],
-					"Show" => [
+					'Show' => [
 						['action' => USER_ACTION_UPDATE, 'index' => 0, 'section' => 'Description'],
-						['action' => USER_ACTION_REMOVE, 'index' => 1],
+						['action' => USER_ACTION_REMOVE, 'index' => 2],
 						['action' => USER_ACTION_REMOVE, 'index' => 1],
 						['action' => USER_ACTION_REMOVE, 'index' => 1]
 					]
@@ -1429,9 +1398,9 @@ class testDashboardItemCardWidget extends testWidgets {
 						'Refresh interval' => '2 minutes',
 						'Item' => 'Item for item card widget'
 					],
-					"Show" => [
+					'Show' => [
 						['action' => USER_ACTION_UPDATE, 'index' => 0, 'section' => 'Tags'],
-						['action' => USER_ACTION_REMOVE, 'index' => 2],
+						['action' => USER_ACTION_REMOVE, 'index' => 3],
 						['action' => USER_ACTION_REMOVE, 'index' => 2],
 						['action' => USER_ACTION_UPDATE, 'index' => 1, 'section' => 'Host inventory'],
 						['action' => USER_ACTION_REMOVE, 'index' => 1]
@@ -1447,7 +1416,7 @@ class testDashboardItemCardWidget extends testWidgets {
 						'Item' => 'Item for item card widget',
 						'Override host' => 'Dashboard'
 					],
-					"Show" => [
+					'Show' => [
 						['section' => 'Description'],
 						['section' => 'Error text'],
 						['section' => 'Latest data'],
@@ -1473,7 +1442,7 @@ class testDashboardItemCardWidget extends testWidgets {
 						'Item' => 'Item for item card widget',
 						'Override host' => 'Geomap'
 					],
-					"Show" => [
+					'Show' => [
 						['section' => 'Description'],
 						['section' => 'Error text'],
 						['section' => 'Latest data'],
@@ -1498,7 +1467,7 @@ class testDashboardItemCardWidget extends testWidgets {
 						'Name' => 'User changing Show options',
 						'Item' => 'Item for item card widget'
 					],
-					"Show" => [
+					'Show' => [
 						['action' => USER_ACTION_UPDATE, 'index' => 0, 'section' => 'Description'],
 						['section' => 'Latest data'],
 						['action' => USER_ACTION_UPDATE, 'index' => 1, 'section' => 'Error text'],
@@ -1691,7 +1660,7 @@ class testDashboardItemCardWidget extends testWidgets {
 					'Context menu' => [
 						'VIEW' => [
 							'Latest data' => 'zabbix.php?action=latest.view&hostids%5B%5D={hostid}'.
-								'&name=Item%20for%20item%20card%20widget&filter_set=1',
+									'&name=Item%20for%20item%20card%20widget&filter_set=1',
 							'Graph' => 'history.php?action=showgraph&itemids%5B%5D={itemid}',
 							'Values' => 'history.php?action=showvalues&itemids%5B%5D={itemid}',
 							'500 latest values' => 'history.php?action=showlatest&itemids%5B%5D={itemid}'
@@ -1701,17 +1670,17 @@ class testDashboardItemCardWidget extends testWidgets {
 							'Host' => 'zabbix.php?action=popup&popup=host.edit&hostid={hostid}',
 							'Triggers' => [
 								'Not classified trigger' => 'zabbix.php?action=popup&popup=trigger.edit'.
-									'&triggerid={triggerid}&hostid={hostid}&context=host',
+										'&triggerid={triggerid}&hostid={hostid}&context=host',
 								'Information trigger' => 'zabbix.php?action=popup&popup=trigger.edit'.
-									'&triggerid={triggerid}&hostid={hostid}&context=host',
+										'&triggerid={triggerid}&hostid={hostid}&context=host',
 								'Warning trigger' => 'zabbix.php?action=popup&popup=trigger.edit'.
-									'&triggerid={triggerid}&hostid={hostid}&context=host',
+										'&triggerid={triggerid}&hostid={hostid}&context=host',
 								'Average trigger' => 'zabbix.php?action=popup&popup=trigger.edit'.
-									'&triggerid={triggerid}&hostid={hostid}&context=host',
+										'&triggerid={triggerid}&hostid={hostid}&context=host',
 								'High trigger' => 'zabbix.php?action=popup&popup=trigger.edit'.
-									'&triggerid={triggerid}&hostid={hostid}&context=host',
+										'&triggerid={triggerid}&hostid={hostid}&context=host',
 								'Disaster trigger' => 'zabbix.php?action=popup&popup=trigger.edit'.
-									'&triggerid={triggerid}&hostid={hostid}&context=host'
+										'&triggerid={triggerid}&hostid={hostid}&context=host'
 							],
 							'Create trigger' => 'menu-popup-item',
 							'Create dependent item' => 'menu-popup-item',
@@ -1759,8 +1728,8 @@ class testDashboardItemCardWidget extends testWidgets {
 					'Tags' => ['tagFromItem: 🙃zabbix🙃'],
 					'Context menu' => [
 						'VIEW' => [
-							'Latest data' => 'zabbix.php?action=latest.view&hostids%5B%5D={hostid}&name=Dependent%20item%201'.
-									'&filter_set=1',
+							'Latest data' => 'zabbix.php?action=latest.view&hostids%5B%5D={hostid}&name=Dependent%20'.
+									'item%201&filter_set=1',
 							'Graph' => 'history.php?action=showgraph&itemids%5B%5D={itemid}',
 							'Values' => 'history.php?action=showvalues&itemids%5B%5D={itemid}',
 							'500 latest values' => 'history.php?action=showlatest&itemids%5B%5D={itemid}'
@@ -1770,7 +1739,7 @@ class testDashboardItemCardWidget extends testWidgets {
 							'Host' => 'zabbix.php?action=popup&popup=host.edit&hostid={hostid}',
 							'Triggers' => [
 								'Disabled trigger' => 'zabbix.php?action=popup&popup=trigger.edit'.
-									'&triggerid={triggerid}&hostid={hostid}&context=host'
+										'&triggerid={triggerid}&hostid={hostid}&context=host'
 							],
 							'Create trigger' => 'menu-popup-item',
 							'Create dependent item' => 'menu-popup-item',
@@ -1883,8 +1852,9 @@ class testDashboardItemCardWidget extends testWidgets {
 		if (array_key_exists('Context menu', $data)) {
 			$widget->query('link', $data['Item'])->one()->waitUntilClickable()->click();
 			$this->checkContextMenuLinks($data['Context menu'], self::$host_ids['hostids'][self::HOST_NAME],
-					($data['Item'] === 'Dependent item 1') ? self::$depend_items[$data['Item']]
-					: self::$itemids[$data['Item']]
+					($data['Item'] === 'Dependent item 1')
+						? self::$depend_items[$data['Item']]
+						: self::$itemids[$data['Item']]
 			);
 		}
 
@@ -2067,16 +2037,16 @@ class testDashboardItemCardWidget extends testWidgets {
 						// Check 2-level menu links.
 						$popup->getItem($menu_level1)->click();
 						$item_link = $popup->getItem($menu_level1)->query('xpath:./../ul//a[contains'.
-								'(@class, "menu-popup-item") and text()='.CXPathHelper::escapeQuotes($menu_level2).']')
-						->one();
+								'(@class, "menu-popup-item") and text()='.CXPathHelper::escapeQuotes($menu_level2).']'
+						)->one();
 
 						if (str_contains($attribute, 'menu-popup-item')) {
 							$this->assertEquals($attribute, $item_link->getAttribute('class'));
 						}
 						else {
-							$triggerid = self::$trigger_ids[$menu_level2];
-
-							$attribute = str_replace(['{triggerid}', '{hostid}'], [$triggerid, $hostid], $attribute);
+							$attribute = str_replace(['{triggerid}', '{hostid}'],
+									[self::$trigger_ids[$menu_level2], $hostid], $attribute
+							);
 							$this->assertEquals($menu_level2, $item_link->getText());
 							$this->assertStringContainsString($attribute, $item_link->getAttribute('href'));
 						}
@@ -2227,7 +2197,7 @@ class testDashboardItemCardWidget extends testWidgets {
 
 			case 'template':
 				$link = 'zabbix.php?action=item.list&filter_set=1&filter_hostids%5B0%5D='.
-						self::$template_id['templateids']['Template for item card widget'].'&context=template';
+						self::$templateid.'&context=template';
 				$this->assertEquals($link, $widget->query('class:sections-header')->query('class:section-path')
 						->query('class:link-alt')->one()->getAttribute('href')
 				);
@@ -2314,14 +2284,14 @@ class testDashboardItemCardWidget extends testWidgets {
 		]);
 
 		$data = [
-			"Show" => [
+			'Show' => [
 				['action' => USER_ACTION_UPDATE, 'index' => 0, 'section' => 'Tags'],
+				['action' => USER_ACTION_UPDATE, 'index' => 2, 'section' => 'Description'],
 				['action' => USER_ACTION_REMOVE, 'index' => 1],
-				['action' => USER_ACTION_UPDATE, 'index' => 1, 'section' => 'Description'],
 				['section' => 'Error text']
 			]
 		];
-		$this->getShowTable()->fill($data["Show"]);
+		$this->getShowTable()->fill($data['Show']);
 
 		// Save or cancel widget.
 		if (CTestArrayHelper::get($data, 'save_widget', false)) {
@@ -2397,8 +2367,8 @@ class testDashboardItemCardWidget extends testWidgets {
 		$form->fill(['Type' => CFormElement::RELOADABLE_FILL('Item card')]);
 		$form->fill($data['fields']);
 
-		if (array_key_exists("Show", $data)) {
-			$this->getShowTable()->fill($data["Show"]);
+		if (array_key_exists('Show', $data)) {
+			$this->getShowTable()->fill($data['Show']);
 		}
 
 		if (array_key_exists('Sparkline', $data)) {
@@ -2483,7 +2453,7 @@ class testDashboardItemCardWidget extends testWidgets {
 			$this->assertEquals(self::$old_widget_count + (($action === 'create') ? 1 : 0), $dashboard->getWidgets()->count());
 
 			$dashboard->getWidget($header)->edit()->checkValue($data['fields']);
-			$this->getShowTable()->checkValue($this->calculateShowResult(CTestArrayHelper::get($data, "Show", [])));
+			$this->getShowTable()->checkValue($this->calculateShowResult(CTestArrayHelper::get($data, 'Show', [])));
 			COverlayDialogElement::find()->one()->close();
 			$dashboard->save();
 			$this->assertMessage(TEST_GOOD, 'Dashboard updated');

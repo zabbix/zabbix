@@ -2649,7 +2649,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					$this->assertEquals($field_details['rows'][$i], $dropdown->getText());
 					$this->assertEquals(array_keys($field_details['option_states']), $options->asText());
 
-					// IF option is selected in the dropdown, it appears in the list as enabled.
+					// If option is selected in the dropdown, it appears in the list as enabled.
 					$reference_options = array_merge($field_details['option_states'], [$field_details['rows'][$i] => true]);
 
 					// If option does not have a "disabled" attribute, then it is considered enabled.
@@ -4654,7 +4654,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					'page' => '2nd page'
 				]
 			],
-			// #105 Item card widget with all values.
+			// #105 Host card widget with all values.
 			[
 				[
 					'fields' => [
@@ -4792,8 +4792,8 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					$color_picker_dialog = $form->query('class:color-picker')->one()->asColorPicker();
 					$color_picker_dialog->fill($value);
 				}
-				else if ($field === 'widget') {
-					$sparkline = $form->query('class:widget-field-sparkline')->one()->waitUntilReady();
+				elseif ($field === 'widget') {
+					$sparkline = $form->query('class:widget-field-sparkline')->one()->waitUntilVisible();
 					$sparkline->query('button', 'Select')->one()->waitUntilClickable()->click();
 					$dialog = COverlayDialogElement::find()->all()->last()->waitUntilReady();
 					$dialog->query('link:'. $value)->one()->click();
