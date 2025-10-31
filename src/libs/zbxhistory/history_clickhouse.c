@@ -1177,13 +1177,10 @@ static int	clickhouse_conn_post(zbx_clickhouse_conn_t *conn, zbx_clickhouse_data
 		attempts_num++;
 		retries_num = history_clickhouse_flush_conns(d, mhandle, &errmsg);
 
-		if (CLICKHOUSE_RETRIES_OFF == retry_mode)
-			retries_num = 0;
-
 		if (FAIL == conn->status && NULL == errmsg)
 			errmsg = zbx_strdup(NULL, "unknown error");
 
-		if (0 == retries_num)
+		if (0 == retries_num || CLICKHOUSE_RETRIES_OFF == retry_mode)
 			break;
 
 		if (NULL != errmsg)
