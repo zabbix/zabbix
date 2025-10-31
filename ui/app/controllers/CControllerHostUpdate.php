@@ -223,6 +223,7 @@ class CControllerHostUpdate extends CControllerHostUpdateGeneral {
 							VALUEMAP_MAPPING_TYPE_IN_RANGE, VALUEMAP_MAPPING_TYPE_REGEXP, VALUEMAP_MAPPING_TYPE_DEFAULT
 						]],
 						'value' => [
+							['db valuemap_mapping.value'],
 							['db valuemap_mapping.value', 'required', 'when' => ['type', 'in' => [
 								VALUEMAP_MAPPING_TYPE_EQUAL
 							]]],

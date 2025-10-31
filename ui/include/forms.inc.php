@@ -618,6 +618,7 @@ function getItemPreprocessing(array $preprocessing, $readonly, array $types) {
 					(new CCheckBox('preprocessing['.$i.'][params_2]', ZBX_PREPROC_CSV_HEADER))
 						->setLabel(_('With header row'))
 						->setChecked($step_param_2_value == ZBX_PREPROC_CSV_HEADER)
+						->setUncheckedValue(ZBX_PREPROC_CSV_NO_HEADER)
 						->setReadonly($readonly)
 				];
 				break;
