@@ -77,7 +77,7 @@ class CConditionFormulaParser extends CParser {
 		}
 
 		$this->error = isset($source[0])
-			? _s('incorrect syntax near "%1$s"', substr($source, $p == 0 ? 0 : $p - 1))
+			? _s('incorrect syntax near "%1$s"', substr($source, $parsed_pos == 0 ? 0 : $parsed_pos - 1))
 			: _('expression is empty');
 
 		return CParser::PARSE_FAIL;
