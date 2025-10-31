@@ -9423,6 +9423,10 @@ msgstr "Требования к полю:"
 msgid "File checksum, calculated by the UNIX cksum algorithm. Returns integer for crc32 (default) and string for md5, sha256"
 msgstr "Контрольная сумма файла, вычисляется алгоритмом UNIX cksum. Возвращает целое число для crc32 (по умолчанию) и строки для md5, sha256"
 
+#: include/classes/validators/CFormValidator.php:1451 jsLoader.php:445
+msgid "File format is unsupported."
+msgstr ""
+
 #: include/classes/import/readers/CYamlImportReader.php:52
 msgid "File is empty"
 msgstr "Файл пустой"
@@ -9439,6 +9443,11 @@ msgstr "Информация о владельце файла. Возвраща�
 #: include/classes/data/CItemData.php:1679
 msgid "File size in bytes (default) or in newlines. Returns integer"
 msgstr "Размер файла в байтах (по умолчанию) или в количестве символов новых строк. Возвращает целое число"
+
+#: include/classes/helpers/CUploadFile.php:129 jsLoader.php:444
+#, c-format
+msgid "File size must be less than %1$s."
+msgstr ""
 
 #: include/classes/data/CItemData.php:1687
 msgid "File time information. Returns integer (Unix timestamp)"
@@ -12292,6 +12301,18 @@ msgstr "Макросы узла сети и унаследованные"
 msgid "Inherited and host prototype macros"
 msgstr "Унаследованные и макросы прототипов узлов сети"
 
+#: include/classes/helpers/CTagHelper.php:230
+msgid "Inherited and host tag"
+msgstr ""
+
+#: app/partials/configuration.tags.tab.php:42
+msgid "Inherited and host tags"
+msgstr ""
+
+#: include/classes/helpers/CTagHelper.php:231
+msgid "Inherited and item tag"
+msgstr ""
+
 #: app/partials/configuration.tags.tab.php:165
 msgid "Inherited and item tags"
 msgstr "Унаследованные и собственные теги"
@@ -12304,13 +12325,33 @@ msgstr "Унаследованные и собственные теги"
 msgid "Inherited and template macros"
 msgstr "Унаследованные и макросы из шаблонов"
 
+#: include/classes/helpers/CTagHelper.php:229
+msgid "Inherited and template tag"
+msgstr ""
+
+#: app/partials/configuration.tags.tab.php:33
+msgid "Inherited and template tags"
+msgstr ""
+
+#: include/classes/helpers/CTagHelper.php:232
+msgid "Inherited and trigger tag"
+msgstr ""
+
 #: app/partials/configuration.tags.tab.php:155
 msgid "Inherited and trigger tags"
 msgstr "Унаследованные и собственные теги"
 
+#: include/classes/helpers/CTagHelper.php:233
+msgid "Inherited and web scenario tag"
+msgstr ""
+
 #: include/forms.inc.php:311
 msgid "Inherited items"
 msgstr "Унаследованные элементы данных"
+
+#: include/classes/helpers/CTagHelper.php:222
+msgid "Inherited tag"
+msgstr ""
 
 #: widgets/geomap/includes/WidgetForm.php:62
 msgid "Initial view"
@@ -21964,6 +22005,10 @@ msgstr "Имя шаблона"
 msgid "Template permissions"
 msgstr "Права доступа к шаблонам"
 
+#: app/partials/configuration.tags.tab.php:33
+msgid "Template tags"
+msgstr ""
+
 #: report2.php:398
 msgid "Template trigger"
 msgstr "Шаблонный триггер"
@@ -22475,6 +22520,10 @@ msgstr "Это значение не может быть одним из %1$s."
 #: include/classes/validators/CFormValidator.php:946 jsLoader.php:421
 msgid "This value does not match pattern."
 msgstr "Это значение не соответствует шаблону."
+
+#: jsLoader.php:442
+msgid "This value is not a valid file."
+msgstr ""
 
 #: include/classes/validators/CFormValidator.php:874 jsLoader.php:424
 msgid "This value is not a valid floating-point value."
