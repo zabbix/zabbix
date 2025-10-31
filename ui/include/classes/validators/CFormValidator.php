@@ -52,7 +52,8 @@ class CFormValidator {
 	 *
 	 * Supported rules:
 	 *   Data types:
-	 *     'boolean', 'string', 'integer', 'float', 'id', 'objects', 'object', 'array', 'db <table>.<field>'
+	 *     'boolean', 'string', 'integer', 'float', 'id', 'objects', 'object', 'array', 'db <table>.<field>',
+	 *     'file'
 	 *   Constraints:
 	 *     'not_empty', 'required', 'length', 'api_uniq'
 	 *   Value comparisons:
@@ -85,13 +86,18 @@ class CFormValidator {
 
 					$result[$value] = true;
 				}
-				elseif (in_array($value, ['id', 'integer', 'float', 'string', 'object', 'objects', 'array'], true)) {
+				elseif (in_array($value, ['id', 'integer', 'float', 'string', 'object', 'objects', 'array', 'file'],
+						true)) {
 					if (array_key_exists('type', $result)) {
 						// "type" is specified multiple times.
 						throw new Exception('[RULES ERROR] Rule "type" is specified multiple times (Path: '.$rule_path.')');
 					}
 
 					$result['type'] = $value;
+
+					if ($value === 'file') {
+						$result['file-type'] = 'file';
+					}
 				}
 				elseif ($value === 'boolean') {
 					if (array_key_exists('type', $result)) {
@@ -246,23 +252,7 @@ class CFormValidator {
 						break;
 
 					case 'api_uniq':
-						if (!is_array($value) || !array_key_exists(0, $value)) {
-							throw new Exception('[RULES ERROR] Rule "'.$key.'" should contain non-empty array (Path: '.$rule_path.')');
-						}
-
-						if (!is_array($value[0])) {
-							$value = [$value];
-						}
-
-						foreach ($value as &$api_uniq_check) {
-							if (count(explode('.', $api_uniq_check[0])) !== 2) {
-								throw new Exception('[RULES ERROR] Rule "'.$key.'" should contain a valid API call (Path: '.$rule_path.', API call:'.$api_uniq_check[0].')');
-							}
-							$api_uniq_check += [1 => [], 2 => null, 3 => null];
-						}
-						unset($api_uniq_check);
-
-						$result[$key] = $value;
+						$result[$key] = self::normalizeApiUniqRule($value, $rule_path);
 						break;
 
 					case 'regex':
@@ -277,6 +267,20 @@ class CFormValidator {
 						$result[$key] = $value;
 						break;
 
+					case 'max-size':
+						$result[$key] = (int) $value;
+						$result['max-size-human-readable'] = convertUnits(['value' => $result[$key], 'units' => 'B']);
+
+						break;
+					case 'file-type':
+						if (!in_array($value, ['file', 'image'])) {
+							throw new Exception('[RULES ERROR] Rule "'.$key.'" contains invalid value (Path: ' .$rule_path.')');
+						}
+
+						$result[$key] = $value;
+
+						break;
+
 					default:
 						throw new Exception('[RULES ERROR] Unknown rule "'.$key.'" (Path: '.$rule_path.')');
 				}
@@ -289,7 +293,7 @@ class CFormValidator {
 		}
 
 		if (array_key_exists('not_empty', $result)) {
-			if (!in_array($result['type'], ['string', 'objects', 'array'])) {
+			if (!in_array($result['type'], ['string', 'objects', 'array', 'file'])) {
 				throw new Exception('[RULES ERROR] Rule "not_empty" is not compatible with type "'.$result['type'].'" (Path: '.$rule_path.')');
 			}
 		}
@@ -515,6 +519,32 @@ class CFormValidator {
 		return $result;
 	}
 
+	private static function normalizeApiUniqRule(array $value, string $rule_path): array {
+		if (!is_array($value) || !array_key_exists(0, $value)) {
+			throw new Exception('[RULES ERROR] Rule "api_uniq" should contain non-empty array (Path: '.$rule_path.')');
+		}
+
+		if (!is_array($value[0])) {
+			$value = [$value];
+		}
+
+		foreach ($value as &$api_uniq_check) {
+			if (count(explode('.', $api_uniq_check[0])) != 2) {
+				throw new Exception(
+					'[RULES ERROR] Rule "api_uniq" should contain a valid API call (Path: '.$rule_path.', API call:'.
+					$api_uniq_check[0].')'
+				);
+			}
+			$api_uniq_check += [1 => [], 2 => null, 3 => null, 4 => []];
+			$api_uniq_check[1] = ['filter' => $api_uniq_check[1]];
+			$api_uniq_check[1] += $api_uniq_check[4];
+			unset($api_uniq_check[4]);
+		}
+		unset($api_uniq_check);
+
+		return $value;
+	}
+
 	/**
 	 * Parse 'in' rule, that was passed as string.
 	 *
@@ -591,10 +621,15 @@ class CFormValidator {
 	 * Base validation function.
 	 *
 	 * @param array  $data  Form input data.
+	 * @param ?array  $files From files
 	 *
 	 * @return int
 	 */
-	public function validate(&$data): int {
+	public function validate(&$data, ?array &$files = null): int {
+		if ($files === null) {
+			$files = [];
+		}
+
 		$this->errors = [];
 
 		$this->has_fatal = false;
@@ -604,7 +639,7 @@ class CFormValidator {
 		$this->field_values = $this->resolveWhenFields($this->rules, $data);
 
 		$path = '';
-		if ($this->validateObject($this->rules, $data, $error, $path) === false) {
+		if ($this->validateObject($this->rules, $data, $error, $path, $files) === false) {
 			$this->addError(self::ERROR, $path, $error, self::ERROR_LEVEL_PRIMARY);
 		}
 
@@ -669,8 +704,9 @@ class CFormValidator {
 	 * @param array  $data    Data to validate.
 	 * @param string $field   Field to validate.
 	 * @param string $path    Path of field.
+	 * @param array $files    Files to validate
 	 */
-	private function validateField(array $rules, &$data, string $field, string $path): void {
+	private function validateField(array $rules, &$data, string $field, string $path, ?array &$files = []): void {
 		if (array_key_exists('when', $rules)) {
 			foreach ($rules['when'] as $when) {
 				if ($this->testWhenCondition($when, $path) === false) {
@@ -680,11 +716,15 @@ class CFormValidator {
 		}
 
 		// Single value ID may be passed as null when value is not specified.
-		if (array_key_exists($field, $data) && $data[$field] === null) {
+		if ($rules['type'] !== 'file' && array_key_exists($field, $data) && $data[$field] === null) {
 			unset($data[$field]);
 		}
 
-		if (!array_key_exists($field, $data)) {
+		$field_exists = $rules['type'] === 'file'
+			? array_key_exists($field, $files)
+			: array_key_exists($field, $data);
+
+		if (!$field_exists) {
 			if (array_key_exists('required', $rules)) {
 				$this->addError(self::ERROR, $path,
 					self::getMessage($rules, 'required', _('Required field is missing.')), self::ERROR_LEVEL_PRIMARY
@@ -694,72 +734,78 @@ class CFormValidator {
 			return;
 		}
 
-		if (array_key_exists('type', $rules)) {
-			switch ($rules['type']) {
-				case 'id':
-					if (!self::validateId($rules, $data[$field], $error)) {
-						$this->addError(self::ERROR, $path, $error, self::ERROR_LEVEL_PRIMARY);
+		switch ($rules['type']) {
+			case 'id':
+				if (!self::validateId($rules, $data[$field], $error)) {
+					$this->addError(self::ERROR, $path, $error, self::ERROR_LEVEL_PRIMARY);
 
-						return;
-					}
-					break;
+					return;
+				}
+				break;
 
-				case 'integer':
-					if (!self::validateInt32($rules, $data[$field], $error)) {
-						$this->addError(self::ERROR, $path, $error, self::ERROR_LEVEL_PRIMARY);
+			case 'integer':
+				if (!self::validateInt32($rules, $data[$field], $error)) {
+					$this->addError(self::ERROR, $path, $error, self::ERROR_LEVEL_PRIMARY);
 
-						return;
-					}
-					break;
+					return;
+				}
+				break;
 
-				case 'float':
-					if (!self::validateFloat($rules, $data[$field], $error)) {
-						$this->addError(self::ERROR, $path, $error, self::ERROR_LEVEL_PRIMARY);
+			case 'float':
+				if (!self::validateFloat($rules, $data[$field], $error)) {
+					$this->addError(self::ERROR, $path, $error, self::ERROR_LEVEL_PRIMARY);
 
-						return;
-					}
-					break;
+					return;
+				}
+				break;
 
-				case 'string':
-					if (!self::validateStringUtf8($rules, $data[$field], $error)) {
-						$this->addError(self::ERROR, $path, $error, self::ERROR_LEVEL_PRIMARY);
+			case 'string':
+				if (!self::validateStringUtf8($rules, $data[$field], $error)) {
+					$this->addError(self::ERROR, $path, $error, self::ERROR_LEVEL_PRIMARY);
 
-						return;
-					}
+					return;
+				}
 
-					if (!self::validateUse($rules, $data[$field], $error, $error_code)) {
-						$error = self::getMessage($rules, 'use', $error, $error_code);
+				if (!self::validateUse($rules, $data[$field], $error, $error_code)) {
+					$error = self::getMessage($rules, 'use', $error, $error_code);
 
-						$this->addError(self::ERROR, $path, $error, self::ERROR_LEVEL_DELAYED);
+					$this->addError(self::ERROR, $path, $error, self::ERROR_LEVEL_DELAYED);
 
-						return;
-					}
-					break;
+					return;
+				}
+				break;
 
-				case 'array':
-					if (!$this->validateArray($rules, $data[$field], $error, $path)) {
-						$this->addError(self::ERROR, $path, $error, self::ERROR_LEVEL_PRIMARY);
+			case 'array':
+				if (!$this->validateArray($rules, $data[$field], $error, $path)) {
+					$this->addError(self::ERROR, $path, $error, self::ERROR_LEVEL_PRIMARY);
 
-						return;
-					}
-					break;
+					return;
+				}
+				break;
 
-				case 'object':
-					if (!$this->validateObject($rules, $data[$field], $error, $path)) {
-						$this->addError(self::ERROR, $path, $error, self::ERROR_LEVEL_PRIMARY);
+			case 'object':
+				if (!$this->validateObject($rules, $data[$field], $error, $path)) {
+					$this->addError(self::ERROR, $path, $error, self::ERROR_LEVEL_PRIMARY);
 
-						return;
-					}
-					break;
+					return;
+				}
+				break;
 
-				case 'objects':
-					if (!$this->validateObjects($rules, $data[$field], $error, $path)) {
-						$this->addError(self::ERROR, $path, $error, self::ERROR_LEVEL_PRIMARY);
+			case 'objects':
+				if (!$this->validateObjects($rules, $data[$field], $error, $path)) {
+					$this->addError(self::ERROR, $path, $error, self::ERROR_LEVEL_PRIMARY);
 
-						return;
-					}
-					break;
-			}
+					return;
+				}
+				break;
+
+			case 'file':
+				if (!$this->validateFile($rules, $files[$field], $error)) {
+					$this->addError(self::ERROR, $path, $error, self::ERROR_LEVEL_PRIMARY);
+
+					return;
+				}
+				break;
 		}
 	}
 
@@ -1098,23 +1144,41 @@ class CFormValidator {
 	 * @param mixed  $value
 	 * @param string $error
 	 * @param string $path
+	 * @param array $files
 	 *
 	 * @return bool
 	 */
-	public function validateObject(array $rules, &$value, ?string &$error = null, string &$path = ''): bool {
+	public function validateObject(array $rules, &$value, ?string &$error = null, string &$path = '',
+			?array &$files = []): bool {
 		if (!is_array($value)) {
 			$error = self::getMessage($rules, 'type', _('An array is expected.'));
 
 			return false;
 		}
 
+		$value_fields = [];
+		$file_fields = [];
+
 		foreach ($rules['fields'] as $field => $rule_sets) {
+			if (!$rule_sets) {
+				$value_fields[$field] = true;
+				$file_fields[$field] = true;
+			}
+
 			foreach ($rule_sets as $rule_set) {
-				$this->validateField($rule_set, $value, $field, $path.'/'.$field);
+				$this->validateField($rule_set, $value, $field, $path.'/'.$field, $files);
+
+				if ($rule_set['type'] == 'file') {
+					$file_fields[$field] = true;
+				}
+				else {
+					$value_fields[$field] = true;
+				}
 			}
 		}
 
-		$value = array_intersect_key($value, $rules['fields']);
+		$value = array_intersect_key($value, $value_fields);
+		$files = $files ? array_intersect_key($files, $file_fields) : $files;
 
 		if (array_key_exists('api_uniq', $rules)) {
 			foreach ($rules['api_uniq'] as $api_check) {
@@ -1245,11 +1309,12 @@ class CFormValidator {
 	}
 
 	/**
-	 * Check via API if item exists, excluding provided id. Used for unique checks
+	 * Check via API if item exists, excluding provided ID. Used for unique checks.
 	 *
-	 * @param string $api
-	 * @param array $options
+	 * @param string      $api
+	 * @param array       $options
 	 * @param string|null $exclude_primary_id
+	 *
 	 * @return bool
 	 */
 	public static function existsAPIObject(string $api, array $options, ?string $exclude_primary_id = null): bool {
@@ -1278,6 +1343,22 @@ class CFormValidator {
 		return false;
 	}
 
+	private function resolveFieldReference(string $parameter, ?string $field_path, string $path): array {
+		if (substr($parameter, 0, 1) === '{' && substr($parameter, -1, 1) === '}') {
+			$field_data = $this->getWhenFieldValue(substr($parameter, 1, -1), $path);
+
+			if (in_array($field_data['type'], ['id', 'integer', 'float', 'string'])) {
+				$parameter = $field_data['value'];
+
+				if ($field_path === null && $path === '') {
+					$field_path = $field_data['path'];
+				}
+			}
+		}
+
+		return [$parameter, $field_path];
+	}
+
 	private function validateApiUniq(array $check, string &$path, ?string &$error = null): bool {
 		[$method, $parameters, $exclude_id] = $check;
 		[$api] = explode('.', $method);
@@ -1285,17 +1366,17 @@ class CFormValidator {
 		$field_path = null;
 
 		// Replace field references by real values in API request parameters.
-		foreach ($parameters as &$parameter) {
-			if (substr($parameter, 0, 1) === '{' && substr($parameter, -1, 1) === '}') {
-				$field_data = $this->getWhenFieldValue(substr($parameter, 1, -1), $path);
+		foreach ($parameters['filter'] as &$parameter) {
+			[$parameter, $field_path] = $this->resolveFieldReference($parameter, $field_path, $path);
+		}
+		unset($parameter);
 
-				if (in_array($field_data['type'], ['id', 'integer', 'float', 'string'])) {
-					$parameter = $field_data['value'];
-					if ($field_path === null && $path === '') {
-						$field_path = $field_data['path'];
-					}
-				}
+		foreach ($parameters as $name => &$parameter) {
+			if ($name === 'filter') {
+				continue;
 			}
+
+			[$parameter, $field_path] = $this->resolveFieldReference($parameter, $field_path, $path);
 		}
 		unset($parameter);
 
@@ -1310,10 +1391,6 @@ class CFormValidator {
 
 			$exclude_id = $exclude_id_field_data['type'] === 'id' ? $exclude_id_field_data['value'] : null;
 		}
-
-		$parameters = [
-			'filter' => $parameters
-		];
 
 		if (self::existsAPIObject($api, $parameters, $exclude_id)) {
 			$error = _('This object already exists.');
@@ -1330,6 +1407,70 @@ class CFormValidator {
 			}
 
 			return false;
+		}
+
+		return true;
+	}
+
+	/**
+	 * File validator
+	 *
+	 * @param array  $rules
+	 * @param string $rules['file']['type']       File type (image or file).
+	 * @param int    $rules['file']['max-size']  (optional) Maximum size of file
+	 * @param array  $rules['messages']			 (optional) Error messages to use when some check fails.
+	 * @param mixed  $value
+	 * @param string $error
+	 *
+	 * @return bool
+	 */
+	private static function validateFile(array $rules, &$value, ?string &$error = null): bool {
+		$file = null;
+
+		try {
+			$file = new CUploadFile($value);
+		}
+		catch (Exception $e) {
+			$error = $e->getMessage();
+
+			return false;
+		}
+
+		if ($file->wasUploaded() || array_key_exists('not_empty', $rules)) {
+			$file_content = null;
+
+			try {
+				$file_content = $file->getContent();
+			}
+			catch (Exception $e) {
+				$error = $e->getMessage();
+
+				return false;
+			}
+
+			if (array_key_exists('max-size', $rules)) {
+				try {
+					$file->validateFileSize($rules['max-size'], $rules['file-type']);
+				}
+				catch (Exception $e) {
+					$error = self::getMessage($rules, 'max-size', $e->getMessage());
+
+					return false;
+				}
+			}
+
+			if ($rules['file-type'] === 'image') {
+				try {
+					if (@imageCreateFromString($file_content) === false) {
+						throw new Exception(_('File format is unsupported.'));
+					}
+				}
+				catch (Exception $e) {
+					$error = self::getMessage($rules, 'file-type', $e->getMessage());
+
+					return false;
+				}
+			}
 		}
 
 		return true;
@@ -1710,7 +1851,18 @@ class CFormValidator {
 
 		if (array_key_exists('api_uniq', $rules)) {
 			foreach ($rules['api_uniq'] as $api_check) {
-				foreach ($api_check[1] as $param) {
+				foreach ($api_check[1]['filter'] as $param) {
+					if (substr($param, 0, 1) === '{' && substr($param, -1, 1) === '}') {
+						$this->when_resolved_data['fields_to_lookup'][]
+							= self::getWhenFieldAbsolutePath(substr($param, 1, -1), $path);
+					}
+				}
+
+				foreach ($api_check[1] as $name => $param) {
+					if ($name === 'filter') {
+						continue;
+					}
+
 					if (substr($param, 0, 1) === '{' && substr($param, -1, 1) === '}') {
 						$this->when_resolved_data['fields_to_lookup'][]
 							= self::getWhenFieldAbsolutePath(substr($param, 1, -1), $path);
@@ -1943,6 +2095,9 @@ class CFormValidator {
 
 			case 'string':
 				return self::validateStringUtf8($when_rules, $when_field['value']);
+
+			case 'file':
+				return self::validateFile($when_rules, $when_field['value']);
 
 			default:
 				/*

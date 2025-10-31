@@ -1552,7 +1552,7 @@ class testDashboardHostCardWidget extends testWidgets {
 	public function testDashboardHostCardWidget_CheckLinks($data) {
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.
 				self::$dashboardid['Dashboard for HostCard widget display check'])->waitUntilReady();
-		$dashboard = CDashboardElement::find()->one();
+		$dashboard = CDashboardElement::find()->one()->waitUntilReady();
 
 		// Check for missing reference if there are no objects.
 		if (array_key_exists('inactive', $data)) {

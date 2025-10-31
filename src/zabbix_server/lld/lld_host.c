@@ -3593,7 +3593,7 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_lld_host_ptr_t
 	zbx_db_insert_t		db_insert, db_insert_hdiscovery, db_insert_hinventory, db_insert_hgroups,
 				db_insert_hmacro, db_insert_interface, db_insert_idiscovery, db_insert_snmp,
 				db_insert_tag, db_insert_host_rtdata, db_insert_hgset, db_insert_hgset_group,
-				db_insert_host_hgset, db_insert_permission;
+				db_insert_host_hgset, db_insert_permission, db_insert_host_template_cache;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -3816,6 +3816,8 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_lld_host_ptr_t
 				"lldruleid", (char *)NULL);
 		zbx_db_insert_prepare(&db_insert_host_rtdata, "host_rtdata", "hostid", "active_available",
 				(char *)NULL);
+		zbx_db_insert_prepare(&db_insert_host_template_cache, "host_template_cache", "hostid", "link_hostid",
+				(char *)NULL);
 	}
 
 	if (0 != new_host_hgsets)
@@ -3955,6 +3957,8 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_lld_host_ptr_t
 				zbx_db_insert_add_values(&db_insert_hinventory, host->hostid,
 						(int)host->inventory_mode);
 			}
+
+			zbx_db_insert_add_values(&db_insert_host_template_cache, host->hostid, host->hostid);
 
 			zbx_audit_host_update_json_add_details(audit_entry, host->host, host->name, monitored_by,
 					proxyid, proxy_groupid, (int)ipmi_authtype, (int)ipmi_privilege, ipmi_username,
@@ -4496,6 +4500,9 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_lld_host_ptr_t
 
 		zbx_db_insert_execute(&db_insert_host_rtdata);
 		zbx_db_insert_clean(&db_insert_host_rtdata);
+
+		zbx_db_insert_execute(&db_insert_host_template_cache);
+		zbx_db_insert_clean(&db_insert_host_template_cache);
 	}
 
 	if (0 != new_host_hgsets)
