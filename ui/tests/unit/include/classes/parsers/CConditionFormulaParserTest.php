@@ -18,10 +18,7 @@ use PHPUnit\Framework\TestCase;
 
 class CConditionFormulaParserTest extends TestCase {
 
-	/**
-	 * @var CConditionFormulaParser
-	 */
-	protected $condition_formula_parser;
+	protected CConditionFormulaParser $condition_formula_parser;
 
 	protected function setUp(): void {
 		$this->condition_formula_parser = new CConditionFormulaParser();
@@ -188,10 +185,6 @@ class CConditionFormulaParserTest extends TestCase {
 
 	/**
 	 * @dataProvider dataProvider
-	 *
-	 * @param string $formula
-	 * @param int    $pos
-	 * @param array  $expected
 	 */
 	public function testParseConstants(string $formula, int $pos, array $expected) {
 		$result = $this->condition_formula_parser->parse($formula, $pos);

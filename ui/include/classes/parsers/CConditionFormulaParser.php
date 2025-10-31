@@ -13,9 +13,9 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
+
 class CConditionFormulaParser extends CParser {
 
-	// possible parsing states
 	const STATE_AFTER_OPEN_BRACE = 0;
 	const STATE_AFTER_OPERATOR = 1;
 	const STATE_AFTER_CLOSE_BRACE = 2;
@@ -27,14 +27,14 @@ class CConditionFormulaParser extends CParser {
 	 *
 	 * @var string
 	 */
-	private $error;
+	private string $error;
 
 	/**
 	 * Array of unique constants used in the formula.
 	 *
 	 * @var array
 	 */
-	private $constants = [];
+	private array $constants = [];
 
 	/**
 	 * Parses the given condition formula.
