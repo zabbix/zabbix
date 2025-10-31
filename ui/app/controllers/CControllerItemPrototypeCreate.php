@@ -112,7 +112,6 @@ class CControllerItemPrototypeCreate extends CControllerItemPrototype {
 			'key' => [
 				['db items.key_', 'required', 'not_empty', 'use' => [CItemKeyValidator::class, ['lldmacros' => true]],
 					'messages' => ['use' => [
-						null => 'OTHERS',
 						CItemKeyValidator::ERROR_CODE_LLD_MACRO => _('This field must contain at least one low-level discovery macro.')
 					]],
 				],
