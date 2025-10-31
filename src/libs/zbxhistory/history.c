@@ -865,9 +865,10 @@ int	zbx_history_add_values(const zbx_vector_dc_history_ptr_t *history, zbx_uint6
 
 	history_manager_init_session(&history_manager, &session);
 
-	entries = (const zbx_history_entry_t **)zbx_malloc(NULL, sizeof(zbx_history_entry_t *) * history->values_num);
+	entries = (const zbx_history_entry_t **)zbx_malloc(NULL,
+			sizeof(zbx_history_entry_t *) * (size_t)history->values_num);
 
-	for (int value_type = 0; value_type <= ITEM_VALUE_TYPE_BIN; value_type++)
+	for (unsigned char value_type = 0; value_type <= ITEM_VALUE_TYPE_BIN; value_type++)
 	{
 		int	entries_num = 0;
 
@@ -923,7 +924,7 @@ int	zbx_history_get_values(zbx_uint64_t itemid, int value_type, int start, int c
 
 	history_manager_init_session(&history_manager, &session);
 
-	ret = history_session_fetch(&session, itemid, value_type, start, end, count, &records);
+	ret = history_session_fetch(&session, itemid, (unsigned char)value_type, start, end, count, &records);
 
 	if (SUCCEED <= ret)
 	{
@@ -966,7 +967,7 @@ void	zbx_history_get_batch(zbx_vector_item_history_t *results, int value_type, i
 
 	history_manager_init_session(&history_manager, &session);
 
-	history_session_fetch_batch(&session, results, value_type, start);
+	history_session_fetch_batch(&session, results, (unsigned char)value_type, start);
 
 	if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_TRACE))
 	{

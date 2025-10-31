@@ -2759,7 +2759,7 @@ static int	vc_precache_query_windows(zbx_vector_vc_query_t *queries, int interva
 		return SUCCEED;
 
 	zbx_vector_int32_create(&window);
-	zbx_vector_int32_reserve(&window, queries->values_num);
+	zbx_vector_int32_reserve(&window, (size_t)queries->values_num);
 
 	query = &queries->values[queries->values_num - 1];
 	ts_start = query->ts_end;

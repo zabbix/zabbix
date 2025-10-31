@@ -100,6 +100,7 @@
 #include "zbx_ha_constants.h"
 #include "zbxescalations.h"
 #include "zbxbincommon.h"
+#include "zbxcurl.h"
 
 #ifdef HAVE_LIBCURL
 #	include "zbxcurl.h"

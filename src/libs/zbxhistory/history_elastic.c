@@ -1293,7 +1293,7 @@ static void	history_elastic_get_value_type_data(zbx_history_elastic_data_t *d, z
 {
 	zbx_vector_history_provider_value_type_info_reserve(&info->value_types, ITEM_VALUE_TYPE_COUNT);
 
-	for (int i = 0; i < ITEM_VALUE_TYPE_BIN; i++)
+	for (unsigned char i = 0; i < ITEM_VALUE_TYPE_BIN; i++)
 	{
 		if (FAIL == ZBX_HISTORY_CHECK_TYPE_FLAGS(d->value_type_flags, i))
 			continue;
@@ -1440,10 +1440,10 @@ static void	*history_elastic_create_data(const zbx_history_option_t *options, in
 	zbx_rtrim(data->base_url, "/");
 
 	if (NULL != (value = history_option_value(options, options_num, HISTORY_PROVIDER_OPTION_DATE_INDEX)))
-		data->pipelines = atoi(value);
+		data->pipelines = (unsigned char)atoi(value);
 
 	if (NULL != (value = history_option_value(options, options_num, HISTORY_PROVIDER_OPTION_LOG_SLOW_QUERIES)))
-		data->log_slow_queries = atoi(value);
+		data->log_slow_queries = (unsigned char)atoi(value);
 
 	zbx_vector_elastic_conn_ptr_create(&data->conns);
 
