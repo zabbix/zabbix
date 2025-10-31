@@ -22,7 +22,7 @@
 window.mediatype_edit_popup = new class {
 
 	init({rules, clone_rules, mediatype, message_templates, smtp_server_default, smtp_email_default,
-			 oauth_defaults_by_provider}) {
+			oauth_defaults_by_provider}) {
 		this.overlay = overlays_stack.getById('mediatype.edit');
 		this.dialogue = this.overlay.$dialogue[0];
 		this.form_element = this.overlay.$dialogue.$body[0].querySelector('form');
