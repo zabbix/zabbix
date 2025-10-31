@@ -1,6 +1,8 @@
 Changes for 7.4.5
 
 Bug fixes:
+..F....... [ZBX-27153] fixed undefined index error in SVG graphs for Zabbix agent active items (gcalenko)
+...G...... [ZBX-27156] fix CPU spike in Zabbix agent 2 mysql plugin (esneiders)
 
 --------------------------------------------------------------------------------
 Changes for 7.4.4
@@ -1116,6 +1118,8 @@ A.F....... [ZBX-23227] fixed issue where using an empty array or string value fo
 Changes for 7.0.21
 
 Bug fixes:
+..F....... [ZBX-27153] fixed undefined index error in SVG graphs for Zabbix agent active items (gcalenko)
+...G...... [ZBX-27156] fix CPU spike in Zabbix agent 2 mysql plugin (esneiders)
 
 --------------------------------------------------------------------------------
 Changes for 7.0.20
