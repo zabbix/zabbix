@@ -86,7 +86,7 @@ This template has been tested on:
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|OpenAI Platform: [{#ID}]: Daily expenses exceeded|<p>The daily expense limit is higher than the maximum.</p>|`last(/OpenAI Platform by HTTP/openai.expenses.amount[{#ID}])>{$OPENAI.EXPENSES.MAX:"{#NAME}"}`|Warning|**Manual close**: Yes|
+|OpenAI Platform: [{#ID}]: Daily expenses exceeded|<p>The daily expense limit is higher than the maximum.</p>|`last(/OpenAI Platform by HTTP/openai.expenses.amount[{#ID}])>{$OPENAI.EXPENSES.MAX:"{#ID}"}`|Warning|**Manual close**: Yes|
 
 ### LLD rule [{#ID}]: Model discovery
 
