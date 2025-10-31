@@ -37,7 +37,7 @@ class testFormMapProperties extends CWebTest {
 		];
 	}
 
-	const MAP_UPDATE = 'Map for simple update and update test';
+	const MAP_SIMPLE_UPDATE = 'Map for simple update and update test';
 	const MAP_CLONE = 'Map for clone and delete test';
 	const CLONED_MAP = 'Cloned map';
 	const HASH_SQL = 'SELECT * FROM sysmaps ORDER BY sysmapid';
@@ -97,7 +97,7 @@ class testFormMapProperties extends CWebTest {
 				'label_type' => MAP_LABEL_TYPE_LABEL
 			],
 			[
-				'name' => self::MAP_UPDATE,
+				'name' => self::MAP_SIMPLE_UPDATE,
 				'width' => 10000,
 				'height' => 9000,
 				'iconmapid' => $mapping_ids[self::ICON_MAPPING],
@@ -336,7 +336,6 @@ class testFormMapProperties extends CWebTest {
 			'Map label type' => ['Label', 'Element name', 'Status only', 'Nothing', 'Custom label'],
 			'Image label type' => ['Label', 'Element name', 'Nothing', 'Custom label']
 		];
-
 		foreach ($dropdowns_advanced_labels as $field => $options) {
 			$this->assertEquals($options, $form->getField($field)->getOptions()->asText());
 		}
@@ -467,9 +466,9 @@ class testFormMapProperties extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'map_properties' => [
-						'Name' => self::MAP_UPDATE
+						'Name' => self::MAP_SIMPLE_UPDATE
 					],
-					'error_details' => 'Map "'.self::MAP_UPDATE.'" already exists.'
+					'error_details' => 'Map "'.self::MAP_SIMPLE_UPDATE.'" already exists.'
 				]
 			],
 			// #3 Missing mandatory parameter - Owner.
@@ -1009,9 +1008,8 @@ class testFormMapProperties extends CWebTest {
 				[
 					'expected' => TEST_GOOD,
 					'map_properties' => [
-						'Name' => 'Sysmap with multiple URLs'
+						'Name' => 'Sysmap with multiple URLs'.microtime()
 					],
-					'rename' => true,
 					'urls' => [
 						[
 							'action' => USER_ACTION_UPDATE,
@@ -1080,9 +1078,9 @@ class testFormMapProperties extends CWebTest {
 				[
 					'expected' => TEST_GOOD,
 					'sorting' => true,
-					'rename' => true,
+
 					'map_properties' => [
-						'Name' => 'URL sorting'
+						'Name' => 'URL sorting'.microtime()
 					],
 					'urls' => [
 						[
@@ -1170,7 +1168,6 @@ class testFormMapProperties extends CWebTest {
 	 * @dataProvider getMapCommonData
 	 * @dataProvider getMapUpdateData
 	 */
-
 	public function testFormMapProperties_Update($data) {
 		$this->checkSysmapForm($data, true);
 	}
@@ -1178,7 +1175,6 @@ class testFormMapProperties extends CWebTest {
 	/**
 	 * @dataProvider getMapCommonData
 	 */
-
 	public function testFormMapProperties_Create($data) {
 		$this->checkSysmapForm($data);
 	}
@@ -1187,7 +1183,7 @@ class testFormMapProperties extends CWebTest {
 		$old_hash = CDBHelper::getHash(self::HASH_SQL);
 		$this->page->login()->open('sysmaps.php')->waitUntilReady();
 		$table = $this->query('class:list-table')->asTable()->one();
-		$table->findRow('Name', self::MAP_UPDATE)->query('link:Properties')->one()->click();
+		$table->findRow('Name', self::MAP_SIMPLE_UPDATE)->query('link:Properties')->one()->click();
 		$form = $this->query('id:sysmap-form')->waitUntilPresent()->asForm()->one();
 		$form->submit()->waitUntilStalled();
 		$this->assertMessage(TEST_GOOD, 'Network map updated');
@@ -1202,7 +1198,7 @@ class testFormMapProperties extends CWebTest {
 					'expected' => TEST_GOOD,
 					'remove_urls' => true,
 					'map_properties' => [
-						'Name' => self::MAP_UPDATE
+						'Name' => self::MAP_SIMPLE_UPDATE
 					],
 					'urls' => [
 						[
@@ -1347,20 +1343,18 @@ class testFormMapProperties extends CWebTest {
 	 *
 	 * @param boolean $update	updating is performed
 	 */
-	public function checkSysmapForm($data, $update = false) {
-		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
+	protected function checkSysmapForm($data, $update = false) {
+		if ($data['expected'] === TEST_BAD) {
 			$old_hash = CDBHelper::getHash(self::HASH_SQL);
 		}
 
 		$this->page->login()->open('sysmaps.php')->waitUntilReady();
+		$table = $this->query('class:list-table')->asTable()->one();
 
 		if ($update) {
-			$table = $this->query('class:list-table')->asTable()->one();
-			if (array_key_exists('remove_urls', $data)) {
-				self::$map_update = self::MAP_UPDATE;
-			}
+			self::$map_update = (array_key_exists('remove_urls', $data)) ? self::MAP_SIMPLE_UPDATE : self::$map_update;
 			$table->findRow('Name', (array_key_exists('sorting', $data) ? self::MAP_URL_ADD : self::$map_update))
-				->query('link:Properties')->one()->click();
+					->query('link:Properties')->one()->click();
 		}
 		else {
 			$this->query('button:Create map')->one()->click();
@@ -1369,7 +1363,7 @@ class testFormMapProperties extends CWebTest {
 		$form = $this->query('id:sysmap-form')->waitUntilPresent()->asForm()->one();
 		$form->fill($data['map_properties']);
 
-		if(array_key_exists('urls', $data)) {
+		if (array_key_exists('urls', $data)) {
 			$form->query('class:table-forms-separator')->asMultifieldTable()->one()->fill($data['urls']);
 		}
 
@@ -1395,11 +1389,14 @@ class testFormMapProperties extends CWebTest {
 				$data = CTestArrayHelper::trim($data);
 			}
 
-			$table = $this->query('class:list-table')->asTable()->one();
 			$table->findRow('Name', $data['map_properties']['Name'])->query('link:Properties')->one()->click();
 			$saved_form = $this->query('id:sysmap-form')->waitUntilPresent()->asForm()->one();
 
 			$saved_form->checkValue($data['map_properties']);
+
+			if (array_key_exists('result_urls', $data)) {
+				$saved_form->checkValue($data['result_urls']);
+			}
 
 			// Check that unchanged fields are not affected.
 			if (!array_key_exists('sorting', $data) && !array_key_exists('remove_urls', $data)) {
@@ -1408,18 +1405,8 @@ class testFormMapProperties extends CWebTest {
 				);
 			}
 
-			if (array_key_exists('result_urls', $data)) {
-				$saved_form->checkValue($data['result_urls']);
-			}
-
-			// Rename map last update map to not interfere with Create tests.
-			if ($update && array_key_exists('rename', $data)) {
-				$saved_form->fill(['Name' => 'test'.$data['map_properties']['Name']]);
-			}
-
 			if ($update) {
 				self::$map_update = $saved_form->getField('Name')->getValue();
-				$saved_form->submit();
 			}
 		}
 	}
