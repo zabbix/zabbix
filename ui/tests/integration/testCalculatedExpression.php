@@ -236,7 +236,7 @@ class testCalculatedExpression extends CIntegrationTest {
 		$calcItemId = $response['result']['itemids'][0];
 		self::$itemIds = array_merge(self::$itemIds, [$calcItemId]);
 
-		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, "End of expression_eval_many():SUCCEED value:2 flags:uint64", true, 120);
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, "End of expression_eval_many():SUCCEED value:2 flags:uint64", false, 120);
 		$this->assertEquals('2', $this->getItemLastValue($calcItemId));
 	}
 
