@@ -389,7 +389,7 @@ static duk_ret_t	es_httprequest_query(duk_context *ctx, const char *http_request
 	{
 		ZBX_CURL_SETOPT(ctx, request->handle, CURLOPT_NOBODY, 1L, err);
 	}
-	else if (NULL != contents && 0 != contents_len)
+	else if (0 != contents_len)
 	{
 		ZBX_CURL_SETOPT(ctx, request->handle, CURLOPT_POSTFIELDS, contents, err);
 		ZBX_CURL_SETOPT(ctx, request->handle, CURLOPT_POSTFIELDSIZE, (long)contents_len, err);
