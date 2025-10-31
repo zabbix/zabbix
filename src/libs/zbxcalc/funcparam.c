@@ -177,7 +177,7 @@ out:
  ******************************************************************************/
 int	get_function_parameter_period(const char *parameters, int Nparam, zbx_history_range_t *range)
 {
-	char	*parameter;
+	char	*parameter = NULL;
 	int	ret = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() parameters:'%s' Nparam:%d", __func__, parameters, Nparam);

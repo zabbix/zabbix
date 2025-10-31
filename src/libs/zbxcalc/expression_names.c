@@ -68,6 +68,8 @@ const char	*zbx_type_string(zbx_value_type_t type)
 			return "sec";
 		case ZBX_VALUE_NVALUES:
 			return "num";
+		case ZBX_VALUE_NODATA:
+			return "nodata";
 		default:
 			THIS_SHOULD_NEVER_HAPPEN;
 			return "unknown";

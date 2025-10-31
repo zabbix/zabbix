@@ -1913,6 +1913,8 @@ static int	evaluate_NODATA(zbx_variant_t *value, const zbx_dc_evaluate_item_t *i
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
+	zbx_history_record_vector_create(&values);
+
 	if (2 < (num = zbx_function_param_parse_count(parameters)))
 	{
 		*error = zbx_strdup(*error, "invalid number of parameters");
@@ -1920,7 +1922,7 @@ static int	evaluate_NODATA(zbx_variant_t *value, const zbx_dc_evaluate_item_t *i
 	}
 
 	if (SUCCEED != get_function_parameter_period(parameters, 1, range) ||
-			ZBX_VALUE_SECONDS != range->type || 0 >= range->value)
+			(ZBX_VALUE_SECONDS != range->type && ZBX_VALUE_NODATA != range->type) || 0 >= range->value)
 	{
 		*error = zbx_strdup(*error, "invalid second parameter");
 		goto out;
@@ -1931,10 +1933,8 @@ static int	evaluate_NODATA(zbx_variant_t *value, const zbx_dc_evaluate_item_t *i
 	if (NULL == value)
 	{
 		ret = SUCCEED;
-		goto ret;
+		goto out;
 	}
-
-	zbx_history_record_vector_create(&values);
 
 	if (1 < num && (SUCCEED != get_function_parameter_str(parameters, 2, &arg2) ||
 			('\0' != *arg2 && 0 != (lazy = strcmp("strict", arg2)))))
@@ -2003,7 +2003,7 @@ static int	evaluate_NODATA(zbx_variant_t *value, const zbx_dc_evaluate_item_t *i
 out:
 	zbx_history_record_vector_destroy(&values, item->value_type);
 	zbx_free(arg2);
-ret:
+
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;

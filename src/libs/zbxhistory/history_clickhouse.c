@@ -937,6 +937,7 @@ static const char	*history_clickhouse_parse_value(const struct zbx_json_parse *j
 	if (NULL == (p = zbx_json_next_value_dyn(jp, p, &buf, &buf_alloc, NULL)))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot parse value from row \"%s\"", jp->start);
+		zbx_free(buf);
 		return NULL;
 	}
 
