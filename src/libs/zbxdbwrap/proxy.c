@@ -1212,8 +1212,8 @@ static int	proxy_item_validator(zbx_history_recv_item_t *item, zbx_socket_t *soc
  *   mode           - [IN]  item retrieve mode is used to retrieve            *
  *                          only necessary data to reduce time spent          *
  *                          holding read lock                                 *
- *   program_type   - [IN]  program type                                      *
- *                          (ZBX_PROGRAM_TYPE_PROXY/ZBX_PROGRAM_TYPE_AGENT)   *
+ *   source         - [IN]  string indicating data source                     *
+ *                          ("proxy"/"agent")                                 *
  *                                                                            *
  * Return value:  SUCCEED - processed successfully                            *
  *                FAIL    - an error occurred                                 *
@@ -1224,7 +1224,7 @@ static int	proxy_item_validator(zbx_history_recv_item_t *item, zbx_socket_t *soc
  ******************************************************************************/
 static int	process_history_data_by_itemids(zbx_socket_t *sock, zbx_client_item_validator_t validator_func,
 		void *validator_args, struct zbx_json_parse *jp_data, zbx_session_t *session,
-		zbx_proxy_suppress_t *nodata_win, char **info, unsigned int mode, int program_type)
+		zbx_proxy_suppress_t *nodata_win, char **info, unsigned int mode, const char *source)
 {
 	const char		*pnext = NULL;
 	int			ret = SUCCEED, processed_num = 0, total_num = 0, values_num, read_num, i, *errcodes;
@@ -1293,8 +1293,7 @@ static int	process_history_data_by_itemids(zbx_socket_t *sock, zbx_client_item_v
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "received value identifier " ZBX_FS_UI64 " from %s "
 					ZBX_FS_UI64 " is lower than the last processed value identifier " ZBX_FS_UI64,
-					last_valueid, (program_type & ZBX_PROGRAM_TYPE_PROXY) ? "proxy" : "host",
-					session->hostid, session->last_id);
+					last_valueid, source, session->hostid, session->last_id);
 		}
 		else
 			session->last_id = last_valueid;
@@ -1729,7 +1728,7 @@ int	zbx_process_agent_history_data(zbx_socket_t *sock, struct zbx_json_parse *jp
 			session = zbx_dc_get_or_create_session(hostid, token, ZBX_SESSION_TYPE_DATA);
 
 		ret = process_history_data_by_itemids(sock, agent_item_validator, &rights, &jp_data, session, NULL,
-				info, ZBX_ITEM_GET_DEFAULT, ZBX_PROGRAM_TYPE_SERVER);
+				info, ZBX_ITEM_GET_DEFAULT, "agent");
 	}
 	else
 	{
@@ -2627,7 +2626,7 @@ int	zbx_process_proxy_data(const zbx_dc_proxy_t *proxy, const struct zbx_json_pa
 
 		if (SUCCEED != (ret = process_history_data_by_itemids(NULL, proxy_item_validator,
 				(void *)&proxy->proxyid, &jp_data, session, &proxy_diff.nodata_win, &error_step,
-				ZBX_ITEM_GET_PROCESS, ZBX_PROGRAM_TYPE_PROXY)))
+				ZBX_ITEM_GET_PROCESS, "proxy")))
 		{
 			zbx_strcatnl_alloc(error, &error_alloc, &error_offset, error_step);
 		}
