@@ -19,7 +19,7 @@ require_once __DIR__.'/../../include/helpers/CDataHelper.php';
 require_once __DIR__.'/../common/testWidgets.php';
 
 /**
- * @backup hosts, hosts_groups, hosts_templates, users, dashboard_user, users_groups, dashboard
+ * @backup hosts, hosts_groups, hosts_templates, users, dashboard_user, users_groups, usrgrp, dashboard, dashboard_usrgrp
  *
  * @onBefore prepareTestData
  */
@@ -502,7 +502,7 @@ class testDashboardsUserPermissions extends CWebTest {
 	}
 
 	/**
-	 * Verify user access to the dashboard through Sharing.
+	 * Verify user access to the dashboard through sharing.
 	 *
 	 * @dataProvider sharingPermissions
 	 */
@@ -510,10 +510,10 @@ class testDashboardsUserPermissions extends CWebTest {
 		// Reuse and update the existing user to prevent creating 10+ separate test users during test preparation.
 		$this->updateUser($data['user_role'], $data['user_group']);
 
-		// Update dashboard permissions.
+		// Update dashboard access settings.
 		$this->updateDashboardAccess($data['permissions'], $data['dashboard_group']);
 
-		// Login under updated user and open inherited dashboard.
+		// Login under updated user and open private dashboard.
 		$this->page->userLogin(self::USERNAME, self::PASSWORD);
 		$this->page->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid)->waitUntilReady();
 
@@ -537,7 +537,7 @@ class testDashboardsUserPermissions extends CWebTest {
 	}
 
 	/**
-	 * Change dashboard permissions using API request.
+	 * Change dashboard sharing access via API.
 	 *
 	 * @param integer $permissions      read or write
 	 * @param integer $group            user group ID
@@ -557,10 +557,10 @@ class testDashboardsUserPermissions extends CWebTest {
 	}
 
 	/**
-	 * Change user role and group via API request for existing user.
+	 * Change user role and user group request for existing user via API.
 	 *
-	 * @param string  $group             user group name
-	 * @param integer $password          user role ID
+	 * @param integer	$role		user role ID
+	 * @param string	$group		user group name
 	 */
 	public static function updateUser($role, $group = 'Read/Write access to template and host') {
 		CDataHelper::call('user.update', [
@@ -582,6 +582,7 @@ class testDashboardsUserPermissions extends CWebTest {
 	public static function addClockWidget($source = 'template') {
 		$dashboard = CDashboardElement::find()->one()->waitUntilVisible();
 
+		// Edit button is clicked only when flag is Global; Template opens in edit mode by default.
 		if ($source === 'global'){
 			$dashboard->edit()->addWidget()->asForm();
 		}
