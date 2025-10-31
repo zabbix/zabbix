@@ -107,18 +107,19 @@
 	)
 
 #define zbx_deserialize_vector_uint64(buffer, vector_uint64, value_len)					\
-	({												\
-		memcpy(&(value_len), (buffer), sizeof(zbx_uint32_t));					\
-		if (value_len > 0)									\
-		{											\
-			int	num = (int)((value_len) / sizeof(zbx_uint64_t));			\
-			zbx_vector_uint64_reserve((vector_uint64), (vector_uint64)->values_num + num);	\
+	(												\
+		memcpy(&(value_len), (buffer), sizeof(zbx_uint32_t)),					\
+		0 < value_len ? (									\
+			zbx_vector_uint64_reserve((vector_uint64),					\
+				(size_t)(vector_uint64)->values_num +					\
+				(value_len) / sizeof(zbx_uint64_t)),					\
 			memcpy((vector_uint64)->values + (vector_uint64)->values_num,			\
-				((buffer) + sizeof(zbx_uint32_t)), (value_len));			\
-				(vector_uint64)->values_num += num;					\
-		}											\
-		(value_len) + sizeof(zbx_uint32_t);							\
-	})
+			((buffer) + sizeof(zbx_uint32_t)), (value_len)),				\
+			(vector_uint64)->values_num += (int)((value_len) / sizeof(zbx_uint64_t)),	\
+			(value_len) + sizeof(zbx_uint32_t)						\
+		) :											\
+		(value_len) + sizeof(zbx_uint32_t)							\
+	)
 
 #define zbx_deserialize_value(buffer, value) \
 	(memcpy(value, buffer, sizeof(*value)), sizeof(*value))
