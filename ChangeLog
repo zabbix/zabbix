@@ -43,6 +43,13 @@ Bug fixes:
 .......PS. [ZBX-25752] reduced memory allocations in preprocessing manager (wiper)
 
 --------------------------------------------------------------------------------
+Changes for 7.4.5rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
 Changes for 7.4.4
 
 7.4.4rc1 was released as 7.4.4 without any changes
