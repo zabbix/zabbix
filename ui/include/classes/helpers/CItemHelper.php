@@ -269,30 +269,6 @@ class CItemHelper extends CItemGeneralHelper {
 	}
 
 	/**
-	 * Get aggregated value using the aggregation function
-	 *
-	 * @param array  $values    Item values
-	 * @param int    $function  Aggregation function
-	 *
-	 * @return float|int|null
-	 */
-	public static function getAggregatedValue(array $values, int $function): float|int|null {
-		$values = array_filter($values);
-		if (!$values) {
-			return null;
-		}
-
-		return match ($function) {
-			AGGREGATE_MIN => min($values),
-			AGGREGATE_MAX => max($values),
-			AGGREGATE_AVG => array_sum($values) / count($values),
-			AGGREGATE_COUNT => count($values),
-			AGGREGATE_SUM => array_sum($values),
-			default => 0
-		};
-	}
-
-	/**
 	 * Resolve string representation of the aggregate function into AGGREGATE_* constant.
 	 *
 	 * @param string $name

@@ -17,10 +17,13 @@
 namespace Widgets\TopItems\Actions;
 
 use API,
+	CAggFunctionData,
+	CAggHelper,
 	CArrayHelper,
 	CControllerDashboardWidgetView,
 	CControllerResponseData,
 	CItemHelper,
+	CMathHelper,
 	CNumberParser,
 	CSettingsHelper,
 	CWidgetsData,
@@ -94,9 +97,20 @@ class WidgetView extends CControllerDashboardWidgetView {
 			// Each column has different aggregation function and time period.
 			$db_values = self::getItemValues($db_column_items, $column);
 
-			if ($column['aggregate_grouping'] === Widget::TOP_ITEMS_AGGREGATE_COMBINED
-					&& $column['combined_aggregate_function'] !== AGGREGATE_NONE) {
-				[$db_column_items, $db_values] = self::getCombinedItemValues($db_column_items, $db_values, $column);
+			if ($column['aggregate_columns'] && $column['column_aggregate_function'] != AGGREGATE_NONE) {
+				if (CAggFunctionData::requiresNumericItem($column['column_aggregate_function'])) {
+					foreach ($db_column_items as $item) {
+						if (!in_array($item['value_type'], [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64])) {
+							return [
+								'error' => _('No data found')
+							];
+						}
+					}
+				}
+
+				[$db_column_items, $db_values] = self::getCombinedItemValues($db_column_items, $db_values,
+					$column['column_aggregate_function'], $column['combined_column_name']
+				);
 			}
 
 			if ($column['display'] == CWidgetFieldColumnsList::DISPLAY_SPARKLINE) {
@@ -347,32 +361,75 @@ class WidgetView extends CControllerDashboardWidgetView {
 		return $result;
 	}
 
-	private static function getCombinedItemValues(array $db_column_items, array $db_values, array $column): array {
-		if (!$db_column_items || !$db_values) {
-			return [$db_column_items, $db_values];
+	private static function getCombinedItemValues(array $db_column_items, array $db_values, int $function,
+			string $column_name): array {
+		$grouped_values = [];
+
+		foreach ($db_column_items as $itemid => $item) {
+			$grouped_values[$item['hostid']][$itemid] = $db_values[$itemid] ?? null;
 		}
 
-		$host_itemids = $host_values = [];
+		foreach ($grouped_values as $values) {
+			$itemids = array_keys($values);
 
-		foreach ($db_column_items as $itemid => $db_column_item) {
-			$hostid = $db_column_item['hostid'];
-
-			$host_itemids[$hostid][] = $itemid;
-			$host_values[$hostid][] = $db_values[$itemid] ?? null;
-		}
-
-		foreach ($host_values as $hostid => $values) {
-			$itemid = array_shift($host_itemids[$hostid]);
-
-			foreach ($host_itemids[$hostid] as $host_itemid) {
-				unset($db_column_items[$host_itemid], $db_values[$host_itemid]);
+			foreach (array_splice($itemids, 1) as $itemid) {
+				unset($db_column_items[$itemid], $db_values[$itemid]);
 			}
 
-			$db_values[$itemid] = CItemHelper::getAggregatedValue($values,
-				$column['combined_aggregate_function']
+			$values = array_filter($values);
+			$itemid = array_shift($itemids);
+
+			$item = $db_column_items[$itemid];
+
+			if (!CAggFunctionData::preservesUnits($function)) {
+				$item['units'] = '';
+			}
+
+			if (!CAggFunctionData::preservesValueMapping($function)) {
+				$item['valuemap'] = [];
+			}
+
+			$item['name'] = $column_name;
+
+			$values = array_map(
+				fn ($value) => CAggHelper::formatValue($value, $item['value_type'], $function,
+					$item['units'] == 'unixtime' ? '' : $item['units']
+				),
+				$values
 			);
 
-			$db_column_items[$itemid]['name'] = $column['combined_column_name'];
+			$combined_value = [
+				'value' => $function == AGGREGATE_COUNT ? 0 : null,
+				'units' => ''
+			];
+
+			if ($values) {
+				$value = reset($values);
+				$units = $value['units'];
+				$values = array_column($values, 'value');
+
+				$value = match ($function) {
+					AGGREGATE_MIN =>	min($values),
+					AGGREGATE_MAX =>	max($values),
+					AGGREGATE_AVG =>	CMathHelper::safeAvg($values),
+					AGGREGATE_COUNT =>	count($values),
+					AGGREGATE_SUM =>	CMathHelper::safeSum($values),
+					default =>			0
+				};
+
+				$combined_value = CAggHelper::formatValue($value, $item['value_type'], $function, $units,
+					['valuemap' => $item['valuemap']]
+				);
+
+				$item['units'] = $combined_value['units'] != '' ? ' '.$combined_value['units'] : '';
+			}
+
+			if ($combined_value['value']) {
+				$combined_value['value'] .= $item['units'];
+			}
+
+			$db_column_items[$itemid] = $item;
+			$db_values[$itemid] = $combined_value['value'];
 		}
 
 		return [$db_column_items, $db_values];

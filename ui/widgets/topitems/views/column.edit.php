@@ -237,7 +237,7 @@ $advanced_configuration->addItem([
 
 // Aggregation function.
 $advanced_configuration->addItem([
-	new CLabel(_('Item aggregation function'), 'column_aggregate_function'),
+	new CLabel(_('Aggregation function'), 'aggregate_function'),
 	new CFormField([
 		(new CSelect('aggregate_function'))
 			->setId('aggregate_function')
@@ -252,9 +252,9 @@ $advanced_configuration->addItem([
 				AGGREGATE_FIRST => CItemHelper::getAggregateFunctionName(AGGREGATE_FIRST),
 				AGGREGATE_LAST => CItemHelper::getAggregateFunctionName(AGGREGATE_LAST)
 			]))
-			->setFocusableElementId('column_aggregate_function'),
+			->setFocusableElementId('aggregate_function'),
 		(makeWarningIcon(_('Item aggregation function does not affect the sparkline.')))
-			->addClass('js-item-aggregate-function-warning')
+			->addClass('js-aggregate-function-warning')
 	])
 ]);
 
@@ -280,30 +280,23 @@ $advanced_configuration->addItem(new CScriptTag([
 
 // Aggregate.
 $advanced_configuration->addItem([
-	(new CLabel([
-		_('Aggregate'),
-		makeHelpIcon(new CDiv([
-			new CDiv(_('Each item - aggregates values for each item, with each result presented in a separate cell.')),
-			new CDiv(_('Combined - aggregates values for each item, then aggregates the results in a single value presented in a single cell.'))
-		]))
-	], 'aggregate_grouping'))->addClass('js-aggregate-grouping-row'),
+	(new CLabel(_('Aggregate columns'), 'aggregate_columns'))
+		->addClass('js-aggregate-grouping-row'),
 	(new CFormField(
-		(new CRadioButtonList('aggregate_grouping', (int) $data['aggregate_grouping']))
-			->addValue(_('Each item'), Widget::TOP_ITEMS_AGGREGATE_BY_ITEM)
-			->addValue(_('Combined'), Widget::TOP_ITEMS_AGGREGATE_COMBINED)
-			->setModern()
+		(new CCheckBox('aggregate_columns'))
+			->setChecked((bool) $data['aggregate_columns'])
 	))->addClass('js-aggregate-grouping-row')
 ]);
 
-// Combined aggregation function.
+// Column aggregation function.
 $advanced_configuration->addItem([
-	(new CLabel(_('Combined aggregation function'), 'combined_aggregate_function'))
+	(new CLabel(_('Column aggregation function'), 'column_aggregate_function'))
 		->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK)
 		->addClass('js-combined-row'),
 	(new CFormField(
-		(new CSelect('combined_aggregate_function'))
-			->setId('combined_aggregate_function')
-			->setValue($data['combined_aggregate_function'])
+		(new CSelect('column_aggregate_function'))
+			->setId('column_aggregate_function')
+			->setValue($data['column_aggregate_function'])
 			->addOptions(CSelect::createOptionsFromArray([
 				AGGREGATE_MIN => CItemHelper::getAggregateFunctionName(AGGREGATE_MIN),
 				AGGREGATE_MAX => CItemHelper::getAggregateFunctionName(AGGREGATE_MAX),
@@ -311,7 +304,7 @@ $advanced_configuration->addItem([
 				AGGREGATE_COUNT => CItemHelper::getAggregateFunctionName(AGGREGATE_COUNT),
 				AGGREGATE_SUM => CItemHelper::getAggregateFunctionName(AGGREGATE_SUM)
 			]))
-			->setFocusableElementId('combined_aggregate_function')
+			->setFocusableElementId('column_aggregate_function')
 	))->addClass('js-combined-row')
 ]);
 

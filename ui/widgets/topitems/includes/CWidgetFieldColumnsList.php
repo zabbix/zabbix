@@ -170,8 +170,8 @@ class CWidgetFieldColumnsList extends CWidgetField {
 			'decimal_places' => ZBX_WIDGET_FIELD_TYPE_INT32,
 			'aggregate_function' => ZBX_WIDGET_FIELD_TYPE_INT32,
 			'history' => ZBX_WIDGET_FIELD_TYPE_INT32,
-			'aggregate_grouping' => ZBX_WIDGET_FIELD_TYPE_INT32,
-			'combined_aggregate_function' => ZBX_WIDGET_FIELD_TYPE_INT32,
+			'aggregate_columns' => ZBX_WIDGET_FIELD_TYPE_INT32,
+			'column_aggregate_function' => ZBX_WIDGET_FIELD_TYPE_INT32,
 			'combined_column_name' => ZBX_WIDGET_FIELD_TYPE_STR
 		];
 
@@ -194,8 +194,8 @@ class CWidgetFieldColumnsList extends CWidgetField {
 				)
 			],
 			'history' => CWidgetFieldColumnsList::HISTORY_DATA_AUTO,
-			'aggregate_grouping' => Widget::TOP_ITEMS_AGGREGATE_BY_ITEM,
-			'combined_aggregate_function' => AGGREGATE_SUM,
+			'aggregate_columns' => 0,
+			'column_aggregate_function' => AGGREGATE_SUM,
 			'combined_column_name' => ''
 		];
 
@@ -316,15 +316,15 @@ class CWidgetFieldColumnsList extends CWidgetField {
 				'color'							=> ['type' => API_COLOR, 'flags' => API_REQUIRED | API_NOT_EMPTY],
 				'threshold'						=> ['type' => API_NUMERIC]
 			]],
-			'aggregate_grouping'			=> ['type' => API_INT32, 'in' => implode(',', [Widget::TOP_ITEMS_AGGREGATE_BY_ITEM, Widget::TOP_ITEMS_AGGREGATE_COMBINED]), 'default' => Widget::TOP_ITEMS_AGGREGATE_BY_ITEM],
-			'combined_aggregate_function'	=> ['type' => API_MULTIPLE, 'rules' => [
-													['if' => ['field' => 'aggregate_grouping', 'type' => API_INT32, 'in' => Widget::TOP_ITEMS_AGGREGATE_COMBINED, 'default' => Widget::TOP_ITEMS_AGGREGATE_BY_ITEM],
+			'aggregate_columns'				=> ['type' => API_INT32, 'default' => 0],
+			'column_aggregate_function'		=> ['type' => API_MULTIPLE, 'rules' => [
+													['if' => ['field' => 'aggregate_columns', 'in' => 1],
 														'type' => API_INT32, 'in' => implode(',', [AGGREGATE_NONE, AGGREGATE_MIN, AGGREGATE_MAX, AGGREGATE_AVG, AGGREGATE_COUNT, AGGREGATE_SUM]), 'default' => AGGREGATE_SUM, 'flags' => API_REQUIRED | API_NOT_EMPTY],
 													['else' => AGGREGATE_NONE,
 														'type' => API_INT32]
 			]],
 			'combined_column_name'			=> ['type' => API_MULTIPLE, 'rules' => [
-													['if' => ['field' => 'aggregate_grouping', 'type' => API_INT32, 'in' => Widget::TOP_ITEMS_AGGREGATE_COMBINED, 'default' => Widget::TOP_ITEMS_AGGREGATE_BY_ITEM],
+													['if' => ['field' => 'aggregate_columns', 'in' => 1],
 														'type' => API_STRING_UTF8, 'default' => '', 'flags' => API_REQUIRED | API_NOT_EMPTY],
 													['else' => '',
 														'type' => API_STRING_UTF8]

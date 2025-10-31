@@ -56,7 +56,7 @@ window.topitems_column_edit_form = new class {
 
 		this.#form
 			.querySelectorAll(
-				'[name="display_value_as"], [name="aggregate_function"], [name="display"], [name="history"], [name="aggregate_grouping"]'
+				'[name="display_value_as"], [name="aggregate_function"], [name="display"], [name="history"], [name="aggregate_columns"]'
 			)
 			.forEach(element => {
 				element.addEventListener('change', () => this.#updateForm());
@@ -140,23 +140,22 @@ window.topitems_column_edit_form = new class {
 	 * Updates widget column configuration form field visibility, enable/disable state and available options.
 	 */
 	#updateForm() {
-		const display_value_as = parseInt(this.#form.querySelector('[name="display_value_as"]:checked').value);
-		const display_value_as_numeric = display_value_as === <?= CWidgetFieldColumnsList::DISPLAY_VALUE_AS_NUMERIC ?>;
-		const display = parseInt(this.#form.querySelector('[name="display"]:checked').value);
-		const aggregate_grouping = parseInt(this.#form.querySelector('[name="aggregate_grouping"]:checked').value);
-		const item_aggregate_function = parseInt(this.#form.querySelector('[name="aggregate_function"]').value);
+		const display_value_as = this.#form.querySelector('[name="display_value_as"]:checked').value;
+		const display = this.#form.querySelector('[name="display"]:checked').value;
 
 		// Display.
+		const display_show = display_value_as == <?= CWidgetFieldColumnsList::DISPLAY_VALUE_AS_NUMERIC ?>;
 		for (const element of this.#form.querySelectorAll('.js-display-row')) {
-			element.style.display = display_value_as_numeric ? '' : 'none';
+			element.style.display = display_show ? '' : 'none';
 
 			for (const input of element.querySelectorAll('input')) {
-				input.disabled = !display_value_as_numeric;
+				input.disabled = !display_show;
 			}
 		}
 
 		// Sparkline.
-		const sparkline_show = display_value_as_numeric && display === <?= CWidgetFieldColumnsList::DISPLAY_SPARKLINE ?>;
+		const sparkline_show = display_value_as == <?= CWidgetFieldColumnsList::DISPLAY_VALUE_AS_NUMERIC ?>
+			&& display == <?= CWidgetFieldColumnsList::DISPLAY_SPARKLINE ?>;
 
 		for (const element of this.#form.querySelectorAll('.js-sparkline-row')) {
 			element.style.display = sparkline_show ? '' : 'none';
@@ -168,9 +167,9 @@ window.topitems_column_edit_form = new class {
 		this.#form.fields['sparkline[time_period]'].disabled = !sparkline_show;
 
 		// Min/Max.
-		const min_max_show = display_value_as_numeric && [
-			<?= CWidgetFieldColumnsList::DISPLAY_BAR ?>,
-			<?= CWidgetFieldColumnsList::DISPLAY_INDICATORS ?>
+		const min_max_show = display_value_as == <?= CWidgetFieldColumnsList::DISPLAY_VALUE_AS_NUMERIC ?> && [
+			'<?= CWidgetFieldColumnsList::DISPLAY_BAR ?>',
+			'<?= CWidgetFieldColumnsList::DISPLAY_INDICATORS ?>'
 		].includes(display);
 
 		for (const element of this.#form.querySelectorAll('.js-min-max-row')) {
@@ -182,40 +181,45 @@ window.topitems_column_edit_form = new class {
 		}
 
 		// Highlights.
+		const highlights_show = display_value_as == <?= CWidgetFieldColumnsList::DISPLAY_VALUE_AS_TEXT ?>;
 		for (const element of this.#form.querySelectorAll('.js-highlights-row')) {
-			element.style.display = !display_value_as_numeric ? '' : 'none';
+			element.style.display = highlights_show ? '' : 'none';
 
 			for (const input of element.querySelectorAll('input')) {
-				input.disabled = display_value_as_numeric;
+				input.disabled = !highlights_show;
 			}
 		}
 
 		// Thresholds.
+		const thresholds_show = display_value_as == <?= CWidgetFieldColumnsList::DISPLAY_VALUE_AS_NUMERIC ?>;
 		for (const element of this.#form.querySelectorAll('.js-thresholds-row')) {
-			element.style.display = display_value_as_numeric ? '' : 'none';
+			element.style.display = thresholds_show ? '' : 'none';
 
 			for (const input of element.querySelectorAll('input')) {
-				input.disabled = !display_value_as_numeric;
+				input.disabled = !thresholds_show;
 			}
 		}
 
 		// Decimal places.
+		const decimals_show = display_value_as == <?= CWidgetFieldColumnsList::DISPLAY_VALUE_AS_NUMERIC ?>;
 		for (const element of this.#form.querySelectorAll('.js-decimals-row')) {
-			element.style.display = display_value_as_numeric ? '' : 'none';
+			element.style.display = decimals_show ? '' : 'none';
 
 			for (const input of element.querySelectorAll('input')) {
-				input.disabled = !display_value_as_numeric;
+				input.disabled = !decimals_show;
 			}
 		}
 
 		// Aggregation function.
 		const aggregation_function_select = this.#form.querySelector('z-select[name=aggregate_function]');
-
 		[<?= AGGREGATE_MIN ?>, <?= AGGREGATE_MAX ?>, <?= AGGREGATE_AVG ?>, <?= AGGREGATE_SUM ?>].forEach(option => {
-			aggregation_function_select.getOptionByValue(option).disabled = !display_value_as_numeric;
-			aggregation_function_select.getOptionByValue(option).hidden = !display_value_as_numeric;
+			aggregation_function_select.getOptionByValue(option).disabled =
+				display_value_as != <?= CWidgetFieldColumnsList::DISPLAY_VALUE_AS_NUMERIC ?>;
+			aggregation_function_select.getOptionByValue(option).hidden =
+				display_value_as != <?= CWidgetFieldColumnsList::DISPLAY_VALUE_AS_NUMERIC ?>;
 
-			if (aggregation_function_select.value == option && !display_value_as_numeric) {
+			if (aggregation_function_select.value == option
+					&& display_value_as != <?= CWidgetFieldColumnsList::DISPLAY_VALUE_AS_NUMERIC ?>) {
 				aggregation_function_select.value = <?= AGGREGATE_NONE ?>;
 			}
 		});
@@ -226,7 +230,7 @@ window.topitems_column_edit_form = new class {
 		this.#form.fields.time_period.hidden = !time_period_show;
 
 		// History data.
-		const history_show = display_value_as_numeric;
+		const history_show = display_value_as == <?= CWidgetFieldColumnsList::DISPLAY_VALUE_AS_NUMERIC ?>;
 		for (const element of this.#form.querySelectorAll('.js-history-row')) {
 			element.style.display = history_show ? '' : 'none';
 
@@ -236,20 +240,9 @@ window.topitems_column_edit_form = new class {
 		}
 
 		// Combined fields.
-		const display_sparkline = display === <?= CWidgetFieldColumnsList::DISPLAY_SPARKLINE ?>;
-		const aggregate_grouping_show = (item_aggregate_function === <?= AGGREGATE_COUNT ?> ||
-			(display_value_as_numeric && item_aggregate_function !== <?= AGGREGATE_NONE ?>)) && !display_sparkline;
-
-		for (const element of this.#form.querySelectorAll('.js-aggregate-grouping-row')) {
-			element.style.display = aggregate_grouping_show ? '' : 'none';
-
-			for (const input of element.querySelectorAll('input')) {
-				input.disabled = !aggregate_grouping_show;
-			}
-		}
-
-		const combined_fields_show = aggregate_grouping_show &&
-			aggregate_grouping === <?= Widget::TOP_ITEMS_AGGREGATE_COMBINED ?> && !display_sparkline;
+		const display_sparkline = display == <?= CWidgetFieldColumnsList::DISPLAY_SPARKLINE ?>;
+		const aggregate_columns = document.querySelector('[name="aggregate_columns"]').checked;
+		const combined_fields_show = aggregate_columns && !display_sparkline;
 
 		for (const element of this.#form.querySelectorAll('.js-combined-row')) {
 			element.style.display = combined_fields_show ? '' : 'none';
@@ -259,12 +252,13 @@ window.topitems_column_edit_form = new class {
 			}
 		}
 
-		const item_aggregate_function_warning = this.#form.querySelector('.js-item-aggregate-function-warning');
-		if (item_aggregate_function_warning) {
-			const warning_show = display_value_as_numeric
-				&& item_aggregate_function !== <?= AGGREGATE_NONE ?> && display_sparkline;
+		const aggregate_function_warning = this.#form.querySelector('.js-aggregate-function-warning');
+		if (aggregate_function_warning != null) {
+			const warning_show = display_value_as == <?= CWidgetFieldColumnsList::DISPLAY_VALUE_AS_NUMERIC ?>
+				&& parseInt(document.getElementById('aggregate_function').value) != <?= AGGREGATE_NONE ?>
+				&& display_sparkline;
 
-			item_aggregate_function_warning.style.display = warning_show ? '' : 'none';
+			aggregate_function_warning.style.display = warning_show ? '' : 'none';
 		}
 	}
 

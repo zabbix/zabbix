@@ -41,27 +41,27 @@ class ColumnEdit extends CController {
 	protected function checkInput(): bool {
 		// Validation is done by CWidgetFieldColumnsList
 		$fields = [
-			'items' =>					     'array',
-			'item_tags_evaltype' =>		     'int32',
-			'item_tags' =>				     'array',
-			'base_color' =>				     'string',
-			'display_value_as' =>		     'int32',
-			'display' =>				     'int32',
-			'sparkline' =>				     'array',
-			'min' =>					     'string',
-			'max' =>					     'string',
-			'thresholds' =>				     'array',
-			'highlights' =>				     'array',
-			'decimal_places' =>			     'string',
-			'aggregate_function' =>		     'int32',
-			'time_period' =>			     'array',
-			'history' =>				     'int32',
-			'aggregate_grouping' =>          'int32',
-			'combined_aggregate_function' => 'int32',
-			'combined_column_name' =>        'string',
-			'edit' =>					     'in 1',
-			'update' =>					     'in 1',
-			'templateid' =>				     'string'
+			'items' =>						'array',
+			'item_tags_evaltype' =>			'int32',
+			'item_tags' =>					'array',
+			'base_color' =>					'string',
+			'display_value_as' =>			'int32',
+			'display' =>					'int32',
+			'sparkline' =>					'array',
+			'min' =>						'string',
+			'max' =>						'string',
+			'thresholds' =>					'array',
+			'highlights' =>					'array',
+			'decimal_places' =>				'string',
+			'aggregate_function' =>			'int32',
+			'time_period' =>				'array',
+			'history' =>					'int32',
+			'aggregate_columns' =>			'int32',
+			'column_aggregate_function' =>	'int32',
+			'combined_column_name' =>		'string',
+			'edit' =>						'in 1',
+			'update' =>						'in 1',
+			'templateid' =>					'string'
 		];
 
 		$ret = $this->validateInput($fields) && $this->validateFields();
@@ -211,8 +211,8 @@ class ColumnEdit extends CController {
 					)
 				],
 				'history' => CWidgetFieldColumnsList::HISTORY_DATA_AUTO,
-				'aggregate_grouping' => Widget::TOP_ITEMS_AGGREGATE_BY_ITEM,
-				'combined_aggregate_function' => AGGREGATE_SUM,
+				'aggregate_columns' => 0,
+				'column_aggregate_function' => AGGREGATE_SUM,
 				'combined_column_name' => ''
 			];
 		}
