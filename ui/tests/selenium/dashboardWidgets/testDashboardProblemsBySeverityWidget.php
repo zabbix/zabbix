@@ -13,6 +13,7 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
+
 require_once __DIR__.'/../../include/CWebTest.php';
 require_once __DIR__.'/../behaviors/CTagBehavior.php';
 require_once __DIR__.'/../../include/helpers/CDataHelper.php';
@@ -21,8 +22,10 @@ require_once __DIR__.'/../../include/helpers/CDataHelper.php';
  * @backup widget, profiles
  *
  * @dataSource UserPermissions
+ *
+ * @onBefore prepareData
  */
-class testDashboardProblemsBySeverityWidget extends CWebTest {
+class testDashboardProblemsBySeverityWidget extends testWidgets {
 
 	/**
 	 * Attach TagBehavior to the test.
@@ -36,24 +39,129 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 		];
 	}
 
+	const DEFAULT_DASHBOARD = 'Dashboard for Problems by severity';
+
 	/**
-	 * Id of the dashboard that is created within this test specifically for the update scenario.
-	 *
-	 * @var integer
+	 * ID of the dashboard that is created within this test specifically for the update scenario.
 	 */
 	protected static $dashboardid;
 
-	/*
-	 * SQL query to get widget and widget_field tables to compare hash values, but without widget_fieldid
-	 * because it can change.
-	 */
-	private $sql = 'SELECT wf.widgetid, wf.type, wf.name, wf.value_int, wf.value_str, wf.value_groupid, wf.value_hostid,'.
-		' wf.value_itemid, wf.value_graphid, wf.value_sysmapid, w.widgetid, w.dashboard_pageid, w.type, w.name, w.x, w.y,'.
-		' w.width, w.height'.
-		' FROM widget_field wf'.
-		' INNER JOIN widget w'.
-		' ON w.widgetid=wf.widgetid ORDER BY wf.widgetid, wf.name, wf.value_int, wf.value_str, wf.value_groupid, wf.value_hostid,'.
-		' wf.value_itemid, wf.value_graphid';
+	public static function prepareData() {
+		// Form an array with configuration of widgets with "Show" = "Host groups".
+		$widgets = [];
+		$id = 1;
+		for ($y = 0; $y <= 39; $y += 3) {
+			for ($x = 0; $x <= 36; $x += 36) {
+				$widgets[] = [
+					'type' => 'problemsbysv',
+					'name' => 'Reference widget '.$id,
+					'x' => $x,
+					'y' => $y,
+					'width' => 36,
+					'height' => 3,
+					'view_mode' => 0
+				];
+
+				$id++;
+			}
+		}
+
+		// Form an array with configuration of widgets with "Show" = "Totals".
+		$id = 1;
+		for ($y = 42; $y <= 48; $y += 4) {
+			for ($x = 0; $x <= 70; $x += 12) {
+				if ($id > 10) {
+					break 2;
+				}
+				$widgets[] = [
+					'type' => 'problemsbysv',
+					'name' => 'Totals reference widget '.$id,
+					'x' => $x,
+					'y' => $y,
+					'width' => 12,
+					'height' => 4,
+					'view_mode' => 0,
+					'fields' => [
+						[
+							'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+							'name' => 'show_type',
+							'value' => '1'
+						]
+					]
+				];
+
+				$id++;
+			}
+		}
+
+		CDataHelper::call('dashboard.create', [
+			[
+				'name' => self::DEFAULT_DASHBOARD,
+				'pages' => [
+					[
+						'widgets' => [
+							[
+								'type' => 'problemsbysv',
+								'name' => 'Reference widget',
+								'x' => 0,
+								'y' => 0,
+								'width' => 24,
+								'height' => 5,
+								'fields' => [
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'reference',
+										'value' => 'PBYSV'
+									]
+								]
+							],
+							[
+								'type' => 'problemsbysv',
+								'name' => 'Reference PBS widget to delete',
+								'x' => 24,
+								'y' => 0,
+								'width' => 24,
+								'height' => 5,
+								'fields' => [
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'show_type',
+										'value' => 1
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'layout',
+										'value' => 1
+									]
+								]
+							],
+							[
+								'type' => 'problemsbysv',
+								'name' => 'Totals reference PBS widget to delete',
+								'x' => 48,
+								'y' => 0,
+								'width' => 24,
+								'height' => 5
+							]
+						]
+					]
+				]
+			],
+			[
+				'name' => 'Problems by severity update dashboard',
+				'display_period' => 60,
+				'auto_start' => 1,
+				'pages' => [
+					[
+						'name' => 'Test Dashboard Page',
+						'display_period' => 1800,
+						'widgets' => array_values($widgets)
+					]
+				]
+			]
+		]);
+		self::$dashboardid = CDataHelper::getIds('name');
+	}
 
 	public function getCreateWidgetData() {
 		return [
@@ -343,7 +451,7 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 				]
 			],
 			/*
-			 * #14 Totals: Create a widget with selected 'show supprossed problems and ''show operational data' option
+			 * #14 Totals: Create a widget with selected 'show suppressed problems and ''show operational data' option
 			 * and removed 'show timeline' option.
 			 */
 			[
@@ -489,7 +597,8 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 	 * @dataProvider getCreateWidgetData
 	 */
 	public function testDashboardProblemsBySeverityWidget_Create($data) {
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=1040');
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.
+				self::$dashboardid[self::DEFAULT_DASHBOARD])->waitUntilReady();
 		$dashboard = CDashboardElement::find()->one();
 		$old_widget_count = $dashboard->getWidgets()->count();
 
@@ -499,7 +608,8 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 		$header = CTestArrayHelper::get($data['fields'], 'Name', 'Problems by severity');
 		$this->fillFormAndSaveDashboard($dashboard, $form, $data, $header);
 		$widget = $dashboard->getWidget($header);
-		// Check that Dashboard has been saved and that there are no errors in the widget
+
+		// Check that Dashboard has been saved and that there are no errors in the widget.
 		$this->checkDashboardMessage();
 		$this->assertEquals($old_widget_count + 1, $dashboard->getWidgets()->count());
 		$show = CTestArrayHelper::get($data['fields'], 'Show', 'Host groups');
@@ -509,79 +619,11 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 		else {
 			$this->checkTotalsWidgetContent($data, $widget);
 		}
+
 		// Check the content of details hintbox for Host "ЗАББИКС Сервер" and severity "Average" if needed.
 		if (CTestArrayHelper::get($data, 'check.pop-up', false)) {
 			$this->checkPopupContent($data, $widget, $show);
 		}
-	}
-
-	/**
-	 * Function used to create a dashboard with widgets required for the Update scenario.
-	 */
-	public function prepareUpdateData() {
-		// Form an array with configuration of widgets with "Show" = "Host groups"
-		$widgets = [];
-		$id = 1;
-		for ($y = 0; $y <= 39; $y += 3) {
-			for ($x = 0; $x <= 36; $x += 36) {
-				$widgets[] = [
-					'type' => 'problemsbysv',
-					'name' => 'Reference widget '.$id,
-					'x' => $x,
-					'y' => $y,
-					'width' => 36,
-					'height' => 3,
-					'view_mode' => 0
-				];
-
-				$id++;
-			}
-		}
-
-		// Form an array with configuration of widgets with "Show" = "Totals"
-		$id = 1;
-		for ($y = 42; $y <= 48; $y += 4) {
-			for ($x = 0; $x <= 70; $x += 12) {
-				if ($id > 10) {
-					break 2;
-				}
-				$widgets[] = [
-					'type' => 'problemsbysv',
-					'name' => 'Totals reference widget '.$id,
-					'x' => $x,
-					'y' => $y,
-					'width' => 12,
-					'height' => 4,
-					'view_mode' => 0,
-					'fields' => [
-						[
-							'type' => 0,
-							'name' => 'show_type',
-							'value' => '1'
-						]
-					]
-				];
-
-				$id++;
-			}
-		}
-
-		// Create dashboard
-		$response = CDataHelper::call('dashboard.create', [
-			'name' => 'Problems by severity update dashboard',
-			'display_period' => 60,
-			'auto_start' => 1,
-			'pages' => [
-				[
-					'name' => 'Test Dashboard Page',
-					'display_period' => 1800,
-					'widgets' => array_values($widgets)
-				]
-			]
-		]);
-
-		$this->assertArrayHasKey('dashboardids', $response);
-		self::$dashboardid = $response['dashboardids'][0];
 	}
 
 	public function getUpdateWidgetData() {
@@ -750,7 +792,7 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 						'Group to check triggers filtering' => [
 							'Average' => '1'
 						],
-						'Host group for tag permissions' =>[
+						'Host group for tag permissions' => [
 							'Not classified' => '2'
 						],
 						'Zabbix servers' => [
@@ -1329,13 +1371,14 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 	}
 
 	/**
-	 * @onBeforeOnce prepareUpdateData
 	 * @dataProvider getUpdateWidgetData
 	 */
 	public function testDashboardProblemsBySeverityWidget_Update($data) {
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid);
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.
+				self::$dashboardid['Problems by severity update dashboard'])->waitUntilReady();
 		$dashboard = CDashboardElement::find()->one();
 		$dashboard->edit();
+
 		// Select the widget to update
 		$form = $dashboard->getWidget($data['widget to update'])->edit();
 
@@ -1344,6 +1387,7 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 
 		$this->fillFormAndSaveDashboard($dashboard, $form, $data, $header);
 		$widget = $dashboard->getWidget($header);
+
 		// Check that Dashboard has been saved and that there are no errors in the widget
 		$this->checkDashboardMessage();
 
@@ -1365,10 +1409,11 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 	}
 
 	public function testDashboardProblemsBySeverityWidget_SimpleUpdate() {
-		$initial_values = CDBHelper::getHash($this->sql);
+		$initial_values = CDBHelper::getHash(self::SQL);
 
 		// Open a dashboard widget and then save it without applying any changes
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=1040');
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.
+				self::$dashboardid[self::DEFAULT_DASHBOARD])->waitUntilReady();
 		$dashboard = CDashboardElement::find()->one();
 		$dashboard->edit();
 		$form = $dashboard->getWidget('Reference widget')->edit();
@@ -1381,7 +1426,7 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 
 		// Check that Dashboard has been saved and that there are no changes made to the widgets.
 		$this->checkDashboardMessage();
-		$this->assertEquals($initial_values, CDBHelper::getHash($this->sql));
+		$this->assertEquals($initial_values, CDBHelper::getHash(self::SQL));
 	}
 
 	public function getCancelActionsData() {
@@ -1421,9 +1466,10 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 	 * @dataProvider getCancelActionsData
 	 */
 	public function testDashboardProblemsBySeverityWidget_Cancel($data) {
-		$old_hash = CDBHelper::getHash($this->sql);
+		$old_hash = CDBHelper::getHash(self::SQL);
 
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=1040');
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.
+				self::$dashboardid[self::DEFAULT_DASHBOARD])->waitUntilReady();
 		$dashboard = CDashboardElement::find()->one()->edit();
 
 		// Start updating or creating a widget.
@@ -1443,11 +1489,13 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 		if (CTestArrayHelper::get($data, 'save_widget', false)) {
 			$form->submit();
 			$this->page->waitUntilReady();
+
 			// Check that changes took place on the unsaved dashboard.
 			$this->assertTrue($dashboard->getWidget('Widget to be cancelled')->isVisible());
 		}
 		else {
 			$this->query('button:Cancel')->one()->click();
+
 			// Check that widget changes wasn't took place after pressing "Cancel".
 			if (CTestArrayHelper::get($data, 'existing_widget', false)) {
 				$this->assertNotEquals('Widget to be cancelled', $widget->waitUntilReady()->getHeaderText());
@@ -1460,6 +1508,7 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 				}
 			}
 		}
+
 		// Save or cancel dashboard update.
 		if (CTestArrayHelper::get($data, 'save_dashboard', false)) {
 			$dashboard->save();
@@ -1467,20 +1516,23 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 		else {
 			$dashboard->cancelEditing();
 		}
+
 		// Confirm that no changes were made to the widget.
-		$this->assertEquals($old_hash, CDBHelper::getHash($this->sql));
+		$this->assertEquals($old_hash, CDBHelper::getHash(self::SQL));
 	}
 
 	public function testDashboardProblemsBySeverityWidget_Delete() {
 		foreach (['Reference PBS widget to delete', 'Totals reference PBS widget to delete'] as $name) {
-			$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=1040');
+			$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.
+					self::$dashboardid[self::DEFAULT_DASHBOARD])->waitUntilReady();
 			$dashboard = CDashboardElement::find()->one()->edit();
-			$widget = $dashboard->getWidget($name);
 			$dashboard->deleteWidget($name);
 			$this->page->waitUntilReady();
 			$dashboard->save();
+
 			// Check that Dashboard has been saved
 			$this->checkDashboardMessage();
+
 			// Confirm that widget is not present on dashboard.
 			$this->assertEquals(0, $dashboard->query('xpath:.//div[contains(@class, "dashboard-grid-widget-header")]/h4[text()='.
 					CXPathHelper::escapeQuotes($name).']')->count());
@@ -1490,7 +1542,7 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 		}
 	}
 
-	private function fillFormAndSaveDashboard($dashboard, $form, $data, $header) {
+	protected function fillFormAndSaveDashboard($dashboard, $form, $data, $header) {
 		$form->fill($data['fields']);
 		COverlayDialogElement::find()->one()->waitUntilReady();
 
@@ -1514,8 +1566,9 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 		$dashboard->save();
 	}
 
-	private function checkWidgetContent($data, $widget) {
+	protected function checkWidgetContent($data, $widget) {
 		$table = $widget->getContent()->asTable();
+
 		// Defining expected results in case if no filtering is applied.
 		$default_values = [
 			'values' => [
@@ -1596,7 +1649,7 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 		}
 	}
 
-	private function checkTotalsWidgetContent($data, $widget) {
+	protected function checkTotalsWidgetContent($data, $widget) {
 		// Verify that layout is correct.
 		if (CTestArrayHelper::get($data['fields'], 'Layout', 'Horizontal') === 'Horizontal') {
 			$this->assertEquals($widget->query('class:totals-list-horizontal')->count(), 1);
@@ -1636,11 +1689,11 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 		}
 	}
 
-	/*
+	/**
 	 * This function checks problem details hintbox content for Host "ЗАББИКС Сервер" and severity "Average".
 	 * Only the number of problems and the values for one specific problem are checked.
 	 */
-	private function checkPopupContent($data, $widget, $show){
+	protected function checkPopupContent($data, $widget, $show){
 		$expected_popup = [
 			'fields' => [
 				'Time' => '2020-10-23 15:33:48',
@@ -1690,10 +1743,10 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 		}
 	}
 
-	/*
+	/**
 	 * Check dashboard update message.
 	 */
-	private function checkDashboardMessage() {
+	protected function checkDashboardMessage() {
 		$message = CMessageElement::find()->waitUntilVisible()->one();
 		$this->assertTrue($message->isGood());
 		$this->assertEquals('Dashboard updated', $message->getTitle());

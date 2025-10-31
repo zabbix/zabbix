@@ -666,6 +666,31 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 		self::$dashboardid_with_widgets = $response['dashboardids'][0];
 		self::$empty_dashboardid = $response['dashboardids'][1];
 		self::$dashboardid_for_update = $response['dashboardids'][2];
+
+		// Insert favorite map and graph into profiles table for checking the data that is displayed by favorite maps and favorite graphs widgets.
+		$insert_favorite = [
+			[
+				'profileid' => 1,
+				'userid' => 1,
+				'idx' => zbx_dbstr('web.favorite.sysmapids'),
+				'value_id' => 1, // Map:Local network.
+				'value_str' => zbx_dbstr(''),
+				'source' => zbx_dbstr('sysmapid'),
+				'type' => 1
+			],
+			[
+				'profileid' => 2,
+				'userid' => 1,
+				'idx' => zbx_dbstr('web.favorite.graphids'),
+				'value_id' => 42258, // Item:CPU iowait time.
+				'value_str' => zbx_dbstr(''),
+				'source' => zbx_dbstr('itemid'),
+				'type' => 1
+			]
+		];
+		foreach ($insert_favorite as $data) {
+			DBexecute('INSERT INTO profiles ('.implode(', ', array_keys($data)).') VALUES ('.implode(', ', $data).')');
+		}
 	}
 
 	/**
@@ -4929,8 +4954,8 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 			$all_types = ['Action log', 'Clock', 'Discovery status', 'Favorite graphs', 'Favorite maps', 'Gauge', 'Geomap',
 				'Graph', 'Graph (classic)', 'Graph prototype', 'Honeycomb', 'Host availability', 'Host card',
 				'Host navigator', 'Item card', 'Item history', 'Item navigator', 'Item value', 'Map', 'Map navigation tree',
-				'Pie chart', 'Problem hosts', 'Problems', 'Problems by severity', 'SLA report', 'System information',
-				'Top hosts', 'Top items', 'Top triggers', 'Trigger overview', 'URL', 'Web monitoring'
+				'Pie chart', 'Problem hosts', 'Problems', 'Problems by severity', 'Scatter plot', 'SLA report',
+				'System information', 'Top hosts', 'Top items', 'Top triggers', 'Trigger overview', 'URL', 'Web monitoring'
 			];
 			$this->assertEquals($all_types, $form->getField('Type')->getOptions()->asText());
 		}
