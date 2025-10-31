@@ -21,11 +21,13 @@
 
 window.mediatype_edit_popup = new class {
 
-	init({rules, mediatype, message_templates, smtp_server_default, smtp_email_default, oauth_defaults_by_provider}) {
+	init({rules, clone_rules, mediatype, message_templates, smtp_server_default, smtp_email_default,
+			 oauth_defaults_by_provider}) {
 		this.overlay = overlays_stack.getById('mediatype.edit');
 		this.dialogue = this.overlay.$dialogue[0];
 		this.form_element = this.overlay.$dialogue.$body[0].querySelector('form');
 		this.form = new CForm(this.form_element, rules);
+		this.clone_rules = clone_rules;
 		this.mediatypeid = mediatype.mediatypeid;
 		this.mediatype = mediatype;
 		this.row_nums = {exec: 0, webhook: 0};
@@ -76,6 +78,18 @@ window.mediatype_edit_popup = new class {
 				e.target.closest('tr').remove();
 				delete this.message_template_list[e.target.closest('tr').getAttribute('data-message-type')];
 				this.#toggleAddButton();
+			}
+		});
+
+		this.dialogue.querySelector('.overlay-dialogue-footer').addEventListener('click', (e) => {
+			if (e.target.classList.contains('js-add') || e.target.classList.contains('js-update')) {
+				this.submit();
+			}
+			else if (e.target.classList.contains('js-clone')) {
+				this.clone();
+			}
+			else if (e.target.classList.contains('js-delete')) {
+				this.delete()
 			}
 		});
 
@@ -131,17 +145,33 @@ window.mediatype_edit_popup = new class {
 		});
 	}
 
-	clone({rules, title, buttons}) {
+	clone() {
 		this.mediatypeid = null;
 		document.getElementById('mediatypeid').remove();
 		this.#setOAuth();
+
+		const title = <?= json_encode(_('New media type')) ?>;
+		const buttons = [
+			{
+				title: <?= json_encode(_('Add')) ?>,
+				class: 'js-add',
+				keepOpen: true,
+				isSubmit: true
+			},
+			{
+				title: <?= json_encode(_('Cancel')) ?>,
+				class: ZBX_STYLE_BTN_ALT,
+				cancel: true,
+				action: ''
+			}
+		];
 
 		this.#toggleChangePasswordButton();
 		this.overlay.setProperties({title, buttons});
 		this.overlay.unsetLoading();
 		this.overlay.recoverFocus();
 		this.overlay.containFocus();
-		this.form.reload(rules);
+		this.form.reload(this.clone_rules);
 	}
 
 	delete() {

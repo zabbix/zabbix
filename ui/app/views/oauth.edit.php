@@ -34,8 +34,7 @@ $buttons = [
 		'title' => $data['update'] ? _('Update') : _('Add'),
 		'class' => 'js-add',
 		'keepOpen' => true,
-		'isSubmit' => true,
-		'action' => 'oauth_edit_popup.submit();'
+		'isSubmit' => true
 	]
 ];
 

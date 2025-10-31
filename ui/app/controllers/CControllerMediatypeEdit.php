@@ -179,10 +179,9 @@ class CControllerMediatypeEdit extends CController {
 		}
 
 		$data['js_validation_rules'] = $data['mediatypeid'] == null
-			? CControllerMediatypeCreate::getValidationRules()
-			: CControllerMediatypeUpdate::getValidationRules();
+			? (new CFormValidator(CControllerMediatypeCreate::getValidationRules()))->getRules()
+			: (new CFormValidator(CControllerMediatypeUpdate::getValidationRules()))->getRules();
 
-		$data['js_validation_rules'] = (new CFormValidator($data['js_validation_rules']))->getRules();
 		$data['js_clone_validation_rules'] = (new CFormValidator(CControllerMediatypeCreate::getValidationRules()))
 			->getRules();
 

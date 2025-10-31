@@ -136,6 +136,12 @@ window.oauth_edit_popup = new class {
 			input.removeAttribute('disabled');
 			input.focus();
 		});
+
+		this.dialogue.querySelector('.overlay-dialogue-footer').addEventListener('click', (e) => {
+			if (e.target.classList.contains('js-add')) {
+				this.submit();
+			}
+		});
 	}
 
 	#initDynamicRows(url_selector, parameters_selector, options) {

@@ -562,6 +562,7 @@ $form
 	->addItem(
 		(new CScriptTag('mediatype_edit_popup.init('.json_encode([
 			'rules' => $data['js_validation_rules'],
+			'clone_rules' => $data['js_clone_validation_rules'],
 			'mediatype' => $data,
 			'message_templates' => CMediatypeHelper::getAllMessageTemplates(),
 			'smtp_server_default' => $email_defaults['smtp_server'],
@@ -574,41 +575,22 @@ if ($data['mediatypeid']) {
 	$buttons = [
 		[
 			'title' => _('Update'),
+			'class' => 'js-update',
 			'keepOpen' => true,
-			'isSubmit' => true,
-			'action' => 'mediatype_edit_popup.submit();'
+			'isSubmit' => true
 		],
 		[
 			'title' => _('Clone'),
-			'class' => ZBX_STYLE_BTN_ALT,
+			'class' => implode(' ', [ZBX_STYLE_BTN_ALT, 'js-clone']),
 			'keepOpen' => true,
-			'isSubmit' => false,
-			'action' => 'mediatype_edit_popup.clone('.json_encode([
-					'rules' => $data['js_clone_validation_rules'],
-					'title' => _('New media type'),
-					'buttons' => [
-						[
-							'title' => _('Add'),
-							'keepOpen' => true,
-							'isSubmit' => true,
-							'action' => 'mediatype_edit_popup.submit();'
-						],
-						[
-							'title' => _('Cancel'),
-							'class' => ZBX_STYLE_BTN_ALT,
-							'cancel' => true,
-							'action' => ''
-						]
-					]
-				]).');'
+			'isSubmit' => false
 		],
 		[
 			'title' => _('Delete'),
+			'class' => implode(' ', [ZBX_STYLE_BTN_ALT, 'js-delete']),
 			'confirmation' => _('Delete media type?'),
-			'class' => ZBX_STYLE_BTN_ALT,
 			'keepOpen' => true,
-			'isSubmit' => false,
-			'action' => 'mediatype_edit_popup.delete();'
+			'isSubmit' => false
 		]
 	];
 }
@@ -616,9 +598,9 @@ else {
 	$buttons = [
 		[
 			'title' => _('Add'),
+			'class' => 'js-add',
 			'keepOpen' => true,
-			'isSubmit' => true,
-			'action' => 'mediatype_edit_popup.submit();'
+			'isSubmit' => true
 		]
 	];
 }
