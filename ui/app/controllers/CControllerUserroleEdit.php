@@ -242,9 +242,9 @@ class CControllerUserroleEdit extends CControllerUserroleEditGeneral {
 
 		$data['form_refresh'] = $this->getInput('form_refresh', 0);
 		$data['js_validation_rules'] = $data['roleid'] == null
-			? CControllerUserroleCreate::getValidationRules()
-			: CControllerUserroleUpdate::getValidationRules();
-		$data['js_validation_rules'] = (new CFormValidator($data['js_validation_rules']))->getRules();
+			? (new CFormValidator(CControllerUserroleCreate::getValidationRules()))->getRules()
+			: (new CFormValidator(CControllerUserroleUpdate::getValidationRules()))->getRules();
+
 		$data['js_validation_rules_create'] = (new CFormValidator(CControllerUserroleCreate::getValidationRules()))
 			->getRules();
 
