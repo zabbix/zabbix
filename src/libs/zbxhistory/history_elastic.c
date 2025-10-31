@@ -35,6 +35,14 @@
 
 const char	*value_type_str[] = {"dbl", "str", "log", "uint", "text"};
 
+typedef enum
+{
+	ELASTIC_RETRIES_OFF,
+	ELASTIC_RETRIES_ON
+}
+zbx_elastic_retries_t;
+
+
 typedef struct
 {
 	unsigned char		value_type;
@@ -282,6 +290,24 @@ static int	history_elastic_curl_check_error(CURLcode err, CURLoption opt, char *
 #define CURL_SETOPT(conn, option, value, error)	\
 		history_elastic_curl_check_error(curl_easy_setopt(conn->handle, option, value), option, error)
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: initialize elasticsearch connection structure                     *
+ *                                                                            *
+ * Parameters: conn         - [OUT] connection structure to initialize        *
+ *             d            - [IN] elasticsearch data                         *
+ *             path         - [IN] URL path (optional)                        *
+ *             content_type - [IN] HTTP content type header (optional)        *
+ *             data         - [IN] POST data (optional)                       *
+ *                                 If set the connection takes ownership of   *
+ *                                 the data and it's freed when connection    *
+ *                                 is cleared/freed.                          *
+ *             error        - [OUT] error message                             *
+ *                                                                            *
+ * Return value: SUCCEED - connection initialized successfully                *
+ *               FAIL    - initialization failed                              *
+ *                                                                            *
+ ******************************************************************************/
 static int	history_elastic_conn_init(zbx_elastic_conn_t *conn, zbx_history_elastic_data_t *d,
 		const char *path, const char *content_type, char *data, char **error)
 {
@@ -365,6 +391,19 @@ static int	history_elastic_conn_init(zbx_elastic_conn_t *conn, zbx_history_elast
 	return SUCCEED;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: set URL path for elasticsearch connection                         *
+ *                                                                            *
+ * Parameters: conn  - [IN/OUT] connection structure                          *
+ *             d     - [IN] elasticsearch data                                *
+ *             path  - [IN] URL path to set                                   *
+ *             error - [OUT] error message                                    *
+ *                                                                            *
+ * Return value: SUCCEED - URL path set successfully                          *
+ *               FAIL    - failed to set URL path                             *
+ *                                                                            *
+ ******************************************************************************/
 static int	history_elastic_conn_set_url_path(zbx_elastic_conn_t *conn, zbx_history_elastic_data_t *d,
 		const char *path, char **error)
 {
@@ -373,6 +412,19 @@ static int	history_elastic_conn_set_url_path(zbx_elastic_conn_t *conn, zbx_histo
 	return CURL_SETOPT(conn, CURLOPT_URL, conn->url, error);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: set POST data for elasticsearch connection                        *
+ *                                                                            *
+ * Parameters: conn     - [IN/OUT] connection structure                       *
+ *             data     - [IN] POST data to set                               *
+ *             data_len - [IN] length of POST data                            *
+ *             error    - [OUT] error message                                 *
+ *                                                                            *
+ * Return value: SUCCEED - POST data set successfully                         *
+ *               FAIL    - failed to set POST data                            *
+ *                                                                            *
+ ******************************************************************************/
 static int	history_elastic_conn_set_post_data(zbx_elastic_conn_t *conn, const char *data, size_t data_len,
 		char **error)
 {
@@ -386,6 +438,17 @@ static int	history_elastic_conn_set_post_data(zbx_elastic_conn_t *conn, const ch
 	return SUCCEED;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: configure connection for DELETE request                           *
+ *                                                                            *
+ * Parameters: conn  - [IN/OUT] connection structure                          *
+ *             error - [OUT] error message                                    *
+ *                                                                            *
+ * Return value: SUCCEED - DELETE request configured successfully             *
+ *               FAIL    - failed to configure DELETE request                 *
+ *                                                                            *
+ ******************************************************************************/
 static int	history_elastic_conn_set_delete(zbx_elastic_conn_t *conn, char **error)
 {
 	if (SUCCEED != CURL_SETOPT(conn, CURLOPT_POSTFIELDSIZE, 0L, error) ||
@@ -429,6 +492,21 @@ static void	history_elastic_add_conn(zbx_history_elastic_data_t *d, unsigned cha
 	return;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: perform single iteration of elasticsearch requests                *
+ *                                                                            *
+ * Parameters: d       - [IN] elasticsearch data structure                    *
+ *             mhandle - [IN] curl multi handle                               *
+ *                                                                            *
+ * Return value: number of handles to retry                                   *
+ *               FAIL - if curl multi handle operation failed                 *
+ *                                                                            *
+ * Comments: Retryable connections are re-added to multi handle after         *
+ *           iteration so they would be retried with the next                 *
+ *           history_elastic_perform_once() call.                             *
+ *                                                                            *
+ ******************************************************************************/
 static int	history_elastic_perform_once(zbx_history_elastic_data_t *d, CURLM *mhandle)
 {
 	CURLMcode		code;
@@ -582,6 +660,20 @@ out:
 	return ret;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: perform elasticsearch requests with retry logic                   *
+ *                                                                            *
+ * Parameters: d       - [IN] elasticsearch data structure                    *
+ *             mhandle - [IN] curl multi handle                               *
+ *                                                                            *
+ * Return value: SUCCEED - all requests completed successfully                *
+ *               FAIL    - curl multi handle operation failed                 *
+ *                                                                            *
+ * Comments: Retries failed requests with delay until all succeed or          *
+ *           unrecoverable error occurs.                                      *
+ *                                                                            *
+ ******************************************************************************/
 static int	history_elastic_perform(zbx_history_elastic_data_t *d, CURLM *mhandle)
 {
 	int	retries_num = 0, ret;
@@ -601,7 +693,21 @@ static int	history_elastic_perform(zbx_history_elastic_data_t *d, CURLM *mhandle
 	return ret;
 }
 
-static int	history_elastic_query(zbx_history_elastic_data_t *d, CURLM *mhandle, zbx_elastic_conn_t *conn)
+/******************************************************************************
+ *                                                                            *
+ * Purpose: execute single elasticsearch query                                *
+ *                                                                            *
+ * Parameters: d          - [IN] elasticsearch data structure                 *
+ *             mhandle    - [IN] curl multi handle                            *
+ *             conn       - [IN/OUT] elasticsearch connection                 *
+ *             retry_mode - [IN] retry mode                                   *
+ *                                                                            *
+ * Return value: SUCCEED - query executed successfully                        *
+ *               FAIL    - query execution failed                             *
+ *                                                                            *
+ ******************************************************************************/
+static int	history_elastic_query(zbx_history_elastic_data_t *d, CURLM *mhandle, zbx_elastic_conn_t *conn,
+		zbx_elastic_retries_t retry_mode)
 {
 	CURLMcode	code;
 	int		ret;
@@ -618,7 +724,15 @@ static int	history_elastic_query(zbx_history_elastic_data_t *d, CURLM *mhandle, 
 		return FAIL;
 	}
 
-	ret = history_elastic_perform(d, d->mhandle);
+	if (ELASTIC_RETRIES_ON == retry_mode)
+	{
+		ret = history_elastic_perform(d, d->mhandle);
+	}
+	else
+	{
+		if (0 < (ret = history_elastic_perform_once(d, d->mhandle)))
+			ret = FAIL;
+	}
 
 	if (CURLM_OK != (code = curl_multi_remove_handle(mhandle, conn->handle)))
 	{
@@ -796,7 +910,7 @@ static int	elastic_get_values_for_period(zbx_history_elastic_data_t *data, zbx_u
 
 	/* initiate search context */
 
-	if (SUCCEED != history_elastic_query(data, data->mhandle, &conn))
+	if (SUCCEED != history_elastic_query(data, data->mhandle, &conn, ELASTIC_RETRIES_ON))
 		goto out;
 
 	/* fetch search results */
@@ -880,7 +994,7 @@ static int	elastic_get_values_for_period(zbx_history_elastic_data_t *data, zbx_u
 			break;
 		}
 
-		if (SUCCEED != history_elastic_query(data, data->mhandle, &conn))
+		if (SUCCEED != history_elastic_query(data, data->mhandle, &conn, ELASTIC_RETRIES_ON))
 			break;
 	}
 	while (0 == empty);
@@ -909,7 +1023,7 @@ static int	elastic_get_values_for_period(zbx_history_elastic_data_t *data, zbx_u
 
 		zabbix_log(LOG_LEVEL_DEBUG, "elasticsearch closing scroll %s", post_url);
 
-		ret = history_elastic_query(data, data->mhandle, &conn);
+		ret = history_elastic_query(data, data->mhandle, &conn, ELASTIC_RETRIES_ON);
 	}
 
 out:
@@ -1224,7 +1338,7 @@ static int	history_elastic_get_info(void *data, zbx_history_provider_info_t *inf
 		goto out;
 	}
 
-	if (FAIL == history_elastic_query(d, d->mhandle, &conn))
+	if (FAIL == history_elastic_query(d, d->mhandle, &conn, ELASTIC_RETRIES_OFF))
 	{
 		*error = zbx_strdup(NULL, "Cannot perform elasticsearch query");
 		goto out;
