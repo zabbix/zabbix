@@ -1,3 +1,13 @@
+Changes for 7.0.21
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 7.0.20
+
+7.0.20rc1 was released as 7.0.20 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 7.0.20rc1
 
 New features:
@@ -151,6 +161,9 @@ A......... [ZBX-26078] fixed filtering by inherited tags with negative operators
 ..F....... [ZBX-26159] fixed log[] item with 'numeric' type of information unexpected changing to 'log' type (aluchko)
 ..F....... [ZBX-26374] added updates for displaying the relevant monitoring data or "no permissions" notification for the Classic Graph widget (msnihach)
 .....J.... [ZBX-26220] fixed scheduled report creation with IPv6 address in Zabbix frontend URL (vsmelovs)
+.......... [ZBX-27061] moved OpenSSL directory to system-protected path on build server (yurii)
+A.F....... [ZBX-27062] updated LDAP bind password to reset on LDAP host change (aluchko)
+..F....... [ZBX-27063] fixed permission check for Problems view refresh (gberzina)
 
 --------------------------------------------------------------------------------
 Changes for 7.0.17
@@ -216,6 +229,7 @@ A......... [ZBX-26436] prevented redundant row locks in the database when deleti
 ..F....... [ZBX-26454] set a readonly property for the "Allowed Hosts" input for discovered items (msnihach)
 ........S. [ZBX-26486] fixed errors in Zabbix server log on second and subsequent server starts with TimescaleDB (mprihodko)
 ........S. [ZBX-25413] fixed race condition that could lead to user macro changes not be synced with Zabbix proxy (vso)
+A......... [ZBX-27060] fixed scope of information available via user.get (jfreibergs)
 
 --------------------------------------------------------------------------------
 Changes for 7.0.16
@@ -3855,6 +3869,10 @@ Bug fixes:
 ...G...... [ZBX-26344] refactored zbxcmd execute to avoid Windows syscalls in Zabbix agent 2 (esneiders)
 .......PS. [ZBX-26433] fixed values outside of history storage period causing trigger to cache all values in storage period (vso)
 ...G...... [ZBX-26244] fixed Zabbix agent 2 memory leak related to traffic compression (MVekslers)
+A......... [ZBX-27060] fixed scope of information available via user.get (jfreibergs)
+.......... [ZBX-27061] moved OpenSSL directory to system-protected path on build server (yurii)
+A.F....... [ZBX-27062] updated LDAP bind password to reset on LDAP host change (aluchko)
+..F....... [ZBX-27063] fixed permission check for Problems view refresh (gberzina)
 
 --------------------------------------------------------------------------------
 Changes for 6.0.40
