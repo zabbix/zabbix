@@ -71,7 +71,7 @@ class CControllerOauthAuthorize extends CController {
 		if (array_key_exists('signature', $state)) {
 			$sign = $state;
 			unset($sign['signature']);
-			$sign = base64_encode(CEncryptHelper::sign(json_encode($sign)));
+			$sign = CEncryptHelper::sign(json_encode($sign));
 
 			if (!CEncryptHelper::checkSign($sign, $state['signature'])) {
 				error(_('Invalid request.'), true);
