@@ -114,7 +114,7 @@
 				(size_t)(vector_uint64)->values_num +					\
 				(value_len) / sizeof(zbx_uint64_t)),					\
 			memcpy((vector_uint64)->values + (vector_uint64)->values_num,			\
-			((buffer) + sizeof(zbx_uint32_t)), (value_len)),				\
+				((buffer) + sizeof(zbx_uint32_t)), (value_len)),			\
 			(vector_uint64)->values_num += (int)((value_len) / sizeof(zbx_uint64_t)),	\
 			(value_len) + sizeof(zbx_uint32_t)						\
 		) :											\
