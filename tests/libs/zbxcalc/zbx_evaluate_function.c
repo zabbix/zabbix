@@ -81,6 +81,7 @@ void	zbx_mock_test_entry(void **state)
 	zbx_mock_handle_t	handle;
 	zbx_variant_t		returned_value;
 	zbx_dc_evaluate_item_t	evaluate_item;
+	zbx_history_range_t	range = {0};
 
 	zbx_update_epsilon_to_float_precision();
 
@@ -111,7 +112,7 @@ void	zbx_mock_test_entry(void **state)
 	evaluate_item.key_orig = item.key_orig;
 
 	if (SUCCEED != (returned_ret = zbx_evaluate_function(&returned_value, &evaluate_item, function, params, &ts,
-			&error)))
+			&range, &error)))
 	{
 		printf("zbx_evaluate_function returned error: %s\n", error);
 		zbx_free(error);
