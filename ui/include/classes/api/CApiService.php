@@ -718,24 +718,6 @@ class CApiService {
 	}
 
 	/**
-	 * Adds the given field to the ORDER BY part of the $sqlParts array.
-	 *
-	 * @param string $fieldId
-	 * @param array  $sqlParts
-	 * @param string $sortorder		sort direction, ZBX_SORT_UP or ZBX_SORT_DOWN
-	 *
-	 * @return array
-	 */
-	protected function addQueryOrder($fieldId, array $sqlParts, $sortorder = null) {
-		// some databases require the sortable column to be present in the SELECT part of the query
-		$sqlParts = $this->addQuerySelect($fieldId, $sqlParts);
-
-		$sqlParts['order'][$fieldId] = $fieldId.($sortorder ? ' '.$sortorder : '');
-
-		return $sqlParts;
-	}
-
-	/**
 	 * Adds the related objects requested by "select*" options to the resulting object set.
 	 *
 	 * @param array $options
@@ -747,19 +729,6 @@ class CApiService {
 		// must be implemented in each API separately
 
 		return $result;
-	}
-
-	/**
-	 * Deletes the object with the given IDs with respect to relative objects.
-	 *
-	 * The method must be extended to handle relative objects.
-	 *
-	 * @param array $ids
-	 */
-	protected function deleteByIds(array $ids) {
-		DB::delete($this->tableName(), [
-			$this->pk() => $ids
-		]);
 	}
 
 	/**
@@ -789,23 +758,6 @@ class CApiService {
 		}
 
 		return $objects;
-	}
-
-	/**
-	 * An extendObjects() wrapper for singular objects.
-	 *
-	 * @see extendObjects()
-	 *
-	 * @param string $tableName
-	 * @param array  $object
-	 * @param array  $fields
-	 *
-	 * @return mixed
-	 */
-	protected function extendObject($tableName, array $object, array $fields) {
-		$objects = $this->extendObjects($tableName, [$object], $fields);
-
-		return reset($objects);
 	}
 
 	/**
@@ -854,50 +806,6 @@ class CApiService {
 		unset($object);
 
 		return $objects;
-	}
-
-	/**
-	 * Checks that each object has a valid ID.
-	 *
-	 * @param array $objects
-	 * @param $idField			name of the field that contains the id
-	 * @param $messageRequired	error message if no ID is given
-	 * @param $messageEmpty		error message if the ID is empty
-	 * @param $messageInvalid	error message if the ID is invalid
-	 */
-	protected function checkObjectIds(array $objects, $idField, $messageRequired, $messageEmpty, $messageInvalid) {
-		$idValidator = new CIdValidator([
-			'messageEmpty' => $messageEmpty,
-			'messageInvalid' => $messageInvalid
-		]);
-		foreach ($objects as $object) {
-			if (!isset($object[$idField])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _params($messageRequired, [$idField]));
-			}
-
-			$this->checkValidator($object[$idField], $idValidator);
-		}
-	}
-
-	/**
-	 * Checks if the object has any fields, that are not defined in the schema or in $extraFields.
-	 *
-	 * @param string $tableName
-	 * @param array  $object
-	 * @param string $error
-	 * @param array  $extraFields	an array of field names, that are not present in the schema, but may be
-	 *								used in requests
-	 *
-	 * @throws APIException
-	 */
-	protected function checkUnsupportedFields($tableName, array $object, $error, array $extraFields = []) {
-		$extraFields = array_flip($extraFields);
-
-		foreach ($object as $field => $value) {
-			if (!DB::hasField($tableName, $field) && !isset($extraFields[$field])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, $error);
-			}
-		}
 	}
 
 	/**

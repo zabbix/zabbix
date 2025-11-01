@@ -322,16 +322,13 @@ class CDRule extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
 		}
 
-		if (!$drules) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
-		}
+		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE | API_ALLOW_UNEXPECTED, 'uniq' => [['druleid']], 'fields' => [
+			'druleid' =>	['type' => API_ID, 'flags' => API_REQUIRED]
+		]];
 
-		// Validate given IDs.
-		$this->checkObjectIds($drules, 'druleid',
-			_('Field "%1$s" is mandatory.'),
-			_s('Incorrect value for field "%1$s": %2$s.', 'druleid', _('cannot be empty')),
-			_s('Incorrect value for field "%1$s": %2$s.', 'druleid', _('a numeric value is expected'))
-		);
+		if (!CApiInputValidator::validate($api_input_rules, $drules, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+		}
 
 		$db_drules = $this->get([
 			'output' => ['druleid', 'name'],
