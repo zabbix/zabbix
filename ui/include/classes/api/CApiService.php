@@ -416,11 +416,7 @@ class CApiService {
 	 *
 	 * @return string
 	 */
-	protected function dbDistinct(array $sql_parts) {
-		if (preg_grep('/^COUNT\(/', $sql_parts['select'])) {
-			return '';
-		}
-
+	private static function dbDistinct(array $sql_parts) {
 		$count = count($sql_parts['from']);
 
 		if ($count == 1 && array_key_exists('join', $sql_parts)) {
@@ -440,7 +436,7 @@ class CApiService {
 			}
 		}
 
-		return ($count > 1 ? ' DISTINCT' : '');
+		return ($count > 1 ? 'DISTINCT ' : '');
 	}
 
 	/**
@@ -480,7 +476,9 @@ class CApiService {
 		$sqlGroup = empty($sqlParts['group']) ? '' : ' GROUP BY '.implode(',', array_unique($sqlParts['group']));
 		$sqlOrder = empty($sqlParts['order']) ? '' : ' ORDER BY '.implode(',', array_unique($sqlParts['order']));
 
-		return 'SELECT'.$this->dbDistinct($sqlParts).' '.$sqlSelect.
+		$distinct = str_starts_with($sqlSelect, 'COUNT(') ? '' : self::dbDistinct($sqlParts);
+
+		return 'SELECT '.$distinct.$sqlSelect.
 				' FROM '.$sqlFrom.
 				$sql_join.
 				$sqlWhere.
@@ -514,7 +512,7 @@ class CApiService {
 			}
 
 			$sql_parts['select'] = $has_joins
-				? ['COUNT(DISTINCT '.$this->fieldId($pk, $table_alias).') AS rowscount']
+				? ['COUNT('.self::dbDistinct($sql_parts).$this->fieldId($pk, $table_alias).') AS rowscount']
 				: ['COUNT(*) AS rowscount'];
 
 			// Select columns used by group count.
