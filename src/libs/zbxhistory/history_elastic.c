@@ -572,6 +572,26 @@ static int	history_elastic_perform_once(zbx_history_elastic_data_t *d, CURLM *mh
 		/* That's why we actually check for transport and curl errors separately */
 		if (CURLE_HTTP_RETURNED_ERROR == msg->data.result)
 		{
+			char		http_status[MAX_STRING_LEN];
+			long int	response_code = -1;
+
+			if (CURLE_OK == curl_easy_getinfo(msg->easy_handle, CURLINFO_RESPONSE_CODE, &response_code))
+			{
+				/* add retry 'too many requests' response */
+				if (429 == response_code)
+				{
+					zbx_vector_ptr_append(&retries, conn->handle);
+					continue;
+				}
+
+				zbx_snprintf(http_status, sizeof(http_status), "HTTP status code: %ld",
+						response_code);
+			}
+			else
+			{
+				zbx_strlcpy(http_status, "unknown HTTP status code", sizeof(http_status));
+			}
+
 			if ('\0' != *conn->resp.errbuf)
 			{
 				zabbix_log(LOG_LEVEL_ERR, "cannot query elasticsearch, HTTP error message: %s",
@@ -579,20 +599,6 @@ static int	history_elastic_perform_once(zbx_history_elastic_data_t *d, CURLM *mh
 			}
 			else
 			{
-				char		http_status[MAX_STRING_LEN];
-				long int	response_code;
-
-				if (CURLE_OK == curl_easy_getinfo(msg->easy_handle, CURLINFO_RESPONSE_CODE,
-						&response_code))
-				{
-					zbx_snprintf(http_status, sizeof(http_status), "HTTP status code: %ld",
-							response_code);
-				}
-				else
-				{
-					zbx_strlcpy(http_status, "unknown HTTP status code", sizeof(http_status));
-				}
-
 				zabbix_log(LOG_LEVEL_ERR, "cannot query elasticsearch, %s", http_status);
 			}
 		}
@@ -637,24 +643,6 @@ static int	history_elastic_perform_once(zbx_history_elastic_data_t *d, CURLM *mh
 		}
 		else
 		{
-			/* add retry check for 'too many requests' response */
-			long int	response_code;
-
-			if (CURLE_OK != (code = curl_easy_getinfo(msg->easy_handle, CURLINFO_RESPONSE_CODE,
-					&response_code)))
-			{
-				zabbix_log(LOG_LEVEL_WARNING, "cannot retrieve repsonse code: %s",
-						curl_multi_strerror(code));
-
-				continue;
-			}
-
-			if (429 == response_code)
-			{
-				zbx_vector_ptr_append(&retries, conn->handle);
-				continue;
-			}
-
 			/* mark connection as completed */
 			conn->status = SUCCEED;
 		}
