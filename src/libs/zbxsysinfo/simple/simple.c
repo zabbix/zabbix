@@ -19,6 +19,7 @@
 #include "../common/net.h"
 #include "ntp.h"
 
+#include "zbxip.h"
 #include "zbxstr.h"
 #include "zbxnum.h"
 #include "zbxtime.h"
@@ -27,7 +28,6 @@
 
 #ifdef HAVE_LIBCURL
 #	include "zbxcurl.h"
-#	include "zbxip.h"
 #endif
 
 #ifdef HAVE_LDAP
