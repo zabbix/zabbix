@@ -2551,7 +2551,7 @@ static int	vc_query_item_cached(zbx_vc_item_t *item)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: precache history data for count-based range                       *
+ * Purpose: precache history data for number of values                        *
  *                                                                            *
  * Parameters: item      - [IN/OUT] the item                                  *
  *             rows      - [IN] history records to cache                      *
@@ -2560,26 +2560,31 @@ static int	vc_query_item_cached(zbx_vc_item_t *item)
  ******************************************************************************/
 static void	vc_item_precache_nvalues(zbx_vc_item_t *item, zbx_vector_history_record_t *rows, int nvalues)
 {
-	int	i, ts_start = 0;
+	int	index_start = -1, ts_start = 0;
 
-	if (1 == nvalues)
-		nvalues++;
-
-	for (i = rows->values_num - 1; i >= 0; i--)
+	/* Find the starting index for values to cache. To ensure complete second coverage, */
+	/* discard the earliest value(s) by iterating through values and tracking the index */
+	/* where the timestamp (seconds) changed. Use this index as the starting point.     */
+	ts_start = rows->values[0].timestamp.sec;
+	for (int i = 1; i < rows->values_num; i++)
 	{
-		nvalues--;
-		if (0 == nvalues)
-			ts_start = rows->values[i].timestamp.sec;
+		if (ts_start != rows->values[i].timestamp.sec)
+		{
+			/* the new index would not cover the required nvalues - */
+			/* so the current index is the closest one              */
+			if (-1 != index_start && i + nvalues > rows->values_num)
+				break;
 
-		if (0 > nvalues && ts_start != rows->values[i].timestamp.sec)
-			break;
+			ts_start = rows->values[i].timestamp.sec;
+			index_start = i;
+		}
 	}
 
-	i++;
-
-	vch_item_add_values_at_tail(item, rows->values + i, rows->values_num - i);
-
-	vc_item_update_db_cached_from(item, ts_start);
+	if (-1 != index_start)
+	{
+		vch_item_add_values_at_tail(item, rows->values + index_start, rows->values_num - index_start);
+		vc_item_update_db_cached_from(item, ts_start);
+	}
 }
 
 /******************************************************************************
@@ -2630,9 +2635,20 @@ static void	vc_precache_item(zbx_item_history_t *hist, unsigned char value_type,
 	zbx_vector_history_record_sort(&hist->rows, (zbx_compare_func_t)zbx_history_record_compare_asc_func);
 
 	if (hist->rows.values_num < limit)
+	{
 		vc_item_precache_seconds(item, &hist->rows, ts_start);
+	}
 	else
-		vc_item_precache_nvalues(item, &hist->rows, hist->range->value);
+	{
+		int	nvalues;
+
+		if (ZBX_VALUE_SECONDS == hist->range->type)
+			nvalues = limit;
+		else
+			nvalues = hist->range->value;
+
+		vc_item_precache_nvalues(item, &hist->rows, nvalues);
+	}
 }
 
 /******************************************************************************
