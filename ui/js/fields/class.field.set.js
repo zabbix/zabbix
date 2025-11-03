@@ -22,13 +22,6 @@ class CFieldSet extends CField {
 	 */
 	#fields = {};
 
-	/**
-	 * On frequent MutationObserver dispatching "field.change" event.
-	 *
-	 * @type {Number|Null}
-	 */
-	#on_blur_debounce = null;
-
 	init() {
 		super.init();
 
@@ -212,8 +205,6 @@ class CFieldSet extends CField {
 	}
 
 	#fieldsSetErrors(errors, force_display_errors) {
-		let missing_field_errors = {};
-
 		for (const [key, field_errors] of Object.entries(errors)) {
 			const key_full = key.charAt(0) === '[' ? key : `[${key}]`;
 
