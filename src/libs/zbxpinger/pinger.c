@@ -365,9 +365,9 @@ static int	pinger_parse_key_params(const char *key, const char *host_addr, zbx_p
 	{
 		pinger->timeout = 0;
 	}
-	else if (FAIL == zbx_is_uint31(tmp, &pinger->timeout) || MIN_TIMEOUT  > pinger->timeout)
+	else if (FAIL == zbx_is_uint31(tmp, &pinger->timeout) || MIN_TIMEOUT > pinger->timeout)
 	{
-		*error = zbx_dsprintf(NULL, "Timeout \"%s\" should be at least %d.", tmp, MIN_TIMEOUT );
+		*error = zbx_dsprintf(NULL, "Timeout \"%s\" should be at least %d.", tmp, MIN_TIMEOUT);
 		goto out;
 	}
 
