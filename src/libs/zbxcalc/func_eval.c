@@ -2281,7 +2281,7 @@ static int	evaluate_FORECAST(zbx_variant_t *value, const zbx_dc_evaluate_item_t 
 	char				*fit_str = NULL, *mode_str = NULL;
 	double				*t = NULL, *x = NULL;
 	int				nparams, i, ret = FAIL, seconds = 0, nvalues = 0;
-	zbx_history_range_t		time_range;
+	zbx_history_range_t		time_range = {0};
 	unsigned int			k = 0;
 	zbx_vector_history_record_t	values;
 	zbx_timespec_t			zero_time;
