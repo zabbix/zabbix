@@ -821,6 +821,29 @@ static int	history_sql_get_info(void *data, zbx_history_provider_info_t *info, c
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: validate configuration options for SQL history provider           *
+ *                                                                            *
+ * Parameters:                                                                *
+ *     options     - [IN] configuration options                               *
+ *     options_num - [IN] number of configuration options                     *
+ *                                                                            *
+ ******************************************************************************/
+static void	history_sql_validate_options(const zbx_history_option_t *options, int options_num)
+{
+	const char	*supported_options = "name,precache";
+
+	for (int i = 0; i < options_num; i++)
+	{
+		if (SUCCEED != zbx_str_in_list(supported_options, options[i].name, ','))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "Unsupported SQL history provider option: %s=%s",
+					options[i].name, options[i].value);
+		}
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: open and initialize SQL history provider                          *
  *                                                                            *
  * Parameters:                                                                *
@@ -838,6 +861,8 @@ zbx_history_provider_t	*history_sql_open(const zbx_history_option_t *options, in
 	ZBX_UNUSED(options);
 	ZBX_UNUSED(options_num);
 	ZBX_UNUSED(error);
+
+	history_sql_validate_options(options, options_num);
 
 	provider = (zbx_history_provider_t *)zbx_malloc(NULL, sizeof(zbx_history_provider_t));
 

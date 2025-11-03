@@ -1486,6 +1486,29 @@ static void	history_elastic_close(void *data)
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: validate configuration options for ElasticSearch history provider  *
+ *                                                                            *
+ * Parameters:                                                                *
+ *     options     - [IN] configuration options                               *
+ *     options_num - [IN] number of configuration options                     *
+ *                                                                            *
+ ******************************************************************************/
+static void	history_elastic_validate_options(const zbx_history_option_t *options, int options_num)
+{
+	const char	*supported_options = "name,precache,url,log_slow_queries,date_index";
+
+	for (int i = 0; i < options_num; i++)
+	{
+		if (SUCCEED != zbx_str_in_list(supported_options, options[i].name, ','))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "Unsupported SQL history provider option: %s=%s",
+					options[i].name, options[i].value);
+		}
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: open and initialize the elsticsearch history provider             *
  *                                                                            *
  * Parameters:                                                                *
@@ -1502,6 +1525,8 @@ zbx_history_provider_t *history_elastic_open(const zbx_history_option_t *options
 	void			*data;
 
 	zbx_curl_init();
+
+	history_elastic_validate_options(options, options_num);
 
 	if (NULL == (data = history_elastic_create_data(options, options_num, error)))
 		return NULL;

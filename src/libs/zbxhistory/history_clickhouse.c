@@ -188,7 +188,7 @@ static void	history_clickhouse_validate_options(const zbx_history_option_t *opti
 {
 	const char	*supported_options = "name,log_slow_queries,url,username,password,db,types,source_ip,"
 				"ssl_cert_file,ssl_key_file,ssl_key_password,ssl_verify_peer,ssl_verify_host,"
-				"ssl_ca_location,ssl_cert_location,ssl_key_location";
+				"ssl_ca_location,ssl_cert_location,ssl_key_location,precache";
 
 	for (int i = 0; i < options_num; i++)
 	{
