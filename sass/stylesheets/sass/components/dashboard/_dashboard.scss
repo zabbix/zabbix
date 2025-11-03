@@ -1091,7 +1091,7 @@
 	}
 }
 
-.overlay-dialogue {
+.overlay-dialogue.modal {
 	&.modal-widget-configuration {
 		--modal-width: auto;
 		--modal-max-width: calc(100vw - 20px);
@@ -1114,6 +1114,14 @@
 	}
 
 	.table-tags {
+		.table-tags-input {
+			width: 150px;
+		}
+
+		z-select {
+			min-width: 140px;
+		}
+
 		tr:last-of-type {
 			td {
 				padding-bottom: 0;

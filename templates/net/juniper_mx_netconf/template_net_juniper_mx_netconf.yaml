@@ -52,7 +52,7 @@ zabbix_export:
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback
       vendor:
         name: Zabbix
-        version: 8.0-1
+        version: 8.0-2
       groups:
         - name: 'Templates/Network devices'
       items:
@@ -4321,12 +4321,6 @@ zabbix_export:
                     - type: STRING
                       name: itemid._reference
                       value: EXLMY._itemid
-                    - type: STRING
-                      name: max
-                      value: '100'
-                    - type: STRING
-                      name: min
-                      value: '0'
                     - type: INTEGER
                       name: show.0
                       value: '3'
@@ -4884,9 +4878,6 @@ zabbix_export:
                     - type: STRING
                       name: max
                       value: '25000'
-                    - type: STRING
-                      name: min
-                      value: '0'
                     - type: INTEGER
                       name: show.0
                       value: '3'

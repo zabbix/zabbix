@@ -33,6 +33,7 @@
 #include "zbxdbhigh.h"
 #include "zbxrtc.h"
 #include "zbx_rtc_constants.h"
+#include "zbxipcservice.h"
 
 #define ZBX_DATASENDER_AVAILABILITY		0x0001
 #define ZBX_DATASENDER_HISTORY			0x0002

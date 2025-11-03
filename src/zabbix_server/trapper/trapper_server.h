@@ -21,6 +21,7 @@
 #include "zbxcomms.h"
 #include "zbxtime.h"
 #include "zbxjson.h"
+#include "zbxipcservice.h"
 
 int	zbx_send_proxy_data_response(const zbx_dc_proxy_t *proxy, zbx_socket_t *sock, const char *info, int status,
 		int upload_status, int config_timeout);

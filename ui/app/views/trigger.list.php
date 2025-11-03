@@ -411,7 +411,7 @@ $triggers_form->addItem([
 					->setId('js-massdelete-trigger')
 			]
 		],
-		'trigger'
+		'trigger'.($data['checkbox_hash'] ? '_'.$data['checkbox_hash'] : '')
 	)
 ]);
 
