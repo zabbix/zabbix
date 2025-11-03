@@ -84,7 +84,7 @@ class CControllerOauthCheck extends CController {
 		}
 
 		$oauth['token_url'] = $token_url->getUrl();
-		$oauth['signature'] = CEncryptHelper::sign(json_encode($oauth));
+		$oauth['sign'] = CEncryptHelper::sign(json_encode($oauth));
 
 		if ($this->getInput('authorization_mode', 'auto') === 'auto') {
 			$url = $authorization_url;
