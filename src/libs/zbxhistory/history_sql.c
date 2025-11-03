@@ -402,15 +402,17 @@ static int	db_read_batch(zbx_vector_item_history_t *results, unsigned char value
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 			"select itemid,clock,ns,%s"
-			" from %s"
-			" where",
-			table->fields, table->name);
-
+			" from (select itemid,clock,ns,%s,"
+				"row_number() over (partition by itemid order by clock desc, ns desc) as rn"
+				" from %s"
+				" where",
+			table->fields, table->fields, table->name);
 	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "itemid", itemids.values, itemids.values_num);
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " and clock>" ZBX_FS_TIME_T
+			") sub"
+			" where rn<=%d"
+			" order by itemid,clock,ns desc", (zbx_fs_time_t)time_from, limit);
 	zbx_vector_uint64_destroy(&itemids);
-
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " and clock>" ZBX_FS_TIME_T " order by itemid,clock,ns desc",
-				(zbx_fs_time_t)time_from);
 
 	result = zbx_db_select("%s", sql);
 

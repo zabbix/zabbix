@@ -1438,8 +1438,8 @@ static int	history_clickhouse_fetch_batch(void *data, zbx_vector_item_history_t 
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " and timestamp>='" ZBX_FS_TIME_T ".0'", start + 1);
 
-	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " order by itemid,timestamp desc"
-			" format JSONCompactEachRow");
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " order by itemid,timestamp desc limit %d by itemid"
+			" format JSONCompactEachRow", limit);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "batch query: %s", sql);
 
