@@ -34,6 +34,7 @@
 #include "zbxalgo.h"
 #include "zbxdbwrap.h"
 #include "zbx_expression_constants.h"
+#include "zbxhistory_provider.h"
 
 #define ZBX_ITEM_QUERY_UNSET		0x0000
 

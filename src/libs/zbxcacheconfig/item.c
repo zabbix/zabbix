@@ -18,7 +18,7 @@
 #include "zbx_item_constants.h"
 #include "zbxcachevalue.h"
 #include "zbxtime.h"
-#include "zbxvariant.h"
+#include "zbxhistory_provider.h"
 #include "zbxexpr.h"
 
 static const char	*item_logtype_string(unsigned char logtype)

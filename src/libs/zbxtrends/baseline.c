@@ -17,6 +17,7 @@
 #include "zbxalgo.h"
 #include "zbxtime.h"
 #include "zbxstr.h"
+#include "zbxhistory.h"
 
 /******************************************************************************
  *                                                                            *

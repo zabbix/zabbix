@@ -17,6 +17,7 @@
 #include "dbconfig.h"
 #include "dbsync.h"
 #include "zbxdb.h"
+#include "zbxdbhigh.h"
 #include "zbxdbschema.h"
 #include "zbxnum.h"
 #include "zbxtime.h"

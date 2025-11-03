@@ -102,10 +102,6 @@
 #include "zbxbincommon.h"
 #include "zbxcurl.h"
 
-#ifdef HAVE_LIBCURL
-#	include "zbxcurl.h"
-#endif
-
 ZBX_GET_CONFIG_VAR2(const char*, const char*, zbx_progname, NULL)
 
 static const char	title_message[] = "zabbix_server";

@@ -15,7 +15,7 @@
 #ifndef ZABBIX_HISTORY_H
 #define ZABBIX_HISTORY_H
 
-#include "zbxhistory.h"
+#include "zbxhistory_provider.h"
 #include "zbxtypes.h"
 
 #define HISTORY_PROVIDER_SQL		"sql"	/* default provider */

@@ -33,6 +33,7 @@
 #include "zbxregexp.h"
 #include "zbxstr.h"
 #include "zbxtrends.h"
+#include "zbxhistory_provider.h"
 
 #define ZBX_VALUEMAP_TYPE_MATCH			0
 #define ZBX_VALUEMAP_TYPE_GREATER_OR_EQUAL	1

@@ -18,6 +18,7 @@
 #include "zbxnum.h"
 #include "zbxexpr.h"
 #include "zbxtime.h"
+#include "eval.h"
 
 int	get_function_parameter_uint64(const char *parameters, int Nparam, zbx_uint64_t *value)
 {

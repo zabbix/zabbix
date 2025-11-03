@@ -14,7 +14,6 @@
 
 #include "history_option.h"
 #include "zbxcommon.h"
-#include "zbxhistory.h"
 #include "zbxstr.h"
 
 ZBX_VECTOR_IMPL(history_option, zbx_history_option_t)

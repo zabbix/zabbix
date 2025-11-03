@@ -18,7 +18,6 @@
 #if defined(HAVE_LIBCURL)
 
 #include "zbxhistory.h"
-#include "history.h"
 #include "history_curl.h"
 #include "history_option.h"
 
@@ -33,6 +32,9 @@
 #include "zbxdb.h"
 #include "zbxcrypto.h"
 #include "zbxcacheconfig.h"
+#include "zbxregexp.h"
+#include "zbxtime.h"
+
 
 typedef void (*write_value_t)(zbx_json_t *row, const zbx_history_value_t *value);
 
