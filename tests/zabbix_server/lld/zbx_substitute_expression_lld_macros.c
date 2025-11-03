@@ -29,7 +29,6 @@
 void	zbx_mock_test_entry(void **state)
 {
 	char				*error, *data = zbx_strdup(NULL ,zbx_mock_get_parameter_string("in.data"));
-	const char			*lld_row;
 	zbx_vector_lld_macro_path_ptr_t	macros;
 	zbx_jsonobj_t			obj;
 	zbx_lld_entry_t			entry;
@@ -41,7 +40,7 @@ void	zbx_mock_test_entry(void **state)
 	zbx_vector_lld_macro_path_ptr_create(&macros);
 	get_macros("in.macros", &macros);
 
-	lld_row = zbx_mock_get_parameter_string("in.lld");
+	const char	*lld_row = zbx_mock_get_parameter_string("in.lld");
 
 	if (SUCCEED != zbx_jsonobj_open(lld_row, &obj))
 		fail_msg("invalid lld row parameter: %s", zbx_json_strerror());
