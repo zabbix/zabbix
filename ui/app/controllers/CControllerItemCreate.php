@@ -142,6 +142,7 @@ class CControllerItemCreate extends CControllerItem {
 				ZBX_POSTTYPE_XML
 			], 'when' => ['type', 'in' => [ITEM_TYPE_HTTPAGENT]]],
 			'posts' => [
+				['db items.posts'],
 				['db items.posts', 'required', 'not_empty',
 					'when' => ['post_type', 'in' => [ZBX_POSTTYPE_XML]],
 					'use' => [CXmlValidator::class, []]

@@ -207,40 +207,7 @@ class CControllerHostCreate extends CControllerHostUpdateGeneral {
 					'inherited_type' => ['integer']
 				]
 			],
-			'valuemaps' => ['objects', 'fields' => [
-				'valuemapid' => ['db valuemap.valuemapid'],
-				'name' => ['db valuemap.name', 'not_empty', 'required'],
-				'mappings' => ['objects', 'not_empty', 'uniq' => ['type', 'value'],
-					'messages' => ['uniq' => _('Mapping type and value combination is not unique.')],
-					'fields' => [
-						'type' => ['db valuemap_mapping.type', 'required', 'in' => [VALUEMAP_MAPPING_TYPE_EQUAL,
-							VALUEMAP_MAPPING_TYPE_GREATER_EQUAL, VALUEMAP_MAPPING_TYPE_LESS_EQUAL,
-							VALUEMAP_MAPPING_TYPE_IN_RANGE, VALUEMAP_MAPPING_TYPE_REGEXP, VALUEMAP_MAPPING_TYPE_DEFAULT
-						]],
-						'value' => [
-							['db valuemap_mapping.value', 'required', 'when' => ['type', 'in' => [
-								VALUEMAP_MAPPING_TYPE_EQUAL
-							]]],
-							['db valuemap_mapping.value', 'required', 'not_empty', 'when' => ['type', 'in' => [
-								VALUEMAP_MAPPING_TYPE_GREATER_EQUAL, VALUEMAP_MAPPING_TYPE_LESS_EQUAL,
-								VALUEMAP_MAPPING_TYPE_IN_RANGE, VALUEMAP_MAPPING_TYPE_REGEXP
-							]]],
-							['float', 'when' => ['type', 'in' => [VALUEMAP_MAPPING_TYPE_GREATER_EQUAL,
-								VALUEMAP_MAPPING_TYPE_LESS_EQUAL
-							]]],
-							['string',
-								'use' => [CRangesParser::class, ['with_minus' => true, 'with_float' => true, 'with_suffix' => true]],
-								'when' => ['type', 'in' => [VALUEMAP_MAPPING_TYPE_IN_RANGE]],
-								'messages' => ['use' => _('Invalid range.')]
-							],
-							['string', 'use' => [CRegexValidator::class, []],
-								'when' => ['type', 'in' => [VALUEMAP_MAPPING_TYPE_REGEXP]]
-							]
-						],
-						'newvalue' => ['db valuemap_mapping.newvalue', 'required', 'not_empty']
-					]
-				]
-			]],
+			'valuemaps' => ['objects', 'fields' => CControllerValueMapCheck::getFieldsValidationRules()],
 			'clone' => ['integer', 'in' => [1]],
 			'clone_hostid' => ['db hosts.hostid']
 		]];
