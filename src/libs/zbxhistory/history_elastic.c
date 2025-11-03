@@ -137,6 +137,8 @@ static int	history_parse_value(struct zbx_json_parse *jp, unsigned char value_ty
 	size_t	value_alloc = 0;
 	int	ret = FAIL;
 
+	memset(hr, 0, sizeof(zbx_history_record_t));
+
 	if (SUCCEED != zbx_json_value_by_name_dyn(jp, "clock", &value, &value_alloc, NULL))
 		goto out;
 
@@ -177,8 +179,10 @@ static int	history_parse_value(struct zbx_json_parse *jp, unsigned char value_ty
 	}
 
 	ret = SUCCEED;
-
 out:
+	if (SUCCEED != ret)
+		zbx_history_record_clear(hr, value_type);
+
 	zbx_free(value);
 
 	return ret;
@@ -601,6 +605,9 @@ static int	history_elastic_perform_once(zbx_history_elastic_data_t *d, CURLM *mh
 			{
 				zabbix_log(LOG_LEVEL_ERR, "cannot query elasticsearch, %s", http_status);
 			}
+
+			if (0 != conn->resp.page.offset)
+				zabbix_log(LOG_LEVEL_ERR, "received response: %s", conn->resp.page.data);
 		}
 		else if (CURLE_OK != msg->data.result)
 		{
@@ -1203,17 +1210,195 @@ static int	history_elastic_fetch(void *data, zbx_uint64_t itemid, unsigned char 
 	return ret;
 }
 
+static int	history_elastic_parse_bucket(const char *p_bucket, unsigned char value_type,
+		zbx_vector_item_history_t *results)
+{
+	char			buffer[MAX_STRING_LEN];
+	zbx_json_parse_t	jp_bucket, jp_top, jp_hits, jp_hits2;
+	zbx_item_history_t	hist_local;
+	int			index, rows_num = 0;
+
+	if (SUCCEED != zbx_json_brackets_open(p_bucket, &jp_bucket))
+		goto out;
+
+	if (SUCCEED != zbx_json_value_by_name(&jp_bucket, "key", buffer, sizeof(buffer), NULL))
+		goto out;
+
+	if (zbx_is_uint64(buffer, &hist_local.itemid))
+		goto out;
+
+	if (FAIL == (index = zbx_vector_item_history_bsearch(results, hist_local, zbx_item_history_compare_by_itemid)))
+		goto out;
+
+	zbx_item_history_t	*hist = &results->values[index];
+
+	if (SUCCEED != zbx_json_brackets_by_name(&jp_bucket, "top_values", &jp_top))
+		goto out;
+
+	if (SUCCEED != zbx_json_brackets_by_name(&jp_top, "hits", &jp_hits))
+		goto out;
+
+	if (SUCCEED != zbx_json_brackets_by_name(&jp_hits, "hits", &jp_hits2))
+		goto out;
+
+	for (const char *p = zbx_json_next(&jp_hits2, NULL); NULL != p; p = zbx_json_next(&jp_hits2, p))
+	{
+		zbx_json_parse_t	jp_hit, jp_source;
+
+		zbx_json_brackets_open(p, &jp_hit);
+
+		if (SUCCEED != zbx_json_brackets_by_name(&jp_hit, "_source", &jp_source))
+			continue;
+
+		zbx_history_record_t	hr;
+
+		if (SUCCEED == history_parse_value(&jp_source, value_type, &hr))
+		{
+			zbx_vector_history_record_append_ptr(&hist->rows, &hr);
+			rows_num++;
+		}
+	}
+out:
+	return rows_num;
+}
+
 static int	history_elastic_fetch_batch(void *data, zbx_vector_item_history_t *results,
 		unsigned char value_type, time_t start, int limit, char **error)
 {
-	ZBX_UNUSED(data);
-	ZBX_UNUSED(results);
-	ZBX_UNUSED(value_type);
-	ZBX_UNUSED(start);
-	ZBX_UNUSED(limit);
+	zbx_history_elastic_data_t	*d = (zbx_history_elastic_data_t *)data;
+	size_t			url_alloc = 0, url_offset = 0;
+	int			ret = FAIL, rows_num = 0;
+	struct zbx_json		query;
+	char			*post_url = NULL;
+	double			sec = 0;
+	zbx_elastic_conn_t	conn = {0};
 
-	*error = zbx_strdup(NULL, "batch fetching not supported for ElasticSearch history storage provider");
-	return FAIL;
+	if (0 != d->log_slow_queries)
+		sec = zbx_time();
+
+	/* prepare the json query for elasticsearch, apply ranges if needed */
+	zbx_json_init(&query, ZBX_JSON_ALLOCATE);
+
+	zbx_json_addint64(&query, "size", 0);
+	zbx_json_addobject(&query, "query");	/* $.query. */
+	zbx_json_addobject(&query, "bool");	/* $.query.bool. */
+
+	zbx_json_addarray(&query, "filter");	/* $.query.bool.filter[ */
+	zbx_json_addobject(&query, NULL);	/* $.query.bool.filter[. */
+
+	zbx_json_addobject(&query, "range");	/* $.query.bool.filter[.range. */
+	zbx_json_addobject(&query, "clock");	/* $.query.bool.filter[.range.clock. */
+	zbx_json_addstring(&query, "format", "epoch_second", ZBX_JSON_TYPE_STRING);
+	zbx_json_addint64(&query, "gt", start);
+	zbx_json_close(&query);			/* $.query.bool.filter[.range. */
+	zbx_json_close(&query);			/* $.query.bool.filter[. */
+	zbx_json_close(&query);			/* $.query.bool.filter[ */
+
+	zbx_json_addobject(&query, NULL);	/* $.query.bool.filter[. */
+	zbx_json_addobject(&query, "terms");	/* $.query.bool.filter[.terms. */
+	zbx_json_addarray(&query, "itemid");	/* #.query.bool.filter[.terms.itemid[ */
+
+	for (int i = 0; i < results->values_num; i++)
+		zbx_json_addint64(&query, NULL, results->values[i].itemid);
+
+	zbx_json_close(&query);			/* $.query.bool.filter[.terms. */
+	zbx_json_close(&query);			/* $.query.bool.filter[. */
+	zbx_json_close(&query);			/* $.query.bool.filter[ */
+
+	zbx_json_close(&query);			/* $.query.bool.*/
+	zbx_json_close(&query);			/* $.query.*/
+	zbx_json_close(&query);			/* $. */
+
+	zbx_json_addobject(&query, "aggs");	/* $.aggs. */
+	zbx_json_addobject(&query, "items");	/* $.aggs.items. */
+
+	zbx_json_addobject(&query, "terms");	/* $.aggs.items.terms. */
+	zbx_json_addstring(&query, "field", "itemid", ZBX_JSON_TYPE_STRING);
+	zbx_json_addint64(&query, "size", results->values_num);
+	zbx_json_close(&query);			/* $.aggs.items. */
+
+	zbx_json_addobject(&query, "aggs");		/* $.aggs.items.aggs. */
+	zbx_json_addobject(&query, "top_values");	/* $.aggs.items.aggs.top_values. */
+	zbx_json_addobject(&query, "top_hits");		/* $.aggs.items.aggs.top_values.top_hits. */
+	zbx_json_addint64(&query, "size", limit);
+	zbx_json_addarray(&query, "sort");		/* $.aggs.items.aggs.top_values.top_hits.sort[ */
+	zbx_json_addobject(&query, NULL);		/* $.aggs.items.aggs.top_values.top_hits.sort[. */
+	zbx_json_addobject(&query, "clock");		/* $.aggs.items.aggs.top_values.top_hits.sort[.clock. */
+	zbx_json_addstring(&query, "order", "desc", ZBX_JSON_TYPE_STRING);
+
+	zbx_json_close(&query);				/* $.aggs.items.aggs.top_values.top_hits.sort[. */
+	zbx_json_close(&query);				/* $.aggs.items.aggs.top_values.top_hits.sort[ */
+	zbx_json_close(&query);				/* $.aggs.items.aggs.top_values.top_hits. */
+	zbx_json_close(&query);				/* $.aggs.items.aggs.top_values. */
+	zbx_json_close(&query);				/* $.aggs.items.aggs. */
+	zbx_json_close(&query);				/* $.aggs.items. */
+	zbx_json_close(&query);				/* $.aggs.*/
+	zbx_json_close(&query);				/* $.*/
+
+
+	url_offset = 0;
+	zbx_snprintf_alloc(&post_url, &url_alloc, &url_offset, "%s*/_search", value_type_str[value_type]);
+
+	if (SUCCEED != history_elastic_conn_init(&conn, d, post_url, "application/json", NULL, error))
+		goto out;
+
+	if (FAIL == history_elastic_conn_set_post_data(&conn, query.buffer, query.buffer_size, error))
+		goto out;
+
+	zabbix_log(LOG_LEVEL_TRACE, "sending query to %s; post data: %s", conn.url, query.buffer);
+
+	/* initiate search context */
+
+	if (SUCCEED != history_elastic_query(data, d->mhandle, &conn, ELASTIC_RETRIES_ON))
+		goto out;
+
+	/* fetch search results */
+
+	if (SUCCEED != history_elastic_conn_set_url_path(&conn, data, "_search/scroll", error))
+		goto out;
+
+	if (0 != conn.resp.page.offset)
+	{
+		struct zbx_json_parse	jp, jp_aggs, jp_items, jp_buckets;
+		const char		*p = NULL;
+
+		zabbix_log(LOG_LEVEL_TRACE, "received from elasticsearch: %s", conn.resp.page.data);
+
+		zbx_json_open(conn.resp.page.data, &jp);
+		if (SUCCEED != zbx_json_brackets_by_name(&jp, "aggregations", &jp_aggs))
+			goto out;
+
+		if (SUCCEED != zbx_json_brackets_by_name(&jp_aggs, "items", &jp_items))
+			goto out;
+
+		if (SUCCEED != zbx_json_brackets_by_name(&jp_items, "buckets", &jp_buckets))
+			goto out;
+
+		while (NULL != (p = zbx_json_next(&jp_buckets, p)))
+		{
+			rows_num += history_elastic_parse_bucket(p, value_type, results);
+		}
+	}
+
+	ret = SUCCEED;
+
+out:
+	elastic_conn_clear(&conn);
+
+	zbx_free(post_url);
+
+	if (0 != d->log_slow_queries)
+	{
+		sec = zbx_time() - sec;
+		if (sec > (double)d->log_slow_queries / 1000.0)
+			zabbix_log(LOG_LEVEL_WARNING, "slow query: " ZBX_FS_DBL " sec, \"%s\"", sec, query.buffer);
+	}
+
+	zbx_json_free(&query);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() rows:%d", __func__, rows_num);
+
+	return ret;
 }
 
 
@@ -1495,13 +1680,15 @@ static void	history_elastic_close(void *data)
  ******************************************************************************/
 static void	history_elastic_validate_options(const zbx_history_option_t *options, int options_num)
 {
-	const char	*supported_options = "name,precache,url,log_slow_queries,date_index";
+	const char	*supported_options = "name,log_slow_queries,types,source_ip,log_slow_queries,date_index,"
+				"ssl_cert_file,ssl_key_file,ssl_key_password,ssl_verify_peer,ssl_verify_host,"
+				"ssl_ca_location,ssl_cert_location,ssl_key_location,precache,url";
 
 	for (int i = 0; i < options_num; i++)
 	{
 		if (SUCCEED != zbx_str_in_list(supported_options, options[i].name, ','))
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "Unsupported SQL history provider option: %s=%s",
+			zabbix_log(LOG_LEVEL_WARNING, "Unsupported ElasticSearch history provider option: %s=%s",
 					options[i].name, options[i].value);
 		}
 	}
@@ -1534,7 +1721,7 @@ zbx_history_provider_t *history_elastic_open(const zbx_history_option_t *options
 	provider = (zbx_history_provider_t *)zbx_malloc(NULL, sizeof(zbx_history_provider_t));
 
 	provider->name = zbx_strdup(NULL, HISTORY_PROVIDER_ELASTIC);
-	provider->traits = ZBX_HISTORY_TRAIT_TYPES_NOBIN;
+	provider->traits = ZBX_HISTORY_TRAIT_TYPES_NOBIN | history_options_precache(options, options_num);
 	provider->impl.write = history_elastic_write;
 	provider->impl.flush = history_elastic_flush;
 	provider->impl.fetch = history_elastic_fetch;

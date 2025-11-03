@@ -803,7 +803,7 @@ out:
 					curl_multi_strerror(code));
 		}
 
-		if (CURLE_OK != (err = curl_easy_setopt(conn->handle, CURLOPT_POSTFIELDSIZE, 0)))
+		if (CURLE_OK != (err = curl_easy_setopt(conn->handle, CURLOPT_POSTFIELDSIZE, 0L)))
 			zabbix_log(LOG_LEVEL_WARNING, "cannot remove post fields: %s", curl_easy_strerror(err));
 
 		zbx_free(conn->post_data);
