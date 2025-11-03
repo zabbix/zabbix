@@ -547,7 +547,7 @@ zabbix_export:
               value: system
       discovery_rules:
         - uuid: 5ad946dd847944a294a56ed0a244a219
-          name: '[{#ID}]: Model discovery'
+          name: '{#NAME}: Model discovery'
           type: DEPENDENT
           key: 'openai.model.discovery[{#ID}]'
           filter:
@@ -564,9 +564,9 @@ zabbix_export:
           description: 'Used for discovering models used in the {#NAME} project on the OpenAI Platform.'
           item_prototypes:
             - uuid: 03057358da3f42c9bce9b3f9814e108a
-              name: '[{#ID}/{#MODEL}]: Get model data'
+              name: '{#NAME} [{#MODEL}]: Get model data'
               type: DEPENDENT
-              key: 'openai.model.get[{#ID},{#MODEL}]'
+              key: 'openai.model.get[{#ID},"{#MODEL}"]'
               history: '0'
               value_type: TEXT
               description: 'Item for gathering data of the {#MODEL} model.'
@@ -586,14 +586,14 @@ zabbix_export:
                   value: raw
                 - tag: model
                   value: '{#MODEL}'
-                - tag: project
+                - tag: project_id
                   value: '{#ID}'
-                - tag: project
+                - tag: project_name
                   value: '{#NAME}'
             - uuid: 635d12e823b547169da209e7aaa3ec79
-              name: '[{#ID}/{#MODEL}]: Model request number'
+              name: '{#NAME} [{#MODEL}]: Model request number'
               type: DEPENDENT
-              key: 'openai.requests.number[{#ID},{#MODEL}]'
+              key: 'openai.requests.number[{#ID},"{#MODEL}"]'
               description: 'Total number of requests to the model {#MODEL} in the {#NAME} project.'
               preprocessing:
                 - type: JSONPATH
@@ -602,7 +602,7 @@ zabbix_export:
                   error_handler: CUSTOM_VALUE
                   error_handler_params: '0'
               master_item:
-                key: 'openai.model.get[{#ID},{#MODEL}]'
+                key: 'openai.model.get[{#ID},"{#MODEL}"]'
               tags:
                 - tag: component
                   value: completions
@@ -610,14 +610,14 @@ zabbix_export:
                   value: model
                 - tag: model
                   value: '{#MODEL}'
-                - tag: project
+                - tag: project_id
                   value: '{#ID}'
-                - tag: project
+                - tag: project_name
                   value: '{#NAME}'
             - uuid: 58083a34c49a4a5298f75717085969a2
-              name: '[{#ID}/{#MODEL}]: Input tokens'
+              name: '{#NAME} [{#MODEL}]: Input tokens'
               type: DEPENDENT
-              key: 'openai.tokens.input[{#ID},{#MODEL}]'
+              key: 'openai.tokens.input[{#ID},"{#MODEL}"]'
               description: 'Total number of input tokens received by the model {#MODEL} in the {#NAME} project.'
               preprocessing:
                 - type: JSONPATH
@@ -626,7 +626,7 @@ zabbix_export:
                   error_handler: CUSTOM_VALUE
                   error_handler_params: '0'
               master_item:
-                key: 'openai.model.get[{#ID},{#MODEL}]'
+                key: 'openai.model.get[{#ID},"{#MODEL}"]'
               tags:
                 - tag: component
                   value: completions
@@ -634,14 +634,14 @@ zabbix_export:
                   value: model
                 - tag: model
                   value: '{#MODEL}'
-                - tag: project
+                - tag: project_id
                   value: '{#ID}'
-                - tag: project
+                - tag: project_name
                   value: '{#NAME}'
             - uuid: 8210adc308084ac08a9550e89b73d663
-              name: '[{#ID}/{#MODEL}]: Input audio tokens'
+              name: '{#NAME} [{#MODEL}]: Input audio tokens'
               type: DEPENDENT
-              key: 'openai.tokens.input_audio[{#ID},{#MODEL}]'
+              key: 'openai.tokens.input_audio[{#ID},"{#MODEL}"]'
               description: 'Total number of input audio tokens sent by the model {#MODEL} in the {#NAME} project.'
               preprocessing:
                 - type: JSONPATH
@@ -650,7 +650,7 @@ zabbix_export:
                   error_handler: CUSTOM_VALUE
                   error_handler_params: '0'
               master_item:
-                key: 'openai.model.get[{#ID},{#MODEL}]'
+                key: 'openai.model.get[{#ID},"{#MODEL}"]'
               tags:
                 - tag: component
                   value: completions
@@ -658,14 +658,14 @@ zabbix_export:
                   value: model
                 - tag: model
                   value: '{#MODEL}'
-                - tag: project
+                - tag: project_id
                   value: '{#ID}'
-                - tag: project
+                - tag: project_name
                   value: '{#NAME}'
             - uuid: d4fa2aa80bb647b8a2b79f556004af7c
-              name: '[{#ID}/{#MODEL}]: Input cached tokens'
+              name: '{#NAME} [{#MODEL}]: Input cached tokens'
               type: DEPENDENT
-              key: 'openai.tokens.input_cached[{#ID},{#MODEL}]'
+              key: 'openai.tokens.input_cached[{#ID},"{#MODEL}"]'
               description: 'Total number of input cached tokens sent by the model {#MODEL} in the {#NAME} project.'
               preprocessing:
                 - type: JSONPATH
@@ -674,7 +674,7 @@ zabbix_export:
                   error_handler: CUSTOM_VALUE
                   error_handler_params: '0'
               master_item:
-                key: 'openai.model.get[{#ID},{#MODEL}]'
+                key: 'openai.model.get[{#ID},"{#MODEL}"]'
               tags:
                 - tag: component
                   value: completions
@@ -682,14 +682,14 @@ zabbix_export:
                   value: model
                 - tag: model
                   value: '{#MODEL}'
-                - tag: project
+                - tag: project_id
                   value: '{#ID}'
-                - tag: project
+                - tag: project_name
                   value: '{#NAME}'
             - uuid: e56e31c7988041a9b4506ffba4e6fa52
-              name: '[{#ID}/{#MODEL}]: Output tokens'
+              name: '{#NAME} [{#MODEL}]: Output tokens'
               type: DEPENDENT
-              key: 'openai.tokens.output[{#ID},{#MODEL}]'
+              key: 'openai.tokens.output[{#ID},"{#MODEL}"]'
               description: 'Total number of output tokens sent by the model {#MODEL} in the {#NAME} project.'
               preprocessing:
                 - type: JSONPATH
@@ -698,7 +698,7 @@ zabbix_export:
                   error_handler: CUSTOM_VALUE
                   error_handler_params: '0'
               master_item:
-                key: 'openai.model.get[{#ID},{#MODEL}]'
+                key: 'openai.model.get[{#ID},"{#MODEL}"]'
               tags:
                 - tag: component
                   value: completions
@@ -706,14 +706,14 @@ zabbix_export:
                   value: model
                 - tag: model
                   value: '{#MODEL}'
-                - tag: project
+                - tag: project_id
                   value: '{#ID}'
-                - tag: project
+                - tag: project_name
                   value: '{#NAME}'
             - uuid: 0dc8c1eaa9314927b7108cc93c854521
-              name: '[{#ID}/{#MODEL}]: Output audio tokens'
+              name: '{#NAME} [{#MODEL}]: Output audio tokens'
               type: DEPENDENT
-              key: 'openai.tokens.output_audio[{#ID},{#MODEL}]'
+              key: 'openai.tokens.output_audio[{#ID},"{#MODEL}"]'
               description: 'Total number of output audio tokens sent by the model {#MODEL} in the {#NAME} project.'
               preprocessing:
                 - type: JSONPATH
@@ -722,7 +722,7 @@ zabbix_export:
                   error_handler: CUSTOM_VALUE
                   error_handler_params: '0'
               master_item:
-                key: 'openai.model.get[{#ID},{#MODEL}]'
+                key: 'openai.model.get[{#ID},"{#MODEL}"]'
               tags:
                 - tag: component
                   value: completions
@@ -730,38 +730,38 @@ zabbix_export:
                   value: model
                 - tag: model
                   value: '{#MODEL}'
-                - tag: project
+                - tag: project_id
                   value: '{#ID}'
-                - tag: project
+                - tag: project_name
                   value: '{#NAME}'
           graph_prototypes:
             - uuid: d992c2b6fef4446591d7014cabc94dea
-              name: '[{#ID}/{#MODEL}]: Tokens statistics'
+              name: '{#NAME} [{#ID}/{#MODEL}]: Tokens statistics'
               graph_items:
                 - color: 199C0D
                   item:
                     host: 'OpenAI Platform by HTTP'
-                    key: 'openai.tokens.input[{#ID},{#MODEL}]'
+                    key: 'openai.tokens.input[{#ID},"{#MODEL}"]'
                 - sortorder: '1'
                   color: F63100
                   item:
                     host: 'OpenAI Platform by HTTP'
-                    key: 'openai.tokens.output[{#ID},{#MODEL}]'
+                    key: 'openai.tokens.output[{#ID},"{#MODEL}"]'
                 - sortorder: '2'
                   color: 00611C
                   item:
                     host: 'OpenAI Platform by HTTP'
-                    key: 'openai.tokens.input_cached[{#ID},{#MODEL}]'
+                    key: 'openai.tokens.input_cached[{#ID},"{#MODEL}"]'
                 - sortorder: '3'
                   color: F7941D
                   item:
                     host: 'OpenAI Platform by HTTP'
-                    key: 'openai.tokens.input_audio[{#ID},{#MODEL}]'
+                    key: 'openai.tokens.input_audio[{#ID},"{#MODEL}"]'
                 - sortorder: '4'
                   color: FC6EA3
                   item:
                     host: 'OpenAI Platform by HTTP'
-                    key: 'openai.tokens.output_audio[{#ID},{#MODEL}]'
+                    key: 'openai.tokens.output_audio[{#ID},"{#MODEL}"]'
           parent_discovery_rule:
             key: openai.project.discovery
           master_item:
@@ -792,7 +792,7 @@ zabbix_export:
           description: 'Used for discovering projects on the OpenAI Platform.'
           item_prototypes:
             - uuid: 93782ec08c734abd9a8bb7c6e8c157ab
-              name: '[{#ID}]: Get completion data'
+              name: '{#NAME}: Get completion data'
               type: DEPENDENT
               key: 'openai.completions.get[{#ID}]'
               history: '0'
@@ -812,12 +812,12 @@ zabbix_export:
               tags:
                 - tag: component
                   value: raw
-                - tag: project
+                - tag: project_id
                   value: '{#ID}'
-                - tag: project
+                - tag: project_name
                   value: '{#NAME}'
             - uuid: 8c51d3b0157f476eb4a62c036473438b
-              name: '[{#ID}]: Daily expenses'
+              name: '{#NAME}: Daily expenses'
               type: DEPENDENT
               key: 'openai.expenses.amount[{#ID}]'
               value_type: FLOAT
@@ -836,24 +836,24 @@ zabbix_export:
                   value: costs
                 - tag: component
                   value: project
-                - tag: project
+                - tag: project_id
                   value: '{#ID}'
-                - tag: project
+                - tag: project_name
                   value: '{#NAME}'
               trigger_prototypes:
                 - uuid: 406d38421362474d98fac3e3bc4d41b1
                   expression: 'last(/OpenAI Platform by HTTP/openai.expenses.amount[{#ID}])>{$OPENAI.EXPENSES.MAX:"{#ID}"}'
-                  name: 'OpenAI Platform: [{#ID}]: Daily expenses exceeded'
-                  event_name: 'OpenAI Platform: [{#ID}]: Daily expenses exceeded (>{$OPENAI.EXPENSES.MAX:"{#ID}"})'
+                  name: 'OpenAI Platform: {#NAME}: Daily expenses exceeded'
+                  event_name: 'OpenAI Platform: {#NAME} [{#ID}]: Daily expenses exceeded (>{$OPENAI.EXPENSES.MAX:"{#ID}"})'
                   opdata: 'Expenses for the past day: {ITEM.LASTVALUE1}'
                   priority: WARNING
-                  description: 'The daily expense limit is higher than the maximum.'
+                  description: 'The daily expense limit for the {#NAME} ({#ID}) project is higher than the maximum.'
                   manual_close: 'YES'
                   tags:
                     - tag: scope
                       value: performance
             - uuid: c6e74fff343c4c0fbfee1704ba794d40
-              name: '[{#ID}]: Get expense data'
+              name: '{#NAME}: Get expense data'
               type: DEPENDENT
               key: 'openai.expenses.get[{#ID}]'
               history: '0'
@@ -873,12 +873,12 @@ zabbix_export:
               tags:
                 - tag: component
                   value: raw
-                - tag: project
+                - tag: project_id
                   value: '{#ID}'
-                - tag: project
+                - tag: project_name
                   value: '{#NAME}'
             - uuid: 797302910c5b4f238d77aaa3a22551f3
-              name: '[{#ID}]: Model request number'
+              name: '{#NAME}: Model request number'
               type: DEPENDENT
               key: 'openai.requests.number[{#ID}]'
               description: 'Total number of requests to all models in the project.'
@@ -895,12 +895,12 @@ zabbix_export:
                   value: completions
                 - tag: component
                   value: project
-                - tag: project
+                - tag: project_id
                   value: '{#ID}'
-                - tag: project
+                - tag: project_name
                   value: '{#NAME}'
             - uuid: 67ffcc8be80641acbe6556381d540fba
-              name: '[{#ID}]: Input tokens'
+              name: '{#NAME}: Input tokens'
               type: DEPENDENT
               key: 'openai.tokens.input[{#ID}]'
               description: 'Total number of input tokens received by all models in the project.'
@@ -917,12 +917,12 @@ zabbix_export:
                   value: completions
                 - tag: component
                   value: project
-                - tag: project
+                - tag: project_id
                   value: '{#ID}'
-                - tag: project
+                - tag: project_name
                   value: '{#NAME}'
             - uuid: f4edc1c6e7354760b5cd7dc53697be30
-              name: '[{#ID}]: Input audio tokens'
+              name: '{#NAME}: Input audio tokens'
               type: DEPENDENT
               key: 'openai.tokens.input_audio[{#ID}]'
               description: 'Total number of input audio tokens sent by all models in the project.'
@@ -939,12 +939,12 @@ zabbix_export:
                   value: completions
                 - tag: component
                   value: project
-                - tag: project
+                - tag: project_id
                   value: '{#ID}'
-                - tag: project
+                - tag: project_name
                   value: '{#NAME}'
             - uuid: fc03925deb5d40efbd443160d60e616a
-              name: '[{#ID}]: Input cached tokens'
+              name: '{#NAME}: Input cached tokens'
               type: DEPENDENT
               key: 'openai.tokens.input_cached[{#ID}]'
               description: 'Total number of input cached tokens sent by all models in the project.'
@@ -961,12 +961,12 @@ zabbix_export:
                   value: completions
                 - tag: component
                   value: project
-                - tag: project
+                - tag: project_id
                   value: '{#ID}'
-                - tag: project
+                - tag: project_name
                   value: '{#NAME}'
             - uuid: b4502508f47f40318cb56631002d801d
-              name: '[{#ID}]: Output tokens'
+              name: '{#NAME}: Output tokens'
               type: DEPENDENT
               key: 'openai.tokens.output[{#ID}]'
               description: 'Total number of output tokens sent by all models in the project.'
@@ -983,12 +983,12 @@ zabbix_export:
                   value: completions
                 - tag: component
                   value: project
-                - tag: project
+                - tag: project_id
                   value: '{#ID}'
-                - tag: project
+                - tag: project_name
                   value: '{#NAME}'
             - uuid: 8db5eb1f3c39437db160e02047da5ede
-              name: '[{#ID}]: Output audio tokens'
+              name: '{#NAME}: Output audio tokens'
               type: DEPENDENT
               key: 'openai.tokens.output_audio[{#ID}]'
               description: 'Total number of output audio tokens sent by all models in the project.'
@@ -1005,13 +1005,13 @@ zabbix_export:
                   value: completions
                 - tag: component
                   value: project
-                - tag: project
+                - tag: project_id
                   value: '{#ID}'
-                - tag: project
+                - tag: project_name
                   value: '{#NAME}'
           graph_prototypes:
             - uuid: ee1bb621d8294ea88db88de69f6066ca
-              name: '[{#ID}]: Daily expenses'
+              name: '{#NAME} [{#ID}]: Daily expenses'
               graph_items:
                 - drawtype: GRADIENT_LINE
                   color: 199C0D
@@ -1019,7 +1019,7 @@ zabbix_export:
                     host: 'OpenAI Platform by HTTP'
                     key: 'openai.expenses.amount[{#ID}]'
             - uuid: d0d0638efe8144a39a81e3026559bcd3
-              name: '[{#ID}]: Tokens statistics'
+              name: '{#NAME} [{#ID}]: Tokens statistics'
               graph_items:
                 - color: 199C0D
                   item:
