@@ -2556,11 +2556,9 @@ static int	vc_query_item_cached(zbx_vc_item_t *item)
  * Parameters: item      - [IN/OUT] the item                                  *
  *             rows      - [IN] history records to cache                      *
  *             nvalues   - [IN] number of values to cache                     *
- *             ts_window - [IN] window start timestamp                        *
  *                                                                            *
  ******************************************************************************/
-static void	vc_item_precache_nvalues(zbx_vc_item_t *item, zbx_vector_history_record_t *rows, int nvalues,
-		int ts_window)
+static void	vc_item_precache_nvalues(zbx_vc_item_t *item, zbx_vector_history_record_t *rows, int nvalues)
 {
 	int	i, ts_start = 0;
 
@@ -2581,10 +2579,6 @@ static void	vc_item_precache_nvalues(zbx_vc_item_t *item, zbx_vector_history_rec
 
 	vch_item_add_values_at_tail(item, rows->values + i, rows->values_num - i);
 
-	/* not enough data, set the cached start from the window timestamp */
-	if (0 < nvalues)
-		ts_start = ts_window;
-
 	vc_item_update_db_cached_from(item, ts_start);
 }
 
@@ -2594,13 +2588,13 @@ static void	vc_item_precache_nvalues(zbx_vc_item_t *item, zbx_vector_history_rec
  *                                                                            *
  * Parameters: item      - [IN/OUT] the item                                  *
  *             rows      - [IN] history records to cache                      *
- *             ts_window - [IN] window start timestamp                        *
+ *             ts_start  - [IN] window start timestamp                        *
  *                                                                            *
  ******************************************************************************/
-static void	vc_item_precache_seconds(zbx_vc_item_t *item, zbx_vector_history_record_t *rows, int ts_window)
+static void	vc_item_precache_seconds(zbx_vc_item_t *item, zbx_vector_history_record_t *rows, int ts_start)
 {
 	vch_item_add_values_at_tail(item, rows->values, rows->values_num);
-	vc_item_update_db_cached_from(item, ts_window);
+	vc_item_update_db_cached_from(item, ts_start);
 }
 
 /******************************************************************************
@@ -2610,15 +2604,14 @@ static void	vc_item_precache_seconds(zbx_vc_item_t *item, zbx_vector_history_rec
  * Parameters: hist       - [IN] item history data                            *
  *             value_type - [IN] item value type                              *
  *             ts_start   - [IN] history start timestamp                      *
- *             range_type - [IN] range type                                   *
+ *             limit      - [IN] maximum number of values                     *
  *                                                                            *
  * Comments: For count based requests only the required number of values will *
  *           be cached. For time based requests all fetched values will be    *
  *           cached.                                                          *
  *                                                                            *
  ******************************************************************************/
-static void	vc_precache_item(zbx_item_history_t *hist, unsigned char value_type, int ts_start,
-		zbx_value_type_t range_type)
+static void	vc_precache_item(zbx_item_history_t *hist, unsigned char value_type, int ts_start, int limit)
 {
 	zbx_vc_item_t	*item;
 
@@ -2636,20 +2629,10 @@ static void	vc_precache_item(zbx_item_history_t *hist, unsigned char value_type,
 
 	zbx_vector_history_record_sort(&hist->rows, (zbx_compare_func_t)zbx_history_record_compare_asc_func);
 
-	switch (range_type)
-	{
-		case ZBX_VALUE_SECONDS:
-			vc_item_precache_seconds(item, &hist->rows, ts_start);
-			break;
-		case ZBX_VALUE_NVALUES:
-		case ZBX_VALUE_NODATA:
-			vc_item_precache_nvalues(item, &hist->rows, hist->range->value, ts_start);
-			break;
-		default:
-			THIS_SHOULD_NEVER_HAPPEN_MSG("invalid history range");
-	}
-
-	vch_item_add_values_at_tail(item, hist->rows.values, hist->rows.values_num);
+	if (hist->rows.values_num < limit)
+		vc_item_precache_seconds(item, &hist->rows, ts_start);
+	else
+		vc_item_precache_nvalues(item, &hist->rows, hist->range->value);
 }
 
 /******************************************************************************
@@ -2660,6 +2643,7 @@ static void	vc_precache_item(zbx_item_history_t *hist, unsigned char value_type,
  *             window     - [IN/OUT] vector of query indices to precache      *
  *             value_type - [IN] item value type                              *
  *             ts_start   - [IN] window start timestamp                       *
+ *             max_limit  - [IN] maximum number of values per item to cache   *
  *             mode       - [IN] precache mode (QUERY or RANGE)               *
  *                                                                            *
  * Return value: SUCCEED - queries were precached successfully                *
@@ -2670,14 +2654,16 @@ static void	vc_precache_item(zbx_item_history_t *hist, unsigned char value_type,
  *                                                                            *
  ******************************************************************************/
 static int	vc_precache_window(zbx_vector_vc_query_t *queries, zbx_vector_int32_t *window,
-		unsigned char value_type, int ts_start, zbx_vc_precache_mode_t mode)
+		unsigned char value_type, int ts_start, int max_limit, zbx_vc_precache_mode_t mode)
 {
 	zbx_vector_item_history_t	results;
+	int				limit;
 
 	if (VC_PRECACHE_MIN_QUERIES > window->values_num)
 		goto out;
 
 	zbx_vector_item_history_create(&results);
+	limit = 1;
 
 	for (int i = 0; i < window->values_num; i++)
 	{
@@ -2690,10 +2676,25 @@ static int	vc_precache_window(zbx_vector_vc_query_t *queries, zbx_vector_int32_t
 		hist_local.range = query->range;
 		zbx_vector_history_record_create(&hist_local.rows);
 		zbx_vector_item_history_append_ptr(&results, &hist_local);
+
+		switch (query->range->type)
+		{
+			case ZBX_VALUE_SECONDS:
+				if (limit < max_limit)
+					limit = max_limit;
+				break;
+			case ZBX_VALUE_NVALUES:
+			case ZBX_VALUE_NODATA:
+				if (limit < query->range->value + 1)
+					limit = query->range->value + 1;
+				break;
+			default:
+				THIS_SHOULD_NEVER_HAPPEN_MSG("invalid history range");
+		}
 	}
 
 	zbx_vector_item_history_sort(&results, zbx_item_history_compare_by_itemid);
-	zbx_history_get_batch(&results, value_type, ts_start, 0);
+	zbx_history_get_batch(&results, value_type, ts_start, limit);
 
 	zbx_vector_item_history_sort(&results, zbx_item_history_compare_by_index_desc);
 
@@ -2708,15 +2709,12 @@ static int	vc_precache_window(zbx_vector_vc_query_t *queries, zbx_vector_int32_t
 
 		if (1 < hist->rows.values_num)
 		{
-			vc_precache_item(hist, value_type, ts_start, hist->range->type);
+			vc_precache_item(hist, value_type, ts_start, limit);
 			zbx_vector_vc_query_remove(queries, hist->index);
 		}
 		else if (VC_PRECACHE_RANGE == mode)
 		{
-			zabbix_log(LOG_LEVEL_TRACE, "insufficient values for itemid:" ZBX_FS_UI64 " pre-caching",
-					hist->itemid);
-
-			vc_precache_item(hist, value_type, ts_start, ZBX_VALUE_SECONDS);
+			vc_precache_item(hist, value_type, ts_start, limit);
 			zbx_vector_vc_query_remove(queries, hist->index);
 		}
 	}
@@ -2778,14 +2776,15 @@ static int	vc_precache_query_windows(zbx_vector_vc_query_t *queries, int interva
 			continue;
 		}
 
-		if (FAIL == vc_precache_window(queries, &window, value_type, ts_start - interval, mode))
+		if (FAIL == vc_precache_window(queries, &window, value_type, ts_start - interval,
+				interval / SEC_PER_MIN, mode))
 			goto out;
 
 		ts_start = query->ts_end;
 		zbx_vector_int32_append(&window, i);
 	}
 
-	if (FAIL == vc_precache_window(queries, &window, value_type, ts_start - interval, mode))
+	if (FAIL == vc_precache_window(queries, &window, value_type, ts_start - interval, interval / SEC_PER_MIN, mode))
 		goto out;
 
 	ret = SUCCEED;
