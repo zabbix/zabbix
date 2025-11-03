@@ -360,7 +360,7 @@ JAVASCRIPT;
 				['db item_preproc.params', 'required', 'not_empty', 'when' => ['type', 'in' => [
 					ZBX_PREPROC_ERROR_FIELD_REGEX
 				]]],
-				['db item_preproc.params', 'required', 'not_empty',
+				['integer', 'required',
 					'in' => [ZBX_PREPROC_SNMP_UNCHANGED, ZBX_PREPROC_SNMP_UTF8_FROM_HEX,
 						ZBX_PREPROC_SNMP_MAC_FROM_HEX, ZBX_PREPROC_SNMP_INT_FROM_BITS
 					],
