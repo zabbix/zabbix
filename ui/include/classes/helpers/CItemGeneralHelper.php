@@ -688,9 +688,6 @@ JAVASCRIPT;
 				$step['params'][] = $step[$key];
 				unset($step[$key]);
 			}
-			else {
-				error_log('missing key'. $key);
-			}
 		}
 
 		foreach (['params_0_not_supported', 'params_1_not_supported'] as $key) {

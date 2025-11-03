@@ -88,7 +88,6 @@ class CControllerValueMapEdit extends CController {
 			case 'template':
 				$rules = CControllerValueMapCheck::getValidationRules(['valuemap_names']);
 				$data += ['js_validation_rules' => (new CFormValidator($rules))->getRules()];
-
 				break;
 		}
 
