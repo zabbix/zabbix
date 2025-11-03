@@ -422,7 +422,7 @@ class CTest extends TestCase {
 		DBclose();
 
 		if (defined('PHPUNIT_REPORT_WARNINGS') && PHPUNIT_REPORT_WARNINGS && self::$warnings) {
-			throw new PHPUnit_Framework_Warning(implode("\n", self::$warnings));
+			throw new \PHPUnit\Framework\Warning(implode("\n", self::$warnings));
 		}
 
 		if ($errors !== '' && $errors !== false) {
