@@ -340,7 +340,6 @@
 			this.#setLoadingStatus(['add', 'update'])
 			clearMessages();
 			const fields = this.form.getAllValues();
-			const url = new URL(this.form_element.getAttribute('action'), location.href);
 
 			this.form.validateSubmit(fields)
 				.then((result) => {

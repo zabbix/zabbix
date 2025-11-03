@@ -148,13 +148,6 @@ window.tag_filter_edit = new class {
 				})
 					.then((response) => response.json())
 					.then((response) => {
-						if (overlays_stack.getById(this.overlay.dialogueid) !== this.overlay) {
-							throw { canceled: true };
-						}
-
-						return response;
-					})
-					.then((response) => {
 						if ('error' in response) {
 							throw {error: response.error};
 						}
@@ -185,10 +178,6 @@ window.tag_filter_edit = new class {
 	}
 
 	#ajaxExceptionHandler(exception) {
-		if (typeof exception === 'object' && exception.canceled) {
-			return;
-		}
-
 		let title, messages;
 
 		if (typeof exception === 'object' && 'error' in exception) {
