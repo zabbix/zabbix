@@ -692,6 +692,11 @@ static int	evaluate_expression(zbx_eval_context_t *ctx, const zbx_timespec_t *ts
 	return SUCCEED;
 }
 
+int	zbx_um_expand_cb_wrapper(void *data, char **str, const zbx_uint64_t *hostids, int hostids_num, char **error)
+{
+	return zbx_dc_expand_user_and_func_macros((const zbx_dc_um_handle_t *)data, str, hostids, hostids_num, error);
+}
+
 static int	expand_expression_macros(zbx_eval_context_t *ctx, zbx_dc_um_handle_t *um_handle,
 		const zbx_db_event *db_event, const zbx_uint64_t *hostids, int hostids_num, char **error)
 {
@@ -703,8 +708,7 @@ static int	expand_expression_macros(zbx_eval_context_t *ctx, zbx_dc_um_handle_t 
 		return FAIL;
 	}
 
-	return zbx_eval_expand_user_macros(ctx, hostids, hostids_num,
-			(zbx_macro_expand_func_t)zbx_dc_expand_user_and_func_macros, um_handle, error);
+	return zbx_eval_expand_user_macros(ctx, hostids, hostids_num, zbx_um_expand_cb_wrapper, um_handle, error);
 }
 
 static int	expand_trigger_macros(zbx_dc_trigger_t *tr, zbx_db_event *db_event, zbx_dc_um_handle_t *um_handle,
