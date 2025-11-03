@@ -142,7 +142,7 @@ class CControllerUsergroupEdit extends CController {
 			}
 		}
 
-		$data['tag_filters_badges'] = makeTags($tag_filters_badges, true, 'groupid');
+		$data['tag_filters_badges'] = CTagHelper::getTagsHtml($tag_filters_badges, ZBX_TAG_OBJECT_HOST_GROUP);
 		$data['users_ms'] = $this->getUsersMs();
 		$data['can_update_group'] = (!$this->hasInput('usrgrpid') || granted2update_group($this->getInput('usrgrpid')));
 

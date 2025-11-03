@@ -16,37 +16,45 @@
 
 class CControllerImageCreate extends CController {
 
-	protected function checkInput() {
-		$fields = [
-			'name'      => 'required|not_empty|db images.name',
-			'imagetype' => 'required|fatal|db images.imagetype'
+	protected function init(): void {
+		$this->setInputValidationMethod(self::INPUT_VALIDATION_FORM);
+		$this->setPostContentType(self::POST_CONTENT_TYPE_FORM);
+	}
+
+	public static function getValidationRules(): array {
+		$api_uniq = [
+			['image.get', ['name' => '{name}'], 'imageid']
 		];
 
-		$ret = $this->validateInput($fields);
+		return ['object', 'api_uniq' => $api_uniq, 'fields' => [
+			'imagetype' => ['db images.imagetype','required', 'in '.IMAGE_TYPE_ICON.','.IMAGE_TYPE_BACKGROUND],
+			'name' => ['db images.name', 'required', 'not_empty'],
+			'image' => ['file', 'required', 'not_empty', 'max-size' => ZBX_MAX_IMAGE_SIZE, 'file-type' => 'image']
+		]];
+	}
+
+	protected function checkInput(): bool {
+
+		$ret = $this->validateInput(self::getValidationRules());
 
 		if (!$ret) {
-			switch ($this->getValidationResult()) {
-				case self::VALIDATION_ERROR:
-					$url = (new CUrl('zabbix.php'))
-						->setArgument('action', 'image.edit')
-						->setArgument('imagetype', $this->getInput('imagetype'));
+			$form_errors = $this->getValidationError();
+			$response = $form_errors
+				? ['form_errors' => $form_errors]
+				: ['error' => [
+					'title' => _('Cannot add image'),
+					'messages' => array_column(get_and_clear_messages(), 'message')
+				]];
 
-					$response = new CControllerResponseRedirect($url);
-					$response->setFormData($this->getInputAll());
-					CMessageHelper::setErrorTitle(_('Cannot add image'));
-					$this->setResponse($response);
-					break;
-
-				case self::VALIDATION_FATAL_ERROR:
-					$this->setResponse(new CControllerResponseFatal());
-					break;
-			}
+			$this->setResponse(
+				new CControllerResponseData(['main_block' => json_encode($response)])
+			);
 		}
 
 		return $ret;
 	}
 
-	protected function checkPermissions() {
+	protected function checkPermissions(): bool {
 		if (!$this->checkAccess(CRoleHelper::UI_ADMINISTRATION_GENERAL)) {
 			return false;
 		}
@@ -54,25 +62,14 @@ class CControllerImageCreate extends CController {
 		return true;
 	}
 
-	/**
-	 * @param $error string
-	 *
-	 * @return string|null
-	 */
-	protected function uploadImage(&$error) {
+	protected function uploadImage(?string &$error): ?string {
 		try {
-			if (array_key_exists('image', $_FILES)) {
-				$file = new CUploadFile($_FILES['image']);
+			if ($this->hasFile('image')) {
+				$file = new CUploadFile($this->getFile('image'));
 
 				if ($file->wasUploaded()) {
-					$file->validateImageSize();
 					return base64_encode($file->getContent());
 				}
-
-				return null;
-			}
-			else {
-				return null;
 			}
 		}
 		catch (Exception $e) {
@@ -82,20 +79,16 @@ class CControllerImageCreate extends CController {
 		return null;
 	}
 
-	protected function doAction() {
+	protected function doAction(): void {
 		$image = $this->uploadImage($error);
 
 		if ($error) {
-			$url = (new CUrl('zabbix.php'))
-				->setArgument('action', 'image.edit')
-				->setArgument('imagetype', $this->getInput('imagetype'));
+			$output['error'] = [
+				'title' => _('Cannot add image'),
+				'messages' => $error
+			];
+			$this->setResponse(new CControllerResponseData(['main_block' => json_encode($output)]));
 
-			$response = new CControllerResponseRedirect($url);
-			error($error);
-			$response->setFormData($this->getInputAll());
-			CMessageHelper::setErrorTitle(_('Cannot add image'));
-
-			$this->setResponse($response);
 			return;
 		}
 
@@ -111,23 +104,23 @@ class CControllerImageCreate extends CController {
 		$result = API::Image()->create($options);
 
 		if ($result) {
-			$response = new CControllerResponseRedirect(
-				(new CUrl('zabbix.php'))
-					->setArgument('action', 'image.list')
-					->setArgument('imagetype', $this->getInput('imagetype'))
-			);
-			CMessageHelper::setSuccessTitle(_('Image added'));
+			$output['success']['title'] = _('Image added');
+			$output['success']['redirect'] = (new CUrl('zabbix.php'))
+				->setArgument('action', 'image.list')
+				->setArgument('imagetype', $this->getInput('imagetype'))
+				->getUrl();
+
+			if ($messages = get_and_clear_messages()) {
+				$output['success']['messages'] = array_column($messages, 'message');
+			}
 		}
 		else {
-			$response = new CControllerResponseRedirect(
-				(new CUrl('zabbix.php'))
-					->setArgument('action', 'image.edit')
-					->setArgument('imagetype', $this->getInput('imagetype'))
-			);
-			$response->setFormData($this->getInputAll());
-			CMessageHelper::setErrorTitle(_('Cannot add image'));
+			$output['error'] = [
+				'title' => _('Cannot add image'),
+				'messages' => array_column(get_and_clear_messages(), 'message')
+			];
 		}
 
-		$this->setResponse($response);
+		$this->setResponse(new CControllerResponseData(['main_block' => json_encode($output)]));
 	}
 }

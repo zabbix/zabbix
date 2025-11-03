@@ -92,6 +92,7 @@ class CControllerHostPrototypeList extends CController {
 			'output' => ['hostid', 'host', 'name', 'status', 'templateid', 'discover', 'flags'],
 			'selectTemplates' => ['templateid', 'name'],
 			'selectTags' => ['tag', 'value'],
+			'selectInheritedTags' => ['tag', 'value'],
 			'selectDiscoveryData' => ['parent_hostid'],
 			'discoveryids' => $data['parent_discoveryid'],
 			'sortfield' => $sort_field,
@@ -148,8 +149,10 @@ class CControllerHostPrototypeList extends CController {
 			]);
 		}
 
+		CTagHelper::mergeOwnAndInheritedTags($data['host_prototypes'], true);
+
 		$data += [
-			'tags' =>  makeTags($data['host_prototypes'], true, 'hostid'),
+			'tags' => CTagHelper::getTagsHtml($data['host_prototypes'], ZBX_TAG_OBJECT_HOST_PROTOTYPE),
 			'parent_templates' => getHostPrototypeParentTemplates($data['host_prototypes'])
 		];
 

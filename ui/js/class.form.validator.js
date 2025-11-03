@@ -949,7 +949,8 @@ class CFormValidator {
 			'string': this.#validateStringUtf8,
 			'array': this.#validateArray,
 			'object': this.#validateObject,
-			'objects': this.#validateObjects
+			'objects': this.#validateObjects,
+			'file': this.#validateFile
 		}[rules.type] || null;
 
 		if (validator !== null) {
@@ -1368,6 +1369,54 @@ class CFormValidator {
 		objects_values = normalized_values;
 
 		return {result: CFormValidator.SUCCESS, value: objects_values};
+	}
+
+	/**
+	 * Function to validate data that according to the rules is expected to be a file.
+	 *
+	 * @param {Object} rules  Ruleset to use for validation.
+	 * @param {any}    value  Data to validate (an uploaded file).
+	 *
+	 * @returns {Object}
+	 */
+	#validateFile(rules, value) {
+		if (!(value instanceof File)) {
+			return {
+				result: CFormValidator.ERROR,
+				error: this.#getMessage(rules, 'type', t('This value is not a valid file.'))
+			};
+		}
+
+		if ('not_empty' in rules && value.size == 0) {
+			return {
+				result: CFormValidator.ERROR,
+				error: this.#getMessage(rules, 'not_empty', t('This field cannot be empty.'))
+			};
+		}
+
+		if (rules['max-size'] && value.size > rules['max-size']) {
+			const error_msg = rules['file-type'] === 'image'
+				? t('Image size must be less than %1$s.')
+				: t('File size must be less than %1$s.');
+
+			return {
+				result: CFormValidator.ERROR,
+				error: this.#getMessage(rules, 'max-size',
+					sprintf(error_msg, rules['max-size-human-readable'])
+				)
+			};
+		}
+
+		if (rules['file-type'] !== 'file' && value.size > 0) {
+			if (!value.type.startsWith(`${rules['file-type']}/`)) {
+				return {
+					result: CFormValidator.ERROR,
+					error: this.#getMessage(rules, 'file-type', t('File format is unsupported.'))
+				};
+			}
+		}
+
+		return {result: CFormValidator.SUCCESS, value};
 	}
 
 	/**

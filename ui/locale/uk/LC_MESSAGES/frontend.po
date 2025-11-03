@@ -9439,6 +9439,10 @@ msgstr ""
 msgid "File checksum, calculated by the UNIX cksum algorithm. Returns integer for crc32 (default) and string for md5, sha256"
 msgstr "Контрольна сума файлу обчислюється алгоритмом UNIX cksum. Повертає ціле число для crc32 (за замовчуванням) та рядок для md5, sha256"
 
+#: include/classes/validators/CFormValidator.php:1451 jsLoader.php:445
+msgid "File format is unsupported."
+msgstr ""
+
 #: include/classes/import/readers/CYamlImportReader.php:52
 msgid "File is empty"
 msgstr "Файл порожній"
@@ -9455,6 +9459,11 @@ msgstr "Інформація про власника файлу. Поверта�
 #: include/classes/data/CItemData.php:1679
 msgid "File size in bytes (default) or in newlines. Returns integer"
 msgstr "Розмір файлу в байтах (за замовчуванням) або кількість символів нових рядків. Повертається ціле число"
+
+#: include/classes/helpers/CUploadFile.php:129 jsLoader.php:444
+#, c-format
+msgid "File size must be less than %1$s."
+msgstr ""
 
 #: include/classes/data/CItemData.php:1687
 msgid "File time information. Returns integer (Unix timestamp)"
@@ -12313,6 +12322,18 @@ msgstr "Макроси вузла мережі та успадковані"
 msgid "Inherited and host prototype macros"
 msgstr ""
 
+#: include/classes/helpers/CTagHelper.php:230
+msgid "Inherited and host tag"
+msgstr ""
+
+#: app/partials/configuration.tags.tab.php:42
+msgid "Inherited and host tags"
+msgstr ""
+
+#: include/classes/helpers/CTagHelper.php:231
+msgid "Inherited and item tag"
+msgstr ""
+
 #: app/partials/configuration.tags.tab.php:165
 msgid "Inherited and item tags"
 msgstr ""
@@ -12325,13 +12346,33 @@ msgstr ""
 msgid "Inherited and template macros"
 msgstr "Успадковані та макроси із шаблонів"
 
+#: include/classes/helpers/CTagHelper.php:229
+msgid "Inherited and template tag"
+msgstr ""
+
+#: app/partials/configuration.tags.tab.php:33
+msgid "Inherited and template tags"
+msgstr ""
+
+#: include/classes/helpers/CTagHelper.php:232
+msgid "Inherited and trigger tag"
+msgstr ""
+
 #: app/partials/configuration.tags.tab.php:155
 msgid "Inherited and trigger tags"
 msgstr "Успадковані та теги тригера"
 
+#: include/classes/helpers/CTagHelper.php:233
+msgid "Inherited and web scenario tag"
+msgstr ""
+
 #: include/forms.inc.php:311
 msgid "Inherited items"
 msgstr "Успадковані елементи даних"
+
+#: include/classes/helpers/CTagHelper.php:222
+msgid "Inherited tag"
+msgstr ""
 
 #: widgets/geomap/includes/WidgetForm.php:62
 msgid "Initial view"
@@ -21990,6 +22031,10 @@ msgstr "Ім'я шаблону"
 msgid "Template permissions"
 msgstr ""
 
+#: app/partials/configuration.tags.tab.php:33
+msgid "Template tags"
+msgstr ""
+
 #: report2.php:398
 msgid "Template trigger"
 msgstr "Тригер з шаблону"
@@ -22501,6 +22546,10 @@ msgstr ""
 
 #: include/classes/validators/CFormValidator.php:946 jsLoader.php:421
 msgid "This value does not match pattern."
+msgstr ""
+
+#: jsLoader.php:442
+msgid "This value is not a valid file."
 msgstr ""
 
 #: include/classes/validators/CFormValidator.php:874 jsLoader.php:424

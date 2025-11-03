@@ -2641,6 +2641,30 @@ div {
 	&.yellow-bg {
 		color: darken($alt-yellow, 45%);
 	}
+
+	&.tag-inherited::before,
+	&.tag-inherited-duplicate::before {
+		@extend %icons-font;
+
+		margin-right: 3px;
+		font-size: $icon-smaller-size;
+		line-height: 12px;
+		vertical-align: top;
+		opacity: .6;
+	}
+
+	&.tag-inherited::before {
+		content: $zi-file;
+	}
+
+	&.tag-inherited-duplicate::before {
+		content: $zi-file-filled;
+	}
+}
+
+.tag-inherited-title {
+	margin-bottom: 3px;
+	color: $font-alt-color;
 }
 
 .green-bg {

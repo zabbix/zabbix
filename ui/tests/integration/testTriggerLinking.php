@@ -42,8 +42,6 @@ class testTriggerLinking extends CIntegrationTest {
 	const TRIGGER_URL_PRE = 'strata_url';
 	const TRIGGER_URL_NAME_PRE = 'strata_url_name';
 	const TRIGGER_TYPE = 1;
-	const TRIGGER_RECOVERY_MODE = 1;
-	const TRIGGER_CORRELATION_MODE = 1;
 	const TRIGGER_CORRELATION_TAG_PRE = 'strata_correlation_tag';
 	const TRIGGER_CORRELATION_TAG_FOR_NEW_TEMPLATE = 'Xtag';
 	const TRIGGER_MANUAL_CLOSE = 1;
@@ -216,8 +214,8 @@ class testTriggerLinking extends CIntegrationTest {
 				'url' => self::TRIGGER_URL_PRE . "_" . self::$stringids[$i],
 				'url_name' => self::TRIGGER_URL_NAME_PRE . "_" . self::$stringids[$i],
 				'type' => self::TRIGGER_TYPE,
-				'recovery_mode' => self::TRIGGER_RECOVERY_MODE,
-				'correlation_mode' => self::TRIGGER_CORRELATION_MODE,
+				'recovery_mode' => ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION,
+				'correlation_mode' => ZBX_CORRELATION_DISABLED,
 				'correlation_tag' => self::TRIGGER_CORRELATION_TAG_PRE . "_" . self::$stringids[$i],
 				'manual_close' => self::TRIGGER_MANUAL_CLOSE,
 				'opdata' => self::TRIGGER_OPDATA_PRE . "_" . self::$stringids[$i],
@@ -248,8 +246,8 @@ class testTriggerLinking extends CIntegrationTest {
 				'comments' => self::TRIGGER_COMMENTS_PRE . "_" . self::$stringids[$i],
 				'url' => self::TRIGGER_URL_PRE . "_" . self::$stringids[$i],
 				'type' => self::TRIGGER_TYPE,
-				'recovery_mode' => self::TRIGGER_RECOVERY_MODE,
-				'correlation_mode' => self::TRIGGER_CORRELATION_MODE,
+				'recovery_mode' => ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION,
+				'correlation_mode' => ZBX_CORRELATION_DISABLED,
 				'correlation_tag' => self::TRIGGER_CORRELATION_TAG_PRE . "_" . self::$stringids[$i],
 				'manual_close' => self::TRIGGER_MANUAL_CLOSE,
 				'opdata' => self::TRIGGER_OPDATA_PRE . "_" . self::$stringids[$i],
@@ -291,8 +289,8 @@ class testTriggerLinking extends CIntegrationTest {
 				'priority' => self::TRIGGER_PRIORITY,
 				'status' => self::TRIGGER_STATUS,
 				'type' => self::TRIGGER_TYPE,
-				'recovery_mode' => self::TRIGGER_RECOVERY_MODE,
-				'correlation_mode' => self::TRIGGER_CORRELATION_MODE,
+				'recovery_mode' => ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION,
+				'correlation_mode' => ZBX_CORRELATION_DISABLED,
 				'correlation_tag' => self::TRIGGER_CORRELATION_TAG_FOR_NEW_TEMPLATE,
 				'manual_close' => self::TRIGGER_MANUAL_CLOSE,
 				'expression' => 'last(/' .  self::$templateX_name . '/' .
@@ -430,8 +428,8 @@ class testTriggerLinking extends CIntegrationTest {
 			$this->assertEquals($entry['url_name'],         self::TRIGGER_URL_NAME_PRE . "_" . self::$stringids[$i], $ep);
 			$this->assertEquals($entry['type'],        self::TRIGGER_TYPE, $ep);
 
-			$this->assertEquals($entry['recovery_mode'],    self::TRIGGER_RECOVERY_MODE, $ep);
-			$this->assertEquals($entry['correlation_mode'], self::TRIGGER_CORRELATION_MODE, $ep);
+			$this->assertEquals($entry['recovery_mode'],    ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION, $ep);
+			$this->assertEquals($entry['correlation_mode'], ZBX_CORRELATION_DISABLED, $ep);
 			$this->assertEquals($entry['correlation_tag'],  self::TRIGGER_CORRELATION_TAG_PRE . "_" .
 					self::$stringids[$i], $ep);
 			$this->assertEquals($entry['manual_close'],     self::TRIGGER_MANUAL_CLOSE, $ep);
@@ -549,8 +547,8 @@ class testTriggerLinking extends CIntegrationTest {
 		$this->assertEquals($entry['priority'],    self::TRIGGER_PRIORITY, $ep);
 		$this->assertEquals($entry['status'],      self::TRIGGER_STATUS, $ep);
 		$this->assertEquals($entry['type'],        self::TRIGGER_TYPE, $ep);
-		$this->assertEquals($entry['recovery_mode'],    self::TRIGGER_RECOVERY_MODE, $ep);
-		$this->assertEquals($entry['correlation_mode'], self::TRIGGER_CORRELATION_MODE, $ep);
+		$this->assertEquals($entry['recovery_mode'], ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION, $ep);
+		$this->assertEquals($entry['correlation_mode'], ZBX_CORRELATION_DISABLED, $ep);
 		$this->assertEquals($entry['manual_close'],     self::TRIGGER_MANUAL_CLOSE, $ep);
 		$this->assertEquals($entry['expression'],  "{{$entry['functions'][0]['functionid']}}=99", $ep);
 		$this->assertEquals($entry['recovery_expression'],  "{{$entry['functions'][0]['functionid']}}=999", $ep);

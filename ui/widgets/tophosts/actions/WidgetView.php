@@ -74,12 +74,15 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 		if ($this->isTemplateDashboard()) {
 			$hostids = $this->fields_values['override_hostid'];
+			$evaltype = TAG_EVAL_TYPE_AND_OR;
+			$tags = null;
 		}
 		else {
 			$hostids = $this->fields_values['hostids'] ?: null;
+			$evaltype = $this->fields_values['evaltype'];
+			$tags = $this->fields_values['tags'] ?: null;
 		}
 
-		$tags_exist = array_key_exists('tags', $this->fields_values);
 		$maintenance_status = $this->fields_values['maintenance'] == HOST_MAINTENANCE_STATUS_OFF
 			? HOST_MAINTENANCE_STATUS_OFF
 			: null;
@@ -88,8 +91,9 @@ class WidgetView extends CControllerDashboardWidgetView {
 			'output' => ['name', 'maintenance_status', 'maintenance_type', 'maintenanceid'],
 			'groupids' => $groupids,
 			'hostids' => $hostids,
-			'evaltype' => $tags_exist ? $this->fields_values['evaltype'] : null,
-			'tags' => $tags_exist ? $this->fields_values['tags'] : null,
+			'evaltype' => $evaltype,
+			'tags' => $tags,
+			'inheritedTags' => true,
 			'filter' => ['maintenance_status' => $maintenance_status],
 			'monitored_hosts' => true,
 			'preservekeys' => true

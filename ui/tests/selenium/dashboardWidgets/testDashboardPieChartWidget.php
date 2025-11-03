@@ -227,7 +227,7 @@ class testDashboardPieChartWidget extends testWidgets {
 			'Data set label' => ''
 		];
 		$form->checkValue($expected_values);
-		$expected_labels = ['Data set #1', 'Aggregation function', 'Data set aggregation', 'Data set label'];
+		$expected_labels = ['Data set #1', 'Aggregation function', 'Data set aggregation', 'Data set label', 'Item tags'];
 		$data_set_tab = $form->query('id:data_set')->one();
 		$this->assertAllVisibleLabels($data_set_tab, $expected_labels);
 		$this->validateDataSetHintboxes($form);

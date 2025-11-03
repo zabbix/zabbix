@@ -144,11 +144,11 @@ $tabs = (new CTabView(['id' => $tabsid]))
 	)
 	->addTab('tags-tab', _('Tags'),
 		new CPartial('configuration.tags.tab', [
-			'readonly' => $item['discovered'],
-			'show_inherited_tags' => $item['show_inherited_tags'],
-			'source' => 'item',
-			'tabs_id' => $tabsid,
+			'source' => 'item_prototype',
 			'tags' => $item['tags'],
+			'show_inherited_tags' => $item['show_inherited_tags'],
+			'readonly' => $item['discovered'],
+			'tabs_id' => $tabsid,
 			'tags_tab_id' => 'tags-tab',
 			'has_inline_validation' => true
 		]),

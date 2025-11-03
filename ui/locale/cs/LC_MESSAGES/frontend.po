@@ -9423,6 +9423,10 @@ msgstr "Požadavky na pole:"
 msgid "File checksum, calculated by the UNIX cksum algorithm. Returns integer for crc32 (default) and string for md5, sha256"
 msgstr "Kontrolní součet souboru, vypočítaný UNIX algoritmem cksum. Vrátí celé číslo pro crc32 (výchozí) a řetězec pro md5, sha256"
 
+#: include/classes/validators/CFormValidator.php:1451 jsLoader.php:445
+msgid "File format is unsupported."
+msgstr ""
+
 #: include/classes/import/readers/CYamlImportReader.php:52
 msgid "File is empty"
 msgstr "Soubor je prázdný"
@@ -9439,6 +9443,11 @@ msgstr "Informace o vlastníkovi souboru. Vrátí řetězec"
 #: include/classes/data/CItemData.php:1679
 msgid "File size in bytes (default) or in newlines. Returns integer"
 msgstr "Velikost souboru v bajtech (výchozí) nebo v nových řádcích. Vrátí celé číslo"
+
+#: include/classes/helpers/CUploadFile.php:129 jsLoader.php:444
+#, c-format
+msgid "File size must be less than %1$s."
+msgstr ""
 
 #: include/classes/data/CItemData.php:1687
 msgid "File time information. Returns integer (Unix timestamp)"
@@ -12292,6 +12301,18 @@ msgstr "Makra zděděná a makra hosta"
 msgid "Inherited and host prototype macros"
 msgstr "Makra zděděná a makra prototypu hosta"
 
+#: include/classes/helpers/CTagHelper.php:230
+msgid "Inherited and host tag"
+msgstr ""
+
+#: app/partials/configuration.tags.tab.php:42
+msgid "Inherited and host tags"
+msgstr ""
+
+#: include/classes/helpers/CTagHelper.php:231
+msgid "Inherited and item tag"
+msgstr ""
+
 #: app/partials/configuration.tags.tab.php:165
 msgid "Inherited and item tags"
 msgstr "Zděděné tagy a tagy itemů"
@@ -12304,13 +12325,33 @@ msgstr "Zděděné tagy a tagy scénářů"
 msgid "Inherited and template macros"
 msgstr "Makra zděděná a makra šablon"
 
+#: include/classes/helpers/CTagHelper.php:229
+msgid "Inherited and template tag"
+msgstr ""
+
+#: app/partials/configuration.tags.tab.php:33
+msgid "Inherited and template tags"
+msgstr ""
+
+#: include/classes/helpers/CTagHelper.php:232
+msgid "Inherited and trigger tag"
+msgstr ""
+
 #: app/partials/configuration.tags.tab.php:155
 msgid "Inherited and trigger tags"
 msgstr "Zděděné a spuštěné značky"
 
+#: include/classes/helpers/CTagHelper.php:233
+msgid "Inherited and web scenario tag"
+msgstr ""
+
 #: include/forms.inc.php:311
 msgid "Inherited items"
 msgstr "Zděděné položky"
+
+#: include/classes/helpers/CTagHelper.php:222
+msgid "Inherited tag"
+msgstr ""
 
 #: widgets/geomap/includes/WidgetForm.php:62
 msgid "Initial view"
@@ -21964,6 +22005,10 @@ msgstr "Jméno šablony"
 msgid "Template permissions"
 msgstr "Skupiny práv"
 
+#: app/partials/configuration.tags.tab.php:33
+msgid "Template tags"
+msgstr ""
+
 #: report2.php:398
 msgid "Template trigger"
 msgstr "Šablona spouštěče"
@@ -22475,6 +22520,10 @@ msgstr "Tato hodnota nemůže být jedna z %1$s."
 #: include/classes/validators/CFormValidator.php:946 jsLoader.php:421
 msgid "This value does not match pattern."
 msgstr "Tato hodnota neodpovídá vzoru."
+
+#: jsLoader.php:442
+msgid "This value is not a valid file."
+msgstr ""
 
 #: include/classes/validators/CFormValidator.php:874 jsLoader.php:424
 msgid "This value is not a valid floating-point value."

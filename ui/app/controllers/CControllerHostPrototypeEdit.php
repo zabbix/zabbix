@@ -38,12 +38,13 @@ class CControllerHostPrototypeEdit extends CController {
 			'add_templates' =>			'array_db hosts.hostid',
 			'group_links' =>			'array',
 			'group_prototypes' =>		'array',
-			'macros' =>					'array',
+			'show_inherited_tags' =>	'in 0,1',
 			'tags' =>					'array',
+			'show_inherited_macros' =>	'in 0,1',
+			'macros' =>					'array',
 			'custom_interfaces' =>		'in '.implode(',', [HOST_PROT_INTERFACES_INHERIT, HOST_PROT_INTERFACES_CUSTOM]),
 			'interfaces' =>				'array',
 			'inventory_mode' =>			'db host_inventory.inventory_mode| in '.implode(',', [HOST_INVENTORY_DISABLED, HOST_INVENTORY_MANUAL, HOST_INVENTORY_AUTOMATIC]),
-			'show_inherited_macros' =>	'in 0,1',
 			'clone' =>					'in 1'
 		];
 
@@ -120,6 +121,7 @@ class CControllerHostPrototypeEdit extends CController {
 			'context' => $this->getInput('context'),
 			'discovery_rule' => $this->parent_discovery,
 			'clone' => $this->hasInput('clone') ? 1 : null,
+			'show_inherited_tags' => (bool) $this->getInput('show_inherited_tags', 0),
 			'show_inherited_macros' => (bool) $this->getInput('show_inherited_macros', 0),
 			'warnings' => []
 		];
