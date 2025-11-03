@@ -929,7 +929,7 @@ static int	elastic_get_values_for_period(zbx_history_elastic_data_t *data, zbx_u
 
 	int	hits_num = 0;
 
-	do
+	while (0 != conn.resp.page.offset)
 	{
 		struct zbx_json_parse	jp, jp_values, jp_item, jp_sub, jp_hits, jp_source;
 		zbx_history_record_t	hr;
@@ -1006,7 +1006,6 @@ static int	elastic_get_values_for_period(zbx_history_elastic_data_t *data, zbx_u
 		if (SUCCEED != history_elastic_query(data, data->mhandle, &conn, ELASTIC_RETRIES_ON))
 			break;
 	}
-	while (0 == empty);
 
 	/* as recommended by the elasticsearch documentation, we close the scroll search through a DELETE request */
 	if (NULL != scroll_id && 0 != hits_num)
