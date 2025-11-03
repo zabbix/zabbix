@@ -665,6 +665,11 @@ static void	cached_headers_free(zbx_cached_header_t *header)
 	zbx_free(header);
 }
 
+static void	cached_headers_free_wrapper(void *data)
+{
+	cached_headers_free((zbx_cached_header_t*)data);
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: retrieve headers from request in form of arrays                   *
@@ -741,7 +746,7 @@ static duk_ret_t	get_headers_as_arrays(duk_context *ctx, zbx_es_httprequest_t *r
 	}
 
 out:
-	zbx_vector_ptr_clear_ext(&headers, (zbx_mem_free_func_t)cached_headers_free);
+	zbx_vector_ptr_clear_ext(&headers, cached_headers_free_wrapper);
 	zbx_vector_ptr_destroy(&headers);
 	return 1;
 }
