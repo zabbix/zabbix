@@ -1401,7 +1401,7 @@ static int	history_clickhouse_parse_batch_response(char *response, unsigned char
  *                                                                            *
  ******************************************************************************/
 static int	history_clickhouse_fetch_batch(void *data, zbx_vector_item_history_t *results,
-		unsigned char value_type, time_t start, char **error)
+		unsigned char value_type, time_t start, int limit, char **error)
 {
 	zbx_clickhouse_data_t	*d = (zbx_clickhouse_data_t *)data;
 	char			*sql = NULL, *errmsg = NULL;

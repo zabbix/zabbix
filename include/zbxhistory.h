@@ -65,7 +65,7 @@ void	zbx_dc_history_shallow_free(zbx_dc_history_t *dc_history);
 int	zbx_history_add_values(const zbx_vector_dc_history_ptr_t *history, zbx_uint64_t *flush_err);
 int	zbx_history_get_values(zbx_uint64_t itemid, int value_type, int start, int count, int end,
 		zbx_vector_history_record_t *values);
-void	zbx_history_get_batch(zbx_vector_item_history_t *results, int value_type, int start);
+void	zbx_history_get_batch(zbx_vector_item_history_t *results, int value_type, int start, int limit);
 
 zbx_uint64_t	zbx_history_get_precache_flags(void);
 zbx_uint64_t	zbx_history_get_trends_flags(void);

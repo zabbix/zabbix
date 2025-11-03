@@ -1190,12 +1190,13 @@ static int	history_elastic_fetch(void *data, zbx_uint64_t itemid, unsigned char 
 }
 
 static int	history_elastic_fetch_batch(void *data, zbx_vector_item_history_t *results,
-		unsigned char value_type, time_t start, char **error)
+		unsigned char value_type, time_t start, int limit, char **error)
 {
 	ZBX_UNUSED(data);
 	ZBX_UNUSED(results);
 	ZBX_UNUSED(value_type);
 	ZBX_UNUSED(start);
+	ZBX_UNUSED(limit);
 
 	*error = zbx_strdup(NULL, "batch fetching not supported for ElasticSearch history storage provider");
 	return FAIL;

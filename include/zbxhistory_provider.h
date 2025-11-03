@@ -271,6 +271,7 @@ typedef int (*zbx_history_provider_fetch_t)(void *data, zbx_uint64_t itemid, uns
  *     value_type - [IN] type of values to fetch                              *
  *     start      - [IN] start timestamp of the requested period              *
  *                       (greater than)                                       *
+ *     limit      - [IN] maximum number of values to retrieve per item        *
  *     error      - [OUT] error message in case of failure                    *
  *                                                                            *
  * Return value: SUCCEED - data fetched successfully                          *
@@ -282,7 +283,7 @@ typedef int (*zbx_history_provider_fetch_t)(void *data, zbx_uint64_t itemid, uns
  *                                                                            *
  ******************************************************************************/
 typedef int (*zbx_history_provider_fetch_batch_t)(void *data, zbx_vector_item_history_t *results,
-		unsigned char value_type, time_t start, char **error);
+		unsigned char value_type, time_t start, int limit, char **error);
 
 /******************************************************************************
  *                                                                            *

@@ -2693,7 +2693,7 @@ static int	vc_precache_window(zbx_vector_vc_query_t *queries, zbx_vector_int32_t
 	}
 
 	zbx_vector_item_history_sort(&results, zbx_item_history_compare_by_itemid);
-	zbx_history_get_batch(&results, value_type, ts_start);
+	zbx_history_get_batch(&results, value_type, ts_start, 0);
 
 	zbx_vector_item_history_sort(&results, zbx_item_history_compare_by_index_desc);
 

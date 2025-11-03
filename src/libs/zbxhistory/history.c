@@ -883,7 +883,7 @@ static int	history_session_fetch(zbx_history_session_t *session, zbx_uint64_t it
 }
 
 static void	history_session_fetch_batch(zbx_history_session_t *session, zbx_vector_item_history_t *results,
-		unsigned char value_type, time_t start)
+		unsigned char value_type, time_t start, int limit)
 {
 	zbx_history_provider_t	*provider;
 	char			*error = NULL;
@@ -897,7 +897,7 @@ static void	history_session_fetch_batch(zbx_history_session_t *session, zbx_vect
 	if (NULL == (provider = history_session_get_provider(session, value_type)))
 		return;
 
-	if (FAIL == provider->impl.fetch_batch(provider->data, results, value_type, start,  &error))
+	if (FAIL == provider->impl.fetch_batch(provider->data, results, value_type, start, limit, &error))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "Failed to fetch batch data from %s: %s",
 				provider->name, error);
@@ -1026,7 +1026,7 @@ int	zbx_history_get_values(zbx_uint64_t itemid, int value_type, int start, int c
 	return ret;
 }
 
-void	zbx_history_get_batch(zbx_vector_item_history_t *results, int value_type, int start)
+void	zbx_history_get_batch(zbx_vector_item_history_t *results, int value_type, int start, int limit)
 {
 	zbx_history_session_t	session;
 
@@ -1035,7 +1035,7 @@ void	zbx_history_get_batch(zbx_vector_item_history_t *results, int value_type, i
 
 	history_manager_init_session(&history_manager, &session);
 
-	history_session_fetch_batch(&session, results, (unsigned char)value_type, start);
+	history_session_fetch_batch(&session, results, (unsigned char)value_type, start, limit);
 
 	if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_TRACE))
 	{

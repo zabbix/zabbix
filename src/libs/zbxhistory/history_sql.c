@@ -386,7 +386,7 @@ out:
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-static int	db_read_batch(zbx_vector_item_history_t *results, unsigned char value_type, int time_from)
+static int	db_read_batch(zbx_vector_item_history_t *results, unsigned char value_type, int time_from, int limit)
 {
 	char			*sql = NULL;
 	size_t			sql_alloc = 0, sql_offset = 0;
@@ -770,12 +770,12 @@ static int	history_sql_fetch(void *data, zbx_uint64_t itemid, unsigned char valu
  *                                                                            *
  ******************************************************************************/
 static int	history_sql_fetch_batch(void *data, zbx_vector_item_history_t *results, unsigned char value_type,
-		time_t start, char **error)
+		time_t start, int limit, char **error)
 {
 	ZBX_UNUSED(data);
 	ZBX_UNUSED(error);
 
-	return db_read_batch(results, value_type, (int)start);
+	return db_read_batch(results, value_type, (int)start, limit);
 }
 
 /******************************************************************************
