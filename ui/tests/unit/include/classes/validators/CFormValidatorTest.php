@@ -2173,7 +2173,9 @@ class CFormValidatorTest extends TestCase {
 			],
 			[
 				['object', 'fields' => [
-					'value' => ['string', 'use' => [CAbsoluteTimeParser::class, [], ['min' => 0, 'max' => ZBX_MAX_DATE]]]
+					'value' => ['string',
+						'use' => [CAbsoluteTimeValidator::class, ['min' => 0, 'max' => ZBX_MAX_DATE]]
+					]
 				]],
 				['value' => '2024-01-08 12:00:00'],
 				['value' => '2024-01-08 12:00:00'],
@@ -2182,7 +2184,7 @@ class CFormValidatorTest extends TestCase {
 			],
 			[
 				['object', 'fields' => [
-					'value' => ['string', 'use' => [CAbsoluteTimeParser::class, [], ['max' => 1704700000]]]
+					'value' => ['string', 'use' => [CAbsoluteTimeValidator::class, ['max' => 1704700000]]]
 				]],
 				['value' => '2024-01-08 12:00:00'],
 				['value' => '2024-01-08 12:00:00'],
@@ -2193,13 +2195,13 @@ class CFormValidatorTest extends TestCase {
 			],
 			[
 				['object', 'fields' => [
-					'value' => ['string', 'use' => [CAbsoluteTimeParser::class, [], ['min' => 2147464799]]]
+					'value' => ['string', 'use' => [CAbsoluteTimeValidator::class, ['min' => 2147464799]]]
 				]],
 				['value' => '2024-01-08 12:00:00'],
 				['value' => '2024-01-08 12:00:00'],
 				CFormValidator::ERROR,
 				['/value' => [
-					['message' => 'Value must be greater than 2038-01-18 23:59:59.', 'level' => CFormValidator::ERROR_LEVEL_DELAYED]
+					['message' => 'Value must be equal or greater than 2038-01-18 23:59:59.', 'level' => CFormValidator::ERROR_LEVEL_DELAYED]
 				]]
 			],
 			[

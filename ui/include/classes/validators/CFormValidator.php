@@ -1094,30 +1094,6 @@ class CFormValidator {
 		}
 		$error = ucfirst($error);
 
-		// Parser specific checks not supported by parser itself.
-		if ($error === '') {
-			if ($instance instanceof CAbsoluteTimeParser) {
-				if (array_key_exists('min', $more_options)
-						&& $instance->getDateTime(true)->getTimestamp() < $more_options['min']) {
-					$error = _s('Value must be greater than %1$s.', date(ZBX_FULL_DATE_TIME, $more_options['min']));
-				}
-
-				if (array_key_exists('max', $more_options)
-						&& $instance->getDateTime(true)->getTimestamp() > $more_options['max']) {
-					$error = _s('Value must be smaller than %1$s.', date(ZBX_FULL_DATE_TIME, $more_options['max']));
-				}
-			}
-			elseif ($instance instanceof CSimpleIntervalParser) {
-				if (array_key_exists('min', $more_options) && timeUnitToSeconds($value, true) < $more_options['min']) {
-					$error = _s('Value must be greater than %1$s.', $more_options['min']);
-				}
-
-				if (array_key_exists('max', $more_options) && timeUnitToSeconds($value, true) > $more_options['max']) {
-					$error = _s('Value must be smaller than %1$s.', $more_options['max']);
-				}
-			}
-		}
-
 		return $error === '';
 	}
 

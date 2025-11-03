@@ -60,7 +60,7 @@ class CControllerMaintenanceTimePeriodCheck extends CController {
 				'when' => [['month_date_type', 'in' => [0]], ['timeperiod_type', 'in' => [TIMEPERIOD_TYPE_MONTHLY]]]
 			],
 			'start_date' => ['string', 'required', 'not_empty',
-				'use' => [CAbsoluteTimeParser::class, [], ['min' => 0, 'max' => ZBX_MAX_DATE]],
+				'use' => [CAbsoluteTimeValidator::class, ['min' => 0, 'max' => ZBX_MAX_DATE]],
 				'when' => ['timeperiod_type', 'in' => [TIMEPERIOD_TYPE_ONETIME]],
 				'messages' => ['use' => _('Invalid date.')]
 			],
