@@ -1026,6 +1026,16 @@ int	zbx_history_get_values(zbx_uint64_t itemid, int value_type, int start, int c
 	return ret;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: retrieve history values for multiple items in a single batch      *
+ *                                                                            *
+ * Parameters: results    - [IN/OUT] vector of item history structures        *
+ *             value_type - [IN] item value type                              *
+ *             start      - [IN] start timestamp of the requested period      *
+ *             limit      - [IN] maximum number of values to retrieve per item*
+ *                                                                            *
+ ******************************************************************************/
 void	zbx_history_get_batch(zbx_vector_item_history_t *results, int value_type, int start, int limit)
 {
 	zbx_history_session_t	session;

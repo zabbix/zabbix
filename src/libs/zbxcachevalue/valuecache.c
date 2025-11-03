@@ -2643,7 +2643,6 @@ static void	vc_precache_item(zbx_item_history_t *hist, unsigned char value_type,
  *             window     - [IN/OUT] vector of query indices to precache      *
  *             value_type - [IN] item value type                              *
  *             ts_start   - [IN] window start timestamp                       *
- *             max_limit  - [IN] maximum number of values per item to cache   *
  *             mode       - [IN] precache mode (QUERY or RANGE)               *
  *                                                                            *
  * Return value: SUCCEED - queries were precached successfully                *
@@ -2654,7 +2653,7 @@ static void	vc_precache_item(zbx_item_history_t *hist, unsigned char value_type,
  *                                                                            *
  ******************************************************************************/
 static int	vc_precache_window(zbx_vector_vc_query_t *queries, zbx_vector_int32_t *window,
-		unsigned char value_type, int ts_start, int max_limit, zbx_vc_precache_mode_t mode)
+		unsigned char value_type, int ts_start, zbx_vc_precache_mode_t mode)
 {
 	zbx_vector_item_history_t	results;
 	int				limit;
@@ -2663,7 +2662,7 @@ static int	vc_precache_window(zbx_vector_vc_query_t *queries, zbx_vector_int32_t
 		goto out;
 
 	zbx_vector_item_history_create(&results);
-	limit = 1;
+	limit = 2;
 
 	for (int i = 0; i < window->values_num; i++)
 	{
@@ -2680,8 +2679,8 @@ static int	vc_precache_window(zbx_vector_vc_query_t *queries, zbx_vector_int32_t
 		switch (query->range->type)
 		{
 			case ZBX_VALUE_SECONDS:
-				if (limit < max_limit)
-					limit = max_limit;
+				if (limit < query->range->value / SEC_PER_MIN + 1)
+					limit = query->range->value / SEC_PER_MIN + 1;
 				break;
 			case ZBX_VALUE_NVALUES:
 			case ZBX_VALUE_NODATA:
@@ -2776,15 +2775,14 @@ static int	vc_precache_query_windows(zbx_vector_vc_query_t *queries, int interva
 			continue;
 		}
 
-		if (FAIL == vc_precache_window(queries, &window, value_type, ts_start - interval,
-				interval / SEC_PER_MIN, mode))
+		if (FAIL == vc_precache_window(queries, &window, value_type, ts_start - interval, mode))
 			goto out;
 
 		ts_start = query->ts_end;
 		zbx_vector_int32_append(&window, i);
 	}
 
-	if (FAIL == vc_precache_window(queries, &window, value_type, ts_start - interval, interval / SEC_PER_MIN, mode))
+	if (FAIL == vc_precache_window(queries, &window, value_type, ts_start - interval, mode))
 		goto out;
 
 	ret = SUCCEED;
