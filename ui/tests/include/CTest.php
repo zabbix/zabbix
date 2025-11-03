@@ -55,7 +55,6 @@ use PHPUnit\Framework\TestCase;
  */
 use PHPUnit\Framework\Warning;
 
-
 class CTest extends TestCase {
 
 	// Table that should be backed up at the test suite level.
