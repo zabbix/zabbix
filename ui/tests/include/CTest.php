@@ -50,7 +50,7 @@ define('STRING_32', substr(STRING_6000, 0, 32));
 use PHPUnit\Framework\TestCase;
 
 /**
- * php unit built-in exception class.
+ * Php unit built-in exception class.
  */
 use PHPUnit\Framework\Warning;
 
