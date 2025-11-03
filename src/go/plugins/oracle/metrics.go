@@ -82,15 +82,15 @@ var metricsMeta = map[string]handlerFunc{ //nolint:gochecknoglobals
 // Common params: [URI|Session][,User][,Password][,Service].
 var (
 	paramURI = metric.NewConnParam("URI", "URI to connect or session name."). //nolint:gochecknoglobals
-			WithDefault(dbconn.URIDefaults.Scheme + "://localhost:" + dbconn.URIDefaults.Port).
-			WithSession().
-			WithValidator(uri.URIValidator{Defaults: dbconn.URIDefaults, AllowedSchemes: []string{"tcp"}})
+		WithDefault(dbconn.URIDefaults.Scheme + "://localhost:" + dbconn.URIDefaults.Port).
+		WithSession().
+		WithValidator(uri.URIValidator{Defaults: dbconn.URIDefaults, AllowedSchemes: []string{"tcp", "tcps"}})
 	paramUsername = metric.NewConnParam("User", "Oracle user."). //nolint:gochecknoglobals
-			WithDefault("")
+		WithDefault("")
 	paramPassword = metric.NewConnParam("Password", "User's password."). //nolint:gochecknoglobals
-			WithDefault("")
+		WithDefault("")
 	paramService = metric.NewConnParam("Service", "Service name to be used for connection."). //nolint:gochecknoglobals
-			WithDefault("XE")
+		WithDefault("XE")
 )
 
 var metrics = metric.MetricSet{ //nolint:gochecknoglobals

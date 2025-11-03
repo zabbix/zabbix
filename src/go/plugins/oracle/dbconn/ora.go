@@ -227,8 +227,9 @@ func prepareConnectString(tnsType TNSNameType, cd *ConnDetails, connectTimeout t
 		connectString = cd.Uri.Host()
 	case tnsNone:
 		connectString = fmt.Sprintf(
-			`(DESCRIPTION=(ADDRESS=(PROTOCOL=tcp)(HOST=%s)(PORT=%s))`+
+			`(DESCRIPTION=(ADDRESS=(PROTOCOL=%s)(HOST=%s)(PORT=%s))`+
 				`(CONNECT_DATA=(SERVICE_NAME="%s"))(CONNECT_TIMEOUT=%d)(RETRY_COUNT=0))`,
+			cd.Uri.Scheme(),
 			cd.Uri.Host(),
 			cd.Uri.Port(),
 			service,
