@@ -1638,11 +1638,12 @@ zbx_history_provider_t	*history_clickhouse_open(const zbx_history_option_t *opti
 	if (NULL == (data = history_clickhouse_create_data(options, options_num, error)))
 		return NULL;
 
+
 	provider = (zbx_history_provider_t *)zbx_malloc(NULL, sizeof(zbx_history_provider_t));
 
 	provider->name = zbx_strdup(NULL, HISTORY_PROVIDER_CLICKHOUSE);
 
-	provider->traits = ZBX_HISTORY_TRAIT_TYPES_NOBIN | ZBX_HISTORY_TRAIT_REQUIRES_PRECACHING;
+	provider->traits = ZBX_HISTORY_TRAIT_TYPES_NOBIN | history_options_precache(options, options_num);
 	provider->impl.write = history_clickhouse_write;
 	provider->impl.flush = history_clickhouse_flush;
 	provider->impl.fetch = history_clickhouse_fetch;

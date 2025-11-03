@@ -366,6 +366,33 @@ zbx_uint64_t	history_options_type_mask(const zbx_history_option_t *options, int 
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: determine if precaching is required based on provider options     *
+ *                                                                            *
+ * Parameters: options     - [IN] array of history options                    *
+ *             options_num - [IN] number of options in the array              *
+ *                                                                            *
+ * Return value: ZBX_HISTORY_TRAIT_REQUIRES_PRECACHING if precaching is       *
+ *               enabled, 0 otherwise                                         *
+ *                                                                            *
+ * Comments: Precaching is enabled by default or when explicitly set to "on"  *
+ *           or "1".                                                          *
+ *                                                                            *
+ ******************************************************************************/
+zbx_uint64_t	history_options_precache(const zbx_history_option_t *options, int options_num)
+{
+	const char	*precache;
+
+	if (NULL == (precache = history_option_value(options, options_num, HISTORY_PROVIDER_OPTION_PRECACHE)) ||
+			0 == strcmp(precache, "on") || 0 == strcmp(precache, "1"))
+	{
+		return ZBX_HISTORY_TRAIT_REQUIRES_PRECACHING;
+	}
+
+	return 0;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: create a history types option from a bitmask                      *
  *                                                                            *
  * Parameters: mask - [IN] bitmask representing value types                   *
@@ -488,3 +515,4 @@ int	history_options_add_common_params(zbx_vector_history_option_t *options, cons
 
 	return SUCCEED;
 }
+

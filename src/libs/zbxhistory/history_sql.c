@@ -14,6 +14,7 @@
 
 #include "zbxhistory.h"
 #include "history.h"
+#include "history_option.h"
 #include "history_sql.h"
 #include "zbxcommon.h"
 #include "zbxalgo.h"
@@ -841,7 +842,7 @@ zbx_history_provider_t	*history_sql_open(const zbx_history_option_t *options, in
 	provider->name = zbx_strdup(NULL, HISTORY_PROVIDER_SQL);
 	provider->traits = ZBX_HISTORY_TRAIT_REQUIRES_TRENDS | ZBX_HISTORY_TRAIT_REQUIRES_HOUSEKEEPING |
 			ZBX_HISTORY_TRAIT_TYPES_ALL | ZBX_HISTORY_TRAIT_DEFAULT_PROVIDER |
-			ZBX_HISTORY_TRAIT_REQUIRES_PRECACHING;
+			history_options_precache(options, options_num);
 	provider->impl.write = history_sql_write;
 	provider->impl.flush = history_sql_flush;
 	provider->impl.fetch = history_sql_fetch;
