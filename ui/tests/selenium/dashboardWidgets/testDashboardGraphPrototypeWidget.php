@@ -125,7 +125,7 @@ class testDashboardGraphPrototypeWidget extends testWidgets {
 			[
 				'name' => 'Dashboard for Graph Prototype widget',
 				'userid' => '1',
-				'private' => 1,
+				'private' => PRIVATE_SHARING,
 				'pages' => [
 					[
 						'widgets' => [
@@ -176,7 +176,7 @@ class testDashboardGraphPrototypeWidget extends testWidgets {
 			[
 				'name' => 'Dashboard for Sceenshoting Graph Prototype widgets',
 				'userid' => '1',
-				'private' => 1,
+				'private' => PRIVATE_SHARING,
 				'pages' => [[]]
 			]
 		]);
@@ -473,7 +473,7 @@ class testDashboardGraphPrototypeWidget extends testWidgets {
 		$form->submit();
 		COverlayDialogElement::ensureNotPresent();
 		$dashboard->waitUntilReady()->getWidget($widget['Name']);
-		$dashboard->save();
+		$dashboard->save()->waitUntilReady();
 		$this->page->removeFocus();
 		sleep(1);
 		$screenshot_area = $this->query('class:dashboard-grid')->one();
@@ -549,13 +549,12 @@ class testDashboardGraphPrototypeWidget extends testWidgets {
 				$widget = $dashboard->getWidget($data['fields']['Name']);
 				$this->assertTrue($widget->getContent()->isValid());
 
-				// Compare placeholders count in data and created widget.
-				$expected_placeholders_count =
-						(CTestArrayHelper::get($data['fields'], 'Columns') && CTestArrayHelper::get($data['fields'], 'Rows'))
-						? $data['fields']['Columns'] * $data['fields']['Rows']
-						: 2;
+				// Compare placeholders count in data and created widget. Default placeholder count is 2.
+				$expected_count = (array_key_exists('Columns', $data['fields']) && array_key_exists('Rows', $data['fields']))
+					? $data['fields']['Columns'] * $data['fields']['Rows']
+					: 2;
 				$placeholders_count = $widget->query('class:dashboard-grid-iterator-placeholder')->count();
-				$this->assertEquals($expected_placeholders_count, $placeholders_count);
+				$this->assertEquals($expected_count, $placeholders_count);
 				// Check Dynamic item setting on Dashboard.
 				if (CTestArrayHelper::get($data['fields'], 'Override host')) {
 					$this->assertTrue($dashboard->getControls()->query('xpath://form[@aria-label = '.
@@ -622,7 +621,7 @@ class testDashboardGraphPrototypeWidget extends testWidgets {
 			$dashboard->getWidget(self::$previous_widget_name);
 		}
 
-		$dashboard->save();
+		$dashboard->save()->waitUntilReady();
 
 		// Check that Dashboard has been saved and that there are no changes made to the widgets.
 		$this->assertMessage(TEST_GOOD, 'Dashboard updated');
