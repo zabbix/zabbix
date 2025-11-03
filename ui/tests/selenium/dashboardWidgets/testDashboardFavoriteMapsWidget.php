@@ -428,11 +428,10 @@ class testDashboardFavoriteMapsWidget extends CWebTest {
 
 		if ($update) {
 			self::$edit_widget = $header;
-			
+
 			if (array_key_exists('Refresh interval', $data['fields'])) {
 				self::$default_values['Refresh interval'] = $data['fields']['Refresh interval'];
 			}
-			
 		}
 
 		// Check widgets count.
