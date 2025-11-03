@@ -559,7 +559,7 @@ class testDashboardGraphPrototypeWidget extends testWidgets {
 				: 2;
 
 			$placeholders_count = $widget->query('class:dashboard-grid-iterator-placeholder')->count();
-			$this->assertEquals($expected_placeholders_count, $placeholders_count);
+			$this->assertEquals($expected_count, $placeholders_count);
 
 			// Check Dynamic item setting on Dashboard.
 			if (CTestArrayHelper::get($data['fields'], 'Override host')) {
