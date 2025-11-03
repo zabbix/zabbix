@@ -15,6 +15,10 @@
 #include "history_option.h"
 #include "zbxcommon.h"
 #include "zbxstr.h"
+#include "zbxhistory.h"
+
+static const char	*history_options_value_types[ITEM_VALUE_TYPE_COUNT] = {
+		"dbl", "str", "log", "uint", "text", "bin"};
 
 ZBX_VECTOR_IMPL(history_option, zbx_history_option_t)
 
@@ -297,7 +301,7 @@ int	history_provider_parse_options(const char *conf, char **name, zbx_vector_his
 	if (SUCCEED != history_get_options(ptr, options, error))
 		return FAIL;
 
-	if (NULL == (ptr = history_option_value(options->values, options->values_num, ZBX_HISTORY_OPTION_VALUE_TYPES)))
+	if (NULL == (ptr = history_option_value(options->values, options->values_num, HISTORY_PROVIDER_OPTION_TYPES)))
 	{
 		for (int i = 0; i < options->values_num; i++)
 		{
@@ -307,7 +311,7 @@ int	history_provider_parse_options(const char *conf, char **name, zbx_vector_his
 		zbx_vector_history_option_clear(options);
 
 		*error = zbx_dsprintf(NULL, "cannot find mandatory option \"%s\" in history provider configuration"
-				" \"%s\"", ZBX_HISTORY_OPTION_VALUE_TYPES, conf);
+				" \"%s\"", HISTORY_PROVIDER_OPTION_TYPES, conf);
 
 		return FAIL;
 	}
@@ -339,12 +343,10 @@ void	history_options_clear(zbx_history_option_t *options, int options_num)
  ******************************************************************************/
 zbx_uint64_t	history_options_type_mask(const zbx_history_option_t *options, int options_num)
 {
-	static const char	*value_types[ITEM_VALUE_TYPE_COUNT] = {"dbl", "str", "log", "uint", "text", "bin"};
-
 	zbx_uint64_t	mask = 0;
 	const char	*types;
 
-	if (NULL == (types = history_option_value(options, options_num, ZBX_HISTORY_OPTION_VALUE_TYPES)))
+	if (NULL == (types = history_option_value(options, options_num, HISTORY_PROVIDER_OPTION_TYPES)))
 	{
 		THIS_SHOULD_NEVER_HAPPEN;
 		return 0;
@@ -352,14 +354,47 @@ zbx_uint64_t	history_options_type_mask(const zbx_history_option_t *options, int 
 
 	for (int i = 0; i < ITEM_VALUE_TYPE_COUNT; i++)
 	{
-		if (NULL == value_types[i])
+		if (NULL == history_options_value_types[i])
 			continue;
 
-		if (SUCCEED == zbx_str_in_list(types, value_types[i], ','))
+		if (SUCCEED == zbx_str_in_list(types, history_options_value_types[i], ','))
 			mask |= (__UINT64_C(1) << i);
 	}
 
 	return mask;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: create a history types option from a bitmask                      *
+ *                                                                            *
+ * Parameters: mask - [IN] bitmask representing value types                   *
+ *                                                                            *
+ * Return value: The created option with comma-separated value types.         *
+ *                                                                            *
+ ******************************************************************************/
+zbx_history_option_t	history_option_types(zbx_uint64_t mask)
+{
+	zbx_history_option_t	option;
+
+	char	*types = NULL;
+	size_t	types_alloc = 0, types_offset = 0;
+
+	for (int i = 0; i < ITEM_VALUE_TYPE_COUNT; i++)
+	{
+		if (NULL == history_options_value_types[i] || SUCCEED != ZBX_HISTORY_CHECK_TYPE_FLAGS(mask, i))
+			continue;
+
+		if (0 != types_offset)
+			zbx_chrcpy_alloc(&types, &types_alloc, &types_offset, ',');
+
+		zbx_strcpy_alloc(&types, &types_alloc, &types_offset, history_options_value_types[i]);
+	}
+
+	option.name = zbx_strdup(NULL, HISTORY_PROVIDER_OPTION_TYPES);
+	option.value = types;
+
+	return option;
 }
 
 /******************************************************************************

@@ -274,6 +274,70 @@ static void	history_manager_map_value_types(zbx_history_manager_t *manager, int 
 	}
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: update the types option in the provider registry                  *
+ *                                                                            *
+ * Parameters: manager   - [IN/OUT] history manager                           *
+ *             index     - [IN] provider registry index                       *
+ *             type_mask - [IN] bitmask of value types to set                 *
+ *                                                                            *
+ * Comments: Removes existing types option if present and adds a new one with *
+ *           the specified type mask.                                         *
+ *                                                                            *
+ ******************************************************************************/
+static void	history_manager_registry_update_types(zbx_history_manager_t *manager, int index, zbx_uint64_t type_mask)
+{
+	zbx_history_registry_t	*registry = manager->registry.values[index];
+
+	for (int i = 0; i < registry->options.values_num; i++)
+	{
+		zbx_history_option_t	*option = &registry->options.values[i];
+
+		if (0 == strcmp(option->name, HISTORY_PROVIDER_OPTION_TYPES))
+		{
+			history_options_clear(option, 1);
+			zbx_vector_history_option_remove_noorder(&registry->options, i);
+			break;
+		}
+	}
+
+	zbx_vector_history_option_append(&registry->options, history_option_types(type_mask));
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: get the default history provider index from the registry          *
+ *                                                                            *
+ * Parameters: manager - [IN] history manager                                 *
+ *                                                                            *
+ * Return value: index of the default provider                                *
+ *                                                                            *
+ * Comments: Default history provider is one with types set to '*' or SQL.    *
+ *                                                                            *
+ ******************************************************************************/
+static int	history_manager_get_default_provider(zbx_history_manager_t *manager)
+{
+	int	sql_index = FAIL;
+
+	for (int i = 0; i < manager->registry.values_num; i++)
+	{
+		zbx_history_registry_t	*registry = manager->registry.values[i];
+		const char		*types;
+
+		types = history_option_value(registry->options.values, registry->options.values_num,
+				HISTORY_PROVIDER_OPTION_TYPES);
+
+		if (NULL != types && '*' == *types)
+			return i;
+
+		if (0 == strcmp(registry->name, HISTORY_PROVIDER_SQL))
+			sql_index = i;
+	}
+
+	return sql_index;
+}
+
 /*******************************************************************************
  *                                                                             *
  * Purpose: initialize the history manager                                     *
@@ -378,10 +442,13 @@ static int	history_manager_init(zbx_history_manager_t *manager, const char *conf
 
 	mask = value_type_mask ^ ((__UINT64_C(1) << ITEM_VALUE_TYPE_COUNT) - 1);
 
-	/* register default SQL provider for unconfigured value types */
+	/* register default SQL provider for unhandled value types */
 	if (0 != mask)
 	{
-		index = history_manager_register_provider(manager, HISTORY_PROVIDER_SQL, &options);
+		if (FAIL == (index = history_manager_get_default_provider(manager)))
+			index = history_manager_register_provider(manager, HISTORY_PROVIDER_SQL, &options);
+
+		history_manager_registry_update_types(manager, index, mask);
 		history_manager_map_value_types(manager, index, mask);
 	}
 
