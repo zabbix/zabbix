@@ -125,7 +125,7 @@ class testDashboardGraphPrototypeWidget extends testWidgets {
 			[
 				'name' => 'Dashboard for Graph Prototype widget',
 				'userid' => '1',
-				'private' => 1,
+				'private' => PRIVATE_SHARING,
 				'pages' => [
 					[
 						'widgets' => [
@@ -176,7 +176,7 @@ class testDashboardGraphPrototypeWidget extends testWidgets {
 			[
 				'name' => 'Dashboard for Sceenshoting Graph Prototype widgets',
 				'userid' => '1',
-				'private' => 1,
+				'private' => PRIVATE_SHARING,
 				'pages' => [[]]
 			]
 		]);
@@ -553,8 +553,8 @@ class testDashboardGraphPrototypeWidget extends testWidgets {
 			$widget = $dashboard->getWidget($data['fields']['Name']);
 			$this->assertTrue($widget->getContent()->isValid());
 
-			// Compare placeholders count in data and created widget.
-			$expected_placeholders_count = (CTestArrayHelper::get($data['fields'], 'Columns') && CTestArrayHelper::get($data['fields'], 'Rows'))
+			// Compare placeholders count in data and created widget. Default placeholder count is 2.
+			$expected_count = (array_key_exists('Columns', $data['fields']) && array_key_exists('Rows', $data['fields']))
 				? $data['fields']['Columns'] * $data['fields']['Rows']
 				: 2;
 

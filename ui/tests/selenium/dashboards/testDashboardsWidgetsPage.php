@@ -29,7 +29,7 @@ class testDashboardsWidgetsPage extends CWebTest {
 
 	public static function prepareData() {
 		// Create dashboard and widget for checkProblemHostsWidget test.
-		$response = CDataHelper::call('dashboard.create', [
+		self::$dashboardid = CDataHelper::call('dashboard.create', [
 			[
 				'name' => 'Dashboard for Problem hosts widget test',
 				'userid' => '1',
@@ -49,8 +49,7 @@ class testDashboardsWidgetsPage extends CWebTest {
 					]
 				]
 			]
-		]);
-		self::$dashboardid = $response['dashboardids'][0];
+		])['dashboardids'][0];
 	}
 
 	/**
