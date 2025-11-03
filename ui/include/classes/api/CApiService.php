@@ -449,6 +449,18 @@ class CApiService {
 	protected function createSelectQueryFromParts(array $sqlParts) {
 		$sql_join = '';
 
+		if (count($sqlParts['from']) != 1) {
+			trigger_error('The CApiService database framework does not support multiple "from" clauses.'.
+				' Use "join" instead.', E_USER_ERROR
+			);
+		}
+
+		if (array_key_exists('left_join', $sqlParts)) {
+			trigger_error('The CApiService database framework no longer supports "left_join". '.
+				'Please use "join" with the "type" => "left" option instead.', E_USER_ERROR
+			);
+		}
+
 		if (array_key_exists('join', $sqlParts)) {
 			foreach ($sqlParts['join'] as $r_alias => $join) {
 				$l_alias = array_key_exists('left_table', $join) ? $join['left_table'] : $this->tableAlias();
