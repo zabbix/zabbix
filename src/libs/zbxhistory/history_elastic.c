@@ -637,6 +637,24 @@ static int	history_elastic_perform_once(zbx_history_elastic_data_t *d, CURLM *mh
 		}
 		else
 		{
+			/* add retry check for 'too many requests' response */
+			long int	response_code;
+
+			if (CURLE_OK != (code = curl_easy_getinfo(msg->easy_handle, CURLINFO_RESPONSE_CODE,
+					&response_code)))
+			{
+				zabbix_log(LOG_LEVEL_WARNING, "cannot retrieve repsonse code: %s",
+						curl_multi_strerror(code));
+
+				continue;
+			}
+
+			if (429 == response_code)
+			{
+				zbx_vector_ptr_append(&retries, conn->handle);
+				continue;
+			}
+
 			/* mark connection as completed */
 			conn->status = SUCCEED;
 		}
