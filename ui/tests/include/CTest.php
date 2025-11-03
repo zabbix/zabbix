@@ -49,6 +49,7 @@ define('STRING_64', substr(STRING_6000, 0, 64));
  * Base class of php unit tests.
  */
 use PHPUnit\Framework\TestCase;
+use PHPUnit\Framework\Warning;
 
 class CTest extends TestCase {
 
@@ -414,7 +415,7 @@ class CTest extends TestCase {
 		DBclose();
 
 		if (defined('PHPUNIT_REPORT_WARNINGS') && PHPUNIT_REPORT_WARNINGS && self::$warnings) {
-			throw new PHPUnit_Framework_Warning(implode("\n", self::$warnings));
+			throw new Warning(implode("\n", self::$warnings));
 		}
 
 		if ($errors !== '' && $errors !== false) {
