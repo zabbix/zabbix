@@ -49,6 +49,10 @@ define('STRING_64', substr(STRING_6000, 0, 64));
  * Base class of php unit tests.
  */
 use PHPUnit\Framework\TestCase;
+
+/**
+ * Php unit built-in exception class.
+ */
 use PHPUnit\Framework\Warning;
 
 class CTest extends TestCase {
