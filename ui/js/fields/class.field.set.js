@@ -212,11 +212,14 @@ class CFieldSet extends CField {
 	}
 
 	#fieldsSetErrors(errors, force_display_errors) {
+		let missing_field_errors = {};
+
 		for (const [key, field_errors] of Object.entries(errors)) {
 			const key_full = key.charAt(0) === '[' ? key : `[${key}]`;
 
 			if (key_full in this.#fields) {
-				if (this.#fields[key_full].hasChanged() || this.#hasObjectChanged(key_full) || force_display_errors) {
+				if (this.#fields[key_full].hasChanged() || this.#hasObjectChanged(key_full) || force_display_errors
+						|| field_errors.some((error) => error.message === '' || error.level == CFormValidator.ERROR_LEVEL_UNIQ)) {
 					field_errors.forEach((error) => this.#fields[key_full].setErrors(error));
 
 					this._global_errors = {...this._global_errors, ...this.#fields[key_full].getGlobalErrors()};
