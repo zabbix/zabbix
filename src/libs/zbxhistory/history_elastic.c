@@ -906,7 +906,7 @@ static int	elastic_get_values_for_period(zbx_history_elastic_data_t *data, zbx_u
 		goto out;
 	}
 
-	zabbix_log(LOG_LEVEL_TRACE, "sending query to %s/%s; post data: %s", data->base_url, post_url, query.buffer);
+	zabbix_log(LOG_LEVEL_TRACE, "sending query to %s; post data: %s", conn.url, query.buffer);
 
 	/* initiate search context */
 
@@ -926,6 +926,9 @@ static int	elastic_get_values_for_period(zbx_history_elastic_data_t *data, zbx_u
 	/* For processing the records, we need to keep track of the total requested and if the response from the */
 	/* elasticsearch server is empty. For this we use two variables, empty and total. If the result is empty or */
 	/* the total reach zero, we terminate the scrolling query and return what we currently have. */
+
+	int	hits_num = 0;
+
 	do
 	{
 		struct zbx_json_parse	jp, jp_values, jp_item, jp_sub, jp_hits, jp_source;
@@ -952,6 +955,8 @@ static int	elastic_get_values_for_period(zbx_history_elastic_data_t *data, zbx_u
 		while (NULL != (p = zbx_json_next(&jp_hits, p)))
 		{
 			empty = 0;
+
+			hits_num++;
 
 			if (SUCCEED != zbx_json_brackets_open(p, &jp_item))
 				continue;
@@ -983,6 +988,10 @@ static int	elastic_get_values_for_period(zbx_history_elastic_data_t *data, zbx_u
 		}
 
 		/* scroll to the next page */
+
+		zabbix_log(LOG_LEVEL_TRACE, "scroll next batch: sending query to %s; post data: %s", conn.url,
+				scroll_query);
+
 		scroll_offset = 0;
 		zbx_snprintf_alloc(&scroll_query, &scroll_alloc, &scroll_offset,
 				"{\"scroll\":\"10s\",\"scroll_id\":\"%s\"}\n", ZBX_NULL2EMPTY_STR(scroll_id));
@@ -1000,7 +1009,7 @@ static int	elastic_get_values_for_period(zbx_history_elastic_data_t *data, zbx_u
 	while (0 == empty);
 
 	/* as recommended by the elasticsearch documentation, we close the scroll search through a DELETE request */
-	if (NULL != scroll_id)
+	if (NULL != scroll_id && 0 != hits_num)
 	{
 		url_offset = 0;
 		zbx_snprintf_alloc(&post_url, &url_alloc, &url_offset, "_search/scroll/%s", scroll_id);
@@ -1021,7 +1030,7 @@ static int	elastic_get_values_for_period(zbx_history_elastic_data_t *data, zbx_u
 			goto out;
 		}
 
-		zabbix_log(LOG_LEVEL_DEBUG, "elasticsearch closing scroll %s", post_url);
+		zabbix_log(LOG_LEVEL_TRACE, "delete scroll: sending query to %s", conn.url);
 
 		ret = history_elastic_query(data, data->mhandle, &conn, ELASTIC_RETRIES_ON);
 	}
