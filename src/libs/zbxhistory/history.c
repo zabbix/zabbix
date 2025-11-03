@@ -1030,8 +1030,8 @@ void	zbx_history_get_batch(zbx_vector_item_history_t *results, int value_type, i
 {
 	zbx_history_session_t	session;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() items:%d value_type:%d start:%d",
-			__func__, results->values_num, value_type, start);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() items:%d value_type:%d start:%d list:%d",
+			__func__, results->values_num, value_type, start, limit);
 
 	history_manager_init_session(&history_manager, &session);
 
