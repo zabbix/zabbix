@@ -37,13 +37,14 @@ class testFormMapProperties extends CWebTest {
 		];
 	}
 
-	const MAP_UPDATE = 'Map for simple update and update test';
+	const MAP_SIMPLE_UPDATE = 'Map for simple update and update test';
 	const MAP_CLONE = 'Map for clone and delete test';
 	const CLONED_MAP = 'Cloned map';
 	const HASH_SQL = 'SELECT * FROM sysmaps ORDER BY sysmapid';
 	const ICON_MAPPING = 'Icon mapping for map properties';
 	const XSS_EXAMPLE = '<script>alert(\'XSS\');</script>';
 	const BACKGROUND_IMAGE = 'Background image for map properties';
+	const MAP_URL_ADD = 'Map for update - adding URL ';
 
 	protected static $map_update = 'Map for update test';
 
@@ -86,37 +87,17 @@ class testFormMapProperties extends CWebTest {
 				'width' => 800,
 				'height' => 600,
 				'highlight' => SYSMAP_HIGHLIGHT_OFF,
-				'label_type' => MAP_LABEL_TYPE_LABEL,
-				'urls' => [
-					[
-						'name' => '1 Host URL',
-						'url' => 'test',
-						'elementtype' => SYSMAP_ELEMENT_TYPE_HOST
-					],
-					[
-						'name' => '2 Host group URL',
-						'url' => 'test',
-						'elementtype' => SYSMAP_ELEMENT_TYPE_HOST_GROUP
-					],
-					[
-						'name' => '3 Map URL',
-						'url' => 'test',
-						'elementtype' => SYSMAP_ELEMENT_TYPE_MAP
-					],
-					[
-						'name' => '5 Trigger URL',
-						'url' => 'test',
-						'elementtype' => SYSMAP_ELEMENT_TYPE_TRIGGER
-					],
-					[
-						'name' => '4 Image URL',
-						'url' => 'test',
-						'elementtype' => SYSMAP_ELEMENT_TYPE_IMAGE
-					]
-				]
+				'label_type' => MAP_LABEL_TYPE_LABEL
 			],
 			[
-				'name' => self::MAP_UPDATE,
+				'name' => self::MAP_URL_ADD,
+				'width' => 800,
+				'height' => 600,
+				'highlight' => SYSMAP_HIGHLIGHT_OFF,
+				'label_type' => MAP_LABEL_TYPE_LABEL
+			],
+			[
+				'name' => self::MAP_SIMPLE_UPDATE,
 				'width' => 10000,
 				'height' => 9000,
 				'iconmapid' => $mapping_ids[self::ICON_MAPPING],
@@ -446,7 +427,7 @@ class testFormMapProperties extends CWebTest {
 		}
 	}
 
-	public function getMapValidationData() {
+	public function getMapCommonData() {
 		return [
 			// #0 Missing mandatory parameter - Name.
 			[
@@ -475,9 +456,9 @@ class testFormMapProperties extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'map_properties' => [
-						'Name' => self::MAP_UPDATE
+						'Name' => self::MAP_SIMPLE_UPDATE
 					],
-					'error_details' => 'Map "'.self::MAP_UPDATE.'" already exists.'
+					'error_details' => 'Map "'.self::MAP_SIMPLE_UPDATE.'" already exists.'
 				]
 			],
 			// #3 Missing mandatory parameter - Owner.
@@ -704,46 +685,17 @@ class testFormMapProperties extends CWebTest {
 					],
 					'error_details' => 'URL name should be unique for map "Non-unique URL".'
 				]
-			]
-		];
-	}
-
-	public function getMapCreateData() {
-		return [
-			// #20 Create with mandatory fields.
+			],
+			// #20 Mandatory fields.
 			[
 				[
 					'expected' => TEST_GOOD,
 					'map_properties' => [
 						'Name' => 'Map create with mandatory fields'
-					],
-					'result' => [
-						'Owner' => ['Admin (Zabbix Administrator)'],
-						'Name' => 'Map create with mandatory fields',
-						'Width' => '800',
-						'Height' => '600',
-						'Background image' => 'No image',
-						'Automatic icon mapping' => '<manual>',
-						'Icon highlight' => false,
-						'Mark elements on trigger status change' => false,
-						'Display problems' => 'Expand single problem',
-						'Advanced labels' => false,
-						'Map element label type' => 'Label',
-						'Map element label location' => 'Bottom',
-						'Problem display' => 'All',
-						'Minimum severity' => 'Not classified',
-						'Show suppressed problems' => false,
-						'URLs' => [
-							[
-								'Name' => '',
-								'URL' => '',
-								'Element' => 'Host'
-							]
-						]
 					]
 				]
 			],
-			// #21 Create with leading and trailing spaces.
+			// #21 Leading and trailing spaces.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -772,31 +724,7 @@ class testFormMapProperties extends CWebTest {
 							'Element' => 'Host group'
 						]
 					],
-					'result' => [
-						'Owner' => ['Admin (Zabbix Administrator)'],
-						'Name' => 'Map create with leading and trailing spaces',
-						'Width' => '800',
-						'Height' => '600',
-						'Background image' => 'No image',
-						'Automatic icon mapping' => '<manual>',
-						'Icon highlight' => false,
-						'Mark elements on trigger status change' => false,
-						'Display problems' => 'Expand single problem',
-						'Advanced labels' => true,
-						'id:label_string_hostgroup' => 'Test host group custom label',
-						'id:label_string_host' => 'Test host custom label',
-						'id:label_string_trigger' => 'Test trigger custom label',
-						'id:label_string_map' => 'Test map custom label',
-						'id:label_string_image' => 'Test image custom label',
-						'Host group label type' => 'Custom label',
-						'Host label type' => 'Custom label',
-						'Trigger label type' => 'Custom label',
-						'Map label type' => 'Custom label',
-						'Image label type' => 'Custom label',
-						'Map element label location' => 'Bottom',
-						'Problem display' => 'All',
-						'Minimum severity' => 'Not classified',
-						'Show suppressed problems' => false,
+					'result_urls' => [
 						'URLs' => [
 							[
 								'Name' => 'Test url',
@@ -804,10 +732,20 @@ class testFormMapProperties extends CWebTest {
 								'Element' => 'Host group'
 							]
 						]
+					],
+					'trim' => [
+						'Name',
+						'Width',
+						'Height',
+						'id:label_string_hostgroup',
+						'id:label_string_host',
+						'id:label_string_trigger',
+						'id:label_string_map',
+						'id:label_string_image'
 					]
 				]
 			],
-			// #22 Create with maximum string length.
+			// #22 Maximum string length.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -837,31 +775,7 @@ class testFormMapProperties extends CWebTest {
 							'Element' => 'Host'
 						]
 					],
-					'result' => [
-						'Owner' => ['Admin (Zabbix Administrator)'],
-						'Name' => STRING_128,
-						'Width' => '65535',
-						'Height' => '65535',
-						'Background image' => 'No image',
-						'Automatic icon mapping' => '<manual>',
-						'Icon highlight' => false,
-						'Mark elements on trigger status change' => false,
-						'Display problems' => 'Number of problems',
-						'Advanced labels' => true,
-						'id:label_string_hostgroup' => STRING_255,
-						'id:label_string_host' => STRING_255,
-						'id:label_string_trigger' => STRING_255,
-						'id:label_string_map' => STRING_255,
-						'id:label_string_image' => STRING_255,
-						'Host group label type' => 'Custom label',
-						'Host label type' => 'Custom label',
-						'Trigger label type' => 'Custom label',
-						'Map label type' => 'Custom label',
-						'Image label type' => 'Custom label',
-						'Map element label location' => 'Bottom',
-						'Problem display' => 'All',
-						'Minimum severity' => 'Not classified',
-						'Show suppressed problems' => false,
+					'result_urls' => [
 						'URLs' => [
 							[
 								'Name' => STRING_255,
@@ -872,91 +786,51 @@ class testFormMapProperties extends CWebTest {
 					]
 				]
 			],
-			// #23 Create with string length which exceeds maximum allowed value.
+			// #23 XSS imitation text.
 			[
 				[
 					'expected' => TEST_GOOD,
 					'map_properties' => [
-						'Name' => STRING_64.' Check that fields are limited: '.STRING_128,
-						'Width' => '65535',
-						'Height' => '65535',
+						'Name' => self::XSS_EXAMPLE.' update',
+						'Width' => '1000',
+						'Height' => '1000',
 						'Advanced labels' => true,
 						'Host group label type' => 'Custom label',
-						'id:label_string_hostgroup' => STRING_512,
+						'id:label_string_hostgroup' => self::XSS_EXAMPLE,
 						'Host label type' => 'Custom label',
-						'id:label_string_host' => STRING_512,
+						'id:label_string_host' => self::XSS_EXAMPLE,
 						'Trigger label type' => 'Custom label',
-						'id:label_string_trigger' => STRING_512,
+						'id:label_string_trigger' => self::XSS_EXAMPLE,
 						'Map label type' => 'Custom label',
-						'id:label_string_map' => STRING_512,
+						'id:label_string_map' => self::XSS_EXAMPLE,
 						'Image label type' => 'Custom label',
-						'id:label_string_image' => STRING_512
+						'id:label_string_image' => self::XSS_EXAMPLE
 					],
 					'urls' => [
 						[
 							'action' => USER_ACTION_UPDATE,
 							'index' => 0,
-							'Name' => STRING_512,
-							'URL' => STRING_2200,
+							'Name' => self::XSS_EXAMPLE,
+							'URL' => self::XSS_EXAMPLE,
 							'Element' => 'Host'
 						]
 					],
-					'result' => [
-						'Owner' => ['Admin (Zabbix Administrator)'],
-						'Name' => STRING_64.' Check that fields are limited: '.STRING_32,
-						'Width' => '65535',
-						'Height' => '65535',
-						'Background image' => 'No image',
-						'Automatic icon mapping' => '<manual>',
-						'Icon highlight' => false,
-						'Mark elements on trigger status change' => false,
-						'Display problems' => 'Expand single problem',
-						'Advanced labels' => true,
-						'id:label_string_hostgroup' => STRING_255,
-						'id:label_string_host' => STRING_255,
-						'id:label_string_trigger' => STRING_255,
-						'id:label_string_map' => STRING_255,
-						'id:label_string_image' => STRING_255,
-						'Host group label type' => 'Custom label',
-						'Host label type' => 'Custom label',
-						'Trigger label type' => 'Custom label',
-						'Map label type' => 'Custom label',
-						'Image label type' => 'Custom label',
-						'Map element label location' => 'Bottom',
-						'Problem display' => 'All',
-						'Minimum severity' => 'Not classified',
-						'Show suppressed problems' => false,
+					'result_urls' => [
 						'URLs' => [
 							[
-								'Name' => STRING_255,
-								'URL' => STRING_2048,
+								'Name' => self::XSS_EXAMPLE,
+								'URL' => self::XSS_EXAMPLE,
 								'Element' => 'Host'
 							]
 						]
 					]
 				]
 			],
-			// #24 Create with non-default parameters #1.
+			// #24 Non-default parameters #1.
 			[
 				[
 					'expected' => TEST_GOOD,
 					'map_properties' => [
-						'Owner' => ['guest'],
-						'Name' => 'Non-default parameters sysmap 1',
-						'Width' => '100',
-						'Height' => '200',
-						'Background image' => self::BACKGROUND_IMAGE,
-						'Automatic icon mapping' => self::ICON_MAPPING,
-						'Icon highlight' => true,
-						'Mark elements on trigger status change' => true,
-						'Display problems' => 'Number of problems and expand most critical one',
-						'Map element label type' => 'Nothing',
-						'Map element label location' => 'Top',
-						'Problem display' => 'Unacknowledged only',
-						'Minimum severity' => 'Disaster',
-						'Show suppressed problems' => true
-					],
-					'result' => [
 						'Owner' => ['guest'],
 						'Name' => 'Non-default parameters sysmap 1',
 						'Width' => '100',
@@ -971,18 +845,11 @@ class testFormMapProperties extends CWebTest {
 						'Map element label location' => 'Top',
 						'Problem display' => 'Unacknowledged only',
 						'Minimum severity' => 'Disaster',
-						'Show suppressed problems' => true,
-						'URLs' => [
-							[
-								'Name' => '',
-								'URL' => '',
-								'Element' => 'Host'
-							]
-						]
+						'Show suppressed problems' => true
 					]
 				]
 			],
-			// #25 Create with non-default parameters #2.
+			// #25 Non-default parameters #2.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1001,34 +868,10 @@ class testFormMapProperties extends CWebTest {
 						'Problem display' => 'Separated',
 						'Minimum severity' => 'High',
 						'Show suppressed problems' => true
-					],
-					'result' => [
-						'Owner' => ['guest'],
-						'Name' => 'Non-default parameters sysmap 2',
-						'Width' => '100',
-						'Height' => '200',
-						'Background image' => self::BACKGROUND_IMAGE,
-						'Automatic icon mapping' => self::ICON_MAPPING,
-						'Icon highlight' => true,
-						'Mark elements on trigger status change' => true,
-						'Display problems' => 'Number of problems',
-						'Advanced labels' => false,
-						'Map element label type' => 'Status only',
-						'Map element label location' => 'Right',
-						'Problem display' => 'Separated',
-						'Minimum severity' => 'High',
-						'Show suppressed problems' => true,
-						'URLs' => [
-							[
-								'Name' => '',
-								'URL' => '',
-								'Element' => 'Host'
-							]
-						]
 					]
 				]
 			],
-			// #26 Create with non-default parameters #3.
+			// #26 Non-default parameters #3.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1046,34 +889,10 @@ class testFormMapProperties extends CWebTest {
 						'Problem display' => 'Separated',
 						'Minimum severity' => 'Average',
 						'Show suppressed problems' => true
-					],
-					'result' => [
-						'Owner' => ['guest'],
-						'Name' => 'Non-default parameters sysmap 3',
-						'Width' => '100',
-						'Height' => '200',
-						'Background image' => 'No image',
-						'Automatic icon mapping' => self::ICON_MAPPING,
-						'Icon highlight' => true,
-						'Mark elements on trigger status change' => true,
-						'Display problems' => 'Number of problems',
-						'Advanced labels' => false,
-						'Map element label type' => 'Element name',
-						'Map element label location' => 'Left',
-						'Problem display' => 'Separated',
-						'Minimum severity' => 'Average',
-						'Show suppressed problems' => true,
-						'URLs' => [
-							[
-								'Name' => '',
-								'URL' => '',
-								'Element' => 'Host'
-							]
-						]
 					]
 				]
 			],
-			// #27 Create with non-default parameters #4.
+			// #27 Non-default parameters #4.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1090,30 +909,6 @@ class testFormMapProperties extends CWebTest {
 						'Problem display' => 'Separated',
 						'Minimum severity' => 'Warning',
 						'Show suppressed problems' => true
-					],
-					'result' => [
-						'Owner' => ['guest'],
-						'Name' => 'Non-default parameters sysmap 4',
-						'Width' => '100',
-						'Height' => '200',
-						'Background image' => 'No image',
-						'Automatic icon mapping' => self::ICON_MAPPING,
-						'Icon highlight' => true,
-						'Mark elements on trigger status change' => true,
-						'Display problems' => 'Number of problems',
-						'Advanced labels' => false,
-						'Map element label type' => 'IP address',
-						'Map element label location' => 'Bottom',
-						'Problem display' => 'Separated',
-						'Minimum severity' => 'Warning',
-						'Show suppressed problems' => true,
-						'URLs' => [
-							[
-								'Name' => '',
-								'URL' => '',
-								'Element' => 'Host'
-							]
-						]
 					]
 				]
 			],
@@ -1130,34 +925,6 @@ class testFormMapProperties extends CWebTest {
 						'Map label type' => 'Nothing',
 						'Image label type' => 'Nothing',
 						'Minimum severity' => 'Information'
-					],
-					'result' => [
-						'Owner' => ['Admin (Zabbix Administrator)'],
-						'Name' => 'Advanced labels: Nothing',
-						'Width' => '800',
-						'Height' => '600',
-						'Background image' => 'No image',
-						'Automatic icon mapping' => '<manual>',
-						'Icon highlight' => false,
-						'Mark elements on trigger status change' => false,
-						'Display problems' => 'Expand single problem',
-						'Advanced labels' => true,
-						'Host group label type' => 'Nothing',
-						'Host label type' => 'Nothing',
-						'Trigger label type' => 'Nothing',
-						'Map label type' => 'Nothing',
-						'Image label type' => 'Nothing',
-						'Map element label location' => 'Bottom',
-						'Problem display' => 'All',
-						'Minimum severity' => 'Information',
-						'Show suppressed problems' => false,
-						'URLs' => [
-							[
-								'Name' => '',
-								'URL' => '',
-								'Element' => 'Host'
-							]
-						]
 					]
 				]
 			],
@@ -1173,34 +940,6 @@ class testFormMapProperties extends CWebTest {
 						'Trigger label type' => 'Element name',
 						'Map label type' => 'Element name',
 						'Image label type' => 'Element name'
-					],
-					'result' => [
-						'Owner' => ['Admin (Zabbix Administrator)'],
-						'Name' => 'Advanced labels: Element name',
-						'Width' => '800',
-						'Height' => '600',
-						'Background image' => 'No image',
-						'Automatic icon mapping' => '<manual>',
-						'Icon highlight' => false,
-						'Mark elements on trigger status change' => false,
-						'Display problems' => 'Expand single problem',
-						'Advanced labels' => true,
-						'Host group label type' => 'Element name',
-						'Host label type' => 'Element name',
-						'Trigger label type' => 'Element name',
-						'Map label type' => 'Element name',
-						'Image label type' => 'Element name',
-						'Map element label location' => 'Bottom',
-						'Problem display' => 'All',
-						'Minimum severity' => 'Not classified',
-						'Show suppressed problems' => false,
-						'URLs' => [
-							[
-								'Name' => '',
-								'URL' => '',
-								'Element' => 'Host'
-							]
-						]
 					]
 				]
 			],
@@ -1216,34 +955,6 @@ class testFormMapProperties extends CWebTest {
 						'Trigger label type' => 'Status only',
 						'Map label type' => 'Status only',
 						'Image label type' => 'Element name'
-					],
-					'result' => [
-						'Owner' => ['Admin (Zabbix Administrator)'],
-						'Name' => 'Advanced labels: Status only',
-						'Width' => '800',
-						'Height' => '600',
-						'Background image' => 'No image',
-						'Automatic icon mapping' => '<manual>',
-						'Icon highlight' => false,
-						'Mark elements on trigger status change' => false,
-						'Display problems' => 'Expand single problem',
-						'Advanced labels' => true,
-						'Host group label type' => 'Status only',
-						'Host label type' => 'Status only',
-						'Trigger label type' => 'Status only',
-						'Map label type' => 'Status only',
-						'Image label type' => 'Element name',
-						'Map element label location' => 'Bottom',
-						'Problem display' => 'All',
-						'Minimum severity' => 'Not classified',
-						'Show suppressed problems' => false,
-						'URLs' => [
-							[
-								'Name' => '',
-								'URL' => '',
-								'Element' => 'Host'
-							]
-						]
 					]
 				]
 			],
@@ -1259,34 +970,6 @@ class testFormMapProperties extends CWebTest {
 						'Trigger label type' => 'Label',
 						'Map label type' => 'Label',
 						'Image label type' => 'Label'
-					],
-					'result' => [
-						'Owner' => ['Admin (Zabbix Administrator)'],
-						'Name' => 'Advanced labels: Label',
-						'Width' => '800',
-						'Height' => '600',
-						'Background image' => 'No image',
-						'Automatic icon mapping' => '<manual>',
-						'Icon highlight' => false,
-						'Mark elements on trigger status change' => false,
-						'Display problems' => 'Expand single problem',
-						'Advanced labels' => true,
-						'Host group label type' => 'Label',
-						'Host label type' => 'Label',
-						'Trigger label type' => 'Label',
-						'Map label type' => 'Label',
-						'Image label type' => 'Label',
-						'Map element label location' => 'Bottom',
-						'Problem display' => 'All',
-						'Minimum severity' => 'Not classified',
-						'Show suppressed problems' => false,
-						'URLs' => [
-							[
-								'Name' => '',
-								'URL' => '',
-								'Element' => 'Host'
-							]
-						]
 					]
 				]
 			],
@@ -1303,44 +986,15 @@ class testFormMapProperties extends CWebTest {
 						'Map label type' => 'Status only',
 						'Image label type' => 'Custom label',
 						'id:label_string_image' => 'Image custom label'
-					],
-					'result' => [
-						'Owner' => ['Admin (Zabbix Administrator)'],
-						'Name' => 'Advanced labels: different options',
-						'Width' => '800',
-						'Height' => '600',
-						'Background image' => 'No image',
-						'Automatic icon mapping' => '<manual>',
-						'Icon highlight' => false,
-						'Mark elements on trigger status change' => false,
-						'Display problems' => 'Expand single problem',
-						'Advanced labels' => true,
-						'Host group label type' => 'Label',
-						'Host label type' => 'IP address',
-						'Trigger label type' => 'Element name',
-						'Map label type' => 'Status only',
-						'Image label type' => 'Custom label',
-						'id:label_string_image' => 'Image custom label',
-						'Map element label location' => 'Bottom',
-						'Problem display' => 'All',
-						'Minimum severity' => 'Not classified',
-						'Show suppressed problems' => false,
-						'URLs' => [
-							[
-								'Name' => '',
-								'URL' => '',
-								'Element' => 'Host'
-							]
-						]
 					]
 				]
 			],
-			// #33 Check creation of different type URLs.
+			// #33 Different type URLs.
 			[
 				[
 					'expected' => TEST_GOOD,
 					'map_properties' => [
-						'Name' => 'Sysmap with multiple URLs'
+						'Name' => 'Sysmap with multiple URLs'.microtime()
 					],
 					'urls' => [
 						[
@@ -1374,22 +1028,7 @@ class testFormMapProperties extends CWebTest {
 							'Element' => 'Trigger'
 						]
 					],
-					'result' => [
-						'Owner' => ['Admin (Zabbix Administrator)'],
-						'Name' => 'Sysmap with multiple URLs',
-						'Width' => '800',
-						'Height' => '600',
-						'Background image' => 'No image',
-						'Automatic icon mapping' => '<manual>',
-						'Icon highlight' => false,
-						'Mark elements on trigger status change' => false,
-						'Display problems' => 'Expand single problem',
-						'Advanced labels' => false,
-						'Map element label type' => 'Label',
-						'Map element label location' => 'Bottom',
-						'Problem display' => 'All',
-						'Minimum severity' => 'Not classified',
-						'Show suppressed problems' => false,
+					'result_urls' => [
 						'URLs' => [
 							[
 								'Name' => '1 Host URL',
@@ -1420,12 +1059,14 @@ class testFormMapProperties extends CWebTest {
 					]
 				]
 			],
-			// #34 Check sorting by name of URLs.
+			// #34 Sorting by name of URLs.
 			[
 				[
 					'expected' => TEST_GOOD,
+					'sorting' => true,
+
 					'map_properties' => [
-						'Name' => 'URL sorting'
+						'Name' => 'URL sorting'.microtime()
 					],
 					'urls' => [
 						[
@@ -1436,7 +1077,7 @@ class testFormMapProperties extends CWebTest {
 						],
 						[
 							'action' => USER_ACTION_ADD,
-							'Name' => '012345',
+							'Name' => '!test',
 							'URL' => 'test'
 						],
 						[
@@ -1453,25 +1094,25 @@ class testFormMapProperties extends CWebTest {
 							'action' => USER_ACTION_ADD,
 							'Name' => '02223',
 							'URL' => 'test'
+						],
+						[
+							'action' => USER_ACTION_ADD,
+							'Name' => '🤖🤖🤖',
+							'URL' => 'test'
+						],
+						[
+							'action' => USER_ACTION_ADD,
+							'Name' => 'ĀĒļķņЙЭ test special character',
+							'URL' => 'test'
 						]
 					],
-					'result' => [
-						'Owner' => ['Admin (Zabbix Administrator)'],
-						'Name' => 'URL sorting',
-						'Width' => '800',
-						'Height' => '600',
-						'Background image' => 'No image',
-						'Automatic icon mapping' => '<manual>',
-						'Icon highlight' => false,
-						'Mark elements on trigger status change' => false,
-						'Display problems' => 'Expand single problem',
-						'Advanced labels' => false,
-						'Map element label type' => 'Label',
-						'Map element label location' => 'Bottom',
-						'Problem display' => 'All',
-						'Minimum severity' => 'Not classified',
-						'Show suppressed problems' => false,
+					'result_urls' => [
 						'URLs' => [
+							[
+								'Name' => '!test',
+								'URL' => 'test',
+								'Element' => 'Host'
+							],
 							[
 								'Name' => '9 sysmap',
 								'URL' => 'test',
@@ -1479,11 +1120,6 @@ class testFormMapProperties extends CWebTest {
 							],
 							[
 								'Name' => '02223',
-								'URL' => 'test',
-								'Element' => 'Host'
-							],
-							[
-								'Name' => '012345',
 								'URL' => 'test',
 								'Element' => 'Host'
 							],
@@ -1496,6 +1132,16 @@ class testFormMapProperties extends CWebTest {
 								'Name' => 'Zabbix sysmap',
 								'URL' => 'test',
 								'Element' => 'Host'
+							],
+							[
+								'Name' => 'ĀĒļķņЙЭ test special character',
+								'URL' => 'test',
+								'Element' => 'Host'
+							],
+							[
+								'Name' => '🤖🤖🤖',
+								'URL' => 'test',
+								'Element' => 'Host'
 							]
 						]
 					]
@@ -1505,593 +1151,40 @@ class testFormMapProperties extends CWebTest {
 	}
 
 	/**
-	 * @dataProvider getMapValidationData
-	 * @dataProvider getMapCreateData
+	 * @dataProvider getMapCommonData
+	 * @dataProvider getMapUpdateData
+	 */
+	public function testFormMapProperties_Update($data) {
+		$this->checkSysmapForm($data, true);
+	}
+
+	/**
+	 * @dataProvider getMapCommonData
 	 */
 	public function testFormMapProperties_Create($data) {
-		if ($data['expected'] === TEST_BAD) {
-			$old_hash = CDBHelper::getHash(self::HASH_SQL);
-		}
-
-		$this->page->login()->open('sysmaps.php?form=Create+map')->waitUntilReady();
-		$form = $this->query('id:sysmap-form')->waitUntilPresent()->asForm()->one();
-		$form->fill($data['map_properties']);
-
-		if(array_key_exists('urls', $data)) {
-			$form->query('class:table-forms-separator')->asMultifieldTable()->one()->fill($data['urls']);
-		}
-
-		$form->submit()->waitUntilStalled();
-
-		if ($data['expected'] === TEST_BAD) {
-			$this->assertMessage(TEST_BAD, (array_key_exists('incorrect_data', $data)
-					? 'Page received incorrect data'
-					: 'Cannot add network map'),
-					$data['error_details']
-			);
-
-			// Check that DB hash is not changed.
-			$this->assertEquals($old_hash, CDBHelper::getHash(self::HASH_SQL));
-		}
-		else {
-			$this->page->waitUntilReady();
-			$this->assertMessage(TEST_GOOD, 'Network map added');
-			$table = $this->query('class:list-table')->asTable()->one();
-			$table->findRow('Name', $data['result']['Name'])->query('link:Properties')->one()->click();
-			$this->query('id:sysmap-form')->waitUntilPresent()->asForm()->one()->checkValue($data['result']);
-		}
+		$this->checkSysmapForm($data);
 	}
 
 	public function testFormMapProperties_SimpleUpdate() {
 		$old_hash = CDBHelper::getHash(self::HASH_SQL);
 		$this->page->login()->open('sysmaps.php')->waitUntilReady();
 		$table = $this->query('class:list-table')->asTable()->one();
-		$table->findRow('Name', self::MAP_UPDATE)->query('link:Properties')->one()->click();
+		$table->findRow('Name', self::MAP_SIMPLE_UPDATE)->query('link:Properties')->one()->click();
 		$form = $this->query('id:sysmap-form')->waitUntilPresent()->asForm()->one();
 		$form->submit()->waitUntilStalled();
 		$this->assertMessage(TEST_GOOD, 'Network map updated');
-		$this->page->waitUntilReady();
 		$this->assertEquals($old_hash, CDBHelper::getHash(self::HASH_SQL));
 	}
 
 	public function getMapUpdateData() {
 		return [
-			// #20 Update to check trailing of spaces and different symbols of input type text fields.
+			// #35 Update - delete URLs and change other possible fields.
 			[
 				[
 					'expected' => TEST_GOOD,
-					'map_properties' => [
-						'Name' => '  🌑🌑🌑 Update: trailing, leading spaces, symbols: ĀāŅņШщЙй㐤㐃 🌕🌕🌕 ',
-						'Width' => ' 800 ',
-						'Height' => ' 600 ',
-						'Advanced labels' => true,
-						'Host group label type' => 'Custom label',
-						'id:label_string_hostgroup' => ' Label: 🌑🌑🌑1234ĀāŅņШщЙй㐤㐃 ',
-						'Host label type' => 'Custom label',
-						'id:label_string_host' => '   Label: 🌑🌑🌑1234ĀāŅņШщЙй㐤㐃   ',
-						'Trigger label type' => 'Custom label',
-						'id:label_string_trigger' => ' Label: 🌑🌑🌑1234ĀāŅņШщЙй㐤㐃 ',
-						'Map label type' => 'Custom label',
-						'id:label_string_map' => ' Label: 🌑🌑🌑1234ĀāŅņШщЙй㐤㐃 ',
-						'Image label type' => 'Custom label',
-						'id:label_string_image' => ' Label: 🌑🌑🌑1234ĀāŅņШщЙй㐤㐃 '
-					],
-					'urls' => [
-						[
-							'action' => USER_ACTION_UPDATE,
-							'index' => 0,
-							'Name' => ' URL ₥₳₽1 name 📡 ',
-							'URL' => ' URL ₥₳₽1 📡 ',
-							'Element' => 'Host'
-						],
-						[
-							'action' => USER_ACTION_UPDATE,
-							'index' => 1,
-							'Name' => ' URL ₥₳₽2 name 📡 ',
-							'URL' => ' URL ₥₳₽2 📡 ',
-							'Element' => 'Host group'
-						],
-						[
-							'action' => USER_ACTION_UPDATE,
-							'index' => 2,
-							'Name' => ' URL ₥₳₽3 name 📡 ',
-							'URL' => ' URL ₥₳₽3 📡 ',
-							'Element' => 'Image'
-						],
-						[
-							'action' => USER_ACTION_UPDATE,
-							'index' => 3,
-							'Name' => ' URL ₥₳₽4 name 📡 ',
-							'URL' => ' URL ₥₳₽4 📡 ',
-							'Element' => 'Map'
-						],
-						[
-							'action' => USER_ACTION_UPDATE,
-							'index' => 4,
-							'Name' => ' URL ₥₳₽5 name 📡 ',
-							'URL' => ' URL ₥₳₽5 📡 ',
-							'Element' => 'Trigger'
-						]
-					],
-					'result' => [
-						'Owner' => ['Admin (Zabbix Administrator)'],
-						'Name' => '🌑🌑🌑 Update: trailing, leading spaces, symbols: ĀāŅņШщЙй㐤㐃 🌕🌕🌕',
-						'Width' => '800',
-						'Height' => '600',
-						'Background image' => 'No image',
-						'Automatic icon mapping' => '<manual>',
-						'Icon highlight' => false,
-						'Mark elements on trigger status change' => false,
-						'Display problems' => 'Expand single problem',
-						'Advanced labels' => true,
-						'Host group label type' => 'Custom label',
-						'Host label type' => 'Custom label',
-						'Trigger label type' => 'Custom label',
-						'Map label type' => 'Custom label',
-						'Image label type' => 'Custom label',
-						'id:label_string_hostgroup' => 'Label: 🌑🌑🌑1234ĀāŅņШщЙй㐤㐃',
-						'id:label_string_host' => 'Label: 🌑🌑🌑1234ĀāŅņШщЙй㐤㐃',
-						'id:label_string_trigger' => 'Label: 🌑🌑🌑1234ĀāŅņШщЙй㐤㐃',
-						'id:label_string_map' => 'Label: 🌑🌑🌑1234ĀāŅņШщЙй㐤㐃',
-						'id:label_string_image' => 'Label: 🌑🌑🌑1234ĀāŅņШщЙй㐤㐃',
-						'Map element label location' => 'Bottom',
-						'Problem display' => 'All',
-						'Minimum severity' => 'Not classified',
-						'Show suppressed problems' => false,
-						'URLs' => [
-							[
-								'Name' => 'URL ₥₳₽1 name 📡',
-								'URL' => 'URL ₥₳₽1 📡',
-								'Element' => 'Host'
-							],
-							[
-								'Name' => 'URL ₥₳₽2 name 📡',
-								'URL' => 'URL ₥₳₽2 📡',
-								'Element' => 'Host group'
-							],
-							[
-								'Name' => 'URL ₥₳₽3 name 📡',
-								'URL' => 'URL ₥₳₽3 📡',
-								'Element' => 'Image'
-							],
-							[
-								'Name' => 'URL ₥₳₽4 name 📡',
-								'URL' => 'URL ₥₳₽4 📡',
-								'Element' => 'Map'
-							],
-							[
-								'Name' => 'URL ₥₳₽5 name 📡',
-								'URL' => 'URL ₥₳₽5 📡',
-								'Element' => 'Trigger'
-							]
-						]
-					]
-				]
-			],
-			// #21 Update with maximum string length, width, height values.
-			[
-				[
-					'expected' => TEST_GOOD,
-					'map_properties' => [
-						'Name' => 'Update: maximum possible sysmap name length 128 characters test:'.STRING_64,
-						'Width' => '65535',
-						'Height' => '65535',
-						'Advanced labels' => true,
-						'Host group label type' => 'Custom label',
-						'id:label_string_hostgroup' => STRING_255,
-						'Host label type' => 'Custom label',
-						'id:label_string_host' => STRING_255,
-						'Trigger label type' => 'Custom label',
-						'id:label_string_trigger' => STRING_255,
-						'Map label type' => 'Custom label',
-						'id:label_string_map' => STRING_255,
-						'Image label type' => 'Custom label',
-						'id:label_string_image' => STRING_255
-					],
-					'urls' => [
-						[
-							'action' => USER_ACTION_UPDATE,
-							'index' => 0,
-							'Name' => STRING_64.'Update: maximum possible urlname length 255 characters test 1 :'.STRING_128,
-							'URL' => STRING_2048,
-							'Element' => 'Host'
-						],
-						[
-							'action' => USER_ACTION_UPDATE,
-							'index' => 1,
-							'Name' => STRING_64.'Update: maximum possible urlname length 255 characters test 2 :'.STRING_128,
-							'URL' => STRING_2048,
-							'Element' => 'Host group'
-						],
-						[
-							'action' => USER_ACTION_UPDATE,
-							'index' => 2,
-							'Name' => STRING_64.'Update: maximum possible urlname length 255 characters test 3 :'.STRING_128,
-							'URL' => STRING_2048,
-							'Element' => 'Image'
-						],
-						[
-							'action' => USER_ACTION_UPDATE,
-							'index' => 3,
-							'Name' => STRING_64.'Update: maximum possible urlname length 255 characters test 4 :'.STRING_128,
-							'URL' => STRING_2048,
-							'Element' => 'Map'
-						],
-						[
-							'action' => USER_ACTION_UPDATE,
-							'index' => 4,
-							'Name' => STRING_64.'Update: maximum possible urlname length 255 characters test 5 :'.STRING_128,
-							'URL' => STRING_2048,
-							'Element' => 'Trigger'
-						]
-					],
-					'result' => [
-						'Owner' => ['Admin (Zabbix Administrator)'],
-						'Name' => 'Update: maximum possible sysmap name length 128 characters test:'.STRING_64,
-						'Width' => '65535',
-						'Height' => '65535',
-						'Background image' => 'No image',
-						'Automatic icon mapping' => '<manual>',
-						'Icon highlight' => false,
-						'Mark elements on trigger status change' => false,
-						'Display problems' => 'Expand single problem',
-						'Advanced labels' => true,
-						'Host group label type' => 'Custom label',
-						'Host label type' => 'Custom label',
-						'Trigger label type' => 'Custom label',
-						'Map label type' => 'Custom label',
-						'Image label type' => 'Custom label',
-						'id:label_string_hostgroup' => STRING_255,
-						'id:label_string_host' => STRING_255,
-						'id:label_string_trigger' => STRING_255,
-						'id:label_string_map' => STRING_255,
-						'id:label_string_image' => STRING_255,
-						'Map element label location' => 'Bottom',
-						'Problem display' => 'All',
-						'Minimum severity' => 'Not classified',
-						'Show suppressed problems' => false,
-						'URLs' => [
-							[
-								'Name' => STRING_64.'Update: maximum possible urlname length 255 characters test 1 :'.
-									STRING_128,
-								'URL' => STRING_2048,
-								'Element' => 'Host'
-							],
-							[
-								'Name' => STRING_64.'Update: maximum possible urlname length 255 characters test 2 :'.
-									STRING_128,
-								'URL' => STRING_2048,
-								'Element' => 'Host group'
-							],
-							[
-								'Name' => STRING_64.'Update: maximum possible urlname length 255 characters test 3 :'.
-									STRING_128,
-								'URL' => STRING_2048,
-								'Element' => 'Image'
-							],
-							[
-								'Name' => STRING_64.'Update: maximum possible urlname length 255 characters test 4 :'.
-									STRING_128,
-								'URL' => STRING_2048,
-								'Element' => 'Map'
-							],
-							[
-								'Name' => STRING_64.'Update: maximum possible urlname length 255 characters test 5 :'.
-									STRING_128,
-								'URL' => STRING_2048,
-								'Element' => 'Trigger'
-							]
-						]
-					]
-				]
-			],
-			// #22 Update with XSS imitation text.
-			[
-				[
-					'expected' => TEST_GOOD,
-					'map_properties' => [
-						'Name' => self::XSS_EXAMPLE.' update',
-						'Width' => '1000',
-						'Height' => '1000',
-						'Advanced labels' => true,
-						'Host group label type' => 'Custom label',
-						'id:label_string_hostgroup' => self::XSS_EXAMPLE,
-						'Host label type' => 'Custom label',
-						'id:label_string_host' => self::XSS_EXAMPLE,
-						'Trigger label type' => 'Custom label',
-						'id:label_string_trigger' => self::XSS_EXAMPLE,
-						'Map label type' => 'Custom label',
-						'id:label_string_map' => self::XSS_EXAMPLE,
-						'Image label type' => 'Custom label',
-						'id:label_string_image' => self::XSS_EXAMPLE
-					],
-					'urls' => [
-						[
-							'action' => USER_ACTION_UPDATE,
-							'index' => 0,
-							'Name' => self::XSS_EXAMPLE,
-							'URL' => self::XSS_EXAMPLE,
-							'Element' => 'Host'
-						],
-						[
-							'action' => USER_ACTION_UPDATE,
-							'index' => 1,
-							'Name' => self::XSS_EXAMPLE.' 1',
-							'URL' => self::XSS_EXAMPLE,
-							'Element' => 'Host group'
-						],
-						[
-							'action' => USER_ACTION_UPDATE,
-							'index' => 2,
-							'Name' => self::XSS_EXAMPLE.' 2',
-							'URL' => self::XSS_EXAMPLE,
-							'Element' => 'Image'
-						],
-						[
-							'action' => USER_ACTION_UPDATE,
-							'index' => 3,
-							'Name' => self::XSS_EXAMPLE.' 3',
-							'URL' => self::XSS_EXAMPLE,
-							'Element' => 'Map'
-						],
-						[
-							'action' => USER_ACTION_UPDATE,
-							'index' => 4,
-							'Name' => self::XSS_EXAMPLE.' 4',
-							'URL' => self::XSS_EXAMPLE,
-							'Element' => 'Trigger'
-						]
-					],
-					'result' => [
-						'Owner' => ['Admin (Zabbix Administrator)'],
-						'Name' => self::XSS_EXAMPLE.' update',
-						'Width' => '1000',
-						'Height' => '1000',
-						'Background image' => 'No image',
-						'Automatic icon mapping' => '<manual>',
-						'Icon highlight' => false,
-						'Mark elements on trigger status change' => false,
-						'Display problems' => 'Expand single problem',
-						'Advanced labels' => true,
-						'Host group label type' => 'Custom label',
-						'Host label type' => 'Custom label',
-						'Trigger label type' => 'Custom label',
-						'Map label type' => 'Custom label',
-						'Image label type' => 'Custom label',
-						'id:label_string_hostgroup' => self::XSS_EXAMPLE,
-						'id:label_string_host' => self::XSS_EXAMPLE,
-						'id:label_string_trigger' => self::XSS_EXAMPLE,
-						'id:label_string_map' => self::XSS_EXAMPLE,
-						'id:label_string_image' => self::XSS_EXAMPLE,
-						'Map element label location' => 'Bottom',
-						'Problem display' => 'All',
-						'Minimum severity' => 'Not classified',
-						'Show suppressed problems' => false,
-						'URLs' => [
-							[
-								'Name' => self::XSS_EXAMPLE,
-								'URL' => self::XSS_EXAMPLE,
-								'Element' => 'Host'
-							],
-							[
-								'Name' => self::XSS_EXAMPLE.' 1',
-								'URL' => self::XSS_EXAMPLE,
-								'Element' => 'Host group'
-							],
-							[
-								'Name' => self::XSS_EXAMPLE.' 2',
-								'URL' => self::XSS_EXAMPLE,
-								'Element' => 'Image'
-							],
-							[
-								'Name' => self::XSS_EXAMPLE.' 3',
-								'URL' => self::XSS_EXAMPLE,
-								'Element' => 'Map'
-							],
-							[
-								'Name' => self::XSS_EXAMPLE.' 4',
-								'URL' => self::XSS_EXAMPLE,
-								'Element' => 'Trigger'
-							]
-						]
-					]
-				]
-			],
-			// #23 Update with string length which exceeds maximum allowed value.
-			[
-				[
-					'expected' => TEST_GOOD,
-					'map_properties' => [
-						'Name' => STRING_64.' Update: maximum possible sysmap name length 128 characters test!',
-						'Width' => '65535',
-						'Height' => '65535',
-						'Advanced labels' => true,
-						'Host group label type' => 'Custom label',
-						'id:label_string_hostgroup' => STRING_512,
-						'Host label type' => 'Custom label',
-						'id:label_string_host' => STRING_512,
-						'Trigger label type' => 'Custom label',
-						'id:label_string_trigger' => STRING_512,
-						'Map label type' => 'Custom label',
-						'id:label_string_map' => STRING_512,
-						'Image label type' => 'Custom label',
-						'id:label_string_image' => STRING_512
-					],
-					'urls' => [
-						[
-							'action' => USER_ACTION_UPDATE,
-							'index' => 0,
-							'Name' => STRING_128.' Host name test '.STRING_32.' test url name '.STRING_128,
-							'URL' => STRING_2200,
-							'Element' => 'Host'
-						],
-						[
-							'action' => USER_ACTION_UPDATE,
-							'index' => 1,
-							'Name' => STRING_128.'Group name test '.STRING_32.' test url name '.STRING_128,
-							'URL' => STRING_2200,
-							'Element' => 'Host group'
-						],
-						[
-							'action' => USER_ACTION_UPDATE,
-							'index' => 2,
-							'Name' => STRING_128.'Image name test '.STRING_32.' test url name '.STRING_128,
-							'URL' => STRING_2200,
-							'Element' => 'Image'
-						],
-						[
-							'action' => USER_ACTION_UPDATE,
-							'index' => 3,
-							'Name' => STRING_128.'Map : name test '.STRING_32.' test url name '.STRING_128,
-							'URL' => STRING_2200,
-							'Element' => 'Map'
-						],
-						[
-							'action' => USER_ACTION_UPDATE,
-							'index' => 4,
-							'Name' => STRING_128.'Trigger name test '.STRING_32.'test url name'.STRING_128,
-							'URL' => STRING_2200,
-							'Element' => 'Trigger'
-						]
-					],
-					'result' => [
-						'Owner' => ['Admin (Zabbix Administrator)'],
-						'Name' => STRING_64.' Update: maximum possible sysmap name length 128 characters test',
-						'Width' => '65535',
-						'Height' => '65535',
-						'Background image' => 'No image',
-						'Automatic icon mapping' => '<manual>',
-						'Icon highlight' => false,
-						'Mark elements on trigger status change' => false,
-						'Display problems' => 'Expand single problem',
-						'Advanced labels' => true,
-						'Host group label type' => 'Custom label',
-						'Host label type' => 'Custom label',
-						'Trigger label type' => 'Custom label',
-						'Map label type' => 'Custom label',
-						'Image label type' => 'Custom label',
-						'id:label_string_hostgroup' => STRING_255,
-						'id:label_string_host' => STRING_255,
-						'id:label_string_trigger' => STRING_255,
-						'id:label_string_map' => STRING_255,
-						'id:label_string_image' => STRING_255,
-						'Map element label location' => 'Bottom',
-						'Problem display' => 'All',
-						'Minimum severity' => 'Not classified',
-						'Show suppressed problems' => false,
-						'URLs' => [
-							[
-								'Name' => STRING_128.'Group name test '.STRING_32.' test url name '.STRING_64,
-								'URL' => STRING_2048,
-								'Element' => 'Host group'
-							],
-							[
-								'Name' => STRING_128.' Host name test '.STRING_32.' test url name '.STRING_64,
-								'URL' => STRING_2048,
-								'Element' => 'Host'
-							],
-							[
-								'Name' => STRING_128.'Image name test '.STRING_32.' test url name '.STRING_64,
-								'URL' => STRING_2048,
-								'Element' => 'Image'
-							],
-							[
-								'Name' => STRING_128.'Map : name test '.STRING_32.' test url name '.STRING_64,
-								'URL' => STRING_2048,
-								'Element' => 'Map'
-							],
-							[
-								'Name' => STRING_128.'Trigger name test '.STRING_32.'test url name'.STRING_64,
-								'URL' => STRING_2048,
-								'Element' => 'Trigger'
-							]
-						]
-					]
-				]
-			],
-			// #24 Update - change advanced label fields of existing map.
-			[
-				[
-					'expected' => TEST_GOOD,
-					'map_name' => self::MAP_UPDATE,
-					'map_properties' => [
-						'Host group label type' => 'Label',
-						'Host label type' => 'IP address',
-						'Trigger label type' => 'Status only',
-						'Map label type' => 'Nothing',
-						'Image label type' => 'Custom label',
-						'id:label_string_image' => 'Update labels check'
-					],
-					'result' => [
-						'Owner' => ['Admin (Zabbix Administrator)'],
-						'Name' => self::MAP_UPDATE,
-						'Width' => '10000',
-						'Height' => '9000',
-						'Background image' => 'No image',
-						'Automatic icon mapping' => self::ICON_MAPPING,
-						'Icon highlight' => true,
-						'Mark elements on trigger status change' => true,
-						'Display problems' => 'Number of problems and expand most critical one',
-						'Advanced labels' => true,
-						'Host group label type' => 'Label',
-						'Host label type' => 'IP address',
-						'Trigger label type' => 'Status only',
-						'Map label type' => 'Nothing',
-						'Image label type' => 'Custom label',
-						'id:label_string_image' => 'Update labels check',
-						'Map element label location' => 'Right',
-						'Problem display' => 'Separated',
-						'Minimum severity' => 'Disaster',
-						'Show suppressed problems' => true,
-						'URLs' => [
-							[
-								'Name' => '1 Host URL',
-								'URL' => 'test',
-								'Element' => 'Host'
-							],
-							[
-								'Name' => '2 Host group URL',
-								'URL' => 'test',
-								'Element' => 'Host group'
-							],
-							[
-								'Name' => '3 Map URL',
-								'URL' => 'test',
-								'Element' => 'Map'
-							],
-							[
-								'Name' => '4 Image URL',
-								'URL' => 'test',
-								'Element' => 'Image'
-							],
-							[
-								'Name' => '5 Trigger URL',
-								'URL' => 'test',
-								'Element' => 'Trigger'
-							]
-						]
-					]
-				]
-			],
-			// #25 Update - change other possible fields.
-			[
-				[
-					'expected' => TEST_GOOD,
-					'map_name' => self::MAP_UPDATE,
 					'remove_urls' => true,
 					'map_properties' => [
-						'Owner' => 'guest',
-						'Background image' => self::BACKGROUND_IMAGE,
-						'Display problems' => 'Number of problems',
-						'Automatic icon mapping' => '<manual>',
-						'Icon highlight' => false,
-						'Mark elements on trigger status change' => false,
-						'Advanced labels' => false,
-						'Map element label type' => 'Element name',
-						'Map element label location' => 'Left',
-						'Problem display' => 'Unacknowledged only',
-						'Minimum severity' => 'Information',
-						'Show suppressed problems' => false
+						'Name' => self::MAP_SIMPLE_UPDATE
 					],
 					'urls' => [
 						[
@@ -2115,22 +1208,7 @@ class testFormMapProperties extends CWebTest {
 							'index' => 0
 						]
 					],
-					'result' => [
-						'Owner' => ['guest'],
-						'Name' => self::MAP_UPDATE,
-						'Width' => '10000',
-						'Height' => '9000',
-						'Background image' => self::BACKGROUND_IMAGE,
-						'Automatic icon mapping' => '<manual>',
-						'Icon highlight' => false,
-						'Mark elements on trigger status change' => false,
-						'Display problems' => 'Number of problems',
-						'Advanced labels' => false,
-						'Map element label type' => 'Element name',
-						'Map element label location' => 'Left',
-						'Problem display' => 'Unacknowledged only',
-						'Minimum severity' => 'Information',
-						'Show suppressed problems' => false,
+					'result_urls' => [
 						'URLs' => [
 							[
 								'Name' => '',
@@ -2142,49 +1220,6 @@ class testFormMapProperties extends CWebTest {
 				]
 			]
 		];
-	}
-
-	/**
-	 * @dataProvider getMapValidationData
-	 * @dataProvider getMapUpdateData
-	 */
-	public function testFormMapProperties_Update($data) {
-		if ($data['expected'] === TEST_BAD) {
-			$old_hash = CDBHelper::getHash(self::HASH_SQL);
-		}
-
-		$this->page->login()->open('sysmaps.php')->waitUntilReady();
-		$table = $this->query('class:list-table')->asTable()->one();
-		$table->findRow('Name', (array_key_exists('map_name', $data) ? $data['map_name'] : self::$map_update))
-				->query('link:Properties')->one()->click();
-		$form = $this->query('id:sysmap-form')->waitUntilPresent()->asForm()->one();
-		$form->fill($data['map_properties']);
-
-		if(array_key_exists('urls', $data)) {
-			$form->query('class:table-forms-separator')->asMultifieldTable()->one()->fill($data['urls']);
-		}
-
-		$form->submit()->waitUntilStalled();
-
-		if ($data['expected'] === TEST_BAD) {
-			$this->assertMessage(TEST_BAD, (array_key_exists('incorrect_data', $data)
-					? 'Page received incorrect data'
-					: 'Cannot update network map'),
-					$data['error_details']
-			);
-
-			// Check that DB hash is not changed.
-			$this->assertEquals($old_hash, CDBHelper::getHash(self::HASH_SQL));
-		}
-		else {
-			$this->page->waitUntilReady();
-			$this->assertMessage(TEST_GOOD, 'Network map updated');
-			$table = $this->query('class:list-table')->asTable()->one();
-			$table->findRow('Name', $data['result']['Name'])->query('link:Properties')->one()->click();
-			$this->query('id:sysmap-form')->waitUntilPresent()->asForm()->one()->checkValue($data['result']);
-			self::$map_update = $this->query('id:sysmap-form')->waitUntilPresent()->asForm()->one()->getField('Name')
-					->getValue();
-		}
 	}
 
 	public function testFormMapProperties_CancelCreate() {
@@ -2284,5 +1319,78 @@ class testFormMapProperties extends CWebTest {
 		// Check the presence of the map in the list and database.
 		$this->assertFalse($table->findRow('Name', self::MAP_CLONE, true)->isPresent());
 		$this->assertEquals(0, CDBHelper::getCount('SELECT sysmapid FROM sysmaps WHERE name=\''.self::MAP_CLONE.'\''));
+	}
+
+	/**
+	 * Perform sysmap's creation or update and verify the result.
+	 *
+	 * @param boolean $update	updating is performed
+	 */
+	protected function checkSysmapForm($data, $update = false) {
+		if ($data['expected'] === TEST_BAD) {
+			$old_hash = CDBHelper::getHash(self::HASH_SQL);
+		}
+
+		$this->page->login()->open('sysmaps.php')->waitUntilReady();
+		$table = $this->query('class:list-table')->asTable()->one();
+
+		if ($update) {
+			self::$map_update = (array_key_exists('remove_urls', $data)) ? self::MAP_SIMPLE_UPDATE : self::$map_update;
+			$table->findRow('Name', (array_key_exists('sorting', $data) ? self::MAP_URL_ADD : self::$map_update))
+					->query('link:Properties')->one()->click();
+		}
+		else {
+			$this->query('button:Create map')->one()->click();
+		}
+
+		$form = $this->query('id:sysmap-form')->waitUntilPresent()->asForm()->one();
+		$form->fill($data['map_properties']);
+
+		if (array_key_exists('urls', $data)) {
+			$form->query('class:table-forms-separator')->asMultifieldTable()->one()->fill($data['urls']);
+		}
+
+		$values = $form->getFields()->filter(CElementFilter::VISIBLE)->asValues();
+		$form->submit()->waitUntilStalled();
+
+		if ($data['expected'] === TEST_BAD) {
+			$this->assertMessage(TEST_BAD, (array_key_exists('incorrect_data', $data)
+					? 'Page received incorrect data'
+					: (($update) ? 'Cannot update network map' : 'Cannot add network map')),
+					$data['error_details']
+			);
+
+			// Check that DB hash is not changed.
+			$this->assertEquals($old_hash, CDBHelper::getHash(self::HASH_SQL));
+		}
+		else {
+			$this->page->waitUntilReady();
+			$this->assertMessage(TEST_GOOD, $update ? 'Network map updated' : 'Network map added');
+
+			// Trim leading and trailing spaces from expected results if necessary.
+			if (CTestArrayHelper::get($data, 'trim', false)) {
+				$data = CTestArrayHelper::trim($data);
+			}
+
+			$table->findRow('Name', $data['map_properties']['Name'])->query('link:Properties')->one()->click();
+			$saved_form = $this->query('id:sysmap-form')->waitUntilPresent()->asForm()->one();
+
+			$saved_form->checkValue($data['map_properties']);
+
+			if (array_key_exists('result_urls', $data)) {
+				$saved_form->checkValue($data['result_urls']);
+			}
+
+			// Check that unchanged fields are not affected.
+			if (!array_key_exists('sorting', $data) && !array_key_exists('remove_urls', $data)) {
+				$this->assertEquals(CTestArrayHelper::trim($values), $saved_form->getFields()
+						->filter(CElementFilter::VISIBLE)->asValues()
+				);
+			}
+
+			if ($update) {
+				self::$map_update = $saved_form->getField('Name')->getValue();
+			}
+		}
 	}
 }
