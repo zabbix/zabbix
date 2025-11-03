@@ -280,8 +280,9 @@ class CWebTest extends CTest {
 	protected static function closePage() {
 		try {
 			if (self::$shared_page !== null) {
-				self::$shared_page->destroy();
+				$page = self::$shared_page;
 				self::$shared_page = null;
+				$page->destroy();
 			}
 		}
 		catch (Exception $exception) {
