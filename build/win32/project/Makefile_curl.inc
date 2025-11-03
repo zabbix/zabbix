@@ -1,3 +1,12 @@
+!	IF "$(CURL)" == "yes"
+!		IF "$(CURLINCDIR)" == ""
+CURLINCDIR = C:\Zabbix\x64\curl\include
+!		ENDIF
+!		IF "$(CURLLIBDIR)" == ""
+CURLLIBDIR = C:\Zabbix\x64\curl\lib
+!		ENDIF
+!	ENDIF
+
 !	IF "$(CURLINCDIR)" != ""
 !		IF EXISTS("$(CURLINCDIR)\curl\curl.h")
 CFLAGS =	$(CFLAGS) /DHAVE_LIBCURL /DCURL_STATICLIB
