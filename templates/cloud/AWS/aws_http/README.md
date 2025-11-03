@@ -504,7 +504,7 @@ For more information, see the [EC2 policies](https://docs.aws.amazon.com/AWSEC2/
 
 Set the macros: `{$AWS.AUTH_TYPE}`, `{$AWS.REGION}`, `{$AWS.EC2.INSTANCE.ID}`.
 
-For more information about manage access keys, see [official documentation](https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html#access-keys-and-secret-access-keys)
+For more information about manage access keys, see [official documentation](https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html#access-keys-and-secret-access-keys).
 
 Also, see the Macros section for a list of macros used for LLD filters.
 
@@ -811,7 +811,7 @@ Next, add a principal to the trust relationships of the role you are using:
 
 Set the macros: `{$AWS.AUTH_TYPE}`, `{$AWS.REGION}`, `{$AWS.RDS.INSTANCE.ID}`.
 
-For more information about manage access keys, see [official documentation](https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html#access-keys-and-secret-access-keys)
+For more information about manage access keys, see [official documentation](https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html#access-keys-and-secret-access-keys).
 
 Also, see the Macros section for a list of macros used for LLD filters.
 
@@ -1008,6 +1008,7 @@ Also, see the Macros section for a list of macros used for LLD filters.
 
 The template to monitor AWS S3 bucket by HTTP via Zabbix that works without any external scripts.
 Most of the metrics are collected in one go, thanks to Zabbix bulk data collection.
+
 *NOTE*
 This template uses the GetMetricData CloudWatch API calls to list and retrieve metrics.
 For more information, please refer to the [CloudWatch pricing](https://aws.amazon.com/cloudwatch/pricing/) page.
@@ -1171,7 +1172,7 @@ You can also define a filter for the Request metrics using a shared prefix, obje
 
 Set the macros: `{$AWS.AUTH_TYPE}`, `{$AWS.S3.BUCKET.NAME}`.
 
-For more information about manage access keys, see [official documentation](https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html#access-keys-and-secret-access-keys)
+For more information about manage access keys, see [official documentation](https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html#access-keys-and-secret-access-keys).
 
 Also, see the Macros section for a list of macros used for LLD filters.
 
@@ -2861,8 +2862,9 @@ See the section below for a list of macros used for LLD filters.
 
 The template to monitor AWS Cost Explorer by HTTP via Zabbix, which works without any external scripts.
 Most of the metrics are collected in one go, thanks to Zabbix bulk data collection.
-*NOTE*
-This template uses the Cost Explorer API calls to list and retrieve metrics.
+
+**Note:** This template uses the Cost Explorer API calls to list and retrieve metrics.
+
 For more information, please refer to the [Cost Explorer pricing](https://aws.amazon.com/aws-cost-management/aws-cost-explorer/pricing/) page.
 
 
