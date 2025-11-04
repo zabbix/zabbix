@@ -276,9 +276,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 			];
 
 			if ($value_type == ITEM_VALUE_TYPE_BINARY || $value_type == ITEM_VALUE_TYPE_JSON) {
-				$params += [
-					'maxValueSize' => 64 * ZBX_KIBIBYTE + 1
-				];
+				$params['maxValueSize'] = 64 * ZBX_KIBIBYTE + 1;
 			}
 
 			$db_items_values = API::History()->get($params);
