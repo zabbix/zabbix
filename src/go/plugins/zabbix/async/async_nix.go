@@ -16,9 +16,32 @@
 
 package zabbixasync
 
+import (
+	"golang.zabbix.com/agent2/pkg/zbxlib"
+	"golang.zabbix.com/sdk/errs"
+	"golang.zabbix.com/sdk/plugin"
+)
+
+var impl Plugin
+
+// Plugin -
+type Plugin struct {
+	plugin.Base
+}
+
+func init() {
+	err := plugin.RegisterMetrics(&impl, "ZabbixAsync", getMetrics()...)
+	if err != nil {
+		panic(errs.Wrap(err, "failed to register metrics"))
+	}
+}
+
+func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
+	return zbxlib.ExecuteCheck(key, params)
+}
+
 func getMetrics() []string {
 	return []string{
-		"system.localtime", "Returns system local time.",
 		"system.boottime", "Returns system boot time.",
 		"net.tcp.listen", "Checks if this TCP port is in LISTEN state.",
 		"net.udp.listen", "Checks if this UDP port is in LISTEN state.",
