@@ -268,9 +268,11 @@ WALLET_LOCATION =
 		(METHOD_DATA = (DIRECTORY = /path/to/wallet))
 	  )
 ```
-The wallet is Oracle-specific file with that contains the same cryptographic material as p12 but in a format that 
+The wallet is Oracle-specific file which contains the same cryptographic material as p12 but in a format that 
 doesn't require a password to access (auto-login feature). The file can contain private keys, X.509 certificates,
 certificate chains and metadata. 
+
+**Note!** If client-side wallet is changed, the Zabbix agent 2 must be restarted!
 
 See Oracle documentation for proper Oracle client configuration.
 

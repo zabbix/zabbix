@@ -167,7 +167,7 @@ func (conn *OraConn) closeWithLog() {
 
 	err := conn.Client.Close()
 	if err != nil {
-		log.Debugf("Cannot close Oracle connection: %w", err)
+		log.Debugf("[Oracle] cannot close the connection: %w", err)
 	}
 }
 

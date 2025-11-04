@@ -175,7 +175,7 @@ func (c *ConnManager) closeUnused() {
 			conn.closeWithLog()
 
 			delete(c.Connections, cd)
-			log.Debugf("[Oracle] Closed unused connection: %s", cd.Uri.Addr())
+			log.Debugf("[Oracle] closed unused connection: %s", cd.Uri.Addr())
 		}
 	}
 }
