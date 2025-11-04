@@ -624,13 +624,7 @@ static int	history_elastic_perform_once(zbx_history_elastic_data_t *d, CURLM *mh
 			/* If the error is due to curl internal problems or unrelated */
 			/* problems with HTTP, we put the handle in a retry list and */
 			/* remove it from the current execution loop */
-			if (CURLM_OK != (code = curl_multi_remove_handle(d->mhandle, conn->handle)))
-			{
-				zabbix_log(LOG_LEVEL_WARNING, "cannot remove handle from curl multi handle: %s",
-						curl_multi_strerror(code));
-			}
-			else
-				zbx_vector_ptr_append(&retries, conn->handle);
+			zbx_vector_ptr_append(&retries, conn->handle);
 		}
 		else if (SUCCEED == elastic_is_error_present(&conn->resp.page, &error))
 		{
@@ -640,13 +634,7 @@ static int	history_elastic_perform_once(zbx_history_elastic_data_t *d, CURLM *mh
 			/* If the error is due to elastic internal problems (for example an index */
 			/* became read-only), we put the handle in a retry list and */
 			/* remove it from the current execution loop */
-			if (CURLM_OK != (code = curl_multi_remove_handle(d->mhandle, conn->handle)))
-			{
-				zabbix_log(LOG_LEVEL_WARNING, "cannot remove handle from curl multi handle: %s",
-						curl_multi_strerror(code));
-			}
-			else
-				zbx_vector_ptr_append(&retries, conn->handle);
+			zbx_vector_ptr_append(&retries, conn->handle);
 		}
 		else
 		{
@@ -659,7 +647,15 @@ static int	history_elastic_perform_once(zbx_history_elastic_data_t *d, CURLM *mh
 
 	for (int i = 0; i < retries.values_num; i++)
 	{
-		if (CURLM_OK != (code = curl_multi_add_handle(mhandle, retries.values[i])))
+		/* If the error is due to curl internal problems or unrelated */
+		/* problems with HTTP, we put the handle in a retry list and */
+		/* remove it from the current execution loop */
+		if (CURLM_OK != (code = curl_multi_remove_handle(d->mhandle, retries.values[i])))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "cannot remove handle from curl multi handle: %s",
+					curl_multi_strerror(code));
+		}
+		else if (CURLM_OK != (code = curl_multi_add_handle(mhandle, retries.values[i])))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "cannot add handle to curl multi handle: %s",
 						curl_multi_strerror(code));
