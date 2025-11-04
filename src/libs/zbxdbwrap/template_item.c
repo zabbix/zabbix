@@ -119,6 +119,11 @@ typedef struct
 }
 zbx_lld_rule_map_t;
 
+ZBX_PTR_VECTOR_DECL(lld_rule_map_ptr, zbx_lld_rule_map_t*)
+ZBX_PTR_VECTOR_IMPL(lld_rule_map_ptr, zbx_lld_rule_map_t*)
+
+ZBX_PTR_VECTOR_IMPL(template_item_ptr, zbx_template_item_t*)
+
 typedef struct
 {
 	zbx_uint64_t				overrideid;
@@ -141,11 +146,6 @@ typedef struct
 	unsigned char		operator;
 }
 lld_override_condition_t;
-
-ZBX_PTR_VECTOR_DECL(lld_rule_map_ptr, zbx_lld_rule_map_t*)
-ZBX_PTR_VECTOR_IMPL(lld_rule_map_ptr, zbx_lld_rule_map_t*)
-
-ZBX_PTR_VECTOR_IMPL(template_item_ptr, zbx_template_item_t*)
 
 /* auxiliary function for DBcopy_template_items() */
 static void	DBget_interfaces_by_hostid(zbx_uint64_t hostid, zbx_uint64_t *interfaceids)
