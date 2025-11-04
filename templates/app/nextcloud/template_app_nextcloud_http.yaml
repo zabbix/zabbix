@@ -28,7 +28,7 @@ zabbix_export:
         The user must be included in the Administrators group.
       vendor:
         name: Zabbix
-        version: 8.0-1
+        version: 8.0-2
       groups:
         - name: Templates/Applications
       items:
