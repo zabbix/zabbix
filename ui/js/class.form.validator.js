@@ -808,6 +808,28 @@ class CFormValidator {
 			return rules;
 		};
 
+		const extractReferencedFieldNames = (object) => {
+			let parameter_fields = [];
+			const reference_to_field_name = (reference) => reference.slice(1, -1);
+			const is_named_reference = (value) => is_string(value) && value.startsWith('{')
+				&& value.endsWith('}');
+
+			for (let api_field of Object.values(object)) {
+				if (is_object(api_field)) {
+					for (let nested_api_field of Object.values(api_field)) {
+						if (is_named_reference(nested_api_field)) {
+							parameter_fields.push(reference_to_field_name(nested_api_field));
+						}
+					}
+				}
+				else if (is_named_reference(api_field)) {
+					parameter_fields.push(reference_to_field_name(api_field));
+				}
+			}
+
+			return [...new Set(parameter_fields)];
+		};
+
 		const findRelatedFieldPaths = (lookup_field_path) => {
 			const scan = (lookup_rule_path, rules, current_rule_path) => {
 				const current_field_name = current_rule_path.split('/').at(-1);
@@ -826,10 +848,7 @@ class CFormValidator {
 						// If lookup field is used in API uniqueness check then all fields used in that API
 						// check should be validated.
 						rule_value.forEach((api_uniq) => {
-							let parameter_fields = Object.values(api_uniq[1])
-								.filter(value => String(value).startsWith('{') && String(value).endsWith('}'))
-								.map(field => field.slice(1, -1));
-
+							let parameter_fields = extractReferencedFieldNames(api_uniq[1]);
 							const has_match = parameter_fields.some((field) => {
 								return this.#getFieldAbsolutePath(field, current_rule_path + '/') === lookup_rule_path;
 							});
