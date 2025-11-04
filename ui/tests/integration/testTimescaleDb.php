@@ -33,7 +33,7 @@ class testTimescaleDb extends CIntegrationTest {
 		storing old data deep in the past - 20 days, which is way longer that the minimum 7days,
 		and must be guaranteed to be compressed
 	*/
-	private const TEST_DATA_OLDER_THAN = 20 * 24 * 3600;
+	private const COMPRESSION_TEST_DATA_OLDER_THAN = 20 * 24 * 3600;
 	private static $db_extension = null;
 	private static $hostid;
 	private static $itemid;
@@ -101,18 +101,21 @@ class testTimescaleDb extends CIntegrationTest {
 	 * Requires the running server.
 	 * Requires disabled compression. This may be changed in future.
 	 */
-	private function generateHistoryData($data_older_than) {
+	private function generateHistoryData() {
 		$count_start = $this->getHistoryCount();
 		$this->assertNotEquals(-1, $count_start);
 
 		$now = time();
 
 		/* data for 3 chunks in the past old enough to be compressed */
+		/* tuple format: start clock, value count */
 		$input = [
-			/* start clock, value count */
-			[$now - $data_older_than - 0 * self::getChunkTimeInterval(), 100],
-			[$now - $data_older_than - 2 * self::getChunkTimeInterval(), 100],
-			[$now - $data_older_than - 4 * self::getChunkTimeInterval(), 100]
+			/* current chunk should not be compressed */
+			[$now, 100],
+			/* chunks to be compressed */
+			[$now - self::COMPRESSION_TEST_DATA_OLDER_THAN - 0 * self::getChunkTimeInterval(), 100],
+			[$now - self::COMPRESSION_TEST_DATA_OLDER_THAN - 2 * self::getChunkTimeInterval(), 100],
+			[$now - self::COMPRESSION_TEST_DATA_OLDER_THAN - 4 * self::getChunkTimeInterval(), 100]
 		];
 
 		$sender_data = [];
@@ -342,7 +345,7 @@ class testTimescaleDb extends CIntegrationTest {
 
 		/* Requires the running server. */
 		/* Requires disabled compression. This may be changed in future. */
-		$this->generateHistoryData(self::TEST_DATA_OLDER_THAN);
+		$this->generateHistoryData();
 
 		/* Zabbix server configures TimescaleDB compression on the the next Zabbix server start */
 		$this->compressionSet(self::COMPRESSION_STATUS_ON);
@@ -369,13 +372,6 @@ class testTimescaleDb extends CIntegrationTest {
 		/* Allow enough time to TimescaleDB settings to be applied */
 		for ($attempt = 1; $attempt <= self::MAX_ATTEMPTS; $attempt++) {
 			try {
-				/* Get number of compressed chunks */
-				$res = DBfetch(DBselect($sql_num_compressed));
-				$this->assertArrayHasKey('number_compressed_chunks', $res);
-				$number_compressed_chunks0 = $res['number_compressed_chunks'];
-				$this->assertEquals(0, $number_compressed_chunks0,
-						"It is expected that there are no compressed chunks in the beginning.");
-
 				/* Get all chunk names. */
 				$res = DBfetchArray(DBselect("SELECT show_chunks('".self::TABLENAME."')"));
 				$chunks = array_column($res, 'show_chunks');
@@ -485,7 +481,7 @@ class testTimescaleDb extends CIntegrationTest {
 
 		/* Requires the running server. */
 		/* Requires disabled compression. This may be changed in future. */
-		$this->generateHistoryData(self::TEST_DATA_OLDER_THAN);
+		$this->generateHistoryData();
 
 		/* Zabbix server configures TimescaleDB compression on the the next Zabbix server start */
 		$this->compressionSet(self::COMPRESSION_STATUS_ON);

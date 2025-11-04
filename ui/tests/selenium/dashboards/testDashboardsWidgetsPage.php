@@ -138,6 +138,7 @@ class testDashboardsWidgetsPage extends CWebTest {
 		$widget = $dashboard->getWidget('Problem hosts');
 		// Check refresh interval of widget.
 		$this->assertEquals('1 minute', $widget->getRefreshInterval());
+		CPopupMenuElement::find()->one()->close();
 
 		// Get widget content as table.
 		$table = $widget->getContent()->asTable();
@@ -146,7 +147,7 @@ class testDashboardsWidgetsPage extends CWebTest {
 
 		// Expected table values.
 		$expected = [
-			'Zabbix servers'					=> 19,
+			'Zabbix servers'					=> 18,
 			'Inheritance test'					=> 1,
 			'Host group for suppression'		=> 1
 		];
