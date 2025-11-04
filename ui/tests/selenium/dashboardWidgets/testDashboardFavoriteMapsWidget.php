@@ -39,6 +39,7 @@ class testDashboardFavoriteMapsWidget extends CWebTest {
 	const CANCEL_WIDGET = 'Widget for testing cancel button';
 
 	protected static $dashboardid;
+	protected static $dashboard_url;
 	protected static $mapid;
 	protected static $edit_widget = 'Widget for update';
 	protected static $default_values = [
@@ -56,7 +57,7 @@ class testDashboardFavoriteMapsWidget extends CWebTest {
 			' w.width, w.height'.
 			' FROM widget_field wf'.
 			' INNER JOIN widget w'.
-			' ON w.widgetid=wf.widgetid '.
+			' ON w.widgetid=wf.widgetid'.
 			' ORDER BY wf.widgetid, wf.name, wf.value_int, wf.value_str, wf.value_groupid, wf.value_itemid, wf.value_graphid';
 
 	public static function prepareDashboardData() {
@@ -98,6 +99,8 @@ class testDashboardFavoriteMapsWidget extends CWebTest {
 			]
 		])['dashboardids'][0];
 
+		self::$dashboard_url = 'zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid;
+
 		// Create host for map.
 		$hosts = CDataHelper::call('host.create', [
 			[
@@ -136,14 +139,14 @@ class testDashboardFavoriteMapsWidget extends CWebTest {
 		$button->waitUntilClickable()->click();
 		$this->query('id:addrm_fav')->one()->waitUntilAttributesPresent(['title' => 'Remove from favorites']);
 
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid)->waitUntilReady();
+		$this->page->login()->open(self::$dashboard_url)->waitUntilReady();
 		$widget = CDashboardElement::find()->one()->getWidget(self::$edit_widget)->waitUntilReady()->getContent();
 
 		$this->assertEquals('zabbix.php?action=map.view&sysmapid='.self::$mapid,
 				$widget->query('link', self::MAP_NAME)->one()->getAttribute('href')
 		);
 
-		$this->assertEquals(1, CDBHelper::getCount('SELECT profileid FROM profiles WHERE idx='.
+		$this->assertEquals(1, CDBHelper::getCount('SELECT null FROM profiles WHERE idx='.
 				zbx_dbstr('web.favorite.sysmapids').' AND value_id='.zbx_dbstr(self::$mapid))
 		);
 	}
@@ -151,7 +154,7 @@ class testDashboardFavoriteMapsWidget extends CWebTest {
 	public function testDashboardFavoriteMapsWidget_RemoveFavoriteMaps() {
 		$favorite_maps = CDBHelper::getAll('SELECT value_id FROM profiles WHERE idx='.zbx_dbstr('web.favorite.sysmapids'));
 
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid)->waitUntilReady();
+		$this->page->login()->open(self::$dashboard_url)->waitUntilReady();
 		$widget = CDashboardElement::find()->waitUntilReady()->one()->getWidget(self::$edit_widget)->getContent();
 
 		foreach ($favorite_maps as $map) {
@@ -163,11 +166,11 @@ class testDashboardFavoriteMapsWidget extends CWebTest {
 		}
 
 		$this->assertEquals('No maps added.', $widget->query('class:no-data-message')->waitUntilVisible()->one()->getText());
-		$this->assertEquals(0, CDBHelper::getCount('SELECT profileid FROM profiles WHERE idx='.zbx_dbstr('web.favorite.sysmapids')));
+		$this->assertEquals(0, CDBHelper::getCount('SELECT null FROM profiles WHERE idx='.zbx_dbstr('web.favorite.sysmapids')));
 	}
 
 	public function testDashboardFavoriteMapsWidget_Layout() {
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid)->waitUntilReady();
+		$this->page->login()->open(self::$dashboard_url)->waitUntilReady();
 		$dialog = CDashboardElement::find()->one()->edit()->addWidget();
 		$form = $dialog->asForm();
 
@@ -195,7 +198,7 @@ class testDashboardFavoriteMapsWidget extends CWebTest {
 
 		// Verify that both Apply and Cancel buttons are clickable.
 		$this->assertEquals(2, $dialog->getFooter()->query('button', ['Add', 'Cancel'])->all()
-			->filter(new CElementFilter(CElementFilter::CLICKABLE))->count()
+				->filter(new CElementFilter(CElementFilter::CLICKABLE))->count()
 		);
 
 		// Check max length of the "Name" input field.
@@ -268,7 +271,7 @@ class testDashboardFavoriteMapsWidget extends CWebTest {
 
 	public function testDashboardFavoriteMapsWidget_SimpleUpdate() {
 		$old_hash = CDBHelper::getHash(self::SQL);
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid)->waitUntilReady();
+		$this->page->login()->open(self::$dashboard_url)->waitUntilReady();
 		$dashboard = CDashboardElement::find()->one();
 		$form = $dashboard->getWidget(self::$edit_widget)->edit();
 		$form->submit()->waitUntilStalled();
@@ -286,7 +289,7 @@ class testDashboardFavoriteMapsWidget extends CWebTest {
 	}
 
 	public function testDashboardFavoriteMapsWidget_Delete() {
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid)->waitUntilReady();
+		$this->page->login()->open(self::$dashboard_url)->waitUntilReady();
 
 		$dashboard = CDashboardElement::find()->one()->edit();
 		$widget = $dashboard->getWidget(self::DELETE_WIDGET);
@@ -297,8 +300,8 @@ class testDashboardFavoriteMapsWidget extends CWebTest {
 
 		$this->assertFalse($dashboard->getWidget(self::DELETE_WIDGET, false)->isValid());
 		$this->assertEquals(0, CDBHelper::getCount('SELECT null FROM widget_field wf'.
-		' LEFT JOIN widget w ON w.widgetid=wf.widgetid WHERE w.name='.zbx_dbstr(self::DELETE_WIDGET))
-		);
+				' LEFT JOIN widget w ON w.widgetid=wf.widgetid WHERE w.name='.zbx_dbstr(self::DELETE_WIDGET)
+		));
 	}
 
 	public static function getCancelData() {
@@ -341,7 +344,7 @@ class testDashboardFavoriteMapsWidget extends CWebTest {
 		$old_hash = CDBHelper::getHash(self::SQL);
 		$new_name = 'Cancel test - favorite maps';
 
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid)->waitUntilReady();
+		$this->page->login()->open(self::$dashboard_url)->waitUntilReady();
 
 		$dashboard = CDashboardElement::find()->one()->edit();
 		$old_widget_count = $dashboard->getWidgets()->count();
@@ -357,7 +360,7 @@ class testDashboardFavoriteMapsWidget extends CWebTest {
 
 		$form->fill([
 			'Name' => $new_name,
-			'Refresh interval' => '15 minutes'
+			'Refresh interval' => '10 minutes'
 		]);
 
 		// Save or cancel widget.
@@ -394,7 +397,7 @@ class testDashboardFavoriteMapsWidget extends CWebTest {
 	protected function checkWidgetForm($data, $update = false) {
 		$data['fields'] = CTestArrayHelper::get($data, 'fields', self::$default_values);
 
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid)->waitUntilReady();
+		$this->page->login()->open(self::$dashboard_url)->waitUntilReady();
 		$dashboard = CDashboardElement::find()->waitUntilReady()->one();
 		$old_widget_count = $dashboard->getWidgets()->count();
 
