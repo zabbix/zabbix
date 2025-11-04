@@ -22,17 +22,10 @@ class CConditionFormulaParser extends CParser {
 	const STATE_AFTER_CONSTANT = 3;
 	const STATE_AFTER_NOT_OPERATOR = 4;
 
-	/**
-	 * Error message if the formula is invalid.
-	 *
-	 * @var string
-	 */
 	private string $error;
 
 	/**
 	 * Array of unique constants used in the formula.
-	 *
-	 * @var array
 	 */
 	private array $constants = [];
 
@@ -48,7 +41,6 @@ class CConditionFormulaParser extends CParser {
 	 * @return int
 	 */
 	public function parse($source, $pos = 0) {
-		// initializing local variables
 		$this->error = '';
 		$this->match = '';
 		$this->length = 0;
@@ -83,17 +75,7 @@ class CConditionFormulaParser extends CParser {
 		return CParser::PARSE_FAIL;
 	}
 
-	/**
-	 * Parses an expression.
-	 *
-	 * @param string  $source
-	 * @param int     $pos
-	 * @param array   $constants
-	 * @param int     $parsed_pos
-	 *
-	 * @return bool  Returns true if parsed successfully, false otherwise.
-	 */
-	private static function parseExpression(string $source, int &$pos, array &$constants, int &$parsed_pos) {
+	private static function parseExpression(string $source, int &$pos, array &$constants, int &$parsed_pos): bool {
 		$state = self::STATE_AFTER_OPEN_BRACE;
 		$after_space = false;
 		$level = 0;
@@ -252,12 +234,6 @@ class CConditionFormulaParser extends CParser {
 
 	/**
 	 * Parses a constant and advances the position to its last character.
-	 *
-	 * @param string  $source
-	 * @param int     $pos
-	 * @param array   $constants
-	 *
-	 * @return bool
 	 */
 	private static function parseConstant(string $source, int &$pos, array &$constants): bool {
 		if (preg_match('/^([A-Z]+)/', substr($source, $pos), $matches)) {
@@ -276,11 +252,6 @@ class CConditionFormulaParser extends CParser {
 
 	/**
 	 * Parses a keyword and advances the position to its last character.
-	 *
-	 * @param string  $source
-	 * @param int     $pos
-	 *
-	 * @return bool
 	 */
 	private static function parseNot(string $source, int &$pos): bool {
 		if (substr($source, $pos, 3) !== 'not') {
@@ -294,34 +265,23 @@ class CConditionFormulaParser extends CParser {
 
 	/**
 	 * Parses an operator and advances the position to its last character.
-	 *
-	 * @param string  $source
-	 * @param int     $pos
-	 *
-	 * @return bool
 	 */
 	private static function parseOperator(string $source, int &$pos): bool {
 		if (preg_match('/^(and|or)/', substr($source, $pos), $matches)) {
 			$pos += strlen($matches[1]) - 1;
+
 			return true;
 		}
 
 		return false;
 	}
 
-	/**
-	 * Returns the list of constants.
-	 *
-	 * @return array
-	 */
 	public function getConstants(): array {
 		return $this->constants;
 	}
 
 	/**
 	 * Returns a friendly error message or empty string if expression was parsed successfully.
-	 *
-	 * @return string
 	 */
 	public function getError(): string {
 		return $this->error;
