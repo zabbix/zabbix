@@ -196,7 +196,7 @@ class testFormMaintenance extends CLegacyWebTest {
 				[
 					'screenshot_name' => 'Monthly with Day of week period',
 					'fields' => [
-						'Period type' => 'Monthly', 
+						'Period type' => 'Monthly',
 						'Date' => 'Day of week'
 						]
 					],
@@ -206,7 +206,7 @@ class testFormMaintenance extends CLegacyWebTest {
 
 	/**
 	 * Check screenshots of period form.
-	 * 
+	 *
 	 * @dataProvider maintenancePeriodsProvider
 	 */
 	public function testFormMaintenance_CheckPeriodForm($data) {
