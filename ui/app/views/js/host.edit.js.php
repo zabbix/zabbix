@@ -32,7 +32,9 @@ window.host_edit_popup = {
 		this.form_element = this.overlay.$dialogue.$body[0].querySelector('form');
 		this.form = new CForm(this.form_element, rules);
 		this.initial_proxy_groupid = proxy_groupid;
-		this.macros_templateids = null;
+		this.all_templateids = null;
+		this.show_inherited_tags = false;
+		this.tags_table = this.form_element.querySelector('.tags-table');
 		this.show_inherited_macros = false;
 
 		const return_url = new URL('zabbix.php', location.href);
@@ -50,6 +52,7 @@ window.host_edit_popup = {
 		}
 
 		this.initHostTab(host_interfaces, host_is_discovered);
+		this.initTagsTab();
 		this.initMacrosTab();
 		this.initInventoryTab();
 		this.initEncryptionTab();
@@ -263,6 +266,84 @@ window.host_edit_popup = {
 	},
 
 	/**
+	 * Set up of tags functionality.
+	 */
+	initTagsTab() {
+		const show_inherited_tags_element = document.getElementById('host_show_inherited_tags');
+
+		this.show_inherited_tags = show_inherited_tags_element.querySelector('input:checked').value == 1;
+
+		show_inherited_tags_element.addEventListener('change', e => {
+			this.show_inherited_tags = e.target.value == 1;
+			this.all_templateids = this.getAllTemplates();
+
+			this.updateTagsList();
+		});
+
+		const observer = new IntersectionObserver(entries => {
+			if (entries[0].isIntersecting && this.show_inherited_tags) {
+				const templateids = this.getAllTemplates();
+
+				if (this.all_templateids === null || this.all_templateids.xor(templateids).length > 0) {
+					this.all_templateids = templateids;
+
+					this.updateTagsList();
+				}
+			}
+		});
+
+		observer.observe(document.getElementById('host-tags-tab'));
+	},
+
+	updateTagsList() {
+		const fields = getFormFields(this.form_element);
+
+		fields.tags = Object.values(fields.tags).reduce((tags, tag) => {
+			if (!('type' in tag) || (tag.type & <?= ZBX_PROPERTY_OWN ?>)) {
+				tags.push({tag: tag.tag.trim(), value: tag.value.trim(), automatic: tag.automatic});
+			}
+
+			return tags;
+		}, []);
+
+		const url = new URL('zabbix.php', location.href);
+		url.searchParams.set('action', 'host.tags.list');
+
+		const data = {
+			source: 'host',
+			hostid: fields.hostid,
+			templateids: this.getAllTemplates(),
+			show_inherited_tags: fields.host_show_inherited_tags,
+			tags: fields.tags
+		}
+
+		this.overlay.setLoading();
+
+		fetch(url, {
+			method: 'POST',
+			headers: {'Content-Type': 'application/json'},
+			body: JSON.stringify(data)
+		})
+			.then(response => response.json())
+			.then(response => {
+				this.tags_table.innerHTML = response.body;
+
+				const $tags_table = jQuery(this.tags_table);
+
+				$tags_table.data('dynamicRows').counter = this.tags_table.querySelectorAll('tr.form_row').length;
+				$tags_table.find(`.${ZBX_STYLE_TEXTAREA_FLEXIBLE}`).textareaFlexible();
+			})
+			.catch((message) => {
+				this.form.addGeneralErrors({[t('Unexpected server error.')]: message});
+				this.form.renderErrors();
+				throw message;
+			})
+			.finally(() => {
+				this.overlay.unsetLoading();
+			});
+	},
+
+	/**
 	 * Set up of macros functionality.
 	 */
 	initMacrosTab() {
@@ -279,8 +360,7 @@ window.host_edit_popup = {
 				});
 
 				this.form.validateChanges(fields, true);
-			},
-			source: 'host'
+			}
 		});
 
 		$('#host-tabs', this.form_element).on('tabscreate tabsactivate', (e, ui) => {
@@ -294,8 +374,8 @@ window.host_edit_popup = {
 					const templateids = this.getAllTemplates();
 
 					// First time always load inherited macros.
-					if (this.macros_templateids === null) {
-						this.macros_templateids = templateids;
+					if (this.all_templateids === null) {
+						this.all_templateids = templateids;
 
 						if (show_inherited_macros) {
 							this.macros_manager.load(show_inherited_macros, templateids);
@@ -303,8 +383,8 @@ window.host_edit_popup = {
 						}
 					}
 					// Other times load inherited macros only if templates changed.
-					else if (show_inherited_macros && this.macros_templateids.xor(templateids).length > 0) {
-						this.macros_templateids = templateids;
+					else if (show_inherited_macros && this.all_templateids.xor(templateids).length > 0) {
+						this.all_templateids = templateids;
 						this.macros_manager.load(show_inherited_macros, templateids);
 					}
 				}

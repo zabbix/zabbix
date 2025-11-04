@@ -18,7 +18,6 @@
 
 #include "zbxcommon.h"
 #include "zbxtypes.h"
-#include "zbxexpression.h"
 #include "zbxtasks.h"
 #include "zbxcachevalue.h"
 #include "zbxcacheconfig.h"
@@ -168,8 +167,12 @@ static void	preprocess_trigger_name(zbx_db_trigger *trigger, int *historical)
 	event.objectid = trigger->triggerid;
 	event.trigger = *trigger;
 
-	zbx_substitute_simple_macros(NULL, &event, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
-			&trigger->description, ZBX_MACRO_TYPE_TRIGGER_DESCRIPTION, NULL, 0);
+	zbx_dc_um_handle_t		*um_handle = zbx_dc_open_user_macros_masked();
+
+	zbx_substitute_macros_ext_search(ZBX_TOKEN_SEARCH_REFERENCES, &trigger->description, NULL, 0,
+			&zbx_macro_trigger_desc_resolv, um_handle, &event, NULL);
+
+	zbx_dc_close_user_macros(um_handle);
 
 	if (SUCCEED == *historical)
 	{
@@ -280,11 +283,12 @@ static int	process_event_bulk_update(const zbx_db_trigger *trigger, char **sql, 
  ******************************************************************************/
 static int	process_event_update(const zbx_db_trigger *trigger, char **sql, size_t *sql_alloc, size_t *sql_offset)
 {
-	zbx_db_result_t	result;
-	zbx_db_row_t	row;
-	zbx_db_event	event;
-	char		*name, *name_esc;
-	int		ret = SUCCEED;
+	zbx_db_result_t		result;
+	zbx_db_row_t		row;
+	zbx_db_event		event;
+	char			*name, *name_esc;
+	int			ret = SUCCEED;
+	zbx_dc_um_handle_t	*um_handle = zbx_dc_open_user_macros_masked();
 
 	memset(&event, 0, sizeof(zbx_db_event));
 
@@ -312,8 +316,8 @@ static int	process_event_update(const zbx_db_trigger *trigger, char **sql, size_
 
 		name = zbx_strdup(NULL, trigger->description);
 
-		zbx_substitute_simple_macros(NULL, &event, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
-				&name, ZBX_MACRO_TYPE_TRIGGER_DESCRIPTION, NULL, 0);
+		zbx_substitute_macros_ext_search(ZBX_TOKEN_SEARCH_REFERENCES, &name, NULL, 0,
+				&zbx_macro_trigger_desc_resolv, um_handle, &event, NULL);
 
 		name_esc = zbx_db_dyn_escape_string_len(name, EVENT_NAME_LEN);
 
@@ -339,6 +343,7 @@ static int	process_event_update(const zbx_db_trigger *trigger, char **sql, size_
 	}
 
 	zbx_db_free_result(result);
+	zbx_dc_close_user_macros(um_handle);
 
 	return ret;
 }

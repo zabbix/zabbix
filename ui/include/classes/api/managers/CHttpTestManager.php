@@ -117,6 +117,16 @@ class CHttpTestManager {
 		self::updateSteps($httptests);
 		self::updateTags($httptests);
 
+		foreach ($httptests as &$httptest) {
+			if (!array_key_exists('ins_template_cache', $httptest)) {
+				$httptest['ins_template_cache'] = [$httptest['hostid']];
+			}
+			else {
+				$httptest['ins_template_cache'][] = $httptest['hostid'];
+			}
+		}
+		unset($httptest);
+
 		return $httptests;
 	}
 
@@ -190,9 +200,11 @@ class CHttpTestManager {
 			$delay_updated = array_key_exists('delay', $httptest) && $httptest['delay'] !== $db_httptest['delay'];
 			$templateid_updated = array_key_exists('templateid', $httptest)
 				&& bccomp($httptest['templateid'], $db_httptest['templateid']) != 0;
+			$item_template_cache_updated = array_key_exists('ins_template_cache', $httptest)
+				|| array_key_exists('del_template_cache', $httptest);
 
 			if ($name_updated || $status_updated || $delay_updated || $templateid_updated
-					|| array_key_exists('tags', $httptest)) {
+					|| array_key_exists('tags', $httptest) || $item_template_cache_updated) {
 				$httptestids[] = $httptest['httptestid'];
 			}
 		}
@@ -349,9 +361,11 @@ class CHttpTestManager {
 			$delay_updated = array_key_exists('delay', $httptest) && $httptest['delay'] != $db_httptest['delay'];
 			$templateid_updated = array_key_exists('templateid', $httptest)
 				&& bccomp($httptest['templateid'], $db_httptest['templateid']) != 0;
+			$item_template_cache_updated = array_key_exists('ins_template_cache', $httptest)
+				|| array_key_exists('del_template_cache', $httptest);
 
 			if (array_key_exists('steps', $httptest) || $name_updated || $status_updated || $delay_updated
-					|| $templateid_updated || array_key_exists('tags', $httptest)) {
+					|| $templateid_updated || array_key_exists('tags', $httptest) || $item_template_cache_updated) {
 				$httptestids[] = $httptest['httptestid'];
 			}
 		}
@@ -577,6 +591,8 @@ class CHttpTestManager {
 				$httptest['delay'] = DB::getDefault('httptest', 'delay');
 			}
 
+			$ins_template_cache = array_intersect_key($httptest, array_flip(['ins_template_cache']));
+
 			foreach ($type_items as $type => $type_item) {
 				$item_key = self::getTestKey($type, $httptest['name']);
 
@@ -595,7 +611,7 @@ class CHttpTestManager {
 					'templateid' => array_key_exists('templateid', $httptest)
 						? self::$parent_itemids[$httptest['templateid']][$item_key]
 						: 0
-				] + $type_item;
+				] + $type_item + $ins_template_cache;
 			}
 		}
 
@@ -669,6 +685,13 @@ class CHttpTestManager {
 					$item['tags'] = $httptest['tags'];
 				}
 
+				if (array_key_exists('ins_template_cache', $httptest)) {
+					$item['ins_template_cache'] = $httptest['ins_template_cache'];
+				}
+				elseif (array_key_exists('del_template_cache', $httptest)) {
+					$item['del_template_cache'] = $httptest['del_template_cache'];
+				}
+
 				$items[] = ['itemid' => $db_item['itemid']] + $item;
 			}
 
@@ -711,6 +734,13 @@ class CHttpTestManager {
 
 					if (array_key_exists('tags', $httptest)) {
 						$item['tags'] = $httptest['tags'];
+					}
+
+					if (array_key_exists('ins_template_cache', $httptest)) {
+						$item['ins_template_cache'] = $httptest['ins_template_cache'];
+					}
+					elseif (array_key_exists('del_template_cache', $httptest)) {
+						$item['del_template_cache'] = $httptest['del_template_cache'];
 					}
 
 					$items[] = ['itemid' => $db_item['itemid']] + $item;
@@ -900,6 +930,7 @@ class CHttpTestManager {
 
 		if ($ins_steps) {
 			$stepids = DB::insert('httpstep', $ins_steps);
+			$ins_httptest_stepids = [];
 
 			foreach ($httptests as &$httptest) {
 				if (!array_key_exists('steps', $httptest)) {
@@ -910,6 +941,12 @@ class CHttpTestManager {
 					if (!array_key_exists('httpstepid', $step)) {
 						$step['httpstepid'] = current($stepids);
 						next($stepids);
+
+						$ins_httptest_stepids[$httptest['httptestid']][$step['httpstepid']] = true;
+
+						if (array_key_exists('ins_template_cache', $httptest)) {
+							$step['ins_template_cache'] = $httptest['ins_template_cache'];
+						}
 					}
 				}
 				unset($step);
@@ -917,6 +954,27 @@ class CHttpTestManager {
 			unset($httptest);
 
 			self::createStepItems($httptests, $stepids, $db_httptests);
+
+			foreach ($httptests as &$httptest) {
+				if (!array_key_exists($httptest['httptestid'], $ins_httptest_stepids)) {
+					continue;
+				}
+
+				foreach ($httptest['steps'] as &$step) {
+					if (!array_key_exists($step['httpstepid'], $ins_httptest_stepids[$httptest['httptestid']])) {
+						continue;
+					}
+
+					if (array_key_exists('ins_template_cache', $step)) {
+						$step['ins_template_cache'][] = $httptest['hostid'];
+					}
+					else {
+						$step['ins_template_cache'] = [$httptest['hostid']];
+					}
+				}
+				unset($step);
+			}
+			unset($httptest);
 		}
 
 		self::updateStepFields($httptests, $db_httptests);
@@ -1048,6 +1106,8 @@ class CHttpTestManager {
 					continue;
 				}
 
+				$ins_template_cache = array_intersect_key($step, array_flip(['ins_template_cache']));
+
 				foreach ($type_items as $type => $type_item) {
 					$item_key = self::getStepKey($type, $httptest['name'], $step['name']);
 
@@ -1066,7 +1126,7 @@ class CHttpTestManager {
 						'templateid' => array_key_exists('templateid', $httptest)
 							? self::$parent_itemids[$httptest['templateid']][$item_key]
 							: 0
-					] + $type_item;
+					] + $type_item + $ins_template_cache;
 				}
 			}
 		}
@@ -1330,6 +1390,8 @@ class CHttpTestManager {
 			'preservekeys' => true,
 			'nopermissions' => true
 		]);
+
+		CHttpTest::addInsTemplateCaches($httpTests);
 
 		$this->inherit($httpTests, $hostIds);
 	}

@@ -20,17 +20,23 @@ class CWidgetFieldTags extends CWidgetField {
 	 */
 	#tags_table;
 
-	constructor({name, form_name}) {
+	/**
+	 * @type {string}
+	 */
+	#field_id;
+
+	constructor({name, form_name, field_id}) {
 		super({name, form_name});
 
-		this.#tags_table = document.getElementById(`tags_table_${name}`);
+		this.#tags_table = document.getElementById(`tags_table_${field_id}`);
+		this.#field_id = field_id;
 
 		this.#initField();
 	}
 
 	#initField() {
 		jQuery(this.#tags_table)
-			.dynamicRows({template: `#${this.getName()}-row-tmpl`, allow_empty: true})
+			.dynamicRows({template: `#${this.#field_id}-row-tmpl`, allow_empty: true})
 			.on('afteradd.dynamicRows', () => {
 				const rows = this.#tags_table.querySelectorAll('.form_row');
 

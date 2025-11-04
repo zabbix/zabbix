@@ -111,6 +111,7 @@ zbx_db_config_t;
 
 #define ZBX_DB_MAX_ID	(zbx_uint64_t)__UINT64_C(0x7fffffffffffffff)
 
+int	zbx_db_library_init(char **error);
 int	zbx_db_init(char **error);
 void	zbx_db_deinit(void);
 
@@ -451,6 +452,43 @@ zbx_db_row_t	zbx_db_large_query_fetch(zbx_db_large_query_t *query);
 void	zbx_db_large_query_clear(zbx_db_large_query_t *query);
 void	zbx_dbconn_large_query_append_sql(zbx_db_large_query_t *query, const char *sql);
 
+/* connection pool */
+typedef struct zbx_dbconn_pool zbx_dbconn_pool_t;
+
+typedef struct
+{
+	int	max_open;
+	int	max_idle;
+	int	idle_timeout;
+}
+zbx_dbconn_pool_config_t;
+
+typedef struct
+{
+	zbx_uint64_t	provided_num;
+	double		time_wait;
+	double		time_idle;
+}
+zbx_dbconn_pool_stats_t;
+
+typedef struct
+{
+	zbx_dbconn_pool_config_t	cfg;
+	zbx_dbconn_pool_stats_t		stats;
+}
+zbx_dbconn_pool_info_t;
+
+void	zbx_dbconn_pool_set_config(const zbx_dbconn_pool_config_t *cfg);
+void	zbx_dbconn_pool_get_config(zbx_dbconn_pool_config_t *cfg);
+int	zbx_dbconn_pool_flush_config(zbx_dbconn_pool_config_t *cfg, char **error);
+void	zbx_dbconn_pool_get_stats(zbx_dbconn_pool_stats_t *stats);
+
+zbx_dbconn_pool_t	*zbx_dbconn_pool_create(char **error);
+void	zbx_dbconn_pool_free(zbx_dbconn_pool_t *pool);
+zbx_dbconn_t	*zbx_dbconn_pool_acquire_connection(zbx_dbconn_pool_t *pool);
+void	zbx_dbconn_pool_release_connection(zbx_dbconn_pool_t *pool, zbx_dbconn_t *db);
+void	zbx_dbconn_pool_sync(zbx_dbconn_pool_t *pool);
+
 /* compatibility wrappers */
 
 void	zbx_db_init_autoincrement_options(void);
@@ -497,4 +535,24 @@ void	zbx_db_large_query_prepare_str(zbx_db_large_query_t *query, char **sql,
 void	zbx_db_large_query_prepare(zbx_db_large_query_t *query, char **sql, size_t *sql_alloc, size_t *sql_offset);
 void	zbx_db_large_query_append_sql(zbx_db_large_query_t *query, const char *sql);
 
+/* type of value in settings table */
+#define ZBX_SETTING_TYPE_STR			1
+#define ZBX_SETTING_TYPE_INT			2
+#define ZBX_SETTING_TYPE_USRGRPID		3
+#define ZBX_SETTING_TYPE_HOSTGROUPID		4
+#define ZBX_SETTING_TYPE_USRDIRID		5
+#define ZBX_SETTING_TYPE_MFAID			6
+
+#define ZBX_SETTING_TYPE_MAX			7
+
+#define DBPOOL_MINIMUM_MAX_IDLE	0
+#define DBPOOL_MAXIMUM_MAX_IDLE	10000
+
+#define DBPOOL_MINIMUM_MAX_OPEN	1
+#define DBPOOL_MAXIMUM_MAX_OPEN	10000
+
+#define DBPOOL_MINIMUM_IDLE_TIMEOUT	SEC_PER_MIN
+#define DBPOOL_MAXIMUM_IDLE_TIMEOUT	SEC_PER_DAY
+
 #endif
+

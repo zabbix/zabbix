@@ -15,9 +15,9 @@
 #include "zbxmocktest.h"
 #include "zbxmockdata.h"
 
-#include "zbxexpression.h"
 #include "zbxparam.h"
 #include "zbxsysinfo.h"
+#include "zbxstr.h"
 
 /******************************************************************************
  *                                                                            *

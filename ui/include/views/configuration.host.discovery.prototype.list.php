@@ -231,7 +231,8 @@ foreach ($data['discoveries'] as $discovery) {
 		],
 		[
 			new CLink(_('Host prototypes'),
-				(new CUrl('host_prototypes.php'))
+				(new CUrl('zabbix.php'))
+					->setArgument('action', 'host.prototype.list')
 					->setArgument('parent_discoveryid', $discovery['itemid'])
 					->setArgument('context', $data['context'])
 			),
