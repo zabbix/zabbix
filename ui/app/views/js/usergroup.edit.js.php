@@ -390,7 +390,7 @@
 		}
 
 		#delete() {
-			if (window.confirm(t('Delete selected group?'))) {
+			if (window.confirm(<?= json_encode(_('Delete selected group?')) ?>)) {
 				this.#setLoadingStatus(['delete']);
 				const fields = this.form.getAllValues();
 
@@ -411,7 +411,7 @@
 				messages = exception.error.messages;
 			}
 			else {
-				messages = [t('Unexpected server error.')];
+				messages = [<?= json_encode(_('Unexpected server error.')) ?>];
 			}
 
 			addMessage(makeMessageBox('bad', messages, title)[0]);
