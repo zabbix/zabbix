@@ -31,8 +31,6 @@
 #include "zbxdb.h"
 #include "zbxcacheconfig.h"
 #include "zbxalgo.h"
-#include "zbxdbwrap.h"
-#include "zbx_expression_constants.h"
 #include "zbxhistory_provider.h"
 
 /* one item query data - index in hostkeys items */
