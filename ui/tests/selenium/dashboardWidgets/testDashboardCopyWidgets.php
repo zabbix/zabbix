@@ -641,6 +641,13 @@ class testDashboardCopyWidgets extends CWebTest {
 			],
 			[
 				[
+					'module_name' => 'Favorite maps',
+					'widget_name' => 'Test copy Favorite maps',
+					'action' => 'copy page'
+				]
+			],
+			[
+				[
 					'module_name' => 'Item history',
 					'widget_name' => 'Item history widget',
 					'action' => 'copy widget',
