@@ -717,7 +717,7 @@ window.mediatype_edit_popup = new class {
 				element.style.display = '';
 
 				if (element.classList.contains('form-field')) {
-					element.querySelectorAll('multilineinput-control, input:not(.inactive), select, textarea')
+					element.querySelectorAll('.multilineinput-control, input:not(.inactive), select, textarea')
 						.forEach((input) => {
 							input.disabled = false;
 					});
