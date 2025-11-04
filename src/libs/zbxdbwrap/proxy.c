@@ -1218,7 +1218,7 @@ static int	proxy_item_validator(zbx_history_recv_item_t *item, zbx_socket_t *soc
  *                FAIL    - an error occurred                                 *
  *                                                                            *
  * Comments: This function is used to process history data received from      *
- *           proxy and agent.                                                 *
+ *           proxy or agent.                                                  *
  *                                                                            *
  ******************************************************************************/
 static int	process_history_data_by_itemids(zbx_socket_t *sock, zbx_client_item_validator_t validator_func,
