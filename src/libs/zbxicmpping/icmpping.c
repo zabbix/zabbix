@@ -830,7 +830,6 @@ static int	hosts_ping(zbx_fping_host_t *hosts, int hosts_count, int requests_cou
 	sigset_t	mask, orig_mask;
 	zbx_fping_args	fping_args;
 	zbx_fping_resp	fping_resp;
-	time_t		start_time;
 
 #ifdef HAVE_IPV6
 	int		family;
@@ -1172,10 +1171,10 @@ static int	hosts_ping(zbx_fping_host_t *hosts, int hosts_count, int requests_cou
 #ifdef HAVE_IPV6
 	fping_args.fping_existence = fping_existence;
 #endif
-	start_time = 0;
+	double start_time = 0;
 
 	if (0 < max_execution_time)
-		start_time = time(NULL);
+		start_time = zbx_time();
 
 	if (SUCCEED == fping_output_process(&fping_resp, &fping_args, max_execution_time, start_time))
 	{
