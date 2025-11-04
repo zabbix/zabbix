@@ -163,8 +163,8 @@ class CControllerUsergroupEdit extends CController {
 		$data['mfa_config_status'] = $mfa_config_status;
 
 		$data['js_validation_rules'] = $data['usrgrpid'] === null
-			?  (new CFormValidator(CControllerUsergroupCreate::getValidationRules()))->getRules()
-			:  (new CFormValidator(CControllerUsergroupUpdate::getValidationRules()))->getRules();
+			? (new CFormValidator(CControllerUsergroupCreate::getValidationRules()))->getRules()
+			: (new CFormValidator(CControllerUsergroupUpdate::getValidationRules()))->getRules();
 
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Configuration of user groups'));
