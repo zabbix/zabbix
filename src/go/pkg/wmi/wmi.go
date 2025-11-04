@@ -20,6 +20,7 @@ import (
 
 	"github.com/go-ole/go-ole"
 	"github.com/go-ole/go-ole/oleutil"
+	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/log"
 )
 
@@ -95,74 +96,85 @@ func isPropertyKeyProperty(propsCol *ole.IDispatch) (isKeyProperty bool, err err
 func (r *valueResult) write(rs *ole.IDispatch) (err error) {
 	v, err := oleutil.GetProperty(rs, "Count")
 	if err != nil {
-		return err
+		return errs.Wrap(err, "failed to get row count")
 	}
 	defer clearOle(v)
+
 	if v.Val == 0 {
-		return errors.New("Empty WMI search result.")
+		return errs.New("empty WMI search result")
 	}
 
 	var propertyKeyFieldValue any
 
-	oleErr := oleutil.ForEach(rs, func(vr *ole.VARIANT) (err error) {
+	oleErr := oleutil.ForEach(rs, func(vr *ole.VARIANT) error {
 		row := vr.ToIDispatch()
 		defer row.Release()
 
-		rawProps, err := row.GetProperty("Properties_")
-		if err != nil {
-			return
+		rawProps, rowErr := row.GetProperty("Properties_")
+		if rowErr != nil {
+			return errs.Wrap(rowErr, "failed to get item property row")
 		}
 
 		props := rawProps.ToIDispatch()
 		defer props.Release()
 
-		err = oleutil.ForEach(props, func(vc *ole.VARIANT) (err error) {
+		rowErr = oleutil.ForEach(props, func(vc *ole.VARIANT) error {
 			propsCol := vc.ToIDispatch()
 			defer propsCol.Release()
 
-			propsName, err := oleutil.GetProperty(propsCol, "Name")
-			if err != nil {
-				return
+			isKeyProperty, colErr := isPropertyKeyProperty(propsCol)
+			if colErr != nil {
+				return colErr
+			}
+
+			propsName, colErr := oleutil.GetProperty(propsCol, "Name")
+			if colErr != nil {
+				return errs.Wrap(colErr, "failed to get item name")
 			}
 			defer clearOle(propsName)
 
-			propsVal, err := oleutil.GetProperty(propsCol, "Value")
-			if err != nil {
-				return
+			propsVal, colErr := oleutil.GetProperty(propsCol, "Value")
+			if colErr != nil {
+				return errs.Wrap(colErr, "failed to get item value")
 			}
 			defer clearOle(propsVal)
 
+			if isKeyProperty {
+				// remember key field value in the case it was the only selected column
+				propertyKeyFieldValue = propsVal.Value()
+
+				return nil
+			}
+
 			if propsVal.Value() == nil {
-				return errors.New("Empty WMI search result.")
+				return errs.New("empty WMI search result")
 			}
 
-			isKeyProperty, err := isPropertyKeyProperty(propsCol)
-			if err != nil {
-				return
-			}
+			r.data = propsVal.Value()
 
-			if !isKeyProperty {
-				r.data = propsVal.Value()
-				return stopErrorCol
-			}
-			// remember key field value in the case it was the only selected column
-			propertyKeyFieldValue = propsVal.Value()
-			return
+			return stopErrorCol
 		})
-
-		if err == nil {
+		if rowErr == nil {
 			return stopErrorRow
 		}
-		return
+
+		return rowErr //nolint:wrapcheck // keeping "empty WMI search result" unwrapped
 	})
-	if stop, ok := oleErr.(stopError); !ok {
-		return oleErr
-	} else {
-		if oleErr == nil || stop == stopErrorRow {
-			r.data = propertyKeyFieldValue
-		}
+
+	stop, ok := oleErr.(stopError) //nolint:errorlint // stopError type does not work with errors.As()
+	if !ok {
+		return oleErr //nolint:wrapcheck // keeping "empty WMI search result" unwrapped
 	}
-	return
+
+	if oleErr == nil || stop == stopErrorRow {
+		if propertyKeyFieldValue == nil {
+			return errs.New("empty WMI search result")
+		}
+
+		r.data = propertyKeyFieldValue
+	}
+
+	return nil
 }
 
 type tableResult struct {

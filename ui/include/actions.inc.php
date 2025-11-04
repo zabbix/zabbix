@@ -658,29 +658,27 @@ function getActionOperationDescriptions(array $operations, int $eventsource, arr
 
 			case OPERATION_TYPE_HOST_TAGS_ADD:
 			case OPERATION_TYPE_HOST_TAGS_REMOVE:
+				$operation_title = bold(_('Add host tags').': ');
 				$tags = [];
 				if (array_key_exists('optag', $operation) && $operation['optag']) {
 					CArrayHelper::sort($operation['optag'], ['tag', 'value']);
 
 					foreach ($operation['optag'] as $tag) {
-						$value = getTagString($tag);
+						$value = CTagHelper::getTagString($tag);
 
 						if ($value !== '') {
 							$tags[] = (new CSpan($value))
 								->addClass(ZBX_STYLE_TAG)
-								->setHint(getTagString($tag));
+								->setHint($value);
 						}
 					}
 
-					if ($operation['operationtype'] == OPERATION_TYPE_HOST_TAGS_ADD) {
-						$result[$i][] = bold(_('Add host tags').': ');
-					}
-					else {
-						$result[$i][] = bold(_('Remove host tags').': ');
+					if ($operation['operationtype'] == OPERATION_TYPE_HOST_TAGS_REMOVE) {
+						$operation_title = bold(_('Remove host tags').': ');
 					}
 				}
 
-				$result[$i][] = [$tags, BR()];
+				$result[$i][] = (new CDiv([$operation_title, $tags]))->addClass(ZBX_STYLE_TAGS_WRAPPER);
 				break;
 
 			case OPERATION_TYPE_HOST_ENABLE:

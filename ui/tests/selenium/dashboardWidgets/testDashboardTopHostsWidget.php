@@ -5824,7 +5824,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					]
 				]
 			],
-			// Check that widget displays bar/idnicators when aggregation function 'count' is used for non-numeric item.
+			// Check that widget displays bar/indicators when aggregation function 'count' is used for non-numeric item.
 			[
 				[
 					'widget_name' => 'Displaying count for non-numeric data via bar indicators',

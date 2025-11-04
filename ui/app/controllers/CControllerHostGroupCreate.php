@@ -17,26 +17,39 @@
 class CControllerHostGroupCreate extends CController {
 
 	protected function init(): void {
+		$this->setInputValidationMethod(self::INPUT_VALIDATION_FORM);
 		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
 	}
 
-	protected function checkInput(): bool {
-		$fields = [
-			'name' => 			'db hstgrp.name',
-			'subgroups' => 		'in 0,1'
+	public static function getValidationRules(): array {
+		$api_uniq = [
+			'hostgroup.get', ['name' => '{name}']
 		];
 
-		$ret = $this->validateInput($fields);
+		return ['object', 'api_uniq' => $api_uniq, 'fields' => [
+			'name' => ['db hstgrp.name', 'required', 'not_empty', 'use' => [CHostGroupNameParser::class],
+				'messages' => ['use' => _('Invalid host group name.')]
+			],
+			'subgroups' => ['boolean']
+		]];
+	}
+
+	protected function checkInput(): bool {
+		$ret = $this->validateInput(self::getValidationRules());
 
 		if (!$ret) {
-			$this->setResponse(
-				new CControllerResponseData(['main_block' => json_encode([
-					'error' => [
+			$form_errors = $this->getValidationError();
+			$response = array_filter([
+				'form_errors' => $form_errors,
+				'error' => !$form_errors
+					? [
 						'title' => _('Cannot add host group'),
 						'messages' => array_column(get_and_clear_messages(), 'message')
 					]
-				])])
-			);
+					: null
+			]);
+
+			$this->setResponse(new CControllerResponseData(['main_block' => json_encode($response)]));
 		}
 
 		return $ret;

@@ -19,21 +19,20 @@
 #include "zbxdb.h"
 #include "zbxdbschema.h"
 #include "zbxtypes.h"
+#include "zbxalgo.h"
 
 #if defined(HAVE_MYSQL)
 #	include "mysql.h"
 #	include "errmsg.h"
 #	include "mysqld_error.h"
-#elif defined(HAVE_ORACLE)
-#	include "zbxcrypto.h"
-#	include "zbxdbschema.h"
-#	include "oci.h"
 #elif defined(HAVE_POSTGRESQL)
 #	include <libpq-fe.h>
 #elif defined(HAVE_SQLITE3)
 #	include <sqlite3.h>
 #	include <zbxmutexs.h>
 #endif
+
+ZBX_PTR_VECTOR_DECL(dbconn_ptr, zbx_dbconn_t *)
 
 typedef enum
 {
@@ -60,6 +59,8 @@ struct zbx_dbconn
 
 	const zbx_db_config_t	*config;
 
+	double			last_used;	/* last time the connection was used */
+
 #if defined(HAVE_MYSQL)
 	MYSQL			*conn;
 	int			error_count;
@@ -75,13 +76,24 @@ struct zbx_dbconn
 int	dbconn_init(char **error);
 void	dbconn_deinit(void);
 
-void	dbconn_set_managed(zbx_dbconn_t *db);
+void	dbconn_set_managed(zbx_dbconn_t *db, zbx_dbconn_type_t type);
+int	dbconn_is_open(zbx_dbconn_t *db);
+int	dbconn_open_retry(zbx_dbconn_t *db);
+void	dbconn_close(zbx_dbconn_t *db);
 
 char	*db_dyn_escape_string(const char *src, size_t max_bytes, size_t max_chars, zbx_escape_sequence_t flag);
 char	*db_dyn_escape_field_len(const zbx_db_field_t *field, const char *src, zbx_escape_sequence_t flag);
 int	db_is_escape_sequence(char c);
 
 zbx_uint32_t	db_get_server_version(void);
+
+void	dbconn_pool_sync_info(zbx_dbconn_pool_stats_t *stats, zbx_dbconn_pool_config_t *cfg);
+
+/* connection pool settings */
+#define ZBX_SETTINGS_DBPOOL			"dbpool_"
+#define ZBX_SETTINGS_DBPOOL_MAX_IDLE		ZBX_SETTINGS_DBPOOL "max_idle"
+#define ZBX_SETTINGS_DBPOOL_MAX_OPEN		ZBX_SETTINGS_DBPOOL "max_open"
+#define ZBX_SETTINGS_DBPOOL_IDLE_TIMEOUT	ZBX_SETTINGS_DBPOOL "idle_timeout"
 
 #endif
 

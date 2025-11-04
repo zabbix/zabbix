@@ -91,8 +91,6 @@ class CTrigger extends CTriggerGeneral {
 			'host'							=> null,
 			'only_true'						=> null,
 			'min_severity'					=> null,
-			'evaltype'						=> TAG_EVAL_TYPE_AND_OR,
-			'tags'							=> null,
 			'filter'						=> null,
 			'search'						=> null,
 			'searchByAny'					=> null,
@@ -111,7 +109,6 @@ class CTrigger extends CTriggerGeneral {
 			'selectFunctions'				=> null,
 			'selectDependencies'			=> null,
 			'selectLastEvent'				=> null,
-			'selectTags'					=> null,
 			'countOutput'					=> false,
 			'groupCount'					=> false,
 			'preservekeys'					=> false,
@@ -151,9 +148,10 @@ class CTrigger extends CTriggerGeneral {
 				' JOIN items i1 ON f1.itemid=i1.itemid'.
 				' JOIN host_hgset hh1 ON i1.hostid=hh1.hostid'.
 				' LEFT JOIN permission p1 ON hh1.hgsetid=p1.hgsetid'.
-					' AND p1.ugsetid=p.ugsetid'.
-				' WHERE t.triggerid=f1.triggerid'.
-					' AND p1.permission IS NULL'.
+					' AND p1.ugsetid='.self::$userData['ugsetid'].
+				' WHERE f.triggerid=f1.triggerid'.
+					' AND i.itemid!=f1.itemid'.
+					' AND p1.hgsetid IS NULL'.
 			')';
 		}
 
@@ -440,10 +438,29 @@ class CTrigger extends CTriggerGeneral {
 		}
 
 		// tags
-		if ($options['tags'] !== null && $options['tags']) {
-			$sqlParts['where'][] = CApiTagHelper::addWhereCondition($options['tags'], $options['evaltype'], 't',
-				'trigger_tag', 'triggerid'
-			);
+		if ($options['tags'] !== null) {
+			if ($options['inheritedTags']) {
+				$positive_tag_operators = [TAG_OPERATOR_LIKE, TAG_OPERATOR_EQUAL, TAG_OPERATOR_EXISTS];
+
+				if (array_intersect(array_column($options['tags'], 'operator'), $positive_tag_operators)) {
+					$sqlParts['from']['functions'] = 'functions f';
+					$sqlParts['where']['ft'] = 'f.triggerid=t.triggerid';
+
+					$sqlParts['where'][] = CApiTagHelper::getTagCondition($options['tags'], $options['evaltype'],
+						['t', 'f'], 'trigger_tag', 'triggerid', true
+					);
+				}
+				else {
+					$sqlParts['where'][] = CApiTagHelper::getTagCondition($options['tags'], $options['evaltype'],
+						['t'], 'trigger_tag', 'triggerid', true
+					);
+				}
+			}
+			else {
+				$sqlParts['where'][] = CApiTagHelper::getTagCondition($options['tags'], $options['evaltype'], ['t'],
+					'trigger_tag', 'triggerid'
+				);
+			}
 		}
 
 		// limit
@@ -525,9 +542,20 @@ class CTrigger extends CTriggerGeneral {
 
 	private static function validateGet(array &$options): void {
 		$api_input_rules = ['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
-			'selectDiscoveryRule' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', CDiscoveryRule::OUTPUT_FIELDS), 'default' => null],
+			// Filters.
+			'evaltype' =>				['type' => API_INT32, 'in' => implode(',', [TAG_EVAL_TYPE_AND_OR, TAG_EVAL_TYPE_OR]), 'default' => TAG_EVAL_TYPE_AND_OR],
+			'tags' =>					['type' => API_OBJECTS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null, 'fields' => [
+				'tag' =>					['type' => API_STRING_UTF8, 'flags' => API_REQUIRED],
+				'operator' =>				['type' => API_INT32, 'in' => implode(',', [TAG_OPERATOR_LIKE, TAG_OPERATOR_EQUAL, TAG_OPERATOR_NOT_LIKE, TAG_OPERATOR_NOT_EQUAL, TAG_OPERATOR_EXISTS, TAG_OPERATOR_NOT_EXISTS]), 'default' => TAG_OPERATOR_LIKE],
+				'value' =>					['type' => API_STRING_UTF8, 'default' => '']
+			]],
+			'inheritedTags' =>			['type' => API_BOOLEAN, 'default' => false],
+			// Output.
+			'selectTags' =>				['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', ['tag', 'value']), 'default' => null],
+			'selectInheritedTags' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', self::INHERITED_TAG_OUTPUT_FIELDS), 'default' => null],
 			'selectTriggerDiscovery' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_NORMALIZE | API_DEPRECATED, 'in' => implode(',', self::DISCOVERY_DATA_OUTPUT_FIELDS), 'default' => null],
-			'selectDiscoveryData' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', self::DISCOVERY_DATA_OUTPUT_FIELDS), 'default' => null]
+			'selectDiscoveryData' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', self::DISCOVERY_DATA_OUTPUT_FIELDS), 'default' => null],
+			'selectDiscoveryRule' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', CDiscoveryRule::OUTPUT_FIELDS), 'default' => null]
 		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $options, '/', $error)) {
@@ -735,9 +763,8 @@ class CTrigger extends CTriggerGeneral {
 	protected function addRelatedObjects(array $options, array $result) {
 		$result = parent::addRelatedObjects($options, $result);
 
-		if (!$result) {
-			return $result;
-		}
+		self::addRelatedTags($options, $result);
+		self::addRelatedInheritedTags($options, $result);
 
 		$triggerids = array_keys($result);
 

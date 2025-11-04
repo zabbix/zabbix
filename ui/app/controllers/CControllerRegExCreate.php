@@ -16,61 +16,103 @@
 
 class CControllerRegExCreate extends CController {
 
-	protected function checkInput() {
-		$fields = [
-			'name'         => 'required|string|not_empty|db regexps.name',
-			'test_string'  => 'string|db regexps.test_string',
-			'expressions'  => 'required|array',
-			'form_refresh' => 'int32'
+	protected function init(): void {
+		$this->setInputValidationMethod(self::INPUT_VALIDATION_FORM);
+		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
+	}
+
+	public static function getValidationRules(): array {
+		$api_uniq = [
+			['regexp.get', ['name' => '{name}']]
 		];
 
-		$ret = $this->validateInput($fields);
+		return ['object', 'api_uniq' => $api_uniq, 'fields' => [
+			'name' => ['db regexps.name', 'required', 'not_empty'],
+			'test_string' => ['db regexps.test_string'],
+			'expressions' => ['objects', 'required', 'not_empty', 'uniq' => [['expression_type', 'expression']],
+				'fields' => [
+					'expression_type' => ['db expressions.expression_type', 'required',
+						'in' => [EXPRESSION_TYPE_INCLUDED, EXPRESSION_TYPE_ANY_INCLUDED, EXPRESSION_TYPE_NOT_INCLUDED,
+							EXPRESSION_TYPE_TRUE, EXPRESSION_TYPE_FALSE
+						]
+					],
+					'expression' => [
+						['db expressions.expression', 'required', 'not_empty', 'use' => [CRegexValidator::class, []],
+							'when' => ['expression_type', 'in' => [EXPRESSION_TYPE_TRUE, EXPRESSION_TYPE_FALSE]]
+						],
+						['db expressions.expression', 'required', 'not_empty', 'when' => ['expression_type', 'in' => [
+							EXPRESSION_TYPE_INCLUDED, EXPRESSION_TYPE_ANY_INCLUDED, EXPRESSION_TYPE_NOT_INCLUDED
+						]]]
+					],
+					'exp_delimiter' => ['db expressions.exp_delimiter', 'in' => [',', '.', '/'], 'when' => [
+						'expression_type', 'in' => [EXPRESSION_TYPE_ANY_INCLUDED]
+					]],
+					'case_sensitive' => ['db expressions.case_sensitive', 'in' => [0, 1]]
+				],
+				'messages' => [
+					'uniq' => _('Expression type and expression combination is not unique.'),
+					'not_empty' => _('At least one expression must be added.')
+				]
+			]
+		]];
+	}
+
+	protected function checkInput(): bool {
+		$ret = $this->validateInput(self::getValidationRules());
 
 		if (!$ret) {
-			switch ($this->getValidationResult()) {
-				case self::VALIDATION_ERROR:
-					$url = (new CUrl('zabbix.php'))->setArgument('action', 'regex.edit');
+			$form_errors = $this->getValidationError();
+			$response = $form_errors
+				? ['form_errors' => $form_errors]
+				: ['error' => [
+					'title' => _('Cannot add regular expression'),
+					'messages' => array_column(get_and_clear_messages(), 'message')
+				]];
 
-					$response = new CControllerResponseRedirect($url);
-					$response->setFormData($this->getInputAll());
-					CMessageHelper::setErrorTitle(_('Cannot add regular expression'));
-					$this->setResponse($response);
-					break;
-
-				case self::VALIDATION_FATAL_ERROR:
-					$this->setResponse(new CControllerResponseFatal());
-					break;
-			}
+			$this->setResponse(
+				new CControllerResponseData(['main_block' => json_encode($response)])
+			);
 		}
 
 		return $ret;
 	}
 
-	protected function checkPermissions() {
+	protected function checkPermissions(): bool {
 		return $this->checkAccess(CRoleHelper::UI_ADMINISTRATION_GENERAL);
 	}
 
-	protected function doAction() {
-		$result = API::Regexp()->create([
+	protected function doAction(): void {
+		$regexp = [
 			'name' => $this->getInput('name'),
 			'test_string' => $this->getInput('test_string', ''),
 			'expressions' => $this->getInput('expressions')
-		]);
+		];
+
+		foreach ($regexp['expressions'] as &$expression) {
+			if ($expression['expression_type'] != EXPRESSION_TYPE_ANY_INCLUDED) {
+				$expression['exp_delimiter'] = '';
+			}
+		}
+		unset($expression);
+
+		$result = API::Regexp()->create($regexp);
+
+		$output = [];
 
 		if ($result) {
-			$response = new CControllerResponseRedirect(
-				(new CUrl('zabbix.php'))->setArgument('action', 'regex.list')
-			);
-			CMessageHelper::setSuccessTitle(_('Regular expression added'));
+			$output['success']['title'] = _('Regular expression added');
+
+			if ($messages = get_and_clear_messages()) {
+				$output['success']['messages'] = array_column($messages, 'message');
+			}
 		}
 		else {
-			$response = new CControllerResponseRedirect(
-				(new CUrl('zabbix.php'))->setArgument('action', 'regex.edit')
-			);
-			$response->setFormData($this->getInputAll());
-			CMessageHelper::setErrorTitle(_('Cannot add regular expression'));
+			$output['error'] = [
+				'title' => _('Cannot add regular expression'),
+				'messages' => array_column(get_and_clear_messages(), 'message')
+			];
 		}
 
-		$this->setResponse($response);
+		$this->setResponse(new CControllerResponseData(['main_block' => json_encode($output)]));
 	}
 }

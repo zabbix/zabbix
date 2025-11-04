@@ -108,6 +108,8 @@ zbx_pp_top_stats_t;
 
 ZBX_PTR_VECTOR_DECL(pp_top_stats_ptr, zbx_pp_top_stats_t *)
 
+void	zbx_pp_top_stats_free(zbx_pp_top_stats_t *pts);
+
 int	zbx_diag_add_preproc_info(const struct zbx_json_parse *jp, struct zbx_json *json, char **error);
 void	zbx_preproc_stats_ext_get_data(struct zbx_json *json, const void *arg);
 zbx_uint64_t	zbx_preprocessor_get_queue_size(void);

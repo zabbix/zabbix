@@ -17,10 +17,11 @@
 
 window.service_status_rule_edit_popup = new class {
 
-	init() {
+	init({rules}) {
 		this.overlay = overlays_stack.getById('service_status_rule_edit');
 		this.dialogue = this.overlay.$dialogue[0];
-		this.form = this.overlay.$dialogue.$body[0].querySelector('form');
+		this.form_element = this.overlay.$dialogue.$body[0].querySelector('form');
+		this.form = new CForm(this.form_element, rules);
 
 		document
 			.getElementById('service-status-rule-type')
@@ -62,16 +63,41 @@ window.service_status_rule_edit_popup = new class {
 	}
 
 	submit() {
-		this.overlay.setLoading();
+		const fields = this.form.getAllValues();
 
-		const curl = new Curl('zabbix.php');
+		this.form.validateSubmit(fields)
+			.then((result) => {
+				if (!result) {
+					this.overlay.unsetLoading();
 
-		curl.setArgument('action', 'service.statusrule.validate');
+					return;
+				}
 
-		fetch(curl.getUrl(), {
+				const curl = new Curl('zabbix.php');
+
+				curl.setArgument('action', 'service.statusrule.validate');
+
+				this.#post(curl.getUrl(), fields, (response) => {
+					if ('form_errors' in response) {
+						this.form.setErrors(response.form_errors, true, true);
+						this.form.renderErrors();
+					}
+					else if ('error' in response) {
+						throw {error: response.error};
+					}
+					else {
+						overlayDialogueDestroy(this.overlay.dialogueid);
+						this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response.body}));
+					}
+				});
+			});
+	}
+
+	#post(url, data, success_callback) {
+		fetch(url, {
 			method: 'POST',
 			headers: {'Content-Type': 'application/json'},
-			body: JSON.stringify(getFormFields(this.form))
+			body: JSON.stringify(getFormFields(this.form_element))
 		})
 			.then((response) => response.json())
 			.then((response) => {
@@ -79,12 +105,11 @@ window.service_status_rule_edit_popup = new class {
 					throw {error: response.error};
 				}
 
-				overlayDialogueDestroy(this.overlay.dialogueid);
-
-				this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response.body}));
+				return response;
 			})
+			.then(success_callback)
 			.catch((exception) => {
-				for (const element of this.form.parentNode.children) {
+				for (const element of this.form_element.parentNode.children) {
 					if (element.matches('.msg-good, .msg-bad, .msg-warning')) {
 						element.parentNode.removeChild(element);
 					}
@@ -102,7 +127,7 @@ window.service_status_rule_edit_popup = new class {
 
 				const message_box = makeMessageBox('bad', messages, title)[0];
 
-				this.form.parentNode.insertBefore(message_box, this.form);
+				this.form_element.parentNode.insertBefore(message_box, this.form_element);
 			})
 			.finally(() => {
 				this.overlay.unsetLoading();

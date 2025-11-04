@@ -21,9 +21,14 @@
  * @var array $data
  */
 
-(new CWidgetView($data))
+$view = new CWidgetView($data);
+
+foreach ($data['vars'] as $name => $value) {
+	$view->setVar($name, $value);
+}
+
+$view
 	->addItem(
 		(new CDiv())->setId($data['unique_id'])
 	)
-	->setVar('geomap', array_intersect_key($data, array_flip(['config', 'hosts'])))
 	->show();

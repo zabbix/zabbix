@@ -62,8 +62,8 @@ class CProblem extends CApiService {
 			'evaltype' =>				['type' => API_INT32, 'in' => implode(',', [TAG_EVAL_TYPE_AND_OR, TAG_EVAL_TYPE_OR]), 'default' => TAG_EVAL_TYPE_AND_OR],
 			'tags' =>					['type' => API_OBJECTS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null, 'fields' => [
 				'tag' =>					['type' => API_STRING_UTF8, 'flags' => API_REQUIRED],
-				'operator' =>				['type' => API_INT32, 'in' => implode(',', [TAG_OPERATOR_LIKE, TAG_OPERATOR_EQUAL, TAG_OPERATOR_NOT_LIKE, TAG_OPERATOR_NOT_EQUAL, TAG_OPERATOR_EXISTS, TAG_OPERATOR_NOT_EXISTS])],
-				'value' =>					['type' => API_STRING_UTF8]
+				'operator' =>				['type' => API_INT32, 'in' => implode(',', [TAG_OPERATOR_LIKE, TAG_OPERATOR_EQUAL, TAG_OPERATOR_NOT_LIKE, TAG_OPERATOR_NOT_EQUAL, TAG_OPERATOR_EXISTS, TAG_OPERATOR_NOT_EXISTS]), 'default' => TAG_OPERATOR_LIKE],
+				'value' =>					['type' => API_STRING_UTF8, 'default' => '']
 			]],
 			'filter' =>					['type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => ['eventid', 'source', 'object', 'objectid', 'r_eventid', 'correlationid', 'userid', 'name', 'acknowledged', 'severity', 'cause_eventid']],
 			'search' =>					['type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => ['name']],
@@ -76,7 +76,7 @@ class CProblem extends CApiService {
 			'countOutput' =>			['type' => API_FLAG, 'default' => false],
 			'selectAcknowledges' =>		['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT, 'in' => implode(',', ['acknowledgeid', 'userid', 'clock', 'message', 'action', 'old_severity', 'new_severity', 'suppress_until', 'taskid']), 'default' => null],
 			'selectSuppressionData' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['maintenanceid', 'suppress_until', 'userid']), 'default' => null],
-			'selectTags' =>				['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['tag', 'value']), 'default' => null],
+			'selectTags' =>				['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', ['tag', 'value']), 'default' => null],
 			'sortfield' =>				['type' => API_STRINGS_UTF8, 'flags' => API_NORMALIZE, 'in' => implode(',', $this->sortColumns), 'uniq' => true, 'default' => []],
 			'sortorder' =>				['type' => API_SORTORDER, 'default' => []],
 			'limit' =>					['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'in' => '1:'.ZBX_MAX_INT32, 'default' => null],
@@ -152,9 +152,10 @@ class CProblem extends CApiService {
 					' JOIN items i1 ON f1.itemid=i1.itemid'.
 					' JOIN host_hgset hh1 ON i1.hostid=hh1.hostid'.
 					' LEFT JOIN permission pp1 ON hh1.hgsetid=pp1.hgsetid'.
-						' AND pp1.ugsetid=pp.ugsetid'.
-					' WHERE p.objectid=f1.triggerid'.
-						' AND pp1.permission IS NULL'.
+						' AND pp1.ugsetid='.self::$userData['ugsetid'].
+					' WHERE f.triggerid=f1.triggerid'.
+						' AND i.itemid!=f1.itemid'.
+						' AND pp1.hgsetid IS NULL'.
 				')';
 
 				if ($options['source'] == EVENT_SOURCE_TRIGGERS) {
@@ -283,7 +284,7 @@ class CProblem extends CApiService {
 
 		// tags
 		if ($options['tags'] !== null) {
-			$sql_parts['where'][] = CApiTagHelper::addWhereCondition($options['tags'], $options['evaltype'], 'p',
+			$sql_parts['where'][] = CApiTagHelper::getTagCondition($options['tags'], $options['evaltype'], ['p'],
 				'problem_tag', 'eventid'
 			);
 		}
@@ -550,37 +551,24 @@ class CProblem extends CApiService {
 		}
 	}
 
-	private static function addRelatedTags(array $options, array &$result): void {
+	private static function addRelatedTags(array $options, array &$problems): void {
 		if ($options['selectTags'] === null) {
 			return;
 		}
 
-		foreach ($result as &$row) {
-			$row['tags'] = [];
+		foreach ($problems as &$problem) {
+			$problem['tags'] = [];
 		}
-		unset($row);
-
-		$output = $options['selectTags'] === API_OUTPUT_EXTEND
-			? ['problemtagid', 'eventid', 'tag', 'value']
-			: array_unique(array_merge(['problemtagid', 'eventid'], $options['selectTags']));
+		unset($problem);
 
 		$sql_options = [
-			'output' => $output,
-			'filter' => ['eventid' => array_keys($result)]
+			'output' => array_merge(['problemtagid', 'eventid'], $options['selectTags']),
+			'filter' => ['eventid' => array_keys($problems)]
 		];
-		$db_tags = DBselect(DB::makeSql('problem_tag', $sql_options));
+		$resource = DBselect(DB::makeSql('problem_tag', $sql_options));
 
-		foreach ($result as &$event) {
-			$event['tags'] = [];
-		}
-		unset($event);
-
-		while ($db_tag = DBfetch($db_tags)) {
-			$eventid = $db_tag['eventid'];
-
-			unset($db_tag['problemtagid'], $db_tag['eventid']);
-
-			$result[$eventid]['tags'][] = $db_tag;
+		while ($row = DBfetch($resource)) {
+			$problems[$row['eventid']]['tags'][] = array_diff_key($row, array_flip(['problemtagid', 'eventid']));
 		}
 	}
 

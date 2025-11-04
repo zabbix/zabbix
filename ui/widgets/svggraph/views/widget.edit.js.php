@@ -40,7 +40,7 @@ window.widget_form = new class extends CWidgetForm {
 		this._any_ds_aggregation_function_enabled = false;
 
 		this.#dataset_row_unique_id =
-			this._dataset_wrapper.querySelectorAll('.<?= ZBX_STYLE_LIST_ACCORDION_ITEM ?>').length;
+			this._dataset_wrapper.querySelectorAll('.<?= ZBX_STYLE_LIST_ACCORDION_ITEM ?>').length - 1;
 
 		jQuery(`#${form_tabs_id}`)
 			.on('change', 'input, z-color-picker, z-select, .multiselect', () => this.onGraphConfigChange());
@@ -83,15 +83,16 @@ window.widget_form = new class extends CWidgetForm {
 					}
 				});
 
-				jQuery(`[name^="${var_prefix}["]`, this)
-					.filter(function () {
-						return jQuery(this).attr('name').match(/[a-z]+\[\d+]\[[a-z_]+]/);
-					})
-					.each(function () {
-						jQuery(this).attr('name',
-							jQuery(this).attr('name').replace(/([a-z]+\[)\d+(]\[[a-z_]+])/, `$1${k + i}$2`)
-						);
-					});
+				['name', 'color-field-name', 'palette-field-name'].forEach(attr => {
+					jQuery(`[${attr}^="${var_prefix}["]`, this)
+						.filter(function () {
+							return jQuery(this).attr(attr).match(/[a-z]+\[\d+]\[[a-z_]+]/);
+						})
+						.each(function () {
+							const $this = jQuery(this);
+							$this.attr(attr, $this.attr(attr).replace(/([a-z]+\[)\d+(]\[[a-z_]+])/, `$1${k + i}$2`));
+						});
+				});
 			});
 		}
 	}
@@ -174,7 +175,7 @@ window.widget_form = new class extends CWidgetForm {
 				this._editItem(e.target);
 			}
 
-			if (e.target.classList.contains('element-table-remove')) {
+			if (e.target.classList.contains('js-remove-item')) {
 				this._removeSingleItem(e.target);
 			}
 
@@ -302,7 +303,7 @@ window.widget_form = new class extends CWidgetForm {
 		}
 
 		const fragment = document.createRange().createContextualFragment(template.evaluate({
-			rowNum: this.#dataset_row_unique_id++,
+			rowNum: ++this.#dataset_row_unique_id,
 			color: type == <?= CWidgetFieldDataSet::DATASET_TYPE_SINGLE_ITEM ?>
 				? ''
 				: colorPalette.getNextColor(used_colors)

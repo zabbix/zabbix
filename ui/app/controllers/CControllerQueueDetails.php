@@ -69,12 +69,14 @@ class CControllerQueueDetails extends CController {
 			}
 
 			$hosts = API::Host()->get([
-				'output' => ['proxyid'],
+				'output' => ['proxyid', 'assigned_proxyid'],
 				'hostids' => array_unique(array_column($items, 'hostid')),
 				'preservekeys' => true
 			]);
 
-			$proxyids = array_flip(array_column($hosts, 'proxyid'));
+			$proxyids = array_flip(array_merge(array_column($hosts, 'proxyid'),
+				array_column($hosts, 'assigned_proxyid'))
+			);
 			unset($proxyids[0]);
 
 			$proxies = $proxyids

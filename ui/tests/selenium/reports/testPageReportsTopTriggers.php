@@ -1215,7 +1215,7 @@ class testPageReportsTopTriggers extends CWebTest {
 
 		$filter_form = $filter->getForm();
 
-		// If test case doesn't filter by hostgroup, then filter by common hostgroup to to get rid of external data.
+		// If test case doesn't filter by hostgroup, then filter by common hostgroup to get rid of external data.
 		if (!CTestArrayHelper::get($data, 'fields.Host groups')) {
 			$filter_form->getField('Host groups')->fill('Common group');
 			$filter_form->submit();
