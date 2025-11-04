@@ -4127,7 +4127,6 @@ class CApiInputValidator {
 					'1' => ['type' => API_FLOAT, 'flags' => API_REQUIRED | API_ALLOW_NULL | ($flags & API_ALLOW_USER_MACRO) | ($flags & API_ALLOW_LLD_MACRO)],
 					'2' => ['type' => API_FLOAT, 'flags' => API_REQUIRED | API_ALLOW_NULL | ($flags & API_ALLOW_USER_MACRO) | ($flags & API_ALLOW_LLD_MACRO), 'compare' => ['operator' => '>', 'field' => '1']]
 				]];
-
 				break;
 
 			case ZBX_PREPROC_VALIDATE_REGEX:
