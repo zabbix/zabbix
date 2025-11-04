@@ -2403,6 +2403,45 @@ class CFormValidatorTest extends TestCase {
 				['/value' => [
 					['message' => 'This value must be "abc".', 'level' => CFormValidator::ERROR_LEVEL_PRIMARY]
 				]]
+			],
+			[
+				['object', 'fields' => [
+					'value' => ['string', 'use' => [CTimeUnitValidator::class, ['min' => 0, 'max' => 61]]]
+				]],
+				['value' => 70],
+				[],
+				CFormValidator::ERROR,
+				['/value' => [
+					['message' => 'Value must be between 0 and 1m 1s (61s).',
+						'level' => CFormValidator::ERROR_LEVEL_DELAYED
+					]
+				]],
+			],
+			[
+				['object', 'fields' => [
+					'value' => ['string', 'use' => [CTimeUnitValidator::class, ['min' => 0, 'max' => 60]]]
+				]],
+				['value' => 70],
+				[],
+				CFormValidator::ERROR,
+				['/value' => [
+					['message' => 'Value must be between 0 and 1m.', 'level' => CFormValidator::ERROR_LEVEL_DELAYED]
+				]],
+			],
+			[
+				['object', 'fields' => [
+					'value' => ['string',
+						'use' => [CTimeUnitValidator::class, ['min' => SEC_PER_HOUR, 'max' => 86400]]
+					]
+				]],
+				['value' => 10],
+				[],
+				CFormValidator::ERROR,
+				['/value' => [
+					['message' => 'Value must be between 1h and 1d (86400s).',
+						'level' => CFormValidator::ERROR_LEVEL_DELAYED
+					]
+				]],
 			]
 		];
 	}
