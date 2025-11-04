@@ -207,6 +207,7 @@ class testDashboardFavoriteMapsWidget extends CWebTest {
 		}
 
 		$dialog->close();
+		CDashboardElement::find()->one()->cancelEditing();
 	}
 
 	public static function getFavoriteMapsWidgetData() {
