@@ -746,7 +746,7 @@ class testFormHostPrototype extends CLegacyWebTest {
 		$this->page->open('zabbix.php?action=popup&popup=host.prototype.edit&parent_discoveryid='.self::DISCOVERY_RULE_ID.
 				'&hostid='.self::HOST_PROTOTYPE_ID.'&context=host'
 		);
-		$prototype_form = $this->query('id:host-prototype-form')->asForm()->one()->waitUntilVisible();
+		$prototype_form = $this->query('id:host-prototype-form')->asForm()->waitUntilVisible()->one();
 		$prototype_form->selectTab('IPMI');
 
 		$new_values['ipmi_authtype'] = 1;	// IPMI_AUTHTYPE_MD2
