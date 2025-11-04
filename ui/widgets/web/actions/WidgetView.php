@@ -17,7 +17,6 @@
 namespace Widgets\Web\Actions;
 
 use API,
-	CApiTagHelper,
 	CArrayHelper,
 	CControllerDashboardWidgetView,
 	CControllerResponseData,
@@ -97,10 +96,16 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 			CArrayHelper::sort($groups, ['name']);
 
+			foreach ($groups as &$group) {
+				$group += ['ok' => 0, 'failed' => 0, 'unknown' => 0];
+			}
+			unset($group);
+
 			$groupids = array_keys($groups);
 
 			$hosts = API::Host()->get([
 				'output' => [],
+				'selectHostGroups' => ['groupid'],
 				'groupids' => $groupids,
 				'hostids' => $filter_hostids,
 				'filter' => ['maintenance_status' => $filter_maintenance],
@@ -108,42 +113,35 @@ class WidgetView extends CControllerDashboardWidgetView {
 				'preservekeys' => true
 			]);
 
-			foreach ($groups as &$group) {
-				$group += ['ok' => 0, 'failed' => 0, 'unknown' => 0];
-			}
-			unset($group);
-
-			// Fetch links between HTTP tests and host groups.
-			$where_tags = (array_key_exists('tags', $this->fields_values) && $this->fields_values['tags'])
-				? CApiTagHelper::addWhereCondition($this->fields_values['tags'], $this->fields_values['evaltype'], 'ht',
-					'httptest_tag', 'httptestid'
-				)
-				: '';
-
-			$result = DbFetchArray(DBselect(
-				'SELECT DISTINCT ht.httptestid,hg.groupid' .
-				' FROM httptest ht,hosts_groups hg' .
-				' WHERE ht.hostid=hg.hostid' .
-				' AND ' . dbConditionInt('hg.hostid', array_keys($hosts)) .
-				' AND ' . dbConditionInt('hg.groupid', $groupids) .
-				' AND ht.status=' . HTTPTEST_STATUS_ACTIVE .
-				(($where_tags !== '') ? ' AND ' . $where_tags : '')
-			));
+			$httptests = API::HttpTest()->get([
+				'output' => ['hostid'],
+				'groupids' => $groupids,
+				'hostids' => array_keys($hosts),
+				'evaltype' => $this->fields_values['evaltype'],
+				'tags' => $this->fields_values['tags'] ?: null,
+				'inheritedTags' => true,
+				'filter' => ['status' => HTTPTEST_STATUS_ACTIVE],
+				'preservekeys' => true
+			]);
 
 			// Fetch HTTP test execution data.
-			$httptest_data = Manager::HttpTest()->getLastData(array_column($result, 'httptestid'));
+			$httptest_data = Manager::HttpTest()->getLastData(array_keys($httptests));
 
-			foreach ($result as $row) {
-				$group = &$groups[$row['groupid']];
+			foreach ($httptests as $httptestid => $httptest) {
+				foreach ($hosts[$httptest['hostid']]['hostgroups'] as $group) {
+					if ($filter_groupids !== null && !in_array($group['groupid'], $filter_groupids)) {
+						continue;
+					}
 
-				if (array_key_exists($row['httptestid'], $httptest_data)
-					&& $httptest_data[$row['httptestid']]['lastfailedstep'] !== null) {
-					$group[($httptest_data[$row['httptestid']]['lastfailedstep'] != 0) ? 'failed' : 'ok']++;
+					if (array_key_exists($httptestid, $httptest_data)
+							&& $httptest_data[$httptestid]['lastfailedstep'] !== null) {
+						$status_name = $httptest_data[$httptestid]['lastfailedstep'] != 0 ? 'failed' : 'ok';
+						$groups[$group['groupid']][$status_name]++;
+					}
+					else {
+						$groups[$group['groupid']]['unknown']++;
+					}
 				}
-				else {
-					$group['unknown']++;
-				}
-				unset($group);
 			}
 
 			$data += [

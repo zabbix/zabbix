@@ -340,7 +340,7 @@ static void	flush_proxy_hostdata(zbx_avail_active_hb_cache_t *cache, zbx_ipc_mes
 	zbx_vector_uint64_destroy(&status_unknown);
 	zbx_vector_uint64_destroy(&status_available);
 	zbx_vector_uint64_destroy(&status_unavailable);
-	zbx_vector_proxy_hostdata_ptr_clear_ext(&hosts, (zbx_proxy_hostdata_ptr_free_func_t)zbx_ptr_free);
+	zbx_vector_proxy_hostdata_ptr_clear_ext(&hosts, zbx_proxy_hostdata_free);
 	zbx_vector_proxy_hostdata_ptr_destroy(&hosts);
 }
 

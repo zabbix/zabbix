@@ -3,7 +3,7 @@
 form.dashboard-widget-piechart {
 	max-width: 1330px;
 	min-width: 1120px;
-	width: 100vw;
+	width: #{"min(100vw - 42px, calc(var(--modal-max-width) - 22px))"};
 
 	.pie-chart-widget-config-tabs {
 		grid-column: 1 / -1;
@@ -52,10 +52,35 @@ form.dashboard-widget-piechart {
 
 	.dataset-body {
 		.form-grid {
+			grid-template-columns: auto 1fr;
+			grid-auto-rows: auto;
 			padding-top: 0;
+
+			> label {
+				display: inline-block;
+				text-align: right;
+				min-width: 60px;
+				max-width: 150px;
+
+				@extend %overflow-ellipsis;
+			}
 
 			&:first-child {
 				grid-column-start: 5;
+			}
+
+			.table-tags {
+				max-width: 453px;
+
+				.table-tags-input {
+					min-width: 100px;
+					max-width: 130px;
+					width: 100%;
+				}
+
+				z-select {
+					min-width: 120px;
+				}
 			}
 		}
 	}

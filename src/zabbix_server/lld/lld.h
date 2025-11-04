@@ -94,6 +94,7 @@ zbx_lld_entry_t;
 ZBX_PTR_VECTOR_DECL(lld_entry_ptr, zbx_lld_entry_t *)
 
 void	lld_entry_clear(zbx_lld_entry_t *entry);
+void	lld_entry_clear_wrapper(void *data);
 
 zbx_hash_t	lld_entry_hash(const void *data);
 int	lld_entry_compare(const void *d1, const void *d2);

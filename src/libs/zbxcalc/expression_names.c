@@ -12,6 +12,8 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
+#include "zbxcalc.h"
+
 #include "eval.h"
 
 #include "zbx_discoverer_constants.h"

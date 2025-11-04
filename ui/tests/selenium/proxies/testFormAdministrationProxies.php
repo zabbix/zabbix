@@ -688,7 +688,7 @@ class testFormAdministrationProxies extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'proxy_fields' => [],
-					'error' => 'Incorrect value for field "name": cannot be empty.'
+					'error' => ['Proxy name' => 'This field cannot be empty.']
 				]
 			],
 			[
@@ -709,7 +709,7 @@ class testFormAdministrationProxies extends CWebTest {
 					'proxy_fields' => [
 						'Proxy name' => 'Active proxy 1'
 					],
-					'error' => 'Proxy "Active proxy 1" already exists.'
+					'error' => ['Proxy name' => 'This object already exists.']
 				]
 			],
 			[
@@ -718,7 +718,7 @@ class testFormAdministrationProxies extends CWebTest {
 					'proxy_fields' => [
 						'Proxy name' => ''
 					],
-					'error' => 'Incorrect value for field "name": cannot be empty.'
+					'error' => ['Proxy name' => 'This field cannot be empty.']
 				]
 			],
 			[
@@ -727,7 +727,7 @@ class testFormAdministrationProxies extends CWebTest {
 					'proxy_fields' => [
 						'Proxy name' => '@#$%^&*()_+'
 					],
-					'error' => 'Invalid parameter "/1/name": invalid host name.'
+					'error' => ['Proxy name' => 'Incorrect characters used for proxy name.']
 				]
 			],
 			[
@@ -736,7 +736,7 @@ class testFormAdministrationProxies extends CWebTest {
 					'proxy_fields' => [
 						'Proxy name' => '😀'
 					],
-					'error' => 'Invalid parameter "/1/name": invalid host name.'
+					'error' => ['Proxy name' => 'Incorrect characters used for proxy name.']
 				]
 			],
 			[
@@ -745,7 +745,7 @@ class testFormAdministrationProxies extends CWebTest {
 					'proxy_fields' => [
 						'Proxy name' => '{$USERMACRO}'
 					],
-					'error' => 'Invalid parameter "/1/name": invalid host name.'
+					'error' => ['Proxy name' => 'Incorrect characters used for proxy name.']
 				]
 			],
 			[
@@ -754,7 +754,7 @@ class testFormAdministrationProxies extends CWebTest {
 					'proxy_fields' => [
 						'Proxy name' => '{#LLDMACRO}'
 					],
-					'error' => 'Invalid parameter "/1/name": invalid host name.'
+					'error' => ['Proxy name' => 'Incorrect characters used for proxy name.']
 				]
 			],
 			[
@@ -763,7 +763,7 @@ class testFormAdministrationProxies extends CWebTest {
 					'proxy_fields' => [
 						'Proxy name' => 'кириллица'
 					],
-					'error' => 'Invalid parameter "/1/name": invalid host name.'
+					'error' => ['Proxy name' => 'Incorrect characters used for proxy name.']
 				]
 			],
 			[
@@ -773,7 +773,7 @@ class testFormAdministrationProxies extends CWebTest {
 						'Proxy name' => 'Empty local address',
 						'Proxy group' => 'Online proxy group'
 					],
-					'error' => 'Incorrect value for field "Address for active agents: Address": cannot be empty.'
+					'error' => ['id:local_address' => 'Address: This field cannot be empty.']
 				]
 			],
 			[
@@ -784,7 +784,7 @@ class testFormAdministrationProxies extends CWebTest {
 						'Proxy group' => 'Online proxy group',
 						'id:local_address' => '!@#$%^&*()_+'
 					],
-					'error' => 'Invalid parameter "/1/local_address": an IP or DNS is expected.'
+					'error' => ['id:local_address' => 'Address: Invalid address.']
 				]
 			],
 			[
@@ -795,7 +795,7 @@ class testFormAdministrationProxies extends CWebTest {
 						'Proxy group' => 'Online proxy group',
 						'id:local_address' => '127.0 .0.1'
 					],
-					'error' => 'Invalid parameter "/1/local_address": an IP or DNS is expected.'
+					'error' => ['id:local_address' => 'Address: Invalid address.']
 				]
 			],
 			[
@@ -806,7 +806,7 @@ class testFormAdministrationProxies extends CWebTest {
 						'Proxy group' => 'Online proxy group',
 						'id:local_address' => 'zab bix'
 					],
-					'error' => 'Invalid parameter "/1/local_address": an IP or DNS is expected.'
+					'error' => ['id:local_address' => 'Address: Invalid address.']
 				]
 			],
 			[
@@ -817,7 +817,7 @@ class testFormAdministrationProxies extends CWebTest {
 						'Proxy group' => 'Online proxy group',
 						'id:local_address' => '{$MACRO}'
 					],
-					'error' => 'Invalid parameter "/1/local_address": an IP or DNS is expected.'
+					'error' => ['id:local_address' => 'Address: Invalid address.']
 				]
 			],
 			[
@@ -828,7 +828,7 @@ class testFormAdministrationProxies extends CWebTest {
 						'Proxy group' => 'Online proxy group',
 						'id:local_address' => '{TIME}'
 					],
-					'error' => 'Invalid parameter "/1/local_address": an IP or DNS is expected.'
+					'error' => ['id:local_address' => 'Address: Invalid address.']
 				]
 			],
 			[
@@ -839,7 +839,7 @@ class testFormAdministrationProxies extends CWebTest {
 						'Proxy group' => 'Online proxy group',
 						'id:local_address' => '{#MACRO}'
 					],
-					'error' => 'Invalid parameter "/1/local_address": an IP or DNS is expected.'
+					'error' => ['id:local_address' => 'Address: Invalid address.']
 				]
 			],
 			[
@@ -851,7 +851,7 @@ class testFormAdministrationProxies extends CWebTest {
 						'id:local_address' => '127.0.0.1',
 						'id:local_port' => ''
 					],
-					'error' => 'Incorrect value for field "Address for active agents: Port": cannot be empty.'
+					'error' => ['id:local_port' => 'Port: This field cannot be empty.']
 				]
 			],
 			[
@@ -863,7 +863,7 @@ class testFormAdministrationProxies extends CWebTest {
 						'id:local_address' => '127.0.0.1',
 						'id:local_port' => '3k'
 					],
-					'error' => 'Invalid parameter "/1/local_port": a port number is expected.'
+					'error' => ['id:local_port' => 'Port: Incorrect port.']
 				]
 			],
 			[
@@ -875,7 +875,7 @@ class testFormAdministrationProxies extends CWebTest {
 						'id:local_address' => '127.0.0.1',
 						'id:local_port' => '65536'
 					],
-					'error' => 'Invalid parameter "/1/local_port": a port number is expected.'
+					'error' => ['id:local_port' => 'Port: Incorrect port.']
 				]
 			],
 			[
@@ -887,7 +887,7 @@ class testFormAdministrationProxies extends CWebTest {
 						'id:local_address' => '127.0.0.1',
 						'id:local_port' => '-1'
 					],
-					'error' => 'Invalid parameter "/1/local_port": a port number is expected.'
+					'error' => ['id:local_port' => 'Port: Incorrect port.']
 				]
 			],
 			[
@@ -899,7 +899,7 @@ class testFormAdministrationProxies extends CWebTest {
 						'id:local_address' => '127.0.0.1',
 						'id:local_port' => '{TIME}'
 					],
-					'error' => 'Invalid parameter "/1/local_port": a port number is expected.'
+					'error' => ['id:local_port' => 'Port: Incorrect port.']
 				]
 			],
 			[
@@ -911,7 +911,7 @@ class testFormAdministrationProxies extends CWebTest {
 						'id:local_address' => '127.0.0.1',
 						'id:local_port' => '{#PORT}'
 					],
-					'error' => 'Invalid parameter "/1/local_port": a port number is expected.'
+					'error' => ['id:local_port' => 'Port: Incorrect port.']
 				]
 			],
 			[
@@ -922,7 +922,7 @@ class testFormAdministrationProxies extends CWebTest {
 						'Proxy mode' => 'Passive',
 						'id:address' => ''
 					],
-					'error' => 'Incorrect value for field "Interface: Address": cannot be empty.'
+					'error' => ['id:address' => 'Address: This field cannot be empty.']
 				]
 			],
 			[
@@ -933,7 +933,7 @@ class testFormAdministrationProxies extends CWebTest {
 						'Proxy mode' => 'Passive',
 						'id:port' => ''
 					],
-					'error' => 'Incorrect value for field "Interface: Port": cannot be empty.'
+					'error' => ['id:port' => 'Port: This field cannot be empty.']
 				]
 			],
 			[
@@ -944,7 +944,7 @@ class testFormAdministrationProxies extends CWebTest {
 						'Proxy mode' => 'Passive',
 						'id:address' => '🙂🙂🙂😀😀😀'
 					],
-					'error' => 'Invalid parameter "/1/address": an IP or DNS is expected.'
+					'error' => ['id:address' => 'Address: Invalid address.']
 				]
 			],
 			[
@@ -955,22 +955,19 @@ class testFormAdministrationProxies extends CWebTest {
 						'Proxy mode' => 'Passive',
 						'id:port' => 65536
 					],
-					'error' => 'Invalid parameter "/1/port": a port number is expected.'
+					'error' => ['id:port' => 'Port: Incorrect port.']
 				]
 			],
 			[
 				[
-					'expected' => TEST_BAD,
+					'expected' => TEST_GOOD,
 					'proxy_fields' => [
 						'Proxy name' => 'Active empty Encryption',
 						'Proxy mode' => 'Active'
 					],
 					'encryption_fields' => [
-						'id:tls_accept_none' => false,
-						'id:tls_accept_psk' => false,
-						'id:tls_accept_certificate' => false
-					],
-					'error' => 'Incorrect value for field "Connections from proxy": cannot be empty.'
+						'Connections from proxy' => []
+					]
 				]
 			],
 			[
@@ -981,10 +978,10 @@ class testFormAdministrationProxies extends CWebTest {
 						'Proxy mode' => 'Active'
 					],
 					'encryption_fields' => [
-						'id:tls_accept_psk' => true,
+						'Connections from proxy' => ['No encryption', 'PSK'],
 						'PSK identity' => 'test'
 					],
-					'error' => 'Incorrect value for field "PSK": cannot be empty.'
+					'error' => ['PSK' => 'This field cannot be empty.']
 				]
 			],
 			[
@@ -995,10 +992,10 @@ class testFormAdministrationProxies extends CWebTest {
 						'Proxy mode' => 'Active'
 					],
 					'encryption_fields' => [
-						'id:tls_accept_psk' => true,
+						'Connections from proxy' => ['No encryption', 'PSK'],
 						'PSK' => '41b4d07b27a8efdcc15d4742e03857eba377fe010853a1499b0522df171282cb'
 					],
-					'error' => 'Incorrect value for field "PSK identity": cannot be empty.'
+					'error' => ['PSK identity' => 'This field cannot be empty.']
 				]
 			],
 			[
@@ -1009,11 +1006,11 @@ class testFormAdministrationProxies extends CWebTest {
 						'Proxy mode' => 'Active'
 					],
 					'encryption_fields' => [
-						'id:tls_accept_psk' => true,
+						'Connections from proxy' => ['No encryption', 'PSK'],
 						'PSK identity' => 'test',
 						'PSK' => '41b4d07b27a8efdcc15d474'
 					],
-					'error' => 'Invalid parameter "/1/tls_psk": minimum length is 32 characters.'
+					'error' => ['PSK' => 'PSK must be at least 32 characters long.']
 				]
 			],
 			[
@@ -1024,11 +1021,11 @@ class testFormAdministrationProxies extends CWebTest {
 						'Proxy mode' => 'Active'
 					],
 					'encryption_fields' => [
-						'id:tls_accept_psk' => true,
+						'Connections from proxy' => ['No encryption', 'PSK'],
 						'PSK identity' => 'test',
 						'PSK' => '3713AD479CE5B2FA06EB308D7AE96408A70ADE7F630191B6035E13B6DD779B68303FA08E38E38E38E38E38E38E38E38E38E37'
 					],
-					'error' => 'Invalid parameter "/1/tls_psk": an even number of hexadecimal characters is expected.'
+					'error' => ['PSK' => 'PSK must be an even number of characters.']
 				]
 			],
 			[
@@ -1051,16 +1048,16 @@ class testFormAdministrationProxies extends CWebTest {
 						'Browser' => ''
 					],
 					'error' => [
-						'Incorrect value for field "timeout_zabbix_agent": cannot be empty.',
-						'Incorrect value for field "timeout_simple_check": cannot be empty.',
-						'Incorrect value for field "timeout_snmp_agent": cannot be empty.',
-						'Incorrect value for field "timeout_external_check": cannot be empty.',
-						'Incorrect value for field "timeout_db_monitor": cannot be empty.',
-						'Incorrect value for field "timeout_http_agent": cannot be empty.',
-						'Incorrect value for field "timeout_ssh_agent": cannot be empty.',
-						'Incorrect value for field "timeout_telnet_agent": cannot be empty.',
-						'Incorrect value for field "timeout_script": cannot be empty.',
-						'Incorrect value for field "timeout_browser": cannot be empty.'
+						'Zabbix agent' => 'This field cannot be empty.',
+						'Simple check' => 'This field cannot be empty.',
+						'SNMP agent' => 'This field cannot be empty.',
+						'External check' => 'This field cannot be empty.',
+						'Database monitor' => 'This field cannot be empty.',
+						'HTTP agent' => 'This field cannot be empty.',
+						'SSH agent' => 'This field cannot be empty.',
+						'TELNET agent' => 'This field cannot be empty.',
+						'Script' => 'This field cannot be empty.',
+						'Browser' => 'This field cannot be empty.'
 					]
 				]
 			],
@@ -1075,7 +1072,7 @@ class testFormAdministrationProxies extends CWebTest {
 						'Zabbix agent' => '0'
 					],
 					'error' => [
-						'Invalid parameter "/1/timeout_zabbix_agent": value must be one of 1-600.'
+						'Zabbix agent' => 'Value must be one of 1-600.'
 					]
 				]
 			],
@@ -1090,7 +1087,7 @@ class testFormAdministrationProxies extends CWebTest {
 						'Zabbix agent' => '0'
 					],
 					'error' => [
-						'Invalid parameter "/1/timeout_zabbix_agent": value must be one of 1-600.'
+						'Zabbix agent' => 'Value must be one of 1-600.'
 					]
 				]
 			],
@@ -1105,7 +1102,7 @@ class testFormAdministrationProxies extends CWebTest {
 						'Zabbix agent' => '1234567890123456'
 					],
 					'error' => [
-						'Invalid parameter "/1/timeout_zabbix_agent": a number is too large.'
+						'Zabbix agent' => 'Value must be one of 1-600.'
 					]
 				]
 			],
@@ -1120,7 +1117,7 @@ class testFormAdministrationProxies extends CWebTest {
 						'Zabbix agent' => 'test'
 					],
 					'error' => [
-						'Invalid parameter "/1/timeout_zabbix_agent": a time unit is expected.'
+						'Zabbix agent' => 'A time unit is expected.'
 					]
 				]
 			],
@@ -1135,7 +1132,7 @@ class testFormAdministrationProxies extends CWebTest {
 						'Simple check' => '0'
 					],
 					'error' => [
-						'Invalid parameter "/1/timeout_simple_check": value must be one of 1-600.'
+						'Simple check' => 'Value must be one of 1-600.'
 					]
 				]
 			],
@@ -1150,7 +1147,7 @@ class testFormAdministrationProxies extends CWebTest {
 						'Simple check' => '601'
 					],
 					'error' => [
-						'Invalid parameter "/1/timeout_simple_check": value must be one of 1-600.'
+						'Simple check' => 'Value must be one of 1-600.'
 					]
 				]
 			],
@@ -1165,7 +1162,7 @@ class testFormAdministrationProxies extends CWebTest {
 						'Simple check' => '1234567890123456'
 					],
 					'error' => [
-						'Invalid parameter "/1/timeout_simple_check": a number is too large.'
+						'Simple check' => 'Value must be one of 1-600.'
 					]
 				]
 			],
@@ -1180,7 +1177,7 @@ class testFormAdministrationProxies extends CWebTest {
 						'Simple check' => 'test'
 					],
 					'error' => [
-						'Invalid parameter "/1/timeout_simple_check": a time unit is expected.'
+						'Simple check' => 'A time unit is expected.'
 					]
 				]
 			],
@@ -1195,7 +1192,7 @@ class testFormAdministrationProxies extends CWebTest {
 						'SNMP agent' => '0'
 					],
 					'error' => [
-						'Invalid parameter "/1/timeout_snmp_agent": value must be one of 1-600.'
+						'SNMP agent' => 'Value must be one of 1-600.'
 					]
 				]
 			],
@@ -1210,7 +1207,7 @@ class testFormAdministrationProxies extends CWebTest {
 						'SNMP agent' => '601'
 					],
 					'error' => [
-						'Invalid parameter "/1/timeout_snmp_agent": value must be one of 1-600.'
+						'SNMP agent' => 'Value must be one of 1-600.'
 					]
 				]
 			],
@@ -1225,7 +1222,7 @@ class testFormAdministrationProxies extends CWebTest {
 						'SNMP agent' => '1234567890123456'
 					],
 					'error' => [
-						'Invalid parameter "/1/timeout_snmp_agent": a number is too large'
+						'SNMP agent' => 'Value must be one of 1-600.'
 					]
 				]
 			],
@@ -1240,7 +1237,7 @@ class testFormAdministrationProxies extends CWebTest {
 						'SNMP agent' => 'test'
 					],
 					'error' => [
-						'Invalid parameter "/1/timeout_snmp_agent": a time unit is expected.'
+						'SNMP agent' => 'A time unit is expected.'
 					]
 				]
 			],
@@ -1255,7 +1252,7 @@ class testFormAdministrationProxies extends CWebTest {
 						'External check' => '0'
 					],
 					'error' => [
-						'Invalid parameter "/1/timeout_external_check": value must be one of 1-600.'
+						'External check' => 'Value must be one of 1-600.'
 					]
 				]
 			],
@@ -1270,7 +1267,7 @@ class testFormAdministrationProxies extends CWebTest {
 						'External check' => '601'
 					],
 					'error' => [
-						'Invalid parameter "/1/timeout_external_check": value must be one of 1-600.'
+						'External check' => 'Value must be one of 1-600.'
 					]
 				]
 			],
@@ -1285,7 +1282,7 @@ class testFormAdministrationProxies extends CWebTest {
 						'External check' => '1234567890123456'
 					],
 					'error' => [
-						'Invalid parameter "/1/timeout_external_check": a number is too large.'
+						'External check' => 'Value must be one of 1-600.'
 					]
 				]
 			],
@@ -1300,7 +1297,7 @@ class testFormAdministrationProxies extends CWebTest {
 						'External check' => 'test'
 					],
 					'error' => [
-						'Invalid parameter "/1/timeout_external_check": a time unit is expected.'
+						'External check' => 'A time unit is expected.'
 					]
 				]
 			],
@@ -1315,7 +1312,7 @@ class testFormAdministrationProxies extends CWebTest {
 						'Database monitor' => '0'
 					],
 					'error' => [
-						'Invalid parameter "/1/timeout_db_monitor": value must be one of 1-600.'
+						'Database monitor' => 'Value must be one of 1-600.'
 					]
 				]
 			],
@@ -1330,7 +1327,7 @@ class testFormAdministrationProxies extends CWebTest {
 						'Database monitor' => '601'
 					],
 					'error' => [
-						'Invalid parameter "/1/timeout_db_monitor": value must be one of 1-600.'
+						'Database monitor' => 'Value must be one of 1-600.'
 					]
 				]
 			],
@@ -1345,7 +1342,7 @@ class testFormAdministrationProxies extends CWebTest {
 						'Database monitor' => '1234567890123456'
 					],
 					'error' => [
-						'Invalid parameter "/1/timeout_db_monitor": a number is too large.'
+						'Database monitor' => 'Value must be one of 1-600.'
 					]
 				]
 			],
@@ -1360,7 +1357,7 @@ class testFormAdministrationProxies extends CWebTest {
 						'Database monitor' => 'test'
 					],
 					'error' => [
-						'Invalid parameter "/1/timeout_db_monitor": a time unit is expected.'
+						'Database monitor' => 'A time unit is expected.'
 					]
 				]
 			],
@@ -1375,7 +1372,7 @@ class testFormAdministrationProxies extends CWebTest {
 						'HTTP agent' => '0'
 					],
 					'error' => [
-						'Invalid parameter "/1/timeout_http_agent": value must be one of 1-600.'
+						'HTTP agent' => 'Value must be one of 1-600.'
 					]
 				]
 			],
@@ -1390,7 +1387,7 @@ class testFormAdministrationProxies extends CWebTest {
 						'HTTP agent' => '601'
 					],
 					'error' => [
-						'Invalid parameter "/1/timeout_http_agent": value must be one of 1-600.'
+						'HTTP agent' => 'Value must be one of 1-600.'
 					]
 				]
 			],
@@ -1405,7 +1402,7 @@ class testFormAdministrationProxies extends CWebTest {
 						'HTTP agent' => '1234567890123456'
 					],
 					'error' => [
-						'Invalid parameter "/1/timeout_http_agent": a number is too large.'
+						'HTTP agent' => 'Value must be one of 1-600.'
 					]
 				]
 			],
@@ -1420,7 +1417,7 @@ class testFormAdministrationProxies extends CWebTest {
 						'HTTP agent' => 'test'
 					],
 					'error' => [
-						'Invalid parameter "/1/timeout_http_agent": a time unit is expected.'
+						'HTTP agent' => 'A time unit is expected.'
 					]
 				]
 			],
@@ -1435,7 +1432,7 @@ class testFormAdministrationProxies extends CWebTest {
 						'SSH agent' => '0'
 					],
 					'error' => [
-						'Invalid parameter "/1/timeout_ssh_agent": value must be one of 1-600.'
+						'SSH agent' => 'Value must be one of 1-600.'
 					]
 				]
 			],
@@ -1450,7 +1447,7 @@ class testFormAdministrationProxies extends CWebTest {
 						'SSH agent' => '601'
 					],
 					'error' => [
-						'Invalid parameter "/1/timeout_ssh_agent": value must be one of 1-600.'
+						'SSH agent' => 'Value must be one of 1-600.'
 					]
 				]
 			],
@@ -1465,7 +1462,7 @@ class testFormAdministrationProxies extends CWebTest {
 						'SSH agent' => '1234567890123456'
 					],
 					'error' => [
-						'Invalid parameter "/1/timeout_ssh_agent": a number is too large.'
+						'SSH agent' => 'Value must be one of 1-600.'
 					]
 				]
 			],
@@ -1480,7 +1477,7 @@ class testFormAdministrationProxies extends CWebTest {
 						'SSH agent' => 'test'
 					],
 					'error' => [
-						'Invalid parameter "/1/timeout_ssh_agent": a time unit is expected.'
+						'SSH agent' => 'A time unit is expected.'
 					]
 				]
 			],
@@ -1495,7 +1492,7 @@ class testFormAdministrationProxies extends CWebTest {
 						'TELNET agent' => '0'
 					],
 					'error' => [
-						'Invalid parameter "/1/timeout_telnet_agent": value must be one of 1-600.'
+						'TELNET agent' => 'Value must be one of 1-600.'
 					]
 				]
 			],
@@ -1510,7 +1507,7 @@ class testFormAdministrationProxies extends CWebTest {
 						'TELNET agent' => '601'
 					],
 					'error' => [
-						'Invalid parameter "/1/timeout_telnet_agent": value must be one of 1-600.'
+						'TELNET agent' => 'Value must be one of 1-600.'
 					]
 				]
 			],
@@ -1525,7 +1522,7 @@ class testFormAdministrationProxies extends CWebTest {
 						'TELNET agent' => '1234567890123456'
 					],
 					'error' => [
-						'Invalid parameter "/1/timeout_telnet_agent": a number is too large.'
+						'TELNET agent' => 'Value must be one of 1-600.'
 					]
 				]
 			],
@@ -1540,7 +1537,7 @@ class testFormAdministrationProxies extends CWebTest {
 						'TELNET agent' => 'test'
 					],
 					'error' => [
-						'Invalid parameter "/1/timeout_telnet_agent": a time unit is expected.'
+						'TELNET agent' => 'A time unit is expected.'
 					]
 				]
 			],
@@ -1555,7 +1552,7 @@ class testFormAdministrationProxies extends CWebTest {
 						'Script' => '0'
 					],
 					'error' => [
-						'Invalid parameter "/1/timeout_script": value must be one of 1-600.'
+						'Script' => 'Value must be one of 1-600.'
 					]
 				]
 			],
@@ -1570,7 +1567,7 @@ class testFormAdministrationProxies extends CWebTest {
 						'Script' => '601'
 					],
 					'error' => [
-						'Invalid parameter "/1/timeout_script": value must be one of 1-600.'
+						'Script' => 'Value must be one of 1-600.'
 					]
 				]
 			],
@@ -1585,7 +1582,7 @@ class testFormAdministrationProxies extends CWebTest {
 						'Script' => '1234567890123456'
 					],
 					'error' => [
-						'Invalid parameter "/1/timeout_script": a number is too large.'
+						'Script' => 'Value must be one of 1-600.'
 					]
 				]
 			],
@@ -1600,7 +1597,7 @@ class testFormAdministrationProxies extends CWebTest {
 						'Script' => 'test'
 					],
 					'error' => [
-						'Invalid parameter "/1/timeout_script": a time unit is expected.'
+						'Script' => 'A time unit is expected.'
 					]
 				]
 			],
@@ -1615,7 +1612,7 @@ class testFormAdministrationProxies extends CWebTest {
 						'Browser' => '0'
 					],
 					'error' => [
-						'Invalid parameter "/1/timeout_browser": value must be one of 1-600.'
+						'Browser' => 'Value must be one of 1-600.'
 					]
 				]
 			],
@@ -1630,7 +1627,7 @@ class testFormAdministrationProxies extends CWebTest {
 						'Browser' => '601'
 					],
 					'error' => [
-						'Invalid parameter "/1/timeout_browser": value must be one of 1-600.'
+						'Browser' => 'Value must be one of 1-600.'
 					]
 				]
 			],
@@ -1645,7 +1642,7 @@ class testFormAdministrationProxies extends CWebTest {
 						'Browser' => '1234567890123456'
 					],
 					'error' => [
-						'Invalid parameter "/1/timeout_browser": a number is too large.'
+						'Browser' => 'Value must be one of 1-600.'
 					]
 				]
 			],
@@ -1660,7 +1657,7 @@ class testFormAdministrationProxies extends CWebTest {
 						'Browser' => 'test'
 					],
 					'error' => [
-						'Invalid parameter "/1/timeout_browser": a time unit is expected.'
+						'Browser' => 'A time unit is expected.'
 					]
 				]
 			],
@@ -1675,7 +1672,7 @@ class testFormAdministrationProxies extends CWebTest {
 						'TELNET agent' => '{PROXY.NAME}'
 					],
 					'error' => [
-						'Invalid parameter "/1/timeout_telnet_agent": a time unit is expected.'
+						'TELNET agent' => 'A time unit is expected.'
 					]
 				]
 			],
@@ -1690,7 +1687,7 @@ class testFormAdministrationProxies extends CWebTest {
 						'Zabbix agent' => '{#MACROS}'
 					],
 					'error' => [
-						'Invalid parameter "/1/timeout_zabbix_agent": a time unit is expected.'
+						'Zabbix agent' => 'A time unit is expected.'
 					]
 				]
 			],
@@ -1705,7 +1702,7 @@ class testFormAdministrationProxies extends CWebTest {
 						'SSH agent' => '<script>alert("hi!");</script>'
 					],
 					'error' => [
-						'Invalid parameter "/1/timeout_ssh_agent": a time unit is expected.'
+						'SSH agent' => 'A time unit is expected.'
 					]
 				]
 			],
@@ -1720,7 +1717,7 @@ class testFormAdministrationProxies extends CWebTest {
 						'SNMP agent' => '☺♥²©™"\''
 					],
 					'error' => [
-						'Invalid parameter "/1/timeout_snmp_agent": a time unit is expected.'
+						'SNMP agent' => 'A time unit is expected.'
 					]
 				]
 			],
@@ -1736,7 +1733,8 @@ class testFormAdministrationProxies extends CWebTest {
 						'TELNET agent' => '800'
 					],
 					'error' => [
-						'Invalid parameter "/1/timeout_external_check": a time unit is expected.'
+						'External check' => 'A time unit is expected.',
+						'TELNET agent' => 'Value must be one of 1-600.'
 					]
 				]
 			],
@@ -2044,7 +2042,7 @@ class testFormAdministrationProxies extends CWebTest {
 		$this->page->waitUntilReady();
 
 		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
-			$this->assertMessage(TEST_BAD, ($update ? 'Cannot update proxy' : 'Cannot add proxy'), $data['error']);
+			$this->assertInlineError($form, $data['error']);
 
 			// Check that DB hash is not changed.
 			$this->assertEquals($old_hash, CDBHelper::getHash($this->sql));
@@ -2084,6 +2082,11 @@ class testFormAdministrationProxies extends CWebTest {
 				foreach (['PSK identity', 'PSK'] as $field) {
 					$this->assertEquals('', $form->getField($field)->waitUntilVisible()->getText());
 				}
+			}
+
+			// Check that 'No encryption' is set after form was submitted with all encryption checkboxes unchecked.
+			if (CTestArrayHelper::get($data, 'encryption_fields.Connections from proxy') === []) {
+				$data['encryption_fields']['Connections from proxy'] = ['No encryption'];
 			}
 
 			$form->checkValue(array_merge($data['proxy_fields'], CTestArrayHelper::get($data, 'encryption_fields', [])));

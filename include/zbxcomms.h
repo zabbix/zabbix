@@ -292,7 +292,7 @@ int	zbx_tcp_send_context(zbx_socket_t *s, zbx_tcp_send_context_t *context, short
 void	zbx_tcp_close(zbx_socket_t *s);
 
 #ifdef HAVE_IPV6
-int	get_address_family(const char *addr, int *family, char *error, int max_error_len);
+int	zbx_get_address_family(const char *addr, int *family, char *error, int max_error_len);
 #endif
 
 int	zbx_tcp_listen(zbx_socket_t *s, const char *listen_ip, unsigned short listen_port, int timeout,

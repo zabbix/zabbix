@@ -30,6 +30,7 @@
 #include "zbxmockutil.h"
 
 #include "zbxcommon.h"
+#include "zbxalgo.h"
 
 #define ZBX_MOCK_MAX_FILES	16
 
@@ -197,19 +198,65 @@ int	__wrap_connect(int socket, void *addr, socklen_t address_len)
 	return 0;
 }
 
+#define MOCK_POLL_DEFAULT		0
+#define MOCK_POLL_TIMEOUT		1
+#define MOCK_POLL_ERROR			2
+#define MOCK_POLL_REVENTS_ERROR		3
+#define MOCK_POLL_SOCKET_BLOCKING_ERROR	4
+
+static int	g_mock_poll_mode = MOCK_POLL_DEFAULT;
+
+void	zbx_comms_mock_poll_set_mode_from_param(const char *param)
+{
+	if (0 == strcmp(param, "MOCK_POLL_TIMEOUT"))
+		g_mock_poll_mode = MOCK_POLL_TIMEOUT;
+	else if (0 == strcmp(param, "MOCK_POLL_ERROR"))
+		g_mock_poll_mode = MOCK_POLL_ERROR;
+	else if (0 == strcmp(param, "MOCK_POLL_REVENTS_ERROR"))
+		g_mock_poll_mode = MOCK_POLL_REVENTS_ERROR;
+	else if (0 == strcmp(param, "MOCK_POLL_SOCKET_BLOCKING_ERROR"))
+		g_mock_poll_mode = MOCK_POLL_SOCKET_BLOCKING_ERROR;
+	else
+		g_mock_poll_mode = MOCK_POLL_DEFAULT;
+}
+
 int	__wrap_poll(struct pollfd *pds, int nfds, int timeout)
 {
 	ZBX_UNUSED(timeout);
 
-	for (int i = 0; i < nfds; i++)
-		pds[i].revents = (POLLIN | POLLOUT);
-
-	return nfds;
+	switch (g_mock_poll_mode)
+	{
+		case MOCK_POLL_TIMEOUT:
+			return 0;
+		case MOCK_POLL_ERROR:
+			return -1;
+		case MOCK_POLL_REVENTS_ERROR:
+			for (int i = 0; i < nfds; i++)
+				pds[i].revents = POLLERR;
+			return nfds;
+		case MOCK_POLL_SOCKET_BLOCKING_ERROR:
+			errno = EPERM;
+			return -1;
+		case MOCK_POLL_DEFAULT:
+		default:
+			for (int i = 0; i < nfds; i++)
+				pds[i].revents = (POLLIN | POLLOUT);
+			return nfds;
+	}
 }
+
+#undef MOCK_POLL_DEFAULT
+#undef MOCK_POLL_TIMEOUT
+#undef MOCK_POLL_ERROR
+#undef MOCK_POLL_REVENTS_ERROR
+#undef MOCK_POLL_SOCKET_BLOCKING_ERROR
 
 static const char	*frag_data = NULL;
 static const char	*frag_pos = NULL;
 static size_t		frag_sz = 0;
+static int		zbx_comms_test_comms = FAIL;
+static int		zbx_comms_read_iter = 0;
+static int		zbx_comms_read_ret[5];
 
 static int	next_fragment(void)
 {
@@ -260,6 +307,14 @@ ssize_t	__wrap_read(int fildes, void *buf, size_t nbyte)
 
 	ZBX_UNUSED(fildes);
 
+	if (SUCCEED == zbx_comms_test_comms)
+	{
+		int	ret = zbx_comms_read_ret[zbx_comms_read_iter];
+		zbx_comms_read_iter++;
+
+		return ret;
+	}
+
 	if (frag_pos >= frag_data + frag_sz)
 	{
 		if (1 != next_fragment())
@@ -276,6 +331,17 @@ ssize_t	__wrap_read(int fildes, void *buf, size_t nbyte)
 	frag_pos += mv_len;
 
 	return mv_len;
+}
+
+void	zbx_comms_set_test_comms(int status)
+{
+	zbx_comms_test_comms = status;
+}
+
+void	zbx_comms_setup_read(zbx_vector_int32_t *v)
+{
+	for (int i = 0; i < v->values_num; i++)
+		zbx_comms_read_ret[i] = v->values[i];
 }
 
 off_t	__wrap_lseek(int fd, off_t offset, int whence)

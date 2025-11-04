@@ -168,6 +168,7 @@ if ($data['vendor']) {
 $tags_tab = new CPartial('configuration.tags.tab', [
 	'source' => 'template',
 	'tags' => $data['tags'],
+	'show_inherited_tags' => $data['show_inherited_tags'],
 	'readonly' => $data['readonly'],
 	'tabs_id' => 'template-tabs',
 	'tags_tab_id' => 'template-tags-tab',
@@ -187,8 +188,7 @@ $macros_tab = (new CFormList('macrosFormList'))
 	)
 	->addRow(null, new CPartial($macros_tmpl, [
 		'macros' => $data['macros'],
-		'readonly' => $data['readonly'],
-		'has_inline_validation' => true
+		'readonly' => $data['readonly']
 	]), 'template_macros_container');
 
 if (!$data['readonly']) {

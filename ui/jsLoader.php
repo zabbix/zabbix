@@ -169,6 +169,7 @@ $available_js = [
 	'class.field.js' => 'fields/',
 	'class.field.array.js' => 'fields/',
 	'class.field.checkbox.js' => 'fields/',
+	'class.field.file.js' => 'fields/',
 	'class.field.hidden.js' => 'fields/',
 	'class.field.multiline.js' => 'fields/',
 	'class.field.multiselect.js' => 'fields/',
@@ -437,7 +438,11 @@ $translate_strings = [
 		'within ranges %1$s' => _('within ranges %1$s'),
 		'one of %1$s' => _('one of %1$s'),
 		' or ' => _(' or '),
-		'%1$s: %2$s' => _('%1$s: %2$s')
+		'%1$s: %2$s' => _('%1$s: %2$s'),
+		'This value is not a valid file.' => _('This value is not a valid file.'),
+		'Image size must be less than %1$s.' => _('Image size must be less than %1$s.'),
+		'File size must be less than %1$s.' => _('File size must be less than %1$s.'),
+		'File format is unsupported.' => _('File format is unsupported.')
 	],
 	'main.js' => [
 		'S_EXPAND' => _('Expand'),
@@ -621,6 +626,7 @@ if (empty($_GET['files'])) {
 		'class.field.js',
 		'class.field.array.js',
 		'class.field.checkbox.js',
+		'class.field.file.js',
 		'class.field.hidden.js',
 		'class.field.multiline.js',
 		'class.field.multiselect.js',

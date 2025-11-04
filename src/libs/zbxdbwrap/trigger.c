@@ -273,6 +273,124 @@ int	zbx_db_trigger_supplement_eval_resolv(zbx_token_type_t token_type, char **va
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: extract index from valid indexed host or item key macro.          *
+ *                                                                            *
+ * Return value: the index or -1 if it was not valid indexed host or item key *
+ *               macro.                                                       *
+ *                                                                            *
+ ******************************************************************************/
+static int	expr_macro_index(const char *macro)
+{
+	/* macros that are supported in expression macro */
+	static const char	*expr_macros[] = {MVAR_HOST_HOST, MVAR_HOSTNAME, MVAR_ITEM_KEY, NULL};
+
+	zbx_strloc_t	loc;
+	int		func_num;
+
+	loc.l = 0;
+	loc.r = strlen(macro) - 1;
+
+	if (NULL != zbx_macro_in_list(macro, loc, expr_macros, &func_num))
+		return func_num;
+
+	return -1;
+}
+
+typedef int (*resolv_func_t)(uint64_t itemid, char **replace_to);
+
+static int	resolve_expression_query_macro(const zbx_db_trigger *trigger, resolv_func_t resolv_func,
+		const char *name, int func_num, zbx_expression_query_t *query, char **entity,
+		zbx_vector_macro_index_t *indices)
+{
+	int			id;
+	zbx_macro_index_t	*index;
+
+	if (FAIL == (id = zbx_vector_ptr_search((const zbx_vector_ptr_t *)indices, &func_num, zbx_macro_index_compare)))
+	{
+		index = (zbx_macro_index_t *)zbx_malloc(NULL, sizeof(zbx_macro_index_t));
+		index->num = func_num;
+		index->macro = NULL;
+
+		uint64_t	itemid;
+
+		if (SUCCEED == zbx_db_trigger_get_itemid(trigger, func_num, &itemid))
+		{
+			resolv_func(itemid, &index->macro);
+		}
+
+		zbx_vector_macro_index_append(indices, index);
+	}
+	else
+		index = indices->values[id];
+
+	if (NULL == index->macro)
+	{
+		query->flags = ZBX_ITEM_QUERY_ERROR;
+		query->error = zbx_dsprintf(NULL, "invalid %s \"%s\"", name, ZBX_NULL2EMPTY_STR(*entity));
+		return FAIL;
+	}
+
+	*entity = zbx_strdup(*entity, index->macro);
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+*                                                                             *
+* Purpose: resolve expression with an empty host macro (default host),        *
+*          macro host references and item key references, like:               *
+*          (two forward slashes, {HOST.HOST}, {HOST.HOST<N>},                 *
+*          {ITEM.KEY} and {ITEM.KEY<N>}) to host names and item keys.         *
+*                                                                             *
+* Parameters: eval    - [IN/OUT] evaluation expression                        *
+*             trigger - [IN] trigger which defines evaluation expression      *
+*                                                                             *
+*******************************************************************************/
+static void	expression_eval_resolve_trigger_hosts_items(zbx_expression_eval_t *eval, const zbx_db_trigger *trigger)
+{
+	zbx_vector_macro_index_t	hosts, item_keys;
+
+	zbx_vector_macro_index_create(&hosts);
+	zbx_vector_macro_index_create(&item_keys);
+
+	for (int i = 0; i < eval->queries.values_num; i++)
+	{
+		int			func_num;
+		zbx_expression_query_t	*query = eval->queries.values[i];
+
+		/* resolve host */
+
+		if (0 != (ZBX_ITEM_QUERY_HOST_ONE & query->flags))
+			func_num = expr_macro_index(query->ref.host);
+		else if (0 != (ZBX_ITEM_QUERY_HOST_SELF & query->flags))
+			func_num = 1;
+		else
+			func_num = -1;
+
+		if (-1 != func_num && FAIL == resolve_expression_query_macro(trigger, &zbx_dc_get_host_host, "host",
+				func_num, query, &query->ref.host, &hosts))
+		{
+			continue;
+		}
+
+		/* resolve item key */
+
+		if (0 != (ZBX_ITEM_QUERY_KEY_ONE & query->flags) &&
+				-1 != (func_num = expr_macro_index(query->ref.key)))
+		{
+			resolve_expression_query_macro(trigger, &zbx_dc_get_item_key, "item key", func_num, query,
+					&query->ref.key, &item_keys);
+		}
+	}
+
+	zbx_vector_macro_index_clear_ext(&hosts, zbx_macro_index_free);
+	zbx_vector_macro_index_clear_ext(&item_keys, zbx_macro_index_free);
+	zbx_vector_macro_index_destroy(&hosts);
+	zbx_vector_macro_index_destroy(&item_keys);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: calculate result of expression macro.                             *
  *                                                                            *
  * Return value: upon successful completion return SUCCEED                    *
@@ -315,7 +433,7 @@ int	zbx_db_get_expression_macro_result(const zbx_db_event *event, char *data, zb
 	}
 
 	zbx_expression_eval_init(&eval, ZBX_EXPRESSION_NORMAL, &ctx);
-	zbx_expression_eval_resolve_trigger_hosts_items(&eval, &event->trigger);
+	expression_eval_resolve_trigger_hosts_items(&eval, &event->trigger);
 
 	if (SUCCEED == (ret = zbx_expression_eval_execute(&eval, ts, &value, error)))
 	{

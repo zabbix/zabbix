@@ -737,10 +737,12 @@ else {
 	$options = [
 		'output' => ['httptestid', $sortField],
 		'selectTags' => ['tag', 'value'],
+		'selectInheritedTags' => ['tag', 'value'],
 		'hostids' => $filter['hosts'] ? array_keys($filter['hosts']) : null,
 		'groupids' => $filter_groupids ? $filter_groupids : null,
-		'tags' => $data['filter']['tags'],
 		'evaltype' => $data['filter']['evaltype'],
+		'tags' => $data['filter']['tags'] ?: null,
+		'inheritedTags' => true,
 		'templated' => ($data['context'] === 'template'),
 		'editable' => true,
 		'limit' => CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1,
@@ -762,7 +764,8 @@ else {
 	$http_tests = [];
 	while ($dbHttpTest = DBfetch($dbHttpTests)) {
 		$http_tests[$dbHttpTest['httptestid']] = $dbHttpTest + [
-			'tags' => $httpTests[$dbHttpTest['httptestid']]['tags']
+			'tags' => $httpTests[$dbHttpTest['httptestid']]['tags'],
+			'inheritedTags' => $httpTests[$dbHttpTest['httptestid']]['inheritedTags']
 		];
 	}
 
@@ -784,6 +787,8 @@ else {
 	$data['paging'] = CPagerHelper::paginate($page_num, $http_tests, $sortOrder,
 		(new CUrl('httpconf.php'))->setArgument('context', $data['context'])
 	);
+
+	CTagHelper::mergeOwnAndInheritedTags($http_tests, true);
 
 	// Get the error column data only for hosts.
 	if ($data['context'] === 'host') {
@@ -817,7 +822,7 @@ else {
 	$data['httpTestsLastData'] = $httpTestsLastData;
 	$data['allowed_ui_conf_templates'] = CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES);
 
-	$data['tags'] = makeTags($data['http_tests'], true, 'httptestid', ZBX_TAG_COUNT_DEFAULT);
+	$data['tags'] = CTagHelper::getTagsHtml($data['http_tests'], ZBX_TAG_OBJECT_HTTPTEST);
 
 	if (!$data['filter']['tags']) {
 		$data['filter']['tags'] = [[

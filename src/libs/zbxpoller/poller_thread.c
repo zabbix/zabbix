@@ -36,7 +36,6 @@
 #include "checks_java.h"
 #include "checks_calculated.h"
 
-#include "zbxexpression.h"
 #include "zbxalgo.h"
 #include "zbxcacheconfig.h"
 #include "zbxdbhigh.h"

@@ -19,21 +19,160 @@ require_once dirname(__FILE__).'/../include/CTest.php';
 
 class dbConditionStringTest extends CTest {
 
-	public static function provider() {
-		return [
-			[
-				['field', []],
-				'1=0'
-			],
-			[
-				['field', ['a']],
-				'field=\'a\''
-			],
-			[
-				['field', ['a'], true],
-				'field!=\'a\''
-			]
+	private const FILTER_CHUNK_SIZE = 950;
+
+	public static function provider(): Generator {
+		yield 'Filter is empty.' => [
+			['field', []],
+			'1=0'
 		];
+
+		yield 'Filter contain a single value.' => [
+			['field', ['a']],
+			'field=\'a\''
+		];
+
+
+		yield 'Filter contain 2 values.' => [
+			['field', ['a', 'b']],
+			'field IN (\'a\',\'b\')'
+		];
+
+		$value_count = self::FILTER_CHUNK_SIZE - 1;
+
+		[$values, $filter_chunks] = self::getValuesAndFilterChunks($value_count);
+
+		yield 'Filter contain '.$value_count.' values.' => [
+			['field', $values],
+			'field IN ('.implode(',', $filter_chunks[0]).')'
+		];
+
+
+		[$values, $filter_chunks] = self::getValuesAndFilterChunks(self::FILTER_CHUNK_SIZE);
+
+		yield 'Filter contain '.self::FILTER_CHUNK_SIZE.' values.' => [
+			['field', $values],
+			'field IN ('.implode(',', $filter_chunks[0]).')'
+		];
+
+		$value_count = self::FILTER_CHUNK_SIZE + 1;
+
+		[$values, $filter_chunks] = self::getValuesAndFilterChunks($value_count);
+
+		yield 'Filter contain '.$value_count.' values.' => [
+			['field', $values],
+			'('.
+				'field IN ('.implode(',', $filter_chunks[0]).')'.
+				' OR field='.reset($filter_chunks[1]).
+			')'
+		];
+
+		$value_count = (self::FILTER_CHUNK_SIZE * 2) - floor(self::FILTER_CHUNK_SIZE / 2);
+
+		[$values, $filter_chunks] = self::getValuesAndFilterChunks($value_count);
+
+		yield 'Filter contain '.$value_count.' values.' => [
+			['field', $values],
+			'('.
+				'field IN ('.implode(',', $filter_chunks[0]).')'.
+				' OR field IN ('.implode(',', $filter_chunks[1]).')'.
+			')'
+		];
+
+		$value_count = (self::FILTER_CHUNK_SIZE * 2) + floor(self::FILTER_CHUNK_SIZE / 2);
+
+		[$values, $filter_chunks] = self::getValuesAndFilterChunks($value_count);
+
+		yield 'Filter contain '.$value_count.' values.' => [
+			['field', $values],
+			'('.
+				'field IN ('.implode(',', $filter_chunks[0]).')'.
+				' OR field IN ('.implode(',', $filter_chunks[1]).')'.
+				' OR field IN ('.implode(',', $filter_chunks[2]).')'.
+			')'
+		];
+
+		yield 'Filter with negation contain a single value.' => [
+			['field', ['a'], true],
+			'field!=\'a\''
+		];
+
+		yield 'Filter with negation contain 2 values.' => [
+			['field', ['a', 'b'], true],
+			'field NOT IN (\'a\',\'b\')'
+		];
+
+		$value_count = self::FILTER_CHUNK_SIZE - 1;
+
+		[$values, $filter_chunks] = self::getValuesAndFilterChunks($value_count);
+
+		yield 'Filter with negation contain '.$value_count.' values.' => [
+			['field', $values, true],
+			'field NOT IN ('.implode(',', $filter_chunks[0]).')'
+		];
+
+
+		[$values, $filter_chunks] = self::getValuesAndFilterChunks(self::FILTER_CHUNK_SIZE);
+
+		yield 'Filter with negation contain '.self::FILTER_CHUNK_SIZE.' values.' => [
+			['field', $values, true],
+			'field NOT IN ('.implode(',', $filter_chunks[0]).')'
+		];
+
+		$value_count = self::FILTER_CHUNK_SIZE + 1;
+
+		[$values, $filter_chunks] = self::getValuesAndFilterChunks($value_count);
+
+		yield 'Filter with negation contain '.$value_count.' values.' => [
+			['field', $values, true],
+			'('.
+				'field NOT IN ('.implode(',', $filter_chunks[0]).')'.
+				' AND field!='.reset($filter_chunks[1]).
+			')'
+		];
+
+		$value_count = (self::FILTER_CHUNK_SIZE * 2) - floor(self::FILTER_CHUNK_SIZE / 2);
+
+		[$values, $filter_chunks] = self::getValuesAndFilterChunks($value_count);
+
+		yield 'Filter with negation contain '.$value_count.' values.' => [
+			['field', $values, true],
+			'('.
+				'field NOT IN ('.implode(',', $filter_chunks[0]).')'.
+				' AND field NOT IN ('.implode(',', $filter_chunks[1]).')'.
+			')'
+		];
+
+		$value_count = (self::FILTER_CHUNK_SIZE * 2) + floor(self::FILTER_CHUNK_SIZE / 2);
+
+		[$values, $filter_chunks] = self::getValuesAndFilterChunks($value_count);
+
+		yield 'Filter with negation contain '.$value_count.' values.' => [
+			['field', $values, true],
+			'('.
+				'field NOT IN ('.implode(',', $filter_chunks[0]).')'.
+				' AND field NOT IN ('.implode(',', $filter_chunks[1]).')'.
+				' AND field NOT IN ('.implode(',', $filter_chunks[2]).')'.
+			')'
+		];
+	}
+
+	private static function getValuesAndFilterChunks(int $value_count): array {
+		$values = [];
+		$filter_chunks = [];
+		$filter_chunk = [];
+
+		for ($i = 1; $i <= $value_count; $i++) {
+			$values[] = (string) $i;
+			$filter_chunk[] = '\''.$i.'\'';
+
+			if ($i % self::FILTER_CHUNK_SIZE == 0 || $i == $value_count) {
+				$filter_chunks[] = $filter_chunk;
+				$filter_chunk = [];
+			}
+		}
+
+		return [$values, $filter_chunks];
 	}
 
 	/**

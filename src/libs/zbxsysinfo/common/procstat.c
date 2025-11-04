@@ -538,6 +538,11 @@ static void	procstat_free_query_data(zbx_procstat_query_data_t *data)
 	zbx_free(data);
 }
 
+static void	procstat_free_query_data_wrapper(void *data)
+{
+	procstat_free_query_data((zbx_procstat_query_data_t*)data);
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: Tries to compress (remove inactive queries) the procstat shared   *
@@ -1099,7 +1104,7 @@ clean:
 	zbx_proc_free_processes(&processes);
 	zbx_vector_ptr_destroy(&processes);
 
-	zbx_vector_ptr_clear_ext(&queries, (zbx_mem_free_func_t)procstat_free_query_data);
+	zbx_vector_ptr_clear_ext(&queries, procstat_free_query_data_wrapper);
 	zbx_vector_ptr_destroy(&queries);
 out:
 	runid++;

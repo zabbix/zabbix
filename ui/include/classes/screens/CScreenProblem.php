@@ -1109,14 +1109,21 @@ class CScreenProblem extends CScreenBase {
 				]));
 			}
 
-			$tags = $this->data['filter']['show_tags']
-				? makeTags($data['problems'] + $symptom_data['problems'], true, 'eventid',
-					$this->data['filter']['show_tags'], array_key_exists('tags', $this->data['filter'])
-						? $this->data['filter']['tags']
-						: [],
-					null, $this->data['filter']['tag_name_format'], $this->data['filter']['tag_priority']
-				)
-				: [];
+			$tags = [];
+
+			if ($this->data['filter']['show_tags']) {
+				$object_type = $this->data['filter']['show'] == TRIGGERS_OPTION_ALL
+					? ZBX_TAG_OBJECT_EVENT
+					: ZBX_TAG_OBJECT_PROBLEM;
+
+				$tags = CTagHelper::getTagsHtml($data['problems'] + $symptom_data['problems'], $object_type, [
+					'filter_tags' =>
+						array_key_exists('tags', $this->data['filter']) ? $this->data['filter']['tags'] : [],
+					'tag_priority' => $this->data['filter']['tag_priority'],
+					'show_tags_limit' => $this->data['filter']['show_tags'],
+					'tag_name_format' => $this->data['filter']['tag_name_format']
+				]);
+			}
 
 			$triggers_hosts = $data['problems'] ? makeTriggersHostsList($triggers_hosts) : [];
 
@@ -1166,11 +1173,9 @@ class CScreenProblem extends CScreenBase {
 			return $this->getOutput($form->addItem([$table, $footer]), false, $this->data);
 		}
 
-		/*
-		 * Search limit performs +1 selection to know if limit was exceeded, this will assure that CSV has
-		 * "search_limit" records at most.
-		 */
-		array_splice($data['problems'], $this->data['limit']);
+		if (count($data['problems']) > $this->data['limit']) {
+			array_pop($data['problems']);
+		}
 
 		$csv = [];
 
@@ -1189,8 +1194,7 @@ class CScreenProblem extends CScreenBase {
 			_('Tags')
 		]);
 
-		// Make tags from all events.
-		$tags = makeTags($data['problems'] + $symptom_data['problems'], false);
+		$tags = CTagHelper::getTagsRaw($data['problems'] + $symptom_data['problems']);
 
 		// Get cause event names for symptoms.
 		$causes = [];

@@ -159,6 +159,11 @@ void	lld_entry_clear(zbx_lld_entry_t *entry)
 	zbx_vector_lld_macro_destroy(&entry->macros);
 }
 
+void	lld_entry_clear_wrapper(void *data)
+{
+	lld_entry_clear((zbx_lld_entry_t*)data);
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: lld_entry_get_macro                                              *

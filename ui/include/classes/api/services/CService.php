@@ -61,15 +61,15 @@ class CService extends CApiService {
 			'deep_parentids' =>			['type' => API_BOOLEAN, 'default' => false],
 			'childids' =>				['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
 			'evaltype' =>				['type' => API_INT32, 'in' => implode(',', [TAG_EVAL_TYPE_AND_OR, TAG_EVAL_TYPE_OR]), 'default' => TAG_EVAL_TYPE_AND_OR],
-			'tags' =>					['type' => API_OBJECTS, 'default' => [], 'fields' => [
+			'tags' =>					['type' => API_OBJECTS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null, 'fields' => [
 				'tag' =>					['type' => API_STRING_UTF8, 'flags' => API_REQUIRED],
-				'value' =>					['type' => API_STRING_UTF8],
-				'operator' =>				['type' => API_INT32, 'in' => implode(',', [TAG_OPERATOR_LIKE, TAG_OPERATOR_EQUAL, TAG_OPERATOR_NOT_LIKE, TAG_OPERATOR_NOT_EQUAL, TAG_OPERATOR_EXISTS, TAG_OPERATOR_NOT_EXISTS])]
+				'operator' =>				['type' => API_INT32, 'in' => implode(',', [TAG_OPERATOR_LIKE, TAG_OPERATOR_EQUAL, TAG_OPERATOR_NOT_LIKE, TAG_OPERATOR_NOT_EQUAL, TAG_OPERATOR_EXISTS, TAG_OPERATOR_NOT_EXISTS]), 'default' => TAG_OPERATOR_LIKE],
+				'value' =>					['type' => API_STRING_UTF8, 'default' => '']
 			]],
-			'problem_tags' =>			['type' => API_OBJECTS, 'default' => [], 'fields' => [
+			'problem_tags' =>			['type' => API_OBJECTS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null, 'fields' => [
 				'tag' =>					['type' => API_STRING_UTF8, 'flags' => API_REQUIRED],
-				'value' =>					['type' => API_STRING_UTF8],
-				'operator' =>				['type' => API_INT32, 'in' => implode(',', [TAG_OPERATOR_LIKE, TAG_OPERATOR_EQUAL, TAG_OPERATOR_NOT_LIKE, TAG_OPERATOR_NOT_EQUAL, TAG_OPERATOR_EXISTS, TAG_OPERATOR_NOT_EXISTS])]
+				'operator' =>				['type' => API_INT32, 'in' => implode(',', [TAG_OPERATOR_LIKE, TAG_OPERATOR_EQUAL, TAG_OPERATOR_NOT_LIKE, TAG_OPERATOR_NOT_EQUAL, TAG_OPERATOR_EXISTS, TAG_OPERATOR_NOT_EXISTS]), 'default' => TAG_OPERATOR_LIKE],
+				'value' =>					['type' => API_STRING_UTF8, 'default' => '']
 			]],
 			'without_problem_tags' =>	['type' => API_BOOLEAN, 'default' => false],
 			'slaids' =>					['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
@@ -84,8 +84,8 @@ class CService extends CApiService {
 			'countOutput' =>			['type' => API_FLAG, 'default' => false],
 			'selectParents' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT, 'in' => implode(',', self::OUTPUT_FIELDS), 'default' => null],
 			'selectChildren' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT, 'in' => implode(',', self::OUTPUT_FIELDS), 'default' => null],
-			'selectTags' =>				['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT, 'in' => implode(',', ['tag', 'value']), 'default' => null],
-			'selectProblemTags' =>		['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT, 'in' => implode(',', ['tag', 'operator', 'value']), 'default' => null],
+			'selectTags' =>				['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT | API_NORMALIZE, 'in' => implode(',', ['tag', 'value']), 'default' => null],
+			'selectProblemTags' =>		['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT | API_NORMALIZE, 'in' => implode(',', ['tag', 'operator', 'value']), 'default' => null],
 			'selectProblemEvents' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT, 'in' => implode(',', ['eventid', 'severity', 'name']), 'default' => null],
 			'selectStatusRules' =>		['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT, 'in' => implode(',', ['type', 'limit_value', 'limit_status', 'new_status']), 'default' => null],
 			'selectStatusTimeline' =>	['type' => API_OBJECTS, 'flags' => API_ALLOW_NULL | API_NOT_EMPTY, 'uniq' => [['period_from', 'period_to']], 'default' => null, 'fields' => [
@@ -582,14 +582,14 @@ class CService extends CApiService {
 		}
 
 		if ($options['tags']) {
-			$sql_parts['where'][] = CApiTagHelper::addWhereCondition($options['tags'], $options['evaltype'], 's',
+			$sql_parts['where'][] = CApiTagHelper::getTagCondition($options['tags'], $options['evaltype'], ['s'],
 				'service_tag', 'serviceid'
 			);
 		}
 
 		if ($options['problem_tags']) {
-			$sql_parts['where'][] = CApiTagHelper::addWhereCondition($options['problem_tags'], $options['evaltype'],
-				's', 'service_problem_tag', 'serviceid'
+			$sql_parts['where'][] = CApiTagHelper::getTagCondition($options['problem_tags'], $options['evaltype'],
+				['s'], 'service_problem_tag', 'serviceid'
 			);
 		}
 		elseif ($options['without_problem_tags']) {
@@ -742,95 +742,86 @@ class CService extends CApiService {
 		unset($row);
 	}
 
-	/**
-	 * @param array $options
-	 * @param array $result
-	 */
-	private static function addRelatedTags(array $options, array &$result): void {
+	private static function addRelatedTags(array $options, array &$services): void {
 		if ($options['selectTags'] === null) {
 			return;
 		}
 
-		foreach ($result as &$row) {
-			$row['tags'] = [];
-		}
-		unset($row);
-
 		if ($options['selectTags'] === API_OUTPUT_COUNT) {
-			$output = ['servicetagid', 'serviceid'];
+			foreach ($services as &$service) {
+				$service['tags'] = '0';
+			}
+			unset($service);
+
+			$resource = DBselect(
+				'SELECT st.serviceid,COUNT(st.servicetagid) AS rowscount'.
+				' FROM service_tag st'.
+				' WHERE '.dbConditionId('st.serviceid', array_keys($services)).
+				' GROUP BY st.serviceid'
+			);
+
+			while ($row = DBfetch($resource)) {
+				$services[$row['serviceid']]['tags'] = $row['rowscount'];
+			}
+
+			return;
 		}
-		elseif ($options['selectTags'] === API_OUTPUT_EXTEND) {
-			$output = ['servicetagid', 'serviceid', 'tag', 'value'];
+
+		foreach ($services as &$service) {
+			$service['tags'] = [];
 		}
-		else {
-			$output = array_unique(array_merge(['servicetagid', 'serviceid'], $options['selectTags']));
-		}
+		unset($service);
 
 		$sql_options = [
-			'output' => $output,
-			'filter' => ['serviceid' => array_keys($result)]
+			'output' => array_merge(['servicetagid', 'serviceid'], $options['selectTags']),
+			'filter' => ['serviceid' => array_keys($services)]
 		];
-		$db_tags = DBselect(DB::makeSql('service_tag', $sql_options));
+		$resource = DBselect(DB::makeSql('service_tag', $sql_options));
 
-		while ($db_tag = DBfetch($db_tags)) {
-			$serviceid = $db_tag['serviceid'];
-
-			unset($db_tag['servicetagid'], $db_tag['serviceid']);
-
-			$result[$serviceid]['tags'][] = $db_tag;
-		}
-
-		if ($options['selectTags'] === API_OUTPUT_COUNT) {
-			foreach ($result as &$row) {
-				$row['tags'] = (string) count($row['tags']);
-			}
-			unset($row);
+		while ($row = DBfetch($resource)) {
+			$services[$row['serviceid']]['tags'][] = array_diff_key($row, array_flip(['servicetagid', 'serviceid']));
 		}
 	}
 
-	/**
-	 * @param array $options
-	 * @param array $result
-	 */
-	private static function addRelatedProblemTags(array $options, array &$result): void {
+	private static function addRelatedProblemTags(array $options, array &$services): void {
 		if ($options['selectProblemTags'] === null) {
 			return;
 		}
 
-		foreach ($result as &$row) {
-			$row['problem_tags'] = [];
-		}
-		unset($row);
-
 		if ($options['selectProblemTags'] === API_OUTPUT_COUNT) {
-			$output = ['service_problem_tagid', 'serviceid'];
+			foreach ($services as &$service) {
+				$service['problem_tags'] = '0';
+			}
+			unset($service);
+
+			$resource = DBselect(
+				'SELECT spt.serviceid,COUNT(spt.service_problem_tagid) AS rowscount'.
+				' FROM service_problem_tag spt'.
+				' WHERE '.dbConditionId('spt.serviceid', array_keys($services)).
+				' GROUP BY spt.serviceid'
+			);
+
+			while ($row = DBfetch($resource)) {
+				$services[$row['serviceid']]['problem_tags'] = $row['rowscount'];
+			}
+
+			return;
 		}
-		elseif ($options['selectProblemTags'] === API_OUTPUT_EXTEND) {
-			$output = ['service_problem_tagid', 'serviceid', 'tag', 'operator', 'value'];
+
+		foreach ($services as &$service) {
+			$service['problem_tags'] = [];
 		}
-		else {
-			$output = array_unique(array_merge(['service_problem_tagid', 'serviceid'], $options['selectProblemTags']));
-		}
+		unset($service);
 
 		$sql_options = [
-			'output' => $output,
-			'filter' => ['serviceid' => array_keys($result)]
+			'output' => array_merge(['service_problem_tagid', 'serviceid'], $options['selectProblemTags']),
+			'filter' => ['serviceid' => array_keys($services)]
 		];
-		$db_problem_tags = DBselect(DB::makeSql('service_problem_tag', $sql_options));
+		$resource = DBselect(DB::makeSql('service_problem_tag', $sql_options));
 
-		while ($db_problem_tag = DBfetch($db_problem_tags)) {
-			$serviceid = $db_problem_tag['serviceid'];
-
-			unset($db_problem_tag['service_problem_tagid'], $db_problem_tag['serviceid']);
-
-			$result[$serviceid]['problem_tags'][] = $db_problem_tag;
-		}
-
-		if ($options['selectProblemTags'] === API_OUTPUT_COUNT) {
-			foreach ($result as &$row) {
-				$row['problem_tags'] = (string) count($row['problem_tags']);
-			}
-			unset($row);
+		while ($row = DBfetch($resource)) {
+			$services[$row['serviceid']]['problem_tags'][] =
+				array_diff_key($row, array_flip(['service_problem_tagid', 'serviceid']));
 		}
 	}
 

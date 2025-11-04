@@ -152,6 +152,11 @@ static void	event_ptr_free(zbx_event_t **event)
 	event_free(*event);
 }
 
+static void	event_ptr_free_wrapper(void *data)
+{
+	event_ptr_free((zbx_event_t**)data);
+}
+
 static zbx_hash_t	default_uint64_ptr_hash_func(const void *d)
 {
 	return ZBX_DEFAULT_UINT64_HASH_FUNC(*(const zbx_uint64_t * const *)d);
@@ -1224,16 +1229,31 @@ static void	service_clean(zbx_service_t *service)
 	zbx_vector_service_problem_ptr_destroy(&service->service_problems);
 }
 
+static void	service_clean_wrapper(void *data)
+{
+	service_clean((zbx_service_t*)data);
+}
+
 static void	service_tag_clean(zbx_service_tag_t *tag)
 {
 	zbx_free(tag->name);
 	zbx_free(tag->value);
 }
 
+static void	service_tag_clean_wrapper(void *data)
+{
+	service_tag_clean((zbx_service_tag_t*)data);
+}
+
 static void	service_problem_tag_clean(zbx_service_problem_tag_t *service_problem_tag)
 {
 	zbx_free(service_problem_tag->tag);
 	zbx_free(service_problem_tag->value);
+}
+
+static void	service_problem_tag_clean_wrapper(void *data)
+{
+	service_problem_tag_clean((zbx_service_problem_tag_t*)data);
 }
 
 static void	service_diff_clean(void *data)
@@ -1252,10 +1272,20 @@ static void	service_action_clean(zbx_service_action_t *action)
 	zbx_vector_service_action_condition_ptr_destroy(&action->conditions);
 }
 
+static void	service_action_clean_wrapper(void *data)
+{
+	service_action_clean((zbx_service_action_t*)data);
+}
+
 static void	service_action_condition_clean(zbx_service_action_condition_t *condition)
 {
 	zbx_free(condition->value);
 	zbx_free(condition->value2);
+}
+
+static void	service_action_condition_clean_wrapper(void *data)
+{
+	service_action_condition_clean((zbx_service_action_condition_t*)data);
 }
 
 static zbx_hash_t	tag_services_hash(const void *data)
@@ -3242,11 +3272,11 @@ out:
 static void	service_manager_create_event_cache(zbx_service_manager_t *service_manager)
 {
 	zbx_hashset_create_ext(&service_manager->problem_events, 1000, default_uint64_ptr_hash_func,
-			ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC, (zbx_clean_func_t)event_ptr_free,
+			ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC, event_ptr_free_wrapper,
 			ZBX_DEFAULT_MEM_MALLOC_FUNC, ZBX_DEFAULT_MEM_REALLOC_FUNC, ZBX_DEFAULT_MEM_FREE_FUNC);
 
 	zbx_hashset_create_ext(&service_manager->recovery_events, 1, default_uint64_ptr_hash_func,
-			ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC, (zbx_clean_func_t)event_ptr_free,
+			ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC, event_ptr_free_wrapper,
 			ZBX_DEFAULT_MEM_MALLOC_FUNC, ZBX_DEFAULT_MEM_REALLOC_FUNC, ZBX_DEFAULT_MEM_FREE_FUNC);
 
 	zbx_hashset_create(&service_manager->deleted_eventids, 1000, ZBX_DEFAULT_UINT64_HASH_FUNC,
@@ -3265,18 +3295,18 @@ static void	service_manager_init(zbx_service_manager_t *service_manager)
 	service_manager_create_event_cache(service_manager);
 
 	zbx_hashset_create_ext(&service_manager->services, 1000, ZBX_DEFAULT_UINT64_HASH_FUNC,
-			ZBX_DEFAULT_UINT64_COMPARE_FUNC, (zbx_clean_func_t)service_clean,
+			ZBX_DEFAULT_UINT64_COMPARE_FUNC, service_clean_wrapper,
 			ZBX_DEFAULT_MEM_MALLOC_FUNC, ZBX_DEFAULT_MEM_REALLOC_FUNC, ZBX_DEFAULT_MEM_FREE_FUNC);
 
 	zbx_hashset_create(&service_manager->service_rules, 1000, ZBX_DEFAULT_UINT64_HASH_FUNC,
 			ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 	zbx_hashset_create_ext(&service_manager->service_tags, 1000, ZBX_DEFAULT_UINT64_HASH_FUNC,
-			ZBX_DEFAULT_UINT64_COMPARE_FUNC, (zbx_clean_func_t)service_tag_clean,
+			ZBX_DEFAULT_UINT64_COMPARE_FUNC, service_tag_clean_wrapper,
 			ZBX_DEFAULT_MEM_MALLOC_FUNC, ZBX_DEFAULT_MEM_REALLOC_FUNC, ZBX_DEFAULT_MEM_FREE_FUNC);
 
 	zbx_hashset_create_ext(&service_manager->service_problem_tags, 1000, ZBX_DEFAULT_UINT64_HASH_FUNC,
-			ZBX_DEFAULT_UINT64_COMPARE_FUNC, (zbx_clean_func_t)service_problem_tag_clean,
+			ZBX_DEFAULT_UINT64_COMPARE_FUNC, service_problem_tag_clean_wrapper,
 			ZBX_DEFAULT_MEM_MALLOC_FUNC, ZBX_DEFAULT_MEM_REALLOC_FUNC, ZBX_DEFAULT_MEM_FREE_FUNC);
 
 	zbx_hashset_create_ext(&service_manager->service_problem_tags_index, 1000, tag_services_hash,
@@ -3295,11 +3325,11 @@ static void	service_manager_init(zbx_service_manager_t *service_manager)
 			ZBX_DEFAULT_MEM_REALLOC_FUNC, ZBX_DEFAULT_MEM_FREE_FUNC);
 
 	zbx_hashset_create_ext(&service_manager->actions, 1000, ZBX_DEFAULT_UINT64_HASH_FUNC,
-			ZBX_DEFAULT_UINT64_COMPARE_FUNC, (zbx_clean_func_t)service_action_clean,
+			ZBX_DEFAULT_UINT64_COMPARE_FUNC, service_action_clean_wrapper,
 			ZBX_DEFAULT_MEM_MALLOC_FUNC, ZBX_DEFAULT_MEM_REALLOC_FUNC, ZBX_DEFAULT_MEM_FREE_FUNC);
 
 	zbx_hashset_create_ext(&service_manager->action_conditions, 1000, ZBX_DEFAULT_UINT64_HASH_FUNC,
-			ZBX_DEFAULT_UINT64_COMPARE_FUNC, (zbx_clean_func_t)service_action_condition_clean,
+			ZBX_DEFAULT_UINT64_COMPARE_FUNC, service_action_condition_clean_wrapper,
 			ZBX_DEFAULT_MEM_MALLOC_FUNC, ZBX_DEFAULT_MEM_REALLOC_FUNC, ZBX_DEFAULT_MEM_FREE_FUNC);
 
 	memset(&service_manager->severities, 0, sizeof(service_manager->severities));

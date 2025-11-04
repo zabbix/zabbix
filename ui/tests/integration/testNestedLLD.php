@@ -22,7 +22,6 @@ require_once dirname(__FILE__) . '/../include/CIntegrationTest.php';
  * @required-components server
  * @configurationDataProvider serverConfigurationProvider
  * @backup hosts,items,item_rtdata,triggers,actions,operations,graphs
- * @onAfter clearData
  *
  */
 class testNestedLLD extends CIntegrationTest{
@@ -2581,25 +2580,5 @@ class testNestedLLD extends CIntegrationTest{
 		];
 
 		$itemsTest(self::$hostid_macros, $expected_item_keys);
-	}
-
-	/**
-	 * Delete data objects created for this test suite
-	 *
-	 */
-	public static function clearData(): void {
-		try {
-			/* Nested LLD test */
-			CDataHelper::call('itemprototype.delete', [self::$lld_item_protoid_macros_1st_level]);
-			CDataHelper::call('discoveryruleprototype.delete', [self::$lld_drule_protoid_macros_1st_level]);
-			CDataHelper::call('itemprototype.delete', [self::$lld_item_protoid_macros_root]);
-			CDataHelper::call('discoveryrule.delete', [self::$lld_ruleid_macros_root]);
-			CDataHelper::call('host.delete', [self::$hostid_macros]);
-		} catch (Exception $e) {
-			/* This should never happen. */
-			printf("Test cleanup failed.\nMessage: %s\nFile: %s\nLine: %d\nException code: %s\nTrace:\n%s\n",
-				$e->getMessage(), $e->getFile(), $e->getLine(), $e->getCode(), $e->getTraceAsString()
-			);
-		}
 	}
 }
