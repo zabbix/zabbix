@@ -134,7 +134,7 @@ class CHostInterface extends CApiService {
 			zbx_value2array($options['triggerids']);
 
 			$sqlParts['join']['i'] = ['table' => 'items', 'using' => 'interfaceid'];
-			$sql_parts['join']['f'] = ['table' => 'functions', 'using' => 'itemid', 'left_table' => 'i'];
+			$sqlParts['join']['f'] = ['table' => 'functions', 'using' => 'itemid', 'left_table' => 'i'];
 			$sqlParts['where'][] = dbConditionInt('f.triggerid', $options['triggerids']);
 		}
 
