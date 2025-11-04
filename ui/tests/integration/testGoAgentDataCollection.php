@@ -636,7 +636,7 @@ class testGoAgentDataCollection extends CIntegrationTest {
 					$b = substr($b, 0, $item['threshold']);
 				}
 
-				$this->assertEquals($a."+++", $b."---", 'Strings do not match for '.$item['key']);
+				$this->assertEquals($a, $b, 'Strings do not match for '.$item['key']);
 				break;
 
 			case ITEM_VALUE_TYPE_FLOAT:
