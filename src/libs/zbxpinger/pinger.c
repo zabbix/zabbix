@@ -571,12 +571,13 @@ static int	process_pinger_hosts(zbx_hashset_t *pinger_items, int process_num, in
 {
 #define EXEC_TIME_DELTA	1
 
-	int				ping_result, processed_num = 0, max_execution_time;
+	int				ping_result, processed_num = 0;
 	char				error[ZBX_ITEM_ERROR_LEN_MAX];
 	zbx_vector_fping_host_t		hosts;
 	zbx_timespec_t			ts;
 	zbx_hashset_iter_t		iter;
 	zbx_pinger_t			*pinger;
+	double 				max_execution_time;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
