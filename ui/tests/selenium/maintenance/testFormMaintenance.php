@@ -162,7 +162,7 @@ class testFormMaintenance extends CLegacyWebTest {
 					'fields' => [
 						'Period type' => 'One time only'
 						]
-					],
+					]
 			],
 			// #1 New maintenance with Daily period.
 			[
@@ -171,7 +171,7 @@ class testFormMaintenance extends CLegacyWebTest {
 					'fields' => [
 						'Period type' => 'Daily'
 						]
-					],
+					]
 			],
 			// #2 New maintenance with Weekly period.
 			[
@@ -180,7 +180,7 @@ class testFormMaintenance extends CLegacyWebTest {
 					'fields' => [
 						'Period type' => 'Weekly'
 						]
-					],
+					]
 			],
 			// #3 New maintenance with Monthly with Day of month period.
 			[
@@ -189,7 +189,7 @@ class testFormMaintenance extends CLegacyWebTest {
 					'fields' => [
 						'Period type' => 'Monthly'
 						]
-					],
+					]
 			],
 			// #4 New maintenance with Monthly with Day of week period.
 			[
@@ -199,7 +199,7 @@ class testFormMaintenance extends CLegacyWebTest {
 						'Period type' => 'Monthly',
 						'Date' => 'Day of week'
 						]
-					],
+					]
 			]
 		];
 	}
