@@ -17,13 +17,9 @@ INCS =	$(INCS) /I "$(CURLINCDIR)"
 !	ENDIF
 
 !	IF "$(CURLLIBDIR)" != ""
-!		IF EXISTS("$(CURLLIBDIR)\libcurl_a.lib")
-LIBS =	$(LIBS) "$(CURLLIBDIR)\libcurl_a.lib" Crypt32.lib Normaliz.lib Secur32.lib
-!		ELSEIF EXISTS("$(CURLLIBDIR)\libcurl.lib")
-LIBS =	$(LIBS) "$(CURLLIBDIR)\libcurl.lib" Crypt32.lib Normaliz.lib Secur32.lib
-!		ELSEIF EXISTS("$(CURLLIBDIR)\libcurl_imp.lib") # else if CURL was installed with vcpkg
-LIBS =	$(LIBS) "$(CURLLIBDIR)\libcurl_imp.lib" $(LIBS)
+!		IF EXISTS("$(CURLLIBDIR)\libcurl.lib")
+LIBS = $(LIBS) "$(CURLLIBDIR)\libcurl.lib" Crypt32.lib
 !		ELSE
-!			ERROR CURLLIBDIR "$(CURLLIBDIR)" cannot find libcurl_a.lib, libcurl.lib or libcurl_imp.lib
+!			ERROR CURLLIBDIR "$(CURLLIBDIR)" cannot find "$(CURLLIBDIR)\libcurl.lib"
 !		ENDIF
 !	ENDIF
