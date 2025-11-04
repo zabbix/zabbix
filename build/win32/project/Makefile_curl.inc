@@ -1,9 +1,9 @@
-!	IF "$(CURL)" == "yes"
+!	IF "$(CURL)" != ""
 !		IF "$(CURLINCDIR)" == ""
-CURLINCDIR = C:\Program Files\Zabbix\x64\curl\include
+CURLINCDIR=$(CURL)\include
 !		ENDIF
 !		IF "$(CURLLIBDIR)" == ""
-CURLLIBDIR = C:\Program Files\Zabbix\x64\curl\lib
+CURLLIBDIR=$(CURL)\lib
 !		ENDIF
 !	ENDIF
 
