@@ -3072,15 +3072,6 @@ class testSla extends CAPITest {
 					'error' => 'Invalid parameter "/service_tags": an array is expected.'
 				]
 			],
-			'service_tags null' => [
-				'request' => [
-					'output' => [],
-					'service_tags' => null
-				],
-				'expected' => [
-					'error' => 'Invalid parameter "/service_tags": an array is expected.'
-				]
-			],
 			'service_tags float' => [
 				'request' => [
 					'output' => [],
@@ -3848,6 +3839,24 @@ class testSla extends CAPITest {
 					'result' => []
 				]
 			],
+			'service_tags null' => [
+				'request' => [
+					'output' => [],
+					'service_tags' => null
+				],
+				'expected' => [
+					'error' => null
+				]
+			],
+			'service_tags empty array' => [
+				'request' => [
+					'output' => [],
+					'service_tags' => []
+				],
+				'expected' => [
+					'error' => null
+				]
+			],
 			'service_tags no value' => [
 				'request' => [
 					'output' => [],
@@ -4431,15 +4440,11 @@ class testSla extends CAPITest {
 	public function testSla_Get(array $request, array $expected): void {
 		$response = $this->call('sla.get', $request, $expected['error']);
 
-		if ($expected['error'] !== null) {
+		if ($expected['error'] !== null || !array_key_exists('result', $expected)) {
 			return;
 		}
 
-		if (!array_key_exists('result', $expected)) {
-			return;
-		}
-
-		$this->assertEquals($response['result'], $expected['result']);
+		$this->assertEquals($expected['result'], $response['result']);
 	}
 
 	public static function sla_delete_data_invalid(): array {

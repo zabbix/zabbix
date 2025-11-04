@@ -17,7 +17,6 @@
 #include "zbxmockassert.h"
 #include "zbxmockutil.h"
 
-#include "zbxexpression.h"
 #include "zbxcommon.h"
 #include "zbxeval.h"
 #include "mock_eval.h"
