@@ -1016,8 +1016,7 @@ class CApiInputValidator {
 				$value = (float) $number_parser->getMatch();
 			}
 			else {
-
-				if (self::checkMacrosSyntax($data, $flags)) {
+				if (self::hasValidMacros([$data], $flags)) {
 					return true;
 				}
 
@@ -1514,8 +1513,13 @@ class CApiInputValidator {
 			}
 
 			if (array_key_exists('compare', $field_rule)) {
-				$field_rule['compare']['path'] = ($path === '/' ? $path : $path.'/').$field_rule['compare']['field'];
-				$field_rule['compare']['value'] = $data[$field_rule['compare']['field']];
+				if (self::hasValidMacros($data, $flags)) {
+					unset($field_rule['compare']);
+				}
+				else {
+					$field_rule['compare']['path'] = ($path === '/' ? $path : $path.'/').$field_rule['compare']['field'];
+					$field_rule['compare']['value'] = $data[$field_rule['compare']['field']];
+				}
 			}
 
 			if (array_key_exists('preproc_type', $field_rule)) {
@@ -2860,7 +2864,7 @@ class CApiInputValidator {
 			return false;
 		}
 
-		if (self::checkMacrosSyntax($data, $flags)) {
+		if (self::hasValidMacros([$data], $flags)) {
 			return true;
 		}
 
@@ -4124,13 +4128,6 @@ class CApiInputValidator {
 					'2' => ['type' => API_FLOAT, 'flags' => API_REQUIRED | API_ALLOW_NULL | ($flags & API_ALLOW_USER_MACRO) | ($flags & API_ALLOW_LLD_MACRO), 'compare' => ['operator' => '>', 'field' => '1']]
 				]];
 
-				foreach ($params as $param) {
-					if ($param !== null && self::checkMacrosSyntax($param, $flags)) {
-						unset($api_input_rules['fields']['2']['compare']);
-						break;
-					}
-				}
-
 				break;
 
 			case ZBX_PREPROC_VALIDATE_REGEX:
@@ -4341,7 +4338,7 @@ class CApiInputValidator {
 		return self::validateUserMacro($rule, $data, $path, $error);
 	}
 
-	private static function checkMacrosSyntax(string $string, int $flags): bool {
+	private static function hasValidMacros(array $strings, int $flags): bool {
 		$macro_parsers = [];
 		if ($flags & API_ALLOW_USER_MACRO) {
 			$macro_parsers[] = new CUserMacroParser();
@@ -4351,10 +4348,11 @@ class CApiInputValidator {
 			$macro_parsers[] = new CLLDMacroParser();
 			$macro_parsers[] = new CLLDMacroFunctionParser();
 		}
-
-		foreach ($macro_parsers as $macro_parser) {
-			if ($macro_parser->parse($string) == CParser::PARSE_SUCCESS) {
-				return true;
+		foreach ($strings as $string) {
+			foreach ($macro_parsers as $macro_parser) {
+				if ($macro_parser->parse($string) == CParser::PARSE_SUCCESS) {
+					return true;
+				}
 			}
 		}
 
