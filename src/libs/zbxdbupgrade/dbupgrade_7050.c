@@ -117,7 +117,6 @@ static int	DBpatch_7050010(void)
 			" where triggerid in ("
 				"select triggerid"
 				" from trigger_discovery"
-				" where parent_triggerid is not null"
 			")"))
 	{
 		return FAIL;
