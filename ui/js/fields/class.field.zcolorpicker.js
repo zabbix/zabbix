@@ -13,7 +13,7 @@
 **/
 
 
-class ClassFieldZColorPicker extends CField {
+class CFieldZColorPicker extends CField {
 
 	init() {
 		super.init();
