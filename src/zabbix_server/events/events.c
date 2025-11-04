@@ -17,7 +17,6 @@
 #include "../db_lengths_constants.h"
 #include "../actions/actions.h"
 
-#include "zbxexpression.h"
 #include "zbxexport.h"
 #include "zbxservice.h"
 #include "zbxnum.h"
@@ -58,6 +57,9 @@ typedef struct
 	zbx_vector_tags_ptr_t	tags;
 }
 zbx_event_problem_t;
+
+ZBX_PTR_VECTOR_DECL(event_problem_ptr, zbx_event_problem_t *)
+ZBX_PTR_VECTOR_IMPL(event_problem_ptr, zbx_event_problem_t *)
 
 typedef struct
 {
@@ -451,8 +453,13 @@ zbx_db_event	*zbx_add_event(unsigned char source, unsigned char object, zbx_uint
 		zbx_substitute_macros(&event->trigger.correlation_tag, err, sizeof(err), &macro_trigger_tag_resolv,
 				um_handle, event, NULL);
 
-		zbx_substitute_simple_macros(NULL, event, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
-				&event->name, ZBX_MACRO_TYPE_EVENT_NAME, err, sizeof(err));
+		zbx_token_search_t	search_token = ZBX_TOKEN_SEARCH_REFERENCES;
+
+		if (EVENT_SOURCE_TRIGGERS == event->source)
+			search_token |= ZBX_TOKEN_SEARCH_EXPRESSION_MACRO;
+
+		zbx_substitute_macros_ext_search(search_token, &event->name, err, sizeof(err),
+				&zbx_macro_event_name_resolv, um_handle, event, NULL);
 
 		zbx_vector_tags_ptr_create(&event->tags);
 
@@ -2616,13 +2623,13 @@ static void	event_problem_free(zbx_event_problem_t *problem)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: gets open problems created by the specified triggers              *
+ * Purpose: gets open problems created by specified triggers                  *
  *                                                                            *
  * Parameters: triggerids - [IN] trigger identifiers (sorted)                 *
  *             problems   - [OUT]                                             *
  *                                                                            *
  ******************************************************************************/
-static void	get_open_problems(const zbx_vector_uint64_t *triggerids, zbx_vector_ptr_t *problems)
+static void	get_open_problems(const zbx_vector_uint64_t *triggerids, zbx_vector_event_problem_ptr_t *problems)
 {
 	zbx_db_result_t		result;
 	zbx_db_row_t		row;
@@ -2630,7 +2637,6 @@ static void	get_open_problems(const zbx_vector_uint64_t *triggerids, zbx_vector_
 	size_t			sql_alloc = 0, sql_offset = 0;
 	zbx_event_problem_t	*problem;
 	zbx_tag_t		*tag;
-	zbx_uint64_t		eventid;
 	int			index;
 	zbx_vector_uint64_t	eventids;
 
@@ -2651,7 +2657,7 @@ static void	get_open_problems(const zbx_vector_uint64_t *triggerids, zbx_vector_
 		ZBX_STR2UINT64(problem->eventid, row[0]);
 		ZBX_STR2UINT64(problem->triggerid, row[1]);
 		zbx_vector_tags_ptr_create(&problem->tags);
-		zbx_vector_ptr_append(problems, problem);
+		zbx_vector_event_problem_ptr_append(problems, problem);
 
 		zbx_vector_uint64_append(&eventids, problem->eventid);
 	}
@@ -2669,13 +2675,13 @@ static void	get_open_problems(const zbx_vector_uint64_t *triggerids, zbx_vector_
 			continue;
 
 		event_problem_free(problem);
-		zbx_vector_ptr_remove(problems, i);
+		zbx_vector_event_problem_ptr_remove(problems, i);
 		i--;
 	}
 
 	if (0 != problems->values_num)
 	{
-		zbx_vector_ptr_sort(problems, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
+		zbx_vector_event_problem_ptr_sort(problems, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
 
 		sql_offset = 0;
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "select eventid,tag,value from problem_tag where");
@@ -2685,15 +2691,18 @@ static void	get_open_problems(const zbx_vector_uint64_t *triggerids, zbx_vector_
 
 		while (NULL != (row = zbx_db_fetch(result)))
 		{
-			ZBX_STR2UINT64(eventid, row[0]);
-			if (FAIL == (index = zbx_vector_ptr_bsearch(problems, &eventid,
+			zbx_event_problem_t	event_problem_local;
+
+			ZBX_STR2UINT64(event_problem_local.eventid, row[0]);
+
+			if (FAIL == (index = zbx_vector_event_problem_ptr_bsearch(problems, &event_problem_local,
 					ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
 			{
 				THIS_SHOULD_NEVER_HAPPEN;
 				continue;
 			}
 
-			problem = (zbx_event_problem_t *)problems->values[index];
+			problem = problems->values[index];
 
 			tag = (zbx_tag_t *)zbx_malloc(NULL, sizeof(zbx_tag_t));
 			tag->tag = zbx_strdup(NULL, row[1]);
@@ -2811,8 +2820,6 @@ static int	match_tag(const char *name, const zbx_vector_tags_ptr_t *tags1, const
 
 /******************************************************************************
  *                                                                            *
- * Purpose: processes trigger events                                          *
- *                                                                            *
  * Parameters: trigger_events - [IN] trigger events to process                *
  *             trigger_diff   - [IN] trigger changeset                        *
  *                                                                            *
@@ -2822,7 +2829,7 @@ static void	process_trigger_events(const zbx_vector_ptr_t *trigger_events,
 {
 	int				i, j, index;
 	zbx_vector_uint64_t		triggerids;
-	zbx_vector_ptr_t		problems;
+	zbx_vector_event_problem_ptr_t	problems;
 	zbx_vector_trigger_dep_ptr_t	deps;
 	zbx_db_event			*event;
 	zbx_event_problem_t		*problem;
@@ -2832,8 +2839,8 @@ static void	process_trigger_events(const zbx_vector_ptr_t *trigger_events,
 	zbx_vector_uint64_create(&triggerids);
 	zbx_vector_uint64_reserve(&triggerids, trigger_events->values_num);
 
-	zbx_vector_ptr_create(&problems);
-	zbx_vector_ptr_reserve(&problems, trigger_events->values_num);
+	zbx_vector_event_problem_ptr_create(&problems);
+	zbx_vector_event_problem_ptr_reserve(&problems, trigger_events->values_num);
 
 	zbx_vector_trigger_dep_ptr_create(&deps);
 	zbx_vector_trigger_dep_ptr_reserve(&deps, trigger_events->values_num);
@@ -2915,7 +2922,7 @@ static void	process_trigger_events(const zbx_vector_ptr_t *trigger_events,
 			/* trigger value to OK                                           */
 			for (j = 0; j < problems.values_num; j++)
 			{
-				problem = (zbx_event_problem_t *)problems.values[j];
+				problem = problems.values[j];
 
 				if (problem->triggerid == event->objectid)
 				{
@@ -2939,7 +2946,7 @@ static void	process_trigger_events(const zbx_vector_ptr_t *trigger_events,
 
 			for (j = 0; j < problems.values_num; j++)
 			{
-				problem = (zbx_event_problem_t *)problems.values[j];
+				problem = problems.values[j];
 
 				if (problem->triggerid == event->objectid)
 				{
@@ -2960,8 +2967,8 @@ static void	process_trigger_events(const zbx_vector_ptr_t *trigger_events,
 		}
 	}
 
-	zbx_vector_ptr_clear_ext(&problems, (zbx_clean_func_t)event_problem_free);
-	zbx_vector_ptr_destroy(&problems);
+	zbx_vector_event_problem_ptr_clear_ext(&problems, event_problem_free);
+	zbx_vector_event_problem_ptr_destroy(&problems);
 
 	zbx_vector_trigger_dep_ptr_clear_ext(&deps, trigger_dep_free);
 	zbx_vector_trigger_dep_ptr_destroy(&deps);

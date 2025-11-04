@@ -126,8 +126,9 @@ foreach ($data['groups'] as $group) {
 				if ($data['allowed_ui_conf_hosts'] && $lld_rule['is_editable']
 						&& array_key_exists($lld_rule['itemid'], $data['ldd_rule_to_host_prototype'])) {
 					$lld_name = (new CLink($lld_rule['name'],
-						(new CUrl('host_prototypes.php'))
-							->setArgument('form', 'update')
+						(new CUrl('zabbix.php'))
+							->setArgument('action', 'popup')
+							->setArgument('popup', 'host.prototype.edit')
 							->setArgument('parent_discoveryid', $lld_rule['itemid'])
 							->setArgument('hostid', reset($data['ldd_rule_to_host_prototype'][$lld_rule['itemid']]))
 							->setArgument('context', 'host')

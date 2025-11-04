@@ -24,7 +24,10 @@ ZBX_PTR_VECTOR_DECL(item_preproc_ptr, zbx_template_item_preproc_t *)
 typedef struct _zbx_template_lld_macro_t zbx_template_lld_macro_t;
 ZBX_PTR_VECTOR_DECL(lld_macro_ptr, zbx_template_lld_macro_t *)
 
-typedef struct
+typedef struct _zbx_template_item_t zbx_template_item_t;
+ZBX_PTR_VECTOR_DECL(template_item_ptr, zbx_template_item_t *)
+
+struct _zbx_template_item_t
 {
 	zbx_uint64_t			itemid;
 #define ZBX_FLAG_TEMPLATE_ITEM_UPDATE_RESET_FLAG		__UINT64_C(0x0000000000000)
@@ -184,7 +187,7 @@ typedef struct
 	unsigned char			lifetime_type;
 	unsigned char			enabled_lifetime_type_orig;
 	unsigned char			enabled_lifetime_type;
-	zbx_vector_ptr_t		dependent_items;
+	zbx_vector_template_item_ptr_t	dependent_items;
 	zbx_vector_item_preproc_ptr_t	item_preprocs;
 	zbx_vector_item_preproc_ptr_t	template_preprocs;
 	zbx_vector_db_tag_ptr_t		item_tags;
@@ -193,8 +196,7 @@ typedef struct
 	zbx_vector_item_param_ptr_t	template_params;
 	zbx_vector_lld_macro_ptr_t	item_lld_macros;
 	zbx_vector_lld_macro_ptr_t	template_lld_macros;
-}
-zbx_template_item_t;
+};
 
 void	DBcopy_template_items(zbx_uint64_t hostid, const zbx_vector_uint64_t *templateids, int audit_context_mode);
 void	zbx_audit_item_update_json_add_data(int audit_context_mode, const zbx_template_item_t *item,

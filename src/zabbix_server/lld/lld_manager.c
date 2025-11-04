@@ -129,6 +129,11 @@ static void	lld_rule_clear(zbx_lld_rule_t *rule)
 	}
 }
 
+static void	lld_rule_clear_wrapper(void *data)
+{
+	lld_rule_clear((zbx_lld_rule_t*)data);
+}
+
 ZBX_PTR_VECTOR_IMPL(lld_rule_info_ptr, zbx_lld_rule_info_t*)
 
 static void	lld_manager_init(zbx_lld_manager_t *manager, zbx_get_config_forks_f get_config_forks_cb)
@@ -142,8 +147,8 @@ static void	lld_manager_init(zbx_lld_manager_t *manager, zbx_get_config_forks_f 
 	zbx_hashset_create(&manager->workers_client, 0, worker_hash_func, worker_compare_func);
 
 	zbx_hashset_create_ext(&manager->rule_index, 0, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC,
-			(zbx_clean_func_t)lld_rule_clear,
-			ZBX_DEFAULT_MEM_MALLOC_FUNC, ZBX_DEFAULT_MEM_REALLOC_FUNC, ZBX_DEFAULT_MEM_FREE_FUNC);
+			lld_rule_clear_wrapper, ZBX_DEFAULT_MEM_MALLOC_FUNC, ZBX_DEFAULT_MEM_REALLOC_FUNC,
+			ZBX_DEFAULT_MEM_FREE_FUNC);
 
 	zbx_binary_heap_create(&manager->rule_queue, rule_elem_compare_func, ZBX_BINARY_HEAP_OPTION_EMPTY);
 

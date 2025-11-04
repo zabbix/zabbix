@@ -20,7 +20,6 @@
 #include "zbx_expression_constants.h"
 #include "zbxevent.h"
 #include "zbxdbwrap.h"
-#include "zbxalgo.h"
 #include "zbxtime.h"
 
 static int	macro_message_normal_resolv(zbx_macro_resolv_data_t *p, va_list args, char **replace_to, char **data,
@@ -42,17 +41,10 @@ static int	macro_message_normal_resolv(zbx_macro_resolv_data_t *p, va_list args,
 	const zbx_db_service		*service = va_arg(args, const zbx_db_service *);
 	const char			*tz = va_arg(args, const char *);
 
-	/* Passed arguments holding cached data */
-	zbx_vector_uint64_t		*item_hosts = va_arg(args, zbx_vector_uint64_t *);
-	const zbx_vector_uint64_t	**trigger_hosts = va_arg(args, const zbx_vector_uint64_t **);
-	zbx_db_event			**cause_event = va_arg(args, zbx_db_event **);
-	zbx_db_event			**cause_recovery_event = va_arg(args, zbx_db_event **);
-
 	const zbx_db_event	*c_event = ((NULL != r_event) ? r_event : event);
 
 	ret = zbx_macro_message_common_resolv(p, um_handle, actionid, event, r_event, userid, dc_host, alert,
-			service_alarm, service, tz, item_hosts, trigger_hosts, cause_event, cause_recovery_event,
-			replace_to, data, error, maxerrlen);
+			service_alarm, service, tz, replace_to, data, error, maxerrlen);
 
 	if (SUCCEED == ret && NULL != p->macro)
 	{
@@ -97,17 +89,10 @@ static int	macro_message_update_resolv(zbx_macro_resolv_data_t *p, va_list args,
 	/* Specific passed arguments */
 	const zbx_db_acknowledge	*ack = va_arg(args, const zbx_db_acknowledge *);
 
-	/* Passed arguments holding cached data */
-	zbx_vector_uint64_t		*item_hosts = va_arg(args, zbx_vector_uint64_t *);
-	const zbx_vector_uint64_t	**trigger_hosts = va_arg(args, const zbx_vector_uint64_t **);
-	zbx_db_event			**cause_event = va_arg(args, zbx_db_event **);
-	zbx_db_event			**cause_recovery_event = va_arg(args, zbx_db_event **);
-
 	const zbx_db_event	*c_event = ((NULL != r_event) ? r_event : event);
 
 	ret = zbx_macro_message_common_resolv(p, um_handle, actionid, event, r_event, userid, dc_host, alert,
-			service_alarm, service, tz, item_hosts, trigger_hosts, cause_event, cause_recovery_event,
-			replace_to, data, error, maxerrlen);
+			service_alarm, service, tz, replace_to, data, error, maxerrlen);
 
 	if (SUCCEED != ret || NULL == p->macro)
 		return ret;
@@ -191,15 +176,7 @@ int	substitute_message_macros(char **data, char *error, int maxerrlen, int messa
 	int			ret = FAIL;
 	zbx_token_search_t	token_search = ZBX_TOKEN_SEARCH_BASIC;
 
-	/* Shared data between resolver calls */
-	zbx_vector_uint64_t		item_hosts;
-	const zbx_vector_uint64_t	*trigger_hosts = NULL;
-	zbx_db_event			*cause_event = NULL;
-	zbx_db_event			*cause_recovery_event = NULL;
-
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
-
-	zbx_vector_uint64_create(&item_hosts);
 
 	const zbx_db_event	*c_event = ((NULL != r_event) ? r_event : event);
 
@@ -212,24 +189,14 @@ int	substitute_message_macros(char **data, char *error, int maxerrlen, int messa
 		case ZBX_MESSAGE_TYPE_NORMAL:
 			ret = zbx_substitute_macros_ext_search(token_search, data, error, maxerrlen,
 					&macro_message_normal_resolv, um_handle, actionid, event, r_event, userid,
-					dc_host, alert, service_alarm, service, tz, &item_hosts, &trigger_hosts,
-					&cause_event, &cause_recovery_event);
+					dc_host, alert, service_alarm, service, tz);
 			break;
 		case ZBX_MESSAGE_TYPE_UPDATE:
 			ret = zbx_substitute_macros_ext_search(token_search, data, error, maxerrlen,
 					&macro_message_update_resolv, um_handle, actionid, event, r_event, userid,
-					dc_host, alert, service_alarm, service, tz, ack, &item_hosts, &trigger_hosts,
-					&cause_event, &cause_recovery_event);
+					dc_host, alert, service_alarm, service, tz, ack);
 			break;
 	}
-
-	if (NULL != cause_event)
-		zbx_db_free_event(cause_event);
-
-	if (NULL != cause_recovery_event)
-		zbx_db_free_event(cause_recovery_event);
-
-	zbx_vector_uint64_destroy(&item_hosts);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
