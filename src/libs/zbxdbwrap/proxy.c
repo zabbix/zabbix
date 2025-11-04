@@ -1212,14 +1212,13 @@ static int	proxy_item_validator(zbx_history_recv_item_t *item, zbx_socket_t *soc
  *   mode           - [IN]  item retrieve mode is used to retrieve            *
  *                          only necessary data to reduce time spent          *
  *                          holding read lock                                 *
- *   source         - [IN]  string indicating data source                     *
- *                          ("proxy"/"agent")                                 *
+ *   source         - [IN]  data source (proxy, agent)                        *
  *                                                                            *
  * Return value:  SUCCEED - processed successfully                            *
  *                FAIL    - an error occurred                                 *
  *                                                                            *
- * Comments: This function is used to parse the new proxy history data        *
- *           protocol introduced in Zabbix v3.3.                              *
+ * Comments: This function is used to process history data received from      *
+ *           proxy and agent.                                                 *
  *                                                                            *
  ******************************************************************************/
 static int	process_history_data_by_itemids(zbx_socket_t *sock, zbx_client_item_validator_t validator_func,
