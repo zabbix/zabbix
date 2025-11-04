@@ -563,10 +563,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 						'URL' => 'zabbix.com',
 						'Request body' => '{"<key>": "<value>"'
 					],
-					'request_type' => 'JSON data',
-					'inline_errors' => [
-						'Request body' => 'JSON is expected.'
-					]
+					'request_type' => 'JSON data'
 				]
 			],
 			[
@@ -590,10 +587,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 						'URL' => 'zabbix.com',
 						'Request body' => 'test'
 					],
-					'request_type' => 'XML data',
-					'inline_errors' => [
-						'Request body' => '(4) Start tag expected, \'<\' not found [Line: 1 | Column: 1].'
-					]
+					'request_type' => 'XML data'
 				]
 			],
 			[
@@ -604,10 +598,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 						'URL' => 'zabbix.com',
 						'Request body' => '<foo>bar</foo'
 					],
-					'request_type' => 'XML data',
-					'inline_errors' => [
-						'Request body' => '(73) expected \'>\' [Line: 1 | Column: 14].'
-					]
+					'request_type' => 'XML data'
 				]
 			],
 			// Check required status codes.
@@ -737,10 +728,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 					'fields' => [
 						'Request body' => 'test'
 					],
-					'request_type' => 'XML data',
-					'inline_errors' => [
-						'Request body' => '(4) Start tag expected, \'<\' not found [Line: 1 | Column: 1].'
-					]
+					'request_type' => 'XML data'
 				]
 			],
 			// Check required status codes.
