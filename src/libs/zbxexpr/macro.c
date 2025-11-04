@@ -498,6 +498,9 @@ int	zbx_is_user_macro(const char *str)
 	if (3 > len)
 		return FAIL;
 
+	if ('{' != str[0] || '$' != str[1])
+		return FAIL;
+
 	if (SUCCEED != zbx_user_macro_parse(str, &macro_r, &context_l, &context_r, NULL))
 		return FAIL;
 
