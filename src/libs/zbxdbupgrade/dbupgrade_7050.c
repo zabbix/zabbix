@@ -236,6 +236,46 @@ static int	DBpatch_7050018(void)
 	return SUCCEED;
 }
 
+static int	DBpatch_7050019(void)
+{
+	int			ret = SUCCEED;
+	zbx_vector_uint64_t	ids;
+	zbx_db_insert_t		db_insert;
+
+	zbx_vector_uint64_create(&ids);
+
+	zbx_db_select_uint64("select rr.roleid from role_rule rr"
+			" left join role r on r.roleid = rr.roleid"
+			" where rr.name = 'api.mode' and rr.value_int = 1"
+				" and not exists ("
+					"select null"
+					" from role_rule rr2"
+					" where rr2.roleid = rr.roleid and"
+						" rr2.name like 'api.method.%'"
+				")", &ids);
+
+	if (0 == ids.values_num)
+		goto out;
+
+	zbx_db_insert_prepare(&db_insert, "role_rule", "role_ruleid", "roleid", "type", "name", "value_str",
+			(char *)NULL);
+
+	for (int i = 0; i < ids.values_num; i++)
+	{
+		zbx_uint64_t	roleid = ids.values[i];
+
+		zbx_db_insert_add_values(&db_insert, __UINT64_C(0), roleid, 1, "api.method.0", "*");
+	}
+
+	ret = zbx_db_insert_execute(&db_insert);
+
+	zbx_db_insert_clean(&db_insert);
+out:
+	zbx_vector_uint64_destroy(&ids);
+
+	return ret;
+}
+
 #endif
 
 DBPATCH_START(7050)
@@ -261,5 +301,6 @@ DBPATCH_ADD(7050015, 0, 1)
 DBPATCH_ADD(7050016, 0, 1)
 DBPATCH_ADD(7050017, 0, 1)
 DBPATCH_ADD(7050018, 0, 1)
+DBPATCH_ADD(7050019, 0, 1)
 
 DBPATCH_END()
