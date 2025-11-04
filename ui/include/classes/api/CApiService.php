@@ -465,20 +465,23 @@ class CApiService {
 			foreach ($sqlParts['join'] as $r_alias => $join) {
 				$l_alias = array_key_exists('left_table', $join) ? $join['left_table'] : $this->tableAlias();
 
-				if (array_key_exists('type', $join) && $join['type'] === 'left') {
-					$sql_join .= ' LEFT';
-				}
-				$sql_join .= ' JOIN '.$join['table'].' '.$r_alias.' ON ';
+				$sql_join_conditions = [];
+
 				if (array_key_exists('using', $join)) {
 					foreach ((array) $join['using'] as $field) {
-						$sql_join .= $l_alias.'.'.$field.'='.$r_alias.'.'.$field;
+						$sql_join_conditions[] = $l_alias.'.'.$field.'='.$r_alias.'.'.$field;
 					}
 				}
 				else {
 					foreach ($join['on'] as $l_field => $r_field) {
-						$sql_join .= $l_alias.'.'.$l_field.'='.$r_alias.'.'.$r_field;
+						$sql_join_conditions[] = $l_alias.'.'.$l_field.'='.$r_alias.'.'.$r_field;
 					}
 				}
+
+				if (array_key_exists('type', $join) && $join['type'] === 'left') {
+					$sql_join .= ' LEFT';
+				}
+				$sql_join .= ' JOIN '.$join['table'].' '.$r_alias.' ON '.implode(' AND ', $sql_join_conditions);
 			}
 		}
 
