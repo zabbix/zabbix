@@ -356,7 +356,7 @@ class testFormMapProperties extends CWebTest {
 			'xpath://textarea[@name="label_string_map"]',
 			'xpath://textarea[@name="label_string_image"]'
 		];
-		foreach($textarea_xpath as $textarea) {
+		foreach ($textarea_xpath as $textarea) {
 			$field = $form->getField($textarea);
 			$this->assertEquals('', $field->getValue());
 
