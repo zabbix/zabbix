@@ -732,7 +732,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 		$this->executeValidation($data, 'clone');
 	}
 
-	public static function getCreataData() {
+	public static function getCreateData() {
 		return [
 			// Fill required fields and check default values.
 			[
@@ -758,7 +758,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 					'check_form' => true
 				]
 			],
-			// Symbols in query and headers field
+			// Symbols in query and headers field.
 			[
 				[
 					'fields' => [
@@ -776,7 +776,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 					]
 				]
 			],
-			// JSON body
+			// JSON body.
 			[
 				[
 					'fields' => [
@@ -788,16 +788,42 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 					'request_type' => 'JSON data'
 				]
 			],
-			// XML body
+			// ZBXNEXT-9595: Invalid JSON structure in "Request body" field.
+			[
+				[
+					'fields' => [
+						'Name' => 'item with invalid JSON body',
+						'Key' => 'http.json.123',
+						'URL' => 'zabbix.com',
+						'Request body' => '{"{{{KEY}}}}}{VALUE}"}'
+					],
+					'request_type' => 'JSON data',
+					'check_form' => true
+				]
+			],
+			// XML body.
 			[
 				[
 					'fields' => [
 						'Name' => 'item with XML body',
-						'Key' => 'http.xml',
+						'Key' => 'http.xml.123',
 						'URL' => 'zabbix.com',
 						'Request body' => '<data><macro>{$MACRO}</macro><![CDATA[{$MACRO}<foo></bar>]]></data>'
 					],
 					'request_type' => 'XML data'
+				]
+			],
+			// ZBXNEXT-9595: Invalid XML structure in "Request body" field.
+			[
+				[
+					'fields' => [
+						'Name' => 'item with invalid XML body',
+						'Key' => 'http.xml',
+						'URL' => 'zabbix.com',
+						'Request body' => '<data><macro>KEY<ma'
+					],
+					'request_type' => 'XML data',
+					'check_form' => true
 				]
 			],
 			// All possible fields.
@@ -842,7 +868,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 					'screenshot' => true
 				]
 			],
-			// Empty Basic authentication user/password
+			// Empty Basic authentication user/password.
 			[
 				[
 					'fields' => [
@@ -854,7 +880,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 					'check_form' => true
 				]
 			],
-			// Empty NTLM authentication user/password
+			// Empty NTLM authentication user/password.
 			[
 				[
 					'fields' => [
@@ -898,7 +924,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 	/**
 	 * Test creation of a HTTP agent item.
 	 *
-	 * @dataProvider getCreataData
+	 * @dataProvider getCreateData
 	 */
 	public function testFormItemHttpAgent_Create($data) {
 		$this->zbxTestLogin('zabbix.php?action=item.list&context=host&filter_set=1&filter_hostids[0]='.self::$hostid);
@@ -1023,6 +1049,16 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 					'check_form' => true
 				]
 			],
+			// ZBXNEXT-9595: Invalid JSON structure in "Request body" field.
+			[
+				[
+					'fields' => [
+						'Request body' => '{"KEY":"{'
+					],
+					'request_type' => 'JSON data',
+					'check_form' => true
+				]
+			],
 			// XML body with macro.
 			[
 				[
@@ -1033,7 +1069,17 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 					'check_form' => true
 				]
 			],
-			// Empty Basic authentication user/password
+			// ZBXNEXT-9595: Invalid XML structure in "Request body" field.
+			[
+				[
+					'fields' => [
+						'Request body' => '<data><macro>KEY<'
+					],
+					'request_type' => 'XML data',
+					'check_form' => true
+				]
+			],
+			// Empty Basic authentication user/password.
 			[
 				[
 					'fields' => [
@@ -1042,7 +1088,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 					'check_form' => true
 				]
 			],
-			// Empty NTLM authentication user/password
+			// Empty NTLM authentication user/password.
 			[
 				[
 					'fields' => [
