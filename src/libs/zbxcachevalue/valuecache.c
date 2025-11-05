@@ -2632,8 +2632,6 @@ static void	vc_precache_item(zbx_item_history_t *hist, unsigned char value_type,
 	if (SUCCEED == vc_query_item_cached(item))
 		return;
 
-	zbx_vector_history_record_sort(&hist->rows, (zbx_compare_func_t)zbx_history_record_compare_asc_func);
-
 	if (hist->rows.values_num < limit)
 	{
 		vc_item_precache_seconds(item, &hist->rows, ts_start);
@@ -2724,6 +2722,12 @@ static int	vc_precache_window(zbx_vector_vc_query_t *queries, zbx_vector_int32_t
 	zbx_history_get_batch(&results, value_type, ts_start, limit);
 
 	zbx_vector_item_history_sort(&results, zbx_item_history_compare_by_index_desc);
+
+	for (int i = 0; i < results.values_num; i++)
+	{
+		zbx_vector_history_record_sort(&results.values[i].rows,
+				(zbx_compare_func_t)zbx_history_record_compare_asc_func);
+	}
 
 	WRLOCK_CACHE;
 
