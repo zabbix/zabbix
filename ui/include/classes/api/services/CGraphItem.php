@@ -68,8 +68,8 @@ class CGraphItem extends CApiService {
 			}
 
 			$sqlParts['join']['i'] = ['table' => 'items', 'using' => 'itemid'];
-			$sqlParts['join']['hh'] = ['table' => 'host_hgset', 'using' => 'hostid', 'left_table' => 'i'];
-			$sqlParts['join']['p'] = ['table' => 'permission', 'using' => 'hgsetid', 'left_table' => 'hh'];
+			$sqlParts['join']['hh'] = ['left_table' => 'i', 'table' => 'host_hgset', 'using' => 'hostid'];
+			$sqlParts['join']['p'] = ['left_table' => 'hh', 'table' => 'permission', 'using' => 'hgsetid'];
 			$sqlParts['where'][] = 'p.ugsetid='.self::$userData['ugsetid'];
 
 			if ($options['editable']) {

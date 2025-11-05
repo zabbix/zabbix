@@ -185,12 +185,12 @@ class CAlert extends CApiService {
 				}
 
 				$sql_parts['join']['e'] = ['table' => 'events', 'using' => 'eventid'];
-				$sql_parts['join']['f'] = ['table' => 'functions', 'on' => ['objectid' => 'triggerid'],
-					'left_table' => 'e'
+				$sql_parts['join']['f'] = ['left_table' => 'e', 'table' => 'functions',
+					'on' => ['objectid' => 'triggerid']
 				];
-				$sql_parts['join']['i'] = ['table' => 'items', 'using' => 'itemid', 'left_table' => 'f'];
-				$sql_parts['join']['hh'] = ['table' => 'host_hgset', 'using' => 'hostid', 'left_table' => 'i'];
-				$sql_parts['join']['p'] = ['table' => 'permission', 'using' => 'hgsetid', 'left_table' => 'hh'];
+				$sql_parts['join']['i'] = ['left_table' => 'f', 'table' => 'items', 'using' => 'itemid'];
+				$sql_parts['join']['hh'] = ['left_table' => 'i', 'table' => 'host_hgset', 'using' => 'hostid'];
+				$sql_parts['join']['p'] = ['left_table' => 'hh', 'table' => 'permission', 'using' => 'hgsetid'];
 				$sql_parts['where'][] = 'p.ugsetid='.self::$userData['ugsetid'];
 
 				if ($options['editable']) {
@@ -215,9 +215,9 @@ class CAlert extends CApiService {
 				}
 
 				$sql_parts['join']['e'] = ['table' => 'events', 'using' => 'eventid'];
-				$sql_parts['join']['i'] = ['table' => 'items', 'on' => ['objectid' => 'itemid'], 'left_table' => 'e'];
-				$sql_parts['join']['hh'] = ['table' => 'host_hgset', 'using' => 'hostid', 'left_table' => 'i'];
-				$sql_parts['join']['p'] = ['table' => 'permission', 'using' => 'hgsetid', 'left_table' => 'hh'];
+				$sql_parts['join']['i'] = ['left_table' => 'e', 'table' => 'items', 'on' => ['objectid' => 'itemid']];
+				$sql_parts['join']['hh'] = ['left_table' => 'i', 'table' => 'host_hgset', 'using' => 'hostid'];
+				$sql_parts['join']['p'] = ['left_table' => 'hh', 'table' => 'permission', 'using' => 'hgsetid'];
 				$sql_parts['where'][] = 'p.ugsetid='.self::$userData['ugsetid'];
 
 				if ($options['editable']) {
@@ -243,18 +243,18 @@ class CAlert extends CApiService {
 			// triggers
 			if ($options['eventobject'] == EVENT_OBJECT_TRIGGER) {
 				$sql_parts['join']['e'] = ['table' => 'events', 'using' => 'eventid'];
-				$sql_parts['join']['f'] = ['table' => 'functions', 'on' => ['objectid' => 'triggerid'],
-					'left_table' => 'e'
+				$sql_parts['join']['f'] = ['left_table' => 'e', 'table' => 'functions',
+					'on' => ['objectid' => 'triggerid']
 				];
-				$sql_parts['join']['i'] = ['table' => 'items', 'using' => 'itemid', 'left_table' => 'f'];
-				$sql_parts['join']['hg'] = ['table' => 'hosts_groups', 'using' => 'hostid', 'left_table' => 'i'];
+				$sql_parts['join']['i'] = ['left_table' => 'f', 'table' => 'items', 'using' => 'itemid'];
+				$sql_parts['join']['hg'] = ['left_table' => 'i', 'table' => 'hosts_groups', 'using' => 'hostid'];
 				$sql_parts['where'][] = dbConditionId('hg.groupid', $options['groupids']);
 			}
 			// lld rules and items
 			elseif ($options['eventobject'] == EVENT_OBJECT_LLDRULE || $options['eventobject'] == EVENT_OBJECT_ITEM) {
 				$sql_parts['join']['e'] = ['table' => 'events', 'using' => 'eventid'];
-				$sql_parts['join']['i'] = ['table' => 'items', 'on' => ['objectid' => 'itemid'], 'left_table' => 'e'];
-				$sql_parts['join']['hg'] = ['table' => 'hosts_groups', 'using' => 'hostid', 'left_table' => 'i'];
+				$sql_parts['join']['i'] = ['left_table' => 'e', 'table' => 'items', 'on' => ['objectid' => 'itemid']];
+				$sql_parts['join']['hg'] = ['left_table' => 'i', 'table' => 'hosts_groups', 'using' => 'hostid'];
 				$sql_parts['where'][] = dbConditionId('hg.groupid', $options['groupids']);
 			}
 		}
@@ -264,16 +264,16 @@ class CAlert extends CApiService {
 			// triggers
 			if ($options['eventobject'] == EVENT_OBJECT_TRIGGER) {
 				$sql_parts['join']['e'] = ['table' => 'events', 'using' => 'eventid'];
-				$sql_parts['join']['f'] = ['table' => 'functions', 'on' => ['objectid' => 'triggerid'],
-					'left_table' => 'e'
+				$sql_parts['join']['f'] = ['left_table' => 'e', 'table' => 'functions',
+					'on' => ['objectid' => 'triggerid']
 				];
-				$sql_parts['join']['i'] = ['table' => 'items', 'using' => 'itemid', 'left_table' => 'f'];
+				$sql_parts['join']['i'] = ['left_table' => 'f', 'table' => 'items', 'using' => 'itemid'];
 				$sql_parts['where'][] = dbConditionId('i.hostid', $options['hostids']);
 			}
 			// lld rules and items
 			elseif ($options['eventobject'] == EVENT_OBJECT_LLDRULE || $options['eventobject'] == EVENT_OBJECT_ITEM) {
 				$sql_parts['join']['e'] = ['table' => 'events', 'using' => 'eventid'];
-				$sql_parts['join']['i'] = ['table' => 'items', 'on' => ['objectid' => 'itemid'], 'left_table' => 'e'];
+				$sql_parts['join']['i'] = ['left_table' => 'e', 'table' => 'items', 'on' => ['objectid' => 'itemid']];
 				$sql_parts['where'][] = dbConditionId('i.hostid', $options['hostids']);
 			}
 		}

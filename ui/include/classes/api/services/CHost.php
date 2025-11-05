@@ -158,7 +158,7 @@ class CHost extends CHostGeneral {
 			}
 
 			$sqlParts['join']['hh'] = ['table' => 'host_hgset', 'using' => 'hostid'];
-			$sqlParts['join']['p1'] = ['table' => 'permission', 'using' => 'hgsetid', 'left_table' => 'hh'];
+			$sqlParts['join']['p1'] = ['left_table' => 'hh', 'table' => 'permission', 'using' => 'hgsetid'];
 			$sqlParts['where'][] = 'p1.ugsetid='.self::$userData['ugsetid'];
 
 			if ($options['editable']) {
@@ -231,7 +231,7 @@ class CHost extends CHostGeneral {
 			zbx_value2array($options['triggerids']);
 
 			$sqlParts['join']['i'] = ['table' => 'items', 'using' => 'hostid'];
-			$sqlParts['join']['f'] = ['table' => 'functions', 'using' => 'itemid', 'left_table' => 'i'];
+			$sqlParts['join']['f'] = ['left_table' => 'i', 'table' => 'functions', 'using' => 'itemid'];
 			$sqlParts['where'][] = dbConditionInt('f.triggerid', $options['triggerids']);
 		}
 
@@ -248,7 +248,7 @@ class CHost extends CHostGeneral {
 			zbx_value2array($options['graphids']);
 
 			$sqlParts['join']['i'] = ['table' => 'items', 'using' => 'hostid'];
-			$sqlParts['join']['gi'] = ['table' => 'graphs_items', 'using' => 'itemid', 'left_table' => 'i'];
+			$sqlParts['join']['gi'] = ['left_table' => 'i', 'table' => 'graphs_items', 'using' => 'itemid'];
 			$sqlParts['where'][] = dbConditionInt('gi.graphid', $options['graphids']);
 		}
 
@@ -257,7 +257,7 @@ class CHost extends CHostGeneral {
 			zbx_value2array($options['dserviceids']);
 
 			$sqlParts['join']['hi2'] = ['table' => 'interface', 'using' => 'hostid'];
-			$sqlParts['join']['ds'] = ['table' => 'dservices', 'using' => 'ip', 'left_table' => 'hi2'];
+			$sqlParts['join']['ds'] = ['left_table' => 'hi2', 'table' => 'dservices', 'using' => 'ip'];
 			$sqlParts['where'][] = dbConditionInt('ds.dserviceid', $options['dserviceids']);
 
 			if ($options['groupCount']) {
@@ -613,7 +613,7 @@ class CHost extends CHostGeneral {
 				|| (is_array($options['filter']) && array_key_exists('assigned_proxyid', $options['filter'])
 					&& $options['filter']['assigned_proxyid'] !== null)) {
 			$sqlParts['join']['hp'] = ['type' => 'left', 'table' => 'host_proxy', 'using' => 'hostid'];
-			$sqlParts['join']['p'] = ['type' => 'left', 'table' => 'proxy', 'using' => 'proxyid', 'left_table' => 'hp'];
+			$sqlParts['join']['p'] = ['type' => 'left', 'left_table' => 'hp', 'table' => 'proxy', 'using' => 'proxyid'];
 		}
 
 		if (!$options['countOutput']) {

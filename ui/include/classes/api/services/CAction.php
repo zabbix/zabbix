@@ -311,7 +311,7 @@ class CAction extends CApiService {
 			zbx_value2array($options['mediatypeids']);
 
 			$sqlParts['join']['omed'] = ['table' => 'operations', 'using' => 'actionid'];
-			$sqlParts['join']['om'] = ['table' => 'opmessage', 'using' => 'operationid', 'left_table' => 'omed'];
+			$sqlParts['join']['om'] = ['left_table' => 'omed', 'table' => 'opmessage', 'using' => 'operationid'];
 			$sqlParts['where'][] = dbConditionId('om.mediatypeid', $options['mediatypeids']);
 		}
 
@@ -321,7 +321,7 @@ class CAction extends CApiService {
 			zbx_value2array($options['usrgrpids']);
 
 			$sqlParts['join']['oug'] = ['table' => 'operations', 'using' => 'actionid'];
-			$sqlParts['join']['omg'] = ['table' => 'opmessage_grp', 'using' => 'operationid', 'left_table' => 'oug'];
+			$sqlParts['join']['omg'] = ['left_table' => 'oug', 'table' => 'opmessage_grp', 'using' => 'operationid'];
 			$sqlParts['where'][] = dbConditionInt('omg.usrgrpid', $options['usrgrpids']);
 		}
 
@@ -330,7 +330,7 @@ class CAction extends CApiService {
 			zbx_value2array($options['userids']);
 
 			$sqlParts['join']['ou'] = ['table' => 'operations', 'using' => 'actionid'];
-			$sqlParts['join']['omu'] = ['table' => 'opmessage_usr', 'using' => 'operationid', 'left_table' => 'ou'];
+			$sqlParts['join']['omu'] = ['left_table' => 'ou', 'table' => 'opmessage_usr', 'using' => 'operationid'];
 			$sqlParts['where'][] = dbConditionInt('omu.userid', $options['userids']);
 		}
 
@@ -340,7 +340,7 @@ class CAction extends CApiService {
 			zbx_value2array($options['scriptids']);
 
 			$sqlParts['join']['os'] = ['table' => 'operations', 'using' => 'actionid'];
-			$sqlParts['join']['oc'] = ['table' => 'opcommand', 'using' => 'operationid', 'left_table' => 'os'];
+			$sqlParts['join']['oc'] = ['left_table' => 'os', 'table' => 'opcommand', 'using' => 'operationid'];
 			$sqlParts['where'][] = dbConditionInt('oc.scriptid', $options['scriptids']);
 		}
 

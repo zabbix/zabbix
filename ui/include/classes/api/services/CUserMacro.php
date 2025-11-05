@@ -123,7 +123,7 @@ class CUserMacro extends CApiService {
 			}
 			else {
 				$sqlParts['join']['hh'] = ['table' => 'host_hgset', 'using' => 'hostid'];
-				$sqlParts['join']['p'] = ['table' => 'permission', 'using' => 'hgsetid', 'left_table' => 'hh'];
+				$sqlParts['join']['p'] = ['left_table' => 'hh', 'table' => 'permission', 'using' => 'hgsetid'];
 
 				if ($options['editable']) {
 					$sqlParts['where'][] = 'p.permission='.PERM_READ_WRITE;

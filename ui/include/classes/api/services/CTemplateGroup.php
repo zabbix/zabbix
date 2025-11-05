@@ -128,16 +128,16 @@ class CTemplateGroup extends CApiService {
 		// triggerids
 		if ($options['triggerids'] !== null) {
 			$sqlParts['join']['hg'] = ['table' => 'hosts_groups', 'using' => 'groupid'];
-			$sqlParts['join']['i'] = ['table' => 'items', 'using' => 'hostid', 'left_table' => 'hg'];
-			$sqlParts['join']['f'] = ['table' => 'functions', 'using' => 'itemid', 'left_table' => 'i'];
+			$sqlParts['join']['i'] = ['left_table' => 'hg', 'table' => 'items', 'using' => 'hostid'];
+			$sqlParts['join']['f'] = ['left_table' => 'i', 'table' => 'functions', 'using' => 'itemid'];
 			$sqlParts['where'][] = dbConditionInt('f.triggerid', $options['triggerids']);
 		}
 
 		// graphids
 		if ($options['graphids'] !== null) {
 			$sqlParts['join']['hg'] = ['table' => 'hosts_groups', 'using' => 'groupid'];
-			$sqlParts['join']['i'] = ['table' => 'items', 'using' => 'hostid', 'left_table' => 'hg'];
-			$sqlParts['join']['gi'] = ['table' => 'graphs_items', 'using' => 'itemid', 'left_table' => 'i'];
+			$sqlParts['join']['i'] = ['left_table' => 'hg', 'table' => 'items', 'using' => 'hostid'];
+			$sqlParts['join']['gi'] = ['left_table' => 'i', 'table' => 'graphs_items', 'using' => 'itemid'];
 			$sqlParts['where'][] = dbConditionInt('gi.graphid', $options['graphids']);
 		}
 

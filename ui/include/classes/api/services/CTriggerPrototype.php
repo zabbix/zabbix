@@ -102,9 +102,9 @@ class CTriggerPrototype extends CTriggerGeneral {
 			}
 
 			$sqlParts['join']['f'] = ['table' => 'functions', 'using' => 'triggerid'];
-			$sqlParts['join']['i'] = ['table' => 'items', 'using' => 'itemid', 'left_table' => 'f'];
-			$sqlParts['join']['hh'] = ['table' => 'host_hgset', 'using' => 'hostid', 'left_table' => 'i'];
-			$sqlParts['join']['p'] = ['table' => 'permission', 'using' => 'hgsetid', 'left_table' => 'hh'];
+			$sqlParts['join']['i'] = ['left_table' => 'f', 'table' => 'items', 'using' => 'itemid'];
+			$sqlParts['join']['hh'] = ['left_table' => 'i', 'table' => 'host_hgset', 'using' => 'hostid'];
+			$sqlParts['join']['p'] = ['left_table' => 'hh', 'table' => 'permission', 'using' => 'hgsetid'];
 			$sqlParts['where'][] = 'p.ugsetid='.self::$userData['ugsetid'];
 
 			if ($options['editable']) {
@@ -129,8 +129,8 @@ class CTriggerPrototype extends CTriggerGeneral {
 			zbx_value2array($options['groupids']);
 
 			$sqlParts['join']['f'] = ['table' => 'functions', 'using' => 'triggerid'];
-			$sqlParts['join']['i'] = ['table' => 'items', 'using' => 'itemid', 'left_table' => 'f'];
-			$sqlParts['join']['hg'] = ['table' => 'hosts_groups', 'using' => 'hostid', 'left_table' => 'i'];
+			$sqlParts['join']['i'] = ['left_table' => 'f', 'table' => 'items', 'using' => 'itemid'];
+			$sqlParts['join']['hg'] = ['left_table' => 'i', 'table' => 'hosts_groups', 'using' => 'hostid'];
 			$sqlParts['where']['groupid'] = dbConditionInt('hg.groupid', $options['groupids']);
 
 			if ($options['groupCount']) {
@@ -156,7 +156,7 @@ class CTriggerPrototype extends CTriggerGeneral {
 			zbx_value2array($options['hostids']);
 
 			$sqlParts['join']['f'] = ['table' => 'functions', 'using' => 'triggerid'];
-			$sqlParts['join']['i'] = ['table' => 'items', 'using' => 'itemid', 'left_table' => 'f'];
+			$sqlParts['join']['i'] = ['left_table' => 'f', 'table' => 'items', 'using' => 'itemid'];
 			$sqlParts['where']['hostid'] = dbConditionInt('i.hostid', $options['hostids']);
 
 			if ($options['groupCount']) {
@@ -188,7 +188,7 @@ class CTriggerPrototype extends CTriggerGeneral {
 			zbx_value2array($options['discoveryids']);
 
 			$sqlParts['join']['f'] = ['table' => 'functions', 'using' => 'triggerid'];
-			$sqlParts['join']['id'] = ['table' => 'item_discovery', 'using' => 'itemid', 'left_table' => 'f'];
+			$sqlParts['join']['id'] = ['left_table' => 'f', 'table' => 'item_discovery', 'using' => 'itemid'];
 			$sqlParts['where'][] = dbConditionId('id.lldruleid', $options['discoveryids']);
 
 			if ($options['groupCount']) {
@@ -264,8 +264,8 @@ class CTriggerPrototype extends CTriggerGeneral {
 		// templated
 		if ($options['templated'] !== null) {
 			$sqlParts['join']['f'] = ['table' => 'functions', 'using' => 'triggerid'];
-			$sqlParts['join']['i'] = ['table' => 'items', 'using' => 'itemid', 'left_table' => 'f'];
-			$sqlParts['join']['h'] = ['table' => 'hosts', 'using' => 'hostid', 'left_table' => 'i'];
+			$sqlParts['join']['i'] = ['left_table' => 'f', 'table' => 'items', 'using' => 'itemid'];
+			$sqlParts['join']['h'] = ['left_table' => 'i', 'table' => 'hosts', 'using' => 'hostid'];
 
 			if ($options['templated']) {
 				$sqlParts['where'][] = 'h.status='.HOST_STATUS_TEMPLATE;
@@ -298,8 +298,8 @@ class CTriggerPrototype extends CTriggerGeneral {
 				zbx_value2array($options['filter']['host']);
 
 				$sqlParts['join']['f'] = ['table' => 'functions', 'using' => 'triggerid'];
-				$sqlParts['join']['i'] = ['table' => 'items', 'using' => 'itemid', 'left_table' => 'f'];
-				$sqlParts['join']['h'] = ['table' => 'hosts', 'using' => 'hostid', 'left_table' => 'i'];
+				$sqlParts['join']['i'] = ['left_table' => 'f', 'table' => 'items', 'using' => 'itemid'];
+				$sqlParts['join']['h'] = ['left_table' => 'i', 'table' => 'hosts', 'using' => 'hostid'];
 				$sqlParts['where']['host'] = dbConditionString('h.host', $options['filter']['host']);
 			}
 
@@ -307,7 +307,7 @@ class CTriggerPrototype extends CTriggerGeneral {
 				zbx_value2array($options['filter']['hostid']);
 
 				$sqlParts['join']['f'] = ['table' => 'functions', 'using' => 'triggerid'];
-				$sqlParts['join']['i'] = ['table' => 'items', 'using' => 'itemid', 'left_table' => 'f'];
+				$sqlParts['join']['i'] = ['left_table' => 'f', 'table' => 'items', 'using' => 'itemid'];
 				$sqlParts['where']['hostid'] = dbConditionInt('i.hostid', $options['filter']['hostid']);
 			}
 		}
@@ -315,17 +315,17 @@ class CTriggerPrototype extends CTriggerGeneral {
 		// group
 		if ($options['group'] !== null) {
 			$sqlParts['join']['f'] = ['table' => 'functions', 'using' => 'triggerid'];
-			$sqlParts['join']['i'] = ['table' => 'items', 'using' => 'itemid', 'left_table' => 'f'];
-			$sqlParts['join']['hg'] = ['table' => 'hosts_groups', 'using' => 'hostid', 'left_table' => 'i'];
-			$sqlParts['join']['g'] = ['table' => 'hstgrp', 'using' => 'groupid', 'left_table' => 'hg'];
+			$sqlParts['join']['i'] = ['left_table' => 'f', 'table' => 'items', 'using' => 'itemid'];
+			$sqlParts['join']['hg'] = ['left_table' => 'i', 'table' => 'hosts_groups', 'using' => 'hostid'];
+			$sqlParts['join']['g'] = ['left_table' => 'hg', 'table' => 'hstgrp', 'using' => 'groupid'];
 			$sqlParts['where']['group'] = ' g.name='.zbx_dbstr($options['group']);
 		}
 
 		// host
 		if ($options['host'] !== null) {
 			$sqlParts['join']['f'] = ['table' => 'functions', 'using' => 'triggerid'];
-			$sqlParts['join']['i'] = ['table' => 'items', 'using' => 'itemid', 'left_table' => 'f'];
-			$sqlParts['join']['h'] = ['table' => 'hosts', 'using' => 'hostid', 'left_table' => 'i'];
+			$sqlParts['join']['i'] = ['left_table' => 'f', 'table' => 'items', 'using' => 'itemid'];
+			$sqlParts['join']['h'] = ['left_table' => 'i', 'table' => 'hosts', 'using' => 'hostid'];
 			$sqlParts['where']['host'] = ' h.host='.zbx_dbstr($options['host']);
 		}
 

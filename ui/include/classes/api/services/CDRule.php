@@ -102,7 +102,7 @@ class CDRule extends CApiService {
 			zbx_value2array($options['dserviceids']);
 
 			$sqlParts['join']['dh'] = ['table' => 'dhosts', 'using' => 'druleid'];
-			$sqlParts['join']['ds'] = ['table' => 'dservices', 'using' => 'dhostid', 'left_table' => 'dh'];
+			$sqlParts['join']['ds'] = ['left_table' => 'dh', 'table' => 'dservices', 'using' => 'dhostid'];
 			$sqlParts['where']['dserviceid'] = dbConditionInt('ds.dserviceid', $options['dserviceids']);
 
 			if ($options['groupCount']) {

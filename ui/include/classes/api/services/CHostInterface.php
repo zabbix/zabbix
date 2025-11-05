@@ -97,7 +97,7 @@ class CHostInterface extends CApiService {
 			}
 
 			$sqlParts['join']['hh'] = ['table' => 'host_hgset', 'using' => 'hostid'];
-			$sqlParts['join']['p'] = ['table' => 'permission', 'using' => 'hgsetid', 'left_table' => 'hh'];
+			$sqlParts['join']['p'] = ['left_table' => 'hh', 'table' => 'permission', 'using' => 'hgsetid'];
 			$sqlParts['where'][] = 'p.ugsetid='.self::$userData['ugsetid'];
 
 			if ($options['editable']) {
@@ -134,7 +134,7 @@ class CHostInterface extends CApiService {
 			zbx_value2array($options['triggerids']);
 
 			$sqlParts['join']['i'] = ['table' => 'items', 'using' => 'interfaceid'];
-			$sqlParts['join']['f'] = ['table' => 'functions', 'using' => 'itemid', 'left_table' => 'i'];
+			$sqlParts['join']['f'] = ['left_table' => 'i', 'table' => 'functions', 'using' => 'itemid'];
 			$sqlParts['where'][] = dbConditionInt('f.triggerid', $options['triggerids']);
 		}
 

@@ -222,9 +222,9 @@ class CEvent extends CApiService {
 			}
 			elseif ($options['object'] == EVENT_OBJECT_TRIGGER) {
 				$sql_parts['join']['f'] = ['table' => 'functions', 'on' => ['objectid' => 'triggerid']];
-				$sql_parts['join']['i'] = ['table' => 'items', 'using' => 'itemid', 'left_table' => 'f'];
-				$sql_parts['join']['hh'] = ['table' => 'host_hgset', 'using' => 'hostid', 'left_table' => 'i'];
-				$sql_parts['join']['p'] = ['table' => 'permission', 'using' => 'hgsetid', 'left_table' => 'hh'];
+				$sql_parts['join']['i'] = ['left_table' => 'f', 'table' => 'items', 'using' => 'itemid'];
+				$sql_parts['join']['hh'] = ['left_table' => 'i', 'table' => 'host_hgset', 'using' => 'hostid'];
+				$sql_parts['join']['p'] = ['left_table' => 'hh', 'table' => 'permission', 'using' => 'hgsetid'];
 				$sql_parts['where'][] = 'p.ugsetid='.self::$userData['ugsetid'];
 
 				if ($options['editable']) {
@@ -251,8 +251,8 @@ class CEvent extends CApiService {
 			}
 			elseif ($options['object'] == EVENT_OBJECT_ITEM || $options['object'] == EVENT_OBJECT_LLDRULE) {
 				$sql_parts['join']['i'] = ['table' => 'items', 'on' => ['objectid' => 'itemid']];
-				$sql_parts['join']['hh'] = ['table' => 'host_hgset', 'using' => 'hostid', 'left_table' => 'i'];
-				$sql_parts['join']['p'] = ['table' => 'permission', 'using' => 'hgsetid', 'left_table' => 'hh'];
+				$sql_parts['join']['hh'] = ['left_table' => 'i', 'table' => 'host_hgset', 'using' => 'hostid'];
+				$sql_parts['join']['p'] = ['left_table' => 'hh', 'table' => 'permission', 'using' => 'hgsetid'];
 				$sql_parts['where'][] = 'p.ugsetid='.self::$userData['ugsetid'];
 
 				if ($options['editable']) {
@@ -303,19 +303,19 @@ class CEvent extends CApiService {
 		if ($options['groupids'] !== null) {
 			if ($options['object'] == EVENT_OBJECT_TRIGGER) {
 				$sql_parts['join']['f'] = ['table' => 'functions', 'on' => ['objectid' => 'triggerid']];
-				$sql_parts['join']['i'] = ['table' => 'items', 'using' => 'itemid', 'left_table' => 'f'];
+				$sql_parts['join']['i'] = ['left_table' => 'f', 'table' => 'items', 'using' => 'itemid'];
 			}
 			elseif ($options['object'] == EVENT_OBJECT_LLDRULE || $options['object'] == EVENT_OBJECT_ITEM) {
 				$sql_parts['join']['i'] = ['table' => 'items', 'on' => ['objectid' => 'itemid']];
 			}
-			$sql_parts['join']['hg'] = ['table' => 'hosts_groups', 'using' => 'hostid', 'left_table' => 'i'];
+			$sql_parts['join']['hg'] = ['left_table' => 'i', 'table' => 'hosts_groups', 'using' => 'hostid'];
 			$sql_parts['where']['hg'] = dbConditionInt('hg.groupid', $options['groupids']);
 		}
 
 		if ($options['hostids'] !== null) {
 			if ($options['object'] == EVENT_OBJECT_TRIGGER) {
 				$sql_parts['join']['f'] = ['table' => 'functions', 'on' => ['objectid' => 'triggerid']];
-				$sql_parts['join']['i'] = ['table' => 'items', 'using' => 'itemid', 'left_table' => 'f'];
+				$sql_parts['join']['i'] = ['left_table' => 'f', 'table' => 'items', 'using' => 'itemid'];
 			}
 			elseif ($options['object'] == EVENT_OBJECT_LLDRULE || $options['object'] == EVENT_OBJECT_ITEM) {
 				$sql_parts['join']['i'] = ['table' => 'items', 'on' => ['objectid' => 'itemid']];
@@ -478,8 +478,8 @@ class CEvent extends CApiService {
 		}
 
 		$sql_parts['join']['f'] = ['table' => 'functions', 'on' => ['objectid' => 'triggerid']];
-		$sql_parts['join']['i'] = ['table' => 'items', 'using' => 'itemid', 'left_table' => 'f'];
-		$sql_parts['join']['hg'] = ['table' => 'hosts_groups', 'using' => 'hostid', 'left_table' => 'i'];
+		$sql_parts['join']['i'] = ['left_table' => 'f', 'table' => 'items', 'using' => 'itemid'];
+		$sql_parts['join']['hg'] = ['left_table' => 'i', 'table' => 'hosts_groups', 'using' => 'hostid'];
 
 		$tag_conditions = [];
 		$full_access_groupids = [];
@@ -526,8 +526,8 @@ class CEvent extends CApiService {
 			}
 			else {
 				$sql_parts['join']['er'] = ['table' => 'event_recovery', 'on' => ['eventid' => 'r_eventid']];
-				$sql_parts['join']['et'] = ['type' => 'left', 'table' => 'event_tag', 'using' => 'eventid',
-					'left_table' => 'er'
+				$sql_parts['join']['et'] = ['type' => 'left', 'left_table' => 'er', 'table' => 'event_tag',
+					'using' => 'eventid'
 				];
 			}
 

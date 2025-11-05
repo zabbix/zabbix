@@ -149,7 +149,7 @@ class CItem extends CItemGeneral {
 			}
 
 			$sqlParts['join']['hh'] = ['table' => 'host_hgset', 'using' => 'hostid'];
-			$sqlParts['join']['p'] = ['table' => 'permission', 'using' => 'hgsetid', 'left_table' => 'hh'];
+			$sqlParts['join']['p'] = ['left_table' => 'hh', 'table' => 'permission', 'using' => 'hgsetid'];
 			$sqlParts['where'][] = 'p.ugsetid='.self::$userData['ugsetid'];
 
 			if ($options['editable']) {
@@ -352,7 +352,7 @@ class CItem extends CItemGeneral {
 		// group
 		if (!is_null($options['group'])) {
 			$sqlParts['join']['hg'] = ['table' => 'hosts_groups', 'using' => 'hostid'];
-			$sqlParts['join']['g'] = ['table' => 'hstgrp', 'using' => 'groupid', 'left_table' => 'hg'];
+			$sqlParts['join']['g'] = ['left_table' => 'hg', 'table' => 'hstgrp', 'using' => 'groupid'];
 			$sqlParts['where'][] = ' g.name='.zbx_dbstr($options['group']);
 		}
 

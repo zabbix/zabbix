@@ -99,9 +99,9 @@ class CGraph extends CGraphGeneral {
 			}
 
 			$sqlParts['join']['gi'] = ['table' => 'graphs_items', 'using' => 'graphid'];
-			$sqlParts['join']['i'] = ['table' => 'items', 'using' => 'itemid', 'left_table' => 'gi'];
-			$sqlParts['join']['hh'] = ['table' => 'host_hgset', 'using' => 'hostid', 'left_table' => 'i'];
-			$sqlParts['join']['p'] = ['table' => 'permission', 'using' => 'hgsetid', 'left_table' => 'hh'];
+			$sqlParts['join']['i'] = ['left_table' => 'gi', 'table' => 'items', 'using' => 'itemid'];
+			$sqlParts['join']['hh'] = ['left_table' => 'i', 'table' => 'host_hgset', 'using' => 'hostid'];
+			$sqlParts['join']['p'] = ['left_table' => 'hh', 'table' => 'permission', 'using' => 'hgsetid'];
 			$sqlParts['where'][] = 'p.ugsetid='.self::$userData['ugsetid'];
 
 			if ($options['editable']) {
@@ -125,8 +125,8 @@ class CGraph extends CGraphGeneral {
 			zbx_value2array($options['groupids']);
 
 			$sqlParts['join']['gi'] = ['table' => 'graphs_items', 'using' => 'graphid'];
-			$sqlParts['join']['i'] = ['table' => 'items', 'using' => 'itemid', 'left_table' => 'gi'];
-			$sqlParts['join']['hg'] = ['table' => 'hosts_groups', 'using' => 'hostid', 'left_table' => 'i'];
+			$sqlParts['join']['i'] = ['left_table' => 'gi', 'table' => 'items', 'using' => 'itemid'];
+			$sqlParts['join']['hg'] = ['left_table' => 'i', 'table' => 'hosts_groups', 'using' => 'hostid'];
 			$sqlParts['where'][] = dbConditionInt('hg.groupid', $options['groupids']);
 
 			if ($options['groupCount']) {
@@ -152,7 +152,7 @@ class CGraph extends CGraphGeneral {
 			zbx_value2array($options['hostids']);
 
 			$sqlParts['join']['gi'] = ['table' => 'graphs_items', 'using' => 'graphid'];
-			$sqlParts['join']['i'] = ['table' => 'items', 'using' => 'itemid', 'left_table' => 'gi'];
+			$sqlParts['join']['i'] = ['left_table' => 'gi', 'table' => 'items', 'using' => 'itemid'];
 			$sqlParts['where'][] = dbConditionInt('i.hostid', $options['hostids']);
 
 			if ($options['groupCount']) {
@@ -182,8 +182,8 @@ class CGraph extends CGraphGeneral {
 		// templated
 		if (!is_null($options['templated'])) {
 			$sqlParts['join']['gi'] = ['table' => 'graphs_items', 'using' => 'graphid'];
-			$sqlParts['join']['i'] = ['table' => 'items', 'using' => 'itemid', 'left_table' => 'gi'];
-			$sqlParts['join']['h'] = ['table' => 'hosts', 'using' => 'hostid', 'left_table' => 'i'];
+			$sqlParts['join']['i'] = ['left_table' => 'gi', 'table' => 'items', 'using' => 'itemid'];
+			$sqlParts['join']['h'] = ['left_table' => 'i', 'table' => 'hosts', 'using' => 'hostid'];
 
 			if ($options['templated']) {
 				$sqlParts['where'][] = 'h.status='.HOST_STATUS_TEMPLATE;
@@ -224,8 +224,8 @@ class CGraph extends CGraphGeneral {
 				zbx_value2array($options['filter']['host']);
 
 				$sqlParts['join']['gi'] = ['table' => 'graphs_items', 'using' => 'graphid'];
-				$sqlParts['join']['i'] = ['table' => 'items', 'using' => 'itemid', 'left_table' => 'gi'];
-				$sqlParts['join']['h'] = ['table' => 'hosts', 'using' => 'hostid', 'left_table' => 'i'];
+				$sqlParts['join']['i'] = ['left_table' => 'gi', 'table' => 'items', 'using' => 'itemid'];
+				$sqlParts['join']['h'] = ['left_table' => 'i', 'table' => 'hosts', 'using' => 'hostid'];
 				$sqlParts['where']['host'] = dbConditionString('h.host', $options['filter']['host']);
 			}
 
@@ -233,7 +233,7 @@ class CGraph extends CGraphGeneral {
 				zbx_value2array($options['filter']['hostid']);
 
 				$sqlParts['join']['gi'] = ['table' => 'graphs_items', 'using' => 'graphid'];
-				$sqlParts['join']['i'] = ['table' => 'items', 'using' => 'itemid', 'left_table' => 'gi'];
+				$sqlParts['join']['i'] = ['left_table' => 'gi', 'table' => 'items', 'using' => 'itemid'];
 				$sqlParts['where']['hostid'] = dbConditionInt('i.hostid', $options['filter']['hostid']);
 			}
 		}

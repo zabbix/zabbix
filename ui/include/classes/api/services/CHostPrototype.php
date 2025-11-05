@@ -154,9 +154,9 @@ class CHostPrototype extends CHostBase {
 			}
 			else {
 				$sqlParts['join']['hd'] = ['table' => 'host_discovery', 'using' => 'hostid'];
-				$sqlParts['join']['i'] = ['table' => 'items', 'on' => ['lldruleid' => 'itemid'], 'left_table' => 'hd'];
-				$sqlParts['join']['hh'] = ['table' => 'host_hgset', 'using' => 'hostid', 'left_table' => 'i'];
-				$sqlParts['join']['p'] = ['table' => 'permission', 'using' => 'hgsetid', 'left_table' => 'hh'];
+				$sqlParts['join']['i'] = ['left_table' => 'hd', 'table' => 'items', 'on' => ['lldruleid' => 'itemid']];
+				$sqlParts['join']['hh'] = ['left_table' => 'i', 'table' => 'host_hgset', 'using' => 'hostid'];
+				$sqlParts['join']['p'] = ['left_table' => 'hh', 'table' => 'permission', 'using' => 'hgsetid'];
 				$sqlParts['where'][] = 'p.ugsetid='.self::$userData['ugsetid'];
 
 				if ($options['editable']) {

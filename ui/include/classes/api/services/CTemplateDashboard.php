@@ -85,7 +85,7 @@ class CTemplateDashboard extends CDashboardGeneral {
 			}
 
 			$sql_parts['join']['hh'] = ['table' => 'host_hgset', 'on' => ['templateid' => 'hostid']];
-			$sql_parts['join']['p'] = ['table' => 'permission', 'using' => 'hgsetid', 'left_table' => 'hh'];
+			$sql_parts['join']['p'] = ['left_table' => 'hh', 'table' => 'permission', 'using' => 'hgsetid'];
 			$sql_parts['where'][] = 'p.ugsetid='.self::$userData['ugsetid'];
 
 			if ($options['editable']) {
