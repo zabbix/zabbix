@@ -2742,7 +2742,6 @@ static int	vc_precache_window(zbx_vector_vc_query_t *queries, zbx_vector_int32_t
 		else if (VC_PRECACHE_RANGE == mode)
 		{
 			vc_precache_item(hist, value_type, ts_start, limit);
-			zbx_vector_vc_query_remove(queries, hist->index);
 		}
 	}
 
