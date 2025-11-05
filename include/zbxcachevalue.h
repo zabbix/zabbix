@@ -125,7 +125,7 @@ typedef struct
 	zbx_uint64_t			itemid;
 	unsigned char			value_type;
 	int				ts_end;
-	const zbx_history_range_t	*range;
+	const zbx_history_selector_t	*selector;
 }
 zbx_vc_query_t;
 

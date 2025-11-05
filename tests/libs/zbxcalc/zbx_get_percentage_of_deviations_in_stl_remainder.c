@@ -66,7 +66,7 @@ void	zbx_mock_test_entry(void **state)
 	zbx_timespec_t			ts, ts_evaluate_end;
 	zbx_mock_handle_t		handle;
 	zbx_vector_history_record_t	values_in;
-	zbx_history_range_t		range = {0};
+	zbx_history_selector_t		selector = {0};
 
 	/* ZBX_DOUBLE_EPSILON = 0.000001; results into output that is different from python test case output */
 	zbx_update_epsilon_to_python_compatible_precision();
@@ -113,13 +113,13 @@ void	zbx_mock_test_entry(void **state)
 	ts_evaluate_end.sec = end_evaluate_period;
 	evaluate_seconds = end_evaluate_period - start_evaluate_period;
 
-	if (SUCCEED != get_function_parameter_hist_range(ts.sec, params, 2, &range))
+	if (SUCCEED != get_function_parameter_history_selector(ts.sec, params, 2, &selector))
 	{
 		fail_msg("invalid third parameter");
 		goto out;
 	}
 
-	detect_period = range.value;
+	detect_period = selector.value;
 
 	start_detect_period = ts_evaluate_end.sec - detect_period;
 	end_detect_period = ts_evaluate_end.sec;

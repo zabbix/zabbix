@@ -99,7 +99,7 @@ typedef struct
 	unsigned char	type;
 
 	/* cached data */
-	zbx_history_range_t	range;
+	zbx_history_selector_t	selector;
 	zbx_dc_evaluate_item_t	item;
 
 	/* output data */
@@ -184,7 +184,7 @@ static void	populate_function_items(const zbx_vector_uint64_t *functionids, zbx_
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() functionids_num:%d", __func__, functionids->values_num);
 
 	zbx_variant_set_none(&func_local.value);
-	func_local.range.type = ZBX_VALUE_UNKNOWN;
+	func_local.selector.type = ZBX_VALUE_UNKNOWN;
 
 	functions = (zbx_dc_function_t *)zbx_malloc(functions, sizeof(zbx_dc_function_t) * functionids->values_num);
 	errcodes = (int *)zbx_malloc(errcodes, sizeof(int) * functionids->values_num);
@@ -389,7 +389,7 @@ static void	prepare_item_functions(zbx_hashset_t *funcs, const zbx_vector_uint64
 		func->item.host = item->host.host;
 		func->item.key_orig = item->key_orig;
 
-		ret = zbx_evaluate_function(NULL, &func->item, func->function, params, &func->timespec, &func->range,
+		ret = zbx_evaluate_function(NULL, &func->item, func->function, params, &func->timespec, &func->selector,
 				&error);
 
 		if (SUCCEED != ret)
@@ -409,26 +409,26 @@ static void	prepare_item_functions(zbx_hashset_t *funcs, const zbx_vector_uint64
  *                                                                            *
  * Purpose: update item query history range                                   *
  *                                                                            *
- * Parameters: query - [IN/OUT] item query to update                          *
- *             range - [IN] additional history range                          *
+ * Parameters: query    - [IN/OUT] item query to update                       *
+ *             selector - [IN] new history selector                           *
  *                                                                            *
  * Comments: If item is used in trigger expression in different functions or  *
  *           with different history ranges it will have multiple function     *
  *           calculation queries. This function is used to 'upmerge' ranges.  *
  *                                                                            *
  ******************************************************************************/
-static void	precache_history_range_update(zbx_vc_query_t *query, const zbx_history_range_t *range)
+static void	precache_history_range_update(zbx_vc_query_t *query, const zbx_history_selector_t *selector)
 {
-	if (query->range->type == range->type)
+	if (query->selector->type == selector->type)
 	{
-		if (query->range->value < range->value)
-			query->range = range;
+		if (query->selector->value < selector->value)
+			query->selector = selector;
 
 		return;
 	}
 
-	if (ZBX_VALUE_NODATA == query->range->type || ZBX_VALUE_SECONDS == range->type)
-		query->range = range;
+	if (ZBX_VALUE_NODATA == query->selector->type || ZBX_VALUE_SECONDS == selector->type)
+		query->selector = selector;
 }
 
 /******************************************************************************
@@ -478,7 +478,7 @@ static void	precache_item_history(zbx_hashset_t *funcs)
 		if (0 == (precache_flags & (UINT64_C(1) << func->item.value_type)))
 			continue;
 
-		if (0 != func->range.timeshift)
+		if (0 != func->selector.timeshift)
 			continue;
 
 		refs_num = item_queries.num_data;
@@ -490,7 +490,7 @@ static void	precache_item_history(zbx_hashset_t *funcs)
 			zbx_vc_query_t	query_local = {
 					.itemid = func->item.itemid,
 					.value_type = func->item.value_type,
-					.range = &func->range,
+					.selector = &func->selector,
 					.ts_end = func->timespec.sec
 			};
 
@@ -498,7 +498,7 @@ static void	precache_item_history(zbx_hashset_t *funcs)
 			zbx_vector_vc_query_append_ptr(&queries, &query_local);
 		}
 		else
-			precache_history_range_update(&queries.values[ref->index], &func->range);
+			precache_history_range_update(&queries.values[ref->index], &func->selector);
 	}
 
 	if (0 != queries.values_num)
@@ -536,7 +536,7 @@ static void	evaluate_item_functions(zbx_hashset_t *funcs, const zbx_vector_uint6
 			continue;
 
 		ret = zbx_evaluate_function(&func->value, &func->item, func->function, func->parameter, &func->timespec,
-				&func->range, &error);
+				&func->selector, &error);
 
 		if (SUCCEED != ret)
 		{

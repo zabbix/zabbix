@@ -123,13 +123,13 @@ typedef struct
 	zbx_value_type_t	type;
 	int			timeshift;
 }
-zbx_history_range_t;
+zbx_history_selector_t;
 
 typedef struct
 {
 	zbx_uint64_t			itemid;
 	int				index;
-	const zbx_history_range_t	*range;
+	const zbx_history_selector_t	*selector;
 	zbx_vector_history_record_t	rows;
 }
 zbx_item_history_t;

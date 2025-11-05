@@ -35,7 +35,7 @@ typedef enum
 zbx_host_template_link_type;
 
 typedef int (*zbx_evaluate_function_trigger_t)(zbx_variant_t *, const zbx_dc_evaluate_item_t *, const char *,
-		const char *, const zbx_timespec_t *, zbx_history_range_t *range, char **);
+		const char *, const zbx_timespec_t *, zbx_history_selector_t *selector, char **);
 typedef void (*zbx_lld_process_agent_result_func_t)(zbx_uint64_t itemid, zbx_uint64_t hostid, AGENT_RESULT *result,
 		zbx_timespec_t *ts, char *error);
 typedef void (*zbx_preprocess_item_value_func_t)(zbx_uint64_t itemid, unsigned char item_value_type,

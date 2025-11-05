@@ -93,14 +93,15 @@ out:
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-int	get_function_parameter_hist_range(int from, const char *parameters, int Nparam, zbx_history_range_t *range)
+int	get_function_parameter_history_selector(int from, const char *parameters, int Nparam,
+		zbx_history_selector_t *selector)
 {
 	char	*parameter = NULL, *shift;
 	int	ret = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() parameters:'%s' Nparam:%d", __func__, parameters, Nparam);
 
-	if (ZBX_VALUE_UNKNOWN != range->type)
+	if (ZBX_VALUE_UNKNOWN != selector->type)
 		goto ok;
 
 	if (NULL == (parameter = zbx_function_get_param_dyn(parameters, Nparam)))
@@ -111,21 +112,24 @@ int	get_function_parameter_hist_range(int from, const char *parameters, int Npar
 
 	if ('\0' == *parameter)
 	{
-		range->value = 0;
-		range->type = ZBX_VALUE_NONE;
+		selector->value = 0;
+		selector->type = ZBX_VALUE_NONE;
 	}
 	else if ('#' != *parameter)
 	{
-		if (SUCCEED != zbx_is_time_suffix(parameter, &range->value, ZBX_LENGTH_UNLIMITED) || 0 > range->value)
+		if (SUCCEED != zbx_is_time_suffix(parameter, &selector->value, ZBX_LENGTH_UNLIMITED) ||
+				0 > selector->value)
+		{
 			goto out;
+		}
 
-		range->type = ZBX_VALUE_SECONDS;
+		selector->type = ZBX_VALUE_SECONDS;
 	}
 	else
 	{
-		if (SUCCEED != zbx_is_uint31(parameter + 1, &range->value) || 0 >= range->value)
+		if (SUCCEED != zbx_is_uint31(parameter + 1, &selector->value) || 0 >= selector->value)
 			goto out;
-		range->type = ZBX_VALUE_NVALUES;
+		selector->type = ZBX_VALUE_NVALUES;
 	}
 
 	if (NULL != shift)
@@ -148,14 +152,14 @@ int	get_function_parameter_hist_range(int from, const char *parameters, int Npar
 			goto out;
 		}
 
-		range->timeshift = from - end;
+		selector->timeshift = from - end;
 	}
 	else
-		range->timeshift = 0;
+		selector->timeshift = 0;
 ok:
 	ret = SUCCEED;
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() type:%s value:%d timeshift:%d", __func__, zbx_type_string(range->type),
-			range->value, range->timeshift);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() type:%s value:%d timeshift:%d", __func__, zbx_type_string(selector->type),
+			selector->value, selector->timeshift);
 out:
 	zbx_free(parameter);
 
@@ -170,20 +174,20 @@ out:
  *                                                                            *
  * Parameters: parameters - [IN] trigger function parameters                  *
  *             Nparam     - [IN] specifies which parameter to extract         *
- *             range      - [IN/OUT] parameter value range                    *
+ *             selector   - [IN/OUT] parameter history selector               *
  *                                                                            *
  * Return value: SUCCEED - parameter is valid                                 *
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-int	get_function_parameter_period(const char *parameters, int Nparam, zbx_history_range_t *range)
+int	get_function_parameter_period(const char *parameters, int Nparam, zbx_history_selector_t *selector)
 {
 	char	*parameter = NULL;
 	int	ret = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() parameters:'%s' Nparam:%d", __func__, parameters, Nparam);
 
-	if (ZBX_VALUE_UNKNOWN != range->type)
+	if (ZBX_VALUE_UNKNOWN != selector->type)
 	{
 		ret = SUCCEED;
 		goto ok;
@@ -192,38 +196,38 @@ int	get_function_parameter_period(const char *parameters, int Nparam, zbx_histor
 	if (NULL == (parameter = zbx_function_get_param_dyn(parameters, Nparam)))
 		goto out;
 
-	range->timeshift = 0;
+	selector->timeshift = 0;
 
 	if ('\0' != *parameter)
 	{
 		if ('#' == *parameter)
 		{
-			if (SUCCEED == zbx_is_uint31(parameter + 1, &range->value) && 0 < range->value)
+			if (SUCCEED == zbx_is_uint31(parameter + 1, &selector->value) && 0 < selector->value)
 			{
-				range->type = ZBX_VALUE_NVALUES;
+				selector->type = ZBX_VALUE_NVALUES;
 				ret = SUCCEED;
 			}
 		}
 		else if ('-' == *parameter)
 		{
-			if (SUCCEED == zbx_is_time_suffix(parameter + 1, &range->value, ZBX_LENGTH_UNLIMITED))
+			if (SUCCEED == zbx_is_time_suffix(parameter + 1, &selector->value, ZBX_LENGTH_UNLIMITED))
 			{
-				range->value = -(range->value);
-				range->type = ZBX_VALUE_SECONDS;
+				selector->value = -(selector->value);
+				selector->type = ZBX_VALUE_SECONDS;
 				ret = SUCCEED;
 			}
 		}
-		else if (SUCCEED == zbx_is_time_suffix(parameter, &range->value, ZBX_LENGTH_UNLIMITED))
+		else if (SUCCEED == zbx_is_time_suffix(parameter, &selector->value, ZBX_LENGTH_UNLIMITED))
 		{
-			range->type = ZBX_VALUE_SECONDS;
+			selector->type = ZBX_VALUE_SECONDS;
 			ret = SUCCEED;
 		}
 	}
 ok:
 	if (SUCCEED == ret)
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() type:%s value:%d", __func__, zbx_type_string(range->type),
-				range->value);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() type:%s value:%d", __func__, zbx_type_string(selector->type),
+				selector->value);
 	}
 
 	zbx_free(parameter);

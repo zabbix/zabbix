@@ -2642,10 +2642,10 @@ static void	vc_precache_item(zbx_item_history_t *hist, unsigned char value_type,
 	{
 		int	nvalues;
 
-		if (ZBX_VALUE_SECONDS == hist->range->type)
+		if (ZBX_VALUE_SECONDS == hist->selector->type)
 			nvalues = limit;
 		else
-			nvalues = hist->range->value;
+			nvalues = hist->selector->value;
 
 		vc_item_precache_nvalues(item, &hist->rows, nvalues);
 	}
@@ -2688,19 +2688,19 @@ static int	vc_precache_window(zbx_vector_vc_query_t *queries, zbx_vector_int32_t
 
 		hist_local.index = index;
 		hist_local.itemid = query->itemid;
-		hist_local.range = query->range;
+		hist_local.selector = query->selector;
 		zbx_vector_history_record_create(&hist_local.rows);
 		zbx_vector_item_history_append_ptr(&results, &hist_local);
 
-		switch (query->range->type)
+		switch (query->selector->type)
 		{
 			case ZBX_VALUE_SECONDS:
-				if (limit < query->range->value / SEC_PER_MIN + 1)
-					limit = query->range->value / SEC_PER_MIN + 1;
+				if (limit < query->selector->value / SEC_PER_MIN + 1)
+					limit = query->selector->value / SEC_PER_MIN + 1;
 				break;
 			case ZBX_VALUE_NVALUES:
-				if (limit < query->range->value + 1)
-					limit = query->range->value + 1;
+				if (limit < query->selector->value + 1)
+					limit = query->selector->value + 1;
 				break;
 			case ZBX_VALUE_NODATA:
 				/* nodata requires 1 value, which is the starting point */
