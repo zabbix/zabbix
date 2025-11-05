@@ -3018,6 +3018,24 @@ class CApiInputValidatorTest extends TestCase {
 				]
 			],
 			[
+				['type' => API_OBJECTS, 'flags' => API_PRESERVE_KEYS, 'fields' => []],
+				[
+					10 => [],
+					13 => null
+				],
+				'/',
+				'Invalid parameter "/14": an array is expected.'
+			],
+			[
+				['type' => API_OBJECTS, 'fields' => []],
+				[
+					10 => [],
+					13 => null
+				],
+				'/',
+				'Invalid parameter "/2": an array is expected.'
+			],
+			[
 				['type' => API_OBJECTS, 'fields' => [
 					'hostid' =>	['type' => API_ID],
 					'host' =>	['type'=> API_STRING_UTF8],
@@ -8816,32 +8834,8 @@ class CApiInputValidatorTest extends TestCase {
 		];
 	}
 
-	public function dataProviderRawPathIndexes() {
-		return [
-			[
-				['type' => API_OBJECTS, 'flags' => API_PRESERVE_KEYS, 'fields' => []],
-				[
-					10 => [],
-					13 => null
-				],
-				'/',
-				'Invalid parameter "/14": an array is expected.'
-			],
-			[
-				['type' => API_OBJECTS, 'fields' => []],
-				[
-					10 => [],
-					13 => null
-				],
-				'/',
-				'Invalid parameter "/2": an array is expected.'
-			],
-		];
-	}
-
 	/**
 	 * @dataProvider dataProviderInput
-	 * @dataProvider dataProviderRawPathIndexes
 	 *
 	 * @param array       $rule
 	 * @param mixed       $data
