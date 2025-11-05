@@ -366,7 +366,6 @@ class testDashboardURLWidget extends testWidgets {
 				[
 					'expected' => TEST_GOOD,
 					'fields' => [
-						'Show header' => false,
 						'Refresh interval' => '15 minutes',
 						'URL' => 'tel://zabbix.com'
 					]
@@ -376,7 +375,7 @@ class testDashboardURLWidget extends testWidgets {
 				[
 					'expected' => TEST_GOOD,
 					'fields' => [
-						'Show header' => true,
+						'Show header' => false,
 						'Refresh interval' => 'No refresh',
 						'URL' => 'ssh://zabbix.com'
 					]
