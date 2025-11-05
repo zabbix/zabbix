@@ -341,8 +341,8 @@ Additional information about the metrics and used API methods:
 
 The template to monitor AWS EC2 and attached AWS EBS volumes by HTTP via Zabbix that works without any external scripts.
 Most of the metrics are collected in one go, thanks to Zabbix bulk data collection.
-*NOTE*
-This template uses the GetMetricData CloudWatch API calls to list and retrieve metrics.
+
+**Note:** This template uses the GetMetricData CloudWatch API calls to list and retrieve metrics.
 For more information, please refer to the [CloudWatch pricing](https://aws.amazon.com/cloudwatch/pricing/) page.
 
 Additional information about metrics and used API methods:
@@ -368,7 +368,6 @@ This template has been tested on:
 ## Setup
 
 The template get AWS EC2 and attached AWS EBS volumes metrics and uses the script item to make HTTP requests to the CloudWatch API.
-
 Before using the template, you need to create an IAM policy with the necessary permissions for the Zabbix role in your AWS account.
 
 ### Required Permissions
@@ -647,8 +646,8 @@ Also, see the Macros section for a list of macros used for LLD filters.
 
 The template to monitor AWS RDS instance by HTTP via Zabbix that works without any external scripts.
 Most of the metrics are collected in one go, thanks to Zabbix bulk data collection.
-*NOTE*
-This template uses the GetMetricData CloudWatch API calls to list and retrieve metrics.
+
+**Note:** This template uses the GetMetricData CloudWatch API calls to list and retrieve metrics.
 For more information, please refer to the [CloudWatch pricing](https://aws.amazon.com/cloudwatch/pricing/) page.
 
 Additional information about metrics and used API methods:
@@ -674,7 +673,6 @@ This template has been tested on:
 ## Setup
 
 The template get AWS RDS instance metrics and uses the script item to make HTTP requests to the CloudWatch API.
-
 Before using the template, you need to create an IAM policy with the necessary permissions for the Zabbix role in your AWS account.
 
 ### Required Permissions
@@ -1009,8 +1007,7 @@ Also, see the Macros section for a list of macros used for LLD filters.
 The template to monitor AWS S3 bucket by HTTP via Zabbix that works without any external scripts.
 Most of the metrics are collected in one go, thanks to Zabbix bulk data collection.
 
-*NOTE*
-This template uses the GetMetricData CloudWatch API calls to list and retrieve metrics.
+**Note:** This template uses the GetMetricData CloudWatch API calls to list and retrieve metrics.
 For more information, please refer to the [CloudWatch pricing](https://aws.amazon.com/cloudwatch/pricing/) page.
 
 Additional information about metrics and used API methods:
@@ -1034,7 +1031,6 @@ This template has been tested on:
 ## Setup
 
 The template gets AWS S3 metrics and uses the script item to make HTTP requests to the CloudWatch API.
-
 Before using the template, you need to create an IAM policy for the Zabbix role in your AWS account with the necessary permissions.
 
 ### Required Permissions
@@ -1272,8 +1268,8 @@ Also, see the Macros section for a list of macros used for LLD filters.
 
 The template to monitor AWS ECS Serverless Cluster by HTTP via Zabbix that works without any external scripts.
 Most of the metrics are collected in one go, thanks to Zabbix bulk data collection.
-*NOTE*
-This template uses the GetMetricData CloudWatch API calls to list and retrieve metrics.
+
+**Note:** This template uses the GetMetricData CloudWatch API calls to list and retrieve metrics.
 For more information, please refer to the [CloudWatch pricing](https://aws.amazon.com/cloudwatch/pricing/) page.
 
 Additional information about the metrics and used API methods:
@@ -1297,7 +1293,6 @@ This template has been tested on:
 ## Setup
 
 The template gets AWS ECS metrics and uses the script item to make HTTP requests to the CloudWatch API.
-
 Before using the template, you need to create an IAM policy for the Zabbix role in your AWS account with the necessary permissions.
 
 ### Required Permissions
@@ -1430,7 +1425,7 @@ Next, add a principal to the trust relationships of the role you are using:
 
 Set the following macros `{$AWS.AUTH_TYPE}`, `{$AWS.REGION}`, `{$AWS.ECS.CLUSTER.NAME}`.
 
-For more information about managing access keys, see [official documentation](https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html#access-keys-and-secret-access-keys)
+For more information about managing access keys, see [official documentation](https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html#access-keys-and-secret-access-keys).
 
 Refer to the Macros section for a list of macros used for LLD filters.
 
@@ -1548,8 +1543,8 @@ Refer to the Macros section for a list of macros used for LLD filters.
 
 The template to monitor AWS ECS Cluster by HTTP via Zabbix that works without any external scripts.
 Most of the metrics are collected in one go, thanks to Zabbix bulk data collection.
-*NOTE*
-This template uses the GetMetricData CloudWatch API calls to list and retrieve metrics.
+
+**Note:** This template uses the GetMetricData CloudWatch API calls to list and retrieve metrics.
 For more information, please refer to the [CloudWatch pricing](https://aws.amazon.com/cloudwatch/pricing/) page.
 
 Additional information about the metrics and used API methods:
@@ -1573,7 +1568,6 @@ This template has been tested on:
 ## Setup
 
 The template gets AWS ECS metrics and uses the script item to make HTTP requests to the CloudWatch API.
-
 Before using the template, you need to create an IAM policy for the Zabbix role in your AWS account with the necessary permissions.
 
 ### Required Permissions
@@ -1707,7 +1701,7 @@ Next, add a principal to the trust relationships of the role you are using:
 
 Set the following macros `{$AWS.AUTH_TYPE}`, `{$AWS.REGION}`, `{$AWS.ECS.CLUSTER.NAME}`.
 
-For more information about managing access keys, see [official documentation](https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html#access-keys-and-secret-access-keys)
+For more information about managing access keys, see [official documentation](https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html#access-keys-and-secret-access-keys).
 
 Refer to the Macros section for a list of macros used for LLD filters.
 
