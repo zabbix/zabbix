@@ -427,7 +427,7 @@ static void	precache_history_range_update(zbx_vc_query_t *query, const zbx_histo
 		return;
 	}
 
-	if (range->type == ZBX_VALUE_SECONDS)
+	if (ZBX_VALUE_NODATA == query->range->type || ZBX_VALUE_SECONDS == range->type)
 		query->range = range;
 }
 

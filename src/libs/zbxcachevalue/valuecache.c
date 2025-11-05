@@ -2699,9 +2699,11 @@ static int	vc_precache_window(zbx_vector_vc_query_t *queries, zbx_vector_int32_t
 					limit = query->range->value / SEC_PER_MIN + 1;
 				break;
 			case ZBX_VALUE_NVALUES:
-			case ZBX_VALUE_NODATA:
 				if (limit < query->range->value + 1)
 					limit = query->range->value + 1;
+				break;
+			case ZBX_VALUE_NODATA:
+				/* nodata requires 1 value, which is the starting point */
 				break;
 			default:
 				THIS_SHOULD_NEVER_HAPPEN_MSG("invalid history range");
