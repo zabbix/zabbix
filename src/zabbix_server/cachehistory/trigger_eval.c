@@ -99,7 +99,6 @@ typedef struct
 	unsigned char	type;
 
 	/* cached data */
-	unsigned char		value_type;
 	zbx_history_range_t	range;
 	zbx_dc_evaluate_item_t	item;
 
@@ -401,8 +400,6 @@ static void	prepare_item_functions(zbx_hashset_t *funcs, const zbx_vector_uint64
 							item->key_orig, params, error));
 			zbx_free(error);
 		}
-		else
-			func->value_type = item->value_type;
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
