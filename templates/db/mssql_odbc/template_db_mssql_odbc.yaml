@@ -4180,7 +4180,7 @@ zabbix_export:
             type: TEXT
             priority: '3'
             label: 'MSSQL password'
-            description: 'Password for MSSQL.'
+            description: 'MSSQL user password used by the monitoring agent for database connection.'
             required: 'YES'
         - macro: '{$MSSQL.PERCENT_COMPILATIONS.MAX}'
           value: '10'
@@ -4255,7 +4255,7 @@ zabbix_export:
             type: TEXT
             priority: '2'
             label: 'MSSQL user'
-            description: 'User for MSSQL.'
+            description: 'MSSQL user name used by the monitoring agent for database connection.'
             required: 'YES'
         - macro: '{$MSSQL.WORKTABLES_FROM_CACHE_RATIO.MIN.CRIT}'
           value: '90'

@@ -1367,7 +1367,7 @@ zabbix_export:
             type: TEXT
             priority: '3'
             label: 'MySQL password'
-            description: 'Password for MySQL.'
+            description: 'MySQL user password used by the monitoring agent for database connection.'
             required: 'YES'
         - macro: '{$MYSQL.REPL_LAG.MAX.WARN}'
           value: 30m
@@ -1394,7 +1394,7 @@ zabbix_export:
             type: TEXT
             priority: '2'
             label: 'MySQL user'
-            description: 'User for MySQL.'
+            description: 'MySQL user name used by the monitoring agent for database connection.'
             required: 'YES'
       dashboards:
         - uuid: 403df820c4d3431ba3d2879f6025389e
