@@ -607,7 +607,7 @@ abstract class CTriggerGeneral extends CApiService {
 			}
 		}
 
-		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_ALLOW_UNEXPECTED, 'uniq' => [['uuid']], 'fields' => [
+		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_ALLOW_UNEXPECTED | API_PRESERVE_KEYS, 'uniq' => [['uuid']], 'fields' => [
 			'host_status' =>	['type' => API_ANY],
 			'uuid' =>			['type' => API_MULTIPLE, 'rules' => [
 									['if' => ['field' => 'host_status', 'in' => HOST_STATUS_TEMPLATE], 'type' => API_UUID],
