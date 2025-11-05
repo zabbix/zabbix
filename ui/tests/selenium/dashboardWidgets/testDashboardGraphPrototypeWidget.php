@@ -473,9 +473,12 @@ class testDashboardGraphPrototypeWidget extends testWidgets {
 		$form->submit();
 		COverlayDialogElement::ensureNotPresent();
 		$dashboard->waitUntilReady()->getWidget($widget['Name']);
-		$dashboard->save()->waitUntilReady();
-		$this->page->removeFocus();
-		sleep(1);
+		$dashboard->save();
+		$this->assertMessage(TEST_GOOD, 'Dashboard updated');
+		$dashboard->waitUntilReady();
+
+		// Remove mouse from widget to hide widget name.
+		$this->query('tag:h1')->one()->hoverMouse();
 		$screenshot_area = $this->query('class:dashboard-grid')->one();
 		$screenshot_area->query('xpath:.//div[contains(@class, "dashboard-grid-iterator-focus")]')->waitUntilNotVisible();
 		$this->assertScreenshot($screenshot_area, $data['screenshot_id']);
