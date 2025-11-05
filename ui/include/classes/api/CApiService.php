@@ -416,10 +416,8 @@ class CApiService {
 	 *
 	 * @return string
 	 */
-	private static function dbDistinct(array $sql_parts) {
-		$count = count($sql_parts['from']);
-
-		if ($count == 1 && array_key_exists('join', $sql_parts)) {
+	private static function dbDistinct(array $sql_parts): string {
+		if (array_key_exists('join', $sql_parts)) {
 			foreach ($sql_parts['join'] as $join) {
 				$r_table = DB::getSchema($join['table']);
 				$r_table_key = explode(',', $r_table['key']);
@@ -428,15 +426,14 @@ class CApiService {
 				$r_table_fields = array_key_exists('using', $join) ? (array) $join['using'] : $join['on'];
 				sort($r_table_fields);
 
-				// Increase count when table linked by non-unique column(s).
+				// Apply DISTINCT when table linked by non-unique column(s).
 				if ($r_table_key !== $r_table_fields) {
-					$count++;
-					break;
+					return 'DISTINCT ';
 				}
 			}
 		}
 
-		return ($count > 1 ? 'DISTINCT ' : '');
+		return '';
 	}
 
 	/**
@@ -447,8 +444,6 @@ class CApiService {
 	 * @return string			The resulting SQL query
 	 */
 	protected function createSelectQueryFromParts(array $sqlParts) {
-		$sql_join = '';
-
 		if (count($sqlParts['from']) != 1) {
 			trigger_error('The CApiService database framework does not support multiple "from" clauses.'.
 				' Use "join" instead.', E_USER_ERROR
@@ -460,6 +455,8 @@ class CApiService {
 				'Please use "join" with the "type" => "left" option instead.', E_USER_ERROR
 			);
 		}
+
+		$sql_join = '';
 
 		if (array_key_exists('join', $sqlParts)) {
 			foreach ($sqlParts['join'] as $r_alias => $join) {
@@ -486,7 +483,6 @@ class CApiService {
 		}
 
 		$sqlSelect = implode(',', array_unique($sqlParts['select']));
-		$sqlFrom = implode(',', array_unique($sqlParts['from']));
 		$sqlWhere = empty($sqlParts['where']) ? '' : ' WHERE '.implode(' AND ', array_unique($sqlParts['where']));
 		$sqlGroup = empty($sqlParts['group']) ? '' : ' GROUP BY '.implode(',', array_unique($sqlParts['group']));
 		$sqlOrder = empty($sqlParts['order']) ? '' : ' ORDER BY '.implode(',', array_unique($sqlParts['order']));
@@ -494,11 +490,11 @@ class CApiService {
 		$distinct = str_starts_with($sqlSelect, 'COUNT(') ? '' : self::dbDistinct($sqlParts);
 
 		return 'SELECT '.$distinct.$sqlSelect.
-				' FROM '.$sqlFrom.
-				$sql_join.
-				$sqlWhere.
-				$sqlGroup.
-				$sqlOrder;
+			' FROM '.reset($sqlParts['from']).
+			$sql_join.
+			$sqlWhere.
+			$sqlGroup.
+			$sqlOrder;
 	}
 
 	/**
@@ -515,12 +511,18 @@ class CApiService {
 	 */
 	protected function applyQueryOutputOptions(string $table_name, string $table_alias, array $options,
 			array $sql_parts) {
+		if (count($sql_parts['from']) != 1) {
+			trigger_error('The CApiService database framework does not support multiple "from" clauses.'.
+				' Use "join" instead.', E_USER_ERROR
+			);
+		}
+
 		$pk = $this->pk($table_name);
 		$pk_composite = strpos($pk, ',') !== false;
 
 		if (array_key_exists('countOutput', $options) && $options['countOutput']
 				&& !$this->requiresPostSqlFiltering($options)) {
-			$has_joins = count($sql_parts['from']) > 1 || (array_key_exists('join', $sql_parts) && $sql_parts['join']);
+			$has_joins = array_key_exists('join', $sql_parts) && $sql_parts['join'];
 
 			if ($pk_composite && $has_joins) {
 				throw new Exception('Joins with composite primary keys are not supported in this API version.');
