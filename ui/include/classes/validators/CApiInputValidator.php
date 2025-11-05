@@ -1016,7 +1016,7 @@ class CApiInputValidator {
 				$value = (float) $number_parser->getMatch();
 			}
 			else {
-				if (self::hasValidMacros([$data], $flags)) {
+				if (self::checkValueIsMacro($data, $flags)) {
 					return true;
 				}
 
@@ -1513,13 +1513,8 @@ class CApiInputValidator {
 			}
 
 			if (array_key_exists('compare', $field_rule)) {
-				if (self::hasValidMacros($data, $flags)) {
-					unset($field_rule['compare']);
-				}
-				else {
-					$field_rule['compare']['path'] = ($path === '/' ? $path : $path.'/').$field_rule['compare']['field'];
-					$field_rule['compare']['value'] = $data[$field_rule['compare']['field']];
-				}
+				$field_rule['compare']['path'] = ($path === '/' ? $path : $path.'/').$field_rule['compare']['field'];
+				$field_rule['compare']['value'] = $data[$field_rule['compare']['field']];
 			}
 
 			if (array_key_exists('preproc_type', $field_rule)) {
@@ -2864,7 +2859,7 @@ class CApiInputValidator {
 			return false;
 		}
 
-		if (self::hasValidMacros([$data], $flags)) {
+		if (self::checkValueIsMacro($data, $flags)) {
 			return true;
 		}
 
@@ -3484,7 +3479,11 @@ class CApiInputValidator {
 	 * @return bool
 	 */
 	private static function checkCompare(array $rule, $data, string $path, string &$error): bool {
-		if (!array_key_exists('compare', $rule) || $rule['compare']['value'] === null) {
+		$flags = array_key_exists('flags', $rule) ? $rule['flags'] : 0x00;
+
+		if (!array_key_exists('compare', $rule) || $rule['compare']['value'] === null
+				|| self::checkValueIsMacro($data, $flags)
+				|| self::checkValueIsMacro($rule['compare']['value'], $flags)) {
 			return true;
 		}
 
@@ -4124,8 +4123,8 @@ class CApiInputValidator {
 				}
 
 				$api_input_rules = ['type' => API_OBJECT, 'fields' => [
-					'1' => ['type' => API_FLOAT, 'flags' => API_REQUIRED | API_ALLOW_NULL | ($flags & API_ALLOW_USER_MACRO) | ($flags & API_ALLOW_LLD_MACRO)],
-					'2' => ['type' => API_FLOAT, 'flags' => API_REQUIRED | API_ALLOW_NULL | ($flags & API_ALLOW_USER_MACRO) | ($flags & API_ALLOW_LLD_MACRO), 'compare' => ['operator' => '>', 'field' => '1']]
+					'1' =>	['type' => API_FLOAT, 'flags' => API_REQUIRED | API_ALLOW_NULL | ($flags & API_ALLOW_USER_MACRO) | ($flags & API_ALLOW_LLD_MACRO)],
+					'2' =>	['type' => API_FLOAT, 'flags' => API_REQUIRED | API_ALLOW_NULL | ($flags & API_ALLOW_USER_MACRO) | ($flags & API_ALLOW_LLD_MACRO), 'compare' => ['operator' => '>', 'field' => '1']]
 				]];
 				break;
 
@@ -4337,7 +4336,7 @@ class CApiInputValidator {
 		return self::validateUserMacro($rule, $data, $path, $error);
 	}
 
-	private static function hasValidMacros(array $strings, int $flags): bool {
+	private static function checkValueIsMacro($value, int $flags): bool {
 		$macro_parsers = [];
 		if ($flags & API_ALLOW_USER_MACRO) {
 			$macro_parsers[] = new CUserMacroParser();
@@ -4347,11 +4346,9 @@ class CApiInputValidator {
 			$macro_parsers[] = new CLLDMacroParser();
 			$macro_parsers[] = new CLLDMacroFunctionParser();
 		}
-		foreach ($strings as $string) {
-			foreach ($macro_parsers as $macro_parser) {
-				if ($macro_parser->parse($string) == CParser::PARSE_SUCCESS) {
-					return true;
-				}
+		foreach ($macro_parsers as $macro_parser) {
+			if ($macro_parser->parse($value) == CParser::PARSE_SUCCESS) {
+				return true;
 			}
 		}
 
