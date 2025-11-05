@@ -353,6 +353,7 @@ class testFormMapProperties extends CWebTest {
 		foreach ($textarea_xpath as $textarea) {
 			$field = $form->getField($textarea);
 			$this->assertEquals('', $field->getValue());
+
 			foreach (['rows' => 7, 'maxlength' => 255, 'spellcheck' => 'false'] as $attribute => $value) {
 				$this->assertEquals($value, $field->getAttribute($attribute));
 			}
