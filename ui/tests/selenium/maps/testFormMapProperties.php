@@ -1078,7 +1078,6 @@ class testFormMapProperties extends CWebTest {
 				[
 					'expected' => TEST_GOOD,
 					'sorting' => true,
-
 					'map_properties' => [
 						'Name' => 'URL sorting'.microtime()
 					],
