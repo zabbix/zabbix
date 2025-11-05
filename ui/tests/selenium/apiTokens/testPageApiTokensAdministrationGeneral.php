@@ -149,7 +149,7 @@ class testPageApiTokensAdministrationGeneral extends testPageApiTokens {
 				'Name' => 'Checking sp aces in names',
 				'Expires at' => date('Y-m-d H:i:s', self::$timestamp),
 				'Created at' => '2021-01-01 00:00:01',
-				'Last accessed at' => '2021-01-01 00:00:10',
+				'Last accessed at' => '2021-01-01 00:00:09',
 				'Status' => 'Disabled'
 			],
 			[
@@ -479,6 +479,7 @@ class testPageApiTokensAdministrationGeneral extends testPageApiTokens {
 						'filter-create: future token for filter-create',
 						'filter-create: expired token for filter-create',
 						'filter-create: aktīvs токен - 頑張って',
+						'Checking sp aces in names',
 						'Admin: token for filter-create',
 						'Admin: future token for admin',
 						'Admin: expired token for admin',
@@ -490,6 +491,7 @@ class testPageApiTokensAdministrationGeneral extends testPageApiTokens {
 				[
 					'sort_field' => 'User',
 					'expected' => [
+						'Admin (Zabbix Administrator)',
 						'Admin (Zabbix Administrator)',
 						'Admin (Zabbix Administrator)',
 						'Admin (Zabbix Administrator)',
@@ -511,6 +513,7 @@ class testPageApiTokensAdministrationGeneral extends testPageApiTokens {
 						'2021-01-01 00:06:00',
 						'change_to_timestamp',
 						'change_to_timestamp',
+						'change_to_timestamp',
 						'2026-12-31 23:59:59',
 						'2026-12-31 23:59:59'
 					]
@@ -520,6 +523,7 @@ class testPageApiTokensAdministrationGeneral extends testPageApiTokens {
 				[
 					'sort_field' => 'Created by user',
 					'expected' => [
+						'Admin (Zabbix Administrator)',
 						'Admin (Zabbix Administrator)',
 						'Admin (Zabbix Administrator)',
 						'Admin (Zabbix Administrator)',
@@ -542,7 +546,8 @@ class testPageApiTokensAdministrationGeneral extends testPageApiTokens {
 						'2021-01-01 00:00:06',
 						'2021-01-01 00:00:07',
 						'2021-01-01 00:00:08',
-						'2021-01-01 00:00:09'
+						'2021-01-01 00:00:09',
+						'2021-01-01 00:00:10'
 					]
 				]
 			],
@@ -554,6 +559,7 @@ class testPageApiTokensAdministrationGeneral extends testPageApiTokens {
 						'Enabled',
 						'Enabled',
 						'Enabled',
+						'Disabled',
 						'Disabled',
 						'Disabled',
 						'Disabled',
