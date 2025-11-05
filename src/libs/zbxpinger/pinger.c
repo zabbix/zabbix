@@ -598,7 +598,7 @@ static int	process_pinger_hosts(zbx_hashset_t *pinger_items, int process_num, in
 		max_execution_time = 0;
 
 		if (0 < pinger->timeout)
-			max_execution_time = (pinger->timeout / 1000) + EXEC_TIME_DELTA;
+			max_execution_time = (pinger->timeout / 1000) + (pinger->retries * EXEC_TIME_DELTA);
 
 		ping_result = zbx_ping(hosts.values, hosts.values_num, pinger->count, pinger->interval, pinger->size,
 				pinger->timeout, pinger->retries, pinger->backoff, pinger->allow_redirect, 0,
