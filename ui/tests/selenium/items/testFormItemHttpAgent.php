@@ -558,17 +558,6 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 			[
 				[
 					'fields' => [
-						'Name' => 'item with wrong JSON request body',
-						'Key' => 'check-json',
-						'URL' => 'zabbix.com',
-						'Request body' => '{"<key>": "<value>"'
-					],
-					'request_type' => 'JSON data'
-				]
-			],
-			[
-				[
-					'fields' => [
 						'Name' => 'item with XML empty request body',
 						'Key' => 'check-empty-xml',
 						'URL' => 'zabbix.com'
@@ -577,28 +566,6 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 					'inline_errors' => [
 						'Request body' => 'This field cannot be empty.'
 					]
-				]
-			],
-			[
-				[
-					'fields' => [
-						'Name' => 'item with wrong XML request body',
-						'Key' => 'check-wrong-xml',
-						'URL' => 'zabbix.com',
-						'Request body' => 'test'
-					],
-					'request_type' => 'XML data'
-				]
-			],
-			[
-				[
-					'fields' => [
-						'Name' => 'item with wrong XML request body',
-						'Key' => 'check-xml',
-						'URL' => 'zabbix.com',
-						'Request body' => '<foo>bar</foo'
-					],
-					'request_type' => 'XML data'
 				]
 			],
 			// Check required status codes.
@@ -721,14 +688,6 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 					'inline_errors' => [
 						'Request body' => 'This field cannot be empty.'
 					]
-				]
-			],
-			[
-				[
-					'fields' => [
-						'Request body' => 'test'
-					],
-					'request_type' => 'XML data'
 				]
 			],
 			// Check required status codes.
