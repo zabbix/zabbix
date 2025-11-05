@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2025-10-03 11:20+0000\n"
+"PO-Revision-Date: 2025-10-30 17:03+0000\n"
 "Last-Translator: Vicente Salvador <vicentesalvadorcubedo@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: es\n"
@@ -19530,7 +19530,7 @@ msgstr "Hora de inicio del servidor Zabbix, marca de tiempo Unix."
 #: app/views/trigger.list.php:91 include/forms.inc.php:543
 #: include/views/configuration.host.discovery.list.php:161
 msgid "State"
-msgstr "Estado"
+msgstr "Condición"
 
 #: include/classes/data/CItemData.php:2912
 msgid "State of proxy group. Returns integer: 0 - unknown; 1 - offline; 2 - recovering; 3 - online; 4 - degrading."
