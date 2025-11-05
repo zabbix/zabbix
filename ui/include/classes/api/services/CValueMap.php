@@ -73,8 +73,8 @@ class CValueMap extends CApiService {
 				return $options['countOutput'] ? '0' : [];
 			}
 
-			$sqlParts['join']['hh'] = ['table' => 'host_hgset', 'using' => 'hostid'];
-			$sqlParts['join']['p'] = ['table' => 'permission', 'using' => 'hgsetid', 'left_table' => 'hh'];
+			$sql_parts['join']['hh'] = ['table' => 'host_hgset', 'using' => 'hostid'];
+			$sql_parts['join']['p'] = ['table' => 'permission', 'using' => 'hgsetid', 'left_table' => 'hh'];
 			$sql_parts['where'][] = 'p.ugsetid='.self::$userData['ugsetid'];
 
 			if ($options['editable']) {
