@@ -385,7 +385,18 @@ class testPageMaps extends CWebTest {
 					]
 				]
 			],
-			// #5 View results with request that has spaces separating the words.
+			// #5 View results with multiple spaces in map name.
+			[
+				[
+					'filter' => [
+						'Name' => '   '
+					],
+					'expected' => [
+						self::SYSMAP_NO_SAPCE_NAME
+					]
+				]
+			],
+			// #6 View results with request that has spaces separating the words.
 			[
 				[
 					'filter' => [
@@ -396,7 +407,7 @@ class testPageMaps extends CWebTest {
 					]
 				]
 			],
-			// #6 View results with partial name match.
+			// #7 View results with partial name match.
 			[
 				[
 					'filter' => [
@@ -407,7 +418,7 @@ class testPageMaps extends CWebTest {
 					]
 				]
 			],
-			// #7 View results with partial name match with space.
+			// #8 View results with partial name match with space.
 			[
 				[
 					'filter' => [
@@ -424,7 +435,7 @@ class testPageMaps extends CWebTest {
 					]
 				]
 			],
-			// #8 View results with partial match, trailing and leading spaces.
+			// #9 View results with partial match, trailing and leading spaces.
 			[
 				[
 					'filter' => [
@@ -436,7 +447,7 @@ class testPageMaps extends CWebTest {
 					]
 				]
 			],
-			// #9 View results with upper case.
+			// #10 View results with upper case.
 			[
 				[
 					'filter' => [
@@ -450,7 +461,7 @@ class testPageMaps extends CWebTest {
 					]
 				]
 			],
-			// #10 View results with lower case.
+			// #11 View results with lower case.
 			[
 				[
 					'filter' => [
@@ -464,7 +475,7 @@ class testPageMaps extends CWebTest {
 					]
 				]
 			],
-			// #11 View results with non-existing request.
+			// #12 View results with non-existing request.
 			[
 				[
 					'filter' => [
@@ -472,7 +483,7 @@ class testPageMaps extends CWebTest {
 					]
 				]
 			],
-			// #12 View results if request contains special symbols.
+			// #13 View results if request contains special symbols.
 			[
 				[
 					'filter' => [

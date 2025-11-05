@@ -368,6 +368,17 @@ class testPageAlertsScripts extends CWebTest {
 					]
 				]
 			],
+			// Only empty spaces in search field Name.
+			[
+				[
+					'filter' => [
+						'Name' => '   '
+					],
+					'expected' => [
+						'Multiple spaces in script name'
+					]
+				]
+			],
 			// Partial name match with space between.
 			[
 				[

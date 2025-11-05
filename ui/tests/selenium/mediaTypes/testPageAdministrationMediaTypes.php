@@ -340,8 +340,9 @@ class testPageAdministrationMediaTypes extends CWebTest {
 
 			foreach (CDBHelper::getAll('SELECT name FROM media_type WHERE status='.$db_status.
 					' ORDER BY LOWER(name) ASC') as $name) {
-				$data['result'][] = ($name['name'] === 'Multiple spaces in   webhook   123') ? str_replace('  ', '',
-						$name['name']) : $name['name'];
+				$data['result'][] = ($name['name'] === 'Multiple spaces in   webhook   123')
+						? str_replace('  ', '', $name['name'])
+						: $name['name'];
 			}
 		}
 
