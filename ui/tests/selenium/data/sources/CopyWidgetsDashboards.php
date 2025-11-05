@@ -774,7 +774,7 @@ class CopyWidgetsDashboards {
 									],
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
-										'name' => 'layout ',
+										'name' => 'layout',
 										'value' => 1
 									],
 									[
