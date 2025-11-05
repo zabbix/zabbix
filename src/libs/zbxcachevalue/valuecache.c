@@ -2678,6 +2678,8 @@ static int	vc_precache_window(zbx_vector_vc_query_t *queries, zbx_vector_int32_t
 		goto out;
 
 	zbx_vector_item_history_create(&results);
+	zbx_vector_item_history_reserve(&results, (size_t)window->values_num);
+
 	limit = 2;
 
 	for (int i = 0; i < window->values_num; i++)
