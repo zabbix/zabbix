@@ -81,17 +81,14 @@ window.mediatype_edit_popup = new class {
 			}
 		});
 
-		this.dialogue.querySelector('.overlay-dialogue-footer').addEventListener('click', (e) => {
-			if (e.target.classList.contains('js-add') || e.target.classList.contains('js-update')) {
-				this.submit();
-			}
-			else if (e.target.classList.contains('js-clone')) {
-				this.clone();
-			}
-			else if (e.target.classList.contains('js-delete')) {
-				this.delete()
-			}
-		});
+		this.overlay.$dialogue.$footer[0].querySelector('.js-submit')
+			.addEventListener('click', () => this.#submit());
+
+		this.overlay.$dialogue.$footer[0].querySelector('.js-clone')
+			?.addEventListener('click', () => this.#clone());
+
+		this.overlay.$dialogue.$footer[0].querySelector('.js-delete')
+			?.addEventListener('click', () => this.#delete());
 
 		if (this.form_element.querySelector('#chPass_btn') !== null) {
 			this.form_element.querySelector('#chPass_btn').addEventListener('click', () => this.#toggleChangePasswordButton());
@@ -145,7 +142,7 @@ window.mediatype_edit_popup = new class {
 		});
 	}
 
-	clone() {
+	#clone() {
 		this.mediatypeid = null;
 		document.getElementById('mediatypeid').remove();
 		this.#setOAuth();
@@ -154,7 +151,7 @@ window.mediatype_edit_popup = new class {
 		const buttons = [
 			{
 				title: <?= json_encode(_('Add')) ?>,
-				class: 'js-add',
+				class: 'js-submit',
 				keepOpen: true,
 				isSubmit: true
 			},
@@ -168,13 +165,17 @@ window.mediatype_edit_popup = new class {
 
 		this.#toggleChangePasswordButton();
 		this.overlay.setProperties({title, buttons});
+
+		this.overlay.$dialogue.$footer[0].querySelector('.js-submit')
+			.addEventListener('click', () => this.#submit());
+
 		this.overlay.unsetLoading();
 		this.overlay.recoverFocus();
 		this.overlay.containFocus();
 		this.form.reload(this.clone_rules);
 	}
 
-	delete() {
+	#delete() {
 		const curl = new Curl('zabbix.php');
 
 		curl.setArgument('action', 'mediatype.delete');
@@ -187,7 +188,7 @@ window.mediatype_edit_popup = new class {
 		});
 	}
 
-	submit() {
+	#submit() {
 		const fields = this.form.getAllValues();
 
 		switch (fields.maxsessions_type) {

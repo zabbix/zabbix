@@ -575,7 +575,7 @@ if ($data['mediatypeid']) {
 	$buttons = [
 		[
 			'title' => _('Update'),
-			'class' => 'js-update',
+			'class' => 'js-submit',
 			'keepOpen' => true,
 			'isSubmit' => true
 		],
@@ -598,7 +598,7 @@ else {
 	$buttons = [
 		[
 			'title' => _('Add'),
-			'class' => 'js-add',
+			'class' => 'js-submit',
 			'keepOpen' => true,
 			'isSubmit' => true
 		]

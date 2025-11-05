@@ -44,11 +44,8 @@ window.mediatype_message_popup = new class {
 			this.form_element.querySelector('#message').value = message_template.message;
 		};
 
-		this.dialogue.querySelector('.overlay-dialogue-footer').addEventListener('click', (e) => {
-			if (e.target.classList.contains('js-update')) {
-				this.submit();
-			}
-		});
+		this.overlay.$dialogue.$footer[0].querySelector('.js-submit')
+			.addEventListener('click', () => this.#submit());
 	}
 
 	/**
@@ -82,7 +79,7 @@ window.mediatype_message_popup = new class {
 		};
 	}
 
-	submit() {
+	#submit() {
 		this.overlay.setLoading();
 		const fields = this.form.getAllValues();
 

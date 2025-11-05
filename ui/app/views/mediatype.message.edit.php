@@ -111,7 +111,7 @@ $output = [
 	'buttons' => [
 		[
 			'title' => $data['params']['old_message_type'] == -1 ? _('Add') : _('Update'),
-			'class' => 'js-update',
+			'class' => 'js-submit',
 			'keepOpen' => true,
 			'isSubmit' => true
 		]

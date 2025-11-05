@@ -45,7 +45,7 @@ window.oauth_edit_popup = new class {
 		this.#updateFieldsVisibility();
 	}
 
-	submit() {
+	#submit() {
 		const fields = this.form.getAllValues();
 
 		this.form.validateSubmit(fields)
@@ -137,11 +137,8 @@ window.oauth_edit_popup = new class {
 			input.focus();
 		});
 
-		this.dialogue.querySelector('.overlay-dialogue-footer').addEventListener('click', (e) => {
-			if (e.target.classList.contains('js-add')) {
-				this.submit();
-			}
-		});
+		this.overlay.$dialogue.$footer[0].querySelector('.js-add')
+			.addEventListener('click', () => this.#submit());
 	}
 
 	#initDynamicRows(url_selector, parameters_selector, options) {
