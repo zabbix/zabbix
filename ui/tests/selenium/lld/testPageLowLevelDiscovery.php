@@ -516,7 +516,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 						'Type' => 'Dependent item'
 					],
 					'context' => 'template',
-					'rows' => 23
+					'rows' => 33
 				]
 			],
 			// #13.

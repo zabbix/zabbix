@@ -62,7 +62,7 @@ class CControllerUsergroupTagFilterList extends CController {
 			}
 		}
 
-		$data['tag_filters_badges'] = makeTags($tag_filters_badges, true, 'groupid');
+		$data['tag_filters_badges'] = CTagHelper::getTagsHtml($tag_filters_badges, ZBX_TAG_OBJECT_HOST_GROUP);
 
 		$this->setResponse(new CControllerResponseData($data));
 	}

@@ -664,12 +664,12 @@ function getActionOperationDescriptions(array $operations, int $eventsource, arr
 					CArrayHelper::sort($operation['optag'], ['tag', 'value']);
 
 					foreach ($operation['optag'] as $tag) {
-						$value = getTagString($tag);
+						$value = CTagHelper::getTagString($tag);
 
 						if ($value !== '') {
 							$tags[] = (new CSpan($value))
 								->addClass(ZBX_STYLE_TAG)
-								->setHint(getTagString($tag));
+								->setHint($value);
 						}
 					}
 

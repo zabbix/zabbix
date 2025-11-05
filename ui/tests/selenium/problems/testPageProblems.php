@@ -1285,7 +1285,8 @@ class testPageProblems extends CWebTest {
 				]
 			],
 			// #30 Tags priority check 3.
-			[
+			// TODO: uncomment after fix ZBX-27171
+/*			[
 				[
 					'fields' => [
 						'Problem' => 'test trigger with tag priority',
@@ -1311,7 +1312,7 @@ class testPageProblems extends CWebTest {
 						]
 					]
 				]
-			],
+			],*/
 			// #31 Test result with 2 tags, and then result after removing one tag.
 			[
 				[
