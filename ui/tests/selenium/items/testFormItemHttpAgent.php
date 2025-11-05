@@ -806,7 +806,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 				[
 					'fields' => [
 						'Name' => 'item with XML body',
-						'Key' => 'http.xml.123',
+						'Key' => 'http.xml',
 						'URL' => 'zabbix.com',
 						'Request body' => '<data><macro>{$MACRO}</macro><![CDATA[{$MACRO}<foo></bar>]]></data>'
 					],
@@ -818,7 +818,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 				[
 					'fields' => [
 						'Name' => 'item with invalid XML body',
-						'Key' => 'http.xml',
+						'Key' => 'http.xml.123',
 						'URL' => 'zabbix.com',
 						'Request body' => '<data><macro>KEY<ma'
 					],
