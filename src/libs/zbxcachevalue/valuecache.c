@@ -2642,10 +2642,18 @@ static void	vc_precache_item(zbx_item_history_t *hist, unsigned char value_type,
 	{
 		int	nvalues;
 
-		if (ZBX_VALUE_SECONDS == hist->selector->type)
-			nvalues = limit;
-		else
-			nvalues = hist->selector->value;
+		switch (hist->selector->type)
+		{
+			case ZBX_VALUE_SECONDS:
+				nvalues = limit;
+				break;
+			case ZBX_VALUE_NVALUES:
+				nvalues = hist->selector->value;
+				break;
+			default:
+				nvalues = 1;
+				break;
+		}
 
 		vc_item_precache_nvalues(item, &hist->rows, nvalues);
 	}
