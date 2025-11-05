@@ -1180,13 +1180,10 @@ class testDashboardItemCardWidget extends testWidgets {
 					$this->assertEquals($labels, $form->getField($locator)->getLabels()->asText());
 				}
 
-				// Check color-picker form is opened.
-				$color_picker_dialog = $form->query('class:color-picker')->one()->asColorPicker();
-
 				// Check that apply button disabled if field is empty.
-				$color_picker_dialog->fill('');
-				$this->assertTrue($color_picker_dialog->isSubmittionDisabled());
-				$color_picker_dialog->close();
+				$form->fill([self::PATH_TO_COLOR_PICKER.'"sparkline[color]"]' => '']);
+				$this->assertTrue(CColorPickerElement::isSubmitable(false));
+				CColorPickerElement::close();
 			}
 			else {
 				$this->assertTrue($sparkline->isVisible(false));
