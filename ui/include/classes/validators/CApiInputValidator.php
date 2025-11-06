@@ -1521,22 +1521,10 @@ class CApiInputValidator {
 			}
 
 			if (array_key_exists('compare', $field_rule)) {
-				$skip_compare = false;
 				$compare_field = $data[$field_rule['compare']['field']];
 
-				if ($flags & API_ALLOW_USER_MACRO) {
-					if (self::checkValueIsUserMacro($compare_field)) {
-						$skip_compare = true;
-					}
-				}
-
-				if ($flags & API_ALLOW_LLD_MACRO) {
-					if (self::checkValueIsLldMacro($compare_field)) {
-						$skip_compare = true;
-					}
-				}
-
-				if ($skip_compare) {
+				if ((($flags & API_ALLOW_USER_MACRO) && self::checkValueIsUserMacro($compare_field))
+						|| (($flags & API_ALLOW_LLD_MACRO) && self::checkValueIsLldMacro($compare_field))) {
 					unset($field_rule['compare']);
 				}
 				else {
