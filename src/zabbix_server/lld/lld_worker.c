@@ -25,7 +25,6 @@
 #include "zbxself.h"
 #include "zbxtime.h"
 #include "zbx_item_constants.h"
-#include "zbxstr.h"
 #include "zbxcacheconfig.h"
 #include "zbxdb.h"
 #include "zbxdbhigh.h"
