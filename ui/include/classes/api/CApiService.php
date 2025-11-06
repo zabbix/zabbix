@@ -411,12 +411,8 @@ class CApiService {
 
 	/**
 	 * Returns DISTINCT modifier for sql statements with multiple joins and without aggregations.
-	 *
-	 * @param array $sql_parts  An SQL parts array.
-	 *
-	 * @return string
 	 */
-	private static function dbDistinct(array $sql_parts): string {
+	private static function dbDistinct(array $sql_parts): bool {
 		if (array_key_exists('join', $sql_parts)) {
 			foreach ($sql_parts['join'] as $join) {
 				$r_table = DB::getSchema($join['table']);
@@ -428,12 +424,12 @@ class CApiService {
 
 				// Apply DISTINCT when table linked by non-unique column(s).
 				if ($r_table_key !== $r_table_fields) {
-					return 'DISTINCT ';
+					return true;
 				}
 			}
 		}
 
-		return '';
+		return false;
 	}
 
 	/**
@@ -481,9 +477,7 @@ class CApiService {
 		$sqlGroup = empty($sqlParts['group']) ? '' : ' GROUP BY '.implode(',', array_unique($sqlParts['group']));
 		$sqlOrder = empty($sqlParts['order']) ? '' : ' ORDER BY '.implode(',', array_unique($sqlParts['order']));
 
-		$distinct = str_starts_with($sqlSelect, 'COUNT(') ? '' : self::dbDistinct($sqlParts);
-
-		return 'SELECT '.$distinct.$sqlSelect.
+		return 'SELECT '.($sqlParts['distinct'] ? 'DISTINCT ' : '').$sqlSelect.
 			' FROM '.$sqlParts['from'].
 			$sql_join.
 			$sqlWhere.
@@ -508,6 +502,8 @@ class CApiService {
 		$pk = $this->pk($table_name);
 		$pk_composite = strpos($pk, ',') !== false;
 
+		$sql_parts['distinct'] = self::dbDistinct($sql_parts);
+
 		if (array_key_exists('countOutput', $options) && $options['countOutput']
 				&& !$this->requiresPostSqlFiltering($options)) {
 			$has_joins = array_key_exists('join', $sql_parts) && $sql_parts['join'];
@@ -517,8 +513,11 @@ class CApiService {
 			}
 
 			$sql_parts['select'] = $has_joins
-				? ['COUNT('.self::dbDistinct($sql_parts).$this->fieldId($pk, $table_alias).') AS rowscount']
+				? ['COUNT('.($sql_parts['distinct'] ? 'DISTINCT ' : '').$this->fieldId($pk, $table_alias).')'.
+					' AS rowscount']
 				: ['COUNT(*) AS rowscount'];
+
+			$sql_parts['distinct'] = false;
 
 			// Select columns used by group count.
 			if (array_key_exists('groupCount', $options) && $options['groupCount']) {
