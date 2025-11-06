@@ -16,6 +16,6 @@ VALUECACHE_WRAP_FUNCS = \
 	-Wl,--wrap=zbx_elastic_version_extract \
 	-Wl,--wrap=zbx_elastic_version_get \
 	-Wl,--wrap=time \
-	-Wl,--wrap=substitute_simple_macros \
+	-Wl,--wrap=zbx_substitute_macros_args \
 	-Wl,--wrap=zbx_dc_get_data_expected_from \
 	-Wl,--wrap=zbx_timespec

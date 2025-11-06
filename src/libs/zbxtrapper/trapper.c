@@ -48,10 +48,9 @@
 #include "zbxthreads.h"
 #include "zbxvault.h"
 #include "zbxautoreg.h"
-
+#include "zbxrtc.h"
+#include "zbx_rtc_constants.h"
 #ifdef HAVE_NETSNMP
-#	include "zbxrtc.h"
-#	include "zbx_rtc_constants.h"
 #	include "zbxipcservice.h"
 #endif
 
@@ -1209,7 +1208,8 @@ static int	process_trap(zbx_socket_t *sock, char *s, zbx_timespec_t *ts,
 		int config_enable_global_scripts, zbx_get_value_internal_ext_f zbx_get_value_internal_ext_cb,
 		const char *config_ssh_key_location, const char *config_webdriver_url,
 		zbx_trapper_process_request_func_t trapper_process_request_cb,
-		zbx_autoreg_update_host_func_t autoreg_update_host_cb, const char *config_frontend_allowed_ip)
+		zbx_autoreg_update_host_func_t autoreg_update_host_cb, const char *config_frontend_allowed_ip,
+		zbx_ipc_async_socket_t *rtc)
 {
 	int	ret = SUCCEED;
 
@@ -1315,7 +1315,7 @@ static int	process_trap(zbx_socket_t *sock, char *s, zbx_timespec_t *ts,
 		}
 		else if (SUCCEED != trapper_process_request_cb(value, sock, &jp, ts, config_comms, config_vault,
 				proxydata_frequency, zbx_get_program_type_cb, events_cbs, get_config_forks,
-				config_comms->config_tls, config_frontend_allowed_ip))
+				config_comms->config_tls, config_frontend_allowed_ip, rtc))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "unknown request received from \"%s\": [%s]", sock->peer,
 				value);
@@ -1405,7 +1405,8 @@ static void	process_trapper_child(zbx_socket_t *sock, zbx_timespec_t *ts,
 		int config_enable_global_scripts, zbx_get_value_internal_ext_f zbx_get_value_internal_ext_cb,
 		const char *config_ssh_key_location, const char *config_webdriver_url,
 		zbx_trapper_process_request_func_t trapper_process_request_cb,
-		zbx_autoreg_update_host_func_t autoreg_update_host_cb, const char *config_frontend_allowed_ip)
+		zbx_autoreg_update_host_func_t autoreg_update_host_cb, const char *config_frontend_allowed_ip,
+		zbx_ipc_async_socket_t *rtc)
 {
 	if (FAIL == zbx_tcp_recv_to(sock, config_comms->config_trapper_timeout))
 		return;
@@ -1415,7 +1416,7 @@ static void	process_trapper_child(zbx_socket_t *sock, zbx_timespec_t *ts,
 			config_java_gateway, config_java_gateway_port, config_externalscripts,
 			config_enable_global_scripts, zbx_get_value_internal_ext_cb, config_ssh_key_location,
 			config_webdriver_url, trapper_process_request_cb, autoreg_update_host_cb,
-			config_frontend_allowed_ip);
+			config_frontend_allowed_ip, rtc);
 }
 
 ZBX_THREAD_ENTRY(zbx_trapper_thread, args)
@@ -1429,10 +1430,7 @@ ZBX_THREAD_ENTRY(zbx_trapper_thread, args)
 	int			ret = SUCCEED, server_num = ((zbx_thread_args_t *)args)->info.server_num,
 				process_num = ((zbx_thread_args_t *)args)->info.process_num;
 	unsigned char		process_type = ((zbx_thread_args_t *)args)->info.process_type;
-#ifdef HAVE_NETSNMP
-	zbx_uint32_t		rtc_msgs[] = {ZBX_RTC_SNMP_CACHE_RELOAD};
 	zbx_ipc_async_socket_t	rtc;
-#endif
 
 	zbx_get_program_type_cb = trapper_args_in->zbx_get_program_type_cb_arg;
 
@@ -1451,18 +1449,12 @@ ZBX_THREAD_ENTRY(zbx_trapper_thread, args)
 
 	zbx_db_connect(ZBX_DB_CONNECT_NORMAL);
 
-#ifdef HAVE_NETSNMP
-	zbx_rtc_subscribe(process_type, process_num, rtc_msgs, ARRSIZE(rtc_msgs),
-			trapper_args_in->config_comms->config_timeout, &rtc);
-#endif
+	zbx_rtc_subscribe(process_type, process_num, NULL, 0, trapper_args_in->config_comms->config_timeout, &rtc);
 
 	while (ZBX_IS_RUNNING())
 	{
-#ifdef HAVE_NETSNMP
 		zbx_uint32_t	rtc_cmd;
 		unsigned char	*rtc_data;
-		int		snmp_reload = 0;
-#endif
 
 		if (TIMEOUT_ERROR != ret)
 		{
@@ -1496,22 +1488,15 @@ ZBX_THREAD_ENTRY(zbx_trapper_thread, args)
 			zbx_setproctitle("%s #%d [processing data]", get_process_type_string(process_type),
 					process_num);
 
-#ifdef HAVE_NETSNMP
 			while (SUCCEED == zbx_rtc_wait(&rtc, info, &rtc_cmd, &rtc_data, 0) && 0 != rtc_cmd)
 			{
-				if (ZBX_RTC_SNMP_CACHE_RELOAD == rtc_cmd && 0 == snmp_reload)
-				{
-					zbx_clear_cache_snmp(process_type, process_num);
-					snmp_reload = 1;
-				}
-				else if (ZBX_RTC_SHUTDOWN == rtc_cmd)
+				if (ZBX_RTC_SHUTDOWN == rtc_cmd)
 				{
 					zbx_tcp_unaccept(&s);
 					goto out;
 				}
-
 			}
-#endif
+
 			sec = zbx_time();
 			process_trapper_child(&s, &ts, trapper_args_in->config_comms, trapper_args_in->config_vault,
 					trapper_args_in->config_startup_time, trapper_args_in->events_cbs,
@@ -1527,7 +1512,8 @@ ZBX_THREAD_ENTRY(zbx_trapper_thread, args)
 					trapper_args_in->config_webdriver_url,
 					trapper_args_in->trapper_process_request_func_cb,
 					trapper_args_in->autoreg_update_host_cb,
-					trapper_args_in->config_frontend_allowed_ip);
+					trapper_args_in->config_frontend_allowed_ip,
+					&rtc);
 			sec = zbx_time() - sec;
 
 			zbx_tcp_unaccept(&s);
@@ -1538,10 +1524,8 @@ ZBX_THREAD_ENTRY(zbx_trapper_thread, args)
 					zbx_socket_strerror());
 		}
 	}
-#ifdef HAVE_NETSNMP
 out:
 	zbx_ipc_async_socket_close(&rtc);
-#endif
 	zbx_db_close();
 
 	zbx_setproctitle("%s #%d [terminated]", get_process_type_string(process_type), process_num);

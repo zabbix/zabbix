@@ -1231,7 +1231,7 @@ class testFormTrigger extends CLegacyWebTest {
 					$this->zbxTestAssertElementText("//a[text()='$description']/ancestor::tr/td[6]", $expression);
 					break;
 				case TEST_BAD:
-					// TODO: All error checks should be moced to inline validation once DEV-4259 is fixed.
+					// TODO: All error checks should be mocked to inline validation once DEV-4259 is fixed.
 					if (array_key_exists('inline_errors', $data)) {
 						$this->assertInlineError($dialog->asForm(), $data['inline_errors']);
 					}

@@ -116,8 +116,10 @@ class CWidgetItemNavigator extends CWidget {
 			selected_itemid: this.#selected_itemid
 		});
 
-		if (!this.hasEverUpdated() && this.isReferred()) {
-			this.#selected_itemid = this.#getDefaultSelectable();
+		if (this.isReferred() && (this.isFieldsReferredDataUpdated() || !this.hasEverUpdated())) {
+			if (this.#selected_itemid === null || (!this.#hasSelectable() && !this.#selectItemidByKey())) {
+				this.#selected_itemid = this.#getDefaultSelectable();
+			}
 
 			if (this.#selected_itemid !== null) {
 				this.#selected_key_ = this.#items_data.get(this.#selected_itemid).key_;
@@ -126,17 +128,22 @@ class CWidgetItemNavigator extends CWidget {
 			}
 		}
 		else if (this.#selected_itemid !== null) {
-			if (!this.#items_data.has(this.#selected_itemid)) {
-				for (let [itemid, item] of this.#items_data) {
-					if (item.key_ === this.#selected_key_) {
-						this.#selected_itemid = itemid;
-
-						this.#item_navigator.selectItem(this.#selected_itemid);
-						break;
-					}
-				}
+			if (!this.#items_data.has(this.#selected_itemid) && this.#selectItemidByKey()) {
+				this.#item_navigator.selectItem(this.#selected_itemid);
 			}
 		}
+	}
+
+	#selectItemidByKey() {
+		for (let [itemid, item] of this.#items_data) {
+			if (item.key_ === this.#selected_key_) {
+				this.#selected_itemid = itemid;
+
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	#broadcast() {
@@ -150,6 +157,10 @@ class CWidgetItemNavigator extends CWidget {
 		const selected_element = this._body.querySelector(`.${CNavigationTree.ZBX_STYLE_NODE_IS_ITEM}`);
 
 		return selected_element !== null ? selected_element.dataset.id : null;
+	}
+
+	#hasSelectable() {
+		return this.#items_data.has(this.#selected_itemid);
 	}
 
 	onReferredUpdate() {

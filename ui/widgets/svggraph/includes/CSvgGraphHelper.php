@@ -19,6 +19,7 @@ namespace Widgets\SvgGraph\Includes;
 use API,
 	CArrayHelper,
 	CColorPicker,
+	CGraphHelper,
 	CHousekeepingHelper,
 	CItemHelper,
 	CMacrosResolverHelper,
@@ -66,6 +67,7 @@ class CSvgGraphHelper {
 		// Find which metrics will be shown in graph and calculate time periods and display options.
 		self::getMetricsPattern($metrics, $options['data_sets'], $options['templateid'], $options['override_hostid']);
 		self::getMetricsItems($metrics, $options['data_sets'], $options['templateid'], $options['override_hostid']);
+		CGraphHelper::calculateMetricsDelay($metrics);
 		self::sortByDataset($metrics);
 		// Apply overrides for previously selected $metrics.
 		self::applyOverrides($metrics, $options['templateid'], $options['override_hostid'], $options['overrides']);
@@ -78,6 +80,8 @@ class CSvgGraphHelper {
 		self::getGraphDataSource($metrics, $errors, $options['data_source'], $width);
 		// Load Data for each metric.
 		self::getMetricsData($metrics, $width);
+		// Additional data processing for items with the preprocessing step "Discard unchanged".
+		self::populateValuesBetweenHeartbeats($metrics, $width);
 		// Load aggregated Data for each dataset.
 		self::getMetricsAggregatedData($metrics, $width, $options['data_sets'], $options['legend']['show_aggregation']);
 
@@ -151,9 +155,15 @@ class CSvgGraphHelper {
 			$resolve_macros = $templateid === '' || $override_hostid !== '';
 
 			$options = [
-				'output' => ['itemid', 'hostid', 'history', 'trends', 'units', 'value_type'],
+				'output' => ['itemid', 'hostid', 'type', 'key_', 'master_itemid', 'delay', 'history', 'trends', 'units',
+					'value_type'
+				],
+				'selectPreprocessing' => ['type', 'params'],
 				'selectHosts' => ['name'],
 				'webitems' => true,
+				'evaltype' => $data_set['item_tags_evaltype'],
+				'tags' => $data_set['item_tags'] ?: null,
+				'inheritedTags' => true,
 				'filter' => [
 					'value_type' => [ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_FLOAT]
 				],
@@ -309,9 +319,10 @@ class CSvgGraphHelper {
 			$resolve_macros = $templateid === '' || $override_hostid !== '';
 
 			$db_items = API::Item()->get([
-				'output' => ['itemid', 'hostid', $resolve_macros ? 'name_resolved' : 'name', 'history', 'trends',
-					'units', 'value_type'
+				'output' => ['itemid', 'hostid', 'type', 'key_', 'master_itemid', 'delay',
+					$resolve_macros ? 'name_resolved' : 'name', 'history', 'trends', 'units', 'value_type'
 				],
+				'selectPreprocessing' => ['type', 'params'],
 				'selectHosts' => ['name'],
 				'webitems' => true,
 				'filter' => [
@@ -704,12 +715,78 @@ class CSvgGraphHelper {
 						}
 						ksort($metric['points'], SORT_NUMERIC);
 
-						unset($metric['source'], $metric['history'], $metric['trends']);
+						unset($metric['history'], $metric['trends']);
 					}
 				}
 				unset($metric);
 			}
 		}
+	}
+
+	private static function populateValuesBetweenHeartbeats(array &$metrics, int $width) {
+		foreach ($metrics as &$metric) {
+			if ($metric['options']['aggregate_function'] != AGGREGATE_NONE) {
+				continue;
+			}
+
+			if ($metric['throttling_type'] != ZBX_PREPROC_THROTTLE_VALUE
+					&& $metric['throttling_type'] != ZBX_PREPROC_THROTTLE_TIMED_VALUE) {
+				continue;
+			}
+
+			if ($metric['delay'] === null || $metric['delay'] == 0) {
+				continue;
+			}
+
+			$throttling_delay = null;
+
+			if ($metric['throttling_type'] == ZBX_PREPROC_THROTTLE_TIMED_VALUE
+					&& ($throttling_delay = timeUnitToSeconds($metric['throttling_delay'])) === null) {
+				continue;
+			}
+
+			$delay = $metric['source'] == SVG_GRAPH_DATA_SOURCE_TRENDS
+				? max($metric['delay'], ZBX_MAX_TREND_DIFF)
+				: $metric['delay'];
+			$time_to = $metric['time_period']['time_to'];
+			$period = $time_to - $metric['time_period']['time_from'];
+
+			if (($delay_width = $delay * $width / $period) < 1) {
+				$delay = (int) ceil($delay / $delay_width);
+			}
+
+			$prev_ts = null;
+			$prev_point = null;
+			$new_points = [];
+
+			foreach ($metric['points'] as $ts => $point) {
+				if ($prev_ts != null && $ts - $prev_ts > $delay
+						&& ($throttling_delay === null || $ts - $prev_ts <= 2 * $throttling_delay)) {
+					$n = round(($ts - $prev_ts) / $delay) - 1;
+					for ($i = 1; $i < $n; $i += 3) {
+						$new_points[$prev_ts + $i * $delay] = $prev_point;
+					}
+					$new_points[$prev_ts + $n * $delay] = $prev_point;
+				}
+
+				$new_points[$ts] = $point;
+				$prev_ts = $ts;
+				$prev_point = $point;
+			}
+
+			if ($prev_ts != null && $time_to - $prev_ts > $delay
+					&& ($throttling_delay === null || $time_to - $prev_ts <= 2 * $throttling_delay)) {
+				$n = round(($time_to - $prev_ts) / $delay);
+				for ($i = 1; $i < $n; $i += 3) {
+					$new_points[$prev_ts + $i * $delay] = $prev_point;
+				}
+				$new_points[$prev_ts + $n * $delay] = $prev_point;
+			}
+
+			$metric['points'] = $new_points;
+			unset($metric['source']);
+		}
+		unset($metric);
 	}
 
 	/**

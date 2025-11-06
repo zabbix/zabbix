@@ -169,7 +169,26 @@ if ($data['multiselect'] && $form !== null) {
 	$table_columns[] = $ch_box;
 }
 
-$table = (new CTableInfo())->setHeader(array_merge($table_columns, $data['table_columns']));
+$table_header = new CRowHeader();
+$table_columns = array_merge($table_columns, $data['table_columns']);
+
+foreach ($table_columns as $i => $column) {
+	$column = $column instanceof CColHeader ? $column : new CColHeader($column);
+
+	if ($data['popup_type'] === 'help_items') {
+		if ($i === array_key_first($table_columns)) {
+			$column->addStyle('min-width: 210px;');
+		}
+
+		if ($i === array_key_last($table_columns)) {
+			$column->addStyle('width: 18px;');
+		}
+	}
+
+	$table_header->addItem($column);
+}
+
+$table = (new CTableInfo())->setHeader($table_header);
 
 if ($data['preselect_required']) {
 	$table->setNoDataMessage(_('Filter is not set'), _('Use the filter to display results'), ZBX_ICON_FILTER_LARGE);
@@ -386,7 +405,7 @@ switch ($data['popup_type']) {
 				$values[$options['dstfld2']] = $item[$options['srcfld2']];
 			}
 
-			$name = (new CLink($key))
+			$name = (new CCol((new CLink($key))
 				->setAttribute('data-dstfld1', $options['dstfld1'])
 				->setAttribute('data-dstfld2', $options['dstfld2'])
 				->setAttribute('data-values', json_encode($values))
@@ -406,7 +425,9 @@ switch ($data['popup_type']) {
 					}
 
 					popup_generic.closePopup(event);
-				');
+				')))->addClass(ZBX_STYLE_WORDBREAK);
+
+			$description = (new CCol($item['description']))->addClass(ZBX_STYLE_WORDBREAK);
 
 			$documentation_link = (new CLink(null, CDocHelper::getUrl($item['documentation_link'])))
 				->addClass(ZBX_STYLE_BTN_ICON)
@@ -414,7 +435,7 @@ switch ($data['popup_type']) {
 				->setTitle(_('Help'))
 				->setTarget('_blank');
 
-			$table->addRow([$name, $item['description'], $documentation_link]);
+			$table->addRow([$name, $description, $documentation_link]);
 		}
 		unset($data['table_records']);
 		break;

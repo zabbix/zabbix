@@ -74,6 +74,7 @@ class testPageAdministrationGeneralModules extends CWebTest {
 		'Problem hosts' => 'Displays the problem count by host group and the highest problem severity within a group.',
 		'Problems' => 'Displays currently open problems with quick access links to the problem details.',
 		'Problems by severity' => 'Displays the problem count by severity.',
+		'Scatter plot' => 'Displays data of relationships between two different metrics.',
 		'SLA report' => 'Displays SLA reports.',
 		'System information' => 'Displays the current status and system statistics of the Zabbix server and its '.
 				'associated components.',
@@ -577,7 +578,7 @@ class testPageAdministrationGeneralModules extends CWebTest {
 
 		// Sort column contents ascending.
 		usort($all_modules, function($a, $b) {
-			return strcmp($a['Name'], $b['Name']);
+			return strnatcasecmp($a['Name'], $b['Name']);
 		});
 
 		// Check parameters of modules in the modules table.
@@ -713,7 +714,7 @@ class testPageAdministrationGeneralModules extends CWebTest {
 		$this->query('link', $data['Name'])->waitUntilVisible()->one()->click();
 		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
 		$form = $dialog->asForm();
-		// Check value af every field in Module details form.
+		// Check value of every field in Module details form.
 		foreach ($data as $key => $value) {
 			$this->assertEquals($value, $form->getFieldContainer($key)->getText());
 		}
@@ -1370,7 +1371,7 @@ class testPageAdministrationGeneralModules extends CWebTest {
 		}
 
 		if ($status === 'enabled') {
-			// Check that widget with required name is shown and that is doesn't have the inaccessilbe widget string in it.
+			// Check that widget with required name is shown and that is doesn't have the inaccessible widget string in it.
 			$widget = $dashboard->getWidget($module['widget_name']);
 			$this->assertFalse($widget->query("xpath:.//div[text()=".CXPathHelper::escapeQuotes(self::INACCESSIBLE_TEXT).
 					"]")->one(false)->isValid()

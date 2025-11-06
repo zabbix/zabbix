@@ -15,124 +15,140 @@
 package mysql
 
 import (
-	"reflect"
+	"errors"
 	"testing"
 
+	"github.com/google/go-cmp/cmp"
 	"golang.zabbix.com/sdk/tlsconfig"
+	"golang.zabbix.com/sdk/uri"
+	"golang.zabbix.com/sdk/zbxerr"
 )
 
 func Test_getTLSDetails(t *testing.T) {
-	type args struct {
-		ck connKey
+	t.Parallel()
+
+	// Mock URL for testing.
+	testURL, _ := uri.New("https://zabbix.com:10051", nil)
+
+	allowedConnections := map[string]bool{
+		string(tlsconfig.Disabled):   true,
+		string(tlsconfig.Required):   true,
+		string(tlsconfig.VerifyCA):   true,
+		string(tlsconfig.VerifyFull): true,
 	}
+
+	// Define test cases.
 	tests := []struct {
-		name    string
-		args    args
-		want    *tlsconfig.Details
-		wantErr bool
+		name          string
+		ck            connKey
+		wantDetails   *tlsconfig.Details
+		wantErr       bool
+		validationErr error
 	}{
 		{
-			"required",
-			args{
-
-				connKey{
-					tlsConnect: "required",
-					rawUri:     "127.0.0.1",
-				},
+			name: "+tlsConnectDisable",
+			ck: connKey{
+				rawUri:     "zabbix.com",
+				uri:        *testURL,
+				tlsConnect: string(tlsconfig.Disabled),
 			},
-			&tlsconfig.Details{
-				TlsConnect:         "required",
-				RawUri:             "127.0.0.1",
-				AllowedConnections: map[string]bool{disable: true, require: true, verifyCa: true, verifyFull: true},
+			wantDetails: &tlsconfig.Details{
+				TLSConnect:         tlsconfig.Disabled,
+				RawURI:             "zabbix.com",
+				AllowedConnections: allowedConnections,
 			},
-			false,
+			wantErr: false,
 		},
 		{
-			"verify_ca",
-			args{
-				connKey{
-					tlsConnect: "verify_ca",
-					tlsCA:      "path/to/ca",
-					rawUri:     "127.0.0.1",
-				},
+			name: "+tlsConnectRequireWithClientCerts",
+			ck: connKey{
+				rawUri:     "zabbix.com",
+				uri:        *testURL,
+				tlsCert:    "client.crt",
+				tlsKey:     "client.key",
+				tlsConnect: string(tlsconfig.Required),
 			},
-			&tlsconfig.Details{
-				TlsConnect:         "verify_ca",
-				TlsCaFile:          "path/to/ca",
-				RawUri:             "127.0.0.1",
-				AllowedConnections: map[string]bool{disable: true, require: true, verifyCa: true, verifyFull: true},
+			wantDetails: &tlsconfig.Details{
+				TLSConnect:         tlsconfig.Required,
+				RawURI:             "zabbix.com",
+				TLSCertFile:        "client.crt",
+				TLSKeyFile:         "client.key",
+				AllowedConnections: allowedConnections,
 			},
-			false,
+			wantErr: false,
 		},
 		{
-			"verify_full and check clients certs",
-			args{
-				connKey{
-					tlsConnect: "verify_ca",
-					tlsCA:      "path/to/ca",
-					tlsCert:    "path/to/cert",
-					tlsKey:     "path/to/key",
-					rawUri:     "127.0.0.1",
-				},
+			name: "+tlsConnectVerifyCa",
+			ck: connKey{
+				rawUri:     "zabbix.com",
+				uri:        *testURL,
+				tlsCA:      "ca.pem",
+				tlsConnect: string(tlsconfig.VerifyCA),
 			},
-			&tlsconfig.Details{
-				TlsConnect:         "verify_ca",
-				TlsCaFile:          "path/to/ca",
-				TlsCertFile:        "path/to/cert",
-				TlsKeyFile:         "path/to/key",
-				RawUri:             "127.0.0.1",
-				AllowedConnections: map[string]bool{disable: true, require: true, verifyCa: true, verifyFull: true},
+			wantDetails: &tlsconfig.Details{
+				TLSConnect:         tlsconfig.VerifyCA,
+				RawURI:             "zabbix.com",
+				TLSCaFile:          "ca.pem",
+				AllowedConnections: allowedConnections,
 			},
-			false,
+			wantErr: false,
 		},
 		{
-			"missing ca file",
-			args{
-				connKey{
-					tlsConnect: "verify_ca",
-					rawUri:     "127.0.0.1",
-				},
+			name: "+tlsConnectVerifyFull",
+			ck: connKey{
+				rawUri:     "zabbix.com",
+				uri:        *testURL,
+				tlsCA:      "ca.pem",
+				tlsCert:    "client.crt",
+				tlsKey:     "client.key",
+				tlsConnect: string(tlsconfig.VerifyFull),
 			},
-			nil,
-			true,
+			wantDetails: &tlsconfig.Details{
+				TLSConnect:         tlsconfig.VerifyFull,
+				RawURI:             "zabbix.com",
+				TLSCaFile:          "ca.pem",
+				TLSCertFile:        "client.crt",
+				TLSKeyFile:         "client.key",
+				AllowedConnections: allowedConnections,
+			},
+			wantErr: false,
 		},
 		{
-			"missing client key file",
-			args{
-				connKey{
-					tlsConnect: "verify_ca",
-					tlsCA:      "path/to/ca",
-					tlsCert:    "path/to/cert",
-					rawUri:     "127.0.0.1",
-				},
+			name: "-validationFails",
+			ck: connKey{
+				rawUri:     "zabbix.com",
+				uri:        *testURL,
+				tlsConnect: string(tlsconfig.VerifyFull),
 			},
-			nil,
-			true,
-		},
-		{
-			"missing client cert file",
-			args{
-				connKey{
-					tlsConnect: "verify_ca",
-					tlsCA:      "path/to/ca",
-					tlsKey:     "path/to/key",
-					rawUri:     "127.0.0.1",
-				},
-			},
-			nil,
-			true,
+			wantErr:       true,
+			validationErr: errors.New("invalid TLS configuration"),
 		},
 	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			got, err := getTLSDetails(tt.args.ck)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("getTLSDetails() error = %v, wantErr %v", err, tt.wantErr)
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
+			t.Helper()
+
+			details, err := getTLSDetails(tc.ck)
+
+			if (err != nil) != tc.wantErr {
+				t.Fatalf("getTLSDetails() error = %v, wantErr %v", err, tc.wantErr)
+			}
+
+			if tc.wantErr {
+				if !errors.Is(err, zbxerr.ErrorInvalidConfiguration) &&
+					//nolint:staticcheck //old test that still works
+					err.Error() != zbxerr.ErrorInvalidConfiguration.Error()+": "+tc.validationErr.Error() {
+					t.Errorf("getTLSDetails() error = %v, "+
+						"want wrapped error for %v", err, zbxerr.ErrorInvalidConfiguration)
+				}
 
 				return
 			}
-			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("getTLSDetails() = %v, want %v", got, tt.want)
+
+			if diff := cmp.Diff(tc.wantDetails, details, cmp.AllowUnexported(tlsconfig.Details{})); diff != "" {
+				t.Errorf("getTLSDetails() mismatch (-want +got):\n%s", diff)
 			}
 		})
 	}

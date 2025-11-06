@@ -30,6 +30,8 @@ abstract class CItemGeneral extends CApiService {
 		'disable_source'
 	];
 
+	protected const INHERITED_TAG_OUTPUT_FIELDS = ['tag', 'value', 'object', 'objectid'];
+
 	public const INTERFACE_TYPES_BY_PRIORITY = [
 		INTERFACE_TYPE_AGENT,
 		INTERFACE_TYPE_SNMP,
@@ -119,6 +121,64 @@ abstract class CItemGeneral extends CApiService {
 	 * @return array
 	 */
 	abstract public function get($options = []);
+
+	protected static function addRelatedTags(array $options, array &$items): void {
+		if ($options['selectTags'] === null) {
+			return;
+		}
+
+		foreach ($items as &$item) {
+			$item['tags'] = [];
+		}
+		unset($item);
+
+		$sql_options = [
+			'output' => array_merge(['itemtagid', 'itemid'], $options['selectTags']),
+			'filter' => ['itemid' => array_keys($items)]
+		];
+		$resource = DBselect(DB::makeSql('item_tag', $sql_options));
+
+		while ($row = DBfetch($resource)) {
+			$items[$row['itemid']]['tags'][] = array_diff_key($row, array_flip(['itemtagid', 'itemid']));
+		}
+	}
+
+	protected static function addRelatedInheritedTags(array $options, array &$items): void {
+		if ($options['selectInheritedTags'] === null) {
+			return;
+		}
+
+		foreach ($items as &$item) {
+			$item['inheritedTags'] = [];
+		}
+		unset($item);
+
+		$output = ['itc.itemid'];
+
+		foreach ($options['selectInheritedTags'] as $field) {
+			$output[] = match ($field) {
+				'tag', 'value' => 'ht.'.$field,
+				'object' =>
+					'CASE WHEN h.status='.HOST_STATUS_TEMPLATE.
+					' THEN '.ZBX_TAG_OBJECT_TEMPLATE.
+					' ELSE '.ZBX_TAG_OBJECT_HOST.
+					' END AS object',
+				'objectid' => 'itc.link_hostid AS objectid'
+			};
+		}
+
+		$resource = DBselect(
+			'SELECT '.implode(',', $output).
+			' FROM item_template_cache itc'.
+			' JOIN host_tag ht ON itc.link_hostid=ht.hostid'.
+			(in_array('object', $options['selectInheritedTags']) ? ' JOIN hosts h ON itc.link_hostid=h.hostid' : '').
+			' WHERE '.dbConditionId('itc.itemid', array_keys($items))
+		);
+
+		while ($row = DBfetch($resource)) {
+			$items[$row['itemid']]['inheritedTags'][] = array_diff_key($row, array_flip(['itemid']));
+		}
+	}
 
 	/**
 	 * @param array      $field_names
@@ -2863,5 +2923,126 @@ abstract class CItemGeneral extends CApiService {
 		unset($header);
 
 		return $headers ? implode("\r\n", $headers) : '';
+	}
+
+	public static function addInsTemplateCaches(array &$items): void {
+		$item_templates = [];
+		$item_template_links = [];
+		$item_indexes = [];
+
+		foreach ($items as $i => &$item) {
+			$item['ins_template_cache'] = [$item['hostid']];
+
+			$item_indexes[$item['itemid']] = $i;
+
+			if ($item['templateid'] != 0) {
+				$item_templates[$item['templateid']][$item['itemid']] = null;
+				$item_template_links[$item['templateid']][$item['itemid']] = [];
+			}
+		}
+		unset($item);
+
+		if ($item_templates) {
+			self::loadAncestorLinks($item_templates, $vertices);
+			self::addItemTemplateLinks($item_template_links, $item_templates, $vertices);
+
+			foreach ($item_template_links as $template_links) {
+				foreach ($template_links as $itemid => $links) {
+					$i = $item_indexes[$itemid];
+
+					$items[$i]['ins_template_cache'] =
+						array_merge($items[$i]['ins_template_cache'], array_keys($links));
+				}
+			}
+		}
+	}
+
+	public static function addDelTemplateCaches(array &$items, array $db_items): void {
+		$item_templates = [];
+		$item_template_links = [];
+		$item_indexes = [];
+
+		foreach ($items as $i => &$item) {
+			$item['del_template_cache'] = [];
+
+			$item_indexes[$item['itemid']] = $i;
+
+			$item_templates[$db_items[$item['itemid']]['templateid']][$item['itemid']] = null;
+			$item_template_links[$db_items[$item['itemid']]['templateid']][$item['itemid']] = [];
+		}
+		unset($item);
+
+		self::loadAncestorLinks($item_templates, $vertices);
+		self::addItemTemplateLinks($item_template_links, $item_templates, $vertices);
+
+		foreach ($item_template_links as $template_links) {
+			foreach ($template_links as $itemid => $links) {
+				$i = $item_indexes[$itemid];
+
+				$items[$i]['del_template_cache'] =
+					array_merge($items[$i]['del_template_cache'], array_keys($links));
+			}
+		}
+	}
+
+	protected static function loadAncestorLinks(array &$item_templates, ?array &$vertices = null): void {
+		$parent_itemids = $item_templates;
+
+		if ($vertices === null) {
+			$vertices = [];
+		}
+
+		do {
+			$options = [
+				'output' => ['itemid', 'hostid', 'templateid'],
+				'filter' => ['itemid' => array_keys($parent_itemids)]
+			];
+			$resource = DBselect(DB::makeSql('items', $options));
+
+			$parent_itemids = [];
+
+			while ($row = DBfetch($resource)) {
+				foreach ($item_templates[$row['itemid']] as &$templateid) {
+					$templateid = $row['hostid'];
+				}
+
+				if ($row['templateid'] != 0) {
+					$item_templates[$row['templateid']][$row['itemid']] = null;
+
+					$parent_itemids[$row['templateid']] = true;
+				}
+				else {
+					$vertices[$row['itemid']] = [];
+				}
+			}
+		} while ($parent_itemids);
+	}
+
+	protected static function addItemTemplateLinks(array &$item_template_links, array $item_templates,
+			array $vertices): void {
+		do {
+			$_vertices = [];
+
+			foreach ($vertices as $parent_itemid => $vertex_links) {
+				if (!array_key_exists($parent_itemid, $item_templates)) {
+					continue;
+				}
+
+				foreach ($item_templates[$parent_itemid] as $itemid => $templateid) {
+					if (!array_key_exists($itemid, $_vertices)) {
+						$_vertices[$itemid] = [];
+					}
+
+					$_vertices[$itemid] += [$templateid => true] + $vertex_links;
+
+					if (array_key_exists($parent_itemid, $item_template_links)
+							&& array_key_exists($itemid, $item_template_links[$parent_itemid])) {
+						$item_template_links[$parent_itemid][$itemid] = $_vertices[$itemid];
+					}
+				}
+			}
+
+			$vertices = $_vertices;
+		} while ($vertices);
 	}
 }

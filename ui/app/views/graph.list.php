@@ -222,7 +222,7 @@ $buttons = new CActionButtonList('action', 'group_graphid', [
 			->addClass('js-no-chkbxrange')
 			->setId('js-massdelete-graph')
 	]
-], 'graph');
+], 'graphs'.($data['checkbox_hash'] ? '_'.$data['checkbox_hash'] : ''));
 
 $graphs_form->addItem([$graphs_table, $buttons]);
 

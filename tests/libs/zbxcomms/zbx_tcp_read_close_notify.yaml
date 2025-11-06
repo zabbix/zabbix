@@ -1,0 +1,23 @@
+---
+test case: event is null
+in:
+  event_is_null: true
+  read_return: [0, 1]
+  timeout: 1
+out:
+  result: SUCCEED
+---
+test case: without TLS
+in:
+  read_return: [0, 1]
+  timeout: 1
+out:
+  result: SUCCEED
+---
+test case: read error
+in:
+  read_return: [-1]
+  timeout: 1
+out:
+  result: SUCCEED
+...

@@ -207,7 +207,7 @@ class testFormWebScenarioStep extends CWebTest {
 			foreach ($post_fields as $post_field) {
 				/*
 				 * Post fields table has the disabled class even when enabled to disable the drag icon if table has only
-				 * one row. Therefore, the state of all four interactable elements is checked induvidually.
+				 * one row. Therefore, the state of all four interactable elements is checked individually.
 				 */
 				if ($post_field === 'Post fields') {
 					$post_fields_table = $step_form->getField($post_field);

@@ -818,6 +818,7 @@ static int	hosts_ping(zbx_fping_host_t *hosts, int hosts_count, int requests_cou
 	sigset_t	mask, orig_mask;
 	zbx_fping_args	fping_args;
 	zbx_fping_resp	fping_resp;
+	mode_t		old_umask = 0026;
 
 #ifdef HAVE_IPV6
 	int		family;
@@ -1049,7 +1050,7 @@ static int	hosts_ping(zbx_fping_host_t *hosts, int hosts_count, int requests_cou
 #ifdef HAVE_IPV6
 	if (NULL != config_icmpping->get_source_ip())
 	{
-		if (SUCCEED != get_address_family(config_icmpping->get_source_ip(), &family, error,
+		if (SUCCEED != zbx_get_address_family(config_icmpping->get_source_ip(), &family, error,
 				(int)max_error_len))
 			goto out;
 
@@ -1107,7 +1108,11 @@ static int	hosts_ping(zbx_fping_host_t *hosts, int hosts_count, int requests_cou
 	zbx_snprintf(linebuf, linebuf_size, "%s %s 2>&1 <%s", config_icmpping->get_fping_location(), params, filename);
 #endif	/* HAVE_IPV6 */
 
-	if (NULL == (f = fopen(filename, "w")))
+	old_umask = umask(0026);
+	f = fopen(filename, "w");
+	umask(old_umask);
+
+	if (NULL == f)
 	{
 		zbx_snprintf(error, max_error_len, "%s: %s", filename, zbx_strerror(errno));
 		goto out;

@@ -56,7 +56,7 @@ class CFieldHidden extends CField {
 	}
 
 	setErrors({message, level}) {
-		if (this._error_container !== null) {
+		if (super._error_container !== null) {
 			super.setErrors({message, level});
 		}
 		else if (message !== '') {

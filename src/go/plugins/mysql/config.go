@@ -79,7 +79,7 @@ func (p *Plugin) Configure(global *plugin.GlobalOptions, options any) {
 
 // Validate implements the Configurator interface.
 // Returns an error if validation of a plugin's configuration is failed.
-func (p *Plugin) Validate(options interface{}) error {
+func (*Plugin) Validate(options any) error {
 	var opts PluginOptions
 
 	err := conf.UnmarshalStrict(options, &opts)

@@ -295,6 +295,12 @@ class testDashboardGraphWidget extends testWidgets {
 				$this->page->getDriver()->executeScript('arguments[0].style.borderRadius=0;', [$button]);
 			}
 
+			// TODO: unstable screenshot on Jenkins. Remove border radius from Aggregate field segment.
+			if ($tab === 'Data set') {
+				$segment = $form->getField('Aggregate')->query('xpath:.//label[text()="Data set"]')->one();
+				$this->page->getDriver()->executeScript('arguments[0].style.borderRadius=0;', [$segment]);
+			}
+
 			$this->page->removeFocus();
 			sleep(1);
 			$this->assertScreenshotExcept($overlay, $add_button, 'tab_'.$tab);
@@ -341,10 +347,9 @@ class testDashboardGraphWidget extends testWidgets {
 
 		// Verify that it is not possible to submit color-picker dialog with invalid color and exit this scenario.
 		if (CTestArrayHelper::get($data, 'invalid_color')) {
-			$color_picker_dialog = $this->query('class:color-picker-dialog')->one()->asColorPicker();
-			$this->assertTrue($color_picker_dialog->isSubmittionDisabled());
+			$this->assertTrue(CColorPickerElement::isSubmitable(false));
 
-			$color_picker_dialog->close();
+			CColorPickerElement::close();
 			COverlayDialogElement::find()->one()->close();
 
 			return;
@@ -2804,12 +2809,12 @@ class testDashboardGraphWidget extends testWidgets {
 
 		$fields = ['Selected items only', 'Severity', 'Problem', 'Problem tags', 'Problem hosts'];
 		$tag_elements = [
-			'id:evaltype',				// Tag type.
-			'id:tags_0_tag',			// Tag name.
-			'id:tags_0_operator',		// Tag operator.
-			'id:tags_0_value',			// Tag value
-			'id:tags_0_remove',			// Tag remove button.
-			'id:tags_add'				// Tag add button.
+			'id:evaltype',													// Tag type.
+			'id:tags_0_tag',												// Tag name.
+			'id:tags_0_operator',											// Tag operator.
+			'id:tags_0_value',												// Tag value
+			'id:tags_0_remove',												// Tag remove button.
+			'xpath:.//table[@id="tags_table_tags"]//button[@id="tags_add"]'	// Tag add button.
 		];
 		$this->assertEnabledFields(array_merge($fields, $tag_elements), false);
 

@@ -554,27 +554,36 @@ function dbConditionId($fieldName, array $values, $notIn = false) {
  *
  * @return string
  */
-function dbConditionString($fieldName, array $values, $notIn = false) {
-	switch (count($values)) {
-		case 0:
-			return '1=0';
-		case 1:
-			return $notIn
-				? $fieldName.'!='.zbx_dbstr(reset($values))
-				: $fieldName.'='.zbx_dbstr(reset($values));
+function dbConditionString(string $field_name, array $values, bool $not_in = false): string {
+	if (!$values) {
+		return '1=0';
 	}
 
-	$in = $notIn ? ' NOT IN ' : ' IN ';
-	$concat = $notIn ? ' AND ' : ' OR ';
-	$items = array_chunk($values, 950);
-
-	$condition = '';
-	foreach ($items as $values) {
-		$condition .= !empty($condition) ? ')'.$concat.$fieldName.$in.'(' : '';
-		$condition .= implode(',', zbx_dbstr($values));
+	if (count($values) == 1) {
+		return $field_name.($not_in ? '!=' : '=').zbx_dbstr(reset($values));
 	}
 
-	return '('.$fieldName.$in.'('.$condition.'))';
+	$value_index = 0;
+	$in_conditions = [];
+	$chunk = [];
+
+	foreach ($values as $value) {
+		if ($value_index != 0 && $value_index % 950 == 0) {
+			$in_conditions[] = $field_name.($not_in ? ' NOT IN ' : ' IN ').'('.implode(',', $chunk).')';
+			$chunk = [];
+		}
+
+		$chunk[] = zbx_dbstr($value);
+		$value_index++;
+	}
+
+	if ($chunk) {
+		$in_conditions[] = count($chunk) == 1
+			? $field_name.($not_in ? '!=' : '=').$chunk[0]
+			: $field_name.($not_in ? ' NOT IN ' : ' IN ').'('.implode(',', $chunk).')';
+	}
+
+	return count($in_conditions) == 1 ? $in_conditions[0] : '('.implode($not_in ? ' AND ' : ' OR ', $in_conditions).')';
 }
 
 /**

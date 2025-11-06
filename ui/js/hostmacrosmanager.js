@@ -26,24 +26,23 @@ class HostMacrosManager {
 	static DISCOVERY_STATE_CONVERTING = 0x2;
 	static DISCOVERY_STATE_MANUAL = 0x3;
 
-	constructor({container, readonly, parent_hostid, load_callback, source}) {
+	constructor({container, readonly, parent_hostid, load_callback}) {
 		this.$container = container;
 		this.readonly = readonly;
 		this.parent_hostid = parent_hostid ?? null;
 		this.load_callback = load_callback ?? null;
-		this.source = source ?? null;
 	}
 
 	load(show_inherited_macros, templateids) {
 		const url = new Curl('zabbix.php');
+
 		url.setArgument('action', 'hostmacros.list');
 
 		const post_data = {
 			macros: this.getMacros(),
 			show_inherited_macros: show_inherited_macros ? 1 : 0,
-			templateids: templateids,
-			readonly: this.readonly ? 1 : 0,
-			source: this.source
+			templateids,
+			readonly: this.readonly ? 1 : 0
 		};
 
 		if (this.parent_hostid !== null) {
