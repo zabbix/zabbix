@@ -56,7 +56,6 @@ require_once __DIR__.'/dashboards/testDashboardsListPage.php';
 require_once __DIR__.'/dashboards/testDashboardsPages.php';
 require_once __DIR__.'/dashboards/testDashboardsTemplatedDashboardForm.php';
 require_once __DIR__.'/dashboards/testDashboardsTemplatedDashboardPage.php';
-require_once __DIR__.'/dashboards/testDashboardsUserPermissions.php';
 require_once __DIR__.'/dashboards/testDashboardsViewMode.php';
 require_once __DIR__.'/dashboards/testDashboardsWidgetsPage.php';
 
@@ -209,6 +208,7 @@ require_once __DIR__.'/networkDiscovery/testFormNetworkDiscovery.php';
 require_once __DIR__.'/networkDiscovery/testPageNetworkDiscovery.php';
 
 // Permissions.
+require_once __DIR__.'/permissions/testDashboardsUserPermissions.php';
 require_once __DIR__.'/permissions/testPermissionsWithoutCSRF.php';
 require_once __DIR__.'/permissions/testTagBasedPermissions.php';
 require_once __DIR__.'/permissions/testUrlUserPermissions.php';
@@ -405,7 +405,6 @@ class SeleniumTests {
 		$suite->addTestSuite('testDashboardsPages');
 		$suite->addTestSuite('testDashboardsTemplatedDashboardForm');
 		$suite->addTestSuite('testDashboardsTemplatedDashboardPage');
-		$suite->addTestSuite('testDashboardsUserPermissions');
 		$suite->addTestSuite('testDashboardsViewMode');
 		$suite->addTestSuite('testDashboardsWidgetsPage');
 
@@ -558,6 +557,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testPageNetworkDiscovery');
 
 		// Permissions.
+		$suite->addTestSuite('testDashboardsUserPermissions');
 		$suite->addTestSuite('testPermissionsWithoutCSRF');
 		$suite->addTestSuite('testTagBasedPermissions');
 		$suite->addTestSuite('testUrlUserPermissions');

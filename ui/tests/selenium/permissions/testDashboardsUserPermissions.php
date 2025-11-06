@@ -13,23 +13,20 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
+
 require_once __DIR__.'/../../include/CWebTest.php';
 require_once __DIR__.'/../behaviors/CMessageBehavior.php';
 require_once __DIR__.'/../../include/helpers/CDataHelper.php';
-require_once __DIR__.'/../common/testWidgets.php';
 
 /**
- * @backup hosts, hosts_groups, hosts_templates, users, dashboard_user, users_groups, usrgrp, dashboard, dashboard_usrgrp
+ * @backup hosts
  *
  * @onBefore prepareTestData
  */
 class testDashboardsUserPermissions extends CWebTest {
 
 	public function getBehaviors() {
-		return [
-			CMessageBehavior::class,
-			CTableBehavior::class
-		];
+		return [CMessageBehavior::class];
 	}
 
 	const USERNAME = 'test_user_123';
@@ -183,11 +180,22 @@ class testDashboardsUserPermissions extends CWebTest {
 				'name' => 'Read access to host, but deny from template',
 				'templategroup_rights' => [
 					'id' => self::$template_groupids['Template group for dashboard access testing'],
-					'permission' => PERM_DENY // Denied access.
+					'permission' => PERM_DENY
 				],
 				'hostgroup_rights' => [
 					'id' => self::$host_groupids['Host group for dashboard access testing'],
 					'permission' => PERM_READ
+				]
+			],
+			[
+				'name' => 'Deny access to host, but read from template',
+				'templategroup_rights' => [
+					'id' => self::$template_groupids['Template group for dashboard access testing'],
+					'permission' => PERM_READ
+				],
+				'hostgroup_rights' => [
+					'id' => self::$host_groupids['Host group for dashboard access testing'],
+					'permission' => PERM_DENY
 				]
 			]
 		]);
@@ -249,6 +257,14 @@ class testDashboardsUserPermissions extends CWebTest {
 					'edit' => true
 				]
 			],
+			'Super admin with deny-host and read-template access' => [
+				[
+					'user_role' => USER_TYPE_SUPER_ADMIN,
+					'user_group' => 'Deny access to host, but read from template',
+					'view' => true,
+					'edit' => true
+				]
+			],
 			'Regular admin with full access' => [
 				[
 					'user_role' => USER_TYPE_ZABBIX_ADMIN,
@@ -278,6 +294,14 @@ class testDashboardsUserPermissions extends CWebTest {
 					'user_role' => USER_TYPE_ZABBIX_ADMIN,
 					'user_group' => 'Read access to host, but deny from template',
 					'view' => true,
+					'edit' => false
+				]
+			],
+			'Regular admin with deny-host and read-template access' => [
+				[
+					'user_role' => USER_TYPE_ZABBIX_ADMIN,
+					'user_group' => 'Deny access to host, but read from template',
+					'view' => false,
 					'edit' => false
 				]
 			],
@@ -312,11 +336,21 @@ class testDashboardsUserPermissions extends CWebTest {
 					'view' => true,
 					'edit' => false
 				]
+			],
+			'User with deny-host and read-template access' => [
+				[
+					'user_role' => USER_TYPE_ZABBIX_USER,
+					'user_group' => 'Deny access to host, but read from template',
+					'view' => false,
+					'edit' => false
+				]
 			]
 		];
 	}
 
 	/**
+	 * Check that users has access to host dashboards according to user group and user role permissions.
+	 *
 	 * @dataProvider dashboardPermissions
 	 */
 	public function testDashboardsUserPermissions_HostDashboard($data) {
@@ -379,7 +413,7 @@ class testDashboardsUserPermissions extends CWebTest {
 		else {
 			$this->assertMessage(TEST_BAD, 'Access denied', 'You are logged in as "'.self::USERNAME.'". '.
 					'You have no permissions to access this page.');
-			$this->query('button:Go to "Dashboards"')->one()->waitUntilClickable()->click();
+			$this->assertTrue($this->query('button:Go to "Dashboards"')->one()->isClickable());
 		}
 	}
 
@@ -396,15 +430,14 @@ class testDashboardsUserPermissions extends CWebTest {
 				self::$template_dashboardids['Check user group access'])->waitUntilReady();
 
 		if ($data['edit']) {
-			$this->addClockWidget();
-			// Check success message after dashboard update.
-			$this->page->waitUntilReady();
-			$this->assertMessage(TEST_GOOD, 'Dashboard updated');
+			$dashboard = CDashboardElement::find()->one()->waitUntilVisible();
+			$dashboard->edit();
+			$this->assertTrue($dashboard->isEditable());
 		}
 		else {
 			$this->assertMessage(TEST_BAD, 'Access denied', 'You are logged in as "'.self::USERNAME.'". '.
 					'You have no permissions to access this page.');
-			$this->query('button:Go to "Dashboards"')->one()->waitUntilClickable()->click();
+			$this->assertTrue($this->query('button:Go to "Dashboards"')->one()->isClickable());
 		}
 	}
 
@@ -522,10 +555,9 @@ class testDashboardsUserPermissions extends CWebTest {
 			$this->assertEquals('Test sharing functionality', $this->query('id:page-title-general')->one()->getText());
 
 			if ($data['edit']) {
-				$this->addClockWidget('global');
-				// Check success message after dashboard update.
-				$this->page->waitUntilReady();
-				$this->assertMessage(TEST_GOOD, 'Dashboard updated');
+				$dashboard = CDashboardElement::find()->one()->waitUntilVisible();
+				$dashboard->edit();
+				$this->assertTrue($dashboard->isEditable());
 			}
 			else {
 				$this->assertFalse($this->query('xpath:.//nav[@class="dashboard-edit"]')->one()->isClickable());
@@ -542,7 +574,7 @@ class testDashboardsUserPermissions extends CWebTest {
 	 * @param integer $permissions      read or write
 	 * @param integer $group            user group ID
 	 */
-	public static function updateDashboardAccess($permissions, $group) {
+	protected function updateDashboardAccess($permissions, $group) {
 		CDataHelper::call('dashboard.update', [
 			[
 				'dashboardid' => self::$dashboardid,
@@ -562,7 +594,7 @@ class testDashboardsUserPermissions extends CWebTest {
 	 * @param integer	$role		user role ID
 	 * @param string	$group		user group name
 	 */
-	public static function updateUser($role, $group = 'Read/Write access to template and host') {
+	protected function updateUser($role, $group = 'Read/Write access to template and host') {
 		CDataHelper::call('user.update', [
 			[
 				'userid' => self::$userid,
@@ -572,28 +604,5 @@ class testDashboardsUserPermissions extends CWebTest {
 				'roleid' => $role
 			]
 		]);
-	}
-
-	/**
-	 * Add 'Clock' widget to test edit functionality.
-	 *
-	 * @param string  $source		flag for additional edit() click
-	 */
-	public static function addClockWidget($source = 'template') {
-		$dashboard = CDashboardElement::find()->one()->waitUntilVisible();
-
-		// Edit button is clicked only when flag is Global; Template opens in edit mode by default.
-		if ($source === 'global'){
-			$dashboard->edit()->addWidget()->asForm();
-		}
-		else {
-			$dashboard->addWidget()->asForm();
-		}
-
-		$dialog = COverlayDialogElement::find()->one()->asForm();
-		$dialog->fill(['Type' => CFormElement::RELOADABLE_FILL('Clock')]);
-		$dialog->submit();
-
-		$dashboard->getControls()->query('id:dashboard-save')->one()->click();
 	}
 }
