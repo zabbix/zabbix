@@ -159,7 +159,7 @@ class CHistory extends CApiService {
 		}
 
 		if (!$options['countOutput'] && $this->outputIsRequested('value', $options['output'])) {
-			if ($options['history'] == ITEM_VALUE_TYPE_BINARY) {
+			if ($options['history'] == ITEM_VALUE_TYPE_BINARY && $options['maxValueSize'] != null) {
 				foreach ($result as &$row) {
 					$row['value'] = mb_strcut($row['value'], 0, $options['maxValueSize']);
 					$row['value'] = base64_encode($row['value']);
@@ -167,7 +167,7 @@ class CHistory extends CApiService {
 				unset($row);
 			}
 
-			if ($options['history'] == ITEM_VALUE_TYPE_JSON) {
+			if ($options['history'] == ITEM_VALUE_TYPE_JSON && $options['maxValueSize'] != null) {
 				foreach ($result as &$row) {
 					$row['value'] = mb_substr($row['value'], 0, $options['maxValueSize']);
 				}
