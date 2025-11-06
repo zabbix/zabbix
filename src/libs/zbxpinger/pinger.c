@@ -613,8 +613,8 @@ static int	process_pinger_hosts(zbx_hashset_t *pinger_items, int process_num, in
 			}
 			else
 			{
-				max_execution_time = (pinger->count * pinger->timeout);
-				max_execution_time += ((pinger->count - 1) * pinger->interval);
+				max_execution_time = pinger->count * pinger->timeout;
+				max_execution_time += (pinger->count - 1) * pinger->interval;
 			}
 			/* Add safety margin 10% */
 			max_execution_time += max_execution_time * EXEC_TIME_DELTA;
