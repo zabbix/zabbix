@@ -129,7 +129,7 @@ class testDashboardsListPage extends CWebTest {
 						'Name' => 'graph',
 						'Show' => 'All'
 					],
-					'result_count' => 2
+					'result_count' => 23
 				]
 			],
 			[
