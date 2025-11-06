@@ -4148,6 +4148,10 @@ msgstr "Không thể đặt \"%1$s\" cho kiểu đồ thị \"%2$s\"."
 msgid "Cannot set \"Data set aggregation\" when item with type \"Total\" is added to the chart."
 msgstr "Không thể cài đặt \"Data set aggregation\" khi đã có sẵn một item với kiểu là \"Total\" được thêm vào biểu đồ."
 
+#: include/classes/db/MysqlDbBackend.php:197
+msgid "Cannot set charset."
+msgstr ""
+
 #: include/classes/api/services/CItemGeneral.php:2478
 #, c-format
 msgid "Cannot set dependency for LLD rule with key \"%1$s\" on the master item with key \"%2$s\" on the host \"%3$s\": %4$s."
