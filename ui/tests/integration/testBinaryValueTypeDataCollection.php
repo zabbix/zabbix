@@ -97,13 +97,15 @@ class testBinaryValueTypeDataCollection extends CIntegrationTest {
 		}
 		$proxyid = $proxy['result'][0]['proxyid'];
 
-		$this->call('proxy.update', [
+		$response =$this->call('proxy.update', [
 			'proxyid' => $proxyid,
-			'tls_connect' => 1, // certificate
+			'tls_connect' => 1,
 			'tls_accept' => 4, // certificate
 			'tls_issuer' => 'CN=ZabbixCA',
 			'tls_subject' => 'CN=zabbix_proxy'
 		]);
+		$this->assertArrayHasKey('proxyids', $response['result']);
+		$this->assertEquals(1, count($response['result']['proxyids']));
 	}
 
 	/**
@@ -119,13 +121,15 @@ class testBinaryValueTypeDataCollection extends CIntegrationTest {
 		}
 		$hostid = $agentHost['result'][0]['hostid'];
 
-		$this->call('host.update', [
+		$response = $this->call('host.update', [
 			'hostid' => $hostid,
 			'tls_connect' => 4, // certificate
 			'tls_accept' => 4, // certificate
 			'tls_issuer' => 'CN=ZabbixCA',
 			'tls_subject' => 'CN=zabbix_agentd'
 		]);
+		$this->assertArrayHasKey('hostids', $response['result']);
+		$this->assertEquals(1, count($response['result']['hostids']));
 	}
 
 	/**
