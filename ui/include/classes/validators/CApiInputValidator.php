@@ -1015,19 +1015,11 @@ class CApiInputValidator {
 			if ($number_parser->parse($data) == CParser::PARSE_SUCCESS) {
 				$value = (float) $number_parser->getMatch();
 			}
+			elseif ((($flags & API_ALLOW_USER_MACRO) && self::checkValueIsUserMacro($data))
+					|| (($flags & API_ALLOW_LLD_MACRO) && self::checkValueIsLldMacro($data))) {
+				return true;
+			}
 			else {
-				if ($flags & API_ALLOW_USER_MACRO) {
-					if (self::checkValueIsUserMacro($data)) {
-						return true;
-					}
-				}
-
-				if ($flags & API_ALLOW_LLD_MACRO) {
-					if (self::checkValueIsLldMacro($data)) {
-						return true;
-					}
-				}
-
 				$value = NAN;
 			}
 		}
@@ -2875,16 +2867,9 @@ class CApiInputValidator {
 			return false;
 		}
 
-		if ($flags & API_ALLOW_USER_MACRO) {
-			if (self::checkValueIsUserMacro($data)) {
-				return true;
-			}
-		}
-
-		if ($flags & API_ALLOW_LLD_MACRO) {
-			if (self::checkValueIsLldMacro($data)) {
-				return true;
-			}
+		if ((($flags & API_ALLOW_USER_MACRO) && self::checkValueIsUserMacro($data))
+				|| (($flags & API_ALLOW_LLD_MACRO) && self::checkValueIsLldMacro($data))) {
+			return true;
 		}
 
 		if (!self::validateInt32(['in' => ZBX_MIN_PORT_NUMBER.':'.ZBX_MAX_PORT_NUMBER], $data, $path, $error)) {
