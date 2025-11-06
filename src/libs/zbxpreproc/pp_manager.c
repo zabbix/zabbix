@@ -451,7 +451,7 @@ static void	pp_manager_queue_value_task_result(zbx_pp_manager_t *manager, zbx_pp
 	d->preproc->time_ms = task->time_ms;
 	d->preproc->total_ms += task->time_ms;
 
-	if (ZBX_VARIANT_NONE == d->result.type && 0 == (d->result.flags & ZBX_VARIANT_FLAG_CHANGED))
+	if (ZBX_VARIANT_NONE == d->result.type && 0 == (d->result.data.flags & ZBX_VARIANT_FLAG_CHANGED))
 		return;
 
 	if (NULL != (item = pp_manager_get_cacheable_dependent_item(manager, d->preproc->dep_itemids,
