@@ -726,6 +726,12 @@ static int	get_first_n_value(const zbx_dc_evaluate_item_t *item, const char *par
 		goto out;
 	}
 
+	if (NULL == value)
+	{
+		ret = SUCCEED;
+		goto out;
+	}
+
 	ts_end.sec -= selector->timeshift;
 
 	if (SUCCEED == zbx_vc_get_values(item->itemid, item->value_type, &values, seconds, 0, &ts_end))
