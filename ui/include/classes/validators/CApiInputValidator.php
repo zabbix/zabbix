@@ -1016,10 +1016,17 @@ class CApiInputValidator {
 				$value = (float) $number_parser->getMatch();
 			}
 			else {
-				if (self::checkValueIsMacro($data, $flags)) {
-					return true;
+				if ($flags & API_ALLOW_USER_MACRO) {
+					if (self::checkValueIsUserMacro($data)) {
+						return true;
+					}
 				}
 
+				if ($flags & API_ALLOW_LLD_MACRO) {
+					if (self::checkValueIsLldMacro($data)) {
+						return true;
+					}
+				}
 				$value = NAN;
 			}
 		}
@@ -1513,8 +1520,28 @@ class CApiInputValidator {
 			}
 
 			if (array_key_exists('compare', $field_rule)) {
-				$field_rule['compare']['path'] = ($path === '/' ? $path : $path.'/').$field_rule['compare']['field'];
-				$field_rule['compare']['value'] = $data[$field_rule['compare']['field']];
+				$skip_compare = false;
+				$compare_field = $data[$field_rule['compare']['field']];
+
+				if ($flags & API_ALLOW_USER_MACRO) {
+					if (self::checkValueIsUserMacro($compare_field)) {
+						$skip_compare = true;
+					}
+				}
+
+				if ($flags & API_ALLOW_LLD_MACRO) {
+					if (self::checkValueIsLldMacro($compare_field)) {
+						$skip_compare = true;
+					}
+				}
+
+				if ($skip_compare) {
+					unset($field_rule['compare']);
+				}
+				else {
+					$field_rule['compare']['path'] = ($path === '/' ? $path : $path.'/').$field_rule['compare']['field'];
+					$field_rule['compare']['value'] = $compare_field;
+				}
 			}
 
 			if (array_key_exists('preproc_type', $field_rule)) {
@@ -2859,8 +2886,16 @@ class CApiInputValidator {
 			return false;
 		}
 
-		if (self::checkValueIsMacro($data, $flags)) {
-			return true;
+		if ($flags & API_ALLOW_USER_MACRO) {
+			if (self::checkValueIsUserMacro($data)) {
+				return true;
+			}
+		}
+
+		if ($flags & API_ALLOW_LLD_MACRO) {
+			if (self::checkValueIsLldMacro($data)) {
+				return true;
+			}
 		}
 
 		if (!self::validateInt32(['in' => ZBX_MIN_PORT_NUMBER.':'.ZBX_MAX_PORT_NUMBER], $data, $path, $error)) {
@@ -3479,11 +3514,7 @@ class CApiInputValidator {
 	 * @return bool
 	 */
 	private static function checkCompare(array $rule, $data, string $path, string &$error): bool {
-		$flags = array_key_exists('flags', $rule) ? $rule['flags'] : 0x00;
-
-		if (!array_key_exists('compare', $rule) || $rule['compare']['value'] === null
-				|| self::checkValueIsMacro($data, $flags)
-				|| self::checkValueIsMacro($rule['compare']['value'], $flags)) {
+		if (!array_key_exists('compare', $rule) || $rule['compare']['value'] === null) {
 			return true;
 		}
 
@@ -4336,16 +4367,19 @@ class CApiInputValidator {
 		return self::validateUserMacro($rule, $data, $path, $error);
 	}
 
-	private static function checkValueIsMacro($value, int $flags): bool {
-		$macro_parsers = [];
-		if ($flags & API_ALLOW_USER_MACRO) {
-			$macro_parsers[] = new CUserMacroParser();
-			$macro_parsers[] = new CUserMacroFunctionParser();
+	private static function checkValueIsUserMacro(string $value): bool {
+		$macro_parsers = [new CUserMacroParser(), new CUserMacroFunctionParser()];
+		foreach ($macro_parsers as $macro_parser) {
+			if ($macro_parser->parse($value) == CParser::PARSE_SUCCESS) {
+				return true;
+			}
 		}
-		if ($flags & API_ALLOW_LLD_MACRO) {
-			$macro_parsers[] = new CLLDMacroParser();
-			$macro_parsers[] = new CLLDMacroFunctionParser();
-		}
+
+		return false;
+	}
+
+	private static function checkValueIsLldMacro(string $value): bool {
+		$macro_parsers = [new CLLDMacroParser(), new CLLDMacroFunctionParser()];
 		foreach ($macro_parsers as $macro_parser) {
 			if ($macro_parser->parse($value) == CParser::PARSE_SUCCESS) {
 				return true;
