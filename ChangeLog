@@ -43,6 +43,13 @@ Bug fixes:
 .......PS. [ZBX-25752] reduced memory allocations in preprocessing manager (wiper)
 
 --------------------------------------------------------------------------------
+Changes for 7.4.6rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
 Changes for 7.4.5
 
 Bug fixes:
@@ -1158,6 +1165,13 @@ A.F....... [ZBX-23227] fixed issue where using an empty array or string value fo
 ...GI..PS. [ZBX-25140] updated configure to reject TLS-unaware compilers (jxl)
 ...G...... [ZBX-25149] fixed Zabbix agent build on AIX and Solaris (arimdjonoks)
 ....I..... [ZBX-23881] dropped preference list when searching for compiler (jxl)
+
+--------------------------------------------------------------------------------
+Changes for 7.0.22rc1
+
+New features:
+
+Bug fixes:
 
 --------------------------------------------------------------------------------
 Changes for 7.0.21
