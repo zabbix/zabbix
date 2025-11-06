@@ -172,7 +172,7 @@ class CScreenHistory extends CScreenBase {
 
 			/**
 			 * View type: As plain text.
-			 * Item type: numeric (unsigned, char), float, text, log, JSON.
+			 * Item type: numeric (unsigned, char), float, text, log, binary, JSON.
 			 */
 			if ($this->plaintext) {
 				if (!$numeric_items && $this->filter !== ''
@@ -197,6 +197,9 @@ class CScreenHistory extends CScreenBase {
 
 					if ($value_type == ITEM_VALUE_TYPE_BINARY || $value_type == ITEM_VALUE_TYPE_JSON) {
 						$options['maxValueSize'] = null;
+					}
+					else {
+						unset($options['maxValueSize']);
 					}
 
 					$item_data = API::History()->get($options);
@@ -404,13 +407,15 @@ class CScreenHistory extends CScreenBase {
 				foreach ($items_by_type as $value_type => $itemids) {
 					$options['history'] = $value_type;
 					$options['itemids'] = $itemids;
-					$item_data = API::History()->get($options);
 
 					if ($value_type == ITEM_VALUE_TYPE_JSON) {
-						$options += [
-							'maxValueSize' => 64 * ZBX_KIBIBYTE + 1
-						];
+						$options['maxValueSize'] = 64 * ZBX_KIBIBYTE + 1;
 					}
+					else {
+						unset($options['maxValueSize']);
+					}
+
+					$item_data = API::History()->get($options);
 
 					if ($item_data) {
 						$history_data = array_merge($history_data, $item_data);
@@ -465,9 +470,10 @@ class CScreenHistory extends CScreenBase {
 					$options['history'] = $item['value_type'];
 
 					if ($item['value_type'] == ITEM_VALUE_TYPE_JSON) {
-						$options += [
-							'maxValueSize' => 64 * ZBX_KIBIBYTE + 1
-						];
+						$options['maxValueSize'] = 64 * ZBX_KIBIBYTE + 1;
+					}
+					else {
+						unset($options['maxValueSize']);
 					}
 
 					$item_data = API::History()->get($options);
