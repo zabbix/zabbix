@@ -21,7 +21,6 @@
 #include "zbxregexp.h"
 #include "zbxstr.h"
 #include "zbxjson.h"
-#include "zbxexpression.h"
 #include "zbxalgo.h"
 #include "zbxdb.h"
 #include "zbxparam.h"
@@ -95,7 +94,7 @@ int	zbx_lld_macro_paths_get(zbx_uint64_t lld_ruleid, zbx_vector_lld_macro_path_p
 
 zbx_lld_macro_path_t	*lld_macro_path_create(const char *lld_macro, const char *path)
 {
-	zbx_lld_macro_path_t        *lld_macro_path;
+	zbx_lld_macro_path_t	*lld_macro_path;
 
 	lld_macro_path = (zbx_lld_macro_path_t *)zbx_malloc(NULL, sizeof(zbx_lld_macro_path_t));
 	lld_macro_path->lld_macro = zbx_strdup(NULL, lld_macro);

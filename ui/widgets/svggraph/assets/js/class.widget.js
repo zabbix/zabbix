@@ -110,6 +110,7 @@ class CWidgetSvgGraph extends CWidget {
 				show_problems: true,
 				show_simple_triggers: true,
 				hint_max_rows: 20,
+				hintbox_type: GRAPH_HINTBOX_TYPE_SVG_GRAPH,
 				min_period: 60,
 				...response.svg_options.data
 			});

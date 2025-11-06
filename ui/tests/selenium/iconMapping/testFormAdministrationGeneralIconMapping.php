@@ -287,11 +287,10 @@ class testFormAdministrationGeneralIconMapping extends CLegacyWebTest {
 			$this->processExpressionRows($data['mappings']);
 		}
 
-		// Take a screenshot to test draggable object position of icon mappings.
+		// Take a screenshot of icon mapping form.
 		if (array_key_exists('screenshot', $data)) {
-			$form = $this->query('id:iconmap')->waitUntilVisible()->one()->asForm();
 			$this->page->removeFocus();
-			$this->assertScreenshot($form->query('id:iconmap-edit')->waitUntilPresent()->one(), 'Icon mapping');
+			$this->assertScreenshot($this->query('id:iconmap')->waitUntilVisible()->one(), 'Icon mapping');
 		}
 
 		$this->zbxTestClickXpath('//button[@value="Add"]');
@@ -484,6 +483,7 @@ class testFormAdministrationGeneralIconMapping extends CLegacyWebTest {
 
 		$form = $this->query('id:iconmap')->asForm()->one();
 		$this->zbxTestClick('update');
+		$form->query('button:Update')->one()->waitUntilClassesNotPresent('is-loading');
 
 		// Check the results in frontend.
 		if (array_key_exists('error_inline', $data)) {
@@ -747,8 +747,8 @@ class testFormAdministrationGeneralIconMapping extends CLegacyWebTest {
 
 		$this->zbxTestClickXpath('//button[@value="Add"]');
 		$this->zbxTestWaitForPageToLoad();
-		$this->page->removeFocus();
 		$form = $this->query('id:iconmap')->asForm()->one();
+		$form->query('xpath:.//tr[@id="iconmap-list-footer"]//button')->one()->waitUntilClassesNotPresent('is-loading');
 
 		// Check the results in frontend.
 		$this->assertInlineError($form, $data['error']);

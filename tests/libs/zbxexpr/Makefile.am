@@ -666,6 +666,5 @@ zbx_calculate_macro_function_LDFLAGS = @SERVER_LDFLAGS@ $(VALUECACHE_WRAP_FUNCS)
 zbx_calculate_macro_function_CFLAGS = $(EXPR_COMPILER_FLAGS) $(TLS_CFLAGS) \
 	-I@top_srcdir@/src/libs/zbxcacheconfig \
 	-I@top_srcdir@/src/libs/zbxcachehistory \
-	-I@top_srcdir@/src/libs/zbxcachevalue \
-	-I@top_srcdir@/src/libs/zbxexpression
+	-I@top_srcdir@/src/libs/zbxcachevalue
 endif

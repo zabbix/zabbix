@@ -18,6 +18,8 @@
  * @var CView $this
  */
 
+$data['form_name'] = 'image-form';
+
 $this->includeJsFile('administration.image.edit.js.php');
 
 $html_page = (new CHtmlPage())
@@ -25,19 +27,13 @@ $html_page = (new CHtmlPage())
 	->setTitleSubmenu(getAdministrationGeneralSubmenu())
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::ADMINISTRATION_IMAGE_EDIT));
 
-$csrf_token = CCsrfTokenHelper::get('image');
-
-$form = (new CForm('post', (new CUrl('zabbix.php'))
-	->setArgument('action', ($data['imageid'] == 0) ? 'image.create' : 'image.update')
-	->getUrl(), 'multipart/form-data')
-)
-	->addItem((new CVar(CSRF_TOKEN_NAME, $csrf_token))->removeId())
+$form = (new CForm())
+	->setId($data['form_name'])
+	->setName($data['form_name'])
+	->addItem((new CVar(CSRF_TOKEN_NAME, CCsrfTokenHelper::get('image')))->removeId())
 	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)
-	->addVar('imagetype', $data['imagetype']);
-
-if ($data['imageid'] != 0) {
-	$form->addVar('imageid', $data['imageid']);
-}
+	->addVar('imagetype', $data['imagetype'])
+	->addVar('imageid', $data['imageid']);
 
 $form_list = (new CFormList('imageFormList'))
 	->addRow(
@@ -48,13 +44,14 @@ $form_list = (new CFormList('imageFormList'))
 			->setAriaRequired()
 	)
 	->addRow(
-		(new CLabel(_('Upload'), 'image'))->setAsteriskMark($data['imageid'] == 0),
+		(new CLabel(_('Upload'), 'image'))->setAsteriskMark($data['imageid'] == null),
 		(new CFile('image'))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAriaRequired()
+			->setAttribute('accept', 'image/*')
 	);
 
-if ($data['imageid'] != 0) {
+if ($data['imageid'] != null) {
 	if ($data['imagetype'] == IMAGE_TYPE_BACKGROUND) {
 		$form_list->addRow(_('Image'), new CLink(
 			(new CImg('imgstore.php?iconid='.$data['imageid'], 'no image'))->addStyle('max-width:100%;'),
@@ -71,17 +68,12 @@ if ($data['imageid'] != 0) {
 $tab_view = (new CTabView())
 	->addTab('imageTab', ($data['imagetype'] == IMAGE_TYPE_ICON) ? _('Icon') : _('Background'), $form_list);
 
-if ($data['imageid'] != 0) {
+if ($data['imageid'] != null) {
 	$tab_view->setFooter(makeFormFooter(
 		new CSubmit('update', _('Update')),
 		[
-			(new CRedirectButton(_('Delete'), (new CUrl('zabbix.php'))
-					->setArgument('action', 'image.delete')
-					->setArgument('imageid', $data['imageid'])
-					->setArgument('imagetype', $data['imagetype'])
-					->setArgument(CSRF_TOKEN_NAME, $csrf_token),
-				_('Delete selected image?')
-			))->setId('delete'),
+			(new CSimpleButton(_('Delete')))
+				->setId('delete'),
 			(new CRedirectButton(_('Cancel'), (new CUrl('zabbix.php'))
 				->setArgument('action', 'image.list')
 				->setArgument('imagetype', $data['imagetype'])
@@ -91,7 +83,7 @@ if ($data['imageid'] != 0) {
 }
 else {
 	$tab_view->setFooter(makeFormFooter(
-		new CSubmit(null, _('Add')),
+		new CSubmit('add', _('Add')),
 		[
 			(new CRedirectButton(_('Cancel'), (new CUrl('zabbix.php'))
 				->setArgument('action', 'image.list')
@@ -102,3 +94,10 @@ else {
 }
 
 $html_page->addItem($form->addItem($tab_view))->show();
+
+(new CScriptTag('
+	view.init('.json_encode([
+		'rules' => $data['js_validation_rules']
+	]).');
+'))
+	->show();

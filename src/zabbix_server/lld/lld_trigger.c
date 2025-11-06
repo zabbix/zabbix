@@ -17,7 +17,6 @@
 #include "../db_lengths_constants.h"
 #include "../server_constants.h"
 
-#include "zbxexpression.h"
 #include "audit/zbxaudit.h"
 #include "audit/zbxaudit_trigger.h"
 #include "zbxnum.h"
@@ -1734,7 +1733,8 @@ static void 	lld_trigger_make(const zbx_lld_trigger_prototype_t *trigger_prototy
 	{
 		if (err_msg)
 		{
-			*error = zbx_strdcatf(*error, "Cannot %s trigger \"%s\": %s.\n", trigger->description, operation_msg, err_msg);
+			*error = zbx_strdcatf(*error, "Cannot %s trigger \"%s\": %s.\n", operation_msg,
+					trigger->description, err_msg);
 			zbx_free(err_msg);
 		}
 		goto out;

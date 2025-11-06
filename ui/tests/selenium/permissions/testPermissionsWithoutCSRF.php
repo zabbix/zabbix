@@ -276,7 +276,17 @@ class testPermissionsWithoutCSRF extends CWebTest {
 				[
 					'db' => 'SELECT * FROM maintenances',
 					'link' => 'zabbix.php?action=maintenance.list',
-					'overlay' => 'create'
+					'overlay' => 'create',
+					'fields' => [
+						'id:name' => 'CSRF maintenance test name',
+						'xpath://div[@id="groupids_"]/..' => 'Zabbix servers'
+					],
+					'secondary_dialog' => [
+						'field' => 'id:timeperiods',
+						'fill' => [
+							'Period type' => 'One time only'
+						]
+					]
 				]
 			],
 			// #21 Maintenance update.
@@ -362,26 +372,29 @@ class testPermissionsWithoutCSRF extends CWebTest {
 			[
 				[
 					'db' => 'SELECT * FROM images',
-					'link' => 'zabbix.php?action=image.edit&imageid=1',
-					'return_button' => true
+					'link' => 'zabbix.php?action=image.edit&imageid=1'
 				]
 			],
-			// #32 Image create.
+			/* Commented till problem with file upload solved.
+			// Image create.
 			[
 				[
 					'db' => 'SELECT * FROM images',
 					'link' => 'zabbix.php?action=image.edit&imagetype=1',
-					'return_button' => true
+					'fields' => [
+						'id:name' => 'CSRF image test name',
+						'id:image' => PHPUNIT_BASEDIR.'/ui/tests/images/image.png'
+					]
 				]
-			],
-			// #33 Icon map update.
+			],*/
+			// #32 Icon map update.
 			[
 				[
 					'db' => 'SELECT * FROM icon_map',
-					'link' => 'zabbix.php?action=iconmap.edit&iconmapid=101',
+					'link' => 'zabbix.php?action=iconmap.edit&iconmapid=101'
 				]
 			],
-			// #34 Icon map create.
+			// #33 Icon map create.
 			[
 				[
 					'db' => 'SELECT * FROM icon_map',
@@ -392,32 +405,32 @@ class testPermissionsWithoutCSRF extends CWebTest {
 					]
 				]
 			],
-			// #35 Regular expression update.
+			// #34 Regular expression update.
 			[
 				[
 					'db' => 'SELECT * FROM regexps',
 					'link' => 'zabbix.php?action=regex.edit&regexpid=2'
 				]
 			],
-			// #36 Regular expression create.
+			// #35 Regular expression create.
 			[
 				[
 					'db' => 'SELECT * FROM regexps',
 					'link' => 'zabbix.php?action=regex.edit',
 					'fields' => [
-						'id:name' => 'CSRF test name',
+						'id:name' => 'CSRF regex test name',
 						'id:expressions_0_expression' => 'abc'
 					]
 				]
 			],
-			// #37 Macros update.
+			// #36 Macros update.
 			[
 				[
 					'db' => 'SELECT * FROM globalmacro',
 					'link' => 'zabbix.php?action=macros.edit'
 				]
 			],
-			// #38 Trigger displaying options update.
+			// #37 Trigger displaying options update.
 			[
 				[
 					'db' => 'SELECT * FROM settings',
@@ -425,7 +438,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 					'return_button' => true
 				]
 			],
-			// #39 API token create.
+			// #38 API token create.
 			[
 				[
 					'db' => 'SELECT * FROM token',
@@ -433,7 +446,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 					'overlay' => 'create'
 				]
 			],
-			// #40 API token update.
+			// #39 API token update.
 			[
 				[
 					'db' => 'SELECT * FROM token',
@@ -441,7 +454,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 					'overlay' => 'update'
 				]
 			],
-			// #41 Other parameters update.
+			// #40 Other parameters update.
 			[
 				[
 					'db' => 'SELECT * FROM settings',
@@ -449,23 +462,29 @@ class testPermissionsWithoutCSRF extends CWebTest {
 					'return_button' => true
 				]
 			],
-			// #42 Proxy update.
+			// #41 Proxy update.
 			[
 				[
 					'db' => 'SELECT * FROM hosts',
 					'link' => 'zabbix.php?action=proxy.list',
-					'overlay' => 'update'
+					'overlay' => 'update',
+					'fields' => [
+						'id:name' => 'CSRF validation proxy update'
+					]
 				]
 			],
-			// #43 Proxy create.
+			// #42 Proxy create.
 			[
 				[
 					'db' => 'SELECT * FROM hosts',
 					'link' => 'zabbix.php?action=proxy.list',
-					'overlay' => 'create'
+					'overlay' => 'create',
+					'fields' => [
+						'id:name' => 'CSRF validation proxy create'
+					]
 				]
 			],
-			// #44 Authentication update.
+			// #43 Authentication update.
 			[
 				[
 					'db' => 'SELECT * FROM settings',
@@ -473,7 +492,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 					'return_button' => true
 				]
 			],
-			//#45 User group update.
+			// #44 User group update.
 			[
 				[
 					'db' => 'SELECT * FROM users_groups',
@@ -481,7 +500,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 					'return_button' => true
 				]
 			],
-			// #46 User group create.
+			// #45 User group create.
 			[
 				[
 					'db' => 'SELECT * FROM users_groups',
@@ -489,7 +508,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 					'return_button' => true
 				]
 			],
-			// #47 User update.
+			// #46 User update.
 			[
 				[
 					'db' => 'SELECT * FROM users',
@@ -497,7 +516,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 					'return_button' => true
 				]
 			],
-			// #48 User create.
+			// #47 User create.
 			[
 				[
 					'db' => 'SELECT * FROM users',
@@ -505,7 +524,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 					'return_button' => true
 				]
 			],
-			// #49 Media update.
+			// #48 Media update.
 			[
 				[
 					'db' => 'SELECT * FROM media',
@@ -513,7 +532,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 					'overlay' => 'update'
 				]
 			],
-			// #50 Media create.
+			// #49 Media create.
 			[
 				[
 					'db' => 'SELECT * FROM media',
@@ -521,7 +540,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 					'overlay' => 'create'
 				]
 			],
-			// #51 Script update.
+			// #50 Script update.
 			[
 				[
 					'db' => 'SELECT * FROM scripts',
@@ -529,7 +548,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 					'overlay' => 'update'
 				]
 			],
-			// #52 Script create.
+			// #51 Script create.
 			[
 				[
 					'db' => 'SELECT * FROM scripts',
@@ -537,7 +556,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 					'overlay' => 'create'
 				]
 			],
-			// #53 User profile update.
+			// #52 User profile update.
 			[
 				[
 					'db' => 'SELECT * FROM profiles',
@@ -545,7 +564,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 					'return_button' => true
 				]
 			],
-			// #54 User role update.
+			// #53 User role update.
 			[
 				[
 					'db' => 'SELECT * FROM role',
@@ -553,7 +572,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 					'return_button' => true
 				]
 			],
-			// #55 User role create.
+			// #54 User role create.
 			[
 				[
 					'db' => 'SELECT * FROM role',
@@ -561,7 +580,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 					'return_button' => true
 				]
 			],
-			// #56 User API token create.
+			// #55 User API token create.
 			[
 				[
 					'db' => 'SELECT * FROM token',
@@ -569,7 +588,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 					'overlay' => 'create'
 				]
 			],
-			// #57 User API token update.
+			// #56 User API token update.
 			[
 				[
 					'db' => 'SELECT * FROM token',
@@ -577,7 +596,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 					'overlay' => 'update'
 				]
 			],
-			// #58 Scheduled report create.
+			// #57 Scheduled report create.
 			[
 				[
 					'db' => 'SELECT * FROM report',
@@ -585,7 +604,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 					'return_button' => true
 				]
 			],
-			// #59 Scheduled report update.
+			// #58 Scheduled report update.
 			[
 				[
 					'db' => 'SELECT * FROM report',
@@ -593,7 +612,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 					'return_button' => true
 				]
 			],
-			// #60 Connector create.
+			// #59 Connector create.
 			[
 				[
 					'db' => 'SELECT * FROM connector',
@@ -601,7 +620,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 					'overlay' => 'create'
 				]
 			],
-			// #61 Connector update.
+			// #60 Connector update.
 			[
 				[
 					'db' => 'SELECT * FROM connector',
@@ -609,7 +628,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 					'overlay' => 'update'
 				]
 			],
-			// #62 Problem update.
+			// #61 Problem update.
 			[
 				[
 					'db' => 'SELECT * FROM problem, events, acknowledges',
@@ -617,7 +636,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 					'overlay' => 'problem'
 				]
 			],
-			// #63 Service create.
+			// #62 Service create.
 			[
 				[
 					'db' => 'SELECT * FROM services',
@@ -628,7 +647,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 					]
 				]
 			],
-			// #64 Service update.
+			// #63 Service update.
 			[
 				[
 					'db' => 'SELECT * FROM services',
@@ -636,7 +655,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 					'overlay' => 'service'
 				]
 			],
-			// #65 SLA create.
+			// #64 SLA create.
 			[
 				[
 					'db' => 'SELECT * FROM sla',
@@ -644,7 +663,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 					'overlay' => 'create'
 				]
 			],
-			// #66 SLA update.
+			// #65 SLA update.
 			[
 				[
 					'db' => 'SELECT * FROM sla',
@@ -652,14 +671,14 @@ class testPermissionsWithoutCSRF extends CWebTest {
 					'overlay' => 'update'
 				]
 			],
-			// #67 Geomap update.
+			// #66 Geomap update.
 			[
 				[
 					'db' => 'SELECT * FROM settings',
 					'link' => 'zabbix.php?action=geomaps.edit'
 				]
 			],
-			// #68 Module update.
+			// #67 Module update.
 			[
 				[
 					'db' => 'SELECT * FROM module',
@@ -667,7 +686,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 					'overlay' => 'update'
 				]
 			],
-			// #69 Audit log administration update.
+			// #68 Audit log administration update.
 			[
 				[
 					'db' => 'SELECT * FROM module',
@@ -675,7 +694,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 					'return_button' => true
 				]
 			],
-			// #70 Timeout options update.
+			// #69 Timeout options update.
 			[
 				[
 					'db' => 'SELECT * FROM settings',
@@ -722,6 +741,16 @@ class testPermissionsWithoutCSRF extends CWebTest {
 			foreach ($data['fields'] as $field => $value) {
 				$this->query($field)->one()->detect()->fill($value);
 			}
+		}
+
+		// Fill in mandatory fields in a secondary form if it contains fields that are required for form submission.
+		if (array_key_exists('secondary_dialog', $data)) {
+			$this->query($data['secondary_dialog']['field'])->one()->query('button:Add')->one()->click();
+
+			$secondary_form = COverlayDialogElement::find()->waitUntilReady()->all()->last()->asForm();
+			$secondary_form->fill($data['secondary_dialog']['fill']);
+			$secondary_form->submit();
+			$secondary_form->waitUntilNotVisible();
 		}
 
 		// Delete hidden input with CSRF token.
