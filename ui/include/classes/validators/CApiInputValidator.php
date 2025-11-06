@@ -1027,6 +1027,7 @@ class CApiInputValidator {
 						return true;
 					}
 				}
+
 				$value = NAN;
 			}
 		}
