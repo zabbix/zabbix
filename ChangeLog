@@ -1,6 +1,14 @@
+Changes for 8.0.0alpha2
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
 Changes for 8.0.0alpha1
 
 New features:
+A.F.I...S. [ZBXNEXT-9546] implemented inherited tags in latest data (agriscenko, arimdjonoks, vmaksimovs)
 ..F....... [ZBXNEXT-9752] implemented inline validation for images form (gberzina)
 ..F....... [ZBXNEXT-9848] moved host prototypes to MVC framework, refactored edit form to modal window and added inline validation (Ivo)
 ..F....... [ZBXNEXT-9755] implemented inline form validation for proxy form (msnihach)
@@ -33,6 +41,18 @@ A.F....... [ZBXNEXT-9816] added ability to convert to JSON for discovery rule wi
 Bug fixes:
 ..F....... [ZBX-26665] fixed widget configuration form layout on narrow screens (averza)
 .......PS. [ZBX-25752] reduced memory allocations in preprocessing manager (wiper)
+
+--------------------------------------------------------------------------------
+Changes for 7.4.5
+
+Bug fixes:
+..F....... [ZBX-27153] fixed undefined index error in SVG graphs for Zabbix agent active items (gcalenko)
+...G...... [ZBX-27156] fix CPU spike in Zabbix agent 2 mysql plugin (esneiders)
+
+--------------------------------------------------------------------------------
+Changes for 7.4.4
+
+7.4.4rc1 was released as 7.4.4 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 7.4.4rc1
@@ -512,6 +532,13 @@ A.F....PS. [ZBXNEXT-9564] implemented vault macro resolution on proxies (esekace
 ........S. [ZBXNEXT-9582] added discarding of queued duplicate LLD rule values based on embedded and LLD macros (wiper)
 ..F....... [ZBXNEXT-9614] implemented scrolling down to bottom in Item history widget when New values parameter is set to "Bottom" (dfofanovs)
 ...G...... [ZBXNEXT-9508] added custom query path to MySQL and Oracle plugins for Zabbix agent 2 (esneiders)
+
+--------------------------------------------------------------------------------
+Changes for 7.2.15rc1
+
+New features:
+
+Bug fixes:
 
 --------------------------------------------------------------------------------
 Changes for 7.2.14
@@ -1131,6 +1158,13 @@ A.F....... [ZBX-23227] fixed issue where using an empty array or string value fo
 ...GI..PS. [ZBX-25140] updated configure to reject TLS-unaware compilers (jxl)
 ...G...... [ZBX-25149] fixed Zabbix agent build on AIX and Solaris (arimdjonoks)
 ....I..... [ZBX-23881] dropped preference list when searching for compiler (jxl)
+
+--------------------------------------------------------------------------------
+Changes for 7.0.21
+
+Bug fixes:
+..F....... [ZBX-27153] fixed undefined index error in SVG graphs for Zabbix agent active items (gcalenko)
+...G...... [ZBX-27156] fix CPU spike in Zabbix agent 2 mysql plugin (esneiders)
 
 --------------------------------------------------------------------------------
 Changes for 7.0.20
