@@ -1171,7 +1171,7 @@ static int	hosts_ping(zbx_fping_host_t *hosts, int hosts_count, int requests_cou
 #ifdef HAVE_IPV6
 	fping_args.fping_existence = fping_existence;
 #endif
-	double start_time = 0;
+	double	start_time = 0;
 
 	if (0 < max_execution_time)
 		start_time = zbx_time();

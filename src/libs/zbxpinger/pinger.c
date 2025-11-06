@@ -571,7 +571,7 @@ static int	process_pinger_hosts(zbx_hashset_t *pinger_items, int process_num, in
 {
 #define EXEC_TIME_DELTA	0.1f
 
-	int				ping_result, processed_num = 0;
+	int				ping_result, i, processed_num = 0;
 	char				error[ZBX_ITEM_ERROR_LEN_MAX];
 	zbx_vector_fping_host_t		hosts;
 	zbx_timespec_t			ts;
@@ -587,7 +587,7 @@ static int	process_pinger_hosts(zbx_hashset_t *pinger_items, int process_num, in
 	zbx_hashset_iter_reset(pinger_items, &iter);
 	while (NULL != (pinger = (zbx_pinger_t *)zbx_hashset_iter_next(&iter)) && ZBX_IS_RUNNING())
 	{
-		for (int i = 0; i < pinger->items.values_num; i++)
+		for (i = 0; i < pinger->items.values_num; i++)
 			add_pinger_host(&hosts, pinger->items.values[i].addr);
 
 		processed_num += pinger->items.values_num;
@@ -601,10 +601,9 @@ static int	process_pinger_hosts(zbx_hashset_t *pinger_items, int process_num, in
 		{
 			if (-1 == pinger->count)
 			{
-				double total_timeout_factor = 0.0;
-				double backoff_power = 1.0;
+				double	total_timeout_factor = 0.0, backoff_power = 1.0;
 
-				for (int i = 0; i <= pinger->retries; i++)
+				for (i = 0; i <= pinger->retries; i++)
 				{
 					total_timeout_factor += backoff_power;
 					backoff_power *= pinger->backoff;
