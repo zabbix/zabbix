@@ -936,11 +936,11 @@ class testPageProblems extends CWebTest {
 						['Problem' => 'Symbols in Item metric'],
 						['Problem' => 'No operational data popup'],
 						['Problem' => 'Trigger for Age problem'],
+						['Problem' => 'Trigger for tag permissions Oracle'],
+						['Problem' => 'Trigger for tag permissions MySQL'],
 						['Problem' => 'trigger on host 3'],
 						['Problem' => 'trigger on host 2'],
 						['Problem' => 'trigger on host 1'],
-						['Problem' => 'Trigger for tag permissions Oracle'],
-						['Problem' => 'Trigger for tag permissions MySQL'],
 						['Problem' => 'Trigger for Age problem 1 day'],
 						['Problem' => 'Trigger for Age problem 1 month'],
 						['Problem' => 'Test trigger with tag'],
@@ -1397,11 +1397,11 @@ class testPageProblems extends CWebTest {
 						['Problem' => 'Symbols in Item metric'],
 						['Problem' => 'No operational data popup'],
 						['Problem' => 'Trigger for Age problem'],
+						['Problem' => 'Trigger for tag permissions Oracle'],
+						['Problem' => 'Trigger for tag permissions MySQL'],
 						['Problem' => 'trigger on host 3'],
 						['Problem' => 'trigger on host 2'],
 						['Problem' => 'trigger on host 1'],
-						['Problem' => 'Trigger for tag permissions Oracle'],
-						['Problem' => 'Trigger for tag permissions MySQL'],
 						['Problem' => 'Trigger for Age problem 1 day'],
 						['Problem' => 'Trigger for Age problem 1 month']
 					]
@@ -1435,11 +1435,11 @@ class testPageProblems extends CWebTest {
 						['Problem' => 'Symbols in Item metric'],
 						['Problem' => 'No operational data popup'],
 						['Problem' => 'Trigger for Age problem'],
+						['Problem' => 'Trigger for tag permissions Oracle'],
+						['Problem' => 'Trigger for tag permissions MySQL'],
 						['Problem' => 'trigger on host 3'],
 						['Problem' => 'trigger on host 2'],
 						['Problem' => 'trigger on host 1'],
-						['Problem' => 'Trigger for tag permissions Oracle'],
-						['Problem' => 'Trigger for tag permissions MySQL'],
 						['Problem' => 'Trigger for Age problem 1 day']
 					]
 				]
@@ -1464,11 +1464,11 @@ class testPageProblems extends CWebTest {
 						['Problem' => 'Symbols in Item metric'],
 						['Problem' => 'No operational data popup'],
 						['Problem' => 'Trigger for Age problem'],
+						['Problem' => 'Trigger for tag permissions Oracle'],
+						['Problem' => 'Trigger for tag permissions MySQL'],
 						['Problem' => 'trigger on host 3'],
 						['Problem' => 'trigger on host 2'],
-						['Problem' => 'trigger on host 1'],
-						['Problem' => 'Trigger for tag permissions Oracle'],
-						['Problem' => 'Trigger for tag permissions MySQL']
+						['Problem' => 'trigger on host 1']
 					]
 				]
 			],

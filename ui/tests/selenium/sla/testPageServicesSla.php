@@ -330,8 +330,10 @@ class testPageServicesSla extends CWebTest {
 				$overlay->close();
 			}
 			else {
-				$schedule = ($schedule['name'] == 'Multiple spaces in SLA name') ? 'Multiple   spaces   in SLA name'
+				$schedule = ($schedule['name'] == 'Multiple spaces in SLA name')
+						? 'Multiple   spaces   in SLA name'
 						: $schedule['name'];
+
 				$this->assertFalse($table->findRow('Name', $schedule)->query('class:icon-description')
 						->one(false)->isValid()
 				);

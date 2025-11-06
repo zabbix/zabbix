@@ -295,6 +295,7 @@ class testPageApiTokensUserSettings extends testPageApiTokens {
 						'Token that will expire in 2 days',
 						'Future token for admin',
 						'Expired token for admin',
+						'Checking sp aces in names',
 						'Aktīvs токен - 頑張って'
 					]
 				]
@@ -305,6 +306,7 @@ class testPageApiTokensUserSettings extends testPageApiTokens {
 					'expected' => [
 						'Never',
 						'2021-01-01 00:06:00',
+						'2 days in the future',
 						'2 days in the future',
 						'12 days in the future'
 					]
@@ -317,7 +319,8 @@ class testPageApiTokensUserSettings extends testPageApiTokens {
 						'2021-01-01 00:00:02',
 						'2021-01-01 00:00:03',
 						'2021-01-01 00:00:04',
-						'2021-01-01 00:00:05'
+						'2021-01-01 00:00:05',
+						'2021-01-01 00:00:06'
 					]
 				]
 			],
@@ -327,6 +330,7 @@ class testPageApiTokensUserSettings extends testPageApiTokens {
 					'expected' => [
 						'Enabled',
 						'Enabled',
+						'Disabled',
 						'Disabled',
 						'Disabled'
 					]

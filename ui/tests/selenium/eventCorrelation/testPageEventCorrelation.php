@@ -709,7 +709,7 @@ class testPageEventCorrelation extends CWebTest {
 				[
 					'link_button' => true,
 					'action' => 'Disable',
-					'name' => '📌€√Σnt correlation for   filter   and deletion'
+					'name' => EVENT_WITH_SEVERAL_SPACES
 				]
 			],
 			[

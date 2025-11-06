@@ -349,8 +349,8 @@ class testPageAlertsScripts extends CWebTest {
 					'expected' => [
 						self::$custom_script,
 						'Detect operating system',
-						'Multiple spaces in script name',
 						self::$script_scope_event,
+						'Multiple spaces in script name',
 						self::HOST_GROUP_SCRIPT,
 						self::$script_for_filter,
 						'Selenium script'
@@ -361,14 +361,25 @@ class testPageAlertsScripts extends CWebTest {
 			[
 				[
 					'filter' => [
-						'Name' => '   Zabbix   '
+						'Name' => '   spaces   '
 					],
 					'expected' => [
 						'Multiple spaces in script name'
 					]
 				]
 			],
-			// #5. Partial name match with space between.
+			// #5. Empty spaces in search field Name.
+			[
+				[
+					'filter' => [
+						'Name' => '   '
+					],
+					'expected' => [
+						'Multiple spaces in script name'
+					]
+				]
+			],
+			// #6. Partial name match with space between.
 			[
 				[
 					'filter' => [
@@ -380,7 +391,7 @@ class testPageAlertsScripts extends CWebTest {
 					]
 				]
 			],
-			// #6. Partial name match with spaces on the sides.
+			// #7. Partial name match with spaces on the sides.
 			[
 				[
 					'filter' => [
@@ -391,7 +402,7 @@ class testPageAlertsScripts extends CWebTest {
 					]
 				]
 			],
-			// #7. Search should not be case sensitive.
+			// #8. Search should not be case sensitive.
 			[
 				[
 					'filter' => [
@@ -402,7 +413,7 @@ class testPageAlertsScripts extends CWebTest {
 					]
 				]
 			],
-			// #8. Wrong name in filter field "Name".
+			// #9. Wrong name in filter field "Name".
 			[
 				[
 					'filter' => [
@@ -410,7 +421,7 @@ class testPageAlertsScripts extends CWebTest {
 					]
 				]
 			],
-			// #9. Search by Action operation.
+			// #10. Search by Action operation.
 			[
 				[
 					'filter' => [
@@ -425,7 +436,7 @@ class testPageAlertsScripts extends CWebTest {
 					]
 				]
 			],
-			// #10. Search by Action operation and Name.
+			// #11. Search by Action operation and Name.
 			[
 				[
 					'filter' => [
@@ -437,7 +448,7 @@ class testPageAlertsScripts extends CWebTest {
 					]
 				]
 			],
-			// #11. Search by Manual host action.
+			// #12. Search by Manual host action.
 			[
 				[
 					'filter' => [
@@ -450,7 +461,7 @@ class testPageAlertsScripts extends CWebTest {
 					]
 				]
 			],
-			// #12. Search by Manual host action and Partial name match.
+			// #13. Search by Manual host action and Partial name match.
 			[
 				[
 					'filter' => [
@@ -463,7 +474,7 @@ class testPageAlertsScripts extends CWebTest {
 					]
 				]
 			],
-			// #13. Search by Manual event action.
+			// #14. Search by Manual event action.
 			[
 				[
 					'filter' => [
@@ -475,7 +486,7 @@ class testPageAlertsScripts extends CWebTest {
 					]
 				]
 			],
-			// #14. Search by Manual event action and Partial name match.
+			// #15. Search by Manual event action and Partial name match.
 			[
 				[
 					'filter' => [
@@ -487,7 +498,7 @@ class testPageAlertsScripts extends CWebTest {
 					]
 				]
 			],
-			// #15. Search Any scripts.
+			// #16. Search Any scripts.
 			[
 				[
 					'filter' => [
@@ -496,8 +507,8 @@ class testPageAlertsScripts extends CWebTest {
 					'expected' => [
 						self::$custom_script,
 						'Detect operating system',
-						'Multiple spaces in script name',
 						self::$script_scope_event,
+						'Multiple spaces in script name',
 						'Ping',
 						'Reboot',
 						self::HOST_GROUP_SCRIPT,
@@ -543,8 +554,8 @@ class testPageAlertsScripts extends CWebTest {
 						self::HOST_GROUP_SCRIPT,
 						'Reboot',
 						'Ping',
-						self::$script_scope_event,
 						'Multiple spaces in script name',
+						self::$script_scope_event,
 						'Detect operating system',
 						self::$custom_script
 					]
