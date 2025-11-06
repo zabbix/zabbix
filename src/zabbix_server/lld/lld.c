@@ -1244,3 +1244,29 @@ out:
 	return ret;
 #undef LIFETIME_DURATION_GET
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: check if text contains LLD macros                                 *
+ *                                                                            *
+ * Parameters: text - [IN] text to check for LLD macros                       *
+ *                                                                            *
+ * Return value: SUCCEED - text contains LLD macros                           *
+ *               FAIL    - text does not contain LLD macros                   *
+ *                                                                            *
+ ******************************************************************************/
+int	lld_text_has_lld_macro(const char *text)
+{
+	zbx_token_t	token;
+	int		pos = 0;
+
+	while (SUCCEED == zbx_token_find(text, pos, &token, ZBX_TOKEN_SEARCH_BASIC))
+	{
+		if (ZBX_TOKEN_LLD_MACRO == token.type || ZBX_TOKEN_LLD_FUNC_MACRO == token.type)
+			return SUCCEED;
+
+		pos++;
+	}
+
+	return FAIL;
+}
