@@ -1,6 +1,21 @@
 //go:build !windows
 
 /*
+ ** Copyright (C) 2001-2025 Zabbix SIA
+ **
+ ** This program is free software: you can redistribute it and/or modify it under the terms of
+ ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
+ **
+ ** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ ** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ ** See the GNU Affero General Public License for more details.
+ **
+ ** You should have received a copy of the GNU Affero General Public License along with this program.
+ ** If not, see <https://www.gnu.org/licenses/>.
+
+ **/
+
+/*
 ** Copyright (C) 2001-2025 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
@@ -22,22 +37,29 @@ import (
 	"golang.zabbix.com/sdk/plugin"
 )
 
+//nolint:gochecknoglobals
 var impl Plugin
 
-// Plugin -
+// Plugin structure.
 type Plugin struct {
 	plugin.Base
 }
 
-func init() {
+func init() { //nolint:gochecknoinits // such is current plugin implementation.
 	err := plugin.RegisterMetrics(&impl, "ZabbixAsync", getMetrics()...)
 	if err != nil {
 		panic(errs.Wrap(err, "failed to register metrics"))
 	}
 }
 
-func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
-	return zbxlib.ExecuteCheck(key, params)
+// Export implements exporter interface.
+func (*Plugin) Export(key string, params []string, _ plugin.ContextProvider) (any, error) {
+	result, err := zbxlib.ExecuteCheck(key, params)
+	if err != nil {
+		return nil, errs.Wrap(err, "failed to execute check")
+	}
+
+	return result, nil
 }
 
 func getMetrics() []string {
