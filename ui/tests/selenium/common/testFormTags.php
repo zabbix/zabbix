@@ -484,9 +484,9 @@ class testFormTags extends CWebTest {
 		$sql = null;
 		$old_hash = null;
 		$expected = CTestArrayHelper::get($data, 'expected', TEST_GOOD);
-		$inline_validation = in_array($object, ['host', 'host prototype', 'template', 'trigger', 'trigger prototype', 'item', 'item prototype',
-				'service']
-		);
+		$inline_validation = in_array($object, ['host', 'host prototype', 'template', 'trigger', 'trigger prototype',
+			'item', 'item prototype', 'service'
+		]);
 
 		switch ($object) {
 			case 'trigger':

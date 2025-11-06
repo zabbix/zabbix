@@ -462,14 +462,14 @@ static void	pp_manager_queue_value_task_result(zbx_pp_manager_t *manager, zbx_pp
 	d->preproc->time_ms = task->time_ms;
 	d->preproc->total_ms += task->time_ms;
 
-	if (ZBX_VARIANT_NONE == d->result.type)
+	if (ZBX_VARIANT_NONE == d->result.type && 0 == (d->result.flags & ZBX_VARIANT_FLAG_CHANGED))
 		return;
 
 	if (NULL != (item = pp_manager_get_cacheable_dependent_item(manager, d->preproc->dep_itemids,
 			d->preproc->dep_itemids_num)))
 	{
 		zbx_pp_task_t	*dep_task;
-		zbx_variant_t	value;
+		zbx_variant_t	value = {0};
 
 		dep_task = pp_task_dependent_create(item->itemid, d->preproc);
 		zbx_pp_task_dependent_t	*d_dep = (zbx_pp_task_dependent_t *)PP_TASK_DATA(dep_task);

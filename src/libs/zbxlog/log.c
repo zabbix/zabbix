@@ -70,7 +70,7 @@ int	zbx_redirect_stdio(const char *filename)
 	else
 		filename = default_file;
 
-	if (-1 == (fd = open(filename, open_flags, 0666)))
+	if (-1 == (fd = open(filename, open_flags, 0640)))
 	{
 		zbx_error("cannot open \"%s\": %s", filename, zbx_strerror(errno));
 		return FAIL;
@@ -130,8 +130,14 @@ static void	rotate_log(const char *filename)
 		if (0 != rename(filename, filename_old))
 		{
 			FILE	*log_file = NULL;
-
-			if (NULL != (log_file = fopen(filename, "w")))
+#ifndef _WINDOWS
+			mode_t	old_umask = umask(0026);
+#endif
+			log_file = fopen(filename, "w");
+#ifndef _WINDOWS
+			umask(old_umask);
+#endif
+			if (NULL != log_file)
 			{
 				long		milliseconds;
 				struct tm	tm;
@@ -287,8 +293,14 @@ int	zbx_open_log(const zbx_config_log_t *log_file_cfg, int level, const char *sy
 
 		if (SUCCEED != zbx_mutex_create(&log_access, ZBX_MUTEX_LOG, error))
 			return FAIL;
-
-		if (NULL == (log_file = fopen(filename, "a+")))
+#ifndef _WINDOWS
+		mode_t	old_umask = umask(0026);
+#endif
+		log_file = fopen(filename, "a+");
+#ifndef _WINDOWS
+		umask(old_umask);
+#endif
+		if (NULL == log_file)
 		{
 			*error = zbx_dsprintf(*error, "unable to open log file [%s]: %s", filename,
 					zbx_strerror(errno));
@@ -363,7 +375,14 @@ void	zbx_log_impl(int level, const char *fmt, va_list args)
 		if (0 != get_config_log_file_size())
 			rotate_log(log_filename);
 
-		if (NULL != (log_file = fopen(log_filename, "a+")))
+#ifndef _WINDOWS
+		mode_t	old_umask = umask(0026);
+#endif
+		log_file = fopen(log_filename, "a+");
+#ifndef _WINDOWS
+		umask(old_umask);
+#endif
+		if (NULL != log_file)
 		{
 			long		milliseconds;
 			struct tm	tm;

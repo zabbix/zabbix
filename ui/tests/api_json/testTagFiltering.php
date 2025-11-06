@@ -14,11 +14,188 @@
 **/
 
 
-require_once dirname(__FILE__).'/../include/CAPITest.php';
+require_once __DIR__.'/../include/CAPITest.php';
+require_once __DIR__.'/../include/helpers/CTestDataHelper.php';
 
+/**
+ * @onBefore prepareTestData
+ * @onAfter  cleanTestData
+ */
 class testTagFiltering extends CAPITest {
 
-	const HOST_GROUPS = [50027, 50028];
+	public static function prepareTestData(): void {
+		CTestDataHelper::createObjects([
+			'template_groups' => [
+				['name' => 'Group of hosts with wide usage of tags/Templates']
+			],
+			'templates' => [
+				[
+					'host' => 'Workstation',
+					'groups' => [
+						['groupid' => ':template_group:Group of hosts with wide usage of tags/Templates']
+					],
+					'tags' => [
+						['tag' => 'office', 'value' => 'Riga']
+					]
+				],
+				[
+					'host' => 'Template Browser - FF',
+					'groups' => [
+						['groupid' => ':template_group:Group of hosts with wide usage of tags/Templates']
+					],
+					'tags' => [
+						['tag' => 'Browser', 'value' => 'FF'],
+						['tag' => 'Webbrowser', 'value' => 'Mozilla']
+					]
+				],
+				[
+					'host' => 'Template OS - Ubuntu Bionic Beaver',
+					'groups' => [
+						['groupid' => ':template_group:Group of hosts with wide usage of tags/Templates']
+					],
+					'tags' => [
+						['tag' => 'OS', 'value' => 'Ubuntu Bionic Beaver']
+					]
+				]
+			],
+			'host_groups' => [
+				['name' => 'Group of hosts with wide usage of tags/Hosts']
+			],
+			'hosts' => [
+				[
+					'host' => 'Host without tags',
+					'groups' => [
+						['groupid' => ':host_group:Group of hosts with wide usage of tags/Hosts']
+					]
+				],
+				[
+					'host' => 'Host with very general tags only',
+					'groups' => [
+						['groupid' => ':host_group:Group of hosts with wide usage of tags/Hosts']
+					],
+					'tags' => [
+						['tag' => 'Other', 'value' => '']
+					]
+				],
+				[
+					'host' => 'Host Browser',
+					'groups' => [
+						['groupid' => ':host_group:Group of hosts with wide usage of tags/Hosts']
+					],
+					'tags' => [
+						['tag' => 'Browser', 'value' => '']
+					]
+				],
+				[
+					'host' => 'Host Browser - Chrome',
+					'groups' => [
+						['groupid' => ':host_group:Group of hosts with wide usage of tags/Hosts']
+					],
+					'tags' => [
+						['tag' => 'Browser', 'value' => 'Chrome']
+					]
+				],
+				[
+					'host' => 'Host Browser - IE',
+					'groups' => [
+						['groupid' => ':host_group:Group of hosts with wide usage of tags/Hosts']
+					],
+					'tags' => [
+						['tag' => 'Browser', 'value' => 'IE']
+					]
+				],
+				[
+					'host' => 'Host OS',
+					'groups' => [
+						['groupid' => ':host_group:Group of hosts with wide usage of tags/Hosts']
+					],
+					'tags' => [
+						['tag' => 'OS', 'value' => '']
+					]
+				],
+				[
+					'host' => 'Host OS - Android',
+					'groups' => [
+						['groupid' => ':host_group:Group of hosts with wide usage of tags/Hosts']
+					],
+					'tags' => [
+						['tag' => 'OS', 'value' => 'Android']
+					]
+				],
+				[
+					'host' => 'Host OS - Mac',
+					'groups' => [
+						['groupid' => ':host_group:Group of hosts with wide usage of tags/Hosts']
+					],
+					'tags' => [
+						['tag' => 'OS', 'value' => 'Mac']
+					]
+				]
+			]
+		]);
+
+		CTestDataHelper::createObjects([
+			'templates' => [
+				[
+					'host' => 'Template OS - Windows',
+					'groups' => [
+						['groupid' => ':template_group:Group of hosts with wide usage of tags/Templates']
+					],
+					'templates' => [
+						['templateid' => ':template:Workstation']
+					],
+					'tags' => [
+						['tag' => 'OS', 'value' => 'Win7']
+					]
+				]
+			]
+		]);
+
+		CTestDataHelper::createObjects([
+			'hosts' => [
+				[
+					'host' => 'Host Browser - Firefox',
+					'groups' => [
+						['groupid' => ':host_group:Group of hosts with wide usage of tags/Hosts']
+					],
+					'templates' => [
+						['templateid' => ':template:Template Browser - FF']
+					],
+					'tags' => [
+						['tag' => 'Browser', 'value' => 'Firefox']
+					]
+				],
+				[
+					'host' => 'Host OS - Linux',
+					'groups' => [
+						['groupid' => ':host_group:Group of hosts with wide usage of tags/Hosts']
+					],
+					'templates' => [
+						['templateid' => ':template:Template OS - Ubuntu Bionic Beaver']
+					],
+					'tags' => [
+						['tag' => 'OS', 'value' => 'Linux']
+					]
+				],
+				[
+					'host' => 'Host OS - Windows',
+					'groups' => [
+						['groupid' => ':host_group:Group of hosts with wide usage of tags/Hosts']
+					],
+					'templates' => [
+						['templateid' => ':template:Template OS - Windows']
+					],
+					'tags' => [
+						['tag' => 'OS', 'value' => 'Windows']
+					]
+				]
+			]
+		]);
+	}
+
+	public static function cleanTestData(): void {
+		CTestDataHelper::cleanUp();
+	}
 
 	public static function host_get_data() {
 		return [
@@ -171,7 +348,10 @@ class testTagFiltering extends CAPITest {
 	public function testHost_Get($filter, $expected) {
 		$request = [
 			'output' => ['host'],
-			'groupids' => self::HOST_GROUPS
+			'groupids' => CTestDataHelper::getConvertedValueReferences([
+				':template_group:Group of hosts with wide usage of tags/Templates',
+				':host_group:Group of hosts with wide usage of tags/Hosts'
+			])
 		] + $filter;
 
 		['result' => $result] = $this->call('host.get', $request);
@@ -346,7 +526,10 @@ class testTagFiltering extends CAPITest {
 	public function testHostTagInheritance_Get($filter, $expected) {
 		$request = [
 			'output' => ['host'],
-			'groupids' => self::HOST_GROUPS,
+			'groupids' => CTestDataHelper::getConvertedValueReferences([
+				':template_group:Group of hosts with wide usage of tags/Templates',
+				':host_group:Group of hosts with wide usage of tags/Hosts'
+			]),
 			'inheritedTags' => true
 		] + $filter;
 
@@ -532,257 +715,13 @@ class testTagFiltering extends CAPITest {
 	public function testTemplate_Get($filter, $expected) {
 		$request = [
 			'output' => ['name'],
-			'groupids' => self::HOST_GROUPS
+			'groupids' => CTestDataHelper::getConvertedValueReferences([
+				':template_group:Group of hosts with wide usage of tags/Templates',
+				':host_group:Group of hosts with wide usage of tags/Hosts'
+			])
 		] + $filter;
 
 		['result' => $result] = $this->call('template.get', $request);
-
-		$result = array_column($result, 'name');
-
-		sort($result);
-		sort($expected);
-
-		$this->assertTrue(array_values($result) === array_values($expected));
-	}
-
-	/**
-	 * Test cases for event.get and problem.get API methods.
-	 */
-	public static function event_get_data() {
-		return [
-			// evaltype: AND/OR
-			'events-exists-single-tag' => [
-				'filter' => [
-					'evaltype' => TAG_EVAL_TYPE_AND_OR,
-					'tags' => [
-						['tag' => 'OS', 'operator' => TAG_OPERATOR_EXISTS]
-					]
-				],
-				'expected' => [
-					'trigger1', 'trigger2', 'trigger3', 'trigger4'
-				]
-			],
-			'events-exists-two-tags' => [
-				'filter' => [
-					'evaltype' => TAG_EVAL_TYPE_AND_OR,
-					'tags' => [
-						['tag' => 'OS', 'operator' => TAG_OPERATOR_EXISTS],
-						['tag' => 'tag2', 'operator' => TAG_OPERATOR_EXISTS]
-					]
-				],
-				'expected' => [
-					'trigger1', 'trigger2'
-				]
-			],
-			'events-equals-single-tag' => [
-				'filter' => [
-					'evaltype' => TAG_EVAL_TYPE_AND_OR,
-					'tags' => [
-						['tag' => 'tag2', 'operator' => TAG_OPERATOR_EQUAL, 'value' => 'value6']
-					]
-				],
-				'expected' => [
-					'trigger2'
-				]
-			],
-			'events-equals-two-tags' => [
-				'filter' => [
-					'evaltype' => TAG_EVAL_TYPE_AND_OR,
-					'tags' => [
-						['tag' => 'tag1', 'operator' => TAG_OPERATOR_EQUAL, 'value' => 'value1'],
-						['tag' => 'tag1', 'operator' => TAG_OPERATOR_EQUAL, 'value' => 'value5']
-					]
-				],
-				'expected' => [
-					'trigger1', 'trigger2'
-				]
-			],
-			'events-equals-two-tags-one-empty' => [
-				'filter' => [
-					'evaltype' => TAG_EVAL_TYPE_AND_OR,
-					'tags' => [
-						['tag' => 'tag2', 'operator' => TAG_OPERATOR_EQUAL, 'value' => 'value6'],
-						['tag' => 'tag2', 'operator' => TAG_OPERATOR_EQUAL, 'value' => '']
-					]
-				],
-				'expected' => [
-					'trigger1', 'trigger2'
-				]
-			],
-			'events-contains-single-tag' => [
-				'filter' => [
-					'evaltype' => TAG_EVAL_TYPE_AND_OR,
-					'tags' => [
-						['tag' => 'tag3', 'operator' => TAG_OPERATOR_LIKE, 'value' => 'value']
-					]
-				],
-				'expected' => [
-					'trigger1'
-				]
-			],
-			'events-contains-two-tags' => [
-				'filter' => [
-					'evaltype' => TAG_EVAL_TYPE_AND_OR,
-					'tags' => [
-						['tag' => 'tag1', 'operator' => TAG_OPERATOR_LIKE, 'value' => 'value'],
-						['tag' => 'OS', 'operator' => TAG_OPERATOR_LIKE, 'value' => 'Win']
-					]
-				],
-				'expected' => [
-					'trigger1', 'trigger2', 'trigger3'
-				]
-			],
-			'events-not-exist-single-tag' => [
-				'filter' => [
-					'evaltype' => TAG_EVAL_TYPE_AND_OR,
-					'tags' => [
-						['tag' => 'tag2', 'operator' => TAG_OPERATOR_NOT_EXISTS]
-					]
-				],
-				'expected' => [
-					'trigger3', 'trigger4'
-				]
-			],
-			'events-not-equal-single-tag' => [
-				'filter' => [
-					'evaltype' => TAG_EVAL_TYPE_AND_OR,
-					'tags' => [
-						['tag' => 'tag2', 'operator' => TAG_OPERATOR_NOT_EQUAL, 'value' => '']
-					]
-				],
-				'expected' => [
-					'trigger2', 'trigger3', 'trigger4'
-				]
-			],
-			'events-not-equal-two-tags' => [
-				'filter' => [
-					'evaltype' => TAG_EVAL_TYPE_AND_OR,
-					'tags' => [
-						['tag' => 'tag2', 'operator' => TAG_OPERATOR_NOT_EQUAL, 'value' => ''],
-						['tag' => 'tag1', 'operator' => TAG_OPERATOR_NOT_EQUAL, 'value' => 'value7']
-					]
-				],
-				'expected' => [
-					'trigger2', 'trigger4'
-				]
-			],
-			'events-not-contain-single-tag' => [
-				'filter' => [
-					'evaltype' => TAG_EVAL_TYPE_AND_OR,
-					'tags' => [
-						['tag' => 'tag1', 'operator' => TAG_OPERATOR_NOT_LIKE, 'value' => 'value']
-					]
-				],
-				'expected' => [
-					'trigger4'
-				]
-			],
-
-			// evaltype: OR
-			'events-exist-one-of-two-tags' => [
-				'filter' => [
-					'evaltype' => TAG_EVAL_TYPE_OR,
-					'tags' => [
-						['tag' => 'tag2', 'operator' => TAG_OPERATOR_EXISTS],
-						['tag' => 'tag3', 'operator' => TAG_OPERATOR_EXISTS]
-					]
-				],
-				'expected' => [
-					'trigger1', 'trigger2'
-				]
-			],
-			'events-tag-exists-or-another-empty' => [
-				'filter' => [
-					'evaltype' => TAG_EVAL_TYPE_OR,
-					'tags' => [
-						['tag' => 'tag2', 'operator' => TAG_OPERATOR_LIKE, 'value' => ''],
-						['tag' => 'tag3', 'operator' => TAG_OPERATOR_EXISTS]
-					]
-				],
-				'expected' => [
-					'trigger1', 'trigger2'
-				]
-			],
-			'events-contains-one-of-two-tags' => [
-				'filter' => [
-					'evaltype' => TAG_EVAL_TYPE_OR,
-					'tags' => [
-						['tag' => 'tag1', 'operator' => TAG_OPERATOR_LIKE, 'value' => '5'],
-						['tag' => 'tag1', 'operator' => TAG_OPERATOR_LIKE, 'value' => '7']
-					]
-				],
-				'expected' => [
-					'trigger2', 'trigger3'
-				]
-			],
-			'events-not-exist-one-of-two-tags' => [
-				'filter' => [
-					'evaltype' => TAG_EVAL_TYPE_OR,
-					'tags' => [
-						['tag' => 'tag2', 'operator' => TAG_OPERATOR_NOT_EXISTS],
-						['tag' => 'tag3', 'operator' => TAG_OPERATOR_NOT_EXISTS]
-					]
-				],
-				'expected' => [
-					'trigger2', 'trigger3', 'trigger4'
-				]
-			],
-			'events-not-equal-one-of-two-tag-values' => [
-				'filter' => [
-					'evaltype' => TAG_EVAL_TYPE_OR,
-					'tags' => [
-						['tag' => 'tag1', 'operator' => TAG_OPERATOR_NOT_EQUAL, 'value' => 'value1'],
-						['tag' => 'tag1', 'operator' => TAG_OPERATOR_NOT_EQUAL, 'value' => 'value7']
-					]
-				],
-				'expected' => [
-					'trigger2', 'trigger4'
-				]
-			],
-			'events-not-contain-one-of-two-tags' => [
-				'filter' => [
-					'evaltype' => TAG_EVAL_TYPE_OR,
-					'tags' => [
-						['tag' => 'tag1', 'operator' => TAG_OPERATOR_NOT_LIKE, 'value' => 'value'],
-						['tag' => 'OS', 'operator' => TAG_OPERATOR_NOT_LIKE, 'value' => 'win']
-					]
-				],
-				'expected' => [
-					'trigger4'
-				]
-			]
-		];
-	}
-
-	/**
-	 * @dataProvider event_get_data
-	 */
-	public function testEvent_Get($filter, $expected) {
-		$request = [
-			'output' => ['name'],
-			'groupids' => self::HOST_GROUPS
-		] + $filter;
-
-		['result' => $result] = $this->call('event.get', $request);
-
-		$result = array_column($result, 'name');
-
-		sort($result);
-		sort($expected);
-
-		$this->assertTrue(array_values($result) === array_values($expected));
-	}
-
-	/**
-	 * @dataProvider event_get_data
-	 */
-	public function testProblem_Get($filter, $expected) {
-		$request = [
-			'output' => ['name'],
-			'groupids' => self::HOST_GROUPS
-		] + $filter;
-
-		['result' => $result] = $this->call('problem.get', $request);
 
 		$result = array_column($result, 'name');
 

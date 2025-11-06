@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2025-10-03 11:19+0000\n"
+"PO-Revision-Date: 2025-10-30 17:07+0000\n"
 "Last-Translator: Vicente Salvador <vicentesalvadorcubedo@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: es\n"
@@ -304,19 +304,19 @@ msgstr "%1$s: %2$s"
 #: include/classes/setup/CSetupWizard.php:1460
 #, c-format
 msgid "%1$s: %2$s."
-msgstr ""
+msgstr "%1$s: %2$s."
 
 #: include/classes/server/CZabbixServer.php:746
 #: include/classes/setup/CSetupWizard.php:1466
 #, c-format
 msgid "%1$s: file is not readable."
-msgstr ""
+msgstr "%1$s: el fichero no se puede leer."
 
 #: include/classes/server/CZabbixServer.php:743
 #: include/classes/setup/CSetupWizard.php:1463
 #, c-format
 msgid "%1$s: invalid path or file not found."
-msgstr ""
+msgstr "%1$s: ruta invalida o fichero no encontrado."
 
 #: include/classes/graph/CSvgGraph.php:1418
 #, c-format
@@ -1764,7 +1764,7 @@ msgstr "Debe existir al menos un usuario activo con el rol \"%1$s\"."
 
 #: app/controllers/CControllerMaintenanceTimePeriodCheck.php:40
 msgid "At least one day must be selected."
-msgstr ""
+msgstr "Al menos un día debe ser seleccionado."
 
 #: include/classes/api/services/CMaintenance.php:686
 msgid "At least one day of the week or day of the month must be specified."
@@ -2209,7 +2209,7 @@ msgstr "Azul"
 
 #: include/classes/core/ZBase.php:376
 msgid "Blue (classic)"
-msgstr ""
+msgstr "Azul (clásico)"
 
 #: app/views/webscenario.step.edit.php:250
 #: include/views/configuration.host.discovery.edit.php:383
@@ -3644,7 +3644,7 @@ msgstr "No se puede encontrar el mapa de valores \"%1$s\" usado para el prototip
 
 #: app/views/oauth.authorize.php:33
 msgid "Cannot get authentication tokens"
-msgstr ""
+msgstr "No se pueden obtener tokens de autenticación"
 
 #: app/views/oauth.edit.php:230
 msgid "Cannot get authorization code."
@@ -4180,7 +4180,7 @@ msgstr "No se puede leer YAML: %1$s."
 #: include/classes/server/CZabbixServer.php:511
 #, c-format
 msgid "Cannot read response from Zabbix server \"%1$s\"."
-msgstr ""
+msgstr "No se puede leer la respuesta del servidor Zabbix \"%1$s\"."
 
 #: include/classes/server/CZabbixServer.php:567
 #, c-format
@@ -6903,7 +6903,7 @@ msgstr "¿Desea eliminar la asociación de iconos?"
 
 #: app/views/host.prototype.edit.php:699
 msgid "Delete host prototype?"
-msgstr ""
+msgstr "¿Desea eliminar prototipo de equipo?"
 
 #: app/views/administration.iconmap.edit.php:145
 msgid "Delete icon map?"
@@ -9300,6 +9300,10 @@ msgstr "Requisitos de campo:"
 msgid "File checksum, calculated by the UNIX cksum algorithm. Returns integer for crc32 (default) and string for md5, sha256"
 msgstr "Suma de comprobación del archivo, calculada mediante el algoritmo cksum de UNIX. Devuelve un número entero para crc32 (predeterminado) y una cadena para md5, sha256"
 
+#: include/classes/validators/CFormValidator.php:1451 jsLoader.php:445
+msgid "File format is unsupported."
+msgstr ""
+
 #: include/classes/import/readers/CYamlImportReader.php:52
 msgid "File is empty"
 msgstr "El archivo está vacío"
@@ -9316,6 +9320,11 @@ msgstr "Información del propietario del archivo. Devuelve una cadena"
 #: include/classes/data/CItemData.php:1679
 msgid "File size in bytes (default) or in newlines. Returns integer"
 msgstr "Tamaño del archivo en bytes (predeterminado) o en número de líneas. Devuelve un número entero"
+
+#: include/classes/helpers/CUploadFile.php:129 jsLoader.php:444
+#, c-format
+msgid "File size must be less than %1$s."
+msgstr ""
 
 #: include/classes/data/CItemData.php:1687
 msgid "File time information. Returns integer (Unix timestamp)"
@@ -12156,6 +12165,18 @@ msgstr "Macros heredadas y de equipo"
 msgid "Inherited and host prototype macros"
 msgstr "Macros heredadas y de prototipo de equipo"
 
+#: include/classes/helpers/CTagHelper.php:230
+msgid "Inherited and host tag"
+msgstr ""
+
+#: app/partials/configuration.tags.tab.php:42
+msgid "Inherited and host tags"
+msgstr ""
+
+#: include/classes/helpers/CTagHelper.php:231
+msgid "Inherited and item tag"
+msgstr ""
+
 #: app/partials/configuration.tags.tab.php:165
 msgid "Inherited and item tags"
 msgstr "Etiquetas heredadas y de métricas"
@@ -12168,13 +12189,33 @@ msgstr "Etiquetas heredadas y de escenario"
 msgid "Inherited and template macros"
 msgstr "Etiquetas heredadas y de plantillas"
 
+#: include/classes/helpers/CTagHelper.php:229
+msgid "Inherited and template tag"
+msgstr ""
+
+#: app/partials/configuration.tags.tab.php:33
+msgid "Inherited and template tags"
+msgstr ""
+
+#: include/classes/helpers/CTagHelper.php:232
+msgid "Inherited and trigger tag"
+msgstr ""
+
 #: app/partials/configuration.tags.tab.php:155
 msgid "Inherited and trigger tags"
 msgstr "Etiquetas heredadas y de iniciador"
 
+#: include/classes/helpers/CTagHelper.php:233
+msgid "Inherited and web scenario tag"
+msgstr ""
+
 #: include/forms.inc.php:311
 msgid "Inherited items"
 msgstr "Métricas heredadas"
+
+#: include/classes/helpers/CTagHelper.php:222
+msgid "Inherited tag"
+msgstr ""
 
 #: widgets/geomap/includes/WidgetForm.php:62
 msgid "Initial view"
@@ -21024,7 +21065,7 @@ msgstr "Hora de inicio del servidor Zabbix, marca de tiempo Unix."
 #: app/views/trigger.list.php:91 include/forms.inc.php:543
 #: include/views/configuration.host.discovery.list.php:161
 msgid "State"
-msgstr "Estado"
+msgstr "Condición"
 
 #: include/classes/data/CItemData.php:2912
 msgid "State of proxy group. Returns integer: 0 - unknown; 1 - offline; 2 - recovering; 3 - online; 4 - degrading."
@@ -21790,6 +21831,10 @@ msgstr "Nombre de plantilla"
 msgid "Template permissions"
 msgstr "Permisos de plantillas"
 
+#: app/partials/configuration.tags.tab.php:33
+msgid "Template tags"
+msgstr ""
+
 #: report2.php:398
 msgid "Template trigger"
 msgstr "Plantilla de iniciador"
@@ -22296,6 +22341,10 @@ msgstr "Este valor no puede ser uno de %1$s."
 #: include/classes/validators/CFormValidator.php:946 jsLoader.php:421
 msgid "This value does not match pattern."
 msgstr "Este valor no coincide con el patrón."
+
+#: jsLoader.php:442
+msgid "This value is not a valid file."
+msgstr ""
 
 #: include/classes/validators/CFormValidator.php:874 jsLoader.php:424
 msgid "This value is not a valid floating-point value."

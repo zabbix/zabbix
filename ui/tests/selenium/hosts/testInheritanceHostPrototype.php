@@ -162,9 +162,7 @@ class testInheritanceHostPrototype extends CLegacyWebTest {
 			$this->zbxTestAssertElementPresentXpath('//input[@id="'.$id.'"][@readonly]');
 		}
 
-		$dialog = COverlayDialogElement::find()->one();
-		$dialog_footer = $dialog->getFooter();
-		$this->assertFalse($dialog_footer->query('button:Delete')->one()->isEnabled());
+		$this->assertFalse(COverlayDialogElement::find()->one()->getFooter()->query('button:Delete')->one()->isEnabled());
 	}
 
 	public static function getCreateData() {
@@ -293,9 +291,7 @@ class testInheritanceHostPrototype extends CLegacyWebTest {
 		$this->selectHostPrototypeForUpdate($data['update'], $data);
 
 		$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
-		$dialog_footer = $dialog->getFooter();
-		$dialog_footer->query('button:Update')->one()->click();
-
+		$dialog->getFooter()->query('button:Update')->one()->click();
 		$dialog->ensureNotPresent();
 		$this->page->waitUntilReady();
 
@@ -379,8 +375,8 @@ class testInheritanceHostPrototype extends CLegacyWebTest {
 		}
 
 		$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
-		$dialog_footer = $dialog->getFooter();
-		$dialog_footer->query('button:Update')->one()->click();
+		$dialog->getFooter()->query('button:Update')->one()->click();
+		$dialog->ensureNotPresent();
 
 		// Check the results in frontend.
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Host prototype updated');
@@ -501,13 +497,10 @@ class testInheritanceHostPrototype extends CLegacyWebTest {
 		}
 
 		$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
-		$dialog_footer = $dialog->getFooter();
-		$dialog_footer->query('button:Add')->one()->click();
-
-		$form = COverlayDialogElement::find()->one()->asForm();
+		$dialog->getFooter()->query('button:Add')->one()->click();
 
 		if (array_key_exists('error_inline', $data)) {
-			$this->assertInlineError($form, $data['error_inline']);
+			$this->assertInlineError($dialog->waitUntilReady()->asForm(), $data['error_inline']);
 		}
 		else {
 			$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Host prototype added');
@@ -589,8 +582,9 @@ class testInheritanceHostPrototype extends CLegacyWebTest {
 			]
 		];
 		// Edit host prototype on template and add macros.
-		$this->page->login()->open('zabbix.php?action=popup&popup=host.prototype.edit&parent_discoveryid='
-			.$template_lld_id.'&hostid='.$template_prototype_id.'&context=host');
+		$this->page->login()->open('zabbix.php?action=popup&popup=host.prototype.edit&parent_discoveryid='.
+				$template_lld_id.'&hostid='.$template_prototype_id.'&context=host'
+		);
 
 		$dialog = COverlayDialogElement::find()->one();
 		$form = $dialog->asForm();
@@ -602,8 +596,9 @@ class testInheritanceHostPrototype extends CLegacyWebTest {
 		$this->page->waitUntilReady();
 
 		// Open host prototype inherited from template on host and check inherited macros.
-		$this->page->open('zabbix.php?action=popup&popup=host.prototype.edit&parent_discoveryid='
-			.$host_lld_id.'&hostid='.$host_prototype_id.'&context=host');
+		$this->page->open('zabbix.php?action=popup&popup=host.prototype.edit&parent_discoveryid='.
+				$host_lld_id.'&hostid='.$host_prototype_id.'&context=host'
+		);
 		$form->selectTab('Macros');
 		$this->assertMacros($macros);
 

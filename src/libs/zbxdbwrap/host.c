@@ -17,6 +17,7 @@
 #include "template.h"
 #include "trigger_linking.h"
 #include "graph_linking.h"
+#include "tag_cache.h"
 
 #include "zbxcacheconfig.h"
 #include "audit/zbxaudit_host.h"
@@ -2410,6 +2411,9 @@ int	zbx_db_delete_template_elements(zbx_uint64_t hostid, const char *hostname, z
 	zbx_db_execute("%s", sql);
 
 	zbx_free(sql);
+
+	if (SUCCEED != (res = zbx_db_delete_host_template_cache(hostid, del_templateids)))
+		*error = zbx_dsprintf(NULL, "failed to delete host tag cache for hostid: " ZBX_FS_UI64, hostid);
 clean:
 	zbx_vector_uint64_destroy(&templateids);
 
@@ -5870,6 +5874,12 @@ int	zbx_db_copy_template_elements(zbx_uint64_t hostid, zbx_vector_uint64_t *lnk_
 	if (0 == lnk_templateids->values_num)
 		goto clean;
 
+	if (FAIL == (res = zbx_db_copy_host_template_cache(hostid, lnk_templateids)))
+	{
+		*error = zbx_dsprintf(NULL, "failed to copy host tag cache for hostid: " ZBX_FS_UI64, hostid);
+		goto clean;
+	}
+
 	hosttemplateid = zbx_db_get_maxid_num("hosts_templates", lnk_templateids->values_num);
 
 	db_insert_htemplates = zbx_malloc(NULL, sizeof(zbx_db_insert_t));
@@ -5900,7 +5910,6 @@ int	zbx_db_copy_template_elements(zbx_uint64_t hostid, zbx_vector_uint64_t *lnk_
 		DBcopy_template_httptests(hostid, lnk_templateids, audit_context_mode);
 	}
 clean:
-
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(res));
 
 	return res;

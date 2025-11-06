@@ -26,7 +26,8 @@ class CForm {
 		'set': CFieldSet,
 		'text-box': CFieldTextBox,
 		'textarea': CFieldTextarea,
-		'z-select': CFieldZSelect
+		'z-select': CFieldZSelect,
+		'file': CFieldFile
 	};
 	#form = null;
 	#rules = null;
