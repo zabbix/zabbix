@@ -81,16 +81,20 @@ var metricsMeta = map[string]handlerFunc{ //nolint:gochecknoglobals
 
 // Common params: [URI|Session][,User][,Password][,Service].
 var (
-	paramURI = metric.NewConnParam("URI", "URI to connect or session name."). //nolint:gochecknoglobals
+	//nolint:gochecknoglobals
+	paramURI = metric.NewConnParam("URI", "URI to connect or session name.").
+		WithValidator(uri.URIValidator{Defaults: dbconn.URIDefaults, AllowedSchemes: []string{"tcp", "tcps"}}). //nolint:gci,gofmt,lll //here and next - suppress linter's dislike of newlines in fluent builder
 		WithDefault(dbconn.URIDefaults.Scheme + "://localhost:" + dbconn.URIDefaults.Port).
-		WithSession().
-		WithValidator(uri.URIValidator{Defaults: dbconn.URIDefaults, AllowedSchemes: []string{"tcp", "tcps"}})
-	paramUsername = metric.NewConnParam("User", "Oracle user."). //nolint:gochecknoglobals
-		WithDefault("")
-	paramPassword = metric.NewConnParam("Password", "User's password."). //nolint:gochecknoglobals
-		WithDefault("")
-	paramService = metric.NewConnParam("Service", "Service name to be used for connection."). //nolint:gochecknoglobals
-		WithDefault("XE")
+		WithSession()
+	//nolint:gochecknoglobals
+	paramUsername = metric.NewConnParam("User", "Oracle user.").
+		WithDefault("") //nolint:gci,gofmt
+	//nolint:gochecknoglobals
+	paramPassword = metric.NewConnParam("Password", "User's password.").
+		WithDefault("") //nolint:gci,gofmt
+	//nolint:gochecknoglobals
+	paramService = metric.NewConnParam("Service", "Service name to be used for connection.").
+		WithDefault("XE") //nolint:gci,gofmt
 )
 
 var metrics = metric.MetricSet{ //nolint:gochecknoglobals
