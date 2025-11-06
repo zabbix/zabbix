@@ -90,7 +90,7 @@ class CItem extends CItemGeneral {
 	public function get($options = []) {
 		$sqlParts = [
 			'select'	=> ['items' => 'i.itemid'],
-			'from'		=> ['items' => 'items i'],
+			'from'		=> 'items i',
 			'where'		=> ['webtype' => 'i.type<>'.ITEM_TYPE_HTTPTEST, 'flags' => 'i.flags IN ('.ZBX_FLAG_DISCOVERY_NORMAL.','.ZBX_FLAG_DISCOVERY_CREATED.')'],
 			'group'		=> [],
 			'order'		=> [],

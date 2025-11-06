@@ -100,7 +100,7 @@ class CAuditLog extends CApiService {
 
 		$sql_parts = [
 			'select'	=> ['auditlog' => 'a.auditid'],
-			'from'		=> ['auditlog' => 'auditlog a'],
+			'from'		=> 'auditlog a',
 			'where'		=> [],
 			'order'		=> [],
 			'limit'		=> null

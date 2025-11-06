@@ -97,7 +97,7 @@ class CAction extends CApiService {
 
 		$sqlParts = [
 			'select'	=> ['actions' => 'a.actionid'],
-			'from'		=> ['actions' => 'actions a'],
+			'from'		=> 'actions a',
 			'where'		=> [],
 			'order'		=> [],
 			'limit'		=> null

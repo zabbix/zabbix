@@ -50,7 +50,7 @@ class CIconMap extends CApiService {
 
 		$sqlParts = [
 			'select'	=> ['icon_map' => 'im.iconmapid'],
-			'from'		=> ['icon_map' => 'icon_map im'],
+			'from'		=> 'icon_map im',
 			'where'		=> [],
 			'order'		=> [],
 			'limit'		=> null

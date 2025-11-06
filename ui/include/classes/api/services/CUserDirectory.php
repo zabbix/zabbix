@@ -120,7 +120,7 @@ class CUserDirectory extends CApiService {
 		if ($db_userdirectories_by_type[IDP_TYPE_LDAP] && $ldap_output) {
 			$sql_parts = [
 				'select' => array_merge(['userdirectoryid'], $ldap_output),
-				'from' => ['userdirectory_ldap'],
+				'from' => 'userdirectory_ldap',
 				'where' => [dbConditionInt('userdirectoryid', $db_userdirectories_by_type[IDP_TYPE_LDAP])]
 			];
 

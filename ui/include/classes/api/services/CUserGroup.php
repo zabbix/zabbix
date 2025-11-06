@@ -56,7 +56,7 @@ class CUserGroup extends CApiService {
 
 		$sqlParts = [
 			'select'	=> ['usrgrp' => 'g.usrgrpid'],
-			'from'		=> ['usrgrp' => 'usrgrp g'],
+			'from'		=> 'usrgrp g',
 			'where'		=> [],
 			'order'		=> [],
 			'limit'		=> null

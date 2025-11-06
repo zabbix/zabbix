@@ -57,7 +57,7 @@ class CTrigger extends CTriggerGeneral {
 
 		$sqlParts = [
 			'select'	=> ['triggers' => 't.triggerid'],
-			'from'		=> ['t' => 'triggers t'],
+			'from'		=> 'triggers t',
 			'where'		=> [],
 			'group'		=> [],
 			'order'		=> [],

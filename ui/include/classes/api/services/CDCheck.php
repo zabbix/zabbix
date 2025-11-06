@@ -32,7 +32,7 @@ class CDCheck extends CApiService {
 
 		$sqlParts = [
 			'select'	=> ['dchecks' => 'dc.dcheckid'],
-			'from'		=> ['dchecks' => 'dchecks dc'],
+			'from'		=> 'dchecks dc',
 			'where'		=> [],
 			'group'		=> [],
 			'order'		=> [],

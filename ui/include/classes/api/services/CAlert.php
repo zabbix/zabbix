@@ -133,7 +133,7 @@ class CAlert extends CApiService {
 	protected function createSelectQueryParts($tableName, $tableAlias, array $options) {
 		$sql_parts = [
 			'select' => ['a.alertid'],
-			'from' => ['a' => 'alerts a'],
+			'from' => 'alerts a',
 			'where' => [],
 			'group' => [],
 			'order' => [],

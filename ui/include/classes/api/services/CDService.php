@@ -63,7 +63,7 @@ class CDService extends CApiService {
 
 		$sqlParts = [
 			'select'	=> ['dservices' => 'ds.dserviceid'],
-			'from'		=> ['dservices' => 'dservices ds'],
+			'from'		=> 'dservices ds',
 			'where'		=> [],
 			'group'		=> [],
 			'order'		=> [],

@@ -38,7 +38,7 @@ class CGraphItem extends CApiService {
 
 		$sqlParts = [
 			'select'	=> ['gitems' => 'gi.gitemid'],
-			'from'		=> ['graphs_items' => 'graphs_items gi'],
+			'from'		=> 'graphs_items gi',
 			'where'		=> [],
 			'order'		=> [],
 			'limit'		=> null

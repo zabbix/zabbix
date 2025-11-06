@@ -58,7 +58,7 @@ class CImage extends CApiService {
 
 		$sqlParts = [
 			'select'	=> ['images' => 'i.imageid'],
-			'from'		=> ['images' => 'images i'],
+			'from'		=> 'images i',
 			'where'		=> [],
 			'order'		=> [],
 			'limit'		=> null

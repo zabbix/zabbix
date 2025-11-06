@@ -48,7 +48,7 @@ class CGraph extends CGraphGeneral {
 
 		$sqlParts = [
 			'select'	=> ['graphs' => 'g.graphid'],
-			'from'		=> ['graphs' => 'graphs g'],
+			'from'		=> 'graphs g',
 			'where'		=> [],
 			'group'		=> [],
 			'order'		=> [],

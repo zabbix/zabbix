@@ -390,7 +390,7 @@ class CApiService {
 
 		$sqlParts = [
 			'select' => [$this->fieldId($this->pk($tableName), $tableAlias)],
-			'from' => [$this->tableId($tableName, $tableAlias)],
+			'from' => $this->tableId($tableName, $tableAlias),
 			'where' => [],
 			'group' => [],
 			'order' => [],
@@ -444,12 +444,6 @@ class CApiService {
 	 * @return string			The resulting SQL query
 	 */
 	protected function createSelectQueryFromParts(array $sqlParts) {
-		if (count($sqlParts['from']) != 1) {
-			trigger_error('The CApiService database framework does not support multiple "from" clauses.'.
-				' Use "join" instead.', E_USER_ERROR
-			);
-		}
-
 		if (array_key_exists('left_join', $sqlParts)) {
 			trigger_error('The CApiService database framework no longer supports "left_join". '.
 				'Please use "join" with the "type" => "left" option instead.', E_USER_ERROR
@@ -490,7 +484,7 @@ class CApiService {
 		$distinct = str_starts_with($sqlSelect, 'COUNT(') ? '' : self::dbDistinct($sqlParts);
 
 		return 'SELECT '.$distinct.$sqlSelect.
-			' FROM '.reset($sqlParts['from']).
+			' FROM '.$sqlParts['from'].
 			$sql_join.
 			$sqlWhere.
 			$sqlGroup.
@@ -511,12 +505,6 @@ class CApiService {
 	 */
 	protected function applyQueryOutputOptions(string $table_name, string $table_alias, array $options,
 			array $sql_parts) {
-		if (count($sql_parts['from']) != 1) {
-			trigger_error('The CApiService database framework does not support multiple "from" clauses.'.
-				' Use "join" instead.', E_USER_ERROR
-			);
-		}
-
 		$pk = $this->pk($table_name);
 		$pk_composite = strpos($pk, ',') !== false;
 
@@ -688,7 +676,7 @@ class CApiService {
 	 */
 	protected function applyQuerySortField($sortfield, $sortorder, $alias, array $sqlParts) {
 		// add sort field to select if distinct is used
-		if ((count($sqlParts['from']) > 1 || (array_key_exists('join', $sqlParts) && $sqlParts['join']))
+		if (array_key_exists('join', $sqlParts) && $sqlParts['join']
 				&& !str_in_array($alias.'.'.$sortfield, $sqlParts['select'])
 				&& !str_in_array($alias.'.*', $sqlParts['select'])) {
 

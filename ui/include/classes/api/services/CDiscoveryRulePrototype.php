@@ -40,7 +40,7 @@ class CDiscoveryRulePrototype extends CDiscoveryRuleGeneral {
 
 		$sql_parts = [
 			'select'	=> ['items' => 'i.itemid'],
-			'from'		=> ['items' => 'items i'],
+			'from'		=> 'items i',
 			'where'		=> ['i.flags IN('.ZBX_FLAG_DISCOVERY_RULE_PROTOTYPE.','.ZBX_FLAG_DISCOVERY_RULE_PROTOTYPE_CREATED.')'],
 			'group'		=> [],
 			'order'		=> [],

@@ -42,7 +42,7 @@ class CTriggerPrototype extends CTriggerGeneral {
 
 		$sqlParts = [
 			'select'	=> ['triggers' => 't.triggerid'],
-			'from'		=> ['t' => 'triggers t'],
+			'from'		=> 'triggers t',
 			'where'		=> ['t.flags IN ('.ZBX_FLAG_DISCOVERY_PROTOTYPE.','.ZBX_FLAG_DISCOVERY_PROTOTYPE_CREATED.')'],
 			'group'		=> [],
 			'order'		=> [],

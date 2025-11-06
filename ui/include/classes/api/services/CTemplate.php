@@ -33,7 +33,7 @@ class CTemplate extends CHostGeneral {
 
 		$sqlParts = [
 			'select'	=> ['templates' => 'h.hostid'],
-			'from'		=> ['hosts' => 'hosts h'],
+			'from'		=> 'hosts h',
 			'where'		=> ['h.status='.HOST_STATUS_TEMPLATE],
 			'group'		=> [],
 			'order'		=> [],

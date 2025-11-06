@@ -137,7 +137,7 @@ class CUser extends CApiService {
 
 		$sql_parts = [
 			'select'	=> ['users' => 'u.userid'],
-			'from'		=> ['users' => 'users u'],
+			'from'		=> 'users u',
 			'where'		=> [],
 			'order'		=> [],
 			'limit'		=> null

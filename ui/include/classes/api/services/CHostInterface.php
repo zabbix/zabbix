@@ -54,7 +54,7 @@ class CHostInterface extends CApiService {
 
 		$sqlParts = [
 			'select'	=> ['interface' => 'hi.interfaceid'],
-			'from'		=> ['interface' => 'interface hi'],
+			'from'		=> 'interface hi',
 			'where'		=> [],
 			'group'		=> [],
 			'order'		=> [],

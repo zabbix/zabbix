@@ -73,7 +73,7 @@ class CToken extends CApiService {
 
 		$sql_parts = [
 			'select' => [],
-			'from'   => [$this->tableName() => $this->tableName().' '.$this->tableAlias()],
+			'from'   => $this->tableName().' '.$this->tableAlias(),
 			'where'  => [],
 			'order'  => [],
 			'group'  => []

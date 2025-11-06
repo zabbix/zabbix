@@ -59,7 +59,7 @@ class CDHost extends CApiService {
 
 		$sqlParts = [
 			'select'	=> ['dhosts' => 'dh.dhostid'],
-			'from'		=> ['dhosts' => 'dhosts dh'],
+			'from'		=> 'dhosts dh',
 			'where'		=> [],
 			'group'		=> [],
 			'order'		=> [],

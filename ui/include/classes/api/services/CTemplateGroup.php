@@ -89,7 +89,7 @@ class CTemplateGroup extends CApiService {
 
 		$sqlParts = [
 			'select' => ['hstgrp' => 'g.groupid'],
-			'from' => ['hstgrp' => 'hstgrp g'],
+			'from' => 'hstgrp g',
 			'where' => ['g.type='.HOST_GROUP_TYPE_TEMPLATE_GROUP],
 			'order' => []
 		];

@@ -42,7 +42,7 @@ class CHttpTest extends CApiService {
 
 		$sqlParts = [
 			'select'	=> ['httptests' => 'ht.httptestid'],
-			'from'		=> ['httptest' => 'httptest ht'],
+			'from'		=> 'httptest ht',
 			'where'		=> [],
 			'group'		=> [],
 			'order'		=> [],

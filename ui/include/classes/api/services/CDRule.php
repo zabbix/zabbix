@@ -42,7 +42,7 @@ class CDRule extends CApiService {
 
 		$sqlParts = [
 			'select'	=> ['drules' => 'dr.druleid'],
-			'from'		=> ['drules' => 'drules dr'],
+			'from'		=> 'drules dr',
 			'where'		=> [],
 			'group'		=> [],
 			'order'		=> [],

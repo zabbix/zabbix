@@ -47,7 +47,7 @@ class CGraphPrototype extends CGraphGeneral {
 
 		$sqlParts = [
 			'select'	=> ['graphs' => 'g.graphid'],
-			'from'		=> ['graphs' => 'graphs g'],
+			'from'		=> 'graphs g',
 			'where'		=> ['g.flags IN ('.ZBX_FLAG_DISCOVERY_PROTOTYPE.','.ZBX_FLAG_DISCOVERY_PROTOTYPE_CREATED.')'],
 			'group'		=> [],
 			'order'		=> [],

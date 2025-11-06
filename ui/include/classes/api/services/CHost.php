@@ -83,7 +83,7 @@ class CHost extends CHostGeneral {
 
 		$sqlParts = [
 			'select'	=> ['hosts' => 'h.hostid'],
-			'from'		=> ['hosts' => 'hosts h'],
+			'from'		=> 'hosts h',
 			'where'		=> ['flags' => 'h.flags IN ('.ZBX_FLAG_DISCOVERY_NORMAL.','.ZBX_FLAG_DISCOVERY_CREATED.')'],
 			'group'		=> [],
 			'order'		=> [],

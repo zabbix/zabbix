@@ -71,7 +71,7 @@ class CUserMacro extends CApiService {
 
 		$sqlParts = [
 			'select'	=> ['macros' => 'hm.hostmacroid'],
-			'from'		=> ['hostmacro hm'],
+			'from'		=> 'hostmacro hm',
 			'where'		=> [],
 			'order'		=> [],
 			'limit'		=> null
@@ -79,7 +79,7 @@ class CUserMacro extends CApiService {
 
 		$sqlPartsGlobal = [
 			'select'	=> ['macros' => 'gm.globalmacroid'],
-			'from'		=> ['globalmacro gm'],
+			'from'		=> 'globalmacro gm',
 			'where'		=> [],
 			'order'		=> [],
 			'limit'		=> null
