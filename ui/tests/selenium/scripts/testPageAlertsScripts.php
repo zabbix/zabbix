@@ -554,8 +554,8 @@ class testPageAlertsScripts extends CWebTest {
 						self::HOST_GROUP_SCRIPT,
 						'Reboot',
 						'Ping',
-						self::$script_scope_event,
 						'Multiple spaces in script name',
+						self::$script_scope_event,
 						'Detect operating system',
 						self::$custom_script
 					]

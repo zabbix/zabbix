@@ -50,7 +50,7 @@ class testPageAdministrationProxies extends CWebTest {
 	public function prepareProxyData() {
 		CDataHelper::call('proxy.create', [
 			[
-				'name' => 'Test   Proxy   tseT',
+				'name' => 'Multiple   spaces   in proxy name',
 				'operating_mode' => PROXY_OPERATING_MODE_ACTIVE
 			]
 		]);
@@ -279,7 +279,17 @@ class testPageAdministrationProxies extends CWebTest {
 						'Name' => '   '
 					],
 					'result' => [
-						'Test Proxy tseT'
+						'Multiple spaces in proxy name'
+					]
+				]
+			],
+			[
+				[
+					'filter' => [
+						'Name' => '   spaces   '
+					],
+					'result' => [
+						'Multiple spaces in proxy name'
 					]
 				]
 			],
