@@ -25,7 +25,6 @@ class CControllerValidate extends CController {
 	protected function checkInput() {
 		$ret = $this->validateInput(['object', 'fields' => [
 			'use' => [],
-			'result_codes' => [],
 			'value' => ['string'],
 			'jsonrpc' => ['string', 'in' => ['2.0']],
 			'id' => []
@@ -52,7 +51,7 @@ class CControllerValidate extends CController {
 	}
 
 	protected function doAction() {
-		$data = $this->getInputAll() + ['result_codes' => []];
+		$data = $this->getInputAll();
 		$response = [
 			'jsonrpc' => '2.0',
 			'id' => array_key_exists('id', $data) ? $data['id'] : null
@@ -65,12 +64,7 @@ class CControllerValidate extends CController {
 				throw new Exception('Invalid Request', -32600);
 			}
 
-			$rules = ['use' => $data['use'], 'error_codes' => $data['result_codes']];
-			CFormValidator::validateUse($rules, $data['value'], $error, $error_code);
-
-			if (in_array($error_code, $data['result_codes'])) {
-				$error = $error_code;
-			}
+			CFormValidator::validateUse(['use' => $data['use']], $data['value'], $error);
 
 			$response += ['result' => $error ?? ''];
 		}

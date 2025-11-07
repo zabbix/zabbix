@@ -110,12 +110,7 @@ class CControllerItemPrototypeCreate extends CControllerItemPrototype {
 					ITEM_TYPE_SCRIPT, ITEM_TYPE_BROWSER
 			]],
 			'key' => [
-				['db items.key_', 'required', 'not_empty', 'use' => [CItemKeyValidator::class, ['lldmacros' => true]],
-					'messages' => ['use' => [
-						null => 'OTHERS',
-						CItemKeyValidator::ERROR_CODE_LLD_MACRO => _('This field must contain at least one low-level discovery macro.')
-					]],
-				],
+				['db items.key_', 'required', 'not_empty', 'use' => [CItemKeyValidator::class, ['lldmacros' => true]]],
 				['string', 'regex' => '/^(?!'.preg_quote(ZBX_DEFAULT_KEY_DB_MONITOR, '/').')/',
 					'messages' => ['regex' => _('Check the key, please. Default example was passed.')],
 					'when' => ['type', 'in' => [ITEM_TYPE_DB_MONITOR]]
