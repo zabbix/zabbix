@@ -32,7 +32,7 @@ class CColorPickerElement extends CElement {
 	 * @return type
 	 */
 	public function getInput() {
-		return $this->query('xpath:./input')->one();
+		return $this->query('xpath:.//input')->one();
 	}
 
 	/**
@@ -52,10 +52,8 @@ class CColorPickerElement extends CElement {
 		else {
 			$overlay->query('xpath:.//div[@class="color-picker-input"]/input')->one()->overwrite($color);
 
-			if (preg_match('/^[a-fA-F0-9]+$/', $color) === 1 && strlen($color) === 6) {
-				CElementQuery::getPage()->pressKey(WebDriverKeys::ENTER);
-				$overlay->waitUntilNotVisible();
-			}
+			CElementQuery::getPage()->pressKey(WebDriverKeys::ENTER);
+			$overlay->waitUntilNotVisible();
 		}
 
 		return $this;
