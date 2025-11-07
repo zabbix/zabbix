@@ -21,7 +21,8 @@ use API,
 	CControllerDashboardWidgetView,
 	CControllerResponseData,
 	CProfile,
-	CSeverityHelper;
+	CSeverityHelper,
+	CTagHelper;
 
 use Widgets\HostNavigator\Includes\{
 	CWidgetFieldHostGrouping,
@@ -107,6 +108,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 				'groupids' => $groupids,
 				'evaltype' => $this->fields_values['host_tags_evaltype'],
 				'tags' => $this->fields_values['host_tags'] ?: null,
+				'inheritedTags' => true,
 				'search' => [
 					'name' => in_array('*', $this->fields_values['hosts'], true) ? null : $this->fields_values['hosts']
 				],
@@ -132,6 +134,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 				],
 				'selectHostGroups' => $group_by_host_groups ? ['groupid', 'name'] : null,
 				'selectTags' => $tags_to_keep ? ['tag', 'value'] : null,
+				'selectInheritedTags' => $tags_to_keep ? ['tag', 'value'] : null,
 				'sortfield' => 'name',
 				// Request more than the set limit to distinguish if there are even more hosts available.
 				'limit' => $this->fields_values['show_lines'] + 1
@@ -146,7 +149,8 @@ class WidgetView extends CControllerDashboardWidgetView {
 					'maintenance_status' => $is_show_in_maintenance_on ? null : HOST_MAINTENANCE_STATUS_OFF
 				],
 				'selectHostGroups' => $group_by_host_groups ? ['groupid', 'name'] : null,
-				'selectTags' => $tags_to_keep ? ['tag', 'value'] : null
+				'selectTags' => $tags_to_keep ? ['tag', 'value'] : null,
+				'selectInheritedTags' => $tags_to_keep ? ['tag', 'value'] : null
 			]);
 		}
 
@@ -199,6 +203,10 @@ class WidgetView extends CControllerDashboardWidgetView {
 		$maintenanceids = [];
 
 		if ($group_by_severity || $is_show_in_maintenance_on || $tags_to_keep || $group_by_host_groups) {
+			if ($tags_to_keep) {
+				CTagHelper::mergeOwnAndInheritedTags($hosts);
+			}
+
 			foreach ($hosts as &$host) {
 				if ($tags_to_keep) {
 					$host['tags'] = array_values(array_filter($host['tags'], function($tag) use ($tags_to_keep) {
