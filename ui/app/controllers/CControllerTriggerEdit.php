@@ -149,7 +149,7 @@ class CControllerTriggerEdit extends CController {
 				$tags[] = [
 					'tag' => $tag['tag'],
 					'value' => $tag['value'],
-					'automatic' => $tag['automatic']
+					'automatic' => $this->trigger ? $tag['automatic'] : ZBX_TAG_MANUAL
 				];
 			}
 
