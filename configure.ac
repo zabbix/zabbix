@@ -1206,10 +1206,7 @@ if test "x$enable_static" = "xyes" && test "x$enable_static_libs" = "xyes"; then
   AC_MSG_ERROR([cannot use --enable-static and --enable-static-libs at the same time])
 fi
 
-if test "x$static_linking" = "xyes" \
-    || test "x$static_linking_support" = "x-Wl,-b" \
-    || test "x$static_linking_support" = "x-Wl,-B" ;
-then
+if test "x$enable_static" = "xyes" || test "x$enable_static_libs" = "xyes"; then
   AC_DEFINE(STATIC_LINKING,1,[Define to 1 if libraries are linked statically.])
 fi
 
