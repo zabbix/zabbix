@@ -50,7 +50,7 @@ The user must be included in the Administrators group.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Get server information|<p>This item provides useful server information, such as CPU load, RAM usage, disk usage, number of users, etc.</p><p>https://github.com/nextcloud/serverinfo</p>|HTTP agent|nextcloud.serverinfo.get_data<p>**Preprocessing**</p><ul><li><p>Check for not supported value: `any error`</p><p>⛔️Custom on fail: Set value to: `Could not get data.`</p></li></ul>|
+|Get server information|<p>This item provides useful server information, such as CPU load, RAM usage, disk usage, number of users, etc.</p><p>https://github.com/nextcloud/serverinfo</p>|HTTP agent|nextcloud.serverinfo.get_data<p>**Preprocessing**</p><ul><li><p>Check for not supported value: `any error`</p><p>⛔️Custom on fail: Set error to: `Could not get data.`</p></li></ul>|
 |Server information status|<p>Server information API status</p>|Dependent item|nextcloud.serverinfo.status<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.ocs.meta.message`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 |Version|<p>Nextcloud service version.</p>|Dependent item|nextcloud.serverinfo.version<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.ocs.data.nextcloud.system.version`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 |Free space|<p>The amount of free disk space.</p>|Dependent item|nextcloud.serverinfo.freespace<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.ocs.data.nextcloud.system.freespace`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
@@ -110,7 +110,7 @@ The user must be included in the Administrators group.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|User "{#NEXTCLOUD.USER}": Get data|<p>Get common information about user</p>|HTTP agent|nextcloud.user.get_data[{#NEXTCLOUD.USER}]<p>**Preprocessing**</p><ul><li><p>Check for not supported value: `any error`</p><p>⛔️Custom on fail: Set value to: `Could not get data.`</p></li></ul>|
+|User "{#NEXTCLOUD.USER}": Get data|<p>Get common information about user</p>|HTTP agent|nextcloud.user.get_data[{#NEXTCLOUD.USER}]<p>**Preprocessing**</p><ul><li><p>Check for not supported value: `any error`</p><p>⛔️Custom on fail: Set error to: `Could not get data.`</p></li></ul>|
 |User "{#NEXTCLOUD.USER}": Status|<p>User account status.</p>|Dependent item|nextcloud.user.enabled[{#NEXTCLOUD.USER}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.ocs.data.enabled`</p><p>⛔️Custom on fail: Discard value</p></li><li>Boolean to decimal</li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 |User "{#NEXTCLOUD.USER}": Storage location|<p>The location of the user's store.</p>|Dependent item|nextcloud.user.storageLocation[{#NEXTCLOUD.USER}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.ocs.data.storageLocation`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 |User "{#NEXTCLOUD.USER}": Last login|<p>The time the user has last logged in.</p>|Dependent item|nextcloud.user.lastLogin[{#NEXTCLOUD.USER}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.ocs.data.lastLogin`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Custom multiplier: `0.001`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
