@@ -287,7 +287,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 			'Display' => ['value' => 'As is', 'labels' => ['As is', 'Bar', 'Indicators']],
 			'Min' => ['value' => '', 'placeholder' => 'calculated', 'maxlength' => 255, 'visible' => false, 'enabled' => false],
 			'Max' => ['value' => '', 'placeholder' => 'calculated', 'maxlength' => 255, 'visible' => false, 'enabled' => false],
-			'xpath://input[@id="base_color"]/..' => ['color' => ''],
+			'xpath:.//input[@id="base_color"]/..' => ['color' => ''],
 			'Thresholds' => ['visible' => true],
 			'Decimal places' => ['value' => 2, 'maxlength' => 2],
 			'Aggregation function' => ['value' => 'not used', 'options' => ['not used', 'min', 'max', 'avg', 'count', 'sum',
