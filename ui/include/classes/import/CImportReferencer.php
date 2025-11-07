@@ -1422,7 +1422,7 @@ class CImportReferencer {
 		$uuids = [];
 		$hosts = [];
 
-		foreach ($this->triggers as $description => $trigger_references) {
+		foreach ($this->triggers as $trigger_references) {
 			foreach ($trigger_references as $expression => $recovery_references) {
 				foreach ($recovery_references as $recovery_expression => $trigger) {
 					if (array_key_exists('uuid', $trigger)) {

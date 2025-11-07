@@ -1936,13 +1936,13 @@ class CConfigurationImport {
 		$host_trigger_indexes = [];
 
 		foreach ($triggers as $i => $trigger) {
-			$hosts = array_flip(CConfigurationImport::extractHosts($trigger));
+			$hosts = self::extractHosts($trigger);
 
 			if (!$hosts) {
 				return [];
 			}
 
-			foreach (array_keys($hosts) as $host) {
+			foreach ($hosts as $host) {
 				$host_trigger_indexes[$host][] = $i;
 			}
 		}
@@ -1981,7 +1981,7 @@ class CConfigurationImport {
 			$hosts = array_merge($hosts, $expression_parser->getResult()->getHosts());
 		}
 
-		return $hosts;
+		return array_unique($hosts);
 	}
 
 	/**
