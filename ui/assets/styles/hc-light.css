@@ -2112,8 +2112,10 @@ button {
   border-color: #555555; }
 
 .overlay-dialogue.modal-popup.modal-widget-configuration {
-  max-width: calc(100vw - 40px);
-  min-width: 650px; }
+  width: auto;
+  max-width: calc(100vw - 20px);
+  min-width: 650px;
+  box-sizing: border-box; }
   .overlay-dialogue.modal-popup.modal-widget-configuration .overlay-dialogue-body {
     overflow-x: auto; }
 
@@ -4791,8 +4793,8 @@ div.dashboard-widget-navtree .navtree .tree .tree-item .tree-row {
 
 form.dashboard-widget-piechart {
   max-width: 1330px;
-  min-width: 1110px;
-  width: 100vw; }
+  min-width: 1120px;
+  width: calc(100vw - 42px); }
   form.dashboard-widget-piechart .pie-chart-widget-config-tabs {
     grid-column: 1 / -1; }
   form.dashboard-widget-piechart .pie-chart-widget-config-tabs > .tabs-nav {
@@ -4936,8 +4938,8 @@ div.dashboard-widget-problemsbysv .by-severity-widget > div {
 
 form.dashboard-widget-svggraph {
   max-width: 1330px;
-  min-width: 1110px;
-  width: 100vw; }
+  min-width: 1120px;
+  width: calc(100vw - 42px); }
   form.dashboard-widget-svggraph .svg-graph-preview,
   form.dashboard-widget-svggraph .graph-widget-config-tabs {
     grid-column: 1 / -1; }
