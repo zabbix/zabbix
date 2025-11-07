@@ -162,6 +162,7 @@ class testBinaryAndJSONValueTypesDataCollection extends CIntegrationTest {
 					[
 						'name' => 'JSON_TRAPPER',
 						'key_' => 'JSON_TRAPPER',
+						'type' => ITEM_TYPE_TRAPPER,
 						'value_type' => ITEM_VALUE_TYPE_JSON
 					]
 				]
@@ -205,6 +206,7 @@ class testBinaryAndJSONValueTypesDataCollection extends CIntegrationTest {
 					[
 						'name' => 'JSON_TRAPPER',
 						'key_' => 'JSON_TRAPPER',
+						'type' => ITEM_TYPE_TRAPPER,
 						'value_type' => ITEM_VALUE_TYPE_JSON
 					]
 				]
