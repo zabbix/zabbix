@@ -3286,7 +3286,7 @@ out:
 	zbx_history_record_vector_destroy(&values, item->value_type);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s rate=" ZBX_FS_DBL " error:%s", __func__, zbx_result_string(ret),
-			(FAIL == ret ? 0 : value->data.dbl), ZBX_NULL2EMPTY_STR(*error));
+			(FAIL == ret || NULL == value ? 0 : value->data.dbl), ZBX_NULL2EMPTY_STR(*error));
 
 	return ret;
 
