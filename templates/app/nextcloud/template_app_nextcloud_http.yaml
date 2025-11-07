@@ -350,7 +350,7 @@ zabbix_export:
             - type: CHECK_NOT_SUPPORTED
               parameters:
                 - '-1'
-              error_handler: CUSTOM_VALUE
+              error_handler: CUSTOM_ERROR
               error_handler_params: 'Could not get data.'
           timeout: 10s
           url: '{$NEXTCLOUD.SCHEMA}://{$NEXTCLOUD.ADDRESS}/ocs/v2.php/apps/serverinfo/api/v1/info'
@@ -973,7 +973,7 @@ zabbix_export:
                 - type: CHECK_NOT_SUPPORTED
                   parameters:
                     - '-1'
-                  error_handler: CUSTOM_VALUE
+                  error_handler: CUSTOM_ERROR
                   error_handler_params: 'Could not get data.'
               timeout: 10s
               url: '{$NEXTCLOUD.SCHEMA}://{$NEXTCLOUD.ADDRESS}/ocs/v1.php/cloud/users/{#NEXTCLOUD.USER}'
