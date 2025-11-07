@@ -142,7 +142,7 @@ static zbx_uint64_t	history_sql_make_flush_error(zbx_history_sql_data_t *data, i
 
 	for (int i = 0; i < data->db_inserts.values_num; i++)
 	{
-		zbx_db_insert_t        *db_insert = data->db_inserts.values[i];
+		zbx_db_insert_t	*db_insert = data->db_inserts.values[i];
 
 		if (0 == strcmp(db_insert->table->table, "history"))
 			err |= history_make_flush_error(ret, 0);
@@ -186,7 +186,6 @@ static zbx_uint64_t	history_sql_flush(void *data)
 	if (ZBX_DB_OK == txn_error)
 	{
 		ret = ZBX_HISTORY_FLUSH_SUCCEED;
-		goto out;
 	}
 	else
 	{
@@ -196,7 +195,6 @@ static zbx_uint64_t	history_sql_flush(void *data)
 			ret = ZBX_HISTORY_FLUSH_FAIL;
 	}
 
-out:
 	flush_err = history_sql_make_flush_error(data, ret);
 
 	zbx_vector_db_insert_ptr_clear_ext(&d->db_inserts, db_insert_free);
