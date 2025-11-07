@@ -120,8 +120,7 @@ class CUserDirectory extends CApiService {
 		if ($db_userdirectories_by_type[IDP_TYPE_LDAP] && $ldap_output) {
 			$_options = [
 				'output' => array_merge(['userdirectoryid'], $ldap_output),
-				'userdirectoryids' => $db_userdirectories_by_type[IDP_TYPE_LDAP],
-				'preservekeys' => true
+				'userdirectoryids' => $db_userdirectories_by_type[IDP_TYPE_LDAP]
 			];
 			$result = DBselect(DB::makeSql('userdirectory_ldap', $_options));
 
