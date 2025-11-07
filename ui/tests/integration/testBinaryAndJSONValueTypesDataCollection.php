@@ -383,8 +383,15 @@ class testBinaryAndJSONValueTypesDataCollection extends CIntegrationTest {
 	}
 
 
-	/* Test trapper items*/
+	/**
+	 * Test trapper items
+	 *
+	 * @required-components server, proxy
+	 * @configurationDataProvider agentConfigurationProvider
+	 * @hosts agent, proxy_agent
+	 */
 	public function testTrapperJSON() {
+		$this->reloadConfigurationCache();
 		$this->sendSenderValue('agent', 'JSON_TRAPPER', self::$json_with_image);
 		$response = $this->callUntilDataIsPresent('history.get', [
 			'sortfield' => 'clock',
