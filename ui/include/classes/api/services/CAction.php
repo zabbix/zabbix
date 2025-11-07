@@ -99,6 +99,7 @@ class CAction extends CApiService {
 			'select'	=> ['actions' => 'a.actionid'],
 			'from'		=> 'actions a',
 			'where'		=> [],
+			'group'		=> [],
 			'order'		=> [],
 			'limit'		=> null
 		];

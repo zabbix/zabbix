@@ -66,8 +66,8 @@ class CTemplateDashboard extends CDashboardGeneral {
 			'select' => ['dashboard' => 'd.dashboardid'],
 			'from' => 'dashboard d',
 			'where' => ['templateids' => 'd.templateid IS NOT NULL'],
-			'order' => [],
-			'group' => []
+			'group' => [],
+			'order' => []
 		];
 
 		if (!$options['countOutput'] && $options['output'] === API_OUTPUT_EXTEND) {

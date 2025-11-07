@@ -60,6 +60,7 @@ class CImage extends CApiService {
 			'select'	=> ['images' => 'i.imageid'],
 			'from'		=> 'images i',
 			'where'		=> [],
+			'group'		=> [],
 			'order'		=> [],
 			'limit'		=> null
 		];

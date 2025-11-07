@@ -471,9 +471,9 @@ class CApiService {
 		}
 
 		$sql_select = ($sql_parts['distinct'] ? 'DISTINCT ' : '').implode(',', array_unique($sql_parts['select']));
-		$sql_where = empty($sql_parts['where']) ? '' : ' WHERE '.implode(' AND ', array_unique($sql_parts['where']));
-		$sql_group = empty($sql_parts['group']) ? '' : ' GROUP BY '.implode(',', array_unique($sql_parts['group']));
-		$sql_order = empty($sql_parts['order']) ? '' : ' ORDER BY '.implode(',', array_unique($sql_parts['order']));
+		$sql_where = $sql_parts['where'] ? ' WHERE '.implode(' AND ', array_unique($sql_parts['where'])) : '';
+		$sql_group = $sql_parts['group'] ? ' GROUP BY '.implode(',', array_unique($sql_parts['group'])) : '';
+		$sql_order = $sql_parts['order'] ? ' ORDER BY '.implode(',', array_unique($sql_parts['order'])) : '';
 
 		return 'SELECT '.$sql_select.$sql_from.$sql_where.$sql_group.$sql_order;
 	}

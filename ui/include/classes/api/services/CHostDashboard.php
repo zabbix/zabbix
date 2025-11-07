@@ -279,8 +279,11 @@ class CHostDashboard extends CApiService {
 
 	private function getTemplateDashboardSelectQuery(array $options, array $templateids): string {
 		$sql_parts = [
+			'select' => [],
 			'from' => 'dashboard d',
-			'where' => [dbConditionId('d.templateid', $templateids)]
+			'where' => [dbConditionId('d.templateid', $templateids)],
+			'group' => [],
+			'order' => []
 		];
 
 		if ($options['dashboardids'] !== null) {

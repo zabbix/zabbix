@@ -110,6 +110,7 @@ class CHostGroup extends CApiService {
 			'select' => ['hstgrp' => 'g.groupid'],
 			'from' => 'hstgrp g',
 			'where' => ['g.type='.HOST_GROUP_TYPE_HOST_GROUP],
+			'group' => [],
 			'order' => []
 		];
 

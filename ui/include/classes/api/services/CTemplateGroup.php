@@ -91,6 +91,7 @@ class CTemplateGroup extends CApiService {
 			'select' => ['hstgrp' => 'g.groupid'],
 			'from' => 'hstgrp g',
 			'where' => ['g.type='.HOST_GROUP_TYPE_TEMPLATE_GROUP],
+			'group' => [],
 			'order' => []
 		];
 

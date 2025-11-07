@@ -58,6 +58,7 @@ class CUserGroup extends CApiService {
 			'select'	=> ['usrgrp' => 'g.usrgrpid'],
 			'from'		=> 'usrgrp g',
 			'where'		=> [],
+			'group'		=> [],
 			'order'		=> [],
 			'limit'		=> null
 		];

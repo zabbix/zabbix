@@ -40,6 +40,7 @@ class CGraphItem extends CApiService {
 			'select'	=> ['gitems' => 'gi.gitemid'],
 			'from'		=> 'graphs_items gi',
 			'where'		=> [],
+			'group'		=> [],
 			'order'		=> [],
 			'limit'		=> null
 		];

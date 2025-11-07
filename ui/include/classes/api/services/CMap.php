@@ -162,6 +162,7 @@ class CMap extends CMapElement {
 			'select'	=> ['sysmaps' => 's.sysmapid'],
 			'from'		=> 'sysmaps s',
 			'where'		=> [],
+			'group'		=> [],
 			'order'		=> [],
 			'limit'		=> null
 		];

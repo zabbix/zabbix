@@ -103,6 +103,7 @@ class CScript extends CApiService {
 			'select' =>	['scripts' => 's.scriptid'],
 			'from' =>	'scripts s',
 			'where' =>	[],
+			'group' =>	[],
 			'order' =>	[]
 		];
 

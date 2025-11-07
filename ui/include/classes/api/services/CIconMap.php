@@ -52,6 +52,7 @@ class CIconMap extends CApiService {
 			'select'	=> ['icon_map' => 'im.iconmapid'],
 			'from'		=> 'icon_map im',
 			'where'		=> [],
+			'group'		=> [],
 			'order'		=> [],
 			'limit'		=> null
 		];

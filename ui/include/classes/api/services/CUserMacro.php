@@ -73,6 +73,7 @@ class CUserMacro extends CApiService {
 			'select'	=> ['macros' => 'hm.hostmacroid'],
 			'from'		=> 'hostmacro hm',
 			'where'		=> [],
+			'group'		=> [],
 			'order'		=> [],
 			'limit'		=> null
 		];
@@ -81,6 +82,7 @@ class CUserMacro extends CApiService {
 			'select'	=> ['macros' => 'gm.globalmacroid'],
 			'from'		=> 'globalmacro gm',
 			'where'		=> [],
+			'group'		=> [],
 			'order'		=> [],
 			'limit'		=> null
 		];

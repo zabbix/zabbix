@@ -102,6 +102,7 @@ class CAuditLog extends CApiService {
 			'select'	=> ['auditlog' => 'a.auditid'],
 			'from'		=> 'auditlog a',
 			'where'		=> [],
+			'group'		=> [],
 			'order'		=> [],
 			'limit'		=> null
 		];

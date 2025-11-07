@@ -139,6 +139,7 @@ class CUser extends CApiService {
 			'select'	=> ['users' => 'u.userid'],
 			'from'		=> 'users u',
 			'where'		=> [],
+			'group'		=> [],
 			'order'		=> [],
 			'limit'		=> null
 		];
