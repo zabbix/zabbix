@@ -17,8 +17,8 @@ require_once dirname(__FILE__).'/../include/CIntegrationTest.php';
 require_once dirname(__FILE__).'/../include/helpers/CDataHelper.php';
 
 /**
- * Test suite for data collection using both active and passive agents.
  *
+ * Test suite for data collection using both active and passive agents.
  * @backup history, hosts, host_rtdata, proxy, proxy_rtdata, auditlog, changelog, settings, ha_node, changelog
  * @backup config_autoreg_tls, expressions, globalmacro, hosts, interface, item_preproc, item_rtdata, items, regexps
  */
@@ -38,6 +38,7 @@ class testBinaryAndJSONValueTypesDataCollection extends CIntegrationTest {
 	static $file_name_invalid_json_for_json_item;
 	static $json_with_image;
 	static $invalid_json;
+	static $json_image_normalized;
 
 	/**
 	 * @inheritdoc
@@ -105,6 +106,8 @@ class testBinaryAndJSONValueTypesDataCollection extends CIntegrationTest {
 		$this->assertTrue(@file_put_contents(self::$file_name_json_with_image_for_json_item, self::$json_with_image) !== false);
 		$this->assertTrue(@file_put_contents(self::$file_name_invalid_json_for_binary_item, self::$invalid_json) !== false);
 		$this->assertTrue(@file_put_contents(self::$file_name_invalid_json_for_json_item, self::$invalid_json) !== false);
+
+		self::$json_image_normalized = shell_exec('echo ' . escapeshellarg(self::$json_with_image) . ' | jq -S -c .');
 
 		CDataHelper::call('proxy.create', [
 			'name' => 'proxy',
@@ -386,44 +389,52 @@ class testBinaryAndJSONValueTypesDataCollection extends CIntegrationTest {
 	/**
 	 * Test trapper items
 	 *
-	 * @required-components server, proxy
+	 * @required-components server
 	 * @configurationDataProvider agentConfigurationProvider
-	 * @hosts agent, proxy_agent
+	 *
+	 * @hosts agent
 	 */
 	public function testTrapperJSON() {
-		$this->reloadConfigurationCache();
+
 		$this->sendSenderValue('agent', 'JSON_TRAPPER', self::$json_with_image);
 		$response = $this->callUntilDataIsPresent('history.get', [
-			'sortfield' => 'clock',
-			'sortorder' => 'DESC',
-			'limit' => 1,
-			'itemids' => self::$itemids['agent:JSON_TRAPPER']
-		], 60, 1);
+			'itemids' => self::$itemids['agent:JSON_TRAPPER'],
+			'history' => ITEM_VALUE_TYPE_JSON,
+		]);
 		$this->assertArrayHasKey('result', $response);
 		$this->assertEquals(1, count($response['result']));
 		$this->assertArrayHasKey('value', $response['result'][0]);
-		$this->assertEquals(self::$json_with_image, $response['result'][0]['value']);
 
+		$json_result = shell_exec('echo ' . escapeshellarg($response['result'][0]['value']) . ' | jq -S -c .');
+
+		$this->assertEquals(self::$json_image_normalized, $json_result);
 
 		$this->sendSenderValue('agent', 'JSON_TRAPPER', self::$invalid_json);
 		$this->checkItemState('agent:JSON_TRAPPER', ITEM_STATE_NOTSUPPORTED);
+	}
 
-
-		// proxy
-		$this->sendSenderValue('proxy_agent', 'JSON_TRAPPER', self::$json_with_image);
+	/**
+	 * Test trapper items
+	 *
+	 * @required-components server, proxy
+	 * @configurationDataProvider proxyConfigurationProvider
+	 *
+	 * @hosts proxy_agent
+	 */
+	public function testTrapperJSON_proxy() {
+		$this->sendSenderValue('proxy_agent', 'JSON_TRAPPER', self::$json_with_image, self::COMPONENT_PROXY);
 		$response = $this->callUntilDataIsPresent('history.get', [
-			'sortfield' => 'clock',
-			'sortorder' => 'DESC',
-			'limit' => 1,
-			'itemids' => self::$itemids['agent:JSON_TRAPPER']
-		], 60, 1);
+			'itemids' => self::$itemids['proxy_agent:JSON_TRAPPER'],
+			'history' => ITEM_VALUE_TYPE_JSON,
+		]);
 		$this->assertArrayHasKey('result', $response);
 		$this->assertEquals(1, count($response['result']));
 		$this->assertArrayHasKey('value', $response['result'][0]);
-		$this->assertEquals(self::$json_with_image, $response['result'][0]['value']);
 
+		$json_result = shell_exec('echo ' . escapeshellarg($response['result'][0]['value']) . ' | jq -S -c .');
+		$this->assertEquals(self::$json_image_normalized, $json_result);
 
-		$this->sendSenderValue('proxy_agent', 'JSON_TRAPPER', self::$invalid_json);
+		$this->sendSenderValue('proxy_agent', 'JSON_TRAPPER', self::$invalid_json, self::COMPONENT_PROXY);
 		$this->checkItemState('proxy_agent:JSON_TRAPPER', ITEM_STATE_NOTSUPPORTED);
 	}
 
