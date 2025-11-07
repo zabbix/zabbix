@@ -28,10 +28,13 @@
 
 void	zbx_mock_test_entry(void **state)
 {
-	char				*error, *data = zbx_strdup(NULL ,zbx_mock_get_parameter_string("in.data"));
+	char				*error,
+					*data_expression = zbx_strdup(NULL ,zbx_mock_get_parameter_string("in.data")),
+					*data_calc = zbx_strdup(NULL ,zbx_mock_get_parameter_string("in.data"));
 	zbx_vector_lld_macro_path_ptr_t	macros;
 	zbx_jsonobj_t			obj;
 	zbx_lld_entry_t			entry;
+	int				result_expression, result_calc;
 
 	ZBX_UNUSED(state);
 
@@ -47,14 +50,21 @@ void	zbx_mock_test_entry(void **state)
 
 	lld_entry_create(&entry, &obj, &macros);
 
-	int	result = zbx_substitute_expression_lld_macros(&data, ZBX_EVAL_EXPRESSION_MACRO_LLD, &entry, &error);
+	result_expression = zbx_substitute_expression_lld_macros(&data_expression, ZBX_EVAL_EXPRESSION_MACRO_LLD,
+			&entry, &error);
 
-	zbx_mock_assert_result_eq("return value", SUCCEED, result);
-	zbx_mock_assert_str_eq("data", expected_data, data);
+	result_calc = zbx_substitute_expression_lld_macros(&data_calc, ZBX_EVAL_CALC_EXPRESSION_LLD, &entry, &error);
+
+	zbx_mock_assert_result_eq("return value with rule ZBX_EVAL_EXPRESSION_MACRO_LLD", SUCCEED, result_expression);
+	zbx_mock_assert_str_eq("data with rule ZBX_EVAL_EXPRESSION_MACRO_LLD", expected_data, data_expression);
+
+	zbx_mock_assert_result_eq("return value with rule ZBX_EVAL_CALC_EXPRESSION_LLD", SUCCEED, result_calc);
+	zbx_mock_assert_str_eq("data with rule ZBX_EVAL_CALC_EXPRESSION_LLD", expected_data, data_calc);
 
 	zbx_vector_lld_macro_path_ptr_clear_ext(&macros, zbx_lld_macro_path_free);
 	zbx_vector_lld_macro_path_ptr_destroy(&macros);
 	zbx_jsonobj_clear(&obj);
 	lld_entry_clear(&entry);
-	zbx_free(data);
+	zbx_free(data_expression);
+	zbx_free(data_calc);
 }

@@ -90,3 +90,29 @@ in:
 out:
   data: ''
   return: SUCCEED
+---
+test case: macro in key and value all printable ASCII characters
+in:
+  lld: '{"id":"(#$%&()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[]^_`abcdefghijklmnopqrstuvwxyz|~"}'
+  data: |
+    [
+      { "{#ID}": "{#ID}" }
+    ]
+  macros:
+    - { macro: '{#ID}', path: $.id }
+out:
+  data: '[{"(#$%&()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[]^_`abcdefghijklmnopqrstuvwxyz|~":"(#$%&()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[]^_`abcdefghijklmnopqrstuvwxyz|~"}]'
+  return: SUCCEED
+---
+test case: macro in key and value emojis
+in:
+  lld: '{"id":"😀😃😄😁😆😅😂🤣😊😇🙂🙃😉😌😍🥰😘😗😙😚😋😛😝😜🤪🤨🧐🤓😎🥳🤠🤡🤥🤫🤭🧐🤓😎🥳🤠🤡🤥🤫🤭"}'
+  data: |
+    [
+      { "{#ID}": "{#ID}" }
+    ]
+  macros:
+    - { macro: '{#ID}', path: $.id }
+out:
+  data: '[{"😀😃😄😁😆😅😂🤣😊😇🙂🙃😉😌😍🥰😘😗😙😚😋😛😝😜🤪🤨🧐🤓😎🥳🤠🤡🤥🤫🤭🧐🤓😎🥳🤠🤡🤥🤫🤭":"😀😃😄😁😆😅😂🤣😊😇🙂🙃😉😌😍🥰😘😗😙😚😋😛😝😜🤪🤨🧐🤓😎🥳🤠🤡🤥🤫🤭🧐🤓😎🥳🤠🤡🤥🤫🤭"}]'
+  return: SUCCEED

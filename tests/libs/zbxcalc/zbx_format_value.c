@@ -22,9 +22,9 @@
 
 void	zbx_mock_test_entry(void **state)
 {
-	const char	*in_value = zbx_mock_get_parameter_string("in.value");
+	const char	*in_value = zbx_mock_get_parameter_string("in.value"),
+			*units = zbx_mock_get_parameter_string("in.units");
 	zbx_uint64_t	valuemapid = zbx_mock_get_parameter_uint64("in.valuemapid");
-	const char	*units = zbx_mock_get_parameter_string("in.units");
 	unsigned char	value_type = (unsigned char)zbx_mock_get_parameter_uint64("in.value_type");
 
 	ZBX_UNUSED(state);

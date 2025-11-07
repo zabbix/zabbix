@@ -43,8 +43,7 @@ class testCalculatedExpression extends CIntegrationTest {
 		return [
 			self::COMPONENT_SERVER => [
 				'DebugLevel' => 4,
-				'LogFileSize' => 20,
-				'AllowUnsupportedDBVersions' => 1
+				'LogFileSize' => 20
 			]
 		];
 	}
@@ -69,7 +68,7 @@ class testCalculatedExpression extends CIntegrationTest {
 			],
 			'groups' => [
 				[
-					'groupid' => 4
+					'groupid' => 4 // Zabbix servers
 				]
 			]
 		]);
@@ -126,14 +125,14 @@ class testCalculatedExpression extends CIntegrationTest {
 		return $response['result']['itemids'][0];
 	}
 
-	private function sendSequence($n, $itemkey)
+	private function sendIncrementingSequence($n, $itemkey)
 	{
 		for ($i = 1; $i <= $n; $i++) {
 			$this->sendSenderValue(self::HOST_NAME, $itemkey, $i);
 		}
 	}
 
-	private function sendToSecondSequence($n)
+	private function sendScaledSequenceToSecondItem($n)
 	{
 		for ($i = 1; $i <= $n; $i++) {
 			$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_KEY_2, $i * 10);
@@ -156,7 +155,7 @@ class testCalculatedExpression extends CIntegrationTest {
 		$formula = 'avg(/' . self::HOST_NAME . '/' . self::TRAPPER_ITEM_KEY . ',#5)';
 		$itemid = $this->createCalculatedItemWithFormula($formula, 'avg5');
 		self::$itemIds = array_merge(self::$itemIds, [$itemid]);
-		$this->sendSequence(5, self::TRAPPER_ITEM_KEY); // 1..5 -> avg = 3
+		$this->sendIncrementingSequence(5, self::TRAPPER_ITEM_KEY); // 1..5 -> avg = 3
 		$this->assertEquals('3', $this->getItemLastValue($itemid));
 	}
 
@@ -165,7 +164,7 @@ class testCalculatedExpression extends CIntegrationTest {
 		$formula = 'max(/' . self::HOST_NAME . '/' . self::TRAPPER_ITEM_KEY . ',#4)';
 		$itemid = $this->createCalculatedItemWithFormula($formula, 'max4');
 		self::$itemIds = array_merge(self::$itemIds, [$itemid]);
-		$this->sendSequence(5, self::TRAPPER_ITEM_KEY); // last 4 are 2,3,4,5 -> max = 5
+		$this->sendIncrementingSequence(5, self::TRAPPER_ITEM_KEY); // last 4 are 2,3,4,5 -> max = 5
 		$this->assertEquals('5', $this->getItemLastValue($itemid));
 	}
 
@@ -174,7 +173,7 @@ class testCalculatedExpression extends CIntegrationTest {
 		$formula = 'min(/' . self::HOST_NAME . '/' . self::TRAPPER_ITEM_KEY . ',#3)';
 		$itemid = $this->createCalculatedItemWithFormula($formula, 'min3');
 		self::$itemIds = array_merge(self::$itemIds, [$itemid]);
-		$this->sendSequence(5, self::TRAPPER_ITEM_KEY); // last 3 are 3,4,5 -> min = 3
+		$this->sendIncrementingSequence(5, self::TRAPPER_ITEM_KEY); // last 3 are 3,4,5 -> min = 3
 		$this->assertEquals('3', $this->getItemLastValue($itemid));
 	}
 
@@ -183,7 +182,7 @@ class testCalculatedExpression extends CIntegrationTest {
 		$formula = 'last(/' . self::HOST_NAME . '/' . self::TRAPPER_ITEM_KEY . ',#1)';
 		$itemid = $this->createCalculatedItemWithFormula($formula, 'last1');
 		self::$itemIds = array_merge(self::$itemIds, [$itemid]);
-		$this->sendSequence(3, self::TRAPPER_ITEM_KEY); // last = 3
+		$this->sendIncrementingSequence(3, self::TRAPPER_ITEM_KEY); // last = 3
 		$this->assertEquals('3', $this->getItemLastValue($itemid));
 	}
 
@@ -192,28 +191,30 @@ class testCalculatedExpression extends CIntegrationTest {
 		$formula = '(avg(/' . self::HOST_NAME . '/' . self::TRAPPER_ITEM_KEY . ',#5) * 2) + 1';
 		$itemid = $this->createCalculatedItemWithFormula($formula, 'avg5_mul2');
 		self::$itemIds = array_merge(self::$itemIds, [$itemid]);
-		$this->sendSequence(5, self::TRAPPER_ITEM_KEY); // last5:1,2,3,4,5 avg=3
+		$this->sendIncrementingSequence(5, self::TRAPPER_ITEM_KEY); // last5:1,2,3,4,5 avg=3
 		$this->assertEquals('7', $this->getItemLastValue($itemid));
 	}
 
 	public function testCalculatedExpression_CombinedFunctions()
 	{
 		// formula: sum(last5) - avg(last5)
-		$formula = 'sum(/' . self::HOST_NAME . '/' . self::TRAPPER_ITEM_KEY . ',#5) - avg(/' . self::HOST_NAME . '/' . self::TRAPPER_ITEM_KEY . ',#5)';
+		$formula = 'sum(/' . self::HOST_NAME . '/' . self::TRAPPER_ITEM_KEY . ',#5) - avg(/'
+			. self::HOST_NAME . '/' . self::TRAPPER_ITEM_KEY . ',#5)';
 		$itemid = $this->createCalculatedItemWithFormula($formula, 'sum_minus_avg5');
 		self::$itemIds = array_merge(self::$itemIds, [$itemid]);
-		$this->sendSequence(5, self::TRAPPER_ITEM_KEY); // sum=15 avg=3 -> 12
+		$this->sendIncrementingSequence(5, self::TRAPPER_ITEM_KEY); // /sum(1,2,3,4,5)-avg(1,2,3,4,5) = 15-3=12
 		$this->assertEquals('12', $this->getItemLastValue($itemid));
 	}
 
 	public function testCalculatedExpression_MultiItemAverage()
 	{
 		// formula averaging two items' last values
-		$formula = 'avg(/' . self::HOST_NAME . '/' . self::TRAPPER_ITEM_KEY . ',#1) + avg(/' . self::HOST_NAME . '/' . self::TRAPPER_ITEM_KEY_2 . ',#1)';
+		$formula = 'avg(/' . self::HOST_NAME . '/' . self::TRAPPER_ITEM_KEY . ',#1) + avg(/' . self::HOST_NAME
+			. '/' . self::TRAPPER_ITEM_KEY_2 . ',#1)';
 		$itemid = $this->createCalculatedItemWithFormula($formula, 'multi_avg');
 		self::$itemIds = array_merge(self::$itemIds, [$itemid]);
-		$this->sendSequence(3, self::TRAPPER_ITEM_KEY);
-		$this->sendToSecondSequence(3);
+		$this->sendIncrementingSequence(3, self::TRAPPER_ITEM_KEY);
+		$this->sendScaledSequenceToSecondItem(3);
 		// last values: 3 and 30 -> sum = 33
 		$this->assertEquals('33', $this->getItemLastValue($itemid));
 	}

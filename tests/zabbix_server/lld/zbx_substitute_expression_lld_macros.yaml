@@ -99,4 +99,24 @@ in:
 out:
   data: '1 = 1'
   return: SUCCEED
+---
+test case: 'LLD macro in condition all printable ASCII characters'
+in:
+  lld: '{"state":"(#$%&()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[]^_`abcdefghijklmnopqrstuvwxyz|~"}'
+  data: '{#STATE} = 1'
+  macros:
+    - { macro: '{#STATE}', path: $.state }
+out:
+  data: '"(#$%&()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[]^_`abcdefghijklmnopqrstuvwxyz|~" = 1'
+  return: SUCCEED
+---
+test case: 'LLD macro in condition emojis'
+in:
+  lld: '{"state":"😀😃😄😁😆😅😂🤣😊😇🙂🙃😉😌😍🥰😘😗😙😚😋😛😝😜🤪🤨🧐🤓😎🥳🤠🤡🤥🤫🤭🧐🤓😎🥳🤠🤡🤥🤫🤭"}'
+  data: '{#STATE} = 1'
+  macros:
+    - { macro: '{#STATE}', path: $.state }
+out:
+  data: '"😀😃😄😁😆😅😂🤣😊😇🙂🙃😉😌😍🥰😘😗😙😚😋😛😝😜🤪🤨🧐🤓😎🥳🤠🤡🤥🤫🤭🧐🤓😎🥳🤠🤡🤥🤫🤭" = 1'
+  return: SUCCEED
 ...

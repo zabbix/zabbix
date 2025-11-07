@@ -36,8 +36,8 @@ int	__wrap_zbx_substitute_macros_args(zbx_token_search_t search, char **data, ch
 int	__wrap_zbx_dc_get_data_expected_from(zbx_uint64_t itemid, int *seconds);
 
 int	__wrap_zbx_baseline_get_data(uint64_t itemid, unsigned char value_type, time_t now, const char *period,
-			int season_num, zbx_time_unit_t season_unit, int skip, zbx_vector_dbl_t *values,
-			zbx_vector_uint64_t *index, char **error);
+		int season_num, zbx_time_unit_t season_unit, int skip, zbx_vector_dbl_t *values,
+		zbx_vector_uint64_t *index, char **error);
 
 void	__wrap_zbx_recalc_time_period(time_t *ts_from, int table_group);
 

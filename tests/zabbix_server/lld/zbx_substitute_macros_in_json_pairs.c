@@ -28,7 +28,7 @@
 void	zbx_mock_test_entry(void **state)
 {
 	char				*error = NULL,
-					*data = zbx_strdup(NULL ,zbx_mock_get_parameter_string("in.data"));
+					*data = zbx_strdup(NULL, zbx_mock_get_parameter_string("in.data"));
 	zbx_vector_lld_macro_path_ptr_t	macros;
 	zbx_jsonobj_t			obj;
 	zbx_lld_entry_t			entry;
