@@ -978,9 +978,9 @@ class testDashboardGaugeWidget extends testWidgets {
 			COverlayDialogElement::ensureNotPresent();
 
 			/**
-			 *  When name is absent in create scenario it remains default: host name + item name,
-			 *  if name is absent in update scenario then previous name remains.
-			 *  If name is empty string in both scenarios it is replaced by host name + item name.
+			 * When name is absent in create scenario it remains default: host name + item name,
+			 * if name is absent in update scenario then previous name remains.
+			 * If name is empty string in both scenarios it is replaced by host name + item name.
 			 */
 			if (array_key_exists('Name', $data['fields'])) {
 				$header = ($data['fields']['Name'] === '')

@@ -75,13 +75,6 @@ class CColorPickerElement extends CElement {
 	}
 
 	/**
-	 * @inheritdoc
-	 */
-	public function checkValue($expected, $raise_exception = true) {
-		return parent::checkValue($expected, $raise_exception);
-	}
-
-	/**
 	 * Alias for getValue.
 	 * @see self::getValue
 	 *
