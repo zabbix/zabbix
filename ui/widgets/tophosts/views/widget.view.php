@@ -140,8 +140,9 @@ else {
 					elseif ($column_config['display_value_as'] == CWidgetFieldColumnsList::DISPLAY_VALUE_AS_TEXT) {
 						if (array_key_exists('highlights', $column_config)) {
 							$value_to_check = $column['item']['value_type'] == ITEM_VALUE_TYPE_BINARY
-								? $column['value']
-								: $formatted_value;
+								|| $column['item']['value_type'] == ITEM_VALUE_TYPE_JSON
+									? $column['value']
+									: $formatted_value;
 
 							foreach ($column_config['highlights'] as $highlight) {
 								if (@preg_match('('.$highlight['pattern'].')', $value_to_check)) {
