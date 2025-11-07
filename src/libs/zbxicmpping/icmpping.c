@@ -22,6 +22,7 @@
 #include "zbxip.h"
 #include "zbxfile.h"
 #include "zbxalgo.h"
+#include "zbxthreads.h"
 
 #include <signal.h>
 
@@ -765,18 +766,20 @@ out:
  *             args               - [IN/OUT] host data and fping settings     *
  *             max_execution_time - [IN] maximum allowed execution time in    *
  *                                       seconds; 0 - no limit                *
- *             start_time         - [IN] execution start timestamp            *
  *                                                                            *
  * Return value: SUCCEED      - fping output processed successfully           *
  *               NOTSUPPORTED - unexpected error or timeout exceeded          *
  *                                                                            *
  ******************************************************************************/
-static int	fping_output_process(zbx_fping_resp *resp, zbx_fping_args *args, double max_execution_time,
-		double start_time)
+static int	fping_output_process(zbx_fping_resp *resp, zbx_fping_args *args, double max_execution_time)
 {
 	int	i, ret = NOTSUPPORTED;
+	double	start_time = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	if (0 < max_execution_time)
+		start_time = zbx_time();
 
 	if (NULL == zbx_fgets(resp->linebuf, (int)resp->linebuf_size, resp->input_pipe))
 	{
@@ -794,7 +797,7 @@ static int	fping_output_process(zbx_fping_resp *resp, zbx_fping_args *args, doub
 		{
 			if (0 < max_execution_time && (zbx_time() - start_time) > max_execution_time)
 			{
-				zabbix_log(LOG_LEVEL_WARNING, "fping execution time limit (%d s) exceeded, "
+				zabbix_log(LOG_LEVEL_WARNING, "fping execution time limit (%ds) exceeded, "
 						"stopping output processing", (int)max_execution_time);
 				ret = NOTSUPPORTED;
 				break;
@@ -815,12 +818,72 @@ static int	fping_output_process(zbx_fping_resp *resp, zbx_fping_args *args, doub
 	return ret;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: opens a process by creating a pipe, forking, and invoking shell  *
+ *          (simplified version of zbx_popen from execute.c)                 *
+ *                                                                            *
+ * Parameters: pid     - [OUT] child process PID                              *
+ *             command - [IN] command to execute                              *
+ *                                                                            *
+ * Return value: FILE pointer on success, NULL on error                       *
+ *                                                                            *
+ ******************************************************************************/
+static FILE	*fping_popen(pid_t *pid, const char *command)
+{
+	int	fd[2];
+	FILE	*fp;
+
+	if (-1 == pipe(fd))
+		return NULL;
+
+	if (-1 == (*pid = zbx_fork()))
+	{
+		close(fd[0]);
+		close(fd[1]);
+		return NULL;
+	}
+
+	if (0 != *pid)	/* parent process */
+	{
+		close(fd[1]);
+
+		if (NULL == (fp = fdopen(fd[0], "r")))
+		{
+			close(fd[0]);
+			return NULL;
+		}
+
+		return fp;
+	}
+	/* child process */
+	close(fd[0]);
+	/* set the child as the process group leader, otherwise orphans may be left after timeout */
+	if (-1 == setpgid(0, 0))
+	{
+		zabbix_log(LOG_LEVEL_ERR, "%s(): failed to create a process group: %s",
+				__func__, zbx_strerror(errno));
+		exit(EXIT_FAILURE);
+	}
+	/* redirect output right before script execution after all logging is done */
+	dup2(fd[1], STDOUT_FILENO);
+	dup2(fd[1], STDERR_FILENO);
+	close(fd[1]);
+
+	execl("/bin/sh", "sh", "-c", command, (char *)NULL);
+	/* this message may end up in stdout or stderr */
+	zabbix_log(LOG_LEVEL_WARNING, "execl() failed for [%s]: %s", command, zbx_strerror(errno));
+
+	exit(EXIT_FAILURE);
+}
+
 static int	hosts_ping(zbx_fping_host_t *hosts, int hosts_count, int requests_count, int interval, int size,
 		int timeout, int retries, double backoff, unsigned char allow_redirect, int rdns,
 		double max_execution_time, char *error, size_t max_error_len)
 {
 	const int	response_time_chars_max = 20;
 	FILE		*f;
+	pid_t		fping_pid;
 	char		params[70];
 	char		filename[MAX_STRING_LEN];
 	char		*linebuf = NULL;
@@ -1144,7 +1207,7 @@ static int	hosts_ping(zbx_fping_host_t *hosts, int hosts_count, int requests_cou
 	if (0 > zbx_sigmask(SIG_BLOCK, &mask, &orig_mask))
 		zbx_error("cannot set sigprocmask to block the user signal");
 
-	if (NULL == (f = popen(linebuf, "r")))
+	if (NULL == (f = fping_popen(&fping_pid, linebuf)))
 	{
 		zbx_snprintf(error, max_error_len, "%s: %s", linebuf, zbx_strerror(errno));
 
@@ -1171,26 +1234,25 @@ static int	hosts_ping(zbx_fping_host_t *hosts, int hosts_count, int requests_cou
 #ifdef HAVE_IPV6
 	fping_args.fping_existence = fping_existence;
 #endif
-	double	start_time = 0;
+	ret = fping_output_process(&fping_resp, &fping_args, max_execution_time);
 
-	if (0 < max_execution_time)
-		start_time = zbx_time();
-
-	if (SUCCEED == fping_output_process(&fping_resp, &fping_args, max_execution_time, start_time))
+	if (0 < max_execution_time && NOTSUPPORTED == ret )
 	{
-		ret = SUCCEED;
+		kill(-fping_pid, SIGKILL);
+		zbx_snprintf(error, max_error_len, "fping killed due to execution timeout");
 	}
 
-	rc = pclose(f);
+	fclose(f);
+	waitpid(fping_pid, &rc, 0);
 
 	if (0 > zbx_sigmask(SIG_SETMASK, &orig_mask, NULL))
 		zbx_error("cannot restore sigprocmask");
 
 	unlink(filename);
 
-	if (WIFSIGNALED(rc))
+	if (WIFSIGNALED(rc) && SUCCEED == ret)
 		ret = FAIL;
-	else
+	else if (NOTSUPPORTED == ret && '\0' == error[0])
 		zbx_snprintf(error, max_error_len, "fping failed: %s", linebuf);
 out:
 	zbx_free(linebuf);
@@ -1268,7 +1330,7 @@ int	zbx_ping(zbx_fping_host_t *hosts, int hosts_count, int requests_count, int p
 {
 	int	ret;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() hosts_count:%d max_execution_time:%d", __func__, hosts_count,
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() hosts_count:%d max_execution_time:%ds", __func__, hosts_count,
 			(int)max_execution_time);
 
 	if (NOTSUPPORTED == (ret = hosts_ping(hosts, hosts_count, requests_count, period, size, timeout, retries,
