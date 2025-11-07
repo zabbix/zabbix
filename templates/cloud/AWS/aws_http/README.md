@@ -503,7 +503,7 @@ For more information, see the [EC2 policies](https://docs.aws.amazon.com/AWSEC2/
 
 Set the macros: `{$AWS.AUTH_TYPE}`, `{$AWS.REGION}`, `{$AWS.EC2.INSTANCE.ID}`.
 
-For more information about manage access keys, see [official documentation](https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html#access-keys-and-secret-access-keys).
+For more information about managing access keys, see [official documentation](https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html#access-keys-and-secret-access-keys).
 
 Also, see the Macros section for a list of macros used for LLD filters.
 
@@ -809,7 +809,7 @@ Next, add a principal to the trust relationships of the role you are using:
 
 Set the macros: `{$AWS.AUTH_TYPE}`, `{$AWS.REGION}`, `{$AWS.RDS.INSTANCE.ID}`.
 
-For more information about manage access keys, see [official documentation](https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html#access-keys-and-secret-access-keys).
+For more information about managing access keys, see [official documentation](https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html#access-keys-and-secret-access-keys).
 
 Also, see the Macros section for a list of macros used for LLD filters.
 
@@ -1168,7 +1168,7 @@ You can also define a filter for the Request metrics using a shared prefix, obje
 
 Set the macros: `{$AWS.AUTH_TYPE}`, `{$AWS.S3.BUCKET.NAME}`.
 
-For more information about manage access keys, see [official documentation](https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html#access-keys-and-secret-access-keys).
+For more information about managing access keys, see [official documentation](https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html#access-keys-and-secret-access-keys).
 
 Also, see the Macros section for a list of macros used for LLD filters.
 

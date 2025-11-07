@@ -26,7 +26,7 @@ zabbix_export:
         ## Overview
         
         This template uses the AWS Backup API calls to list and retrieve metrics.
-        For more information, please refer to the [AWS Backup API]https://docs.aws.amazon.com/aws-backup/latest/devguide/api-reference.html) page.
+        For more information, please refer to the [AWS Backup API](https://docs.aws.amazon.com/aws-backup/latest/devguide/api-reference.html) page.
         
         Additional information about metrics and API methods used in the template:
         * [Metrics related to a Backup vault](https://docs.aws.amazon.com/aws-backup/latest/devguide/API_BackupVaultListMember.html)
@@ -5281,7 +5281,7 @@ zabbix_export:
         
         Additional information about metrics and used API methods:
         
-        * [Describe AWS Cost Explore API actions](https://docs.aws.amazon.com/aws-cost-management/latest/APIReference/API_Operations.html)
+        * [Describe AWS Cost Explore API actions](https://docs.aws.amazon.com/aws-cost-management/latest/APIReference/API_Operations.html).
       vendor:
         name: Zabbix
         version: 7.4-5
@@ -6391,7 +6391,7 @@ zabbix_export:
         
         Set the following fields: `Authorization method`, `AWS Region`, `EC2 instance ID`.
         
-        For more information about manage access keys, see [official documentation](https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html#access-keys-and-secret-access-keys).
+        For more information about managing access keys, see [official documentation](https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html#access-keys-and-secret-access-keys).
         
         Also, see the Macros section for a list of macros used for LLD filters.
       vendor:
@@ -9454,7 +9454,7 @@ zabbix_export:
         
         Set the following macros `Authorization method`, `AWS Region`, `ECS cluster name`.
         
-        For more information about managing access keys, see [official documentation](https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html#access-keys-and-secret-access-keys)
+        For more information about managing access keys, see [official documentation](https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html#access-keys-and-secret-access-keys).
         
         Refer to the Macros section for a list of macros used for LLD filters.
       vendor:
@@ -12023,7 +12023,7 @@ zabbix_export:
         
         Set the following macros `Authorization method`, `AWS Region`, `ECS cluster name`.
         
-        For more information about managing access keys, see [official documentation](https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html#access-keys-and-secret-access-keys)
+        For more information about managing access keys, see [official documentation](https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html#access-keys-and-secret-access-keys).
         
         Refer to the Macros section for a list of macros used for LLD filters.
       vendor:
@@ -21946,7 +21946,7 @@ zabbix_export:
         
         Set the following fields: `Authorization method`, `AWS Region`, `RDS DB Instance identifier`.
         
-        For more information about manage access keys, see [official documentation](https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html#access-keys-and-secret-access-keys).
+        For more information about managing access keys, see [official documentation](https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html#access-keys-and-secret-access-keys).
         
         Also, see the Macros section for a list of macros used for LLD filters.
       vendor:
@@ -25580,7 +25580,7 @@ zabbix_export:
         
         Set the following fields: `Authorization method`, `S3 bucket name`.
         
-        For more information about manage access keys, see [official documentation](https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html#access-keys-and-secret-access-keys).
+        For more information about managing access keys, see [official documentation](https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html#access-keys-and-secret-access-keys).
         
         Also, see the Macros section for a list of macros used for LLD filters.
       vendor:
