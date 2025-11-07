@@ -36,6 +36,8 @@ class testBinaryAndJSONValueTypesDataCollection extends CIntegrationTest {
 	static $file_name_json_with_image_for_json_item;
 	static $file_name_invalid_json_for_binary_item;
 	static $file_name_invalid_json_for_json_item;
+	static $json_with_image;
+	static $invalid_json;
 
 	/**
 	 * @inheritdoc
@@ -52,7 +54,7 @@ class testBinaryAndJSONValueTypesDataCollection extends CIntegrationTest {
 		$base64_invalid = self::base64_invalid;
 		$json_data_http_response = self::json_data_http_response;
 
-		$json_with_image = <<<HEREA
+		self::$json_with_image = <<<HEREA
 		{
 			"result": "fail",
 			"error_message": "assertion failed: element id top-header not found",
@@ -76,7 +78,7 @@ class testBinaryAndJSONValueTypesDataCollection extends CIntegrationTest {
 		}
 		HEREA;
 
-		$invalid_json = <<<HEREA
+		self::$invalid_json = <<<HEREA
 		{
 			"a": "a",
 			"b": "b",
@@ -99,10 +101,10 @@ class testBinaryAndJSONValueTypesDataCollection extends CIntegrationTest {
 			unlink(self::$file_name_invalid_json_for_json_item);
 		}
 
-		$this->assertTrue(@file_put_contents(self::$file_name_json_with_image_for_binary_item, $json_with_image) !== false);
-		$this->assertTrue(@file_put_contents(self::$file_name_json_with_image_for_json_item, $json_with_image) !== false);
-		$this->assertTrue(@file_put_contents(self::$file_name_invalid_json_for_binary_item, $invalid_json) !== false);
-		$this->assertTrue(@file_put_contents(self::$file_name_invalid_json_for_json_item, $invalid_json) !== false);
+		$this->assertTrue(@file_put_contents(self::$file_name_json_with_image_for_binary_item, self::$json_with_image) !== false);
+		$this->assertTrue(@file_put_contents(self::$file_name_json_with_image_for_json_item, self::$json_with_image) !== false);
+		$this->assertTrue(@file_put_contents(self::$file_name_invalid_json_for_binary_item, self::$invalid_json) !== false);
+		$this->assertTrue(@file_put_contents(self::$file_name_invalid_json_for_json_item, self::$invalid_json) !== false);
 
 		CDataHelper::call('proxy.create', [
 			'name' => 'proxy',
@@ -156,6 +158,11 @@ class testBinaryAndJSONValueTypesDataCollection extends CIntegrationTest {
 						'type' => ITEM_TYPE_ZABBIX,
 						'value_type' => ITEM_VALUE_TYPE_TEXT,
 						'delay' => '1s'
+					],
+					[
+						'name' => 'JSON_TRAPPER',
+						'key_' => 'JSON_TRAPPER',
+						'value_type' => ITEM_VALUE_TYPE_JSON
 					]
 				]
 			],
@@ -194,6 +201,11 @@ class testBinaryAndJSONValueTypesDataCollection extends CIntegrationTest {
 						'type' => ITEM_TYPE_ZABBIX,
 						'value_type' => ITEM_VALUE_TYPE_TEXT,
 						'delay' => '1s'
+					],
+					[
+						'name' => 'JSON_TRAPPER',
+						'key_' => 'JSON_TRAPPER',
+						'value_type' => ITEM_VALUE_TYPE_JSON
 					]
 				]
 			]
@@ -368,6 +380,44 @@ class testBinaryAndJSONValueTypesDataCollection extends CIntegrationTest {
 		$this->assertEquals($state, $item['state'], 'User parameter failed to reload, item name: '.$name);
 	}
 
+
+	/* Test trapper items*/
+	public function testTrapperJSON() {
+		$this->sendSenderValue('agent', 'JSON_TRAPPER', self::$json_with_image);
+		$response = $this->callUntilDataIsPresent('history.get', [
+			'sortfield' => 'clock',
+			'sortorder' => 'DESC',
+			'limit' => 1,
+			'itemids' => self::$itemids['agent:JSON_TRAPPER']
+		], 60, 1);
+		$this->assertArrayHasKey('result', $response);
+		$this->assertEquals(1, count($response['result']));
+		$this->assertArrayHasKey('value', $response['result'][0]);
+		$this->assertEquals(self::$json_with_image, $response['result'][0]['value']);
+
+
+		$this->sendSenderValue('agent', 'JSON_TRAPPER', self::$invalid_json);
+		$this->checkItemState('agent:JSON_TRAPPER', ITEM_STATE_NOTSUPPORTED);
+
+
+		// proxy
+		$this->sendSenderValue('proxy_agent', 'JSON_TRAPPER', self::$json_with_image);
+		$response = $this->callUntilDataIsPresent('history.get', [
+			'sortfield' => 'clock',
+			'sortorder' => 'DESC',
+			'limit' => 1,
+			'itemids' => self::$itemids['agent:JSON_TRAPPER']
+		], 60, 1);
+		$this->assertArrayHasKey('result', $response);
+		$this->assertEquals(1, count($response['result']));
+		$this->assertArrayHasKey('value', $response['result'][0]);
+		$this->assertEquals(self::$json_with_image, $response['result'][0]['value']);
+
+
+		$this->sendSenderValue('proxy_agent', 'JSON_TRAPPER', self::$invalid_json);
+		$this->checkItemState('proxy_agent:JSON_TRAPPER', ITEM_STATE_NOTSUPPORTED);
+	}
+
 	/**
 	 * Test if both active and passive agent checks are processed.
 	 *
@@ -376,7 +426,6 @@ class testBinaryAndJSONValueTypesDataCollection extends CIntegrationTest {
 	 * @hosts agent
 	 */
 	public function testBinaryValueTypeDataCollection_checkAgentData() {
-
 		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, [
 			'enabling Zabbix agent checks on host "agent": interface became available',
 			'resuming Zabbix agent checks on host "agent": connection restored'
