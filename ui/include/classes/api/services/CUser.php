@@ -278,7 +278,7 @@ class CUser extends CApiService {
 
 		$sql_parts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sql_parts);
 		$sql_parts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sql_parts);
-		$resource = DBselect($this->createSelectQueryFromParts($sql_parts), $sql_parts['limit']);
+		$resource = DBselect(self::createSelectQueryFromParts($sql_parts), $sql_parts['limit']);
 
 		if ($options['countOutput']) {
 			return DBfetch($resource)['rowscount'];

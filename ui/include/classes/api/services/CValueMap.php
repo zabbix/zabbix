@@ -87,7 +87,7 @@ class CValueMap extends CApiService {
 			$sql_parts['where']['hostid'] = dbConditionInt('vm.hostid', $options['hostids']);
 		}
 
-		$result = DBselect($this->createSelectQueryFromParts($sql_parts), $options['limit']);
+		$result = DBselect(self::createSelectQueryFromParts($sql_parts), $options['limit']);
 
 		while ($row = DBfetch($result)) {
 			if ($options['countOutput']) {

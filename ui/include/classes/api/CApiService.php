@@ -372,7 +372,7 @@ class CApiService {
 	protected function createSelectQuery($tableName, array $options) {
 		$sqlParts = $this->createSelectQueryParts($tableName, $this->tableAlias(), $options);
 
-		return $this->createSelectQueryFromParts($sqlParts);
+		return self::createSelectQueryFromParts($sqlParts);
 	}
 
 	/**
@@ -434,12 +434,8 @@ class CApiService {
 
 	/**
 	 * Creates a SELECT SQL query from the given SQL parts array.
-	 *
-	 * @param array $sqlParts	An SQL parts array
-	 *
-	 * @return string			The resulting SQL query
 	 */
-	protected function createSelectQueryFromParts(array $sqlParts) {
+	protected static function createSelectQueryFromParts(array $sqlParts): string {
 		if (array_key_exists('left_join', $sqlParts)) {
 			trigger_error('The CApiService database framework no longer supports "left_join". '.
 				'Please use "join" with the "type" => "left" option instead.', E_USER_ERROR
@@ -447,10 +443,12 @@ class CApiService {
 		}
 
 		$sql_join = '';
+		$from_alias = explode(' ', $sqlParts['from']);
+		$from_alias = end($from_alias);
 
 		if (array_key_exists('join', $sqlParts)) {
 			foreach ($sqlParts['join'] as $r_alias => $join) {
-				$l_alias = array_key_exists('left_table', $join) ? $join['left_table'] : $this->tableAlias();
+				$l_alias = array_key_exists('left_table', $join) ? $join['left_table'] : $from_alias;
 
 				$sql_join_conditions = [];
 

@@ -96,7 +96,7 @@ class CAlert extends CApiService {
 		}
 
 		$sql_parts = $this->createSelectQueryParts($this->tableName, $this->tableAlias(), $options);
-		$res = DBselect($this->createSelectQueryFromParts($sql_parts), $options['limit']);
+		$res = DBselect(self::createSelectQueryFromParts($sql_parts), $options['limit']);
 
 		$db_alerts = [];
 

@@ -391,7 +391,7 @@ class CItem extends CItemGeneral {
 
 		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$sqlParts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
-		$resource = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
+		$resource = DBselect(self::createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 
 		if ($options['countOutput']) {
 			if ($options['groupCount']) {

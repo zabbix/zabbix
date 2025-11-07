@@ -232,7 +232,7 @@ class CDiscoveryRulePrototype extends CDiscoveryRuleGeneral {
 
 		$sql_parts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sql_parts);
 		$sql_parts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sql_parts);
-		$res = DBselect($this->createSelectQueryFromParts($sql_parts), $sql_parts['limit']);
+		$res = DBselect(self::createSelectQueryFromParts($sql_parts), $sql_parts['limit']);
 
 		while ($item = DBfetch($res)) {
 			if (!$options['countOutput']) {

@@ -137,7 +137,7 @@ class CToken extends CApiService {
 		$sql_parts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sql_parts);
 		$sql_parts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sql_parts);
 
-		$result = DBselect($this->createSelectQueryFromParts($sql_parts), $options['limit']);
+		$result = DBselect(self::createSelectQueryFromParts($sql_parts), $options['limit']);
 
 		$db_tokens = [];
 		while ($row = DBfetch($result)) {

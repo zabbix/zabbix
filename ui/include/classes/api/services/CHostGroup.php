@@ -326,7 +326,7 @@ class CHostGroup extends CApiService {
 		// limit
 		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$sqlParts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
-		$res = DBselect($this->createSelectQueryFromParts($sqlParts), $options['limit']);
+		$res = DBselect(self::createSelectQueryFromParts($sqlParts), $options['limit']);
 		while ($group = DBfetch($res)) {
 			if ($options['countOutput']) {
 				$result = $group['rowscount'];
