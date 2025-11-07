@@ -695,6 +695,21 @@ class CMediatype extends CApiService {
 				_('both "access_token" and "access_expires_in" should be either present or absent')
 			));
 		}
+
+		if ((array_key_exists('token_url', $mediatype)
+				&& $mediatype['token_url'] !== $db_mediatype['token_url'])
+			|| (array_key_exists('authorization_url', $mediatype)
+				&& $mediatype['authorization_url'] !== $db_mediatype['authorization_url'])) {
+			if (!array_key_exists('client_secret', $mediatype) && $db_mediatype['client_secret'] !== '') {
+				if (array_key_exists('tokens_status', $mediatype)) {
+					$mediatype['tokens_status'] = 0;
+				}
+
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.', $path,
+					_s('the parameter "%1$s" is missing', 'client_secret')
+				));
+			}
+		}
 	}
 
 	private static function getSmsTypeValidationFields(bool $is_update = false): array {
