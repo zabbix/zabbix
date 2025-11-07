@@ -45,6 +45,32 @@ class CWidgetItemHistory extends CWidget {
 			return;
 		}
 
+		const iframes = this.#values_table.querySelectorAll('.js-iframe');
+
+		for (const iframe of iframes) {
+			iframe.addEventListener('load', () => {
+				const content_document = iframe.contentDocument;
+
+				content_document.documentElement.querySelector('body').style.margin = '0px';
+
+				const height = content_document.documentElement.scrollHeight;
+				const width = content_document.documentElement.scrollWidth;
+
+				iframe.style.height = Math.ceil(height) + 'px';
+				iframe.style.width = Math.ceil(width) + 'px';
+
+				const resizeObserver = new ResizeObserver(() => {
+					const height = iframe.contentDocument.documentElement.scrollHeight;
+					const width = iframe.contentDocument.documentElement.scrollWidth;
+
+					iframe.style.height = Math.ceil(height) + 'px';
+					iframe.style.width = Math.ceil(width) + 'px';
+				});
+
+				resizeObserver.observe(content_document.documentElement);
+			});
+		}
+
 		const items_data = new Map();
 		this.#values_table.querySelectorAll('.has-broadcast-data').forEach(element => {
 			const itemid = element.dataset.itemid;
