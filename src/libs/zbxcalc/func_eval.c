@@ -3583,6 +3583,12 @@ static int	evaluate_BASELINE(zbx_variant_t *value, const zbx_dc_evaluate_item_t 
 		goto out;
 	}
 
+	if (NULL == value)
+	{
+		ret = SUCCEED;
+		goto out;
+	}
+
 	if (0 == strcmp(func, "wma"))
 	{
 		int	i, weights = 0;
