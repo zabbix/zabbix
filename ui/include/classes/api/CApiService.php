@@ -435,19 +435,19 @@ class CApiService {
 	/**
 	 * Creates a SELECT SQL query from the given SQL parts array.
 	 */
-	protected static function createSelectQueryFromParts(array $sqlParts): string {
-		if (array_key_exists('left_join', $sqlParts)) {
+	protected static function createSelectQueryFromParts(array $sql_parts): string {
+		if (array_key_exists('left_join', $sql_parts)) {
 			trigger_error('The CApiService database framework no longer supports "left_join". '.
 				'Please use "join" with the "type" => "left" option instead.', E_USER_ERROR
 			);
 		}
 
-		$sql_join = '';
-		$from_alias = explode(' ', $sqlParts['from']);
+		$sql_from = ' FROM '.$sql_parts['from'];
+		$from_alias = explode(' ', $sql_parts['from']);
 		$from_alias = end($from_alias);
 
-		if (array_key_exists('join', $sqlParts)) {
-			foreach ($sqlParts['join'] as $r_alias => $join) {
+		if (array_key_exists('join', $sql_parts)) {
+			foreach ($sql_parts['join'] as $r_alias => $join) {
 				$l_alias = array_key_exists('left_table', $join) ? $join['left_table'] : $from_alias;
 
 				$sql_join_conditions = [];
@@ -464,23 +464,18 @@ class CApiService {
 				}
 
 				if (array_key_exists('type', $join) && $join['type'] === 'left') {
-					$sql_join .= ' LEFT';
+					$sql_from .= ' LEFT';
 				}
-				$sql_join .= ' JOIN '.$join['table'].' '.$r_alias.' ON '.implode(' AND ', $sql_join_conditions);
+				$sql_from .= ' JOIN '.$join['table'].' '.$r_alias.' ON '.implode(' AND ', $sql_join_conditions);
 			}
 		}
 
-		$sqlSelect = implode(',', array_unique($sqlParts['select']));
-		$sqlWhere = empty($sqlParts['where']) ? '' : ' WHERE '.implode(' AND ', array_unique($sqlParts['where']));
-		$sqlGroup = empty($sqlParts['group']) ? '' : ' GROUP BY '.implode(',', array_unique($sqlParts['group']));
-		$sqlOrder = empty($sqlParts['order']) ? '' : ' ORDER BY '.implode(',', array_unique($sqlParts['order']));
+		$sql_select = ($sql_parts['distinct'] ? 'DISTINCT ' : '').implode(',', array_unique($sql_parts['select']));
+		$sql_where = empty($sql_parts['where']) ? '' : ' WHERE '.implode(' AND ', array_unique($sql_parts['where']));
+		$sql_group = empty($sql_parts['group']) ? '' : ' GROUP BY '.implode(',', array_unique($sql_parts['group']));
+		$sql_order = empty($sql_parts['order']) ? '' : ' ORDER BY '.implode(',', array_unique($sql_parts['order']));
 
-		return 'SELECT '.($sqlParts['distinct'] ? 'DISTINCT ' : '').$sqlSelect.
-			' FROM '.$sqlParts['from'].
-			$sql_join.
-			$sqlWhere.
-			$sqlGroup.
-			$sqlOrder;
+		return 'SELECT '.$sql_select.$sql_from.$sql_where.$sql_group.$sql_order;
 	}
 
 	/**
