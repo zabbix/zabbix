@@ -75,7 +75,7 @@ class CControllerTriggerMassupdate extends CController {
 		];
 
 		if (array_key_exists('tags', $this->getInput('visible', []))) {
-			$options['selectTags'] = ['tag', 'value', 'automatic'];
+			$options['selectTags'] = ['tag', 'value'];
 		}
 
 		if ($parent_lld) {
@@ -114,69 +114,50 @@ class CControllerTriggerMassupdate extends CController {
 
 			$triggers_to_update = [];
 
-			try {
-				foreach ($this->triggers as $triggerid => $trigger) {
-					$upd_trigger = ['triggerid' => $triggerid];
+			foreach ($this->triggers as $triggerid => $trigger) {
+				$upd_trigger = ['triggerid' => $triggerid];
 
-					if (array_key_exists('priority', $visible)) {
-						$upd_trigger['priority'] = $this->getInput('priority');
-					}
-
-					if (array_key_exists('dependencies', $visible)) {
-						$upd_trigger['dependencies'] = zbx_toObject($this->getInput('dependencies', []), 'triggerid');
-					}
-
-					if (array_key_exists('tags', $visible)) {
-						$tags_action = $this->getInput('mass_update_tags', ZBX_ACTION_ADD);
-
-						if ($tags && $tags_action == ZBX_ACTION_ADD) {
-							$upd_trigger['tags'] = self::getUniqueTags(array_merge($trigger['tags'], $tags));
-						}
-						elseif ($tags_action == ZBX_ACTION_REPLACE) {
-							$upd_trigger['tags'] = $tags;
-						}
-						elseif ($tags && $tags_action == ZBX_ACTION_REMOVE) {
-							$upd_trigger['tags'] =
-								array_filter($trigger['tags'],
-										static function (array $tag) use ($tags, $trigger): bool {
-									foreach ($tags as $_tag) {
-										if ($tag['tag'] === $_tag['tag'] && $tag['value'] === $_tag['value']) {
-											if ($tag['automatic'] == ZBX_TAG_AUTOMATIC) {
-												error(_s(
-													'Cannot remove the tag with name "%1$s" and value "%2$s", defined in a trigger prototype, from trigger "%3$s".',
-													$_tag['tag'], $_tag['value'], $trigger['description']
-												));
-												throw new Exception();
-											}
-
-											return false;
-										}
-									}
-
-									return true;
-								});
-						}
-
-						foreach ($upd_trigger['tags'] as $key => $tag) {
-							unset($upd_trigger['tags'][$key]['automatic']);
-						}
-					}
-
-					if ($trigger['templateid'] == 0 && array_key_exists('manual_close', $visible)) {
-						$upd_trigger['manual_close'] = $this->getInput('manual_close');
-					}
-
-					$triggers_to_update[] = $upd_trigger;
+				if (array_key_exists('priority', $visible)) {
+					$upd_trigger['priority'] = $this->getInput('priority');
 				}
 
-				$result = $this->hasInput('prototype')
-					? API::TriggerPrototype()->update($triggers_to_update)
-					: API::Trigger()->update($triggers_to_update);
+				if (array_key_exists('dependencies', $visible)) {
+					$upd_trigger['dependencies'] = zbx_toObject($this->getInput('dependencies', []), 'triggerid');
+				}
 
+				if (array_key_exists('tags', $visible)) {
+					$tags_action = $this->getInput('mass_update_tags', ZBX_ACTION_ADD);
+
+					if ($tags && $tags_action == ZBX_ACTION_ADD) {
+						$upd_trigger['tags'] = self::getUniqueTags(array_merge($trigger['tags'], $tags));
+					}
+					elseif ($tags_action == ZBX_ACTION_REPLACE) {
+						$upd_trigger['tags'] = $tags;
+					}
+					elseif ($tags && $tags_action == ZBX_ACTION_REMOVE) {
+						$upd_trigger['tags'] =
+							array_filter($trigger['tags'], static function (array $tag) use ($tags): bool {
+								foreach ($tags as $_tag) {
+									if ($tag['tag'] === $_tag['tag'] && $tag['value'] === $_tag['value']) {
+										return false;
+									}
+								}
+
+								return true;
+							});
+					}
+				}
+
+				if ($trigger['templateid'] == 0 && array_key_exists('manual_close', $visible)) {
+					$upd_trigger['manual_close'] = $this->getInput('manual_close');
+				}
+
+				$triggers_to_update[] = $upd_trigger;
 			}
-			catch (Exception $e) {
-				$result = false;
-			}
+
+			$result = $this->hasInput('prototype')
+				? API::TriggerPrototype()->update($triggers_to_update)
+				: API::Trigger()->update($triggers_to_update);
 
 			$triggers_count = count($this->triggers);
 

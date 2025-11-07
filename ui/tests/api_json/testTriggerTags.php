@@ -79,6 +79,21 @@ class testTriggerTags extends CAPITest {
 				'params' => [
 					'triggerid' => ':discovered_trigger:discovered.trigger[eth0]',
 					'tags' => [
+						['tag' => 'source', 'value' => 'trigger_prototype'],
+						['tag' => 'discovered.own', 'value' => 'tag']
+					]
+				],
+				'errors' => null,
+				'expected' => [
+					['tag' => 'source', 'value' => 'trigger_prototype', 'automatic' => ZBX_TAG_AUTOMATIC],
+					['tag' => 'discovered.own', 'value' => 'tag', 'automatic' => ZBX_TAG_MANUAL]
+				]
+			],
+			'Update discovered trigger by deleting automatic tag' => [
+				'method' => 'trigger.update',
+				'params' => [
+					'triggerid' => ':discovered_trigger:discovered.trigger[eth0]',
+					'tags' => [
 						['tag' => 'discovered.own', 'value' => 'tag']
 					]
 				],
@@ -133,8 +148,8 @@ class testTriggerTags extends CAPITest {
 				],
 				'errors' => null,
 				'expected' => [
-					['tag' => 'source', 'value' => 'trigger_prototype', 'automatic' => ZBX_TAG_MANUAL],
-					['tag' => 'source', 'value' => 'trigger_prototype#2', 'automatic' => ZBX_TAG_MANUAL]
+					['tag' => 'source', 'value' => 'trigger_prototype'],
+					['tag' => 'source', 'value' => 'trigger_prototype#2']
 				]
 			],
 			'Update trigger prototype by deleting last added tag' => [
@@ -147,7 +162,7 @@ class testTriggerTags extends CAPITest {
 				],
 				'errors' => null,
 				'expected' => [
-					['tag' => 'source', 'value' => 'trigger_prototype', 'automatic' => ZBX_TAG_MANUAL]
+					['tag' => 'source', 'value' => 'trigger_prototype']
 				]
 			]
 		];
@@ -184,11 +199,13 @@ class testTriggerTags extends CAPITest {
 			return;
 		}
 
-		$response = $this->call($api_object . '.get', [
+		$options = [
 			'output' => [],
 			'triggerids' => $response['result']['triggerids'],
-			'selectTags' => ['tag', 'value', 'automatic']
-		]);
+			'selectTags' => $api_object == 'trigger' ? ['tag', 'value', 'automatic'] : ['tag', 'value']
+		];
+
+		$response = $this->call($api_object . '.get', $options);
 
 		$this->assertArrayHasKey('result', $response);
 
