@@ -76,8 +76,8 @@ Note: Since version 7.2.0, you can also connect to the MSSQL instance using its 
 |Name|Description|Default|
 |----|-----------|-------|
 |{$MSSQL.URI}|<p>Connection string.</p>||
-|{$MSSQL.USER}|<p>MSSQL username.</p>||
-|{$MSSQL.PASSWORD}|<p>MSSQL user password.</p>||
+|{$MSSQL.USER}|<p>MSSQL database username.</p>||
+|{$MSSQL.PASSWORD}|<p>MSSQL database password.</p>||
 |{$MSSQL.HOST}|<p>The hostname or IP address of the MSSQL instance.</p>|`localhost`|
 |{$MSSQL.PORT}|<p>MSSQL TCP port.</p>|`1433`|
 |{$MSSQL.WORK_FILES.MAX}|<p>The maximum number of work files created per second - for the trigger expression.</p>|`20`|
