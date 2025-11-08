@@ -1269,6 +1269,15 @@ static int	history_elastic_fetch_batch(void *data, zbx_vector_item_history_t *re
 	char			*post_url = NULL;
 	double			sec = 0;
 	zbx_elastic_conn_t	conn = {0};
+	CURLM			*mhandle;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	if (NULL == (mhandle = curl_multi_init()))
+	{
+		*error = zbx_strdup(NULL, "Cannot initialize curl multi session");
+		goto fail;
+	}
 
 	if (0 != d->log_slow_queries)
 		sec = zbx_time();
@@ -1349,7 +1358,7 @@ static int	history_elastic_fetch_batch(void *data, zbx_vector_item_history_t *re
 
 	/* initiate search context */
 
-	if (SUCCEED != history_elastic_query(data, d->mhandle, &conn, ELASTIC_RETRIES_ON))
+	if (SUCCEED != history_elastic_query(data, mhandle, &conn, ELASTIC_RETRIES_ON))
 		goto out;
 
 	/* fetch search results */
@@ -1399,6 +1408,7 @@ static int	history_elastic_fetch_batch(void *data, zbx_vector_item_history_t *re
 
 out:
 	elastic_conn_clear(&conn);
+	curl_multi_cleanup(mhandle);
 
 	zbx_free(post_url);
 
@@ -1410,7 +1420,7 @@ out:
 	}
 
 	zbx_json_free(&query);
-
+fail:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() rows:%d results:%d", __func__, rows_num, results->values_num);
 
 	return ret;
