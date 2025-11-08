@@ -75,8 +75,8 @@ Note: You can use the context macros `{$MSSQL.BACKUP_FULL.USED}`, `{$MSSQL.BACKU
 |Name|Description|Default|
 |----|-----------|-------|
 |{$MSSQL.DSN}|<p>System data source name.</p>||
-|{$MSSQL.USER}|<p>MSSQL username.</p>||
-|{$MSSQL.PASSWORD}|<p>MSSQL user password.</p>||
+|{$MSSQL.USER}|<p>MSSQL database username.</p>||
+|{$MSSQL.PASSWORD}|<p>MSSQL database password.</p>||
 |{$MSSQL.HOST}|<p>The hostname or IP address of the MSSQL instance.</p>|`localhost`|
 |{$MSSQL.PORT}|<p>MSSQL TCP port.</p>|`1433`|
 |{$MSSQL.WORK_FILES.MAX}|<p>The maximum number of work files created per second - for the trigger expression.</p>|`20`|
