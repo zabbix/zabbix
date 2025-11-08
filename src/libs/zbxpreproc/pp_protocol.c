@@ -1143,17 +1143,26 @@ void	zbx_preprocess_item_value(zbx_uint64_t itemid, unsigned char item_value_typ
 	}
 	else
 	{
-
+		/* When received value from passive agent, all item value types have TEXT type at this stage. */
+		/* When received from trapper - the value type is correlated with item_value_type.            */
+		/* If item_value_type is JSON, then must use either text or json, depending on result->type.  */
 		if (ITEM_VALUE_TYPE_JSON == item_value_type && ITEM_STATE_NOTSUPPORTED != state)
 		{
-			char	*dyn_error = NULL;
+			char	*json_val, *dyn_error = NULL;
 
-			if (ZBX_HISTORY_JSON_VALUE_LEN < strlen(result->text))
+			if (ZBX_ISSET_JSON(result))
+				json_val = result->tjson;
+			else if (ZBX_ISSET_TEXT(result))
+				json_val = result->text;
+			else
+				THIS_SHOULD_NEVER_HAPPEN;
+
+			if (ZBX_HISTORY_JSON_VALUE_LEN < strlen(json_val))
 			{
 				state = ITEM_STATE_NOTSUPPORTED;
 				dyn_error = zbx_strdup(NULL, "JSON is too large.");
 			}
-			else if (0 == zbx_json_validate_ext(result->text, &dyn_error))
+			else if (0 == zbx_json_validate_ext(json_val, &dyn_error))
 			{
 				state = ITEM_STATE_NOTSUPPORTED;
 			}

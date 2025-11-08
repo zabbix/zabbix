@@ -2240,27 +2240,6 @@ static void	dc_local_add_history_text_bin_json_helper(unsigned char value_type, 
 		item_value->value.value_str.len = 0;
 }
 
-static void	dc_local_add_history_text(zbx_uint64_t itemid, unsigned char item_value_type, const zbx_timespec_t *ts,
-		const char *value_orig, zbx_uint64_t lastlogsize, int mtime, unsigned char flags)
-{
-	dc_local_add_history_text_bin_json_helper(ITEM_VALUE_TYPE_TEXT, itemid, item_value_type, ts, value_orig,
-			lastlogsize, mtime, flags);
-}
-
-static void	dc_local_add_history_bin(zbx_uint64_t itemid, unsigned char item_value_type, const zbx_timespec_t *ts,
-		const char *value_orig, zbx_uint64_t lastlogsize, int mtime, unsigned char flags)
-{
-	dc_local_add_history_text_bin_json_helper(ITEM_VALUE_TYPE_BIN, itemid, item_value_type, ts, value_orig,
-			lastlogsize, mtime, flags);
-}
-
-static void	dc_local_add_history_json(zbx_uint64_t itemid, unsigned char item_value_type, const zbx_timespec_t *ts,
-		const char *value_orig, zbx_uint64_t lastlogsize, int mtime, unsigned char flags)
-{
-	dc_local_add_history_text_bin_json_helper(ITEM_VALUE_TYPE_JSON, itemid, item_value_type, ts, value_orig,
-			lastlogsize, mtime, flags);
-}
-
 static void	dc_local_add_history_log(zbx_uint64_t itemid, unsigned char item_value_type, const zbx_timespec_t *ts,
 		const zbx_log_t *log, zbx_uint64_t lastlogsize, int mtime, unsigned char flags)
 {
@@ -2437,7 +2416,6 @@ void	zbx_dc_add_history(zbx_uint64_t itemid, unsigned char item_value_type, unsi
 	/* Add data to the local history cache if:                                           */
 	/*   1) the NOVALUE flag is set                                                      */
 	/*   2) the NOVALUE flag is not set and value conversion succeeded                   */
-
 	if (0 == (value_flags & ZBX_DC_FLAG_NOVALUE))
 	{
 		if (0 != (ZBX_FLAG_DISCOVERY_RULE & item_flags))
@@ -2469,23 +2447,23 @@ void	zbx_dc_add_history(zbx_uint64_t itemid, unsigned char item_value_type, unsi
 		}
 		else if (ZBX_ISSET_STR(result))
 		{
-			dc_local_add_history_text(itemid, item_value_type, ts, result->str, result->lastlogsize,
-					result->mtime, value_flags);
+			dc_local_add_history_text_bin_json_helper(ITEM_VALUE_TYPE_TEXT, itemid, item_value_type, ts,
+					result->str, result->lastlogsize, result->mtime, value_flags);
 		}
 		else if (ZBX_ISSET_TEXT(result))
 		{
-			dc_local_add_history_text(itemid, item_value_type, ts, result->text, result->lastlogsize,
-					result->mtime, value_flags);
+			dc_local_add_history_text_bin_json_helper(ITEM_VALUE_TYPE_TEXT, itemid, item_value_type, ts,
+					result->text, result->lastlogsize, result->mtime, value_flags);
 		}
 		else if (ZBX_ISSET_BIN(result))
 		{
-			dc_local_add_history_bin(itemid, item_value_type, ts, result->bin, result->lastlogsize,
-					result->mtime, value_flags);
+			dc_local_add_history_text_bin_json_helper(ITEM_VALUE_TYPE_BIN, itemid, item_value_type, ts,
+					result->bin, result->lastlogsize, result->mtime, value_flags);
 		}
 		else if (ZBX_ISSET_JSON(result))
 		{
-			dc_local_add_history_json(itemid, item_value_type, ts, result->tjson, result->lastlogsize,
-					result->mtime, value_flags);
+			dc_local_add_history_text_bin_json_helper(ITEM_VALUE_TYPE_JSON, itemid, item_value_type, ts,
+					result->tjson, result->lastlogsize, result->mtime, value_flags);
 		}
 		else
 		{
@@ -2644,13 +2622,13 @@ void	zbx_dc_add_history_variant(zbx_uint64_t itemid, unsigned char value_type, u
 					return;
 				}
 
-				dc_local_add_history_json(itemid, value_type, &ts, value->data.json, lastlogsize, mtime,
-						value_flags);
+				dc_local_add_history_text_bin_json_helper(ITEM_VALUE_TYPE_JSON, itemid, value_type, &ts,
+						value->data.json, lastlogsize, mtime, value_flags);
 			}
 			else
 			{
-				dc_local_add_history_text(itemid, value_type, &ts, value->data.str, lastlogsize, mtime,
-						value_flags);
+				dc_local_add_history_text_bin_json_helper(ITEM_VALUE_TYPE_TEXT, itemid, value_type, &ts,
+						value->data.str, lastlogsize, mtime, value_flags);
 			}
 			break;
 		case ZBX_VARIANT_NONE:
