@@ -140,7 +140,7 @@ class CUser extends CApiService {
 					' SELECT uug.usrgrpid'.
 					' FROM users_groups uug'.
 					' WHERE uug.userid='.self::$userData['userid'].
-					')';
+				')';
 			}
 			else {
 				$sqlParts['where']['userid'] = 'u.userid='.self::$userData['userid'];
