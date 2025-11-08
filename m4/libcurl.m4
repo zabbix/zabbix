@@ -37,8 +37,6 @@
 
 AC_DEFUN([LIBCURL_CHECK_CONFIG],
 [
-  _libcurl_config="no"
-
   AC_ARG_WITH(libcurl,
      [
 If you want to use cURL library:
@@ -63,7 +61,8 @@ AS_HELP_STRING([--with-libcurl@<:@=DIR@:>@],[use cURL package @<:@default=no@:>@
 
 		_libcurl_try_link=no
 
-		AC_PATH_PROG([_libcurl_config], [curl-config], [])
+		test -n "$_libcurl_config" && AC_PATH_PROG([_libcurl_config], [curl-config], [])
+		test -f "$_libcurl_config" && test -x "$_libcurl_config" || AC_MSG_ERROR([curl-config is not executable: $_libcurl_config])
 
 		if test -x "$_libcurl_config"; then
 			AC_CACHE_CHECK([for the version of libcurl],
@@ -165,8 +164,8 @@ AS_HELP_STRING([--with-libcurl@<:@=DIR@:>@],[use cURL package @<:@default=no@:>@
 											;;
 											esac
 										fi
-										test -z "${LIBCURL_LIBS##*$_lib_i*}" && LIBCURL_LIBS=`echo "$LIBCURL_LIBS"|sed "s|$_lib_i||g"`
-										test -z "${LIBCURL_LIBS##*$i*}" || LIBCURL_LIBS="$LIBCURL_LIBS $i"
+										LIBCURL_LIBS=`echo "$LIBCURL_LIBS"|sed -E "s| $_lib_i([ \n])|\1|"`
+										LIBCURL_LIBS="$LIBCURL_LIBS $i"
 									],[
 										AC_MSG_ERROR([static library $_lib_name required for linking libcurl not found])
 									])
@@ -252,7 +251,7 @@ x=CURLOPT_VERBOSE;
 
 			if test "x$libcurl_cv_lib_curl_usable" = "xno"; then
 				link_mode="dynamic"
-				if test "x$enable_static" = "xyes"; then
+				if test "x$enable_static" = "xyes" -o "x$enable_static_libs" = "xyes" ; then
 					link_mode="static"
 				fi
 				AC_MSG_ERROR([libcurl is not available for ${link_mode} linking])
