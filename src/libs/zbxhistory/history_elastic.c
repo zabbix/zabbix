@@ -581,15 +581,16 @@ static int	history_elastic_perform_once(zbx_history_elastic_data_t *d, CURLM *mh
 
 			if (CURLE_OK == curl_easy_getinfo(msg->easy_handle, CURLINFO_RESPONSE_CODE, &response_code))
 			{
+				zbx_snprintf(http_status, sizeof(http_status), "HTTP status code: %ld",
+						response_code);
 				/* add retry 'too many requests' response */
 				if (429 == response_code)
 				{
+					zabbix_log(LOG_LEVEL_ERR, "cannot query elasticsearch, %s", http_status);
 					zbx_vector_ptr_append(&retries, conn->handle);
 					continue;
 				}
 
-				zbx_snprintf(http_status, sizeof(http_status), "HTTP status code: %ld",
-						response_code);
 			}
 			else
 			{
@@ -1336,7 +1337,10 @@ static int	history_elastic_fetch_batch(void *data, zbx_vector_item_history_t *re
 	zbx_snprintf_alloc(&post_url, &url_alloc, &url_offset, "%s*/_search", value_type_str[value_type]);
 
 	if (SUCCEED != history_elastic_conn_init(&conn, d, post_url, "application/json", NULL, error))
+	{
+		zabbix_log(LOG_LEVEL_ERR, "cannot initialize curl for elastic connection");
 		goto out;
+	}
 
 	if (FAIL == history_elastic_conn_set_post_data(&conn, query.buffer, query.buffer_size, error))
 		goto out;
@@ -1351,7 +1355,10 @@ static int	history_elastic_fetch_batch(void *data, zbx_vector_item_history_t *re
 	/* fetch search results */
 
 	if (SUCCEED != history_elastic_conn_set_url_path(&conn, data, "_search/scroll", error))
+	{
+		zabbix_log(LOG_LEVEL_ERR, "cannot set elastic url path");
 		goto out;
+	}
 
 	if (0 != conn.resp.page.offset)
 	{
@@ -1362,13 +1369,25 @@ static int	history_elastic_fetch_batch(void *data, zbx_vector_item_history_t *re
 
 		zbx_json_open(conn.resp.page.data, &jp);
 		if (SUCCEED != zbx_json_brackets_by_name(&jp, "aggregations", &jp_aggs))
+		{
+			zabbix_log(LOG_LEVEL_ERR, "cannot find aggregations in elasticsearch response '%s',"
+					" query '%s'", conn.resp.page.data, query.buffer);
 			goto out;
+		}
 
 		if (SUCCEED != zbx_json_brackets_by_name(&jp_aggs, "items", &jp_items))
+		{
+			zabbix_log(LOG_LEVEL_ERR, "cannot find items in elasticsearch response '%s',"
+					" query '%s'", conn.resp.page.data, query.buffer);
 			goto out;
+		}
 
 		if (SUCCEED != zbx_json_brackets_by_name(&jp_items, "buckets", &jp_buckets))
+		{
+			zabbix_log(LOG_LEVEL_ERR, "cannot find items in elasticsearch response '%s',"
+					" query '%s'", conn.resp.page.data, query.buffer);
 			goto out;
+		}
 
 		while (NULL != (p = zbx_json_next(&jp_buckets, p)))
 		{
@@ -1392,7 +1411,7 @@ out:
 
 	zbx_json_free(&query);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() rows:%d", __func__, rows_num);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() rows:%d results:%d", __func__, rows_num, results->values_num);
 
 	return ret;
 }
