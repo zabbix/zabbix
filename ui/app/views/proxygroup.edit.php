@@ -102,6 +102,8 @@ $form
 	->addItem($form_grid)
 	->addItem(
 		(new CScriptTag('proxy_group_edit_popup.init('.json_encode([
+			'rules' => $data['js_validation_rules'],
+			'rules_for_clone' => $data['js_validation_rules_for_clone'],
 			'proxy_groupid' => $data['proxy_groupid']
 		]).');'))->setOnDocumentReady()
 	);
