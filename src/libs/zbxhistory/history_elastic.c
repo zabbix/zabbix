@@ -651,7 +651,7 @@ static int	history_elastic_perform_once(zbx_history_elastic_data_t *d, CURLM *mh
 		/* If the error is due to curl internal problems or unrelated */
 		/* problems with HTTP, we put the handle in a retry list and */
 		/* remove it from the current execution loop */
-		if (CURLM_OK != (code = curl_multi_remove_handle(d->mhandle, retries.values[i])))
+		if (CURLM_OK != (code = curl_multi_remove_handle(mhandle, retries.values[i])))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "cannot remove handle from curl multi handle: %s",
 					curl_multi_strerror(code));
@@ -736,11 +736,11 @@ static int	history_elastic_query(zbx_history_elastic_data_t *d, CURLM *mhandle, 
 
 	if (ELASTIC_RETRIES_ON == retry_mode)
 	{
-		ret = history_elastic_perform(d, d->mhandle);
+		ret = history_elastic_perform(d, mhandle);
 	}
 	else
 	{
-		if (0 < (ret = history_elastic_perform_once(d, d->mhandle)))
+		if (0 < (ret = history_elastic_perform_once(d, mhandle)))
 			ret = FAIL;
 	}
 
@@ -1363,12 +1363,6 @@ static int	history_elastic_fetch_batch(void *data, zbx_vector_item_history_t *re
 
 	/* fetch search results */
 
-	if (SUCCEED != history_elastic_conn_set_url_path(&conn, data, "_search/scroll", error))
-	{
-		zabbix_log(LOG_LEVEL_ERR, "cannot set elastic url path");
-		goto out;
-	}
-
 	if (0 != conn.resp.page.offset)
 	{
 		struct zbx_json_parse	jp, jp_aggs, jp_items, jp_buckets;
@@ -1563,7 +1557,7 @@ static int	history_elastic_get_info(void *data, zbx_history_provider_info_t *inf
 		goto out;
 	}
 
-	if (FAIL == history_elastic_query(d, d->mhandle, &conn, ELASTIC_RETRIES_OFF))
+	if (FAIL == history_elastic_query(d, mhandle, &conn, ELASTIC_RETRIES_OFF))
 	{
 		*error = zbx_strdup(NULL, "Cannot perform elasticsearch query");
 		goto out;
