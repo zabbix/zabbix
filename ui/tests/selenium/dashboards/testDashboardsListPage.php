@@ -18,7 +18,7 @@ require_once __DIR__.'/../behaviors/CMessageBehavior.php';
 require_once __DIR__.'/../behaviors/CTableBehavior.php';
 
 /**
- * @dataSource TopHostsWidget, ItemValueWidget, DynamicItemWidgets, CopyWidgetsDashboards
+ * @dataSource TopHostsWidget, ItemValueWidget, DynamicItemWidgets, CopyWidgetsDashboards, HostAvailabilityWidget
  *
  * @backup dashboard, dashboard_user, dashboard_usrgrp
  *
@@ -57,6 +57,18 @@ class testDashboardsListPage extends CWebTest {
 						'permission' => 2
 					]
 				]
+			],
+			[
+				'name' => 'The Graph dashboard without widgets',
+				'userid' => '1',
+				'private' => 1,
+				'pages' => [[]]
+			],
+			[
+				'name' => 'The Graph prototype dashboard without widgets',
+				'userid' => '1',
+				'private' => 1,
+				'pages' => [[]]
 			]
 		]);
 	}
@@ -100,7 +112,7 @@ class testDashboardsListPage extends CWebTest {
 					'fields' => [
 						'Show' => 'All'
 					],
-					'result_count' => 24
+					'result_count' => 22
 				]
 			],
 			[
@@ -108,7 +120,7 @@ class testDashboardsListPage extends CWebTest {
 					'fields' => [
 						'Show' => 'Created by me'
 					],
-					'result_count' => 23
+					'result_count' => 21
 				]
 			],
 			[
@@ -126,7 +138,7 @@ class testDashboardsListPage extends CWebTest {
 						'Name' => 'widget',
 						'Show' => 'Created by me'
 					],
-					'result_count' => 9
+					'result_count' => 7
 				]
 			],
 			[
