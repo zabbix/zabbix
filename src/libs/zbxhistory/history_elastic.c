@@ -188,6 +188,18 @@ out:
 	return ret;
 }
 
+static void	history_elastic_prepare(zbx_history_elastic_data_t *d)
+{
+	if (NULL == d->mhandle)
+	{
+		if (NULL == (d->mhandle = curl_multi_init()))
+		{
+			zabbix_log(LOG_LEVEL_ERR, "Cannot initialize curl multi session");
+			exit(EXIT_FAILURE);
+		}
+	}
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: check an error from Elastic json response                         *
@@ -767,6 +779,8 @@ static zbx_uint64_t	history_elastic_flush(void *data)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
+	history_elastic_prepare(d);
+
 	for (int i = 0; i < d->conns.values_num; i++)
 	{
 		zbx_elastic_conn_t	*conn = d->conns.values[i];
@@ -849,6 +863,8 @@ static int	elastic_get_values_for_period(zbx_history_elastic_data_t *data, zbx_u
 		zabbix_log(LOG_LEVEL_DEBUG, "In %s() window:(%s, %s] age: %s count:%d", __func__, start_str, end_str,
 				zbx_age2str(end - start), *count);
 	}
+
+	history_elastic_prepare(data);
 
 	if (0 != data->log_slow_queries)
 		sec = zbx_time();
@@ -1269,15 +1285,8 @@ static int	history_elastic_fetch_batch(void *data, zbx_vector_item_history_t *re
 	char			*post_url = NULL;
 	double			sec = 0;
 	zbx_elastic_conn_t	conn = {0};
-	CURLM			*mhandle;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
-
-	if (NULL == (mhandle = curl_multi_init()))
-	{
-		*error = zbx_strdup(NULL, "Cannot initialize curl multi session");
-		goto fail;
-	}
+	history_elastic_prepare(d);
 
 	if (0 != d->log_slow_queries)
 		sec = zbx_time();
@@ -1358,7 +1367,7 @@ static int	history_elastic_fetch_batch(void *data, zbx_vector_item_history_t *re
 
 	/* initiate search context */
 
-	if (SUCCEED != history_elastic_query(data, mhandle, &conn, ELASTIC_RETRIES_ON))
+	if (SUCCEED != history_elastic_query(data, d->mhandle, &conn, ELASTIC_RETRIES_ON))
 		goto out;
 
 	/* fetch search results */
@@ -1402,7 +1411,6 @@ static int	history_elastic_fetch_batch(void *data, zbx_vector_item_history_t *re
 
 out:
 	elastic_conn_clear(&conn);
-	curl_multi_cleanup(mhandle);
 
 	zbx_free(post_url);
 
@@ -1414,7 +1422,7 @@ out:
 	}
 
 	zbx_json_free(&query);
-fail:
+
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() rows:%d results:%d", __func__, rows_num, results->values_num);
 
 	return ret;
@@ -1637,7 +1645,6 @@ static void	*history_elastic_create_data(const zbx_history_option_t *options, in
 {
 	zbx_history_elastic_data_t	*data;
 	const char			*value;
-	CURLM				*mhandle;
 
 	if (NULL == (value = history_option_value(options, options_num, HISTORY_PROVIDER_OPTION_URL)))
 	{
@@ -1645,16 +1652,9 @@ static void	*history_elastic_create_data(const zbx_history_option_t *options, in
 		return NULL;
 	}
 
-	if (NULL == (mhandle = curl_multi_init()))
-	{
-		*error = zbx_strdup(*error, "Cannot initialize cURL multi session");
-		return NULL;
-	}
-
 	data = (zbx_history_elastic_data_t *)zbx_malloc(NULL, sizeof(zbx_history_elastic_data_t));
 	memset(data, 0, sizeof(zbx_history_elastic_data_t));
 
-	data->mhandle = mhandle;
 	data->base_url = zbx_strdup(NULL, value);
 	zbx_rtrim(data->base_url, "/");
 
@@ -1671,7 +1671,6 @@ static void	*history_elastic_create_data(const zbx_history_option_t *options, in
 	return (void *)data;
 }
 
-
 /******************************************************************************
  *                                                                            *
  * Purpose: close elasticsearch history provider                              *
@@ -1681,7 +1680,9 @@ static void	history_elastic_close(void *data)
 {
 	zbx_history_elastic_data_t	*d = (zbx_history_elastic_data_t *)data;
 
-	curl_multi_cleanup(d->mhandle);
+	if (NULL != d->mhandle)
+		curl_multi_cleanup(d->mhandle);
+
 	zbx_vector_elastic_conn_ptr_destroy(&d->conns);
 
 	zbx_free(d->base_url);
