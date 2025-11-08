@@ -1477,6 +1477,10 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 			// #2 LDAP server without name, Base DN and Search attribute.
 			[
 				[
+					'ldap_fields' => [
+						'Enable JIT provisioning' => true,
+						'Provisioning period' => '1h'
+					],
 					'servers_settings' => [
 						[
 							'fields' => [
@@ -1974,6 +1978,50 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 					],
 					'error' => 'At least one LDAP server must exist.'
 				]
+			],
+			// #20 Time (in seconds) value below the boundary in Provisioning period.
+			[
+				[
+					'ldap_fields' => [
+						'Enable LDAP authentication' => true,
+						'Enable JIT provisioning' => true,
+						'Provisioning period' => '3599'
+					],
+					'error' => 'Incorrect value for field "jit_provision_interval": value must be one of 3600-788400000.'
+				]
+			],
+			// #21 Time (in seconds) value above the boundary in Provisioning period.
+			[
+				[
+					'ldap_fields' => [
+						'Enable LDAP authentication' => true,
+						'Enable JIT provisioning' => true,
+						'Provisioning period' => '788400001'
+					],
+					'error' => 'Incorrect value for field "jit_provision_interval": value must be one of 3600-788400000.'
+				]
+			],
+			// #22 Time (in minutes) value below the boundary in Provisioning period.
+			[
+				[
+					'ldap_fields' => [
+						'Enable LDAP authentication' => true,
+						'Enable JIT provisioning' => true,
+						'Provisioning period' => '59m'
+					],
+					'error' => 'Incorrect value for field "jit_provision_interval": value must be one of 3600-788400000.'
+				]
+			],
+			// #23 Invalid time unit used in Provisioning period.
+			[
+				[
+					'ldap_fields' => [
+						'Enable LDAP authentication' => true,
+						'Enable JIT provisioning' => true,
+						'Provisioning period' => '1q'
+					],
+					'error' => 'Incorrect value for field "jit_provision_interval": a time unit is expected.'
+				]
 			]
 		];
 	}
@@ -2317,9 +2365,8 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 								[
 									'Name' => '   leading.trailing   ',
 									'Media type' => 'Discord',
-									'Attribute' => '   leading.trailing   '
-									// TODO: uncomment When active value, after ZBX-24720 is fixed
-									// 'When active' => '   1-7,00:00-24:00   '
+									'Attribute' => '   leading.trailing   ',
+									'When active' => '   1-7,00:00-24:00   '
 								]
 							]
 						]
@@ -2569,6 +2616,13 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 			[
 				[
 					'expected' => TEST_GOOD,
+					'authentication' => [
+						'Deprovisioned users group' => 'Disabled'
+					],
+					'ldap_fields' => [
+						'Enable JIT provisioning' => true,
+						'Provisioning period' => '3600'
+					],
 					'servers_settings' => [
 						[
 							'fields' => [
@@ -2798,6 +2852,13 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 			[
 				[
 					'expected' => TEST_GOOD,
+					'authentication' => [
+						'Deprovisioned users group' => 'Disabled'
+					],
+					'ldap_fields' => [
+						'Enable JIT provisioning' => true,
+						'Provisioning period' => '788400000'
+					],
 					'servers_settings' => [
 						[
 							'fields' => [
@@ -2982,11 +3043,15 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 	 * Function for opening LDAP configuration form.
 	 *
 	 * @param string $auth    default authentication field value
+	 * @param array $data	  data provider to fill Authentication form
 	 */
-	private function openLdapForm($auth = 'Internal') {
+	private function openLdapForm($auth = 'Internal', $data = []) {
 		$this->page->login()->open('zabbix.php?action=authentication.edit')->waitUntilReady();
 		$form = $this->query('id:authentication-form')->asForm()->one();
 		$form->fill(['Default authentication' => $auth]);
+		if (array_key_exists('authentication', $data)) {
+			$form->fill($data['authentication']);
+		}
 		$form->selectTab('LDAP settings');
 
 		return $form;
@@ -3071,9 +3136,9 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 	 * @param string    $query    object to click for LDAP creating or updating
 	 */
 	private function checkLdap($data, $query) {
-		$form = $this->openLdapForm('LDAP');
+		$form = $this->openLdapForm('LDAP', $data);
 
-		// Configuration at 'LDAP settings' tab.
+		// Configuration of LDAP servers.
 		if (array_key_exists('servers_settings', $data)) {
 			$this->setLdap($data, $query);
 
@@ -3082,6 +3147,11 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 				$this->assertMessage(TEST_BAD, $data['ldap_error'], $data['ldap_error_details']);
 				COverlayDialogElement::find()->all()->last()->close();
 			}
+		}
+
+		// Configuration of LDAP form.
+		if (array_key_exists('ldap_fields', $data)) {
+			$form->fill($data['ldap_fields']);
 		}
 
 		$form->submit();
