@@ -65,14 +65,6 @@ class CFieldArray extends CField {
 		return this.getInnerValue(true);
 	}
 
-	_appendErrorHint(error_hint) {
-		this._field.parentNode.parentNode.appendChild(error_hint);
-	}
-
-	_toggleError() {
-		this._field.parentNode.classList.toggle('has-error', this.hasErrorHint());
-	}
-
 	#detectFieldChanges = () => {
 		this.#discoverAllFields();
 
@@ -94,6 +86,9 @@ class CFieldArray extends CField {
 					field_instance = new CForm.field_types[field_type](field);
 					field_instance.init();
 					field_instance.setTabId(this._tab_id);
+				}
+				else {
+					field_instance.updateState();
 				}
 
 				fields.push(field_instance);

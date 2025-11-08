@@ -22,56 +22,40 @@ class CFieldSet extends CField {
 	 */
 	#fields = {};
 
-	/**
-	 * On frequent MutationObserver dispatching "field.change" event.
-	 *
-	 * @type {Number|Null}
-	 */
-	#on_blur_debounce = null;
-
 	init() {
 		super.init();
 
 		this.#discoverAllFields();
 
 		const observer = new MutationObserver(observations => {
-			/*
-			 * Observer is launched also when error message node is added (because childList is observer).
-			 * This must be skipped.
-			 */
+			let node_change = false;
+			let attribute_change = false;
 
-			// Check that only a temporary element was created or deleted.
-			const has_not_direct_temp_field = observations.some((obs) => {
-				return [...obs.addedNodes, ...obs.removedNodes]
-					.some((n) => n.nodeType == Node.ELEMENT_NODE && !n.hasAttribute('data-temp-field'))
-			});
+			for (const obs of observations) {
+				if (obs.type === 'childList') {
+					node_change = [...obs.addedNodes, ...obs.removedNodes]
+						.some(node => {
+							const is_field = '[data-field-type]:not([data-temp-field])';
 
-			if (!has_not_direct_temp_field) {
-				return;
+							return node.nodeType == Node.ELEMENT_NODE
+								&& (node.matches(is_field) || node.querySelector(is_field));
+						});
+
+					if (node_change) {
+						break;
+					}
+				}
+				else if (obs.type === 'attributes') {
+					attribute_change = attribute_change || obs.attributeName === 'data-skip-from-submit';
+				}
 			}
 
-			const skip = observations.some((obs) => {
-				return obs.type === 'childList'
-						&& [...obs.addedNodes, ...obs.removedNodes]
-								.filter((n) => n.nodeType == Node.ELEMENT_NODE)
-								.every((n) => n.classList.contains('error') || n.classList.contains('error-list'));
-			});
+			if (node_change) {
+				this.#discoverAllFields();
+			}
 
-			let force_validate = Object.values(this.#fields).length == 0;
-
-			// Later discovered fields are automatically made changed to allow it to show errors immediately.
-			this.#discoverAllFields();
-
-			// Validate anyway if there were no fields and now some are made.
-			force_validate = force_validate && Object.values(this.#fields).length != 0;
-
-			// Validate anyway if some of field has received or lost 'data-skip-from-submit' attribute.
-			force_validate = force_validate
-				|| observations.some(obs => obs.type === 'attributes' && obs.attributeName === 'data-skip-from-submit');
-
-			if (force_validate || !skip) {
-				clearTimeout(this.#on_blur_debounce);
-				this.#on_blur_debounce = setTimeout(() => this.onBlur(), 50);
+			if (node_change || attribute_change) {
+				this.onBlur();
 			}
 		});
 
@@ -102,6 +86,7 @@ class CFieldSet extends CField {
 
 				for (const existing_field of Object.values(this.#fields)) {
 					if (existing_field.isSameField(discovered_field)) {
+						existing_field.updateState();
 						fields_rediscovered.push(existing_field.getName());
 						field_instance = existing_field;
 						break;
@@ -143,7 +128,7 @@ class CFieldSet extends CField {
 		let result = {};
 
 		for (const field of Object.values(this.#fields)) {
-			if (field._field.hasAttribute('data-skip-from-submit')) {
+			if (field._field.hasAttribute('data-skip-from-submit') || field.isDisabled()) {
 				continue;
 			}
 

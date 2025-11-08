@@ -25,7 +25,8 @@ class CForm {
 		'set': CFieldSet,
 		'text-box': CFieldTextBox,
 		'textarea': CFieldTextarea,
-		'z-select': CFieldZSelect
+		'z-select': CFieldZSelect,
+		'file': CFieldFile
 	};
 	#form = null;
 	#rules = null;
@@ -75,7 +76,7 @@ class CForm {
 	}
 
 	reload(rules) {
-		this.release();
+		this.#reset();
 
 		this.#rules = rules;
 		this.discoverAllFields();
@@ -89,7 +90,7 @@ class CForm {
 		this.#form_ready = true;
 	}
 
-	release() {
+	#reset() {
 		this.#form_ready = false;
 
 		for (const field of Object.values(this.#fields)) {
@@ -102,6 +103,10 @@ class CForm {
 
 		clearTimeout(this.#validate_changes_timeout);
 		this.#validate_changes_call = null;
+	}
+
+	release() {
+		this.#reset();
 		document.removeEventListener('mousedown', this.#listeners.mousedown);
 		document.removeEventListener('mouseup', this.#listeners.mouseup);
 	}
@@ -115,6 +120,7 @@ class CForm {
 			// If instance is already created.
 			for (const existing_field of Object.values(this.#fields)) {
 				if (existing_field.isSameField(discovered_field)) {
+					existing_field.updateState();
 					field_instance = existing_field;
 					break;
 				}
@@ -174,17 +180,15 @@ class CForm {
 
 				if (i === key_parts.length - 1) {
 					if (typeof field.getExtraFields === 'function') {
-						for (const [extra_key, values] of Object.entries(field.getExtraFields())) {
-							if (values !== null) {
+						if (!field.isDisabled()) {
+							for (const [extra_key, values] of Object.entries(field.getExtraFields())) {
 								key_fields[extra_key] = values;
 							}
 						}
 					}
 					else {
-						let trimmed_value = field.getValueTrimmed();
-
-						if (trimmed_value !== null) {
-							key_fields[key_part] = trimmed_value;
+						if (!field.isDisabled()) {
+							key_fields[key_part] = field.getValueTrimmed();
 						}
 					}
 
