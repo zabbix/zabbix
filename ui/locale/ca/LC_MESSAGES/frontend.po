@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2025-09-19 10:32+0000\n"
+"PO-Revision-Date: 2025-10-13 11:29+0000\n"
 "Last-Translator: Xevi Noè i Nogueiras <xevi.noe@gmail.com>\n"
 "Language-Team: none\n"
 "Language: ca\n"
@@ -303,19 +303,19 @@ msgstr "(%1$s: %2$s)"
 #: include/classes/setup/CSetupWizard.php:1459
 #, c-format
 msgid "%1$s: %2$s."
-msgstr ""
+msgstr "%1$s: %2$s."
 
 #: include/classes/server/CZabbixServer.php:746
 #: include/classes/setup/CSetupWizard.php:1465
 #, c-format
 msgid "%1$s: file is not readable."
-msgstr ""
+msgstr "%1$s: l'arxiu no és llegible."
 
 #: include/classes/server/CZabbixServer.php:743
 #: include/classes/setup/CSetupWizard.php:1462
 #, c-format
 msgid "%1$s: invalid path or file not found."
-msgstr ""
+msgstr "%1$s: ruta no vàlida o arxiu no trobat."
 
 #: include/classes/graph/CSvgGraph.php:1418
 #, c-format
@@ -4206,6 +4206,10 @@ msgstr "No es pot pas establir \"%1$s\" per al prototip de gràfic \"%2$s\"."
 #: widgets/piechart/includes/CWidgetFieldDataSet.php:175
 msgid "Cannot set \"Data set aggregation\" when item with type \"Total\" is added to the chart."
 msgstr "No es pot pas establir \"Afegit del conjunt de dades\" quan s'afegeix un element de tipus \"Total\" al gràfic."
+
+#: include/classes/db/MysqlDbBackend.php:197
+msgid "Cannot set charset."
+msgstr ""
 
 #: include/classes/api/services/CItemGeneral.php:2478
 #, c-format

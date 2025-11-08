@@ -1091,7 +1091,7 @@
 	}
 }
 
-.overlay-dialogue {
+.overlay-dialogue.modal {
 	&.modal-widget-configuration {
 		--modal-width: auto;
 		--modal-max-width: calc(100vw - 20px);

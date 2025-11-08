@@ -146,11 +146,10 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 
 		$form->fill(['Use custom event status colours' => true]);
 		foreach ($color_pickers as $selector) {
-			$form->query('xpath:.//z-color-picker[@color-field-name='.CXPathHelper::escapeQuotes($selector).']')->one()
-					->click();
-			$color_picker_dialog = $this->query('class:color-picker-dialog')->asColorPicker()->one();
-			$this->assertEquals(6, $color_picker_dialog->query('class:color-picker-input')->one()->getAttribute('maxlength'));
-			$color_picker_dialog->close();
+			$overlay = $form->query('xpath:.//z-color-picker[@color-field-name='.CXPathHelper::escapeQuotes($selector).']')
+					->asColorPicker()->one()->open();
+			$this->assertEquals(6, $overlay->query('class:color-picker-input')->one()->getAttribute('maxlength'));
+			CColorPickerElement::close();
 		}
 
 		$checkboxes = [
@@ -264,7 +263,7 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 					]
 				]
 			],
-			//  #1 Unchecked checkboxes.
+			// #1 Unchecked checkboxes.
 			[
 				[
 					'fields' => [
@@ -531,7 +530,7 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 					]
 				]
 			],
-			// #16 Invalid zero values in Moths (Months not supported).
+			// #16 Invalid zero values in Months (Months not supported).
 			[
 				[
 					'expected' => TEST_BAD,
@@ -787,11 +786,11 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 			'severity_color_1', 'severity_color_2', 'severity_color_3', 'severity_color_4', 'severity_color_5'
 		];
 		foreach ($color_picker_names as $field_name) {
-			$xpath = 'xpath:.//z-color-picker[@color-field-name='.CXPathHelper::escapeQuotes($field_name).']';
-			$color_picker = $form->query($xpath)->one()->asColorPicker();
-			$color_picker->fill($data['value']);
-			$this->assertTrue($color_picker->isSubmittionDisabled());
-			$color_picker->close();
+			$overlay = $form->query('xpath:.//z-color-picker[@color-field-name='.CXPathHelper::escapeQuotes($field_name).']')
+					->asColorPicker()->one()->open();
+			$overlay->query('class:color-picker-input')->one()->fill($data['value']);
+			$this->assertTrue(CColorPickerElement::isSubmitable(false));
+			CColorPickerElement::close();
 		}
 	}
 }

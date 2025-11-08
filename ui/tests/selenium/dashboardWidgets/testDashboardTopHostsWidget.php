@@ -362,7 +362,8 @@ class testDashboardTopHostsWidget extends testWidgets {
 			'Max' => ['value' => '', 'placeholder' => 'calculated', 'maxlength' => 255, 'visible' => false, 'enabled' => false],
 			'id:sparkline_width' => ['value' => 1, 'maxlength' => 2, 'visible' => false, 'enabled' => false],
 			'id:sparkline_fill' => ['value' => 3, 'maxlength' => 2, 'visible' => false, 'enabled' => false],
-			self::PATH_TO_COLOR_PICKER.'"sparkline[color]"]' => ['color' => '42A5F5', 'visible' => false, 'enabled' => false],
+			// TODO: remove input from the sparkline color picker path when DEV-4512 is fixed.
+			self::PATH_TO_COLOR_PICKER.'"sparkline[color]"]/input' => ['value' => '42A5F5', 'visible' => false, 'enabled' => false],
 			'id:sparkline_time_period_data_source' => ['value' => 'Custom', 'labels' => ['Dashboard', 'Widget', 'Custom'],
 				'visible' => false, 'enabled' => false
 			],
@@ -513,14 +514,14 @@ class testDashboardTopHostsWidget extends testWidgets {
 						'header' => 'Threshold',
 						'color_selector' => self::PATH_TO_COLOR_PICKER.'"thresholds[0][color]"]',
 						'input_selector' => 'id:thresholds_0_threshold',
-						'color' => 'FCCB1D'
+						'color' => 'E65660'
 					]
 					: [
 						'label' => 'Highlights',
 						'header' => 'Regular expression',
 						'color_selector' => self::PATH_TO_COLOR_PICKER.'"highlights[0][color]"]',
 						'input_selector' => 'id:highlights_0_pattern',
-						'color' => 'E65660'
+						'color' => 'FCCB1D'
 					];
 
 				$color_container = $column_form->getFieldContainer(($color_table['label']));
@@ -528,7 +529,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 				$color_container->query('button:Add')->one()->waitUntilClickable()->click();
 
 				$this->checkFieldsAttributes([
-						$color_table['color_selector'] => [$color_table['color']],
+						$color_table['color_selector'] => ['color' => $color_table['color']],
 						$color_table['input_selector'] => ['value' => '', 'maxlength' => 255]
 					], $column_form
 				);
@@ -5864,7 +5865,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					]
 				]
 			],
-			// Check that widget displays bar/idnicators when aggregation function 'count' is used for non-numeric item.
+			// Check that widget displays bar/indicators when aggregation function 'count' is used for non-numeric item.
 			[
 				[
 					'widget_name' => 'Displaying count for non-numeric data via bar indicators',
@@ -6287,6 +6288,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 
 			foreach ($attributes as $attribute => $value) {
 				switch ($attribute) {
+					case 'color':
 					case 'value':
 						$this->assertEquals($value, $field->getValue());
 						break;
@@ -6302,10 +6304,6 @@ class testDashboardTopHostsWidget extends testWidgets {
 
 					case 'options':
 						$this->assertEquals($value, $field->asDropdown()->getOptions()->asText());
-						break;
-
-					case 'color':
-						$this->assertEquals($value, $form->query($label)->asColorPicker()->one()->getValue());
 						break;
 				}
 			}
