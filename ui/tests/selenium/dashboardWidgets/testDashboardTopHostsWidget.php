@@ -17,11 +17,11 @@
 require_once __DIR__.'/../common/testWidgets.php';
 
 /**
- * @dataSource AllItemValueTypes, ItemValueWidget, GlobalMacros, TopHostsWidget
+ * @dataSource AllItemValueTypes, TopHostsWidget, ItemValueWidget, GlobalMacros
  *
  * @backup profiles
  *
- * @onBefore prepareData
+ * @onBefore prepareSparklineData, prepareData
  */
 class testDashboardTopHostsWidget extends testWidgets {
 
@@ -3291,8 +3291,6 @@ class testDashboardTopHostsWidget extends testWidgets {
 
 	/**
 	 * Check widget bars, indicators and sparkline with screenshots.
-	 *
-	 * @onBeforeOnce prepareSparklineData
 	 *
 	 * @dataProvider getScreenshotsData
 	 */
