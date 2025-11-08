@@ -278,7 +278,10 @@ class CFormValidator {
 						}
 
 						$result[$key] = $value;
+						break;
 
+					case 'count_values':
+						$result[$key] = $this->normalizeCountValuesRules($value, $rule_path);
 						break;
 
 					default:
@@ -543,6 +546,66 @@ class CFormValidator {
 		unset($api_uniq_check);
 
 		return $value;
+	}
+
+	private function normalizeCountValuesRules(array $count_rules, string $rule_path): array
+	{
+		if (!is_array($count_rules)) {
+			throw new Exception('[RULES ERROR] Count values condition should be an array (Path: ' . $rule_path . ')');
+		}
+
+		if (!is_array($count_rules[0])) {
+			$count_rules = [$count_rules];
+		}
+
+		foreach ($count_rules as &$count_rule) {
+			$result = [];
+
+			foreach ($count_rule as $key => $value) {
+				switch ($key) {
+					case 0:
+						$field_path = $rule_path . '/' . $value;
+
+						if (!in_array($field_path, $this->existing_rule_paths)) {
+							throw new Exception('[RULES ERROR] Only fields defined prior to this can be used for "when" checks (Path: ' . $field_path . ')');
+						}
+
+						$result[0] = $value;
+						break;
+
+					case 'min':
+					case 'max':
+						if (!is_int($value)) {
+							throw new Exception('[RULES ERROR] Rule "' . $key . '" should contain a number (Path: ' . $rule_path . ')');
+						}
+
+						$result[$key] = $value;
+						break;
+
+					case 'message':
+					case 'in':
+					case 'not_in':
+						$result[$key] = $value;
+						break;
+
+					default:
+						throw new Exception('[RULES ERROR] Unknown count values rule "' . $key . '" (Path: ' . $rule_path . ')');
+				}
+			}
+
+			if (!array_key_exists(0, $result)) {
+				throw new Exception('[RULES ERROR] Counted field path is required (Path: ' . $rule_path . ')');
+			}
+
+			if (count(array_intersect(array_keys($result), ['min', 'max'])) == 0) {
+				throw new Exception('[RULES ERROR] Counted field requires min or max rule (Path: ' . $rule_path . ')');
+			}
+
+			$count_rule = $result;
+		}
+		unset($count_rule);
+
+		return $count_rules;
 	}
 
 	/**
@@ -1213,16 +1276,26 @@ class CFormValidator {
 			];
 		}
 
-		foreach ($objects_values as $index => &$value) {
-			$path_to_test = $path.'/'.$index;
-			if (!$this->validateObject(['fields' => $rules['fields']], $value, $error, $path_to_test)) {
-				// Through the reference, give back to the caller which field failed.
-				$path = $path_to_test;
+		if (array_key_exists('fields', $rules)) {
+			foreach ($objects_values as $index => &$value) {
+				$path_to_test = $path . '/' . $index;
+				if (!$this->validateObject(['fields' => $rules['fields']], $value, $error, $path_to_test)) {
+					// Through the reference, give back to the caller which field failed.
+					$path = $path_to_test;
 
-				return false;
+					return false;
+				}
+			}
+			unset($value);
+		}
+
+		if (array_key_exists('count_values', $rules)) {
+			foreach ($rules['count_values'] as $count_rule) {
+				if (!$this->validateObjectsCount($count_rule, $objects_values, $path, $error)) {
+					return false;
+				}
 			}
 		}
-		unset($value);
 
 		return true;
 	}
@@ -2101,5 +2174,44 @@ class CFormValidator {
 
 				return true;
 		}
+	}
+
+	private function validateObjectsCount(array $count_rules, array $objects, string $path, ?string &$error): bool {
+		if (array_key_exists('when', $count_rules)) {
+			foreach ($count_rules['when'] as $when) {
+				if ($this->testWhenCondition($when, $path) === false) {
+					return true;
+				}
+			}
+		}
+
+		$field_values = array_column($objects, $count_rules[0]);
+
+		if (array_key_exists('in', $count_rules)) {
+			$field_values = array_intersect($field_values, $count_rules['in']);
+		}
+
+		if (array_key_exists('not_in', $count_rules)) {
+			$field_values = array_diff($field_values, $count_rules['not_in']);
+		}
+
+		$valid_count = count($field_values);
+
+		if (array_key_exists('min', $count_rules) && $count_rules['min'] > $valid_count) {
+			$error = array_key_exists('message', $count_rules)
+				? $count_rules['message']
+				: _s('At least %1$d items based on field "%2$s" rules', $count_rules['min'], $count_rules[0]);
+
+			return false;
+		}
+		elseif (array_key_exists('max', $count_rules) && $count_rules['max'] < $valid_count) {
+			$error = array_key_exists('message', $count_rules)
+				? $count_rules['message']
+				: _s('No more than %1$d items based on field "%2$s" rules', $count_rules['max'], $count_rules[0]);
+
+			return false;
+		}
+
+		return true;
 	}
 }

@@ -741,6 +741,13 @@ class CFormValidator {
 						}
 					});
 				}
+				else if (key === 'count_values') {
+					// count_values rules should be included only if objects key is included to not validate
+					// if subitems, that don't affect count is changed
+					if (fields.includes(rule_path)) {
+						rule[key] = value;
+					}
+				}
 				else {
 					// 'when' rule should be kept in the rules, only if this 'when' rule value matches any of fields
 					// that will need to be validated. Necessary for multilevel 'when' rules on 'object' type rules.
@@ -827,6 +834,17 @@ class CFormValidator {
 							// Add fields that relates on current lookup field.
 							if (lookup_rule_path === this.#getFieldAbsolutePath(when[0], current_rule_path)) {
 								related_fields.push(this.#getFieldAbsolutePath(current_field_name, lookup_field_path));
+							}
+						});
+					}
+					else if (rule_key === 'count_values') {
+						rule_value.forEach((count_rule) => {
+							const count_field_path = this.#getFieldAbsolutePath(count_rule[0],
+								current_rule_path + '/'
+							);
+
+							if (lookup_rule_path === count_field_path) {
+								related_fields.push(current_rule_path);
 							}
 						});
 					}
@@ -1382,6 +1400,49 @@ class CFormValidator {
 					normalized_values[key] = value;
 				}
 			}
+		}
+
+		if ('count_values' in rules) {
+			rules.count_values.forEach(count_rule => {
+				const field_values = [];
+
+				Object.values(normalized_values).forEach(obj => {
+					if (count_rule[0] in obj) {
+						let keep = true;
+
+						if ('in' in count_rule) {
+							keep = keep && count_rule['in'].includes(obj[count_rule[0]]);
+						}
+
+						if ('not_in' in count_rule) {
+							keep = keep && !count_rule['in'].includes(obj[count_rule[0]]);
+						}
+
+						if (keep) {
+							field_values.push(obj[count_rule[0]]);
+						}
+					}
+				})
+
+				if ('min' in count_rule && field_values.length < count_rule['min']) {
+					const message = 'message' in count_rule
+						? count_rule['message']
+						: sprintf(t('At least %1$d items based on field "%2$s" rules'), count_rule['min'],
+							count_rule[0]
+						);
+
+					this.#addError(path, message, CFormValidator.ERROR_LEVEL_PRIMARY);
+				}
+				else if ('max' in count_rule && field_values.length > count_rule['max']) {
+					const message = 'message' in count_rule
+						? count_rule['message']
+						: sprintf(t('No more than %1$d items based on field "%2$s" rules'), count_rule['max'],
+							count_rule[0]
+						);
+
+					this.#addError(path, message, CFormValidator.ERROR_LEVEL_PRIMARY);
+				}
+			})
 		}
 
 		if (has_error) {

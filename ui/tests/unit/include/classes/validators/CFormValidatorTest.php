@@ -844,6 +844,32 @@ class CFormValidatorTest extends TestCase {
 				]],
 				null,
 				'[RULES ERROR] Only fields defined prior to this can be used for "when" checks (Path: /dns)'
+			],
+			[
+				['object', 'fields' => [
+					'items_enabled' => ['boolean'],
+					'items' => ['objects',
+						'fields' => [
+							'field1' => ['string'],
+							'field2' => ['integer']
+						],
+						'count_values' => ['field2', 'in' => [1,2], 'min' => 3, 'max' => 100,
+							'message' => 'Must have 3-100 items with field2 equal to 1 or 2.'
+						]
+					]
+				]],
+				['type' => 'object', 'fields' => [
+					'items_enabled' => [['type' => 'integer', 'in' => [0,1]]],
+					'items' => [['type' => 'objects',
+						'fields' => [
+							'field1' => [['type' => 'string']],
+							'field2' => [['type' => 'integer']]
+						],
+						'count_values' => [['field2', 'in' => [1,2], 'min' => 3, 'max' => 100,
+							'message' => 'Must have 3-100 items with field2 equal to 1 or 2.'
+						]]
+					]]
+				]]
 			]
 		];
 	}
@@ -2088,7 +2114,9 @@ class CFormValidatorTest extends TestCase {
 				[],
 				CFormValidator::ERROR,
 				['/value' => [
-					['message' => 'This value does not match pattern.', 'level' => CFormValidator::ERROR_LEVEL_PRIMARY]
+					['message' => 'This value does not match pattern "/^([0-9]{1,})$/i".',
+						'level' => CFormValidator::ERROR_LEVEL_PRIMARY
+					]
 				]]
 			],
 			[
@@ -2509,6 +2537,67 @@ class CFormValidatorTest extends TestCase {
 				['value' => ['name' => '', 'type' => '', 'tmp_name' => 'phpunit.xml', 'error' => UPLOAD_ERR_OK,
 					'size' => 10
 				]]
+			],
+			[
+				['object', 'fields' => [
+					'items_enabled' => ['boolean'],
+					'items' => [
+						['objects', 'when' => ['items_enabled', 'exist'],
+							'fields' => [
+								'field1' => ['string'],
+								'field2' => ['integer']
+							],
+						],
+						['objects', 'when' => ['items_enabled', 'in' => [1]],
+							'count_values' => [
+								'field2', 'in' => [1,2], 'min' => 3, 'max' => 100,
+								'message' => 'Must have 3-100 items with field2 equal to 1 or 2.'
+							]
+						]
+					]
+				]],
+				['items_enabled' => 1, 'items' => [
+					['field1' => 'abc', 'field2' => 1],
+					['field1' => 'abc', 'field2' => 2],
+					['field1' => 'abc', 'field2' => 10]
+				]],
+				[],
+				CFormValidator::ERROR,
+				['/items' => [
+					['message' => 'Must have 3-100 items with field2 equal to 1 or 2.', 'level' => CFormValidator::ERROR_LEVEL_PRIMARY]
+				]]
+			],
+			[
+				['object', 'fields' => [
+					'items_enabled' => ['boolean'],
+					'items' => [
+						['objects', 'when' => ['items_enabled', 'exist'],
+							'fields' => [
+								'field1' => ['string'],
+								'field2' => ['integer']
+							],
+						],
+						['objects', 'when' => ['items_enabled', 'in' => [1]],
+							'count_values' => ['field2', 'in' => [1,2], 'min' => 3, 'max' => 100,
+								'message' => 'Must have 3-100 items with field2 equal to 1 or 2.'
+							]
+						]
+					]
+				]],
+				['items_enabled' => 1, 'items' => [
+					['field1' => 'abc', 'field2' => 1],
+					['field1' => 'abc', 'field2' => 2],
+					['field1' => 'abc', 'field2' => 10],
+					['field1' => 'abc2', 'field2' => 1]
+				]],
+				['items_enabled' => 1, 'items' => [
+					['field1' => 'abc', 'field2' => 1],
+					['field1' => 'abc', 'field2' => 2],
+					['field1' => 'abc', 'field2' => 10],
+					['field1' => 'abc2', 'field2' => 1]
+				]],
+				CFormValidator::SUCCESS,
+				[]
 			]
 		];
 	}
