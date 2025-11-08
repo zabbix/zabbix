@@ -111,42 +111,22 @@ if ($data['proxy_groupid'] !== null) {
 	$buttons = [
 		[
 			'title' => _('Update'),
-			'class' => 'js-update',
+			'class' => 'js-submit',
 			'keepOpen' => true,
-			'isSubmit' => true,
-			'action' => 'proxy_group_edit_popup.submit();'
+			'isSubmit' => true
 		],
 		[
 			'title' => _('Clone'),
 			'class' => implode(' ', [ZBX_STYLE_BTN_ALT, 'js-clone']),
 			'keepOpen' => true,
-			'isSubmit' => false,
-			'action' => 'proxy_group_edit_popup.clone('.json_encode([
-				'title' => _('New proxy group'),
-				'buttons' => [
-					[
-						'title' => _('Add'),
-						'class' => 'js-add',
-						'keepOpen' => true,
-						'isSubmit' => true,
-						'action' => 'proxy_group_edit_popup.submit();'
-					],
-					[
-						'title' => _('Cancel'),
-						'class' => implode(' ', [ZBX_STYLE_BTN_ALT, 'js-cancel']),
-						'cancel' => true,
-						'action' => ''
-					]
-				]
-			]).');'
+			'isSubmit' => false
 		],
 		[
 			'title' => _('Delete'),
 			'confirmation' => _('Delete selected proxy group?'),
 			'class' => implode(' ', [ZBX_STYLE_BTN_ALT, 'js-delete']),
 			'keepOpen' => true,
-			'isSubmit' => false,
-			'action' => 'proxy_group_edit_popup.delete();'
+			'isSubmit' => false
 		]
 	];
 }
@@ -155,10 +135,9 @@ else {
 	$buttons = [
 		[
 			'title' => _('Add'),
-			'class' => 'js-add',
+			'class' => 'js-submit',
 			'keepOpen' => true,
-			'isSubmit' => true,
-			'action' => 'proxy_group_edit_popup.submit();'
+			'isSubmit' => true
 		]
 	];
 }
