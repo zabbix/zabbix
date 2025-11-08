@@ -590,7 +590,7 @@ static int	zbx_comms_exchange_data(zbx_socket_t *sock, const char *data, zbx_add
  * Return value: SUCCEED - data was exchanged successfully                    *
  *               CONNECT_ERROR - connection error                             *
  *               SEND_ERROR - request sending error                           *
- *               READ_ERROR - response reading error                          *
+ *               RECV_ERROR - response reading error                          *
  *                                                                            *
  * Comments: If response contains valid redirect block the address list will  *
  *           be updated accordingly and connection will be retried with the   *

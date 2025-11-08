@@ -12,24 +12,27 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-package redis
+#include "zbxmocktest.h"
+#include "zbxmockdata.h"
+#include "zbxmockassert.h"
+#include "zbxmockutil.h"
 
-import (
-	"github.com/mediocregopher/radix/v3"
-)
+#include "zbxcommon.h"
+#include "zbxcomms.h"
 
-const (
-	pingFailed = 0
-	pingOk     = 1
-)
 
-// pingHandler executes 'PING' command and returns pingOk if a connection is alive or pingFailed otherwise.
-func pingHandler(conn redisClient, _ map[string]string) (interface{}, error) {
-	var res string
+void	zbx_mock_test_entry(void **state)
+{
+	const char	*host = zbx_mock_get_parameter_string("in.host");
+	char		ip[ZBX_MAX_HOSTNAME_LEN];
 
-	if _ = conn.Query(radix.Cmd(&res, "PING")); res != "PONG" {
-		return pingFailed, nil
-	}
+	ZBX_UNUSED(state);
 
-	return pingOk, nil
+	zbx_getip_by_host(host, ip, ZBX_MAX_HOSTNAME_LEN);
+
+	const char	*exp_v4 = zbx_mock_get_parameter_string("out.result_v4");
+	const char	*exp_v6 = zbx_mock_get_parameter_string("out.result_v6");
+
+	if (0 != strcmp(ip, exp_v4) && 0 != strcmp(ip, exp_v6))
+		fail_msg("Expected %s or %s, got %s", exp_v4, exp_v6, ip);
 }
