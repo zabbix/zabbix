@@ -38,6 +38,7 @@ class CFormValidator {
 	const ERROR_LEVEL_UNIQ = 2;
 	const ERROR_LEVEL_API = 3;
 	const ERROR_LEVEL_UNKNOWN = 4;
+	const ERROR_LEVEL_OBJECTS_COUNT = 5;
 
 	public function __construct(array $rules) {
 		$this->rules = $this->normalizeRules($rules);
@@ -548,17 +549,14 @@ class CFormValidator {
 		return $value;
 	}
 
-	private function normalizeCountValuesRules(array $count_rules, string $rule_path): array
-	{
-		if (!is_array($count_rules)) {
-			throw new Exception('[RULES ERROR] Count values condition should be an array (Path: ' . $rule_path . ')');
+	private function normalizeCountValuesCountFieldRules(array &$count_fields_rules, string $rule_path): array {
+		if (!is_array($count_fields_rules[0])) {
+			$count_fields_rules = [$count_fields_rules];
 		}
 
-		if (!is_array($count_rules[0])) {
-			$count_rules = [$count_rules];
-		}
+		$results = [];
 
-		foreach ($count_rules as &$count_rule) {
+		foreach ($count_fields_rules as $count_rule) {
 			$result = [];
 
 			foreach ($count_rule as $key => $value) {
@@ -567,10 +565,48 @@ class CFormValidator {
 						$field_path = $rule_path . '/' . $value;
 
 						if (!in_array($field_path, $this->existing_rule_paths)) {
-							throw new Exception('[RULES ERROR] Only fields defined prior to this can be used for "when" checks (Path: ' . $field_path . ')');
+							throw new Exception('[RULES ERROR] Only fields defined prior to this can be used for "count_values" checks (Path: ' . $field_path . ')');
 						}
 
 						$result[0] = $value;
+						break;
+
+					case 'in':
+					case 'not_in':
+						$result[$key] = $value;
+						break;
+
+					default:
+						throw new Exception('[RULES ERROR] Unknown count values field rule "' . $key . '" (Path: ' . $rule_path . ')');
+				}
+			}
+
+			$results[] = $result;
+		}
+
+		return $results;
+	}
+
+	private function normalizeCountValuesRules(array $count_rules, string $rule_path): array {
+		if (!is_array($count_rules)) {
+			throw new Exception('[RULES ERROR] Count values condition should be an array (Path: ' . $rule_path . ')');
+		}
+
+		if (array_key_exists('field_rules', $count_rules)) {
+			$count_rules = [$count_rules];
+		}
+
+		foreach ($count_rules as &$count_rule) {
+			$result = [];
+
+			foreach ($count_rule as $key => $value) {
+				switch ($key) {
+					case 'field_rules':
+						if (!is_array($value)) {
+							throw new Exception('[RULES ERROR] Count values field condition should be an array (Path: ' . $rule_path . ')');
+						}
+
+						$result['field_rules'] = $this->normalizeCountValuesCountFieldRules($value, $rule_path);
 						break;
 
 					case 'min':
@@ -583,8 +619,6 @@ class CFormValidator {
 						break;
 
 					case 'message':
-					case 'in':
-					case 'not_in':
 						$result[$key] = $value;
 						break;
 
@@ -593,7 +627,7 @@ class CFormValidator {
 				}
 			}
 
-			if (!array_key_exists(0, $result)) {
+			if (!array_key_exists('field_rules', $result)) {
 				throw new Exception('[RULES ERROR] Counted field path is required (Path: ' . $rule_path . ')');
 			}
 
@@ -1291,9 +1325,7 @@ class CFormValidator {
 
 		if (array_key_exists('count_values', $rules)) {
 			foreach ($rules['count_values'] as $count_rule) {
-				if (!$this->validateObjectsCount($count_rule, $objects_values, $path, $error)) {
-					return false;
-				}
+				$this->validateObjectsCount($count_rule, $objects_values, $path);
 			}
 		}
 
@@ -2176,42 +2208,65 @@ class CFormValidator {
 		}
 	}
 
-	private function validateObjectsCount(array $count_rules, array $objects, string $path, ?string &$error): bool {
-		if (array_key_exists('when', $count_rules)) {
-			foreach ($count_rules['when'] as $when) {
-				if ($this->testWhenCondition($when, $path) === false) {
-					return true;
+	private function validateObjectsCount(array $count_rules, array $objects, string $path): void {
+		$counted_fields = [];
+		$field_names = [];
+
+		foreach ($objects as $key => $object_values) {
+			$keep = true;
+
+			foreach ($count_rules['field_rules'] as $field_count_rules) {
+				$field_names[$field_count_rules[0]] = true;
+
+				if (array_key_exists($field_count_rules[0], $object_values)) {
+					if (array_key_exists('in', $field_count_rules)) {
+						$keep = $keep && in_array($object_values[$field_count_rules[0]], $field_count_rules['in']);
+					}
+
+					if (array_key_exists('not_in', $field_count_rules)) {
+						$keep = $keep && !in_array($object_values[$field_count_rules[0]], $field_count_rules['not_in']);
+					}
 				}
+				else {
+					$keep = false;
+				}
+
+				if (!$keep) {
+					break;
+				}
+			}
+
+			if ($keep) {
+				$counted_fields[$key] = true;
 			}
 		}
 
-		$field_values = array_column($objects, $count_rules[0]);
+		$counted_fields = array_keys($counted_fields);
+		$valid_count = count($counted_fields);
 
-		if (array_key_exists('in', $count_rules)) {
-			$field_values = array_intersect($field_values, $count_rules['in']);
-		}
-
-		if (array_key_exists('not_in', $count_rules)) {
-			$field_values = array_diff($field_values, $count_rules['not_in']);
-		}
-
-		$valid_count = count($field_values);
-
-		if (array_key_exists('min', $count_rules) && $count_rules['min'] > $valid_count) {
+		if (array_key_exists('min', $count_rules) && $count_rules['min'] > count($counted_fields)) {
 			$error = array_key_exists('message', $count_rules)
 				? $count_rules['message']
-				: _s('At least %1$d items based on field "%2$s" rules', $count_rules['min'], $count_rules[0]);
+				: _s('At least %1$d items based on field "%2$s" rules', $count_rules['min'],
+					implode('", "', array_keys($field_names))
+				);
 
-			return false;
+			$this->addError(self::ERROR, $path, $error, self::ERROR_LEVEL_OBJECTS_COUNT);
 		}
 		elseif (array_key_exists('max', $count_rules) && $count_rules['max'] < $valid_count) {
 			$error = array_key_exists('message', $count_rules)
 				? $count_rules['message']
-				: _s('No more than %1$d items based on field "%2$s" rules', $count_rules['max'], $count_rules[0]);
+				: _s('No more than %1$d items based on field "%2$s" rules', $count_rules['max'],
+					implode('", "', array_keys($field_names))
+				);
 
-			return false;
+			$field_name = array_keys($field_names)[0];
+
+			for ($i = $count_rules['max']; $i < $valid_count; $i++) {
+				$this->addError(self::ERROR, $path.'/'.$counted_fields[$i].'/'.$field_name, $error,
+					self::ERROR_LEVEL_OBJECTS_COUNT
+				);
+			}
 		}
-
-		return true;
 	}
 }

@@ -22,7 +22,7 @@ class CControllerItemPrototypeUpdate extends CControllerItemPrototype {
 	}
 
 	protected function checkInput(): bool {
-		$ret = $this->validateInput(self::getValidationRules()) && $this->validateInputExtended();
+		$ret = $this->validateInput(self::getValidationRules());
 
 		if (!$ret) {
 			$form_errors = $this->getValidationError();

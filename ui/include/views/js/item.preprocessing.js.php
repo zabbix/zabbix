@@ -694,7 +694,9 @@
 				if (window.item_edit_form) {
 					const {step} = this.closest('[data-step]').dataset;
 
-					window.item_edit_form.form.validateChanges([`preprocessing[${step}][on_fail]`]);
+					window.item_edit_form.form.validateChanges(['preprocessing',
+						`preprocessing[${step}][on_fail]`]
+					);
 				}
 
 				var $row = $(this).closest('.preprocessing-list-item'),

@@ -23,6 +23,7 @@ class CFormValidator {
 	static ERROR_LEVEL_UNIQ = 2;
 	static ERROR_LEVEL_API = 3;
 	static ERROR_LEVEL_UNKNOWN = 4;
+	static ERROR_LEVEL_OBJECTS_COUNT = 5;
 
 	/**
 	 * AbortSignal object instance used to abort currently running validation.
@@ -839,13 +840,15 @@ class CFormValidator {
 					}
 					else if (rule_key === 'count_values') {
 						rule_value.forEach((count_rule) => {
-							const count_field_path = this.#getFieldAbsolutePath(count_rule[0],
-								current_rule_path + '/'
-							);
+							count_rule.field_rules.forEach((count_field_rule) => {
+								const count_field_path = this.#getFieldAbsolutePath(count_field_rule[0],
+									current_rule_path + '/'
+								);
 
-							if (lookup_rule_path === count_field_path) {
-								related_fields.push(current_rule_path);
-							}
+								if (lookup_rule_path === count_field_path) {
+									related_fields.push(current_rule_path);
+								}
+							});
 						});
 					}
 					else if (rule_key === 'api_uniq') {
@@ -1404,43 +1407,62 @@ class CFormValidator {
 
 		if ('count_values' in rules) {
 			rules.count_values.forEach(count_rule => {
-				const field_values = [];
+				let counted_fields = {};
+				const field_names = {};
 
-				Object.values(normalized_values).forEach(obj => {
-					if (count_rule[0] in obj) {
-						let keep = true;
+				for (const [key, obj] of Object.entries(normalized_values)) {
+					let keep = true;
+					count_rule.field_rules.forEach((count_field_rule) => {
+						field_names[count_field_rule[0]] = true;
 
-						if ('in' in count_rule) {
-							keep = keep && count_rule['in'].includes(obj[count_rule[0]]);
+						if (count_field_rule[0] in obj) {
+							if ('in' in count_field_rule) {
+								keep = keep && count_field_rule['in'].includes(obj[count_field_rule[0]]);
+							}
+
+							if ('not_in' in count_field_rule) {
+								keep = keep && !count_field_rule['not_in'].includes(obj[count_field_rule[0]]);
+							}
 						}
-
-						if ('not_in' in count_rule) {
-							keep = keep && !count_rule['in'].includes(obj[count_rule[0]]);
+						else {
+							keep = false;
 						}
+					});
 
-						if (keep) {
-							field_values.push(obj[count_rule[0]]);
-						}
+					if (keep) {
+						counted_fields[key] = true
 					}
-				})
-
-				if ('min' in count_rule && field_values.length < count_rule['min']) {
-					const message = 'message' in count_rule
-						? count_rule['message']
-						: sprintf(t('At least %1$d items based on field "%2$s" rules'), count_rule['min'],
-							count_rule[0]
-						);
-
-					this.#addError(path, message, CFormValidator.ERROR_LEVEL_PRIMARY);
 				}
-				else if ('max' in count_rule && field_values.length > count_rule['max']) {
+
+				counted_fields = Object.keys(counted_fields);
+				const valid_count = counted_fields.length;
+
+				if ('min' in count_rule && valid_count < count_rule.min) {
 					const message = 'message' in count_rule
 						? count_rule['message']
-						: sprintf(t('No more than %1$d items based on field "%2$s" rules'), count_rule['max'],
-							count_rule[0]
+						: sprintf(t('At least %1$d items based on field "%2$s" rules'), count_rule.min,
+							Object.keys(field_names).concat('", "')
 						);
 
-					this.#addError(path, message, CFormValidator.ERROR_LEVEL_PRIMARY);
+					this.#addError(path, message, CFormValidator.ERROR_LEVEL_OBJECTS_COUNT);
+					has_error = true;
+				}
+				else if ('max' in count_rule && valid_count > count_rule.max) {
+					const message = 'message' in count_rule
+						? count_rule.message
+						: sprintf(t('No more than %1$d items based on field "%2$s" rules'), count_rule.max,
+							Object.keys(field_names).concat('", "')
+						);
+
+					const field_name = Object.keys(field_names).pop();
+
+					for (let i = count_rule.max; i < valid_count; i++) {
+						this.#addError(`${path}/${counted_fields[i]}/${field_name}`, message,
+							CFormValidator.ERROR_LEVEL_OBJECTS_COUNT
+						);
+					}
+
+					has_error = true;
 				}
 			})
 		}
