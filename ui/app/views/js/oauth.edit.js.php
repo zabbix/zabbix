@@ -28,14 +28,16 @@ window.oauth_edit_popup = new class {
 		this.is_advanced_form = false;
 		this.oauth_popup = null;
 		this.messages = {};
+		this.endpoints = {};
 	}
 
-	init({is_advanced_form, messages}) {
+	init({is_advanced_form, messages, endpoints}) {
 		this.overlay = overlays_stack.end();
 		this.dialogue = this.overlay.$dialogue[0];
 		this.form = this.overlay.$dialogue.$body[0].querySelector('form');
 		this.is_advanced_form = is_advanced_form;
 		this.messages = messages;
+		this.endpoints = endpoints;
 
 		this.#initForm();
 		this.#initFormEvents();
@@ -123,6 +125,16 @@ window.oauth_edit_popup = new class {
 
 		if (target.matches('[name="authorization_mode"]')) {
 			this.#updateFieldsVisibility();
+		}
+		else if (target.matches('[name="authorization_url"]') || target.matches('[name="token_url"]')) {
+			const input = this.form.querySelector('[name="client_secret"]');
+			const button = this.form.querySelector('button[name="client_secret_button"]');
+
+			if (target.value !== this.endpoints.authorization_url) {
+				button.click();
+				input.focus();
+				document.querySelector('.js-client-secret-warning').style.display = '';
+			}
 		}
 	}
 

@@ -29,8 +29,7 @@ class CControllerOauthAuthorize extends CController {
 
 		$ret = $this->validateCurl()
 			&& $this->validateInput($fields)
-			&& $this->validateState($this->getInput('state'))
-			&& $this->validateClientSecret($this->getInput('state'));
+			&& $this->validateState($this->getInput('state'));
 
 		if (!$ret) {
 			$this->setResponse((new CControllerResponseData([])));
@@ -69,37 +68,20 @@ class CControllerOauthAuthorize extends CController {
 			error(_('Invalid request.'), true);
 		}
 
-		return $result;
-	}
+		if ($result && !array_key_exists('client_secret', $state)) {
+			$result = (bool) API::MediaType()->get([
+				'output' => ['token_url', 'authorization_url'],
+				'mediatypeids' => [$state['mediatypeid']],
+				'search' => ['token_url' => $state['token_url'], 'authorization_url' => $state['authorization_url']],
+				'startSearch' => true
+			]);
 
-	protected function validateClientSecret(string $state): bool {
-		$state = json_decode(base64_decode($state, true), true);
-
-		if (!is_array($state)) {
-			error(_('Invalid request.'), true);
-
-			return false;
-		}
-
-		$mediatype = API::MediaType()->get([
-			'output' => ['client_secret', 'token_url', 'authorization_url'],
-			'mediatypeids' => [$state['mediatypeid']]
-		]);
-
-		if ($mediatype) {
-			if (preg_replace('/\?=.*/', '', $state['token_url']) === $mediatype[0]['token_url']
-					&& preg_replace('/\?=.*/', '', $state['authorization_url']) === $mediatype[0]['authorization_url']) {
-				return true;
-			}
-
-			if (!array_key_exists('client_secret', $state) && $mediatype[0]['client_secret'] !== '') {
+			if (!$result) {
 				error(_s('Incorrect value for field "%1$s": %2$s.', 'client_secret', _('cannot be empty')));
-
-				return false;
 			}
 		}
 
-		return true;
+		return $result;
 	}
 
 	protected function checkPermissions(): bool {

@@ -100,7 +100,12 @@ else {
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAriaRequired()
 			->addStyle('display: none;')
-			->setEnabled(false)
+			->setEnabled(false),
+		makeWarningIcon(
+			_('The previous client secret was cleared due to the token or authorization url change. Please update the client secret.')
+		)
+			->addStyle('display: none;')
+			->addClass('js-client-secret-warning')
 	];
 }
 
@@ -228,6 +233,10 @@ $form_grid->addItem(
 				'popup_closed' => _('Complete authentication to get tokens.'),
 				'popup_blocked_error' => _('Cannot open authorization popup window.'),
 				'authorization_error' => _('Cannot get authorization code.')
+			],
+			'endpoints' => [
+				'token_url' => $data['token_url'],
+				'authorization_url' => $data['authorization_url']
 			]
 		]) .');
 	'))->setOnDocumentReady()
