@@ -32,6 +32,7 @@
 
 #define		ZBX_IDX_JSON_ALLOCATE		256
 #define		ZBX_JSON_ALLOCATE		2048
+#define		ZBX_MAX_RESULT_WINDOW		9999
 
 const char	*value_type_str[] = {"dbl", "str", "log", "uint", "text"};
 
@@ -854,8 +855,8 @@ static int	elastic_get_values_for_period(zbx_history_elastic_data_t *data, zbx_u
 	zbx_elastic_conn_t	conn = {0};
 	char			*scroll = "?scroll=10s";
 
-	/* creating scroll context can be very slow, avoid if possible */
-	if (10000 >= *count && 0 != *count)
+	/* creating scroll context can be very extremely slow, avoid if not needed */
+	if (ZBX_MAX_RESULT_WINDOW >= *count && 0 != *count)
 		scroll = "";
 
 	if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_DEBUG))
@@ -1213,7 +1214,28 @@ static int	history_elastic_fetch(void *data, zbx_uint64_t itemid, unsigned char 
 	zbx_vector_history_record_create(&result);
 
 	if (0 == count || 0 != start)
-		ret = elastic_get_values_for_period(d, itemid, value_type, start, &count, end, &result);
+	{
+		if (0 == count)
+		{
+			/* creating scroll context can be extremely slow, also it is unlikely to be ever needed */
+			count = ZBX_MAX_RESULT_WINDOW;
+			if (SUCCEED == (ret = elastic_get_values_for_period(d, itemid, value_type, start, &count, end,
+					&result)))
+			{
+				if (0 == count)
+				{
+					zbx_history_record_vector_clean(&result, value_type);
+					ret = elastic_get_values_for_period(d, itemid, value_type, start, &count, end,
+							&result);
+				}
+			}
+		}
+		else
+		{
+			ret = elastic_get_values_for_period(d, itemid, value_type, start, &count, end,
+				&result);
+		}
+	}
 	else
 		ret = elastic_read_values_by_count(d, itemid, value_type, count, end, &result);
 
