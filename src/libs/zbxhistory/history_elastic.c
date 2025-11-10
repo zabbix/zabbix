@@ -852,6 +852,11 @@ static int	elastic_get_values_for_period(zbx_history_elastic_data_t *data, zbx_u
 				*post_url = NULL;
 	double			sec = 0;
 	zbx_elastic_conn_t	conn = {0};
+	char			*scroll = "?scroll=10s";
+
+	/* creating scroll context can be very slow, avoid if possible */
+	if (10000 >= *count && 0 != *count)
+		scroll = "";
 
 	if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_DEBUG))
 	{
@@ -914,7 +919,7 @@ static int	elastic_get_values_for_period(zbx_history_elastic_data_t *data, zbx_u
 	zbx_json_close(&query);
 
 	url_offset = 0;
-	zbx_snprintf_alloc(&post_url, &url_alloc, &url_offset, "%s*/_search?scroll=10s", value_type_str[value_type]);
+	zbx_snprintf_alloc(&post_url, &url_alloc, &url_offset, "%s*/_search%s", value_type_str[value_type], scroll);
 
 	if (SUCCEED != history_elastic_conn_init(&conn, data, post_url, "application/json", NULL, &error))
 	{
@@ -968,11 +973,14 @@ static int	elastic_get_values_for_period(zbx_history_elastic_data_t *data, zbx_u
 		zbx_json_open(conn.resp.page.data, &jp);
 		zbx_json_brackets_open(jp.start, &jp_values);
 
-		/* get the scroll id immediately, for being used in subsequent queries */
-		if (SUCCEED != zbx_json_value_by_name_dyn(&jp_values, "_scroll_id", &scroll_id, &id_alloc, NULL))
+		if ('\0' != *scroll)
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "elasticsearch version is not compatible with zabbix server. "
-					"_scroll_id tag is absent");
+			/* get the scroll id immediately, for being used in subsequent queries */
+			if (SUCCEED != zbx_json_value_by_name_dyn(&jp_values, "_scroll_id", &scroll_id, &id_alloc, NULL))
+			{
+				zabbix_log(LOG_LEVEL_WARNING, "elasticsearch version is not compatible with"
+						" zabbix server. _scroll_id tag is absent");
+			}
 		}
 
 		zbx_json_brackets_by_name(&jp_values, "hits", &jp_sub);
@@ -1007,7 +1015,7 @@ static int	elastic_get_values_for_period(zbx_history_elastic_data_t *data, zbx_u
 			}
 		}
 
-		if (1 == empty)
+		if (1 == empty || '\0' == *scroll)
 		{
 			ret = SUCCEED;
 			break;
