@@ -1145,12 +1145,6 @@ INSERT INTO trigger_tag (triggertagid, tag, value, triggerid) VALUES (99045, 'Ta
 INSERT INTO triggers (triggerid, description, expression, value, priority, state, lastchange, comments) VALUES (100064, 'Fifth trigger for tag filtering (no tags)', '{100064}>0', 0, 5, 0, '0', '');
 INSERT INTO functions (functionid, itemid, triggerid, name, parameter) VALUES (100064, 99090, 100064, 'last', '$');
 
--- Dashboard for problem hosts widget
-INSERT INTO dashboard (dashboardid, name, userid, private) VALUES (1000, 'Dashboard for Problem hosts widget', 1, 1);
-INSERT INTO dashboard_page (dashboard_pageid, dashboardid) VALUES (123450, 1000);
-INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (100000, 123450, 'problemhosts', '', 0, 0, 8, 8);
-INSERT INTO profiles (profileid,userid,idx,value_id,value_str,source,type) VALUES (4, 1, 'web.dashboard.dashboardid', 1,'','', 1);
-
 -- testPageAvailabilityReport SLA reports
 INSERT INTO hosts (hostid, host, name, status, description) VALUES (50014, 'SLA reports host', 'SLA reports host', 0, '');
 INSERT INTO interface (interfaceid, hostid, main, type, useip, ip, port) VALUES (50042, 50014, 1, 1, 1, '127.0.0.1', '10051');
@@ -1269,19 +1263,10 @@ INSERT INTO media_type (mediatypeid, type, name, status, script, show_event_menu
 INSERT INTO media_type_param (mediatype_paramid, mediatypeid, name, value) VALUES (1010, 103, 'Parameter name to be deleted', 'Parameter value to be deleted');
 INSERT INTO media_type_param (mediatype_paramid, mediatypeid, name, value) VALUES (1011, 103, '2nd parameter name to be deleted', '2nd parameter value to be deleted');
 
--- Dashboard for Graph Prototype widget
-INSERT INTO dashboard (dashboardid, name, userid, private) VALUES (1400, 'Dashboard for Graph Prototype widget', 1, 1);
-INSERT INTO dashboard_page (dashboard_pageid, dashboardid) VALUES (90004, 1400);
-INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (100099, 90004, 'graphprototype', 'Graph prototype widget for update', 0, 0, 48, 5);
-INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_graphid) VALUES (905054, 100099, 7, 'graphid.0', 600003);
-INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_str) VALUES (905055, 100099, 1, 'reference', 'RZALA');
-
-INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (120000, 90004, 'graphprototype', 'Graph prototype widget for delete', 0, 5, 48, 5);
-INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_graphid) VALUES (905056, 120000, 7, 'graphid.0', 600002);
-INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_str) VALUES (905057, 120000, 1, 'reference', 'MJHNB');
-
-INSERT INTO dashboard (dashboardid, name, userid, private) VALUES (1410, 'Dashboard for Sceenshoting Graph Prototype widgets', 1, 1);
-INSERT INTO dashboard_page (dashboard_pageid, dashboardid) VALUES (90005, 1410);
+-- testPageProblems_ProblemLinks
+INSERT INTO media_type (mediatypeid, type, name, status, script, show_event_menu, event_menu_name, event_menu_url, description) VALUES (104, 4, 'URL test webhook', 0, 'return 0;', 1, 'Webhook url for all', 'zabbix.php?action=mediatype.edit&mediatypeid=101', 'Webhook media type for URL test');
+INSERT INTO event_tag (eventtagid, eventid, tag, value) VALUES (201, 9003, 'webhook', '1');
+INSERT INTO problem_tag (problemtagid, eventid, tag, value) VALUES (201, 9003, 'webhook', '1');
 
 -- Overrides for LLD Overrides test
 INSERT INTO lld_override (lld_overrideid, itemid, name, step, evaltype, stop) values (5000, 133800, 'Override for update 1', 1, 1, 0);
