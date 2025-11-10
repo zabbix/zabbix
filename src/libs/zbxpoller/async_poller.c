@@ -427,6 +427,11 @@ static void	fd_event_clean(zbx_fd_event *fd_event)
 	event_free(fd_event->event);
 }
 
+static void	fd_event_clean_wrapper(void *data)
+{
+	fd_event_clean((zbx_fd_event*)data);
+}
+
 static void	async_poller_init(zbx_poller_config_t *poller_config, zbx_thread_poller_args *poller_args_in,
 		int process_num)
 {
@@ -436,11 +441,11 @@ static void	async_poller_init(zbx_poller_config_t *poller_config, zbx_thread_pol
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	zbx_hashset_create_ext(&poller_config->interfaces, 100, ZBX_DEFAULT_UINT64_HASH_FUNC,
-			ZBX_DEFAULT_UINT64_COMPARE_FUNC, (zbx_clean_func_t)zbx_interface_status_clean,
+			ZBX_DEFAULT_UINT64_COMPARE_FUNC, zbx_interface_status_clean_wrapper,
 			ZBX_DEFAULT_MEM_MALLOC_FUNC, ZBX_DEFAULT_MEM_REALLOC_FUNC, ZBX_DEFAULT_MEM_FREE_FUNC);
 
 	zbx_hashset_create_ext(&poller_config->fd_events, 100, fd_event_hash_func,
-			fd_event_compare_func, (zbx_clean_func_t)fd_event_clean,
+			fd_event_compare_func, fd_event_clean_wrapper,
 			ZBX_DEFAULT_MEM_MALLOC_FUNC, ZBX_DEFAULT_MEM_REALLOC_FUNC, ZBX_DEFAULT_MEM_FREE_FUNC);
 
 	if (NULL == (poller_config->base = event_base_new()))
