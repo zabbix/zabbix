@@ -636,6 +636,7 @@ static int	process_pinger_hosts(zbx_hashset_t *pinger_items, int process_num, in
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 
 	return processed_num;
+#undef EXEC_TIME_DELTA
 }
 
 /******************************************************************************
