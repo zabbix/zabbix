@@ -828,9 +828,21 @@ static int	history_sql_get_info(void *data, zbx_history_provider_info_t *info, c
  ******************************************************************************/
 static void	history_sql_validate_options(const zbx_history_option_t *options, int options_num)
 {
-	const char	*supported_options = "name,log_slow_queries,types,source_ip,"
-				"ssl_cert_file,ssl_key_file,ssl_key_password,ssl_verify_peer,ssl_verify_host,"
-				"ssl_ca_location,ssl_cert_location,ssl_key_location,precache";
+	const char	*supported_options = ""
+				HISTORY_PROVIDER_OPTION_NAME ","
+				HISTORY_PROVIDER_OPTION_LOG_SLOW_QUERIES ","
+				HISTORY_PROVIDER_OPTION_VALUE_TYPES ","
+				HISTORY_PROVIDER_OPTION_SOURCE_IP ","
+				HISTORY_PROVIDER_OPTION_SSL_CERT_FILE ","
+				HISTORY_PROVIDER_OPTION_SSL_KEY_FILE ","
+				HISTORY_PROVIDER_OPTION_SSL_KEY_PASSWORD ","
+				HISTORY_PROVIDER_OPTION_SSL_VERIFY_PEER ","
+				HISTORY_PROVIDER_OPTION_SSL_VERIFY_HOST ","
+				HISTORY_PROVIDER_OPTION_SSL_CA_LOCATION ","
+				HISTORY_PROVIDER_OPTION_SSL_CERT_LOCATION ","
+				HISTORY_PROVIDER_OPTION_SSL_KEY_LOCATION ","
+				HISTORY_PROVIDER_OPTION_PRECACHE ","
+			;
 
 	for (int i = 0; i < options_num; i++)
 	{

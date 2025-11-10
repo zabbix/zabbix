@@ -301,19 +301,24 @@ int	history_provider_parse_options(const char *conf, char **name, zbx_vector_his
 	if (SUCCEED != history_get_options(ptr, options, error))
 		return FAIL;
 
-	if (NULL == (ptr = history_option_value(options->values, options->values_num, HISTORY_PROVIDER_OPTION_TYPES)))
+	if (0 != strncmp(conf, HISTORY_PROVIDER_SQL, ZBX_CONST_STRLEN(HISTORY_PROVIDER_SQL)))
 	{
-		for (int i = 0; i < options->values_num; i++)
+		/* value_types option is mandatory for non default providers */
+		if (NULL == (ptr = history_option_value(options->values, options->values_num,
+				HISTORY_PROVIDER_OPTION_VALUE_TYPES)))
 		{
-			zbx_free(options->values[i].name);
-			zbx_free(options->values[i].value);
+			for (int i = 0; i < options->values_num; i++)
+			{
+				zbx_free(options->values[i].name);
+				zbx_free(options->values[i].value);
+			}
+			zbx_vector_history_option_clear(options);
+
+			*error = zbx_dsprintf(NULL, "cannot find mandatory option \"%s\" in history provider"
+					" configuration \"%s\"", HISTORY_PROVIDER_OPTION_VALUE_TYPES, conf);
+
+			return FAIL;
 		}
-		zbx_vector_history_option_clear(options);
-
-		*error = zbx_dsprintf(NULL, "cannot find mandatory option \"%s\" in history provider configuration"
-				" \"%s\"", HISTORY_PROVIDER_OPTION_TYPES, conf);
-
-		return FAIL;
 	}
 
 	/* unquoted string extraction never fails */
@@ -346,11 +351,8 @@ zbx_uint64_t	history_options_type_mask(const zbx_history_option_t *options, int 
 	zbx_uint64_t	mask = 0;
 	const char	*types;
 
-	if (NULL == (types = history_option_value(options, options_num, HISTORY_PROVIDER_OPTION_TYPES)))
-	{
-		THIS_SHOULD_NEVER_HAPPEN;
+	if (NULL == (types = history_option_value(options, options_num, HISTORY_PROVIDER_OPTION_VALUE_TYPES)))
 		return 0;
-	}
 
 	for (int i = 0; i < ITEM_VALUE_TYPE_COUNT; i++)
 	{
@@ -418,7 +420,7 @@ zbx_history_option_t	history_option_types(zbx_uint64_t mask)
 		zbx_strcpy_alloc(&types, &types_alloc, &types_offset, history_options_value_types[i]);
 	}
 
-	option.name = zbx_strdup(NULL, HISTORY_PROVIDER_OPTION_TYPES);
+	option.name = zbx_strdup(NULL, HISTORY_PROVIDER_OPTION_VALUE_TYPES);
 	option.value = types;
 
 	return option;

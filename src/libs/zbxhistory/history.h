@@ -18,10 +18,6 @@
 #include "zbxhistory_provider.h"
 #include "zbxtypes.h"
 
-#define HISTORY_PROVIDER_SQL		"sql"	/* default provider */
-#define HISTORY_PROVIDER_ELASTIC	"elastic"
-#define HISTORY_PROVIDER_CLICKHOUSE	"clickhouse"
-
 typedef struct
 {
 	zbx_history_provider_write_t		write;

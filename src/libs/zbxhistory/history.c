@@ -294,7 +294,7 @@ static void	history_manager_registry_update_types(zbx_history_manager_t *manager
 	{
 		zbx_history_option_t	*option = &registry->options.values[i];
 
-		if (0 == strcmp(option->name, HISTORY_PROVIDER_OPTION_TYPES))
+		if (0 == strcmp(option->name, HISTORY_PROVIDER_OPTION_VALUE_TYPES))
 		{
 			history_options_clear(option, 1);
 			zbx_vector_history_option_remove_noorder(&registry->options, i);
@@ -313,7 +313,7 @@ static void	history_manager_registry_update_types(zbx_history_manager_t *manager
  *                                                                            *
  * Return value: index of the default provider                                *
  *                                                                            *
- * Comments: Default history provider is one with types set to '*' or SQL.    *
+ * Comments: Default history provider is SQL.                                 *
  *                                                                            *
  ******************************************************************************/
 static int	history_manager_get_default_provider(zbx_history_manager_t *manager)
@@ -322,20 +322,11 @@ static int	history_manager_get_default_provider(zbx_history_manager_t *manager)
 
 	for (int i = 0; i < manager->registry.values_num; i++)
 	{
-		zbx_history_registry_t	*registry = manager->registry.values[i];
-		const char		*types;
-
-		types = history_option_value(registry->options.values, registry->options.values_num,
-				HISTORY_PROVIDER_OPTION_TYPES);
-
-		if (NULL != types && '*' == *types)
+		if (0 == strcmp(manager->registry.values[i]->name, HISTORY_PROVIDER_SQL))
 			return i;
-
-		if (0 == strcmp(registry->name, HISTORY_PROVIDER_SQL))
-			sql_index = i;
 	}
 
-	return sql_index;
+	return FAIL;
 }
 
 /*******************************************************************************
@@ -383,7 +374,7 @@ static int	history_manager_init(zbx_history_manager_t *manager, const char *conf
 	{
 		zbx_vector_history_option_append(&options, history_option_str(HISTORY_PROVIDER_OPTION_URL,
 				config_history_storage_url));
-		zbx_vector_history_option_append(&options, history_option_str(HISTORY_PROVIDER_OPTION_TYPES,
+		zbx_vector_history_option_append(&options, history_option_str(HISTORY_PROVIDER_OPTION_VALUE_TYPES,
 				config_history_storage_opts));
 		zbx_vector_history_option_append(&options, history_option_int(HISTORY_PROVIDER_OPTION_LOG_SLOW_QUERIES,
 				config_log_slow_queries));

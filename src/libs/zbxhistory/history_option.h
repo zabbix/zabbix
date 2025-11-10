@@ -19,6 +19,10 @@
 #include "zbxtypes.h"
 #include "zbxalgo.h"
 
+#define HISTORY_PROVIDER_SQL		"sql"	/* default provider */
+#define HISTORY_PROVIDER_ELASTIC	"elastic"
+#define HISTORY_PROVIDER_CLICKHOUSE	"clickhouse"
+
 #define HISTORY_PROVIDER_OPTION_NAME			"name"
 #define HISTORY_PROVIDER_OPTION_PATH			"path"
 #define HISTORY_PROVIDER_OPTION_LOG_SLOW_QUERIES	"log_slow_queries"
@@ -26,7 +30,7 @@
 #define HISTORY_PROVIDER_OPTION_USERNAME		"username"
 #define HISTORY_PROVIDER_OPTION_PASSWORD		"password"
 #define HISTORY_PROVIDER_OPTION_DB			"db"
-#define HISTORY_PROVIDER_OPTION_TYPES			"types"
+#define HISTORY_PROVIDER_OPTION_VALUE_TYPES		"value_types"
 #define HISTORY_PROVIDER_OPTION_DATE_INDEX		"date_index"
 #define HISTORY_PROVIDER_OPTION_PRECACHE		"precache"
 #define HISTORY_PROVIDER_OPTION_SOURCE_IP		"source_ip"
