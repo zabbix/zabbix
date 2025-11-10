@@ -16,6 +16,7 @@
 #define ZABBIX_MOCK_DATA_H
 
 #include "zbxtime.h"
+#include "zbxalgo.h"
 
 int	zbx_mock_data_init(void **state);
 int	zbx_mock_data_free(void **state);
@@ -73,5 +74,10 @@ zbx_mock_error_t	zbx_timespec_to_strtime(const zbx_timespec_t *ts, char *buffer,
 
 /* miscelanious functions */
 void	zbx_set_fopen_mock_callback(FILE *(*fopen_callback)(const char *, const char *));
+
+/* test setup functions for zbx_comms library*/
+void	zbx_comms_mock_poll_set_mode_from_param(const char *param);
+void	zbx_comms_set_test_comms(int status);
+void	zbx_comms_setup_read(zbx_vector_int32_t *v);
 
 #endif	/* ZABBIX_MOCK_DATA_H */

@@ -2136,12 +2136,12 @@ button {
   background-color: #e0e0e0;
   border-color: #e0e0e0; }
 
-.overlay-dialogue.modal-widget-configuration {
+.overlay-dialogue.modal.modal-widget-configuration {
   --modal-width: auto;
   --modal-max-width: calc(100vw - 20px);
   --modal-min-width: 650px;
   box-sizing: border-box; }
-  .overlay-dialogue.modal-widget-configuration .overlay-dialogue-body {
+  .overlay-dialogue.modal.modal-widget-configuration .overlay-dialogue-body {
     overflow-x: auto; }
 
 .dashboard-widget-form {
@@ -5473,7 +5473,7 @@ div.dashboard-widget-navtree .navtree .tree .tree-item .tree-row {
 form.dashboard-widget-piechart {
   max-width: 1330px;
   min-width: 1120px;
-  width: 100vw; }
+  width: min(100vw - 42px, calc(var(--modal-max-width) - 22px)); }
   form.dashboard-widget-piechart .pie-chart-widget-config-tabs {
     grid-column: 1 / -1; }
   form.dashboard-widget-piechart .pie-chart-widget-config-tabs > .tabs-nav {
@@ -5618,7 +5618,7 @@ div.dashboard-widget-problemsbysv .by-severity-widget > div {
 form.dashboard-widget-svggraph {
   max-width: 1330px;
   min-width: 1120px;
-  width: 100vw; }
+  width: min(100vw - 42px, calc(var(--modal-max-width) - 22px)); }
   form.dashboard-widget-svggraph .graph-widget-config-tabs {
     grid-column: 1 / -1; }
   form.dashboard-widget-svggraph .graph-widget-config-tabs > .tabs-nav {
@@ -7727,6 +7727,9 @@ z-select[disabled] .focusable, input[disabled], textarea[disabled], select optio
   .tags-wrapper .tag {
     margin-top: 1px;
     margin-bottom: 1px; }
+  .tags-wrapper.form-field .tag {
+    margin-top: 4px;
+    margin-bottom: 4px; }
 
 .tag {
   display: inline-block;
