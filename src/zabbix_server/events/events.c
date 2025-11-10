@@ -537,6 +537,7 @@ zbx_db_event	*zbx_add_event(unsigned char source, unsigned char object, zbx_uint
  *             trigger_priority            - [IN]                                             *
  *             trigger_type                - [IN] TRIGGER_TYPE_* defines                      *
  *             trigger_opdata              - [IN] trigger operational data                    *
+ *             trigger_tags                - [IN]                                             *
  *             event_name                  - [IN]                                             *
  *                                                                                            *
  * Return value: Recovery event, created to close the specified event.                        *
@@ -546,15 +547,15 @@ static zbx_db_event	*close_trigger_event(zbx_uint64_t eventid, zbx_uint64_t obje
 		zbx_uint64_t userid, zbx_uint64_t correlationid, zbx_uint64_t c_eventid,
 		const char *trigger_description, const char *trigger_expression,
 		const char *trigger_recovery_expression, unsigned char trigger_priority, unsigned char trigger_type,
-		const char *trigger_opdata, const char *event_name)
+		const char *trigger_opdata, const zbx_vector_tags_ptr_t *trigger_tags, const char *event_name)
 {
 	zbx_event_recovery_t	recovery_local;
 	zbx_db_event		*r_event;
 
 	r_event = zbx_add_event(EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER, objectid, ts, TRIGGER_VALUE_OK,
 			trigger_description, trigger_expression, trigger_recovery_expression, trigger_priority,
-			trigger_type, NULL, ZBX_TRIGGER_CORRELATION_NONE, "", TRIGGER_VALUE_PROBLEM, trigger_opdata,
-			event_name, NULL);
+			trigger_type, trigger_tags, ZBX_TRIGGER_CORRELATION_NONE, "", TRIGGER_VALUE_PROBLEM,
+			trigger_opdata, event_name, NULL);
 
 	recovery_local.eventid = eventid;
 	recovery_local.objectid = objectid;
@@ -1314,7 +1315,7 @@ static void	correlation_execute_operations(const zbx_correlation_t *correlation,
 						correlation->correlationid, event->eventid, event->trigger.description,
 						event->trigger.expression, event->trigger.recovery_expression,
 						event->trigger.priority, event->trigger.type, event->trigger.opdata,
-						event->trigger.event_name);
+						NULL, event->trigger.event_name);
 
 				event->flags |= ZBX_FLAGS_DB_EVENT_NO_ACTION;
 				r_event->flags |= ZBX_FLAGS_DB_EVENT_NO_ACTION;
@@ -1707,7 +1708,8 @@ static void	flush_correlation_queue(zbx_vector_trigger_diff_ptr_t *trigger_diff,
 				close_trigger_event(recovery->eventid, recovery->objectid, &recovery->ts, 0,
 						recovery->correlationid, recovery->c_eventid, trigger->description,
 						trigger->expression, trigger->recovery_expression,
-						trigger->priority, trigger->type, trigger->opdata, trigger->event_name);
+						trigger->priority, trigger->type, trigger->opdata, &trigger->tags,
+						trigger->event_name);
 
 				closed_num++;
 			}
@@ -3213,7 +3215,7 @@ int	zbx_close_problem(zbx_uint64_t triggerid, zbx_uint64_t eventid, zbx_uint64_t
 		{
 			r_event = close_trigger_event(eventid, triggerid, &ts, userid, 0, 0, trigger.description,
 				trigger.expression, trigger.recovery_expression, trigger.priority,
-				trigger.type, trigger.opdata, trigger.event_name);
+				trigger.type, trigger.opdata, &trigger.tags, trigger.event_name);
 
 			r_event->eventid = zbx_db_get_maxid_num("events", 1);
 
