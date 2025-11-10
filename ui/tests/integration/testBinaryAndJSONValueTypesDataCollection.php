@@ -497,7 +497,7 @@ class testBinaryAndJSONValueTypesDataCollection extends CIntegrationTest {
 		]);
 
 		$json_data_http_response = self::json_data_http_response;
-		$this->assertEquals($json_data_http_response, $json_dep_data[0]['value']);
+		$this->assertEquals($json_data_http_response, $json_dep_data['result'][0]['value']);
 
 		$this->checkItemState('agent:BINARY_IMAGE', ITEM_STATE_NORMAL);
 		$this->checkItemState('agent:BINARY_IMAGE_EMPTY', ITEM_STATE_NORMAL);
