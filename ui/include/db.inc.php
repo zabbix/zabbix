@@ -506,23 +506,21 @@ function dbConditionInt($field_name, array $values, $not_in = false, $zero_inclu
 	natsort($values);
 	$values = array_values($values);
 
-	$singles = array_map(function($value) {
-		return dbQuoteInt($value);
-	}, $values);
+	foreach ($values as &$value) {
+		$value = dbQuoteInt($value);
+	}
+	unset($value);
 
-	$singles_count = count($singles);
 	$multiple_conditions = false;
 
-	if ($singles_count != 0) {
-		if ($condition !== '') {
-			$condition .= $not_in ? ' AND ' : ' OR ';
-			$multiple_conditions = true;
-		}
-
-		$condition .= $singles_count == 1
-			? $field_name.($not_in ? '!=' : '=').$singles[0]
-			: $field_name.($not_in ? ' NOT' : '').' IN ('.implode(',', $singles).')';
+	if ($condition !== '') {
+		$condition .= $not_in ? ' AND ' : ' OR ';
+		$multiple_conditions = true;
 	}
+
+	$condition .= count($values) == 1
+		? $field_name.($not_in ? '!=' : '=').$values[0]
+		: $field_name.($not_in ? ' NOT' : '').' IN ('.implode(',', $values).')';
 
 	if (!$not_in && $multiple_conditions) {
 		$condition = '('.$condition.')';
