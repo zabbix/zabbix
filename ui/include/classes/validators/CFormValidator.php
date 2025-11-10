@@ -628,7 +628,7 @@ class CFormValidator {
 			}
 
 			if (!array_key_exists('field_rules', $result)) {
-				throw new Exception('[RULES ERROR] Counted field path is required (Path: ' . $rule_path . ')');
+				throw new Exception('[RULES ERROR] Counted field_rules is required (Path: ' . $rule_path . ')');
 			}
 
 			if (count(array_intersect(array_keys($result), ['min', 'max'])) == 0) {

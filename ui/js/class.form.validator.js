@@ -1410,7 +1410,11 @@ class CFormValidator {
 				let counted_fields = {};
 				const field_names = {};
 
-				for (const [key, obj] of Object.entries(normalized_values)) {
+				for (const [key, obj] of Object.entries(objects_values)) {
+					if (typeof(obj) !== 'object' || obj === null) {
+						continue;
+					}
+
 					let keep = true;
 					count_rule.field_rules.forEach((count_field_rule) => {
 						field_names[count_field_rule[0]] = true;
