@@ -1435,6 +1435,8 @@ static int	evaluate_AVG(zbx_variant_t *value, const zbx_dc_evaluate_item_t *item
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
+	zbx_history_record_vector_create(&values);
+
 	if (ITEM_VALUE_TYPE_FLOAT != item->value_type && ITEM_VALUE_TYPE_UINT64 != item->value_type)
 	{
 		*error = zbx_strdup(*error, "invalid value type");
@@ -1453,14 +1455,6 @@ static int	evaluate_AVG(zbx_variant_t *value, const zbx_dc_evaluate_item_t *item
 		*error = zbx_strdup(*error, "invalid second parameter");
 		goto out;
 	}
-
-	if (NULL == value)
-	{
-		ret = SUCCEED;
-		goto ret;
-	}
-
-	zbx_history_record_vector_create(&values);
 
 	ts_end.sec -= selector->timeshift;
 
@@ -1515,7 +1509,7 @@ static int	evaluate_AVG(zbx_variant_t *value, const zbx_dc_evaluate_item_t *item
 	}
 out:
 	zbx_history_record_vector_destroy(&values, item->value_type);
-ret:
+
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
