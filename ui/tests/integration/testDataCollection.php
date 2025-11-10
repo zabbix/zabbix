@@ -31,6 +31,8 @@ class testDataCollection extends CIntegrationTest {
 	 * @inheritdoc
 	 */
 	public function prepareData() {
+		$this->generateCertificates();
+
 		// Create proxy "proxy".
 		CDataHelper::call('proxy.create', [
 			'name' => 'proxy',
@@ -276,6 +278,105 @@ class testDataCollection extends CIntegrationTest {
 	}
 
 	/**
+	 * Generate CA, server and agent certificates for TLS testing.
+	 */
+	private function generateCertificates() {
+
+		$baseDir = '/tmp/zabbix_cert/';
+		if (!is_dir($baseDir)) {
+			mkdir($baseDir, 0777, true);
+		}
+
+		$baseDir = '/tmp/zabbix_cert/';
+		$caKey = $baseDir . 'zabbix_ca_file.key';
+		$caCert = $baseDir . 'zabbix_ca_file.crt';
+		$serverKey = $baseDir . 'zabbix_server.key';
+		$serverCsr = $baseDir . 'zabbix_server.csr';
+		$serverCert = $baseDir . 'zabbix_server.crt';
+		$agentKey = $baseDir . 'zabbix_agentd.key';
+		$agentCsr = $baseDir . 'zabbix_agentd.csr';
+		$agentCert = $baseDir . 'zabbix_agentd.crt';
+		$proxyKey = $baseDir . 'zabbix_proxy.key';
+		$proxyCsr = $baseDir . 'zabbix_proxy.csr';
+		$proxyCert = $baseDir . 'zabbix_proxy.crt';
+
+		// CA
+		shell_exec("openssl genrsa -out $caKey 4096");
+		shell_exec("openssl req -x509 -new -nodes -key $caKey -sha256 -days 3650 -out $caCert -subj '/CN=ZabbixCA'");
+
+		// Server
+		shell_exec("openssl genrsa -out $serverKey 2048");
+		shell_exec("openssl req -new -key $serverKey -out $serverCsr -subj '/CN=zabbix_server'");
+		shell_exec("openssl x509 -req -in $serverCsr -CA $caCert -CAkey $caKey -CAcreateserial -out $serverCert -days 365 -sha256");
+
+		// Agent
+		shell_exec("openssl genrsa -out $agentKey 2048");
+		shell_exec("openssl req -new -key $agentKey -out $agentCsr -subj '/CN=zabbix_agent'");
+		shell_exec("openssl x509 -req -in $agentCsr -CA $caCert -CAkey $caKey -CAcreateserial -out $agentCert -days 365 -sha256");
+
+		// Proxy
+		shell_exec("openssl genrsa -out $proxyKey 2048");
+		shell_exec("openssl req -new -key $proxyKey -out $proxyCsr -subj '/CN=zabbix_proxy'");
+		shell_exec("openssl x509 -req -in $proxyCsr -CA $caCert -CAkey $caKey -CAcreateserial -out $proxyCert -days 365 -sha256");
+
+		$serverVerify = shell_exec("openssl verify -CAfile $caCert $serverCert");
+		$agentVerify = shell_exec("openssl verify -CAfile $caCert $agentCert");
+		$proxyVerify = shell_exec("openssl verify -CAfile $caCert $proxyCert");
+
+		$this->assertStringContainsString('OK', $serverVerify, 'Server certificate verification failed');
+		$this->assertStringContainsString('OK', $agentVerify, 'Agent certificate verification failed');
+		$this->assertStringContainsString('OK', $proxyVerify, 'Proxy certificate verification failed');
+	}
+
+	/**
+	 * Update proxy host to use TLS certificates.
+	 */
+	private function updateProxyHostTLS() {
+		$proxy = $this->call('proxy.get', [
+			'filter' => ['name' => 'proxy'],
+			'output' => ['proxyid']
+		]);
+		if (empty($proxy['result'])) {
+			throw new Exception('Proxy not found');
+		}
+		$proxyid = $proxy['result'][0]['proxyid'];
+
+		$response = $this->call('proxy.update', [
+			'proxyid' => $proxyid,
+			'tls_connect' => 1,
+			'tls_accept' => 4, // certificate
+			'tls_issuer' => 'CN=ZabbixCA',
+			'tls_subject' => 'CN=zabbix_proxy'
+		]);
+		$this->assertArrayHasKey('proxyids', $response['result']);
+		$this->assertEquals(1, count($response['result']['proxyids']));
+	}
+
+	/**
+	 * Update agent host to use TLS certificates.
+	 */
+	private function updateAgentHostTLS() {
+		$agentHost = $this->call('host.get', [
+			'filter' => ['host' => 'proxy_agent'],
+			'output' => ['hostid']
+		]);
+		if (empty($agentHost['result'])) {
+			throw new Exception('Agent host not found');
+		}
+		$hostid = $agentHost['result'][0]['hostid'];
+
+		$response = $this->call('host.update', [
+			'hostid' => $hostid,
+			'tls_connect' => 4, // certificate
+			'tls_accept' => 4,
+			'tls_issuer' => 'CN=ZabbixCA',
+			'tls_subject' => 'CN=zabbix_agent'
+		]);
+		$this->assertArrayHasKey('hostids', $response['result']);
+		$this->assertEquals(1, count($response['result']['hostids']));
+	}
+
+	/**
 	 * Component configuration provider for proxy related tests.
 	 *
 	 * @return array
@@ -286,7 +387,10 @@ class testDataCollection extends CIntegrationTest {
 				'UnreachablePeriod' => 5,
 				'UnavailableDelay' => 5,
 				'UnreachableDelay' => 1,
-				'DebugLevel' => 4
+				'DebugLevel' => 4,
+				'TLSCAFile' => '/tmp/zabbix_cert/zabbix_ca_file.crt',
+				'TLSCertFile' => '/tmp/zabbix_cert/zabbix_server.crt',
+				'TLSKeyFile' => '/tmp/zabbix_cert/zabbix_server.key'
 			],
 			self::COMPONENT_PROXY => [
 				'UnreachablePeriod' => 5,
@@ -294,11 +398,25 @@ class testDataCollection extends CIntegrationTest {
 				'UnreachableDelay' => 1,
 				'DebugLevel' => 4,
 				'Hostname' => 'proxy',
-				'Server' => '127.0.0.1:'.self::getConfigurationValue(self::COMPONENT_SERVER, 'ListenPort')
+				'Server' => '127.0.0.1:'.self::getConfigurationValue(self::COMPONENT_SERVER, 'ListenPort'),
+				'TLSConnect' => 'cert',
+				'TLSAccept' => 'cert',
+				'TLSCAFile' => '/tmp/zabbix_cert/zabbix_ca_file.crt',
+				'TLSServerCertIssuer' => 'CN=ZabbixCA',
+				'TLSServerCertSubject' => 'CN=zabbix_server',
+				'TLSCertFile' => '/tmp/zabbix_cert/zabbix_proxy.crt',
+				'TLSKeyFile' => '/tmp/zabbix_cert/zabbix_proxy.key'
 			],
 			self::COMPONENT_AGENT => [
 				'Hostname' => 'proxy_agent',
-				'ServerActive' => '127.0.0.1:'.self::getConfigurationValue(self::COMPONENT_PROXY, 'ListenPort')
+				'ServerActive' => '127.0.0.1:'.self::getConfigurationValue(self::COMPONENT_PROXY, 'ListenPort'),
+				'TLSConnect' => 'cert',
+				'TLSAccept' => 'cert',
+				'TLSCAFile' => '/tmp/zabbix_cert/zabbix_ca_file.crt',
+				'TLSCertFile' => '/tmp/zabbix_cert/zabbix_agentd.crt',
+				'TLSKeyFile' => '/tmp/zabbix_cert/zabbix_agentd.key',
+				'TLSServerCertIssuer' => 'CN=ZabbixCA',
+				'TLSServerCertSubject' => 'CN=zabbix_proxy'
 			]
 		];
 	}
@@ -311,6 +429,10 @@ class testDataCollection extends CIntegrationTest {
 	 * @hosts proxy_agent
 	 */
 	public function testDataCollection_checkProxyData() {
+
+		$this->updateAgentHostTLS();
+		$this->updateProxyHostTLS();
+
 		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, 'sending configuration data to proxy "proxy"');
 		self::waitForLogLineToBePresent(self::COMPONENT_PROXY, 'received configuration data from server');
 		self::waitForLogLineToBePresent(self::COMPONENT_PROXY, [
