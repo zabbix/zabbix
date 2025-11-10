@@ -16,18 +16,18 @@
 
 class CTimeUnitValidator extends CValidator {
 
-	protected int $max = 0;
-	protected int $min = 0;
+	protected ?int $max = 0;
+	protected ?int $min = 0;
 	protected bool $usermacros = false;
 	protected bool $lldmacros = false;
 
 	public function __construct(array $options = []) {
 		if (array_key_exists('min', $options)) {
-			$this->min = (int) $options['min'];
+			$this->min = $options['min'] === null ? null : (int) $options['min'];
 		}
 
 		if (array_key_exists('max', $options)) {
-			$this->max = (int) $options['max'];
+			$this->max = $options['max'] === null ? null : (int) $options['max'];
 		}
 
 		if (array_key_exists('lldmacros', $options)) {
@@ -57,7 +57,17 @@ class CTimeUnitValidator extends CValidator {
 
 		$seconds = timeUnitToSeconds($value, false);
 
-		if ($seconds > $this->max || $seconds < $this->min) {
+		if ($this->max === null && $this->min !== null && $seconds < $this->min) {
+			$this->setError(_s('Value must be equal or greater than %1$s.', secondsToPeriod($this->min)));
+
+			return false;
+		}
+		elseif ($this->min === null && $this->max !== null && $seconds > $this->max) {
+			$this->setError(_s('Value must be equal or smaller than %1$s.', secondsToPeriod($this->max)));
+
+			return false;
+		}
+		elseif (($this->max !== null && $seconds > $this->max) || ($this->min !== null && $seconds < $this->min)) {
 			$this->setError(_s('value must be one of %1$s', $this->min.'-'.$this->max));
 
 			return false;

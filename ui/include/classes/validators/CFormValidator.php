@@ -248,7 +248,21 @@ class CFormValidator {
 						break;
 
 					case 'allow_macro':
-						$result[$key] = true;
+						$allowed_macros = ['usermacros' => true, 'lldmacros' => false];
+
+						if (is_array($value)) {
+							foreach ($value as $macrotype => $enabled) {
+								if (!array_key_exists($macrotype, $allowed_macros)) {
+									throw new Exception('[RULES ERROR] Rule "'.$key.'" should contain valid macro type ('.
+										implode(',', array_keys($allowed_macros)).') (Path: '.$rule_path.')');
+								}
+								else {
+									$allowed_macros[$macrotype] = $enabled;
+								}
+							}
+						}
+
+						$result[$key] = $allowed_macros;
 						break;
 
 					case 'api_uniq':
@@ -337,7 +351,7 @@ class CFormValidator {
 		}
 
 		if (array_key_exists('allow_macro', $result) && $result['type'] !== 'string') {
-			throw new Exception('[RULES ERROR] Rule "length" is supported only by type "string" (Path: '.$rule_path.')');
+			throw new Exception('[RULES ERROR] Rule "allow_macro" is supported only by type "string" (Path: '.$rule_path.')');
 		}
 
 		if (array_key_exists('when', $result)) {
@@ -1006,7 +1020,7 @@ class CFormValidator {
 		}
 
 		if (array_key_exists('allow_macro', $rules) && $value_check !== ''
-				&& (new CUserMacroParser)->parse($value_check) == CParser::PARSE_SUCCESS) {
+				&& self::validateMacro($rules['allow_macro'], $value)) {
 			return true;
 		}
 
@@ -1016,7 +1030,7 @@ class CFormValidator {
 			return false;
 		}
 
-		if (array_key_exists('regex', $rules) && !preg_match($rules['regex'], $value)) {
+		if (array_key_exists('regex', $rules) && $value !== '' && !preg_match($rules['regex'], $value)) {
 			$error = self::getMessage($rules, 'regex', _('This value does not match pattern.'));
 
 			return false;
@@ -2099,5 +2113,21 @@ class CFormValidator {
 
 				return true;
 		}
+	}
+
+	private static function validateMacro(array $macro_rules, $value): bool {
+		$parsers = [
+			'usermacros' => CUserMacroParser::class,
+			'lldmacros' => CLLDMacroParser::class
+		];
+
+		foreach ($parsers as $parser_key => $parser_class) {
+			if (array_key_exists($parser_key, $macro_rules) &&
+					(new $parser_class())->parse($value) == CParser::PARSE_SUCCESS) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 }

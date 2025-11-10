@@ -1189,7 +1189,7 @@ class CFormValidator {
 			};
 		}
 
-		if (('allow_macro' in rules) && value !== '' && this.#isUserMacro(value)) {
+		if (('allow_macro' in rules) && value !== '' && this.#isMacro(rules['allow_macro'], value)) {
 			return {result: CFormValidator.SUCCESS};
 		}
 
@@ -1200,7 +1200,7 @@ class CFormValidator {
 			};
 		}
 
-		if ('regex' in rules) {
+		if ('regex' in rules && value !== '') {
 			const {pattern, flags} = this.#extractRegex(rules.regex);
 
 			const re = new RegExp(pattern, flags);
@@ -1629,6 +1629,38 @@ class CFormValidator {
 	}
 
 	/**
+	 * Check if value looks as LLD macro.
+	 *
+	 * @param {string} value  Value to check.
+	 *
+	 * @returns {boolean}
+	 */
+	#isLLDMacro(value) {
+		return value.match(/^\{#[A-Z0-9._]+(:.*)?\}$/) !== null;
+	}
+
+	/**
+	 * Check if value looks like macro based on allowed macro types
+	 *
+	 * @param {array} macro_types
+	 * @param {string} value
+	 *
+	 * @returns {boolean}
+	 */
+	#isMacro(macro_types, value) {
+		if (macro_types.usermacros && this.#isUserMacro(value)) {
+			return true;
+		}
+
+		if (macro_types.lldmacros && this.#isLLDMacro(value)) {
+			return true;
+		}
+
+		return false;
+	}
+
+
+	/**
 	 * Calculate result of 'when' conditions.
 	 *
 	 * @param {Array}  when_rules  Array of 'when' condition objects.
@@ -1668,7 +1700,14 @@ class CFormValidator {
 	 * @returns {string}
 	 */
 	#getFieldAbsolutePath(field_name, field_path) {
-		const target_path = [...field_path.split('/').slice(0, -1), field_name];
+		const target_path = field_path.split('/').slice(0, -1);
+
+		while (field_name.startsWith('../')) {
+			field_name = field_name.substring(3);
+			target_path.pop();
+		}
+
+		target_path.push(field_name);
 
 		return `/${target_path.join('/')}`.replace(/\/\/+/g, '/');
 	}

@@ -924,6 +924,22 @@ switch ($data['method']) {
 		}
 		break;
 
+	case 'item_prototype_value_type.get':
+		$result = '';
+
+		if (array_key_exists('itemid', $data) && is_scalar($data['itemid'])) {
+			$items = API::ItemPrototype()->get([
+				'output' => ['value_type'],
+				'itemids' => $data['itemid'],
+				'webitems' => true
+			]);
+
+			if ($items) {
+				$result = $items[0]['value_type'];
+			}
+		}
+		break;
+
 	case 'get_scripts_by_hosts':
 		$result = [];
 
