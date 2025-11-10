@@ -24,70 +24,52 @@ use Facebook\WebDriver\WebDriverKeys;
  */
 class CColorPickerElement extends CElement {
 
+	const USE_DEFAULT = null;
+
 	/**
 	 * Get input field of color pick form.
 	 *
 	 * @return type
 	 */
 	public function getInput() {
-		return $this->query('xpath:.//input')->one();
+		return $this->query('xpath:./input')->one();
 	}
 
 	/**
 	 * Overwrite input value.
 	 *
-	 * @inheritdoc
-	 *
-	 * @param string $color		color code
-	 */
-	public function overwrite($color) {
-		$this->query('xpath:./button['.CXPathHelper::fromClass('color-picker-preview').']')->one()->click();
-		$overlay = (new CElementQuery('id:color_picker'))->waitUntilVisible()->asOverlayDialog()->one();
-
-		if ($color === null) {
-			$overlay->query('button:Use default')->one()->click();
-		}
-		else {
-			$overlay->asColorPicker()->selectTab('Solid color');
-			$overlay->query('class:color-picker-input')->waitUntilVisible()->one()->overwrite($color);
-		}
-
-		$apply_button = $overlay->query('button:Apply');
-
-		if (preg_match('/^[a-fA-F0-9]+$/', $color) === 1 && strlen($color) === 6) {
-			CElementQuery::getPage()->pressKey(WebDriverKeys::ENTER);
-			$overlay->waitUntilNotVisible();
-		}
-		else {
-			if (!$apply_button->one()->isAttributePresent('disabled')) {
-				throw new \Exception('Passes value is not a valid hexadecimal value, but Apply button is not disabled.');
-			}
-		}
-
-		return $this;
-	}
-
-	/**
-	 * Get text of selected color-picker tab.
-	 *
-	 * @return string
-	 */
-	public function getSelectedTab() {
-		return $this->query('xpath:.//ul[@class="color-picker-tabs"]'.
-			'//li[contains(@class, "color-picker-tab-selected")]/label')->waitUntilPresent()->one()->getText();
-	}
-
-	/**
-	 * Switch color-picker tab by its name.
+	 * @param string|int|null $color	color code or palette number as a 'palette:number' pattern
 	 *
 	 * @return $this
 	 */
-	public function selectTab($name) {
-		$selector = 'xpath:.//label[text()='.CXPathHelper::escapeQuotes($name).']';
+	public function overwrite($color) {
+		$overlay = $this->open();
+		$name = (str_starts_with($color, 'palette')) ? 'Palette' : 'Solid color';
 
-		if ($this->getSelectedTab() !== $name) {
-			$this->query($selector)->waitUntilPresent()->one()->click();
-			$this->query($selector.'/..')->waitUntilClassesPresent('color-picker-tab-selected');
+		if ($color === self::USE_DEFAULT) {
+			$overlay->query('button:Use default')->one()->click()->waitUntilNotVisible();
+			return $this;
+		}
+		else {
+			if ($overlay->query('xpath:.//li['.CXPathHelper::fromClass('color-picker-tab-selected').']/label')
+					->waitUntilPresent()->one()->getText() !== $name) {
+				$tab_selector = ('xpath:.//label[text()='.CXPathHelper::escapeQuotes($name).']');
+				$overlay->query($tab_selector)->waitUntilPresent()->one()->click();
+				$overlay->query($tab_selector.'/..')->waitUntilClassesPresent('color-picker-tab-selected');
+			}
+
+			if ($name === 'Palette') {
+				$palette_number = substr($color, strlen('palette:'));
+				$overlay->query('xpath:.//input[@id="color-picker-palette-input-'.$palette_number.'"]')->one()->click();
+			}
+			else {
+				$overlay->query('class:color-picker-input')->waitUntilVisible()->one()->overwrite($color);
+
+				if (preg_match('/^[a-fA-F0-9]+$/', $color) === 1 && strlen($color) === 6) {
+					CElementQuery::getPage()->pressKey(WebDriverKeys::ENTER);
+					$overlay->waitUntilNotVisible();
+				}
+			}
 		}
 
 		return $this;
@@ -97,7 +79,8 @@ class CColorPickerElement extends CElement {
 	 * @inheritdoc
 	 */
 	public function isEnabled($enabled = true) {
-		return $this->getInput()->isEnabled($enabled);
+		return parent::isEnabled($enabled) && $this->getInput()->isEnabled($enabled)
+				&& $this->query('xpath:./button')->one()->isEnabled($enabled);
 	}
 
 	/**
@@ -105,6 +88,17 @@ class CColorPickerElement extends CElement {
 	 */
 	public function getValue() {
 		return $this->getInput()->getValue();
+	}
+
+	/**
+	 * @inheritdoc
+	 */
+	public function checkValue($expected, $raise_exception = true) {
+		if (is_string($expected) && str_starts_with($expected, 'palette:')) {
+			$expected = substr($expected, strlen('palette:'));
+		}
+
+		return parent::checkValue($expected, $raise_exception);
 	}
 
 	/**
@@ -118,11 +112,19 @@ class CColorPickerElement extends CElement {
 	}
 
 	/**
-	 * Close color picker overlay dialog.
+	 * Open color picker.
 	 *
-	 * @return $this
+	 * @return CElement
 	 */
-	public function close() {
+	public function open() {
+		$this->query('xpath:./button['.CXPathHelper::fromClass('color-picker-preview').']')->one()->click();
+		return (new CElementQuery('id:color_picker'))->waitUntilVisible()->one();
+	}
+
+	/**
+	 * Press Escape key to close color picker.
+	 */
+	public static function close() {
 		CElementQuery::getPage()->pressKey(WebDriverKeys::ESCAPE);
 		(new CElementQuery('id:color_picker'))->waitUntilNotVisible();
 	}
@@ -137,13 +139,13 @@ class CColorPickerElement extends CElement {
 	}
 
 	/**
-	 * Check if color-picker dialog can be submitted
+	 * Check if color-picker dialog can be submitted.
 	 *
 	 * @param boolean	$submitable		should dialog submission be disabled or not
 	 *
-	 * @return type
+	 * @return boolean
 	 */
-	public function isSubmittionDisabled($submitable = false) {
+	public static function isSubmitable($submitable = true) {
 		$dialog = (new CElementQuery('id:color_picker'))->one();
 		$clickable = $dialog->query('button:Apply')->one()->isClickable();
 
