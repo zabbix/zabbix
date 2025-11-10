@@ -839,25 +839,25 @@ static FILE	*fping_popen(pid_t *pid, const char *command)
 
 	if (-1 == (*pid = zbx_fork()))
 	{
-		close(fd[0]);
-		close(fd[1]);
+		(void)close(fd[0]);
+		(void)close(fd[1]);
 		return NULL;
 	}
 
-	if (0 != *pid)	/* parent process */
+	if (0 != *pid) /* parent process */
 	{
-		close(fd[1]);
+		(void)close(fd[1]);
 
 		if (NULL == (fp = fdopen(fd[0], "r")))
 		{
-			close(fd[0]);
+			(void)close(fd[0]);
 			return NULL;
 		}
 
 		return fp;
 	}
 	/* child process */
-	close(fd[0]);
+	(void)close(fd[0]);
 	/* set the child as the process group leader, otherwise orphans may be left after timeout */
 	if (-1 == setpgid(0, 0))
 	{
@@ -865,9 +865,13 @@ static FILE	*fping_popen(pid_t *pid, const char *command)
 		exit(EXIT_FAILURE);
 	}
 	/* redirect output right before script execution after all logging is done */
-	dup2(fd[1], STDOUT_FILENO);
-	dup2(fd[1], STDERR_FILENO);
-	close(fd[1]);
+	if (-1 == dup2(fd[1], STDOUT_FILENO) || -1 == dup2(fd[1], STDERR_FILENO))
+	{
+		zabbix_log(LOG_LEVEL_ERR, "%s(): failed to redirect output: %s", __func__, zbx_strerror(errno));
+		exit(EXIT_FAILURE);
+	}
+
+	(void)close(fd[1]);
 
 	execl("/bin/sh", "sh", "-c", command, (char *)NULL);
 	/* this message may end up in stdout or stderr */
