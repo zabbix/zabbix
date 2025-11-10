@@ -947,12 +947,15 @@ static int	elastic_get_values_for_period(zbx_history_elastic_data_t *data, zbx_u
 
 	/* fetch search results */
 
-	if (SUCCEED != history_elastic_conn_set_url_path(&conn, data, "_search/scroll", &error))
+	if ('\0' != *scroll)
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "cannot set URL for elasticsearch: %s", error);
-		zbx_free(error);
+		if (SUCCEED != history_elastic_conn_set_url_path(&conn, data, "_search/scroll", &error))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "cannot set URL for elasticsearch: %s", error);
+			zbx_free(error);
 
-		goto out;
+			goto out;
+		}
 	}
 
 	/* For processing the records, we need to keep track of the total requested and if the response from the */
