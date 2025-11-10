@@ -808,7 +808,7 @@ class testFormUser extends CWebTest {
 					'role' => 'Guest role'
 				]
 			],
-			// Creating a user with optional parameters specified (including autologout) using Cyrillic charatcers.
+			// Creating a user with optional parameters specified (including autologout) using Cyrillic characters.
 			[
 				[
 					'expected' => TEST_GOOD,

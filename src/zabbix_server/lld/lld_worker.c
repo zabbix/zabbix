@@ -28,6 +28,7 @@
 #include "zbxalgo.h"
 #include "zbxcacheconfig.h"
 #include "zbxdbhigh.h"
+#include "zbxhash.h"
 
 /******************************************************************************
  *                                                                            *
@@ -116,10 +117,15 @@ static void	lld_process_task(const zbx_ipc_message_t *message)
 		}
 
 		/* with successful LLD processing LLD error will be set to empty string */
-		if (NULL != error && 0 != strcmp(error, ZBX_NULL2EMPTY_STR(item.error)))
+		if (NULL != error)
 		{
-			diff.error = error;
-			diff.flags |= ZBX_FLAGS_ITEM_DIFF_UPDATE_ERROR;
+			zbx_sha512_hash(error, diff.error_hash);
+
+			if (0 != memcmp(item.error_hash, diff.error_hash, sizeof(item.error_hash)))
+			{
+				diff.error = error;
+				diff.flags |= ZBX_FLAGS_ITEM_DIFF_UPDATE_ERROR;
+			}
 		}
 	}
 
