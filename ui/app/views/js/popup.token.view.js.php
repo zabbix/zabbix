@@ -19,7 +19,7 @@
  */
 ?>
 
-window.token_view_popup = {
+window.token_view_popup = new class {
 
 	init() {
 		const form = document.getElementById('token_form');
