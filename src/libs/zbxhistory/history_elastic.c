@@ -847,7 +847,7 @@ static int	elastic_get_values_for_period(zbx_history_elastic_data_t *data, zbx_u
 		unsigned char value_type, time_t start, int *count, time_t end, zbx_vector_history_record_t *values)
 {
 	size_t			url_alloc = 0, url_offset = 0, id_alloc = 0, scroll_alloc = 0, scroll_offset = 0;
-	int			empty, ret = FAIL;
+	int			empty, ret = FAIL, hits_num = 0;
 	struct zbx_json		query;
 	char			*scroll_id = NULL, *scroll_query = NULL, *error = NULL,
 				*post_url = NULL;
@@ -961,8 +961,6 @@ static int	elastic_get_values_for_period(zbx_history_elastic_data_t *data, zbx_u
 	/* For processing the records, we need to keep track of the total requested and if the response from the */
 	/* elasticsearch server is empty. For this we use two variables, empty and total. If the result is empty or */
 	/* the total reach zero, we terminate the scrolling query and return what we currently have. */
-
-	int	hits_num = 0;
 
 	while (0 != conn.resp.page.offset)
 	{
@@ -1277,8 +1275,6 @@ static int	history_elastic_parse_bucket(const char *p_bucket, unsigned char valu
 	if (FAIL == (index = zbx_vector_item_history_bsearch(results, hist_local, zbx_item_history_compare_by_itemid)))
 		goto out;
 
-	zbx_item_history_t	*hist = &results->values[index];
-
 	if (SUCCEED != zbx_json_brackets_by_name(&jp_bucket, "top_values", &jp_top))
 		goto out;
 
@@ -1301,7 +1297,7 @@ static int	history_elastic_parse_bucket(const char *p_bucket, unsigned char valu
 
 		if (SUCCEED == history_parse_value(&jp_source, value_type, &hr))
 		{
-			zbx_vector_history_record_append_ptr(&hist->rows, &hr);
+			zbx_vector_history_record_append_ptr(&results->values[index].rows, &hr);
 			rows_num++;
 		}
 	}

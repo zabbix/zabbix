@@ -318,8 +318,6 @@ static void	history_manager_registry_update_types(zbx_history_manager_t *manager
  ******************************************************************************/
 static int	history_manager_get_default_provider(zbx_history_manager_t *manager)
 {
-	int	sql_index = FAIL;
-
 	for (int i = 0; i < manager->registry.values_num; i++)
 	{
 		if (0 == strcmp(manager->registry.values[i]->name, HISTORY_PROVIDER_SQL))
