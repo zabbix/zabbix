@@ -1145,12 +1145,6 @@ INSERT INTO trigger_tag (triggertagid, tag, value, triggerid) VALUES (99045, 'Ta
 INSERT INTO triggers (triggerid, description, expression, value, priority, state, lastchange, comments) VALUES (100064, 'Fifth trigger for tag filtering (no tags)', '{100064}>0', 0, 5, 0, '0', '');
 INSERT INTO functions (functionid, itemid, triggerid, name, parameter) VALUES (100064, 99090, 100064, 'last', '$');
 
--- Dashboard for problem hosts widget
-INSERT INTO dashboard (dashboardid, name, userid, private) VALUES (1000, 'Dashboard for Problem hosts widget', 1, 1);
-INSERT INTO dashboard_page (dashboard_pageid, dashboardid) VALUES (123456, 1000);
-INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (100000, 123456, 'problemhosts', '', 0, 0, 8, 8);
-INSERT INTO profiles (profileid,userid,idx,value_id,value_str,source,type) VALUES (4, 1, 'web.dashboard.dashboardid', 1,'','', 1);
-
 -- testPageAvailabilityReport SLA reports
 INSERT INTO hosts (hostid, host, name, status, description, readme) VALUES (50014, 'SLA reports host', 'SLA reports host', 0, '', '');
 INSERT INTO interface (interfaceid, hostid, main, type, useip, ip, port) VALUES (50042, 50014, 1, 1, 1, '127.0.0.1', '10051');
