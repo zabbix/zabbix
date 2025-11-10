@@ -977,7 +977,8 @@ static int	elastic_get_values_for_period(zbx_history_elastic_data_t *data, zbx_u
 		if ('\0' != *scroll)
 		{
 			/* get the scroll id immediately, for being used in subsequent queries */
-			if (SUCCEED != zbx_json_value_by_name_dyn(&jp_values, "_scroll_id", &scroll_id, &id_alloc, NULL))
+			if (SUCCEED != zbx_json_value_by_name_dyn(&jp_values, "_scroll_id", &scroll_id, &id_alloc,
+					NULL))
 			{
 				zabbix_log(LOG_LEVEL_WARNING, "elasticsearch version is not compatible with"
 						" zabbix server. _scroll_id tag is absent");
