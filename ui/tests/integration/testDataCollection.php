@@ -26,12 +26,12 @@ class testDataCollection extends CIntegrationTest {
 
 	private static $hostids = [];
 	private static $itemids = [];
+	private $certBaseDir;
 
 	/**
 	 * @inheritdoc
 	 */
 	public function prepareData() {
-		$this->generateCertificates();
 
 		// Create proxy "proxy".
 		CDataHelper::call('proxy.create', [
@@ -282,12 +282,14 @@ class testDataCollection extends CIntegrationTest {
 	 */
 	private function generateCertificates() {
 
-		$baseDir = '/tmp/zabbix_cert/';
+		// Generate unique directory name for certificates
+		$unique = time() . '_' . mt_rand(10000, 99999);
+		$baseDir = "/tmp/zabbix_cert_$unique/";
+		$this->certBaseDir = $baseDir;
 		if (!is_dir($baseDir)) {
 			mkdir($baseDir, 0777, true);
 		}
 
-		$baseDir = '/tmp/zabbix_cert/';
 		$caKey = $baseDir . 'zabbix_ca_file.key';
 		$caCert = $baseDir . 'zabbix_ca_file.crt';
 		$serverKey = $baseDir . 'zabbix_server.key';
@@ -382,15 +384,17 @@ class testDataCollection extends CIntegrationTest {
 	 * @return array
 	 */
 	public function proxyConfigurationProvider() {
+		$this->generateCertificates();
+		$baseDir = $this->certBaseDir;
 		return [
 			self::COMPONENT_SERVER => [
 				'UnreachablePeriod' => 5,
 				'UnavailableDelay' => 5,
 				'UnreachableDelay' => 1,
 				'DebugLevel' => 4,
-				'TLSCAFile' => '/tmp/zabbix_cert/zabbix_ca_file.crt',
-				'TLSCertFile' => '/tmp/zabbix_cert/zabbix_server.crt',
-				'TLSKeyFile' => '/tmp/zabbix_cert/zabbix_server.key'
+				'TLSCAFile' => $baseDir . 'zabbix_ca_file.crt',
+				'TLSCertFile' => $baseDir . 'zabbix_server.crt',
+				'TLSKeyFile' => $baseDir . 'zabbix_server.key'
 			],
 			self::COMPONENT_PROXY => [
 				'UnreachablePeriod' => 5,
@@ -401,20 +405,21 @@ class testDataCollection extends CIntegrationTest {
 				'Server' => '127.0.0.1:'.self::getConfigurationValue(self::COMPONENT_SERVER, 'ListenPort'),
 				'TLSConnect' => 'cert',
 				'TLSAccept' => 'cert',
-				'TLSCAFile' => '/tmp/zabbix_cert/zabbix_ca_file.crt',
+				'TLSCAFile' => $baseDir . 'zabbix_ca_file.crt',
 				'TLSServerCertIssuer' => 'CN=ZabbixCA',
 				'TLSServerCertSubject' => 'CN=zabbix_server',
-				'TLSCertFile' => '/tmp/zabbix_cert/zabbix_proxy.crt',
-				'TLSKeyFile' => '/tmp/zabbix_cert/zabbix_proxy.key'
+				'TLSCertFile' => $baseDir . 'zabbix_proxy.crt',
+				'TLSKeyFile' =>  $baseDir . 'zabbix_proxy.key'
 			],
 			self::COMPONENT_AGENT => [
+				'DebugLevel' => 4,
 				'Hostname' => 'proxy_agent',
 				'ServerActive' => '127.0.0.1:'.self::getConfigurationValue(self::COMPONENT_PROXY, 'ListenPort'),
 				'TLSConnect' => 'cert',
 				'TLSAccept' => 'cert',
-				'TLSCAFile' => '/tmp/zabbix_cert/zabbix_ca_file.crt',
-				'TLSCertFile' => '/tmp/zabbix_cert/zabbix_agentd.crt',
-				'TLSKeyFile' => '/tmp/zabbix_cert/zabbix_agentd.key',
+				'TLSCAFile' => $baseDir . 'zabbix_ca_file.crt',
+				'TLSCertFile' => $baseDir . 'zabbix_agentd.crt',
+				'TLSKeyFile' => $baseDir . 'zabbix_agentd.key',
 				'TLSServerCertIssuer' => 'CN=ZabbixCA',
 				'TLSServerCertSubject' => 'CN=zabbix_proxy'
 			]
@@ -440,6 +445,14 @@ class testDataCollection extends CIntegrationTest {
 			'resuming Zabbix agent checks on host "proxy_agent": connection restored'
 		]);
 
+		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, 'zbx_tls_accept() peer certificate' .
+			' issuer:"CN=ZabbixCA" subject:"CN=zabbix_proxy"', false);
+		self::waitForLogLineToBePresent(self::COMPONENT_PROXY, 'zbx_tls_accept() peer certificate' .
+			' issuer:"CN=ZabbixCA" subject:"CN=zabbix_agent"', false);
+
+		self::waitForLogLineToBePresent(self::COMPONENT_AGENT, 'zbx_tls_accept() peer certificate' .
+			' issuer:"CN=ZabbixCA" subject:"CN=zabbix_proxy"', false);
+
 		$passive_data = $this->call('history.get', [
 			'itemids'	=> self::$itemids['proxy_agent:agent.ping'],
 			'history'	=> ITEM_VALUE_TYPE_UINT64
@@ -457,6 +470,12 @@ class testDataCollection extends CIntegrationTest {
 
 		foreach ($active_data['result'] as $item) {
 			$this->assertEquals('proxy_agent', $item['value']);
+		}
+
+		// Cleanup: remove the certificate directory and all its contents
+		$baseDir = $this->certBaseDir;
+		if (is_dir($baseDir)) {
+			shell_exec('rm -rf ' . escapeshellarg($baseDir));
 		}
 	}
 
