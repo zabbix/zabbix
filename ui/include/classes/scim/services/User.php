@@ -458,11 +458,15 @@ class User extends ScimApiService {
 	public function delete(array $options): array {
 		$this->validateDelete($options);
 
-		return APIRPC::User()->updateProvisionedUser([
+		$user_data = [
 			'userid' => $options['id'],
 			'medias' => [],
 			'usrgrps' => []
-		]);
+		];
+
+		DB::delete('user_scim_group', ['userid' => $user_data['userid']]);
+
+		return APIRPC::User()->updateProvisionedUser($user_data);
 	}
 
 	/**
