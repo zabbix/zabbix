@@ -16,33 +16,25 @@ package mysql
 
 import (
 	"context"
-	"encoding/json"
 
+	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/zbxerr"
 )
 
-func replicationDiscoveryHandler(ctx context.Context, conn MyClient, _ map[string]string,
-	_ ...string) (interface{}, error) {
-	res := make([]map[string]string, 0)
-
-	rows, err := conn.Query(ctx, `SHOW SLAVE STATUS`)
+func replicationDiscoveryHandler(
+	ctx context.Context,
+	conn MyClient,
+	_ map[string]string,
+	_ ...string,
+) (any, error) {
+	data, err := querySlaveOrReplicaStatus(ctx, conn)
 	if err != nil {
-		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
+		return nil, errs.WrapConst(err, zbxerr.ErrorCannotFetchData)
 	}
 
-	data, err := rows2data(rows)
-	if err != nil {
-		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
+	if isOldSyle(data) {
+		return parseResponse(duplicateByKey(data, masterKey, substituteRulesOld2New))
 	}
 
-	for _, row := range data {
-		res = append(res, map[string]string{"Master_Host": row["Master_Host"]})
-	}
-
-	jsonRes, err := json.Marshal(res)
-	if err != nil {
-		return nil, zbxerr.ErrorCannotMarshalJSON.Wrap(err)
-	}
-
-	return string(jsonRes), nil
+	return parseResponse(duplicateByKey(data, sourceKey, substituteRulesNew2Old))
 }
