@@ -152,7 +152,7 @@ class testFormTotpEnroll extends testFormTotp {
 		// Reset TOTP secret to make sure the user has not already been enrolled.
 		$this->resetTotpConfiguration();
 
-		// Open the the enroll form and get the secret.
+		// Open the enroll form and get the secret.
 		$this->userLogin();
 		$old_totp_secret = $this->validateQrCodeAndExtractSecret();
 

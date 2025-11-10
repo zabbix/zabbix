@@ -117,6 +117,12 @@ static const char	*help_message[] = {
 	"                                   target is not specified",
 	"      " ZBX_PROF_DISABLE "=target        Disable profiling, affects all processes if",
 	"                                   target is not specified",
+	"      " ZBX_DBPOOL_STATUS "              Display database connection pool status",
+	"      " ZBX_DBPOOL_SET_IDLE_TIMEOUT "=seconds",
+	"                                 Set the idle timeout for connections in the database pool",
+	"      " ZBX_DBPOOL_SET_MAX_IDLE "=num    Set the maximum number of idle connections retained in",
+	"      "      "                           the database pool",
+	"      " ZBX_DBPOOL_SET_MAX_OPEN "=num    Set the maximum number of open connections in the database pool",
 	"",
 	"      Log level control targets:",
 	"        process-type             All processes of specified type",
@@ -1392,6 +1398,13 @@ static void	proxy_db_init(void)
 	int		db_type, version_check;
 
 	zbx_db_config->read_only_recoverable = 1;
+
+	if (SUCCEED != zbx_db_library_init(&error))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize database library: %s", error);
+		zbx_free(error);
+		exit(EXIT_FAILURE);
+	}
 
 	if (SUCCEED != zbx_db_init(&error))
 	{

@@ -16,6 +16,8 @@
 
 class CMaintenanceHelper {
 
+	public const MAX_TIMEPERIOD = 999 * SEC_PER_DAY + 23 * SEC_PER_HOUR + 59 * SEC_PER_MIN;
+
 	public static function getTimePeriodTypeNames(): array {
 		static $timeperiod_type_names;
 

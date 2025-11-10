@@ -25,7 +25,7 @@ zabbix_export:
         Template for Vyatta Virtual Router 1908e.
       vendor:
         name: Zabbix
-        version: 8.0-0
+        version: 8.0-1
       groups:
         - name: 'Templates/Network devices'
       items:
@@ -1724,12 +1724,6 @@ zabbix_export:
                       value:
                         host: 'Vyatta Virtual Router by SNMP'
                         key: system.memory.util
-                    - type: STRING
-                      name: max
-                      value: '100'
-                    - type: STRING
-                      name: min
-                      value: '0'
                     - type: INTEGER
                       name: rf_rate
                       value: '30'

@@ -663,7 +663,7 @@ class CFormValidatorTest extends TestCase {
 				],
 				['type' => 'object',
 					'api_uniq' => [
-						['host.get', [], [], []]
+						['host.get', ['filter' => []], [], []]
 					],
 					'fields' => [
 						'ip' => [['type' => 'string', 'messages' => [
@@ -683,7 +683,7 @@ class CFormValidatorTest extends TestCase {
 				],
 				['type' => 'object',
 					'api_uniq' => [
-						['host.get', ['host' => '{host}'], null, null]
+						['host.get', ['filter' => ['host' => '{host}']], null, null]
 					],
 					'fields' => [
 						'ip' => [['type' => 'string', 'messages' => [
@@ -703,8 +703,36 @@ class CFormValidatorTest extends TestCase {
 				],
 				['type' => 'object',
 					'api_uniq' => [
-						['host.get', [], null, null],
-						['host.get', [], null, null]
+						['host.get', ['filter' => []], null, null],
+						['host.get', ['filter' => []], null, null]
+					],
+					'fields' => [
+						'ip' => [['type' => 'string', 'messages' => [
+							'type' => 'String error.'
+						]]]
+					]
+				]
+			],
+			[
+				['object',
+					'api_uniq' => [
+						['host.get', [], null, null, ['param_1' => 'value_1']],
+						['host.get', ['filter_param_1' => 'filter_value_1'], null, null, ['param_1' => 'value_1']],
+						['host.get']
+					],
+					'fields' => [
+						'ip' => ['string', 'messages' => [
+							'type' => 'String error.'
+						]]
+					]
+				],
+				['type' => 'object',
+					'api_uniq' => [
+						['host.get', ['filter' => [], 'param_1' => 'value_1'], null, null],
+						['host.get', ['filter' => ['filter_param_1' => 'filter_value_1'], 'param_1' => 'value_1'],
+							null, null
+						],
+						['host.get', ['filter' => []], null, null]
 					],
 					'fields' => [
 						'ip' => [['type' => 'string', 'messages' => [
@@ -2289,7 +2317,7 @@ class CFormValidatorTest extends TestCase {
 			],
 			[
 				['object', 'fields' => [
-					'value' => ['string', 'use' => [CAbsoluteTimeParser::class, [], ['min' => 0, 'max' => 2147464800]]]
+					'value' => ['string', 'use' => [CAbsoluteTimeParser::class, [], ['min' => 0, 'max' => ZBX_MAX_DATE]]]
 				]],
 				['value' => '2024-01-08 12:00:00'],
 				['value' => '2024-01-08 12:00:00'],
@@ -2353,7 +2381,7 @@ class CFormValidatorTest extends TestCase {
 			],
 			[
 				['object', 'fields' => [
-					'value' => ['objects', 'uniq' => ['macro','value'], 'fields' => [
+					'value' => ['objects', 'uniq' => ['macro', 'value'], 'fields' => [
 						'macro' => ['string']
 					]]
 				]],
@@ -2369,7 +2397,7 @@ class CFormValidatorTest extends TestCase {
 			],
 			[
 				['object', 'fields' => [
-					'value' => ['objects', 'uniq' => [['macro','value']], 'fields' => [
+					'value' => ['objects', 'uniq' => [['macro', 'value']], 'fields' => [
 						'macro' => ['string']
 					]]
 				]],
@@ -2385,7 +2413,7 @@ class CFormValidatorTest extends TestCase {
 			],
 			[
 				['object', 'fields' => [
-					'value' => ['objects', 'uniq' => [['macro','value'], 'description'], 'fields' => [
+					'value' => ['objects', 'uniq' => [['macro', 'value'], 'description'], 'fields' => [
 						'macro' => ['string']
 					]]
 				]],
@@ -2545,6 +2573,86 @@ class CFormValidatorTest extends TestCase {
 				['/value' => [
 					['message' => 'This value must be "abc".', 'level' => CFormValidator::ERROR_LEVEL_PRIMARY]
 				]]
+			],
+			[
+				['object', 'fields' => [
+					'value' => ['string', 'in' => ['abc']]
+				]],
+				['value' => '{$USER_MACRO}'],
+				[],
+				CFormValidator::ERROR,
+				['/value' => [
+					['message' => 'This value must be "abc".', 'level' => CFormValidator::ERROR_LEVEL_PRIMARY]
+				]]
+			],
+			[
+				['object', 'fields' => [
+					'value' => ['file', 'required', 'not_empty']
+				]],
+				[],
+				[],
+				CFormValidator::ERROR,
+				['/value' => [
+					['message' => 'No file was uploaded.', 'level' => CFormValidator::ERROR_LEVEL_PRIMARY]
+				]],
+				['value' => ['name' => '', 'type' => '', 'tmp_name' => '', 'error' => UPLOAD_ERR_NO_FILE, 'size' => 0]]
+			],
+			[
+				['object', 'fields' => [
+					'value' => ['file', 'max-size' => 1024]
+				]],
+				[],
+				[],
+				CFormValidator::ERROR,
+				['/value' => [
+					['message' => 'File size must be less than 1 KB.', 'level' => CFormValidator::ERROR_LEVEL_PRIMARY]
+				]],
+				['value' => ['name' => '', 'type' => '', 'tmp_name' => 'phpunit.xml', 'error' => UPLOAD_ERR_OK,
+					'size' => 1300
+				]]
+			],
+			[
+				['object', 'fields' => [
+					'value' => ['file', 'file-type' => 'image']
+				]],
+				[],
+				[],
+				CFormValidator::ERROR,
+				['/value' => [
+					['message' => 'File format is unsupported.', 'level' => CFormValidator::ERROR_LEVEL_PRIMARY]
+				]],
+				['value' => ['name' => '', 'type' => '', 'tmp_name' => 'phpunit.xml', 'error' => UPLOAD_ERR_OK,
+					'size' => 10
+				]]
+			],
+			[
+				['object', 'fields' => [
+					'value' => ['file', 'file-type' => 'image', 'messages' => ['file-type' => 'msg1']]
+				]],
+				[],
+				[],
+				CFormValidator::ERROR,
+				['/value' => [
+					['message' => 'msg1', 'level' => CFormValidator::ERROR_LEVEL_PRIMARY]
+				]],
+				['value' => ['name' => '', 'type' => '', 'tmp_name' => 'phpunit.xml', 'error' => UPLOAD_ERR_OK,
+					'size' => 10
+				]]
+			],
+			[
+				['object', 'fields' => [
+					'value' => ['file']
+				]],
+				[],
+				[],
+				CFormValidator::SUCCESS,
+				[],
+				['value' => ['name' => '', 'type' => '', 'tmp_name' => 'phpunit.xml', 'error' => UPLOAD_ERR_OK,
+					'size' => 10
+				]],
+				['value' => ['name' => '', 'type' => '', 'tmp_name' => 'phpunit.xml', 'error' => UPLOAD_ERR_OK,
+					'size' => 10
+				]]
 			]
 		];
 	}
@@ -2559,7 +2667,7 @@ class CFormValidatorTest extends TestCase {
 	 * @param array $expected_errors
 	 */
 	public function testFormValidator(array $rules, array $data, array $expected_data, int $expected_result,
-			array $expected_errors) {
+			array $expected_errors, array $files = [], array $expected_files = []): void {
 		global $DB;
 
 		$DB['TYPE'] = ZBX_DB_MYSQL;
@@ -2569,13 +2677,14 @@ class CFormValidatorTest extends TestCase {
 
 		$this->assertSame('array', gettype($normalized_rules));
 
-		$result = $validator->validate($data);
+		$result = $validator->validate($data, $files);
 
 		$this->assertSame($expected_result, $result);
 		$this->assertSame($expected_errors, $validator->getErrors());
 
 		if ($expected_result == CFormValidator::SUCCESS) {
 			$this->assertSame($expected_data, $data);
+			$this->assertSame($files, $expected_files);
 		}
 	}
 }
