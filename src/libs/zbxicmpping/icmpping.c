@@ -861,8 +861,7 @@ static FILE	*fping_popen(pid_t *pid, const char *command)
 	/* set the child as the process group leader, otherwise orphans may be left after timeout */
 	if (-1 == setpgid(0, 0))
 	{
-		zabbix_log(LOG_LEVEL_ERR, "%s(): failed to create a process group: %s",
-				__func__, zbx_strerror(errno));
+		zabbix_log(LOG_LEVEL_ERR, "%s(): failed to create a process group: %s", __func__, zbx_strerror(errno));
 		exit(EXIT_FAILURE);
 	}
 	/* redirect output right before script execution after all logging is done */
