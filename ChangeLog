@@ -1,8 +1,13 @@
 Changes for 6.0.43rc1
 
 New features:
+A......PS. [ZBXNEXT-10219] updated maximum supported PostgreSQL version to 18 (mprihodko)
+A.......S. [ZBXNEXT-10271] updated maximum supported TimescaleDB version to 2.22 (mprihodko)
 
 Bug fixes:
+..F....... [ZBX-27020] fixed user with limited permissions access to map containing submap with inaccessible host or hostgroup (talbergs)
+........S. [ZBX-27106] fixed crash when using {HOST.DNS} macro in allowed hosts for trapper item (vso)
+..F....... [ZBX-22157] added Map navigation tree widget problem filtering using Problem display and Show suppressed problems filter of map settings (dfofanovs)
 ...G...... [ZBX-24918] fixed crashes of Zabbix agent 2 for Windows related with PDH perf_counter (opucka)
 
 --------------------------------------------------------------------------------
@@ -45,6 +50,10 @@ Bug fixes:
 ...G...... [ZBX-26344] refactored zbxcmd execute to avoid Windows syscalls in Zabbix agent 2 (esneiders)
 .......PS. [ZBX-26433] fixed values outside of history storage period causing trigger to cache all values in storage period (vso)
 ...G...... [ZBX-26244] fixed Zabbix agent 2 memory leak related to traffic compression (MVekslers)
+A......... [ZBX-27060] fixed scope of information available via user.get (jfreibergs)
+.......... [ZBX-27061] moved OpenSSL directory to system-protected path on build server (yurii)
+A.F....... [ZBX-27062] updated LDAP bind password to reset on LDAP host change (aluchko)
+..F....... [ZBX-27063] fixed permission check for Problems view refresh (gberzina)
 
 --------------------------------------------------------------------------------
 Changes for 6.0.40
