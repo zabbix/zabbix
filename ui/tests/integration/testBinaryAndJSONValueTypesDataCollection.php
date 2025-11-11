@@ -48,7 +48,7 @@ class testBinaryAndJSONValueTypesDataCollection extends CIntegrationTest {
 		ksort($array);
 
 		foreach ($array as &$value) {
-			ksort_recursive($value);
+			self::ksort_recursive($value);
 		}
 	}
 
