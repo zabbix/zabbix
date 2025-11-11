@@ -1325,6 +1325,18 @@ static int	history_elastic_fetch_batch(void *data, zbx_vector_item_history_t *re
 	if (0 != d->log_slow_queries)
 		sec = zbx_time();
 
+	if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_DEBUG))
+	{
+		char	start_str[32], end_str[32];
+		time_t	end = time(NULL);
+
+		strftime(start_str, sizeof(start_str), "%Y-%m-%d %H:%M:%S", localtime(&start));
+		strftime(end_str, sizeof(end_str), "%Y-%m-%d %H:%M:%S", localtime(&end));
+
+		zabbix_log(LOG_LEVEL_DEBUG, "In %s() window:(%s, %s] age: %s count:%d", __func__, start_str, end_str,
+				zbx_age2str(end - start), 0);
+	}
+
 	/* prepare the json query for elasticsearch, apply ranges if needed */
 	zbx_json_init(&query, ZBX_JSON_ALLOCATE);
 
@@ -1397,7 +1409,7 @@ static int	history_elastic_fetch_batch(void *data, zbx_vector_item_history_t *re
 	if (FAIL == history_elastic_conn_set_post_data(&conn, query.buffer, query.buffer_size, error))
 		goto out;
 
-	zabbix_log(LOG_LEVEL_TRACE, "sending query to %s; post data: %s", conn.url, query.buffer);
+	zabbix_log(LOG_LEVEL_DEBUG, "sending query to %s; post data: %s", conn.url, query.buffer);
 
 	/* initiate search context */
 
