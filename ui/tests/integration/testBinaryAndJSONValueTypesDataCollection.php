@@ -40,7 +40,7 @@ class testBinaryAndJSONValueTypesDataCollection extends CIntegrationTest {
 	static $invalid_json;
 	static $json_image_normalized;
 
-	function normalize_json($json) {
+	public function normalize_json($json) {
 		$data = json_decode($json, true);
 
 		if (json_last_error() !== JSON_ERROR_NONE) {
@@ -52,7 +52,7 @@ class testBinaryAndJSONValueTypesDataCollection extends CIntegrationTest {
 		return json_encode($data, JSON_UNESCAPED_SLASHES);
 	}
 
-	function ksort_recursive(&$array) {
+	public function ksort_recursive(&$array) {
 		if (!is_array($array)) {
 			return;
 		}
