@@ -59,10 +59,7 @@ class CColorPickerElement extends CElement {
 	 * @inheritdoc
 	 */
 	public function isEnabled($enabled = true) {
-		$is_enabled = $this->getInput()->isEnabled($enabled)
-			&& (parent::getAttribute('disabled') === null);
-
-		return $is_enabled === $enabled;
+		return $this->getInput()->isEnabled($enabled);
 	}
 
 	/**
