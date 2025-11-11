@@ -2285,6 +2285,7 @@ define('ZBX_STYLE_TIMELINE_DOT', 'timeline-dot');
 define('ZBX_STYLE_TIMELINE_DOT_BIG', 'timeline-dot-big');
 define('ZBX_STYLE_TIMELINE_TD', 'timeline-td');
 define('ZBX_STYLE_TIMELINE_TH', 'timeline-th');
+define('ZBX_STYLE_TRIMMED_CONTENT', 'trimmed-content');
 define('ZBX_STYLE_PROBLEM_EXPAND_TD', 'problem-expand-td');
 define('ZBX_STYLE_PROBLEM_NESTED', 'problem-nested');
 define('ZBX_STYLE_PROBLEM_NESTED_SMALL', 'problem-nested-small');
