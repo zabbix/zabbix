@@ -302,6 +302,7 @@ static int	DBpatch_7000020(void)
 
 static int	DBpatch_7000021(void)
 {
+	/* 3 - HOST_STATUS_TEMPLATE */
 	if (ZBX_DB_OK > zbx_db_execute("delete from item_rtdata"
 			" where exists ("
 				" select 1 from items i where"
