@@ -207,12 +207,12 @@ class CopyWidgetsDashboards {
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_GROUP,
 										'name' => 'groupids',
-										'value' => 50011
+										'value' => 6 // Virtual machines.
 									],
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_HOST,
 										'name' => 'hostids',
-										'value' => 50012
+										'value' => 10084 // ЗАББИКС Сервер.
 									],
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
@@ -253,7 +253,7 @@ class CopyWidgetsDashboards {
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_ITEM,
 										'name' => 'itemid',
-										'value' => 99088
+										'value' => 42243 // Available memory.
 									],
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
@@ -708,7 +708,7 @@ class CopyWidgetsDashboards {
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_GROUP,
 										'name' => 'groupids',
-										'value' => 50011
+										'value' => 6 // Virtual machines.
 									],
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_HOST,
@@ -785,7 +785,7 @@ class CopyWidgetsDashboards {
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_GROUP,
 										'name' => 'groupids',
-										'value' => 50011
+										'value' => 6 // Virtual machines.
 									],
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_HOST,
@@ -1074,7 +1074,7 @@ class CopyWidgetsDashboards {
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_GROUP,
 										'name' => 'groupids',
-										'value' => 50011
+										'value' => 6 // Virtual machines.
 									],
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_ITEM,
@@ -1526,12 +1526,12 @@ class CopyWidgetsDashboards {
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_GROUP,
 										'name' => 'groupids',
-										'value' => 50011
+										'value' => 6 // Virtual machines.
 									],
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_HOST,
 										'name' => 'hostids',
-										'value' => 50012
+										'value' => 10084 // ЗАББИКС Сервер.
 									],
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
@@ -2343,7 +2343,7 @@ class CopyWidgetsDashboards {
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_HOST,
 										'name' => 'hostids.0',
-										'value' => 10084 // Zabbix server.
+										'value' => 10084 // ЗАББИКС Сервер.
 									],
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
