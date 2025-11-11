@@ -153,7 +153,7 @@ foreach ($data['items'] as $itemid => $item) {
 			$last_value = (new CSpan(formatHistoryValue($last_history['value'], $item, false)))
 				->addClass(ZBX_STYLE_CURSOR_POINTER)
 				->setHint(
-					(new CDiv(CTextHelper::trimWithEllipsis($last_history['value'], ZBX_HINTBOX_CONTENT_LIMIT)))
+					(new CTrim($last_history['value'], ZBX_HINTBOX_CONTENT_LIMIT))
 						->addClass(ZBX_STYLE_HINTBOX_RAW_DATA)
 						->addClass(ZBX_STYLE_HINTBOX_WRAP),
 					'', true, '', 0

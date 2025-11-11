@@ -139,7 +139,8 @@ class CScreenHistory extends CScreenBase {
 
 		$iv_string = [
 			ITEM_VALUE_TYPE_LOG => 1,
-			ITEM_VALUE_TYPE_TEXT => 1
+			ITEM_VALUE_TYPE_TEXT => 1,
+			ITEM_VALUE_TYPE_JSON => 1
 		];
 
 		if ($this->action == HISTORY_VALUES || $this->action == HISTORY_LATEST) {
@@ -242,7 +243,7 @@ class CScreenHistory extends CScreenBase {
 			}
 			/**
 			 * View type: Values, 500 latest values
-			 * Item type: text, log
+			 * Item type: text, log, JSON.
 			 */
 			elseif (!$numeric_items) {
 				$use_log_item = false;
@@ -289,6 +290,14 @@ class CScreenHistory extends CScreenBase {
 				foreach ($items_by_type as $value_type => $itemids) {
 					$options['history'] = $value_type;
 					$options['itemids'] = $itemids;
+
+					if ($value_type == ITEM_VALUE_TYPE_JSON) {
+						$options['maxValueSize'] = 64 * ZBX_KIBIBYTE + 1;
+					}
+					else {
+						unset($options['maxValueSize']);
+					}
+
 					$item_data = API::History()->get($options);
 
 					if ($item_data) {
@@ -316,7 +325,9 @@ class CScreenHistory extends CScreenBase {
 					}
 					else {
 						$data['value'] = rtrim($data['value'], " \t\r\n");
-						$value = zbx_nl2br($data['value']);
+
+						$value = $value_type == ITEM_VALUE_TYPE_JSON ?
+							(new CTrim($data['value'], 64 * ZBX_KIBIBYTE)) : $data['value'];
 
 						if ($this->filter !== '') {
 							$haystack = mb_strtolower($data['value']);
@@ -391,7 +402,7 @@ class CScreenHistory extends CScreenBase {
 			}
 			/**
 			 * View type: 500 latest values.
-			 * Item type: numeric (unsigned, char), float, JSON.
+			 * Item type: numeric (unsigned, char), float.
 			 */
 			elseif ($this->action === HISTORY_LATEST) {
 				$history_table = (new CTableInfo())
@@ -407,13 +418,6 @@ class CScreenHistory extends CScreenBase {
 				foreach ($items_by_type as $value_type => $itemids) {
 					$options['history'] = $value_type;
 					$options['itemids'] = $itemids;
-
-					if ($value_type == ITEM_VALUE_TYPE_JSON) {
-						$options['maxValueSize'] = 64 * ZBX_KIBIBYTE + 1;
-					}
-					else {
-						unset($options['maxValueSize']);
-					}
 
 					$item_data = API::History()->get($options);
 
@@ -437,10 +441,6 @@ class CScreenHistory extends CScreenBase {
 						$value = formatFloat($value, ['decimals' => ZBX_UNITS_ROUNDOFF_UNSUFFIXED]);
 					}
 
-					if ($item['value_type'] == ITEM_VALUE_TYPE_JSON) {
-						$value = CTextHelper::trimWithEllipsis($value, 64 * ZBX_KIBIBYTE);
-					}
-
 					$value = $item['value_type'] == ITEM_VALUE_TYPE_BINARY
 						? italic(_('binary value'))->addClass(ZBX_STYLE_GREY)
 						: zbx_nl2br(CValueMapHelper::applyValueMap($item['value_type'], $value, $item['valuemap']));
@@ -456,7 +456,7 @@ class CScreenHistory extends CScreenBase {
 			}
 			/**
 			 * View type: Values.
-			 * Item type: numeric (unsigned, char), float, JSON.
+			 * Item type: numeric (unsigned, char), float.
 			 */
 			else {
 				CArrayHelper::sort($items, [
@@ -468,13 +468,6 @@ class CScreenHistory extends CScreenBase {
 				foreach ($items as $item) {
 					$options['itemids'] = [$item['itemid']];
 					$options['history'] = $item['value_type'];
-
-					if ($item['value_type'] == ITEM_VALUE_TYPE_JSON) {
-						$options['maxValueSize'] = 64 * ZBX_KIBIBYTE + 1;
-					}
-					else {
-						unset($options['maxValueSize']);
-					}
 
 					$item_data = API::History()->get($options);
 
@@ -537,10 +530,6 @@ class CScreenHistory extends CScreenBase {
 
 						if ($item['value_type'] == ITEM_VALUE_TYPE_FLOAT) {
 							$value = formatFloat($value, ['decimals' => ZBX_UNITS_ROUNDOFF_UNSUFFIXED]);
-						}
-
-						if ($item['value_type'] == ITEM_VALUE_TYPE_JSON) {
-							$value = CTextHelper::trimWithEllipsis($value, 64 * ZBX_KIBIBYTE);
 						}
 
 						$value = $item['value_type'] == ITEM_VALUE_TYPE_BINARY
