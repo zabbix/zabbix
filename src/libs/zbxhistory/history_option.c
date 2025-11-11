@@ -289,7 +289,7 @@ int	history_provider_parse_options(const char *conf, char **name, zbx_vector_his
 		ptr++;
 
 	/* there must be at least one mandatory option */
-	if (0 == len || ',' != *ptr)
+	if (0 == len || ';' != *ptr)
 	{
 		*error = zbx_dsprintf(NULL, "invalid HistoryProvider value \"%s\"", conf);
 		return FAIL;
