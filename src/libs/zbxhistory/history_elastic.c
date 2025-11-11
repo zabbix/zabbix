@@ -62,7 +62,7 @@ ZBX_PTR_VECTOR_IMPL(elastic_conn_ptr, zbx_elastic_conn_t *)
 
 typedef struct
 {
-	unsigned char			log_slow_queries;
+	int				log_slow_queries;
 	unsigned char			pipelines;
 
 	zbx_uint64_t			value_type_flags;
@@ -1696,7 +1696,7 @@ static void	*history_elastic_create_data(const zbx_history_option_t *options, in
 		data->pipelines = (unsigned char)atoi(value);
 
 	if (NULL != (value = history_option_value(options, options_num, HISTORY_PROVIDER_OPTION_LOG_SLOW_QUERIES)))
-		data->log_slow_queries = (unsigned char)atoi(value);
+		data->log_slow_queries = atoi(value);
 
 	zbx_vector_elastic_conn_ptr_create(&data->conns);
 
