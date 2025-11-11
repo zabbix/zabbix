@@ -1978,6 +1978,10 @@ select {
 		max-height: 240px;
 	}
 
+	.trimmed-content::after {
+		content: '\2026';
+	}
+
 	.msg-bad,
 	.msg-good,
 	.msg-warning {
@@ -2339,6 +2343,10 @@ select {
 		float: left;
 		margin-top: 0;
 	}
+}
+
+.hintbox-wrap {
+	display: block;
 }
 
 // Problem notification overlay.
