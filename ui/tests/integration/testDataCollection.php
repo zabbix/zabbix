@@ -32,7 +32,6 @@ class testDataCollection extends CIntegrationTest {
 	 * @inheritdoc
 	 */
 	public function prepareData() {
-
 		// Create proxy "proxy".
 		CDataHelper::call('proxy.create', [
 			'name' => 'proxy',
@@ -449,7 +448,6 @@ class testDataCollection extends CIntegrationTest {
 			' issuer:"CN=ZabbixCA" subject:"CN=zabbix_proxy"', false);
 		self::waitForLogLineToBePresent(self::COMPONENT_PROXY, 'zbx_tls_accept() peer certificate' .
 			' issuer:"CN=ZabbixCA" subject:"CN=zabbix_agent"', false);
-
 		self::waitForLogLineToBePresent(self::COMPONENT_AGENT, 'zbx_tls_accept() peer certificate' .
 			' issuer:"CN=ZabbixCA" subject:"CN=zabbix_proxy"', false);
 
