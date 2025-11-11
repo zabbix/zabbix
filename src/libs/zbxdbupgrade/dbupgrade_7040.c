@@ -14,6 +14,8 @@
 
 #include "dbupgrade.h"
 
+#include "zbxdb.h"
+
 /*
  * 7.4 maintenance database patches
  */
@@ -25,6 +27,22 @@ static int	DBpatch_7040000(void)
 	return SUCCEED;
 }
 
+static int	DBpatch_7040001(void)
+{
+	/* 3 - HOST_STATUS_TEMPLATE */
+	if (ZBX_DB_OK > zbx_db_execute("delete from item_rtdata"
+			" where exists ("
+				" select 1 from items i where"
+					" item_rtdata.itemid=i.itemid and i.hostid in ("
+						"select hostid from hosts where status=3)"
+				")"))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
 #endif
 
 DBPATCH_START(7040)
@@ -32,5 +50,6 @@ DBPATCH_START(7040)
 /* version, duplicates flag, mandatory flag */
 
 DBPATCH_ADD(7040000, 0, 1)
+DBPATCH_ADD(7040001, 0, 0)
 
 DBPATCH_END()
