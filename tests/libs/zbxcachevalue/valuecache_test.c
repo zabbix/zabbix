@@ -146,10 +146,13 @@ int	zbx_vcmock_str_to_cache_mode(const char *mode)
 	return FAIL;
 }
 
+/* mocks */
+
 int	__wrap_zbx_db_version_check(const char *database, zbx_uint32_t current_version, zbx_uint32_t min_version,
 		zbx_uint32_t max_version, zbx_uint32_t min_supported_version);
 int	__wrap_zbx_db_verify_version_info(struct zbx_db_version_info_t *info, int allow_unsupported,
 		unsigned char program_type);
+int	__wrap_zbx_db_settings_set_value(const char *name, const void *value, int type);
 
 int	__wrap_zbx_db_version_check(const char *database, zbx_uint32_t current_version, zbx_uint32_t min_version,
 		zbx_uint32_t max_version, zbx_uint32_t min_supported_version)

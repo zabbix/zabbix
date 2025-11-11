@@ -679,15 +679,6 @@ zbx_history_provider_t	*__wrap_history_clickhouse_open(const zbx_history_option_
 	return NULL;
 }
 
-zbx_history_provider_t	*__wrap_history_module_open(const zbx_history_option_t *options, int options_num, char **error)
-{
-	ZBX_UNUSED(options);
-	ZBX_UNUSED(options_num);
-	ZBX_UNUSED(error);
-
-	return NULL;
-}
-
 void	__wrap_zbx_elastic_version_extract(void)
 {
 }

@@ -101,7 +101,6 @@ COMMON_WRAP_FUNCS = \
 	-Wl,--wrap=history_sql_open \
 	-Wl,--wrap=history_elastic_open \
 	-Wl,--wrap=history_clickhouse_open \
-	-Wl,--wrap=history_module_open \
 	-Wl,--wrap=zbx_elastic_version_extract \
 	-Wl,--wrap=zbx_elastic_version_get \
 	-Wl,--wrap=time
