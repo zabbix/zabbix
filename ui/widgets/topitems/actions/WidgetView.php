@@ -413,8 +413,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 					AGGREGATE_MAX =>	max($values),
 					AGGREGATE_AVG =>	CMathHelper::safeAvg($values),
 					AGGREGATE_COUNT =>	count($values),
-					AGGREGATE_SUM =>	CMathHelper::safeSum($values),
-					default =>			0
+					AGGREGATE_SUM =>	CMathHelper::safeSum($values)
 				};
 
 				$combined_value = CAggHelper::formatValue($value, $item['value_type'], $function, $units,

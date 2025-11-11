@@ -835,10 +835,10 @@ function formatAggregatedHistoryValue($value, array $item, int $function, bool $
 function formatAggregatedHistoryValueRaw($value, array $item, int $function, bool $force_units = false,
 		bool $trim = true, array $convert_options = []): array {
 	$options = [
-		'force_units' =>		$force_units,
-		'trim' =>				$trim,
-		'convert_options' =>	$convert_options,
-		'valuemap' =>			$item['valuemap']
+		'force_units' => $force_units,
+		'trim' => $trim,
+		'convert_options' => $convert_options,
+		'valuemap' => $item['valuemap']
 	];
 
 	return CAggHelper::formatValue($value, $item['value_type'], $function, $item['units'], $options);
