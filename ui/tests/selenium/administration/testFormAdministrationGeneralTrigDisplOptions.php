@@ -147,8 +147,8 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 		foreach ($color_pickers as $selector) {
 			$form->query($selector)->one()->click()->waitUntilReady();
 			$overlay = $this->query('xpath://div[@id="color_picker"]')->asColorPicker()->one();
-			$this->assertEquals(6, $overlay->getInput()->getAttribute('maxlength'));
-			CColorPickerElement::close();
+			$this->assertEquals(6, $overlay->query('xpath:.//input')->one()->getAttribute('maxlength'));
+			$overlay->close();
 		}
 
 		$checkboxes = [

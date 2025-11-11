@@ -254,7 +254,6 @@ class testDashboardItemValueWidget extends testWidgets {
 					'id:time_period_to' => 'now',
 					'History data' => 'Auto'
 				];
-
 				foreach ($default_values_advanced as $field => $value) {
 					$this->assertEquals($value, $form->getField($field)->getValue());
 				}

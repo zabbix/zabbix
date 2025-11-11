@@ -17,8 +17,6 @@ require_once 'vendor/autoload.php';
 
 require_once __DIR__.'/../CElement.php';
 
-use Facebook\WebDriver\WebDriverKeys;
-
 /**
  * Color picker element.
  */
@@ -32,7 +30,7 @@ class CColorPickerElement extends CElement {
 	 * @return type
 	 */
 	public function getInput() {
-		return $this->query('xpath:.//input')->one();
+		return $this->query('xpath:./input')->one();
 	}
 
 	/**
@@ -51,9 +49,7 @@ class CColorPickerElement extends CElement {
 		}
 		else {
 			$overlay->query('xpath:.//div[@class="color-picker-input"]/input')->one()->overwrite($color);
-
-			CElementQuery::getPage()->pressKey(WebDriverKeys::ENTER);
-			$overlay->waitUntilNotVisible();
+			$overlay->query('class:btn-overlay-close')->one()->click()->waitUntilNotVisible();
 		}
 
 		return $this;
@@ -63,8 +59,10 @@ class CColorPickerElement extends CElement {
 	 * @inheritdoc
 	 */
 	public function isEnabled($enabled = true) {
-		return parent::isEnabled($enabled) && $this->getInput()->isEnabled($enabled)
-			&& $this->query('xpath:./button')->one()->isEnabled($enabled);
+		$is_enabled = $this->getInput()->isEnabled($enabled)
+			&& (parent::getAttribute('disabled') === null);
+
+		return $is_enabled === $enabled;
 	}
 
 	/**
@@ -95,11 +93,12 @@ class CColorPickerElement extends CElement {
 	}
 
 	/**
-	 * Press Escape key to close color picker.
+	 * Close color pick overlay dialog.
+	 *
+	 * @return $this
 	 */
-	public static function close() {
-		CElementQuery::getPage()->pressKey(WebDriverKeys::ESCAPE);
-		(new CElementQuery('id:color_picker'))->waitUntilNotVisible();
+	public function close() {
+		$this->query('class:btn-overlay-close')->one()->click()->waitUntilNotVisible();
 	}
 
 	/**
