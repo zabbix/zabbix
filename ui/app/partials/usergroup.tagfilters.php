@@ -38,7 +38,7 @@ foreach ($data['tag_filters'] as $key => $tag_filter) {
 		$badges = italic(_('All tags'));
 	}
 	else {
-		$badges = $data['tag_filters_badges'][$tag_filter['groupid']];
+		$badges = (new CDiv($data['tag_filters_badges'][$tag_filter['groupid']]))->addClass(ZBX_STYLE_TAGS_WRAPPER);
 	}
 
 	$tag_filter_table->addRow([

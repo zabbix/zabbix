@@ -3072,6 +3072,24 @@ uwMrOBKatg7CZ1Uenv1K3ioD5w==
 				]
 			],
 			[
+				['type' => API_OBJECTS, 'flags' => API_PRESERVE_KEYS, 'fields' => []],
+				[
+					10 => [],
+					13 => null
+				],
+				'/',
+				'Invalid parameter "/14": an array is expected.'
+			],
+			[
+				['type' => API_OBJECTS, 'fields' => []],
+				[
+					10 => [],
+					13 => null
+				],
+				'/',
+				'Invalid parameter "/2": an array is expected.'
+			],
+			[
 				['type' => API_OBJECTS, 'fields' => [
 					'hostid' =>	['type' => API_ID],
 					'host' =>	['type'=> API_STRING_UTF8],

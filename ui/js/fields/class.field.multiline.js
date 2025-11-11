@@ -31,10 +31,18 @@ class CFieldMultiline extends CField {
 	}
 
 	getValue() {
+		if (this.isDisabled()) {
+			return null;
+		}
+
 		return this._field.querySelector(`input[name="${this.getName()}"]`).value;
 	}
 
 	getName() {
 		return this._field.dataset.name;
+	}
+
+	isDisabled() {
+		return this._field.disabled;
 	}
 }

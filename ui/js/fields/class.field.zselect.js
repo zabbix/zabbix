@@ -26,11 +26,15 @@ class CFieldZSelect extends CField {
 	}
 
 	getValue() {
-		if (this._field.disabled) {
+		if (this.isDisabled()) {
 			return null;
 		}
 
 		return this._field.value;
+	}
+
+	isDisabled() {
+		return this._field.disabled;
 	}
 
 	focusErrorField() {

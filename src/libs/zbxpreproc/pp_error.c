@@ -309,7 +309,7 @@ int	pp_error_on_fail(zbx_dc_um_shared_handle_t *um_handle, zbx_uint64_t hostid, 
 	switch (step->error_handler)
 	{
 		case ZBX_PREPROC_FAIL_DISCARD_VALUE:
-			zbx_variant_clear(value);
+			zbx_variant_clear_ext(value, ZBX_VARIANT_FLAG_CHANGED);
 			break;
 		case ZBX_PREPROC_FAIL_SET_VALUE:
 		case ZBX_PREPROC_FAIL_SET_ERROR:
