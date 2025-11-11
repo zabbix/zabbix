@@ -344,7 +344,7 @@ class testDocumentationLinks extends CWebTest {
 					'doc_link' => '/en/manual/web_interface/frontend_sections/monitoring/latest_data'
 				]
 			],
-			// #17 Speccific item graph from latest data view.
+			// #17 Specific item graph from latest data view.
 			[
 				[
 					'url' => 'history.php?action=showgraph&itemids%5B%5D=42237',
@@ -943,21 +943,33 @@ class testDocumentationLinks extends CWebTest {
 			// #86 Template LLD host prototype list view.
 			[
 				[
-					'url' => 'host_prototypes.php?parent_discoveryid=15011&context=template',
+					'url' => 'zabbix.php?action=host.prototype.list&parent_discoveryid=15011&context=template',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/data_collection/templates/discovery/host_prototypes'
 				]
 			],
 			// #87 Template LLD host prototype create form.
 			[
 				[
-					'url' => 'host_prototypes.php?form=create&parent_discoveryid=15011&context=template',
+					'url' => 'zabbix.php?action=host.prototype.list&parent_discoveryid=15011&context=template',
+					'actions' => [
+						[
+							'callback' => 'openFormWithLink',
+							'element' => 'button:Create host prototype'
+						]
+					],
 					'doc_link' => '/en/manual/discovery/low_level_discovery/host_prototypes'
 				]
 			],
 			// #88 Template LLD host prototype edit form.
 			[
 				[
-					'url' => 'host_prototypes.php?form=update&parent_discoveryid=15011&hostid=99000&context=template',
+					'url' => 'zabbix.php?action=host.prototype.list&parent_discoveryid=15011&hostid=99000&context=template',
+					'actions' => [
+						[
+							'callback' => 'openFormWithLink',
+							'element' => 'link:testInheritanceHostPrototype {#TEST}'
+						]
+					],
 					'doc_link' => '/en/manual/discovery/low_level_discovery/host_prototypes'
 				]
 			],
@@ -1324,14 +1336,20 @@ class testDocumentationLinks extends CWebTest {
 			// #129 Host LLD host prototype list view.
 			[
 				[
-					'url' => 'host_prototypes.php?parent_discoveryid=90001&context=host',
+					'url' => 'zabbix.php?action=host.prototype.list&parent_discoveryid=90001&context=host',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/data_collection/hosts/discovery/host_prototypes'
 				]
 			],
 			// #130 Host LLD host prototype create form.
 			[
 				[
-					'url' => 'host_prototypes.php?form=create&parent_discoveryid=90001&context=host',
+					'url' => 'zabbix.php?action=host.prototype.list&parent_discoveryid=90001&context=host',
+					'actions' => [
+						[
+							'callback' => 'openFormWithLink',
+							'element' => 'button:Create host prototype'
+						]
+					],
 					'doc_link' => '/en/manual/discovery/low_level_discovery/host_prototypes'
 				]
 			],
@@ -2557,6 +2575,24 @@ class testDocumentationLinks extends CWebTest {
 					'widget_type' => 'Item navigator',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/dashboards/widgets/item_navigator'
 				]
+			],
+			// #249 Start creating Item Card widget.
+			[
+				[
+					'url' => 'zabbix.php?action=dashboard.view&dashboardid=1',
+					'actions' => [
+						[
+							'callback' => 'openFormWithLink',
+							'element' => 'button:Edit dashboard'
+						],
+						[
+							'callback' => 'openFormWithLink',
+							'element' => 'id:dashboard-add-widget'
+						]
+					],
+					'widget_type' => 'Item card',
+					'doc_link' => '/en/manual/web_interface/frontend_sections/dashboards/widgets/item_card'
+				]
 			]
 		];
 	}
@@ -2569,8 +2605,8 @@ class testDocumentationLinks extends CWebTest {
 	 */
 	public function testDocumentationLinks_checkGeneralLinks($data) {
 		$replace_urls = [
-			'host_prototype' => 'host_prototypes.php?form=update&parent_discoveryid='.self::$lldid.'&hostid='.
-					self::$host_prototypeid.'&context=host',
+			'host_prototype' => 'zabbix.php?action=popup&popup=host.prototype.edit&parent_discoveryid='.self::$lldid.
+					'&hostid='.self::$host_prototypeid.'&context=host',
 			'lld_prototype_list_template' => 'host_discovery_prototypes.php?parent_discoveryid='.self::$template_lldid.
 					'&context=template',
 			'lld_prototype_create_template' => 'host_discovery_prototypes.php?form=create&hostid='.self::$templateid.
