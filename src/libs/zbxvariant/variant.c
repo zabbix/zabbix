@@ -83,6 +83,8 @@ void	zbx_variant_clear(zbx_variant_t *value)
 			zbx_free(value->data.vector);
 			break;
 		case ZBX_VARIANT_NONE:
+			value->data.flags = 0;
+			break;
 		case ZBX_VARIANT_DBL:
 		case ZBX_VARIANT_UI64:
 			break;
@@ -92,6 +94,12 @@ void	zbx_variant_clear(zbx_variant_t *value)
 	}
 
 	value->type = ZBX_VARIANT_NONE;
+}
+
+void	zbx_variant_clear_ext(zbx_variant_t *value, unsigned char flags)
+{
+	zbx_variant_clear(value);
+	value->data.flags = flags;
 }
 
 /******************************************************************************
@@ -126,6 +134,7 @@ void	zbx_variant_set_ui64(zbx_variant_t *value, zbx_uint64_t value_ui64)
 
 void	zbx_variant_set_none(zbx_variant_t *value)
 {
+	value->data.flags = 0;
 	value->type = ZBX_VARIANT_NONE;
 }
 
@@ -177,6 +186,7 @@ void	zbx_variant_copy(zbx_variant_t *value, const zbx_variant_t *source)
 			zbx_variant_set_bin(value, zbx_variant_data_bin_copy(source->data.bin));
 			break;
 		case ZBX_VARIANT_NONE:
+			value->data.flags = source->data.flags;
 			value->type = ZBX_VARIANT_NONE;
 			break;
 		case ZBX_VARIANT_ERR:
@@ -701,7 +711,8 @@ int	zbx_variant_compare(const zbx_variant_t *value1, const zbx_variant_t *value2
  *                                                                            *
  * Comments: This function checks if two variants are of the same type and    *
  *           have identical content. For string, error, binary, and vector    *
- *           types, it checks if they point to the same memory location.      *
+ *           types, it checks if they point to the same memory location. It   *
+ *           does not compare flags used in processing.                       *
  *                                                                            *
  ******************************************************************************/
 int	zbx_variant_same(const zbx_variant_t *value1, const zbx_variant_t *value2)
