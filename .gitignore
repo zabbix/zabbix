@@ -383,7 +383,7 @@ tests/zabbix_server/lld/lld_compare_entries
 tests/zabbix_server/lld/lld_entry_create
 tests/zabbix_server/lld/lld_rule_merge_exported_macros
 tests/zabbix_server/lld/zbx_lld_hgsets_test
-tests/zabbix_server/lld/zbx_lld_hgsets_testzbx_substitute_expression_lld_macros
+tests/zabbix_server/lld/zbx_substitute_expression_lld_macros
 tests/zabbix_server/lld/zbx_substitute_lld_macros
 tests/zabbix_server/lld/zbx_substitute_macros_in_json_pairs
 tests/zabbix_server/pinger/zbx_pinger_test

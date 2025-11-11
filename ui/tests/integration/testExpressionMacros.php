@@ -877,7 +877,7 @@ class testExpressionMacros extends CIntegrationTest {
 		return [
 			self::COMPONENT_SERVER => [
 				'DebugLevel' => 4,
-				'LogFileSize' => 2
+				'LogFileSize' => 20
 			]
 		];
 	}

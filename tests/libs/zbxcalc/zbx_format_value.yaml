@@ -11,7 +11,7 @@ db data:
   valuemap_mapping:
     - ["OK", "Operational", 0, 1]
 ---
-test case: float value minutes and seconds
+test case: float value seconds and milliseconds
 in:
   value: "1.156"
   valuemapid: 0
@@ -129,4 +129,54 @@ in:
   value_type: 3   # ITEM_VALUE_TYPE_UINT64
 out:
   value: "2009.02.14 01:31:30"
+db data: {}
+---
+test case: max uint64 value B
+in:
+  value: "18446744073709551615"
+  valuemapid: 0
+  units: "B"
+  value_type: 3   # ITEM_VALUE_TYPE_UINT64
+out:
+  value: "16777216 TB"
+db data: {}
+---
+test case: max uint64 value s
+in:
+  value: "18446744073709551615"
+  valuemapid: 0
+  units: "s"
+  value_type: 3   # ITEM_VALUE_TYPE_UINT64
+out:
+  value: "584942417355y 26d"
+db data: {}
+---
+test case: max uint64 unixtime (integer overflow)
+in:
+  value: "18446744073709551615"
+  valuemapid: 0
+  units: "unixtime"
+  value_type: 3   # ITEM_VALUE_TYPE_UINT64
+out:
+  value: "1970.01.01 03:00:00"
+db data: {}
+---
+test case: max float value Bps
+in:
+  value: "1.7976931348623157e+308"
+  valuemapid: 0
+  units: "Bps"
+  value_type: 0   # ITEM_VALUE_TYPE_FLOAT
+out:
+  value: "163499238157084228818828181585290037035584252885969359885091286 TBps"
+db data: {}
+---
+test case: min float value Bps
+in:
+  value: "2.2250738585072014e-308"
+  valuemapid: 0
+  units: "Bps"
+  value_type: 0   # ITEM_VALUE_TYPE_FLOAT
+out:
+  value: "0 Bps"
 db data: {}
