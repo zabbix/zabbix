@@ -1425,7 +1425,12 @@ static int	history_elastic_fetch_batch(void *data, zbx_vector_item_history_t *re
 
 		zabbix_log(LOG_LEVEL_TRACE, "received from elasticsearch: %s", conn.resp.page.data);
 
-		zbx_json_open(conn.resp.page.data, &jp);
+		if (SUCCEED != zbx_json_open(conn.resp.page.data, &jp))
+		{
+			zabbix_log(LOG_LEVEL_ERR, "cannot parse elasticsearch error: %s response '%s',"
+					" query '%s'", zbx_json_strerror(), conn.resp.page.data, query.buffer);
+			goto out;
+		}
 		if (SUCCEED != zbx_json_brackets_by_name(&jp, "aggregations", &jp_aggs))
 		{
 			zabbix_log(LOG_LEVEL_ERR, "cannot find aggregations in elasticsearch response '%s',"
