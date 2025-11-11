@@ -446,10 +446,14 @@ function makeSectionLatestData(array $item, string $context): CDiv {
 					->setAttribute('data-clock', $item_value['clock'].'.'.$item_value['ns']);
 			}
 			else {
+				$hintbox_value = $item['value_type'] == ITEM_VALUE_TYPE_JSON
+					? (new CTrim($item_value['value'], ZBX_HINTBOX_CONTENT_LIMIT))
+					: (new CDiv ($item_value['value']));
+
 				$last_value_column_value = (new CSpan(formatHistoryValue($item_value['value'], $item, false)))
 					->addClass(ZBX_STYLE_CURSOR_POINTER)
 					->setHint(
-						(new CDiv(CTextHelper::trimWithEllipsis($item_value['value'], ZBX_HINTBOX_CONTENT_LIMIT)))
+						$hintbox_value
 							->addClass(ZBX_STYLE_HINTBOX_RAW_DATA)
 							->addClass(ZBX_STYLE_HINTBOX_WRAP),
 						'', true, '', 0
