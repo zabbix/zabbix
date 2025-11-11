@@ -229,8 +229,8 @@ static void	setopt_error(const char *option, CURLcode err, char **error)
 int	zbx_curl_setopt_https(CURL *easyhandle, char **error)
 {
 	CURLcode	err;
-	static char	*protocols_str;
-	static long	protocols = 0;
+	static ZBX_THREAD_LOCAL char	*protocols_str;
+	static ZBX_THREAD_LOCAL long	protocols = 0;
 
 /* added in 7.19.4 (0x071304), deprecated since 7.85.0 */
 #if LIBCURL_VERSION_NUM < 0x071304
@@ -282,8 +282,8 @@ int	zbx_curl_setopt_https(CURL *easyhandle, char **error)
 int	zbx_curl_setopt_smtps(CURL *easyhandle, char **error)
 {
 	CURLcode	err;
-	static char	*protocols_str;
-	static long	protocols = 0;
+	static ZBX_THREAD_LOCAL char	*protocols_str;
+	static ZBX_THREAD_LOCAL long	protocols = 0;
 
 /* added in 7.20.0 (0x071400), deprecated since 7.85.0 */
 #if LIBCURL_VERSION_NUM < 0x071400
