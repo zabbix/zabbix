@@ -1515,7 +1515,7 @@ class testDashboardItemCardWidget extends testWidgets {
 				self::$dashboard_ids['Dashboard for Item Card widget update']
 		)->waitUntilReady();
 
-		$dashboard = CDashboardElement::find()->one();
+		$dashboard = CDashboardElement::find()->waitUntilReady()->one();
 		$dashboard->edit()->getWidget('Item card')->edit()->submit();
 		$dashboard->getWidget('Item card');
 		$dashboard->save();
@@ -1837,7 +1837,7 @@ class testDashboardItemCardWidget extends testWidgets {
 				self::$dashboard_ids['Dashboard for Item Card widget display check']
 		)->waitUntilReady();
 
-		$dashboard = CDashboardElement::find()->one();
+		$dashboard = CDashboardElement::find()->waitUntilReady()->one();
 		$widget = $dashboard->getWidget($data['Header']);
 
 		if (array_key_exists('Item', $data)) {
@@ -2131,7 +2131,7 @@ class testDashboardItemCardWidget extends testWidgets {
 				self::$dashboard_ids['Dashboard for Item Card widget display check']
 		)->waitUntilReady();
 
-		$dashboard = CDashboardElement::find()->one();
+		$dashboard = CDashboardElement::find()->waitUntilReady()->one();
 		$widget = $dashboard->getWidget($data['widget_name']);
 
 		switch ($data['link_name']) {
@@ -2262,7 +2262,7 @@ class testDashboardItemCardWidget extends testWidgets {
 				self::$dashboard_ids['Dashboard for canceling Item Card widget']
 		);
 
-		$dashboard = CDashboardElement::find()->one()->edit();
+		$dashboard = CDashboardElement::find()->waitUntilReady()->one()->edit();
 		self::$old_widget_count = $dashboard->getWidgets()->count();
 
 		// Start updating or creating a widget.
@@ -2346,7 +2346,9 @@ class testDashboardItemCardWidget extends testWidgets {
 				self::$dashboard_ids['Dashboard for Item Card widget display check']
 		)->waitUntilReady();
 
-		$this->assertScreenshot(CDashboardElement::find()->one()->getWidget($data['Name']), 'itemcard_'.$data['Name']);
+		$this->assertScreenshot(CDashboardElement::find()->waitUntilReady()->one()->getWidget($data['Name']),
+				'itemcard_'.$data['Name']
+		);
 	}
 
 	/**
