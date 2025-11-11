@@ -111,6 +111,9 @@ else {
 
 					$formatted_value = getFormattedValue($column, $column_config);
 
+					$hintbox_value = $column['item']['value_type'] == ITEM_VALUE_TYPE_JSON
+						? (new CTrim($column['value'], ZBX_HINTBOX_CONTENT_LIMIT)) : $column['value'];
+
 					if ($column_config['display_value_as'] == CWidgetFieldColumnsList::DISPLAY_VALUE_AS_BINARY) {
 						if ($column['item']['value_type'] == ITEM_VALUE_TYPE_BINARY
 								&& $column_config['aggregate_function'] != AGGREGATE_COUNT) {
@@ -152,10 +155,10 @@ else {
 							}
 						}
 
-						$row[] = createTextColumn($formatted_value, $column['value'], $color, true);
+						$row[] = createTextColumn($formatted_value, $hintbox_value, $color, true);
 					}
 					elseif ($column_config['display'] == CWidgetFieldColumnsList::DISPLAY_AS_IS) {
-						$row[] = createTextColumn($formatted_value, $column['value'], $color);
+						$row[] = createTextColumn($formatted_value, $hintbox_value, $color);
 					}
 					elseif ($column_config['display'] == CWidgetFieldColumnsList::DISPLAY_SPARKLINE) {
 						$row[] = new CCol((new CSparkline())
@@ -167,7 +170,7 @@ else {
 							->setTimePeriodFrom($column_config['sparkline']['time_period']['from_ts'])
 							->setTimePeriodTo($column_config['sparkline']['time_period']['to_ts'])
 						);
-						$row[] = createTextColumn($formatted_value, $column['value'] ?? '', $color)
+						$row[] = createTextColumn($formatted_value, $hintbox_value ?? '', $color)
 							->addStyle('width: 0;')
 							->addClass(ZBX_STYLE_NOWRAP);
 					}
@@ -248,9 +251,9 @@ function createNonBinaryShowButton(string $column_name): CButton {
 		->setAttribute('data-alt', $column_name);
 }
 
-function createTextColumn(string $formatted_value, string $hint_value, string $color, bool $raw_data = false): CCol {
-	$hint = (new CDiv(CTextHelper::trimWithEllipsis($hint_value, ZBX_HINTBOX_CONTENT_LIMIT)))
-		->addClass(ZBX_STYLE_HINTBOX_WRAP);
+function createTextColumn(string $formatted_value, string|CTrim $hint_value, string $color, bool $raw_data = false): CCol {
+
+	$hint = is_string($hint_value) ? (new CDiv($hint_value)) : $hint_value;
 
 	if ($raw_data) {
 		$hint->addClass(ZBX_STYLE_HINTBOX_RAW_DATA);
@@ -260,7 +263,7 @@ function createTextColumn(string $formatted_value, string $hint_value, string $c
 		->setAttribute('bgcolor', $color !== '' ? '#'.$color : null)
 		->addItem(
 			(new CDiv($formatted_value))
-				->setHint($hint)
+				->setHint($hint->addClass(ZBX_STYLE_HINTBOX_WRAP))
 		);
 }
 
