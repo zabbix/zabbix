@@ -137,10 +137,14 @@ function makeTableCellViewsNumeric(array $cell, array $data, $formatted_value, b
 		->addClass(ZBX_STYLE_CURSOR_POINTER)
 		->addClass(ZBX_STYLE_NOWRAP);
 
+	$hintbox_value = $item['value_type'] == ITEM_VALUE_TYPE_JSON
+		? (new CTrim($value, ZBX_HINTBOX_CONTENT_LIMIT)) : (new CDiv($value));
+
 	if ($value !== '') {
 		$value_cell->setHint(
-			(new CDiv(CTextHelper::trimWithEllipsis($value, ZBX_HINTBOX_CONTENT_LIMIT)))
-				->addClass(ZBX_STYLE_HINTBOX_WRAP)
+			$hintbox_value
+				->addClass(ZBX_STYLE_HINTBOX_WRAP),
+			'', true, '', 0
 		);
 	}
 
@@ -233,6 +237,7 @@ function makeTableCellViewFormattedValue(array $cell, array $data): CSpan {
 }
 
 function makeTableCellViewsText(array $cell, array $data, $formatted_value, bool $is_view_value): array {
+	$item = $data['db_items'][$cell[Widget::CELL_ITEMID]];
 	$value = $cell[Widget::CELL_VALUE];
 	$column = $data['configuration'][$cell[Widget::CELL_METADATA]['column_index']];
 
@@ -252,8 +257,15 @@ function makeTableCellViewsText(array $cell, array $data, $formatted_value, bool
 		->addClass(ZBX_STYLE_CURSOR_POINTER)
 		->addClass(ZBX_STYLE_NOWRAP);
 
+	$hintbox_value = $item['value_type'] == ITEM_VALUE_TYPE_JSON
+		? (new CTrim($value, ZBX_HINTBOX_CONTENT_LIMIT)) : (new CDiv($value));
+
 	if ($value !== '') {
-		$value_cell->setHint((new CDiv($value))->addClass(ZBX_STYLE_HINTBOX_WRAP), '', false);
+		$value_cell->setHint(
+			$hintbox_value
+			->addClass(ZBX_STYLE_HINTBOX_WRAP),
+			'', true, '', 0
+		);
 	}
 
 	if ($is_view_value) {
