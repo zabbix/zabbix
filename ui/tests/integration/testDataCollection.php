@@ -344,7 +344,7 @@ class testDataCollection extends CIntegrationTest {
 
 		$response = $this->call('proxy.update', [
 			'proxyid' => $proxyid,
-			'tls_connect' => 1,
+			'tls_connect' => 1, // no encryption
 			'tls_accept' => 4, // certificate
 			'tls_issuer' => 'CN=ZabbixCA',
 			'tls_subject' => 'CN=zabbix_proxy'
@@ -369,7 +369,7 @@ class testDataCollection extends CIntegrationTest {
 		$response = $this->call('host.update', [
 			'hostid' => $hostid,
 			'tls_connect' => 4, // certificate
-			'tls_accept' => 4,
+			'tls_accept' => 4, // certificate
 			'tls_issuer' => 'CN=ZabbixCA',
 			'tls_subject' => 'CN=zabbix_agent'
 		]);
