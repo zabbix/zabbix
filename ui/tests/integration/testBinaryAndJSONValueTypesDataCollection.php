@@ -420,7 +420,7 @@ class testBinaryAndJSONValueTypesDataCollection extends CIntegrationTest {
 		$this->sendSenderValue('agent', 'JSON_TRAPPER', self::$json_with_image);
 		$response = $this->callUntilDataIsPresent('history.get', [
 			'itemids' => self::$itemids['agent:JSON_TRAPPER'],
-			'history' => ITEM_VALUE_TYPE_JSON,
+			'history' => ITEM_VALUE_TYPE_JSON
 		]);
 		$this->assertArrayHasKey('result', $response);
 		$this->assertEquals(1, count($response['result']));
@@ -448,7 +448,7 @@ class testBinaryAndJSONValueTypesDataCollection extends CIntegrationTest {
 		$this->sendSenderValue('proxy_agent', 'JSON_TRAPPER', self::$json_with_image, self::COMPONENT_PROXY);
 		$response = $this->callUntilDataIsPresent('history.get', [
 			'itemids' => self::$itemids['proxy_agent:JSON_TRAPPER'],
-			'history' => ITEM_VALUE_TYPE_JSON,
+			'history' => ITEM_VALUE_TYPE_JSON
 		]);
 		$this->assertArrayHasKey('result', $response);
 		$this->assertEquals(1, count($response['result']));
