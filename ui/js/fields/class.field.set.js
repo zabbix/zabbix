@@ -86,6 +86,7 @@ class CFieldSet extends CField {
 
 				for (const existing_field of Object.values(this.#fields)) {
 					if (existing_field.isSameField(discovered_field)) {
+						existing_field.updateState();
 						fields_rediscovered.push(existing_field.getName());
 						field_instance = existing_field;
 						break;
@@ -127,7 +128,7 @@ class CFieldSet extends CField {
 		let result = {};
 
 		for (const field of Object.values(this.#fields)) {
-			if (field._field.hasAttribute('data-skip-from-submit')) {
+			if (field._field.hasAttribute('data-skip-from-submit') || field.isDisabled()) {
 				continue;
 			}
 

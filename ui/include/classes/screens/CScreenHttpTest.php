@@ -155,7 +155,7 @@ class CScreenHttpTest extends CScreenBase {
 				$httptest['steps'],
 				$lastcheck,
 				(new CCol($status))->addClass(ZBX_STYLE_WORDBREAK),
-				array_key_exists($key, $tags) ? $tags[$key] : ''
+				array_key_exists($key, $tags) ? (new CDiv($tags[$key]))->addClass(ZBX_STYLE_TAGS_WRAPPER) : ''
 			]));
 		}
 
