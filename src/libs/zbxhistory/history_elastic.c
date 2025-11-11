@@ -1288,7 +1288,8 @@ static int	history_elastic_parse_bucket(const char *p_bucket, unsigned char valu
 	{
 		zbx_json_parse_t	jp_hit, jp_source;
 
-		zbx_json_brackets_open(p, &jp_hit);
+		if (SUCCEED != zbx_json_brackets_open(p, &jp_hit))
+			continue;
 
 		if (SUCCEED != zbx_json_brackets_by_name(&jp_hit, "_source", &jp_source))
 			continue;

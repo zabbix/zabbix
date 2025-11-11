@@ -1113,6 +1113,9 @@ zbx_uint64_t	zbx_history_get_housekeep_flags(void)
  ******************************************************************************/
 static void	history_logfree(zbx_log_value_t *log)
 {
+	if (NULL == log)
+		return;
+
 	zbx_free(log->source);
 	zbx_free(log->value);
 	zbx_free(log);
