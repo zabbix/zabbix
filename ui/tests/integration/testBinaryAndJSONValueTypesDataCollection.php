@@ -132,7 +132,7 @@ class testBinaryAndJSONValueTypesDataCollection extends CIntegrationTest {
 		$this->assertTrue(@file_put_contents(self::$file_name_invalid_json_for_json_item, self::$invalid_json) !== false);
 
 		//self::$json_image_normalized = shell_exec('echo ' . escapeshellarg(self::$json_with_image) . ' | jq -S -c .');
-		self::$json_image_normalized = self::normalize_json(self::$json_with_image);
+		self::$json_image_normalized = self::normalize_json(self::$json_with_image . 'test');
 
 		CDataHelper::call('proxy.create', [
 			'name' => 'proxy',
