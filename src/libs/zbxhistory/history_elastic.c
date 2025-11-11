@@ -855,9 +855,6 @@ static int	elastic_get_values_for_period(zbx_history_elastic_data_t *data, zbx_u
 	zbx_elastic_conn_t	conn = {0};
 	char			*scroll = "?scroll=10s";
 
-	/* creating scroll context can be very extremely slow, avoid if not needed */
-	if (ZBX_MAX_RESULT_WINDOW >= *count && 0 != *count)
-		scroll = "";
 
 	if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_DEBUG))
 	{
@@ -880,6 +877,10 @@ static int	elastic_get_values_for_period(zbx_history_elastic_data_t *data, zbx_u
 
 	if (0 < *count)
 	{
+		/* creating scroll context can be extremely slow, avoid if not needed */
+		if (ZBX_MAX_RESULT_WINDOW >= *count)
+			scroll = "";
+
 		zbx_json_adduint64(&query, "size", *count);
 		zbx_json_addarray(&query, "sort");
 		zbx_json_addobject(&query, NULL);
@@ -889,6 +890,8 @@ static int	elastic_get_values_for_period(zbx_history_elastic_data_t *data, zbx_u
 		zbx_json_close(&query);
 		zbx_json_close(&query);
 	}
+	else
+		zbx_json_adduint64(&query, "size", ZBX_MAX_RESULT_WINDOW);
 
 	zbx_json_addobject(&query, "query");
 	zbx_json_addobject(&query, "bool");
@@ -938,7 +941,7 @@ static int	elastic_get_values_for_period(zbx_history_elastic_data_t *data, zbx_u
 		goto out;
 	}
 
-	zabbix_log(LOG_LEVEL_TRACE, "sending query to %s; post data: %s", conn.url, query.buffer);
+	zabbix_log(LOG_LEVEL_DEBUG, "sending query to %s; post data: %s", conn.url, query.buffer);
 
 	/* initiate search context */
 
@@ -1026,8 +1029,8 @@ static int	elastic_get_values_for_period(zbx_history_elastic_data_t *data, zbx_u
 
 		/* scroll to the next page */
 
-		zabbix_log(LOG_LEVEL_TRACE, "scroll next batch: sending query to %s; post data: %s", conn.url,
-				scroll_query);
+		zabbix_log(LOG_LEVEL_DEBUG, "scroll next batch: sending query to %s; post data: %s values:%d", conn.url,
+				scroll_query, values->values_num);
 
 		scroll_offset = 0;
 		zbx_snprintf_alloc(&scroll_query, &scroll_alloc, &scroll_offset,
@@ -1066,7 +1069,7 @@ static int	elastic_get_values_for_period(zbx_history_elastic_data_t *data, zbx_u
 			goto out;
 		}
 
-		zabbix_log(LOG_LEVEL_TRACE, "delete scroll: sending query to %s", conn.url);
+		zabbix_log(LOG_LEVEL_DEBUG, "delete scroll: sending query to %s", conn.url);
 
 		ret = history_elastic_query(data, data->mhandle, &conn, ELASTIC_RETRIES_ON);
 	}
