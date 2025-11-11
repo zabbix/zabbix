@@ -131,9 +131,7 @@ class testBinaryAndJSONValueTypesDataCollection extends CIntegrationTest {
 		$this->assertTrue(@file_put_contents(self::$file_name_invalid_json_for_binary_item, self::$invalid_json) !== false);
 		$this->assertTrue(@file_put_contents(self::$file_name_invalid_json_for_json_item, self::$invalid_json) !== false);
 
-		//self::$json_image_normalized = shell_exec('echo ' . escapeshellarg(self::$json_with_image) . ' | jq -S -c .');
 		self::$json_image_normalized = self::normalize_json(self::$json_with_image);
-		self::$json_image_normalized .= 'test';
 
 		CDataHelper::call('proxy.create', [
 			'name' => 'proxy',
@@ -428,7 +426,6 @@ class testBinaryAndJSONValueTypesDataCollection extends CIntegrationTest {
 		$this->assertEquals(1, count($response['result']));
 		$this->assertArrayHasKey('value', $response['result'][0]);
 
-		//$json_result = shell_exec('echo ' . escapeshellarg($response['result'][0]['value']) . ' | jq -S -c .');
 		$json_result = self::normalize_json($response['result'][0]['value']);
 
 		$this->assertEquals(self::$json_image_normalized, $json_result);
@@ -457,7 +454,6 @@ class testBinaryAndJSONValueTypesDataCollection extends CIntegrationTest {
 		$this->assertEquals(1, count($response['result']));
 		$this->assertArrayHasKey('value', $response['result'][0]);
 
-		//$json_result = shell_exec('echo ' . escapeshellarg($response['result'][0]['value']) . ' | jq -S -c .');
 		$json_result = self::normalize_json($response['result'][0]['value']);
 		$this->assertEquals(self::$json_image_normalized, $json_result);
 
@@ -515,7 +511,6 @@ class testBinaryAndJSONValueTypesDataCollection extends CIntegrationTest {
 			'history'	=>	ITEM_VALUE_TYPE_JSON
 		]);
 
-		//$json_result = shell_exec('echo ' . escapeshellarg($json_dep_data['result'][0]['value']) . ' | jq -S -c .');
 		$json_result = self::normalize_json($json_dep_data['result'][0]['value']);
 
 		$this->assertEquals(self::$json_image_normalized, $json_result);
