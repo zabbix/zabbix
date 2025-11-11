@@ -40,18 +40,6 @@ class testBinaryAndJSONValueTypesDataCollection extends CIntegrationTest {
 	static $invalid_json;
 	static $json_image_normalized;
 
-	public static function normalize_json($json) {
-		$data = json_decode($json, true);
-
-		if (json_last_error() !== JSON_ERROR_NONE) {
-			throw new InvalidArgumentException('Invalid JSON: ' . json_last_error_msg());
-		}
-
-		self::ksort_recursive($data);
-
-		return json_encode($data, JSON_UNESCAPED_SLASHES);
-	}
-
 	public static function ksort_recursive(&$array) {
 		if (!is_array($array)) {
 			return;
@@ -62,6 +50,18 @@ class testBinaryAndJSONValueTypesDataCollection extends CIntegrationTest {
 		foreach ($array as &$value) {
 			ksort_recursive($value);
 		}
+	}
+
+	public static function normalize_json($json) {
+		$data = json_decode($json, true);
+
+		if (json_last_error() !== JSON_ERROR_NONE) {
+			throw new InvalidArgumentException('Invalid JSON: ' . json_last_error_msg());
+		}
+
+		self::ksort_recursive($data);
+
+		return json_encode($data, JSON_UNESCAPED_SLASHES);
 	}
 
 	/**
