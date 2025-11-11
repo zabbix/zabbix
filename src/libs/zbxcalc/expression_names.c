@@ -64,6 +64,8 @@ const char	*zbx_type_string(zbx_value_type_t type)
 {
 	switch (type)
 	{
+		case ZBX_VALUE_UNKNOWN:
+			return "unknown";
 		case ZBX_VALUE_NONE:
 			return "none";
 		case ZBX_VALUE_SECONDS:
