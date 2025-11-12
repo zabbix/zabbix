@@ -24,32 +24,44 @@ class CTagHelper {
 	}
 
 	public static function mergeOwnAndInheritedTagsForObject(array &$object, bool $add_tag_type = false): void {
+		$tag_value_pairs = [];
 		$tag_types = [];
 
 		foreach ($object['inheritedTags'] as $tag) {
-			$tag_types[$tag['tag']][$tag['value']] = ZBX_PROPERTY_INHERITED;
+			$tag_value_pair = [
+				'tag' => $tag['tag'],
+				'value' => $tag['value']
+			];
+
+			if (!in_array($tag_value_pair, $tag_value_pairs, true)) {
+				$tag_value_pairs[] = $tag_value_pair;
+				$tag_types[] = ZBX_PROPERTY_INHERITED;
+			}
 		}
 
 		unset($object['inheritedTags']);
 
 		foreach ($object['tags'] as $tag) {
-			if (array_key_exists($tag['tag'], $tag_types) && array_key_exists($tag['value'], $tag_types[$tag['tag']])) {
-				$tag_types[$tag['tag']][$tag['value']] = ZBX_PROPERTY_BOTH;
+			$tag_value_pair = [
+				'tag' => $tag['tag'],
+				'value' => $tag['value']
+			];
+
+			$tag_index = array_search($tag_value_pair, $tag_value_pairs, true);
+
+			if ($tag_index !== false) {
+				$tag_types[$tag_index] = ZBX_PROPERTY_BOTH;
 			}
 			else {
-				$tag_types[$tag['tag']][$tag['value']] = ZBX_PROPERTY_OWN;
+				$tag_value_pairs[] = $tag_value_pair;
+				$tag_types[] = ZBX_PROPERTY_OWN;
 			}
 		}
 
 		$object['tags'] = [];
 
-		foreach ($tag_types as $tag => $values) {
-			foreach ($values as $value => $type) {
-				$object['tags'][] = [
-					'tag' => $tag,
-					'value' => $value
-				] + ($add_tag_type ? ['type' => $type] : []);
-			}
+		foreach ($tag_value_pairs as $i => $tag_value_pair) {
+			$object['tags'][] = $tag_value_pair + ($add_tag_type ? ['type' => $tag_types[$i]] : []);
 		}
 	}
 
