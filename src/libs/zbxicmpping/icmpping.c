@@ -22,7 +22,6 @@
 #include "zbxip.h"
 #include "zbxfile.h"
 #include "zbxalgo.h"
-#include "zbxthreads.h"
 
 #include <signal.h>
 
