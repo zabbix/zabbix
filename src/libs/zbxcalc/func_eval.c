@@ -928,8 +928,6 @@ static int	evaluate_LOGSOURCE(zbx_variant_t *value, const zbx_dc_evaluate_item_t
 	{
 		if (SUCCEED == get_last_n_value(item, parameters, ts, selector, &vc_value, error))
 		{
-			int	rc;
-
 			if (NULL != vc_value.value.log->source)
 			{
 				switch (zbx_regexp_match_ex(&regexps, vc_value.value.log->source, pattern,
