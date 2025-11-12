@@ -324,10 +324,9 @@ class CScreenHistory extends CScreenBase {
 						$value = italic(_('binary value'))->addClass(ZBX_STYLE_GREY);
 					}
 					else {
-						$data['value'] = rtrim($data['value'], " \t\r\n");
-
-						$value = $value_type == ITEM_VALUE_TYPE_JSON ?
-							(new CTrim($data['value'], 64 * ZBX_KIBIBYTE)) : $data['value'];
+						$value = $value_type == ITEM_VALUE_TYPE_JSON
+							? (new CTrim($data['value'], 64 * ZBX_KIBIBYTE))
+							: rtrim($data['value'], " \t\r\n");
 
 						if ($this->filter !== '') {
 							$haystack = mb_strtolower($data['value']);
