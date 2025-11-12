@@ -70,6 +70,8 @@ void	zbx_history_get_batch(zbx_vector_item_history_t *results, int value_type, i
 zbx_uint64_t	zbx_history_get_precache_flags(void);
 zbx_uint64_t	zbx_history_get_trends_flags(void);
 zbx_uint64_t	zbx_history_get_housekeep_flags(void);
+zbx_uint64_t	zbx_history_get_default_type_flags(void);
+
 int	zbx_history_check_version(int config_allow_unsupported_db_versions, unsigned char program_type);
 
 #define ZBX_HISTORY_FLUSH_SUCCEED		0

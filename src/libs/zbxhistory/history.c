@@ -87,6 +87,7 @@ struct zbx_history_manager
 	zbx_uint64_t				precache_flags;
 	zbx_uint64_t				trends_flags;
 	zbx_uint64_t				housekeep_flags;
+	zbx_uint64_t				default_type_flags;
 };
 
 static zbx_history_manager_t        history_manager;
@@ -413,6 +414,9 @@ static int	history_manager_init(zbx_history_manager_t *manager, const char *conf
 			}
 			value_type_mask |= mask;
 
+			if (0 != strcmp(name, HISTORY_PROVIDER_SQL))
+				manager->default_type_flags |= mask;
+
 			if (FAIL == history_options_add_common_params(&options, config_source_ip,
 					config_log_slow_queries, config_ssl_ca_location, config_ssl_cert_location,
 					config_ssl_key_location, error))
@@ -439,6 +443,8 @@ static int	history_manager_init(zbx_history_manager_t *manager, const char *conf
 
 		history_manager_registry_update_types(manager, index, mask);
 		history_manager_map_value_types(manager, index, mask);
+
+		manager->default_type_flags |= mask;
 	}
 
 	manager->providers = (zbx_vector_history_provider_ptr_t *)zbx_malloc(NULL,
@@ -1573,3 +1579,16 @@ int	zbx_item_history_compare_by_index_desc(const void *d1, const void *d2)
 	return h2->index - h1->index;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: get bitmask of value types handled by the default history         *
+ *          provider                                                          *
+ *                                                                            *
+ * Return value: bitmask with bits set for value types handled by the default *
+ *               provider (SQL), 0 if default provider is not found           *
+ *                                                                            *
+ ******************************************************************************/
+zbx_uint64_t	zbx_history_get_default_type_flags(void)
+{
+	return history_manager.default_type_flags;
+}

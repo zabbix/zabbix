@@ -1085,10 +1085,13 @@ static void	DCmass_prepare_history(zbx_dc_history_t *history, zbx_history_sync_i
 	static time_t	last_history_discard = 0;
 	time_t		now;
 	int		i;
+	zbx_uint64_t	default_type_flags;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() history_num:%d", __func__, history_num);
 
 	now = time(NULL);
+
+	default_type_flags = zbx_history_get_default_type_flags();
 
 	for (i = 0; i < history_num; i++)
 	{
@@ -1096,20 +1099,24 @@ static void	DCmass_prepare_history(zbx_dc_history_t *history, zbx_history_sync_i
 		zbx_history_sync_item_t	*item;
 		zbx_item_diff_t		*diff;
 
-		/* discard history items that are older than compression age */
-		if (0 != compression_age && h->entry.ts.sec < compression_age)
+		/* compression checks are supported only for the default (sql) history provider */
+		if (SUCCEED == ZBX_HISTORY_CHECK_TYPE_FLAGS(default_type_flags, h->entry.value_type))
 		{
-			if (SEC_PER_HOUR < (now - last_history_discard)) /* log once per hour */
+			/* discard history items that are older than compression age */
+			if (0 != compression_age && h->entry.ts.sec < compression_age)
 			{
-				zabbix_log(LOG_LEVEL_WARNING, "discarding history that is pointing to"
-							" compressed history period");
-				last_history_discard = now;
-			}
+				if (SEC_PER_HOUR < (now - last_history_discard)) /* log once per hour */
+				{
+					zabbix_log(LOG_LEVEL_WARNING, "discarding history that is pointing to"
+								" compressed history period");
+					last_history_discard = now;
+				}
 
-			zbx_dc_history_clean_value(h);
-			h->state = ITEM_STATE_NORMAL;
-			h->flags |= ZBX_DC_FLAG_NOVALUE;
-			continue;
+				zbx_dc_history_clean_value(h);
+				h->state = ITEM_STATE_NORMAL;
+				h->flags |= ZBX_DC_FLAG_NOVALUE;
+				continue;
+			}
 		}
 
 		if (SUCCEED != errcodes[i])
