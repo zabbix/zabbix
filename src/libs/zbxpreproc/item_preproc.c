@@ -1186,7 +1186,10 @@ int	item_preproc_throttle_value(zbx_variant_t *value, const zbx_timespec_t *ts,
 {
 	int	ret;
 
-	ret = zbx_variant_compare(value, history_value_in);
+	if (ZBX_VARIANT_STR == value->type && ZBX_VARIANT_STR == history_value_in->type)
+		ret = strcmp(value->data.str, history_value_in->data.str);
+	else
+		ret = zbx_variant_compare(value, history_value_in);
 
 	zbx_variant_clear(history_value_out);
 	zbx_variant_copy(history_value_out, value);
