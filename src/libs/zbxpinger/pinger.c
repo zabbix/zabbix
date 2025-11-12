@@ -37,6 +37,7 @@ typedef struct
 	icmpping_t		icmpping;
 	icmppingsec_type_t	type;
 	char			*addr;
+	int			item_delay;
 }
 zbx_pinger_item_t;
 
@@ -442,7 +443,7 @@ out:
 }
 
 static void	add_icmpping_item(zbx_hashset_t *pinger_items, zbx_pinger_t *pinger_local, zbx_uint64_t itemid,
-		char *addr, icmpping_t icmpping, icmppingsec_type_t type)
+		char *addr, icmpping_t icmpping, icmppingsec_type_t type, int delay_s)
 {
 	int			num;
 	zbx_pinger_item_t	item;
@@ -468,6 +469,7 @@ static void	add_icmpping_item(zbx_hashset_t *pinger_items, zbx_pinger_t *pinger_
 	item.addr = addr;
 	item.icmpping = icmpping;
 	item.type = type;
+	item.item_delay = delay_s;
 	zbx_vector_pinger_item_append_ptr(&pinger->items, &item);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
@@ -515,8 +517,16 @@ static void	get_pinger_hosts(zbx_hashset_t *pinger_items, int config_timeout)
 
 		if (SUCCEED == rc)
 		{
-			add_icmpping_item(pinger_items, &pinger_local, items[i].itemid, addr, icmpping, type);
-			items_count++;
+			int	delay_s = 0;
+
+			rc = zbx_interval_preproc(items[i].delay, &delay_s, NULL, &errmsg);
+
+			if (SUCCEED == rc)
+			{
+				add_icmpping_item(pinger_items, &pinger_local, items[i].itemid, addr, icmpping, type,
+						delay_s);
+				items_count++;
+			}
 		}
 		else
 		{
@@ -569,9 +579,7 @@ static void	add_pinger_host(zbx_vector_fping_host_t *hosts, char *addr)
 
 static int	process_pinger_hosts(zbx_hashset_t *pinger_items, int process_num, int process_type)
 {
-#define EXEC_TIME_DELTA	0.1f
-
-	int				ping_result, i, processed_num = 0;
+	int				ping_result, processed_num = 0;
 	char				error[ZBX_ITEM_ERROR_LEN_MAX];
 	zbx_vector_fping_host_t		hosts;
 	zbx_timespec_t			ts;
@@ -587,39 +595,20 @@ static int	process_pinger_hosts(zbx_hashset_t *pinger_items, int process_num, in
 	zbx_hashset_iter_reset(pinger_items, &iter);
 	while (NULL != (pinger = (zbx_pinger_t *)zbx_hashset_iter_next(&iter)) && ZBX_IS_RUNNING())
 	{
-		for (i = 0; i < pinger->items.values_num; i++)
+		max_execution_time = 0;
+
+		for (int i = 0; i < pinger->items.values_num; i++)
+		{
 			add_pinger_host(&hosts, pinger->items.values[i].addr);
+			/* Find maximum delay among all items in pinger group */
+			if (max_execution_time < pinger->items.values[i].item_delay)
+				max_execution_time = pinger->items.values[i].item_delay;
+		}
 
 		processed_num += pinger->items.values_num;
 
 		zbx_setproctitle("%s #%d [pinging hosts]", get_process_type_string(process_type), process_num);
 		zbx_timespec(&ts);
-
-		max_execution_time = 0;
-
-		if (0 < pinger->timeout)
-		{
-			if (-1 == pinger->count)
-			{
-				double	total_timeout_factor = 0.0, backoff_power = 1.0;
-
-				for (i = 0; i <= pinger->retries; i++)
-				{
-					total_timeout_factor += backoff_power;
-					backoff_power *= pinger->backoff;
-				}
-
-				max_execution_time = pinger->timeout * total_timeout_factor;
-			}
-			else
-			{
-				max_execution_time = pinger->count * pinger->timeout;
-				max_execution_time += (pinger->count - 1) * pinger->interval;
-			}
-			/* Add safety margin 10% */
-			max_execution_time += max_execution_time * EXEC_TIME_DELTA;
-			max_execution_time /= 1000;
-		}
 
 		ping_result = zbx_ping(hosts.values, hosts.values_num, pinger->count, pinger->interval, pinger->size,
 				pinger->timeout, pinger->retries, pinger->backoff, pinger->allow_redirect, 0,
@@ -636,7 +625,6 @@ static int	process_pinger_hosts(zbx_hashset_t *pinger_items, int process_num, in
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 
 	return processed_num;
-#undef EXEC_TIME_DELTA
 }
 
 /******************************************************************************

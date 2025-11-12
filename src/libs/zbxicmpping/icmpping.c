@@ -818,75 +818,12 @@ static int	fping_output_process(zbx_fping_resp *resp, zbx_fping_args *args, doub
 	return ret;
 }
 
-/******************************************************************************
- *                                                                            *
- * Purpose: opens a process by creating a pipe, forking, and invoking shell  *
- *          (simplified version of zbx_popen from execute.c)                 *
- *                                                                            *
- * Parameters: pid     - [OUT] child process PID                              *
- *             command - [IN] command to execute                              *
- *                                                                            *
- * Return value: FILE pointer on success, NULL on error                       *
- *                                                                            *
- ******************************************************************************/
-static FILE	*fping_popen(pid_t *pid, const char *command)
-{
-	int	fd[2];
-	FILE	*fp;
-
-	if (-1 == pipe(fd))
-		return NULL;
-
-	if (-1 == (*pid = zbx_fork()))
-	{
-		(void)close(fd[0]);
-		(void)close(fd[1]);
-		return NULL;
-	}
-
-	if (0 != *pid) /* parent process */
-	{
-		(void)close(fd[1]);
-
-		if (NULL == (fp = fdopen(fd[0], "r")))
-		{
-			(void)close(fd[0]);
-			return NULL;
-		}
-
-		return fp;
-	}
-	/* child process */
-	(void)close(fd[0]);
-	/* set the child as the process group leader, otherwise orphans may be left after timeout */
-	if (-1 == setpgid(0, 0))
-	{
-		zabbix_log(LOG_LEVEL_ERR, "%s(): failed to create a process group: %s", __func__, zbx_strerror(errno));
-		exit(EXIT_FAILURE);
-	}
-	/* redirect output right before script execution after all logging is done */
-	if (-1 == dup2(fd[1], STDOUT_FILENO) || -1 == dup2(fd[1], STDERR_FILENO))
-	{
-		zabbix_log(LOG_LEVEL_ERR, "%s(): failed to redirect output: %s", __func__, zbx_strerror(errno));
-		exit(EXIT_FAILURE);
-	}
-
-	(void)close(fd[1]);
-
-	execl("/bin/sh", "sh", "-c", command, (char *)NULL);
-	/* this message may end up in stdout or stderr */
-	zabbix_log(LOG_LEVEL_WARNING, "execl() failed for [%s]: %s", command, zbx_strerror(errno));
-
-	exit(EXIT_FAILURE);
-}
-
 static int	hosts_ping(zbx_fping_host_t *hosts, int hosts_count, int requests_count, int interval, int size,
 		int timeout, int retries, double backoff, unsigned char allow_redirect, int rdns,
 		double max_execution_time, char *error, size_t max_error_len)
 {
 	const int	response_time_chars_max = 20;
 	FILE		*f;
-	pid_t		fping_pid;
 	char		params[70];
 	char		filename[MAX_STRING_LEN];
 	char		*linebuf = NULL;
@@ -1210,7 +1147,7 @@ static int	hosts_ping(zbx_fping_host_t *hosts, int hosts_count, int requests_cou
 	if (0 > zbx_sigmask(SIG_BLOCK, &mask, &orig_mask))
 		zbx_error("cannot set sigprocmask to block the user signal");
 
-	if (NULL == (f = fping_popen(&fping_pid, linebuf)))
+	if (NULL == (f = popen(linebuf, "r")))
 	{
 		zbx_snprintf(error, max_error_len, "%s: %s", linebuf, zbx_strerror(errno));
 
@@ -1237,25 +1174,21 @@ static int	hosts_ping(zbx_fping_host_t *hosts, int hosts_count, int requests_cou
 #ifdef HAVE_IPV6
 	fping_args.fping_existence = fping_existence;
 #endif
-	ret = fping_output_process(&fping_resp, &fping_args, max_execution_time);
-
-	if (0 < max_execution_time && NOTSUPPORTED == ret )
+	if (SUCCEED == fping_output_process(&fping_resp, &fping_args, max_execution_time))
 	{
-		kill(-fping_pid, SIGKILL);
-		zbx_snprintf(error, max_error_len, "fping killed due to execution timeout");
+		ret = SUCCEED;
 	}
 
-	fclose(f);
-	waitpid(fping_pid, &rc, 0);
+	rc = pclose(f);
 
 	if (0 > zbx_sigmask(SIG_SETMASK, &orig_mask, NULL))
 		zbx_error("cannot restore sigprocmask");
 
 	unlink(filename);
 
-	if (WIFSIGNALED(rc) && SUCCEED == ret)
+	if (WIFSIGNALED(rc))
 		ret = FAIL;
-	else if (NOTSUPPORTED == ret && '\0' == error[0])
+	else
 		zbx_snprintf(error, max_error_len, "fping failed: %s", linebuf);
 out:
 	zbx_free(linebuf);
