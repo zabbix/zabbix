@@ -307,7 +307,7 @@ static int	DBpatch_7000021(void)
 			" where exists ("
 				" select null from items i,hosts h"
 					" where item_rtdata.itemid=i.itemid"
-						" and i.itemid=i.hostid and h.status=3"
+						" and i.hostid=i.hostid and h.status=3"
 				")"))
 	{
 		return FAIL;
