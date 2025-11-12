@@ -1267,35 +1267,69 @@ static int	history_elastic_parse_bucket(const char *p_bucket, unsigned char valu
 	int			index, rows_num = 0;
 
 	if (SUCCEED != zbx_json_brackets_open(p_bucket, &jp_bucket))
+	{
+		zabbix_log(LOG_LEVEL_ERR, "cannot open items in elasticsearch response starting with '%s'", p_bucket);
 		goto out;
+	}
 
 	if (SUCCEED != zbx_json_value_by_name(&jp_bucket, "key", buffer, sizeof(buffer), NULL))
+	{
+		zabbix_log(LOG_LEVEL_ERR, "cannot get itemid from elasticsearch response '%.*s'",
+				(int)(jp_bucket.end - jp_bucket.start + 1), jp_bucket.start);
 		goto out;
+	}
 
-	if (zbx_is_uint64(buffer, &hist_local.itemid))
+	if (FAIL == zbx_is_uint64(buffer, &hist_local.itemid))
+	{
+		zabbix_log(LOG_LEVEL_ERR, "invalid itemid in elasticsearch response '%s'", buffer);
 		goto out;
+	}
 
 	if (FAIL == (index = zbx_vector_item_history_bsearch(results, hist_local, zbx_item_history_compare_by_itemid)))
+	{
+		zabbix_log(LOG_LEVEL_ERR, "cannot find item " ZBX_FS_UI64 " in precache request", hist_local.itemid);
 		goto out;
+	}
 
 	if (SUCCEED != zbx_json_brackets_by_name(&jp_bucket, "top_values", &jp_top))
+	{
+		zabbix_log(LOG_LEVEL_ERR, "cannot find \"top_values\" tag in elasticsearch response '%.*s'",
+				(int)(jp_bucket.end - jp_bucket.start + 1), jp_bucket.start);
 		goto out;
+	}
 
 	if (SUCCEED != zbx_json_brackets_by_name(&jp_top, "hits", &jp_hits))
+	{
+		zabbix_log(LOG_LEVEL_ERR, "cannot find \"hits\" tag in elasticsearch response '%.*s'",
+				(int)(jp_top.end - jp_top.start + 1), jp_top.start);
 		goto out;
+	}
 
 	if (SUCCEED != zbx_json_brackets_by_name(&jp_hits, "hits", &jp_hits2))
+
+	{
+		zabbix_log(LOG_LEVEL_ERR, "cannot find \"hits\" tag in elasticsearch response '%.*s'",
+				(int)(jp_hits.end - jp_hits.start + 1), jp_hits.start);
 		goto out;
+	}
 
 	for (const char *p = zbx_json_next(&jp_hits2, NULL); NULL != p; p = zbx_json_next(&jp_hits2, p))
 	{
 		zbx_json_parse_t	jp_hit, jp_source;
 
 		if (SUCCEED != zbx_json_brackets_open(p, &jp_hit))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "cannot open \"hits\" array in elasticsearch response starting "
+					"with '%s'", p);
 			continue;
+		}
 
 		if (SUCCEED != zbx_json_brackets_by_name(&jp_hit, "_source", &jp_source))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "cannot find \"_source\" tag in elasticsearch response '%.*s'",
+					(int)(jp_hit.end - jp_hit.start + 1), jp_hit.start);
 			continue;
+		}
 
 		zbx_history_record_t	hr;
 
@@ -1303,6 +1337,11 @@ static int	history_elastic_parse_bucket(const char *p_bucket, unsigned char valu
 		{
 			zbx_vector_history_record_append_ptr(&results->values[index].rows, &hr);
 			rows_num++;
+		}
+		else
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "cannot parse history value in elasticsearch response '%.*s'",
+					(int)(jp_source.end - jp_source.start + 1), jp_source.start);
 		}
 	}
 out:
