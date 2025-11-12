@@ -304,7 +304,7 @@ class testDashboardWidgetBroadcastedData extends testWidgetCommunication {
 			]
 		]);
 
-		// Make all old listener widgets on the page to listen the corresponding custom proadcaster widget.
+		// Make all old listener widgets on the page to listen the corresponding custom broadcaster widget.
 		foreach (array_keys($pageids) as $page_name) {
 			// Create the broadcaster reference using the type of broadcasted data and pre-defined reference id.
 			if ($used_pages[$page_name] === 'groupids') {
@@ -519,7 +519,7 @@ class testDashboardWidgetBroadcastedData extends testWidgetCommunication {
 			$this->assertEquals($expected_text, substr($value, 11));
 		}
 
-		// Check that no feedback was send to the custom broadcaster thom the listeners.
+		// Check that no feedback was send to the custom broadcaster from the listeners.
 		if (array_key_exists('broadcaster', $data)) {
 			$value = $dashboard->getWidget($data['broadcaster'])->query('name:feedbacks')->one()->getValue();
 			$this->assertEquals('', $value);

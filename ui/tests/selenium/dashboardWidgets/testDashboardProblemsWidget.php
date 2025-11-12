@@ -444,7 +444,7 @@ class testDashboardProblemsWidget extends CWebTest {
 					'tag_fields' => []
 				]
 			],
-			// #9 Cyrillyc and special symbols in inputs.
+			// #9 Cyrillic and special symbols in inputs.
 			[
 				[
 					'fields' => [
