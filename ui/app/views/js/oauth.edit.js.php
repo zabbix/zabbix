@@ -131,8 +131,7 @@ window.oauth_edit_popup = new class {
 			if (this.form.querySelector('button[name="client_secret_button"]') !== null) {
 				this.form.querySelector('button[name="client_secret_button"]').click();
 			}
-
-			document.querySelector('.js-client-secret-warning').style.display = '';
+			this.form.querySelector('.js-client-secret-warning').style.display = '';
 		}
 	}
 

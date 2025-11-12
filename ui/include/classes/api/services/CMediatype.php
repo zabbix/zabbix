@@ -696,20 +696,34 @@ class CMediatype extends CApiService {
 			));
 		}
 
-		if ((array_key_exists('token_url', $mediatype)
-				&& $mediatype['token_url'] !== $db_mediatype['token_url'])
-			|| (array_key_exists('authorization_url', $mediatype)
-				&& $mediatype['authorization_url'] !== $db_mediatype['authorization_url'])) {
-			if (!array_key_exists('client_secret', $mediatype) && $db_mediatype['client_secret'] !== '') {
-				if (array_key_exists('tokens_status', $mediatype)) {
-					$mediatype['tokens_status'] = 0;
-				}
+		if ($is_update && !array_key_exists('client_secret', $mediatype)) {
+			$provider = array_key_exists('provider', $mediatype) ? $mediatype['provider']
+				: $db_mediatype['provider'];
 
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.', $path,
-					_s('the parameter "%1$s" is missing', 'client_secret')
-				));
+			if ($provider == CMediatypeHelper::EMAIL_PROVIDER_SMTP) {
+				if (self::smtpAuthenticationOauthEndpointChanged($mediatype, $db_mediatype)) {
+					if (array_key_exists('tokens_status', $mediatype)) {
+						$mediatype['tokens_status'] = 0;
+					}
+
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.', $path,
+							_s('the parameter "%1$s" is missing', 'client_secret')
+					));
+				}
 			}
 		}
+	}
+
+	private static function smtpAuthenticationOauthEndpointChanged(array $mediatype, array $db_mediatype): bool {
+		$modified_url = array_key_exists('authorization_url', $mediatype)
+			&& urldecode($mediatype['authorization_url']) !== urldecode($db_mediatype['authorization_url']);
+
+		if ($modified_url) {
+			return true;
+		}
+
+		return array_key_exists('token_url', $mediatype)
+			&& urldecode($mediatype['token_url']) !== urldecode($db_mediatype['token_url']);
 	}
 
 	private static function getSmsTypeValidationFields(bool $is_update = false): array {
