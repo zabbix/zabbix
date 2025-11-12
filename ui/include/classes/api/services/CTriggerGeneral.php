@@ -23,6 +23,8 @@ abstract class CTriggerGeneral extends CApiService {
 		'disable_source'
 	];
 
+	protected const INHERITED_TAG_OUTPUT_FIELDS = ['tag', 'value', 'object', 'objectid'];
+
 	private static function isTrigger(): bool {
 		return static::class === 'CTrigger';
 	}
@@ -39,6 +41,86 @@ abstract class CTriggerGeneral extends CApiService {
 	 * @return array
 	 */
 	abstract public function get(array $options = []);
+
+	protected static function addRelatedTags(array $options, array &$triggers): void {
+		if ($options['selectTags'] === null) {
+			return;
+		}
+
+		foreach ($triggers as &$trigger) {
+			$trigger['tags'] = [];
+		}
+		unset($trigger);
+
+		$sql_options = [
+			'output' => array_merge(['triggertagid', 'triggerid'], $options['selectTags']),
+			'filter' => ['triggerid' => array_keys($triggers)]
+		];
+		$resource = DBselect(DB::makeSql('trigger_tag', $sql_options));
+
+		while ($row = DBfetch($resource)) {
+			$triggers[$row['triggerid']]['tags'][] = array_diff_key($row, array_flip(['triggertagid', 'triggerid']));
+		}
+	}
+
+	protected static function addRelatedInheritedTags(array $options, array &$triggers): void {
+		if ($options['selectInheritedTags'] === null) {
+			return;
+		}
+
+		foreach ($triggers as &$trigger) {
+			$trigger['inheritedTags'] = [];
+		}
+		unset($trigger);
+
+		$item_tag_output = ['f.triggerid'];
+		$host_or_template_tag_output = ['f.triggerid'];
+
+		foreach ($options['selectInheritedTags'] as $field) {
+			$item_tag_output[] = match ($field) {
+				'tag', 'value' => 'it.'.$field,
+				'object' =>
+					'CASE WHEN i.flags IN ('.
+						implode(',', [ZBX_FLAG_DISCOVERY_PROTOTYPE, ZBX_FLAG_DISCOVERY_PROTOTYPE_CREATED]).
+					')'.
+					' THEN '.ZBX_TAG_OBJECT_ITEM_PROTOTYPE.
+					' ELSE '.ZBX_TAG_OBJECT_ITEM.
+					' END AS object',
+				'objectid' => 'f.itemid AS objectid'
+			};
+
+			$host_or_template_tag_output[] = match ($field) {
+				'tag', 'value' => 'ht.'.$field,
+				'object' =>
+					'CASE WHEN h.status='.HOST_STATUS_TEMPLATE.
+					' THEN '.ZBX_TAG_OBJECT_TEMPLATE.
+					' ELSE '.ZBX_TAG_OBJECT_HOST.
+					' END AS object',
+				'objectid' => 'itc.link_hostid AS objectid'
+			};
+		}
+
+		$triggerids = array_keys($triggers);
+
+		$resource = DBselect(
+			'SELECT '.implode(',', $item_tag_output).
+			' FROM functions f'.
+			' JOIN item_tag it ON f.itemid=it.itemid'.
+			(in_array('object', $options['selectInheritedTags']) ? ' JOIN items i ON f.itemid=i.itemid' : '').
+			' WHERE '.dbConditionId('f.triggerid', $triggerids).
+			' UNION ALL '.
+			'SELECT DISTINCT '.implode(',', $host_or_template_tag_output).
+			' FROM functions f'.
+			' JOIN item_template_cache itc ON f.itemid=itc.itemid'.
+			' JOIN host_tag ht ON itc.link_hostid=ht.hostid'.
+			(in_array('object', $options['selectInheritedTags']) ? ' JOIN hosts h ON itc.link_hostid=h.hostid' : '').
+			' WHERE '.dbConditionId('f.triggerid', $triggerids)
+		);
+
+		while ($row = DBfetch($resource)) {
+			$triggers[$row['triggerid']]['inheritedTags'][] = array_diff_key($row, array_flip(['triggerid']));
+		}
+	}
 
 	/**
 	 * Prepares and returns an array of child triggers, inherited from triggers $tpl_triggers on the given hosts.
@@ -597,19 +679,24 @@ abstract class CTriggerGeneral extends CApiService {
 	 * @throws APIException
 	 */
 	private static function validateUuid(array $triggers, array $descriptions): void {
+		$triggers_validate_indexes = [];
+
 		foreach ($descriptions as $_triggers) {
 			foreach ($_triggers as $_trigger) {
 				$triggers[$_trigger['index']]['host_status'] = $_trigger['host']['status'];
+				$triggers_validate_indexes[] = $_trigger['index'];
 			}
 		}
 
-		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_ALLOW_UNEXPECTED, 'uniq' => [['uuid']], 'fields' => [
+		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_ALLOW_UNEXPECTED | API_PRESERVE_KEYS, 'uniq' => [['uuid']], 'fields' => [
 			'host_status' =>	['type' => API_ANY],
 			'uuid' =>			['type' => API_MULTIPLE, 'rules' => [
 									['if' => ['field' => 'host_status', 'in' => HOST_STATUS_TEMPLATE], 'type' => API_UUID],
 									['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('triggers', 'uuid'), 'unset' => true]
 			]]
 		]];
+
+		$triggers = array_intersect_key($triggers, array_flip($triggers_validate_indexes));
 
 		if (!CApiInputValidator::validate($api_input_rules, $triggers, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
@@ -794,19 +881,6 @@ abstract class CTriggerGeneral extends CApiService {
 
 			$functions = $this->unsetExtraFields($functions, ['triggerid', 'functionid'], $options['selectFunctions']);
 			$result = $relationMap->mapMany($result, $functions, 'functions');
-		}
-
-		// Adding trigger tags.
-		if ($options['selectTags'] !== null && $options['selectTags'] != API_OUTPUT_COUNT) {
-			$tags = API::getApiService()->select('trigger_tag', [
-				'output' => $this->outputExtend($options['selectTags'], ['triggerid']),
-				'filter' => ['triggerid' => $triggerids],
-				'preservekeys' => true
-			]);
-
-			$relationMap = $this->createRelationMap($tags, 'triggerid', 'triggertagid');
-			$tags = $this->unsetExtraFields($tags, ['triggertagid', 'triggerid'], []);
-			$result = $relationMap->mapMany($result, $tags, 'tags');
 		}
 
 		return $result;

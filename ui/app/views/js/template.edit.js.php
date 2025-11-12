@@ -28,7 +28,9 @@ window.template_edit_popup = new class {
 		this.form = new CForm(this.form_element, rules);
 		this.templateid = templateid;
 		this.linked_templateids = this.#getLinkedTemplates();
-		this.macros_templateids = null;
+		this.all_templateids = null;
+		this.show_inherited_tags = false;
+		this.tags_table = this.form_element.querySelector('.tags-table');
 		this.show_inherited_macros = false;
 
 		const return_url = new URL('zabbix.php', location.href);
@@ -47,6 +49,7 @@ window.template_edit_popup = new class {
 
 		this.#initActions();
 		this.#initTemplateTab();
+		this.#initTagsTab();
 		this.#initMacrosTab();
 		this.#initPopupListeners();
 
@@ -77,7 +80,7 @@ window.template_edit_popup = new class {
 		const $template_ms = $('#template_add_templates_', this.form_element);
 
 		$template_ms.on('change', () => {
-			$template_ms.multiSelect('setDisabledEntries', this.#getLinkedTemplates().concat(this.#getNewTemplates()));
+			$template_ms.multiSelect('setDisabledEntries', this.#getAllTemplates());
 		});
 
 		$groups_ms.on('change', () => {
@@ -88,10 +91,83 @@ window.template_edit_popup = new class {
 		});
 	}
 
+	#initTagsTab() {
+		const show_inherited_tags_element = document.getElementById('template_show_inherited_tags');
+
+		this.show_inherited_tags = show_inherited_tags_element.querySelector('input:checked').value == 1;
+
+		show_inherited_tags_element.addEventListener('change', e => {
+			this.show_inherited_tags = e.target.value == 1;
+			this.all_templateids = this.#getAllTemplates();
+
+			this.#updateTagsList();
+		});
+
+		const observer = new IntersectionObserver(entries => {
+			if (entries[0].isIntersecting && this.show_inherited_tags) {
+				const templateids = this.#getAllTemplates();
+
+				if (this.all_templateids === null || this.all_templateids.xor(templateids).length > 0) {
+					this.all_templateids = templateids;
+
+					this.#updateTagsList();
+				}
+			}
+		});
+
+		observer.observe(document.getElementById('template-tags-tab'));
+	}
+
+	#updateTagsList() {
+		const fields = getFormFields(this.form_element);
+
+		fields.tags = Object.values(fields.tags).reduce((tags, tag) => {
+			if (!('type' in tag) || (tag.type & <?= ZBX_PROPERTY_OWN ?>)) {
+				tags.push({tag: tag.tag.trim(), value: tag.value.trim()});
+			}
+
+			return tags;
+		}, []);
+
+		const url = new URL('zabbix.php', location.href);
+		url.searchParams.set('action', 'host.tags.list');
+
+		const data = {
+			source: 'template',
+			templateids: this.#getAllTemplates(),
+			show_inherited_tags: fields.template_show_inherited_tags,
+			tags: fields.tags
+		}
+
+		this.overlay.setLoading();
+
+		fetch(url, {
+			method: 'POST',
+			headers: {'Content-Type': 'application/json'},
+			body: JSON.stringify(data)
+		})
+			.then(response => response.json())
+			.then(response => {
+				this.tags_table.innerHTML = response.body;
+
+				const $tags_table = jQuery(this.tags_table);
+
+				$tags_table.data('dynamicRows').counter = this.tags_table.querySelectorAll('tr.form_row').length;
+				$tags_table.find(`.${ZBX_STYLE_TEXTAREA_FLEXIBLE}`).textareaFlexible();
+			})
+			.catch((message) => {
+				this.form.addGeneralErrors({[t('Unexpected server error.')]: message});
+				this.form.renderErrors();
+				throw message;
+			})
+			.finally(() => {
+				this.overlay.unsetLoading();
+			});
+	}
+
 	#initMacrosTab() {
 		this.macros_manager = new HostMacrosManager({
 			container: $('#template_macros_container .table-forms-td-right'),
-			source: 'template',
 			load_callback: () => {
 				this.form.discoverAllFields();
 
@@ -113,10 +189,10 @@ window.template_edit_popup = new class {
 
 		const observer = new IntersectionObserver(entries => {
 			if (entries[0].isIntersecting && this.show_inherited_macros) {
-				const templateids = this.linked_templateids.concat(this.#getNewTemplates());
+				const templateids = this.#getAllTemplates();
 
-				if (this.macros_templateids === null || this.macros_templateids.xor(templateids).length > 0) {
-					this.macros_templateids = templateids;
+				if (this.all_templateids === null || this.all_templateids.xor(templateids).length > 0) {
+					this.all_templateids = templateids;
 
 					this.macros_manager.load(this.show_inherited_macros, templateids);
 				}
@@ -126,9 +202,9 @@ window.template_edit_popup = new class {
 
 		show_inherited_macros_element.addEventListener('change', e => {
 			this.show_inherited_macros = e.target.value == 1;
-			this.macros_templateids = this.linked_templateids.concat(this.#getNewTemplates());
+			this.all_templateids = this.#getAllTemplates();
 
-			this.macros_manager.load(this.show_inherited_macros, this.macros_templateids);
+			this.macros_manager.load(this.show_inherited_macros, this.all_templateids);
 		});
 	}
 
@@ -143,7 +219,7 @@ window.template_edit_popup = new class {
 					action: 'template.edit'
 				},
 				callback: ({data, event}) => {
-					if (data.action_parameters.templateid === this.templateid || this.templateid === null) {
+					if (data.action_parameters.templateid === this.templateid) {
 						return;
 					}
 
@@ -234,6 +310,15 @@ window.template_edit_popup = new class {
 		}
 
 		return templateids;
+	}
+
+	/**
+	 * Collects ids of currently active (linked + new) templates.
+	 *
+	 * @return {array}  Templateids.
+	 */
+	#getAllTemplates() {
+		return this.#getLinkedTemplates().concat(this.#getNewTemplates());
 	}
 
 	clone() {
