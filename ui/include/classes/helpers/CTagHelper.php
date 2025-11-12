@@ -190,16 +190,25 @@ class CTagHelper {
 	}
 
 	private static function orderByPriorityTagsFirst(array &$tags, array $priority_tags): void {
-		$first_tags = [];
+		$priority_tags = array_fill_keys($priority_tags, []);
+		$regular_tags = [];
 
-		foreach ($tags as $i => $tag) {
-			if (in_array($tag['tag'], $priority_tags)) {
-				$first_tags[] = $tag;
-				unset($tags[$i]);
+		foreach ($tags as $tag) {
+			if (array_key_exists($tag['tag'], $priority_tags)) {
+				$priority_tags[$tag['tag']][] = $tag;
+			}
+			else {
+				$regular_tags[] = $tag;
 			}
 		}
 
-		$tags = array_merge($first_tags, $tags);
+		$tags = [];
+
+		foreach ($priority_tags as $_tags) {
+			$tags = array_merge($tags, $_tags);
+		}
+
+		$tags = array_merge($tags, $regular_tags);
 	}
 
 	private static function getTagHtml(array $tag, int $object_type, array $options): CTag {
