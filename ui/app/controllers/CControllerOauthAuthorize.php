@@ -58,7 +58,7 @@ class CControllerOauthAuthorize extends CController {
 			return false;
 		}
 
-		$mandatory_all = array_flip(['client_id', 'redirection_url', 'token_url']);
+		$mandatory_all = array_flip(['client_id', 'redirection_url', 'token_url', 'sign']);
 		$result = !array_diff_key($mandatory_all, $state);
 
 		$mandatory_one = array_flip(['mediatypeid', 'client_secret']);
@@ -66,22 +66,36 @@ class CControllerOauthAuthorize extends CController {
 
 		if (!$result) {
 			error(_('Invalid request.'), true);
+
+			return false;
 		}
 
-		if ($result && !array_key_exists('client_secret', $state)) {
-			$result = (bool) API::MediaType()->get([
+		if (!array_key_exists('client_secret', $state)) {
+			$endpoints_match = (bool) API::MediaType()->get([
 				'output' => ['token_url', 'authorization_url'],
 				'mediatypeids' => [$state['mediatypeid']],
 				'search' => ['token_url' => $state['token_url'], 'authorization_url' => $state['authorization_url']],
 				'startSearch' => true
 			]);
 
-			if (!$result) {
+			if (!$endpoints_match) {
 				error(_s('Incorrect value for field "%1$s": %2$s.', 'client_secret', _('cannot be empty')));
+				
+				return false;
 			}
 		}
 
-		return $result;
+		$state_sign = $state['sign'];
+		unset($state['sign']);
+		$sign = CEncryptHelper::sign(json_encode($state));
+
+		if (!CEncryptHelper::checkSign($state_sign, $sign)) {
+			error(_('Invalid request.'), true);
+
+			return false;
+		}
+
+		return true;
 	}
 
 	protected function checkPermissions(): bool {
