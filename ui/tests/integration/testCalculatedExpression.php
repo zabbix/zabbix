@@ -339,26 +339,21 @@ class testCalculatedExpression extends CIntegrationTest {
 		$this->assertEquals(1, count($response['result']['itemids']));
 		self::$itemIds = array_merge(self::$itemIds, [$calcItemId]);
 
-		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, "In zbx_substitute_item_key_params():" .
-			" data:test.calc.calculated.count_disk_pused_gt_95", true, 120);
 
+		/* Send values to the trapper items: fs1=90, fs2=96, fs3=97, fs4=80 */
 		$senderValues = [
-			['host' => self::HOST_NAME, 'key' => self::TRAPPER_ITEM_KEY, 'value' => 90],
-			['host' => self::HOST_NAME, 'key' => self::TRAPPER_ITEM_KEY, 'value' => 96],
-			['host' => self::HOST_NAME, 'key' => self::TRAPPER_ITEM_KEY, 'value' => 97],
-			['host' => self::HOST_NAME, 'key' => self::TRAPPER_ITEM_KEY, 'value' => 80]
+			['host' => self::HOST_NAME, 'key' => self::TRAPPER_ITEM_KEY . '.disk.pused[fs1]', 'value' => 90],
+			['host' => self::HOST_NAME, 'key' => self::TRAPPER_ITEM_KEY . '.disk.pused[fs2]', 'value' => 96],
+			['host' => self::HOST_NAME, 'key' => self::TRAPPER_ITEM_KEY . '.disk.pused[fs3]', 'value' => 97],
+			['host' => self::HOST_NAME, 'key' => self::TRAPPER_ITEM_KEY . '.disk.pused[fs4]', 'value' => 80]
 		];
 
 		$this->sendSenderValues($senderValues);
-		/* Send values to the trapper items: fs1=90, fs2=96, fs3=97, fs4=80 */
-		// $this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_KEY . '.disk.pused[fs1]', 90);
-		// $this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_KEY . '.disk.pused[fs2]', 96);
-		// $this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_KEY . '.disk.pused[fs3]', 97);
-		// $this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_KEY . '.disk.pused[fs4]', 80);
 
-		/* Wait for calculated item to process. */
-		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, "zbx_expression_eval_execute() expression:" .
-			"'count(last_foreach(/*/test.calc.trapper.disk.pused[*]),\"gt\",95)'", true, 120);
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, "In zbx_substitute_item_key_params():" .
+			" data:test.calc.calculated.count_disk_pused_gt_95", true, 120);
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, "End of expression_eval_many():SUCCEED" .
+			" value:var vector[0:4] flags:vector", true, 120);
 
 		// We have 4 items: [90, 96, 97, 80]. The formula counts how many have last value greater than 95. So expected result is 2.
 		$this->assertEquals('2', $this->getItemLastValue($calcItemId));
