@@ -472,8 +472,7 @@ class testPageMonitoringLatestData extends CWebTest {
 				]
 			],
 			// Tag priority: opposite alphabetic.
-			// TODO: uncomment after fix ZBX-27171
-/*			[
+			[
 				[
 					'filter' => [
 						'Name' => 'tag_item_1',
@@ -483,7 +482,7 @@ class testPageMonitoringLatestData extends CWebTest {
 						['Name' => 'tag_item_1', 'Tags' => "tag_number: 0\ntag: filtering_value\ncomponent: name:tag_item_1"]
 					]
 				]
-			],*/
+			],
 			// Tag priority: one first.
 			[
 				[
