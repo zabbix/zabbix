@@ -928,18 +928,29 @@ static int	evaluate_LOGSOURCE(zbx_variant_t *value, const zbx_dc_evaluate_item_t
 	{
 		if (SUCCEED == get_last_n_value(item, parameters, ts, selector, &vc_value, error))
 		{
-			switch (zbx_regexp_match_ex(&regexps, vc_value.value.log->source, pattern, ZBX_CASE_SENSITIVE))
+			int	rc;
+
+			if (NULL != vc_value.value.log->source)
 			{
-				case ZBX_REGEXP_MATCH:
-					zbx_variant_set_dbl(value, 1);
-					ret = SUCCEED;
-					break;
-				case ZBX_REGEXP_NO_MATCH:
-					zbx_variant_set_dbl(value, 0);
-					ret = SUCCEED;
-					break;
-				case FAIL:
-					*error = zbx_dsprintf(*error, "invalid regular expression");
+				switch (zbx_regexp_match_ex(&regexps, vc_value.value.log->source, pattern,
+						ZBX_CASE_SENSITIVE))
+				{
+					case ZBX_REGEXP_MATCH:
+						zbx_variant_set_dbl(value, 1);
+						ret = SUCCEED;
+						break;
+					case ZBX_REGEXP_NO_MATCH:
+						zbx_variant_set_dbl(value, 0);
+						ret = SUCCEED;
+						break;
+					case FAIL:
+						*error = zbx_dsprintf(*error, "invalid regular expression");
+				}
+			}
+			else
+			{
+				zbx_variant_set_dbl(value, 0);
+				ret = SUCCEED;
 			}
 
 			zbx_history_record_clear(&vc_value, item->value_type);
