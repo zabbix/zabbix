@@ -534,8 +534,6 @@ static char	*zbx_regexp(const char *string, const char *pattern, uint32_t flags,
 		else if (ZBX_REGEXP_NO_MATCH == r && NULL != len)
 			*len = 0;
 	}
-	if (NULL != len)
-		*len = 0;
 
 	return c;
 }
