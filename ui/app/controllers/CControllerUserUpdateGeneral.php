@@ -35,9 +35,30 @@ abstract class CControllerUserUpdateGeneral extends CController {
 	protected function init() {
 		parent::init();
 
-		$this->timezones = array_keys(CTimezoneHelper::getList());
-		$this->timezones[] = TIMEZONE_DEFAULT;
+		$this->timezones = self::getAllowedTimezones();
 	}
+
+	public static function getAllowedTimezones(): array {
+		$timezones = array_keys(CTimezoneHelper::getList());
+		$timezones[] = TIMEZONE_DEFAULT;
+
+		return $timezones;
+	}
+
+	public static function getAllowedLocales(): array {
+		$locales = array_keys(getLocales());
+		$locales[] = LANG_DEFAULT;
+
+		return $locales;
+	}
+
+	public static function getAllowedThemes(): array {
+		$themes = array_keys(APP::getThemes());
+		$themes[] = THEME_DEFAULT;
+
+		return $themes;
+	}
+
 
 	/**
 	 * Get groups gui access.

@@ -74,21 +74,32 @@ $media_table_info_template = new CTemplateTag('media-row-tmpl',
 				->setEnabled($data['can_edit_media'])
 				->addClass('js-remove'),
 			(new CDiv([
-				new CInput('hidden', 'medias[#{row_index}][mediaid]', '#{mediaid}'),
-				new CInput('hidden', 'medias[#{row_index}][mediatypeid]', '#{mediatypeid}'),
-				new CInput('hidden', 'medias[#{row_index}][period]', '#{period}'),
-				new CInput('hidden', 'medias[#{row_index}][sendto]', '#{sendto}'),
-				new CInput('hidden', 'medias[#{row_index}][severity]', '#{severity}'),
-				new CInput('hidden', 'medias[#{row_index}][active]', '#{active}'),
-				new CInput('hidden', 'medias[#{row_index}][provisioned]', '#{provisioned}')
+				(new CInput('hidden', 'medias[#{row_index}][mediaid]', '#{mediaid}'))
+					->setAttribute('data-field-type', 'hidden'),
+				(new CInput('hidden', 'medias[#{row_index}][mediatypeid]', '#{mediatypeid}'))
+					->setAttribute('data-field-type', 'hidden'),
+				(new CInput('hidden', 'medias[#{row_index}][sendto_multi]', '#{sendto_multi}'))
+					->setAttribute('data-field-type', 'hidden'),
+				(new CInput('hidden', 'medias[#{row_index}][period]', '#{period}'))
+					->setAttribute('data-field-type', 'hidden'),
+				(new CInput('hidden', 'medias[#{row_index}][sendto]', '#{sendto}'))
+					->setAttribute('data-field-type', 'hidden'),
+				(new CInput('hidden', 'medias[#{row_index}][severity]', '#{severity}'))
+					->setAttribute('data-field-type', 'hidden'),
+				(new CInput('hidden', 'medias[#{row_index}][active]', '#{active}'))
+					->setAttribute('data-field-type', 'hidden'),
+				(new CInput('hidden', 'medias[#{row_index}][provisioned]', '#{provisioned}'))
+					->setAttribute('data-field-type', 'hidden')
 			]))
 		]))
 	]))->setAttribute('data-row_index', '#{row_index}')
+		->setAttribute('data-field-type', 'set')
+		->setAttribute('data-field-name', 'medias')
 		->setId('medias_#{row_index}')
 );
 
 (new CScriptTag('media_tab.init('.json_encode([
-	'userid' => $data['userid'],
+	'userid' => $data['userid'] ? $data['userid'] : 0,
 	'medias' => $data['medias']
 ]).');'))
 	->setOnDocumentReady()
