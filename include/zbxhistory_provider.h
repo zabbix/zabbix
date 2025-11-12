@@ -170,27 +170,6 @@ zbx_history_provider_info_t;
 
 /******************************************************************************
  *                                                                            *
- * Purpose: open and initialize the history storage provider                  *
- *                                                                            *
- * Parameters:                                                                *
- *     options     - [IN] array of configuration options                      *
- *     options_num - [IN] number of elements in the options array             *
- *     error       - [OUT] error message                                      *
- *                                                                            *
- * Return value: history provider internal data handle or NULL on error       *
- *                                                                            *
- * Comments: This function is called to open and initialize the history       *
- *           storage provider. It should allocate and return a pointer to     *
- *           the provider-specific data structure, which will be passed to    *
- *           other provider functions. If an error occurs during              *
- *           initialization, the function should return NULL and set an error *
- *           message.                                                         *
- *                                                                            *
- ******************************************************************************/
-typedef void *(*zbx_history_provider_open_t)(const zbx_history_option_t *options, int options_num, char **error);
-
-/******************************************************************************
- *                                                                            *
  * Purpose: close and clean up the history storage provider                   *
  *                                                                            *
  * Parameters:                                                                *

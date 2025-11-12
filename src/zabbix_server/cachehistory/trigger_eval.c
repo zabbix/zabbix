@@ -440,6 +440,9 @@ static void	precache_history_range_update(zbx_vc_query_t *query, const zbx_histo
  ******************************************************************************/
 static void	precache_item_history(zbx_hashset_t *funcs)
 {
+/* maximum number of values per single item to precache */
+#define PRECACHE_LIMIT	60
+
 	typedef struct
 	{
 		zbx_uint64_t	itemid;
@@ -481,6 +484,20 @@ static void	precache_item_history(zbx_hashset_t *funcs)
 		if (0 != func->selector.timeshift)
 			continue;
 
+		/* skip functions requesting too many values/large range */
+		switch (func->selector.type)
+		{
+			case ZBX_VALUE_NVALUES:
+				if (PRECACHE_LIMIT < func->selector.value)
+					continue;
+				break;
+			case ZBX_VALUE_SECONDS:
+				if (PRECACHE_LIMIT < func->selector.value / SEC_PER_MIN)
+					continue;
+				break;
+			default:
+		}
+
 		refs_num = item_queries.num_data;
 		ref_local.itemid = func->item.itemid;
 
@@ -506,6 +523,8 @@ static void	precache_item_history(zbx_hashset_t *funcs)
 
 	zbx_vector_vc_query_destroy(&queries);
 	zbx_hashset_destroy(&item_queries);
+
+#undef PRECACHE_LIMIT
 }
 
 static void	evaluate_item_functions(zbx_hashset_t *funcs, const zbx_vector_uint64_t *history_itemids,
