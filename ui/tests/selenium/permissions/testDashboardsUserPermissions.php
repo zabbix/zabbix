@@ -1513,7 +1513,7 @@ class testDashboardsUserPermissions extends CWebTest {
 	 * @param integer $private				PUBLIC_SHARING or PRIVATE_SHARING.
 	 */
 	protected function updateDashboardAccess($group_permissions, $group, $user_permissions, $scenario, $private) {
-		// Clear all privious permissions first.
+		// Clear all previous permissions first.
 		CDataHelper::call('dashboard.update', [
 			[
 				'dashboardid' => self::$dashboardid,
