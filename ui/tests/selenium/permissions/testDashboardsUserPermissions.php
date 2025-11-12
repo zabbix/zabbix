@@ -223,7 +223,7 @@ class testDashboardsUserPermissions extends CWebTest {
 		])['dashboardids'][0];
 	}
 
-	public static function dashboardPermissions() {
+	public static function getDashboardPermissionsData() {
 		return [
 			'Super admin with full access' => [
 				[
@@ -351,7 +351,7 @@ class testDashboardsUserPermissions extends CWebTest {
 	/**
 	 * Check that users has access to host dashboards according to user group and user role permissions.
 	 *
-	 * @dataProvider dashboardPermissions
+	 * @dataProvider getDashboardPermissionsData
 	 */
 	public function testDashboardsUserPermissions_HostDashboard($data) {
 		// Reuse and update the existing user to prevent creating 10+ separate test users during test preparation.
@@ -391,7 +391,9 @@ class testDashboardsUserPermissions extends CWebTest {
 	}
 
 	/**
-	 * @dataProvider dashboardPermissions
+	 * Check that user has access to host dashboards via URL according to user group and user role permissions.
+	 *
+	 * @dataProvider getDashboardPermissionsData
 	 */
 	public function testDashboardsUserPermissions_HostDashboardURL($data) {
 		// Reuse and update the existing user to prevent creating 10+ separate test users during test preparation.
@@ -418,7 +420,9 @@ class testDashboardsUserPermissions extends CWebTest {
 	}
 
 	/**
-	 * @dataProvider dashboardPermissions
+	 * Check that user has access to template dashboards via URL according to user group and user role permissions.
+	 *
+	 * @dataProvider getDashboardPermissionsData
 	 */
 	public function testDashboardsUserPermissions_TemplateDashboardURL($data) {
 		// Reuse and update the existing user to prevent creating 10+ separate test users during test preparation.
@@ -441,11 +445,12 @@ class testDashboardsUserPermissions extends CWebTest {
 		}
 	}
 
-	public static function sharingPermissions() {
+	public static function getSharingPermissionsData() {
 		return [
 			// List of user group shares.
-			'Group access: Super admin with write access' => [
+			'Private dashboard. Group access: Super admin with write access' => [
 				[
+					'status' => PRIVATE_SHARING,
 					'scenario' => 'group_access',
 					'user_role' => USER_TYPE_SUPER_ADMIN,
 					'permissions' => PERM_READ_WRITE,
@@ -455,8 +460,9 @@ class testDashboardsUserPermissions extends CWebTest {
 					'view' => true
 				]
 			],
-			'Group access: Super admin with read access' => [
+			'Private dashboard. Group access: Super admin with read access' => [
 				[
+					'status' => PRIVATE_SHARING,
 					'scenario' => 'group_access',
 					'user_role' => USER_TYPE_SUPER_ADMIN,
 					'permissions' => PERM_READ,
@@ -466,8 +472,9 @@ class testDashboardsUserPermissions extends CWebTest {
 					'view' => true
 				]
 			],
-			'Group access: Super admin with different user group' => [
+			'Private dashboard. Group access: Super admin with different user group' => [
 				[
+					'status' => PRIVATE_SHARING,
 					'scenario' => 'group_access',
 					'user_role' => USER_TYPE_SUPER_ADMIN,
 					'permissions' => PERM_READ,
@@ -477,8 +484,9 @@ class testDashboardsUserPermissions extends CWebTest {
 					'view' => true
 				]
 			],
-			'Group access: Admin with write access' => [
+			'Private dashboard. Group access: Admin with write access' => [
 				[
+					'status' => PRIVATE_SHARING,
 					'scenario' => 'group_access',
 					'user_role' => USER_TYPE_ZABBIX_ADMIN,
 					'permissions' => PERM_READ_WRITE,
@@ -488,8 +496,9 @@ class testDashboardsUserPermissions extends CWebTest {
 					'view' => true
 				]
 			],
-			'Group access: Admin with read access' => [
+			'Private dashboard. Group access: Admin with read access' => [
 				[
+					'status' => PRIVATE_SHARING,
 					'scenario' => 'group_access',
 					'user_role' => USER_TYPE_ZABBIX_ADMIN,
 					'permissions' => PERM_READ,
@@ -499,18 +508,21 @@ class testDashboardsUserPermissions extends CWebTest {
 					'view' => true
 				]
 			],
-			'Group access: Admin with different user group' => [
+			'Private dashboard. Group access: Admin with different user group' => [
 				[
+					'status' => PRIVATE_SHARING,
 					'scenario' => 'group_access',
 					'user_role' => USER_TYPE_ZABBIX_ADMIN,
 					'permissions' => PERM_READ,
 					'dashboard_group' => 'Read/Write access to template and host',
 					'user_group' => 'Read access to template and host',
+					'edit' => false,
 					'view' => false
 				]
 			],
-			'Group access: User with write access' => [
+			'Private dashboard. Group access: User with write access' => [
 				[
+					'status' => PRIVATE_SHARING,
 					'scenario' => 'group_access',
 					'user_role' => USER_TYPE_ZABBIX_USER,
 					'permissions' => PERM_READ_WRITE,
@@ -520,8 +532,9 @@ class testDashboardsUserPermissions extends CWebTest {
 					'view' => true
 				]
 			],
-			'Group access: User with read access' => [
+			'Private dashboard. Group access: User with read access' => [
 				[
+					'status' => PRIVATE_SHARING,
 					'scenario' => 'group_access',
 					'user_role' => USER_TYPE_ZABBIX_USER,
 					'permissions' => PERM_READ,
@@ -531,8 +544,9 @@ class testDashboardsUserPermissions extends CWebTest {
 					'view' => true
 				]
 			],
-			'Group access: User with different user group' => [
+			'Private dashboard. Group access: User with different user group' => [
 				[
+					'status' => PRIVATE_SHARING,
 					'scenario' => 'group_access',
 					'user_role' => USER_TYPE_ZABBIX_USER,
 					'permissions' => PERM_READ,
@@ -542,8 +556,9 @@ class testDashboardsUserPermissions extends CWebTest {
 				]
 			],
 			// List of user shares.
-			'User access: Super admin with write access' => [
+			'Private dashboard. User access: Super admin with write access' => [
 				[
+					'status' => PRIVATE_SHARING,
 					'scenario' => 'user_access',
 					'user_role' => USER_TYPE_SUPER_ADMIN,
 					'user_permissions' => PERM_READ_WRITE,
@@ -551,8 +566,9 @@ class testDashboardsUserPermissions extends CWebTest {
 					'view' => true
 				]
 			],
-			'User access: Super admin with read access' => [
+			'Private dashboard. User access: Super admin with read access' => [
 				[
+					'status' => PRIVATE_SHARING,
 					'scenario' => 'user_access',
 					'user_role' => USER_TYPE_SUPER_ADMIN,
 					'user_permissions' => PERM_READ,
@@ -560,8 +576,9 @@ class testDashboardsUserPermissions extends CWebTest {
 					'view' => true
 				]
 			],
-			'User access: Admin with write access' => [
+			'Private dashboard. User access: Admin with write access' => [
 				[
+					'status' => PRIVATE_SHARING,
 					'scenario' => 'user_access',
 					'user_role' => USER_TYPE_ZABBIX_ADMIN,
 					'user_permissions' => PERM_READ_WRITE,
@@ -569,8 +586,9 @@ class testDashboardsUserPermissions extends CWebTest {
 					'view' => true
 				]
 			],
-			'User access: Admin with read access' => [
+			'Private dashboard. User access: Admin with read access' => [
 				[
+					'status' => PRIVATE_SHARING,
 					'scenario' => 'user_access',
 					'user_role' => USER_TYPE_ZABBIX_ADMIN,
 					'user_permissions' => PERM_READ,
@@ -578,8 +596,9 @@ class testDashboardsUserPermissions extends CWebTest {
 					'view' => true
 				]
 			],
-			'User access: User with write access' => [
+			'Private dashboard. User access: User with write access' => [
 				[
+					'status' => PRIVATE_SHARING,
 					'scenario' => 'user_access',
 					'user_role' => USER_TYPE_ZABBIX_ADMIN,
 					'user_permissions' => PERM_READ_WRITE,
@@ -587,8 +606,9 @@ class testDashboardsUserPermissions extends CWebTest {
 					'view' => true
 				]
 			],
-			'User access: User with read access' => [
+			'Private dashboard. User access: User with read access' => [
 				[
+					'status' => PRIVATE_SHARING,
 					'scenario' => 'user_access',
 					'user_role' => USER_TYPE_ZABBIX_ADMIN,
 					'user_permissions' => PERM_READ,
@@ -597,24 +617,27 @@ class testDashboardsUserPermissions extends CWebTest {
 				]
 			],
 			// Shared dashboard with different user.
-			'Access for unexpected user: Super admin with no access to dashboard' => [
+			'Private dashboard. Access for unexpected user: Super admin with no access to dashboard' => [
 				[
+					'status' => PRIVATE_SHARING,
 					'scenario' => 'different_user',
 					'user_role' => USER_TYPE_SUPER_ADMIN,
 					'edit' => true,
 					'view' => true
 				]
 			],
-			'Access for unexpected user: Admin with no access to dashboard' => [
+			'Private dashboard. Access for unexpected user: Admin with no access to dashboard' => [
 				[
+					'status' => PRIVATE_SHARING,
 					'scenario' => 'different_user',
 					'user_role' => USER_TYPE_ZABBIX_ADMIN,
 					'edit' => false,
 					'view' => false
 				]
 			],
-			'Access for unexpected user: User with no access to dashboard' => [
+			'Private dashboard. Access for unexpected user: User with no access to dashboard' => [
 				[
+					'status' => PRIVATE_SHARING,
 					'scenario' => 'different_user',
 					'user_role' => USER_TYPE_ZABBIX_USER,
 					'edit' => false,
@@ -622,54 +645,59 @@ class testDashboardsUserPermissions extends CWebTest {
 				]
 			],
 			// List of users + list of user groups.
-			'User and group access: super admin - read, group - read, same groups' => [
+			'Private dashboard. User and group access: super admin - read, group - read, same groups' => [
 				[
+					'status' => PRIVATE_SHARING,
 					'scenario' => 'group_and_user',
-					'user_role' => USER_TYPE_ZABBIX_ADMIN,
+					'user_role' => USER_TYPE_SUPER_ADMIN,
 					'permissions' => PERM_READ,
 					'dashboard_group' => 'Read access to template and host',
 					'user_group' => 'Read access to template and host',
 					'user_permissions' => PERM_READ,
-					'edit' => false,
+					'edit' => true,
 					'view' => true
 				]
 			],
-			'User and group access: super admin - read, group - read, different groups' => [
+			'Private dashboard. User and group access: super admin - read, group - read, different groups' => [
 				[
+					'status' => PRIVATE_SHARING,
 					'scenario' => 'group_and_user',
-					'user_role' => USER_TYPE_ZABBIX_ADMIN,
+					'user_role' => USER_TYPE_SUPER_ADMIN,
 					'permissions' => PERM_READ,
 					'dashboard_group' => 'Read access to template and host',
 					'user_permissions' => PERM_READ,
-					'edit' => false,
+					'edit' => true,
 					'view' => true
 				]
 			],
-			'User and group access: super admin - read, group - write, same groups' => [
+			'Private dashboard. User and group access: super admin - read, group - write, same groups' => [
 				[
+					'status' => PRIVATE_SHARING,
 					'scenario' => 'group_and_user',
 					'user_role' => USER_TYPE_SUPER_ADMIN,
 					'permissions' => PERM_READ_WRITE,
 					'dashboard_group' => 'Read access to template and host',
 					'user_group' => 'Read access to template and host',
 					'user_permissions' => PERM_READ,
-					'edit' => false,
+					'edit' => true,
 					'view' => true
 				]
 			],
-			'User and group access: super admin - read, group - write, different groups' => [
+			'Private dashboard. User and group access: super admin - read, group - write, different groups' => [
 				[
+					'status' => PRIVATE_SHARING,
 					'scenario' => 'group_and_user',
 					'user_role' => USER_TYPE_SUPER_ADMIN,
 					'permissions' => PERM_READ_WRITE,
 					'dashboard_group' => 'Read access to template and host',
 					'user_permissions' => PERM_READ,
-					'edit' => false,
+					'edit' => true,
 					'view' => true
 				]
 			],
-			'User and group access: super admin - write, group - read, same groups' => [
+			'Private dashboard. User and group access: super admin - write, group - read, same groups' => [
 				[
+					'status' => PRIVATE_SHARING,
 					'scenario' => 'group_and_user',
 					'user_role' => USER_TYPE_SUPER_ADMIN,
 					'permissions' => PERM_READ,
@@ -680,8 +708,9 @@ class testDashboardsUserPermissions extends CWebTest {
 					'view' => true
 				]
 			],
-			'User and group access: super admin - write, group - read, different groups' => [
+			'Private dashboard. User and group access: super admin - write, group - read, different groups' => [
 				[
+					'status' => PRIVATE_SHARING,
 					'scenario' => 'group_and_user',
 					'user_role' => USER_TYPE_SUPER_ADMIN,
 					'permissions' => PERM_READ,
@@ -691,8 +720,9 @@ class testDashboardsUserPermissions extends CWebTest {
 					'view' => true
 				]
 			],
-			'User and group access: super admin - write, group - write, same groups' => [
+			'Private dashboard. User and group access: super admin - write, group - write, same groups' => [
 				[
+					'status' => PRIVATE_SHARING,
 					'scenario' => 'group_and_user',
 					'user_role' => USER_TYPE_SUPER_ADMIN,
 					'permissions' => PERM_READ_WRITE,
@@ -703,8 +733,9 @@ class testDashboardsUserPermissions extends CWebTest {
 					'view' => true
 				]
 			],
-			'User and group access: super admin - write, group - write, different groups' => [
+			'Private dashboard. User and group access: super admin - write, group - write, different groups' => [
 				[
+					'status' => PRIVATE_SHARING,
 					'scenario' => 'group_and_user',
 					'user_role' => USER_TYPE_SUPER_ADMIN,
 					'permissions' => PERM_READ_WRITE,
@@ -714,8 +745,9 @@ class testDashboardsUserPermissions extends CWebTest {
 					'view' => true
 				]
 			],
-			'User and group access: admin - read, group - read, same groups' => [
+			'Private dashboard. User and group access: admin - read, group - read, same groups' => [
 				[
+					'status' => PRIVATE_SHARING,
 					'scenario' => 'group_and_user',
 					'user_role' => USER_TYPE_ZABBIX_ADMIN,
 					'permissions' => PERM_READ,
@@ -726,8 +758,9 @@ class testDashboardsUserPermissions extends CWebTest {
 					'view' => true
 				]
 			],
-			'User and group access: admin - read, group - read, different groups' => [
+			'Private dashboard. User and group access: admin - read, group - read, different groups' => [
 				[
+					'status' => PRIVATE_SHARING,
 					'scenario' => 'group_and_user',
 					'user_role' => USER_TYPE_ZABBIX_ADMIN,
 					'permissions' => PERM_READ,
@@ -737,31 +770,34 @@ class testDashboardsUserPermissions extends CWebTest {
 					'view' => true
 				]
 			],
-			'User and group access: admin - read, group - write, same groups' => [
+			'Private dashboard. User and group access: admin - read, group - write, same groups' => [
 				[
+					'status' => PRIVATE_SHARING,
 					'scenario' => 'group_and_user',
 					'user_role' => USER_TYPE_ZABBIX_ADMIN,
 					'permissions' => PERM_READ_WRITE,
 					'dashboard_group' => 'Read access to template and host',
 					'user_group' => 'Read access to template and host',
 					'user_permissions' => PERM_READ,
-					'edit' => false,
+					'edit' => true,
 					'view' => true
 				]
 			],
-			'User and group access: admin - read, group - write, different groups' => [
+			'Private dashboard. User and group access: admin - read, group - write, different groups' => [
 				[
+					'status' => PRIVATE_SHARING,
 					'scenario' => 'group_and_user',
 					'user_role' => USER_TYPE_ZABBIX_ADMIN,
 					'permissions' => PERM_READ_WRITE,
 					'dashboard_group' => 'Read access to template and host',
 					'user_permissions' => PERM_READ,
-					'edit' => false,
+					'edit' => true,
 					'view' => true
 				]
 			],
-			'User and group access: admin - write, group - read, same groups' => [
+			'Private dashboard. User and group access: admin - write, group - read, same groups' => [
 				[
+					'status' => PRIVATE_SHARING,
 					'scenario' => 'group_and_user',
 					'user_role' => USER_TYPE_ZABBIX_ADMIN,
 					'permissions' => PERM_READ,
@@ -772,8 +808,9 @@ class testDashboardsUserPermissions extends CWebTest {
 					'view' => true
 				]
 			],
-			'User and group access: admin - write, group - read, different groups' => [
+			'Private dashboard. User and group access: admin - write, group - read, different groups' => [
 				[
+					'status' => PRIVATE_SHARING,
 					'scenario' => 'group_and_user',
 					'user_role' => USER_TYPE_ZABBIX_ADMIN,
 					'permissions' => PERM_READ,
@@ -783,8 +820,9 @@ class testDashboardsUserPermissions extends CWebTest {
 					'view' => true
 				]
 			],
-			'User and group access: admin - write, group - write, same groups' => [
+			'Private dashboard. User and group access: admin - write, group - write, same groups' => [
 				[
+					'status' => PRIVATE_SHARING,
 					'scenario' => 'group_and_user',
 					'user_role' => USER_TYPE_ZABBIX_ADMIN,
 					'permissions' => PERM_READ_WRITE,
@@ -795,8 +833,9 @@ class testDashboardsUserPermissions extends CWebTest {
 					'view' => true
 				]
 			],
-			'User and group access: admin - write, group - write, different groups' => [
+			'Private dashboard. User and group access: admin - write, group - write, different groups' => [
 				[
+					'status' => PRIVATE_SHARING,
 					'scenario' => 'group_and_user',
 					'user_role' => USER_TYPE_ZABBIX_ADMIN,
 					'permissions' => PERM_READ_WRITE,
@@ -806,8 +845,9 @@ class testDashboardsUserPermissions extends CWebTest {
 					'view' => true
 				]
 			],
-			'User and group access: user - read, group - read, same groups' => [
+			'Private dashboard. User and group access: user - read, group - read, same groups' => [
 				[
+					'status' => PRIVATE_SHARING,
 					'scenario' => 'group_and_user',
 					'user_role' => USER_TYPE_ZABBIX_USER,
 					'permissions' => PERM_READ,
@@ -818,8 +858,9 @@ class testDashboardsUserPermissions extends CWebTest {
 					'view' => true
 				]
 			],
-			'User and group access: user - read, group - read, different groups' => [
+			'Private dashboard. User and group access: user - read, group - read, different groups' => [
 				[
+					'status' => PRIVATE_SHARING,
 					'scenario' => 'group_and_user',
 					'user_role' => USER_TYPE_ZABBIX_USER,
 					'permissions' => PERM_READ,
@@ -829,31 +870,34 @@ class testDashboardsUserPermissions extends CWebTest {
 					'view' => true
 				]
 			],
-			'User and group access: user - read, group - write, same groups' => [
+			'Private dashboard. User and group access: user - read, group - write, same groups' => [
 				[
+					'status' => PRIVATE_SHARING,
 					'scenario' => 'group_and_user',
 					'user_role' => USER_TYPE_ZABBIX_USER,
 					'permissions' => PERM_READ_WRITE,
 					'dashboard_group' => 'Read access to template and host',
 					'user_group' => 'Read access to template and host',
 					'user_permissions' => PERM_READ,
-					'edit' => false,
+					'edit' => true,
 					'view' => true
 				]
 			],
-			'User and group access: user - read, group - write, different groups' => [
+			'Private dashboard. User and group access: user - read, group - write, different groups' => [
 				[
+					'status' => PRIVATE_SHARING,
 					'scenario' => 'group_and_user',
 					'user_role' => USER_TYPE_ZABBIX_USER,
 					'permissions' => PERM_READ_WRITE,
 					'dashboard_group' => 'Read access to template and host',
 					'user_permissions' => PERM_READ,
-					'edit' => false,
+					'edit' => true,
 					'view' => true
 				]
 			],
-			'User and group access: user - write, group - read, same groups' => [
+			'Private dashboard. User and group access: user - write, group - read, same groups' => [
 				[
+					'status' => PRIVATE_SHARING,
 					'scenario' => 'group_and_user',
 					'user_role' => USER_TYPE_ZABBIX_USER,
 					'permissions' => PERM_READ,
@@ -864,8 +908,9 @@ class testDashboardsUserPermissions extends CWebTest {
 					'view' => true
 				]
 			],
-			'User and group access: user - write, group - read, different groups' => [
+			'Private dashboard. User and group access: user - write, group - read, different groups' => [
 				[
+					'status' => PRIVATE_SHARING,
 					'scenario' => 'group_and_user',
 					'user_role' => USER_TYPE_ZABBIX_USER,
 					'permissions' => PERM_READ,
@@ -875,8 +920,9 @@ class testDashboardsUserPermissions extends CWebTest {
 					'view' => true
 				]
 			],
-			'User and group access: user - write, group - write, same groups' => [
+			'Private dashboard. User and group access: user - write, group - write, same groups' => [
 				[
+					'status' => PRIVATE_SHARING,
 					'scenario' => 'group_and_user',
 					'user_role' => USER_TYPE_ZABBIX_USER,
 					'permissions' => PERM_READ_WRITE,
@@ -887,8 +933,509 @@ class testDashboardsUserPermissions extends CWebTest {
 					'view' => true
 				]
 			],
-			'User and group access: user - write, group - write, different groups' => [
+			'Private dashboard. User and group access: user - write, group - write, different groups' => [
 				[
+					'status' => PRIVATE_SHARING,
+					'scenario' => 'group_and_user',
+					'user_role' => USER_TYPE_ZABBIX_USER,
+					'permissions' => PERM_READ_WRITE,
+					'dashboard_group' => 'Read access to template and host',
+					'user_permissions' => PERM_READ_WRITE,
+					'edit' => true,
+					'view' => true
+				]
+			],
+			// Same scenarios, with public dashboards.
+			// List of user group shares.
+			'Public dashboard. Group access: Super admin with write access' => [
+				[
+					'status' => PUBLIC_SHARING,
+					'scenario' => 'group_access',
+					'user_role' => USER_TYPE_SUPER_ADMIN,
+					'permissions' => PERM_READ_WRITE,
+					'dashboard_group' => 'Read/Write access to template and host',
+					'user_group' => 'Read/Write access to template and host',
+					'edit' => true,
+					'view' => true
+				]
+			],
+			'Public dashboard. Group access: Super admin with read access' => [
+				[
+					'status' => PUBLIC_SHARING,
+					'scenario' => 'group_access',
+					'user_role' => USER_TYPE_SUPER_ADMIN,
+					'permissions' => PERM_READ,
+					'dashboard_group' => 'Read access to template and host',
+					'user_group' => 'Read access to template and host',
+					'edit' => true,
+					'view' => true
+				]
+			],
+			'Public dashboard. Group access: Super admin with different user group' => [
+				[
+					'status' => PUBLIC_SHARING,
+					'scenario' => 'group_access',
+					'user_role' => USER_TYPE_SUPER_ADMIN,
+					'permissions' => PERM_READ,
+					'dashboard_group' => 'Read/Write access to template and host',
+					'user_group' => 'Read access to template and host',
+					'edit' => true,
+					'view' => true
+				]
+			],
+			'Public dashboard. Group access: Admin with write access' => [
+				[
+					'status' => PUBLIC_SHARING,
+					'scenario' => 'group_access',
+					'user_role' => USER_TYPE_ZABBIX_ADMIN,
+					'permissions' => PERM_READ_WRITE,
+					'dashboard_group' => 'Read/Write access to template and host',
+					'user_group' => 'Read/Write access to template and host',
+					'edit' => true,
+					'view' => true
+				]
+			],
+			'Public dashboard. Group access: Admin with read access' => [
+				[
+					'status' => PUBLIC_SHARING,
+					'scenario' => 'group_access',
+					'user_role' => USER_TYPE_ZABBIX_ADMIN,
+					'permissions' => PERM_READ,
+					'dashboard_group' => 'Read access to template and host',
+					'user_group' => 'Read access to template and host',
+					'edit' => false,
+					'view' => true
+				]
+			],
+			'Public dashboard. Group access: Admin with different user group' => [
+				[
+					'status' => PUBLIC_SHARING,
+					'scenario' => 'group_access',
+					'user_role' => USER_TYPE_ZABBIX_ADMIN,
+					'permissions' => PERM_READ,
+					'dashboard_group' => 'Read/Write access to template and host',
+					'user_group' => 'Read access to template and host',
+					'edit' => false,
+					'view' => true
+				]
+			],
+			'Public dashboard. Group access: User with write access' => [
+				[
+					'status' => PUBLIC_SHARING,
+					'scenario' => 'group_access',
+					'user_role' => USER_TYPE_ZABBIX_USER,
+					'permissions' => PERM_READ_WRITE,
+					'dashboard_group' => 'Read/Write access to template and host',
+					'user_group' => 'Read/Write access to template and host',
+					'edit' => true,
+					'view' => true
+				]
+			],
+			'Public dashboard. Group access: User with read access' => [
+				[
+					'status' => PUBLIC_SHARING,
+					'scenario' => 'group_access',
+					'user_role' => USER_TYPE_ZABBIX_USER,
+					'permissions' => PERM_READ,
+					'dashboard_group' => 'Read access to template and host',
+					'user_group' => 'Read access to template and host',
+					'edit' => false,
+					'view' => true
+				]
+			],
+			'Public dashboard. Group access: User with different user group' => [
+				[
+					'status' => PUBLIC_SHARING,
+					'scenario' => 'group_access',
+					'user_role' => USER_TYPE_ZABBIX_USER,
+					'permissions' => PERM_READ,
+					'dashboard_group' => 'Read/Write access to template and host',
+					'user_group' => 'Read access to template and host',
+					'edit' => false,
+					'view' => true
+				]
+			],
+			// List of user shares.
+			'Public dashboard. User access: Super admin with write access' => [
+				[
+					'status' => PUBLIC_SHARING,
+					'scenario' => 'user_access',
+					'user_role' => USER_TYPE_SUPER_ADMIN,
+					'user_permissions' => PERM_READ_WRITE,
+					'edit' => true,
+					'view' => true
+				]
+			],
+			'Public dashboard. User access: Super admin with read access' => [
+				[
+					'status' => PUBLIC_SHARING,
+					'scenario' => 'user_access',
+					'user_role' => USER_TYPE_SUPER_ADMIN,
+					'user_permissions' => PERM_READ,
+					'edit' => true,
+					'view' => true
+				]
+			],
+			'Public dashboard. User access: Admin with write access' => [
+				[
+					'status' => PUBLIC_SHARING,
+					'scenario' => 'user_access',
+					'user_role' => USER_TYPE_ZABBIX_ADMIN,
+					'user_permissions' => PERM_READ_WRITE,
+					'edit' => true,
+					'view' => true
+				]
+			],
+			'Public dashboard. User access: Admin with read access' => [
+				[
+					'status' => PUBLIC_SHARING,
+					'scenario' => 'user_access',
+					'user_role' => USER_TYPE_ZABBIX_ADMIN,
+					'user_permissions' => PERM_READ,
+					'edit' => false,
+					'view' => true
+				]
+			],
+			'Public dashboard. User access: User with write access' => [
+				[
+					'status' => PUBLIC_SHARING,
+					'scenario' => 'user_access',
+					'user_role' => USER_TYPE_ZABBIX_ADMIN,
+					'user_permissions' => PERM_READ_WRITE,
+					'edit' => true,
+					'view' => true
+				]
+			],
+			'Public dashboard. User access: User with read access' => [
+				[
+					'status' => PUBLIC_SHARING,
+					'scenario' => 'user_access',
+					'user_role' => USER_TYPE_ZABBIX_ADMIN,
+					'user_permissions' => PERM_READ,
+					'edit' => false,
+					'view' => true
+				]
+			],
+			// Shared dashboard with different user.
+			'Public dashboard. Access for unexpected user: Super admin with no access to dashboard' => [
+				[
+					'status' => PUBLIC_SHARING,
+					'scenario' => 'different_user',
+					'user_role' => USER_TYPE_SUPER_ADMIN,
+					'edit' => true,
+					'view' => true
+				]
+			],
+			'Public dashboard. Access for unexpected user: Admin with no access to dashboard' => [
+				[
+					'status' => PUBLIC_SHARING,
+					'scenario' => 'different_user',
+					'user_role' => USER_TYPE_ZABBIX_ADMIN,
+					'edit' => false,
+					'view' => true
+				]
+			],
+			'Public dashboard. Access for unexpected user: User with no access to dashboard' => [
+				[
+					'status' => PUBLIC_SHARING,
+					'scenario' => 'different_user',
+					'user_role' => USER_TYPE_ZABBIX_USER,
+					'edit' => false,
+					'view' => true
+				]
+			],
+			// List of users + list of user groups.
+			'Public dashboard. User and group access: super admin - read, group - read, same groups' => [
+				[
+					'status' => PUBLIC_SHARING,
+					'scenario' => 'group_and_user',
+					'user_role' => USER_TYPE_SUPER_ADMIN,
+					'permissions' => PERM_READ,
+					'dashboard_group' => 'Read access to template and host',
+					'user_group' => 'Read access to template and host',
+					'user_permissions' => PERM_READ,
+					'edit' => true,
+					'view' => true
+				]
+			],
+			'Public dashboard. User and group access: super admin - read, group - read, different groups' => [
+				[
+					'status' => PUBLIC_SHARING,
+					'scenario' => 'group_and_user',
+					'user_role' => USER_TYPE_SUPER_ADMIN,
+					'permissions' => PERM_READ,
+					'dashboard_group' => 'Read access to template and host',
+					'user_permissions' => PERM_READ,
+					'edit' => true,
+					'view' => true
+				]
+			],
+			'Public dashboard. User and group access: super admin - read, group - write, same groups' => [
+				[
+					'status' => PUBLIC_SHARING,
+					'scenario' => 'group_and_user',
+					'user_role' => USER_TYPE_SUPER_ADMIN,
+					'permissions' => PERM_READ_WRITE,
+					'dashboard_group' => 'Read access to template and host',
+					'user_group' => 'Read access to template and host',
+					'user_permissions' => PERM_READ,
+					'edit' => true,
+					'view' => true
+				]
+			],
+			'Public dashboard. User and group access: super admin - read, group - write, different groups' => [
+				[
+					'status' => PUBLIC_SHARING,
+					'scenario' => 'group_and_user',
+					'user_role' => USER_TYPE_SUPER_ADMIN,
+					'permissions' => PERM_READ_WRITE,
+					'dashboard_group' => 'Read access to template and host',
+					'user_permissions' => PERM_READ,
+					'edit' => true,
+					'view' => true
+				]
+			],
+			'Public dashboard. User and group access: super admin - write, group - read, same groups' => [
+				[
+					'status' => PUBLIC_SHARING,
+					'scenario' => 'group_and_user',
+					'user_role' => USER_TYPE_SUPER_ADMIN,
+					'permissions' => PERM_READ,
+					'dashboard_group' => 'Read access to template and host',
+					'user_group' => 'Read access to template and host',
+					'user_permissions' => PERM_READ_WRITE,
+					'edit' => true,
+					'view' => true
+				]
+			],
+			'Public dashboard. User and group access: super admin - write, group - read, different groups' => [
+				[
+					'status' => PUBLIC_SHARING,
+					'scenario' => 'group_and_user',
+					'user_role' => USER_TYPE_SUPER_ADMIN,
+					'permissions' => PERM_READ,
+					'dashboard_group' => 'Read access to template and host',
+					'user_permissions' => PERM_READ_WRITE,
+					'edit' => true,
+					'view' => true
+				]
+			],
+			'Public dashboard. User and group access: super admin - write, group - write, same groups' => [
+				[
+					'status' => PUBLIC_SHARING,
+					'scenario' => 'group_and_user',
+					'user_role' => USER_TYPE_SUPER_ADMIN,
+					'permissions' => PERM_READ_WRITE,
+					'dashboard_group' => 'Read access to template and host',
+					'user_group' => 'Read access to template and host',
+					'user_permissions' => PERM_READ_WRITE,
+					'edit' => true,
+					'view' => true
+				]
+			],
+			'Public dashboard. User and group access: super admin - write, group - write, different groups' => [
+				[
+					'status' => PUBLIC_SHARING,
+					'scenario' => 'group_and_user',
+					'user_role' => USER_TYPE_SUPER_ADMIN,
+					'permissions' => PERM_READ_WRITE,
+					'dashboard_group' => 'Read access to template and host',
+					'user_permissions' => PERM_READ_WRITE,
+					'edit' => true,
+					'view' => true
+				]
+			],
+			'Public dashboard. User and group access: admin - read, group - read, same groups' => [
+				[
+					'status' => PUBLIC_SHARING,
+					'scenario' => 'group_and_user',
+					'user_role' => USER_TYPE_ZABBIX_ADMIN,
+					'permissions' => PERM_READ,
+					'dashboard_group' => 'Read access to template and host',
+					'user_group' => 'Read access to template and host',
+					'user_permissions' => PERM_READ,
+					'edit' => false,
+					'view' => true
+				]
+			],
+			'Public dashboard. User and group access: admin - read, group - read, different groups' => [
+				[
+					'status' => PUBLIC_SHARING,
+					'scenario' => 'group_and_user',
+					'user_role' => USER_TYPE_ZABBIX_ADMIN,
+					'permissions' => PERM_READ,
+					'dashboard_group' => 'Read access to template and host',
+					'user_permissions' => PERM_READ,
+					'edit' => false,
+					'view' => true
+				]
+			],
+			'Public dashboard. User and group access: admin - read, group - write, same groups' => [
+				[
+					'status' => PUBLIC_SHARING,
+					'scenario' => 'group_and_user',
+					'user_role' => USER_TYPE_ZABBIX_ADMIN,
+					'permissions' => PERM_READ_WRITE,
+					'dashboard_group' => 'Read access to template and host',
+					'user_group' => 'Read access to template and host',
+					'user_permissions' => PERM_READ,
+					'edit' => true,
+					'view' => true
+				]
+			],
+			'Public dashboard. User and group access: admin - read, group - write, different groups' => [
+				[
+					'status' => PUBLIC_SHARING,
+					'scenario' => 'group_and_user',
+					'user_role' => USER_TYPE_ZABBIX_ADMIN,
+					'permissions' => PERM_READ_WRITE,
+					'dashboard_group' => 'Read access to template and host',
+					'user_permissions' => PERM_READ,
+					'edit' => true,
+					'view' => true
+				]
+			],
+			'Public dashboard. User and group access: admin - write, group - read, same groups' => [
+				[
+					'status' => PUBLIC_SHARING,
+					'scenario' => 'group_and_user',
+					'user_role' => USER_TYPE_ZABBIX_ADMIN,
+					'permissions' => PERM_READ,
+					'dashboard_group' => 'Read access to template and host',
+					'user_group' => 'Read access to template and host',
+					'user_permissions' => PERM_READ_WRITE,
+					'edit' => true,
+					'view' => true
+				]
+			],
+			'Public dashboard. User and group access: admin - write, group - read, different groups' => [
+				[
+					'status' => PUBLIC_SHARING,
+					'scenario' => 'group_and_user',
+					'user_role' => USER_TYPE_ZABBIX_ADMIN,
+					'permissions' => PERM_READ,
+					'dashboard_group' => 'Read access to template and host',
+					'user_permissions' => PERM_READ_WRITE,
+					'edit' => true,
+					'view' => true
+				]
+			],
+			'Public dashboard. User and group access: admin - write, group - write, same groups' => [
+				[
+					'status' => PUBLIC_SHARING,
+					'scenario' => 'group_and_user',
+					'user_role' => USER_TYPE_ZABBIX_ADMIN,
+					'permissions' => PERM_READ_WRITE,
+					'dashboard_group' => 'Read access to template and host',
+					'user_group' => 'Read access to template and host',
+					'user_permissions' => PERM_READ_WRITE,
+					'edit' => true,
+					'view' => true
+				]
+			],
+			'Public dashboard. User and group access: admin - write, group - write, different groups' => [
+				[
+					'status' => PUBLIC_SHARING,
+					'scenario' => 'group_and_user',
+					'user_role' => USER_TYPE_ZABBIX_ADMIN,
+					'permissions' => PERM_READ_WRITE,
+					'dashboard_group' => 'Read access to template and host',
+					'user_permissions' => PERM_READ_WRITE,
+					'edit' => true,
+					'view' => true
+				]
+			],
+			'Public dashboard. User and group access: user - read, group - read, same groups' => [
+				[
+					'status' => PUBLIC_SHARING,
+					'scenario' => 'group_and_user',
+					'user_role' => USER_TYPE_ZABBIX_USER,
+					'permissions' => PERM_READ,
+					'dashboard_group' => 'Read access to template and host',
+					'user_group' => 'Read access to template and host',
+					'user_permissions' => PERM_READ,
+					'edit' => false,
+					'view' => true
+				]
+			],
+			'Public dashboard.  User and group access: user - read, group - read, different groups' => [
+				[
+					'status' => PUBLIC_SHARING,
+					'scenario' => 'group_and_user',
+					'user_role' => USER_TYPE_ZABBIX_USER,
+					'permissions' => PERM_READ,
+					'dashboard_group' => 'Read access to template and host',
+					'user_permissions' => PERM_READ,
+					'edit' => false,
+					'view' => true
+				]
+			],
+			'Public dashboard. User and group access: user - read, group - write, same groups' => [
+				[
+					'status' => PUBLIC_SHARING,
+					'scenario' => 'group_and_user',
+					'user_role' => USER_TYPE_ZABBIX_USER,
+					'permissions' => PERM_READ_WRITE,
+					'dashboard_group' => 'Read access to template and host',
+					'user_group' => 'Read access to template and host',
+					'user_permissions' => PERM_READ,
+					'edit' => true,
+					'view' => true
+				]
+			],
+			'Public dashboard. User and group access: user - read, group - write, different groups' => [
+				[
+					'status' => PUBLIC_SHARING,
+					'scenario' => 'group_and_user',
+					'user_role' => USER_TYPE_ZABBIX_USER,
+					'permissions' => PERM_READ_WRITE,
+					'dashboard_group' => 'Read access to template and host',
+					'user_permissions' => PERM_READ,
+					'edit' => true,
+					'view' => true
+				]
+			],
+			'Public dashboard. User and group access: user - write, group - read, same groups' => [
+				[
+					'status' => PUBLIC_SHARING,
+					'scenario' => 'group_and_user',
+					'user_role' => USER_TYPE_ZABBIX_USER,
+					'permissions' => PERM_READ,
+					'dashboard_group' => 'Read access to template and host',
+					'user_group' => 'Read access to template and host',
+					'user_permissions' => PERM_READ_WRITE,
+					'edit' => true,
+					'view' => true
+				]
+			],
+			'Public dashboard. User and group access: user - write, group - read, different groups' => [
+				[
+					'status' => PUBLIC_SHARING,
+					'scenario' => 'group_and_user',
+					'user_role' => USER_TYPE_ZABBIX_USER,
+					'permissions' => PERM_READ,
+					'dashboard_group' => 'Read access to template and host',
+					'user_permissions' => PERM_READ_WRITE,
+					'edit' => true,
+					'view' => true
+				]
+			],
+			'Public dashboard. User and group access: user - write, group - write, same groups' => [
+				[
+					'status' => PUBLIC_SHARING,
+					'scenario' => 'group_and_user',
+					'user_role' => USER_TYPE_ZABBIX_USER,
+					'permissions' => PERM_READ_WRITE,
+					'dashboard_group' => 'Read access to template and host',
+					'user_group' => 'Read access to template and host',
+					'user_permissions' => PERM_READ_WRITE,
+					'edit' => true,
+					'view' => true
+				]
+			],
+			'Public dashboard. User and group access: user - write, group - write, different groups' => [
+				[
+					'status' => PUBLIC_SHARING,
 					'scenario' => 'group_and_user',
 					'user_role' => USER_TYPE_ZABBIX_USER,
 					'permissions' => PERM_READ_WRITE,
@@ -902,10 +1449,9 @@ class testDashboardsUserPermissions extends CWebTest {
 	}
 
 	/**
-	 * Verify user access to the private dashboard through sharing. A dashboard with a Public status is accessible
-	 * to all users, so access checks are pointless.
+	 * Verify user access to the private and public dashboards through sharing.
 	 *
-	 * @dataProvider sharingPermissions
+	 * @dataProvider getSharingPermissionsData
 	 */
 	public function testDashboardsUserPermissions_DashboardShare($data) {
 
@@ -913,26 +1459,29 @@ class testDashboardsUserPermissions extends CWebTest {
 		switch ($data['scenario']) {
 			case 'group_access':
 				$this->updateUser($data['user_role'], $data['user_group']);
-				$this->updateDashboardAccess($data['permissions'], $data['dashboard_group'], 0, 1);
+				$this->updateDashboardAccess($data['permissions'], $data['dashboard_group'], 0, 1, $data['status']);
 				break;
 			case 'user_access':
 				$this->updateUser($data['user_role']);
-				$this->updateDashboardAccess(0, 0, $data['user_permissions'], 2);
+				$this->updateDashboardAccess(0, 0, $data['user_permissions'], 2, $data['status']);
 				break;
 			case 'group_and_user':
 				$user_group = (array_key_exists('dashboard_group', $data))
 						? $data['dashboard_group']
 						: 'Read/Write access to template and host';
+
 				$this->updateUser($data['user_role'], $user_group);
-				$this->updateDashboardAccess($data['permissions'], $data['dashboard_group'], $data['user_permissions'], 3);
+				$this->updateDashboardAccess($data['permissions'], $data['dashboard_group'], $data['user_permissions'],
+						3, $data['status']
+				);
 				break;
 			case 'different_user':
 				$this->updateUser($data['user_role']);
-				$this->updateDashboardAccess(0, 0, PERM_READ_WRITE, 4);
+				$this->updateDashboardAccess(0, 0, PERM_READ_WRITE, 4, $data['status']);
 				break;
 		}
 
-		// Login under updated user and open private dashboard.
+		// Login under updated user and open dashboard.
 		$this->page->userLogin(self::USERNAME, self::PASSWORD);
 		$this->page->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid)->waitUntilReady();
 
@@ -946,7 +1495,7 @@ class testDashboardsUserPermissions extends CWebTest {
 				$this->assertTrue($dashboard->isEditable());
 			}
 			else {
-				$this->assertFalse($this->query('xpath:.//nav[@class="dashboard-edit"]')->one()->isClickable());
+				$this->assertFalse($this->query('button:Edit dashboard')->one()->isClickable(), 'Button is clickable');
 			}
 		}
 		else {
@@ -957,15 +1506,18 @@ class testDashboardsUserPermissions extends CWebTest {
 	/**
 	 * Change dashboard sharing access via API.
 	 *
-	 * @param integer  $permissions      PERM_READ_WRITE or PERM_READ
-	 * @param string   $group            user group name
-	 * @param interger $scenario		 1 - group, 2 - user, 3 - group and user, 4 - different user
+	 * @param integer $group_permissions	PERM_READ_WRITE or PERM_READ.
+	 * @param string  $group				User group name.
+	 * @param integer $user_permissions		PERM_READ_WRITE or PERM_READ.
+	 * @param integer $scenario				Dashboard update scenario: 1 - update only group, 2 - only user, 3 - group and user, 4 - different user.
+	 * @param integer $private				PUBLIC_SHARING or PRIVATE_SHARING.
 	 */
-	protected function updateDashboardAccess($group_permissions, $group, $user_permissions, $scenario) {
+	protected function updateDashboardAccess($group_permissions, $group, $user_permissions, $scenario, $private) {
 		// Clear all privious permissions first.
 		CDataHelper::call('dashboard.update', [
 			[
 				'dashboardid' => self::$dashboardid,
+				'private' => $private,
 				'userGroups' => [],
 				'users' => []
 			]
@@ -1037,8 +1589,8 @@ class testDashboardsUserPermissions extends CWebTest {
 	/**
 	 * Change user role and user group request for existing user via API.
 	 *
-	 * @param integer	$role		user role ID
-	 * @param string	$group		user group name
+	 * @param integer	$role		User role ID.
+	 * @param string	$group		User group name.
 	 */
 	protected function updateUser($role, $group = 'Read/Write access to template and host') {
 		CDataHelper::call('user.update', [
