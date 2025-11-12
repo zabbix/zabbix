@@ -295,7 +295,7 @@ static int	get_expression_macro_result(const zbx_db_event *event, char *data, zb
 	}
 
 	if (SUCCEED != zbx_eval_expand_user_macros(&ctx, hostids->values, hostids->values_num,
-			(zbx_macro_expand_func_t)zbx_dc_expand_user_and_func_macros, um_handle, NULL))
+			zbx_um_expand_cb_wrapper, um_handle, NULL))
 	{
 		goto out;
 	}
