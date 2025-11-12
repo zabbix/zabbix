@@ -23,7 +23,7 @@ require_once __DIR__.'/../../include/helpers/CDataHelper.php';
 /**
  * @backup widget, profiles, triggers, problem, config
  *
- * @dataSource DynamicItemWidgets
+ * @dataSource DynamicItemWidgets, MonitoringOverview
  *
  * @onBefore prepareData
  */

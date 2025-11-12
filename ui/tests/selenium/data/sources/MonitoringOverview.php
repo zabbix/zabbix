@@ -217,6 +217,111 @@ class MonitoringOverview {
 		]);
 		$itemids = CDataHelper::getIds('name');
 
+		$i = 1;
+		foreach (array_values($itemids) as $itemid) {
+			CDataHelper::addItemData($itemid, [$i], 1533555726);
+			$i++;
+		}
+
+		// Create triggers based on items.
+		CDataHelper::call('trigger.create', [
+			[
+				'description' => '1_trigger_Not_classified',
+				'expression' => 'last(/1_Host_to_check_Monitoring_Overview/trap[1],#1)>0',
+				'comments' => 'Macro should be resolved, host IP should be visible here: {HOST.CONN}',
+				'priority' => TRIGGER_SEVERITY_NOT_CLASSIFIED,
+				'url' => 'tr_events.php?triggerid={TRIGGER.ID}&eventid={EVENT.ID}'
+			],
+			[
+				'description' => '1_trigger_Warning',
+				'expression' => 'last(/1_Host_to_check_Monitoring_Overview/trap[1],#1)>0',
+				'comments' => 'The following url should be clickable: https://zabbix.com',
+				'priority' => TRIGGER_SEVERITY_WARNING
+			],
+			[
+				'description' => '1_trigger_Average',
+				'expression' => 'last(/1_Host_to_check_Monitoring_Overview/trap[1],#1)>0',
+				'comments' => 'https://zabbix.com',
+				'priority' => TRIGGER_SEVERITY_AVERAGE,
+				'url' => 'tr_events.php?triggerid={TRIGGER.ID}&eventid={EVENT.ID}'
+			],
+			[
+				'description' => '1_trigger_High',
+				'expression' => 'last(/1_Host_to_check_Monitoring_Overview/trap[1],#1)>0',
+				'comments' => 'Non-clickable description',
+				'priority' => TRIGGER_SEVERITY_HIGH,
+				'url' => 'tr_events.php?triggerid={TRIGGER.ID}&eventid={EVENT.ID}'
+			],
+			[
+				'description' => '1_trigger_Disaster',
+				'expression' => 'last(/1_Host_to_check_Monitoring_Overview/trap[1],#1)>0',
+				'priority' => TRIGGER_SEVERITY_DISASTER
+			],
+			[
+				'description' => '2_trigger_Information',
+				'expression' => 'last(/1_Host_to_check_Monitoring_Overview/trap[2],#1)>0',
+				'comments' => 'http://zabbix.com https://www.zabbix.com/career https://www.zabbix.com/contact',
+				'priority' => TRIGGER_SEVERITY_INFORMATION
+			],
+			[
+				'description' => '3_trigger_Average',
+				'expression' => 'last(/3_Host_to_check_Monitoring_Overview/trap[3],#1)>0',
+				'comments' => 'Macro - resolved, URL - clickable: {HOST.NAME}, https://zabbix.com',
+				'priority' => TRIGGER_SEVERITY_AVERAGE
+			],
+			[
+				'description' => '3_trigger_Disaster',
+				'expression' => 'last(/3_Host_to_check_Monitoring_Overview/trap[3],#1)>0',
+				'priority' => TRIGGER_SEVERITY_DISASTER,
+				'url' => 'triggers.php?form=update&triggerid={TRIGGER.ID}&context=host'
+			],
+			[
+				'description' => '4_trigger_Average',
+				'expression' => 'last(/4_Host_to_check_Monitoring_Overview/trap[4],#1)>0',
+				'priority' => TRIGGER_SEVERITY_AVERAGE
+			]
+		]);
+
+		// Create events and problems.
+		$trigger_names = [
+			'1_trigger_Not_classified',
+			'1_trigger_Warning',
+			'1_trigger_Average',
+			'1_trigger_High',
+			'1_trigger_Disaster',
+			'2_trigger_Information',
+			'3_trigger_Average',
+			'4_trigger_Average'
+		];
+		CDBHelper::setTriggerProblem($trigger_names, TRIGGER_VALUE_TRUE, ['clock' => 1533555726, 'ns' => 726692808]);
+
+		foreach ($trigger_names as $description) {
+			DBexecute('UPDATE triggers SET value=1 WHERE description='.zbx_dbstr($description));
+		}
+
+		// Get event ids.
+		$eventids = [];
+		foreach ($trigger_names as $event_name) {
+			$eventids[$event_name] = CDBHelper::getValue('SELECT eventid FROM events WHERE name='.zbx_dbstr($event_name));
+		}
+
+		$acknowledge = [
+			$eventids['2_trigger_Information'],
+			$eventids['3_trigger_Average'],
+			$eventids['4_trigger_Average']
+		];
+
+		CDataHelper::call('event.acknowledge', [
+			'eventids' => $acknowledge,
+			'message' => '1 acknowledged',
+			'action' => 2
+		]);
+
+		foreach ($acknowledge as $id) {
+			DBexecute('UPDATE acknowledges SET clock=1533629135 WHERE eventid='.zbx_dbstr($id));
+			$id = CDBHelper::getValue('SELECT acknowledgeid FROM acknowledges WHERE eventid='.zbx_dbstr($id));
+			DBexecute('UPDATE task SET clock=1533631968 WHERE taskid='.zbx_dbstr($id));
+		}
 
 		return [
 			'groupids' => $groupids,
