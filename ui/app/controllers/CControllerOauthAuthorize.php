@@ -80,7 +80,7 @@ class CControllerOauthAuthorize extends CController {
 
 			if (!$endpoints_match) {
 				error(_s('Incorrect value for field "%1$s": %2$s.', 'client_secret', _('cannot be empty')));
-				
+
 				return false;
 			}
 		}
