@@ -3669,7 +3669,7 @@ static void	DCsync_items(zbx_dbsync_t *sync, zbx_uint64_t revision, int flags, z
 					/* NOT be from template. That means, its hostid MUST NOT be in        */
 					/* config->hosts.           	                                      */
 					zabbix_log(LOG_LEVEL_INFORMATION, "item_rtdata entry unexpectedly is present "
-						" for template itemid: " ZBX_FS_UI64 " on host: " ZBX_FS_UI64, itemid,
+						"for template itemid: " ZBX_FS_UI64 " on host: " ZBX_FS_UI64, itemid,
 						hostid);
 					THIS_SHOULD_NEVER_HAPPEN;
 				}
