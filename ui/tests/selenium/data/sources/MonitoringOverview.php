@@ -250,7 +250,13 @@ class MonitoringOverview {
 				'expression' => 'last(/1_Host_to_check_Monitoring_Overview/trap[1],#1)>0',
 				'comments' => 'Non-clickable description',
 				'priority' => TRIGGER_SEVERITY_HIGH,
-				'url' => 'tr_events.php?triggerid={TRIGGER.ID}&eventid={EVENT.ID}'
+				'url' => 'tr_events.php?triggerid={TRIGGER.ID}&eventid={EVENT.ID}',
+				'tags' => [
+					[
+						'tag' => 'webhook',
+						'value' => '1'
+					]
+				]
 			],
 			[
 				'description' => '1_trigger_Disaster',

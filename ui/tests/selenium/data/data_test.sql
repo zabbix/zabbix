@@ -779,7 +779,7 @@ UPDATE config SET alert_usrgrpid = 150 WHERE configid = 1;
 -- Disable warning if Zabbix server is down
 UPDATE config SET server_check_interval = 0 WHERE configid = 1;
 -- Super admin rows per page
-UPDATE users SET rows_per_page = 100 WHERE userid = 1;
+UPDATE users SET rows_per_page = 150 WHERE userid = 1;
 -- Set default language to EN_gb to display the date/time in the 24-hour format
 UPDATE config SET default_lang='en_GB' WHERE configid=1;
 
