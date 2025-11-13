@@ -583,13 +583,12 @@ static void	add_pinger_host(zbx_vector_fping_host_t *hosts, char *addr)
 static int	process_pinger_hosts(zbx_hashset_t *pinger_items, int process_num, int process_type)
 {
 #define ZBX_ITEM_TIMEOUT_MAX	600
-	int				ping_result, processed_num = 0;
+	int				ping_result, max_execution_time, processed_num = 0;
 	char				error[ZBX_ITEM_ERROR_LEN_MAX];
 	zbx_vector_fping_host_t		hosts;
 	zbx_timespec_t			ts;
 	zbx_hashset_iter_t		iter;
 	zbx_pinger_t			*pinger;
-	int				max_execution_time;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
