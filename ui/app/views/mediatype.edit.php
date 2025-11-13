@@ -269,6 +269,7 @@ if (!$data['display_password_input']) {
 			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 			->setAriaRequired()
 			->setAttribute('autocomplete', 'off')
+			->setAttribute('data-notrim', '')
 			->addStyle('display: none;')
 			->addClass('inactive')
 			->setEnabled(false)
@@ -277,6 +278,7 @@ if (!$data['display_password_input']) {
 else {
 	$passwd_field = (new CPassBox('passwd', ''))
 		->setAttribute('autocomplete', 'off')
+		->setAttribute('data-notrim', '')
 		->setWidth(ZBX_TEXTAREA_SMALL_WIDTH);
 }
 
