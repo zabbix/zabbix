@@ -134,11 +134,9 @@
 				sendto_full = media.sendto.join(', ');
 				sendto_array = media.sendto;
 				delete(media.sendto);
-				media.sendto_multi = 1;
 			}
 			else {
 				sendto_full = media.sendto;
-				media.sendto_multi = 0;
 			}
 
 			media.sendto_short = sendto_full.length > 50

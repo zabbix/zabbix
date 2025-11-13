@@ -327,7 +327,6 @@ $role_multiselect = (new CMultiSelect([
 		'parameters' => [
 			'srctbl' => 'roles',
 			'srcfld1' => 'roleid',
-			'srcfld2' => '',
 			'dstfrm' => 'user_form',
 			'dstfld1' => 'roleid'
 		]

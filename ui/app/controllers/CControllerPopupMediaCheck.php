@@ -31,11 +31,14 @@ class CControllerPopupMediaCheck extends CController {
 			'userid' => ['db users.userid', 'required'],
 			'mediatypeid' => ['db media.mediatypeid', 'required'],
 			'mediatype_type' => ['integer', 'required'],
-			'sendto' => ['db media.sendto',
+			'sendto' => ['db media.sendto', 'not_empty',
 				'when' => ['mediatype_type', 'not_in' => [MEDIA_TYPE_EMAIL]]
 			],
 			'sendto_emails' => ['array', 'required', 'not_empty',
-				'field' => ['string', 'not_empty', 'use' => [CEmailValidator::class, []]],
+				'field' => ['string',
+					// TODO: uncomment with DEV-4644
+					// 'not_empty', 'use' => [CEmailValidator::class, []]
+				],
 				'when' => ['mediatype_type', 'in' => [MEDIA_TYPE_EMAIL]]
 			],
 			'period' => ['string', 'required', 'not_empty',
@@ -144,7 +147,8 @@ class CControllerPopupMediaCheck extends CController {
 			'active' => $this->getInput('active', MEDIA_STATUS_DISABLED),
 			'provisioned' => $this->getInput('provisioned', CUser::PROVISION_STATUS_NO),
 			'mediatype_name' => $this->mediatype['name'],
-			'mediatype_status' => $this->mediatype['status']
+			'mediatype_status' => $this->mediatype['status'],
+			'mediatype_type' => $this->mediatype['type']
 		];
 
 		if ($this->hasInput('mediaid')) {

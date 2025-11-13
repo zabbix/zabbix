@@ -48,11 +48,19 @@ class CControllerUserCreate extends CControllerUserUpdateGeneral {
 			'medias' => ['objects', 'fields' => [
 				'mediaid' => ['db media.mediaid'],
 				'mediatypeid' => ['db media.mediatypeid', 'required'],
-				'sendto_multi' => ['boolean', 'required'],
+				'mediatype_type' => ['integer', 'required'],
 				'sendto' => [
-					['db media.sendto', 'required', 'not_empty', 'when' => ['sendto_multi', 'in' => [0]]],
-					['array', 'required', 'not_empty', 'field' => ['db media.sendto', 'required', 'not_empty'],
-						'when' => ['sendto_multi', 'in' => [0]]
+					[
+						'db media.sendto', 'required', 'not_empty',
+						'when' => ['mediatype_type', 'not_in' => [MEDIA_TYPE_EMAIL]]
+					],
+					[
+						'array', 'required', 'not_empty',
+						'field' => ['db media.sendto', 'required',
+							// TODO: uncomment with DEV-4644
+							// 'not_empty', 'use' => [CEmailValidator::class, []]
+						],
+						'when' => ['mediatype_type', 'in' => [MEDIA_TYPE_EMAIL]]
 					]
 				],
 				'period' => ['string', 'required', 'not_empty',

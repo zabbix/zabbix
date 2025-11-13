@@ -28,6 +28,8 @@ $media_form_list = new CFormList('userMediaFormList');
 $media_table_info = (new CTable())
 	->setId('media-table')
 	->setAttribute('style', 'width: 100%;')
+	->setAttribute('data-field-type', 'set')
+	->setAttribute('data-field-name', 'medias')
 	->setHeader([_('Type'), _('Send to'), _('When active'), _('Use if severity'), _('Status'), _('Actions')]);
 
 $media_add_button = (new CButtonLink(_('Add')))
@@ -78,7 +80,7 @@ $media_table_info_template = new CTemplateTag('media-row-tmpl',
 					->setAttribute('data-field-type', 'hidden'),
 				(new CInput('hidden', 'medias[#{row_index}][mediatypeid]', '#{mediatypeid}'))
 					->setAttribute('data-field-type', 'hidden'),
-				(new CInput('hidden', 'medias[#{row_index}][sendto_multi]', '#{sendto_multi}'))
+				(new CInput('hidden', 'medias[#{row_index}][mediatype_type]', '#{mediatype_type}'))
 					->setAttribute('data-field-type', 'hidden'),
 				(new CInput('hidden', 'medias[#{row_index}][period]', '#{period}'))
 					->setAttribute('data-field-type', 'hidden'),
@@ -93,8 +95,6 @@ $media_table_info_template = new CTemplateTag('media-row-tmpl',
 			]))
 		]))
 	]))->setAttribute('data-row_index', '#{row_index}')
-		->setAttribute('data-field-type', 'set')
-		->setAttribute('data-field-name', 'medias')
 		->setId('medias_#{row_index}')
 );
 

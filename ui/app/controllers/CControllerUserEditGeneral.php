@@ -58,7 +58,7 @@ abstract class CControllerUserEditGeneral extends CController {
 		}
 
 		$mediatypes = API::Mediatype()->get([
-			'output' => ['name', 'status'],
+			'output' => ['name', 'status', 'type'],
 			'mediatypeids' => array_keys($mediatypeids),
 			'preservekeys' => true
 		]);
@@ -67,6 +67,9 @@ abstract class CControllerUserEditGeneral extends CController {
 			$media['row_index'] = $row_index;
 			$media['mediatype_name'] = array_key_exists($media['mediatypeid'], $mediatypes)
 				? $mediatypes[$media['mediatypeid']]['name']
+				: null;
+			$media['mediatype_type'] = array_key_exists($media['mediatypeid'], $mediatypes)
+				? $mediatypes[$media['mediatypeid']]['type']
 				: null;
 			$media['mediatype_status'] = array_key_exists($media['mediatypeid'], $mediatypes)
 				? $mediatypes[$media['mediatypeid']]['status']
