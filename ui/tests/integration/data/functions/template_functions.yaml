@@ -317,8 +317,8 @@ zabbix_export:
           key: 'item[30]'
           triggers:
             - uuid: 211e1ba754914e59b81e14e811bf93f7
-              expression: 'lastclock(/Integration function test/item[30]) = 1762430060'
-              name: 'Item 30 lastclock() eq 1762430060'
+              expression: 'lastclock(/Integration function test/item[30]) = {$LASTCLOCK}'
+              name: 'Item 30 lastclock() eq {$LASTCLOCK}'
         - uuid: 530b7325500b412ab7d909eb19fd2d05
           name: 'Item 31'
           type: TRAP
@@ -334,8 +334,8 @@ zabbix_export:
           key: 'item[32]'
           triggers:
             - uuid: 0fd458b245054d82b8200a525069fd9e
-              expression: 'firstclock(/Integration function test/item[32], 5m) = 1762430300'
-              name: 'Item 32 firstclock(5m) eq 1762430300'
+              expression: 'firstclock(/Integration function test/item[32], 5m) = {$FIRSTCLOCK}'
+              name: 'Item 32 firstclock(5m) eq {$FIRSTCLOCK}'
         - uuid: ae9a426dde7a484b97bc62af901e4c90
           name: 'Item 51'
           type: TRAP
@@ -356,6 +356,11 @@ zabbix_export:
           name: 'Item 55'
           type: TRAP
           key: 'item[55]'
+      macros:
+        - macro: '{$FIRSTCLOCK}'
+          value: '1762430060'
+        - macro: '{$LASTCLOCK}'
+          value: '1762430300'
   triggers:
     - uuid: 3b3c6effd9fb4eabad6f15b3e7ed4764
       expression: 'trendavg(/Integration function test/item[52], 1d:now/d) = 3 and last(/Integration function test/item[51]) > 0'

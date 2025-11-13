@@ -27,8 +27,11 @@ require_once dirname(__FILE__) . '/../include/CIntegrationTest.php';
 class testFunctions extends CIntegrationTest{
 
 	const HOSTNAME_MAIN = "function_host";
+	const LASTCLOCK = 1762430060;
+	const FIRSTCLOCK = 1762430300;
 
 	private $hostid;
+	private $timeOffset = 0;
 
 	/**
 	 *
@@ -136,6 +139,49 @@ class testFunctions extends CIntegrationTest{
 
 		$this->assertCount(1, $response['result']['hostids']);
 		$this->hostid = $response['result']['hostids'][0];
+
+		$this->getTimeOffset('values1');
+
+		$this->call('usermacro.create', [
+			[
+				'hostid' => $this->hostid,
+				'macro' => '{$FIRSTCLOCK}',
+				'value' => (string)(self::FIRSTCLOCK + $this->timeOffset)
+			],
+			[
+				'hostid' => $this->hostid,
+				'macro' => '{$LASTCLOCK}',
+				'value' => (string)(self::LASTCLOCK + $this->timeOffset)
+			]
+		]);
+	}
+
+	private function getTimeOffset($filename) {
+		$data = file_get_contents('integration/data/functions/' . $filename);
+		$lines = explode("\n", trim($data));
+
+		$maxClock = 0;
+
+		foreach ($lines as $line) {
+			if (trim($line) === '') {
+				continue;
+			}
+
+			$parts = preg_split('/\s+/', trim($line));
+
+			if (count($parts) >= 4) {
+				$clockValue = (int)$parts[2];
+
+				if ($clockValue > $maxClock) {
+					$maxClock = $clockValue;
+				}
+			}
+		}
+
+		$currentTime = time();
+		$timeDiff = $currentTime - $maxClock;
+		$daysToAdd = floor($timeDiff / 86400);
+		$this->timeOffset = $daysToAdd * 86400;
 	}
 
 	private function getSenderData($filename) {
@@ -159,6 +205,10 @@ class testFunctions extends CIntegrationTest{
 					'clock' => (int)$parts[2]
 				];
 			}
+		}
+
+		foreach ($data as &$value) {
+			$value['clock'] += $this->timeOffset;
 		}
 
 		return $data;
@@ -230,9 +280,9 @@ class testFunctions extends CIntegrationTest{
 			'Item 28 rate(5m) eq 1' => ['state' => 1, 'value' => 0],
 			'Item 29 changecount(#5) eq 1' => ['state' => 1, 'value' => 0],
 			'Item 29 changecount(5m) eq 1' => ['state' => 1, 'value' => 0],
-			'Item 30 lastclock() eq 1762430060' => ['state' => 0, 'value' => 0],
+			'Item 30 lastclock() eq {$LASTCLOCK}' => ['state' => 0, 'value' => 0],
 			'Item 31 logtimestamp() eq 0' => ['state' => 1, 'value' => 0],
-			'Item 32 firstclock(5m) eq 1762430300' => ['state' => 0, 'value' => 0],
+			'Item 32 firstclock(5m) eq {$FIRSTCLOCK}' => ['state' => 0, 'value' => 0],
 			'Item 52 trendcount eq 2' => ['state' => 0, 'value' => 0],
 			'Item 52 trendmin eq 2' => ['state' => 0, 'value' => 0],
 			'Item 52 trendmax eq 4' => ['state' => 0, 'value' => 0],
@@ -249,8 +299,8 @@ class testFunctions extends CIntegrationTest{
 			$this->assertArrayHasKey($description, $triggers_expected);
 			$expected = $triggers_expected[$description];
 
-			$this->assertEquals($expected['state'], $trigger['state'], "State mismatch for trigger: $description");
-			$this->assertEquals($expected['value'], $trigger['value'], "Value mismatch for trigger: $description");
+			$this->assertEquals($expected['state'], $trigger['state'], "[1] State mismatch for trigger: $description");
+			$this->assertEquals($expected['value'], $trigger['value'], "[1] Value mismatch for trigger: $description");
 		}
 	}
 
@@ -314,9 +364,9 @@ class testFunctions extends CIntegrationTest{
 			'Item 28 rate(5m) eq 1' => ['state' => 0, 'value' => 1],
 			'Item 29 changecount(#5) eq 1' => ['state' => 0, 'value' => 1],
 			'Item 29 changecount(5m) eq 1' => ['state' => 0, 'value' => 1],
-			'Item 30 lastclock() eq 1762430060' => ['state' => 0, 'value' => 1],
+			'Item 30 lastclock() eq {$LASTCLOCK}' => ['state' => 0, 'value' => 1],
 			'Item 31 logtimestamp() eq 0' => ['state' => 1, 'value' => 0],
-			'Item 32 firstclock(5m) eq 1762430300' => ['state' => 0, 'value' => 1],
+			'Item 32 firstclock(5m) eq {$FIRSTCLOCK}' => ['state' => 0, 'value' => 1],
 			'Item 52 trendcount eq 2' => ['state' => 0, 'value' => 1],
 			'Item 52 trendmin eq 2' => ['state' => 0, 'value' => 1],
 			'Item 52 trendmax eq 4' => ['state' => 0, 'value' => 1],
@@ -333,8 +383,8 @@ class testFunctions extends CIntegrationTest{
 			$this->assertArrayHasKey($description, $triggers_expected);
 			$expected = $triggers_expected[$description];
 
-			$this->assertEquals($expected['state'], $trigger['state'], "State mismatch for trigger: $description");
-			$this->assertEquals($expected['value'], $trigger['value'], "Value mismatch for trigger: $description");
+			$this->assertEquals($expected['state'], $trigger['state'], "[2] State mismatch for trigger: $description");
+			$this->assertEquals($expected['value'], $trigger['value'], "[2] Value mismatch for trigger: $description");
 		}
 	}
 
@@ -398,9 +448,9 @@ class testFunctions extends CIntegrationTest{
 			'Item 28 rate(5m) eq 1' => ['state' => 0, 'value' => 0],
 			'Item 29 changecount(#5) eq 1' => ['state' => 0, 'value' => 0],
 			'Item 29 changecount(5m) eq 1' => ['state' => 0, 'value' => 0],
-			'Item 30 lastclock() eq 1762430060' => ['state' => 0, 'value' => 0],
+			'Item 30 lastclock() eq {$LASTCLOCK}' => ['state' => 0, 'value' => 0],
 			'Item 31 logtimestamp() eq 0' => ['state' => 1, 'value' => 0],
-			'Item 32 firstclock(5m) eq 1762430300' => ['state' => 0, 'value' => 0],
+			'Item 32 firstclock(5m) eq {$FIRSTCLOCK}' => ['state' => 0, 'value' => 0],
 			'Item 52 trendcount eq 2' => ['state' => 0, 'value' => 0],
 			'Item 52 trendmin eq 2' => ['state' => 0, 'value' => 0],
 			'Item 52 trendmax eq 4' => ['state' => 0, 'value' => 0],
@@ -417,8 +467,8 @@ class testFunctions extends CIntegrationTest{
 			$this->assertArrayHasKey($description, $triggers_expected);
 			$expected = $triggers_expected[$description];
 
-			$this->assertEquals($expected['state'], $trigger['state'], "State mismatch for trigger: $description");
-			$this->assertEquals($expected['value'], $trigger['value'], "Value mismatch for trigger: $description");
+			$this->assertEquals($expected['state'], $trigger['state'], "[3] State mismatch for trigger: $description");
+			$this->assertEquals($expected['value'], $trigger['value'], "[3] Value mismatch for trigger: $description");
 		}
 	}
 
@@ -427,7 +477,6 @@ class testFunctions extends CIntegrationTest{
 	 * @configurationDataProvider serverConfigurationProvider
 	 */
 	public function testFunctions_testAllFunctions() {
-
 		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
 
 		$this->processStep1();
