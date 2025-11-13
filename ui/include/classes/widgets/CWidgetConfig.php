@@ -107,7 +107,7 @@ class CWidgetConfig {
 			WIDGET_HOST_AVAIL			=> 'CWidget',
 			WIDGET_MAP					=> 'CWidgetMap',
 			WIDGET_NAV_TREE				=> 'CWidgetNavTree',
-			WIDGET_PLAIN_TEXT			=> 'CWidget',
+			WIDGET_PLAIN_TEXT			=> 'CWidgetPlainText',
 			WIDGET_PROBLEM_HOSTS		=> 'CWidget',
 			WIDGET_PROBLEMS				=> 'CWidgetProblems',
 			WIDGET_PROBLEMS_BY_SV		=> 'CWidgetProblemsBySv',
