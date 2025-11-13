@@ -15,7 +15,7 @@
 #ifndef ZABBIX_ANOMALYSTL_H
 #define ZABBIX_ANOMALYSTL_H
 
-#include "zbxhistory_provider.h"
+#include "zbxhistory.h"
 #include "zbxvariant.h"
 
 /* default values which can be used in zbx_STL() arguments */

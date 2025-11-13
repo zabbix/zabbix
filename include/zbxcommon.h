@@ -221,6 +221,26 @@ zbx_item_value_type_t;
 
 const char	*zbx_item_value_type_string(zbx_item_value_type_t value_type);
 
+typedef struct
+{
+	int	timestamp;
+	int	logeventid;
+	int	severity;
+	char	*source;
+	char	*value;
+}
+zbx_log_value_t;
+
+typedef union
+{
+	double		dbl;
+	zbx_uint64_t	ui64;
+	char		*str;
+	char		*err;
+	zbx_log_value_t	*log;
+}
+zbx_history_value_t;
+
 /* value for not supported items */
 #define ZBX_NOTSUPPORTED	"ZBX_NOTSUPPORTED"
 /* value for item not having any data */

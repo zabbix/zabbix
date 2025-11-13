@@ -17,7 +17,7 @@
 #include "eval.h"
 
 #include "zbx_discoverer_constants.h"
-#include "zbxhistory_provider.h"
+#include "zbxhistory.h"
 
 const char	*zbx_dservice_type_string(zbx_dservice_type_t service)
 {

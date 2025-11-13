@@ -28,7 +28,6 @@
 #include "zbxdbhigh.h"
 #include "zbxalgo.h"
 #include "zbxcalc.h"
-#include "zbxhistory_provider.h"
 #include "zbxhistory.h"
 
 static void	extract_functionids(zbx_vector_uint64_t *functionids, zbx_vector_dc_trigger_t *triggers)

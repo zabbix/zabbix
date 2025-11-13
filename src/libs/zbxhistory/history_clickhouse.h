@@ -15,7 +15,6 @@
 #ifndef ZABBIX_HISTORY_CLICKHOUSE_H
 #define ZABBIX_HISTORY_CLICKHOUSE_H
 
-#include "zbxhistory_provider.h"
 #include "history.h"
 
 zbx_history_provider_t	*history_clickhouse_open(const zbx_history_option_t *options, int options_num, char **error);

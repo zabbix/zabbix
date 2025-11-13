@@ -18,8 +18,56 @@
 #include "zbxvariant.h"
 #include "zbxjson.h"
 #include "zbxtime.h"
-#include "zbxhistory_provider.h"
+#include "zbxalgo.h"
 
+typedef enum
+{
+	ZBX_VALUE_UNKNOWN,
+	ZBX_VALUE_NONE,
+	ZBX_VALUE_SECONDS,
+	ZBX_VALUE_NVALUES,
+	ZBX_VALUE_NODATA,
+}
+zbx_value_type_t;
+
+typedef struct
+{
+	int			value;
+	zbx_value_type_t	type;
+	int			timeshift;
+}
+zbx_history_selector_t;
+
+/* the item history value */
+typedef struct
+{
+	zbx_timespec_t		timestamp;
+	zbx_history_value_t	value;
+}
+zbx_history_record_t;
+
+ZBX_VECTOR_DECL(history_record, zbx_history_record_t)
+
+typedef struct
+{
+	zbx_uint64_t		itemid;
+	unsigned char		value_type;
+	zbx_history_value_t	value;
+	zbx_timespec_t		ts;
+	int			ttl;
+}
+zbx_history_entry_t;
+
+typedef struct
+{
+	zbx_uint64_t			itemid;
+	int				index;
+	const zbx_history_selector_t	*selector;
+	zbx_vector_history_record_t	rows;
+}
+zbx_item_history_t;
+
+ZBX_VECTOR_DECL(item_history, zbx_item_history_t)
 #define ZBX_HISTORY_CHECK_TYPE_FLAGS(flags, value_type) \
 	(0 == (flags & (__UINT64_C(1) << value_type)) ? FAIL : SUCCEED)
 

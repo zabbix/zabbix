@@ -31,7 +31,6 @@
 #include "zbxdb.h"
 #include "zbxcacheconfig.h"
 #include "zbxalgo.h"
-#include "zbxhistory_provider.h"
 
 /* one item query data - index in hostkeys items */
 typedef struct

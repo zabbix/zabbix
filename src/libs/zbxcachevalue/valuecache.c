@@ -18,7 +18,6 @@
 #include "zbxtime.h"
 #include "zbxalgo.h"
 #include "zbxhistory.h"
-#include "zbxhistory_provider.h"
 #include "zbxshmem.h"
 
 /*

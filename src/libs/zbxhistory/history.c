@@ -13,14 +13,13 @@
 **/
 
 #include "history.h"
-#include "zbxcommon.h"
 #include "zbxhistory.h"
 #include "history_option.h"
 #include "history_sql.h"
 #include "history_elastic.h"
 #include "history_clickhouse.h"
-#include "zbxhistory_provider.h"
 
+#include "zbxcommon.h"
 #include "zbxdb.h"
 #include "zbxdbhigh.h"
 #include "zbxstr.h"

@@ -37,7 +37,6 @@
 #include "zbxprof.h"
 #include "zbxcalc.h"
 #include "zbxhash.h"
-#include "zbxhistory_provider.h"
 
 /******************************************************************************
  *                                                                            *

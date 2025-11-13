@@ -13,6 +13,7 @@
 **/
 
 #include "history_clickhouse.h"
+#include "history.h"
 #include "zbxcommon.h"
 
 #if defined(HAVE_LIBCURL)

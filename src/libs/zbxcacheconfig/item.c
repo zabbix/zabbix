@@ -18,7 +18,6 @@
 #include "zbx_item_constants.h"
 #include "zbxcachevalue.h"
 #include "zbxtime.h"
-#include "zbxhistory_provider.h"
 #include "zbxexpr.h"
 
 int	zbx_dc_get_item_key(zbx_uint64_t itemid, char **key)

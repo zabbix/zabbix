@@ -27,7 +27,6 @@
 #include "zbx_host_constants.h"
 #include "zbxtime.h"
 #include "zbxhash.h"
-#include "zbxhistory_provider.h"
 
 static char	*sql = NULL;
 static size_t	sql_alloc = 4 * ZBX_KIBIBYTE;

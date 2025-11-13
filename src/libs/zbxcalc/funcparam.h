@@ -16,7 +16,7 @@
 #define ZABBIX_FUNCPARAM_H
 
 #include "eval.h"
-#include "zbxhistory_provider.h"
+#include "zbxhistory.h"
 
 int	get_function_parameter_uint64(const char *parameters, int Nparam, zbx_uint64_t *value);
 int	get_function_parameter_float(const char *parameters, int Nparam, unsigned char flags, double *value);

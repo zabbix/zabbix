@@ -19,6 +19,8 @@
 #include "zbxjson.h"
 #include "zbxdbschema.h"
 
+#define ZBX_DBVERSION_UNDEFINED			0
+
 #define ZBX_DB_OK	0
 #define ZBX_DB_FAIL	-1
 #define ZBX_DB_DOWN	-2

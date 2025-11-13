@@ -16,7 +16,7 @@
 #define ZABBIX_CALC_H
 
 #include "zbxcacheconfig.h"
-
+#include "zbxhistory.h"
 #include "zbx_discoverer_constants.h"
 
 #define ZBX_ITEM_QUERY_UNSET		0x0000
