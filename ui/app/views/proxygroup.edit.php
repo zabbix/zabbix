@@ -99,14 +99,7 @@ if ($data['proxies']) {
 }
 
 $form
-	->addItem($form_grid)
-	->addItem(
-		(new CScriptTag('proxy_group_edit_popup.init('.json_encode([
-			'rules' => $data['js_validation_rules'],
-			'rules_for_clone' => $data['js_validation_rules_for_clone'],
-			'proxy_groupid' => $data['proxy_groupid']
-		]).');'))->setOnDocumentReady()
-	);
+	->addItem($form_grid);
 
 if ($data['proxy_groupid'] !== null) {
 	$title = _('Proxy group');
@@ -150,7 +143,11 @@ $output = [
 	'body' => $form->toString(),
 	'buttons' => $buttons,
 	'script_inline' => getPagePostJs().
-		$this->readJsFile('proxygroup.edit.js.php'),
+		$this->readJsFile('proxygroup.edit.js.php').'proxy_group_edit_popup.init('.json_encode([
+		'rules' => $data['js_validation_rules'],
+		'rules_for_clone' => $data['js_validation_rules_for_clone'],
+		'proxy_groupid' => $data['proxy_groupid']
+	]).');',
 	'dialogue_class' => 'modal-popup-static'
 ];
 
