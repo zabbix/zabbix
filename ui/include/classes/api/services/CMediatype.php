@@ -697,11 +697,10 @@ class CMediatype extends CApiService {
 		}
 
 		if ($is_update && !array_key_exists('client_secret', $mediatype)) {
-			$provider = array_key_exists('provider', $mediatype) ? $mediatype['provider']
-				: $db_mediatype['provider'];
+			$provider = array_key_exists('provider', $mediatype) ? $mediatype['provider'] : $db_mediatype['provider'];
 
 			if ($provider == CMediatypeHelper::EMAIL_PROVIDER_SMTP) {
-				if (self::smtpAuthenticationOauthEndpointChanged($mediatype, $db_mediatype)) {
+				if (self::smtpAuthenticationOauthUrlChanged($mediatype, $db_mediatype)) {
 					if (array_key_exists('tokens_status', $mediatype)) {
 						$mediatype['tokens_status'] = 0;
 					}
@@ -714,16 +713,16 @@ class CMediatype extends CApiService {
 		}
 	}
 
-	private static function smtpAuthenticationOauthEndpointChanged(array $mediatype, array $db_mediatype): bool {
-		$modified_url = array_key_exists('authorization_url', $mediatype)
-			&& urldecode($mediatype['authorization_url']) !== urldecode($db_mediatype['authorization_url']);
+	private static function smtpAuthenticationOauthUrlChanged(array $mediatype, array $db_mediatype): bool {
+		$changed_url = array_key_exists('token_url', $mediatype)
+			&& $mediatype['token_url'] !== $db_mediatype['token_url'];
 
-		if ($modified_url) {
+		if ($changed_url) {
 			return true;
 		}
 
-		return array_key_exists('token_url', $mediatype)
-			&& urldecode($mediatype['token_url']) !== urldecode($db_mediatype['token_url']);
+		return array_key_exists('authorization_url', $mediatype)
+			&& $mediatype['authorization_url'] !== $db_mediatype['authorization_url'];
 	}
 
 	private static function getSmsTypeValidationFields(bool $is_update = false): array {
