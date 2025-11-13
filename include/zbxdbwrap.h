@@ -159,6 +159,16 @@ int	zbx_get_user_info(zbx_uint64_t userid, zbx_uint64_t *roleid, char **user_tim
 int	zbx_get_item_permission(zbx_uint64_t userid, zbx_uint64_t itemid, char **user_timezone);
 int	zbx_get_host_permission(const zbx_user_t *user, zbx_uint64_t hostid);
 
+typedef enum
+{
+	ZBX_VALUE_PROPERTY_VALUE,
+	ZBX_VALUE_PROPERTY_TIME,
+	ZBX_VALUE_PROPERTY_DATE,
+	ZBX_VALUE_PROPERTY_AGE,
+	ZBX_VALUE_PROPERTY_TIMESTAMP
+}
+zbx_expr_db_item_value_property_t;
+
 int	zbx_db_get_proxy_value(zbx_uint64_t proxyid, char **replace_to, const char *field_name);
 int	zbx_db_item_get_value(zbx_uint64_t itemid, char **lastvalue, int raw, zbx_timespec_t *ts, time_t *tstamp);
 int	zbx_db_item_lastvalue(const zbx_db_trigger *trigger, char **lastvalue, int N_functionid, int raw,

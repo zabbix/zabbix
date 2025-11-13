@@ -178,3 +178,4 @@ int	zbx_db_item_value_type_changed_category(unsigned char value_type_new, unsign
 
 	return SUCCEED;
 }
+
