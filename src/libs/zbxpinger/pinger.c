@@ -579,6 +579,7 @@ static void	add_pinger_host(zbx_vector_fping_host_t *hosts, char *addr)
 
 static int	process_pinger_hosts(zbx_hashset_t *pinger_items, int process_num, int process_type)
 {
+#define ZBX_ITEM_TIMEOUT_MAX	600
 	int				ping_result, processed_num = 0;
 	char				error[ZBX_ITEM_ERROR_LEN_MAX];
 	zbx_vector_fping_host_t		hosts;
@@ -610,6 +611,9 @@ static int	process_pinger_hosts(zbx_hashset_t *pinger_items, int process_num, in
 		zbx_setproctitle("%s #%d [pinging hosts]", get_process_type_string(process_type), process_num);
 		zbx_timespec(&ts);
 
+		if (ZBX_ITEM_TIMEOUT_MAX < max_execution_time)
+			max_execution_time = ZBX_ITEM_TIMEOUT_MAX;
+
 		ping_result = zbx_ping(hosts.values, hosts.values_num, pinger->count, pinger->interval, pinger->size,
 				pinger->timeout, pinger->retries, pinger->backoff, pinger->allow_redirect, 0,
 				max_execution_time, error, sizeof(error));
@@ -625,6 +629,7 @@ static int	process_pinger_hosts(zbx_hashset_t *pinger_items, int process_num, in
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 
 	return processed_num;
+#undef ZBX_ITEM_TIMEOUT_MAX
 }
 
 /******************************************************************************
