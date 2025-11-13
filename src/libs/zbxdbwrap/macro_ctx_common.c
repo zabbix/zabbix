@@ -28,6 +28,7 @@
 #include "zbxstr.h"
 #include "zbxtime.h"
 #include "zbxcachevalue.h"
+#include "zbxhistory.h"
 
 /******************************************************************************
  *                                                                            *

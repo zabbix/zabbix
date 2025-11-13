@@ -29,6 +29,7 @@
 #include "zbxcurl.h"
 #include "zbxcacheconfig.h"
 #include "zbxtypes.h"
+#include "zbxdb.h"
 
 #define		ZBX_IDX_JSON_ALLOCATE		256
 #define		ZBX_JSON_ALLOCATE		2048

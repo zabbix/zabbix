@@ -16,7 +16,6 @@
 #define ZABBIX_HISTORY_OPTION_H
 
 #include "history.h"
-#include "zbxhistory.h"
 #include "zbxtypes.h"
 #include "zbxalgo.h"
 
