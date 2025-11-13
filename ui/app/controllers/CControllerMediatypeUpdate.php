@@ -181,7 +181,7 @@ class CControllerMediatypeUpdate extends CControllerMediatypeUpdateGeneral {
 				'fields' => ['value' => ['string']],
 				'when' => ['type', 'in' => [MEDIA_TYPE_EXEC]]
 			],
-			'parameters_webhook' =>	['objects', 'required', 'uniq' => ['value', 'name'],
+			'parameters_webhook' =>	['objects', 'required', 'uniq' => ['name'],
 				'fields' => [
 					'value' => ['string', 'required'],
 					'name' => ['string', 'required', 'not_empty', 'when' => ['value', 'not_empty']]
