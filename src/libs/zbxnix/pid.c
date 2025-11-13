@@ -29,6 +29,7 @@ int	create_pid_file(const char *pidfile)
 	int		fd;
 	zbx_stat_t	buf;
 	struct flock	fl;
+	mode_t		old_umask;
 
 	fl.l_type = F_WRLCK;
 	fl.l_whence = SEEK_SET;
@@ -50,7 +51,7 @@ int	create_pid_file(const char *pidfile)
 		close(fd);
 	}
 
-	mode_t	old_umask = umask(0026);
+	old_umask = umask(0026);
 
 	/* open pid file */
 	fpid = fopen(pidfile, "w");

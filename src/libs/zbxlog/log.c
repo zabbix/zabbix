@@ -315,6 +315,9 @@ int	zabbix_open_log(int type, int level, const char *filename, char **error)
 	}
 	else if (LOG_TYPE_FILE == type)
 	{
+#ifndef _WINDOWS
+		mode_t	old_umask;
+#endif
 		FILE	*log_file = NULL;
 
 		if (MAX_STRING_LEN <= strlen(filename))
@@ -326,7 +329,7 @@ int	zabbix_open_log(int type, int level, const char *filename, char **error)
 		if (SUCCEED != zbx_mutex_create(&log_access, ZBX_MUTEX_LOG, error))
 			return FAIL;
 #ifndef _WINDOWS
-		mode_t	old_umask = umask(0026);
+		old_umask = umask(0026);
 #endif
 		log_file = fopen(filename, "a+");
 #ifndef _WINDOWS
