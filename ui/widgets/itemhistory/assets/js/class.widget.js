@@ -49,24 +49,23 @@ class CWidgetItemHistory extends CWidget {
 
 		for (const iframe of iframes) {
 			iframe.addEventListener('load', () => {
-				const content_document = iframe.contentDocument;
+				const content_document = iframe.contentDocument.documentElement.querySelector('body');
+				const iframe_styles = getComputedStyle(iframe);
 
-				content_document.documentElement.querySelector('body').style.margin = '0px';
+				content_document.style.margin = '0px';
+				content_document.style.font = iframe_styles.font;
 
-				const height = content_document.documentElement.scrollHeight;
-				const width = content_document.documentElement.scrollWidth;
+				const resizeContainer = () => {
+					const height = Math.ceil(content_document.scrollHeight);
+					const width = Math.ceil(content_document.scrollWidth);
 
-				iframe.style.height = Math.ceil(height) + 'px';
-				iframe.style.width = Math.ceil(width) + 'px';
+					iframe.style.height = `${height}px`;
+					iframe.style.width = `${width}px`;
+				};
 
-				iframe.resize_observer = new ResizeObserver(() => {
-					const height = iframe.contentDocument.documentElement.scrollHeight;
-					const width = iframe.contentDocument.documentElement.scrollWidth;
+				resizeContainer();
 
-					iframe.style.height = Math.ceil(height) + 'px';
-					iframe.style.width = Math.ceil(width) + 'px';
-				});
-
+				iframe.resize_observer = new ResizeObserver(resizeContainer);
 				iframe.resize_observer.observe(content_document.documentElement);
 			});
 		}
