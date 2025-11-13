@@ -49,6 +49,9 @@ This template has been tested on:
 |{$RIBBON.PROXY}|<p>Sets the HTTP proxy value. If this macro is empty, then no proxy is used.</p>||
 |{$RIBBON.CPU.UTIL.CRIT}|<p>The threshold of the CPU usage in percent.</p>|`90`|
 |{$RIBBON.MEMORY.UTIL.CRIT}|<p>The threshold of the memory usage in percent.</p>|`90`|
+|{$RIBBON.DNS.ERRORS.TRIGGER.THRESHOLD}|<p>The threshold of the DNS errors.</p>|`1000`|
+|{$RIBBON.DNS.ERRORS.PERCENT.TRIGGER.THRESHOLD}|<p>The threshold of the DNS errors in percent.</p>|`70`|
+|{$RIBBON.DNS.TIMEOUTS.PERCENT.TRIGGER.THRESHOLD}|<p>The threshold of the DNS timeouts in percent.</p>|`70`|
 |{$RIBBON.CE.DISCOVERY.NAME.MATCHES}|<p>Sets the regex string of call engine name to be allowed in discovery.</p>|`.*`|
 |{$RIBBON.CE.DISCOVERY.NAME.NOT_MATCHES}|<p>Sets the regex string of call engine name to be ignored in discovery.</p>|`CHANGE_IF_NEEDED`|
 |{$RIBBON.CE.DISCOVERY.ROLE.MATCHES}|<p>Sets the regex string of call engine role to be allowed in discovery.</p>|`.*`|
@@ -57,6 +60,12 @@ This template has been tested on:
 |{$RIBBON.CE.DISCOVERY.HW.TYPE.NOT_MATCHES}|<p>Sets the regex string of call engine hardware type to be ignored in discovery.</p>|`CHANGE_IF_NEEDED`|
 |{$RIBBON.SYNC.MODULE.DISCOVERY.NAME.MATCHES}|<p>Sets the regex string of sync module name to be allowed in discovery.</p>|`.*`|
 |{$RIBBON.SYNC.MODULE.DISCOVERY.NAME.NOT_MATCHES}|<p>Sets the regex string of sync module name to be ignored in discovery.</p>|`CHANGE_IF_NEEDED`|
+|{$RIBBON.LICENSE.DISCOVERY.NAME.MATCHES}|<p>Sets the regex string of license name to be allowed in discovery.</p>|`.*`|
+|{$RIBBON.LICENSE.DISCOVERY.NAME.NOT_MATCHES}|<p>Sets the regex string of license name to be ignored in discovery.</p>|`CHANGE_IF_NEEDED`|
+|{$RIBBON.DNS.GROUP.DISCOVERY.NAME.MATCHES}|<p>Sets the regex string of DNS group name to be allowed in discovery.</p>|`.*`|
+|{$RIBBON.DNS.GROUP.DISCOVERY.NAME.NOT_MATCHES}|<p>Sets the regex string of DNS group name to be ignored in discovery.</p>|`CHANGE_IF_NEEDED`|
+|{$RIBBON.TRUNK.GROUP.DISCOVERY.NAME.MATCHES}|<p>Sets the regex string of Trunk group name to be allowed in discovery.</p>|`.*`|
+|{$RIBBON.TRUNK.GROUP.DISCOVERY.NAME.NOT_MATCHES}|<p>Sets the regex string of Trunk group name to be ignored in discovery.</p>|`CHANGE_IF_NEEDED`|
 
 ### Items
 
@@ -114,7 +123,7 @@ This template has been tested on:
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Module [{#SYNC.MODULE}]: Sync status|<p>Indicates the inter-CE data synchronization state.</p>|Dependent item|ribbon.sync.module.status[{#SYNC.MODULE}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
+|Module [{#SYNC.MODULE}]: Sync status|<p>Indicates the inter-CE data synchronization state.</p>|Dependent item|ribbon.sync.module.status[{#SYNC.MODULE}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 
 ### Trigger prototypes for Sync module discovery
 
@@ -132,10 +141,80 @@ This template has been tested on:
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Call engine [{#CE.NAME}]: Name|<p>Instance/Ce Name given by user as userdata.</p>|Dependent item|ribbon.ce.name[{#CE.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
-|Call engine [{#CE.NAME}]: Role|<p>When set to primary, role designates a server for internal processing.</p>|Dependent item|ribbon.ce.role[{#CE.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.serverAdmin.[?(@.name == "{#CE.NAME}")].role.first()`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
-|Call engine [{#CE.NAME}]: HW type|<p>HW type of the server.</p>|Dependent item|ribbon.ce.hwType[{#CE.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.serverAdmin.[?(@.name == "{#CE.NAME}")].hwType.first()`</p></li><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
+|Call engine [{#CE.NAME}]: Name|<p>Instance/Ce name given by user as userdata.</p>|Dependent item|ribbon.ce.name[{#CE.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
+|Call engine [{#CE.NAME}]: Role|<p>Server admin role. When set to primary, role designates a server for internal processing.</p>|Dependent item|ribbon.ce.role[{#CE.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.serverAdmin.[?(@.name == "{#CE.NAME}")].role.first()`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Call engine [{#CE.NAME}]: HW type|<p>HW type of the server.</p>|Dependent item|ribbon.ce.hw.type[{#CE.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.serverAdmin.[?(@.name == "{#CE.NAME}")].hwType.first()`</p></li><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
 |Call engine [{#CE.NAME}]: HW sub-type|<p>HW sub-type of the server.</p>|Dependent item|ribbon.ce.hw.sub.type[{#CE.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.serverAdmin.[?(@.name == "{#CE.NAME}")].hwSubType.first()`</p></li><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
+
+### LLD rule License discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|License discovery|<p>Used for discovering of license info.</p>|Dependent item|ribbon.license.discovery<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+
+### Item prototypes for License discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|License [{#LICENSE.NAME}]: Usage limit|<p>Usage limit of the license.</p>|Dependent item|ribbon.license.usage.limit[{#LICENSE.NAME}/{#LICENSE.SOURCE}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|License [{#LICENSE.NAME}]: Current usage|<p>Current usage of the license.</p>|Dependent item|ribbon.license.usage.current[{#LICENSE.NAME}/{#LICENSE.SOURCE}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|License [{#LICENSE.NAME}]: Expiry date|<p>Expiry date of the license.</p>|Dependent item|ribbon.license.expiry.date[{#LICENSE.NAME}/{#LICENSE.SOURCE}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+
+### LLD rule DNS discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|DNS discovery|<p>Used for discovering of DNS statistics.</p>|Dependent item|ribbon.dns.discovery<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+
+### Item prototypes for DNS discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|DNS [{#DNS.GROUP}][{#DNS.SERVER}][{#DNS.IP}]: Raw data|<p>Raw data of the DNS statistics.</p>|Dependent item|ribbon.dns.get.stats.data[{#DNS.GROUP}/{#DNS.SERVER}/{#DNS.IP}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li></ul>|
+|DNS [{#DNS.GROUP}][{#DNS.SERVER}][{#DNS.IP}]: Query|<p>Total number of DNS queries received by the server.</p>|Dependent item|ribbon.dns.query[{#DNS.GROUP}/{#DNS.SERVER}/{#DNS.IP}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.queries`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|DNS [{#DNS.GROUP}][{#DNS.SERVER}][{#DNS.IP}]: Errors|<p>Total number of DNS errors.</p>|Dependent item|ribbon.dns.errors[{#DNS.GROUP}/{#DNS.SERVER}/{#DNS.IP}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.errors`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|DNS [{#DNS.GROUP}][{#DNS.SERVER}][{#DNS.IP}]: Timeouts|<p>Total number of DNS timeouts.</p>|Dependent item|ribbon.dns.timeouts[{#DNS.GROUP}/{#DNS.SERVER}/{#DNS.IP}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.timeouts`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|DNS [{#DNS.GROUP}][{#DNS.SERVER}][{#DNS.IP}]: Referrals|<p>Total number of DNS referrals.</p>|Dependent item|ribbon.dns.referrals[{#DNS.GROUP}/{#DNS.SERVER}/{#DNS.IP}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.referrals`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|DNS [{#DNS.GROUP}][{#DNS.SERVER}][{#DNS.IP}]: Tcp connection|<p>Total number of DNS tcp connection.</p>|Dependent item|ribbon.dns.connection[{#DNS.GROUP}/{#DNS.SERVER}/{#DNS.IP}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.totalTcpConnection`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|DNS [{#DNS.GROUP}][{#DNS.SERVER}][{#DNS.IP}]: Tcp connection failed|<p>Total number of DNS tcp connection failed.</p>|Dependent item|ribbon.dns.connection.failed[{#DNS.GROUP}/{#DNS.SERVER}/{#DNS.IP}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.tcpConnectionFailed`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|DNS [{#DNS.GROUP}][{#DNS.SERVER}][{#DNS.IP}]: Tcp connection torn down|<p>Total number of DNS tcp connection torn down.</p>|Dependent item|ribbon.dns.connection.torn.down[{#DNS.GROUP}/{#DNS.SERVER}/{#DNS.IP}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.tcpConnectiontorndown`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+
+### Trigger prototypes for DNS discovery
+
+|Name|Description|Expression|Severity|Dependencies and additional info|
+|----|-----------|----------|--------|--------------------------------|
+|Ribbon: DNS [{#DNS.GROUP}][{#DNS.SERVER}][{#DNS.IP}]: High number of errors|<p>The number of DNS errors is high.</p>|`last(/Ribbon SBC SWe core by HTTP/ribbon.dns.errors[{#DNS.GROUP}/{#DNS.SERVER}/{#DNS.IP}]) >= {$RIBBON.DNS.ERRORS.TRIGGER.THRESHOLD}`|Warning||
+|Ribbon: DNS [{#DNS.GROUP}][{#DNS.SERVER}][{#DNS.IP}]: High percentage of errors|<p>The percentage of DNS errors is high.</p>|`last(/Ribbon SBC SWe core by HTTP/ribbon.dns.errors[{#DNS.GROUP}/{#DNS.SERVER}/{#DNS.IP}])/last(/Ribbon SBC SWe core by HTTP/ribbon.dns.query[{#DNS.GROUP}/{#DNS.SERVER}/{#DNS.IP}])*100>{$RIBBON.DNS.ERRORS.PERCENT.TRIGGER.THRESHOLD}`|Warning||
+|Ribbon: DNS [{#DNS.GROUP}][{#DNS.SERVER}][{#DNS.IP}]: High percentage of timeouts|<p>The percentage of DNS timeouts is high.</p>|`last(/Ribbon SBC SWe core by HTTP/ribbon.dns.timeouts[{#DNS.GROUP}/{#DNS.SERVER}/{#DNS.IP}])/last(/Ribbon SBC SWe core by HTTP/ribbon.dns.query[{#DNS.GROUP}/{#DNS.SERVER}/{#DNS.IP}])*100>{$RIBBON.DNS.TIMEOUTS.PERCENT.TRIGGER.THRESHOLD}`|Warning||
+
+### LLD rule Trunk group discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Trunk group discovery|<p>Used for discovering of trunk group statistics.</p>|Dependent item|ribbon.trunk.group.discovery<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+
+### Item prototypes for Trunk group discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Trunk [{#TRUNK.GROUP}][{#TRUNK.ZONE}]: Raw data|<p>Raw data of the trunk group statistics.</p>|Dependent item|ribbon.trunk.get.stats.data[{#TRUNK.GROUP}/{#TRUNK.ZONE}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li></ul>|
+|Trunk [{#TRUNK.GROUP}][{#TRUNK.ZONE}]: State|<p>Current operational state of the IP trunk group.</p>|Dependent item|ribbon.trunk.state[{#TRUNK.GROUP}/{#TRUNK.ZONE}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.state`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Trunk [{#TRUNK.GROUP}][{#TRUNK.ZONE}]: Packet out detect state|<p>This object indicates the packet outage detection state. `normal` - No packet outage has been declared. `packetOutageState - Packet outage has been declared. The current bandwidth limit has been reduced by packet outage detection bandwidth limit reduction.</p>|Dependent item|ribbon.trunk.packet.out.detect.state[{#TRUNK.GROUP}/{#TRUNK.ZONE}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.packetOutDetectState`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Trunk [{#TRUNK.GROUP}][{#TRUNK.ZONE}]: Total available calls|<p>The sum of all available or unblocked calls for this trunk group.</p>|Dependent item|ribbon.trunk.available.calls[{#TRUNK.GROUP}/{#TRUNK.ZONE}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.totalCallsAvailable`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Trunk [{#TRUNK.GROUP}][{#TRUNK.ZONE}]: Inbound calls usage|<p>This is only meaningful for IP trunk groups that are configured for inbound or both directions. This reflects the current inbound or incoming usage count of this IP trunk group(measured in no. of calls).</p>|Dependent item|ribbon.trunk.inbound.usage.calls[{#TRUNK.GROUP}/{#TRUNK.ZONE}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.inboundCallsUsage`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Trunk [{#TRUNK.GROUP}][{#TRUNK.ZONE}]: Outbound calls usage|<p>This reflects the current outbound, non-priority usage count of this IP trunk group(measured in no. of calls).</p>|Dependent item|ribbon.trunk.outbound.usage.calls[{#TRUNK.GROUP}/{#TRUNK.ZONE}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.outboundCallsUsage`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Trunk [{#TRUNK.GROUP}][{#TRUNK.ZONE}]: Priority calls usage|<p>This is only meaningful for IP trunk groups that are configured with call reserved state enabled. This reflects the current priority usage count of this IP trunk group(measured in no. of calls).</p>|Dependent item|ribbon.trunk.priority.usage.calls[{#TRUNK.GROUP}/{#TRUNK.ZONE}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.priorityCallUsage`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Trunk [{#TRUNK.GROUP}][{#TRUNK.ZONE}]: Bandwidth current limit|<p>This is the current bandwidth limit for this IP trunk group. It is initially set to the configured bandwidth limit but may be reduced due to packet outage detection events(in Kbits/sec).</p>|Dependent item|ribbon.trunk.bw.current.limit[{#TRUNK.GROUP}/{#TRUNK.ZONE}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.bwCurrentLimit`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Trunk [{#TRUNK.GROUP}][{#TRUNK.ZONE}]: Bandwidth available|<p>This is how much bandwidth is available for allocation(in Kbits/sec).</p>|Dependent item|ribbon.trunk.bw.available[{#TRUNK.GROUP}/{#TRUNK.ZONE}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.bwAvailable`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Trunk [{#TRUNK.GROUP}][{#TRUNK.ZONE}]: Bandwidth inbound usage|<p>This is how much bandwidth is in use for inbound traffic(in Kbits/sec).</p>|Dependent item|ribbon.trunk.bw.inbound.usage[{#TRUNK.GROUP}/{#TRUNK.ZONE}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.bwInboundUsage`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Trunk [{#TRUNK.GROUP}][{#TRUNK.ZONE}]: Bandwidth outbound usage|<p>This is how much bandwidth is in use for outbound traffic(in Kbits/sec).</p>|Dependent item|ribbon.trunk.bw.outbound.usage[{#TRUNK.GROUP}/{#TRUNK.ZONE}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.bwOutboundUsage`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+
+### Trigger prototypes for Trunk group discovery
+
+|Name|Description|Expression|Severity|Dependencies and additional info|
+|----|-----------|----------|--------|--------------------------------|
+|Ribbon: Trunk [{#TRUNK.GROUP}][{#TRUNK.ZONE}]: State is not "inService"|<p>The trunk state is not "inService".</p>|`last(/Ribbon SBC SWe core by HTTP/ribbon.trunk.state[{#TRUNK.GROUP}/{#TRUNK.ZONE}])<>"inService"`|Warning||
+|Ribbon: Trunk [{#TRUNK.GROUP}][{#TRUNK.ZONE}]: Packet out detect state is not "normal"|<p>The packet out detect state is not "normal".</p>|`last(/Ribbon SBC SWe core by HTTP/ribbon.trunk.packet.out.detect.state[{#TRUNK.GROUP}/{#TRUNK.ZONE}])<>1`|Average||
 
 # Ribbon SBC SWe CE by HTTP
 
@@ -223,7 +302,7 @@ This template has been tested on:
 |Uptime|<p>Indicates the server module uptime in days/hours/minutes/sec.</p>|Dependent item|ribbon.server.uptime<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.serverStatus[0].upTime`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
 |Application uptime|<p>Indicates the application uptime on the server in days/hours/minutes/sec.</p>|Dependent item|ribbon.server.application.uptime<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.serverStatus[0].applicationUpTime`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
 |Sync status|<p>Indicates the inter-CE data synchronization state.</p>|Dependent item|ribbon.server.sync.status<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.serverStatus[0].syncStatus`</p></li><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
-|Memory utilization|<p>The average memory % utilization for this interval.</p>|Dependent item|ribbon.server.memory.util<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.memoryUtilCurrentStatistics[0].average`</p></li><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
+|Memory utilization|<p>The average memory % utilization for this interval.</p>|Dependent item|ribbon.server.memory.util<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.memoryUtilCurrentStatistics[0].average`</p></li></ul>|
 |Swap utilization|<p>The average % of swap utilization for this interval.</p>|Dependent item|ribbon.server.swap.util<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.memoryUtilCurrentStatistics[0].averageSwap`</p></li><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
 |CPU utilization|<p>The average % of cpu utilization for this interval.</p>|Dependent item|ribbon.server.cpu.util<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.cpuUtilCurrentStatistics`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
 
@@ -233,8 +312,9 @@ This template has been tested on:
 |----|-----------|----------|--------|--------------------------------|
 |Ribbon: Failed to get metrics data|<p>Failed to get API metrics for the Ribbon.</p>|`length(last(/Ribbon SBC SWe CE by HTTP/ribbon.server.data.get.check))>0`|Warning||
 |Ribbon: Role has been changed||`last(/Ribbon SBC SWe CE by HTTP/ribbon.server.role)<>last(/Ribbon SBC SWe CE by HTTP/ribbon.server.role,#2)`|Info|**Manual close**: Yes|
+|Ribbon: Server has been restarted||`last(/Ribbon SBC SWe CE by HTTP/ribbon.server.uptime)<10m`|Info|**Manual close**: Yes|
 |Ribbon: Application has been restarted||`last(/Ribbon SBC SWe CE by HTTP/ribbon.server.application.uptime)<10m`|Info|**Manual close**: Yes|
-|Ribbon: Sync status is not "Completed"||`last(/Ribbon SBC SWe CE by HTTP/ribbon.server.sync.status)<>"syncCompleted"`|Warning|**Manual close**: Yes|
+|Ribbon: Synchronization status in not complete||`last(/Ribbon SBC SWe CE by HTTP/ribbon.server.sync.status)<>"syncCompleted"`|Warning|**Manual close**: Yes|
 |Ribbon: High memory utilization|<p>The system is running out of free memory.</p>|`min(/Ribbon SBC SWe CE by HTTP/ribbon.server.memory.util,5m) > {$RIBBON.MEMORY.UTIL.CRIT}`|Average||
 |Ribbon: High swap utilization|<p>The system is running out of free memory.</p>|`min(/Ribbon SBC SWe CE by HTTP/ribbon.server.swap.util,5m) > {$RIBBON.SWAP.UTIL.CRIT}`|Average||
 |Ribbon: High cpu utilization|<p>CPU utilization is too high. The system might be slow to respond.</p>|`min(/Ribbon SBC SWe CE by HTTP/ribbon.server.cpu.util,5m) > {$RIBBON.CPU.UTIL.CRIT}`|Average||
@@ -284,10 +364,10 @@ This template has been tested on:
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
 |Packet port [{#PORT}]: Negotiated speed|<p>The interface speed. Packet port speed is not negotiable. When statistics are generated for EMS, negotiatedSpeed will be displayed as integer value.</p><p>Possible values:</p><p>0 - speed10Mbps</p><p>1 - speed100Mbps</p><p>2 - speed1000Mbps</p><p>3 - speed10000Mbps</p><p>4 - unknown</p>|Dependent item|ribbon.packet.port.speed[{#PORT}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.packetPortStatus.["{#PORT}"].negotiatedSpeed`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
-|Packet port [{#PORT}]: Bits received|<p>Actual Rx bandwidth in use on this port, bytes/sec.</p>|Dependent item|ribbon.packet.port.in[{#PORT}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.packetPortStatus.["{#PORT}"].rxActualBandwidth`</p></li></ul>|
-|Packet port [{#PORT}]: Bits sent|<p>Actual Tx bandwidth in use on this port, bytes/sec.</p>|Dependent item|ribbon.packet.port.out[{#PORT}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.packetPortStatus.["{#PORT}"].txActualBandwidth`</p></li></ul>|
+|Packet port [{#PORT}]: RX bandwidth|<p>Actual Rx bandwidth in use on this port, bytes/sec.</p>|Dependent item|ribbon.packet.port.rx.bandwidth[{#PORT}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.packetPortStatus.["{#PORT}"].rxActualBandwidth`</p></li></ul>|
+|Packet port [{#PORT}]: TX bandwidth|<p>Actual Tx bandwidth in use on this port, bytes/sec.</p>|Dependent item|ribbon.packet.port.tx.bandwidth[{#PORT}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.packetPortStatus.["{#PORT}"].txActualBandwidth`</p></li></ul>|
 |Packet port [{#PORT}]: Utilization|<p>Percentage of maximum bandwidth allocated on this port.</p>|Dependent item|ribbon.packet.port.util[{#PORT}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.packetPortStatus.["{#PORT}"].bandwidthUsage`</p></li></ul>|
-|Packet port [{#PORT}]: Link state|<p>The state of the interface. When statistics are generated for EMS, linkState will be displayed as integer value.</p><p>Possible values:</p><p>0 - null</p><p>1 - admnDisabled</p><p>2 - admnEnabledPortDown</p><p>3 - admnEnabledPortUp</p><p>4 - admnDisabledNoLicense</p><p>5 - admnEnabledPortDownInvalidSfpWrongSpeed</p><p>6 - admnEnabledPortDownInvalidSfpNonSonus</p>|Dependent item|ribbon.packet.port.link.state[{#PORT}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.packetPortStatus.["{#PORT}"].linkState`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
+|Packet port [{#PORT}]: Link state|<p>The state of the interface. When statistics are generated for EMS, linkState will be displayed as integer value.</p><p>Possible values:</p><p>0 - null</p><p>1 - admnDisabled</p><p>2 - admnEnabledPortDown</p><p>3 - admnEnabledPortUp</p><p>4 - admnDisabledNoLicense</p><p>5 - admnEnabledPortDownInvalidSfpWrongSpeed</p><p>6 - admnEnabledPortDownInvalidSfpNonSonus</p><p>7 - unknown</p>|Dependent item|ribbon.packet.port.link.state[{#PORT}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.packetPortStatus.["{#PORT}"].linkState`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
 
 ### Trigger prototypes for Packet port discovery
 
@@ -307,10 +387,10 @@ This template has been tested on:
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
 |Management port [{#PORT}]: Negotiated speed|<p>The negotiated interface speed. When statistics are generated for EMS, negotiatedSpeed will be displayed as integer value.</p><p>Possible values:</p><p>0 - speed10Mbps</p><p>1 - speed100Mbps</p><p>2 - speed1000Mbps</p><p>3 - speed10000Mbps</p><p>4 - unknown</p>|Dependent item|ribbon.mgmt.port.speed[{#PORT}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.mgmtPortStatus.["{#PORT}"].negotiatedSpeed`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
-|Management port [{#PORT}]: Link state|<p>The state of the interface.</p><p>Possible values:</p><p>0 - null</p><p>1 - admnDisabled</p><p>2 - admnEnabledPortDown</p><p>3 - admnEnabledPortUp</p><p>4 - admnDisabledNoLicense</p><p>5 - admnEnabledPortDownInvalidSfpWrongSpeed</p><p>6 - admnEnabledPortDownInvalidSfpNonSonus</p>|Dependent item|ribbon.mgmt.port.link.state[{#PORT}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.mgmtPortStatus.["{#PORT}"].linkState`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
+|Management port [{#PORT}]: Link state|<p>The state of the interface.</p><p>Possible values:</p><p>0 - null</p><p>1 - admnDisabled</p><p>2 - admnEnabledPortDown</p><p>3 - admnEnabledPortUp</p><p>4 - admnDisabledNoLicense</p><p>5 - admnEnabledPortDownInvalidSfpWrongSpeed</p><p>6 - admnEnabledPortDownInvalidSfpNonSonus</p><p>7 - unknown</p>|Dependent item|ribbon.mgmt.port.link.state[{#PORT}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.mgmtPortStatus.["{#PORT}"].linkState`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
 |Management port [{#PORT}]: Duplex mode|<p>The negotiated interface duplex mode.</p>|Dependent item|ribbon.mgmt.port.duplex.mode[{#PORT}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.mgmtPortStatus.["{#PORT}"].duplexMode`</p></li><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
-|Management port [{#PORT}]: Bits received|<p>Actual Rx bandwidth in use on this port, bytes/sec.</p>|Dependent item|ribbon.mgmt.port.in[{#PORT}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.mgmtPortStatus.["{#PORT}"].rxActualBandwidth`</p></li></ul>|
-|Management port [{#PORT}]: Bits sent|<p>Actual Tx bandwidth in use on this port, bytes/sec.</p>|Dependent item|ribbon.mgmt.port.out[{#PORT}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.mgmtPortStatus.["{#PORT}"].txActualBandwidth`</p></li></ul>|
+|Management port [{#PORT}]: RX bandwidth|<p>Actual Rx bandwidth in use on this port, bytes/sec.</p>|Dependent item|ribbon.mgmt.port.rx.bandwidth[{#PORT}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.mgmtPortStatus.["{#PORT}"].rxActualBandwidth`</p></li></ul>|
+|Management port [{#PORT}]: TX bandwidth|<p>Actual Tx bandwidth in use on this port, bytes/sec.</p>|Dependent item|ribbon.mgmt.port.tx.bandwidth[{#PORT}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.mgmtPortStatus.["{#PORT}"].txActualBandwidth`</p></li></ul>|
 
 ### Trigger prototypes for Management port discovery
 
@@ -333,7 +413,7 @@ This template has been tested on:
 |Port redundancy group [{#PORT}]: Type|<p>Interface Type of this port redundancy group.</p>|Dependent item|ribbon.redundancy.port.type[{#PORT}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.portRedundancyGroupStatus.["{#PORT}"].interfaceType`</p></li><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
 |Port redundancy group [{#PORT}]: State|<p>The state of the logical port.</p>|Dependent item|ribbon.redundancy.port.state[{#PORT}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.portRedundancyGroupStatus.["{#PORT}"].state`</p></li><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
 |Port redundancy group [{#PORT}]: Redundancy mode|<p>The VM redundancy mode of the CE.</p>|Dependent item|ribbon.redundancy.port.mode[{#PORT}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.portRedundancyGroupStatus.["{#PORT}"].vmRedundancyMode`</p></li><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
-|Port redundancy group [{#PORT}]: Failure count|<p>The current number of port monitors within this port redundancy group that have declared themselves failed.</p>|Dependent item|ribbon.redundancy.port.failure.count[{#PORT}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.portRedundancyGroupStatus.["{#PORT}"].failureCount`</p></li><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
+|Port redundancy group [{#PORT}]: Failure count|<p>The current number of port monitors within this port redundancy group that have declared themselves failed.</p>|Dependent item|ribbon.redundancy.port.failure.count[{#PORT}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.portRedundancyGroupStatus.["{#PORT}"].failureCount`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 
 ### Trigger prototypes for Port redundancy group discovery
 
