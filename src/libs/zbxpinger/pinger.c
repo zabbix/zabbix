@@ -511,24 +511,27 @@ static void	get_pinger_hosts(zbx_hashset_t *pinger_items, int config_timeout)
 		{
 			rc = pinger_parse_key_params(items[i].key, items[i].interface.addr, &pinger_local, &icmpping,
 					&addr, &type, &errmsg);
-		}
-		else
-			errmsg = zbx_strdup(NULL, error);
-
-		if (SUCCEED == rc)
-		{
-			int	delay_s = 0;
-
-			rc = zbx_interval_preproc(items[i].delay, &delay_s, NULL, &errmsg);
 
 			if (SUCCEED == rc)
 			{
-				add_icmpping_item(pinger_items, &pinger_local, items[i].itemid, addr, icmpping, type,
-						delay_s);
-				items_count++;
+				int	delay_s = 0;
+
+				rc = zbx_interval_preproc(items[i].delay, &delay_s, NULL, &errmsg);
+
+				if (SUCCEED == rc)
+				{
+					add_icmpping_item(pinger_items, &pinger_local, items[i].itemid, addr, icmpping,
+							type, delay_s);
+					items_count++;
+				}
 			}
 		}
 		else
+		{
+			errmsg = zbx_strdup(NULL, error);
+		}
+
+		if (SUCCEED != rc)
 		{
 			zbx_timespec_t	ts;
 
