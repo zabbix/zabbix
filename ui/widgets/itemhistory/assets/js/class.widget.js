@@ -59,7 +59,7 @@ class CWidgetItemHistory extends CWidget {
 				iframe.style.height = Math.ceil(height) + 'px';
 				iframe.style.width = Math.ceil(width) + 'px';
 
-				const resizeObserver = new ResizeObserver(() => {
+				iframe.resize_observer = new ResizeObserver(() => {
 					const height = iframe.contentDocument.documentElement.scrollHeight;
 					const width = iframe.contentDocument.documentElement.scrollWidth;
 
@@ -67,7 +67,7 @@ class CWidgetItemHistory extends CWidget {
 					iframe.style.width = Math.ceil(width) + 'px';
 				});
 
-				resizeObserver.observe(content_document.documentElement);
+				iframe.resize_observer.observe(content_document.documentElement);
 			});
 		}
 
