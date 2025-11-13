@@ -177,7 +177,7 @@ class CControllerMediatypeUpdate extends CControllerMediatypeUpdateGeneral {
 			'exec_path' => ['db media_type.exec_path', 'required', 'not_empty',
 				'when' => ['type', 'in' => [MEDIA_TYPE_EXEC]]
 			],
-			'parameters_exec' => ['objects', 'required', 'uniq' => ['value'],
+			'parameters_exec' => ['objects', 'required',
 				'fields' => ['value' => ['string']],
 				'when' => ['type', 'in' => [MEDIA_TYPE_EXEC]]
 			],

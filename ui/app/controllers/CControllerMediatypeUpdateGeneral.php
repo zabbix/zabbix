@@ -59,6 +59,13 @@ abstract class CControllerMediatypeUpdateGeneral extends CController {
 		elseif ($mediatype['type'] == MEDIA_TYPE_WEBHOOK) {
 			$mediatype['parameters'] = $mediatype['parameters_webhook'];
 		}
+		elseif ($mediatype['type'] == MEDIA_TYPE_EXEC) {
+			$mediatype['parameters'] = [];
+
+			foreach ($mediatype['parameters_exec'] as $sortorder => $parameter) {
+				$mediatype['parameters'][] = ['sortorder' => $sortorder, 'value' => $parameter['value']];
+			}
+		}
 
 		if ($mediatype['type'] != MEDIA_TYPE_EMAIL)  {
 			$mediatype['provider'] = CMediatypeHelper::EMAIL_PROVIDER_SMTP;
