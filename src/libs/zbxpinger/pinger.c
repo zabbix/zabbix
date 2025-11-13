@@ -586,7 +586,7 @@ static int	process_pinger_hosts(zbx_hashset_t *pinger_items, int process_num, in
 	zbx_timespec_t			ts;
 	zbx_hashset_iter_t		iter;
 	zbx_pinger_t			*pinger;
-	double				max_execution_time;
+	int				max_execution_time;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -601,7 +601,7 @@ static int	process_pinger_hosts(zbx_hashset_t *pinger_items, int process_num, in
 		for (int i = 0; i < pinger->items.values_num; i++)
 		{
 			add_pinger_host(&hosts, pinger->items.values[i].addr);
-			/* Find maximum delay among all items in pinger group */
+
 			if (max_execution_time < pinger->items.values[i].item_delay)
 				max_execution_time = pinger->items.values[i].item_delay;
 		}
