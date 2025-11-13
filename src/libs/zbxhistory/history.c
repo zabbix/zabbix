@@ -152,7 +152,7 @@ static zbx_history_provider_t	*history_provider_open(const char *name, zbx_histo
 	else
 		*error = zbx_dsprintf(NULL, "unsupported history storage provider \"%s\"", name);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() provider:%p error:%s", __func__, provider,
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() provider:%p error:%s", __func__, (void *)provider,
 			ZBX_NULL2EMPTY_STR(*error));
 
 	return provider;

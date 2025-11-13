@@ -495,6 +495,7 @@ static void	precache_item_history(zbx_hashset_t *funcs)
 					continue;
 				break;
 			default:
+				break;
 		}
 
 		refs_num = item_queries.num_data;
