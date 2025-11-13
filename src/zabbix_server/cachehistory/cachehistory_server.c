@@ -1098,8 +1098,17 @@ static void	DCmass_prepare_history(zbx_dc_history_t *history, zbx_history_sync_i
 		zbx_history_sync_item_t	*item;
 		zbx_item_diff_t		*diff;
 
+		if (SUCCEED != errcodes[i])
+		{
+			h->flags |= ZBX_DC_FLAG_UNDEF;
+			zbx_hc_clear_item_middle(h->entry.itemid);
+			continue;
+		}
+
+		item = &items[i];
+
 		/* compression checks are supported only for the default (sql) history provider */
-		if (SUCCEED == ZBX_HISTORY_CHECK_TYPE_FLAGS(default_type_flags, h->entry.value_type))
+		if (SUCCEED == ZBX_HISTORY_CHECK_TYPE_FLAGS(default_type_flags, item->value_type))
 		{
 			/* discard history items that are older than compression age */
 			if (0 != compression_age && h->entry.ts.sec < compression_age)
@@ -1117,15 +1126,6 @@ static void	DCmass_prepare_history(zbx_dc_history_t *history, zbx_history_sync_i
 				continue;
 			}
 		}
-
-		if (SUCCEED != errcodes[i])
-		{
-			h->flags |= ZBX_DC_FLAG_UNDEF;
-			zbx_hc_clear_item_middle(h->entry.itemid);
-			continue;
-		}
-
-		item = &items[i];
 
 		if (ITEM_STATUS_ACTIVE != item->status || HOST_STATUS_MONITORED != item->host.status)
 		{
