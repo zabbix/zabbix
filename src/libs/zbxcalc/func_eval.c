@@ -2759,7 +2759,7 @@ static int	evaluate_TREND(zbx_variant_t *value, const zbx_dc_evaluate_item_t *it
 	else if (0 == strcmp(func, "stl"))
 	{
 		char			*dev_alg = NULL;
-		zbx_history_selector_t	detect, season;
+		zbx_history_selector_t	detect = {0}, season = {0};
 		int			start_detect_period, end_detect_period, season_processed;
 		double			deviations;
 		zbx_uint64_t		s_window;
