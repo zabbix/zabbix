@@ -653,6 +653,8 @@ window.mediatype_edit_popup = new class {
 				`input[name=smtp_authentication][value='${providers[provider]['smtp_authentication']}']`
 			).checked = true;
 			this.#setOAuth();
+
+			this.form.validateChanges(['smtp_username', 'smtp_port', 'smtp_email', 'smtp_server']);
 		}
 
 		const authentication = this.form_element.querySelector('#smtp_authentication');
