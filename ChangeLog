@@ -1,8 +1,23 @@
 Changes for 8.0.0alpha2
 
 New features:
+........S. [ZBXNEXT-10291] fixed EVENT.RECOVERY.TAGS macro not being resolved when problem is closed manually (wiper)
 
 Bug fixes:
+...G...... [ZBX-26500] fixed system.users.num metric incorrect returned value for both agents (opucka, vsmelovs)
+........S. [ZBX-27032] fixed header executing error from JavaScript request (vsmelovs)
+.........T [ZBX-27155] fixed OID for protected host memory item in Stormshield SNS by SNMP template (knaglis)
+..F....... [ZBX-27020] fixed user with limited permissions access to map containing submap with inaccessible host or hostgroup (talbergs)
+.......PS. [ZBX-26867] cleared dependent item error message upon master item change (askolmeisters)
+.........T [ZBX-26623] fixed ODBC pollers error handling in Zabbix server/proxy health templates (kflorowski)
+..F....... [ZBX-26932] fixed inline validation for multiselect to work on focus out (gberzina)
+..F....... [ZBX-27031] fixed host navigator to load when show problems is set to None (gberzina)
+........S. [ZBX-26552] added validation for LLD macro presence when creating host and group prototypes (wiper)
+A.F....... [ZBX-25037] fixed slow performance of show queries for dbversion and charset on mysql (dpankins)
+.........T [ZBX-27097] improved the OpenAI Platform by HTTP template (aiantsen)
+..F....... [ZBX-27153] fixed undefined index error in SVG graphs for Zabbix agent active items (gcalenko)
+...G...... [ZBX-27156] fix CPU spike in Zabbix agent 2 mysql plugin (esneiders)
+.......PS. [ZBX-26900] fixed Zabbix server warning log for out-of-order value identifier detection to clarify data source (rtrizna)
 
 --------------------------------------------------------------------------------
 Changes for 8.0.0alpha1
@@ -46,8 +61,21 @@ Bug fixes:
 Changes for 7.4.6rc1
 
 New features:
+...G...... [ZBXNEXT-10012] added both SHOW SLAVE STATUS and SHOW REPLICA STATUS for Zabbix agent 2 MySQL plugin (lsurvilo)
 
 Bug fixes:
+...G...... [ZBX-26500] fixed system.users.num metric incorrect returned value for both agents (opucka, vsmelovs)
+........S. [ZBX-27032] fixed header executing error from JavaScript request (vsmelovs)
+.........T [ZBX-27155] fixed OID for protected host memory item in Stormshield SNS by SNMP template (knaglis)
+..F....... [ZBX-27020] fixed user with limited permissions access to map containing submap with inaccessible host or hostgroup (talbergs)
+.......PS. [ZBX-26867] cleared dependent item error message upon master item change (askolmeisters)
+.......PS. [ZBX-26900] fixed Zabbix server warning log for out-of-order value identifier detection to clarify data source (rtrizna)
+..F....... [ZBX-26665] fixed widget configuration form layout on narrow screens (averza)
+.........T [ZBX-26623] fixed ODBC pollers error handling in Zabbix server/proxy health templates (kflorowski)
+..F....... [ZBX-26932] fixed inline validation for multiselect to work on focus out (gberzina)
+..F....... [ZBX-27031] fixed host navigator to load when show problems is set to None (gberzina)
+........S. [ZBX-26552] added validation for LLD macro presence when creating host and group prototypes (wiper)
+A.F....... [ZBX-25037] fixed slow performance of show queries for dbversion and charset on mysql (dpankins)
 
 --------------------------------------------------------------------------------
 Changes for 7.4.5
@@ -546,6 +574,7 @@ Changes for 7.2.15rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-27020] fixed user with limited permissions access to map containing submap with inaccessible host or hostgroup (talbergs)
 
 --------------------------------------------------------------------------------
 Changes for 7.2.14
@@ -1170,8 +1199,20 @@ A.F....... [ZBX-23227] fixed issue where using an empty array or string value fo
 Changes for 7.0.22rc1
 
 New features:
+...G...... [ZBXNEXT-10012] added both SHOW SLAVE STATUS and SHOW REPLICA STATUS for Zabbix agent 2 MySQL plugin (lsurvilo)
 
 Bug fixes:
+...G...... [ZBX-26500] fixed system.users.num metric incorrect returned value for both agents (opucka, vsmelovs)
+........S. [ZBX-27032] fixed header executing error from JavaScript request (vsmelovs)
+.........T [ZBX-27155] fixed OID for protected host memory item in Stormshield SNS by SNMP template (knaglis)
+..F....... [ZBX-27020] fixed user with limited permissions access to map containing submap with inaccessible host or hostgroup (talbergs)
+.......PS. [ZBX-26867] cleared dependent item error message upon master item change (askolmeisters)
+.......PS. [ZBX-26900] fixed Zabbix server warning log for out-of-order value identifier detection to clarify data source (rtrizna)
+.........T [ZBX-26623] fixed ODBC pollers error handling in Zabbix server/proxy health templates (kflorowski)
+..F....... [ZBX-26665] fixed widget configuration form layout on narrow screens (isharha)
+..F....... [ZBX-27031] fixed host navigator to load when show problems is set to None (gberzina)
+.......PS. [ZBX-26702] fixed query failures on Oracle in lld_hosts_remove (dgoloscapov)
+A.F....... [ZBX-25037] fixed slow performance of show queries for dbversion and charset on mysql (dpankins)
 
 --------------------------------------------------------------------------------
 Changes for 7.0.21
@@ -5004,6 +5045,8 @@ A......PS. [ZBXNEXT-10219] updated maximum supported PostgreSQL version to 18 (m
 A.......S. [ZBXNEXT-10271] updated maximum supported TimescaleDB version to 2.22 (mprihodko)
 
 Bug fixes:
+..F....... [ZBX-27020] fixed user with limited permissions access to map containing submap with inaccessible host or hostgroup (talbergs)
+........S. [ZBX-27106] fixed crash when using {HOST.DNS} macro in allowed hosts for trapper item (vso)
 ..F....... [ZBX-22157] added Map navigation tree widget problem filtering using Problem display and Show suppressed problems filter of map settings (dfofanovs)
 ...G...... [ZBX-24918] fixed crashes of Zabbix agent 2 for Windows related with PDH perf_counter (opucka)
 

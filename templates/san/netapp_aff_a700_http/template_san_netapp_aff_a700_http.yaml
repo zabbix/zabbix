@@ -16,7 +16,7 @@ zabbix_export:
       wizard_ready: 'YES'
       vendor:
         name: Zabbix
-        version: 8.0-1
+        version: 8.0-2
       groups:
         - name: Templates/SAN
       items:
@@ -27,10 +27,10 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           authtype: BASIC
-          username: '{$USERNAME}'
-          password: '{$PASSWORD}'
-          timeout: '{$HTTP.AGENT.TIMEOUT}'
-          url: '{$URL}/api/cluster/chassis?fields=id,state'
+          username: '{$NETAPP.USERNAME}'
+          password: '{$NETAPP.PASSWORD}'
+          timeout: '{$NETAPP.HTTP.AGENT.TIMEOUT}'
+          url: '{$NETAPP.URL}/api/cluster/chassis?fields=id,state'
           tags:
             - tag: component
               value: raw
@@ -41,10 +41,10 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           authtype: BASIC
-          username: '{$USERNAME}'
-          password: '{$PASSWORD}'
-          timeout: '{$HTTP.AGENT.TIMEOUT}'
-          url: '{$URL}/api/cluster'
+          username: '{$NETAPP.USERNAME}'
+          password: '{$NETAPP.PASSWORD}'
+          timeout: '{$NETAPP.HTTP.AGENT.TIMEOUT}'
+          url: '{$NETAPP.URL}/api/cluster'
           tags:
             - tag: component
               value: raw
@@ -501,10 +501,10 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           authtype: BASIC
-          username: '{$USERNAME}'
-          password: '{$PASSWORD}'
-          timeout: '{$HTTP.AGENT.TIMEOUT}'
-          url: '{$URL}/api/storage/disks?fields=state,node.name'
+          username: '{$NETAPP.USERNAME}'
+          password: '{$NETAPP.PASSWORD}'
+          timeout: '{$NETAPP.HTTP.AGENT.TIMEOUT}'
+          url: '{$NETAPP.URL}/api/storage/disks?fields=state,node.name'
           tags:
             - tag: component
               value: raw
@@ -515,8 +515,8 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           authtype: BASIC
-          username: '{$USERNAME}'
-          password: '{$PASSWORD}'
+          username: '{$NETAPP.USERNAME}'
+          password: '{$NETAPP.PASSWORD}'
           preprocessing:
             - type: JAVASCRIPT
               parameters:
@@ -531,8 +531,8 @@ zabbix_export:
                   });
                   
                   return JSON.stringify(result);
-          timeout: '{$HTTP.AGENT.TIMEOUT}'
-          url: '{$URL}/api/cluster/chassis?fields=id,frus.id,frus.state'
+          timeout: '{$NETAPP.HTTP.AGENT.TIMEOUT}'
+          url: '{$NETAPP.URL}/api/cluster/chassis?fields=id,frus.id,frus.state'
           tags:
             - tag: component
               value: raw
@@ -543,10 +543,10 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           authtype: BASIC
-          username: '{$USERNAME}'
-          password: '{$PASSWORD}'
-          timeout: '{$HTTP.AGENT.TIMEOUT}'
-          url: '{$URL}/api/storage/luns?fields=name,svm.name,space.size,space.used,status.state,status.container_state'
+          username: '{$NETAPP.USERNAME}'
+          password: '{$NETAPP.PASSWORD}'
+          timeout: '{$NETAPP.HTTP.AGENT.TIMEOUT}'
+          url: '{$NETAPP.URL}/api/storage/luns?fields=name,svm.name,space.size,space.used,status.state,status.container_state'
           tags:
             - tag: component
               value: raw
@@ -557,10 +557,10 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           authtype: BASIC
-          username: '{$USERNAME}'
-          password: '{$PASSWORD}'
-          timeout: '{$HTTP.AGENT.TIMEOUT}'
-          url: '{$URL}/api/cluster/nodes?fields=*'
+          username: '{$NETAPP.USERNAME}'
+          password: '{$NETAPP.PASSWORD}'
+          timeout: '{$NETAPP.HTTP.AGENT.TIMEOUT}'
+          url: '{$NETAPP.URL}/api/cluster/nodes?fields=*'
           tags:
             - tag: component
               value: raw
@@ -571,10 +571,10 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           authtype: BASIC
-          username: '{$USERNAME}'
-          password: '{$PASSWORD}'
-          timeout: '{$HTTP.AGENT.TIMEOUT}'
-          url: '{$URL}/api/network/ethernet/ports?fields=name,type,node.name,broadcast_domain.name,enabled,state,mtu,speed'
+          username: '{$NETAPP.USERNAME}'
+          password: '{$NETAPP.PASSWORD}'
+          timeout: '{$NETAPP.HTTP.AGENT.TIMEOUT}'
+          url: '{$NETAPP.URL}/api/network/ethernet/ports?fields=name,type,node.name,broadcast_domain.name,enabled,state,mtu,speed'
           tags:
             - tag: component
               value: raw
@@ -585,10 +585,10 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           authtype: BASIC
-          username: '{$USERNAME}'
-          password: '{$PASSWORD}'
-          timeout: '{$HTTP.AGENT.TIMEOUT}'
-          url: '{$URL}/api/network/fc/ports?fields=name,node.name,description,enabled,fabric.switch_port,state'
+          username: '{$NETAPP.USERNAME}'
+          password: '{$NETAPP.PASSWORD}'
+          timeout: '{$NETAPP.HTTP.AGENT.TIMEOUT}'
+          url: '{$NETAPP.URL}/api/network/fc/ports?fields=name,node.name,description,enabled,fabric.switch_port,state'
           tags:
             - tag: component
               value: raw
@@ -599,10 +599,10 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           authtype: BASIC
-          username: '{$USERNAME}'
-          password: '{$PASSWORD}'
-          timeout: '{$HTTP.AGENT.TIMEOUT}'
-          url: '{$URL}/api/svm/svms?fields=name,state,comment'
+          username: '{$NETAPP.USERNAME}'
+          password: '{$NETAPP.PASSWORD}'
+          timeout: '{$NETAPP.HTTP.AGENT.TIMEOUT}'
+          url: '{$NETAPP.URL}/api/svm/svms?fields=name,state,comment'
           tags:
             - tag: component
               value: raw
@@ -613,10 +613,10 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           authtype: BASIC
-          username: '{$USERNAME}'
-          password: '{$PASSWORD}'
-          timeout: '{$HTTP.AGENT.TIMEOUT}'
-          url: '{$URL}/api/storage/volumes?fields=name,comment,state,type,svm.name,space.size,space.available,space.used,statistics'
+          username: '{$NETAPP.USERNAME}'
+          password: '{$NETAPP.PASSWORD}'
+          timeout: '{$NETAPP.HTTP.AGENT.TIMEOUT}'
+          url: '{$NETAPP.URL}/api/storage/volumes?fields=name,comment,state,type,svm.name,space.size,space.available,space.used,statistics'
           tags:
             - tag: component
               value: raw
@@ -627,8 +627,8 @@ zabbix_export:
           key: netapp.chassis.discovery
           delay: 1h
           authtype: BASIC
-          username: '{$USERNAME}'
-          password: '{$PASSWORD}'
+          username: '{$NETAPP.USERNAME}'
+          password: '{$NETAPP.PASSWORD}'
           item_prototypes:
             - uuid: 7e6b1e1d5b484080b8f31929a78e44e7
               name: '{#ID}: State'
@@ -662,8 +662,8 @@ zabbix_export:
                   tags:
                     - tag: scope
                       value: performance
-          timeout: '{$HTTP.AGENT.TIMEOUT}'
-          url: '{$URL}/api/cluster/chassis?fields=id'
+          timeout: '{$NETAPP.HTTP.AGENT.TIMEOUT}'
+          url: '{$NETAPP.URL}/api/cluster/chassis?fields=id'
           preprocessing:
             - type: JAVASCRIPT
               parameters:
@@ -681,8 +681,8 @@ zabbix_export:
           key: netapp.disks.discovery
           delay: 1h
           authtype: BASIC
-          username: '{$USERNAME}'
-          password: '{$PASSWORD}'
+          username: '{$NETAPP.USERNAME}'
+          password: '{$NETAPP.PASSWORD}'
           item_prototypes:
             - uuid: f170a3d8e98048ce91bf10f1ebcd2611
               name: '{#DISKNAME}: State'
@@ -718,8 +718,8 @@ zabbix_export:
                   tags:
                     - tag: scope
                       value: performance
-          timeout: '{$HTTP.AGENT.TIMEOUT}'
-          url: '{$URL}/api/storage/disks?fields=name,node.name'
+          timeout: '{$NETAPP.HTTP.AGENT.TIMEOUT}'
+          url: '{$NETAPP.URL}/api/storage/disks?fields=name,node.name'
           preprocessing:
             - type: JAVASCRIPT
               parameters:
@@ -794,8 +794,8 @@ zabbix_export:
           key: netapp.luns.discovery
           delay: 1h
           authtype: BASIC
-          username: '{$USERNAME}'
-          password: '{$PASSWORD}'
+          username: '{$NETAPP.USERNAME}'
+          password: '{$NETAPP.PASSWORD}'
           item_prototypes:
             - uuid: 05dfdbc0cacb4f1fa458180e4b4fe35c
               name: '{#LUNNAME}: Space size'
@@ -909,8 +909,8 @@ zabbix_export:
                   tags:
                     - tag: scope
                       value: performance
-          timeout: '{$HTTP.AGENT.TIMEOUT}'
-          url: '{$URL}/api/storage/luns?fields=name,svm.name,space.size,space.used,status.state,status.container_state'
+          timeout: '{$NETAPP.HTTP.AGENT.TIMEOUT}'
+          url: '{$NETAPP.URL}/api/storage/luns?fields=name,svm.name,space.size,space.used,status.state,status.container_state'
           preprocessing:
             - type: JAVASCRIPT
               parameters:
@@ -928,8 +928,8 @@ zabbix_export:
           key: netapp.nodes.discovery
           delay: 1h
           authtype: BASIC
-          username: '{$USERNAME}'
-          password: '{$PASSWORD}'
+          username: '{$NETAPP.USERNAME}'
+          password: '{$NETAPP.PASSWORD}'
           item_prototypes:
             - uuid: 23474d549a4c4e80b2e89c12a909dc0c
               name: '{#NODENAME}: Software version'
@@ -1111,8 +1111,8 @@ zabbix_export:
                   tags:
                     - tag: scope
                       value: notice
-          timeout: '{$HTTP.AGENT.TIMEOUT}'
-          url: '{$URL}/api/cluster/nodes?fields=name'
+          timeout: '{$NETAPP.HTTP.AGENT.TIMEOUT}'
+          url: '{$NETAPP.URL}/api/cluster/nodes?fields=name'
           preprocessing:
             - type: JAVASCRIPT
               parameters:
@@ -1130,8 +1130,8 @@ zabbix_export:
           key: netapp.ports.ether.discovery
           delay: 1h
           authtype: BASIC
-          username: '{$USERNAME}'
-          password: '{$PASSWORD}'
+          username: '{$NETAPP.USERNAME}'
+          password: '{$NETAPP.PASSWORD}'
           item_prototypes:
             - uuid: dda2086a96f844c7b5a8002549fe6bf5
               name: '{#ETHPORTNAME}: State'
@@ -1167,8 +1167,8 @@ zabbix_export:
                   tags:
                     - tag: scope
                       value: availability
-          timeout: '{$HTTP.AGENT.TIMEOUT}'
-          url: '{$URL}/api/network/ethernet/ports?fields=name,state,node.name'
+          timeout: '{$NETAPP.HTTP.AGENT.TIMEOUT}'
+          url: '{$NETAPP.URL}/api/network/ethernet/ports?fields=name,state,node.name'
           preprocessing:
             - type: JAVASCRIPT
               parameters:
@@ -1186,8 +1186,8 @@ zabbix_export:
           key: netapp.ports.fc.discovery
           delay: 1h
           authtype: BASIC
-          username: '{$USERNAME}'
-          password: '{$PASSWORD}'
+          username: '{$NETAPP.USERNAME}'
+          password: '{$NETAPP.PASSWORD}'
           item_prototypes:
             - uuid: b4358be015104524811f011ddf0fb1a1
               name: '{#FCPORTNAME}: Description'
@@ -1255,8 +1255,8 @@ zabbix_export:
                       value: availability
                     - tag: scope
                       value: performance
-          timeout: '{$HTTP.AGENT.TIMEOUT}'
-          url: '{$URL}/api/network/fc/ports?fields=node.name,name,state'
+          timeout: '{$NETAPP.HTTP.AGENT.TIMEOUT}'
+          url: '{$NETAPP.URL}/api/network/fc/ports?fields=node.name,name,state'
           preprocessing:
             - type: JAVASCRIPT
               parameters:
@@ -1274,8 +1274,8 @@ zabbix_export:
           key: netapp.svms.discovery
           delay: 1h
           authtype: BASIC
-          username: '{$USERNAME}'
-          password: '{$PASSWORD}'
+          username: '{$NETAPP.USERNAME}'
+          password: '{$NETAPP.PASSWORD}'
           item_prototypes:
             - uuid: e7fab9c64c5348158418a02b1139eb68
               name: '{#SVMNAME}: Comment'
@@ -1331,8 +1331,8 @@ zabbix_export:
                       value: availability
                     - tag: scope
                       value: performance
-          timeout: '{$HTTP.AGENT.TIMEOUT}'
-          url: '{$URL}/api/svm/svms?fields=name'
+          timeout: '{$NETAPP.HTTP.AGENT.TIMEOUT}'
+          url: '{$NETAPP.URL}/api/svm/svms?fields=name'
           preprocessing:
             - type: JAVASCRIPT
               parameters:
@@ -1350,8 +1350,8 @@ zabbix_export:
           key: netapp.volumes.discovery
           delay: 1h
           authtype: BASIC
-          username: '{$USERNAME}'
-          password: '{$PASSWORD}'
+          username: '{$NETAPP.USERNAME}'
+          password: '{$NETAPP.PASSWORD}'
           item_prototypes:
             - uuid: 7218a035d00b47faae1d47955de4f61f
               name: '{#VOLUMENAME}: Comment'
@@ -1936,8 +1936,8 @@ zabbix_export:
                   item:
                     host: 'NetApp AFF A700 by HTTP'
                     key: 'netapp.volume.space_available[{#VOLUMENAME}]'
-          timeout: '{$HTTP.AGENT.TIMEOUT}'
-          url: '{$URL}/api/storage/volumes?fields=name'
+          timeout: '{$NETAPP.HTTP.AGENT.TIMEOUT}'
+          url: '{$NETAPP.URL}/api/storage/volumes?fields=name'
           preprocessing:
             - type: JAVASCRIPT
               parameters:
@@ -1959,7 +1959,7 @@ zabbix_export:
         - tag: target
           value: netapp-aff-a700
       macros:
-        - macro: '{$HTTP.AGENT.TIMEOUT}'
+        - macro: '{$NETAPP.HTTP.AGENT.TIMEOUT}'
           value: 5s
           description: 'The HTTP agent timeout to wait for a response from AFF700.'
           config:
@@ -1968,7 +1968,7 @@ zabbix_export:
             section_name: Other
             label: 'Agent timeout'
             description: 'The HTTP agent timeout to wait for a response from AFF700.'
-        - macro: '{$PASSWORD}'
+        - macro: '{$NETAPP.PASSWORD}'
           description: 'AFF700 user password.'
           config:
             type: TEXT
@@ -1976,7 +1976,7 @@ zabbix_export:
             label: Password
             description: 'AFF700 user password.'
             required: 'YES'
-        - macro: '{$URL}'
+        - macro: '{$NETAPP.URL}'
           description: 'AFF700 cluster URL address.'
           config:
             type: TEXT
@@ -1984,7 +1984,7 @@ zabbix_export:
             label: URL
             description: 'AFF700 cluster URL address.'
             required: 'YES'
-        - macro: '{$USERNAME}'
+        - macro: '{$NETAPP.USERNAME}'
           description: 'AFF700 user name.'
           config:
             type: TEXT
