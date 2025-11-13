@@ -16,17 +16,13 @@
 require_once dirname(__FILE__).'/../include/CIntegrationTest.php';
 require_once dirname(__FILE__).'/../include/helpers/CDataHelper.php';
 
-/**
- * Test suite for data collection using both active and passive agents.
- *
- * @backup history, hosts, host_rtdata, proxy, proxy_rtdata, changelog, settings, config_autoreg_tls, expressions
- * @backup globalmacro, hosts, interface, item_rtdata, items, proxy_history, regexps, ha_node
- */
+
 class testDataCollection extends CIntegrationTest {
 
 	private static $hostids = [];
 	private static $itemids = [];
-	private $certBaseDir;
+	private static $certBaseDirProxy;
+	private static $certBaseDirAgent;
 
 	/**
 	 * @inheritdoc
@@ -135,16 +131,28 @@ class testDataCollection extends CIntegrationTest {
 	 * @return array
 	 */
 	public function agentConfigurationProvider() {
+		self::$certBaseDirAgent = self::generateCertificates();
+		$baseDir = self::$certBaseDirAgent;
 		return [
 			self::COMPONENT_SERVER => [
 				'UnreachablePeriod' => 5,
 				'UnavailableDelay' => 5,
 				'UnreachableDelay' => 1,
-				'DebugLevel' => 4
+				'DebugLevel' => 4,
+				'TLSCAFile' => $baseDir . 'zabbix_ca_file.crt',
+				'TLSCertFile' => $baseDir . 'zabbix_server.crt',
+				'TLSKeyFile' => $baseDir . 'zabbix_server.key'
 			],
 			self::COMPONENT_AGENT => [
 				'Hostname' => 'agent',
-				'ServerActive' => '127.0.0.1'
+				'ServerActive' => '127.0.0.1',
+				'TLSConnect' => 'cert',
+				'TLSAccept' => 'cert',
+				'TLSCAFile' => $baseDir . 'zabbix_ca_file.crt',
+				'TLSCertFile' => $baseDir . 'zabbix_agentd.crt',
+				'TLSKeyFile' => $baseDir . 'zabbix_agentd.key',
+				'TLSServerCertIssuer' => 'CN=ZabbixCA',
+				'TLSServerCertSubject' => 'CN=zabbix_server'
 			]
 		];
 	}
@@ -157,6 +165,8 @@ class testDataCollection extends CIntegrationTest {
 	 * @hosts agent
 	 */
 	public function testDataCollection_checkHostAvailability() {
+		$this->updateAgentHostTLS("agent");
+
 		self::waitForLogLineToBePresent(self::COMPONENT_SERVER,
 			'temporarily disabling Zabbix agent checks on host "agent": interface unavailable'
 		);
@@ -188,6 +198,8 @@ class testDataCollection extends CIntegrationTest {
 	 * @hosts agent
 	 */
 	public function testDataCollection_checkAgentData() {
+		$this->updateAgentHostTLS("agent");
+
 		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, [
 			'enabling Zabbix agent checks on host "agent": interface became available',
 			'resuming Zabbix agent checks on host "agent": connection restored'
@@ -222,6 +234,8 @@ class testDataCollection extends CIntegrationTest {
 	public function testDataCollection_checkCustomActiveChecks() {
 		$host = 'custom_agent';
 		$items = [];
+
+		$this->updateAgentHostTLS("custom_agent");
 
 		// Retrieve item data from API.
 		$response = $this->call('item.get', [
@@ -284,7 +298,6 @@ class testDataCollection extends CIntegrationTest {
 		// Generate unique directory name for certificates
 		$unique = time() . '_' . mt_rand(10000, 99999);
 		$baseDir = "/tmp/zabbix_cert_$unique/";
-		$this->certBaseDir = $baseDir;
 		if (!is_dir($baseDir)) {
 			mkdir($baseDir, 0777, true);
 		}
@@ -327,6 +340,8 @@ class testDataCollection extends CIntegrationTest {
 		$this->assertStringContainsString('OK', $serverVerify, 'Server certificate verification failed');
 		$this->assertStringContainsString('OK', $agentVerify, 'Agent certificate verification failed');
 		$this->assertStringContainsString('OK', $proxyVerify, 'Proxy certificate verification failed');
+
+		return $baseDir;
 	}
 
 	/**
@@ -356,9 +371,9 @@ class testDataCollection extends CIntegrationTest {
 	/**
 	 * Update agent host to use TLS certificates.
 	 */
-	private function updateAgentHostTLS() {
+	private function updateAgentHostTLS($host_name) {
 		$agentHost = $this->call('host.get', [
-			'filter' => ['host' => 'proxy_agent'],
+			'filter' => ['host' => $host_name],
 			'output' => ['hostid']
 		]);
 		if (empty($agentHost['result'])) {
@@ -383,8 +398,9 @@ class testDataCollection extends CIntegrationTest {
 	 * @return array
 	 */
 	public function proxyConfigurationProvider() {
-		$this->generateCertificates();
-		$baseDir = $this->certBaseDir;
+	self::$certBaseDirProxy = self::generateCertificates();
+	$baseDir = self::$certBaseDirProxy;
+
 		return [
 			self::COMPONENT_SERVER => [
 				'UnreachablePeriod' => 5,
@@ -434,7 +450,7 @@ class testDataCollection extends CIntegrationTest {
 	 */
 	public function testDataCollection_checkProxyData() {
 
-		$this->updateAgentHostTLS();
+		$this->updateAgentHostTLS("proxy_agent");
 		$this->updateProxyHostTLS();
 
 		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, 'sending configuration data to proxy "proxy"');
@@ -471,10 +487,10 @@ class testDataCollection extends CIntegrationTest {
 		}
 
 		// Cleanup: remove the certificate directory and all its contents
-		$baseDir = $this->certBaseDir;
-		if (is_dir($baseDir)) {
-			shell_exec('rm -rf ' . escapeshellarg($baseDir));
-		}
+		// $baseDir = self::$certBaseDirProxy;
+		// if (is_dir($baseDir)) {
+		// 	shell_exec('rm -rf ' . escapeshellarg($baseDir));
+		// }
 	}
 
 	/**
