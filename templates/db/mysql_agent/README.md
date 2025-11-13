@@ -52,7 +52,7 @@ GRANT REPLICATION CLIENT,PROCESS,SHOW DATABASES,SHOW VIEW,SLAVE MONITOR ON *.* T
 
 For more information, please read the [`MariaDB documentation`](https://mariadb.com/docs/server/ref/mdb/privileges/SLAVE_MONITOR/).
 
-NOTE: Linux distributions that use SELinux may require additional steps for access configuration.
+**NOTE:** Linux distributions that use SELinux may require additional steps for access configuration.
 
 For example, the following rule could be added to the SELinux policy:
 
