@@ -176,6 +176,7 @@ window.mediatype_edit_popup = new class {
 	}
 
 	#delete() {
+		this.#removePopupMessages();
 		const curl = new Curl('zabbix.php');
 
 		curl.setArgument('action', 'mediatype.delete');
@@ -189,6 +190,7 @@ window.mediatype_edit_popup = new class {
 	}
 
 	#submit() {
+		this.#removePopupMessages();
 		const fields = this.form.getAllValues();
 
 		switch (fields.maxsessions_type) {
@@ -892,6 +894,14 @@ window.mediatype_edit_popup = new class {
 		}
 
 		this.#hideAndDisableFormElements(fields);
+	}
+
+	#removePopupMessages() {
+		for (const el of this.form_element.parentNode.children) {
+			if (el.matches('.msg-good, .msg-bad, .msg-warning')) {
+				el.parentNode.removeChild(el);
+			}
+		}
 	}
 
 	#ajaxExceptionHandler(exception) {
