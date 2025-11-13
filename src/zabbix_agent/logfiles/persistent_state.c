@@ -376,10 +376,11 @@ static int	zbx_write_persistent_file(const char *filename, const char *data, cha
 	FILE	*fp;
 	size_t	sz, alloc_bytes = 0, offset = 0;
 	int	ret = SUCCEED;
+	mode_t	old_umask;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%s(): filename:[%s] data:[%s]", __func__, filename, data);
 
-	mode_t	old_umask = umask(0026);
+	old_umask = umask(0026);
 
 	fp = fopen(filename, "w");
 	umask(old_umask);
