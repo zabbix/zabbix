@@ -64,12 +64,14 @@ zabbix_export:
                   var days = 0, hours = 0, minutes = 0, seconds = 0;
                   
                   const daysMatch = data.match(/(\d+)\s+Days?/i);
+                  
                   if (daysMatch) {
                   	days = parseInt(daysMatch[1], 10);
                   	data = data.replace(daysMatch[0], "").trim();
                   }
                   
                   const timeMatch = data.match(/(\d+):(\d+):(\d+)/);
+                  
                   if (!timeMatch) {
                   	throw "Unknown uptime format";
                   }
@@ -129,8 +131,8 @@ zabbix_export:
                 - |
                   const data = JSON.parse(value);
                   
-                  var sum = 0;
-                  var count = 0;
+                  var sum = 0,
+                  	count = 0;
                   
                   for (var key in data) {
                   	if (data.hasOwnProperty(key)) {
@@ -177,7 +179,7 @@ zabbix_export:
             				throw 'Required param is not set: ' + field + '.';
             			}
             		});
-            		
+            
             		Ribbon.params = params;
             
             		if (typeof Ribbon.params.url === 'string') {
@@ -233,8 +235,8 @@ zabbix_export:
             		var result = {};
             
             		for (var key in data) {
-            			if (typeof data[key] === 'object' && data[key] !== null && data[key][param_name] !== 'undefined') {
-            				if (data[key][param_name] == Ribbon.params.server_name) {
+            			if (typeof data[key] === 'object' && data[key] !== null && typeof data[key][param_name] !== 'undefined') {
+            				if (data[key][param_name] === Ribbon.params.server_name) {
             					result[data[key][key_field]] = data[key];
             				};
             			}
@@ -323,6 +325,36 @@ zabbix_export:
           tags:
             - tag: component
               value: raw
+        - uuid: 48536769afc946aca214d49e7f2bebda
+          name: 'Get data check'
+          type: DEPENDENT
+          key: ribbon.server.data.get.check
+          value_type: CHAR
+          description: 'Check that the Ribbon metrics data has been received correctly.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.error
+              error_handler: CUSTOM_VALUE
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 3h
+          master_item:
+            key: ribbon.server.data.get
+          tags:
+            - tag: component
+              value: status
+          triggers:
+            - uuid: b71110508de943589a1576596d3927ac
+              expression: 'length(last(/Ribbon SBC SWe CE by HTTP/ribbon.server.data.get.check))>0'
+              name: 'Ribbon: Failed to get metrics data'
+              event_name: 'Ribbon: Failed to get API metrics for the Ribbon'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: WARNING
+              description: 'Failed to get API metrics for the Ribbon.'
+              tags:
+                - tag: scope
+                  value: availability
         - uuid: 92ceb828307d4c7998ecf2840eee9fb4
           name: 'Server hardware sub type'
           type: DEPENDENT
@@ -369,9 +401,6 @@ zabbix_export:
             - type: JSONPATH
               parameters:
                 - '$.memoryUtilCurrentStatistics[0].average'
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 12h
           master_item:
             key: ribbon.server.data.get
           tags:
@@ -470,7 +499,7 @@ zabbix_export:
             key: ribbon.server.data.get
           tags:
             - tag: component
-              value: application
+              value: system
         - uuid: 6279c6ef1262473494342fde1c10e444
           name: 'Swap utilization'
           type: DEPENDENT
@@ -521,7 +550,8 @@ zabbix_export:
           triggers:
             - uuid: 58c3e53e7b3c4f61ab33c8230681589c
               expression: 'last(/Ribbon SBC SWe CE by HTTP/ribbon.server.sync.status)<>"syncCompleted"'
-              name: 'Ribbon: Sync status is not "Completed"'
+              name: 'Ribbon: Synchronization status in not complete'
+              event_name: 'Ribbon: Sync status is not "syncCompleted"'
               opdata: 'Current status: {ITEM.LASTVALUE}'
               priority: WARNING
               manual_close: 'YES'
@@ -545,12 +575,14 @@ zabbix_export:
                   var days = 0, hours = 0, minutes = 0, seconds = 0;
                   
                   const daysMatch = data.match(/(\d+)\s+Days?/i);
+                  
                   if (daysMatch) {
                   	days = parseInt(daysMatch[1], 10);
                   	data = data.replace(daysMatch[0], "").trim();
                   }
                   
                   const timeMatch = data.match(/(\d+):(\d+):(\d+)/);
+                  
                   if (!timeMatch) {
                   	throw "Unknown uptime format";
                   }
@@ -565,6 +597,17 @@ zabbix_export:
           tags:
             - tag: component
               value: system
+          triggers:
+            - uuid: f8efa94e91304890bdbf6bc25637efca
+              expression: 'last(/Ribbon SBC SWe CE by HTTP/ribbon.server.uptime)<10m'
+              name: 'Ribbon: Server has been restarted'
+              event_name: 'Ribbon: Server has been restarted (uptime < 10m)'
+              opdata: 'Current uptime: {ITEM.LASTVALUE}'
+              priority: INFO
+              manual_close: 'YES'
+              tags:
+                - tag: scope
+                  value: notice
       discovery_rules:
         - uuid: d886ff2a43f34450bc88de7d4956a226
           name: 'CPU discovery'
@@ -813,25 +856,6 @@ zabbix_export:
                   value: network
                 - tag: mgmt-port
                   value: '{#PORT}'
-            - uuid: e8859ed1e9a04b46b7a646d0a9111366
-              name: 'Management port [{#PORT}]: Bits received'
-              type: DEPENDENT
-              key: 'ribbon.mgmt.port.in[{#PORT}]'
-              units: bps
-              description: 'Actual Rx bandwidth in use on this port, bytes/sec.'
-              preprocessing:
-                - type: JSONPATH
-                  parameters:
-                    - '$.mgmtPortStatus.["{#PORT}"].rxActualBandwidth'
-              master_item:
-                key: ribbon.server.data.get
-              tags:
-                - tag: component
-                  value: mgmt-port
-                - tag: component
-                  value: network
-                - tag: mgmt-port
-                  value: '{#PORT}'
             - uuid: aab28dc7b149479ca4061527a3ae580a
               name: 'Management port [{#PORT}]: Link state'
               type: DEPENDENT
@@ -846,6 +870,7 @@ zabbix_export:
                 4 - admnDisabledNoLicense
                 5 - admnEnabledPortDownInvalidSfpWrongSpeed
                 6 - admnEnabledPortDownInvalidSfpNonSonus
+                7 - unknown
               valuemap:
                 name: 'Ribbon: Port link state'
               preprocessing:
@@ -888,16 +913,16 @@ zabbix_export:
                   tags:
                     - tag: scope
                       value: availability
-            - uuid: f20e8343c3234ae8b0a5334e3b19329f
-              name: 'Management port [{#PORT}]: Bits sent'
+            - uuid: e8859ed1e9a04b46b7a646d0a9111366
+              name: 'Management port [{#PORT}]: RX bandwidth'
               type: DEPENDENT
-              key: 'ribbon.mgmt.port.out[{#PORT}]'
+              key: 'ribbon.mgmt.port.rx.bandwidth[{#PORT}]'
               units: bps
-              description: 'Actual Tx bandwidth in use on this port, bytes/sec.'
+              description: 'Actual Rx bandwidth in use on this port, bytes/sec.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
-                    - '$.mgmtPortStatus.["{#PORT}"].txActualBandwidth'
+                    - '$.mgmtPortStatus.["{#PORT}"].rxActualBandwidth'
               master_item:
                 key: ribbon.server.data.get
               tags:
@@ -912,7 +937,7 @@ zabbix_export:
               type: DEPENDENT
               key: 'ribbon.mgmt.port.speed[{#PORT}]'
               description: |
-                The negotiated interface speed. When statistics are generated for EMS, negotiatedSpeed will be displayed as integer value. 
+                The negotiated interface speed. When statistics are generated for EMS, negotiatedSpeed will be displayed as integer value.
                 Possible values:
                 0 - speed10Mbps
                 1 - speed100Mbps
@@ -949,6 +974,25 @@ zabbix_export:
                   value: network
                 - tag: mgmt-port
                   value: '{#PORT}'
+            - uuid: f20e8343c3234ae8b0a5334e3b19329f
+              name: 'Management port [{#PORT}]: TX bandwidth'
+              type: DEPENDENT
+              key: 'ribbon.mgmt.port.tx.bandwidth[{#PORT}]'
+              units: bps
+              description: 'Actual Tx bandwidth in use on this port, bytes/sec.'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$.mgmtPortStatus.["{#PORT}"].txActualBandwidth'
+              master_item:
+                key: ribbon.server.data.get
+              tags:
+                - tag: component
+                  value: mgmt-port
+                - tag: component
+                  value: network
+                - tag: mgmt-port
+                  value: '{#PORT}'
           graph_prototypes:
             - uuid: c5e51691c6664520812ab3019ed51a68
               name: 'Management port [{#PORT}]: Usage'
@@ -958,14 +1002,14 @@ zabbix_export:
                   color: 81C784
                   item:
                     host: 'Ribbon SBC SWe CE by HTTP'
-                    key: 'ribbon.mgmt.port.in[{#PORT}]'
+                    key: 'ribbon.mgmt.port.rx.bandwidth[{#PORT}]'
                 - sortorder: '1'
                   drawtype: GRADIENT_LINE
                   color: FFD54F
                   yaxisside: RIGHT
                   item:
                     host: 'Ribbon SBC SWe CE by HTTP'
-                    key: 'ribbon.mgmt.port.out[{#PORT}]'
+                    key: 'ribbon.mgmt.port.tx.bandwidth[{#PORT}]'
           master_item:
             key: ribbon.server.data.get
           preprocessing:
@@ -1216,31 +1260,12 @@ zabbix_export:
                 operator: NOT_MATCHES_REGEX
           description: 'Used for discovering of packet port.'
           item_prototypes:
-            - uuid: 8ccfc427d4d64aef886cb1e05c30ce8c
-              name: 'Packet port [{#PORT}]: Bits received'
-              type: DEPENDENT
-              key: 'ribbon.packet.port.in[{#PORT}]'
-              units: bps
-              description: 'Actual Rx bandwidth in use on this port, bytes/sec.'
-              preprocessing:
-                - type: JSONPATH
-                  parameters:
-                    - '$.packetPortStatus.["{#PORT}"].rxActualBandwidth'
-              master_item:
-                key: ribbon.server.data.get
-              tags:
-                - tag: component
-                  value: network
-                - tag: component
-                  value: packet-port
-                - tag: packet-port
-                  value: '{#PORT}'
             - uuid: 71872e6ceec74c1e8b88882a16ff5501
               name: 'Packet port [{#PORT}]: Link state'
               type: DEPENDENT
               key: 'ribbon.packet.port.link.state[{#PORT}]'
               description: |
-                The state of the interface. When statistics are generated for EMS, linkState will be displayed as integer value. 
+                The state of the interface. When statistics are generated for EMS, linkState will be displayed as integer value.
                 Possible values:
                 0 - null
                 1 - admnDisabled
@@ -1249,6 +1274,7 @@ zabbix_export:
                 4 - admnDisabledNoLicense
                 5 - admnEnabledPortDownInvalidSfpWrongSpeed
                 6 - admnEnabledPortDownInvalidSfpNonSonus
+                7 - unknown
               valuemap:
                 name: 'Ribbon: Port link state'
               preprocessing:
@@ -1291,16 +1317,16 @@ zabbix_export:
                   tags:
                     - tag: scope
                       value: availability
-            - uuid: 9b01ae59d2c94386ba69bdcb42aa959e
-              name: 'Packet port [{#PORT}]: Bits sent'
+            - uuid: 8ccfc427d4d64aef886cb1e05c30ce8c
+              name: 'Packet port [{#PORT}]: RX bandwidth'
               type: DEPENDENT
-              key: 'ribbon.packet.port.out[{#PORT}]'
+              key: 'ribbon.packet.port.rx.bandwidth[{#PORT}]'
               units: bps
-              description: 'Actual Tx bandwidth in use on this port, bytes/sec.'
+              description: 'Actual Rx bandwidth in use on this port, bytes/sec.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
-                    - '$.packetPortStatus.["{#PORT}"].txActualBandwidth'
+                    - '$.packetPortStatus.["{#PORT}"].rxActualBandwidth'
               master_item:
                 key: ribbon.server.data.get
               tags:
@@ -1315,7 +1341,7 @@ zabbix_export:
               type: DEPENDENT
               key: 'ribbon.packet.port.speed[{#PORT}]'
               description: |
-                The interface speed. Packet port speed is not negotiable. When statistics are generated for EMS, negotiatedSpeed will be displayed as integer value. 
+                The interface speed. Packet port speed is not negotiable. When statistics are generated for EMS, negotiatedSpeed will be displayed as integer value.
                 Possible values:
                 0 - speed10Mbps
                 1 - speed100Mbps
@@ -1340,6 +1366,25 @@ zabbix_export:
                       ].indexOf(value);
                       
                       return idx !== -1 ? idx : 4;
+              master_item:
+                key: ribbon.server.data.get
+              tags:
+                - tag: component
+                  value: network
+                - tag: component
+                  value: packet-port
+                - tag: packet-port
+                  value: '{#PORT}'
+            - uuid: 9b01ae59d2c94386ba69bdcb42aa959e
+              name: 'Packet port [{#PORT}]: TX bandwidth'
+              type: DEPENDENT
+              key: 'ribbon.packet.port.tx.bandwidth[{#PORT}]'
+              units: bps
+              description: 'Actual Tx bandwidth in use on this port, bytes/sec.'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$.packetPortStatus.["{#PORT}"].txActualBandwidth'
               master_item:
                 key: ribbon.server.data.get
               tags:
@@ -1382,20 +1427,19 @@ zabbix_export:
           graph_prototypes:
             - uuid: 7dea3cb8675a4f0b9afe14c80d2aa7b7
               name: 'Packet port [{#PORT}]: usage'
-              ymax_type_1: FIXED
               graph_items:
                 - drawtype: GRADIENT_LINE
                   color: 81C784
                   item:
                     host: 'Ribbon SBC SWe CE by HTTP'
-                    key: 'ribbon.packet.port.in[{#PORT}]'
+                    key: 'ribbon.packet.port.rx.bandwidth[{#PORT}]'
                 - sortorder: '1'
                   drawtype: GRADIENT_LINE
                   color: FFD54F
                   yaxisside: RIGHT
                   item:
                     host: 'Ribbon SBC SWe CE by HTTP'
-                    key: 'ribbon.packet.port.out[{#PORT}]'
+                    key: 'ribbon.packet.port.tx.bandwidth[{#PORT}]'
             - uuid: 0e0e6ad3b7f34a4fbab81f268c24c54f
               name: 'Packet port [{#PORT}]: Utilization'
               ymax_type_1: FIXED
@@ -1449,7 +1493,7 @@ zabbix_export:
                     - '$.portRedundancyGroupStatus.["{#PORT}"].failureCount'
                 - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
-                    - 12h
+                    - 1h
               master_item:
                 key: ribbon.server.data.get
               tags:
@@ -2420,6 +2464,8 @@ zabbix_export:
             key: ribbon.system.data.get
           tags:
             - tag: component
+              value: calls
+            - tag: component
               value: system
         - uuid: 5ed0bad322164073aaf5db9b1791a3d8
           name: 'Call status: Attempts'
@@ -2436,6 +2482,8 @@ zabbix_export:
           master_item:
             key: ribbon.system.data.get
           tags:
+            - tag: component
+              value: calls
             - tag: component
               value: system
         - uuid: 6e5ec53168d14b3d951e48f7c0e28c2c
@@ -2454,6 +2502,8 @@ zabbix_export:
             key: ribbon.system.data.get
           tags:
             - tag: component
+              value: calls
+            - tag: component
               value: system
         - uuid: e3855ac0b82b4af6990b704eff03afbd
           name: 'Call statistics: Concurrent calls'
@@ -2470,6 +2520,8 @@ zabbix_export:
           master_item:
             key: ribbon.system.data.get
           tags:
+            - tag: component
+              value: calls
             - tag: component
               value: system
         - uuid: d1ff4e8e50fc44ebb52414e2c872c4ec
@@ -2488,6 +2540,8 @@ zabbix_export:
             key: ribbon.system.data.get
           tags:
             - tag: component
+              value: calls
+            - tag: component
               value: system
         - uuid: a6b366b5cdad4e41bdd4aacdfbf006c9
           name: 'Call statistics: NICE recorded calls'
@@ -2504,6 +2558,8 @@ zabbix_export:
           master_item:
             key: ribbon.system.data.get
           tags:
+            - tag: component
+              value: calls
             - tag: component
               value: system
         - uuid: c32af5bd2a62410eb15963aa81bbd0a9
@@ -2522,6 +2578,8 @@ zabbix_export:
             key: ribbon.system.data.get
           tags:
             - tag: component
+              value: calls
+            - tag: component
               value: system
         - uuid: 9e1836504f604cc2a96ae8354d245376
           name: 'Call statistics: SIP recorded calls'
@@ -2538,6 +2596,8 @@ zabbix_export:
           master_item:
             key: ribbon.system.data.get
           tags:
+            - tag: component
+              value: calls
             - tag: component
               value: system
         - uuid: 52684c20d4134677b946d2c901e0e1fd
@@ -2556,6 +2616,8 @@ zabbix_export:
             key: ribbon.system.data.get
           tags:
             - tag: component
+              value: calls
+            - tag: component
               value: system
         - uuid: a6909ad4316642b6ba038de1dd678f56
           name: 'Call status: Stable'
@@ -2572,6 +2634,8 @@ zabbix_export:
           master_item:
             key: ribbon.system.data.get
           tags:
+            - tag: component
+              value: calls
             - tag: component
               value: system
         - uuid: 2be5c70ea19744159c89e3bec6975f37
@@ -2590,6 +2654,8 @@ zabbix_export:
             key: ribbon.system.data.get
           tags:
             - tag: component
+              value: calls
+            - tag: component
               value: system
         - uuid: 1645dc510644472180fbd4bd49765cb7
           name: 'Call statistics: Transcoded calls'
@@ -2606,6 +2672,8 @@ zabbix_export:
           master_item:
             key: ribbon.system.data.get
           tags:
+            - tag: component
+              value: calls
             - tag: component
               value: system
         - uuid: 9ff0738420f94ef19f633f2216813c77
@@ -2624,6 +2692,8 @@ zabbix_export:
             key: ribbon.system.data.get
           tags:
             - tag: component
+              value: calls
+            - tag: component
               value: system
         - uuid: a639e7401f4e440ebc48495d1ed276b7
           name: 'Call statistics: Video calls'
@@ -2640,6 +2710,8 @@ zabbix_export:
           master_item:
             key: ribbon.system.data.get
           tags:
+            - tag: component
+              value: calls
             - tag: component
               value: system
         - uuid: 55cd46b62b16462d97200cac6dee8e3d
@@ -2693,7 +2765,7 @@ zabbix_export:
             				throw 'Required param is not set: ' + field + '.';
             			}
             		});
-            		
+            
             		Ribbon.params = params;
             
             		if (typeof Ribbon.params.url === 'string') {
@@ -2749,8 +2821,8 @@ zabbix_export:
             		var result = {};
             
             		for (var key in data) {
-            			if (typeof data[key] === 'object' && data[key] !== null && data[key][param_name] !== 'undefined') {
-            				if (data[key][param_name] == Ribbon.params.server_name) {
+            			if (typeof data[key] === 'object' && data[key] !== null && typeof data[key][param_name] !== 'undefined') {
+            				if (data[key][param_name] === Ribbon.params.server_name) {
             					result[data[key][key_field]] = data[key];
             				};
             			}
@@ -2776,18 +2848,22 @@ zabbix_export:
             	Ribbon.setParams(JSON.parse(value));
             
             	endpoints = {
-            		'serverAdmin': {'url': '/restconf/data/sonusSystem:system/serverAdmin', 'path': 'sonusSystem:serverAdmin'},
-            		'admin': {'url': '/restconf/data/sonusSystem:system/admin', 'path': 'sonusSystem:admin'},
-            		'syncStatus': {'url': '/restconf/data/sonusSystem:system/syncStatus', 'path': 'sonusSystem:syncStatus'},
+            		'serverAdmin': { 'url': '/restconf/data/sonusSystem:system/serverAdmin', 'path': 'sonusSystem:serverAdmin' },
+            		'admin': { 'url': '/restconf/data/sonusSystem:system/admin', 'path': 'sonusSystem:admin' },
+            		'syncStatus': { 'url': '/restconf/data/sonusSystem:system/syncStatus', 'path': 'sonusSystem:syncStatus' },
             		'CongestionStatistics': {
             			'url': '/restconf/data/sonusSystem:system/sonusOrcaSystem:systemCongestionCurrentStatistics',
-            			'path': 'sonusOrcaSystem:systemCongestionCurrentStatistics'},
-            		'CongestionStatus': {'url': '/restconf/data/sonusSystem:system/sonusOrcaSystem:systemCongestionStatus', 'path': 'sonusOrcaSystem:systemCongestionStatus'},
-            		'callCountStatus': {'url': '/restconf/data/sonusGlobal:global/sonusActiveCall:callCountStatus', 'path': 'sonusActiveCall:callCountStatus'},
-            		'callCountCurrentStatistics': {'url': '/restconf/data/sonusGlobal:global/callCountCurrentStatistics', 'path': 'sonusGlobal:callCountCurrentStatistics'}
+            			'path': 'sonusOrcaSystem:systemCongestionCurrentStatistics'
+            		},
+            		'CongestionStatus': { 'url': '/restconf/data/sonusSystem:system/sonusOrcaSystem:systemCongestionStatus', 'path': 'sonusOrcaSystem:systemCongestionStatus' },
+            		'callCountStatus': { 'url': '/restconf/data/sonusGlobal:global/sonusActiveCall:callCountStatus', 'path': 'sonusActiveCall:callCountStatus' },
+            		'callCountCurrentStatistics': { 'url': '/restconf/data/sonusGlobal:global/callCountCurrentStatistics', 'path': 'sonusGlobal:callCountCurrentStatistics' },
+            		'licenseInfo': { 'url': '/restconf/data/sonusSystem:system/licenseInfo', 'path': 'sonusSystem:licenseInfo' },
+            		'dnsGroup': { 'url': '/restconf/data/sonusAddressContext:addressContext=default/sonusDns:dnsGroup=', 'path': 'sonusDns:dnsGroup' },
+            		'globalTrunkGroupStatus': { 'url': '/restconf/data/sonusGlobal:global/sonusGlobalTrunkGroup:globalTrunkGroupStatus=', 'path': 'sonusGlobalTrunkGroup:globalTrunkGroupStatus' }
             	};
             
-            	
+            
             	return JSON.stringify(Ribbon.getMetricsData(endpoints));
             
             }
@@ -2795,7 +2871,7 @@ zabbix_export:
             	Zabbix.log(3, '[ Ribbon SBC SWe core ] ERROR: ' + error);
             	error_msg = 'Failed to get data from API:' + error;
             
-            	return JSON.stringify({ 'error':  error_msg });
+            	return JSON.stringify({ 'error': error_msg });
             }
           description: 'Gets the system information.'
           timeout: '30'
@@ -2811,6 +2887,36 @@ zabbix_export:
           tags:
             - tag: component
               value: raw
+        - uuid: f3d28176e1234b99aadb19c81b83850a
+          name: 'Get data check'
+          type: DEPENDENT
+          key: ribbon.system.data.get.check
+          value_type: CHAR
+          description: 'Check that the Ribbon metrics data has been received correctly.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.error
+              error_handler: CUSTOM_VALUE
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 3h
+          master_item:
+            key: ribbon.system.data.get
+          tags:
+            - tag: component
+              value: status
+          triggers:
+            - uuid: 50ed5b65a1b048c99c9f5f5101630fe6
+              expression: 'length(last(/Ribbon SBC SWe core by HTTP/ribbon.system.data.get.check))>0'
+              name: 'Ribbon: Failed to get metrics data'
+              event_name: 'Ribbon: Failed to get API metrics for the Ribbon'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: WARNING
+              description: 'Failed to get API metrics for the Ribbon.'
+              tags:
+                - tag: scope
+                  value: availability
         - uuid: ea77f9d8f1ba4a9fbe40549ce0d17091
           name: 'DSP congestion level'
           type: DEPENDENT
@@ -2844,6 +2950,8 @@ zabbix_export:
             key: ribbon.system.data.get
           tags:
             - tag: component
+              value: calls
+            - tag: component
               value: system
         - uuid: eb174749ba8e4f74abdd4fb60627f761
           name: 'Call status: Emergency stable'
@@ -2860,6 +2968,8 @@ zabbix_export:
           master_item:
             key: ribbon.system.data.get
           tags:
+            - tag: component
+              value: calls
             - tag: component
               value: system
         - uuid: 0209ccef35384da29d1bb002788a3fa8
@@ -2911,6 +3021,8 @@ zabbix_export:
             key: ribbon.system.data.get
           tags:
             - tag: component
+              value: calls
+            - tag: component
               value: system
         - uuid: 220d681a8be3491aa96c0d4bcb90c101
           name: 'Call statistics: HPC queue attempts'
@@ -2927,6 +3039,8 @@ zabbix_export:
           master_item:
             key: ribbon.system.data.get
           tags:
+            - tag: component
+              value: calls
             - tag: component
               value: system
         - uuid: e1ef92e48d6a4f048624f9ad26f06fa8
@@ -2945,6 +3059,8 @@ zabbix_export:
             key: ribbon.system.data.get
           tags:
             - tag: component
+              value: calls
+            - tag: component
               value: system
         - uuid: 4f2b31343898463d847d3ddefcadb3ee
           name: 'Call statistics: HPC queue timeouts'
@@ -2961,6 +3077,8 @@ zabbix_export:
           master_item:
             key: ribbon.system.data.get
           tags:
+            - tag: component
+              value: calls
             - tag: component
               value: system
         - uuid: a5cf7bc5ff094df69ecae1c97c627171
@@ -3014,6 +3132,8 @@ zabbix_export:
             key: ribbon.system.data.get
           tags:
             - tag: component
+              value: calls
+            - tag: component
               value: system
         - uuid: 7e8c3eaf11124075aa9ecfdf08c4a2cd
           name: 'Call status: Signalling stable'
@@ -3030,6 +3150,8 @@ zabbix_export:
           master_item:
             key: ribbon.system.data.get
           tags:
+            - tag: component
+              value: calls
             - tag: component
               value: system
         - uuid: cb23fde59fb34988aba1132eaace6df6
@@ -3048,6 +3170,8 @@ zabbix_export:
             key: ribbon.system.data.get
           tags:
             - tag: component
+              value: calls
+            - tag: component
               value: system
         - uuid: acb2541b36294604b5c6bb260cccdd09
           name: 'Call statistics: MRF sessions'
@@ -3064,6 +3188,8 @@ zabbix_export:
           master_item:
             key: ribbon.system.data.get
           tags:
+            - tag: component
+              value: calls
             - tag: component
               value: system
         - uuid: 5856ac0adb1d4d7fb2aee5c3f41af29a
@@ -3082,6 +3208,8 @@ zabbix_export:
             key: ribbon.system.data.get
           tags:
             - tag: component
+              value: calls
+            - tag: component
               value: system
         - uuid: d546591b91314e35b4823af140a25c52
           name: 'Call statistics: SOSBC sessions'
@@ -3099,6 +3227,8 @@ zabbix_export:
             key: ribbon.system.data.get
           tags:
             - tag: component
+              value: calls
+            - tag: component
               value: system
         - uuid: 3f72e3c4ad8c44398a70975456b27b25
           name: 'Call statistics: WebSocket sessions'
@@ -3115,6 +3245,8 @@ zabbix_export:
           master_item:
             key: ribbon.system.data.get
           tags:
+            - tag: component
+              value: calls
             - tag: component
               value: system
       discovery_rules:
@@ -3165,7 +3297,7 @@ zabbix_export:
             - uuid: f324e184bb244bd3b03065401d851efb
               name: 'Call engine [{#CE.NAME}]: HW type'
               type: DEPENDENT
-              key: 'ribbon.ce.hwType[{#CE.NAME}]'
+              key: 'ribbon.ce.hw.type[{#CE.NAME}]'
               value_type: CHAR
               description: 'HW type of the server.'
               preprocessing:
@@ -3187,7 +3319,7 @@ zabbix_export:
               type: DEPENDENT
               key: 'ribbon.ce.name[{#CE.NAME}]'
               value_type: CHAR
-              description: 'Instance/Ce Name given by user as userdata.'
+              description: 'Instance/Ce name given by user as userdata.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -3206,7 +3338,7 @@ zabbix_export:
               name: 'Call engine [{#CE.NAME}]: Role'
               type: DEPENDENT
               key: 'ribbon.ce.role[{#CE.NAME}]'
-              description: 'When set to primary, role designates a server for internal processing.'
+              description: 'Server admin role. When set to primary, role designates a server for internal processing.'
               valuemap:
                 name: 'Ribbon: Call engine role'
               preprocessing:
@@ -3224,7 +3356,7 @@ zabbix_export:
                       return idx !== -1 ? idx : 2;
                 - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
-                    - 12h
+                    - 1h
               master_item:
                 key: ribbon.system.data.get
               tags:
@@ -3266,6 +3398,391 @@ zabbix_export:
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1h
+        - uuid: 1dc609eea19f4c56a055d6ecd0ca3c1f
+          name: 'DNS discovery'
+          type: DEPENDENT
+          key: ribbon.dns.discovery
+          filter:
+            evaltype: AND
+            conditions:
+              - macro: '{#DNS.GROUP}'
+                value: '{$RIBBON.DNS.GROUP.DISCOVERY.NAME.MATCHES}'
+              - macro: '{#DNS.GROUP}'
+                value: '{$RIBBON.DNS.GROUP.DISCOVERY.NAME.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+              - macro: '{#DNS.STATE}'
+                value: enabled
+          description: 'Used for discovering of DNS statistics.'
+          item_prototypes:
+            - uuid: aeb501d0b80847868e80c796912f4bd1
+              name: 'DNS [{#DNS.GROUP}][{#DNS.SERVER}][{#DNS.IP}]: Tcp connection failed'
+              type: DEPENDENT
+              key: 'ribbon.dns.connection.failed[{#DNS.GROUP}/{#DNS.SERVER}/{#DNS.IP}]'
+              description: 'Total number of DNS tcp connection failed.'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - $.tcpConnectionFailed
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              master_item:
+                key: 'ribbon.dns.get.stats.data[{#DNS.GROUP}/{#DNS.SERVER}/{#DNS.IP}]'
+              tags:
+                - tag: component
+                  value: dns
+                - tag: dns-group
+                  value: '{#DNS.GROUP}'
+                - tag: dns-ip
+                  value: '{#DNS.IP}'
+                - tag: dns-server
+                  value: '{#DNS.SERVER}'
+                - tag: dns-type
+                  value: '{#DNS.TYPE}'
+            - uuid: 3426b7302ef449b38e2ea49047569329
+              name: 'DNS [{#DNS.GROUP}][{#DNS.SERVER}][{#DNS.IP}]: Tcp connection torn down'
+              type: DEPENDENT
+              key: 'ribbon.dns.connection.torn.down[{#DNS.GROUP}/{#DNS.SERVER}/{#DNS.IP}]'
+              description: 'Total number of DNS tcp connection torn down.'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - $.tcpConnectiontorndown
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              master_item:
+                key: 'ribbon.dns.get.stats.data[{#DNS.GROUP}/{#DNS.SERVER}/{#DNS.IP}]'
+              tags:
+                - tag: component
+                  value: dns
+                - tag: dns-group
+                  value: '{#DNS.GROUP}'
+                - tag: dns-ip
+                  value: '{#DNS.IP}'
+                - tag: dns-server
+                  value: '{#DNS.SERVER}'
+                - tag: dns-type
+                  value: '{#DNS.TYPE}'
+            - uuid: 036858d6e02a482a87da5c66c2bb3a4f
+              name: 'DNS [{#DNS.GROUP}][{#DNS.SERVER}][{#DNS.IP}]: Tcp connection'
+              type: DEPENDENT
+              key: 'ribbon.dns.connection[{#DNS.GROUP}/{#DNS.SERVER}/{#DNS.IP}]'
+              description: 'Total number of DNS tcp connection.'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - $.totalTcpConnection
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              master_item:
+                key: 'ribbon.dns.get.stats.data[{#DNS.GROUP}/{#DNS.SERVER}/{#DNS.IP}]'
+              tags:
+                - tag: component
+                  value: dns
+                - tag: dns-group
+                  value: '{#DNS.GROUP}'
+                - tag: dns-ip
+                  value: '{#DNS.IP}'
+                - tag: dns-server
+                  value: '{#DNS.SERVER}'
+                - tag: dns-type
+                  value: '{#DNS.TYPE}'
+            - uuid: 8981ce984a194bfbbe535753a81a9099
+              name: 'DNS [{#DNS.GROUP}][{#DNS.SERVER}][{#DNS.IP}]: Errors'
+              type: DEPENDENT
+              key: 'ribbon.dns.errors[{#DNS.GROUP}/{#DNS.SERVER}/{#DNS.IP}]'
+              description: 'Total number of DNS errors.'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - $.errors
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              master_item:
+                key: 'ribbon.dns.get.stats.data[{#DNS.GROUP}/{#DNS.SERVER}/{#DNS.IP}]'
+              tags:
+                - tag: component
+                  value: dns
+                - tag: dns-group
+                  value: '{#DNS.GROUP}'
+                - tag: dns-ip
+                  value: '{#DNS.IP}'
+                - tag: dns-server
+                  value: '{#DNS.SERVER}'
+                - tag: dns-type
+                  value: '{#DNS.TYPE}'
+              trigger_prototypes:
+                - uuid: e1bc3be5563147c3a38ee20f99f9330c
+                  expression: 'last(/Ribbon SBC SWe core by HTTP/ribbon.dns.errors[{#DNS.GROUP}/{#DNS.SERVER}/{#DNS.IP}]) >= {$RIBBON.DNS.ERRORS.TRIGGER.THRESHOLD}'
+                  name: 'Ribbon: DNS [{#DNS.GROUP}][{#DNS.SERVER}][{#DNS.IP}]: High number of errors'
+                  opdata: 'Current number of errors: {ITEM.LASTVALUE}'
+                  priority: WARNING
+                  description: 'The number of DNS errors is high.'
+                  tags:
+                    - tag: scope
+                      value: availability
+            - uuid: d34426bc96e44b77a85b65f433bb0f27
+              name: 'DNS [{#DNS.GROUP}][{#DNS.SERVER}][{#DNS.IP}]: Raw data'
+              type: DEPENDENT
+              key: 'ribbon.dns.get.stats.data[{#DNS.GROUP}/{#DNS.SERVER}/{#DNS.IP}]'
+              history: '0'
+              value_type: TEXT
+              description: 'Raw data of the DNS statistics.'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$.dnsGroup[?(@.name=="{#DNS.GROUP}")].dnsServerStatistics[?(@.ipAddress=="{#DNS.IP}")].first()'
+              master_item:
+                key: ribbon.system.data.get
+              tags:
+                - tag: component
+                  value: dns
+                - tag: component
+                  value: raw
+                - tag: dns-group
+                  value: '{#DNS.GROUP}'
+                - tag: dns-ip
+                  value: '{#DNS.IP}'
+                - tag: dns-server
+                  value: '{#DNS.SERVER}'
+                - tag: dns-type
+                  value: '{#DNS.TYPE}'
+            - uuid: 02a9cf1f50e3466b9a100e5dc108d16e
+              name: 'DNS [{#DNS.GROUP}][{#DNS.SERVER}][{#DNS.IP}]: Query'
+              type: DEPENDENT
+              key: 'ribbon.dns.query[{#DNS.GROUP}/{#DNS.SERVER}/{#DNS.IP}]'
+              description: 'Total number of DNS queries received by the server.'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - $.queries
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              master_item:
+                key: 'ribbon.dns.get.stats.data[{#DNS.GROUP}/{#DNS.SERVER}/{#DNS.IP}]'
+              tags:
+                - tag: component
+                  value: dns
+                - tag: dns-group
+                  value: '{#DNS.GROUP}'
+                - tag: dns-ip
+                  value: '{#DNS.IP}'
+                - tag: dns-server
+                  value: '{#DNS.SERVER}'
+                - tag: dns-type
+                  value: '{#DNS.TYPE}'
+            - uuid: 67a79aebf33046f397ecc565d3e95695
+              name: 'DNS [{#DNS.GROUP}][{#DNS.SERVER}][{#DNS.IP}]: Referrals'
+              type: DEPENDENT
+              key: 'ribbon.dns.referrals[{#DNS.GROUP}/{#DNS.SERVER}/{#DNS.IP}]'
+              description: 'Total number of DNS referrals.'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - $.referrals
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              master_item:
+                key: 'ribbon.dns.get.stats.data[{#DNS.GROUP}/{#DNS.SERVER}/{#DNS.IP}]'
+              tags:
+                - tag: component
+                  value: dns
+                - tag: dns-group
+                  value: '{#DNS.GROUP}'
+                - tag: dns-ip
+                  value: '{#DNS.IP}'
+                - tag: dns-server
+                  value: '{#DNS.SERVER}'
+                - tag: dns-type
+                  value: '{#DNS.TYPE}'
+            - uuid: 2729f041ee1b451da2af1676acab928f
+              name: 'DNS [{#DNS.GROUP}][{#DNS.SERVER}][{#DNS.IP}]: Timeouts'
+              type: DEPENDENT
+              key: 'ribbon.dns.timeouts[{#DNS.GROUP}/{#DNS.SERVER}/{#DNS.IP}]'
+              description: 'Total number of DNS timeouts.'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - $.timeouts
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              master_item:
+                key: 'ribbon.dns.get.stats.data[{#DNS.GROUP}/{#DNS.SERVER}/{#DNS.IP}]'
+              tags:
+                - tag: component
+                  value: dns
+                - tag: dns-group
+                  value: '{#DNS.GROUP}'
+                - tag: dns-ip
+                  value: '{#DNS.IP}'
+                - tag: dns-server
+                  value: '{#DNS.SERVER}'
+                - tag: dns-type
+                  value: '{#DNS.TYPE}'
+          trigger_prototypes:
+            - uuid: bc7d79451e4340f9b1c8417236fd1433
+              expression: 'last(/Ribbon SBC SWe core by HTTP/ribbon.dns.errors[{#DNS.GROUP}/{#DNS.SERVER}/{#DNS.IP}])/last(/Ribbon SBC SWe core by HTTP/ribbon.dns.query[{#DNS.GROUP}/{#DNS.SERVER}/{#DNS.IP}])*100>{$RIBBON.DNS.ERRORS.PERCENT.TRIGGER.THRESHOLD}'
+              name: 'Ribbon: DNS [{#DNS.GROUP}][{#DNS.SERVER}][{#DNS.IP}]: High percentage of errors'
+              opdata: 'Current error: {ITEM.LASTVALUE1} of {ITEM.LASTVALUE2} queries'
+              priority: WARNING
+              description: 'The percentage of DNS errors is high.'
+              tags:
+                - tag: scope
+                  value: availability
+            - uuid: c3f4e1d5b1e14f2fa9f3e6d3e8b7a6c1
+              expression: 'last(/Ribbon SBC SWe core by HTTP/ribbon.dns.timeouts[{#DNS.GROUP}/{#DNS.SERVER}/{#DNS.IP}])/last(/Ribbon SBC SWe core by HTTP/ribbon.dns.query[{#DNS.GROUP}/{#DNS.SERVER}/{#DNS.IP}])*100>{$RIBBON.DNS.TIMEOUTS.PERCENT.TRIGGER.THRESHOLD}'
+              name: 'Ribbon: DNS [{#DNS.GROUP}][{#DNS.SERVER}][{#DNS.IP}]: High percentage of timeouts'
+              opdata: 'Current timeouts: {ITEM.LASTVALUE1} of {ITEM.LASTVALUE2} queries'
+              priority: WARNING
+              description: 'The percentage of DNS timeouts is high.'
+              tags:
+                - tag: scope
+                  value: availability
+          master_item:
+            key: ribbon.system.data.get
+          preprocessing:
+            - type: JAVASCRIPT
+              parameters:
+                - |
+                  var data = JSON.parse(value),
+                  	dns = getField(data, 'dnsGroup'),
+                  	dns_servers = [];
+                  
+                  function getField(data, path, defaultValue) {
+                  	var steps = path.split('.'),
+                  		step = steps.shift();
+                  
+                  	while (typeof step !== 'undefined') {
+                  		if (typeof data === 'undefined' || typeof data[step] === 'undefined') {
+                  			return defaultValue;
+                  		}
+                  
+                  		data = data[step];
+                  		step = steps.shift();
+                  	}
+                  	return data;
+                  };
+                  
+                  dns.forEach(function (item) {
+                  
+                  	var group = getField(item, "name"),
+                  		type = getField(item, "type"),
+                  		servers = getField(item, "server", {}),
+                  		servers = Array.isArray(servers) ? servers : [servers];
+                  
+                  	servers.forEach(function (server) {
+                  		dns_servers.push({
+                  			"{#DNS.GROUP}": group,
+                  			"{#DNS.TYPE}": type,
+                  			"{#DNS.SERVER}": getField(server, "name", ''),
+                  			"{#DNS.IP}": getField(server, "ipAddress", ''),
+                  			"{#DNS.STATE}": getField(server, "state", '')
+                  		});
+                  	});
+                  });
+                  
+                  return JSON.stringify(dns_servers);
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+        - uuid: 1e3d38f447114daab812c98af635dc30
+          name: 'License discovery'
+          type: DEPENDENT
+          key: ribbon.license.discovery
+          filter:
+            evaltype: AND
+            conditions:
+              - macro: '{#LICENSE.NAME}'
+                value: '{$RIBBON.LICENSE.DISCOVERY.NAME.MATCHES}'
+              - macro: '{#LICENSE.NAME}'
+                value: '{$RIBBON.LICENSE.DISCOVERY.NAME.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+          description: 'Used for discovering of license info.'
+          item_prototypes:
+            - uuid: 4d378c397f214642aa2348bf60719805
+              name: 'License [{#LICENSE.NAME}]: Expiry date'
+              type: DEPENDENT
+              key: 'ribbon.license.expiry.date[{#LICENSE.NAME}/{#LICENSE.SOURCE}]'
+              value_type: CHAR
+              description: 'Expiry date of the license.'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$.licenseInfo.[?(@.featureName == "{#LICENSE.NAME}" && @.source == "{#LICENSE.SOURCE}")].expirationDate.first()'
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              master_item:
+                key: ribbon.system.data.get
+              tags:
+                - tag: component
+                  value: license
+                - tag: license-name
+                  value: '{#LICENSE.NAME}'
+            - uuid: 76038b1448e54068a32195e88b96578f
+              name: 'License [{#LICENSE.NAME}]: Current usage'
+              type: DEPENDENT
+              key: 'ribbon.license.usage.current[{#LICENSE.NAME}/{#LICENSE.SOURCE}]'
+              description: 'Current usage of the license.'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$.licenseInfo.[?(@.featureName == "{#LICENSE.NAME}" && @.source == "{#LICENSE.SOURCE}")].inUse.first()'
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              master_item:
+                key: ribbon.system.data.get
+              tags:
+                - tag: component
+                  value: license
+                - tag: license-name
+                  value: '{#LICENSE.NAME}'
+            - uuid: 0e9b831e5d75425fa8f71ea23a21826a
+              name: 'License [{#LICENSE.NAME}]: Usage limit'
+              type: DEPENDENT
+              key: 'ribbon.license.usage.limit[{#LICENSE.NAME}/{#LICENSE.SOURCE}]'
+              description: 'Usage limit of the license.'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$.licenseInfo.[?(@.featureName == "{#LICENSE.NAME}" && @.source == "{#LICENSE.SOURCE}")].usageLimit.first()'
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              master_item:
+                key: ribbon.system.data.get
+              tags:
+                - tag: component
+                  value: license
+                - tag: license-name
+                  value: '{#LICENSE.NAME}'
+          master_item:
+            key: ribbon.system.data.get
+          preprocessing:
+            - type: JAVASCRIPT
+              parameters:
+                - |
+                  const json_data = JSON.parse(value)["licenseInfo"];
+                  var output_data = [];
+                  
+                  for (var entity in json_data) {
+                  	output_data.push({
+                  		"{#LICENSE.NAME}": json_data[entity]["featureName"],
+                  		"{#LICENSE.SOURCE}": json_data[entity]["source"]
+                  	});
+                  };
+                  
+                  return JSON.stringify(output_data);
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
         - uuid: f10278da819b4ba5b76f505e4289f63a
           name: 'Sync module discovery'
           type: DEPENDENT
@@ -3292,7 +3809,7 @@ zabbix_export:
                     - '$.syncStatus.[?(@.syncModule == "{#SYNC.MODULE}")].status.first()'
                 - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
-                    - 12h
+                    - 1h
               master_item:
                 key: ribbon.system.data.get
               tags:
@@ -3329,6 +3846,332 @@ zabbix_export:
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1h
+        - uuid: cde1b0d0f05e4cdea40c15756057e3ef
+          name: 'Trunk group discovery'
+          type: DEPENDENT
+          key: ribbon.trunk.group.discovery
+          filter:
+            evaltype: AND
+            conditions:
+              - macro: '{#TRUNK.GROUP}'
+                value: '{$RIBBON.TRUNK.GROUP.DISCOVERY.NAME.MATCHES}'
+              - macro: '{#TRUNK.GROUP}'
+                value: '{$RIBBON.TRUNK.GROUP.DISCOVERY.NAME.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+          description: 'Used for discovering of trunk group statistics.'
+          item_prototypes:
+            - uuid: 3dc2bc687ac34b56b6baeebee2eee175
+              name: 'Trunk [{#TRUNK.GROUP}][{#TRUNK.ZONE}]: Total available calls'
+              type: DEPENDENT
+              key: 'ribbon.trunk.available.calls[{#TRUNK.GROUP}/{#TRUNK.ZONE}]'
+              value_type: FLOAT
+              description: 'The sum of all available or unblocked calls for this trunk group.'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - $.totalCallsAvailable
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              master_item:
+                key: 'ribbon.trunk.get.stats.data[{#TRUNK.GROUP}/{#TRUNK.ZONE}]'
+              tags:
+                - tag: component
+                  value: calls
+                - tag: component
+                  value: trunk
+                - tag: trunk-group
+                  value: '{#TRUNK.GROUP}'
+                - tag: trunk-zone
+                  value: '{#TRUNK.ZONE}'
+            - uuid: a80bd3155466423e962d93833c29a7d7
+              name: 'Trunk [{#TRUNK.GROUP}][{#TRUNK.ZONE}]: Bandwidth available'
+              type: DEPENDENT
+              key: 'ribbon.trunk.bw.available[{#TRUNK.GROUP}/{#TRUNK.ZONE}]'
+              value_type: FLOAT
+              units: '!kbit/s'
+              description: 'This is how much bandwidth is available for allocation(in Kbits/sec).'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - $.bwAvailable
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              master_item:
+                key: 'ribbon.trunk.get.stats.data[{#TRUNK.GROUP}/{#TRUNK.ZONE}]'
+              tags:
+                - tag: component
+                  value: bandwidth
+                - tag: component
+                  value: trunk
+                - tag: trunk-group
+                  value: '{#TRUNK.GROUP}'
+                - tag: trunk-zone
+                  value: '{#TRUNK.ZONE}'
+            - uuid: 59f4808a47dc498085febaf9a6346ea3
+              name: 'Trunk [{#TRUNK.GROUP}][{#TRUNK.ZONE}]: Bandwidth current limit'
+              type: DEPENDENT
+              key: 'ribbon.trunk.bw.current.limit[{#TRUNK.GROUP}/{#TRUNK.ZONE}]'
+              value_type: FLOAT
+              units: '!kbit/s'
+              description: 'This is the current bandwidth limit for this IP trunk group. It is initially set to the configured bandwidth limit but may be reduced due to packet outage detection events(in Kbits/sec).'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - $.bwCurrentLimit
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              master_item:
+                key: 'ribbon.trunk.get.stats.data[{#TRUNK.GROUP}/{#TRUNK.ZONE}]'
+              tags:
+                - tag: component
+                  value: bandwidth
+                - tag: component
+                  value: trunk
+                - tag: trunk-group
+                  value: '{#TRUNK.GROUP}'
+                - tag: trunk-zone
+                  value: '{#TRUNK.ZONE}'
+            - uuid: 2a94701789934237a306d4cee56a6931
+              name: 'Trunk [{#TRUNK.GROUP}][{#TRUNK.ZONE}]: Bandwidth inbound usage'
+              type: DEPENDENT
+              key: 'ribbon.trunk.bw.inbound.usage[{#TRUNK.GROUP}/{#TRUNK.ZONE}]'
+              value_type: FLOAT
+              units: '!kbit/s'
+              description: 'This is how much bandwidth is in use for inbound traffic(in Kbits/sec).'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - $.bwInboundUsage
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              master_item:
+                key: 'ribbon.trunk.get.stats.data[{#TRUNK.GROUP}/{#TRUNK.ZONE}]'
+              tags:
+                - tag: component
+                  value: bandwidth
+                - tag: component
+                  value: trunk
+                - tag: trunk-group
+                  value: '{#TRUNK.GROUP}'
+                - tag: trunk-zone
+                  value: '{#TRUNK.ZONE}'
+            - uuid: 2218ec6ed3e7470d98a42153f4fe5bb7
+              name: 'Trunk [{#TRUNK.GROUP}][{#TRUNK.ZONE}]: Bandwidth outbound usage'
+              type: DEPENDENT
+              key: 'ribbon.trunk.bw.outbound.usage[{#TRUNK.GROUP}/{#TRUNK.ZONE}]'
+              value_type: FLOAT
+              units: '!kbit/s'
+              description: 'This is how much bandwidth is in use for outbound traffic(in Kbits/sec).'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - $.bwOutboundUsage
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              master_item:
+                key: 'ribbon.trunk.get.stats.data[{#TRUNK.GROUP}/{#TRUNK.ZONE}]'
+              tags:
+                - tag: component
+                  value: bandwidth
+                - tag: component
+                  value: trunk
+                - tag: trunk-group
+                  value: '{#TRUNK.GROUP}'
+                - tag: trunk-zone
+                  value: '{#TRUNK.ZONE}'
+            - uuid: 320d5534056742589e120c743f3c7a99
+              name: 'Trunk [{#TRUNK.GROUP}][{#TRUNK.ZONE}]: Raw data'
+              type: DEPENDENT
+              key: 'ribbon.trunk.get.stats.data[{#TRUNK.GROUP}/{#TRUNK.ZONE}]'
+              history: '0'
+              value_type: TEXT
+              description: 'Raw data of the trunk group statistics.'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$.globalTrunkGroupStatus[?(@.name=="{#TRUNK.GROUP}" && @.zone == "{#TRUNK.ZONE}")].first()'
+              master_item:
+                key: ribbon.system.data.get
+              tags:
+                - tag: component
+                  value: raw
+                - tag: component
+                  value: trunk
+                - tag: trunk-group
+                  value: '{#TRUNK.GROUP}'
+                - tag: trunk-zone
+                  value: '{#TRUNK.ZONE}'
+            - uuid: 769834a24caa42c4b4dbd223142eed68
+              name: 'Trunk [{#TRUNK.GROUP}][{#TRUNK.ZONE}]: Inbound calls usage'
+              type: DEPENDENT
+              key: 'ribbon.trunk.inbound.usage.calls[{#TRUNK.GROUP}/{#TRUNK.ZONE}]'
+              value_type: FLOAT
+              description: 'This is only meaningful for IP trunk groups that are configured for inbound or both directions. This reflects the current inbound or incoming usage count of this IP trunk group(measured in no. of calls).'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - $.inboundCallsUsage
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              master_item:
+                key: 'ribbon.trunk.get.stats.data[{#TRUNK.GROUP}/{#TRUNK.ZONE}]'
+              tags:
+                - tag: component
+                  value: calls
+                - tag: component
+                  value: trunk
+                - tag: trunk-group
+                  value: '{#TRUNK.GROUP}'
+                - tag: trunk-zone
+                  value: '{#TRUNK.ZONE}'
+            - uuid: 89721a0f5621478f9ed6b76258e7f690
+              name: 'Trunk [{#TRUNK.GROUP}][{#TRUNK.ZONE}]: Outbound calls usage'
+              type: DEPENDENT
+              key: 'ribbon.trunk.outbound.usage.calls[{#TRUNK.GROUP}/{#TRUNK.ZONE}]'
+              value_type: FLOAT
+              description: 'This reflects the current outbound, non-priority usage count of this IP trunk group(measured in no. of calls).'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - $.outboundCallsUsage
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              master_item:
+                key: 'ribbon.trunk.get.stats.data[{#TRUNK.GROUP}/{#TRUNK.ZONE}]'
+              tags:
+                - tag: component
+                  value: calls
+                - tag: component
+                  value: trunk
+                - tag: trunk-group
+                  value: '{#TRUNK.GROUP}'
+                - tag: trunk-zone
+                  value: '{#TRUNK.ZONE}'
+            - uuid: fbb82a63eed74bf781ac725bcf68ce4f
+              name: 'Trunk [{#TRUNK.GROUP}][{#TRUNK.ZONE}]: Packet out detect state'
+              type: DEPENDENT
+              key: 'ribbon.trunk.packet.out.detect.state[{#TRUNK.GROUP}/{#TRUNK.ZONE}]'
+              description: 'This object indicates the packet outage detection state. `normal` - No packet outage has been declared. `packetOutageState - Packet outage has been declared. The current bandwidth limit has been reduced by packet outage detection bandwidth limit reduction.'
+              valuemap:
+                name: 'Ribbon: Trunk packet out detect state'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - $.packetOutDetectState
+                - type: JAVASCRIPT
+                  parameters:
+                    - |
+                      const idx = [
+                      	'packetOutageState',
+                      	'normal'
+                      ].indexOf(value);
+                      
+                      return idx !== -1 ? idx : 2;
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              master_item:
+                key: 'ribbon.trunk.get.stats.data[{#TRUNK.GROUP}/{#TRUNK.ZONE}]'
+              tags:
+                - tag: component
+                  value: trunk
+                - tag: trunk-group
+                  value: '{#TRUNK.GROUP}'
+                - tag: trunk-zone
+                  value: '{#TRUNK.ZONE}'
+              trigger_prototypes:
+                - uuid: d18a4f15d3134cdcb8ce70556bfbcbee
+                  expression: 'last(/Ribbon SBC SWe core by HTTP/ribbon.trunk.packet.out.detect.state[{#TRUNK.GROUP}/{#TRUNK.ZONE}])<>1'
+                  name: 'Ribbon: Trunk [{#TRUNK.GROUP}][{#TRUNK.ZONE}]: Packet out detect state is not "normal"'
+                  opdata: 'Current state: {ITEM.LASTVALUE}'
+                  priority: AVERAGE
+                  description: 'The packet out detect state is not "normal".'
+                  tags:
+                    - tag: scope
+                      value: availability
+            - uuid: ff1e154269e647b5add00b88dd3b3891
+              name: 'Trunk [{#TRUNK.GROUP}][{#TRUNK.ZONE}]: Priority calls usage'
+              type: DEPENDENT
+              key: 'ribbon.trunk.priority.usage.calls[{#TRUNK.GROUP}/{#TRUNK.ZONE}]'
+              value_type: FLOAT
+              description: 'This is only meaningful for IP trunk groups that are configured with call reserved state enabled. This reflects the current priority usage count of this IP trunk group(measured in no. of calls).'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - $.priorityCallUsage
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              master_item:
+                key: 'ribbon.trunk.get.stats.data[{#TRUNK.GROUP}/{#TRUNK.ZONE}]'
+              tags:
+                - tag: component
+                  value: calls
+                - tag: component
+                  value: trunk
+                - tag: trunk-group
+                  value: '{#TRUNK.GROUP}'
+                - tag: trunk-zone
+                  value: '{#TRUNK.ZONE}'
+            - uuid: bdbe03787d544f41bdbcbb8e3eb6c621
+              name: 'Trunk [{#TRUNK.GROUP}][{#TRUNK.ZONE}]: State'
+              type: DEPENDENT
+              key: 'ribbon.trunk.state[{#TRUNK.GROUP}/{#TRUNK.ZONE}]'
+              value_type: CHAR
+              description: 'Current operational state of the IP trunk group.'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - $.state
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              master_item:
+                key: 'ribbon.trunk.get.stats.data[{#TRUNK.GROUP}/{#TRUNK.ZONE}]'
+              tags:
+                - tag: component
+                  value: trunk
+                - tag: trunk-group
+                  value: '{#TRUNK.GROUP}'
+                - tag: trunk-zone
+                  value: '{#TRUNK.ZONE}'
+              trigger_prototypes:
+                - uuid: 4caad3b7c12d4ac897a7534babf1a9a2
+                  expression: 'last(/Ribbon SBC SWe core by HTTP/ribbon.trunk.state[{#TRUNK.GROUP}/{#TRUNK.ZONE}])<>"inService"'
+                  name: 'Ribbon: Trunk [{#TRUNK.GROUP}][{#TRUNK.ZONE}]: State is not "inService"'
+                  opdata: 'Current state: {ITEM.LASTVALUE}'
+                  priority: WARNING
+                  description: 'The trunk state is not "inService".'
+                  tags:
+                    - tag: scope
+                      value: availability
+          master_item:
+            key: ribbon.system.data.get
+          preprocessing:
+            - type: JAVASCRIPT
+              parameters:
+                - |
+                  const json_data = JSON.parse(value)["globalTrunkGroupStatus"];
+                  var output_data = [];
+                  
+                  for (var entity in json_data) {
+                  	output_data.push({
+                  		"{#TRUNK.GROUP}": json_data[entity]["name"],
+                  		"{#TRUNK.ZONE}": json_data[entity]["zone"]
+                  	});
+                  };
+                  
+                  return JSON.stringify(output_data);
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
       tags:
         - tag: class
           value: software
@@ -3344,7 +4187,7 @@ zabbix_export:
           description: 'Sets the regex string of call engine hardware type to be allowed in discovery.'
           config:
             type: TEXT
-            priority: '11'
+            priority: '14'
             section_name: Filters
             label: 'Include call engine hardware type filter'
             description: 'Regex string to include call engine by hardware type.'
@@ -3353,7 +4196,7 @@ zabbix_export:
           description: 'Sets the regex string of call engine hardware type to be ignored in discovery.'
           config:
             type: TEXT
-            priority: '12'
+            priority: '15'
             section_name: Filters
             label: 'Exclude call engine hardware type filter'
             description: 'Regex string to exclude call engine by hardware type.'
@@ -3362,7 +4205,7 @@ zabbix_export:
           description: 'Sets the regex string of call engine name to be allowed in discovery.'
           config:
             type: TEXT
-            priority: '7'
+            priority: '10'
             section_name: Filters
             label: 'Include call engine name filter'
             description: 'Regex string to include call engine by name.'
@@ -3371,7 +4214,7 @@ zabbix_export:
           description: 'Sets the regex string of call engine name to be ignored in discovery.'
           config:
             type: TEXT
-            priority: '8'
+            priority: '11'
             section_name: Filters
             label: 'Exclude call engine name filter'
             description: 'Regex string to exclude call engine by name.'
@@ -3380,7 +4223,7 @@ zabbix_export:
           description: 'Sets the regex string of call engine role to be allowed in discovery.'
           config:
             type: TEXT
-            priority: '9'
+            priority: '12'
             section_name: Filters
             label: 'Include call engine role type filter'
             description: 'Regex string to include call engine by role.'
@@ -3389,7 +4232,7 @@ zabbix_export:
           description: 'Sets the regex string of call engine role to be ignored in discovery.'
           config:
             type: TEXT
-            priority: '10'
+            priority: '13'
             section_name: Filters
             label: 'Exclude call engine role type filter'
             description: 'Regex string to exclude call engine by role.'
@@ -3403,16 +4246,61 @@ zabbix_export:
             label: 'Warning CPU usage threshold'
             description: 'In the range from 0 to 100 inclusive.'
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
-        - macro: '{$RIBBON.MEMORY.UTIL.CRIT}'
-          value: '90'
-          description: 'The threshold of the memory usage in percent.'
+        - macro: '{$RIBBON.DNS.ERRORS.PERCENT.TRIGGER.THRESHOLD}'
+          value: '70'
+          description: 'The threshold of the DNS errors in percent.'
+        - macro: '{$RIBBON.DNS.ERRORS.TRIGGER.THRESHOLD}'
+          value: '1000'
+          description: 'The threshold of the DNS errors.'
+        - macro: '{$RIBBON.DNS.GROUP.DISCOVERY.NAME.MATCHES}'
+          value: '.*'
+          description: 'Sets the regex string of DNS group name to be allowed in discovery.'
           config:
             type: TEXT
-            priority: '6'
+            priority: '20'
+            section_name: Filters
+            label: 'Include DNS group name filter'
+            description: 'Regex string to include DNS group by name.'
+        - macro: '{$RIBBON.DNS.GROUP.DISCOVERY.NAME.NOT_MATCHES}'
+          value: CHANGE_IF_NEEDED
+          description: 'Sets the regex string of DNS group name to be ignored in discovery.'
+          config:
+            type: TEXT
+            priority: '21'
+            section_name: Filters
+            label: 'Exclude DNS group name filter'
+            description: 'Regex string to exclude DNS group by name.'
+        - macro: '{$RIBBON.DNS.TIMEOUTS.PERCENT.TRIGGER.THRESHOLD}'
+          value: '70'
+          description: 'The threshold of the DNS timeouts in percent.'
+          config:
+            type: TEXT
+            priority: '9'
             section_name: Thresholds
             label: 'Warning memory usage threshold'
             description: 'In the range from 0 to 100 inclusive.'
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
+        - macro: '{$RIBBON.LICENSE.DISCOVERY.NAME.MATCHES}'
+          value: '.*'
+          description: 'Sets the regex string of license name to be allowed in discovery.'
+          config:
+            type: TEXT
+            priority: '18'
+            section_name: Filters
+            label: 'Include license name filter'
+            description: 'Regex string to include license by name.'
+        - macro: '{$RIBBON.LICENSE.DISCOVERY.NAME.NOT_MATCHES}'
+          value: CHANGE_IF_NEEDED
+          description: 'Sets the regex string of license name to be ignored in discovery.'
+          config:
+            type: TEXT
+            priority: '19'
+            section_name: Filters
+            label: 'Exclude license name filter'
+            description: 'Regex string to exclude license by name.'
+        - macro: '{$RIBBON.MEMORY.UTIL.CRIT}'
+          value: '90'
+          description: 'The threshold of the memory usage in percent.'
         - macro: '{$RIBBON.PASSWORD}'
           type: SECRET_TEXT
           description: 'Ribbon SBC user password.'
@@ -3433,7 +4321,7 @@ zabbix_export:
           description: 'Sets the regex string of sync module name to be allowed in discovery.'
           config:
             type: TEXT
-            priority: '13'
+            priority: '16'
             section_name: Filters
             label: 'Include sync module name filter'
             description: 'Regex string to include sync module by name.'
@@ -3442,10 +4330,28 @@ zabbix_export:
           description: 'Sets the regex string of sync module name to be ignored in discovery.'
           config:
             type: TEXT
-            priority: '14'
+            priority: '17'
             section_name: Filters
             label: 'Exclude sync module name filter'
             description: 'Regex string to exclude sync module by name.'
+        - macro: '{$RIBBON.TRUNK.GROUP.DISCOVERY.NAME.MATCHES}'
+          value: '.*'
+          description: 'Sets the regex string of Trunk group name to be allowed in discovery.'
+          config:
+            type: TEXT
+            priority: '22'
+            section_name: Filters
+            label: 'Include Trunk group name filter'
+            description: 'Regex string to include Trunk group by name.'
+        - macro: '{$RIBBON.TRUNK.GROUP.DISCOVERY.NAME.NOT_MATCHES}'
+          value: CHANGE_IF_NEEDED
+          description: 'Sets the regex string of Trunk group name to be ignored in discovery.'
+          config:
+            type: TEXT
+            priority: '23'
+            section_name: Filters
+            label: 'Exclude Trunk group name filter'
+            description: 'Regex string to exclude Trunk group by name.'
         - macro: '{$RIBBON.URL}'
           description: 'Ribbon SBC API IP.'
           config:
@@ -3791,6 +4697,201 @@ zabbix_export:
                     - type: STRING
                       name: reference
                       value: AAAAD
+            - name: 'Ribbon: DNS'
+              widgets:
+                - type: svggraph
+                  name: Query
+                  width: '36'
+                  height: '6'
+                  fields:
+                    - type: STRING
+                      name: ds.0.color
+                      value: A1887F
+                    - type: STRING
+                      name: ds.0.items.0
+                      value: '''DNS *: Query'''
+                    - type: INTEGER
+                      name: legend_columns
+                      value: '1'
+                    - type: INTEGER
+                      name: legend_lines
+                      value: '6'
+                    - type: INTEGER
+                      name: legend_statistic
+                      value: '1'
+                    - type: STRING
+                      name: reference
+                      value: ECVDV
+                    - type: INTEGER
+                      name: righty
+                      value: '0'
+                - type: svggraph
+                  name: Timeouts
+                  'y': '6'
+                  width: '36'
+                  height: '6'
+                  fields:
+                    - type: STRING
+                      name: ds.0.color
+                      value: 1565C0
+                    - type: STRING
+                      name: ds.0.items.0
+                      value: 'DNS *: Timeouts'
+                    - type: INTEGER
+                      name: legend_columns
+                      value: '1'
+                    - type: INTEGER
+                      name: legend_lines
+                      value: '6'
+                    - type: INTEGER
+                      name: legend_statistic
+                      value: '1'
+                    - type: STRING
+                      name: reference
+                      value: OZIZA
+                    - type: INTEGER
+                      name: righty
+                      value: '0'
+                    - type: INTEGER
+                      name: simple_triggers
+                      value: '1'
+                - type: svggraph
+                  name: Errors
+                  x: '36'
+                  width: '36'
+                  height: '6'
+                  fields:
+                    - type: STRING
+                      name: ds.0.color
+                      value: FF5722
+                    - type: STRING
+                      name: ds.0.items.0
+                      value: 'DNS *: Errors'
+                    - type: INTEGER
+                      name: legend_columns
+                      value: '1'
+                    - type: INTEGER
+                      name: legend_lines
+                      value: '6'
+                    - type: INTEGER
+                      name: legend_statistic
+                      value: '1'
+                    - type: STRING
+                      name: reference
+                      value: MPGLZ
+                    - type: INTEGER
+                      name: righty
+                      value: '0'
+                - type: svggraph
+                  name: Connections
+                  x: '36'
+                  'y': '6'
+                  width: '36'
+                  height: '6'
+                  fields:
+                    - type: STRING
+                      name: ds.0.color
+                      value: 7E57C2
+                    - type: STRING
+                      name: ds.0.items.0
+                      value: 'DNS *: Tcp connection'
+                    - type: STRING
+                      name: ds.1.items.0
+                      value: 'DNS *: Tcp connection failed'
+                    - type: STRING
+                      name: ds.2.color
+                      value: FFD54F
+                    - type: STRING
+                      name: ds.2.items.0
+                      value: 'DNS *: Tcp connection torn down'
+                    - type: INTEGER
+                      name: legend_columns
+                      value: '1'
+                    - type: INTEGER
+                      name: legend_lines
+                      value: '6'
+                    - type: INTEGER
+                      name: legend_statistic
+                      value: '1'
+                    - type: STRING
+                      name: reference
+                      value: EAGUY
+                    - type: INTEGER
+                      name: righty
+                      value: '0'
+            - name: 'Ribbon: Trunk'
+              widgets:
+                - type: svggraph
+                  name: Calls
+                  width: '36'
+                  height: '6'
+                  fields:
+                    - type: STRING
+                      name: ds.0.color
+                      value: 3949AB
+                    - type: STRING
+                      name: ds.0.items.0
+                      value: 'Trunk *: Total available calls'
+                    - type: STRING
+                      name: ds.1.items.0
+                      value: 'Trunk *: Inbound calls usage'
+                    - type: STRING
+                      name: ds.2.color
+                      value: FFD54F
+                    - type: STRING
+                      name: ds.2.items.0
+                      value: 'Trunk *: Outbound calls usage'
+                    - type: INTEGER
+                      name: legend_columns
+                      value: '1'
+                    - type: INTEGER
+                      name: legend_lines
+                      value: '6'
+                    - type: INTEGER
+                      name: legend_statistic
+                      value: '1'
+                    - type: STRING
+                      name: reference
+                      value: NOKXU
+                    - type: INTEGER
+                      name: righty
+                      value: '0'
+                - type: svggraph
+                  name: Bandwidth
+                  x: '36'
+                  width: '36'
+                  height: '6'
+                  fields:
+                    - type: STRING
+                      name: ds.0.color
+                      value: 7CB342
+                    - type: STRING
+                      name: ds.0.items.0
+                      value: 'Trunk *: Bandwidth available'
+                    - type: STRING
+                      name: ds.1.color
+                      value: CC6600
+                    - type: STRING
+                      name: ds.1.items.0
+                      value: 'Trunk *: Bandwidth inbound usage'
+                    - type: STRING
+                      name: ds.2.items.0
+                      value: 'Trunk *: Bandwidth outbound usage'
+                    - type: INTEGER
+                      name: legend_columns
+                      value: '1'
+                    - type: INTEGER
+                      name: legend_lines
+                      value: '6'
+                    - type: INTEGER
+                      name: legend_statistic
+                      value: '1'
+                    - type: STRING
+                      name: reference
+                      value: ZETRZ
+                    - type: INTEGER
+                      name: righty
+                      value: '0'
       valuemaps:
         - uuid: 4d1dd88f5c48462fa55ba7bd73476cb7
           name: 'Ribbon: Call engine role'
@@ -3810,10 +4911,18 @@ zabbix_export:
               newvalue: haModeNto1
             - value: '2'
               newvalue: unknown
+        - uuid: 1262d32d602344e49fae29f64f6c2eb7
+          name: 'Ribbon: Trunk packet out detect state'
+          mappings:
+            - value: '0'
+              newvalue: packetOutageState
+            - value: '1'
+              newvalue: normal
+            - value: '2'
+              newvalue: unknown
   graphs:
     - uuid: 476512eb28de43c6bcc2bfdfc2240904
       name: 'Call statistics'
-      ymax_type_1: FIXED
       graph_items:
         - drawtype: GRADIENT_LINE
           color: 199C0D
@@ -3840,7 +4949,6 @@ zabbix_export:
             key: ribbon.system.call.concurrent
     - uuid: db7a698f6488496f8a1bbdb00545141e
       name: 'Call status'
-      ymax_type_1: FIXED
       graph_items:
         - drawtype: GRADIENT_LINE
           color: 199C0D
@@ -3888,7 +4996,6 @@ zabbix_export:
             key: ribbon.server.cpu.util
     - uuid: 9f0b5130421143f592f9d068d4e1c5f3
       name: 'Emergency call status'
-      ymax_type_1: FIXED
       graph_items:
         - drawtype: GRADIENT_LINE
           color: 199C0D
@@ -3903,7 +5010,6 @@ zabbix_export:
             key: ribbon.system.emergency.call.establishing
     - uuid: 1041f98ee1cf44d29fa37b7b716c6a53
       name: 'HPC queue'
-      ymax_type_1: FIXED
       graph_items:
         - drawtype: GRADIENT_LINE
           color: 199C0D
@@ -3939,7 +5045,6 @@ zabbix_export:
             key: ribbon.server.memory.util
     - uuid: 33b98206ab36464eb434307807227c9c
       name: 'Signalling call status'
-      ymax_type_1: FIXED
       graph_items:
         - drawtype: GRADIENT_LINE
           color: 199C0D
