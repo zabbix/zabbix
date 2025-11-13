@@ -55,7 +55,7 @@ class CWidgetItemHistory extends CWidget {
 				content_document.style.margin = '0px';
 				content_document.style.font = iframe_styles.font;
 
-				const resizeContainer = () => {
+				const resizeIframe = () => {
 					const height = Math.ceil(content_document.scrollHeight);
 					const width = Math.ceil(content_document.scrollWidth);
 
@@ -63,9 +63,9 @@ class CWidgetItemHistory extends CWidget {
 					iframe.style.width = `${width}px`;
 				};
 
-				resizeContainer();
+				resizeIframe();
 
-				iframe.resize_observer = new ResizeObserver(resizeContainer);
+				iframe.resize_observer = new ResizeObserver(resizeIframe);
 				iframe.resize_observer.observe(content_document.documentElement);
 			});
 		}
