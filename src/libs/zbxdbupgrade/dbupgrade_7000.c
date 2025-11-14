@@ -302,6 +302,7 @@ static int	DBpatch_7000020(void)
 
 static int	DBpatch_7000021(void)
 {
+	/* 2 - ZBX_FLAG_DISCOVERY_PROTOTYPE */
 	if (ZBX_DB_OK > zbx_db_execute(
 			"delete from httpstepitem"
 				" where itemid in ("
@@ -320,6 +321,7 @@ static int	DBpatch_7000021(void)
 
 static int	DBpatch_7000022(void)
 {
+	/* 2 - ZBX_FLAG_DISCOVERY_PROTOTYPE */
 	if (ZBX_DB_OK > zbx_db_execute(
 			"delete from httptestitem"
 				" where itemid in ("
@@ -338,6 +340,7 @@ static int	DBpatch_7000022(void)
 
 static int	DBpatch_7000023(void)
 {
+	/* 2 - ZBX_FLAG_DISCOVERY_PROTOTYPE */
 	if (ZBX_DB_OK > zbx_db_execute(
 			"delete from items"
 				" where hostid in ("
@@ -353,6 +356,7 @@ static int	DBpatch_7000023(void)
 
 static int	DBpatch_7000024(void)
 {
+	/* 2 - ZBX_FLAG_DISCOVERY_PROTOTYPE */
 	if (ZBX_DB_OK > zbx_db_execute(
 			"delete from httpstep_field"
 				" where httpstepid in ("
@@ -371,6 +375,7 @@ static int	DBpatch_7000024(void)
 
 static int	DBpatch_7000025(void)
 {
+	/* 2 - ZBX_FLAG_DISCOVERY_PROTOTYPE */
 	if (ZBX_DB_OK > zbx_db_execute(
 			"delete from httpstep"
 				" where httptestid in ("
@@ -386,6 +391,7 @@ static int	DBpatch_7000025(void)
 
 static int	DBpatch_7000026(void)
 {
+	/* 2 - ZBX_FLAG_DISCOVERY_PROTOTYPE */
 	if (ZBX_DB_OK > zbx_db_execute(
 			"delete from httptest_tag"
 				" where httptestid in ("
@@ -401,6 +407,7 @@ static int	DBpatch_7000026(void)
 
 static int	DBpatch_7000027(void)
 {
+	/* 2 - ZBX_FLAG_DISCOVERY_PROTOTYPE */
 	if (ZBX_DB_OK > zbx_db_execute(
 			"delete from httptest"
 				" where httptestid in ("
