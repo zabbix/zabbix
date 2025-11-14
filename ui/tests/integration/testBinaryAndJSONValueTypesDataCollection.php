@@ -191,6 +191,16 @@ class testBinaryAndJSONValueTypesDataCollection extends CIntegrationTest {
 						'key_' => 'JSON_TRAPPER',
 						'type' => ITEM_TYPE_TRAPPER,
 						'value_type' => ITEM_VALUE_TYPE_JSON
+					],
+					[
+						'name' => 'JSON_TRAPPER_PREPROC_THROTTLING',
+						'key_' => 'JSON_TRAPPER_PREPROC_THROTTLING',
+						'type' => ITEM_TYPE_TRAPPER,
+						'value_type' => ITEM_VALUE_TYPE_JSON,
+						'preprocessing' =>
+						[[
+							'type' => ZBX_PREPROC_THROTTLE_VALUE
+						]]
 					]
 				]
 			],
@@ -235,6 +245,16 @@ class testBinaryAndJSONValueTypesDataCollection extends CIntegrationTest {
 						'key_' => 'JSON_TRAPPER',
 						'type' => ITEM_TYPE_TRAPPER,
 						'value_type' => ITEM_VALUE_TYPE_JSON
+					],
+					[
+						'name' => 'JSON_TRAPPER_PREPROC_THROTTLING',
+						'key_' => 'JSON_TRAPPER_PREPROC_THROTTLING',
+						'type' => ITEM_TYPE_TRAPPER,
+						'value_type' => ITEM_VALUE_TYPE_JSON,
+						'preprocessing' =>
+						[[
+							'type' => ZBX_PREPROC_THROTTLE_VALUE
+						]]
 					]
 				]
 			]
@@ -318,18 +338,6 @@ class testBinaryAndJSONValueTypesDataCollection extends CIntegrationTest {
 						'value_type' => ITEM_VALUE_TYPE_JSON,
 						'delay' => '0s'
 				],
-				[
-						'name' => 'JSON_VALUE_TYPE_DEP_WITH_PREPROC_THROTTLING',
-						'key_' => 'JSON_VALUE_TYPE_DEP_WITH_PREPROC_THROTTLING',
-						'type' => ITEM_TYPE_DEPENDENT,
-						'master_itemid' => self::$itemids['agent:vfs.file.contents['.self::$file_name_json_with_image_for_json_item.',]'],
-						'value_type' => ITEM_VALUE_TYPE_JSON,
-						'delay' => '0s',
-						'preprocessing' =>
-						[[
-							'type' => ZBX_PREPROC_THROTTLE_VALUE
-						]]
-				]
 				]
 			]
 		, $result['hostids']);
@@ -444,6 +452,15 @@ class testBinaryAndJSONValueTypesDataCollection extends CIntegrationTest {
 
 		$this->sendSenderValue('agent', 'JSON_TRAPPER', self::$invalid_json);
 		$this->checkItemState('agent:JSON_TRAPPER', ITEM_STATE_NOTSUPPORTED);
+
+		$this->sendSenderValue('agent', 'JSON_TRAPPER', self::$json_with_image);
+		$active_data = $this->callUntilDataIsPresent('history.get', [
+			'itemids'	=>	self::$itemids['agent:JSON_TRAPPER_PREPROC_THROTTLING'],
+			'history'	=>	ITEM_VALUE_TYPE_JSON
+		]);
+
+		$json_result = self::normalize_json($response['result'][0]['value']);
+		$this->assertEquals(self::$json_image_normalized, $json_result);
 	}
 
 	/**
@@ -471,6 +488,15 @@ class testBinaryAndJSONValueTypesDataCollection extends CIntegrationTest {
 
 		$this->sendSenderValue('proxy_agent', 'JSON_TRAPPER', self::$invalid_json, self::COMPONENT_PROXY);
 		$this->checkItemState('proxy_agent:JSON_TRAPPER', ITEM_STATE_NOTSUPPORTED);
+
+		$this->sendSenderValue('proxy_agent', 'JSON_TRAPPER', self::$json_with_image);
+		$active_data = $this->callUntilDataIsPresent('history.get', [
+			'itemids'	=>	self::$itemids['proxy_agent:JSON_TRAPPER_PREPROC_THROTTLING'],
+			'history'	=>	ITEM_VALUE_TYPE_JSON
+		]);
+
+		$json_result = self::normalize_json($response['result'][0]['value']);
+		$this->assertEquals(self::$json_image_normalized, $json_result);
 	}
 
 	/**
@@ -511,15 +537,6 @@ class testBinaryAndJSONValueTypesDataCollection extends CIntegrationTest {
 		// Retrieve JSON item value type history data from API
 		$active_data = $this->callUntilDataIsPresent('history.get', [
 			'itemids'	=>	self::$itemids['agent:JSON_VALUE_TYPE_DEP_WITH_PREPROC'],
-			'history'	=>	ITEM_VALUE_TYPE_JSON
-		]);
-
-		$json_data_http_response = self::json_data_http_response;
-		$this->assertEquals($json_data_http_response, $active_data['result'][0]['value']);
-
-		// Retrieve JSON item value type history data from API
-		$active_data = $this->callUntilDataIsPresent('history.get', [
-			'itemids'	=>	self::$itemids['agent:JSON_VALUE_TYPE_DEP_WITH_PREPROC_THROTTLING'],
 			'history'	=>	ITEM_VALUE_TYPE_JSON
 		]);
 
