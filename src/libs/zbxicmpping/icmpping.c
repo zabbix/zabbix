@@ -1265,7 +1265,7 @@ int	zbx_ping(zbx_fping_host_t *hosts, int hosts_count, int requests_count, int p
 	int	ret;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() hosts_count:%d max_execution_time:%ds", __func__, hosts_count,
-			(int)max_execution_time);
+			max_execution_time);
 
 	if (NOTSUPPORTED == (ret = hosts_ping(hosts, hosts_count, requests_count, period, size, timeout, retries,
 			backoff, allow_redirect, rdns, max_execution_time, error, max_error_len)))
