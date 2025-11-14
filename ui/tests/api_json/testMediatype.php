@@ -98,13 +98,6 @@ class testMediatype extends CAPITest {
 					'token_url' => 'http://example123.com'
 				]],
 				'Invalid parameter "/1": the parameter "client_secret" is missing.'
-			],
-			'OAuth not accepting existing client_secret if authorization_url has been changed' => [
-				[[
-					'mediatypeid' => ':media_type:OAuth with media type SMTP',
-					'authorization_url' => 'http://example123.com'
-				]],
-				'Invalid parameter "/1": the parameter "client_secret" is missing.'
 			]
 		];
 	}

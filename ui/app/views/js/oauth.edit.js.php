@@ -26,18 +26,18 @@ window.oauth_edit_popup = new class {
 		this.dialogue = null;
 		this.form = null;
 		this.is_advanced_form = false;
+		this.token_url = null;
 		this.oauth_popup = null;
 		this.messages = {};
-		this.endpoints = {};
 	}
 
-	init({is_advanced_form, messages, endpoints}) {
+	init({is_advanced_form, messages, token_url}) {
 		this.overlay = overlays_stack.end();
 		this.dialogue = this.overlay.$dialogue[0];
 		this.form = this.overlay.$dialogue.$body[0].querySelector('form');
 		this.is_advanced_form = is_advanced_form;
+		this.token_url = token_url;
 		this.messages = messages;
-		this.endpoints = endpoints;
 
 		this.#initForm();
 		this.#initFormEvents();
@@ -126,13 +126,6 @@ window.oauth_edit_popup = new class {
 		if (target.matches('[name="authorization_mode"]')) {
 			this.#updateFieldsVisibility();
 		}
-		else if ((target.matches('[name="authorization_url"]') && target.value !== this.endpoints.authorization_url)
-				|| (target.matches('[name="token_url"]') && target.value !== this.endpoints.token_url)) {
-			if (this.form.querySelector('button[name="client_secret_button"]') !== null) {
-				this.form.querySelector('button[name="client_secret_button"]').click();
-			}
-			this.form.querySelector('.js-client-secret-warning').style.display = '';
-		}
 	}
 
 	#updateFieldsVisibility() {
@@ -187,6 +180,15 @@ window.oauth_edit_popup = new class {
 				.then((response) => {
 					if ('error' in response) {
 						reject(response.error);
+					}
+					else if ('token_url' in response.oauth && response.oauth.token_url !== this.token_url) {
+						if (this.form.querySelector('button[name="client_secret_button"]') !== null) {
+							this.form.querySelector('button[name="client_secret_button"]').click();
+						}
+						if (this.form.querySelector('.js-client-secret-warning')) {
+							this.form.querySelector('.js-client-secret-warning').style.display = '';
+						}
+						this.overlay.unsetLoading();
 					}
 					else {
 						resolve(response);
