@@ -305,6 +305,7 @@ class testDashboardItemValueWidget extends CWebTest {
 						$form->fill([$config => $state]);
 
 						foreach ($elements as $element)  {
+							$element = str_replace('/..', '', $element);
 							$this->assertTrue($form->getField($element)->isEnabled($state));
 						}
 					}
