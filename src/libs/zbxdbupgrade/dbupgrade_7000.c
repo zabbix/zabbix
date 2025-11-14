@@ -307,7 +307,8 @@ static int	DBpatch_7000021(void)
 				" where itemid in ("
 					" select itemid from items"
 					" where hostid in ("
-						" select ht.hostid from httptest ht,hosts h where ht.hostid=h.hostid and h.flags=2"
+						" select ht.hostid from httptest ht,hosts h"
+							" where ht.hostid=h.hostid and h.flags=2"
 					")"
 				")"))
 	{
@@ -324,7 +325,8 @@ static int	DBpatch_7000022(void)
 				" where itemid in ("
 					" select itemid from items"
 					" where hostid in ("
-						" select ht.hostid from httptest ht,hosts h where ht.hostid=h.hostid and h.flags=2"
+						" select ht.hostid from httptest ht,hosts h where"
+						" ht.hostid=h.hostid and h.flags=2"
 					")"
 				")"))
 	{
@@ -339,7 +341,8 @@ static int	DBpatch_7000023(void)
 	if (ZBX_DB_OK > zbx_db_execute(
 			"delete from items"
 				" where hostid in ("
-					" select ht.hostid from httptest ht,hosts h where ht.hostid=h.hostid and h.flags=2"
+					" select ht.hostid from httptest ht,hosts h where"
+					" ht.hostid=h.hostid and h.flags=2"
 				")"))
 	{
 		return FAIL;
@@ -355,7 +358,8 @@ static int	DBpatch_7000024(void)
 				" where httpstepid in ("
 					" select httpstepid from httpstep"
 					" where httptestid in ("
-						" select ht.httptestid from httptest ht,hosts h where ht.hostid=h.hostid and h.flags=2"
+						" select ht.httptestid from httptest ht,hosts h"
+							" where ht.hostid=h.hostid and h.flags=2"
 					")"
 				")"))
 	{
@@ -370,7 +374,8 @@ static int	DBpatch_7000025(void)
 	if (ZBX_DB_OK > zbx_db_execute(
 			"delete from httpstep"
 				" where httptestid in ("
-					" select ht.httptestid from httptest ht,hosts h where ht.hostid=h.hostid and h.flags=2"
+					" select ht.httptestid from httptest ht,hosts h"
+						" where ht.hostid=h.hostid and h.flags=2"
 				")"))
 	{
 		return FAIL;
@@ -384,7 +389,8 @@ static int	DBpatch_7000026(void)
 	if (ZBX_DB_OK > zbx_db_execute(
 			"delete from httptest_tag"
 				" where httptestid in ("
-					" select ht.httptestid from httptest ht,hosts h where ht.hostid=h.hostid and h.flags=2"
+					" select ht.httptestid from httptest ht,hosts h"
+						" where ht.hostid=h.hostid and h.flags=2"
 				")"))
 	{
 		return FAIL;
@@ -398,7 +404,8 @@ static int	DBpatch_7000027(void)
 	if (ZBX_DB_OK > zbx_db_execute(
 			"delete from httptest"
 				" where httptestid in ("
-					" select ht.httptestid from httptest ht,hosts h where ht.hostid=h.hostid and h.flags=2"
+					" select ht.httptestid from httptest ht,hosts h"
+						" where ht.hostid=h.hostid and h.flags=2"
 				")"))
 	{
 		return FAIL;
