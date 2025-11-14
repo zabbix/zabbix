@@ -21,6 +21,8 @@ require_once __DIR__.'/../../include/helpers/CDataHelper.php';
 
 /**
  * Base class for Value mappings function tests.
+ *
+ * @onBefore prepareData
  */
 class testFormValueMappings extends CWebTest {
 
@@ -36,7 +38,6 @@ class testFormValueMappings extends CWebTest {
 		];
 	}
 
-	const HOSTID = 99134;	// ID of the host for valuemap update.
 	const TEMPLATEID = 40000;	// ID of the template for valuemap update.
 	const UPDATE_VALUEMAP1 = 'Valuemap for update 1';
 	const UPDATE_VALUEMAP2 = 'Valuemap for update 2';
@@ -61,9 +62,13 @@ class testFormValueMappings extends CWebTest {
 		]
 	];
 
-	private static $previous_valuemap_name = self::UPDATE_VALUEMAP1;
+	protected static $previous_valuemap_name = self::UPDATE_VALUEMAP1;
+	protected static $previous_class = null;
+	protected static $hostids;
 
-	private static $previous_class = null;
+	public static function prepareData() {
+		self::$hostids = CDataHelper::get('HostAvailabilityWidget.hostids');
+	}
 
 	/**
 	 * Function that checks the layout of the Value mappings tab in Host or Template configuration forms.
@@ -134,7 +139,7 @@ class testFormValueMappings extends CWebTest {
 	public function checkClone($source) {
 		// Create a clone of an existing host/template with value mappings.
 		$this->openValueMappingTab($source, true, false);
-		$this->query('button', 'Clone')->one()->click();
+		$this->query('button', 'Clone')->one()->click()->waitUntilNotVisible();
 		$form = COverlayDialogElement::find()->asForm()->waitUntilReady()->one();
 		$form->getField(ucfirst($source).' name')->fill('Clone Valuemap Test');
 		$form->submit();
@@ -624,8 +629,8 @@ class testFormValueMappings extends CWebTest {
 						[
 							'action' => USER_ACTION_UPDATE,
 							'index' => 0,
-							'type' => 'in range',
 							'value' => '5---10',
+							'type' => 'in range',
 							'newvalue' => 'several symbols'
 						]
 					],
@@ -743,8 +748,8 @@ class testFormValueMappings extends CWebTest {
 						[
 							'action' => USER_ACTION_UPDATE,
 							'index' => 0,
-							'type' => 'in range',
 							'value' => '1-10',
+							'type' => 'in range',
 							'newvalue' => ''
 						]
 					],
@@ -762,8 +767,8 @@ class testFormValueMappings extends CWebTest {
 						[
 							'action' => USER_ACTION_UPDATE,
 							'index' => 0,
-							'type' => 'is less than or equals',
 							'value' => '11',
+							'type' => 'is less than or equals',
 							'newvalue' => ''
 						]
 					],
@@ -781,8 +786,8 @@ class testFormValueMappings extends CWebTest {
 						[
 							'action' => USER_ACTION_UPDATE,
 							'index' => 0,
-							'type' => 'is greater than or equals',
 							'value' => '12',
+							'type' => 'is greater than or equals',
 							'newvalue' => ''
 						]
 					],
@@ -800,8 +805,8 @@ class testFormValueMappings extends CWebTest {
 						[
 							'action' => USER_ACTION_UPDATE,
 							'index' => 0,
-							'type' => 'regexp',
 							'value' => 'regexp',
+							'type' => 'regexp',
 							'newvalue' => ''
 						]
 					],
@@ -875,7 +880,7 @@ class testFormValueMappings extends CWebTest {
 		$this->query(($action === 'create')
 			? 'name:valuemap_add'
 			: 'link:'.($expected === TEST_GOOD ? self::$previous_valuemap_name : self::UPDATE_VALUEMAP2
-		))->one()->click();
+		))->WaitUntilVisible()->one()->click();
 
 		// Fill in the name of the valuemap and the parameters of its mappings.
 		$dialog = COverlayDialogElement::find()->waitUntilVisible()->all()->last();
@@ -1002,7 +1007,7 @@ class testFormValueMappings extends CWebTest {
 	 * @return CFormElement|CFluidFormElemt    $form
 	 */
 	private function openValueMappingTab($source, $login = true, $open_tab = true) {
-		$sourceid = ($source === 'host') ? self::HOSTID : self::TEMPLATEID;
+		$sourceid = ($source === 'host') ? self::$hostids['Available host'] : self::TEMPLATEID;
 		if ($login) {
 			$this->page->login();
 		}

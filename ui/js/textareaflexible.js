@@ -79,6 +79,7 @@
 			// Calculation of scrollHeight property in firefox do not count placeholder dimension when value is empty.
 			const $clone = $textarea.clone()
 				.css('position', 'absolute')
+				.attr('data-temp-field', true)
 				.insertAfter($textarea)
 				.height(0)
 				.val($textarea.attr('placeholder'));

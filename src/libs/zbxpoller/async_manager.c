@@ -19,6 +19,7 @@
 #include "zbxstr.h"
 #include "zbxalgo.h"
 #include "zbxpoller.h"
+#include "zbxnix.h"
 
 ZBX_PTR_VECTOR_IMPL(interface_status, zbx_interface_status_t *)
 ZBX_PTR_VECTOR_IMPL(poller_item, zbx_poller_item_t *)
@@ -47,6 +48,10 @@ zbx_async_manager_t	*zbx_async_manager_create(int workers_num, zbx_async_notify_
 
 	manager->workers_num = workers_num;
 	manager->workers = (zbx_async_worker_t *)zbx_calloc(NULL, (size_t)workers_num, sizeof(zbx_async_worker_t));
+
+	sigset_t	orig_mask;
+
+	zbx_block_thread_signals(&orig_mask);
 
 	for (int i = 0; i < workers_num; i++)
 	{
@@ -93,6 +98,8 @@ out:
 
 		manager = NULL;
 	}
+
+	zbx_unblock_signals(&orig_mask);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() ret:%s error:%s", __func__, zbx_result_string(ret),
 			ZBX_NULL2EMPTY_STR(*error));
@@ -188,6 +195,11 @@ void	zbx_async_manager_interfaces_flush(zbx_async_manager_t *manager, zbx_hashse
 	async_task_queue_unlock(&manager->queue);
 
 	zbx_hashset_clear(interfaces);
+}
+
+void	zbx_interface_status_clean_wrapper(void *data)
+{
+	zbx_interface_status_clean((zbx_interface_status_t *)data);
 }
 
 void	zbx_interface_status_clean(zbx_interface_status_t *interface_status)

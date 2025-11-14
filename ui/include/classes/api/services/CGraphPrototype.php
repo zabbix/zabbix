@@ -119,7 +119,7 @@ class CGraphPrototype extends CGraphGeneral {
 				' LEFT JOIN permission p1 ON hh1.hgsetid=p1.hgsetid'.
 					' AND p1.ugsetid=p.ugsetid'.
 				' WHERE g.graphid=gi1.graphid'.
-					' AND p1.permission IS NULL'.
+					' AND p1.hgsetid IS NULL'.
 			')';
 		}
 

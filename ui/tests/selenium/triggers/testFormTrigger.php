@@ -1231,7 +1231,7 @@ class testFormTrigger extends CLegacyWebTest {
 					$this->zbxTestAssertElementText("//a[text()='$description']/ancestor::tr/td[6]", $expression);
 					break;
 				case TEST_BAD:
-					// TODO: All error checks should be moced to inline validation once DEV-4259 is fixed.
+					// TODO: All error checks should be mocked to inline validation once DEV-4259 is fixed.
 					if (array_key_exists('inline_errors', $data)) {
 						$this->assertInlineError($dialog->asForm(), $data['inline_errors']);
 					}
@@ -1376,8 +1376,8 @@ class testFormTrigger extends CLegacyWebTest {
 	 * @param string $name name of a host or template where triggers are opened
 	 */
 	private function filterEntriesAndOpenTriggers($name, $form) {
-		$table = $this->query('xpath://table[@class="list-table"]')->asTable()->one();
 		$this->query('button:Reset')->one()->click();
+		$table = $this->query('xpath://table[@class="list-table"]')->asTable()->one();
 		$form->fill(['Name' => $name]);
 		$this->query('button:Apply')->one()->waitUntilClickable()->click();
 		$table->waitUntilReloaded();

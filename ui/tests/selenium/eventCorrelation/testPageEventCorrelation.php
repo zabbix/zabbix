@@ -561,10 +561,12 @@ class testPageEventCorrelation extends CWebTest {
 	public function testPageEventCorrelation_Filter($data) {
 		$this->page->login()->open('zabbix.php?action=correlation.list');
 		$form = $this->query('name:zbx_filter')->asForm()->waitUntilVisible()->one();
+		$table = $this->getTable();
 
 		// Fill filter fields if such present in data provider.
 		$form->fill(CTestArrayHelper::get($data, 'filter'));
 		$form->submit();
+		$table->waitUntilReloaded();
 		$this->page->waitUntilReady();
 
 		// Check that expected Event correlations are returned in the list.

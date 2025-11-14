@@ -77,5 +77,6 @@ void	zbx_wildcard_minimize(char *str);
 int	zbx_wildcard_match(const char *value, const char *wildcard);
 
 void	zbx_init_regexp_env(void);
+void	zbx_deinit_regexp_env(void);
 
 #endif /* ZABBIX_ZBXREGEXP_H */

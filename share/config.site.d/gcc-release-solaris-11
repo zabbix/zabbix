@@ -1,0 +1,16 @@
+#!/bin/bash
+
+if [ -z "$CC" ]
+then
+	CC=gcc
+fi
+
+
+if [ -z "$CFLAGS" ]
+then
+	CFLAGS="-std=gnu99"
+	CFLAGS+=" -m64"
+	CFLAGS+=" -O2"
+	CFLAGS+=" -fPIE"
+	CFLAGS+=" -D_FORTIFY_SOURCE=1"
+fi

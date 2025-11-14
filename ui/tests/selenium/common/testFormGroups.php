@@ -354,7 +354,7 @@ class testFormGroups extends CWebTest {
 	 * Update group without changing data.
 	 *
 	 * @param string  $name        group name to be opened for check
-	 * @param bollean $discovered  discovered host group or not
+	 * @param boolean $discovered  discovered host group or not
 	 */
 	public function simpleUpdate($name, $discovered = false) {
 		$old_hash = CDBHelper::getHash(self::GROUPS_SQL);
@@ -412,7 +412,7 @@ class testFormGroups extends CWebTest {
 
 		$form = $this->openForm($data['name'], CTestArrayHelper::get($data, 'discovered', false));
 		$footer = COverlayDialogElement::find()->one()->waitUntilReady()->getFooter();
-		$footer->query('button:Clone')->one()->waitUntilClickable()->click();
+		$footer->query('button:Clone')->one()->waitUntilClickable()->click()->waitUntilNotVisible();
 		$form->invalidate();
 
 		// Check that the group creation form is open after cloning.
@@ -492,7 +492,7 @@ class testFormGroups extends CWebTest {
 
 		if (in_array($data['action'], ['Clone', 'Delete'])) {
 			COverlayDialogElement::find()->one()->waitUntilReady()->getFooter()->query('button', $data['action'])
-					->one()->click();
+					->one()->waitUntilClickable()->click();
 		}
 
 		if ($data['action'] === 'Delete') {

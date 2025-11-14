@@ -16,6 +16,7 @@ package pdh
 
 import (
 	"fmt"
+	"runtime"
 	"strconv"
 	"syscall"
 	"unsafe"
@@ -25,13 +26,8 @@ import (
 	"golang.zabbix.com/sdk/log"
 )
 
-var ObjectsNames map[string]string
-
-type sysCounter struct {
-	name  string
-	index string
-}
-
+// The following constants define the types of objects and counters
+// used for performance monitoring.
 const (
 	ObjectSystem = iota
 	ObjectProcessor
@@ -41,9 +37,21 @@ const (
 	CounterSystemUptime
 	ObjectTerminalServices
 	CounterTotalSessions
+	CounterActiveSessions
 )
 
-var sysCounters []sysCounter = []sysCounter{
+// HKEY_PERFORMANCE_TEXT is a handle to the registry key containing performance counter
+// names in English. The name follows a legacy pattern to align with the Windows API.
+const HKEY_PERFORMANCE_TEXT = 0x80000050 //nolint:revive
+
+// HKEY_PERFORMANCE_NLSTEXT is a handle to the registry key containing performance counter
+// names in the system's default language. The name follows a legacy pattern to align with the Windows API.
+const HKEY_PERFORMANCE_NLSTEXT = 0x80000060 //nolint:revive
+
+// ObjectsNames maps English performance object names to their localized counterparts.
+var ObjectsNames map[string]string //nolint:gochecknoglobals // legacy implementation
+
+var sysCounters = []sysCounter{ //nolint:gochecknoglobals // this is filled once at startup
 	{name: "System"},
 	{name: "Processor"},
 	{name: "Processor Information"},
@@ -52,10 +60,13 @@ var sysCounters []sysCounter = []sysCounter{
 	{name: "System Up Time"},
 	{name: "Terminal Services"},
 	{name: "Total Sessions"},
+	{name: "Active Sessions"},
 }
 
-const HKEY_PERFORMANCE_TEXT = 0x80000050
-const HKEY_PERFORMANCE_NLSTEXT = 0x80000060
+type sysCounter struct {
+	name  string
+	index string
+}
 
 type CounterPathElements struct {
 	MachineName    string
@@ -217,43 +228,60 @@ func ConvertPath(path string) (outPath string, err error) {
 		if objectName, err = win32.PdhLookupPerfNameByIndex(int(objectIndex)); err != nil {
 			return
 		}
-		elements.ObjectName = uintptr(unsafe.Pointer(windows.StringToUTF16Ptr(objectName)))
+		elements.ObjectName = uintptr(unsafe.Pointer(windows.StringToUTF16Ptr(objectName))) // safe usage due to runtime.KeepAlive(objectName)
 	}
 	if counterErr == nil {
 		if counterName, err = win32.PdhLookupPerfNameByIndex(int(counterIndex)); err != nil {
 			return
 		}
-		elements.CounterName = uintptr(unsafe.Pointer(windows.StringToUTF16Ptr(counterName)))
+		elements.CounterName = uintptr(unsafe.Pointer(windows.StringToUTF16Ptr(counterName))) // safe usage due to runtime.KeepAlive(counterName)
 	}
 
-	return win32.PdhMakeCounterPath(elements)
+	path, err = win32.PdhMakeCounterPath(elements)
+	if err != nil {
+		return
+	}
+
+	runtime.KeepAlive(counterName)
+	runtime.KeepAlive(objectName)
+
+	return path, nil
 }
 
-func uft16PtrFromStringZ(s string) (ptr uintptr, err error) {
-	if s == "" {
+func uft16PtrFromStringZ(s *string) (ptr uintptr, err error) {
+	if s == nil || *s == "" {
 		return 0, nil
 	}
-	p, err := syscall.UTF16PtrFromString(s)
+	p, err := syscall.UTF16PtrFromString(*s)
 	return uintptr(unsafe.Pointer(p)), err
 }
 
-func MakePath(elements *CounterPathElements) (path string, err error) {
+func MakePath(elements *CounterPathElements) (string, error) {
+	var err error
+
 	var cpe win32.PDH_COUNTER_PATH_ELEMENTS
-	if cpe.MachineName, err = uft16PtrFromStringZ(elements.MachineName); err != nil {
-		return
+	if cpe.MachineName, err = uft16PtrFromStringZ(&elements.MachineName); err != nil {
+		return "", err
 	}
-	if cpe.ObjectName, err = uft16PtrFromStringZ(elements.ObjectName); err != nil {
-		return
+	if cpe.ObjectName, err = uft16PtrFromStringZ(&elements.ObjectName); err != nil {
+		return "", err
 	}
-	if cpe.InstanceName, err = uft16PtrFromStringZ(elements.InstanceName); err != nil {
-		return
+	if cpe.InstanceName, err = uft16PtrFromStringZ(&elements.InstanceName); err != nil {
+		return "", err
 	}
-	if cpe.ParentInstance, err = uft16PtrFromStringZ(elements.ParentInstance); err != nil {
-		return
+	if cpe.ParentInstance, err = uft16PtrFromStringZ(&elements.ParentInstance); err != nil {
+		return "", err
 	}
-	if cpe.CounterName, err = uft16PtrFromStringZ(elements.CounterName); err != nil {
-		return
+	if cpe.CounterName, err = uft16PtrFromStringZ(&elements.CounterName); err != nil {
+		return "", err
 	}
 	cpe.InstanceIndex = uint32(elements.InstanceIndex)
-	return win32.PdhMakeCounterPath(&cpe)
+
+	path, err := win32.PdhMakeCounterPath(&cpe)
+	if err != nil {
+		return "", err
+	}
+
+	runtime.KeepAlive(elements)
+	return path, nil
 }

@@ -64,10 +64,33 @@ class CWidgetFieldDataSet extends CWidgetField {
 			]]);
 	}
 
+	public function getValue() {
+		$values = parent::getValue();
+
+		foreach ($values as &$value) {
+			if ($value['dataset_type'] != self::DATASET_TYPE_SINGLE_ITEM) {
+				continue;
+			}
+
+			foreach (array_keys($value['itemids']) as $i) {
+				if (!array_key_exists($i, $value['type'])) {
+					$value['type'][$i] = self::ITEM_TYPE_NORMAL;
+				}
+			}
+		}
+		unset($value);
+
+		return $values;
+	}
+
 	public function setValue($value): self {
 		$data_sets = [];
 
 		foreach ((array) $value as $data_set) {
+			if (array_key_exists('itemids', $data_set)) {
+				$data_set['itemids'] = array_values($data_set['itemids']);
+			}
+
 			$data_sets[] = $data_set + self::getDefaults();
 		}
 
@@ -118,16 +141,15 @@ class CWidgetFieldDataSet extends CWidgetField {
 			return [];
 		}
 
-		$errors = [];
 		$total_item_count = 0;
 
 		$validation_rules = $this->getValidationRules($strict);
 		$value = $this->getValue();
 		$label = $this->getErrorLabel();
 
-		if (!count($value)) {
+		if (!$value) {
 			if (!CApiInputValidator::validate($validation_rules, $value, $label, $error)) {
-				$errors[] = $error;
+				return [$error];
 			}
 		}
 		else {
@@ -162,13 +184,18 @@ class CWidgetFieldDataSet extends CWidgetField {
 			}
 
 			if (!CApiInputValidator::validate($validation_rules_by_type, $data, $label.'/'.($index + 1), $error)) {
-				$errors[] = $error;
-				break;
+				return [$error];
 			}
 
 			if ($data['dataset_type'] == self::DATASET_TYPE_SINGLE_ITEM) {
 				foreach ($data['itemids'] as $i => &$item_spec) {
 					if ($item_spec == 0) {
+						if ($data['references'][$i] === '') {
+							return [_s('Invalid parameter "%1$s": %2$s.', $label.'/'.($index + 1),
+								_('referred widget is unavailable')
+							)];
+						}
+
 						$item_spec = [CWidgetField::FOREIGN_REFERENCE_KEY => $data['references'][$i]];
 					}
 				}
@@ -180,24 +207,20 @@ class CWidgetFieldDataSet extends CWidgetField {
 		unset($data);
 
 		if ($total_item_count > 1) {
-			$errors[] = _('Cannot add more than one item with type "Total" to the chart.');
+			return [_('Cannot add more than one item with type "Total" to the chart.')];
 		}
 
 		if ($total_item_count > 0) {
 			foreach ($value as $data) {
 				if ($data['dataset_aggregation'] !== AGGREGATE_NONE) {
-					$errors[] =
-						_('Cannot set "Data set aggregation" when item with type "Total" is added to the chart.');
-					break;
+					return [_('Cannot set "Data set aggregation" when item with type "Total" is added to the chart.')];
 				}
 			}
 		}
 
-		if (!$errors) {
-			$this->setValue($value);
-		}
+		$this->setValue($value);
 
-		return $errors;
+		return [];
 	}
 
 	public function toApi(array &$widget_fields = []): void {

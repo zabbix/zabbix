@@ -203,7 +203,7 @@ class testDashboardSlaReportWidget extends testSlaReport {
 			'buttons' => ['Filter', 'Reset', 'Cancel'],
 			'check_row' => [
 				'Name' => 'Simple actions service',
-				'Tags' => 'problem: falsetest: test789',
+				'Tags' => "problem: false\ntest: test789",
 				'Problem tags' => 'problem: true'
 			]
 		];
@@ -1998,7 +1998,10 @@ class testDashboardSlaReportWidget extends testSlaReport {
 					],
 					'reporting_period' => 'Daily',
 					'equivalent_timestamps' => [
-						'From' => date('Y-m-d', strtotime('first day of this month'))
+						'From' => [
+							'format' => 'Y-m-d',
+							'string' => 'first day of this month'
+						]
 					]
 				]
 			],
@@ -2077,7 +2080,10 @@ class testDashboardSlaReportWidget extends testSlaReport {
 					],
 					'reporting_period' => 'Daily',
 					'equivalent_timestamps' => [
-						'To' => date('Y-m-d', strtotime('last day of this month'))
+						'To' => [
+							'format' => 'Y-m-d',
+							'string' => 'last day of this month'
+						]
 					]
 				]
 			],
@@ -2131,24 +2137,14 @@ class testDashboardSlaReportWidget extends testSlaReport {
 					],
 					'reporting_period' => 'Monthly',
 					'equivalent_timestamps' => [
-						'From' => date('Y-m', strtotime('first day of this month')).' - 1 month'
+						'From' => [
+							'format' => 'Y-m',
+							'string' => 'first day of this month',
+							'additional_string' => ' - 1 month'
+						]
 					]
 				]
 			],
-			// TODO: uncomment the below case when ZBX-21821 is fixed.
-//			[
-//				[
-//					'fields' => [
-//						'SLA' => 'SLA Monthly',
-//						'To' => 'now/M+1M',
-//						'Show periods' => 3
-//					],
-//					'reporting_period' => 'Monthly',
-//					'equivalent_timestamps' => [
-//						'To' => date('Y-m', strtotime('last day of this month')).' + 1 month'
-//					]
-//				]
-//			],
 			[
 				[
 					'fields' => [
@@ -2216,6 +2212,13 @@ class testDashboardSlaReportWidget extends testSlaReport {
 			$data_for_period = $data;
 			if (array_key_exists('equivalent_timestamps', $data)) {
 				foreach ($data_for_period['equivalent_timestamps'] as $field => $value) {
+					if (is_array($value)) {
+						$additional_string = (array_key_exists('additional_string', $value))
+							? $value['additional_string']
+							: '';
+						$value = date($value['format'], strtotime($value['string'])).$additional_string;
+					}
+
 					$data_for_period['fields'][$field] = $value;
 				}
 			}
@@ -2346,6 +2349,15 @@ class testDashboardSlaReportWidget extends testSlaReport {
 				'Annually' => 'years'
 			];
 			$multiplier = ($data['reporting_period'] === 'Quarterly') ? 3 : 1;
+
+			/**
+			 * For monthly, quarterly and annual reporting periods the "days" related information is not needed,
+			 * and even causes issues when tests run at the end of the month. Therefore, for this type of period the
+			 * "days" related information can be discarded.
+			 */
+			if (in_array($data['reporting_period'], ['Monthly', 'Quarterly', 'Annually'])) {
+				$data['fields']['From'] = date('Y-m', strtotime($data['fields']['From']));
+			}
 
 			$to_date = date('Y-m-d', strtotime($data['fields']['From'].' + '.($multiplier * ($show_periods - 1)).
 					' '.$units[$data['reporting_period']])

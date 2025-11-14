@@ -162,32 +162,40 @@ class CWidgetHoneycomb extends CWidget {
 		this.#cells_data.clear();
 		response.cells.forEach(cell => this.#cells_data.set(cell.itemid, cell));
 
-		if (!this.hasEverUpdated() && this.isReferred()) {
-			const selected_cell = this.#getDefaultSelectable();
+		if (this.isReferred() && (this.isFieldsReferredDataUpdated() || !this.hasEverUpdated())) {
+			if (this.#selected_itemid === null || (!this.#hasSelectable() && !this.#selectItemidByKey())) {
+				const selected_cell = this.#getDefaultSelectable();
 
-			if (selected_cell !== null) {
-				this.#selected_hostid = selected_cell.hostid;
-				this.#selected_itemid = selected_cell.itemid;
-				this.#selected_key_ = this.#cells_data.get(this.#selected_itemid).key_;
-
-				this.#honeycomb.selectCell(this.#selected_itemid);
-				this.#broadcast();
-			}
-		}
-		else if (this.#selected_itemid !== null) {
-			if (!this.#cells_data.has(this.#selected_itemid)) {
-				for (let [itemid, cell] of this.#cells_data) {
-					if (cell.key_ === this.#selected_key_) {
-						this.#selected_itemid = itemid;
-
-						this.#broadcast();
-						break;
-					}
+				if (selected_cell !== null) {
+					this.#selected_hostid = selected_cell.hostid;
+					this.#selected_itemid = selected_cell.itemid;
+					this.#selected_key_ = this.#cells_data.get(this.#selected_itemid).key_;
 				}
 			}
 
 			this.#honeycomb.selectCell(this.#selected_itemid);
+			this.#broadcast();
 		}
+		else if (this.#selected_itemid !== null) {
+			if (!this.#hasSelectable() && this.#selectItemidByKey()) {
+				this.#broadcast();
+			}
+
+			this.#honeycomb.selectCell(this.#selected_itemid);
+		}
+	}
+
+	#selectItemidByKey() {
+		for (let [itemid, cell] of this.#cells_data) {
+			if (cell.key_ === this.#selected_key_) {
+				this.#selected_itemid = itemid;
+				this.#selected_hostid = cell.hostid;
+
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	#broadcast() {
@@ -203,6 +211,10 @@ class CWidgetHoneycomb extends CWidget {
 		return this.#honeycomb.getCellsData().length > 0
 			? this.#honeycomb.getCellsData()[0]
 			: null;
+	}
+
+	#hasSelectable() {
+		return this.#cells_data.has(this.#selected_itemid);
 	}
 
 	onReferredUpdate() {

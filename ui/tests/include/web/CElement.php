@@ -614,9 +614,7 @@ class CElement extends CBaseElement implements IWaitable {
 			throw new Exception('Cannot wait for element reload on element selected in multi-element query.');
 		}
 
-		$this->waitUntilStalled($timeout, true);
-
-		return $this;
+		return $this->waitUntilStalled($timeout, true);
 	}
 
 	/**
@@ -642,6 +640,8 @@ class CElement extends CBaseElement implements IWaitable {
 
 					return !$element->isStalled();
 				}
+
+				return false;
 			}
 			catch (Exception $e) {
 				// Code is not missing here.
@@ -687,6 +687,10 @@ class CElement extends CBaseElement implements IWaitable {
 			return $this->asDropdown($options);
 		}
 
+		if ($tag === 'z-color-picker') {
+			return $this->asColorPicker($options);
+		}
+
 		if ($tag === 'table') {
 			return $this->asTable($options);
 		}
@@ -716,10 +720,6 @@ class CElement extends CBaseElement implements IWaitable {
 
 		if (in_array('range-control', $class) || in_array('calendar-control', $class)) {
 			return $this->asCompositeInput($options);
-		}
-
-		if (in_array('color-picker', $class)) {
-			return $this->asColorPicker($options);
 		}
 
 		if (in_array('multilineinput-control', $class)) {

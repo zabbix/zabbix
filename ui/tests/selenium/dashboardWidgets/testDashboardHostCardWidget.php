@@ -1109,7 +1109,7 @@ class testDashboardHostCardWidget extends testWidgets {
 					],
 					'Monitoring' => [
 						'Dashboards' => 8,
-						'Latest data' => 288,
+						'Latest data' => 291,
 						'Graphs' => 29,
 						'Web' => 1
 					],
@@ -1247,7 +1247,7 @@ class testDashboardHostCardWidget extends testWidgets {
 					],
 					'Monitoring' => [
 						'Dashboards' => 4,
-						'Latest data' => 122,
+						'Latest data' => 125,
 						'Graphs' => 8,
 						'Web' => 0
 					]
@@ -1583,6 +1583,11 @@ class testDashboardHostCardWidget extends testWidgets {
 		$data['url'] = str_replace('{hostid}', self::$hostid, $data['url']);
 		$this->assertEquals(PHPUNIT_URL.$data['url'], $this->page->getCurrentUrl());
 		$this->page->assertTitle($data['title']);
+
+		// Unstable test on Jenkins, graphs page opens slow and loose session before next test.
+		if (CTestArrayHelper::get($data, 'link') === 'Graphs') {
+			$this->page->open('browserwarning.php');
+		}
 	}
 
 	public static function getCancelData() {

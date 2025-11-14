@@ -22,24 +22,15 @@
 $this->enableLayoutModes();
 $this->setLayoutMode(ZBX_LAYOUT_KIOSKMODE);
 
-$error_title = CMessageHelper::getTitle();
-$errors = CMessageHelper::getMessages();
-CMessageHelper::clear();
-
 $body = new CDiv();
 
-if ($errors || array_key_exists('raw_response', $data['tokens'])) {
-	$show_details = true;
-
-	if ($data && array_key_exists('raw_response', $data['tokens'])) {
-		$errors[] = ['message' => [_('Response'), new CPre($data['tokens']['raw_response'])]];
-		$show_details = false;
-	}
-
-	$body->addItem(makeMessageBox(ZBX_STYLE_MSG_BAD, $errors, $error_title, false, $show_details));
+if (array_key_exists('tokens', $data) && array_key_exists('access_token', $data['tokens'])) {
+	$body->addItem(
+		new CScriptTag('window.opener.postMessage('.json_encode($data['tokens']).', window.location.origin);')
+	);
 }
 else {
-	$body->addItem(new CScriptTag('window.opener.postMessage('.json_encode($data['tokens']).', window.location.origin);'));
+	$body->addItem(getMessages(false, _('Cannot get authentication tokens'), false));
 }
 
 $body->show();

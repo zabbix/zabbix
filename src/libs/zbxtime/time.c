@@ -37,6 +37,26 @@ double	zbx_time(void)
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: Nanoseconds should always be in range 0 <= ns < 1'000'000'000     *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_timespec_normalize(zbx_timespec_t *ts)
+{
+	while (1000000000 <= ts->ns)
+	{
+		ts->sec++;
+		ts->ns -= 1000000000;
+	}
+
+	while (0 > ts->ns)
+	{
+		ts->sec--;
+		ts->ns += 1000000000;
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: Gets the current time.                                            *
  *                                                                            *
  * Comments: Time in seconds since midnight (00:00:00),                       *
@@ -289,11 +309,21 @@ static struct tm	*zbx_localtime_r(const time_t *time)
 	time_t					time_zerro = (time_t)0;
 	static ZBX_THREAD_LOCAL struct tm	tm_safe;
 
+#if defined(_WINDOWS) || defined(__MINGW32__)
+	struct tm	*tm;
+
+	if (NULL == (tm = localtime(time)))
+	{
+		tm = localtime(&time_zerro);
+	}
+	tm_safe = *tm;
+#else
 	if (NULL == localtime_r(time, &tm_safe))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "Wrong time value " ZBX_FS_TIME_T, (zbx_fs_time_t)(*time));
 		localtime_r(&time_zerro, &tm_safe);
 	}
+#endif
 
 	return &tm_safe;
 }

@@ -123,6 +123,7 @@ class testWidgets extends CWebTest {
 
 		// Fill the host name and check the table.
 		$items_dialog->query('class:multiselect-control')->asMultiselect()->one()->fill(self::HOST_ALL_ITEMS);
+		$items_dialog->query('button:Select')->one()->waitUntilStalled();
 		$table->waitUntilReloaded();
 		$items_dialog->query('button:Select')->waitUntilClickable();
 		$this->assertTableDataColumn($item_types, 'Name', self::TABLE_SELECTOR);
@@ -346,9 +347,8 @@ class testWidgets extends CWebTest {
 	 */
 	public function checkColorPickerState($data) {
 		if (CTestArrayHelper::get($data, 'invalid_color')) {
-			$color_picker = $this->query('class:color-picker-dialog')->one()->asColorPicker();
-			$this->assertTrue($color_picker->isSubmittionDisabled());
-			$color_picker->close();
+			$this->assertTrue(CColorPickerElement::isSubmitable(false));
+			CColorPickerElement::close();
 		}
 	}
 }

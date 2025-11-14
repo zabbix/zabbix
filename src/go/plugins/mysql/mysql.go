@@ -30,7 +30,6 @@ import (
 const (
 	sqlExt     = ".sql"
 	pluginName = "Mysql"
-	hkInterval = 10
 )
 
 // Plugin inherits plugin.Base and store plugin-specific data.
@@ -69,7 +68,7 @@ func (p *Plugin) Export(key string, rawParams []string, _ plugin.ContextProvider
 		return nil, zbxerr.ErrorUnsupportedMetric
 	}
 
-	conn, err := p.connMgr.GetConnection(*uri, params)
+	conn, err := p.connMgr.GetConnection(uri, params)
 	if err != nil {
 		// Special logic of processing connection errors should be used if mysql.ping is requested
 		// because it must return pingFailed if any error occurred.
@@ -94,14 +93,15 @@ func (p *Plugin) Export(key string, rawParams []string, _ plugin.ContextProvider
 
 // Start implements the Runner interface and performs initialization when plugin is activated.
 func (p *Plugin) Start() {
-	p.connMgr = NewConnManager(
-		time.Duration(p.options.KeepAlive)*time.Second,
-		time.Duration(p.options.Timeout)*time.Second,
-		time.Duration(p.options.CallTimeout)*time.Second,
-		hkInterval*time.Second,
-		p.setCustomQuery(),
-		p.Logger,
-	)
+	options := &connectionManagerOptions{
+		keepAlive:      time.Duration(p.options.KeepAlive) * time.Second,
+		connectTimeout: time.Duration(p.options.Timeout) * time.Second,
+		callTimeout:    time.Duration(p.options.CallTimeout) * time.Second,
+		queryStorage:   p.setCustomQuery(),
+		logger:         p.Logger,
+	}
+
+	p.connMgr = NewConnManager(options)
 }
 
 func (p *Plugin) setCustomQuery() yarn.Yarn {
