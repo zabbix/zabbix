@@ -502,49 +502,45 @@ static void	get_pinger_hosts(zbx_hashset_t *pinger_items, int config_timeout)
 	for (int i = 0; i < num; i++)
 	{
 		zbx_pinger_t	pinger_local;
+		int		delay_s = 0;
 
 		ZBX_STRDUP(items[i].key, items[i].key_orig);
 		int	rc = zbx_substitute_item_key_params(&items[i].key, error, sizeof(error),
 				zbx_item_key_subst_cb, um_handle, &items[i]);
 
-		if (SUCCEED == rc)
-		{
-			rc = pinger_parse_key_params(items[i].key, items[i].interface.addr, &pinger_local, &icmpping,
-					&addr, &type, &errmsg);
-
-			if (SUCCEED == rc)
-			{
-				int	delay_s = 0;
-
-				rc = zbx_interval_preproc(items[i].delay, &delay_s, NULL, &errmsg);
-
-				if (SUCCEED == rc)
-				{
-					add_icmpping_item(pinger_items, &pinger_local, items[i].itemid, addr, icmpping,
-							type, delay_s);
-					items_count++;
-				}
-			}
-		}
-		else
-		{
-			errmsg = zbx_strdup(NULL, error);
-		}
-
 		if (SUCCEED != rc)
 		{
-			zbx_timespec_t	ts;
-
-			zbx_timespec(&ts);
-
-			items[i].state = ITEM_STATE_NOTSUPPORTED;
-			zbx_preprocess_item_value(items[i].itemid, items[i].host.hostid, items[i].value_type,
-					items[i].flags, items[i].preprocessing, NULL, &ts, items[i].state, errmsg);
-
-			zbx_dc_requeue_items(&items[i].itemid, &ts.sec, &errcode, 1);
-			zbx_free(errmsg);
+			errmsg = zbx_strdup(NULL, error);
+			goto not_supported;
 		}
 
+		rc = pinger_parse_key_params(items[i].key, items[i].interface.addr, &pinger_local, &icmpping, &addr,
+				&type, &errmsg);
+
+		if (SUCCEED != rc)
+			goto not_supported;
+
+		rc = zbx_interval_preproc(items[i].delay, &delay_s, NULL, &errmsg);
+
+		if (SUCCEED != rc)
+			goto not_supported;
+
+		add_icmpping_item(pinger_items, &pinger_local, items[i].itemid, addr, icmpping, type, delay_s);
+		items_count++;
+		zbx_free(items[i].key);
+
+		continue;
+not_supported:
+		zbx_timespec_t	ts;
+
+		zbx_timespec(&ts);
+
+		items[i].state = ITEM_STATE_NOTSUPPORTED;
+		zbx_preprocess_item_value(items[i].itemid, items[i].host.hostid, items[i].value_type,
+				items[i].flags, items[i].preprocessing, NULL, &ts, items[i].state, errmsg);
+
+		zbx_dc_requeue_items(&items[i].itemid, &ts.sec, &errcode, 1);
+		zbx_free(errmsg);
 		zbx_free(items[i].key);
 	}
 
