@@ -32,7 +32,7 @@ class CTimeUnitValidator extends CValidator {
 		}
 
 		if (array_key_exists('accept_zero', $options)) {
-			$this->accept_zero = (bool) $options['accept_zero'];
+			$this->accept_zero = $options['accept_zero'];
 		}
 
 		if (array_key_exists('lldmacros', $options)) {

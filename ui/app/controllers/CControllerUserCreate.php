@@ -27,15 +27,12 @@ class CControllerUserCreate extends CControllerUserUpdateGeneral {
 			'surname' => ['db users.surname'],
 			'user_groups' => ['array', 'field' => ['db users_groups.usrgrpid']],
 			'change_password' => ['boolean'],
-			'password1' => [
-				[
-					'string', 'required',
-					'use' => [CPasswordComplexityValidator::class, [
-						'passwd_min_length' => CAuthenticationHelper::get(CAuthenticationHelper::PASSWD_MIN_LENGTH),
-						'passwd_check_rules' => CAuthenticationHelper::get(CAuthenticationHelper::PASSWD_CHECK_RULES)
-					]],
-					'when' => ['change_password', 'in' => [1]]
-				]
+			'password1' => ['string', 'required',
+				'use' => [CPasswordComplexityValidator::class, [
+					'passwd_min_length' => CAuthenticationHelper::get(CAuthenticationHelper::PASSWD_MIN_LENGTH),
+					'passwd_check_rules' => CAuthenticationHelper::get(CAuthenticationHelper::PASSWD_CHECK_RULES)
+				]],
+				'when' => ['change_password', 'in' => [1]]
 			],
 			'password2' => ['string', 'required', 'when' => ['change_password', 'in' => [1]]],
 			'current_password' => ['string'],
