@@ -171,7 +171,7 @@ class testCalculatedExpression extends CIntegrationTest {
 		$formula = 'avg(/' . self::HOST_NAME . '/' . self::TRAPPER_ITEM_KEY . ',#5)';
 		$itemid = $this->createCalculatedItemWithFormula($formula, 'avg5MaxValue');
 		self::$itemIds = array_merge(self::$itemIds, [$itemid]);
-		$this->sendExtremeValues(5, self::TRAPPER_ITEM_KEY); // 1..5 -> avg = 3
+		$this->sendExtremeValues(5, self::TRAPPER_ITEM_KEY); // last 5 are max values
 		$this->assertEquals((float)'1.7976931348623157e308', $this->getItemLastValue($itemid));
 	}
 
