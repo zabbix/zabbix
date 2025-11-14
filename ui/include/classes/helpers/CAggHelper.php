@@ -36,9 +36,7 @@ class CAggHelper {
 	 *
 	 * @return array
 	 */
-	public static function formatValue($value, $value_type, int $function, string $units,
-			array $options = []): array {
-
+	public static function formatValue($value, $value_type, int $function, string $units, array $options = []): array {
 		$options = array_merge([
 			'force_units' => false,
 			'trim' => true,

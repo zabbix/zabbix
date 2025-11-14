@@ -108,9 +108,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 					}
 				}
 
-				[$db_column_items, $db_values] = self::getCombinedItemValues($db_column_items, $db_values,
-					$column['aggregate_function'], $column['column_aggregate_function'], $column['combined_column_name']
-				);
+				[$db_column_items, $db_values] = self::getCombinedItemValues($db_column_items, $db_values, $column);
 			}
 
 			if ($column['display'] == CWidgetFieldColumnsList::DISPLAY_SPARKLINE) {
@@ -358,13 +356,15 @@ class WidgetView extends CControllerDashboardWidgetView {
 		return $result;
 	}
 
-	private static function getCombinedItemValues(array $db_column_items, array $db_values, int $function,
-			int $combined_function, string $column_name): array {
+	private static function getCombinedItemValues(array $db_column_items, array $db_values, array $column): array {
 		$grouped_values = [];
 
 		foreach ($db_column_items as $itemid => $item) {
 			$grouped_values[$item['hostid']][$itemid] = $db_values[$itemid] ?? null;
 		}
+
+		$function = $column['aggregate_function'];
+		$combined_function = $column['column_aggregate_function'];
 
 		foreach ($grouped_values as $values) {
 			$itemids = array_keys($values);
@@ -386,12 +386,13 @@ class WidgetView extends CControllerDashboardWidgetView {
 				$item['valuemap'] = [];
 			}
 
-			$item['name'] = $column_name;
+			$item['name'] = $column['combined_column_name'];
+
+			$value_type = $item['value_type'];
+			$value_units = $item['units'] == 'unixtime' ? '' : $item['units'];
 
 			$values = array_map(
-				fn ($value) => CAggHelper::formatValue($value, $item['value_type'], $function,
-					$item['units'] == 'unixtime' ? '' : $item['units']
-				),
+				fn ($value) => CAggHelper::formatValue($value, $value_type, $function, $value_units),
 				$values
 			);
 
@@ -413,9 +414,15 @@ class WidgetView extends CControllerDashboardWidgetView {
 					AGGREGATE_SUM =>	CMathHelper::safeSum($values)
 				};
 
-				$combined_value = CAggHelper::formatValue($value, $item['value_type'], $combined_function, $units,
-					['valuemap' => $item['valuemap']]
-				);
+				$options = [
+					'valuemap' => $item['valuemap'],
+					'convert_options' => [
+						'decimals' => $column['decimal_places'],
+						'decimals_exact' => true
+					]
+				];
+
+				$combined_value = CAggHelper::formatValue($value, $value_type, $combined_function, $units, $options);
 
 				$item['units'] = $combined_value['units'] != '' ? ' '.$combined_value['units'] : '';
 			}
