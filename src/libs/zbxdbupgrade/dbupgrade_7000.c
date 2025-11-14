@@ -300,6 +300,113 @@ static int	DBpatch_7000020(void)
 	return SUCCEED;
 }
 
+static int	DBpatch_7000021(void)
+{
+	if (ZBX_DB_OK > zbx_db_execute(
+			"delete from httpstepitem"
+				" where itemid in ("
+					" select itemid from items"
+					" where hostid in ("
+						" select ht.hostid from httptest ht,hosts h where ht.hostid=h.hostid and h.flags=2"
+					")"
+				")"))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+static int	DBpatch_7000022(void)
+{
+	if (ZBX_DB_OK > zbx_db_execute(
+			"delete from httptestitem"
+				" where itemid in ("
+					" select itemid from items"
+					" where hostid in ("
+						" select ht.hostid from httptest ht,hosts h where ht.hostid=h.hostid and h.flags=2"
+					")"
+				")"))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+static int	DBpatch_7000023(void)
+{
+	if (ZBX_DB_OK > zbx_db_execute(
+			"delete from items"
+				" where hostid in ("
+					" select ht.hostid from httptest ht,hosts h where ht.hostid=h.hostid and h.flags=2"
+				")"))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+static int	DBpatch_7000024(void)
+{
+	if (ZBX_DB_OK > zbx_db_execute(
+			"delete from httpstep_field"
+				" where httpstepid in ("
+					" select httpstepid from httpstep"
+					" where httptestid in ("
+						" select ht.httptestid from httptest ht,hosts h where ht.hostid=h.hostid and h.flags=2"
+					")"
+				")"))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+static int	DBpatch_7000025(void)
+{
+	if (ZBX_DB_OK > zbx_db_execute(
+			"delete from httpstep"
+				" where httptestid in ("
+					" select ht.httptestid from httptest ht,hosts h where ht.hostid=h.hostid and h.flags=2"
+				")"))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+static int	DBpatch_7000026(void)
+{
+	if (ZBX_DB_OK > zbx_db_execute(
+			"delete from httptest_tag"
+				" where httptestid in ("
+					" select ht.httptestid from httptest ht,hosts h where ht.hostid=h.hostid and h.flags=2"
+				")"))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+static int	DBpatch_7000027(void)
+{
+	if (ZBX_DB_OK > zbx_db_execute(
+			"delete from httptest"
+				" where httptestid in ("
+					" select ht.httptestid from httptest ht,hosts h where ht.hostid=h.hostid and h.flags=2"
+				")"))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
 #endif
 
 DBPATCH_START(7000)
@@ -327,5 +434,12 @@ DBPATCH_ADD(7000017, 0, 0)
 DBPATCH_ADD(7000018, 0, 0)
 DBPATCH_ADD(7000019, 0, 0)
 DBPATCH_ADD(7000020, 0, 0)
+DBPATCH_ADD(7000021, 0, 0)
+DBPATCH_ADD(7000022, 0, 0)
+DBPATCH_ADD(7000023, 0, 0)
+DBPATCH_ADD(7000024, 0, 0)
+DBPATCH_ADD(7000025, 0, 0)
+DBPATCH_ADD(7000026, 0, 0)
+DBPATCH_ADD(7000027, 0, 0)
 
 DBPATCH_END()
