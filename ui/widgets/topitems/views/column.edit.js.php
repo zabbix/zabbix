@@ -241,15 +241,30 @@ window.topitems_column_edit_form = new class {
 
 		// Combined fields.
 		const display_sparkline = display == <?= CWidgetFieldColumnsList::DISPLAY_SPARKLINE ?>;
-		const aggregate_columns = document.querySelector('[name="aggregate_columns"]').checked;
-		const combined_fields_show = aggregate_columns && !display_sparkline;
+
+		const aggregate_columns = document.querySelector('[name="aggregate_columns"]');
+		if (aggregate_columns != null) {
+			aggregate_columns.disabled = display_sparkline;
+		}
+
+		const combined_fields_show = aggregate_columns.checked && !display_sparkline;
+
+		const column_aggregate_function = document.querySelector('[name="column_aggregate_function"]');
+		if (column_aggregate_function != null) {
+			column_aggregate_function.disabled = !combined_fields_show;
+		}
+
+		const combined_column_name = document.querySelector('[name="combined_column_name"]');
+		if (combined_column_name != null) {
+			combined_column_name.disabled = !combined_fields_show;
+		}
+
+		for (const element of this.#form.querySelectorAll('.js-aggregate-grouping-row')) {
+			element.style.display = !display_sparkline ? '' : 'none';
+		}
 
 		for (const element of this.#form.querySelectorAll('.js-combined-row')) {
 			element.style.display = combined_fields_show ? '' : 'none';
-
-			for (const input of element.querySelectorAll('input')) {
-				input.disabled = !combined_fields_show;
-			}
 		}
 
 		const aggregate_function_warning = this.#form.querySelector('.js-aggregate-function-warning');
