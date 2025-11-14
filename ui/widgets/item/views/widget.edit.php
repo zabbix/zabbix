@@ -91,7 +91,7 @@ $form
 					])
 						->addStyle('display: none')
 						->setId('combined-warning')
-				]),
+				])
 			])
 			->addField(
 				(new CWidgetFieldTimePeriodView($data['fields']['time_period']))

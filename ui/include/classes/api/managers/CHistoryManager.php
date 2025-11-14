@@ -1371,22 +1371,27 @@ class CHistoryManager {
 			foreach ($items_by_source as $source => $itemids) {
 				$sql_select = ['itemid'];
 
+				$value = 'value';
+				if (in_array($function, [AGGREGATE_MIN, AGGREGATE_MAX, AGGREGATE_AVG, AGGREGATE_SUM])) {
+					$value = 'CASE WHEN value BETWEEN '.ZBX_MIN_INT64.' AND '.ZBX_MAX_INT64.' THEN value ELSE 0 END';
+				}
+
 				if ($source === 'history') {
 					switch ($function) {
 						case AGGREGATE_MIN:
-							$sql_select[] = 'MIN(value) AS value,MAX(clock) AS clock';
+							$sql_select[] = 'MIN('.$value.') AS value,MAX(clock) AS clock';
 							break;
 						case AGGREGATE_MAX:
-							$sql_select[] = 'MAX(value) AS value,MAX(clock) AS clock';
+							$sql_select[] = 'MAX('.$value.') AS value,MAX(clock) AS clock';
 							break;
 						case AGGREGATE_AVG:
-							$sql_select[] = 'AVG(value) AS value,MAX(clock) AS clock';
+							$sql_select[] = 'AVG('.$value.') AS value,MAX(clock) AS clock';
 							break;
 						case AGGREGATE_COUNT:
 							$sql_select[] = 'COUNT(*) AS value,MAX(clock) AS clock';
 							break;
 						case AGGREGATE_SUM:
-							$sql_select[] = 'SUM(value) AS value,MAX(clock) AS clock';
+							$sql_select[] = 'SUM('.$value.') AS value,MAX(clock) AS clock';
 							break;
 						case AGGREGATE_FIRST:
 							$sql_select[] = 'MIN(clock) AS clock';
