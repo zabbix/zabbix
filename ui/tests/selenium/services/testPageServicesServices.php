@@ -19,7 +19,7 @@ require_once __DIR__.'/../behaviors/CMessageBehavior.php';
 require_once __DIR__.'/../behaviors/CTableBehavior.php';
 
 /**
- * @dataSource EntitiesTags, Services, Actions
+ * @dataSource EntitiesTags, Services, Actions, MonitoringOverview
  *
  * @backup services
  */
@@ -53,10 +53,14 @@ class testPageServicesServices extends CWebTest {
 	const BREADCRUMB_SELECTOR = 'xpath://ul[@class="breadcrumbs"]';
 	const TABLE_SELECTOR = 'id:service-list';
 
+	protected static $monitoring_overview_eventids;
+
 	/**
 	 * Set parent and child services to Problem status and link the child services to the corresponding problem events.
 	 */
 	public static function prepareServiceProblemsData() {
+		self::$monitoring_overview_eventids = CDataHelper::get('MonitoringOverview.eventids');
+
 		// Statuses: Warning = 2, Average = 3, High = 4.
 		$service_statuses = [
 			self::ROOTCAUSE_PARENT => 4,
@@ -66,8 +70,7 @@ class testPageServicesServices extends CWebTest {
 		];
 
 		$service_ids = [];
-		$i = 1;
-
+		$i = 0;
 		foreach ($service_statuses as $service => $status) {
 			$service_ids[$service] = CDBHelper::getValue('SELECT serviceid FROM services WHERE name='.zbx_dbstr($service));
 
@@ -76,9 +79,10 @@ class testPageServicesServices extends CWebTest {
 
 			// Link child services to the corresponding problem events.
 			if ($service !== self::ROOTCAUSE_PARENT) {
-				// Corresponding trigger problem events have ids starting from 9001 in data_test.sql, so "9000 + $i" is used.
+				// Corresponding events from MonitoringOverview starts with warning trigger.
 				DBexecute('INSERT into service_problem (service_problemid, eventid, serviceid, severity) '.
-						'VALUES ('.$i.', '.(9000 + $i).', '.$service_ids[$service].', '.$status.')'
+						'VALUES ('.(1 + $i).', '.(self::$monitoring_overview_eventids['1_trigger_Warning'] + $i).', '.
+						$service_ids[$service].', '.$status.')'
 				);
 
 				$i++;

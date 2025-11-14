@@ -287,6 +287,7 @@ class MonitoringOverview {
 				'priority' => TRIGGER_SEVERITY_AVERAGE
 			]
 		]);
+		$triggerids = CDataHelper::getIds('description');
 
 		// Create events and problems.
 		$trigger_names = [
@@ -330,9 +331,9 @@ class MonitoringOverview {
 		}
 
 		return [
-			'groupids' => $groupids,
-			'hostids' => $host['hostids'],
-			'itemids' => $itemids
+			'itemids' => $itemids,
+			'eventids' => $eventids,
+			'triggerids' => $triggerids
 		];
 	}
 }
