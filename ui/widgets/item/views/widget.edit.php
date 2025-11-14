@@ -82,12 +82,12 @@ $form
 					makeWarningIcon(_('With this setting only numeric items will be displayed.'))
 						->addStyle('display: none')
 						->setId('numeric-items-warning'),
-					makeWarningIcon(_('Item aggregation function does not affect the sparkline.'))
+					makeWarningIcon(_('Aggregation function does not affect the sparkline.'))
 						->addStyle('display: none')
 						->setId('sparkline-warning'),
 					makeWarningIcon([
 						new CDiv(_('With this setting only numeric items will be displayed.')),
-						new CDiv(_('Item aggregation function does not affect the sparkline.'))
+						new CDiv(_('Aggregation function does not affect the sparkline.'))
 					])
 						->addStyle('display: none')
 						->setId('combined-warning')

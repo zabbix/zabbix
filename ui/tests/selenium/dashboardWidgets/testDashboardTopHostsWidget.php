@@ -517,7 +517,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 				$warning_button->click();
 
 				// Check hintbox text.
-				$hint_text = 'Item aggregation function does not affect the sparkline.';
+				$hint_text = 'Aggregation function does not affect the sparkline.';
 				$hint_dialog = $this->query('xpath://div[@class="overlay-dialogue wordbreak"]')->waitUntilVisible()->one();
 				$this->assertEquals($hint_text, $hint_dialog->getText());
 

@@ -327,7 +327,7 @@ $advanced_configuration_fieldset
 					AGGREGATE_LAST => CItemHelper::getAggregateFunctionName(AGGREGATE_LAST)
 				]))
 				->setFocusableElementId('column_aggregate_function'),
-			(makeWarningIcon(_('Item aggregation function does not affect the sparkline.')))
+			(makeWarningIcon(_('Aggregation function does not affect the sparkline.')))
 				->addClass('js-aggregate-function-warning')
 		])
 	]);

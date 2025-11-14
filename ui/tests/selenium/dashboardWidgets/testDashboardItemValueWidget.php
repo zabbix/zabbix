@@ -360,9 +360,9 @@ class testDashboardItemValueWidget extends testWidgets {
 					foreach ($options as $option => $visible) {
 						if ($warning_label === 'Aggregation function') {
 							$hint_text = in_array($option, ['count', 'first', 'last'])
-								? 'Item aggregation function does not affect the sparkline.'
+								? 'Aggregation function does not affect the sparkline.'
 								: "With this setting only numeric items will be displayed.\n".
-									"Item aggregation function does not affect the sparkline.";
+									"Aggregation function does not affect the sparkline.";
 						}
 
 						$form->fill([$warning_label => $option]);
