@@ -20,10 +20,8 @@
 class CControllerUserEdit extends CControllerUserEditGeneral {
 
 	protected function checkInput(): bool {
-		$locales = array_keys(getLocales());
-		$locales[] = LANG_DEFAULT;
-		$themes = array_keys(APP::getThemes());
-		$themes[] = THEME_DEFAULT;
+		$locales = CControllerUserUpdateGeneral::getAllowedLocales();
+		$themes = CControllerUserUpdateGeneral::getAllowedThemes();
 
 		$fields = [
 			'userid' =>				'db users.userid',

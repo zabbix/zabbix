@@ -19,12 +19,6 @@
  */
 class CControllerUserUpdate extends CControllerUserUpdateGeneral {
 
-	protected function init() {
-		parent::init();
-		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
-		$this->setInputValidationMethod(self::INPUT_VALIDATION_FORM);
-	}
-
 	public static function getValidationRules(): array {
 		$api_uniq = [
 			['user.get', ['username' => '{username}'], 'userid']

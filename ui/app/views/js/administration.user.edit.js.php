@@ -30,7 +30,7 @@
 				this.#submit();
 			});
 
-			document.getElementById('delete')?.addEventListener('click', () => this._delete());
+			document.getElementById('delete')?.addEventListener('click', () => this.#delete());
 			document.getElementById('change-password-button')?.addEventListener('click', () => {
 				document.getElementById('change_password').setAttribute('value', 1);
 				this.#displayPasswordChange(true);
@@ -155,8 +155,6 @@
 		}
 
 		#submit() {
-			this.form.discoverAllFields();
-
 			if (!this.#confirmSubmit()) {
 				return;
 			}
@@ -164,8 +162,6 @@
 			this.#setLoadingStatus(['add', 'update'])
 			clearMessages();
 			const fields = this.form.getAllValues();
-
-			console.log(fields);
 
 			this.form.validateSubmit(fields)
 				.then((result) => {
@@ -215,7 +211,7 @@
 				});
 		}
 
-		_delete() {
+		#delete() {
 			if (window.confirm(<?= json_encode(_('Delete selected user?')) ?>)) {
 				this.#setLoadingStatus(['delete']);
 				const fields = this.form.getAllValues();

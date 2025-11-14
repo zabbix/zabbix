@@ -35,6 +35,8 @@ abstract class CControllerUserUpdateGeneral extends CController {
 	protected function init() {
 		parent::init();
 
+		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
+		$this->setInputValidationMethod(self::INPUT_VALIDATION_FORM);
 		$this->timezones = self::getAllowedTimezones();
 	}
 
@@ -68,7 +70,7 @@ abstract class CControllerUserUpdateGeneral extends CController {
 	 *
 	 * @return int
 	 */
-	private static function hasInternalAuth($usrgrps) {
+	public static function hasInternalAuth($usrgrps) {
 		$system_gui_access =
 			(CAuthenticationHelper::get(CAuthenticationHelper::AUTHENTICATION_TYPE) == ZBX_AUTH_INTERNAL)
 				? GROUP_GUI_ACCESS_INTERNAL

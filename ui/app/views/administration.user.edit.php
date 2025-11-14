@@ -90,7 +90,6 @@ $user_form_list
 				'parameters' => [
 					'srctbl' => 'usrgrp',
 					'srcfld1' => 'usrgrpid',
-					'srcfld2' => 'name',
 					'dstfrm' => $user_form->getName(),
 					'dstfld1' => 'user_groups_'
 				]
@@ -149,6 +148,7 @@ if (!$data['readonly'] && $data['internal_auth'] && $data['db_user']['username']
 		$current_password = (new CPassBox('current_password'))
 			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 			->setAriaRequired()
+			->setAttribute('data-notrim', '')
 			->setAttribute('autocomplete', 'off')
 			->setAttribute('autofocus', 'autofocus');
 
@@ -160,6 +160,7 @@ if (!$data['readonly'] && $data['internal_auth'] && $data['db_user']['username']
 
 	$user_form_list->addRow(_('Password'), [
 		(new CSimpleButton(_('Change password')))
+			->setId('change-password-button')
 			->setId('change-password-button')
 			->addClass(ZBX_STYLE_BTN_GREY),
 		null,
@@ -174,12 +175,14 @@ if (!$data['readonly'] && $data['internal_auth'] && $data['db_user']['username']
 			(new CPassBox('password1', $data['password1']))
 				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 				->setAriaRequired()
+				->setAttribute('data-notrim', '')
 				->setAttribute('autocomplete', 'off')
 		], null, 'password-change-active')
 		->addRow((new CLabel(_('Password (once again)'), 'password2'))->setAsteriskMark(),
 			(new CPassBox('password2', $data['password2']))
 				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 				->setAriaRequired()
+				->setAttribute('data-notrim', '')
 				->setAttribute('autocomplete', 'off'),
 			null,
 			'password-change-active'
