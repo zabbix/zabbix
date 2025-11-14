@@ -329,7 +329,7 @@ class CMultifieldTableElement extends CTableElement {
 	 */
 	public function addRow($values) {
 		$rows = $this->getRows()->count();
-		$this->query('button:Add')->one()->click();
+		$this->query('button:Add')->one()->hoverMouse()->click();
 
 		// Wait until new table row appears.
 		$this->query('xpath:.//'.CXPathHelper::fromSelector($this->selectors['row']).'['.($rows + 1).']')->waitUntilPresent();

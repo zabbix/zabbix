@@ -581,7 +581,7 @@ class testMultiselectsWithoutData extends testMultiselectDialogs {
 		// Fill filter to enable dependent multiselects.
 		if (array_key_exists('filter', $data)) {
 			$form->fill($data['filter']);
-			$form->submit();
+			$form->submit()->waitUntilStalled();
 			$form->invalidate();
 		}
 
