@@ -171,6 +171,10 @@ class CForm {
 		for (const [key, field] of Object.entries(this.#fields)) {
 			field.cancelDelayedValidation();
 
+			if (field.isDisabled()) {
+				continue;
+			}
+
 			const key_parts = [...key.matchAll(/[^\[\]]+|\[\]/g)];
 
 			let key_fields = fields;
@@ -180,16 +184,13 @@ class CForm {
 
 				if (i === key_parts.length - 1) {
 					if (typeof field.getExtraFields === 'function') {
-						if (!field.isDisabled()) {
-							for (const [extra_key, values] of Object.entries(field.getExtraFields())) {
-								key_fields[extra_key] = values;
-							}
+						for (const [extra_key, value] of Object.entries(field.getExtraFields())) {
+							const extra_field_key_parts = [...extra_key.matchAll(/[^\[\]]+|\[\]/g)];
+							objectSetDeepValue(fields, extra_field_key_parts, value);
 						}
 					}
 					else {
-						if (!field.isDisabled()) {
-							key_fields[key_part] = field.getValueTrimmed();
-						}
+						key_fields[key_part] = field.getValueTrimmed();
 					}
 
 					break;

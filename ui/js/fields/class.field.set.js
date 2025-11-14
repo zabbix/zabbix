@@ -124,6 +124,17 @@ class CFieldSet extends CField {
 		return this._field.getAttribute('data-field-name');
 	}
 
+	#subFieldNameParts(sub_field_name) {
+		if (!sub_field_name.startsWith(this.getName())) {
+			return false;
+		}
+
+		return sub_field_name
+			.slice(this.getName().length)
+			.replace(/^\[|]$/g, '')
+			.split(/\]\[/);
+	}
+
 	getInnerValue(trim_value) {
 		let result = {};
 
@@ -132,27 +143,24 @@ class CFieldSet extends CField {
 				continue;
 			}
 
-			/*
-			 * This code converts name of the simple field (belonged to the fieldset) to the array of name keys.
-			 * The main part that matches fieldset name is skipped.
-			 *
-			 * For example, field name: interfaces[0][port] must be converted to following array: ['0', 'port'].
-			 */
-			const name_parts = field.getName().replace(/]$/, '').split(/\]\[|\[/);
+			if (typeof field.getExtraFields === 'function') {
+				for (const [extra_field_name, value] of Object.entries(field.getExtraFields())) {
+					const name_parts = this.#subFieldNameParts(extra_field_name);
 
-			if (name_parts[0] === this.getName()) {
-				name_parts.shift();
-			}
+					if (name_parts === false) {
+						continue;
+					}
 
-			if (field instanceof CFieldMultiselect) {
-				const values = trim_value ? field.getValueTrimmed() : field.getValue();
-
-				for (const [name_part, value] of Object.entries(values)) {
-					name_parts[name_parts.length - 1] = name_part;
 					result = objectSetDeepValue(result, name_parts, value);
 				}
 			}
 			else {
+				const name_parts = this.#subFieldNameParts(field.getName());
+
+				if (name_parts === false) {
+					continue;
+				}
+
 				result = objectSetDeepValue(result, name_parts, trim_value ? field.getValueTrimmed() : field.getValue());
 			}
 		}
