@@ -181,7 +181,7 @@ class testCalculatedExpression extends CIntegrationTest {
 		$itemid = $this->createCalculatedItemWithFormula($formula, 'max4MaxValue');
 		self::$itemIds = array_merge(self::$itemIds, [$itemid]);
 		$this->sendExtremeValues(4, self::TRAPPER_ITEM_KEY); // last 4 are max values
-		$this->assertEquals('1.7976931348623157e308', $this->getItemLastValue($itemid));
+		$this->assertEquals((float)'1.7976931348623157e308', $this->getItemLastValue($itemid));
 	}
 
 	public function testCalculatedExpression_MinOfLast3()
@@ -199,7 +199,7 @@ class testCalculatedExpression extends CIntegrationTest {
 		$itemid = $this->createCalculatedItemWithFormula($formula, 'min3MaxValue');
 		self::$itemIds = array_merge(self::$itemIds, [$itemid]);
 		$this->sendExtremeValues(3, self::TRAPPER_ITEM_KEY); // last 3 are max values
-		$this->assertEquals('1.7976931348623157e308', $this->getItemLastValue($itemid));
+		$this->assertEquals((float)'1.7976931348623157e308', $this->getItemLastValue($itemid));
 	}
 
 	public function testCalculatedExpression_LastValue()
@@ -217,7 +217,7 @@ class testCalculatedExpression extends CIntegrationTest {
 		$itemid = $this->createCalculatedItemWithFormula($formula, 'last1MaxValue');
 		self::$itemIds = array_merge(self::$itemIds, [$itemid]);
 		$this->sendExtremeValues(3, self::TRAPPER_ITEM_KEY); // last 3 are max values
-		$this->assertEquals('1.7976931348623157e308', $this->getItemLastValue($itemid));
+		$this->assertEquals((float)'1.7976931348623157e308', $this->getItemLastValue($itemid));
 	}
 
 	public function testCalculatedExpression_ArithmeticAndScaling()
