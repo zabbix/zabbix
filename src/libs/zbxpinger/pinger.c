@@ -548,7 +548,6 @@ static void	get_pinger_hosts(zbx_hashset_t *pinger_items, int config_timeout)
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __func__, items_count);
 }
 
-
 static int	fping_host_compare(const void *d1, const void *d2)
 {
 	const zbx_fping_host_t	*h1 = (const zbx_fping_host_t *)d1;
