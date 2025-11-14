@@ -453,7 +453,8 @@ class testBinaryAndJSONValueTypesDataCollection extends CIntegrationTest {
 		$this->sendSenderValue('agent', 'JSON_TRAPPER', self::$invalid_json);
 		$this->checkItemState('agent:JSON_TRAPPER', ITEM_STATE_NOTSUPPORTED);
 
-		$this->sendSenderValue('agent', 'JSON_TRAPPER', self::$json_with_image);
+		$this->sendSenderValue('agent', 'JSON_TRAPPER_PREPROC_THROTTLING', self::$json_with_image);
+		$this->sendSenderValue('agent', 'JSON_TRAPPER_PREPROC_THROTTLING', self::$json_with_image);
 		$active_data = $this->callUntilDataIsPresent('history.get', [
 			'itemids'	=>	self::$itemids['agent:JSON_TRAPPER_PREPROC_THROTTLING'],
 			'history'	=>	ITEM_VALUE_TYPE_JSON
@@ -489,7 +490,8 @@ class testBinaryAndJSONValueTypesDataCollection extends CIntegrationTest {
 		$this->sendSenderValue('proxy_agent', 'JSON_TRAPPER', self::$invalid_json, self::COMPONENT_PROXY);
 		$this->checkItemState('proxy_agent:JSON_TRAPPER', ITEM_STATE_NOTSUPPORTED);
 
-		$this->sendSenderValue('proxy_agent', 'JSON_TRAPPER', self::$json_with_image);
+		$this->sendSenderValue('proxy_agent', 'JSON_TRAPPER_PREPROC_THROTTLING', self::$json_with_image);
+		$this->sendSenderValue('proxy_agent', 'JSON_TRAPPER_PREPROC_THROTTLING', self::$json_with_image);
 		$active_data = $this->callUntilDataIsPresent('history.get', [
 			'itemids'	=>	self::$itemids['proxy_agent:JSON_TRAPPER_PREPROC_THROTTLING'],
 			'history'	=>	ITEM_VALUE_TYPE_JSON
