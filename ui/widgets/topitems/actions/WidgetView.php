@@ -109,7 +109,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 				}
 
 				[$db_column_items, $db_values] = self::getCombinedItemValues($db_column_items, $db_values,
-					$column['column_aggregate_function'], $column['combined_column_name']
+					$column['aggregate_function'], $column['column_aggregate_function'], $column['combined_column_name']
 				);
 			}
 
@@ -359,7 +359,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 	}
 
 	private static function getCombinedItemValues(array $db_column_items, array $db_values, int $function,
-			string $column_name): array {
+			int $combined_function, string $column_name): array {
 		$grouped_values = [];
 
 		foreach ($db_column_items as $itemid => $item) {
@@ -378,11 +378,11 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 			$item = $db_column_items[$itemid];
 
-			if (!CAggFunctionData::preservesUnits($function)) {
+			if (!CAggFunctionData::preservesUnits($function) || !CAggFunctionData::preservesUnits($combined_function)) {
 				$item['units'] = '';
 			}
 
-			if (!CAggFunctionData::preservesValueMapping($function)) {
+			if (!CAggFunctionData::preservesValueMapping($combined_function)) {
 				$item['valuemap'] = [];
 			}
 
@@ -396,7 +396,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 			);
 
 			$combined_value = [
-				'value' => $function == AGGREGATE_COUNT ? 0 : null,
+				'value' => $combined_function == AGGREGATE_COUNT ? 0 : null,
 				'units' => ''
 			];
 
@@ -405,7 +405,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 				$units = $value['units'];
 				$values = array_column($values, 'value');
 
-				$value = match ($function) {
+				$value = match ($combined_function) {
 					AGGREGATE_MIN =>	min($values),
 					AGGREGATE_MAX =>	max($values),
 					AGGREGATE_AVG =>	CMathHelper::safeAvg($values),
@@ -413,7 +413,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 					AGGREGATE_SUM =>	CMathHelper::safeSum($values)
 				};
 
-				$combined_value = CAggHelper::formatValue($value, $item['value_type'], $function, $units,
+				$combined_value = CAggHelper::formatValue($value, $item['value_type'], $combined_function, $units,
 					['valuemap' => $item['valuemap']]
 				);
 
