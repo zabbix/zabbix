@@ -166,6 +166,15 @@ class testCalculatedExpression extends CIntegrationTest {
 		$this->assertEquals('3', $this->getItemLastValue($itemid));
 	}
 
+	public function testCalculatedExpression_AvgOfLast5MaxValue()
+	{
+		$formula = 'avg(/' . self::HOST_NAME . '/' . self::TRAPPER_ITEM_KEY . ',#5)';
+		$itemid = $this->createCalculatedItemWithFormula($formula, 'avg5MaxValue');
+		self::$itemIds = array_merge(self::$itemIds, [$itemid]);
+		$this->sendExtremeValues(5, self::TRAPPER_ITEM_KEY); // 1..5 -> avg = 3
+		$this->assertEquals((float)'1.7976931348623157e308', $this->getItemLastValue($itemid));
+	}
+
 	public function testCalculatedExpression_MaxOfLast4()
 	{
 		$formula = 'max(/' . self::HOST_NAME . '/' . self::TRAPPER_ITEM_KEY . ',#4)';
