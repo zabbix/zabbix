@@ -317,6 +317,18 @@ class testBinaryAndJSONValueTypesDataCollection extends CIntegrationTest {
 						'master_itemid' => self::$itemids['agent:vfs.file.contents['.self::$file_name_invalid_json_for_json_item.',]'],
 						'value_type' => ITEM_VALUE_TYPE_JSON,
 						'delay' => '0s'
+				],
+				[
+						'name' => 'JSON_VALUE_TYPE_DEP_WITH_PREPROC_THROTTLING',
+						'key_' => 'JSON_VALUE_TYPE_DEP_WITH_PREPROC_THROTTLING',
+						'type' => ITEM_TYPE_DEPENDENT,
+						'master_itemid' => self::$itemids['agent:vfs.file.contents['.self::$file_name_json_with_image_for_json_item.',]'],
+						'value_type' => ITEM_VALUE_TYPE_JSON,
+						'delay' => '0s',
+						'preprocessing' =>
+						[[
+							'type' => ZBX_PREPROC_THROTTLE_VALUE
+						]]
 				]
 				]
 			]
@@ -499,6 +511,15 @@ class testBinaryAndJSONValueTypesDataCollection extends CIntegrationTest {
 		// Retrieve JSON item value type history data from API
 		$active_data = $this->callUntilDataIsPresent('history.get', [
 			'itemids'	=>	self::$itemids['agent:JSON_VALUE_TYPE_DEP_WITH_PREPROC'],
+			'history'	=>	ITEM_VALUE_TYPE_JSON
+		]);
+
+		$json_data_http_response = self::json_data_http_response;
+		$this->assertEquals($json_data_http_response, $active_data['result'][0]['value']);
+
+		// Retrieve JSON item value type history data from API
+		$active_data = $this->callUntilDataIsPresent('history.get', [
+			'itemids'	=>	self::$itemids['agent:JSON_VALUE_TYPE_DEP_WITH_PREPROC_THROTTLING'],
 			'history'	=>	ITEM_VALUE_TYPE_JSON
 		]);
 
