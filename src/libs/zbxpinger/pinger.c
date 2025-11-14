@@ -486,7 +486,7 @@ static void	add_icmpping_item(zbx_hashset_t *pinger_items, zbx_pinger_t *pinger_
 static void	get_pinger_hosts(zbx_hashset_t *pinger_items, int config_timeout)
 {
 	zbx_dc_item_t		item, *items;
-	int			num, errcode = SUCCEED, items_count = 0;
+	int			num, delay_s, errcode = SUCCEED, items_count = 0;
 	char			error[MAX_STRING_LEN], *addr = NULL, *errmsg = NULL;
 	icmpping_t		icmpping;
 	icmppingsec_type_t	type;
@@ -502,45 +502,37 @@ static void	get_pinger_hosts(zbx_hashset_t *pinger_items, int config_timeout)
 	for (int i = 0; i < num; i++)
 	{
 		zbx_pinger_t	pinger_local;
-		int		delay_s = 0;
 
 		ZBX_STRDUP(items[i].key, items[i].key_orig);
-		int	rc = zbx_substitute_item_key_params(&items[i].key, error, sizeof(error),
-				zbx_item_key_subst_cb, um_handle, &items[i]);
+		int	rc = zbx_substitute_item_key_params(&items[i].key, error, sizeof(error), zbx_item_key_subst_cb,
+				um_handle, &items[i]);
 
 		if (SUCCEED != rc)
 		{
 			errmsg = zbx_strdup(NULL, error);
-			goto not_supported;
+		}
+		else if (SUCCEED == (rc = pinger_parse_key_params(items[i].key, items[i].interface.addr, &pinger_local,
+				&icmpping, &addr, &type, &errmsg)) &&
+				SUCCEED == (rc = zbx_interval_preproc(items[i].delay, &delay_s, NULL, &errmsg)))
+		{
+			add_icmpping_item(pinger_items, &pinger_local, items[i].itemid, addr, icmpping, type, delay_s);
+			items_count++;
 		}
 
-		rc = pinger_parse_key_params(items[i].key, items[i].interface.addr, &pinger_local, &icmpping, &addr,
-				&type, &errmsg);
-
 		if (SUCCEED != rc)
-			goto not_supported;
+		{
+			zbx_timespec_t	ts;
 
-		rc = zbx_interval_preproc(items[i].delay, &delay_s, NULL, &errmsg);
+			zbx_timespec(&ts);
 
-		if (SUCCEED != rc)
-			goto not_supported;
+			items[i].state = ITEM_STATE_NOTSUPPORTED;
+			zbx_preprocess_item_value(items[i].itemid, items[i].host.hostid, items[i].value_type,
+					items[i].flags, items[i].preprocessing, NULL, &ts, items[i].state, errmsg);
 
-		add_icmpping_item(pinger_items, &pinger_local, items[i].itemid, addr, icmpping, type, delay_s);
-		items_count++;
-		zbx_free(items[i].key);
+			zbx_dc_requeue_items(&items[i].itemid, &ts.sec, &errcode, 1);
+			zbx_free(errmsg);
+		}
 
-		continue;
-not_supported:
-		zbx_timespec_t	ts;
-
-		zbx_timespec(&ts);
-
-		items[i].state = ITEM_STATE_NOTSUPPORTED;
-		zbx_preprocess_item_value(items[i].itemid, items[i].host.hostid, items[i].value_type,
-				items[i].flags, items[i].preprocessing, NULL, &ts, items[i].state, errmsg);
-
-		zbx_dc_requeue_items(&items[i].itemid, &ts.sec, &errcode, 1);
-		zbx_free(errmsg);
 		zbx_free(items[i].key);
 	}
 
@@ -556,10 +548,11 @@ not_supported:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __func__, items_count);
 }
 
+
 static int	fping_host_compare(const void *d1, const void *d2)
 {
-	const zbx_fping_host_t        *h1 = (const zbx_fping_host_t *)d1;
-	const zbx_fping_host_t        *h2 = (const zbx_fping_host_t *)d2;
+	const zbx_fping_host_t	*h1 = (const zbx_fping_host_t *)d1;
+	const zbx_fping_host_t	*h2 = (const zbx_fping_host_t *)d2;
 
 	return strcmp(h1->addr, h2->addr);
 }
