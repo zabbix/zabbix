@@ -169,10 +169,11 @@ static void	rotate_log(const char *filename)
 #endif
 		if (0 != rename(filename, filename_old))
 		{
-			FILE	*log_file = NULL;
 #ifndef _WINDOWS
 			mode_t	old_umask = umask(0026);
 #endif
+			FILE	*log_file = NULL;
+
 			log_file = fopen(filename, "w");
 #ifndef _WINDOWS
 			umask(old_umask);
@@ -314,6 +315,9 @@ int	zabbix_open_log(int type, int level, const char *filename, char **error)
 	}
 	else if (LOG_TYPE_FILE == type)
 	{
+#ifndef _WINDOWS
+		mode_t	old_umask;
+#endif
 		FILE	*log_file = NULL;
 
 		if (MAX_STRING_LEN <= strlen(filename))
@@ -325,7 +329,7 @@ int	zabbix_open_log(int type, int level, const char *filename, char **error)
 		if (SUCCEED != zbx_mutex_create(&log_access, ZBX_MUTEX_LOG, error))
 			return FAIL;
 #ifndef _WINDOWS
-		mode_t	old_umask = umask(0026);
+		old_umask = umask(0026);
 #endif
 		log_file = fopen(filename, "a+");
 #ifndef _WINDOWS
@@ -396,14 +400,16 @@ void	__zbx_zabbix_log(int level, const char *fmt, ...)
 	if (LOG_TYPE_FILE == log_type)
 	{
 		FILE	*log_file;
-
+#ifndef _WINDOWS
+		mode_t	old_umask;
+#endif
 		LOCK_LOG;
 
 		if (0 != CONFIG_LOG_FILE_SIZE)
 			rotate_log(log_filename);
 
 #ifndef _WINDOWS
-		mode_t	old_umask = umask(0026);
+		old_umask = umask(0026);
 #endif
 		log_file = fopen(log_filename, "a+");
 #ifndef _WINDOWS
