@@ -31,7 +31,7 @@ class CControllerConnectorCreate extends CControllerConnectorUpdateGeneral {
 				'in' => [ZBX_CONNECTOR_DATA_TYPE_ITEM_VALUES, ZBX_CONNECTOR_DATA_TYPE_EVENTS]
 			],
 			'url' => ['db connector.url', 'required', 'not_empty',
-				'use' => [CUrlValidator::class, []],
+				'use' => [CUrlValidator::class, []]
 			],
 			'item_value_types' => ['array', 'required', 'not_empty',
 				'field' => ['integer',
@@ -73,7 +73,7 @@ class CControllerConnectorCreate extends CControllerConnectorUpdateGeneral {
 				'when' => ['max_attempts', 'not_in' => [0,1]]
 			],
 			'timeout' => ['db connector.timeout', 'required', 'not_empty',
-				'use' => [CTimeUnitValidator::class, ['min' => 1, 'max' => SEC_PER_MIN, 'usermacros' => true]],
+				'use' => [CTimeUnitValidator::class, ['min' => 1, 'max' => SEC_PER_MIN, 'usermacros' => true]]
 			],
 			'verify_peer' => ['db connector.verify_peer', 'required',
 				'in' => [ZBX_HTTP_VERIFY_PEER_OFF, ZBX_HTTP_VERIFY_PEER_ON]
@@ -154,13 +154,11 @@ class CControllerConnectorCreate extends CControllerConnectorUpdateGeneral {
 		$output = [];
 
 		if ($result) {
-			$success = ['title' => _('Connector created')];
+			$output['success']['title'] = _('Connector created');
 
 			if ($messages = get_and_clear_messages()) {
-				$success['messages'] = array_column($messages, 'message');
+				$output['success']['messages'] = array_column($messages, 'message');
 			}
-
-			$output['success'] = $success;
 		}
 		else {
 			$output['error'] = [
