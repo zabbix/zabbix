@@ -22,8 +22,7 @@
  */
 function organizeInterfaces(interface_ids_by_types, item_interface_types, item_type) {
 	const use_inline_validation = window.item_edit_form && window.item_edit_form.form_element.isConnected;
-	const  INTERFACE_TYPE_ANY = -1,
-		INTERFACE_TYPE_OPT = -2,
+	const  INTERFACE_TYPE_OPT = -2,
 		$interface_select = $('#interface-select'),
 		interface_select_node = $interface_select.get(0);
 
@@ -70,7 +69,7 @@ function organizeInterfaces(interface_ids_by_types, item_interface_types, item_t
 			.show();
 	}
 	// If any interface type allowed, enable all options.
-	else if (select_options.length && (interface_type == INTERFACE_TYPE_ANY || interface_type == INTERFACE_TYPE_OPT)) {
+	else if (select_options.length && interface_type == INTERFACE_TYPE_OPT) {
 		interface_select_node.disabled = false;
 		select_options.map(opt => opt.disabled = false);
 		$interface_select.show();
