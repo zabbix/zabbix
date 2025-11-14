@@ -16,7 +16,6 @@
 
 require_once __DIR__.'/../../include/CWebTest.php';
 require_once __DIR__.'/../behaviors/CMessageBehavior.php';
-require_once __DIR__.'/../../include/helpers/CDataHelper.php';
 
 /**
  * @backup hosts
