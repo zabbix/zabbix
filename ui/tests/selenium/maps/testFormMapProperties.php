@@ -1323,7 +1323,7 @@ class testFormMapProperties extends CWebTest {
 		$form = $this->query('id:sysmap-form')->waitUntilPresent()->asForm()->one();
 		$form->fill($data['map_properties']);
 
-		if (CTestArrayHelper::get($data, 'urls')) {
+		if (array_key_exists('urls', $data)) {
 			$form->query('class:table-forms-separator')->asMultifieldTable()->one()->fill($data['urls']);
 		}
 
@@ -1358,7 +1358,7 @@ class testFormMapProperties extends CWebTest {
 			$saved_form = $this->query('id:sysmap-form')->waitUntilPresent()->asForm()->one();
 			$saved_form->checkValue($data['map_properties']);
 
-			if (CTestArrayHelper::get($data, 'result_urls')) {
+			if (array_key_exists('result_urls', $data)) {
 				$saved_form->checkValue($data['result_urls']);
 			}
 
