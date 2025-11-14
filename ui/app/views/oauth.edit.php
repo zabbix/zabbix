@@ -102,7 +102,7 @@ else {
 			->addStyle('display: none;')
 			->setEnabled(false),
 		makeWarningIcon(
-			_('The client secret was cleared due to a token/authorization endpoint change. Please enter the new client secret.')
+			_('The client secret was cleared due to a token endpoint change. Please enter the new client secret.')
 		)
 			->addStyle('display: none;')
 			->addClass('js-client-secret-warning')
