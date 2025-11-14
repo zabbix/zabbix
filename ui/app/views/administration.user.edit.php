@@ -163,7 +163,7 @@ if (!$data['readonly'] && $data['internal_auth'] && $data['db_user']['username']
 			->setId('change-password-button')
 			->setId('change-password-button')
 			->addClass(ZBX_STYLE_BTN_GREY),
-		null,
+		null
 	], null, 'password-change-inactive');
 
 	$user_form_list

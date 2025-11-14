@@ -47,7 +47,7 @@ class CControllerUserCreate extends CControllerUserUpdateGeneral {
 					],
 					[
 						'array', 'required', 'not_empty',
-						'field' => ['db media.sendto', 'required',
+						'field' => ['db media.sendto', 'required'
 							// TODO: uncomment with DEV-4644
 							// 'not_empty', 'use' => [CEmailValidator::class, []]
 						],
@@ -81,7 +81,7 @@ class CControllerUserCreate extends CControllerUserUpdateGeneral {
 				]
 			],
 			'refresh' => ['db users.refresh', 'not_empty',
-				'use' => [CTimeUnitValidator::class, ['min' => 0, 'max' => SEC_PER_HOUR]],
+				'use' => [CTimeUnitValidator::class, ['min' => 0, 'max' => SEC_PER_HOUR]]
 			],
 			'rows_per_page' => ['db users.rows_per_page', 'required', 'min' => 1, 'max' => 999999],
 			'url' => ['db users.url'],

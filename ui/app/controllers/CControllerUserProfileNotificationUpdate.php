@@ -78,7 +78,7 @@ class CControllerUserProfileNotificationUpdate extends CControllerUserUpdateGene
 						],
 						[
 							'array', 'required', 'not_empty',
-							'field' => ['db media.sendto', 'required',
+							'field' => ['db media.sendto', 'required'
 								// TODO: uncomment with DEV-4644
 								// 'not_empty', 'use' => [CEmailValidator::class, []]
 							],
