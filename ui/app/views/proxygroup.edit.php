@@ -143,11 +143,12 @@ $output = [
 	'body' => $form->toString(),
 	'buttons' => $buttons,
 	'script_inline' => getPagePostJs().
-		$this->readJsFile('proxygroup.edit.js.php').'proxy_group_edit_popup.init('.json_encode([
-		'rules' => $data['js_validation_rules'],
-		'rules_for_clone' => $data['js_validation_rules_for_clone'],
-		'proxy_groupid' => $data['proxy_groupid']
-	]).');',
+		$this->readJsFile('proxygroup.edit.js.php').
+		'proxy_group_edit_popup.init('.json_encode([
+			'rules' => $data['js_validation_rules'],
+			'rules_for_clone' => $data['js_validation_rules_for_clone'],
+			'proxy_groupid' => $data['proxy_groupid']
+		]).');',
 	'dialogue_class' => 'modal-popup-static'
 ];
 
