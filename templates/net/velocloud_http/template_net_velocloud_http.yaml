@@ -564,6 +564,10 @@ zabbix_export:
                 - type: JSONPATH
                   parameters:
                     - $.description
+                - type: STR_REPLACE
+                  parameters:
+                    - 'null'
+                    - ''
                 - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 12h
@@ -1156,6 +1160,10 @@ zabbix_export:
             - type: JSONPATH
               parameters:
                 - $..description.first()
+            - type: STR_REPLACE
+              parameters:
+                - 'null'
+                - ''
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 12h
@@ -2523,6 +2531,10 @@ zabbix_export:
                 - type: JSONPATH
                   parameters:
                     - $.description
+                - type: STR_REPLACE
+                  parameters:
+                    - 'null'
+                    - ''
                 - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 12h
@@ -2920,7 +2932,7 @@ zabbix_export:
                   fields:
                     - type: STRING
                       name: ds.0.color
-                      value: 1565C0
+                      value: 388E3C
                     - type: STRING
                       name: ds.0.items.0
                       value: '*Best latency tx, ms'
