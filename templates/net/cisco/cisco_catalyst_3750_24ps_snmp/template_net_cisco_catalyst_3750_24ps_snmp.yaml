@@ -38,7 +38,7 @@ zabbix_export:
         Refer to the vendor documentation.
       vendor:
         name: Zabbix
-        version: 8.0-2
+        version: 8.0-3
       groups:
         - name: 'Templates/Network devices'
       items:
@@ -1204,7 +1204,7 @@ zabbix_export:
             priority: '1'
             section_name: Thresholds
             label: 'Threshold for CPU utilization (critical)'
-            description: 'In the range from 0 to 100 inclusive.'
+            description: 'Critical threshold of the CPU utilization in %. In the range from 0 to 100 inclusive.'
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
         - macro: '{$ICMP_LOSS_WARN}'
           value: '20'
@@ -1221,6 +1221,7 @@ zabbix_export:
             priority: '3'
             section_name: Thresholds
             label: 'Threshold of the average ICMP response'
+            description: 'Threshold of the average ICMP response time in seconds.'
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
         - macro: '{$IF.ERRORS.WARN}'
           value: '2'
@@ -1253,7 +1254,7 @@ zabbix_export:
             priority: '7'
             section_name: Thresholds
             label: 'Threshold for memory utilization'
-            description: 'In the range from 0 to 100 inclusive.'
+            description: 'Warning threshold of the "Physical memory: Memory utilization" item. In the range from 0 to 100 inclusive.'
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
         - macro: '{$NET.IF.IFADMINSTATUS.MATCHES}'
           value: '^.*'

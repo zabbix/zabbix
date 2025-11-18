@@ -37,7 +37,7 @@ zabbix_export:
         > Refer to the [vendor documentation](https://www.cisco.com/c/en/us/support/switches/nexus-9000-series-switches/products-installation-and-configuration-guides-list.html) for details.
       vendor:
         name: Zabbix
-        version: 8.0-2
+        version: 8.0-3
       groups:
         - name: 'Templates/Network devices'
       items:
@@ -1361,7 +1361,7 @@ zabbix_export:
             priority: '1'
             section_name: Thresholds
             label: 'Threshold for CPU utilization (critical)'
-            description: 'In the range from 0 to 100 inclusive.'
+            description: 'Critical threshold of the CPU utilization in %. In the range from 0 to 100 inclusive.'
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
         - macro: '{$ENT_CLASS.NOT_MATCHES}'
           value: '3'
@@ -1388,6 +1388,7 @@ zabbix_export:
             priority: '2'
             section_name: Thresholds
             label: 'Threshold of ICMP packet loss'
+            description: 'Warning threshold of the ICMP packet loss in %.'
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
         - macro: '{$ICMP_RESPONSE_TIME_WARN}'
           value: '0.15'
@@ -1396,6 +1397,7 @@ zabbix_export:
             priority: '3'
             section_name: Thresholds
             label: 'Threshold of the average ICMP response'
+            description: 'Threshold of the average ICMP response time in seconds.'
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
         - macro: '{$IF.ERRORS.WARN}'
           value: '2'
@@ -1404,6 +1406,7 @@ zabbix_export:
             priority: '4'
             section_name: Thresholds
             label: 'Threshold of error packet rate'
+            description: 'Threshold of the error packet rate. Can be used with interface name as context.'
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
         - macro: '{$IF.UTIL.MAX}'
           value: '90'
@@ -1412,7 +1415,7 @@ zabbix_export:
             priority: '5'
             section_name: Thresholds
             label: 'The threshold in the interface utilization'
-            description: 'In the range from 0 to 100 inclusive.'
+            description: 'Threshold of interface bandwidth utilization for warning trigger in %. Can be used with interface name as context. In the range from 0 to 100 inclusive.'
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
         - macro: '{$IFCONTROL}'
           value: '1'
@@ -1421,6 +1424,7 @@ zabbix_export:
             priority: '6'
             section_name: Other
             label: 'Interfaces control'
+            description: 'Macro for operational state of the interface for link down trigger. Can be used with interface name as context.'
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
         - macro: '{$MEMORY.UTIL.MAX}'
           value: '90'
@@ -1429,6 +1433,7 @@ zabbix_export:
             priority: '7'
             section_name: Thresholds
             label: 'Threshold for memory utilization'
+            description: 'Warning threshold of the "Physical memory: Memory utilization" item.'
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
         - macro: '{$NET.IF.IFADMINSTATUS.MATCHES}'
           value: '^.*'
@@ -1437,6 +1442,7 @@ zabbix_export:
             priority: '8'
             section_name: Thresholds
             label: 'Filter for network interface by adminstatus'
+            description: 'This macro is used in filters of network interfaces discovery rule.'
         - macro: '{$NET.IF.IFADMINSTATUS.NOT_MATCHES}'
           value: ^2$
           description: 'If the administrative status is down (2), then an interface is excluded.'
@@ -1453,6 +1459,7 @@ zabbix_export:
             priority: '10'
             section_name: Thresholds
             label: 'Filter for network interfaces by alias'
+            description: 'This macro is used in filters of network interfaces discovery rule.'
         - macro: '{$NET.IF.IFALIAS.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
           config:
@@ -1460,6 +1467,7 @@ zabbix_export:
             priority: '11'
             section_name: Thresholds
             label: 'Filter for network interfaces by alias (exclude)'
+            description: 'This macro is used in filters of network interfaces discovery rule.'
         - macro: '{$NET.IF.IFDESCR.MATCHES}'
           value: '.*'
           config:
@@ -1467,6 +1475,7 @@ zabbix_export:
             priority: '14'
             section_name: Thresholds
             label: 'Filter for network interfaces by description'
+            description: 'This macro is used in filters of network interfaces discovery rule.'
         - macro: '{$NET.IF.IFDESCR.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
           config:
@@ -1474,6 +1483,7 @@ zabbix_export:
             priority: '15'
             section_name: Thresholds
             label: 'Filter for network interfaces by description (exclude)'
+            description: 'This macro is used in filters of network interfaces discovery rule.'
         - macro: '{$NET.IF.IFNAME.MATCHES}'
           value: '^.*$'
           config:
@@ -1481,6 +1491,7 @@ zabbix_export:
             priority: '16'
             section_name: Thresholds
             label: 'Filter for network interface by name'
+            description: 'This macro is used in filters of network interfaces discovery rule.'
         - macro: '{$NET.IF.IFNAME.NOT_MATCHES}'
           value: '(^Software Loopback Interface|^NULL[0-9.]*$|^[Ll]o[0-9.]*$|^[Ss]ystem$|^Nu[0-9.]*$|^veth[0-9a-z]+$|docker[0-9]+|br-[a-z0-9]{12})'
           description: 'It filters out `loopbacks`, `nulls`, `docker veth` links and `docker0 bridge` by default.'
@@ -1497,6 +1508,7 @@ zabbix_export:
             priority: '18'
             section_name: Thresholds
             label: 'Filter for network interface by status'
+            description: 'This macro is used in filters of network interfaces discovery rule.'
         - macro: '{$NET.IF.IFOPERSTATUS.NOT_MATCHES}'
           value: ^6$
           description: 'If the operational status is `notPresent (6)`, then an interface is excluded.'
@@ -1513,6 +1525,7 @@ zabbix_export:
             priority: '20'
             section_name: Thresholds
             label: 'Filter for network interfaces by type'
+            description: 'This macro is used in filters of network interfaces discovery rule.'
         - macro: '{$NET.IF.IFTYPE.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
           config:
@@ -1520,6 +1533,7 @@ zabbix_export:
             priority: '21'
             section_name: Thresholds
             label: 'Filter for network interfaces by type (exclude)'
+            description: 'This macro is used in filters of network interfaces discovery rule.'
         - macro: '{$PSU.PROBLEM.STATES}'
           value: ^(1|4|5|6|7|9|10|11|12)$
           description: 'The PSU states list for average trigger priority.'
@@ -1536,6 +1550,7 @@ zabbix_export:
             priority: '22'
             section_name: Other
             label: 'Time interval'
+            description: 'The time interval for SNMP availability trigger.'
         - macro: '{$TEMP_CRIT}'
           value: '60'
           config:
@@ -1543,6 +1558,7 @@ zabbix_export:
             priority: '35'
             section_name: Thresholds
             label: 'Threshold for temperature (critical)'
+            description: 'Critical threshold of the temperature in °C.'
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
         - macro: '{$TEMP_CRIT:regex:"BACK"}'
           value: '70'
@@ -1551,6 +1567,7 @@ zabbix_export:
             priority: '24'
             section_name: Thresholds
             label: 'Threshold for temperature critical (back)'
+            description: 'Critical threshold for the back temperature in °C.'
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
         - macro: '{$TEMP_CRIT:regex:"CPU"}'
           value: '90'
@@ -1559,6 +1576,7 @@ zabbix_export:
             priority: '28'
             section_name: Thresholds
             label: 'Threshold for temperature critical (CPU)'
+            description: 'Critical threshold of the CPU temperature in °C.'
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
         - macro: '{$TEMP_CRIT:regex:"FRONT"}'
           value: '80'
@@ -1567,6 +1585,7 @@ zabbix_export:
             priority: '26'
             section_name: Thresholds
             label: 'Threshold for temperature critical (front)'
+            description: 'Critical threshold of the front temperature in °C.'
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
         - macro: '{$TEMP_CRIT:regex:"SUN1"}'
           value: '110'
@@ -1575,6 +1594,7 @@ zabbix_export:
             priority: '30'
             section_name: Thresholds
             label: 'Threshold for temperature critical (SUN1)'
+            description: 'Critical threshold of the SUN1 temperature in °C.'
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
         - macro: '{$TEMP_CRIT:regex:"Transceiver"}'
           value: '75'
@@ -1582,7 +1602,8 @@ zabbix_export:
             type: TEXT
             priority: '32'
             section_name: Thresholds
-            label: 'Threshold for temperature warning (Transceiver)'
+            label: 'Threshold for temperature critical (Transceiver)'
+            description: 'Critical threshold of the Transceiver temperature in °C.'
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
         - macro: '{$TEMP_CRIT_LOW}'
           value: '5'
@@ -1591,6 +1612,7 @@ zabbix_export:
             priority: '33'
             section_name: Thresholds
             label: 'Threshold for low temperature (critical)'
+            description: 'Critical threshold of the low temperature in °C.'
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
         - macro: '{$TEMP_WARN}'
           value: '50'
@@ -1599,6 +1621,7 @@ zabbix_export:
             priority: '34'
             section_name: Thresholds
             label: 'Threshold for temperature (warning)'
+            description: 'Warning threshold of the temperature in °C.'
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
         - macro: '{$TEMP_WARN:regex:"BACK"}'
           value: '42'
@@ -1607,6 +1630,7 @@ zabbix_export:
             priority: '23'
             section_name: Thresholds
             label: 'Threshold for temperature warning (back)'
+            description: 'Warning threshold for the back temperature in °C.'
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
         - macro: '{$TEMP_WARN:regex:"CPU"}'
           value: '80'
@@ -1615,6 +1639,7 @@ zabbix_export:
             priority: '27'
             section_name: Thresholds
             label: 'Threshold for temperature warning (CPU)'
+            description: 'Warning threshold of the CPU temperature in °C.'
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
         - macro: '{$TEMP_WARN:regex:"FRONT"}'
           value: '70'
@@ -1623,6 +1648,7 @@ zabbix_export:
             priority: '25'
             section_name: Thresholds
             label: 'Threshold for temperature warning (front)'
+            description: 'Warning threshold for the front temperature in °C.'
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
         - macro: '{$TEMP_WARN:regex:"SUN1"}'
           value: '90'
@@ -1631,6 +1657,7 @@ zabbix_export:
             priority: '29'
             section_name: Thresholds
             label: 'Threshold for temperature warning (SUN1)'
+            description: 'Warning threshold of the SUN1 temperature in °C.'
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
         - macro: '{$TEMP_WARN:regex:"Transceiver"}'
           value: '70'
@@ -1639,6 +1666,7 @@ zabbix_export:
             priority: '31'
             section_name: Thresholds
             label: 'Threshold for temperature warning (Transceiver)'
+            description: 'Warning threshold of the Transceiver temperature in °C.'
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
       dashboards:
         - uuid: 370f653fc1eb4600afdc5c37fe7b9d0d
