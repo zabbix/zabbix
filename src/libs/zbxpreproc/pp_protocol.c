@@ -1156,11 +1156,20 @@ void	zbx_preprocess_item_value(zbx_uint64_t itemid, unsigned char item_value_typ
 			char	*json_val, *dyn_error = NULL;
 
 			if (ZBX_ISSET_JSON(result))
+			{
 				json_val = result->tjson;
+			}
 			else if (ZBX_ISSET_TEXT(result))
+			{
 				json_val = result->text;
+			}
 			else
+			{
+				zabbix_log(LOG_LEVEL_CRIT, "unexpected result type: %d and item_value_type: %d combo "
+						"for itemid: " ZBX_FS_UI64, result->type, item_value_type, itemid);
 				THIS_SHOULD_NEVER_HAPPEN;
+				exit(EXIT_FAILURE);
+			}
 
 			if (ZBX_HISTORY_JSON_VALUE_LEN < strlen(json_val))
 			{

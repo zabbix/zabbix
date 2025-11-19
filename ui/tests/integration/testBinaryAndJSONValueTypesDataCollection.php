@@ -465,7 +465,7 @@ class testBinaryAndJSONValueTypesDataCollection extends CIntegrationTest {
 		$this->assertEquals(1, count($response['result']));
 		$this->assertEquals(self::$json_image_normalized, $json_result);
 
-		$this->sendSenderValue('agent', 'JSON_TRAPPER_PREPROC_THROTTLING', "");
+		$this->sendSenderValue('agent', 'JSON_TRAPPER_PREPROC_THROTTLING', "{}");
 		$active_data = $this->callUntilDataIsPresent('history.get', [
 			'itemids'	=>	self::$itemids['agent:JSON_TRAPPER_PREPROC_THROTTLING'],
 			'history'	=>	ITEM_VALUE_TYPE_JSON
@@ -512,7 +512,7 @@ class testBinaryAndJSONValueTypesDataCollection extends CIntegrationTest {
 		$this->assertEquals(self::$json_image_normalized, $json_result);
 
 
-		$this->sendSenderValue('proxy_agent', 'JSON_TRAPPER_PREPROC_THROTTLING', "");
+		$this->sendSenderValue('proxy_agent', 'JSON_TRAPPER_PREPROC_THROTTLING', "null");
 		$active_data = $this->callUntilDataIsPresent('history.get', [
 			'itemids'	=>	self::$itemids['proxy_agent:JSON_TRAPPER_PREPROC_THROTTLING'],
 			'history'	=>	ITEM_VALUE_TYPE_JSON
