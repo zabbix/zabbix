@@ -162,7 +162,11 @@ class CControllerHostTagsList extends CController {
 			'preservekeys' => true
 		]);
 
-		$templateids = array_flip($templateids);
+		if (!$templates) {
+			return $tag_details;
+		}
+
+		$templateids = array_intersect_key(array_flip($templateids), $templates);
 
 		$tag_templates_by_templateid = [];
 
