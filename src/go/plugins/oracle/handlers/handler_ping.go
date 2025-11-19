@@ -36,13 +36,21 @@ func PingHandler(ctx context.Context, conn dbconn.OraClient, _ map[string]string
 	row, err := conn.QueryRow(ctx, fmt.Sprintf("SELECT %d FROM DUAL", PingOk))
 	if err != nil {
 		log.Errf("[Oracle] ping failed: %v\n", err.Error())
+
 		return PingFailed, nil //nolint:nilerr
 	}
 
 	err = row.Scan(&res)
 
-	if err != nil || res != PingOk {
+	if err != nil {
 		log.Errf("[Oracle] ping failed: %v\n", err.Error())
+
+		return PingFailed, nil
+	}
+
+	if res != PingOk {
+		log.Errf("[Oracle] ping failed\n")
+
 		return PingFailed, nil //nolint:nilerr
 	}
 
