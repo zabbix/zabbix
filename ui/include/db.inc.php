@@ -562,14 +562,7 @@ function dbConditionString($fieldName, array $values, $notIn = false) {
 	}
 
 	$in = $notIn ? ' NOT IN ' : ' IN ';
-	$concat = $notIn ? ' AND ' : ' OR ';
-	$items = array_chunk($values, 950);
-
-	$condition = '';
-	foreach ($items as $values) {
-		$condition .= !empty($condition) ? ')'.$concat.$fieldName.$in.'(' : '';
-		$condition .= implode(',', zbx_dbstr($values));
-	}
+	$condition = implode(',', zbx_dbstr($values));
 
 	return '('.$fieldName.$in.'('.$condition.'))';
 }
