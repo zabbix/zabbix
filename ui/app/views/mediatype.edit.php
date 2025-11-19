@@ -590,7 +590,6 @@ if ($data['mediatypeid']) {
 		[
 			'title' => _('Delete'),
 			'class' => implode(' ', [ZBX_STYLE_BTN_ALT, 'js-delete']),
-			'confirmation' => _('Delete media type?'),
 			'keepOpen' => true,
 			'isSubmit' => false
 		]

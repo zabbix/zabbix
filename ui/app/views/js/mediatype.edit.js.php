@@ -176,17 +176,22 @@ window.mediatype_edit_popup = new class {
 	}
 
 	#delete() {
-		this.#removePopupMessages();
-		const curl = new Curl('zabbix.php');
+		if (window.confirm(<?= json_encode(_('Delete media type?')) ?>)) {
+			this.#removePopupMessages();
+			const curl = new Curl('zabbix.php');
 
-		curl.setArgument('action', 'mediatype.delete');
-		curl.setArgument(CSRF_TOKEN_NAME, <?= json_encode(CCsrfTokenHelper::get('mediatype')) ?>);
+			curl.setArgument('action', 'mediatype.delete');
+			curl.setArgument(CSRF_TOKEN_NAME, <?= json_encode(CCsrfTokenHelper::get('mediatype')) ?>);
 
-		this.#post(curl.getUrl(), {mediatypeids: [this.mediatypeid]}, (response) => {
-			overlayDialogueDestroy(this.overlay.dialogueid);
+			this.#post(curl.getUrl(), {mediatypeids: [this.mediatypeid]}, (response) => {
+				overlayDialogueDestroy(this.overlay.dialogueid);
 
-			this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response}));
-		});
+				this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response}));
+			});
+		}
+		else {
+			this.overlay.unsetLoading();
+		}
 	}
 
 	#submit() {
