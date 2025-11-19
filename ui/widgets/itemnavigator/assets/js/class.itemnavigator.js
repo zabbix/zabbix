@@ -161,12 +161,17 @@ class CItemNavigator {
 	#prepareNodesProperties(nodes) {
 		for (let i = 0; i < nodes.length; i++) {
 			if (nodes[i].children === undefined) {
-				nodes[i] = {
+				const properties = {
 					id: nodes[i].itemid,
 					name: nodes[i].name,
-					level: this.#config.group_by?.length || 0,
-					problem_count: nodes[i].problem_count
+					level: this.#config.group_by?.length || 0
 				};
+
+				if (nodes[i].problem_count !== undefined) {
+					properties.problem_count = nodes[i].problem_count;
+				}
+
+				nodes[i] = properties;
 			}
 			else {
 				nodes[i].is_open = this.#config.open_groups.includes(JSON.stringify(nodes[i].group_identifier));
