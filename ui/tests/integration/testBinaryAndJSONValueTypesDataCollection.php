@@ -473,7 +473,7 @@ class testBinaryAndJSONValueTypesDataCollection extends CIntegrationTest {
 		]);
 
 		$this->assertEquals(2, count($response['result']), json_encode($response['result']));
-		$this->assertEquals(json_encode($response['result'][1]), "{}");
+		$this->assertEquals(json_encode($response['result'][1]['value']), "{}");
 	}
 
 	/**
@@ -502,8 +502,8 @@ class testBinaryAndJSONValueTypesDataCollection extends CIntegrationTest {
 		$this->sendSenderValue('proxy_agent', 'JSON_TRAPPER', self::$invalid_json, self::COMPONENT_PROXY);
 		$this->checkItemState('proxy_agent:JSON_TRAPPER', ITEM_STATE_NOTSUPPORTED);
 
-		$this->sendSenderValue('proxy_agent', 'JSON_TRAPPER_PREPROC_THROTTLING', self::$json_with_image);
-		$this->sendSenderValue('proxy_agent', 'JSON_TRAPPER_PREPROC_THROTTLING', self::$json_with_image);
+		$this->sendSenderValue('proxy_agent', 'JSON_TRAPPER_PREPROC_THROTTLING', self::$json_with_image, self::COMPONENT_PROXY);
+		$this->sendSenderValue('proxy_agent', 'JSON_TRAPPER_PREPROC_THROTTLING', self::$json_with_image, self::COMPONENT_PROXY);
 		$response = $this->callUntilDataIsPresent('history.get', [
 			'itemids'	=>	self::$itemids['proxy_agent:JSON_TRAPPER_PREPROC_THROTTLING'],
 			'history'	=>	ITEM_VALUE_TYPE_JSON
@@ -513,7 +513,7 @@ class testBinaryAndJSONValueTypesDataCollection extends CIntegrationTest {
 		$json_result = self::normalize_json($response['result'][0]['value']);
 		$this->assertEquals(self::$json_image_normalized, $json_result);
 
-		$this->sendSenderValue('proxy_agent', 'JSON_TRAPPER_PREPROC_THROTTLING', "null");
+		$this->sendSenderValue('proxy_agent', 'JSON_TRAPPER_PREPROC_THROTTLING', "null", self::COMPONENT_PROXY);
 		$response = $this->callUntilDataIsPresent('history.get', [
 			'itemids'	=>	self::$itemids['proxy_agent:JSON_TRAPPER_PREPROC_THROTTLING'],
 			'history'	=>	ITEM_VALUE_TYPE_JSON,
@@ -522,7 +522,7 @@ class testBinaryAndJSONValueTypesDataCollection extends CIntegrationTest {
 		]);
 
 		$this->assertEquals(2, count($response['result']), json_encode($response['result']));
-		$this->assertEquals($response['result'][0], "null");
+		$this->assertEquals($response['result'][0]['value'], "null");
 	}
 
 	/**
