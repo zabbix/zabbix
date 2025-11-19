@@ -3680,6 +3680,11 @@ msgstr "XML: %1$s 을 읽을 수 없습니다."
 msgid "Cannot read YAML: %1$s."
 msgstr "YAML을 읽을 수 없습니다: %1$s."
 
+#: include/classes/server/CZabbixServer.php:502
+#, c-format
+msgid "Cannot read response from Zabbix server \"%1$s\"."
+msgstr ""
+
 #: include/classes/server/CZabbixServer.php:567
 #, c-format
 msgid "Cannot read the response, check connection with the Zabbix server \"%1$s\"."
@@ -3739,6 +3744,10 @@ msgstr "그래프의 프로토타입 \"%2$s\"에 \"%1$s\"를 설정할 수 없�
 
 #: widgets/piechart/includes/CWidgetFieldDataSet.php:175
 msgid "Cannot set \"Data set aggregation\" when item with type \"Total\" is added to the chart."
+msgstr ""
+
+#: include/classes/db/MysqlDbBackend.php:197
+msgid "Cannot set charset."
 msgstr ""
 
 #: include/classes/api/services/CItemGeneral.php:2478
@@ -17581,6 +17590,11 @@ msgstr "응답 코드"
 #: httpdetails.php:149 include/classes/screens/CScreenHttpTestDetails.php:83
 msgid "Response time"
 msgstr "응답 시간"
+
+#: include/classes/server/CZabbixServer.php:498
+#, c-format
+msgid "Response timeout of %1$s exceeded when connecting to Zabbix server \"%2$s\"."
+msgstr ""
 
 #: app/controllers/CControllerMediatypeTestSend.php:182
 msgid "Response type: JSON"

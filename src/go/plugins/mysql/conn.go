@@ -25,18 +25,11 @@ import (
 
 	"github.com/go-sql-driver/mysql"
 	"github.com/omeid/go-yarn"
+	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/log"
 	"golang.zabbix.com/sdk/tlsconfig"
 	"golang.zabbix.com/sdk/uri"
 	"golang.zabbix.com/sdk/zbxerr"
-)
-
-const (
-	// connType
-	disable    = "disabled"
-	require    = "required"
-	verifyCa   = "verify_ca"
-	verifyFull = "verify_full"
 )
 
 type MyClient interface {
@@ -62,6 +55,14 @@ type ConnManager struct {
 	Destroy        context.CancelFunc
 	queryStorage   yarn.Yarn
 	log            log.Logger
+}
+
+type connectionManagerOptions struct {
+	keepAlive      time.Duration
+	connectTimeout time.Duration
+	callTimeout    time.Duration
+	queryStorage   yarn.Yarn
+	logger         log.Logger
 }
 
 type connKey struct {
@@ -96,30 +97,50 @@ func (conn *MyConn) QueryByName(ctx context.Context, name string, args ...interf
 }
 
 // QueryRow wraps DB.QueryRowContext.
-func (conn *MyConn) QueryRow(ctx context.Context, query string, args ...interface{}) (row *sql.Row, err error) {
-	row = conn.client.QueryRowContext(ctx, query, args...)
+func (conn *MyConn) QueryRow(ctx context.Context, query string, args ...any) (*sql.Row, error) {
+	row := conn.client.QueryRowContext(ctx, query, args...)
 
-	if ctxErr := ctx.Err(); ctxErr != nil {
-		err = ctxErr
+	err := ctx.Err()
+	if err != nil {
+		return nil, errs.Wrap(err, "context failed")
 	}
 
-	return
+	return row, nil
+}
+
+// NewConnManager initializes connManager structure and runs Go Routine that watches for unused connections.
+func NewConnManager(options *connectionManagerOptions) *ConnManager {
+	ctx, cancel := context.WithCancel(context.Background())
+
+	connMgr := &ConnManager{
+		connections:    make(map[connKey]*MyConn),
+		keepAlive:      options.keepAlive,
+		connectTimeout: options.connectTimeout,
+		callTimeout:    options.callTimeout,
+		Destroy:        cancel, // Destroy stops originated goroutines and closes connections.
+		queryStorage:   options.queryStorage,
+		log:            options.logger,
+	}
+
+	go connMgr.housekeeper(ctx)
+
+	return connMgr
 }
 
 // GetConnection returns an existing connection or creates a new one.
-func (c *ConnManager) GetConnection(uri uri.URI, params map[string]string) (*MyConn, error) {
-	ck := createConnKey(uri, params)
+func (c *ConnManager) GetConnection(u *uri.URI, params map[string]string) (*MyConn, error) {
+	ck := createConnKey(u, params)
 
 	conn := c.getConn(ck)
 	if conn != nil {
-		c.log.Tracef("connection found for host: %s", uri.Host())
+		c.log.Tracef("connection found for host: %s", u.Host())
 
 		conn.updateLastAccessTime()
 
 		return conn, nil
 	}
 
-	c.log.Tracef("creating new connection for host: %s", uri.Host())
+	c.log.Tracef("creating new connection for host: %s", u.Host())
 
 	conn, err := c.create(ck)
 	if err != nil {
@@ -127,27 +148,6 @@ func (c *ConnManager) GetConnection(uri uri.URI, params map[string]string) (*MyC
 	}
 
 	return c.setConn(ck, conn), nil
-}
-
-// NewConnManager initializes connManager structure and runs Go Routine that watches for unused connections.
-func NewConnManager(
-	keepAlive, connectTimeout, callTimeout, hkInterval time.Duration, queryStorage yarn.Yarn, logger log.Logger,
-) *ConnManager {
-	ctx, cancel := context.WithCancel(context.Background())
-
-	connMgr := &ConnManager{
-		connections:    make(map[connKey]*MyConn),
-		keepAlive:      keepAlive,
-		connectTimeout: connectTimeout,
-		callTimeout:    callTimeout,
-		Destroy:        cancel, // Destroy stops originated goroutines and closes connections.
-		queryStorage:   queryStorage,
-		log:            logger,
-	}
-
-	go connMgr.housekeeper(ctx, hkInterval)
-
-	return connMgr
 }
 
 // updateLastAccessTime updates the last time a connection was accessed.
@@ -191,8 +191,10 @@ func (c *ConnManager) closeAll() {
 }
 
 // housekeeper repeatedly checks for unused connections and closes them.
-func (c *ConnManager) housekeeper(ctx context.Context, interval time.Duration) {
-	ticker := time.NewTicker(interval)
+func (c *ConnManager) housekeeper(ctx context.Context) {
+	const interval = 10
+
+	ticker := time.NewTicker(interval * time.Second)
 
 	for {
 		select {
@@ -214,12 +216,12 @@ func (c *ConnManager) create(ck connKey) (*MyConn, error) {
 		return nil, err
 	}
 
-	tlsConfig, err := c.getTLSConfig(details)
+	tlsConfig, err := details.GetTLSConfig()
 	if err != nil {
-		return nil, err
+		return nil, errs.Wrap(err, "failed to get TLS config")
 	}
 
-	config, err := getMySQLConfig(ck.uri, tlsConfig, c.connectTimeout, c.callTimeout)
+	config, err := getMySQLConfig(&ck.uri, tlsConfig, c.connectTimeout, c.callTimeout)
 	if err != nil {
 		return nil, err
 	}
@@ -273,84 +275,43 @@ func (c *ConnManager) setConn(ck connKey, conn *MyConn) *MyConn {
 	return conn
 }
 
-func getMySQLConfig(uri uri.URI, tls *tls.Config, connectTimeout, callTimeout time.Duration) (*mysql.Config, error) {
+func getMySQLConfig(
+	u *uri.URI,
+	tlsConfig *tls.Config,
+	connectTimeout,
+	callTimeout time.Duration,
+) (*mysql.Config, error) {
 	config := mysql.NewConfig()
-	config.User = uri.User()
-	config.Passwd = uri.Password()
-	config.Net = uri.Scheme()
-	config.Addr = uri.Addr()
+	config.User = u.User()
+	config.Passwd = u.Password()
+	config.Net = u.Scheme()
+	config.Addr = u.Addr()
 	config.Timeout = connectTimeout
 	config.ReadTimeout = callTimeout
 	config.InterpolateParams = true
 
-	if tls == nil {
+	if tlsConfig == nil {
 		return config, nil
 	}
 
-	err := mysql.RegisterTLSConfig(uri.String(), tls)
+	err := mysql.RegisterTLSConfig(u.String(), tlsConfig)
 	if err != nil {
 		return nil, zbxerr.New("failed to register TLS config").Wrap(err)
 	}
 
-	config.TLSConfig = uri.String()
+	config.TLSConfig = u.String()
 
 	return config, nil
 }
 
-func (c *ConnManager) getTLSConfig(details *tlsconfig.Details) (*tls.Config, error) {
-	var (
-		tlsConf *tls.Config
-		err     error
-	)
-
-	switch details.TlsConnect {
-	case "required":
-		tlsConf, err = c.getRequiredTLSConfig(details)
-		if err != nil {
-			return nil, zbxerr.New("failed to get TLS config for required connection").Wrap(err)
-		}
-	case "verify_ca":
-		tlsConf, err = details.GetTLSConfig(true)
-		if err != nil {
-			return nil, zbxerr.New("failed to get TLS config for verify_ca connection").Wrap(err)
-		}
-
-		tlsConf.VerifyPeerCertificate = tlsconfig.VerifyPeerCertificateFunc("", tlsConf.RootCAs)
-	case "verify_full":
-		tlsConf, err = details.GetTLSConfig(false)
-		if err != nil {
-			return nil, zbxerr.New("failed to get TLS config for verify_full connection").Wrap(err)
-		}
-
-		tlsConf.VerifyPeerCertificate = tlsconfig.VerifyPeerCertificateFunc(tlsConf.ServerName, tlsConf.RootCAs)
-	default:
-		return nil, nil
-	}
-
-	return tlsConf, nil
-}
-
-func (c *ConnManager) getRequiredTLSConfig(details *tlsconfig.Details) (*tls.Config, error) {
-	if details.TlsCaFile != "" {
-		c.log.Warningf("server CA will not be verified for %s", details.TlsConnect)
-	}
-
-	clientCerts, err := details.LoadCertificates()
-	if err != nil {
-		return nil, err
-	}
-
-	return &tls.Config{Certificates: clientCerts, InsecureSkipVerify: true}, nil
-}
-
-func createConnKey(uri uri.URI, params map[string]string) connKey {
+func createConnKey(u *uri.URI, params map[string]string) connKey {
 	tlsType := params[tlsConnectParam]
 	if tlsType == "" {
-		tlsType = disable
+		tlsType = string(tlsconfig.Disabled)
 	}
 
 	return connKey{
-		uri:        uri,
+		uri:        *u,
 		rawUri:     params[uriParam],
 		tlsConnect: tlsType,
 		tlsCA:      params[tlsCAParam],
@@ -365,30 +326,37 @@ func getTLSDetails(ck connKey) (*tlsconfig.Details, error) {
 		validateClient = false
 	)
 
+	connectionType, err := tlsconfig.NewTLSConnectionType(ck.tlsConnect)
+	if err != nil {
+		return nil, errs.Wrap(err, "failed to parse TLS connection type "+ck.tlsConnect)
+	}
+
 	details := tlsconfig.NewDetails(
 		"",
-		ck.tlsConnect,
-		ck.tlsCA,
-		ck.tlsCert,
-		ck.tlsKey,
 		ck.rawUri,
-		disable,
-		require,
-		verifyCa,
-		verifyFull,
+		tlsconfig.WithTLSCaFile(ck.tlsCA),
+		tlsconfig.WithTLSCertFile(ck.tlsCert),
+		tlsconfig.WithTLSKeyFile(ck.tlsKey),
+		tlsconfig.WithTLSConnect(connectionType),
+		tlsconfig.WithAllowedConnections(
+			string(tlsconfig.Disabled),
+			string(tlsconfig.Required),
+			string(tlsconfig.VerifyCA),
+			string(tlsconfig.VerifyFull),
+		),
 	)
 
-	if ck.tlsConnect == disable || ck.tlsConnect == require {
+	if connectionType == tlsconfig.Disabled || connectionType == tlsconfig.Required {
 		validateCA = false
 	}
 
-	if details.TlsKeyFile != "" || details.TlsCertFile != "" {
+	if details.TLSKeyFile != "" || details.TLSCertFile != "" {
 		validateClient = true
 	}
 
-	err := details.Validate(validateCA, validateClient, validateClient)
+	err = details.Validate(validateCA, validateClient, validateClient)
 	if err != nil {
-		return nil, zbxerr.ErrorInvalidConfiguration.Wrap(err)
+		return nil, errs.WrapConst(err, zbxerr.ErrorInvalidConfiguration)
 	}
 
 	return &details, nil

@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2025-08-20 19:49+0000\n"
+"PO-Revision-Date: 2025-11-16 13:55+0000\n"
 "Last-Translator: ERIC <eric78.zabbix@orange.fr>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: fr\n"
@@ -3758,6 +3758,11 @@ msgstr "Impossible de lire du XML : %1$s."
 msgid "Cannot read YAML: %1$s."
 msgstr "Impossible de lire le YAML : %1$s."
 
+#: include/classes/server/CZabbixServer.php:502
+#, c-format
+msgid "Cannot read response from Zabbix server \"%1$s\"."
+msgstr "Impossible de lire la réponse du serveur Zabbix « %1$s »."
+
 #: include/classes/server/CZabbixServer.php:567
 #, c-format
 msgid "Cannot read the response, check connection with the Zabbix server \"%1$s\"."
@@ -3819,6 +3824,10 @@ msgstr "Impossible de configurer \"%1$s\" pour le prototype de graphique \"%2$s\
 #: widgets/piechart/includes/CWidgetFieldDataSet.php:175
 msgid "Cannot set \"Data set aggregation\" when item with type \"Total\" is added to the chart."
 msgstr "Impossible de définir l'« Agrégation d'ensembles de données » lorsqu'un élément de type « Total » est ajouté au graphique."
+
+#: include/classes/db/MysqlDbBackend.php:197
+msgid "Cannot set charset."
+msgstr "Impossible de définir l'encodage des caractères."
 
 #: include/classes/api/services/CItemGeneral.php:2478
 #, c-format
@@ -4316,7 +4325,7 @@ msgstr "Certificat"
 #: include/items.inc.php:1581
 msgctxt "noun"
 msgid "Change"
-msgstr "Changer"
+msgstr "Changement"
 
 #: app/partials/hostmacros.inherited.list.html.php:124
 #: app/partials/hostmacros.inherited.list.html.php:141
@@ -10078,7 +10087,7 @@ msgstr "IPMI"
 
 #: include/items.inc.php:96
 msgid "IPMI agent"
-msgstr "agent IPMI"
+msgstr "Agent IPMI"
 
 #: include/views/inventory.host.view.php:67
 msgid "IPMI interfaces"
@@ -11257,7 +11266,7 @@ msgstr "Tags hérités et d'élément"
 
 #: app/partials/configuration.tags.tab.php:160
 msgid "Inherited and scenario tags"
-msgstr "Tags héritées et de scénario"
+msgstr "Tags hérités et de scénario"
 
 #: app/views/template.edit.php:184
 msgid "Inherited and template macros"
@@ -12137,7 +12146,7 @@ msgstr "JMX"
 
 #: include/items.inc.php:99
 msgid "JMX agent"
-msgstr "agent JMX"
+msgstr "Agent JMX"
 
 #: app/views/popup.massupdate.item.php:77
 #: include/views/configuration.host.discovery.edit.php:586
@@ -17711,6 +17720,11 @@ msgstr "Code de réponse"
 msgid "Response time"
 msgstr "Temps de réponse"
 
+#: include/classes/server/CZabbixServer.php:498
+#, c-format
+msgid "Response timeout of %1$s exceeded when connecting to Zabbix server \"%2$s\"."
+msgstr "Délai de réponse de %1$s dépassé lors de la connexion au serveur Zabbix « %2$s »."
+
 #: app/controllers/CControllerMediatypeTestSend.php:182
 msgid "Response type: JSON"
 msgstr "Type de réponse : JSON"
@@ -19961,7 +19975,7 @@ msgstr "TCP"
 #: app/views/administration.timeouts.edit.php:115
 #: app/views/popup.proxy.edit.php:283 include/items.inc.php:98
 msgid "TELNET agent"
-msgstr "agent TELNET"
+msgstr "Agent TELNET"
 
 #: include/classes/screens/CScreenHttpTestDetails.php:190
 msgid "TOTAL"
@@ -20681,7 +20695,7 @@ msgstr "Seuils"
 
 #: include/items.inc.php:1629 include/items.inc.php:1633
 msgid "Throttling"
-msgstr "Étranglement"
+msgstr "Limitation"
 
 #: include/func.inc.php:216
 msgid "Thu"
@@ -23860,7 +23874,7 @@ msgstr "Support Technique Zabbix"
 #: app/views/popup.proxy.edit.php:206 include/discovery.inc.php:56
 #: include/items.inc.php:86
 msgid "Zabbix agent"
-msgstr "agent Zabbix"
+msgstr "Agent Zabbix"
 
 #: widgets/hostavail/includes/WidgetForm.php:47
 msgid "Zabbix agent (active checks)"
@@ -23868,7 +23882,7 @@ msgstr "Agent Zabbix (contrôles actifs)"
 
 #: include/items.inc.php:87
 msgid "Zabbix agent (active)"
-msgstr "agent Zabbix (actif)"
+msgstr "Agent Zabbix (actif)"
 
 #: widgets/hostavail/includes/WidgetForm.php:48
 msgid "Zabbix agent (passive checks)"
