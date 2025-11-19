@@ -29,6 +29,7 @@ class CControllerMiscConfigUpdate extends CController {
 				'in' => [HOST_INVENTORY_DISABLED, HOST_INVENTORY_MANUAL, HOST_INVENTORY_AUTOMATIC]
 			],
 			'alert_usrgrpid' => ['db usrgrp.usrgrpid'],
+			'snmptrap_logging' => ['boolean', 'required'],
 			'login_attempts' => ['integer', 'required', 'min' => 1, 'max' => 32],
 			'login_block' => ['string', 'required', 'not_empty',
 				'use' => [CTimeUnitValidator::class, ['min' => 30, 'max' => SEC_PER_HOUR]]
