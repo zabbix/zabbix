@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2025-10-30 17:03+0000\n"
+"PO-Revision-Date: 2025-11-01 09:43+0000\n"
 "Last-Translator: Vicente Salvador <vicentesalvadorcubedo@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: es\n"
@@ -3825,6 +3825,10 @@ msgstr "No pude definir \"%1$s\" para el prototipo de gráfico \"%2$s\"."
 msgid "Cannot set \"Data set aggregation\" when item with type \"Total\" is added to the chart."
 msgstr "No se puede establecer \"Agregación de conjuntos de datos\" cuando se agrega una métrica con el tipo \"Total\" al gráfico."
 
+#: include/classes/db/MysqlDbBackend.php:197
+msgid "Cannot set charset."
+msgstr ""
+
 #: include/classes/api/services/CItemGeneral.php:2478
 #, c-format
 msgid "Cannot set dependency for LLD rule with key \"%1$s\" on the master item with key \"%2$s\" on the host \"%3$s\": %4$s."
@@ -5774,7 +5778,7 @@ msgstr "Oscuro"
 #: include/classes/widgets/fields/CWidgetFieldTimePeriod.php:83
 #: jsLoader.php:198
 msgid "Dashboard"
-msgstr "Panel de control"
+msgstr "Tablero"
 
 #: include/classes/api/services/CDashboard.php:379
 #: include/classes/api/services/CTemplateDashboard.php:508
