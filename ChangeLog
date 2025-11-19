@@ -1,9 +1,22 @@
 Changes for 8.0.0alpha2
 
 New features:
+.........T [ZBXNEXT-10231] added support for the new syntax to MySQL templates (aiantsen)
 ........S. [ZBXNEXT-10291] fixed EVENT.RECOVERY.TAGS macro not being resolved when problem is closed manually (wiper)
 
 Bug fixes:
+...G...... [ZBX-26640] fixed Zabbix agent built with statically linked curl library crashing on web.page.get[] items (aetatsu)
+..F.....S. [ZBX-26451] fixed inventory macros not being resolved in script and browser type items (aetatsu, msnihach)
+..F....... [ZBX-27126] fixed misaligned pixel appears when preceded by horizontal symbols (ashubin)
+...GI..... [ZBX-24140] fixed not being able to build Zabbix agent with statically linked curl library and inability to use curl without ssl for "web.page.get[...]" items (aetatsu)
+.........T [ZBX-26949] changed macro names in the NetApp AFF A700 by HTTP template (sbelakovs)
+...G...... [ZBX-26111] fixed JSON output for vfs.dev.discovery DEVTYPE field (rtrizna)
+..F....... [ZBX-27127] fixed warning alert not being displayed when navigating away from new template by clicking another template name in inherited macro list (agriscenko)
+..F....... [ZBX-25761] fixed displaying of top hosts sparkline chart if column is configured to show custom time period (aluchko)
+..F....... [ZBX-26289] fixed pre-processed result not displaying white spaces correctly (gklavins)
+..F....... [ZBX-27053] added space between tags on Web monitoring list page and in LDAP settings (msnihach)
+A......... [ZBX-26830] fixed undefined array key "host_status" on triggers import (kkuzmina)
+.........T [ZBX-26626] added additional GRANT statements for both MSSQL templates (smansurovs)
 ...G...... [ZBX-26500] fixed system.users.num metric incorrect returned value for both agents (opucka, vsmelovs)
 ........S. [ZBX-27032] fixed header executing error from JavaScript request (vsmelovs)
 .........T [ZBX-27155] fixed OID for protected host memory item in Stormshield SNS by SNMP template (knaglis)
@@ -61,9 +74,21 @@ Bug fixes:
 Changes for 7.4.6rc1
 
 New features:
+.........T [ZBXNEXT-10231] added support for the new syntax to MySQL templates (aiantsen)
 ...G...... [ZBXNEXT-10012] added both SHOW SLAVE STATUS and SHOW REPLICA STATUS for Zabbix agent 2 MySQL plugin (lsurvilo)
 
 Bug fixes:
+...G...... [ZBX-26640] fixed Zabbix agent built with statically linked curl library crashing on web.page.get[] items (aetatsu)
+..F.....S. [ZBX-26451] fixed inventory macros not being resolved in script and browser type items (aetatsu, msnihach)
+...GI..... [ZBX-24140] fixed not being able to build Zabbix agent with statically linked curl library and inability to use curl without ssl for "web.page.get[...]" items (aetatsu)
+.........T [ZBX-26949] changed macro names in the NetApp AFF A700 by HTTP template (sbelakovs)
+...G...... [ZBX-26111] fixed JSON output for vfs.dev.discovery DEVTYPE field (rtrizna)
+..F....... [ZBX-27127] fixed warning alert not being displayed when navigating away from new template by clicking another template name in inherited macro list (agriscenko)
+..F....... [ZBX-25761] fixed displaying of top hosts sparkline chart if column is configured to show custom time period (aluchko)
+..F....... [ZBX-26289] fixed pre-processed result not displaying white spaces correctly (gklavins)
+..F....... [ZBX-27053] added space between tags on Web monitoring list page and in LDAP settings (msnihach)
+A......... [ZBX-26830] fixed undefined array key "host_status" on triggers import (kkuzmina)
+.........T [ZBX-26626] added additional GRANT statements for both MSSQL templates (smansurovs)
 ...G...... [ZBX-26500] fixed system.users.num metric incorrect returned value for both agents (opucka, vsmelovs)
 ........S. [ZBX-27032] fixed header executing error from JavaScript request (vsmelovs)
 .........T [ZBX-27155] fixed OID for protected host memory item in Stormshield SNS by SNMP template (knaglis)
@@ -574,6 +599,7 @@ Changes for 7.2.15rc1
 New features:
 
 Bug fixes:
+...G...... [ZBX-26111] fixed JSON output for vfs.dev.discovery DEVTYPE field (rtrizna)
 ..F....... [ZBX-27020] fixed user with limited permissions access to map containing submap with inaccessible host or hostgroup (talbergs)
 
 --------------------------------------------------------------------------------
@@ -1199,9 +1225,19 @@ A.F....... [ZBX-23227] fixed issue where using an empty array or string value fo
 Changes for 7.0.22rc1
 
 New features:
+.........T [ZBXNEXT-10231] added support for the new syntax to MySQL templates (aiantsen)
 ...G...... [ZBXNEXT-10012] added both SHOW SLAVE STATUS and SHOW REPLICA STATUS for Zabbix agent 2 MySQL plugin (lsurvilo)
 
 Bug fixes:
+...G...... [ZBX-26640] fixed Zabbix agent built with statically linked curl library crashing on web.page.get[] items (aetatsu)
+..F.....S. [ZBX-26451] fixed inventory macros not being resolved in script and browser type items (aetatsu, msnihach)
+...GI..... [ZBX-24140] fixed not being able to build Zabbix agent with statically linked curl library and inability to use curl without ssl for "web.page.get[...]" items (aetatsu)
+.........T [ZBX-26949] changed macro names in the NetApp AFF A700 by HTTP template (sbelakovs)
+...G...... [ZBX-26111] fixed JSON output for vfs.dev.discovery DEVTYPE field (rtrizna)
+..F....... [ZBX-26289] fixed pre-processed result not displaying white spaces correctly (gklavins)
+..F....... [ZBX-27053] added space between tags on Web monitoring list page and in LDAP settings (msnihach)
+A......... [ZBX-26830] fixed undefined array key "host_status" on triggers import (kkuzmina)
+.........T [ZBX-26626] added additional GRANT statements for both MSSQL templates (smansurovs)
 ...G...... [ZBX-26500] fixed system.users.num metric incorrect returned value for both agents (opucka, vsmelovs)
 ........S. [ZBX-27032] fixed header executing error from JavaScript request (vsmelovs)
 .........T [ZBX-27155] fixed OID for protected host memory item in Stormshield SNS by SNMP template (knaglis)
