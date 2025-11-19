@@ -124,7 +124,7 @@ void	zbx_replace_string(char **data, size_t l, size_t *r, const char *value);
 #if defined(ZBX_DEBUG)
 #	define ZBX_STRMASK(x)	x
 #else
-#	define ZBX_STRMASK(x)	ZBX_SECRET_MASK
+#	define ZBX_STRMASK(x)	((void)(x), ZBX_SECRET_MASK)
 #endif
 
 

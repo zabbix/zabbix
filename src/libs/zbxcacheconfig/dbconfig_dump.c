@@ -544,9 +544,6 @@ static void	DCdump_telnetitem(const ZBX_DC_TELNETITEM *telnetitem)
 
 static void	DCdump_simpleitem(const ZBX_DC_SIMPLEITEM *simpleitem)
 {
-#ifndef ZBX_DEBUG
-	ZBX_UNUSED(simpleitem);
-#endif
 	zabbix_log(LOG_LEVEL_TRACE, "  simple:[username:'%s' password:'%s']", ZBX_STRMASK(simpleitem->username),
 			ZBX_STRMASK(simpleitem->password));
 }
