@@ -460,7 +460,7 @@ class testBinaryAndJSONValueTypesDataCollection extends CIntegrationTest {
 			'history'	=>	ITEM_VALUE_TYPE_JSON
 		]);
 
-		$this->assertEquals(1, count($response['result']));
+		$this->assertEquals(1, count($response['result']), json_encode($response));
 		$json_result = self::normalize_json($response['result'][0]['value']);
 		$this->assertEquals(self::$json_image_normalized, $json_result);
 
@@ -473,7 +473,7 @@ class testBinaryAndJSONValueTypesDataCollection extends CIntegrationTest {
 		]);
 
 		$this->assertEquals(2, count($response['result']), json_encode($response['result']));
-		$this->assertEquals($response['result'][1], "{}");
+		$this->assertEquals(json_encode($response['result'][1]), "{}");
 	}
 
 	/**
@@ -509,7 +509,7 @@ class testBinaryAndJSONValueTypesDataCollection extends CIntegrationTest {
 			'history'	=>	ITEM_VALUE_TYPE_JSON
 		]);
 
-		$this->assertEquals(1, count($response['result']));
+		$this->assertEquals(1, count($response['result']), json_encode($response));
 		$json_result = self::normalize_json($response['result'][0]['value']);
 		$this->assertEquals(self::$json_image_normalized, $json_result);
 
