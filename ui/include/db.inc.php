@@ -759,6 +759,8 @@ function dbConditionId($fieldName, array $values, $notIn = false) {
  * @return string
  */
 function dbConditionString($fieldName, array $values, $notIn = false) {
+	global $DB;
+
 	switch (count($values)) {
 		case 0:
 			return '1=0';
@@ -770,7 +772,7 @@ function dbConditionString($fieldName, array $values, $notIn = false) {
 
 	$in = $notIn ? ' NOT IN ' : ' IN ';
 	$concat = $notIn ? ' AND ' : ' OR ';
-	$items = array_chunk($values, 950);
+	$items = $DB['TYPE'] === ZBX_DB_ORACLE ? array_chunk($values, 950) : [$values];
 
 	$condition = '';
 	foreach ($items as $values) {
