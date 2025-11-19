@@ -9374,27 +9374,30 @@ size_t	zbx_dc_get_psk_by_identity(const unsigned char *psk_identity, unsigned ch
 
 /******************************************************************************
  *                                                                            *
- * Purpose:                                                                   *
- *     Copy autoregistration PSK identity and value from configuration cache  *
- *     into caller's buffers                                                  *
+ * Purpose: copies autoregistration TLS configuration from configuration      *
+ *          cache into caller's buffers.                                      *
  *                                                                            *
  * Parameters:                                                                *
- *     psk_identity_buf     - [OUT] buffer for PSK identity                   *
  *     psk_identity_buf_len - [IN] buffer length for PSK identity             *
- *     psk_buf              - [OUT] buffer for PSK value                      *
  *     psk_buf_len          - [IN] buffer length for PSK value                *
+ *     tls_accept           - [OUT] buffer for type of allowed incoming       *
+ *                                  connections for autoregistration          *
+ *                                  (bit field)                               *
+ *     psk_identity_buf     - [OUT] buffer for PSK identity                   *
+ *     psk_buf              - [OUT] buffer for PSK value                      *
  *                                                                            *
  * Comments: if autoregistration PSK is not configured then empty strings     *
  *           will be copied into buffers                                      *
  *                                                                            *
  ******************************************************************************/
-void	zbx_dc_get_autoregistration_psk(char *psk_identity_buf, size_t psk_identity_buf_len,
-		unsigned char *psk_buf, size_t psk_buf_len)
+void	zbx_dc_get_autoreg_tls_config(size_t psk_identity_buf_len, size_t psk_buf_len, unsigned char *tls_accept,
+		char *psk_identity_buf, char *psk_buf)
 {
 	RDLOCK_CACHE;
 
 	zbx_strlcpy((char *)psk_identity_buf, config->autoreg_psk_identity, psk_identity_buf_len);
 	zbx_strlcpy((char *)psk_buf, config->autoreg_psk, psk_buf_len);
+	*tls_accept = config->config->autoreg_tls_accept;
 
 	UNLOCK_CACHE;
 }
