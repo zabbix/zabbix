@@ -554,10 +554,9 @@ static void	process_pinger_hosts(icmpitem_t *items, int items_count, int process
 			if (ZBX_ITEM_TIMEOUT_MAX < max_execution_time)
 				max_execution_time = ZBX_ITEM_TIMEOUT_MAX;
 
-			ping_result = zbx_ping(hosts, hosts_count,
-
-						items[i].count, items[i].interval, items[i].size, items[i].timeout,
-						items[i].allow_redirect, 0, max_execution_time, error, sizeof(error));
+			ping_result = zbx_ping(hosts, hosts_count, items[i].count, items[i].interval, items[i].size,
+					items[i].timeout, items[i].allow_redirect, 0, max_execution_time, error,
+					sizeof(error));
 
 			if (FAIL != ping_result)
 				process_values(items, first_index, i + 1, hosts, hosts_count, &ts, ping_result, error);
