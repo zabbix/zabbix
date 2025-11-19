@@ -455,23 +455,25 @@ class testBinaryAndJSONValueTypesDataCollection extends CIntegrationTest {
 
 		$this->sendSenderValue('agent', 'JSON_TRAPPER_PREPROC_THROTTLING', self::$json_with_image);
 		$this->sendSenderValue('agent', 'JSON_TRAPPER_PREPROC_THROTTLING', self::$json_with_image);
-		$active_data = $this->callUntilDataIsPresent('history.get', [
+		$response = $this->callUntilDataIsPresent('history.get', [
 			'itemids'	=>	self::$itemids['agent:JSON_TRAPPER_PREPROC_THROTTLING'],
 			'history'	=>	ITEM_VALUE_TYPE_JSON
 		]);
 
-		$json_result = self::normalize_json($response['result'][0]['value']);
-
 		$this->assertEquals(1, count($response['result']));
+		$json_result = self::normalize_json($response['result'][0]['value']);
 		$this->assertEquals(self::$json_image_normalized, $json_result);
 
 		$this->sendSenderValue('agent', 'JSON_TRAPPER_PREPROC_THROTTLING', "{}");
-		$active_data = $this->callUntilDataIsPresent('history.get', [
+		$response = $this->callUntilDataIsPresent('history.get', [
 			'itemids'	=>	self::$itemids['agent:JSON_TRAPPER_PREPROC_THROTTLING'],
-			'history'	=>	ITEM_VALUE_TYPE_JSON
+			'history'	=>	ITEM_VALUE_TYPE_JSON,
+			'sortfield'	=>	'clock',
+			'sortorder'	=>	'ASC',
 		]);
 
 		$this->assertEquals(2, count($response['result']), json_encode($response['result']));
+		$this->assertEquals($response['result'][1], "{}");
 	}
 
 	/**
@@ -502,7 +504,7 @@ class testBinaryAndJSONValueTypesDataCollection extends CIntegrationTest {
 
 		$this->sendSenderValue('proxy_agent', 'JSON_TRAPPER_PREPROC_THROTTLING', self::$json_with_image);
 		$this->sendSenderValue('proxy_agent', 'JSON_TRAPPER_PREPROC_THROTTLING', self::$json_with_image);
-		$active_data = $this->callUntilDataIsPresent('history.get', [
+		$response = $this->callUntilDataIsPresent('history.get', [
 			'itemids'	=>	self::$itemids['proxy_agent:JSON_TRAPPER_PREPROC_THROTTLING'],
 			'history'	=>	ITEM_VALUE_TYPE_JSON
 		]);
@@ -512,12 +514,15 @@ class testBinaryAndJSONValueTypesDataCollection extends CIntegrationTest {
 		$this->assertEquals(self::$json_image_normalized, $json_result);
 
 		$this->sendSenderValue('proxy_agent', 'JSON_TRAPPER_PREPROC_THROTTLING', "null");
-		$active_data = $this->callUntilDataIsPresent('history.get', [
+		$response = $this->callUntilDataIsPresent('history.get', [
 			'itemids'	=>	self::$itemids['proxy_agent:JSON_TRAPPER_PREPROC_THROTTLING'],
-			'history'	=>	ITEM_VALUE_TYPE_JSON
+			'history'	=>	ITEM_VALUE_TYPE_JSON,
+			'sortfield'	=>	'clock',
+			'sortorder'	=>	'DESC',
 		]);
 
 		$this->assertEquals(2, count($response['result']), json_encode($response['result']));
+		$this->assertEquals($response['result'][0], "null");
 	}
 
 	/**
