@@ -45,8 +45,6 @@ window.token_edit_popup = new class {
 		this.expires_at = document.getElementById('expires_at');
 		this.expires_state = document.getElementById('expires_state');
 		this.#expiresAtHandler();
-
-		this.expires_state.addEventListener('change', () => this.#expiresAtHandler());
 		this.#initActions();
 	}
 
@@ -59,7 +57,7 @@ window.token_edit_popup = new class {
 
 		// Name field value shall be unique per selected user, trigger API unique validation.
 		jQuery(document.getElementById('userid')).change(() => this.form.validateChanges(['name', 'userid']));
-		this.expires_state.addEventListener('', () => this.#expiresAtHandler());
+		this.expires_state.addEventListener('change', () => this.#expiresAtHandler());
 	}
 
 	#submit() {
