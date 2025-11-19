@@ -241,9 +241,9 @@ static int	DBpatch_7050019(void)
 	/* 3 - HOST_STATUS_TEMPLATE */
 	if (ZBX_DB_OK > zbx_db_execute("delete from item_rtdata"
 			" where exists ("
-				" select null from items i,hosts h"
-					" where item_rtdata.itemid=i.itemid"
-						" and i.hostid=h.hostid and h.status=3"
+				"select null from items i,hosts h"
+				" where item_rtdata.itemid=i.itemid"
+					" and i.hostid=h.hostid and h.status=3"
 				")"))
 	{
 		return FAIL;
