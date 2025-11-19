@@ -1,0 +1,121 @@
+zabbix_export:
+  version: '6.0'
+  date: '2023-08-10T09:58:49Z'
+  media_types:
+    - name: 'Grafana OnCall'
+      type: WEBHOOK
+      parameters:
+        - name: alert_message
+          value: '{ALERT.MESSAGE}'
+        - name: alert_uid
+          value: '{EVENT.ID}'
+        - name: grafana_url
+          value: 'https://xxxxxxxxx.grafana.net/oncall/integrations/v1/zabbix/xxxxxxxxxxxxxxxxx/'
+        - name: link_to_upstream_details
+          value: '{$ZABBIX.URL}/tr_events.php?triggerid={TRIGGER.ID}&eventid={EVENT.ID}'
+        - name: state
+          value: '{TRIGGER.STATUS}'
+        - name: title
+          value: '{EVENT.NAME}'
+      attempts: '6'
+      script: |
+        try {
+
+          var params = JSON.parse(value),
+            req = new HttpRequest(),
+            fields = {},
+            resp = '';
+
+
+          if (typeof params.HTTPProxy === 'string' && params.HTTPProxy.trim() !== '') {
+            req.setProxy(params.HTTPProxy);
+          }
+
+          if (isNaN(parseInt(params.alert_uid)) || params.alert_uid < 1) {
+            throw 'incorrect value for variable "alert_uid". The value must be a positive number.';
+          }
+          if (params.title.length < 1) {
+            throw 'incorrect value for variable "title". The value must be a non-empty string.';
+          }
+          if (params.state.length < 1) {
+            throw 'incorrect value for variable "state". The value must be a non-empty string.';
+          }
+          if (params.alert_message.length < 1) {
+            throw 'incorrect value for variable "alert_message". The value must be a non-empty string.';
+          }
+          if (params.link_to_upstream_details.length < 1) {
+            throw 'incorrect value for variable "link_to_upstream_details". The value must be a non-empty string.';
+          }
+          if (params.grafana_url.length < 1) {
+            throw 'incorrect value for variable "grafana_url". The value must be a non-empty string.';
+          }
+
+          req.addHeader('Content-Type: application/json');
+
+          var trigger_status = "";
+          var regex = new RegExp("^RECOVER(Y|ED)?$|^OK$|^Resolved.*");
+          if (regex.test(params.state)) {
+            trigger_status = 'ok';
+          } else {
+            trigger_status = 'alerting';
+          }
+
+          fields = {
+            'alert_uid': params.alert_uid,
+            'title': params.title,
+            'state': trigger_status,
+            'message': params.alert_message,
+            'link_to_upstream_details': params.link_to_upstream_details
+          };
+
+          Zabbix.log(4, '[GrafanaOncall Webhook] Sending request:' + JSON.stringify(fields));
+          resp = req.post(params.grafana_url,
+            JSON.stringify(fields)
+          );
+          Zabbix.log(4, '[GrafanaOncall Webhook] Receiving response:' + resp);
+          //Zabbix.log(3, '[GrafanaOncall Webhook] reqStatus '+ req.getStatus());
+          if (req.getStatus() != 200) {
+            throw '[GrafanaOncall Webhook] request error';
+          }
+
+          return 'OK';
+        }
+        catch (error) {
+          Zabbix.log(3, '[GrafanaOncall Webhook] Notification failed : ' + error + error.lineNumber);
+          throw 'GrafanaOncall Webhook notification failed : ' + error + error.lineNumber;
+        }
+      process_tags: 'YES'
+      description: 'https://grafana.com/docs/grafana-cloud/alerting-and-irm/oncall/integrations/zabbix/'
+      message_templates:
+        - event_source: TRIGGERS
+          operation_mode: PROBLEM
+          subject: 'Problem: {EVENT.NAME}'
+          message: |
+            Problem started at {EVENT.TIME} on {EVENT.DATE}
+            Problem name: {EVENT.NAME}
+            Host: {HOST.NAME}
+            Severity: {EVENT.SEVERITY}
+            Operational data: {EVENT.OPDATA}
+            Original problem ID: {EVENT.ID}
+            Event URL: {$ZABBIX.URL}/tr_events.php?triggerid={TRIGGER.ID}&eventid={EVENT.ID}
+            Description: {TRIGGER.DESCRIPTION}
+        - event_source: TRIGGERS
+          operation_mode: RECOVERY
+          subject: 'Resolved in {EVENT.DURATION}: {EVENT.NAME}'
+          message: |
+            Problem has been resolved at {EVENT.RECOVERY.TIME} on {EVENT.RECOVERY.DATE}
+            Problem name: {EVENT.NAME}
+            Problem duration: {EVENT.DURATION}
+            Host: {HOST.NAME}
+            Severity: {EVENT.SEVERITY}
+            Original problem ID: {EVENT.ID}
+            Event URL: {$ZABBIX.URL}/tr_events.php?triggerid={TRIGGER.ID}&eventid={EVENT.ID}
+            Description: {TRIGGER.DESCRIPTION}
+        - event_source: TRIGGERS
+          operation_mode: UPDATE
+          subject: 'Updated problem in {EVENT.AGE}: {EVENT.NAME}'
+          message: |
+            {USER.FULLNAME} {EVENT.UPDATE.ACTION} problem at {EVENT.UPDATE.DATE} {EVENT.UPDATE.TIME}.
+            {EVENT.UPDATE.MESSAGE}
+
+            Current problem status is {EVENT.STATUS}, age is {EVENT.AGE}, acknowledged: {EVENT.ACK.STATUS}.
