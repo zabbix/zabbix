@@ -344,7 +344,6 @@ if ($data['connectorid'] !== null) {
 		],
 		[
 			'title' => _('Delete'),
-			'confirmation' => _('Delete selected connector?'),
 			'class' => implode(' ', [ZBX_STYLE_BTN_ALT, 'js-delete']),
 			'keepOpen' => true,
 			'isSubmit' => false

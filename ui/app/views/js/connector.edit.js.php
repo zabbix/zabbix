@@ -126,16 +126,21 @@ window.connector_edit_popup = new class {
 	}
 
 	#delete() {
-		this.#removePopupMessages();
-		const curl = new Curl('zabbix.php');
-		curl.setArgument('action', 'connector.delete');
-		curl.setArgument(CSRF_TOKEN_NAME, <?= json_encode(CCsrfTokenHelper::get('connector')) ?>);
+		if (window.confirm(<?= json_encode(_('Delete selected connector?')) ?>)) {
+			this.#removePopupMessages();
+			const curl = new Curl('zabbix.php');
+			curl.setArgument('action', 'connector.delete');
+			curl.setArgument(CSRF_TOKEN_NAME, <?= json_encode(CCsrfTokenHelper::get('connector')) ?>);
 
-		this.#post(curl.getUrl(), {connectorids: [document.getElementById('connectorid').value]}, (response) => {
-			overlayDialogueDestroy(this.overlay.dialogueid);
+			this.#post(curl.getUrl(), {connectorids: [document.getElementById('connectorid').value]}, (response) => {
+				overlayDialogueDestroy(this.overlay.dialogueid);
 
-			this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response}));
-		});
+				this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response}));
+			});
+		}
+		else {
+			this.overlay.unsetLoading();
+		}
 	}
 
 	#submit() {
