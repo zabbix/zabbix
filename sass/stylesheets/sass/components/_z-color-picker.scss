@@ -8,6 +8,12 @@ z-color-picker {
 		}
 	}
 
+	&.has-error {
+		.color-picker-box {
+			border: 1px solid $error;
+		}
+	}
+
 	.color-picker-box {
 		position: relative;
 		vertical-align: top;
