@@ -378,7 +378,7 @@ static int	get_icmpping_nearestindex(icmpitem_t *items, int items_count, int cou
 
 static void	add_icmpping_item(icmpitem_t **items, int *items_alloc, int *items_count, int count, int interval,
 		int size, int timeout, zbx_uint64_t itemid, char *addr, icmpping_t icmpping, icmppingsec_type_t type,
-		unsigned char allow_redirect)
+		unsigned char allow_redirect, int delay_s)
 {
 	int		index;
 	icmpitem_t	*item;
@@ -408,6 +408,7 @@ static void	add_icmpping_item(icmpitem_t **items, int *items_alloc, int *items_c
 	item->icmpping	= icmpping;
 	item->type	= type;
 	item->allow_redirect = allow_redirect;
+	item->item_delay = delay_s;
 
 	(*items_count)++;
 
@@ -426,8 +427,8 @@ static void	get_pinger_hosts(icmpitem_t **icmp_items, int *icmp_items_alloc, int
 		int config_timeout)
 {
 	zbx_dc_item_t		item, *items;
-	int			num, count, interval, size, timeout, errcode = SUCCEED;
-	char			error[MAX_STRING_LEN], *addr = NULL;
+	int			num, delay_s, count, interval, size, timeout, errcode = SUCCEED;
+	char			error[MAX_STRING_LEN], *addr = NULL, *errmsg = NULL;
 	unsigned char		allow_redirect;
 	icmpping_t		icmpping;
 	icmppingsec_type_t	type;
@@ -446,16 +447,12 @@ static void	get_pinger_hosts(icmpitem_t **icmp_items, int *icmp_items_alloc, int
 		int	rc = zbx_substitute_key_macros(&items[i].key, NULL, &items[i], NULL, NULL,
 				ZBX_MACRO_TYPE_ITEM_KEY, error, sizeof(error));
 
-		if (SUCCEED == rc)
-		{
-			rc = zbx_parse_key_params(items[i].key, items[i].interface.addr, &icmpping, &addr, &count,
-					&interval, &size, &timeout, &type, &allow_redirect, error, sizeof(error));
-		}
-
-		if (SUCCEED == rc)
+		if (SUCCEED == (rc = zbx_parse_key_params(items[i].key, items[i].interface.addr, &icmpping, &addr,
+				&count, &interval, &size, &timeout, &type, &allow_redirect, error, sizeof(error))) &&
+				SUCCEED == (rc = zbx_interval_preproc(items[i].delay, &delay_s, NULL, &errmsg)))
 		{
 			add_icmpping_item(icmp_items, icmp_items_alloc, icmp_items_count, count, interval, size,
-				timeout, items[i].itemid, addr, icmpping, type, allow_redirect);
+					timeout, items[i].itemid, addr, icmpping, type, allow_redirect, delay_s);
 		}
 		else
 		{
@@ -525,7 +522,8 @@ static void	add_pinger_host(zbx_fping_host_t **hosts, int *hosts_alloc, int *hos
 
 static void	process_pinger_hosts(icmpitem_t *items, int items_count, int process_num, int process_type)
 {
-	int			ping_result, first_index = 0;
+#define ZBX_ITEM_TIMEOUT_MAX	600
+	int			ping_result, first_index = 0, max_execution_time = 0;
 	char			error[ZBX_ITEM_ERROR_LEN_MAX];
 	static zbx_fping_host_t	*hosts = NULL;
 	static int		hosts_alloc = 4;
@@ -541,6 +539,9 @@ static void	process_pinger_hosts(icmpitem_t *items, int items_count, int process
 	{
 		add_pinger_host(&hosts, &hosts_alloc, &hosts_count, items[i].addr);
 
+		if (max_execution_time < items[i].item_delay)
+			max_execution_time = items[i].item_delay;
+
 		if (i == items_count - 1 || items[i].count != items[i + 1].count ||
 				items[i].interval != items[i + 1].interval || items[i].size != items[i + 1].size ||
 				items[i].timeout != items[i + 1].timeout ||
@@ -550,9 +551,13 @@ static void	process_pinger_hosts(icmpitem_t *items, int items_count, int process
 
 			zbx_timespec(&ts);
 
+			if (ZBX_ITEM_TIMEOUT_MAX < max_execution_time)
+				max_execution_time = ZBX_ITEM_TIMEOUT_MAX;
+
 			ping_result = zbx_ping(hosts, hosts_count,
+
 						items[i].count, items[i].interval, items[i].size, items[i].timeout,
-						items[i].allow_redirect, 0, error, sizeof(error));
+						items[i].allow_redirect, 0, max_execution_time, error, sizeof(error));
 
 			if (FAIL != ping_result)
 				process_values(items, first_index, i + 1, hosts, hosts_count, &ts, ping_result, error);
@@ -563,6 +568,7 @@ static void	process_pinger_hosts(icmpitem_t *items, int items_count, int process
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+#undef ZBX_ITEM_TIMEOUT_MAX
 }
 
 /******************************************************************************

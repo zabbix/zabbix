@@ -67,6 +67,7 @@ typedef struct
 	icmpping_t		icmpping;
 	icmppingsec_type_t	type;
 	unsigned char		allow_redirect;
+	int			item_delay;
 }
 icmpitem_t;
 
@@ -74,6 +75,6 @@ void	zbx_init_library_icmpping(const zbx_config_icmpping_t *config);
 void	zbx_init_icmpping_env(const char *prefix, long int id);
 
 int	zbx_ping(zbx_fping_host_t *hosts, int hosts_count, int requests_count, int period, int size, int timeout,
-		unsigned char allow_redirect, int rdns, char *error, size_t max_error_len);
+		unsigned char allow_redirect, int rdns, int max_execution_time, char *error, size_t max_error_len);
 
 #endif
