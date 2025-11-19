@@ -835,7 +835,7 @@ ZBX_THREAD_ENTRY(zbx_poller_thread, args)
 	int			nextcheck, sleeptime = -1, processed = 0, old_processed = 0,
 				server_num = ((zbx_thread_args_t *)args)->info.server_num,
 				process_num = ((zbx_thread_args_t *)args)->info.process_num;
-	double			sec, total_sec = 0.0, old_total_sec = 0.0;
+	double			sec, total_sec = 0.0, old_total_sec = 0.0, time_trim = 0.0;
 	time_t			last_stat_time;
 	unsigned char		poller_type;
 	zbx_ipc_async_socket_t	rtc;
@@ -929,6 +929,14 @@ ZBX_THREAD_ENTRY(zbx_poller_thread, args)
 			processed = 0;
 			total_sec = 0.0;
 			last_stat_time = time(NULL);
+
+			if (0 != sleeptime || SEC_PER_MIN * 10 <= sec - time_trim)
+			{
+#ifdef	HAVE_MALLOC_TRIM
+				malloc_trim(ZBX_MEBIBYTE);
+#endif
+				time_trim = sec;
+			}
 		}
 
 		if (SUCCEED == zbx_rtc_wait(&rtc, info, &rtc_cmd, &rtc_data, sleeptime) && 0 != rtc_cmd)
