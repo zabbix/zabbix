@@ -713,11 +713,7 @@ function dbConditionInt($field_name, array $values, $not_in = false, $zero_inclu
 
 	// Process individual values.
 
-	if ($DB['TYPE'] === ZBX_DB_ORACLE) {
-		$single_chunks = array_chunk($singles, $MAX_NUM_IN);
-	} else {
-		$single_chunks = [$singles];
-	}
+	$single_chunks = $DB['TYPE'] === ZBX_DB_ORACLE ? array_chunk($singles, $MAX_NUM_IN) : [$singles];
 
 	foreach ($single_chunks as $chunk) {
 		if ($condition !== '') {
