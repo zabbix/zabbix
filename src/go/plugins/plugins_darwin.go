@@ -25,6 +25,7 @@ import (
 	_ "golang.zabbix.com/agent2/plugins/oracle"
 	_ "golang.zabbix.com/agent2/plugins/redis"
 	_ "golang.zabbix.com/agent2/plugins/smart"
+	_ "golang.zabbix.com/agent2/plugins/system/localtime"
 	_ "golang.zabbix.com/agent2/plugins/system/sw"
 	_ "golang.zabbix.com/agent2/plugins/system/users"
 	_ "golang.zabbix.com/agent2/plugins/systemrun"
