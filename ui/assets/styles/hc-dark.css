@@ -57,13 +57,15 @@ svg *:focus {
   src: url("../fonts/InterVariable.woff2?t=1749715841257") format("woff2");
   font-weight: 100 900;
   font-style: normal;
-  font-display: swap; }
+  font-display: swap;
+  font-feature-settings: "calt" 0; }
 @font-face {
   font-family: 'Inter';
   src: url("../fonts/InterVariable-Italic.woff2?t=1749715841257") format("woff2");
   font-weight: 100 900;
   font-style: italic;
-  font-display: swap; }
+  font-display: swap;
+  font-feature-settings: "calt" 0; }
 @font-face {
   font-family: 'Noto Sans Georgian';
   src: url("../fonts/NotoSansGeorgian-VariableFont.woff2?t=1749715841257") format("woff2");
@@ -2207,13 +2209,6 @@ button {
 
 .dashboard-grid-iterator-contents.is-loading::before {
   margin: calc(.25rem + 1px); }
-
-.dashboard-list .status-green {
-  background-color: #e0e0e0;
-  border-color: #e0e0e0; }
-.dashboard-list .status-yellow {
-  background-color: #e0e0e0;
-  border-color: #e0e0e0; }
 
 .overlay-dialogue.modal.modal-widget-configuration {
   --modal-width: auto;
@@ -7086,9 +7081,6 @@ select {
     color: #ffffff !important;
     pointer-events: none; }
 
-div .overlay-dialogue.wordbreak {
-  white-space: normal; }
-
 .form-fields-inline label {
   margin: 0 8px 0 3px; }
 
@@ -7556,8 +7548,6 @@ z-select[disabled] .focusable, input[disabled], textarea[disabled], select optio
   border: 1px solid #666666;
   border-bottom-color: #636363;
   box-shadow: 0 4px 20px 0 rgba(0, 0, 0, 0.5); }
-  .overlay-dialogue .wordbreak {
-    white-space: normal; }
   .overlay-dialogue .overlay-dialogue-header {
     margin: -8px -10px 6px -10px;
     padding: 8px 10px;
