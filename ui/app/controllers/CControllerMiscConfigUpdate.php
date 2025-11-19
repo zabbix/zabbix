@@ -43,7 +43,7 @@ class CControllerMiscConfigUpdate extends CController {
 				'when' => ['validate_uri_schemes', 'in' => [1]]
 			],
 			'x_frame_header_enabled' => ['boolean', 'required'],
-			'x_frame_options' => ['string', 'required',
+			'x_frame_options' => ['string', 'required', 'not_empty',
 				'length' => CSettingsSchema::getFieldLength('x_frame_options'),
 				'when' => ['x_frame_header_enabled', 'in' => [1]]
 			],
