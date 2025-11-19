@@ -203,8 +203,8 @@ static void     preprocessor_serialize_value(zbx_uint64_t itemid, unsigned char 
 		}
 		else if (ZBX_ISSET_JSON(result))
 		{
-			THIS_SHOULD_NEVER_HAPPEN;
-			exit(EXIT_FAILURE);
+			var_type = ZBX_VARIANT_JSON;
+			zbx_serialize_prepare_str_len(data_len, result->tjson, value_len);
 		}
 	}
 
@@ -288,6 +288,8 @@ static void     preprocessor_serialize_value(zbx_uint64_t itemid, unsigned char 
 			ptr += zbx_serialize_str(ptr, result->str, value_len);
 		else if (ZBX_ISSET_TEXT(result))
 			ptr += zbx_serialize_str(ptr, result->text, value_len);
+		else if (ZBX_ISSET_JSON(result))
+			ptr += zbx_serialize_str(ptr, result->tjson, value_len);
 	}
 
 	ptr += zbx_serialize_value(ptr, ts->sec);
@@ -329,6 +331,9 @@ static zbx_uint32_t	preprocessor_deserialize_variant(const unsigned char *data, 
 			break;
 		case ZBX_VARIANT_STR:
 			ptr += zbx_deserialize_str(ptr, &value->data.str, len);
+			break;
+		case ZBX_VARIANT_JSON:
+			ptr += zbx_deserialize_str(ptr, &value->data.json, len);
 			break;
 		case ZBX_VARIANT_ERR:
 			ptr += zbx_deserialize_str(ptr, &value->data.err, len);

@@ -74,6 +74,7 @@ void		zbx_variant_set_str(zbx_variant_t *value, char *text);
 void		zbx_variant_set_dbl(zbx_variant_t *value, double value_dbl);
 void		zbx_variant_set_ui64(zbx_variant_t *value, zbx_uint64_t value_ui64);
 void		zbx_variant_set_bin(zbx_variant_t *value, void *value_bin);
+void		zbx_variant_set_json(zbx_variant_t *value, char *value_json);
 void		zbx_variant_set_error(zbx_variant_t *value, char *error);
 void		zbx_variant_set_dbl_vector(zbx_variant_t *value, zbx_vector_dbl_t *dbl_vector);
 

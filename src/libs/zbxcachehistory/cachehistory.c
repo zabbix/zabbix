@@ -2482,6 +2482,29 @@ void	zbx_dc_add_history(zbx_uint64_t itemid, unsigned char item_value_type, unsi
 	}
 }
 
+static void	validate_json_and_add_to_history(zbx_uint64_t itemid, unsigned char value_type, zbx_variant_t *value,
+		zbx_timespec_t ts, unsigned char value_flags, int mtime, zbx_uint64_t lastlogsize)
+{
+	if (ZBX_HISTORY_JSON_VALUE_LEN < strlen(value->data.json))
+	{
+		dc_local_add_history_notsupported(itemid, &ts, "JSON is too large. ", lastlogsize, mtime, value_flags);
+		return;
+	}
+
+	char	*err = NULL;
+
+	if (0 == zbx_json_validate_ext(value->data.json, &err))
+	{
+		dc_local_add_history_notsupported(itemid, &ts, err, lastlogsize, mtime, value_flags);
+		zbx_free(err);
+
+		return;
+	}
+
+	dc_local_add_history_text_bin_json_helper(ITEM_VALUE_TYPE_JSON, itemid, value_type, &ts, value->data.json,
+			lastlogsize, mtime, value_flags);
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: add new variant value to the cache                                *
@@ -2604,26 +2627,8 @@ void	zbx_dc_add_history_variant(zbx_uint64_t itemid, unsigned char value_type, u
 			}
 			else if (ITEM_VALUE_TYPE_JSON == value_type)
 			{
-				if (ZBX_HISTORY_JSON_VALUE_LEN < strlen(value->data.json))
-				{
-					dc_local_add_history_notsupported(itemid, &ts, "JSON is too large. ",
-							lastlogsize, mtime, value_flags);
-					return;
-				}
-
-				char	*err = NULL;
-
-				if (0 == zbx_json_validate_ext(value->data.json, &err))
-				{
-					dc_local_add_history_notsupported(itemid, &ts,
-							err, lastlogsize, mtime, value_flags);
-					zbx_free(err);
-
-					return;
-				}
-
-				dc_local_add_history_text_bin_json_helper(ITEM_VALUE_TYPE_JSON, itemid, value_type, &ts,
-						value->data.json, lastlogsize, mtime, value_flags);
+				validate_json_and_add_to_history(itemid, value_type, value, ts, value_flags, mtime,
+						lastlogsize);
 			}
 			else
 			{
@@ -2631,9 +2636,12 @@ void	zbx_dc_add_history_variant(zbx_uint64_t itemid, unsigned char value_type, u
 						value->data.str, lastlogsize, mtime, value_flags);
 			}
 			break;
+		case ZBX_VARIANT_JSON:
+			validate_json_and_add_to_history(itemid, value_type, value, ts, value_flags, mtime,
+					lastlogsize);
+			break;
 		case ZBX_VARIANT_NONE:
 		case ZBX_VARIANT_BIN:
-		case ZBX_VARIANT_JSON:
 		case ZBX_VARIANT_VECTOR:
 		case ZBX_VARIANT_ERR:
 		default:

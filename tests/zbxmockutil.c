@@ -272,6 +272,9 @@ unsigned char	zbx_mock_str_to_variant(const char *str)
 	if (0 == strcmp(str, "ZBX_VARIANT_UI64"))
 		return ZBX_VARIANT_UI64;
 
+	if (0 == strcmp(str, "ZBX_VARIANT_JSON"))
+		return ZBX_VARIANT_JSON;
+
 	fail_msg("Unknown variant \"%s\"", str);
 	return ZBX_VARIANT_NONE;
 }
