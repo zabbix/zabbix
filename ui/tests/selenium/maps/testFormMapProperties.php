@@ -203,7 +203,7 @@ class testFormMapProperties extends CWebTest {
 		$this->assertEquals('Map', $form->getSelectedTab());
 
 		// Check that correct labels are visible.
-		$hidden_map_labels = [ 'Host group label type', '', 'Host label type', '', 'Trigger label type', '',
+		$hidden_map_labels = ['Host group label type', '', 'Host label type', '', 'Trigger label type', '',
 			'Map label type', '', 'Image label type', '', 'Type', 'List of user group shares', 'List of user shares'
 		];
 		$sharing_labels = ['Type', 'List of user group shares', 'List of user shares'];
@@ -698,9 +698,9 @@ class testFormMapProperties extends CWebTest {
 					'result_urls' => [
 						'URLs' => [
 							[
-								'Name' => 'Test url',
-								'URL' => 'Test url',
-								'Element' => 'Host group'
+								'name' => 'Test url',
+								'url' => 'Test url',
+								'elementtype' => 'Host group'
 							]
 						]
 					],
@@ -749,9 +749,9 @@ class testFormMapProperties extends CWebTest {
 					'result_urls' => [
 						'URLs' => [
 							[
-								'Name' => STRING_255,
-								'URL' => STRING_2048,
-								'Element' => 'Host'
+								'name' => STRING_255,
+								'url' => STRING_2048,
+								'elementtype' => 'Host'
 							]
 						]
 					]
@@ -789,9 +789,9 @@ class testFormMapProperties extends CWebTest {
 					'result_urls' => [
 						'URLs' => [
 							[
-								'Name' => self::XSS_EXAMPLE,
-								'URL' => self::XSS_EXAMPLE,
-								'Element' => 'Host'
+								'name' => self::XSS_EXAMPLE,
+								'url' => self::XSS_EXAMPLE,
+								'elementtype' => 'Host'
 							]
 						]
 					]
@@ -1006,29 +1006,29 @@ class testFormMapProperties extends CWebTest {
 					'result_urls' => [
 						'URLs' => [
 							[
-								'Name' => '1 Host URL',
-								'URL' => 'http://test1-url@zabbix.com',
-								'Element' => 'Host'
+								'name' => '1 Host URL',
+								'url' => 'http://test1-url@zabbix.com',
+								'elementtype' => 'Host'
 							],
 							[
-								'Name' => '2 Group URL',
-								'URL' => 'http://test2-url@zabbix.com',
-								'Element' => 'Host group'
+								'name' => '2 Group URL',
+								'url' => 'http://test2-url@zabbix.com',
+								'elementtype' => 'Host group'
 							],
 							[
-								'Name' => '3 Image URL',
-								'URL' => 'http://test3-url@zabbix.com',
-								'Element' => 'Image'
+								'name' => '3 Image URL',
+								'url' => 'http://test3-url@zabbix.com',
+								'elementtype' => 'Image'
 							],
 							[
-								'Name' => '4 Map URL',
-								'URL' => 'http://test4-url@zabbix.com',
-								'Element' => 'Map'
+								'name' => '4 Map URL',
+								'url' => 'http://test4-url@zabbix.com',
+								'elementtype' => 'Map'
 							],
 							[
-								'Name' => '5 Trigger URL',
-								'URL' => 'http://test5-url@zabbix.com',
-								'Element' => 'Trigger'
+								'name' => '5 Trigger URL',
+								'url' => 'http://test5-url@zabbix.com',
+								'elementtype' => 'Trigger'
 							]
 						]
 					]
@@ -1039,7 +1039,6 @@ class testFormMapProperties extends CWebTest {
 				[
 					'expected' => TEST_GOOD,
 					'update_map' => self::MAP_URL_ADD,
-					'sorting' => true,
 					'map_properties' => [
 						'Name' => 'URL sorting'.microtime()
 					],
@@ -1084,39 +1083,39 @@ class testFormMapProperties extends CWebTest {
 					'result_urls' => [
 						'URLs' => [
 							[
-								'Name' => '!test',
-								'URL' => 'test',
-								'Element' => 'Host'
+								'name' => '!test',
+								'url' => 'test',
+								'elementtype' => 'Host'
 							],
 							[
-								'Name' => '9 sysmap',
-								'URL' => 'test',
-								'Element' => 'Host'
+								'name' => '9 sysmap',
+								'url' => 'test',
+								'elementtype' => 'Host'
 							],
 							[
-								'Name' => '02223',
-								'URL' => 'test',
-								'Element' => 'Host'
+								'name' => '02223',
+								'url' => 'test',
+								'elementtype' => 'Host'
 							],
 							[
-								'Name' => 'Administration map',
-								'URL' => 'test',
-								'Element' => 'Host'
+								'name' => 'Administration map',
+								'url' => 'test',
+								'elementtype' => 'Host'
 							],
 							[
-								'Name' => 'Zabbix sysmap',
-								'URL' => 'test',
-								'Element' => 'Host'
+								'name' => 'Zabbix sysmap',
+								'url' => 'test',
+								'elementtype' => 'Host'
 							],
 							[
-								'Name' => 'ĀĒļķņЙЭ test special character',
-								'URL' => 'test',
-								'Element' => 'Host'
+								'name' => 'ĀĒļķņЙЭ test special character',
+								'url' => 'test',
+								'elementtype' => 'Host'
 							],
 							[
-								'Name' => '🤖🤖🤖',
-								'URL' => 'test',
-								'Element' => 'Host'
+								'name' => '🤖🤖🤖',
+								'url' => 'test',
+								'elementtype' => 'Host'
 							]
 						]
 					]
@@ -1186,9 +1185,9 @@ class testFormMapProperties extends CWebTest {
 					'result_urls' => [
 						'URLs' => [
 							[
-								'Name' => '',
-								'URL' => '',
-								'Element' => 'Host'
+								'name' => '',
+								'url' => '',
+								'elementtype' => 'Host'
 							]
 						]
 					]
@@ -1240,29 +1239,29 @@ class testFormMapProperties extends CWebTest {
 			'Show suppressed problems' => true,
 			'URLs' => [
 				[
-					'Name' => '1 Host URL 📰📰📰',
-					'URL' => 'test 📰📰📰',
-					'Element' => 'Host'
+					'name' => '1 Host URL 📰📰📰',
+					'url' => 'test 📰📰📰',
+					'elementtype' => 'Host'
 				],
 				[
-					'Name' => '2 Image URL',
-					'URL' => 'test',
-					'Element' => 'Image'
+					'name' => '2 Image URL',
+					'url' => 'test',
+					'elementtype' => 'Image'
 				],
 				[
-					'Name' => '3 Trigger URL',
-					'URL' => 'test',
-					'Element' => 'Trigger'
+					'name' => '3 Trigger URL',
+					'url' => 'test',
+					'elementtype' => 'Trigger'
 				],
 				[
-					'Name' => '4 Host group - xss',
-					'URL' => self::XSS_EXAMPLE,
-					'Element' => 'Host group'
+					'name' => '4 Host group - xss',
+					'url' => self::XSS_EXAMPLE,
+					'elementtype' => 'Host group'
 				],
 				[
-					'Name' => STRING_255,
-					'URL' => STRING_2048,
-					'Element' => 'Map'
+					'name' => STRING_255,
+					'url' => STRING_2048,
+					'elementtype' => 'Map'
 				]
 			]
 		];
@@ -1327,6 +1326,7 @@ class testFormMapProperties extends CWebTest {
 			$form->query('class:table-forms-separator')->asMultifieldTable()->one()->fill($data['urls']);
 		}
 
+		// Save the input values for later check, that only updated fields are affected.
 		$values = $form->getFields()->filter(CElementFilter::VISIBLE)->asValues();
 		$form->submit()->waitUntilStalled();
 
@@ -1362,16 +1362,17 @@ class testFormMapProperties extends CWebTest {
 				$saved_form->checkValue($data['result_urls']);
 			}
 
-			/*
-			 * Check that unchanged fields are not affected. Sorting and URL remove test cases are not checked, as the
-			 * URL list state changes after the save.
-			 */
-			if (!CTestArrayHelper::get($data, 'update_map')) {
-				if (CTestArrayHelper::get($data, 'trim')) {
-					CTestArrayHelper::trim($values);
-				}
-				$this->assertEquals($values, $saved_form->getFields()->filter(CElementFilter::VISIBLE)->asValues());
+			// Overwrite the previously saved URLs for cases with sorting and removing URLs.
+			if (CTestArrayHelper::get($data, 'update_map')) {
+				$values['URLs'] = $data['result_urls']['URLs'];
 			}
+
+			if (CTestArrayHelper::get($data, 'trim')) {
+				CTestArrayHelper::trim($values);
+			}
+
+			// Check that unchanged fields are not affected.
+			$this->assertEquals($values, $saved_form->getFields()->filter(CElementFilter::VISIBLE)->asValues());
 		}
 	}
 }
