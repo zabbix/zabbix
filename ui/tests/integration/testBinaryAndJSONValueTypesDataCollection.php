@@ -473,7 +473,7 @@ class testBinaryAndJSONValueTypesDataCollection extends CIntegrationTest {
 		]);
 
 		$this->assertEquals(2, count($response['result']), json_encode($response['result']));
-		$this->assertEquals(json_encode($response['result'][1]['value']), "{}");
+		$this->assertEquals(json_encode($response['result'][1]['value']), json_encode("{}"));
 	}
 
 	/**
