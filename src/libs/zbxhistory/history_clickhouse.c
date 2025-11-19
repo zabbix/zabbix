@@ -324,7 +324,7 @@ static void	history_clickhouse_close(void *data)
  *                                                                            *
  * Parameters:                                                                *
  *     conn    - [IN] ClickHouse connection                                   *
- *     headers - [IN] HTTP headers                                            *
+ *     d       - [IN] internal ClickHouse data                                *
  *     error   - [OUT] error message                                          *
  *                                                                            *
  * Return value: SUCCEED - connection initialized successfully                *
@@ -603,7 +603,6 @@ static void	history_clickhouse_add_error(char **err, const char *format, ...)
  * Parameters:                                                                *
  *     d       - [IN] ClickHouse data                                         *
  *     mhandle - [IN] curl multi handle                                       *
- *     retries - [OUT] vector of handles to retry (optional)                  *
  *     error   - [OUT] error message                                          *
  *                                                                            *
  * Return value: Number of connections to be retried. Those connections will  *
@@ -691,7 +690,7 @@ static int	history_clickhouse_flush_conns(zbx_clickhouse_data_t *d, CURLM *mhand
 
 			if (CURLM_OK != (code = curl_multi_remove_handle(mhandle, msg->easy_handle)))
 			{
-				zabbix_log(LOG_LEVEL_WARNING, "cannot remove handle from curl curl handle: %s",
+				zabbix_log(LOG_LEVEL_WARNING, "cannot remove handle from curl handle: %s",
 						curl_multi_strerror(code));
 			}
 
@@ -1026,7 +1025,7 @@ static const char	*history_clickhouse_parse_itemid(const struct zbx_json_parse *
  *     jp         - [IN] row with log data as JSON array of values            *
  *     p          - [IN] pointer to current position in JSON data             *
  *     value_type - [IN] value type (ITEM_VALUE_TYPE_*)                       *
- *     records    - [OUT] vector to store parsed history records              *
+ *     record     - [OUT] parsed history record                               *
  *                                                                            *
  * Return value: pointer to next position in JSON data or NULL on failure     *
  *                                                                            *
@@ -1412,6 +1411,7 @@ static int	history_clickhouse_parse_batch_response(char *response, unsigned char
  *     results    - [IN/OUT] vector of item history structures to fill        *
  *     value_type - [IN] value type (ITEM_VALUE_TYPE_*)                       *
  *     start      - [IN] period start time                                    *
+ *     limit      - [IN] maximum number of values to read                     *
  *     error      - [OUT] error message                                       *
  *                                                                            *
  * Return value: number of fetched batches or FAIL                            *
@@ -1565,9 +1565,9 @@ static void	history_clickhouse_get_value_type_data(zbx_clickhouse_data_t *d, CUR
 static int	history_clickhouse_get_info(void *data, zbx_history_provider_info_t *info, char **error)
 {
 #define HISTORY_CLICKHOUSE_MIN_VERSION			25000000
-#define HISTORY_CLICKHOUSE_MIN_VERSION_STR		"24.x.x.x"
+#define HISTORY_CLICKHOUSE_MIN_VERSION_STR		"25.x.x.x"
 #define HISTORY_CLICKHOUSE_MAX_VERSION			25999999
-#define HISTORY_CLICKHOUSE_MAX_VERSION_STR		"25.x.x.x"
+#define HISTORY_CLICKHOUSE_MAX_VERSION_STR		"26.x.x.x"
 
 	zbx_clickhouse_data_t	*d = (zbx_clickhouse_data_t *)data;
 	int			ret = FAIL, v1, v2, v3, v4;
@@ -1629,6 +1629,12 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() ret:%s", __func__, zbx_result_string(ret));
 
 	return ret;
+
+#undef HISTORY_CLICKHOUSE_MIN_VERSION
+#undef HISTORY_CLICKHOUSE_MIN_VERSION_STR
+#undef HISTORY_CLICKHOUSE_MAX_VERSION
+#undef HISTORY_CLICKHOUSE_MAX_VERSION_STR
+
 }
 
 /******************************************************************************

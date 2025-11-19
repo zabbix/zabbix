@@ -18,7 +18,7 @@ if [ $# -eq 0 ]; then
 fi
 
 if ! curl --version > /dev/null 2>&1; then
-	echo "This script requries curl command utility"
+	echo "This script requires curl command utility"
 	exit 0
 fi
 

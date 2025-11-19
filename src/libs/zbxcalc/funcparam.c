@@ -87,7 +87,7 @@ out:
  * Parameters: from       - [IN] function calculation time                    *
  *             parameters - [IN] trigger function parameters                  *
  *             Nparam     - [IN] specifies which parameter to extract         *
- *             range      - [IN/OUT] parameter value range                    *
+ *             selector   - [IN/OUT] parameter value range                    *
  *                                                                            *
  * Return value: SUCCEED - parameter is valid                                 *
  *               FAIL    - otherwise                                          *

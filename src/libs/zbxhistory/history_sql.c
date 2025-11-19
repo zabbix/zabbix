@@ -16,6 +16,7 @@
 #include "history.h"
 #include "history_option.h"
 #include "history_sql.h"
+
 #include "zbxcommon.h"
 #include "zbxalgo.h"
 #include "zbxcacheconfig.h"
@@ -377,8 +378,9 @@ out:
  * Purpose: read history data for multiple items from database                *
  *                                                                            *
  * Parameters: results    - [IN/OUT] vector of item history structures        *
- *             value_type - [IN] the value type (see ITEM_VALUE_TYPE_* )      *
- *             time_from  - [IN] the start timestamp                          *
+ *             value_type - [IN] value type (see ITEM_VALUE_TYPE_* )          *
+ *             time_from  - [IN] start timestamp                              *
+ *             limit      - [IN] maximum number of values to read             *
  *                                                                            *
  * Return value: SUCCEED - the history data were read successfully            *
  *               FAIL    - otherwise                                          *
@@ -719,12 +721,12 @@ static void	history_sql_write(void *data, unsigned char value_type, const zbx_hi
  * Purpose: fetch item history data from SQL database                         *
  *                                                                            *
  * Parameters: data       - [IN] history provider data                        *
- *             itemid     - [IN] the itemid                                   *
- *             value_type - [IN] the item value type                          *
- *             start      - [IN] the period start timestamp                   *
- *             end        - [IN] the period end timestamp                     *
- *             count      - [IN] the number of values to read                 *
- *             values     - [OUT] the item history records                    *
+ *             itemid     - [IN]                                              *
+ *             value_type - [IN] item value type                              *
+ *             start      - [IN] period start timestamp                       *
+ *             end        - [IN] period end timestamp                         *
+ *             count      - [IN] number of values to read                     *
+ *             values     - [OUT] item history records                        *
  *             error      - [OUT] error message                               *
  *                                                                            *
  * Return value: >=0      - number of records retrieved                       *
@@ -761,8 +763,9 @@ static int	history_sql_fetch(void *data, zbx_uint64_t itemid, unsigned char valu
  *                                                                            *
  * Parameters: data       - [IN] history provider data                        *
  *             results    - [IN/OUT] vector of item history structures        *
- *             value_type - [IN] the item value type                          *
- *             start      - [IN] the period start timestamp                   *
+ *             value_type - [IN] item value type                              *
+ *             start      - [IN] period start timestamp                       *
+ *             limit      - [IN] maximum number of values to fetch            *
  *             error      - [OUT] error message                               *
  *                                                                            *
  * Return value: SUCCEED - history data fetched successfully                  *
@@ -783,6 +786,7 @@ static int	history_sql_fetch_batch(void *data, zbx_vector_item_history_t *result
  * Purpose: retrieve information about the SQL history storage provider       *
  *                                                                            *
  * Parameters:                                                                *
+ *     data  - [IN] history provider data                                     *
  *     info  - [OUT] pointer to structure for storing module information      *
  *     error - [OUT] error message in case of failure                         *
  *                                                                            *

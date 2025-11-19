@@ -971,7 +971,7 @@ static int	remove_history_duplicates(zbx_vector_dc_history_ptr_t *history)
 	zbx_vector_dc_history_ptr_clear_ext(&duplicates, zbx_dc_history_shallow_free);
 	zbx_vector_dc_history_ptr_destroy(&duplicates);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s(): dupliactes:%d", __func__, dup_num);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s(): duplicates:%d", __func__, dup_num);
 
 	return dup_num;
 }

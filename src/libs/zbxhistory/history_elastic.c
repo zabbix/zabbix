@@ -724,7 +724,7 @@ static int	history_elastic_perform(zbx_history_elastic_data_t *d, CURLM *mhandle
  * Parameters: d          - [IN] elasticsearch data structure                 *
  *             mhandle    - [IN] curl multi handle                            *
  *             conn       - [IN/OUT] elasticsearch connection                 *
- *             retry_mode - [IN] retry mode                                   *
+ *             retry_mode - [IN]                                              *
  *                                                                            *
  * Return value: SUCCEED - query executed successfully                        *
  *               FAIL    - query execution failed                             *
@@ -1729,7 +1729,7 @@ out:
  *     options_num - [IN] number of elements in the options array             *
  *     error       - [OUT] error message if function fails                    *
  *                                                                            *
- * Return value: elasticsarch history provier or NULL on failure              *
+ * Return value: elasticsarch history provider or NULL on failure             *
  *                                                                            *
  ******************************************************************************/
 static void	*history_elastic_create_data(const zbx_history_option_t *options, int options_num, char **error)

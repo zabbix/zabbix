@@ -837,7 +837,7 @@ static zbx_uint64_t	history_session_flush(zbx_history_session_t *session)
  * Purpose: fetch history data for a specific item                             *
  *                                                                             *
  * Parameters: session    - [IN] history session                               *
- *             itemid     - [IN] item identifier                               *
+ *             itemid     - [IN]                                               *
  *             value_type - [IN] item value type                               *
  *             start      - [IN] start timestamp of the requested period,      *
  *                               0 - ignored                                   *
@@ -1461,7 +1461,7 @@ int	zbx_history_check_version(int config_allow_unsupported_db_versions, unsigned
  * Purpose: duplicates history log by allocating necessary resources and      *
  *          copying the target log values.                                    *
  *                                                                            *
- * Parameters: log   - [IN] the history log to duplicate                      *
+ * Parameters: log   - [IN] history log to duplicate                          *
  *                                                                            *
  * Return value: the duplicated history log                                   *
  *                                                                            *
@@ -1485,9 +1485,9 @@ static zbx_log_value_t	*log_value_dup(const zbx_log_value_t *log)
  *                                                                            *
  * Purpose: copies history value                                              *
  *                                                                            *
- * Parameters: dst        - [OUT] a pointer to the destination value          *
- *             src        - [IN] a pointer to the source value                *
- *             value_type - [IN] the value type (see ITEM_VALUE_TYPE_* defs)  *
+ * Parameters: dst        - [OUT] pointer to the destination value            *
+ *             src        - [IN] pointer to the source value                  *
+ *             value_type - [IN] value type (see ITEM_VALUE_TYPE_* defs)      *
  *                                                                            *
  * Comments: Additional memory is allocated to store string, text and log     *
  *           value contents. This memory must be freed by the caller.         *
