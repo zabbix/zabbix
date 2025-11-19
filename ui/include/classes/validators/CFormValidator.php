@@ -244,6 +244,10 @@ class CFormValidator {
 						break;
 
 					case 'use':
+						if (!is_array($value) || count($value) > 2) {
+							throw new Exception('[RULES ERROR] Rule "'.$key.'" should contain an array with up to two elements (Path: '.$rule_path.')');
+						}
+
 						$result[$key] = $value;
 						break;
 
@@ -1051,7 +1055,7 @@ class CFormValidator {
 
 		$error = '';
 
-		[$class_name, $class_options, $more_options] = $rules['use'] + [1 => null, 2 => []];
+		[$class_name, $class_options] = $rules['use'] + [1 => null];
 
 		switch ($class_name) {
 			case 'CRegexValidator':

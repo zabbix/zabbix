@@ -844,6 +844,13 @@ class CFormValidatorTest extends TestCase {
 				]],
 				null,
 				'[RULES ERROR] Only fields defined prior to this can be used for "when" checks (Path: /dns)'
+			],
+			[
+				['object', 'fields' => [
+					'value' => ['string', 'use' => [CAbsoluteTimeValidator::class, [], ['min' => 2147464799]]]
+				]],
+				null,
+				'[RULES ERROR] Rule "use" should contain an array with up to two elements (Path: /value)'
 			]
 		];
 	}

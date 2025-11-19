@@ -35,7 +35,7 @@ class CControllerMaintenanceUpdate extends CControllerMaintenanceUpdateGeneral {
 				'use' => [CAbsoluteTimeValidator::class, ['min' => 0, 'max' => ZBX_MAX_DATE]],
 				'messages' => ['use' => _('Invalid date.')]],
 			'active_till' => ['string', 'required', 'not_empty',
-				'use' => [CAbsoluteTimeValidator::class, [], ['min' => 0, 'max' => ZBX_MAX_DATE]],
+				'use' => [CAbsoluteTimeValidator::class, ['min' => 0, 'max' => ZBX_MAX_DATE]],
 				'messages' => ['use' => _('Invalid date.')]],
 			'timeperiods' => ['objects', 'required', 'not_empty',
 				'messages' => ['not_empty' => _('At least one period must be added.')],
