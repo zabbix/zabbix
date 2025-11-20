@@ -12,28 +12,8 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-package zabbixasync
+#include "zbxalgo.h"
 
-import (
-	"golang.zabbix.com/agent2/pkg/zbxlib"
-	"golang.zabbix.com/sdk/errs"
-	"golang.zabbix.com/sdk/plugin"
-)
-
-var impl Plugin
-
-// Plugin -
-type Plugin struct {
-	plugin.Base
-}
-
-func init() {
-	err := plugin.RegisterMetrics(&impl, "ZabbixAsync", getMetrics()...)
-	if err != nil {
-		panic(errs.Wrap(err, "failed to register metrics"))
-	}
-}
-
-func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
-	return zbxlib.ExecuteCheck(key, params)
-}
+int	zbx_db_delete_host_template_cache(zbx_uint64_t hostid, zbx_vector_uint64_t *del_templateids);
+int	zbx_db_copy_host_template_cache(zbx_uint64_t hostid, zbx_vector_uint64_t *lnk_templateids);
+void	zbx_db_save_item_template_cache(zbx_uint64_t hostid, zbx_vector_uint64_t *new_itemids);

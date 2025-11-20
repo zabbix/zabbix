@@ -13,11 +13,11 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-define('ZABBIX_VERSION',		'8.0.0alpha1');
+define('ZABBIX_VERSION',		'8.0.0alpha2');
 define('ZABBIX_API_VERSION',	'8.0.0');
 define('ZABBIX_EXPORT_VERSION',	'8.0');
 
-define('ZABBIX_DB_VERSION',		7050008);
+define('ZABBIX_DB_VERSION',		7050018);
 
 define('DB_VERSION_SUPPORTED',						0);
 define('DB_VERSION_LOWER_THAN_MINIMUM',				1);
@@ -1249,6 +1249,19 @@ define('EVENT_OBJECT_ITEM',				4);
 define('EVENT_OBJECT_LLDRULE',			5);
 define('EVENT_OBJECT_SERVICE',			6);
 
+define('ZBX_TAG_OBJECT_TEMPLATE',			0);
+define('ZBX_TAG_OBJECT_HOST',				1);
+define('ZBX_TAG_OBJECT_HOST_PROTOTYPE',		2);
+define('ZBX_TAG_OBJECT_ITEM',				3);
+define('ZBX_TAG_OBJECT_ITEM_PROTOTYPE',		4);
+define('ZBX_TAG_OBJECT_TRIGGER',			5);
+define('ZBX_TAG_OBJECT_TRIGGER_PROTOTYPE',	6);
+define('ZBX_TAG_OBJECT_HTTPTEST',			7);
+define('ZBX_TAG_OBJECT_EVENT',				8);
+define('ZBX_TAG_OBJECT_PROBLEM',			9);
+define('ZBX_TAG_OBJECT_SERVICE',			10);
+define('ZBX_TAG_OBJECT_HOST_GROUP',			11);
+
 // System information widget constants.
 define('ZBX_SYSTEM_INFO_SERVER_STATS',	0);
 define('ZBX_SYSTEM_INFO_HAC_STATUS',	1);
@@ -2252,6 +2265,9 @@ define('ZBX_STYLE_TABLE_INITIAL_WIDTH', 'table-initial-width');
 define('ZBX_STYLE_TABLE_STATS', 'table-stats');
 define('ZBX_STYLE_TABS_NAV', 'tabs-nav');
 define('ZBX_STYLE_TAG', 'tag');
+define('ZBX_STYLE_TAG_INHERITED', 'tag-inherited');
+define('ZBX_STYLE_TAG_INHERITED_DUPLICATE', 'tag-inherited-duplicate');
+define('ZBX_STYLE_TAG_INHERITED_TITLE', 'tag-inherited-title');
 define('ZBX_STYLE_TAGS_LIST', 'tags-list');
 define('ZBX_STYLE_TAGS_WRAPPER', 'tags-wrapper');
 define('ZBX_STYLE_TEXT_PLACEHOLDER', 'text-placeholder');
