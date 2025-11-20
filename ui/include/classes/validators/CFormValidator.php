@@ -375,8 +375,8 @@ class CFormValidator {
 			if (!array_key_exists('in', $result)) {
 				$result['in'] = [0, 1];
 			}
-			elseif (!array_key_exists('messages', $result) || !array_key_exists('in', $result['messages'])) {
-				$result['messages']['in'] = _('Must be selected.');
+			else if (array_diff($result['in'], [0, 1]) !== []) {
+				throw new Exception('[RULES ERROR] Invalid value for rule "in" for type "boolean" (Path: '.$rule_path .')');
 			}
 		}
 

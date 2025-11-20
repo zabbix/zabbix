@@ -787,10 +787,16 @@ class CFormValidatorTest extends TestCase {
 				['type' => 'object', 'fields' => [
 					'value' => [[
 						'type' => 'integer',
-						'in' => [1],
-						'messages' => ['in' => 'Must be selected.']
+						'in' => [1]
 					]]
 				]]
+			],
+			[
+				['object', 'fields' => [
+					'value' => ['boolean', 'in' => [1, 2]]
+				]],
+				null,
+				'[RULES ERROR] Invalid value for rule "in" for type "boolean" (Path: /value)'
 			],
 			[
 				['object', 'fields' => [
