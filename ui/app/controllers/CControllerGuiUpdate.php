@@ -37,7 +37,7 @@ class CControllerGuiUpdate extends CController {
 			],
 			'work_period' => ['setting work_period', 'required', 'not_empty',
 				'use' => [CTimePeriodsParser::class, ['usermacros' => true]],
-				'messages' => ['use' => _('Invalid period.')]
+				'messages' => ['use' => _('Invalid time period.')]
 			],
 			'show_technical_errors' => ['boolean', 'required'],
 			'history_period' => ['setting history_period', 'required', 'not_empty',
