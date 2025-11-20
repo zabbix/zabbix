@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2025-10-30 20:06+0000\n"
+"PO-Revision-Date: 2025-11-13 17:21+0000\n"
 "Last-Translator: ERIC <eric78.zabbix@orange.fr>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: fr\n"
@@ -4246,7 +4246,7 @@ msgstr "Impossible de définir l'« Agrégation d'ensembles de données » lor
 
 #: include/classes/db/MysqlDbBackend.php:197
 msgid "Cannot set charset."
-msgstr ""
+msgstr "Impossible de définir l'encodage des caractères."
 
 #: include/classes/api/services/CItemGeneral.php:2478
 #, c-format
@@ -4766,7 +4766,7 @@ msgstr "Changer"
 
 #: app/views/administration.authentication.edit.php:316
 msgid "Change IdP certificate"
-msgstr ""
+msgstr "Modifier le certificat IdP"
 
 #: app/partials/configuration.host.edit.html.php:449
 #: app/views/administration.autoreg.edit.php:82
@@ -4777,11 +4777,11 @@ msgstr "Changer PSK"
 
 #: app/views/administration.authentication.edit.php:367
 msgid "Change SP certificate"
-msgstr ""
+msgstr "Modifier le certificat SP"
 
 #: app/views/administration.authentication.edit.php:342
 msgid "Change SP private key"
-msgstr ""
+msgstr "Modifier la clé privée SP"
 
 #: app/views/mfa.edit.php:128
 msgid "Change client secret"
@@ -5129,7 +5129,7 @@ msgstr "Fermer les problèmes"
 #: widgets/geomap/includes/WidgetForm.php:66
 #: widgets/geomap/views/widget.edit.php:59
 msgid "Clustering"
-msgstr ""
+msgstr "Regroupement"
 
 #: app/views/mfa.edit.php:90
 msgid "Code length"
@@ -6184,11 +6184,11 @@ msgstr "Courant"
 
 #: app/views/js/administration.authentication.edit.js.php:419
 msgid "Current SP certificate will be deleted."
-msgstr ""
+msgstr "Le certificat SP actuel sera supprimé."
 
 #: app/views/js/administration.authentication.edit.js.php:425
 msgid "Current SP private key will be deleted."
-msgstr ""
+msgstr "La clé privée SP actuelle sera supprimée."
 
 #: app/views/popup.operation.edit.php:256
 msgid "Current host"
@@ -10019,7 +10019,7 @@ msgstr "Le prototype de groupe ne peut pas être basé sur un groupe d'hôte \"%
 #: app/controllers/CControllerHostPrototypeCreate.php:55
 #: app/controllers/CControllerHostPrototypeUpdate.php:58
 msgid "Group prototype is not unique."
-msgstr ""
+msgstr "Le prototype de groupe n'est pas unique."
 
 #: include/views/configuration.host.prototype.edit.php:204
 msgid "Group prototypes"
@@ -11028,7 +11028,7 @@ msgstr "Icônes"
 
 #: app/views/administration.authentication.edit.php:312
 msgid "IdP certificate"
-msgstr ""
+msgstr "Certificat IdP"
 
 #: app/views/administration.authentication.edit.php:291
 msgid "IdP entity ID"
@@ -12187,7 +12187,7 @@ msgstr "Tags hérités et d'élément"
 
 #: app/partials/configuration.tags.tab.php:160
 msgid "Inherited and scenario tags"
-msgstr "Tags héritées et de scénario"
+msgstr "Tags hérités et de scénario"
 
 #: app/views/template.edit.php:184
 msgid "Inherited and template macros"
@@ -12211,7 +12211,7 @@ msgstr "Tags hérités et déclencheurs"
 
 #: include/classes/helpers/CTagHelper.php:233
 msgid "Inherited and web scenario tag"
-msgstr ""
+msgstr "Tags hérités et de scénario web"
 
 #: include/forms.inc.php:311
 msgid "Inherited items"
@@ -12889,7 +12889,7 @@ msgstr "Tag \"%1$s\" invalide : %2$s."
 #: app/controllers/CControllerTemplateGroupCreate.php:31
 #: app/controllers/CControllerTemplateGroupUpdate.php:32
 msgid "Invalid template group name."
-msgstr ""
+msgstr "Nom de groupe de modèles non valide."
 
 #: include/classes/validators/CActionCondValidator.php:103
 msgid "Invalid time period."
@@ -13445,7 +13445,7 @@ msgstr "La langue \"%1$s\" n'est pas prise en charge."
 
 #: widgets/scatterplot/includes/CWidgetFieldDataSetView.php:445
 msgid "Large"
-msgstr ""
+msgstr "Grand"
 
 #: include/classes/helpers/CPagerHelper.php:232
 msgctxt "page navigation"
@@ -14334,7 +14334,7 @@ msgstr "Marquer les éléments sélectionnés comme symptômes"
 
 #: widgets/scatterplot/includes/CWidgetFieldDataSetView.php:437
 msgid "Marker"
-msgstr ""
+msgstr "Marqueur"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:408
 #: app/controllers/CControllerPopupTriggerExpr.php:448
@@ -14621,7 +14621,7 @@ msgstr "Types de médias utilisés par l'action \"%1$s\"."
 
 #: widgets/scatterplot/includes/CWidgetFieldDataSetView.php:444
 msgid "Medium"
-msgstr ""
+msgstr "Moyen"
 
 #: app/views/usergroup.list.php:78
 msgid "Members"
@@ -14837,7 +14837,7 @@ msgstr[1] "La période minimale à afficher est %1$s minutes."
 #: app/controllers/CControllerMaintenanceTimePeriodCheck.php:82
 #, c-format
 msgid "Minimum value of \"Maintenance period length\" is %1$d minutes."
-msgstr ""
+msgstr "La valeur minimale de \"Durée de la période de maintenance\" est de %1$d minutes."
 
 #: app/views/maintenance.timeperiod.edit.php:202
 msgid "Minute"
@@ -17079,15 +17079,15 @@ msgstr "Propriétaire"
 
 #: app/views/administration.authentication.edit.php:322
 msgid "PEM-encoded IdP certificate"
-msgstr ""
+msgstr "Certificat IdP encodé en PEM"
 
 #: app/views/administration.authentication.edit.php:373
 msgid "PEM-encoded SP certificate"
-msgstr ""
+msgstr "Certificat SP encodé en PEM"
 
 #: app/views/administration.authentication.edit.php:348
 msgid "PEM-encoded SP private key"
-msgstr ""
+msgstr "Clé privée SP encodé en PEM"
 
 #: include/classes/setup/CFrontendSetup.php:531
 msgid "PHP LDAP"
@@ -19202,7 +19202,7 @@ msgstr "Retourne un objet JSON contenant les métriques internes du serveur Zabb
 
 #: include/classes/data/CItemData.php:2797
 msgid "Returns a JSON object containing database connection pool configuration and statistics."
-msgstr ""
+msgstr "Retourne un objet JSON contenant la configuration et les statistiques du pool de connexions à la base de données."
 
 #: include/classes/data/CItemData.php:2673
 msgid "Returns availability of a particular type of checks on the host. Value of this item corresponds to availability icons in the host list. Valid types are: agent, active_agent, snmp, ipmi, jmx."
@@ -19572,7 +19572,7 @@ msgstr "agent SNMPv3"
 
 #: app/views/administration.authentication.edit.php:363
 msgid "SP certificate"
-msgstr ""
+msgstr "Certificat SP"
 
 #: app/views/administration.authentication.edit.php:334
 msgid "SP entity ID"
@@ -19584,7 +19584,7 @@ msgstr "Format d'ID du nom du SP"
 
 #: app/views/administration.authentication.edit.php:338
 msgid "SP private key"
-msgstr ""
+msgstr "Clé privée SP"
 
 #: include/classes/debug/CProfiler.php:158
 #, c-format
@@ -20854,7 +20854,7 @@ msgstr "Slovaque (sk_SK)"
 
 #: widgets/scatterplot/includes/CWidgetFieldDataSetView.php:443
 msgid "Small"
-msgstr ""
+msgstr "Petit"
 
 #: jsLoader.php:288
 msgid "Snooze"
@@ -21621,12 +21621,12 @@ msgstr "Nom de tag"
 #: app/controllers/CControllerTriggerPrototypeUpdate.php:61
 #: app/controllers/CControllerTriggerUpdate.php:61
 msgid "Tag name and value combination is not unique."
-msgstr ""
+msgstr "La combinaison du nom et de la valeur du tag n'est pas unique."
 
 #: app/controllers/CControllerMaintenanceCreate.php:93
 #: app/controllers/CControllerMaintenanceUpdate.php:94
 msgid "Tag name, operator and value combination is not unique."
-msgstr ""
+msgstr "La combinaison du nom du tag, de l'opérateur et de la valeur n'est pas unique."
 
 #: include/actions.inc.php:68
 msgid "Tag value"
@@ -21837,7 +21837,7 @@ msgstr "Autorisations du modèle"
 
 #: app/partials/configuration.tags.tab.php:33
 msgid "Template tags"
-msgstr ""
+msgstr "Tags de modèle"
 
 #: report2.php:398
 msgid "Template trigger"
@@ -22348,7 +22348,7 @@ msgstr "Cette valeur ne correspond pas au modèle."
 
 #: jsLoader.php:442
 msgid "This value is not a valid file."
-msgstr ""
+msgstr "Cette valeur ne correspond pas à un fichier valide."
 
 #: include/classes/validators/CFormValidator.php:874 jsLoader.php:424
 msgid "This value is not a valid floating-point value."
@@ -22640,7 +22640,7 @@ msgstr ""
 
 #: app/views/oauth.edit.php:188
 msgid "Token endpoint"
-msgstr ""
+msgstr "Token du point de terminaison"
 
 #: app/views/oauth.edit.php:201
 msgid "Token parameters"
@@ -23939,7 +23939,7 @@ msgstr "Utilisez le filtre pour afficher les résultats"
 
 #: app/views/host.wizard.edit.php:424
 msgid "Use:"
-msgstr ""
+msgstr "Utilisation :"
 
 #: app/views/administration.script.list.php:93 app/views/mediatype.list.php:98
 msgid "Used in actions"
@@ -25440,7 +25440,7 @@ msgstr "X"
 #: widgets/scatterplot/includes/WidgetForm.php:194
 #: widgets/scatterplot/includes/WidgetForm.php:199
 msgid "X axis"
-msgstr ""
+msgstr "Axe X"
 
 #: widgets/scatterplot/includes/WidgetForm.php:80
 msgid "X axis MAX value must be greater than X axis MIN value"
@@ -25452,7 +25452,7 @@ msgstr "Axe X"
 
 #: widgets/scatterplot/includes/CWidgetFieldAxisThresholdsView.php:40
 msgid "X-Axis threshold"
-msgstr ""
+msgstr "Seuil de l'axe X"
 
 #: app/views/administration.miscconfig.edit.php:120
 msgid "X-Frame-Options HTTP header"
@@ -25544,7 +25544,7 @@ msgstr "Axe X"
 
 #: widgets/scatterplot/includes/CWidgetFieldAxisThresholdsView.php:41
 msgid "Y-Axis threshold"
-msgstr ""
+msgstr "Seuil de l'axe Y"
 
 #: widgets/svggraph/includes/CWidgetFieldDataSetView.php:367
 #: widgets/svggraph/includes/CWidgetFieldOverrideView.php:185
@@ -25868,7 +25868,7 @@ msgstr "Zabbix trapper"
 #: widgets/geomap/includes/WidgetForm.php:68
 #: widgets/geomap/includes/WidgetForm.php:72
 msgid "Zoom level"
-msgstr ""
+msgstr "Niveau de zoom"
 
 #: include/classes/html/CFilter.php:258 include/classes/html/CTabFilter.php:324
 msgid "Zoom out"
@@ -25898,11 +25898,11 @@ msgstr "un nom DNS est attendu"
 
 #: include/classes/validators/CApiInputValidator.php:4407
 msgid "a PEM-encoded certificate is expected"
-msgstr ""
+msgstr "un certificat encodé au format PEM est attendu"
 
 #: include/classes/validators/CApiInputValidator.php:4444
 msgid "a PEM-encoded private key is expected"
-msgstr ""
+msgstr "une clé privée encodée au format PEM est attendue"
 
 #: include/classes/validators/CApiInputValidator.php:1381
 msgid "a boolean is expected"
