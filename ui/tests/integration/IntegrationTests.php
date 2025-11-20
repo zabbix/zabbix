@@ -30,7 +30,7 @@ require_once dirname(__FILE__).'/testEscalations.php';
 require_once dirname(__FILE__).'/testAlertingForServices.php';
 require_once dirname(__FILE__).'/testComplexServiceStatus.php';
 require_once dirname(__FILE__).'/testServiceRoles.php';
-require_once dirname(__FILE__).'/testExpressionMacros.php';
+require_once dirname(__FILE__).'/testMacros.php';
 require_once dirname(__FILE__).'/testExpressionTriggerMacros.php';
 require_once dirname(__FILE__).'/testAgentItems.php';
 require_once dirname(__FILE__).'/testScriptItems.php';
@@ -62,6 +62,7 @@ require_once dirname(__FILE__).'/testLLDLinking.php';
 require_once dirname(__FILE__).'/testUserMacrosWithContext.php';
 require_once dirname(__FILE__).'/testUserMacrosWithContextRegex.php';
 require_once dirname(__FILE__).'/testNestedLLD.php';
+require_once dirname(__FILE__).'/testCalculatedExpression.php';
 
 use PHPUnit\Framework\TestSuite;
 
@@ -90,7 +91,7 @@ class IntegrationTests {
 		$suite->addTestSuite('testAlertingForServices');
 		$suite->addTestSuite('testComplexServiceStatus');
 		$suite->addTestSuite('testServiceRoles');
-		$suite->addTestSuite('testExpressionMacros');
+		$suite->addTestSuite('testMacros');
 		$suite->addTestSuite('testExpressionTriggerMacros');
 		$suite->addTestSuite('testScriptItems');
 		$suite->addTestSuite('testItemRate');
@@ -119,7 +120,7 @@ class IntegrationTests {
 		$suite->addTestSuite('testUserMacrosWithContext');
 		$suite->addTestSuite('testUserMacrosWithContextRegex');
 		$suite->addTestSuite('testNestedLLD');
-
+		$suite->addTestSuite('testCalculatedExpression');
 		return $suite;
 	}
 }
