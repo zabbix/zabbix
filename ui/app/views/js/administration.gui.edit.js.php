@@ -78,7 +78,7 @@ const view = new class {
 
 	#submit(e) {
 		e.preventDefault();
-		this.#setLoadingStatus(['update'])
+		this.#setLoadingStatus(['update']);
 		clearMessages();
 		const fields = this.form.getAllValues();
 

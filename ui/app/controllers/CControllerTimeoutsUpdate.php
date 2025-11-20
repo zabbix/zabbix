@@ -23,52 +23,52 @@ class CControllerTimeoutsUpdate extends CController {
 
 	public static function getValidationRules(): array {
 		return ['object', 'fields' => [
-			'timeout_zabbix_agent' => ['string', 'required', 'not_empty',
+			'timeout_zabbix_agent' => ['setting timeout_zabbix_agent', 'required', 'not_empty',
 				'use' => [CTimeUnitValidator::class, ['min' => 1, 'max' => 600, 'usermacros' => true]]
 			],
-			'timeout_simple_check' => ['string', 'required', 'not_empty',
+			'timeout_simple_check' => ['setting timeout_simple_check', 'required', 'not_empty',
 				'use' => [CTimeUnitValidator::class, ['min' => 1, 'max' => 600, 'usermacros' => true]]
 			],
-			'timeout_snmp_agent' => ['string', 'required', 'not_empty',
+			'timeout_snmp_agent' => ['setting timeout_snmp_agent', 'required', 'not_empty',
 				'use' => [CTimeUnitValidator::class, ['min' => 1, 'max' => 600, 'usermacros' => true]]
 			],
-			'timeout_external_check' => ['string', 'required', 'not_empty',
+			'timeout_external_check' => ['setting timeout_external_check', 'required', 'not_empty',
 				'use' => [CTimeUnitValidator::class, ['min' => 1, 'max' => 600, 'usermacros' => true]]
 			],
-			'timeout_db_monitor' => ['string', 'required', 'not_empty',
+			'timeout_db_monitor' => ['setting timeout_db_monitor', 'required', 'not_empty',
 				'use' => [CTimeUnitValidator::class, ['min' => 1, 'max' => 600, 'usermacros' => true]]
 			],
-			'timeout_http_agent' =>	['string', 'required', 'not_empty',
+			'timeout_http_agent' =>	['setting timeout_http_agent', 'required', 'not_empty',
 				'use' => [CTimeUnitValidator::class, ['min' => 1, 'max' => 600, 'usermacros' => true]]
 			],
-			'timeout_ssh_agent' => ['string', 'required', 'not_empty',
+			'timeout_ssh_agent' => ['setting timeout_ssh_agent', 'required', 'not_empty',
 				'use' => [CTimeUnitValidator::class, ['min' => 1, 'max' => 600, 'usermacros' => true]]
 			],
-			'timeout_telnet_agent' => ['string', 'required', 'not_empty',
+			'timeout_telnet_agent' => ['setting timeout_telnet_agent', 'required', 'not_empty',
 				'use' => [CTimeUnitValidator::class, ['min' => 1, 'max' => 600, 'usermacros' => true]]
 			],
-			'timeout_script' => ['string', 'required', 'not_empty',
+			'timeout_script' => ['setting timeout_script', 'required', 'not_empty',
 				'use' => [CTimeUnitValidator::class, ['min' => 1, 'max' => 600, 'usermacros' => true]]
 			],
-			'timeout_browser' => ['string', 'required', 'not_empty',
+			'timeout_browser' => ['setting timeout_browser', 'required', 'not_empty',
 				'use' => [CTimeUnitValidator::class, ['min' => 1, 'max' => 600, 'usermacros' => true]]
 			],
-			'socket_timeout' => ['string', 'required', 'not_empty',
+			'socket_timeout' => ['setting socket_timeout', 'required', 'not_empty',
 				'use' => [CTimeUnitValidator::class, ['min' => 1, 'max' => 300]]
 			],
-			'connect_timeout' => ['string', 'required', 'not_empty',
+			'connect_timeout' => ['setting connect_timeout', 'required', 'not_empty',
 				'use' => [CTimeUnitValidator::class, ['min' => 1, 'max' => 30]]
 			],
-			'media_type_test_timeout' => ['string', 'required', 'not_empty',
+			'media_type_test_timeout' => ['setting media_type_test_timeout', 'required', 'not_empty',
 				'use' => [CTimeUnitValidator::class, ['min' => 1, 'max' => 300]]
 			],
-			'script_timeout' => ['string', 'required', 'not_empty',
+			'script_timeout' => ['setting script_timeout', 'required', 'not_empty',
 				'use' => [CTimeUnitValidator::class, ['min' => 1, 'max' => 300]]
 			],
-			'item_test_timeout' => ['string', 'required', 'not_empty',
+			'item_test_timeout' => ['setting item_test_timeout', 'required', 'not_empty',
 				'use' => [CTimeUnitValidator::class, ['min' => 1, 'max' => 600]]
 			],
-			'report_test_timeout' => ['string', 'required', 'not_empty',
+			'report_test_timeout' => ['setting report_test_timeout', 'required', 'not_empty',
 				'use' => [CTimeUnitValidator::class, ['min' => 1, 'max' => 300]]
 			]
 		]];

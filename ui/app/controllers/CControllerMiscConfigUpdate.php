@@ -23,34 +23,33 @@ class CControllerMiscConfigUpdate extends CController {
 
 	public static function getValidationRules(): array {
 		return ['object', 'fields' => [
-			'url' => ['string', 'required', 'length' => CSettingsSchema::getFieldLength('url')],
-			'discovery_groupid' => ['db hstgrp.groupid', 'required'],
-			'default_inventory_mode' => ['integer', 'required',
+			'url' => ['setting url', 'required'],
+			'discovery_groupid' => ['setting discovery_groupid', 'required'],
+			'default_inventory_mode' => ['setting default_inventory_mode', 'required',
 				'in' => [HOST_INVENTORY_DISABLED, HOST_INVENTORY_MANUAL, HOST_INVENTORY_AUTOMATIC]
 			],
-			'alert_usrgrpid' => ['db usrgrp.usrgrpid'],
+			'alert_usrgrpid' => ['setting alert_usrgrpid'],
 			'snmptrap_logging' => ['boolean', 'required'],
-			'login_attempts' => ['integer', 'required', 'min' => 1, 'max' => 32],
-			'login_block' => ['string', 'required', 'not_empty',
+			'login_attempts' => ['setting login_attempts', 'required', 'min' => 1, 'max' => 32],
+			'login_block' => ['setting login_block', 'required', 'not_empty',
 				'use' => [CTimeUnitValidator::class, ['min' => 30, 'max' => SEC_PER_HOUR]]
 			],
-			'vault_provider' => ['integer', 'required', 'in' => [ZBX_VAULT_TYPE_HASHICORP, ZBX_VAULT_TYPE_CYBERARK]],
-			'proxy_secrets_provider' => ['integer', 'required',
+			'vault_provider' => ['setting vault_provider', 'required',
+				'in' => [ZBX_VAULT_TYPE_HASHICORP, ZBX_VAULT_TYPE_CYBERARK]
+			],
+			'proxy_secrets_provider' => ['setting proxy_secrets_provider', 'required',
 				'in' => [ZBX_PROXY_SECRETS_PROVIDER_SERVER, ZBX_PROXY_SECRETS_PROVIDER_PROXY]
 			],
 			'validate_uri_schemes' => ['boolean', 'required'],
-			'uri_valid_schemes' => ['string', 'required',
-				'length' => CSettingsSchema::getFieldLength('uri_valid_schemes'),
+			'uri_valid_schemes' => ['setting uri_valid_schemes', 'required',
 				'when' => ['validate_uri_schemes', 'in' => [1]]
 			],
 			'x_frame_header_enabled' => ['boolean', 'required'],
-			'x_frame_options' => ['string', 'required', 'not_empty',
-				'length' => CSettingsSchema::getFieldLength('x_frame_options'),
+			'x_frame_options' => ['setting x_frame_options', 'required', 'not_empty',
 				'when' => ['x_frame_header_enabled', 'in' => [1]]
 			],
 			'iframe_sandboxing_enabled' => ['boolean', 'required'],
-			'iframe_sandboxing_exceptions' => ['string', 'required',
-				'length' => CSettingsSchema::getFieldLength('iframe_sandboxing_exceptions'),
+			'iframe_sandboxing_exceptions' => ['setting iframe_sandboxing_exceptions', 'required',
 				'when' => ['iframe_sandboxing_enabled', 'in' => [1]]
 			]
 		]];

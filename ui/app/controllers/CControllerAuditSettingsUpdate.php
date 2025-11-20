@@ -26,7 +26,7 @@ class CControllerAuditSettingsUpdate extends CController {
 			'auditlog_enabled' => ['boolean', 'required'],
 			'auditlog_mode' => ['boolean', 'required', 'when' => ['auditlog_enabled', 'in' => [1]]],
 			'hk_audit_mode' => ['boolean', 'required'],
-			'hk_audit' => ['string', 'required', 'not_empty',
+			'hk_audit' => ['setting hk_audit', 'required', 'not_empty',
 				'when' => ['hk_audit_mode', 'in' => [1]],
 				'use' => [CTimeUnitValidator::class, ['min' => SEC_PER_DAY, 'max' => 25 * SEC_PER_YEAR]]
 			]

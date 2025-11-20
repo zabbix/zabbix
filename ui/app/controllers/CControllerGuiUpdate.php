@@ -26,27 +26,29 @@ class CControllerGuiUpdate extends CController {
 		$timezones[] = ZBX_DEFAULT_TIMEZONE;
 
 		return ['object', 'fields' => [
-			'default_lang' => ['string', 'required', 'in' => array_keys(getLocales())],
-			'default_timezone' => ['string', 'required', 'in' => $timezones],
-			'default_theme' => ['string', 'required', 'in' => array_keys(APP::getThemes())],
-			'search_limit' => ['integer', 'required', 'min' => 1, 'max' => 999999],
-			'max_overview_table_size' => ['integer', 'required', 'min' => 5, 'max' => 999999],
-			'max_in_table' => ['integer', 'required', 'min' => 1, 'max' => 99999],
-			'server_check_interval' => ['integer', 'required', 'in' => [0, SERVER_CHECK_INTERVAL]],
-			'work_period' => ['string', 'required', 'not_empty',
-				'length' => CSettingsSchema::getFieldLength('work_period'),
-				'use' => [CTimePeriodsParser::class, ['usermacros' => true]]
+			'default_lang' => ['setting default_lang', 'in' => array_keys(getLocales())],
+			'default_timezone' => ['setting default_timezone', 'required', 'in' => $timezones],
+			'default_theme' => ['setting default_theme', 'required', 'in' => array_keys(APP::getThemes())],
+			'search_limit' => ['setting search_limit', 'required', 'min' => 1, 'max' => 999999],
+			'max_overview_table_size' => ['setting max_overview_table_size', 'required', 'min' => 5, 'max' => 999999],
+			'max_in_table' => ['setting max_in_table', 'required', 'min' => 1, 'max' => 99999],
+			'server_check_interval' => ['setting server_check_interval', 'required',
+				'in' => [0, SERVER_CHECK_INTERVAL]
+			],
+			'work_period' => ['setting work_period', 'required', 'not_empty',
+				'use' => [CTimePeriodsParser::class, ['usermacros' => true]],
+				'messages' => ['use' => _('Invalid period.')]
 			],
 			'show_technical_errors' => ['boolean', 'required'],
-			'history_period' => ['string', 'required', 'not_empty',
+			'history_period' => ['setting history_period', 'required', 'not_empty',
 				'use' => [CTimeUnitValidator::class, ['min' => SEC_PER_DAY, 'max' => 7 * SEC_PER_DAY]]
 			],
-			'period_default' => ['string', 'required', 'not_empty',
+			'period_default' => ['setting period_default', 'required', 'not_empty',
 				'use' => [CTimeUnitValidator::class,
 					['min' => SEC_PER_MIN, 'max' => 10 * SEC_PER_YEAR, 'with_year' => true]
 				]
 			],
-			'max_period' => ['string', 'required', 'not_empty',
+			'max_period' => ['setting max_period', 'required', 'not_empty',
 				'use' => [CTimeUnitValidator::class,
 					['min' => SEC_PER_YEAR, 'max' => 10 * SEC_PER_YEAR, 'with_year' => true]
 				]

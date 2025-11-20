@@ -26,52 +26,40 @@ class CControllerTrigDisplayUpdate extends CController {
 			'custom_color' => ['integer', 'required',
 				'in' => [EVENT_CUSTOM_COLOR_DISABLED, EVENT_CUSTOM_COLOR_ENABLED]
 			],
-			'problem_unack_color' => ['string', 'required', 'rgb',
+			'problem_unack_color' => ['setting problem_unack_color', 'required', 'rgb',
 				'when' => ['custom_color', 'in' => [EVENT_CUSTOM_COLOR_ENABLED]]
 			],
-			'problem_ack_color' => ['string', 'required', 'rgb',
+			'problem_ack_color' => ['setting problem_ack_color', 'required', 'rgb',
 				'when' => ['custom_color', 'in' => [EVENT_CUSTOM_COLOR_ENABLED]]
 			],
-			'ok_unack_color' => ['string', 'required', 'rgb',
+			'ok_unack_color' => ['setting ok_unack_color', 'required', 'rgb',
 				'when' => ['custom_color', 'in' => [EVENT_CUSTOM_COLOR_ENABLED]]
 			],
-			'ok_ack_color' => ['string', 'required', 'rgb',
+			'ok_ack_color' => ['setting ok_ack_color', 'required', 'rgb',
 				'when' => ['custom_color', 'in' => [EVENT_CUSTOM_COLOR_ENABLED]]
 			],
 			'problem_unack_style' => ['boolean', 'required'],
 			'problem_ack_style' => ['boolean', 'required'],
 			'ok_unack_style' => ['boolean', 'required'],
 			'ok_ack_style' => ['boolean', 'required'],
-			'ok_period' => ['string', 'required', 'not_empty',
+			'ok_period' => ['setting ok_period', 'required', 'not_empty',
 				'use' => [CTimeUnitValidator::class, ['min' => 0, 'max' => SEC_PER_DAY]]
 			],
-			'blink_period' => ['string', 'required', 'not_empty',
+			'blink_period' => ['setting blink_period', 'required', 'not_empty',
 				'use' => [CTimeUnitValidator::class, ['min' => 0, 'max' => SEC_PER_DAY]]
 			],
-			'severity_name_0' => ['string', 'required', 'not_empty',
-				'length' => CSettingsSchema::getFieldLength('severity_name_0')
-			],
-			'severity_color_0' => ['string', 'required', 'rgb'],
-			'severity_name_1' => ['string', 'required', 'not_empty',
-				'length' => CSettingsSchema::getFieldLength('severity_name_0')
-			],
-			'severity_color_1' => ['string', 'required', 'rgb'],
-			'severity_name_2' => ['string', 'required', 'not_empty',
-				'length' => CSettingsSchema::getFieldLength('severity_name_0')
-			],
-			'severity_color_2' => ['string', 'required', 'rgb'],
-			'severity_name_3' => ['string', 'required', 'not_empty',
-				'length' => CSettingsSchema::getFieldLength('severity_name_0')
-			],
-			'severity_color_3' => ['string', 'required', 'rgb'],
-			'severity_name_4' => ['string', 'required', 'not_empty',
-				'length' => CSettingsSchema::getFieldLength('severity_name_0')
-			],
-			'severity_color_4' => ['string', 'required', 'rgb'],
-			'severity_name_5' => ['string', 'required', 'not_empty',
-				'length' => CSettingsSchema::getFieldLength('severity_name_0')
-			],
-			'severity_color_5' => ['string', 'required', 'rgb']
+			'severity_name_0' => ['setting severity_name_0', 'required', 'not_empty'],
+			'severity_color_0' => ['setting severity_color_0', 'required', 'rgb'],
+			'severity_name_1' => ['setting severity_name_1', 'required', 'not_empty'],
+			'severity_color_1' => ['setting severity_color_1', 'required', 'rgb'],
+			'severity_name_2' => ['setting severity_name_2', 'required', 'not_empty'],
+			'severity_color_2' => ['setting severity_color_2', 'required', 'rgb'],
+			'severity_name_3' => ['setting severity_name_3', 'required', 'not_empty'],
+			'severity_color_3' => ['setting severity_color_3', 'required', 'rgb'],
+			'severity_name_4' => ['setting severity_name_4', 'required', 'not_empty'],
+			'severity_color_4' => ['setting severity_color_4', 'required', 'rgb'],
+			'severity_name_5' => ['setting severity_name_5', 'required', 'not_empty'],
+			'severity_color_5' => ['setting severity_color_5', 'required', 'rgb']
 		]];
 	}
 
