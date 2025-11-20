@@ -160,7 +160,8 @@ class testFormMaintenance extends CLegacyWebTest {
 				[
 					'fields' => [
 						'Period type' => 'One time only'
-					]
+					],
+					'skip_element' => 'id:start_date'
 				]
 			],
 			// #1 New maintenance with Daily period.
@@ -215,10 +216,18 @@ class testFormMaintenance extends CLegacyWebTest {
 		$period_overlay = COverlayDialogElement::find(1)->waitUntilReady()->one();
 		$period_overlay->asForm()->fill($data['fields']);
 		$period_overlay->waitUntilReady();
-		$this->page->removeFocus();
 
 		$screenshot_name = CTestArrayHelper::get($data, 'screenshot_name', $data['fields']['Period type']);
-		$this->assertScreenshot($period_overlay, $screenshot_name);
+		$this->page->removeFocus();
+
+		if (array_key_exists('skip_element', $data)) {
+			$skip_element = $period_overlay->query($data['skip_element'])->one();
+			$this->assertScreenshotExcept($period_overlay, [$skip_element], $screenshot_name);
+		}
+		else {
+			$this->assertScreenshot($period_overlay, $screenshot_name);
+		}
+
 		$period_overlay->query('button:Cancel')->one()->click();
 		$period_overlay->waitUntilNotPresent();
 
