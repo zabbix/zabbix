@@ -930,7 +930,7 @@ ZBX_THREAD_ENTRY(zbx_poller_thread, args)
 			total_sec = 0.0;
 			last_stat_time = now;
 
-			zbx_malloc_trim(now, 0 != sleeptime ? 0 : SEC_PER_MIN * 10, ZBX_MEBIBYTE);
+			zbx_malloc_trim(now, SEC_PER_MIN, ZBX_MEBIBYTE);
 		}
 
 		if (SUCCEED == zbx_rtc_wait(&rtc, info, &rtc_cmd, &rtc_data, sleeptime) && 0 != rtc_cmd)
