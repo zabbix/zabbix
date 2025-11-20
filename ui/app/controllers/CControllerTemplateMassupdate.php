@@ -311,23 +311,14 @@ class CControllerTemplateMassupdate extends CControllerPopupMassupdateAbstract {
 									$template_macros_by_macro = array_column($template['macros'], null, 'macro');
 									$macros_by_macro = array_column($macros, null, 'macro');
 
-									$user_macro_parser = new CUserMacroParser(['allow_regex' => true]);
+									foreach ($macros_by_macro as $key => $value) {
+										$trimmed_macro = CApiInputValidator::trimMacro($key);
 
-									foreach ($macros_by_macro as $key_macro => $value_macro) {
-										$user_macro_parser->parse($key_macro);
-										$name_macro = $user_macro_parser->getMacro();
-										$context_macro = $user_macro_parser->getContext();
-										$regex_macro = $user_macro_parser->getRegex();
+										foreach ($template_macros_by_macro as $key_template => $value_template) {
+											$trimmed_template_macro = CApiInputValidator::trimMacro($key_template);
 
-										foreach ($template_macros_by_macro as $key => $value) {
-											$user_macro_parser->parse($key);
-											$name = $user_macro_parser->getMacro();
-											$context = $user_macro_parser->getContext();
-											$regex = $user_macro_parser->getRegex();
-
-											if ($name == $name_macro && ($context == $context_macro && $context != null
-													|| $regex == $regex_macro && $regex != null)) {
-												$template['macros'] = [$key => $value];
+											if ($trimmed_macro == $trimmed_template_macro) {
+												$template['macros'] = [$key_template => $value_template];
 											}
 										}
 									}
