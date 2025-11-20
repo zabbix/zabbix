@@ -311,9 +311,30 @@ class CControllerTemplateMassupdate extends CControllerPopupMassupdateAbstract {
 									$template_macros_by_macro = array_column($template['macros'], null, 'macro');
 									$macros_by_macro = array_column($macros, null, 'macro');
 
+									$user_macro_parser = new CUserMacroParser(['allow_regex' => true]);
+
+									foreach ($macros_by_macro as $key_macro => $value_macro) {
+										$user_macro_parser->parse($key_macro);
+										$name_macro = $user_macro_parser->getMacro();
+										$context_macro = $user_macro_parser->getContext();
+										$regex_macro = $user_macro_parser->getRegex();
+
+										foreach ($template_macros_by_macro as $key => $value) {
+											$user_macro_parser->parse($key);
+											$name = $user_macro_parser->getMacro();
+											$context = $user_macro_parser->getContext();
+											$regex = $user_macro_parser->getRegex();
+
+											if ($name == $name_macro && ($context == $context_macro && $context != null
+													|| $regex == $regex_macro && $regex != null)) {
+												$template['macros'] = [$key => $value];
+											}
+										}
+									}
+
 									$template['macros'] = $except_selected
-										? array_intersect_key($template_macros_by_macro, $macros_by_macro)
-										: array_diff_key($template_macros_by_macro, $macros_by_macro);
+										? array_intersect_key($template_macros_by_macro, $template['macros'])
+										: array_diff_key($template_macros_by_macro, $template['macros']);
 								}
 								break;
 

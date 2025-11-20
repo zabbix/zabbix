@@ -441,9 +441,30 @@ class CControllerPopupMassupdateHost extends CControllerPopupMassupdateAbstract 
 									$host_macros_by_macro = array_column($host['macros'], null, 'macro');
 									$macros_by_macro = array_column($macros, null, 'macro');
 
+									$user_macro_parser = new CUserMacroParser(['allow_regex' => true]);
+
+									foreach ($macros_by_macro as $key_macro => $value_macro) {
+										$user_macro_parser->parse($key_macro);
+										$name_macro = $user_macro_parser->getMacro();
+										$context_macro = $user_macro_parser->getContext();
+										$regex_macro = $user_macro_parser->getRegex();
+
+										foreach ($host_macros_by_macro as $key => $value) {
+											$user_macro_parser->parse($key);
+											$name = $user_macro_parser->getMacro();
+											$context = $user_macro_parser->getContext();
+											$regex = $user_macro_parser->getRegex();
+
+											if ($name == $name_macro && ($context == $context_macro && $context != null
+													|| $regex == $regex_macro && $regex != null)) {
+												$host['macros'] = [$key => $value];
+											}
+										}
+									}
+
 									$host['macros'] = $except_selected
-										? array_intersect_key($host_macros_by_macro, $macros_by_macro)
-										: array_diff_key($host_macros_by_macro, $macros_by_macro);
+										? array_intersect_key($host_macros_by_macro, $host['macros'])
+										: array_diff_key($host_macros_by_macro, $host['macros']);
 								}
 								break;
 
