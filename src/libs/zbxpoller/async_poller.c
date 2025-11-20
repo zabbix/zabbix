@@ -780,7 +780,9 @@ ZBX_THREAD_ENTRY(zbx_async_poller_thread, args)
 		if (ZBX_IS_RUNNING())
 			zbx_preprocessor_flush();
 
-		if (STAT_INTERVAL <= (now = time(NULL)) - last_stat_time)
+		now = time(NULL);
+
+		if (STAT_INTERVAL <= now - last_stat_time)
 		{
 			zbx_update_env(get_process_type_string(process_type), zbx_time());
 			zbx_malloc_trim(now, SEC_PER_HOUR, ZBX_MEBIBYTE);

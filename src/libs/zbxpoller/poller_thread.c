@@ -907,7 +907,9 @@ ZBX_THREAD_ENTRY(zbx_poller_thread, args)
 
 		total_sec += zbx_time() - sec;
 
-		if (0 != sleeptime || STAT_INTERVAL <= (now = time(NULL)) - last_stat_time)
+		now = time(NULL);
+
+		if (0 != sleeptime || STAT_INTERVAL <= now - last_stat_time)
 		{
 			if (0 == sleeptime)
 			{
