@@ -137,26 +137,38 @@ class CTemplateDashboard extends CDashboardGeneral {
 					: [];
 
 				if ($templateids_of_accessible_hosts) {
-					$templateids_condition = $templateids_without_hosts
-						? dbConditionId('d.templateid', $templateids_without_hosts)
-						: dbConditionId('d.templateid', $templateids_of_accessible_hosts, true);
-
-					if ($templateids_without_hosts === [] && $options['templateids'] !== null) {
-						$templateids_condition .= ' AND '.dbConditionId('d.templateid', $options['templateids']);
-					}
-
-					$sql_parts['where']['templateids'] = '('.
-						dbConditionId('d.templateid', $templateids_of_accessible_hosts).
-						' OR ('.$templateids_condition.
-							' AND EXISTS('.
-								'SELECT NULL'.
-								' FROM host_hgset hh,permission p'.
-								' WHERE d.templateid=hh.hostid'.
-									' AND hh.hgsetid=p.hgsetid'.
-									' AND p.ugsetid='.self::$userData['ugsetid'].
-							')'.
-						')'.
+					$template_permission_condition = 'EXISTS ('.
+						'SELECT NULL'.
+						' FROM host_hgset hh,permission p'.
+						' WHERE d.templateid=hh.hostid'.
+							' AND hh.hgsetid=p.hgsetid'.
+							' AND p.ugsetid='.self::$userData['ugsetid'].
 					')';
+
+					if ($options['templateids'] !== null)  {
+						if ($templateids_without_hosts) {
+							$sql_parts['where']['templateids'] = '('.
+								dbConditionId('d.templateid', $templateids_of_accessible_hosts).
+								' OR ('.
+									dbConditionId('d.templateid', $templateids_without_hosts).
+									' AND '.$template_permission_condition.
+								')'.
+							')';
+						}
+						else {
+							$sql_parts['where']['templateids'] =
+								dbConditionId('d.templateid', $templateids_of_accessible_hosts);
+						}
+					}
+					else {
+						$sql_parts['where']['templateids'] = '('.
+							dbConditionId('d.templateid', $templateids_of_accessible_hosts).
+							' OR ('.
+								dbConditionId('d.templateid', $templateids_of_accessible_hosts, true).
+								' AND '.$template_permission_condition.
+							')'.
+						')';
+					}
 				}
 				else {
 					$sql_parts['from'][] = 'host_hgset hh';
