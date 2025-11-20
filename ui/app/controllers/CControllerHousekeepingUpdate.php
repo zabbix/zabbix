@@ -70,7 +70,7 @@ class CControllerHousekeepingUpdate extends CController {
 					['min' => SEC_PER_DAY, 'max' => 25 * SEC_PER_YEAR, 'accept_zero' => true]
 				]
 			],
-			'compression_status' => ['boolean', 'required'],
+			'compression_status' => ['boolean'],
 			'compress_older' => ['setting compress_older', 'required', 'not_empty',
 				'when' => ['compression_status', 'in' => [1]],
 				'use' => [CTimeUnitValidator::class, ['min' => 7 * SEC_PER_DAY, 'max' => 25 * SEC_PER_YEAR]]
