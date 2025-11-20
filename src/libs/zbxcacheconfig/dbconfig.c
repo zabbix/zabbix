@@ -1570,7 +1570,9 @@ static void	DCsync_hosts(zbx_dbsync_t *sync, zbx_uint64_t revision, zbx_vector_u
 
 		/* store new information in host structure */
 
-		dc_strpool_replace(found, &host->host, row[2]);
+		if (SUCCEED == dc_strpool_replace(found, &host->host, row[2]))
+			host->sz_host = strlen(host->host) + 1;
+
 		dc_strpool_replace(found, &host->name, row[11]);
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 		dc_strpool_replace(found, &host->tls_issuer, row[14]);
@@ -3211,6 +3213,8 @@ static void	dc_item_value_type_free(ZBX_DC_ITEM *item, zbx_item_value_type_t typ
 static void	dc_item_value_type_update(int found, ZBX_DC_ITEM *item, zbx_item_value_type_t *old_value_type,
 		char **row)
 {
+	ZBX_DC_NUMITEM	*numitem;
+
 	if (1 == found && *old_value_type != item->value_type)
 	{
 		dc_item_value_type_free(item, *old_value_type);
@@ -3227,8 +3231,18 @@ static void	dc_item_value_type_update(int found, ZBX_DC_ITEM *item, zbx_item_val
 						sizeof(ZBX_DC_NUMITEM));
 			}
 
-			dc_strpool_replace(found, &item->itemvaluetype.numitem->trends_period, row[23]);
-			dc_strpool_replace(found, &item->itemvaluetype.numitem->units, row[26]);
+			numitem = item->itemvaluetype.numitem;
+
+			if (SUCCEED == dc_strpool_replace(found, &numitem->trends_period, row[23]))
+			{
+				numitem->sz_trends_period = strlen(numitem->trends_period) + 1;
+				if (FAIL == zbx_is_time_suffix(numitem->trends_period,
+						&numitem->trends_sec, ZBX_LENGTH_UNLIMITED))
+					numitem->trends_sec = 0;
+			}
+
+			if (SUCCEED == dc_strpool_replace(found, &numitem->units, row[26]))
+				numitem->sz_units = strlen(numitem->units) + 1;
 			break;
 		case ITEM_VALUE_TYPE_LOG:
 			if ('\0' == *row[10])
@@ -3428,7 +3442,10 @@ static void	DCsync_items(zbx_dbsync_t *sync, zbx_uint64_t revision, zbx_synced_n
 			}
 
 			if (SUCCEED == dc_strpool_replace(found, &item->key, row[5]))
+			{
+				item->sz_key = strlen(item->key) + 1;
 				flags |= ZBX_ITEM_KEY_CHANGED;
+			}
 
 			item_hk_local.hostid = hostid;
 			item_hk_local.key = item->key;
@@ -3453,7 +3470,12 @@ static void	DCsync_items(zbx_dbsync_t *sync, zbx_uint64_t revision, zbx_synced_n
 		item->flags = item_flags;
 		ZBX_DBROW2UINT64(interfaceid, row[19]);
 
-		dc_strpool_replace(found, &item->history_period, row[22]);
+		if (SUCCEED == dc_strpool_replace(found, &item->history_period, row[22]))
+		{
+			item->sz_history_period = strlen(item->history_period) + 1;
+			if (FAIL == zbx_is_time_suffix(item->history_period, &item->history_sec, ZBX_LENGTH_UNLIMITED))
+				item->history_sec = 0;
+		}
 
 		ZBX_STR2UCHAR(item->inventory_link, row[24]);
 		ZBX_DBROW2UINT64(item->valuemapid, row[25]);
