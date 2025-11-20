@@ -90,6 +90,8 @@ ZBX_THREAD_ENTRY(zbx_alerter_thread, args);
 ZBX_THREAD_ENTRY(zbx_alert_manager_thread, args);
 ZBX_THREAD_ENTRY(zbx_alert_syncer_thread, args);
 
+void	zbx_am_source_stats_free(zbx_am_source_stats_t *as);
+
 int	zbx_alerter_get_diag_stats(zbx_uint64_t *alerts_num, char **error);
 int	zbx_alerter_get_top_mediatypes(int limit, zbx_vector_uint64_pair_t *mediatypes, char **error);
 int	zbx_alerter_get_top_sources(int limit, zbx_vector_am_source_stats_ptr_t *sources, char **error);

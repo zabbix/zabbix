@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2025-10-20 09:36+0000\n"
+"PO-Revision-Date: 2025-11-06 08:53+0000\n"
 "Last-Translator: Andrey <i@ashekhov.ru>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: ru\n"
@@ -4303,6 +4303,10 @@ msgstr "Не удалось установить \"%1$s\" для прототи�
 #: widgets/piechart/includes/CWidgetFieldDataSet.php:175
 msgid "Cannot set \"Data set aggregation\" when item with type \"Total\" is added to the chart."
 msgstr "Невозможно задать \"Агрегирование набора данных\" при добавленном на диаграмму элементе данных с типом \"Итого\"."
+
+#: include/classes/db/MysqlDbBackend.php:197
+msgid "Cannot set charset."
+msgstr ""
 
 #: include/classes/api/services/CItemGeneral.php:2478
 #, c-format
@@ -20427,7 +20431,7 @@ msgstr "Следует указать не менее %1$s."
 #: app/views/administration.housekeeping.edit.php:197
 #, c-format
 msgid "Should not be higher than %1$s."
-msgstr "Следует указать не ,более %1$s."
+msgstr "Следует указать не более %1$s."
 
 #: app/partials/monitoring.problem.filter.php:27
 #: app/views/monitoring.charts.view.php:80

@@ -787,6 +787,11 @@ function getSelementsInfo(array $sysmap, array $options = []): array {
 		$selement_info['maintenance'] = getTriggerMaintenance($selement, $selement_info, $sysmaps_data, $trigger_hosts);
 
 		foreach ($selement['hosts'] as $hostid) {
+			// If selement host is not readable via API, it's maintenance information is also not readable.
+			if (!array_key_exists($hostid, $hosts)) {
+				continue;
+			}
+
 			$host = $hosts[$hostid];
 
 			if ($host['status'] == HOST_STATUS_NOT_MONITORED) {
@@ -962,7 +967,9 @@ function getElementHosts($selement, $sysmaps_data, $hosts_by_groupids): array {
 	}
 	elseif ($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST_GROUP) {
 		$groupid = $selement['elements'][0]['groupid'];
-		$host_ids = $hosts_by_groupids[$groupid];
+		if (array_key_exists($groupid, $hosts_by_groupids)) {
+			$host_ids = $hosts_by_groupids[$groupid];
+		}
 	}
 	elseif ($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_MAP) {
 		$sysmapid = $selement['elements'][0]['sysmapid'];
