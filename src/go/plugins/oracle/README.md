@@ -191,7 +191,7 @@ The connection can be configured using either key parameters or named sessions.
 
       oracle.ping[tcp://127.0.0.1,USER,password,XE]
 
-* The only supported URI network schema is "tcp". Examples of valid URIs:
+* The only supported URI network scheme is "tcp". Examples of valid URIs:
 
     - tcp://localhost:1521
     - tcp://localhost
