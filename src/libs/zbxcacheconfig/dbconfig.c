@@ -3396,16 +3396,9 @@ static void	DCsync_items(zbx_dbsync_t *sync, zbx_uint64_t revision, zbx_synced_n
 			{
 				if (SUCCEED != zbx_db_is_null(row[12]))
 				{
-					/* Templates (hosts with HOST_STATUS_TEMPLATE) are the only ones not  */
-					/* expected to be present in config->hosts (which contains only hosts */
-					/* with status HOST_STATUS_MONITORED and HOST_STATUS_NOT_MONITORED).  */
-					/* So, if there is an item with item_rtdata entry present - it MUST   */
-					/* NOT be from template. That means, its hostid MUST NOT be in        */
-					/* config->hosts.           	                                      */
-					zabbix_log(LOG_LEVEL_INFORMATION, "item_rtdata entry unexpectedly is present "
-						"for template itemid: " ZBX_FS_UI64 " on host: " ZBX_FS_UI64, itemid,
-						hostid);
-					THIS_SHOULD_NEVER_HAPPEN;
+					THIS_SHOULD_NEVER_HAPPEN_MSG("item_rtdata entry unexpectedly is present for"
+							" item: " ZBX_FS_UI64 " on not synced hostid: " ZBX_FS_UI64,
+							itemid, hostid);
 				}
 				continue;
 			}
