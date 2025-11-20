@@ -469,7 +469,7 @@ class testBinaryAndJSONValueTypesDataCollection extends CIntegrationTest {
 			'itemids'	=>	self::$itemids['agent:JSON_TRAPPER_PREPROC_THROTTLING'],
 			'history'	=>	ITEM_VALUE_TYPE_JSON,
 			'sortfield'	=>	'clock',
-			'sortorder'	=>	'ASC',
+			'sortorder'	=>	'ASC'
 		]);
 
 		$this->assertEquals(2, count($response['result']), json_encode($response['result']));
@@ -518,7 +518,7 @@ class testBinaryAndJSONValueTypesDataCollection extends CIntegrationTest {
 			'itemids'	=>	self::$itemids['proxy_agent:JSON_TRAPPER_PREPROC_THROTTLING'],
 			'history'	=>	ITEM_VALUE_TYPE_JSON,
 			'sortfield'	=>	'clock',
-			'sortorder'	=>	'DESC',
+			'sortorder'	=>	'DESC'
 		]);
 
 		$this->assertEquals(2, count($response['result']), json_encode($response['result']));
