@@ -8,7 +8,7 @@ SERVER_tests = \
 	zbx_STL \
 	zbx_get_percentage_of_deviations_in_stl_remainder \
 	zbx_calculate_macro_function \
-        zbx_substitute_simple_macros \
+	zbx_substitute_simple_macros \
 	evaluate_value_by_map \
 	zbx_format_value
 endif
@@ -183,13 +183,6 @@ zbx_evaluate_function_SOURCES = \
 	zbx_evaluate_function.c \
 	$(COMMON_SRC_FILES)
 
-zbx_evaluate_function_CFLAGS = $(COMMON_COMPILER_FLAGS) $(TLS_CFLAGS) \
-	-I@top_srcdir@/src/libs/zbxalgo \
-	-I@top_srcdir@/src/libs/zbxcacheconfig \
-	-I@top_srcdir@/src/libs/zbxcachehistory \
-	-I@top_srcdir@/src/libs/zbxcachevalue \
-	-I@top_srcdir@/src/libs/zbxhistory
-
 zbx_evaluate_function_LDADD = \
 	$(top_srcdir)/tests/mocks/valuecache/libvaluecachemock.a
 
@@ -206,13 +199,6 @@ zbx_STL_SOURCES = \
 	zbx_STL.c \
 	$(COMMON_SRC_FILES)
 
-zbx_STL_CFLAGS = $(COMMON_COMPILER_FLAGS) $(TLS_CFLAGS) \
-	-I@top_srcdir@/src/libs/zbxalgo \
-	-I@top_srcdir@/src/libs/zbxcacheconfig \
-	-I@top_srcdir@/src/libs/zbxcachehistory \
-	-I@top_srcdir@/src/libs/zbxcachevalue \
-	-I@top_srcdir@/src/libs/zbxhistory
-
 zbx_STL_LDADD = \
 	$(top_srcdir)/tests/mocks/valuecache/libvaluecachemock.a
 
@@ -225,13 +211,6 @@ zbx_STL_LDFLAGS = @SERVER_LDFLAGS@ $(VALUECACHE_WRAP_FUNCS) $(CMOCKA_LDFLAGS) $(
 zbx_get_percentage_of_deviations_in_stl_remainder_SOURCES = \
 	zbx_get_percentage_of_deviations_in_stl_remainder.c \
 	$(COMMON_SRC_FILES)
-
-zbx_get_percentage_of_deviations_in_stl_remainder_CFLAGS = $(COMMON_COMPILER_FLAGS) $(TLS_CFLAGS) \
-	-I@top_srcdir@/src/libs/zbxalgo \
-	-I@top_srcdir@/src/libs/zbxcacheconfig \
-	-I@top_srcdir@/src/libs/zbxcachehistory \
-	-I@top_srcdir@/src/libs/zbxcachevalue \
-	-I@top_srcdir@/src/libs/zbxhistory
 
 zbx_get_percentage_of_deviations_in_stl_remainder_LDADD = \
 	$(top_srcdir)/tests/mocks/valuecache/libvaluecachemock.a
@@ -246,14 +225,6 @@ zbx_get_percentage_of_deviations_in_stl_remainder_LDFLAGS = @SERVER_LDFLAGS@ $(V
 evaluate_value_by_map_SOURCES = \
 	evaluate_value_by_map.c \
 	$(COMMON_SRC_FILES)
-
-evaluate_value_by_map_CFLAGS = $(COMMON_COMPILER_FLAGS) $(TLS_CFLAGS) \
-	-I@top_srcdir@/src/libs/zbxalgo \
-	-I@top_srcdir@/src/libs/zbxcacheconfig \
-	-I@top_srcdir@/src/libs/zbxcachehistory \
-	-I@top_srcdir@/src/libs/zbxcachevalue \
-	-I@top_srcdir@/src/libs/zbxhistory \
-	-I@top_srcdir@/src/libs/zbxexpression
 
 evaluate_value_by_map_LDADD = $(EVALUATE_LIB_FILES) $(TLS_LIBS)
 
@@ -280,6 +251,35 @@ VALUECACHE_WRAP_FUNCS = \
 	-Wl,--wrap=zbx_dc_get_data_expected_from \
 	-Wl,--wrap=zbx_timespec
 
+zbx_evaluate_function_CFLAGS = $(COMMON_COMPILER_FLAGS) $(TLS_CFLAGS) \
+	-I@top_srcdir@/src/libs/zbxalgo \
+	-I@top_srcdir@/src/libs/zbxcacheconfig \
+	-I@top_srcdir@/src/libs/zbxcachehistory \
+	-I@top_srcdir@/src/libs/zbxcachevalue \
+	-I@top_srcdir@/src/libs/zbxhistory
+
+zbx_STL_CFLAGS = $(COMMON_COMPILER_FLAGS) $(TLS_CFLAGS) \
+	-I@top_srcdir@/src/libs/zbxalgo \
+	-I@top_srcdir@/src/libs/zbxcacheconfig \
+	-I@top_srcdir@/src/libs/zbxcachehistory \
+	-I@top_srcdir@/src/libs/zbxcachevalue \
+	-I@top_srcdir@/src/libs/zbxhistory
+
+zbx_get_percentage_of_deviations_in_stl_remainder_CFLAGS = $(COMMON_COMPILER_FLAGS) $(TLS_CFLAGS) \
+	-I@top_srcdir@/src/libs/zbxalgo \
+	-I@top_srcdir@/src/libs/zbxcacheconfig \
+	-I@top_srcdir@/src/libs/zbxcachehistory \
+	-I@top_srcdir@/src/libs/zbxcachevalue \
+	-I@top_srcdir@/src/libs/zbxhistory
+
+evaluate_value_by_map_CFLAGS = $(COMMON_COMPILER_FLAGS) $(TLS_CFLAGS) \
+	-I@top_srcdir@/src/libs/zbxalgo \
+	-I@top_srcdir@/src/libs/zbxcacheconfig \
+	-I@top_srcdir@/src/libs/zbxcachehistory \
+	-I@top_srcdir@/src/libs/zbxcachevalue \
+	-I@top_srcdir@/src/libs/zbxhistory \
+	-I@top_srcdir@/src/libs/zbxexpression
+
 #zbx_format_value
 
 zbx_format_value_SOURCES = \
@@ -292,7 +292,6 @@ zbx_format_value_CFLAGS = $(COMMON_COMPILER_FLAGS) $(TLS_CFLAGS) \
 	-I@top_srcdir@/src/libs/zbxcachehistory \
 	-I@top_srcdir@/src/libs/zbxcachevalue \
 	-I@top_srcdir@/src/libs/zbxhistory
-
 
 zbx_format_value_LDADD = \
 	$(top_srcdir)/tests/mocks/valuecache/libvaluecachemock.a
