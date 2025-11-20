@@ -65,8 +65,8 @@ class CWidgetItemHistory extends CWidget {
 
 				resizeIframe();
 
-				iframe.resize_observer = new ResizeObserver(resizeIframe);
-				iframe.resize_observer.observe(content_document.documentElement);
+				iframe.resize_observer = new ResizeObserver(() => resizeIframe());
+				iframe.resize_observer.observe(content_document);
 			});
 		}
 
