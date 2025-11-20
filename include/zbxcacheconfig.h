@@ -304,6 +304,7 @@ typedef struct
 	zbx_uint64_t	functionid;
 	zbx_uint64_t	triggerid;
 	zbx_uint64_t	itemid;
+#define ZBX_DC_FUNCTION_PREALOCATED_FUNC_SIZE	256
 	char		*function;
 	char		*parameter;
 	unsigned char	type;
@@ -876,7 +877,7 @@ void	zbx_dc_config_get_preprocessable_items(zbx_hashset_t *items, zbx_dc_um_shar
 		zbx_uint64_t *revision);
 void	zbx_dc_config_get_functions_by_functionids(zbx_dc_function_t *functions,
 		zbx_uint64_t *functionids, int *errcodes, size_t num);
-void	zbx_dc_config_clean_functions(zbx_dc_function_t *functions, int *errcodes, size_t num);
+void	zbx_dc_config_clean_functions(zbx_dc_function_t *functions, size_t num);
 void	zbx_dc_config_clean_triggers(zbx_dc_trigger_t *triggers, int *errcodes, size_t num);
 
 typedef struct zbx_hc_data

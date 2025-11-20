@@ -93,7 +93,9 @@ typedef struct
 	zbx_uint64_t	triggerid;
 	zbx_uint64_t	itemid;
 	const char	*function;
+	size_t		sz_function;
 	const char	*parameter;
+	size_t		sz_parameter;
 	zbx_uint64_t	revision;
 	zbx_uint64_t	timer_revision;
 	unsigned char	type;

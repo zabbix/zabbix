@@ -379,7 +379,7 @@ static void	determine_items_in_expressions(zbx_vector_dc_trigger_t *trigger_orde
 		}
 	}
 
-	zbx_dc_config_clean_functions(functions, errcodes, functionids.values_num);
+	zbx_dc_config_clean_functions(functions, functionids.values_num);
 	zbx_free(errcodes);
 	zbx_free(functions);
 out:
