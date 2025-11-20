@@ -2447,7 +2447,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 				break;
 
 			case 'color_picker':
-				$field = $field->asColorPicker();
+				$field = $field->query('xpath://div[@class="color-picker"]')->asColorPicker()->one();
 				$this->assertEquals($default_value, $field->getValue());
 				break;
 
