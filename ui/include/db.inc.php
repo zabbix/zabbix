@@ -545,42 +545,18 @@ function dbConditionId($fieldName, array $values, $notIn = false) {
 /**
  * Takes an initial part of SQL query and appends a generated WHERE condition.
  *
- * @param string $fieldName		field name to be used in SQL WHERE condition
- * @param array  $values		array of string values sorted in ascending order to be included in WHERE
- * @param bool   $notIn			builds inverted condition
+ * @param string $field_name  Field name to be used in SQL WHERE condition.
+ * @param array  $values      Array of string values sorted in ascending order to be included in WHERE.
+ * @param bool   $not_in      Builds inverted condition.
  *
  * @return string
  */
 function dbConditionString(string $field_name, array $values, bool $not_in = false): string {
-	if (!$values) {
-		return '1=0';
-	}
-
-	if (count($values) == 1) {
-		return $field_name.($not_in ? '!=' : '=').zbx_dbstr(reset($values));
-	}
-
-	$value_index = 0;
-	$in_conditions = [];
-	$chunk = [];
-
-	foreach ($values as $value) {
-		if ($value_index != 0 && $value_index % 950 == 0) {
-			$in_conditions[] = $field_name.($not_in ? ' NOT IN ' : ' IN ').'('.implode(',', $chunk).')';
-			$chunk = [];
-		}
-
-		$chunk[] = zbx_dbstr($value);
-		$value_index++;
-	}
-
-	if ($chunk) {
-		$in_conditions[] = count($chunk) == 1
-			? $field_name.($not_in ? '!=' : '=').$chunk[0]
-			: $field_name.($not_in ? ' NOT IN ' : ' IN ').'('.implode(',', $chunk).')';
-	}
-
-	return count($in_conditions) == 1 ? $in_conditions[0] : '('.implode($not_in ? ' AND ' : ' OR ', $in_conditions).')';
+	return match (count($values)) {
+		0 => $not_in ? '1=1' : '1=0',
+		1 => $field_name.($not_in ? '!=' : '=').zbx_dbstr(reset($values)),
+		default => $field_name.($not_in ? ' NOT' : '').' IN ('.implode(',', zbx_dbstr($values)).')'
+	};
 }
 
 /**
