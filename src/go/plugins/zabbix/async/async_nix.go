@@ -49,7 +49,6 @@ func (*Plugin) Export(key string, params []string, _ plugin.ContextProvider) (an
 
 func getMetrics() []string {
 	return []string{
-		"system.boottime", "Returns system boot time.",
 		"net.tcp.listen", "Checks if this TCP port is in LISTEN state.",
 		"net.udp.listen", "Checks if this UDP port is in LISTEN state.",
 		"sensor", "Hardware sensor reading.",
