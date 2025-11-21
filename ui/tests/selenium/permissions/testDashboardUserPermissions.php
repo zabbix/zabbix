@@ -22,7 +22,7 @@ require_once __DIR__.'/../behaviors/CMessageBehavior.php';
  *
  * @onBefore prepareTestData
  */
-class testDashboardsUserPermissions extends CWebTest {
+class testDashboardUserPermissions extends CWebTest {
 
 	public function getBehaviors() {
 		return [CMessageBehavior::class];
@@ -31,39 +31,33 @@ class testDashboardsUserPermissions extends CWebTest {
 	const USERNAME = 'test_user_123';
 	const PASSWORD = 'zabbix_zabbix';
 	const HOSTNAME = 'Check dashboard access';
+	const USER_ROLE_GUEST = 4; // Default Zabbix user role 'Guest'.
 
 	/**
-	 * List of created template dashboard IDs.
+	 * Created template dashboard ID.
 	 *
-	 * @var array
+	 * @var integer
 	 */
-	protected static $template_dashboardids;
+	protected static $template_dashboardid;
 
 	/**
-	 * List of created template group IDs.
+	 * Created global dashboard ID.
 	 *
-	 * @var array
+	 * @var integer
 	 */
-	protected static $template_groupids;
+	protected static $dashboardid;
 
 	/**
-	 * List of created template IDs.
+	 * Created host group ID.
 	 *
-	 * @var array
+	 * @var integer
 	 */
-	protected static $templateids;
+	protected static $host_groupid;
 
 	/**
-	 * List of created host group IDs.
+	 * Created host ID.
 	 *
-	 * @var attay
-	 */
-	protected static $host_groupids;
-
-	/**
-	 * List of created host IDs.
-	 *
-	 * @var array
+	 * @var integer
 	 */
 	protected static $hostid;
 
@@ -82,118 +76,106 @@ class testDashboardsUserPermissions extends CWebTest {
 	protected static $userid;
 
 	/**
-	 * ID of created dashboard.
-	 *
-	 * @var integer
-	 */
-	protected static $dashboardid;
-
-	/**
 	 * Function used to create users, template, dashboards, hosts and user groups.
 	 */
 	public static function prepareTestData() {
 
-		CDataHelper::call('templategroup.create', [
+		$template_groupid = CDataHelper::call('templategroup.create', [
 			[
 				'name' => 'Template group for dashboard access testing'
 			]
-		]);
-		self::$template_groupids = CDataHelper::getIds('name');
+		])['groupids'][0];
 
-		CDataHelper::call('hostgroup.create', [
+		self::$host_groupid = CDataHelper::call('hostgroup.create', [
 			[
 				'name' => 'Host group for dashboard access testing'
 			]
-		]);
-		self::$host_groupids = CDataHelper::getIds('name');
+		])['groupids'][0];
 
-		CDataHelper::call('template.create', [
+		$templateid = CDataHelper::call('template.create', [
 			[
 				'host' => 'Template with host dashboard',
-				'groups' => ['groupid' => self::$template_groupids['Template group for dashboard access testing']]
+				'groups' => ['groupid' => $template_groupid]
 			]
-		]);
-		self::$templateids = CDataHelper::getIds('host');
+		])['templateids'][0];
 
-		CDataHelper::call('templatedashboard.create', [
+		self::$template_dashboardid = CDataHelper::call('templatedashboard.create', [
 			[
-				'templateid' => self::$templateids['Template with host dashboard'],
+				'templateid' => $templateid,
 				'name' => 'Check user group access',
 				'pages' => [[]]
 			]
-		]);
-		self::$template_dashboardids = CDataHelper::getIds('name');
+		])['dashboardids'][0];
 
-		CDataHelper::call('host.create', [
+		self::$hostid = CDataHelper::call('host.create', [
 			[
 				'host' => self::HOSTNAME,
 				'groups' => [
 					[
-						'groupid' => self::$host_groupids['Host group for dashboard access testing']
+						'groupid' => self::$host_groupid
 					]
 				],
 				'templates' => [
 					[
-						'templateid' => self::$templateids['Template with host dashboard']
+						'templateid' => $templateid
 					]
 				]
 			]
-		]);
-		self::$hostid = CDataHelper::getIds('host');
+		])['hostids'][0];
 
 		CDataHelper::call('usergroup.create', [
 			[
 				'name' => 'Read/Write access to template and host',
 				'templategroup_rights' => [
-					'id' => self::$template_groupids['Template group for dashboard access testing'],
+					'id' => $template_groupid,
 					'permission' => PERM_READ_WRITE
 				],
 				'hostgroup_rights' => [
-					'id' => self::$host_groupids['Host group for dashboard access testing'],
+					'id' => self::$host_groupid,
 					'permission' => PERM_READ_WRITE
 				]
 			],
 			[
 				'name' => 'Read access to template and host',
 				'templategroup_rights' => [
-					'id' => self::$template_groupids['Template group for dashboard access testing'],
+					'id' => $template_groupid,
 					'permission' => PERM_READ
 				],
 				'hostgroup_rights' => [
-					'id' => self::$host_groupids['Host group for dashboard access testing'],
+					'id' => self::$host_groupid,
 					'permission' => PERM_READ
 				]
 			],
 			[
 				'name' => 'Deny access to template and host',
 				'templategroup_rights' => [
-					'id' => self::$template_groupids['Template group for dashboard access testing'],
+					'id' => $template_groupid,
 					'permission' => PERM_DENY
 				],
 				'hostgroup_rights' => [
-					'id' => self::$host_groupids['Host group for dashboard access testing'],
+					'id' => self::$host_groupid,
 					'permission' => PERM_DENY
 				]
 			],
 			[
 				'name' => 'Read access to host, but deny from template',
 				'templategroup_rights' => [
-					'id' => self::$template_groupids['Template group for dashboard access testing'],
+					'id' => $template_groupid,
 					'permission' => PERM_DENY
 				],
 				'hostgroup_rights' => [
-					'id' => self::$host_groupids['Host group for dashboard access testing'],
+					'id' => self::$host_groupid,
 					'permission' => PERM_READ
 				]
 			],
 			[
 				'name' => 'Deny access to host, but read from template',
 				'templategroup_rights' => [
-					'id' => self::$template_groupids['Template group for dashboard access testing'],
+					'id' => $template_groupid,
 					'permission' => PERM_READ
 				],
 				'hostgroup_rights' => [
-					'id' => self::$host_groupids['Host group for dashboard access testing'],
+					'id' => self::$host_groupid,
 					'permission' => PERM_DENY
 				]
 			]
@@ -348,20 +330,33 @@ class testDashboardsUserPermissions extends CWebTest {
 	}
 
 	/**
-	 * Check that users has access to host dashboards according to user group and user role permissions.
+	 * Check users access to host, template and global dashboards according to user group and user role permissions.
 	 *
 	 * @dataProvider getDashboardPermissionsData
 	 */
-	public function testDashboardsUserPermissions_HostDashboard($data) {
-		// Reuse and update the existing user to prevent creating 10+ separate test users during test preparation.
+	public function testDashboardUserPermissions_DashboardAccess($data) {
+		// Update the existing user to prevent creating 10+ separate test users during test preparation.
 		$this->updateUser($data['user_role'], $data['user_group']);
-
-		// Login under updated user and open host list in monitorting section.
 		$this->page->userLogin(self::USERNAME, self::PASSWORD);
-		$this->page->open('zabbix.php?action=host.view&groupids%5B%5D='.
-				self::$host_groupids['Host group for dashboard access testing']
-		)->waitUntilReady();
 
+		// Check user aceess to template dashboard via URL.
+		$this->testDashboardUserPermissions_TemplateDashboardURL($data);
+
+		// Check user aceess to host dashboard via URL.
+		$this->testDashboardUserPermissions_HostDashboardURL($data);
+
+		//  Check user access to host dashboard via frontend.
+		$this->testDashboardUserPermissions_HostDashboard($data);
+	}
+
+	/**
+	 * Check that users has access to host dashboard according to user group and user role permissions.
+	 *
+	 * @param array		$data		Data from data provider.
+	 */
+	protected function testDashboardUserPermissions_HostDashboard($data) {
+		// Open host list in monitorting section.
+		$this->page->open('zabbix.php?action=host.view&groupids%5B%5D='.self::$host_groupid)->waitUntilReady();
 		$table = $this->query('class:list-table')->waitUntilPresent()->asTable()->one();
 
 		if ($data['view']) {
@@ -371,8 +366,9 @@ class testDashboardsUserPermissions extends CWebTest {
 			$this->assertEquals('1', $column->query('xpath:./sup')->one()->getText());
 
 			// Open inherited dashboard.
-			$this->assertTrue($column->query('link:Dashboards')->one()->isClickable());
-			$column->query('link:Dashboards')->one()->click();
+			$link = $column->query('link:Dashboards')->one();
+			$this->assertTrue($link->isClickable());
+			$link->click();
 			$this->page->waitUntilReady();
 
 			// Check dashboard name.
@@ -392,15 +388,11 @@ class testDashboardsUserPermissions extends CWebTest {
 	/**
 	 * Check that user has access to host dashboards via URL according to user group and user role permissions.
 	 *
-	 * @dataProvider getDashboardPermissionsData
+	 * @param array		$data		Data from data provider.
 	 */
-	public function testDashboardsUserPermissions_HostDashboardURL($data) {
-		// Reuse and update the existing user to prevent creating 10+ separate test users during test preparation.
-		$this->updateUser($data['user_role'], $data['user_group']);
-
-		// Login under updated user and open inherited dashboard.
-		$this->page->userLogin(self::USERNAME, self::PASSWORD);
-		$this->page->open('zabbix.php?action=host.dashboard.view&hostid='.self::$hostid[self::HOSTNAME])->waitUntilReady();
+	protected function testDashboardUserPermissions_HostDashboardURL($data) {
+		// Open inherited dashboard.
+		$this->page->open('zabbix.php?action=host.dashboard.view&hostid='.self::$hostid)->waitUntilReady();
 
 		if ($data['view']) {
 			// Check dashboard name.
@@ -413,7 +405,8 @@ class testDashboardsUserPermissions extends CWebTest {
 		}
 		else {
 			$this->assertMessage(TEST_BAD, 'Access denied', 'You are logged in as "'.self::USERNAME.'". '.
-					'You have no permissions to access this page.');
+					'You have no permissions to access this page.'
+			);
 			$this->assertTrue($this->query('button:Go to "Dashboards"')->one()->isClickable());
 		}
 	}
@@ -421,16 +414,12 @@ class testDashboardsUserPermissions extends CWebTest {
 	/**
 	 * Check that user has access to template dashboards via URL according to user group and user role permissions.
 	 *
-	 * @dataProvider getDashboardPermissionsData
+	 * @param array		$data		Data from data provider.
 	 */
-	public function testDashboardsUserPermissions_TemplateDashboardURL($data) {
-		// Reuse and update the existing user to prevent creating 10+ separate test users during test preparation.
-		$this->updateUser($data['user_role'], $data['user_group']);
-
+	protected function testDashboardUserPermissions_TemplateDashboardURL($data) {
 		// Login under updated user and open inherited dashboard.
 		$this->page->userLogin(self::USERNAME, self::PASSWORD);
-		$this->page->open('zabbix.php?action=template.dashboard.edit&dashboardid='.
-				self::$template_dashboardids['Check user group access'])->waitUntilReady();
+		$this->page->open('zabbix.php?action=template.dashboard.edit&dashboardid='.self::$template_dashboardid)->waitUntilReady();
 
 		if ($data['edit']) {
 			$dashboard = CDashboardElement::find()->one()->waitUntilVisible();
@@ -439,7 +428,8 @@ class testDashboardsUserPermissions extends CWebTest {
 		}
 		else {
 			$this->assertMessage(TEST_BAD, 'Access denied', 'You are logged in as "'.self::USERNAME.'". '.
-					'You have no permissions to access this page.');
+					'You have no permissions to access this page.'
+			);
 			$this->assertTrue($this->query('button:Go to "Dashboards"')->one()->isClickable());
 		}
 	}
@@ -546,6 +536,39 @@ class testDashboardsUserPermissions extends CWebTest {
 					'view' => false
 				]
 			],
+			'Group access: Guest with write access' => [
+				[
+					'scenario' => 'group_access',
+					'user_role' => self::USER_ROLE_GUEST,
+					'permissions' => PERM_READ_WRITE,
+					'dashboard_group' => 'Read/Write access to template and host',
+					'user_group' => 'Read/Write access to template and host',
+					'edit' => false,
+					'view' => true
+				]
+			],
+			'Group access: Guest with read access' => [
+				[
+					'scenario' => 'group_access',
+					'user_role' => self::USER_ROLE_GUEST,
+					'permissions' => PERM_READ,
+					'dashboard_group' => 'Read access to template and host',
+					'user_group' => 'Read access to template and host',
+					'edit' => false,
+					'view' => true
+				]
+			],
+			'Group access: Guest with different user group' => [
+				[
+					'scenario' => 'group_access',
+					'user_role' => self::USER_ROLE_GUEST,
+					'permissions' => PERM_READ,
+					'dashboard_group' => 'Read/Write access to template and host',
+					'user_group' => 'Read access to template and host',
+					'edit' => false,
+					'view' => false
+				]
+			],
 			// List of user shares.
 			'User access: Super admin with write access' => [
 				[
@@ -586,7 +609,7 @@ class testDashboardsUserPermissions extends CWebTest {
 			'User access: User with write access' => [
 				[
 					'scenario' => 'user_access',
-					'user_role' => USER_TYPE_ZABBIX_ADMIN,
+					'user_role' => USER_TYPE_ZABBIX_USER,
 					'user_permissions' => PERM_READ_WRITE,
 					'edit' => true,
 					'view' => true
@@ -595,7 +618,25 @@ class testDashboardsUserPermissions extends CWebTest {
 			'User access: User with read access' => [
 				[
 					'scenario' => 'user_access',
-					'user_role' => USER_TYPE_ZABBIX_ADMIN,
+					'user_role' => USER_TYPE_ZABBIX_USER,
+					'user_permissions' => PERM_READ,
+					'edit' => false,
+					'view' => true
+				]
+			],
+			'User access: Guest with write access' => [
+				[
+					'scenario' => 'user_access',
+					'user_role' => self::USER_ROLE_GUEST,
+					'user_permissions' => PERM_READ_WRITE,
+					'edit' => false,
+					'view' => true
+				]
+			],
+			'User access: User with read access' => [
+				[
+					'scenario' => 'user_access',
+					'user_role' => self::USER_ROLE_GUEST,
 					'user_permissions' => PERM_READ,
 					'edit' => false,
 					'view' => true
@@ -622,6 +663,14 @@ class testDashboardsUserPermissions extends CWebTest {
 				[
 					'scenario' => 'different_user',
 					'user_role' => USER_TYPE_ZABBIX_USER,
+					'edit' => false,
+					'view' => false
+				]
+			],
+			'Access for unexpected user: User with no access to dashboard' => [
+				[
+					'scenario' => 'different_user',
+					'user_role' => self::USER_ROLE_GUEST,
 					'edit' => false,
 					'view' => false
 				]
@@ -902,6 +951,98 @@ class testDashboardsUserPermissions extends CWebTest {
 					'edit' => true,
 					'view' => true
 				]
+			],
+			'User and group access: guest - read, group - read, same groups' => [
+				[
+					'scenario' => 'group_and_user',
+					'user_role' => self::USER_ROLE_GUEST,
+					'permissions' => PERM_READ,
+					'dashboard_group' => 'Read access to template and host',
+					'user_group' => 'Read access to template and host',
+					'user_permissions' => PERM_READ,
+					'edit' => false,
+					'view' => true
+				]
+			],
+			'User and group access: guest - read, group - read, different groups' => [
+				[
+					'scenario' => 'group_and_user',
+					'user_role' => self::USER_ROLE_GUEST,
+					'permissions' => PERM_READ,
+					'dashboard_group' => 'Read access to template and host',
+					'user_permissions' => PERM_READ,
+					'edit' => false,
+					'view' => true
+				]
+			],
+			'User and group access: guest - read, group - write, same groups' => [
+				[
+					'scenario' => 'group_and_user',
+					'user_role' => self::USER_ROLE_GUEST,
+					'permissions' => PERM_READ_WRITE,
+					'dashboard_group' => 'Read access to template and host',
+					'user_group' => 'Read access to template and host',
+					'user_permissions' => PERM_READ,
+					'edit' => false,
+					'view' => true
+				]
+			],
+			'User and group access: guest - read, group - write, different groups' => [
+				[
+					'scenario' => 'group_and_user',
+					'user_role' => self::USER_ROLE_GUEST,
+					'permissions' => PERM_READ_WRITE,
+					'dashboard_group' => 'Read access to template and host',
+					'user_permissions' => PERM_READ,
+					'edit' => false,
+					'view' => true
+				]
+			],
+			'User and group access: guest - write, group - read, same groups' => [
+				[
+					'scenario' => 'group_and_user',
+					'user_role' => self::USER_ROLE_GUEST,
+					'permissions' => PERM_READ,
+					'dashboard_group' => 'Read access to template and host',
+					'user_group' => 'Read access to template and host',
+					'user_permissions' => PERM_READ_WRITE,
+					'edit' => false,
+					'view' => true
+				]
+			],
+			'User and group access: guest - write, group - read, different groups' => [
+				[
+					'scenario' => 'group_and_user',
+					'user_role' => self::USER_ROLE_GUEST,
+					'permissions' => PERM_READ,
+					'dashboard_group' => 'Read access to template and host',
+					'user_permissions' => PERM_READ_WRITE,
+					'edit' => false,
+					'view' => true
+				]
+			],
+			'User and group access: guest - write, group - write, same groups' => [
+				[
+					'scenario' => 'group_and_user',
+					'user_role' => self::USER_ROLE_GUEST,
+					'permissions' => PERM_READ_WRITE,
+					'dashboard_group' => 'Read access to template and host',
+					'user_group' => 'Read access to template and host',
+					'user_permissions' => PERM_READ_WRITE,
+					'edit' => false,
+					'view' => true
+				]
+			],
+			'User and group access: guest - write, group - write, different groups' => [
+				[
+					'scenario' => 'group_and_user',
+					'user_role' => self::USER_ROLE_GUEST,
+					'permissions' => PERM_READ_WRITE,
+					'dashboard_group' => 'Read access to template and host',
+					'user_permissions' => PERM_READ_WRITE,
+					'edit' => false,
+					'view' => true
+				]
 			]
 		];
 	}
@@ -911,49 +1052,50 @@ class testDashboardsUserPermissions extends CWebTest {
 	 *
 	 * @dataProvider getSharingPermissionsData
 	 */
-	public function testDashboardsUserPermissions_PublicDashboardShare($data) {
+	public function testDashboardUserPermissions_PublicDashboardShare($data) {
 		$this->checkDashboardShare($data, PUBLIC_SHARING);
 	}
 
 	/**
-	 * Verify user access to the private and public dashboards through sharing.
+	 * Verify user access to the private dashboards through sharing.
 	 *
 	 * @dataProvider getSharingPermissionsData
 	 */
-	public function testDashboardsUserPermissions_PrivateDashboardShare($data) {
+	public function testDashboardUserPermissions_PrivateDashboardShare($data) {
 		$this->checkDashboardShare($data, PRIVATE_SHARING);
 	}
 
 	/**
 	 * Verify user access to the private and public dashboards through sharing.
 	 *
-	 * @param array   $data          data from data provider
-	 * @param integer $sharing_type	 dashboard sharing type - public or private
+	 * @param array   $data          Data from data provider.
+	 * @param integer $sharing_type	 Dashboard sharing type - public or private.
 	 */
 	protected function checkDashboardShare($data, $sharing_type) {
 		// Update dashboard access settings and user permissions.
 		switch ($data['scenario']) {
 			case 'group_access':
 				$this->updateUser($data['user_role'], $data['user_group']);
-				$this->updateDashboardAccess($data['permissions'], $data['dashboard_group'], 0, 1, $sharing_type);
+				$this->updateDashboardAccess($data['permissions'], $data['dashboard_group'], PERM_READ_WRITE,
+						$data['scenario'], $sharing_type);
 				break;
 			case 'user_access':
 				$this->updateUser($data['user_role']);
-				$this->updateDashboardAccess(0, 0, $data['user_permissions'], 2, $sharing_type);
+				$this->updateDashboardAccess(PERM_DENY, PERM_DENY, $data['user_permissions'], $data['scenario'], $sharing_type);
 				break;
 			case 'group_and_user':
 				$user_group = (array_key_exists('dashboard_group', $data))
-						? $data['dashboard_group']
-						: 'Read/Write access to template and host';
+					? $data['dashboard_group']
+					: 'Read/Write access to template and host';
 
 				$this->updateUser($data['user_role'], $user_group);
 				$this->updateDashboardAccess($data['permissions'], $data['dashboard_group'], $data['user_permissions'],
-						3, $sharing_type
+						$data['scenario'], $sharing_type
 				);
 				break;
 			case 'different_user':
 				$this->updateUser($data['user_role']);
-				$this->updateDashboardAccess(0, 0, PERM_READ_WRITE, 4, $sharing_type);
+				$this->updateDashboardAccess(PERM_DENY, PERM_DENY, PERM_READ_WRITE, $data['scenario'], $sharing_type);
 				break;
 		}
 
@@ -982,10 +1124,10 @@ class testDashboardsUserPermissions extends CWebTest {
 	/**
 	 * Change dashboard sharing access via API.
 	 *
-	 * @param integer $group_permissions	PERM_READ_WRITE or PERM_READ.
+	 * @param integer $group_permissions	PERM_READ_WRITE, PERM_READ or PERM_DENY.
 	 * @param string  $group				User group name.
-	 * @param integer $user_permissions		PERM_READ_WRITE or PERM_READ.
-	 * @param integer $scenario				Dashboard update scenario: 1 - update only group, 2 - only user, 3 - group and user, 4 - different user.
+	 * @param integer $user_permissions		PERM_READ_WRITE, PERM_READ or PERM_DENY.
+	 * @param integer $scenario				Dashboard update scenario: group_access, user_access, group_and_user or different_user.
 	 * @param integer $sharing				PUBLIC_SHARING or PRIVATE_SHARING.
 	 */
 	protected function updateDashboardAccess($group_permissions, $group, $user_permissions, $scenario, $sharing) {
@@ -1001,7 +1143,7 @@ class testDashboardsUserPermissions extends CWebTest {
 
 		// Change dashboard sharing permissions.
 		switch ($scenario) {
-			case 1:
+			case 'group_access':
 				CDataHelper::call('dashboard.update', [
 					[
 						'dashboardid' => self::$dashboardid,
@@ -1014,7 +1156,7 @@ class testDashboardsUserPermissions extends CWebTest {
 					]
 				]);
 				break;
-			case 2:
+			case 'user_access':
 				CDataHelper::call('dashboard.update', [
 					[
 						'dashboardid' => self::$dashboardid,
@@ -1027,7 +1169,7 @@ class testDashboardsUserPermissions extends CWebTest {
 					]
 				]);
 				break;
-			case 3:
+			case 'group_and_user':
 				CDataHelper::call('dashboard.update', [
 					[
 						'dashboardid' => self::$dashboardid,
@@ -1046,7 +1188,7 @@ class testDashboardsUserPermissions extends CWebTest {
 					]
 				]);
 				break;
-			case 4:
+			case 'different_user':
 				CDataHelper::call('dashboard.update', [
 					[
 						'dashboardid' => self::$dashboardid,
@@ -1065,17 +1207,17 @@ class testDashboardsUserPermissions extends CWebTest {
 	/**
 	 * Change user role and user group request for existing user via API.
 	 *
-	 * @param integer	$role		User role ID.
-	 * @param string	$group		User group name.
+	 * @param integer	$user_roleid	User role ID.
+	 * @param string	$user_group		User group name.
 	 */
-	protected function updateUser($role, $group = 'Read/Write access to template and host') {
+	protected function updateUser($user_roleid, $user_group = 'Read/Write access to template and host') {
 		CDataHelper::call('user.update', [
 			[
 				'userid' => self::$userid,
 				'usrgrps' => [
-					['usrgrpid' => self::$user_groups[$group]]
+					['usrgrpid' => self::$user_groups[$user_group]]
 				],
-				'roleid' => $role
+				'roleid' => $user_roleid
 			]
 		]);
 	}
