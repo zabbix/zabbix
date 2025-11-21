@@ -32,9 +32,9 @@ const (
 	directionTotal
 )
 
-var impl Plugin
+var impl Plugin //nolint:gochecknoglobals // legacy implementation
 
-// Plugin -
+// Plugin netif plugin implementation.
 type Plugin struct {
 	plugin.Base
 }

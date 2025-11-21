@@ -30,7 +30,7 @@ const (
 
 var netDevFilepath = "/proc/net/dev" //nolint:gochecknoglobals // such implementation to make it mockable
 
-var mapNetStatIn = map[string]uint{
+var mapNetStatIn = map[string]uint{ //nolint:gochecknoglobals // used as constant check map.
 	"bytes":      0,
 	"packets":    1,
 	"errors":     2,
@@ -41,7 +41,7 @@ var mapNetStatIn = map[string]uint{
 	"multicast":  7,
 }
 
-var mapNetStatOut = map[string]uint{
+var mapNetStatOut = map[string]uint{ //nolint:gochecknoglobals // used as constant check map.
 	"bytes":      8,
 	"packets":    9,
 	"errors":     10,
@@ -52,7 +52,7 @@ var mapNetStatOut = map[string]uint{
 	"compressed": 15,
 }
 
-func init() {
+func init() { //nolint:gochecknoinits // legacy implementation
 	err := plugin.RegisterMetrics(
 		&impl, "NetIf",
 		"net.if.collisions", "Returns number of out-of-window collisions.",
@@ -66,8 +66,8 @@ func init() {
 	}
 }
 
-//nolint:gocyclo // file parsing takes a lot of ifs in this case.
-func (p *Plugin) getNetStats(networkIf, statName string, dir dirFlag) (uint64, error) {
+//nolint:gocyclo,cyclop // file parsing takes a lot of ifs in this case.
+func (*Plugin) getNetStats(networkIf, statName string, dir dirFlag) (uint64, error) {
 	var statNums []uint
 
 	if dir == directionIn || dir == directionTotal {
@@ -144,8 +144,8 @@ func (*Plugin) getDevDiscovery() ([]msgIfDiscovery, error) {
 
 // Export implements plugin.Exporter interface.
 //
-//nolint:gocyclo // export function delegates its requests, so high cyclo is expected.
-func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (any, error) {
+//nolint:gocyclo,cyclop // export function delegates its requests, so high cyclo is expected.
+func (p *Plugin) Export(key string, params []string, _ plugin.ContextProvider) (any, error) {
 	var direction dirFlag
 
 	switch key {
