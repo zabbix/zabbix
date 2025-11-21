@@ -306,8 +306,8 @@ static int	DBpatch_7000021(void)
 	if (ZBX_DB_OK > zbx_db_execute(
 			"delete from httptestitem"
 				" where httptestid in ("
-					" select ht.httptestid from hosts h,httptest ht where"
-					" h.hostid=ht.hostid and h.flags=2"
+					" select ht.httptestid from hosts h,httptest ht"
+					" where h.hostid=ht.hostid and h.flags=2"
 				")"))
 	{
 		return FAIL;
@@ -340,8 +340,8 @@ static int	DBpatch_7000023(void)
 	if (ZBX_DB_OK > zbx_db_execute(
 			"delete from item_tag"
 				" where itemid in ("
-					" select i.itemid from hosts h,items i where"
-					" h.hostid=i.hostid and h.flags=2"
+					" select i.itemid from hosts h,items i"
+					" where h.hostid=i.hostid and h.flags=2"
 				")"))
 	{
 		return FAIL;
@@ -356,8 +356,8 @@ static int	DBpatch_7000024(void)
 	if (ZBX_DB_OK > zbx_db_execute(
 			"delete from items"
 				" where itemid in ("
-					" select i.itemid from hosts h,items i where"
-					" h.hostid=i.hostid and h.flags=2"
+					" select i.itemid from hosts h,items i"
+					" where h.hostid=i.hostid and h.flags=2"
 				")"))
 	{
 		return FAIL;
@@ -376,7 +376,6 @@ static int	DBpatch_7000025(void)
 					" from hosts h,httptest ht,httpstep hts"
 					" where h.hostid=ht.hostid"
 						" and ht.httptestid=hts.httptestid and h.flags=2"
-					")"
 				")"))
 	{
 		return FAIL;
@@ -392,7 +391,7 @@ static int	DBpatch_7000026(void)
 			"delete from httpstep"
 				" where httptestid in ("
 					" select ht.httptestid from hosts h,httptest ht"
-						" where h.hostid=ht.hostid and h.flags=2"
+					" where h.hostid=ht.hostid and h.flags=2"
 				")"))
 	{
 		return FAIL;
@@ -408,7 +407,7 @@ static int	DBpatch_7000027(void)
 			"delete from httptest_field"
 				" where httptestid in ("
 					" select ht.httptestid from hosts h,httptest ht"
-						" where h.hostid=ht.hostid and h.flags=2"
+					" where h.hostid=ht.hostid and h.flags=2"
 				")"))
 	{
 		return FAIL;
@@ -424,7 +423,7 @@ static int	DBpatch_7000028(void)
 			"delete from httptest"
 				" where httptestid in ("
 					" select ht.httptestid from httptest ht,hosts h"
-						" where ht.hostid=h.hostid and h.flags=2"
+					" where ht.hostid=h.hostid and h.flags=2"
 				")"))
 	{
 		return FAIL;
