@@ -18,36 +18,31 @@ require_once __DIR__.'/../common/testWidgets.php';
 
 /**
  * @backup profiles
+ *
+ * @dataSource HostAvailabilityWidget
+ *
+ * @onBefore prepareData
  */
 class testDashboardHostAvailabilityWidget extends testWidgets {
 
-	/*
-	 * SQL query to get widget and widget_field tables to compare hash values, but without widget_fieldid
-	 * because it can change.
-	 */
-	private $sql = 'SELECT wf.widgetid, wf.type, wf.name, wf.value_int, wf.value_str, wf.value_groupid, wf.value_hostid,'.
-			' wf.value_itemid, wf.value_graphid, wf.value_sysmapid, w.widgetid, w.dashboard_pageid, w.type, w.name, w.x, w.y,'.
-			' w.width, w.height'.
-			' FROM widget_field wf'.
-			' INNER JOIN widget w'.
-			' ON w.widgetid=wf.widgetid ORDER BY wf.widgetid, wf.name, wf.value_int, wf.value_str, wf.value_groupid,'.
-			' wf.value_itemid, wf.value_graphid';
+	protected static $dashboardid;
+
+	public static function prepareData() {
+		self::$dashboardid = CDataHelper::get('HostAvailabilityWidget.dashboardid');
+	}
 
 	public static function getCreateWidgetData() {
 		return [
 			// #0 Create a Host availability widget with default values.
 			[
 				[
-					'fields' => [
-						'Type' => 'Host availability'
-					]
+					'fields' => []
 				]
 			],
 			// #1 Create a Host availability widget with default values for Zabbix agent interface.
 			[
 				[
 					'fields' => [
-						'Type' => 'Host availability',
 						'Name' => 'Single interface widget - default',
 						'Interface type' => 'Zabbix agent (passive checks)'
 					]
@@ -57,7 +52,6 @@ class testDashboardHostAvailabilityWidget extends testWidgets {
 			[
 				[
 					'fields' => [
-						'Type' => 'Host availability',
 						'Name' => 'Include hosts in maintenance',
 						'Refresh interval' => '1 minute',
 						'Host groups' => ['Group for Host availability widget', 'Group in maintenance for Host availability widget'],
@@ -77,7 +71,6 @@ class testDashboardHostAvailabilityWidget extends testWidgets {
 			[
 				[
 					'fields' => [
-						'Type' => 'Host availability',
 						'Name' => 'Dont include hosts in maintenance',
 						'Refresh interval' => '10 minutes',
 						'Host groups' => ['Group for Host availability widget', 'Group in maintenance for Host availability widget'],
@@ -97,7 +90,6 @@ class testDashboardHostAvailabilityWidget extends testWidgets {
 			[
 				[
 					'fields' => [
-						'Type' => 'Host availability',
 						'Name' => 'Host availability widget - IPMI with maintenance',
 						'Refresh interval' => '10 seconds',
 						'Interface type' => 'IPMI',
@@ -116,7 +108,6 @@ class testDashboardHostAvailabilityWidget extends testWidgets {
 			[
 				[
 					'fields' => [
-						'Type' => 'Host availability',
 						'Name' => 'Host availability widget - SNMP',
 						'Refresh interval' => '2 minutes',
 						'Interface type' => 'SNMP',
@@ -135,7 +126,6 @@ class testDashboardHostAvailabilityWidget extends testWidgets {
 			[
 				[
 					'fields' => [
-						'Type' => 'Host availability',
 						'Name' => 'Host availability widget - JMX',
 						'Refresh interval' => '10 minutes',
 						'Interface type' => 'JMX'
@@ -153,7 +143,6 @@ class testDashboardHostAvailabilityWidget extends testWidgets {
 			[
 				[
 					'fields' => [
-						'Type' => 'Host availability',
 						'Name' => 'All interfaces selected',
 						'Layout' => 'Vertical',
 						'Interface type' => ['Zabbix agent (passive checks)', 'SNMP', 'JMX', 'IPMI']
@@ -165,7 +154,6 @@ class testDashboardHostAvailabilityWidget extends testWidgets {
 			[
 				[
 					'fields' => [
-						'Type' => 'Host availability',
 						'Name' => 'HA widget - include hosts in maintenance SNMP + JMX + IPMI',
 						'Refresh interval' => '1 minute',
 						'Include hosts in maintenance' => true,
@@ -207,7 +195,6 @@ class testDashboardHostAvailabilityWidget extends testWidgets {
 			[
 				[
 					'fields' => [
-						'Type' => 'Host availability',
 						'Name' => 'Vertical HA widget - SNMP + JMX + IPMI',
 						'Refresh interval' => '10 minutes',
 						'Layout' => 'Vertical',
@@ -251,7 +238,6 @@ class testDashboardHostAvailabilityWidget extends testWidgets {
 			[
 				[
 					'fields' => [
-						'Type' => 'Host availability',
 						'Name' => 'Misconfiguration - zeros should be returned',
 						'Refresh interval' => '1 minute',
 						'Host groups' => ['Group to check Overview'],
@@ -298,13 +284,14 @@ class testDashboardHostAvailabilityWidget extends testWidgets {
 	 * @dataProvider getCreateWidgetData
 	 */
 	public function testDashboardHostAvailabilityWidget_Create($data) {
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=1010');
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid);
 		$dashboard = CDashboardElement::find()->one();
 		$old_widget_count = $dashboard->getWidgets()->count();
 
 		// Add a widget.
 		$dialogue = $dashboard->edit()->addWidget();
 		$form = $dialogue->asForm();
+		$form->fill(['Type' => CFormElement::RELOADABLE_FILL('Host availability')]);
 		$form->fill($data['fields']);
 		COverlayDialogElement::find()->waitUntilReady()->one();
 		$form->submit();
@@ -321,6 +308,7 @@ class testDashboardHostAvailabilityWidget extends testWidgets {
 
 		// Check that widget has been added.
 		$this->checkRefreshInterval($data, $header);
+
 		// Verify widget content depending on the number of interfaces displayed (single or multiple)
 		$this->checkWidgetContent($data, $header);
 	}
@@ -350,7 +338,6 @@ class testDashboardHostAvailabilityWidget extends testWidgets {
 			[
 				[
 					'fields' => [
-						'Type' => 'Host availability',
 						'Name' => 'Return hosts in maintenance',
 						'Refresh interval' => '10 seconds',
 						'Host groups' => ['Group in maintenance for Host availability widget'],
@@ -370,7 +357,6 @@ class testDashboardHostAvailabilityWidget extends testWidgets {
 			[
 				[
 					'fields' => [
-						'Type' => 'Host availability',
 						'Name' => 'Layout is now vertical',
 						'Refresh interval' => '2 minutes',
 						'Layout' => 'Vertical',
@@ -389,7 +375,6 @@ class testDashboardHostAvailabilityWidget extends testWidgets {
 			[
 				[
 					'fields' => [
-						'Type' => 'Host availability',
 						'Name' => '',
 						'Refresh interval' => 'Default (15 minutes)',
 						'Interface type' => 'Zabbix agent (passive checks)'
@@ -400,7 +385,6 @@ class testDashboardHostAvailabilityWidget extends testWidgets {
 			[
 				[
 					'fields' => [
-						'Type' => 'Host availability',
 						'Name' => 'Show completely all hosts',
 						'Refresh interval' => 'No refresh',
 						'Interface type' => 'Zabbix agent (passive checks)',
@@ -412,7 +396,6 @@ class testDashboardHostAvailabilityWidget extends testWidgets {
 			[
 				[
 					'fields' => [
-						'Type' => 'Host availability',
 						'Name' => 'Show completely all hosts for Zabbix agent and SNMP',
 						'Refresh interval' => '10 seconds',
 						'Interface type' => ['Zabbix agent (passive checks)', 'SNMP'],
@@ -425,7 +408,6 @@ class testDashboardHostAvailabilityWidget extends testWidgets {
 			[
 				[
 					'fields' => [
-						'Type' => 'Host availability',
 						'Name' => 'Show hosts for Zabbix agent, SNMP and JMX',
 						'Refresh interval' => '2 minutes',
 						'Interface type' => ['Zabbix agent (passive checks)', 'SNMP', 'JMX']
@@ -437,7 +419,6 @@ class testDashboardHostAvailabilityWidget extends testWidgets {
 			[
 				[
 					'fields' => [
-						'Type' => 'Host availability',
 						'Name' => 'Show completely all hosts for all interfaces',
 						'Refresh interval' => '2 minutes',
 						'Interface type' => ['Zabbix agent (passive checks)', 'SNMP', 'JMX', 'IPMI'],
@@ -451,7 +432,6 @@ class testDashboardHostAvailabilityWidget extends testWidgets {
 			[
 				[
 					'fields' => [
-						'Type' => 'Host availability',
 						'Name' => 'Show all hosts for all interfaces of 2 groups',
 						'Refresh interval' => '10 minutes',
 						'Host groups' => ['Group for Host availability widget', 'Group in maintenance for Host availability widget'],
@@ -511,12 +491,13 @@ class testDashboardHostAvailabilityWidget extends testWidgets {
 	 * @dataProvider getUpdateWidgetData
 	 */
 	public function testDashboardHostAvailabilityWidget_Update($data) {
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=1010');
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid);
 		$dashboard = CDashboardElement::find()->one();
 		$form = $dashboard->getWidget('Reference HA widget')->edit();
 
 		// Update the widget.
 		$header = ($data['fields']['Name'] === '') ? 'Host availability' : $data['fields']['Name'];
+		$form->fill(['Type' => CFormElement::RELOADABLE_FILL('Host availability')]);
 		$form->fill($data['fields']);
 		$form->submit();
 		$this->page->waitUntilReady();
@@ -527,17 +508,19 @@ class testDashboardHostAvailabilityWidget extends testWidgets {
 
 		// Check that Dashboard has been saved and that widget has been added.
 		$this->checkDashboardUpdateMessage();
+
 		// Check that widget has been added.
 		$this->checkRefreshInterval($data, $header);
+
 		// Verify widget content depending on the number of interfaces displayed (single or multiple)
 		$this->checkWidgetContent($data, $header);
 	}
 
 	public function testDashboardHostAvailabilityWidget_SimpleUpdate() {
-		$initial_values = CDBHelper::getHash($this->sql);
+		$initial_values = CDBHelper::getHash(self::SQL);
 
 		// Open a dashboard widget and then save it without applying any changes
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=1010');
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid);
 		$dashboard = CDashboardElement::find()->one();
 		$form = $dashboard->getWidget('Reference HA widget')->edit();
 		$form->submit();
@@ -548,7 +531,7 @@ class testDashboardHostAvailabilityWidget extends testWidgets {
 
 		// Check that Dashboard has been saved and that there are no changes made to the widgets.
 		$this->checkDashboardUpdateMessage();
-		$this->assertEquals($initial_values, CDBHelper::getHash($this->sql));
+		$this->assertEquals($initial_values, CDBHelper::getHash(self::SQL));
 	}
 
 
@@ -589,9 +572,9 @@ class testDashboardHostAvailabilityWidget extends testWidgets {
 	 * @dataProvider getCancelData
 	 */
 	public function testDashboardHostAvailabilityWidget_Cancel($data) {
-		$old_hash = CDBHelper::getHash($this->sql);
+		$old_hash = CDBHelper::getHash(self::SQL);
 
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=1010');
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid);
 		$dashboard = CDashboardElement::find()->one();
 
 		// Start updating or creating a widget.
@@ -640,13 +623,13 @@ class testDashboardHostAvailabilityWidget extends testWidgets {
 		}
 
 		// Confirm that no changes were made to the widget.
-		$this->assertEquals($old_hash, CDBHelper::getHash($this->sql));
+		$this->assertEquals($old_hash, CDBHelper::getHash(self::SQL));
 	}
 
 	public function testDashboardHostAvailabilityWidget_Delete() {
 		$name = 'Reference HA widget to delete';
 
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=1010');
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid);
 		$dashboard = CDashboardElement::find()->one()->edit();
 		$widget = $dashboard->getWidget($name);
 		$dashboard->deleteWidget($name);
@@ -789,5 +772,6 @@ class testDashboardHostAvailabilityWidget extends testWidgets {
 			? '15 minutes'
 			: (CTestArrayHelper::get($data['fields'], 'Refresh interval', '15 minutes'));
 		$this->assertEquals($refresh, $widget->getRefreshInterval());
+		CPopupMenuElement::find()->one()->close();
 	}
 }

@@ -952,7 +952,7 @@ class testManualActionScripts extends CWebTest {
 					]
 				]
 			],
-			// #29 Host url with confirmation message andwith input type - dropdown.
+			// #29 Host url with confirmation message and with input type - dropdown.
 			[
 				[
 					'expected' => TEST_GOOD,
