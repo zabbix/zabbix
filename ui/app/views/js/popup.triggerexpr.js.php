@@ -189,6 +189,11 @@ window.trigger_edit_expression_popup = new class {
 			}
 		}
 
+		if (document.getElementById('itemid').value === '') {
+			document.getElementById('itemid').setAttribute('disabled', 'disabled');
+			document.getElementById('item_value_type').setAttribute('disabled', 'disabled');
+		}
+
 		if (name in this.functions) {
 			const rules = this.functions[name]['types'][type].rules;
 			this.form.reload(rules, false);
@@ -255,6 +260,8 @@ window.trigger_edit_expression_popup = new class {
 				this.#promiseGetItemType(document.getElementById('itemid').value, mode)
 					.then((type) => {
 						document.getElementById('item_value_type').setAttribute('value', type);
+						document.getElementById('itemid').removeAttribute('disabled');
+						document.getElementById('item_value_type').removeAttribute('disabled');
 						this.form.validateChanges(['itemid', 'item_value_type']);
 						this.#setFilterFunctions(type);
 					});
