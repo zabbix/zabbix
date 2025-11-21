@@ -3137,6 +3137,12 @@ static void	hc_add_item_values(dc_item_value_t *values, int values_num)
 			item = hc_add_item(item_value->itemid, data);
 			hc_queue_item(item);
 		}
+		else if (NULL == item->tail)
+		{
+			item->tail = data;
+			item->head = data;
+			hc_queue_item(item);
+		}
 		else
 		{
 			item->head->next = data;
@@ -3302,7 +3308,7 @@ void	zbx_hc_push_items(zbx_vector_hc_item_ptr_t *history_items)
 				item->tail = item->tail->next;
 				hc_free_data(data_free);
 				if (NULL == item->tail)
-					zbx_hashset_remove(&cache->history_items, item);
+					item->head = NULL;
 				else
 					hc_queue_item(item);
 				break;
