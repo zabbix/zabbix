@@ -26,91 +26,30 @@ import (
 	"golang.zabbix.com/sdk/errs"
 )
 
-const (
-	// ModeContains is used to find any line that has given pattern.
-	ModeContains MatchMode = iota
-	// ModePrefix is used to find any line that starts with given pattern.
-	ModePrefix
-	// ModeSuffix is used to find any line that ends with given pattern.
-	ModeSuffix
-	// ModeRegex is used to find any line that matches the given regex pattern.
-	ModeRegex
-)
-
-const (
-	// StrategyReadAll reads the entire file content at once.
-	// Use this for /proc files or small configs.
-	StrategyReadAll ScanStrategy = iota
-
-	// StrategyReadLineByLine reads the file one line at a time using a scanner.
-	// Use this for large files to lower RAM usage.
-	StrategyReadLineByLine
-)
-
-var validModes = map[MatchMode]struct{}{ //nolint:gochecknoglobals // used as a constant check map.
-	ModeContains: {},
-	ModePrefix:   {},
-	ModeSuffix:   {},
-	ModeRegex:    {},
-}
-
-var validStrategies = map[ScanStrategy]struct{}{ //nolint:gochecknoglobals // used as a constant check map.
-	StrategyReadAll:        {},
-	StrategyReadLineByLine: {},
-}
-
-var allowedPrefixes = []string{"/proc", "/dev"} //nolint:gochecknoglobals // used as a constant check slice.
-
-// MatchMode sets what parser mode will be used to find compatible lines.
-type MatchMode int
-
-// ScanStrategy sets what reading approach will be used when reading file.
-type ScanStrategy int
+var allowedPrefixes = []string{"/proc", "/dev", "/tmp"} //nolint:gochecknoglobals // used as a constant check slice.
 
 // Parser holds the configuration for the file parsing process.
 type Parser struct {
-	maxMatches   int
-	scanStrategy ScanStrategy
-	matchMode    MatchMode
+	maxMatches    int
+	scanStrategy  ScanStrategy
+	matchMode     MatchMode
+	splitIndex    int
+	splitSep      string
+	splitSepBytes []byte
+	pattern       string
+	patternBytes  []byte
 }
 
 // NewParser creates a new Parser instance with default settings (Unlimited lines, Contains mode).
 func NewParser() *Parser {
 	return &Parser{
-		maxMatches:   0,
 		matchMode:    ModeContains,
 		scanStrategy: StrategyReadAll,
 	}
 }
 
-// SetMaxMatches sets the maximum number of matches to find from the file.
-// 0 indicates unlimited lines.
-func (p *Parser) SetMaxMatches(lines int) {
-	p.maxMatches = lines
-}
-
-// SetMatchMode sets the strategy used to find the pattern in the line.
-func (p *Parser) SetMatchMode(mode MatchMode) {
-	_, ok := validModes[mode]
-	if !ok {
-		return
-	}
-
-	p.matchMode = mode
-}
-
-// SetScanStrategy sets the strategy which will be used to read the file.
-func (p *Parser) SetScanStrategy(scanStrategy ScanStrategy) {
-	_, ok := validStrategies[scanStrategy]
-	if !ok {
-		return
-	}
-
-	p.scanStrategy = scanStrategy
-}
-
 // Parse opens the file at path and returns the remaining content of all lines matching the pattern.
-func (p *Parser) Parse(path, pattern string) ([]string, error) {
+func (p *Parser) Parse(path string) ([]string, error) {
 	var (
 		cleanPath     = filepath.Clean(path)
 		isValidPrefix = false
@@ -133,31 +72,28 @@ func (p *Parser) Parse(path, pattern string) ([]string, error) {
 	if p.matchMode == ModeRegex {
 		var err error
 
-		reg, err = regexp.Compile(pattern)
+		reg, err = regexp.Compile(p.pattern)
 		if err != nil {
-			return nil, errs.Wrapf(err, "failed to compile regex pattern %s", pattern)
+			return nil, errs.Wrapf(err, "failed to compile regex pattern %s", p.pattern)
 		}
 	}
 
 	switch p.scanStrategy {
 	case StrategyReadLineByLine:
-		return p.parseLineByLine(cleanPath, pattern, reg)
+		return p.parseLineByLine(cleanPath, reg)
 	case StrategyReadAll:
-		return p.parseReadAll(cleanPath, pattern, reg)
+		return p.parseReadAll(cleanPath, reg)
 	default:
 		return nil, errs.Errorf("unknown scan strategy: %d", p.scanStrategy)
 	}
 }
 
-func (p *Parser) parseReadAll(path, pattern string, reg *regexp.Regexp) ([]string, error) {
-	// ReadAll reads the whole file safely.
+// reads all file into memory.
+func (p *Parser) parseReadAll(path string, reg *regexp.Regexp) ([]string, error) {
 	content, err := ReadAll(path)
 	if err != nil {
 		return nil, errs.Wrapf(err, "failed to read file %s", path)
 	}
-
-	// Convert pattern to bytes once
-	patternBytes := []byte(pattern)
 
 	var (
 		results []string
@@ -176,8 +112,7 @@ func (p *Parser) parseReadAll(path, pattern string, reg *regexp.Regexp) ([]strin
 			continue
 		}
 
-		matchedStr, found := p.
-			processByteLine(lineBytes, patternBytes, reg)
+		matchedStr, found := p.processByteLine(lineBytes, reg)
 		if found {
 			results = append(results, matchedStr)
 		}
@@ -186,7 +121,8 @@ func (p *Parser) parseReadAll(path, pattern string, reg *regexp.Regexp) ([]strin
 	return results, nil
 }
 
-func (p *Parser) parseLineByLine(path, pattern string, reg *regexp.Regexp) ([]string, error) {
+// reads file one by one.
+func (p *Parser) parseLineByLine(path string, reg *regexp.Regexp) ([]string, error) {
 	// G304: The path is sanitized using filepath.Clean and validated against a strict allowlist (allowedPrefixes).
 	//nolint:gosec
 	file, err := os.Open(path)
@@ -212,7 +148,7 @@ func (p *Parser) parseLineByLine(path, pattern string, reg *regexp.Regexp) ([]st
 		line := scanner.Text()
 
 		// If we found a match, we append it. We do NOT return immediately, maxLines decides.
-		matchedStr, found := p.processStringLine(line, pattern, reg)
+		matchedStr, found := p.processStringLine(line, reg)
 		if found {
 			results = append(results, matchedStr)
 		}
@@ -228,31 +164,44 @@ func (p *Parser) parseLineByLine(path, pattern string, reg *regexp.Regexp) ([]st
 
 // processByteLine handles the specific matching logic for a single line using byte slices.
 //
-//nolint:cyclop // this is simple switch and is readable.
-func (p *Parser) processByteLine(line, pattern []byte, reg *regexp.Regexp) (string, bool) {
-	switch p.matchMode {
-	case ModeContains:
-		if bytes.Contains(line, pattern) {
-			return string(line), true
-		}
-	case ModePrefix:
-		if bytes.HasPrefix(line, pattern) {
-			return string(line), true
-		}
-	case ModeSuffix:
-		if bytes.HasSuffix(line, pattern) {
-			return string(line), true
-		}
-	case ModeRegex:
-		if reg == nil {
+//nolint:cyclop,gocyclo // this is simple switch and is readable.
+func (p *Parser) processByteLine(line []byte, reg *regexp.Regexp) (string, bool) {
+	if len(p.patternBytes) > 0 { //nolint:nestif // this is only one switch.
+		var matched bool
+
+		switch p.matchMode {
+		case ModeContains:
+			if bytes.Contains(line, p.patternBytes) {
+				matched = true
+			}
+		case ModePrefix:
+			if bytes.HasPrefix(line, p.patternBytes) {
+				matched = true
+			}
+		case ModeSuffix:
+			if bytes.HasSuffix(line, p.patternBytes) {
+				matched = true
+			}
+		case ModeRegex:
+			if reg != nil && reg.Match(line) {
+				matched = true
+			}
+		default:
 			return "", false
 		}
 
-		if reg.Match(line) {
-			return string(line), true
+		if !matched {
+			return "", false
 		}
-	default:
-		return "", false
+	}
+
+	if len(p.splitSepBytes) == 0 {
+		return string(line), true
+	}
+
+	parts := bytes.Split(line, p.splitSepBytes)
+	if len(parts) > p.splitIndex {
+		return string(bytes.TrimSpace(parts[p.splitIndex])), true //todo need to check if spaces are trimmed everywhere
 	}
 
 	return "", false
@@ -260,31 +209,44 @@ func (p *Parser) processByteLine(line, pattern []byte, reg *regexp.Regexp) (stri
 
 // processStringLine handles the specific matching logic for a single line.
 //
-//nolint:cyclop // this is simple switch and is readable.
-func (p *Parser) processStringLine(line, pattern string, reg *regexp.Regexp) (string, bool) {
-	switch p.matchMode {
-	case ModeContains:
-		if strings.Contains(line, pattern) {
-			return line, true
-		}
-	case ModePrefix:
-		if strings.HasPrefix(line, pattern) {
-			return line, true
-		}
-	case ModeSuffix:
-		if strings.HasSuffix(line, pattern) {
-			return line, true
-		}
-	case ModeRegex:
-		if reg == nil {
+//nolint:cyclop,gocyclo // this is simple switch and one check and is readable.
+func (p *Parser) processStringLine(line string, reg *regexp.Regexp) (string, bool) {
+	if p.pattern != "" { //nolint:nestif // this is one switch.
+		var matched bool
+
+		switch p.matchMode {
+		case ModeContains:
+			if strings.Contains(line, p.pattern) {
+				matched = true
+			}
+		case ModePrefix:
+			if strings.HasPrefix(line, p.pattern) {
+				matched = true
+			}
+		case ModeSuffix:
+			if strings.HasSuffix(line, p.pattern) {
+				matched = true
+			}
+		case ModeRegex:
+			if reg != nil && reg.MatchString(line) {
+				matched = true
+			}
+		default:
 			return "", false
 		}
 
-		if reg.MatchString(line) {
-			return line, true
+		if !matched {
+			return "", false
 		}
-	default:
-		return "", false
+	}
+
+	if p.splitSep == "" {
+		return line, true
+	}
+
+	parts := strings.Split(line, p.splitSep)
+	if len(parts) > p.splitIndex {
+		return strings.TrimSpace(parts[p.splitIndex]), true
 	}
 
 	return "", false
