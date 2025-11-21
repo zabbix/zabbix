@@ -763,7 +763,7 @@ function dbConditionString($fieldName, array $values, $notIn = false) {
 
 	switch (count($values)) {
 		case 0:
-			return '1=0';
+			return $notIn ? '1=1' : '1=0';
 		case 1:
 			return $notIn
 				? $fieldName.'!='.zbx_dbstr(reset($values))
