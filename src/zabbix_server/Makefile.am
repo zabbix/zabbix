@@ -90,7 +90,6 @@ zabbix_server_LDADD = \
 	$(top_builddir)/src/libs/zbxpgservice/libzbxpgservice.a \
 	$(top_builddir)/src/libs/zbxcachehistory/libzbxcachehistory.a \
 	$(top_builddir)/src/libs/zbxcachevalue/libzbxcachevalue.a \
-	$(top_builddir)/src/libs/zbxexpression/libzbxexpression.a \
 	$(top_builddir)/src/libs/zbxevent/libzbxevent.a \
 	$(top_builddir)/src/libs/zbxcacheconfig/libzbxcacheconfig.a \
 	$(top_builddir)/src/libs/zbxcachehistory/libzbxcachehistory.a \
@@ -131,6 +130,7 @@ zabbix_server_LDADD = \
 	$(top_builddir)/src/libs/zbxdbupgrade/libzbxdbupgrade.a \
 	$(top_builddir)/src/libs/zbxdbhigh/libzbxdbhigh.a \
 	$(top_builddir)/src/libs/zbxdbwrap/libzbxdbwrap.a \
+	$(top_builddir)/src/libs/zbxcacheconfig/libzbxcacheconfig.a \
 	$(top_builddir)/src/libs/zbxdb/libzbxdb.a \
 	$(top_builddir)/src/libs/zbxdbschema/libzbxdbschema.a \
 	$(top_builddir)/src/libs/zbxmodules/libzbxmodules.a \

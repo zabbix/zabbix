@@ -18,6 +18,7 @@ class CFile extends CInput {
 
 	public function __construct($name = 'file') {
 		parent::__construct('file', $name);
+		$this->setAttribute('data-field-type', 'file');
 	}
 
 	public function setWidth($value) {

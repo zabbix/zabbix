@@ -23,7 +23,7 @@ require_once dirname(__FILE__).'/../include/CAPITest.php';
 class testHistory extends CAPITest {
 
 	public static function history_get_data() {
-		$binary_itemid = 158740;
+		$binary_itemid = 158739;
 
 		return [
 			// Test item history of value_type == ITEM_VALUE_TYPE_STR ('history' => 1).
@@ -275,7 +275,7 @@ class testHistory extends CAPITest {
 	}
 
 	public static function history_clear_data() {
-		$binary_itemid = 158740;
+		$binary_itemid = 158739;
 
 		return [
 			[

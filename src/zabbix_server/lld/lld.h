@@ -94,6 +94,7 @@ zbx_lld_entry_t;
 ZBX_PTR_VECTOR_DECL(lld_entry_ptr, zbx_lld_entry_t *)
 
 void	lld_entry_clear(zbx_lld_entry_t *entry);
+void	lld_entry_clear_wrapper(void *data);
 
 zbx_hash_t	lld_entry_hash(const void *data);
 int	lld_entry_compare(const void *d1, const void *d2);
@@ -568,5 +569,7 @@ void	lld_rule_overrides_make(zbx_vector_lld_item_full_ptr_t *items, char **info)
 int	lld_rule_filters_save(zbx_uint64_t hostid, zbx_vector_lld_item_full_ptr_t *items, int *host_locked);
 int	lld_items_overrides_save(zbx_uint64_t hostid, zbx_vector_lld_item_full_ptr_t *items, int *host_locked);
 int	lld_rule_macro_paths_save(zbx_uint64_t hostid, zbx_vector_lld_item_full_ptr_t *items, int *host_locked);
+
+int	lld_text_has_lld_macro(const char *text);
 
 #endif

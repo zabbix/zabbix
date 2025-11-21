@@ -57,6 +57,7 @@
 #include "zbxinterface.h"
 #include "zbxhistory.h"
 #include "zbx_expression_constants.h"
+#include "zbxhash.h"
 
 #define	ZBX_VECTOR_ARRAY_RESERVE	3
 
@@ -657,6 +658,7 @@ static int	DCget_disable_until(const ZBX_DC_ITEM *item, const ZBX_DC_INTERFACE *
 			return 0;
 	}
 }
+
 /******************************************************************************
  *                                                                            *
  * Purpose: expand user and function macros in string returning new string    *
@@ -3471,7 +3473,7 @@ static void	DCsync_items(zbx_dbsync_t *sync, zbx_uint64_t revision, zbx_synced_n
 			item->state = (unsigned char)atoi(row[12]);
 			ZBX_STR2UINT64(item->lastlogsize, row[20]);
 			item->mtime = atoi(row[21]);
-			dc_strpool_replace(found, &item->error, row[27]);
+			zbx_sha512_hash(row[27], item->error_hash);
 			item->data_expected_from = now;
 			item->location = ZBX_LOC_NOWHERE;
 			item->poller_type = ZBX_NO_POLLER;
@@ -3743,7 +3745,6 @@ static void	DCsync_items(zbx_dbsync_t *sync, zbx_uint64_t revision, zbx_synced_n
 			zbx_binary_heap_remove_direct(&config->queues[item->poller_type], item->itemid);
 
 		dc_strpool_release(item->key);
-		dc_strpool_release(item->error);
 		dc_strpool_release(item->delay);
 		dc_strpool_release(item->history_period);
 
@@ -3856,6 +3857,8 @@ static void	DCsync_triggers(zbx_dbsync_t *sync, zbx_uint64_t revision)
 
 	while (SUCCEED == (ret = zbx_dbsync_next(sync, &rowid, &row, &tag)))
 	{
+		unsigned char	modified = 0, status, recovery_mode, timer;
+
 		/* removed rows will be always added at the end */
 		if (ZBX_DBSYNC_ROW_REMOVE == tag)
 			break;
@@ -3873,15 +3876,23 @@ static void	DCsync_triggers(zbx_dbsync_t *sync, zbx_uint64_t revision)
 			continue;
 
 		dc_strpool_replace(found, &trigger->description, row[1]);
-		dc_strpool_replace(found, &trigger->expression, row[2]);
-		dc_strpool_replace(found, &trigger->recovery_expression, row[11]);
+
+		if (SUCCEED == dc_strpool_replace(found, &trigger->expression, row[2]))
+			modified = 1;
+
+		if (SUCCEED == dc_strpool_replace(found, &trigger->recovery_expression, row[11]))
+			modified = 1;
+
 		dc_strpool_replace(found, &trigger->correlation_tag, row[13]);
 		dc_strpool_replace(found, &trigger->opdata, row[14]);
 		dc_strpool_replace(found, &trigger->event_name, row[15]);
 		ZBX_STR2UCHAR(trigger->priority, row[4]);
 		ZBX_STR2UCHAR(trigger->type, row[5]);
-		ZBX_STR2UCHAR(trigger->status, row[9]);
-		ZBX_STR2UCHAR(trigger->recovery_mode, row[10]);
+
+		ZBX_STR2UCHAR(status, row[9]);
+		ZBX_STR2UCHAR(recovery_mode, row[10]);
+		timer = atoi(row[18]);
+
 		ZBX_STR2UCHAR(trigger->correlation_mode, row[12]);
 
 		if (0 == found)
@@ -3904,12 +3915,26 @@ static void	DCsync_triggers(zbx_dbsync_t *sync, zbx_uint64_t revision)
 				__config_shmem_free_func((void *)trigger->expression_bin);
 			if (NULL != trigger->recovery_expression_bin)
 				__config_shmem_free_func((void *)trigger->recovery_expression_bin);
+
+			if (status != trigger->status)
+				modified = 1;
+
+			if (recovery_mode != trigger->recovery_mode)
+				modified = 1;
+
+			if (timer != trigger->timer)
+				modified = 1;
 		}
+
+		trigger->status = status;
+		trigger->recovery_mode = recovery_mode;
+		trigger->timer = timer;
 
 		trigger->expression_bin = config_decode_serialized_expression(row[16]);
 		trigger->recovery_expression_bin = config_decode_serialized_expression(row[17]);
-		trigger->timer = atoi(row[18]);
-		trigger->revision = revision;
+
+		if (1 == modified)
+			trigger->revision = revision;
 	}
 
 	/* remove deleted triggers from buffer */
@@ -9350,27 +9375,30 @@ size_t	zbx_dc_get_psk_by_identity(const unsigned char *psk_identity, unsigned ch
 
 /******************************************************************************
  *                                                                            *
- * Purpose:                                                                   *
- *     Copy autoregistration PSK identity and value from configuration cache  *
- *     into caller's buffers                                                  *
+ * Purpose: copies autoregistration TLS configuration from configuration      *
+ *          cache into caller's buffers.                                      *
  *                                                                            *
  * Parameters:                                                                *
- *     psk_identity_buf     - [OUT] buffer for PSK identity                   *
  *     psk_identity_buf_len - [IN] buffer length for PSK identity             *
- *     psk_buf              - [OUT] buffer for PSK value                      *
  *     psk_buf_len          - [IN] buffer length for PSK value                *
+ *     tls_accept           - [OUT] buffer for type of allowed incoming       *
+ *                                  connections for autoregistration          *
+ *                                  (bit field)                               *
+ *     psk_identity_buf     - [OUT] buffer for PSK identity                   *
+ *     psk_buf              - [OUT] buffer for PSK value                      *
  *                                                                            *
  * Comments: if autoregistration PSK is not configured then empty strings     *
  *           will be copied into buffers                                      *
  *                                                                            *
  ******************************************************************************/
-void	zbx_dc_get_autoregistration_psk(char *psk_identity_buf, size_t psk_identity_buf_len,
-		unsigned char *psk_buf, size_t psk_buf_len)
+void	zbx_dc_get_autoreg_tls_config(size_t psk_identity_buf_len, size_t psk_buf_len, unsigned char *tls_accept,
+		char *psk_identity_buf, char *psk_buf)
 {
 	RDLOCK_CACHE;
 
 	zbx_strlcpy((char *)psk_identity_buf, config->autoreg_psk_identity, psk_identity_buf_len);
 	zbx_strlcpy((char *)psk_buf, config->autoreg_psk, psk_buf_len);
+	*tls_accept = config->config->autoreg_tls_accept;
 
 	UNLOCK_CACHE;
 }
@@ -9441,10 +9469,7 @@ static void	DCget_item(zbx_dc_item_t *dst_item, const ZBX_DC_ITEM *src_item)
 
 	dst_item->delay = zbx_strdup(NULL, src_item->delay);	/* not used, should be initialized */
 
-	if ('\0' != *src_item->error)
-		dst_item->error = zbx_strdup(NULL, src_item->error);
-	else
-		dst_item->error = NULL;
+	memcpy(dst_item->error_hash, src_item->error_hash, sizeof(dst_item->error_hash));
 
 	switch (src_item->value_type)
 	{
@@ -9689,7 +9714,6 @@ void	zbx_dc_config_clean_items(zbx_dc_item_t *items, int *errcodes, size_t num)
 		}
 
 		zbx_free(items[i].delay);
-		zbx_free(items[i].error);
 	}
 }
 
@@ -14048,11 +14072,13 @@ void	zbx_set_availability_diff_ts(int ts)
  *                                                                            *
  * Purpose: frees correlation condition                                       *
  *                                                                            *
- * Parameter: condition - [IN] the condition to free                          *
+ * Parameter: data - [IN] condition to free                                   *
  *                                                                            *
  ******************************************************************************/
-static void	corr_condition_clean(zbx_corr_condition_t *condition)
+static void	corr_condition_clean(void *data)
 {
+	zbx_corr_condition_t	*condition = (zbx_corr_condition_t*)data;
+
 	switch (condition->type)
 	{
 		case ZBX_CORR_CONDITION_OLD_EVENT_TAG:
@@ -14254,8 +14280,8 @@ void	zbx_dc_correlation_rules_init(zbx_correlation_rules_t *rules)
 {
 	zbx_vector_correlation_ptr_create(&rules->correlations);
 	zbx_hashset_create_ext(&rules->conditions, 0, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC,
-			(zbx_clean_func_t)corr_condition_clean, ZBX_DEFAULT_MEM_MALLOC_FUNC,
-			ZBX_DEFAULT_MEM_REALLOC_FUNC, ZBX_DEFAULT_MEM_FREE_FUNC);
+			corr_condition_clean, ZBX_DEFAULT_MEM_MALLOC_FUNC, ZBX_DEFAULT_MEM_REALLOC_FUNC,
+			ZBX_DEFAULT_MEM_FREE_FUNC);
 
 	rules->sync_ts = 0;
 }
@@ -14789,7 +14815,7 @@ void	zbx_dc_config_items_apply_changes(const zbx_vector_item_diff_ptr_t *item_di
 			dc_item->mtime = diff->mtime;
 
 		if (0 != (ZBX_FLAGS_ITEM_DIFF_UPDATE_ERROR & diff->flags))
-			dc_strpool_replace(1, &dc_item->error, diff->error);
+			memcpy(dc_item->error_hash, diff->error_hash, sizeof(dc_item->error_hash));
 
 		if (0 != (ZBX_FLAGS_ITEM_DIFF_UPDATE_STATE & diff->flags))
 			dc_item->state = diff->state;
@@ -16252,6 +16278,14 @@ void	zbx_dc_close_user_macros(zbx_dc_um_handle_t *um_handle)
 	zbx_free(um_handle);
 }
 
+unsigned char	zbx_dc_get_user_macro_env(zbx_dc_um_handle_t *um_handle)
+{
+	if (NULL == um_handle)
+		return ZBX_MACRO_ENV_DEFAULT;
+
+	return um_handle->macro_env;
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: get user macro using the specified hosts                          *
@@ -16333,7 +16367,14 @@ int	zbx_dc_expand_user_and_func_macros(const zbx_dc_um_handle_t *um_handle, char
 
 	ret = SUCCEED;
 out:
-	zabbix_log(LOG_LEVEL_TRACE, "End of %s() '%s'", __func__, *text);
+#ifdef ZBX_DEBUG
+	zabbix_log(LOG_LEVEL_TRACE, "End of %s(): '%s'", __func__, *text);
+#else
+	if (ZBX_MACRO_ENV_SECURE == um_handle->macro_env)
+		zabbix_log(LOG_LEVEL_TRACE, "End of %s()", __func__);
+	else
+		zabbix_log(LOG_LEVEL_TRACE, "End of %s(): '%s'", __func__, *text);
+#endif
 
 	return ret;
 }

@@ -57,7 +57,7 @@ class CTrigger extends CTriggerGeneral {
 
 		$sqlParts = [
 			'select'	=> ['triggers' => 't.triggerid'],
-			'from'		=> ['t' => 'triggers t'],
+			'from'		=> 'triggers t',
 			'where'		=> [],
 			'group'		=> [],
 			'order'		=> [],
@@ -91,8 +91,6 @@ class CTrigger extends CTriggerGeneral {
 			'host'							=> null,
 			'only_true'						=> null,
 			'min_severity'					=> null,
-			'evaltype'						=> TAG_EVAL_TYPE_AND_OR,
-			'tags'							=> null,
 			'filter'						=> null,
 			'search'						=> null,
 			'searchByAny'					=> null,
@@ -111,7 +109,6 @@ class CTrigger extends CTriggerGeneral {
 			'selectFunctions'				=> null,
 			'selectDependencies'			=> null,
 			'selectLastEvent'				=> null,
-			'selectTags'					=> null,
 			'countOutput'					=> false,
 			'groupCount'					=> false,
 			'preservekeys'					=> false,
@@ -131,14 +128,10 @@ class CTrigger extends CTriggerGeneral {
 				return $options['countOutput'] ? '0' : [];
 			}
 
-			$sqlParts['from']['functions'] = 'functions f';
-			$sqlParts['from']['items'] = 'items i';
-			$sqlParts['from'][] = 'host_hgset hh';
-			$sqlParts['from'][] = 'permission p';
-			$sqlParts['where']['ft'] = 'f.triggerid=t.triggerid';
-			$sqlParts['where']['fi'] = 'f.itemid=i.itemid';
-			$sqlParts['where'][] = 'i.hostid=hh.hostid';
-			$sqlParts['where'][] = 'hh.hgsetid=p.hgsetid';
+			$sqlParts['join']['f'] = ['table' => 'functions', 'using' => 'triggerid'];
+			$sqlParts['join']['i'] = ['left_table' => 'f', 'table' => 'items', 'using' => 'itemid'];
+			$sqlParts['join']['hh'] = ['left_table' => 'i', 'table' => 'host_hgset', 'using' => 'hostid'];
+			$sqlParts['join']['p'] = ['left_table' => 'hh', 'table' => 'permission', 'using' => 'hgsetid'];
 			$sqlParts['where'][] = 'p.ugsetid='.self::$userData['ugsetid'];
 
 			if ($options['editable']) {
@@ -164,12 +157,9 @@ class CTrigger extends CTriggerGeneral {
 
 			sort($options['groupids']);
 
-			$sqlParts['from']['functions'] = 'functions f';
-			$sqlParts['from']['items'] = 'items i';
-			$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
-			$sqlParts['where']['hgi'] = 'hg.hostid=i.hostid';
-			$sqlParts['where']['ft'] = 'f.triggerid=t.triggerid';
-			$sqlParts['where']['fi'] = 'f.itemid=i.itemid';
+			$sqlParts['join']['f'] = ['table' => 'functions', 'using' => 'triggerid'];
+			$sqlParts['join']['i'] = ['left_table' => 'f', 'table' => 'items', 'using' => 'itemid'];
+			$sqlParts['join']['hg'] = ['left_table' => 'i', 'table' => 'hosts_groups', 'using' => 'hostid'];
 			$sqlParts['where']['groupid'] = dbConditionInt('hg.groupid', $options['groupids']);
 
 			if ($options['groupCount']) {
@@ -194,11 +184,9 @@ class CTrigger extends CTriggerGeneral {
 		if ($options['hostids'] !== null) {
 			zbx_value2array($options['hostids']);
 
-			$sqlParts['from']['functions'] = 'functions f';
-			$sqlParts['from']['items'] = 'items i';
+			$sqlParts['join']['f'] = ['table' => 'functions', 'using' => 'triggerid'];
+			$sqlParts['join']['i'] = ['left_table' => 'f', 'table' => 'items', 'using' => 'itemid'];
 			$sqlParts['where']['hostid'] = dbConditionInt('i.hostid', $options['hostids']);
-			$sqlParts['where']['ft'] = 'f.triggerid=t.triggerid';
-			$sqlParts['where']['fi'] = 'f.itemid=i.itemid';
 
 			if ($options['groupCount']) {
 				$sqlParts['group']['i'] = 'i.hostid';
@@ -216,9 +204,8 @@ class CTrigger extends CTriggerGeneral {
 		if ($options['itemids'] !== null) {
 			zbx_value2array($options['itemids']);
 
-			$sqlParts['from']['functions'] = 'functions f';
+			$sqlParts['join']['f'] = ['table' => 'functions', 'using' => 'triggerid'];
 			$sqlParts['where']['itemid'] = dbConditionInt('f.itemid', $options['itemids']);
-			$sqlParts['where']['ft'] = 'f.triggerid=t.triggerid';
 
 			if ($options['groupCount']) {
 				$sqlParts['group']['f'] = 'f.itemid';
@@ -229,8 +216,7 @@ class CTrigger extends CTriggerGeneral {
 		if ($options['functions'] !== null) {
 			zbx_value2array($options['functions']);
 
-			$sqlParts['from']['functions'] = 'functions f';
-			$sqlParts['where']['ft'] = 'f.triggerid=t.triggerid';
+			$sqlParts['join']['f'] = ['table' => 'functions', 'using' => 'triggerid'];
 			$sqlParts['where'][] = dbConditionString('f.name', $options['functions']);
 		}
 
@@ -315,12 +301,9 @@ class CTrigger extends CTriggerGeneral {
 
 		// templated
 		if ($options['templated'] !== null) {
-			$sqlParts['from']['functions'] = 'functions f';
-			$sqlParts['from']['items'] = 'items i';
-			$sqlParts['from']['hosts'] = 'hosts h';
-			$sqlParts['where']['ft'] = 'f.triggerid=t.triggerid';
-			$sqlParts['where']['fi'] = 'f.itemid=i.itemid';
-			$sqlParts['where']['hi'] = 'h.hostid=i.hostid';
+			$sqlParts['join']['f'] = ['table' => 'functions', 'using' => 'triggerid'];
+			$sqlParts['join']['i'] = ['left_table' => 'f', 'table' => 'items', 'using' => 'itemid'];
+			$sqlParts['join']['h'] = ['left_table' => 'i', 'table' => 'hosts', 'using' => 'hostid'];
 
 			if ($options['templated']) {
 				$sqlParts['where'][] = 'h.status='.HOST_STATUS_TEMPLATE;
@@ -381,47 +364,35 @@ class CTrigger extends CTriggerGeneral {
 			if (array_key_exists('host', $options['filter']) && $options['filter']['host'] !== null) {
 				zbx_value2array($options['filter']['host']);
 
-				$sqlParts['from']['functions'] = 'functions f';
-				$sqlParts['from']['items'] = 'items i';
-				$sqlParts['where']['ft'] = 'f.triggerid=t.triggerid';
-				$sqlParts['where']['fi'] = 'f.itemid=i.itemid';
-				$sqlParts['from']['hosts'] = 'hosts h';
-				$sqlParts['where']['hi'] = 'h.hostid=i.hostid';
+				$sqlParts['join']['f'] = ['table' => 'functions', 'using' => 'triggerid'];
+				$sqlParts['join']['i'] = ['left_table' => 'f', 'table' => 'items', 'using' => 'itemid'];
+				$sqlParts['join']['h'] = ['left_table' => 'i', 'table' => 'hosts', 'using' => 'hostid'];
 				$sqlParts['where']['host'] = dbConditionString('h.host', $options['filter']['host']);
 			}
 
 			if (array_key_exists('hostid', $options['filter']) && $options['filter']['hostid'] !== null) {
 				zbx_value2array($options['filter']['hostid']);
 
-				$sqlParts['from']['functions'] = 'functions f';
-				$sqlParts['from']['items'] = 'items i';
-				$sqlParts['where']['ft'] = 'f.triggerid=t.triggerid';
-				$sqlParts['where']['fi'] = 'f.itemid=i.itemid';
+				$sqlParts['join']['f'] = ['table' => 'functions', 'using' => 'triggerid'];
+				$sqlParts['join']['i'] = ['left_table' => 'f', 'table' => 'items', 'using' => 'itemid'];
 				$sqlParts['where']['hostid'] = dbConditionInt('i.hostid', $options['filter']['hostid']);
 			}
 		}
 
 		// group
 		if ($options['group'] !== null) {
-			$sqlParts['from']['functions'] = 'functions f';
-			$sqlParts['from']['items'] = 'items i';
-			$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
-			$sqlParts['from']['hstgrp'] = 'hstgrp g';
-			$sqlParts['where']['ft'] = 'f.triggerid=t.triggerid';
-			$sqlParts['where']['fi'] = 'f.itemid=i.itemid';
-			$sqlParts['where']['hgi'] = 'hg.hostid=i.hostid';
-			$sqlParts['where']['ghg'] = 'g.groupid = hg.groupid';
+			$sqlParts['join']['f'] = ['table' => 'functions', 'using' => 'triggerid'];
+			$sqlParts['join']['i'] = ['left_table' => 'f', 'table' => 'items', 'using' => 'itemid'];
+			$sqlParts['join']['hg'] = ['left_table' => 'i', 'table' => 'hosts_groups', 'using' => 'hostid'];
+			$sqlParts['join']['g'] = ['left_table' => 'hg', 'table' => 'hstgrp', 'using' => 'groupid'];
 			$sqlParts['where']['group'] = ' g.name='.zbx_dbstr($options['group']);
 		}
 
 		// host
 		if ($options['host'] !== null) {
-			$sqlParts['from']['functions'] = 'functions f';
-			$sqlParts['from']['items'] = 'items i';
-			$sqlParts['from']['hosts'] = 'hosts h';
-			$sqlParts['where']['ft'] = 'f.triggerid=t.triggerid';
-			$sqlParts['where']['fi'] = 'f.itemid=i.itemid';
-			$sqlParts['where']['hi'] = 'h.hostid=i.hostid';
+			$sqlParts['join']['f'] = ['table' => 'functions', 'using' => 'triggerid'];
+			$sqlParts['join']['i'] = ['left_table' => 'f', 'table' => 'items', 'using' => 'itemid'];
+			$sqlParts['join']['h'] = ['left_table' => 'i', 'table' => 'hosts', 'using' => 'hostid'];
 			$sqlParts['where']['host'] = ' h.host='.zbx_dbstr($options['host']);
 		}
 
@@ -441,10 +412,27 @@ class CTrigger extends CTriggerGeneral {
 		}
 
 		// tags
-		if ($options['tags'] !== null && $options['tags']) {
-			$sqlParts['where'][] = CApiTagHelper::addWhereCondition($options['tags'], $options['evaltype'], 't',
-				'trigger_tag', 'triggerid'
-			);
+		if ($options['tags'] !== null) {
+			if ($options['inheritedTags']) {
+				$positive_tag_operators = [TAG_OPERATOR_LIKE, TAG_OPERATOR_EQUAL, TAG_OPERATOR_EXISTS];
+
+				if (array_intersect(array_column($options['tags'], 'operator'), $positive_tag_operators)) {
+					$sqlParts['join']['f'] = ['table' => 'functions', 'using' => 'triggerid'];
+					$sqlParts['where'][] = CApiTagHelper::getTagCondition($options['tags'], $options['evaltype'],
+						['t', 'f'], 'trigger_tag', 'triggerid', true
+					);
+				}
+				else {
+					$sqlParts['where'][] = CApiTagHelper::getTagCondition($options['tags'], $options['evaltype'],
+						['t'], 'trigger_tag', 'triggerid', true
+					);
+				}
+			}
+			else {
+				$sqlParts['where'][] = CApiTagHelper::getTagCondition($options['tags'], $options['evaltype'], ['t'],
+					'trigger_tag', 'triggerid'
+				);
+			}
 		}
 
 		// limit
@@ -526,9 +514,20 @@ class CTrigger extends CTriggerGeneral {
 
 	private static function validateGet(array &$options): void {
 		$api_input_rules = ['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
-			'selectDiscoveryRule' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', CDiscoveryRule::OUTPUT_FIELDS), 'default' => null],
+			// Filters.
+			'evaltype' =>				['type' => API_INT32, 'in' => implode(',', [TAG_EVAL_TYPE_AND_OR, TAG_EVAL_TYPE_OR]), 'default' => TAG_EVAL_TYPE_AND_OR],
+			'tags' =>					['type' => API_OBJECTS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null, 'fields' => [
+				'tag' =>					['type' => API_STRING_UTF8, 'flags' => API_REQUIRED],
+				'operator' =>				['type' => API_INT32, 'in' => implode(',', [TAG_OPERATOR_LIKE, TAG_OPERATOR_EQUAL, TAG_OPERATOR_NOT_LIKE, TAG_OPERATOR_NOT_EQUAL, TAG_OPERATOR_EXISTS, TAG_OPERATOR_NOT_EXISTS]), 'default' => TAG_OPERATOR_LIKE],
+				'value' =>					['type' => API_STRING_UTF8, 'default' => '']
+			]],
+			'inheritedTags' =>			['type' => API_BOOLEAN, 'default' => false],
+			// Output.
+			'selectTags' =>				['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', ['tag', 'value']), 'default' => null],
+			'selectInheritedTags' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', self::INHERITED_TAG_OUTPUT_FIELDS), 'default' => null],
 			'selectTriggerDiscovery' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_NORMALIZE | API_DEPRECATED, 'in' => implode(',', self::DISCOVERY_DATA_OUTPUT_FIELDS), 'default' => null],
-			'selectDiscoveryData' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', self::DISCOVERY_DATA_OUTPUT_FIELDS), 'default' => null]
+			'selectDiscoveryData' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', self::DISCOVERY_DATA_OUTPUT_FIELDS), 'default' => null],
+			'selectDiscoveryRule' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', CDiscoveryRule::OUTPUT_FIELDS), 'default' => null]
 		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $options, '/', $error)) {
@@ -736,9 +735,8 @@ class CTrigger extends CTriggerGeneral {
 	protected function addRelatedObjects(array $options, array $result) {
 		$result = parent::addRelatedObjects($options, $result);
 
-		if (!$result) {
-			return $result;
-		}
+		self::addRelatedTags($options, $result);
+		self::addRelatedInheritedTags($options, $result);
 
 		$triggerids = array_keys($result);
 
@@ -883,12 +881,9 @@ class CTrigger extends CTriggerGeneral {
 	protected function applyQuerySortField($sortfield, $sortorder, $alias, array $sqlParts) {
 		if ($sortfield === 'hostname') {
 			$sqlParts['select']['hostname'] = 'h.name AS hostname';
-			$sqlParts['from']['functions'] = 'functions f';
-			$sqlParts['from']['items'] = 'items i';
-			$sqlParts['from']['hosts'] = 'hosts h';
-			$sqlParts['where'][] = 't.triggerid = f.triggerid';
-			$sqlParts['where'][] = 'f.itemid = i.itemid';
-			$sqlParts['where'][] = 'i.hostid = h.hostid';
+			$sqlParts['join']['f'] = ['table' => 'functions', 'using' => 'triggerid'];
+			$sqlParts['join']['i'] = ['left_table' => 'f', 'table' => 'items', 'using' => 'itemid'];
+			$sqlParts['join']['h'] = ['left_table' => 'i', 'table' => 'hosts', 'using' => 'hostid'];
 			$sqlParts['order'][] = 'h.name '.$sortorder;
 		}
 		else {
