@@ -545,26 +545,18 @@ function dbConditionId($fieldName, array $values, $notIn = false) {
 /**
  * Takes an initial part of SQL query and appends a generated WHERE condition.
  *
- * @param string $fieldName		field name to be used in SQL WHERE condition
- * @param array  $values		array of string values sorted in ascending order to be included in WHERE
- * @param bool   $notIn			builds inverted condition
+ * @param string $field_name  Field name to be used in SQL WHERE condition.
+ * @param array  $values      Array of string values sorted in ascending order to be included in WHERE.
+ * @param bool   $not_in      Builds inverted condition.
  *
  * @return string
  */
-function dbConditionString($fieldName, array $values, $notIn = false) {
-	switch (count($values)) {
-		case 0:
-			return '1=0';
-		case 1:
-			return $notIn
-				? $fieldName.'!='.zbx_dbstr(reset($values))
-				: $fieldName.'='.zbx_dbstr(reset($values));
-	}
-
-	$in = $notIn ? ' NOT IN ' : ' IN ';
-	$condition = implode(',', zbx_dbstr($values));
-
-	return '('.$fieldName.$in.'('.$condition.'))';
+function dbConditionString(string $field_name, array $values, bool $not_in = false): string {
+	return match (count($values)) {
+		0 => $not_in ? '1=1' : '1=0',
+		1 => $field_name.($not_in ? '!=' : '=').zbx_dbstr(reset($values)),
+		default => $field_name.($not_in ? ' NOT' : '').' IN ('.implode(',', zbx_dbstr($values)).')'
+	};
 }
 
 /**
