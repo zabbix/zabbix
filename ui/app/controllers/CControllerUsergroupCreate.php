@@ -85,10 +85,11 @@ class CControllerUsergroupCreate extends CControllerUsergroupUpdateGeneral {
 	}
 
 	protected function doAction(): void {
-		$user_group = $this->getUserGroupInputData();
-		self::processUserGroupInputData($user_group);
+		$user_group = self::processUserGroupInputData($this->getUserGroupInputData());
 
 		$result = (bool) API::UserGroup()->create($user_group);
+
+		$output = [];
 
 		if ($result) {
 			$output['success']['title'] = _('User group added');
@@ -100,24 +101,14 @@ class CControllerUsergroupCreate extends CControllerUsergroupUpdateGeneral {
 			if ($messages = get_and_clear_messages()) {
 				$output['success']['messages'] = array_column($messages, 'message');
 			}
-
-			$this->setResponse(new CControllerResponseData(['main_block' => json_encode($output)]));
 		}
 		else {
-			$this->setErrorResponse();
-		}
-	}
-
-	protected function setErrorResponse(?array $form_errors = null): void {
-		$response = $form_errors
-			? ['form_errors' => $form_errors]
-			: ['error' => [
+			$output['error'] = [
 				'title' => _('Cannot add user group'),
 				'messages' => array_column(get_and_clear_messages(), 'message')
-			]];
+			];
+		}
 
-		$this->setResponse(
-			new CControllerResponseData(['main_block' => json_encode($response)])
-		);
+		$this->setResponse(new CControllerResponseData(['main_block' => json_encode($output)]));
 	}
 }

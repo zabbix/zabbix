@@ -18,27 +18,9 @@
  * Class containing operations for updating/creating a usergroup.
  */
 abstract class CControllerUsergroupUpdateGeneral extends CController {
-	private static function processTagFilters(array $input_tag_filters): array {
-		$tag_filters = [];
-
-		foreach ($input_tag_filters as $hostgroup) {
-			foreach ($hostgroup['tags'] as $tag_filter) {
-				if ($hostgroup['groupid'] != 0) {
-					$tag_filters[] = [
-						'groupid' => $hostgroup['groupid'],
-						'tag' => $tag_filter['tag'],
-						'value' => $tag_filter['value']
-					];
-				}
-			}
-		}
-
-		return $tag_filters;
-	}
-
 	protected function getUserGroupInputData(): array {
 		$user_group = [];
-		$user_group['users'] = array_map(static fn($userid) => ['userid' => $userid], $this->getInput('userids', []));
+		$user_group['users'] = zbx_toObject($this->getInput('userids', []), 'userid');
 		$this->getInputs($user_group, ['users_status', 'gui_access', 'debug_mode', 'userdirectoryid', 'mfaid',
 			'name', 'hostgroup_rights', 'templategroup_rights', 'tag_filters'
 		]);
@@ -46,7 +28,7 @@ abstract class CControllerUsergroupUpdateGeneral extends CController {
 		return $user_group;
 	}
 
-	final protected static function processUserGroupInputData(array &$user_group): void {
+	protected static function processUserGroupInputData(array $user_group): array {
 		$user_group['hostgroup_rights'] = self::processRights($user_group['hostgroup_rights']);
 		$user_group['templategroup_rights'] = self::processRights($user_group['templategroup_rights']);
 		$user_group['tag_filters'] = self::processTagFilters($user_group['tag_filters']);
@@ -58,6 +40,8 @@ abstract class CControllerUsergroupUpdateGeneral extends CController {
 		elseif (array_key_exists('mfaid', $user_group)) {
 			$user_group['mfa_status'] = GROUP_MFA_ENABLED;
 		}
+
+		return $user_group;
 	}
 
 	private static function processRights(array $rights): array {
@@ -80,5 +64,23 @@ abstract class CControllerUsergroupUpdateGeneral extends CController {
 		}
 
 		return array_values($processed_rights);
+	}
+
+	private static function processTagFilters(array $input_tag_filters): array {
+		$tag_filters = [];
+
+		foreach ($input_tag_filters as $hostgroup) {
+			foreach ($hostgroup['tags'] as $tag_filter) {
+				if ($hostgroup['groupid'] != 0) {
+					$tag_filters[] = [
+						'groupid' => $hostgroup['groupid'],
+						'tag' => $tag_filter['tag'],
+						'value' => $tag_filter['value']
+					];
+				}
+			}
+		}
+
+		return $tag_filters;
 	}
 }
