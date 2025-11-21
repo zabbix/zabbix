@@ -447,14 +447,19 @@ static void	get_pinger_hosts(icmpitem_t **icmp_items, int *icmp_items_alloc, int
 		int	rc = zbx_substitute_key_macros(&items[i].key, NULL, &items[i], NULL, NULL,
 				ZBX_MACRO_TYPE_ITEM_KEY, error, sizeof(error));
 
-		if (SUCCEED == (rc = zbx_parse_key_params(items[i].key, items[i].interface.addr, &icmpping, &addr,
+		if (SUCCEED != rc)
+		{
+			errmsg = zbx_strdup(NULL, error);
+		}
+		else if (SUCCEED == (rc = zbx_parse_key_params(items[i].key, items[i].interface.addr, &icmpping, &addr,
 				&count, &interval, &size, &timeout, &type, &allow_redirect, error, sizeof(error))) &&
 				SUCCEED == (rc = zbx_interval_preproc(items[i].delay, &delay_s, NULL, &errmsg)))
 		{
 			add_icmpping_item(icmp_items, icmp_items_alloc, icmp_items_count, count, interval, size,
 					timeout, items[i].itemid, addr, icmpping, type, allow_redirect, delay_s);
 		}
-		else
+
+		if (SUCCEED != rc)
 		{
 			zbx_timespec_t	ts;
 
@@ -465,6 +470,7 @@ static void	get_pinger_hosts(icmpitem_t **icmp_items, int *icmp_items_alloc, int
 					items[i].flags, items[i].preprocessing, NULL, &ts, items[i].state, error);
 
 			zbx_dc_requeue_items(&items[i].itemid, &ts.sec, &errcode, 1);
+			zbx_free(errmsg);
 		}
 
 		zbx_free(items[i].key);
