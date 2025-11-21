@@ -859,6 +859,20 @@ form {
 	.wordbreak {
 		white-space: normal;
 	}
+
+	.tags-wrapper {
+		@media screen and (min-width: 1200px) {
+			max-width: 266px;
+		}
+
+		@media screen and (min-width: 1400px) {
+			max-width: 359px;
+		}
+
+		@media screen and (min-width: 1600px) {
+			max-width: 452px;
+		}
+	}
 }
 
 .border-left {
@@ -1061,12 +1075,6 @@ select {
 		color: $font-color !important;
 		pointer-events: none;
 		@extend %form-disabled;
-	}
-}
-
-div {
-	.overlay-dialogue.wordbreak {
-		white-space: normal;
 	}
 }
 
@@ -1802,10 +1810,6 @@ div {
 	border: 1px solid $overlay-border-color;
 	border-bottom-color: darken($overlay-border-color, 1%);
 	box-shadow: 0 4px 20px 0 $action-shadow-color;
-
-	.wordbreak {
-		white-space: normal;
-	}
 
 	.overlay-dialogue-header {
 		margin: -8px -10px 6px -10px;
@@ -2569,17 +2573,34 @@ div {
 	background-attachment: local, local, scroll, scroll;
 }
 
+.tags-wrapper {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 2px 3px;
+
+	.tag {
+		margin-top: 1px;
+		margin-bottom: 1px;
+	}
+
+	&.form-field {
+		.tag {
+			margin-top: 4px;
+			margin-bottom: 4px;
+		}
+	}
+}
+
 .tag {
 	display: inline-block;
 	color: $font-selected-color;
 	background-color: $ui-bg-selected-color;
-	margin: 1px 3px 1px 0;
 	padding: 2px 3px;
 	line-height: 1em;
-	max-width: 133px;
 	vertical-align: middle;
 	@extend %overflow-ellipsis;
 	border-radius: 2px;
+	box-sizing: border-box;
 
 	a.link-action {
 		color: inherit !important;
@@ -2614,23 +2635,6 @@ div {
 
 .yellow-bg {
 	background-color: $alt-yellow;
-}
-
-// Severity statuses.
-@if $theme-name == 'blue' or $theme-name == 'dark' {
-	td[class] {
-		+ {
-			td.na-bg,
-			td.normal-bg,
-			td.info-bg,
-			td.average-bg,
-			td.warning-bg,
-			td.high-bg,
-			td.disaster-bg {
-				border-left: 1px dotted $table-border-color;
-			}
-		}
-	}
 }
 
 @each $severity-type, $color in (

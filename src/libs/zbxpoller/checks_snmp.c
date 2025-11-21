@@ -370,7 +370,7 @@ static int	zbx_snmp_cache_handle_engineid(netsnmp_session *session, zbx_dc_item_
 		zbx_vector_engineid_device_append(&local_record.devices, d);
 		local_record.lastlog = 0;
 		local_record.lastseen = time(NULL);
-		zbx_hashset_insert(&engineid_cache, &local_record, sizeof(local_record));
+		ptr = zbx_hashset_insert(&engineid_cache, &local_record, sizeof(local_record));
 		snmp_remove_user_by_engineid(ptr);
 
 		goto out;
@@ -926,7 +926,7 @@ static zbx_snmp_sess_t	zbx_snmp_open_session(unsigned char snmp_version, const c
 	zbx_snmp_sess_t		ssp = NULL;
 	char			addr[128];
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() itemid:" ZBX_FS_UI64, __func__, itemid);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() itemid:" ZBX_FS_UI64 ", version:%d", __func__, itemid, snmp_version);
 
 	snmp_sess_init(&session);
 
@@ -968,8 +968,10 @@ static zbx_snmp_sess_t	zbx_snmp_open_session(unsigned char snmp_version, const c
 	{
 		session.community = (u_char *)snmp_community;
 		session.community_len = strlen((char *)session.community);
+#ifdef ZBX_DEBUG
 		zabbix_log(LOG_LEVEL_DEBUG, "itemid:" ZBX_FS_UI64 " SNMP [%s@%s]", itemid,
 				session.community, session.peername);
+#endif
 	}
 	else if (SNMP_VERSION_3 == session.version)
 	{
@@ -1091,8 +1093,10 @@ static zbx_snmp_sess_t	zbx_snmp_open_session(unsigned char snmp_version, const c
 				break;
 		}
 
+#ifdef ZBX_DEBUG
 		zabbix_log(LOG_LEVEL_DEBUG, "itemid:" ZBX_FS_UI64 " SNMPv3 [%s@%s]", itemid, session.securityName,
 				session.peername);
+#endif
 	}
 
 #ifdef HAVE_NETSNMP_SESSION_LOCALNAME

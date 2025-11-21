@@ -451,12 +451,7 @@ class testDashboardItemValueWidget extends testWidgets {
 				];
 				foreach ($inputs as $field => $attributes) {
 					foreach ($attributes as $attribute => $value) {
-						if ($attribute === 'color') {
-							$this->assertEquals($value, $form->query($field)->asColorPicker()->one()->getValue());
-						}
-						else {
-							$this->assertEquals($value, $form->getField($field)->getAttribute($attribute));
-						}
+						$this->assertEquals($value, $form->getField($field)->getAttribute($attribute));
 					}
 				}
 
@@ -483,6 +478,11 @@ class testDashboardItemValueWidget extends testWidgets {
 						$form->fill([$config => $state]);
 
 						foreach ($elements as $element) {
+							// TODO: remove if statement when DEV-4512 is fixed.
+							if (str_contains($element, self::PATH_TO_COLOR_PICKER)) {
+								$element .= '/input';
+							}
+
 							$this->assertTrue($form->getField($element)->isEnabled($state));
 						}
 					}
@@ -4412,31 +4412,30 @@ class testDashboardItemValueWidget extends testWidgets {
 				[
 					'fields' => [
 						'Advanced configuration' => true,
-						'id:description' => '{'.self::USER_MACRO.'.regsub(^[0-9]+, Problem)}, '.
-							'{'.self::USER_MACRO.'.iregsub(^[0-9]+, Problem)}, '.
-							'{'.self::USER_SECRET_MACRO.'.regsub(^[0-9]+, Problem)}, '.
-							'{'.self::USER_SECRET_MACRO.'.iregsub(^[0-9]+, Problem)}, '.
+						'id:description' => '{'.self::USER_MACRO.'.regsub([0-9]+, Problem)}, '.
+							'{'.self::USER_MACRO.'.iregsub([0-9]+, Problem)}, '.
+							'{'.self::USER_SECRET_MACRO.'.regsub([0-9]+, Problem)}, '.
+							'{'.self::USER_SECRET_MACRO.'.iregsub([0-9]+, Problem)}, '.
 							'{{ITEM.NAME}.regsub(CPU, test)}, {{ITEM.NAME}.iregsub(CPU, test)}',
 						'id:desc_size' => 5
 					],
-					'result' => 'Problem, Problem, Problem, Problem, test, test'
+					'result' => 'Problem, Problem, , , test, test'
+				]
+			],
+			'Macro functions regsub(), iregsub() - empty value in case of no match' => [
+				[
+					'fields' => [
+						'Advanced configuration' => true,
+						'id:description' => '{'.self::USER_MACRO.'.regsub(0, Problem)}, '.
+							'{'.self::USER_MACRO.'.iregsub(0, Problem)}, '.
+							'{'.self::USER_SECRET_MACRO.'.regsub(0, Problem)}, '.
+							'{'.self::USER_SECRET_MACRO.'.iregsub(0, Problem)}, '.
+							'{{ITEM.NAME}.regsub(0, test)}, {{ITEM.NAME}.iregsub(0, test)}',
+						'id:desc_size' => 5
+					],
+					'result' => ', , , , ,'
 				]
 			]
-			// TODO: Uncomment and check the test case, after ZBX-25420 fix.
-//			'Macro functions regsub(), iregsub() - empty value in case of no match' => [
-//				[
-//					'fields' => [
-//						'Advanced configuration' => true,
-//						'id:description' => '{'.self::USER_MACRO.'.regsub(0, Problem)}, '.
-//							'{'.self::USER_MACRO.'.iregsub(0, Problem)}, '.
-//							'{'.self::USER_SECRET_MACRO.'.regsub(0, Problem)}, '.
-//							'{'.self::USER_SECRET_MACRO.'.iregsub(0, Problem)}, '.
-//							'{{ITEM.NAME}.regsub(0, test)}, {{ITEM.NAME}.iregsub(0, test)}',
-//						'id:desc_size' => 5
-//					],
-//					'result' => ', , , , ,'
-//				]
-//			]
 		];
 	}
 

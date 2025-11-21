@@ -11,18 +11,22 @@ Change the values according to the environment in the file $HOME/zabbix_values.y
 
 For example:
 
- -  ## Enables use of **Zabbix proxy**
-    enabled: false
+Enables use of **Zabbix proxy**
+  `enabled: false`
 
 Set the `{$KUBE.API.URL}` such as `<scheme>://<host>:<port>`.
 
-Get the generated service account token using the command
+Get the service account name. If a different release name is used.
 
-`kubectl get secret zabbix-service-account -n monitoring -o jsonpath={.data.token} | base64 -d`
+`kubectl get serviceaccounts -n monitoring`
+
+Get the generated service account token using the command:
+
+`kubectl get secret zabbix-zabbix-helm-chart -n monitoring -o jsonpath={.data.token} | base64 -d`
 
 Then set it to the macro `{$KUBE.API.TOKEN}`.
 
-Set up the macros to filter the metrics of discovered nodes
+Set up the macros to filter the metrics of discovered nodes.
 
 
 ## Requirements
@@ -44,12 +48,12 @@ Install the [Zabbix Helm Chart](https://git.zabbix.com/projects/ZT/repos/kuberne
 
 Set the `{$KUBE.API.URL}` such as `<scheme>://<host>:<port>`.
 
-Get the generated service account token using the command
+Get the generated service account token using the command:
 
-`kubectl get secret zabbix-service-account -n monitoring -o jsonpath={.data.token} | base64 -d`
+`kubectl get secret zabbix-zabbix-helm-chart -n monitoring -o jsonpath={.data.token} | base64 -d`
 
 Then set it to the macro `{$KUBE.API.TOKEN}`.
-Set `{$KUBE.NODES.ENDPOINT.NAME}` with Zabbix agent's endpoint name. See `kubectl -n monitoring get ep`. Default: `zabbix-zabbix-helm-chrt-agent`.
+Set `{$KUBE.NODES.ENDPOINT.NAME}` with Zabbix agent's endpoint name. See `kubectl -n monitoring get ep`. Default: `zabbix-zabbix-helm-chart-agent`.
 
 Set up the macros to filter the metrics of discovered nodes and host creation based on host prototypes:
 
@@ -63,7 +67,7 @@ Set up macros to filter pod metrics by namespace:
 - {$KUBE.LLD.FILTER.POD.NAMESPACE.MATCHES}
 - {$KUBE.LLD.FILTER.POD.NAMESPACE.NOT_MATCHES}
 
-**Note**, If you have a large cluster, it is highly recommended to set a filter for discoverable pods.
+**Note:** If you have a large cluster, it is highly recommended to set a filter for discoverable pods.
 
 You can use the `{$KUBE.NODE.FILTER.LABELS}`, `{$KUBE.POD.FILTER.LABELS}`, `{$KUBE.NODE.FILTER.ANNOTATIONS}` and `{$KUBE.POD.FILTER.ANNOTATIONS}` macros for advanced filtering of nodes and pods by labels and annotations.
 
@@ -82,7 +86,7 @@ See the Kubernetes documentation for details about labels and annotations:
 - <https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/>
 - <https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/>
 
-**Note**, the discovered nodes will be created as separate hosts in Zabbix with the Linux template automatically assigned to them.
+**Note:** The discovered nodes will be created as separate hosts in Zabbix with the Linux template automatically assigned to them.
 
 
 
@@ -93,7 +97,7 @@ See the Kubernetes documentation for details about labels and annotations:
 |{$KUBE.API.TOKEN}|<p>Service account bearer token.</p>||
 |{$KUBE.API.URL}|<p>Kubernetes API endpoint URL in the format <scheme>://<host>:<port></p>|`https://kubernetes.default.svc.cluster.local:443`|
 |{$KUBE.HTTP.PROXY}|<p>Sets the HTTP proxy to `http_proxy` value. If this parameter is empty, then no proxy is used.</p>||
-|{$KUBE.NODES.ENDPOINT.NAME}|<p>Kubernetes nodes endpoint name. See "kubectl -n monitoring get ep".</p>|`zabbix-zabbix-helm-chrt-agent`|
+|{$KUBE.NODES.ENDPOINT.NAME}|<p>Kubernetes nodes endpoint name. See "kubectl -n monitoring get ep".</p>|`zabbix-zabbix-helm-chart-agent`|
 |{$KUBE.LLD.FILTER.NODE.MATCHES}|<p>Filter of discoverable nodes.</p>|`.*`|
 |{$KUBE.LLD.FILTER.NODE.NOT_MATCHES}|<p>Filter to exclude discovered nodes.</p>|`CHANGE_IF_NEEDED`|
 |{$KUBE.LLD.FILTER.NODE.ROLE.MATCHES}|<p>Filter of discoverable nodes by role.</p>|`.*`|

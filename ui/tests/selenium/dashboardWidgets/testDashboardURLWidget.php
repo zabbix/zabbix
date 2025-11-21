@@ -321,7 +321,6 @@ class testDashboardURLWidget extends testWidgets {
 				[
 					'expected' => TEST_GOOD,
 					'fields' => [
-						'Show header' => false,
 						'Refresh interval' => '10 seconds',
 						'URL' => 'http://zabbix.com'
 					]
@@ -331,7 +330,6 @@ class testDashboardURLWidget extends testWidgets {
 				[
 					'expected' => TEST_GOOD,
 					'fields' => [
-						'Show header' => false,
 						'Refresh interval' => '30 seconds',
 						'URL' => 'https://zabbix.com'
 					]
@@ -377,6 +375,7 @@ class testDashboardURLWidget extends testWidgets {
 				[
 					'expected' => TEST_GOOD,
 					'fields' => [
+						'Show header' => false,
 						'Refresh interval' => 'No refresh',
 						'URL' => 'ssh://zabbix.com'
 					]
@@ -753,6 +752,7 @@ class testDashboardURLWidget extends testWidgets {
 				$other_form = $this->query('name:otherForm')->waitUntilVisible()->asForm()->one();
 				$other_form->fill(['id:iframe_sandboxing_enabled' => !$state]);
 				$other_form->submit();
+				$this->assertMessage(TEST_GOOD, 'Configuration updated');
 				$this->page->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboard_for_frame_widget)->waitUntilReady();
 			}
 		}
@@ -914,6 +914,8 @@ class testDashboardURLWidget extends testWidgets {
 		}
 
 		$other_form->submit();
+		$this->assertMessage(TEST_GOOD, 'Configuration updated');
+		$this->page->waitUntilReady();
 
 		// Check widget content with changed Xframe options.
 		$this->page->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboard_for_frame_widget)->waitUntilReady();

@@ -769,10 +769,6 @@ INSERT INTO users_groups (id, usrgrpid, userid) VALUES (60, 7, 40);
 INSERT INTO users (userid, username, passwd, autologin, autologout, lang, refresh, roleid, theme, attempt_failed, attempt_clock, rows_per_page) VALUES (50, 'user-zabbix', '$2y$10$MZQTU3/7XsECy1DbQqvn/eaoPoMDgMYJ7Ml1wYon1dC0NfwM9E3zu', 0, 0, 'en_US', 30, 1, 'default', 0, 0, 50);
 INSERT INTO users_groups (id, usrgrpid, userid) VALUES (70, 7, 50);
 
--- testPageDashboard Favorites
-INSERT INTO profiles (profileid,userid,idx,value_id,value_str,source,type) VALUES (1,1,'web.favorite.sysmapids',1,'','sysmapid',1);
-INSERT INTO profiles (profileid,userid,idx,value_id,value_str,source,type) VALUES (2,1,'web.favorite.graphids',42258,'','itemid',1);
-
 -- testFormAdministrationUserGroups
 INSERT INTO usrgrp (usrgrpid, name) VALUES (130, 'Selenium user group');
 INSERT INTO usrgrp (usrgrpid, name) VALUES (140, 'Selenium user group in scripts');
@@ -1219,12 +1215,6 @@ INSERT INTO task (taskid, type, status, clock, ttl, proxyid) VALUES (2, 4, 1, 15
 INSERT INTO task_acknowledge (taskid, acknowledgeid) VALUES (1, 1);
 INSERT INTO task_acknowledge (taskid, acknowledgeid) VALUES (2, 2);
 
--- Dashboard for problem hosts widget
-INSERT INTO dashboard (dashboardid, name, userid, private) VALUES (1000, 'Dashboard for Problem hosts widget', 1, 1);
-INSERT INTO dashboard_page (dashboard_pageid, dashboardid) VALUES (123456, 1000);
-INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (100000, 123456, 'problemhosts', '', 0, 0, 8, 8);
-INSERT INTO profiles (profileid,userid,idx,value_id,value_str,source,type) VALUES (4, 1, 'web.dashboard.dashboardid', 1,'','', 1);
-
 -- testPageAvailabilityReport SLA reports
 INSERT INTO hosts (hostid, host, name, status, description, readme) VALUES (50014, 'SLA reports host', 'SLA reports host', 0, '', '');
 INSERT INTO interface (interfaceid, hostid, main, type, useip, ip, port) VALUES (50042, 50014, 1, 1, 1, '127.0.0.1', '10051');
@@ -1293,101 +1283,11 @@ INSERT INTO triggers (triggerid, description, expression, status, value, priorit
 INSERT INTO functions (functionid, itemid, triggerid, name, parameter) VALUES (100070, 99097, 100069, 'last', '$');
 INSERT INTO trigger_discovery (triggerid, parent_triggerid) VALUES (100069, 100068);
 
--- testFormAdministrationMediaTypes
-INSERT INTO media_type (mediatypeid, type, name, exec_path, status, script, description) VALUES (110, 1, 'Test script', 'Selenium test script', 1, '', '');
-INSERT INTO media_type_param (mediatype_paramid, mediatypeid, name, value, sortorder) VALUES (1312, 110, '', '{ALERT.SUBJECT}', 0);
-
 -- testFormUser
 INSERT INTO sysmaps (sysmapid, name, width, height, backgroundid, label_type, label_location, highlight, expandproblem, markelements, show_unack, userid, private) VALUES (10, 'Public map with image', 800, 600, NULL, 0, 0, 1, 1, 1, 2, 1, 0);
 INSERT INTO sysmaps_elements (selementid, sysmapid, elementid, elementtype, iconid_off, iconid_on, label, label_location, x, y, iconid_disabled, iconid_maintenance) VALUES (10,10,0,4,7,NULL,'Test phone icon',0,151,101,NULL,NULL);
 INSERT INTO users (userid, username, passwd, autologin, autologout, lang, refresh, roleid, theme, attempt_failed, attempt_clock, rows_per_page) VALUES (91, 'http-auth-admin', '$2y$10$HuvU0X0vGitK8YhwyxILbOVU6oxYNF.BqsOhaieVBvDiGlxgxriay', 0, 0, 'en_US', 30, 2, 'default', 0, 0, 50);
 INSERT INTO users_groups (id, usrgrpid, userid) VALUES (92, 7, 91);
-
--- testHostAvailabilityWidget
-INSERT INTO dashboard (dashboardid, name, userid, private) VALUES (1010, 'Dashboard for Host availability widget', 1, 1);
-INSERT INTO dashboard_page (dashboard_pageid, dashboardid) VALUES (90000, 1010);
-INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (100001, 90000, 'hostavail', 'Reference HA widget', 0, 0, 6, 3);
-INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (100002, 90000, 'hostavail', 'Reference HA widget to delete', 0, 3, 6, 3);
-INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_groupid) VALUES (1234, 100002, 2, 'groupids', 0, 4);
-INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (1235, 100002, 0, 'layout', 1);
-INSERT INTO hstgrp (groupid,name,type) VALUES (50015,'Group for Host availability widget',0);
-INSERT INTO hstgrp (groupid,name,type) VALUES (50016,'Group in maintenance for Host availability widget',0);
-
-INSERT INTO maintenances (maintenanceid, name, maintenance_type, description, active_since, active_till,tags_evaltype) VALUES (5,'Maintenance for Host availability widget',0,'Maintenance for checking Show hosts in maintenance option in Host availability widget',1534971600,2147378400,0);
-INSERT INTO timeperiods (timeperiodid, timeperiod_type, every, month, dayofweek, day, start_time, period, start_date) VALUES (14,0,1,0,0,1,43200,612406800,1534971600);
-INSERT INTO maintenances_windows (maintenance_timeperiodid, maintenanceid, timeperiodid) VALUES (14,5,14);
-INSERT INTO maintenances_groups (maintenance_groupid, maintenanceid, groupid) VALUES (4,5,50016);
-
-INSERT INTO hosts (hostid, host, name, status, description, readme) VALUES (99130, 'Not available host', 'Not available host', 0, 'Not available host for Host availability widget', '');
-INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (99050, 99130, 50015);
-INSERT INTO interface (interfaceid, hostid, type, ip, dns, useip, port, main, available, error) VALUES (55040, 99130, 1, '127.0.0.1', 'zabbixzabbixzabbix.com', '0', '10050', '1', 2, 'ERROR Agent');
-INSERT INTO interface (interfaceid, hostid, type, ip, dns, useip, port, main, available, error) VALUES (55041, 99130, 2, '127.0.0.1', 'zabbixzabbixzabbix.com', '0', '10050', '1', 2, 'ERROR SNMP');
-INSERT INTO interface_snmp (interfaceid, version, bulk, community) values (55041, 2, 1, '{$SNMP_COMMUNITY}');
-INSERT INTO interface (interfaceid, hostid, type, ip, dns, useip, port, main, available, error) VALUES (55042, 99130, 3, '127.0.0.1', 'zabbixzabbixzabbix.com', '0', '10050', '1', 2, 'ERROR IPMI');
-INSERT INTO interface (interfaceid, hostid, type, ip, dns, useip, port, main, available, error) VALUES (55043, 99130, 4, '127.0.0.1', 'zabbixzabbixzabbix.com', '0', '10050', '1', 2, 'ERROR JMX');
-
-INSERT INTO hosts (hostid, host, name, status, description, maintenanceid, maintenance_status, maintenance_type, maintenance_from, readme) VALUES (99131, 'Not available host in maintenance', 'Not available host in maintenance', 0, 'Not available host in maintenance for Host availability widget', 5, 1, 0, 1534971600, '');
-INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (99051, 99131, 50016);
-INSERT INTO interface (interfaceid, hostid, type, ip, dns, useip, port, main, available) VALUES (55044, 99131, 1, '127.0.0.1', 'zabbixzabbixzabbix.com', '0', '10050', '1', 2);
-INSERT INTO interface (interfaceid, hostid, type, ip, dns, useip, port, main, available) VALUES (55045, 99131, 2, '127.0.0.1', 'zabbixzabbixzabbix.com', '0', '10050', '1', 2);
-INSERT INTO interface_snmp (interfaceid, version, bulk, community) values (55045, 2, 1, '{$SNMP_COMMUNITY}');
-INSERT INTO interface (interfaceid, hostid, type, ip, dns, useip, port, main, available) VALUES (55046, 99131, 3, '127.0.0.1', 'zabbixzabbixzabbix.com', '0', '10050', '1', 2);
-INSERT INTO interface (interfaceid, hostid, type, ip, dns, useip, port, main, available) VALUES (55047, 99131, 4, '127.0.0.1', 'zabbixzabbixzabbix.com', '0', '10050', '1', 2);
-
-INSERT INTO hosts (hostid, host, name, status, description, readme) VALUES (99132, 'Unknown host', 'Unknown host', 0,'Unknown host for Host availability widget', '');
-INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (99052, 99132, 50015);
-INSERT INTO interface (interfaceid, hostid, type, ip, dns, useip, port, main, available) VALUES (55048, 99132, 1, '127.0.0.1', 'zabbixzabbixzabbix.com', '0', '10050', '1',0);
-
-INSERT INTO hosts (hostid, host, name, status, description, maintenanceid, maintenance_status, maintenance_type, maintenance_from, readme) VALUES (99133, 'Unknown host in maintenance', 'Unknown host in maintenance', 0,'Unknown host for Host availability widget in maintenance', 5, 1, 0, 1534971600, '');
-INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (99053, 99133, 50016);
-INSERT INTO interface (interfaceid, hostid, type, ip, dns, useip, port, main, available) VALUES (55049, 99133, 1, '127.0.0.1', 'zabbixzabbixzabbix.com', '0', '10050', '1',0);
-
-INSERT INTO hosts (hostid, host, name, status, description, readme) VALUES (99134, 'Available host', 'Available host', 0, 'Available host for Host availability widget', '');
-INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (99054, 99134, 50015);
-INSERT INTO interface (interfaceid, hostid, type, ip, dns, useip, port, main, available) VALUES (55050, 99134, 1, '127.0.0.1', '', '1', '10050', '1', 1);
-INSERT INTO interface (interfaceid, hostid, type, ip, dns, useip, port, main, available) VALUES (55051, 99134, 2, '127.0.0.1', 'zabbixzabbixzabbix.com', '0', '10050', '1', 1);
-INSERT INTO interface_snmp (interfaceid, version, bulk, community) values (55051, 2, 1, '{$SNMP_COMMUNITY}');
-INSERT INTO interface (interfaceid, hostid, type, ip, dns, useip, port, main, available) VALUES (55052, 99134, 3, '127.0.0.1', 'zabbixzabbixzabbix.com', '0', '10050', '1', 1);
-INSERT INTO interface (interfaceid, hostid, type, ip, dns, useip, port, main, available) VALUES (55053, 99134, 4, '127.0.0.1', 'zabbixzabbixzabbix.com', '0', '10050', '1', 1);
-
-INSERT INTO hosts (hostid, host, name, status, description, maintenanceid, maintenance_status, maintenance_type, maintenance_from, readme) VALUES (99135, 'Available host in maintenance', 'Available host in maintenance', 0, 'Available host in maintenance for Host availability widget', 5, 1, 0, 1534971600, '');
-INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (99055, 99135, 50016);
-INSERT INTO interface (interfaceid, hostid, type, ip, dns, useip, port, main, available) VALUES (55054, 99135, 1, '127.0.0.1', '', '1', '10050', '1', 1);
-INSERT INTO interface (interfaceid, hostid, type, ip, dns, useip, port, main, available) VALUES (55055, 99135, 2, '127.0.0.1', '', '1', '10050', '1', 1);
-INSERT INTO interface_snmp (interfaceid, version, bulk, community) values (55055, 2, 1, '{$SNMP_COMMUNITY}');
-INSERT INTO interface (interfaceid, hostid, type, ip, dns, useip, port, main, available) VALUES (55056, 99135, 3, '127.0.0.1', '', '1', '10050', '1', 1);
-INSERT INTO interface (interfaceid, hostid, type, ip, dns, useip, port, main, available) VALUES (55057, 99135, 4, '127.0.0.1', '', '1', '10050', '1', 1);
-
-INSERT INTO hosts (hostid, host, name, status, description, readme) VALUES (30010, 'Host for macros remove', 'Host for macros remove', 0, '', '');
-INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (90900, 30010, 4);
-INSERT INTO interface (type, ip, dns, useip, port, main, hostid, interfaceid) VALUES (1, '127.0.0.1', '', '1', '10050', '1', 30010, 20030);
-
-INSERT INTO hostmacro (hostmacroid, hostid, macro, value, description) VALUES (90106, 99016, '{$TEMPLATE_MACRO_FOR_REMOVE1}', '', '');
-INSERT INTO hostmacro (hostmacroid, hostid, macro, value, description) VALUES (90107, 99016, '{$TEMPLATE_MACRO_FOR_REMOVE2}', '', '');
-
--- testPageTriggerUrl
-INSERT INTO dashboard (dashboardid, name, userid, private) VALUES (1020, 'Dashboard for Trigger overview widget', 1, 1);
-INSERT INTO dashboard_page (dashboard_pageid, dashboardid) VALUES (156700, 1020);
-INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (100003, 156700, 'trigover', 'Group to check Overview', 0, 0, 12, 7);
-INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (1345, 100003, 0, 'layout', 1);
-INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_groupid) VALUES (1346, 100003, 2, 'groupids', 0, 50011);
-
--- Dashboard for sharing testing
-INSERT INTO dashboard (dashboardid, name, userid, private) VALUES (1210, 'Testing share dashboard', 9, 0);
-INSERT INTO dashboard_page (dashboard_pageid, dashboardid) VALUES (53345, 1210);
-INSERT INTO dashboard (dashboardid, name, userid, private) VALUES (1220, 'Dashboard for Admin share testing', 1, 1);
-INSERT INTO dashboard_page (dashboard_pageid, dashboardid) VALUES (54345, 1220);
-INSERT INTO dashboard_user (dashboard_userid, dashboardid, userid, permission) VALUES (1, 1220, 9, 2);
-
--- testProblemsBySeverityWidget
-INSERT INTO dashboard (dashboardid, name, userid, private) VALUES (1040, 'Dashboard for Problems by severity', 1, 1);
-INSERT INTO dashboard_page (dashboard_pageid, dashboardid) VALUES (55690, 1040);
-INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (100006, 55690, 'problemsbysv', 'Reference widget', 0, 0, 12, 5);
-INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (100007, 55690, 'problemsbysv', 'Reference PBS widget to delete', 12, 0, 6, 3);
-INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (100009, 55690, 'problemsbysv', 'Totals reference PBS widget to delete',18, 0, 6, 3);
-INSERT INTO widget_field (widgetid, widget_fieldid, type, name, value_str) VALUES (100006, 8013999, 1, 'reference', 'QWCBA');
-INSERT INTO widget_field (widgetid, widget_fieldid, type, name, value_int) VALUES (100009, 8013799, 0, 'show_type', 1);
-INSERT INTO widget_field (widgetid, widget_fieldid, type, name, value_int) VALUES (100009, 8013899, 0, 'layout', 1);
 
 -- testFormItemTest
 INSERT INTO hosts (hostid, host, name, status, description, readme) VALUES (99136, 'Test item host', 'Test item host', 0, 'Test item host for testing items', '');
@@ -1437,20 +1337,6 @@ INSERT INTO media_type_param (mediatype_paramid, mediatypeid, name, value) VALUE
 INSERT INTO media_type (mediatypeid, type, name, status, script, show_event_menu, event_menu_name, event_menu_url, description) VALUES (104, 4, 'URL test webhook', 0, 'return 0;', 1, 'Webhook url for all', 'zabbix.php?action=mediatype.edit&mediatypeid=101', 'Webhook media type for URL test');
 INSERT INTO event_tag (eventtagid, eventid, tag, value) VALUES (201, 9003, 'webhook', '1');
 INSERT INTO problem_tag (problemtagid, eventid, tag, value) VALUES (201, 9003, 'webhook', '1');
-
--- Dashboard for Graph Prototype widget
-INSERT INTO dashboard (dashboardid, name, userid, private) VALUES (1400, 'Dashboard for Graph Prototype widget', 1, 1);
-INSERT INTO dashboard_page (dashboard_pageid, dashboardid) VALUES (90004, 1400);
-INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (100099, 90004, 'graphprototype', 'Graph prototype widget for update', 0, 0, 48, 5);
-INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_graphid) VALUES (905054, 100099, 7, 'graphid.0', 600003);
-INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_str) VALUES (905055, 100099, 1, 'reference', 'RZALA');
-
-INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (120000, 90004, 'graphprototype', 'Graph prototype widget for delete', 0, 5, 48, 5);
-INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_graphid) VALUES (905056, 120000, 7, 'graphid.0', 600002);
-INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_str) VALUES (905057, 120000, 1, 'reference', 'MJHNB');
-
-INSERT INTO dashboard (dashboardid, name, userid, private) VALUES (1410, 'Dashboard for Sceenshoting Graph Prototype widgets', 1, 1);
-INSERT INTO dashboard_page (dashboard_pageid, dashboardid) VALUES (90005, 1410);
 
 -- Overrides for LLD Overrides test
 INSERT INTO lld_override (lld_overrideid, itemid, name, step, evaltype, stop) values (5000, 133800, 'Override for update 1', 1, 1, 0);

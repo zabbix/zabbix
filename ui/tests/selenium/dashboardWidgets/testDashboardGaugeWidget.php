@@ -210,9 +210,9 @@ class testDashboardGaugeWidget extends testWidgets {
 			'Max' => ['value' => 100, 'maxlength' => 255, 'enabled' => true, 'visible' => true],
 
 			// Colors.
-			self::PATH_TO_COLOR_PICKER.'"value_arc_color"]' => ['color' => '', 'enabled' => true, 'visible' => true],
-			self::PATH_TO_COLOR_PICKER.'"empty_color"]' => ['color' => '', 'enabled' => true, 'visible' => true],
-			self::PATH_TO_COLOR_PICKER.'"bg_color"]' => ['color' => '', 'enabled' => true, 'visible' => true],
+			self::PATH_TO_COLOR_PICKER.'"value_arc_color"]' => ['value' => '', 'enabled' => true, 'visible' => true],
+			self::PATH_TO_COLOR_PICKER.'"empty_color"]' => ['value' => '', 'enabled' => true, 'visible' => true],
+			self::PATH_TO_COLOR_PICKER.'"bg_color"]' => ['value' => '', 'enabled' => true, 'visible' => true],
 
 			// Show.
 			'id:show_1' => ['value' => true, 'enabled' => true, 'visible' => true], // Show Description.
@@ -228,13 +228,13 @@ class testDashboardGaugeWidget extends testWidgets {
 			'id:desc_size' => ['value' => '15', 'maxlength' => 3, 'enabled' => true, 'visible' => false],
 			'id:desc_v_pos' => ['value' => 'Bottom', 'enabled' => true, 'labels' => ['Top', 'Bottom'], 'visible' => false],
 			'id:desc_bold' => ['value' => false, 'enabled' => true, 'visible' => false],
-			self::PATH_TO_COLOR_PICKER.'"desc_color"]' =>  ['color' => '', 'enabled' => true, 'visible' => false],
+			self::PATH_TO_COLOR_PICKER.'"desc_color"]' => ['value' => '', 'enabled' => true, 'visible' => false],
 
 			// Value.
 			'id:decimal_places' => ['value' => 2, 'maxlength' => 2, 'enabled' => true, 'visible' => false],
 			'id:value_bold' => ['value' => false, 'enabled' => true, 'visible' => false],
 			'id:value_size' => ['value' => 25, 'maxlength' => 3, 'enabled' => true, 'visible' => false],
-			self::PATH_TO_COLOR_PICKER.'"value_color"]' => ['color' => '', 'enabled' => true, 'visible' => false],
+			self::PATH_TO_COLOR_PICKER.'"value_color"]' => ['value' => '', 'enabled' => true, 'visible' => false],
 
 			// Value arc.
 			'id:value_arc_size' => ['value' => 20, 'maxlength' => 3, 'enabled' => true, 'visible' => false],
@@ -245,10 +245,10 @@ class testDashboardGaugeWidget extends testWidgets {
 			'id:units_size' => ['value' => 25, 'maxlength' => 3, 'enabled' => true, 'visible' => false],
 			'id:units_pos' => ['value' => 'After value', 'enabled' => true, 'visible' => false],
 			'id:units_bold' => ['value' => false, 'enabled' => true, 'visible' => false],
-			self::PATH_TO_COLOR_PICKER.'"units_color"]'=> ['color' => '', 'enabled' => true, 'visible' => false],
+			self::PATH_TO_COLOR_PICKER.'"units_color"]'=> ['value' => '', 'enabled' => true, 'visible' => false],
 
 			// Needle.
-			self::PATH_TO_COLOR_PICKER.'"needle_color"]' => ['color' => '', 'enabled' => false, 'visible' => false],
+			self::PATH_TO_COLOR_PICKER.'"needle_color"]' => ['value' => '', 'enabled' => false, 'visible' => false],
 
 			// Scale.
 			'id:scale_show_units' => ['value' => true, 'enabled' => true, 'visible' => false],
@@ -267,29 +267,23 @@ class testDashboardGaugeWidget extends testWidgets {
 
 		$not_visible = [];
 		foreach ($fields as $label => $attributes) {
-			if (array_key_exists('color', $attributes)) {
-				$this->assertEquals($attributes['color'], $form->query($label)->asColorPicker()->one()->getValue());
+			$field = $form->getField($label);
+			foreach ($attributes as $attribute => $value) {
+				if ($attribute === 'value') {
+					$this->assertEquals($value, $field->getValue());
+				}
+
+				if ($attribute === 'maxlength' || $attribute === 'placeholder') {
+					$this->assertEquals($value, $field->getAttribute($attribute));
+				}
+
+				if ($attribute === 'labels') {
+					$this->assertEquals($value, $field->getLabels()->asText());
+				}
 			}
 
-			$field = $form->getField($label);
 			$this->assertTrue($field->isEnabled($attributes['enabled']));
 			$this->assertTrue($field->isVisible($attributes['visible']));
-
-			if (array_key_exists('value', $attributes)) {
-				$this->assertEquals($attributes['value'], $field->getValue());
-			}
-
-			if (array_key_exists('maxlength', $attributes)) {
-				$this->assertEquals($attributes['maxlength'], $field->getAttribute('maxlength'));
-			}
-
-			if (array_key_exists('placeholder', $attributes)) {
-				$this->assertEquals($attributes['placeholder'], $field->getAttribute('placeholder'));
-			}
-
-			if (array_key_exists('labels', $attributes)) {
-				$this->assertEquals($attributes['labels'], $field->asSegmentedRadio()->getLabels()->asText());
-			}
 
 			// Show Needle is unchecked and Needle color remains invisible by default.
 			if ($attributes['visible'] === false && $label !== self::PATH_TO_COLOR_PICKER.'"needle_color"]') {
@@ -297,7 +291,7 @@ class testDashboardGaugeWidget extends testWidgets {
 			}
 		}
 
-		// Check  Advanced configuration's fields visibility.
+		// Check Advanced configuration's fields visibility.
 		$form->fill(['Advanced configuration' => true]);
 
 		// Check hintboxes.
@@ -461,10 +455,10 @@ class testDashboardGaugeWidget extends testWidgets {
 				'id:show_2' => true, // Value.
 				'id:show_3' => true, // Needle.
 				'id:show_4' => true, // Scale.
-				'id:show_5' => true  // Value arc.
+				'id:show_5' => true // Value arc.
 			];
 
-			if (!$show_arc)  {
+			if (!$show_arc) {
 				$show['id:show_3'] = false;
 				$show['id:show_4'] = false;
 			}
@@ -783,7 +777,7 @@ class testDashboardGaugeWidget extends testWidgets {
 						'id:show_2' => false, // Value.
 						'id:show_3' => false, // Needle.
 						'id:show_4' => false, // Scale.
-						'id:show_5' => false  // Value arc.
+						'id:show_5' => false // Value arc.
 					],
 					'error' => [
 						'Invalid parameter "Show": at least one option must be selected.'
@@ -980,9 +974,9 @@ class testDashboardGaugeWidget extends testWidgets {
 			COverlayDialogElement::ensureNotPresent();
 
 			/**
-			 *  When name is absent in create scenario it remains default: host name + item name,
-			 *  if name is absent in update scenario then previous name remains.
-			 *  If name is empty string in both scenarios it is replaced by host name + item name.
+			 * When name is absent in create scenario it remains default: host name + item name,
+			 * if name is absent in update scenario then previous name remains.
+			 * If name is empty string in both scenarios it is replaced by host name + item name.
 			 */
 			if (array_key_exists('Name', $data['fields'])) {
 				$header = ($data['fields']['Name'] === '')
@@ -1461,22 +1455,21 @@ class testDashboardGaugeWidget extends testWidgets {
 					],
 					'result' => 'Problem, Problem, Problem, Problem, test, test'
 				]
+			],
+			'Macro functions regsub() / iregsub() - successful scenarios' => [
+				[
+					'fields' => [
+						'Advanced configuration' => true,
+						'id:description' => '{'.self::USER_MACRO.'.regsub(0, Problem)}, '.
+							'{'.self::USER_MACRO.'.iregsub(0, Problem)}, '.
+							'{'.self::USER_SECRET_MACRO.'.regsub(0, Problem)}, '.
+							'{'.self::USER_SECRET_MACRO.'.iregsub(0, Problem)}, '.
+							'{{ITEM.NAME}.regsub(0, test)}, {{ITEM.NAME}.iregsub(0, test)}',
+						'id:desc_size' => 5
+					],
+					'result' => ', , , , ,'
+				]
 			]
-			// TODO: Uncomment and check the test case, after ZBX-25420 fix.
-//			'Macro functions regsub() / iregsub() - successful scenarios' => [
-//				[
-//					'fields' => [
-//						'Advanced configuration' => true,
-//						'id:description' => '{'.self::USER_MACRO.'.regsub(0, Problem)}, '.
-//							'{'.self::USER_MACRO.'.iregsub(0, Problem)}, '.
-//							'{'.self::USER_SECRET_MACRO.'.regsub(0, Problem)}, '.
-//							'{'.self::USER_SECRET_MACRO.'.iregsub(0, Problem)}, '.
-//							'{{ITEM.NAME}.regsub(0, test)}, {{ITEM.NAME}.iregsub(0, test)}',
-//						'id:desc_size' => 5
-//					],
-//					'result' => ', , , , ,'
-//				]
-//			]
 		];
 	}
 

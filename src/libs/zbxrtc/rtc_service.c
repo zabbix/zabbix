@@ -477,6 +477,37 @@ static void	rtc_subscribe_service(zbx_rtc_t *rtc, const unsigned char *data)
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: unsubscribe service from RTC notifications                        *
+ *                                                                            *
+ ******************************************************************************/
+static void	rtc_unsubscribe_service(zbx_rtc_t *rtc, const unsigned char *data)
+{
+	char		*service;
+	zbx_uint32_t	service_len;
+
+	(void)zbx_deserialize_str(data, &service, service_len);
+
+	for (int i = 0; i < rtc->subs.values_num; i++)
+	{
+		zbx_rtc_sub_t	*sub = rtc->subs.values[i];
+
+		if (ZBX_RTC_SUB_SERVICE == sub->type && 0 == strcmp(sub->source.service, service))
+		{
+			zbx_free(sub->source.service);
+			zbx_vector_uint32_destroy(&sub->msgs);
+			zbx_free(sub);
+			zbx_vector_rtc_sub_remove_noorder(&rtc->subs, i);
+
+			break;
+		}
+
+	}
+
+	zbx_free(service);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: process runtime control option                                    *
  *                                                                            *
  * Parameters: rtc    - [IN] the RTC service                                  *
@@ -516,9 +547,7 @@ static void	rtc_process_request(zbx_rtc_t *rtc, zbx_uint32_t code, const unsigne
 			zbx_rtc_notify(rtc, ZBX_PROCESS_TYPE_SNMP_POLLER, 0, ZBX_RTC_SNMP_CACHE_RELOAD, NULL, 0);
 			zbx_rtc_notify(rtc, ZBX_PROCESS_TYPE_POLLER, 0, ZBX_RTC_SNMP_CACHE_RELOAD, NULL, 0);
 			zbx_rtc_notify(rtc, ZBX_PROCESS_TYPE_UNREACHABLE, 0, ZBX_RTC_SNMP_CACHE_RELOAD, NULL, 0);
-			zbx_rtc_notify(rtc, ZBX_PROCESS_TYPE_TRAPPER, 0, ZBX_RTC_SNMP_CACHE_RELOAD, NULL, 0);
 			zbx_rtc_notify(rtc, ZBX_PROCESS_TYPE_DISCOVERYMANAGER, 0, ZBX_RTC_SNMP_CACHE_RELOAD, NULL, 0);
-			zbx_rtc_notify(rtc, ZBX_PROCESS_TYPE_TASKMANAGER, 0, ZBX_RTC_SNMP_CACHE_RELOAD, NULL, 0);
 #else
 			*result = zbx_strdup(NULL, "Invalid runtime control option: no SNMP support enabled\n");
 #endif
@@ -642,6 +671,9 @@ void	zbx_rtc_dispatch(zbx_rtc_t *rtc, zbx_ipc_client_t *client, zbx_ipc_message_
 			break;
 		case ZBX_RTC_SUBSCRIBE_SERVICE:
 			rtc_subscribe_service(rtc, message->data);
+			break;
+		case ZBX_RTC_UNSUBSCRIBE_SERVICE:
+			rtc_unsubscribe_service(rtc, message->data);
 			break;
 		case ZBX_RTC_CONFIG_CACHE_RELOAD_WAIT:
 			rtc_add_control_hook(rtc, client, ZBX_RTC_CONFIG_SYNC_NOTIFY);

@@ -43,7 +43,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 	const SELECTOR = 'xpath://form[@name="discovery"]/table[contains(@class, "list-table")]';
 
 	public static function prepareLLDData() {
-		CDataHelper::createHosts([
+		$host_responce = CDataHelper::createHosts([
 			[
 				'host' => 'Host with LLD',
 				'groups' => [['groupid' => 4]], // Zabbix servers.
@@ -55,6 +55,13 @@ class testPageLowLevelDiscovery extends CWebTest {
 					]
 				]
 			]
+		]);
+
+		CDataHelper::call('discoveryrule.create', [
+			'name' => 'Multiple   spaces   in LLD name',
+			'key_' => '123lld_rule321',
+			'hostid' =>  $host_responce['hostids']['Host with LLD'],
+			'type' => ITEM_TYPE_TRAPPER
 		]);
 	}
 
@@ -140,6 +147,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 		// Filling fields with needed discovery rule info.
 		$form->fill(['Name' => 'Discovery rule 3']);
 		$form->submit();
+		$table->waitUntilReloaded();
 
 		// Check that filtered count matches expected.
 		$this->assertEquals(1, $table->getRows()->count());
@@ -167,13 +175,14 @@ class testPageLowLevelDiscovery extends CWebTest {
 		$discovery_status = ['Enabled' => 1, 'Disabled' => 0];
 		foreach ($discovery_status as $action => $expected_status) {
 			$row->query('link', $action)->one()->click();
+			$message_action = ($action === 'Enabled') ? 'disabled' : 'enabled';
+			$this->assertMessage(TEST_GOOD, 'Discovery rule '.$message_action);
 			$status = CDBHelper::getValue('SELECT status FROM items WHERE name='.zbx_dbstr('Discovery rule 2').' and hostid='
 				.self::HOST_ID);
 			$this->assertEquals($expected_status, $status);
-			$message_action = ($action === 'Enabled') ? 'disabled' : 'enabled';
-			$this->assertEquals('Discovery rule '.$message_action, CMessageElement::find()->one()->getTitle());
 			$link_color = ($action === 'Enabled') ? 'red' : 'green';
 			$this->assertTrue($row->query('xpath://td/a[@class="link-action '.$link_color.'"]')->one()->isPresent());
+			CMessageElement::find()->one()->close();
 		}
 	}
 
@@ -372,6 +381,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 						]
 					],
 					'expected' => [
+						'Multiple spaces in LLD name',
 						'Test discovery rule',
 						'Trapper LLD for filter'
 					]
@@ -470,6 +480,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 						'LLD rule for item types',
 						'LLD 🙂🙃 !@#$%^&*()_+ 祝你今天过得愉快',
 						'Linux by Zabbix agent: Get filesystems: Mounted filesystem discovery',
+						'Multiple spaces in LLD name',
 						'Mūsu desmitais LLD',
 						'Linux by Zabbix agent: Network interface discovery',
 						'sevenths LLD',
@@ -505,7 +516,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 						'Type' => 'Dependent item'
 					],
 					'context' => 'template',
-					'rows' => 23
+					'rows' => 33
 				]
 			],
 			// #13.
@@ -571,6 +582,15 @@ class testPageLowLevelDiscovery extends CWebTest {
 					'expected' => [
 						'Test discovery rule'
 					]
+				]
+			],
+			// #18.
+			[
+				[
+					'filter' => [
+						'Name' => '   '
+					],
+					'expected' => ['Multiple spaces in LLD name']
 				]
 			]
 		];
@@ -654,7 +674,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 		// Delete all discovery rules.
 		$form = $this->query('name:zbx_filter')->one()->asForm();
 		$form->fill($data['filter']);
-		$form->submit();
+		$form->submit()->waitUntilStalled();
 		$this->selectTableRows($data['keys'], 'Key', self::SELECTOR);
 		$this->query('button:Delete')->one()->click();
 		$this->page->acceptAlert();

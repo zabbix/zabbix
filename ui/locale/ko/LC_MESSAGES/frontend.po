@@ -285,6 +285,24 @@ msgstr "%1$s.php 클래스는 %3$s에 있는 모듈에 대해 %2$s를 확장해�
 msgid "%1$s: %2$s"
 msgstr "%1$s: %2$s"
 
+#: include/classes/server/CZabbixServer.php:740
+#: include/classes/setup/CSetupWizard.php:1459
+#, c-format
+msgid "%1$s: %2$s."
+msgstr ""
+
+#: include/classes/server/CZabbixServer.php:746
+#: include/classes/setup/CSetupWizard.php:1465
+#, c-format
+msgid "%1$s: file is not readable."
+msgstr ""
+
+#: include/classes/server/CZabbixServer.php:743
+#: include/classes/setup/CSetupWizard.php:1462
+#, c-format
+msgid "%1$s: invalid path or file not found."
+msgstr ""
+
 #: include/classes/graph/CSvgGraph.php:1418
 #, c-format
 msgid "%1$sth percentile: %2$s"
@@ -2018,6 +2036,10 @@ msgstr "수집 간격 동안 가상 디스크에 대한 미해결 쓰기 요청�
 msgid "Avoid easy-to-guess passwords"
 msgstr "추측하기 쉬운 암호를 피하십시오"
 
+#: app/views/host.wizard.edit.php:473
+msgid "Avoid including sensitive data."
+msgstr ""
+
 #: jsLoader.php:172
 msgid "Awaiting data"
 msgstr "데이터 대기 중"
@@ -3492,6 +3514,10 @@ msgstr "\"%4$s\"상의 디스커버리 규칙 \"%3$s\"의 아이템 프로토타
 msgid "Cannot find value map \"%1$s\" used for item prototype \"%2$s\" of discovery rule prototype \"%3$s\" on \"%4$s\"."
 msgstr ""
 
+#: app/views/oauth.authorize.php:33
+msgid "Cannot get authentication tokens"
+msgstr ""
+
 #: app/views/oauth.edit.php:230
 msgid "Cannot get authorization code."
 msgstr ""
@@ -4020,6 +4046,11 @@ msgstr "XML: %1$s 을 읽을 수 없습니다."
 msgid "Cannot read YAML: %1$s."
 msgstr "YAML을 읽을 수 없습니다: %1$s."
 
+#: include/classes/server/CZabbixServer.php:511
+#, c-format
+msgid "Cannot read response from Zabbix server \"%1$s\"."
+msgstr ""
+
 #: include/classes/server/CZabbixServer.php:567
 #, c-format
 msgid "Cannot read the response, check connection with the Zabbix server \"%1$s\"."
@@ -4080,6 +4111,10 @@ msgstr "그래프의 프로토타입 \"%2$s\"에 \"%1$s\"를 설정할 수 없�
 #: widgets/piechart/includes/CWidgetFieldDataSet.php:175
 msgid "Cannot set \"Data set aggregation\" when item with type \"Total\" is added to the chart."
 msgstr "\"전체\" 유형의 항목이 차트에 추가되면 \"데이터 세트 집계\"를 설정할 수 없습니다."
+
+#: include/classes/db/MysqlDbBackend.php:197
+msgid "Cannot set charset."
+msgstr ""
 
 #: include/classes/api/services/CItemGeneral.php:2478
 #, c-format
@@ -7172,6 +7207,10 @@ msgstr "웹 시나리오 세부 내용"
 msgid "Detected TimescaleDB license does not support compression. Compression is supported in TimescaleDB Community Edition."
 msgstr "감지된 TimescaleDB 라이센스는 압축을 지원하지 않습니다. 압축은 TimescaleDB Community Edition에서 지원됩니다."
 
+#: app/views/administration.housekeeping.edit.php:204
+msgid "Detected license does not support compression. Compression is supported in TimescaleDB Community Edition."
+msgstr ""
+
 #: app/controllers/CControllerPopupTriggerExpr.php:1130
 msgid "Detection period"
 msgstr "탐지 기간"
@@ -8423,6 +8462,10 @@ msgstr "영어 (en_US)"
 
 #: app/views/host.wizard.edit.php:399
 msgid "Enter a non-secret pre-shared key identity string. Avoid including sensitive data."
+msgstr ""
+
+#: app/views/host.wizard.edit.php:470
+msgid "Enter a unique name that Zabbix components will use to recognize the pre-shared key."
 msgstr ""
 
 #: app/views/host.wizard.edit.php:609
@@ -12058,6 +12101,10 @@ msgstr "Internet Explorer"
 msgid "Interval"
 msgstr "갱신 간격"
 
+#: widgets/itemcard/includes/CWidgetFieldItemSectionsView.php:76
+msgid "Interval and storage"
+msgstr ""
+
 #: include/classes/api/services/CRole.php:731
 #, c-format
 msgid "Invalid API method \"%2$s\" for user role \"%1$s\"."
@@ -14082,6 +14129,11 @@ msgstr "최대 행 수"
 msgid "Maximum required %1$s database version is %2$s."
 msgstr "필요한 최대 %1$s 데이터베이스 버전은 %2$s입니다."
 
+#: app/partials/administration.system.info.php:221
+#, c-format
+msgid "Maximum required version is %1$s."
+msgstr ""
+
 #: app/controllers/CControllerTimeSelectorUpdate.php:136
 #: include/classes/mvc/CController.php:320
 #: include/classes/widgets/fields/CWidgetFieldTimePeriod.php:203
@@ -14421,6 +14473,12 @@ msgstr "PHP 스크립트의 입력 구문 분석 시간에 필요한 최소 제�
 msgid "Minimum required size of PHP post is %1$s (configuration option \"post_max_size\")."
 msgstr "PHP 게시물의 최소 필수 크기는 %1$s입니다(구성 옵션 \"post_max_size\")."
 
+#: app/partials/administration.system.info.php:212
+#: app/views/administration.housekeeping.edit.php:183
+#, c-format
+msgid "Minimum required version is %1$s."
+msgstr ""
+
 #: app/views/monitoring.map.view.php:48
 #: include/views/monitoring.sysmap.edit.php:276
 msgid "Minimum severity"
@@ -14648,8 +14706,18 @@ msgstr "복수"
 msgid "Multiple PROBLEM events"
 msgstr "장애이벤트를 계속해서 생성"
 
+#: app/partials/administration.system.info.php:235
+#, c-format
+msgid "Must be at least %1$s."
+msgstr ""
+
 #: include/classes/validators/CFormValidator.php:340
 msgid "Must be selected."
+msgstr ""
+
+#: app/partials/administration.system.info.php:254
+#, c-format
+msgid "Must not be higher than %1$s."
 msgstr ""
 
 #: jsLoader.php:284
@@ -15419,6 +15487,66 @@ msgstr "시스템 액세스 권한이 없습니다."
 #, c-format
 msgid "No permissions to call \"%1$s.%2$s\"."
 msgstr "\"%1$s.%2$s\"를 호출할 권한이 없습니다."
+
+#: include/classes/api/services/CConfiguration.php:312
+msgid "No permissions to import discovery rules."
+msgstr ""
+
+#: include/classes/api/services/CConfiguration.php:313
+msgid "No permissions to import graphs."
+msgstr ""
+
+#: include/classes/api/services/CConfiguration.php:314
+msgid "No permissions to import host groups."
+msgstr ""
+
+#: include/classes/api/services/CConfiguration.php:316
+msgid "No permissions to import hosts."
+msgstr ""
+
+#: include/classes/api/services/CConfiguration.php:318
+msgid "No permissions to import images."
+msgstr ""
+
+#: include/classes/api/services/CConfiguration.php:319
+msgid "No permissions to import items."
+msgstr ""
+
+#: include/classes/api/services/CConfiguration.php:320
+msgid "No permissions to import maps."
+msgstr ""
+
+#: include/classes/api/services/CConfiguration.php:321
+msgid "No permissions to import media types."
+msgstr ""
+
+#: include/classes/api/services/CConfiguration.php:324
+msgid "No permissions to import template dashboards."
+msgstr ""
+
+#: include/classes/api/services/CConfiguration.php:315
+msgid "No permissions to import template groups."
+msgstr ""
+
+#: include/classes/api/services/CConfiguration.php:322
+msgid "No permissions to import template links."
+msgstr ""
+
+#: include/classes/api/services/CConfiguration.php:323
+msgid "No permissions to import templates."
+msgstr ""
+
+#: include/classes/api/services/CConfiguration.php:325
+msgid "No permissions to import triggers."
+msgstr ""
+
+#: include/classes/api/services/CConfiguration.php:326
+msgid "No permissions to import value maps."
+msgstr ""
+
+#: include/classes/api/services/CConfiguration.php:317
+msgid "No permissions to import web scenarios."
+msgstr ""
 
 #: app/controllers/CControllerChartsView.php:133
 #: app/controllers/CControllerDashboardPrint.php:99
@@ -16620,6 +16748,10 @@ msgstr "PHP ctype모듈이 존재하지 않습니다 (PHP 설정 파라미터 --
 #: include/classes/setup/CFrontendSetup.php:687
 msgid "PHP curl"
 msgstr "PHP curl"
+
+#: include/classes/setup/CFrontendSetup.php:733
+msgid "PHP curl extension is missing or outdated."
+msgstr ""
 
 #: include/classes/setup/CFrontendSetup.php:691
 msgid "PHP curl extension missing."
@@ -18586,6 +18718,11 @@ msgstr "응답 코드"
 msgid "Response time"
 msgstr "응답 시간"
 
+#: include/classes/server/CZabbixServer.php:507
+#, c-format
+msgid "Response timeout of %1$s exceeded when connecting to Zabbix server \"%2$s\"."
+msgstr ""
+
 #: app/controllers/CControllerMediatypeTestSend.php:182
 msgid "Response type: JSON"
 msgstr "응답 유형: JSON"
@@ -19940,6 +20077,18 @@ msgstr "짧게"
 #: widgets/problems/includes/WidgetForm.php:106
 msgid "Shortened"
 msgstr "단축"
+
+#: app/partials/administration.system.info.php:243
+#: app/views/administration.housekeeping.edit.php:187
+#, c-format
+msgid "Should be at least %1$s."
+msgstr ""
+
+#: app/partials/administration.system.info.php:262
+#: app/views/administration.housekeeping.edit.php:197
+#, c-format
+msgid "Should not be higher than %1$s."
+msgstr ""
 
 #: app/partials/monitoring.problem.filter.php:27
 #: app/views/monitoring.charts.view.php:80
@@ -21588,6 +21737,10 @@ msgstr "프로세스 수. integer를 리턴."
 msgid "The parameter \"%1$s\" is missing from the user attributes."
 msgstr "사용자 속성에서 \"%1$s\" 매개변수가 누락되었습니다."
 
+#: app/views/popup.ldap.edit.php:101
+msgid "The previous password was cleared due to a host change. Please enter the new password."
+msgstr ""
+
 #: include/classes/core/CJsonRpc.php:206
 msgid "The received JSON is not a valid JSON-RPC request."
 msgstr "수신된 JSON은 유효한 JSON-RPC 요청이 아닙니다."
@@ -22779,6 +22932,14 @@ msgstr "TimescaleDB 압축 지원 상태를 가져올 수 없습니다."
 msgid "Unable to retrieve TimescaleDB version."
 msgstr "TimescaleDB 버전을 가져올 수 없습니다."
 
+#: app/views/administration.housekeeping.edit.php:173
+msgid "Unable to retrieve compression support status of TimescaleDB time-series database extension for PostgreSQL."
+msgstr ""
+
+#: app/views/administration.housekeeping.edit.php:178
+msgid "Unable to retrieve version of TimescaleDB time-series database extension for PostgreSQL."
+msgstr ""
+
 #: include/views/mfa.login.php:65
 #, c-format
 msgid "Unable to scan? You can use %1$s secret key to manually configure your authenticator app:"
@@ -23066,6 +23227,11 @@ msgstr "지원되지 않는 %1$s 데이터베이스 서버 버전입니다. %2$s
 #, c-format
 msgid "Unsupported %1$s database server version. Must not be higher than %2$s."
 msgstr "지원되지 않는 %1$s 데이터베이스 서버 버전입니다. %2$s보다 높을 수 없습니다."
+
+#: app/partials/administration.system.info.php:206
+#: app/views/administration.housekeeping.edit.php:169
+msgid "Unsupported TimescaleDB time-series database extension for PostgreSQL is used."
+msgstr ""
 
 #: app/views/administration.housekeeping.edit.php:190
 #, c-format
@@ -24510,6 +24676,11 @@ msgstr "경고"
 #: include/func.inc.php:1775 jsLoader.php:216
 msgid "Warning message"
 msgstr "경고 메시지"
+
+#: app/partials/administration.system.info.php:243
+#: app/partials/administration.system.info.php:262
+msgid "Warning!"
+msgstr ""
 
 #: app/partials/administration.system.info.php:198
 msgid "Warning! Support for Oracle DB is deprecated since Zabbix 7.0 and will be removed in future versions."
@@ -26096,6 +26267,10 @@ msgstr "설명"
 #: include/classes/validators/CApiInputValidator.php:1985
 msgid "directory cannot be empty"
 msgstr "디렉토리는 비워둘 수 없음"
+
+#: include/views/configuration.host.discovery.list.php:340
+msgid "discovery rule"
+msgstr ""
 
 #: app/controllers/CControllerItemMassCheckNow.php:138
 #: include/classes/api/services/CTask.php:562

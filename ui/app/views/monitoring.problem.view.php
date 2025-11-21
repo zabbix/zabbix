@@ -22,8 +22,6 @@
 if ($data['action'] === 'problem.view') {
 	$this->addJsFile('gtlc.js');
 	$this->addJsFile('layout.mode.js');
-	$this->addJsFile('class.tabfilter.js');
-	$this->addJsFile('class.tabfilteritem.js');
 
 	$this->enableLayoutModes();
 	$web_layout_mode = $this->getLayoutMode();

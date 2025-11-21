@@ -98,7 +98,7 @@ class CMultiSelect extends CTag {
 
 		$options_list = [
 			'defaultValue', 'disabled', 'selectedLimit', 'addNew', 'newItemName', 'styles', 'placeholder', 'hidden',
-			'readonly'
+			'readonly', 'maxlength'
 		];
 		foreach ($options_list as $option) {
 			if (array_key_exists($option, $options)) {
@@ -154,7 +154,7 @@ class CMultiSelect extends CTag {
 	protected function mapOptions(array $options) {
 		$valid_fields = ['name', 'object_name', 'multiselect_id', 'multiple', 'disabled', 'default_value', 'data',
 			'add_new', 'new_item_name', 'add_post_js', 'styles', 'popup', 'custom_select', 'placeholder', 'autosuggest',
-			'hidden', 'readonly'
+			'hidden', 'readonly', 'maxlength'
 		];
 
 		foreach ($options as $field => $value) {
@@ -177,7 +177,8 @@ class CMultiSelect extends CTag {
 			'add_post_js' => 'add_post_js',
 			'styles' => 'styles',
 			'placeholder' => 'placeholder',
-			'readonly' => 'readonly'
+			'readonly' => 'readonly',
+			'maxlength' => 'maxlength'
 		];
 
 		foreach ($mappings as $new_field => $old_field) {
@@ -317,7 +318,7 @@ class CMultiSelect extends CTag {
 				}
 
 				if (array_key_exists('with_hosts', $parameters) && $parameters['with_hosts']) {
-					$popup_parameters['real_hosts'] = '1';
+					$popup_parameters['with_hosts'] = '1';
 					$autocomplete_parameters['with_hosts'] = true;
 				}
 

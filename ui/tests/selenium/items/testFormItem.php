@@ -14,6 +14,8 @@
 **/
 
 
+use Facebook\WebDriver\Exception\NoSuchElementException;
+
 require_once __DIR__.'/../../include/CLegacyWebTest.php';
 require_once __DIR__.'/../../../include/items.inc.php';
 require_once __DIR__.'/../../../include/classes/api/services/CItemGeneral.php';
@@ -31,10 +33,15 @@ use Facebook\WebDriver\WebDriverBy;
 class testFormItem extends CLegacyWebTest {
 
 	/**
-	 * Attach MessageBehavior to the test.
+	 * Attach MessageBehavior and TableBehavior to the test.
+	 *
+	 * @return array
 	 */
 	public function getBehaviors() {
-		return [CMessageBehavior::class];
+		return [
+			CMessageBehavior::class,
+			CTableBehavior::class
+		];
 	}
 
 	/**
@@ -1001,8 +1008,10 @@ class testFormItem extends CLegacyWebTest {
 		// Open hosts page.
 		$this->zbxTestLogin(self::HOST_LIST_PAGE);
 		// Find filter form and filter necessary host.
+		$table = $this->getTable();
 		$this->query('name:zbx_filter')->asForm()->waitUntilReady()->one()->fill(['Name' => $this->host]);
 		$this->query('button:Apply')->one()->waitUntilClickable()->click();
+		$table->waitUntilReloaded();
 		// Find Items link in host row and click it.
 		$this->query('xpath://table[@class="list-table"]')->asTable()->one()->findRow('Name', $this->host)
 				->getColumn('Items')->query('link:Items')->one()->click();
@@ -2095,8 +2104,17 @@ class testFormItem extends CLegacyWebTest {
 					$this->zbxTestInputType('delay_flex_'.$itemCount.'_delay', $period['flexDelay']);
 				}
 				$itemCount ++;
-				$form->query("xpath://div[@id='js-item-flex-intervals-field']//button[@class='btn-link element-table-add']")
-						->one()->click();
+
+				$add = $form->query("xpath://div[@id='js-item-flex-intervals-field']//button[@class='btn-link element-table-add']")
+						->one();
+				$add->click();
+				// TODO: sometimes inline validation error appears at the same time, and the click on Add doesn't pass.
+				try {
+					$this->zbxTestAssertVisibleId('delay_flex_'.$itemCount.'_delay');
+				}
+				catch (NoSuchElementException $e) {
+					$add->click();
+				}
 
 				$this->zbxTestAssertVisibleId('delay_flex_'.$itemCount.'_delay');
 				$this->zbxTestAssertVisibleId('delay_flex_'.$itemCount.'_period');
@@ -2271,6 +2289,7 @@ class testFormItem extends CLegacyWebTest {
 		$this->zbxTestInputType('hk_trends', '455d');
 
 		$this->zbxTestClickWait('update');
+		$this->assertMessage(TEST_GOOD, 'Configuration updated');
 
 		$this->zbxTestOpen(self::HOST_LIST_PAGE);
 		$this->filterEntriesAndOpenItems();
@@ -2305,8 +2324,8 @@ class testFormItem extends CLegacyWebTest {
 	private function filterEntriesAndOpenItems() {
 		$form = $this->query('name:zbx_filter')->asForm()->waitUntilReady()->one();
 		$form->fill(['Name' => $this->host]);
+		$table = $this->query('xpath://table[@class="list-table"]')->asTable()->one();
 		$this->query('button:Apply')->one()->waitUntilClickable()->click();
-		$this->query('xpath://table[@class="list-table"]')->asTable()->one()->findRow('Name', $this->host)
-				->getColumn('Items')->query('link:Items')->one()->click();
+		$table->waitUntilReloaded()->findRow('Name', $this->host)->getColumn('Items')->query('link:Items')->one()->click();
 	}
 }

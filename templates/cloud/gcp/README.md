@@ -43,7 +43,7 @@ This template has been tested on:
 
     You can copy and paste private_key string data from the Service Account JSON key file as is or replace the new line metasymbol (\n) with an actual new line.
 
->Please, refer to the [vendor documentation](https://cloud.google.com/iam/docs/manage-access-service-accounts)  about the service accounts management.
+Please, refer to the [vendor documentation](https://cloud.google.com/iam/docs/manage-access-service-accounts) about the service accounts management.
 
 **IMPORTANT!!!**
 

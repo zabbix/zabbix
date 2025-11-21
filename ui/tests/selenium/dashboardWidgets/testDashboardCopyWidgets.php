@@ -335,6 +335,24 @@ class testDashboardCopyWidgets extends CWebTest {
 			],
 			[
 				[
+					'name' => 'Host card widget',
+					'copy to' => 'same page'
+				]
+			],
+			[
+				[
+					'name' => 'Item card widget',
+					'copy to' => 'same page'
+				]
+			],
+			[
+				[
+					'name' => 'Web monitoring widget',
+					'copy to' => 'same page'
+				]
+			],
+			[
+				[
 					'name' => 'Clock widget',
 					'copy to' => 'another page'
 				]
@@ -407,6 +425,24 @@ class testDashboardCopyWidgets extends CWebTest {
 			],
 			[
 				[
+					'name' => 'Host card widget',
+					'copy to' => 'another page'
+				]
+			],
+			[
+				[
+					'name' => 'Item card widget',
+					'copy to' => 'another page'
+				]
+			],
+			[
+				[
+					'name' => 'Web monitoring widget',
+					'copy to' => 'another page'
+				]
+			],
+			[
+				[
 					'name' => 'Clock widget',
 					'copy to' => 'another dashboard'
 				]
@@ -438,12 +474,30 @@ class testDashboardCopyWidgets extends CWebTest {
 			[
 				[
 					'name' => 'Honeycomb widget',
-					'copy to' => 'another page'
+					'copy to' => 'another dashboard'
+				]
+			],
+			[
+				[
+					'name' => 'Host card widget',
+					'copy to' => 'another dashboard'
+				]
+			],
+			[
+				[
+					'name' => 'Item card widget',
+					'copy to' => 'another dashboard'
 				]
 			],
 			[
 				[
 					'name' => 'Item value widget',
+					'copy to' => 'another dashboard'
+				]
+			],
+			[
+				[
+					'name' => 'Web monitoring widget',
 					'copy to' => 'another dashboard'
 				]
 			],
@@ -492,6 +546,18 @@ class testDashboardCopyWidgets extends CWebTest {
 			[
 				[
 					'name' => 'Honeycomb widget',
+					'copy to' => 'another template'
+				]
+			],
+			[
+				[
+					'name' => 'Host card widget',
+					'copy to' => 'another template'
+				]
+			],
+			[
+				[
+					'name' => 'Item card widget',
 					'copy to' => 'another template'
 				]
 			]
@@ -623,6 +689,13 @@ class testDashboardCopyWidgets extends CWebTest {
 			],
 			[
 				[
+					'module_name' => 'Favorite maps',
+					'widget_name' => 'Test copy Favorite maps',
+					'action' => 'copy page'
+				]
+			],
+			[
+				[
 					'module_name' => 'Item history',
 					'widget_name' => 'Item history widget',
 					'action' => 'copy widget',
@@ -688,7 +761,7 @@ class testDashboardCopyWidgets extends CWebTest {
 		$inaccessible_xpath = 'xpath:.//div[contains(@class, "dashboard-widget-inaccessible")]';
 		$count = $dashboard->query($inaccessible_xpath)->waitUntilVisible()->count();
 
-		// Template dashbards are always in edit mode, so entering edit mode is only required for regular dashboards.
+		// Template dashboard are always in edit mode, so entering edit mode is only required for regular dashboards.
 		if(!array_key_exists('template', $data)) {
 			$dashboard->edit();
 		}
@@ -734,6 +807,8 @@ class testDashboardCopyWidgets extends CWebTest {
 		if ($this->page->isAlertPresent()) {
 			$this->page->acceptAlert();
 		}
+		// TODO: unstable test on Jenkins, appears js error 34749:5 Uncaught
+		CDashboardElement::find()->waitUntilReady();
 	}
 
 	/**

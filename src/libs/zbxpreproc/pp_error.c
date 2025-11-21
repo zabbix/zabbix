@@ -165,7 +165,8 @@ static char	*pp_error_format_value(const zbx_variant_t *value)
 	}
 	else
 	{
-		value_str = zbx_malloc(NULL, (len = strlen(value_desc)) + 1);
+		len = strlen(value_desc);
+		value_str = zbx_malloc(NULL, len + 1);
 		memcpy(value_str, value_desc, len + 1);
 	}
 
@@ -308,7 +309,7 @@ int	pp_error_on_fail(zbx_dc_um_shared_handle_t *um_handle, zbx_uint64_t hostid, 
 	switch (step->error_handler)
 	{
 		case ZBX_PREPROC_FAIL_DISCARD_VALUE:
-			zbx_variant_clear(value);
+			zbx_variant_clear_ext(value, ZBX_VARIANT_FLAG_CHANGED);
 			break;
 		case ZBX_PREPROC_FAIL_SET_VALUE:
 		case ZBX_PREPROC_FAIL_SET_ERROR:

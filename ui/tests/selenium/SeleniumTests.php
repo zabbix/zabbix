@@ -76,6 +76,7 @@ require_once __DIR__.'/dashboardWidgets/testDashboardHoneycombWidget.php';
 require_once __DIR__.'/dashboardWidgets/testDashboardHostAvailabilityWidget.php';
 require_once __DIR__.'/dashboardWidgets/testDashboardHostCardWidget.php';
 require_once __DIR__.'/dashboardWidgets/testDashboardHostNavigatorWidget.php';
+require_once __DIR__.'/dashboardWidgets/testDashboardItemCardWidget.php';
 require_once __DIR__.'/dashboardWidgets/testDashboardItemHistoryWidget.php';
 require_once __DIR__.'/dashboardWidgets/testDashboardItemNavigatorWidget.php';
 require_once __DIR__.'/dashboardWidgets/testDashboardItemValueWidget.php';
@@ -90,6 +91,7 @@ require_once __DIR__.'/dashboardWidgets/testDashboardTopHostsWidget.php';
 require_once __DIR__.'/dashboardWidgets/testDashboardTopTriggersWidget.php';
 require_once __DIR__.'/dashboardWidgets/testDashboardTriggerOverviewWidget.php';
 require_once __DIR__.'/dashboardWidgets/testDashboardURLWidget.php';
+require_once __DIR__.'/dashboardWidgets/testDashboardWebMonitoringWidget.php';
 require_once __DIR__.'/dashboardWidgets/testDashboardWidgetBroadcastedData.php';
 require_once __DIR__.'/dashboardWidgets/testDashboardWidgetCommunication.php';
 
@@ -423,6 +425,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testDashboardHostAvailabilityWidget');
 		$suite->addTestSuite('testDashboardHostCardWidget');
 		$suite->addTestSuite('testDashboardHostNavigatorWidget');
+		$suite->addTestSuite('testDashboardItemCardWidget');
 		$suite->addTestSuite('testDashboardItemHistoryWidget');
 		$suite->addTestSuite('testDashboardItemNavigatorWidget');
 		$suite->addTestSuite('testDashboardItemValueWidget');
@@ -437,6 +440,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testDashboardTopTriggersWidget');
 		$suite->addTestSuite('testDashboardTriggerOverviewWidget');
 		$suite->addTestSuite('testDashboardURLWidget');
+		$suite->addTestSuite('testDashboardWebMonitoringWidget');
 		$suite->addTestSuite('testDashboardWidgetBroadcastedData');
 		$suite->addTestSuite('testDashboardWidgetCommunication');
 

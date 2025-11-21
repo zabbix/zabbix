@@ -300,6 +300,24 @@ msgstr ""
 msgid "%1$s: %2$s"
 msgstr "%1$s: %2$s"
 
+#: include/classes/server/CZabbixServer.php:740
+#: include/classes/setup/CSetupWizard.php:1459
+#, c-format
+msgid "%1$s: %2$s."
+msgstr ""
+
+#: include/classes/server/CZabbixServer.php:746
+#: include/classes/setup/CSetupWizard.php:1465
+#, c-format
+msgid "%1$s: file is not readable."
+msgstr ""
+
+#: include/classes/server/CZabbixServer.php:743
+#: include/classes/setup/CSetupWizard.php:1462
+#, c-format
+msgid "%1$s: invalid path or file not found."
+msgstr ""
+
 #: include/classes/graph/CSvgGraph.php:1418
 #, c-format
 msgid "%1$sth percentile: %2$s"
@@ -2044,6 +2062,10 @@ msgstr ""
 msgid "Avoid easy-to-guess passwords"
 msgstr ""
 
+#: app/views/host.wizard.edit.php:473
+msgid "Avoid including sensitive data."
+msgstr ""
+
 #: jsLoader.php:172
 msgid "Awaiting data"
 msgstr ""
@@ -3592,6 +3614,10 @@ msgstr ""
 msgid "Cannot find value map \"%1$s\" used for item prototype \"%2$s\" of discovery rule prototype \"%3$s\" on \"%4$s\"."
 msgstr ""
 
+#: app/views/oauth.authorize.php:33
+msgid "Cannot get authentication tokens"
+msgstr ""
+
 #: app/views/oauth.edit.php:230
 msgid "Cannot get authorization code."
 msgstr ""
@@ -4123,6 +4149,11 @@ msgstr ""
 msgid "Cannot read YAML: %1$s."
 msgstr ""
 
+#: include/classes/server/CZabbixServer.php:511
+#, c-format
+msgid "Cannot read response from Zabbix server \"%1$s\"."
+msgstr ""
+
 #: include/classes/server/CZabbixServer.php:567
 #, c-format
 msgid "Cannot read the response, check connection with the Zabbix server \"%1$s\"."
@@ -4183,6 +4214,10 @@ msgstr ""
 
 #: widgets/piechart/includes/CWidgetFieldDataSet.php:175
 msgid "Cannot set \"Data set aggregation\" when item with type \"Total\" is added to the chart."
+msgstr ""
+
+#: include/classes/db/MysqlDbBackend.php:197
+msgid "Cannot set charset."
 msgstr ""
 
 #: include/classes/api/services/CItemGeneral.php:2478
@@ -7286,6 +7321,10 @@ msgstr ""
 msgid "Detected TimescaleDB license does not support compression. Compression is supported in TimescaleDB Community Edition."
 msgstr ""
 
+#: app/views/administration.housekeeping.edit.php:204
+msgid "Detected license does not support compression. Compression is supported in TimescaleDB Community Edition."
+msgstr ""
+
 #: app/controllers/CControllerPopupTriggerExpr.php:1130
 msgid "Detection period"
 msgstr ""
@@ -8542,6 +8581,10 @@ msgstr ""
 
 #: app/views/host.wizard.edit.php:399
 msgid "Enter a non-secret pre-shared key identity string. Avoid including sensitive data."
+msgstr ""
+
+#: app/views/host.wizard.edit.php:470
+msgid "Enter a unique name that Zabbix components will use to recognize the pre-shared key."
 msgstr ""
 
 #: app/views/host.wizard.edit.php:609
@@ -12197,6 +12240,10 @@ msgstr ""
 msgid "Interval"
 msgstr "Intervallum"
 
+#: widgets/itemcard/includes/CWidgetFieldItemSectionsView.php:76
+msgid "Interval and storage"
+msgstr ""
+
 #: include/classes/api/services/CRole.php:731
 #, c-format
 msgid "Invalid API method \"%2$s\" for user role \"%1$s\"."
@@ -14237,6 +14284,11 @@ msgstr ""
 msgid "Maximum required %1$s database version is %2$s."
 msgstr ""
 
+#: app/partials/administration.system.info.php:221
+#, c-format
+msgid "Maximum required version is %1$s."
+msgstr ""
+
 #: app/controllers/CControllerTimeSelectorUpdate.php:136
 #: include/classes/mvc/CController.php:320
 #: include/classes/widgets/fields/CWidgetFieldTimePeriod.php:203
@@ -14580,6 +14632,12 @@ msgstr ""
 msgid "Minimum required size of PHP post is %1$s (configuration option \"post_max_size\")."
 msgstr ""
 
+#: app/partials/administration.system.info.php:212
+#: app/views/administration.housekeeping.edit.php:183
+#, c-format
+msgid "Minimum required version is %1$s."
+msgstr ""
+
 #: app/views/monitoring.map.view.php:48
 #: include/views/monitoring.sysmap.edit.php:276
 msgid "Minimum severity"
@@ -14812,8 +14870,18 @@ msgstr ""
 msgid "Multiple PROBLEM events"
 msgstr ""
 
+#: app/partials/administration.system.info.php:235
+#, c-format
+msgid "Must be at least %1$s."
+msgstr ""
+
 #: include/classes/validators/CFormValidator.php:340
 msgid "Must be selected."
+msgstr ""
+
+#: app/partials/administration.system.info.php:254
+#, c-format
+msgid "Must not be higher than %1$s."
 msgstr ""
 
 #: jsLoader.php:284
@@ -15584,6 +15652,66 @@ msgstr ""
 #: include/classes/api/services/CUser.php:252
 #, c-format
 msgid "No permissions to call \"%1$s.%2$s\"."
+msgstr ""
+
+#: include/classes/api/services/CConfiguration.php:312
+msgid "No permissions to import discovery rules."
+msgstr ""
+
+#: include/classes/api/services/CConfiguration.php:313
+msgid "No permissions to import graphs."
+msgstr ""
+
+#: include/classes/api/services/CConfiguration.php:314
+msgid "No permissions to import host groups."
+msgstr ""
+
+#: include/classes/api/services/CConfiguration.php:316
+msgid "No permissions to import hosts."
+msgstr ""
+
+#: include/classes/api/services/CConfiguration.php:318
+msgid "No permissions to import images."
+msgstr ""
+
+#: include/classes/api/services/CConfiguration.php:319
+msgid "No permissions to import items."
+msgstr ""
+
+#: include/classes/api/services/CConfiguration.php:320
+msgid "No permissions to import maps."
+msgstr ""
+
+#: include/classes/api/services/CConfiguration.php:321
+msgid "No permissions to import media types."
+msgstr ""
+
+#: include/classes/api/services/CConfiguration.php:324
+msgid "No permissions to import template dashboards."
+msgstr ""
+
+#: include/classes/api/services/CConfiguration.php:315
+msgid "No permissions to import template groups."
+msgstr ""
+
+#: include/classes/api/services/CConfiguration.php:322
+msgid "No permissions to import template links."
+msgstr ""
+
+#: include/classes/api/services/CConfiguration.php:323
+msgid "No permissions to import templates."
+msgstr ""
+
+#: include/classes/api/services/CConfiguration.php:325
+msgid "No permissions to import triggers."
+msgstr ""
+
+#: include/classes/api/services/CConfiguration.php:326
+msgid "No permissions to import value maps."
+msgstr ""
+
+#: include/classes/api/services/CConfiguration.php:317
+msgid "No permissions to import web scenarios."
 msgstr ""
 
 #: app/controllers/CControllerChartsView.php:133
@@ -16786,6 +16914,10 @@ msgstr ""
 
 #: include/classes/setup/CFrontendSetup.php:687
 msgid "PHP curl"
+msgstr ""
+
+#: include/classes/setup/CFrontendSetup.php:733
+msgid "PHP curl extension is missing or outdated."
 msgstr ""
 
 #: include/classes/setup/CFrontendSetup.php:691
@@ -18756,6 +18888,11 @@ msgstr "Válaszkód"
 msgid "Response time"
 msgstr "Válaszidő"
 
+#: include/classes/server/CZabbixServer.php:507
+#, c-format
+msgid "Response timeout of %1$s exceeded when connecting to Zabbix server \"%2$s\"."
+msgstr ""
+
 #: app/controllers/CControllerMediatypeTestSend.php:182
 msgid "Response type: JSON"
 msgstr ""
@@ -20117,6 +20254,18 @@ msgstr ""
 #: app/partials/monitoring.problem.filter.php:263
 #: widgets/problems/includes/WidgetForm.php:106
 msgid "Shortened"
+msgstr ""
+
+#: app/partials/administration.system.info.php:243
+#: app/views/administration.housekeeping.edit.php:187
+#, c-format
+msgid "Should be at least %1$s."
+msgstr ""
+
+#: app/partials/administration.system.info.php:262
+#: app/views/administration.housekeeping.edit.php:197
+#, c-format
+msgid "Should not be higher than %1$s."
 msgstr ""
 
 #: app/partials/monitoring.problem.filter.php:27
@@ -21773,6 +21922,10 @@ msgstr ""
 msgid "The parameter \"%1$s\" is missing from the user attributes."
 msgstr ""
 
+#: app/views/popup.ldap.edit.php:101
+msgid "The previous password was cleared due to a host change. Please enter the new password."
+msgstr ""
+
 #: include/classes/core/CJsonRpc.php:206
 msgid "The received JSON is not a valid JSON-RPC request."
 msgstr ""
@@ -22976,6 +23129,14 @@ msgstr ""
 msgid "Unable to retrieve TimescaleDB version."
 msgstr ""
 
+#: app/views/administration.housekeeping.edit.php:173
+msgid "Unable to retrieve compression support status of TimescaleDB time-series database extension for PostgreSQL."
+msgstr ""
+
+#: app/views/administration.housekeeping.edit.php:178
+msgid "Unable to retrieve version of TimescaleDB time-series database extension for PostgreSQL."
+msgstr ""
+
 #: include/views/mfa.login.php:65
 #, c-format
 msgid "Unable to scan? You can use %1$s secret key to manually configure your authenticator app:"
@@ -23263,6 +23424,11 @@ msgstr ""
 #: app/partials/administration.system.info.php:174
 #, c-format
 msgid "Unsupported %1$s database server version. Must not be higher than %2$s."
+msgstr ""
+
+#: app/partials/administration.system.info.php:206
+#: app/views/administration.housekeeping.edit.php:169
+msgid "Unsupported TimescaleDB time-series database extension for PostgreSQL is used."
 msgstr ""
 
 #: app/views/administration.housekeeping.edit.php:190
@@ -24713,6 +24879,11 @@ msgstr ""
 
 #: include/func.inc.php:1775 jsLoader.php:216
 msgid "Warning message"
+msgstr ""
+
+#: app/partials/administration.system.info.php:243
+#: app/partials/administration.system.info.php:262
+msgid "Warning!"
 msgstr ""
 
 #: app/partials/administration.system.info.php:198
@@ -26298,6 +26469,10 @@ msgstr ""
 
 #: include/classes/validators/CApiInputValidator.php:1985
 msgid "directory cannot be empty"
+msgstr ""
+
+#: include/views/configuration.host.discovery.list.php:340
+msgid "discovery rule"
 msgstr ""
 
 #: app/controllers/CControllerItemMassCheckNow.php:138

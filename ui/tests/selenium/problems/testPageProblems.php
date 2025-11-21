@@ -151,6 +151,11 @@ class testPageProblems extends CWebTest {
 				'expression' => 'last(/Host for Problems Page/trap1)<>"" and last(/Host for Problems Page/trapSQL)<>""',
 				'priority' => TRIGGER_SEVERITY_AVERAGE,
 				'opdata' => 'No popup "],*,a[x=": "],*,a[x="/\|\'/æ㓴🍭🍭'
+			],
+			[
+				'description' => 'Multiple   spaces   in problem name',
+				'expression' => 'last(/Host for Problems Page/trap)=150',
+				'priority' => TRIGGER_SEVERITY_NOT_CLASSIFIED
 			]
 		]);
 
@@ -184,7 +189,8 @@ class testPageProblems extends CWebTest {
 			CDBHelper::setTriggerProblem($trigger_name, TRIGGER_VALUE_TRUE, $clock);
 		}
 		CDBHelper::setTriggerProblem(['Symbols in Item metric', 'Filled opdata with macros', 'XSS code in Item metric',
-				'SQL Injection Item metric', 'Trigger for String problem', 'Two trigger expressions'
+				'SQL Injection Item metric', 'Trigger for String problem', 'Two trigger expressions',
+				'Multiple   spaces   in problem name'
 		]);
 
 		$dayid = CDBHelper::getValue('SELECT eventid FROM problem WHERE name='.zbx_dbstr('Trigger for Age problem 1 day'));
@@ -261,7 +267,7 @@ class testPageProblems extends CWebTest {
 			'Compact view' => ['value' => false],
 			'Show details' => ['value' => false],
 			'Show timeline' => ['value' => true],
-			'Highlight whole row' => ['value' => false, 'enabled' => false]
+			'Highlight whole row' => ['value' => false, 'enabled' => true]
 		];
 
 		foreach ($fields_values as $label => $attributes) {
@@ -404,7 +410,7 @@ class testPageProblems extends CWebTest {
 			foreach (['Show operational data', 'Show details', 'Show timeline'] as $field) {
 				$this->assertTrue($filter_form->getField($field)->isEnabled(!$state));
 			}
-			$this->assertTrue($filter_form->getField('Highlight whole row')->isEnabled($state));
+			$this->assertTrue($filter_form->getField('Highlight whole row')->isEnabled());
 		}
 
 		$this->assertEquals(3, $filter_tab->query('button', ['Save as', 'Apply', 'Reset'])
@@ -651,7 +657,7 @@ class testPageProblems extends CWebTest {
 							'Host' => 'ЗАББИКС Сервер',
 							'Problem' => 'Test trigger to check tag filter on problem page',
 							'Update' => 'Update',
-							'Tags' => 'DatabaseService: abcservice: abcdef'
+							'Tags' => "Database\nService: abc\nservice: abcdef"
 						]
 					]
 				]
@@ -704,7 +710,7 @@ class testPageProblems extends CWebTest {
 							'Host' => 'ЗАББИКС Сервер',
 							'Problem' => 'Test trigger to check tag filter on problem page',
 							'Update' => 'Update',
-							'Tags' => 'DatabaseService: abcservice: abcdef'
+							'Tags' => "Database\nService: abc\nservice: abcdef"
 						]
 					]
 				]
@@ -726,7 +732,7 @@ class testPageProblems extends CWebTest {
 							'Host' => 'ЗАББИКС Сервер',
 							'Problem' => 'Test trigger to check tag filter on problem page',
 							'Update' => 'Update',
-							'Tags' => 'service: abcdefDatabaseService: abc'
+							'Tags' => "service: abcdef\nDatabase\nService: abc"
 						]
 					]
 				]
@@ -921,6 +927,7 @@ class testPageProblems extends CWebTest {
 						]
 					],
 					'result' => [
+						['Problem' => 'Multiple spaces in problem name'],
 						['Problem' => 'Two trigger expressions'],
 						['Problem' => 'Trigger for String problem'],
 						['Problem' => 'SQL Injection Item metric'],
@@ -1123,7 +1130,7 @@ class testPageProblems extends CWebTest {
 						'Acknowledgement status' => 'Unacknowledged',
 						'Host inventory' => [
 							'action' => USER_ACTION_UPDATE, 'index' => 0,
-							'field' => 'Location latitude', 'value' => '56.95387'
+							'field' => 'Location latitude', 'value' => '56.97612'
 						],
 						'Show tags' => 3,
 						'id:tag_name_format_0' => 'Shortened',
@@ -1152,14 +1159,14 @@ class testPageProblems extends CWebTest {
 							'Operational data' => '*UNKNOWN*',
 							'Update' => 'Update',
 							'Actions' => '',
-							'Tags' => 'TagSer: abcDat'
+							'Tags' => "Tag\nSer: abc\nDat"
 						]
 					],
 					'check_tags' => [
 						'Tag' => 'Tag4',
 						'Ser: abc' => 'Service: abc',
 						'Dat' => 'Database',
-						'...' => 'DatabaseService: abcservice: abcdefTag4Tag5: 5'
+						'...' => "Database\nService: abc\nservice: abcdef\nTag4\nTag5: 5"
 					]
 				]
 			],
@@ -1175,13 +1182,13 @@ class testPageProblems extends CWebTest {
 					'result' => [
 						[
 							'Problem' => 'Test trigger to check tag filter on problem page',
-							'Tags' => 'DatabaseService: abc'
+							'Tags' => "Database\nService: abc"
 						]
 					],
 					'check_tags' => [
 						'Database' => 'Database',
 						'Service: abc' => 'Service: abc',
-						'...' => 'DatabaseService: abcservice: abcdefTag4Tag5: 5'
+						'...' => "Database\nService: abc\nservice: abcdef\nTag4\nTag5: 5"
 					]
 				]
 			],
@@ -1202,7 +1209,7 @@ class testPageProblems extends CWebTest {
 					],
 					'check_tags' => [
 						'abc' => 'Service: abc',
-						'...' => 'DatabaseService: abcservice: abcdefTag4Tag5: 5'
+						'...' => "Database\nService: abc\nservice: abcdef\nTag4\nTag5: 5"
 					]
 				]
 			],
@@ -1232,19 +1239,19 @@ class testPageProblems extends CWebTest {
 					'result' => [
 						[
 							'Problem' => 'Fourth test trigger with tag priority',
-							'Tags' => 'Delta: tEta: eGamma: g'
+							'Tags' => "Delta: t\nEta: e\nGamma: g"
 						],
 						[
 							'Problem' => 'Third test trigger with tag priority',
-							'Tags' => 'Kappa: kAlpha: aIota: i'
+							'Tags' => "Kappa: k\nAlpha: a\nIota: i"
 						],
 						[
 							'Problem' => 'Second test trigger with tag priority',
-							'Tags' => 'Beta: bEpsilon: eEta: e'
+							'Tags' => "Beta: b\nEpsilon: e\nEta: e"
 						],
 						[
 							'Problem' => 'First test trigger with tag priority',
-							'Tags' => 'Alpha: aBeta: bDelta: d'
+							'Tags' => "Alpha: a\nBeta: b\nDelta: d"
 						]
 					]
 				]
@@ -1260,19 +1267,19 @@ class testPageProblems extends CWebTest {
 					'result' => [
 						[
 							'Problem' => 'Fourth test trigger with tag priority',
-							'Tags' => 'Delta: tEta: eGamma: g'
+							'Tags' => "Delta: t\nEta: e\nGamma: g"
 						],
 						[
 							'Problem' => 'Third test trigger with tag priority',
-							'Tags' => 'Kappa: kAlpha: aIota: i'
+							'Tags' => "Kappa: k\nAlpha: a\nIota: i"
 						],
 						[
 							'Problem' => 'Second test trigger with tag priority',
-							'Tags' => 'Beta: bEpsilon: eEta: e'
+							'Tags' => "Beta: b\nEpsilon: e\nEta: e"
 						],
 						[
 							'Problem' => 'First test trigger with tag priority',
-							'Tags' => 'Beta: bAlpha: aDelta: d'
+							'Tags' => "Beta: b\nAlpha: a\nDelta: d"
 						]
 					]
 				]
@@ -1288,19 +1295,19 @@ class testPageProblems extends CWebTest {
 					'result' => [
 						[
 							'Problem' => 'Fourth test trigger with tag priority',
-							'Tags' => 'Gamma: gDelta: tEta: e'
+							'Tags' => "Gamma: g\nDelta: t\nEta: e"
 						],
 						[
 							'Problem' => 'Third test trigger with tag priority',
-							'Tags' => 'Kappa: kAlpha: aIota: i'
+							'Tags' => "Kappa: k\nAlpha: a\nIota: i"
 						],
 						[
 							'Problem' => 'Second test trigger with tag priority',
-							'Tags' => 'Beta: bEpsilon: eEta: e'
+							'Tags' => "Beta: b\nEpsilon: e\nEta: e"
 						],
 						[
 							'Problem' => 'First test trigger with tag priority',
-							'Tags' => 'Gamma: gBeta: bAlpha: a'
+							'Tags' => "Gamma: g\nBeta: b\nAlpha: a"
 						]
 					]
 				]
@@ -1381,6 +1388,7 @@ class testPageProblems extends CWebTest {
 						'Show timeline' => false
 					],
 					'result' => [
+						['Problem' => 'Multiple spaces in problem name'],
 						['Problem' => 'Two trigger expressions'],
 						['Problem' => 'Trigger for String problem'],
 						['Problem' => 'SQL Injection Item metric'],
@@ -1418,6 +1426,7 @@ class testPageProblems extends CWebTest {
 						'Show timeline' => false
 					],
 					'result' => [
+						['Problem' => 'Multiple spaces in problem name'],
 						['Problem' => 'Two trigger expressions'],
 						['Problem' => 'Trigger for String problem'],
 						['Problem' => 'SQL Injection Item metric'],
@@ -1446,6 +1455,7 @@ class testPageProblems extends CWebTest {
 						'link' => 'Last 1 day'
 					],
 					'result' => [
+						['Problem' => 'Multiple spaces in problem name'],
 						['Problem' => 'Two trigger expressions'],
 						['Problem' => 'Trigger for String problem'],
 						['Problem' => 'SQL Injection Item metric'],
@@ -1471,6 +1481,7 @@ class testPageProblems extends CWebTest {
 						'Show timeline' => false
 					],
 					'result' => [
+						['Problem' => 'Multiple spaces in problem name'],
 						['Problem' => 'Trigger for tag permissions Oracle'],
 						['Problem' => 'Trigger for tag permissions MySQL'],
 						['Problem' => '1_trigger_Not_classified']
@@ -1562,6 +1573,7 @@ class testPageProblems extends CWebTest {
 						'id:to' => 'now'
 					],
 					'result' => [
+						['Problem' => 'Multiple spaces in problem name'],
 						['Problem' => 'Two trigger expressions'],
 						['Problem' => 'Trigger for String problem'],
 						['Problem' => 'SQL Injection Item metric'],
@@ -1586,6 +1598,7 @@ class testPageProblems extends CWebTest {
 						'id:to' => 'now'
 					],
 					'result' => [
+						['Problem' => 'Multiple spaces in problem name'],
 						['Problem' => 'Two trigger expressions'],
 						['Problem' => 'Trigger for String problem'],
 						['Problem' => 'SQL Injection Item metric'],
@@ -1610,6 +1623,7 @@ class testPageProblems extends CWebTest {
 						'link' => 'Last 1 year'
 					],
 					'result' => [
+						['Problem' => 'Multiple spaces in problem name'],
 						['Problem' => 'Two trigger expressions'],
 						['Problem' => 'Trigger for String problem'],
 						['Problem' => 'SQL Injection Item metric'],
@@ -1620,6 +1634,28 @@ class testPageProblems extends CWebTest {
 						['Problem' => 'Trigger for Age problem'],
 						['Problem' => 'Trigger for Age problem 1 day'],
 						['Problem' => 'Trigger for Age problem 1 month']
+					]
+				]
+			],
+			// #48 Multiple spaces between words in "Problem" field name.
+			[
+				[
+					'fields' => [
+						'Problem' => '   spaces   '
+					],
+					'result' => [
+						['Problem' => 'Multiple spaces in problem name']
+					]
+				]
+			],
+			// #48 Multiple spaces in "Problem" field name.
+			[
+				[
+					'fields' => [
+						'Problem' => '   '
+					],
+					'result' => [
+						['Problem' => 'Multiple spaces in problem name']
 					]
 				]
 			]
@@ -1985,10 +2021,10 @@ class testPageProblems extends CWebTest {
 
 		$this->assertEquals($data_in_column, $opdata_column->getText());
 
-		// TODO: uncomment the lines below and add new screenshot references after ZBX-25103 is fixed.
-//		if (array_key_exists('screen_name', $data)) {
-//			$this->assertScreenshot($opdata_column, $data['screen_name']);
-//		}
+
+		if (array_key_exists('screen_name', $data)) {
+			$this->assertScreenshot($opdata_column, $data['screen_name']);
+		}
 
 		// Check data in popup.
 		foreach ($data['popup rows'] as $i => $popup_row) {

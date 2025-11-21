@@ -1,6 +1,6 @@
 @charset "UTF-8";
 .sidebar .server-name, .dashboard-navigation-tabs .sortable li div span, .host-dashboard-header-navigation .host-dashboard-navigation .host-dashboard-navigation-tabs .sortable li div span, .dashboard-grid-widget-header h4, .dashboard-grid-iterator-header h4, .list-table .action-container .link-action, div.dashboard-widget-hostcard .host-card .sections-header .host-name .link-action, div.dashboard-widget-hostcard .host-card .sections .section .section-name, div.dashboard-widget-hostcard .host-card .sections .section.section-host-groups .host-groups .host-group .host-group-name, div.dashboard-widget-hostcard .host-card .sections .section.section-monitoring .monitoring .monitoring-item .monitoring-item-name, div.dashboard-widget-hostcard .host-card .sections .section.section-monitored-by .section-body, div.dashboard-widget-hostcard .host-card .sections .section.section-templates .templates .template .template-name, div.dashboard-widget-hostcard .host-card .sections .section.section-inventory .section-body .inventory-field-name,
-div.dashboard-widget-hostcard .host-card .sections .section.section-inventory .section-body .inventory-field-value, div.dashboard-widget-itemcard .item-card .sections-header .section-item .item-name .link-action, div.dashboard-widget-itemcard .item-card .sections-header .section-path, div.dashboard-widget-itemcard .item-card .sections-header .section-path .path-element, div.dashboard-widget-itemcard .item-card .sections .section .section-name, div.dashboard-widget-itemcard .item-card .sections .section.section-metrics .center-column, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .center-column, div.dashboard-widget-itemcard .item-card .sections .section.section-metrics .column, div.dashboard-widget-itemcard .item-card .sections .section.section-metrics .right-column, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .column, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .right-column, div.dashboard-widget-itemcard .item-card .sections .section.section-metrics .column .column-header, div.dashboard-widget-itemcard .item-card .sections .section.section-metrics .column .column-value, div.dashboard-widget-itemcard .item-card .sections .section.section-metrics .right-column .column-header, div.dashboard-widget-itemcard .item-card .sections .section.section-metrics .right-column .column-value, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .column .column-header, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .column .column-value, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .right-column .column-header, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .right-column .column-value, div.dashboard-widget-itemcard .item-card .sections .section.section-triggers .triggers .trigger .trigger-name, div.dashboard-widget-itemcard .item-card .sections .section.section-single-parameter .section-body, div.dashboard-widget-map .btn-back-map-container a:focus .btn-back-map .btn-back-map-content, div.dashboard-widget-map .btn-back-map-container a:hover .btn-back-map .btn-back-map-content, form.dashboard-widget-tophosts #list_columns .text, form.dashboard-widget-topitems #list_columns .text, .menu-popup .menu-popup-item, .menu-popup h3, .notif-body h4, .overlay-descr-url, .tag, .overflow-ellipsis, .overflow-ellipsis td:not(.wordbreak, .wordwrap), .overflow-ellipsis th, .overflow-ellipsis th a, .preprocessing-list .preprocessing-list-head .step-on-fail, .totals-list.totals-list-horizontal .count,
+div.dashboard-widget-hostcard .host-card .sections .section.section-inventory .section-body .inventory-field-value, div.dashboard-widget-itemcard .item-card .sections-header .section-item .item-name .link-action, div.dashboard-widget-itemcard .item-card .sections-header .section-path, div.dashboard-widget-itemcard .item-card .sections-header .section-path .path-element, div.dashboard-widget-itemcard .item-card .sections .section .section-name, div.dashboard-widget-itemcard .item-card .sections .section.section-interval-and-storage .center-column, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .center-column, div.dashboard-widget-itemcard .item-card .sections .section.section-interval-and-storage .column, div.dashboard-widget-itemcard .item-card .sections .section.section-interval-and-storage .right-column, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .column, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .right-column, div.dashboard-widget-itemcard .item-card .sections .section.section-interval-and-storage .column .column-header, div.dashboard-widget-itemcard .item-card .sections .section.section-interval-and-storage .column .column-value, div.dashboard-widget-itemcard .item-card .sections .section.section-interval-and-storage .right-column .column-header, div.dashboard-widget-itemcard .item-card .sections .section.section-interval-and-storage .right-column .column-value, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .column .column-header, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .column .column-value, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .right-column .column-header, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .right-column .column-value, div.dashboard-widget-itemcard .item-card .sections .section.section-triggers .triggers .trigger .trigger-name, div.dashboard-widget-itemcard .item-card .sections .section.section-single-parameter .section-body, div.dashboard-widget-map .btn-back-map-container a:focus .btn-back-map .btn-back-map-content, div.dashboard-widget-map .btn-back-map-container a:hover .btn-back-map .btn-back-map-content, form.dashboard-widget-tophosts #list_columns .text, form.dashboard-widget-topitems #list_columns .text, .menu-popup .menu-popup-item, .menu-popup h3, .notif-body h4, .overlay-descr-url, .tag, .overflow-ellipsis, .overflow-ellipsis td:not(.wordbreak, .wordwrap), .overflow-ellipsis th, .overflow-ellipsis th a, .preprocessing-list .preprocessing-list-head .step-on-fail, .totals-list.totals-list-horizontal .count,
 .totals-list.totals-list-horizontal .name {
   overflow: hidden;
   text-overflow: ellipsis;
@@ -1424,7 +1424,8 @@ button {
 .btn-tag {
   height: auto;
   outline: none;
-  border: none; }
+  border: none;
+  box-sizing: content-box; }
   .btn-tag:hover {
     text-decoration: underline;
     background-color: #768d99; }
@@ -2188,19 +2189,12 @@ button {
 .dashboard-grid-iterator-contents.is-loading::before {
   margin: calc(.25rem + 1px); }
 
-.dashboard-list .status-green {
-  background-color: #2f9f5e;
-  border-color: #2f9f5e; }
-.dashboard-list .status-yellow {
-  background-color: #e79e0b;
-  border-color: #e79e0b; }
-
-.overlay-dialogue.modal-widget-configuration {
+.overlay-dialogue.modal.modal-widget-configuration {
   --modal-width: auto;
   --modal-max-width: calc(100vw - 20px);
   --modal-min-width: 650px;
   box-sizing: border-box; }
-  .overlay-dialogue.modal-widget-configuration .overlay-dialogue-body {
+  .overlay-dialogue.modal.modal-widget-configuration .overlay-dialogue-body {
     overflow-x: auto; }
 
 .dashboard-widget-form {
@@ -2549,13 +2543,14 @@ div[data-field-type="set"].has-error {
   .list-table.compact-view td {
     padding-top: 2px;
     padding-bottom: 2px;
-    border-bottom: 0;
-    box-shadow: inset 0 -1px 0 0 rgba(31, 44, 51, 0.1);
     white-space: nowrap; }
     .list-table.compact-view td .rel-container span {
       margin: 0; }
     .list-table.compact-view td.nowrap {
       text-overflow: clip; }
+  .list-table.compact-view td, .list-table.has-highlighted-rows td {
+    border-bottom: 0;
+    box-shadow: inset 0 -1px 0 0 rgba(31, 44, 51, 0.1); }
   .list-table.no-data tbody tr td {
     height: auto;
     color: #768d99;
@@ -2579,10 +2574,7 @@ div[data-field-type="set"].has-error {
 .list-table .btn-small,
 .list-table .problem-icon-link,
 .list-table .status-container,
-.list-table .entity-count,
-.list-table .tag {
-  margin-top: 1px;
-  margin-bottom: 1px;
+.list-table .entity-count {
   vertical-align: top; }
 
 .list-table thead th.column-tags-1 {
@@ -2618,6 +2610,15 @@ div[data-field-type="set"].has-error {
   @media screen and (min-width: 1600px) {
     .list-table thead th.column-tags-3 {
       width: 452px; } }
+@media screen and (min-width: 1200px) {
+  .list-table .tags-wrapper {
+    max-width: 266px; } }
+@media screen and (min-width: 1400px) {
+  .list-table .tags-wrapper {
+    max-width: 359px; } }
+@media screen and (min-width: 1600px) {
+  .list-table .tags-wrapper {
+    max-width: 452px; } }
 .list-table.compact-view .tag {
   max-width: 40px; }
   @media screen and (min-width: 1200px) {
@@ -2687,23 +2688,33 @@ div[data-field-type="set"].has-error {
     font-size: 12px; }
 .list-table.compact-view .problem-nested:not([class*='flh-']):not(.row-selected) td,
 .list-table.compact-view .problem-nested:not([class*='flh-']):not(.row-selected) .timeline-axis,
-.list-table.compact-view .problem-nested:not([class*='flh-']):not(.row-selected) .timeline-td {
+.list-table.compact-view .problem-nested:not([class*='flh-']):not(.row-selected) .timeline-td, .list-table.has-highlighted-rows .problem-nested:not([class*='flh-']):not(.row-selected) td,
+.list-table.has-highlighted-rows .problem-nested:not([class*='flh-']):not(.row-selected) .timeline-axis,
+.list-table.has-highlighted-rows .problem-nested:not([class*='flh-']):not(.row-selected) .timeline-td {
   border-bottom-style: none; }
-.list-table.compact-view [class*='flh-']:not(.row-selected):not(:hover) a,
+.list-table.compact-view [class*='flh-']:not(.row-selected):not(:hover) a:not(.green):not(.green.btn-icon:not([disabled])):not(.green.btn-link:not([disabled])):not(.green.link-action:not(:hover):not(:focus)):not(.green.link-alt:not(:hover):not(:focus)),
 .list-table.compact-view [class*='flh-']:not(.row-selected):not(:hover) td,
-.list-table.compact-view [class*='flh-']:not(.row-selected):not(:hover) sup {
+.list-table.compact-view [class*='flh-']:not(.row-selected):not(:hover) sup, .list-table.has-highlighted-rows [class*='flh-']:not(.row-selected):not(:hover) a:not(.green):not(.green.btn-icon:not([disabled])):not(.green.btn-link:not([disabled])):not(.green.link-action:not(:hover):not(:focus)):not(.green.link-alt:not(:hover):not(:focus)),
+.list-table.has-highlighted-rows [class*='flh-']:not(.row-selected):not(:hover) td,
+.list-table.has-highlighted-rows [class*='flh-']:not(.row-selected):not(:hover) sup {
   color: #1f2c33; }
-.list-table.compact-view [class*='flh-']:not(.row-selected):not(:hover) .link-alt {
-  border-bottom-color: #1f2c33; }
-.list-table.compact-view [class*='flh-']:not(.row-selected):not(:hover) .tag {
+.list-table.compact-view [class*='flh-']:not(.row-selected):not(:hover) .tag, .list-table.has-highlighted-rows [class*='flh-']:not(.row-selected):not(:hover) .tag {
   color: #ffffff;
   background-color: rgba(31, 44, 51, 0.5); }
 .list-table.compact-view [class*='flh-']:not(.row-selected):not(:hover) .btn-icon,
-.list-table.compact-view [class*='flh-']:not(.row-selected):not(:hover) .icon {
+.list-table.compact-view [class*='flh-']:not(.row-selected):not(:hover) .icon, .list-table.has-highlighted-rows [class*='flh-']:not(.row-selected):not(:hover) .btn-icon,
+.list-table.has-highlighted-rows [class*='flh-']:not(.row-selected):not(:hover) .icon {
   background-color: #ffffff; }
-.list-table.compact-view [class*='flh-']:not(.row-selected):not(:hover) .entity-count {
-  margin-top: 0;
-  margin-bottom: 0;
+.list-table.has-highlighted-rows .problem-unack-fg,
+.list-table.has-highlighted-rows .problem-ack-fg {
+  color: #cc0000; }
+.list-table.has-highlighted-rows .ok-unack-fg,
+.list-table.has-highlighted-rows .ok-ack-fg {
+  color: #009900; }
+.list-table.has-highlighted-rows .link-alt:active, .list-table.has-highlighted-rows .link-alt:not(:hover):not(:focus) {
+  color: #1f2c33;
+  border-bottom-color: #1f2c33; }
+.list-table.has-highlighted-rows .entity-count {
   border: 1px solid #ffffff; }
 
 .no-data-message {
@@ -2738,26 +2749,47 @@ div[data-field-type="set"].has-error {
     line-height: 18px; }
   .markdown h1:not(:first-child), .modal-popup-host-wizard .formated-text h1:not(:first-child), .markdown h2:not(:first-child), .modal-popup-host-wizard .formated-text h2:not(:first-child), .markdown h3:not(:first-child), .modal-popup-host-wizard .formated-text h3:not(:first-child), .markdown h4:not(:first-child), .modal-popup-host-wizard .formated-text h4:not(:first-child), .markdown h5:not(:first-child), .modal-popup-host-wizard .formated-text h5:not(:first-child) {
     margin-top: 24px; }
-  .markdown ol, .modal-popup-host-wizard .formated-text ol, .markdown ul, .modal-popup-host-wizard .formated-text ul, .markdown p, .modal-popup-host-wizard .formated-text p, .markdown pre, .modal-popup-host-wizard .formated-text pre {
+  .markdown ol, .modal-popup-host-wizard .formated-text ol, .markdown ul, .modal-popup-host-wizard .formated-text ul, .markdown p, .modal-popup-host-wizard .formated-text p, .markdown pre, .modal-popup-host-wizard .formated-text pre, .markdown blockquote, .modal-popup-host-wizard .formated-text blockquote {
     margin-top: 16px;
     margin-bottom: 0; }
-    .markdown ol:first-child, .modal-popup-host-wizard .formated-text ol:first-child, .markdown ul:first-child, .modal-popup-host-wizard .formated-text ul:first-child, .markdown p:first-child, .modal-popup-host-wizard .formated-text p:first-child, .markdown pre:first-child, .modal-popup-host-wizard .formated-text pre:first-child {
+    .markdown ol:first-child, .modal-popup-host-wizard .formated-text ol:first-child, .markdown ul:first-child, .modal-popup-host-wizard .formated-text ul:first-child, .markdown p:first-child, .modal-popup-host-wizard .formated-text p:first-child, .markdown pre:first-child, .modal-popup-host-wizard .formated-text pre:first-child, .markdown blockquote:first-child, .modal-popup-host-wizard .formated-text blockquote:first-child {
+      margin-top: 0; }
+    .markdown ol ol, .modal-popup-host-wizard .formated-text ol ol, .markdown ol ul, .modal-popup-host-wizard .formated-text ol ul, .markdown ul ol, .modal-popup-host-wizard .formated-text ul ol, .markdown ul ul, .modal-popup-host-wizard .formated-text ul ul, .markdown p ol, .modal-popup-host-wizard .formated-text p ol, .markdown p ul, .modal-popup-host-wizard .formated-text p ul, .markdown pre ol, .modal-popup-host-wizard .formated-text pre ol, .markdown pre ul, .modal-popup-host-wizard .formated-text pre ul, .markdown blockquote ol, .modal-popup-host-wizard .formated-text blockquote ol, .markdown blockquote ul, .modal-popup-host-wizard .formated-text blockquote ul {
       margin-top: 0; }
   .markdown h5 + *, .modal-popup-host-wizard .formated-text h5 + * {
     margin-top: 0; }
+  .markdown ul, .modal-popup-host-wizard .formated-text ul {
+    list-style-type: disc; }
+  .markdown :is(ol, ul) ul, .modal-popup-host-wizard .formated-text :is(ol, ul) ul {
+    list-style-type: circle; }
+  .markdown :is(ol, ul) :is(ol, ul) ul, .modal-popup-host-wizard .formated-text :is(ol, ul) :is(ol, ul) ul {
+    list-style-type: square; }
+  .markdown ol, .modal-popup-host-wizard .formated-text ol {
+    list-style-type: decimal; }
+  .markdown :is(ol, ul) ol, .modal-popup-host-wizard .formated-text :is(ol, ul) ol {
+    list-style-type: lower-latin; }
+  .markdown :is(ol, ul) :is(ol, ul) ol, .modal-popup-host-wizard .formated-text :is(ol, ul) :is(ol, ul) ol {
+    list-style-type: lower-roman; }
   .markdown ol, .modal-popup-host-wizard .formated-text ol, .markdown ul, .modal-popup-host-wizard .formated-text ul {
-    list-style-type: initial;
     list-style-position: outside;
     padding-left: 2em; }
     .markdown ol li, .modal-popup-host-wizard .formated-text ol li, .markdown ul li, .modal-popup-host-wizard .formated-text ul li {
       padding-bottom: 0; }
   .markdown p, .modal-popup-host-wizard .formated-text p, .markdown pre, .modal-popup-host-wizard .formated-text pre {
     overflow: hidden; }
+  .markdown code, .modal-popup-host-wizard .formated-text code {
+    font-family: "Courier New", Courier, monospace;
+    font-size: 1em; }
   .markdown pre, .modal-popup-host-wizard .formated-text pre {
     padding: 5px;
     background: #f8f8f8;
     border: 1px solid #acbbc2;
     border-radius: 2px; }
+  .markdown blockquote, .modal-popup-host-wizard .formated-text blockquote {
+    margin-block-start: 1em;
+    margin-block-end: 1em;
+    margin-inline-start: 40px;
+    margin-inline-end: 40px; }
 
 .menu-main > li {
   line-height: 16px; }
@@ -3614,6 +3646,11 @@ section {
     padding: 10px 10px 0; }
     .service-info .service-info-grid:last-of-type {
       padding-bottom: 10px; }
+    .service-info .service-info-grid .tags-wrapper {
+      min-width: 1%; }
+      .service-info .service-info-grid .tags-wrapper .btn-icon {
+        height: 18px;
+        width: 18px; }
   .service-info .service-info-label::after {
     content: ':'; }
   .service-info .service-info-value .service-info-value-sla {
@@ -5122,48 +5159,48 @@ div.dashboard-widget-itemcard .item-card {
         grid-template-columns: 1fr;
         word-break: break-word;
         --line-clamp: 2; }
-      div.dashboard-widget-itemcard .item-card .sections .section.section-metrics, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data {
+      div.dashboard-widget-itemcard .item-card .sections .section.section-interval-and-storage, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data {
         grid-template-columns: repeat(3, 1fr);
         column-gap: 10px; }
-        div.dashboard-widget-itemcard .item-card .sections .section.section-metrics .center-column, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .center-column {
+        div.dashboard-widget-itemcard .item-card .sections .section.section-interval-and-storage .center-column, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .center-column {
           display: flex;
           justify-content: center; }
-        div.dashboard-widget-itemcard .item-card .sections .section.section-metrics .column, div.dashboard-widget-itemcard .item-card .sections .section.section-metrics .right-column, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .column, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .right-column {
+        div.dashboard-widget-itemcard .item-card .sections .section.section-interval-and-storage .column, div.dashboard-widget-itemcard .item-card .sections .section.section-interval-and-storage .right-column, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .column, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .right-column {
           display: flex;
           flex-direction: column;
           gap: 5px; }
-          div.dashboard-widget-itemcard .item-card .sections .section.section-metrics .column .column-header:not(a), div.dashboard-widget-itemcard .item-card .sections .section.section-metrics .right-column .column-header:not(a), div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .column .column-header:not(a), div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .right-column .column-header:not(a) {
+          div.dashboard-widget-itemcard .item-card .sections .section.section-interval-and-storage .column .column-header:not(a), div.dashboard-widget-itemcard .item-card .sections .section.section-interval-and-storage .right-column .column-header:not(a), div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .column .column-header:not(a), div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .right-column .column-header:not(a) {
             color: #768d99; }
-          div.dashboard-widget-itemcard .item-card .sections .section.section-metrics .column .column-header, div.dashboard-widget-itemcard .item-card .sections .section.section-metrics .column .column-value, div.dashboard-widget-itemcard .item-card .sections .section.section-metrics .right-column .column-header, div.dashboard-widget-itemcard .item-card .sections .section.section-metrics .right-column .column-value, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .column .column-header, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .column .column-value, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .right-column .column-header, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .right-column .column-value {
+          div.dashboard-widget-itemcard .item-card .sections .section.section-interval-and-storage .column .column-header, div.dashboard-widget-itemcard .item-card .sections .section.section-interval-and-storage .column .column-value, div.dashboard-widget-itemcard .item-card .sections .section.section-interval-and-storage .right-column .column-header, div.dashboard-widget-itemcard .item-card .sections .section.section-interval-and-storage .right-column .column-value, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .column .column-header, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .column .column-value, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .right-column .column-header, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .right-column .column-value {
             display: block;
             position: relative;
             height: 17px;
             line-height: 17px;
             box-sizing: border-box; }
-          div.dashboard-widget-itemcard .item-card .sections .section.section-metrics .column .column-value .btn-icon, div.dashboard-widget-itemcard .item-card .sections .section.section-metrics .right-column .column-value .btn-icon, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .column .column-value .btn-icon, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .right-column .column-value .btn-icon {
+          div.dashboard-widget-itemcard .item-card .sections .section.section-interval-and-storage .column .column-value .btn-icon, div.dashboard-widget-itemcard .item-card .sections .section.section-interval-and-storage .right-column .column-value .btn-icon, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .column .column-value .btn-icon, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .right-column .column-value .btn-icon {
             height: 14px;
             margin-top: 2px; }
-          div.dashboard-widget-itemcard .item-card .sections .section.section-metrics .column .column-value z-sparkline, div.dashboard-widget-itemcard .item-card .sections .section.section-metrics .right-column .column-value z-sparkline, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .column .column-value z-sparkline, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .right-column .column-value z-sparkline {
+          div.dashboard-widget-itemcard .item-card .sections .section.section-interval-and-storage .column .column-value z-sparkline, div.dashboard-widget-itemcard .item-card .sections .section.section-interval-and-storage .right-column .column-value z-sparkline, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .column .column-value z-sparkline, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .right-column .column-value z-sparkline {
             position: absolute;
             top: 0;
             right: 0;
             left: 0;
             height: 17px; }
-        div.dashboard-widget-itemcard .item-card .sections .section.section-metrics .right-column, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .right-column {
+        div.dashboard-widget-itemcard .item-card .sections .section.section-interval-and-storage .right-column, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .right-column {
           align-items: flex-end;
           text-align: right; }
-          div.dashboard-widget-itemcard .item-card .sections .section.section-metrics .right-column .column-header, div.dashboard-widget-itemcard .item-card .sections .section.section-metrics .right-column .column-value, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .right-column .column-header, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .right-column .column-value {
+          div.dashboard-widget-itemcard .item-card .sections .section.section-interval-and-storage .right-column .column-header, div.dashboard-widget-itemcard .item-card .sections .section.section-interval-and-storage .right-column .column-value, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .right-column .column-header, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .right-column .column-value {
             width: 100%; }
-          div.dashboard-widget-itemcard .item-card .sections .section.section-metrics .right-column .btn-thumbnail, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .right-column .btn-thumbnail {
+          div.dashboard-widget-itemcard .item-card .sections .section.section-interval-and-storage .right-column .btn-thumbnail, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .right-column .btn-thumbnail {
             overflow: hidden; }
-            div.dashboard-widget-itemcard .item-card .sections .section.section-metrics .right-column .btn-thumbnail:not(.btn-link), div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .right-column .btn-thumbnail:not(.btn-link) {
+            div.dashboard-widget-itemcard .item-card .sections .section.section-interval-and-storage .right-column .btn-thumbnail:not(.btn-link), div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .right-column .btn-thumbnail:not(.btn-link) {
               width: 100px;
               height: 53px;
               background: transparent var(--thumbnail) no-repeat center;
               background-size: cover;
               border-color: transparent;
               text-indent: -9999px; }
-              div.dashboard-widget-itemcard .item-card .sections .section.section-metrics .right-column .btn-thumbnail:not(.btn-link):not(.is-loading), div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .right-column .btn-thumbnail:not(.btn-link):not(.is-loading) {
+              div.dashboard-widget-itemcard .item-card .sections .section.section-interval-and-storage .right-column .btn-thumbnail:not(.btn-link):not(.is-loading), div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .right-column .btn-thumbnail:not(.btn-link):not(.is-loading) {
                 border: 1px solid #dfe4e7;
                 border-radius: 3px; }
       div.dashboard-widget-itemcard .item-card .sections .section.section-triggers .triggers {
@@ -5482,7 +5519,7 @@ div.dashboard-widget-navtree .treeview {
 form.dashboard-widget-piechart {
   max-width: 1330px;
   min-width: 1120px;
-  width: 100vw; }
+  width: min(100vw - 42px, calc(var(--modal-max-width) - 22px)); }
   form.dashboard-widget-piechart .pie-chart-widget-config-tabs {
     grid-column: 1 / -1; }
   form.dashboard-widget-piechart .pie-chart-widget-config-tabs > .tabs-nav {
@@ -5619,7 +5656,7 @@ div.dashboard-widget-problemsbysv .list-table tr[data-hostgroupid] {
 form.dashboard-widget-svggraph {
   max-width: 1330px;
   min-width: 1120px;
-  width: 100vw; }
+  width: min(100vw - 42px, calc(var(--modal-max-width) - 22px)); }
   form.dashboard-widget-svggraph .graph-widget-config-tabs {
     grid-column: 1 / -1; }
   form.dashboard-widget-svggraph .graph-widget-config-tabs > .tabs-nav {
@@ -6699,6 +6736,15 @@ form.is-loading {
   position: relative; }
   .table-forms-separator .wordbreak {
     white-space: normal; }
+  @media screen and (min-width: 1200px) {
+    .table-forms-separator .tags-wrapper {
+      max-width: 266px; } }
+  @media screen and (min-width: 1400px) {
+    .table-forms-separator .tags-wrapper {
+      max-width: 359px; } }
+  @media screen and (min-width: 1600px) {
+    .table-forms-separator .tags-wrapper {
+      max-width: 452px; } }
 
 .border-left {
   border-left: 1px solid #ebeef0; }
@@ -6782,9 +6828,6 @@ select {
   select[readonly] {
     color: #1f2c33 !important;
     pointer-events: none; }
-
-div .overlay-dialogue.wordbreak {
-  white-space: normal; }
 
 .form-fields-inline label {
   margin: 0 8px 0 3px; }
@@ -7255,8 +7298,6 @@ z-select[disabled] .focusable, input[disabled], textarea[disabled], select optio
   border: 1px solid #ccd5d9;
   border-bottom-color: #c9d3d7;
   box-shadow: 0 4px 20px 0 rgba(118, 141, 153, 0.5); }
-  .overlay-dialogue .wordbreak {
-    white-space: normal; }
   .overlay-dialogue .overlay-dialogue-header {
     margin: -8px -10px 6px -10px;
     padding: 8px 10px;
@@ -7720,16 +7761,26 @@ z-select[disabled] .focusable, input[disabled], textarea[disabled], select optio
   background-size: 100% 40px, 100% 40px, 100% 4px, 100% 4px;
   background-attachment: local, local, scroll, scroll; }
 
+.tags-wrapper {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px 3px; }
+  .tags-wrapper .tag {
+    margin-top: 1px;
+    margin-bottom: 1px; }
+  .tags-wrapper.form-field .tag {
+    margin-top: 4px;
+    margin-bottom: 4px; }
+
 .tag {
   display: inline-block;
   color: #ffffff;
   background-color: #768d99;
-  margin: 1px 3px 1px 0;
   padding: 2px 3px;
   line-height: 1em;
-  max-width: 133px;
   vertical-align: middle;
-  border-radius: 2px; }
+  border-radius: 2px;
+  box-sizing: border-box; }
   .tag a.link-action {
     color: inherit !important;
     border-bottom: none; }
@@ -7751,15 +7802,6 @@ z-select[disabled] .focusable, input[disabled], textarea[disabled], select optio
 
 .yellow-bg {
   background-color: #ffc859; }
-
-td[class] + td.na-bg,
-td[class] + td.normal-bg,
-td[class] + td.info-bg,
-td[class] + td.average-bg,
-td[class] + td.warning-bg,
-td[class] + td.high-bg,
-td[class] + td.disaster-bg {
-  border-left: 1px dotted #ebeef0; }
 
 .na-bg {
   color: #2a353a;

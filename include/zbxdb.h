@@ -235,11 +235,22 @@ struct zbx_db_version_info_t
 	int			trends_compressed_chunks;
 };
 
+typedef enum
+{
+	ZBX_DB_MASK_QUERIES,
+	ZBX_DB_DONT_MASK_QUERIES
+}
+zbx_db_query_mask_t;
+
+void	zbx_dbms_version_info_extract(struct zbx_db_version_info_t *version_info);
+
 #ifdef HAVE_POSTGRESQL
 void	zbx_tsdb_info_extract(struct zbx_db_version_info_t *version_info);
 void	zbx_tsdb_set_compression_availability(int compression_availabile);
 int	zbx_tsdb_get_compression_availability(void);
 void	zbx_tsdb_extract_compressed_chunk_flags(struct zbx_db_version_info_t *version_info);
+#elif defined(HAVE_MYSQL)
+int	zbx_mariadb_fork_get(void);
 #endif
 
 int	zbx_db_version_check(const char *database, zbx_uint32_t current_version, zbx_uint32_t min_version,
@@ -410,7 +421,8 @@ void	zbx_db_check_character_set(void);
 typedef enum
 {
 	ZBX_DB_LARGE_QUERY_UI64,
-	ZBX_DB_LARGE_QUERY_STR
+	ZBX_DB_LARGE_QUERY_STR,
+	ZBX_DB_LARGE_QUERY
 }
 zbx_db_large_query_type_t;
 
@@ -442,6 +454,8 @@ void	zbx_dbconn_large_query_prepare_uint(zbx_db_large_query_t *query, zbx_dbconn
 		size_t *sql_alloc, size_t *sql_offset, const char *field, const zbx_vector_uint64_t *ids);
 void	zbx_dbconn_large_query_prepare_str(zbx_db_large_query_t *query, zbx_dbconn_t *db, char **sql,
 		size_t *sql_alloc, size_t *sql_offset, const char *field, const zbx_vector_str_t *ids);
+void	zbx_dbconn_large_query_prepare(zbx_db_large_query_t *query, zbx_dbconn_t *db, char **sql, size_t *sql_alloc,
+		size_t *sql_offset);
 zbx_db_row_t	zbx_db_large_query_fetch(zbx_db_large_query_t *query);
 void	zbx_db_large_query_clear(zbx_db_large_query_t *query);
 void	zbx_dbconn_large_query_append_sql(zbx_db_large_query_t *query, const char *sql);
@@ -489,6 +503,11 @@ void	zbx_db_large_query_prepare_uint(zbx_db_large_query_t *query, char **sql,
 		size_t *sql_alloc, size_t *sql_offset, const char *field, const zbx_vector_uint64_t *ids);
 void	zbx_db_large_query_prepare_str(zbx_db_large_query_t *query, char **sql,
 		size_t *sql_alloc, size_t *sql_offset, const char *field, const zbx_vector_str_t *ids);
+void	zbx_db_large_query_prepare(zbx_db_large_query_t *query, char **sql, size_t *sql_alloc, size_t *sql_offset);
 void	zbx_db_large_query_append_sql(zbx_db_large_query_t *query, const char *sql);
+void	zbx_db_clear_idcache(void);
+
+zbx_db_query_mask_t	zbx_db_set_log_masked_values(zbx_db_query_mask_t flag);
+zbx_db_query_mask_t	zbx_db_get_log_masked_values(void);
 
 #endif

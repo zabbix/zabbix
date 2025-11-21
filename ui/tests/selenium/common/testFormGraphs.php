@@ -94,7 +94,7 @@ class testFormGraphs extends CWebTest {
 				[
 					'check_defaults' => true,
 					'set_fields' => [
-						'Graph type' => 'Normal'
+						'Graph type' => CFormElement::RELOADABLE_FILL('Normal')
 					],
 					'check_fields' => [
 						'id:name' => ['value' => '', 'maxlength' => 128],
@@ -129,7 +129,7 @@ class testFormGraphs extends CWebTest {
 			[
 				[
 					'set_fields' => [
-						'Graph type' => 'Stacked'
+						'Graph type' => CFormElement::RELOADABLE_FILL('Stacked')
 					],
 					'check_fields' => [
 						'id:name' => ['value' => ''],
@@ -163,7 +163,7 @@ class testFormGraphs extends CWebTest {
 			[
 				[
 					'set_fields' => [
-						'Graph type' => 'Pie'
+						'Graph type' => CFormElement::RELOADABLE_FILL('Pie')
 					],
 					'check_fields' => [
 						'id:name' => ['value' => ''],
@@ -196,7 +196,7 @@ class testFormGraphs extends CWebTest {
 			[
 				[
 					'set_fields' => [
-						'Graph type' => 'Exploded'
+						'Graph type' => CFormElement::RELOADABLE_FILL('Exploded')
 					],
 					'check_fields' => [
 						'id:name' => ['value' => ''],
@@ -214,8 +214,8 @@ class testFormGraphs extends CWebTest {
 						'id:ymax_type' => ['exists' => true, 'visible' => false], // Y axis MAX value dropdown.
 						'id:yaxismin' => ['exists' => true, 'visible' => false], // Y axis MIN fixed value input.
 						'id:yaxismax' => ['exists' => true, 'visible' => false], // Y axis MAX fixed value input.
-						'id:ymin_itemid' =>  ['visible' => false], // Y axis MIN item input.
-						'id:ymax_itemid' =>  ['visible' => false], // Y axis MAX item input.
+						'id:ymin_itemid' => ['visible' => false], // Y axis MIN item input.
+						'id:ymax_itemid' => ['visible' => false], // Y axis MAX item input.
 						'id:show_3d' => ['value' => false],
 						'id:items-table' => ['visible' => true]
 					],
@@ -236,8 +236,8 @@ class testFormGraphs extends CWebTest {
 						'id:visible_percent_right' => true // Percentile line (right) checkbox.
 					],
 					'check_fields' => [
-						'id:percent_left' =>  ['value' => 0, 'visible' => true], // Percentile line (left) input.
-						'id:percent_right' =>  ['value' => 0, 'visible' => true] // Percentile line (right) input.
+						'id:percent_left' => ['value' => 0, 'visible' => true], // Percentile line (left) input.
+						'id:percent_right' => ['value' => 0, 'visible' => true] // Percentile line (right) input.
 					]
 				]
 			],
@@ -249,8 +249,8 @@ class testFormGraphs extends CWebTest {
 						'id:ymax_type' => CFormElement::RELOADABLE_FILL('Fixed') // Y axis MAX value dropdown.
 					],
 					'check_fields' => [
-						'id:yaxismin' =>  ['value' => 0, 'visible' => true], // Y axis MIN fixed value input.
-						'id:yaxismax' =>  ['value' => 100, 'visible' => true] // Y axis MAX fixed value input.
+						'id:yaxismin' => ['value' => 0, 'visible' => true], // Y axis MIN fixed value input.
+						'id:yaxismax' => ['value' => 100, 'visible' => true] // Y axis MAX fixed value input.
 					]
 				]
 			],
@@ -262,8 +262,8 @@ class testFormGraphs extends CWebTest {
 						'id:ymax_type' => CFormElement::RELOADABLE_FILL('Item') // Y axis MAX value dropdown.
 					],
 					'check_fields' => [
-						'id:ymin_itemid' =>  ['value' => '', 'visible' => true], // Y axis MIN item input.
-						'id:ymax_itemid' =>  ['value' => '', 'visible' => true] // Y axis MAX item input.
+						'id:ymin_itemid' => ['value' => '', 'visible' => true], // Y axis MIN item input.
+						'id:ymax_itemid' => ['value' => '', 'visible' => true] // Y axis MAX item input.
 					]
 				]
 			]
@@ -275,7 +275,7 @@ class testFormGraphs extends CWebTest {
 		$object = 'Graph'.$this->getGraphSuffix();
 		$this->query('button', 'Create '.lcfirst($object))->waitUntilClickable()->one()->click();
 		$this->page->assertTitle('Configuration of '.lcfirst($object).'s');
-		$dialog = COverlayDialogElement::find()->one();
+		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
 		$form = $dialog->query('id', $this->formid)->waitUntilVisible()->asForm()->one();
 
 		// Check default fields only for first case.
@@ -865,7 +865,7 @@ class testFormGraphs extends CWebTest {
 			foreach ($data['yaxis_items'] as $y => $yaxis_item) {
 				if ($this->prototype) {
 					$form->query('xpath:.//button[@id="yaxis_'.$y.'_prototype"]')->waitUntilClickable()->one()->click();
-					$yaxis_items_dialog  = COverlayDialogElement::find()->all()->waitUntilReady()->last();
+					$yaxis_items_dialog = COverlayDialogElement::find()->all()->waitUntilReady()->last();
 					$yaxis_items_dialog->query('link', $yaxis_item)->waitUntilClickable()->one()->click();
 					$yaxis_items_dialog->waitUntilNotPresent();
 				}
@@ -972,8 +972,8 @@ class testFormGraphs extends CWebTest {
 
 				// Check lines color.
 				if (array_key_exists('color', $item)) {
-					$this->assertEquals($item['color'],
-							$item_row->query('xpath:.//z-color-picker')->asColorPicker()->one()->getValue()
+					$this->assertEquals($item['color'], $item_row->query('xpath:.//z-color-picker')->asColorPicker()
+							->one()->getValue()
 					);
 				}
 			}
@@ -1122,8 +1122,8 @@ class testFormGraphs extends CWebTest {
 			}
 
 			// Check lines color.
-			$this->assertEquals($data['items'][0]['color'],
-					$item_row->query('xpath:.//z-color-picker')->asColorPicker()->one()->getValue()
+			$this->assertEquals($data['items'][0]['color'], $item_row->query('xpath:.//z-color-picker')->asColorPicker()
+					->one()->getValue()
 			);
 		}
 	}
@@ -1238,8 +1238,8 @@ class testFormGraphs extends CWebTest {
 			);
 		}
 
-		$this->assertEquals($data['expected']['color'],
-				$item_row->query('xpath:.//z-color-picker')->asColorPicker()->one()->getValue()
+		$this->assertEquals($data['expected']['color'], $item_row->query('xpath:.//z-color-picker')->asColorPicker()
+				->one()->getValue()
 		);
 	}
 
@@ -1288,7 +1288,7 @@ class testFormGraphs extends CWebTest {
 		$item_dialog = COverlayDialogElement::find()->all()->waitUntilReady()->last();
 
 		// Assert that text items are not present in dialog.
-		foreach ($data['items'] as  $item) {
+		foreach ($data['items'] as $item) {
 			$this->assertFalse($item_dialog->query('link', $item)->exists());
 		}
 

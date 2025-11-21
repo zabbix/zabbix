@@ -39,7 +39,7 @@ class testPageServicesServices extends CWebTest {
 
 	const EDIT = true;
 
-	const SERVICE_COUNT = 20;
+	const SERVICE_COUNT = 21;
 
 	const LAYOUT_PARENT = 'Parent for 2 levels of child services';
 	const LAYOUT_CHILD = 'Child service with child service';
@@ -403,6 +403,28 @@ class testPageServicesServices extends CWebTest {
 					]
 				]
 			],
+			// Multiple spaces between words in the filter.
+			[
+				[
+					'filter' => [
+						'Name' => '   spaces   '
+					],
+					'result' => [
+						'Multiple spaces in service name'
+					]
+				]
+			],
+			// Multiple spaces in the filter.
+			[
+				[
+					'filter' => [
+						'Name' => '   '
+					],
+					'result' => [
+						'Multiple spaces in service name'
+					]
+				]
+			],
 			// Evaluation: And/Or.
 			[
 				[
@@ -600,6 +622,8 @@ class testPageServicesServices extends CWebTest {
 		// Reset filter in case if some filtering remained before ongoing test case.
 		$filter_form->query('button:Reset')->one()->click();
 
+		$table = $this->query(self::TABLE_SELECTOR)->asTable()->one();
+
 		// Fill filter form with data.
 		$filter_form->fill(CTestArrayHelper::get($data, 'filter'));
 
@@ -617,6 +641,7 @@ class testPageServicesServices extends CWebTest {
 		}
 
 		$filter_form->submit();
+		$table->waitUntilReloaded();
 		$this->page->waitUntilReady();
 
 		// Check filtered result.
@@ -624,7 +649,6 @@ class testPageServicesServices extends CWebTest {
 
 		// Check breadcrumbs and table headers.
 		$selector = $this->query(self::BREADCRUMB_SELECTOR);
-		$table = $this->query(self::TABLE_SELECTOR)->asTable()->one();
 		if (CTestArrayHelper::get($data, 'check_breadcrumbs')) {
 			$this->assertTrue($selector->one()->query('link:All services')->one()->isClickable());
 			$this->assertTrue($selector->query('xpath:.//span[@class="selected" and text()="Filter results"]')->exists());
@@ -665,6 +689,7 @@ class testPageServicesServices extends CWebTest {
 		// Filling fields with needed services info.
 		$form->fill(['id:filter_name' => 'Parent for 2 levels of child services']);
 		$form->submit();
+		$table->waitUntilReloaded();
 
 		// Check that filtered count matches expected.
 		$this->assertEquals(1, $table->getRows()->count());
