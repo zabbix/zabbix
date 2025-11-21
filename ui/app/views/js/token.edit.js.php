@@ -64,7 +64,8 @@ window.token_edit_popup = new class {
 		this.#removePopupMessages();
 
 		const fields = this.form.getAllValues();
-		const curl = new Curl(this.form_element.getAttribute('action'));
+		const curl = new Curl('zabbix.php');
+		curl.setArgument('action', fields.tokenid == 0 ? 'token.create' : 'token.update');
 
 		this.form.validateSubmit(fields).then((result) => {
 			if (!result) {
@@ -121,7 +122,8 @@ window.token_edit_popup = new class {
 				return;
 			}
 
-			const curl = new Curl(this.form_element.getAttribute('action'));
+			const curl = new Curl('zabbix.php');
+			curl.setArgument('action', fields.tokenid == 0 ? 'token.create' : 'token.update');
 
 			fetch(curl.getUrl(), {
 				method: 'POST',

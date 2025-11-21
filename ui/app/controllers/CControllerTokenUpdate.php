@@ -31,7 +31,7 @@ class CControllerTokenUpdate extends CController {
 			'tokenid' => ['db token.tokenid', 'required'],
 			'name' => ['db token.name', 'required', 'not_empty'],
 			'description' => ['db token.description'],
-			'admin_mode' => ['integer', 'in' => [0, 1]],
+			'admin_mode' => ['boolean'],
 			'expires_state' => ['integer', 'in' => [0, 1]],
 			'regenerate' => ['integer', 'in' => [1]],
 			'expires_at' => ['string', 'required', 'not_empty',

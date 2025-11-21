@@ -19,11 +19,7 @@
  * @var array $data
  */
 
-$url = (new CUrl('zabbix.php'))
-	->setArgument('action', ($data['tokenid'] == 0) ? 'token.create' : 'token.update')
-	->getUrl();
-
-$token_form = (new CForm('post', $url))
+$token_form = (new CForm())
 	->addItem((new CVar(CSRF_TOKEN_NAME, CCsrfTokenHelper::get('token')))->removeId())
 	->setId('token_form')
 	->setName('token')
