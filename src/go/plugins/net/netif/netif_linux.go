@@ -66,6 +66,7 @@ func init() {
 	}
 }
 
+//nolint:gocyclo // file parsing takes a lot of ifs in this case.
 func (p *Plugin) getNetStats(networkIf, statName string, dir dirFlag) (uint64, error) {
 	var statNums []uint
 
@@ -106,10 +107,14 @@ func (p *Plugin) getNetStats(networkIf, statName string, dir dirFlag) (uint64, e
 
 	var total uint64
 
+	if len(stats) < 16 {
+		return 0, errs.New(errorCannotFindIf)
+	}
+
 	for _, statNum := range statNums {
 		res, err := strconv.ParseUint(stats[statNum], 10, 64)
 		if err != nil {
-			break
+			return 0, errs.New(errorCannotFindIf)
 		}
 
 		total += res
@@ -118,27 +123,28 @@ func (p *Plugin) getNetStats(networkIf, statName string, dir dirFlag) (uint64, e
 	return total, nil
 }
 
-func (p *Plugin) getDevDiscovery() (netInterfaces []msgIfDiscovery, err error) {
-	filepath := "/proc/net/dev"
-
+func (*Plugin) getDevDiscovery() ([]msgIfDiscovery, error) {
 	parser := procfs.NewParser().
 		SetMatchMode(procfs.ModeContains).
 		SetPattern(":").
 		SetSplitter(":", 0)
 
-	data, err := parser.Parse(filepath)
+	data, err := parser.Parse(netDevFilepath)
 	if err != nil {
 		return nil, errs.Wrap(err, "failed to parse /proc/net/dev file")
 	}
 
+	result := make([]msgIfDiscovery, 0, len(data))
 	for _, line := range data {
-		netInterfaces = append(netInterfaces, msgIfDiscovery{line, nil})
+		result = append(result, msgIfDiscovery{line, nil})
 	}
 
-	return netInterfaces, nil
+	return result, nil
 }
 
-// Export -
+// Export implements plugin.Exporter interface.
+//
+//nolint:gocyclo // export function delegates its requests, so high cyclo is expected.
 func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (any, error) {
 	var direction dirFlag
 
