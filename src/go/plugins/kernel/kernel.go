@@ -17,13 +17,11 @@ package kernel
 import (
 	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/plugin"
-	"golang.zabbix.com/sdk/std"
 	"golang.zabbix.com/sdk/zbxerr"
 )
 
 var (
-	impl  Plugin
-	stdOs std.Os
+	impl Plugin
 )
 
 // Plugin -
@@ -32,7 +30,6 @@ type Plugin struct {
 }
 
 func init() {
-	stdOs = std.NewOs()
 	err := plugin.RegisterMetrics(
 		&impl, "Kernel",
 		"kernel.maxproc", "Returns maximum number of processes supported by OS.",

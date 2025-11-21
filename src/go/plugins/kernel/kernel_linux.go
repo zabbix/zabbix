@@ -15,15 +15,18 @@
 package kernel
 
 import (
-	"bufio"
-	"fmt"
+	"bytes"
 	"strconv"
-	"strings"
+
+	"golang.zabbix.com/agent2/pkg/procfs"
+	"golang.zabbix.com/sdk/errs"
+	"golang.zabbix.com/sdk/plugin"
 )
 
 // getFirstNum  - get first number from file
-func getFirstNum(key string) (max uint64, err error) {
+func getFirstNum(key string) (uint64, error) {
 	fileName := "/proc"
+
 	switch key {
 	case "kernel.maxproc":
 		fileName += "/sys/kernel/pid_max"
@@ -31,29 +34,28 @@ func getFirstNum(key string) (max uint64, err error) {
 		fileName += "/sys/fs/file-max"
 	case "kernel.openfiles":
 		fileName += "/sys/fs/file-nr"
+	default:
+		return 0, plugin.UnsupportedMetricError
 	}
 
-	file, err := stdOs.Open(fileName)
-	if err == nil {
-		var line []byte
-		var long bool
-
-		reader := bufio.NewReader(file)
-
-		if line, long, err = reader.ReadLine(); err == nil && !long {
-			if key == "kernel.openfiles" {
-				max, err = strconv.ParseUint(strings.Split(string(line), "\t")[0], 10, 64)
-			} else {
-				max, err = strconv.ParseUint(string(line), 10, 64)
-			}
-		}
-
-		file.Close()
-	}
-
+	data, err := procfs.ReadAll(fileName)
 	if err != nil {
-		err = fmt.Errorf("Cannot obtain data from %s.", fileName)
+		return 0, errs.Wrapf(err, "failed to read %s", fileName)
 	}
 
-	return
+	if key == "kernel.openfiles" {
+		parts := bytes.Split(data, []byte("\t"))
+		if len(parts) > 0 {
+			data = parts[0]
+		}
+	}
+
+	data = bytes.TrimSpace(data) // removing \n
+
+	maximum, err := strconv.ParseUint(string(data), 10, 64)
+	if err != nil {
+		return 0, errs.Wrapf(err, "Cannot obtain data from %s.", fileName)
+	}
+
+	return maximum, nil
 }
