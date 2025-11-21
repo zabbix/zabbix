@@ -80,10 +80,16 @@ window.token_edit_popup = new class {
 				body: JSON.stringify(fields)
 			})
 				.then((response) => response.json())
-				.then((response) => this.#formErrorHandler(response))
 				.then((response) => {
 					if ('error' in response) {
 						throw {error: response.error};
+					}
+
+					if ('form_errors' in response) {
+						this.form.setErrors(response.form_errors, true, true);
+						this.form.renderErrors();
+
+						return;
 					}
 
 					if ('data' in response) {
@@ -131,10 +137,16 @@ window.token_edit_popup = new class {
 				body: JSON.stringify(fields)
 			})
 				.then((response) => response.json())
-				.then((response) => this.#formErrorHandler(response))
 				.then((response) => {
 					if ('error' in response) {
 						throw {error: response.error};
+					}
+
+					if ('form_errors' in response) {
+						this.form.setErrors(response.form_errors, true, true);
+						this.form.renderErrors();
+
+						return;
 					}
 
 					this.#loadTokenView(response.data);
@@ -185,23 +197,8 @@ window.token_edit_popup = new class {
 		}
 	}
 
-	#formErrorHandler(response) {
-		if (typeof response === 'object' && 'form_errors' in response) {
-			this.form.setErrors(response.form_errors, true, true);
-			this.form.renderErrors();
-
-			throw new Error('form_error');
-		}
-
-		return response;
-	}
-
 	#ajaxExceptionHandler(exception) {
 		let title, messages;
-
-		if (exception.message === 'form_error') {
-			return;
-		}
 
 		if (typeof exception === 'object' && 'error' in exception) {
 			title = exception.error.title;
