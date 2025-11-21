@@ -417,7 +417,6 @@ class CScreenHistory extends CScreenBase {
 				foreach ($items_by_type as $value_type => $itemids) {
 					$options['history'] = $value_type;
 					$options['itemids'] = $itemids;
-
 					$item_data = API::History()->get($options);
 
 					if ($item_data) {
@@ -467,7 +466,6 @@ class CScreenHistory extends CScreenBase {
 				foreach ($items as $item) {
 					$options['itemids'] = [$item['itemid']];
 					$options['history'] = $item['value_type'];
-
 					$item_data = API::History()->get($options);
 
 					CArrayHelper::sort($item_data, [
