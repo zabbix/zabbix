@@ -2509,6 +2509,50 @@ class CFormValidatorTest extends TestCase {
 				['value' => ['name' => '', 'type' => '', 'tmp_name' => 'phpunit.xml', 'error' => UPLOAD_ERR_OK,
 					'size' => 10
 				]]
+			],
+			[
+				['object', 'fields' => [
+					'value' => ['string',
+						'use' => [CRangeTimeValidator::class, ['min' => strtotime('2025-02-01')]]
+					]
+				]],
+				['value' => 'zzzz'],
+				['value' => 'zzzz'],
+				CFormValidator::ERROR,
+				['/value' => [
+					[
+						'message' => 'Invalid time.',
+						'level' => CFormValidator::ERROR_LEVEL_DELAYED
+					]
+				]]
+			],
+			[
+				['object', 'fields' => [
+					'value' => ['string',
+						'use' => [CRangeTimeValidator::class, ['min_now' => true]],
+						'messages' => ['use' => 'Must be in the future']
+					]
+				]],
+				['value' => '2025-01-01'],
+				['value' => '2025-01-01'],
+				CFormValidator::ERROR,
+				['/value' => [
+					[
+						'message' => 'Must be in the future',
+						'level' => CFormValidator::ERROR_LEVEL_DELAYED
+					]
+				]]
+			],
+			[
+				['object', 'fields' => [
+					'value' => ['string',
+						'use' => [CRangeTimeValidator::class, ['min_now' => true]]
+					]
+				]],
+				['value' => date('Y-m-d', time() + SEC_PER_DAY)],
+				['value' => date('Y-m-d', time() + SEC_PER_DAY)],
+				CFormValidator::SUCCESS,
+				[]
 			]
 		];
 	}
