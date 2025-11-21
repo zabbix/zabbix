@@ -15,24 +15,20 @@
 package netif
 
 import (
-	"bufio"
 	"encoding/json"
-	"errors"
-	"fmt"
 	"strconv"
 	"strings"
 
+	"golang.zabbix.com/agent2/pkg/procfs"
 	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/plugin"
-	"golang.zabbix.com/sdk/std"
 )
 
 const (
-	errorCannotFindIf     = "Cannot find information for this network interface in /proc/net/dev."
-	errorCannotOpenNetDev = "Cannot open /proc/net/dev: %s"
+	errorCannotFindIf = "Cannot find information for this network interface in /proc/net/dev."
 )
 
-var stdOs std.Os
+var netDevFilepath = "/proc/net/dev" //nolint:gochecknoglobals // such implementation to make it mockable
 
 var mapNetStatIn = map[string]uint{
 	"bytes":      0,
@@ -57,8 +53,6 @@ var mapNetStatOut = map[string]uint{
 }
 
 func init() {
-	stdOs = std.NewOs()
-
 	err := plugin.RegisterMetrics(
 		&impl, "NetIf",
 		"net.if.collisions", "Returns number of out-of-window collisions.",
@@ -72,127 +66,129 @@ func init() {
 	}
 }
 
-func (p *Plugin) addStatNum(statName string, mapNetStat map[string]uint, statNums *[]uint) error {
-	if statNum, ok := mapNetStat[statName]; ok {
-		*statNums = append(*statNums, statNum)
-	} else {
-		return errors.New(errorInvalidSecondParam)
-	}
-	return nil
-}
-
-func (p *Plugin) getNetStats(networkIf, statName string, dir dirFlag) (result uint64, err error) {
+func (p *Plugin) getNetStats(networkIf, statName string, dir dirFlag) (uint64, error) {
 	var statNums []uint
 
-	if dir&dirIn != 0 {
-		if err = p.addStatNum(statName, mapNetStatIn, &statNums); err != nil {
-			return
+	if dir == directionIn || dir == directionTotal {
+		statNum, ok := mapNetStatIn[statName]
+		if !ok {
+			return 0, errs.New(errorInvalidSecondParam)
 		}
+
+		statNums = append(statNums, statNum)
 	}
 
-	if dir&dirOut != 0 {
-		if err = p.addStatNum(statName, mapNetStatOut, &statNums); err != nil {
-			return
+	if dir == directionOut || dir == directionTotal {
+		statNum, ok := mapNetStatOut[statName]
+		if !ok {
+			return 0, errs.New(errorInvalidSecondParam)
 		}
+
+		statNums = append(statNums, statNum)
 	}
 
-	file, err := stdOs.Open("/proc/net/dev")
+	parser := procfs.NewParser().
+		SetMatchMode(procfs.ModeContains).
+		SetPattern(networkIf).
+		SetSplitter(":", 1).
+		SetMaxMatches(1)
+
+	data, err := parser.Parse(netDevFilepath)
 	if err != nil {
-		return 0, fmt.Errorf(errorCannotOpenNetDev, err)
+		return 0, errs.Wrapf(err, "failed to parse %s", netDevFilepath)
 	}
-	defer file.Close()
+
+	if len(data) != 1 {
+		return 0, errs.New(errorCannotFindIf)
+	}
+
+	stats := strings.Fields(data[0])
 
 	var total uint64
-loop:
-	for sLines := bufio.NewScanner(file); sLines.Scan(); {
-		dev := strings.Split(sLines.Text(), ":")
 
-		if len(dev) > 1 && networkIf == strings.TrimSpace(dev[0]) {
-			stats := strings.Fields(dev[1])
-
-			if len(stats) >= 16 {
-				for _, statNum := range statNums {
-					var res uint64
-
-					if res, err = strconv.ParseUint(stats[statNum], 10, 64); err != nil {
-						break loop
-					}
-					total += res
-				}
-				return total, nil
-			}
+	for _, statNum := range statNums {
+		res, err := strconv.ParseUint(stats[statNum], 10, 64)
+		if err != nil {
 			break
 		}
+
+		total += res
 	}
-	err = errors.New(errorCannotFindIf)
-	return
+
+	return total, nil
 }
 
 func (p *Plugin) getDevDiscovery() (netInterfaces []msgIfDiscovery, err error) {
-	var f std.File
-	if f, err = stdOs.Open("/proc/net/dev"); err != nil {
-		return nil, fmt.Errorf(errorCannotOpenNetDev, err)
-	}
-	defer f.Close()
+	filepath := "/proc/net/dev"
 
-	netInterfaces = make([]msgIfDiscovery, 0)
-	for sLines := bufio.NewScanner(f); sLines.Scan(); {
-		dev := strings.Split(sLines.Text(), ":")
-		if len(dev) > 1 {
-			netInterfaces = append(netInterfaces, msgIfDiscovery{strings.TrimSpace(dev[0]), nil})
-		}
+	parser := procfs.NewParser().
+		SetMatchMode(procfs.ModeContains).
+		SetPattern(":").
+		SetSplitter(":", 0)
+
+	data, err := parser.Parse(filepath)
+	if err != nil {
+		return nil, errs.Wrap(err, "failed to parse /proc/net/dev file")
+	}
+
+	for _, line := range data {
+		netInterfaces = append(netInterfaces, msgIfDiscovery{line, nil})
 	}
 
 	return netInterfaces, nil
 }
 
 // Export -
-func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
+func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (any, error) {
 	var direction dirFlag
-	var mode string
 
 	switch key {
 	case "net.if.discovery":
 		if len(params) > 0 {
-			return nil, errors.New(errorParametersNotAllowed)
+			return nil, errs.New(errorParametersNotAllowed)
 		}
-		var devices []msgIfDiscovery
-		if devices, err = p.getDevDiscovery(); err != nil {
-			return
+
+		devices, err := p.getDevDiscovery()
+		if err != nil {
+			return nil, err
 		}
-		var b []byte
-		if b, err = json.Marshal(devices); err != nil {
-			return
+
+		b, err := json.Marshal(devices)
+		if err != nil {
+			return nil, errs.Wrap(err, "failed to marshal devices")
 		}
+
 		return string(b), nil
 	case "net.if.collisions":
 		if len(params) > 1 {
-			return nil, errors.New(errorTooManyParams)
+			return nil, errs.New(errorTooManyParams)
 		}
 
 		if len(params) < 1 || params[0] == "" {
-			return nil, errors.New(errorEmptyIfName)
+			return nil, errs.New(errorEmptyIfName)
 		}
-		return p.getNetStats(params[0], "collisions", dirOut)
+
+		return p.getNetStats(params[0], "collisions", directionOut)
 	case "net.if.in":
-		direction = dirIn
+		direction = directionIn
 	case "net.if.out":
-		direction = dirOut
+		direction = directionOut
 	case "net.if.total":
-		direction = dirIn | dirOut
+		direction = directionTotal
 	default:
 		/* SHOULD_NEVER_HAPPEN */
-		return nil, errors.New(errorUnsupportedMetric)
+		return nil, errs.New(errorUnsupportedMetric)
 	}
 
 	if len(params) < 1 || params[0] == "" {
-		return nil, errors.New(errorEmptyIfName)
+		return nil, errs.New(errorEmptyIfName)
 	}
 
 	if len(params) > 2 {
-		return nil, errors.New(errorTooManyParams)
+		return nil, errs.New(errorTooManyParams)
 	}
 
+	var mode string
 	if len(params) == 2 && params[1] != "" {
 		mode = params[1]
 	} else {

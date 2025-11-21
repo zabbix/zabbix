@@ -135,31 +135,31 @@ func (p *Plugin) getNetStats(networkIf, statName string, dir dirFlag) (result ui
 	var value uint64
 	switch statName {
 	case "bytes":
-		if dir&dirIn != 0 {
+		if dir == directionIn || dir == directionTotal {
 			value += row.InOctets
 		}
-		if dir&dirOut != 0 {
+		if dir == directionOut || dir == directionTotal {
 			value += row.OutOctets
 		}
 	case "packets":
-		if dir&dirIn != 0 {
+		if dir == directionIn || dir == directionTotal {
 			value += row.InUcastPkts + row.InNUcastPkts
 		}
-		if dir&dirOut != 0 {
+		if dir == directionOut || dir == directionTotal {
 			value += row.OutUcastPkts + row.OutNUcastPkts
 		}
 	case "errors":
-		if dir&dirIn != 0 {
+		if dir == directionIn || dir == directionTotal {
 			value += row.InErrors
 		}
-		if dir&dirOut != 0 {
+		if dir == directionOut || dir == directionTotal {
 			value += row.OutErrors
 		}
 	case "dropped":
-		if dir&dirIn != 0 {
+		if dir == directionIn || dir == directionTotal {
 			value += row.InDiscards + row.InUnknownProtos
 		}
-		if dir&dirOut != 0 {
+		if dir == directionOut || dir == directionTotal {
 			value += row.OutDiscards
 		}
 	default:
@@ -277,11 +277,11 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 		}
 		return p.getDevList()
 	case "net.if.in":
-		direction = dirIn
+		direction = directionIn
 	case "net.if.out":
-		direction = dirOut
+		direction = directionOut
 	case "net.if.total":
-		direction = dirIn | dirOut
+		direction = directionTotal
 	default:
 		/* SHOULD_NEVER_HAPPEN */
 		return nil, errors.New(errorUnsupportedMetric)

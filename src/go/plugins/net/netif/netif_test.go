@@ -18,10 +18,12 @@ package netif
 
 import (
 	"fmt"
+	"os"
+	"path/filepath"
 	"reflect"
 	"testing"
 
-	"golang.zabbix.com/sdk/std"
+	"golang.zabbix.com/sdk/errs"
 )
 
 var testSets = []testSet{
@@ -33,7 +35,8 @@ var testSets = []testSet{
 		},
 		"",
 		"",
-	}, {
+	},
+	{
 		"testNetif02",
 		[]testCase{
 			{0, "test_name", "net.if.in", []string{"eno2", "packets"}, true, uint64(0), reflect.Uint64},
@@ -93,7 +96,8 @@ face |bytes    packets errs drop fifo frame compressed multicast|bytes    packet
  eno2: 709017493  abc   15    7    1   345        500     16001 22780124  241308   87 1234    5   543       x        100
   lo1  2897093   11757    0    0    0     0          0         0  2897093   11757    0    0    0     0       0          0
  eno3: 709017493  620061   15    7    1   345        500     16001 22780124  241308   87 1234    5   543       2`,
-	}, {
+	},
+	{
 		"testNetif03",
 		[]testCase{
 			{1, "test_name", "net.if.collisions", []string{"eno1"}, true, uint64(543), reflect.Uint64},
@@ -123,17 +127,36 @@ type testSet struct {
 }
 
 func TestNetif(t *testing.T) {
-	stdOs = std.NewMockOs()
+	for _, ts := range testSets {
+		// Create a temporary directory for the test set.
+		tempDir := t.TempDir()
+		var tempFilePath string
 
-	for _, testSet := range testSets {
-		if testSet.fileName != "" {
-			stdOs.(std.MockOs).MockFile(testSet.fileName, []byte(testSet.fileContent))
+		// If the test set requires a file, create it.
+		if ts.name != "" {
+			tempFilePath = filepath.Join(tempDir, ts.name)
+			err := os.WriteFile(tempFilePath, []byte(ts.fileContent), 0644)
+			if err != nil {
+				t.Fatalf("Failed to create temp file for test set %s: %v", ts.name, err)
+			}
 		}
 
-		for _, testCase := range testSet.testCases {
-			if err := testCase.checkResult(); err != nil {
-				t.Errorf("Test case (%s: %s_%d) for key %s %s", testSet.name, testCase.name, testCase.id, testCase.key, err.Error())
-			}
+		// Initialize the plugin with the path to the temporary file.
+		var originalFilePath = netDevFilepath
+		t.Cleanup(func() {
+			netDevFilepath = originalFilePath
+		})
+
+		netDevFilepath = tempFilePath
+
+		// Run each test case within the set.
+		for _, tc := range ts.testCases {
+			t.Run(fmt.Sprintf("%s_%s_%d", ts.name, tc.name, tc.id), func(t *testing.T) {
+				err := tc.checkResult()
+				if err != nil {
+					t.Error(err)
+				}
+			})
 		}
 	}
 }
@@ -141,9 +164,10 @@ func TestNetif(t *testing.T) {
 func (tc *testCase) checkResult() error {
 	var resTextOutput string
 
-	if ret, err := impl.Export(tc.key, tc.params, nil); err != nil {
+	ret, err := impl.Export(tc.key, tc.params, nil)
+	if err != nil {
 		if tc.fail != true {
-			return fmt.Errorf("returned error: %s", err)
+			return errs.Wrap(err, "returned error")
 		}
 	} else {
 		if typ := reflect.TypeOf(ret).Kind(); typ == tc.typ {
