@@ -62,7 +62,7 @@ class testDashboardUserPermissions extends CWebTest {
 	protected static $hostid;
 
 	/**
-	 * List of created user groups IDs.
+	 * List of created user group IDs.
 	 *
 	 * @var array
 	 */
@@ -325,12 +325,52 @@ class testDashboardUserPermissions extends CWebTest {
 					'view' => false,
 					'edit' => false
 				]
+			],
+			'Guest with full access' => [
+				[
+					'user_role' => self::USER_ROLE_GUEST,
+					'user_group' => 'Read/Write access to template and host',
+					'view' => true,
+					'edit' => false
+				]
+			],
+			'Guest with read access' => [
+				[
+					'user_role' => self::USER_ROLE_GUEST,
+					'user_group' => 'Read access to template and host',
+					'view' => true,
+					'edit' => false
+				]
+			],
+			'Guest with deny access' => [
+				[
+					'user_role' => self::USER_ROLE_GUEST,
+					'user_group' => 'Deny access to template and host',
+					'view' => false,
+					'edit' => false
+				]
+			],
+			'Guest with read-host and deny-template access' => [
+				[
+					'user_role' => self::USER_ROLE_GUEST,
+					'user_group' => 'Read access to host, but deny from template',
+					'view' => true,
+					'edit' => false
+				]
+			],
+			'Guest with deny-host and read-template access' => [
+				[
+					'user_role' => self::USER_ROLE_GUEST,
+					'user_group' => 'Deny access to host, but read from template',
+					'view' => false,
+					'edit' => false
+				]
 			]
 		];
 	}
 
 	/**
-	 * Check users access to host, template and global dashboards according to user group and user role permissions.
+	 * Check users access to host and template dashboards according to user group and user role permissions.
 	 *
 	 * @dataProvider getDashboardPermissionsData
 	 */
