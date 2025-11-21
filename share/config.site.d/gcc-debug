@@ -47,4 +47,6 @@ then
 	CFLAGS+=" -Wjump-misses-init"
 	CFLAGS+=" -Wformat-signedness"
 
+	# other
+	CFLAGS+=" -DZBX_DEBUG"
 fi
