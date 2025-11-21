@@ -398,7 +398,7 @@ zabbix_export:
                 - tag: scope
                   value: performance
         - uuid: 8030911f70f54e90af72087fbfad8195
-          name: 'Chassis core switch temp'
+          name: 'Chassis core switch temperature'
           type: DEPENDENT
           key: ribbon.chassis.core.switch.temp
           delay: '0'
@@ -1864,7 +1864,7 @@ zabbix_export:
           triggers:
             - uuid: 729be287a380479c9d916610432038c0
               expression: 'last(/Ribbon SBC Edge by HTTP/ribbon.system.dns.server1,#1)<>last(/Ribbon SBC Edge by HTTP/ribbon.system.dns.server1,#2) and length(last(/Ribbon SBC Edge by HTTP/ribbon.system.dns.server1))>0'
-              name: 'Ribbon: DNS server 1 been change'
+              name: 'Ribbon: DNS server 1 has been changed'
               event_name: 'Ribbon: DNS server 1 has been changed on ({ITEM.LASTVALUE1})'
               priority: WARNING
               description: 'The DNS server 1 has been changed. Acknowledge to close the problem manually.'
@@ -1895,7 +1895,7 @@ zabbix_export:
           triggers:
             - uuid: 0fab918917b7407b983b4e0da3cab4a5
               expression: 'last(/Ribbon SBC Edge by HTTP/ribbon.system.dns.server2,#1)<>last(/Ribbon SBC Edge by HTTP/ribbon.system.dns.server2,#2) and length(last(/Ribbon SBC Edge by HTTP/ribbon.system.dns.server2))>0'
-              name: 'Ribbon: DNS server 2 been change'
+              name: 'Ribbon: DNS server 2 has been changed'
               event_name: 'Ribbon: DNS server 2 has been changed on ({ITEM.LASTVALUE1})'
               priority: WARNING
               description: 'The DNS server 2 has been changed. Acknowledge to close the problem manually.'
