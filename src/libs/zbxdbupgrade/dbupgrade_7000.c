@@ -355,9 +355,9 @@ static int	DBpatch_7000024(void)
 	/* 2 - ZBX_FLAG_DISCOVERY_PROTOTYPE */
 	if (ZBX_DB_OK > zbx_db_execute(
 			"delete from items"
-			" where itemid in ("
-				"select i.itemid from hosts h,items i"
-				" where h.hostid=i.hostid and h.flags=2"
+			" where exists ("
+				"select null from hosts h"
+				" where h.hostid=items.hostid and h.flags=2"
 			")"))
 	{
 		return FAIL;
@@ -421,9 +421,9 @@ static int	DBpatch_7000028(void)
 	/* 2 - ZBX_FLAG_DISCOVERY_PROTOTYPE */
 	if (ZBX_DB_OK > zbx_db_execute(
 			"delete from httptest"
-			" where httptestid in ("
-				"select ht.httptestid from httptest ht,hosts h"
-				" where ht.hostid=h.hostid and h.flags=2"
+			" where exists ("
+				"select null from hosts h"
+				" where h.hostid=httptest.hostid and h.flags=2"
 			")"))
 	{
 		return FAIL;
