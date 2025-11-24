@@ -1978,10 +1978,6 @@ select {
 		max-height: 240px;
 	}
 
-	.trimmed-content::after {
-		content: '\2026';
-	}
-
 	.msg-bad,
 	.msg-good,
 	.msg-warning {
