@@ -51,10 +51,10 @@ func TestOraConn_Query(t *testing.T) { //nolint:tparallel
 		t.Fatalf("OraConn_Query: get connection fail: %v", err)
 	}
 
-	ctx, cancel := oraCon.GetContextWithTimeout()
+	ctx, cancel := oraCon.GetContextWithCallTimeout()
 	defer cancel()
 
-	ctxCancelled, cancel := oraCon.GetContextWithTimeout()
+	ctxCancelled, cancel := oraCon.GetContextWithCallTimeout()
 	cancel()
 
 	type args struct {
@@ -179,7 +179,7 @@ func TestOraConn_QueryByName(t *testing.T) { //nolint:tparallel,gocyclo,cyclop
 		t.Fatalf("OraConn_Query: get connection fail: %v", err)
 	}
 
-	ctx, cancel := oraCon.GetContextWithTimeout()
+	ctx, cancel := oraCon.GetContextWithCallTimeout()
 	defer cancel()
 
 	type args struct {
@@ -266,10 +266,10 @@ func TestOraConn_QueryRow(t *testing.T) { //nolint:tparallel
 		t.Fatalf("TestConnManager_Query: get connection fail: %v", err)
 	}
 
-	ctx, cancel := oraCon.GetContextWithTimeout()
+	ctx, cancel := oraCon.GetContextWithCallTimeout()
 	defer cancel()
 
-	ctxCancelled, cancel := oraCon.GetContextWithTimeout()
+	ctxCancelled, cancel := oraCon.GetContextWithCallTimeout()
 	cancel()
 
 	type args struct {
@@ -361,7 +361,7 @@ func TestOraConn_QueryRowByName(t *testing.T) { //nolint:tparallel
 		t.Fatalf("OraConn_Query: get connection fail: %v", err)
 	}
 
-	ctx, cancel := oraCon.GetContextWithTimeout()
+	ctx, cancel := oraCon.GetContextWithCallTimeout()
 	defer cancel()
 
 	type args struct {

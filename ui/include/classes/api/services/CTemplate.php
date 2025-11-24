@@ -33,7 +33,7 @@ class CTemplate extends CHostGeneral {
 
 		$sqlParts = [
 			'select'	=> ['templates' => 'h.hostid'],
-			'from'		=> ['hosts' => 'hosts h'],
+			'from'		=> 'hosts h',
 			'where'		=> ['h.status='.HOST_STATUS_TEMPLATE],
 			'group'		=> [],
 			'order'		=> [],
@@ -90,10 +90,8 @@ class CTemplate extends CHostGeneral {
 				return $options['countOutput'] ? '0' : [];
 			}
 
-			$sqlParts['from'][] = 'host_hgset hh';
-			$sqlParts['from'][] = 'permission p';
-			$sqlParts['where'][] = 'h.hostid=hh.hostid';
-			$sqlParts['where'][] = 'hh.hgsetid=p.hgsetid';
+			$sqlParts['join']['hh'] = ['table' => 'host_hgset', 'using' => 'hostid'];
+			$sqlParts['join']['p'] = ['left_table' => 'hh', 'table' => 'permission', 'using' => 'hgsetid'];
 			$sqlParts['where'][] = 'p.ugsetid='.self::$userData['ugsetid'];
 
 			if ($options['editable']) {
@@ -105,9 +103,8 @@ class CTemplate extends CHostGeneral {
 		if (!is_null($options['groupids'])) {
 			zbx_value2array($options['groupids']);
 
-			$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
+			$sqlParts['join']['hg'] = ['table' => 'hosts_groups', 'using' => 'hostid'];
 			$sqlParts['where'][] = dbConditionInt('hg.groupid', $options['groupids']);
-			$sqlParts['where']['hgh'] = 'hg.hostid=h.hostid';
 
 			if ($options['groupCount']) {
 				$sqlParts['group']['hg'] = 'hg.groupid';
@@ -125,9 +122,8 @@ class CTemplate extends CHostGeneral {
 		if (!is_null($options['parentTemplateids'])) {
 			zbx_value2array($options['parentTemplateids']);
 
-			$sqlParts['from']['hosts_templates'] = 'hosts_templates ht';
+			$sqlParts['join']['ht'] = ['table' => 'hosts_templates', 'using' => 'hostid'];
 			$sqlParts['where'][] = dbConditionInt('ht.templateid', $options['parentTemplateids']);
-			$sqlParts['where']['hht'] = 'h.hostid=ht.hostid';
 
 			if ($options['groupCount']) {
 				$sqlParts['group']['templateid'] = 'ht.templateid';
@@ -138,9 +134,8 @@ class CTemplate extends CHostGeneral {
 		if (!is_null($options['hostids'])) {
 			zbx_value2array($options['hostids']);
 
-			$sqlParts['from']['hosts_templates'] = 'hosts_templates ht';
+			$sqlParts['join']['ht'] = ['table' => 'hosts_templates', 'using' => 'hostid'];
 			$sqlParts['where'][] = dbConditionInt('ht.hostid', $options['hostids']);
-			$sqlParts['where']['hht'] = 'h.hostid=ht.templateid';
 
 			if ($options['groupCount']) {
 				$sqlParts['group']['ht'] = 'ht.hostid';
@@ -151,31 +146,26 @@ class CTemplate extends CHostGeneral {
 		if (!is_null($options['itemids'])) {
 			zbx_value2array($options['itemids']);
 
-			$sqlParts['from']['items'] = 'items i';
+			$sqlParts['join']['i'] = ['table' => 'items', 'using' => 'hostid'];
 			$sqlParts['where'][] = dbConditionInt('i.itemid', $options['itemids']);
-			$sqlParts['where']['hi'] = 'h.hostid=i.hostid';
 		}
 
 		// triggerids
 		if (!is_null($options['triggerids'])) {
 			zbx_value2array($options['triggerids']);
 
-			$sqlParts['from']['functions'] = 'functions f';
-			$sqlParts['from']['items'] = 'items i';
+			$sqlParts['join']['i'] = ['table' => 'items', 'using' => 'hostid'];
+			$sqlParts['join']['f'] = ['left_table' => 'i', 'table' => 'functions', 'using' => 'itemid'];
 			$sqlParts['where'][] = dbConditionInt('f.triggerid', $options['triggerids']);
-			$sqlParts['where']['hi'] = 'h.hostid=i.hostid';
-			$sqlParts['where']['fi'] = 'f.itemid=i.itemid';
 		}
 
 		// graphids
 		if (!is_null($options['graphids'])) {
 			zbx_value2array($options['graphids']);
 
-			$sqlParts['from']['graphs_items'] = 'graphs_items gi';
-			$sqlParts['from']['items'] = 'items i';
+			$sqlParts['join']['i'] = ['table' => 'items', 'using' => 'hostid'];
+			$sqlParts['join']['gi'] = ['left_table' => 'i', 'table' => 'graphs_items', 'using' => 'itemid'];
 			$sqlParts['where'][] = dbConditionInt('gi.graphid', $options['graphids']);
-			$sqlParts['where']['igi'] = 'i.itemid=gi.itemid';
-			$sqlParts['where']['hi'] = 'h.hostid=i.hostid';
 		}
 
 		// with_items

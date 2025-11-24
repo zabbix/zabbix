@@ -171,7 +171,7 @@ void	*zbx_hashset_insert_ext(zbx_hashset_t *hs, const void *data, size_t size, s
 		zbx_hashset_uniq_t uniq);
 void	*zbx_hashset_search(const zbx_hashset_t *hs, const void *data);
 void	zbx_hashset_remove(zbx_hashset_t *hs, const void *data);
-void	zbx_hashset_remove_direct(zbx_hashset_t *hs, void *data);
+void	zbx_hashset_remove_direct(zbx_hashset_t *hs, const void *data);
 
 void	zbx_hashset_clear(zbx_hashset_t *hs);
 

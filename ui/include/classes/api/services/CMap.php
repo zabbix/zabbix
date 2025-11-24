@@ -160,8 +160,9 @@ class CMap extends CMapElement {
 	private function getMaps(array $options) {
 		$sql_parts = [
 			'select'	=> ['sysmaps' => 's.sysmapid'],
-			'from'		=> ['sysmaps' => 'sysmaps s'],
+			'from'		=> 'sysmaps s',
 			'where'		=> [],
+			'group'		=> [],
 			'order'		=> [],
 			'limit'		=> null
 		];
