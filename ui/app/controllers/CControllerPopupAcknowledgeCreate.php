@@ -104,7 +104,7 @@ class CControllerPopupAcknowledgeCreate extends CController {
 				'use' => [CRangeTimeValidator::class, ['min_now' => true]],
 				'when' => [
 					['suppress_problem', 'in' => [ZBX_PROBLEM_UPDATE_SUPPRESS]],
-					['suppress_time_option', 'in' => [ZBX_PROBLEM_SUPPRESS_TIME_DEFINITE]],
+					['suppress_time_option', 'in' => [ZBX_PROBLEM_SUPPRESS_TIME_DEFINITE]]
 				]
 			],
 			'unsuppress_problem' => ['integer', 'in' => [ZBX_PROBLEM_UPDATE_UNSUPPRESS]],
@@ -128,7 +128,7 @@ class CControllerPopupAcknowledgeCreate extends CController {
 					],
 					'messages' => ['not_empty' => _('At least one update operation or message is mandatory')]
 				]
-			],
+			]
 		]];
 	}
 
