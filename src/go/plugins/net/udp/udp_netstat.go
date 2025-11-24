@@ -27,7 +27,7 @@ import (
 )
 
 // exportNetUdpSocketCount - returns number of UDP sockets that match parameters.
-func (p *Plugin) exportNetUdpSocketCount(params []string) (result int, err error) {
+func (p *Plugin) exportNetUDPSocketCount(params []string) (result int, err error) {
 	if len(params) > 5 {
 		return 0, errors.New(errorTooManyParams)
 	}
