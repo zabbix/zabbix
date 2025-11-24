@@ -1648,7 +1648,7 @@ class testPageProblems extends CWebTest {
 					]
 				]
 			],
-			// #48 Multiple spaces in "Problem" field name.
+			// #49 Multiple spaces in "Problem" field name.
 			[
 				[
 					'fields' => [
