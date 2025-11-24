@@ -96,7 +96,7 @@ func (p *Parser) parseReadAll(path string, reg *regexp.Regexp) ([]string, error)
 	}
 
 	var (
-		results []string
+		results = make([]string, 0, p.maxMatches)
 		lines   = bytes.Split(content, []byte("\n"))
 	)
 
@@ -133,7 +133,7 @@ func (p *Parser) parseLineByLine(path string, reg *regexp.Regexp) ([]string, err
 	defer file.Close() //nolint:errcheck // standard defer function which error would not change anything.
 
 	var (
-		results []string
+		results = make([]string, 0, p.maxMatches)
 		scanner = bufio.NewScanner(file)
 	)
 
