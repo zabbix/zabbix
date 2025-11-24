@@ -891,7 +891,7 @@ function getMenuPopupTrigger(options, trigger_element) {
 					fetch(curl.getUrl(), {
 						method: 'POST',
 						headers: {'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'},
-						body: urlEncodeData({
+						body: JSON.stringify({
 							eventids: [options.eventid],
 							change_rank: ZBX_PROBLEM_UPDATE_RANK_TO_CAUSE,
 							[CSRF_TOKEN_NAME]: options.csrf_tokens['acknowledge']
@@ -906,6 +906,10 @@ function getMenuPopupTrigger(options, trigger_element) {
 								addMessage(makeMessageBox('bad', [response.error.messages], response.error.title, true,
 									true
 								));
+							}
+							else if ('form_errors' in response) {
+								console.error(response.form_errors);
+								throw {error: true};
 							}
 							else if ('success' in response) {
 								addMessage(makeMessageBox('good', [], response.success.title, true, false));
@@ -938,7 +942,7 @@ function getMenuPopupTrigger(options, trigger_element) {
 					fetch(curl.getUrl(), {
 						method: 'POST',
 						headers: {'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'},
-						body: urlEncodeData({
+						body: JSON.stringify({
 							eventids: options.eventids,
 							cause_eventid: options.eventid,
 							change_rank: ZBX_PROBLEM_UPDATE_RANK_TO_SYMPTOM,
@@ -954,6 +958,10 @@ function getMenuPopupTrigger(options, trigger_element) {
 								addMessage(makeMessageBox('bad', [response.error.messages], response.error.title, true,
 									true
 								));
+							}
+							else if ('form_errors' in response) {
+								console.error(response.form_errors);
+								throw {error: true};
 							}
 							else if ('success' in response) {
 								addMessage(makeMessageBox('good', [], response.success.title, true, false));

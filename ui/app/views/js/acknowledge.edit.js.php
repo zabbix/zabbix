@@ -20,31 +20,54 @@
 ?>
 
 window.update_problem_popup = new class {
-	init() {
+	init({rules}) {
+		this.overlay = overlays_stack.getById('acknowledge.edit');
+		this.dialogue = this.overlay.$dialogue[0];
+		this.form = this.overlay.$dialogue.$body[0].querySelector('form');
+		this.form_element = this.overlay.$dialogue.$body[0].querySelector('form');
+		this.form = new CForm(this.form_element, rules);
 		this.problem_suppressible = !document.getElementById('suppress_problem').disabled;
 		this.problem_unsuppressible = !document.getElementById('unsuppress_problem').disabled;
-
-		document.getElementById('suppress_problem').addEventListener('change', () => this._update());
-		document.getElementById('suppress_time_option').addEventListener('change', () => this._update());
-		document.getElementById('unsuppress_problem').addEventListener('change', () => this._update());
-		document.getElementById('close_problem').addEventListener('change', () => this._update());
 
 		const return_url = new URL('zabbix.php', location.href);
 		return_url.searchParams.set('action', 'problem.view');
 		ZABBIX.PopupManager.setReturnUrl(return_url.href);
+
+		this.#initEvents();
 	}
 
-	_update() {
+	#initEvents () {
+		document.getElementById('change_severity').addEventListener('change', (e) => {
+			document.querySelectorAll('#severity input').forEach((el) => {
+				if (e.target.checked) {
+					el.removeAttribute('disabled');
+				}
+				else {
+					el.setAttribute('disabled', 'disabled');
+				}
+			});
+		});
+
+		document.getElementById('suppress_problem').addEventListener('change', () => this.#update());
+		document.getElementById('suppress_time_option').addEventListener('change', () => this.#update());
+		document.getElementById('unsuppress_problem').addEventListener('change', () => this.#update());
+		document.getElementById('close_problem').addEventListener('change', () => this.#update());
+
+		this.overlay.$dialogue.$footer[0].querySelector('.js-submit')
+			.addEventListener('click', () => this.#submit());
+	}
+
+	#update() {
 		const suppress_checked = document.getElementById('suppress_problem').checked;
 		const unsuppress_checked = document.getElementById('unsuppress_problem').checked;
 		const close_problem_checked = document.getElementById('close_problem').checked;
 
-		this._update_suppress_problem_state(close_problem_checked || unsuppress_checked);
-		this._update_unsuppress_problem_state(close_problem_checked || suppress_checked);
-		this._update_suppress_time_options();
+		this.#update_suppress_problem_state(close_problem_checked || unsuppress_checked);
+		this.#update_unsuppress_problem_state(close_problem_checked || suppress_checked);
+		this.#update_suppress_time_options();
 	}
 
-	_update_suppress_problem_state(state) {
+	#update_suppress_problem_state(state) {
 		if (this.problem_suppressible) {
 			document.getElementById('suppress_problem').disabled = state;
 
@@ -54,7 +77,7 @@ window.update_problem_popup = new class {
 		}
 	}
 
-	_update_unsuppress_problem_state(state) {
+	#update_unsuppress_problem_state(state) {
 		if (this.problem_unsuppressible) {
 			document.getElementById('unsuppress_problem').disabled = state;
 			if (state) {
@@ -63,7 +86,7 @@ window.update_problem_popup = new class {
 		}
 	}
 
-	_update_suppress_time_options() {
+	#update_suppress_time_options() {
 		for (const element of document.querySelectorAll('#suppress_time_option input[type="radio"]')) {
 			element.disabled = !document.getElementById('suppress_problem').checked;
 
@@ -79,44 +102,67 @@ window.update_problem_popup = new class {
 		}
 	}
 
-	/**
-	 * @param {Overlay} overlay
-	 */
-	submitAcknowledge(overlay) {
-		var $form = overlay.$dialogue.find('form'),
-			url = new Curl('zabbix.php'),
-			form_data;
+	#submit() {
+		this.#removePopupMessages();
+		const fields = this.form.getAllValues();
 
-		$form.trimValues(['#message', '#suppress_until_problem']);
-		form_data = jQuery('#message, input:visible, input[type=hidden]', $form).serialize();
-		url.setArgument('action', 'popup.acknowledge.create');
+		this.form.validateSubmit(fields)
+			.then((result) => {
+				if (!result) {
+					this.overlay.unsetLoading();
+					return;
+				}
 
-		overlay.xhr = sendAjaxData(url.getUrl(), {
-			data: form_data,
-			dataType: 'json',
-			method: 'POST',
-			beforeSend: function() {
-				overlay.setLoading();
-			},
-			complete: function() {
-				overlay.unsetLoading();
+				const curl = new Curl('zabbix.php');
+				curl.setArgument('action', 'popup.acknowledge.create');
+
+				fetch(curl.getUrl(), {
+					method: 'POST',
+					headers: {'Content-Type': 'application/json'},
+					body: JSON.stringify(fields)
+				})
+					.then((response) => response.json())
+					.then((response) => {
+						if ('error' in response) {
+							throw {error: response.error};
+						}
+
+						if ('form_errors' in response) {
+							this.form.setErrors(response.form_errors, true, true);
+							this.form.renderErrors();
+							return;
+						}
+
+						overlayDialogueDestroy(this.overlay.dialogueid);
+						this.overlay.$dialogue[0].dispatchEvent(new CustomEvent('dialogue.submit', {detail: response}));
+						$.publish('acknowledge.create', [response, this.overlay]);
+					})
+					.catch((exception) => this.#ajaxExceptionHandler(exception))
+					.finally(() => this.overlay.unsetLoading());
+			});
+	}
+
+	#removePopupMessages() {
+		for (const el of this.form_element.parentNode.children) {
+			if (el.matches('.msg-good, .msg-bad, .msg-warning')) {
+				el.parentNode.removeChild(el);
 			}
-		})
-		.done(function(response) {
-			overlay.$dialogue.find('.msg-bad').remove();
+		}
+	}
 
-			if ('error' in response) {
-				const message_box = makeMessageBox('bad', response.error.messages,
-					response.error.title
-				);
+	#ajaxExceptionHandler(exception) {
+		let title, messages;
 
-				message_box.insertBefore($form);
-			}
-			else {
-				overlayDialogueDestroy(overlay.dialogueid);
-				overlay.$dialogue[0].dispatchEvent(new CustomEvent('dialogue.submit', {detail: response}));
-				$.publish('acknowledge.create', [response, overlay]);
-			}
-		});
+		if (typeof exception === 'object' && 'error' in exception) {
+			title = exception.error.title;
+			messages = exception.error.messages;
+		}
+		else {
+			messages = [<?= json_encode(_('Unexpected server error.')) ?>];
+		}
+
+		const message_box = makeMessageBox('bad', messages, title)[0];
+
+		this.form_element.parentNode.insertBefore(message_box, this.form_element);
 	}
 };

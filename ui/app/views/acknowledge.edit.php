@@ -22,7 +22,6 @@
 $form = (new CForm())
 	->addItem((new CVar(CSRF_TOKEN_NAME, CCsrfTokenHelper::get('acknowledge')))->removeId())
 	->setId('acknowledge_form')
-	->addVar('action', 'popup.acknowledge.create')
 	->addVar('eventids', $data['eventids']);
 
 $form_list = (new CFormList())
@@ -68,7 +67,6 @@ $form_list
 		new CLabel(_('Change severity'), 'change_severity'),
 		(new CList([
 			(new CCheckBox('change_severity', ZBX_PROBLEM_UPDATE_SEVERITY))
-				->onClick('javascript: jQuery("#severity input").attr("disabled", this.checked ? false : true)')
 				->setChecked($data['change_severity'])
 				->setEnabled($data['allowed_change_severity'] && $data['problem_severity_can_be_changed']),
 			(new CSeverity('severity', (int) $data['severity'], $data['change_severity']))
@@ -152,14 +150,13 @@ $output = [
 	'buttons' => [
 		[
 			'title' => _('Update'),
-			'class' => '',
+			'class' => 'js-submit',
 			'keepOpen' => true,
-			'isSubmit' => true,
-			'action' => 'update_problem_popup.submitAcknowledge(overlay);'
+			'isSubmit' => true
 		]
 	],
 	'script_inline' => $this->readJsFile('acknowledge.edit.js.php').
-		'update_problem_popup.init();',
+		'update_problem_popup.init('.json_encode(['rules' => $data['js_validation_rules']]).');',
 	'dialogue_class' => 'modal-popup-generic'
 ];
 
