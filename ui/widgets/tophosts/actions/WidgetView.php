@@ -553,13 +553,19 @@ class WidgetView extends CControllerDashboardWidgetView {
 	private static function getItemValues(array $items, array $column): array {
 		static $history_period_s;
 
-		if ($history_period_s === null) {
+		if ($history_period_s === null && in_array($column['display'], [CWidgetFieldColumnsList::DISPLAY_AS_IS,
+				CWidgetFieldColumnsList::DISPLAY_BAR, CWidgetFieldColumnsList::DISPLAY_INDICATORS])) {
 			$history_period_s = timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::HISTORY_PERIOD));
 		}
 
-		$time_from = $column['aggregate_function'] != AGGREGATE_NONE
-			? $column['time_period']['from_ts']
-			: time() - $history_period_s;
+		if ($column['aggregate_function'] != AGGREGATE_NONE) {
+			$time_from = $column['time_period']['from_ts'];
+		}
+		else {
+			$time_from = $column['display'] == CWidgetFieldColumnsList::DISPLAY_SPARKLINE
+				? $column['sparkline']['time_period']['from_ts']
+				: time() - $history_period_s;
+		}
 
 		$items_by_value_type = self::addDataSource($items, $time_from, $column);
 

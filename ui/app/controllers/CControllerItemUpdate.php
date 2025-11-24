@@ -131,17 +131,11 @@ class CControllerItemUpdate extends CControllerItem {
 			'posts' => [
 				['db items.posts'],
 				['db items.posts', 'required', 'not_empty',
-					'when' => ['post_type', 'in' => [ZBX_POSTTYPE_XML]],
-					'use' => [CXmlValidator::class, []]
-				],
-				['db items.posts', 'required', 'not_empty',
-					'when' => ['post_type', 'in' => [ZBX_POSTTYPE_JSON]],
-					'use' => [CJsonValidator::class, ['macros_n' => CItemTypeHttpAgent::POSTS_JSON_MACROS_N, 'usermacros' => true]]
-				],
-				['db items.posts', 'required', 'not_empty', 'when' => [
-					['post_type', 'in' => [ZBX_POSTTYPE_JSON, ZBX_POSTTYPE_XML]],
-					['type', 'in' => [ITEM_TYPE_HTTPAGENT]]
-				]]
+					'when' => [
+						['post_type', 'in' => [ZBX_POSTTYPE_JSON, ZBX_POSTTYPE_XML]],
+						['type', 'in' => [ITEM_TYPE_HTTPAGENT]]
+					]
+				]
 			],
 			'headers' => ['objects',
 				'fields' => [

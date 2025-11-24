@@ -4245,6 +4245,10 @@ msgstr "Não é possível definir \"%1$s\" para o protótipo de gráfico \"%2$s\
 msgid "Cannot set \"Data set aggregation\" when item with type \"Total\" is added to the chart."
 msgstr "Não é possível definir \"Agregação de conjunto de dados\" quando o item com tipo \"Total\" é adicionado ao gráfico."
 
+#: include/classes/db/MysqlDbBackend.php:197
+msgid "Cannot set charset."
+msgstr ""
+
 #: include/classes/api/services/CItemGeneral.php:2478
 #, c-format
 msgid "Cannot set dependency for LLD rule with key \"%1$s\" on the master item with key \"%2$s\" on the host \"%3$s\": %4$s."
@@ -9303,6 +9307,10 @@ msgstr "Requisitos de campo:"
 msgid "File checksum, calculated by the UNIX cksum algorithm. Returns integer for crc32 (default) and string for md5, sha256"
 msgstr "Soma de verificação do arquivo, calculada pelo algoritmo cksum do UNIX. Retorna um número inteiro para crc32 (padrão) e uma string para md5, sha256"
 
+#: include/classes/validators/CFormValidator.php:1451 jsLoader.php:445
+msgid "File format is unsupported."
+msgstr ""
+
 #: include/classes/import/readers/CYamlImportReader.php:52
 msgid "File is empty"
 msgstr "Arquivo está vazio"
@@ -9319,6 +9327,11 @@ msgstr "Informações sobre o proprietário do arquivo. Retorna string"
 #: include/classes/data/CItemData.php:1679
 msgid "File size in bytes (default) or in newlines. Returns integer"
 msgstr "Tamanho do arquivo em bytes (padrão) ou em novas linhas. Retorna um número inteiro"
+
+#: include/classes/helpers/CUploadFile.php:129 jsLoader.php:444
+#, c-format
+msgid "File size must be less than %1$s."
+msgstr ""
 
 #: include/classes/data/CItemData.php:1687
 msgid "File time information. Returns integer (Unix timestamp)"
@@ -12159,6 +12172,18 @@ msgstr "Macros herdadas e do host"
 msgid "Inherited and host prototype macros"
 msgstr "Macros de protótipo herdadas e de host"
 
+#: include/classes/helpers/CTagHelper.php:230
+msgid "Inherited and host tag"
+msgstr ""
+
+#: app/partials/configuration.tags.tab.php:42
+msgid "Inherited and host tags"
+msgstr ""
+
+#: include/classes/helpers/CTagHelper.php:231
+msgid "Inherited and item tag"
+msgstr ""
+
 #: app/partials/configuration.tags.tab.php:165
 msgid "Inherited and item tags"
 msgstr "Tags herdadas e de itens"
@@ -12171,13 +12196,33 @@ msgstr "Tags herdadas e de cenário"
 msgid "Inherited and template macros"
 msgstr "Macros herdadas e de template"
 
+#: include/classes/helpers/CTagHelper.php:229
+msgid "Inherited and template tag"
+msgstr ""
+
+#: app/partials/configuration.tags.tab.php:33
+msgid "Inherited and template tags"
+msgstr ""
+
+#: include/classes/helpers/CTagHelper.php:232
+msgid "Inherited and trigger tag"
+msgstr ""
+
 #: app/partials/configuration.tags.tab.php:155
 msgid "Inherited and trigger tags"
 msgstr "Tags herdadas e de acionamento"
 
+#: include/classes/helpers/CTagHelper.php:233
+msgid "Inherited and web scenario tag"
+msgstr ""
+
 #: include/forms.inc.php:311
 msgid "Inherited items"
 msgstr "Itens herdados"
+
+#: include/classes/helpers/CTagHelper.php:222
+msgid "Inherited tag"
+msgstr ""
 
 #: widgets/geomap/includes/WidgetForm.php:62
 msgid "Initial view"
@@ -21794,6 +21839,10 @@ msgstr "Nome do template"
 msgid "Template permissions"
 msgstr "Permissões de modelo"
 
+#: app/partials/configuration.tags.tab.php:33
+msgid "Template tags"
+msgstr ""
+
 #: report2.php:398
 msgid "Template trigger"
 msgstr "Trigger do template"
@@ -22299,6 +22348,10 @@ msgstr ""
 
 #: include/classes/validators/CFormValidator.php:946 jsLoader.php:421
 msgid "This value does not match pattern."
+msgstr ""
+
+#: jsLoader.php:442
+msgid "This value is not a valid file."
 msgstr ""
 
 #: include/classes/validators/CFormValidator.php:874 jsLoader.php:424

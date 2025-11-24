@@ -4,8 +4,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2025-07-14 08:25+0000\n"
-"Last-Translator: Alexey <alexey.pustovalov@zabbix.com>\n"
+"PO-Revision-Date: 2025-11-06 08:56+0000\n"
+"Last-Translator: Andrey <i@ashekhov.ru>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: ru\n"
 "MIME-Version: 1.0\n"
@@ -319,19 +319,19 @@ msgstr "%1$s: %2$s"
 #: include/classes/setup/CSetupWizard.php:1460
 #, c-format
 msgid "%1$s: %2$s."
-msgstr ""
+msgstr "%1$s: %2$s."
 
 #: include/classes/server/CZabbixServer.php:746
 #: include/classes/setup/CSetupWizard.php:1466
 #, c-format
 msgid "%1$s: file is not readable."
-msgstr ""
+msgstr "%1$s: файл недоступен для чтения."
 
 #: include/classes/server/CZabbixServer.php:743
 #: include/classes/setup/CSetupWizard.php:1463
 #, c-format
 msgid "%1$s: invalid path or file not found."
-msgstr ""
+msgstr "%1$s: неверный путь или файл не найден."
 
 #: include/classes/graph/CSvgGraph.php:1418
 #, c-format
@@ -1789,7 +1789,7 @@ msgstr "Должен существовать, по крайней мере, о�
 
 #: app/controllers/CControllerMaintenanceTimePeriodCheck.php:40
 msgid "At least one day must be selected."
-msgstr ""
+msgstr "Необходимо выбрать по крайней мере один день."
 
 #: include/classes/api/services/CMaintenance.php:686
 msgid "At least one day of the week or day of the month must be specified."
@@ -2120,7 +2120,7 @@ msgstr "Избегать легко угадываемых паролей"
 
 #: app/views/host.wizard.edit.php:473
 msgid "Avoid including sensitive data."
-msgstr ""
+msgstr "Избегайте включения конфиденциальных данных."
 
 #: jsLoader.php:172
 msgid "Awaiting data"
@@ -2234,7 +2234,7 @@ msgstr "Голубая"
 
 #: include/classes/core/ZBase.php:376
 msgid "Blue (classic)"
-msgstr ""
+msgstr "Синий (классический)"
 
 #: app/views/webscenario.step.edit.php:250
 #: include/views/configuration.host.discovery.edit.php:383
@@ -3736,7 +3736,7 @@ msgstr "Не удалось найти преобразование значен
 
 #: app/views/oauth.authorize.php:33
 msgid "Cannot get authentication tokens"
-msgstr ""
+msgstr "Не удалось получить токены аутентификации"
 
 #: app/views/oauth.edit.php:230
 msgid "Cannot get authorization code."
@@ -4275,7 +4275,7 @@ msgstr "Не удалось прочитать YAML: %1$s."
 #: include/classes/server/CZabbixServer.php:511
 #, c-format
 msgid "Cannot read response from Zabbix server \"%1$s\"."
-msgstr ""
+msgstr "Не удалось прочитать ответ от сервера Zabbix \"%1$s\"."
 
 #: include/classes/server/CZabbixServer.php:567
 #, c-format
@@ -4339,6 +4339,10 @@ msgstr "Не удалось установить \"%1$s\" для прототи�
 #: widgets/piechart/includes/CWidgetFieldDataSet.php:175
 msgid "Cannot set \"Data set aggregation\" when item with type \"Total\" is added to the chart."
 msgstr "Невозможно задать \"Агрегирование набора данных\" при добавленном на диаграмму элементе данных с типом \"Итого\"."
+
+#: include/classes/db/MysqlDbBackend.php:197
+msgid "Cannot set charset."
+msgstr ""
 
 #: include/classes/api/services/CItemGeneral.php:2478
 #, c-format
@@ -5066,7 +5070,7 @@ msgstr "Китайский (zh_TW)"
 #: app/views/administration.authentication.edit.php:354
 #: app/views/administration.authentication.edit.php:379
 msgid "Choose file"
-msgstr ""
+msgstr "Выберите файл"
 
 #: include/classes/import/importers/CTemplateImporter.php:294
 #, c-format
@@ -6454,7 +6458,7 @@ msgstr "Темная"
 
 #: include/classes/core/ZBase.php:378
 msgid "Dark (classic)"
-msgstr ""
+msgstr "Темный (классический)"
 
 #: app/controllers/CControllerAuditLogList.php:227
 #: app/controllers/CControllerDashboardPrint.php:71
@@ -7016,7 +7020,7 @@ msgstr "Удалить график?"
 
 #: app/views/host.prototype.edit.php:699
 msgid "Delete host prototype?"
-msgstr ""
+msgstr "Удалить прототип узла сети?"
 
 #: app/views/administration.iconmap.edit.php:145
 msgid "Delete icon map?"
@@ -7519,7 +7523,7 @@ msgstr "Обнаруженная лицензия TimescaleDB не поддер�
 
 #: app/views/administration.housekeeping.edit.php:204
 msgid "Detected license does not support compression. Compression is supported in TimescaleDB Community Edition."
-msgstr ""
+msgstr "Обнаруженная лицензия не поддерживает сжатие. Сжатие поддерживается в TimescaleDB Community Edition."
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1130
 msgid "Detection period"
@@ -8787,7 +8791,7 @@ msgstr "Введите строку идентификатора PSK (pre-shared
 
 #: app/views/host.wizard.edit.php:470
 msgid "Enter a unique name that Zabbix components will use to recognize the pre-shared key."
-msgstr ""
+msgstr "Введите уникальное имя, которое компоненты Zabbix будут использовать для распознавания pre-shared ключа."
 
 #: app/views/host.wizard.edit.php:609
 msgid "Enter the IP/DNS address and port of the Zabbix agent installed on your monitoring target."
@@ -9423,6 +9427,10 @@ msgstr "Требования к полю:"
 msgid "File checksum, calculated by the UNIX cksum algorithm. Returns integer for crc32 (default) and string for md5, sha256"
 msgstr "Контрольная сумма файла, вычисляется алгоритмом UNIX cksum. Возвращает целое число для crc32 (по умолчанию) и строки для md5, sha256"
 
+#: include/classes/validators/CFormValidator.php:1451 jsLoader.php:445
+msgid "File format is unsupported."
+msgstr "Формат файла не поддерживается."
+
 #: include/classes/import/readers/CYamlImportReader.php:52
 msgid "File is empty"
 msgstr "Файл пустой"
@@ -9439,6 +9447,11 @@ msgstr "Информация о владельце файла. Возвраща�
 #: include/classes/data/CItemData.php:1679
 msgid "File size in bytes (default) or in newlines. Returns integer"
 msgstr "Размер файла в байтах (по умолчанию) или в количестве символов новых строк. Возвращает целое число"
+
+#: include/classes/helpers/CUploadFile.php:129 jsLoader.php:444
+#, c-format
+msgid "File size must be less than %1$s."
+msgstr "Размер файла должен быть менее %1$s."
 
 #: include/classes/data/CItemData.php:1687
 msgid "File time information. Returns integer (Unix timestamp)"
@@ -11695,7 +11708,7 @@ msgstr "Некорректное значение массового опрос�
 
 #: include/classes/validators/CHostGroupNameValidator.php:36
 msgid "Incorrect characters used for host group name."
-msgstr ""
+msgstr "В имени группы узлов сети использованы некорректные символы."
 
 #: include/classes/api/services/CHost.php:1029
 #: include/classes/api/services/CHost.php:2052
@@ -11712,7 +11725,7 @@ msgstr "В имени узла сети использованы некорре�
 #: app/controllers/CControllerProxyCreate.php:34
 #: app/controllers/CControllerProxyUpdate.php:30
 msgid "Incorrect characters used for proxy name."
-msgstr ""
+msgstr "В имени прокси использованы некорректные символы."
 
 #: app/controllers/CControllerTemplateCreate.php:35
 #: app/controllers/CControllerTemplateUpdate.php:36
@@ -12292,6 +12305,18 @@ msgstr "Макросы узла сети и унаследованные"
 msgid "Inherited and host prototype macros"
 msgstr "Унаследованные и макросы прототипов узлов сети"
 
+#: include/classes/helpers/CTagHelper.php:230
+msgid "Inherited and host tag"
+msgstr ""
+
+#: app/partials/configuration.tags.tab.php:42
+msgid "Inherited and host tags"
+msgstr ""
+
+#: include/classes/helpers/CTagHelper.php:231
+msgid "Inherited and item tag"
+msgstr ""
+
 #: app/partials/configuration.tags.tab.php:165
 msgid "Inherited and item tags"
 msgstr "Унаследованные и собственные теги"
@@ -12304,13 +12329,33 @@ msgstr "Унаследованные и собственные теги"
 msgid "Inherited and template macros"
 msgstr "Унаследованные и макросы из шаблонов"
 
+#: include/classes/helpers/CTagHelper.php:229
+msgid "Inherited and template tag"
+msgstr ""
+
+#: app/partials/configuration.tags.tab.php:33
+msgid "Inherited and template tags"
+msgstr ""
+
+#: include/classes/helpers/CTagHelper.php:232
+msgid "Inherited and trigger tag"
+msgstr ""
+
 #: app/partials/configuration.tags.tab.php:155
 msgid "Inherited and trigger tags"
 msgstr "Унаследованные и собственные теги"
 
+#: include/classes/helpers/CTagHelper.php:233
+msgid "Inherited and web scenario tag"
+msgstr ""
+
 #: include/forms.inc.php:311
 msgid "Inherited items"
 msgstr "Унаследованные элементы данных"
+
+#: include/classes/helpers/CTagHelper.php:222
+msgid "Inherited tag"
+msgstr ""
 
 #: widgets/geomap/includes/WidgetForm.php:62
 msgid "Initial view"
@@ -14951,7 +14996,7 @@ msgstr ""
 
 #: app/views/maintenance.timeperiod.edit.php:202
 msgid "Minute"
-msgstr ""
+msgstr "Минута"
 
 #: app/views/maintenance.timeperiod.edit.php:212
 #: app/views/popup.sla.excludeddowntime.edit.php:73
@@ -15177,12 +15222,12 @@ msgstr "Множественные события ПРОБЛЕМА"
 #: app/partials/administration.system.info.php:235
 #, c-format
 msgid "Must be at least %1$s."
-msgstr ""
+msgstr "Должно быть не менее %1$s."
 
 #: app/controllers/CControllerMaintenanceUpdateGeneral.php:32
 #, c-format
 msgid "Must be greater than \"%1$s\"."
-msgstr ""
+msgstr "Должно быть не больше \"%1$s\"."
 
 #: include/classes/validators/CFormValidator.php:340
 msgid "Must be selected."
@@ -15191,7 +15236,7 @@ msgstr "Обязательно для выбора."
 #: app/partials/administration.system.info.php:254
 #, c-format
 msgid "Must not be higher than %1$s."
-msgstr ""
+msgstr "Должно быть не более %1$s."
 
 #: jsLoader.php:284
 msgid "Mute"
@@ -15594,7 +15639,7 @@ msgstr "Новая группа узлов сети"
 
 #: app/views/host.prototype.edit.php:727
 msgid "New host prototype"
-msgstr ""
+msgstr "Новый прототип узлов сети"
 
 #: app/views/item.edit.php:218
 msgid "New item"
@@ -15969,63 +16014,63 @@ msgstr "Нет прав доступа на вызов \"%1$s.%2$s\"."
 
 #: include/classes/api/services/CConfiguration.php:312
 msgid "No permissions to import discovery rules."
-msgstr ""
+msgstr "Нет прав на импорт правил обнаружения."
 
 #: include/classes/api/services/CConfiguration.php:313
 msgid "No permissions to import graphs."
-msgstr ""
+msgstr "Нет прав на импорт графиков."
 
 #: include/classes/api/services/CConfiguration.php:314
 msgid "No permissions to import host groups."
-msgstr ""
+msgstr "Нет прав на импорт групп узлов сети."
 
 #: include/classes/api/services/CConfiguration.php:316
 msgid "No permissions to import hosts."
-msgstr ""
+msgstr "Нет прав на импорт узлов сети."
 
 #: include/classes/api/services/CConfiguration.php:318
 msgid "No permissions to import images."
-msgstr ""
+msgstr "Нет прав на импорт изображений."
 
 #: include/classes/api/services/CConfiguration.php:319
 msgid "No permissions to import items."
-msgstr ""
+msgstr "Нет прав на импорт элементов данных."
 
 #: include/classes/api/services/CConfiguration.php:320
 msgid "No permissions to import maps."
-msgstr ""
+msgstr "Нет прав на импорт карт."
 
 #: include/classes/api/services/CConfiguration.php:321
 msgid "No permissions to import media types."
-msgstr ""
+msgstr "Нет прав на импорт способов оповещения."
 
 #: include/classes/api/services/CConfiguration.php:324
 msgid "No permissions to import template dashboards."
-msgstr ""
+msgstr "Нет прав на импорт шаблонов панелей."
 
 #: include/classes/api/services/CConfiguration.php:315
 msgid "No permissions to import template groups."
-msgstr ""
+msgstr "Нет прав на импорт групп шаблонов."
 
 #: include/classes/api/services/CConfiguration.php:322
 msgid "No permissions to import template links."
-msgstr ""
+msgstr "Нет прав на импорт шаблонов связей."
 
 #: include/classes/api/services/CConfiguration.php:323
 msgid "No permissions to import templates."
-msgstr ""
+msgstr "Нет прав на импорт шаблонов."
 
 #: include/classes/api/services/CConfiguration.php:325
 msgid "No permissions to import triggers."
-msgstr ""
+msgstr "Нет прав на импорт триггеров."
 
 #: include/classes/api/services/CConfiguration.php:326
 msgid "No permissions to import value maps."
-msgstr ""
+msgstr "Нет прав на импорт преобразований значений."
 
 #: include/classes/api/services/CConfiguration.php:317
 msgid "No permissions to import web scenarios."
-msgstr ""
+msgstr "Нет прав на импорт веб-сценариев."
 
 #: app/controllers/CControllerChartsView.php:133
 #: app/controllers/CControllerDashboardPrint.php:99
@@ -20613,13 +20658,13 @@ msgstr "Сокращённое"
 #: app/views/administration.housekeeping.edit.php:187
 #, c-format
 msgid "Should be at least %1$s."
-msgstr ""
+msgstr "Следует указать не менее %1$s."
 
 #: app/partials/administration.system.info.php:262
 #: app/views/administration.housekeeping.edit.php:197
 #, c-format
 msgid "Should not be higher than %1$s."
-msgstr ""
+msgstr "Следует указать не более %1$s."
 
 #: app/partials/monitoring.problem.filter.php:27
 #: app/views/monitoring.charts.view.php:80
@@ -21964,6 +22009,10 @@ msgstr "Имя шаблона"
 msgid "Template permissions"
 msgstr "Права доступа к шаблонам"
 
+#: app/partials/configuration.tags.tab.php:33
+msgid "Template tags"
+msgstr ""
+
 #: report2.php:398
 msgid "Template trigger"
 msgstr "Шаблонный триггер"
@@ -22475,6 +22524,10 @@ msgstr "Это значение не может быть одним из %1$s."
 #: include/classes/validators/CFormValidator.php:946 jsLoader.php:421
 msgid "This value does not match pattern."
 msgstr "Это значение не соответствует шаблону."
+
+#: jsLoader.php:442
+msgid "This value is not a valid file."
+msgstr ""
 
 #: include/classes/validators/CFormValidator.php:874 jsLoader.php:424
 msgid "This value is not a valid floating-point value."
@@ -25268,7 +25321,7 @@ msgstr "Предупреждающее сообщение"
 #: app/partials/administration.system.info.php:243
 #: app/partials/administration.system.info.php:262
 msgid "Warning!"
-msgstr ""
+msgstr "Предупреждение!"
 
 #: app/partials/administration.system.info.php:198
 msgid "Warning! Support for Oracle DB is deprecated since Zabbix 7.0 and will be removed in future versions."
@@ -26907,7 +26960,7 @@ msgstr "папка не может быть пустой"
 
 #: include/views/configuration.host.discovery.list.php:340
 msgid "discovery rule"
-msgstr ""
+msgstr "правило обнаружения"
 
 #: app/controllers/CControllerItemMassCheckNow.php:138
 #: include/classes/api/services/CTask.php:562
