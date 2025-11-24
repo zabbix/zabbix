@@ -79,7 +79,6 @@ class testDashboardUserPermissions extends CWebTest {
 	 * Function used to create users, template, dashboards, hosts and user groups.
 	 */
 	public static function prepareTestData() {
-
 		$template_groupid = CDataHelper::call('templategroup.create', [
 			[
 				'name' => 'Template group for dashboard access testing'
@@ -370,7 +369,7 @@ class testDashboardUserPermissions extends CWebTest {
 	}
 
 	/**
-	 * Check users access to host and template dashboards according to user group and user role permissions.
+	 * Check that users have access to host and template dashboards according to user group and user role permissions.
 	 *
 	 * @dataProvider getDashboardPermissionsData
 	 */
@@ -380,13 +379,13 @@ class testDashboardUserPermissions extends CWebTest {
 		$this->page->userLogin(self::USERNAME, self::PASSWORD);
 
 		// Check user aceess to template dashboard via URL.
-		$this->testDashboardUserPermissions_TemplateDashboardURL($data);
+		$this->checkAccessViaUrlOnTemplate($data);
 
 		// Check user aceess to host dashboard via URL.
-		$this->testDashboardUserPermissions_HostDashboardURL($data);
+		$this->checkAccessViaUrlOnHost($data);
 
 		//  Check user access to host dashboard via frontend.
-		$this->testDashboardUserPermissions_HostDashboard($data);
+		$this->checkAccessViaMonitoringHosts($data);
 	}
 
 	/**
@@ -394,7 +393,7 @@ class testDashboardUserPermissions extends CWebTest {
 	 *
 	 * @param array		$data		Data from data provider.
 	 */
-	protected function testDashboardUserPermissions_HostDashboard($data) {
+	protected function checkAccessViaMonitoringHosts($data) {
 		// Open host list in monitorting section.
 		$this->page->open('zabbix.php?action=host.view&groupids%5B%5D='.self::$host_groupid)->waitUntilReady();
 		$table = $this->query('class:list-table')->waitUntilPresent()->asTable()->one();
@@ -430,7 +429,7 @@ class testDashboardUserPermissions extends CWebTest {
 	 *
 	 * @param array		$data		Data from data provider.
 	 */
-	protected function testDashboardUserPermissions_HostDashboardURL($data) {
+	protected function checkAccessViaUrlOnHost($data) {
 		// Open inherited dashboard.
 		$this->page->open('zabbix.php?action=host.dashboard.view&hostid='.self::$hostid)->waitUntilReady();
 
@@ -444,8 +443,8 @@ class testDashboardUserPermissions extends CWebTest {
 			$this->assertFalse($this->query('xpath:.//nav[@class="dashboard-edit"]')->exists());
 		}
 		else {
-			$this->assertMessage(TEST_BAD, 'Access denied', 'You are logged in as "'.self::USERNAME.'". '.
-					'You have no permissions to access this page.'
+			$this->assertMessage(TEST_BAD, 'Access denied', 'You are logged in as "'.self::USERNAME.
+					'". You have no permissions to access this page.'
 			);
 			$this->assertTrue($this->query('button:Go to "Dashboards"')->one()->isClickable());
 		}
@@ -456,9 +455,7 @@ class testDashboardUserPermissions extends CWebTest {
 	 *
 	 * @param array		$data		Data from data provider.
 	 */
-	protected function testDashboardUserPermissions_TemplateDashboardURL($data) {
-		// Login under updated user and open inherited dashboard.
-		$this->page->userLogin(self::USERNAME, self::PASSWORD);
+	protected function checkAccessViaUrlOnTemplate($data) {
 		$this->page->open('zabbix.php?action=template.dashboard.edit&dashboardid='.self::$template_dashboardid)->waitUntilReady();
 
 		if ($data['edit']) {
@@ -467,8 +464,8 @@ class testDashboardUserPermissions extends CWebTest {
 			$this->assertTrue($dashboard->isEditable());
 		}
 		else {
-			$this->assertMessage(TEST_BAD, 'Access denied', 'You are logged in as "'.self::USERNAME.'". '.
-					'You have no permissions to access this page.'
+			$this->assertMessage(TEST_BAD, 'Access denied', 'You are logged in as "'.self::USERNAME.
+					'". You have no permissions to access this page.'
 			);
 			$this->assertTrue($this->query('button:Go to "Dashboards"')->one()->isClickable());
 		}
@@ -1117,7 +1114,8 @@ class testDashboardUserPermissions extends CWebTest {
 			case 'group_access':
 				$this->updateUser($data['user_role'], $data['user_group']);
 				$this->updateDashboardAccess($data['permissions'], $data['dashboard_group'], PERM_READ_WRITE,
-						$data['scenario'], $sharing_type);
+						$data['scenario'], $sharing_type
+				);
 				break;
 			case 'user_access':
 				$this->updateUser($data['user_role']);
@@ -1167,7 +1165,7 @@ class testDashboardUserPermissions extends CWebTest {
 	 * @param integer $group_permissions	PERM_READ_WRITE, PERM_READ or PERM_DENY.
 	 * @param string  $group				User group name.
 	 * @param integer $user_permissions		PERM_READ_WRITE, PERM_READ or PERM_DENY.
-	 * @param integer $scenario				Dashboard update scenario: group_access, user_access, group_and_user or different_user.
+	 * @param string  $scenario				Dashboard update scenario: group_access, user_access, group_and_user or different_user.
 	 * @param integer $sharing				PUBLIC_SHARING or PRIVATE_SHARING.
 	 */
 	protected function updateDashboardAccess($group_permissions, $group, $user_permissions, $scenario, $sharing) {
