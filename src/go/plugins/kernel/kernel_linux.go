@@ -15,7 +15,6 @@
 package kernel
 
 import (
-	"bytes"
 	"strconv"
 
 	"golang.zabbix.com/agent2/pkg/procfs"
@@ -38,21 +37,24 @@ func getFirstNum(key string) (uint64, error) {
 		return 0, plugin.UnsupportedMetricError
 	}
 
-	data, err := procfs.ReadAll(fileName)
+	parser := procfs.NewParser().
+		SetScanStrategy(procfs.StrategyReadAll).
+		SetMaxMatches(1)
+
+	if key == "kernel.openfiles" {
+		parser.SetSplitter("\t", 0)
+	}
+
+	data, err := parser.Parse(fileName)
 	if err != nil {
 		return 0, errs.Wrapf(err, "failed to read %s", fileName)
 	}
 
-	if key == "kernel.openfiles" {
-		parts := bytes.Split(data, []byte("\t"))
-		if len(parts) > 0 {
-			data = parts[0]
-		}
+	if len(data) == 0 {
+		return 0, errs.Errorf("failed to parse %s", fileName)
 	}
 
-	data = bytes.TrimSpace(data) // removing \n
-
-	maximum, err := strconv.ParseUint(string(data), 10, 64)
+	maximum, err := strconv.ParseUint(data[0], 10, 64)
 	if err != nil {
 		return 0, errs.Wrapf(err, "Cannot obtain data from %s.", fileName)
 	}
