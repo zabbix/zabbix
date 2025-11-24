@@ -3,8 +3,8 @@
 This plugin provides a native Zabbix solution to monitor Oracle Database (multi-model database management system).
 It can monitor several Oracle instances simultaneously; remote or local to Zabbix agent 2.
 The plugin keeps connections in an open state to reduce network congestion, latency, CPU and
-memory usage. It is highly recommended to use it in conjunction with the official 
-[Oracle template.](https://git.zabbix.com/projects/ZBX/repos/zabbix/browse/templates/db/oracle_agent2) 
+memory usage. It is highly recommended to use it in conjunction with the official
+[Oracle template.](https://git.zabbix.com/projects/ZBX/repos/zabbix/browse/templates/db/oracle_agent2)
 You can extend it or create your own template to cater to specific needs.
 
 **Important! This integration queries the `V$ACTIVE_SESSION_HISTORY` dynamic performance view which is part of the Oracle Diagnostics Pack. Please make sure that you have the license required for using this management pack.**
@@ -78,9 +78,9 @@ However, there are ways to go around this, if the `SELECT_CATALOG_ROLE` assigned
 One way to do this is using **pipelined table functions**:
 
   1. Log into your database as the `SYS` user or make sure that your administration user has the required privileges to execute the steps below;
-  
+
   2. Create types for the table function:
-    
+
       ```sql
       CREATE OR REPLACE TYPE zbx_mon_restore_point_row AS OBJECT (
         SCN                           NUMBER,
@@ -99,9 +99,9 @@ One way to do this is using **pipelined table functions**:
       );
       CREATE OR REPLACE TYPE zbx_mon_restore_point_tab IS TABLE OF zbx_mon_restore_point_row;
       ```
-  
+
   3. Create the pipelined table function:
-  
+
       ```sql
       CREATE OR REPLACE FUNCTION zbx_mon_restore_point RETURN zbx_mon_restore_point_tab PIPELINED AS
       BEGIN
@@ -111,7 +111,7 @@ One way to do this is using **pipelined table functions**:
         RETURN;
       END;
       ```
-  
+
   4. Grant the Zabbix monitoring user the Execute privilege on the created pipelined table function and replace the monitoring user `V$RESTORE_POINT` view with the `SYS` user function (in this example, the `SYS` user is used to create DB types and function):
 
     ```sql
@@ -133,58 +133,59 @@ One way to do this is using **pipelined table functions**:
     ```
 
   > Note that in these examples, the monitoring user is named `c##zabbix_mon` and the system user - `SYS`. Change these example usernames to ones that are appropriate for your environment.
-  
+
   If this workaround does not work for you, there are more options available, such as __materialized views__, but look out for data refresh as `V$RESTORE_POINT` is the dynamic performance view.
 
-  6. Make sure a TNS<sup>[2](#footnote-2)</sup> Listener and an Oracle instance are available for the connection. 
+  6. Make sure a TNS<sup>[2](#footnote-2)</sup> Listener and an Oracle instance are available for the connection.
 
   _Note_:
-  Upgrading 
+  Upgrading
 
 ## Configuration
 
 To configure plugins, Zabbix agent 2 configuration file is used.
 
-**Plugins.Oracle.CallTimeout** — the maximum time in seconds for waiting when a request has to be done.  
-*Default value:* equals the global<sup>[1](#footnote-1)</sup> Timeout configuration parameter.  
+**Plugins.Oracle.CallTimeout** — the maximum wait time in seconds for a request to be completed.
+Currently has no effect and the maximum wait time is determined by item timeout instead.
+*Default value:* equals the global<sup>[1](#footnote-1)</sup> "Timeout" configuration option.
 *Limits:* 1-30
 
-**Plugins.Oracle.ConnectTimeout** — the maximum time in seconds for waiting when a connection has to be established.   
-*Default value:* equals the global<sup>[1](#footnote-1)</sup> Timeout configuration parameter.  
+**Plugins.Oracle.ConnectTimeout** — the maximum wait time in seconds for a connection to be established.
+*Default value:* equals the global<sup>[1](#footnote-1)</sup> "Timeout" configuration option.
 *Limits:* 1-30
 
-**Plugins.Oracle.CustomQueriesPath** — the full pathname of a directory containing *.sql* files with custom queries.  
+**Plugins.Oracle.CustomQueriesPath** — the full pathname of a directory containing *.sql* files with custom queries.
 *Default value:* —  the feature is disabled by default.
 
 
-**Plugins.Oracle.KeepAlive** — sets the time for waiting before unused connections will be closed.  
-*Default value:* 300 sec.  
+**Plugins.Oracle.KeepAlive** — sets the time for waiting before unused connections will be closed.
+*Default value:* 300 sec.
 *Limits:* 60-900
 
 **Plugins.Oracle.ResolveTNS** — specifies how to interpret the URI string — provided either in the metrics key (ConnString part) or the Uri option parameter in Oracle plugin's config file — for a connection to the Oracle server. If ResolveTNS set to true, the URI schema and port will be ignored and only hostname part will be used as TNS descriptor — either key or value. If the descriptor is a TNS key, the Oracle client looks up the connection description in the tnsnames.ora file. If a TNS value (begins with `(DESCRIPTION...`), the Oracle client will use it for the Oracle server connection as is.
-*Default value:* true 
+*Default value:* true
 
 ### Configuring connection
 
 The connection can be configured using either key parameters or named sessions.
 
-*Notes*:  
+*Notes*:
 * You can leave any connection parameter value empty; in this case, the default - hard-coded value will be used.
-* Embedded URI credentials (e.g., user credentials) are not supported and will be ignored. It is not possible to override the credentials this way: 
-  
-      oracle.ping[tcp://USER:password@127.0.0.1/XE] — WRONG  
-  
+* Embedded URI credentials (e.g., user credentials) are not supported and will be ignored. It is not possible to override the credentials this way:
+
+      oracle.ping[tcp://USER:password@127.0.0.1/XE] — WRONG
+
   The correct way is:
-    
+
       oracle.ping[tcp://127.0.0.1,USER,password,XE]
-      
+
 * The only supported URI network schema is "tcp". Examples of valid URIs:
 
     - tcp://localhost:1521
     - tcp://localhost
     - localhost:1521
     - localhost
-  
+
     The hostname "localhost" in examples can be IP address, e.g., 127.0.0.1 or any other hostname.
 
 * Usernames are supported only if written in uppercase characters.
@@ -198,12 +199,12 @@ To be able to monitor tablespaces across multiple containers, the Oracle service
 #### Using key parameters
 
 Common parameters for all keys are: [ConnString][User][Password][Service] where `ConnString` can be an URI, session name, TNS key or its value.
-`ConnString` will be treated as follows:   
+`ConnString` will be treated as follows:
   - as session name — if such a name is found in the plugin's configuration file
   - as URI — if no any session with the given name is found, and Plugins.Oracle.ResolveTNS is set to false. If it contains a schema, e.g., "tcp://", port, e.g., 1521 or both, ResolveTNS option will not be taken into account, and it anyway will be treated as URI
   - as TNS key — if the plugin's option ResolveTNS is set to true, and none of the above conditions apply
   - as TNS value — if it starts with the open bracket “(“ (leading spaces ignored). In this case, the ResolveTNS option is not taken into account.
- 
+
 
  See the chapter [Using TNS Names](#using-tns-names) for the details about how the plugin resolves TNS names.
 
@@ -211,37 +212,37 @@ The parameter User can contain sysdba, sysoper, sysasm, sysbackup, sysdg, syskm,
 e.g `user as sysdba`, privilege can be upper or lowercase, and must be at the end of the username string.
 If you use `ConnString` as a session name, you can skip the rest of the connection parameters.
 
-_Note:_  
+_Note:_
 If ResolveTNS=true and ConnString is specified for TNS lookup, but the name does not exist in tnsnames.ora, the Oracle client tries to resolve the ConnString as a DNS name.
 In the case where it is a non-existent DNS name, the process usually takes a long time and ends with an error response: "Timeout occurred while gathering data" (if the default timeout option is used).
 If the specified ConnString is resolved as a DNS name, the Oracle client attempts to connect using the hostname.
- 
+
 #### Using named sessions
 
 Named sessions allow defining specific parameters for each Oracle instance. Currently, there are four supported parameters: `Uri`, `User`, `Password` and `Service`.
 This option to store credentials is a slightly more secure way compared to item keys or macros.
 
-For example, if you have two Oracle instances: "Oracle12" and "Oracle19", you should add the following options to the agent configuration file:   
+For example, if you have two Oracle instances: "Oracle12" and "Oracle19", you should add the following options to the agent configuration file:
 
     Plugins.Oracle.Sessions.Oracle12.Uri=tcp://192.168.1.1:1521
     Plugins.Oracle.Sessions.Oracle12.User=<USERFORORACLE12>
     Plugins.Oracle.Sessions.Oracle12.Password=<PasswordForOracle12>
     Plugins.Oracle.Sessions.Oracle12.Service=orcl
-        
+
     Plugins.Oracle.Sessions.Oracle19.Uri=tcp://192.168.1.2:1521
     Plugins.Oracle.Sessions.Oracle19.User=<USERFORORACLE19>
     Plugins.Oracle.Sessions.Oracle19.Password=<PasswordForOracle19>
     Plugins.Oracle.Sessions.Oracle19.Service=orcl
-        
+
 Then you will be able to use these names as the first parameter (ConnString) in keys instead of URIs.
 For example:
 
     oracle.ping[Oracle12]
     oracle.ping[Oracle19]
 
-_Notes_:    
+_Notes_:
 - Session names are case-sensitive.
-- URI can also contain either TNS key or value. 
+- URI can also contain either TNS key or value.
 - ConnectTimeout option parameter is not applicable when the Oracle client looks the TNS key up in the tnsnames.ora file.
 
 #### Using TNS Names
@@ -267,18 +268,18 @@ In the example above, `zbx_tns_example`  is the TNS key, while the rest — star
 
 _Usage Examples_
 
-- TNS key in the plugin's config file (either in the named session or in the default option):  
-`Plugins.Oracle.Default.Uri=zbx_tns_example`  
+- TNS key in the plugin's config file (either in the named session or in the default option):
+`Plugins.Oracle.Default.Uri=zbx_tns_example`
 `Plugins.Oracle.Sessions.MySession.Uri=zbx_tns_example`
 
-- TNS value in the plugin's config file (either in the named session or default option). Must be composed without whitespaces:  
-`Plugins.Oracle.Default.Uri=(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=localhost)(PORT=1521))(CONNECT_DATA=(SERVICE_NAME=xe)))`   
+- TNS value in the plugin's config file (either in the named session or default option). Must be composed without whitespaces:
+`Plugins.Oracle.Default.Uri=(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=localhost)(PORT=1521))(CONNECT_DATA=(SERVICE_NAME=xe)))`
 `Plugins.Oracle.Sessions.MySession.Uri=(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=localhost)(PORT=1521))(CONNECT_DATA=(SERVICE_NAME=xe)))`
 
-- TNS key in the metric key's ConnString part (the service name "XE" will be ignored):  
+- TNS key in the metric key's ConnString part (the service name "XE" will be ignored):
 `oracle.ping[zbx_tns_example,ZABBIX_MON,zabbix,xe]`
 
-- TNS value in the metric key (the service name "XE" will be ignored):  
+- TNS value in the metric key (the service name "XE" will be ignored):
 `oracle.ping["(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=localhost)(PORT=1521))(CONNECT_DATA=(SERVICE_NAME=xe)))",ZABBIX_MON,zabbix]`
 
 The plugin will interpret ConnString as TNS only if the option Plugins.Oracle.ResolveTNS is set to true.  Although some nuances exist (see the chapter [Using key parameters](#Using-key-parameters)).
@@ -287,24 +288,24 @@ The plugin will interpret ConnString as TNS only if the option Plugins.Oracle.Re
 
 **oracle.diskgroups.stats[\<commonParams\>,\<diskgroup\>]** — returns Automatic Storage Management (ASM) disk groups statistics.
 
-*Parameters:*  
+*Parameters:*
 `diskgroup` (optional) — the name of a diskgroup.
 
 **oracle.diskgroups.discovery[\<commonParams\>]** — returns a list of ASM disk groups in LLD format.
 
 **oracle.archive.info[\<commonParams\>,\<destination\>]** — returns archive logs statistics.
-*Parameters:*  
+*Parameters:*
 `destination` (optional) — the name of the destination.
 
 **oracle.archive.discovery[\<commonParams\>]** — returns a list of archive logs in LLD format.
 
 **oracle.cdb.info[\<commonParams\>,\<database\>]** — returns Container Databases (CDBs) info.
-*Parameters:*  
+*Parameters:*
 `database` (optional) — the name of a database.
 
 **oracle.custom.query[\<commonParams\>,queryName[,args...]]** — returns the result of a custom query.
 
-*Parameters:*  
+*Parameters:*
 `queryName` (required) — the name of a custom query (must be equal to the name of a *sql* file without an extension).
 `args` (optional) — one or more arguments to pass to a query.
 
@@ -317,12 +318,12 @@ The plugin will interpret ConnString as TNS only if the option Plugins.Oracle.Re
 **oracle.instance.info[\<commonParams\>]** — returns instance statistics.
 
 **oracle.pdb.info[\<commonParams\>,\<database\>]** — returns a Pluggable Databases (PDBs) information.
-*Parameters:*  
+*Parameters:*
 `database` (optional) — the name of a database.
 
 **oracle.pdb.discovery[\<commonParams\>]** — returns a list of PDBs in LLD format.
 
-**oracle.pga.stats[\<commonParams\>]** — returns the Program Global Area (PGA) statistics.  
+**oracle.pga.stats[\<commonParams\>]** — returns the Program Global Area (PGA) statistics.
 
 **oracle.ping[\<commonParams\>]** — performs a simple ping to check if the connection is alive or not.
 
@@ -330,7 +331,7 @@ The plugin will interpret ConnString as TNS only if the option Plugins.Oracle.Re
 - "1" if a connection is alive.
 - "0" if a connection is broken (if there is any error presented including authorization and configuration issues).
 
-**oracle.proc.stats[\<commonParams\>]** — returns processes' statistics. 
+**oracle.proc.stats[\<commonParams\>]** — returns processes' statistics.
 
 **oracle.redolog.info[\<commonParams\>]** — returns log file information from the control file.
 
@@ -338,23 +339,23 @@ The plugin will interpret ConnString as TNS only if the option Plugins.Oracle.Re
 
 **oracle.sessions.stats[\<commonParams\>,[lockMaxTime]]** — returns sessions' statistics.
 
-*Parameters:*    
+*Parameters:*
 `lockMaxTime` (optional) — the maximum duration of the session lock in seconds to count the session as locked prolongedly.
-Default: 600 seconds.    
+Default: 600 seconds.
 
 **oracle.sys.metrics[\<commonParams\>[,duration]]** — returns a set of the system metric values.
 
-*Parameters:*  
+*Parameters:*
 Duration (optional) — capturing interval in seconds of system metric values.
-Possible values:  
-60 — long duration (default).  
-15 — short duration.  
+Possible values:
+60 — long duration (default).
+15 — short duration.
 
 **oracle.sys.params[\<commonParams\>]** — returns a set of system parameter values.
 
-**oracle.ts.stats[\<commonParams\>,[tablespace],[type],[conname]]** — returns tablespace statistics. 
+**oracle.ts.stats[\<commonParams\>,[tablespace],[type],[conname]]** — returns tablespace statistics.
 
-*Parameters:*  
+*Parameters:*
 `tablespace` (optional) — a name of a tablespace.
 `type` (optional) — a list of a tablespace.
 `conname` (optional) — the container name for which information is required.
@@ -363,7 +364,7 @@ Possible values:
 
 **oracle.user.info[\<commonParams\>[,username]]** — returns user information.
 
-*Parameters:*  
+*Parameters:*
 Username (optional) — the username for which information is required. Usernames written in lowercase characters are not supported.
 Default: the current user.
 
@@ -374,34 +375,34 @@ Default: the current user.
 It is possible to extend the functionality of the plugin using user-defined queries. To do it, you should place all your queries in a specified directory in `Plugins.Oracle.CustomQueriesPath` (there is no default path) as it is for *.sql* files.
 For example, you can have the following tree:
 
-    /etc/zabbix/oracle/sql/  
+    /etc/zabbix/oracle/sql/
     ├── long_tx.sql
-    ├── payment.sql    
+    ├── payment.sql
     └── top_proc.sql
-     
+
 Then, you should set `Plugins.Oracle.CustomQueriesPath=/etc/zabbix/oracle/sql`.
-     
+
 Finally, when the queries are located in the right place, you can execute them:
 
-    oracle.custom.query[<commonParams>,top_proc]  
+    oracle.custom.query[<commonParams>,top_proc]
     oracle.custom.query[<commonParams>,long_tx,600]
-          
-You can pass as many parameters to a query as you need.   
-The syntax for placeholder parameters uses ":#" where "#" is an index number of the parameter. 
-For example: 
+
+You can pass as many parameters to a query as you need.
+The syntax for placeholder parameters uses ":#" where "#" is an index number of the parameter.
+For example:
 
 ```
 /* payment.sql */
 
-SELECT 
-    amount 
-FROM 
-    payment 
+SELECT
+    amount
+FROM
+    payment
 WHERE
     user = :1
     AND service_id = :2
     AND date = :3
-``` 
+```
 
     oracle.custom.query[<commonParams>,payment,"John Doe",1,"10/25/2020"]
 
@@ -427,6 +428,6 @@ The environment variable DPI_DEBUG_LEVEL can be used to selectively turn on the 
 See [ODPI-C Debugging](https://oracle.github.io/odpi/doc/user_guide/debugging.html) for details.
 
 ## Footnotes
-<a name="footnote-1">1</a>: Global timeout is defined in Zabbix agent 2 configuration file zabbix_agent2.config the option Timeout.
+<a name="footnote-1">1</a>: Global timeout is defined in Zabbix agent 2 configuration file zabbix_agent2.conf or zabbix_agent2.win.conf the option "Timeout".
 
 <a name="footnote-2">2</a>: TNS or Transparent Network Substrate is a connection description format used by Oracle databases to manage communication between clients (like SQL*Plus, Oracle SQL Developer, etc.) and Oracle databases. TNS is part of Oracle Net Services, which is responsible for enabling communication between different systems in an Oracle environment.

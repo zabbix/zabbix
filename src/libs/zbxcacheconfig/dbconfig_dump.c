@@ -630,7 +630,7 @@ static void	DCdump_items(void)
 				item->itemid, item->hostid, item->key, item->revision);
 		zabbix_log(LOG_LEVEL_TRACE, "  type:%u value_type:%u", item->type, item->value_type);
 		zabbix_log(LOG_LEVEL_TRACE, "  interfaceid:" ZBX_FS_UI64, item->interfaceid);
-		zabbix_log(LOG_LEVEL_TRACE, "  state:%u error:'%s'", item->state, item->error);
+		zabbix_log(LOG_LEVEL_TRACE, "  state:%u", item->state);
 		zabbix_log(LOG_LEVEL_TRACE, "  flags:%u status:%u", item->flags, item->status);
 		zabbix_log(LOG_LEVEL_TRACE, "  valuemapid:" ZBX_FS_UI64, item->valuemapid);
 		zabbix_log(LOG_LEVEL_TRACE, "  lastlogsize:" ZBX_FS_UI64 " mtime:%d", item->lastlogsize, item->mtime);
@@ -1365,7 +1365,7 @@ static void	DCdump_maintenances(void)
 }
 
 /* stringpool dumping is disabled by default to avoid leaking secret macro data */
-#ifdef HAVE_TESTS
+#ifdef ZBX_DEBUG
 static int	strpool_compare(const void *v1, const void *v2)
 {
 	const char	*s1 = *(const char * const *)v1 + sizeof(zbx_uint32_t);
@@ -1675,7 +1675,7 @@ void	DCdump_configuration(void)
 	DCdump_connectors();
 	DCdump_proxy_groups();
 	DCdump_host_proxy_index();
-#ifdef HAVE_TESTS
+#ifdef ZBX_DEBUG
 	DCdump_strpool();
 #endif
 }

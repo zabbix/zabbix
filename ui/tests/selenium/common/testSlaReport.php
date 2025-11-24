@@ -473,7 +473,7 @@ class testSlaReport extends CWebTest {
 							implode(', ', $reference_uptime)
 					);
 
-					// Calculate the error budet based on the actual uptime and compare with actual error budget.
+					// Calculate the error budget based on the actual uptime and compare with actual error budget.
 					$uptime_seconds = 0;
 					foreach (explode(' ', $uptime) as $time_unit) {
 						$uptime_seconds = $uptime_seconds + timeUnitToSeconds($time_unit);
