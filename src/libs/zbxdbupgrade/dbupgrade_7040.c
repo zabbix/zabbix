@@ -30,7 +30,7 @@ static int	DBpatch_7040000(void)
 static int	DBpatch_7040001(void)
 {
 	/* 2 - ZBX_FLAG_DISCOVERY_PROTOTYPE */
-	/* 6 - ZBX_FLAG_DISCOVERY_PROTOTYPE_CREATED */
+	/* 6 - ZBX_FLAG_DISCOVERY_PROTOTYPE_CREATED (host prototype discovered via nested LLD) */
 	if (ZBX_DB_OK > zbx_db_execute(
 			"delete from httptestitem"
 			" where httptestid in ("
@@ -47,7 +47,7 @@ static int	DBpatch_7040001(void)
 static int	DBpatch_7040002(void)
 {
 	/* 2 - ZBX_FLAG_DISCOVERY_PROTOTYPE */
-	/* 6 - ZBX_FLAG_DISCOVERY_PROTOTYPE_CREATED */
+	/* 6 - ZBX_FLAG_DISCOVERY_PROTOTYPE_CREATED (host prototype discovered via nested LLD) */
 	if (ZBX_DB_OK > zbx_db_execute(
 			"delete from httpstepitem"
 			" where httpstepid in ("
@@ -66,7 +66,7 @@ static int	DBpatch_7040002(void)
 static int	DBpatch_7040003(void)
 {
 	/* 2 - ZBX_FLAG_DISCOVERY_PROTOTYPE */
-	/* 6 - ZBX_FLAG_DISCOVERY_PROTOTYPE_CREATED */
+	/* 6 - ZBX_FLAG_DISCOVERY_PROTOTYPE_CREATED (host prototype discovered via nested LLD) */
 	if (ZBX_DB_OK > zbx_db_execute(
 			"delete from item_tag"
 			" where itemid in ("
@@ -83,12 +83,12 @@ static int	DBpatch_7040003(void)
 static int	DBpatch_7040004(void)
 {
 	/* 2 - ZBX_FLAG_DISCOVERY_PROTOTYPE */
-	/* 6 - ZBX_FLAG_DISCOVERY_PROTOTYPE_CREATED */
+	/* 6 - ZBX_FLAG_DISCOVERY_PROTOTYPE_CREATED (host prototype discovered via nested LLD) */
 	if (ZBX_DB_OK > zbx_db_execute(
 			"delete from items"
-			" where itemid in ("
-				"select i.itemid from hosts h,items i"
-				" where h.hostid=i.hostid and h.flags in (2,6)"
+			" where exists ("
+				"select null from hosts h"
+				" where h.hostid=items.hostid and h.flags in (2,6)"
 			")"))
 	{
 		return FAIL;
@@ -100,7 +100,7 @@ static int	DBpatch_7040004(void)
 static int	DBpatch_7040005(void)
 {
 	/* 2 - ZBX_FLAG_DISCOVERY_PROTOTYPE */
-	/* 6 - ZBX_FLAG_DISCOVERY_PROTOTYPE_CREATED */
+	/* 6 - ZBX_FLAG_DISCOVERY_PROTOTYPE_CREATED (host prototype discovered via nested LLD) */
 	if (ZBX_DB_OK > zbx_db_execute(
 			"delete from httpstep_field"
 			" where httpstepid in ("
@@ -119,7 +119,7 @@ static int	DBpatch_7040005(void)
 static int	DBpatch_7040006(void)
 {
 	/* 2 - ZBX_FLAG_DISCOVERY_PROTOTYPE */
-	/* 6 - ZBX_FLAG_DISCOVERY_PROTOTYPE_CREATED */
+	/* 6 - ZBX_FLAG_DISCOVERY_PROTOTYPE_CREATED (host prototype discovered via nested LLD) */
 	if (ZBX_DB_OK > zbx_db_execute(
 			"delete from httpstep"
 			" where httptestid in ("
@@ -136,7 +136,7 @@ static int	DBpatch_7040006(void)
 static int	DBpatch_7040007(void)
 {
 	/* 2 - ZBX_FLAG_DISCOVERY_PROTOTYPE */
-	/* 6 - ZBX_FLAG_DISCOVERY_PROTOTYPE_CREATED */
+	/* 6 - ZBX_FLAG_DISCOVERY_PROTOTYPE_CREATED (host prototype discovered via nested LLD) */
 	if (ZBX_DB_OK > zbx_db_execute(
 			"delete from httptest_field"
 			" where httptestid in ("
@@ -153,12 +153,12 @@ static int	DBpatch_7040007(void)
 static int	DBpatch_7040008(void)
 {
 	/* 2 - ZBX_FLAG_DISCOVERY_PROTOTYPE */
-	/* 6 - ZBX_FLAG_DISCOVERY_PROTOTYPE_CREATED */
+	/* 6 - ZBX_FLAG_DISCOVERY_PROTOTYPE_CREATED (host prototype discovered via nested LLD) */
 	if (ZBX_DB_OK > zbx_db_execute(
 			"delete from httptest"
-			" where httptestid in ("
-				"select ht.httptestid from httptest ht,hosts h"
-				" where ht.hostid=h.hostid and h.flags in (2,6)"
+			" where exists ("
+				"select null from hosts h"
+				" where h.hostid=httptest.hostid and h.flags in (2,6)"
 			")"))
 	{
 		return FAIL;
