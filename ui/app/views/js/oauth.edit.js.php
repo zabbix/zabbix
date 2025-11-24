@@ -26,17 +26,15 @@ window.oauth_edit_popup = new class {
 		this.dialogue = null;
 		this.form = null;
 		this.is_advanced_form = false;
-		this.token_url = null;
 		this.oauth_popup = null;
 		this.messages = {};
 	}
 
-	init({is_advanced_form, messages, token_url}) {
+	init({is_advanced_form, messages}) {
 		this.overlay = overlays_stack.end();
 		this.dialogue = this.overlay.$dialogue[0];
 		this.form = this.overlay.$dialogue.$body[0].querySelector('form');
 		this.is_advanced_form = is_advanced_form;
-		this.token_url = token_url;
 		this.messages = messages;
 
 		this.#initForm();
@@ -180,15 +178,6 @@ window.oauth_edit_popup = new class {
 				.then((response) => {
 					if ('error' in response) {
 						reject(response.error);
-					}
-					else if ('token_url' in response.oauth && response.oauth.token_url !== this.token_url) {
-						if (this.form.querySelector('button[name="client_secret_button"]') !== null) {
-							this.form.querySelector('button[name="client_secret_button"]').click();
-						}
-						if (this.form.querySelector('.js-client-secret-warning')) {
-							this.form.querySelector('.js-client-secret-warning').style.display = '';
-						}
-						this.overlay.unsetLoading();
 					}
 					else {
 						resolve(response);

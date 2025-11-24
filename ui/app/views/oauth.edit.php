@@ -229,7 +229,6 @@ $form_grid->addItem(
 	(new CScriptTag('
 		oauth_edit_popup.init('.json_encode([
 			'is_advanced_form' => $data['advanced_form'] == 1,
-			'token_url' => $data['token_url'],
 			'messages' => [
 				'popup_closed' => _('Complete authentication to get tokens.'),
 				'popup_blocked_error' => _('Cannot open authorization popup window.'),
