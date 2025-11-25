@@ -348,9 +348,9 @@ static int	DBpatch_7050025(void)
 	/* 6 - ZBX_FLAG_DISCOVERY_PROTOTYPE_CREATED (host prototype discovered via nested LLD) */
 	if (ZBX_DB_OK > zbx_db_execute(
 			"delete from httptest_field"
-				" where httptestid in ("
-					"select ht.httptestid from hosts h,httptest ht"
-					" where h.hostid=ht.hostid and h.flags in (2,6)"
+			" where httptestid in ("
+				"select ht.httptestid from hosts h,httptest ht"
+				" where h.hostid=ht.hostid and h.flags in (2,6)"
 			")"))
 	{
 		return FAIL;
@@ -365,9 +365,9 @@ static int	DBpatch_7050026(void)
 	/* 6 - ZBX_FLAG_DISCOVERY_PROTOTYPE_CREATED (host prototype discovered via nested LLD) */
 	if (ZBX_DB_OK > zbx_db_execute(
 			"delete from httptest"
-				" where exists ("
-					"select null from hosts h"
-					" where h.hostid=httptest.hostid and h.flags in (2,6)"
+			" where exists ("
+				"select null from hosts h"
+				" where h.hostid=httptest.hostid and h.flags in (2,6)"
 			")"))
 	{
 		return FAIL;
