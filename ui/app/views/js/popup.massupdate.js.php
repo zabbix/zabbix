@@ -80,6 +80,13 @@ $('#tabs').on('tabsactivate', (event, ui) => {
 		.macroValue();
 
 	$(obj.querySelector('#tbl_macros'))
+	.on('change keydown', '<?= ZBX_STYLE_Z_TEXTAREA_FLEXIBLE ?> .macro', function(event) {
+		if (event.type === 'change' || event.which === 13) {
+			$(this).val($(this).val().replace(/([^:]+)/, (value) => value.toUpperCase('$1')));
+		}
+	});
+
+	$(obj.querySelector('#tbl_macros'))
 		.on('resize', '<?= ZBX_STYLE_Z_TEXTAREA_FLEXIBLE ?> textarea', () => {
 			$(window).resize();
 		});

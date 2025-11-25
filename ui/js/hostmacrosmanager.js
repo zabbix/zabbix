@@ -21,6 +21,7 @@ class HostMacrosManager {
 	static ZBX_MACRO_TYPE_TEXT = 0;
 	static ZBX_MACRO_TYPE_SECRET = 1;
 	static ZBX_MACRO_TYPE_VAULT = 2;
+	static ZBX_STYLE_Z_TEXTAREA_FLEXIBLE = 'z-textarea-flexible';
 	static DISCOVERY_STATE_AUTOMATIC = 0x1;
 	static DISCOVERY_STATE_CONVERTING = 0x2;
 	static DISCOVERY_STATE_MANUAL = 0x3;
@@ -128,6 +129,9 @@ class HostMacrosManager {
 				remove_next_sibling: show_inherited_macros,
 				template: show_inherited_macros ? '#macro-row-tmpl-inherited' : '#macro-row-tmpl',
 				allow_empty: true,
+			})
+			.on('click', 'button.element-table-add', () => {
+				this.initMacroFields($parent);
 			})
 			.on('click', 'button.element-table-change', (e) => {
 				const macro_num = e.target.id.split('_')[1];
@@ -246,6 +250,23 @@ class HostMacrosManager {
 			.on('afteradd.dynamicRows', function() {
 				$('.macro-input-group').macroValue();
 			});
+
+		this.initMacroFields($parent);
+	}
+
+	initMacroFields($parent) {
+		$(HostMacrosManager.ZBX_STYLE_Z_TEXTAREA_FLEXIBLE, $parent).not('.initialized-field')
+		.each((index, textarea) => {
+			const $textarea = $(textarea);
+
+			if ($textarea.hasClass('macro')) {
+				$textarea.on('change keydown', (e) => {
+					if (e.type === 'change' || e.which === 13) {
+						this.macroToUpperCase($textarea);
+					}
+				});
+			}
+		});
 	}
 
 	getMacroTable() {
@@ -261,6 +282,21 @@ class HostMacrosManager {
 
 	loaderStop() {
 		this.$preloader.remove();
+	}
+
+	macroToUpperCase($element) {
+		var macro = $element.val(),
+			end = macro.indexOf(':');
+
+		if (end == -1) {
+			$element.val(macro.toUpperCase());
+		}
+		else {
+			var macro_part = macro.substr(0, end),
+				context_part = macro.substr(end, macro.length);
+
+			$element.val(macro_part.toUpperCase() + context_part);
+		}
 	}
 
 	getManualDiscoveryState() {

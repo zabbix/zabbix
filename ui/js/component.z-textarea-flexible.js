@@ -120,10 +120,6 @@ class ZTextareaFlexible extends HTMLElement {
 			},
 
 			textareaBlur: () => {
-				if (this.#textarea.classList.contains('macro')) {
-					this.#macroToUpperCase();
-				}
-
 				this.#updateHeight();
 				this.dispatchEvent(new Event('blur', { bubbles: true }));
 			},
@@ -189,18 +185,6 @@ class ZTextareaFlexible extends HTMLElement {
 		});
 
 		this.#intersection_observer.observe(this);
-	}
-
-	#macroToUpperCase() {
-		const end = this.#textarea.value.indexOf(':');
-
-		if (end === -1) {
-			this.#textarea.value = this.#textarea.value.toUpperCase();
-		} else {
-			const macro_part = this.#textarea.value.substring(0, end);
-			const context_part = this.#textarea.value.substring(end);
-			this.#textarea.value = macro_part.toUpperCase() + context_part;
-		}
 	}
 
 	get width() {
