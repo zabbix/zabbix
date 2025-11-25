@@ -891,12 +891,11 @@ static void	adjust_time(zbx_timespec_t *unique_shift, zbx_agent_value_t *av)
 static void	parse_history_data_row_value(const struct zbx_json_parse *jp_row, zbx_timespec_t *unique_shift,
 		zbx_agent_value_t *av, char **tmp, size_t *tmp_alloc)
 {
-	int	found_clock = FAIL, found_ns = FAIL;
-
-	memset(av, 0, sizeof(zbx_agent_value_t));
-
 	char		buffer[MAX_STRING_LEN];
 	const char	*p = NULL;
+	int		found_clock = FAIL, found_ns = FAIL;
+
+	memset(av, 0, sizeof(zbx_agent_value_t));
 
 	while (NULL != (p = zbx_json_pair_next(jp_row, p, buffer, sizeof(buffer))))
 	{
