@@ -16,7 +16,7 @@
 
 use PHPUnit\Framework\TestCase;
 
-class CPeriodTimeRangeValidatorTest extends TestCase {
+class CTimeRagesValidatorTest extends TestCase {
 
 	public static function dataProvider() {
 		$error_syntax = _('comma separated list of time periods is expected');
@@ -73,7 +73,7 @@ class CPeriodTimeRangeValidatorTest extends TestCase {
 	 * @dataProvider dataProvider
 	 */
 	public function testValidate(string $source, string $expected_error = '') {
-		$validator = new CPeriodTimeRangeValidator();
+		$validator = new CTimeRangesValidator();
 		$result = $validator->validate($source);
 
 		if ($expected_error === '') {

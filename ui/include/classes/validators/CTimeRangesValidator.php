@@ -14,13 +14,13 @@
 **/
 
 
-class CPeriodTimeRangeValidator extends CValidator {
+class CTimeRangesValidator extends CValidator {
 
-	private CPeriodTimeParser $period_time_parser;
+	private CTimeRangeParser $period_time_parser;
 
 	public function __construct(array $options = []) {
 		parent::__construct($options);
-		$this->period_time_parser = new CPeriodTimeParser();
+		$this->period_time_parser = new CTimeRangeParser();
 	}
 
 	public function validate($value) {

@@ -17,7 +17,7 @@
 /**
  * Parses a time period in notation 00:00 - 24:00.
  */
-class CPeriodTimeParser extends CParser {
+class CTimeRangeParser extends CParser {
 
 	private string $time_from = '';
 	private string $time_till = '';

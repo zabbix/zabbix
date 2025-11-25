@@ -35,8 +35,6 @@ $form->addItem((new CSubmitButton())->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN));
 $schedule = (new CTable())->addStyle('min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;');
 
 for ($weekday = 0; $weekday < 7; $weekday++) {
-	$enabled = $data['form']['schedule_periods'][$weekday] !== '';
-
 	$schedule
 		->addRow(
 			new CRow([

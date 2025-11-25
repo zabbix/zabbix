@@ -68,7 +68,7 @@ class PeriodTimeParserTest extends TestCase {
 	 * @dataProvider dataProvider
 	*/
 	public function testParse(int $expect_result, string $source, int $pos = 0) {
-		$parser = new CPeriodTimeParser();
+		$parser = new CTimeRangeParser();
 
 		$result = $parser->parse($source, $pos);
 

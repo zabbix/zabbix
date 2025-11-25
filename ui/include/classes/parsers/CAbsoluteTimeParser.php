@@ -15,12 +15,14 @@
 
 
 /**
- * A parser for absolute time in "YYYY[-MM[-DD]][ hh[:mm[:ss]]]" format.
+ * A parser for absolute time or date based on passed configuration to parser.
  */
 class CAbsoluteTimeParser extends CParser {
 
 	/**
-	 * Date and time in "YYYY-MM-DD hh:mm:ss" format.
+	 * Time in format, which depends on $date_only value:
+	 * - FALSE: "YYYY-MM-DD hh:mm:ss"
+	 * - TRUE: "YYYY-MM-DD"
 	 */
 	private string $date;
 	private array $tokens;

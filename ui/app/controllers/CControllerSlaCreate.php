@@ -31,7 +31,7 @@ class CControllerSlaCreate extends CController {
 			$schedule_fields += [
 				'schedule_enabled_'.$i => ['integer', 'in 1'],
 				'schedule_period_'.$i => ['string', 'not_empty',
-					'use' => [CPeriodTimeRangeValidator::class, []],
+					'use' => [CTimeRangesValidator::class, []],
 					'when' => ['schedule_enabled_'.$i, 'in 1']
 				]
 			];

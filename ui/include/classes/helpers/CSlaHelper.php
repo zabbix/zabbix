@@ -36,6 +36,7 @@ final class CSlaHelper {
 		}
 
 		info(_('Incorrect schedule: at least one period should be selected.'));
+
 		return false;
 	}
 
@@ -295,7 +296,7 @@ final class CSlaHelper {
 
 			foreach (explode(',', $schedule['schedule_period_'.$weekday]) as $schedule_period) {
 				$schedule_period = trim($schedule_period);
-				$period_time_parser = new CPeriodTimeParser();
+				$period_time_parser = new CTimeRangeParser();
 
 				if ($period_time_parser->parse($schedule_period) != CParser::PARSE_FAIL) {
 

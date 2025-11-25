@@ -1108,9 +1108,7 @@ class CFormValidator {
 		}
 
 		if (('decimal_limit' in rules) && value) {
-			const regex = /^[+-]?(?:(?<int>\d*)\.(?<frac>\d+)|\d+)(?:[eE](?<exp>[+-]?\d+))?$/; // ZBX_PREG_SCIENTIFIC
-
-			const match = value.match(regex);
+			const match = value.match(ZBX_PREG_SCIENTIFIC);
 
 			if (match) {
 				const frac = match.groups.frac || '';
