@@ -71,14 +71,12 @@ class CControllerOauthAuthorize extends CController {
 		}
 
 		if (!array_key_exists('client_secret', $state)) {
-			$url_unchanged = (bool) API::MediaType()->get([
+			$db_mediatype = API::MediaType()->get([
 				'output' => ['token_url'],
-				'mediatypeids' => [$state['mediatypeid']],
-				'search' => ['token_url' => $state['token_url']],
-				'startSearch' => true
+				'mediatypeids' => [$state['mediatypeid']]
 			]);
 
-			if (!$url_unchanged) {
+			if ($state['token_url'] !== $db_mediatype[0]['token_url']) {
 				error(_s('Incorrect value for field "%1$s": %2$s.', 'client_secret', _('cannot be empty')));
 
 				return false;
