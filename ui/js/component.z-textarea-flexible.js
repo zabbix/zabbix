@@ -143,7 +143,7 @@ class ZTextareaFlexible extends HTMLElement {
 	}
 
 	#unregisterEvents() {
-		this.#textarea.removeEventListener('keyup', this.#events.textareaKeydown);
+		this.#textarea.removeEventListener('keydown', this.#events.textareaKeydown);
 		this.#textarea.removeEventListener('blur', this.#events.textareaBlur);
 
 		['input', 'keyup', 'paste'].forEach(listen_event =>
