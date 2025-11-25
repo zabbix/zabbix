@@ -64,6 +64,7 @@ This template has been tested on:
 |{$RIBBON.TEMP1.CRIT}|<p>The threshold of temperature on the bottom of the main board in degrees Celsius.</p>|`80`|
 |{$RIBBON.TEMP2.CRIT}|<p>The threshold of temperature on the top of the main board in degrees Celsius.</p>|`80`|
 |{$RIBBON.TEMP.CORE.CRIT}|<p>The threshold of core switch temperature in degrees Celsius.</p>|`80`|
+|{$RIBBON.TEMP.PSU.CRIT}|<p>The threshold of power supply temperature in degrees Celsius.</p>|`80`|
 |{$RIBBON.INTERFACE.DISCOVERY.TYPE.MATCHES}|<p>Sets the regex string of the interface type to be allowed in discovery.</p>|`.*`|
 |{$RIBBON.INTERFACE.DISCOVERY.TYPE.NOT_MATCHES}|<p>Sets the regex string of the interface type to be ignored in discovery.</p>|`CHANGE_IF_NEEDED`|
 |{$RIBBON.INTERFACE.DISCOVERY.NAME.MATCHES}|<p>Sets the regex string of the interface name to be allowed in discovery.</p>|`.*`|
@@ -215,6 +216,13 @@ This template has been tested on:
 |PSU [{#PSU.ID}]: Temperature|<p>Temperature of this power supply in degrees Celsius.</p>|Dependent item|ribbon.psu.temp[{#PSU.ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.Temp`</p></li></ul>|
 |PSU [{#PSU.ID}]: Fan1 speed|<p>The speed of the first fan on this power supply in RPM.</p>|Dependent item|ribbon.psu.fan1.speed[{#PSU.ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.Fan1_Speed`</p></li></ul>|
 |PSU [{#PSU.ID}]: Fan2 speed|<p>The speed of the second fan on this power supply in RPM.</p>|Dependent item|ribbon.psu.fan2.speed[{#PSU.ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.Fan2_Speed`</p></li></ul>|
+
+### Trigger prototypes for Power supply discovery
+
+|Name|Description|Expression|Severity|Dependencies and additional info|
+|----|-----------|----------|--------|--------------------------------|
+|Ribbon: PSU [{#PSU.ID}]: AC input is not OK|<p>The AC power input of the power supply reports a bad state.</p>|`last(/Ribbon SBC Edge by HTTP/ribbon.psu.ac.input.good[{#PSU.ID}]) = 0`|Warning|**Manual close**: Yes|
+|Ribbon: PSU [{#PSU.ID}]: Temperature on power supply is above critical threshold|<p>This trigger uses temperature of power supply value.</p>|`avg(/Ribbon SBC Edge by HTTP/ribbon.psu.temp[{#PSU.ID}],5m)>{$RIBBON.TEMP.PSU.CRIT}`|High||
 
 ### LLD rule Fan discovery
 

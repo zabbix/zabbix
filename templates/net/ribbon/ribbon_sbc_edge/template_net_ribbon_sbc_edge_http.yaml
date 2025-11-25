@@ -3222,6 +3222,17 @@ zabbix_export:
                   value: psu
                 - tag: psu
                   value: '{#PSU.ID}'
+              trigger_prototypes:
+                - uuid: 6f70c36a7c144c5ebf3fe6911d4c8d07
+                  expression: 'last(/Ribbon SBC Edge by HTTP/ribbon.psu.ac.input.good[{#PSU.ID}]) = 0'
+                  name: 'Ribbon: PSU [{#PSU.ID}]: AC input is not OK'
+                  opdata: 'Current state: {ITEM.LASTVALUE1}'
+                  priority: WARNING
+                  description: 'The AC power input of the power supply reports a bad state.'
+                  manual_close: 'YES'
+                  tags:
+                    - tag: scope
+                      value: availability
             - uuid: 88ca7c8494824e24871f9b63d5ab663c
               name: 'PSU [{#PSU.ID}]: Current in'
               type: DEPENDENT
@@ -3377,6 +3388,21 @@ zabbix_export:
                   value: psu
                 - tag: psu
                   value: '{#PSU.ID}'
+              trigger_prototypes:
+                - uuid: 0084aa4adf6949b888fc30e5643dd96b
+                  expression: 'avg(/Ribbon SBC Edge by HTTP/ribbon.psu.temp[{#PSU.ID}],5m)>{$RIBBON.TEMP.PSU.CRIT}'
+                  recovery_mode: RECOVERY_EXPRESSION
+                  recovery_expression: 'max(/Ribbon SBC Edge by HTTP/ribbon.psu.temp[{#PSU.ID}],5m)<{$RIBBON.TEMP.PSU.CRIT}-3'
+                  name: 'Ribbon: PSU [{#PSU.ID}]: Temperature on power supply is above critical threshold'
+                  event_name: 'Ribbon: PSU [{#PSU.ID}]: Temperature is above critical threshold: >{$RIBBON.TEMP.PSU.CRIT}'
+                  opdata: 'Current temperature: {ITEM.LASTVALUE1}'
+                  priority: HIGH
+                  description: 'This trigger uses temperature of power supply value.'
+                  tags:
+                    - tag: scope
+                      value: availability
+                    - tag: scope
+                      value: performance
             - uuid: d91ff2d143b9418b91933ab52c6361eb
               name: 'PSU [{#PSU.ID}]: Voltage in'
               type: DEPENDENT
@@ -3936,6 +3962,9 @@ zabbix_export:
         - macro: '{$RIBBON.TEMP.CORE.CRIT}'
           value: '80'
           description: 'The threshold of core switch temperature in degrees Celsius.'
+        - macro: '{$RIBBON.TEMP.PSU.CRIT}'
+          value: '80'
+          description: 'The threshold of power supply temperature in degrees Celsius.'
         - macro: '{$RIBBON.TEMP1.CRIT}'
           value: '80'
           description: 'The threshold of temperature on the bottom of the main board in degrees Celsius.'
