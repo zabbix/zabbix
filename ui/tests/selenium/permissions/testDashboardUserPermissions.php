@@ -378,10 +378,10 @@ class testDashboardUserPermissions extends CWebTest {
 		$this->updateUser($data['user_role'], $data['user_group']);
 		$this->page->userLogin(self::USERNAME, self::PASSWORD);
 
-		// Check user aceess to template dashboard via URL.
+		// Check user access to template dashboard via URL.
 		$this->checkAccessViaUrlOnTemplate($data);
 
-		// Check user aceess to host dashboard via URL.
+		// Check user access to host dashboard via URL.
 		$this->checkAccessViaUrlOnHost($data);
 
 		//  Check user access to host dashboard via frontend.
