@@ -907,7 +907,7 @@ static void	parse_history_data_row_value(const struct zbx_json_parse *jp_row, zb
 				if (SUCCEED == zbx_is_uint31(*tmp, &av->ts.sec))
 					found_clock = SUCCEED;
 				else
-					zabbix_log(LOG_LEVEL_DEBUG, "invalid clock");	
+					zabbix_log(LOG_LEVEL_DEBUG, "invalid clock");
 			}
 		}
 		else if (0 == strcmp(ZBX_PROTO_TAG_NS, buffer))
