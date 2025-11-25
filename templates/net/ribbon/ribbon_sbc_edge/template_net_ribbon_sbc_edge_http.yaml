@@ -3133,6 +3133,17 @@ zabbix_export:
                   value: psu
                 - tag: psu
                   value: '{#PSU.ID}'
+              trigger_prototypes:
+                - uuid: 6f70c36a7c144c5ebf3fe6911d4c8d07
+                  expression: 'last(/Ribbon SBC Edge by HTTP/ribbon.psu.ac.input.good[{#PSU.ID}]) = 0'
+                  name: 'Ribbon: PSU [{#PSU.ID}]: AC input is not OK'
+                  opdata: 'Current state: {ITEM.LASTVALUE1}'
+                  priority: WARNING
+                  description: 'The AC power input of the power supply reports a bad state.'
+                  manual_close: 'YES'
+                  tags:
+                    - tag: scope
+                      value: availability
             - uuid: 88ca7c8494824e24871f9b63d5ab663c
               name: 'PSU [{#PSU.ID}]: Current in'
               type: DEPENDENT
@@ -3279,6 +3290,21 @@ zabbix_export:
                   value: psu
                 - tag: psu
                   value: '{#PSU.ID}'
+              trigger_prototypes:
+                - uuid: 0084aa4adf6949b888fc30e5643dd96b
+                  expression: 'avg(/Ribbon SBC Edge by HTTP/ribbon.psu.temp[{#PSU.ID}],5m)>{$RIBBON.TEMP.PSU.CRIT}'
+                  recovery_mode: RECOVERY_EXPRESSION
+                  recovery_expression: 'max(/Ribbon SBC Edge by HTTP/ribbon.psu.temp[{#PSU.ID}],5m)<{$RIBBON.TEMP.PSU.CRIT}-3'
+                  name: 'Ribbon: PSU [{#PSU.ID}]: Temperature on power supply is above critical threshold'
+                  event_name: 'Ribbon: PSU [{#PSU.ID}]: Temperature is above critical threshold: >{$RIBBON.TEMP.PSU.CRIT}'
+                  opdata: 'Current temperature: {ITEM.LASTVALUE1}'
+                  priority: HIGH
+                  description: 'This trigger uses temperature of power supply value.'
+                  tags:
+                    - tag: scope
+                      value: availability
+                    - tag: scope
+                      value: performance
             - uuid: d91ff2d143b9418b91933ab52c6361eb
               name: 'PSU [{#PSU.ID}]: Voltage in'
               type: DEPENDENT
@@ -3711,7 +3737,7 @@ zabbix_export:
           description: 'Sets of the alarm event ID to be allowed in discovery. See the https://publicdoc.rbbn.com/spaces/UXDOC70/pages/122292177/Alarms+and+Events+Reference for possible values.'
           config:
             type: TEXT
-            priority: '38'
+            priority: '39'
             section_name: Filters
             label: 'Include alarm event ID filter'
             description: 'Regex string to include alarm event by ID.'
@@ -3720,7 +3746,7 @@ zabbix_export:
           description: 'Sets of the alarm event ID to be ignored in discovery.'
           config:
             type: TEXT
-            priority: '39'
+            priority: '40'
             section_name: Filters
             label: 'Exclude alarm event ID filter'
             description: 'Regex string to exclude alarm event by ID.'
@@ -3729,7 +3755,7 @@ zabbix_export:
           description: 'Sets of the alarm state to be allowed in discovery.'
           config:
             type: TEXT
-            priority: '36'
+            priority: '37'
             section_name: Filters
             label: 'Include alarm state filter'
             description: 'Regex string to include alarm by state.'
@@ -3738,7 +3764,7 @@ zabbix_export:
           description: 'Sets of the alarm state to be ignored in discovery.'
           config:
             type: TEXT
-            priority: '37'
+            priority: '38'
             section_name: Filters
             label: 'Exclude alarm state filter'
             description: 'Regex string to exclude alarm by state.'
@@ -3747,7 +3773,7 @@ zabbix_export:
           description: 'Sets the regex string of the certificate name to be allowed in discovery.'
           config:
             type: TEXT
-            priority: '34'
+            priority: '35'
             section_name: Filters
             label: 'Include certificate name filter'
             description: 'Regex string to include certificate by name.'
@@ -3756,7 +3782,7 @@ zabbix_export:
           description: 'Sets the regex string of the certificate name to be ignored in discovery.'
           config:
             type: TEXT
-            priority: '35'
+            priority: '36'
             section_name: Filters
             label: 'Exclude certificate name filter'
             description: 'Regex string to exclude certificate by name.'
@@ -3775,7 +3801,7 @@ zabbix_export:
           description: 'Sets the regex string of the disk name to be allowed in discovery.'
           config:
             type: TEXT
-            priority: '28'
+            priority: '29'
             section_name: Filters
             label: 'Include disk name filter'
             description: 'Regex string to include disk by name.'
@@ -3784,7 +3810,7 @@ zabbix_export:
           description: 'Sets the regex string of the disk name to be ignored in discovery.'
           config:
             type: TEXT
-            priority: '29'
+            priority: '30'
             section_name: Filters
             label: 'Exclude disk name filter'
             description: 'Regex string to exclude disk by name.'
@@ -3793,7 +3819,7 @@ zabbix_export:
           description: 'Sets the regex string of the disk type to be allowed in discovery.'
           config:
             type: TEXT
-            priority: '26'
+            priority: '27'
             section_name: Filters
             label: 'Include disk type filter'
             description: 'Regex string to include disk by type.'
@@ -3802,7 +3828,7 @@ zabbix_export:
           description: 'Sets the regex string of the disk type to be ignored in discovery.'
           config:
             type: TEXT
-            priority: '27'
+            priority: '28'
             section_name: Filters
             label: 'Exclude disk type filter'
             description: 'Regex string to exclude disk by type.'
@@ -3811,7 +3837,7 @@ zabbix_export:
           description: 'The threshold of the disk usage in percent.'
           config:
             type: TEXT
-            priority: '40'
+            priority: '41'
             section_name: Thresholds
             label: 'Warning disk usage threshold'
             description: 'In the range from 0 to 100 inclusive.'
@@ -3831,7 +3857,7 @@ zabbix_export:
           description: 'Sets the regex string of the interface name to be allowed in discovery.'
           config:
             type: TEXT
-            priority: '24'
+            priority: '25'
             section_name: Filters
             label: 'Include interface name filter'
             description: 'Regex string to include interface by name.'
@@ -3840,7 +3866,7 @@ zabbix_export:
           description: 'Sets the regex string of the interface name to be ignored in discovery.'
           config:
             type: TEXT
-            priority: '25'
+            priority: '26'
             section_name: Filters
             label: 'Exclude interface name filter'
             description: 'Regex string to exclude interface by name.'
@@ -3849,7 +3875,7 @@ zabbix_export:
           description: 'Sets the regex string of the interface type to be allowed in discovery.'
           config:
             type: TEXT
-            priority: '22'
+            priority: '23'
             section_name: Filters
             label: 'Include interface type filter'
             description: 'Regex string to include interface by type.'
@@ -3858,7 +3884,7 @@ zabbix_export:
           description: 'Sets the regex string of the interface type to be ignored in discovery.'
           config:
             type: TEXT
-            priority: '23'
+            priority: '24'
             section_name: Filters
             label: 'Exclude interface type filter'
             description: 'Regex string to exclude interface by type.'
@@ -3992,7 +4018,7 @@ zabbix_export:
           description: 'Sets the regex string of the SIP server name to be allowed in discovery.'
           config:
             type: TEXT
-            priority: '30'
+            priority: '31'
             section_name: Filters
             label: 'Include SIP server name filter'
             description: 'Regex string to include SIP server by name.'
@@ -4001,7 +4027,7 @@ zabbix_export:
           description: 'Sets the regex string of the SIP server name to be ignored in discovery.'
           config:
             type: TEXT
-            priority: '31'
+            priority: '32'
             section_name: Filters
             label: 'Exclude SIP server name filter'
             description: 'Regex string to exclude SIP server by name.'
@@ -4010,7 +4036,7 @@ zabbix_export:
           description: 'The threshold of the SIP server failed transactions.'
           config:
             type: TEXT
-            priority: '41'
+            priority: '42'
             section_name: Thresholds
             label: 'Warning SIP server failed transactions threshold'
             description: 'No less than 0'
@@ -4020,7 +4046,7 @@ zabbix_export:
           description: 'Sets the regex string of the SIP signal group description to be allowed in discovery.'
           config:
             type: TEXT
-            priority: '32'
+            priority: '33'
             section_name: Filters
             label: 'Include SIP signal group description filter'
             description: 'Regex string to include SIP signal group by description.'
@@ -4029,7 +4055,7 @@ zabbix_export:
           description: 'Sets the regex string of the SIP signal group description to be ignored in discovery.'
           config:
             type: TEXT
-            priority: '33'
+            priority: '34'
             section_name: Filters
             label: 'Exclude SIP signal group description filter'
             description: 'Regex string to exclude SIP signal group by description.'
@@ -4041,6 +4067,16 @@ zabbix_export:
             priority: '21'
             section_name: Thresholds
             label: 'Warning core switch temperature in degrees celsius threshold'
+            description: 'No less than 0'
+            regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
+        - macro: '{$RIBBON.TEMP.PSU.CRIT}'
+          value: '80'
+          description: 'The threshold of power supply temperature in degrees Celsius.'
+          config:
+            type: TEXT
+            priority: '22'
+            section_name: Thresholds
+            label: 'Warning power supply temperature in degrees celsius threshold'
             description: 'No less than 0'
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
         - macro: '{$RIBBON.TEMP1.CRIT}'
