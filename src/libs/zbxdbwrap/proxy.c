@@ -906,7 +906,12 @@ static void	parse_history_data_row_value(const struct zbx_json_parse *jp_row, zb
 
 		p = ptr;
 
-		if (0 == strcmp(ZBX_PROTO_TAG_CLOCK, buffer))
+		if (0 == strcmp(ZBX_PROTO_TAG_ID, buffer))
+		{
+			if (SUCCEED != zbx_is_uint64(*tmp, &av->id))
+				av->id = 0;
+		}
+		else if (0 == strcmp(ZBX_PROTO_TAG_CLOCK, buffer))
 		{
 			if (SUCCEED == zbx_is_uint31(*tmp, &av->ts.sec))
 				found_clock = SUCCEED;
@@ -952,18 +957,13 @@ static void	parse_history_data_row_value(const struct zbx_json_parse *jp_row, zb
 		{
 			av->source = zbx_strdup(av->source, *tmp);
 		}
-		else if ( 0 == strcmp(ZBX_PROTO_TAG_LOGSEVERITY, buffer))
+		else if (0 == strcmp(ZBX_PROTO_TAG_LOGSEVERITY, buffer))
 		{
 			av->severity = atoi(*tmp);
 		}
 		else if (0 == strcmp(ZBX_PROTO_TAG_LOGEVENTID, buffer))
 		{
 			av->logeventid = atoi(*tmp);
-		}
-		else if (0 == strcmp(ZBX_PROTO_TAG_ID, buffer))
-		{
-			if (SUCCEED != zbx_is_uint64(*tmp, &av->id))
-				av->id = 0;
 		}
 	}
 
