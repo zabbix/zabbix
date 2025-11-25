@@ -900,83 +900,69 @@ static void	parse_history_data_row_value(const struct zbx_json_parse *jp_row, zb
 
 	while (NULL != (p = zbx_json_pair_next(jp_row, p, buffer, sizeof(buffer))))
 	{
+		const char	*ptr;
+
+		if (NULL == (ptr = zbx_json_decodevalue_dyn(p, tmp, tmp_alloc, NULL)))
+			continue;
+
 		if (0 == strcmp(ZBX_PROTO_TAG_CLOCK, buffer))
 		{
-			if (NULL != zbx_json_decodevalue_dyn(p, tmp, tmp_alloc, NULL))
-			{
-				if (SUCCEED == zbx_is_uint31(*tmp, &av->ts.sec))
-					found_clock = SUCCEED;
-				else
-					zabbix_log(LOG_LEVEL_DEBUG, "invalid clock");
-			}
+			if (SUCCEED == zbx_is_uint31(*tmp, &av->ts.sec))
+				found_clock = SUCCEED;
+			else
+				zabbix_log(LOG_LEVEL_DEBUG, "invalid clock");
 		}
 		else if (0 == strcmp(ZBX_PROTO_TAG_NS, buffer))
 		{
-			if (NULL != zbx_json_decodevalue_dyn(p, tmp, tmp_alloc, NULL))
+			if (SUCCEED == zbx_is_uint_n_range(*tmp, *tmp_alloc, &av->ts.ns, sizeof(av->ts.ns), 0LL,
+					999999999LL))
 			{
-				if (SUCCEED == zbx_is_uint_n_range(*tmp, *tmp_alloc, &av->ts.ns, sizeof(av->ts.ns), 0LL,
-						999999999LL))
-				{
-					/* adjust ns for older systems where sometimes ns == 0 */
-					if (av->ts.ns == 0)
-						adjust_time(unique_shift, av);
+				/* adjust ns for older systems where sometimes ns == 0 */
+				if (av->ts.ns == 0)
+					adjust_time(unique_shift, av);
 
-					found_ns = SUCCEED;
-				}
-				else
-					zabbix_log(LOG_LEVEL_DEBUG, "invalid ns");
+				found_ns = SUCCEED;
 			}
+			else
+				zabbix_log(LOG_LEVEL_DEBUG, "invalid ns");
 		}
 		else if (0 == strcmp(ZBX_PROTO_TAG_STATE, buffer))
 		{
-			if (NULL != zbx_json_decodevalue_dyn(p, tmp, tmp_alloc, NULL))
-				av->state = (unsigned char)atoi(*tmp);
+			av->state = (unsigned char)atoi(*tmp);
 		}
 		else if (0 == strcmp(ZBX_PROTO_TAG_LASTLOGSIZE, buffer))
 		{
-			if (NULL != zbx_json_decodevalue_dyn(p, tmp, tmp_alloc, NULL) &&
-					SUCCEED == zbx_is_uint64(*tmp, &av->lastlogsize))
-			{
+			if (SUCCEED == zbx_is_uint64(*tmp, &av->lastlogsize))
 				av->meta = 1;
-			}
 		}
 		else if (0 == strcmp(ZBX_PROTO_TAG_MTIME, buffer))
 		{
-			if (NULL != zbx_json_decodevalue_dyn(p, tmp, tmp_alloc, NULL))
-				av->mtime = atoi(*tmp);
+			av->mtime = atoi(*tmp);
 		}
 		else if (0 == strcmp(ZBX_PROTO_TAG_VALUE, buffer))
 		{
-			if (NULL != zbx_json_decodevalue_dyn(p, tmp, tmp_alloc, NULL))
-				av->value = zbx_strdup(av->value, *tmp);
+			av->value = zbx_strdup(av->value, *tmp);
 		}
 		else if (0 == strcmp(ZBX_PROTO_TAG_LOGTIMESTAMP, buffer))
 		{
-			if (NULL != zbx_json_decodevalue_dyn(p, tmp, tmp_alloc, NULL))
-				av->timestamp = atoi(*tmp);
+			av->timestamp = atoi(*tmp);
 		}
 		else if (0 == strcmp(ZBX_PROTO_TAG_LOGSOURCE, buffer))
 		{
-			if (NULL != zbx_json_decodevalue_dyn(p, tmp, tmp_alloc, NULL))
-				av->source = zbx_strdup(av->source, *tmp);
+			av->source = zbx_strdup(av->source, *tmp);
 		}
 		else if ( 0 == strcmp(ZBX_PROTO_TAG_LOGSEVERITY, buffer))
 		{
-			if (NULL != zbx_json_decodevalue_dyn(p, tmp, tmp_alloc, NULL))
-				av->severity = atoi(*tmp);
+			av->severity = atoi(*tmp);
 		}
 		else if (0 == strcmp(ZBX_PROTO_TAG_LOGEVENTID, buffer))
 		{
-			if (NULL != zbx_json_decodevalue_dyn(p, tmp, tmp_alloc, NULL))
-				av->logeventid = atoi(*tmp);
+			av->logeventid = atoi(*tmp);
 		}
 		else if (0 == strcmp(ZBX_PROTO_TAG_ID, buffer))
 		{
-			if (NULL != zbx_json_decodevalue_dyn(p, tmp, tmp_alloc, NULL) ||
-				SUCCEED != zbx_is_uint64(*tmp, &av->id))
-			{
+			if (SUCCEED != zbx_is_uint64(*tmp, &av->id))
 				av->id = 0;
-			}
 		}
 	}
 
