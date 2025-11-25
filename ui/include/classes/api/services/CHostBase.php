@@ -30,6 +30,8 @@ abstract class CHostBase extends CApiService {
 	protected $tableName = 'hosts';
 	protected $tableAlias = 'h';
 
+	protected const INHERITED_TAG_OUTPUT_FIELDS = ['tag', 'value', 'object', 'objectid'];
+
 	protected static function isHost(): bool {
 		return static::class === 'CHost';
 	}
@@ -40,6 +42,60 @@ abstract class CHostBase extends CApiService {
 
 	private static function isHostPrototype(): bool {
 		return static::class === 'CHostPrototype';
+	}
+
+	protected static function addRelatedTags(array $options, array &$hosts): void {
+		if ($options['selectTags'] === null) {
+			return;
+		}
+
+		foreach ($hosts as &$host) {
+			$host['tags'] = [];
+		}
+		unset($host);
+
+		$sql_options = [
+			'output' => array_merge(['hosttagid', 'hostid'], $options['selectTags']),
+			'filter' => ['hostid' => array_keys($hosts)]
+		];
+		$resource = DBselect(DB::makeSql('host_tag', $sql_options));
+
+		while ($row = DBfetch($resource)) {
+			$hosts[$row['hostid']]['tags'][] = array_diff_key($row, array_flip(['hosttagid', 'hostid']));
+		}
+	}
+
+	protected static function addRelatedInheritedTags(array $options, array &$hosts): void {
+		if ($options['selectInheritedTags'] === null) {
+			return;
+		}
+
+		foreach ($hosts as &$host) {
+			$host['inheritedTags'] = [];
+		}
+		unset($host);
+
+		$output = ['htc.hostid'];
+
+		foreach ($options['selectInheritedTags'] as $field) {
+			$output[] = match ($field) {
+				'tag', 'value' => 'ht.'.$field,
+				'object' => ZBX_TAG_OBJECT_TEMPLATE.' AS object',
+				'objectid' => 'htc.link_hostid AS objectid'
+			};
+		}
+
+		$resource = DBselect(
+			'SELECT '.implode(',', $output).
+			' FROM host_template_cache htc'.
+			' JOIN host_tag ht ON htc.link_hostid=ht.hostid'.
+			' WHERE htc.hostid!=htc.link_hostid'.
+				' AND '.dbConditionId('htc.hostid', array_keys($hosts))
+		);
+
+		while ($row = DBfetch($resource)) {
+			$hosts[$row['hostid']]['inheritedTags'][] = array_diff_key($row, array_flip(['hostid']));
+		}
 	}
 
 	protected function checkTemplates(array &$hosts, ?array &$db_hosts = null, ?string $path = null,
@@ -1355,103 +1411,292 @@ abstract class CHostBase extends CApiService {
 		}
 	}
 
-	/**
-	 * Update table "hosts_templates".
-	 *
-	 * @param array      $hosts
-	 * @param array|null $db_hosts
-	 * @param array|null $upd_hostids
-	 */
-	protected function updateTemplates(array &$hosts, ?array &$db_hosts = null, ?array &$upd_hostids = null): void {
-		$id_field_name = $this instanceof CTemplate ? 'templateid' : 'hostid';
+	protected static function updateHostTemplateCache(array $hosts, ?array $db_hosts = null): void {
+		$id_field_name = self::isTemplate() ? 'templateid' : 'hostid';
 
-		$ins_hosts_templates = [];
-		$del_hosttemplateids = [];
+		$ins_template_host_links = [];
+		$del_template_host_links = [];
 
-		foreach ($hosts as $i => &$host) {
-			if (!array_key_exists('templates', $host) && !array_key_exists('templates_clear', $host)) {
-				continue;
-			}
-
-			$db_templates = ($db_hosts !== null)
-				? array_column($db_hosts[$host[$id_field_name]]['templates'], null, 'templateid')
-				: [];
-			$changed = false;
-
+		foreach ($hosts as $host) {
 			if (array_key_exists('templates', $host)) {
-				foreach ($host['templates'] as &$template) {
+				$db_templates = $db_hosts !== null
+					? array_column($db_hosts[$host[$id_field_name]]['templates'], null, 'templateid')
+					: [];
+
+				foreach ($host['templates'] as $template) {
 					if (array_key_exists($template['templateid'], $db_templates)) {
-						$template['hosttemplateid'] = $db_templates[$template['templateid']]['hosttemplateid'];
 						unset($db_templates[$template['templateid']]);
 					}
 					else {
-						$ins_hosts_templates[] = [
-							'hostid' => $host[$id_field_name],
-							'templateid' => $template['templateid']
-						];
-						$changed = true;
-					}
-				}
-				unset($template);
-
-				$templates_clear_indexes = [];
-
-				if (array_key_exists('templates_clear', $host)) {
-					foreach ($host['templates_clear'] as $index => $template) {
-						$templates_clear_indexes[$template['templateid']] = $index;
+						$ins_template_host_links[$template['templateid']][$host[$id_field_name]] = [];
 					}
 				}
 
-				foreach ($db_templates as $del_template) {
-					$changed = true;
-					$del_hosttemplateids[] = $del_template['hosttemplateid'];
-
-					if (array_key_exists($del_template['templateid'], $templates_clear_indexes)) {
-						$index = $templates_clear_indexes[$del_template['templateid']];
-						$host['templates_clear'][$index]['hosttemplateid'] = $del_template['hosttemplateid'];
-					}
+				foreach ($db_templates as $db_template) {
+					$del_template_host_links[$db_template['templateid']][$host[$id_field_name]] = [];
 				}
 			}
 			elseif (array_key_exists('templates_clear', $host)) {
-				foreach ($host['templates_clear'] as &$template) {
-					$template['hosttemplateid'] = $db_templates[$template['templateid']]['hosttemplateid'];
-					$del_hosttemplateids[] = $db_templates[$template['templateid']]['hosttemplateid'];
+				foreach ($host['templates_clear'] as $template) {
+					$del_template_host_links[$template['templateid']][$host[$id_field_name]] = [];
 				}
-				unset($template);
 			}
+		}
 
-			if ($db_hosts !== null) {
-				if ($changed) {
-					$upd_hostids[$i] = $host[$id_field_name];
+		if ($del_template_host_links) {
+			self::deleteHostTemplateCache($del_template_host_links, $ins_template_host_links);
+		}
+
+		if ($ins_template_host_links) {
+			self::createHostTemplateCache($ins_template_host_links);
+		}
+	}
+
+	protected static function deleteHostTemplateCache(array $del_template_host_links,
+			array $ins_template_host_links = []): void {
+		self::loadAncestorLinks($del_template_host_links, $template_hosts, $vertices, $ins_template_host_links);
+
+		if (self::isTemplate()) {
+			self::loadDescendantLinks($del_template_host_links, $template_hosts, $ins_template_host_links);
+		}
+
+		self::addTemplateHostLinks($del_template_host_links, $template_hosts, $vertices);
+
+		$del_host_template_cache = [];
+
+		foreach ($del_template_host_links as $host_links) {
+			foreach ($host_links as $hostid => $links) {
+				uksort($links, 'bccomp');
+				$key = implode('|', array_keys($links));
+
+				if (array_key_exists($key, $del_host_template_cache)) {
+					$del_host_template_cache[$key]['hostid'][] = $hostid;
 				}
 				else {
-					unset($host['templates'], $db_hosts[$host[$id_field_name]]['templates']);
+					$del_host_template_cache[$key] = [
+						'hostid' => [$hostid],
+						'link_hostid' => []
+					];
+
+					foreach ($links as $templateid => $true) {
+						$del_host_template_cache[$key]['link_hostid'][] = $templateid;
+					}
 				}
 			}
 		}
-		unset($host);
 
-		if ($del_hosttemplateids) {
-			DB::delete('hosts_templates', ['hosttemplateid' => $del_hosttemplateids]);
+		foreach ($del_host_template_cache as $_del_host_template_cache) {
+			DB::delete('host_template_cache', $_del_host_template_cache);
+		}
+	}
+
+	private static function createHostTemplateCache(array $ins_template_host_links): void {
+		$ins_host_template_cache = [];
+
+		self::loadAncestorLinks($ins_template_host_links, $template_hosts, $vertices);
+
+		if (self::isTemplate()) {
+			self::loadDescendantLinks($ins_template_host_links, $template_hosts);
 		}
 
-		if ($ins_hosts_templates) {
-			$hosttemplateids = DB::insertBatch('hosts_templates', $ins_hosts_templates);
-		}
+		self::addTemplateHostLinks($ins_template_host_links, $template_hosts, $vertices);
 
-		foreach ($hosts as &$host) {
-			if (!array_key_exists('templates', $host)) {
-				continue;
-			}
-
-			foreach ($host['templates'] as &$template) {
-				if (!array_key_exists('hosttemplateid', $template)) {
-					$template['hosttemplateid'] = array_shift($hosttemplateids);
+		foreach ($ins_template_host_links as $host_links) {
+			foreach ($host_links as $hostid => $links) {
+				foreach ($links as $templateid => $true) {
+					$ins_host_template_cache[] = [
+						'hostid' => $hostid,
+						'link_hostid' => $templateid
+					];
 				}
 			}
-			unset($template);
 		}
-		unset($host);
+
+		if ($ins_host_template_cache) {
+			DB::insertBatch('host_template_cache', $ins_host_template_cache, false);
+		}
+	}
+
+	private static function loadAncestorLinks(array $template_host_links, ?array &$template_hosts = null,
+			?array &$vertices = null, ?array $ins_template_host_links = null): void {
+		$templateids = [];
+		$template_hosts = [];
+
+		foreach ($template_host_links as $templateid => $host_links) {
+			$templateids[$templateid] = true;
+
+			foreach ($host_links as $hostid => $links) {
+				$template_hosts[$templateid][$hostid] = true;
+			}
+		}
+
+		if ($ins_template_host_links !== null) {
+			$del_hostids = [];
+
+			foreach ($template_host_links as $host_links) {
+				foreach ($host_links as $hostid => $links) {
+					$del_hostids[$hostid] = true;
+				}
+			}
+		}
+
+		$processed_templateids = [];
+		$vertices = [];
+
+		do {
+			$options = [
+				'output' => ['hostid', 'templateid'],
+				'filter' => ['hostid' => array_keys($templateids)]
+			];
+			$resource = DBselect(DB::makeSql('hosts_templates', $options));
+
+			$processed_templateids += $templateids;
+			$_templateids = [];
+
+			if ($ins_template_host_links !== null) {
+				foreach ($templateids as $templateid => $true) {
+					if (array_key_exists($templateid, $del_hostids)) {
+						unset($templateids[$hostid]);
+					}
+				}
+			}
+
+			while ($row = DBfetch($resource)) {
+				if ($ins_template_host_links !== null && array_key_exists($row['templateid'], $ins_template_host_links)
+						&& array_key_exists($row['hostid'], $ins_template_host_links[$row['templateid']])) {
+					continue;
+				}
+
+				unset($templateids[$row['hostid']]);
+
+				$template_hosts[$row['templateid']][$row['hostid']] = true;
+
+				if (!array_key_exists($row['templateid'], $processed_templateids)) {
+					$_templateids[$row['templateid']] = true;
+				}
+			}
+
+			foreach ($templateids as $templateid => $true) {
+				$vertices[$templateid] = [];
+			}
+
+			$templateids = $_templateids;
+		} while ($templateids);
+	}
+
+	private static function loadDescendantLinks(array $template_host_links, array &$template_hosts,
+			array $ins_template_host_links = []): void {
+		$hostids = [];
+
+		foreach ($template_host_links as $host_links) {
+			foreach ($host_links as $hostid => $links) {
+				$hostids[$hostid] = true;
+			}
+		}
+
+		$processed_hostids = [];
+
+		do {
+			$options = [
+				'output' => ['templateid', 'hostid'],
+				'filter' => ['templateid' => array_keys($hostids)]
+			];
+			$resource = DBselect(DB::makeSql('hosts_templates', $options));
+
+			$processed_hostids += $hostids;
+			$hostids = [];
+
+			while ($row = DBfetch($resource)) {
+				if (array_key_exists($row['templateid'], $ins_template_host_links)
+						&& array_key_exists($row['hostid'], $ins_template_host_links[$row['templateid']])) {
+					continue;
+				}
+
+				$template_hosts[$row['templateid']][$row['hostid']] = true;
+
+				if (!array_key_exists($row['hostid'], $processed_hostids)) {
+					$hostids[$row['hostid']] = true;
+				}
+			}
+		} while ($hostids);
+	}
+
+	private static function addTemplateHostLinks(array &$template_host_links, array $template_hosts,
+			array $vertices): void {
+		$children_links = [];
+
+		do {
+			$_vertices = [];
+
+			foreach ($vertices as $templateid => $vertex_links) {
+				if (!array_key_exists($templateid, $template_hosts)) {
+					continue;
+				}
+
+				foreach ($template_hosts[$templateid] as $hostid => $true) {
+					if (!array_key_exists($hostid, $_vertices) || !array_key_exists($templateid, $_vertices[$hostid])) {
+						$_vertices[$hostid][$templateid] = [];
+					}
+
+					$_vertices[$hostid][$templateid] += [$templateid => true] + $vertex_links;
+
+					if (array_key_exists($templateid, $template_host_links)
+							&& array_key_exists($hostid, $template_host_links[$templateid])) {
+
+						$template_host_links[$templateid][$hostid] += $_vertices[$hostid][$templateid];
+
+						if (array_key_exists($hostid, $template_hosts)) {
+							self::addOrSupplementChildrenLinks($children_links, $template_hosts, $hostid,
+								$template_host_links[$templateid][$hostid]
+							);
+						}
+					}
+
+					if (array_key_exists($templateid, $children_links)
+							&& array_key_exists($hostid, $children_links[$templateid])
+							&& array_key_exists($hostid, $template_hosts)) {
+						self::addOrSupplementChildrenLinks($children_links, $template_hosts, $hostid,
+							$children_links[$templateid][$hostid]
+						);
+					}
+				}
+			}
+
+			$vertices = [];
+
+			foreach ($_vertices as $hostid => $template_vertices) {
+				$vertices[$hostid] = [];
+
+				foreach ($template_vertices as $vertex_links) {
+					$vertices[$hostid] += $vertex_links;
+				}
+			}
+		} while ($vertices);
+
+		foreach ($children_links as $templateid => $host_links) {
+			foreach ($host_links as $hostid => $links) {
+				if (array_key_exists($templateid, $template_host_links)
+						&& array_key_exists($hostid, $template_host_links[$templateid])) {
+					$template_host_links[$templateid][$hostid] += $links;
+				}
+				else {
+					$template_host_links[$templateid][$hostid] = $links;
+				}
+			}
+		}
+	}
+
+	private static function addOrSupplementChildrenLinks(array &$children_links, array $template_hosts,
+			string $templateid, array $links): void {
+		foreach ($template_hosts[$templateid] as $hostid => $true) {
+			if (array_key_exists($templateid, $children_links)
+					&& array_key_exists($hostid, $children_links[$templateid])) {
+				$children_links[$templateid][$hostid] += $links;
+			}
+			else {
+				$children_links[$templateid][$hostid] = $links;
+			}
+		}
 	}
 
 	/**

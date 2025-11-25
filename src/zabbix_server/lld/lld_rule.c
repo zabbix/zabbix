@@ -30,7 +30,6 @@
 #include "zbxjson.h"
 #include "zbxtypes.h"
 #include "zbxexpr.h"
-#include "zbxexpression.h"
 
 /* lld_override table columns */
 #define LLD_OVERRIDE_COL_NAME			0

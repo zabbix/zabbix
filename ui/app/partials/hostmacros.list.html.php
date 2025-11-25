@@ -32,18 +32,14 @@ else {
 			(new CTableColumn(_('Value')))->addClass('table-col-value'),
 			(new CTableColumn(_('Description')))->addClass('table-col-description'),
 			$data['readonly'] ? null : (new CTableColumn())->addClass('table-col-action')
-		]);
-
-	if ($data['has_inline_validation']) {
-		$table
-			->setAttribute('data-field-type', 'set')
-			->setAttribute('data-field-name', 'macros');
-	}
+		])
+		->setAttribute('data-field-type', 'set')
+		->setAttribute('data-field-name', 'macros');
 
 	foreach ($data['macros'] as $i => $macro) {
 		$value = array_key_exists('value', $macro) ? $macro['value'] : null;
 		$macro_value = (new CMacroValue($macro['type'], 'macros['.$i.']', $value, false))
-			->setErrorContainer($data['has_inline_validation'] ? 'macros_'.$i.'_error_container' : null)
+			->setErrorContainer('macros_'.$i.'_error_container')
 			->setReadonly($data['readonly']
 				|| !($macro['discovery_state'] & CControllerHostMacrosList::DISCOVERY_STATE_CONVERTING)
 			)
@@ -51,7 +47,7 @@ else {
 
 		$macro_cell = [
 			(new CTextAreaFlexible('macros['.$i.'][macro]', $macro['macro']))
-				->setErrorContainer($data['has_inline_validation'] ? 'macros_'.$i.'_error_container' : null)
+				->setErrorContainer('macros_'.$i.'_error_container')
 				->setReadonly($data['readonly']
 					|| $macro['discovery_state'] != CControllerHostMacrosList::DISCOVERY_STATE_MANUAL
 				)
@@ -59,7 +55,7 @@ else {
 				->setWidth(ZBX_TEXTAREA_MACRO_WIDTH)
 				->setAttribute('placeholder', '{$MACRO}')
 				->disableSpellcheck()
-				->setErrorLabel($data['has_inline_validation'] ? _('Macro'): null)
+				->setErrorLabel(_('Macro'))
 		];
 
 		if (!$data['readonly']) {
@@ -115,7 +111,7 @@ else {
 				->addClass(ZBX_STYLE_NOWRAP),
 			(new CCol(
 				(new CTextAreaFlexible('macros['.$i.'][description]', $macro['description']))
-					->setErrorContainer($data['has_inline_validation'] ? 'macros_'.$i.'_error_container' : null)
+					->setErrorContainer('macros_'.$i.'_error_container')
 					->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH)
 					->setMaxlength(DB::getFieldLength('hostmacro', 'description'))
 					->setReadonly($data['readonly']
@@ -128,12 +124,10 @@ else {
 
 		$table
 			->addRow($row, 'form_row')
-			->addRow($data['has_inline_validation']
-				? (new CCol())
-					->setId('macros_'.$i.'_error_container')
-					->setAttribute('colspan', count($row))
-					->addClass(ZBX_STYLE_ERROR_CONTAINER)
-				: null
+			->addRow((new CCol())
+				->setId('macros_'.$i.'_error_container')
+				->setAttribute('colspan', count($row))
+				->addClass(ZBX_STYLE_ERROR_CONTAINER)
 			);
 	}
 
