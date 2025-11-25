@@ -5324,6 +5324,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 
 			foreach ($attributes as $attribute => $value) {
 				switch ($attribute) {
+					case 'color':
 					case 'value':
 						$this->assertEquals($value, $field->getValue());
 						break;
@@ -5339,10 +5340,6 @@ class testDashboardTopHostsWidget extends testWidgets {
 
 					case 'options':
 						$this->assertEquals($value, $field->asDropdown()->getOptions()->asText());
-						break;
-
-					case 'color':
-						$this->assertEquals($value,  $form->query($label)->asColorPicker()->one()->getValue());
 						break;
 				}
 			}
