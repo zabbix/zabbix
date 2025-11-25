@@ -700,8 +700,8 @@ class CApiService {
 
 			foreach ($options['sortfield'] as $i => $sortfield) {
 				// Validate sortfield.
-				if (!in_array($sortfield, $sort_fields)
-						|| ($group_by && !in_array($sortfield, $group_by_fields))) {
+				if (!str_in_array($sortfield, $sort_fields)
+						|| ($group_by && !str_in_array($sortfield, $group_by_fields))) {
 					throw new APIException(ZBX_API_ERROR_INTERNAL,
 						_s('Sorting by field "%1$s" not allowed.', $sortfield)
 					);
