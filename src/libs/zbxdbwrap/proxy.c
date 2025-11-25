@@ -905,6 +905,8 @@ static void	parse_history_data_row_value(const struct zbx_json_parse *jp_row, zb
 		if (NULL == (ptr = zbx_json_decodevalue_dyn(p, tmp, tmp_alloc, NULL)))
 			continue;
 
+		p = ptr;
+
 		if (0 == strcmp(ZBX_PROTO_TAG_CLOCK, buffer))
 		{
 			if (SUCCEED == zbx_is_uint31(*tmp, &av->ts.sec))
