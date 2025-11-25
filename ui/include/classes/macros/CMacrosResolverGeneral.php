@@ -2625,7 +2625,7 @@ class CMacrosResolverGeneral {
 							elseif ($data['context'] !== null && count($global_macros[$data['macro']]['regex'])) {
 								foreach ($global_macros[$data['macro']]['regex'] as $regex => $val) {
 									if (preg_match(
-											'/'.CRegexHelpe::handleSlashEscaping($regex).'/', $data['context'])) {
+											'/'.CRegexHelper::handleSlashEscaping($regex).'/', $data['context'])) {
 										$data['value']['value'] = $val;
 										break;
 									}
