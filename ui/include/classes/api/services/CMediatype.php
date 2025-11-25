@@ -696,15 +696,27 @@ class CMediatype extends CApiService {
 			));
 		}
 
-		if ($is_update && !array_key_exists('client_secret', $mediatype)) {
-			if (array_key_exists('token_url', $mediatype) && $mediatype['token_url'] !== $db_mediatype['token_url']) {
-				if (array_key_exists('tokens_status', $mediatype)) {
-					$mediatype['tokens_status'] = 0;
+		if ($is_update
+				&& (array_key_exists('token_url', $mediatype) || array_key_exists('authorization_url', $mediatype))) {
+			$upd_url = DB::getUpdatedValues(
+				'media_type_oauth',
+				['token_url' => $mediatype['token_url'], 'authorization_url' => $mediatype['authorization_url']],
+				['token_url' => $db_mediatype['token_url'], 'authorization_url' => $db_mediatype['authorization_url']]
+			);
+
+			if ($upd_url) {
+				if (array_key_exists('token_url', $upd_url) && !array_key_exists('client_secret', $mediatype)) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.', $path,
+						_s('the parameter "%1$s" is missing', 'client_secret')
+					));
 				}
 
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.', $path,
-					_s('the parameter "%1$s" is missing', 'client_secret')
-				));
+				$tokens_status = array_key_exists('tokens_status', $mediatype) ? $mediatype['tokens_status'] : 0;
+
+				DB::update('media_type_oauth', [[
+					'values' => ['tokens_status' => $tokens_status],
+					'where' => ['mediatypeid' => $mediatype['mediatypeid']]
+				]]);
 			}
 		}
 	}
