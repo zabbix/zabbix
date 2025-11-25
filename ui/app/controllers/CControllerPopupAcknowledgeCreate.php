@@ -224,6 +224,7 @@ class CControllerPopupAcknowledgeCreate extends CController {
 				// Convert suppress until problem input to Unix timestamp.
 				$suppress_until_time_parser = new CRangeTimeParser();
 				$suppress_until_time_parser->parse($this->getInput('suppress_until_problem'));
+				$this->suppress_until = $suppress_until_time_parser->getDateTime(false)->getTimestamp();
 				// Save if inserted was relative time.
 				if ($suppress_until_time_parser->getTimeType() == CRangeTimeParser::ZBX_TIME_RELATIVE) {
 					$suppress_until_time = $this->getInput('suppress_until_problem');

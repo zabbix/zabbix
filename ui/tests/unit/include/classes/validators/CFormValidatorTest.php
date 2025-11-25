@@ -2553,6 +2553,22 @@ class CFormValidatorTest extends TestCase {
 				['value' => date('Y-m-d', time() + SEC_PER_DAY)],
 				CFormValidator::SUCCESS,
 				[]
+			],
+			[
+				['object', 'fields' => [
+					'value' => ['string',
+						'use' => [CRangeTimeValidator::class, []]
+					]
+				]],
+				['value' => '2040-01-01'],
+				['value' => '2040-01-01'],
+				CFormValidator::ERROR,
+				['/value' => [
+					[
+						'message' => 'Invalid time.',
+						'level' => CFormValidator::ERROR_LEVEL_DELAYED
+					]
+				]]
 			]
 		];
 	}

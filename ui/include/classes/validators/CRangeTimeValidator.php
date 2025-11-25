@@ -39,6 +39,14 @@ class CRangeTimeValidator extends CValidator {
 			return false;
 		}
 
+		$timestamp = $parser->getDateTime(false)->getTimestamp();
+
+		if (bccomp($timestamp, ZBX_MAX_DATE) > 0) {
+			$this->setError(_('invalid time'));
+
+			return false;
+		}
+
 		if ($this->min !== null) {
 			$timestamp = $parser->getDateTime(false)->getTimestamp();
 
