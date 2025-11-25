@@ -17,7 +17,6 @@
 #include "zbxdb.h"
 #include "zbxhttp.h"
 #include "audit/zbxaudit.h"
-#include "zbxcacheconfig.h"
 #include "zbxalgo.h"
 #include "zbxstr.h"
 
@@ -338,8 +337,8 @@ static void	oauth_audit(int audit_context_mode, zbx_uint64_t mediatypeid, const 
 
 		if (SUCCEED == fetch_result)
 		{
-			zbx_audit_entry_update_string(entry, "access_token", ZBX_MACRO_SECRET_MASK,
-					ZBX_MACRO_SECRET_MASK);
+			zbx_audit_entry_update_string(entry, "access_token", ZBX_SECRET_MASK,
+					ZBX_SECRET_MASK);
 			zbx_audit_entry_update_int(entry, "access_expires_in", data->old_access_expires_in,
 					data->access_expires_in);
 			zbx_audit_entry_update_int(entry, "access_token_updated", (int)data->old_access_token_updated,
@@ -347,8 +346,8 @@ static void	oauth_audit(int audit_context_mode, zbx_uint64_t mediatypeid, const 
 
 			if (NULL != data->old_refresh_token)
 			{
-				zbx_audit_entry_update_string(entry, "refresh_token", ZBX_MACRO_SECRET_MASK,
-						ZBX_MACRO_SECRET_MASK);
+				zbx_audit_entry_update_string(entry, "refresh_token", ZBX_SECRET_MASK,
+						ZBX_SECRET_MASK);
 			}
 		}
 
