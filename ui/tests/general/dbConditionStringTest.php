@@ -41,12 +41,12 @@ class dbConditionStringTest extends CTest {
 
 		yield 'Inclusion filter with two values.' => [
 			['field', ['a', 'b']],
-			"field IN ('a','b')"
+			"(field IN ('a','b'))"
 		];
 
 		yield 'Exclusion filter with two values.' => [
 			['field', ['a', 'b'], true],
-			"field NOT IN ('a','b')"
+			"(field NOT IN ('a','b'))"
 		];
 	}
 

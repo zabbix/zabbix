@@ -555,7 +555,7 @@ function dbConditionString(string $field_name, array $values, bool $not_in = fal
 	return match (count($values)) {
 		0 => $not_in ? '1=1' : '1=0',
 		1 => $field_name.($not_in ? '!=' : '=').zbx_dbstr(reset($values)),
-		default => $field_name.($not_in ? ' NOT' : '').' IN ('.implode(',', zbx_dbstr($values)).')'
+		default => '('.$field_name.($not_in ? ' NOT' : '').' IN ('.implode(',', zbx_dbstr($values)).'))'
 	};
 }
 
