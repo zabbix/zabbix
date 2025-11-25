@@ -1,1 +1,1 @@
-A......... [ZBX-24435] improved performance by removing or conditions from in statements (agriscenko, vmaksimovs, vso)
+A......... [ZBX-24435] improved performance in cases where the number of values filtered by a specific string, integer, or ID type parameter exceeds 950 (agriscenko, vmaksimovs, vso)
