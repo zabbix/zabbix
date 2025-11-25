@@ -37,7 +37,6 @@ class CControllerValueMapCheck extends CController {
 						VALUEMAP_MAPPING_TYPE_IN_RANGE, VALUEMAP_MAPPING_TYPE_REGEXP, VALUEMAP_MAPPING_TYPE_DEFAULT
 					]],
 					'value' => [
-						['db valuemap_mapping.value', 'when' => ['type', 'in' => [VALUEMAP_MAPPING_TYPE_DEFAULT]]],
 						['db valuemap_mapping.value', 'required', 'when' => ['type', 'in' => [
 							VALUEMAP_MAPPING_TYPE_EQUAL
 						]]],
