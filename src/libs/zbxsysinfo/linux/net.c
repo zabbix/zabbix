@@ -18,6 +18,12 @@
 #include "zbxcomms.h"
 #include "zbxnum.h"
 #include "zbxip.h"
+#include "zbxregexp.h"
+#include "zbxstr.h"
+
+#include <linux/wireless.h>
+#include <linux/ethtool.h>
+#include <linux/sockios.h>
 
 typedef struct
 {
@@ -1160,4 +1166,235 @@ int	net_tcp_socket_count(AGENT_REQUEST *request, AGENT_RESULT *result)
 int	net_udp_socket_count(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	return net_socket_count(NET_CONN_TYPE_UDP, request, result);
+}
+
+static void	get_wifi_info(const char *interface, struct zbx_json *j)
+{
+	struct	iwreq wreq;
+	struct	iw_statistics stats;
+	struct	iw_range range;
+	char	buffer[IW_ESSID_MAX_SIZE + 1];
+	int	sockfd, signal_level, link_quality, noise_level;
+	uint64_t	bitrate;
+
+	sockfd = socket(AF_INET, SOCK_DGRAM, 0);
+	if (-1 == sockfd)
+		return;
+
+	memset(&wreq, 0, sizeof(struct iwreq));
+	zbx_strlcpy(wreq.ifr_name, interface, IFNAMSIZ);
+
+	wreq.u.data.pointer = (caddr_t)&stats;
+	wreq.u.data.length = sizeof(struct iw_statistics);
+	wreq.u.data.flags = 1;
+
+	if (ioctl(sockfd, SIOCGIWSTATS, &wreq) == 0)
+	{
+		memset(&range, 0, sizeof(struct iw_range));
+		wreq.u.data.pointer = (caddr_t)&range;
+		wreq.u.data.length = sizeof(struct iw_range);
+		wreq.u.data.flags = 0;
+
+		if (0 == ioctl(sockfd, SIOCGIWRANGE, &wreq))
+		{
+			if (0 != (stats.qual.updated & IW_QUAL_DBM))
+				signal_level = stats.qual.level - 256;
+			else
+				signal_level = stats.qual.level;
+
+			zbx_json_addint64(j, "signal_level", signal_level);
+
+			if (range.max_qual.qual != 0)
+				link_quality = (stats.qual.qual * 100) / range.max_qual.qual;
+			else
+				link_quality = stats.qual.qual;
+
+			zbx_json_addint64(j, "link_quality", link_quality);
+
+			if (0 != (stats.qual.updated & IW_QUAL_DBM))
+				noise_level = stats.qual.noise - 256;
+			else
+				noise_level = stats.qual.noise;
+
+			zbx_json_addint64(j, "noise_level", noise_level);
+		}
+	}
+
+	memset(buffer, 0, sizeof(buffer));
+	wreq.u.essid.pointer = buffer;
+	wreq.u.essid.length = IW_ESSID_MAX_SIZE;
+	wreq.u.essid.flags = 0;
+
+	if (0 == ioctl(sockfd, SIOCGIWESSID, &wreq))
+	{
+		zbx_json_addstring(j, "ssid", buffer, ZBX_JSON_TYPE_STRING);
+	}
+
+	if (0 == ioctl(sockfd, SIOCGIWRATE, &wreq))
+	{
+		bitrate = (uint64_t)wreq.u.bitrate.value / 1000000;
+		zbx_json_adduint64(j, "bitrate", bitrate);
+	}
+
+	close(sockfd);
+}
+
+static void	get_link_settings(const char *interface, struct zbx_json *j)
+{
+	int sock;
+	struct ifreq ifr;
+	struct ethtool_cmd ecmd;
+
+	sock = socket(AF_INET, SOCK_DGRAM, 0);
+	if (0 > sock)
+		return;
+
+	memset(&ifr, 0, sizeof(ifr));
+	memset(&ecmd, 0, sizeof(ecmd));
+
+	zbx_strlcpy(ifr.ifr_name, interface, IFNAMSIZ - 1);
+
+	ecmd.cmd = ETHTOOL_GSET;
+	ifr.ifr_data = (char *)&ecmd;
+
+	if (0 > ioctl(sock, SIOCETHTOOL, &ifr))
+	{
+		close(sock);
+		return;
+	}
+
+	zbx_json_addstring(j, "negotiation", ecmd.autoneg == AUTONEG_ENABLE ? "on" : "off", ZBX_JSON_TYPE_STRING);
+	close(sock);
+}
+
+static void	get_link_flags(const char *interface, struct zbx_json *j)
+{
+	int sock;
+	struct ifreq ifr;
+
+	sock = socket(AF_INET, SOCK_DGRAM, 0);
+	if (sock < 0)
+		return;
+
+	memset(&ifr, 0, sizeof(ifr));
+	zbx_strlcpy(ifr.ifr_name, interface, IFNAMSIZ);
+
+	if (ioctl(sock, SIOCGIFFLAGS, &ifr) < 0)
+	{
+		close(sock);
+		return;
+	}
+
+	zbx_json_addstring(j, "administrative_state",
+			(0 != (ifr.ifr_flags & IFF_UP)) ? "up" : "down", ZBX_JSON_TYPE_STRING);
+	zbx_json_addstring(j, "operational_state",
+			(0 != (ifr.ifr_flags & IFF_RUNNING)) ? "up" : "down", ZBX_JSON_TYPE_STRING);
+
+	close(sock);
+}
+
+static void	fill_net_if_get_params(char *name, char *param, char *jsonname, struct zbx_json *j, int as_int)
+{
+	FILE	*f;
+	char	*path, value[MAX_STRING_LEN];
+
+	if (NULL == (path = zbx_dsprintf(NULL, "/sys/class/net/%s/%s", name, param)))
+		return;
+
+	if (NULL != (f = fopen(path, "r")))
+	{
+		if (NULL != fgets(value, sizeof(value), f))
+		{
+			zbx_rtrim(value, "\n");
+
+			if (NULL != jsonname)
+				param = jsonname;
+
+			if (0 == as_int)
+			{
+				zbx_json_addstring(j, param, value, ZBX_JSON_TYPE_STRING);
+			}
+			else
+			{
+				zbx_uint64_t	uintvalue;
+
+				if (SUCCEED == zbx_is_uint64(value, &uintvalue))
+					zbx_json_adduint64(j, param, uintvalue);
+			}
+		}
+		zbx_fclose(f);
+	}
+
+	zbx_free(path);
+}
+
+int	net_if_get(AGENT_REQUEST *request, AGENT_RESULT *result)
+{
+	FILE			*f;
+	struct zbx_json		j;
+	zbx_regexp_t		*rxp = NULL;
+	char			line[MAX_STRING_LEN], *p, *pattern = NULL, *error = NULL;
+
+	if (NULL == (f = fopen("/proc/net/dev", "r")))
+	{
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot open /proc/net/dev: %s", zbx_strerror(errno)));
+		return SYSINFO_RET_FAIL;
+	}
+	zbx_json_initarray(&j, ZBX_JSON_STAT_BUF_LEN);
+
+	if (1 == request->nparam)
+	{
+		pattern = get_rparam(request, 0);
+
+		if (FAIL == zbx_regexp_compile(pattern, &rxp, &error))
+		{
+			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "invalid regular expression: %s", error));
+			zbx_free(error);
+			return FAIL;
+		}
+	}
+
+	while (NULL != fgets(line, sizeof(line), f))
+	{
+		if (NULL == (p = strstr(line, ":")))
+			continue;
+
+		*p = '\0';
+
+		/* trim left spaces */
+		for (p = line; ' ' == *p && '\0' != *p; p++)
+			;
+
+		if (NULL != rxp && 0 != zbx_regexp_match_precompiled(p, rxp))
+			continue;
+
+		zbx_json_addobject(&j, NULL);
+		zbx_json_addstring(&j, "name", p, ZBX_JSON_TYPE_STRING);
+		get_link_flags(p, &j);
+		fill_net_if_get_params(p, "statistics/rx_bytes", "received", &j, 1);
+		fill_net_if_get_params(p, "statistics/tx_bytes", "sent", &j, 1);
+		fill_net_if_get_params(p, "type", NULL, &j, 1);
+		fill_net_if_get_params(p, "address", NULL, &j, 0);
+		fill_net_if_get_params(p, "ifalias", NULL, &j, 0);
+		fill_net_if_get_params(p, "carrier", NULL, &j, 1);
+		fill_net_if_get_params(p, "speed", NULL, &j, 1);
+		fill_net_if_get_params(p, "duplex", NULL, &j, 0);
+		get_link_settings(p, &j);
+
+		get_wifi_info(p, &j);
+		zbx_json_close(&j);
+	}
+
+	zbx_fclose(f);
+
+	zbx_json_close(&j);
+
+	SET_STR_RESULT(result, strdup(j.buffer));
+
+	zbx_json_free(&j);
+
+	if (NULL != rxp)
+		zbx_regexp_free(rxp);
+
+	return SYSINFO_RET_OK;
 }

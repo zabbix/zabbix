@@ -44,3 +44,23 @@ type msgIfDiscovery struct {
 	Ifname string  `json:"{#IFNAME}"`
 	Ifguid *string `json:"{#IFGUID},omitempty"`
 }
+
+type msgIfGet struct {
+	Ifname        string  `json:"name"`
+	Ifadmstate    *string `json:"administrative_state,omitempty"`
+	Ifoperstatus  *string `json:"operational_state,omitempty"`
+	Ifalias       string  `json:"alias"`
+	Ifoutoctets   *uint64 `json:"sent"`
+	Ifinoctets    *uint64 `json:"received"`
+	Ifmac         string  `json:"mac,omitempty"`
+	Iftype        *uint64 `json:"type,omitempty"`
+	Ifcarrier     *uint64 `json:"carrier,omitempty"`
+	Ifnegotiation string  `json:"negotiation,omitempty"`
+	Ifduplex      string  `json:"duplex,omitempty"`
+	Ifspeed       *uint64 `json:"speed,omitempty"`
+	Ifslevel      *int64  `json:"signal_level,omitempty"`
+	Iflquality    *int64  `json:"link_quality,omitempty"`
+	Ifnoicelevel  *int64  `json:"noise_level,omitempty"`
+	Ifssid        *string `json:"ssid,omitempty"`
+	Ifbitrate     *int64  `json:"bitrate,omitempty"`
+}

@@ -14,13 +14,138 @@
 
 package netif
 
+/*
+#include <linux/wireless.h>
+#include <linux/ethtool.h>
+#include <linux/sockios.h>
+#include <stdlib.h>
+#include <sys/socket.h>
+#include <sys/ioctl.h>
+#include <sys/types.h>
+#include <string.h>
+#include <unistd.h>
+
+typedef struct
+{
+	int64_t	bitrate;
+	int	autoneg;
+	int	administrative_state;
+	int	operational_state;
+	int	wifiinfo;
+	int	signal_level;
+	int	link_quality;
+	int	noise_level;
+	char	ssid[IW_ESSID_MAX_SIZE + 1];
+} ll_info_t;
+
+int	get_ll_info(const char* interface, ll_info_t* info)
+{
+	int sockfd;
+	struct iwreq wreq;
+	struct iw_statistics stats;
+	struct iw_range range;
+	char buffer[IW_ESSID_MAX_SIZE + 1];
+	struct ifreq ifr;
+	struct ethtool_cmd ecmd;
+
+	memset(info, 0, sizeof(ll_info_t));
+	sockfd = socket(AF_INET, SOCK_DGRAM, 0);
+
+	if (-1 == sockfd)
+	{
+		return -1;
+	}
+
+	memset(&wreq, 0, sizeof(struct iwreq));
+	strncpy(wreq.ifr_name, interface, IFNAMSIZ - 1);
+	wreq.u.data.pointer = (caddr_t) &stats;
+	wreq.u.data.length = sizeof(struct iw_statistics);
+	wreq.u.data.flags = 1;
+
+	if (0 == ioctl(sockfd, SIOCGIWSTATS, &wreq))
+	{
+		memset(&range, 0, sizeof(struct iw_range));
+		wreq.u.data.pointer = (caddr_t) &range;
+		wreq.u.data.length = sizeof(struct iw_range);
+		wreq.u.data.flags = 0;
+
+		if (0 == ioctl(sockfd, SIOCGIWRANGE, &wreq))
+		{
+			info->wifiinfo = 1;
+
+			if (0 != (stats.qual.updated & IW_QUAL_DBM))
+				info->signal_level = stats.qual.level - 256;
+			else
+				info->signal_level = stats.qual.level;
+
+			if (0 != range.max_qual.qual)
+				info->link_quality = (stats.qual.qual * 100) / range.max_qual.qual;
+			else
+				info->link_quality = stats.qual.qual;
+
+			if (0 != (stats.qual.updated & IW_QUAL_DBM))
+				info->noise_level = stats.qual.noise - 256;
+			else
+				info->noise_level = stats.qual.noise;
+		}
+	}
+
+	memset(buffer, 0, sizeof(buffer));
+	wreq.u.essid.pointer = buffer;
+	wreq.u.essid.length = IW_ESSID_MAX_SIZE;
+	wreq.u.essid.flags = 0;
+
+	if (0 == ioctl(sockfd, SIOCGIWESSID, &wreq))
+	{
+		strncpy(info->ssid, buffer, IW_ESSID_MAX_SIZE);
+		info->ssid[IW_ESSID_MAX_SIZE] = '\0';
+	}
+
+	info->bitrate = -1;
+	if (0 == ioctl(sockfd, SIOCGIWRATE, &wreq))
+		info->bitrate = (int)wreq.u.bitrate.value / 1000000;
+
+	memset(&ifr, 0, sizeof(ifr));
+	memset(&ecmd, 0, sizeof(ecmd));
+	ecmd.cmd = ETHTOOL_GSET;
+	ifr.ifr_data = (char*)&ecmd;
+	strncpy(ifr.ifr_name, interface, IFNAMSIZ - 1);
+
+	if (0 == ioctl(sockfd, SIOCETHTOOL, &ifr))
+		info->autoneg = ecmd.autoneg;
+
+	memset(&ifr, 0, sizeof(ifr));
+	strncpy(ifr.ifr_name, interface, IFNAMSIZ - 1);
+
+	if (0 == ioctl(sockfd, SIOCGIFFLAGS, &ifr))
+	{
+		if (0 != (ifr.ifr_flags & IFF_UP))
+			info->administrative_state = 1;
+		else
+			info->administrative_state = 2;
+
+		if (0 != (ifr.ifr_flags & IFF_RUNNING))
+			info->operational_state = 1;
+		else
+			info->operational_state = 2;
+	}
+
+	close(sockfd);
+	return 0;
+}
+*/
+import "C"
+
 import (
 	"bufio"
 	"encoding/json"
 	"errors"
 	"fmt"
+	"os"
+	"regexp"
 	"strconv"
 	"strings"
+	"unsafe"
 
 	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/plugin"
@@ -66,6 +191,7 @@ func init() {
 		"net.if.out", "Returns outgoing traffic statistics on network interface.",
 		"net.if.total", "Returns sum of incoming and outgoing traffic statistics on network interface.",
 		"net.if.discovery", "Returns list of network interfaces. Used for low-level discovery.",
+		"net.if.get", "Returns list of network interfaces with parameters.",
 	)
 	if err != nil {
 		panic(errs.Wrap(err, "failed to register metrics"))
@@ -146,6 +272,171 @@ func (p *Plugin) getDevDiscovery() (netInterfaces []msgIfDiscovery, err error) {
 	return netInterfaces, nil
 }
 
+func (p *Plugin) fillNetIfGetParams(ifName, param string) (retvalue string) {
+	path := fmt.Sprintf("/sys/class/net/%s/%s", ifName, param)
+
+	data, err := os.ReadFile(path)
+	if err != nil {
+		return
+	}
+
+	value := strings.TrimSpace(string(data))
+
+	return value
+}
+
+func (p *Plugin) getIfGet(regexExpr string) (netInterfaces []msgIfGet, err error) {
+
+	var f std.File
+	var compiledRegex *regexp.Regexp
+
+	if f, err = stdOs.Open("/proc/net/dev"); err != nil {
+		return nil, fmt.Errorf(errorCannotOpenNetDev, err)
+	}
+	defer f.Close()
+
+	if regexExpr != "" {
+		compiledRegex, err = regexp.Compile(regexExpr)
+		if err != nil {
+			err = fmt.Errorf("invalid regex expression '%s': %w", regexExpr, err)
+			return
+		}
+	}
+
+	netInterfaces = make([]msgIfGet, 0)
+	for sLines := bufio.NewScanner(f); sLines.Scan(); {
+		dev := strings.Split(sLines.Text(), ":")
+		ifName := strings.TrimSpace(dev[0])
+
+		if len(dev) <= 1 {
+			continue
+		}
+		if compiledRegex != nil {
+			if !compiledRegex.MatchString(strings.TrimSpace(dev[0])) {
+				continue
+			}
+		}
+
+		cIface := C.CString(ifName)
+		cInfo := (*C.ll_info_t)(C.malloc(C.sizeof_ll_info_t))
+
+		result := C.get_ll_info(cIface, cInfo)
+		if result != 0 {
+			C.free(unsafe.Pointer(cIface))
+			C.free(unsafe.Pointer(cInfo))
+			return nil, fmt.Errorf("ioctl call failed")
+		}
+
+		isAutonegEnabled := "off"
+		if int(cInfo.autoneg) != 0 {
+			isAutonegEnabled = "on"
+		}
+
+		var speedPtr *uint64
+		speedVal, errSpeed := strconv.ParseUint(
+			p.fillNetIfGetParams(strings.TrimSpace(dev[0]), "speed"), 10, 64)
+		if errSpeed == nil {
+			speedPtr = &speedVal
+		}
+
+		var typePtr *uint64
+		typeVal, errType := strconv.ParseUint(
+			p.fillNetIfGetParams(strings.TrimSpace(dev[0]), "type"), 10, 64)
+		if errType == nil {
+			typePtr = &typeVal
+		}
+
+		var carrierPtr *uint64
+		carrierVal, errCarrier := strconv.ParseUint(
+			p.fillNetIfGetParams(strings.TrimSpace(dev[0]), "carrier"), 10, 64)
+		if errCarrier == nil {
+			carrierPtr = &carrierVal
+		}
+
+		var rxPtr *uint64
+		rxVal, errRx := strconv.ParseUint(
+			p.fillNetIfGetParams(strings.TrimSpace(dev[0]), "statistics/rx_bytes"), 10, 64)
+		if errRx == nil {
+			rxPtr = &rxVal
+		}
+
+		var txPtr *uint64
+		txVal, errTx := strconv.ParseUint(
+			p.fillNetIfGetParams(strings.TrimSpace(dev[0]), "statistics/tx_bytes"), 10, 64)
+		if errTx == nil {
+			txPtr = &txVal
+		}
+
+		var operstatusPtr *string
+		if int(cInfo.operational_state) == 1 {
+			val := "up"
+			operstatusPtr = &val
+		} else if int(cInfo.operational_state) == 2 {
+			val := "down"
+			operstatusPtr = &val
+		}
+
+		var administrativePtr *string
+		if int(cInfo.administrative_state) == 1 {
+			val := "up"
+			administrativePtr = &val
+		} else if int(cInfo.administrative_state) == 2 {
+			val := "down"
+			administrativePtr = &val
+		}
+
+		var levelPtr *int64
+		var qualityPtr *int64
+		var noicelevelPtr *int64
+
+		if int(cInfo.wifiinfo) == 1 {
+			levelVal := int64(cInfo.signal_level)
+			levelPtr = &levelVal
+			qualityVal := int64(cInfo.link_quality)
+			qualityPtr = &qualityVal
+			noicelevelVal := int64(cInfo.noise_level)
+			noicelevelPtr = &noicelevelVal
+		}
+
+		valSSID := C.GoString((*C.char)(unsafe.Pointer(&cInfo.ssid[0])))
+		var ssidPtr *string
+
+		if valSSID != "" {
+			ssidPtr = &valSSID
+		}
+		var bitratePtr *int64
+		bitrateVal := int64(cInfo.bitrate)
+		if bitrateVal > 0 {
+			bitratePtr = &bitrateVal
+		}
+
+		netInterfaces = append(netInterfaces, msgIfGet{
+			Ifname:        ifName,
+			Ifmac:         p.fillNetIfGetParams(strings.TrimSpace(dev[0]), "address"),
+			Iftype:        typePtr,
+			Ifinoctets:    rxPtr,
+			Ifoutoctets:   txPtr,
+			Ifoperstatus:  operstatusPtr,
+			Ifadmstate:    administrativePtr,
+			Ifcarrier:     carrierPtr,
+			Ifalias:       p.fillNetIfGetParams(strings.TrimSpace(dev[0]), "ifalias"),
+			Ifnegotiation: isAutonegEnabled,
+			Ifduplex:      p.fillNetIfGetParams(strings.TrimSpace(dev[0]), "duplex"),
+			Ifspeed:       speedPtr,
+			Ifslevel:      levelPtr,
+			Iflquality:    qualityPtr,
+			Ifnoicelevel:  noicelevelPtr,
+			Ifssid:        ssidPtr,
+			Ifbitrate:     bitratePtr,
+		})
+
+		C.free(unsafe.Pointer(cIface))
+		C.free(unsafe.Pointer(cInfo))
+	}
+
+	return netInterfaces, nil
+}
+
 // Export -
 func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
 	var direction dirFlag
@@ -158,6 +449,23 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 		}
 		var devices []msgIfDiscovery
 		if devices, err = p.getDevDiscovery(); err != nil {
+			return
+		}
+		var b []byte
+		if b, err = json.Marshal(devices); err != nil {
+			return
+		}
+		return string(b), nil
+	case "net.if.get":
+		if len(params) > 1 {
+			return nil, errors.New(errorTooManyParams)
+		}
+		expression := ""
+		if len(params) > 0 {
+			expression = params[0]
+		}
+		var devices []msgIfGet
+		if devices, err = p.getIfGet(expression); err != nil {
 			return
 		}
 		var b []byte

@@ -19,6 +19,21 @@
 
 #include "zbxjson.h"
 #include "zbxnum.h"
+#include "zbxregexp.h"
+#include "zbxcomms.h"
+#include "zbxip.h"
+#include <sys/socket.h>
+#include <kstat.h>
+#include <sys/sockio.h>
+#include <net/if.h>
+#include <sys/stropts.h>
+#include <errno.h>
+#include <string.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <ifaddrs.h>
+#include <net/if.h>
+#include <net/if_dl.h>
 
 static int	get_kstat_named_field(const char *name, const char *field, zbx_uint64_t *field_value, char **error)
 {
@@ -482,6 +497,167 @@ int	net_if_discovery(AGENT_REQUEST *request, AGENT_RESULT *result)
 	}
 
 	if_freenameindex(ni);
+
+	zbx_json_close(&j);
+
+	SET_STR_RESULT(result, strdup(j.buffer));
+
+	zbx_json_free(&j);
+
+	return SYSINFO_RET_OK;
+}
+
+static void	get_carrier(const char* interface, struct zbx_json *j)
+{
+	kstat_ctl_t	*kc = NULL;
+	kstat_t		*ksp = NULL;
+	kstat_named_t	*knp = NULL;
+	int		i;
+
+	if (NULL == (kc = kstat_open()))
+		return;
+
+	for (ksp = kc->kc_chain; NULL != ksp; ksp = ksp->ks_next)
+	{
+		if (0 == strcmp(ksp->ks_class, "net") && 0 == strcmp(ksp->ks_name, interface))
+		{
+			if (-1 == kstat_read(kc, ksp, NULL))
+				break;
+
+			if (KSTAT_TYPE_NAMED == ksp->ks_type)
+			{
+				knp = KSTAT_NAMED_PTR(ksp);
+				for (i = 0; i < ksp->ks_ndata; i++, knp++)
+				{
+					if (0 == strcmp(knp->name, "link_state"))
+					{
+						int kstat = 0;
+
+						if (KSTAT_DATA_UINT32 == knp->data_type && 1 == knp->value.ui32)
+							kstat = 1;
+						else if (KSTAT_DATA_INT32 == knp->data_type && 1 == knp->value.i32)
+							kstat = 1;
+
+						zbx_json_addstring(j, "carrier", kstat ? "1": "0",
+								ZBX_JSON_TYPE_STRING);
+						break;
+					}
+				}
+			}
+			break;
+		}
+	}
+
+	kstat_close(kc);
+}
+
+static void	get_if_flags(const char* interface, struct zbx_json *j)
+{
+	int		sock;
+	struct ifreq	ifr;
+
+	sock = socket(AF_INET, SOCK_DGRAM, 0);
+	if (0 > sock)
+		return;
+
+	memset(&ifr, 0, sizeof(ifr));
+	zbx_strlcpy(ifr.ifr_name, interface, IFNAMSIZ);
+
+	if (0 > ioctl(sock, SIOCGIFFLAGS, &ifr))
+	{
+		close(sock);
+		return;
+	}
+
+	zbx_json_addstring(j, "administrative_state",
+			(0 != (ifr.ifr_flags & IFF_UP)) ? "up" : "down", ZBX_JSON_TYPE_STRING);
+	zbx_json_addstring(j, "operational_state",
+			(0 != (ifr.ifr_flags & IFF_RUNNING)) ? "up" : "down", ZBX_JSON_TYPE_STRING);
+
+	close(sock);
+}
+
+static void	get_mac(const char* interface, struct zbx_json *j)
+{
+	int		sock;
+	struct ifreq	ifr;
+	char		*mac_addr_str;
+
+	sock = socket(AF_INET, SOCK_DGRAM, 0);
+	if (0 > sock)
+		return;
+
+	memset(&ifr, 0, sizeof(ifr));
+	zbx_strlcpy(ifr.ifr_name, interface, IFNAMSIZ);
+
+	if (0 == ioctl(sock, SIOCGIFHWADDR, &ifr))
+	{
+		unsigned char	*hwaddr = (unsigned char *)ifr.ifr_addr.sa_data;
+
+		mac_addr_str = zbx_dsprintf(NULL, "%02x:%02x:%02x:%02x:%02x:%02x",
+				hwaddr[0], hwaddr[1], hwaddr[2], hwaddr[3], hwaddr[4], hwaddr[5]);
+
+		zbx_json_addstring(j, "mac", mac_addr_str, ZBX_JSON_TYPE_STRING);
+		zbx_free(mac_addr_str);
+	}
+}
+
+int	net_if_get(AGENT_REQUEST *request, AGENT_RESULT *result)
+{
+	struct zbx_json	j;
+	zbx_regexp_t	*rxp = NULL;
+	char		*error = NULL, *p, *pattern;
+	struct if_nameindex	*ni;
+	int		i;
+
+	if (1 < request->nparam)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters."));
+		return SYSINFO_RET_FAIL;
+	}
+
+	zbx_json_initarray(&j, ZBX_JSON_STAT_BUF_LEN);
+
+	if (1 == request->nparam)
+	{
+		pattern = get_rparam(request, 0);
+
+		if (FAIL == zbx_regexp_compile(pattern, &rxp, &error))
+		{
+			zbx_free(error);
+			zbx_json_free(&j);
+			return SYSINFO_RET_FAIL;
+		}
+	}
+
+	if (NULL == (ni = if_nameindex()))
+	{
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain system information: %s", zbx_strerror(errno)));
+		if (NULL != rxp)
+			zbx_regexp_free(rxp);
+		zbx_json_free(&j);
+		return SYSINFO_RET_FAIL;
+	}
+
+	for (i = 0; 0 != ni[i].if_index; i++)
+	{
+		p = ni[i].if_name;
+
+		if (NULL != rxp && 0 != zbx_regexp_match_precompiled(p, rxp))
+			continue;
+
+		zbx_json_addobject(&j, NULL);
+		zbx_json_addstring(&j, "name", p, ZBX_JSON_TYPE_STRING);
+		get_if_flags(p, &j);
+		get_mac(p, &j);
+		get_carrier(p, &j);
+		zbx_json_close(&j);
+	}
+
+	if_freenameindex(ni);
+
+	if (NULL != rxp)
+		zbx_regexp_free(rxp);
 
 	zbx_json_close(&j);
 

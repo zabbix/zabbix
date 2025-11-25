@@ -19,6 +19,8 @@
 #include "zbxnum.h"
 #include "zbxlog.h"
 #include "zbxjson.h"
+#include "zbxregexp.h"
+#include "zbxtime.h"
 
 /* __stdcall calling convention is used for GetIfEntry2(). In order to declare a */
 /* pointer to GetIfEntry2() we have to expand NETIOPAPI_API macro manually since */
@@ -841,6 +843,205 @@ int	net_tcp_listen(AGENT_REQUEST *request, AGENT_RESULT *result)
 		SET_UI64_RESULT(result, 0);
 clean:
 	zbx_free(pTcpTable);
+
+	return ret;
+}
+
+static void	get_wmi_check_timeout(const char *wmi_namespace, const char *query, char **var,
+		double time_first_query_started, double *time_previous_query_finished)
+{
+	double	time_left = sysinfo_get_config_timeout() - (*time_previous_query_finished -
+			time_first_query_started);
+
+	if (0 >= time_left)
+		return;
+
+	zbx_wmi_get(wmi_namespace, query, time_left, var);
+	*time_previous_query_finished = zbx_time();
+}
+
+int	net_if_get(AGENT_REQUEST *request, AGENT_RESULT *result)
+{
+	DWORD		dwSize, dwRetVal;
+	int		ret = SYSINFO_RET_FAIL;
+	zbx_regexp_t	*rxp = NULL;
+	MIB_IFTABLE	*pIfTable = NULL;
+	zbx_ifrow_t	ifrow = {NULL, NULL};
+	struct zbx_json	j;
+	char		*pattern = NULL, *error = NULL, *name, *os = NULL, *text, *alias;
+	size_t		os_alloc = 0, os_offset = 0;
+	char		*wmi_namespace = "root\\StandardCimv2";
+	double		start_time = zbx_time();
+	double		time_previous_query_finished = start_time;
+
+	if (1 < request->nparam)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters."));
+		return ret;
+	}
+
+	if (1 == request->nparam)
+	{
+		pattern = get_rparam(request, 0);
+		if (NULL == pattern || '\0' == *pattern)
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid first parameter."));
+			return ret;
+		}
+
+		if (FAIL == zbx_regexp_compile(pattern, &rxp, &error))
+		{
+			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "invalid regular expression: %s", error));
+			zbx_free(error);
+			return ret;
+		}
+	}
+
+	dwSize = sizeof(MIB_IFTABLE);
+	pIfTable = (MIB_IFTABLE *)zbx_malloc(pIfTable, dwSize);
+
+	if (ERROR_INSUFFICIENT_BUFFER == GetIfTable(pIfTable, &dwSize, 0))
+		pIfTable = (MIB_IFTABLE *)zbx_realloc(pIfTable, dwSize);
+
+	if (NO_ERROR != (dwRetVal = GetIfTable(pIfTable, &dwSize, 0)))
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "GetIfTable failed with error: %s", zbx_strerror_from_system(dwRetVal));
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain system information: %s",
+				zbx_strerror_from_system(dwRetVal)));
+		goto clean;
+	}
+
+	zbx_json_initarray(&j, ZBX_JSON_STAT_BUF_LEN);
+	zbx_ifrow_init(&ifrow);
+
+	for (unsigned int i = 0; i < pIfTable->dwNumEntries; i++)
+	{
+		zbx_ifrow_set_index(&ifrow, pIfTable->table[i].dwIndex);
+
+		if (NO_ERROR != (dwRetVal = zbx_ifrow_call_get_if_entry(&ifrow)))
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "zbx_ifrow_call_get_if_entry failed with error: %s",
+					zbx_strerror_from_system(dwRetVal));
+			continue;
+		}
+
+		name = zbx_ifrow_get_utf8_description(&ifrow);
+		if (NULL != rxp && 0 != zbx_regexp_match_precompiled(name, rxp))
+		{
+			zbx_free(name);
+			continue;
+		}
+
+		/* TODO: need to implement also for old ifRow ? */
+		if (NULL == ifrow.ifRow2)
+		{
+			zbx_free(name);
+			continue;
+		}
+
+		zbx_json_addobject(&j, NULL);
+		zbx_json_addstring(&j, "name", name, ZBX_JSON_TYPE_STRING);
+		zbx_free(name);
+
+		zbx_json_addstring(&j, "operational_state",
+			(ifrow.ifRow2->OperStatus == IfOperStatusUp)? "up" : "down", ZBX_JSON_TYPE_STRING);
+		zbx_json_addstring(&j, "administrative_state",
+			(ifrow.ifRow2->AdminStatus == NET_IF_ADMIN_STATUS_UP)? "up" : "down", ZBX_JSON_TYPE_STRING);
+
+		if (0 != ifrow.ifRow2->PhysicalAddressLength)
+		{
+			size_t		buf_alloc = 64, buf_offset = 0;
+			char		*buf = (char *)zbx_malloc(NULL, sizeof(char) * buf_alloc);
+
+			for (unsigned int k = 0; k < ifrow.ifRow2->PhysicalAddressLength; k++)
+				zbx_snprintf_alloc(&buf, &buf_alloc, &buf_offset,
+							"%02X%s", ifrow.ifRow2->PhysicalAddress[k],
+							(k == ifrow.ifRow2->PhysicalAddressLength - 1) ? "" : ":");
+
+			zbx_json_addstring(&j, "mac", buf, ZBX_JSON_TYPE_STRING);
+			zbx_free(buf);
+		}
+
+		alias = zbx_unicode_to_utf8(ifrow.ifRow2->Alias);
+		zbx_json_addstring(&j, "alias", alias, ZBX_JSON_TYPE_STRING);
+		zbx_json_addint64(&j, "sent", zbx_ifrow_get_out_octets(&ifrow));
+		zbx_json_addint64(&j, "received", ifrow.ifRow2->InOctets);
+		zbx_json_addint64(&j, "type", ifrow.ifRow2->Type);
+		zbx_json_addint64(&j, "carrier", ifrow.ifRow2->InterfaceAndOperStatusFlags.ConnectorPresent);
+
+		/* TODO: optimize, using one call to wmi */
+		result = NULL;
+		zbx_snprintf_alloc(&os, &os_alloc, &os_offset,
+			"select DisplayValue FROM MSFT_NetAdapterAdvancedPropertySettingData WHERE "
+			"DisplayName = 'Speed & Duplex' AND Name = '%s'", alias);
+		get_wmi_check_timeout(wmi_namespace, os, &result, start_time, &time_previous_query_finished);
+
+		if (NULL != result)
+		{
+			if (0 == strcmp(result, "Auto Negotiation"))
+			{
+				zbx_json_addstring(&j, "negotiation", "on", ZBX_JSON_TYPE_STRING);
+			}
+			else
+			{
+				zbx_json_addstring(&j, "negotiation", "off", ZBX_JSON_TYPE_STRING);
+			}
+		}
+
+		zbx_free(result);
+		result = NULL;
+		zbx_free(os);
+		os_alloc = 0;
+		os_offset = 0;
+
+		zbx_snprintf_alloc(&os, &os_alloc, &os_offset,
+				"select FullDuplex FROM MSFT_NetAdapter where Name ='%s'", alias);
+		get_wmi_check_timeout(wmi_namespace, os, &result, start_time, &time_previous_query_finished);
+
+		if (NULL != result)
+		{
+			char	*duplex = "half";
+
+			if (0 == strcmp(result, "True"))
+				duplex = "full";
+
+			zbx_json_addstring(&j, "duplex", duplex, ZBX_JSON_TYPE_STRING);
+		}
+
+		zbx_free(result);
+		zbx_free(os);
+		os_alloc = 0;
+		os_offset = 0;
+		result = NULL;
+		zbx_snprintf_alloc(&os, &os_alloc, &os_offset, "select Speed FROM MSFT_NetAdapter where Name = '%s'",
+				alias);
+		get_wmi_check_timeout(wmi_namespace, os , &result, start_time, &time_previous_query_finished);
+
+		if (NULL != result)
+		{
+			zbx_uint64_t	value_ui64;
+
+			if (SUCCEED == zbx_is_uint64(result, &value_ui64))
+				zbx_json_adduint64(&j, "speed", value_ui64);
+		}
+
+		zbx_free(os);
+		zbx_free(result);
+		zbx_free(alias);
+		zbx_json_close(&j);
+	}
+
+	zbx_ifrow_clean(&ifrow);
+
+	zbx_json_close(&j);
+
+	SET_STR_RESULT(result, strdup(j.buffer));
+
+	zbx_json_free(&j);
+
+	ret = SYSINFO_RET_OK;
+clean:
+	zbx_free(pIfTable);
 
 	return ret;
 }

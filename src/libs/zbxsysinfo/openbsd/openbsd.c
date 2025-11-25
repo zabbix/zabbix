@@ -48,6 +48,7 @@ static zbx_metric_t	parameters_specific[] =
 	{"system.cpu.load",	CF_HAVEPARAMS,	system_cpu_load,	"all,avg1"},
 	{"system.cpu.num",	CF_HAVEPARAMS,	system_cpu_num,		"online"},
 	{"system.cpu.discovery",0,		system_cpu_discovery,	NULL},
+	{"net.if.get",		CF_HAVEPARAMS,	net_if_get,		NULL},
 
 	{"system.uname",	0,		system_uname,		NULL},
 

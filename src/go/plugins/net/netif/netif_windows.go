@@ -19,10 +19,12 @@ import (
 	"errors"
 	"fmt"
 	"net"
+	"regexp"
 	"unsafe"
 
 	"golang.org/x/sys/windows"
 	"golang.zabbix.com/agent2/pkg/win32"
+	"golang.zabbix.com/agent2/pkg/wmi"
 	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/plugin"
 )
@@ -41,6 +43,7 @@ func init() {
 		"net.if.out", "Returns outgoing traffic statistics on network interface.",
 		"net.if.total", "Returns sum of incoming and outgoing traffic statistics on network interface.",
 		"net.if.discovery", "Returns list of network interfaces. Used for low-level discovery.",
+		"net.if.get", "Returns list of network interfaces.",
 	)
 	if err != nil {
 		panic(errs.Wrap(err, "failed to register metrics"))
@@ -184,6 +187,124 @@ func (p *Plugin) getDevDiscovery() (devices []msgIfDiscovery, err error) {
 	return
 }
 
+func (p *Plugin) getMacAddress(physAddr [32]byte, physAddrLen uint32) string {
+	if physAddrLen == 0 {
+		return ""
+	}
+	mac := make([]byte, physAddrLen)
+	for i := uint32(0); i < physAddrLen; i++ {
+		mac[i] = physAddr[i]
+	}
+	return net.HardwareAddr(mac).String()
+}
+
+func (p *Plugin) getDevGet(regexExpr string) (devices []msgIfGet, err error) {
+	var table *win32.MIB_IF_TABLE2
+	var compiledRegex *regexp.Regexp
+
+	if table, err = win32.GetIfTable2(); err != nil {
+		return
+	}
+	defer win32.FreeMibTable(table)
+
+	if regexExpr != "" {
+		compiledRegex, err = regexp.Compile(regexExpr)
+		if err != nil {
+			err = fmt.Errorf("invalid regex expression '%s': %w", regexExpr, err)
+			return
+		}
+	}
+	devices = make([]msgIfGet, 0, table.NumEntries)
+	rows := (*win32.RGMIB_IF_ROW2)(unsafe.Pointer(&table.Table[0]))[:table.NumEntries:table.NumEntries]
+
+	for i := range rows {
+		if compiledRegex != nil {
+			if !compiledRegex.MatchString(windows.UTF16ToString(rows[i].Description[:])) {
+				continue
+			}
+		}
+
+		mac := p.getMacAddress(rows[i].PhysicalAddress, rows[i].PhysicalAddressLength)
+
+		operState := "down"
+		if rows[i].OperStatus == windows.IfOperStatusUp {
+			operState = "up"
+		}
+
+		admstate := "down"
+		if rows[i].AdminStatus == 1 {
+			admstate = "up"
+		}
+
+		wmiQuery := fmt.Sprintf("select DisplayValue FROM MSFT_NetAdapterAdvancedPropertySettingData WHERE DisplayName = 'Speed & Duplex' AND Name = '%s'", windows.UTF16ToString(rows[i].Alias[:]))
+		negotiationStatus := ""
+		value, wmiErr := wmi.QueryValue("root\\StandardCimv2", wmiQuery)
+
+		if wmiErr == nil {
+			if s, ok := value.(string); ok {
+				if s == "Auto Negotiation" {
+					negotiationStatus = "on"
+				} else {
+					negotiationStatus = "off"
+				}
+
+			}
+		}
+
+		wmiQuery = fmt.Sprintf("select FullDuplex FROM MSFT_NetAdapter where Name ='%s'", windows.UTF16ToString(rows[i].Alias[:]))
+		duplexStatus := ""
+		value, wmiErr = wmi.QueryValue("root\\StandardCimv2", wmiQuery)
+
+		if wmiErr == nil {
+			if b, ok := value.(bool); ok {
+				if b {
+					duplexStatus = "full"
+				} else {
+					duplexStatus = "half"
+				}
+			} else if i, ok := value.(int32); ok {
+				if i != 0 {
+					duplexStatus = "full"
+				} else {
+					duplexStatus = "half"
+				}
+			}
+		}
+
+		wmiQuery = fmt.Sprintf("select Speed FROM MSFT_NetAdapter where Name = '%s'", windows.UTF16ToString(rows[i].Alias[:]))
+
+		var speedPtr *uint64
+		value, wmiErr = wmi.QueryValue("root\\StandardCimv2", wmiQuery)
+
+		if wmiErr == nil {
+			if s, ok := value.(uint64); ok {
+				speedPtr = &s
+			}
+		}
+
+		ifTypeVal := uint64(rows[i].Type)
+		ifType := &ifTypeVal
+
+		carrierVal := uint64(rows[i].InterfaceAndOperStatusFlags & 1)
+
+		devices = append(devices, msgIfGet{
+			Ifname:        windows.UTF16ToString(rows[i].Description[:]),
+			Ifmac:         mac,
+			Iftype:        ifType,
+			Ifinoctets:    &rows[i].InOctets,
+			Ifoutoctets:   &rows[i].OutOctets,
+			Ifoperstatus:  &operState,
+			Ifadmstate:    &admstate,
+			Ifcarrier:     &carrierVal,
+			Ifalias:       windows.UTF16ToString(rows[i].Alias[:]),
+			Ifnegotiation: negotiationStatus,
+			Ifduplex:      duplexStatus,
+			Ifspeed:       speedPtr,
+		})
+	}
+	return
+}
+
 func (p *Plugin) getIfType(iftype uint32) string {
 	switch iftype {
 	case windows.IF_TYPE_OTHER:
@@ -264,6 +385,23 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 		}
 		var devices []msgIfDiscovery
 		if devices, err = p.getDevDiscovery(); err != nil {
+			return
+		}
+		var b []byte
+		if b, err = json.Marshal(devices); err != nil {
+			return
+		}
+		return string(b), nil
+	case "net.if.get":
+		if len(params) > 1 {
+			return nil, errors.New(errorTooManyParams)
+		}
+		expression := ""
+		if len(params) > 0 {
+			expression = params[0]
+		}
+		var devices []msgIfGet
+		if devices, err = p.getDevGet(expression); err != nil {
 			return
 		}
 		var b []byte

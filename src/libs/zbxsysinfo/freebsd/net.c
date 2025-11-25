@@ -18,6 +18,17 @@
 
 #include "zbxjson.h"
 #include "zbxnum.h"
+#include "zbxregexp.h"
+#include "zbxcomms.h"
+
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <sys/ioctl.h>
+#include <sys/sysctl.h>
+#include <net/if.h>
+#include <net/if_dl.h>
+#include <net/if_media.h>
+#include <ifaddrs.h>
 
 static struct ifmibdata	ifmd;
 
@@ -286,6 +297,192 @@ int	net_if_discovery(AGENT_REQUEST *request, AGENT_RESULT *result)
 	zbx_json_free(&j);
 
 	if_freenameindex(interfaces);
+
+	return SYSINFO_RET_OK;
+}
+
+static void	zbx_get_link_settings(const char* interface, struct zbx_json *j)
+{
+	int			sock;
+	struct ifmediareq	ifmr;
+	const char		*autoneg = "unknown";
+
+	if (0 > (sock = socket(AF_INET, SOCK_DGRAM, 0)))
+		return;
+
+	memset(&ifmr, 0, sizeof(ifmr));
+	zbx_strlcpy(ifmr.ifm_name, interface, sizeof(ifmr.ifm_name));
+
+	if (0 > ioctl(sock, SIOCGIFMEDIA, &ifmr))
+	{
+		close(sock);
+		return;
+	}
+
+	if (IFM_SUBTYPE(ifmr.ifm_current) == IFM_AUTO)
+		autoneg = "on";
+	else if (IFM_SUBTYPE(ifmr.ifm_current) == IFM_NONE)
+		autoneg = "unknown";
+	else
+		autoneg = "off";
+
+	zbx_json_addstring(j, "negotiation", autoneg, ZBX_JSON_TYPE_STRING);
+
+	if (0 != (ifmr.ifm_current & IFM_FDX))
+		zbx_json_addstring(j, "duplex", "full", ZBX_JSON_TYPE_STRING);
+	else if (0 != (ifmr.ifm_current & IFM_HDX))
+		zbx_json_addstring(j, "duplex", "half", ZBX_JSON_TYPE_STRING);
+	else
+		zbx_json_addstring(j, "duplex", "unknown", ZBX_JSON_TYPE_STRING);
+
+	if (0 != (ifmr.ifm_status & IFM_AVALID))
+		zbx_json_addint64(j, "carrier", (0 != (ifmr.ifm_status & IFM_ACTIVE)) ? 1 : 0);
+
+	close(sock);
+}
+
+static void	get_link_flags(const char* interface, struct zbx_json *j)
+{
+	int		sock;
+	struct ifreq	ifr;
+
+	if (0 > (sock = socket(AF_INET, SOCK_DGRAM, 0)))
+		return;
+
+	memset(&ifr, 0, sizeof(ifr));
+	zbx_strlcpy(ifr.ifr_name, interface, sizeof(ifr.ifr_name));
+
+	if (0 > ioctl(sock, SIOCGIFFLAGS, &ifr))
+	{
+		close(sock);
+		return;
+	}
+
+	zbx_json_addstring(j, "administrative_state",
+					(0 != (ifr.ifr_flags & IFF_UP)) ? "up" : "down", ZBX_JSON_TYPE_STRING);
+
+	zbx_json_addstring(j, "operational_state",
+					(0 != (ifr.ifr_flags & IFF_RUNNING)) ? "up" : "down", ZBX_JSON_TYPE_STRING);
+
+	close(sock);
+}
+
+static void	if_description(const char* interface, struct zbx_json *j)
+{
+	int	sock;
+	struct	ifreq ifr;
+	char	desc[100];
+
+	sock = socket(AF_INET, SOCK_DGRAM, 0);
+	if (0 > sock)
+		return;
+
+	memset(&ifr, 0, sizeof(ifr));
+	memset(desc, 0, sizeof(desc));
+	zbx_strlcpy(ifr.ifr_name, interface, sizeof(ifr.ifr_name));
+
+#ifdef SIOCGIFDESCR
+	ifr.ifr_buffer.length = sizeof(desc);
+	ifr.ifr_buffer.buffer = desc;
+
+	if (0 == ioctl(sock, SIOCGIFDESCR, &ifr))
+	{
+		zbx_json_addstring(j, "ifalias", desc, ZBX_JSON_TYPE_STRING);
+	}
+#endif
+	close(sock);
+}
+
+int	net_if_get(AGENT_REQUEST *request, AGENT_RESULT *result)
+{
+	struct if_nameindex	*interfaces;
+	struct zbx_json		j;
+	zbx_regexp_t		*rxp = NULL;
+	struct ifaddrs		*ifap, *ifa;
+	char			*value = NULL, *pattern = NULL, *error = NULL;
+
+	if (1 < request->nparam)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters."));
+		return SYSINFO_RET_FAIL;
+	}
+
+	if (NULL == (interfaces = if_nameindex()) || 0 != getifaddrs(&ifap))
+	{
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain system information: %s", zbx_strerror(errno)));
+		return SYSINFO_RET_FAIL;
+	}
+
+	zbx_json_initarray(&j, ZBX_JSON_STAT_BUF_LEN);
+
+	if (1 == request->nparam)
+	{
+		pattern = get_rparam(request, 0);
+
+		if (FAIL == zbx_regexp_compile(pattern, &rxp, &error))
+		{
+			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "invalid regular expression: %s", error));
+			zbx_free(error);
+			if_freenameindex(interfaces);
+			freeifaddrs(ifap);
+			return SYSINFO_RET_FAIL;
+		}
+	}
+
+	for (int i = 0; 0 != interfaces[i].if_index; i++)
+	{
+		const char *if_name = interfaces[i].if_name;
+
+		if (NULL != rxp && 0 != zbx_regexp_match_precompiled(if_name, rxp))
+			continue;
+
+		if (SYSINFO_RET_FAIL == get_ifmib_general(if_name, &error))
+		{
+			zbx_free(error);
+			continue;
+		}
+
+		zbx_json_addobject(&j, NULL);
+		zbx_json_addstring(&j, "name", if_name, ZBX_JSON_TYPE_STRING);
+		get_link_flags(if_name, &j);
+		zbx_json_addint64(&j, "sent", ifmd.ifmd_data.ifi_obytes);
+		zbx_json_addint64(&j, "received", ifmd.ifmd_data.ifi_ibytes);
+		zbx_json_addint64(&j, "speed", ifmd.ifmd_data.ifi_baudrate / 1000000);
+
+		for (ifa = ifap; ifa != NULL; ifa = ifa->ifa_next)
+		{
+			if (strcmp(ifa->ifa_name, if_name) == 0 &&
+				NULL != ifa->ifa_addr && ifa->ifa_addr->sa_family == AF_LINK)
+			{
+				struct sockaddr_dl	*sdl = (struct sockaddr_dl *)ifa->ifa_addr;
+				unsigned char		*mac = (unsigned char *)LLADDR(sdl);
+
+				zbx_json_addint64(&j, "type", sdl->sdl_type);
+
+				value = zbx_dsprintf(NULL, "%02x:%02x:%02x:%02x:%02x:%02x",
+						mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
+
+				zbx_json_addstring(&j, "mac", value, ZBX_JSON_TYPE_STRING);
+
+				zbx_free(value);
+				break;
+			}
+		}
+
+		if_description(if_name, &j);
+		zbx_get_link_settings(if_name, &j);
+		zbx_json_close(&j);
+	}
+
+	if (NULL != rxp)
+		zbx_regexp_free(rxp);
+
+	if_freenameindex(interfaces);
+	freeifaddrs(ifap);
+	zbx_json_close(&j);
+
+	SET_STR_RESULT(result, strdup(j.buffer));
+	zbx_json_free(&j);
 
 	return SYSINFO_RET_OK;
 }
