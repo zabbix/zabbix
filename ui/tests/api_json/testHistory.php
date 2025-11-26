@@ -155,7 +155,7 @@ class testHistory extends CAPITest {
 			[
 				'api_request' => [
 					'history' => 5,
-					'maxValueSize' => 2,
+					'maxValueSize' => 1,
 					'itemids' => ['158741']
 				],
 				'expected_result' => [
@@ -163,7 +163,7 @@ class testHistory extends CAPITest {
 						'itemid' => '158741',
 						'clock' => '1549351002',
 						'ns' => '164888032',
-						'value' => 'YQ=='
+						'value' => base64_encode('a')
 					]
 				],
 				'expected_error' => false

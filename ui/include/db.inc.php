@@ -751,3 +751,42 @@ function zbx_dbcast_2bigint($field) {
 			return false;
 	}
 }
+
+/**
+ * Creates DB dependent string with SQL expression that casts passed value to text.
+ *
+ * @param $field
+ *
+ * @return bool|string
+ */
+function zbx_dbcast_2text($field) {
+	global $DB;
+
+	if (!isset($DB['TYPE'])) {
+		return false;
+	}
+
+	switch ($DB['TYPE']) {
+		case ZBX_DB_POSTGRESQL:
+			return 'CAST('.$field.' AS TEXT)';
+
+		case ZBX_DB_MYSQL:
+			return 'CAST('.$field.' AS CHAR)';
+
+		default:
+			return false;
+	}
+}
+
+/**
+ * Creates string with SQL expression that derive substring from given value.
+ *
+ * @param $field
+ * @param $offset
+ * @param $count
+ *
+ * @return string
+ */
+function zbx_dbsubstring($field, $offset, $count) {
+	return 'SUBSTRING('.zbx_dbcast_2text($field).','.dbQuoteInt($offset).','.dbQuoteInt($count).') AS '.$field;
+}

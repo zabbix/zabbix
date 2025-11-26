@@ -158,21 +158,12 @@ class CHistory extends CApiService {
 				break;
 		}
 
-		if (!$options['countOutput'] && $this->outputIsRequested('value', $options['output'])) {
-			if ($options['history'] == ITEM_VALUE_TYPE_BINARY && $options['maxValueSize'] != null) {
-				foreach ($result as &$row) {
-					$row['value'] = mb_strcut($row['value'], 0, $options['maxValueSize']);
-					$row['value'] = base64_encode($row['value']);
-				}
-				unset($row);
+		if (!$options['countOutput'] && $options['history'] == ITEM_VALUE_TYPE_BINARY
+				&& $this->outputIsRequested('value', $options['output'])) {
+			foreach ($result as &$row) {
+				$row['value'] = base64_encode($row['value']);
 			}
-
-			if ($options['history'] == ITEM_VALUE_TYPE_JSON && $options['maxValueSize'] != null) {
-				foreach ($result as &$row) {
-					$row['value'] = mb_substr($row['value'], 0, $options['maxValueSize']);
-				}
-				unset($row);
-			}
+			unset($row);
 		}
 
 		return $result;
@@ -233,6 +224,21 @@ class CHistory extends CApiService {
 		}
 
 		return $result;
+	}
+
+	protected function applyQueryOutputOptions(string $table_name, string $table_alias, array $options, array $sql_parts) {
+		$sql_parts = parent::applyQueryOutputOptions($table_name, $table_alias, $options, $sql_parts);
+
+		if (($options['history'] == ITEM_VALUE_TYPE_JSON || $options['history'] == ITEM_VALUE_TYPE_BINARY)
+				&& $options['maxValueSize'] !== null && !$options['countOutput']
+				&& $this->outputIsRequested('value', $options['output'])) {
+
+			$value_index = $options['output'] === API_OUTPUT_EXTEND ? count($sql_parts['select'])
+				: array_search('h.value', $sql_parts['select']);
+
+			$sql_parts['select'][$value_index] = zbx_dbsubstring('value', 1, $options['maxValueSize']);
+		}
+		return $sql_parts;
 	}
 
 	/**
