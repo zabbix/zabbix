@@ -705,7 +705,8 @@ class CMediatype extends CApiService {
 			);
 
 			if ($upd_url) {
-				if (array_key_exists('token_url', $upd_url) && !array_key_exists('client_secret', $mediatype)) {
+				if (array_key_exists('token_url', $upd_url)
+						&& $upd_url['token_url'] !== null && !array_key_exists('client_secret', $mediatype)) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.', $path,
 						_s('the parameter "%1$s" is missing', 'client_secret')
 					));
