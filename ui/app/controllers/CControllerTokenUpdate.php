@@ -32,7 +32,7 @@ class CControllerTokenUpdate extends CController {
 			'name' => ['db token.name', 'required', 'not_empty'],
 			'description' => ['db token.description'],
 			'admin_mode' => ['boolean'],
-			'expires_state' => ['integer', 'in' => [0, 1]],
+			'expires_state' => ['boolean'],
 			'regenerate' => ['integer', 'in' => [1]],
 			'expires_at' => ['string', 'required', 'not_empty',
 				'use' => [CAbsoluteTimeParser::class, [], ['min' => 0, 'max' => ZBX_MAX_DATE]],

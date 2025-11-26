@@ -29,4 +29,4 @@ window.token_view_popup = new class {
 			e.target.focus();
 		});
 	}
-}
+};
