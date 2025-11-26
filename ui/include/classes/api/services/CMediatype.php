@@ -698,15 +698,16 @@ class CMediatype extends CApiService {
 
 		if ($is_update
 				&& (array_key_exists('token_url', $mediatype) || array_key_exists('authorization_url', $mediatype))) {
-			$upd_url = DB::getUpdatedValues(
+			$updated_items = DB::getUpdatedValues(
 				'media_type_oauth',
 				['token_url' => $mediatype['token_url'], 'authorization_url' => $mediatype['authorization_url']],
 				['token_url' => $db_mediatype['token_url'], 'authorization_url' => $db_mediatype['authorization_url']]
 			);
 
-			if ($upd_url) {
-				if (array_key_exists('token_url', $upd_url)
-						&& $upd_url['token_url'] !== null && !array_key_exists('client_secret', $mediatype)) {
+			$updated_items = array_filter($updated_items);
+
+			if ($updated_items) {
+				if (array_key_exists('token_url', $updated_items) && !array_key_exists('client_secret', $mediatype)) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.', $path,
 						_s('the parameter "%1$s" is missing', 'client_secret')
 					));
