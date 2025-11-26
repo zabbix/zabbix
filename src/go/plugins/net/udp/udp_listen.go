@@ -27,12 +27,9 @@ import (
 const (
 	udpListenIPv4Pattern = "%04X 00000000:0000 07"
 	udpListenIPv6Pattern = "%04X 00000000000000000000000000000000:0000 07"
-
-	udpListenIPv4FileLocation = "/proc/net/udp"
-	udpListenIPv6FileLocation = "/proc/net/udp6"
 )
 
-func (*Plugin) exportNetUDPListen(params []string) (string, error) {
+func (p *Plugin) exportNetUDPListen(params []string) (string, error) {
 	if len(params) == 0 {
 		return "", zbxerr.ErrorTooFewParameters
 	}
@@ -56,9 +53,9 @@ func (*Plugin) exportNetUDPListen(params []string) (string, error) {
 		SetPattern(ipv4SearchString).
 		SetMaxMatches(1)
 
-	data, err := parser.Parse(udpListenIPv4FileLocation)
+	data, err := parser.Parse(p.udp4Path)
 	if err != nil {
-		return "", errs.Wrapf(err, "failed to parse %s", udpListenIPv4FileLocation)
+		return "", errs.Wrapf(err, "failed to parse %s", p.udp4Path)
 	}
 
 	if len(data) == 1 {
@@ -70,9 +67,9 @@ func (*Plugin) exportNetUDPListen(params []string) (string, error) {
 
 	parser.SetPattern(ipv6SearchString)
 
-	data, err = parser.Parse(udpListenIPv6FileLocation)
+	data, err = parser.Parse(p.udp6Path)
 	if err != nil {
-		return "", errs.Wrapf(err, "failed to parse %s", udpListenIPv6FileLocation)
+		return "", errs.Wrapf(err, "failed to parse %s", p.udp6Path)
 	}
 
 	if len(data) == 1 {

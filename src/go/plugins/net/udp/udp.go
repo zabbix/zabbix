@@ -48,14 +48,18 @@ const (
 	ntpScale            = 4294967296.0
 )
 
-var impl Plugin
-
-// Plugin -
+// Plugin udp plugin implementation.
 type Plugin struct {
 	plugin.Base
+
+	udp4Path string
+	udp6Path string
 }
 
+//nolint:gochecknoinits // this is used solely for plugin registration.
 func init() {
+	impl := Plugin{}
+
 	err := plugin.RegisterMetrics(
 		&impl, "UDP",
 		"net.udp.service", "Checks if service is running and responding to UDP requests.",
@@ -67,6 +71,13 @@ func init() {
 		panic(errs.Wrap(err, "failed to register metrics"))
 	}
 
+	const (
+		udpListenIPv4FileLocation = "/proc/net/udp"
+		udpListenIPv6FileLocation = "/proc/net/udp6"
+	)
+
+	impl.udp4Path = udpListenIPv4FileLocation
+	impl.udp6Path = udpListenIPv6FileLocation
 	impl.SetHandleTimeout(true)
 }
 
