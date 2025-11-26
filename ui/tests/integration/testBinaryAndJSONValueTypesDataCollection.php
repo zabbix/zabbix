@@ -331,6 +331,19 @@ class testBinaryAndJSONValueTypesDataCollection extends CIntegrationTest {
 						]]
 				],
 				[
+						'name' => 'STR_VALUE_TYPE_DEP_WITH_PREPROC',
+						'key_' => 'STR_VALUE_TYPE_DEP_WITH_PREPROC',
+						'type' => ITEM_TYPE_DEPENDENT,
+						'master_itemid' => self::$itemids['agent:vfs.file.contents['.self::$file_name_json_with_image_for_json_item.',]'],
+						'value_type' => ITEM_VALUE_TYPE_STR,
+						'delay' => '0s',
+						'preprocessing' =>
+						[[
+							'type' => ZBX_PREPROC_JSONPATH,
+							'params' => '$.http_response',
+						]]
+				],
+				[
 						'name' => 'JSON_VALUE_TYPE_DEP_INVALID',
 						'key_' => 'JSON_VALUE_TYPE_DEP_INVALID',
 						'type' => ITEM_TYPE_DEPENDENT,
@@ -375,7 +388,20 @@ class testBinaryAndJSONValueTypesDataCollection extends CIntegrationTest {
 							'error_handler' => 0,
 							'error_handler_params' => ''
 						]]
-				]
+				],
+				[
+					'name' => 'STR_VALUE_TYPE_DEP_WITH_PREPROC',
+					'key_' => 'STR_VALUE_TYPE_DEP_WITH_PREPROC',
+					'type' => ITEM_TYPE_DEPENDENT,
+					'master_itemid' => self::$itemids['agent:vfs.file.contents['.self::$file_name_json_with_image_for_json_item.',]'],
+					'value_type' => ITEM_VALUE_TYPE_STR,
+					'delay' => '0s',
+					'preprocessing' =>
+						[[
+							'type' => ZBX_PREPROC_JSONPATH,
+							'params' => '$.http_response',
+						]]
+				],
 				]
 			]
 		, $result['hostids']);
@@ -548,6 +574,7 @@ class testBinaryAndJSONValueTypesDataCollection extends CIntegrationTest {
 			'history'	=>	ITEM_VALUE_TYPE_BINARY
 		]);
 
+		$this->assertEquals(1, count($active_data['result']));
 		$base64_image = self::base64_image;
 		$this->assertEquals($base64_image, $active_data['result'][0]['value']);
 
@@ -566,7 +593,15 @@ class testBinaryAndJSONValueTypesDataCollection extends CIntegrationTest {
 			'history'	=>	ITEM_VALUE_TYPE_JSON
 		]);
 
+		$this->assertEquals(1, count($active_data['result']));
 		$json_data_http_response = self::json_data_http_response;
+		$this->assertEquals($json_data_http_response, $active_data['result'][0]['value']);
+
+		// Retrieve str dependent item value type history data from API
+		$active_data = $this->callUntilDataIsPresent('history.get', [
+			'itemids'	=>	self::$itemids['agent:STR_VALUE_TYPE_DEP_WITH_PREPROC'],
+			'history'	=>	ITEM_VALUE_TYPE_STR
+		]);
 		$this->assertEquals($json_data_http_response, $active_data['result'][0]['value']);
 
 		// Retrieve JSON item value type history data from API, dep
@@ -575,6 +610,7 @@ class testBinaryAndJSONValueTypesDataCollection extends CIntegrationTest {
 			'history'	=>	ITEM_VALUE_TYPE_JSON
 		]);
 
+		$this->assertEquals(1, count($json_dep_data['result']));
 		$json_result = self::normalize_json($json_dep_data['result'][0]['value']);
 
 		$this->assertEquals(self::$json_image_normalized, $json_result);
@@ -585,6 +621,7 @@ class testBinaryAndJSONValueTypesDataCollection extends CIntegrationTest {
 
 		$this->checkItemState('agent:JSON_VALUE_TYPE_DEP', ITEM_STATE_NORMAL);
 		$this->checkItemState('agent:JSON_VALUE_TYPE_DEP_WITH_PREPROC', ITEM_STATE_NORMAL);
+		$this->checkItemState('agent:STR_VALUE_TYPE_DEP_WITH_PREPROC', ITEM_STATE_NORMAL);
 		$this->checkItemState('agent:JSON_VALUE_TYPE_DEP_INVALID', ITEM_STATE_NOTSUPPORTED);
 	}
 
@@ -643,9 +680,9 @@ class testBinaryAndJSONValueTypesDataCollection extends CIntegrationTest {
 			'history'	=> ITEM_VALUE_TYPE_BINARY
 		]);
 
-		foreach ($active_data['result'] as $item) {
-			$this->assertEquals($base64_image, $item['value']);
-		}
+		$this->assertEquals(1, count($active_data['result']));
+
+		$this->assertEquals($base64_image, $active_data['result'][0]['value']);
 
 		// Retrieve JSON item value type history data from API
 		$active_data = $this->callUntilDataIsPresent('history.get', [
@@ -653,9 +690,20 @@ class testBinaryAndJSONValueTypesDataCollection extends CIntegrationTest {
 			'history'	=> ITEM_VALUE_TYPE_JSON
 		]);
 
+		$this->assertEquals(1, count($active_data['result']));
+
 		$json_data_http_response = self::json_data_http_response;
-		foreach ($active_data['result'] as $item) {
-			$this->assertEquals($json_data_http_response, $item['value']);
-		}
+
+		$this->assertEquals($json_data_http_response, $active_data['result'][0]['value']);
+
+		// Retrieve str dependent item value type history data from API
+		$active_data = $this->callUntilDataIsPresent('history.get', [
+			'itemids'	=>	self::$itemids['proxy_agent:STR_VALUE_TYPE_DEP_WITH_PREPROC'],
+			'history'	=>	ITEM_VALUE_TYPE_STR
+		]);
+
+		$this->assertEquals(1, count($active_data['result']));
+		$this->assertEquals($json_data_http_response, $active_data['result'][0]['value']);
+
 	}
 }
