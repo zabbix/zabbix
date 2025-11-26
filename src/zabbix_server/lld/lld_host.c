@@ -4770,6 +4770,8 @@ static void	lld_hosts_remove(const zbx_vector_lld_host_ptr_t *hosts, const zbx_l
 						" set ts_delete=%d"
 						" where hostid=" ZBX_FS_UI64 ";\n",
 						ts_delete, host->hostid);
+
+				zbx_db_execute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 			}
 
 			if (ZBX_LLD_LIFETIME_TYPE_NEVER == enabled_lifetime->type)
@@ -4786,6 +4788,8 @@ static void	lld_hosts_remove(const zbx_vector_lld_host_ptr_t *hosts, const zbx_l
 						" set ts_disable=%d"
 						" where hostid=" ZBX_FS_UI64 ";\n",
 						ts_disable, host->hostid);
+
+				zbx_db_execute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 			}
 
 			if ((ZBX_LLD_LIFETIME_TYPE_AFTER == enabled_lifetime->type && lastcheck <= ts_disable) ||
@@ -4833,7 +4837,6 @@ static void	lld_hosts_remove(const zbx_vector_lld_host_ptr_t *hosts, const zbx_l
 		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid",
 				discovered_hostids.values, discovered_hostids.values_num);
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
-
 		zbx_db_execute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 	}
 
@@ -4855,7 +4858,6 @@ static void	lld_hosts_remove(const zbx_vector_lld_host_ptr_t *hosts, const zbx_l
 		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid",
 				lc_hostids.values, lc_hostids.values_num);
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
-
 		zbx_db_execute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 	}
 
@@ -4877,7 +4879,6 @@ static void	lld_hosts_remove(const zbx_vector_lld_host_ptr_t *hosts, const zbx_l
 		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid",
 				dis_hostids.values, dis_hostids.values_num);
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
-
 		zbx_db_execute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update hosts set status=%d where",
@@ -5005,6 +5006,8 @@ static void	lld_groups_remove(const zbx_vector_lld_group_ptr_t *groups, const zb
 							" set ts_delete=%d"
 							" where groupdiscoveryid=" ZBX_FS_UI64 ";\n",
 							ts_delete, discovery->groupdiscoveryid);
+
+					zbx_db_execute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 				}
 			}
 			else
