@@ -2597,13 +2597,10 @@ void	zbx_dc_add_history_variant(zbx_uint64_t itemid, unsigned char value_type, u
 
 size_t	zbx_dc_flush_history(void)
 {
-	LOCK_CACHE;
-
 	if (0 == item_values_num)
-	{
-		UNLOCK_CACHE;
 		return 0;
-	}
+
+	LOCK_CACHE;
 
 	hc_add_item_values(item_values, item_values_num);
 
@@ -2737,9 +2734,33 @@ static zbx_hc_item_t	*hc_get_item(zbx_uint64_t itemid)
  ******************************************************************************/
 static zbx_hc_item_t	*hc_add_item(zbx_uint64_t itemid, zbx_hc_data_t *data)
 {
-	zbx_hc_item_t	item_local = {itemid, ZBX_HC_ITEM_STATUS_NORMAL, 0, data, data};
+	zbx_hc_item_t	item_local = {.itemid = itemid, .status = ZBX_HC_ITEM_STATUS_NORMAL,
+			.cache = ZBX_HC_ITEM_CACHE_TRUE, .values_num = 0, .tail = data, .head = data};
 
 	return (zbx_hc_item_t *)zbx_hashset_insert(&cache->history_items, &item_local, sizeof(item_local));
+}
+
+void	zbx_hc_remove_items_by_ids(zbx_vector_uint64_t *itemids)
+{
+	LOCK_CACHE;
+
+	for (int i = 0; i < itemids->values_num; i++)
+	{
+		zbx_hc_item_t	*item = hc_get_item(itemids->values[i]);
+
+		if (NULL == item)
+			continue;
+
+		if (NULL == item->tail)
+		{
+			zbx_hashset_remove_direct(&cache->history_items, item);
+			continue;
+		}
+
+		item->cache = ZBX_HC_ITEM_CACHE_FALSE;
+	}
+
+	UNLOCK_CACHE;
 }
 
 /******************************************************************************
@@ -2775,6 +2796,8 @@ int	zbx_hc_clear_item_middle(zbx_uint64_t itemid)
 				i++;
 			}
 		}
+		else
+			item->cache = ZBX_HC_ITEM_CACHE_FALSE;
 
 		cache->history_num -= i;
 	}
@@ -3308,7 +3331,12 @@ void	zbx_hc_push_items(zbx_vector_hc_item_ptr_t *history_items)
 				item->tail = item->tail->next;
 				hc_free_data(data_free);
 				if (NULL == item->tail)
-					item->head = NULL;
+				{
+					if (ZBX_HC_ITEM_CACHE_TRUE == item->cache)
+						item->head = NULL;
+					else
+						zbx_hashset_remove(&cache->history_items, item);
+				}
 				else
 					hc_queue_item(item);
 				break;
@@ -3696,11 +3724,12 @@ void	zbx_hc_get_mem_stats(zbx_shmem_stats_t *data, zbx_shmem_stats_t *index)
  ******************************************************************************/
 int	zbx_hc_is_itemid_cached(zbx_uint64_t itemid)
 {
-	int	ret = FAIL;
+	int		ret = FAIL;
+	zbx_hc_item_t	*item;
 
 	LOCK_CACHE;
 
-	if (NULL != zbx_hashset_search(&cache->history_items, &itemid))
+	if (NULL != (item = (zbx_hc_item_t *)zbx_hashset_search(&cache->history_items, &itemid)) && NULL != item->tail)
 		ret = SUCCEED;
 
 	UNLOCK_CACHE;
@@ -3724,7 +3753,8 @@ static void	hc_get_items(zbx_vector_uint64_pair_t *items)
 	while (NULL != (item = (zbx_hc_item_t *)zbx_hashset_iter_next(&iter)))
 	{
 		zbx_uint64_pair_t	pair = {item->itemid, item->values_num};
-		zbx_vector_uint64_pair_append_ptr(items, &pair);
+		if (0 != item->values_num)
+			zbx_vector_uint64_pair_append_ptr(items, &pair);
 	}
 }
 
