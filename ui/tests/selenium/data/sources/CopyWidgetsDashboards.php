@@ -15,6 +15,8 @@
 
 class CopyWidgetsDashboards {
 
+	const ZABBIX_SERVER_HOSTID = 10084; // ЗАББИКС Сервер.
+
 	/**
 	 * Create data for Copy widgets test.
 	 *
@@ -89,7 +91,7 @@ class CopyWidgetsDashboards {
 		]);
 		$templateid = $templates['templateids']['Template for copy widgets'];
 		$template_itemid = $templates['itemids']['Template for copy widgets:templ_key[1]'];
-		$discoveryruleid =  $templates['discoveryruleids']['Template for copy widgets:drule'];
+		$discoveryruleid = $templates['discoveryruleids']['Template for copy widgets:drule'];
 
 		$item_protototypes = CDataHelper::call('itemprototype.create', [
 			[
@@ -212,7 +214,7 @@ class CopyWidgetsDashboards {
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_HOST,
 										'name' => 'hostids',
-										'value' => 10084 // ЗАББИКС Сервер.
+										'value' => self::ZABBIX_SERVER_HOSTID
 									],
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
@@ -1531,7 +1533,7 @@ class CopyWidgetsDashboards {
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_HOST,
 										'name' => 'hostids',
-										'value' => 10084 // ЗАББИКС Сервер.
+										'value' => self::ZABBIX_SERVER_HOSTID
 									],
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
@@ -1902,7 +1904,7 @@ class CopyWidgetsDashboards {
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_HOST,
 										'name' => 'hostids',
-										'value' => 10084 // Zabbix server.
+										'value' => self::ZABBIX_SERVER_HOSTID
 									],
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
@@ -2232,7 +2234,7 @@ class CopyWidgetsDashboards {
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_HOST,
 										'name' => 'hosts.0',
-										'value' => 10084 // ЗАББИКС Сервер.
+										'value' => self::ZABBIX_SERVER_HOSTID
 									],
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
@@ -2343,7 +2345,7 @@ class CopyWidgetsDashboards {
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_HOST,
 										'name' => 'hostids.0',
-										'value' => 10084 // ЗАББИКС Сервер.
+										'value' => self::ZABBIX_SERVER_HOSTID
 									],
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
@@ -2468,7 +2470,7 @@ class CopyWidgetsDashboards {
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_HOST,
 										'name' => 'hostid.0',
-										'value' => 10084 // Zabbix server.
+										'value' => self::ZABBIX_SERVER_HOSTID
 									]
 								]
 							],
@@ -3263,7 +3265,7 @@ class CopyWidgetsDashboards {
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_HOST,
 										'name' => 'hostid.0',
-										'value' => 10084 // Zabbix server.
+										'value' => self::ZABBIX_SERVER_HOSTID
 									]
 								]
 							],
