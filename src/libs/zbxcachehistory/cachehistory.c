@@ -3757,7 +3757,7 @@ static void	hc_get_items(zbx_vector_uint64_pair_t *items)
 		if (0 != item->values_num)
 		{
 			zbx_uint64_pair_t	pair = {item->itemid, item->values_num};
-	
+
 			zbx_vector_uint64_pair_append_ptr(items, &pair);
 		}
 	}
