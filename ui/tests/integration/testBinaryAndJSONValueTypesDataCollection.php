@@ -87,7 +87,7 @@ class testBinaryAndJSONValueTypesDataCollection extends CIntegrationTest {
 		self::$json_with_image = <<<HEREA
 		{
 			"result": "fail",
-			"error_message": $error_message,
+			"error_message": "$error_message",
 			"http_response": "$json_data_http_response",
 			"start_time": {
 			"value": "Nov 11 10:00:00 2022 GMT",
