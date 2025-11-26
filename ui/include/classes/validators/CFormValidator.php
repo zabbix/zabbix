@@ -1003,9 +1003,12 @@ class CFormValidator {
 		}
 
 		if (array_key_exists('decimal_limit', $rules)) {
-			preg_match(ZBX_PREG_SCIENTIFIC, $value, $matches);
+			preg_match('/^'.ZBX_PREG_NUMBER.'/', $value, $matches);
 
-			$decimals_before_e = array_key_exists('frac', $matches) ? strlen($matches['frac']) : 0;
+			$decimals_before_e = array_key_exists('frac', $matches)
+				? strlen($matches['frac'])
+				: (array_key_exists('frac_only', $matches) ? strlen($matches['frac_only']) : 0);
+
 			$exponent = array_key_exists('exp', $matches) ? (int) $matches['exp'] : 0;
 
 			$decimal_count = max(0, $decimals_before_e - $exponent);

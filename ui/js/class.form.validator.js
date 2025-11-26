@@ -1108,10 +1108,10 @@ class CFormValidator {
 		}
 
 		if (('decimal_limit' in rules) && value) {
-			const match = value.match(ZBX_PREG_SCIENTIFIC);
+			const match = parseFloat(value).toString().match(ZBX_PREG_NUMBER);
 
 			if (match) {
-				const frac = match.groups.frac || '';
+				const frac = (match.groups.frac || '') + (match.groups.frac_only || '');
 				const exp = match.groups.exp ? parseInt(match.groups.exp) : 0;
 
 				const decimals_before_e = frac.length;

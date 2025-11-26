@@ -45,7 +45,7 @@ window.sla_edit_popup = new class {
 		document
 			.querySelectorAll('#schedule_mode input[type="radio"], #schedule input[type="checkbox"]')
 			.forEach(element => {
-				element.addEventListener('change', () => this._updateScheduleFields());
+				element.addEventListener('change', () => this._update());
 			});
 
 		// Setup Problem tags.
@@ -75,13 +75,13 @@ window.sla_edit_popup = new class {
 				}
 			});
 
-		this._updateScheduleFields();
+		this._update();
 
 		this.form_element.style.display = '';
 		this.overlay.recoverFocus();
 	}
 
-	_updateScheduleFields() {
+	_update() {
 		const schedule = document.getElementById('schedule');
 		const schedule_mode = document.querySelector('#schedule_mode input:checked').value;
 
