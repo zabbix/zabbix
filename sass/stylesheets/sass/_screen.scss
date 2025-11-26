@@ -100,6 +100,7 @@ $browser-sprite: '../img/browser-sprite.png?20220722';
 @import "components/dashboard/widget-problemhosts";
 @import "components/dashboard/widget-problems";
 @import "components/dashboard/widget-problemsbysv";
+@import "components/dashboard/widget-scatterplot";
 @import "components/dashboard/widget-svggraph";
 @import "components/dashboard/widget-tophosts";
 @import "components/dashboard/widget-topitems";
@@ -1075,12 +1076,6 @@ select {
 	}
 }
 
-div {
-	.overlay-dialogue.wordbreak {
-		white-space: normal;
-	}
-}
-
 .form-fields-inline {
 	label {
 		margin: 0 8px 0 3px;
@@ -1820,10 +1815,6 @@ div {
 	border-bottom-color: darken($overlay-border-color, 1%);
 	box-shadow: 0 4px 20px 0 $action-shadow-color;
 
-	.wordbreak {
-		white-space: normal;
-	}
-
 	.overlay-dialogue-header {
 		margin: -8px -10px 6px -10px;
 		padding: 8px 10px;
@@ -2501,6 +2492,17 @@ div {
 	li {
 		padding-left: 23px;
 
+		.svg-graph-hintbox-icon-color {
+			@extend %icon-small;
+
+			display: inline-block;
+			float: left;
+			width: 12px;
+			height: 12px;
+			margin-left: -20px;
+			margin-top: -1px;
+		}
+
 		.svg-graph-hintbox-item-color,
 		.svg-graph-hintbox-trigger-color {
 			margin: 3px 10px 3px -20px;
@@ -2595,6 +2597,13 @@ div {
 		margin-top: 1px;
 		margin-bottom: 1px;
 	}
+
+	&.form-field {
+		.tag {
+			margin-top: 4px;
+			margin-bottom: 4px;
+		}
+	}
 }
 
 .tag {
@@ -2629,6 +2638,30 @@ div {
 	&.yellow-bg {
 		color: darken($alt-yellow, 45%);
 	}
+
+	&.tag-inherited::before,
+	&.tag-inherited-duplicate::before {
+		@extend %icons-font;
+
+		margin-right: 3px;
+		font-size: $icon-smaller-size;
+		line-height: 12px;
+		vertical-align: top;
+		opacity: .6;
+	}
+
+	&.tag-inherited::before {
+		content: $zi-file;
+	}
+
+	&.tag-inherited-duplicate::before {
+		content: $zi-file-filled;
+	}
+}
+
+.tag-inherited-title {
+	margin-bottom: 3px;
+	color: $font-alt-color;
 }
 
 .green-bg {

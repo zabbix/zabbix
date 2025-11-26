@@ -242,9 +242,11 @@ int	zbx_trapper_process_request_server(const char *request, zbx_socket_t *sock, 
 		const zbx_config_vault_t *config_vault, int proxydata_frequency,
 		zbx_get_program_type_f get_program_type_cb, const zbx_events_funcs_t *events_cbs,
 		zbx_get_config_forks_f get_config_forks,
-		const zbx_config_tls_t *config_tls, const char *config_frontend_allowed_ip)
+		const zbx_config_tls_t *config_tls, const char *config_frontend_allowed_ip,
+		zbx_ipc_async_socket_t *rtc)
 {
 	ZBX_UNUSED(get_program_type_cb);
+	ZBX_UNUSED(rtc);
 
 	if (0 == strcmp(request, ZBX_PROTO_VALUE_REPORT_TEST))
 	{
@@ -262,6 +264,9 @@ int	zbx_trapper_process_request_server(const char *request, zbx_socket_t *sock, 
 	}
 	else if (0 == strcmp(request, ZBX_PROTO_VALUE_PROXY_CONFIG))
 	{
+#ifndef ZBX_DEBUG
+		zabbix_log(LOG_LEVEL_DEBUG, "trapper got '%s'", jp->start);
+#endif
 		zbx_send_proxyconfig(sock, jp, config_vault, config_comms->config_timeout,
 				config_comms->config_trapper_timeout, config_comms->config_source_ip,
 				config_comms->config_ssl_ca_location, config_comms->config_ssl_cert_location,
@@ -271,6 +276,9 @@ int	zbx_trapper_process_request_server(const char *request, zbx_socket_t *sock, 
 	}
 	else if (0 == strcmp(request, ZBX_PROTO_VALUE_PROXY_DATA))
 	{
+#ifndef ZBX_DEBUG
+		zabbix_log(LOG_LEVEL_DEBUG, "trapper got '%s'", jp->start);
+#endif
 		recv_proxy_data(sock, jp, ts, events_cbs, config_comms->config_timeout, proxydata_frequency);
 
 		return SUCCEED;

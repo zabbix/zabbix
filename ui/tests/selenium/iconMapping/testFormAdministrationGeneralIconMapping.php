@@ -483,6 +483,7 @@ class testFormAdministrationGeneralIconMapping extends CLegacyWebTest {
 
 		$form = $this->query('id:iconmap')->asForm()->one();
 		$this->zbxTestClick('update');
+		$form->query('button:Update')->one()->waitUntilClassesNotPresent('is-loading');
 
 		// Check the results in frontend.
 		if (array_key_exists('error_inline', $data)) {
@@ -746,8 +747,8 @@ class testFormAdministrationGeneralIconMapping extends CLegacyWebTest {
 
 		$this->zbxTestClickXpath('//button[@value="Add"]');
 		$this->zbxTestWaitForPageToLoad();
-		$this->page->removeFocus();
 		$form = $this->query('id:iconmap')->asForm()->one();
+		$form->query('xpath:.//tr[@id="iconmap-list-footer"]//button')->one()->waitUntilClassesNotPresent('is-loading');
 
 		// Check the results in frontend.
 		$this->assertInlineError($form, $data['error']);

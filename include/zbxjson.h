@@ -228,6 +228,12 @@
 #define ZBX_PROTO_TAG_LEASE_DURATION		"lease_duration"
 #define ZBX_PROTO_TAG_PREPROC			"preproc"
 #define ZBX_PROTO_TAG_PROXY_SECRETS_PROVIDER	"proxy_secrets_provider"
+#define ZBX_PROTO_TAG_WAIT_TIME			"wait_time"
+#define ZBX_PROTO_TAG_IDLE_TIME			"idle_time"
+#define ZBX_PROTO_TAG_CONN_PROVIDED		"connections_provided"
+#define ZBX_PROTO_TAG_IDLE_TIMEOUT		"idle_timeout"
+#define ZBX_PROTO_TAG_MAX_IDLE			"max_idle"
+#define ZBX_PROTO_TAG_MAX_OPEN			"max_open"
 
 #define ZBX_PROTO_VALUE_FAILED		"failed"
 #define ZBX_PROTO_VALUE_SUCCESS		"success"
@@ -417,6 +423,7 @@ void	zbx_jsonobj_clear(zbx_jsonobj_t *obj);
 int	zbx_jsonobj_query(const zbx_jsonobj_t *obj, const char *path, char **output);
 int	zbx_jsonobj_query_ext(const zbx_jsonobj_t *obj, zbx_jsonpath_index_t *index, const char *path, char **output);
 int	zbx_jsonobj_to_string(char **str, size_t *str_alloc, size_t *str_offset, const zbx_jsonobj_t *obj);
-const zbx_jsonobj_t *zbx_jsonobj_get_value(const zbx_jsonobj_t *obj, const char *name);
+zbx_jsonobj_t *zbx_jsonobj_get_value(const zbx_jsonobj_t *obj, const char *name);
+void	zbx_jsonobj_remove_value(zbx_jsonobj_t *obj, const char *name);
 
 #endif /* ZABBIX_ZJSON_H */

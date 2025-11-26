@@ -192,16 +192,14 @@ class testPageGroups extends CWebTest {
 		// Check link to host prototype from host group name.
 		if (array_key_exists('lld', $links)) {
 			$row->getColumn('Name')->query('link', $links['lld'])->one()->click();
-			$this->assertStringContainsString('host_prototypes.php?form=update&parent_discoveryid=',
+			$this->assertStringContainsString('zabbix.php?action=popup&popup=host.prototype.edit&parent_discoveryid=',
 					$this->page->getCurrentUrl()
 			);
-			$this->page->assertHeader('Host prototypes');
-			$this->query('id:host-prototype-form')->asForm(['normalized' => true])->waitUntilVisible()->one()
+			$this->page->assertHeader('Host groups');
+			$this->query('id:host-prototype-form')->asForm()->waitUntilVisible()->one()
 					->checkValue(['Host name' => self::HOST_PROTOTYPE]);
 			$this->query('button:Cancel')->one()->click();
-			$this->assertStringContainsString('host_prototypes.php?cancel=1&parent_discoveryid=',
-					$this->page->getCurrentUrl()
-			);
+			$this->assertStringContainsString('zabbix.php?action=hostgroup.list', $this->page->getCurrentUrl());
 			$this->page->open($this->link)->waitUntilReady();
 		}
 	}
@@ -252,18 +250,12 @@ class testPageGroups extends CWebTest {
 			$names = $this->getGroupNames($sorting);
 			$table->query('link:Name')->waitUntilClickable()->one()->click();
 			$table->waitUntilReloaded();
-			$this->assertTableDataColumn($names);
+			$this->assertTableDataColumn(preg_replace('/\s+/', ' ', $names));
 		}
 	}
 
 	public static function getFilterData() {
 		return [
-			// Too many spaces in field.
-			[
-				[
-					'Name' => '  '
-				]
-			],
 			// Special symbols, utf8 and long name.
 			[
 				[

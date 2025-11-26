@@ -945,6 +945,35 @@ function objectToSearchParams(object) {
 }
 
 /**
+ * Convert nested data object into Form data object.
+ *
+ * @param {Object|Array} object
+ *
+ * @returns {FormData}
+ */
+function objectToFormData(object) {
+	const combine = (data, form_data = new FormData(), name_prefix = '') => {
+		if (Array.isArray(data)) {
+			for (const [index, datum] of data.entries()) {
+				combine(datum, form_data, name_prefix !== '' ? `${name_prefix}[${index}]` : index);
+			}
+		}
+		else if (data !== null && typeof data === 'object' && !(data instanceof File)) {
+			for (const [name, datum] of Object.entries(data)) {
+				combine(datum, form_data, name_prefix !== '' ? `${name_prefix}[${name}]` : name);
+			}
+		}
+		else {
+			form_data.append(name_prefix, data);
+		}
+
+		return form_data;
+	};
+
+	return combine(object);
+}
+
+/**
  * Convert RGB encoded color into HSL encoded color.
  *
  * @param {number} r  Red component in range of 0-1.

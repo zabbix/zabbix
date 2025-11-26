@@ -95,8 +95,8 @@ class WidgetCommunication {
 				'status' => HOST_STATUS_MONITORED,
 				'inventory_mode' => HOST_INVENTORY_MANUAL,
 				'inventory' => [
-					'location_lat' => '56.95387',
-					'location_lon' => '24.22067'
+					'location_lat' => '56.97612',
+					'location_lon' => '24.16553'
 				],
 				'tags' => [
 					[
@@ -249,7 +249,7 @@ class WidgetCommunication {
 		]);
 
 		// Create a map to be displayed on the Map widget.
-		$submapid = CDataHelper::call('map.create', [
+		$map_response = CDataHelper::call('map.create', [
 			[
 				'name' => self::SUBMAP_NAME,
 				'height' => 400,
@@ -334,8 +334,90 @@ class WidgetCommunication {
 						'heidght' => 200
 					]
 				]
+			],
+			[
+				'name' => self::FIRST_HOST_NAME.' map',
+				'height' => 300,
+				'width' => 400,
+				'selements' => [
+					[
+						'selementid' => 1,
+						'elementtype' => SYSMAP_ELEMENT_TYPE_HOST,
+						'elements' => [
+							['hostid' => $hostids[self::FIRST_HOST_NAME]]
+						],
+						'label' => '{HOST.NAME}',
+						'iconid_off' => 151, // Server_(96) element icon.
+						'x' => 220,
+						'y' => 100,
+						'width' => 200,
+						'heidght' => 200
+					]
+				]
+			],
+			[
+				'name' => self::SECOND_HOST_NAME.' map',
+				'height' => 300,
+				'width' => 400,
+				'selements' => [
+					[
+						'selementid' => 1,
+						'elementtype' => SYSMAP_ELEMENT_TYPE_HOST,
+						'elements' => [
+							['hostid' => $hostids[self::SECOND_HOST_NAME]]
+						],
+						'label' => '{HOST.NAME}',
+						'iconid_off' => 151, // Server_(96) element icon.
+						'x' => 220,
+						'y' => 100,
+						'width' => 200,
+						'heidght' => 200
+					]
+				]
+			],
+			[
+				'name' => self::FIRST_HOSTGROUP_NAME.' map',
+				'height' => 300,
+				'width' => 400,
+				'selements' => [
+					[
+						'selementid' => 1,
+						'elementtype' => SYSMAP_ELEMENT_TYPE_HOST_GROUP,
+						'elements' => [
+							['groupid' => $host_groupids[self::FIRST_HOSTGROUP_NAME]]
+						],
+						'label' => '{HOSTGROUP}',
+						'iconid_off' => 136, // SAN_(96) element icon.
+						'x' => 220,
+						'y' => 100,
+						'width' => 200,
+						'heidght' => 200
+					]
+				]
+			],
+			[
+				'name' => self::SECOND_HOSTGROUP_NAME.' map',
+				'height' => 300,
+				'width' => 400,
+				'selements' => [
+					[
+						'selementid' => 1,
+						'elementtype' => SYSMAP_ELEMENT_TYPE_HOST_GROUP,
+						'elements' => [
+							['groupid' => $host_groupids[self::SECOND_HOSTGROUP_NAME]]
+						],
+						'label' => '{HOSTGROUP}',
+						'iconid_off' => 136, // SAN_(96) element icon.
+						'x' => 220,
+						'y' => 100,
+						'width' => 200,
+						'heidght' => 200
+					]
+				]
 			]
-		])['sysmapids'][0];
+		]);
+
+		$submapid = $map_response['sysmapids'][0];
 
 		// Create a map that contains the previously created submap.
 		$mapid = CDataHelper::call('map.create', [
@@ -679,7 +761,7 @@ class WidgetCommunication {
 								'name' => 'Problems by severity listener',
 								'x' => 21,
 								'y' => 8,
-								'width' => 26,
+								'width' => 18,
 								'height' => 3,
 								'fields' => [
 									[
@@ -719,7 +801,7 @@ class WidgetCommunication {
 								'name' => 'Trigger overview listener',
 								'x' => 21,
 								'y' => 11,
-								'width' => 26,
+								'width' => 18,
 								'height' => 3,
 								'fields' => [
 									[
@@ -757,9 +839,9 @@ class WidgetCommunication {
 							[
 								'type' => 'tophosts',
 								'name' => 'Top hosts listener',
-								'x' => 47,
+								'x' => 39,
 								'y' => 8,
-								'width' => 25,
+								'width' => 16,
 								'height' => 3,
 								'fields' => [
 									[
@@ -852,9 +934,9 @@ class WidgetCommunication {
 							[
 								'type' => 'web',
 								'name' => 'Web monitoring listener',
-								'x' => 47,
+								'x' => 39,
 								'y' => 11,
-								'width' => 25,
+								'width' => 16,
 								'height' => 3,
 								'fields' => [
 									[
@@ -881,6 +963,71 @@ class WidgetCommunication {
 										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'reference',
 										'value' => 'CBUEA'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'rf_rate',
+										'value' => 0
+									]
+								]
+							],
+							[
+								'type' => 'hostnavigator',
+								'name' => 'Host navigator listener',
+								'x' => 55,
+								'y' => 8,
+								'width' => 17,
+								'height' => 3,
+								'fields' => [
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'hosts.0',
+										'value' => '*host for widgets'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'groupids._reference',
+										'value' => 'NRDLG._hostgroupids'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'reference',
+										'value' => 'HCXYG'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'rf_rate',
+										'value' => 0
+									]
+								]
+							],
+							[
+								'type' => 'itemnavigator',
+								'name' => 'Item navigator listener',
+								'x' => 55,
+								'y' => 11,
+								'width' => 17,
+								'height' => 3,
+								'fields' => [
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'groupids._reference',
+										'value' => 'NRDLG._hostgroupids'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'reference',
+										'value' => 'TVLPM'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'items.0',
+										'value' => 'Trapper item'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'group_by.0.attribute',
+										'value' => 1
 									],
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
@@ -989,7 +1136,7 @@ class WidgetCommunication {
 								'name' => 'Top hosts host broadcaster',
 								'x' => 0,
 								'y' => 13,
-								'width' => 25,
+								'width' => 20,
 								'height' => 3,
 								'fields' => [
 									[
@@ -1095,7 +1242,7 @@ class WidgetCommunication {
 								'name' => 'Host navigator broadcaster',
 								'x' => 0,
 								'y' => 16,
-								'width' => 25,
+								'width' => 20,
 								'height' => 3,
 								'fields' => [
 									[
@@ -1562,6 +1709,86 @@ class WidgetCommunication {
 										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'rf_rate',
 										'value' => 0
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'reference',
+										'value' => 'ICWLP'
+									]
+								]
+							],
+							[
+								'type' => 'itemcard',
+								'name' => 'Item card listener',
+								'x' => 53,
+								'y' => 12,
+								'width' => 19,
+								'height' => 5,
+								'fields' => [
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'itemid._reference',
+										'value' => 'RICVX._itemid'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'sections.0',
+										'value' => 2
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'sections.1',
+										'value' => 4
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'sections.2',
+										'value' => 6
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'sections.3',
+										'value' => 3
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'override_hostid._reference',
+										'value' => 'JRVYU._hostid'
+									]
+								]
+							],
+							[
+								'type' => 'itemnavigator',
+								'name' => 'Item navigator listener',
+								'x' => 21,
+								'y' => 16,
+								'width' => 16,
+								'height' => 3,
+								'fields' => [
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'hostids._reference',
+										'value' => 'JRVYU._hostids'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'reference',
+										'value' => 'NNAJF'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'items.0',
+										'value' => 'Trapper item'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'group_by.0.attribute',
+										'value' => 1
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'rf_rate',
+										'value' => 0
 									]
 								]
 							]
@@ -1903,6 +2130,41 @@ class WidgetCommunication {
 										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'decimal_places',
 										'value' => 0
+									]
+								]
+							],
+							[
+								'type' => 'itemcard',
+								'name' => 'Item card listener',
+								'x' => 27,
+								'y' => 10,
+								'width' => 18,
+								'height' => 5,
+								'fields' => [
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'itemid._reference',
+										'value' => 'QFWQX._itemid'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'sections.0',
+										'value' => 2
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'sections.1',
+										'value' => 4
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'sections.2',
+										'value' => 6
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'sections.3',
+										'value' => 3
 									]
 								]
 							]
@@ -2304,6 +2566,973 @@ class WidgetCommunication {
 										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'reference',
 										'value' => 'DNDNC'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'rf_rate',
+										'value' => 0
+									]
+								]
+							]
+						]
+					],
+					[
+						'name' => 'Value re-broadcasting page',
+						'widgets' => [
+							[
+								'type' => 'navtree',
+								'name' => 'Navigation tree broadcaster',
+								'x' => 0,
+								'y' => 0,
+								'width' => 15,
+								'height' => 3,
+								'fields' => [
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'navtree.1.name',
+										'value' => self::FIRST_HOST_NAME.' map'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_MAP,
+										'name' => 'navtree.1.sysmapid',
+										'value' => $map_response['sysmapids'][1]
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'navtree.2.name',
+										'value' => self::SECOND_HOST_NAME.' map'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'navtree.2.order',
+										'value' => 2
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_MAP,
+										'name' => 'navtree.2.sysmapid',
+										'value' => $map_response['sysmapids'][2]
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'navtree.3.name',
+										'value' => self::FIRST_HOSTGROUP_NAME.' map'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'navtree.3.order',
+										'value' => 3
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_MAP,
+										'name' => 'navtree.3.sysmapid',
+										'value' => $map_response['sysmapids'][3]
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'navtree.4.name',
+										'value' => self::SECOND_HOSTGROUP_NAME.' map'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'navtree.4.order',
+										'value' => 4
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_MAP,
+										'name' => 'navtree.4.sysmapid',
+										'value' => $map_response['sysmapids'][4]
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'reference',
+										'value' => 'TRAMP'
+									]
+								]
+							],
+							[
+								'type' => 'map',
+								'name' => 'Map re-broadcaster',
+								'x' => 17,
+								'y' => 0,
+								'width' => 17,
+								'height' => 3,
+								'fields' => [
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'sysmapid._reference',
+										'value' => 'TRAMP._mapid'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'reference',
+										'value' => 'PMART'
+									]
+								]
+							],
+							[
+								'type' => 'item',
+								'name' => 'Item value host listener from map',
+								'x' => 36,
+								'y' => 0,
+								'width' => 18,
+								'height' => 3,
+								'fields' => [
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'override_hostid._reference',
+										'value' => 'PMART._hostid'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'rf_rate',
+										'value' => 0
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'decimal_places',
+										'value' => 0
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_ITEM,
+										'name' => 'itemid.0',
+										'value' => $itemids[self::FIRST_HOST_NAME.':trap.widget.communication']
+									]
+								]
+							],
+							[
+								'type' => 'honeycomb',
+								'name' => 'Honeycomb broadcaster',
+								'x' => 0,
+								'y' => 3,
+								'width' => 15,
+								'height' => 3,
+								'fields' => [
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'items.0',
+										'value' => 'Trapper item'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'reference',
+										'value' => 'UWIZG'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'rf_rate',
+										'value' => 0
+									]
+								]
+							],
+							[
+								'type' => 'geomap',
+								'name' => 'Geomap re-broadcaster',
+								'x' => 17,
+								'y' => 3,
+								'width' => 17,
+								'height' => 3,
+								'fields' => [
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'hostids._reference',
+										'value' => 'UWIZG._hostids'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'default_view',
+										'value' => '56.9,24.0,4'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'reference',
+										'value' => 'NBQXG'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'tags.0.tag',
+										'value' => 'widget'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'tags.0.operator',
+										'value' => TAG_OPERATOR_LIKE
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'tags.0.value',
+										'value' => 'communication'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'rf_rate',
+										'value' => 0
+									]
+								]
+							],
+							[
+								'type' => 'gauge',
+								'name' => 'Gauge host listener from geomap',
+								'x' => 36,
+								'y' => 3,
+								'width' => 18,
+								'height' => 3,
+								'fields' => [
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'itemid.0',
+										'value' => $itemids[self::FIRST_HOST_NAME.':trap.widget.communication']
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'min',
+										'value' => '0'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'max',
+										'value' => '10'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'rf_rate',
+										'value' => 0
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'override_hostid._reference',
+										'value' => 'NBQXG._hostid'
+									]
+								]
+							],
+							[
+								'type' => 'problemsbysv',
+								'name' => 'Problems by severity re-broadcaster',
+								'x' => 17,
+								'y' => 6,
+								'width' => 17,
+								'height' => 3,
+								'fields' => [
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'hostids._reference',
+										'value' => 'UWIZG._hostid'
+									],
+
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'reference',
+										'value' => 'TYSXP'
+									]
+								]
+							],
+							[
+								'type' => 'tophosts',
+								'name' => 'Top hosts hostgroup listener from PBS',
+								'x' => 36,
+								'y' => 6,
+								'width' => 18,
+								'height' => 3,
+								'fields' => [
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'groupids._reference',
+										'value' => 'TYSXP._hostgroupids'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'columns.0.aggregate_function',
+										'value' => AGGREGATE_NONE
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'columns.0.decimal_places',
+										'value' => 0
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'columns.0.base_color',
+										'value' => ''
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'columns.0.name',
+										'value' => 'Hostname'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'columns.0.data',
+										'value' => 2
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'columns.0.display',
+										'value' => 1
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'columns.0.history',
+										'value' => 1
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'columns.1.aggregate_function',
+										'value' => AGGREGATE_NONE
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'columns.1.decimal_places',
+										'value' => 2
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'columns.1.base_color',
+										'value' => ''
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'columns.1.name',
+										'value' => 'Item value'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'columns.1.data',
+										'value' => 1
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'columns.1.item',
+										'value' => 'Trapper item'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'columns.1.display',
+										'value' => 1
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'columns.1.history',
+										'value' => 1
+									],
+
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'reference',
+										'value' => 'AIIBM'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'rf_rate',
+										'value' => 0
+									]
+								]
+							],
+							[
+								'type' => 'web',
+								'name' => 'Web monitoring broadcaster',
+								'x' => 0,
+								'y' => 12,
+								'width' => 15,
+								'height' => 3,
+								'fields' => [
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_GROUP,
+										'name' => 'groupids.0',
+										'value' => $host_groupids[self::FIRST_HOSTGROUP_NAME]
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_GROUP,
+										'name' => 'groupids.1',
+										'value' => $host_groupids[self::SECOND_HOSTGROUP_NAME]
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_GROUP,
+										'name' => 'groupids.2',
+										'value' => $host_groupids[self::THIRD_HOSTGROUP_NAME]
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'reference',
+										'value' => 'KTFNF'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'rf_rate',
+										'value' => 0
+									]
+								]
+							],
+							[
+								'type' => 'honeycomb',
+								'name' => 'Honeycomb re-broadcaster',
+								'x' => 17,
+								'y' => 12,
+								'width' => 17,
+								'height' => 3,
+								'fields' => [
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'groupids._reference',
+										'value' => 'KTFNF._hostgroupids'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'items.0',
+										'value' => 'Trapper item'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'reference',
+										'value' => 'JHHSX'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'rf_rate',
+										'value' => 0
+									]
+								]
+							],
+							[
+								'type' => 'topitems',
+								'name' => 'Top item host listener from honeycomb',
+								'x' => 36,
+								'y' => 12,
+								'width' => 18,
+								'height' => 3,
+								'fields' => [
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'hostids._reference',
+										'value' => 'JHHSX._hostids'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'tags.0.tag',
+										'value' => 'item'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'tags.0.operator',
+										'value' => TAG_OPERATOR_LIKE
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'tags.0.value',
+										'value' => 'widget communication'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'rf_rate',
+										'value' => 0
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'columns.0.items.0',
+										'value' => 'Trapper item'
+									]
+								]
+							],
+							[
+								'type' => 'tophosts',
+								'name' => 'Top hosts re-broadcaster',
+								'x' => 17,
+								'y' => 15,
+								'width' => 17,
+								'height' => 3,
+								'fields' => [
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'groupids._reference',
+										'value' => 'KTFNF._hostgroupids'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'columns.0.name',
+										'value' => 'Hostname'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'columns.0.data',
+										'value' => 2
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'columns.0.aggregate_function',
+										'value' => AGGREGATE_NONE
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'columns.0.decimal_places',
+										'value' => 2
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'columns.0.base_color',
+										'value' => ''
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'columns.1.name',
+										'value' => 'Item value'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'columns.1.data',
+										'value' => 1
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'columns.1.item',
+										'value' => 'Trapper item'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'columns.1.decimal_places',
+										'value' => 2
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'columns.1.display',
+										'value' => 1
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'columns.1.history',
+										'value' => 1
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'columns.1.base_color',
+										'value' => ''
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'reference',
+										'value' => 'CEPBS'
+									]
+								]
+							],
+							[
+								'type' => 'trigover',
+								'name' => 'Trigger overview host listener from top hosts',
+								'x' => 36,
+								'y' => 15,
+								'width' => 18,
+								'height' => 3,
+								'fields' => [
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'hostids._reference',
+										'value' => 'CEPBS._hostids'
+									],
+																		[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'layout',
+										'value' => 1
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'rf_rate',
+										'value' => 0
+									]
+								]
+							],
+							[
+								'type' => 'problemhosts',
+								'name' => 'Problem hosts broadcaster',
+								'x' => 0,
+								'y' => 24,
+								'width' => 15,
+								'height' => 3,
+								'fields' => [
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_GROUP,
+										'name' => 'groupids.0',
+										'value' => $host_groupids[self::FIRST_HOSTGROUP_NAME]
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_GROUP,
+										'name' => 'groupids.1',
+										'value' => $host_groupids[self::SECOND_HOSTGROUP_NAME]
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_GROUP,
+										'name' => 'groupids.2',
+										'value' => $host_groupids[self::THIRD_HOSTGROUP_NAME]
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'reference',
+										'value' => 'NHPQH'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'rf_rate',
+										'value' => 0
+									]
+								]
+							],
+							[
+								'type' => 'itemnavigator',
+								'name' => 'Item navigator re-broadcaster',
+								'x' => 17,
+								'y' => 24,
+								'width' => 17,
+								'height' => 3,
+								'fields' => [
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'groupids._reference',
+										'value' => 'NHPQH._hostgroupid'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'items.0',
+										'value' => 'Trapper item'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'group_by.0.attribute',
+										'value' => 1
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'reference',
+										'value' => 'UOWGM'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'rf_rate',
+										'value' => 0
+									]
+								]
+							],
+							[
+								'type' => 'piechart',
+								'name' => 'Pie chart item listener from item navigator',
+								'x' => 36,
+								'y' => 24,
+								'width' => 18,
+								'height' => 3,
+								'fields' => [
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'ds.0.itemids.0._reference',
+										'value' => 'UOWGM._itemid'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'ds.0.type.0',
+										'value' => 0
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'ds.0.color.0',
+										'value' => 'FFD54F'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'ds.0.dataset_type',
+										'value' => 0
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'rf_rate',
+										'value' => 0
+									]
+								]
+							],
+							[
+								'type' => 'map',
+								'name' => 'Map broadcaster',
+								'x' => 0,
+								'y' => 18,
+								'width' => 15,
+								'height' => 3,
+								'fields' => [
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_MAP,
+										'name' => 'sysmapid.0',
+										'value' => $submapid
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'reference',
+										'value' => 'XHONA'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'rf_rate',
+										'value' => 0
+									]
+								]
+							],
+							[
+								'type' => 'hostnavigator',
+								'name' => 'Host navigator re-broadcaster',
+								'x' => 17,
+								'y' => 18,
+								'width' => 17,
+								'height' => 3,
+								'fields' => [
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'groupids._reference',
+										'value' => 'XHONA._hostgroupid'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'reference',
+										'value' => 'KAOIO'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'rf_rate',
+										'value' => 0
+									]
+								]
+							],
+							[
+								'type' => 'web',
+								'name' => 'Web monitoring hosts listener from host navigator',
+								'x' => 36,
+								'y' => 18,
+								'width' => 18,
+								'height' => 3,
+								'fields' => [
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'hostids._reference',
+										'value' => 'KAOIO._hostids'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'reference',
+										'value' => 'CBUEA'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'rf_rate',
+										'value' => 0
+									]
+								]
+							],
+							[
+								'type' => 'web',
+								'name' => 'Web monitoring re-broadcaster',
+								'x' => 17,
+								'y' => 27,
+								'width' => 17,
+								'height' => 3,
+								'fields' => [
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'groupids._reference',
+										'value' => 'NHPQH._hostgroupids'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'reference',
+										'value' => 'FFSYS'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'rf_rate',
+										'value' => 0
+									]
+								]
+							],
+							[
+								'type' => 'problemhosts',
+								'name' => 'Problem hosts re-broadcaster',
+								'x' => 17,
+								'y' => 21,
+								'width' => 17,
+								'height' => 3,
+								'fields' => [
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'groupids._reference',
+										'value' => 'XHONA._hostgroupids'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'reference',
+										'value' => 'OCKHI'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'rf_rate',
+										'value' => 0
+									]
+								]
+							],
+							[
+								'type' => 'honeycomb',
+								'name' => 'Honeycomb hostgroup listener from web monitoring',
+								'x' => 36,
+								'y' => 27,
+								'width' => 18,
+								'height' => 3,
+								'fields' => [
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'groupids._reference',
+										'value' => 'FFSYS._hostgroupids'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'items.0',
+										'value' => 'Trapper item'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'reference',
+										'value' => 'JBNTX'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'rf_rate',
+										'value' => 0
+									]
+								]
+							],
+							[
+								'type' => 'problemsbysv',
+								'name' => 'Problems by severity hostgroup listener from problem hosts',
+								'x' => 36,
+								'y' => 21,
+								'width' => 18,
+								'height' => 3,
+								'fields' => [
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'groupids._reference',
+										'value' => 'OCKHI._hostgroupids'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'reference',
+										'value' => 'DQQAV'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'rf_rate',
+										'value' => 0
+									]
+								]
+							],
+							[
+								'type' => 'honeycomb',
+								'name' => 'Honeycomb hostgroup listener from map',
+								'x' => 54,
+								'y' => 0,
+								'width' => 18,
+								'height' => 3,
+								'fields' => [
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'groupids._reference',
+										'value' => 'PMART._hostgroupids'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'items.0',
+										'value' => 'Trapper item'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'reference',
+										'value' => 'FBUHD'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'rf_rate',
+										'value' => 0
+									]
+								]
+							],
+							[
+								'type' => 'item',
+								'name' => 'Item value item listener from honeycomb',
+								'x' => 54,
+								'y' => 12,
+								'width' => 18,
+								'height' => 3,
+								'fields' => [
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'itemid._reference',
+										'value' => 'JHHSX._itemid'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'rf_rate',
+										'value' => 0
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'decimal_places',
+										'value' => 0
+									]
+								]
+							],
+							[
+								'type' => 'itemhistory',
+								'name' => 'Item history re-broadcaster',
+								'x' => 17,
+								'y' => 9,
+								'width' => 17,
+								'height' => 3,
+								'fields' => [
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'reference',
+										'value' => 'XMKPZ'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'columns.0.name',
+										'value' => self::FIRST_HOST_NAME.': Trapper item'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_ITEM,
+										'name' => 'columns.0.itemid',
+										'value' => $itemids[self::FIRST_HOST_NAME.':trap.widget.communication']
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'override_hostid._reference',
+										'value' => 'UWIZG._hostid'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'rf_rate',
+										'value' => 0
+									]
+								]
+							],
+							[
+								'type' => 'gauge',
+								'name' => 'Gauge item listener from item history',
+								'x' => 36,
+								'y' => 9,
+								'width' => 18,
+								'height' => 3,
+								'fields' => [
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'itemid._reference',
+										'value' => 'XMKPZ._itemid'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'min',
+										'value' => '0'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'max',
+										'value' => '10'
 									],
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
