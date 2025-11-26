@@ -77,11 +77,11 @@ class ZTextareaFlexible extends HTMLElement {
 
 		switch (name) {
 			case 'width':
-				this.#textarea.width = new_value;
+				this.#textarea.style.width = new_value;
 				break;
 
 			case 'height':
-				this.#textarea.height = new_value;
+				this.#textarea.style.height = new_value;
 				break;
 
 			case 'maxlength':
@@ -178,19 +178,19 @@ class ZTextareaFlexible extends HTMLElement {
 	}
 
 	get width() {
-		return this.#textarea.width;
+		return this.#textarea.style.width;
 	}
 
 	set width(width) {
-		this.setAttribute('width', width);
+		this.#textarea.style.width = width;
 	}
 
 	get height() {
-		return this.#textarea.height;
+		return this.#textarea.style.height;
 	}
 
 	set height(height) {
-		this.setAttribute('height', height);
+		this.#textarea.style.height = height;
 	}
 
 	get maxlength() {
