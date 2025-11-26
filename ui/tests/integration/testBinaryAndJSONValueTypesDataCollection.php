@@ -151,58 +151,62 @@ class testBinaryAndJSONValueTypesDataCollection extends CIntegrationTest {
 
 		$groups = ['groupid' => 4];
 
+		$items = [
+				[
+					'name' => 'JSON_WITH_IMAGE',
+					'key_' => 'vfs.file.contents['.self::$file_name_json_with_image_for_binary_item.',]',
+					'type' => ITEM_TYPE_ZABBIX,
+					'value_type' => ITEM_VALUE_TYPE_TEXT,
+					'delay' => '1s'
+				],
+				[
+					'name' => 'JSON_WITH_IMAGE_JSON_VALUE_TYPE',
+					'key_' => 'vfs.file.contents['.self::$file_name_json_with_image_for_json_item.',]',
+					'type' => ITEM_TYPE_ZABBIX,
+					'value_type' => ITEM_VALUE_TYPE_JSON,
+					'delay' => '1s'
+				],
+				[
+					'name' => 'INVALID_JSON_TEXT_VALUE_TYPE',
+					'key_' => 'vfs.file.contents['.self::$file_name_invalid_json_for_binary_item.',]',
+					'type' => ITEM_TYPE_ZABBIX,
+					'value_type' => ITEM_VALUE_TYPE_TEXT,
+					'delay' => '1s'
+				],
+				[
+					'name' => 'INVALID_JSON_JSON_VALUE_TYPE',
+					'key_' => 'vfs.file.contents['.self::$file_name_invalid_json_for_json_item.',]',
+					'type' => ITEM_TYPE_ZABBIX,
+					'value_type' => ITEM_VALUE_TYPE_JSON,
+					'delay' => '1s'
+				],
+				[
+					'name' => 'JSON_TRAPPER',
+					'key_' => 'JSON_TRAPPER',
+					'type' => ITEM_TYPE_TRAPPER,
+					'value_type' => ITEM_VALUE_TYPE_JSON
+				],
+				[
+					'name' => 'JSON_TRAPPER_PREPROC_THROTTLING',
+					'key_' => 'JSON_TRAPPER_PREPROC_THROTTLING',
+					'type' => ITEM_TYPE_TRAPPER,
+					'value_type' => ITEM_VALUE_TYPE_JSON,
+					'preprocessing' =>
+					[[
+						'type' => ZBX_PREPROC_THROTTLE_VALUE
+					]]
+				]
+		];
+
+
+
 		$result = CDataHelper::createHosts([
 			[
 				'host' => 'agent',
 				'interfaces' => $interfaces,
 				'groups' => $groups,
 				'status' => HOST_STATUS_MONITORED,
-				'items' => [
-					[
-						'name' => 'JSON_WITH_IMAGE',
-						'key_' => 'vfs.file.contents['.self::$file_name_json_with_image_for_binary_item.',]',
-						'type' => ITEM_TYPE_ZABBIX,
-						'value_type' => ITEM_VALUE_TYPE_TEXT,
-						'delay' => '1s'
-					],
-					[
-						'name' => 'JSON_WITH_IMAGE_JSON_VALUE_TYPE',
-						'key_' => 'vfs.file.contents['.self::$file_name_json_with_image_for_json_item.',]',
-						'type' => ITEM_TYPE_ZABBIX,
-						'value_type' => ITEM_VALUE_TYPE_JSON,
-						'delay' => '1s'
-					],
-					[
-						'name' => 'INVALID_JSON_TEXT_VALUE_TYPE',
-						'key_' => 'vfs.file.contents['.self::$file_name_invalid_json_for_binary_item.',]',
-						'type' => ITEM_TYPE_ZABBIX,
-						'value_type' => ITEM_VALUE_TYPE_TEXT,
-						'delay' => '1s'
-					],
-					[
-						'name' => 'INVALID_JSON_JSON_VALUE_TYPE',
-						'key_' => 'vfs.file.contents['.self::$file_name_invalid_json_for_json_item.',]',
-						'type' => ITEM_TYPE_ZABBIX,
-						'value_type' => ITEM_VALUE_TYPE_JSON,
-						'delay' => '1s'
-					],
-					[
-						'name' => 'JSON_TRAPPER',
-						'key_' => 'JSON_TRAPPER',
-						'type' => ITEM_TYPE_TRAPPER,
-						'value_type' => ITEM_VALUE_TYPE_JSON
-					],
-					[
-						'name' => 'JSON_TRAPPER_PREPROC_THROTTLING',
-						'key_' => 'JSON_TRAPPER_PREPROC_THROTTLING',
-						'type' => ITEM_TYPE_TRAPPER,
-						'value_type' => ITEM_VALUE_TYPE_JSON,
-						'preprocessing' =>
-						[[
-							'type' => ZBX_PREPROC_THROTTLE_VALUE
-						]]
-					]
-				]
+				'items' => $items
 			],
 			[
 				'host' => 'proxy_agent',
@@ -211,52 +215,7 @@ class testBinaryAndJSONValueTypesDataCollection extends CIntegrationTest {
 				'proxyid' => $proxyids['proxy'],
 				'monitored_by' => ZBX_MONITORED_BY_PROXY,
 				'status' => HOST_STATUS_MONITORED,
-				'items' => [
-					[
-						'name' => 'JSON_WITH_IMAGE',
-						'key_' => 'vfs.file.contents['.self::$file_name_json_with_image_for_binary_item.',]',
-						'type' => ITEM_TYPE_ZABBIX,
-						'value_type' => ITEM_VALUE_TYPE_TEXT,
-						'delay' => '1s'
-					],
-					[
-						'name' => 'JSON_WITH_IMAGE_JSON_VALUE_TYPE',
-						'key_' => 'vfs.file.contents['.self::$file_name_json_with_image_for_json_item.',]',
-						'type' => ITEM_TYPE_ZABBIX,
-						'value_type' => ITEM_VALUE_TYPE_JSON,
-						'delay' => '1s'
-					],
-					[
-						'name' => 'INVALID_JSON_TEXT_VALUE_TYPE',
-						'key_' => 'vfs.file.contents['.self::$file_name_invalid_json_for_binary_item.',]',
-						'type' => ITEM_TYPE_ZABBIX,
-						'value_type' => ITEM_VALUE_TYPE_TEXT,
-						'delay' => '1s'
-					],
-					[
-						'name' => 'INVALID_JSON_JSON_VALUE_TYPE',
-						'key_' => 'vfs.file.contents['.self::$file_name_invalid_json_for_json_item.',]',
-						'type' => ITEM_TYPE_ZABBIX,
-						'value_type' => ITEM_VALUE_TYPE_JSON,
-						'delay' => '1s'
-					],
-					[
-						'name' => 'JSON_TRAPPER',
-						'key_' => 'JSON_TRAPPER',
-						'type' => ITEM_TYPE_TRAPPER,
-						'value_type' => ITEM_VALUE_TYPE_JSON
-					],
-					[
-						'name' => 'JSON_TRAPPER_PREPROC_THROTTLING',
-						'key_' => 'JSON_TRAPPER_PREPROC_THROTTLING',
-						'type' => ITEM_TYPE_TRAPPER,
-						'value_type' => ITEM_VALUE_TYPE_JSON,
-						'preprocessing' =>
-						[[
-							'type' => ZBX_PREPROC_THROTTLE_VALUE
-						]]
-					]
-				]
+				'items' => $items
 			]
 		]);
 
@@ -266,16 +225,19 @@ class testBinaryAndJSONValueTypesDataCollection extends CIntegrationTest {
 			['agent' =>
 				[
 				[
-						'name' => 'BINARY_IMAGE',
-						'key_' => 'BINARY_IMAGE',
-						'type' => ITEM_TYPE_DEPENDENT,
-						'master_itemid' => self::$itemids['agent:vfs.file.contents['.self::$file_name_json_with_image_for_binary_item.',]'],
-						'value_type' => ITEM_VALUE_TYPE_BINARY,
-						'delay' => '0s',
-						'preprocessing' => [['type' => ZBX_PREPROC_JSONPATH, 'params' => '$.screenshot_image',
-						'error_handler' => 0,
-						'error_handler_params' => ''
-							]]
+					'name' => 'BINARY_IMAGE',
+					'key_' => 'BINARY_IMAGE',
+					'type' => ITEM_TYPE_DEPENDENT,
+					'master_itemid' => self::$itemids['agent:vfs.file.contents['.self::$file_name_json_with_image_for_binary_item.',]'],
+					'value_type' => ITEM_VALUE_TYPE_BINARY,
+					'delay' => '0s',
+					'preprocessing' =>
+						[[
+							'type' => ZBX_PREPROC_JSONPATH,
+							'params' => '$.screenshot_image',
+							'error_handler' => 0,
+							'error_handler_params' => ''
+						]]
 				],
 				[
 					'name' => 'BINARY_IMAGE_EMPTY',
@@ -395,7 +357,7 @@ class testBinaryAndJSONValueTypesDataCollection extends CIntegrationTest {
 					'name' => 'STR_VALUE_TYPE_DEP_WITH_PREPROC',
 					'key_' => 'STR_VALUE_TYPE_DEP_WITH_PREPROC',
 					'type' => ITEM_TYPE_DEPENDENT,
-					'master_itemid' => self::$itemids['agent:vfs.file.contents['.self::$file_name_json_with_image_for_json_item.',]'],
+					'master_itemid' => self::$itemids['proxy_agent:vfs.file.contents['.self::$file_name_json_with_image_for_json_item.',]'],
 					'value_type' => ITEM_VALUE_TYPE_STR,
 					'delay' => '0s',
 					'preprocessing' =>
