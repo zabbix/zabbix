@@ -81,7 +81,7 @@ class testBinaryAndJSONValueTypesDataCollection extends CIntegrationTest {
 		$base64_invalid = self::base64_invalid;
 		$json_data_http_response = self::json_data_http_response;
 
-		$tls_handshake = self::dns_handshake;
+		$tls_handshake = self::tls_handshake;
 		$error_message = self::error_message;
 
 		self::$json_with_image = <<<HEREA
@@ -521,7 +521,7 @@ class testBinaryAndJSONValueTypesDataCollection extends CIntegrationTest {
 		]);
 
 		$this->assertEquals(1, count($response['result']), json_encode($response['result']));
-		$this->assertEquals($response['result'][0]['value'], self::dns_handshake);
+		$this->assertEquals($response['result'][0]['value'], self::tls_handshake);
 	}
 
 	/**
@@ -592,7 +592,7 @@ class testBinaryAndJSONValueTypesDataCollection extends CIntegrationTest {
 		]);
 
 		$this->assertEquals(1, count($response['result']), json_encode($response['result']));
-		$this->assertEquals($response['result'][0]['value'], self::dns_handshake);
+		$this->assertEquals($response['result'][0]['value'], self::tls_handshake);
 	}
 
 	/**
