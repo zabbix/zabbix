@@ -510,7 +510,7 @@ class testBinaryAndJSONValueTypesDataCollection extends CIntegrationTest {
 		$this->assertEquals(self::$json_image_normalized, $json_result);
 
 		// Dependent
-		$this->checkItemState('agent:TEXT_VALUE_TYPE_DEP_FROM_TRAPPER_WITH_PREPROC', ITEM_STATE_SUPPORTED);
+		$this->checkItemState('agent:TEXT_VALUE_TYPE_DEP_FROM_TRAPPER_WITH_PREPROC', ITEM_STATE_NORMAL);
 		$response = $this->callUntilDataIsPresent('history.get', [
 			'itemids'	=>	self::$itemids['agent:TEXT_VALUE_TYPE_DEP_FROM_TRAPPER_WITH_PREPROC'],
 			'history'	=>	ITEM_VALUE_TYPE_TEXT,
@@ -521,7 +521,7 @@ class testBinaryAndJSONValueTypesDataCollection extends CIntegrationTest {
 		$this->assertEquals(1, count($response['result']), json_encode($response['result']));
 		$this->assertEquals($response['result'][0]['value'], self::error_message);
 
-		$this->checkItemState('agent:UINT64_VALUE_TYPE_DEP_FROM_TRAPPER_WITH_PREPROC', ITEM_STATE_SUPPORTED);
+		$this->checkItemState('agent:UINT64_VALUE_TYPE_DEP_FROM_TRAPPER_WITH_PREPROC', ITEM_STATE_NORMAL);
 		$response = $this->callUntilDataIsPresent('history.get', [
 			'itemids'	=>	self::$itemids['agent:UINT64_VALUE_TYPE_DEP_FROM_TRAPPER_WITH_PREPROC'],
 			'history'	=>	ITEM_VALUE_TYPE_UINT64,
@@ -585,7 +585,7 @@ class testBinaryAndJSONValueTypesDataCollection extends CIntegrationTest {
 		$this->assertEquals(self::$json_image_normalized, $json_result);
 
 		// Dependent
-		$this->checkItemState('proxy_agent:TEXT_VALUE_TYPE_DEP_FROM_TRAPPER_WITH_PREPROC', ITEM_STATE_SUPPORTED);
+		$this->checkItemState('proxy_agent:TEXT_VALUE_TYPE_DEP_FROM_TRAPPER_WITH_PREPROC', ITEM_STATE_NORMAL);
 		$response = $this->callUntilDataIsPresent('history.get', [
 			'itemids'	=>	self::$itemids['proxy_agent:TEXT_VALUE_TYPE_DEP_FROM_TRAPPER_WITH_PREPROC'],
 			'history'	=>	ITEM_VALUE_TYPE_TEXT,
@@ -596,7 +596,7 @@ class testBinaryAndJSONValueTypesDataCollection extends CIntegrationTest {
 		$this->assertEquals(1, count($response['result']), json_encode($response['result']));
 		$this->assertEquals($response['result'][0]['value'], self::error_message);
 
-		$this->checkItemState('proxy_agent:UINT64_VALUE_TYPE_DEP_FROM_TRAPPER_WITH_PREPROC', ITEM_STATE_SUPPORTED);
+		$this->checkItemState('proxy_agent:UINT64_VALUE_TYPE_DEP_FROM_TRAPPER_WITH_PREPROC', ITEM_STATE_NORMAL);
 		$response = $this->callUntilDataIsPresent('history.get', [
 			'itemids'	=>	self::$itemids['proxy_agent:UINT64_VALUE_TYPE_DEP_FROM_TRAPPER_WITH_PREPROC'],
 			'history'	=>	ITEM_VALUE_TYPE_UINT64,
