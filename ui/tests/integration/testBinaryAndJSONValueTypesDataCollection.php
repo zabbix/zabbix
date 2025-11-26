@@ -560,7 +560,10 @@ class testBinaryAndJSONValueTypesDataCollection extends CIntegrationTest {
 		// Retrieve JSON item value type history data from API
 		$active_data = $this->callUntilDataIsPresent('history.get', [
 			'itemids'	=>	self::$itemids['agent:JSON_VALUE_TYPE_DEP_WITH_PREPROC'],
-			'history'	=>	ITEM_VALUE_TYPE_JSON
+			'history'	=>	ITEM_VALUE_TYPE_JSON,
+			'sortfield'	=>	"clock",
+			'sortorder'	=>	"DESC",
+			'limit'		=>	1
 		]);
 
 		$this->assertEquals(1, count($active_data['result']), json_encode($active_data['result']));
@@ -661,7 +664,10 @@ class testBinaryAndJSONValueTypesDataCollection extends CIntegrationTest {
 		// Retrieve JSON item value type history data from API
 		$active_data = $this->callUntilDataIsPresent('history.get', [
 			'itemids'	=>	self::$itemids['proxy_agent:JSON_VALUE_TYPE_DEP_WITH_PREPROC'],
-			'history'	=>	ITEM_VALUE_TYPE_JSON
+			'history'	=>	ITEM_VALUE_TYPE_JSON,
+			'sortfield'     =>      "clock",
+			'sortorder'     =>      "DESC",
+			'limit'         =>      1
 		]);
 
 		$this->assertEquals(1, count($active_data['result']));
