@@ -132,27 +132,17 @@ class ZTextareaFlexible extends HTMLElement {
 
 		this.#textarea.addEventListener('keydown', this.#events.textareaKeydown);
 		this.#textarea.addEventListener('blur', this.#events.textareaBlur);
-
-		['input', 'keyup', 'paste'].forEach(listen_event =>
-			this.addEventListener(listen_event, e => {
-				if (e.target === this.#textarea) {
-					this.#events.textareaResize(e);
-				}
-			})
-		);
+		this.#textarea.addEventListener('input', this.#events.textareaResize);
+		this.#textarea.addEventListener('keyup', this.#events.textareaResize);
+		this.#textarea.addEventListener('paste', this.#events.textareaResize);
 	}
 
 	#unregisterEvents() {
 		this.#textarea.removeEventListener('keydown', this.#events.textareaKeydown);
 		this.#textarea.removeEventListener('blur', this.#events.textareaBlur);
-
-		['input', 'keyup', 'paste'].forEach(listen_event =>
-			this.removeEventListener(listen_event, e => {
-				if (e.target === this.#textarea) {
-					this.#events.textareaResize(e);
-				}
-			})
-		);
+		this.#textarea.removeEventListener('input', this.#events.textareaResize);
+		this.#textarea.removeEventListener('keyup', this.#events.textareaResize);
+		this.#textarea.removeEventListener('paste', this.#events.textareaResize);
 	}
 
 	#updateHeight() {
