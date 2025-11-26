@@ -436,26 +436,25 @@ class CControllerPopupMassupdateHost extends CControllerPopupMassupdateAbstract 
 								break;
 
 							case ZBX_ACTION_REMOVE:
-								if ($macros) {
-									$except_selected = $this->getInput('macros_remove', 0);
-									$host_macros_by_macro = array_column($host['macros'], null, 'macro');
-									$macros_by_macro = array_column($macros, null, 'macro');
+								if ($host['macros'] && $macros) {
+									$host['macros'] = array_column($host['macros'], null, 'macro');
+									$matched_macros = [];
 
-									foreach ($macros_by_macro as $key => $value) {
-										$trimmed_macro = CApiInputValidator::trimMacro($key);
+									foreach ($host['macros'] as $host_macro => $foo) {
+										$trimmed_macro = CApiInputValidator::trimMacro($host_macro);
 
-										foreach ($host_macros_by_macro as $key_host => $value_host) {
-											$trimmed_host_macro = CApiInputValidator::trimMacro($key_host);
+										foreach ($macros as $macro) {
+											if (CApiInputValidator::trimMacro($macro['macro']) === $trimmed_macro) {
+												$matched_macros[$host_macro] = true;
 
-											if ($trimmed_macro == $trimmed_host_macro) {
-												$host['macros'] = [$key_host => $value_host];
+												continue 2;
 											}
 										}
 									}
 
-									$host['macros'] = $except_selected
-										? array_intersect_key($host_macros_by_macro, $host['macros'])
-										: array_diff_key($host_macros_by_macro, $host['macros']);
+									$host['macros'] = (bool) $this->getInput('macros_remove', 0)
+										? array_intersect_key($host['macros'], $matched_macros)
+										: array_diff_key($host['macros'], $matched_macros);
 								}
 								break;
 

@@ -306,26 +306,25 @@ class CControllerTemplateMassupdate extends CControllerPopupMassupdateAbstract {
 								break;
 
 							case ZBX_ACTION_REMOVE:
-								if ($macros) {
-									$except_selected = $this->getInput('macros_remove', 0);
-									$template_macros_by_macro = array_column($template['macros'], null, 'macro');
-									$macros_by_macro = array_column($macros, null, 'macro');
+								if ($template['macros'] && $macros) {
+									$template['macros'] = array_column($template['macros'], null, 'macro');
+									$matched_macros = [];
 
-									foreach ($macros_by_macro as $key => $value) {
-										$trimmed_macro = CApiInputValidator::trimMacro($key);
+									foreach ($template['macros'] as $template_macro => $foo) {
+										$trimmed_macro = CApiInputValidator::trimMacro($template_macro);
 
-										foreach ($template_macros_by_macro as $key_template => $value_template) {
-											$trimmed_template_macro = CApiInputValidator::trimMacro($key_template);
+										foreach ($macros as $macro) {
+											if (CApiInputValidator::trimMacro($macro['macro']) === $trimmed_macro) {
+												$matched_macros[$template_macro] = true;
 
-											if ($trimmed_macro == $trimmed_template_macro) {
-												$template['macros'] = [$key_template => $value_template];
+												continue 2;
 											}
 										}
 									}
 
-									$template['macros'] = $except_selected
-										? array_intersect_key($template_macros_by_macro, $template['macros'])
-										: array_diff_key($template_macros_by_macro, $template['macros']);
+									$template['macros'] = (bool) $this->getInput('macros_remove', 0)
+										? array_intersect_key($template['macros'], $matched_macros)
+										: array_diff_key($template['macros'], $matched_macros);
 								}
 								break;
 
