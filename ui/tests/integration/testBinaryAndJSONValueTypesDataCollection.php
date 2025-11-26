@@ -341,6 +341,8 @@ class testBinaryAndJSONValueTypesDataCollection extends CIntegrationTest {
 						[[
 							'type' => ZBX_PREPROC_JSONPATH,
 							'params' => '$.http_response',
+							'error_handler' => 0,
+							'error_handler_params' => ''
 						]]
 				],
 				[
@@ -400,6 +402,8 @@ class testBinaryAndJSONValueTypesDataCollection extends CIntegrationTest {
 						[[
 							'type' => ZBX_PREPROC_JSONPATH,
 							'params' => '$.http_response',
+							'error_handler' => 0,
+							'error_handler_params' => ''
 						]]
 				],
 				]
