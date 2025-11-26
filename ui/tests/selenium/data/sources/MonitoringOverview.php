@@ -330,10 +330,24 @@ class MonitoringOverview {
 			DBexecute('UPDATE task SET clock=1533631968 WHERE taskid='.zbx_dbstr($id));
 		}
 
+		CDataHelper::call('mediatype.create', [
+			[
+				'type' => MEDIA_TYPE_WEBHOOK,
+				'name' => 'URL test webhook',
+				'status' => MEDIA_STATUS_ACTIVE,
+				'script' => 'return 0;',
+				'show_event_menu' => ZBX_EVENT_MENU_SHOW,
+				'event_menu_name' => 'Webhook url for all',
+				'event_menu_url' => 'zabbix.php?action=mediatype.edit&mediatypeid=101',
+				'description' => 'Webhook media type for URL test'
+			]
+		]);
+
 		return [
 			'itemids' => $itemids,
 			'eventids' => $eventids,
-			'triggerids' => $triggerids
+			'triggerids' => $triggerids,
+			'groupids' => $groupids
 		];
 	}
 }
