@@ -2640,11 +2640,8 @@ static int	hc_queue_elem_compare_func(const void *d1, const void *d2)
 	const zbx_binary_heap_elem_t	*e1 = (const zbx_binary_heap_elem_t *)d1;
 	const zbx_binary_heap_elem_t	*e2 = (const zbx_binary_heap_elem_t *)d2;
 
-	const zbx_hc_item_t	*item1 = (const zbx_hc_item_t *)e1->data;
-	const zbx_hc_item_t	*item2 = (const zbx_hc_item_t *)e2->data;
-
 	/* compare by timestamp of the oldest value */
-	return zbx_timespec_compare(&item1->tail->ts, &item2->tail->ts);
+	return zbx_timespec_compare(&((const zbx_hc_item_t *)e1)->ts, &((const zbx_hc_item_t *)e2)->ts);
 }
 
 /******************************************************************************
@@ -3158,12 +3155,14 @@ static void	hc_add_item_values(dc_item_value_t *values, int values_num)
 		if (NULL == item)
 		{
 			item = hc_add_item(item_value->itemid, data);
+			item->ts = data->ts;
 			hc_queue_item(item);
 		}
 		else if (NULL == item->tail)
 		{
 			item->tail = data;
 			item->head = data;
+			item->ts = data->ts;
 			hc_queue_item(item);
 		}
 		else
@@ -3338,7 +3337,10 @@ void	zbx_hc_push_items(zbx_vector_hc_item_ptr_t *history_items)
 						zbx_hashset_remove(&cache->history_items, item);
 				}
 				else
+				{
+					item->ts = item->tail->ts;
 					hc_queue_item(item);
+				}
 				break;
 		}
 	}
