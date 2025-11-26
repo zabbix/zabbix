@@ -1494,9 +1494,6 @@ class CMacrosResolverGeneral {
 									? CMacroFunction::calcMacrofunc($db_item['lastvalue'], $macro_data['macrofunc'])
 									: formatHistoryValue($db_item['lastvalue'], $db_item);
 							}
-							else {
-								$macro_values[$macro_data['macro']] = UNRESOLVED_MACRO_STRING;
-							}
 						}
 					}
 				}
@@ -1506,7 +1503,8 @@ class CMacrosResolverGeneral {
 						'webitems' => true,
 						'filter' => [
 							'host' => $host,
-							'key_' => array_keys($keys)
+							'key_' => array_keys($keys),
+							'value_type' => [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64]
 						]
 					]);
 
@@ -1520,9 +1518,6 @@ class CMacrosResolverGeneral {
 										$macro_values[$macro_data['macro']] = array_key_exists('macrofunc', $macro_data)
 											? CMacroFunction::calcMacrofunc($value, $macro_data['macrofunc'])
 											: convertUnits(['value' => $value, 'units' => $db_item['units']]);
-									}
-									else {
-										$macro_values[$macro_data['macro']] = UNRESOLVED_MACRO_STRING;
 									}
 								}
 							}
