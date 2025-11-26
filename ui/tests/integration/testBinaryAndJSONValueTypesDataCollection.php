@@ -540,7 +540,8 @@ class testBinaryAndJSONValueTypesDataCollection extends CIntegrationTest {
 			'history'	=>	ITEM_VALUE_TYPE_BINARY,
 			'sortfield'	=>	"clock",
 			'sortorder'	=>	"DESC",
-			'limit'		=>	1
+			'limit'		=>	1,
+			'maxValueSize'  =>	null //TEMPORARY, REMOVE !!!
 		]);
 
 		$this->assertEquals(1, count($active_data['result']), json_encode($active_data['result']));
@@ -649,7 +650,8 @@ class testBinaryAndJSONValueTypesDataCollection extends CIntegrationTest {
 			'history'	=>	ITEM_VALUE_TYPE_BINARY,
 			'sortfield'	=>	"clock",
 			'sortorder'	=>	"DESC",
-			'limit'		=>	1
+			'limit'		=>	1,
+			'maxValueSize'	=>	null // TEMPORARY, REMOVE !!!
 		]);
 
 		$this->assertEquals(1, count($active_data['result']));
