@@ -58,7 +58,7 @@ class testBinaryAndJSONValueTypesDataCollection extends CIntegrationTest {
 		$data = json_decode($json, true);
 
 		if (json_last_error() !== JSON_ERROR_NONE) {
-			throw new InvalidArgumentException('Invalid JSON: ' . json_last_error_msg());
+			throw new InvalidArgumentException('Invalid JSON: ' . json_last_error_msg() . " ; input: " . json_encode($json));
 		}
 
 		self::ksort_recursive($data);
