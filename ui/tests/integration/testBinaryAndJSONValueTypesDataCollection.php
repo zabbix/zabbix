@@ -509,6 +509,29 @@ class testBinaryAndJSONValueTypesDataCollection extends CIntegrationTest {
 
 		$this->assertEquals(self::$json_image_normalized, $json_result);
 
+		// Dependent
+		$response = $this->callUntilDataIsPresent('history.get', [
+			'itemids'	=>	self::$itemids['agent:TEXT_VALUE_TYPE_DEP_FROM_TRAPPER_WITH_PREPROC'],
+			'history'	=>	ITEM_VALUE_TYPE_TEXT,
+			'sortfield'	=>	'clock',
+			'sortorder'	=>	'ASC'
+		]);
+
+		$this->assertEquals(1, count($response['result']), json_encode($response['result']));
+		$this->assertEquals($response['result'][0]['value'], self::error_message);
+
+		$response = $this->callUntilDataIsPresent('history.get', [
+			'itemids'	=>	self::$itemids['agent:UINT64_VALUE_TYPE_DEP_FROM_TRAPPER_WITH_PREPROC'],
+			'history'	=>	ITEM_VALUE_TYPE_UINT64,
+			'sortfield'	=>	'clock',
+			'sortorder'	=>	'ASC'
+		]);
+
+		$this->assertEquals(1, count($response['result']), json_encode($response['result']));
+		$this->assertEquals($response['result'][0]['value'], self::tls_handshake);
+
+		// Invalid JSON
+
 		$this->sendSenderValue('agent', 'JSON_TRAPPER', self::$invalid_json);
 		$this->checkItemState('agent:JSON_TRAPPER', ITEM_STATE_NOTSUPPORTED);
 
@@ -534,26 +557,6 @@ class testBinaryAndJSONValueTypesDataCollection extends CIntegrationTest {
 		$this->assertEquals(2, count($response['result']), json_encode($response['result']));
 		$this->assertEquals(json_encode($response['result'][1]['value']), json_encode("{}"));
 
-		// Dependent
-		$response = $this->callUntilDataIsPresent('history.get', [
-			'itemids'	=>	self::$itemids['agent:TEXT_VALUE_TYPE_DEP_FROM_TRAPPER_WITH_PREPROC'],
-			'history'	=>	ITEM_VALUE_TYPE_TEXT,
-			'sortfield'	=>	'clock',
-			'sortorder'	=>	'ASC'
-		]);
-
-		$this->assertEquals(1, count($response['result']), json_encode($response['result']));
-		$this->assertEquals($response['result'][0]['value'], self::error_message);
-
-		$response = $this->callUntilDataIsPresent('history.get', [
-			'itemids'	=>	self::$itemids['agent:UINT64_VALUE_TYPE_DEP_FROM_TRAPPER_WITH_PREPROC'],
-			'history'	=>	ITEM_VALUE_TYPE_UINT64,
-			'sortfield'	=>	'clock',
-			'sortorder'	=>	'ASC'
-		]);
-
-		$this->assertEquals(1, count($response['result']), json_encode($response['result']));
-		$this->assertEquals($response['result'][0]['value'], self::tls_handshake);
 	}
 
 	/**
@@ -579,6 +582,28 @@ class testBinaryAndJSONValueTypesDataCollection extends CIntegrationTest {
 		$json_result = self::normalize_json($response['result'][0]['value']);
 		$this->assertEquals(self::$json_image_normalized, $json_result);
 
+		// Dependent
+		$response = $this->callUntilDataIsPresent('history.get', [
+			'itemids'	=>	self::$itemids['proxy_agent:TEXT_VALUE_TYPE_DEP_FROM_TRAPPER_WITH_PREPROC'],
+			'history'	=>	ITEM_VALUE_TYPE_TEXT,
+			'sortfield'	=>	'clock',
+			'sortorder'	=>	'ASC'
+		]);
+
+		$this->assertEquals(1, count($response['result']), json_encode($response['result']));
+		$this->assertEquals($response['result'][0]['value'], self::error_message);
+
+		$response = $this->callUntilDataIsPresent('history.get', [
+			'itemids'	=>	self::$itemids['proxy_agent:UINT64_VALUE_TYPE_DEP_FROM_TRAPPER_WITH_PREPROC'],
+			'history'	=>	ITEM_VALUE_TYPE_UINT64,
+			'sortfield'	=>	'clock',
+			'sortorder'	=>	'ASC'
+		]);
+
+		$this->assertEquals(1, count($response['result']), json_encode($response['result']));
+		$this->assertEquals($response['result'][0]['value'], self::tls_handshake);
+
+		// Invalid JSON
 		$this->sendSenderValue('proxy_agent', 'JSON_TRAPPER', self::$invalid_json, self::COMPONENT_PROXY);
 		$this->checkItemState('proxy_agent:JSON_TRAPPER', ITEM_STATE_NOTSUPPORTED);
 
@@ -605,26 +630,6 @@ class testBinaryAndJSONValueTypesDataCollection extends CIntegrationTest {
 		$this->assertEquals($response['result'][0]['value'], "null");
 
 
-		// Dependent
-		$response = $this->callUntilDataIsPresent('history.get', [
-			'itemids'	=>	self::$itemids['proxy_agent:TEXT_VALUE_TYPE_DEP_FROM_TRAPPER_WITH_PREPROC'],
-			'history'	=>	ITEM_VALUE_TYPE_TEXT,
-			'sortfield'	=>	'clock',
-			'sortorder'	=>	'ASC'
-		]);
-
-		$this->assertEquals(1, count($response['result']), json_encode($response['result']));
-		$this->assertEquals($response['result'][0]['value'], self::error_message);
-
-		$response = $this->callUntilDataIsPresent('history.get', [
-			'itemids'	=>	self::$itemids['proxy_agent:UINT64_VALUE_TYPE_DEP_FROM_TRAPPER_WITH_PREPROC'],
-			'history'	=>	ITEM_VALUE_TYPE_UINT64,
-			'sortfield'	=>	'clock',
-			'sortorder'	=>	'ASC'
-		]);
-
-		$this->assertEquals(1, count($response['result']), json_encode($response['result']));
-		$this->assertEquals($response['result'][0]['value'], self::tls_handshake);
 	}
 
 	/**
