@@ -2641,7 +2641,7 @@ static int	hc_queue_elem_compare_func(const void *d1, const void *d2)
 	const zbx_binary_heap_elem_t	*e2 = (const zbx_binary_heap_elem_t *)d2;
 
 	/* compare by timestamp of the oldest value */
-	return zbx_timespec_compare(&((const zbx_hc_item_t *)e1)->ts, &((const zbx_hc_item_t *)e2)->ts);
+	return zbx_timespec_compare(&((const zbx_hc_item_t *)e1->data)->ts, &((const zbx_hc_item_t *)e2->data)->ts);
 }
 
 /******************************************************************************
