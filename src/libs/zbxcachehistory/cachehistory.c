@@ -3754,9 +3754,12 @@ static void	hc_get_items(zbx_vector_uint64_pair_t *items)
 	zbx_hashset_iter_reset(&cache->history_items, &iter);
 	while (NULL != (item = (zbx_hc_item_t *)zbx_hashset_iter_next(&iter)))
 	{
-		zbx_uint64_pair_t	pair = {item->itemid, item->values_num};
 		if (0 != item->values_num)
+		{
+			zbx_uint64_pair_t	pair = {item->itemid, item->values_num};
+	
 			zbx_vector_uint64_pair_append_ptr(items, &pair);
+		}
 	}
 }
 
