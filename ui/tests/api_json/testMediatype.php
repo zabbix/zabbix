@@ -94,7 +94,7 @@ class testMediatype extends CAPITest {
 			],
 			'OAuth not accepting existing client_secret if token_url has been changed' => [
 				[[
-					'mediatypeid' => ':media_type:OAuth with media type SMTP',
+					'mediatypeid' => ':media_type:OAuth media type SMTP with tokens',
 					'token_url' => 'http://example123.com'
 				]],
 				'Invalid parameter "/1": the parameter "client_secret" is missing.'
@@ -186,6 +186,55 @@ class testMediatype extends CAPITest {
 		$this->call('mediatype.update', $mediatypes, $expected_error);
 	}
 
+	public static function updateOAuthUrlUpdatedDataProvider(): array {
+		return [
+			'User specified tokens_status and changed token_url' => [
+				[[
+					'mediatypeid' => ':media_type:OAuth media type SMTP with tokens',
+					'token_url' => 'http://example123.com',
+					'tokens_status' => 3
+				]],
+				'token_url'
+			],
+			'User did not specified tokens_status and changed token_url' => [
+				[[
+					'mediatypeid' => ':media_type:OAuth accOAuth media type SMTP with tokens',
+					'token_url' => 'http://example123.com',
+				]],
+				'token_url'
+			],
+			'User did not change token_url' => [
+				[[
+					'mediatypeid' => ':media_type:OAuth media type SMTP with tokens',
+					'token_url' => 'http://example.com',
+				]],
+				'token_url'
+			],
+			'User specified tokens_status and changed authorization_url' => [
+				[[
+					'mediatypeid' => ':media_type:OAuth media type SMTP with tokens',
+					'authorization_url' => 'http://example123.com',
+					'tokens_status' => 3
+				]],
+				'authorization_url'
+			],
+			'User did not specified tokens_status and changed authorization_url' => [
+				[[
+					'mediatypeid' => ':media_type:OAuth media type SMTP with tokens',
+					'authorization_url' => 'http://example123.com',
+				]],
+				'authorization_url'
+			],
+			'User did not change authorization_url' => [
+				[[
+					'mediatypeid' => ':media_type:OAuth media type SMTP with tokens',
+					'authorization_url' => 'http://example.com',
+				]],
+				'authorization_url'
+			]
+		];
+	}
+
 	public static function updateAccessTokenUpdatedDataProvider(): array {
 		return [
 			'access_token change updates access_token_updated' => [
@@ -211,6 +260,52 @@ class testMediatype extends CAPITest {
 				false
 			]
 		];
+	}
+
+	/**
+	 * @dataProvider updateOAuthUrlUpdatedDataProvider
+	 */
+	public function testMediatypeUpdateOAuthUrlUpdated(array $mediatypes, string $field_name) {
+		$oauth_url = [];
+		$oauth_url_updated = [];
+		
+		CTestDataHelper::convertMediatypesReferences($mediatypes);
+
+		$result = $this->call('mediatype.get', [
+			'output' => ['mediatypeid', 'tokens_status', $field_name],
+			'mediatypeids' => array_column($mediatypes, 'mediatypeid')
+		])['result'];
+
+		$oauth_url[$field_name] = $result[0]['token_url'];
+		$oauth_url['tokens_status'] = $result[0]['tokens_status'];
+
+		sleep(1);
+
+		$this->call('mediatype.update', $mediatypes);
+		
+		$result = $this->call('mediatype.get', [
+			'output' => ['mediatypeid', 'tokens_status', $field_name],
+			'mediatypeids' => array_column($mediatypes, 'mediatypeid')
+		])['result'];
+		
+		$oauth_url_updated[$field_name] = $result[0]['token_url'];
+		$oauth_url_updated['tokens_status'] = $result[0]['tokens_status'];
+
+		if ($oauth_url[$field_name] !== $oauth_url_updated[$field_name]
+				&& !array_key_exists('tokens_status', $mediatypes[0])) {
+			$this->assertEquals(0, $oauth_url_updated['tokens_status'], 'tokens_status has been changed to 0.');
+		}
+		elseif ($oauth_url[$field_name] !== $oauth_url_updated[$field_name]
+				&& array_key_exists('tokens_status', $mediatypes[0])) {
+			$this->assertEquals($mediatypes[0]['tokens_status'], $oauth_url_updated['tokens_status'],
+				'tokens_status has been changed to '.$oauth_url_updated['tokens_status'].'.'
+			);
+		}
+		else {
+			$this->assertEquals($oauth_url['tokens_status'], $oauth_url_updated['tokens_status'],
+				'tokens_status stay unchanged.'
+			);
+		}
 	}
 
 	/**
@@ -489,7 +584,22 @@ class testMediatype extends CAPITest {
 				'tokens_status' => 0
 			],
 			[
-				'name' => 'OAuth with media type SMTP',
+				'name' => 'OAuth media type SMTP with tokens',
+				'type' => MEDIA_TYPE_EMAIL,
+				'provider' => CMediatypeHelper::EMAIL_PROVIDER_SMTP,
+				'smtp_server' => 'smtp.generic.com',
+				'smtp_helo' => 'example.com',
+				'smtp_email' => 'zabbix@example.com',
+				'smtp_authentication' => SMTP_AUTHENTICATION_OAUTH,
+				'redirection_url' => 'http://example.com',
+				'client_id' => 'client_id',
+				'client_secret' => 'client',
+				'authorization_url' => 'http://example.com',
+				'token_url' => 'http://example.com',
+				'tokens_status' => 3
+			],
+			[
+				'name' => 'OAuth media type SMTP without tokens',
 				'type' => MEDIA_TYPE_EMAIL,
 				'provider' => CMediatypeHelper::EMAIL_PROVIDER_SMTP,
 				'smtp_server' => 'smtp.generic.com',
