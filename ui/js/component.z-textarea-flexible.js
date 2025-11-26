@@ -48,6 +48,7 @@ class ZTextareaFlexible extends HTMLElement {
 			this.#textarea.disabled = this.hasAttribute('disabled');
 			this.#textarea.readOnly = this.hasAttribute('readonly');
 			this.#textarea.singleline = this.hasAttribute('singleline')	? this.getAttribute('singleline') : null;
+			this.#textarea.spellcheck = this.getAttribute('spellcheck') !== 'false';
 
 			if (this.hasAttribute('class')) {
 				this.#textarea.classList.add(this.getAttribute('class'));
@@ -68,7 +69,8 @@ class ZTextareaFlexible extends HTMLElement {
 	}
 
 	static get observedAttributes() {
-		return ['width', 'height', 'value', 'maxlength', 'placeholder', 'disabled', 'readonly', 'singleline'];
+		return ['width', 'height', 'value', 'maxlength', 'placeholder', 'disabled', 'readonly', 'singleline',
+			'spellcheck'];
 	}
 
 	attributeChangedCallback(name, old_value, new_value) {
@@ -107,6 +109,10 @@ class ZTextareaFlexible extends HTMLElement {
 
 			case 'singleline':
 				this.#textarea.singleline = new_value;
+				break;
+
+			case 'spellcheck':
+				this.#textarea.spellcheck = new_value !== 'false';
 				break;
 
 			default:
@@ -244,6 +250,14 @@ class ZTextareaFlexible extends HTMLElement {
 
 	set singleline(singleline) {
 		this.setAttribute('singleline', singleline);
+	}
+
+	get spellcheck() {
+		return this.#textarea.spellcheck;
+	}
+
+	set spellcheck(spellcheck) {
+		this.setAttribute('spellcheck', String(spellcheck));
 	}
 }
 
