@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-04-02 17:26+0300\n"
-"PO-Revision-Date: 2025-10-03 11:21+0000\n"
+"PO-Revision-Date: 2025-10-30 17:04+0000\n"
 "Last-Translator: Vicente Salvador <vicentesalvadorcubedo@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: es\n"
@@ -16836,7 +16836,7 @@ msgstr "Hora de inicio del servidor Zabbix, marca de tiempo Unix."
 #: include/views/configuration.maintenance.list.php:89
 #: include/views/configuration.triggers.list.php:80
 msgid "State"
-msgstr "Estado"
+msgstr "Condición"
 
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:155
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:227
