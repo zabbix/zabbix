@@ -580,7 +580,10 @@ class testBinaryAndJSONValueTypesDataCollection extends CIntegrationTest {
 		// Retrieve JSON item value type history data from API, dep
 		$json_dep_data = $this->callUntilDataIsPresent('history.get', [
 			'itemids'	=>	self::$itemids['agent:JSON_VALUE_TYPE_DEP'],
-			'history'	=>	ITEM_VALUE_TYPE_JSON
+			'history'	=>	ITEM_VALUE_TYPE_JSON,
+			'sortfield'	=>	"clock",
+			'sortorder'	=>	"DESC",
+			'limit'		=>	1
 		]);
 
 		$this->assertEquals(1, count($json_dep_data['result']), json_encode($json_dep_data['result']));
