@@ -172,7 +172,7 @@ static void	process_values(icmpitem_t *items, int first_index, int last_index, z
 
 static int	zbx_parse_key_params(const char *key, const char *host_addr, icmpping_t *icmpping, char **addr,
 		int *count, int *interval, int *size, int *timeout, icmppingsec_type_t *type,
-		unsigned char *allow_redirect, char *error, int max_error_len)
+		unsigned char *allow_redirect, char **error)
 {
 /* defines for `fping' and `fping6' to successfully process pings */
 #define MIN_COUNT	1
@@ -189,7 +189,7 @@ static int	zbx_parse_key_params(const char *key, const char *host_addr, icmpping
 
 	if (SUCCEED != zbx_parse_item_key(key, &request))
 	{
-		zbx_snprintf(error, (size_t)max_error_len, "Invalid item key format.");
+		*error = zbx_strdup(NULL, "Invalid item key format.");
 		goto out;
 	}
 
@@ -207,13 +207,13 @@ static int	zbx_parse_key_params(const char *key, const char *host_addr, icmpping
 	}
 	else
 	{
-		zbx_snprintf(error, (size_t)max_error_len, "Unsupported pinger key.");
+		*error = zbx_strdup(NULL, "Unsupported pinger key.");
 		goto out;
 	}
 
 	if (7 < get_rparams_num(&request) || (ICMPPINGSEC != *icmpping && 6 < get_rparams_num(&request)))
 	{
-		zbx_snprintf(error, (size_t)max_error_len, "Too many arguments.");
+		*error = zbx_strdup(NULL, "Too many arguments.");
 		goto out;
 	}
 
@@ -223,8 +223,8 @@ static int	zbx_parse_key_params(const char *key, const char *host_addr, icmpping
 	}
 	else if (FAIL == zbx_is_uint31(tmp, count) || MIN_COUNT > *count || *count > MAX_COUNT)
 	{
-		zbx_snprintf(error, (size_t)max_error_len, "Number of packets \"%s\" is not between %d and %d.",
-				tmp, MIN_COUNT, MAX_COUNT);
+		*error = zbx_dsprintf(NULL, "Number of packets \"%s\" is not between %d and %d.", tmp, MIN_COUNT,
+				MAX_COUNT);
 		goto out;
 	}
 
@@ -234,7 +234,7 @@ static int	zbx_parse_key_params(const char *key, const char *host_addr, icmpping
 	}
 	else if (FAIL == zbx_is_uint31(tmp, interval) || MIN_INTERVAL > *interval)
 	{
-		zbx_snprintf(error, (size_t)max_error_len, "Interval \"%s\" should be at least %d.", tmp, MIN_INTERVAL);
+		*error = zbx_dsprintf(NULL, "Interval \"%s\" should be at least %d.", tmp, MIN_INTERVAL);
 		goto out;
 	}
 
@@ -244,8 +244,7 @@ static int	zbx_parse_key_params(const char *key, const char *host_addr, icmpping
 	}
 	else if (FAIL == zbx_is_uint31(tmp, size) || MIN_SIZE > *size || *size > MAX_SIZE)
 	{
-		zbx_snprintf(error, (size_t)max_error_len, "Packet size \"%s\" is not between %d and %d.",
-				tmp, MIN_SIZE, MAX_SIZE);
+		*error = zbx_dsprintf(NULL, "Packet size \"%s\" is not between %d and %d.", tmp, MIN_SIZE, MAX_SIZE);
 		goto out;
 	}
 
@@ -255,7 +254,7 @@ static int	zbx_parse_key_params(const char *key, const char *host_addr, icmpping
 	}
 	else if (FAIL == zbx_is_uint31(tmp, timeout) || MIN_TIMEOUT > *timeout)
 	{
-		zbx_snprintf(error, (size_t)max_error_len, "Timeout \"%s\" should be at least %d.", tmp, MIN_TIMEOUT);
+		*error = zbx_dsprintf(NULL, "Timeout \"%s\" should be at least %d.", tmp, MIN_TIMEOUT);
 		goto out;
 	}
 
@@ -280,7 +279,7 @@ static int	zbx_parse_key_params(const char *key, const char *host_addr, icmpping
 		}
 		else
 		{
-			zbx_snprintf(error, (size_t)max_error_len, "Mode \"%s\" is not supported.", tmp);
+			*error = zbx_dsprintf(NULL, "Mode \"%s\" is not supported.", tmp);
 			goto out;
 		}
 	}
@@ -295,8 +294,7 @@ static int	zbx_parse_key_params(const char *key, const char *host_addr, icmpping
 	}
 	else
 	{
-		zbx_snprintf(error, (size_t)max_error_len, "\"%s\" is not supported as the \"options\" parameter value"
-				".", tmp);
+		*error = zbx_dsprintf(NULL, "\"%s\" is not supported as the \"options\" parameter value.", tmp);
 		goto out;
 	}
 
@@ -304,8 +302,7 @@ static int	zbx_parse_key_params(const char *key, const char *host_addr, icmpping
 	{
 		if (NULL == host_addr || '\0' == *host_addr)
 		{
-			zbx_snprintf(error, (size_t)max_error_len,
-						"Ping item must have target or host interface specified.");
+			*error = zbx_strdup(NULL, "Ping item must have target or host interface specified.");
 			goto out;
 		}
 		*addr = strdup(host_addr);
@@ -452,7 +449,7 @@ static void	get_pinger_hosts(icmpitem_t **icmp_items, int *icmp_items_alloc, int
 			errmsg = zbx_strdup(NULL, error);
 		}
 		else if (SUCCEED == (rc = zbx_parse_key_params(items[i].key, items[i].interface.addr, &icmpping, &addr,
-				&count, &interval, &size, &timeout, &type, &allow_redirect, error, sizeof(error))) &&
+				&count, &interval, &size, &timeout, &type, &allow_redirect, &errmsg)) &&
 				SUCCEED == (rc = zbx_interval_preproc(items[i].delay, &delay_s, NULL, &errmsg)))
 		{
 			add_icmpping_item(icmp_items, icmp_items_alloc, icmp_items_count, count, interval, size,
@@ -467,7 +464,7 @@ static void	get_pinger_hosts(icmpitem_t **icmp_items, int *icmp_items_alloc, int
 
 			items[i].state = ITEM_STATE_NOTSUPPORTED;
 			zbx_preprocess_item_value(items[i].itemid, items[i].host.hostid, items[i].value_type,
-					items[i].flags, items[i].preprocessing, NULL, &ts, items[i].state, error);
+					items[i].flags, items[i].preprocessing, NULL, &ts, items[i].state, errmsg);
 
 			zbx_dc_requeue_items(&items[i].itemid, &ts.sec, &errcode, 1);
 			zbx_free(errmsg);
