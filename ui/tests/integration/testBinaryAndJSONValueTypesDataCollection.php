@@ -31,6 +31,8 @@ class testBinaryAndJSONValueTypesDataCollection extends CIntegrationTest {
 	const base64_empty = "";
 	const base64_invalid = "a";
 	const json_data_http_response = "200";
+	const tls_handshake = 230;
+	const error_message = "assertion failed: element id top-header not found";
 
 	static $file_name_json_with_image_for_binary_item;
 	static $file_name_json_with_image_for_json_item;
@@ -79,10 +81,13 @@ class testBinaryAndJSONValueTypesDataCollection extends CIntegrationTest {
 		$base64_invalid = self::base64_invalid;
 		$json_data_http_response = self::json_data_http_response;
 
+		$tls_handshake = self::dns_handshake;
+		$error_message = self::error_message;
+
 		self::$json_with_image = <<<HEREA
 		{
 			"result": "fail",
-			"error_message": "assertion failed: element id top-header not found",
+			"error_message": $error_message,
 			"http_response": "$json_data_http_response",
 			"start_time": {
 			"value": "Nov 11 10:00:00 2022 GMT",
@@ -91,7 +96,7 @@ class testBinaryAndJSONValueTypesDataCollection extends CIntegrationTest {
 			"duration": 11628,
 			"performance_timings": {
 			"download": 1070,
-			"tls_handshake": 230,
+			"tls_handshake": $tls_handshake,
 			"dns_lookup": 290
 			},
 			"screenshot_image": "$base64_image",
@@ -308,6 +313,36 @@ class testBinaryAndJSONValueTypesDataCollection extends CIntegrationTest {
 						]]
 				],
 				[
+						'name' => 'TEXT_VALUE_TYPE_DEP_FROM_TRAPPER_WITH_PREPROC',
+						'key_' => 'TEXT_VALUE_TYPE_DEP_FROM_TRAPPER_WITH_PREPROC',
+						'type' => ITEM_TYPE_DEPENDENT,
+						'master_itemid' => self::$itemids['JSON_TRAPPER'],
+						'value_type' => ITEM_VALUE_TYPE_TEXT,
+						'delay' => '0s',
+						'preprocessing' =>
+						[[
+							'type' => ZBX_PREPROC_JSONPATH,
+							'params' => '$.error_message',
+							'error_handler' => 0,
+							'error_handler_params' => ''
+						]]
+				],
+				[
+						'name' => 'UINT64_VALUE_TYPE_DEP_FROM_TRAPPER_WITH_PREPROC',
+						'key_' => 'UINT64_VALUE_TYPE_DEP_FROM_TRAPPER_WITH_PREPROC',
+						'type' => ITEM_TYPE_DEPENDENT,
+						'master_itemid' => self::$itemids['JSON_TRAPPER'],
+						'value_type' => ITEM_VALUE_TYPE_UINT64,
+						'delay' => '0s',
+						'preprocessing' =>
+						[[
+							'type' => ZBX_PREPROC_JSONPATH,
+							'params' => '$.tls_handshake',
+							'error_handler' => 0,
+							'error_handler_params' => ''
+						]]
+				],
+				[
 						'name' => 'JSON_VALUE_TYPE_DEP_INVALID',
 						'key_' => 'JSON_VALUE_TYPE_DEP_INVALID',
 						'type' => ITEM_TYPE_DEPENDENT,
@@ -466,6 +501,27 @@ class testBinaryAndJSONValueTypesDataCollection extends CIntegrationTest {
 
 		$this->assertEquals(2, count($response['result']), json_encode($response['result']));
 		$this->assertEquals(json_encode($response['result'][1]['value']), json_encode("{}"));
+
+		// Dependent
+		$response = $this->callUntilDataIsPresent('history.get', [
+			'itemids'	=>	self::$itemids['agent:TEXT_VALUE_TYPE_DEP_FROM_TRAPPER_WITH_PREPROC'],
+			'history'	=>	ITEM_VALUE_TYPE_TEXT,
+			'sortfield'	=>	'clock',
+			'sortorder'	=>	'ASC'
+		]);
+
+		$this->assertEquals(1, count($response['result']), json_encode($response['result']));
+		$this->assertEquals($response['result'][0]['value'], self::error_message);
+
+		$response = $this->callUntilDataIsPresent('history.get', [
+			'itemids'	=>	self::$itemids['agent:UINT64_VALUE_TYPE_DEP_FROM_TRAPPER_WITH_PREPROC'],
+			'history'	=>	ITEM_VALUE_TYPE_UINT64,
+			'sortfield'	=>	'clock',
+			'sortorder'	=>	'ASC'
+		]);
+
+		$this->assertEquals(1, count($response['result']), json_encode($response['result']));
+		$this->assertEquals($response['result'][0]['value'], self::dns_handshake);
 	}
 
 	/**
@@ -515,6 +571,28 @@ class testBinaryAndJSONValueTypesDataCollection extends CIntegrationTest {
 
 		$this->assertEquals(2, count($response['result']), json_encode($response['result']));
 		$this->assertEquals($response['result'][0]['value'], "null");
+
+
+		// Dependent
+		$response = $this->callUntilDataIsPresent('history.get', [
+			'itemids'	=>	self::$itemids['proxy_agent:TEXT_VALUE_TYPE_DEP_FROM_TRAPPER_WITH_PREPROC'],
+			'history'	=>	ITEM_VALUE_TYPE_TEXT,
+			'sortfield'	=>	'clock',
+			'sortorder'	=>	'ASC'
+		]);
+
+		$this->assertEquals(1, count($response['result']), json_encode($response['result']));
+		$this->assertEquals($response['result'][0]['value'], self::error_message);
+
+		$response = $this->callUntilDataIsPresent('history.get', [
+			'itemids'	=>	self::$itemids['proxy_agent:UINT64_VALUE_TYPE_DEP_FROM_TRAPPER_WITH_PREPROC'],
+			'history'	=>	ITEM_VALUE_TYPE_UINT64,
+			'sortfield'	=>	'clock',
+			'sortorder'	=>	'ASC'
+		]);
+
+		$this->assertEquals(1, count($response['result']), json_encode($response['result']));
+		$this->assertEquals($response['result'][0]['value'], self::dns_handshake);
 	}
 
 	/**
