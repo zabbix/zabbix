@@ -316,7 +316,7 @@ class testBinaryAndJSONValueTypesDataCollection extends CIntegrationTest {
 						'name' => 'TEXT_VALUE_TYPE_DEP_FROM_TRAPPER_WITH_PREPROC',
 						'key_' => 'TEXT_VALUE_TYPE_DEP_FROM_TRAPPER_WITH_PREPROC',
 						'type' => ITEM_TYPE_DEPENDENT,
-						'master_itemid' => self::$itemids['JSON_TRAPPER'],
+						'master_itemid' => self::$itemids['agent:JSON_TRAPPER'],
 						'value_type' => ITEM_VALUE_TYPE_TEXT,
 						'delay' => '0s',
 						'preprocessing' =>
@@ -331,7 +331,7 @@ class testBinaryAndJSONValueTypesDataCollection extends CIntegrationTest {
 						'name' => 'UINT64_VALUE_TYPE_DEP_FROM_TRAPPER_WITH_PREPROC',
 						'key_' => 'UINT64_VALUE_TYPE_DEP_FROM_TRAPPER_WITH_PREPROC',
 						'type' => ITEM_TYPE_DEPENDENT,
-						'master_itemid' => self::$itemids['JSON_TRAPPER'],
+						'master_itemid' => self::$itemids['agent:JSON_TRAPPER'],
 						'value_type' => ITEM_VALUE_TYPE_UINT64,
 						'delay' => '0s',
 						'preprocessing' =>
@@ -403,6 +403,38 @@ class testBinaryAndJSONValueTypesDataCollection extends CIntegrationTest {
 							'error_handler_params' => ''
 						]]
 				],
+				[
+					'name' => 'TEXT_VALUE_TYPE_DEP_FROM_TRAPPER_WITH_PREPROC',
+					'key_' => 'TEXT_VALUE_TYPE_DEP_FROM_TRAPPER_WITH_PREPROC',
+					'type' => ITEM_TYPE_DEPENDENT,
+					'master_itemid' => self::$itemids['proxy_agent:JSON_TRAPPER'],
+					'value_type' => ITEM_VALUE_TYPE_TEXT,
+					'delay' => '0s',
+					'preprocessing' =>
+					[[
+						'type' => ZBX_PREPROC_JSONPATH,
+						'params' => '$.error_message',
+						'error_handler' => 0,
+						'error_handler_params' => ''
+					]]
+				],
+				[
+					'name' => 'UINT64_VALUE_TYPE_DEP_FROM_TRAPPER_WITH_PREPROC',
+					'key_' => 'UINT64_VALUE_TYPE_DEP_FROM_TRAPPER_WITH_PREPROC',
+					'type' => ITEM_TYPE_DEPENDENT,
+					'master_itemid' => self::$itemids['proxy_agent:JSON_TRAPPER'],
+					'value_type' => ITEM_VALUE_TYPE_UINT64,
+					'delay' => '0s',
+					'preprocessing' =>
+					[[
+						'type' => ZBX_PREPROC_JSONPATH,
+						'params' => '$.tls_handshake',
+						'error_handler' => 0,
+						'error_handler_params' => ''
+					]]
+				],
+
+
 				]
 			]
 		, $result['hostids']);
