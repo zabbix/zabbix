@@ -42,7 +42,8 @@ class CTextAreaFlexible extends CTag {
 			->setId(zbx_formatDomId($name))
 			->setName($name)
 			->setAttribute('value', $value)
-			->setAttribute('data-field-type', 'z-textarea-flexible');
+			->setAttribute('data-field-type', 'z-textarea-flexible')
+			->setAttribute('singleline', 'true');
 
 		if (array_key_exists('readonly', $options)) {
 			$this->setReadonly($options['readonly']);
@@ -51,6 +52,12 @@ class CTextAreaFlexible extends CTag {
 		if (array_key_exists('maxlength', $options)) {
 			$this->setMaxlength($options['maxlength']);
 		}
+	}
+
+	public function setSingleline(bool $is_singleline = true): self {
+		$this->setAttribute('singleline', $is_singleline);
+
+		return $this;
 	}
 
 	public function setReadonly(bool $is_readonly = true): self {

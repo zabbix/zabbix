@@ -47,6 +47,7 @@ class ZTextareaFlexible extends HTMLElement {
 			this.#textarea.placeholder = this.hasAttribute('placeholder') ? this.getAttribute('placeholder') : null;
 			this.#textarea.disabled = this.hasAttribute('disabled');
 			this.#textarea.readOnly = this.hasAttribute('readonly');
+			this.#textarea.singleline = this.hasAttribute('singleline')	? this.getAttribute('singleline') : null;
 
 			if (this.hasAttribute('class')) {
 				this.#textarea.classList.add(this.getAttribute('class'));
@@ -67,7 +68,7 @@ class ZTextareaFlexible extends HTMLElement {
 	}
 
 	static get observedAttributes() {
-		return ['width', 'height', 'value', 'maxlength', 'placeholder', 'disabled', 'readonly'];
+		return ['width', 'height', 'value', 'maxlength', 'placeholder', 'disabled', 'readonly', 'singleline'];
 	}
 
 	attributeChangedCallback(name, old_value, new_value) {
@@ -104,6 +105,10 @@ class ZTextareaFlexible extends HTMLElement {
 				this.#textarea.readOnly = new_value !== null;
 				break;
 
+			case 'singleline':
+				this.#textarea.singleline = new_value;
+				break;
+
 			default:
 				return;
 		}
@@ -114,7 +119,7 @@ class ZTextareaFlexible extends HTMLElement {
 	#registerEvents() {
 		this.#events = {
 			textareaKeydown: e => {
-				if (e.key === 'Enter') {
+				if (e.key === 'Enter' && this.#textarea.singleline) {
 					e.preventDefault();
 				}
 			},
@@ -231,6 +236,14 @@ class ZTextareaFlexible extends HTMLElement {
 
 	set readonly(readonly) {
 		this.toggleAttribute('readonly', readonly);
+	}
+
+	get singleline() {
+		return this.#textarea.singleline;
+	}
+
+	set singleline(singleline) {
+		this.setAttribute('singleline', singleline);
 	}
 }
 
