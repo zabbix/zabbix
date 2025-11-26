@@ -30,16 +30,24 @@ static int	__binary_heap_bubble_down(zbx_binary_heap_t *heap, int index);
 
 static void	swap(zbx_binary_heap_t *heap, int index_1, int index_2)
 {
-	zbx_binary_heap_elem_t	tmp;
-
-	tmp = heap->elems[index_1];
-	heap->elems[index_1] = heap->elems[index_2];
-	heap->elems[index_2] = tmp;
-
 	if (HAS_DIRECT_OPTION(heap))
 	{
+		zbx_binary_heap_elem_t	tmp;
+
+		tmp = heap->elems[index_1];
+		heap->elems[index_1] = heap->elems[index_2];
+		heap->elems[index_2] = tmp;
+
 		zbx_hashmap_set(heap->key_index, heap->elems[index_1].key, index_1);
 		zbx_hashmap_set(heap->key_index, heap->elems[index_2].key, index_2);
+	}
+	else
+	{
+		void	*tmp;
+
+		tmp = heap->elems[index_1].data;
+		heap->elems[index_1].data = heap->elems[index_2].data;
+		heap->elems[index_2].data = tmp;
 	}
 }
 
