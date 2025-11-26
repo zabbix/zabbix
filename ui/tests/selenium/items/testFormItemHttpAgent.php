@@ -944,8 +944,8 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 		// Take a screenshot to test draggable object position of query and headers fields.
 		if (array_key_exists('screenshot', $data)) {
 			$this->page->removeFocus();
-			$this->assertScreenshot($this->query('id:query-fields-table')->one(), 'Query fields');
-			$this->assertScreenshot($this->query('id:headers-table')->one(), 'Headers fields');
+			$this->assertScreenshot($form->query('id:query-fields-table')->one(), 'Query fields');
+			$this->assertScreenshot($form->query('id:headers-table')->one(), 'Headers fields');
 		}
 
 		if (array_key_exists('request_type', $data)) {
