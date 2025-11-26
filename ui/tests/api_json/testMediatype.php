@@ -268,7 +268,7 @@ class testMediatype extends CAPITest {
 	public function testMediatypeUpdateOAuthUrlUpdated(array $mediatypes, string $field_name) {
 		$oauth_url = [];
 		$oauth_url_updated = [];
-		
+
 		CTestDataHelper::convertMediatypesReferences($mediatypes);
 
 		$result = $this->call('mediatype.get', [
@@ -282,12 +282,12 @@ class testMediatype extends CAPITest {
 		sleep(1);
 
 		$this->call('mediatype.update', $mediatypes);
-		
+
 		$result = $this->call('mediatype.get', [
 			'output' => ['mediatypeid', 'tokens_status', $field_name],
 			'mediatypeids' => array_column($mediatypes, 'mediatypeid')
 		])['result'];
-		
+
 		$oauth_url_updated[$field_name] = $result[0]['token_url'];
 		$oauth_url_updated['tokens_status'] = $result[0]['tokens_status'];
 
