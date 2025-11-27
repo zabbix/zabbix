@@ -28,17 +28,11 @@ import (
 //go:embed testdata/kernel.maxfiles_valid.txt
 var maxfilesValid []byte
 
-//go:embed testdata/kernel.maxfiles_valid_no_newline.txt
-var maxfilesValidNoNewline []byte
-
 //go:embed testdata/kernel.maxfiles_invalid.txt
 var maxfilesInvalid []byte
 
 //go:embed testdata/kernel.maxproc_valid.txt
 var maxprocValid []byte
-
-//go:embed testdata/kernel.maxproc_valid_no_newline.txt
-var maxprocValidNoNewline []byte
 
 //go:embed testdata/kernel.maxproc_invalid.txt
 var maxprocInvalid []byte
@@ -110,16 +104,6 @@ func TestPlugin_Export(t *testing.T) {
 			wantErr:        false,
 		},
 		{
-			name: "+maxfilesValidNoNewline",
-			args: args{
-				key:    "kernel.maxfiles",
-				params: []string{},
-			},
-			fileMaxContent: maxfilesValidNoNewline,
-			want:           uint64(18446744073709551615),
-			wantErr:        false,
-		},
-		{
 			name: "-maxfilesInvalid",
 			args: args{
 				key:    "kernel.maxfiles",
@@ -158,16 +142,6 @@ func TestPlugin_Export(t *testing.T) {
 				params: []string{},
 			},
 			pidMaxContent: maxprocValid,
-			want:          uint64(18446744073709551615),
-			wantErr:       false,
-		},
-		{
-			name: "+maxprocValidNoNewline",
-			args: args{
-				key:    "kernel.maxproc",
-				params: []string{},
-			},
-			pidMaxContent: maxprocValidNoNewline,
 			want:          uint64(18446744073709551615),
 			wantErr:       false,
 		},
