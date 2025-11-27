@@ -613,6 +613,8 @@ class testBinaryAndJSONValueTypesDataCollection extends CIntegrationTest {
 
 		$this->sendSenderValue('proxy_agent', 'JSON_TRAPPER_PREPROC_THROTTLING', self::$json_with_image, self::COMPONENT_PROXY);
 		$this->sendSenderValue('proxy_agent', 'JSON_TRAPPER_PREPROC_THROTTLING', self::$json_with_image, self::COMPONENT_PROXY);
+
+		// there is intentionally no limit, we need to make sure, the throttling worked
 		$response = $this->callUntilDataIsPresent('history.get', [
 			'itemids'	=>	self::$itemids['proxy_agent:JSON_TRAPPER_PREPROC_THROTTLING'],
 			'history'	=>	ITEM_VALUE_TYPE_JSON
@@ -623,12 +625,13 @@ class testBinaryAndJSONValueTypesDataCollection extends CIntegrationTest {
 		$this->assertEquals(self::$json_image_normalized, $json_result);
 
 		$this->sendSenderValue('proxy_agent', 'JSON_TRAPPER_PREPROC_THROTTLING', "null", self::COMPONENT_PROXY);
+
+		// there is intentionally no limit, we need to make sure, the throttling worked
 		$response = $this->callUntilDataIsPresent('history.get', [
 			'itemids'	=>	self::$itemids['proxy_agent:JSON_TRAPPER_PREPROC_THROTTLING'],
 			'history'	=>	ITEM_VALUE_TYPE_JSON,
 			'sortfield'	=>	'clock',
-			'sortorder'	=>	'DESC',
-			'limit'         =>      1
+			'sortorder'	=>	'DESC'
 		]);
 
 		$this->assertEquals(2, count($response['result']), json_encode($response['result']));
