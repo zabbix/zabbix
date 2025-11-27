@@ -16,7 +16,6 @@ package udp
 
 import (
 	"bytes"
-	"errors"
 	"math"
 	"net"
 	"strconv"
@@ -82,38 +81,47 @@ func init() {
 }
 
 // Export function that implements plugin.Exporter interface.
-func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (result any, err error) {
+//
+//nolint:gocyclo,cyclop // this is an Export function that delegates its calls further.
+func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (any, error) {
 	switch key {
 	case "net.udp.service", "net.udp.service.perf":
 		if len(params) > 3 {
 			return nil, errs.New(errorTooManyParams)
 		}
+
 		if len(params) < 1 || (len(params) == 1 && params[0] == "") {
 			return nil, errs.New(errorInvalidFirstParam)
 		}
+
 		if params[0] != "ntp" {
 			return nil, errs.New(errorInvalidFirstParam)
 		}
 
-		if len(params) == 3 && len(params[2]) != 0 {
-			if _, err = strconv.ParseUint(params[2], 10, 16); err != nil {
+		if len(params) == 3 && params[2] != "" {
+			_, err := strconv.ParseUint(params[2], 10, 16)
+			if err != nil {
 				return nil, errs.New(errorInvalidThirdParam)
 			}
 		}
 
-		if key == "net.udp.service" {
+		switch key {
+		case "net.udp.service":
 			return p.exportNetService(params, ctx.Timeout()), nil
-		} else if key == "net.udp.service.perf" {
+		case "net.udp.service.perf":
 			return p.exportNetServicePerf(params, ctx.Timeout()), nil
 		}
+
 	case "net.udp.socket.count":
 		return p.exportNetUDPSocketCount(params)
 	case "net.udp.listen":
 		return p.exportNetUDPListen(params)
+	default:
+		return nil, errs.New(errorUnsupportedMetric)
 	}
 
 	/* SHOULD_NEVER_HAPPEN */
-	return nil, errors.New(errorUnsupportedMetric)
+	return nil, errs.New(errorUnsupportedMetric)
 }
 
 func (p *Plugin) createRequest(req []byte) {

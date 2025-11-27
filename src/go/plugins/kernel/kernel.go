@@ -54,7 +54,7 @@ func init() {
 }
 
 // Export implements plugin.Configurator interface.
-func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (any, error) {
+func (p *Plugin) Export(key string, params []string, _ plugin.ContextProvider) (any, error) {
 	if len(params) > 0 {
 		return nil, zbxerr.ErrorTooManyParameters
 	}

@@ -325,7 +325,7 @@ func BenchmarkParser_VsNativeGo(b *testing.B) {
 				}
 
 				if bytes.Contains(line, pattern) {
-					results = append(results, string(line))
+					results = append(results, string(line)) //nolint:staticcheck // this is a benchmark.
 				}
 			}
 		}
@@ -348,11 +348,14 @@ func BenchmarkParser_VsNativeGo(b *testing.B) {
 			for scanner.Scan() {
 				line := scanner.Text()
 				if strings.Contains(line, "[ERROR]") {
-					results = append(results, line)
+					results = append(results, line) //nolint:staticcheck // this is a benchmark.
 				}
 			}
 
-			file.Close()
+			err = file.Close()
+			if err != nil {
+				b.Fatalf("Close() error = %v", err)
+			}
 
 			err = scanner.Err()
 			if err != nil {
@@ -383,7 +386,7 @@ func BenchmarkParser_VsNativeGo(b *testing.B) {
 				}
 
 				if re.Match(line) {
-					results = append(results, string(line))
+					results = append(results, string(line)) //nolint:staticcheck // this is a benchmark.
 				}
 			}
 		}
