@@ -24,6 +24,7 @@ import (
 	"strings"
 
 	"golang.zabbix.com/sdk/errs"
+	"golang.zabbix.com/sdk/log"
 )
 
 var allowedPrefixes = []string{"/proc", "/dev", "/tmp"} //nolint:gochecknoglobals // used as a constant check slice.
@@ -44,7 +45,7 @@ type Parser struct {
 func NewParser() *Parser {
 	return &Parser{
 		matchMode:    ModeContains,
-		scanStrategy: StrategyReadAll,
+		scanStrategy: StrategyOSReadFile,
 	}
 }
 
@@ -79,18 +80,34 @@ func (p *Parser) Parse(path string) ([]string, error) {
 	}
 
 	switch p.scanStrategy {
+	case StrategyReadAll, StrategyOSReadFile:
+		return p.parseByReadingAllIntoMemory(cleanPath, reg)
 	case StrategyReadLineByLine:
-		return p.parseLineByLine(cleanPath, reg)
-	case StrategyReadAll:
-		return p.parseReadAll(cleanPath, reg)
+		return p.parseLineByScanning(cleanPath, reg)
+
 	default:
 		return nil, errs.Errorf("unknown scan strategy: %d", p.scanStrategy)
 	}
 }
 
 // reads all file into memory.
-func (p *Parser) parseReadAll(path string, reg *regexp.Regexp) ([]string, error) {
-	content, err := ReadAll(path)
+func (p *Parser) parseByReadingAllIntoMemory(path string, reg *regexp.Regexp) ([]string, error) {
+	var (
+		content []byte
+		err     error
+	)
+
+	switch p.scanStrategy {
+	case StrategyReadAll:
+		content, err = ReadAll(path)
+	case StrategyOSReadFile:
+		// G304: The path is sanitized using filepath.Clean and validated against a strict allowlist (allowedPrefixes).
+		//nolint:gosec
+		content, err = os.ReadFile(path)
+	default:
+		return nil, errs.Errorf("unknown scan strategy: %d", p.scanStrategy)
+	}
+
 	if err != nil {
 		return nil, errs.Wrapf(err, "failed to read file %s", path)
 	}
@@ -99,6 +116,8 @@ func (p *Parser) parseReadAll(path string, reg *regexp.Regexp) ([]string, error)
 		results = make([]string, 0, p.maxMatches)
 		lines   = bytes.Split(content, []byte("\n"))
 	)
+
+	log.Tracef("Opened file %s, with size of %d bytes, of %d lines", path, len(content), len(lines))
 
 	for _, lineBytes := range lines {
 		// Check match limit at the start of iteration
@@ -122,12 +141,19 @@ func (p *Parser) parseReadAll(path string, reg *regexp.Regexp) ([]string, error)
 }
 
 // reads file one by one.
-func (p *Parser) parseLineByLine(path string, reg *regexp.Regexp) ([]string, error) {
+func (p *Parser) parseLineByScanning(path string, reg *regexp.Regexp) ([]string, error) {
 	// G304: The path is sanitized using filepath.Clean and validated against a strict allowlist (allowedPrefixes).
 	//nolint:gosec
 	file, err := os.Open(path)
 	if err != nil {
 		return nil, errs.Wrapf(err, "failed to open file %s", path)
+	}
+
+	stats, err := file.Stat()
+	if err == nil {
+		log.Tracef("Opened file %s, with size of %d bytes", path, stats.Size())
+	} else {
+		log.Tracef("Opened file %s, failed to read size of it", path)
 	}
 
 	defer file.Close() //nolint:errcheck // standard defer function which error would not change anything.

@@ -42,7 +42,7 @@ func (p *Plugin) gatherData(key string) (uint64, error) {
 		SetMaxMatches(1)
 
 	if key == "kernel.openfiles" {
-		parser.SetSplitter("\t", 0) // there are several values in the file
+		parser.SetSplitter("\t", 0) // there are several values in the line.
 	}
 
 	data, err := parser.Parse(fileName)

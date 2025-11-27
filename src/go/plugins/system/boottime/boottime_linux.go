@@ -60,6 +60,7 @@ func (p *Plugin) Export(_ string, params []string, _ plugin.ContextProvider) (an
 	}
 
 	parser := procfs.NewParser().
+		SetScanStrategy(procfs.StrategyOSReadFile).
 		SetPattern(pattern).
 		SetMatchMode(procfs.ModePrefix).
 		SetSplitter(pattern, 1)

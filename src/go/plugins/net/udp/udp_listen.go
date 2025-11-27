@@ -51,6 +51,7 @@ func (p *Plugin) exportNetUDPListen(params []string) (string, error) {
 	ipv4SearchString := fmt.Sprintf(udpListenIPv4Pattern, port)
 
 	parser := procfs.NewParser().
+		SetScanStrategy(procfs.StrategyOSReadFile).
 		SetMatchMode(procfs.ModeContains).
 		SetPattern(ipv4SearchString).
 		SetMaxMatches(1)

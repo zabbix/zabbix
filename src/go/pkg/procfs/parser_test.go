@@ -230,7 +230,7 @@ func TestParser_Parse(t *testing.T) { //nolint:tparallel,paralleltest // Disable
 			args:        args{path: "regex_fail.txt"},
 			fileContent: "content irrelevant",
 			want:        nil,
-			wantErr:     true, // Expect compile error
+			wantErr:     true,
 		},
 
 		// -------------------------------------------------------------------

@@ -92,6 +92,7 @@ func (p *Plugin) getNetStats(networkIf, statName string, direction networkDirect
 	}
 
 	parser := procfs.NewParser().
+		SetScanStrategy(procfs.StrategyOSReadFile).
 		SetMatchMode(procfs.ModeContains).
 		SetPattern(networkIf).
 		SetSplitter(":", 1).
@@ -128,6 +129,7 @@ func (p *Plugin) getNetStats(networkIf, statName string, direction networkDirect
 
 func (p *Plugin) getDevDiscovery() ([]msgIfDiscovery, error) {
 	parser := procfs.NewParser().
+		SetScanStrategy(procfs.StrategyOSReadFile).
 		SetMatchMode(procfs.ModeContains).
 		SetPattern(":").
 		SetSplitter(":", 0)

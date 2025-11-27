@@ -26,9 +26,14 @@ const (
 )
 
 const (
-	// StrategyReadAll reads the entire file content at once.
+	// StrategyOSReadFile reads entire file content at once. Well optimized for small/mid size files.
+	// Use this for most use cases.
+	StrategyOSReadFile ScanStrategy = iota
+
+	// StrategyReadAll reads the entire file content at once. Well optimized for tiny files.
 	// Use this for /proc files or small configs.
-	StrategyReadAll ScanStrategy = iota
+	// Switch to StrategyOSReadFile if there are more than 100 lines expected.
+	StrategyReadAll
 
 	// StrategyReadLineByLine reads the file one line at a time using a scanner.
 	// Use this for large files to lower RAM usage.
@@ -72,8 +77,15 @@ func (p *Parser) SetPattern(pattern string) *Parser {
 	return p
 }
 
-// SetSplitter sets the separator and the index of the field in the resulting slice to return.
-// If the separator is empty, splitting is disabled.
+// SetSplitter configures the parser to split each processed line by the given separator
+// and extract a specific field from the resulting slice.
+//
+// Parameters:
+//   - separator: the string used to split each line. If empty, splitting is disabled.
+//   - index: zero-based position of the field to extract from the split result.
+//
+// If the index is out of bounds for a particular line (e.g., the line splits into fewer
+// fields than index+1), that line will be excluded from the output.
 func (p *Parser) SetSplitter(separator string, index int) *Parser {
 	p.splitSep = separator
 	p.splitSepBytes = []byte(separator)
