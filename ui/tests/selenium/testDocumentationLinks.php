@@ -2635,8 +2635,7 @@ class testDocumentationLinks extends CWebTest {
 				'{template_item_prototypeid}' => self::$template_lld_prototypeid,
 				'{item_prototypeid}' => self::$lld_prototypeid,
 				'{template_discoveryid}' => self::$template_lldid,
-				'{discoveryid}' => self::$lldid,
-
+				'{discoveryid}' => self::$lldid
 			];
 			$data['url'] = str_replace(array_keys($replacements), array_values($replacements), $data['url']);
 		}
