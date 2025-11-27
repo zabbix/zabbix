@@ -45,7 +45,7 @@
 				.getElementById('service-write-access')
 				.addEventListener('change', () => this.serviceWriteAccessChange());
 
-			document.getElementById('delete').addEventListener('click', () => this.delete());
+			document.getElementById('delete')?.addEventListener('click', () => this.delete());
 
 			this.updateServicesWriteAccessFields();
 
