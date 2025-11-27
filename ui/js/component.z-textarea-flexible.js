@@ -116,6 +116,7 @@ class ZTextareaFlexible extends HTMLElement {
 			textareaKeydown: e => {
 				if (e.key === 'Enter' && this.#textarea.singleline) {
 					e.preventDefault();
+					this.closest('form')?.requestSubmit();
 				}
 			},
 
