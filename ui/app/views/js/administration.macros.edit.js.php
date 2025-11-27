@@ -165,10 +165,10 @@
 			.macroValue();
 
 		table
-			.on('change keydown', '<?= ZBX_STYLE_Z_TEXTAREA_FLEXIBLE ?> .macro', function(event) {
+			.on('change keydown', '<?= ZBX_STYLE_Z_TEXTAREA_FLEXIBLE ?>.macro', function(event) {
 				if (event.type === 'change' || event.which === 13) {
-				$(this).val($(this).val().replace(/([^:]+)/, (value) => value.toUpperCase('$1')));
-			}
-		})
+					$(this).val($(this).val().replace(/([^:]+)/, (value) => value.toUpperCase('$1')));
+				}
+			});
 	});
 </script>

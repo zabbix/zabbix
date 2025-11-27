@@ -50,10 +50,6 @@ class ZTextareaFlexible extends HTMLElement {
 			this.#textarea.singleline = this.hasAttribute('singleline')	? this.getAttribute('singleline') : null;
 			this.#textarea.spellcheck = this.getAttribute('spellcheck') !== 'false';
 
-			if (this.hasAttribute('class')) {
-				this.#textarea.classList.add(this.getAttribute('class'));
-			}
-
 			if (this.hasAttribute('maxlength')) {
 				this.#textarea.maxLength = Number(this.getAttribute('maxlength'));
 			}
