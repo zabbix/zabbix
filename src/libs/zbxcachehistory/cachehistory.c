@@ -3297,15 +3297,21 @@ void	zbx_hc_get_item_values(zbx_dc_history_t *history, zbx_vector_hc_item_ptr_t 
 
 static void	hc_remove_item(zbx_hc_item_t *item)
 {
+	int	i = 0;
+
 	while (NULL != item->tail)
 	{
 		zbx_hc_data_t	*next = item->tail->next;
 
 		hc_free_data(item->tail);
 		item->tail = next;
+		i++;
 	}
 
 	zbx_hashset_remove_direct(&cache->history_items, item);
+
+	if (1 < i)
+		cache->history_num -= i - 1;
 }
 
 /******************************************************************************
