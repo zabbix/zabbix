@@ -432,9 +432,7 @@ class testBinaryAndJSONValueTypesDataCollection extends CIntegrationTest {
 						'error_handler' => 0,
 						'error_handler_params' => ''
 					]]
-				],
-
-
+				]
 				]
 			]
 		, $result['hostids']);
