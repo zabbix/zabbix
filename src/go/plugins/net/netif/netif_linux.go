@@ -26,9 +26,8 @@ import (
 
 const (
 	errorCannotFindIf = "Cannot find information for this network interface in /proc/net/dev."
+	netDevFilepath    = "/proc/net/dev"
 )
-
-var netDevFilepath = "/proc/net/dev" //nolint:gochecknoglobals // such implementation to make it mockable
 
 var mapNetStatIn = map[string]uint{ //nolint:gochecknoglobals // used as constant check map.
 	"bytes":      0,
@@ -53,8 +52,10 @@ var mapNetStatOut = map[string]uint{ //nolint:gochecknoglobals // used as consta
 }
 
 func init() { //nolint:gochecknoinits // legacy implementation
+	impl := &Plugin{}
+
 	err := plugin.RegisterMetrics(
-		&impl, "NetIf",
+		impl, "NetIf",
 		"net.if.collisions", "Returns number of out-of-window collisions.",
 		"net.if.in", "Returns incoming traffic statistics on network interface.",
 		"net.if.out", "Returns outgoing traffic statistics on network interface.",
@@ -64,13 +65,15 @@ func init() { //nolint:gochecknoinits // legacy implementation
 	if err != nil {
 		panic(errs.Wrap(err, "failed to register metrics"))
 	}
+
+	impl.netDevFilepath = netDevFilepath
 }
 
 //nolint:gocyclo,cyclop // file parsing takes a lot of ifs in this case.
-func (*Plugin) getNetStats(networkIf, statName string, dir dirFlag) (uint64, error) {
+func (p *Plugin) getNetStats(networkIf, statName string, direction networkDirection) (uint64, error) {
 	var statNums []uint
 
-	if dir == directionIn || dir == directionTotal {
+	if direction == directionIn || direction == directionTotal {
 		statNum, ok := mapNetStatIn[statName]
 		if !ok {
 			return 0, errs.New(errorInvalidSecondParam)
@@ -79,7 +82,7 @@ func (*Plugin) getNetStats(networkIf, statName string, dir dirFlag) (uint64, err
 		statNums = append(statNums, statNum)
 	}
 
-	if dir == directionOut || dir == directionTotal {
+	if direction == directionOut || direction == directionTotal {
 		statNum, ok := mapNetStatOut[statName]
 		if !ok {
 			return 0, errs.New(errorInvalidSecondParam)
@@ -94,9 +97,9 @@ func (*Plugin) getNetStats(networkIf, statName string, dir dirFlag) (uint64, err
 		SetSplitter(":", 1).
 		SetMaxMatches(1)
 
-	data, err := parser.Parse(netDevFilepath)
+	data, err := parser.Parse(p.netDevFilepath)
 	if err != nil {
-		return 0, errs.Wrapf(err, "failed to parse %s", netDevFilepath)
+		return 0, errs.Wrapf(err, "failed to parse %s", p.netDevFilepath)
 	}
 
 	if len(data) != 1 {
@@ -123,13 +126,13 @@ func (*Plugin) getNetStats(networkIf, statName string, dir dirFlag) (uint64, err
 	return total, nil
 }
 
-func (*Plugin) getDevDiscovery() ([]msgIfDiscovery, error) {
+func (p *Plugin) getDevDiscovery() ([]msgIfDiscovery, error) {
 	parser := procfs.NewParser().
 		SetMatchMode(procfs.ModeContains).
 		SetPattern(":").
 		SetSplitter(":", 0)
 
-	data, err := parser.Parse(netDevFilepath)
+	data, err := parser.Parse(p.netDevFilepath)
 	if err != nil {
 		return nil, errs.Wrap(err, "failed to parse /proc/net/dev file")
 	}
@@ -146,7 +149,7 @@ func (*Plugin) getDevDiscovery() ([]msgIfDiscovery, error) {
 //
 //nolint:gocyclo,cyclop // export function delegates its requests, so high cyclo is expected.
 func (p *Plugin) Export(key string, params []string, _ plugin.ContextProvider) (any, error) {
-	var direction dirFlag
+	var direction networkDirection
 
 	switch key {
 	case "net.if.discovery":

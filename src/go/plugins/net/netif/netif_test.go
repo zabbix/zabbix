@@ -17,6 +17,7 @@
 package netif
 
 import (
+	_ "embed"
 	"os"
 	"path/filepath"
 	"testing"
@@ -24,7 +25,10 @@ import (
 	"github.com/google/go-cmp/cmp"
 )
 
-func TestNetif(t *testing.T) { //nolint:tparallel //cannot run in parallel due to primitive mocking.
+//go:embed testdata/netif.txt
+var contentNetif02 []byte
+
+func TestNetif(t *testing.T) {
 	t.Parallel()
 
 	type args struct {
@@ -32,26 +36,16 @@ func TestNetif(t *testing.T) { //nolint:tparallel //cannot run in parallel due t
 		params []string
 	}
 
-	//nolint:lll // this is a file output
-	const contentNetif02 = `Inter-|   Receive                                                |  Transmit
-face |bytes    packets errs drop fifo frame compressed multicast|bytes    packets errs drop fifo colls carrier compressed
-   lo: 2897093   11757    0    0    0     0          0         0  2897093   11757    0    0    0     0       0          0
- eno1: 709017493  620061   15    7    1   345        500     16001 22780124  241308   87 1234    5   543       2        100
- eno2: 709017493  abc   15    7    1   345        500     16001 22780124  241308   87 1234    5   543       x        100
-  lo1  2897093   11757    0    0    0     0          0         0  2897093   11757    0    0    0     0       0          0
-eno3: 709017493  620061   15    7    1   345        500     16001 22780124  241308   87 1234    5   543       2`
-
 	tests := []struct {
 		name        string
-		fileContent string
+		fileContent []byte
 		args        args
 		want        any
 		wantErr     bool
 	}{
-		// testNetif01 (Empty file)
 		{
 			name:        "-InEmptyFile",
-			fileContent: "",
+			fileContent: []byte{},
 			args: args{
 				key:    "net.if.in",
 				params: []string{"eno1", "bytes"},
@@ -61,7 +55,7 @@ eno3: 709017493  620061   15    7    1   345        500     16001 22780124  2413
 		},
 		{
 			name:        "+DiscoveryEmptyFile",
-			fileContent: "",
+			fileContent: []byte{},
 			args: args{
 				key:    "net.if.discovery",
 				params: []string{},
@@ -71,7 +65,7 @@ eno3: 709017493  620061   15    7    1   345        500     16001 22780124  2413
 		},
 		{
 			name:        "-CollisionsEmptyFile",
-			fileContent: "",
+			fileContent: []byte{},
 			args: args{
 				key:    "net.if.collisions",
 				params: []string{"eno1"},
@@ -79,8 +73,6 @@ eno3: 709017493  620061   15    7    1   345        500     16001 22780124  2413
 			want:    uint64(0),
 			wantErr: true,
 		},
-
-		// testNetif02 (Valid content with some errors)
 		{
 			name:        "-InEno2PacketsDataMissing",
 			fileContent: contentNetif02,
@@ -422,16 +414,6 @@ eno3: 709017493  620061   15    7    1   345        500     16001 22780124  2413
 			wantErr: true,
 		},
 		{
-			name:        "-InEno2PacketsDataMissing",
-			fileContent: contentNetif02,
-			args: args{
-				key:    "net.if.in",
-				params: []string{"eno2", "packets"},
-			},
-			want:    uint64(0),
-			wantErr: true,
-		},
-		{
 			name:        "-OutEno2CarrierMissing",
 			fileContent: contentNetif02,
 			args: args{
@@ -508,7 +490,7 @@ eno3: 709017493  620061   15    7    1   345        500     16001 22780124  2413
 				key:    "net.if.discovery",
 				params: []string{},
 			},
-			want:    "[{\"{#IFNAME}\":\"lo\"},{\"{#IFNAME}\":\"eno1\"},{\"{#IFNAME}\":\"eno2\"},{\"{#IFNAME}\":\"eno3\"}]", //nolint:lll //this is long expected result
+			want:    "[{\"{#IFNAME}\":\"lo\"},{\"{#IFNAME}\":\"eno1\"},{\"{#IFNAME}\":\"eno2\"},{\"{#IFNAME}\":\"eno3\"}]", //nolint:lll
 			wantErr: false,
 		},
 		{
@@ -521,11 +503,9 @@ eno3: 709017493  620061   15    7    1   345        500     16001 22780124  2413
 			want:    nil,
 			wantErr: true,
 		},
-
-		// testNetif03 (Empty file)
 		{
 			name:        "-CollisionsEmptyFile2",
-			fileContent: "",
+			fileContent: []byte{},
 			args: args{
 				key:    "net.if.collisions",
 				params: []string{"eno1"},
@@ -535,7 +515,7 @@ eno3: 709017493  620061   15    7    1   345        500     16001 22780124  2413
 		},
 		{
 			name:        "-InEmptyFile2",
-			fileContent: "",
+			fileContent: []byte{},
 			args: args{
 				key:    "net.if.in",
 				params: []string{"eno1", "bytes"},
@@ -545,7 +525,7 @@ eno3: 709017493  620061   15    7    1   345        500     16001 22780124  2413
 		},
 		{
 			name:        "+DiscoveryEmptyFile2",
-			fileContent: "",
+			fileContent: []byte{},
 			args: args{
 				key:    "net.if.discovery",
 				params: []string{},
@@ -555,30 +535,17 @@ eno3: 709017493  620061   15    7    1   345        500     16001 22780124  2413
 		},
 	}
 
-	for _, tt := range tests { //nolint:paralleltest // cannot test due to primitive mocking.
+	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			// Create a temporary directory and file for each test case
-			dir := t.TempDir()
-			fn := filepath.Join(dir, "dev")
+			t.Parallel()
 
-			err := os.WriteFile(fn, []byte(tt.fileContent), 0600)
-			if err != nil {
-				t.Fatalf("failed to create temp file: %v", err)
+			p := Plugin{
+				netDevFilepath: createMockFile(t, tt.fileContent),
 			}
 
-			// Mock the file path global variable
-			old := netDevFilepath
-			netDevFilepath = fn
-
-			t.Cleanup(func() {
-				netDevFilepath = old
-			})
-
-			got, err := impl.Export(tt.args.key, tt.args.params, nil)
+			got, err := p.Export(tt.args.key, tt.args.params, nil)
 			if (err != nil) != tt.wantErr {
 				t.Fatalf("Export() error = %v, wantErr %v", err, tt.wantErr)
-
-				return
 			}
 
 			diff := cmp.Diff(tt.want, got)
@@ -587,4 +554,20 @@ eno3: 709017493  620061   15    7    1   345        500     16001 22780124  2413
 			}
 		})
 	}
+}
+
+func createMockFile(t *testing.T, content []byte) string {
+	t.Helper()
+
+	var (
+		tmpDir = t.TempDir()
+		path   = filepath.Join(tmpDir, "dev")
+	)
+
+	err := os.WriteFile(path, content, 0600)
+	if err != nil {
+		t.Fatalf("failed to write temp mock file: %v", err)
+	}
+
+	return path
 }

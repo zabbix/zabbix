@@ -27,19 +27,19 @@ const (
 )
 
 const (
-	directionIn dirFlag = iota
+	directionIn networkDirection = iota
 	directionOut
 	directionTotal
 )
 
-var impl Plugin //nolint:gochecknoglobals // legacy implementation
-
 // Plugin netif plugin implementation.
 type Plugin struct {
 	plugin.Base
+
+	netDevFilepath string
 }
 
-type dirFlag uint8
+type networkDirection uint8
 
 type msgIfDiscovery struct {
 	Ifname string  `json:"{#IFNAME}"`           //nolint:tagliatelle // legacy compatibility
