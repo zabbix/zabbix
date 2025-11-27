@@ -38,12 +38,13 @@ class CControllerUserroleUpdate extends CControllerUserroleEditGeneral {
 				USER_TYPE_SUPER_ADMIN
 			]],
 			'ui' => ['array', 'required', 'not_empty',
-				'field' => ['string', 'in' => CRoleHelper::getUiElementsByUserType(USER_TYPE_SUPER_ADMIN)]
+				'field' => ['string', 'in' => CRoleHelper::getUiElementsByUserType(USER_TYPE_SUPER_ADMIN)],
+				'messages' => ['not_empty' => _('At least one UI element must be checked.')]
 			],
 			'ui_default_access' => ['boolean'],
 			'modules' => ['array', 'required', 'field' => ['boolean']],
 			'modules_default_access' => ['boolean'],
-			'actions' => ['array', 'required', 'not_empty',
+			'actions' => ['array', 'required',
 				'field' => ['string', 'in' => CRoleHelper::getActionsByUserType(USER_TYPE_SUPER_ADMIN)]
 			],
 			'actions_default_access' => ['boolean'],

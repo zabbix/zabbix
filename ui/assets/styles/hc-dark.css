@@ -2397,16 +2397,12 @@ div[data-field-type="set"].has-error {
   width: min-content;
   border: 1px solid #ff5e5e; }
 
-div[data-field-type="array"].has-error {
-  padding-left: 5px;
-  width: min-content;
-  border: 1px solid #ff5e5e; }
-  div[data-field-type="array"].has-error input[type="checkbox"]:not([readonly]) + label span {
-    border: 1px solid #ff5e5e;
-    color: #000000 !important; }
-  div[data-field-type="array"].has-error input[type="checkbox"]:not([readonly]):checked + label span::after {
-    border-left-color: #ff5e5e;
-    border-bottom-color: #ff5e5e; }
+div[data-field-type="array"].has-error input[type="checkbox"]:not([readonly]) + label span {
+  border: 1px solid #ff5e5e;
+  color: #000000 !important; }
+div[data-field-type="array"].has-error input[type="checkbox"]:not([readonly]):checked + label span::after {
+  border-left-color: #ff5e5e;
+  border-bottom-color: #ff5e5e; }
 
 .radio-list-control.has-error input[type="radio"] + label {
   border-color: #ff5e5e; }

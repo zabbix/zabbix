@@ -132,14 +132,6 @@ foreach ($data['labels']['sections'] as $section_key => $section_label) {
 	}
 }
 
-if (!$data['readonly']) {
-	$form_grid->addItem(
-		new CFormField(
-			(new CLabel(_('At least one UI element must be checked.')))->setAsteriskMark()
-		)
-	);
-}
-
 $form_container->addItem($form_grid);
 $form_grid = (new CFormGrid());
 $form_grid->addItem([new CDiv(),(new CDiv())->setId('ui-error-container')]);
