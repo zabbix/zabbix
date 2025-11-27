@@ -361,9 +361,7 @@ class HostMacrosTabIndicatorItem extends TabIndicatorItem {
 	}
 
 	getValue() {
-		let macros = [...document.forms['host-form'].querySelectorAll('#tbl_macros .form_row')];
-
-		return macros
+		return [...document.querySelectorAll('#tbl_macros .form_row')]
 			.filter((row) => {
 				const macro = row.querySelector('textarea[name$="[macro]"]');
 				const inherited_type = row.querySelector('input[name$="[inherited_type]"]');
@@ -405,15 +403,13 @@ class HostPrototypeMacrosTabIndicatorItem extends TabIndicatorItem {
 	}
 
 	getValue() {
-		let macros = [...document.forms['host-prototype-form'].querySelectorAll('#tbl_macros .form_row')];
-
-		return macros
+		return [...document.querySelectorAll('#tbl_macros .form_row')]
 			.filter((row) => {
 				const macro = row.querySelector('textarea[name$="[macro]"]');
 				const inherited_type = row.querySelector('input[name$="[inherited_type]"]');
-				const inherited = HostPrototypeMacrosTabIndicatorItem.ZBX_PROPERTY_INHERITED;
 
-				if (inherited_type !== null && parseInt(inherited_type.value, 10) == inherited) {
+				if (inherited_type !== null
+						&& parseInt(inherited_type.value, 10) == HostMacrosTabIndicatorItem.ZBX_PROPERTY_INHERITED) {
 					return false;
 				}
 
@@ -449,15 +445,13 @@ class TemplateMacrosTabIndicatorItem extends TabIndicatorItem {
 	}
 
 	getValue() {
-		let macros = [...document.forms['templates-form'].querySelectorAll('#tbl_macros .form_row')];
-
-		return macros
+		return [...document.querySelectorAll('#tbl_macros .form_row')]
 			.filter((row) => {
 				const macro = row.querySelector('textarea[name$="[macro]"]');
 				const inherited_type = row.querySelector('input[name$="[inherited_type]"]');
-				const inherited = TemplateMacrosTabIndicatorItem.ZBX_PROPERTY_INHERITED;
 
-				if (inherited_type !== null && parseInt(inherited_type.value, 10) == inherited) {
+				if (inherited_type !== null
+						&& parseInt(inherited_type.value, 10) == HostMacrosTabIndicatorItem.ZBX_PROPERTY_INHERITED) {
 					return false;
 				}
 

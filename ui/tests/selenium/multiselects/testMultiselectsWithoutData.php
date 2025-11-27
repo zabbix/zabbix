@@ -27,7 +27,7 @@ class testMultiselectsWithoutData extends testMultiselectDialogs {
 
 	const EMPTY_HOST = 'Empty host for multiselects test';
 	const EMPTY_LLD_HOST = 'Host with empty LLD';
-	const EMPTY_TEMPLATE = 'Empty template for multiselects test';
+	const EMPTY_TEMPLATE = 'A-Empty template for multiselects test';
 	const EMPTY_LLD_TEMPLATE = 'Template with empty LLD';
 	const SCRIPT = 'Script for Actions';
 	const TEMPLATES_MULTISELECT = ['Templates' => ['title' => 'Templates', 'empty' => true, 'filter' => ['Template group' => '']]];
@@ -581,7 +581,7 @@ class testMultiselectsWithoutData extends testMultiselectDialogs {
 		// Fill filter to enable dependent multiselects.
 		if (array_key_exists('filter', $data)) {
 			$form->fill($data['filter']);
-			$form->submit();
+			$form->submit()->waitUntilStalled();
 			$form->invalidate();
 		}
 

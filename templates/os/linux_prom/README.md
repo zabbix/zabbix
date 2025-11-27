@@ -7,11 +7,10 @@ This template collects Linux metrics from Node Exporter 0.18 and above. Support 
 
 ### Known Issues
 
-  - Node Exporter 0.16.0 renamed many metrics. CPU utilization for "guest" and "guest_nice" metrics are not supported in this template with Node Exporter < 0.16. Disk IO metrics are not supported. Other metrics provided as best effort. See https://github.com/prometheus/node_exporter/releases/tag/v0.16.0 for details
-See https://github.com/prometheus/node_exporter/releases/tag/v0.16.0 for details.
-    - version: below 0.16.0
-  - metric node_network_info with label 'device' cannot be found, so network discovery is not possible.
-    - version: below 0.18
+  - Node Exporter 0.16.0 renamed many metrics. CPU utilization for "guest" and "guest_nice" metrics are not supported in this template with Node Exporter < 0.16. Disk IO metrics are not supported. Other metrics provided as best effort. See https://github.com/prometheus/node_exporter/releases/tag/v0.16.0 for details.
+    - Version: below 0.16.0
+  - Metric node_network_info with label 'device' cannot be found, so network discovery is not possible.
+    - Version: below 0.18
 
 #### Notes on filesystem (FS) discovery:
   - The ext4/3/2 FS reserves space for privileged usage, typically set at 5% by default.

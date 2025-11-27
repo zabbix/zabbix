@@ -344,7 +344,7 @@ class testDocumentationLinks extends CWebTest {
 					'doc_link' => '/en/manual/web_interface/frontend_sections/monitoring/latest_data'
 				]
 			],
-			// #17 Speccific item graph from latest data view.
+			// #17 Specific item graph from latest data view.
 			[
 				[
 					'url' => 'history.php?action=showgraph&itemids%5B%5D=42237',
@@ -2556,6 +2556,24 @@ class testDocumentationLinks extends CWebTest {
 					],
 					'widget_type' => 'Item navigator',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/dashboards/widgets/item_navigator'
+				]
+			],
+			// #249 Start creating Item Card widget.
+			[
+				[
+					'url' => 'zabbix.php?action=dashboard.view&dashboardid=1',
+					'actions' => [
+						[
+							'callback' => 'openFormWithLink',
+							'element' => 'button:Edit dashboard'
+						],
+						[
+							'callback' => 'openFormWithLink',
+							'element' => 'id:dashboard-add-widget'
+						]
+					],
+					'widget_type' => 'Item card',
+					'doc_link' => '/en/manual/web_interface/frontend_sections/dashboards/widgets/item_card'
 				]
 			]
 		];

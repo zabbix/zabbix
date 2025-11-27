@@ -21,6 +21,8 @@ require_once __DIR__.'/../behaviors/CMessageBehavior.php';
 /**
  * @backup settings, widget
  *
+ * @dataSource HostAvailabilityWidget
+ *
  * @onBefore prepareDashboardData
  */
 class testDashboardProblemsWidget extends CWebTest {
@@ -124,7 +126,7 @@ class testDashboardProblemsWidget extends CWebTest {
 		$this->assertEquals(['Type', 'Show header', 'Name', 'Refresh interval', 'Show', 'Host groups',
 				'Exclude host groups', 'Hosts', 'Problem', 'Severity', 'Problem tags', 'Show tags', 'Tag name',
 				'Tag display priority', 'Show operational data', 'Show symptoms', 'Show suppressed problems',
-				'Acknowledgement status', 'Sort entries by', 'Show timeline', 'Show lines'],
+				'Acknowledgement status', 'Sort entries by', 'Show timeline', 'Highlight whole row', 'Show lines'],
 				$form->getLabels()->asText()
 		);
 
@@ -444,7 +446,7 @@ class testDashboardProblemsWidget extends CWebTest {
 					'tag_fields' => []
 				]
 			],
-			// #9 Cyrillyc and special symbols in inputs.
+			// #9 Cyrillic and special symbols in inputs.
 			[
 				[
 					'fields' => [
