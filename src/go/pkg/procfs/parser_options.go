@@ -87,8 +87,8 @@ func (p *Parser) SetPattern(pattern string) *Parser {
 // If the index is out of bounds for a particular line (e.g., the line splits into fewer
 // fields than index+1), that line will be excluded from the output.
 func (p *Parser) SetSplitter(separator string, index int) *Parser {
-	p.splitSep = separator
-	p.splitSepBytes = []byte(separator)
+	p.splitSeparator = separator
+	p.splitSeparatorBytes = []byte(separator)
 	p.splitIndex = index
 
 	return p

@@ -25,8 +25,9 @@ import (
 	"golang.zabbix.com/sdk/zbxerr"
 )
 
+const pluginName = "Boottime"
+
 const (
-	pluginName       = "Boottime"
 	procStatFilepath = "/proc/stat"
 	pattern          = "btime"
 )

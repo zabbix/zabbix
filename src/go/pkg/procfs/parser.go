@@ -31,17 +31,17 @@ var allowedPrefixes = []string{"/proc", "/dev", "/tmp"} //nolint:gochecknoglobal
 
 // Parser holds the configuration for the file parsing process.
 type Parser struct {
-	maxMatches    int
-	scanStrategy  ScanStrategy
-	matchMode     MatchMode
-	splitIndex    int
-	splitSep      string
-	splitSepBytes []byte
-	pattern       string
-	patternBytes  []byte
+	maxMatches          int
+	scanStrategy        ScanStrategy
+	matchMode           MatchMode
+	splitIndex          int
+	splitSeparator      string
+	splitSeparatorBytes []byte
+	pattern             string
+	patternBytes        []byte
 }
 
-// NewParser creates a new Parser instance with default settings (Unlimited lines, Contains mode).
+// NewParser creates a new Parser instance with default settings.
 func NewParser() *Parser {
 	return &Parser{
 		matchMode:    ModeContains,
@@ -49,7 +49,7 @@ func NewParser() *Parser {
 	}
 }
 
-// Parse opens the file at path and returns the remaining content of all lines matching the pattern.
+// Parse opens the file at path and returns content string lines that match set rules.
 func (p *Parser) Parse(path string) ([]string, error) {
 	var (
 		cleanPath     = filepath.Clean(path)
@@ -190,7 +190,7 @@ func (p *Parser) parseLineByScanning(path string, reg *regexp.Regexp) ([]string,
 
 // processByteLine handles the specific matching logic for a single line using byte slices.
 //
-//nolint:cyclop,gocyclo // this is simple switch and is readable.
+//nolint:cyclop,gocyclo // this is simple switch with split conditional and is readable.
 func (p *Parser) processByteLine(line []byte, reg *regexp.Regexp) (string, bool) {
 	if len(p.patternBytes) > 0 { //nolint:nestif // this is only one switch.
 		var matched bool
@@ -221,11 +221,11 @@ func (p *Parser) processByteLine(line []byte, reg *regexp.Regexp) (string, bool)
 		}
 	}
 
-	if len(p.splitSepBytes) == 0 {
+	if len(p.splitSeparatorBytes) == 0 {
 		return string(bytes.TrimSpace(line)), true
 	}
 
-	parts := bytes.Split(line, p.splitSepBytes)
+	parts := bytes.Split(line, p.splitSeparatorBytes)
 	if len(parts) > p.splitIndex {
 		return string(bytes.TrimSpace(parts[p.splitIndex])), true
 	}
@@ -235,7 +235,7 @@ func (p *Parser) processByteLine(line []byte, reg *regexp.Regexp) (string, bool)
 
 // processStringLine handles the specific matching logic for a single line.
 //
-//nolint:cyclop,gocyclo // this is simple switch and one check and is readable.
+//nolint:cyclop,gocyclo // this is simple switch with split conditional and is readable.
 func (p *Parser) processStringLine(line string, reg *regexp.Regexp) (string, bool) {
 	if p.pattern != "" { //nolint:nestif // this is one switch.
 		var matched bool
@@ -266,11 +266,11 @@ func (p *Parser) processStringLine(line string, reg *regexp.Regexp) (string, boo
 		}
 	}
 
-	if p.splitSep == "" {
-		return line, true
+	if p.splitSeparator == "" {
+		return strings.TrimSpace(line), true
 	}
 
-	parts := strings.Split(line, p.splitSep)
+	parts := strings.Split(line, p.splitSeparator)
 	if len(parts) > p.splitIndex {
 		return strings.TrimSpace(parts[p.splitIndex]), true
 	}

@@ -26,13 +26,9 @@ import (
 
 const unauthorizedPath = "/unauthorized/path.txt"
 
-func TestParser_Parse(t *testing.T) { //nolint:tparallel,paralleltest // Disabled due to global variable modification
+func TestParser_Parse(t *testing.T) {
+	t.Parallel()
 	tmpDir := t.TempDir()
-	allowedPrefixes = append(allowedPrefixes, tmpDir)
-
-	t.Cleanup(func() {
-		allowedPrefixes = allowedPrefixes[:len(allowedPrefixes)-1]
-	})
 
 	// generateBigFile creates a large simulated log file content
 	generateBigFile := func() string {
@@ -275,10 +271,10 @@ func TestParser_Parse(t *testing.T) { //nolint:tparallel,paralleltest // Disable
 				splitIndex:   1,
 			},
 			args: args{path: "config.txt"},
-			fileContent: "user=admin\n" +
-				"pass=1234\n" +
+			fileContent: "user=admin  \n" +
+				"   pass=1234\n" +
 				"role=editor",
-			want:    []string{"admin", "1234", "editor"},
+			want:    []string{"admin", "1234", "editor"}, // will trim lines.
 			wantErr: false,
 		},
 

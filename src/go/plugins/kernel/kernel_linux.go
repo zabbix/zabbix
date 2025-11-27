@@ -54,10 +54,10 @@ func (p *Plugin) gatherData(key string) (uint64, error) {
 		return 0, errs.Errorf("failed to parse %s", fileName)
 	}
 
-	maximum, err := strconv.ParseUint(data[0], 10, 64)
+	result, err := strconv.ParseUint(data[0], 10, 64)
 	if err != nil {
-		return 0, errs.Wrapf(err, "Cannot obtain data from %s.", fileName)
+		return 0, errs.Wrapf(err, "data obtained from %s was invalid", fileName)
 	}
 
-	return maximum, nil
+	return result, nil
 }
