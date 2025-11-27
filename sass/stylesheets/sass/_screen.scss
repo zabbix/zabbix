@@ -4003,12 +4003,6 @@ z-select {
 		background: $header-bg-color;
 		z-index: 3;
 	}
-
-	z-textarea-flexible {
-		textarea {
-			overflow-y: auto;
-		}
-	}
 }
 
 .global-macro-table,

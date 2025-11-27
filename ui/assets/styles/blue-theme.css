@@ -4665,7 +4665,7 @@ z-textarea-flexible {
   display: inline-block; }
   z-textarea-flexible textarea {
     margin: 0;
-    padding: 4px 5px;
+    padding: 5px 5px;
     min-height: 24px;
     overflow: hidden;
     resize: none;
@@ -8808,11 +8808,6 @@ z-select.z-select-host-interface li[disabled] .description:not(:empty) {
   top: 0;
   background: #ffffff;
   z-index: 3; }
-.modal-popup-medium z-textarea-flexible textarea,
-.modal-popup-large z-textarea-flexible textarea,
-.modal-popup-static z-textarea-flexible textarea,
-.modal-popup-preprocessing z-textarea-flexible textarea {
-  overflow-y: auto; }
 
 .global-macro-table .table-col-value,
 .global-macro-table .table-col-template-value,

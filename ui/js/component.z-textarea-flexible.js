@@ -153,24 +153,8 @@ class ZTextareaFlexible extends HTMLElement {
 	}
 
 	#updateHeight() {
-		const computed_style = getComputedStyle(this.#textarea);
-
-		const saved_value = this.#textarea.value;
-		if (!saved_value && this.#textarea.placeholder) {
-			this.#textarea.value = this.#textarea.placeholder;
-		}
-
-		const base = parseFloat(computed_style.minHeight) || 0;
-		this.#textarea.style.height = base + 'px';
-
-		const border = parseFloat(computed_style.borderTopWidth) + parseFloat(computed_style.borderBottomWidth);
-		const target = this.#textarea.scrollHeight + (computed_style.boxSizing === 'border-box' ? border : 0);
-
-		if (!saved_value && this.#textarea.placeholder) {
-			this.#textarea.value = saved_value;
-		}
-
-		this.#textarea.style.height = Math.ceil(target) + 'px';
+		this.#textarea.style.height = '0';
+		this.#textarea.style.height = `${this.#textarea.scrollHeight}px`;
 	}
 
 	#initVisibilityWatch() {
