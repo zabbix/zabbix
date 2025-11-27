@@ -211,7 +211,7 @@ class testMediatype extends CAPITest {
 			'unchanged token_url' => [
 				[[
 					'mediatypeid' => ':media_type:OAuth media type SMTP with tokens',
-					'token_url' => 'http://example.com',
+					'token_url' => 'http://example.com'
 				]],
 				'token_url'
 			],
@@ -229,14 +229,14 @@ class testMediatype extends CAPITest {
 			'authorization_url changed and no tokens_status provided' => [
 				[[
 					'mediatypeid' => ':media_type:OAuth media type SMTP with tokens',
-					'authorization_url' => 'http://example123.com',
+					'authorization_url' => 'http://example123.com'
 				]],
 				'authorization_url'
 			],
 			'unchanged authorization_url' => [
 				[[
 					'mediatypeid' => ':media_type:OAuth media type SMTP with tokens',
-					'authorization_url' => 'http://example.com',
+					'authorization_url' => 'http://example.com'
 				]],
 				'authorization_url'
 			]
