@@ -946,7 +946,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 			$this->page->removeFocus();
 
 			foreach (['js-item-query-fields-field' => 'Query fields', 'js-item-headers-field' => 'Headers fields'] as $id => $name) {
-				$this->assertScreenshot($this->query('xpath://div[@id='. CXPathHelper::escapeQuotes($id).']/div')->one(),
+				$this->assertScreenshot($this->query('xpath://div[@id='. CXPathHelper::escapeQuotes($id).']')->one(),
 						$name
 				);
 			}
