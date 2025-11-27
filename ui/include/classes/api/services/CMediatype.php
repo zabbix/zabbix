@@ -698,16 +698,22 @@ class CMediatype extends CApiService {
 
 		if ($is_update
 				&& (array_key_exists('token_url', $mediatype) || array_key_exists('authorization_url', $mediatype))) {
-			$updated_items = DB::getUpdatedValues(
-				'media_type_oauth',
-				['token_url' => $mediatype['token_url'], 'authorization_url' => $mediatype['authorization_url']],
-				['token_url' => $db_mediatype['token_url'], 'authorization_url' => $db_mediatype['authorization_url']]
+			$mediatype_urls = array_filter(
+				array_intersect_key($mediatype, array_flip(['token_url', 'authorization_url']))
 			);
 
-			$updated_items = array_filter($updated_items);
+			$db_mediatype_urls = array_intersect_key(
+				[
+					'token_url' => $db_mediatype['token_url'],
+					'authorization_url' => $db_mediatype['authorization_url']
+				], $mediatype_urls
+			);
 
-			if ($updated_items) {
-				if (array_key_exists('token_url', $updated_items) && !array_key_exists('client_secret', $mediatype)) {
+			$mediatype_urls_updated = DB::getUpdatedValues('media_type_oauth', $mediatype_urls, $db_mediatype_urls);
+
+			if ($mediatype_urls_updated) {
+				if (array_key_exists('token_url',$mediatype_urls_updated)
+						&& !array_key_exists('client_secret', $mediatype)) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.', $path,
 						_s('the parameter "%1$s" is missing', 'client_secret')
 					));
