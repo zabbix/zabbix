@@ -181,18 +181,23 @@ $form_grid
 		(new CLabel(_('Read-write access to services with tag'), 'service-write-tag-tag'))
 			->addClass('js-service-write-access')
 			->addStyle('display: none;'),
-		(new CFormField(
+		(new CFormField([
 			new CHorList([
 				(new CTextBox('service_write_tag_tag', $data['rules']['service_write_tag']['tag']))
 					->setId('service-write-tag-tag')
+					->setAttribute('data-error-container', 'service-write-tag-tag-error-container')
 					->setAttribute('placeholder', _('tag'))
 					->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
 				(new CTextBox('service_write_tag_value', $data['rules']['service_write_tag']['value']))
 					->setAttribute('placeholder', _('value'))
 					->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-			])))
-				->addClass('js-service-write-access')
-				->addStyle('display: none;')
+			]),
+			(new CDiv())
+				->setId('service-write-tag-tag-error-container')
+				->addClass(ZBX_STYLE_ERROR_CONTAINER),
+		]))
+			->addClass('js-service-write-access')
+			->addStyle('display: none;')
 	])
 	->addItem([
 		new CLabel(_('Read-only access to services'), 'service-read-access'),
@@ -222,16 +227,21 @@ $form_grid
 		(new CLabel(_('Read-only access to services with tag'), 'service-read-tag-tag'))
 			->addClass('js-service-read-access')
 			->addStyle('display: none;'),
-		(new CFormField(
+		(new CFormField([
 			new CHorList([
 				(new CTextBox('service_read_tag_tag', $data['rules']['service_read_tag']['tag']))
 					->setId('service-read-tag-tag')
+					->setAttribute('data-error-container', 'service-read-tag-tag-error-container')
 					->setAttribute('placeholder', _('tag'))
 					->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
 				(new CTextBox('service_read_tag_value', $data['rules']['service_read_tag']['value']))
 					->setAttribute('placeholder', _('value'))
 					->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-			])))
+			]),
+			(new CDiv())
+				->setId('service-read-tag-tag-error-container')
+				->addClass(ZBX_STYLE_ERROR_CONTAINER),
+		]))
 			->addClass('js-service-read-access')
 			->addStyle('display: none;')
 	]);
