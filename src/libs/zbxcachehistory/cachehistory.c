@@ -3295,6 +3295,19 @@ void	zbx_hc_get_item_values(zbx_dc_history_t *history, zbx_vector_hc_item_ptr_t 
 	}
 }
 
+static void	hc_remove_item(zbx_hc_item_t *item)
+{
+	while (NULL != item->tail)
+	{
+		zbx_hc_data_t	*next = item->tail->next;
+
+		hc_free_data(item->tail);
+		item->tail = next;
+	}
+
+	zbx_hashset_remove_direct(&cache->history_items, item);
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: push back the processed history items into history cache          *
@@ -3325,16 +3338,19 @@ void	zbx_hc_push_items(zbx_vector_hc_item_ptr_t *history_items)
 				hc_queue_item(item);
 				break;
 			case ZBX_HC_ITEM_STATUS_NORMAL:
+				if (ZBX_HC_ITEM_CACHE_FALSE == item->cache)
+				{
+					hc_remove_item(item);
+					break;
+				}
+
 				item->values_num--;
 				data_free = item->tail;
 				item->tail = item->tail->next;
 				hc_free_data(data_free);
 				if (NULL == item->tail)
 				{
-					if (ZBX_HC_ITEM_CACHE_TRUE == item->cache)
-						item->head = NULL;
-					else
-						zbx_hashset_remove(&cache->history_items, item);
+					item->head = NULL;
 				}
 				else
 				{
