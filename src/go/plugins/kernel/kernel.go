@@ -20,18 +20,26 @@ import (
 	"golang.zabbix.com/sdk/zbxerr"
 )
 
-var (
-	impl Plugin
+const (
+	pidMaxPath  = "/proc/sys/kernel/pid_max"
+	fileMaxPath = "/proc/sys/fs/file-max"
+	fileNrPath  = "/proc/sys/fs/file-nr"
 )
 
 // Plugin -
 type Plugin struct {
 	plugin.Base
+
+	pidMaxPath  string
+	fileMaxPath string
+	fileNrPath  string
 }
 
 func init() {
+	impl := &Plugin{}
+
 	err := plugin.RegisterMetrics(
-		&impl, "Kernel",
+		impl, "Kernel",
 		"kernel.maxproc", "Returns maximum number of processes supported by OS.",
 		"kernel.maxfiles", "Returns maximum number of opened files supported by OS.",
 		"kernel.openfiles", "Returns number of currently open file descriptors.",
@@ -39,17 +47,21 @@ func init() {
 	if err != nil {
 		panic(errs.Wrap(err, "failed to register metrics"))
 	}
+
+	impl.pidMaxPath = pidMaxPath
+	impl.fileMaxPath = fileMaxPath
+	impl.fileNrPath = fileNrPath
 }
 
-// Export -
-func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
+// Export implements plugin.Configurator interface.
+func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (any, error) {
 	if len(params) > 0 {
 		return nil, zbxerr.ErrorTooManyParameters
 	}
 
 	switch key {
 	case "kernel.maxproc", "kernel.maxfiles", "kernel.openfiles":
-		return getFirstNum(key)
+		return p.gatherData(key)
 	default:
 		/* SHOULD_NEVER_HAPPEN */
 		return 0, plugin.UnsupportedMetricError

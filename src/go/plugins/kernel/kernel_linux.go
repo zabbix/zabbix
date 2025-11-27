@@ -22,17 +22,17 @@ import (
 	"golang.zabbix.com/sdk/plugin"
 )
 
-// getFirstNum  - get first number from file
-func getFirstNum(key string) (uint64, error) {
-	fileName := "/proc"
+// gatherData  - get first number from file.
+func (p *Plugin) gatherData(key string) (uint64, error) {
+	var fileName string
 
 	switch key {
 	case "kernel.maxproc":
-		fileName += "/sys/kernel/pid_max"
+		fileName = p.pidMaxPath
 	case "kernel.maxfiles":
-		fileName += "/sys/fs/file-max"
+		fileName = p.fileMaxPath
 	case "kernel.openfiles":
-		fileName += "/sys/fs/file-nr"
+		fileName = p.fileNrPath
 	default:
 		return 0, plugin.UnsupportedMetricError
 	}
