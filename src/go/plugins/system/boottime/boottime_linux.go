@@ -15,52 +15,77 @@
 package boottime
 
 import (
+	"fmt"
+	"strconv"
+	"strings"
+
 	"golang.zabbix.com/agent2/pkg/procfs"
 	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/plugin"
 	"golang.zabbix.com/sdk/zbxerr"
 )
 
-const pluginName = "Boottime"
-
-var impl Plugin //nolint:gochecknoglobals
+const (
+	pluginName       = "Boottime"
+	procStatFilepath = "/proc/stat"
+	pattern          = "btime"
+)
 
 // Plugin is a base struct for a plugin.
 type Plugin struct {
 	plugin.Base
+
+	procStatFilepath string
 }
 
 //nolint:gochecknoinits
 func init() {
+	impl := &Plugin{}
+
 	err := plugin.RegisterMetrics(
-		&impl, pluginName,
+		impl, pluginName,
 		"system.boottime", "Returns system boot time in unixtime.",
 	)
 	if err != nil {
 		panic(errs.Wrap(err, "failed to register metrics"))
 	}
+
+	impl.procStatFilepath = procStatFilepath
 }
 
-// Export implements Exporter interface.
-func (*Plugin) Export(_ string, params []string, _ plugin.ContextProvider) (any, error) {
+// Export implements plugin.Exporter interface.
+func (p *Plugin) Export(_ string, params []string, _ plugin.ContextProvider) (any, error) {
 	if len(params) != 0 {
 		return nil, zbxerr.ErrorTooManyParameters
 	}
 
 	parser := procfs.NewParser().
-		SetPattern("btime").
-		SetMaxMatches(1).
+		SetPattern(pattern).
 		SetMatchMode(procfs.ModePrefix).
-		SetSplitter("btime", 1)
+		SetSplitter(pattern, 1)
 
-	result, err := parser.Parse("/proc/stat")
+	data, err := parser.Parse(p.procStatFilepath)
 	if err != nil {
-		return nil, errs.Wrap(err, "failed to parse /proc/stat")
+		return nil, errs.Wrapf(err, "failed to parse %s", p.procStatFilepath)
 	}
 
-	if len(result) != 1 {
-		return nil, errs.New("unexpected result")
+	var (
+		result uint64
+		found  bool
+	)
+
+	for _, d := range data {
+		result, err = strconv.ParseUint(strings.TrimSpace(d), 10, 64)
+		if err == nil {
+			found = true
+
+			break
+		}
 	}
 
-	return result[0], nil
+	if !found {
+		return nil, errs.New(fmt.Sprintf("Cannot find a line with %q in %s.", pattern, p.procStatFilepath))
+	}
+
+	return result, nil
 }
