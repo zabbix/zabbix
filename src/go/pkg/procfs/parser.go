@@ -196,12 +196,12 @@ func (p *Parser) processByteLine(line []byte, reg *regexp.Regexp) (string, bool)
 	}
 
 	if len(p.splitSepBytes) == 0 {
-		return string(line), true
+		return string(bytes.TrimSpace(line)), true
 	}
 
 	parts := bytes.Split(line, p.splitSepBytes)
 	if len(parts) > p.splitIndex {
-		return string(bytes.TrimSpace(parts[p.splitIndex])), true //todo need to check if spaces are trimmed everywhere
+		return string(bytes.TrimSpace(parts[p.splitIndex])), true
 	}
 
 	return "", false

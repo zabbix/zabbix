@@ -24,6 +24,8 @@ import (
 	"github.com/google/go-cmp/cmp"
 )
 
+const unauthorizedPath = "/unauthorized/path.txt"
+
 func TestParser_Parse(t *testing.T) { //nolint:tparallel,paralleltest // Disabled due to global variable modification
 	tmpDir := t.TempDir()
 	allowedPrefixes = append(allowedPrefixes, tmpDir)
@@ -366,7 +368,7 @@ func TestParser_Parse(t *testing.T) { //nolint:tparallel,paralleltest // Disable
 			fields: fields{
 				scanStrategy: StrategyReadAll,
 			},
-			args:        args{path: "/unauthorized/path.txt"},
+			args:        args{path: unauthorizedPath},
 			fileContent: "",
 			want:        nil,
 			wantErr:     true,
@@ -436,7 +438,7 @@ func TestParser_Parse(t *testing.T) { //nolint:tparallel,paralleltest // Disable
 
 			var targetPath string
 
-			if tt.args.path == "/unauthorized/path.txt" {
+			if tt.args.path == unauthorizedPath {
 				targetPath = tt.args.path
 			} else {
 				targetPath = filepath.Join(tmpDir, tt.args.path)
