@@ -39,11 +39,11 @@ static void	swap_direct(zbx_binary_heap_t *heap, int index_1, int index_2)
 
 static void	swap(zbx_binary_heap_elem_t *elem_1, zbx_binary_heap_elem_t *elem_2)
 {
-	void	*tmp;
+	zbx_binary_heap_elem_t	tmp;
 
-	tmp = elem_1->data;
-	elem_1->data = elem_2->data;
-	elem_2->data = tmp;
+	tmp = *elem_1;
+	*elem_1 = *elem_2;
+	*elem_2 = tmp;
 }
 
 /* private binary heap functions */
