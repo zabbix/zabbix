@@ -27,6 +27,8 @@ import (
 	"golang.zabbix.com/sdk/log"
 )
 
+const parserLogMessage = "[File Parser]"
+
 var allowedPrefixes = []string{"/proc", "/dev", "/tmp"} //nolint:gochecknoglobals // used as a constant check slice.
 
 // Parser holds the configuration for the file parsing process.
@@ -117,7 +119,12 @@ func (p *Parser) parseByReadingAllIntoMemory(path string, reg *regexp.Regexp) ([
 		lines   = bytes.Split(content, []byte("\n"))
 	)
 
-	log.Tracef("Opened file %s, with size of %d bytes, of %d lines", path, len(content), len(lines))
+	log.Tracef("%s Opened file %s, with size of %d bytes, of %d lines",
+		parserLogMessage,
+		path,
+		len(content),
+		len(lines),
+	)
 
 	for _, lineBytes := range lines {
 		// Check match limit at the start of iteration
@@ -151,9 +158,9 @@ func (p *Parser) parseLineByScanning(path string, reg *regexp.Regexp) ([]string,
 
 	stats, err := file.Stat()
 	if err == nil {
-		log.Tracef("Opened file %s, with size of %d bytes", path, stats.Size())
+		log.Tracef("%s Opened file %s, with size of %d bytes", parserLogMessage, path, stats.Size())
 	} else {
-		log.Tracef("Opened file %s, failed to read size of it", path)
+		log.Tracef("%s Opened file %s, failed to read size of it", parserLogMessage, path)
 	}
 
 	defer file.Close() //nolint:errcheck // standard defer function which error would not change anything.
