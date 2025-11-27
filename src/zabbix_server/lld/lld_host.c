@@ -5556,6 +5556,7 @@ static void	lld_interfaces_make(const zbx_vector_lld_interface_ptr_t *interfaces
 					0);
 			zbx_substitute_lld_macros(&new_interface->port, host->jp_row, lld_macros, ZBX_MACRO_ANY, NULL,
 					0);
+			zbx_ltrim(new_interface->port, "0");
 
 			if (INTERFACE_TYPE_SNMP == interface->type)
 			{
