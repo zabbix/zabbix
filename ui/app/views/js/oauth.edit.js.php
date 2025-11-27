@@ -92,14 +92,67 @@ window.oauth_edit_popup = new class {
 			e.target.focus();
 		});
 
-		this.form.querySelector('button[name="client_secret_button"]')?.addEventListener('click', e => {
-			const input = this.form.querySelector('[name="client_secret"]');
+		if (this.form.querySelector('button[name="client_secret_button"]') !== null) {
+			this.form.querySelector('button[name="client_secret_button"]')
+				.addEventListener('click', this.#showClientSecretField.bind(this));
 
-			e.target.remove();
-			input.style.display = '';
-			input.removeAttribute('disabled');
-			input.focus();
-		});
+			this.form.querySelector('[name="token_url"]')
+				.addEventListener('input', this.#showClientSecretWithWarning.bind(this));
+
+			this.form.querySelector('#oauth-token-parameters-table')
+				.addEventListener('input', e => {
+					if (e.target.name.startsWith('token_url_parameters')) {
+						this.#showClientSecretWithWarning();
+					}
+				});
+
+			this.form.querySelector('#oauth-token-parameters-table')
+				.addEventListener('click', e => {
+					if (e.target.matches('.element-table-remove')) {
+						this.#showClientSecretWithWarning();
+					}
+				});
+		}
+	}
+
+	#showClientSecretWithWarning() {
+		const original_token_url = this.form.querySelector('[name="token_url"]').getAttribute('value');
+		const current_token_url = this.#getUrl('token_url', 'token_url_parameters');
+
+		if (original_token_url !== current_token_url) {
+			this.#showClientSecretField();
+			this.form.querySelector('.js-client-secret-warning').style.display = '';
+		}
+	}
+
+	#getUrl(url_selector, parameters_selector) {
+		const url = new URL(this.form.querySelector('[name="'+url_selector+'"]').value);
+
+		url.search = Array.from(this.form.querySelectorAll('[name^="'+parameters_selector+'"][name$="[name]"]'))
+			.filter(param_name_element => param_name_element.value)
+			.map(param_name_element => {
+				const index = parseInt(param_name_element.name.split('[')[1].replace(']', ''));
+				const param_value_element = this.form.querySelector('input[name="'+parameters_selector+'['+index+'][value]"]');
+
+				return encodeURIComponent(param_name_element.value)+'='+encodeURIComponent(param_value_element.value);
+			}).join('&');
+
+		return url.href;
+	}
+
+	#showClientSecretField() {
+		const button_element = this.form.querySelector('button[name="client_secret_button"]');
+		const input_element = this.form.querySelector('[name="client_secret"]');
+
+		if (button_element !== null) {
+			button_element.remove();
+		}
+
+		if (input_element !== null) {
+			input_element.style.display = '';
+			input_element.removeAttribute('disabled');
+			input_element.focus();
+		}
 	}
 
 	#initDynamicRows(url_selector, parameters_selector, options) {
