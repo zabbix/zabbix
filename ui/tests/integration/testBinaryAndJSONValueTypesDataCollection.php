@@ -337,7 +337,7 @@ class testBinaryAndJSONValueTypesDataCollection extends CIntegrationTest {
 						'preprocessing' =>
 						[[
 							'type' => ZBX_PREPROC_JSONPATH,
-							'params' => '$.tls_handshake',
+							'params' => '$.performance_timings.tls_handshake',
 							'error_handler' => 0,
 							'error_handler_params' => ''
 						]]
@@ -428,7 +428,7 @@ class testBinaryAndJSONValueTypesDataCollection extends CIntegrationTest {
 					'preprocessing' =>
 					[[
 						'type' => ZBX_PREPROC_JSONPATH,
-						'params' => '$.tls_handshake',
+						'params' => '$.performance_timings.tls_handshake',
 						'error_handler' => 0,
 						'error_handler_params' => ''
 					]]
@@ -627,7 +627,8 @@ class testBinaryAndJSONValueTypesDataCollection extends CIntegrationTest {
 			'itemids'	=>	self::$itemids['proxy_agent:JSON_TRAPPER_PREPROC_THROTTLING'],
 			'history'	=>	ITEM_VALUE_TYPE_JSON,
 			'sortfield'	=>	'clock',
-			'sortorder'	=>	'DESC'
+			'sortorder'	=>	'DESC',
+			'limit'         =>      1
 		]);
 
 		$this->assertEquals(2, count($response['result']), json_encode($response['result']));
@@ -801,11 +802,13 @@ class testBinaryAndJSONValueTypesDataCollection extends CIntegrationTest {
 		// Retrieve str dependent item value type history data from API
 		$active_data = $this->callUntilDataIsPresent('history.get', [
 			'itemids'	=>	self::$itemids['proxy_agent:STR_VALUE_TYPE_DEP_WITH_PREPROC'],
-			'history'	=>	ITEM_VALUE_TYPE_STR
+			'history'	=>	ITEM_VALUE_TYPE_STR,
+			'sortfield'     =>      "clock",
+			'sortorder'     =>      "DESC",
+			'limit'         =>      1
 		]);
 
 		$this->assertEquals(1, count($active_data['result']));
 		$this->assertEquals($json_data_http_response, $active_data['result'][0]['value']);
-
 	}
 }
