@@ -23,7 +23,7 @@ class MonitoringOverview {
 		$groupids = CDataHelper::getIds('name');
 
 		// Create hosts with interfaces.
-		$host = CDataHelper::createHosts([
+		$hosts = CDataHelper::createHosts([
 			[
 				'host' => '1_Host_to_check_Monitoring_Overview',
 				'name' => '1_Host_to_check_Monitoring_Overview',
@@ -326,6 +326,12 @@ class MonitoringOverview {
 
 		foreach ($acknowledge as $id) {
 			DBexecute('UPDATE acknowledges SET clock=1533629135 WHERE eventid='.zbx_dbstr($id));
+
+			// Imitate event acknowledge by other user (guest).
+			if ($id === $eventids['4_trigger_Average']) {
+				DBexecute('UPDATE acknowledges SET userid = 2 WHERE eventid='.zbx_dbstr($id));
+			}
+
 			$id = CDBHelper::getValue('SELECT acknowledgeid FROM acknowledges WHERE eventid='.zbx_dbstr($id));
 			DBexecute('UPDATE task SET clock=1533631968 WHERE taskid='.zbx_dbstr($id));
 		}
@@ -347,7 +353,8 @@ class MonitoringOverview {
 			'itemids' => $itemids,
 			'eventids' => $eventids,
 			'triggerids' => $triggerids,
-			'groupids' => $groupids
+			'groupids' => $groupids,
+			'hostids' => $hosts['hostids']
 		];
 	}
 }
