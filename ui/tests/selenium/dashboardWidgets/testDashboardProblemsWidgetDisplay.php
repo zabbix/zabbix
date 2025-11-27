@@ -544,8 +544,7 @@ class testDashboardProblemsWidgetDisplay extends testWidgets {
 				]
 			],
 			// #11 Filtered by Host group, tags, show 3, shortened, tag priority.
-			// TODO: uncomment after fix ZBX-27171
-/*			[
+			[
 				[
 					'fields' => [
 						'Name' => 'Group, tags, show 3, shortened, tag priority',
@@ -579,7 +578,7 @@ class testDashboardProblemsWidgetDisplay extends testWidgets {
 							'Update', 'Actions', 'Tags'
 					]
 				]
-			],*/
+			],
 			// #12 Filtered by Host, operational data - Separately, Show suppressed.
 			[
 				[

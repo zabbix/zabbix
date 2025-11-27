@@ -44,22 +44,12 @@ zbx_hash_t	zbx_hash_modfnv(const void *data, size_t len, zbx_hash_t seed)
 	return hash;
 }
 
-/*
- * see http://xoshiro.di.unimi.it/splitmix64.c
- */
-zbx_hash_t	zbx_hash_splittable64(const void *data)
+zbx_hash_t	zbx_hash_id64(const void *data)
 {
 	zbx_uint64_t	value = *(const zbx_uint64_t *)data;
 
-	value ^= value >> 30;
-	value *= __UINT64_C(0xbf58476d1ce4e5b9);
-	value ^= value >> 27;
-	value *= __UINT64_C(0x94d049bb133111eb);
-	value ^= value >> 31;
-
-	return (zbx_hash_t)value ^ (value >> 32);
+	return (zbx_hash_t)value;
 }
-
 /* default hash functions */
 
 zbx_hash_t	zbx_default_ptr_hash_func(const void *data)
