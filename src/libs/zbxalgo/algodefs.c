@@ -26,9 +26,9 @@ zbx_hash_t	zbx_hash_modfnv(const void *data, size_t len, zbx_hash_t seed)
 {
 	const uchar	*p = (const uchar *)data;
 
-	zbx_hash_t	hash;
+	zbx_uint32_t	hash;
 
-	hash = 2166136261u ^ seed;
+	hash = 2166136261u ^ (zbx_uint32_t)seed;
 
 	while (len-- >= 1)
 	{
