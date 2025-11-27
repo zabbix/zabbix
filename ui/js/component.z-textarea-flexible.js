@@ -41,8 +41,6 @@ class ZTextareaFlexible extends HTMLElement {
 			this.removeAttribute('value');
 
 			this.#textarea.name = this.getAttribute('name');
-			this.#textarea.width = this.hasAttribute('width') ? Number(this.getAttribute('width')) : null;
-			this.#textarea.height = this.hasAttribute('height') ? Number(this.getAttribute('height')) : null;
 			this.#textarea.value = value;
 			this.#textarea.placeholder = this.hasAttribute('placeholder') ? this.getAttribute('placeholder') : null;
 			this.#textarea.disabled = this.hasAttribute('disabled');
@@ -69,8 +67,7 @@ class ZTextareaFlexible extends HTMLElement {
 	}
 
 	static get observedAttributes() {
-		return ['width', 'height', 'value', 'maxlength', 'placeholder', 'disabled', 'readonly', 'singleline',
-			'spellcheck'];
+		return ['width', 'value', 'maxlength', 'placeholder', 'disabled', 'readonly', 'singleline',	'spellcheck'];
 	}
 
 	attributeChangedCallback(name, old_value, new_value) {
@@ -80,11 +77,7 @@ class ZTextareaFlexible extends HTMLElement {
 
 		switch (name) {
 			case 'width':
-				this.#textarea.style.width = new_value;
-				break;
-
-			case 'height':
-				this.#textarea.style.height = new_value;
+				this.style.width = new_value;
 				break;
 
 			case 'maxlength':
@@ -176,19 +169,11 @@ class ZTextareaFlexible extends HTMLElement {
 	}
 
 	get width() {
-		return this.#textarea.style.width;
+		return this.style.width;
 	}
 
 	set width(width) {
-		this.#textarea.style.width = width;
-	}
-
-	get height() {
-		return this.#textarea.style.height;
-	}
-
-	set height(height) {
-		this.#textarea.style.height = height;
+		this.style.width = width;
 	}
 
 	get maxlength() {
