@@ -303,6 +303,7 @@ static int	variant_to_str(zbx_variant_t *value)
 	switch (value->type)
 	{
 		case ZBX_VARIANT_STR:
+		case ZBX_VARIANT_JSON:
 			return SUCCEED;
 		case ZBX_VARIANT_DBL:
 			value_str = zbx_strdup(NULL, zbx_print_double(buffer, sizeof(buffer), value->data.dbl));
@@ -330,6 +331,8 @@ int	zbx_variant_convert(zbx_variant_t *value, int type)
 		case ZBX_VARIANT_DBL:
 			return variant_to_dbl(value);
 		case ZBX_VARIANT_STR:
+			return variant_to_str(value);
+		case ZBX_VARIANT_JSON:
 			return variant_to_str(value);
 		case ZBX_VARIANT_NONE:
 			zbx_variant_clear(value);
@@ -622,6 +625,9 @@ static int	variant_compare_dbl(const zbx_variant_t *value1, const zbx_variant_t 
 		case ZBX_VARIANT_STR:
 			value1_dbl = atof(value1->data.str);
 			break;
+		case ZBX_VARIANT_JSON:
+			value1_dbl = atof(value1->data.json);
+			break;
 		default:
 			THIS_SHOULD_NEVER_HAPPEN;
 			exit(EXIT_FAILURE);
@@ -637,6 +643,9 @@ static int	variant_compare_dbl(const zbx_variant_t *value1, const zbx_variant_t 
 			break;
 		case ZBX_VARIANT_STR:
 			value2_dbl = atof(value2->data.str);
+			break;
+		case ZBX_VARIANT_JSON:
+			value2_dbl = atof(value2->data.json);
 			break;
 		default:
 			THIS_SHOULD_NEVER_HAPPEN;
