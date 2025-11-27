@@ -36,12 +36,8 @@ class ZTextareaFlexible extends HTMLElement {
 
 			this.#textarea = this.querySelector('textarea');
 
-			// Textarea value will become empty if we remove wrapper value after assigned it to textarea
-			const value = this.hasAttribute('value') ? this.getAttribute('value') : null;
-			this.removeAttribute('value');
-
 			this.#textarea.name = this.getAttribute('name');
-			this.#textarea.value = value;
+			this.#textarea.value = this.hasAttribute('value') ? this.getAttribute('value') : null;
 			this.#textarea.placeholder = this.hasAttribute('placeholder') ? this.getAttribute('placeholder') : null;
 			this.#textarea.disabled = this.hasAttribute('disabled');
 			this.#textarea.readOnly = this.hasAttribute('readonly');
