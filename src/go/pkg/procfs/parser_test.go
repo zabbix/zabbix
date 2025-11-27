@@ -384,6 +384,16 @@ func TestParser_Parse(t *testing.T) { //nolint:tparallel,paralleltest // Disable
 			wantErr:     true,
 		},
 		{
+			name: "-FileNotFoundOSReadFile",
+			fields: fields{
+				scanStrategy: StrategyOSReadFile,
+			},
+			args:        args{path: "non_existent_file_os.txt"},
+			fileContent: "", // File not created
+			want:        nil,
+			wantErr:     true,
+		},
+		{
 			name: "-FileNotFoundLineByLine",
 			fields: fields{
 				scanStrategy: StrategyReadLineByLine,
