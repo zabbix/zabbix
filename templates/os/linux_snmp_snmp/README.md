@@ -41,12 +41,10 @@ Ensure snmpd is monitoring disks, using `includeALLDisks` or `disk` options. Exa
 includeALLDisks 0% # monitors all disks starting with 0% fill rate
 # disk / 0% # monitor only / root volume starting with 0% fill rate
 ```
-Make sure you change that in order to read metrics of UCD-SNMP-MIB and UCD-DISKIO-MIB. Please refer to the documentation:
-http://www.net-snmp.org/wiki/index.php/Vacm
+Make sure you change that in order to read metrics of UCD-SNMP-MIB and UCD-DISKIO-MIB.
+Please refer to the documentation: http://www.net-snmp.org/wiki/index.php/Vacm.
 
-You can also try to use `snmpconf`:
-
-http://www.net-snmp.org/wiki/index.php/TUT:snmpd_configuration
+You can also try to use `snmpconf`: http://www.net-snmp.org/wiki/index.php/TUT:snmpd_configuration.
 
 Change `{$SNMP_COMMUNITY}` on the host level in Zabbix.
 
