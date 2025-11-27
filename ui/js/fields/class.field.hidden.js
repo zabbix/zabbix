@@ -38,7 +38,7 @@ class CFieldHidden extends CField {
 	}
 
 	getValue() {
-		if (this._field.disabled) {
+		if (this.isDisabled()) {
 			return null;
 		}
 
@@ -55,8 +55,12 @@ class CFieldHidden extends CField {
 		return value.trim();
 	}
 
+	isDisabled() {
+		return this._field.disabled;
+	}
+
 	setErrors({message, level}) {
-		if (this._error_container !== null) {
+		if (super._error_container !== null) {
 			super.setErrors({message, level});
 		}
 		else if (message !== '') {

@@ -17,6 +17,7 @@
 #include "template.h"
 #include "trigger_linking.h"
 #include "graph_linking.h"
+#include "tag_cache.h"
 
 #include "zbxcacheconfig.h"
 #include "audit/zbxaudit_host.h"
@@ -2410,6 +2411,9 @@ int	zbx_db_delete_template_elements(zbx_uint64_t hostid, const char *hostname, z
 	zbx_db_execute("%s", sql);
 
 	zbx_free(sql);
+
+	if (SUCCEED != (res = zbx_db_delete_host_template_cache(hostid, del_templateids)))
+		*error = zbx_dsprintf(NULL, "failed to delete host tag cache for hostid: " ZBX_FS_UI64, hostid);
 clean:
 	zbx_vector_uint64_destroy(&templateids);
 
@@ -4126,7 +4130,7 @@ static void	DBhost_prototypes_save(const zbx_vector_ptr_t *host_prototypes,
 				zbx_audit_host_update_json_add_hostmacro(audit_context_mode,
 						host_prototype->hostid, ZBX_AUDIT_RESOURCE_HOST_PROTOTYPE,
 						new_hostmacroid, hostmacro->macro, (ZBX_MACRO_VALUE_SECRET ==
-						(int)hostmacro->type) ? ZBX_MACRO_SECRET_MASK : hostmacro->value,
+						(int)hostmacro->type) ? ZBX_SECRET_MASK : hostmacro->value,
 						hostmacro->description, (int)hostmacro->type,
 						(int)hostmacro->automatic);
 				new_hostmacroid++;
@@ -4154,9 +4158,9 @@ static void	DBhost_prototypes_save(const zbx_vector_ptr_t *host_prototypes,
 							ZBX_MACRO_VALUE_SECRET == (int)hostmacro->type_orig) ||
 							(0 == (hostmacro->flags & ZBX_FLAG_HPMACRO_UPDATE_TYPE) &&
 							ZBX_MACRO_VALUE_SECRET == (int)hostmacro->type)) ?
-							ZBX_MACRO_SECRET_MASK : hostmacro->value_orig,
+							ZBX_SECRET_MASK : hostmacro->value_orig,
 							(ZBX_MACRO_VALUE_SECRET == (int)hostmacro->type) ?
-							ZBX_MACRO_SECRET_MASK : hostmacro->value);
+							ZBX_SECRET_MASK : hostmacro->value);
 				}
 
 				if (0 != (hostmacro->flags & ZBX_FLAG_HPMACRO_UPDATE_DESCRIPTION))
@@ -5443,8 +5447,8 @@ static void	DBsave_httptests(zbx_uint64_t hostid, const zbx_vector_ptr_t *httpte
 			zbx_free(str_esc);									\
 														\
 			zbx_audit_httptest_update_json_update_##field(audit_context_mode, httptest->httptestid, \
-					(0 == strcmp("", httptest->field##_orig) ? "" :ZBX_MACRO_SECRET_MASK),	\
-					(0 == strcmp("", httptest->field) ? "" : ZBX_MACRO_SECRET_MASK));	\
+					(0 == strcmp("", httptest->field##_orig) ? "" :ZBX_SECRET_MASK),	\
+					(0 == strcmp("", httptest->field) ? "" : ZBX_SECRET_MASK));	\
 		}
 
 #define PREPARE_UPDATE_HTTPTEST_INT(FLAG, field)								\
@@ -5870,6 +5874,12 @@ int	zbx_db_copy_template_elements(zbx_uint64_t hostid, zbx_vector_uint64_t *lnk_
 	if (0 == lnk_templateids->values_num)
 		goto clean;
 
+	if (FAIL == (res = zbx_db_copy_host_template_cache(hostid, lnk_templateids)))
+	{
+		*error = zbx_dsprintf(NULL, "failed to copy host tag cache for hostid: " ZBX_FS_UI64, hostid);
+		goto clean;
+	}
+
 	hosttemplateid = zbx_db_get_maxid_num("hosts_templates", lnk_templateids->values_num);
 
 	db_insert_htemplates = zbx_malloc(NULL, sizeof(zbx_db_insert_t));
@@ -5900,7 +5910,6 @@ int	zbx_db_copy_template_elements(zbx_uint64_t hostid, zbx_vector_uint64_t *lnk_
 		DBcopy_template_httptests(hostid, lnk_templateids, audit_context_mode);
 	}
 clean:
-
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(res));
 
 	return res;
@@ -6552,6 +6561,7 @@ void	zbx_db_add_interface_snmp(const zbx_uint64_t interfaceid, const unsigned ch
 		if (NULL == (tbl = zbx_db_get_table("interface_snmp")))
 		{
 			THIS_SHOULD_NEVER_HAPPEN;
+			exit(EXIT_FAILURE);
 		}
 
 		max_repetitions = atoi(zbx_db_get_field(tbl, "max_repetitions")->default_value);

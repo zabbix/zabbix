@@ -249,7 +249,9 @@ class testFormTags extends CWebTest {
 		$sql = null;
 		$old_hash = null;
 		$expected = CTestArrayHelper::get($data, 'expected', TEST_GOOD);
-		$inline_validation = in_array($object, ['host', 'template', 'trigger', 'trigger prototype', 'item', 'item prototype']);
+		$inline_validation = in_array($object, ['host', 'host prototype', 'template', 'trigger', 'trigger prototype',
+			'item', 'item prototype', 'service']
+		);
 
 		switch ($object) {
 			case 'trigger':
@@ -297,7 +299,7 @@ class testFormTags extends CWebTest {
 
 		switch ($object) {
 			case 'host prototype':
-				$form = $this->query('name:hostPrototypeForm')->waitUntilPresent()->asForm(['normalized' => true])->one();
+				$form = COverlayDialogElement::find()->waitUntilReady()->one()->asForm();
 				$data['name'] = $data['name'].' {#KEY}';
 				$form->fill(['Host name' => $data['name']]);
 				$form->fill(['Host groups' => 'Zabbix servers']);
@@ -482,7 +484,9 @@ class testFormTags extends CWebTest {
 		$sql = null;
 		$old_hash = null;
 		$expected = CTestArrayHelper::get($data, 'expected', TEST_GOOD);
-		$inline_validation = in_array($object, ['host', 'template', 'trigger', 'trigger prototype', 'item', 'item prototype']);
+		$inline_validation = in_array($object, ['host', 'host prototype', 'template', 'trigger', 'trigger prototype',
+			'item', 'item prototype', 'service'
+		]);
 
 		switch ($object) {
 			case 'trigger':
@@ -537,7 +541,7 @@ class testFormTags extends CWebTest {
 			$this->query('link', $this->update_name)->waitUntilClickable()->one()->click();
 		}
 
-			$form = ($object === 'web scenario' || $object === 'host prototype')
+			$form = ($object === 'web scenario')
 					? $this->query($locator)->asForm()->waitUntilPresent()->one()
 					: COverlayDialogElement::find()->waitUntilVisible()->asForm()->one();
 
@@ -705,7 +709,7 @@ class testFormTags extends CWebTest {
 				break;
 
 			case 'host prototype':
-				$form = $this->query('name:hostPrototypeForm')->asForm(['normalized' => true])->waitUntilPresent()->one();
+				$form = COverlayDialogElement::find()->waitUntilReady()->one()->asForm();
 				$form->fill(['Host name' => $new_name]);
 
 				$sql_old_name = 'SELECT NULL FROM hosts WHERE host='.zbx_dbstr($this->clone_name);
@@ -975,7 +979,7 @@ class testFormTags extends CWebTest {
 		$tags = $element->getValue();
 
 		if (in_array($object, ['connector', 'template', 'trigger', 'item', 'trigger prototype', 'item prototype',
-				'host', 'service'])) {
+				'host', 'host prototype', 'service'])) {
 			COverlayDialogElement::find()->one()->close();
 		}
 
@@ -1043,7 +1047,7 @@ class testFormTags extends CWebTest {
 				break;
 		}
 
-		$new_form = (in_array($object, ['trigger', 'trigger prototype', 'item', 'item prototype']))
+		$new_form = (in_array($object, ['trigger', 'trigger prototype', 'item', 'item prototype', 'host prototype']))
 				? COverlayDialogElement::find()->one()->waitUntilReady()->asForm()
 				: $this->query('xpath://main/form')->asForm()->waitUntilPresent()->one();
 
@@ -1205,6 +1209,7 @@ class testFormTags extends CWebTest {
 		$form->fill(['id:show_inherited_tags' => 'Inherited and '.$field_name.' tags']);
 
 		if ($object === 'web scenario') {
+			$form->waitUntilReloaded();
 			$this->page->waitUntilReady();
 		}
 		else {
@@ -1411,11 +1416,10 @@ class testFormTags extends CWebTest {
 		}
 
 		$locators = [
-			'web scenario' => 'name:webscenario_form',
-			'host prototype' => 'name:hostPrototypeForm'
+			'web scenario' => 'name:webscenario_form'
 		];
 
-		$form = ($object === 'web scenario' || $object === 'host prototype')
+		$form = ($object === 'web scenario')
 				? $this->query($locators[$object])->asForm()->waitUntilPresent()->one()
 				: COverlayDialogElement::find()->waitUntilReady()->asForm()->one();
 

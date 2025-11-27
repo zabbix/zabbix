@@ -21,7 +21,6 @@
 #include "zbxregexp.h"
 #include "zbxstr.h"
 #include "zbxjson.h"
-#include "zbxexpression.h"
 #include "zbxalgo.h"
 #include "zbxdb.h"
 #include "zbxparam.h"
@@ -95,7 +94,7 @@ int	zbx_lld_macro_paths_get(zbx_uint64_t lld_ruleid, zbx_vector_lld_macro_path_p
 
 zbx_lld_macro_path_t	*lld_macro_path_create(const char *lld_macro, const char *path)
 {
-	zbx_lld_macro_path_t        *lld_macro_path;
+	zbx_lld_macro_path_t	*lld_macro_path;
 
 	lld_macro_path = (zbx_lld_macro_path_t *)zbx_malloc(NULL, sizeof(zbx_lld_macro_path_t));
 	lld_macro_path->lld_macro = zbx_strdup(NULL, lld_macro);
@@ -602,8 +601,10 @@ int	zbx_substitute_lld_macros(char **data, const zbx_lld_entry_t *lld_obj, int f
 	size_t		i;
 	zbx_token_t	token;
 
-	zabbix_log(LOG_LEVEL_TRACE, "In %s() data:'%s'", __func__, *data);
-
+	zabbix_log(LOG_LEVEL_TRACE, "In %s()", __func__);
+#ifdef ZBX_DEBUG
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() data:'%s'", __func__, *data);
+#endif
 	while (SUCCEED == ret && SUCCEED == zbx_token_find(*data, pos, &token, ZBX_TOKEN_SEARCH_EXPRESSION_MACRO))
 	{
 		for (i = prev_token_loc_r + 1; i < token.loc.l; i++)
@@ -659,7 +660,10 @@ int	zbx_substitute_lld_macros(char **data, const zbx_lld_entry_t *lld_obj, int f
 		pos++;
 	}
 
-	zabbix_log(LOG_LEVEL_TRACE, "End of %s():%s data:'%s'", __func__, zbx_result_string(ret), *data);
+#ifdef ZBX_DEBUG
+	zabbix_log(LOG_LEVEL_TRACE, "%s() result:'%s'", __func__, *data);
+#endif
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
 }

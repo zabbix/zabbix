@@ -13,7 +13,6 @@
 **/
 
 #include "lld.h"
-#include "zbxexpression.h"
 
 #include "zbxregexp.h"
 #include "audit/zbxaudit.h"
@@ -26,6 +25,7 @@
 #include "zbxexpr.h"
 #include "zbxstr.h"
 #include "zbxtime.h"
+#include "zbxcalc.h"
 
 ZBX_PTR_VECTOR_IMPL(lld_item_link_ptr, zbx_lld_item_link_t*)
 ZBX_PTR_VECTOR_IMPL(lld_row_ptr, zbx_lld_row_t*)
@@ -1243,4 +1243,30 @@ out:
 
 	return ret;
 #undef LIFETIME_DURATION_GET
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: check if text contains LLD macros                                 *
+ *                                                                            *
+ * Parameters: text - [IN] text to check for LLD macros                       *
+ *                                                                            *
+ * Return value: SUCCEED - text contains LLD macros                           *
+ *               FAIL    - text does not contain LLD macros                   *
+ *                                                                            *
+ ******************************************************************************/
+int	lld_text_has_lld_macro(const char *text)
+{
+	zbx_token_t	token;
+	int		pos = 0;
+
+	while (SUCCEED == zbx_token_find(text, pos, &token, ZBX_TOKEN_SEARCH_BASIC))
+	{
+		if (ZBX_TOKEN_LLD_MACRO == token.type || ZBX_TOKEN_LLD_FUNC_MACRO == token.type)
+			return SUCCEED;
+
+		pos++;
+	}
+
+	return FAIL;
 }

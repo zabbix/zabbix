@@ -228,7 +228,7 @@ $arrow-fill-down: #000000;
 $arrow-fill-up-down: #000000;
 
 // Important! @import string should come after variables
-@import 'screen.scss';
+@import 'screen';
 
 // layout/sidebar
 .sidebar {
@@ -542,6 +542,13 @@ a.link-action {
 		background-color: $ui-bg-selected-color;
 		color: $white;
 	}
+
+	&.tag-inherited,
+	&.tag-inherited-duplicate {
+		&::before {
+			opacity: 1;
+		}
+	}
 }
 
 .disabled {
@@ -676,6 +683,25 @@ textarea.has-error {
 	}
 
 	&.compact-view {
+		td {
+			&.na-bg,
+			&.normal-bg,
+			&.info-bg,
+			&.warning-bg,
+			&.average-bg,
+			&.high-bg,
+			&.disaster-bg {
+				&::before {
+					font-size: 22px;
+					padding-top: 0;
+					padding-bottom: 0;
+				}
+			}
+		}
+	}
+
+	&.compact-view,
+	&.has-highlighted-rows {
 		.flh-na-bg,
 		.flh-info-bg,
 		.flh-warning-bg,
@@ -688,6 +714,8 @@ textarea.has-error {
 		}
 
 		td {
+			box-shadow: inset 0 -1px 0 0 $table-border-color;
+
 			&.na-bg,
 			&.normal-bg,
 			&.info-bg,
@@ -697,13 +725,8 @@ textarea.has-error {
 			&.disaster-bg {
 				&::before {
 					box-shadow: inset 0 -1px 0 0 $table-border-color;
-					font-size: 22px;
-					padding-top: 0;
-					padding-bottom: 0;
 				}
 			}
-
-			box-shadow: inset 0 -1px 0 0 $table-border-color;
 		}
 	}
 }

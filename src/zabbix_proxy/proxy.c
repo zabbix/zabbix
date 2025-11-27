@@ -117,6 +117,12 @@ static const char	*help_message[] = {
 	"                                   target is not specified",
 	"      " ZBX_PROF_DISABLE "=target        Disable profiling, affects all processes if",
 	"                                   target is not specified",
+	"      " ZBX_DBPOOL_STATUS "              Display database connection pool status",
+	"      " ZBX_DBPOOL_SET_IDLE_TIMEOUT "=seconds",
+	"                                 Set the idle timeout for connections in the database pool",
+	"      " ZBX_DBPOOL_SET_MAX_IDLE "=num    Set the maximum number of idle connections retained in",
+	"      "      "                           the database pool",
+	"      " ZBX_DBPOOL_SET_MAX_OPEN "=num    Set the maximum number of open connections in the database pool",
 	"",
 	"      Log level control targets:",
 	"        process-type             All processes of specified type",
@@ -1157,7 +1163,7 @@ static void	zbx_on_exit(int ret, void *on_exit_args)
 	if (NULL != zbx_threads)
 	{
 		/* wait for all child processes to exit */
-		zbx_threads_kill_and_wait(zbx_threads, threads_flags, zbx_threads_num);
+		zbx_threads_kill_and_wait(zbx_threads, threads_flags, zbx_threads_num, ret);
 
 		zbx_free(zbx_threads);
 		zbx_free(threads_flags);
@@ -1392,6 +1398,13 @@ static void	proxy_db_init(void)
 	int		db_type, version_check;
 
 	zbx_db_config->read_only_recoverable = 1;
+
+	if (SUCCEED != zbx_db_library_init(&error))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize database library: %s", error);
+		zbx_free(error);
+		exit(EXIT_FAILURE);
+	}
 
 	if (SUCCEED != zbx_db_init(&error))
 	{
@@ -1942,12 +1955,12 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 				zbx_thread_start(zbx_httppoller_thread, &thread_args, &zbx_threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_DISCOVERYMANAGER:
-				threads_flags[i] = ZBX_THREAD_PRIORITY_FIRST;
+				threads_flags[i] = ZBX_THREAD_PRIORITY_COLLECTOR;
 				thread_args.args = &discoverer_args;
 				zbx_thread_start(zbx_discoverer_thread, &thread_args, &zbx_threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_HISTSYNCER:
-				threads_flags[i] = ZBX_THREAD_PRIORITY_FIRST;
+				threads_flags[i] = ZBX_THREAD_PRIORITY_SYNCER;
 				thread_args.args = &dbsyncer_args;
 				zbx_thread_start(zbx_dbsyncer_thread, &thread_args, &zbx_threads[i]);
 				break;
@@ -1981,12 +1994,12 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 				zbx_thread_start(taskmanager_thread, &thread_args, &zbx_threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_PREPROCMAN:
-				threads_flags[i] = ZBX_THREAD_PRIORITY_FIRST;
+				threads_flags[i] = ZBX_THREAD_PRIORITY_COLLECTOR;
 				thread_args.args = &preproc_man_args;
 				zbx_thread_start(zbx_pp_manager_thread, &thread_args, &zbx_threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_AVAILMAN:
-				threads_flags[i] = ZBX_THREAD_PRIORITY_FIRST;
+				threads_flags[i] = ZBX_THREAD_PRIORITY_SYNCER;
 				zbx_thread_start(zbx_availability_manager_thread, &thread_args, &zbx_threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_ODBCPOLLER:
@@ -2042,7 +2055,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 
 		if (0 < (pid = waitpid((pid_t)-1, &i, WNOHANG)))
 		{
-			if (SUCCEED == zbx_is_child_pid(pid, zbx_threads, zbx_threads_num))
+			if (SUCCEED == zbx_child_cleanup(pid, zbx_threads, zbx_threads_num))
 			{
 				zbx_set_exiting_with_fail();
 				break;

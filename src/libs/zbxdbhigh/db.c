@@ -16,6 +16,7 @@
 
 #include "zbxcrypto.h"
 #include "zbxnum.h"
+#include "zbxstr.h"
 #include "zbx_host_constants.h"
 #include "zbxalgo.h"
 #include "zbxdb.h"
@@ -326,15 +327,13 @@ const char	*zbx_user_string(zbx_uint64_t userid)
  *                                                                            *
  * Purpose: get user username, name and surname                               *
  *                                                                            *
- * Parameters: userid     - [IN] user id                                      *
- *             username   - [OUT] user alias                                  *
- *             name       - [OUT] user name                                   *
- *             surname    - [OUT] user surname                                *
+ * Parameters: userid  - [IN] user id                                         *
+ *             names   - [OUT] user names                                     *
  *                                                                            *
  * Return value: SUCCEED or FAIL                                              *
  *                                                                            *
  ******************************************************************************/
-int	zbx_db_get_user_names(zbx_uint64_t userid, char **username, char **name, char **surname)
+int	zbx_db_get_user_names(zbx_uint64_t userid, zbx_user_names_t **names)
 {
 	int		ret = FAIL;
 	zbx_db_result_t	result;
@@ -351,15 +350,26 @@ int	zbx_db_get_user_names(zbx_uint64_t userid, char **username, char **name, cha
 	if (NULL == (row = zbx_db_fetch(result)))
 		goto out;
 
-	*username = zbx_strdup(NULL, row[0]);
-	*name = zbx_strdup(NULL, row[1]);
-	*surname = zbx_strdup(NULL, row[2]);
+	*names = zbx_malloc(*names, sizeof(zbx_user_names_t));
+
+	(*names)->userid = userid;
+	(*names)->username = zbx_strdup(NULL, row[0]);
+	(*names)->name = zbx_strdup(NULL, row[1]);
+	(*names)->surname = zbx_strdup(NULL, row[2]);
 
 	ret = SUCCEED;
 out:
 	zbx_db_free_result(result);
 
 	return ret;
+}
+
+void	zbx_user_names_clean(zbx_user_names_t **names)
+{
+	zbx_free((*names)->name);
+	zbx_free((*names)->surname);
+	zbx_free((*names)->username);
+	zbx_free(*names);
 }
 
 /******************************************************************************
@@ -564,9 +574,11 @@ int	zbx_db_get_user_by_active_session(const char *sessionid, zbx_user_t *user)
 	zbx_db_result_t	result;
 	zbx_db_row_t	row;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() sessionid:%s", __func__, sessionid);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() sessionid:%s", __func__, ZBX_STRMASK(sessionid));
 
 	sessionid_esc = zbx_db_dyn_escape_string(sessionid);
+
+	zbx_db_query_mask_t	old_queries = zbx_db_set_log_masked_values(ZBX_DB_MASK_QUERIES);
 
 	if (NULL == (result = zbx_db_select(
 			"select u.userid,u.roleid,u.username,r.type"
@@ -592,6 +604,7 @@ int	zbx_db_get_user_by_active_session(const char *sessionid, zbx_user_t *user)
 out:
 	zbx_db_free_result(result);
 	zbx_free(sessionid_esc);
+	zbx_db_set_log_masked_values(old_queries);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 

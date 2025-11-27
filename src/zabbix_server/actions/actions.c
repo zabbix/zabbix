@@ -20,7 +20,6 @@
 #include "zbxdb.h"
 #include "zbxexpr.h"
 #include "zbxcacheconfig.h"
-#include "zbxexpression.h"
 #include "zbxregexp.h"
 #include "audit/zbxaudit.h"
 #include "zbxnum.h"
@@ -31,6 +30,7 @@
 #include "zbx_trigger_constants.h"
 #include "zbx_item_constants.h"
 #include "zbxescalations.h"
+#include "zbxcalc.h"
 
 void	zbx_ack_task_free(zbx_ack_task_t *ack_task)
 {
@@ -153,7 +153,8 @@ static int	check_host_group_condition(const zbx_vector_db_event_t *esc_events, z
 	if (ZBX_CONDITION_OPERATOR_EQUAL != condition->op && ZBX_CONDITION_OPERATOR_NOT_EQUAL != condition->op)
 		return NOTSUPPORTED;
 
-	ZBX_STR2UINT64(condition_value, condition->value);
+	if (SUCCEED != zbx_is_uint64(condition->value, &condition_value))
+		return NOTSUPPORTED;
 
 	zbx_vector_uint64_create(&objectids);
 	zbx_vector_uint64_create(&groupids);
@@ -415,13 +416,14 @@ static int	check_host_template_condition(const zbx_vector_db_event_t *esc_events
 	if (ZBX_CONDITION_OPERATOR_EQUAL != condition->op && ZBX_CONDITION_OPERATOR_NOT_EQUAL != condition->op)
 		return NOTSUPPORTED;
 
+	if (SUCCEED != zbx_is_uint64(condition->value, &condition_value))
+		return NOTSUPPORTED;
+
 	zbx_vector_uint64_create(&objectids);
 	zbx_vector_uint64_pair_create(&objectids_pair);
 
 	get_object_ids(esc_events, &objectids);
 	objectids_to_pair(&objectids, &objectids_pair);
-
-	ZBX_STR2UINT64(condition_value, condition->value);
 
 	trigger_parents_sql_alloc(&sql, &sql_alloc, &objectids);
 
@@ -482,7 +484,8 @@ static int	check_host_condition(const zbx_vector_db_event_t *esc_events, zbx_con
 	else
 		return NOTSUPPORTED;
 
-	ZBX_STR2UINT64(condition_value, condition->value);
+	if (SUCCEED != zbx_is_uint64(condition->value, &condition_value))
+		return NOTSUPPORTED;
 
 	zbx_vector_uint64_create(&objectids);
 
@@ -536,7 +539,8 @@ static int	check_trigger_id_condition(const zbx_vector_db_event_t *esc_events, z
 	if (ZBX_CONDITION_OPERATOR_EQUAL != condition->op && ZBX_CONDITION_OPERATOR_NOT_EQUAL != condition->op)
 		return NOTSUPPORTED;
 
-	ZBX_STR2UINT64(condition_value, condition->value);
+	if (SUCCEED != zbx_is_uint64(condition->value, &condition_value))
+		return NOTSUPPORTED;
 
 	zbx_vector_uint64_create(&objectids);
 	zbx_vector_uint64_pair_create(&objectids_pair);
@@ -984,7 +988,8 @@ static int	check_drule_condition(const zbx_vector_db_event_t *esc_events, zbx_co
 	else
 		return NOTSUPPORTED;
 
-	ZBX_STR2UINT64(condition_value, condition->value);
+	if (SUCCEED != zbx_is_uint64(condition->value, &condition_value))
+		return NOTSUPPORTED;
 
 	zbx_vector_uint64_create(&objectids[0]);
 	zbx_vector_uint64_create(&objectids[1]);
@@ -1075,7 +1080,8 @@ static int	check_dcheck_condition(const zbx_vector_db_event_t *esc_events, zbx_c
 	else
 		return NOTSUPPORTED;
 
-	ZBX_STR2UINT64(condition_value, condition->value);
+	if (SUCCEED != zbx_is_uint64(condition->value, &condition_value))
+		return NOTSUPPORTED;
 
 	zbx_vector_uint64_create(&objectids);
 
@@ -1179,7 +1185,8 @@ static int	check_proxy_condition(const zbx_vector_db_event_t *esc_events, zbx_co
 	else
 		return NOTSUPPORTED;
 
-	ZBX_STR2UINT64(condition_value, condition->value);
+	if (SUCCEED != zbx_is_uint64(condition->value, &condition_value))
+		return NOTSUPPORTED;
 
 	zbx_vector_uint64_create(&objectids[0]);
 	zbx_vector_uint64_create(&objectids[1]);
@@ -1362,12 +1369,9 @@ static int	check_dhost_ip_condition(const zbx_vector_db_event_t *esc_events, zbx
 	zbx_db_row_t		row;
 	int			objects[2] = {EVENT_OBJECT_DHOST, EVENT_OBJECT_DSERVICE};
 	zbx_vector_uint64_t	objectids[2];
-	zbx_uint64_t		condition_value;
 
 	if (ZBX_CONDITION_OPERATOR_EQUAL != condition->op && ZBX_CONDITION_OPERATOR_NOT_EQUAL != condition->op)
 		return NOTSUPPORTED;
-
-	ZBX_STR2UINT64(condition_value, condition->value);
 
 	zbx_vector_uint64_create(&objectids[0]);
 	zbx_vector_uint64_create(&objectids[1]);
@@ -1886,9 +1890,10 @@ static int	check_areg_proxy_condition(const zbx_vector_db_event_t *esc_events, z
 	zbx_vector_uint64_t	objectids;
 	zbx_uint64_t		condition_value;
 
-	ZBX_STR2UINT64(condition_value, condition->value);
-
 	if (ZBX_CONDITION_OPERATOR_EQUAL != condition->op && ZBX_CONDITION_OPERATOR_NOT_EQUAL != condition->op)
+		return NOTSUPPORTED;
+
+	if (SUCCEED != zbx_is_uint64(condition->value, &condition_value))
 		return NOTSUPPORTED;
 
 	zbx_vector_uint64_create(&objectids);
@@ -2112,7 +2117,8 @@ static int	check_intern_host_group_condition(const zbx_vector_db_event_t *esc_ev
 	if (ZBX_CONDITION_OPERATOR_EQUAL != condition->op && ZBX_CONDITION_OPERATOR_NOT_EQUAL != condition->op)
 		return NOTSUPPORTED;
 
-	ZBX_STR2UINT64(condition_value, condition->value);
+	if (SUCCEED != zbx_is_uint64(condition->value, &condition_value))
+		return NOTSUPPORTED;
 
 	for (size_t i = 0; i < ARRSIZE(objects); i++)
 		zbx_vector_uint64_create(&objectids[i]);
@@ -2251,6 +2257,9 @@ static int	check_intern_host_template_condition(const zbx_vector_db_event_t *esc
 	if (ZBX_CONDITION_OPERATOR_EQUAL != condition->op && ZBX_CONDITION_OPERATOR_NOT_EQUAL != condition->op)
 		return NOTSUPPORTED;
 
+	if (SUCCEED != zbx_is_uint64(condition->value, &condition_value))
+		return NOTSUPPORTED;
+
 	for (size_t i = 0; i < ARRSIZE(objects); i++)
 	{
 		zbx_vector_uint64_create(&objectids[i]);
@@ -2258,8 +2267,6 @@ static int	check_intern_host_template_condition(const zbx_vector_db_event_t *esc
 	}
 
 	get_object_ids_internal(esc_events, objectids, objects, ARRSIZE(objects));
-
-	ZBX_STR2UINT64(condition_value, condition->value);
 
 	for (size_t i = 0; i < ARRSIZE(objects); i++)
 	{
@@ -2354,7 +2361,8 @@ static int	check_intern_host_condition(const zbx_vector_db_event_t *esc_events, 
 	else
 		return NOTSUPPORTED;
 
-	ZBX_STR2UINT64(condition_value, condition->value);
+	if (SUCCEED != zbx_is_uint64(condition->value, &condition_value))
+		return NOTSUPPORTED;
 
 	for (size_t i = 0; i < ARRSIZE(objects); i++)
 		zbx_vector_uint64_create(&objectids[i]);

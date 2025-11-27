@@ -467,7 +467,10 @@ function stepInstallAgent($agent_script_data): array {
 											DB::getFieldLength('hosts', 'tls_psk_identity')
 										))->setAriaRequired(),
 										(new CDiv(
-											_('Enter a non-secret pre-shared key identity string. Avoid including sensitive data.')
+											_('Enter a unique name that Zabbix components will use to recognize the pre-shared key.')
+										))->addClass(ZBX_STYLE_FORM_FIELDS_HINT),
+										(new CDiv(
+											_('Avoid including sensitive data.')
 										))->addClass(ZBX_STYLE_FORM_FIELDS_HINT)
 									]))->addClass('js-tls-input'),
 									(new CFormField([
@@ -555,7 +558,7 @@ function stepInstallAgent($agent_script_data): array {
 				->addItem(
 					(new CDiv([
 						new CTag('pre', true,
-							"$(command -v curl || echo $(command -v wget) -O -) https://cdn.zabbix.com/scripts/{$agent_script_data['version']}/install-zabbix.sh | bash -s -- #{server_host} #{hostname} #{psk_identity} #{psk}"
+							"$(command -v curl || echo $(command -v wget) -O -) https://cdn.zabbix.com/scripts/install-zabbix.sh | bash -s -- --version {$agent_script_data['version']} #{server_host} #{hostname} #{psk_identity} #{psk}"
 						)
 					]))->addClass(ZBX_STYLE_FORMATED_TEXT)
 				)
@@ -571,10 +574,10 @@ function stepInstallAgent($agent_script_data): array {
 				->addItem(
 					(new CDiv([
 						new CTag('pre', true,
-							"Invoke-WebRequest -Uri https://cdn.zabbix.com/scripts/{$agent_script_data['version']}/install-zabbix.ps1 -OutFile install-zabbix.ps1"
+							"Invoke-WebRequest -Uri https://cdn.zabbix.com/scripts/install-zabbix.ps1 -OutFile install-zabbix.ps1"
 						),
 						new CTag('pre', true,
-							"powershell -executionpolicy bypass .\install-zabbix.ps1 #{server_host} #{hostname} #{psk_identity} #{psk}"
+							"powershell -executionpolicy bypass .\install-zabbix.ps1 -zabbixVersion {$agent_script_data['version']} #{server_host} #{hostname} #{psk_identity} #{psk}"
 						)
 					]))->addClass(ZBX_STYLE_FORMATED_TEXT)
 				)

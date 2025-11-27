@@ -201,4 +201,133 @@ class CGraphHelper extends CGraphGeneralHelper {
 			'preservekeys' => true
 		] + $src_options);
 	}
+
+	/**
+	 * Expands graph item objects data: macros in item name, time units, dependent item
+	 */
+	public static function calculateMetricsDelay(array &$metrics): void {
+		$master_itemids = [];
+
+		foreach ($metrics as &$metric) {
+			if ($metric['type'] == ITEM_TYPE_DEPENDENT) {
+				$master_itemids[$metric['master_itemid']] = true;
+			}
+
+			$metric['throttling_type'] = 0;
+			$metric['throttling_delay'] = '';
+
+			foreach ($metric['preprocessing'] as $step) {
+				if ($step['type'] == ZBX_PREPROC_THROTTLE_VALUE || $step['type'] == ZBX_PREPROC_THROTTLE_TIMED_VALUE) {
+					$metric['throttling_type'] = $step['type'];
+					if ($step['type'] == ZBX_PREPROC_THROTTLE_TIMED_VALUE) {
+						$metric['throttling_delay'] = $step['params'];
+					}
+
+					// Only one throttling step is allowed.
+					break;
+				}
+			}
+			unset($metric['preprocessing']);
+		}
+		unset($metric);
+
+		$master_items = self::getMasterItems(array_keys($master_itemids));
+
+		$master_items = CMacrosResolverHelper::resolveTimeUnitMacros($master_items, ['delay']);
+		$metrics = CMacrosResolverHelper::resolveTimeUnitMacros($metrics, ['delay', 'throttling_delay']);
+
+		foreach ($metrics as &$metric) {
+			if ($metric['type'] == ITEM_TYPE_DEPENDENT) {
+				$master_itemid = $metric['master_itemid'];
+
+				while ($master_items[$master_itemid]['type'] == ITEM_TYPE_DEPENDENT) {
+					$master_itemid = $master_items[$master_itemid]['master_itemid'];
+				}
+
+				// Throttling of the master item is not taken into account, as this configuration is unlikely.
+				$metric['type'] = $master_items[$master_itemid]['type'];
+				$metric['delay'] = $master_items[$master_itemid]['delay'];
+			}
+
+			$metric['delay'] = self::getItemMaxDelay($metric);
+
+			if (strpos($metric['units'], ',') === false) {
+				$metric['units_long'] = '';
+			}
+			else {
+				list($metric['units'], $metric['units_long']) = explode(',', $metric['units'], 2);
+			}
+		}
+		unset($metric);
+	}
+
+	/**
+	 * Returns an array of master items for the given array of item IDs.
+	 *
+	 * @param array  $master_itemids
+	 *
+	 * @return array
+	 */
+	private static function getMasterItems(array $master_itemids): array {
+		$master_items = [];
+
+		do {
+			$items = API::Item()->get([
+				'output' => ['itemid', 'hostid', 'type', 'master_itemid', 'delay'],
+				'itemids' => $master_itemids,
+				'filter' => [
+					'flags' => [ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_PROTOTYPE, ZBX_FLAG_DISCOVERY_CREATED]
+				]
+			]);
+
+			$master_itemids = [];
+
+			foreach ($items as $item) {
+				if ($item['type'] == ITEM_TYPE_DEPENDENT && !array_key_exists($item['master_itemid'], $master_items)) {
+					$master_itemids[$item['master_itemid']] = true;
+				}
+				$master_items[$item['itemid']] = $item;
+			}
+			$master_itemids = array_keys($master_itemids);
+		} while ($master_itemids);
+
+		return $master_items;
+	}
+
+	/**
+	 * Returns the maximum item update interval based on the values of the "type" and "delay" fields.
+	 * Returns NULL if the item type does not support an update interval or if an error occurred during calculation.
+	 *
+	 * @param array  $item
+	 *
+	 * @return int|float|null
+	 */
+	private static function getItemMaxDelay(array $item): int|float|null {
+		if (($item['type'] == ITEM_TYPE_ZABBIX_ACTIVE && preg_match('/^(event)?log(rt)?\[/', $item['key_']))
+				|| $item['type'] == ITEM_TYPE_TRAPPER) {
+			return null;
+		}
+
+		$update_interval_parser = new CUpdateIntervalParser();
+
+		if ($update_interval_parser->parse($item['delay']) != CParser::PARSE_SUCCESS) {
+			return null;
+		}
+
+		$delay = timeUnitToSeconds($update_interval_parser->getDelay());
+
+		foreach ($update_interval_parser->getIntervals(ITEM_DELAY_FLEXIBLE) as $flexible_interval) {
+			$flexible_interval_parts = explode('/', $flexible_interval);
+			$flexible_delay = timeUnitToSeconds($flexible_interval_parts[0]);
+
+			$delay = max($delay, $flexible_delay);
+		}
+
+		if ($delay == 0 && $update_interval_parser->getIntervals(ITEM_DELAY_SCHEDULING)) {
+			return null;
+		}
+
+		return $delay;
+	}
+
 }

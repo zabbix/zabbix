@@ -12,7 +12,7 @@ Zabbix version: 8.0 and higher.
 ## Tested versions
 
 This template has been tested on:
-- Microsoft SQL, version 2019, 2022
+- Microsoft SQL, version 2017, 2019, 2022
 
 ## Configuration
 
@@ -20,25 +20,38 @@ This template has been tested on:
 
 ## Setup
 
-1. Deploy Zabbix agent 2 with the MSSQL plugin. You can use this template starting with version 7.4.0 of both Zabbix and the MSSQL plugin. For more information, see [MSSQL plugin documentation](https://git.zabbix.com/projects/AP/repos/mssql/browse).
+1. Deploy Zabbix agent 2 with the MSSQL plugin. You can use this template starting with version 8.0.0 of both Zabbix and the MSSQL plugin. For more information, see [MSSQL plugin documentation](https://git.zabbix.com/projects/AP/repos/mssql/browse).
 
-**Important!** Starting with version 7.4-1 of this template, the MSSQL plugin must be updated to a version equal to or above 7.4.0. (You can check the version of the template in its YAML file under the "vendor" section.)
 
 Loadable plugin requires installation of a separate package or binary file or [compilation from sources](https://www.zabbix.com/documentation/8.0/manual/extensions/plugins/build).
 
-2. Create an MSSQL user for monitoring. For example, "zbx_monitor".
-
-**View Server State** and **View Any Definition** permissions should be granted to the user.
-Grant this user read permissions to the `sysjobschedules`, `sysjobhistory`, and `sysjobs` tables.
-
-For example, using T-SQL commands:
-
-```sql
-GRANT SELECT ON OBJECT::msdb.dbo.sysjobs TO zbx_monitor;
-GRANT SELECT ON OBJECT::msdb.dbo.sysjobservers TO zbx_monitor;
-GRANT SELECT ON OBJECT::msdb.dbo.sysjobactivity TO zbx_monitor;
-GRANT EXECUTE ON OBJECT::msdb.dbo.agent_datetime TO zbx_monitor;
-```
+2. Create a monitoring user on MSSQL for Zabbix to connect to:
+- for MSSQL version 2022
+  ```sql
+  CREATE LOGIN zabbix WITH PASSWORD = 'password'
+  GRANT VIEW SERVER PERFORMANCE STATE TO zabbix
+  GRANT VIEW ANY DEFINITION TO zabbix
+  USE msdb
+  CREATE USER zabbix FOR LOGIN zabbix
+  GRANT EXECUTE ON msdb.dbo.agent_datetime TO zabbix
+  GRANT SELECT ON msdb.dbo.sysjobactivity TO zabbix
+  GRANT SELECT ON msdb.dbo.sysjobservers TO zabbix
+  GRANT SELECT ON msdb.dbo.sysjobs TO zabbix
+  GO
+  ```
+- for MSSQL versions 2017 and 2019
+  ```sql
+  CREATE LOGIN zabbix WITH PASSWORD = 'password'
+  GRANT VIEW SERVER STATE TO zabbix
+  GRANT VIEW ANY DEFINITION TO zabbix
+  USE msdb
+  CREATE USER zabbix FOR LOGIN zabbix
+  GRANT EXECUTE ON msdb.dbo.agent_datetime TO zabbix
+  GRANT SELECT ON msdb.dbo.sysjobactivity TO zabbix
+  GRANT SELECT ON msdb.dbo.sysjobservers TO zabbix
+  GRANT SELECT ON msdb.dbo.sysjobs TO zabbix
+  GO
+  ```
 
 For more information, see MSSQL documentation:
 
@@ -63,8 +76,8 @@ Note: Since version 7.2.0, you can also connect to the MSSQL instance using its 
 |Name|Description|Default|
 |----|-----------|-------|
 |{$MSSQL.URI}|<p>Connection string.</p>||
-|{$MSSQL.USER}|<p>MSSQL username.</p>||
-|{$MSSQL.PASSWORD}|<p>MSSQL user password.</p>||
+|{$MSSQL.USER}|<p>MSSQL database username.</p>||
+|{$MSSQL.PASSWORD}|<p>MSSQL database password.</p>||
 |{$MSSQL.HOST}|<p>The hostname or IP address of the MSSQL instance.</p>|`localhost`|
 |{$MSSQL.PORT}|<p>MSSQL TCP port.</p>|`1433`|
 |{$MSSQL.WORK_FILES.MAX}|<p>The maximum number of work files created per second - for the trigger expression.</p>|`20`|
@@ -93,7 +106,7 @@ Note: Since version 7.2.0, you can also connect to the MSSQL instance using its 
 |{$MSSQL.BACKUP_FULL.CRIT}|<p>The maximum of days without a full backup - for the High trigger expression.</p>|`10d`|
 |{$MSSQL.BACKUP_LOG.WARN}|<p>The maximum of days without a log backup - for the Warning trigger expression.</p>|`4h`|
 |{$MSSQL.BACKUP_LOG.CRIT}|<p>The maximum of days without a log backup - for the High trigger expression.</p>|`8h`|
-|{$MSSQL.BACKUP_DURATION.WARN}|<p>The maximum job duration - for the Warning trigger expression.</p>|`1h`|
+|{$MSSQL.JOB_DURATION.WARN}|<p>The maximum job duration - for the Warning trigger expression.</p>|`1h`|
 |{$MSSQL.BACKUP_FULL.USED}|<p>The flag for checking the age of a full backup. If set to a value other than "1", the trigger expression for the full backup age will not fire. Can be used with context for database name.</p>|`1`|
 |{$MSSQL.BACKUP_LOG.USED}|<p>The flag for checking the age of a log backup. If set to a value other than "1", the trigger expression for the log backup age will not fire. Can be used with context for database name.</p>|`1`|
 |{$MSSQL.BACKUP_DIFF.USED}|<p>The flag for checking the age of a differential backup. If set to a value other than "1", the trigger expression for the differential backup age will not fire. Can be used with context for database name.</p>|`1`|
@@ -448,7 +461,7 @@ Note: Since version 7.2.0, you can also connect to the MSSQL instance using its 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
 |MSSQL: Job '{#JOBNAME}': Failed to run|<p>The last run of the job has failed.</p>|`last(/MSSQL by Zabbix agent 2/mssql.job.runstatus["{#JOBNAME}"])=0`|Warning|**Manual close**: Yes|
-|MSSQL: Job '{#JOBNAME}': Job duration is high|<p>The job is taking too long.</p>|`last(/MSSQL by Zabbix agent 2/mssql.job.run_duration["{#JOBNAME}"])>{$MSSQL.BACKUP_DURATION.WARN:"{#JOBNAME}"}`|Warning|**Manual close**: Yes|
+|MSSQL: Job '{#JOBNAME}': Job duration is high|<p>The job is taking too long.</p>|`last(/MSSQL by Zabbix agent 2/mssql.job.run_duration["{#JOBNAME}"])>{$MSSQL.JOB_DURATION.WARN:"{#JOBNAME}"}`|Warning|**Manual close**: Yes|
 
 ## Feedback
 

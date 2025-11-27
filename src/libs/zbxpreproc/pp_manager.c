@@ -163,6 +163,10 @@ static zbx_pp_manager_t	*zbx_pp_manager_create(int workers_num, zbx_pp_finished_
 	manager->workers_num = workers_num;
 	manager->workers = (zbx_pp_worker_t *)zbx_calloc(NULL, (size_t)workers_num, sizeof(zbx_pp_worker_t));
 
+	sigset_t	orig_mask;
+
+	zbx_block_thread_signals(&orig_mask);
+
 	for (i = 0; i < workers_num; i++)
 	{
 		if (SUCCEED != pp_worker_init(&manager->workers[i], i + 1, &manager->queue, manager->timekeeper,
@@ -175,7 +179,7 @@ static zbx_pp_manager_t	*zbx_pp_manager_create(int workers_num, zbx_pp_finished_
 	}
 
 	zbx_hashset_create_ext(&manager->items, 100, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC,
-			(zbx_clean_func_t)zbx_pp_item_clear, ZBX_DEFAULT_MEM_MALLOC_FUNC, ZBX_DEFAULT_MEM_REALLOC_FUNC,
+			zbx_pp_item_clear_wrapper, ZBX_DEFAULT_MEM_MALLOC_FUNC, ZBX_DEFAULT_MEM_REALLOC_FUNC,
 			ZBX_DEFAULT_MEM_FREE_FUNC);
 
 	if (FAIL == zbx_ipc_async_socket_open(&manager->rtc, ZBX_IPC_SERVICE_RTC, config_timeout, error))
@@ -215,6 +219,8 @@ out:
 
 		manager = NULL;
 	}
+
+	zbx_unblock_signals(&orig_mask);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() ret:%s error:%s", __func__, zbx_result_string(ret),
 			ZBX_NULL2EMPTY_STR(*error));
@@ -456,14 +462,14 @@ static void	pp_manager_queue_value_task_result(zbx_pp_manager_t *manager, zbx_pp
 	d->preproc->time_ms = task->time_ms;
 	d->preproc->total_ms += task->time_ms;
 
-	if (ZBX_VARIANT_NONE == d->result.type)
+	if (ZBX_VARIANT_NONE == d->result.type && 0 == (d->result.data.flags & ZBX_VARIANT_FLAG_CHANGED))
 		return;
 
 	if (NULL != (item = pp_manager_get_cacheable_dependent_item(manager, d->preproc->dep_itemids,
 			d->preproc->dep_itemids_num)))
 	{
 		zbx_pp_task_t	*dep_task;
-		zbx_variant_t	value;
+		zbx_variant_t	value = {0};
 
 		dep_task = pp_task_dependent_create(item->itemid, d->preproc);
 		zbx_pp_task_dependent_t	*d_dep = (zbx_pp_task_dependent_t *)PP_TASK_DATA(dep_task);
@@ -1114,7 +1120,7 @@ static void	preprocessor_reply_top_stats(zbx_pp_manager_t *manager, zbx_ipc_clie
 	zbx_ipc_client_send(client, ZBX_IPC_PREPROCESSOR_TOP_STATS_RESULT, data, data_len);
 
 	zbx_free(data);
-	zbx_vector_pp_top_stats_ptr_clear_ext(&stats, (zbx_pp_top_stats_ptr_free_func_t)zbx_ptr_free);
+	zbx_vector_pp_top_stats_ptr_clear_ext(&stats, zbx_pp_top_stats_free);
 	zbx_vector_pp_top_stats_ptr_destroy(&stats);
 }
 
@@ -1433,6 +1439,10 @@ ZBX_THREAD_ENTRY(zbx_pp_manager_thread, args)
 	}
 
 	zbx_setproctitle("%s #%d [terminating]", get_process_type_string(process_type), process_num);
+
+	/* on normal exit the shutdown message already has been processed and no more messages will be sent */
+	if (SUCCEED != ZBX_EXIT_STATUS())
+		zbx_rtc_unsubscribe_service(pp_args->config_timeout, ZBX_IPC_SERVICE_PREPROCESSING);
 
 	zbx_vector_pp_task_ptr_destroy(&tasks);
 	zbx_pp_manager_free(manager);

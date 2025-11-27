@@ -13,11 +13,11 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-define('ZABBIX_VERSION',		'8.0.0alpha1');
+define('ZABBIX_VERSION',		'8.0.0alpha2');
 define('ZABBIX_API_VERSION',	'8.0.0');
 define('ZABBIX_EXPORT_VERSION',	'8.0');
 
-define('ZABBIX_DB_VERSION',		7050006);
+define('ZABBIX_DB_VERSION',		7050018);
 
 define('DB_VERSION_SUPPORTED',						0);
 define('DB_VERSION_LOWER_THAN_MINIMUM',				1);
@@ -1249,6 +1249,19 @@ define('EVENT_OBJECT_ITEM',				4);
 define('EVENT_OBJECT_LLDRULE',			5);
 define('EVENT_OBJECT_SERVICE',			6);
 
+define('ZBX_TAG_OBJECT_TEMPLATE',			0);
+define('ZBX_TAG_OBJECT_HOST',				1);
+define('ZBX_TAG_OBJECT_HOST_PROTOTYPE',		2);
+define('ZBX_TAG_OBJECT_ITEM',				3);
+define('ZBX_TAG_OBJECT_ITEM_PROTOTYPE',		4);
+define('ZBX_TAG_OBJECT_TRIGGER',			5);
+define('ZBX_TAG_OBJECT_TRIGGER_PROTOTYPE',	6);
+define('ZBX_TAG_OBJECT_HTTPTEST',			7);
+define('ZBX_TAG_OBJECT_EVENT',				8);
+define('ZBX_TAG_OBJECT_PROBLEM',			9);
+define('ZBX_TAG_OBJECT_SERVICE',			10);
+define('ZBX_TAG_OBJECT_HOST_GROUP',			11);
+
 // System information widget constants.
 define('ZBX_SYSTEM_INFO_SERVER_STATS',	0);
 define('ZBX_SYSTEM_INFO_HAC_STATUS',	1);
@@ -1448,6 +1461,9 @@ define('ZBX_FUNCTION_TYPE_OPERATOR',	5);
 define('ZBX_FUNCTION_TYPE_PREDICTION',	6);
 define('ZBX_FUNCTION_TYPE_STRING',		7);
 
+define('ZBX_HIGHLIGHT_OFF',	0);
+define('ZBX_HIGHLIGHT_ON',	1);
+
 define('ZBX_TIMELINE_OFF',	0);
 define('ZBX_TIMELINE_ON',	1);
 
@@ -1511,7 +1527,9 @@ define('ZBX_PREG_INTERNAL_NAMES', '([0-9a-zA-Z_\. \-]+)'); // !!! Don't forget s
 define('ZBX_PREG_NUMBER', '(?<number>-?(\d+(\.\d*)?|\.\d+)([Ee][+-]?\d+)?)');
 define('ZBX_PREG_INT', '(?<int>-?\d+)');
 define('ZBX_PREG_DEF_FONT_STRING', '/^[0-9\.:% ]+$/');
+define('ZBX_TLS_PSK_PATTERN', '/^(.{2}){1,}$/');
 define('ZBX_PREG_HOST_FORMAT', ZBX_PREG_INTERNAL_NAMES);
+define('ZBX_PREG_PSK_IDENTITY_FORMAT', '[^`\']*');
 
 define('TRIGGER_QUERY_PLACEHOLDER', '$'); // !!! Don't forget sync code with C !!!
 
@@ -1641,8 +1659,6 @@ define('API_COLORS',				57);
 define('API_FILTER',				58);
 define('API_ITEM_KEY',				62);
 define('API_ITEM_DELAY',			63);
-define('API_JSON',					64);
-define('API_XML',					65);
 define('API_PREPROC_PARAMS',		66);
 define('API_PROMETHEUS_PATTERN',	67);
 define('API_PROMETHEUS_LABEL',		68);
@@ -1941,6 +1957,12 @@ define('TAB_INDICATOR_TEMPLATE_PERMISSIONS', 'template-permissions');
 define('TAB_INDICATOR_PREPROCESSING', 'preprocessing');
 define('TAB_INDICATOR_PROXY_ENCRYPTION', 'proxy-encryption');
 define('TAB_INDICATOR_PROXY_TIMEOUTS', 'proxy-timeouts');
+define('TAB_INDICATOR_SCATTER_PLOT_AXES', 'scatter-plot-axes');
+define('TAB_INDICATOR_SCATTER_PLOT_DATASET', 'scatter-plot-dataset');
+define('TAB_INDICATOR_SCATTER_PLOT_LEGEND', 'scatter-plot-legend');
+define('TAB_INDICATOR_SCATTER_PLOT_DISPLAY_OPTIONS', 'scatter-plot-display-options');
+define('TAB_INDICATOR_SCATTER_PLOT_TIME_PERIOD', 'scatter-plot-time-period');
+define('TAB_INDICATOR_SCATTER_PLOT_THRESHOLDS', 'scatter-plot-thresholds');
 define('TAB_INDICATOR_SHARING', 'sharing');
 define('TAB_INDICATOR_STEPS', 'steps');
 define('TAB_INDICATOR_TAG_FILTER', 'tag-filter');
@@ -2241,6 +2263,9 @@ define('ZBX_STYLE_TABLE_INITIAL_WIDTH', 'table-initial-width');
 define('ZBX_STYLE_TABLE_STATS', 'table-stats');
 define('ZBX_STYLE_TABS_NAV', 'tabs-nav');
 define('ZBX_STYLE_TAG', 'tag');
+define('ZBX_STYLE_TAG_INHERITED', 'tag-inherited');
+define('ZBX_STYLE_TAG_INHERITED_DUPLICATE', 'tag-inherited-duplicate');
+define('ZBX_STYLE_TAG_INHERITED_TITLE', 'tag-inherited-title');
 define('ZBX_STYLE_TAGS_LIST', 'tags-list');
 define('ZBX_STYLE_TAGS_WRAPPER', 'tags-wrapper');
 define('ZBX_STYLE_TEXT_PLACEHOLDER', 'text-placeholder');
@@ -2401,9 +2426,12 @@ define('ZBX_ICON_COG_FILLED', 'zi-cog-filled');
 define('ZBX_ICON_COLLAPSE', 'zi-collapse');
 define('ZBX_ICON_COMMAND', 'zi-command');
 define('ZBX_ICON_COPY', 'zi-copy');
+define('ZBX_ICON_CROSS', 'zi-cross');
 define('ZBX_ICON_DASHBOARDS', 'zi-dashboards');
 define('ZBX_ICON_DATA_COLLECTION', 'zi-data-collection');
+define('ZBX_ICON_DIAMOND', 'zi-diamond');
 define('ZBX_ICON_DRAG_HANDLE', 'zi-drag-handle');
+define('ZBX_ICON_ELLIPSE', 'zi-ellipse');
 define('ZBX_ICON_ENVELOPE_FILLED', 'zi-envelope-filled');
 define('ZBX_ICON_EXPAND', 'zi-expand');
 define('ZBX_ICON_EYE', 'zi-eye');
@@ -2451,6 +2479,7 @@ define('ZBX_ICON_SPEAKER_OFF', 'zi-speaker-off');
 define('ZBX_ICON_STAR', 'zi-star');
 define('ZBX_ICON_STAR_FILLED', 'zi-star-filled');
 define('ZBX_ICON_SUPPORT', 'zi-support');
+define('ZBX_ICON_SQUARE', 'zi-square');
 define('ZBX_ICON_TEXT', 'zi-text');
 define('ZBX_ICON_TIME_PERIOD', 'zi-time-period');
 define('ZBX_ICON_TREE_TOP_BOTTOM', 'zi-tree-top-bottom');
@@ -2459,6 +2488,7 @@ define('ZBX_ICON_TREE_TOP_RIGHT', 'zi-tree-top-right');
 define('ZBX_ICON_TREE_TOP_RIGHT_SMALL', 'zi-tree-top-right-small');
 define('ZBX_ICON_TREE_TOP_RIGHT_BOTTOM', 'zi-tree-top-right-bottom');
 define('ZBX_ICON_TREE_TOP_RIGHT_BOTTOM_SMALL', 'zi-tree-top-right-bottom-small');
+define('ZBX_ICON_TRIANGLE', 'zi-triangle');
 define('ZBX_ICON_TRIANGLE_WARNING', 'zi-triangle-warning');
 define('ZBX_ICON_UNCHECK', 'zi-uncheck');
 define('ZBX_ICON_USER', 'zi-user');

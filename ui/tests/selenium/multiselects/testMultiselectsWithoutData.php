@@ -27,7 +27,7 @@ class testMultiselectsWithoutData extends testMultiselectDialogs {
 
 	const EMPTY_HOST = 'Empty host for multiselects test';
 	const EMPTY_LLD_HOST = 'Host with empty LLD';
-	const EMPTY_TEMPLATE = 'Empty template for multiselects test';
+	const EMPTY_TEMPLATE = 'A-Empty template for multiselects test';
 	const EMPTY_LLD_TEMPLATE = 'Template with empty LLD';
 	const SCRIPT = 'Script for Actions';
 	const TEMPLATES_MULTISELECT = ['Templates' => ['title' => 'Templates', 'empty' => true, 'filter' => ['Template group' => '']]];
@@ -581,7 +581,7 @@ class testMultiselectsWithoutData extends testMultiselectDialogs {
 		// Fill filter to enable dependent multiselects.
 		if (array_key_exists('filter', $data)) {
 			$form->fill($data['filter']);
-			$form->submit();
+			$form->submit()->waitUntilStalled();
 			$form->invalidate();
 		}
 
@@ -670,8 +670,9 @@ class testMultiselectsWithoutData extends testMultiselectDialogs {
 			[
 				[
 					'object' => 'host prototype',
-					'url' => 'host_prototypes.php?context=host&parent_discoveryid=',
-					'form' => 'id:host-prototype-form'
+					'url' => 'zabbix.php?action=host.prototype.list&context=host&parent_discoveryid=',
+					'form' => 'id:host-prototype-form',
+					'overlay_form' => true
 				]
 			],
 			// Template objects.
@@ -752,8 +753,9 @@ class testMultiselectsWithoutData extends testMultiselectDialogs {
 			[
 				[
 					'object' => 'host prototype',
-					'url' => 'host_prototypes.php?context=template&parent_discoveryid=',
-					'form' => 'id:host-prototype-form'
+					'url' => 'zabbix.php?action=host.prototype.list&context=template&parent_discoveryid=',
+					'form' => 'id:host-prototype-form',
+					'overlay_form' => true
 				]
 			]
 		];
@@ -818,7 +820,7 @@ class testMultiselectsWithoutData extends testMultiselectDialogs {
 				break;
 
 			case 'host prototype':
-				$form = $this->query($data['form'])->asForm(['normalized' => true])->one();
+				$form = $this->query($data['form'])->asForm()->one();
 				$this->checkMultiselectDialogs($form, [self::TEMPLATES_MULTISELECT]);
 				break;
 		}

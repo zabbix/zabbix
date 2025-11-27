@@ -14,6 +14,7 @@ DIST_SUBDIRS = \
 	zbxcomms \
 	zbxcommshigh \
 	zbxcompress \
+	zbxcalc \
 	zbxcfg \
 	zbxcrypto \
 	zbxcurl \
@@ -70,7 +71,6 @@ DIST_SUBDIRS = \
 	zbxscripts \
 	zbxself \
 	zbxserialize \
-	zbxexpression \
 	zbxservice \
 	zbxshmem \
 	zbxsnmptrapper \
@@ -143,7 +143,6 @@ SERVER_SUBDIRS = \
 	zbxscripts \
 	zbxself \
 	zbxserialize \
-	zbxexpression \
 	zbxservice \
 	zbxshmem \
 	zbxsnmptrapper \
@@ -212,7 +211,6 @@ PROXY_SUBDIRS = \
 	zbxrtc \
 	zbxself \
 	zbxserialize \
-	zbxexpression \
 	zbxscripts \
 	zbxshmem \
 	zbxsnmptrapper \
@@ -242,6 +240,7 @@ SUBDIRS = \
 	zbxcomms \
 	zbxcommshigh \
 	zbxcompress \
+	zbxcalc \
 	zbxcfg \
 	zbxcrypto \
 	zbxcurl \

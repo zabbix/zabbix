@@ -80,13 +80,19 @@ function escapeHtml(string) {
  * @param {bool}             allow_negative  If true, negative numbers are allowed; otherwise, negative numbers
  *                                           are converted to positive.
  * @param {number}           min_length      Pad number with zeroes to maintain min length.
+ * @param {number|null}      default_value
  */
-function normalizeNumericBox(input, {allow_empty, allow_negative, min_length}) {
+function normalizeNumericBox(input, {allow_empty, allow_negative, min_length, default_value}) {
 	const old_value = input.value;
 	let num = parseInt(input.value, 10);
 
 	if (isNaN(num)) {
-		input.value = (input.value === '' && allow_empty) ? '' : '0'.repeat(Math.max(min_length, 1));
+		if (default_value !== null) {
+			input.value = default_value;
+		}
+		else {
+			input.value = (input.value === '' && allow_empty) ? '' : '0'.repeat(Math.max(min_length, 1));
+		}
 	}
 	else {
 		if (num < 0 && !allow_negative) {
@@ -933,6 +939,35 @@ function objectToSearchParams(object) {
 		}
 
 		return search_params;
+	};
+
+	return combine(object);
+}
+
+/**
+ * Convert nested data object into Form data object.
+ *
+ * @param {Object|Array} object
+ *
+ * @returns {FormData}
+ */
+function objectToFormData(object) {
+	const combine = (data, form_data = new FormData(), name_prefix = '') => {
+		if (Array.isArray(data)) {
+			for (const [index, datum] of data.entries()) {
+				combine(datum, form_data, name_prefix !== '' ? `${name_prefix}[${index}]` : index);
+			}
+		}
+		else if (data !== null && typeof data === 'object' && !(data instanceof File)) {
+			for (const [name, datum] of Object.entries(data)) {
+				combine(datum, form_data, name_prefix !== '' ? `${name_prefix}[${name}]` : name);
+			}
+		}
+		else {
+			form_data.append(name_prefix, data);
+		}
+
+		return form_data;
 	};
 
 	return combine(object);
