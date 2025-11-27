@@ -79,15 +79,17 @@ static int	__binary_heap_bubble_up(zbx_binary_heap_t *heap, int index)
 
 	while (0 != index)
 	{
-		if (heap->compare_func(&heap->elems[(index - 1) / 2], &heap->elems[index]) <= 0)
+		int	left = (index - 1) / 2;
+
+		if (heap->compare_func(&heap->elems[left], &heap->elems[index]) <= 0)
 			break;
 
-		swap(&heap->elems[(index - 1) / 2], &heap->elems[index]);
+		swap(&heap->elems[left], &heap->elems[index]);
 
 		if (direct)
-			swap_direct(heap, (index - 1) / 2, index);
+			swap_direct(heap, left, index);
 
-		index = (index - 1) / 2;
+		index = left;
 	}
 
 	return index;
