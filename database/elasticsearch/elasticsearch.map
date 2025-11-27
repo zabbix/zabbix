@@ -170,7 +170,8 @@
             "type": "date"
          },
          "value": {
-            "type": "object"
+            "dynamic": true,
+            "properties": {}
          }
       }
    }
