@@ -68,12 +68,12 @@ class CNumberValidator extends CValidator {
 		}
 
 		if ($this->min !== null && bccomp($value, $this->min) == -1) {
-			$this->setError(_s('Value must be equal or greater than %1$s.', $this->min));
+			$this->setError(_s('value must be equal or greater than %1$s.', $this->min));
 
 			return false;
 		}
 		elseif ($this->max !== null && bccomp($value, $this->max) == 1) {
-			$this->setError(_s('Value must be equal or smaller than %1$s.', $this->max));
+			$this->setError(_s('value must be equal or less than %1$s.', $this->max));
 
 			return false;
 		}
