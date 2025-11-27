@@ -104,8 +104,8 @@ func TestPlugin_exportNetUDPListen(t *testing.T) {
 			},
 			mockV4Content: mockUDP4Data,
 			mockV6Content: mockBrokenData,
-			want:          "0",
-			wantErr:       false, // Will not fail because we are just searching for a pattern.
+			want:          "",
+			wantErr:       true, // number is out of 16 byte range.
 		},
 		{
 			name: "-invalidPort",
