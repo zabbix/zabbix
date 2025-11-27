@@ -78,7 +78,7 @@ func TestPlugin_exportNetUDPListen(t *testing.T) {
 			wantErr:       false,
 		},
 		{
-			name: "ipv4_file_empty_check_ipv6",
+			name: "+ipv4EmptyIPv6Success",
 			args: args{
 				params: []string{"123"}, // 123 is in IPv6
 			},
@@ -88,7 +88,7 @@ func TestPlugin_exportNetUDPListen(t *testing.T) {
 			wantErr:       false,
 		},
 		{
-			name: "-ipv4_file_broken_content",
+			name: "+ipv4Broken",
 			args: args{
 				params: []string{"10051"},
 			},
@@ -98,7 +98,7 @@ func TestPlugin_exportNetUDPListen(t *testing.T) {
 			wantErr:       false, // Will not fail because we are just searching for a pattern.
 		},
 		{
-			name: "-ipv6_file_broken_content",
+			name: "+ipv6Broken",
 			args: args{
 				params: []string{"100510"},
 			},
@@ -117,6 +117,16 @@ func TestPlugin_exportNetUDPListen(t *testing.T) {
 			want:          "",
 			wantErr:       true,
 		},
+		{
+			name: "-invalidPortOutOfRange",
+			args: args{
+				params: []string{"70000"},
+			},
+			mockV4Content: []byte{},
+			mockV6Content: []byte{},
+			want:          "",
+			wantErr:       true,
+		},
 	}
 
 	for _, tt := range tests {
@@ -124,8 +134,8 @@ func TestPlugin_exportNetUDPListen(t *testing.T) {
 			t.Parallel()
 
 			p := &Plugin{
-				udp4Path: createMockFile(t, tt.mockV4Content),
-				udp6Path: createMockFile(t, tt.mockV6Content),
+				udpListen4Path: createMockFile(t, tt.mockV4Content),
+				udp6ListenPath: createMockFile(t, tt.mockV6Content),
 			}
 
 			got, err := p.exportNetUDPListen(tt.args.params)

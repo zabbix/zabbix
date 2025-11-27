@@ -28,6 +28,11 @@ import (
 )
 
 const (
+	udpListenIPv4FileLocation = "/proc/net/udp"
+	udpListenIPv6FileLocation = "/proc/net/udp6"
+)
+
+const (
 	errorInvalidFirstParam  = "Invalid first parameter."
 	errorInvalidSecondParam = "Invalid second parameter."
 	errorInvalidThirdParam  = "Invalid third parameter."
@@ -52,8 +57,8 @@ const (
 type Plugin struct {
 	plugin.Base
 
-	udp4Path string
-	udp6Path string
+	udpListen4Path string
+	udp6ListenPath string
 }
 
 //nolint:gochecknoinits // this is used solely for plugin registration.
@@ -71,13 +76,8 @@ func init() {
 		panic(errs.Wrap(err, "failed to register metrics"))
 	}
 
-	const (
-		udpListenIPv4FileLocation = "/proc/net/udp"
-		udpListenIPv6FileLocation = "/proc/net/udp6"
-	)
-
-	impl.udp4Path = udpListenIPv4FileLocation
-	impl.udp6Path = udpListenIPv6FileLocation
+	impl.udpListen4Path = udpListenIPv4FileLocation
+	impl.udp6ListenPath = udpListenIPv6FileLocation
 	impl.SetHandleTimeout(true)
 }
 

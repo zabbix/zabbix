@@ -25,6 +25,8 @@ import (
 )
 
 const (
+	// using clever pattern that allows fast and easy find open ports.
+	//               port in hex    localhost  udp connection status TCP_CLOSE indicating that udp has no state at all.
 	udpListenIPv4Pattern = "%04X 00000000:0000 07"
 	udpListenIPv6Pattern = "%04X 00000000000000000000000000000000:0000 07"
 )
@@ -40,7 +42,7 @@ func (p *Plugin) exportNetUDPListen(params []string) (string, error) {
 
 	portString := params[0]
 
-	port, err := strconv.Atoi(portString)
+	port, err := strconv.ParseUint(portString, 10, 16)
 	if err != nil {
 		return "", errs.New("invalid port number: " + portString)
 	}
@@ -53,9 +55,9 @@ func (p *Plugin) exportNetUDPListen(params []string) (string, error) {
 		SetPattern(ipv4SearchString).
 		SetMaxMatches(1)
 
-	data, err := parser.Parse(p.udp4Path)
+	data, err := parser.Parse(p.udpListen4Path)
 	if err != nil {
-		return "", errs.Wrapf(err, "failed to parse %s", p.udp4Path)
+		return "", errs.Wrapf(err, "failed to parse %s", p.udpListen4Path)
 	}
 
 	if len(data) == 1 {
@@ -67,9 +69,9 @@ func (p *Plugin) exportNetUDPListen(params []string) (string, error) {
 
 	parser.SetPattern(ipv6SearchString)
 
-	data, err = parser.Parse(p.udp6Path)
+	data, err = parser.Parse(p.udp6ListenPath)
 	if err != nil {
-		return "", errs.Wrapf(err, "failed to parse %s", p.udp6Path)
+		return "", errs.Wrapf(err, "failed to parse %s", p.udp6ListenPath)
 	}
 
 	if len(data) == 1 {
