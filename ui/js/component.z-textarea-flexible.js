@@ -16,7 +16,7 @@
 class ZTextareaFlexible extends HTMLElement {
 
 	#textarea;
-	#intersection_observer;
+	#resize_observer = null;
 
 	#events;
 	#is_connected = false;
@@ -62,6 +62,10 @@ class ZTextareaFlexible extends HTMLElement {
 
 	disconnectedCallback() {
 		this.#unregisterEvents();
+		if (this.#resize_observer !== null) {
+			this.#resize_observer.disconnect();
+			this.#resize_observer = null;
+		}
 	}
 
 	static get observedAttributes() {
@@ -170,14 +174,21 @@ class ZTextareaFlexible extends HTMLElement {
 	}
 
 	#initVisibilityWatch() {
-		this.#intersection_observer = new IntersectionObserver(entries => {
-			if (entries.some(e => e.isIntersecting)) {
-				requestAnimationFrame(() => this.#updateHeight());
-				this.#intersection_observer.disconnect();
-			}
-		});
+		if (this.#resize_observer === null){
+			this.#resize_observer = new ResizeObserver(entries => {
+				for (const entry of entries) {
+					if (entry.contentRect.width > 0) {
+						requestAnimationFrame(() => this.#updateHeight());
 
-		this.#intersection_observer.observe(this);
+						this.#resize_observer.disconnect();
+						this.#resize_observer = null;
+						break;
+					}
+				}
+			});
+
+			this.#resize_observer.observe(this);
+		}
 	}
 
 	get width() {
