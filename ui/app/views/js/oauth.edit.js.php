@@ -118,6 +118,8 @@ window.oauth_edit_popup = new class {
 	#showClientSecretWithWarning() {
 		const original_token_url = this.form.querySelector('[name="token_url"]').getAttribute('value');
 		const current_token_url = this.#getUrl('token_url', 'token_url_parameters');
+		
+		console.log('CURRENT', current_token_url)
 
 		if (original_token_url !== current_token_url) {
 			this.#showClientSecretField();
@@ -126,18 +128,29 @@ window.oauth_edit_popup = new class {
 	}
 
 	#getUrl(url_selector, parameters_selector) {
-		const url = new URL(this.form.querySelector('[name="'+url_selector+'"]').value);
+		const url_element = this.form.querySelector('[name="'+url_selector+'"]');
 
-		url.search = Array.from(this.form.querySelectorAll('[name^="'+parameters_selector+'"][name$="[name]"]'))
-			.filter(param_name_element => param_name_element.value)
-			.map(param_name_element => {
-				const index = parseInt(param_name_element.name.split('[')[1].replace(']', ''));
-				const param_value_element = this.form.querySelector('input[name="'+parameters_selector+'['+index+'][value]"]');
+		if (!url_element || !url_element.value) {
+			return '';
+		}
 
-				return encodeURIComponent(param_name_element.value)+'='+encodeURIComponent(param_value_element.value);
-			}).join('&');
+		try {
+			const url = new URL(url_element.value);
 
-		return url.href;
+			url.search = Array.from(this.form.querySelectorAll('[name^="'+parameters_selector+'"][name$="[name]"]'))
+				.filter(param_name_element => param_name_element.value)
+				.map(param_name_element => {
+					const index = parseInt(param_name_element.name.split('[')[1].replace(']', ''));
+					const param_value_element = this.form.querySelector('input[name="'+parameters_selector+'['+index+'][value]"]');
+
+					return encodeURIComponent(param_name_element.value)+'='+encodeURIComponent(param_value_element.value);
+				}).join('&');
+
+			return url.href;
+		}
+		catch {
+			return '';
+		}
 	}
 
 	#showClientSecretField() {
