@@ -37,6 +37,7 @@ class CControllerMediatypeUpdate extends CControllerMediatypeUpdateGeneral {
 				]
 			],
 			'smtp_port' => ['db media_type.smtp_port', 'required',
+				'min' => ZBX_MIN_PORT_NUMBER, 'max' => ZBX_MAX_PORT_NUMBER,
 				'when' => [
 					['type', 'in' => [MEDIA_TYPE_EMAIL]],
 					['provider', 'in' => [CMediatypeHelper::EMAIL_PROVIDER_SMTP]]
