@@ -74,7 +74,6 @@ class CHost extends CHostGeneral {
 	 * @param string|array  $options['selectInventory']                    Return an "inventory" property with host inventory data.
 	 * @param string|array  $options['selectHttpTests']                    Return an "httpTests" property with host web scenarios.
 	 * @param string|array  $options['selectTags']                         Return a "tags" property with host tags.
-	 * @param string|array  $options['selectInheritedTags']                Return an "inheritedTags" property with tags that are on templates which are linked to host.
 	 * @param bool          $options['countOutput']                        Return host count as output.
 	 * @param bool          $options['groupCount']                         Group the host count.
 	 * @param bool          $options['preservekeys']                       Return host IDs as array keys.
@@ -149,7 +148,6 @@ class CHost extends CHostGeneral {
 			'selectInventory'					=> null,
 			'selectHttpTests'					=> null,
 			'selectTags'						=> null,
-			'selectInheritedTags'				=> null,
 			'selectValueMaps'					=> null,
 			'countOutput'						=> false,
 			'groupCount'						=> false,
@@ -1876,7 +1874,7 @@ class CHost extends CHostGeneral {
 			}
 		}
 
-		if ($options['selectInheritedTags'] !== null && $options['selectInheritedTags'] != API_OUTPUT_COUNT) {
+		if ($options['selectInheritedTags'] !== null) {
 			[$hosts_templates, $templateids] = CApiHostHelper::getParentTemplates($hostids);
 
 			$templates = API::Template()->get([
@@ -1904,9 +1902,12 @@ class CHost extends CHostGeneral {
 					}
 				}
 
-				$host['inheritedTags'] = $this->unsetExtraFields($tags, ['tag', 'value'],
-					$options['selectInheritedTags']
-				);
+				foreach ($tags as &$tag) {
+					$tag = CArrayHelper::getByKeys($tag, $options['selectInheritedTags']);
+				}
+				unset($tag);
+
+				$host['inheritedTags'] = $tags;
 			}
 		}
 
@@ -1954,7 +1955,7 @@ class CHost extends CHostGeneral {
 		$api_input_rules = ['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
 			// Filters.
 			'inheritedTags' =>			['type' => API_BOOLEAN, 'default' => false],
-			'selectInheritedTags' =>	['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
+			'selectInheritedTags' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', ['tag', 'value']), 'default' => null],
 			'severities' =>				['type' => API_INTS32, 'flags' => API_ALLOW_NULL | API_NORMALIZE | API_NOT_EMPTY, 'in' => implode(',', range(TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_COUNT - 1)), 'uniq' => true],
 			'withProblemsSuppressed' =>	['type' => API_BOOLEAN, 'flags' => API_ALLOW_NULL],
 			// Output.

@@ -1420,12 +1420,36 @@ class CImportReferencer {
 		}
 
 		$uuids = [];
+		$hosts = [];
 
-		foreach ($this->triggers as $trigger) {
-			foreach ($trigger as $expression) {
-				$uuids += array_flip(array_column($expression, 'uuid'));
+		foreach ($this->triggers as $trigger_references) {
+			foreach ($trigger_references as $expression => $recovery_references) {
+				foreach ($recovery_references as $recovery_expression => $trigger) {
+					if (array_key_exists('uuid', $trigger)) {
+						$uuids[$trigger['uuid']] = true;
+					}
+					else {
+						$trigger += [
+							'expression' => $expression,
+							'recovery_expression' => $recovery_expression
+						];
+
+						$hosts += array_flip(CConfigurationImport::extractHosts($trigger));
+					}
+				}
 			}
 		}
+
+		$db_hosts = $hosts
+			? API::Host()->get([
+				'output' => [],
+				'filter' => [
+					'host' => array_keys($hosts)
+				],
+				'templated_hosts' => true,
+				'preservekeys' => true
+			])
+			: [];
 
 		$db_triggers = $uuids
 			? API::Trigger()->get([
@@ -1442,18 +1466,21 @@ class CImportReferencer {
 			])
 			: [];
 
-		$db_triggers += API::Trigger()->get([
-			'output' => ['uuid', 'description', 'expression', 'recovery_expression', 'templateid'],
-			'filter' => [
-				'description' => array_keys($this->triggers),
-				'flags' => [
-					ZBX_FLAG_DISCOVERY_NORMAL,
-					ZBX_FLAG_DISCOVERY_PROTOTYPE,
-					ZBX_FLAG_DISCOVERY_CREATED
-				]
-			],
-			'preservekeys' => true
-		]);
+		$db_triggers += $db_hosts
+			? API::Trigger()->get([
+				'output' => ['uuid', 'description', 'expression', 'recovery_expression', 'templateid'],
+				'filter' => [
+					'hostid' => array_keys($db_hosts),
+					'description' => array_keys($this->triggers),
+					'flags' => [
+						ZBX_FLAG_DISCOVERY_NORMAL,
+						ZBX_FLAG_DISCOVERY_PROTOTYPE,
+						ZBX_FLAG_DISCOVERY_CREATED
+					]
+				],
+				'preservekeys' => true
+			])
+			: [];
 
 		if (!$db_triggers) {
 			return;

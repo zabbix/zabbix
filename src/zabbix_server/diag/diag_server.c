@@ -475,7 +475,7 @@ static int	diag_add_alerting_info(const struct zbx_json_parse *jp, struct zbx_js
 					if (FAIL == (ret = zbx_alerter_get_top_sources(map->value, &sources, error)))
 					{
 						zbx_vector_am_source_stats_ptr_clear_ext(&sources,
-								(zbx_am_source_stats_ptr_free_func_t)zbx_ptr_free);
+								zbx_am_source_stats_free);
 						zbx_vector_am_source_stats_ptr_destroy(&sources);
 						goto out;
 					}
@@ -483,8 +483,7 @@ static int	diag_add_alerting_info(const struct zbx_json_parse *jp, struct zbx_js
 					time_total += time2 - time1;
 
 					diag_add_alerting_sources(json, map->name, &sources);
-					zbx_vector_am_source_stats_ptr_clear_ext(&sources,
-							(zbx_am_source_stats_ptr_free_func_t)zbx_ptr_free);
+					zbx_vector_am_source_stats_ptr_clear_ext(&sources, zbx_am_source_stats_free);
 					zbx_vector_am_source_stats_ptr_destroy(&sources);
 				}
 				else
