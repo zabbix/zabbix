@@ -29,6 +29,15 @@ class CAbsoluteTimeValidator extends CValidator {
 		}
 	}
 
+	/**
+	 * Checks if the given string is:
+	 * - valid absolute time with CAbsoluteTimeParser
+	 * - is between provided min and max timestamps
+	 *
+	 * @param string $value
+	 *
+	 * @return bool
+	 */
 	public function validate($value): bool {
 		$parser = new CAbsoluteTimeParser();
 
