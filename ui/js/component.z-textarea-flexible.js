@@ -32,18 +32,15 @@ class ZTextareaFlexible extends HTMLElement {
 
 	constructor() {
 		super();
+
+		this.#textarea = document.createElement('textarea');
 	}
 
 	connectedCallback() {
 		if (!this.#is_connected) {
 			this.#is_connected = true;
 
-			if (!this.querySelector('textarea')) {
-				const textarea = document.createElement('textarea');
-				this.appendChild(textarea);
-			}
-
-			this.#textarea = this.querySelector('textarea');
+			this.appendChild(this.#textarea);
 
 			this.#textarea.name = this.getAttribute('name');
 			this.#textarea.value = this.hasAttribute('value') ? this.getAttribute('value') : null;
