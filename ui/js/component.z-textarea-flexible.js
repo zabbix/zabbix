@@ -42,8 +42,12 @@ class ZTextareaFlexible extends HTMLElement {
 		this.#textarea.singleline = this.getAttribute('singleline');
 		this.#textarea.spellcheck = this.getAttribute('spellcheck') !== 'false';
 
-		if (this.hasAttribute('maxlength')) {
-			this.#textarea.maxLength = Number(this.getAttribute('maxlength'));
+		const maxlength = parseInt(this.getAttribute('maxlength'));
+		if (Number.isFinite(maxlength) && maxlength >= 0) {
+			this.#textarea.maxLength = maxlength;
+		}
+		else {
+			this.#textarea.removeAttribute('maxlength');
 		}
 
 		this.#initVisibilityWatch();
@@ -74,7 +78,14 @@ class ZTextareaFlexible extends HTMLElement {
 				break;
 
 			case 'maxlength':
-				this.#textarea.maxLength = new_value;
+				const maxlength = parseInt(new_value);
+				if (Number.isFinite(maxlength) && maxlength >= 0) {
+					this.#textarea.maxLength = maxlength;
+				}
+				else {
+					this.#textarea.removeAttribute('maxlength');
+				}
+
 				break;
 
 			case 'value':
@@ -168,11 +179,11 @@ class ZTextareaFlexible extends HTMLElement {
 		this.style.width = width;
 	}
 
-	get maxlength() {
+	get maxLength() {
 		return this.#textarea.maxLength;
 	}
 
-	set maxlength(maxlength) {
+	set maxLength(maxlength) {
 		this.setAttribute('maxlength', maxlength);
 	}
 
