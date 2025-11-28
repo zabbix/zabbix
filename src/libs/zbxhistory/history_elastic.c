@@ -30,6 +30,7 @@
 #include "zbxcacheconfig.h"
 #include "zbxtypes.h"
 #include "zbxdb.h"
+#include "zbx_dbversion_constants.h"
 
 #define		ZBX_IDX_JSON_ALLOCATE		256
 #define		ZBX_JSON_ALLOCATE		2048
@@ -1630,11 +1631,6 @@ static void	history_elastic_get_value_type_data(zbx_history_elastic_data_t *d, z
  ************************************************************************************/
 static int	history_elastic_get_info(void *data, zbx_history_provider_info_t *info, char **error)
 {
-#define ZBX_ELASTIC_MIN_VERSION					70000
-#define ZBX_ELASTIC_MIN_VERSION_STR				"7.x"
-#define ZBX_ELASTIC_MAX_VERSION					89999
-#define ZBX_ELASTIC_MAX_VERSION_STR				"8.x"
-
 #define RIGHT2(x)	((int)((zbx_uint32_t)(x) - ((zbx_uint32_t)((x)/100))*100))
 	zbx_history_elastic_data_t	*d = (zbx_history_elastic_data_t *)data;
 	struct zbx_json_parse		jp, jp_values, jp_sub;
@@ -1714,10 +1710,6 @@ out:
 	return ret;
 
 #undef RIGHT2
-#undef ZBX_ELASTIC_MAX_VERSION_STR
-#undef ZBX_ELASTIC_MAX_VERSION
-#undef ZBX_ELASTIC_MIN_VERSION_STR
-#undef ZBX_ELASTIC_MIN_VERSION
 }
 
 /******************************************************************************

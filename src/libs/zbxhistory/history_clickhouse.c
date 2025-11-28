@@ -35,7 +35,7 @@
 #include "zbxcacheconfig.h"
 #include "zbxregexp.h"
 #include "zbxtime.h"
-
+#include "zbx_dbversion_constants.h"
 
 typedef void (*write_value_t)(zbx_json_t *row, const zbx_history_value_t *value);
 
@@ -1564,11 +1564,6 @@ static void	history_clickhouse_get_value_type_data(zbx_clickhouse_data_t *d, CUR
  ******************************************************************************/
 static int	history_clickhouse_get_info(void *data, zbx_history_provider_info_t *info, char **error)
 {
-#define HISTORY_CLICKHOUSE_MIN_VERSION			25000000
-#define HISTORY_CLICKHOUSE_MIN_VERSION_STR		"25.x.x.x"
-#define HISTORY_CLICKHOUSE_MAX_VERSION			25999999
-#define HISTORY_CLICKHOUSE_MAX_VERSION_STR		"26.x.x.x"
-
 	zbx_clickhouse_data_t	*d = (zbx_clickhouse_data_t *)data;
 	int			ret = FAIL, v1, v2, v3, v4;
 	zbx_clickhouse_conn_t	*conn;
@@ -1609,14 +1604,14 @@ static int	history_clickhouse_get_info(void *data, zbx_history_provider_info_t *
 
 	info->database = zbx_strdup(NULL, "ClickHouse");
 	info->current_version = v1 * 1000000 + v2 * 1000 + v3;
-	info->min_version = HISTORY_CLICKHOUSE_MIN_VERSION;
-	info->max_version = HISTORY_CLICKHOUSE_MAX_VERSION;
+	info->min_version = ZBX_CLICKHOUSE_MIN_VERSION;
+	info->max_version = ZBX_CLICKHOUSE_MAX_VERSION;
 	info->min_supported_version = ZBX_DBVERSION_UNDEFINED;
 
 	info->friendly_current_version = zbx_strdup(NULL, conn->resp.page.data);
-	info->friendly_min_version = zbx_strdup(NULL, HISTORY_CLICKHOUSE_MIN_VERSION_STR);
-	info->friendly_max_version = zbx_strdup(NULL, HISTORY_CLICKHOUSE_MAX_VERSION_STR);
-	info->friendly_min_supported_version = zbx_strdup(NULL, HISTORY_CLICKHOUSE_MIN_VERSION_STR);
+	info->friendly_min_version = zbx_strdup(NULL, ZBX_CLICKHOUSE_MIN_VERSION_STR);
+	info->friendly_max_version = zbx_strdup(NULL, ZBX_CLICKHOUSE_MAX_VERSION_STR);
+	info->friendly_min_supported_version = zbx_strdup(NULL, ZBX_CLICKHOUSE_MIN_VERSION_STR);
 
 	zbx_vector_history_provider_value_type_info_create(&info->value_types);
 	history_clickhouse_get_value_type_data(d, mhandle, conn, info);
@@ -1629,12 +1624,6 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() ret:%s", __func__, zbx_result_string(ret));
 
 	return ret;
-
-#undef HISTORY_CLICKHOUSE_MIN_VERSION
-#undef HISTORY_CLICKHOUSE_MIN_VERSION_STR
-#undef HISTORY_CLICKHOUSE_MAX_VERSION
-#undef HISTORY_CLICKHOUSE_MAX_VERSION_STR
-
 }
 
 /******************************************************************************
