@@ -2429,7 +2429,6 @@ void	zbx_vc_reset(void)
  * Parameters:                                                                *
  *   history                          - [IN] item history values              *
  *   *flush_err                       - [OUT]                                 *
- *   config_history_storage_pipelines - [IN]                                  *
  *                                                                            *
  * Return value: SUCCEED - values were added successfully                     *
  *               FAIL    - otherwise                                          *
@@ -2505,9 +2504,6 @@ int	zbx_vc_add_values(zbx_vector_dc_history_ptr_t *history, zbx_uint64_t *flush_
 
 /* history pre-caching */
 
-#define VC_PRECACHE_WINDOW1	(SEC_PER_MIN * 10)
-#define VC_PRECACHE_WINDOW2	(SEC_PER_HOUR)
-
 #define VC_PRECACHE_MIN_QUERIES	5
 
 typedef enum
@@ -2531,7 +2527,7 @@ static int	vc_query_compare_by_timestamp_desc(const void *d1, const void *d2)
  *                                                                            *
  * Purpose: check if item history data is cached                              *
  *                                                                            *
- * Parameters: item - [IN] the item                                           *
+ * Parameters: item - [IN]                                                    *
  *                                                                            *
  * Return value: SUCCEED - item history data is cached                        *
  *               FAIL    - item history data is not cached                    *
@@ -2552,7 +2548,7 @@ static int	vc_query_item_cached(zbx_vc_item_t *item)
  *                                                                            *
  * Purpose: precache history data for number of values                        *
  *                                                                            *
- * Parameters: item      - [IN/OUT] the item                                  *
+ * Parameters: item      - [IN/OUT]                                           *
  *             rows      - [IN] history records to cache                      *
  *             nvalues   - [IN] number of values to cache                     *
  *                                                                            *
@@ -2590,7 +2586,7 @@ static void	vc_item_precache_nvalues(zbx_vc_item_t *item, zbx_vector_history_rec
  *                                                                            *
  * Purpose: precache history data for time-based range                        *
  *                                                                            *
- * Parameters: item      - [IN/OUT] the item                                  *
+ * Parameters: item      - [IN/OUT]                                           *
  *             rows      - [IN] history records to cache                      *
  *             ts_start  - [IN] window start timestamp                        *
  *                                                                            *
@@ -2831,6 +2827,9 @@ out:
  ******************************************************************************/
 void	zbx_vc_precache_queries(zbx_vector_vc_query_t *queries)
 {
+#define VC_PRECACHE_WINDOW1	(SEC_PER_MIN * 10)
+#define VC_PRECACHE_WINDOW2	(SEC_PER_HOUR)
+
 	zbx_vector_vc_query_t	uncached_queries[ITEM_VALUE_TYPE_COUNT - 1];
 	int			uncached_num = 0;
 
@@ -2888,6 +2887,9 @@ out:
 		zbx_vector_vc_query_destroy(&uncached_queries[i]);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+
+#undef VC_PRECACHE_WINDOW1
+#undef VC_PRECACHE_WINDOW2
 }
 
 /******************************************************************************

@@ -172,10 +172,10 @@ int	zbx_db_verify_version_info(struct zbx_db_version_info_t *info, int allow_uns
 int	zbx_db_check_version_info(struct zbx_db_version_info_t *info, int allow_unsupported,
 		unsigned char program_type)
 {
-	zbx_db_extract_version_info(info);
-	zbx_db_verify_version_info(info, allow_unsupported, program_type);
+	if (SUCCEED != zbx_db_extract_version_info(info))
+		return FAIL;
 
-	return SUCCEED;
+	return zbx_db_verify_version_info(info, allow_unsupported, program_type);
 }
 
 void	zbx_db_version_info_clear(struct zbx_db_version_info_t *version_info)

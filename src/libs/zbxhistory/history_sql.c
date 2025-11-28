@@ -449,7 +449,6 @@ static int	db_read_batch(zbx_vector_item_history_t *results, unsigned char value
 			}
 		}
 
-
 		record.timestamp.sec = atoi(row[1]);
 		record.timestamp.ns = atoi(row[2]);
 		table->rtov(&record.value, row + 3);
@@ -460,7 +459,6 @@ static int	db_read_batch(zbx_vector_item_history_t *results, unsigned char value
 out:
 	return SUCCEED;
 }
-
 
 /************************************************************************************
  *                                                                                  *
@@ -746,11 +744,11 @@ static int	history_sql_fetch(void *data, zbx_uint64_t itemid, unsigned char valu
 	zbx_vector_history_record_create(&result);
 
 	if (0 == count)
-		db_read_values_by_time(itemid, value_type, &result, end - start, end);
+		(void)db_read_values_by_time(itemid, value_type, &result, end - start, end);
 	else if (0 == start)
-		db_read_values_by_count(itemid, value_type, &result, count, end);
+		(void)db_read_values_by_count(itemid, value_type, &result, count, end);
 	else
-		db_read_values_by_time_and_count(itemid, value_type, &result, end - start, count, end);
+		(void)db_read_values_by_time_and_count(itemid, value_type, &result, end - start, count, end);
 
 	*values = result.values;
 
@@ -762,7 +760,7 @@ static int	history_sql_fetch(void *data, zbx_uint64_t itemid, unsigned char valu
  * Purpose: fetch history data for multiple items from SQL database           *
  *                                                                            *
  * Parameters: data       - [IN] history provider data                        *
- *             results    - [IN/OUT] vector of item history structures        *
+ *             results    - [IN/OUT] history batches                          *
  *             value_type - [IN] item value type                              *
  *             start      - [IN] period start timestamp                       *
  *             limit      - [IN] maximum number of values to fetch            *
@@ -801,7 +799,8 @@ static int	history_sql_get_info(void *data, zbx_history_provider_info_t *info, c
 	ZBX_UNUSED(data);
 	ZBX_UNUSED(error);
 
-	zbx_db_extract_version_info(&vi);
+	if (SUCCEED != zbx_db_extract_version_info(&vi))
+		return FAIL;
 
 	if (NULL != vi.database)
 		info->database = zbx_strdup(NULL, vi.database);
@@ -874,8 +873,6 @@ zbx_history_provider_t	*history_sql_open(const zbx_history_option_t *options, in
 {
 	zbx_history_provider_t	*provider;
 
-	ZBX_UNUSED(options);
-	ZBX_UNUSED(options_num);
 	ZBX_UNUSED(error);
 
 	history_sql_validate_options(options, options_num);

@@ -374,7 +374,6 @@ static int	history_clickhouse_conn_init(zbx_clickhouse_conn_t *conn, zbx_clickho
 		return FAIL;
 	}
 
-
 	return SUCCEED;
 }
 
@@ -606,7 +605,7 @@ static void	history_clickhouse_add_error(char **err, const char *format, ...)
  *     error   - [OUT] error message                                          *
  *                                                                            *
  * Return value: Number of connections to be retried. Those connections will  *
- *               be readded to the multi handle.                              *
+ *               be re-added to the multi handle.                             *
  *                                                                            *
  ******************************************************************************/
 static int	history_clickhouse_flush_conns(zbx_clickhouse_data_t *d, CURLM *mhandle, char **error)
@@ -940,7 +939,7 @@ static const char 	*history_clickhouse_parse_numeric_value(const struct zbx_json
  * Parameters:                                                                *
  *     jp         - [IN] row with data as JSON array of values                *
  *     p          - [IN] pointer to current position in JSON data             *
- *     value_type - [IN] value type                                           *
+ *     value_type - [IN] item value type                                      *
  *     record     - [OUT] history record structure to fill                    *
  *                                                                            *
  * Return value: pointer to next position in JSON data or NULL on failure     *
@@ -1244,7 +1243,7 @@ out:
  *                                                                            *
  * Parameters:                                                                *
  *     data        - [IN] internal ClickHouse data                            *
- *     itemid      - [IN] item identifier                                     *
+ *     itemid      - [IN]                                                     *
  *     value_type  - [IN] value type (ITEM_VALUE_TYPE_*)                      *
  *     start       - [IN] period start time (0 - ignored)                     *
  *     end         - [IN] period end time  (0 - ignored)                      *

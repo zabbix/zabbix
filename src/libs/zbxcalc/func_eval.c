@@ -2115,7 +2115,7 @@ out:
  *             item       - [IN] item (performance metric)                    *
  *             parameters - [IN] number of seconds                            *
  *             ts         - [IN] starting timestamp                           *
- *             range      - [IN] history range                                *
+ *             selector   - [IN] history range selector                       *
  *             error      - [OUT]                                             *
  *                                                                            *
  * Return value: SUCCEED - evaluated successfully, result is stored in 'value'*
@@ -3707,7 +3707,7 @@ static void	history_to_dbl_vector(const zbx_history_record_t *v, int n, unsigned
  *             ts         - [IN] time shift                                   *
  *             stat_func  - [IN] pointer to aggregate function to be called   *
  *             min_values - [IN] minimum data values required                 *
- *             range      - [IN] history range                                *
+ *             selector   - [IN] history range selector                       *
  *             error      - [OUT]                                             *
  *                                                                            *
  * Return value: SUCCEED - evaluated successfully, result is stored in        *

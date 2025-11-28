@@ -1005,7 +1005,6 @@ static int	add_history(zbx_dc_history_t *history, int history_num, zbx_vector_dc
  * Parameters:                                                                *
  *    history                          - [IN] array of history data           *
  *    history_num                      - [IN] number of history structures    *
- *    config_history_storage_pipelines - [IN]                                 *
  *                                                                            *
  ******************************************************************************/
 static int	DBmass_add_history(zbx_dc_history_t *history, int history_num)
