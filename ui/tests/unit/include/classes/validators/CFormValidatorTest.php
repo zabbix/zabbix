@@ -2197,7 +2197,7 @@ class CFormValidatorTest extends TestCase {
 				['value' => '2024-01-08 12:00:00'],
 				CFormValidator::ERROR,
 				['/value' => [
-					['message' => 'Value must be equal or less than 2024-01-08 09:46:40.',
+					['message' => 'Value must be less than or equal to 2024-01-08 09:46:40.',
 						'level' => CFormValidator::ERROR_LEVEL_DELAYED
 					]
 				]]
@@ -2210,7 +2210,9 @@ class CFormValidatorTest extends TestCase {
 				['value' => '2024-01-08 12:00:00'],
 				CFormValidator::ERROR,
 				['/value' => [
-					['message' => 'Value must be equal or greater than 2038-01-18 23:59:59.', 'level' => CFormValidator::ERROR_LEVEL_DELAYED]
+					['message' => 'Value must be greater than or equal to 2038-01-18 23:59:59.',
+						'level' => CFormValidator::ERROR_LEVEL_DELAYED
+					]
 				]]
 			],
 			[
