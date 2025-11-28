@@ -25,11 +25,6 @@ class ZTextareaFlexible extends HTMLElement {
 	 */
 	#resize_observer = null;
 
-	/**
-	 * @type {boolean}
-	 */
-	#is_connected = false;
-
 	constructor() {
 		super();
 
@@ -37,27 +32,23 @@ class ZTextareaFlexible extends HTMLElement {
 	}
 
 	connectedCallback() {
-		if (!this.#is_connected) {
-			this.#is_connected = true;
+		this.appendChild(this.#textarea);
 
-			this.appendChild(this.#textarea);
+		this.#textarea.name = this.getAttribute('name');
+		this.#textarea.value = this.hasAttribute('value') ? this.getAttribute('value') : null;
+		this.#textarea.placeholder = this.hasAttribute('placeholder') ? this.getAttribute('placeholder') : null;
+		this.#textarea.disabled = this.hasAttribute('disabled');
+		this.#textarea.readOnly = this.hasAttribute('readonly');
+		this.#textarea.singleline = this.hasAttribute('singleline')	? this.getAttribute('singleline') : null;
+		this.#textarea.spellcheck = this.getAttribute('spellcheck') !== 'false';
 
-			this.#textarea.name = this.getAttribute('name');
-			this.#textarea.value = this.hasAttribute('value') ? this.getAttribute('value') : null;
-			this.#textarea.placeholder = this.hasAttribute('placeholder') ? this.getAttribute('placeholder') : null;
-			this.#textarea.disabled = this.hasAttribute('disabled');
-			this.#textarea.readOnly = this.hasAttribute('readonly');
-			this.#textarea.singleline = this.hasAttribute('singleline')	? this.getAttribute('singleline') : null;
-			this.#textarea.spellcheck = this.getAttribute('spellcheck') !== 'false';
-
-			if (this.hasAttribute('maxlength')) {
-				this.#textarea.maxLength = Number(this.getAttribute('maxlength'));
-			}
-
-			this.#initVisibilityWatch();
-			this.#registerEvents();
-			this.#updateHeight();
+		if (this.hasAttribute('maxlength')) {
+			this.#textarea.maxLength = Number(this.getAttribute('maxlength'));
 		}
+
+		this.#initVisibilityWatch();
+		this.#registerEvents();
+		this.#updateHeight();
 	}
 
 	disconnectedCallback() {
@@ -73,7 +64,7 @@ class ZTextareaFlexible extends HTMLElement {
 	}
 
 	attributeChangedCallback(name, old_value, new_value) {
-		if (!this.#is_connected || old_value === new_value) {
+		if (old_value === new_value) {
 			return;
 		}
 
