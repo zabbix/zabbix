@@ -26,9 +26,9 @@ This template has been tested on:
 
 ## Setup
 
-1. Create a new user according to [REST API requirements](https://publicdoc.rbbn.com/spaces/UXAPIDOC/pages/387008769/REST+API+-+Requirements)
-2. Create a new host
-3. Link the template to the host created earlier
+1. Create a new user according to [REST API requirements](https://publicdoc.rbbn.com/spaces/UXAPIDOC/pages/387008769/REST+API+-+Requirements).
+2. Create a new host.
+3. Link the template to the host created earlier.
 4. Set the host macros (on the host or template level) required for getting data:
 ```text
 {$RIBBON.URL}
@@ -61,8 +61,8 @@ This template has been tested on:
 |{$RIBBON.CPU.UTIL.CRIT}|<p>The threshold of CPU usage in percent.</p>|`90`|
 |{$RIBBON.MEMORY.UTIL.CRIT}|<p>The threshold of memory usage in percent.</p>|`90`|
 |{$RIBBON.DSP.CARD.CPU.USAGE.CRIT}|<p>The threshold of DSP card CPU usage in percent.</p>|`90`|
-|{$RIBBON.TEMP1.CRIT}|<p>The threshold of temperature on the bottom of the main board in degrees Celsius.</p>|`80`|
-|{$RIBBON.TEMP2.CRIT}|<p>The threshold of temperature on the top of the main board in degrees Celsius.</p>|`80`|
+|{$RIBBON.TEMP.BOTTOM.MAIN.BOARD.CRIT}|<p>The threshold of temperature on the bottom of the main board in degrees Celsius.</p>|`80`|
+|{$RIBBON.TEMP.TOP.MAIN.BOARD.CRIT}|<p>The threshold of temperature on the top of the main board in degrees Celsius.</p>|`80`|
 |{$RIBBON.TEMP.CORE.CRIT}|<p>The threshold of core switch temperature in degrees Celsius.</p>|`80`|
 |{$RIBBON.TEMP.PSU.CRIT}|<p>The threshold of power supply temperature in degrees Celsius.</p>|`80`|
 |{$RIBBON.INTERFACE.DISCOVERY.TYPE.MATCHES}|<p>Sets the regex string of the interface type to be allowed in discovery.</p>|`.*`|
@@ -141,8 +141,8 @@ This template has been tested on:
 |Ribbon: High CPU utilization|<p>CPU utilization is too high. The system might be slow to respond.</p>|`min(/Ribbon SBC Edge by HTTP/ribbon.cpu.usage,5m)>{$RIBBON.CPU.UTIL.CRIT}`|Average||
 |Ribbon: High memory utilization|<p>Memory utilization is too high. The system might be slow to respond.</p>|`min(/Ribbon SBC Edge by HTTP/ribbon.memory.usage,5m)>{$RIBBON.MEMORY.UTIL.CRIT}`|Average||
 |Ribbon: Chassis status - Card Failed|<p>The current chassis status - Card Failed.</p>|`last(/Ribbon SBC Edge by HTTP/ribbon.chassis.status)=9`|Average||
-|Ribbon: Temperature on the bottom of the main board is above critical threshold|<p>This trigger uses temperature the bottom of the main board value.</p>|`avg(/Ribbon SBC Edge by HTTP/ribbon.chassis.board.bottom.temp,5m)>{$RIBBON.TEMP1.CRIT}`|High||
-|Ribbon: Temperature on the top of the main board is above critical threshold|<p>This trigger uses temperature of on the top of the main board value.</p>|`avg(/Ribbon SBC Edge by HTTP/ribbon.chassis.board.top.temp,5m)>{$RIBBON.TEMP2.CRIT}`|High||
+|Ribbon: Temperature on the bottom of the main board is above critical threshold|<p>This trigger uses temperature the bottom of the main board value.</p>|`avg(/Ribbon SBC Edge by HTTP/ribbon.chassis.board.bottom.temp,5m)>{$RIBBON.TEMP.BOTTOM.MAIN.BOARD.CRIT}`|High||
+|Ribbon: Temperature on the top of the main board is above critical threshold|<p>This trigger uses temperature of on the top of the main board value.</p>|`avg(/Ribbon SBC Edge by HTTP/ribbon.chassis.board.top.temp,5m)>{$RIBBON.TEMP.TOP.MAIN.BOARD.CRIT}`|High||
 |Ribbon: Temperature on chassis core switch is above critical threshold|<p>This trigger uses temperature of chassis core switch value.</p>|`avg(/Ribbon SBC Edge by HTTP/ribbon.chassis.core.switch.temp,5m)>{$RIBBON.TEMP.CORE.CRIT}`|High||
 |Ribbon: DNS server 1 has been changed|<p>The DNS server 1 has been changed. Acknowledge to close the problem manually.</p>|`last(/Ribbon SBC Edge by HTTP/ribbon.system.dns.server1,#1)<>last(/Ribbon SBC Edge by HTTP/ribbon.system.dns.server1,#2) and length(last(/Ribbon SBC Edge by HTTP/ribbon.system.dns.server1))>0`|Warning|**Manual close**: Yes|
 |Ribbon: DNS server 2 has been changed|<p>The DNS server 2 has been changed. Acknowledge to close the problem manually.</p>|`last(/Ribbon SBC Edge by HTTP/ribbon.system.dns.server2,#1)<>last(/Ribbon SBC Edge by HTTP/ribbon.system.dns.server2,#2) and length(last(/Ribbon SBC Edge by HTTP/ribbon.system.dns.server2))>0`|Warning|**Manual close**: Yes|

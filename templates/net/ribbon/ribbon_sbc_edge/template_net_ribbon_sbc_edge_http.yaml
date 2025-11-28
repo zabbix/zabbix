@@ -31,9 +31,9 @@ zabbix_export:
         
         ## Setup
         
-        1. Create a new user according to [REST API requirements](https://publicdoc.rbbn.com/spaces/UXAPIDOC/pages/387008769/REST+API+-+Requirements)
-        2. Create a new host
-        3. Link the template to the host created earlier
+        1. Create a new user according to [REST API requirements](https://publicdoc.rbbn.com/spaces/UXAPIDOC/pages/387008769/REST+API+-+Requirements).
+        2. Create a new host.
+        3. Link the template to the host created earlier.
         4. Set the host wizard configuration field `Ribbon SBC URL` required for getting data.
         5. Set the host wizard configuration fields `Ribbon SBC user` and `Ribbon SBC password` with the login and password of the user created earlier.
       vendor:
@@ -368,11 +368,11 @@ zabbix_export:
               value: sensor
           triggers:
             - uuid: 35998716d90f4b3382042312bdef9ced
-              expression: 'avg(/Ribbon SBC Edge by HTTP/ribbon.chassis.board.bottom.temp,5m)>{$RIBBON.TEMP1.CRIT}'
+              expression: 'avg(/Ribbon SBC Edge by HTTP/ribbon.chassis.board.bottom.temp,5m)>{$RIBBON.TEMP.BOTTOM.MAIN.BOARD.CRIT}'
               recovery_mode: RECOVERY_EXPRESSION
-              recovery_expression: 'max(/Ribbon SBC Edge by HTTP/ribbon.chassis.board.bottom.temp,5m)<{$RIBBON.TEMP1.CRIT}-3'
+              recovery_expression: 'max(/Ribbon SBC Edge by HTTP/ribbon.chassis.board.bottom.temp,5m)<{$RIBBON.TEMP.BOTTOM.MAIN.BOARD.CRIT}-3'
               name: 'Ribbon: Temperature on the bottom of the main board is above critical threshold'
-              event_name: 'Ribbon: Temperature 1 is above critical threshold: >{$RIBBON.TEMP1.CRIT}'
+              event_name: 'Ribbon: Temperature on the bottom of the main board is above critical threshold: >{$RIBBON.TEMP.BOTTOM.MAIN.BOARD.CRIT}'
               opdata: 'Current temperature: {ITEM.LASTVALUE1}'
               priority: HIGH
               description: 'This trigger uses temperature the bottom of the main board value.'
@@ -398,11 +398,11 @@ zabbix_export:
               value: sensor
           triggers:
             - uuid: f80c73ecab184a9aa4428839e34e8f79
-              expression: 'avg(/Ribbon SBC Edge by HTTP/ribbon.chassis.board.top.temp,5m)>{$RIBBON.TEMP2.CRIT}'
+              expression: 'avg(/Ribbon SBC Edge by HTTP/ribbon.chassis.board.top.temp,5m)>{$RIBBON.TEMP.TOP.MAIN.BOARD.CRIT}'
               recovery_mode: RECOVERY_EXPRESSION
-              recovery_expression: 'max(/Ribbon SBC Edge by HTTP/ribbon.chassis.board.top.temp,5m)<{$RIBBON.TEMP2.CRIT}-3'
+              recovery_expression: 'max(/Ribbon SBC Edge by HTTP/ribbon.chassis.board.top.temp,5m)<{$RIBBON.TEMP.TOP.MAIN.BOARD.CRIT}-3'
               name: 'Ribbon: Temperature on the top of the main board is above critical threshold'
-              event_name: 'Ribbon: Temperature is above critical threshold: >{$RIBBON.TEMP2.CRIT}'
+              event_name: 'Ribbon: Temperature on the top of the main board is above critical threshold: >{$RIBBON.TEMP.TOP.MAIN.BOARD.CRIT}'
               opdata: 'Current temperature: {ITEM.LASTVALUE1}'
               priority: HIGH
               description: 'This trigger uses temperature of on the top of the main board value.'
@@ -432,7 +432,7 @@ zabbix_export:
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'max(/Ribbon SBC Edge by HTTP/ribbon.chassis.core.switch.temp,5m)<{$RIBBON.TEMP.CORE.CRIT}-3'
               name: 'Ribbon: Temperature on chassis core switch is above critical threshold'
-              event_name: 'Ribbon: Temperature is above critical threshold: >{$RIBBON.TEMP.CORE.CRIT}'
+              event_name: 'Ribbon: Temperature on chassis core switch is above critical threshold: >{$RIBBON.TEMP.CORE.CRIT}'
               opdata: 'Current temperature: {ITEM.LASTVALUE1}'
               priority: HIGH
               description: 'This trigger uses temperature of chassis core switch value.'
@@ -3794,7 +3794,7 @@ zabbix_export:
             priority: '16'
             section_name: Thresholds
             label: 'Warning CPU usage threshold'
-            description: 'In the range from 0 to 100 inclusive.'
+            description: 'CPU usage threshold. In the range from 0 to 100 inclusive.'
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
         - macro: '{$RIBBON.DISK.DISCOVERY.NAME.MATCHES}'
           value: '.*'
@@ -3840,7 +3840,7 @@ zabbix_export:
             priority: '41'
             section_name: Thresholds
             label: 'Warning disk usage threshold'
-            description: 'In the range from 0 to 100 inclusive.'
+            description: 'Threshold of disk usage in percent. In the range from 0 to 100 inclusive.'
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
         - macro: '{$RIBBON.DSP.CARD.CPU.USAGE.CRIT}'
           value: '90'
@@ -3850,7 +3850,7 @@ zabbix_export:
             priority: '18'
             section_name: Thresholds
             label: 'Warning DSP card CPU usage threshold'
-            description: 'In the range from 0 to 100 inclusive.'
+            description: 'DSP card CPU usage threshold. In the range from 0 to 100 inclusive.'
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
         - macro: '{$RIBBON.INTERFACE.DISCOVERY.NAME.MATCHES}'
           value: '.*'
@@ -3896,8 +3896,7 @@ zabbix_export:
             priority: '5'
             section_name: Other
             label: 'Update interval'
-            description: 'The interval in seconds for retrieving request metrics. In the range from 1 to 86400 inclusive.'
-            regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
+            description: 'The interval for retrieving request metrics.'
         - macro: '{$RIBBON.INTERVAL:"get_alarm"}'
           value: 5m
           description: 'The update interval for the script item that retrieve the active alarms.'
@@ -3905,9 +3904,8 @@ zabbix_export:
             type: TEXT
             priority: '14'
             section_name: Other
-            label: 'Update interval'
-            description: 'The interval in seconds for retrieving the active alarms. In the range from 1 to 86400 inclusive.'
-            regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
+            label: 'Update interval for get active alarms'
+            description: 'The interval for retrieving the active alarms.'
         - macro: '{$RIBBON.INTERVAL:"get_certificate"}'
           value: 5m
           description: 'The update interval for the script item that retrieve the certificate info.'
@@ -3915,9 +3913,8 @@ zabbix_export:
             type: TEXT
             priority: '13'
             section_name: Other
-            label: 'Update interval'
-            description: 'The interval in seconds for retrieving the system stats metrics. In the range from 1 to 86400 inclusive.'
-            regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
+            label: 'Update interval for get certificate info'
+            description: 'The interval for retrieving the system stats metrics.'
         - macro: '{$RIBBON.INTERVAL:"get_disk"}'
           value: 5m
           description: 'The update interval for the script item that retrieve the disk partition data.'
@@ -3925,9 +3922,8 @@ zabbix_export:
             type: TEXT
             priority: '9'
             section_name: Other
-            label: 'Update interval'
-            description: 'The interval in seconds for retrieving the disk partition metrics. In the range from 1 to 86400 inclusive.'
-            regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
+            label: 'Update interval for get disk partition data'
+            description: 'The interval for retrieving the disk partition metrics.'
         - macro: '{$RIBBON.INTERVAL:"get_dsp_card"}'
           value: 5m
           description: 'The update interval for the script item that retrieve the DSP card data.'
@@ -3935,9 +3931,8 @@ zabbix_export:
             type: TEXT
             priority: '11'
             section_name: Other
-            label: 'Update interval'
-            description: 'The interval in seconds for retrieving the DSP card metrics. In the range from 1 to 86400 inclusive.'
-            regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
+            label: 'Update interval for get DSP card metrics'
+            description: 'The interval for retrieving the DSP card metrics.'
         - macro: '{$RIBBON.INTERVAL:"get_fan"}'
           value: 15m
           description: 'The update interval for the script item that retrieve the fan data.'
@@ -3945,9 +3940,8 @@ zabbix_export:
             type: TEXT
             priority: '8'
             section_name: Other
-            label: 'Update interval'
-            description: 'The interval in seconds for retrieving the fan metrics. In the range from 1 to 86400 inclusive.'
-            regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
+            label: 'Update interval for get fan data'
+            description: 'The interval for retrieving the fan metrics.'
         - macro: '{$RIBBON.INTERVAL:"get_interface"}'
           value: 1m
           description: 'The update interval for the script item that retrieve the interface data.'
@@ -3955,9 +3949,8 @@ zabbix_export:
             type: TEXT
             priority: '7'
             section_name: Other
-            label: 'Update interval'
-            description: 'The interval in seconds for retrieving the interface metrics. In the range from 1 to 86400 inclusive.'
-            regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
+            label: 'Update interval for get interface data'
+            description: 'The interval for retrieving the interface metrics.'
         - macro: '{$RIBBON.INTERVAL:"get_psu"}'
           value: 5m
           description: 'The update interval for the script item that retrieve the power supply data.'
@@ -3965,9 +3958,8 @@ zabbix_export:
             type: TEXT
             priority: '10'
             section_name: Other
-            label: 'Update interval'
-            description: 'The interval in seconds for retrieving the power supply metrics. In the range from 1 to 86400 inclusive.'
-            regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
+            label: 'Update interval for get power supply data'
+            description: 'The interval for retrieving the power supply metrics.'
         - macro: '{$RIBBON.INTERVAL:"get_sip_server"}'
           value: 5m
           description: 'The update interval for the script item that retrieve the SIP server data.'
@@ -3975,9 +3967,8 @@ zabbix_export:
             type: TEXT
             priority: '12'
             section_name: Other
-            label: 'Update interval'
-            description: 'The interval in seconds for retrieving the SIP server metrics. In the range from 1 to 86400 inclusive.'
-            regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
+            label: 'Update interval for get SIP server metrics'
+            description: 'The interval for retrieving the SIP server metrics.'
         - macro: '{$RIBBON.INTERVAL:"get_system_stats"}'
           value: 1m
           description: 'The update interval for the script item that retrieve the system stats.'
@@ -3986,8 +3977,7 @@ zabbix_export:
             priority: '6'
             section_name: Other
             label: 'Update interval'
-            description: 'The interval in seconds for retrieving the system stats metrics. In the range from 1 to 86400 inclusive.'
-            regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
+            description: 'The interval for retrieving the system stats metrics.'
         - macro: '{$RIBBON.MEMORY.UTIL.CRIT}'
           value: '90'
           description: 'The threshold of memory usage in percent.'
@@ -3996,7 +3986,7 @@ zabbix_export:
             priority: '17'
             section_name: Thresholds
             label: 'Warning memory usage threshold'
-            description: 'In the range from 0 to 100 inclusive.'
+            description: 'Memory usage threshold In the range from 0 to 100 inclusive.'
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
         - macro: '{$RIBBON.PASSWORD}'
           type: SECRET_TEXT
@@ -4039,7 +4029,7 @@ zabbix_export:
             priority: '42'
             section_name: Thresholds
             label: 'Warning SIP server failed transactions threshold'
-            description: 'No less than 0'
+            description: 'Threshold of SIP server failed transactions. No less than 0.'
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
         - macro: '{$RIBBON.SIP.SIGNAL.GROUP.DISCOVERY.DESCR.MATCHES}'
           value: '.*'
@@ -4059,6 +4049,16 @@ zabbix_export:
             section_name: Filters
             label: 'Exclude SIP signal group description filter'
             description: 'Regex string to exclude SIP signal group by description.'
+        - macro: '{$RIBBON.TEMP.BOTTOM.MAIN.BOARD.CRIT}'
+          value: '80'
+          description: 'The threshold of temperature on the bottom of the main board in degrees Celsius.'
+          config:
+            type: TEXT
+            priority: '19'
+            section_name: Thresholds
+            label: 'Warning temperature on the bottom of the main board in degrees celsius threshold'
+            description: 'Temperature on the bottom of the main board in degrees celsius threshold.'
+            regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
         - macro: '{$RIBBON.TEMP.CORE.CRIT}'
           value: '80'
           description: 'The threshold of core switch temperature in degrees Celsius.'
@@ -4067,7 +4067,7 @@ zabbix_export:
             priority: '21'
             section_name: Thresholds
             label: 'Warning core switch temperature in degrees celsius threshold'
-            description: 'No less than 0'
+            description: 'Core switch temperature in degrees celsius threshold.'
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
         - macro: '{$RIBBON.TEMP.PSU.CRIT}'
           value: '80'
@@ -4077,19 +4077,9 @@ zabbix_export:
             priority: '22'
             section_name: Thresholds
             label: 'Warning power supply temperature in degrees celsius threshold'
-            description: 'No less than 0'
+            description: 'Power supply temperature in degrees celsius threshold.'
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
-        - macro: '{$RIBBON.TEMP1.CRIT}'
-          value: '80'
-          description: 'The threshold of temperature on the bottom of the main board in degrees Celsius.'
-          config:
-            type: TEXT
-            priority: '19'
-            section_name: Thresholds
-            label: 'Warning temperature on the bottom of the main board in degrees celsius threshold'
-            description: 'No less than 0'
-            regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
-        - macro: '{$RIBBON.TEMP2.CRIT}'
+        - macro: '{$RIBBON.TEMP.TOP.MAIN.BOARD.CRIT}'
           value: '80'
           description: 'The threshold of temperature on the top of the main board in degrees Celsius.'
           config:
@@ -4097,7 +4087,7 @@ zabbix_export:
             priority: '20'
             section_name: Thresholds
             label: 'Warning temperature on the top of the main board in degrees celsius threshold'
-            description: 'No less than 0'
+            description: 'Temperature on the top of the main board in degrees celsius threshold.'
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
         - macro: '{$RIBBON.TIMEOUT}'
           value: 60s
