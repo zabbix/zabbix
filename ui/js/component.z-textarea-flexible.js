@@ -35,11 +35,11 @@ class ZTextareaFlexible extends HTMLElement {
 		this.appendChild(this.#textarea);
 
 		this.#textarea.name = this.getAttribute('name');
-		this.#textarea.value = this.hasAttribute('value') ? this.getAttribute('value') : null;
-		this.#textarea.placeholder = this.hasAttribute('placeholder') ? this.getAttribute('placeholder') : null;
+		this.#textarea.value = this.getAttribute('value');
+		this.#textarea.placeholder = this.getAttribute('placeholder');
 		this.#textarea.disabled = this.hasAttribute('disabled');
 		this.#textarea.readOnly = this.hasAttribute('readonly');
-		this.#textarea.singleline = this.hasAttribute('singleline')	? this.getAttribute('singleline') : null;
+		this.#textarea.singleline = this.getAttribute('singleline');
 		this.#textarea.spellcheck = this.getAttribute('spellcheck') !== 'false';
 
 		if (this.hasAttribute('maxlength')) {
