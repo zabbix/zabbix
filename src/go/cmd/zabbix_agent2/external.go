@@ -15,8 +15,10 @@
 package main
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 	"time"
 
 	"golang.zabbix.com/agent2/internal/agent"
@@ -25,28 +27,38 @@ import (
 	"golang.zabbix.com/sdk/log"
 )
 
-func initExternalPlugins(options *agent.AgentOptions, sysOptions agent.PluginSystemOptions) (string, error) {
+func initExternalPlugins(
+	options *agent.AgentOptions,
+	systemOpts agent.PluginSystemOptions,
+	arguments *Arguments,
+) (string, error) {
 	paths := make(map[string]string)
 
-	for name, s := range sysOptions {
+	for name, systemOptions := range systemOpts {
 		// if path is not set it's an internal plugin
-		if s.Path == nil {
+		if systemOptions.Path == nil {
 			continue
 		}
 
-		if !filepath.IsAbs(*s.Path) {
-			return "", errs.Errorf("loadable plugin %q path %q is not absolute", name, *s.Path)
+		if !filepath.IsAbs(*systemOptions.Path) {
+			return "", errs.Errorf("loadable plugin %q path %q is not absolute", name, *systemOptions.Path)
 		}
 
-		paths[name] = *s.Path
+		paths[name] = *systemOptions.Path
 	}
 
 	if len(paths) == 0 {
 		return "", nil
 	}
 
-	timeout := getTimeout()
-	socket := options.ExternalPluginsSocket
+	var (
+		timeout = getTimeout()
+		socket  = options.ExternalPluginsSocket
+	)
+
+	if arguments.isTestCommand() {
+		socket = createTestSocketName(socket)
+	}
 
 	err := os.RemoveAll(socket)
 	if err != nil {
@@ -84,4 +96,13 @@ func getTimeout() time.Duration {
 	}
 
 	return time.Second * time.Duration(agent.Options.ExternalPluginTimeout)
+}
+
+func createTestSocketName(socket string) string {
+	pid := os.Getpid()
+
+	ext := filepath.Ext(socket)
+	base := strings.TrimSuffix(socket, ext)
+
+	return fmt.Sprintf("%s.%d%s", base, pid, ext)
 }
