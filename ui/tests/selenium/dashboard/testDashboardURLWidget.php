@@ -312,7 +312,6 @@ class testDashboardURLWidget extends CWebTest {
 				[
 					'expected' => TEST_GOOD,
 					'fields' => [
-						'Show header' => false,
 						'Refresh interval' => '10 seconds',
 						'URL' => 'http://zabbix.com'
 					]
@@ -322,7 +321,6 @@ class testDashboardURLWidget extends CWebTest {
 				[
 					'expected' => TEST_GOOD,
 					'fields' => [
-						'Show header' => false,
 						'Refresh interval' => '30 seconds',
 						'URL' => 'https://zabbix.com'
 					]
@@ -368,6 +366,7 @@ class testDashboardURLWidget extends CWebTest {
 				[
 					'expected' => TEST_GOOD,
 					'fields' => [
+						'Show header' => false,
 						'Refresh interval' => 'No refresh',
 						'URL' => 'ssh://zabbix.com'
 					]
@@ -458,6 +457,8 @@ class testDashboardURLWidget extends CWebTest {
 			$this->assertEquals($old_widget_count + ($update ? 0 : 1), $dashboard->getWidgets()->count());
 
 			// Check new widget form fields and values in frontend.
+			// TODO: added workaround, remove after fix ZBX-27231
+			$widget->query('class:dashboard-grid-widget-head')->one()->click();
 			$saved_form = $widget->edit();
 			$this->assertEquals($values, $saved_form->getValues());
 

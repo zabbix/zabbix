@@ -284,6 +284,7 @@ class testPageNetworkDiscovery extends CWebTest {
 		// Filling fields with needed discovery rules information.
 		$form->fill(['id:filter_name' => 'External network']);
 		$form->submit();
+		$table->waitUntilReloaded();
 		$this->page->waitUntilReady();
 
 		// Check that filtered count matches expected.
@@ -295,8 +296,9 @@ class testPageNetworkDiscovery extends CWebTest {
 
 		// After pressing reset button, check that previous discovery rules are displayed again.
 		$form->query('button:Reset')->one()->click();
+		$table->waitUntilReloaded();
 
-		$reset_count =  $table->getRows()->count();
+		$reset_count = $table->getRows()->count();
 		$this->assertEquals($start_rows_count, $reset_count);
 		$this->assertTableStats($reset_count);
 		$this->assertEquals($start_contents, $this->getTableColumnData('Name'));

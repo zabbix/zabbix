@@ -340,8 +340,10 @@ class testDashboardGraphPrototypeWidget extends CWebTest {
 		$form->submit();
 		$dashboard->getWidget($widget['Name']);
 		$dashboard->save();
-		$this->page->removeFocus();
-		sleep(1);
+		$this->assertMessage(TEST_GOOD, 'Dashboard updated');
+		$dashboard->waitUntilReady();
+		// Remove mouse from widget to hide widget name.
+		$this->query('tag:h1')->one()->hoverMouse();
 		$screenshot_area = $this->query('class:dashboard-grid')->one();
 		$screenshot_area->query('xpath:.//div[contains(@class, "dashboard-grid-iterator-focus")]')->waitUntilNotVisible();
 		$this->assertScreenshot($screenshot_area, $data['screenshot_id']);

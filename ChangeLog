@@ -5,6 +5,8 @@ A......PS. [ZBXNEXT-10219] updated maximum supported PostgreSQL version to 18 (m
 A.......S. [ZBXNEXT-10271] updated maximum supported TimescaleDB version to 2.22 (mprihodko)
 
 Bug fixes:
+..F....... [ZBX-27020] fixed user with limited permissions access to map containing submap with inaccessible host or hostgroup (talbergs)
+........S. [ZBX-27106] fixed crash when using {HOST.DNS} macro in allowed hosts for trapper item (vso)
 ..F....... [ZBX-22157] added Map navigation tree widget problem filtering using Problem display and Show suppressed problems filter of map settings (dfofanovs)
 ...G...... [ZBX-24918] fixed crashes of Zabbix agent 2 for Windows related with PDH perf_counter (opucka)
 
