@@ -39,6 +39,15 @@ class CTimeUnitValidator extends CValidator {
 		}
 	}
 
+	/**
+	 * Checks if the given string is:
+	 * - either macro or time unit text with CSimpleIntervalParser
+	 * - if value is not a macro, then also validates if value is between provided min and max range
+	 *
+	 * @param string $value
+	 *
+	 * @return bool
+	 */
 	public function validate($value) {
 		$interval_parser = new CSimpleIntervalParser(['usermacros' => $this->usermacros,
 			'lldmacros' => $this->lldmacros
