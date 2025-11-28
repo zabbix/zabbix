@@ -26,9 +26,9 @@ This template has been tested on:
 
 ## Setup
 
-1. Create a new user according to [REST API requirements](https://publicdoc.rbbn.com/spaces/SBXCONFAPIDOC/pages/444760644/RESTCONF+API+Requirements)
-2. Create a new host
-3. Link the template to the host created earlier
+1. Create a new user according to [REST API requirements](https://publicdoc.rbbn.com/spaces/SBXCONFAPIDOC/pages/444760644/RESTCONF+API+Requirements).
+2. Create a new host.
+3. Link the template to the host created earlier.
 4. Set the host macros (on the host or template level) required for getting data:
 ```text
 {$RIBBON.URL}
@@ -243,9 +243,9 @@ This template has been tested on:
 
 ## Setup
 
-1. Create a new user according to [REST API Requirements](https://publicdoc.rbbn.com/spaces/SBXCONFAPIDOC/pages/444760644/RESTCONF+API+Requirements)
-2. Create a new host
-3. Link the template to the host created earlier
+1. Create a new user according to [REST API Requirements](https://publicdoc.rbbn.com/spaces/SBXCONFAPIDOC/pages/444760644/RESTCONF+API+Requirements).
+2. Create a new host.
+3. Link the template to the host created earlier.
 4. Set the host macros (on the host or template level) required for getting data:
 ```text
 {$RIBBON.URL}
