@@ -470,7 +470,7 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 					],
 					'check_provisioning' => [
 						'role' => 'Super admin role',
-						'groups' => 'Zabbix administratorsGuests',
+						'groups' => "Zabbix administrators\nGuests",
 						'medias' => 'mail'
 					]
 				]

@@ -350,7 +350,7 @@ func (c *Connector) sendHeartbeatMsg() {
 	}
 
 	log.Debugf("[%d] In sendHeartbeatMsg() from %s", c.clientID, c.address)
-	defer log.Debugf("[%d] End of sendHeartBeatMsg() from %s", c.clientID, c.address)
+	defer log.Debugf("[%d] End of sendHeartbeatMsg() from %s", c.clientID, c.address)
 
 	request, err := json.Marshal(&h)
 	if err != nil {

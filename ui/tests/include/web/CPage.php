@@ -719,4 +719,17 @@ class CPage {
 	public function navigateBack() {
 		$this->driver->navigate()->back();
 	}
+
+	/**
+	 * Switch browser window by index number.
+	 *
+	 * @param int $window		array element index number.
+	 *
+	 * @return $this
+	 */
+	public function switchBrowserWindow($window) {
+		$this->driver->switchTo()->window($this->driver->getWindowHandles()[$window]);
+
+		return $this;
+	}
 }

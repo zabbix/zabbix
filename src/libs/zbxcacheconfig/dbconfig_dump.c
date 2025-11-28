@@ -1365,7 +1365,7 @@ static void	DCdump_maintenances(void)
 }
 
 /* stringpool dumping is disabled by default to avoid leaking secret macro data */
-#ifdef HAVE_TESTS
+#ifdef ZBX_DEBUG
 static int	strpool_compare(const void *v1, const void *v2)
 {
 	const char	*s1 = *(const char * const *)v1 + sizeof(zbx_uint32_t);
@@ -1675,7 +1675,7 @@ void	DCdump_configuration(void)
 	DCdump_connectors();
 	DCdump_proxy_groups();
 	DCdump_host_proxy_index();
-#ifdef HAVE_TESTS
+#ifdef ZBX_DEBUG
 	DCdump_strpool();
 #endif
 }

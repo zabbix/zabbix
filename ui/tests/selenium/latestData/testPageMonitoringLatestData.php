@@ -112,6 +112,12 @@ class testPageMonitoringLatestData extends CWebTest {
 						'key_' => 'trap',
 						'type' => ITEM_TYPE_TRAPPER,
 						'value_type' => ITEM_VALUE_TYPE_UINT64
+					],
+					[
+						'name' => 'Multiple   spaces   in item name',
+						'key_' => 'msiin',
+						'type' => ITEM_TYPE_TRAPPER,
+						'value_type' => ITEM_VALUE_TYPE_UINT64
 					]
 				]
 			],
@@ -256,6 +262,17 @@ class testPageMonitoringLatestData extends CWebTest {
 					],
 					'result' => [
 						['Name' => '3_item']
+					]
+				]
+			],
+			// Multiple spaces in field name.
+			[
+				[
+					'filter' => [
+						'Name' => '   spaces   '
+					],
+					'result' => [
+						['Name' => 'Multiple spaces in item name']
 					]
 				]
 			],

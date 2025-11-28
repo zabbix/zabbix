@@ -43,8 +43,8 @@ int	get_value_calculated(zbx_dc_item_t *dc_item, AGENT_RESULT *result)
 
 	zbx_eval_deserialize(&ctx, dc_item->params, ZBX_EVAL_PARSE_CALC_EXPRESSION, dc_item->formula_bin);
 
-	if (SUCCEED != zbx_eval_expand_user_macros(&ctx, &dc_item->host.hostid, 1,
-			(zbx_macro_expand_func_t)zbx_dc_expand_user_and_func_macros, um_handle, &error))
+	if (SUCCEED != zbx_eval_expand_user_macros(&ctx, &dc_item->host.hostid, 1, zbx_um_expand_cb_wrapper, um_handle,
+			&error))
 	{
 		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot evaluate calculated item: %s", error));
 		zbx_free(error);

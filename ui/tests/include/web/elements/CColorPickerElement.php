@@ -22,13 +22,15 @@ require_once __DIR__.'/../CElement.php';
  */
 class CColorPickerElement extends CElement {
 
+	const USE_DEFAULT = null;
+
 	/**
 	 * Get input field of color pick form.
 	 *
 	 * @return type
 	 */
 	public function getInput() {
-		return $this->query('xpath:.//input')->one();
+		return $this->query('xpath:./input')->one();
 	}
 
 	/**
@@ -39,17 +41,16 @@ class CColorPickerElement extends CElement {
 	 * @param string $color		color code
 	 */
 	public function overwrite($color) {
-		$this->query('xpath:./button['.CXPathHelper::fromClass('color-picker-preview').']')->one()->click();
-		$overlay = (new CElementQuery('id:color_picker'))->waitUntilVisible()->asOverlayDialog()->one();
+		$overlay = $this->open();
 
-		if ($color === null) {
-			$overlay->query('button:Use default')->one()->click();
+		if ($color === self::USE_DEFAULT) {
+			$overlay->query('button:Use default')->one()->click()->waitUntilNotVisible();
+			return $this;
 		}
 		else {
 			$overlay->query('xpath:.//div[@class="color-picker-input"]/input')->one()->overwrite($color);
+			$overlay->query('class:btn-overlay-close')->one()->click()->waitUntilNotVisible();
 		}
-
-		$overlay->query('class:btn-overlay-close')->one()->click()->waitUntilNotVisible();
 
 		return $this;
 	}
@@ -76,6 +77,16 @@ class CColorPickerElement extends CElement {
 	 */
 	public function getText() {
 		return $this->getValue();
+	}
+
+	/**
+	 * Open color picker.
+	 *
+	 * @return CElement
+	 */
+	public function open() {
+		$this->query('xpath:./button['.CXPathHelper::fromClass('color-picker-preview').']')->one()->click();
+		return (new CElementQuery('id:color_picker'))->waitUntilVisible()->one();
 	}
 
 	/**
