@@ -38,8 +38,8 @@ class CAbsoluteTimeValidatorTest extends TestCase {
 			['1000-01-01 00:00:00', 	[],							'Invalid date.'],
 
 			// Invalid absolute time: out of min/max range.
-			['2040-01-01 00:00:00',		['max' => ZBX_MAX_DATE], 	'value must be less than or equal to 2038-01-19 03:14:07.'],
-			['2010-01-01 00:00:00',		['min' => ZBX_MAX_DATE], 	'value must be greater than or equal to 2038-01-19 03:14:07.']
+			['2040-01-01 00:00:00',		['max' => ZBX_MAX_DATE], 	'value must be less than or equal to '.date(ZBX_FULL_DATE_TIME, ZBX_MAX_DATE).'.'],
+			['2010-01-01 00:00:00',		['min' => ZBX_MAX_DATE], 	'value must be greater than or equal to '.date(ZBX_FULL_DATE_TIME, ZBX_MAX_DATE).'.']
 		];
 	}
 
