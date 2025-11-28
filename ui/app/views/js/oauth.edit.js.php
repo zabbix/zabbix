@@ -118,8 +118,6 @@ window.oauth_edit_popup = new class {
 	#showClientSecretWithWarning() {
 		const original_token_url = this.form.querySelector('[name="token_url"]').getAttribute('value');
 		const current_token_url = this.#getUrl('token_url', 'token_url_parameters');
-		
-		console.log('CURRENT', current_token_url)
 
 		if (original_token_url !== current_token_url) {
 			this.#showClientSecretField();
