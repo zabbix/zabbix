@@ -1,4 +1,3 @@
-<?php
 /*
 ** Copyright (C) 2001-2025 Zabbix SIA
 **
@@ -13,30 +12,11 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
+#ifndef LLD_COMMON
+#define LLD_COMMON
 
-class CXmlValidator extends CValidator {
+#include "../../../src/zabbix_server/lld/lld.h"
 
-	public function validate($value) {
-		libxml_use_internal_errors(true);
+void	get_macros(const char *path, zbx_vector_lld_macro_path_ptr_t *macros);
 
-		if (simplexml_load_string($value, null, LIBXML_IMPORT_FLAGS) === false) {
-			$errors = libxml_get_errors();
-			libxml_clear_errors();
-
-			if ($errors) {
-				$error = reset($errors);
-				$this->setError(_s('%1$s [Line: %2$s | Column: %3$s]', '('.$error->code.') '.trim($error->message),
-					$error->line, $error->column
-				));
-
-				return false;
-			}
-
-			$this->setError(_('XML is expected'));
-
-			return false;
-		}
-
-		return true;
-	}
-}
+#endif
