@@ -56,8 +56,9 @@ class CUserGroup extends CApiService {
 
 		$sqlParts = [
 			'select'	=> ['usrgrp' => 'g.usrgrpid'],
-			'from'		=> ['usrgrp' => 'usrgrp g'],
+			'from'		=> 'usrgrp g',
 			'where'		=> [],
+			'group'		=> [],
 			'order'		=> [],
 			'limit'		=> null
 		];
@@ -141,9 +142,8 @@ class CUserGroup extends CApiService {
 		if (!is_null($options['userids'])) {
 			zbx_value2array($options['userids']);
 
-			$sqlParts['from']['users_groups'] = 'users_groups ug';
+			$sqlParts['join']['ug'] = ['table' => 'users_groups', 'using' => 'usrgrpid'];
 			$sqlParts['where'][] = dbConditionInt('ug.userid', $options['userids']);
-			$sqlParts['where']['gug'] = 'g.usrgrpid=ug.usrgrpid';
 		}
 
 		if (array_key_exists('mfaids', $options) && $options['mfaids'] !== null) {
