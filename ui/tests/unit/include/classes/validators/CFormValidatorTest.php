@@ -2557,7 +2557,7 @@ class CFormValidatorTest extends TestCase {
 				[],
 				CFormValidator::ERROR,
 				['/value' => [
-					['message' => 'Value must be between 1h and 1d (86400s).',
+					['message' => 'Value must be between 1h (3600s) and 1d (86400s).',
 						'level' => CFormValidator::ERROR_LEVEL_DELAYED
 					]
 				]]
