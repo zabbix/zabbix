@@ -1,10 +1,18 @@
 Changes for 7.0.22rc1
 
 New features:
+A......PS. [ZBXNEXT-10306] updated maximum supported MySQL version to 9.5 (mprihodko)
+.........T [ZBXNEXT-9492] added VeloCloud SD-WAN Edge by HTTP template (egordymov)
+.....J.... [ZBXNEXT-10364] added commentary to web service config file that indicates that this config can be extended via Include (opucka)
 .........T [ZBXNEXT-10231] added support for the new syntax to MySQL templates (aiantsen)
 ...G...... [ZBXNEXT-10012] added both SHOW SLAVE STATUS and SHOW REPLICA STATUS for Zabbix agent 2 MySQL plugin (lsurvilo)
 
 Bug fixes:
+.......PS. [ZBX-26946] fixed memory being reserved by pollers due to memory-intensive script items or in async pollers due to large transfers (vso)
+A......... [ZBX-26427] fixed resetting of discovery rule filter on import (jfreibergs)
+...G...... [ZBX-26218] fixed incorrect function name in log for Zabbix agent 2 (esneiders)
+A......... [ZBX-26252] fixed runtime error when linking template with matching discovery rule to host (jfreibergs)
+A......... [ZBX-26562] fixed 'Allowed memory size exhausted' issue while importing a cloned template (aluchko, jfreibergs)
 ..F....... [ZBX-27154] fixed rare occasion of infinite loop in graph scale generation (averza)
 .........T [ZBX-26739] fixed item logic in Nextcloud by HTTP template (mruszczyk)
 .......PS. [ZBX-27188] fixed validation of TLS configuration before adding autoregistered host (mprihodko)
@@ -3856,6 +3864,7 @@ A.F....PS. [ZBXNEXT-7402,ZBXNEXT-7413] added support for CyberArk Vault (acikuns
 Changes for 6.0.43rc1
 
 New features:
+A......PS. [ZBXNEXT-10306] updated maximum supported MySQL version to 9.5 (mprihodko)
 A......PS. [ZBXNEXT-10219] updated maximum supported PostgreSQL version to 18 (mprihodko)
 A.......S. [ZBXNEXT-10271] updated maximum supported TimescaleDB version to 2.22 (mprihodko)
 
