@@ -15,10 +15,19 @@
 
 class ZTextareaFlexible extends HTMLElement {
 
+	/**
+	 * @type {HTMLTextAreaElement | null}
+	 */
 	#textarea;
+
+	/**
+	 * @type {ResizeObserver | null}
+	 */
 	#resize_observer = null;
 
-	#events;
+	/**
+	 * @type {boolean}
+	 */
 	#is_connected = false;
 
 	constructor() {
@@ -112,34 +121,32 @@ class ZTextareaFlexible extends HTMLElement {
 	}
 
 	#registerEvents() {
-		this.#events = {
-			textareaKeydown: e => {
-				if (e.key === 'Enter' && this.#textarea.singleline) {
-					e.preventDefault();
-					this.closest('form')?.requestSubmit();
-				}
-			},
-
-			textareaBlur: () => {
-				this.#updateHeight();
-				this.dispatchEvent(new Event('blur', { bubbles: true }));
-			},
-
-			textareaResize: () => {
-				this.#updateHeight();
-				this.dispatchEvent(new Event('input', { bubbles: true }));
-			}
-		};
-
-		this.#textarea.addEventListener('keydown', this.#events.textareaKeydown);
-		this.#textarea.addEventListener('blur', this.#events.textareaBlur);
-		this.#textarea.addEventListener('input', this.#events.textareaResize);
+		this.#textarea.addEventListener('keydown', this.#keydownHandler);
+		this.#textarea.addEventListener('blur', this.#blurHandler);
+		this.#textarea.addEventListener('input', this.#inputHandler);
 	}
 
 	#unregisterEvents() {
-		this.#textarea.removeEventListener('keydown', this.#events.textareaKeydown);
-		this.#textarea.removeEventListener('blur', this.#events.textareaBlur);
-		this.#textarea.removeEventListener('input', this.#events.textareaResize);
+		this.#textarea.removeEventListener('keydown', this.#keydownHandler);
+		this.#textarea.removeEventListener('blur', this.#blurHandler);
+		this.#textarea.removeEventListener('input', this.#inputHandler);
+	}
+
+	#keydownHandler = (e) => {
+		if (e.key === 'Enter' && this.#textarea.singleline) {
+			e.preventDefault();
+			this.closest('form')?.requestSubmit();
+		}
+	}
+
+	#blurHandler = () => {
+		this.#updateHeight();
+		this.dispatchEvent(new Event('blur', { bubbles: true }));
+	}
+
+	#inputHandler = () => {
+		this.#updateHeight();
+		this.dispatchEvent(new Event('input', { bubbles: true }));
 	}
 
 	#updateHeight() {
