@@ -46,6 +46,7 @@ window.oauth_edit_popup = new class {
 	}
 
 	#submit() {
+		this.#removePopupMessages();
 		const fields = this.form.getAllValues();
 
 		this.form.validateSubmit(fields)
@@ -91,7 +92,7 @@ window.oauth_edit_popup = new class {
 					)
 					.catch(error => {
 						if (error) {
-							this.#addErrorMessage(error);
+							this.#ajaxExceptionHandler(error);
 						}
 					})
 					.finally(() => this.overlay.unsetLoading());
@@ -215,15 +216,27 @@ window.oauth_edit_popup = new class {
 		});
 	}
 
-	#addErrorMessage(error) {
-		if ('message' in error) {
-			// Handle javascript exceptions.
-			error = {title: null, messages: [error.message]};
+	#removePopupMessages() {
+		for (const el of this.form_element.parentNode.children) {
+			if (el.matches('.msg-good, .msg-bad, .msg-warning')) {
+				el.parentNode.removeChild(el);
+			}
+		}
+	}
+
+	#ajaxExceptionHandler(exception) {
+		let title, messages;
+
+		if (typeof exception === 'object' && 'error' in exception) {
+			title = exception.error.title;
+			messages = exception.error.messages;
+		}
+		else {
+			messages = [<?= json_encode(_('Unexpected server error.')) ?>];
 		}
 
-		[...this.form_element.parentNode.querySelectorAll('.msg-good,.msg-bad,.msg-warning')].map(el => el.remove());
+		const message_box = makeMessageBox('bad', messages, title)[0];
 
-		this.form_element.parentNode.insertBefore(makeMessageBox('bad', error.messages, error.title)[0], this
-			.form_element);
+		this.form_element.parentNode.insertBefore(message_box, this.form_element);
 	}
 }();
