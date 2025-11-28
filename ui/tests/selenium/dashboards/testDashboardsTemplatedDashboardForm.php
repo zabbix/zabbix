@@ -2327,7 +2327,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 		foreach ($fields as $field_details) {
 			// Field locator is used for stand-alone fields that cannot be located via label.
 			$field = (array_key_exists('field_locator', $field_details))
-				? $widget_form->query($field_details['field_locator'])->one()->detect()
+				? $widget_form->query($field_details['field_locator'])->one()
 				: $widget_form->getField($field_details['field']);
 
 			$this->assertTrue($field->isVisible());
