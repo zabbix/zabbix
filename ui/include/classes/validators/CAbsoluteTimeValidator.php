@@ -50,12 +50,12 @@ class CAbsoluteTimeValidator extends CValidator {
 		$timestamp = $parser->getDateTime(true)->getTimestamp();
 
 		if ($this->min !== null && $timestamp < $this->min) {
-			$this->setError(_s('value must be equal or greater than %1$s.', date(ZBX_FULL_DATE_TIME, $this->min)));
+			$this->setError(_s('value must be greater than or equal to %1$s.', date(ZBX_FULL_DATE_TIME, $this->min)));
 
 			return false;
 		}
 		elseif ($this->max !== null && $timestamp > $this->max) {
-			$this->setError(_s('value must be equal or less than %1$s.', date(ZBX_FULL_DATE_TIME, $this->max)));
+			$this->setError(_s('value must be less than or equal to %1$s.', date(ZBX_FULL_DATE_TIME, $this->max)));
 
 			return false;
 		}
