@@ -73,10 +73,8 @@ class CValueMap extends CApiService {
 				return $options['countOutput'] ? '0' : [];
 			}
 
-			$sql_parts['from'][] = 'host_hgset hh';
-			$sql_parts['from'][] = 'permission p';
-			$sql_parts['where'][] = 'vm.hostid=hh.hostid';
-			$sql_parts['where'][] = 'hh.hgsetid=p.hgsetid';
+			$sql_parts['join']['hh'] = ['table' => 'host_hgset', 'using' => 'hostid'];
+			$sql_parts['join']['p'] = ['left_table' => 'hh', 'table' => 'permission', 'using' => 'hgsetid'];
 			$sql_parts['where'][] = 'p.ugsetid='.self::$userData['ugsetid'];
 
 			if ($options['editable']) {
@@ -301,7 +299,7 @@ class CValueMap extends CApiService {
 			'where' => ['valuemapid' => $valuemapids]
 		]]);
 
-		$this->deleteByIds($valuemapids);
+		DB::delete('valuemap', ['valuemapid' => $valuemapids]);
 
 		$this->addAuditBulk(CAudit::ACTION_DELETE, CAudit::RESOURCE_VALUE_MAP, $db_valuemaps);
 

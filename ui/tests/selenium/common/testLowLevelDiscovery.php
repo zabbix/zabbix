@@ -1255,29 +1255,13 @@ class testLowLevelDiscovery extends CWebTest {
 						'Type' => 'HTTP agent',
 						'Key' => 'http.check',
 						'URL' => 'test',
-						'Request type' => 'PUT',
-						'Request body type' => 'XML data',
-						'Request body' => 'test'
-					],
-					'error_details' => 'Invalid parameter "/1/posts": (4) Start tag expected, '<' not found [Line: 1 | Column: 1].'
-				]
-			],
-			// #43.
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'Name' => 'HTTP check',
-						'Type' => 'HTTP agent',
-						'Key' => 'http.check',
-						'URL' => 'test',
 						'Enable trapping' => true,
 						'Allowed hosts' => '::ffff:127.0.0.1'
 					],
 					'error_details' => 'Invalid parameter "/1/trapper_hosts": incorrect address starting from ".0.0.1".'
 				]
 			],
-			// #44.
+			// #43.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1290,7 +1274,7 @@ class testLowLevelDiscovery extends CWebTest {
 					'error_details' => 'Invalid parameter "/1/ipmi_sensor": cannot be empty.'
 				]
 			],
-			// #45.
+			// #44.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1308,7 +1292,7 @@ class testLowLevelDiscovery extends CWebTest {
 					]
 				]
 			],
-			// #46.
+			// #45.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1322,7 +1306,7 @@ class testLowLevelDiscovery extends CWebTest {
 					'error_details' => 'Check the key, please. Default example was passed.'
 				]
 			],
-			// #47.
+			// #46.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1340,7 +1324,7 @@ class testLowLevelDiscovery extends CWebTest {
 					]
 				]
 			],
-			// #48.
+			// #47.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1356,7 +1340,7 @@ class testLowLevelDiscovery extends CWebTest {
 					'error_details' => 'Incorrect value for field "jmx_endpoint": cannot be empty.'
 				]
 			],
-			// #49.
+			// #48.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1370,7 +1354,7 @@ class testLowLevelDiscovery extends CWebTest {
 					'error_details' => 'Field "Master item" is mandatory.'
 				]
 			],
-			// #50.
+			// #49.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1385,7 +1369,7 @@ class testLowLevelDiscovery extends CWebTest {
 					'error_details' => 'Invalid parameter "/1": both username and password should be either present or empty.'
 				]
 			],
-			// #51.
+			// #50.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1400,7 +1384,7 @@ class testLowLevelDiscovery extends CWebTest {
 					'error_details' => 'Invalid parameter "/1": both username and password should be either present or empty.'
 				]
 			],
-			// #52.
+			// #51.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1414,7 +1398,7 @@ class testLowLevelDiscovery extends CWebTest {
 					'error_details' => 'Incorrect value for field "Script": cannot be empty.'
 				]
 			],
-			// #53.
+			// #52.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1430,7 +1414,7 @@ class testLowLevelDiscovery extends CWebTest {
 					'error_details' => 'Invalid parameter "/1/parameters/1/name": cannot be empty.'
 				]
 			],
-			// #54.
+			// #53.
 			[
 				[
 					'fields' => [
@@ -1440,7 +1424,7 @@ class testLowLevelDiscovery extends CWebTest {
 					]
 				]
 			],
-			// #55.
+			// #54.
 			[
 				[
 					'fields' => [
@@ -1461,7 +1445,7 @@ class testLowLevelDiscovery extends CWebTest {
 					'trim' => true
 				]
 			],
-			// #56.
+			// #55.
 			[
 				[
 					'fields' => [
@@ -1476,7 +1460,7 @@ class testLowLevelDiscovery extends CWebTest {
 					'trim' => true
 				]
 			],
-			// #57.
+			// #56.
 			[
 				[
 					'fields' => [
@@ -1495,7 +1479,7 @@ class testLowLevelDiscovery extends CWebTest {
 					'trim' => true
 				]
 			],
-			// #58.
+			// #57.
 			[
 				[
 					'fields' => [
@@ -1511,7 +1495,7 @@ class testLowLevelDiscovery extends CWebTest {
 					]
 				]
 			],
-			// #59.
+			// #58.
 			[
 				[
 					'fields' => [
@@ -1523,7 +1507,7 @@ class testLowLevelDiscovery extends CWebTest {
 					'trim' => true
 				]
 			],
-			// #60.
+			// #59.
 			[
 				[
 					'fields' => [
@@ -1534,7 +1518,7 @@ class testLowLevelDiscovery extends CWebTest {
 					]
 				]
 			],
-			// #61.
+			// #60.
 			[
 				[
 					'fields' => [
@@ -1545,7 +1529,7 @@ class testLowLevelDiscovery extends CWebTest {
 					]
 				]
 			],
-			// #62.
+			// #61.
 			[
 				[
 					'fields' => [
@@ -1555,7 +1539,7 @@ class testLowLevelDiscovery extends CWebTest {
 					]
 				]
 			],
-			// #63.
+			// #62.
 			[
 				[
 					'fields' => [
@@ -1568,7 +1552,7 @@ class testLowLevelDiscovery extends CWebTest {
 					'trim' => true
 				]
 			],
-			// #64.
+			// #63.
 			[
 				[
 					'fields' => [
@@ -1578,7 +1562,7 @@ class testLowLevelDiscovery extends CWebTest {
 					]
 				]
 			],
-			// #65.
+			// #64.
 			[
 				[
 					'fields' => [
@@ -1590,7 +1574,7 @@ class testLowLevelDiscovery extends CWebTest {
 					'trim' => true
 				]
 			],
-			// #66.
+			// #65.
 			[
 				[
 					'fields' => [
@@ -1601,7 +1585,7 @@ class testLowLevelDiscovery extends CWebTest {
 					]
 				]
 			],
-			// #67.
+			// #66.
 			[
 				[
 					'fields' => [
@@ -1614,7 +1598,7 @@ class testLowLevelDiscovery extends CWebTest {
 					]
 				]
 			],
-			// #68.
+			// #67.
 			[
 				[
 					'fields' => [
@@ -1627,7 +1611,7 @@ class testLowLevelDiscovery extends CWebTest {
 					]
 				]
 			],
-			// #69.
+			// #68.
 			[
 				[
 					'fields' => [
@@ -1652,7 +1636,7 @@ class testLowLevelDiscovery extends CWebTest {
 					]
 				]
 			],
-			// #70.
+			// #69.
 			[
 				[
 					'fields' => [
@@ -1697,7 +1681,7 @@ class testLowLevelDiscovery extends CWebTest {
 					'trim' => true
 				]
 			],
-			// #71.
+			// #70.
 			[
 				[
 					'fields' => [
@@ -1723,7 +1707,7 @@ class testLowLevelDiscovery extends CWebTest {
 					]
 				]
 			],
-			// #72.
+			// #71.
 			[
 				[
 					'fields' => [
@@ -1749,7 +1733,7 @@ class testLowLevelDiscovery extends CWebTest {
 					]
 				]
 			],
-			// #73.
+			// #72.
 			[
 				[
 					'fields' => [
@@ -1761,7 +1745,7 @@ class testLowLevelDiscovery extends CWebTest {
 					]
 				]
 			],
-			// #74.
+			// #73.
 			[
 				[
 					'fields' => [
@@ -1774,7 +1758,7 @@ class testLowLevelDiscovery extends CWebTest {
 					]
 				]
 			],
-			// #75.
+			// #74.
 			[
 				[
 					'fields' => [
@@ -1788,7 +1772,7 @@ class testLowLevelDiscovery extends CWebTest {
 					'trim' => true
 				]
 			],
-			// #76.
+			// #75.
 			[
 				[
 					'fields' => [
@@ -1801,7 +1785,7 @@ class testLowLevelDiscovery extends CWebTest {
 					]
 				]
 			],
-			// #77.
+			// #76.
 			[
 				[
 					'fields' => [
@@ -1815,7 +1799,7 @@ class testLowLevelDiscovery extends CWebTest {
 					'trim' => true
 				]
 			],
-			// #78.
+			// #77.
 			[
 				[
 					'fields' => [
@@ -1830,7 +1814,7 @@ class testLowLevelDiscovery extends CWebTest {
 					'trim' => true
 				]
 			],
-			// #79.
+			// #78.
 			[
 				[
 					'fields' => [
@@ -1841,7 +1825,7 @@ class testLowLevelDiscovery extends CWebTest {
 					]
 				]
 			],
-			// #80.
+			// #79.
 			[
 				[
 					'fields' => [
@@ -1857,7 +1841,7 @@ class testLowLevelDiscovery extends CWebTest {
 					'trim' => true
 				]
 			],
-			// #81.
+			// #80.
 			[
 				[
 					'fields' => [
@@ -1875,7 +1859,7 @@ class testLowLevelDiscovery extends CWebTest {
 				]
 			],
 			// LLD Macros tab.
-			// #82.
+			// #81.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1890,7 +1874,7 @@ class testLowLevelDiscovery extends CWebTest {
 					'error_details' => 'Invalid parameter "/1/lld_macro_paths/1/path": cannot be empty.'
 				]
 			],
-			// #83.
+			// #82.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1905,7 +1889,7 @@ class testLowLevelDiscovery extends CWebTest {
 					'error_details' => 'Invalid parameter "/1/lld_macro_paths/1/lld_macro": a low-level discovery macro is expected.'
 				]
 			],
-			// #84.
+			// #83.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1920,7 +1904,7 @@ class testLowLevelDiscovery extends CWebTest {
 					'error_details' => 'Invalid parameter "/1/lld_macro_paths/1/lld_macro": a low-level discovery macro is expected.'
 				]
 			],
-			// #85.
+			// #84.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1935,7 +1919,7 @@ class testLowLevelDiscovery extends CWebTest {
 					'error_details' => 'Invalid parameter "/1/lld_macro_paths/1/lld_macro": a low-level discovery macro is expected.'
 				]
 			],
-			// #86.
+			// #85.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1950,7 +1934,7 @@ class testLowLevelDiscovery extends CWebTest {
 					'error_details' => 'Invalid parameter "/1/lld_macro_paths/1/lld_macro": cannot be empty.'
 				]
 			],
-			// #87.
+			// #86.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1965,7 +1949,7 @@ class testLowLevelDiscovery extends CWebTest {
 					'error_details' => 'Invalid parameter "/1/lld_macro_paths/1/lld_macro": a low-level discovery macro is expected.'
 				]
 			],
-			// #88.
+			// #87.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1981,7 +1965,7 @@ class testLowLevelDiscovery extends CWebTest {
 					'error_details' => 'Invalid parameter "/1/lld_macro_paths/2": value (lld_macro)=({#MACRO}) already exists.'
 				]
 			],
-			// #89.
+			// #88.
 			[
 				[
 					'fields' => [
@@ -1996,7 +1980,7 @@ class testLowLevelDiscovery extends CWebTest {
 				]
 			],
 			// Filters tab.
-			// #90.
+			// #89.
 			[
 				[
 					'fields' => [
@@ -2011,7 +1995,7 @@ class testLowLevelDiscovery extends CWebTest {
 					]
 				]
 			],
-			// #91.
+			// #90.
 			[
 				[
 					'fields' => [
@@ -2026,7 +2010,7 @@ class testLowLevelDiscovery extends CWebTest {
 					]
 				]
 			],
-			// #92.
+			// #91.
 			[
 				[
 					'fields' => [
@@ -2043,7 +2027,7 @@ class testLowLevelDiscovery extends CWebTest {
 					]
 				]
 			],
-			// #93.
+			// #92.
 			[
 				[
 					'fields' => [
@@ -2060,7 +2044,7 @@ class testLowLevelDiscovery extends CWebTest {
 					]
 				]
 			],
-			// #94.
+			// #93.
 			[
 				[
 					'fields' => [
@@ -2077,7 +2061,7 @@ class testLowLevelDiscovery extends CWebTest {
 					]
 				]
 			],
-			// #95.
+			// #94.
 			[
 				[
 					'fields' => [
@@ -2096,7 +2080,7 @@ class testLowLevelDiscovery extends CWebTest {
 					]
 				]
 			],
-			// #96.
+			// #95.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -2113,7 +2097,7 @@ class testLowLevelDiscovery extends CWebTest {
 					'error_details' => 'Invalid parameter "/1/filter/conditions/1/macro": a low-level discovery macro is expected.'
 				]
 			],
-			// #97.
+			// #96.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -2133,7 +2117,7 @@ class testLowLevelDiscovery extends CWebTest {
 					'error_details' => 'Invalid parameter "/1/filter/formula": cannot be empty.'
 				]
 			],
-			// #98.
+			// #97.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -2153,7 +2137,7 @@ class testLowLevelDiscovery extends CWebTest {
 					'error_details' => 'Invalid parameter "/1/filter/formula": missing filter condition "F".'
 				]
 			],
-			// #99.
+			// #98.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -2175,7 +2159,7 @@ class testLowLevelDiscovery extends CWebTest {
 						' defined in the formula.'
 				]
 			],
-			// #100.
+			// #99.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -2195,7 +2179,7 @@ class testLowLevelDiscovery extends CWebTest {
 					'error_details' => 'Invalid parameter "/1/filter/formula": incorrect syntax near "Wrong formula".'
 				]
 			],
-			// #101.
+			// #100.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -2215,7 +2199,7 @@ class testLowLevelDiscovery extends CWebTest {
 					'error_details' => 'Invalid parameter "/1/filter/formula": incorrect syntax near "Not B"'
 				]
 			],
-			// #102.
+			// #101.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -2235,7 +2219,7 @@ class testLowLevelDiscovery extends CWebTest {
 					'error_details' => 'Invalid parameter "/1/filter/formula": incorrect syntax near " A and not B".'
 				]
 			],
-			// #103.
+			// #102.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -2255,7 +2239,7 @@ class testLowLevelDiscovery extends CWebTest {
 					'error_details' => 'Invalid parameter "/1/filter/formula": incorrect syntax near " not B".'
 				]
 			],
-			// #104.
+			// #103.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -2269,7 +2253,7 @@ class testLowLevelDiscovery extends CWebTest {
 					'error_details' => 'Incorrect value for field "Script": cannot be empty.'
 				]
 			],
-			// #105.
+			// #104.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -2285,7 +2269,7 @@ class testLowLevelDiscovery extends CWebTest {
 					'error_details' => 'Invalid parameter "/1/parameters/1/name": cannot be empty.'
 				]
 			],
-			// #106.
+			// #105.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -2302,7 +2286,7 @@ class testLowLevelDiscovery extends CWebTest {
 					'error_details' => 'Invalid parameter "/1/parameters/2": value (name)=(test_name) already exists.'
 				]
 			],
-			// #107.
+			// #106.
 			[
 				[
 					'fields' => [

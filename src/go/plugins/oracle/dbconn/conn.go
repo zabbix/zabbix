@@ -160,8 +160,13 @@ func (c *ConnManager) GetConnection(cd ConnDetails) (*OraConn, error) { //nolint
 	return c.setConn(cd, conn)
 }
 
-// GetContextWithTimeout function returns context with timeout = conn.callTimeout.
-func (conn *OraConn) GetContextWithTimeout() (context.Context, context.CancelFunc) {
+// GetContextWithTimeout function returns context with specified timeout.
+func (conn *OraConn) GetContextWithTimeout(timeout time.Duration) (context.Context, context.CancelFunc) {
+	return context.WithTimeout(conn.ctx, timeout)
+}
+
+// GetContextWithCallTimeout function returns context with timeout = conn.callTimeout.
+func (conn *OraConn) GetContextWithCallTimeout() (context.Context, context.CancelFunc) {
 	return context.WithTimeout(conn.ctx, conn.callTimeout)
 }
 

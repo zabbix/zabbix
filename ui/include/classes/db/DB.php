@@ -1169,9 +1169,7 @@ class DB {
 
 		// pks
 		if (array_key_exists($pk_option, $options)) {
-			if (!is_array($options[$pk_option])) {
-				$options[$pk_option] = [$options[$pk_option]];
-			}
+			$options[$pk_option] = (array) $options[$pk_option];
 
 			$field_schema = $table_schema['fields'][$pk];
 			$field_name = self::fieldId($pk, $table_alias);

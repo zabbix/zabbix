@@ -42,7 +42,7 @@ class CDRule extends CApiService {
 
 		$sqlParts = [
 			'select'	=> ['drules' => 'dr.druleid'],
-			'from'		=> ['drules' => 'drules dr'],
+			'from'		=> 'drules dr',
 			'where'		=> [],
 			'group'		=> [],
 			'order'		=> [],
@@ -89,9 +89,8 @@ class CDRule extends CApiService {
 		if (!is_null($options['dhostids'])) {
 			zbx_value2array($options['dhostids']);
 
-			$sqlParts['from']['dhosts'] = 'dhosts dh';
+			$sqlParts['join']['dh'] = ['table' => 'dhosts', 'using' => 'druleid'];
 			$sqlParts['where']['dhostid'] = dbConditionInt('dh.dhostid', $options['dhostids']);
-			$sqlParts['where']['dhdr'] = 'dh.druleid=dr.druleid';
 
 			if ($options['groupCount']) {
 				$sqlParts['group']['dhostid'] = 'dh.dhostid';
@@ -102,12 +101,9 @@ class CDRule extends CApiService {
 		if (!is_null($options['dserviceids'])) {
 			zbx_value2array($options['dserviceids']);
 
-			$sqlParts['from']['dhosts'] = 'dhosts dh';
-			$sqlParts['from']['dservices'] = 'dservices ds';
-
+			$sqlParts['join']['dh'] = ['table' => 'dhosts', 'using' => 'druleid'];
+			$sqlParts['join']['ds'] = ['left_table' => 'dh', 'table' => 'dservices', 'using' => 'dhostid'];
 			$sqlParts['where']['dserviceid'] = dbConditionInt('ds.dserviceid', $options['dserviceids']);
-			$sqlParts['where']['dhdr'] = 'dh.druleid=dr.druleid';
-			$sqlParts['where']['dhds'] = 'dh.dhostid=ds.dhostid';
 
 			if ($options['groupCount']) {
 				$sqlParts['group']['dserviceid'] = 'ds.dserviceid';
@@ -326,16 +322,13 @@ class CDRule extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
 		}
 
-		if (!$drules) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
-		}
+		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE | API_ALLOW_UNEXPECTED, 'uniq' => [['druleid']], 'fields' => [
+			'druleid' =>	['type' => API_ID, 'flags' => API_REQUIRED]
+		]];
 
-		// Validate given IDs.
-		$this->checkObjectIds($drules, 'druleid',
-			_('Field "%1$s" is mandatory.'),
-			_s('Incorrect value for field "%1$s": %2$s.', 'druleid', _('cannot be empty')),
-			_s('Incorrect value for field "%1$s": %2$s.', 'druleid', _('a numeric value is expected'))
-		);
+		if (!CApiInputValidator::validate($api_input_rules, $drules, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+		}
 
 		$db_drules = $this->get([
 			'output' => ['druleid', 'name'],

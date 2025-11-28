@@ -1680,7 +1680,10 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 
 			foreach ($matched_macros['macros'] as $type => $matches) {
 				foreach ($matches as $token => $_data) {
-					$macros[$token] = $data['macros_values'][$type][$token];
+					$value = $data['macros_values'][$type]['{'.$_data['macro'].'}'];
+					$macros[$token] = array_key_exists('macrofunc', $_data)
+						? CMacroFunction::calcMacrofunc($value, $_data['macrofunc'])
+						: $value;
 				}
 			}
 		}
