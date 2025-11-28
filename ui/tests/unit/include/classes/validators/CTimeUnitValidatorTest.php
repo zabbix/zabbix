@@ -54,7 +54,7 @@ class CTimeUnitValidatorTest extends TestCase {
 	/**
 	 * @dataProvider dataProvider
 	 */
-	public function testAbsoluteTimeValidator($name, $options, $expected_error): void {
+	public function testTimeUnitValidator($name, $options, $expected_error): void {
 		$validator = new CTimeUnitValidator($options);
 
 		$expected_result = $expected_error === null;
