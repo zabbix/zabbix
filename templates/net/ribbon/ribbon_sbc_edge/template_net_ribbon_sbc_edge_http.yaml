@@ -353,11 +353,11 @@ zabbix_export:
               value: sensor
           triggers:
             - uuid: 35998716d90f4b3382042312bdef9ced
-              expression: 'avg(/Ribbon SBC Edge by HTTP/ribbon.chassis.board.bottom.temp,5m)>{$RIBBON.TEMP1.CRIT}'
+              expression: 'avg(/Ribbon SBC Edge by HTTP/ribbon.chassis.board.bottom.temp,5m)>{$RIBBON.TEMP.BOTTOM.MAIN.BOARD.CRIT}'
               recovery_mode: RECOVERY_EXPRESSION
-              recovery_expression: 'max(/Ribbon SBC Edge by HTTP/ribbon.chassis.board.bottom.temp,5m)<{$RIBBON.TEMP1.CRIT}-3'
+              recovery_expression: 'max(/Ribbon SBC Edge by HTTP/ribbon.chassis.board.bottom.temp,5m)<{$RIBBON.TEMP.BOTTOM.MAIN.BOARD.CRIT}-3'
               name: 'Ribbon: Temperature on the bottom of the main board is above critical threshold'
-              event_name: 'Ribbon: Temperature 1 is above critical threshold: >{$RIBBON.TEMP1.CRIT}'
+              event_name: 'Ribbon: Temperature on the bottom of the main board is above critical threshold: >{$RIBBON.TEMP.BOTTOM.MAIN.BOARD.CRIT}'
               opdata: 'Current temperature: {ITEM.LASTVALUE1}'
               priority: HIGH
               description: 'This trigger uses temperature the bottom of the main board value.'
@@ -384,11 +384,11 @@ zabbix_export:
               value: sensor
           triggers:
             - uuid: f80c73ecab184a9aa4428839e34e8f79
-              expression: 'avg(/Ribbon SBC Edge by HTTP/ribbon.chassis.board.top.temp,5m)>{$RIBBON.TEMP2.CRIT}'
+              expression: 'avg(/Ribbon SBC Edge by HTTP/ribbon.chassis.board.top.temp,5m)>{$RIBBON.TEMP.TOP.MAIN.BOARD.CRIT}'
               recovery_mode: RECOVERY_EXPRESSION
-              recovery_expression: 'max(/Ribbon SBC Edge by HTTP/ribbon.chassis.board.top.temp,5m)<{$RIBBON.TEMP2.CRIT}-3'
+              recovery_expression: 'max(/Ribbon SBC Edge by HTTP/ribbon.chassis.board.top.temp,5m)<{$RIBBON.TEMP.TOP.MAIN.BOARD.CRIT}-3'
               name: 'Ribbon: Temperature on the top of the main board is above critical threshold'
-              event_name: 'Ribbon: Temperature is above critical threshold: >{$RIBBON.TEMP2.CRIT}'
+              event_name: 'Ribbon: Temperature on the top of the main board is above critical threshold: >{$RIBBON.TEMP.TOP.MAIN.BOARD.CRIT}'
               opdata: 'Current temperature: {ITEM.LASTVALUE1}'
               priority: HIGH
               description: 'This trigger uses temperature of on the top of the main board value.'
@@ -419,7 +419,7 @@ zabbix_export:
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'max(/Ribbon SBC Edge by HTTP/ribbon.chassis.core.switch.temp,5m)<{$RIBBON.TEMP.CORE.CRIT}-3'
               name: 'Ribbon: Temperature on chassis core switch is above critical threshold'
-              event_name: 'Ribbon: Temperature is above critical threshold: >{$RIBBON.TEMP.CORE.CRIT}'
+              event_name: 'Ribbon: Temperature on chassis core switch is above critical threshold: >{$RIBBON.TEMP.CORE.CRIT}'
               opdata: 'Current temperature: {ITEM.LASTVALUE1}'
               priority: HIGH
               description: 'This trigger uses temperature of chassis core switch value.'
@@ -3959,16 +3959,16 @@ zabbix_export:
         - macro: '{$RIBBON.SIP.SIGNAL.GROUP.DISCOVERY.DESCR.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
           description: 'Sets the regex string of the SIP signal group description to be ignored in discovery.'
+        - macro: '{$RIBBON.TEMP.BOTTOM.MAIN.BOARD.CRIT}'
+          value: '80'
+          description: 'The threshold of temperature on the bottom of the main board in degrees Celsius.'
         - macro: '{$RIBBON.TEMP.CORE.CRIT}'
           value: '80'
           description: 'The threshold of core switch temperature in degrees Celsius.'
         - macro: '{$RIBBON.TEMP.PSU.CRIT}'
           value: '80'
           description: 'The threshold of power supply temperature in degrees Celsius.'
-        - macro: '{$RIBBON.TEMP1.CRIT}'
-          value: '80'
-          description: 'The threshold of temperature on the bottom of the main board in degrees Celsius.'
-        - macro: '{$RIBBON.TEMP2.CRIT}'
+        - macro: '{$RIBBON.TEMP.TOP.MAIN.BOARD.CRIT}'
           value: '80'
           description: 'The threshold of temperature on the top of the main board in degrees Celsius.'
         - macro: '{$RIBBON.TIMEOUT}'
