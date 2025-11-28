@@ -42,7 +42,7 @@ class CAbsoluteTimeValidator extends CValidator {
 		$parser = new CAbsoluteTimeParser();
 
 		if ($parser->parse($value) != CParser::PARSE_SUCCESS) {
-			$this->setError($parser->getError());
+			$this->setError(_('Invalid date.'));
 
 			return false;
 		}
