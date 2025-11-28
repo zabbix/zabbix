@@ -27,19 +27,19 @@ class CAbsoluteTimeValidatorTest extends TestCase {
 			['2021-01-01 00:00:00', 	['max' => ZBX_MAX_DATE],	null],
 
 			// Invalid absolute time: format.
-			['00:00:00', 				[], 						'Invalid date.'],
-			['2021-01-01 99:00:00',		[], 						'Invalid date.'],
-			['2021-01-01 12:00:00a',	[], 						'Invalid date.'],
-			['{$MACRO}', 				[], 						'Invalid date.'],
-			['{#MACRO}', 				[],							'Invalid date.'],
-			['{$MACRO}', 				[],							'Invalid date.'],
-			['{MACRO}', 				[],							'Invalid date.'],
-			['zzzz', 					[],							'Invalid date.'],
-			['1000-01-01 00:00:00', 	[],							'Invalid date.'],
+			['00:00:00', 				[], 						'invalid date'],
+			['2021-01-01 99:00:00',		[], 						'invalid date'],
+			['2021-01-01 12:00:00a',	[], 						'invalid date'],
+			['{$MACRO}', 				[], 						'invalid date'],
+			['{#MACRO}', 				[],							'invalid date'],
+			['{$MACRO}', 				[],							'invalid date'],
+			['{MACRO}', 				[],							'invalid date'],
+			['zzzz', 					[],							'invalid date'],
+			['1000-01-01 00:00:00', 	[],							'invalid date'],
 
 			// Invalid absolute time: out of min/max range.
-			['2040-01-01 00:00:00',		['max' => ZBX_MAX_DATE], 	'value must be less than or equal to '.date(ZBX_FULL_DATE_TIME, ZBX_MAX_DATE).'.'],
-			['2010-01-01 00:00:00',		['min' => ZBX_MAX_DATE], 	'value must be greater than or equal to '.date(ZBX_FULL_DATE_TIME, ZBX_MAX_DATE).'.']
+			['2040-01-01 00:00:00',		['max' => ZBX_MAX_DATE], 	'value must be less than or equal to '.date(ZBX_FULL_DATE_TIME, ZBX_MAX_DATE)],
+			['2010-01-01 00:00:00',		['min' => ZBX_MAX_DATE], 	'value must be greater than or equal to '.date(ZBX_FULL_DATE_TIME, ZBX_MAX_DATE)]
 		];
 	}
 

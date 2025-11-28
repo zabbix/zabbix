@@ -42,7 +42,7 @@ class CAbsoluteTimeValidator extends CValidator {
 		$parser = new CAbsoluteTimeParser();
 
 		if ($parser->parse($value) != CParser::PARSE_SUCCESS) {
-			$this->setError(_('Invalid date.'));
+			$this->setError(_('invalid date'));
 
 			return false;
 		}
@@ -50,18 +50,18 @@ class CAbsoluteTimeValidator extends CValidator {
 		$timestamp = $parser->getDateTime(true)->getTimestamp();
 
 		if ($timestamp < 0) {
-			$this->setError(_('Invalid date.'));
+			$this->setError(_('invalid date'));
 
 			return false;
 		}
 
 		if ($this->min !== null && $timestamp < $this->min) {
-			$this->setError(_s('value must be greater than or equal to %1$s.', date(ZBX_FULL_DATE_TIME, $this->min)));
+			$this->setError(_s('value must be greater than or equal to %1$s', date(ZBX_FULL_DATE_TIME, $this->min)));
 
 			return false;
 		}
 		elseif ($this->max !== null && $timestamp > $this->max) {
-			$this->setError(_s('value must be less than or equal to %1$s.', date(ZBX_FULL_DATE_TIME, $this->max)));
+			$this->setError(_s('value must be less than or equal to %1$s', date(ZBX_FULL_DATE_TIME, $this->max)));
 
 			return false;
 		}
