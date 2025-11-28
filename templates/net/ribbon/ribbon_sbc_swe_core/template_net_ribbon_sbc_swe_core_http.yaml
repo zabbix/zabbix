@@ -37,9 +37,9 @@ zabbix_export:
         
         ## Setup
         
-        1. Create a new user according [REST API - Requirements](https://publicdoc.rbbn.com/spaces/SBXCONFAPIDOC/pages/444760644/RESTCONF+API+Requirements)
-        2. Create a new host
-        3. Link the template to the host created earlier
+        1. Create a new user according [REST API - Requirements](https://publicdoc.rbbn.com/spaces/SBXCONFAPIDOC/pages/444760644/RESTCONF+API+Requirements).
+        2. Create a new host.
+        3. Link the template to the host created earlier.
         4. Set the host wizard configuration field `Ribbon SBC URL` required for getting data.
         5. Set the host wizard configuration fields `Ribbon SBC user` and `Ribbon SBC password` with the login and password of the user created earlier.
         6. Set the host wizard configuration fields `Ribbon SBC CE name` and `Ribbon SBC password` with the name of CE.
@@ -1669,7 +1669,7 @@ zabbix_export:
             priority: '6'
             section_name: Thresholds
             label: 'Warning CPU usage threshold'
-            description: 'In the range from 0 to 100 inclusive.'
+            description: 'Set the CPU usage threshold in percent. In the range from 0 to 100 inclusive.'
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
         - macro: '{$RIBBON.DISK.UTIL.CRIT}'
           value: '90'
@@ -1679,7 +1679,7 @@ zabbix_export:
             priority: '9'
             section_name: Thresholds
             label: 'Warning disk usage threshold'
-            description: 'In the range from 0 to 100 inclusive.'
+            description: 'Set the disk usage threshold in percent. In the range from 0 to 100 inclusive.'
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
         - macro: '{$RIBBON.FS.DISCOVERY.NAME.MATCHES}'
           value: '.*'
@@ -1725,7 +1725,7 @@ zabbix_export:
             priority: '7'
             section_name: Thresholds
             label: 'Warning memory usage threshold'
-            description: 'In the range from 0 to 100 inclusive.'
+            description: 'Set the memory usage threshold in percent. In the range from 0 to 100 inclusive.'
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
         - macro: '{$RIBBON.MONITOR.PORT.DISCOVERY.NAME.MATCHES}'
           value: '.*'
@@ -1779,7 +1779,7 @@ zabbix_export:
             priority: '10'
             section_name: Thresholds
             label: 'Warning packet port usage threshold'
-            description: 'In the range from 0 to 100 inclusive.'
+            description: 'Set the packet port usage threshold in percent. In the range from 0 to 100 inclusive.'
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
         - macro: '{$RIBBON.PROXY}'
           description: 'Sets the HTTP proxy value. If this macro is empty, then no proxy is used.'
@@ -1814,7 +1814,7 @@ zabbix_export:
             priority: '8'
             section_name: Thresholds
             label: 'Warning swap usage threshold'
-            description: 'In the range from 0 to 100 inclusive.'
+            description: 'Set the swap usage threshold in percent. In the range from 0 to 100 inclusive.'
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
         - macro: '{$RIBBON.URL}'
           description: 'Ribbon SBC API IP.'
@@ -2440,9 +2440,9 @@ zabbix_export:
         
         ## Setup
         
-        1. Create a new user according [REST API - Requirements](https://publicdoc.rbbn.com/spaces/SBXCONFAPIDOC/pages/444760644/RESTCONF+API+Requirements)
-        2. Create a new host
-        3. Link the template to the host created earlier
+        1. Create a new user according [REST API - Requirements](https://publicdoc.rbbn.com/spaces/SBXCONFAPIDOC/pages/444760644/RESTCONF+API+Requirements).
+        2. Create a new host.
+        3. Link the template to the host created earlier.
         4. Set the host wizard configuration field `Ribbon SBC URL` required for getting data.
         5. Set the host wizard configuration fields `Ribbon SBC user` and `Ribbon SBC password` with the login and password of the user created earlier.
       vendor:
@@ -4247,7 +4247,7 @@ zabbix_export:
             priority: '6'
             section_name: Thresholds
             label: 'Warning DNS errors percentage threshold'
-            description: 'In the range from 0 to 100 inclusive.'
+            description: 'Threshold of DNS errors in percent to trigger warning. In the range from 0 to 100 inclusive.'
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
         - macro: '{$RIBBON.DNS.ERRORS.TRIGGER.THRESHOLD}'
           value: '1000'
@@ -4257,7 +4257,7 @@ zabbix_export:
             priority: '5'
             section_name: Thresholds
             label: 'Warning DNS errors threshold'
-            description: 'No less than 0'
+            description: 'Threshold of DNS errors to trigger warning. No less than 0.'
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
         - macro: '{$RIBBON.DNS.GROUP.DISCOVERY.NAME.MATCHES}'
           value: '.*'
@@ -4285,7 +4285,7 @@ zabbix_export:
             priority: '7'
             section_name: Thresholds
             label: 'Warning DNS timeouts percentage threshold'
-            description: 'In the range from 0 to 100 inclusive.'
+            description: 'Threshold of DNS timeouts in percent to trigger warning. In the range from 0 to 100 inclusive.'
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
         - macro: '{$RIBBON.LICENSE.DISCOVERY.NAME.MATCHES}'
           value: '.*'
