@@ -2451,6 +2451,28 @@ class CFormValidatorTest extends TestCase {
 						'level' => CFormValidator::ERROR_LEVEL_DELAYED
 					]
 				]]
+			],
+			[
+				['object', 'fields' => [
+					'value' => ['string', 'use' => [CTimeUnitValidator::class]]
+				]],
+				['value' => 'zzzz'],
+				['value' => 'zzzz'],
+				CFormValidator::ERROR,
+				['/value' => [
+					['message' => 'A time unit is expected.', 'level' => CFormValidator::ERROR_LEVEL_DELAYED]
+				]]
+			],
+			[
+				['object', 'fields' => [
+					'value' => ['string', 'use' => [CAbsoluteTimeValidator::class]]
+				]],
+				['value' => 'zzzz'],
+				['value' => 'zzzz'],
+				CFormValidator::ERROR,
+				['/value' => [
+					['message' => 'Invalid date.', 'level' => CFormValidator::ERROR_LEVEL_DELAYED]
+				]]
 			]
 		];
 	}
