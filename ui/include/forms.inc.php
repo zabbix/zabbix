@@ -1061,7 +1061,8 @@ function renderTagTableRow($index, array $tag, array $options = []) {
 		->setErrorContainer($options['has_inline_validation'] ? 'tag_'.$index.'_error_container' : null)
 		->setErrorLabel($options['has_inline_validation'] ? _('Name') : null)
 		->setAdaptiveWidth(ZBX_TEXTAREA_TAG_WIDTH)
-		->setAttribute('placeholder', _('tag'));
+		->setAttribute('placeholder', _('tag'))
+		->setReadonly($textarea_options['readonly']);
 
 	$type_field = $options['show_inherited_tags']
 		? new CVar($options['field_name'].'['.$index.'][type]', $tag['type'])
@@ -1071,13 +1072,17 @@ function renderTagTableRow($index, array $tag, array $options = []) {
 		? new CVar($options['field_name'].'['.$index.'][automatic]', $tag['automatic'])
 		: null;
 
-	$value_field = (new CTextAreaFlexible($options['field_name'].'['.$index.'][value]', $tag['value'],
-			$textarea_options
-		))
+	$value_field = (new CTextAreaFlexible($options['field_name'].'['.$index.'][value]', $tag['value']))
 		->setErrorContainer($options['has_inline_validation'] ? 'tag_'.$index.'_error_container' : null)
 		->setErrorLabel($options['has_inline_validation'] ? _('Value') : null)
 		->setAdaptiveWidth(ZBX_TEXTAREA_TAG_VALUE_WIDTH)
-		->setAttribute('placeholder', _('value'));
+		->setAttribute('placeholder', _('value'))
+		->setReadonly($textarea_options['readonly']);
+
+	if (array_key_exists('maxlength', $textarea_options)) {
+		$tag_field->setMaxlength($textarea_options['maxlength']);
+		$value_field->setMaxlength($textarea_options['maxlength']);
+	}
 
 	if ($options['with_automatic'] && $tag['automatic'] == ZBX_TAG_AUTOMATIC) {
 		switch ($options['source']) {

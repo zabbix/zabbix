@@ -29,13 +29,10 @@ class CTextAreaFlexible extends CTag {
 	 * CTextAreaFlexible constructor.
 	 *
 	 * @param string $name
-	 * @param string $value                   (optional)
-	 * @param array  $options                 (optional)
-	 * @param int    $options['maxlength']    (optional)
-	 * @param bool   $options['readonly']     (optional)
+	 * @param string $value		(optional)
 	 */
 
-	public function __construct(string $name, $value = '', array $options = []) {
+	public function __construct(string $name, $value = '') {
 		parent::__construct('z-textarea-flexible', true);
 
 		$this
@@ -44,14 +41,6 @@ class CTextAreaFlexible extends CTag {
 			->setAttribute('value', $value)
 			->setAttribute('data-field-type', 'z-textarea-flexible')
 			->setAttribute('singleline', 'true');
-
-		if (array_key_exists('readonly', $options)) {
-			$this->setReadonly($options['readonly']);
-		}
-
-		if (array_key_exists('maxlength', $options)) {
-			$this->setMaxlength($options['maxlength']);
-		}
 	}
 
 	public function setSingleline(bool $is_singleline = true): self {
