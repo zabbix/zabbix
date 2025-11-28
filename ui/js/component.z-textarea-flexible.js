@@ -144,6 +144,12 @@ class ZTextareaFlexible extends HTMLElement {
 	}
 
 	#inputHandler = () => {
+		let value = this.#textarea.value;
+
+		if ((value.includes('\n') || value.includes('\r')) && this.#textarea.singleline) {
+			this.#textarea.value = value.replace(/[\r\n]+/g, ' ');
+		}
+
 		this.#updateHeight();
 		this.dispatchEvent(new Event('input', { bubbles: true }));
 	}
