@@ -32,10 +32,10 @@ zabbix_export:
         
         Set the following fields: `Kubelet URL`, `API Authorization Token`.
         
-        *NOTE.* Some metrics may not be collected depending on your Kubernetes instance version and configuration.
+        **Note:** Some metrics may not be collected depending on your Kubernetes instance version and configuration.
       vendor:
         name: Zabbix
-        version: 8.0-0
+        version: 8.0-1
       groups:
         - name: Templates/Applications
       items:

@@ -12,28 +12,11 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-package zabbixasync
+#ifndef LLD_COMMON
+#define LLD_COMMON
 
-import (
-	"golang.zabbix.com/agent2/pkg/zbxlib"
-	"golang.zabbix.com/sdk/errs"
-	"golang.zabbix.com/sdk/plugin"
-)
+#include "../../../src/zabbix_server/lld/lld.h"
 
-var impl Plugin
+void	get_macros(const char *path, zbx_vector_lld_macro_path_ptr_t *macros);
 
-// Plugin -
-type Plugin struct {
-	plugin.Base
-}
-
-func init() {
-	err := plugin.RegisterMetrics(&impl, "ZabbixAsync", getMetrics()...)
-	if err != nil {
-		panic(errs.Wrap(err, "failed to register metrics"))
-	}
-}
-
-func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
-	return zbxlib.ExecuteCheck(key, params)
-}
+#endif

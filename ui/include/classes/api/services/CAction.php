@@ -97,8 +97,9 @@ class CAction extends CApiService {
 
 		$sqlParts = [
 			'select'	=> ['actions' => 'a.actionid'],
-			'from'		=> ['actions' => 'actions a'],
+			'from'		=> 'actions a',
 			'where'		=> [],
+			'group'		=> [],
 			'order'		=> [],
 			'limit'		=> null
 		];
@@ -283,41 +284,36 @@ class CAction extends CApiService {
 		if (!is_null($options['groupids'])) {
 			zbx_value2array($options['groupids']);
 
-			$sqlParts['from']['conditions_groups'] = 'conditions cg';
+			$sqlParts['join']['cg'] = ['table' => 'conditions', 'using' => 'actionid'];
 			$sqlParts['where'][] = dbConditionString('cg.value', $options['groupids']);
 			$sqlParts['where']['ctg'] = 'cg.conditiontype='.ZBX_CONDITION_TYPE_HOST_GROUP;
-			$sqlParts['where']['acg'] = 'a.actionid=cg.actionid';
 		}
 
 		// hostids
 		if (!is_null($options['hostids'])) {
 			zbx_value2array($options['hostids']);
 
-			$sqlParts['from']['conditions_hosts'] = 'conditions ch';
+			$sqlParts['join']['ch'] = ['table' => 'conditions', 'using' => 'actionid'];
 			$sqlParts['where'][] = dbConditionString('ch.value', $options['hostids']);
 			$sqlParts['where']['cth'] = 'ch.conditiontype='.ZBX_CONDITION_TYPE_HOST;
-			$sqlParts['where']['ach'] = 'a.actionid=ch.actionid';
 		}
 
 		// triggerids
 		if (!is_null($options['triggerids'])) {
 			zbx_value2array($options['triggerids']);
 
-			$sqlParts['from']['conditions_triggers'] = 'conditions ct';
+			$sqlParts['join']['ct'] = ['table' => 'conditions', 'using' => 'actionid'];
 			$sqlParts['where'][] = dbConditionString('ct.value', $options['triggerids']);
 			$sqlParts['where']['ctt'] = 'ct.conditiontype='.ZBX_CONDITION_TYPE_TRIGGER;
-			$sqlParts['where']['act'] = 'a.actionid=ct.actionid';
 		}
 
 		// mediatypeids
 		if (!is_null($options['mediatypeids'])) {
 			zbx_value2array($options['mediatypeids']);
 
-			$sqlParts['from']['opmessage'] = 'opmessage om';
-			$sqlParts['from']['operations_media'] = 'operations omed';
+			$sqlParts['join']['omed'] = ['table' => 'operations', 'using' => 'actionid'];
+			$sqlParts['join']['om'] = ['left_table' => 'omed', 'table' => 'opmessage', 'using' => 'operationid'];
 			$sqlParts['where'][] = dbConditionId('om.mediatypeid', $options['mediatypeids']);
-			$sqlParts['where']['aomed'] = 'a.actionid=omed.actionid';
-			$sqlParts['where']['oom'] = 'omed.operationid=om.operationid';
 		}
 
 		// operation messages
@@ -325,22 +321,18 @@ class CAction extends CApiService {
 		if (!is_null($options['usrgrpids'])) {
 			zbx_value2array($options['usrgrpids']);
 
-			$sqlParts['from']['opmessage_grp'] = 'opmessage_grp omg';
-			$sqlParts['from']['operations_usergroups'] = 'operations oug';
+			$sqlParts['join']['oug'] = ['table' => 'operations', 'using' => 'actionid'];
+			$sqlParts['join']['omg'] = ['left_table' => 'oug', 'table' => 'opmessage_grp', 'using' => 'operationid'];
 			$sqlParts['where'][] = dbConditionInt('omg.usrgrpid', $options['usrgrpids']);
-			$sqlParts['where']['aoug'] = 'a.actionid=oug.actionid';
-			$sqlParts['where']['oomg'] = 'oug.operationid=omg.operationid';
 		}
 
 		// userids
 		if (!is_null($options['userids'])) {
 			zbx_value2array($options['userids']);
 
-			$sqlParts['from']['opmessage_usr'] = 'opmessage_usr omu';
-			$sqlParts['from']['operations_users'] = 'operations ou';
+			$sqlParts['join']['ou'] = ['table' => 'operations', 'using' => 'actionid'];
+			$sqlParts['join']['omu'] = ['left_table' => 'ou', 'table' => 'opmessage_usr', 'using' => 'operationid'];
 			$sqlParts['where'][] = dbConditionInt('omu.userid', $options['userids']);
-			$sqlParts['where']['aou'] = 'a.actionid=ou.actionid';
-			$sqlParts['where']['oomu'] = 'ou.operationid=omu.operationid';
 		}
 
 		// operation commands
@@ -348,11 +340,9 @@ class CAction extends CApiService {
 		if (!is_null($options['scriptids'])) {
 			zbx_value2array($options['scriptids']);
 
-			$sqlParts['from']['opcommand'] = 'opcommand oc';
-			$sqlParts['from']['operations_scripts'] = 'operations os';
+			$sqlParts['join']['os'] = ['table' => 'operations', 'using' => 'actionid'];
+			$sqlParts['join']['oc'] = ['left_table' => 'os', 'table' => 'opcommand', 'using' => 'operationid'];
 			$sqlParts['where'][] = dbConditionInt('oc.scriptid', $options['scriptids']);
-			$sqlParts['where']['aos'] = 'a.actionid=os.actionid';
-			$sqlParts['where']['ooc'] = 'os.operationid=oc.operationid';
 		}
 
 		// filter

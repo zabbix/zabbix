@@ -112,6 +112,12 @@ class testPageMonitoringLatestData extends CWebTest {
 						'key_' => 'trap',
 						'type' => ITEM_TYPE_TRAPPER,
 						'value_type' => ITEM_VALUE_TYPE_UINT64
+					],
+					[
+						'name' => 'Multiple   spaces   in item name',
+						'key_' => 'msiin',
+						'type' => ITEM_TYPE_TRAPPER,
+						'value_type' => ITEM_VALUE_TYPE_UINT64
 					]
 				]
 			],
@@ -278,6 +284,27 @@ class testPageMonitoringLatestData extends CWebTest {
 						['Name' => '2_item'],
 						['Name' => '3_item'],
 						['Name' => '4_item']
+					]
+				]
+			],
+			// Multiple spaces in field name.
+			[
+				[
+					'filter' => [
+						'Name' => '   spaces   '
+					],
+					'result' => [
+						['Name' => 'Multiple spaces in item name']
+					]
+				]
+			],
+			[
+				[
+					'filter' => [
+						'Name' => '   '
+					],
+					'result' => [
+						['Name' => 'Multiple spaces in item name']
 					]
 				]
 			],
@@ -472,8 +499,7 @@ class testPageMonitoringLatestData extends CWebTest {
 				]
 			],
 			// Tag priority: opposite alphabetic.
-			// TODO: uncomment after fix ZBX-27171
-/*			[
+			[
 				[
 					'filter' => [
 						'Name' => 'tag_item_1',
@@ -483,7 +509,7 @@ class testPageMonitoringLatestData extends CWebTest {
 						['Name' => 'tag_item_1', 'Tags' => "tag_number: 0\ntag: filtering_value\ncomponent: name:tag_item_1"]
 					]
 				]
-			],*/
+			],
 			// Tag priority: one first.
 			[
 				[
