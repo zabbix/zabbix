@@ -546,7 +546,7 @@ function dbConditionId($fieldName, array $values, $notIn = false) {
  * Takes an initial part of SQL query and appends a generated WHERE condition.
  *
  * @param string $field_name  Field name to be used in SQL WHERE condition.
- * @param array  $values      Array of string values sorted in ascending order to be included in WHERE.
+ * @param array  $values      Array of string values to be included in WHERE.
  * @param bool   $not_in      Builds inverted condition.
  *
  * @return string
