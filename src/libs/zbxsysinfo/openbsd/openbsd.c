@@ -35,6 +35,7 @@ static zbx_metric_t	parameters_specific[] =
 	{"net.if.total",	CF_HAVEPARAMS,	net_if_total,		"lo0,bytes"},
 	{"net.if.collisions",	CF_HAVEPARAMS,	net_if_collisions,	"lo0"},
 	{"net.if.discovery",	0,		net_if_discovery,	"lo0"},
+	{"net.if.get",		CF_HAVEPARAMS,	net_if_get,		NULL},
 
 	{"vm.memory.size",	CF_HAVEPARAMS,	vm_memory_size,		"free"},
 
@@ -48,7 +49,6 @@ static zbx_metric_t	parameters_specific[] =
 	{"system.cpu.load",	CF_HAVEPARAMS,	system_cpu_load,	"all,avg1"},
 	{"system.cpu.num",	CF_HAVEPARAMS,	system_cpu_num,		"online"},
 	{"system.cpu.discovery",0,		system_cpu_discovery,	NULL},
-	{"net.if.get",		CF_HAVEPARAMS,	net_if_get,		NULL},
 
 	{"system.uname",	0,		system_uname,		NULL},
 
