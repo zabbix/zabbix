@@ -42,7 +42,7 @@ class CHttpTest extends CApiService {
 
 		$sqlParts = [
 			'select'	=> ['httptests' => 'ht.httptestid'],
-			'from'		=> ['httptest' => 'httptest ht'],
+			'from'		=> 'httptest ht',
 			'where'		=> [],
 			'group'		=> [],
 			'order'		=> [],
@@ -88,10 +88,8 @@ class CHttpTest extends CApiService {
 				return $options['countOutput'] ? '0' : [];
 			}
 
-			$sqlParts['from'][] = 'host_hgset hh';
-			$sqlParts['from'][] = 'permission p';
-			$sqlParts['where'][] = 'ht.hostid=hh.hostid';
-			$sqlParts['where'][] = 'hh.hgsetid=p.hgsetid';
+			$sqlParts['join']['hh'] = ['table' => 'host_hgset', 'using' => 'hostid'];
+			$sqlParts['join']['p'] = ['left_table' => 'hh', 'table' => 'permission', 'using' => 'hgsetid'];
 			$sqlParts['where'][] = 'p.ugsetid='.self::$userData['ugsetid'];
 
 			if ($options['editable']) {
@@ -135,9 +133,7 @@ class CHttpTest extends CApiService {
 				$positive_tag_operators = [TAG_OPERATOR_LIKE, TAG_OPERATOR_EQUAL, TAG_OPERATOR_EXISTS];
 
 				if (array_intersect(array_column($options['tags'], 'operator'), $positive_tag_operators)) {
-					$sqlParts['from']['httptestitem'] = 'httptestitem hti';
-					$sqlParts['where']['ht-hti'] = 'ht.httptestid=hti.httptestid';
-
+					$sqlParts['join']['hti'] = ['table' => 'httptestitem', 'using' => 'httptestid'];
 					$sqlParts['where'][] = CApiTagHelper::getTagCondition($options['tags'], $options['evaltype'],
 						['ht', 'hti'], 'httptest_tag', 'httptestid', true
 					);
@@ -159,9 +155,8 @@ class CHttpTest extends CApiService {
 		if (!is_null($options['groupids'])) {
 			zbx_value2array($options['groupids']);
 
-			$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
+			$sqlParts['join']['hg'] = ['table' => 'hosts_groups', 'using' => 'hostid'];
 			$sqlParts['where'][] = dbConditionInt('hg.groupid', $options['groupids']);
-			$sqlParts['where'][] = 'hg.hostid=ht.hostid';
 
 			if ($options['groupCount']) {
 				$sqlParts['group']['hg'] = 'hg.groupid';
@@ -175,8 +170,7 @@ class CHttpTest extends CApiService {
 
 		// templated
 		if (isset($options['templated'])) {
-			$sqlParts['from']['hosts'] = 'hosts h';
-			$sqlParts['where']['ha'] = 'h.hostid=ht.hostid';
+			$sqlParts['join']['h'] = ['table' => 'hosts', 'using' => 'hostid'];
 			if ($options['templated']) {
 				$sqlParts['where'][] = 'h.status='.HOST_STATUS_TEMPLATE;
 			}
@@ -187,8 +181,7 @@ class CHttpTest extends CApiService {
 
 		// monitored
 		if (!is_null($options['monitored'])) {
-			$sqlParts['from']['hosts'] = 'hosts h';
-			$sqlParts['where']['hht'] = 'h.hostid=ht.hostid';
+			$sqlParts['join']['h'] = ['table' => 'hosts', 'using' => 'hostid'];
 
 			if ($options['monitored']) {
 				$sqlParts['where'][] = 'h.status='.HOST_STATUS_MONITORED;
