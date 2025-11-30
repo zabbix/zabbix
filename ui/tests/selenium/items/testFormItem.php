@@ -1111,7 +1111,7 @@ class testFormItem extends CLegacyWebTest {
 					'key' => 'item-delay-test',
 					'delay' => 86401,
 					'inline_errors' => [
-						'Update interval' => 'Value must be one of 0-86400.'
+						'Update interval' => 'Value must be between 0 and 1d (86400s).'
 					]
 				]
 			],
@@ -1499,7 +1499,7 @@ class testFormItem extends CLegacyWebTest {
 					'key' => 'item-history-test',
 					'history' => 3599,
 					'inline_errors' => [
-						'id:history' => 'Value must be one of 3600-788400000.'
+						'id:history' => 'Value must be between 1h (3600s) and 25y (788400000s).'
 					]
 				]
 			],
@@ -1511,7 +1511,7 @@ class testFormItem extends CLegacyWebTest {
 					'key' => 'item-history-test',
 					'history' => 788400001,
 					'inline_errors' => [
-						'id:history' => 'Value must be one of 3600-788400000.'
+						'id:history' => 'Value must be between 1h (3600s) and 25y (788400000s).'
 					]
 				]
 			],
@@ -1559,7 +1559,7 @@ class testFormItem extends CLegacyWebTest {
 					'key' => 'item-trends-test',
 					'trends' => 788400001,
 					'inline_errors' => [
-						'id:trends' => 'Value must be one of 86400-788400000.'
+						'id:trends' => 'Value must be between 1d (86400s) and 25y (788400000s).'
 					]
 				]
 			],
@@ -1571,7 +1571,7 @@ class testFormItem extends CLegacyWebTest {
 					'key' => 'item-trends-test',
 					'trends' => 86399,
 					'inline_errors' => [
-						'id:trends' => 'Value must be one of 86400-788400000.'
+						'id:trends' => 'Value must be between 1d (86400s) and 25y (788400000s).'
 					]
 				]
 			],
