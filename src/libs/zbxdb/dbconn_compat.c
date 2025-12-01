@@ -75,6 +75,14 @@ void	zbx_db_close(void)
 	dbconn = NULL;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: start a transaction if there are queries later on                 *
+ *                                                                            *
+ * Comments: for performance reasons it is better not to start empty          *
+ *           transactions                                                     *
+*                                                                             *
+ ******************************************************************************/
 void	zbx_db_begin_deferred(void)
 {
 	if (NULL == dbconn)
@@ -87,6 +95,7 @@ void	zbx_db_begin_deferred(void)
 
 	return;
 }
+
 /******************************************************************************
  *                                                                            *
  * Purpose: start a transaction                                               *
