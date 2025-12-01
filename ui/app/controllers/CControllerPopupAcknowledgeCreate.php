@@ -100,7 +100,7 @@ class CControllerPopupAcknowledgeCreate extends CController {
 				'in' => [ZBX_PROBLEM_SUPPRESS_TIME_INDEFINITE, ZBX_PROBLEM_SUPPRESS_TIME_DEFINITE],
 				'when' => ['suppress_problem', 'in' => [ZBX_PROBLEM_UPDATE_SUPPRESS]]
 			],
-			'suppress_until_problem' => ['string',
+			'suppress_until_problem' => ['string', 'required', 'not_empty',
 				'use' => [CRangeTimeValidator::class, ['min_now' => true]],
 				'when' => [
 					['suppress_problem', 'in' => [ZBX_PROBLEM_UPDATE_SUPPRESS]],
