@@ -8,7 +8,9 @@ SERVER_tests = \
 	substitute_lld_macros \
 	macro_fmttime \
 	macro_functions \
-	valuemaps
+	valuemaps \
+	zbx_format_value
+
 endif
 
 noinst_PROGRAMS = $(SERVER_tests)
@@ -219,7 +221,10 @@ evaluate_function_LDADD += $(EVALUATE_LIB_FILES) $(TLS_LIBS)
 
 evaluate_function_LDADD += @SERVER_LIBS@
 
-evaluate_function_LDFLAGS = @SERVER_LDFLAGS@ $(VALUECACHE_WRAP_FUNCS) $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS) $(TLS_LDFLAGS)
+evaluate_function_LDFLAGS = @SERVER_LDFLAGS@ \
+	-Wl,--wrap=zbx_baseline_get_data \
+	-Wl,--wrap=zbx_recalc_time_period \
+	$(VALUECACHE_WRAP_FUNCS) $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS) $(TLS_LDFLAGS)
 
 evaluate_stl_SOURCES = \
 	evaluate_stl.c \
@@ -305,5 +310,28 @@ valuemaps_CFLAGS = $(COMMON_COMPILER_FLAGS) $(TLS_CFLAGS) \
 	-I@top_srcdir@/src/libs/zbxcachevalue \
 	-I@top_srcdir@/src/libs/zbxhistory \
 	-I@top_srcdir@/src/libs/zbxexpression
+
+#zbx_format_value
+
+zbx_format_value_SOURCES = \
+	zbx_format_value.c \
+	$(COMMON_SRC_FILES)
+
+zbx_format_value_CFLAGS = $(COMMON_COMPILER_FLAGS) $(TLS_CFLAGS) \
+	-I@top_srcdir@/src/libs/zbxalgo \
+	-I@top_srcdir@/src/libs/zbxcacheconfig \
+	-I@top_srcdir@/src/libs/zbxcachehistory \
+	-I@top_srcdir@/src/libs/zbxcachevalue \
+	-I@top_srcdir@/src/libs/zbxhistory
+
+zbx_format_value_LDADD = \
+	$(top_srcdir)/tests/mocks/valuecache/libvaluecachemock.a
+
+zbx_format_value_LDADD += $(EVALUATE_LIB_FILES) $(TLS_LIBS)
+
+zbx_format_value_LDADD += @SERVER_LIBS@
+
+zbx_format_value_LDFLAGS = @SERVER_LDFLAGS@ $(YAML_LDFLAGS) $(CMOCKA_LDFLAGS)
+
 endif
 
