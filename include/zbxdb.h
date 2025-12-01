@@ -235,6 +235,15 @@ struct zbx_db_version_info_t
 	int			trends_compressed_chunks;
 };
 
+typedef enum
+{
+	ZBX_DB_MASK_QUERIES,
+	ZBX_DB_DONT_MASK_QUERIES
+}
+zbx_db_query_mask_t;
+
+void	zbx_dbms_version_info_extract(struct zbx_db_version_info_t *version_info);
+
 #ifdef HAVE_POSTGRESQL
 void	zbx_tsdb_info_extract(struct zbx_db_version_info_t *version_info);
 void	zbx_tsdb_set_compression_availability(int compression_availabile);
@@ -497,5 +506,8 @@ void	zbx_db_large_query_prepare_str(zbx_db_large_query_t *query, char **sql,
 void	zbx_db_large_query_prepare(zbx_db_large_query_t *query, char **sql, size_t *sql_alloc, size_t *sql_offset);
 void	zbx_db_large_query_append_sql(zbx_db_large_query_t *query, const char *sql);
 void	zbx_db_clear_idcache(void);
+
+zbx_db_query_mask_t	zbx_db_set_log_masked_values(zbx_db_query_mask_t flag);
+zbx_db_query_mask_t	zbx_db_get_log_masked_values(void);
 
 #endif
