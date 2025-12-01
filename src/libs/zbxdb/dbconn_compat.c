@@ -77,7 +77,7 @@ void	zbx_db_close(void)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: start a transaction if there are queries later on                 *
+ * Purpose: defer start of transaction till actual query is present           *
  *                                                                            *
  * Comments: for performance reasons it is better not to start empty          *
  *           transactions                                                     *
