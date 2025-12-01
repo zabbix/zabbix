@@ -373,7 +373,6 @@ class WidgetView extends CControllerDashboardWidgetView {
 				unset($db_column_items[$itemid], $db_values[$itemid]);
 			}
 
-			$values = array_filter($values);
 			$itemid = array_shift($itemids);
 
 			$item = $db_column_items[$itemid];
@@ -401,7 +400,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 				'units' => ''
 			];
 
-			if ($values) {
+			if ($values = array_filter($values)) {
 				$value = reset($values);
 				$units = $value['units'];
 				$values = array_column($values, 'value');
