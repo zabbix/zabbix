@@ -209,6 +209,7 @@ require_once __DIR__.'/networkDiscovery/testFormNetworkDiscovery.php';
 require_once __DIR__.'/networkDiscovery/testPageNetworkDiscovery.php';
 
 // Permissions.
+require_once __DIR__.'/permissions/testDashboardUserPermissions.php';
 require_once __DIR__.'/permissions/testPermissionsWithoutCSRF.php';
 require_once __DIR__.'/permissions/testTagBasedPermissions.php';
 require_once __DIR__.'/permissions/testUrlUserPermissions.php';
@@ -558,6 +559,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testPageNetworkDiscovery');
 
 		// Permissions.
+		$suite->addTestSuite('testDashboardUserPermissions');
 		$suite->addTestSuite('testPermissionsWithoutCSRF');
 		$suite->addTestSuite('testTagBasedPermissions');
 		$suite->addTestSuite('testUrlUserPermissions');
