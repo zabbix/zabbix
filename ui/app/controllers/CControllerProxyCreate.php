@@ -62,9 +62,8 @@ class CControllerProxyCreate extends CController {
 			'allowed_addresses' => ['db proxy.allowed_addresses',
 				'use' => [CIPRangeParser::class, [
 					'v6' => ZBX_HAVE_IPV6, 'dns' => true, 'usermacros' => false, 'macros' => false
-				],
-					'messages' => ['use' => _('Invalid address.')]
-				],
+				]],
+				'messages' => ['use' => _('Invalid address.')],
 				'when' => ['operating_mode', 'in' => [PROXY_OPERATING_MODE_ACTIVE]]
 			],
 			'description' => ['db proxy.description'],
