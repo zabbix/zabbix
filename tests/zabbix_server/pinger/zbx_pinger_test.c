@@ -42,9 +42,10 @@ void	zbx_mock_test_entry(void **state)
 	ret = zbx_parse_key_params(key, interface, &icmpping, &returned_addr, &count, &interval, &size, &timeout,
 			&type, &allow_redirect, &error);
 	if (SUCCEED != ret)
+	{
 		printf("zbx_pinger_test error: %s\n", error);
 		zbx_free(error);
-
+	}
 
 	if (NULL == returned_addr || '\0' == *returned_addr)
 	{
