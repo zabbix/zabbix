@@ -29,15 +29,15 @@ in:
 out:
   result: FAIL
 ---
-test case: Test parameter 'clickhouse,key='
+test case: Test parameter 'clickhouse;key='
 in:
-    conf: 'clickhouse,key='
+    conf: 'clickhouse;key='
 out:
   result: FAIL
 ---
-test case: Test parameter 'sql,value_types='
+test case: Test parameter 'sql;value_types='
 in:
-    conf: 'sql,value_types='
+    conf: 'sql;value_types='
 out:
   name: sql
   options:
@@ -45,27 +45,27 @@ out:
     value: ''
   result: SUCCEED
 ---
-test case: Test parameter 's l,value_types='
+test case: Test parameter 's l;value_types='
 in:
-    conf: 's l,value_types='
+    conf: 's l;value_types='
 out:
   result: FAIL
 ---
-test case: Test parameter 's*l,value_types='
+test case: Test parameter 's*l;value_types='
 in:
-    conf: 's*l,value_types='
+    conf: 's*l;value_types='
 out:
   result: FAIL
 ---
-test case: Test parameter 'sql,value_types=dbl,uint'
+test case: Test parameter 'sql;value_types=dbl,uint'
 in:
-    conf: 'sql,value_types=dbl,uint'
+    conf: 'sql;value_types=dbl,uint'
 out:
   result: FAIL
 ---
-test case: Test parameter 'sql,value_types="dbl,uint"'
+test case: Test parameter 'sql;value_types="dbl,uint" '
 in:
-    conf: 'sql,value_types="dbl,uint"'
+    conf: 'sql;value_types="dbl,uint" '
 out:
   name: sql
   options:
@@ -73,9 +73,9 @@ out:
     value: 'dbl,uint'
   result: SUCCEED
 ---
-test case: Test parameter 'sql , value_types = "dbl,uint" '
+test case: Test parameter 'sql ; value_types = "dbl,uint"'
 in:
-    conf: 'sql , value_types = "dbl,uint" '
+    conf: 'sql ; value_types = "dbl,uint"'
 out:
   name: sql
   options:
@@ -83,27 +83,27 @@ out:
     value: 'dbl,uint'
   result: SUCCEED
 ---
-test case: Test parameter 'sql,value_types=str,'
+test case: Test parameter 'sql;value_types=str,'
 in:
-    conf: 'sql,value_types=str,'
+    conf: 'sql;value_types=str,'
 out:
   result: FAIL
 ---
-test case: Test parameter 'sql,value_types="str,'
+test case: Test parameter 'sql;value_types="str,'
 in:
-    conf: 'sql,value_types="str,'
+    conf: 'sql;value_types="str,'
 out:
   result: FAIL
 ---
-test case: Test parameter 'sql,value_types="str\x"'
+test case: Test parameter 'sql;value_types="str\x"'
 in:
-    conf: 'sql,value_types="str\x"'
+    conf: 'sql;value_types="str\x"'
 out:
   result: FAIL
 ---
-test case: Test parameter 'sql,value_types=str,opt="\"\\/\""'
+test case: Test parameter 'sql;value_types=str,opt="\"\\/\""'
 in:
-    conf: 'sql,value_types=str,opt="\"\\/\""'
+    conf: 'sql;value_types=str,opt="\"\\/\""'
 out:
   name: sql
   options:
@@ -113,9 +113,9 @@ out:
     value: '"\/"'
   result: SUCCEED
 ---
-test case: Test parameter 'sql,value_types=str,opt=1'
+test case: Test parameter 'sql;value_types=str,opt=1'
 in:
-    conf: 'sql,value_types=str,opt=1'
+    conf: 'sql;value_types=str,opt=1'
 out:
   name: sql
   options:
