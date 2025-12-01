@@ -111,7 +111,6 @@ static void	history_clickhouse_data_free(zbx_clickhouse_data_t *data)
 	zbx_vector_clickhouse_conn_ptr_destroy(&data->conns);
 
 	curl_slist_free_all(data->curl_headers);
-
 	curl_multi_cleanup(data->mhandle);
 
 	zbx_free(data->db);
@@ -1440,7 +1439,10 @@ static int	history_clickhouse_fetch_batch(void *data, zbx_vector_item_history_t 
 
 	zbx_vector_uint64_create(&itemids);
 	for (int i = 0; i < results->values_num; i++)
+	{
 		zbx_vector_uint64_append(&itemids, results->values[i].itemid);
+		zbx_vector_history_record_reserve(&results->values[i].rows, MIN(limit, 32));
+	}
 
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "select itemid,timestamp,value");
 	if (ITEM_VALUE_TYPE_LOG == value_type)
