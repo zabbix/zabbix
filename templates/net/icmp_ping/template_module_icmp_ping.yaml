@@ -18,7 +18,7 @@ zabbix_export:
         Set `Threshold of ICMP packet loss` and `Threshold of the average ICMP response`.
       vendor:
         name: Zabbix
-        version: 7.4-2
+        version: 7.4-3
       groups:
         - name: 'Templates/Network devices'
       items:

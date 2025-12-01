@@ -63,7 +63,7 @@ zabbix_export:
         You can also try to use `snmpconf`: http://www.net-snmp.org/wiki/index.php/TUT:snmpd_configuration.
       vendor:
         name: Zabbix
-        version: 7.4-4
+        version: 7.4-5
       groups:
         - name: 'Templates/Operating systems'
       items:
