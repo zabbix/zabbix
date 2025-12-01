@@ -28,15 +28,21 @@ class CControllerOauthCheck extends CController {
 			'client_id' => ['db media_type_oauth.client_id', 'required', 'not_empty'],
 			'client_secret' => ['db media_type_oauth.client_secret', 'not_empty'],
 			'authorization_url' => ['string', 'not_empty'],
-			'authorization_url_parameters' => ['objects', 'uniq' => ['value', 'name'], 'fields' => [
-				'value' => ['string'],
-				'name' => ['string', 'required', 'not_empty', 'when' => ['value', 'not_empty']]
-			]],
+			'authorization_url_parameters' => ['objects', 'uniq' => ['value', 'name'],
+				'fields' => [
+					'value' => ['string'],
+					'name' => ['string', 'required', 'not_empty', 'when' => ['value', 'not_empty']]
+				],
+				'messages' => ['uniq' => _('Name and value combination is not unique.')]
+			],
 			'token_url' => ['string', 'not_empty'],
-			'token_url_parameters' => ['objects', 'uniq' => ['value', 'name'], 'fields' => [
-				'value' => ['string'],
-				'name' => ['string', 'required', 'not_empty', 'when' => ['value', 'not_empty']]
-			]],
+			'token_url_parameters' => ['objects', 'uniq' => ['value', 'name'],
+				'fields' => [
+					'value' => ['string'],
+					'name' => ['string', 'required', 'not_empty', 'when' => ['value', 'not_empty']]
+				],
+				'messages' => ['uniq' => _('Name and value combination is not unique.')]
+			],
 			'authorization_mode' => ['string', 'in' => ['auto', 'manual']],
 			'code' => ['string', 'required', 'not_empty', 'when' => ['authorization_mode', 'in' => ['manual']]]
 		]];

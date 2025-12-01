@@ -31,7 +31,7 @@ window.oauth_edit_popup = new class {
 		this.messages = {};
 	}
 
-	init({rules,is_advanced_form, messages}) {
+	init({rules, is_advanced_form, messages}) {
 		this.overlay = overlays_stack.end();
 		this.dialogue = this.overlay.$dialogue[0];
 		this.form_element = this.overlay.$dialogue.$body[0].querySelector('form');
@@ -107,6 +107,7 @@ window.oauth_edit_popup = new class {
 				sortable: true,
 				sortable_options: {
 					target: 'tbody',
+					selector_span: ':not(.error-container-row)',
 					selector_handle: 'div.<?= ZBX_STYLE_DRAG_ICON ?>',
 					freeze_end: 1
 				}

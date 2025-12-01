@@ -186,7 +186,8 @@ class CControllerMediatypeCreate extends CControllerMediatypeUpdateGeneral {
 					'value' => ['string', 'required'],
 					'name' => ['string', 'required', 'not_empty', 'when' => ['value', 'not_empty']]
 				],
-				'when' => ['type', 'in' => [MEDIA_TYPE_WEBHOOK]]
+				'when' => ['type', 'in' => [MEDIA_TYPE_WEBHOOK]],
+				'messages' => ['uniq' => _('Name is not unique.')]
 			],
 			'script' => ['db media_type.script', 'required', 'not_empty',
 				'when' => ['type', 'in' => [MEDIA_TYPE_WEBHOOK]]
@@ -217,7 +218,7 @@ class CControllerMediatypeCreate extends CControllerMediatypeUpdateGeneral {
 			],
 			'description' => ['db media_type.description'],
 			'status' =>	['db media_type.status', 'in' => [MEDIA_TYPE_STATUS_ACTIVE, MEDIA_TYPE_STATUS_DISABLED]],
-			'message_templates' => ['objects', 'fields' => [
+			'message_templates' => ['objects', 'uniq' => ['eventsource', 'recovery'], 'fields' => [
 				'eventsource' => ['db media_type_message.eventsource', 'required',
 					'in' => [EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_DISCOVERY, EVENT_SOURCE_AUTOREGISTRATION,
 						EVENT_SOURCE_INTERNAL, EVENT_SOURCE_SERVICE
@@ -271,8 +272,7 @@ class CControllerMediatypeCreate extends CControllerMediatypeUpdateGeneral {
 	}
 
 	protected function doAction(): void {
-		$mediatype = $this->getInputAll();
-		$this->processMediatypeData($mediatype);
+		$mediatype = self::processMediatypeData($this->getInputAll());
 
 		$result = API::Mediatype()->create($mediatype);
 		$output = [];

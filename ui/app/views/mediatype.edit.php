@@ -26,6 +26,7 @@ $form = (new CForm())
 	->addItem((new CVar(CSRF_TOKEN_NAME, CCsrfTokenHelper::get('mediatype')))->removeId())
 	->setId('media-type-form')
 	->addVar('mediatypeid', $data['mediatypeid'])
+	->disablePasswordAutofill()
 	->addItem((new CInput('submit', null))->addStyle('display: none;'))
 	->addStyle('display: none;');
 
@@ -150,7 +151,7 @@ $mediatype_form_grid = (new CFormGrid())
 
 $oauth_status = [
 	(new CVar('tokens_status', $data['tokens_status']))
-		->setAttribute('data-error-container', 'oauth_error_container')
+		->setAttribute('data-error-container', 'oauth-error-container')
 		->removeId()
 ];
 
@@ -171,16 +172,16 @@ if ($data['mediatypeid'] && $data['smtp_authentication'] == SMTP_AUTHENTICATION_
 	// Add input elements after icon to prevent left margin because icon will be not first child.
 	$oauth_status = array_merge($oauth_status, [
 		(new CVar('redirection_url', $data['redirection_url']))
-			->setAttribute('data-error-container', 'oauth_error_container')
+			->setAttribute('data-error-container', 'oauth-error-container')
 			->removeId(),
 		(new CVar('client_id', $data['client_id']))
-			->setAttribute('data-error-container', 'oauth_error_container')
+			->setAttribute('data-error-container', 'oauth-error-container')
 			->removeId(),
 		(new CVar('authorization_url', $data['authorization_url']))
-			->setAttribute('data-error-container', 'oauth_error_container')
+			->setAttribute('data-error-container', 'oauth-error-container')
 			->removeId(),
 		(new CVar('token_url', $data['token_url']))
-			->setAttribute('data-error-container', 'oauth_error_container')
+			->setAttribute('data-error-container', 'oauth-error-container')
 			->removeId()
 	]);
 }
@@ -197,7 +198,7 @@ $mediatype_form_grid->addItem([
 			->setId('js-oauth-configure')
 			->setEnabled(!array_key_exists('curl_error', $data)),
 		array_key_exists('curl_error', $data) ? makeErrorIcon($data['curl_error']) : null,
-		(new CDiv())->setId('oauth_error_container')
+		(new CDiv())->setId('oauth-error-container')
 	]))->setId('oauth-token-field')
 ]);
 
@@ -271,7 +272,7 @@ if (!$data['display_password_input']) {
 			->setAttribute('autocomplete', 'off')
 			->setAttribute('data-notrim', '')
 			->addStyle('display: none;')
-			->addClass('inactive')
+			->addClass('js-inactive')
 			->setEnabled(false)
 	];
 }
@@ -308,24 +309,26 @@ $webhook_params_template = (new CTemplateTag('webhook_params_template'))
 			(new CTextBox('parameters_webhook[#{row_num}][name]', '', false, DB::getFieldLength('media_type_param', 'name')))
 				->addStyle('width: 100%;')
 				->setAttribute('value', '#{name}')
-				->setAttribute('data-error-container', 'parameters_webhook_#{row_num}_error_container')
+				->setAttribute('data-error-container', 'parameters-webhook-#{row_num}-error-container')
 				->removeId(),
 			(new CTextBox('parameters_webhook[#{row_num}][value]', '', false, DB::getFieldLength('media_type_param', 'value')))
 				->addStyle('width: 100%;')
 				->setAttribute('value', '#{value}')
-				->setAttribute('data-error-container', 'parameters_webhook_#{row_num}_error_container')
+				->setAttribute('data-error-container', 'parameters-webhook-#{row_num}-error-container')
 				->removeId(),
 			(new CButtonLink(_('Remove')))
 				->removeId()
 				->addClass('js-remove')
 		]))->addClass('form_row')
 	)
-	->addItem(new CRow([
-		(new CCol((new CDiv())
-			->setId('parameters_webhook_#{row_num}_error_container')))
-			->setColSpan(3)
-			->addStyle('padding: 0;')
-	]));
+	->addItem(
+		(new CRow([
+			(new CCol((new CDiv())
+				->setId('parameters-webhook-#{row_num}-error-container')))
+				->addClass(ZBX_STYLE_ERROR_CONTAINER)
+				->setColSpan(3)
+		]))->addClass('error-container-row')
+	);
 
 $form->addItem($webhook_params_template);
 
@@ -404,7 +407,7 @@ $mediatype_form_grid
 			))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 				->setEnabled($data['show_event_menu'] == ZBX_EVENT_MENU_SHOW)
-				->addClass($data['show_event_menu'] == ZBX_EVENT_MENU_SHOW ? '' : 'inactive')
+				->addClass($data['show_event_menu'] == ZBX_EVENT_MENU_SHOW ? '' : 'js-inactive')
 				->setAriaRequired()
 		))->setId('webhook_url_name_field')
 	])
@@ -418,7 +421,7 @@ $mediatype_form_grid
 			))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 				->setEnabled($data['show_event_menu'] == ZBX_EVENT_MENU_SHOW)
-				->addClass($data['show_event_menu'] == ZBX_EVENT_MENU_SHOW ? '' : 'inactive')
+				->addClass($data['show_event_menu'] == ZBX_EVENT_MENU_SHOW ? '' : 'js-inactive')
 				->setAriaRequired()
 		))->setId('webhook_event_menu_url_field')
 	])

@@ -101,14 +101,14 @@ window.mediatype_edit_popup = new class {
 			const event_menu_url = this.form_element.querySelector('#event_menu_url');
 
 			if (event_menu.checked) {
-				event_menu_name.classList.remove('inactive');
-				event_menu_url.classList.remove('inactive');
+				event_menu_name.classList.remove('js-inactive');
+				event_menu_url.classList.remove('js-inactive');
 				event_menu_name.disabled = false;
 				event_menu_url.disabled = false;
 			}
 			else {
-				event_menu_name.classList.add('inactive');
-				event_menu_url.classList.add('inactive');
+				event_menu_name.classList.add('js-inactive');
+				event_menu_url.classList.add('js-inactive');
 				event_menu_name.disabled = true;
 				event_menu_url.disabled = true;
 			}
@@ -271,14 +271,14 @@ window.mediatype_edit_popup = new class {
 				input.type = 'hidden';
 				input.value = oauth[field];
 				input.setAttribute('data-field-type', 'hidden');
-				input.setAttribute('data-error-container', 'oauth_error_container');
+				input.setAttribute('data-error-container', 'oauth-error-container');
 
 				status_container.append(input);
 			}
 		});
 
 		this.form.discoverAllFields();
-		document.getElementById('oauth_error_container').innerHTML = '';
+		document.getElementById('oauth-error-container').innerHTML = '';
 	}
 
 	/**
@@ -491,7 +491,7 @@ window.mediatype_edit_popup = new class {
 		if (this.form_element.querySelector('#chPass_btn') !== null) {
 			this.form_element.querySelector('#chPass_btn').style.display = 'none';
 			this.form_element.querySelector('#passwd').style.display = 'block';
-			this.form_element.querySelector('#passwd').classList.remove('inactive');
+			this.form_element.querySelector('#passwd').classList.remove('js-inactive');
 			this.form_element.querySelector('#passwd').disabled = false;
 			this.form_element.querySelector('#passwd').focus();
 		}
@@ -710,7 +710,7 @@ window.mediatype_edit_popup = new class {
 				element.style.display = 'none';
 
 				if (element.classList.contains('form-field')) {
-					element.querySelectorAll('.multilineinput-control, input:not(.inactive), select, textarea')
+					element.querySelectorAll('.multilineinput-control, input:not(.js-inactive), select, textarea')
 						.forEach((input) => {
 							input.disabled = true;
 					});
@@ -727,7 +727,7 @@ window.mediatype_edit_popup = new class {
 				element.style.display = '';
 
 				if (element.classList.contains('form-field')) {
-					element.querySelectorAll('.multilineinput-control, input:not(.inactive), select, textarea')
+					element.querySelectorAll('.multilineinput-control, input:not(.js-inactive), select, textarea')
 						.forEach((input) => {
 							input.disabled = false;
 					});

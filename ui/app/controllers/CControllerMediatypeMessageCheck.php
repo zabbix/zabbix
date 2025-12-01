@@ -16,17 +16,10 @@
 
 class CControllerMediatypeMessageCheck extends CController {
 
-	/**
-	 * @var array  An array with all message template types.
-	 */
-	protected $message_types = [];
-
 	protected function init(): void {
 		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
 		$this->setInputValidationMethod(self::INPUT_VALIDATION_FORM);
 		$this->disableCsrfValidation();
-
-		$this->message_types = CMediatypeHelper::getAllMessageTypes();
 	}
 
 	public static function getValidationRules(): array {

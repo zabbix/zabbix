@@ -121,22 +121,21 @@ if ($data['advanced_form']) {
 				(new CCol((new CDiv())->addClass(ZBX_STYLE_DRAG_ICON)))->addClass(ZBX_STYLE_TD_DRAG_ICON),
 				(new CTextBox('#{input_name}_parameters[#{rowNum}][name]', '#{name}', false))
 					->setAttribute('style', 'width: 100%;')
-					->setAttribute('data-error-container', '#{input_name}_parameters_#{rowNum}_error_container')
+					->setAttribute('data-error-container', '#{input_name}-parameters-#{rowNum}-error-container')
 					->removeId(),
 				RARR(),
 				(new CTextBox('#{input_name}_parameters[#{rowNum}][value]', '#{value}', false))
 					->setAttribute('style', 'width: 100%;')
-					->setAttribute('data-error-container', '#{input_name}_parameters_#{rowNum}_error_container')
+					->setAttribute('data-error-container', '#{input_name}-parameters-#{rowNum}-error-container')
 					->removeId(),
 				(new CButtonLink(_('Remove')))
 					->addClass('element-table-remove')
 			]))->addClass('form_row')->addStyle(''),
-			new CRow([
+			(new CRow([
 				(new CCol((new CDiv())
-					->setId('#{input_name}_parameters_#{rowNum}_error_container')))
+					->setId('#{input_name}-parameters-#{rowNum}-error-container')))
 					->setColSpan(3)
-					->addStyle('padding: 0;')
-			])
+			]))->addClass('error-container-row')
 		])
 	);
 	$form_grid->addItem([
