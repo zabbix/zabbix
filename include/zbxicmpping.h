@@ -67,7 +67,6 @@ typedef struct
 	icmpping_t		icmpping;
 	icmppingsec_type_t	type;
 	unsigned char		allow_redirect;
-	int			item_delay;
 }
 icmpitem_t;
 
