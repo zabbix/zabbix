@@ -1072,7 +1072,7 @@ class testFormAdministrationProxies extends CWebTest {
 						'Zabbix agent' => '0'
 					],
 					'error' => [
-						'Zabbix agent' => 'Value must be one of 1-600.'
+						'Zabbix agent' => 'Value must be between 1s and 10m (600s).'
 					]
 				]
 			],
@@ -1087,7 +1087,7 @@ class testFormAdministrationProxies extends CWebTest {
 						'Zabbix agent' => '0'
 					],
 					'error' => [
-						'Zabbix agent' => 'Value must be one of 1-600.'
+						'Zabbix agent' => 'Value must be between 1s and 10m (600s).'
 					]
 				]
 			],
@@ -1102,7 +1102,7 @@ class testFormAdministrationProxies extends CWebTest {
 						'Zabbix agent' => '1234567890123456'
 					],
 					'error' => [
-						'Zabbix agent' => 'Value must be one of 1-600.'
+						'Zabbix agent' => 'Value must be between 1s and 10m (600s).'
 					]
 				]
 			],
@@ -1132,7 +1132,7 @@ class testFormAdministrationProxies extends CWebTest {
 						'Simple check' => '0'
 					],
 					'error' => [
-						'Simple check' => 'Value must be one of 1-600.'
+						'Simple check' => 'Value must be between 1s and 10m (600s).'
 					]
 				]
 			],
@@ -1147,7 +1147,7 @@ class testFormAdministrationProxies extends CWebTest {
 						'Simple check' => '601'
 					],
 					'error' => [
-						'Simple check' => 'Value must be one of 1-600.'
+						'Simple check' => 'Value must be between 1s and 10m (600s).'
 					]
 				]
 			],
@@ -1162,7 +1162,7 @@ class testFormAdministrationProxies extends CWebTest {
 						'Simple check' => '1234567890123456'
 					],
 					'error' => [
-						'Simple check' => 'Value must be one of 1-600.'
+						'Simple check' => 'Value must be between 1s and 10m (600s).'
 					]
 				]
 			],
@@ -1192,7 +1192,7 @@ class testFormAdministrationProxies extends CWebTest {
 						'SNMP agent' => '0'
 					],
 					'error' => [
-						'SNMP agent' => 'Value must be one of 1-600.'
+						'SNMP agent' => 'Value must be between 1s and 10m (600s).'
 					]
 				]
 			],
@@ -1207,7 +1207,7 @@ class testFormAdministrationProxies extends CWebTest {
 						'SNMP agent' => '601'
 					],
 					'error' => [
-						'SNMP agent' => 'Value must be one of 1-600.'
+						'SNMP agent' => 'Value must be between 1s and 10m (600s).'
 					]
 				]
 			],
@@ -1222,7 +1222,7 @@ class testFormAdministrationProxies extends CWebTest {
 						'SNMP agent' => '1234567890123456'
 					],
 					'error' => [
-						'SNMP agent' => 'Value must be one of 1-600.'
+						'SNMP agent' => 'Value must be between 1s and 10m (600s).'
 					]
 				]
 			],
@@ -1252,7 +1252,7 @@ class testFormAdministrationProxies extends CWebTest {
 						'External check' => '0'
 					],
 					'error' => [
-						'External check' => 'Value must be one of 1-600.'
+						'External check' => 'Value must be between 1s and 10m (600s).'
 					]
 				]
 			],
@@ -1267,7 +1267,7 @@ class testFormAdministrationProxies extends CWebTest {
 						'External check' => '601'
 					],
 					'error' => [
-						'External check' => 'Value must be one of 1-600.'
+						'External check' => 'Value must be between 1s and 10m (600s).'
 					]
 				]
 			],
@@ -1282,7 +1282,7 @@ class testFormAdministrationProxies extends CWebTest {
 						'External check' => '1234567890123456'
 					],
 					'error' => [
-						'External check' => 'Value must be one of 1-600.'
+						'External check' => 'Value must be between 1s and 10m (600s).'
 					]
 				]
 			],
@@ -1312,7 +1312,7 @@ class testFormAdministrationProxies extends CWebTest {
 						'Database monitor' => '0'
 					],
 					'error' => [
-						'Database monitor' => 'Value must be one of 1-600.'
+						'Database monitor' => 'Value must be between 1s and 10m (600s).'
 					]
 				]
 			],
@@ -1327,7 +1327,7 @@ class testFormAdministrationProxies extends CWebTest {
 						'Database monitor' => '601'
 					],
 					'error' => [
-						'Database monitor' => 'Value must be one of 1-600.'
+						'Database monitor' => 'Value must be between 1s and 10m (600s).'
 					]
 				]
 			],
@@ -1342,7 +1342,7 @@ class testFormAdministrationProxies extends CWebTest {
 						'Database monitor' => '1234567890123456'
 					],
 					'error' => [
-						'Database monitor' => 'Value must be one of 1-600.'
+						'Database monitor' => 'Value must be between 1s and 10m (600s).'
 					]
 				]
 			],
@@ -1372,7 +1372,7 @@ class testFormAdministrationProxies extends CWebTest {
 						'HTTP agent' => '0'
 					],
 					'error' => [
-						'HTTP agent' => 'Value must be one of 1-600.'
+						'HTTP agent' => 'Value must be between 1s and 10m (600s).'
 					]
 				]
 			],
@@ -1387,7 +1387,7 @@ class testFormAdministrationProxies extends CWebTest {
 						'HTTP agent' => '601'
 					],
 					'error' => [
-						'HTTP agent' => 'Value must be one of 1-600.'
+						'HTTP agent' => 'Value must be between 1s and 10m (600s).'
 					]
 				]
 			],
@@ -1402,7 +1402,7 @@ class testFormAdministrationProxies extends CWebTest {
 						'HTTP agent' => '1234567890123456'
 					],
 					'error' => [
-						'HTTP agent' => 'Value must be one of 1-600.'
+						'HTTP agent' => 'Value must be between 1s and 10m (600s).'
 					]
 				]
 			],
@@ -1432,7 +1432,7 @@ class testFormAdministrationProxies extends CWebTest {
 						'SSH agent' => '0'
 					],
 					'error' => [
-						'SSH agent' => 'Value must be one of 1-600.'
+						'SSH agent' => 'Value must be between 1s and 10m (600s).'
 					]
 				]
 			],
@@ -1447,7 +1447,7 @@ class testFormAdministrationProxies extends CWebTest {
 						'SSH agent' => '601'
 					],
 					'error' => [
-						'SSH agent' => 'Value must be one of 1-600.'
+						'SSH agent' => 'Value must be between 1s and 10m (600s).'
 					]
 				]
 			],
@@ -1462,7 +1462,7 @@ class testFormAdministrationProxies extends CWebTest {
 						'SSH agent' => '1234567890123456'
 					],
 					'error' => [
-						'SSH agent' => 'Value must be one of 1-600.'
+						'SSH agent' => 'Value must be between 1s and 10m (600s).'
 					]
 				]
 			],
@@ -1492,7 +1492,7 @@ class testFormAdministrationProxies extends CWebTest {
 						'TELNET agent' => '0'
 					],
 					'error' => [
-						'TELNET agent' => 'Value must be one of 1-600.'
+						'TELNET agent' => 'Value must be between 1s and 10m (600s).'
 					]
 				]
 			],
@@ -1507,7 +1507,7 @@ class testFormAdministrationProxies extends CWebTest {
 						'TELNET agent' => '601'
 					],
 					'error' => [
-						'TELNET agent' => 'Value must be one of 1-600.'
+						'TELNET agent' => 'Value must be between 1s and 10m (600s).'
 					]
 				]
 			],
@@ -1522,7 +1522,7 @@ class testFormAdministrationProxies extends CWebTest {
 						'TELNET agent' => '1234567890123456'
 					],
 					'error' => [
-						'TELNET agent' => 'Value must be one of 1-600.'
+						'TELNET agent' => 'Value must be between 1s and 10m (600s).'
 					]
 				]
 			],
@@ -1552,7 +1552,7 @@ class testFormAdministrationProxies extends CWebTest {
 						'Script' => '0'
 					],
 					'error' => [
-						'Script' => 'Value must be one of 1-600.'
+						'Script' => 'Value must be between 1s and 10m (600s).'
 					]
 				]
 			],
@@ -1567,7 +1567,7 @@ class testFormAdministrationProxies extends CWebTest {
 						'Script' => '601'
 					],
 					'error' => [
-						'Script' => 'Value must be one of 1-600.'
+						'Script' => 'Value must be between 1s and 10m (600s).'
 					]
 				]
 			],
@@ -1582,7 +1582,7 @@ class testFormAdministrationProxies extends CWebTest {
 						'Script' => '1234567890123456'
 					],
 					'error' => [
-						'Script' => 'Value must be one of 1-600.'
+						'Script' => 'Value must be between 1s and 10m (600s).'
 					]
 				]
 			],
@@ -1612,7 +1612,7 @@ class testFormAdministrationProxies extends CWebTest {
 						'Browser' => '0'
 					],
 					'error' => [
-						'Browser' => 'Value must be one of 1-600.'
+						'Browser' => 'Value must be between 1s and 10m (600s).'
 					]
 				]
 			],
@@ -1627,7 +1627,7 @@ class testFormAdministrationProxies extends CWebTest {
 						'Browser' => '601'
 					],
 					'error' => [
-						'Browser' => 'Value must be one of 1-600.'
+						'Browser' => 'Value must be between 1s and 10m (600s).'
 					]
 				]
 			],
@@ -1642,7 +1642,7 @@ class testFormAdministrationProxies extends CWebTest {
 						'Browser' => '1234567890123456'
 					],
 					'error' => [
-						'Browser' => 'Value must be one of 1-600.'
+						'Browser' => 'Value must be between 1s and 10m (600s).'
 					]
 				]
 			],
@@ -1734,7 +1734,7 @@ class testFormAdministrationProxies extends CWebTest {
 					],
 					'error' => [
 						'External check' => 'A time unit is expected.',
-						'TELNET agent' => 'Value must be one of 1-600.'
+						'TELNET agent' => 'Value must be between 1s and 10m (600s).'
 					]
 				]
 			],
