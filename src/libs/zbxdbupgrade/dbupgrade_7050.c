@@ -238,23 +238,51 @@ static int	DBpatch_7050018(void)
 
 static int	DBpatch_7050019(void)
 {
-	if (ZBX_DB_OK > zbx_db_execute(
-			"insert into role_rule (roleid, type, name, value_str)"
-			" select rr.roleid, 1, 'api.method.0', '*'"
-			" from role_rule rr"
-			" left join role r on r.roleid = rr.roleid"
-			" where rr.name = 'api.mode' and rr.value_int = 1"
+	int			ret = SUCCEED;
+	zbx_vector_uint64_t	ids;
+	zbx_db_insert_t		db_insert;
+
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	zbx_vector_uint64_create(&ids);
+
+	/* Select roles where rule is 'api.mode' and 1 - ("Allow list"). */
+	zbx_db_select_uint64("select rr.roleid from role_rule rr"
+			" left join role r on r.roleid=rr.roleid"
+			" where rr.name='api.mode' and rr.value_int=1"
 				" and not exists ("
 					"select null"
 					" from role_rule rr2"
-					" where rr2.roleid = rr.roleid and"
-						" rr2.name like 'api.method.%'"
-				")"))
+					" where rr2.roleid=rr.roleid"
+						" and rr2.name like 'api.method.%'"
+				")", &ids);
+
+	if (0 == ids.values_num)
+		goto out;
+
+	zbx_db_insert_prepare(&db_insert, "role_rule", "role_ruleid", "roleid", "type", "name", "value_str",
+			(char *)NULL);
+
+	for (int i = 0; i < ids.values_num; i++)
 	{
-		return FAIL;
+#		define ZBX_ROLE_RULE_TYPE_STR		1
+
+		zbx_uint64_t	roleid = ids.values[i];
+
+		zbx_db_insert_add_values(&db_insert, __UINT64_C(0), roleid, ZBX_ROLE_RULE_TYPE_STR, "api.method.0",
+				"*");
+
+#		undef ZBX_ROLE_RULE_TYPE_STR
 	}
 
-	return SUCCEED;
+	ret = zbx_db_insert_execute(&db_insert);
+
+	zbx_db_insert_clean(&db_insert);
+out:
+	zbx_vector_uint64_destroy(&ids);
+
+	return ret;
 }
 
 #endif
