@@ -37,7 +37,6 @@ typedef struct
 	icmpping_t		icmpping;
 	icmppingsec_type_t	type;
 	char			*addr;
-	int			item_delay;
 }
 zbx_pinger_item_t;
 
@@ -469,7 +468,6 @@ static void	add_icmpping_item(zbx_hashset_t *pinger_items, zbx_pinger_t *pinger_
 	item.addr = addr;
 	item.icmpping = icmpping;
 	item.type = type;
-	item.item_delay = delay_s;
 	zbx_vector_pinger_item_append_ptr(&pinger->items, &item);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
@@ -571,7 +569,7 @@ static void	add_pinger_host(zbx_vector_fping_host_t *hosts, char *addr)
 static int	process_pinger_hosts(zbx_hashset_t *pinger_items, int process_num, int process_type)
 {
 #define ZBX_ITEM_TIMEOUT_MAX	600
-	int				ping_result, max_execution_time, processed_num = 0;
+	int				ping_result, processed_num = 0;
 	char				error[ZBX_ITEM_ERROR_LEN_MAX];
 	zbx_vector_fping_host_t		hosts;
 	zbx_timespec_t			ts;
@@ -586,27 +584,17 @@ static int	process_pinger_hosts(zbx_hashset_t *pinger_items, int process_num, in
 	zbx_hashset_iter_reset(pinger_items, &iter);
 	while (NULL != (pinger = (zbx_pinger_t *)zbx_hashset_iter_next(&iter)) && ZBX_IS_RUNNING())
 	{
-		max_execution_time = 0;
-
 		for (int i = 0; i < pinger->items.values_num; i++)
-		{
 			add_pinger_host(&hosts, pinger->items.values[i].addr);
-
-			if (max_execution_time < pinger->items.values[i].item_delay)
-				max_execution_time = pinger->items.values[i].item_delay;
-		}
 
 		processed_num += pinger->items.values_num;
 
 		zbx_setproctitle("%s #%d [pinging hosts]", get_process_type_string(process_type), process_num);
 		zbx_timespec(&ts);
 
-		if (ZBX_ITEM_TIMEOUT_MAX < max_execution_time)
-			max_execution_time = ZBX_ITEM_TIMEOUT_MAX;
-
 		ping_result = zbx_ping(hosts.values, hosts.values_num, pinger->count, pinger->interval, pinger->size,
 				pinger->timeout, pinger->retries, pinger->backoff, pinger->allow_redirect, 0,
-				max_execution_time, error, sizeof(error));
+				ZBX_ITEM_TIMEOUT_MAX, error, sizeof(error));
 
 		if (FAIL != ping_result)
 			process_values(&pinger->items, hosts.values, hosts.values_num, &ts, ping_result, error);
