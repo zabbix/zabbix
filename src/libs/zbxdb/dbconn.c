@@ -399,7 +399,7 @@ static int	dbconn_open(zbx_dbconn_t *db)
 
 	db->txn_error = ZBX_DB_OK;
 	db->txn_level = 0;
-	db->mode = DBCONN_MODE_AUTOCOMMIT;
+	db->mode = DBCONN_MODE_DEFAULT;
 
 #if defined(HAVE_MYSQL)
 	if (NULL == (db->conn = mysql_init(NULL)))
@@ -847,7 +847,7 @@ static int	dbconn_vexecute(zbx_dbconn_t *db, const char *fmt, va_list args)
 	int		err;
 	char		*error = NULL;
 #endif
-	if (DBCONN_MODE_TRANSACTION == db->mode && 0 == db->txn_level)
+	if (DBCONN_MODE_DEFERRED_BEGIN == db->mode && 0 == db->txn_level)
 		zbx_dbconn_begin(db);
 
 	if (0 != db->config->log_slow_queries)
@@ -1084,9 +1084,9 @@ static int	dbconn_commit(zbx_dbconn_t *db)
 
 	if (0 == db->txn_level)
 	{
-		if (DBCONN_MODE_TRANSACTION == db->mode)
+		if (DBCONN_MODE_DEFERRED_BEGIN == db->mode)
 		{
-			db->mode = DBCONN_MODE_AUTOCOMMIT;
+			db->mode = DBCONN_MODE_DEFAULT;
 			return ZBX_DB_OK;
 		}
 
@@ -1096,7 +1096,7 @@ static int	dbconn_commit(zbx_dbconn_t *db)
 		assert(0);
 	}
 
-	db->mode = DBCONN_MODE_AUTOCOMMIT;
+	db->mode = DBCONN_MODE_DEFAULT;
 
 	if (ZBX_DB_OK != db->txn_error)
 		return ZBX_DB_FAIL; /* commit called on failed transaction */
@@ -1131,9 +1131,9 @@ static int	dbconn_rollback(zbx_dbconn_t *db)
 
 	if (0 == db->txn_level)
 	{
-		if (DBCONN_MODE_TRANSACTION == db->mode)
+		if (DBCONN_MODE_DEFERRED_BEGIN == db->mode)
 		{
-			db->mode = DBCONN_MODE_AUTOCOMMIT;
+			db->mode = DBCONN_MODE_DEFAULT;
 			return ZBX_DB_OK;
 		}
 
@@ -1147,7 +1147,7 @@ static int	dbconn_rollback(zbx_dbconn_t *db)
 
 	/* allow rollback of failed transaction */
 	db->txn_error = ZBX_DB_OK;
-	db->mode = DBCONN_MODE_AUTOCOMMIT;
+	db->mode = DBCONN_MODE_DEFAULT;
 
 	rc = dbconn_execute(db, "rollback;");
 
@@ -1186,7 +1186,7 @@ static zbx_db_result_t	dbconn_vselect(zbx_dbconn_t *db, const char *fmt, va_list
 	int		ret = FAIL;
 	char		*error = NULL;
 #endif
-	if (DBCONN_MODE_TRANSACTION == db->mode && 0 == db->txn_level)
+	if (DBCONN_MODE_DEFERRED_BEGIN == db->mode && 0 == db->txn_level)
 		zbx_dbconn_begin(db);
 
 	if (0 != db->config->log_slow_queries)
@@ -1589,7 +1589,7 @@ int	zbx_dbconn_begin(zbx_dbconn_t *db)
 
 void	zbx_dbconn_begin_deferred(zbx_dbconn_t *db)
 {
-	db->mode = DBCONN_MODE_TRANSACTION;
+	db->mode = DBCONN_MODE_DEFERRED_BEGIN;
 }
 
 /******************************************************************************

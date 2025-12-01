@@ -43,8 +43,8 @@ zbx_dbconn_type_t;
 
 typedef enum
 {
-	DBCONN_MODE_AUTOCOMMIT,
-	DBCONN_MODE_TRANSACTION
+	DBCONN_MODE_DEFAULT,
+	DBCONN_MODE_DEFERRED_BEGIN
 }
 zbx_dbconn_mode_t;
 
