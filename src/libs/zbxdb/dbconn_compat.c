@@ -75,6 +75,18 @@ void	zbx_db_close(void)
 	dbconn = NULL;
 }
 
+void	zbx_db_begin_deferred(void)
+{
+	if (NULL == dbconn)
+	{
+		THIS_SHOULD_NEVER_HAPPEN;
+		return;
+	}
+
+	zbx_dbconn_begin_deferred(dbconn);
+
+	return;
+}
 /******************************************************************************
  *                                                                            *
  * Purpose: start a transaction                                               *
