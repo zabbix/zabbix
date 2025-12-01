@@ -780,8 +780,8 @@ window.mediatype_edit_popup = new class {
 		passwd.setAttribute('aria-required', 'true');
 
 		if (this.type == <?= MEDIA_TYPE_EMAIL ?>) {
-			smtp_oauth.removeAttribute('disabled');
-			smtp_none.removeAttribute('disabled');
+			smtp_oauth.classList.remove('js-inactive');
+			smtp_none.classList.remove('js-inactive');
 
 			switch (parseInt(provider)) {
 				case <?= CMediatypeHelper::EMAIL_PROVIDER_SMTP ?>:
@@ -819,6 +819,7 @@ window.mediatype_edit_popup = new class {
 				case <?= CMediatypeHelper::EMAIL_PROVIDER_GMAIL ?>:
 				case <?= CMediatypeHelper::EMAIL_PROVIDER_OFFICE365 ?>:
 					smtp_none.setAttribute('disabled', 'disabled');
+					smtp_none.classList.add('js-inactive');
 
 					switch (parseInt(authentication)) {
 						case <?= SMTP_AUTHENTICATION_PASSWORD ?>:
@@ -833,6 +834,7 @@ window.mediatype_edit_popup = new class {
 							this.#showAndEnableFormElements(['#oauth-token-label', '#oauth-token-field']);
 							break;
 					}
+					break;
 
 				case <?= CMediatypeHelper::EMAIL_PROVIDER_GMAIL_RELAY ?>:
 				case <?= CMediatypeHelper::EMAIL_PROVIDER_OFFICE365_RELAY ?>:
@@ -840,6 +842,7 @@ window.mediatype_edit_popup = new class {
 
 					if (parseInt(provider) == <?= CMediatypeHelper::EMAIL_PROVIDER_OFFICE365_RELAY ?>) {
 						smtp_oauth.setAttribute('disabled', 'disabled');
+						smtp_oauth.classList.add('js-inactive');
 					}
 
 					this.#hideAndDisableFormElements(['#oauth-token-label', '#oauth-token-field']);
@@ -864,6 +867,7 @@ window.mediatype_edit_popup = new class {
 							this.#showAndEnableFormElements(['#oauth-token-label', '#oauth-token-field']);
 							break;
 					}
+					break;
 			}
 		}
 	}
