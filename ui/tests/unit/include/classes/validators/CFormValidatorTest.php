@@ -2529,7 +2529,7 @@ class CFormValidatorTest extends TestCase {
 			[
 				['object', 'fields' => [
 					'value' => ['string',
-						'use' => [CRangeTimeValidator::class, ['min_now' => true]],
+						'use' => [CRangeTimeValidator::class, ['min_in_future' => true]],
 						'messages' => ['use' => 'Must be in the future']
 					]
 				]],
@@ -2546,7 +2546,7 @@ class CFormValidatorTest extends TestCase {
 			[
 				['object', 'fields' => [
 					'value' => ['string',
-						'use' => [CRangeTimeValidator::class, ['min_now' => true]]
+						'use' => [CRangeTimeValidator::class, ['min_in_future' => true]]
 					]
 				]],
 				['value' => date('Y-m-d', time() + SEC_PER_DAY)],

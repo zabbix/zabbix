@@ -85,38 +85,58 @@ class CControllerPopupAcknowledgeCreate extends CController {
 		return ['object', 'fields' => [
 			'eventids' => ['array', 'required', 'not_empty', 'field' => ['db acknowledges.eventid']],
 			'scope' => ['integer', 'in' => [ZBX_ACKNOWLEDGE_SELECTED, ZBX_ACKNOWLEDGE_PROBLEM]],
-			'change_severity' => ['integer', 'in' => [ZBX_PROBLEM_UPDATE_SEVERITY]],
+			'operation_count' => ['integer', 'required', 'min' => 1,
+				'messages' => ['min' => _('A message or at least one operation is required.')]
+			],
+			'change_severity' => [
+				['integer', 'in' => [ZBX_PROBLEM_UPDATE_SEVERITY]],
+				['integer', 'required', 'when' => ['operation_count', 'in' => [0]]]
+			],
 			'severity' => ['integer', 'required',
 				'in' => range(TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_COUNT),
 				'when' => ['change_severity', 'in' => [ZBX_PROBLEM_UPDATE_SEVERITY]]
 			],
-			'acknowledge_problem' => ['integer', 'in' => [ZBX_PROBLEM_UPDATE_ACKNOWLEDGE]],
-			'unacknowledge_problem' => ['integer',
-				'in' => [ZBX_PROBLEM_UPDATE_UNACKNOWLEDGE]
+			'acknowledge_problem' => [
+				['integer', 'in' => [ZBX_PROBLEM_UPDATE_ACKNOWLEDGE]],
+				['integer', 'required', 'when' => ['operation_count', 'in' => [0]]]
 			],
-			'close_problem' => ['integer', 'in' => [ZBX_PROBLEM_UPDATE_CLOSE]],
-			'suppress_problem' => ['integer', 'in' => [ZBX_PROBLEM_UPDATE_SUPPRESS]],
+			'unacknowledge_problem' => [
+				['integer', 'in' => [ZBX_PROBLEM_UPDATE_UNACKNOWLEDGE]],
+				['integer', 'required', 'when' => ['operation_count', 'in' => [0]]]
+			],
+			'close_problem' => [
+				['integer', 'in' => [ZBX_PROBLEM_UPDATE_CLOSE]],
+				['integer', 'required', 'when' => ['operation_count', 'in' => [0]]]
+			],
+			'suppress_problem' => [
+				['integer', 'in' => [ZBX_PROBLEM_UPDATE_SUPPRESS]],
+				['integer', 'required', 'when' => ['operation_count', 'in' => [0]]]
+			],
 			'suppress_time_option' => ['integer',
 				'in' => [ZBX_PROBLEM_SUPPRESS_TIME_INDEFINITE, ZBX_PROBLEM_SUPPRESS_TIME_DEFINITE],
 				'when' => ['suppress_problem', 'in' => [ZBX_PROBLEM_UPDATE_SUPPRESS]]
 			],
 			'suppress_until_problem' => ['string', 'required', 'not_empty',
-				'use' => [CRangeTimeValidator::class, ['min_now' => true]],
+				'use' => [CRangeTimeValidator::class, ['min_in_future' => true]],
 				'when' => [
 					['suppress_problem', 'in' => [ZBX_PROBLEM_UPDATE_SUPPRESS]],
 					['suppress_time_option', 'in' => [ZBX_PROBLEM_SUPPRESS_TIME_DEFINITE]]
 				]
 			],
-			'unsuppress_problem' => ['integer', 'in' => [ZBX_PROBLEM_UPDATE_UNSUPPRESS]],
-			'change_rank' => ['integer',
-				'in' => [ZBX_PROBLEM_UPDATE_RANK_TO_CAUSE, ZBX_PROBLEM_UPDATE_RANK_TO_SYMPTOM]
+			'unsuppress_problem' => [
+				['integer', 'in' => [ZBX_PROBLEM_UPDATE_UNSUPPRESS]],
+				['integer', 'required', 'when' => ['operation_count', 'in' => [0]]]
+			],
+			'change_rank' => [
+				['integer', 'in' => [ZBX_PROBLEM_UPDATE_RANK_TO_CAUSE, ZBX_PROBLEM_UPDATE_RANK_TO_SYMPTOM]],
+				['integer', 'required', 'when' => ['operation_count', 'in' => [0]]]
 			],
 			'cause_eventid' => ['db acknowledges.eventid', 'required',
 				'when' => ['change_rank', 'in' => [ZBX_PROBLEM_UPDATE_RANK_TO_SYMPTOM]]
 			],
 			'message' => [
 				['db acknowledges.message'],
-				['db acknowledges.message', 'not_empty',
+				['db acknowledges.message', 'not_empty', 'required',
 					'when' => [
 						['change_severity', 'not_exist'],
 						['acknowledge_problem', 'not_exist'],
@@ -126,7 +146,10 @@ class CControllerPopupAcknowledgeCreate extends CController {
 						['unsuppress_problem', 'not_exist'],
 						['change_rank', 'not_exist']
 					],
-					'messages' => ['not_empty' => _('At least one update operation or message is mandatory')]
+					'messages' => [
+						'not_empty' => _('At least one update operation or message is mandatory'),
+						'required' => _('At least one update operation or message is mandatory')
+					]
 				]
 			]
 		]];

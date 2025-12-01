@@ -22,9 +22,9 @@ class CRangeTimeValidator extends CValidator {
 			$this->min = (int) $options['min'];
 		}
 
-		if (array_key_exists('min_now', $options)) {
+		if (array_key_exists('min_in_future', $options)) {
 			if ($this->min === null || $this->min < time()) {
-				$this->min = time();
+				$this->min = time()+1;
 			}
 		}
 	}

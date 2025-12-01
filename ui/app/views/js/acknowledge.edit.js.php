@@ -37,21 +37,29 @@ window.update_problem_popup = new class {
 	}
 
 	#initEvents () {
-		document.getElementById('change_severity').addEventListener('change', (e) => {
-			document.querySelectorAll('#severity input').forEach((el) => {
-				if (e.target.checked) {
-					el.removeAttribute('disabled');
+		this.form_element.querySelectorAll('.js-operation-checkbox').forEach((input) => {
+			input.addEventListener('change', (e) => {
+				if (e.target.getAttribute('id') === 'change_severity') {
+					document.querySelectorAll('#severity input').forEach((el) => {
+						if (e.target.checked) {
+							el.removeAttribute('disabled');
+						}
+						else {
+							el.setAttribute('disabled', 'disabled');
+						}
+					});
 				}
-				else {
-					el.setAttribute('disabled', 'disabled');
-				}
+
+				this.#update();
 			});
 		});
 
-		document.getElementById('suppress_problem').addEventListener('change', () => this.#update());
-		document.getElementById('suppress_time_option').addEventListener('change', () => this.#update());
-		document.getElementById('unsuppress_problem').addEventListener('change', () => this.#update());
-		document.getElementById('close_problem').addEventListener('change', () => this.#update());
+		document.getElementById('suppress_time_option').addEventListener('change', () =>
+			this.#update_suppress_time_options()
+		);
+
+		document.getElementById('message').addEventListener('input', () => this.#validateOperations());
+		document.getElementById('message').addEventListener('blur', () => this.#validateOperations());
 
 		this.overlay.$dialogue.$footer[0].querySelector('.js-submit')
 			.addEventListener('click', () => this.#submit());
@@ -65,6 +73,8 @@ window.update_problem_popup = new class {
 		this.#update_suppress_problem_state(close_problem_checked || unsuppress_checked);
 		this.#update_unsuppress_problem_state(close_problem_checked || suppress_checked);
 		this.#update_suppress_time_options();
+
+		this.#validateOperations();
 	}
 
 	#update_suppress_problem_state(state) {
@@ -100,6 +110,21 @@ window.update_problem_popup = new class {
 			document.getElementById('suppress_until_problem').disabled = true;
 			document.getElementById('suppress_until_problem_calendar').disabled = true;
 		}
+	}
+
+	#validateOperations() {
+		const checked_operations = this.form_element.querySelectorAll('.js-operation-checkbox:checked').length;
+
+		document.getElementById('operation_count').value = checked_operations +
+			this.form.findFieldByName('message').getValue()?.length ? 1 : 0
+
+		this.form.validateChanges(
+			[
+				'message', 'change_severity', 'unsuppress_problem', 'suppress_problem',
+				'unacknowledge_problem', 'change_rank', 'close_problem'
+			],
+			true
+		);
 	}
 
 	#submit() {
