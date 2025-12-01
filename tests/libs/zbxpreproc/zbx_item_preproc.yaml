@@ -1513,24 +1513,6 @@ out:
     time: 2017-10-29 03:15:00 +03:00
     data: "000000050000002900000019"
 ---
-test case: throttle of convertible string and float values should be compared as floats (I)
-in:
-  value:
-    value_type: ITEM_VALUE_TYPE_STR
-    time: 2017-10-29 03:15:00 +03:00
-    data: "000000050000002900000019"
-  history:
-    variant: ZBX_VARIANT_DBL
-    time: 2017-10-29 03:14:00 +03:00
-    data: "000000050000002900000012"
-  step:
-    type: ZBX_PREPROC_THROTTLE_VALUE
-out:
-  return: SUCCEED
-  history:
-    time: 2017-10-29 03:14:00 +03:00 # unchanged
-    data: 50000002900000016 # Both 50000002900000019 and 50000002900000012 result in 50000002900000016 after converting to double
----
 test case: throttle of unconvertible string and float should be compared as string (II)
 in:
   value:
