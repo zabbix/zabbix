@@ -45,11 +45,15 @@ abstract class CControllerMediatypeUpdateGeneral extends CController {
 					$mediatype['username'] = $clean_email;
 				}
 
-				if ($mediatype['provider'] == CMediatypeHelper::EMAIL_PROVIDER_OFFICE365_RELAY) {
-					$formatted_domain = str_replace('.', '-', $domain);
-					$static_part = CMediatypeHelper::getEmailProviders($mediatype['provider'])['smtp_server'];
+				$provider_data = CMediatypeHelper::getEmailProviders($mediatype['provider']);
+				$mediatype['smtp_port'] = $provider_data['smtp_port'];
+				$mediatype['smtp_security'] = $provider_data['smtp_security'];
 
-					$mediatype['smtp_server'] = $formatted_domain.$static_part;
+				if ($mediatype['provider'] == CMediatypeHelper::EMAIL_PROVIDER_OFFICE365_RELAY) {
+					$mediatype['smtp_server'] = str_replace('.', '-', $domain).$provider_data['smtp_server'];
+				}
+				else {
+					$mediatype['smtp_server'] = $provider_data['smtp_server'];
 				}
 			}
 		}
