@@ -2928,7 +2928,7 @@ int	zbx_vc_get_values(zbx_uint64_t itemid, unsigned char value_type, zbx_vector_
 		return FAIL;
 
 	if (0 != count)
-		zbx_vector_history_record_reserve(values, count + 1);
+		zbx_vector_history_record_reserve(values, MIN(count + 1, 32));
 	else
 		zbx_vector_history_record_reserve(values, 8);
 
