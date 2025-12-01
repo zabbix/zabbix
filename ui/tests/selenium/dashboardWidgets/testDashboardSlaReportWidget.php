@@ -171,6 +171,7 @@ class testDashboardSlaReportWidget extends testSlaReport {
 				'Name' => [
 					'Disabled SLA',
 					'Disabled SLA Annual',
+					'Multiple spaces in SLA name',
 					'SLA Annual',
 					'SLA Daily',
 					'SLA Monthly',
@@ -182,6 +183,7 @@ class testDashboardSlaReportWidget extends testSlaReport {
 				'Status' => [
 					'Disabled',
 					'Disabled',
+					'Enabled',
 					'Enabled',
 					'Enabled',
 					'Enabled',

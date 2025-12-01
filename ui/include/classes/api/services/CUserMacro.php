@@ -71,16 +71,18 @@ class CUserMacro extends CApiService {
 
 		$sqlParts = [
 			'select'	=> ['macros' => 'hm.hostmacroid'],
-			'from'		=> ['hostmacro hm'],
+			'from'		=> 'hostmacro hm',
 			'where'		=> [],
+			'group'		=> [],
 			'order'		=> [],
 			'limit'		=> null
 		];
 
 		$sqlPartsGlobal = [
 			'select'	=> ['macros' => 'gm.globalmacroid'],
-			'from'		=> ['globalmacro gm'],
+			'from'		=> 'globalmacro gm',
 			'where'		=> [],
+			'group'		=> [],
 			'order'		=> [],
 			'limit'		=> null
 		];
@@ -122,10 +124,8 @@ class CUserMacro extends CApiService {
 				return $options['countOutput'] ? '0' : [];
 			}
 			else {
-				$sqlParts['from'][] = 'host_hgset hh';
-				$sqlParts['from'][] = 'permission p';
-				$sqlParts['where'][] = 'hm.hostid=hh.hostid';
-				$sqlParts['where'][] = 'hh.hgsetid=p.hgsetid';
+				$sqlParts['join']['hh'] = ['table' => 'host_hgset', 'using' => 'hostid'];
+				$sqlParts['join']['p'] = ['left_table' => 'hh', 'table' => 'permission', 'using' => 'hgsetid'];
 
 				if ($options['editable']) {
 					$sqlParts['where'][] = 'p.permission='.PERM_READ_WRITE;
@@ -161,18 +161,16 @@ class CUserMacro extends CApiService {
 
 		// inherited
 		if (!is_null($options['inherited'])) {
-			$sqlParts['from']['hosts'] = 'hosts h';
+			$sqlParts['join']['h'] = ['table' => 'hosts', 'using' => 'hostid'];
 			$sqlParts['where'][] = $options['inherited'] ? 'h.templateid IS NOT NULL' : 'h.templateid IS NULL';
-			$sqlParts['where']['hmh'] = 'hm.hostid=h.hostid';
 		}
 
 		// groupids
 		if (!is_null($options['groupids'])) {
 			zbx_value2array($options['groupids']);
 
-			$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
+			$sqlParts['join']['hg'] = ['table' => 'hosts_groups', 'using' => 'hostid'];
 			$sqlParts['where'][] = dbConditionInt('hg.groupid', $options['groupids']);
-			$sqlParts['where']['hgh'] = 'hg.hostid=hm.hostid';
 		}
 
 		// hostids
@@ -186,9 +184,8 @@ class CUserMacro extends CApiService {
 		if (!is_null($options['templateids'])) {
 			zbx_value2array($options['templateids']);
 
-			$sqlParts['from']['macros_templates'] = 'hosts_templates ht';
+			$sqlParts['join']['ht'] = ['table' => 'hosts_templates', 'using' => 'hostid'];
 			$sqlParts['where'][] = dbConditionInt('ht.templateid', $options['templateids']);
-			$sqlParts['where']['hht'] = 'hm.hostid=ht.hostid';
 		}
 
 		// sorting
