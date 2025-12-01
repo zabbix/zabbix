@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2025-09-18 18:30+0000\n"
+"PO-Revision-Date: 2025-11-16 13:55+0000\n"
 "Last-Translator: ERIC <eric78.zabbix@orange.fr>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: fr\n"
@@ -3827,7 +3827,7 @@ msgstr "Impossible de définir l'« Agrégation d'ensembles de données » lor
 
 #: include/classes/db/MysqlDbBackend.php:197
 msgid "Cannot set charset."
-msgstr ""
+msgstr "Impossible de définir l'encodage des caractères."
 
 #: include/classes/api/services/CItemGeneral.php:2478
 #, c-format
@@ -4325,7 +4325,7 @@ msgstr "Certificat"
 #: include/items.inc.php:1581
 msgctxt "noun"
 msgid "Change"
-msgstr "Changer"
+msgstr "Changement"
 
 #: app/partials/hostmacros.inherited.list.html.php:124
 #: app/partials/hostmacros.inherited.list.html.php:141
@@ -11266,7 +11266,7 @@ msgstr "Tags hérités et d'élément"
 
 #: app/partials/configuration.tags.tab.php:160
 msgid "Inherited and scenario tags"
-msgstr "Tags héritées et de scénario"
+msgstr "Tags hérités et de scénario"
 
 #: app/views/template.edit.php:184
 msgid "Inherited and template macros"
@@ -20695,7 +20695,7 @@ msgstr "Seuils"
 
 #: include/items.inc.php:1629 include/items.inc.php:1633
 msgid "Throttling"
-msgstr "Étranglement"
+msgstr "Limitation"
 
 #: include/func.inc.php:216
 msgid "Thu"
