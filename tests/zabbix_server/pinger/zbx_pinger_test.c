@@ -43,6 +43,8 @@ void	zbx_mock_test_entry(void **state)
 			&type, &allow_redirect, &error);
 	if (SUCCEED != ret)
 		printf("zbx_pinger_test error: %s\n", error);
+		zbx_free(error);
+
 
 	if (NULL == returned_addr || '\0' == *returned_addr)
 	{
