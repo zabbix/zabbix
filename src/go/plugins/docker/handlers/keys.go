@@ -12,24 +12,19 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-package docker
+package handlers
 
-import (
-	"context"
-	"net"
-	"net/http"
-	"time"
+type DockerKey string
+
+// Metrics that are working with docker plugin.
+const (
+	KeyContainerInfo       DockerKey = "docker.container_info"
+	KeyContainerStats      DockerKey = "docker.container_stats"
+	KeyContainers          DockerKey = "docker.containers"
+	KeyContainersDiscovery DockerKey = "docker.containers.discovery"
+	KeyDataUsage           DockerKey = "docker.data_usage"
+	KeyImages              DockerKey = "docker.images"
+	KeyImagesDiscovery     DockerKey = "docker.images.discovery"
+	KeyInfo                DockerKey = "docker.info"
+	KeyPing                DockerKey = "docker.ping"
 )
-
-func newClient(socketPath string, timeout int) *http.Client {
-	transport := &http.Transport{
-		DialContext: func(_ context.Context, _, _ string) (net.Conn, error) {
-			return net.Dial("unix", socketPath)
-		},
-	}
-
-	return &http.Client{
-		Transport: transport,
-		Timeout:   time.Duration(timeout) * time.Second,
-	}
-}
