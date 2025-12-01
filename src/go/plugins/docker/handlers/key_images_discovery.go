@@ -12,43 +12,41 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-package docker
+package handlers
 
 import (
 	"encoding/json"
+	"net/http"
 
 	"golang.zabbix.com/sdk/zbxerr"
 )
-
-type containerDiscovery struct {
-	ID   string `json:"{#ID}"`
-	Name string `json:"{#NAME}"`
-}
 
 type imageDiscovery struct {
 	ID   string `json:"{#ID}"`
 	Name string `json:"{#NAME}"`
 }
 
-func (p *Plugin) getContainersDiscovery(data []Container) (result []byte, err error) {
-	containers := make([]containerDiscovery, 0)
+func keyImagesDiscoveryHandler(client *http.Client, query string, _ ...string) (string, error) {
+	var data []Image
 
-	for _, container := range data {
-		if len(container.Names) == 0 {
-			continue
-		}
-
-		containers = append(containers, containerDiscovery{ID: container.ID, Name: container.Names[0]})
+	body, err := queryDockerAPI(client, query)
+	if err != nil {
+		return "", err
 	}
 
-	if result, err = json.Marshal(&containers); err != nil {
-		return nil, zbxerr.ErrorCannotMarshalJSON.Wrap(err)
+	if err = json.Unmarshal(body, &data); err != nil {
+		return "", zbxerr.ErrorCannotUnmarshalJSON.Wrap(err)
 	}
 
-	return
+	result, err := getImagesDiscovery(data)
+	if err != nil {
+		return "", err
+	}
+
+	return string(result), nil
 }
 
-func (p *Plugin) getImagesDiscovery(data []Image) (result []byte, err error) {
+func getImagesDiscovery(data []Image) (result []byte, err error) {
 	images := make([]imageDiscovery, 0)
 
 	for _, image := range data {

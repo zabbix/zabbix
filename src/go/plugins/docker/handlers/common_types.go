@@ -12,24 +12,28 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-package docker
+package handlers
 
 import (
-	"context"
-	"net"
-	"net/http"
+	"strconv"
 	"time"
 )
 
-func newClient(socketPath string, timeout int) *http.Client {
-	transport := &http.Transport{
-		DialContext: func(_ context.Context, _, _ string) (net.Conn, error) {
-			return net.Dial("unix", socketPath)
-		},
+type unixTime int64
+
+// UnmarshalJSON is used to convert time to unixtime
+func (tm *unixTime) UnmarshalJSON(b []byte) error {
+	s, err := strconv.Unquote(string(b))
+	if err != nil {
+		return nil
 	}
 
-	return &http.Client{
-		Transport: transport,
-		Timeout:   time.Duration(timeout) * time.Second,
+	t, err := time.Parse(time.RFC3339, s)
+	if err != nil {
+		return nil
 	}
+
+	*tm = unixTime(t.Unix())
+
+	return err
 }

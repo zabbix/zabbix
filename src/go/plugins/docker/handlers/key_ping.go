@@ -12,24 +12,20 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-package docker
+package handlers
 
-import (
-	"context"
-	"net"
-	"net/http"
-	"time"
+import "net/http"
+
+const (
+	pingFailed = "0"
+	pingOk     = "1"
 )
 
-func newClient(socketPath string, timeout int) *http.Client {
-	transport := &http.Transport{
-		DialContext: func(_ context.Context, _, _ string) (net.Conn, error) {
-			return net.Dial("unix", socketPath)
-		},
+func keyPingHandler(client *http.Client, query string, args ...string) (string, error) {
+	body, err := queryDockerAPI(client, query)
+	if err != nil || string(body) != "OK" {
+		return pingFailed, nil
 	}
 
-	return &http.Client{
-		Transport: transport,
-		Timeout:   time.Duration(timeout) * time.Second,
-	}
+	return pingOk, nil
 }
