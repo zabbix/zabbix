@@ -1295,6 +1295,9 @@ footer {
   .form-grid .btn-icon.btn-small {
     top: 1px;
     vertical-align: text-bottom; }
+  .form-grid.form-subgrid {
+    grid-template-columns: subgrid;
+    grid-column: 1 / -1; }
 
 button, .btn, .btn-alt, .btn-grey, .btn-icon, .btn-grey-icon, .btn-link, .btn-overlay-close, .btn-debug {
   position: relative;

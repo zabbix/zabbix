@@ -27,6 +27,8 @@ class CFormGrid extends CTag {
 	// Adds a margin if contains form actions only.
 	public const ZBX_STYLE_FORM_GRID_ACTIONS  = 'form-grid-actions';
 
+	public const ZBX_STYLE_FORM_SUBGRID = 'form-subgrid';
+
 	public const ZBX_STYLE_FORM_GRID_1_1 = 'form-grid-1-1';
 	public const ZBX_STYLE_FORM_GRID_3_1 = 'form-grid-3-1';
 

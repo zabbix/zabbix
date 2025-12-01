@@ -35,8 +35,6 @@ $form = (new CForm())
 	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)
 	->addVar('roleid', $data['roleid']);
 
-$form_container = new CDiv();
-
 $form_grid = (new CFormGrid())
 	->addItem([
 		(new CLabel(_('Name'), 'name'))->setAsteriskMark(),
@@ -83,18 +81,16 @@ $form_grid->addItem(
 	)
 );
 
-$form_container->addItem($form_grid);
-
-$form_grid = (new CFormGrid())
+$form_fieldset = (new CFormGrid())
+	->addClass(CFormGrid::ZBX_STYLE_FORM_SUBGRID)
 	->setAttribute('data-field-type', 'array')
 	->setAttribute('data-field-name', 'ui')
-	->setAttribute('data-error-container', 'ui-error-container')
-	->addStyle('width:100%');
+	->setAttribute('data-error-container', 'ui-error-container');
 
 foreach ($data['labels']['sections'] as $section_key => $section_label) {
 	if (count($data['labels']['rules'][$section_key]) === 1) {
 		$first_rule_key = array_key_first($data['labels']['rules'][$section_key]);
-		$form_grid->addItem([
+		$form_fieldset->addItem([
 			new CLabel($section_label, $first_rule_key),
 			new CFormField(
 				(new CCheckBox('ui[]', $first_rule_key))
@@ -117,7 +113,7 @@ foreach ($data['labels']['sections'] as $section_key => $section_label) {
 				'checked' => array_key_exists($rule_key, $data['rules']['ui']) && $data['rules']['ui'][$rule_key]
 			];
 		}
-		$form_grid->addItem([
+		$form_fieldset->addItem([
 			new CLabel($section_label, $section_key),
 			new CFormField(
 				(new CCheckBoxList())
@@ -132,9 +128,8 @@ foreach ($data['labels']['sections'] as $section_key => $section_label) {
 	}
 }
 
-$form_container->addItem($form_grid);
-$form_grid = (new CFormGrid());
-$form_grid->addItem([new CDiv(),(new CDiv())->setId('ui-error-container')]);
+$form_fieldset->addItem([new CDiv(),(new CDiv())->setId('ui-error-container')]);
+$form_grid->addItem($form_fieldset);
 
 $form_grid->addItem([
 	new CLabel(_('Default access to new UI elements'), $data['readonly'] ? '' : 'ui.default_access'),
@@ -373,11 +368,8 @@ $form_grid->addItem(
 	[(new CFormField($actions))
 		->setAttribute('data-field-type', 'array')
 		->setAttribute('data-field-name', 'actions')
-		->setAttribute('data-error-container', 'actions-error-container')
 	]
 );
-
-$form_grid->addItem([new CDiv(),(new CDiv())->setId('actions-error-container')]);
 
 $form_grid->addItem([
 	new CLabel(_('Default access to new actions'), $data['readonly'] ? '' : 'actions.default_access'),
@@ -424,10 +416,7 @@ $form_grid->addItem(
 	)
 );
 
-$form_container->addItem($form_grid);
-$tabs = (new CTabView())->addTab('user_role_tab', _('User role'), $form_container);
-
-$form->addItem((new CTabView())->addTab('user_role_tab', _('User role'), $form_container));
+$form->addItem((new CTabView())->addTab('user_role_tab', _('User role'), $form_grid));
 
 $html_page
 	->addItem($form)
