@@ -102,13 +102,11 @@ class CControllerHostTagsList extends CController {
 		);
 
 		if ($data['show_inherited_tags']) {
-			$tag_values = $data['tags'] ? self::getTagValues($data['tags']) : [];
+			$tag_details = self::getTagDetails($data['tags']);
+			$inherited_tag_details = self::getInheritedTagDetails($this->getInput('templateids', []));
 
-			$templateids = $this->getInput('templateids', []);
-			$inherited_tag_templates = $templateids ? $this->getInheritedTagTemplates($templateids) : [];
-
-			if ($tag_values || $inherited_tag_templates) {
-				$data['tags'] = self::getMergedOwnAndInheritedTags($tag_values, $inherited_tag_templates);
+			if ($tag_details['tag_value_pairs'] || $inherited_tag_details['tag_value_pairs']) {
+				$data['tags'] = self::getMergedOwnAndInheritedTags($tag_details, $inherited_tag_details);
 
 				CArrayHelper::sort($data['tags'], ['tag', 'value']);
 			}
@@ -119,34 +117,43 @@ class CControllerHostTagsList extends CController {
 		$this->setResponse(new CControllerResponseData($data));
 	}
 
-	private static function getTagValues(array $tags): array {
-		$tag_values = [];
+	private static function getTagDetails(array $tags): array {
+		$tag_details = [
+			'tag_value_pairs' => [],
+			'automatics' => []
+		];
 
 		foreach ($tags as $tag) {
 			$tag += ['automatic' => ZBX_TAG_MANUAL];
 
-			if (array_key_exists($tag['tag'], $tag_values)
-					&& array_key_exists($tag['value'], $tag_values[$tag['tag']])
-					&& $tag['automatic'] == ZBX_TAG_MANUAL) {
+			$tag_value_pair = [
+				'tag' => $tag['tag'],
+				'value' => $tag['value']
+			];
+
+			$tag_index = array_search($tag_value_pair, $tag_details['tag_value_pairs'], true);
+
+			if ($tag_index !== false && $tag['automatic'] == ZBX_TAG_MANUAL) {
 				continue;
 			}
 
-			$tag_values[$tag['tag']][$tag['value']] = $tag['automatic'];
+			$tag_details['tag_value_pairs'][] = $tag_value_pair;
+			$tag_details['automatics'][] = $tag['automatic'];
 		}
 
-		return $tag_values;
+		return $tag_details;
 	}
 
-	private function getInheritedTagTemplates(array $templateids): array {
-		$inherited_tag_templates = [];
+	private static function getInheritedTagDetails(array $templateids): array {
+		$tag_details = [
+			'tag_value_pairs' => [],
+			'tag_templates' => []
+		];
 
-		self::addTemplateTags($inherited_tag_templates, $templateids);
-		self::addTemplateData($inherited_tag_templates);
+		if (!$templateids) {
+			return $tag_details;
+		}
 
-		return $inherited_tag_templates;
-	}
-
-	private static function addTemplateTags(array &$inherited_tag_templates, array $templateids): void {
 		$templates = API::Template()->get([
 			'output' => [],
 			'selectTags' => ['tag', 'value'],
@@ -155,34 +162,72 @@ class CControllerHostTagsList extends CController {
 			'preservekeys' => true
 		]);
 
+		if (!$templates) {
+			return $tag_details;
+		}
+
+		$templateids = array_intersect_key(array_flip($templateids), $templates);
+
+		$tag_templates_by_templateid = [];
+
 		foreach ($templates as $templateid => $template) {
-			foreach ($template['tags'] as $tag) {
-				$inherited_tag_templates[$tag['tag']][$tag['value']][$templateid] = [];
+			foreach ($template['tags'] as $tag_value_pair) {
+				$tag_index = array_search($tag_value_pair, $tag_details['tag_value_pairs'], true);
+
+				if ($tag_index !== false) {
+					$tag_details['tag_templates'][$tag_index][$templateid] = [];
+				}
+				else {
+					$tag_details['tag_value_pairs'][] = $tag_value_pair;
+					$tag_details['tag_templates'][] = [$templateid => []];
+
+					$tag_index = array_key_last($tag_details['tag_templates']);
+				}
+
+				$tag_templates_by_templateid[$templateid][] = &$tag_details['tag_templates'][$tag_index][$templateid];
 			}
 
 			foreach ($template['inheritedTags'] as $tag) {
-				$inherited_tag_templates[$tag['tag']][$tag['value']][$tag['objectid']] = [];
+				$tag_value_pair = [
+					'tag' => $tag['tag'],
+					'value' => $tag['value']
+				];
+
+				$tag_index = array_search($tag_value_pair, $tag_details['tag_value_pairs'], true);
+
+				if ($tag_index !== false) {
+					$tag_details['tag_templates'][$tag_index][$tag['objectid']] = [];
+				}
+				else {
+					$tag_details['tag_value_pairs'][] = $tag_value_pair;
+					$tag_details['tag_templates'][] = [$tag['objectid'] => []];
+
+					$tag_index = array_key_last($tag_details['tag_templates']);
+				}
+
+				$tag_templates_by_templateid[$tag['objectid']][] =
+					&$tag_details['tag_templates'][$tag_index][$tag['objectid']];
+
+				$templateids[$tag['objectid']] = true;
 			}
 		}
+
+		$templates = self::getTemplates($templateids);
+
+		foreach ($tag_templates_by_templateid as $templateid => $tag_templates) {
+			foreach ($tag_templates as &$tag_template) {
+				$tag_template = $templates[$templateid];
+			}
+			unset($tag_template);
+		}
+
+		return $tag_details;
 	}
 
-	private static function addTemplateData(array &$inherited_tag_templates): void {
-		$tag_templates_by_templateid = [];
-
-		foreach ($inherited_tag_templates as &$value_templates) {
-			foreach ($value_templates as &$_templates) {
-				foreach ($_templates as $templateid => &$template) {
-					$tag_templates_by_templateid[$templateid][] = &$template;
-				}
-				unset($template);
-			}
-			unset($_templates);
-		}
-		unset($value_templates);
-
+	private static function getTemplates(array $templateids): array {
 		$accessible_templates = API::Template()->get([
 			'output' => ['name'],
-			'templateids' => array_keys($tag_templates_by_templateid),
+			'templateids' => array_keys($templateids),
 			'preservekeys' => true
 		]);
 
@@ -195,8 +240,10 @@ class CControllerHostTagsList extends CController {
 			])
 			: [];
 
-		foreach ($tag_templates_by_templateid as $templateid => &$tag_templates) {
-			$template_data = array_key_exists($templateid, $accessible_templates)
+		$templates = [];
+
+		foreach ($templateids as $templateid => $true) {
+			$templates[$templateid] = array_key_exists($templateid, $accessible_templates)
 				? [
 					'name' => $accessible_templates[$templateid]['name'],
 					'permission' => array_key_exists($templateid, $editable_templates) ? PERM_READ_WRITE : PERM_READ
@@ -205,43 +252,42 @@ class CControllerHostTagsList extends CController {
 					'name' => _('Inaccessible template'),
 					'permission' => PERM_DENY
 				];
-
-			foreach ($tag_templates as &$template) {
-				$template = $template_data;
-			}
-			unset($template);
 		}
-		unset($tag_templates);
+
+		return $templates;
 	}
 
-	private static function getMergedOwnAndInheritedTags(array $tag_values, array $inherited_tag_templates): array {
+	private static function getMergedOwnAndInheritedTags(array $tag_details, array $inherited_tag_details): array {
 		$tags = [];
 
-		foreach ($tag_values as $tag => $values) {
-			foreach ($values as $value => $automatic) {
-				$inherited_tags_exists = array_key_exists($tag, $inherited_tag_templates)
-					&& array_key_exists($value, $inherited_tag_templates[$tag]);
+		foreach ($tag_details['tag_value_pairs'] as $tag_index => $tag_value_pair) {
+			$inherited_tag_index = array_search($tag_value_pair, $inherited_tag_details['tag_value_pairs'], true);
 
-				$tags[] = [
-					'tag' => $tag,
-					'value' => $value,
-					'automatic' => $automatic,
-					'type' => $inherited_tags_exists ? ZBX_PROPERTY_BOTH : ZBX_PROPERTY_OWN
-				] + ($inherited_tags_exists ? ['parent_templates' => $inherited_tag_templates[$tag][$value]] : []);
+			$tag = [
+				'tag' => $tag_value_pair['tag'],
+				'value' => $tag_value_pair['value'],
+				'automatic' => $tag_details['automatics'][$tag_index],
+				'type' => ZBX_PROPERTY_OWN
+			];
 
-				unset($inherited_tag_templates[$tag][$value]);
+			if ($inherited_tag_index !== false) {
+				$tag['type'] = ZBX_PROPERTY_BOTH;
+				$tag['parent_templates'] = $inherited_tag_details['tag_templates'][$inherited_tag_index];
+
+				unset($inherited_tag_details['tag_value_pairs'][$tag_index]);
+				unset($inherited_tag_details['tag_templates'][$tag_index]);
 			}
+
+			$tags[] = $tag;
 		}
 
-		foreach ($inherited_tag_templates as $tag => $value_templates) {
-			foreach ($value_templates as $value => $templates) {
-				$tags[] = [
-					'tag' => $tag,
-					'value' => $value,
-					'type' => ZBX_PROPERTY_INHERITED,
-					'parent_templates' => $templates
-				];
-			}
+		foreach ($inherited_tag_details['tag_value_pairs'] as $tag_index => $tag_value_pair) {
+			$tags[] = [
+				'tag' => $tag_value_pair['tag'],
+				'value' => $tag_value_pair['value'],
+				'type' => ZBX_PROPERTY_INHERITED,
+				'parent_templates' => $inherited_tag_details['tag_templates'][$tag_index]
+			];
 		}
 
 		return $tags;
