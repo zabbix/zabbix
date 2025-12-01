@@ -201,12 +201,12 @@ class testZBX6663 extends CLegacyWebTest {
 			}
 		}
 
-		$this->query('id:elected_count')->waitUntilVisible()->one();
+		$this->query('id:selected_count')->waitUntilVisible()->one();
 		$this->zbxTestTextPresent('0 selected');
 		$this->zbxTestCheckboxSelect("all_$checkbox");
 
 		$this->zbxTestClickLinkText($this->templated);
-		$this->query('id:elected_count')->waitUntilPresent()->one();
+		$this->query('id:selected_count')->waitUntilPresent()->one();
 		$this->zbxTestTextPresent('0 selected');
 	}
 }

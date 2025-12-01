@@ -601,7 +601,7 @@ class testAlarmNotification extends CWebTest {
 	 * Check notification display after changing user Frontend notification settings.
 	 *
 	 * @onBefore resetTriggerSeverities
-	 * @onAfter deleteEvents
+	 * @onAfterOnce deleteEvents
 	 *
 	 * @dataProvider getNotificationSettingsData
 	 */
