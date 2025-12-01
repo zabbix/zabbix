@@ -19,9 +19,10 @@
 
 /* generic */
 
-typedef zbx_uint32_t zbx_hash_t;
+typedef zbx_uint64_t zbx_hash_t;
 
 zbx_hash_t	zbx_hash_modfnv(const void *data, size_t len, zbx_hash_t seed);
+zbx_hash_t	zbx_hash_id64(const void *data);
 zbx_hash_t	zbx_hash_splittable64(const void *data);
 
 #define ZBX_DEFAULT_HASH_ALGO		zbx_hash_modfnv
@@ -40,6 +41,7 @@ zbx_hash_t	zbx_default_uint64_pair_hash_func(const void *data);
 
 #define ZBX_DEFAULT_PTR_HASH_FUNC		zbx_default_ptr_hash_func
 #define ZBX_DEFAULT_UINT64_HASH_FUNC		zbx_hash_splittable64
+#define ZBX_DEFAULT_ID_HASH_FUNC		zbx_hash_id64
 #define ZBX_DEFAULT_STRING_HASH_FUNC		zbx_default_string_hash_func
 #define ZBX_DEFAULT_STRING_PTR_HASH_FUNC	zbx_default_string_ptr_hash_func
 #define ZBX_DEFAULT_UINT64_PAIR_HASH_FUNC	zbx_default_uint64_pair_hash_func
@@ -130,10 +132,6 @@ ZBX_HASHSET_ENTRY_T
 {
 	ZBX_HASHSET_ENTRY_T	*next;
 	zbx_hash_t		hash;
-#if SIZEOF_VOID_P > 4
-	/* the data member must be properly aligned on 64-bit architectures that require aligned memory access */
-	char			padding[sizeof(void *) - sizeof(zbx_hash_t)];
-#endif
 	char			data[1];
 };
 
@@ -171,7 +169,7 @@ void	*zbx_hashset_insert_ext(zbx_hashset_t *hs, const void *data, size_t size, s
 		zbx_hashset_uniq_t uniq);
 void	*zbx_hashset_search(const zbx_hashset_t *hs, const void *data);
 void	zbx_hashset_remove(zbx_hashset_t *hs, const void *data);
-void	zbx_hashset_remove_direct(zbx_hashset_t *hs, void *data);
+void	zbx_hashset_remove_direct(zbx_hashset_t *hs, const void *data);
 
 void	zbx_hashset_clear(zbx_hashset_t *hs);
 

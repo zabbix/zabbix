@@ -1207,8 +1207,7 @@ class CRole extends CApiService {
 		$sql_parts = parent::applyQueryFilterOptions($table_name, $table_alias, $options, $sql_parts);
 
 		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
-			$sql_parts['from']['users'] = 'users u';
-			$sql_parts['where']['u'] = 'r.roleid=u.roleid';
+			$sql_parts['join']['u'] = ['table' => 'users', 'using' => 'roleid'];
 			$sql_parts['where'][] = 'u.userid='.self::$userData['userid'];
 		}
 

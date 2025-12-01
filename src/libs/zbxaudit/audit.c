@@ -255,7 +255,7 @@ out:
 	return ret;
 }
 
-static unsigned	zbx_audit_hash_func(const void *data)
+static zbx_hash_t	zbx_audit_hash_func(const void *data)
 {
 	zbx_hash_t	hash;
 	const zbx_audit_entry_t	* const *audit_entry = (const zbx_audit_entry_t * const *)data;
@@ -537,7 +537,7 @@ void	zbx_audit_update_json_append_string_secret(const zbx_uint64_t id, const int
 		exit(EXIT_FAILURE);
 	}
 
-	append_str_json(&((*found_audit_entry)->details_json), audit_op, key, ZBX_MACRO_SECRET_MASK);
+	append_str_json(&((*found_audit_entry)->details_json), audit_op, key, ZBX_SECRET_MASK);
 }
 
 void	zbx_audit_update_json_append_uint64(const zbx_uint64_t id, const int id_table, const char *audit_op,
@@ -964,7 +964,7 @@ void	zbx_audit_entry_add_secret(zbx_audit_entry_t *entry, const char *table, con
 	if (NULL != table && SUCCEED == audit_field_value_matches_db_default(table, field, value1, 0))
 		return;
 
-	append_str_json(&entry->details_json, AUDIT_DETAILS_ACTION_ADD, key, ZBX_MACRO_SECRET_MASK);
+	append_str_json(&entry->details_json, AUDIT_DETAILS_ACTION_ADD, key, ZBX_SECRET_MASK);
 }
 
 /******************************************************************************

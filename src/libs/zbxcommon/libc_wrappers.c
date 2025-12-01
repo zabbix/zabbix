@@ -27,3 +27,16 @@ char	*zbx_strerror(int errnum)
 
 	return utf8_string;
 }
+
+void	zbx_malloc_trim(time_t now, int period, size_t pad)
+{
+#ifdef HAVE_MALLOC_TRIM
+	static time_t	time_trim;
+
+	if (time_trim + period <= now)
+	{
+		malloc_trim(pad);
+		time_trim = now;
+	}
+#endif
+}

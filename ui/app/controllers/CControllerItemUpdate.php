@@ -128,20 +128,10 @@ class CControllerItemUpdate extends CControllerItem {
 			'browser_script' => ['db items.params', 'required', 'not_empty', 'when' => ['type', 'in' => [ITEM_TYPE_BROWSER]]],
 			'request_method' => ['db items.request_method', 'required', 'in' => [HTTPCHECK_REQUEST_GET, HTTPCHECK_REQUEST_POST, HTTPCHECK_REQUEST_PUT, HTTPCHECK_REQUEST_HEAD], 'when' => ['type', 'in' => [ITEM_TYPE_HTTPAGENT]]],
 			'post_type' => ['db items.request_method', 'required', 'in' => [ZBX_POSTTYPE_RAW, ZBX_POSTTYPE_JSON, ZBX_POSTTYPE_XML], 'when' => ['type', 'in' => [ITEM_TYPE_HTTPAGENT]]],
-			'posts' => [
-				['db items.posts', 'required', 'not_empty',
-					'when' => ['post_type', 'in' => [ZBX_POSTTYPE_XML]],
-					'use' => [CXmlValidator::class, []]
-				],
-				['db items.posts', 'required', 'not_empty',
-					'when' => ['post_type', 'in' => [ZBX_POSTTYPE_JSON]],
-					'use' => [CJsonValidator::class, ['macros_n' => CItemTypeHttpAgent::POSTS_JSON_MACROS_N, 'usermacros' => true]]
-				],
-				['db items.posts', 'required', 'not_empty', 'when' => [
-					['post_type', 'in' => [ZBX_POSTTYPE_JSON, ZBX_POSTTYPE_XML]],
-					['type', 'in' => [ITEM_TYPE_HTTPAGENT]]
-				]]
-			],
+			'posts' => ['db items.posts', 'required', 'not_empty', 'when' => [
+				['post_type', 'in' => [ZBX_POSTTYPE_JSON, ZBX_POSTTYPE_XML]],
+				['type', 'in' => [ITEM_TYPE_HTTPAGENT]]
+			]],
 			'headers' => ['objects',
 				'fields' => [
 					'name' => ['string', 'required', 'not_empty', 'length' => 255],

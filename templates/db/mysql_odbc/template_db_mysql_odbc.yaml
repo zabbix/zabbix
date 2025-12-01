@@ -16,7 +16,7 @@ zabbix_export:
         
         For more information please read the MySQL documentation https://dev.mysql.com/doc/refman/8.0/en/grant.html.
         
-        **NOTE:** In order to collect replication metrics, MariaDB Enterprise Server 10.5.8-5 and above and MariaDB Community Server 10.5.9 and above require the SLAVE MONITOR privilege to be set for the monitoring user:
+        NOTE: In order to collect replication metrics, MariaDB Enterprise Server 10.5.8-5 and above and MariaDB Community Server 10.5.9 and above require the SLAVE MONITOR privilege to be set for the monitoring user:
         
         GRANT REPLICATION CLIENT,PROCESS,SHOW DATABASES,SHOW VIEW,SLAVE MONITOR ON *.* TO 'zbx_monitor'@'%';
         
@@ -51,7 +51,7 @@ zabbix_export:
         2. Set the username and password in the `MySQL user` and `MySQL password` host wizard configuration fields.
       vendor:
         name: Zabbix
-        version: 8.0-2
+        version: 8.0-3
       groups:
         - name: Templates/Databases
       items:

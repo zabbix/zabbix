@@ -133,7 +133,7 @@ class CAlert extends CApiService {
 	protected function createSelectQueryParts($tableName, $tableAlias, array $options) {
 		$sql_parts = [
 			'select' => ['a.alertid'],
-			'from' => [],
+			'from' => 'alerts a',
 			'where' => [],
 			'group' => [],
 			'order' => [],
@@ -141,16 +141,13 @@ class CAlert extends CApiService {
 		];
 
 		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
-			$sql_parts['from']['e'] = 'events e';
-			$sql_parts['from'][] = 'alerts a';
-			$sql_parts['where']['e-a'] = 'e.eventid=a.eventid';
+			$sql_parts['join']['e'] = ['table' => 'events', 'using' => 'eventid'];
 			$sql_parts['where'][] = dbConditionInt('e.source', [$options['eventsource']]);
 			$sql_parts['where'][] = dbConditionInt('e.object', [$options['eventobject']]);
 		}
 		else {
 			if ($options['eventsource'] == EVENT_SOURCE_TRIGGERS
 					|| $options['eventsource'] == EVENT_SOURCE_AUTOREGISTRATION) {
-				$sql_parts['from'][] = 'alerts a';
 				$sql_parts['where'][] = 'EXISTS ('.
 					'SELECT NULL'.
 					' FROM actions aa'.
@@ -159,9 +156,7 @@ class CAlert extends CApiService {
 				')';
 			}
 			else {
-				$sql_parts['from']['e'] = 'events e';
-				$sql_parts['from'][] = 'alerts a';
-				$sql_parts['where']['e-a'] = 'e.eventid=a.eventid';
+				$sql_parts['join']['e'] = ['table' => 'events', 'using' => 'eventid'];
 				$sql_parts['where'][] = dbConditionInt('e.source', [$options['eventsource']]);
 				$sql_parts['where'][] = dbConditionInt('e.object', [$options['eventobject']]);
 			}
@@ -189,16 +184,13 @@ class CAlert extends CApiService {
 					$sql_parts['where'][] = '1=0';
 				}
 
-				$sql_parts['from']['e'] = 'events e';
-				$sql_parts['from']['f'] = 'functions f';
-				$sql_parts['from']['i'] = 'items i';
-				$sql_parts['from'][] = 'host_hgset hh';
-				$sql_parts['from'][] = 'permission p';
-				$sql_parts['where']['e-a'] = 'e.eventid=a.eventid';
-				$sql_parts['where']['e-f'] = 'e.objectid=f.triggerid';
-				$sql_parts['where']['f-i'] = 'f.itemid=i.itemid';
-				$sql_parts['where'][] = 'i.hostid=hh.hostid';
-				$sql_parts['where'][] = 'hh.hgsetid=p.hgsetid';
+				$sql_parts['join']['e'] = ['table' => 'events', 'using' => 'eventid'];
+				$sql_parts['join']['f'] = ['left_table' => 'e', 'table' => 'functions',
+					'on' => ['objectid' => 'triggerid']
+				];
+				$sql_parts['join']['i'] = ['left_table' => 'f', 'table' => 'items', 'using' => 'itemid'];
+				$sql_parts['join']['hh'] = ['left_table' => 'i', 'table' => 'host_hgset', 'using' => 'hostid'];
+				$sql_parts['join']['p'] = ['left_table' => 'hh', 'table' => 'permission', 'using' => 'hgsetid'];
 				$sql_parts['where'][] = 'p.ugsetid='.self::$userData['ugsetid'];
 
 				if ($options['editable']) {
@@ -222,14 +214,10 @@ class CAlert extends CApiService {
 					$sql_parts['where'][] = '1=0';
 				}
 
-				$sql_parts['from']['e'] = 'events e';
-				$sql_parts['from']['i'] = 'items i';
-				$sql_parts['from'][] = 'host_hgset hh';
-				$sql_parts['from'][] = 'permission p';
-				$sql_parts['where']['e-a'] = 'e.eventid=a.eventid';
-				$sql_parts['where']['e-i'] = 'e.objectid=i.itemid';
-				$sql_parts['where'][] = 'i.hostid=hh.hostid';
-				$sql_parts['where'][] = 'hh.hgsetid=p.hgsetid';
+				$sql_parts['join']['e'] = ['table' => 'events', 'using' => 'eventid'];
+				$sql_parts['join']['i'] = ['left_table' => 'e', 'table' => 'items', 'on' => ['objectid' => 'itemid']];
+				$sql_parts['join']['hh'] = ['left_table' => 'i', 'table' => 'host_hgset', 'using' => 'hostid'];
+				$sql_parts['join']['p'] = ['left_table' => 'hh', 'table' => 'permission', 'using' => 'hgsetid'];
 				$sql_parts['where'][] = 'p.ugsetid='.self::$userData['ugsetid'];
 
 				if ($options['editable']) {
@@ -240,10 +228,12 @@ class CAlert extends CApiService {
 
 		// Allow user to get alerts sent only by users with same user group.
 		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
-			$sql_parts['from'][] = 'users_groups ug';
 			$sql_parts['where'][] = '(a.userid IS NULL'.
-				' OR (a.userid=ug.userid'.
-					' AND '.dbConditionId('ug.usrgrpid', getUserGroupsByUserId(self::$userData['userid'])).
+				' OR EXISTS ('.
+					'SELECT NULL'.
+					' FROM users_groups ug'.
+					' WHERE a.userid=ug.userid'.
+						' AND '.dbConditionId('ug.usrgrpid', getUserGroupsByUserId(self::$userData['userid'])).
 				')'.
 			')';
 		}
@@ -252,24 +242,19 @@ class CAlert extends CApiService {
 		if ($options['groupids'] !== null) {
 			// triggers
 			if ($options['eventobject'] == EVENT_OBJECT_TRIGGER) {
-				$sql_parts['from']['e'] = 'events e';
-				$sql_parts['from']['f'] = 'functions f';
-				$sql_parts['from']['i'] = 'items i';
-				$sql_parts['from'][] = 'hosts_groups hg';
-				$sql_parts['where']['e-a'] = 'e.eventid=a.eventid';
-				$sql_parts['where']['e-f'] = 'e.objectid=f.triggerid';
-				$sql_parts['where']['f-i'] = 'f.itemid=i.itemid';
-				$sql_parts['where'][] = 'i.hostid=hg.hostid';
+				$sql_parts['join']['e'] = ['table' => 'events', 'using' => 'eventid'];
+				$sql_parts['join']['f'] = ['left_table' => 'e', 'table' => 'functions',
+					'on' => ['objectid' => 'triggerid']
+				];
+				$sql_parts['join']['i'] = ['left_table' => 'f', 'table' => 'items', 'using' => 'itemid'];
+				$sql_parts['join']['hg'] = ['left_table' => 'i', 'table' => 'hosts_groups', 'using' => 'hostid'];
 				$sql_parts['where'][] = dbConditionId('hg.groupid', $options['groupids']);
 			}
 			// lld rules and items
 			elseif ($options['eventobject'] == EVENT_OBJECT_LLDRULE || $options['eventobject'] == EVENT_OBJECT_ITEM) {
-				$sql_parts['from']['e'] = 'events e';
-				$sql_parts['from']['i'] = 'items i';
-				$sql_parts['from'][] = 'hosts_groups hg';
-				$sql_parts['where']['e-a'] = 'e.eventid=a.eventid';
-				$sql_parts['where']['e-i'] = 'e.objectid=i.itemid';
-				$sql_parts['where'][] = 'i.hostid=hg.hostid';
+				$sql_parts['join']['e'] = ['table' => 'events', 'using' => 'eventid'];
+				$sql_parts['join']['i'] = ['left_table' => 'e', 'table' => 'items', 'on' => ['objectid' => 'itemid']];
+				$sql_parts['join']['hg'] = ['left_table' => 'i', 'table' => 'hosts_groups', 'using' => 'hostid'];
 				$sql_parts['where'][] = dbConditionId('hg.groupid', $options['groupids']);
 			}
 		}
@@ -278,20 +263,17 @@ class CAlert extends CApiService {
 		if ($options['hostids'] !== null) {
 			// triggers
 			if ($options['eventobject'] == EVENT_OBJECT_TRIGGER) {
-				$sql_parts['from']['e'] = 'events e';
-				$sql_parts['from']['f'] = 'functions f';
-				$sql_parts['from']['i'] = 'items i';
-				$sql_parts['where']['e-a'] = 'e.eventid=a.eventid';
-				$sql_parts['where']['e-f'] = 'e.objectid=f.triggerid';
-				$sql_parts['where']['f-i'] = 'f.itemid=i.itemid';
+				$sql_parts['join']['e'] = ['table' => 'events', 'using' => 'eventid'];
+				$sql_parts['join']['f'] = ['left_table' => 'e', 'table' => 'functions',
+					'on' => ['objectid' => 'triggerid']
+				];
+				$sql_parts['join']['i'] = ['left_table' => 'f', 'table' => 'items', 'using' => 'itemid'];
 				$sql_parts['where'][] = dbConditionId('i.hostid', $options['hostids']);
 			}
 			// lld rules and items
 			elseif ($options['eventobject'] == EVENT_OBJECT_LLDRULE || $options['eventobject'] == EVENT_OBJECT_ITEM) {
-				$sql_parts['from']['e'] = 'events e';
-				$sql_parts['from']['i'] = 'items i';
-				$sql_parts['where']['e-a'] = 'e.eventid=a.eventid';
-				$sql_parts['where']['e-i'] = 'e.objectid=i.itemid';
+				$sql_parts['join']['e'] = ['table' => 'events', 'using' => 'eventid'];
+				$sql_parts['join']['i'] = ['left_table' => 'e', 'table' => 'items', 'on' => ['objectid' => 'itemid']];
 				$sql_parts['where'][] = dbConditionId('i.hostid', $options['hostids']);
 			}
 		}
@@ -304,8 +286,7 @@ class CAlert extends CApiService {
 		// objectids
 		if ($options['objectids'] !== null && in_array($options['eventobject'],
 				[EVENT_OBJECT_TRIGGER, EVENT_OBJECT_ITEM, EVENT_OBJECT_LLDRULE, EVENT_OBJECT_SERVICE])) {
-			$sql_parts['from']['e'] = 'events e';
-			$sql_parts['where']['e-a'] = 'e.eventid=a.eventid';
+			$sql_parts['join']['e'] = ['table' => 'events', 'using' => 'eventid'];
 			$sql_parts['where'][] = dbConditionId('e.objectid', $options['objectids']);
 		}
 

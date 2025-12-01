@@ -32,7 +32,8 @@ class CMultifieldTableElement extends CTableElement {
 	 */
 	protected $selectors = [
 		'header' => 'xpath:./thead/tr/th',
-		'row' => 'xpath:./tbody/tr[contains(@class, "form_row") or contains(@class, "pairRow") or contains(@class, "editable_table_row")]',
+		'row' => 'xpath:./tbody/tr[contains(@class, "form_row") or contains(@class, "pairRow") or'.
+			' contains(@class, "editable_table_row") or contains(@id, "url-row")]',
 		'column' => 'xpath:./td'
 	];
 

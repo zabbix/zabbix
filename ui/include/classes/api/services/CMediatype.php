@@ -161,9 +161,8 @@ class CMediatype extends CApiService {
 				$options['mediaids'] = array_intersect($options['mediaids'], $accessible_mediaids);
 			}
 
-			$sql_parts['from']['media'] = 'media m';
+			$sql_parts['join']['m'] = ['table' => 'media', 'using' => 'mediatypeid'];
 			$sql_parts['where'][] = dbConditionId('m.mediaid', $options['mediaids']);
-			$sql_parts['where']['mmt'] = 'm.mediatypeid=mt.mediatypeid';
 		}
 
 		if ($options['userids'] !== null) {
@@ -171,19 +170,15 @@ class CMediatype extends CApiService {
 				$options['userids'] = array_intersect($options['userids'], [self::$userData['userid']]);
 			}
 
-			$sql_parts['from']['media'] = 'media m';
+			$sql_parts['join']['m'] = ['table' => 'media', 'using' => 'mediatypeid'];
 			$sql_parts['where'][] = dbConditionId('m.userid', $options['userids']);
-			$sql_parts['where']['mmt'] = 'm.mediatypeid=mt.mediatypeid';
 		}
 
 		if ($options['filter'] !== null) {
 			$oauth_filter = array_intersect_key($options['filter'], array_flip(self::OAUTH_OUTPUT_FIELDS));
 
 			if ($oauth_filter) {
-				$sql_parts['left_join']['media_type_oauth'] =
-					['alias' => 'mto', 'table' => 'media_type_oauth', 'using' => 'mediatypeid'];
-				$sql_parts['left_table'] = ['alias' => $this->tableAlias, 'table' => $this->tableName];
-
+				$sql_parts['join']['mto'] = ['type' => 'left', 'table' => 'media_type_oauth', 'using' => 'mediatypeid'];
 				$this->dbFilter('media_type_oauth mto', ['filter' => $oauth_filter] + $options, $sql_parts);
 			}
 		}
@@ -192,10 +187,7 @@ class CMediatype extends CApiService {
 			$oauth_search = array_intersect_key($options['search'], array_flip(self::OAUTH_OUTPUT_FIELDS));
 
 			if ($oauth_search) {
-				$sql_parts['left_join']['media_type_oauth'] =
-					['alias' => 'mto', 'table' => 'media_type_oauth', 'using' => 'mediatypeid'];
-				$sql_parts['left_table'] = ['alias' => $this->tableAlias, 'table' => $this->tableName];
-
+				$sql_parts['join']['mto'] = ['type' => 'left', 'table' => 'media_type_oauth', 'using' => 'mediatypeid'];
 				zbx_db_search('media_type_oauth mto', ['search' => $oauth_search] + $options, $sql_parts);
 			}
 		}
@@ -213,9 +205,7 @@ class CMediatype extends CApiService {
 		$oauth_output = array_intersect($options['output'], self::OAUTH_OUTPUT_FIELDS);
 
 		if ($oauth_output) {
-			$sql_parts['left_join']['media_type_oauth'] =
-				['alias' => 'mto', 'table' => 'media_type_oauth', 'using' => 'mediatypeid'];
-			$sql_parts['left_table'] = ['alias' => $this->tableAlias, 'table' => $this->tableName];
+			$sql_parts['join']['mto'] = ['type' => 'left', 'table' => 'media_type_oauth', 'using' => 'mediatypeid'];
 
 			foreach ($oauth_output as $oauth_field) {
 				$sql_parts['select'][] = dbConditionCoalesce('mto.'.$oauth_field,

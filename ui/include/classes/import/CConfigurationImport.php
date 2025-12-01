@@ -1986,17 +1986,19 @@ class CConfigurationImport {
 
 		$triggers_to_process_dependencies = [];
 
-		foreach ($this->getFormattedTriggers() as $trigger) {
-			$hostids = $this->extractHostids($trigger);
+		$triggers = $this->getFormattedTriggers();
 
-			if (!$hostids) {
-				continue;
-			}
+		$trigger_hostids = $this->getHostidsByTriggerIndex($triggers);
 
+		if (!$trigger_hostids) {
+			return;
+		}
+
+		foreach ($triggers as $i => $trigger) {
 			$triggerid = null;
 			$is_template_trigger = false;
 
-			foreach ($hostids as $hostid) {
+			foreach ($trigger_hostids[$i] as $hostid) {
 				if ($this->importedObjectContainer->isTemplateProcessed($hostid)) {
 					$is_template_trigger = true;
 				}
@@ -2054,7 +2056,39 @@ class CConfigurationImport {
 		$this->processTriggerDependencies($triggers_to_process_dependencies);
 	}
 
-	private function extractHostids(array $trigger): array {
+	private function getHostidsByTriggerIndex(array $triggers): array {
+		$host_trigger_indexes = [];
+
+		foreach ($triggers as $i => $trigger) {
+			$hosts = self::extractHosts($trigger);
+
+			if (!$hosts) {
+				return [];
+			}
+
+			foreach ($hosts as $host) {
+				$host_trigger_indexes[$host][] = $i;
+			}
+		}
+
+		$trigger_hostids = [];
+
+		foreach ($host_trigger_indexes as $host => $trigger_indexes) {
+			$hostid = $this->referencer->findTemplateidOrHostidByHost($host);
+
+			if ($hostid === null) {
+				return [];
+			}
+
+			foreach ($trigger_indexes as $i) {
+				$trigger_hostids[$i][] = $hostid;
+			}
+		}
+
+		return $trigger_hostids;
+	}
+
+	public static function extractHosts(array $trigger): array {
 		$expression_parser = new CExpressionParser(['usermacros' => true]);
 
 		if ($expression_parser->parse($trigger['expression']) != CParser::PARSE_SUCCESS) {
@@ -2071,18 +2105,7 @@ class CConfigurationImport {
 			$hosts = array_merge($hosts, $expression_parser->getResult()->getHosts());
 		}
 
-		$hostids = [];
-		foreach (array_unique($hosts) as $host) {
-			$hostid = $this->referencer->findTemplateidOrHostidByHost($host);
-
-			if ($hostid === null) {
-				return [];
-			}
-
-			$hostids[] = $hostid;
-		}
-
-		return $hostids;
+		return array_unique($hosts);
 	}
 
 	/**

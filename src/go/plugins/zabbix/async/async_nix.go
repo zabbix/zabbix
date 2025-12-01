@@ -16,9 +16,39 @@
 
 package zabbixasync
 
+import (
+	"golang.zabbix.com/agent2/pkg/zbxlib"
+	"golang.zabbix.com/sdk/errs"
+	"golang.zabbix.com/sdk/plugin"
+)
+
+//nolint:gochecknoglobals
+var impl Plugin
+
+// Plugin structure.
+type Plugin struct {
+	plugin.Base
+}
+
+func init() { //nolint:gochecknoinits // such is current plugin implementation.
+	err := plugin.RegisterMetrics(&impl, "ZabbixAsync", getMetrics()...)
+	if err != nil {
+		panic(errs.Wrap(err, "failed to register metrics"))
+	}
+}
+
+// Export implements exporter interface.
+func (*Plugin) Export(key string, params []string, _ plugin.ContextProvider) (any, error) {
+	result, err := zbxlib.ExecuteCheck(key, params)
+	if err != nil {
+		return nil, errs.Wrap(err, "failed to execute check")
+	}
+
+	return result, nil
+}
+
 func getMetrics() []string {
 	return []string{
-		"system.localtime", "Returns system local time.",
 		"system.boottime", "Returns system boot time.",
 		"net.tcp.listen", "Checks if this TCP port is in LISTEN state.",
 		"net.udp.listen", "Checks if this UDP port is in LISTEN state.",

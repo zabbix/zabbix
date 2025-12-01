@@ -170,6 +170,7 @@ static zbx_uint64_t	process_checks(const zbx_dc_drule_t *drule, int unique, zbx_
 		}
 
 		ds_dcheck_common = dcheck_clone_get(dcheck, ds_dchecks_common);
+
 		checks_count += process_check_range(drule, ds_dcheck_common, ipranges, tasks);
 	}
 

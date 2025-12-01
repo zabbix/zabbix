@@ -109,9 +109,8 @@ class CProxyGroup extends CApiService {
 
 		// proxyids
 		if ($options['proxyids'] !== null) {
-			$sql_parts['from']['proxy'] = 'proxy p';
+			$sql_parts['join']['p'] = ['table' => 'proxy', 'using' => 'proxy_groupid'];
 			$sql_parts['where'][] = dbConditionId('p.proxyid', $options['proxyids']);
-			$sql_parts['where']['pgp'] = 'pg.proxy_groupid=p.proxy_groupid';
 		}
 
 		if ($options['filter'] !== null && array_key_exists('state', $options['filter'])
@@ -120,12 +119,7 @@ class CProxyGroup extends CApiService {
 				$sql_parts
 			);
 
-			$sql_parts['left_join']['proxy_group_rtdata'] = [
-				'alias' => 'pgr',
-				'table' => 'proxy_group_rtdata',
-				'using' => 'proxy_groupid'
-			];
-			$sql_parts['left_table'] = ['alias' => $this->tableAlias, 'table' => $this->tableName];
+			$sql_parts['join']['pgr'] = ['type' => 'left', 'table' => 'proxy_group_rtdata', 'using' => 'proxy_groupid'];
 		}
 
 		return $sql_parts;
@@ -136,12 +130,7 @@ class CProxyGroup extends CApiService {
 
 		if (!$options['countOutput'] && $this->outputIsRequested('state', $options['output'])) {
 			$sql_parts = $this->addQuerySelect('pgr.state', $sql_parts);
-			$sql_parts['left_join']['proxy_group_rtdata'] = [
-				'alias' => 'pgr',
-				'table' => 'proxy_group_rtdata',
-				'using' => 'proxy_groupid'
-			];
-			$sql_parts['left_table'] = ['alias' => $this->tableAlias, 'table' => $this->tableName];
+			$sql_parts['join']['pgr'] = ['type' => 'left', 'table' => 'proxy_group_rtdata', 'using' => 'proxy_groupid'];
 		}
 
 		return $sql_parts;

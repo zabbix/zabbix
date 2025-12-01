@@ -155,10 +155,6 @@
 					ZBX_EVAL_PARSE_LLDMACRO | \
 					ZBX_EVAL_COMPOSE_LLD)
 
-#define ZBX_EVAL_QUERY_EXPRESSION_LLD	(ZBX_EVAL_PARSE_QUERY_EXPRESSION | \
-					ZBX_EVAL_PARSE_LLDMACRO | \
-					ZBX_EVAL_COMPOSE_LLD)
-
 typedef zbx_uint32_t zbx_token_type_t;
 
 /******************************************************************************

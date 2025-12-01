@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2025-07-02 10:08+0000\n"
+"PO-Revision-Date: 2025-11-17 10:28+0000\n"
 "Last-Translator: NoYoWiFi <1284524409@qq.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: zh_CN\n"
@@ -223,7 +223,7 @@ msgstr "选择了 %1$s 项，您可以使用向上和向下箭头键以及回车
 #, c-format
 msgid "%1$s problem"
 msgid_plural "%1$s problems"
-msgstr[0] "问题发生在 %1$s"
+msgstr[0] "%1$s个问题"
 
 #: include/classes/helpers/CMapHelper.php:319
 #, c-format
@@ -292,19 +292,19 @@ msgstr "%1$s: %2$s"
 #: include/classes/setup/CSetupWizard.php:1460
 #, c-format
 msgid "%1$s: %2$s."
-msgstr ""
+msgstr "%1$s: %2$s。"
 
 #: include/classes/server/CZabbixServer.php:746
 #: include/classes/setup/CSetupWizard.php:1466
 #, c-format
 msgid "%1$s: file is not readable."
-msgstr ""
+msgstr "%1$s: 文件不可读。"
 
 #: include/classes/server/CZabbixServer.php:743
 #: include/classes/setup/CSetupWizard.php:1463
 #, c-format
 msgid "%1$s: invalid path or file not found."
-msgstr ""
+msgstr "%1$s: 路径无效或找不到文件。"
 
 #: include/classes/graph/CSvgGraph.php:1418
 #, c-format
@@ -1742,7 +1742,7 @@ msgstr "角色\"%1$s\"至少存在一个启用的用户"
 
 #: app/controllers/CControllerMaintenanceTimePeriodCheck.php:40
 msgid "At least one day must be selected."
-msgstr ""
+msgstr "至少需要选择一天。"
 
 #: include/classes/api/services/CMaintenance.php:686
 msgid "At least one day of the week or day of the month must be specified."
@@ -1750,12 +1750,12 @@ msgstr "至少须指定一周或一个月中的某一天。"
 
 #: app/controllers/CControllerAutoregUpdate.php:30
 msgid "At least one encryption level must be selected."
-msgstr ""
+msgstr "至少需要选择一个加密级别。"
 
 #: app/controllers/CControllerRegExCreate.php:54
 #: app/controllers/CControllerRegExUpdate.php:55
 msgid "At least one expression must be added."
-msgstr ""
+msgstr "至少需要添加一个表达式。"
 
 #: app/controllers/CControllerMaintenanceCreate.php:62
 #: app/controllers/CControllerMaintenanceUpdate.php:63
@@ -1769,7 +1769,7 @@ msgstr "至少选择一个主机组或主机。"
 #: app/controllers/CControllerMaintenanceTimePeriodCheck.php:45
 #: app/controllers/CControllerMaintenanceUpdate.php:58
 msgid "At least one month must be selected."
-msgstr ""
+msgstr "至少需要选择一个月。"
 
 #: include/classes/helpers/CItemGeneralHelper.php:411
 msgid "At least one of \"min\" or \"max\" parameters should be specified."
@@ -1803,7 +1803,7 @@ msgstr "至少必须启用一个参数。"
 #: app/controllers/CControllerMaintenanceCreate.php:40
 #: app/controllers/CControllerMaintenanceUpdate.php:41
 msgid "At least one period must be added."
-msgstr ""
+msgstr "至少需要添加一个时间段。"
 
 #: app/controllers/CControllerPopupAcknowledgeCreate.php:283
 msgid "At least one update operation or message is mandatory"
@@ -1827,7 +1827,7 @@ msgstr "至少需要指定一个用户或用户组。"
 #: app/controllers/CControllerMaintenanceUpdate.php:62
 #: app/controllers/CControllerMaintenanceUpdate.php:66
 msgid "At least one weekday must be selected."
-msgstr ""
+msgstr "至少需要选择一个星期。"
 
 #: app/views/administration.mediatype.edit.php:354
 #: app/views/mediatype.edit.php:464
@@ -2073,7 +2073,7 @@ msgstr "避免弱密码"
 
 #: app/views/host.wizard.edit.php:473
 msgid "Avoid including sensitive data."
-msgstr ""
+msgstr "请避免包含敏感数据。"
 
 #: jsLoader.php:172
 msgid "Awaiting data"
@@ -2187,7 +2187,7 @@ msgstr "蓝"
 
 #: include/classes/core/ZBase.php:376
 msgid "Blue (classic)"
-msgstr ""
+msgstr "蓝色（经典）"
 
 #: app/views/webscenario.step.edit.php:250
 #: include/views/configuration.host.discovery.edit.php:383
@@ -3555,7 +3555,7 @@ msgstr "在'%4$s'上找不到发现规则原型'%3$s'的监控项原型'%2$s'所
 
 #: app/views/oauth.authorize.php:33
 msgid "Cannot get authentication tokens"
-msgstr ""
+msgstr "无法获取认证令牌"
 
 #: app/views/oauth.edit.php:230
 msgid "Cannot get authorization code."
@@ -4088,7 +4088,7 @@ msgstr "无法读取YAML: %1$s。"
 #: include/classes/server/CZabbixServer.php:511
 #, c-format
 msgid "Cannot read response from Zabbix server \"%1$s\"."
-msgstr ""
+msgstr "无法从 Zabbix server \\%1$s\" 读取响应。\""
 
 #: include/classes/server/CZabbixServer.php:567
 #, c-format
@@ -4153,7 +4153,7 @@ msgstr "当类型为“总计”的监控项添加到图表时，无法设置“
 
 #: include/classes/db/MysqlDbBackend.php:197
 msgid "Cannot set charset."
-msgstr ""
+msgstr "无法设置字符集。"
 
 #: include/classes/api/services/CItemGeneral.php:2478
 #, c-format
@@ -4663,7 +4663,7 @@ msgstr "更改"
 
 #: app/views/administration.authentication.edit.php:316
 msgid "Change IdP certificate"
-msgstr ""
+msgstr "更改 IdP 证书"
 
 #: app/partials/configuration.host.edit.html.php:449
 #: app/views/administration.autoreg.edit.php:82
@@ -4674,11 +4674,11 @@ msgstr "修改 PSK"
 
 #: app/views/administration.authentication.edit.php:367
 msgid "Change SP certificate"
-msgstr ""
+msgstr "更改 SP 证书"
 
 #: app/views/administration.authentication.edit.php:342
 msgid "Change SP private key"
-msgstr ""
+msgstr "更改 SP 私钥"
 
 #: app/views/mfa.edit.php:128
 msgid "Change client secret"
@@ -4721,7 +4721,7 @@ msgstr "修改类型"
 
 #: app/views/js/administration.authentication.edit.js.php:409
 msgid "Changing the authentication method will reset all sessions, except the current one."
-msgstr ""
+msgstr "更改认证方法将重置除当前会话外的所有会话。"
 
 #: app/partials/configuration.filter.items.php:144
 #: app/views/popup.massupdate.item.php:149 include/items.inc.php:127
@@ -4861,7 +4861,7 @@ msgstr "繁體中文 (zh_TW)"
 #: app/views/administration.authentication.edit.php:354
 #: app/views/administration.authentication.edit.php:379
 msgid "Choose file"
-msgstr ""
+msgstr "选择文件"
 
 #: include/classes/import/importers/CTemplateImporter.php:294
 #, c-format
@@ -5026,7 +5026,7 @@ msgstr "关闭问题"
 #: widgets/geomap/includes/WidgetForm.php:66
 #: widgets/geomap/views/widget.edit.php:59
 msgid "Clustering"
-msgstr ""
+msgstr "集群"
 
 #: app/views/mfa.edit.php:90
 msgid "Code length"
@@ -5175,7 +5175,7 @@ msgstr "条件"
 #: app/controllers/CControllerServiceCreate.php:45
 #: app/controllers/CControllerServiceUpdate.php:46
 msgid "Condition, limit and status combination is not unique."
-msgstr ""
+msgstr "条件、限制和状态组合不唯一。"
 
 #: app/views/action.list.php:116 app/views/correlation.edit.php:225
 #: app/views/correlation.list.php:83 app/views/popup.action.edit.php:166
@@ -6075,11 +6075,11 @@ msgstr "当前"
 
 #: app/views/js/administration.authentication.edit.js.php:419
 msgid "Current SP certificate will be deleted."
-msgstr ""
+msgstr "当前 SP 证书将被删除。"
 
 #: app/views/js/administration.authentication.edit.js.php:425
 msgid "Current SP private key will be deleted."
-msgstr ""
+msgstr "当前 SP 私钥将被删除。"
 
 #: app/views/popup.operation.edit.php:256
 msgid "Current host"
@@ -6237,7 +6237,7 @@ msgstr "暗色"
 
 #: include/classes/core/ZBase.php:378
 msgid "Dark (classic)"
-msgstr ""
+msgstr "深色（经典）"
 
 #: app/controllers/CControllerAuditLogList.php:227
 #: app/controllers/CControllerDashboardPrint.php:71
@@ -6634,7 +6634,7 @@ msgstr "默认主机资产记录模式"
 
 #: app/views/administration.iconmap.edit.php:87
 msgid "Default icon"
-msgstr ""
+msgstr "默认图标"
 
 #: app/views/administration.script.edit.php:358
 msgid "Default input string"
@@ -6797,7 +6797,7 @@ msgstr "删除图表?"
 
 #: app/views/host.prototype.edit.php:699
 msgid "Delete host prototype?"
-msgstr ""
+msgstr "是否删除主机原型？"
 
 #: app/views/administration.iconmap.edit.php:145
 msgid "Delete icon map?"
@@ -7300,7 +7300,7 @@ msgstr "检测到的 TimescaleDB 许可证不支持压缩。 TimescaleDB 社区�
 
 #: app/views/administration.housekeeping.edit.php:204
 msgid "Detected license does not support compression. Compression is supported in TimescaleDB Community Edition."
-msgstr ""
+msgstr "检测到的许可证不支持压缩。TimescaleDB 社区版支持压缩功能。"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1130
 msgid "Detection period"
@@ -8556,7 +8556,7 @@ msgstr "输入非机密的预共享密钥标识字符串，避免包含敏感数
 
 #: app/views/host.wizard.edit.php:470
 msgid "Enter a unique name that Zabbix components will use to recognize the pre-shared key."
-msgstr ""
+msgstr "请输入 Zabbix 组件用于识别预共享密钥的唯一名称。"
 
 #: app/views/host.wizard.edit.php:609
 msgid "Enter the IP/DNS address and port of the Zabbix agent installed on your monitoring target."
@@ -8972,7 +8972,7 @@ msgstr "表达式类型"
 #: app/controllers/CControllerRegExCreate.php:53
 #: app/controllers/CControllerRegExUpdate.php:54
 msgid "Expression type and expression combination is not unique."
-msgstr ""
+msgstr "表达式类型和表达式组合不唯一。"
 
 #: app/views/popup.testtriggerexpr.php:29
 msgid "Expression variable elements"
@@ -9186,7 +9186,7 @@ msgstr "文件校验，通过UNIX cksum算法进行检测，返回crc32数值(�
 
 #: include/classes/validators/CFormValidator.php:1451 jsLoader.php:445
 msgid "File format is unsupported."
-msgstr ""
+msgstr "不支持的文件格式。"
 
 #: include/classes/import/readers/CYamlImportReader.php:52
 msgid "File is empty"
@@ -9208,7 +9208,7 @@ msgstr "文件大小以字节（默认）或换行符为单位。返回整数"
 #: include/classes/helpers/CUploadFile.php:129 jsLoader.php:444
 #, c-format
 msgid "File size must be less than %1$s."
-msgstr ""
+msgstr "文件大小必须小于 %1$s。"
 
 #: include/classes/data/CItemData.php:1687
 msgid "File time information. Returns integer (Unix timestamp)"
@@ -9896,7 +9896,7 @@ msgstr "组模板不可以基于一个已经被自动发现的主机组\"%1$s\""
 #: app/controllers/CControllerHostPrototypeCreate.php:55
 #: app/controllers/CControllerHostPrototypeUpdate.php:58
 msgid "Group prototype is not unique."
-msgstr ""
+msgstr "群组原型不唯一。"
 
 #: include/views/configuration.host.prototype.edit.php:204
 msgid "Group prototypes"
@@ -10528,7 +10528,7 @@ msgstr[0] "主机模板已删除"
 
 #: app/controllers/CControllerPopup.php:49
 msgid "Host prototype edit"
-msgstr ""
+msgstr "主机原型编辑"
 
 #: include/views/configuration.host.prototype.edit.php:370
 msgid "Host prototype macros"
@@ -10897,7 +10897,7 @@ msgstr "图标"
 
 #: app/views/administration.authentication.edit.php:312
 msgid "IdP certificate"
-msgstr ""
+msgstr "IdP 证书"
 
 #: app/views/administration.authentication.edit.php:291
 msgid "IdP entity ID"
@@ -11439,7 +11439,7 @@ msgstr "接口的值不正确"
 
 #: include/classes/validators/CHostGroupNameValidator.php:36
 msgid "Incorrect characters used for host group name."
-msgstr ""
+msgstr "主机群组名称包含非法字符。"
 
 #: include/classes/api/services/CHost.php:1029
 #: include/classes/api/services/CHost.php:2052
@@ -11456,7 +11456,7 @@ msgstr "主机名包含非法字符"
 #: app/controllers/CControllerProxyCreate.php:34
 #: app/controllers/CControllerProxyUpdate.php:30
 msgid "Incorrect characters used for proxy name."
-msgstr ""
+msgstr "proxy 名称包含非法字符。"
 
 #: app/controllers/CControllerTemplateCreate.php:35
 #: app/controllers/CControllerTemplateUpdate.php:36
@@ -12038,15 +12038,15 @@ msgstr "继承和主机原型宏"
 
 #: include/classes/helpers/CTagHelper.php:230
 msgid "Inherited and host tag"
-msgstr ""
+msgstr "继承的主机标签"
 
 #: app/partials/configuration.tags.tab.php:42
 msgid "Inherited and host tags"
-msgstr ""
+msgstr "继承的主机标签"
 
 #: include/classes/helpers/CTagHelper.php:231
 msgid "Inherited and item tag"
-msgstr ""
+msgstr "继承的监控项标签"
 
 #: app/partials/configuration.tags.tab.php:165
 msgid "Inherited and item tags"
@@ -12062,15 +12062,15 @@ msgstr "继承模板的宏"
 
 #: include/classes/helpers/CTagHelper.php:229
 msgid "Inherited and template tag"
-msgstr ""
+msgstr "继承的模板标签"
 
 #: app/partials/configuration.tags.tab.php:33
 msgid "Inherited and template tags"
-msgstr ""
+msgstr "继承的模板标签"
 
 #: include/classes/helpers/CTagHelper.php:232
 msgid "Inherited and trigger tag"
-msgstr ""
+msgstr "继承的触发器标签"
 
 #: app/partials/configuration.tags.tab.php:155
 msgid "Inherited and trigger tags"
@@ -12078,7 +12078,7 @@ msgstr "继承和触发标签"
 
 #: include/classes/helpers/CTagHelper.php:233
 msgid "Inherited and web scenario tag"
-msgstr ""
+msgstr "继承的 Web 场景标签"
 
 #: include/forms.inc.php:311
 msgid "Inherited items"
@@ -12086,7 +12086,7 @@ msgstr "继承监控项"
 
 #: include/classes/helpers/CTagHelper.php:222
 msgid "Inherited tag"
-msgstr ""
+msgstr "继承的标签"
 
 #: widgets/geomap/includes/WidgetForm.php:62
 msgid "Initial view"
@@ -12261,7 +12261,7 @@ msgstr "间隔"
 
 #: widgets/itemcard/includes/CWidgetFieldItemSectionsView.php:76
 msgid "Interval and storage"
-msgstr ""
+msgstr "间隔和存储"
 
 #: include/classes/api/services/CRole.php:731
 #, c-format
@@ -12345,7 +12345,7 @@ msgstr "无效的动作条件：%1$s。"
 #: app/controllers/CControllerProxyUpdate.php:51
 #: app/controllers/CControllerProxyUpdate.php:62
 msgid "Invalid address."
-msgstr ""
+msgstr "地址无效。"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1629
 #, c-format
@@ -12369,7 +12369,7 @@ msgstr "媒介类型 ID: \"%1$s\" 的 email 地址无效。"
 #: app/controllers/CControllerHostGroupCreate.php:31
 #: app/controllers/CControllerHostGroupUpdate.php:34
 msgid "Invalid host group name."
-msgstr ""
+msgstr "主机群组名称无效。"
 
 #: app/controllers/CControllerScriptUserInputCheck.php:43
 msgid "Invalid input"
@@ -12756,7 +12756,7 @@ msgstr "标签无效 \"%1$s\": %2$s。"
 #: app/controllers/CControllerTemplateGroupCreate.php:31
 #: app/controllers/CControllerTemplateGroupUpdate.php:32
 msgid "Invalid template group name."
-msgstr ""
+msgstr "模板群组名称无效。"
 
 #: include/classes/validators/CActionCondValidator.php:103
 msgid "Invalid time period."
@@ -13305,7 +13305,7 @@ msgstr "语言 \"%1$s\" 不受支持。"
 
 #: widgets/scatterplot/includes/CWidgetFieldDataSetView.php:445
 msgid "Large"
-msgstr ""
+msgstr "大"
 
 #: include/classes/helpers/CPagerHelper.php:232
 msgctxt "page navigation"
@@ -14187,7 +14187,7 @@ msgstr "标记为故障现象"
 
 #: widgets/scatterplot/includes/CWidgetFieldDataSetView.php:437
 msgid "Marker"
-msgstr ""
+msgstr "标记"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:408
 #: app/controllers/CControllerPopupTriggerExpr.php:448
@@ -14317,7 +14317,7 @@ msgstr "所需的最大 %1$s 数据库版本为 %2$s。"
 #: app/partials/administration.system.info.php:221
 #, c-format
 msgid "Maximum required version is %1$s."
-msgstr ""
+msgstr "所需最高版本为 %1$s。"
 
 #: app/controllers/CControllerTimeSelectorUpdate.php:136
 #: include/classes/mvc/CController.php:320
@@ -14470,7 +14470,7 @@ msgstr "操作“%1$s”使用的媒介类型。"
 
 #: widgets/scatterplot/includes/CWidgetFieldDataSetView.php:444
 msgid "Medium"
-msgstr ""
+msgstr "中"
 
 #: app/views/usergroup.list.php:78
 msgid "Members"
@@ -14666,7 +14666,7 @@ msgstr "所要求的最小PHP post大小是%1$s (配置项\"post_max_size\")。"
 #: app/views/administration.housekeeping.edit.php:183
 #, c-format
 msgid "Minimum required version is %1$s."
-msgstr ""
+msgstr "所需最低版本为 %1$s。"
 
 #: app/views/monitoring.map.view.php:48
 #: include/views/monitoring.sysmap.edit.php:276
@@ -14685,11 +14685,11 @@ msgstr[0] "可显示最短的时间为 %1$s 分。"
 #: app/controllers/CControllerMaintenanceTimePeriodCheck.php:82
 #, c-format
 msgid "Minimum value of \"Maintenance period length\" is %1$d minutes."
-msgstr ""
+msgstr "“维护周期时长”的最小值为 %1$d 分钟。"
 
 #: app/views/maintenance.timeperiod.edit.php:202
 msgid "Minute"
-msgstr ""
+msgstr "分钟"
 
 #: app/views/maintenance.timeperiod.edit.php:212
 #: app/views/popup.sla.excludeddowntime.edit.php:73
@@ -14907,12 +14907,12 @@ msgstr "多重问题事件"
 #: app/partials/administration.system.info.php:235
 #, c-format
 msgid "Must be at least %1$s."
-msgstr ""
+msgstr "必须至少为 %1$s。"
 
 #: app/controllers/CControllerMaintenanceUpdateGeneral.php:32
 #, c-format
 msgid "Must be greater than \"%1$s\"."
-msgstr ""
+msgstr "必须大于 \\%1$s\"。\""
 
 #: include/classes/validators/CFormValidator.php:340
 msgid "Must be selected."
@@ -14921,7 +14921,7 @@ msgstr "必须选择"
 #: app/partials/administration.system.info.php:254
 #, c-format
 msgid "Must not be higher than %1$s."
-msgstr ""
+msgstr "不得高于 %1$s。"
 
 #: jsLoader.php:284
 msgid "Mute"
@@ -15322,7 +15322,7 @@ msgstr "新建主机组"
 
 #: app/views/host.prototype.edit.php:727
 msgid "New host prototype"
-msgstr ""
+msgstr "新建主机原型"
 
 #: app/views/item.edit.php:218
 msgid "New item"
@@ -15697,63 +15697,63 @@ msgstr "没有调用“%1$s.%2$s”的权限。"
 
 #: include/classes/api/services/CConfiguration.php:312
 msgid "No permissions to import discovery rules."
-msgstr ""
+msgstr "无导入发现规则的权限。"
 
 #: include/classes/api/services/CConfiguration.php:313
 msgid "No permissions to import graphs."
-msgstr ""
+msgstr "无导入图形的权限。"
 
 #: include/classes/api/services/CConfiguration.php:314
 msgid "No permissions to import host groups."
-msgstr ""
+msgstr "无导入主机群组的权限。"
 
 #: include/classes/api/services/CConfiguration.php:316
 msgid "No permissions to import hosts."
-msgstr ""
+msgstr "无导入主机的权限。"
 
 #: include/classes/api/services/CConfiguration.php:318
 msgid "No permissions to import images."
-msgstr ""
+msgstr "无导入图像的权限。"
 
 #: include/classes/api/services/CConfiguration.php:319
 msgid "No permissions to import items."
-msgstr ""
+msgstr "无导入监控项的权限。"
 
 #: include/classes/api/services/CConfiguration.php:320
 msgid "No permissions to import maps."
-msgstr ""
+msgstr "无导入地图的权限。"
 
 #: include/classes/api/services/CConfiguration.php:321
 msgid "No permissions to import media types."
-msgstr ""
+msgstr "无导入媒介类型的权限。"
 
 #: include/classes/api/services/CConfiguration.php:324
 msgid "No permissions to import template dashboards."
-msgstr ""
+msgstr "无导入模板仪表盘的权限。"
 
 #: include/classes/api/services/CConfiguration.php:315
 msgid "No permissions to import template groups."
-msgstr ""
+msgstr "无导入模板群组的权限。"
 
 #: include/classes/api/services/CConfiguration.php:322
 msgid "No permissions to import template links."
-msgstr ""
+msgstr "无导入模板链接的权限。"
 
 #: include/classes/api/services/CConfiguration.php:323
 msgid "No permissions to import templates."
-msgstr ""
+msgstr "无导入模板的权限。"
 
 #: include/classes/api/services/CConfiguration.php:325
 msgid "No permissions to import triggers."
-msgstr ""
+msgstr "无导入触发器的权限。"
 
 #: include/classes/api/services/CConfiguration.php:326
 msgid "No permissions to import value maps."
-msgstr ""
+msgstr "无导入值映射的权限。"
 
 #: include/classes/api/services/CConfiguration.php:317
 msgid "No permissions to import web scenarios."
-msgstr ""
+msgstr "无导入 Web 场景的权限。"
 
 #: app/controllers/CControllerChartsView.php:133
 #: app/controllers/CControllerDashboardPrint.php:99
@@ -16921,15 +16921,15 @@ msgstr "所有者"
 
 #: app/views/administration.authentication.edit.php:322
 msgid "PEM-encoded IdP certificate"
-msgstr ""
+msgstr "PEM 编码的 IdP 证书"
 
 #: app/views/administration.authentication.edit.php:373
 msgid "PEM-encoded SP certificate"
-msgstr ""
+msgstr "PEM 编码的 SP 证书"
 
 #: app/views/administration.authentication.edit.php:348
 msgid "PEM-encoded SP private key"
-msgstr ""
+msgstr "PEM 编码的 SP 私钥"
 
 #: include/classes/setup/CFrontendSetup.php:531
 msgid "PHP LDAP"
@@ -16970,7 +16970,7 @@ msgstr "PHP curl扩展"
 
 #: include/classes/setup/CFrontendSetup.php:733
 msgid "PHP curl extension is missing or outdated."
-msgstr ""
+msgstr "PHP curl 扩展缺失或版本过旧。"
 
 #: include/classes/setup/CFrontendSetup.php:691
 msgid "PHP curl extension missing."
@@ -18940,7 +18940,7 @@ msgstr "响应时间"
 #: include/classes/server/CZabbixServer.php:507
 #, c-format
 msgid "Response timeout of %1$s exceeded when connecting to Zabbix server \"%2$s\"."
-msgstr ""
+msgstr "连接至 Zabbix server \\%2$s\" 时超出响应超时时间 %1$s。\""
 
 #: app/controllers/CControllerMediatypeTestSend.php:182
 msgid "Response type: JSON"
@@ -19041,7 +19041,7 @@ msgstr "返回包含 Zabbix Server或Proxy的内部指标JSON对象。"
 
 #: include/classes/data/CItemData.php:2797
 msgid "Returns a JSON object containing database connection pool configuration and statistics."
-msgstr ""
+msgstr "返回包含数据库连接池配置和统计信息的 JSON 对象。"
 
 #: include/classes/data/CItemData.php:2673
 msgid "Returns availability of a particular type of checks on the host. Value of this item corresponds to availability icons in the host list. Valid types are: agent, active_agent, snmp, ipmi, jmx."
@@ -19408,7 +19408,7 @@ msgstr "SNMPv3 客户端"
 
 #: app/views/administration.authentication.edit.php:363
 msgid "SP certificate"
-msgstr ""
+msgstr "SP 证书"
 
 #: app/views/administration.authentication.edit.php:334
 msgid "SP entity ID"
@@ -19420,7 +19420,7 @@ msgstr "SP名称ID格式"
 
 #: app/views/administration.authentication.edit.php:338
 msgid "SP private key"
-msgstr ""
+msgstr "SP 私钥"
 
 #: include/classes/debug/CProfiler.php:158
 #, c-format
@@ -19565,7 +19565,7 @@ msgstr "扫描此二维码"
 
 #: widgets/scatterplot/Widget.php:24
 msgid "Scatter plot"
-msgstr ""
+msgstr "散点图"
 
 #: include/views/configuration.httpconf.edit.php:373
 msgid "Scenario"
@@ -20317,13 +20317,13 @@ msgstr "精简"
 #: app/views/administration.housekeeping.edit.php:187
 #, c-format
 msgid "Should be at least %1$s."
-msgstr ""
+msgstr "应至少为 %1$s。"
 
 #: app/partials/administration.system.info.php:262
 #: app/views/administration.housekeeping.edit.php:197
 #, c-format
 msgid "Should not be higher than %1$s."
-msgstr ""
+msgstr "不应高于 %1$s。"
 
 #: app/partials/monitoring.problem.filter.php:27
 #: app/views/monitoring.charts.view.php:80
@@ -20685,7 +20685,7 @@ msgstr "斯洛伐克(sk_SK)"
 
 #: widgets/scatterplot/includes/CWidgetFieldDataSetView.php:443
 msgid "Small"
-msgstr ""
+msgstr "小"
 
 #: jsLoader.php:288
 msgid "Snooze"
@@ -21457,7 +21457,7 @@ msgstr "标签名称和值的组合不唯一"
 #: app/controllers/CControllerMaintenanceCreate.php:93
 #: app/controllers/CControllerMaintenanceUpdate.php:94
 msgid "Tag name, operator and value combination is not unique."
-msgstr ""
+msgstr "标签名称、运算符和数值组合不唯一。"
 
 #: include/actions.inc.php:68
 msgid "Tag value"
@@ -21666,7 +21666,7 @@ msgstr "模板权限"
 
 #: app/partials/configuration.tags.tab.php:33
 msgid "Template tags"
-msgstr ""
+msgstr "模板标签"
 
 #: report2.php:398
 msgid "Template trigger"
@@ -21947,7 +21947,7 @@ msgstr "被发现的主机丢失它将在下次自动发现规则执行时被删
 
 #: app/controllers/CControllerHostPrototypeEdit.php:268
 msgid "The host prototype being cloned belongs to a host group you don't have write permissions to. Non-writable group has been removed from the new host prototype."
-msgstr ""
+msgstr "正在克隆的主机原型属于您没有写入权限的主机组。不可写入的组已从新主机原型中移除。"
 
 #: include/classes/api/services/CImage.php:555
 #, c-format
@@ -21991,7 +21991,7 @@ msgstr "用户属性中缺少参数“%1$s”。"
 
 #: app/views/popup.ldap.edit.php:101
 msgid "The previous password was cleared due to a host change. Please enter the new password."
-msgstr ""
+msgstr "由于主机变更，先前密码已被清除。请输入新密码。"
 
 #: include/classes/core/CJsonRpc.php:206
 msgid "The received JSON is not a valid JSON-RPC request."
@@ -22172,7 +22172,7 @@ msgstr "该值不符合模式要求"
 
 #: jsLoader.php:442
 msgid "This value is not a valid file."
-msgstr ""
+msgstr "该值不是有效的文件。"
 
 #: include/classes/validators/CFormValidator.php:874 jsLoader.php:424
 msgid "This value is not a valid floating-point value."
@@ -23190,11 +23190,11 @@ msgstr "无法检索 TimescaleDB 版本。"
 
 #: app/views/administration.housekeeping.edit.php:173
 msgid "Unable to retrieve compression support status of TimescaleDB time-series database extension for PostgreSQL."
-msgstr ""
+msgstr "无法检索 PostgreSQL 的 TimescaleDB 时序数据库扩展的压缩支持状态。"
 
 #: app/views/administration.housekeeping.edit.php:178
 msgid "Unable to retrieve version of TimescaleDB time-series database extension for PostgreSQL."
-msgstr ""
+msgstr "无法检索 PostgreSQL 的 TimescaleDB 时序数据库扩展的版本。"
 
 #: include/views/mfa.login.php:65
 #, c-format
@@ -23487,7 +23487,7 @@ msgstr "不支持的 %1$s 数据库服务版本。不得高于 %2$s。"
 #: app/partials/administration.system.info.php:206
 #: app/views/administration.housekeeping.edit.php:169
 msgid "Unsupported TimescaleDB time-series database extension for PostgreSQL is used."
-msgstr ""
+msgstr "使用了不受支持的 PostgreSQL TimescaleDB 时序数据库扩展。"
 
 #: app/views/administration.housekeeping.edit.php:190
 #, c-format
@@ -24936,7 +24936,7 @@ msgstr "告警信息"
 #: app/partials/administration.system.info.php:243
 #: app/partials/administration.system.info.php:262
 msgid "Warning!"
-msgstr ""
+msgstr "警告！"
 
 #: app/partials/administration.system.info.php:198
 msgid "Warning! Support for Oracle DB is deprecated since Zabbix 7.0 and will be removed in future versions."
@@ -25246,11 +25246,11 @@ msgstr "X"
 #: widgets/scatterplot/includes/WidgetForm.php:194
 #: widgets/scatterplot/includes/WidgetForm.php:199
 msgid "X axis"
-msgstr ""
+msgstr "X 轴"
 
 #: widgets/scatterplot/includes/WidgetForm.php:80
 msgid "X axis MAX value must be greater than X axis MIN value"
-msgstr ""
+msgstr "X 轴最大值必须大于 X 轴最小值"
 
 #: widgets/svggraph/includes/WidgetForm.php:341
 msgid "X-Axis"
@@ -25258,7 +25258,7 @@ msgstr "X轴"
 
 #: widgets/scatterplot/includes/CWidgetFieldAxisThresholdsView.php:40
 msgid "X-Axis threshold"
-msgstr ""
+msgstr "X 轴阈值"
 
 #: app/views/administration.miscconfig.edit.php:120
 msgid "X-Frame-Options HTTP header"
@@ -25317,7 +25317,7 @@ msgstr "Y"
 #: widgets/scatterplot/includes/WidgetForm.php:226
 #: widgets/scatterplot/includes/WidgetForm.php:231
 msgid "Y axis"
-msgstr ""
+msgstr "Y 轴"
 
 #: include/views/configuration.graph.edit.php:357
 msgid "Y axis MAX value"
@@ -25346,11 +25346,11 @@ msgstr "纵轴Y侧"
 #: widgets/scatterplot/includes/CWidgetFieldDataSetView.php:362
 #: widgets/scatterplot/includes/WidgetForm.php:216
 msgid "Y-Axis"
-msgstr ""
+msgstr "Y 轴"
 
 #: widgets/scatterplot/includes/CWidgetFieldAxisThresholdsView.php:41
 msgid "Y-Axis threshold"
-msgstr ""
+msgstr "Y 轴阈值"
 
 #: widgets/svggraph/includes/CWidgetFieldDataSetView.php:367
 #: widgets/svggraph/includes/CWidgetFieldOverrideView.php:185
@@ -25361,7 +25361,7 @@ msgstr "Y轴"
 
 #: include/translateDefines.inc.php:34
 msgid "Y-m-d"
-msgstr "Y/m/d"
+msgstr "Y-m-d"
 
 #: include/translateDefines.inc.php:32
 msgid "Y-m-d h:i A"
@@ -25674,7 +25674,7 @@ msgstr "Zabbix采集器"
 #: widgets/geomap/includes/WidgetForm.php:68
 #: widgets/geomap/includes/WidgetForm.php:72
 msgid "Zoom level"
-msgstr ""
+msgstr "缩放级别"
 
 #: include/classes/html/CFilter.php:258 include/classes/html/CTabFilter.php:324
 msgid "Zoom out"
@@ -25704,11 +25704,11 @@ msgstr "需用DNS域名"
 
 #: include/classes/validators/CApiInputValidator.php:4407
 msgid "a PEM-encoded certificate is expected"
-msgstr ""
+msgstr "应为 PEM 编码的证书"
 
 #: include/classes/validators/CApiInputValidator.php:4444
 msgid "a PEM-encoded private key is expected"
-msgstr ""
+msgstr "应为 PEM 编码的私钥"
 
 #: include/classes/validators/CApiInputValidator.php:1381
 msgid "a boolean is expected"
@@ -26569,7 +26569,7 @@ msgstr "目录不能为空"
 
 #: include/views/configuration.host.discovery.list.php:340
 msgid "discovery rule"
-msgstr ""
+msgstr "发现规则"
 
 #: app/controllers/CControllerItemMassCheckNow.php:138
 #: include/classes/api/services/CTask.php:562

@@ -60,8 +60,6 @@ import (
 
 func resolveMetric(key string) (cfunc unsafe.Pointer) {
 	switch key {
-	case "system.localtime":
-		cfunc = unsafe.Pointer(C.system_localtime)
 	case "vfs.dir.get":
 		cfunc = unsafe.Pointer(C.vfs_dir_get)
 	}

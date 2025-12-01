@@ -50,6 +50,8 @@ struct zbx_db_result
 
 static const zbx_db_config_t	*db_config = NULL;
 
+static zbx_db_query_mask_t	db_log_masked_values = ZBX_DB_DONT_MASK_QUERIES;
+
 #if defined(HAVE_POSTGRESQL)
 static 	ZBX_THREAD_LOCAL char	ZBX_PG_ESCAPE_BACKSLASH = 1;
 #elif defined(HAVE_SQLITE3)
@@ -119,6 +121,53 @@ void	dbconn_deinit(void)
 #endif
 }
 
+static char	*mask_skip_whitespace(char *s)
+{
+	while ('\0' != *s && 0 != isspace((unsigned char)*s))
+		s++;
+
+	return s;
+}
+
+static char	*mask_skip_tablename(char *s)
+{
+	while ('\0' != *s && (0 != isalnum((unsigned char)*s) || '_' == *s || '.' == *s))
+		s++;
+
+	return s;
+}
+
+static void	db_mask_printable_sql_values(char **sql)
+{
+#define	DB_MASK	"..."
+	char	*p, *end;
+
+	if (0 == strncmp(*sql, "insert into", ZBX_CONST_STRLEN("insert into")))
+	{
+		p = *sql + ZBX_CONST_STRLEN("insert into");
+	}
+	else if (0 == strncmp(*sql, "update", ZBX_CONST_STRLEN("update")))
+	{
+		p = *sql + ZBX_CONST_STRLEN("update");
+	}
+	else if (0 == strncmp(*sql, "select", ZBX_CONST_STRLEN("select")))
+	{
+		if (NULL == (p = strstr(*sql, " from ")))
+			return;
+
+		p += ZBX_CONST_STRLEN(" from ");
+	}
+	else
+		return;
+
+	p = mask_skip_whitespace(p);
+	end = mask_skip_tablename(p);
+	*end = '\0';
+
+	zbx_strlcpy(end, DB_MASK, ZBX_CONST_STRLEN(DB_MASK) + 1);
+#undef DB_MASK
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: replace non-printable characters in SQL query for logging         *
@@ -131,6 +180,9 @@ static char	*db_replace_nonprintable_chars(const char *sql, char **sql_printable
 		*sql_printable = zbx_strdup(NULL, sql);
 		zbx_replace_invalid_utf8_and_nonprintable(*sql_printable);
 	}
+
+	if (ZBX_DB_MASK_QUERIES == db_log_masked_values)
+		db_mask_printable_sql_values(sql_printable);
 
 	return *sql_printable;
 }
@@ -2697,4 +2749,27 @@ void	zbx_db_large_query_clear(zbx_db_large_query_t *query)
 void	zbx_dbconn_large_query_append_sql(zbx_db_large_query_t *query, const char *sql)
 {
 	query->suffix = zbx_strdup(NULL, sql);
+}
+
+zbx_db_query_mask_t	zbx_db_set_log_masked_values(zbx_db_query_mask_t flag)
+{
+#ifdef ZBX_DEBUG
+	ZBX_UNUSED(flag);
+	return ZBX_DB_DONT_MASK_QUERIES;
+#else
+	zbx_db_query_mask_t	prev_flag = db_log_masked_values;
+
+	db_log_masked_values = flag;
+
+	return prev_flag;
+#endif
+}
+
+zbx_db_query_mask_t	zbx_db_get_log_masked_values(void)
+{
+#ifdef ZBX_DEBUG
+	return ZBX_DB_DONT_MASK_QUERIES;
+#else
+	return db_log_masked_values;
+#endif
 }
