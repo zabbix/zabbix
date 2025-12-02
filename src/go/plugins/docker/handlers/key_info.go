@@ -24,52 +24,54 @@ import (
 
 // info contains response of Engine API:
 // GET "/info".
+//
+//nolint:tagliatelle // Docker API uses non-standard naming conventions.
 type info struct {
-	ID                 string `json:"Id"` //nolint:tagliatelle
-	Containers         int
-	ContainersRunning  int
-	ContainersPaused   int
-	ContainersStopped  int
-	Images             int
-	Driver             string
-	MemoryLimit        bool
-	SwapLimit          bool
-	KernelMemory       bool
-	KernelMemoryTCP    bool
-	CPUCfsPeriod       bool `json:"CpuCfsPeriod"` //nolint:tagliatelle
-	CPUCfsQuota        bool `json:"CpuCfsQuota"`  //nolint:tagliatelle
-	CPUShares          bool
-	CPUSet             bool
-	PidsLimit          bool
-	IPv4Forwarding     bool
-	BridgeNfIptables   bool
-	BridgeNfIP6tables  bool
-	Debug              bool
-	NFd                int
-	OomKillDisable     bool
-	NGoroutines        int
-	LoggingDriver      string
-	CgroupDriver       string
-	NEventsListener    int
-	KernelVersion      string
-	OperatingSystem    string
-	OSVersion          string
-	OSType             string
-	Architecture       string
-	IndexServerAddress string
-	NCPU               int
-	MemTotal           int64
-	DockerRootDir      string
-	Name               string
-	ExperimentalBuild  bool
-	ServerVersion      string
-	ClusterStore       string
-	ClusterAdvertise   string
-	DefaultRuntime     string
-	LiveRestoreEnabled bool
-	InitBinary         string
-	SecurityOptions    []string
-	Warnings           []string
+	ID                 string   `json:"ID"`
+	Containers         int      `json:"Containers"`
+	ContainersRunning  int      `json:"ContainersRunning"`
+	ContainersPaused   int      `json:"ContainersPaused"`
+	ContainersStopped  int      `json:"ContainersStopped"`
+	Images             int      `json:"Images"`
+	Driver             string   `json:"Driver"`
+	MemoryLimit        bool     `json:"MemoryLimit"`
+	SwapLimit          bool     `json:"SwapLimit"`
+	KernelMemory       bool     `json:"KernelMemory,omitempty"`
+	KernelMemoryTCP    bool     `json:"KernelMemoryTCP,omitempty"`
+	CPUCfsPeriod       bool     `json:"CpuCfsPeriod"`
+	CPUCfsQuota        bool     `json:"CpuCfsQuota"`
+	CPUShares          bool     `json:"CPUShares"`
+	CPUSet             bool     `json:"CPUSet"`
+	PidsLimit          bool     `json:"PidsLimit"`
+	IPv4Forwarding     bool     `json:"IPv4Forwarding"`
+	BridgeNfIptables   bool     `json:"BridgeNfIptables,omitempty"`
+	BridgeNfIP6tables  bool     `json:"BridgeNfIP6tables,omitempty"`
+	Debug              bool     `json:"Debug"`
+	NFd                int      `json:"NFd"`
+	OomKillDisable     bool     `json:"OomKillDisable"`
+	NGoroutines        int      `json:"NGoroutines"`
+	LoggingDriver      string   `json:"LoggingDriver"`
+	CgroupDriver       string   `json:"CgroupDriver"`
+	NEventsListener    int      `json:"NEventsListener"`
+	KernelVersion      string   `json:"KernelVersion"`
+	OperatingSystem    string   `json:"OperatingSystem"`
+	OSVersion          string   `json:"OSVersion"`
+	OSType             string   `json:"OSType"`
+	Architecture       string   `json:"Architecture"`
+	IndexServerAddress string   `json:"IndexServerAddress"`
+	NCPU               int      `json:"NCPU"`
+	MemTotal           int64    `json:"MemTotal"`
+	DockerRootDir      string   `json:"DockerRootDir"`
+	Name               string   `json:"Name"`
+	ExperimentalBuild  bool     `json:"ExperimentalBuild"`
+	ServerVersion      string   `json:"ServerVersion"`
+	ClusterStore       string   `json:"ClusterStore,omitempty"`
+	ClusterAdvertise   string   `json:"ClusterAdvertise,omitempty"`
+	DefaultRuntime     string   `json:"DefaultRuntime"`
+	LiveRestoreEnabled bool     `json:"LiveRestoreEnabled"`
+	InitBinary         string   `json:"InitBinary"`
+	SecurityOptions    []string `json:"SecurityOptions"`
+	Warnings           []string `json:"Warnings"`
 }
 
 func keyInfoHandler(client *http.Client, query string, _ ...string) (string, error) {
@@ -80,7 +82,8 @@ func keyInfoHandler(client *http.Client, query string, _ ...string) (string, err
 		return "", err
 	}
 
-	if err = json.Unmarshal(body, &data); err != nil {
+	err = json.Unmarshal(body, &data)
+	if err != nil {
 		return "", errs.WrapConst(err, zbxerr.ErrorCannotUnmarshalJSON)
 	}
 
