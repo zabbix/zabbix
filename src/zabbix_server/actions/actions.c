@@ -2732,7 +2732,7 @@ static void	execute_operations(const zbx_db_event *event, zbx_uint64_t actionid)
 				;
 		}
 
-		if (0 != needs_host && 0 == hostid && 0 == ensure_discovered_host(event, &cfg, &hostid, &status))
+		if (0 != needs_host && 0 == ensure_discovered_host(event, &cfg, &hostid, &status))
 			continue;
 
 		switch (operationtype)
