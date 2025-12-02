@@ -101,9 +101,7 @@ window.oauth_edit_popup = new class {
 
 			this.form.querySelector('#oauth-token-parameters-table')
 				.addEventListener('input', e => {
-					if (e.target.name.startsWith('token_url_parameters')) {
-						this.#showClientSecretWithWarning();
-					}
+					this.#showClientSecretWithWarning();
 				});
 
 			this.form.querySelector('#oauth-token-parameters-table')
@@ -162,7 +160,6 @@ window.oauth_edit_popup = new class {
 		if (input_element !== null) {
 			input_element.style.display = '';
 			input_element.removeAttribute('disabled');
-			input_element.focus();
 		}
 	}
 
