@@ -76,12 +76,30 @@ class CNumberValidator extends CValidator {
 			return true;
 		}
 
-		if ($this->min !== null && bccomp($value, $this->min) == -1) {
+		$scale = getNumDecimals(floatval($value));
+
+		if ($this->min !== null) {
+			$precision = getNumDecimals(floatval($this->min));
+
+			if ($precision > $scale) {
+				$scale = $precision;
+			}
+		}
+
+		if ($this->max !== null) {
+			$precision = getNumDecimals(floatval($this->max));
+
+			if ($precision > $scale) {
+				$scale = $precision;
+			}
+		}
+
+		if ($this->min !== null && bccomp($value, $this->min, $scale) == -1) {
 			$this->setError(_s('value must be greater than or equal to %1$s', $this->min));
 
 			return false;
 		}
-		elseif ($this->max !== null && bccomp($value, $this->max) == 1) {
+		elseif ($this->max !== null && bccomp($value, $this->max, $scale) == 1) {
 			$this->setError(_s('value must be less than or equal to %1$s', $this->max));
 
 			return false;
