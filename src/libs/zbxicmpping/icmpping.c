@@ -733,22 +733,18 @@ static void	line_process(zbx_fping_resp *resp, zbx_fping_args *args)
  *                                                                            *
  * Parameters: resp               - [IN] fping output                         *
  *             args               - [IN/OUT] host data and fping settings     *
- *             max_execution_time - [IN] maximum allowed execution time in    *
- *                                       seconds; 0 - no limit                *
  *                                                                            *
  * Return value: SUCCEED      - fping output processed successfully           *
  *               NOTSUPPORTED - unexpected error or timeout exceeded          *
  *                                                                            *
  ******************************************************************************/
-static int	fping_output_process(zbx_fping_resp *resp, zbx_fping_args *args, int max_execution_time)
+static int	fping_output_process(zbx_fping_resp *resp, zbx_fping_args *args)
 {
+#define ZBX_ITEM_TIMEOUT_MAX	600
 	int	i, ret = NOTSUPPORTED;
-	time_t	start_time = 0;
+	time_t	start_time = time(NULL);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
-
-	if (0 != max_execution_time)
-		start_time = time(NULL);
 
 	if (NULL == zbx_fgets(resp->linebuf, (int)resp->linebuf_size, resp->input_pipe))
 	{
@@ -764,10 +760,10 @@ static int	fping_output_process(zbx_fping_resp *resp, zbx_fping_args *args, int 
 
 		do
 		{
-			if (0 != max_execution_time && (int)(time(NULL) - start_time) > max_execution_time)
+			if ((int)(time(NULL) - start_time) > ZBX_ITEM_TIMEOUT_MAX)
 			{
 				zabbix_log(LOG_LEVEL_WARNING, "fping execution time limit (%ds) exceeded, "
-						"stopping output processing", max_execution_time);
+						"stopping output processing", ZBX_ITEM_TIMEOUT_MAX);
 				ret = NOTSUPPORTED;
 				break;
 			}
@@ -785,11 +781,11 @@ static int	fping_output_process(zbx_fping_resp *resp, zbx_fping_args *args, int 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
+#undef ZBX_ITEM_TIMEOUT_MAX
 }
 
 static int	hosts_ping(zbx_fping_host_t *hosts, int hosts_count, int requests_count, int interval, int size,
-		int timeout, unsigned char allow_redirect, int rdns, int max_execution_time, char *error,
-		size_t max_error_len)
+		int timeout, unsigned char allow_redirect, int rdns, char *error, size_t max_error_len)
 {
 	const int	response_time_chars_max = 20;
 	FILE		*f;
@@ -1140,7 +1136,7 @@ static int	hosts_ping(zbx_fping_host_t *hosts, int hosts_count, int requests_cou
 #ifdef HAVE_IPV6
 	fping_args.fping_existence = fping_existence;
 #endif
-	if (SUCCEED == fping_output_process(&fping_resp, &fping_args, max_execution_time))
+	if (SUCCEED == fping_output_process(&fping_resp, &fping_args))
 	{
 		ret = SUCCEED;
 	}
@@ -1210,8 +1206,6 @@ void	zbx_init_icmpping_env(const char *prefix, long int id)
  *                                    0 - no, 1 - yes                         *
  *             rdns           - [IN]  flag required rdns option               *
  *                                   (fping option -dA)                       *
- *             max_execution_time - [IN]  maximum allowed execution time in   *
- *                                         seconds; 0 - no limit              *
  *             error          - [OUT] error string if function fails          *
  *             max_error_len  - [IN]  length of error buffer                  *
  *                                                                            *
@@ -1222,15 +1216,14 @@ void	zbx_init_icmpping_env(const char *prefix, long int id)
  *                                                                            *
  ******************************************************************************/
 int	zbx_ping(zbx_fping_host_t *hosts, int hosts_count, int requests_count, int period, int size, int timeout,
-		unsigned char allow_redirect, int rdns, int max_execution_time, char *error, size_t max_error_len)
+		unsigned char allow_redirect, int rdns, char *error, size_t max_error_len)
 {
 	int	ret;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() hosts_count:%d max_execution_time:%ds", __func__, hosts_count,
-			max_execution_time);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() hosts_count:%d", __func__, hosts_count);
 
-	if (NOTSUPPORTED == (ret = hosts_ping(hosts, hosts_count, requests_count, period, size, timeout,
-			allow_redirect, rdns, max_execution_time, error, max_error_len)))
+	if (NOTSUPPORTED == (ret = hosts_ping(hosts, hosts_count, requests_count, period, size, timeout, allow_redirect,
+			rdns, error, max_error_len)))
 	{
 		zabbix_log(LOG_LEVEL_ERR, "%s", error);
 	}
