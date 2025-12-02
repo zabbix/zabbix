@@ -18,7 +18,8 @@ import (
 	"net/http"
 )
 
-var handlers = map[DockerKey]Handler{ //nolint:gochecknoglobals // constant map.
+//nolint:gochecknoglobals // constant map.
+var handlers = map[DockerKey]Handler{
 	KeyInfo:                keyInfoHandler,
 	KeyContainers:          keyContainersHandler,
 	KeyContainersDiscovery: keyContainersDiscovery,
