@@ -33,6 +33,9 @@ class HostTemplateGroups {
 			],
 			[
 				'name' => 'Second group to one object for Delete test'
+			],
+			[
+				'name' => 'Multiple   spaces   in template group name'
 			]
 		]);
 		$template_groupids = CDataHelper::getIds('name');
@@ -83,6 +86,9 @@ class HostTemplateGroups {
 			],
 			[
 				'name' => 'Group for hostgroup discovery'
+			],
+			[
+				'name' => 'Multiple   spaces   in host group name'
 			]
 		]);
 		$host_groupids = CDataHelper::getIds('name');

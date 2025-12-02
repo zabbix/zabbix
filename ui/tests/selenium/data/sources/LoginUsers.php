@@ -272,6 +272,11 @@ class LoginUsers {
 				'(127,'.zbx_dbstr($actionid).', 1, '.zbx_dbstr($userids['disabled-user']).', 1478122535, 3, \'notificatio.report@zabbix.com\', \'PROBLEM: problem\', \'Event at 2016.11.02 23:35:35\', 1, 0, \'\', 1, 1, \'\')'
 		);
 
+		// Profile with default selected dashboard (Global view).
+		DBexecute('INSERT INTO profiles (profileid, userid, idx, value_id, value_str, source, type) VALUES '.
+				' (4, 1, \'web.dashboard.dashboardid\', 1, \'\', \'\', 1);'
+		);
+
 		return [
 			'userids' => $userids, 'usrgrpids' => $usergrpids
 		];

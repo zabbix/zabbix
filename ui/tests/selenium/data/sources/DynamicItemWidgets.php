@@ -72,6 +72,12 @@ class DynamicItemWidgets {
 						'value_type' => ITEM_VALUE_TYPE_FLOAT
 					]
 				]
+			],
+			[
+				'host' => 'Multiple   spaces   in host name',
+				'groups' => [
+					'groupid' => $groupids['Dynamic widgets HG2 (H3)']
+				]
 			]
 		]);
 		$itemids = CDataHelper::getIds('name');

@@ -58,8 +58,9 @@ class CImage extends CApiService {
 
 		$sqlParts = [
 			'select'	=> ['images' => 'i.imageid'],
-			'from'		=> ['images' => 'images i'],
+			'from'		=> 'images i',
 			'where'		=> [],
+			'group'		=> [],
 			'order'		=> [],
 			'limit'		=> null
 		];
@@ -101,19 +102,18 @@ class CImage extends CApiService {
 		if (!is_null($options['sysmapids'])) {
 			zbx_value2array($options['sysmapids']);
 
-			$sqlParts['from']['sysmaps'] = 'sysmaps sm';
-			$sqlParts['from']['sysmaps_elements'] = 'sysmaps_elements se';
-			$sqlParts['where']['sm'] = dbConditionInt('sm.sysmapid', $options['sysmapids']);
-			$sqlParts['where']['smse_or_bg'] = '('.
-				'sm.backgroundid=i.imageid'.
-				' OR ('.
-					'sm.sysmapid=se.sysmapid'.
-					' AND ('.
-						'se.iconid_off=i.imageid'.
-						' OR se.iconid_on=i.imageid'.
-						' OR se.iconid_disabled=i.imageid'.
-						' OR se.iconid_maintenance=i.imageid'.
-					')'.
+			$sqlParts['where'][] = '('.
+				'EXISTS ('.
+					'SELECT NULL'.
+					' FROM sysmaps sm'.
+					' WHERE i.imageid=sm.backgroundid'.
+						' AND '.dbConditionInt('sm.sysmapid', $options['sysmapids']).
+				')'.
+				' OR EXISTS ('.
+					'SELECT NULL'.
+					' FROM sysmaps_elements se'.
+					' WHERE i.imageid IN (se.iconid_off,se.iconid_on,se.iconid_disabled,se.iconid_maintenance)'.
+						' AND '.dbConditionInt('se.sysmapid', $options['sysmapids']).
 				')'.
 			')';
 		}

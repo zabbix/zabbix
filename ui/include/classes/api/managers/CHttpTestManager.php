@@ -1445,6 +1445,7 @@ class CHttpTestManager {
 			' FROM hosts_templates ht,hosts h'.
 			' WHERE ht.hostid=h.hostid'.
 				' AND '.dbConditionId('ht.templateid', array_column($httptests, 'hostid')).
+				' AND '.dbConditionInt('flags', [ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED]).
 				$hostids_condition
 		);
 

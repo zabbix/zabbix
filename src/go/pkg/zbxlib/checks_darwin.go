@@ -48,8 +48,6 @@ import (
 
 func resolveMetric(key string) (cfunc unsafe.Pointer) {
 	switch key {
-	case "system.localtime":
-		return unsafe.Pointer(C.system_localtime)
 	case "system.boottime":
 		return unsafe.Pointer(C.system_boottime)
 	case "net.tcp.listen":

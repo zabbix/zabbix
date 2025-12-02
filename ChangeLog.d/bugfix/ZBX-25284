@@ -1,0 +1,1 @@
+A...I..... [ZBX-25284] prevented web scenarios being inherited to host prototypes; fixed inability to delete parent host in such case (jfreibergs)

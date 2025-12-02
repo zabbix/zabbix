@@ -144,5 +144,6 @@ LIBS = ws2_32.lib psapi.lib pdh.lib Wldap32.lib advapi32.lib uuid.lib Iphlpapi.l
 
 !INCLUDE Makefile_pcre.inc
 !INCLUDE Makefile_tls.inc
+!INCLUDE Makefile_curl.inc
 !INCLUDE Makefile_modbus.inc
 !INCLUDE Makefile_targets.inc

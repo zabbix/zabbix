@@ -304,10 +304,6 @@ $compact-view-color: #1f2c33 !default;
 $compact-view-tag-color: #ffffff !default;
 $compact-view-tag-bg-color: rgba($compact-view-color, .5) !default;
 
-// Dashboard list table.
-$dashboard-shared-bg-color: darken(desaturate($alt-yellow, 9%), 20%) !default;
-$dashboard-my-bg-color: darken(desaturate($alt-green, 10%), 20%) !default;
-
 // Import compare.
 $toc-title-color: #ffffff !default;
 $toc-title-bg-color: #768d99 !default;

@@ -378,6 +378,15 @@ class testPageMonitoringHosts extends CWebTest {
 						'Unknown host in maintenance'
 					]
 				]
+			],
+			// #20.
+			[
+				[
+					'filter' => [
+						'Name' => '   '
+					],
+					'expected' => ['Multiple spaces in host name']
+				]
 			]
 		];
 	}

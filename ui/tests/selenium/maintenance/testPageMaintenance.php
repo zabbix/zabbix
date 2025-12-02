@@ -62,6 +62,14 @@ class testPageMaintenance extends CWebTest {
 				'timeperiods' => [[]]
 			],
 			[
+				'name' => 'Multiple   spaces   in maintenance name',
+				'maintenance_type' => MAINTENANCE_TYPE_NODATA,
+				'active_since' => 2017008000,
+				'active_till' => 2019600000,
+				'groups' => [['groupid' => CDataHelper::get('HostTemplateGroups.hostgroups.Group for Maintenance')]],
+				'timeperiods' => [[]]
+			],
+			[
 				'name' => self::MULTIPLE_GROUPS_MAINTENANCE,
 				'maintenance_type' => MAINTENANCE_TYPE_NODATA,
 				'active_since' => 1388534400,
@@ -271,6 +279,14 @@ class testPageMaintenance extends CWebTest {
 						'Active till' => '2023-07-06 03:00',
 						'State' => 'Expired',
 						'Description' => ''
+					],
+					[
+						'Name' => 'Multiple spaces in maintenance name',
+						'Type' => 'No data collection',
+						'Active since' => '2033-12-01 02:00',
+						'Active till' => '2033-12-31 02:00',
+						'State' => 'Approaching',
+						'Description' => ''
 					]
 				]
 			]
@@ -377,7 +393,8 @@ class testPageMaintenance extends CWebTest {
 				[
 					'filter' => [
 						'Name' => '  '
-					]
+					],
+					'expected' => ['Multiple spaces in maintenance name']
 				]
 			],
 			// #3 Name with special symbols.
@@ -419,7 +436,8 @@ class testPageMaintenance extends CWebTest {
 						'State' => 'Approaching'
 					],
 					'expected' => [
-						self::APPROACHING_MAINTENANCE
+						self::APPROACHING_MAINTENANCE,
+						'Multiple spaces in maintenance name'
 					]
 				]
 			],
@@ -459,7 +477,8 @@ class testPageMaintenance extends CWebTest {
 						'Maintenance period 2 (no data collection)',
 						self::MULTIPLE_GROUPS_MAINTENANCE,
 						self::HOST_MAINTENANCE,
-						self::FILTER_NAME_MAINTENANCE
+						self::FILTER_NAME_MAINTENANCE,
+						'Multiple spaces in maintenance name'
 					]
 				]
 			],

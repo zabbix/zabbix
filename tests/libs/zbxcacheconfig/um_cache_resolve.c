@@ -50,6 +50,8 @@ void	zbx_mock_test_entry(void **state)
 	int			ret;
 	zbx_config_vault_t	config_vault = {NULL, NULL, NULL, NULL, NULL, NULL, NULL};
 
+	zbx_config_wlock_set_locked();
+
 	ZBX_UNUSED(state);
 
 	zbx_vector_uint64_create(&hostids);

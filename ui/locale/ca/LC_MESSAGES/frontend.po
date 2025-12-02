@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2025-10-28 17:16+0000\n"
+"PO-Revision-Date: 2025-11-06 22:05+0000\n"
 "Last-Translator: Xevi Noè i Nogueiras <xevi.noe@gmail.com>\n"
 "Language-Team: none\n"
 "Language: ca\n"
@@ -4242,6 +4242,10 @@ msgstr "No es pot pas establir \"%1$s\" per al prototip de gràfic \"%2$s\"."
 #: widgets/piechart/includes/CWidgetFieldDataSet.php:175
 msgid "Cannot set \"Data set aggregation\" when item with type \"Total\" is added to the chart."
 msgstr "No es pot pas establir \"Afegit del conjunt de dades\" quan s'afegeix un element de tipus \"Total\" al gràfic."
+
+#: include/classes/db/MysqlDbBackend.php:197
+msgid "Cannot set charset."
+msgstr "No es pot definir el joc de caràcters."
 
 #: include/classes/api/services/CItemGeneral.php:2478
 #, c-format
@@ -9301,7 +9305,7 @@ msgstr "Suma de comprovació de fitxers, calculada per l'algoritme cksum de UNIX
 
 #: include/classes/validators/CFormValidator.php:1451 jsLoader.php:445
 msgid "File format is unsupported."
-msgstr ""
+msgstr "El format de fitxer no és pas compatible."
 
 #: include/classes/import/readers/CYamlImportReader.php:52
 msgid "File is empty"
@@ -9323,7 +9327,7 @@ msgstr "Mida del fitxer en octets (per defecte) o en noves línies. Retorna un n
 #: include/classes/helpers/CUploadFile.php:129 jsLoader.php:444
 #, c-format
 msgid "File size must be less than %1$s."
-msgstr ""
+msgstr "La mida del fitxer ha d'ésser inferior a %1$s."
 
 #: include/classes/data/CItemData.php:1687
 msgid "File time information. Returns integer (Unix timestamp)"
@@ -12166,15 +12170,15 @@ msgstr "Macros prototip i equips heretats"
 
 #: include/classes/helpers/CTagHelper.php:230
 msgid "Inherited and host tag"
-msgstr ""
+msgstr "Etiquetes d'equip i heretades"
 
 #: app/partials/configuration.tags.tab.php:42
 msgid "Inherited and host tags"
-msgstr ""
+msgstr "Etiquetes d'equip i heretades"
 
 #: include/classes/helpers/CTagHelper.php:231
 msgid "Inherited and item tag"
-msgstr ""
+msgstr "Etiqueta d'equip i heretades"
 
 #: app/partials/configuration.tags.tab.php:165
 msgid "Inherited and item tags"
@@ -12190,15 +12194,15 @@ msgstr "Macros i plantilles heretades"
 
 #: include/classes/helpers/CTagHelper.php:229
 msgid "Inherited and template tag"
-msgstr ""
+msgstr "Plantilla d'etiqueta d'equip i heretades"
 
 #: app/partials/configuration.tags.tab.php:33
 msgid "Inherited and template tags"
-msgstr ""
+msgstr "Plantilles d'etiquetes d'equip i heretades"
 
 #: include/classes/helpers/CTagHelper.php:232
 msgid "Inherited and trigger tag"
-msgstr ""
+msgstr "Etiqueta i triggers heretats"
 
 #: app/partials/configuration.tags.tab.php:155
 msgid "Inherited and trigger tags"
@@ -12206,7 +12210,7 @@ msgstr "Etiquetes i triggers heretats"
 
 #: include/classes/helpers/CTagHelper.php:233
 msgid "Inherited and web scenario tag"
-msgstr ""
+msgstr "Etiquetes i escenaris web heretats"
 
 #: include/forms.inc.php:311
 msgid "Inherited items"
@@ -12214,7 +12218,7 @@ msgstr "Elements heretats"
 
 #: include/classes/helpers/CTagHelper.php:222
 msgid "Inherited tag"
-msgstr ""
+msgstr "Etiquetes heretades"
 
 #: widgets/geomap/includes/WidgetForm.php:62
 msgid "Initial view"
@@ -21832,7 +21836,7 @@ msgstr "Permisos de plantilles"
 
 #: app/partials/configuration.tags.tab.php:33
 msgid "Template tags"
-msgstr ""
+msgstr "Etiquetes de plantilla"
 
 #: report2.php:398
 msgid "Template trigger"
@@ -22343,7 +22347,7 @@ msgstr "Aquest valor no coincideix amb el patró."
 
 #: jsLoader.php:442
 msgid "This value is not a valid file."
-msgstr ""
+msgstr "Aquest valor no és un arxiu vàlid."
 
 #: include/classes/validators/CFormValidator.php:874 jsLoader.php:424
 msgid "This value is not a valid floating-point value."

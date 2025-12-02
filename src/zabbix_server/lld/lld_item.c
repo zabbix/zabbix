@@ -1192,11 +1192,22 @@ static void	lld_validate_item_field(zbx_lld_item_full_t *item, char **field, cha
 		switch (flag)
 		{
 			case ZBX_FLAG_LLD_ITEM_UPDATE_NAME:
-				if ('\0' != **field)
-					return;
-
-				lld_item_add_error(item, error, "name is empty");
-				break;
+				if ('\0' == **field)
+				{
+					lld_item_add_error(item, error, "name is empty");
+					break;
+				}
+				return;
+			case ZBX_FLAG_LLD_ITEM_UPDATE_KEY:
+				if (0 != (item->item_flags & ZBX_FLAG_DISCOVERY_PROTOTYPE))
+				{
+					if (SUCCEED != lld_text_has_lld_macro(*field))
+					{
+						lld_item_add_error(item, error, "key does not contain LLD macro");
+						break;
+					}
+				}
+				return;
 			case ZBX_FLAG_LLD_ITEM_UPDATE_DELAY:
 				switch (item->type)
 				{
@@ -3195,7 +3206,7 @@ static void	lld_item_prepare_update(const zbx_lld_item_prototype_t *item_prototy
 
 		zbx_audit_item_update_json_update_password(ZBX_AUDIT_LLD_CONTEXT, item->itemid,
 				item->item_flags, (0 == strcmp("", item->password_orig) ? "" :
-				ZBX_MACRO_SECRET_MASK), (0 == strcmp("", item->password) ? "" : ZBX_MACRO_SECRET_MASK));
+				ZBX_SECRET_MASK), (0 == strcmp("", item->password) ? "" : ZBX_SECRET_MASK));
 		zbx_free(value_esc);
 	}
 	if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_PUBLICKEY))
@@ -3383,8 +3394,8 @@ static void	lld_item_prepare_update(const zbx_lld_item_prototype_t *item_prototy
 		d = ",";
 		zbx_audit_item_update_json_update_ssl_key_password(ZBX_AUDIT_LLD_CONTEXT, item->itemid,
 				item->item_flags, (0 == strcmp("", item->ssl_key_password_orig) ?
-				"" : ZBX_MACRO_SECRET_MASK), (0 == strcmp("", item->ssl_key_password) ? "" :
-				ZBX_MACRO_SECRET_MASK));
+				"" : ZBX_SECRET_MASK), (0 == strcmp("", item->ssl_key_password) ? "" :
+				ZBX_SECRET_MASK));
 		zbx_free(value_esc);
 	}
 	if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_VERIFY_PEER))

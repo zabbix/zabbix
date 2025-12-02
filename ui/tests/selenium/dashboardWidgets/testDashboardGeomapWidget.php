@@ -20,6 +20,8 @@ require_once __DIR__.'/../behaviors/CMessageBehavior.php';
 /**
  * @backup settings, widget
  *
+ * @dataSource HostAvailabilityWidget
+ *
  * @onBefore prepareDashboardData
  */
 class testDashboardGeomapWidget extends testWidgets {

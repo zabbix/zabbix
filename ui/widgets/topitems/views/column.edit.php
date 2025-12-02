@@ -94,8 +94,8 @@ $form_grid->addItem([
 	new CLabel(_('Display value as'), 'display_value_as'),
 	new CFormField(
 		(new CRadioButtonList('display_value_as', (int) $data['display_value_as']))
-			->addValue(_('Numeric'), CWidgetFieldColumnsList::DISPLAY_AS_IS)
-			->addValue(_('Text'), CWidgetFieldColumnsList::DISPLAY_BAR)
+			->addValue(_('Numeric'), CWidgetFieldColumnsList::DISPLAY_VALUE_AS_NUMERIC)
+			->addValue(_('Text'), CWidgetFieldColumnsList::DISPLAY_VALUE_AS_TEXT)
 			->setModern()
 	)
 ]);

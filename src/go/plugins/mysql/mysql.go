@@ -30,7 +30,6 @@ import (
 const (
 	sqlExt     = ".sql"
 	pluginName = "Mysql"
-	hkInterval = 10
 )
 
 // Plugin inherits plugin.Base and store plugin-specific data.
@@ -98,7 +97,6 @@ func (p *Plugin) Start() {
 		keepAlive:      time.Duration(p.options.KeepAlive) * time.Second,
 		connectTimeout: time.Duration(p.options.Timeout) * time.Second,
 		callTimeout:    time.Duration(p.options.CallTimeout) * time.Second,
-		hkInterval:     hkInterval * time.Second,
 		queryStorage:   p.setCustomQuery(),
 		logger:         p.Logger,
 	}

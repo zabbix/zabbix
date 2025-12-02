@@ -33,10 +33,10 @@ This template has been tested on:
 
 |Name|Description|Default|
 |----|-----------|-------|
-|{$URL}|<p>AFF700 cluster URL address.</p>||
-|{$USERNAME}|<p>AFF700 user name.</p>||
-|{$PASSWORD}|<p>AFF700 user password.</p>||
-|{$HTTP.AGENT.TIMEOUT}|<p>The HTTP agent timeout to wait for a response from AFF700.</p>|`5s`|
+|{$NETAPP.URL}|<p>AFF700 cluster URL address.</p>||
+|{$NETAPP.USERNAME}|<p>AFF700 user name.</p>||
+|{$NETAPP.PASSWORD}|<p>AFF700 user password.</p>||
+|{$NETAPP.HTTP.AGENT.TIMEOUT}|<p>The HTTP agent timeout to wait for a response from AFF700.</p>|`5s`|
 
 ### Items
 

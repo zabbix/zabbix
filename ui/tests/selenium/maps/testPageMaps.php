@@ -50,7 +50,8 @@ class testPageMaps extends CWebTest {
 	const SYSMAP_HIGH_WIDTH = 'Map with highest width';
 	const SYSMAP_LOW_HEIGHT = 'Map with lowest height';
 	const SYSMAP_HIGH_HEIGHT = 'Map with highest height';
-	const SYSMAP_SPACES_NAME = 'Map to check that there is no trim for spaces';
+	const SYSMAP_SPACES_NAME = 'Map to check that   there   is no trim for spaces';
+	const SYSMAP_NO_SAPCE_NAME = 'Map to check that there is no trim for spaces';
 	protected static $sysmapids;
 
 	public function prepareMapsData() {
@@ -170,7 +171,7 @@ class testPageMaps extends CWebTest {
 						'Height' => '1000'
 					],
 					[
-						'Name' => self::SYSMAP_SPACES_NAME,
+						'Name' => self::SYSMAP_NO_SAPCE_NAME,
 						'Width' => '600',
 						'Height' => '600'
 					]
@@ -204,6 +205,9 @@ class testPageMaps extends CWebTest {
 
 		// Check links for created maps.
 		foreach (self::$sysmapids as $name => $id) {
+			// Frontend does not display more than one space in labels.
+			$no_spaces = ($name === self::SYSMAP_SPACES_NAME) ? self::SYSMAP_NO_SAPCE_NAME : $name;
+
 			$row = $this->getTable()->findRow('Name', $name);
 			$this->assertEquals('sysmaps.php?form=update&sysmapid='.$id, $row->getColumn('Actions')
 					->query('link:Properties')->one()->getAttribute('href')
@@ -212,7 +216,7 @@ class testPageMaps extends CWebTest {
 					->getAttribute('href')
 			);
 			$this->assertEquals('zabbix.php?action=map.view&sysmapid='.$id, $row->getColumn('Name')
-					->query('link', $name)->one()->getAttribute('href')
+					->query('link', $no_spaces)->one()->getAttribute('href')
 			);
 		}
 
@@ -304,7 +308,7 @@ class testPageMaps extends CWebTest {
 						'Map for testing feedback',
 						'Map for widget communication test',
 						'Map for widget copies',
-						self::SYSMAP_SPACES_NAME,
+						self::SYSMAP_NO_SAPCE_NAME,
 						self::SYSMAP_HIGH_HEIGHT,
 						self::SYSMAP_HIGH_WIDTH,
 						'Map with icon mapping',
@@ -347,7 +351,7 @@ class testPageMaps extends CWebTest {
 						'Map for testing feedback',
 						'Map for widget communication test',
 						'Map for widget copies',
-						self::SYSMAP_SPACES_NAME,
+						self::SYSMAP_NO_SAPCE_NAME,
 						self::SYSMAP_HIGH_HEIGHT,
 						self::SYSMAP_HIGH_WIDTH,
 						'Map with icon mapping',
@@ -366,7 +370,10 @@ class testPageMaps extends CWebTest {
 			[
 				[
 					'filter' => [
-						'Name' => 'spaces   '
+						'Name' => 'there   '
+					],
+					'expected' => [
+						self::SYSMAP_NO_SAPCE_NAME
 					]
 				]
 			],
@@ -378,18 +385,29 @@ class testPageMaps extends CWebTest {
 					]
 				]
 			],
-			// #5 View results with request that has spaces separating the words.
+			// #5 View results with multiple spaces in map name.
+			[
+				[
+					'filter' => [
+						'Name' => '   '
+					],
+					'expected' => [
+						self::SYSMAP_NO_SAPCE_NAME
+					]
+				]
+			],
+			// #6 View results with request that has spaces separating the words.
 			[
 				[
 					'filter' => [
 						'Name' => self::SYSMAP_SPACES_NAME
 					],
 					'expected' => [
-						self::SYSMAP_SPACES_NAME
+						self::SYSMAP_NO_SAPCE_NAME
 					]
 				]
 			],
-			// #6 View results with partial name match.
+			// #7 View results with partial name match.
 			[
 				[
 					'filter' => [
@@ -400,7 +418,7 @@ class testPageMaps extends CWebTest {
 					]
 				]
 			],
-			// #7 View results with partial name match with space.
+			// #8 View results with partial name match with space.
 			[
 				[
 					'filter' => [
@@ -417,7 +435,7 @@ class testPageMaps extends CWebTest {
 					]
 				]
 			],
-			// #8 View results with partial match, trailing and leading spaces.
+			// #9 View results with partial match, trailing and leading spaces.
 			[
 				[
 					'filter' => [
@@ -429,7 +447,7 @@ class testPageMaps extends CWebTest {
 					]
 				]
 			],
-			// #9 View results with upper case.
+			// #10 View results with upper case.
 			[
 				[
 					'filter' => [
@@ -443,7 +461,7 @@ class testPageMaps extends CWebTest {
 					]
 				]
 			],
-			// #10 View results with lower case.
+			// #11 View results with lower case.
 			[
 				[
 					'filter' => [
@@ -457,7 +475,7 @@ class testPageMaps extends CWebTest {
 					]
 				]
 			],
-			// #11 View results with non-existing request.
+			// #12 View results with non-existing request.
 			[
 				[
 					'filter' => [
@@ -465,7 +483,7 @@ class testPageMaps extends CWebTest {
 					]
 				]
 			],
-			// #12 View results if request contains special symbols.
+			// #13 View results if request contains special symbols.
 			[
 				[
 					'filter' => [

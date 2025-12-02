@@ -57,6 +57,18 @@ class testDashboardsListPage extends CWebTest {
 						'permission' => 2
 					]
 				]
+			],
+			[
+				'name' => 'The Graph dashboard without widgets',
+				'userid' => '1',
+				'private' => 1,
+				'pages' => [[]]
+			],
+			[
+				'name' => 'The Graph prototype dashboard without widgets',
+				'userid' => '1',
+				'private' => 1,
+				'pages' => [[]]
 			]
 		]);
 	}
@@ -100,7 +112,7 @@ class testDashboardsListPage extends CWebTest {
 					'fields' => [
 						'Show' => 'All'
 					],
-					'result_count' => 24
+					'result_count' => 23
 				]
 			],
 			[
@@ -108,7 +120,7 @@ class testDashboardsListPage extends CWebTest {
 					'fields' => [
 						'Show' => 'Created by me'
 					],
-					'result_count' => 23
+					'result_count' => 22
 				]
 			],
 			[
@@ -126,7 +138,7 @@ class testDashboardsListPage extends CWebTest {
 						'Name' => 'widget',
 						'Show' => 'Created by me'
 					],
-					'result_count' => 9
+					'result_count' => 7
 				]
 			],
 			[
@@ -152,6 +164,14 @@ class testDashboardsListPage extends CWebTest {
 						'Show' => 'Created by me'
 					],
 					'result_count' => 0
+				]
+			],
+			[
+				[
+					'fields' => [
+						'Name' => '   '
+					],
+					'result_count' => 1
 				]
 			]
 		];

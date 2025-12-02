@@ -108,8 +108,9 @@ class CHostGroup extends CApiService {
 
 		$sqlParts = [
 			'select' => ['hstgrp' => 'g.groupid'],
-			'from' => ['hstgrp' => 'hstgrp g'],
+			'from' => 'hstgrp g',
 			'where' => ['g.type='.HOST_GROUP_TYPE_HOST_GROUP],
+			'group' => [],
 			'order' => []
 		];
 
@@ -140,38 +141,30 @@ class CHostGroup extends CApiService {
 
 		// hostids
 		if ($options['hostids'] !== null) {
-			$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
+			$sqlParts['join']['hg'] = ['table' => 'hosts_groups', 'using' => 'groupid'];
 			$sqlParts['where'][] = dbConditionInt('hg.hostid', $options['hostids']);
-			$sqlParts['where']['hgg'] = 'hg.groupid=g.groupid';
 		}
 
 		// triggerids
 		if ($options['triggerids'] !== null) {
-			$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
-			$sqlParts['from']['functions'] = 'functions f';
-			$sqlParts['from']['items'] = 'items i';
+			$sqlParts['join']['hg'] = ['table' => 'hosts_groups', 'using' => 'groupid'];
+			$sqlParts['join']['i'] = ['left_table' => 'hg', 'table' => 'items', 'using' => 'hostid'];
+			$sqlParts['join']['f'] = ['left_table' => 'i', 'table' => 'functions', 'using' => 'itemid'];
 			$sqlParts['where'][] = dbConditionInt('f.triggerid', $options['triggerids']);
-			$sqlParts['where']['fi'] = 'f.itemid=i.itemid';
-			$sqlParts['where']['hgi'] = 'hg.hostid=i.hostid';
-			$sqlParts['where']['hgg'] = 'hg.groupid=g.groupid';
 		}
 
 		// graphids
 		if ($options['graphids'] !== null) {
-			$sqlParts['from']['gi'] = 'graphs_items gi';
-			$sqlParts['from']['i'] = 'items i';
-			$sqlParts['from']['hg'] = 'hosts_groups hg';
+			$sqlParts['join']['hg'] = ['table' => 'hosts_groups', 'using' => 'groupid'];
+			$sqlParts['join']['i'] = ['left_table' => 'hg', 'table' => 'items', 'using' => 'hostid'];
+			$sqlParts['join']['gi'] = ['left_table' => 'i', 'table' => 'graphs_items', 'using' => 'itemid'];
 			$sqlParts['where'][] = dbConditionInt('gi.graphid', $options['graphids']);
-			$sqlParts['where']['hgg'] = 'hg.groupid=g.groupid';
-			$sqlParts['where']['igi'] = 'i.itemid=gi.itemid';
-			$sqlParts['where']['hgi'] = 'hg.hostid=i.hostid';
 		}
 
 		// maintenanceids
 		if ($options['maintenanceids'] !== null) {
-			$sqlParts['from']['maintenances_groups'] = 'maintenances_groups mg';
+			$sqlParts['join']['mg'] = ['table' => 'maintenances_groups', 'using' => 'groupid'];
 			$sqlParts['where'][] = dbConditionInt('mg.maintenanceid', $options['maintenanceids']);
-			$sqlParts['where']['hmh'] = 'g.groupid=mg.groupid';
 		}
 
 		$sub_sql_common = [];

@@ -4130,7 +4130,7 @@ static void	DBhost_prototypes_save(const zbx_vector_ptr_t *host_prototypes,
 				zbx_audit_host_update_json_add_hostmacro(audit_context_mode,
 						host_prototype->hostid, ZBX_AUDIT_RESOURCE_HOST_PROTOTYPE,
 						new_hostmacroid, hostmacro->macro, (ZBX_MACRO_VALUE_SECRET ==
-						(int)hostmacro->type) ? ZBX_MACRO_SECRET_MASK : hostmacro->value,
+						(int)hostmacro->type) ? ZBX_SECRET_MASK : hostmacro->value,
 						hostmacro->description, (int)hostmacro->type,
 						(int)hostmacro->automatic);
 				new_hostmacroid++;
@@ -4158,9 +4158,9 @@ static void	DBhost_prototypes_save(const zbx_vector_ptr_t *host_prototypes,
 							ZBX_MACRO_VALUE_SECRET == (int)hostmacro->type_orig) ||
 							(0 == (hostmacro->flags & ZBX_FLAG_HPMACRO_UPDATE_TYPE) &&
 							ZBX_MACRO_VALUE_SECRET == (int)hostmacro->type)) ?
-							ZBX_MACRO_SECRET_MASK : hostmacro->value_orig,
+							ZBX_SECRET_MASK : hostmacro->value_orig,
 							(ZBX_MACRO_VALUE_SECRET == (int)hostmacro->type) ?
-							ZBX_MACRO_SECRET_MASK : hostmacro->value);
+							ZBX_SECRET_MASK : hostmacro->value);
 				}
 
 				if (0 != (hostmacro->flags & ZBX_FLAG_HPMACRO_UPDATE_DESCRIPTION))
@@ -5447,8 +5447,8 @@ static void	DBsave_httptests(zbx_uint64_t hostid, const zbx_vector_ptr_t *httpte
 			zbx_free(str_esc);									\
 														\
 			zbx_audit_httptest_update_json_update_##field(audit_context_mode, httptest->httptestid, \
-					(0 == strcmp("", httptest->field##_orig) ? "" :ZBX_MACRO_SECRET_MASK),	\
-					(0 == strcmp("", httptest->field) ? "" : ZBX_MACRO_SECRET_MASK));	\
+					(0 == strcmp("", httptest->field##_orig) ? "" :ZBX_SECRET_MASK),	\
+					(0 == strcmp("", httptest->field) ? "" : ZBX_SECRET_MASK));	\
 		}
 
 #define PREPARE_UPDATE_HTTPTEST_INT(FLAG, field)								\

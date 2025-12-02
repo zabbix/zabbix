@@ -50,8 +50,9 @@ class CIconMap extends CApiService {
 
 		$sqlParts = [
 			'select'	=> ['icon_map' => 'im.iconmapid'],
-			'from'		=> ['icon_map' => 'icon_map im'],
+			'from'		=> 'icon_map im',
 			'where'		=> [],
+			'group'		=> [],
 			'order'		=> [],
 			'limit'		=> null
 		];
@@ -95,9 +96,8 @@ class CIconMap extends CApiService {
 		if (!is_null($options['sysmapids'])) {
 			zbx_value2array($options['sysmapids']);
 
-			$sqlParts['from']['sysmaps'] = 'sysmaps s';
+			$sqlParts['join']['s'] = ['table' => 'sysmaps', 'using' => 'iconmapid'];
 			$sqlParts['where'][] = dbConditionInt('s.sysmapid', $options['sysmapids']);
-			$sqlParts['where']['ims'] = 'im.iconmapid=s.iconmapid';
 		}
 
 		// filter

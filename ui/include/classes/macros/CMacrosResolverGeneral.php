@@ -1994,7 +1994,7 @@ class CMacrosResolverGeneral {
 	 *
 	 * @return array
 	 */
-	protected static function getSupportedHostInventoryMacrosMap(): array {
+	public static function getSupportedHostInventoryMacrosMap(): array {
 		return [
 			'{INVENTORY.ALIAS}' => 'alias',
 			'{INVENTORY.ASSET.TAG}' => 'asset_tag',

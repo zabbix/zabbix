@@ -19,6 +19,8 @@ require_once dirname(__FILE__) . '/../../include/CWebTest.php';
 /**
  * @backup dashboard
  *
+ * @dataSource HostAvailabilityWidget
+ *
  * @onBefore prepareData
  */
 class testDashboardProblemHostsWidget extends testWidgets {

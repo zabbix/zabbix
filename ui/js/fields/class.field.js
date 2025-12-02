@@ -106,8 +106,20 @@ class CField {
 		return '/' + this.getName().replaceAll('[', '/').replaceAll(']', '');
 	}
 
+	isDisabled() {
+		return false;
+	}
+
 	isSameField(field) {
 		return field == this._field;
+	}
+
+	/**
+	 * This method is called when field is rediscovered. Together with this.isSameField().
+	 * Its purpose is to update field's state if rediscovery could have been triggered by this change.
+	 */
+	updateState() {
+		// blank
 	}
 
 	setTabId(tab_id) {

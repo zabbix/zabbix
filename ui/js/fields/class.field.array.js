@@ -87,6 +87,9 @@ class CFieldArray extends CField {
 					field_instance.init();
 					field_instance.setTabId(this._tab_id);
 				}
+				else {
+					field_instance.updateState();
+				}
 
 				fields.push(field_instance);
 			}

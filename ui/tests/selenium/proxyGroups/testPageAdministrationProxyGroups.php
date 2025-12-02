@@ -23,6 +23,8 @@ require_once __DIR__.'/../../include/helpers/CDataHelper.php';
  * @dataSource Proxies
  *
  * @backup proxy_group
+ *
+ * @onBefore prepareProxyGroupData
  */
 class testPageAdministrationProxyGroups extends CWebTest {
 
@@ -36,6 +38,18 @@ class testPageAdministrationProxyGroups extends CWebTest {
 			CMessageBehavior::class,
 			CTableBehavior::class
 		];
+	}
+
+	/**
+	 * Function used to create proxy group.
+	 */
+	public function prepareProxyGroupData() {
+		CDataHelper::call('proxygroup.create', [
+			[
+				'name' => 'Multiple   spaces   in proxy group',
+				'min_online' => '1'
+			]
+		]);
 	}
 
 	public function testPageAdministrationProxyGroups_Layout() {
@@ -154,6 +168,15 @@ class testPageAdministrationProxyGroups extends CWebTest {
 				7 => ''
 			],
 			[
+				'Name' => 'Multiple spaces in proxy group',
+				'State' => '',
+				'Failover period' => '1m',
+				'Online proxies' => '0',
+				'Minimum proxies' => '1',
+				'Proxies' => '',
+				7 => ''
+			],
+			[
 				'Name' => 'Offline group',
 				'State' => 'Offline',
 				'Failover period' => '900s',
@@ -234,6 +257,7 @@ class testPageAdministrationProxyGroups extends CWebTest {
 					'result' => [
 						'2nd Online proxy group',
 						'Degrading proxy group',
+						'Multiple spaces in proxy group',
 						'Online proxy group'
 					]
 				]
@@ -261,7 +285,16 @@ class testPageAdministrationProxyGroups extends CWebTest {
 					]
 				]
 			],
-			// #4 Search string with utf8mb4 smiley.
+			// #4 Search string with space in the beginning and in the end.
+			[
+				[
+					'filter' => [
+						'Name' => '   '
+					],
+					'result' => ['Multiple spaces in proxy group']
+				]
+			],
+			// #5 Search string with utf8mb4 smiley.
 			[
 				[
 					'filter' => [
@@ -272,7 +305,7 @@ class testPageAdministrationProxyGroups extends CWebTest {
 					]
 				]
 			],
-			// #5 search should be case insensitive.
+			// #6 search should be case insensitive.
 			[
 				[
 					'filter' => [
@@ -283,12 +316,13 @@ class testPageAdministrationProxyGroups extends CWebTest {
 						'Degrading proxy group',
 						'Group without proxies',
 						'Group without proxies with linked host',
+						'Multiple spaces in proxy group',
 						'Offline group',
 						'Online proxy group'
 					]
 				]
 			],
-			// #6 Return online proxy groups.
+			// #7 Return online proxy groups.
 			[
 				[
 					'filter' => [
@@ -300,7 +334,7 @@ class testPageAdministrationProxyGroups extends CWebTest {
 					]
 				]
 			],
-			// #7 Return degrading proxy group.
+			// #8 Return degrading proxy group.
 			[
 				[
 					'filter' => [
@@ -311,7 +345,7 @@ class testPageAdministrationProxyGroups extends CWebTest {
 					]
 				]
 			],
-			// #8 Return offline proxy group.
+			// #9 Return offline proxy group.
 			[
 				[
 					'filter' => [
@@ -322,7 +356,7 @@ class testPageAdministrationProxyGroups extends CWebTest {
 					]
 				]
 			],
-			// #9 Return recovering proxy group.
+			// #10 Return recovering proxy group.
 			[
 				[
 					'filter' => [
@@ -333,7 +367,7 @@ class testPageAdministrationProxyGroups extends CWebTest {
 					]
 				]
 			],
-			// #10 Filter both by name and state.
+			// #11 Filter both by name and state.
 			[
 				[
 					'filter' => [
@@ -346,7 +380,7 @@ class testPageAdministrationProxyGroups extends CWebTest {
 					]
 				]
 			],
-			// #11 No matches for the specified filter.
+			// #12 No matches for the specified filter.
 			[
 				[
 					'filter' => [

@@ -1198,31 +1198,32 @@ static int	proxy_item_validator(zbx_history_recv_item_t *item, zbx_socket_t *soc
 
 /******************************************************************************
  *                                                                            *
- * Purpose: parses history data array and process the data                    *
+ * Purpose: parses history data array and processes the data                  *
  *                                                                            *
- *                                                                            *
- * Parameters: sock           - [IN]  socket for host permission validation   *
- *             validator_func - [IN]  function to validate item permission    *
- *             validator_args - [IN]  validator function arguments            *
- *             jp_data        - [IN]  JSON with history data array            *
- *             session        - [IN]  the data session                        *
- *             nodata_win     - [OUT] counter of delayed values               *
- *             info           - [OUT] address of a pointer to the info        *
- *                                    string (should be freed by the caller)  *
- *             mode           - [IN]  item retrieve mode is used to retrieve  *
- *                                    only necessary data to reduce time      *
- *                                    spent holding read lock                 *
+ * Parameters:                                                                *
+ *   sock           - [IN]  socket for host permission validation             *
+ *   validator_func - [IN]  function to validate item permission              *
+ *   validator_args - [IN]  validator function arguments                      *
+ *   jp_data        - [IN]  JSON with history data array                      *
+ *   session        - [IN]  the data session                                  *
+ *   nodata_win     - [OUT] counter of delayed values                         *
+ *   info           - [OUT] address of a pointer to the info string           *
+ *                          (should be freed by the caller)                   *
+ *   mode           - [IN]  item retrieve mode is used to retrieve            *
+ *                          only necessary data to reduce time spent          *
+ *                          holding read lock                                 *
+ *   source         - [IN]  data source (proxy, agent)                        *
  *                                                                            *
  * Return value:  SUCCEED - processed successfully                            *
- *                FAIL - an error occurred                                    *
+ *                FAIL    - an error occurred                                 *
  *                                                                            *
- * Comments: This function is used to parse the new proxy history data        *
- *           protocol introduced in Zabbix v3.3.                              *
+ * Comments: This function is used to process history data received from      *
+ *           proxy or agent.                                                  *
  *                                                                            *
  ******************************************************************************/
 static int	process_history_data_by_itemids(zbx_socket_t *sock, zbx_client_item_validator_t validator_func,
 		void *validator_args, struct zbx_json_parse *jp_data, zbx_session_t *session,
-		zbx_proxy_suppress_t *nodata_win, char **info, unsigned int mode)
+		zbx_proxy_suppress_t *nodata_win, char **info, unsigned int mode, const char *source)
 {
 	const char		*pnext = NULL;
 	int			ret = SUCCEED, processed_num = 0, total_num = 0, values_num, read_num, i, *errcodes;
@@ -1289,9 +1290,9 @@ static int	process_history_data_by_itemids(zbx_socket_t *sock, zbx_client_item_v
 		/* is smaller than the last known last_valueid represents a network anomaly and is logged.            */
 		if (session->last_id > last_valueid)
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "received value identifier " ZBX_FS_UI64 " from proxy "
+			zabbix_log(LOG_LEVEL_WARNING, "received value identifier " ZBX_FS_UI64 " from %s "
 					ZBX_FS_UI64 " is lower than the last processed value identifier " ZBX_FS_UI64,
-					last_valueid, session->hostid, session->last_id);
+					last_valueid, source, session->hostid, session->last_id);
 		}
 		else
 			session->last_id = last_valueid;
@@ -1726,7 +1727,7 @@ int	zbx_process_agent_history_data(zbx_socket_t *sock, struct zbx_json_parse *jp
 			session = zbx_dc_get_or_create_session(hostid, token, ZBX_SESSION_TYPE_DATA);
 
 		ret = process_history_data_by_itemids(sock, agent_item_validator, &rights, &jp_data, session, NULL,
-				info, ZBX_ITEM_GET_DEFAULT);
+				info, ZBX_ITEM_GET_DEFAULT, "agent");
 	}
 	else
 	{
@@ -2624,7 +2625,7 @@ int	zbx_process_proxy_data(const zbx_dc_proxy_t *proxy, const struct zbx_json_pa
 
 		if (SUCCEED != (ret = process_history_data_by_itemids(NULL, proxy_item_validator,
 				(void *)&proxy->proxyid, &jp_data, session, &proxy_diff.nodata_win, &error_step,
-				ZBX_ITEM_GET_PROCESS)))
+				ZBX_ITEM_GET_PROCESS, "proxy")))
 		{
 			zbx_strcatnl_alloc(error, &error_alloc, &error_offset, error_step);
 		}

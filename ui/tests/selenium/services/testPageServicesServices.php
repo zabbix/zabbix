@@ -39,7 +39,7 @@ class testPageServicesServices extends CWebTest {
 
 	const EDIT = true;
 
-	const SERVICE_COUNT = 20;
+	const SERVICE_COUNT = 21;
 
 	const LAYOUT_PARENT = 'Parent for 2 levels of child services';
 	const LAYOUT_CHILD = 'Child service with child service';
@@ -400,6 +400,28 @@ class testPageServicesServices extends CWebTest {
 					],
 					'result' => [
 						'Service with problem'
+					]
+				]
+			],
+			// Multiple spaces between words in the filter.
+			[
+				[
+					'filter' => [
+						'Name' => '   spaces   '
+					],
+					'result' => [
+						'Multiple spaces in service name'
+					]
+				]
+			],
+			// Multiple spaces in the filter.
+			[
+				[
+					'filter' => [
+						'Name' => '   '
+					],
+					'result' => [
+						'Multiple spaces in service name'
 					]
 				]
 			],

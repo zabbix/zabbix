@@ -671,7 +671,7 @@ function yieldGraphScaleInterval(float $min, float $max, string $units, int $pow
 
 	$is_binary = isBinaryUnits($units);
 
-	$base = getUnitsBase($units, $power);
+	$base = truncateFloat(getUnitsBase($units, $power));
 
 	// Expression optimized to avoid overflow.
 	$interval = truncateFloat($max / $rows - $min / $rows);
