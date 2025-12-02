@@ -15,9 +15,28 @@
 
 
 class CUrlValidator extends CValidator {
+	protected bool $allow_event_tags_macro = false;
 
+	public function __construct(array $options = []) {
+		if (array_key_exists('allow_event_tags_macro', $options)) {
+			$this->allow_event_tags_macro = $options['allow_event_tags_macro'];
+		}
+	}
+
+	/**
+	 * Checks if the given string is:
+	 * - either macro or valid url with CHtmlUrlValidator
+	 *
+	 * @param string $value
+	 *
+	 * @return bool
+	 */
 	public function validate($value) {
-		if (!CHtmlUrlValidator::validate((string) $value)) {
+		$options = [
+			'allow_event_tags_macro' => $this->allow_event_tags_macro
+		];
+
+		if (!CHtmlUrlValidator::validate((string) $value, $options)) {
 			$this->setError(_('unacceptable URL'));
 
 			return false;
