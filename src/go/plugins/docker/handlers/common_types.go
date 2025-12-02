@@ -15,9 +15,10 @@
 package handlers
 
 import (
-	"log"
 	"strconv"
 	"time"
+
+	"golang.zabbix.com/sdk/log"
 )
 
 type unixTime int64
@@ -28,13 +29,13 @@ func (tm *unixTime) UnmarshalJSON(b []byte) error {
 	if err != nil {
 		// This should not be like that, but because it has been like that for a long time,
 		// it is better to log but don't break yet.
-		log.Printf("[Docker plugin] WARNING: failed to unquote timestamp: %v (data: %s)", err, string(b))
+		log.Warningf("[Docker plugin] WARNING: failed to unquote timestamp: %v (data: %s)", err, string(b))
 		return nil //nolint:nlreturn    // Temporary: maintain old behavior.
 	}
 
 	t, err := time.Parse(time.RFC3339, s)
 	if err != nil {
-		log.Printf("[Docker plugin] WARNING: failed to parse timestamp: %v (data: %s)", err, s)
+		log.Warningf("[Docker plugin] WARNING: failed to parse timestamp: %v (data: %s)", err, s)
 		return nil //nolint:nlreturn  // Temporary: maintain old behavior
 	}
 

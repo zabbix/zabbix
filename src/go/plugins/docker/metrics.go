@@ -39,7 +39,7 @@ var metricsMeta = map[handlers.DockerKey]metricMeta{
 
 //nolint:gochecknoglobals //used as constants.
 var (
-	paramContainer = metric.NewParam("container", "container name for which the information is needed.").
+	paramContainer = metric.NewParam("Container", "Container name for which the information is needed.").
 			SetRequired()
 	paramStatusAll = metric.NewParam("All", "Return all containers (true) or only running (false).").
 			WithDefault("false").
