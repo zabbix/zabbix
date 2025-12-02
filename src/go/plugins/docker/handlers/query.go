@@ -15,6 +15,7 @@
 package handlers
 
 import (
+	"context"
 	"encoding/json"
 	"io"
 	"net/http"
@@ -32,7 +33,8 @@ type errorMessage struct {
 }
 
 func queryDockerAPI(client *http.Client, query string) ([]byte, error) {
-	req, err := http.NewRequest(
+	req, err := http.NewRequestWithContext(
+		context.Background(),
 		http.MethodGet,
 		"http://"+path.Join(dockerVersion, query),
 		http.NoBody,
