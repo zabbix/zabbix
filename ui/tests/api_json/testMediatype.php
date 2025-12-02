@@ -287,8 +287,6 @@ class testMediatype extends CAPITest {
 		$oauth_url[$field_name] = $result[0][$field_name];
 		$oauth_url['tokens_status'] = $result[0]['tokens_status'];
 
-		sleep(1);
-
 		$this->call('mediatype.update', $mediatypes);
 
 		$result = $this->call('mediatype.get', [
