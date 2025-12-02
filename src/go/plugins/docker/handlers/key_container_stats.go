@@ -22,16 +22,17 @@ import (
 	"golang.zabbix.com/sdk/zbxerr"
 )
 
-// ContainerStats struct
-type ContainerStats struct {
-	Stats
+// containerStats struct.
+type containerStats struct {
+	stats
+
 	Name     string                  `json:"name"`
 	ID       string                  `json:"id"`
-	Networks map[string]NetworkStats `json:"networks"`
+	Networks map[string]networkStats `json:"networks"`
 }
 
-// NetworkStats aggregates the network stats of one container
-type NetworkStats struct {
+// networkStats aggregates the network stats of one container.
+type networkStats struct {
 	RxBytes    uint64 `json:"rx_bytes"`
 	RxPackets  uint64 `json:"rx_packets"`
 	RxErrors   uint64 `json:"rx_errors"`
@@ -44,16 +45,16 @@ type NetworkStats struct {
 	InstanceID string `json:"instance_id"`
 }
 
-// Stats is struct aggregating all types of stats of one container
-type Stats struct {
-	CPUStats    CPUStats    `json:"cpu_stats"`
-	PreCPUStats CPUStats    `json:"precpu_stats"`
-	MemoryStats MemoryStats `json:"memory_stats"`
-	PIDsStats   PIDsStats   `json:"pids_stats"`
+// stats is struct aggregating all types of stats of one container.
+type stats struct {
+	CPUStats    cpuStats    `json:"cpu_stats"`
+	PreCPUStats cpuStats    `json:"precpu_stats"`
+	MemoryStats memoryStats `json:"memory_stats"`
+	PIDsStats   pidsStats   `json:"pids_stats"`
 }
 
-// CPUUsage stores all CPU stats aggregated since container inception.
-type CPUUsage struct {
+// cpuUsage stores all CPU stats aggregated since container inception.
+type cpuUsage struct {
 	TotalUsage        uint64   `json:"total_usage"`
 	PercpuUsage       []uint64 `json:"percpu_usage"`
 	PercentUsage      float64  `json:"percent_usage"`
@@ -61,23 +62,23 @@ type CPUUsage struct {
 	UsageInUsermode   uint64   `json:"usage_in_usermode"`
 }
 
-// CPUStats aggregates and wraps all CPU related info of container
-type CPUStats struct {
-	CPUUsage       CPUUsage       `json:"cpu_usage"`
+// cpuStats aggregates and wraps all CPU related info of container.
+type cpuStats struct {
+	CPUUsage       cpuUsage       `json:"cpu_usage"`
 	SystemUsage    uint64         `json:"system_cpu_usage"`
 	OnlineCPUs     uint32         `json:"online_cpus"`
-	ThrottlingData ThrottlingData `json:"throttling_data"`
+	ThrottlingData throttlingData `json:"throttling_data"`
 }
 
-// ThrottlingData stores CPU throttling stats of one running container.
-type ThrottlingData struct {
+// throttlingData stores CPU throttling stats of one running container.
+type throttlingData struct {
 	Periods          uint64 `json:"periods"`
 	ThrottledPeriods uint64 `json:"throttled_periods"`
 	ThrottledTime    uint64 `json:"throttled_time"`
 }
 
-// MemoryStats aggregates all memory stats since container inception on Linux.
-type MemoryStats struct {
+// memoryStats aggregates all memory stats since container inception on Linux.
+type memoryStats struct {
 	Usage             uint64            `json:"usage"`
 	MaxUsage          uint64            `json:"max_usage"`
 	Stats             map[string]uint64 `json:"stats"`
@@ -88,13 +89,13 @@ type MemoryStats struct {
 	PrivateWorkingSet uint64            `json:"privateworkingset"`
 }
 
-// PIDsStats holds pid information.
-type PIDsStats struct {
+// pidsStats holds pid information.
+type pidsStats struct {
 	Current uint64 `json:"current"`
 }
 
 func keyContainerStatsHandler(client *http.Client, query string, _ ...string) (string, error) {
-	var data ContainerStats
+	var data containerStats
 
 	body, err := queryDockerAPI(client, query)
 	if err != nil {
@@ -116,7 +117,7 @@ func keyContainerStatsHandler(client *http.Client, query string, _ ...string) (s
 	return string(result), nil
 }
 
-func (s *Stats) setCPUPercentUsage() {
+func (s *stats) setCPUPercentUsage() {
 	// based on formula from docker api doc.
 	delta := s.CPUStats.CPUUsage.TotalUsage - s.PreCPUStats.CPUUsage.TotalUsage
 	systemDelta := s.CPUStats.SystemUsage - s.PreCPUStats.SystemUsage

@@ -91,11 +91,11 @@ func (p *Plugin) Export(key string, rawParams []string, _ plugin.ContextProvider
 
 		return handler(p.client, query)
 	case handlers.KeyContainerInfo:
-		if !p.isValidContainerIdentifier(params["Container"]) {
+		if !p.isValidContainerIdentifier(params["container"]) {
 			return nil, errs.New("invalid container identifier")
 		}
 
-		query = fmt.Sprintf(queryPath, params["Container"])
+		query = fmt.Sprintf(queryPath, params["container"])
 
 		info := params["Info"]
 		if info != "full" && info != "short" {
@@ -104,11 +104,11 @@ func (p *Plugin) Export(key string, rawParams []string, _ plugin.ContextProvider
 
 		return handler(p.client, query, info)
 	case handlers.KeyContainerStats:
-		if !p.isValidContainerIdentifier(params["Container"]) {
+		if !p.isValidContainerIdentifier(params["container"]) {
 			return nil, errs.New("invalid container identifier")
 		}
 
-		query = fmt.Sprintf(queryPath, params["Container"])
+		query = fmt.Sprintf(queryPath, params["container"])
 
 		return handler(p.client, query)
 	default:

@@ -21,10 +21,10 @@ const (
 	pingOk     = "1"
 )
 
-func keyPingHandler(client *http.Client, query string, args ...string) (string, error) {
+func keyPingHandler(client *http.Client, query string, _ ...string) (string, error) {
 	body, err := queryDockerAPI(client, query)
 	if err != nil || string(body) != "OK" {
-		return pingFailed, nil
+		return pingFailed, nil //nolint:nilerr // is intended behavior.
 	}
 
 	return pingOk, nil

@@ -33,7 +33,7 @@ var handlers = map[DockerKey]Handler{ //nolint:gochecknoglobals // constant map.
 // Handler function is a function that handles one of the docker keys.
 type Handler func(client *http.Client, query string, args ...string) (result string, err error)
 
-// GetDockerHandler returns appropriate handler based on key.
+// GetDockerHandler returns appropriate handler based on key, if key not present - nil.
 func GetDockerHandler(key DockerKey) Handler {
 	handler, ok := handlers[key]
 	if !ok {
