@@ -94,6 +94,11 @@ class WidgetView extends CControllerDashboardWidgetView {
 				continue;
 			}
 
+			foreach ($db_column_items as &$item) {
+				$item['combined'] = 0;
+			}
+			unset($item);
+
 			// Each column has different aggregation function and time period.
 			$db_values = self::getItemValues($db_column_items, $column);
 
@@ -153,7 +158,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 			$db_item_problem_triggers = $this->getProblemTriggers(array_keys($db_items));
 		}
 
-		$data = [
+		return [
 			'error' => null,
 			'configuration' => $columns,
 			'rows' => $this->fields_values['layout'] == WidgetForm::LAYOUT_VERTICAL
@@ -163,8 +168,6 @@ class WidgetView extends CControllerDashboardWidgetView {
 			'db_items' => $db_items,
 			'db_item_problem_triggers' => $db_item_problem_triggers
 		];
-
-		return $data;
 	}
 
 	private function getHosts(): array {
@@ -385,6 +388,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 				$item['valuemap'] = [];
 			}
 
+			$item['combined'] = 1;
 			$item['name'] = $column['combined_column_name'];
 
 			$value_type = $item['value_type'];
