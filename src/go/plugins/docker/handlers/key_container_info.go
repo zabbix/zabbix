@@ -16,15 +16,14 @@ package handlers
 
 import (
 	"encoding/json"
-	"errors"
 	"net/http"
 
 	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/zbxerr"
 )
 
-// ContainerState represents the state of a container.
-type ContainerState struct {
+// containerState represents the state of a container.
+type containerState struct {
 	Status            string
 	Running           bool
 	Paused            bool
@@ -39,14 +38,14 @@ type ContainerState struct {
 	FinishedAt        unixTime
 }
 
-// ContainerInfo contains response of Engine API:
+// containerInfo contains response of Engine API:
 // GET "/containers/{name:.*}/json".
-type ContainerInfo struct {
-	ID              string `json:"Id"`
+type containerInfo struct {
+	ID              string `json:"Id"` //nolint:tagliatelle
 	Created         unixTime
 	Path            string
 	Args            []string
-	State           *ContainerState
+	State           *containerState
 	Image           string
 	ResolvConfPath  string
 	HostnamePath    string
@@ -60,20 +59,20 @@ type ContainerInfo struct {
 	ProcessLabel    string
 	AppArmorProfile string
 	ExecIDs         []string
-	HostConfig      *HostConfig
+	HostConfig      *hostConfig
 	SizeRw          int64
 	SizeRootFs      int64
 }
 
-// HostConfig the non-portable Config structure of a container.
-type HostConfig struct {
+// hostConfig the non-portable Config structure of a container.
+type hostConfig struct {
 	Binds           []string
 	ContainerIDFile string
 	NetworkMode     string
 
-	DNS             []string `json:"Dns"`
-	DNSOptions      []string `json:"DnsOptions"`
-	DNSSearch       []string `json:"DnsSearch"`
+	DNS             []string `json:"Dns"`        //nolint:tagliatelle
+	DNSOptions      []string `json:"DnsOptions"` //nolint:tagliatelle
+	DNSSearch       []string `json:"DnsSearch"`  //nolint:tagliatelle
 	ExtraHosts      []string
 	GroupAdd        []string
 	Links           []string
@@ -93,16 +92,16 @@ type HostConfig struct {
 
 // Resources contains container's resources.
 type Resources struct {
-	CPUShares int64 `json:"CpuShares"`
+	CPUShares int64 `json:"CpuShares"` //nolint:tagliatelle
 	Memory    int64
-	NanoCPUs  int64 `json:"NanoCpus"`
+	NanoCPUs  int64 `json:"NanoCpus"` //nolint:tagliatelle
 
 	CgroupParent       string
 	BlkioWeight        uint16
-	CPUPeriod          int64 `json:"CpuPeriod"`
-	CPUQuota           int64 `json:"CpuQuota"`
-	CPURealtimePeriod  int64 `json:"CpuRealtimePeriod"`
-	CPURealtimeRuntime int64 `json:"CpuRealtimeRuntime"`
+	CPUPeriod          int64 `json:"CpuPeriod"`          //nolint:tagliatelle
+	CPUQuota           int64 `json:"CpuQuota"`           //nolint:tagliatelle
+	CPURealtimePeriod  int64 `json:"CpuRealtimePeriod"`  //nolint:tagliatelle
+	CPURealtimeRuntime int64 `json:"CpuRealtimeRuntime"` //nolint:tagliatelle
 	CpusetCpus         string
 	CpusetMems         string
 	KernelMemory       int64
@@ -113,8 +112,8 @@ type Resources struct {
 	OomKillDisable     *bool
 	PidsLimit          *int64
 
-	CPUCount           int64 `json:"CpuCount"`
-	CPUPercent         int64 `json:"CpuPercent"`
+	CPUCount           int64 `json:"CpuCount"`   //nolint:tagliatelle
+	CPUPercent         int64 `json:"CpuPercent"` //nolint:tagliatelle
 	IOMaximumIOps      uint64
 	IOMaximumBandwidth uint64
 }
@@ -133,7 +132,7 @@ func keyContainerInfoHandler(client *http.Client, query string, args ...string) 
 	case "full":
 		return string(body), nil
 	case "short":
-		var info ContainerInfo
+		var info containerInfo
 
 		err = json.Unmarshal(body, &info)
 		if err != nil {
@@ -147,6 +146,6 @@ func keyContainerInfoHandler(client *http.Client, query string, args ...string) 
 
 		return string(result), nil
 	default:
-		return "", errs.WrapConst(errors.New("info must be either 'full' or 'short'"), zbxerr.ErrorInvalidParams)
+		return "", errs.WrapConst(errs.New("info must be either 'full' or 'short'"), zbxerr.ErrorInvalidParams)
 	}
 }

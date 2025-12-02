@@ -18,12 +18,13 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/zbxerr"
 )
 
-// Container represents each container in the list returned by ListContainers.
-type Container struct {
-	ID         string `json:"Id"`
+// container represents each container in the list returned by ListContainers.
+type container struct {
+	ID         string `json:"Id"` //nolint:tagliatelle
 	Image      string
 	Command    string
 	Created    int64
@@ -57,20 +58,21 @@ type Mount struct {
 }
 
 func keyContainersHandler(client *http.Client, query string, _ ...string) (string, error) {
-	var data []Container
+	var data []container
 
 	body, err := queryDockerAPI(client, query)
 	if err != nil {
 		return "", err
 	}
 
-	if err = json.Unmarshal(body, &data); err != nil {
-		return "", zbxerr.ErrorCannotUnmarshalJSON.Wrap(err)
+	err = json.Unmarshal(body, &data)
+	if err != nil {
+		return "", errs.WrapConst(err, zbxerr.ErrorCannotUnmarshalJSON)
 	}
 
 	result, err := json.Marshal(data)
 	if err != nil {
-		return "", zbxerr.ErrorCannotMarshalJSON.Wrap(err)
+		return "", errs.WrapConst(err, zbxerr.ErrorCannotMarshalJSON)
 	}
 
 	return string(result), nil

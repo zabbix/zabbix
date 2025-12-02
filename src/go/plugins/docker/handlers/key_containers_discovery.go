@@ -18,16 +18,17 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/zbxerr"
 )
 
 type containerDiscovery struct {
-	ID   string `json:"{#ID}"`
-	Name string `json:"{#NAME}"`
+	ID   string `json:"{#ID}"`   //nolint:tagliatelle
+	Name string `json:"{#NAME}"` //nolint:tagliatelle
 }
 
 func keyContainersDiscovery(client *http.Client, query string, _ ...string) (string, error) {
-	var data []Container
+	var data []*container
 
 	body, err := queryDockerAPI(client, query)
 	if err != nil {
@@ -35,7 +36,7 @@ func keyContainersDiscovery(client *http.Client, query string, _ ...string) (str
 	}
 
 	if err = json.Unmarshal(body, &data); err != nil {
-		return "", zbxerr.ErrorCannotUnmarshalJSON.Wrap(err)
+		return "", errs.WrapConst(err, zbxerr.ErrorCannotUnmarshalJSON)
 	}
 
 	result, err := getContainersDiscovery(data)
@@ -46,7 +47,7 @@ func keyContainersDiscovery(client *http.Client, query string, _ ...string) (str
 	return string(result), nil
 }
 
-func getContainersDiscovery(data []Container) ([]byte, error) {
+func getContainersDiscovery(data []*container) ([]byte, error) {
 	containers := make([]containerDiscovery, 0)
 
 	for _, container := range data {
@@ -59,7 +60,7 @@ func getContainersDiscovery(data []Container) ([]byte, error) {
 
 	result, err := json.Marshal(&containers)
 	if err != nil {
-		return nil, zbxerr.ErrorCannotMarshalJSON.Wrap(err)
+		return nil, errs.WrapConst(err, zbxerr.ErrorCannotMarshalJSON)
 	}
 
 	return result, nil

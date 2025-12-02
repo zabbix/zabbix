@@ -18,13 +18,14 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/zbxerr"
 )
 
 // info contains response of Engine API:
 // GET "/info".
 type info struct {
-	ID                 string `json:"Id"`
+	ID                 string `json:"Id"` //nolint:tagliatelle
 	Containers         int
 	ContainersRunning  int
 	ContainersPaused   int
@@ -35,8 +36,8 @@ type info struct {
 	SwapLimit          bool
 	KernelMemory       bool
 	KernelMemoryTCP    bool
-	CPUCfsPeriod       bool `json:"CpuCfsPeriod"`
-	CPUCfsQuota        bool `json:"CpuCfsQuota"`
+	CPUCfsPeriod       bool `json:"CpuCfsPeriod"` //nolint:tagliatelle
+	CPUCfsQuota        bool `json:"CpuCfsQuota"`  //nolint:tagliatelle
 	CPUShares          bool
 	CPUSet             bool
 	PidsLimit          bool
@@ -80,12 +81,12 @@ func keyInfoHandler(client *http.Client, query string, _ ...string) (string, err
 	}
 
 	if err = json.Unmarshal(body, &data); err != nil {
-		return "", zbxerr.ErrorCannotUnmarshalJSON.Wrap(err)
+		return "", errs.WrapConst(err, zbxerr.ErrorCannotUnmarshalJSON)
 	}
 
 	result, err := json.Marshal(data)
 	if err != nil {
-		return "", zbxerr.ErrorCannotMarshalJSON.Wrap(err)
+		return "", errs.WrapConst(err, zbxerr.ErrorCannotMarshalJSON)
 	}
 
 	return string(result), nil

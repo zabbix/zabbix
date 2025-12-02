@@ -18,49 +18,50 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/zbxerr"
 )
 
-// DiskUsage contains response of Engine API:
-// GET "/system/df"
-type DiskUsage struct {
+// diskUsage contains response of Engine API:
+// GET "/system/df".
+type diskUsage struct {
 	LayersSize int64
-	Images     []*Image
-	Containers []*Container
-	Volumes    []*Volume
+	Images     []*image
+	Containers []*container
+	Volumes    []*volume
 }
 
-// Volume volume
-type Volume struct {
+// volume details.
+type volume struct {
 	CreatedAt  unixTime
 	Mountpoint string
 	Name       string
-	UsageData  *VolumeUsageData
+	UsageData  *volumeUsageData
 }
 
-// VolumeUsageData Usage details about the volume.
-type VolumeUsageData struct {
+// volumeUsageData Usage details about the volume.
+type volumeUsageData struct {
 	RefCount int64
 	Size     int64
 }
 
 func keyDataUsageHandler(client *http.Client, query string, _ ...string) (string, error) {
-	var data DiskUsage
+	var data diskUsage
 
 	body, err := queryDockerAPI(client, query)
 	if err != nil {
 		return "", err
 	}
 
-	if err = json.Unmarshal(body, &data); err != nil {
-		return "", zbxerr.ErrorCannotUnmarshalJSON.Wrap(err)
+	err = json.Unmarshal(body, &data)
+	if err != nil {
+		return "", errs.WrapConst(err, zbxerr.ErrorCannotUnmarshalJSON)
 	}
 
 	result, err := json.Marshal(data)
 	if err != nil {
-		return "", zbxerr.ErrorCannotMarshalJSON.Wrap(err)
+		return "", errs.WrapConst(err, zbxerr.ErrorCannotMarshalJSON)
 	}
 
 	return string(result), nil
-
 }

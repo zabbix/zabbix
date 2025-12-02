@@ -18,13 +18,14 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/zbxerr"
 )
 
-// Image contains response of Engine API:
+// image contains response of Engine API:
 // GET "/images/{name:.*}/json".
-type Image struct {
-	ID          string `json:"Id"`
+type image struct {
+	ID          string `json:"Id"` //nolint:tagliatelle
 	RepoTags    []string
 	RepoDigests []string
 	Containers  int64
@@ -35,20 +36,21 @@ type Image struct {
 }
 
 func keyImagesHandler(client *http.Client, query string, _ ...string) (string, error) {
-	var data []Image
+	var data []image
 
 	body, err := queryDockerAPI(client, query)
 	if err != nil {
 		return "", err
 	}
 
-	if err = json.Unmarshal(body, &data); err != nil {
-		return "", zbxerr.ErrorCannotUnmarshalJSON.Wrap(err)
+	err = json.Unmarshal(body, &data)
+	if err != nil {
+		return "", errs.WrapConst(err, zbxerr.ErrorCannotUnmarshalJSON)
 	}
 
 	result, err := json.Marshal(data)
 	if err != nil {
-		return "", zbxerr.ErrorCannotMarshalJSON.Wrap(err)
+		return "", errs.WrapConst(err, zbxerr.ErrorCannotMarshalJSON)
 	}
 
 	return string(result), nil
