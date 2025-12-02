@@ -25,7 +25,7 @@ class CRangeTimeTimeValidatorTest extends TestCase {
 			['2021-01-01 00:00', 									[], 											null],
 			['2021-01-01 00:00:00', 								[], 											null],
 			['2021-01-01 00:00:00', 								['min' => strtotime('2010-01-01')],		null],
-			[date(ZBX_FULL_DATE_TIME, time()+1), 	['min_in_future' => true],						null],
+			['2038-01-01', 											['min_in_future' => true],						null],
 
 			// Valid relative times.
 			['now-1d', 												[], 											null],
@@ -46,8 +46,6 @@ class CRangeTimeTimeValidatorTest extends TestCase {
 
 			// Invalid time: out of min range.
 			['2010-01-01 00:00:00',									['min' => ZBX_MAX_DATE], 						'value must be greater than or equal to '.date(ZBX_FULL_DATE_TIME, ZBX_MAX_DATE)],
-			['2010-01-01 00:00:00',									['min_in_future' => true], 						'value must be greater than or equal to '.date(ZBX_FULL_DATE_TIME, time()+1)],
-			['now',													['min_in_future' => true],						'value must be greater than or equal to '.date(ZBX_FULL_DATE_TIME, time()+1)],
 			['now-5d',												['min' => time()],								'value must be greater than or equal to '.date(ZBX_FULL_DATE_TIME, time())]
 		];
 	}
@@ -62,4 +60,29 @@ class CRangeTimeTimeValidatorTest extends TestCase {
 		$this->assertEquals($expected_result, $validator->validate($name));
 		$this->assertSame($expected_error, $validator->getError());
 	}
+
+
+	/**
+	 * Test cases affected by a second difference for error message
+	 * @return array
+	 */
+	public function dataProviderRangeTimeValidatorIgnoreSeconds(): array {
+		return [
+			// Invalid time: out of min range.
+			['2010-01-01 00:00:00',									['min_in_future' => true], 						'value must be greater than or equal to '.date(ZBX_DATE, time()+1)],
+			['now',													['min_in_future' => true],						'value must be greater than or equal to '.date(ZBX_DATE, time()+1)]
+		];
+	}
+
+	/**
+	 * @dataProvider dataProviderRangeTimeValidatorIgnoreSeconds
+	 */
+	public function testRangeTimeValidatorIgnoreSeconds($name, $options, $expected_error): void {
+		$validator = new CRangeTimeValidator($options);
+
+		$expected_result = $expected_error === null;
+		$this->assertEquals($expected_result, $validator->validate($name));
+		$this->assertStringStartsWith($expected_error, $validator->getError());
+	}
+
 }
