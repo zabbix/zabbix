@@ -238,12 +238,152 @@ static int	DBpatch_7050018(void)
 
 static int	DBpatch_7050019(void)
 {
+	/* 2 - ZBX_FLAG_DISCOVERY_PROTOTYPE */
+	/* 6 - ZBX_FLAG_DISCOVERY_PROTOTYPE_CREATED (host prototype discovered via nested LLD) */
+	if (ZBX_DB_OK > zbx_db_execute(
+			"delete from httptestitem"
+			" where httptestid in ("
+				"select ht.httptestid from hosts h,httptest ht"
+				" where h.hostid=ht.hostid and h.flags in (2,6)"
+			")"))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+static int	DBpatch_7050020(void)
+{
+	/* 2 - ZBX_FLAG_DISCOVERY_PROTOTYPE */
+	/* 6 - ZBX_FLAG_DISCOVERY_PROTOTYPE_CREATED (host prototype discovered via nested LLD) */
+	if (ZBX_DB_OK > zbx_db_execute(
+			"delete from httpstepitem"
+			" where httpstepid in ("
+				"select hts.httpstepid"
+				" from hosts h,httptest ht,httpstep hts"
+				" where h.hostid=ht.hostid"
+					" and ht.httptestid=hts.httptestid and h.flags in (2,6)"
+			")"))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+static int	DBpatch_7050021(void)
+{
+	/* 2 - ZBX_FLAG_DISCOVERY_PROTOTYPE */
+	/* 6 - ZBX_FLAG_DISCOVERY_PROTOTYPE_CREATED (host prototype discovered via nested LLD) */
+	if (ZBX_DB_OK > zbx_db_execute(
+			"delete from item_tag"
+			" where itemid in ("
+				"select i.itemid from hosts h,items i"
+				" where h.hostid=i.hostid and h.flags in (2,6)"
+			")"))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+static int	DBpatch_7050022(void)
+{
+	/* 2 - ZBX_FLAG_DISCOVERY_PROTOTYPE */
+	/* 6 - ZBX_FLAG_DISCOVERY_PROTOTYPE_CREATED (host prototype discovered via nested LLD) */
+	if (ZBX_DB_OK > zbx_db_execute(
+			"delete from items"
+			" where exists ("
+				"select null from hosts h"
+				" where h.hostid=items.hostid and h.flags in (2,6)"
+			")"))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+static int	DBpatch_7050023(void)
+{
+	/* 2 - ZBX_FLAG_DISCOVERY_PROTOTYPE */
+	/* 6 - ZBX_FLAG_DISCOVERY_PROTOTYPE_CREATED (host prototype discovered via nested LLD) */
+	if (ZBX_DB_OK > zbx_db_execute(
+			"delete from httpstep_field"
+			" where httpstepid in ("
+				"select hts.httpstepid"
+				" from hosts h,httptest ht,httpstep hts"
+				" where h.hostid=ht.hostid"
+					" and ht.httptestid=hts.httptestid and h.flags in (2,6)"
+			")"))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+static int	DBpatch_7050024(void)
+{
+	/* 2 - ZBX_FLAG_DISCOVERY_PROTOTYPE */
+	/* 6 - ZBX_FLAG_DISCOVERY_PROTOTYPE_CREATED (host prototype discovered via nested LLD) */
+	if (ZBX_DB_OK > zbx_db_execute(
+			"delete from httpstep"
+			" where httptestid in ("
+				"select ht.httptestid from hosts h,httptest ht"
+				" where h.hostid=ht.hostid and h.flags in (2,6)"
+			")"))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+static int	DBpatch_7050025(void)
+{
+	/* 2 - ZBX_FLAG_DISCOVERY_PROTOTYPE */
+	/* 6 - ZBX_FLAG_DISCOVERY_PROTOTYPE_CREATED (host prototype discovered via nested LLD) */
+	if (ZBX_DB_OK > zbx_db_execute(
+			"delete from httptest_field"
+			" where httptestid in ("
+				"select ht.httptestid from hosts h,httptest ht"
+				" where h.hostid=ht.hostid and h.flags in (2,6)"
+			")"))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+static int	DBpatch_7050026(void)
+{
+	/* 2 - ZBX_FLAG_DISCOVERY_PROTOTYPE */
+	/* 6 - ZBX_FLAG_DISCOVERY_PROTOTYPE_CREATED (host prototype discovered via nested LLD) */
+	if (ZBX_DB_OK > zbx_db_execute(
+			"delete from httptest"
+			" where exists ("
+				"select null from hosts h"
+				" where h.hostid=httptest.hostid and h.flags in (2,6)"
+			")"))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+static int	DBpatch_7050027(void)
+{
 	const zbx_db_field_t	field = {"automatic", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("trigger_tag", &field);
 }
 
-static int	DBpatch_7050020(void)
+static int	DBpatch_7050028(void)
 {
 	if (ZBX_DB_OK > zbx_db_execute(
 			"update trigger_tag"
@@ -286,5 +426,13 @@ DBPATCH_ADD(7050017, 0, 1)
 DBPATCH_ADD(7050018, 0, 1)
 DBPATCH_ADD(7050019, 0, 1)
 DBPATCH_ADD(7050020, 0, 1)
+DBPATCH_ADD(7050021, 0, 1)
+DBPATCH_ADD(7050022, 0, 1)
+DBPATCH_ADD(7050023, 0, 1)
+DBPATCH_ADD(7050024, 0, 1)
+DBPATCH_ADD(7050025, 0, 1)
+DBPATCH_ADD(7050026, 0, 1)
+DBPATCH_ADD(7050027, 0, 1)
+DBPATCH_ADD(7050028, 0, 1)
 
 DBPATCH_END()

@@ -28,6 +28,9 @@ void	zbx_vector_var_clear_ext(zbx_vector_var_t *v);
 
 typedef union
 {
+	/* flags for none variant */
+	unsigned char		flags;
+
 	zbx_uint64_t		ui64;
 	double			dbl;
 
@@ -48,7 +51,6 @@ struct zbx_variant
 {
 	unsigned char		type;
 	zbx_variant_data_t	data;
-	unsigned char		flags; /* used for processing */
 };
 
 #define ZBX_VARIANT_NONE	0
@@ -63,6 +65,7 @@ struct zbx_variant
 #define ZBX_VARIANT_FLAG_CHANGED	1
 
 void		zbx_variant_clear(zbx_variant_t *value);
+void		zbx_variant_clear_ext(zbx_variant_t *value, unsigned char flags);
 void		zbx_variant_set_none(zbx_variant_t *value);
 void		zbx_variant_set_str(zbx_variant_t *value, char *text);
 void		zbx_variant_set_dbl(zbx_variant_t *value, double value_dbl);

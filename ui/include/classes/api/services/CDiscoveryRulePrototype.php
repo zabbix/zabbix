@@ -40,7 +40,7 @@ class CDiscoveryRulePrototype extends CDiscoveryRuleGeneral {
 
 		$sql_parts = [
 			'select'	=> ['items' => 'i.itemid'],
-			'from'		=> ['items' => 'items i'],
+			'from'		=> 'items i',
 			'where'		=> ['i.flags IN('.ZBX_FLAG_DISCOVERY_RULE_PROTOTYPE.','.ZBX_FLAG_DISCOVERY_RULE_PROTOTYPE_CREATED.')'],
 			'group'		=> [],
 			'order'		=> [],
@@ -93,10 +93,8 @@ class CDiscoveryRulePrototype extends CDiscoveryRuleGeneral {
 				return $options['countOutput'] ? '0' : [];
 			}
 
-			$sql_parts['from'][] = 'host_hgset hh';
-			$sql_parts['from'][] = 'permission p';
-			$sql_parts['where'][] = 'i.hostid=hh.hostid';
-			$sql_parts['where'][] = 'hh.hgsetid=p.hgsetid';
+			$sql_parts['join']['hh'] = ['table' => 'host_hgset', 'using' => 'hostid'];
+			$sql_parts['join']['p'] = ['left_table' => 'hh', 'table' => 'permission', 'using' => 'hgsetid'];
 			$sql_parts['where'][] = 'p.ugsetid='.self::$userData['ugsetid'];
 
 			if ($options['editable']) {
@@ -135,8 +133,7 @@ class CDiscoveryRulePrototype extends CDiscoveryRuleGeneral {
 		if ($options['discoveryids'] !== null) {
 			zbx_value2array($options['discoveryids']);
 
-			$sql_parts['from'][] = 'item_discovery id';
-			$sql_parts['where'][] = 'i.itemid=id.itemid';
+			$sql_parts['join']['id'] = ['table' => 'item_discovery', 'using' => 'itemid'];
 			$sql_parts['where'][] = dbConditionId('id.lldruleid', $options['discoveryids']);
 
 			if ($options['groupCount']) {
@@ -157,9 +154,8 @@ class CDiscoveryRulePrototype extends CDiscoveryRuleGeneral {
 		if ($options['groupids'] !== null) {
 			zbx_value2array($options['groupids']);
 
-			$sql_parts['from']['hosts_groups'] = 'hosts_groups hg';
+			$sql_parts['join']['hg'] = ['table' => 'hosts_groups', 'using' => 'hostid'];
 			$sql_parts['where'][] = dbConditionId('hg.groupid', $options['groupids']);
-			$sql_parts['where'][] = 'hg.hostid=i.hostid';
 
 			if ($options['groupCount']) {
 				$sql_parts['group']['hg'] = 'hg.groupid';
@@ -176,8 +172,7 @@ class CDiscoveryRulePrototype extends CDiscoveryRuleGeneral {
 		}
 
 		if ($options['templated'] !== null) {
-			$sql_parts['from']['hosts'] = 'hosts h';
-			$sql_parts['where']['hi'] = 'h.hostid=i.hostid';
+			$sql_parts['join']['h'] = ['table' => 'hosts', 'using' => 'hostid'];
 
 			if ($options['templated']) {
 				$sql_parts['where'][] = 'h.status='.HOST_STATUS_TEMPLATE;
@@ -188,8 +183,7 @@ class CDiscoveryRulePrototype extends CDiscoveryRuleGeneral {
 		}
 
 		if ($options['monitored'] !== null) {
-			$sql_parts['from']['hosts'] = 'hosts h';
-			$sql_parts['where']['hi'] = 'h.hostid=i.hostid';
+			$sql_parts['join']['h'] = ['table' => 'hosts', 'using' => 'hostid'];
 
 			if ($options['monitored']) {
 				$sql_parts['where'][] = 'h.status='.HOST_STATUS_MONITORED;
@@ -226,8 +220,7 @@ class CDiscoveryRulePrototype extends CDiscoveryRuleGeneral {
 			if (isset($options['filter']['host'])) {
 				zbx_value2array($options['filter']['host']);
 
-				$sql_parts['from']['hosts'] = 'hosts h';
-				$sql_parts['where']['hi'] = 'h.hostid=i.hostid';
+				$sql_parts['join']['h'] = ['table' => 'hosts', 'using' => 'hostid'];
 				$sql_parts['where']['h'] = dbConditionString('h.host', $options['filter']['host']);
 			}
 		}
