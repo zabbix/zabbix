@@ -157,8 +157,7 @@
 				$curr_control.data('is-activated', true);
 			}
 
-			const $textarea = $('<textarea>')
-				.addClass('textarea-flexible')
+			const $textarea = $('<z-textarea-flexible>')
 				.attr({
 					id: $input.attr('id'),
 					name: $input.attr('name'),

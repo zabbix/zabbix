@@ -2410,6 +2410,7 @@ input[type="number"].has-error,
 input[type="email"].has-error,
 input[type="time"].has-error,
 input[type="file"].has-error,
+z-textarea-flexible.has-error textarea,
 textarea.has-error {
   border: 1px solid #ff5555; }
   z-select.has-error button.focusable:active:focus,
@@ -2422,6 +2423,7 @@ textarea.has-error {
   input[type="email"].has-error:focus,
   input[type="time"].has-error:focus,
   input[type="file"].has-error:focus,
+  z-textarea-flexible.has-error textarea:focus,
   textarea.has-error:focus {
     border-color: #ff9b9b; }
 
@@ -2455,7 +2457,7 @@ div[data-field-type="set"].has-error {
 
 .macro-input-group textarea.has-error, .macro-input-group textarea.has-error:focus {
   border-width: 1px 0 1px 1px; }
-.macro-input-group .has-error + .btn-undo, .macro-input-group .has-error:focus + .btn-undo, .macro-input-group .has-error + .btn-undo:focus {
+.macro-input-group .has-error + .btn-undo, .macro-input-group .has-error:focus + .btn-undo, .macro-input-group .has-error:focus-within + .btn-undo, .macro-input-group .has-error + .btn-undo:focus {
   border-color: #ff5555; }
 .macro-input-group .has-error ~ .btn-dropdown-container .btn-dropdown-toggle {
   border-color: #ff5555; }
@@ -8567,7 +8569,8 @@ svg {
     color: #69808d;
     background-color: #383838;
     border-width: 1px 0;
-    border-color: #4f4f4f; }
+    border-color: #4f4f4f;
+    height: auto; }
     .macro-input-group .btn-undo::before {
       font-size: 16px; }
     .macro-input-group .btn-undo:focus, .macro-input-group .btn-undo:hover {

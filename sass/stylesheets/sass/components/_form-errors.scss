@@ -31,6 +31,7 @@ input[type="number"].has-error,
 input[type="email"].has-error,
 input[type="time"].has-error,
 input[type="file"].has-error,
+z-textarea-flexible.has-error textarea,
 textarea.has-error {
 	border: 1px solid $error;
 
@@ -111,6 +112,7 @@ div[data-field-type="set"] {
 	.has-error {
 		& + .btn-undo,
 		&:focus + .btn-undo,
+		&:focus-within + .btn-undo,
 		& + .btn-undo:focus {
 			border-color: $error;
 		}

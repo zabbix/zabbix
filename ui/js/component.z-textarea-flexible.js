@@ -122,12 +122,14 @@ class ZTextareaFlexible extends HTMLElement {
 	#registerEvents() {
 		this.#textarea.addEventListener('keydown', this.#keydownHandler);
 		this.#textarea.addEventListener('blur', this.#blurHandler);
+		this.#textarea.addEventListener('focus', this.#focusHandler);
 		this.#textarea.addEventListener('input', this.#inputHandler);
 	}
 
 	#unregisterEvents() {
 		this.#textarea.removeEventListener('keydown', this.#keydownHandler);
 		this.#textarea.removeEventListener('blur', this.#blurHandler);
+		this.#textarea.removeEventListener('focus', this.#focusHandler);
 		this.#textarea.removeEventListener('input', this.#inputHandler);
 	}
 
@@ -141,6 +143,10 @@ class ZTextareaFlexible extends HTMLElement {
 	#blurHandler = () => {
 		this.#updateHeight();
 		this.dispatchEvent(new Event('blur', { bubbles: true }));
+	}
+
+	#focusHandler = () => {
+		this.dispatchEvent(new Event('focus', { bubbles: true }));
 	}
 
 	#inputHandler = () => {
