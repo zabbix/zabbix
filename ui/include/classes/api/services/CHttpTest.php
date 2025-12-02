@@ -42,7 +42,7 @@ class CHttpTest extends CApiService {
 
 		$sqlParts = [
 			'select'	=> ['httptests' => 'ht.httptestid'],
-			'from'		=> ['httptest' => 'httptest ht'],
+			'from'		=> 'httptest ht',
 			'where'		=> [],
 			'group'		=> [],
 			'order'		=> [],
@@ -59,8 +59,6 @@ class CHttpTest extends CApiService {
 			'templated'      => null,
 			'monitored'      => null,
 			'nopermissions'  => null,
-			'evaltype'		=> TAG_EVAL_TYPE_AND_OR,
-			'tags'			=> null,
 			// filter
 			'filter'         => null,
 			'search'         => null,
@@ -73,7 +71,6 @@ class CHttpTest extends CApiService {
 			'expandStepName' => null,
 			'selectHosts'    => null,
 			'selectSteps'    => null,
-			'selectTags'	 => null,
 			'countOutput'    => false,
 			'groupCount'     => false,
 			'preservekeys'   => false,
@@ -83,16 +80,16 @@ class CHttpTest extends CApiService {
 		];
 		$options = zbx_array_merge($defOptions, $options);
 
+		self::validateGet($options);
+
 		// editable + PERMISSION CHECK
 		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
 			if (self::$userData['ugsetid'] == 0) {
 				return $options['countOutput'] ? '0' : [];
 			}
 
-			$sqlParts['from'][] = 'host_hgset hh';
-			$sqlParts['from'][] = 'permission p';
-			$sqlParts['where'][] = 'ht.hostid=hh.hostid';
-			$sqlParts['where'][] = 'hh.hgsetid=p.hgsetid';
+			$sqlParts['join']['hh'] = ['table' => 'host_hgset', 'using' => 'hostid'];
+			$sqlParts['join']['p'] = ['left_table' => 'hh', 'table' => 'permission', 'using' => 'hgsetid'];
 			$sqlParts['where'][] = 'p.ugsetid='.self::$userData['ugsetid'];
 
 			if ($options['editable']) {
@@ -131,19 +128,35 @@ class CHttpTest extends CApiService {
 		}
 
 		// tags
-		if ($options['tags'] !== null && $options['tags']) {
-			$sqlParts['where'][] = CApiTagHelper::addWhereCondition($options['tags'], $options['evaltype'], 'ht',
-				'httptest_tag', 'httptestid'
-			);
+		if ($options['tags'] !== null) {
+			if ($options['inheritedTags']) {
+				$positive_tag_operators = [TAG_OPERATOR_LIKE, TAG_OPERATOR_EQUAL, TAG_OPERATOR_EXISTS];
+
+				if (array_intersect(array_column($options['tags'], 'operator'), $positive_tag_operators)) {
+					$sqlParts['join']['hti'] = ['table' => 'httptestitem', 'using' => 'httptestid'];
+					$sqlParts['where'][] = CApiTagHelper::getTagCondition($options['tags'], $options['evaltype'],
+						['ht', 'hti'], 'httptest_tag', 'httptestid', true
+					);
+				}
+				else {
+					$sqlParts['where'][] = CApiTagHelper::getTagCondition($options['tags'], $options['evaltype'],
+						['ht'], 'httptest_tag', 'httptestid', true
+					);
+				}
+			}
+			else {
+				$sqlParts['where'][] = CApiTagHelper::getTagCondition($options['tags'], $options['evaltype'], ['ht'],
+					'httptest_tag', 'httptestid'
+				);
+			}
 		}
 
 		// groupids
 		if (!is_null($options['groupids'])) {
 			zbx_value2array($options['groupids']);
 
-			$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
+			$sqlParts['join']['hg'] = ['table' => 'hosts_groups', 'using' => 'hostid'];
 			$sqlParts['where'][] = dbConditionInt('hg.groupid', $options['groupids']);
-			$sqlParts['where'][] = 'hg.hostid=ht.hostid';
 
 			if ($options['groupCount']) {
 				$sqlParts['group']['hg'] = 'hg.groupid';
@@ -157,8 +170,7 @@ class CHttpTest extends CApiService {
 
 		// templated
 		if (isset($options['templated'])) {
-			$sqlParts['from']['hosts'] = 'hosts h';
-			$sqlParts['where']['ha'] = 'h.hostid=ht.hostid';
+			$sqlParts['join']['h'] = ['table' => 'hosts', 'using' => 'hostid'];
 			if ($options['templated']) {
 				$sqlParts['where'][] = 'h.status='.HOST_STATUS_TEMPLATE;
 			}
@@ -169,8 +181,7 @@ class CHttpTest extends CApiService {
 
 		// monitored
 		if (!is_null($options['monitored'])) {
-			$sqlParts['from']['hosts'] = 'hosts h';
-			$sqlParts['where']['hht'] = 'h.hostid=ht.hostid';
+			$sqlParts['join']['h'] = ['table' => 'hosts', 'using' => 'hostid'];
 
 			if ($options['monitored']) {
 				$sqlParts['where'][] = 'h.status='.HOST_STATUS_MONITORED;
@@ -246,6 +257,86 @@ class CHttpTest extends CApiService {
 		}
 
 		return $result;
+	}
+
+	private static function validateGet(array &$options): void {
+		$api_input_rules = ['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
+			// Filters.
+			'evaltype' =>				['type' => API_INT32, 'in' => implode(',', [TAG_EVAL_TYPE_AND_OR, TAG_EVAL_TYPE_OR]), 'default' => TAG_EVAL_TYPE_AND_OR],
+			'tags' =>					['type' => API_OBJECTS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null, 'fields' => [
+				'tag' =>					['type' => API_STRING_UTF8, 'flags' => API_REQUIRED],
+				'operator' =>				['type' => API_INT32, 'in' => implode(',', [TAG_OPERATOR_LIKE, TAG_OPERATOR_EQUAL, TAG_OPERATOR_NOT_LIKE, TAG_OPERATOR_NOT_EQUAL, TAG_OPERATOR_EXISTS, TAG_OPERATOR_NOT_EXISTS]), 'default' => TAG_OPERATOR_LIKE],
+				'value' =>					['type' => API_STRING_UTF8, 'default' => '']
+			]],
+			'inheritedTags' =>			['type' => API_BOOLEAN, 'default' => false],
+			// Output.
+			'selectTags' =>				['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', ['tag', 'value']), 'default' => null],
+			'selectInheritedTags' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', ['tag', 'value', 'object', 'objectid']), 'default' => null]
+		]];
+
+		if (!CApiInputValidator::validate($api_input_rules, $options, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+		}
+	}
+
+	private static function addRelatedTags(array $options, array &$httptests): void {
+		if ($options['selectTags'] === null) {
+			return;
+		}
+
+		foreach ($httptests as &$httptest) {
+			$httptest['tags'] = [];
+		}
+		unset($httptest);
+
+		$sql_options = [
+			'output' => array_merge(['httptesttagid', 'httptestid'], $options['selectTags']),
+			'filter' => ['httptestid' => array_keys($httptests)]
+		];
+		$resource = DBselect(DB::makeSql('httptest_tag', $sql_options));
+
+		while ($row = DBfetch($resource)) {
+			$httptests[$row['httptestid']]['tags'][] =
+				array_diff_key($row, array_flip(['httptesttagid', 'httptestid']));
+		}
+	}
+
+	private static function addRelatedInheritedTags(array $options, array &$httptests): void {
+		if ($options['selectInheritedTags'] === null) {
+			return;
+		}
+
+		foreach ($httptests as &$httptest) {
+			$httptest['inheritedTags'] = [];
+		}
+		unset($httptest);
+
+		$output = ['hi.httptestid'];
+
+		foreach ($options['selectInheritedTags'] as $field) {
+			$output[] = match ($field) {
+				'tag', 'value' => 'ht.'.$field,
+				'object' =>
+					'CASE WHEN h.status='.HOST_STATUS_TEMPLATE.
+					' THEN '.ZBX_TAG_OBJECT_TEMPLATE.
+					' ELSE '.ZBX_TAG_OBJECT_HOST.
+					' END AS object',
+				'objectid' => 'itc.link_hostid AS objectid'
+			};
+		}
+
+		$resource = DBselect(
+			'SELECT DISTINCT '.implode(',', $output).
+			' FROM httptestitem hi'.
+			' JOIN item_template_cache itc ON hi.itemid=itc.itemid'.
+			' JOIN host_tag ht ON itc.link_hostid=ht.hostid'.
+			(in_array('object', $options['selectInheritedTags']) ? ' JOIN hosts h ON itc.link_hostid=h.hostid' : '').
+			' WHERE '.dbConditionId('hi.httptestid', array_keys($httptests))
+		);
+
+		while ($row = DBfetch($resource)) {
+			$httptests[$row['httptestid']]['inheritedTags'][] = array_diff_key($row, array_flip(['httptestid']));
+		}
 	}
 
 	/**
@@ -1072,29 +1163,8 @@ class CHttpTest extends CApiService {
 			}
 		}
 
-		// Adding web scenario tags.
-		if ($options['selectTags'] !== null) {
-			$options['selectTags'] = ($options['selectTags'] !== API_OUTPUT_EXTEND)
-				? (array) $options['selectTags']
-				: ['tag', 'value'];
-
-			$options['selectTags'] = array_intersect(['tag', 'value'], $options['selectTags']);
-			$requested_output = array_flip($options['selectTags']);
-
-			$db_tags = DBselect(
-				'SELECT '.implode(',', array_merge($options['selectTags'], ['httptestid'])).
-				' FROM httptest_tag'.
-				' WHERE '.dbConditionInt('httptestid', $httpTestIds)
-			);
-
-			array_walk($result, function (&$http_test) {
-				$http_test['tags'] = [];
-			});
-
-			while ($db_tag = DBfetch($db_tags)) {
-				$result[$db_tag['httptestid']]['tags'][] = array_intersect_key($db_tag, $requested_output);
-			}
-		}
+		self::addRelatedTags($options, $result);
+		self::addRelatedInheritedTags($options, $result);
 
 		return $result;
 	}
@@ -1237,7 +1307,7 @@ class CHttpTest extends CApiService {
 		$hostids_condition = $hostids ? ' AND '.dbConditionId('hht.hostid', $hostids) : '';
 
 		$result = DBselect(
-			'SELECT hht.httptestid,hht.name,h.status AS host_status'.
+			'SELECT hht.httptestid,hht.name,hht.hostid,hht.templateid,h.status AS host_status'.
 			' FROM httptest ht,httptest hht,hosts h'.
 			' WHERE ht.httptestid=hht.templateid'.
 				' AND hht.hostid=h.hostid'.
@@ -1246,11 +1316,13 @@ class CHttpTest extends CApiService {
 		);
 
 		$httptests = [];
+		$db_httptests = [];
 
 		while ($row = DBfetch($result)) {
 			$httptest = [
 				'httptestid' => $row['httptestid'],
 				'name' => $row['name'],
+				'hostid' => $row['hostid'],
 				'templateid' => 0
 			];
 
@@ -1259,11 +1331,57 @@ class CHttpTest extends CApiService {
 			}
 
 			$httptests[] = $httptest;
+			$db_httptests[$row['httptestid']] = ['templateid' => $row['templateid']];
 		}
 
 		if ($httptests) {
-			Manager::HttpTest()->update($httptests);
+			self::addDelTemplateCaches($httptests, $db_httptests);
+
+			$httptests = Manager::HttpTest()->update($httptests);
+			Manager::HttpTest()->inherit($httptests);
 		}
+	}
+
+	public static function addInsTemplateCaches(array &$httptests): void {
+		$items = DBfetchArrayAssoc(DBselect(
+			'SELECT hti.httptestid,hti.itemid,i.hostid,i.templateid'.
+			' FROM httptestitem hti'.
+			' JOIN items i ON hti.itemid=i.itemid'.
+			' WHERE '.dbConditionId('hti.httptestid', array_column($httptests, 'httptestid')).
+				' AND hti.type='.HTTPSTEP_ITEM_TYPE_IN
+		), 'httptestid');
+
+		CItem::addInsTemplateCaches($items);
+
+		foreach ($httptests as &$httptest) {
+			$httptest['ins_template_cache'] = $items[$httptest['httptestid']]['ins_template_cache'];
+		}
+		unset($httptest);
+	}
+
+	public static function addDelTemplateCaches(array &$httptests, array $db_httptests): void {
+		$resource = DBselect(
+			'SELECT hti.httptestid,hti.itemid,i.templateid'.
+			' FROM httptestitem hti'.
+			' JOIN items i ON hti.itemid=i.itemid'.
+			' WHERE '.dbConditionId('hti.httptestid', array_keys($db_httptests)).
+				' AND hti.type='.HTTPSTEP_ITEM_TYPE_IN
+		);
+
+		$items = [];
+		$db_items = [];
+
+		while ($row = DBfetch($resource)) {
+			$items[$row['httptestid']] = ['itemid' => $row['itemid']];
+			$db_items[$row['itemid']] = ['templateid' => $row['templateid']];
+		}
+
+		CItem::addDelTemplateCaches($items, $db_items);
+
+		foreach ($httptests as &$httptest) {
+			$httptest['del_template_cache'] = $items[$httptest['httptestid']]['del_template_cache'];
+		}
+		unset($httptest);
 	}
 
 	/**

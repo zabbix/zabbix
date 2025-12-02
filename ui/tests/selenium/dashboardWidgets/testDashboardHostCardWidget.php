@@ -1109,15 +1109,16 @@ class testDashboardHostCardWidget extends testWidgets {
 					],
 					'Monitoring' => [
 						'Dashboards' => 8,
-						'Latest data' => 288,
+						'Latest data' => 291,
 						'Graphs' => 29,
 						'Web' => 1
 					],
 					'Templates' => ['Apache by Zabbix agent', 'Ceph by Zabbix agent 2', 'Docker by Zabbix agent 2',
 							'Linux by Zabbix agent', 'PostgreSQL by Zabbix agent', 'Zabbix server health'
 					],
-					'Tags' => ['class: database', 'class: os', 'class: software', 'subclass: logging',
-							'subclass: monitoring', 'subclass: sql', 'subclass: webserver', 'target: apache',
+					'Tags' => ['class: database', 'class: os', 'class: software', 'subclass: containers',
+							'subclass: deploy', 'subclass: development', 'subclass: logging', 'subclass: monitoring',
+							'subclass: sql', 'subclass: virtualization', 'subclass: webserver', 'target: apache',
 							'target: ceph', 'target: docker', 'target: linux', 'target: postgresql', 'target: server',
 							'target: zabbix'
 					],
@@ -1247,7 +1248,7 @@ class testDashboardHostCardWidget extends testWidgets {
 					],
 					'Monitoring' => [
 						'Dashboards' => 4,
-						'Latest data' => 122,
+						'Latest data' => 125,
 						'Graphs' => 8,
 						'Web' => 0
 					]
@@ -1552,7 +1553,7 @@ class testDashboardHostCardWidget extends testWidgets {
 	public function testDashboardHostCardWidget_CheckLinks($data) {
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.
 				self::$dashboardid['Dashboard for HostCard widget display check'])->waitUntilReady();
-		$dashboard = CDashboardElement::find()->one();
+		$dashboard = CDashboardElement::find()->one()->waitUntilReady();
 
 		// Check for missing reference if there are no objects.
 		if (array_key_exists('inactive', $data)) {
@@ -1583,6 +1584,11 @@ class testDashboardHostCardWidget extends testWidgets {
 		$data['url'] = str_replace('{hostid}', self::$hostid, $data['url']);
 		$this->assertEquals(PHPUNIT_URL.$data['url'], $this->page->getCurrentUrl());
 		$this->page->assertTitle($data['title']);
+
+		// Unstable test on Jenkins, graphs page opens slow and loose session before next test.
+		if (CTestArrayHelper::get($data, 'link') === 'Graphs') {
+			$this->page->open('browserwarning.php');
+		}
 	}
 
 	public static function getCancelData() {

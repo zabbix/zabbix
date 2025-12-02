@@ -68,7 +68,8 @@ class CHostPrototype extends CHostBase {
 			'selectInterfaces' =>				['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', $interface_fields), 'default' => null],
 			'selectTemplates' =>				['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT, 'in' => implode(',', $hosts_fields), 'default' => null],
 			'selectMacros' =>					['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', CUserMacro::getOutputFieldsOnHostPrototype()), 'default' => null],
-			'selectTags' =>						['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['tag', 'value']), 'default' => null],
+			'selectTags' =>						['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', ['tag', 'value']), 'default' => null],
+			'selectInheritedTags' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', self::INHERITED_TAG_OUTPUT_FIELDS), 'default' => null],
 			// sort and limit
 			'sortfield' =>						['type' => API_STRINGS_UTF8, 'flags' => API_NORMALIZE, 'in' => implode(',', $this->sortColumns), 'uniq' => true, 'default' => []],
 			'sortorder' =>						['type' => API_SORTORDER, 'default' => []],
@@ -136,8 +137,7 @@ class CHostPrototype extends CHostBase {
 
 		if ((!$options['countOutput'] && $this->outputIsRequested('inventory_mode', $options['output']))
 				|| ($options['filter'] && array_key_exists('inventory_mode', $options['filter']))) {
-			$sqlParts['left_join'][] = ['alias' => 'hinv', 'table' => 'host_inventory', 'using' => 'hostid'];
-			$sqlParts['left_table'] = ['alias' => $this->tableAlias, 'table' => $this->tableName];
+			$sqlParts['join']['hinv'] = ['type' => 'left', 'table' => 'host_inventory', 'using' => 'hostid'];
 		}
 
 		return $sqlParts;
@@ -153,14 +153,10 @@ class CHostPrototype extends CHostBase {
 				$sqlParts['where'][] = '1=0';
 			}
 			else {
-				$sqlParts['from']['hd'] = 'host_discovery hd';
-				$sqlParts['from'][] = 'items i';
-				$sqlParts['from'][] = 'host_hgset hh';
-				$sqlParts['from'][] = 'permission p';
-				$sqlParts['where']['h-hd'] = 'h.hostid=hd.hostid';
-				$sqlParts['where'][] = 'hd.lldruleid=i.itemid';
-				$sqlParts['where'][] = 'i.hostid=hh.hostid';
-				$sqlParts['where'][] = 'hh.hgsetid=p.hgsetid';
+				$sqlParts['join']['hd'] = ['table' => 'host_discovery', 'using' => 'hostid'];
+				$sqlParts['join']['i'] = ['left_table' => 'hd', 'table' => 'items', 'on' => ['lldruleid' => 'itemid']];
+				$sqlParts['join']['hh'] = ['left_table' => 'i', 'table' => 'host_hgset', 'using' => 'hostid'];
+				$sqlParts['join']['p'] = ['left_table' => 'hh', 'table' => 'permission', 'using' => 'hgsetid'];
 				$sqlParts['where'][] = 'p.ugsetid='.self::$userData['ugsetid'];
 
 				if ($options['editable']) {
@@ -171,8 +167,7 @@ class CHostPrototype extends CHostBase {
 
 		// discoveryids
 		if ($options['discoveryids'] !== null) {
-			$sqlParts['from']['hd'] = 'host_discovery hd';
-			$sqlParts['where']['h-hd'] = 'h.hostid=hd.hostid';
+			$sqlParts['join']['hd'] = ['table' => 'host_discovery', 'using' => 'hostid'];
 			$sqlParts['where'][] = dbConditionId('hd.lldruleid', (array) $options['discoveryids']);
 
 			if ($options['groupCount']) {
@@ -221,16 +216,16 @@ class CHostPrototype extends CHostBase {
 	protected function addRelatedObjects(array $options, array $result) {
 		$result = parent::addRelatedObjects($options, $result);
 
+		self::addRelatedTags($options, $result);
+		self::addRelatedInheritedTags($options, $result);
 		self::addRelatedMacros($options, $result);
-
-		$hostids = array_keys($result);
-
 		self::addRelatedDiscoveryRules($options, $result);
 		self::addRelatedDiscoveryRulePrototypes($options, $result);
 		self::addRelatedDiscoveryData($options, $result);
-
 		self::addRelatedGroupLinks($options, $result);
 		self::addRelatedGroupPrototypes($options, $result);
+
+		$hostids = array_keys($result);
 
 		if ($options['selectParentHost'] !== null) {
 			$hosts = [];
@@ -289,34 +284,6 @@ class CHostPrototype extends CHostBase {
 						? $templates[$hostid]['rowscount']
 						: '0';
 				}
-			}
-		}
-
-		if ($options['selectTags'] !== null) {
-			foreach ($result as &$row) {
-				$row['tags'] = [];
-			}
-			unset($row);
-
-			if ($options['selectTags'] === API_OUTPUT_EXTEND) {
-				$output = ['hosttagid', 'hostid', 'tag', 'value'];
-			}
-			else {
-				$output = array_unique(array_merge(['hosttagid', 'hostid'], $options['selectTags']));
-			}
-
-			$sql_options = [
-				'output' => $output,
-				'filter' => ['hostid' => $hostids]
-			];
-			$db_tags = DBselect(DB::makeSql('host_tag', $sql_options));
-
-			while ($db_tag = DBfetch($db_tags)) {
-				$hostid = $db_tag['hostid'];
-
-				unset($db_tag['hosttagid'], $db_tag['hostid']);
-
-				$result[$hostid]['tags'][] = $db_tag;
 			}
 		}
 
@@ -556,10 +523,16 @@ class CHostPrototype extends CHostBase {
 
 		$hostids = DB::insert('hosts', $hosts);
 
+		$ins_host_template_cache = [];
 		$host_statuses = [];
 
 		foreach ($hosts as &$host) {
 			$host['hostid'] = array_shift($hostids);
+
+			$ins_host_template_cache[] = [
+				'hostid' => $host['hostid'],
+				'link_hostid' => $host['hostid']
+			];
 
 			$host_statuses[] = $host['host_status'];
 			unset($host['host_status']);
@@ -570,12 +543,15 @@ class CHostPrototype extends CHostBase {
 			$this->checkTemplatesLinks($hosts);
 		}
 
+		DB::insertBatch('host_template_cache', $ins_host_template_cache, false);
+
 		self::createHostDiscoveries($hosts);
 
 		self::updateInterfaces($hosts);
 		self::updateGroupLinks($hosts);
 		self::updateGroupPrototypes($hosts);
-		$this->updateTemplates($hosts);
+		self::updateTemplates($hosts);
+		self::updateHostTemplateCache($hosts);
 		$this->updateTags($hosts);
 		self::updateMacros($hosts);
 		self::updateHostInventories($hosts);
@@ -950,7 +926,8 @@ class CHostPrototype extends CHostBase {
 		self::updateInterfaces($hosts, $db_hosts, $upd_hostids);
 		self::updateGroupLinks($hosts, $db_hosts, $upd_hostids);
 		self::updateGroupPrototypes($hosts, $db_hosts, $upd_hostids);
-		$this->updateTemplates($hosts, $db_hosts, $upd_hostids);
+		self::updateTemplates($hosts, $db_hosts, $upd_hostids);
+		self::updateHostTemplateCache($hosts, $db_hosts);
 		$this->updateTags($hosts, $db_hosts, $upd_hostids);
 		self::updateMacros($hosts, $db_hosts, $upd_hostids);
 		self::updateHostInventories($hosts, $db_hosts, $upd_hostids);
@@ -1787,6 +1764,97 @@ class CHostPrototype extends CHostBase {
 				}
 			}
 			unset($group_prototype);
+		}
+		unset($host);
+	}
+
+	private static function updateTemplates(array &$hosts, ?array &$db_hosts = null,
+			?array &$upd_hostids = null): void {
+		$ins_hosts_templates = [];
+		$del_hosttemplateids = [];
+
+		foreach ($hosts as $i => &$host) {
+			if (!array_key_exists('templates', $host) && !array_key_exists('templates_clear', $host)) {
+				continue;
+			}
+
+			$db_templates = ($db_hosts !== null)
+				? array_column($db_hosts[$host['hostid']]['templates'], null, 'templateid')
+				: [];
+			$changed = false;
+
+			if (array_key_exists('templates', $host)) {
+				foreach ($host['templates'] as &$template) {
+					if (array_key_exists($template['templateid'], $db_templates)) {
+						$template['hosttemplateid'] = $db_templates[$template['templateid']]['hosttemplateid'];
+						unset($db_templates[$template['templateid']]);
+					}
+					else {
+						$ins_hosts_templates[] = [
+							'hostid' => $host['hostid'],
+							'templateid' => $template['templateid']
+						];
+						$changed = true;
+					}
+				}
+				unset($template);
+
+				$templates_clear_indexes = [];
+
+				if (array_key_exists('templates_clear', $host)) {
+					foreach ($host['templates_clear'] as $index => $template) {
+						$templates_clear_indexes[$template['templateid']] = $index;
+					}
+				}
+
+				foreach ($db_templates as $del_template) {
+					$changed = true;
+					$del_hosttemplateids[] = $del_template['hosttemplateid'];
+
+					if (array_key_exists($del_template['templateid'], $templates_clear_indexes)) {
+						$index = $templates_clear_indexes[$del_template['templateid']];
+						$host['templates_clear'][$index]['hosttemplateid'] = $del_template['hosttemplateid'];
+					}
+				}
+			}
+			elseif (array_key_exists('templates_clear', $host)) {
+				foreach ($host['templates_clear'] as &$template) {
+					$template['hosttemplateid'] = $db_templates[$template['templateid']]['hosttemplateid'];
+					$del_hosttemplateids[] = $db_templates[$template['templateid']]['hosttemplateid'];
+				}
+				unset($template);
+			}
+
+			if ($db_hosts !== null) {
+				if ($changed) {
+					$upd_hostids[$i] = $host['hostid'];
+				}
+				else {
+					unset($host['templates'], $db_hosts[$host['hostid']]['templates']);
+				}
+			}
+		}
+		unset($host);
+
+		if ($del_hosttemplateids) {
+			DB::delete('hosts_templates', ['hosttemplateid' => $del_hosttemplateids]);
+		}
+
+		if ($ins_hosts_templates) {
+			$hosttemplateids = DB::insertBatch('hosts_templates', $ins_hosts_templates);
+		}
+
+		foreach ($hosts as &$host) {
+			if (!array_key_exists('templates', $host)) {
+				continue;
+			}
+
+			foreach ($host['templates'] as &$template) {
+				if (!array_key_exists('hosttemplateid', $template)) {
+					$template['hosttemplateid'] = array_shift($hosttemplateids);
+				}
+			}
+			unset($template);
 		}
 		unset($host);
 	}

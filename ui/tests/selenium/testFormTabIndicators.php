@@ -198,7 +198,8 @@ class testFormTabIndicators extends CWebTest {
 			[
 				[
 					// Zabbix server, Discovery rule => Block devices discovery
-					'url' => 'host_prototypes.php?form=create&parent_discoveryid=66355&context=host',
+					'url' => 'zabbix.php?action=host.prototype.list&parent_discoveryid=66355&context=host',
+					'create_button' => 'Create host prototype',
 					'form' => 'name:hostPrototypeForm',
 					'tabs' => [
 						[

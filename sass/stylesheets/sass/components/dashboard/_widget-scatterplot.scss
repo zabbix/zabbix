@@ -1,0 +1,307 @@
+// Widget configuration.
+
+form.dashboard-widget-scatterplot {
+	max-width: 1330px;
+	min-width: 1120px;
+	width: #{"min(100vw - 42px, calc(var(--modal-max-width) - 22px))"};
+
+	.scatter-plot-widget-config-tabs {
+		grid-column: 1 / -1;
+
+		> .tabs-nav {
+			border-top: 1px solid $ui-border-color;
+		}
+
+		.ui-tabs-nav {
+			position: sticky;
+			top: 0;
+			background: $header-bg-color;
+			z-index: 3;
+		}
+	}
+
+	.thresholds-tab-grid {
+		display: grid;
+		gap: 10px;
+	}
+
+	.table-forms-container {
+		border: 1px solid $ui-border-color;
+		border-top: none;
+	}
+
+	.table-forms-separator {
+		padding: 0;
+	}
+
+	.dataset-head,
+	.dataset-body.list-accordion-item-body {
+		display: contents;
+	}
+
+	.dataset-head {
+		.multiselect-control {
+			overflow: hidden;
+			margin: -2px;
+			padding: 2px;
+
+			.multiselect {
+				overflow: hidden;
+				flex-grow: 1;
+			}
+		}
+
+		.head-row {
+			display: grid;
+			grid-template-columns: auto 1fr;
+			gap: 10px;
+
+			> label {
+				display: inline-block;
+				text-align: right;
+				min-width: 80px;
+				max-width: 120px;
+				line-height: 24px;
+
+				@extend %overflow-ellipsis;
+			}
+		}
+	}
+
+	.dataset-body {
+		.form-grid {
+			grid-template-columns: auto 1fr;
+			grid-auto-rows: auto;
+			padding-top: 0;
+
+			> label {
+				display: inline-block;
+				text-align: right;
+				min-width: 80px;
+				max-width: 120px;
+
+				@extend %overflow-ellipsis;
+			}
+
+			&:first-child {
+				grid-column-start: 5;
+			}
+
+			.table-tags {
+				max-width: 453px;
+
+				.table-tags-input {
+					min-width: 100px;
+					max-width: 130px;
+					width: 100%;
+				}
+
+				z-select {
+					min-width: 120px;
+				}
+			}
+
+			.marker-config {
+				display: flex;
+				gap: 10px;
+				line-height: 24px;
+
+				.radio-list-control {
+					label {
+						padding: 4px 5px;
+					}
+
+					.icon {
+						@extend %icon-small;
+
+						&::before {
+							color: $font-color;
+						}
+					}
+				}
+			}
+		}
+	}
+
+	.list-item-actions {
+		grid-column: span 1 / -1;
+		text-align: right;
+
+		.btn-icon {
+			@extend %button-size-medium;
+		}
+	}
+
+	.list-vertical-accordion {
+		position: relative;
+		overflow: visible;
+		margin-top: -5px;
+		margin-bottom: 5px;
+
+		.sortable:not(.sortable-disabled) {
+			.list-accordion-item {
+				> .drag-icon + label {
+					cursor: grab;
+				}
+			}
+		}
+	}
+
+	.list-accordion-item {
+		position: relative;
+		display: grid;
+		grid-template-columns: 5px 100px 24px 24px 1fr 1fr 24px;
+		grid-gap: 10px;
+		align-items: start;
+		padding: 5px 0;
+
+		> .drag-icon {
+			height: 24px;
+			margin-left: -2px;
+		}
+
+		> label {
+			pointer-events: initial;
+			overflow: hidden;
+			line-height: 24px;
+			text-align: left;
+			text-overflow: ellipsis;
+		}
+
+		&.list-accordion-item-opened {
+			&::before {
+				content: ' ';
+				position: absolute;
+				top: 24px;
+				bottom: 0;
+				left: 136px;
+				width: 2px;
+				background: $ui-border-color;
+			}
+		}
+
+		&.list-accordion-item-closed {
+			.multiselect {
+				height: 24px;
+				overflow: hidden;
+			}
+
+			.dataset-head {
+				.table-forms-separator {
+					border: none;
+				}
+
+				.single-item-table {
+					thead,
+					tfoot,
+					.table-col-handle,
+					.table-col-action {
+						display: none;
+					}
+				}
+			}
+
+			.dataset-body {
+				display: none;
+			}
+
+			.items-list {
+				padding-left: 0;
+			}
+		}
+	}
+
+	.single-item-table {
+		.table-col-action { width: 55px; }
+
+		th {
+			padding: 5px 5px 5px 0;
+		}
+
+		.single-item-table-row td {
+			padding: 0 5px 5px 0;
+		}
+
+		th,
+		td {
+			&:first-child {
+				padding-left: 5px;
+			}
+		}
+
+		tfoot td {
+			padding: 5px 5px 5px 10px;
+		}
+
+		tbody:not(:empty) + tfoot td {
+			padding-top: 0;
+		}
+
+		.reference-hint {
+			margin-right: 4px;
+
+			&::before {
+				font-size: $icon-medium-size;
+				color: $link-color;
+			}
+		}
+
+		.unavailable-widget {
+			.reference-hint {
+				&::before {
+					color: $form-disabled-font-color;
+				}
+			}
+
+			a {
+				color: $form-disabled-font-color;
+			}
+		}
+	}
+
+	.select-field-view {
+		overflow: hidden;
+		margin: -2px;
+		padding: 2px;
+
+		.multiselect {
+			overflow: hidden;
+			flex-grow: 1;
+		}
+	}
+
+	.no-items-message {
+		display: none;
+		line-height: 24px;
+		color: $font-alt-color;
+	}
+}
+
+// Widget view.
+
+div.dashboard-widget-scatterplot {
+	overflow-x: hidden;
+}
+
+.svg-scatter-plot-legend {
+	$svg-legend-line-height: 18px;
+
+	position: relative;
+	top: 4px;
+	box-sizing: border-box;
+	display: grid;
+	grid-template-columns: repeat(var(--columns, 4), auto);
+	grid-gap: 0 10px;
+	justify-content: start;
+	max-height: calc(var(--lines) * #{$svg-legend-line-height});
+	margin: 0 10px;
+	overflow: hidden;
+	line-height: $svg-legend-line-height;
+
+	.svg-scatter-plot-legend-item {
+		min-width: 100%;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+}

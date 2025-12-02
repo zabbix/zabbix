@@ -52,9 +52,11 @@ class CScreenHttpTest extends CScreenBase {
 			'output' => ['httptestid', 'name', 'hostid'],
 			'selectHosts' => ['name', 'status'],
 			'selectTags' => ['tag', 'value'],
+			'selectInheritedTags' => ['tag', 'value'],
 			'selectSteps' => API_OUTPUT_COUNT,
 			'evaltype' => array_key_exists('evaltype', $this->data) ? $this->data['evaltype'] : TAG_EVAL_TYPE_AND_OR,
-			'tags' => array_key_exists('tags', $this->data) ? $this->data['tags'] : [],
+			'tags' => array_key_exists('tags', $this->data) && $this->data['tags'] ? $this->data['tags'] : null,
+			'inheritedTags' => true,
 			'templated' => false,
 			'preservekeys' => true,
 			'filter' => ['status' => HTTPTEST_STATUS_ACTIVE],
@@ -82,9 +84,11 @@ class CScreenHttpTest extends CScreenBase {
 		$httptests = resolveHttpTestMacros($httptests, true, false);
 		order_result($httptests, $sort_field, $sort_order);
 
-		$tags = makeTags($httptests, true, 'httptestid', ZBX_TAG_COUNT_DEFAULT,
-			array_key_exists('tags', $this->data) ? $this->data['tags'] : []
-		);
+		CTagHelper::mergeOwnAndInheritedTags($httptests);
+
+		$tags = CTagHelper::getTagsHtml($httptests, ZBX_TAG_OBJECT_HTTPTEST, [
+			'filter_tags' => array_key_exists('tags', $this->data) ? $this->data['tags'] : []
+		]);
 
 		// Fetch the latest results of the web scenario.
 		$last_httptest_data = Manager::HttpTest()->getLastData(array_keys($httptests));
@@ -151,7 +155,7 @@ class CScreenHttpTest extends CScreenBase {
 				$httptest['steps'],
 				$lastcheck,
 				(new CCol($status))->addClass(ZBX_STYLE_WORDBREAK),
-				array_key_exists($key, $tags) ? $tags[$key] : ''
+				array_key_exists($key, $tags) ? (new CDiv($tags[$key]))->addClass(ZBX_STYLE_TAGS_WRAPPER) : ''
 			]));
 		}
 

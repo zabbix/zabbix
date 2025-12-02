@@ -252,7 +252,7 @@ class testFormMacrosHostPrototype extends testFormMacros {
 	 */
 	public function testFormMacrosHostPrototype_RemoveInheritedMacro($data) {
 		$this->checkRemoveInheritedMacros($data, 'host prototype', self::$inherited_macros_prototypeid,
-				true, self::$lldid
+				true, self::$lldid, 'Host prototype for Inherited {#MACROS} removing'
 		);
 	}
 
@@ -303,7 +303,7 @@ class testFormMacrosHostPrototype extends testFormMacros {
 	 * @dataProvider getCreateSecretMacrosData
 	 */
 	public function testFormMacrosHostPrototype_CreateSecretMacros($data) {
-		$this->createSecretMacros($data, 'host_prototypes.php?form=update&context=host&parent_discoveryid='.
+		$this->createSecretMacros($data, 'zabbix.php?action=popup&popup=host.prototype.edit&context=host&parent_discoveryid='.
 				self::$lldid.'&hostid='.self::$create_secret_macros_prototypeid, 'host-prototype'
 		);
 	}
@@ -349,7 +349,7 @@ class testFormMacrosHostPrototype extends testFormMacros {
 	 * @dataProvider getUpdateSecretMacrosData
 	 */
 	public function testFormMacrosHostPrototype_UpdateSecretMacros($data) {
-		$this->updateSecretMacros($data, 'host_prototypes.php?form=update&context=host&parent_discoveryid='.
+		$this->updateSecretMacros($data, 'zabbix.php?action=popup&popup=host.prototype.edit&context=host&parent_discoveryid='.
 				self::$lldid.'&hostid='.self::$update_secret_macros_prototypeid, 'host-prototype'
 		);
 	}
@@ -358,7 +358,7 @@ class testFormMacrosHostPrototype extends testFormMacros {
 	 * @dataProvider getRevertSecretMacrosData
 	 */
 	public function testFormMacrosHostPrototype_RevertSecretMacroChanges($data) {
-		$this->revertSecretMacroChanges($data, 'host_prototypes.php?form=update&context=host&parent_discoveryid='.
+		$this->revertSecretMacroChanges($data, 'zabbix.php?action=popup&popup=host.prototype.edit&context=host&parent_discoveryid='.
 				self::$lldid.'&hostid='.self::$update_secret_macros_prototypeid, 'host-prototype'
 		);
 	}
@@ -367,7 +367,7 @@ class testFormMacrosHostPrototype extends testFormMacros {
 	 * Check Vault macros validation.
 	 */
 	public function testFormMacrosHostPrototype_CheckVaultValidation() {
-		$this->checkVaultValidation('host_prototypes.php?form=update&context=host&parent_discoveryid='.
+		$this->checkVaultValidation('zabbix.php?action=popup&popup=host.prototype.edit&context=host&parent_discoveryid='.
 				self::$lldid.'&hostid='.self::$vault_macros_validation_prototypeid, 'host-prototype'
 		);
 	}
@@ -382,7 +382,7 @@ class testFormMacrosHostPrototype extends testFormMacros {
 			? self::$hashi_macros_create_prototypeid
 			: self::$vault_macros_create_prototypeid;
 
-		$this->createVaultMacros($data, 'host_prototypes.php?form=update&context=host&parent_discoveryid='.
+		$this->createVaultMacros($data, 'zabbix.php?action=popup&popup=host.prototype.edit&context=host&parent_discoveryid='.
 				self::$lldid.'&hostid='.$hostid, 'host-prototype'
 		);
 	}
@@ -392,7 +392,7 @@ class testFormMacrosHostPrototype extends testFormMacros {
 	 * @dataProvider getUpdateVaultMacrosCommonData
 	 */
 	public function testFormMacrosHostPrototype_UpdateVaultMacros($data) {
-		$this->updateVaultMacros($data, 'host_prototypes.php?form=update&context=host&parent_discoveryid=
+		$this->updateVaultMacros($data, 'zabbix.php?action=popup&popup=host.prototype.edit&context=host&parent_discoveryid=
 				'.self::$lldid.'&hostid='.self::$vault_macros_update_prototypeid, 'host-prototype'
 		);
 	}

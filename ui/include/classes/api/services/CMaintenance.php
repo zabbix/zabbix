@@ -53,7 +53,7 @@ class CMaintenance extends CApiService {
 
 		$sqlParts = [
 			'select'	=> ['maintenance' => 'm.maintenanceid'],
-			'from'		=> ['maintenances' => 'maintenances m'],
+			'from'		=> 'maintenances m',
 			'where'		=> [],
 			'group'		=> [],
 			'order'		=> [],

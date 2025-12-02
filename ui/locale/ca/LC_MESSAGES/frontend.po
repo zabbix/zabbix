@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2025-06-18 11:38+0000\n"
+"PO-Revision-Date: 2025-11-06 22:05+0000\n"
 "Last-Translator: Xevi Noè i Nogueiras <xevi.noe@gmail.com>\n"
 "Language-Team: none\n"
 "Language: ca\n"
@@ -298,6 +298,24 @@ msgstr "La classe %1$s.php ha d'estendre %2$s per al mòdul situat a %3$s."
 #, c-format
 msgid "%1$s: %2$s"
 msgstr "(%1$s: %2$s)"
+
+#: include/classes/server/CZabbixServer.php:740
+#: include/classes/setup/CSetupWizard.php:1460
+#, c-format
+msgid "%1$s: %2$s."
+msgstr "%1$s: %2$s."
+
+#: include/classes/server/CZabbixServer.php:746
+#: include/classes/setup/CSetupWizard.php:1466
+#, c-format
+msgid "%1$s: file is not readable."
+msgstr "%1$s: l'arxiu no és llegible."
+
+#: include/classes/server/CZabbixServer.php:743
+#: include/classes/setup/CSetupWizard.php:1463
+#, c-format
+msgid "%1$s: invalid path or file not found."
+msgstr "%1$s: ruta no vàlida o arxiu no trobat."
 
 #: include/classes/graph/CSvgGraph.php:1418
 #, c-format
@@ -1743,9 +1761,22 @@ msgstr "Com a mínim una acció és obligatòria."
 msgid "At least one active user must exist with role \"%1$s\"."
 msgstr "Com a mínim un usuari actiu ha d'existir amb el rol \"%1$s\"."
 
+#: app/controllers/CControllerMaintenanceTimePeriodCheck.php:40
+msgid "At least one day must be selected."
+msgstr "Com a mínim heu de triar un dia."
+
 #: include/classes/api/services/CMaintenance.php:686
 msgid "At least one day of the week or day of the month must be specified."
 msgstr "Cal triar, com a mínim, un dia de la setmana o un dia del mes."
+
+#: app/controllers/CControllerAutoregUpdate.php:30
+msgid "At least one encryption level must be selected."
+msgstr "Com a mínim heu de triar un nivell de xifrat."
+
+#: app/controllers/CControllerRegExCreate.php:54
+#: app/controllers/CControllerRegExUpdate.php:55
+msgid "At least one expression must be added."
+msgstr "Com a mínim heu d'afegir una expressió."
 
 #: app/controllers/CControllerMaintenanceCreate.php:62
 #: app/controllers/CControllerMaintenanceUpdate.php:63
@@ -1754,6 +1785,12 @@ msgstr "Cal triar, com a mínim, un dia de la setmana o un dia del mes."
 #: include/classes/api/services/CMaintenance.php:577
 msgid "At least one host group or host must be selected."
 msgstr "S'ha de triar, com a mínim, almenys un grup d'equips o un equip."
+
+#: app/controllers/CControllerMaintenanceCreate.php:57
+#: app/controllers/CControllerMaintenanceTimePeriodCheck.php:45
+#: app/controllers/CControllerMaintenanceUpdate.php:58
+msgid "At least one month must be selected."
+msgstr "Com a mínim heu de triar un mes."
 
 #: include/classes/helpers/CItemGeneralHelper.php:411
 msgid "At least one of \"min\" or \"max\" parameters should be specified."
@@ -1784,6 +1821,11 @@ msgstr "Com a mínim un paràmetre \"%1$s\" o \"%2$s\" s'ha d'activar."
 msgid "At least one parameter must be enabled."
 msgstr "Com a mínim s'ha d'habilitar un paràmetre."
 
+#: app/controllers/CControllerMaintenanceCreate.php:40
+#: app/controllers/CControllerMaintenanceUpdate.php:41
+msgid "At least one period must be added."
+msgstr "Com a mínim heu d'afegir un període."
+
 #: app/controllers/CControllerPopupAcknowledgeCreate.php:283
 msgid "At least one update operation or message is mandatory"
 msgstr "Com a mínim és obligatòria una operació o missatge d'actualització"
@@ -1799,6 +1841,14 @@ msgstr "Com a mínim s'ha d'escollir un usuari o un grup d'usuaris."
 #: include/classes/api/services/CReport.php:363
 msgid "At least one user or user group must be specified."
 msgstr "Com a mínim s'ha d'especificar un usuari o un grup d'usuaris."
+
+#: app/controllers/CControllerMaintenanceCreate.php:61
+#: app/controllers/CControllerMaintenanceCreate.php:65
+#: app/controllers/CControllerMaintenanceTimePeriodCheck.php:57
+#: app/controllers/CControllerMaintenanceUpdate.php:62
+#: app/controllers/CControllerMaintenanceUpdate.php:66
+msgid "At least one weekday must be selected."
+msgstr "Com a mínim heu de triar un dia de la setmana."
 
 #: app/views/administration.mediatype.edit.php:354
 #: app/views/mediatype.edit.php:464
@@ -2042,6 +2092,10 @@ msgstr "El nombre mitjà de sol·licituds d'escriptura pendents al disc virtual 
 msgid "Avoid easy-to-guess passwords"
 msgstr "Eviteu paraules de pas fàcils d'endevinar"
 
+#: app/views/host.wizard.edit.php:473
+msgid "Avoid including sensitive data."
+msgstr "Eviteu incloure dades sensibles."
+
 #: jsLoader.php:172
 msgid "Awaiting data"
 msgstr "Esperant dades"
@@ -2151,6 +2205,10 @@ msgstr "Blocat"
 #: include/classes/core/ZBase.php:380
 msgid "Blue"
 msgstr "Blau"
+
+#: include/classes/core/ZBase.php:376
+msgid "Blue (classic)"
+msgstr "Blau (clàssic)"
 
 #: app/views/webscenario.step.edit.php:250
 #: include/views/configuration.host.discovery.edit.php:383
@@ -3583,6 +3641,10 @@ msgstr "No es pot pas trobar el mapa de valors \"%1$s\" emprat al prototip d'ele
 msgid "Cannot find value map \"%1$s\" used for item prototype \"%2$s\" of discovery rule prototype \"%3$s\" on \"%4$s\"."
 msgstr "No es pot pas trobar el mapa de valors \"%1$s\" emprat al prototip d'element \"%2$s\" del prototip de regla de descoberta \"%3$s\" a \"%4$s\"."
 
+#: app/views/oauth.authorize.php:33
+msgid "Cannot get authentication tokens"
+msgstr "No es poden obtindre els tokens d'autenticació"
+
 #: app/views/oauth.edit.php:230
 msgid "Cannot get authorization code."
 msgstr "No es pot pas obtindre el codi d'autorització."
@@ -4114,6 +4176,11 @@ msgstr "No es pot pas llegir l'XML: %1$s."
 msgid "Cannot read YAML: %1$s."
 msgstr "No es pot pas llegir el YAML: %1$s."
 
+#: include/classes/server/CZabbixServer.php:511
+#, c-format
+msgid "Cannot read response from Zabbix server \"%1$s\"."
+msgstr "No es pot llegir la resposta del servidor Zabbix \"%1$s\"."
+
 #: include/classes/server/CZabbixServer.php:567
 #, c-format
 msgid "Cannot read the response, check connection with the Zabbix server \"%1$s\"."
@@ -4175,6 +4242,10 @@ msgstr "No es pot pas establir \"%1$s\" per al prototip de gràfic \"%2$s\"."
 #: widgets/piechart/includes/CWidgetFieldDataSet.php:175
 msgid "Cannot set \"Data set aggregation\" when item with type \"Total\" is added to the chart."
 msgstr "No es pot pas establir \"Afegit del conjunt de dades\" quan s'afegeix un element de tipus \"Total\" al gràfic."
+
+#: include/classes/db/MysqlDbBackend.php:197
+msgid "Cannot set charset."
+msgstr "No es pot definir el joc de caràcters."
 
 #: include/classes/api/services/CItemGeneral.php:2478
 #, c-format
@@ -4692,12 +4763,24 @@ msgctxt "verb"
 msgid "Change"
 msgstr "Canviar"
 
+#: app/views/administration.authentication.edit.php:316
+msgid "Change IdP certificate"
+msgstr "Canviar el certificat IdP"
+
 #: app/partials/configuration.host.edit.html.php:449
 #: app/views/administration.autoreg.edit.php:82
 #: app/views/popup.proxy.edit.php:158
 #: include/views/configuration.host.prototype.edit.php:510
 msgid "Change PSK"
 msgstr "Canvia el PSK"
+
+#: app/views/administration.authentication.edit.php:367
+msgid "Change SP certificate"
+msgstr "Canviar el certificat SP"
+
+#: app/views/administration.authentication.edit.php:342
+msgid "Change SP private key"
+msgstr "Canviar la clau privada SP"
 
 #: app/views/mfa.edit.php:128
 msgid "Change client secret"
@@ -4737,6 +4820,10 @@ msgstr "Canvia la gravetat"
 #: include/classes/html/CMacroValue.php:168
 msgid "Change type"
 msgstr "Canvia el tipus"
+
+#: app/views/js/administration.authentication.edit.js.php:409
+msgid "Changing the authentication method will reset all sessions, except the current one."
+msgstr "Canviant el mètode d'autenticació reiniciarà totes les sessions, excepte l'actual."
 
 #: app/partials/configuration.filter.items.php:144
 #: app/views/popup.massupdate.item.php:149 include/items.inc.php:127
@@ -4871,6 +4958,12 @@ msgstr "Xinès (zh_CN)"
 #: include/locales.inc.php:38
 msgid "Chinese (zh_TW)"
 msgstr "Xinès (zh_TW)"
+
+#: app/views/administration.authentication.edit.php:329
+#: app/views/administration.authentication.edit.php:354
+#: app/views/administration.authentication.edit.php:379
+msgid "Choose file"
+msgstr "Trieu arxiu"
 
 #: include/classes/import/importers/CTemplateImporter.php:294
 #, c-format
@@ -5032,6 +5125,11 @@ msgstr "Tancar el problema"
 msgid "Close problems"
 msgstr "Tancar els problemes"
 
+#: widgets/geomap/includes/WidgetForm.php:66
+#: widgets/geomap/views/widget.edit.php:59
+msgid "Clustering"
+msgstr "Clustering"
+
 #: app/views/mfa.edit.php:90
 msgid "Code length"
 msgstr "Llargària del codi"
@@ -5175,6 +5273,11 @@ msgstr "Sessions simultànies"
 #: app/views/popup.service.statusrule.edit.php:49
 msgid "Condition"
 msgstr "Condició"
+
+#: app/controllers/CControllerServiceCreate.php:45
+#: app/controllers/CControllerServiceUpdate.php:46
+msgid "Condition, limit and status combination is not unique."
+msgstr "La combinació de condició, límit i estat no és única."
 
 #: app/views/action.list.php:116 app/views/correlation.edit.php:225
 #: app/views/correlation.list.php:83 app/views/popup.action.edit.php:166
@@ -6078,6 +6181,14 @@ msgstr "Crític"
 msgid "Current"
 msgstr "Actual"
 
+#: app/views/js/administration.authentication.edit.js.php:419
+msgid "Current SP certificate will be deleted."
+msgstr "L'actual certificat SP s'esborrarà."
+
+#: app/views/js/administration.authentication.edit.js.php:425
+msgid "Current SP private key will be deleted."
+msgstr "L'actual clau privada SP s'esborrarà."
+
 #: app/views/popup.operation.edit.php:256
 msgid "Current host"
 msgstr "Equip actual"
@@ -6231,6 +6342,10 @@ msgstr "Danès (da_DK)"
 #: include/classes/core/ZBase.php:381
 msgid "Dark"
 msgstr "Fosc"
+
+#: include/classes/core/ZBase.php:378
+msgid "Dark (classic)"
+msgstr "Fosc (clàssic)"
 
 #: app/controllers/CControllerAuditLogList.php:227
 #: app/controllers/CControllerDashboardPrint.php:71
@@ -6626,6 +6741,10 @@ msgstr "Autenticació per defecte"
 msgid "Default host inventory mode"
 msgstr "Mode d'inventari d'equips predeterminat"
 
+#: app/views/administration.iconmap.edit.php:87
+msgid "Default icon"
+msgstr "Icona per defecte"
+
 #: app/views/administration.script.edit.php:358
 msgid "Default input string"
 msgstr "Cadena d'entrada per defecte"
@@ -6784,6 +6903,10 @@ msgstr "Vols esborrar el prototip de gràfic?"
 #: include/views/configuration.graph.edit.php:501
 msgid "Delete graph?"
 msgstr "Vols esborrar el gràfic?"
+
+#: app/views/host.prototype.edit.php:699
+msgid "Delete host prototype?"
+msgstr "Esborrar el prototip d'equip?"
 
 #: app/views/administration.iconmap.edit.php:145
 msgid "Delete icon map?"
@@ -7283,6 +7406,10 @@ msgstr "Detalls de l'escenari web"
 #: app/views/administration.housekeeping.edit.php:206
 msgid "Detected TimescaleDB license does not support compression. Compression is supported in TimescaleDB Community Edition."
 msgstr "La llicència TimescaleDB detectada no admet pas compressió. La compressió és compatible amb TimescaleDB Community Edition."
+
+#: app/views/administration.housekeeping.edit.php:204
+msgid "Detected license does not support compression. Compression is supported in TimescaleDB Community Edition."
+msgstr "La llicència detectada no admet pas compressió. La compressió és compatible amb TimescaleDB Community Edition."
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1130
 msgid "Detection period"
@@ -8542,6 +8669,10 @@ msgstr "Anglès (en_US)"
 msgid "Enter a non-secret pre-shared key identity string. Avoid including sensitive data."
 msgstr "Entreu una cadena d'identitat de clau compartida prèviament que no sigui secreta. Eviteu incloure-hi dades sensibles."
 
+#: app/views/host.wizard.edit.php:470
+msgid "Enter a unique name that Zabbix components will use to recognize the pre-shared key."
+msgstr "Introduïu un nom únic que els components de Zabbix utilitzaran per reconèixer la clau precompartida."
+
 #: app/views/host.wizard.edit.php:609
 msgid "Enter the IP/DNS address and port of the Zabbix agent installed on your monitoring target."
 msgstr "Entreu l'adreça IP/DNS i el port de l'agent Zabbix instal·lat a l'equip a monitorar."
@@ -8957,6 +9088,11 @@ msgstr "Constructor d'expressions"
 msgid "Expression type"
 msgstr "Tipus d'expressió"
 
+#: app/controllers/CControllerRegExCreate.php:53
+#: app/controllers/CControllerRegExUpdate.php:54
+msgid "Expression type and expression combination is not unique."
+msgstr "El tipus i combinació d'expressió no és única."
+
 #: app/views/popup.testtriggerexpr.php:29
 msgid "Expression variable elements"
 msgstr "Elements variables d'expressió"
@@ -9167,6 +9303,10 @@ msgstr "Requeriments del camp:"
 msgid "File checksum, calculated by the UNIX cksum algorithm. Returns integer for crc32 (default) and string for md5, sha256"
 msgstr "Suma de comprovació de fitxers, calculada per l'algoritme cksum de UNIX. Retorna un enter per a crc32 (per defecte) i una cadena per a md5, sha256"
 
+#: include/classes/validators/CFormValidator.php:1451 jsLoader.php:445
+msgid "File format is unsupported."
+msgstr "El format de fitxer no és pas compatible."
+
 #: include/classes/import/readers/CYamlImportReader.php:52
 msgid "File is empty"
 msgstr "El fitxer és buit"
@@ -9183,6 +9323,11 @@ msgstr "Informació del propietari del fitxer. Retorna una cadena"
 #: include/classes/data/CItemData.php:1679
 msgid "File size in bytes (default) or in newlines. Returns integer"
 msgstr "Mida del fitxer en octets (per defecte) o en noves línies. Retorna un nombre enter"
+
+#: include/classes/helpers/CUploadFile.php:129 jsLoader.php:444
+#, c-format
+msgid "File size must be less than %1$s."
+msgstr "La mida del fitxer ha d'ésser inferior a %1$s."
 
 #: include/classes/data/CItemData.php:1687
 msgid "File time information. Returns integer (Unix timestamp)"
@@ -9870,6 +10015,11 @@ msgstr "Atribut de nom de grup"
 msgid "Group prototype cannot be based on a discovered host group \"%1$s\"."
 msgstr "El prototip de grup no es pot basar en un grup d'equips descobert \"%1$s\"."
 
+#: app/controllers/CControllerHostPrototypeCreate.php:55
+#: app/controllers/CControllerHostPrototypeUpdate.php:58
+msgid "Group prototype is not unique."
+msgstr "El prototip de grup no és únic."
+
 #: include/views/configuration.host.prototype.edit.php:204
 msgid "Group prototypes"
 msgstr "Prototips de grups"
@@ -10504,6 +10654,10 @@ msgid_plural "Host prototypes deleted"
 msgstr[0] "S'ha esborrat el prototip d'equips"
 msgstr[1] "S'han esborrat els prototips d'equips"
 
+#: app/controllers/CControllerPopup.php:49
+msgid "Host prototype edit"
+msgstr "Editar el prototip d'equip"
+
 #: include/views/configuration.host.prototype.edit.php:370
 msgid "Host prototype macros"
 msgstr "Prototip de macros d'equips"
@@ -10870,6 +11024,10 @@ msgstr "La icona amb l'identificador \"%1$s\" no és pas disponible."
 #: include/views/js/monitoring.sysmaps.js.php:254
 msgid "Icons"
 msgstr "Icones"
+
+#: app/views/administration.authentication.edit.php:312
+msgid "IdP certificate"
+msgstr "Certificat IdP"
 
 #: app/views/administration.authentication.edit.php:291
 msgid "IdP entity ID"
@@ -11411,6 +11569,10 @@ msgstr "S'han passat arguments incorrectes a la funció."
 msgid "Incorrect bulk value for interface."
 msgstr "Valor massiu incorrecte per a la interfície."
 
+#: include/classes/validators/CHostGroupNameValidator.php:36
+msgid "Incorrect characters used for host group name."
+msgstr "S'empren caràcters incorrectes com a nom de grup d'equips."
+
 #: include/classes/api/services/CHost.php:1029
 #: include/classes/api/services/CHost.php:2052
 #: include/classes/api/services/CHost.php:2390
@@ -11422,6 +11584,11 @@ msgstr "S'empren caràcters incorrectes per al nom d'equip \"%1$s\"."
 #: app/controllers/CControllerHostUpdate.php:42
 msgid "Incorrect characters used for host name."
 msgstr "S'empren caràcters incorrectes com a nom d'equip."
+
+#: app/controllers/CControllerProxyCreate.php:34
+#: app/controllers/CControllerProxyUpdate.php:30
+msgid "Incorrect characters used for proxy name."
+msgstr "S'empren caràcters incorrectes com a nom de proxy."
 
 #: app/controllers/CControllerTemplateCreate.php:35
 #: app/controllers/CControllerTemplateUpdate.php:36
@@ -12001,6 +12168,18 @@ msgstr "Macros i equips heretats"
 msgid "Inherited and host prototype macros"
 msgstr "Macros prototip i equips heretats"
 
+#: include/classes/helpers/CTagHelper.php:230
+msgid "Inherited and host tag"
+msgstr "Etiquetes d'equip i heretades"
+
+#: app/partials/configuration.tags.tab.php:42
+msgid "Inherited and host tags"
+msgstr "Etiquetes d'equip i heretades"
+
+#: include/classes/helpers/CTagHelper.php:231
+msgid "Inherited and item tag"
+msgstr "Etiqueta d'equip i heretades"
+
 #: app/partials/configuration.tags.tab.php:165
 msgid "Inherited and item tags"
 msgstr "Etiquetes i equips heretats"
@@ -12013,13 +12192,33 @@ msgstr "Etiquetes i escenaris heretats"
 msgid "Inherited and template macros"
 msgstr "Macros i plantilles heretades"
 
+#: include/classes/helpers/CTagHelper.php:229
+msgid "Inherited and template tag"
+msgstr "Plantilla d'etiqueta d'equip i heretades"
+
+#: app/partials/configuration.tags.tab.php:33
+msgid "Inherited and template tags"
+msgstr "Plantilles d'etiquetes d'equip i heretades"
+
+#: include/classes/helpers/CTagHelper.php:232
+msgid "Inherited and trigger tag"
+msgstr "Etiqueta i triggers heretats"
+
 #: app/partials/configuration.tags.tab.php:155
 msgid "Inherited and trigger tags"
 msgstr "Etiquetes i triggers heretats"
 
+#: include/classes/helpers/CTagHelper.php:233
+msgid "Inherited and web scenario tag"
+msgstr "Etiquetes i escenaris web heretats"
+
 #: include/forms.inc.php:311
 msgid "Inherited items"
 msgstr "Elements heretats"
+
+#: include/classes/helpers/CTagHelper.php:222
+msgid "Inherited tag"
+msgstr "Etiquetes heretades"
 
 #: widgets/geomap/includes/WidgetForm.php:62
 msgid "Initial view"
@@ -12192,6 +12391,10 @@ msgstr "Internet Explorer"
 msgid "Interval"
 msgstr "Interval"
 
+#: widgets/itemcard/includes/CWidgetFieldItemSectionsView.php:76
+msgid "Interval and storage"
+msgstr "Interval i emmagatzematge"
+
 #: include/classes/api/services/CRole.php:731
 #, c-format
 msgid "Invalid API method \"%2$s\" for user role \"%1$s\"."
@@ -12267,6 +12470,15 @@ msgstr "Contingut del fitxer YAML no vàlid"
 msgid "Invalid action condition: %1$s."
 msgstr "Condició d'acció no vàlida: %1$s."
 
+#: app/controllers/CControllerProxyCreate.php:44
+#: app/controllers/CControllerProxyCreate.php:55
+#: app/controllers/CControllerProxyCreate.php:66
+#: app/controllers/CControllerProxyUpdate.php:40
+#: app/controllers/CControllerProxyUpdate.php:51
+#: app/controllers/CControllerProxyUpdate.php:62
+msgid "Invalid address."
+msgstr "Adreça no vàlida."
+
 #: app/controllers/CControllerPopupTriggerExpr.php:1629
 #, c-format
 msgid "Invalid condition: %1$s."
@@ -12285,6 +12497,11 @@ msgstr "L'adreça electrònica \"%1$s\" no és vàlida."
 #, c-format
 msgid "Invalid email address for media type with ID \"%1$s\"."
 msgstr "Adreça electrònica no vàlida per al tipus de suport amb l'identificador \"%1$s\"."
+
+#: app/controllers/CControllerHostGroupCreate.php:31
+#: app/controllers/CControllerHostGroupUpdate.php:34
+msgid "Invalid host group name."
+msgstr "Nom del grup d'equips no vàlid"
 
 #: app/controllers/CControllerScriptUserInputCheck.php:43
 msgid "Invalid input"
@@ -12667,6 +12884,11 @@ msgstr "Cadena no vàlida."
 #, c-format
 msgid "Invalid tag \"%1$s\": %2$s."
 msgstr "Etiqueta no vàlida \"%1$s\": %2$s."
+
+#: app/controllers/CControllerTemplateGroupCreate.php:31
+#: app/controllers/CControllerTemplateGroupUpdate.php:32
+msgid "Invalid template group name."
+msgstr "Nom del grup de plantilles no vàlid"
 
 #: include/classes/validators/CActionCondValidator.php:103
 msgid "Invalid time period."
@@ -13219,6 +13441,10 @@ msgstr "Idioma"
 #, c-format
 msgid "Language \"%1$s\" is not supported."
 msgstr "L'idioma \"%1$s\" no és pas compatible."
+
+#: widgets/scatterplot/includes/CWidgetFieldDataSetView.php:445
+msgid "Large"
+msgstr "Gran"
 
 #: include/classes/helpers/CPagerHelper.php:232
 msgctxt "page navigation"
@@ -14105,6 +14331,10 @@ msgstr "Marca els triats"
 msgid "Mark selected as symptoms"
 msgstr "Marcar els triats com a símptomes"
 
+#: widgets/scatterplot/includes/CWidgetFieldDataSetView.php:437
+msgid "Marker"
+msgstr "Marcador"
+
 #: app/controllers/CControllerPopupTriggerExpr.php:408
 #: app/controllers/CControllerPopupTriggerExpr.php:448
 #: app/controllers/CControllerPopupTriggerExpr.php:474
@@ -14229,6 +14459,11 @@ msgstr "Nombre màxim de fileres"
 #, c-format
 msgid "Maximum required %1$s database version is %2$s."
 msgstr "La versió màxima necessària de la base de dades %1$s és %2$s."
+
+#: app/partials/administration.system.info.php:221
+#, c-format
+msgid "Maximum required version is %1$s."
+msgstr "La versió màxima requerida és %1$s."
 
 #: app/controllers/CControllerTimeSelectorUpdate.php:136
 #: include/classes/mvc/CController.php:320
@@ -14382,6 +14617,10 @@ msgstr "Tipus de suports desactivats a les alertes."
 #, c-format
 msgid "Media types used by action \"%1$s\"."
 msgstr "Tipus de suport emprats per l'acció \"%1$s\"."
+
+#: widgets/scatterplot/includes/CWidgetFieldDataSetView.php:444
+msgid "Medium"
+msgstr "Mitjana"
 
 #: app/views/usergroup.list.php:78
 msgid "Members"
@@ -14573,6 +14812,12 @@ msgstr "El límit mínim requerit en el temps d'anàlisi d'entrada per als scrip
 msgid "Minimum required size of PHP post is %1$s (configuration option \"post_max_size\")."
 msgstr "La mida mínima necessària de la publicació PHP és %1$s (opció de configuració \"post_max_size\")."
 
+#: app/partials/administration.system.info.php:212
+#: app/views/administration.housekeeping.edit.php:183
+#, c-format
+msgid "Minimum required version is %1$s."
+msgstr "La versió mínima requerida és %1$s."
+
 #: app/views/monitoring.map.view.php:48
 #: include/views/monitoring.sysmap.edit.php:276
 msgid "Minimum severity"
@@ -14587,6 +14832,15 @@ msgid "Minimum time period to display is %1$s minute."
 msgid_plural "Minimum time period to display is %1$s minutes."
 msgstr[0] "El període de temps mínim per mostrar és de %1$s minut."
 msgstr[1] "El període de temps mínim per mostrar és de %1$s minuts."
+
+#: app/controllers/CControllerMaintenanceTimePeriodCheck.php:82
+#, c-format
+msgid "Minimum value of \"Maintenance period length\" is %1$d minutes."
+msgstr "El valor mínim de la \"longitud del període de manteniment\" és %1$d minuts."
+
+#: app/views/maintenance.timeperiod.edit.php:202
+msgid "Minute"
+msgstr "Minut"
 
 #: app/views/maintenance.timeperiod.edit.php:212
 #: app/views/popup.sla.excludeddowntime.edit.php:73
@@ -14805,9 +15059,24 @@ msgstr "Múltiple"
 msgid "Multiple PROBLEM events"
 msgstr "Múltiples PROBLEM"
 
+#: app/partials/administration.system.info.php:235
+#, c-format
+msgid "Must be at least %1$s."
+msgstr "Ha de ser com a mínim %1$s."
+
+#: app/controllers/CControllerMaintenanceUpdateGeneral.php:32
+#, c-format
+msgid "Must be greater than \"%1$s\"."
+msgstr "Ha d'ésser més gran de \"%1$s\""
+
 #: include/classes/validators/CFormValidator.php:340
 msgid "Must be selected."
 msgstr "S'ha de triar."
+
+#: app/partials/administration.system.info.php:254
+#, c-format
+msgid "Must not be higher than %1$s."
+msgstr "No ha de ser superior a %1$s."
 
 #: jsLoader.php:284
 msgid "Mute"
@@ -15207,6 +15476,10 @@ msgstr "Nou equip"
 msgid "New host group"
 msgstr "Nou grup d'equips"
 
+#: app/views/host.prototype.edit.php:727
+msgid "New host prototype"
+msgstr "Prototip d'equips nou"
+
 #: app/views/item.edit.php:218
 msgid "New item"
 msgstr "Element nou"
@@ -15577,6 +15850,66 @@ msgstr "No hi ha pas permís per accedir al sistema."
 #, c-format
 msgid "No permissions to call \"%1$s.%2$s\"."
 msgstr "No hi ha pas permís per trucar a \"%1$s.%2$s\"."
+
+#: include/classes/api/services/CConfiguration.php:312
+msgid "No permissions to import discovery rules."
+msgstr "No hi ha permisos per importar regles de descoberta."
+
+#: include/classes/api/services/CConfiguration.php:313
+msgid "No permissions to import graphs."
+msgstr "No hi ha permisos per importar gràfics."
+
+#: include/classes/api/services/CConfiguration.php:314
+msgid "No permissions to import host groups."
+msgstr "No hi ha permisos per importar grups d'equips."
+
+#: include/classes/api/services/CConfiguration.php:316
+msgid "No permissions to import hosts."
+msgstr "No hi ha permisos per importar equips."
+
+#: include/classes/api/services/CConfiguration.php:318
+msgid "No permissions to import images."
+msgstr "No hi ha permisos per importar imatges."
+
+#: include/classes/api/services/CConfiguration.php:319
+msgid "No permissions to import items."
+msgstr "No hi ha permisos per importar elements."
+
+#: include/classes/api/services/CConfiguration.php:320
+msgid "No permissions to import maps."
+msgstr "No hi ha permisos per importar mapes."
+
+#: include/classes/api/services/CConfiguration.php:321
+msgid "No permissions to import media types."
+msgstr "No hi ha permisos per importar tipus de suport."
+
+#: include/classes/api/services/CConfiguration.php:324
+msgid "No permissions to import template dashboards."
+msgstr "No hi ha permisos per importar plantilles de taulers de control."
+
+#: include/classes/api/services/CConfiguration.php:315
+msgid "No permissions to import template groups."
+msgstr "No hi ha permisos per importar grups de plantilles."
+
+#: include/classes/api/services/CConfiguration.php:322
+msgid "No permissions to import template links."
+msgstr "No hi ha permisos per importar enllaços de plantilla."
+
+#: include/classes/api/services/CConfiguration.php:323
+msgid "No permissions to import templates."
+msgstr "No hi ha permisos per importar plantilles."
+
+#: include/classes/api/services/CConfiguration.php:325
+msgid "No permissions to import triggers."
+msgstr "No hi ha permisos per importar triggers."
+
+#: include/classes/api/services/CConfiguration.php:326
+msgid "No permissions to import value maps."
+msgstr "No hi ha permisos per importar mapes de valors."
+
+#: include/classes/api/services/CConfiguration.php:317
+msgid "No permissions to import web scenarios."
+msgstr "No hi ha permisos per importar escenaris web."
 
 #: app/controllers/CControllerChartsView.php:133
 #: app/controllers/CControllerDashboardPrint.php:99
@@ -16743,6 +17076,18 @@ msgstr "Visió general"
 msgid "Owner"
 msgstr "Propietari"
 
+#: app/views/administration.authentication.edit.php:322
+msgid "PEM-encoded IdP certificate"
+msgstr "Certificat IdP codificat amb PEM"
+
+#: app/views/administration.authentication.edit.php:373
+msgid "PEM-encoded SP certificate"
+msgstr "Certificat SP codificat amb PEM"
+
+#: app/views/administration.authentication.edit.php:348
+msgid "PEM-encoded SP private key"
+msgstr "Clau privada SP codificada amb PEM"
+
 #: include/classes/setup/CFrontendSetup.php:531
 msgid "PHP LDAP"
 msgstr "PHP LDAP"
@@ -16779,6 +17124,10 @@ msgstr "Hi manca l'extensió PHP ctype (paràmetre de configuració PHP --enable
 #: include/classes/setup/CFrontendSetup.php:687
 msgid "PHP curl"
 msgstr "Curl PHP"
+
+#: include/classes/setup/CFrontendSetup.php:733
+msgid "PHP curl extension is missing or outdated."
+msgstr "L'extensió curl de PHP no hi és o és obsoleta."
 
 #: include/classes/setup/CFrontendSetup.php:691
 msgid "PHP curl extension missing."
@@ -18748,6 +19097,11 @@ msgstr "Codi de resposta"
 msgid "Response time"
 msgstr "Hora de resposta"
 
+#: include/classes/server/CZabbixServer.php:507
+#, c-format
+msgid "Response timeout of %1$s exceeded when connecting to Zabbix server \"%2$s\"."
+msgstr "S'ha superat el temps d'espera de resposta de %1$s en connectar al servidor Zabbix \"%2$s\"."
+
 #: app/controllers/CControllerMediatypeTestSend.php:182
 msgid "Response type: JSON"
 msgstr "Tipus de resposta: JSON"
@@ -18844,6 +19198,10 @@ msgstr "Retorna una matriu JSON que descriu les interfícies de xarxa de l'equip
 #: include/classes/data/CItemData.php:2785
 msgid "Returns a JSON object containing Zabbix server or proxy internal metrics."
 msgstr "Retorna un objecte JSON que conté mètriques internes del servidor Zabbix o del servidor intermediari."
+
+#: include/classes/data/CItemData.php:2797
+msgid "Returns a JSON object containing database connection pool configuration and statistics."
+msgstr "Retorna un objecte JSON que conté la configuració i estadístiques de la cadena de connexió de la base de dades."
 
 #: include/classes/data/CItemData.php:2673
 msgid "Returns availability of a particular type of checks on the host. Value of this item corresponds to availability icons in the host list. Valid types are: agent, active_agent, snmp, ipmi, jmx."
@@ -19211,6 +19569,10 @@ msgstr "SNMPv3"
 msgid "SNMPv3 agent"
 msgstr "Agent SNMPv3"
 
+#: app/views/administration.authentication.edit.php:363
+msgid "SP certificate"
+msgstr "Certificat SP"
+
 #: app/views/administration.authentication.edit.php:334
 msgid "SP entity ID"
 msgstr "ID de l'entitat SP"
@@ -19218,6 +19580,10 @@ msgstr "ID de l'entitat SP"
 #: app/views/administration.authentication.edit.php:345
 msgid "SP name ID format"
 msgstr "Format d'identificació del nom del SP"
+
+#: app/views/administration.authentication.edit.php:338
+msgid "SP private key"
+msgstr "Clau privada SP"
 
 #: include/classes/debug/CProfiler.php:158
 #, c-format
@@ -19359,6 +19725,10 @@ msgstr "Escaneja el directori"
 #: include/views/mfa.login.php:60
 msgid "Scan this QR code"
 msgstr "Escaneja aquest codi QR"
+
+#: widgets/scatterplot/Widget.php:24
+msgid "Scatter plot"
+msgstr "Scatter plot"
 
 #: include/views/configuration.httpconf.edit.php:373
 msgid "Scenario"
@@ -20111,6 +20481,18 @@ msgstr "Curt"
 msgid "Shortened"
 msgstr "Escurçat"
 
+#: app/partials/administration.system.info.php:243
+#: app/views/administration.housekeeping.edit.php:187
+#, c-format
+msgid "Should be at least %1$s."
+msgstr "Hauria de ser com a mínim %1$s."
+
+#: app/partials/administration.system.info.php:262
+#: app/views/administration.housekeeping.edit.php:197
+#, c-format
+msgid "Should not be higher than %1$s."
+msgstr "No hauria de ser superior a %1$s."
+
 #: app/partials/monitoring.problem.filter.php:27
 #: app/views/monitoring.charts.view.php:80
 #: app/views/monitoring.dashboard.list.php:64
@@ -20468,6 +20850,10 @@ msgstr "Ometre la tria del sistema operatiu si ja teniu l'agent Zabbix instal·l
 #: include/locales.inc.php:61
 msgid "Slovak (sk_SK)"
 msgstr "Eslovac (sk_SK)"
+
+#: widgets/scatterplot/includes/CWidgetFieldDataSetView.php:443
+msgid "Small"
+msgstr "Petit"
 
 #: jsLoader.php:288
 msgid "Snooze"
@@ -21236,6 +21622,11 @@ msgstr "Nom de l'etiqueta"
 msgid "Tag name and value combination is not unique."
 msgstr "La combinació de nom i valor de l'etiqueta no és única."
 
+#: app/controllers/CControllerMaintenanceCreate.php:93
+#: app/controllers/CControllerMaintenanceUpdate.php:94
+msgid "Tag name, operator and value combination is not unique."
+msgstr "La combinació de nom, operador i valor de l'etiqueta no és única."
+
 #: include/actions.inc.php:68
 msgid "Tag value"
 msgstr "Valor de l'etiqueta"
@@ -21442,6 +21833,10 @@ msgstr "Nom de la plantilla"
 #: app/views/usergroup.edit.php:267
 msgid "Template permissions"
 msgstr "Permisos de plantilles"
+
+#: app/partials/configuration.tags.tab.php:33
+msgid "Template tags"
+msgstr "Etiquetes de plantilla"
 
 #: report2.php:398
 msgid "Template trigger"
@@ -21721,6 +22116,10 @@ msgstr "L'equip ja no es troba pas i s'esborrarà d'aquí a %1$s (el %2$s a %3$s
 msgid "The host is not discovered anymore and will be deleted the next time discovery rule is processed."
 msgstr "L'equip ja no es troba pas i s'esborrarà el proper cop que es processi la regla de descobriment."
 
+#: app/controllers/CControllerHostPrototypeEdit.php:268
+msgid "The host prototype being cloned belongs to a host group you don't have write permissions to. Non-writable group has been removed from the new host prototype."
+msgstr "El prototip d''equip clonat pertany a un grup d'equips al qual no teniu permisos d'escriptura. El grup que no es pot escriure s'ha esborrat del nou protip d'equip."
+
 #: include/classes/api/services/CImage.php:555
 #, c-format
 msgid "The image is used in icon map %1$s."
@@ -21762,6 +22161,10 @@ msgstr "El nombre de processos. Retorna un nombre enter"
 #, c-format
 msgid "The parameter \"%1$s\" is missing from the user attributes."
 msgstr "Hi manca el paràmetre \"%1$s\" als atributs d'usuari."
+
+#: app/views/popup.ldap.edit.php:101
+msgid "The previous password was cleared due to a host change. Please enter the new password."
+msgstr "El mot de pas anterior s'ha esborrat a causa d'un canvi d'equip. Introduïu el nou mot de pas."
 
 #: include/classes/core/CJsonRpc.php:206
 msgid "The received JSON is not a valid JSON-RPC request."
@@ -21941,6 +22344,10 @@ msgstr "Aquest valor no pot ser un de %1$s."
 #: include/classes/validators/CFormValidator.php:946 jsLoader.php:421
 msgid "This value does not match pattern."
 msgstr "Aquest valor no coincideix amb el patró."
+
+#: jsLoader.php:442
+msgid "This value is not a valid file."
+msgstr "Aquest valor no és un arxiu vàlid."
 
 #: include/classes/validators/CFormValidator.php:874 jsLoader.php:424
 msgid "This value is not a valid floating-point value."
@@ -22964,6 +23371,14 @@ msgstr "No s'ha pogut pas recuperar l'estat de suport de la compressió de Times
 msgid "Unable to retrieve TimescaleDB version."
 msgstr "No es pot pas recuperar la versió de TimescaleDB."
 
+#: app/views/administration.housekeeping.edit.php:173
+msgid "Unable to retrieve compression support status of TimescaleDB time-series database extension for PostgreSQL."
+msgstr "No s'ha pogut recuperar l'estat de compatibilitat amb la compressió de l'extensió de base de dades de sèries temporals TimescaleDB per a PostgreSQL."
+
+#: app/views/administration.housekeeping.edit.php:178
+msgid "Unable to retrieve version of TimescaleDB time-series database extension for PostgreSQL."
+msgstr "No es pot recuperar la versió de l'extensió de base de dades de sèries temporals TimescaleDB per a PostgreSQL."
+
 #: include/views/mfa.login.php:65
 #, c-format
 msgid "Unable to scan? You can use %1$s secret key to manually configure your authenticator app:"
@@ -23252,6 +23667,11 @@ msgstr "La versió %1$s del servidor de bases de dades no és pas compatible. Ha
 #, c-format
 msgid "Unsupported %1$s database server version. Must not be higher than %2$s."
 msgstr "La versió %1$s del servidor de bases de dades no és pas compatible. No ha d'ésser superior a %2$s."
+
+#: app/partials/administration.system.info.php:206
+#: app/views/administration.housekeeping.edit.php:169
+msgid "Unsupported TimescaleDB time-series database extension for PostgreSQL is used."
+msgstr "S'utilitza l'extensió de base de dades de sèries temporals TimescaleDB no compatible per a PostgreSQL."
 
 #: app/views/administration.housekeeping.edit.php:190
 #, c-format
@@ -24703,6 +25123,11 @@ msgstr "Avís"
 msgid "Warning message"
 msgstr "Missatge d'avís"
 
+#: app/partials/administration.system.info.php:243
+#: app/partials/administration.system.info.php:262
+msgid "Warning!"
+msgstr "Avís!"
+
 #: app/partials/administration.system.info.php:198
 msgid "Warning! Support for Oracle DB is deprecated since Zabbix 7.0 and will be removed in future versions."
 msgstr "Compte! El suport per a Oracle DB és obsolet des de Zabbix 7.0 i s'esborrarà en versions posteriors."
@@ -25010,9 +25435,23 @@ msgstr "Valor incorrecte per al camp \"url\"."
 msgid "X"
 msgstr "X"
 
+#: widgets/scatterplot/includes/WidgetForm.php:79
+#: widgets/scatterplot/includes/WidgetForm.php:194
+#: widgets/scatterplot/includes/WidgetForm.php:199
+msgid "X axis"
+msgstr "Eix X"
+
+#: widgets/scatterplot/includes/WidgetForm.php:80
+msgid "X axis MAX value must be greater than X axis MIN value"
+msgstr "El valor MAX de l'eix X ha d'ésser superior al valor MIN de l'eix X"
+
 #: widgets/svggraph/includes/WidgetForm.php:341
 msgid "X-Axis"
 msgstr "Eix X"
+
+#: widgets/scatterplot/includes/CWidgetFieldAxisThresholdsView.php:40
+msgid "X-Axis threshold"
+msgstr "Llindar de l'eix X"
 
 #: app/views/administration.miscconfig.edit.php:120
 msgid "X-Frame-Options HTTP header"
@@ -25067,6 +25506,12 @@ msgstr "XPath"
 msgid "Y"
 msgstr "Y"
 
+#: widgets/scatterplot/includes/WidgetForm.php:95
+#: widgets/scatterplot/includes/WidgetForm.php:226
+#: widgets/scatterplot/includes/WidgetForm.php:231
+msgid "Y axis"
+msgstr "Eix Y"
+
 #: include/views/configuration.graph.edit.php:357
 msgid "Y axis MAX value"
 msgstr "Valor MAX de l'eix Y"
@@ -25088,6 +25533,17 @@ msgstr "Valor MIN de l'eix Y"
 #: include/views/configuration.graph.edit.php:394
 msgid "Y axis side"
 msgstr "Banda de l'eix Y"
+
+#: widgets/scatterplot/includes/CWidgetFieldDataSetView.php:164
+#: widgets/scatterplot/includes/CWidgetFieldDataSetView.php:261
+#: widgets/scatterplot/includes/CWidgetFieldDataSetView.php:362
+#: widgets/scatterplot/includes/WidgetForm.php:216
+msgid "Y-Axis"
+msgstr "Eix Y"
+
+#: widgets/scatterplot/includes/CWidgetFieldAxisThresholdsView.php:41
+msgid "Y-Axis threshold"
+msgstr "Llindar de l'eix Y"
 
 #: widgets/svggraph/includes/CWidgetFieldDataSetView.php:367
 #: widgets/svggraph/includes/CWidgetFieldOverrideView.php:185
@@ -25408,6 +25864,11 @@ msgstr "Servidor Zabbix: el servidor Zabbix recupera els secrets de Vault i l'en
 msgid "Zabbix trapper"
 msgstr "Capturador de Zabbix"
 
+#: widgets/geomap/includes/WidgetForm.php:68
+#: widgets/geomap/includes/WidgetForm.php:72
+msgid "Zoom level"
+msgstr "Nivell de zoom"
+
 #: include/classes/html/CFilter.php:258 include/classes/html/CTabFilter.php:324
 msgid "Zoom out"
 msgstr "Allunyar"
@@ -25433,6 +25894,14 @@ msgstr "[protocol://][usuari[:mot_de_pas]@]proxy.exemple.com[:port]"
 #: include/classes/validators/CApiInputValidator.php:2764
 msgid "a DNS name is expected"
 msgstr "S'espera un nom DNS"
+
+#: include/classes/validators/CApiInputValidator.php:4407
+msgid "a PEM-encoded certificate is expected"
+msgstr "S'espera un certificat codificat amb PEM"
+
+#: include/classes/validators/CApiInputValidator.php:4444
+msgid "a PEM-encoded private key is expected"
+msgstr "S'espera una clau privada codificada amb PEM"
 
 #: include/classes/validators/CApiInputValidator.php:1381
 msgid "a boolean is expected"
@@ -26290,6 +26759,10 @@ msgstr "descripció"
 #: include/classes/validators/CApiInputValidator.php:1985
 msgid "directory cannot be empty"
 msgstr "el directori no pot pas ésser buit"
+
+#: include/views/configuration.host.discovery.list.php:340
+msgid "discovery rule"
+msgstr "regla de descoberta"
 
 #: app/controllers/CControllerItemMassCheckNow.php:138
 #: include/classes/api/services/CTask.php:562

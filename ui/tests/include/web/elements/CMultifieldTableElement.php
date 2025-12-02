@@ -32,7 +32,8 @@ class CMultifieldTableElement extends CTableElement {
 	 */
 	protected $selectors = [
 		'header' => 'xpath:./thead/tr/th',
-		'row' => 'xpath:./tbody/tr[contains(@class, "form_row") or contains(@class, "pairRow") or contains(@class, "editable_table_row")]',
+		'row' => 'xpath:./tbody/tr[contains(@class, "form_row") or contains(@class, "pairRow") or'.
+			' contains(@class, "editable_table_row") or contains(@id, "url-row")]',
 		'column' => 'xpath:./td'
 	];
 
@@ -329,7 +330,7 @@ class CMultifieldTableElement extends CTableElement {
 	 */
 	public function addRow($values) {
 		$rows = $this->getRows()->count();
-		$this->query('button:Add')->one()->click();
+		$this->query('button:Add')->one()->hoverMouse()->click();
 
 		// Wait until new table row appears.
 		$this->query('xpath:.//'.CXPathHelper::fromSelector($this->selectors['row']).'['.($rows + 1).']')->waitUntilPresent();

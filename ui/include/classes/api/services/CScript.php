@@ -101,8 +101,9 @@ class CScript extends CApiService {
 
 		$sql_parts = [
 			'select' =>	['scripts' => 's.scriptid'],
-			'from' =>	['scripts' => 'scripts s'],
+			'from' =>	'scripts s',
 			'where' =>	[],
+			'group' =>	[],
 			'order' =>	[]
 		];
 
