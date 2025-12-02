@@ -760,7 +760,7 @@ static int	fping_output_process(zbx_fping_resp *resp, zbx_fping_args *args)
 
 		do
 		{
-			if ((int)(time(NULL) - start_time) > ZBX_ITEM_TIMEOUT_MAX)
+			if (time(NULL) - start_time > ZBX_ITEM_TIMEOUT_MAX)
 			{
 				zabbix_log(LOG_LEVEL_WARNING, "fping execution time limit (%ds) exceeded, "
 						"stopping output processing", ZBX_ITEM_TIMEOUT_MAX);
