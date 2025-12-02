@@ -1023,7 +1023,7 @@ ZBX_THREAD_ENTRY(zbx_poller_thread, args)
 				server_num = ((zbx_thread_args_t *)args)->info.server_num,
 				process_num = ((zbx_thread_args_t *)args)->info.process_num;
 	double			sec, total_sec = 0.0, old_total_sec = 0.0;
-	time_t			last_stat_time;
+	time_t			last_stat_time, now;
 	unsigned char		poller_type;
 	zbx_ipc_async_socket_t	rtc;
 	const zbx_thread_info_t	*info = &((zbx_thread_args_t *)args)->info;
@@ -1094,7 +1094,9 @@ ZBX_THREAD_ENTRY(zbx_poller_thread, args)
 
 		total_sec += zbx_time() - sec;
 
-		if (0 != sleeptime || STAT_INTERVAL <= time(NULL) - last_stat_time)
+		now = time(NULL);
+
+		if (0 != sleeptime || STAT_INTERVAL <= now - last_stat_time)
 		{
 			if (0 == sleeptime)
 			{
@@ -1115,7 +1117,9 @@ ZBX_THREAD_ENTRY(zbx_poller_thread, args)
 			}
 			processed = 0;
 			total_sec = 0.0;
-			last_stat_time = time(NULL);
+			last_stat_time = now;
+
+			zbx_malloc_trim(now, SEC_PER_MIN, ZBX_MEBIBYTE);
 		}
 
 		if (SUCCEED == zbx_rtc_wait(&rtc, info, &rtc_cmd, &rtc_data, sleeptime) && 0 != rtc_cmd)
@@ -1133,9 +1137,9 @@ ZBX_THREAD_ENTRY(zbx_poller_thread, args)
 #ifdef HAVE_NETSNMP
 #define	SNMP_ENGINEID_HK_INTERVAL	86400
 		if ((ZBX_POLLER_TYPE_NORMAL == poller_type || ZBX_POLLER_TYPE_UNREACHABLE == poller_type) &&
-				time(NULL) >= SNMP_ENGINEID_HK_INTERVAL + last_snmp_engineid_hk_time)
+				now >= SNMP_ENGINEID_HK_INTERVAL + last_snmp_engineid_hk_time)
 		{
-			last_snmp_engineid_hk_time = time(NULL);
+			last_snmp_engineid_hk_time = now;
 			zbx_clear_cache_snmp(process_type, process_num);
 		}
 #undef SNMP_ENGINEID_HK_INTERVAL
