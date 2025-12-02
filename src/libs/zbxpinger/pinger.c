@@ -442,7 +442,7 @@ out:
 }
 
 static void	add_icmpping_item(zbx_hashset_t *pinger_items, zbx_pinger_t *pinger_local, zbx_uint64_t itemid,
-		char *addr, icmpping_t icmpping, icmppingsec_type_t type, int delay_s)
+		char *addr, icmpping_t icmpping, icmppingsec_type_t type)
 {
 	int			num;
 	zbx_pinger_item_t	item;
@@ -484,7 +484,7 @@ static void	add_icmpping_item(zbx_hashset_t *pinger_items, zbx_pinger_t *pinger_
 static void	get_pinger_hosts(zbx_hashset_t *pinger_items, int config_timeout)
 {
 	zbx_dc_item_t		item, *items;
-	int			num, delay_s, errcode = SUCCEED, items_count = 0;
+	int			num, errcode = SUCCEED, items_count = 0;
 	char			error[MAX_STRING_LEN], *addr = NULL, *errmsg = NULL;
 	icmpping_t		icmpping;
 	icmppingsec_type_t	type;
@@ -502,22 +502,23 @@ static void	get_pinger_hosts(zbx_hashset_t *pinger_items, int config_timeout)
 		zbx_pinger_t	pinger_local;
 
 		ZBX_STRDUP(items[i].key, items[i].key_orig);
-		int	rc = zbx_substitute_item_key_params(&items[i].key, error, sizeof(error), zbx_item_key_subst_cb,
-				um_handle, &items[i]);
+		int	rc = zbx_substitute_item_key_params(&items[i].key, error, sizeof(error),
+				zbx_item_key_subst_cb, um_handle, &items[i]);
 
-		if (SUCCEED != rc)
+		if (SUCCEED == rc)
 		{
-			errmsg = zbx_strdup(NULL, error);
+			rc = pinger_parse_key_params(items[i].key, items[i].interface.addr, &pinger_local, &icmpping,
+					&addr, &type, &errmsg);
 		}
-		else if (SUCCEED == (rc = pinger_parse_key_params(items[i].key, items[i].interface.addr, &pinger_local,
-				&icmpping, &addr, &type, &errmsg)) &&
-				SUCCEED == (rc = zbx_interval_preproc(items[i].delay, &delay_s, NULL, &errmsg)))
+		else
+			errmsg = zbx_strdup(NULL, error);
+
+		if (SUCCEED == rc)
 		{
-			add_icmpping_item(pinger_items, &pinger_local, items[i].itemid, addr, icmpping, type, delay_s);
+			add_icmpping_item(pinger_items, &pinger_local, items[i].itemid, addr, icmpping, type);
 			items_count++;
 		}
-
-		if (SUCCEED != rc)
+		else
 		{
 			zbx_timespec_t	ts;
 

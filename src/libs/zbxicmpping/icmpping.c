@@ -776,7 +776,6 @@ static int	fping_output_process(zbx_fping_resp *resp, zbx_fping_args *args)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-
 	if (NULL == zbx_fgets(resp->linebuf, (int)resp->linebuf_size, resp->input_pipe))
 	{
 		zbx_snprintf(resp->linebuf, resp->linebuf_size, "no output");
