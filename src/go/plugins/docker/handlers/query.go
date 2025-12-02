@@ -16,11 +16,13 @@
 package handlers
 
 import (
+	"context"
 	"encoding/json"
-	"io/ioutil"
+	"io"
 	"net/http"
-	"path"
+	"net/url"
 
+	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/zbxerr"
 )
 
@@ -31,26 +33,43 @@ type errorMessage struct {
 	Message string `json:"message"`
 }
 
-func queryDockerAPI(client *http.Client, query string) (result []byte, err error) {
-	resp, err := client.Get("http://" + path.Join(dockerVersion, query))
+func queryDockerAPI(client *http.Client, query string) ([]byte, error) {
+	apiURL, err := url.JoinPath("http://"+dockerVersion, query)
 	if err != nil {
-		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
+		return nil, errs.Wrap(err, "failed to construct URL")
 	}
-	defer resp.Body.Close()
 
-	body, err := ioutil.ReadAll(resp.Body)
+	req, err := http.NewRequestWithContext(
+		context.Background(),
+		http.MethodGet,
+		apiURL,
+		http.NoBody,
+	)
+
 	if err != nil {
-		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
+		return nil, errs.Wrap(err, "failed to create request")
+	}
+
+	resp, err := client.Do(req)
+	if err != nil {
+		return nil, errs.Wrap(err, "failed to do request")
+	}
+	defer resp.Body.Close() //nolint:errcheck // typical defer close.
+
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, errs.WrapConst(err, zbxerr.ErrorCannotFetchData)
 	}
 
 	if resp.StatusCode != http.StatusOK {
 		var apiErr errorMessage
 
-		if err = json.Unmarshal(body, &apiErr); err != nil {
-			return nil, zbxerr.ErrorCannotUnmarshalJSON.Wrap(err)
+		err = json.Unmarshal(body, &apiErr)
+		if err != nil {
+			return nil, errs.WrapConst(err, zbxerr.ErrorCannotUnmarshalJSON)
 		}
 
-		return nil, zbxerr.New(apiErr.Message)
+		return nil, errs.New(apiErr.Message)
 	}
 
 	return body, nil

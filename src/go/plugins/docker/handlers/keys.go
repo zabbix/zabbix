@@ -14,8 +14,6 @@
 
 package handlers
 
-type DockerKey string
-
 // Metrics that are working with docker plugin.
 const (
 	KeyContainerInfo       DockerKey = "docker.container_info"
@@ -28,3 +26,6 @@ const (
 	KeyInfo                DockerKey = "docker.info"
 	KeyPing                DockerKey = "docker.ping"
 )
+
+// DockerKey is metric that this plugin implements.
+type DockerKey string

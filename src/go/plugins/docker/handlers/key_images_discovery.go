@@ -23,6 +23,7 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/zbxerr"
 )
 
@@ -32,15 +33,16 @@ type imageDiscovery struct {
 }
 
 func keyImagesDiscoveryHandler(client *http.Client, query string, _ ...string) (string, error) {
-	var data []Image
+	var data []image
 
 	body, err := queryDockerAPI(client, query)
 	if err != nil {
 		return "", err
 	}
 
-	if err = json.Unmarshal(body, &data); err != nil {
-		return "", zbxerr.ErrorCannotUnmarshalJSON.Wrap(err)
+	err = json.Unmarshal(body, &data)
+	if err != nil {
+		return "", errs.WrapConst(err, zbxerr.ErrorCannotUnmarshalJSON)
 	}
 
 	result, err := getImagesDiscovery(data)
@@ -51,7 +53,7 @@ func keyImagesDiscoveryHandler(client *http.Client, query string, _ ...string) (
 	return string(result), nil
 }
 
-func getImagesDiscovery(data []Image) (result []byte, err error) {
+func getImagesDiscovery(data []image) ([]byte, error) {
 	images := make([]imageDiscovery, 0)
 
 	for _, image := range data {
@@ -62,9 +64,10 @@ func getImagesDiscovery(data []Image) (result []byte, err error) {
 		images = append(images, imageDiscovery{ID: image.ID, Name: image.RepoTags[0]})
 	}
 
-	if result, err = json.Marshal(&images); err != nil {
-		return nil, zbxerr.ErrorCannotMarshalJSON.Wrap(err)
+	result, err := json.Marshal(&images)
+	if err != nil {
+		return nil, errs.WrapConst(err, zbxerr.ErrorCannotMarshalJSON)
 	}
 
-	return
+	return result, nil
 }
