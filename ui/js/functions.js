@@ -974,6 +974,17 @@ function objectToFormData(object) {
 }
 
 /**
+ * Create a URL pointing to zabbix.php.
+ *
+ * @param arguments
+ *
+ * @returns {string}
+ */
+function zabbixUrl(arguments) {
+	return `zabbix.php?${objectToSearchParams(arguments)}`;
+}
+
+/**
  * Convert RGB encoded color into HSL encoded color.
  *
  * @param {number} r  Red component in range of 0-1.
@@ -1013,4 +1024,3 @@ function convertHSLToRGB(h, s, l) {
 function isColorHex(value) {
 	return /^#([0-9A-F]{6})$/i.test(value);
 }
-
