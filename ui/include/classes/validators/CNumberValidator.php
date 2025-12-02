@@ -44,6 +44,15 @@ class CNumberValidator extends CValidator {
 		}
 	}
 
+	/**
+	 * Checks if the given string is:
+	 * - either macro or number with CNumberParser
+	 * - if the value is not a macro, then also validates if the value is within min and max constrains.
+	 *
+	 * @param string $value
+	 *
+	 * @return bool
+	 */
 	public function validate($value): bool {
 		$parser = new CNumberParser([
 			'usermacros' => $this->usermacros,
@@ -54,10 +63,10 @@ class CNumberValidator extends CValidator {
 
 		if ($result != CParser::PARSE_SUCCESS) {
 			if ($this->with_float) {
-				$this->setError(_('This value is not a valid floating-point value.'));
+				$this->setError(_('value is not a valid floating point number'));
 			}
 			else {
-				$this->setError(_('This value is not a valid integer.'));
+				$this->setError(_('value is not a valid integer'));
 			}
 
 			return false;
@@ -68,12 +77,12 @@ class CNumberValidator extends CValidator {
 		}
 
 		if ($this->min !== null && bccomp($value, $this->min) == -1) {
-			$this->setError(_s('value must be equal or greater than %1$s.', $this->min));
+			$this->setError(_s('value must be greater than or equal to%1$s', $this->min));
 
 			return false;
 		}
 		elseif ($this->max !== null && bccomp($value, $this->max) == 1) {
-			$this->setError(_s('value must be equal or less than %1$s.', $this->max));
+			$this->setError(_s('value must be less than or equal to %1$s', $this->max));
 
 			return false;
 		}
