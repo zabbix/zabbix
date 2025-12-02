@@ -5,7 +5,7 @@
 
 ### Known Issues
 
-- Description: Doesn't have ifHighSpeed filled. fixed in more recent versions
+- Description: Doesn't have ifHighSpeed filled. Fixed in more recent versions
   - Version: RouterOS 6.28 or lower
 
 - Description: Doesn't have any temperature sensors
