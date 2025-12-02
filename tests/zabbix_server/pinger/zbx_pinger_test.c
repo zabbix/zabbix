@@ -28,7 +28,7 @@ void	zbx_mock_test_entry(void **state)
 	icmpping_t		icmpping;
 	icmppingsec_type_t	type;
 	const char		*expected_addr = NULL, *interface = NULL, *key = NULL;
-	char			*error = NULL;
+	char			error[MAX_ERR_LEN];
 	int			ret;
 	int			count, interval, size, timeout;
 	unsigned char		allow_redirect;
@@ -39,13 +39,10 @@ void	zbx_mock_test_entry(void **state)
 	interface = zbx_mock_get_parameter_string("in.interface");
 	key =  zbx_mock_get_parameter_string("in.key");
 
-	ret = zbx_parse_key_params(key, interface, &icmpping, &returned_addr, &count, &interval, &size, &timeout,
-			&type, &allow_redirect, &error);
+	ret = zbx_parse_key_params(key, interface, &icmpping, &returned_addr, &count,
+			&interval, &size, &timeout, &type, &allow_redirect, error, MAX_ERR_LEN);
 	if (SUCCEED != ret)
-	{
 		printf("zbx_pinger_test error: %s\n", error);
-		zbx_free(error);
-	}
 
 	if (NULL == returned_addr || '\0' == *returned_addr)
 	{
