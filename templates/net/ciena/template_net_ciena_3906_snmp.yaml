@@ -62,7 +62,7 @@ zabbix_export:
           units: '%'
           description: |
             MIB: WWP-LEOS-SYSTEM-CONFIG-MIB
-            CPU utilization average for last 15 minutes (value ×100).
+            CPU utilization average for last 15 minutes.
           preprocessing:
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -74,10 +74,10 @@ zabbix_export:
             - uuid: ba3c33682edd40d7b97d9a50ffcbd903
               expression: 'min(/Ciena 3906 by SNMP/ciena.cpu.utilization15m,5m)>{$CIENA.CPU.UTIL.MAX}'
               name: 'Ciena: High CPU utilization (last 15m)'
-              event_name: 'Ciena: High CPU utilization (over {$CIENA.CPU.UTIL.MAX} for 5m)'
+              event_name: 'Ciena: High CPU utilization (over {$CIENA.CPU.UTIL.MAX}%)'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: WARNING
-              description: 'CPU utilization for last 5 minutes exceeded 100%.'
+              description: 'Average CPU utilization for last 15 minutes exceeded {$CIENA.CPU.UTIL.MAX}%.'
               tags:
                 - tag: scope
                   value: capacity
@@ -91,7 +91,7 @@ zabbix_export:
           units: '%'
           description: |
             MIB: WWP-LEOS-SYSTEM-CONFIG-MIB
-            Maximum 15 minute CPU utilization average (value ×100).
+            Maximum 15 minute CPU utilization average.
           preprocessing:
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -107,7 +107,7 @@ zabbix_export:
           units: '%'
           description: |
             MIB: WWP-LEOS-SYSTEM-CONFIG-MIB
-            Minimum 15 minute CPU utilization average (value ×100).
+            Minimum 15 minute CPU utilization average.
           preprocessing:
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
