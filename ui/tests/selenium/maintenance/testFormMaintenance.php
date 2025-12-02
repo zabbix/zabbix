@@ -153,6 +153,88 @@ class testFormMaintenance extends CLegacyWebTest {
 		$this->assertEquals(3, CDBHelper::getCount('SELECT NULL FROM maintenance_tag WHERE value='.zbx_dbstr($value)));
 	}
 
+	public function getMaintenancePeriodData() {
+		return [
+			// #0 New maintenance with One time only period.
+			[
+				[
+					'fields' => [
+						'Period type' => 'One time only'
+					],
+					'skip_element' => 'id:start_date'
+				]
+			],
+			// #1 New maintenance with Daily period.
+			[
+				[
+					'fields' => [
+						'Period type' => 'Daily'
+					]
+				]
+			],
+			// #2 New maintenance with Weekly period.
+			[
+				[
+					'fields' => [
+						'Period type' => 'Weekly'
+					]
+				]
+			],
+			// #3 New maintenance with Monthly with Day of month period.
+			[
+				[
+					'fields' => [
+						'Period type' => 'Monthly'
+					]
+				]
+			],
+			// #4 New maintenance with Monthly with Day of week period.
+			[
+				[
+					'screenshot_name' => 'Monthly with Day of week period',
+					'fields' => [
+						'Period type' => 'Monthly',
+						'Date' => 'Day of week'
+					]
+				]
+			]
+		];
+	}
+
+	/**
+	 * Check screenshots of period form.
+	 *
+	 * @dataProvider getMaintenancePeriodData
+	 */
+	public function testFormMaintenance_CheckPeriodForm($data) {
+		$this->page->login()->open('zabbix.php?action=maintenance.list')->waitUntilReady();
+		$this->query('button:Create maintenance period')->one()->waitUntilClickable()->click();
+
+		$form = COverlayDialogElement::find()->waitUntilReady()->asForm()->one();
+
+		$form->getField('Periods')->query('button:Add')->one()->waitUntilClickable()->click();
+		$period_overlay = COverlayDialogElement::find(1)->waitUntilReady()->one();
+		$period_overlay->asForm()->fill($data['fields']);
+		$period_overlay->waitUntilReady();
+
+		$screenshot_name = CTestArrayHelper::get($data, 'screenshot_name', $data['fields']['Period type']);
+		$this->page->removeFocus();
+
+		if (array_key_exists('skip_element', $data)) {
+			$skip_element = $period_overlay->query($data['skip_element'])->one();
+			$this->assertScreenshotExcept($period_overlay, [$skip_element], $screenshot_name);
+		}
+		else {
+			$this->assertScreenshot($period_overlay, $screenshot_name);
+		}
+
+		$period_overlay->query('button:Cancel')->one()->click();
+		$period_overlay->waitUntilNotPresent();
+
+		COverlayDialogElement::find()->one()->close(true);
+		COverlayDialogElement::ensureNotPresent();
+	}
+
 	/**
 	 * Changes not preserve when close edit form using cancel button.
 	 *
