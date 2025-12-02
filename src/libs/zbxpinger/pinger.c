@@ -593,8 +593,8 @@ static int	process_pinger_hosts(zbx_hashset_t *pinger_items, int process_num, in
 		zbx_timespec(&ts);
 
 		ping_result = zbx_ping(hosts.values, hosts.values_num, pinger->count, pinger->interval, pinger->size,
-				pinger->timeout, pinger->retries, pinger->backoff, pinger->allow_redirect, 0,
-				ZBX_ITEM_TIMEOUT_MAX, error, sizeof(error));
+				pinger->timeout, pinger->retries, pinger->backoff, pinger->allow_redirect, 0, error,
+				sizeof(error));
 
 		if (FAIL != ping_result)
 			process_values(&pinger->items, hosts.values, hosts.values_num, &ts, ping_result, error);
