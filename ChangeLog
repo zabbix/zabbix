@@ -1,10 +1,25 @@
 Changes for 8.0.0alpha2
 
 New features:
+A......PS. [ZBXNEXT-10306] updated maximum supported MySQL version to 9.5 (mprihodko)
+.........T [ZBXNEXT-9492] added VeloCloud SD-WAN Edge by HTTP template (egordymov)
+.....J.... [ZBXNEXT-10364] added commentary to web service config file that indicates that this config can be extended via Include (opucka)
+A.F....... [ZBXNEXT-9595] allowed use of not formally valid JSON or XML in HTTP Agent request body (jfreibergs)
 .........T [ZBXNEXT-10231] added support for the new syntax to MySQL templates (aiantsen)
 ........S. [ZBXNEXT-10291] fixed EVENT.RECOVERY.TAGS macro not being resolved when problem is closed manually (wiper)
 
 Bug fixes:
+.......PS. [ZBX-27271] improved scalability and performance by not calculating hash for uint64 ids (vso)
+.......PS. [ZBX-26946] fixed memory being reserved by pollers due to memory-intensive script items or in async pollers due to large transfers (vso)
+..F....... [ZBX-27049] corrected constant references in topitems widget view (talbergs)
+..F....... [ZBX-27171] fixed discrepancy between the order of visible tags and the established tag priority on the latest data page (vmaksimovs)
+........S. [ZBX-25080] optimized item_discovery table sync to use copy of items table changelog (wiper)
+A......... [ZBX-26427] fixed resetting of discovery rule filter on import (jfreibergs)
+...G...... [ZBX-26218] fixed incorrect function name in log for Zabbix agent 2 (esneiders)
+A......... [ZBX-26562] fixed 'Allowed memory size exhausted' issue while importing a cloned template (aluchko, jfreibergs)
+..F....... [ZBX-27154] fixed rare occasion of infinite loop in graph scale generation (averza)
+.........T [ZBX-26739] fixed item logic in Nextcloud by HTTP template (mruszczyk)
+.......PS. [ZBX-27188] fixed validation of TLS configuration before adding autoregistered host (mprihodko)
 ...G...... [ZBX-26640] fixed Zabbix agent built with statically linked curl library crashing on web.page.get[] items (aetatsu)
 ..F.....S. [ZBX-26451] fixed inventory macros not being resolved in script and browser type items (aetatsu, msnihach)
 ..F....... [ZBX-27126] fixed misaligned pixel appears when preceded by horizontal symbols (ashubin)
@@ -74,10 +89,22 @@ Bug fixes:
 Changes for 7.4.6rc1
 
 New features:
+A......PS. [ZBXNEXT-10306] updated maximum supported MySQL version to 9.5 (mprihodko)
+.........T [ZBXNEXT-9492] added VeloCloud SD-WAN Edge by HTTP template (egordymov)
+.....J.... [ZBXNEXT-10364] added commentary to web service config file that indicates that this config can be extended via Include (opucka)
 .........T [ZBXNEXT-10231] added support for the new syntax to MySQL templates (aiantsen)
 ...G...... [ZBXNEXT-10012] added both SHOW SLAVE STATUS and SHOW REPLICA STATUS for Zabbix agent 2 MySQL plugin (lsurvilo)
 
 Bug fixes:
+.......PS. [ZBX-26946] fixed memory being reserved by pollers due to memory-intensive script items or in async pollers due to large transfers (vso)
+..F....... [ZBX-27049] corrected constant references in topitems widget view (talbergs)
+A......... [ZBX-26427] fixed resetting of discovery rule filter on import (jfreibergs)
+A......... [ZBX-27090] fixed support of "extend" for host.get selectInheritedTags parameter (jfreibergs)
+...G...... [ZBX-26218] fixed incorrect function name in log for Zabbix agent 2 (esneiders)
+A......... [ZBX-26562] fixed 'Allowed memory size exhausted' issue while importing a cloned template (aluchko, jfreibergs)
+..F....... [ZBX-27154] fixed rare occasion of infinite loop in graph scale generation (averza)
+.........T [ZBX-26739] fixed item logic in Nextcloud by HTTP template (mruszczyk)
+.......PS. [ZBX-27188] fixed validation of TLS configuration before adding autoregistered host (mprihodko)
 ...G...... [ZBX-26640] fixed Zabbix agent built with statically linked curl library crashing on web.page.get[] items (aetatsu)
 ..F.....S. [ZBX-26451] fixed inventory macros not being resolved in script and browser type items (aetatsu, msnihach)
 ...GI..... [ZBX-24140] fixed not being able to build Zabbix agent with statically linked curl library and inability to use curl without ssl for "web.page.get[...]" items (aetatsu)
@@ -597,8 +624,10 @@ A.F....PS. [ZBXNEXT-9564] implemented vault macro resolution on proxies (esekace
 Changes for 7.2.15rc1
 
 New features:
+A......PS. [ZBXNEXT-10306] updated maximum supported MySQL version to 9.5 (mprihodko)
 
 Bug fixes:
+..F....... [ZBX-27154] fixed rare occasion of infinite loop in graph scale generation (averza)
 ...G...... [ZBX-26111] fixed JSON output for vfs.dev.discovery DEVTYPE field (rtrizna)
 ..F....... [ZBX-27020] fixed user with limited permissions access to map containing submap with inaccessible host or hostgroup (talbergs)
 
@@ -1225,10 +1254,21 @@ A.F....... [ZBX-23227] fixed issue where using an empty array or string value fo
 Changes for 7.0.22rc1
 
 New features:
+A......PS. [ZBXNEXT-10306] updated maximum supported MySQL version to 9.5 (mprihodko)
+.........T [ZBXNEXT-9492] added VeloCloud SD-WAN Edge by HTTP template (egordymov)
+.....J.... [ZBXNEXT-10364] added commentary to web service config file that indicates that this config can be extended via Include (opucka)
 .........T [ZBXNEXT-10231] added support for the new syntax to MySQL templates (aiantsen)
 ...G...... [ZBXNEXT-10012] added both SHOW SLAVE STATUS and SHOW REPLICA STATUS for Zabbix agent 2 MySQL plugin (lsurvilo)
 
 Bug fixes:
+.......PS. [ZBX-26946] fixed memory being reserved by pollers due to memory-intensive script items or in async pollers due to large transfers (vso)
+A......... [ZBX-26427] fixed resetting of discovery rule filter on import (jfreibergs)
+...G...... [ZBX-26218] fixed incorrect function name in log for Zabbix agent 2 (esneiders)
+A......... [ZBX-26252] fixed runtime error when linking template with matching discovery rule to host (jfreibergs)
+A......... [ZBX-26562] fixed 'Allowed memory size exhausted' issue while importing a cloned template (aluchko, jfreibergs)
+..F....... [ZBX-27154] fixed rare occasion of infinite loop in graph scale generation (averza)
+.........T [ZBX-26739] fixed item logic in Nextcloud by HTTP template (mruszczyk)
+.......PS. [ZBX-27188] fixed validation of TLS configuration before adding autoregistered host (mprihodko)
 ...G...... [ZBX-26640] fixed Zabbix agent built with statically linked curl library crashing on web.page.get[] items (aetatsu)
 ..F.....S. [ZBX-26451] fixed inventory macros not being resolved in script and browser type items (aetatsu, msnihach)
 ...GI..... [ZBX-24140] fixed not being able to build Zabbix agent with statically linked curl library and inability to use curl without ssl for "web.page.get[...]" items (aetatsu)
@@ -5077,6 +5117,7 @@ A.F....PS. [ZBXNEXT-7402,ZBXNEXT-7413] added support for CyberArk Vault (acikuns
 Changes for 6.0.43rc1
 
 New features:
+A......PS. [ZBXNEXT-10306] updated maximum supported MySQL version to 9.5 (mprihodko)
 A......PS. [ZBXNEXT-10219] updated maximum supported PostgreSQL version to 18 (mprihodko)
 A.......S. [ZBXNEXT-10271] updated maximum supported TimescaleDB version to 2.22 (mprihodko)
 
