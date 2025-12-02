@@ -29,6 +29,16 @@ class CRangeTimeValidator extends CValidator {
 		}
 	}
 
+	/**
+	 * Checks if the given string is
+	 * - either:
+	 * 		a) absolute time in format YYYY[-MM[-DD]][ hh[:mm[:ss]]]
+	 * 		b) relative time
+	 * - after min timestamp (if provided)
+	 *
+	 * @param string $value
+	 * @return bool
+	 */
 	public function validate($value): bool {
 		$parser = new CRangeTimeParser();
 		$result = $parser->parse($value);
@@ -41,7 +51,7 @@ class CRangeTimeValidator extends CValidator {
 
 		$timestamp = $parser->getDateTime(false)->getTimestamp();
 
-		if (bccomp($timestamp, ZBX_MAX_DATE) > 0) {
+		if ($timestamp < 0 || bccomp($timestamp, ZBX_MAX_DATE) > 0) {
 			$this->setError(_('invalid time'));
 
 			return false;
@@ -51,7 +61,7 @@ class CRangeTimeValidator extends CValidator {
 			$timestamp = $parser->getDateTime(false)->getTimestamp();
 
 			if ($timestamp < $this->min) {
-				$this->setError(_s('value must be equal or greater than %1$s.', date(ZBX_FULL_DATE_TIME, $this->min)));
+				$this->setError(_s('value must be greater than or equal to %1$s', date(ZBX_FULL_DATE_TIME, $this->min)));
 
 				return false;
 			}
