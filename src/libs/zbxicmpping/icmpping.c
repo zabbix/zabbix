@@ -735,7 +735,7 @@ static void	line_process(zbx_fping_resp *resp, zbx_fping_args *args)
  *             args               - [IN/OUT] host data and fping settings     *
  *                                                                            *
  * Return value: SUCCEED      - fping output processed successfully           *
- *               NOTSUPPORTED - unexpected error or timeout exceeded          *
+ *               NOTSUPPORTED - unexpected error                              *
  *                                                                            *
  ******************************************************************************/
 static int	fping_output_process(zbx_fping_resp *resp, zbx_fping_args *args)
