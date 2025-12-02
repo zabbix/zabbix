@@ -96,16 +96,15 @@ window.oauth_edit_popup = new class {
 			this.form.querySelector('button[name="client_secret_button"]')
 				.addEventListener('click', this.#showClientSecretField.bind(this));
 
-			this.form.querySelector('[name="token_url"]')
-				.addEventListener('input', this.#showClientSecretWithWarning.bind(this));
+			this.form.querySelector('[name="token_url"]')?.addEventListener('input', () =>
+				this.#showClientSecretWithWarning()
+			);
 
-			this.form.querySelector('#oauth-token-parameters-table')
-				.addEventListener('input', e => {
+			this.form.querySelector('#oauth-token-parameters-table')?.addEventListener('input', () => {
 					this.#showClientSecretWithWarning();
 				});
 
-			this.form.querySelector('#oauth-token-parameters-table')
-				.addEventListener('click', e => {
+			this.form.querySelector('#oauth-token-parameters-table')?.addEventListener('click', e => {
 					if (e.target.matches('.element-table-remove')) {
 						this.#showClientSecretWithWarning();
 					}
@@ -114,39 +113,8 @@ window.oauth_edit_popup = new class {
 	}
 
 	#showClientSecretWithWarning() {
-		const original_token_url = this.form.querySelector('[name="token_url"]').getAttribute('value');
-		const current_token_url = this.#getUrl('token_url', 'token_url_parameters');
-
-		if (original_token_url !== current_token_url) {
-			this.#showClientSecretField();
-			this.form.querySelector('.js-client-secret-warning').style.display = '';
-		}
-	}
-
-	#getUrl(url_selector, parameters_selector) {
-		const url_element = this.form.querySelector('[name="'+url_selector+'"]');
-
-		if (!url_element || !url_element.value) {
-			return '';
-		}
-
-		try {
-			const url = new URL(url_element.value);
-
-			url.search = Array.from(this.form.querySelectorAll('[name^="'+parameters_selector+'"][name$="[name]"]'))
-				.filter(param_name_element => param_name_element.value)
-				.map(param_name_element => {
-					const index = parseInt(param_name_element.name.split('[')[1].replace(']', ''));
-					const param_value_element = this.form.querySelector('input[name="'+parameters_selector+'['+index+'][value]"]');
-
-					return encodeURIComponent(param_name_element.value)+'='+encodeURIComponent(param_value_element.value);
-				}).join('&');
-
-			return url.href;
-		}
-		catch {
-			return '';
-		}
+		this.#showClientSecretField();
+		this.form.querySelector('.js-client-secret-warning').style.display = '';
 	}
 
 	#showClientSecretField() {
