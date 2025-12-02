@@ -696,35 +696,12 @@ class CMediatype extends CApiService {
 			));
 		}
 
-		if ($is_update
-				&& (array_key_exists('token_url', $mediatype) || array_key_exists('authorization_url', $mediatype))) {
-			$mediatype_urls = array_filter(
-				array_intersect_key($mediatype, array_flip(['token_url', 'authorization_url']))
-			);
-
-			$db_mediatype_urls = array_intersect_key(
-				[
-					'token_url' => $db_mediatype['token_url'],
-					'authorization_url' => $db_mediatype['authorization_url']
-				], $mediatype_urls
-			);
-
-			$mediatype_urls_updated = DB::getUpdatedValues('media_type_oauth', $mediatype_urls, $db_mediatype_urls);
-
-			if ($mediatype_urls_updated) {
-				if (array_key_exists('token_url',$mediatype_urls_updated)
-						&& !array_key_exists('client_secret', $mediatype)) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.', $path,
-						_s('the parameter "%1$s" is missing', 'client_secret')
-					));
-				}
-
-				$tokens_status = array_key_exists('tokens_status', $mediatype) ? $mediatype['tokens_status'] : 0;
-
-				DB::update('media_type_oauth', [[
-					'values' => ['tokens_status' => $tokens_status],
-					'where' => ['mediatypeid' => $mediatype['mediatypeid']]
-				]]);
+		if ($is_update && !array_key_exists('client_secret', $mediatype)) {
+			if (array_key_exists('token_url', $mediatype)
+					&& $mediatype['token_url'] !== $db_mediatype['token_url']) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.', $path,
+					_s('the parameter "%1$s" is missing', 'client_secret')
+				));
 			}
 		}
 	}
@@ -944,6 +921,11 @@ class CMediatype extends CApiService {
 					$_upd_media_type_oauth = DB::getUpdatedValues('media_type_oauth', $mediatype, $db_mediatype);
 
 					if ($_upd_media_type_oauth) {
+						if (array_key_exists('authorization_url', $_upd_media_type_oauth)) {
+							$_upd_media_type_oauth['tokens_status'] = array_key_exists('tokens_status', $mediatype)
+								? $mediatype['tokens_status'] : 0;
+						}
+
 						$upd_media_type_oauth[] = [
 							'values' => $_upd_media_type_oauth,
 							'where' => ['mediatypeid' => $mediatype['mediatypeid']]
