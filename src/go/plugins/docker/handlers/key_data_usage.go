@@ -24,25 +24,31 @@ import (
 
 // diskUsage contains response of Engine API:
 // GET "/system/df".
+//
+//nolint:tagliatelle // Docker API uses non-standard naming conventions
 type diskUsage struct {
-	LayersSize int64
-	Images     []*image
-	Containers []*container
-	Volumes    []*volume
+	LayersSize int64        `json:"LayersSize"`
+	Images     []*image     `json:"Images"`
+	Containers []*container `json:"Containers"`
+	Volumes    []*volume    `json:"Volumes"`
 }
 
 // volume details.
+//
+//nolint:tagliatelle // Docker API uses non-standard naming conventions
 type volume struct {
-	CreatedAt  unixTime
-	Mountpoint string
-	Name       string
-	UsageData  *volumeUsageData
+	CreatedAt  unixTime         `json:"CreatedAt"`
+	Mountpoint string           `json:"Mountpoint"`
+	Name       string           `json:"Name"`
+	UsageData  *volumeUsageData `json:"UsageData"`
 }
 
 // volumeUsageData Usage details about the volume.
+//
+//nolint:tagliatelle // Docker API uses non-standard naming conventions
 type volumeUsageData struct {
-	RefCount int64
-	Size     int64
+	RefCount int64 `json:"RefCount"`
+	Size     int64 `json:"Size"`
 }
 
 func keyDataUsageHandler(client *http.Client, query string, _ ...string) (string, error) {

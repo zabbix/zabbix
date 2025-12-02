@@ -22,6 +22,7 @@ import (
 	"golang.zabbix.com/sdk/zbxerr"
 )
 
+//nolint:tagliatelle // our non-standard naming conventions.
 type imageDiscovery struct {
 	ID   string `json:"{#ID}"`
 	Name string `json:"{#NAME}"`

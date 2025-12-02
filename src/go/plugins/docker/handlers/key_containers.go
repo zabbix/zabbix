@@ -23,38 +23,44 @@ import (
 )
 
 // container represents each container in the list returned by ListContainers.
+//
+//nolint:tagliatelle // Docker API uses non-standard naming conventions.
 type container struct {
-	ID         string `json:"Id"` //nolint:tagliatelle
-	Image      string
-	Command    string
-	Created    int64
-	State      string
-	Status     string
-	Ports      []Port
-	SizeRw     int64
-	SizeRootFs int64
-	Names      []string
-	Mounts     []Mount
+	ID         string   `json:"Id"`
+	Image      string   `json:"Image"`
+	Command    string   `json:"Command"`
+	Created    int64    `json:"Created"`
+	State      string   `json:"State"`
+	Status     string   `json:"Status"`
+	Ports      []port   `json:"Ports"`
+	SizeRw     int64    `json:"SizeRw"`
+	SizeRootFs int64    `json:"SizeRootFs"`
+	Names      []string `json:"Names"`
+	Mounts     []mount  `json:"Mounts"`
 }
 
-// Port is a type that represents a port mapping returned by the Docker API.
-type Port struct {
-	PrivatePort int64
-	PublicPort  int64
-	Type        string
-	IP          string
+// port is a type that represents a port mapping returned by the Docker API.
+//
+//nolint:tagliatelle // Docker API uses non-standard naming conventions
+type port struct {
+	PrivatePort int64  `json:"PrivatePort"`
+	PublicPort  int64  `json:"PublicPort"`
+	Type        string `json:"Type"`
+	IP          string `json:"IP"`
 }
 
-// Mount represents a mount point for a container.
-type Mount struct {
-	Name        string
-	Source      string
-	Destination string
-	Driver      string
-	Mode        string
-	RW          bool
-	Propagation string
-	Type        string
+// mount represents a mount point for a container.
+//
+//nolint:tagliatelle // Docker API uses non-standard naming conventions
+type mount struct {
+	Name        string `json:"Name"`
+	Source      string `json:"Source"`
+	Destination string `json:"Destination"`
+	Driver      string `json:"Driver"`
+	Mode        string `json:"Mode"`
+	RW          bool   `json:"RW"`
+	Propagation string `json:"Propagation"`
+	Type        string `json:"Type"`
 }
 
 func keyContainersHandler(client *http.Client, query string, _ ...string) (string, error) {
