@@ -118,31 +118,38 @@ if (!$data['readonly'] && $data['internal_auth']) {
 
 		$form_list
 			->addRow((new CLabel(_('Current password'), 'current_password'))->setAsteriskMark(),
-				$current_password, null,'password-change-active'
+				$current_password, null, 'password-change-active'
 			);
 	}
 
-	$form_list->addRow(_('Password'), [
-		(new CSimpleButton(_('Change password')))
-			->setId('change-password-button')
-			->setId('change-password-button')
-			->addClass(ZBX_STYLE_BTN_GREY),
-		null
-	], null, 'password-change-inactive');
+	$form_list->addRow(_('Password'),
+		[
+			(new CSimpleButton(_('Change password')))
+				->setId('change-password-button')
+				->addClass(ZBX_STYLE_BTN_GREY),
+			null
+		],
+		null,
+		'password-change-inactive'
+	);
 
 	$form_list
-		->addRow((new CLabel([_('Password'), $password_hint_icon], 'password1'))->setAsteriskMark(), [
-			// Hidden dummy login field for protection against chrome error when password autocomplete.
-			(new CInput('text', null, null))
-				->setAttribute('tabindex', '-1')
-				->addStyle('position: absolute; left: -100vw;'),
-			(new CPassBox('password1', $data['password1']))
-				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-				->setAriaRequired()
-				->setAttribute('data-notrim', '')
-				->setAttribute('disabled', 'disabled')
-				->setAttribute('autocomplete', 'off')
-		], null, 'password-change-active')
+		->addRow((new CLabel([_('Password'), $password_hint_icon], 'password1'))->setAsteriskMark(),
+			[
+				// Hidden dummy login field for protection against chrome error when password autocomplete.
+				(new CInput('text', null, null))
+					->setAttribute('tabindex', '-1')
+					->addStyle('position: absolute; left: -100vw;'),
+				(new CPassBox('password1', $data['password1']))
+					->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+					->setAriaRequired()
+					->setAttribute('data-notrim', '')
+					->setAttribute('disabled', 'disabled')
+					->setAttribute('autocomplete', 'off')
+			],
+			null,
+			'password-change-active'
+		)
 		->addRow((new CLabel(_('Password (once again)'), 'password2'))->setAsteriskMark(),
 			(new CPassBox('password2', $data['password2']))
 				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)

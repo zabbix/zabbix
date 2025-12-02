@@ -26,18 +26,11 @@ abstract class CControllerUserUpdateGeneral extends CController {
 	 */
 	protected $allow_empty_password;
 
-
-	/**
-	 * @var array
-	 */
-	protected $timezones;
-
 	protected function init() {
 		parent::init();
 
 		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
 		$this->setInputValidationMethod(self::INPUT_VALIDATION_FORM);
-		$this->timezones = self::getAllowedTimezones();
 	}
 
 	public static function getAllowedTimezones(): array {
@@ -60,7 +53,6 @@ abstract class CControllerUserUpdateGeneral extends CController {
 
 		return $themes;
 	}
-
 
 	/**
 	 * Get groups gui access.

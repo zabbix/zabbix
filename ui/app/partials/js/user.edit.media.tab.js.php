@@ -170,6 +170,7 @@
 				const sendto_input = row.querySelector(`[name="medias[${media.row_index}][sendto]"`);
 
 				const container = document.createElement('div');
+
 				container.setAttribute('data-field-type', 'array');
 				container.setAttribute('data-field-name', `medias[${media.row_index}][sendto]`);
 
