@@ -122,7 +122,7 @@ class CControllerUserProfileUpdate extends CControllerUserUpdateGeneral {
 
 		if ($result) {
 			$response = ['success' => [
-				'title' => 'User updated',
+				'title' => _('User updated'),
 				'redirect' => (new CUrl('zabbix.php'))->setArgument('action', 'userprofile.edit')->getUrl()
 			]];
 		}

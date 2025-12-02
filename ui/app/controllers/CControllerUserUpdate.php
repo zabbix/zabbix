@@ -178,7 +178,7 @@ class CControllerUserUpdate extends CControllerUserUpdateGeneral {
 		$result = (bool) API::User()->update($user);
 
 		if ($result) {
-			$response = ['success' => ['title' => 'User updated']];
+			$response = ['success' => ['title' => _('User updated')]];
 
 			if (array_key_exists('passwd', $user) && CWebUser::$data['userid'] == $user['userid']) {
 				$response['success']['redirect'] = (new CUrl('index.php'))->getUrl();

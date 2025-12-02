@@ -146,7 +146,7 @@ class CControllerUserProfileNotificationUpdate extends CControllerUserUpdateGene
 
 		if ($result) {
 			$response = ['success' => [
-				'title' => 'User updated',
+				'title' => _('User updated'),
 				'redirect' => (new CUrl(CMenuHelper::getFirstUrl()))->getUrl()
 			]];
 		}
