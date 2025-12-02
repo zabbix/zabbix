@@ -24,15 +24,17 @@ import (
 
 // image contains response of Engine API:
 // GET "/images/{name:.*}/json".
+//
+//nolint:tagliatelle // Docker API uses non-standard naming conventions
 type image struct {
-	ID          string `json:"Id"` //nolint:tagliatelle
-	RepoTags    []string
-	RepoDigests []string
-	Containers  int64
-	Created     int64
-	Size        int64
-	VirtualSize int64
-	SharedSize  int64
+	ID          string   `json:"Id"`
+	RepoTags    []string `json:"RepoTags"`
+	RepoDigests []string `json:"RepoDigests"`
+	Containers  int64    `json:"Containers"`
+	Created     int64    `json:"Created"`
+	Size        int64    `json:"Size"`
+	VirtualSize int64    `json:"VirtualSize"`
+	SharedSize  int64    `json:"SharedSize"`
 }
 
 func keyImagesHandler(client *http.Client, query string, _ ...string) (string, error) {

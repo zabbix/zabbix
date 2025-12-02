@@ -22,9 +22,10 @@ import (
 	"golang.zabbix.com/sdk/zbxerr"
 )
 
+//nolint:tagliatelle // our non-standard naming conventions.
 type containerDiscovery struct {
-	ID   string `json:"{#ID}"`   //nolint:tagliatelle
-	Name string `json:"{#NAME}"` //nolint:tagliatelle
+	ID   string `json:"{#ID}"`
+	Name string `json:"{#NAME}"`
 }
 
 func keyContainersDiscovery(client *http.Client, query string, _ ...string) (string, error) {
@@ -35,7 +36,8 @@ func keyContainersDiscovery(client *http.Client, query string, _ ...string) (str
 		return "", err
 	}
 
-	if err = json.Unmarshal(body, &data); err != nil {
+	err = json.Unmarshal(body, &data)
+	if err != nil {
 		return "", errs.WrapConst(err, zbxerr.ErrorCannotUnmarshalJSON)
 	}
 

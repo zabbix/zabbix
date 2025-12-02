@@ -10,9 +10,8 @@
 **
 ** You should have received a copy of the GNU Affero General Public License along with this program.
 ** If not, see <https://www.gnu.org/licenses/>.
+**/
 
-*
- */
 package handlers
 
 import (
@@ -20,7 +19,7 @@ import (
 	"encoding/json"
 	"io"
 	"net/http"
-	"net/url"
+	"path"
 
 	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/zbxerr"
@@ -34,15 +33,10 @@ type errorMessage struct {
 }
 
 func queryDockerAPI(client *http.Client, query string) ([]byte, error) {
-	apiURL, err := url.JoinPath("http://"+dockerVersion, query)
-	if err != nil {
-		return nil, errs.Wrap(err, "failed to construct URL")
-	}
-
 	req, err := http.NewRequestWithContext(
 		context.Background(),
 		http.MethodGet,
-		apiURL,
+		"http://"+path.Join(dockerVersion, query),
 		http.NoBody,
 	)
 

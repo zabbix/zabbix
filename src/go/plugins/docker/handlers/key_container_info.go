@@ -22,100 +22,108 @@ import (
 	"golang.zabbix.com/sdk/zbxerr"
 )
 
-// containerState represents the state of a container.
-type containerState struct {
-	Status            string
-	Running           bool
-	Paused            bool
-	Restarting        bool
-	OOMKilled         bool
-	RemovalInProgress bool
-	Dead              bool
-	Pid               int
-	ExitCode          int
-	Error             string
-	StartedAt         unixTime
-	FinishedAt        unixTime
-}
-
 // containerInfo contains response of Engine API:
 // GET "/containers/{name:.*}/json".
+//
+//nolint:tagliatelle // Docker API uses non-standard naming conventions
 type containerInfo struct {
-	ID              string `json:"Id"` //nolint:tagliatelle
-	Created         unixTime
-	Path            string
-	Args            []string
-	State           *containerState
-	Image           string
-	ResolvConfPath  string
-	HostnamePath    string
-	HostsPath       string
-	LogPath         string
-	Name            string
-	RestartCount    int
-	Driver          string
-	Platform        string
-	MountLabel      string
-	ProcessLabel    string
-	AppArmorProfile string
-	ExecIDs         []string
-	HostConfig      *hostConfig
-	SizeRw          int64
-	SizeRootFs      int64
+	ID              string          `json:"Id"`
+	Created         unixTime        `json:"Created"`
+	Path            string          `json:"Path"`
+	Args            []string        `json:"Args"`
+	State           *containerState `json:"State"`
+	Image           string          `json:"Image"`
+	ResolvConfPath  string          `json:"ResolvConfPath"`
+	HostnamePath    string          `json:"HostnamePath"`
+	HostsPath       string          `json:"HostsPath"`
+	LogPath         string          `json:"LogPath"`
+	Name            string          `json:"Name"`
+	RestartCount    int             `json:"RestartCount"`
+	Driver          string          `json:"Driver"`
+	Platform        string          `json:"Platform"`
+	MountLabel      string          `json:"MountLabel"`
+	ProcessLabel    string          `json:"ProcessLabel"`
+	AppArmorProfile string          `json:"AppArmorProfile"`
+	ExecIDs         []string        `json:"ExecIDs"`
+	HostConfig      *hostConfig     `json:"HostConfig"`
+	SizeRw          int64           `json:"SizeRw"`
+	SizeRootFs      int64           `json:"SizeRootFs"`
+}
+
+// containerState represents the state of a container.
+//
+//nolint:tagliatelle // Docker API uses non-standard naming conventions
+type containerState struct {
+	Status            string   `json:"Status"`
+	Running           bool     `json:"Running"`
+	Paused            bool     `json:"Paused"`
+	Restarting        bool     `json:"Restarting"`
+	OOMKilled         bool     `json:"OOMKilled"`
+	RemovalInProgress bool     `json:"RemovalInProgress"`
+	Dead              bool     `json:"Dead"`
+	Pid               int      `json:"Pid"`
+	ExitCode          int      `json:"ExitCode"`
+	Error             string   `json:"Error"`
+	StartedAt         unixTime `json:"StartedAt"`
+	FinishedAt        unixTime `json:"FinishedAt"`
 }
 
 // hostConfig the non-portable Config structure of a container.
+//
+//nolint:tagliatelle // Docker API uses non-standard naming conventions
 type hostConfig struct {
-	Binds           []string
-	ContainerIDFile string
-	NetworkMode     string
+	Binds           []string `json:"Binds"`
+	ContainerIDFile string   `json:"ContainerIDFile"`
+	NetworkMode     string   `json:"NetworkMode"`
 
-	DNS             []string `json:"Dns"`        //nolint:tagliatelle
-	DNSOptions      []string `json:"DnsOptions"` //nolint:tagliatelle
-	DNSSearch       []string `json:"DnsSearch"`  //nolint:tagliatelle
-	ExtraHosts      []string
-	GroupAdd        []string
-	Links           []string
-	OomScoreAdj     int
-	Privileged      bool
-	PublishAllPorts bool
-	ReadonlyRootfs  bool
-	SecurityOpt     []string
-	StorageOpt      map[string]string
-	Tmpfs           map[string]string
-	ShmSize         int64
-	Sysctls         map[string]string
-	Runtime         string
+	DNS             []string          `json:"Dns"`
+	DNSOptions      []string          `json:"DnsOptions"`
+	DNSSearch       []string          `json:"DnsSearch"`
+	ExtraHosts      []string          `json:"ExtraHosts"`
+	GroupAdd        []string          `json:"GroupAdd"`
+	Links           []string          `json:"Links"`
+	OomScoreAdj     int               `json:"OomScoreAdj"`
+	Privileged      bool              `json:"Privileged"`
+	PublishAllPorts bool              `json:"PublishAllPorts"`
+	ReadonlyRootfs  bool              `json:"ReadonlyRootfs"`
+	SecurityOpt     []string          `json:"SecurityOpt"`
+	StorageOpt      map[string]string `json:"StorageOpt"`
+	Tmpfs           map[string]string `json:"Tmpfs"`
+	ShmSize         int64             `json:"ShmSize"`
+	Sysctls         map[string]string `json:"Sysctls"`
+	Runtime         string            `json:"Runtime"`
 
-	Resources
+	resources
 }
 
-// Resources contains container's resources.
-type Resources struct {
-	CPUShares int64 `json:"CpuShares"` //nolint:tagliatelle
-	Memory    int64
-	NanoCPUs  int64 `json:"NanoCpus"` //nolint:tagliatelle
+// resources contains container's resources.
+//
+//nolint:tagliatelle // Docker API uses non-standard naming conventions
+type resources struct {
+	CPUShares int64 `json:"CpuShares"`
+	Memory    int64 `json:"Memory"`
+	NanoCPUs  int64 `json:"NanoCpus"`
 
-	CgroupParent       string
-	BlkioWeight        uint16
-	CPUPeriod          int64 `json:"CpuPeriod"`          //nolint:tagliatelle
-	CPUQuota           int64 `json:"CpuQuota"`           //nolint:tagliatelle
-	CPURealtimePeriod  int64 `json:"CpuRealtimePeriod"`  //nolint:tagliatelle
-	CPURealtimeRuntime int64 `json:"CpuRealtimeRuntime"` //nolint:tagliatelle
-	CpusetCpus         string
-	CpusetMems         string
-	KernelMemory       int64
-	KernelMemoryTCP    int64
-	MemoryReservation  int64
-	MemorySwap         int64
-	MemorySwappiness   *int64
-	OomKillDisable     *bool
-	PidsLimit          *int64
+	CgroupParent       string `json:"CgroupParent"`
+	BlkioWeight        uint16 `json:"BlkioWeight"`
+	CPUPeriod          int64  `json:"CpuPeriod"`
+	CPUQuota           int64  `json:"CpuQuota"`
+	CPURealtimePeriod  int64  `json:"CpuRealtimePeriod"`
+	CPURealtimeRuntime int64  `json:"CpuRealtimeRuntime"`
+	CpusetCpus         string `json:"CpusetCpus"`
+	CpusetMems         string `json:"CpusetMems"`
+	KernelMemory       int64  `json:"KernelMemory"`
+	KernelMemoryTCP    int64  `json:"KernelMemoryTCP"`
+	MemoryReservation  int64  `json:"MemoryReservation"`
+	MemorySwap         int64  `json:"MemorySwap"`
+	MemorySwappiness   *int64 `json:"MemorySwappiness"`
+	OomKillDisable     *bool  `json:"OomKillDisable"`
+	PidsLimit          *int64 `json:"PidsLimit"`
 
-	CPUCount           int64 `json:"CpuCount"`   //nolint:tagliatelle
-	CPUPercent         int64 `json:"CpuPercent"` //nolint:tagliatelle
-	IOMaximumIOps      uint64
-	IOMaximumBandwidth uint64
+	CPUCount           int64  `json:"CpuCount"`
+	CPUPercent         int64  `json:"CpuPercent"`
+	IOMaximumIOps      uint64 `json:"IOMaximumIOps"`
+	IOMaximumBandwidth uint64 `json:"IOMaximumBandwidth"`
 }
 
 func keyContainerInfoHandler(client *http.Client, query string, args ...string) (string, error) {
@@ -132,14 +140,14 @@ func keyContainerInfoHandler(client *http.Client, query string, args ...string) 
 	case "full":
 		return string(body), nil
 	case "short":
-		var info containerInfo
+		var cInfo containerInfo
 
-		err = json.Unmarshal(body, &info)
+		err = json.Unmarshal(body, &cInfo)
 		if err != nil {
 			return "", errs.WrapConst(err, zbxerr.ErrorCannotUnmarshalJSON)
 		}
 
-		result, err := json.Marshal(info)
+		result, err := json.Marshal(cInfo)
 		if err != nil {
 			return "", errs.WrapConst(err, zbxerr.ErrorCannotMarshalJSON)
 		}
