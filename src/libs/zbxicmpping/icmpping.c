@@ -731,8 +731,8 @@ static void	line_process(zbx_fping_resp *resp, zbx_fping_args *args)
  *                                                                            *
  * Purpose: process multiple-line fping output                                *
  *                                                                            *
- * Parameters: resp               - [IN] fping output                         *
- *             args               - [IN/OUT] host data and fping settings     *
+ * Parameters: resp - [IN] fping output                                       *
+ *             args - [IN/OUT] host data and fping settings                   *
  *                                                                            *
  * Return value: SUCCEED      - fping output processed successfully           *
  *               NOTSUPPORTED - unexpected error                              *
