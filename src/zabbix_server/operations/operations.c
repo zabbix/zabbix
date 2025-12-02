@@ -860,7 +860,7 @@ static int	is_discovery_or_autoregistration(const zbx_db_event *event)
  * Parameters: event          - [IN] source event                             *
  *             cfg            - [IN] global configuration data                *
  *             hostid         - [IN/OUT] current hostid (0 if not provided,   *
- *                              updated if host was added)                    *
+ *                                       updated if host was added)           *
  *             status         - [OUT] host status                             *
  *                                                                            *
  * Return value: hostid - new/existing hostid or 0 if failed                  *
