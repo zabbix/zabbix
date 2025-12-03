@@ -3635,6 +3635,14 @@ svg {
 	}
 }
 
+.macro-value-secret {
+	z-textarea-flexible {
+		textarea {
+			-webkit-text-security: disc;
+		}
+	}
+}
+
 .input-secret {
 	position: relative;
 	display: flex;

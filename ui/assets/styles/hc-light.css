@@ -8513,11 +8513,11 @@ svg {
     display: none; }
   .macro-input-group .btn-undo {
     display: none;
+    height: auto;
     color: #555555;
     background-color: #ffffff;
     border-width: 1px 0;
-    border-color: #888888;
-    height: auto; }
+    border-color: #888888; }
     .macro-input-group .btn-undo::before {
       font-size: 16px; }
     .macro-input-group .btn-undo:focus, .macro-input-group .btn-undo:hover {
@@ -8532,6 +8532,9 @@ svg {
       border-right: 0; }
       .macro-input-group z-textarea-flexible textarea:focus + .btn-undo {
         border-color: #000000; }
+
+.macro-value-secret z-textarea-flexible textarea {
+  -webkit-text-security: disc; }
 
 .input-secret {
   position: relative;
