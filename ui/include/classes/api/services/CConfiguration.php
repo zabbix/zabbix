@@ -207,78 +207,78 @@ class CConfiguration extends CApiService {
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
 			'format' =>					['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'in' => implode(',', [CImportReaderFactory::YAML, CImportReaderFactory::XML, CImportReaderFactory::JSON])],
 			'source' =>					['type' => API_STRING_UTF8, 'flags' => API_REQUIRED],
-			'returnMissingObjects' => 	['type' => API_BOOLEAN, 'default' => false],
-			'rules' =>				['type' => API_OBJECT, 'flags' => API_REQUIRED, 'fields' => [
-				'dashboards' =>			['type' => API_OBJECT, 'fields' => [
+			'returnMissingObjects' =>	['type' => API_BOOLEAN, 'default' => false],
+			'rules' =>					['type' => API_OBJECT, 'flags' => API_REQUIRED, 'fields' => [
+				'dashboards' =>				['type' => API_OBJECT, 'fields' => [
 					'createMissing' =>			['type' => API_BOOLEAN, 'default' => false],
 					'updateExisting' =>			['type' => API_BOOLEAN, 'default' => false]
 				]],
-				'discoveryRules' =>		['type' => API_OBJECT, 'fields' => [
-					'createMissing' =>		['type' => API_BOOLEAN, 'default' => false],
-					'updateExisting' =>		['type' => API_BOOLEAN, 'default' => false],
-					'deleteMissing' =>		['type' => API_BOOLEAN, 'default' => false]
+				'discoveryRules' =>			['type' => API_OBJECT, 'fields' => [
+					'createMissing' =>			['type' => API_BOOLEAN, 'default' => false],
+					'updateExisting' =>			['type' => API_BOOLEAN, 'default' => false],
+					'deleteMissing' =>			['type' => API_BOOLEAN, 'default' => false]
 				]],
-				'graphs' =>				['type' => API_OBJECT, 'fields' => [
-					'createMissing' =>		['type' => API_BOOLEAN, 'default' => false],
-					'updateExisting' =>		['type' => API_BOOLEAN, 'default' => false],
-					'deleteMissing' =>		['type' => API_BOOLEAN, 'default' => false]
+				'graphs' =>					['type' => API_OBJECT, 'fields' => [
+					'createMissing' =>			['type' => API_BOOLEAN, 'default' => false],
+					'updateExisting' =>			['type' => API_BOOLEAN, 'default' => false],
+					'deleteMissing' =>			['type' => API_BOOLEAN, 'default' => false]
 				]],
-				'host_groups' =>		['type' => API_OBJECT, 'fields' => [
-					'createMissing' =>		['type' => API_BOOLEAN, 'default' => false],
-					'updateExisting' =>		['type' => API_BOOLEAN, 'default' => false]
+				'host_groups' =>			['type' => API_OBJECT, 'fields' => [
+					'createMissing' =>			['type' => API_BOOLEAN, 'default' => false],
+					'updateExisting' =>			['type' => API_BOOLEAN, 'default' => false]
 				]],
-				'template_groups' =>	['type' => API_OBJECT, 'fields' => [
-					'createMissing' =>		['type' => API_BOOLEAN, 'default' => false],
-					'updateExisting' =>		['type' => API_BOOLEAN, 'default' => false]
+				'template_groups' =>		['type' => API_OBJECT, 'fields' => [
+					'createMissing' =>			['type' => API_BOOLEAN, 'default' => false],
+					'updateExisting' =>			['type' => API_BOOLEAN, 'default' => false]
 				]],
-				'hosts' =>				['type' => API_OBJECT, 'fields' => [
-					'createMissing' =>		['type' => API_BOOLEAN, 'default' => false],
-					'updateExisting' =>		['type' => API_BOOLEAN, 'default' => false]
+				'hosts' =>					['type' => API_OBJECT, 'fields' => [
+					'createMissing' =>			['type' => API_BOOLEAN, 'default' => false],
+					'updateExisting' =>			['type' => API_BOOLEAN, 'default' => false]
 				]],
-				'httptests' =>			['type' => API_OBJECT, 'fields' => [
-					'createMissing' =>		['type' => API_BOOLEAN, 'default' => false],
-					'updateExisting' =>		['type' => API_BOOLEAN, 'default' => false],
-					'deleteMissing' =>		['type' => API_BOOLEAN, 'default' => false]
+				'httptests' =>				['type' => API_OBJECT, 'fields' => [
+					'createMissing' =>			['type' => API_BOOLEAN, 'default' => false],
+					'updateExisting' =>			['type' => API_BOOLEAN, 'default' => false],
+					'deleteMissing' =>			['type' => API_BOOLEAN, 'default' => false]
 				]],
-				'images' =>				['type' => API_OBJECT, 'fields' => [
-					'createMissing' =>		['type' => API_BOOLEAN, 'default' => false],
-					'updateExisting' =>		['type' => API_BOOLEAN, 'default' => false]
+				'images' =>					['type' => API_OBJECT, 'fields' => [
+					'createMissing' =>			['type' => API_BOOLEAN, 'default' => false],
+					'updateExisting' =>			['type' => API_BOOLEAN, 'default' => false]
 				]],
-				'items' =>				['type' => API_OBJECT, 'fields' => [
-					'createMissing' =>		['type' => API_BOOLEAN, 'default' => false],
-					'updateExisting' =>		['type' => API_BOOLEAN, 'default' => false],
-					'deleteMissing' =>		['type' => API_BOOLEAN, 'default' => false]
+				'items' =>					['type' => API_OBJECT, 'fields' => [
+					'createMissing' =>			['type' => API_BOOLEAN, 'default' => false],
+					'updateExisting' =>			['type' => API_BOOLEAN, 'default' => false],
+					'deleteMissing' =>			['type' => API_BOOLEAN, 'default' => false]
 				]],
-				'maps' =>				['type' => API_OBJECT, 'fields' => [
-					'createMissing' =>		['type' => API_BOOLEAN, 'default' => false],
-					'updateExisting' =>		['type' => API_BOOLEAN, 'default' => false]
+				'maps' =>					['type' => API_OBJECT, 'fields' => [
+					'createMissing' =>			['type' => API_BOOLEAN, 'default' => false],
+					'updateExisting' =>			['type' => API_BOOLEAN, 'default' => false]
 				]],
-				'mediaTypes' =>			['type' => API_OBJECT, 'fields' => [
-					'createMissing' =>		['type' => API_BOOLEAN, 'default' => false],
-					'updateExisting' =>		['type' => API_BOOLEAN, 'default' => false]
+				'mediaTypes' =>				['type' => API_OBJECT, 'fields' => [
+					'createMissing' =>			['type' => API_BOOLEAN, 'default' => false],
+					'updateExisting' =>			['type' => API_BOOLEAN, 'default' => false]
 				]],
-				'templateLinkage' =>	['type' => API_OBJECT, 'default' => [], 'fields' => [
-					'createMissing' =>		['type' => API_BOOLEAN, 'default' => false],
-					'deleteMissing' =>		['type' => API_BOOLEAN, 'default' => false]
+				'templateLinkage' =>		['type' => API_OBJECT, 'default' => [], 'fields' => [
+					'createMissing' =>			['type' => API_BOOLEAN, 'default' => false],
+					'deleteMissing' =>			['type' => API_BOOLEAN, 'default' => false]
 				]],
-				'templates' =>			['type' => API_OBJECT, 'fields' => [
-					'createMissing' =>		['type' => API_BOOLEAN, 'default' => false],
-					'updateExisting' =>		['type' => API_BOOLEAN, 'default' => false]
+				'templates' =>				['type' => API_OBJECT, 'fields' => [
+					'createMissing' =>			['type' => API_BOOLEAN, 'default' => false],
+					'updateExisting' =>			['type' => API_BOOLEAN, 'default' => false]
 				]],
-				'templateDashboards' =>	['type' => API_OBJECT, 'fields' => [
-					'createMissing' =>		['type' => API_BOOLEAN, 'default' => false],
-					'updateExisting' =>		['type' => API_BOOLEAN, 'default' => false],
-					'deleteMissing' =>		['type' => API_BOOLEAN, 'default' => false]
+				'templateDashboards' =>		['type' => API_OBJECT, 'fields' => [
+					'createMissing' =>			['type' => API_BOOLEAN, 'default' => false],
+					'updateExisting' =>			['type' => API_BOOLEAN, 'default' => false],
+					'deleteMissing' =>			['type' => API_BOOLEAN, 'default' => false]
 				]],
-				'triggers' =>			['type' => API_OBJECT, 'fields' => [
-					'createMissing' =>		['type' => API_BOOLEAN, 'default' => false],
-					'updateExisting' =>		['type' => API_BOOLEAN, 'default' => false],
-					'deleteMissing' =>		['type' => API_BOOLEAN, 'default' => false]
+				'triggers' =>				['type' => API_OBJECT, 'fields' => [
+					'createMissing' =>			['type' => API_BOOLEAN, 'default' => false],
+					'updateExisting' =>			['type' => API_BOOLEAN, 'default' => false],
+					'deleteMissing' =>			['type' => API_BOOLEAN, 'default' => false]
 				]],
-				'valueMaps' =>			['type' => API_OBJECT, 'fields' => [
-					'createMissing' =>		['type' => API_BOOLEAN, 'default' => false],
-					'updateExisting' =>		['type' => API_BOOLEAN, 'default' => false],
-					'deleteMissing' =>		['type' => API_BOOLEAN, 'default' => false]
+				'valueMaps' =>				['type' => API_OBJECT, 'fields' => [
+					'createMissing' =>			['type' => API_BOOLEAN, 'default' => false],
+					'updateExisting' =>			['type' => API_BOOLEAN, 'default' => false],
+					'deleteMissing' =>			['type' => API_BOOLEAN, 'default' => false]
 				]]
 			]]
 		]];
