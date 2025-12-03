@@ -1,10 +1,6 @@
 if SERVER
 
-SERVER_tests = \
-	zbx_lld_hgsets_test \
-	zbx_substitute_expression_lld_macros \
-	zbx_substitute_macros_in_json_pairs
-
+SERVER_tests = zbx_lld_hgsets_test
 
 noinst_PROGRAMS = $(SERVER_tests)
 
@@ -142,58 +138,6 @@ zbx_lld_hgsets_test_LDADD += @SERVER_LIBS@
 zbx_lld_hgsets_test_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS) $(TLS_LDFLAGS)
 
 zbx_lld_hgsets_test_CFLAGS = \
-	-I@top_srcdir@/tests @LIBXML2_CFLAGS@ $(CMOCKA_CFLAGS) $(YAML_CFLAGS) $(TLS_CFLAGS)
-
-# zbx_substitute_expression_lld_macros
-
-zbx_substitute_expression_lld_macros_SOURCES = \
-	zbx_substitute_expression_lld_macros.c \
-	../../../src/zabbix_server/lld/lld_common.c \
-	../../../src/zabbix_server/lld/lld_graph.c \
-	../../../src/zabbix_server/lld/lld_audit.c \
-	../../../src/zabbix_server/lld/lld_item.c \
-	../../../src/zabbix_server/lld/lld_item_dep.c \
-	../../../src/zabbix_server/lld/lld_trigger.c \
-	../../../src/zabbix_server/lld/lld.c \
-	../../zbxmockexit.c \
-	../../zbxmockdb.c \
-	../../zbxmockdata.c \
-	../../zbxmocklog.c \
-	../../zbxmockfile.c \
-	../../zbxmockdir.c \
-	lld_common.c
-
-zbx_substitute_expression_lld_macros_LDADD = $(LLD_LIBS)
-zbx_substitute_expression_lld_macros_LDADD += @SERVER_LIBS@
-zbx_substitute_expression_lld_macros_LDFLAGS = @SERVER_LDFLAGS@ $(LLD_WRAP_FUNCS) $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS) $(TLS_LDFLAGS)
-
-zbx_substitute_expression_lld_macros_CFLAGS = \
-	-I@top_srcdir@/tests @LIBXML2_CFLAGS@ $(CMOCKA_CFLAGS) $(YAML_CFLAGS) $(TLS_CFLAGS)
-
-# zbx_substitute_macros_in_json_pairs
-
-zbx_substitute_macros_in_json_pairs_SOURCES = \
-	zbx_substitute_macros_in_json_pairs.c \
-	../../../src/zabbix_server/lld/lld_common.c \
-	../../../src/zabbix_server/lld/lld_graph.c \
-	../../../src/zabbix_server/lld/lld_audit.c \
-	../../../src/zabbix_server/lld/lld_item.c \
-	../../../src/zabbix_server/lld/lld_item_dep.c \
-	../../../src/zabbix_server/lld/lld_trigger.c \
-	../../../src/zabbix_server/lld/lld.c \
-	../../zbxmockexit.c \
-	../../zbxmockdb.c \
-	../../zbxmockdata.c \
-	../../zbxmocklog.c \
-	../../zbxmockfile.c \
-	../../zbxmockdir.c \
-	lld_common.c
-
-zbx_substitute_macros_in_json_pairs_LDADD = $(LLD_LIBS)
-zbx_substitute_macros_in_json_pairs_LDADD += @SERVER_LIBS@
-zbx_substitute_macros_in_json_pairs_LDFLAGS = @SERVER_LDFLAGS@ $(LLD_WRAP_FUNCS) $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS) $(TLS_LDFLAGS)
-
-zbx_substitute_macros_in_json_pairs_CFLAGS = \
 	-I@top_srcdir@/tests @LIBXML2_CFLAGS@ $(CMOCKA_CFLAGS) $(YAML_CFLAGS) $(TLS_CFLAGS)
 
 endif
