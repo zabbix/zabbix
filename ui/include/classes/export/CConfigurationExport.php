@@ -518,6 +518,7 @@ class CConfigurationExport {
 		foreach ($dashboards as &$dashboard) {
 			$dashboard['pages'] = $this->prepareDashboardPages($dashboard['pages']);
 		}
+		unset($dashboard);
 
 		$this->data['dashboards'] = $dashboards;
 	}
