@@ -16,13 +16,19 @@
 require_once dirname(__FILE__).'/../include/CIntegrationTest.php';
 require_once dirname(__FILE__).'/../include/helpers/CDataHelper.php';
 
-
+/**
+ * Test suite for data collection using both active and passive agents.
+ *
+ * @onAfter clearData
+ *
+ */
 class testDataCollection extends CIntegrationTest {
 
 	private static $hostids = [];
 	private static $itemids = [];
 	private static $certBaseDirProxy;
 	private static $certBaseDirAgent;
+	private static $proxyids;
 
 	/**
 	 * @inheritdoc
@@ -34,7 +40,7 @@ class testDataCollection extends CIntegrationTest {
 			'operating_mode' => PROXY_OPERATING_MODE_ACTIVE
 		]);
 
-		$proxyids = CDataHelper::getIds('name');
+		self::$proxyids = CDataHelper::getIds('name');
 
 		// Create host "agent", "custom_agent" and "proxy agent".
 		$interfaces = [
@@ -97,7 +103,7 @@ class testDataCollection extends CIntegrationTest {
 				'host' => 'proxy_agent',
 				'interfaces' => $interfaces,
 				'groups' => $groups,
-				'proxyid' => $proxyids['proxy'],
+				'proxyid' => self::$proxyids['proxy'],
 				'monitored_by' => ZBX_MONITORED_BY_PROXY,
 				'status' => HOST_STATUS_NOT_MONITORED,
 				'items' => [
@@ -131,28 +137,16 @@ class testDataCollection extends CIntegrationTest {
 	 * @return array
 	 */
 	public function agentConfigurationProvider() {
-		self::$certBaseDirAgent = self::generateCertificates();
-		$baseDir = self::$certBaseDirAgent;
 		return [
 			self::COMPONENT_SERVER => [
 				'UnreachablePeriod' => 5,
 				'UnavailableDelay' => 5,
 				'UnreachableDelay' => 1,
-				'DebugLevel' => 4,
-				'TLSCAFile' => $baseDir . 'zabbix_ca_file.crt',
-				'TLSCertFile' => $baseDir . 'zabbix_server.crt',
-				'TLSKeyFile' => $baseDir . 'zabbix_server.key'
+				'DebugLevel' => 4
 			],
 			self::COMPONENT_AGENT => [
 				'Hostname' => 'agent',
-				'ServerActive' => '127.0.0.1',
-				'TLSConnect' => 'cert',
-				'TLSAccept' => 'cert',
-				'TLSCAFile' => $baseDir . 'zabbix_ca_file.crt',
-				'TLSCertFile' => $baseDir . 'zabbix_agentd.crt',
-				'TLSKeyFile' => $baseDir . 'zabbix_agentd.key',
-				'TLSServerCertIssuer' => 'CN=ZabbixCA',
-				'TLSServerCertSubject' => 'CN=zabbix_server'
+				'ServerActive' => '127.0.0.1'
 			]
 		];
 	}
@@ -191,10 +185,42 @@ class testDataCollection extends CIntegrationTest {
 	}
 
 	/**
+	 * Component configuration provider for agent related tests (TLS).
+	 *
+	 * @return array
+	 */
+	public function agentConfigurationProviderTLS() {
+		self::$certBaseDirAgent = self::generateCertificates();
+		$baseDir = self::$certBaseDirAgent;
+		return [
+			self::COMPONENT_SERVER => [
+				'UnreachablePeriod' => 5,
+				'UnavailableDelay' => 5,
+				'UnreachableDelay' => 1,
+				'DebugLevel' => 4,
+				'TLSCAFile' => $baseDir . 'zabbix_ca_file.crt',
+				'TLSCertFile' => $baseDir . 'zabbix_server.crt',
+				'TLSKeyFile' => $baseDir . 'zabbix_server.key'
+			],
+			self::COMPONENT_AGENT => [
+				'Hostname' => 'agent',
+				'ServerActive' => '127.0.0.1',
+				'TLSConnect' => 'cert',
+				'TLSAccept' => 'cert',
+				'TLSCAFile' => $baseDir . 'zabbix_ca_file.crt',
+				'TLSCertFile' => $baseDir . 'zabbix_agentd.crt',
+				'TLSKeyFile' => $baseDir . 'zabbix_agentd.key',
+				'TLSServerCertIssuer' => 'CN=ZabbixCA',
+				'TLSServerCertSubject' => 'CN=zabbix_server'
+			]
+		];
+	}
+
+	/**
 	 * Test if both active and passive agent checks are processed.
 	 *
 	 * @required-components server, agent
-	 * @configurationDataProvider agentConfigurationProvider
+	 * @configurationDataProvider agentConfigurationProviderTLS
 	 * @hosts agent
 	 */
 	public function testDataCollection_checkAgentData() {
@@ -461,11 +487,11 @@ class testDataCollection extends CIntegrationTest {
 		]);
 
 		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, 'zbx_tls_accept() peer certificate' .
-			' issuer:"CN=ZabbixCA" subject:"CN=zabbix_proxy"', false);
+			' issuer:"CN=ZabbixCA" subject:"CN=zabbix_proxy"', true, 120);
 		self::waitForLogLineToBePresent(self::COMPONENT_PROXY, 'zbx_tls_accept() peer certificate' .
-			' issuer:"CN=ZabbixCA" subject:"CN=zabbix_agent"', false);
+			' issuer:"CN=ZabbixCA" subject:"CN=zabbix_agent"', true, 120);
 		self::waitForLogLineToBePresent(self::COMPONENT_AGENT, 'zbx_tls_accept() peer certificate' .
-			' issuer:"CN=ZabbixCA" subject:"CN=zabbix_proxy"', false);
+			' issuer:"CN=ZabbixCA" subject:"CN=zabbix_proxy"', true, 120);
 
 		$passive_data = $this->call('history.get', [
 			'itemids'	=> self::$itemids['proxy_agent:agent.ping'],
@@ -485,12 +511,6 @@ class testDataCollection extends CIntegrationTest {
 		foreach ($active_data['result'] as $item) {
 			$this->assertEquals('proxy_agent', $item['value']);
 		}
-
-		// Cleanup: remove the certificate directory and all its contents
-		// $baseDir = self::$certBaseDirProxy;
-		// if (is_dir($baseDir)) {
-		// 	shell_exec('rm -rf ' . escapeshellarg($baseDir));
-		// }
 	}
 
 	/**
@@ -517,6 +537,7 @@ class testDataCollection extends CIntegrationTest {
 		$this->assertArrayHasKey('hostids', $response['result']);
 		$this->assertArrayHasKey(0, $response['result']['hostids']);
 		$hostid = $response['result']['hostids'][0];
+		self::$hostids = array_merge(self::$hostids, [$hostid]);
 
 		$response = $this->call('item.create', [
 			'hostid' => $hostid,
@@ -603,6 +624,7 @@ class testDataCollection extends CIntegrationTest {
 		$this->assertArrayHasKey('hostids', $response['result']);
 		$this->assertArrayHasKey(0, $response['result']['hostids']);
 		$hostid = $response['result']['hostids'][0];
+		self::$hostids = array_merge(self::$hostids, [$hostid]);
 
 		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, "finished forced reloading of the configuration cache", true, 60, 1);
@@ -666,5 +688,25 @@ class testDataCollection extends CIntegrationTest {
 		$this->assertEquals(1, count($response['result']));
 		$this->assertArrayHasKey('value', $response['result'][0]);
 		$this->assertEquals(444, $response['result'][0]['value']);
+	}
+
+	public static function clearData(): void {
+
+		if (!empty(self::$hostids)) {
+			CDataHelper::call('host.delete', self::$hostids);
+		}
+
+		if (!empty(self::$proxyids)) {
+			CDataHelper::call('proxy.delete', self::$proxyids);
+		}
+
+		// Cleanup: remove the certificate directory and all its contents
+		if (is_dir(self::$certBaseDirProxy)) {
+			shell_exec('rm -rf ' . escapeshellarg(self::$certBaseDirProxy));
+		}
+
+		if (is_dir(self::$certBaseDirAgent)) {
+			shell_exec('rm -rf ' . escapeshellarg(self::$certBaseDirAgent));
+		}
 	}
 }
