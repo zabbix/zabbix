@@ -696,13 +696,13 @@ class CMediatype extends CApiService {
 			));
 		}
 
-		if ($is_update && !array_key_exists('client_secret', $mediatype)) {
-			if (array_key_exists('token_url', $mediatype)
-					&& $mediatype['token_url'] !== $db_mediatype['token_url']) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.', $path,
-					_s('the parameter "%1$s" is missing', 'client_secret')
-				));
-			}
+		if ($is_update
+				&& !array_key_exists('client_secret', $mediatype)
+				&& array_key_exists('token_url', $mediatype)
+				&& $mediatype['token_url'] !== $db_mediatype['token_url']) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.', $path,
+				_s('the parameter "%1$s" is missing', 'client_secret')
+			));
 		}
 	}
 
