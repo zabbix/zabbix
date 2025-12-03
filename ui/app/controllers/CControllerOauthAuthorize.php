@@ -79,7 +79,7 @@ class CControllerOauthAuthorize extends CController {
 			]);
 
 			if (!$db_mediatype_token_url) {
-				error(_s('Incorrect value for field "%1$s": %2$s.', 'client_secret', _('cannot be empty')));
+				error(_s('Incorrect value for field "%1$s": %2$s.', 'client_secret', _('cannot be empty')), true);
 
 				return false;
 			}
