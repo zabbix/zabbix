@@ -205,7 +205,7 @@ class CControllerMediatypeUpdate extends CControllerMediatypeUpdateGeneral {
 				'when' => ['type', 'in' => [MEDIA_TYPE_WEBHOOK]]
 			],
 			'event_menu_url' =>	['db media_type.event_menu_url', 'required', 'not_empty',
-				'use' => [CUrlValidator::class, ['allow_event_tags_macro' => true]],
+				'use' => [CUrlValidator::class, ['allow_event_tags_macro' => true, 'allow_user_macro' => false]],
 				'when' => [
 					['type', 'in' => [MEDIA_TYPE_WEBHOOK]],
 					['show_event_menu', 'in' => [ZBX_EVENT_MENU_SHOW]]
