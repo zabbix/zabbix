@@ -159,7 +159,6 @@
 
 
 # Create new index with settings and mappings
-curl -X PUT "http://localhost:9200/json" -H "Content-Type: application/json" -d '
 {
   "settings": {
     "number_of_shards": 5,
@@ -179,7 +178,6 @@ curl -X PUT "http://localhost:9200/json" -H "Content-Type: application/json" -d 
 '
 
 # Create ingest pipeline for parsing JSON
-curl -X PUT "http://localhost:9200/_ingest/pipeline/json" -H "Content-Type: application/json" -d '
 {
   "processors": [
     {
