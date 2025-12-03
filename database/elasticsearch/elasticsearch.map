@@ -153,11 +153,6 @@
 
 # json mapping
 
-
-
-
-
-
 # Create new index with settings and mappings
 {
   "settings": {
