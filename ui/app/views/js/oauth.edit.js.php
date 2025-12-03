@@ -94,21 +94,19 @@ window.oauth_edit_popup = new class {
 
 		if (this.form.querySelector('button[name="client_secret_button"]') !== null) {
 			this.form.querySelector('button[name="client_secret_button"]')
-				.addEventListener('click', this.#showClientSecretField.bind(this));
+				.addEventListener('click', () => this.#showClientSecretField());
 
-			this.form.querySelector('[name="token_url"]')?.addEventListener('input', () =>
-				this.#showClientSecretWithWarning()
-			);
+			this.form.querySelector('[name="token_url"]')
+				?.addEventListener('input', () => this.#showClientSecretWithWarning());
 
-			this.form.querySelector('#oauth-token-parameters-table')?.addEventListener('input', () => {
-					this.#showClientSecretWithWarning();
-				});
+			this.form.querySelector('#oauth-token-parameters-table')
+				?.addEventListener('input', () => this.#showClientSecretWithWarning());
 
 			this.form.querySelector('#oauth-token-parameters-table')?.addEventListener('click', e => {
-					if (e.target.matches('.element-table-remove')) {
-						this.#showClientSecretWithWarning();
-					}
-				});
+				if (e.target.matches('.element-table-remove')) {
+					this.#showClientSecretWithWarning();
+				}
+			});
 		}
 	}
 
