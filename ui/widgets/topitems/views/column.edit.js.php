@@ -244,10 +244,13 @@ window.topitems_column_edit_form = new class {
 
 		const aggregate_columns = document.querySelector('[name="aggregate_columns"]');
 		if (aggregate_columns != null) {
-			aggregate_columns.disabled = display_sparkline;
+			aggregate_columns.disabled = display_value_as != <?= CWidgetFieldColumnsList::DISPLAY_VALUE_AS_NUMERIC ?>
+				|| display_sparkline;
 		}
 
-		const combined_fields_show = aggregate_columns.checked && !display_sparkline;
+		const combined_fields_show = display_value_as == <?= CWidgetFieldColumnsList::DISPLAY_VALUE_AS_NUMERIC ?>
+			&& aggregate_columns.checked
+			&& !display_sparkline;
 
 		const column_aggregate_function = document.querySelector('[name="column_aggregate_function"]');
 		if (column_aggregate_function != null) {
@@ -260,7 +263,8 @@ window.topitems_column_edit_form = new class {
 		}
 
 		for (const element of this.#form.querySelectorAll('.js-aggregate-grouping-row')) {
-			element.style.display = !display_sparkline ? '' : 'none';
+			element.style.display = display_value_as == <?= CWidgetFieldColumnsList::DISPLAY_VALUE_AS_NUMERIC ?>
+				&& !display_sparkline ? '' : 'none';
 		}
 
 		for (const element of this.#form.querySelectorAll('.js-combined-row')) {
