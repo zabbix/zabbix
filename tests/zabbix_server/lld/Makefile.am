@@ -1,5 +1,4 @@
 if SERVER
-
 SERVER_tests = zbx_lld_hgsets_test
 
 noinst_PROGRAMS = $(SERVER_tests)
@@ -7,13 +6,7 @@ noinst_PROGRAMS = $(SERVER_tests)
 COMMON_SRC_FILES = \
 	../../zbxmocktest.h
 
-LLD_WRAP_FUNCS = \
-	-Wl,--wrap=zbx_preprocess_item_value \
-	-Wl,--wrap=zbx_preprocessor_flush
-
-
 LLD_LIBS = \
-	$(top_srcdir)/src/zabbix_server/lld/libzbxlld.a \
 	$(top_srcdir)/tests/libzbxmocktest.a \
 	$(top_srcdir)/tests/libzbxmockdata.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/libzbxserversysinfo.a \
@@ -115,8 +108,6 @@ LLD_LIBS = \
 	$(top_srcdir)/tests/libzbxmockdummy.a \
 	$(CMOCKA_LIBS) $(YAML_LIBS) $(TLS_LIBS)
 
-# zbx_lld_hgsets_test
-
 zbx_lld_hgsets_test_SOURCES = \
 	../../../src/zabbix_server/lld/lld_common.c \
 	../../../src/zabbix_server/lld/lld_graph.c \
@@ -139,5 +130,4 @@ zbx_lld_hgsets_test_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS)
 
 zbx_lld_hgsets_test_CFLAGS = \
 	-I@top_srcdir@/tests @LIBXML2_CFLAGS@ $(CMOCKA_CFLAGS) $(YAML_CFLAGS) $(TLS_CFLAGS)
-
 endif
