@@ -319,6 +319,7 @@ class CConfiguration extends CApiService {
 								&& !self::checkAccess($access_rules[$option]['action'])))) {
 					self::exception(ZBX_API_ERROR_PERMISSIONS,
 						match ($object_tag) {
+							'dashboards' => _('No permissions to import dashboards.'),
 							'discoveryRules' => _('No permissions to import discovery rules.'),
 							'graphs' => _('No permissions to import graphs.'),
 							'host_groups' => _('No permissions to import host groups.'),
