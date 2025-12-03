@@ -66,7 +66,7 @@ class CItemPrototype extends CItemGeneral {
 	public function get($options = []) {
 		$sqlParts = [
 			'select'	=> ['items' => 'i.itemid'],
-			'from'		=> ['items' => 'items i'],
+			'from'		=> 'items i',
 			'where'		=> ['i.flags IN ('.ZBX_FLAG_DISCOVERY_PROTOTYPE.','.ZBX_FLAG_DISCOVERY_PROTOTYPE_CREATED.')'],
 			'group'		=> [],
 			'order'		=> [],
@@ -118,10 +118,8 @@ class CItemPrototype extends CItemGeneral {
 				return $options['countOutput'] ? '0' : [];
 			}
 
-			$sqlParts['from'][] = 'host_hgset hh';
-			$sqlParts['from'][] = 'permission p';
-			$sqlParts['where'][] = 'i.hostid=hh.hostid';
-			$sqlParts['where'][] = 'hh.hgsetid=p.hgsetid';
+			$sqlParts['join']['hh'] = ['table' => 'host_hgset', 'using' => 'hostid'];
+			$sqlParts['join']['p'] = ['left_table' => 'hh', 'table' => 'permission', 'using' => 'hgsetid'];
 			$sqlParts['where'][] = 'p.ugsetid='.self::$userData['ugsetid'];
 
 			if ($options['editable']) {
@@ -164,9 +162,8 @@ class CItemPrototype extends CItemGeneral {
 		if ($options['discoveryids'] !== null) {
 			zbx_value2array($options['discoveryids']);
 
-			$sqlParts['from']['item_discovery'] = 'item_discovery id';
+			$sqlParts['join']['id'] = ['table' => 'item_discovery', 'using' => 'itemid'];
 			$sqlParts['where'][] = dbConditionId('id.lldruleid', $options['discoveryids']);
-			$sqlParts['where']['idi'] = 'i.itemid=id.itemid';
 
 			if ($options['groupCount']) {
 				$sqlParts['group']['id'] = 'id.lldruleid';
@@ -177,18 +174,16 @@ class CItemPrototype extends CItemGeneral {
 		if (!is_null($options['triggerids'])) {
 			zbx_value2array($options['triggerids']);
 
-			$sqlParts['from']['functions'] = 'functions f';
+			$sqlParts['join']['f'] = ['table' => 'functions', 'using' => 'itemid'];
 			$sqlParts['where'][] = dbConditionInt('f.triggerid', $options['triggerids']);
-			$sqlParts['where']['if'] = 'i.itemid=f.itemid';
 		}
 
 		// graphids
 		if (!is_null($options['graphids'])) {
 			zbx_value2array($options['graphids']);
 
-			$sqlParts['from']['graphs_items'] = 'graphs_items gi';
+			$sqlParts['join']['gi'] = ['table' => 'graphs_items', 'using' => 'itemid'];
 			$sqlParts['where'][] = dbConditionInt('gi.graphid', $options['graphids']);
-			$sqlParts['where']['igi'] = 'i.itemid=gi.itemid';
 		}
 
 		// inherited
@@ -201,8 +196,7 @@ class CItemPrototype extends CItemGeneral {
 
 		// templated
 		if (!is_null($options['templated'])) {
-			$sqlParts['from']['hosts'] = 'hosts h';
-			$sqlParts['where']['hi'] = 'h.hostid=i.hostid';
+			$sqlParts['join']['h'] = ['table' => 'hosts', 'using' => 'hostid'];
 
 			if ($options['templated'])
 				$sqlParts['where'][] = 'h.status='.HOST_STATUS_TEMPLATE;
@@ -212,8 +206,7 @@ class CItemPrototype extends CItemGeneral {
 
 		// monitored
 		if (!is_null($options['monitored'])) {
-			$sqlParts['from']['hosts'] = 'hosts h';
-			$sqlParts['where']['hi'] = 'h.hostid=i.hostid';
+			$sqlParts['join']['h'] = ['table' => 'hosts', 'using' => 'hostid'];
 
 			if ($options['monitored']) {
 				$sqlParts['where'][] = 'h.status='.HOST_STATUS_MONITORED;
@@ -249,8 +242,7 @@ class CItemPrototype extends CItemGeneral {
 			if (isset($options['filter']['host'])) {
 				zbx_value2array($options['filter']['host']);
 
-				$sqlParts['from']['hosts'] = 'hosts h';
-				$sqlParts['where']['hi'] = 'h.hostid=i.hostid';
+				$sqlParts['join']['h'] = ['table' => 'hosts', 'using' => 'hostid'];
 				$sqlParts['where']['h'] = dbConditionString('h.host', $options['filter']['host']);
 			}
 		}

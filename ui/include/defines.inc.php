@@ -17,7 +17,7 @@ define('ZABBIX_VERSION',		'8.0.0alpha2');
 define('ZABBIX_API_VERSION',	'8.0.0');
 define('ZABBIX_EXPORT_VERSION',	'8.0');
 
-define('ZABBIX_DB_VERSION',		7050018);
+define('ZABBIX_DB_VERSION',		7050026);
 
 define('DB_VERSION_SUPPORTED',						0);
 define('DB_VERSION_LOWER_THAN_MINIMUM',				1);
@@ -1659,8 +1659,6 @@ define('API_COLORS',				57);
 define('API_FILTER',				58);
 define('API_ITEM_KEY',				62);
 define('API_ITEM_DELAY',			63);
-define('API_JSON',					64);
-define('API_XML',					65);
 define('API_PREPROC_PARAMS',		66);
 define('API_PROMETHEUS_PATTERN',	67);
 define('API_PROMETHEUS_LABEL',		68);

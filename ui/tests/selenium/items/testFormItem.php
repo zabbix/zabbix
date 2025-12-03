@@ -14,6 +14,8 @@
 **/
 
 
+use Facebook\WebDriver\Exception\NoSuchElementException;
+
 require_once __DIR__.'/../../include/CLegacyWebTest.php';
 require_once __DIR__.'/../../../include/items.inc.php';
 require_once __DIR__.'/../../../include/classes/api/services/CItemGeneral.php';
@@ -2102,9 +2104,17 @@ class testFormItem extends CLegacyWebTest {
 					$this->zbxTestInputType('delay_flex_'.$itemCount.'_delay', $period['flexDelay']);
 				}
 				$itemCount ++;
-				// Unstable test on Jenkins, added hoverMouse()
-				$form->query("xpath://div[@id='js-item-flex-intervals-field']//button[@class='btn-link element-table-add']")
-						->one()->hoverMouse()->click();
+
+				$add = $form->query("xpath://div[@id='js-item-flex-intervals-field']//button[@class='btn-link element-table-add']")
+						->one();
+				$add->click();
+				// TODO: sometimes inline validation error appears at the same time, and the click on Add doesn't pass.
+				try {
+					$this->zbxTestAssertVisibleId('delay_flex_'.$itemCount.'_delay');
+				}
+				catch (NoSuchElementException $e) {
+					$add->click();
+				}
 
 				$this->zbxTestAssertVisibleId('delay_flex_'.$itemCount.'_delay');
 				$this->zbxTestAssertVisibleId('delay_flex_'.$itemCount.'_period');
@@ -2263,6 +2273,7 @@ class testFormItem extends CLegacyWebTest {
 		$this->zbxTestCheckboxSelect('hk_trends_global', false);
 
 		$this->zbxTestClickWait('update');
+		$this->assertMessage(TEST_GOOD, 'Configuration updated');
 
 		$this->zbxTestOpen(self::HOST_LIST_PAGE);
 		$this->filterEntriesAndOpenItems();
@@ -2301,6 +2312,7 @@ class testFormItem extends CLegacyWebTest {
 		$this->zbxTestCheckboxSelect('hk_trends_global', false);
 
 		$this->zbxTestClickWait('update');
+		$this->assertMessage(TEST_GOOD, 'Configuration updated');
 
 		$this->zbxTestOpen(self::HOST_LIST_PAGE);
 		$this->filterEntriesAndOpenItems();
