@@ -107,6 +107,8 @@ class CControllerProxyGroupEdit extends CController {
 					'description' => DB::getDefault('proxy_group', 'description')
 				]
 			];
+
+			$data['js_validation_rules_for_clone'] = $data['js_validation_rules'];
 		}
 
 		$data['user'] = [
