@@ -328,8 +328,8 @@ class testCalculatedExpression extends CIntegrationTest {
 		$this->assertEquals(1, count($response['result']['itemids']));
 		self::$itemIds = array_merge(self::$itemIds, [$calcItemId]);
 
-		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, "In zbx_substitute_item_key_params():" .
-			" data:test.calc.calculated.histogram_quantile", true, 120);
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, "In substitute_key_macros_impl()" .
+			" data:'test.calc.calculated.histogram_quantile'", true, 120);
 
 		// send values to the bucket item (simulate histogram bucket values)
 		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_KEY . '.bucket[0.1]', 10);
@@ -385,8 +385,8 @@ class testCalculatedExpression extends CIntegrationTest {
 		$this->assertEquals(1, count($response['result']['itemids']));
 		self::$itemIds = array_merge(self::$itemIds, [$calcItemId]);
 
-		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, "In zbx_substitute_item_key_params():" .
-			" data:test.calc.calculated.count_disk_pused_gt_95", true, 120);
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, "In substitute_key_macros_impl()" .
+			" data:'test.calc.calculated.count_disk_pused_gt_95'", true, 120);
 
 		/* Send values to the trapper items: fs1=90, fs2=96, fs3=97, fs4=80. */
 		$senderValues = [
