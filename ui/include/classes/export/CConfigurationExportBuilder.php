@@ -286,26 +286,15 @@ class CConfigurationExportBuilder {
 	}
 
 	/**
-	 * Format dashboards.
+	 * Format global dashboards.
 	 *
-	 * @param array $schema           Tag schema from validation class.
-	 * @param array $dashboards       Export data.
+	 * @param array $schema      Tag schema from validation class.
+	 * @param array $dashboards  Export data.
 	 */
 	public function buildDashboards(array $schema, array $dashboards) {
-		$result = [];
+		$dashboards = $this->formatDashboards($dashboards);
 
-		CArrayHelper::sort($dashboards, ['name']);
-
-		foreach ($dashboards as $dashboard) {
-			$result[] = [
-				'name' => $dashboard['name'],
-				'display_period' => $dashboard['display_period'],
-				'auto_start' => $dashboard['auto_start'],
-				'pages' => $this->formatDashboardPages($dashboard['pages'])
-			];
-		}
-
-		$this->data['dashboards'] = self::build($schema, $result, 'dashboards');
+		$this->data['dashboards'] = self::build($schema, $dashboards, 'dashboards');
 	}
 
 	/**
@@ -366,7 +355,7 @@ class CConfigurationExportBuilder {
 				'httptests' => $this->formatHttpTests($template['httptests']),
 				'macros' => $this->formatTemplateMacros($template['macros']),
 				'templates' => $this->formatTemplateLinkage($template['parentTemplates']),
-				'dashboards' => $this->formatDashboards($template['dashboards']),
+				'dashboards' => $this->formatTemplateDashboards($template['dashboards']),
 				'tags' => $this->formatTags($template['tags']),
 				'valuemaps' => $this->formatValueMaps($template['valuemaps'])
 			];
@@ -1405,13 +1394,37 @@ class CConfigurationExportBuilder {
 	}
 
 	/**
-	 * Format dashboards.
+	 * Format global dashboards.
 	 *
 	 * @param array $dashboards
 	 *
 	 * @return array
 	 */
 	protected function formatDashboards(array $dashboards) {
+		$result = [];
+
+		CArrayHelper::sort($dashboards, ['name']);
+
+		foreach ($dashboards as $dashboard) {
+			$result[] = [
+				'name' => $dashboard['name'],
+				'display_period' => $dashboard['display_period'],
+				'auto_start' => $dashboard['auto_start'],
+				'pages' => $this->formatDashboardPages($dashboard['pages'])
+			];
+		}
+
+		return $result;
+	}
+
+	/**
+	 * Format template dashboards.
+	 *
+	 * @param array $dashboards
+	 *
+	 * @return array
+	 */
+	protected function formatTemplateDashboards(array $dashboards) {
 		$result = [];
 
 		CArrayHelper::sort($dashboards, ['name']);
