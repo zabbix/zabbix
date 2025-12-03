@@ -30,30 +30,29 @@ $this->addJsFile('layout.mode.js');
 $this->enableLayoutModes();
 $web_layout_mode = $this->getLayoutMode();
 
-$nav_items = [
-	(new CRedirectButton(_('Create dashboard'),
-		(new CUrl('zabbix.php'))
-			->setArgument('action', 'dashboard.view')
-			->setArgument('new', '1')
-			->getUrl()
-	))->setEnabled($data['allowed_edit'])
-];
-
-if ($data['allowed_edit']) {
-	$nav_items[] = (new CSimpleButton(_('Import')))
-		->setId('dashboard_import');
-}
-
-$nav_items[] = get_icon('kioskmode', ['mode' => $web_layout_mode]);
-
-
 $html_page = (new CHtmlPage())
 	->setTitle(_('Dashboards'))
 	->setWebLayoutMode($web_layout_mode)
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::DASHBOARDS_LIST))
 	->setControls(
-		(new CTag('nav', true, new CList($nav_items)))
-			->setAttribute('aria-label', _('Content controls'))
+		(new CTag('nav', true,
+			(new CList())
+				->addItem(
+					(new CRedirectButton(_('Create dashboard'),
+						(new CUrl('zabbix.php'))
+							->setArgument('action', 'dashboard.view')
+							->setArgument('new', '1')
+							->getUrl()
+					))->setEnabled($data['allowed_edit'])
+				)
+				->addItem(
+					(new CSimpleButton(_('Import')))
+						->setId('dashboard_import')
+						->setEnabled($data['allowed_edit'])
+				)
+				->addItem(get_icon('kioskmode', ['mode' => $web_layout_mode]))
+			)
+		)->setAttribute('aria-label', _('Content controls'))
 	);
 
 if ($web_layout_mode == ZBX_LAYOUT_NORMAL) {
