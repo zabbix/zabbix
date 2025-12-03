@@ -34,8 +34,14 @@
 
 		#import() {
 			return PopUp('popup.import',
-				{rules_preset: 'dashboard', '<?= CSRF_TOKEN_NAME ?>': this.#csrf_token},
-				{dialogueid: 'popup_import', dialogue_class: 'modal-popup-generic'}
+				{
+					rules_preset: 'dashboard',
+					[CSRF_TOKEN_NAME]: this.#csrf_token
+				},
+				{
+					dialogueid: 'popup_import',
+					dialogue_class: 'modal-popup-generic'
+				}
 			)
 		}
 	};
