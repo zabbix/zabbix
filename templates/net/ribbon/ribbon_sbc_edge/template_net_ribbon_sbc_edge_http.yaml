@@ -3488,7 +3488,7 @@ zabbix_export:
               type: DEPENDENT
               key: 'ribbon.sip.server.downtime[{#SIP.SERVER.NAME}]'
               delay: '0'
-              description: 'Displays the the time for which server was down due to not responding to options request or dns failures.'
+              description: 'Displays the time for which server was down due to not responding to options request or dns failures.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
