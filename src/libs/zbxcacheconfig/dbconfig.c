@@ -3662,9 +3662,10 @@ static void	DCsync_items(zbx_dbsync_t *sync, zbx_uint64_t revision, int flags, z
 			{
 				if (SUCCEED != zbx_db_is_null(row[12]))
 				{
-					THIS_SHOULD_NEVER_HAPPEN_MSG("item_rtdata entry unexpectedly is present for"
-							" item: " ZBX_FS_UI64 " on not synced hostid: " ZBX_FS_UI64,
+					zabbix_log(LOG_LEVEL_INFORMATION, "item_rtdata entry unexpectedly is present"
+							" for item: " ZBX_FS_UI64 " on not synced hostid: " ZBX_FS_UI64,
 							itemid, hostid);
+					THIS_SHOULD_NEVER_HAPPEN;
 				}
 				continue;
 			}
