@@ -19,9 +19,6 @@
  * @var array $data
  */
 
-$form_action = (new CUrl('zabbix.php'))
-	->setArgument('action', 'popup.ldap.test.send')
-	->getUrl();
 
 $formgrid = (new CFormGrid())
 	->addItem([
@@ -65,10 +62,9 @@ if ($data['ldap_config']['provision_status'] == JIT_PROVISIONING_ENABLED) {
 		]);
 }
 
-$form = (new CForm('post', $form_action))
+$form = (new CForm())
 	->addItem((new CVar(CSRF_TOKEN_NAME, CCsrfTokenHelper::get('ldap')))->removeId())
-	->addItem($formgrid)
-	->addItem((new CScriptTag('ldap_test_edit_popup.init();'))->setOnDocumentReady());
+	->addItem($formgrid);
 
 // Enable form submitting on Enter.
 $form->addItem((new CSubmitButton())->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN));
@@ -83,12 +79,16 @@ $output = [
 	'buttons' => [
 		[
 			'title' => _('Test'),
+			'class' => 'js-submit',
 			'keepOpen' => true,
-			'isSubmit' => true,
-			'action' => 'ldap_test_edit_popup.submit();'
+			'isSubmit' => true
 		]
 	],
-	'script_inline' => $this->readJsFile('popup.ldap.test.edit.js.php')
+	'script_inline' => getPagePostJs().
+		$this->readJsFile('popup.ldap.test.edit.js.php').
+		'ldap_test_edit_popup.init('.json_encode([
+			'rules' => $data['js_validation_rules']
+		]).');'
 ];
 
 if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {

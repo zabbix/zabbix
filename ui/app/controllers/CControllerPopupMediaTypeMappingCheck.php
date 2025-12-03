@@ -21,6 +21,24 @@ class CControllerPopupMediaTypeMappingCheck extends CController {
 		$this->disableCsrfValidation();
 	}
 
+	public static function getValidationRules(): array {
+		return ['object', 'fields' => [
+			'userdirectory_mediaid' => ['db userdirectory_media.userdirectory_mediaid'],
+			'mediatypeid' => ['db media_type.mediatypeid', 'required'],
+			'name' => ['db userdirectory_media.name', 'required', 'not_empty'],
+			'attribute' => ['db userdirectory_media.attribute', 'required', 'not_empty'],
+			'period' => ['db userdirectory_media.period', 'required', 'not_empty',
+				'use' => [CTimePeriodParser::class, ['usermacros' => true]]
+			],
+			'severity' => ['array', 'field' => ['integer',
+				'in' => range(TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_COUNT-1)
+			]],
+			'active' => ['db userdirectory_media.active', 'required',
+				'in' => [MEDIA_STATUS_ACTIVE, MEDIA_STATUS_DISABLED]
+			]
+		]];
+	}
+
 	protected function checkInput(): bool {
 		$fields = [
 			'userdirectory_mediaid' => 	'id',
