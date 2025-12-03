@@ -21,8 +21,7 @@
 #include "zbxmockdb.h"
 
 #include "zbxexpression.h"
-
-#include "../../../include/zbxcacheconfig.h"
+#include "zbxcacheconfig.h"
 
 #include "lld_common.h"
 
@@ -30,15 +29,13 @@ void	zbx_mock_test_entry(void **state)
 {
 	char				*error = NULL,
 					*data = zbx_strdup(NULL, zbx_mock_get_parameter_string("in.data"));
+	const char			*expected_data = zbx_mock_get_parameter_string("out.data"),
+					*buffer = zbx_mock_get_parameter_string("in.buffer");
 	zbx_vector_lld_macro_path_ptr_t	macros;
 	struct zbx_json_parse		parse;
 	int				max_error_len = MAX_STRING_LEN;
 
 	ZBX_UNUSED(state);
-
-	const char	*expected_data = zbx_mock_get_parameter_string("out.data");
-
-	const char	*buffer = zbx_mock_get_parameter_string("in.buffer");
 
 	if (SUCCEED !=zbx_json_open(buffer, &parse))
 		fail_msg("failed json open\n");
