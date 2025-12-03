@@ -129,6 +129,7 @@ $form->addItem([
 			'content' => new CButtonExport('export.dashboards',
 				(new CUrl('zabbix.php'))
 					->setArgument('action', 'dashboard.list')
+					->setArgument('page', ($data['page'] == 1) ? null : $data['page'])
 					->getUrl()
 			)
 		],
