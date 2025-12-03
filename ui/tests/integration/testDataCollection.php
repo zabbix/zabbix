@@ -26,6 +26,7 @@ class testDataCollection extends CIntegrationTest {
 
 	private static $hostids = [];
 	private static $itemids = [];
+	private static $itemidsToDelete = [];
 	private static $certBaseDirProxy;
 	private static $certBaseDirAgent;
 	private static $proxyids;
@@ -127,6 +128,7 @@ class testDataCollection extends CIntegrationTest {
 
 		self::$hostids = $result['hostids'];
 		self::$itemids = $result['itemids'];
+		self::$itemidsToDelete = array_values($result['itemids']);
 
 		return true;
 	}
@@ -159,7 +161,6 @@ class testDataCollection extends CIntegrationTest {
 	 * @hosts agent
 	 */
 	public function testDataCollection_checkHostAvailability() {
-		$this->updateAgentHostTLS("agent");
 
 		self::waitForLogLineToBePresent(self::COMPONENT_SERVER,
 			'temporarily disabling Zabbix agent checks on host "agent": interface unavailable'
@@ -231,6 +232,9 @@ class testDataCollection extends CIntegrationTest {
 			'resuming Zabbix agent checks on host "agent": connection restored'
 		]);
 
+		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, 'zbx_tls_connect() peer certificate' .
+			' issuer:"CN=ZabbixCA" subject:"CN=zabbix_agent"');
+
 		$passive_data = $this->call('history.get', [
 			'itemids'	=> self::$itemids['agent:agent.ping'],
 			'history'	=> ITEM_VALUE_TYPE_UINT64
@@ -256,12 +260,11 @@ class testDataCollection extends CIntegrationTest {
 	 *
 	 * @required-components server
 	 * @hosts custom_agent
+	 * @configurationDataProvider agentConfigurationProvider
 	 */
 	public function testDataCollection_checkCustomActiveChecks() {
 		$host = 'custom_agent';
 		$items = [];
-
-		$this->updateAgentHostTLS("custom_agent");
 
 		// Retrieve item data from API.
 		$response = $this->call('item.get', [
@@ -487,11 +490,11 @@ class testDataCollection extends CIntegrationTest {
 		]);
 
 		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, 'zbx_tls_accept() peer certificate' .
-			' issuer:"CN=ZabbixCA" subject:"CN=zabbix_proxy"', true, 120);
-		self::waitForLogLineToBePresent(self::COMPONENT_PROXY, 'zbx_tls_accept() peer certificate' .
-			' issuer:"CN=ZabbixCA" subject:"CN=zabbix_agent"', true, 120);
-		self::waitForLogLineToBePresent(self::COMPONENT_AGENT, 'zbx_tls_accept() peer certificate' .
-			' issuer:"CN=ZabbixCA" subject:"CN=zabbix_proxy"', true, 120);
+			' issuer:"CN=ZabbixCA" subject:"CN=zabbix_proxy"');
+		self::waitForLogLineToBePresent(self::COMPONENT_PROXY, 'zbx_tls_connect() peer certificate' .
+			' issuer:"CN=ZabbixCA" subject:"CN=zabbix_agent"');
+		self::waitForLogLineToBePresent(self::COMPONENT_AGENT, 'zbx_tls_connect() peer certificate' .
+			' issuer:"CN=ZabbixCA" subject:"CN=zabbix_proxy"');
 
 		$passive_data = $this->call('history.get', [
 			'itemids'	=> self::$itemids['proxy_agent:agent.ping'],
@@ -555,6 +558,7 @@ class testDataCollection extends CIntegrationTest {
 		$this->assertArrayHasKey('itemids', $response['result']);
 		$this->assertEquals(1, count($response['result']['itemids']));
 		$itemid = $response['result']['itemids'][0];
+		self::$itemidsToDelete = array_merge(self::$itemidsToDelete, [$itemid]);
 
 		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
 
@@ -673,6 +677,7 @@ class testDataCollection extends CIntegrationTest {
 		$this->assertArrayHasKey('itemids', $response['result']);
 		$this->assertEquals(1, count($response['result']['itemids']));
 		$itemid = $response['result']['itemids'][0];
+		self::$itemidsToDelete = array_merge(self::$itemidsToDelete, [$itemid]);
 
 		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, "finished forced reloading of the configuration cache", true, 60, 1);
@@ -691,6 +696,10 @@ class testDataCollection extends CIntegrationTest {
 	}
 
 	public static function clearData(): void {
+
+		if (!empty(self::$hostids)) {
+			CDataHelper::call('item.delete', self::$itemidsToDelete);
+		}
 
 		if (!empty(self::$hostids)) {
 			CDataHelper::call('host.delete', self::$hostids);
