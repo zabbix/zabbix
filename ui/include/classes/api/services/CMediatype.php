@@ -921,7 +921,8 @@ class CMediatype extends CApiService {
 					$_upd_media_type_oauth = DB::getUpdatedValues('media_type_oauth', $mediatype, $db_mediatype);
 
 					if ($_upd_media_type_oauth) {
-						if (array_key_exists('authorization_url', $_upd_media_type_oauth)) {
+						if (array_key_exists('authorization_url', $_upd_media_type_oauth)
+								|| array_key_exists('token_url', $_upd_media_type_oauth)) {
 							$_upd_media_type_oauth['tokens_status'] = array_key_exists('tokens_status', $mediatype)
 								? $mediatype['tokens_status'] : 0;
 						}
