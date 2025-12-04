@@ -99,8 +99,9 @@ class WidgetView extends CControllerDashboardWidgetView {
 				'time_from' => $this->fields_values['time_period']['from_ts'],
 				'time_to' => $this->fields_values['time_period']['to_ts']
 			],
-			'grouped_thresholds' => $this->prepareGroupedThresholds($this->fields_values['thresholds']),
-			'interpolation' => (bool) $this->fields_values['interpolation'],
+			'show_hostnames' => $this->isTemplateDashboard()
+				? SVG_GRAPH_LABELS_IN_HOSTNAMES_HIDE
+				: $this->fields_values['show_hostnames'],
 			'axes' => [
 				'show_x_axis' => $this->fields_values['x_axis'] == SVG_GRAPH_AXIS_ON,
 				'x_axis_min' => $x_axis_min,
@@ -122,6 +123,8 @@ class WidgetView extends CControllerDashboardWidgetView {
 				'legend_lines_mode' => $this->fields_values['legend_lines_mode'],
 				'show_aggregation' => $this->fields_values['legend_aggregation'] == WidgetForm::LEGEND_AGGREGATION_ON
 			],
+			'grouped_thresholds' => $this->prepareGroupedThresholds($this->fields_values['thresholds']),
+			'interpolation' => (bool) $this->fields_values['interpolation'],
 			'templateid' => $this->getInput('templateid', ''),
 			'override_hostid' => $this->fields_values['override_hostid']
 				? $this->fields_values['override_hostid'][0]

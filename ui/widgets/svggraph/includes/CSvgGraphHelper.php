@@ -63,18 +63,31 @@ class CSvgGraphHelper {
 	public static function get(array $options, int $width, int $height): array {
 		$metrics = [];
 		$errors = [];
-		$show_hostname = $options['displaying']['show_hostnames'] != SVG_GRAPH_LABELS_IN_HOSTNAMES_HIDE;
+		$show_hostnames = $options['displaying']['show_hostnames'] != SVG_GRAPH_LABELS_IN_HOSTNAMES_HIDE;
 
 		// Find which metrics will be shown in graph and calculate time periods and display options.
 		self::getMetricsPattern($metrics, $options['data_sets'], $options['templateid'], $options['override_hostid'],
-			$show_hostname
+			$show_hostnames
 		);
 		self::getMetricsItems($metrics, $options['data_sets'], $options['templateid'], $options['override_hostid'],
-			$show_hostname
+			$show_hostnames
 		);
 
 		if ($options['displaying']['show_hostnames'] == SVG_GRAPH_LABELS_IN_HOSTNAMES_AUTO) {
-			$show_hostname = count(array_column($metrics, 'hostid', 'hostid')) > 1;
+			$show_hostnames = false;
+			$unique_hosts = [];
+
+			foreach ($metrics as $metric) {
+				if (!array_key_exists($metric['hostid'], $unique_hosts)) {
+					$unique_hosts[$metric['hostid']] = true;
+
+					if (count($unique_hosts) > 1) {
+						$show_hostnames = true;
+
+						break;
+					}
+				}
+			}
 		}
 
 		CGraphHelper::calculateMetricsDelay($metrics);
@@ -89,12 +102,12 @@ class CSvgGraphHelper {
 		// Find what data source (history or trends) will be used for each metric.
 		self::getGraphDataSource($metrics, $errors, $options['data_source'], $width);
 		// Load Data for each metric.
-		self::getMetricsData($metrics, $width, $show_hostname);
+		self::getMetricsData($metrics, $width, $show_hostnames);
 		// Additional data processing for items with the preprocessing step "Discard unchanged".
 		self::populateValuesBetweenHeartbeats($metrics, $width);
 		// Load aggregated Data for each dataset.
 		self::getMetricsAggregatedData($metrics, $width, $options['data_sets'], $options['legend']['show_aggregation'],
-			$show_hostname
+			$show_hostnames
 		);
 
 		$legend = self::getLegend($metrics, $options['legend']);
