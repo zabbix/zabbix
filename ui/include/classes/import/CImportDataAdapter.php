@@ -411,7 +411,10 @@ class CImportDataAdapter {
 	 */
 	protected function formatDiscoveryRule(array $discovery_rule, $host) {
 		if (!$discovery_rule['filter']) {
-			unset($discovery_rule['filter']);
+			$discovery_rule['filter'] = [
+				'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
+				'conditions' => []
+			];
 		}
 
 		$discovery_rule = $this->renameItemFields($discovery_rule);

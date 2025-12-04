@@ -321,7 +321,6 @@ class testDashboardURLWidget extends testWidgets {
 				[
 					'expected' => TEST_GOOD,
 					'fields' => [
-						'Show header' => false,
 						'Refresh interval' => '10 seconds',
 						'URL' => 'http://zabbix.com'
 					]
@@ -331,7 +330,6 @@ class testDashboardURLWidget extends testWidgets {
 				[
 					'expected' => TEST_GOOD,
 					'fields' => [
-						'Show header' => false,
 						'Refresh interval' => '30 seconds',
 						'URL' => 'https://zabbix.com'
 					]
@@ -377,6 +375,7 @@ class testDashboardURLWidget extends testWidgets {
 				[
 					'expected' => TEST_GOOD,
 					'fields' => [
+						'Show header' => false,
 						'Refresh interval' => 'No refresh',
 						'URL' => 'ssh://zabbix.com'
 					]
@@ -683,6 +682,7 @@ class testDashboardURLWidget extends testWidgets {
 				'id:iframe_sandboxing_exceptions' => 'allow-scripts allow-same-origin allow-forms'
 			]);
 			$other_form->submit();
+			$this->assertMessage(TEST_GOOD, 'Configuration updated');
 			$this->page->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid)->waitUntilReady();
 		}
 		else {
@@ -715,6 +715,7 @@ class testDashboardURLWidget extends testWidgets {
 			$this->page->open('zabbix.php?action=miscconfig.edit')->waitUntilReady();
 			$other_form->fill(['id:iframe_sandboxing_exceptions' => ' ']);
 			$other_form->submit();
+			$this->assertMessage(TEST_GOOD, 'Configuration updated');
 		}
 	}
 
@@ -732,6 +733,8 @@ class testDashboardURLWidget extends testWidgets {
 			'id:iframe_sandboxing_exceptions' => 'allow-scripts allow-same-origin allow-forms'
 		]);
 		$other_form->submit();
+		$other_form->waitUntilReloaded();
+		$this->assertMessage(TEST_GOOD, 'Configuration updated');
 
 		$this->page->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboard_for_frame_widget)->waitUntilReady();
 		$dashboard = CDashboardElement::find()->one();
@@ -916,7 +919,6 @@ class testDashboardURLWidget extends testWidgets {
 
 		$other_form->submit();
 		$this->assertMessage(TEST_GOOD, 'Configuration updated');
-		$this->page->waitUntilReady();
 
 		// Check widget content with changed Xframe options.
 		$this->page->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboard_for_frame_widget)->waitUntilReady();

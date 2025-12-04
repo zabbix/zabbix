@@ -8,7 +8,8 @@ SERVER_tests = \
 	zbx_evaluate_function \
 	zbx_STL \
 	zbx_get_percentage_of_deviations_in_stl_remainder \
-	evaluate_value_by_map
+	evaluate_value_by_map \
+	zbx_format_value
 endif
 
 noinst_PROGRAMS = $(SERVER_tests)
@@ -19,7 +20,6 @@ EVALUATE_LIB_FILES = \
 	$(top_srcdir)/src/libs/zbxdbsyncer/libzbxdbsyncer.a \
 	$(top_srcdir)/src/libs/zbxpoller/libzbxpoller.a \
 	$(top_srcdir)/src/libs/zbxscripts/libzbxscripts.a \
-	$(top_srcdir)/src/libs/zbxexpression/libzbxexpression.a \
 	$(top_srcdir)/src/libs/zbxcacheconfig/libzbxcacheconfig.a \
 	$(top_builddir)/src/libs/zbxpgservice/libzbxpgservice.a \
 	$(top_builddir)/src/libs/zbxcalc/libzbxcalc.a \
@@ -30,7 +30,6 @@ EVALUATE_LIB_FILES = \
 	$(top_srcdir)/src/libs/zbxrtc/libzbxrtc_service.a \
 	$(top_srcdir)/src/libs/zbxrtc/libzbxrtc.a \
 	$(top_srcdir)/src/libs/zbxdiag/libzbxdiag.a \
-	$(top_srcdir)/src/libs/zbxexpression/libzbxexpression.a \
 	$(top_srcdir)/src/libs/zbxevent/libzbxevent.a \
 	$(top_srcdir)/src/libs/zbxcacheconfig/libzbxcacheconfig.a \
 	$(top_builddir)/src/libs/zbxpgservice/libzbxpgservice.a \
@@ -155,6 +154,8 @@ zbx_evaluate_function_LDADD += $(EVALUATE_LIB_FILES) $(TLS_LIBS)
 zbx_evaluate_function_LDADD += @SERVER_LIBS@
 
 zbx_evaluate_function_LDFLAGS = @SERVER_LDFLAGS@ \
+	-Wl,--wrap=zbx_baseline_get_data \
+	-Wl,--wrap=zbx_recalc_time_period \
 	$(VALUECACHE_WRAP_FUNCS) $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS) $(TLS_LDFLAGS)
 
 
@@ -210,13 +211,34 @@ evaluate_value_by_map_CFLAGS = $(COMMON_COMPILER_FLAGS) $(TLS_CFLAGS) \
 	-I@top_srcdir@/src/libs/zbxcacheconfig \
 	-I@top_srcdir@/src/libs/zbxcachehistory \
 	-I@top_srcdir@/src/libs/zbxcachevalue \
-	-I@top_srcdir@/src/libs/zbxhistory \
-	-I@top_srcdir@/src/libs/zbxexpression
+	-I@top_srcdir@/src/libs/zbxhistory
 
 evaluate_value_by_map_LDADD = $(EVALUATE_LIB_FILES) $(TLS_LIBS)
 
 evaluate_value_by_map_LDADD += @SERVER_LIBS@
 
 evaluate_value_by_map_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS) $(TLS_LDFLAGS)
+
+#zbx_format_value
+
+zbx_format_value_SOURCES = \
+	zbx_format_value.c \
+	$(COMMON_SRC_FILES)
+
+zbx_format_value_CFLAGS = $(COMMON_COMPILER_FLAGS) $(TLS_CFLAGS) \
+	-I@top_srcdir@/src/libs/zbxalgo \
+	-I@top_srcdir@/src/libs/zbxcacheconfig \
+	-I@top_srcdir@/src/libs/zbxcachehistory \
+	-I@top_srcdir@/src/libs/zbxcachevalue \
+	-I@top_srcdir@/src/libs/zbxhistory
+
+zbx_format_value_LDADD = \
+	$(top_srcdir)/tests/mocks/valuecache/libvaluecachemock.a
+
+zbx_format_value_LDADD += $(EVALUATE_LIB_FILES) $(TLS_LIBS)
+
+zbx_format_value_LDADD += @SERVER_LIBS@
+
+zbx_format_value_LDFLAGS = @SERVER_LDFLAGS@ $(YAML_LDFLAGS) $(CMOCKA_LDFLAGS)
 
 endif

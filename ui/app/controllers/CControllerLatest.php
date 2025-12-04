@@ -99,6 +99,7 @@ abstract class CControllerLatest extends CController {
 				'webitems' => true,
 				'evaltype' => $filter['evaltype'],
 				'tags' => $filter['tags'] ?: null,
+				'inheritedTags' => true,
 				'filter' => [
 					'status' => [ITEM_STATUS_ACTIVE],
 					'state' => $filter['state'] == -1 ? null : $filter['state']
@@ -116,11 +117,14 @@ abstract class CControllerLatest extends CController {
 					'status', 'value_type', 'units', 'description', 'state', 'error'
 				],
 				'selectTags' => ['tag', 'value'],
+				'selectInheritedTags' => ['tag', 'value'],
 				'selectValueMap' => ['mappings'],
 				'itemids' => array_keys($select_items),
 				'webitems' => true,
 				'preservekeys' => true
 			]), ['name_resolved' => 'name']);
+
+			CTagHelper::mergeOwnAndInheritedTags($items);
 
 			// If user role checkbox 'Invoke "Execute now" on read-only hosts' is ON, read-write items are the same.
 			$items_rw = $items;
