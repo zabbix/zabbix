@@ -121,7 +121,7 @@ window.update_problem_popup = new class {
 		this.form.validateChanges(
 			[
 				'message', 'change_severity', 'unsuppress_problem', 'suppress_problem',
-				'unacknowledge_problem', 'change_rank', 'close_problem'
+				'unacknowledge_problem', 'acknowledge_problem', 'change_rank', 'close_problem'
 			],
 			true
 		);
