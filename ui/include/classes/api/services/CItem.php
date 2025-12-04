@@ -2091,9 +2091,8 @@ class CItem extends CItemGeneral {
 		foreach ($del_itemids as $del_itemid) {
 			foreach ($table_names as $table_name) {
 				$ins_housekeeper[] = [
-					'tablename' => $table_name,
-					'field' => 'itemid',
-					'value' => $del_itemid
+					'object' => 0,
+					'objectid' => $del_itemid
 				];
 
 				if (count($ins_housekeeper) == ZBX_DB_MAX_INSERTS) {

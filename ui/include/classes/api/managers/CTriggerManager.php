@@ -59,18 +59,6 @@ class CTriggerManager {
 			'where' => ['triggerid' => $del_triggerids]
 		]);
 		DB::delete('triggers', ['triggerid' => $del_triggerids]);
-
-		$ins_housekeeper = [];
-
-		foreach ($del_triggerids as $del_triggerid) {
-			$ins_housekeeper[] = [
-				'tablename' => 'events',
-				'field' => 'triggerid',
-				'value' => $del_triggerid
-			];
-		}
-
-		DB::insertBatch('housekeeper', $ins_housekeeper);
 	}
 
 	/**

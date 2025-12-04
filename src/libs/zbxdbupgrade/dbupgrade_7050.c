@@ -376,6 +376,110 @@ static int	DBpatch_7050026(void)
 	return SUCCEED;
 }
 
+static int	DBpatch_7050027(void)
+{
+	return DBrename_table("housekeeper", "housekeeper_tmp");
+}
+
+static int	DBpatch_7050028(void)
+{
+	const zbx_db_table_t	table =
+			{"housekeeper", "housekeeperid", 0,
+				{
+					{"housekeeperid", NULL, NULL, NULL, 0, ZBX_TYPE_SERIAL, ZBX_NOTNULL, 0},
+					{"object", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"objectid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{0}
+				},
+				NULL
+			};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_7050029(void)
+{
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	/* 0 - ZBX_HK_OBJECT_ITEM */
+	/* 1 - ZBX_HK_OBJECT_TRIGGER */
+	/* 2 - ZBX_HK_OBJECT_SERVICE */
+	if (ZBX_DB_OK > zbx_db_execute("insert into housekeeper(object,objectid)"
+			"select distinct"
+			" case"
+				" when tablename in ('history','history_str','history_log','history_uint',"
+					"'history_text','history_bin','history_json','trends','trends_uint') then 0"
+				" when tablename = 'events' and field = 'triggerid' then 1"
+				" when tablename = 'events' and field = 'itemid' then 0"
+				" when tablename = 'events' and field = 'lldruleid' then 0"
+				" when tablename = 'events' and field = 'serviceid' then 2"
+			" end as object,"
+			" value as objectid"
+			" from housekeeper_tmp"))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+static int	DBpatch_7050030(void)
+{
+	return DBdrop_table("housekeeper_tmp");
+}
+
+static int	DBpatch_7050031(void)
+{
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	return DBcreate_housekeeper_trigger("items", "itemid");
+}
+
+static int	DBpatch_7050032(void)
+{
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	return DBcreate_housekeeper_trigger("triggers", "triggerid");
+}
+
+static int	DBpatch_7050033(void)
+{
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	return DBcreate_housekeeper_trigger("services", "serviceid");
+}
+
+static int	DBpatch_7050034(void)
+{
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	return DBcreate_housekeeper_trigger("dhosts", "dhostid");
+}
+
+static int	DBpatch_7050035(void)
+{
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	return DBcreate_housekeeper_trigger("dservices", "dserviceid");
+}
+
+static int	DBpatch_7050036(void)
+{
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > zbx_db_execute("delete from ids where table_name='housekeeper'"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
 #endif
 
 DBPATCH_START(7050)
@@ -409,5 +513,15 @@ DBPATCH_ADD(7050023, 0, 1)
 DBPATCH_ADD(7050024, 0, 1)
 DBPATCH_ADD(7050025, 0, 1)
 DBPATCH_ADD(7050026, 0, 1)
+DBPATCH_ADD(7050027, 0, 1)
+DBPATCH_ADD(7050028, 0, 1)
+DBPATCH_ADD(7050029, 0, 1)
+DBPATCH_ADD(7050030, 0, 1)
+DBPATCH_ADD(7050031, 0, 1)
+DBPATCH_ADD(7050032, 0, 1)
+DBPATCH_ADD(7050033, 0, 1)
+DBPATCH_ADD(7050034, 0, 1)
+DBPATCH_ADD(7050035, 0, 1)
+DBPATCH_ADD(7050036, 0, 1)
 
 DBPATCH_END()

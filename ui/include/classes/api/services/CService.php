@@ -398,18 +398,6 @@ class CService extends CApiService {
 
 		DB::delete('services', ['serviceid' => $serviceids]);
 
-		$ins_housekeeper = [];
-
-		foreach ($serviceids as $serviceid) {
-			$ins_housekeeper[] = [
-				'tablename' => 'events',
-				'field' => 'serviceid',
-				'value' => $serviceid
-			];
-		}
-
-		DB::insertBatch('housekeeper', $ins_housekeeper);
-
 		self::addAuditLog(CAudit::ACTION_DELETE, CAudit::RESOURCE_IT_SERVICE, $db_services);
 
 		return ['serviceids' => $serviceids];
