@@ -306,6 +306,33 @@ class CHistory extends CApiService {
 			$query['size'] = $options['limit'];
 		}
 
+		if ($options['history'] === ITEM_VALUE_TYPE_JSON) {
+			if ($options['maxValueSize'] !== null) {
+				$query['_source'] = true;
+
+				$query['script_fields'] = [
+					'truncated_value' => [
+						'script' => [
+							'lang' => 'painless',
+							'source' => "
+								def string;
+								string = params._source.value.toString();
+
+								if (string.length() > params.len) {
+									return string.substring(0, params.len);
+								} else {
+									return string;
+								}
+							",
+							'params' => [
+								'len' => (int)$options['maxValueSize']
+							]
+						]
+					]
+				];
+			}
+		}
+
 		$endpoints = CHistoryManager::getElasticsearchEndpoints($options['history']);
 		if ($endpoints) {
 			return CElasticsearchHelper::query('POST', reset($endpoints), $query);

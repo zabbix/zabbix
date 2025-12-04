@@ -215,6 +215,10 @@ class CElasticsearchHelper {
 							continue;
 						}
 
+						if (array_key_exists('fields', $row)) {
+							$row['_source']['value'] = $row['fields']['truncated_value'][0];
+						}
+
 						$values[] = $row['_source'];
 					}
 
