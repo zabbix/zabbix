@@ -116,13 +116,9 @@ window.oauth_edit_popup = new class {
 	}
 
 	#showClientSecretField() {
-		const button_element = this.form.querySelector('button[name="client_secret_button"]');
+		this.form.querySelector('button[name="client_secret_button"]')?.remove();
 		const input_element = this.form.querySelector('[name="client_secret"]');
-
-		if (button_element !== null) {
-			button_element.remove();
-		}
-
+		
 		if (input_element !== null) {
 			input_element.style.display = '';
 			input_element.removeAttribute('disabled');
