@@ -1857,7 +1857,7 @@ class CDashboardPage {
 
 			widgetEnter: e => {
 				// Ignore ghost events caused by animations.
-				if (!e.detail.is_explicit && this._events_data.dashboard_grid_mouse_move_timeout_id === null) {
+				if (!e.detail.is_explicit && this._events_data.dashboard_grid_mouse_interaction_timeout_id === null) {
 					return;
 				}
 
@@ -1925,13 +1925,13 @@ class CDashboardPage {
 				this.fire(DASHBOARD_PAGE_EVENT_WIDGET_DELETE);
 			},
 
-			dashboardGridMouseMove: () => {
-				if (this._events_data.dashboard_grid_mouse_move_timeout_id !== null) {
-					clearTimeout(this._events_data.dashboard_grid_mouse_move_timeout_id);
+			dashboardGridMouseInteraction: () => {
+				if (this._events_data.dashboard_grid_mouse_interaction_timeout_id !== null) {
+					clearTimeout(this._events_data.dashboard_grid_mouse_interaction_timeout_id);
 				}
 
-				this._events_data.dashboard_grid_mouse_move_timeout_id = setTimeout(() => {
-					this._events_data.dashboard_grid_mouse_move_timeout_id = null;
+				this._events_data.dashboard_grid_mouse_interaction_timeout_id = setTimeout(() => {
+					this._events_data.dashboard_grid_mouse_interaction_timeout_id = null;
 				}, 100);
 			},
 
@@ -1972,7 +1972,7 @@ class CDashboardPage {
 		this._events_data = {
 			last_num_reserved_header_lines: 0,
 
-			dashboard_grid_mouse_move_timeout_id: null,
+			dashboard_grid_mouse_interaction_timeout_id: null,
 
 			dashboard_grid_resize_timeout_id: null,
 			dashboard_grid_resize_first_time: true,
@@ -1981,14 +1981,16 @@ class CDashboardPage {
 	}
 
 	#activateEvents() {
-		this._dashboard_grid.addEventListener('mousemove', this._events.dashboardGridMouseMove);
+		this._dashboard_grid.addEventListener('mousemove', this._events.dashboardGridMouseInteraction);
+		this._dashboard_grid.addEventListener('mouseenter', this._events.dashboardGridMouseInteraction);
 
 		this._events_data.dashboard_grid_resize_observer = new ResizeObserver(this._events.dashboardGridResize);
 		this._events_data.dashboard_grid_resize_observer.observe(this._dashboard_grid);
 	}
 
 	#deactivateEvents() {
-		this._dashboard_grid.removeEventListener('mousemove', this._events.dashboardGridMouseMove);
+		this._dashboard_grid.removeEventListener('mousemove', this._events.dashboardGridMouseInteraction);
+		this._dashboard_grid.removeEventListener('mouseenter', this._events.dashboardGridMouseInteraction);
 
 		this._events_data.dashboard_grid_resize_observer.disconnect();
 
