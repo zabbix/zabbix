@@ -23,7 +23,6 @@ window.update_problem_popup = new class {
 	init({rules}) {
 		this.overlay = overlays_stack.getById('acknowledge.edit');
 		this.dialogue = this.overlay.$dialogue[0];
-		this.form = this.overlay.$dialogue.$body[0].querySelector('form');
 		this.form_element = this.overlay.$dialogue.$body[0].querySelector('form');
 		this.form = new CForm(this.form_element, rules);
 		this.problem_suppressible = !document.getElementById('suppress_problem').disabled;

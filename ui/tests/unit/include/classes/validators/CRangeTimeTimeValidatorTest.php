@@ -17,31 +17,32 @@
 use PHPUnit\Framework\TestCase;
 
 class CRangeTimeTimeValidatorTest extends TestCase {
+
 	public function dataProvider(): array {
 		return [
 			// Valid absolute times.
-			['2021-01-01', 											[], 											null],
-			['2021-01-01 00', 										[], 											null],
-			['2021-01-01 00:00', 									[], 											null],
-			['2021-01-01 00:00:00', 								[], 											null],
-			['2021-01-01 00:00:00', 								['min' => strtotime('2010-01-01')],		null],
-			['2038-01-01', 											['min_in_future' => true],						null],
+			['2021-01-01',											[],												null],
+			['2021-01-01 00',										[],												null],
+			['2021-01-01 00:00',									[],												null],
+			['2021-01-01 00:00:00',									[],												null],
+			['2021-01-01 00:00:00',									['min' => strtotime('2010-01-01')],		null],
+			['2038-01-01',											['min_in_future' => true],						null],
 
 			// Valid relative times.
-			['now-1d', 												[], 											null],
+			['now-1d',												[],												null],
 			['now+1s',												['min_in_future' => true],						null],
-			['now', 												['min' => strtotime('2010-01-01')],		null],
+			['now',													['min' => strtotime('2010-01-01')],		null],
 
 			// Invalid absolute or relative time: format.
-			['00:00:00', 											[], 											'invalid time'],
-			['2021-01-01 99:00:00',									[], 											'invalid time'],
-			['2021-01-01 12:00:00a',								[], 											'invalid time'],
-			['{$MACRO}', 											[], 											'invalid time'],
-			['{#MACRO}', 											[],												'invalid time'],
-			['{$MACRO}', 											[],												'invalid time'],
-			['{MACRO}', 											[],												'invalid time'],
-			['zzzz', 												[],												'invalid time'],
-			['1000-01-01 00:00:00', 								[],												'invalid time'],
+			['00:00:00',											[],												'invalid time'],
+			['2021-01-01 99:00:00',									[],												'invalid time'],
+			['2021-01-01 12:00:00a',								[],												'invalid time'],
+			['{$MACRO}',											[],												'invalid time'],
+			['{#MACRO}',											[],												'invalid time'],
+			['{$MACRO}',											[],												'invalid time'],
+			['{MACRO}',												[],												'invalid time'],
+			['zzzz',												[],												'invalid time'],
+			['1000-01-01 00:00:00',									[],												'invalid time'],
 			['2040-01-01',											[],												'invalid time'],
 
 			// Invalid time: out of min range.
@@ -63,7 +64,7 @@ class CRangeTimeTimeValidatorTest extends TestCase {
 
 
 	/**
-	 * Test cases affected by a second difference for error message
+	 * Test cases affected by a second difference for error message.
 	 * @return array
 	 */
 	public function dataProviderRangeTimeValidatorIgnoreSeconds(): array {
@@ -84,5 +85,4 @@ class CRangeTimeTimeValidatorTest extends TestCase {
 		$this->assertEquals($expected_result, $validator->validate($name));
 		$this->assertStringStartsWith($expected_error, $validator->getError());
 	}
-
 }

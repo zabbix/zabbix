@@ -92,14 +92,14 @@ $form_list
 					->setErrorContainer('operations-count-error-container-hidden')
 					->setChecked($data['suppress_problem'])
 					->setEnabled($data['allowed_suppress'] && $data['problem_can_be_suppressed'])
-			))->addStyle('vertical-align: top;'),
+			))->addClass('align-top'),
 			(new CListItem(
 				(new CRadioButtonList('suppress_time_option', ZBX_PROBLEM_SUPPRESS_TIME_DEFINITE))
 					->addValue(_('Indefinitely'), ZBX_PROBLEM_SUPPRESS_TIME_INDEFINITE)
 					->addValue(_('Until'), ZBX_PROBLEM_SUPPRESS_TIME_DEFINITE)
 					->setEnabled(false)
 					->setModern(true)
-			))->addStyle('vertical-align: top;'),
+			))->addClass('align-top'),
 			(new CDateSelector('suppress_until_problem', $data['suppress_until_problem']))
 				->setDateFormat(ZBX_FULL_DATE_TIME)
 				->setPlaceholder(_($data['suppress_until_problem']))

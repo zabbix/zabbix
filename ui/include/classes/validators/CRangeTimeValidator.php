@@ -24,7 +24,7 @@ class CRangeTimeValidator extends CValidator {
 
 		if (array_key_exists('min_in_future', $options)) {
 			if ($this->min === null || $this->min < time()) {
-				$this->min = time()+1;
+				$this->min = time() + 1;
 			}
 		}
 	}
@@ -51,20 +51,16 @@ class CRangeTimeValidator extends CValidator {
 
 		$timestamp = $parser->getDateTime(false)->getTimestamp();
 
-		if ($timestamp < 0 || bccomp($timestamp, ZBX_MAX_DATE) > 0) {
+		if ($timestamp < 0 || $timestamp > ZBX_MAX_DATE) {
 			$this->setError(_('invalid time'));
 
 			return false;
 		}
 
-		if ($this->min !== null) {
-			$timestamp = $parser->getDateTime(false)->getTimestamp();
+		if ($this->min !== null && $timestamp < $this->min) {
+			$this->setError(_s('value must be greater than or equal to %1$s', date(ZBX_FULL_DATE_TIME, $this->min)));
 
-			if ($timestamp < $this->min) {
-				$this->setError(_s('value must be greater than or equal to %1$s', date(ZBX_FULL_DATE_TIME, $this->min)));
-
-				return false;
-			}
+			return false;
 		}
 
 		return true;
