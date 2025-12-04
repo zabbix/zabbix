@@ -408,12 +408,10 @@ static int	DBpatch_7050027(void)
 	for (int i = 0; i < ids.values_num; i++)
 	{
 #		define ZBX_ROLE_RULE_TYPE_STR		1
-
 		zbx_uint64_t	roleid = ids.values[i];
 
 		zbx_db_insert_add_values(&db_insert, __UINT64_C(0), roleid, ZBX_ROLE_RULE_TYPE_STR, "api.method.0",
 				"*");
-
 #		undef ZBX_ROLE_RULE_TYPE_STR
 	}
 
