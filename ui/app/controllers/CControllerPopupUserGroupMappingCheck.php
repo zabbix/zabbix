@@ -59,9 +59,7 @@ class CControllerPopupUserGroupMappingCheck extends CController {
 					'messages' => array_column(get_and_clear_messages(), 'message')
 				]];
 
-			$this->setResponse(
-				new CControllerResponseData(['main_block' => json_encode($response)])
-			);
+			$this->setResponse(new CControllerResponseData(['main_block' => json_encode($response)]));
 		}
 
 		return $ret;

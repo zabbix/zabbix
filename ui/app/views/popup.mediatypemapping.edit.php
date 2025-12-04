@@ -87,6 +87,7 @@ $form
 					new CFormField(
 						(new CCheckBox('active', MEDIA_STATUS_ACTIVE))
 							->setChecked($data['active'] == MEDIA_STATUS_ACTIVE)
+							->setUncheckedValue(MEDIA_STATUS_DISABLED)
 					)
 				]
 			]))->addClass(CFormGrid::ZBX_STYLE_FIELDS_GROUP))

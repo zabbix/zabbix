@@ -18,6 +18,7 @@ class CControllerPopupMediaTypeMappingCheck extends CController {
 
 	protected function init(): void {
 		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
+		$this->setInputValidationMethod(self::INPUT_VALIDATION_FORM);
 		$this->disableCsrfValidation();
 	}
 
@@ -40,27 +41,18 @@ class CControllerPopupMediaTypeMappingCheck extends CController {
 	}
 
 	protected function checkInput(): bool {
-		$fields = [
-			'userdirectory_mediaid' => 	'id',
-			'mediatypeid' =>			'required|db media_type.mediatypeid',
-			'name' =>					'required|string|not_empty',
-			'attribute' =>				'required|string|not_empty',
-			'period' =>					'required|time_periods',
-			'severity' =>				'array',
-			'active' =>					'in '.implode(',', [MEDIA_STATUS_ACTIVE, MEDIA_STATUS_DISABLED])
-		];
-
-		$ret = $this->validateInput($fields);
+		$ret = $this->validateInput(self::getValidationRules());
 
 		if (!$ret) {
-			$this->setResponse(
-				new CControllerResponseData(['main_block' => json_encode([
-					'error' => [
-						'title' => _('Invalid media type mapping configuration.'),
-						'messages' => array_column(get_and_clear_messages(), 'message')
-					]
-				])])
-			);
+			$form_errors = $this->getValidationError();
+			$response = $form_errors
+				? ['form_errors' => $form_errors]
+				: ['error' => [
+					'title' => _('Invalid media type mapping configuration.'),
+					'messages' => array_column(get_and_clear_messages(), 'message')
+				]];
+
+			$this->setResponse(new CControllerResponseData(['main_block' => json_encode($response)]));
 		}
 
 		return $ret;

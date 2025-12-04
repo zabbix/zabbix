@@ -96,7 +96,7 @@ class CControllerPopupLdapCheck extends CController {
 				'fields' => CControllerPopupUserGroupMappingCheck::getFieldsValidationRules(),
 				'when' => ['provision_status', 'in' => [JIT_PROVISIONING_ENABLED]]
 			],
-			'provision_media' => ['objects', 'uniq' => ['name', 'mediatypeid'],
+			'provision_media' => ['objects', 'uniq' => ['attribute', 'mediatypeid'],
 				'fields' => [
 					'userdirectory_mediaid' => ['db userdirectory_media.userdirectory_mediaid'],
 					'mediatypeid' => ['db media_type.mediatypeid', 'required'],
@@ -136,9 +136,7 @@ class CControllerPopupLdapCheck extends CController {
 					'messages' => array_column(get_and_clear_messages(), 'message')
 				]];
 
-			$this->setResponse(
-				new CControllerResponseData(['main_block' => json_encode($response)])
-			);
+			$this->setResponse(new CControllerResponseData(['main_block' => json_encode($response)]));
 		}
 
 		return $ret;
@@ -148,8 +146,7 @@ class CControllerPopupLdapCheck extends CController {
 		return $this->checkAccess(CRoleHelper::UI_ADMINISTRATION_AUTHENTICATION);
 	}
 
-	protected function doAction(): void
-	{
+	protected function doAction(): void {
 		$data = [
 			'body' => [
 				'name' => '',

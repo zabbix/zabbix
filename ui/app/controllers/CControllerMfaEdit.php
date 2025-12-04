@@ -68,7 +68,7 @@ class CControllerMfaEdit extends CController {
 				'debug_mode' => $this->getDebugMode()
 			],
 			'add_mfa_method' => 1,
-			'existing_names' => [],
+			'existing_names' =>	[]
 		];
 
 		$data['js_validation_rules'] = (new CFormValidator(

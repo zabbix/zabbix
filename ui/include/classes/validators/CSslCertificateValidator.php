@@ -17,7 +17,7 @@
 class CSslCertificateValidator extends CValidator {
 
 	/**
-	 * Cheks if provided value is PEM-encoded certificate.
+	 * Checks if provided value is PEM-encoded certificate.
 	 *
 	 * @param string $value
 	 *

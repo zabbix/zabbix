@@ -17,7 +17,7 @@
 class CSslPrivateKeyValidator extends CValidator {
 
 	/**
-	 * Cheks if provided value is PEM-encoded private key.
+	 * Checks if provided value is PEM-encoded private key.
 	 *
 	 * @param string $value
 	 *

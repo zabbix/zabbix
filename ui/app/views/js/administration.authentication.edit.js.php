@@ -19,7 +19,7 @@
  */
 
 ?>
-//<script>
+<script>
 	const view = new class {
 
 		/**

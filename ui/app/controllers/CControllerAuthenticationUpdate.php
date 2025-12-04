@@ -23,7 +23,7 @@ class CControllerAuthenticationUpdate extends CController {
 			'authentication_type' => ['setting authentication_type', 'required',
 				'in' => [ZBX_AUTH_INTERNAL, ZBX_AUTH_LDAP]
 			],
-			'disabled_usrgrpid' => ['setting disabled_usrgrpid', 'required'],
+			'disabled_usrgrpid' => ['setting disabled_usrgrpid'],
 			'passwd_min_length' => ['setting passwd_min_length', 'required', 'min' => 1, 'max' => 70],
 			'passwd_check_rules' => ['array', 'field' => ['setting passwd_check_rules',
 				'in' => [0, PASSWD_CHECK_CASE, PASSWD_CHECK_DIGITS, PASSWD_CHECK_SPECIAL, PASSWD_CHECK_SIMPLE]
@@ -122,7 +122,7 @@ class CControllerAuthenticationUpdate extends CController {
 					['saml_provision_status', 'in' => [JIT_PROVISIONING_ENABLED]]
 				]
 			],
-			'saml_provision_media' => ['objects', 'uniq' => ['name', 'mediatypeid'],
+			'saml_provision_media' => ['objects', 'uniq' => ['attribute', 'mediatypeid'],
 				'fields' => [
 					'userdirectory_mediaid' => ['db userdirectory_media.userdirectory_mediaid'],
 					'mediatypeid' => ['db media_type.mediatypeid', 'required'],
@@ -283,7 +283,7 @@ class CControllerAuthenticationUpdate extends CController {
 	 */
 	private function validateLdap(): bool {
 		if ($this->getInput('ldap_auth_enabled', CSettingsSchema::getDefault('ldap_auth_enabled'))
-			== ZBX_AUTH_LDAP_ENABLED) {
+				== ZBX_AUTH_LDAP_ENABLED) {
 			$ldap_status = (new CFrontendSetup())->checkPhpLdapModule();
 
 			if ($ldap_status['result'] != CFrontendSetup::CHECK_OK) {
@@ -295,7 +295,7 @@ class CControllerAuthenticationUpdate extends CController {
 			$ldap_servers = $this->getInput('ldap_servers', []);
 
 			if (!$this->hasInput('ldap_default_row_index')
-				|| !array_key_exists($this->getInput('ldap_default_row_index'), $ldap_servers)) {
+					|| !array_key_exists($this->getInput('ldap_default_row_index'), $ldap_servers)) {
 				error(_('Default LDAP server must be specified.'));
 
 				return false;
@@ -598,8 +598,6 @@ class CControllerAuthenticationUpdate extends CController {
 			}
 		}
 		unset($ldap_server);
-
-		error_log(print_r($upd_ldap_servers, true));
 
 		$result = $upd_ldap_servers ? API::UserDirectory()->update($upd_ldap_servers) : [];
 		$result = $result !== false && $ins_ldap_servers ? API::UserDirectory()->create($ins_ldap_servers) : $result;
