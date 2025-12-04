@@ -682,20 +682,20 @@ class CApiService {
 			array $sql_parts): array {
 		$is_count_output = array_key_exists('countOutput', $options) && $options['countOutput'];
 		$is_group_by = array_key_exists('groupBy', $options) && $options['groupBy'];
-		$sort_fields = $this->sortColumns;
+		$allowed_sort_fields = $this->sortColumns;
 
 		if ($is_group_by && $is_count_output) {
-			$sort_fields[] = 'rowscount';
+			$allowed_sort_fields[] = 'rowscount';
 		}
 
-		if ($sort_fields && !zbx_empty($options['sortfield'])) {
+		if ($allowed_sort_fields && !zbx_empty($options['sortfield'])) {
 			$options['sortfield'] = is_array($options['sortfield'])
 				? array_unique($options['sortfield'])
 				: [$options['sortfield']];
 
 			foreach ($options['sortfield'] as $i => $sortfield) {
 				// Validate sortfield.
-				if (!str_in_array($sortfield, $sort_fields)
+				if (!str_in_array($sortfield, $allowed_sort_fields)
 						|| ($is_group_by && !str_in_array($sortfield, $options['groupBy'])
 								&& (!$is_count_output || $sortfield !== 'rowscount'))) {
 					throw new APIException(ZBX_API_ERROR_INTERNAL,
