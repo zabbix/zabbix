@@ -848,7 +848,7 @@ const hintBox = {
 			document.addEventListener('mouseup', hintBox.drag_listeners.dragStop);
 		},
 		dragMove: function(e) {
-			if (!hintBox.is_dragging) {
+			if (hintBox.draggable_element !== null && !hintBox.is_dragging) {
 				const parent = hintBox.draggable_element.offsetParent;
 				const hintbox_rect = hintBox.draggable_element.getBoundingClientRect();
 
