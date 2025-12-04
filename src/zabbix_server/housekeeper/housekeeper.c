@@ -55,6 +55,7 @@ typedef struct {
 	int	(*get_hk_mode)(void);
 } hk_cleanup_table_t;
 
+/* Cache of housekeeper entries hwich require multiple different operations. */
 static zbx_hashset_t	hk_cache;
 
 #define ITEM_PROBLEM_FILTER	\
@@ -67,6 +68,7 @@ static zbx_hashset_t	hk_cache;
 	" and object="ZBX_STR(EVENT_OBJECT_LLDRULE) \
 	" and objectid=" ZBX_FS_UI64
 
+/* Table of which database tables should be cleared upon item deletion. */
 static hk_cleanup_table_t	hk_item_cleanup_order[] = {
 	{"history",		"itemid=" ZBX_FS_UI64,	&hk_cfg_history_mode},
 	{"history_str",		"itemid=" ZBX_FS_UI64,	&hk_cfg_history_mode},
@@ -86,8 +88,8 @@ static hk_cleanup_table_t	hk_item_cleanup_order[] = {
  * Purpose: perform generic table cleanup                                     *
  *                                                                            *
  * Parameters: table                - [IN]                                    *
- *             field                - [IN]                                    *
- *             fieldid              - [IN]                                    *
+ *             filter_pattern       - [IN]                                    *
+ *             objectid             - [IN]                                    *
  *             config_max_hk_delete - [IN]                                    *
  *             more                 - [OUT] 1 if there might be more data to  *
  *                     remove, otherwise the value is not changed             *
@@ -111,7 +113,18 @@ static int	hk_table_cleanup(const char *table, const char *filter_pattern, zbx_u
 	return ZBX_DB_OK <= ret ? ret : 0;
 }
 
-static int	hk_multiple_cleanup(const zbx_vector_hk_housekeeper_t *hk_entries, int config_max_hk_delete,
+/******************************************************************************
+ *                                                                            *
+ * Purpose: perform generic table cleanup                                     *
+ *                                                                            *
+ * Parameters: hk_entries           - [IN] collected housekeeper entries      *
+ *             config_max_hk_delete - [IN]                                    *
+ *             deleteids            - [IN] housekeeper ids to delete          *
+ *                                                                            *
+ * Return value: number of rows deleted                                       *
+ *                                                                            *
+ ******************************************************************************/
+static int	hk_item_cleanup(const zbx_vector_hk_housekeeper_t *hk_entries, int config_max_hk_delete,
 		zbx_vector_uint64_t *deleteids)
 {
 	int	deleted = 0, complete_mask = (1 << ARRSIZE(hk_item_cleanup_order)) - 1;
@@ -222,13 +235,13 @@ static int	housekeep_events_by_triggerid(const zbx_vector_hk_housekeeper_t *hk_e
  *                                                                            *
  * Purpose: perform problem table cleanup                                     *
  *                                                                            *
- * Parameters: table                - [IN] problem table name                 *
- * Parameters: source               - [IN] event source                       *
- *             object               - [IN] event object type                  *
- *             objectid             - [IN] event object identifier            *
+ * Parameters: hk_entries           - [IN] collected housekeeper entries      *
+ *             table                - [IN] event/problem table name           *
+ *             source               - [IN] event/problem source               *
+ *             object               - [IN] event/problem object type          *
+ *             objectid             - [IN] event/problem object identifier    *
  *             config_max_hk_delete - [IN]                                    *
- *             more                 - [OUT] 1 if there might be more data to  *
- *                     remove, otherwise the value is not changed             *
+ *             deleteids            - [IN] housekeeper ids to delete          *
  *                                                                            *
  * Return value: number of rows deleted                                       *
  *                                                                            *
@@ -312,7 +325,7 @@ int	housekeeper_process(int config_max_hk_delete)
 		switch (object)
 		{
 			case ZBX_HK_OBJECT_ITEM:
-				deleted += hk_multiple_cleanup(&ids[object], config_max_hk_delete, &deleteids);
+				deleted += hk_item_cleanup(&ids[object], config_max_hk_delete, &deleteids);
 				break;
 			case ZBX_HK_OBJECT_TRIGGER:
 				deleted += housekeep_events_by_triggerid(&ids[object], config_max_hk_delete,
