@@ -684,13 +684,8 @@ class CApiService {
 		$group_by = array_key_exists('groupBy', $options) && $options['groupBy'];
 		$sort_fields = $this->sortColumns;
 
-		if ($group_by) {
-			$group_by_fields = $options['groupBy'];
-
-			if ($count_output) {
-				$sort_fields[] = 'rowscount';
-				$group_by_fields[] = 'rowscount';
-			}
+		if ($group_by && $count_output) {
+			$sort_fields[] = 'rowscount';
 		}
 
 		if ($sort_fields && !zbx_empty($options['sortfield'])) {
@@ -701,7 +696,8 @@ class CApiService {
 			foreach ($options['sortfield'] as $i => $sortfield) {
 				// Validate sortfield.
 				if (!str_in_array($sortfield, $sort_fields)
-						|| ($group_by && !str_in_array($sortfield, $group_by_fields))) {
+						|| ($group_by && !str_in_array($sortfield, $options['groupBy'])
+								&& (!$count_output || $sortfield !== 'rowscount'))) {
 					throw new APIException(ZBX_API_ERROR_INTERNAL,
 						_s('Sorting by field "%1$s" not allowed.', $sortfield)
 					);
@@ -718,8 +714,8 @@ class CApiService {
 					$sortorder = $options['sortorder'] === ZBX_SORT_DOWN ? ' '.ZBX_SORT_DOWN : '';
 				}
 
-				if ($sortfield === 'rowscount' && in_array($sortfield, $sort_fields)) {
-					$sql_parts['order'][$sortfield] = $sortfield.$sortorder;
+				if ($sortfield === 'rowscount' && $group_by && $count_output) {
+					$sql_parts['order']['rowscount'] = 'rowscount'.$sortorder;
 				}
 				else {
 					$sql_parts = $this->applyQuerySortField($sortfield, $sortorder, $table_alias, $sql_parts);
