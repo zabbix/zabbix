@@ -5498,6 +5498,26 @@ static void	lld_host_interfaces_make(zbx_uint64_t hostid, zbx_vector_lld_host_pt
 	zbx_vector_if_update_destroy(&updates);
 }
 
+static void	lld_interface_port_trim(char *port)
+{
+	unsigned short	value;
+
+	zbx_lrtrim(port, ZBX_WHITESPACE);
+
+	if (SUCCEED != zbx_is_ushort(port, &value))
+		return;
+
+	if (0 == value)
+	{
+		*port++ = '0';
+		*port = '\0';
+
+		return;
+	}
+
+	zbx_ltrim(port, "0");
+}
+
 /******************************************************************************
  *                                                                            *
  * Parameters: interfaces - [IN] Sorted list of interfaces which should be    *
@@ -5559,8 +5579,8 @@ static void	lld_interfaces_make(const zbx_vector_lld_interface_ptr_t *interfaces
 			zbx_lrtrim(new_interface->dns, ZBX_WHITESPACE);
 			zbx_substitute_lld_macros(&new_interface->port, host->jp_row, lld_macros, ZBX_MACRO_ANY, NULL,
 					0);
-			zbx_ltrim(new_interface->port, "0");
-			zbx_lrtrim(new_interface->port, ZBX_WHITESPACE);
+			lld_interface_port_trim(new_interface->port);
+
 
 			if (INTERFACE_TYPE_SNMP == interface->type)
 			{
@@ -5839,9 +5859,9 @@ static int	lld_interface_validate_fields(const zbx_lld_interface_t *interface, c
 	if (FAIL == zbx_is_ushort(interface->port, &port_n) && FAIL == zbx_is_user_macro(interface->port))
 	{
 		*error = zbx_strdcatf(*error, "Cannot %s \"%s\" interface on host \"%s\": "
-				"invalid port value.\n",
+				"invalid port value \"%s\".\n",
 				op, zbx_interface_type_string(interface->type_orig),
-				hostname);
+				hostname, interface->port);
 
 		return FAIL;
 	}
@@ -5863,7 +5883,7 @@ static int	lld_interface_validate_fields(const zbx_lld_interface_t *interface, c
 		if (ZBX_INTERFACE_DNS_LEN < zbx_strlen_utf8(interface->dns))
 		{
 			*error = zbx_strdcatf(*error, "Cannot %s \"%s\" interface on host \"%s\": "
-					"invalid DNS name is too long.\n",
+					"DNS name is too long.\n",
 					op, zbx_interface_type_string(interface->type_orig),
 					hostname);
 
@@ -5873,9 +5893,9 @@ static int	lld_interface_validate_fields(const zbx_lld_interface_t *interface, c
 		if (FAIL == lld_validate_dns(interface->dns))
 		{
 			*error = zbx_strdcatf(*error, "Cannot %s \"%s\" interface on host \"%s\": "
-				"invalid DNS name.\n",
+				"invalid DNS name \"%s\".\n",
 				op, zbx_interface_type_string(interface->type_orig),
-				hostname);
+				hostname, interface->dns);
 
 			return FAIL;
 		}
@@ -5908,8 +5928,8 @@ static int	lld_interface_validate_fields(const zbx_lld_interface_t *interface, c
 		if (SUCCEED != zbx_is_ip(interface->ip) && SUCCEED != zbx_is_user_macro(interface->ip))
 		{
 			*error = zbx_strdcatf(*error, "Cannot %s \"%s\" interface on host \"%s\": "
-				"invalid IP Address.\n",
-				op, zbx_interface_type_string(interface->type_orig),
+				"invalid IP Address \"%s\".\n",
+				op, zbx_interface_type_string(interface->type_orig, interface->ip),
 				hostname);
 
 			return FAIL;
