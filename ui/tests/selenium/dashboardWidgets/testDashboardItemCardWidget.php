@@ -1137,7 +1137,7 @@ class testDashboardItemCardWidget extends testWidgets {
 
 						if ($locator === 'id:sparkline_time_period_data_source') {
 							switch ($option) {
-								case 'Dashoboard':
+								case 'Dashboard':
 									foreach (['sparkline_time_period_from', 'sparkline_time_period_to', 'js-sparkline_time_period-reference'] as $field) {
 										$selector = ($field === 'js-sparkline_time_period-reference') ? 'class' : 'id';
 										$this->assertFalse($form->query($selector, $field)->one()->isVisible());
