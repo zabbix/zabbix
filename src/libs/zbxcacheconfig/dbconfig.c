@@ -9625,27 +9625,30 @@ size_t	zbx_dc_get_psk_by_identity(const unsigned char *psk_identity, unsigned ch
 
 /******************************************************************************
  *                                                                            *
- * Purpose:                                                                   *
- *     Copy autoregistration PSK identity and value from configuration cache  *
- *     into caller's buffers                                                  *
+ * Purpose: copies autoregistration TLS configuration from configuration      *
+ *          cache into caller's buffers.                                      *
  *                                                                            *
  * Parameters:                                                                *
- *     psk_identity_buf     - [OUT] buffer for PSK identity                   *
  *     psk_identity_buf_len - [IN] buffer length for PSK identity             *
- *     psk_buf              - [OUT] buffer for PSK value                      *
  *     psk_buf_len          - [IN] buffer length for PSK value                *
+ *     tls_accept           - [OUT] buffer for type of allowed incoming       *
+ *                                  connections for autoregistration          *
+ *                                  (bit field)                               *
+ *     psk_identity_buf     - [OUT] buffer for PSK identity                   *
+ *     psk_buf              - [OUT] buffer for PSK value                      *
  *                                                                            *
  * Comments: if autoregistration PSK is not configured then empty strings     *
  *           will be copied into buffers                                      *
  *                                                                            *
  ******************************************************************************/
-void	zbx_dc_get_autoregistration_psk(char *psk_identity_buf, size_t psk_identity_buf_len,
-		unsigned char *psk_buf, size_t psk_buf_len)
+void	zbx_dc_get_autoreg_tls_config(size_t psk_identity_buf_len, size_t psk_buf_len, unsigned char *tls_accept,
+		char *psk_identity_buf, char *psk_buf)
 {
 	RDLOCK_CACHE;
 
 	zbx_strlcpy((char *)psk_identity_buf, config->autoreg_psk_identity, psk_identity_buf_len);
 	zbx_strlcpy((char *)psk_buf, config->autoreg_psk, psk_buf_len);
+	*tls_accept = config->config->autoreg_tls_accept;
 
 	UNLOCK_CACHE;
 }
@@ -14136,11 +14139,13 @@ void	zbx_set_availability_diff_ts(int ts)
  *                                                                            *
  * Purpose: frees correlation condition                                       *
  *                                                                            *
- * Parameter: condition - [IN] the condition to free                          *
+ * Parameter: data - [IN] condition to free                                   *
  *                                                                            *
  ******************************************************************************/
-static void	corr_condition_clean(zbx_corr_condition_t *condition)
+static void	corr_condition_clean(void *data)
 {
+	zbx_corr_condition_t	*condition = (zbx_corr_condition_t*)data;
+
 	switch (condition->type)
 	{
 		case ZBX_CORR_CONDITION_OLD_EVENT_TAG:
@@ -14342,8 +14347,8 @@ void	zbx_dc_correlation_rules_init(zbx_correlation_rules_t *rules)
 {
 	zbx_vector_correlation_ptr_create(&rules->correlations);
 	zbx_hashset_create_ext(&rules->conditions, 0, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC,
-			(zbx_clean_func_t)corr_condition_clean, ZBX_DEFAULT_MEM_MALLOC_FUNC,
-			ZBX_DEFAULT_MEM_REALLOC_FUNC, ZBX_DEFAULT_MEM_FREE_FUNC);
+			corr_condition_clean, ZBX_DEFAULT_MEM_MALLOC_FUNC, ZBX_DEFAULT_MEM_REALLOC_FUNC,
+			ZBX_DEFAULT_MEM_FREE_FUNC);
 
 	rules->sync_ts = 0;
 }
