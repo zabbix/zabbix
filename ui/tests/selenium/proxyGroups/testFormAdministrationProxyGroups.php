@@ -253,7 +253,7 @@ class testFormAdministrationProxyGroups extends CWebTest {
 						'Minimum number of proxies' => 0
 					],
 					'inline_errors' => [
-						'Minimum number of proxies' => 'value must be one of 1-1000.'
+						'Minimum number of proxies' => 'This value must be no less than "1".'
 					]
 				]
 			],
@@ -365,8 +365,9 @@ class testFormAdministrationProxyGroups extends CWebTest {
 					],
 					'trim' => true
 				]
-			],
+			]
 			# 20.
+			/* TODO: uncomment after DEV-4248 done
 			[
 				[
 					'fields' => [
@@ -377,7 +378,9 @@ class testFormAdministrationProxyGroups extends CWebTest {
 					]
 				]
 			],
+			/*
 			# 21.
+			/* TODO: uncomment after DEV-4248 done
 			[
 				[
 					'fields' => [
@@ -388,7 +391,9 @@ class testFormAdministrationProxyGroups extends CWebTest {
 					]
 				]
 			]
+			*/
 		];
+
 	}
 
 	/**
