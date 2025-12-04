@@ -26,11 +26,22 @@
 #define ZBX_HK_OBJECT_DHOST	3
 #define ZBX_HK_OBJECT_DSERVICE	4
 
+#define ZBX_HK_OBJECT_NUM	5
+
 typedef struct {
 	zbx_uint64_t	housekeeperid;
 	zbx_uint64_t	objectid;
 	int		progress;
 } hk_entry_t;
+
+typedef struct {
+	zbx_uint64_t	housekeeperid;
+	int		object;
+	zbx_uint64_t	objectid;
+} hk_housekeeper_t;
+
+ZBX_PTR_VECTOR_DECL(hk_housekeeper, hk_housekeeper_t)
+ZBX_PTR_VECTOR_IMPL(hk_housekeeper, hk_housekeeper_t)
 
 /* This structure is used to list tabled to cleanup */
 typedef struct {
@@ -67,8 +78,7 @@ static hk_cleanup_table_t	hk_item_cleanup_order[] = {
 	{"trends",		"itemid=" ZBX_FS_UI64,	&hk_cfg_trends_mode},
 	{"trends_uint",		"itemid=" ZBX_FS_UI64,	&hk_cfg_trends_mode},
 	{"problem",		ITEM_PROBLEM_FILTER, 	NULL},
-	{"problem",		LLDRULE_PROBLEM_FILTER, NULL},
-	{0}
+	{"problem",		LLDRULE_PROBLEM_FILTER, NULL}
 };
 
 /******************************************************************************
@@ -101,77 +111,109 @@ static int	hk_table_cleanup(const char *table, const char *filter_pattern, zbx_u
 	return ZBX_DB_OK <= ret ? ret : 0;
 }
 
-static int	hk_multiple_cleanup(zbx_uint64_t housekeeperid, zbx_uint64_t objectid,
-		const hk_cleanup_table_t *cleanup_tables, int config_max_hk_delete, int *more)
+static int	hk_multiple_cleanup(const zbx_vector_hk_housekeeper_t *hk_entries, int config_max_hk_delete,
+		zbx_vector_uint64_t *deleteids)
 {
-	const hk_cleanup_table_t	*table;
-	int				i, deleted = 0, mask = 0;
-	hk_entry_t			*entry;
+	int	deleted = 0, complete_mask = (1 << ARRSIZE(hk_item_cleanup_order)) - 1;
 
-	if (NULL == (entry = zbx_hashset_search(&hk_cache, &objectid)))
+	/* delete in order of tables to optimaze database cache */
+	for (size_t i = 0; i < ARRSIZE(hk_item_cleanup_order); i++)
 	{
-		hk_entry_t	entry_local = {housekeeperid, objectid, 0};
-
-		entry = zbx_hashset_insert(&hk_cache, &entry_local, sizeof(entry_local));
-	}
-
-	for (i = 0, table = cleanup_tables; NULL != table->name; i++, table++)
-	{
-		mask |= (1 << i);
+		const hk_cleanup_table_t	*table = &hk_item_cleanup_order[i];
 
 		if (NULL != table->get_hk_mode && ZBX_HK_MODE_REGULAR != table->get_hk_mode()) {
-			entry->progress |= (1 << i);
+			/* remove this table from expected complete task mask */
+			complete_mask &= ~(1 << i);
 			continue;
 		}
 
-		if (0 == (entry->progress & (1 << i)))
+		for (int j = 0; j < hk_entries->values_num; j++)
 		{
-			int	 m = 0;
+			zbx_uint64_t	housekeeperid = hk_entries->values[j].housekeeperid;
+			zbx_uint64_t	objectid = hk_entries->values[j].objectid;
+			hk_entry_t	*entry;
 
-			deleted += hk_table_cleanup(table->name, table->filter, objectid, config_max_hk_delete, &m);
+			if (NULL == (entry = zbx_hashset_search(&hk_cache, &objectid)))
+			{
+				hk_entry_t	entry_local = {housekeeperid, objectid, 0};
 
-			if (0 == m)
-				entry->progress |= (1 << i);
+				entry = zbx_hashset_insert(&hk_cache, &entry_local, sizeof(entry_local));
+			}
+
+			if (0 == (entry->progress & (1 << i)))
+			{
+				int	 m = 0;
+
+				deleted += hk_table_cleanup(table->name, table->filter, objectid,
+						config_max_hk_delete, &m);
+
+				if (0 == m)
+					entry->progress |= (1 << i);
+			}
 		}
 	}
 
-	if (mask == entry->progress)
-		zbx_hashset_remove_direct(&hk_cache, entry);
-	else
-		*more = 1;
+	for (int j = 0; j < hk_entries->values_num; j++)
+	{
+		zbx_uint64_t	housekeeperid = hk_entries->values[j].housekeeperid;
+		zbx_uint64_t	objectid = hk_entries->values[j].objectid;
+		hk_entry_t	*entry;
+
+		if (NULL != (entry = zbx_hashset_search(&hk_cache, &objectid)))
+		{
+			if (complete_mask == entry->progress)
+			{
+				zbx_hashset_remove_direct(&hk_cache, entry);
+				zbx_vector_uint64_append(deleteids, entry->housekeeperid);
+			}
+		}
+		else
+		{
+			/* nothing to clean */
+			zbx_vector_uint64_append(deleteids, housekeeperid);
+		}
+	}
 
 	return deleted;
 }
 
-static int	housekeep_events_by_triggerid(zbx_uint64_t triggerid, int config_max_hk_delete, int events_mode,
-		int *more)
+static int	housekeep_events_by_triggerid(const zbx_vector_hk_housekeeper_t *hk_entries, int config_max_hk_delete,
+		int events_mode, zbx_vector_uint64_t *deleteids)
 {
-	char	query[MAX_STRING_LEN];
 	int	deleted = 0;
 
-	if (SUCCEED == zbx_dc_config_trigger_exists(triggerid))
+	for (int i = 0; i < hk_entries->values_num; i++)
 	{
-		*more = 1;
-		return 0;
-	}
+		zbx_uint64_t	triggerid = hk_entries->values[i].objectid;
+		zbx_uint64_t	housekeeperid = hk_entries->values[i].housekeeperid;
 
-	zbx_snprintf(query, sizeof(query), "select eventid"
+		if (SUCCEED == zbx_dc_config_trigger_exists(triggerid))
+			continue;
+
+		int	more = 0;
+		char	query[MAX_STRING_LEN];
+
+		zbx_snprintf(query, sizeof(query), "select eventid"
 			" from events"
 			" where source=%d"
 				" and object=%d"
 				" and objectid=" ZBX_FS_UI64 " order by eventid",
 			EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER, triggerid);
 
-	deleted = zbx_housekeep_problems_events(query, config_max_hk_delete, events_mode, more);
+		deleted = zbx_housekeep_problems_events(query, config_max_hk_delete, events_mode, &more);
 
-	zbx_snprintf(query, sizeof(query), "select eventid"
-			" from events"
-			" where source=%d"
-				" and object=%d"
-				" and objectid=" ZBX_FS_UI64 " order by eventid",
-				EVENT_SOURCE_INTERNAL, EVENT_OBJECT_TRIGGER, triggerid);
+		zbx_snprintf(query, sizeof(query), "select eventid"
+				" from events"
+				" where source=%d"
+					" and object=%d"
+					" and objectid=" ZBX_FS_UI64 " order by eventid",
+					EVENT_SOURCE_INTERNAL, EVENT_OBJECT_TRIGGER, triggerid);
 
-	deleted += zbx_housekeep_problems_events(query, config_max_hk_delete, events_mode, more);
+		deleted += zbx_housekeep_problems_events(query, config_max_hk_delete, events_mode, &more);
+
+		if (0 == more)
+			zbx_vector_uint64_append(deleteids, housekeeperid);
+	}
 
 	return deleted;
 }
@@ -191,21 +233,32 @@ static int	housekeep_events_by_triggerid(zbx_uint64_t triggerid, int config_max_
  * Return value: number of rows deleted                                       *
  *                                                                            *
  ******************************************************************************/
-static int	hk_problem_cleanup(const char *table, int source, int object, zbx_uint64_t objectid,
-		int config_max_hk_delete, int *more)
+static int	hk_problem_cleanup(const zbx_vector_hk_housekeeper_t *hk_entries, const char *table, int source,
+		int object, int config_max_hk_delete, zbx_vector_uint64_t *deleteids)
 {
-	char	filter[MAX_STRING_LEN];
-	int	ret;
+	int	deleted = 0;
 
-	zbx_snprintf(filter, sizeof(filter), "source=%d and object=%d and objectid=" ZBX_FS_UI64,
+	for (int i = 0; i < hk_entries->values_num; i++)
+	{
+		char		filter[MAX_STRING_LEN];
+		zbx_uint64_t	objectid = hk_entries->values[i].objectid;
+		zbx_uint64_t	housekeeperid = hk_entries->values[i].housekeeperid;
+		int		ret;
+
+		zbx_snprintf(filter, sizeof(filter), "source=%d and object=%d and objectid=" ZBX_FS_UI64,
 			source, object, objectid);
 
-	ret = hk_delete_from_table(table, filter, config_max_hk_delete);
+		ret = hk_delete_from_table(table, filter, config_max_hk_delete);
 
-	if (ZBX_DB_OK > ret || (0 != config_max_hk_delete && ret >= config_max_hk_delete))
-		*more = 1;
+		if (ZBX_DB_OK <= ret)
+		{
+			deleted += ret;
+			if (0 == config_max_hk_delete || ret < config_max_hk_delete)
+				zbx_vector_uint64_append(deleteids, housekeeperid);
+		}
+	}
 
-	return ZBX_DB_OK <= ret ? ret : 0;
+	return deleted;
 }
 
 void	housekeeper_init(void)
@@ -223,56 +276,64 @@ int	housekeeper_process(int config_max_hk_delete)
 	zbx_db_result_t		result;
 	zbx_db_row_t		row;
 	zbx_vector_uint64_t	deleteids;
-	int			deleted;
+	int			deleted = 0;
+
+	zbx_vector_hk_housekeeper_t	ids[ZBX_HK_OBJECT_NUM];
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	zbx_vector_uint64_create(&deleteids);
 
-	result = zbx_db_select("select housekeeperid,object,objectid"
-			" from housekeeper");
+	for (int i = 0; i < ZBX_HK_OBJECT_NUM; i++)
+	{
+		zbx_vector_hk_housekeeper_create(&ids[i]);
+	}
+
+	result = zbx_db_select_n("select housekeeperid,object,objectid"
+			" from housekeeper", config_max_hk_delete);
 
 	while (NULL != (row = zbx_db_fetch(result)))
 	{
-		int		object;
-		zbx_uint64_t	housekeeperid, objectid;
-		int		more = 0;
+		hk_housekeeper_t	hk;
 
-		ZBX_STR2UINT64(housekeeperid, row[0]);
-		object = atoi(row[1]);
-		ZBX_STR2UINT64(objectid, row[2]);
+		ZBX_STR2UINT64(hk.housekeeperid, row[0]);
+		hk.object = atoi(row[1]);
+		ZBX_STR2UINT64(hk.objectid, row[2]);
 
+		if (ZBX_HK_OBJECT_NUM > hk.object)
+			zbx_vector_hk_housekeeper_append(&ids[hk.object], hk);
+		else
+			THIS_SHOULD_NEVER_HAPPEN;
+	}
+	zbx_db_free_result(result);
+
+	for (int object = 0; object < ZBX_HK_OBJECT_NUM; object++)
+	{
 		switch (object)
 		{
 			case ZBX_HK_OBJECT_ITEM:
-				deleted += hk_multiple_cleanup(housekeeperid, objectid, hk_item_cleanup_order,
-						config_max_hk_delete, &more);
+				deleted += hk_multiple_cleanup(&ids[object], config_max_hk_delete, &deleteids);
 				break;
 			case ZBX_HK_OBJECT_TRIGGER:
-				deleted += housekeep_events_by_triggerid(objectid, config_max_hk_delete,
-						hk_cfg_events_mode(), &more);
+				deleted += housekeep_events_by_triggerid(&ids[object], config_max_hk_delete,
+						hk_cfg_events_mode(), &deleteids);
 				break;
 			case ZBX_HK_OBJECT_SERVICE:
-				deleted += hk_problem_cleanup("problems", EVENT_SOURCE_SERVICE, EVENT_OBJECT_SERVICE,
-						objectid, config_max_hk_delete, &more);
+				deleted += hk_problem_cleanup(&ids[object], "problems", EVENT_SOURCE_SERVICE,
+						EVENT_OBJECT_SERVICE, config_max_hk_delete, &deleteids);
 				break;
 			case ZBX_HK_OBJECT_DHOST:
-				deleted += hk_problem_cleanup("events", EVENT_SOURCE_DISCOVERY, EVENT_OBJECT_DHOST,
-						objectid, config_max_hk_delete, &more);
+				deleted += hk_problem_cleanup(&ids[object],"events", EVENT_SOURCE_DISCOVERY,
+						EVENT_OBJECT_DHOST, config_max_hk_delete, &deleteids);
 				break;
 			case ZBX_HK_OBJECT_DSERVICE:
-				deleted += hk_problem_cleanup("events", EVENT_SOURCE_DISCOVERY, EVENT_OBJECT_DSERVICE,
-						objectid, config_max_hk_delete, &more);
-				break;
-			default:
-				THIS_SHOULD_NEVER_HAPPEN;
+				deleted += hk_problem_cleanup(&ids[object], "events", EVENT_SOURCE_DISCOVERY,
+						EVENT_OBJECT_DSERVICE, config_max_hk_delete, &deleteids);
 				break;
 		}
 
-		if (0 == more)
-			zbx_vector_uint64_append(&deleteids, housekeeperid);
+		zbx_vector_hk_housekeeper_destroy(&ids[object]);
 	}
-	zbx_db_free_result(result);
 
 	if (0 != deleteids.values_num)
 	{
