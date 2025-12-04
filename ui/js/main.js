@@ -249,9 +249,17 @@ var jqBlink = {
 /*
  * HintBox class.
  */
-var hintBox = {
+const hintBox = {
 
+	is_rendering: false,
 	show_hint_timer: null,
+
+	// drag variables
+	drag_style: null,
+	draggable_element: null,
+	offsetX: 0,
+	offsetY: 0,
+	is_moving: false,
 
 	/**
 	 * Initialize hint box event handlers.
@@ -287,28 +295,51 @@ var hintBox = {
 	displayHint: function(e, $target, delay = 0) {
 		clearTimeout(hintBox.show_hint_timer);
 
+		const showHint = () => {
+			if (!$target[0].isStatic) {
+				hintBox.hideHint($target[0], false);
+			}
+
+			if ($target[0].dataset.hintboxContents) {
+				hintBox.showHintStart(e, $target, delay);
+			}
+		};
+
 		switch (e.handleObj.origType) {
 			case 'mouseenter':
-				hintBox.showHintStart(e, $target, delay);
-				break;
-
 			case 'mousemove':
-				if (!$target[0].hintBoxItem) {
-					hintBox.showHintStart(e, $target, delay);
+				if (delay > 0) {
+					showHint();
+
+					break;
 				}
-				else if ($target.data('hintbox-track-mouse') === 1 && !$target[0].isStatic) {
-					hintBox.positionElement(e, $target, $target[0].hintBoxItem);
+
+				if (!this.is_rendering) {
+					this.is_rendering = true;
+					requestAnimationFrame(showHint);
 				}
+
+				this.is_rendering = false;
 				break;
 
 			case 'mouseleave':
-				hintBox.hideHint($target[0], false);
-				$target.blur();
+				requestAnimationFrame(() => {
+					hintBox.hideHint($target[0], false);
+					$target.blur();
+				});
 				break;
 
 			case 'keydown':
 			case 'click':
-				if ($target.data('hintbox-static') === 1) {
+				if ($target.data('hintbox-static') !== 1) {
+					break;
+				}
+
+				const result = hintBox.showStaticHint(e, $target[0], $target.data('hintbox-class'), false,
+					$target.data('hintbox-style')
+				);
+
+				if (!result && $target[0].dataset.hintboxStaticReopenOnClick && $target[0].dataset.hintboxContents) {
 					hintBox.showStaticHint(e, $target[0], $target.data('hintbox-class'), false,
 						$target.data('hintbox-style')
 					);
@@ -402,18 +433,18 @@ var hintBox = {
 		});
 	},
 
-	createBox: function(e, target, hintText, className, isStatic, styles, appendTo, reposition_on_resize = true) {
-		var hintboxid = hintBox.getUniqueId(),
-			box = jQuery('<div>', {'data-hintboxid': hintboxid}).addClass('overlay-dialogue wordbreak'),
-			appendTo = appendTo || '.wrapper';
+	createBox: function(e, target, hintText, className, isStatic, styles, appendTo = '.wrapper',
+			reposition_on_resize = true) {
+		const hintboxid = hintBox.getUniqueId();
+		const box = jQuery('<div>', {'data-hintboxid': hintboxid}).addClass('overlay-dialogue hintbox wordbreak');
 
 		if (styles) {
 			// property1: value1; property2: value2; property(n): value(n)
 
-			var style_list = styles.split(';');
+			const style_list = styles.split(';');
 
-			for (var i = 0; i < style_list.length; i++) {
-				var style_props = style_list[i].split(':');
+			for (let i = 0; i < style_list.length; i++) {
+				const style_props = style_list[i].split(':');
 
 				if (style_props[1]) {
 					box.css(style_props[0].trim(), style_props[1].trim());
@@ -437,15 +468,22 @@ var hintBox = {
 			jQuery(target).attr('data-expanded', 'true');
 			addToOverlaysStack(hintboxid, target, 'hintbox');
 
-			var close_link = jQuery('<button>', {
-					'class': 'btn-overlay-close',
-					'title': t('S_CLOSE')
-				}
-			)
-				.click(function() {
-					hintBox.hideHint(target, true);
-				});
-			box.prepend(close_link);
+			box.addClass('hintbox-static');
+
+			const draggable_header = document.createElement('div');
+			draggable_header.classList.add('hintbox-draggable-handle');
+
+			const close_link = document.createElement('button');
+			close_link.setAttribute('title', t('S_CLOSE'));
+			close_link.classList.add('btn-overlay-close');
+			close_link.addEventListener('click', e => {
+				e.stopPropagation();
+
+				hintBox.hideHint(target, true);
+			});
+
+			box.prepend(close_link)
+			box.prepend(draggable_header);
 		}
 
 		if (target.dataset?.hintboxPreload !== '' && target.dataset?.hintboxContents === '') {
@@ -495,9 +533,15 @@ var hintBox = {
 		const isStatic = target.isStatic;
 		hintBox.hideHint(target, true);
 
+		let opened = false;
+
 		if (!isStatic) {
 			if (typeof hintText === 'undefined') {
 				hintText = target.dataset.hintboxContents;
+			}
+
+			if (!target.dataset.hintboxContents) {
+				return;
 			}
 
 			target.isStatic = true;
@@ -540,10 +584,14 @@ var hintBox = {
 				callback: (e) => hintBox.onScroll(target, e)
 			};
 
+			opened = true;
+
 			addEventListener('scroll', target.scroll_observer.callback, {capture: true});
 		}
 
 		addEventListener('resize', target.resizeHandler = e => hintBox.onResize(e, target));
+
+		return opened;
 	},
 
 	onScroll: function(target, e) {
@@ -577,6 +625,11 @@ var hintBox = {
 		if (target.isStatic) {
 			Overlay.prototype.recoverFocus.call({'$dialogue': target.hintBoxItem});
 			Overlay.prototype.containFocus.call({'$dialogue': target.hintBoxItem});
+
+			target.hintBoxItem[0].querySelector('.hintbox-draggable-handle')
+				.addEventListener('mousedown', hintBox.drag_listeners.dragStart);
+
+			target.dispatchEvent(new CustomEvent('onShowStaticHint'));
 		}
 
 		target.dispatchEvent(new CustomEvent('onShowHint.hintBox'));
@@ -589,7 +642,6 @@ var hintBox = {
 		const event_offset = 10;
 		const css = {
 			width: null,
-			height: null,
 			top: null,
 			left: null
 		};
@@ -638,7 +690,7 @@ var hintBox = {
 				if positioned further than the width of window when horizontal scrolling is active.
 			*/
 			css.width = Math.ceil(parseFloat(hint_computed_style.width));
-			css.height = Math.ceil(parseFloat(hint_computed_style.height));
+			const height = Math.ceil(parseFloat(hint_computed_style.height));
 
 			// Event coordinates relative to host.
 			if (target.event_x === undefined) {
@@ -672,13 +724,22 @@ var hintBox = {
 			else if (target.event_y - event_offset - hint_rect.height >= host_y_min) {
 				css.top = target.event_y - event_offset - hint_rect.height;
 			}
-			// Hint fits neither under nor above event - then show it under event.
+			// Hint fits neither under nor above event - then show it where the biggest part is presented.
 			else {
-				css.top = target.event_y + event_offset;
+				css.top = Math.ceil(window.innerHeight / 2 - e.clientY > 0
+					? host_y_max - hint_rect.height - event_offset
+					: host_y_min + event_offset
+				);
+
+				if (target.event_x + event_offset + hint_rect.width > host_x_max) {
+					css.left = target.event_x - event_offset - hint_rect.width;
+				}
 			}
 
 			// Assign css rules to hint.
 			Object.entries(css).forEach(([key, value]) => hint.style[key] = value !== null ? `${value}px` : null);
+
+			hint.style.height = `min(${height}px, calc(100vh - 20px))`;
 		}
 		while (host_client_width > host.clientWidth || host_client_height > host.clientHeight);
 
@@ -701,6 +762,10 @@ var hintBox = {
 	deleteHint: function(target, do_focus_target = true) {
 		delete target.event_x;
 		delete target.event_y;
+
+		if (target.isStatic) {
+			target.dispatchEvent(new CustomEvent('onDeleteStaticHint'));
+		}
 
 		if (typeof target.hintboxid !== 'undefined') {
 			jQuery(target).removeAttr('data-expanded');
@@ -763,6 +828,55 @@ var hintBox = {
 	onResize: function(e, target) {
 		if (target && target.hintBoxItem) {
 			hintBox.positionElement(e, target, target.hintBoxItem);
+		}
+	},
+
+	drag_listeners: {
+		dragStart: function(e) {
+			hintBox.drag_style = document.createElement('style');
+			document.head.appendChild(hintBox.drag_style);
+			hintBox.drag_style.sheet.insertRule(
+				'* { user-select: none; pointer-events: none; cursor: grabbing !important; }'
+			);
+
+			hintBox.draggable_element = e.target.offsetParent;
+
+			hintBox.offsetX = e.clientX - hintBox.draggable_element.offsetLeft;
+			hintBox.offsetY = e.clientY - hintBox.draggable_element.offsetTop;
+
+			document.addEventListener('mousemove', hintBox.drag_listeners.dragMove);
+			document.addEventListener('mouseup', hintBox.drag_listeners.dragStop);
+		},
+		dragMove: function(e) {
+			if (!hintBox.is_moving) {
+				const parent = hintBox.draggable_element.offsetParent;
+				const hintbox_rect = hintBox.draggable_element.getBoundingClientRect();
+
+				const min_left = 50 - hintbox_rect.width;
+				const min_top = 0;
+				const max_left = parent.scrollWidth - hintbox_rect.width;
+				const max_top = parent.scrollHeight - hintbox_rect.height;
+
+				const left = Math.min(Math.max(min_left, e.clientX - hintBox.offsetX), max_left);
+				const top = Math.min(Math.max(min_top, e.clientY - hintBox.offsetY), max_top);
+
+				hintBox.is_moving = true;
+
+				requestAnimationFrame(() => {
+					hintBox.draggable_element.style.left = `${left}px`;
+					hintBox.draggable_element.style.top = `${top}px`;
+
+					hintBox.is_moving = false;
+				});
+			}
+		},
+		dragStop: function () {
+			hintBox.drag_style.remove();
+			hintBox.is_moving = false;
+			hintBox.draggable_element = null;
+
+			document.removeEventListener('mousemove', hintBox.drag_listeners.dragMove);
+			document.removeEventListener('mouseup', hintBox.drag_listeners.dragStop);
 		}
 	}
 };

@@ -1972,6 +1972,27 @@ div {
 		}
 	}
 
+	&.hintbox {
+		display: flex;
+		flex-direction: column;
+		box-sizing: border-box;
+
+		&:not(.hintbox-static) {
+			pointer-events: none;
+		}
+
+		&.hintbox-static {
+			padding-top: 0;
+
+			.hintbox-draggable-handle {
+				min-height: 17px;
+				max-height: 17px;
+				width: 100%;
+				cursor: grab;
+			}
+		}
+	}
+
 	.hintbox-raw-data {
 		white-space: pre-wrap;
 	}
@@ -2481,7 +2502,10 @@ div {
 	font-size: 12px;
 	line-height: 18px;
 	white-space: nowrap;
-	min-width: 145px;
+	min-width: 160px;
+	overflow-y: auto;
+
+	@extend %webkit-scrollbar;
 
 	.table-paging {
 		min-height: 18px;

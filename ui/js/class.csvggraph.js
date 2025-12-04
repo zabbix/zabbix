@@ -37,12 +37,12 @@
 	}
 
 	// Cancel SBox and unset its variables.
-	function destroySBox(e, graph) {
-		var graph = graph || e.data.graph,
-			data = graph.data('options');
+	function destroySBox(e, graph = e.data.graph) {
+		const data = graph.data('options');
+		const is_static_hintbox_opened = graph.data('is_static_hintbox_opened');
 
 		if (data) {
-			if (!data.isHintBoxFrozen && !data.isTriggerHintBoxFrozen) {
+			if (!is_static_hintbox_opened) {
 				graph.data('widget')._resumeUpdating();
 			}
 
@@ -77,30 +77,16 @@
 			jQuery(document)
 				.off('selectstart', disableSelect)
 				.off('keydown', sBoxKeyboardInteraction)
-				.off('mousemove', moveSBoxMouse)
 				.off('mouseup', destroySBox)
 				.off('mouseup', endSBoxDrag);
+
+			graph.off('mousemove', moveSBoxMouse);
 		}
 	}
 
 	// Destroy hintbox, unset its variables and event listeners.
 	function destroyHintbox(graph) {
-		var data = graph.data('options'),
-			hbox = graph.data('hintbox') || null;
-
-		if (hbox !== null && (data.isHintBoxFrozen === false && data.isTriggerHintBoxFrozen === false)) {
-			graph.removeAttr('data-expanded');
-			removeFromOverlaysStack(graph.hintboxid);
-			graph.off('mouseup', makeHintboxStatic);
-			graph.removeData('hintbox');
-			hbox.remove();
-
-			if (graph.observer !== undefined) {
-				graph.observer.disconnect();
-
-				delete graph.observer;
-			}
-		}
+		delete graph[0].dataset.hintboxContents;
 	}
 
 	// Hide vertical helper line and highlighted data points.
@@ -108,10 +94,10 @@
 		graph.find('.svg-helper').attr({'x1': -10, 'x2': -10});
 
 		if (graph.data('options').hintbox_type === GRAPH_HINTBOX_TYPE_SCATTER_PLOT) {
-			const highlighted_points = graph[0].querySelectorAll('g.js-svg-highlight-group');
+			const highlighter_points = graph[0].querySelectorAll('g.js-svg-highlight-group');
 
-			for (const highlighted_point of highlighted_points) {
-				highlighted_point.setAttribute('transform', 'translate(-10, -10)');
+			for (const highlighter_point of highlighter_points) {
+				highlighter_point.setAttribute('transform', 'translate(-10, -10)');
 			}
 		}
 		else {
@@ -119,87 +105,22 @@
 		}
 	}
 
-	// Create a new hintbox and stick it to certain position where user has clicked.
-	function makeHintboxStatic(e, graph) {
-		var graph = graph || e.data.graph,
-			data = graph.data('options'),
-			hbox = graph.data('hintbox'),
-			content = hbox ? hbox.find('> div') : null;
-
-		// Destroy old hintbox to make new one with close button.
-		destroyHintbox(graph);
-
-		if (content) {
-			// Should be put inside hintBoxItem to use functionality of hintBox.
-			graph.hintBoxItem = hintBox.createBox(e, graph, content, '', true, 'top: 0; left: 0',
-				graph.closest('.dashboard-grid-widget-container'), false
-			);
-
-			if (graph.data('simpleTriggersHintbox')) {
-				data.isTriggerHintBoxFrozen = true;
-			}
-			else {
-				data.isHintBoxFrozen = true;
-			}
-
-			graph.data('widget')._pauseUpdating();
-
-			graph.hintBoxItem.on('onDeleteHint.hintBox', function(e) {
-				graph.data('widget')._resumeUpdating();
-
-				data.isTriggerHintBoxFrozen = false;
-				data.isHintBoxFrozen = false; // Unfreeze because only unfrozen hintboxes can be removed.
-				graph.off('mouseup', hintboxSilentMode);
-				destroyHintbox(graph);
-			});
-
-			repositionHintBox(e, graph);
-
-			Overlay.prototype.recoverFocus.call({'$dialogue': graph.hintBoxItem});
-			Overlay.prototype.containFocus.call({'$dialogue': graph.hintBoxItem});
-
-			graph
-				.off('mouseup', hintboxSilentMode)
-				.on('mouseup', {graph: graph}, hintboxSilentMode);
-			graph.data('hintbox', graph.hintBoxItem);
-		}
-	}
-
-	/**
-	 * Silent mode means that hintbox is waiting for click to be repositioned. Once user clicks on graph, existing
-	 * hintbox will be repositioned with a new values in the place where user clicked on.
-	 */
-	function hintboxSilentMode(e) {
-		var graph = e.data.graph,
-			data = graph.data('options');
-
-		if (data.isHintBoxFrozen) {
-			data.isHintBoxFrozen = false;
-			showHintbox(e, graph);
-			makeHintboxStatic(e, graph);
-		}
-		if (data.isTriggerHintBoxFrozen) {
-			data.isTriggerHintBoxFrozen = false;
-			showSimpleTriggerHintbox(e, graph);
-			makeHintboxStatic(e, graph);
-		}
-	}
-
 	// Method to start selection of some horizontal area in graph.
 	function startSBoxDrag(e) {
 		e.stopPropagation();
 
-		var graph = e.data.graph,
-			offsetX = e.clientX - graph.offset().left,
-			data = graph.data('options');
+		const graph = e.data.graph;
+		const offsetX = e.clientX - graph.offset().left;
+		const data = graph.data('options');
 
 		if (data.dimX <= offsetX && offsetX <= data.dimX + data.dimW && data.dimY <= e.offsetY
 				&& e.offsetY <= data.dimY + data.dimH) {
 			jQuery(document)
 				.on('selectstart', disableSelect)
 				.on('keydown', {graph: graph}, sBoxKeyboardInteraction)
-				.on('mousemove', {graph: graph}, moveSBoxMouse)
 				.on('mouseup', {graph: graph}, endSBoxDrag);
+
+			graph.on('mousemove', {graph: graph}, moveSBoxMouse);
 
 			data.start = offsetX - data.dimX;
 		}
@@ -220,10 +141,9 @@
 		// If mouse movement detected (SBox has dragged), destroy opened hintbox and pause widget refresh.
 		if (data.start != data.end && !data.boxing) {
 			graph.data('widget')._pauseUpdating();
-			data.isHintBoxFrozen = false;
-			data.isTriggerHintBoxFrozen = false;
 			data.boxing = true;
 			destroyHintbox(graph);
+			hintBox.hideHint(graph[0], true);
 			hideHelper(graph);
 		}
 
@@ -466,8 +386,8 @@
 		return data_sets;
 	}
 
-	// Find metric points that touches the given x.
-	function findPointsNearX(graph, x) {
+	// Find metric points that touches the given x and y.
+	function findScatterPlotPoints(graph, x, y) {
 		const nodes = graph.querySelectorAll('[data-set]');
 		const points = [];
 
@@ -476,11 +396,10 @@
 
 			for (let c = 0; c < point.length; c++) {
 				const ctm = point[c].getCTM();
-				const bbox = point[c].getBBox();
 				const cx = ctm.e;
 				const cy = ctm.f;
 
-				if (Math.abs(cx - x) <= bbox.width / 2) {
+				if (Math.abs(cx - x) <= 6 && Math.abs(cy - y) <= 6) {
 					if (point[c].getAttribute('value_x') !== null || point[c].getAttribute('value_y') !== null) {
 						points.push({
 							g: nodes[i],
@@ -539,59 +458,154 @@
 	 * actual data point and adds N pixels to all sides. Then looks if mouse is in calculated area. N is calculated by
 	 * this function. Tolerance is used to find exactly matched point only.
 	 */
-	function getDataPointTolerance(ds, hintbox_type) {
-		if (hintbox_type === GRAPH_HINTBOX_TYPE_SVG_GRAPH) {
-			const data_tag = ds.querySelector(':not(.svg-point-highlight)');
+	function getDataPointTolerance(ds) {
+		const data_tag = ds.querySelector(':not(.svg-point-highlight)');
 
-			if (data_tag.tagName.toLowerCase() === 'circle') {
-				return +ds.childNodes[1].getAttribute('r');
-			}
-			else {
-				return +window.getComputedStyle(data_tag)['strokeWidth'];
-			}
+		if (data_tag.tagName.toLowerCase() === 'circle') {
+			return +ds.childNodes[1].getAttribute('r');
 		}
 		else {
-			const data_tag = ds.querySelector("g:not(.js-svg-highlight-group)");
-
-			return data_tag.getBBox().width / 2;
+			return +window.getComputedStyle(data_tag)['strokeWidth'];
 		}
 	}
 
-	// Position hintbox near current mouse position.
-	function repositionHintBox(e, graph) {
-		// Use closest positioned ancestor for offset calculation.
-		var offset = graph.closest('.dashboard-grid-widget-container').offsetParent().offset(),
-			hbox = jQuery(graph.hintBoxItem),
-			page_bottom = jQuery(window.top).scrollTop() + jQuery(window.top).height(),
-			mouse_distance = 15,
-			l = (document.body.clientWidth >= e.clientX + hbox.outerWidth() + mouse_distance)
-				? e.clientX + mouse_distance - offset.left
-				: e.clientX - mouse_distance - hbox.outerWidth() - offset.left,
-			t = e.pageY - offset.top,
-			t = page_bottom >= t + offset.top + hbox.outerHeight() + mouse_distance
-				? t + mouse_distance
-				: t - mouse_distance - hbox.outerHeight(),
-			t = (t + offset.top < 0) ? -offset.top : t;
+	function getProblemHintboxHtml(e, graph) {
+		const problems = findProblems(graph[0], e.offsetX);
+		let problems_total = problems.length;
 
-		hbox.css({'left': l, 'top': t});
+		if (problems_total === 0) {
+			return null;
+		}
+
+		const tbody = jQuery('<tbody>');
+
+		problems.forEach(function(val, i) {
+			tbody.append(
+				jQuery('<tr>')
+					.append(jQuery('<td>').append(jQuery('<a>', {'href': val.url}).text(val.clock)))
+					.append(jQuery('<td>').append(val.r_eventid
+						? jQuery('<a>', {'href': val.url}).text(val.r_clock)
+						: val.r_clock)
+					)
+					.append(jQuery('<td>').append(
+						jQuery('<span>', { 'class': val.status_color }).text(val.status))
+					)
+					.append(jQuery('<td>', {'class': val.severity}).text(val.name))
+			);
+		});
+
+		return jQuery('<div>')
+			.addClass('svg-graph-hintbox')
+			.append(
+				jQuery('<table>')
+					.addClass('list-table compact-view')
+					.append(tbody)
+			);
+	}
+
+	function getSimpleTriggerHintboxHtml(e, triggers) {
+		if (triggers.length > 0) {
+			const hint_body = jQuery('<ul></ul>');
+
+			const trigger_areas = triggers.filter(t => !(t.begin_position > e.offsetX || e.offsetX > t.end_position));
+
+			if (!trigger_areas.length) {
+				return null;
+			}
+
+			for (const trigger of trigger_areas) {
+				hint_body.append(
+					jQuery('<li>')
+						.text(trigger.trigger + ' [' + trigger.constant + ']')
+						.append(
+							jQuery('<span>')
+								.css('background-color', trigger.color)
+								.addClass('svg-graph-hintbox-trigger-color')
+						)
+				)
+			}
+
+			return jQuery('<div>')
+				.addClass('svg-graph-hintbox')
+				.append(hint_body);
+		}
+	}
+
+	function getValuesHintboxHtml(included_points, offsetX, data) {
+		let html = jQuery('<ul>');
+		let rows_added = 0;
+
+		for (const point of included_points) {
+			if (data.hintbox_type === GRAPH_HINTBOX_TYPE_SCATTER_PLOT) {
+				const time_from = new CDate(point.time_from * 1000);
+				const time_to = new CDate(point.time_to * 1000);
+
+				jQuery('<li>')
+					.css('margin-top', rows_added > 0 ? '10px' : null)
+					.text(point.g.getAttribute('data-metric-x') + ': ' + point.vx)
+					.append(
+						jQuery('<span>')
+							.css('color', point.color)
+							.addClass('svg-graph-hintbox-icon-color')
+							.addClass(point.marker_class)
+					)
+					.appendTo(html);
+
+				jQuery('<li>')
+					.text(point.g.getAttribute('data-metric-y') + ': ' + point.vy)
+					.append(
+						jQuery('<span>')
+							.css('color', point.color)
+							.addClass('svg-graph-hintbox-icon-color')
+							.addClass(point.marker_class)
+					)
+					.appendTo(html);
+
+				jQuery('<div>')
+					.text(time_from.format(PHP_ZBX_FULL_DATE_TIME) + ' - ' + time_to.format(PHP_ZBX_FULL_DATE_TIME))
+					.appendTo(html);
+			}
+			else {
+				jQuery('<li>')
+					.text(point.g.getAttribute('data-metric') + ': ' + point.v)
+					.append(
+						jQuery('<span>')
+							.css('background-color', point.g.getAttribute('data-color'))
+							.addClass('svg-graph-hintbox-item-color')
+					)
+					.appendTo(html);
+			}
+		}
+
+		const hintbox_container = jQuery('<div>').addClass('svg-graph-hintbox');
+
+		if (data.hintbox_type === GRAPH_HINTBOX_TYPE_SVG_GRAPH) {
+			// Calculate time at mouse position.
+			const time = new CDate((data.timePeriod.from_ts + (offsetX - data.dimX) * data.spp) * 1000);
+
+			hintbox_container.append(
+				jQuery('<div>')
+					.addClass('header')
+					.html(time.format(PHP_ZBX_FULL_DATE_TIME))
+			);
+		}
+
+		hintbox_container.append(html);
+		html = hintbox_container;
+
+		return html;
 	}
 
 	// Show problem or value hintbox.
-	function showHintbox(e, graph) {
-		var graph = graph || e.data.graph,
-			data = graph.data('options'),
-			hbox = graph.data('hintbox') || null,
-			offsetX = e.clientX - graph.offset().left,
-			html = null,
-			in_x = false,
-			in_values_area = false,
-			in_problem_area = false;
+	function showHintbox(e, graph = e.data.graph) {
+		const data = graph.data('options');
+		const offsetX = e.clientX - graph.offset().left;
+		let html = null;
+		let in_x = false;
+		let in_values_area = false;
+		let in_problem_area = false;
 
 		const hintbox_type = data.hintbox_type;
-
-		if (graph.data('simpleTriggersHintbox') || data.isTriggerHintBoxFrozen === true) {
-			return;
-		}
 
 		if (data.boxing === true) {
 			hideHelper(graph);
@@ -599,200 +613,111 @@
 		}
 
 		// Check if mouse in the horizontal area in which hintbox must be shown.
-		in_x = (data.dimX <= offsetX && offsetX <= data.dimX + data.dimW);
-		in_problem_area = in_x && (data.dimY + data.dimH <= e.offsetY && e.offsetY <= data.dimY + data.dimH + 15);
-		in_values_area = in_x && (data.dimY <= e.offsetY && e.offsetY <= data.dimY + data.dimH);
+		in_x = data.dimX <= offsetX && offsetX <= data.dimX + data.dimW;
+		in_problem_area = in_x && data.dimY + data.dimH <= e.offsetY && e.offsetY <= data.dimY + data.dimH + 15;
+		in_values_area = in_x && data.dimY <= e.offsetY && e.offsetY <= data.dimY + data.dimH;
 
 		// Show problems when mouse is in the 15px high area under the graph canvas.
-		if (data.showProblems && data.isHintBoxFrozen === false && in_problem_area) {
+		if (data.showProblems && in_problem_area) {
 			hideHelper(graph);
 
-			var problems = findProblems(graph[0], e.offsetX),
-				problems_total = problems.length;
-			if (problems_total > 0) {
-				var tbody = jQuery('<tbody>');
-
-				problems.slice(0, data.hintMaxRows).forEach(function(val, i) {
-					tbody.append(
-						jQuery('<tr>')
-							.append(jQuery('<td>').append(jQuery('<a>', {'href': val.url}).text(val.clock)))
-							.append(jQuery('<td>').append(val.r_eventid
-								? jQuery('<a>', {'href': val.url}).text(val.r_clock)
-								: val.r_clock)
-							)
-							.append(jQuery('<td>').append(
-								jQuery('<span>', { 'class': val.status_color }).text(val.status))
-							)
-							.append(jQuery('<td>', {'class': val.severity}).text(val.name))
-					);
-				});
-
-				html = jQuery('<div>')
-						.addClass('svg-graph-hintbox')
-						.append(
-							jQuery('<table>')
-								.addClass('list-table compact-view')
-								.append(tbody)
-						)
-						.append(problems_total > data.hintMaxRows
-							? makeHintBoxFooter(data.hintMaxRows, problems_total)
-							: null
-						);
-			}
+			html = getProblemHintboxHtml(e, graph);
 		}
-		// Show graph values if mouse is over the graph canvas.
+		// Show graph values or simple triggers if mouse is over the graph canvas.
 		else if (in_values_area) {
-			// Set position of mouse following helper line.
-			setHelperPosition(e, graph);
+			const triggers = data.showSimpleTriggers ? findTriggers(graph[0], e.offsetY) : [];
 
-			// Find values.
-			var points = hintbox_type === 1
-					? findPointsNearX(graph[0], offsetX)
-					: findValues(graph[0], offsetX),
-				points_total = points.length,
-				show_hint = false,
-				xy_point = false;
+			if (triggers.length > 0) {
+				hideHelper(graph);
 
-			const xy_points = [];
-			/**
-			 * Decide if one specific value or list of all matching Xs should be highlighted and either to show or
-			 * hide hintbox.
-			 */
-			if (data.isHintBoxFrozen === false) {
-				points.forEach(function(point) {
-					if (!show_hint && (hintbox_type === GRAPH_HINTBOX_TYPE_SCATTER_PLOT || point.v !== null)) {
+				html = getSimpleTriggerHintboxHtml(e, triggers);
+			}
+			else {
+				setHelperPosition(e, graph);
+
+				let included_points = [];
+				let show_hint = false;
+
+				if (hintbox_type === GRAPH_HINTBOX_TYPE_SCATTER_PLOT) {
+					const offsetY = e.clientY - graph.offset().top;
+
+					included_points = findScatterPlotPoints(graph[0], offsetX, offsetY);
+
+					if (included_points.length > 0) {
 						show_hint = true;
 					}
 
-					const tolerance = getDataPointTolerance(point.g, hintbox_type);
+					for (const highlighter_point of graph[0].querySelectorAll('g.js-svg-highlight-group')) {
+						highlighter_point.setAttribute('transform', 'translate(-10, -10)');
+					}
 
-					if (!xy_point && (hintbox_type === GRAPH_HINTBOX_TYPE_SCATTER_PLOT || point.v !== null)
-							&& (+point.x + tolerance) > e.offsetX && e.offsetX > (+point.x - tolerance)
-							&& (+point.y + tolerance) > e.offsetY && e.offsetY > (+point.y - tolerance)) {
-						if (hintbox_type === GRAPH_HINTBOX_TYPE_SCATTER_PLOT) {
-							xy_points.push(point);
-							points_total = xy_points.length;
+					included_points.forEach(point => {
+						const point_highlight = point.g.querySelector('g.js-svg-highlight-group');
+
+						point_highlight.setAttribute('transform', point.transform);
+					});
+				}
+				else {
+					const points = findValues(graph[0], offsetX);
+					let xy_point = false;
+					let points_total = points.length;
+
+					/**
+					 * Decide if one specific value or list of all matching Xs should be highlighted and either to
+					 * show or hide hintbox.
+					 */
+					points.forEach(point => {
+						if (!show_hint && point.v !== null) {
+							show_hint = true;
 						}
-						else {
+
+						const tolerance = getDataPointTolerance(point.g);
+
+						if (!xy_point && point.v !== null
+								&& (+point.x + tolerance) > e.offsetX && e.offsetX > (+point.x - tolerance)
+								&& (+point.y + tolerance) > e.offsetY && e.offsetY > (+point.y - tolerance)) {
 							xy_point = point;
 							points_total = 1;
 						}
-					}
-				});
-			}
+					});
 
-			if (hintbox_type === GRAPH_HINTBOX_TYPE_SCATTER_PLOT) {
-				const highlighted_points = graph[0].querySelectorAll('g.js-svg-highlight-group');
+					points.forEach(point => {
+						const point_highlight = point.g.querySelector('.svg-point-highlight');
+						const include_point = point.v !== null && (xy_point === false || xy_point === point);
 
-				for (const highlighted_point of highlighted_points) {
-					highlighted_point.setAttribute('transform', 'translate(-10, -10)');
-				}
-			}
+						if (include_point) {
+							point_highlight.setAttribute('cx', point.x);
+							point_highlight.setAttribute('cy', point.y);
 
-			// Make html for hintbox.
-			if (show_hint) {
-				html = jQuery('<ul>');
-			}
-			let rows_added = 0;
-			points.forEach(function(point) {
-				const point_highlight = hintbox_type === GRAPH_HINTBOX_TYPE_SCATTER_PLOT
-					? point.g.querySelector('g.js-svg-highlight-group')
-					: point.g.querySelector('.svg-point-highlight');
+							if (point.p > 0) {
+								point_highlight.setAttribute('cx', parseInt(point.x) + parseInt(point.p));
+							}
 
-				const include_point = hintbox_type === GRAPH_HINTBOX_TYPE_SCATTER_PLOT
-					? xy_points.includes(point) || xy_points.length === 0
-					: point.v !== null && (xy_point === false || xy_point === point);
-
-				if (include_point) {
-					if (hintbox_type === GRAPH_HINTBOX_TYPE_SCATTER_PLOT) {
-						point_highlight.setAttribute('transform', point.transform);
-					}
-					else {
-						point_highlight.setAttribute('cx', point.x);
-						point_highlight.setAttribute('cy', point.y);
-					}
-
-					if (point.p > 0) {
-						point_highlight.setAttribute('cx', parseInt(point.x) + parseInt(point.p));
-					}
-
-					if (show_hint && data.hintMaxRows > rows_added) {
-						if (data.hintbox_type === GRAPH_HINTBOX_TYPE_SCATTER_PLOT) {
-							const time_from = new CDate(point.time_from * 1000);
-							const time_to = new CDate(point.time_to * 1000);
-
-							jQuery('<li>')
-								.css('margin-top', rows_added > 0 ? '10px' : null)
-								.text(point.g.getAttribute('data-metric-x') + ': ' + point.vx)
-								.append(
-									jQuery('<span>')
-										.css('color', point.color)
-										.addClass('svg-graph-hintbox-icon-color')
-										.addClass(point.marker_class)
-								)
-								.appendTo(html);
-
-							jQuery('<li>')
-								.text(point.g.getAttribute('data-metric-y') + ': ' + point.vy)
-								.append(
-									jQuery('<span>')
-										.css('color', point.color)
-										.addClass('svg-graph-hintbox-icon-color')
-										.addClass(point.marker_class)
-								)
-								.appendTo(html);
-
-							jQuery('<div>')
-								.text(time_from.format(PHP_ZBX_FULL_DATE_TIME) + ' - ' + time_to.format(PHP_ZBX_FULL_DATE_TIME))
-								.appendTo(html);
+							included_points.push(point);
 						}
 						else {
-							jQuery('<li>')
-								.text(point.g.getAttribute('data-metric') + ': ' + point.v)
-								.append(
-									jQuery('<span>')
-										.css('background-color', point.g.getAttribute('data-color'))
-										.addClass('svg-graph-hintbox-item-color')
-								)
-								.appendTo(html);
+							point_highlight.setAttribute('cx', -10);
+							point_highlight.setAttribute('cy', -10);
 						}
-
-						rows_added++;
-					}
-				}
-				else {
-					if (hintbox_type === GRAPH_HINTBOX_TYPE_SCATTER_PLOT) {
-						point_highlight.setAttribute('transform', 'translate(-10, -10)');
-					}
-					else {
-						point_highlight.setAttribute('cx', -10);
-						point_highlight.setAttribute('cy', -10);
-					}
-				}
-			});
-
-			if (show_hint) {
-				const element = jQuery('<div>').addClass('svg-graph-hintbox');
-
-				if (data.hintbox_type === 0) {
-					// Calculate time at mouse position.
-					const time = new CDate((data.timePeriod.from_ts + (offsetX - data.dimX) * data.spp) * 1000);
-
-					element.append(
-						jQuery('<div>')
-							.addClass('header')
-							.html(time.format(PHP_ZBX_FULL_DATE_TIME))
-					);
+					});
 				}
 
-				element
-					.append(html)
-					.append(points_total > data.hintMaxRows
-						? makeHintBoxFooter(data.hintMaxRows, points_total)
-						: null
-					);
+				if (show_hint) {
+					included_points.sort((p1, p2) => {
+						if (hintbox_type === GRAPH_HINTBOX_TYPE_SVG_GRAPH) {
+							return p1.y - p2.y;
+						}
+						else {
+							if (p1.x !== p2.x) {
+								return p2.x - p1.x;
+							}
 
-				html = element;
+							return p1.y - p2.y;
+						}
+					});
+
+					html = getValuesHintboxHtml(included_points, offsetX, data);
+				}
 			}
 		}
 		else {
@@ -800,45 +725,35 @@
 		}
 
 		if (html !== null) {
-			if (hbox === null) {
-				hbox = hintBox.createBox(e, graph, html, '', false, false,
-					graph.closest('.dashboard-grid-widget-container'), false
-				);
-
-				graph
-					.off('mouseup', makeHintboxStatic)
-					.on('mouseup', {graph: graph}, makeHintboxStatic);
-				graph.data('hintbox', hbox);
-			}
-			else {
-				hbox.find('> div').replaceWith(html);
-			}
-
-			graph.hintBoxItem = hbox;
-			repositionHintBox(e, graph);
+			graph[0].dataset.hintboxContents = html[0].outerHTML;
 		}
-
-		if (html === null && (in_values_area || in_problem_area)) {
+		else if (in_values_area || in_problem_area) {
 			destroyHintbox(graph);
 		}
 	}
 
-	// Function creates hintbox footer.
-	function makeHintBoxFooter(num_displayed, num_total) {
-		return jQuery('<div>')
-			.addClass('table-paging')
-			.append(
-				jQuery('<div>')
-					.addClass('paging-btn-container')
-					.append(
-						jQuery('<div>')
-							.text(sprintf(t('S_DISPLAYING_FOUND'), num_displayed, num_total))
-							.addClass('table-stats')
-					)
-		);
+	function findTriggers(graph, y) {
+		const triggers = [];
+
+		for (const node of graph.querySelectorAll('.svg-graph-simple-trigger line')) {
+			const trigger_y = parseInt(node.getAttribute('y1'));
+
+			if (y < trigger_y + 10 && y > trigger_y - 10) {
+				triggers.push({
+					begin_position: parseInt(node.getAttribute('x1')),
+					end_position: parseInt(node.getAttribute('x2')),
+					color: node.parentElement.getAttribute('severity-color'),
+					constant: node.parentElement.getAttribute('constant'),
+					trigger: node.parentElement.getAttribute('description'),
+					elem: node.parentElement
+				});
+			}
+		}
+
+		return triggers;
 	}
 
-	var methods = {
+	const methods = {
 		init: function(widget) {
 			this.each(function() {
 				jQuery(widget._svg)
@@ -850,8 +765,6 @@
 						showProblems: widget._svg_options.show_problems,
 						showSimpleTriggers: widget._svg_options.show_simple_triggers,
 						hintMaxRows: widget._svg_options.hint_max_rows,
-						isHintBoxFrozen: false,
-						isTriggerHintBoxFrozen: false,
 						spp: widget._svg_options.spp || null,
 						timePeriod: widget._svg_options.time_period,
 						minPeriod: widget._svg_options.min_period,
@@ -859,6 +772,7 @@
 						hintbox_type: widget._svg_options.hintbox_type
 					})
 					.data('widget', widget)
+					.data('is_static_hintbox_opened', false)
 					.attr('unselectable', 'on')
 					.css('user-select', 'none');
 
@@ -872,21 +786,27 @@
 			const graph = jQuery(widget._svg);
 			const data = graph.data('options');
 
+			graph[0].dataset.hintbox = '1';
+			graph[0].dataset.hintboxStatic = '1';
+			graph[0].dataset.hintboxDelay = '0';
+			graph[0].dataset.hintboxStaticReopenOnClick = '1';
+
 			graph
 				.on('mousemove', (e) => {
-					showSimpleTriggerHintbox(e, graph);
 					showHintbox(e, graph);
 				})
 				.on('mouseleave', function() {
 					destroyHintbox(graph);
 					hideHelper(graph);
 				})
-				.on('selectstart', false);
+				.on('selectstart', false)
+				.on('onShowStaticHint', (e) => onStaticHintboxOpen(e, graph))
+				.on('onDeleteStaticHint', (e) => onStaticHintboxClose(e, graph));
 
 			if (widget._svg_options.sbox) {
 				graph
 					.on('dblclick', function() {
-						hintBox.hideHint(graph, true);
+						hintBox.hideHint(graph[0], true);
 
 						const widget = graph.data('widget');
 
@@ -916,127 +836,22 @@
 			const widget = jQuery(this).data('widget');
 			const graph = jQuery(widget._svg);
 
+			delete graph[0].dataset.hintbox;
+			delete graph[0].dataset.hintboxStatic;
+			delete graph[0].dataset.hintboxDelay;
+			delete graph[0].dataset.hintboxStaticReopenOnClick;
+
 			destroySBox(e, graph);
-			graph.off('mousemove mouseleave dblclick mousedown selectstart');
-		}
+			graph.off('mousemove mouseleave dblclick mousedown selectstart onShowStaticHint onDeleteStaticHint');
+		},
 	};
 
-	function showSimpleTriggerHintbox(e, graph) {
-		graph = graph || e.data.graph;
-		const data = graph.data('options');
-		let hbox = graph.data('hintbox') || null;
-
-		graph.data('simpleTriggersHintbox', false);
-		let html = null;
-
-		if (!data.showSimpleTriggers || data.isHintBoxFrozen === true) {
-			return;
-		}
-
-		if (data.boxing === true) {
-			hideHelper(graph);
-			return;
-		}
-
-		// Check if mouse in the horizontal area in which hintbox must be shown.
-		const triggers = findTriggers(graph[0], e.offsetY);
-		if (data.isTriggerHintBoxFrozen === false && triggers) {
-			hideHelper(graph);
-
-			const triggers_length = triggers.length;
-			if (triggers_length > 0) {
-				const hint_body = jQuery('<ul></ul>');
-
-				const trigger_areas = triggers.filter((val) => {
-					if (val.begin_position > e.offsetX) {
-						return false;
-					}
-
-					if (e.offsetX > val.end_position) {
-						return false;
-					}
-
-					return true;
-				});
-
-				if (!trigger_areas.length) {
-					return;
-				}
-
-				triggers.slice(0, data.hintMaxRows).forEach((val, i) => {
-					hint_body.append(
-						jQuery('<li>')
-							.text(val.trigger + ' [' + val.constant + ']')
-							.append(
-								jQuery('<span>')
-									.css('background-color', val.color)
-									.addClass('svg-graph-hintbox-trigger-color')
-							)
-					)
-
-					val.elem.classList.toggle('svg-graph-simple-trigger-hover', true)
-				});
-
-				html = jQuery('<div>')
-					.addClass('svg-graph-hintbox')
-					.append(hint_body)
-					.append(triggers_length > data.hintMaxRows
-						? makeHintBoxFooter(data.hintMaxRows, triggers_length)
-						: null
-					);
-
-				graph.data('simpleTriggersHintbox', true);
-			}
-		}
-
-		if (html !== null) {
-			if (hbox === null) {
-				hbox = hintBox.createBox(e, graph, html, '', false, false,
-					graph.closest('.dashboard-grid-widget-container'), false
-				);
-
-				graph
-					.off('mouseup', makeHintboxStatic)
-					.on('mouseup', {graph: graph}, makeHintboxStatic);
-				graph.data('hintbox', hbox);
-			}
-			else {
-				hbox.find('> div').replaceWith(html);
-			}
-
-			graph.hintBoxItem = hbox;
-			repositionHintBox(e, graph);
-		}
-		else {
-			destroyHintbox(graph);
-		}
+	function onStaticHintboxOpen(e, graph) {
+		graph.data('is_static_hintbox_opened', true);
 	}
 
-	function findTriggers(graph, y) {
-		const triggers = [];
-		const nodes = graph.querySelectorAll('.svg-graph-simple-trigger line');
-
-		[...graph.querySelectorAll('.svg-graph-simple-trigger.svg-graph-simple-trigger-hover')].map(
-			(elem) => elem.classList.toggle('svg-graph-simple-trigger-hover', false)
-		);
-
-
-		for (var i = 0, l = nodes.length; l > i; i++) {
-			const trigger_y = parseInt(nodes[i].getAttribute('y1'));
-
-			if (y < trigger_y + 10 && y > trigger_y - 10) {
-				triggers.push({
-					begin_position: parseInt(nodes[i].getAttribute('x1')),
-					end_position: parseInt(nodes[i].getAttribute('x2')),
-					color: nodes[i].parentElement.getAttribute('severity-color'),
-					constant: nodes[i].parentElement.getAttribute('constant'),
-					trigger: nodes[i].parentElement.getAttribute('description'),
-					elem: nodes[i].parentElement
-				});
-			}
-		}
-
-		return triggers;
+	function onStaticHintboxClose(e, graph) {
+		graph.data('is_static_hintbox_opened', false);
 	}
 
 	jQuery.fn.svggraph = function(method) {
