@@ -194,7 +194,7 @@ class testMediatype extends CAPITest {
 		$this->call('mediatype.update', $mediatypes, $expected_error);
 	}
 
-	public static function updateOauthUrlDataProvider(): array {
+	public static function updateValidResetTokenStatusDataProvider(): array {
 		return [
 			'tokens_status is set to 0 when token_url is changed' => [
 				[[
@@ -202,22 +202,22 @@ class testMediatype extends CAPITest {
 					'token_url' => 'http://example123.com',
 					'client_secret' => 'secret'
 				]],
-				'token_url'
+				'tokens_status is set to 0 when token_url is changed'
 			],
 			'tokens_status is set to 0 when authorization_url is changed' => [
 				[[
 					'mediatypeid' => ':media_type:Oauth SMTP authorization_url with tokens_status',
 					'authorization_url' => 'http://example123.com'
 				]],
-				'authorization_url'
+				'tokens_status is set to 0 when authorization_url is changed'
 			]
 		];
 	}
 
 	/**
-	 * @dataProvider updateOauthUrlDataProvider
+	 * @dataProvider updateValidResetTokenStatusDataProvider
 	 */
-	public function testMediatypeUpdateOauthUrlUpdated(array $mediatypes, string $field_name) {
+	public function testMediatypeUpdateUrlResetTokenStatus(array $mediatypes, string $error_message) {
 		CTestDataHelper::convertMediatypesReferences($mediatypes);
 		$this->call('mediatype.update', $mediatypes);
 
@@ -226,8 +226,7 @@ class testMediatype extends CAPITest {
 			'mediatypeids' => array_column($mediatypes, 'mediatypeid')
 		])['result'];
 
-		$this->assertEquals(0, $result[0]['tokens_status'],
-			'tokens_status is set to 0 when '.$field_name.' is changed.');
+		$this->assertEquals(0, $result[0]['tokens_status'], $error_message);
 	}
 
 	public static function updateAccessTokenUpdatedDataProvider(): array {
