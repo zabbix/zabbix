@@ -21,14 +21,15 @@ class CNumberValidator extends CValidator {
 	protected bool $usermacros = false;
 	protected bool $lldmacros = false;
 	protected bool $with_float = true;
+	private int $decimal_scale = 0;
 
 	public function __construct(array $options = []) {
 		if (array_key_exists('min', $options)) {
-			$this->min = (string) $options['min'];
+			$this->min = $this->processComparisonNumber($options['min']);
 		}
 
 		if (array_key_exists('max', $options)) {
-			$this->max = (string) $options['max'];
+			$this->max = $this->processComparisonNumber($options['max']);
 		}
 
 		if (array_key_exists('usermacros', $options)) {
@@ -76,35 +77,80 @@ class CNumberValidator extends CValidator {
 			return true;
 		}
 
-		$scale = getNumDecimals(floatval($value));
+		$value = $this->processComparisonNumber($value);
 
-		if ($this->min !== null) {
-			$precision = getNumDecimals(floatval($this->min));
-
-			if ($precision > $scale) {
-				$scale = $precision;
-			}
-		}
-
-		if ($this->max !== null) {
-			$precision = getNumDecimals(floatval($this->max));
-
-			if ($precision > $scale) {
-				$scale = $precision;
-			}
-		}
-
-		if ($this->min !== null && bccomp($value, $this->min, $scale) == -1) {
+		if ($this->min !== null && bccomp($value, $this->min, $this->decimal_scale) == -1) {
 			$this->setError(_s('value must be greater than or equal to %1$s', $this->min));
 
 			return false;
 		}
-		elseif ($this->max !== null && bccomp($value, $this->max, $scale) == 1) {
+		elseif ($this->max !== null && bccomp($value, $this->max, $this->decimal_scale) == 1) {
 			$this->setError(_s('value must be less than or equal to %1$s', $this->max));
 
 			return false;
 		}
 
 		return true;
+	}
+
+	private function processComparisonNumber(string|float|int $number): string {
+		if (is_int($number)) {
+			return (string) $number;
+		}
+
+		$decimal_scale = is_float($number) ? getNumDecimals($number) : getStringNumDecimals($number);
+
+		if ($decimal_scale > $this->decimal_scale) {
+			$this->decimal_scale = $decimal_scale;
+		}
+
+		return $this->convertNumberToString($number, $decimal_scale);
+	}
+
+	/**
+	 * Converts to string and covers cases not supported by sprintf('%.Nf'):
+	 * - value over PHP_FLOAT_MAX
+	 * - decimal digit count is over 53
+	 *
+	 * @param string|float $number
+	 * @param int $decimal_scale
+	 *
+	 * @return string
+	 */
+	private function convertNumberToString(string|float $number, int $decimal_scale): string {
+		preg_match('/^'.ZBX_PREG_NUMBER.'/', (string) $number, $matches);
+
+		$result = (array_key_exists('int', $matches) ? ltrim($matches['int'], '0') : '') .
+			(array_key_exists('frac', $matches) ? $matches['frac'] : '') .
+			(array_key_exists('frac_only', $matches) ? $matches['frac_only'] : '');
+
+		if ($decimal_scale > 0) {
+			$add_zeroes = $decimal_scale - strlen($result);
+
+			if ($add_zeroes == 0) {
+				$result = '0.'.$result;
+			}
+			elseif ($add_zeroes > 0) {
+				$result = '0.'.str_repeat('0', $add_zeroes).$result;
+			}
+			elseif ($add_zeroes < 0) {
+				$result = ltrim(substr($result, 0, -$add_zeroes), '0') . '.' . substr($result, -$add_zeroes);
+			}
+		}
+		elseif (array_key_exists('exp', $matches)) {
+			$result = ltrim($result, '0');
+
+			$decimal_numbers = array_key_exists('frac', $matches)
+				? strlen($matches['frac'])
+				: (array_key_exists('frac_only', $matches) ? strlen($matches['frac_only']) : 0);
+
+			$add_zeroes = (int) $matches['exp'] - $decimal_numbers;
+
+			if ($add_zeroes > 0) {
+				$result .= str_repeat('0', $add_zeroes);
+			}
+		}
+
+		return $result;
 	}
 }

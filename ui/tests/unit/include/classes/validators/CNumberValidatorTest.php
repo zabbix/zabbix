@@ -28,6 +28,10 @@ class CNumberValidatorTest extends TestCase {
 			['4.2e-5',		[], 																null],
 			['{$MACRO}', 	['usermacros' => true],												null],
 			['{#MACRO}', 	['lldmacros' => true],												null],
+			['1e-100',		['min' => 0],														null],
+			['1.45e999',	['max' => '1e1000'], 												null],
+			['0.3',			['min' => '0.25', 'max' => '0.4'], 									null],
+			['3e-1',		['min' => '0.25', 'max' => '0.4'], 									null],
 
 			// Invalid integer: format.
 			['10z', 		['with_float' => false], 											'value is not a valid integer'],
@@ -59,8 +63,15 @@ class CNumberValidatorTest extends TestCase {
 			['100',			['min' => 130], 													'value must be greater than or equal to 130'],
 			['100.4',		['max' => 100], 													'value must be less than or equal to 100'],
 			['100.3',		['max' => '100.25'], 												'value must be less than or equal to 100.25'],
+			['100.3',		['max' => '0.10025e3'], 											'value must be less than or equal to 100.25'],
+			['100.3',		['max' => '10025e-2'], 												'value must be less than or equal to 100.25'],
+			['100.3',		['max' => '1002.5e-1'], 											'value must be less than or equal to 100.25'],
 			['100.3',		['min' => '100.31'], 												'value must be greater than or equal to 100.31'],
-			['100.31',		['max' => '100.3'], 												'value must be less than or equal to 100.3']
+			['100.31',		['max' => '100.3'], 												'value must be less than or equal to 100.3'],
+			['1e1000',		['max' => '1000'], 													'value must be less than or equal to 1000'],
+			['1e1000',		['max' => '1e3'], 													'value must be less than or equal to 1000'],
+			['1e1000',		['max' => '0.001e6'], 												'value must be less than or equal to 1000'],
+			['1e1000',		['max' => '0.0011e3'], 												'value must be less than or equal to 1.1']
 		];
 	}
 
