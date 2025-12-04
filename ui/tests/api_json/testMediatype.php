@@ -184,7 +184,7 @@ class testMediatype extends CAPITest {
 			]
 		];
 	}
-	
+
 	public function testMediatypeUpdateOauthAuthorizationUrlUpdated() {
 		$mediatype = [
 			'type' => MEDIA_TYPE_EMAIL,
@@ -203,7 +203,7 @@ class testMediatype extends CAPITest {
 			'access_expires_in' => 600,
 			'refresh_token' => 'refreshtoken'
 		];
-		
+
 		$mediatype = $this->call(
 			'mediatype.create',
 			$mediatype+['name' => 'Oauth SMTP with authorization_url']
@@ -242,7 +242,7 @@ class testMediatype extends CAPITest {
 			'access_expires_in' => 600,
 			'refresh_token' => 'refreshtoken'
 		];
-		
+
 		$mediatype = $this->call(
 			'mediatype.create',
 			$mediatype+['name' => 'Oauth SMTP with token_url']
