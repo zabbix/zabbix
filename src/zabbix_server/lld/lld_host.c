@@ -5551,12 +5551,16 @@ static void	lld_interfaces_make(const zbx_vector_lld_interface_ptr_t *interfaces
 			new_interface->port = zbx_strdup(NULL, interface->port);
 			new_interface->port_orig = NULL;
 
+
 			zbx_substitute_lld_macros(&new_interface->ip, host->jp_row, lld_macros, ZBX_MACRO_ANY, NULL, 0);
+			zbx_lrtrim(new_interface->ip, ZBX_WHITESPACE);
 			zbx_substitute_lld_macros(&new_interface->dns, host->jp_row, lld_macros, ZBX_MACRO_ANY, NULL,
 					0);
+			zbx_lrtrim(new_interface->dns, ZBX_WHITESPACE);
 			zbx_substitute_lld_macros(&new_interface->port, host->jp_row, lld_macros, ZBX_MACRO_ANY, NULL,
 					0);
 			zbx_ltrim(new_interface->port, "0");
+			zbx_lrtrim(new_interface->port, ZBX_WHITESPACE);
 
 			if (INTERFACE_TYPE_SNMP == interface->type)
 			{
@@ -5591,14 +5595,19 @@ static void	lld_interfaces_make(const zbx_vector_lld_interface_ptr_t *interfaces
 
 				zbx_substitute_lld_macros(&snmp->community, host->jp_row, lld_macros, ZBX_MACRO_ANY,
 						NULL, 0);
+				zbx_lrtrim(snmp->community, ZBX_WHITESPACE);
 				zbx_substitute_lld_macros(&snmp->securityname, host->jp_row, lld_macros, ZBX_MACRO_ANY,
 						NULL, 0);
+				zbx_lrtrim(snmp->securityname, ZBX_WHITESPACE);
 				zbx_substitute_lld_macros(&snmp->authpassphrase, host->jp_row, lld_macros,
 						ZBX_MACRO_ANY, NULL, 0);
+				zbx_lrtrim(snmp->authpassphrase, ZBX_WHITESPACE);
 				zbx_substitute_lld_macros(&snmp->privpassphrase, host->jp_row, lld_macros,
 						ZBX_MACRO_ANY, NULL, 0);
+				zbx_lrtrim(snmp->privpassphrase, ZBX_WHITESPACE);
 				zbx_substitute_lld_macros(&snmp->contextname, host->jp_row, lld_macros, ZBX_MACRO_ANY,
 						NULL, 0);
+				zbx_lrtrim(snmp->contextname, ZBX_WHITESPACE);
 			}
 			else
 			{
