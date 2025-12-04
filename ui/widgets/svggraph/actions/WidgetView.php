@@ -84,6 +84,9 @@ class WidgetView extends CControllerDashboardWidgetView {
 			'displaying' => [
 				'show_simple_triggers' => $this->fields_values['simple_triggers'] == SVG_GRAPH_SIMPLE_TRIGGERS_ON,
 				'show_working_time' => $this->fields_values['working_time'] == SVG_GRAPH_WORKING_TIME_ON,
+				'show_hostnames' => $this->isTemplateDashboard()
+					? SVG_GRAPH_LABELS_IN_HOSTNAMES_HIDE
+					: $this->fields_values['show_hostnames'],
 				'show_percentile_left' => $this->fields_values['percentile_left'] == SVG_GRAPH_PERCENTILE_LEFT_ON,
 				'percentile_left_value' => $percentile_left_value,
 				'show_percentile_right' => $this->fields_values['percentile_right'] == SVG_GRAPH_PERCENTILE_RIGHT_ON,

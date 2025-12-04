@@ -248,7 +248,6 @@ class CSvgGraph extends CSvg {
 				'name' => $metric['name'],
 				'itemid' => $metric['itemid'],
 				'units' => $metric['units'],
-				'host' => $metric['hosts'][0],
 				'options' => ['order' => $index] + $metric['options']
 			];
 

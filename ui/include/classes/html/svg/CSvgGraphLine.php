@@ -39,7 +39,6 @@ class CSvgGraphLine extends CSvgPath {
 		$this->itemid = $metric['itemid'];
 		$this->item_name = $metric['name'];
 		$this->units = $metric['units'];
-		$this->host = $metric['host'];
 
 		$this->options = $metric['options'] + [
 			'transparency' => CSvgGraph::SVG_GRAPH_DEFAULT_TRANSPARENCY,
