@@ -680,46 +680,56 @@ class CApiService {
 	 */
 	protected function applyQuerySortOptions(string $table_name, string $table_alias, array $options,
 			array $sql_parts): array {
-		$is_count_output = array_key_exists('countOutput', $options) && $options['countOutput'];
-		$is_group_by = array_key_exists('groupBy', $options) && $options['groupBy'];
-		$allowed_sort_fields = $this->sortColumns;
-
-		if ($is_group_by && $is_count_output) {
-			$allowed_sort_fields[] = 'rowscount';
+		if (!$this->sortColumns || !array_key_exists('sortfield', $options)
+				|| in_array($options['sortfield'], [null, '', []], true)) {
+			return $sql_parts;
 		}
 
-		if ($allowed_sort_fields && !zbx_empty($options['sortfield'])) {
-			$options['sortfield'] = is_array($options['sortfield'])
-				? array_unique($options['sortfield'])
-				: [$options['sortfield']];
+		$allowed_sort_fields = $this->sortColumns;
 
-			foreach ($options['sortfield'] as $i => $sortfield) {
-				// Validate sortfield.
-				if (!str_in_array($sortfield, $allowed_sort_fields)
-						|| ($is_group_by && !str_in_array($sortfield, $options['groupBy'])
-								&& (!$is_count_output || $sortfield !== 'rowscount'))) {
-					throw new APIException(ZBX_API_ERROR_INTERNAL,
-						_s('Sorting by field "%1$s" not allowed.', $sortfield)
-					);
-				}
+		if (array_key_exists('groupBy', $options) && $options['groupBy']) {
+			$options['groupBy'] = is_array($options['groupBy'])
+				? array_unique($options['groupBy'])
+				: [$options['groupBy']];
 
-				// Add sort field to order.
-				$sortorder = '';
-				if (is_array($options['sortorder'])) {
-					if (!empty($options['sortorder'][$i])) {
-						$sortorder = $options['sortorder'][$i] === ZBX_SORT_DOWN ? ' '.ZBX_SORT_DOWN : '';
-					}
+			foreach ($options['groupBy'] as $i => $field_name) {
+				if (!is_string($field_name) || !$this->hasField($field_name, $table_name)) {
+					unset($options['groupBy'][$i]);
 				}
-				else {
-					$sortorder = $options['sortorder'] === ZBX_SORT_DOWN ? ' '.ZBX_SORT_DOWN : '';
-				}
+			}
 
-				if ($sortfield === 'rowscount' && $is_group_by && $is_count_output) {
-					$sql_parts['order']['rowscount'] = 'rowscount'.$sortorder;
-				}
-				else {
-					$sql_parts = $this->applyQuerySortField($sortfield, $sortorder, $table_alias, $sql_parts);
-				}
+			$allowed_sort_fields = array_intersect($this->sortColumns, $options['groupBy']);
+
+			if (array_key_exists('countOutput', $options) && $options['countOutput']) {
+				$allowed_sort_fields[] = 'rowscount';
+			}
+		}
+
+		$options['sortfield'] = is_array($options['sortfield'])
+			? array_unique($options['sortfield'])
+			: [$options['sortfield']];
+
+		$common_sort_order = $options['sortorder'] === ZBX_SORT_DOWN ? ' '.ZBX_SORT_DOWN : '';
+
+		foreach ($options['sortfield'] as $i => $sort_field) {
+			if (!in_array($sort_field, $allowed_sort_fields, true)) {
+				throw new APIException(ZBX_API_ERROR_INTERNAL, _s('Sorting by field "%1$s" not allowed.', $sort_field));
+			}
+
+			if (is_array($options['sortorder'])) {
+				$sort_order = array_key_exists($i, $options['sortorder']) && $options['sortorder'][$i] === ZBX_SORT_DOWN
+					? ' '.ZBX_SORT_DOWN
+					: '';
+			}
+			else {
+				$sort_order = $common_sort_order;
+			}
+
+			if ($sort_field === 'rowscount') {
+				$sql_parts['order']['rowscount'] = 'rowscount'.$sort_order;
+			}
+			else {
+				$sql_parts = $this->applyQuerySortField($sort_field, $sort_order, $table_alias, $sql_parts);
 			}
 		}
 
