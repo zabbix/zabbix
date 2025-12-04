@@ -688,11 +688,7 @@ class CApiService {
 		$allowed_sort_fields = $this->sortColumns;
 
 		if (array_key_exists('groupBy', $options) && $options['groupBy']) {
-			$options['groupBy'] = is_array($options['groupBy'])
-				? array_unique($options['groupBy'])
-				: [$options['groupBy']];
-
-			foreach ($options['groupBy'] as $i => $field_name) {
+			foreach (array_unique((array) $options['groupBy']) as $i => $field_name) {
 				if (!is_string($field_name) || !$this->hasField($field_name, $table_name)) {
 					unset($options['groupBy'][$i]);
 				}
@@ -705,13 +701,9 @@ class CApiService {
 			}
 		}
 
-		$options['sortfield'] = is_array($options['sortfield'])
-			? array_unique($options['sortfield'])
-			: [$options['sortfield']];
-
 		$common_sort_order = $options['sortorder'] === ZBX_SORT_DOWN ? ' '.ZBX_SORT_DOWN : '';
 
-		foreach ($options['sortfield'] as $i => $sort_field) {
+		foreach (array_unique((array) $options['sortfield']) as $i => $sort_field) {
 			if (!in_array($sort_field, $allowed_sort_fields, true)) {
 				throw new APIException(ZBX_API_ERROR_INTERNAL, _s('Sorting by field "%1$s" not allowed.', $sort_field));
 			}
