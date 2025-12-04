@@ -40,7 +40,10 @@ class CUrlValidator extends CValidator {
 	public function validate($value) {
 		$options = [
 			'allow_user_macro' => $this->allow_user_macro,
-			'allow_event_tags_macro' => $this->allow_event_tags_macro
+			'allow_event_tags_macro' => $this->allow_event_tags_macro,
+			'allow_inventory_macro' => INVENTORY_URL_MACRO_NONE,
+			'allow_manualinput_macro' => false,
+			'validate_uri_schemes' => (bool) CSettingsHelper::get(CSettingsHelper::VALIDATE_URI_SCHEMES)
 		];
 
 		if (!CHtmlUrlValidator::validate((string) $value, $options)) {
