@@ -98,7 +98,7 @@ class testMediatype extends CAPITest {
 					'token_url' => 'http://example123.com'
 				]],
 				'Invalid parameter "/1": the parameter "client_secret" is missing.'
-			],
+			]
 		];
 	}
 
@@ -210,7 +210,7 @@ class testMediatype extends CAPITest {
 					'authorization_url' => 'http://example123.com'
 				]],
 				'authorization_url'
-			],
+			]
 		];
 	}
 
@@ -226,9 +226,8 @@ class testMediatype extends CAPITest {
 			'mediatypeids' => array_column($mediatypes, 'mediatypeid')
 		])['result'];
 
-		$this->assertEquals(
-			0, $result[0]['tokens_status'], 'tokens_status is set to 0 when '.$field_name.' is changed.'
-		);
+		$this->assertEquals(0, $result[0]['tokens_status'],
+			'tokens_status is set to 0 when '.$field_name.' is changed.');
 	}
 
 	public static function updateAccessTokenUpdatedDataProvider(): array {
