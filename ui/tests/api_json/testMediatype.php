@@ -187,6 +187,7 @@ class testMediatype extends CAPITest {
 
 	public function testMediatypeUpdateOauthAuthorizationUrlUpdated() {
 		$mediatype = [
+			'name' => 'Oauth SMTP with authorization_url',
 			'type' => MEDIA_TYPE_EMAIL,
 			'provider' => CMediatypeHelper::EMAIL_PROVIDER_SMTP,
 			'smtp_server' => 'smtp.generic.com',
@@ -204,10 +205,7 @@ class testMediatype extends CAPITest {
 			'refresh_token' => 'refreshtoken'
 		];
 
-		$mediatype = $this->call(
-			'mediatype.create',
-			$mediatype+['name' => 'Oauth SMTP with authorization_url']
-		)['result'];
+		$mediatype = $this->call('mediatype.create', $mediatype)['result'];
 
 		$this->call('mediatype.update', [
 			'mediatypeid' => $mediatype['mediatypeids'][0],
@@ -226,6 +224,7 @@ class testMediatype extends CAPITest {
 
 	public function testMediatypeUpdateOauthTokenUrlUpdated() {
 		$mediatype = [
+			'name' => 'Oauth SMTP with token_url',
 			'type' => MEDIA_TYPE_EMAIL,
 			'provider' => CMediatypeHelper::EMAIL_PROVIDER_SMTP,
 			'smtp_server' => 'smtp.generic.com',
@@ -243,10 +242,7 @@ class testMediatype extends CAPITest {
 			'refresh_token' => 'refreshtoken'
 		];
 
-		$mediatype = $this->call(
-			'mediatype.create',
-			$mediatype+['name' => 'Oauth SMTP with token_url']
-		)['result'];
+		$mediatype = $this->call('mediatype.create', $mediatype)['result'];
 
 		$this->call('mediatype.update', [
 			'mediatypeid' => $mediatype['mediatypeids'][0],
