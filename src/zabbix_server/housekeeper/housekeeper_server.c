@@ -29,7 +29,6 @@
 #include "zbxcacheconfig.h"
 #include "zbxdb.h"
 #include "zbxipcservice.h"
-#include "zbxstr.h"
 #include "trigger_housekeeper.h"
 #include "housekeeper.h"
 

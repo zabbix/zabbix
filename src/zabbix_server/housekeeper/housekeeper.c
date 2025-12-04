@@ -14,6 +14,8 @@
 
 #include "zbxdb.h"
 #include "zbxcacheconfig.h"
+#include "zbxalgo.h"
+#include "zbxnum.h"
 
 #include "housekeeper.h"
 #include "trigger_housekeeper.h"
