@@ -415,6 +415,7 @@ static int	DBpatch_7050027(void)
 #		undef ZBX_ROLE_RULE_TYPE_STR
 	}
 
+	zbx_db_insert_autoincrement(&db_insert, "role_ruleid");
 	ret = zbx_db_insert_execute(&db_insert);
 
 	zbx_db_insert_clean(&db_insert);
