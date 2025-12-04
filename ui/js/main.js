@@ -254,12 +254,12 @@ const hintBox = {
 	is_rendering: false,
 	show_hint_timer: null,
 
-	// drag variables
+	// Variables related to hintbox dragging.
 	drag_style: null,
 	draggable_element: null,
 	offsetX: 0,
 	offsetY: 0,
-	is_moving: false,
+	is_dragging: false,
 
 	/**
 	 * Initialize hint box event handlers.
@@ -848,31 +848,29 @@ const hintBox = {
 			document.addEventListener('mouseup', hintBox.drag_listeners.dragStop);
 		},
 		dragMove: function(e) {
-			if (!hintBox.is_moving) {
+			if (!hintBox.is_dragging) {
 				const parent = hintBox.draggable_element.offsetParent;
 				const hintbox_rect = hintBox.draggable_element.getBoundingClientRect();
 
-				const min_left = 50 - hintbox_rect.width;
-				const min_top = 0;
 				const max_left = parent.scrollWidth - hintbox_rect.width;
 				const max_top = parent.scrollHeight - hintbox_rect.height;
 
-				const left = Math.min(Math.max(min_left, e.clientX - hintBox.offsetX), max_left);
-				const top = Math.min(Math.max(min_top, e.clientY - hintBox.offsetY), max_top);
+				const left = Math.min(Math.max(0, e.clientX - hintBox.offsetX), max_left);
+				const top = Math.min(Math.max(0, e.clientY - hintBox.offsetY), max_top);
 
-				hintBox.is_moving = true;
+				hintBox.is_dragging = true;
 
 				requestAnimationFrame(() => {
 					hintBox.draggable_element.style.left = `${left}px`;
 					hintBox.draggable_element.style.top = `${top}px`;
 
-					hintBox.is_moving = false;
+					hintBox.is_dragging = false;
 				});
 			}
 		},
 		dragStop: function () {
 			hintBox.drag_style.remove();
-			hintBox.is_moving = false;
+			hintBox.is_dragging = false;
 			hintBox.draggable_element = null;
 
 			document.removeEventListener('mousemove', hintBox.drag_listeners.dragMove);
