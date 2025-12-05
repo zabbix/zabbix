@@ -515,9 +515,9 @@ class CApiService {
 					$sql_parts['select'][] = $fields;
 				}
 			}
-			elseif (array_key_exists('groupBy', $options) && $options['groupBy']) {
+			elseif (array_key_exists('groupBy', $options) && is_array($options['groupBy'])) {
 				foreach ($options['groupBy'] as $field) {
-					if ($this->hasField($field, $table_name)) {
+					if (is_string($field) && $this->hasField($field, $table_name)) {
 						$field = $this->fieldId($field, $table_alias);
 
 						array_unshift($sql_parts['select'], $field);
@@ -526,11 +526,11 @@ class CApiService {
 				}
 			}
 		}
-		elseif (array_key_exists('groupBy', $options) && $options['groupBy']) {
+		elseif (array_key_exists('groupBy', $options) && is_array($options['groupBy']) && $options['groupBy']) {
 			$sql_parts['select'] = [];
 
 			foreach ($options['groupBy'] as $field) {
-				if ($this->hasField($field, $table_name)) {
+				if (is_string($field) && $this->hasField($field, $table_name)) {
 					$field = $this->fieldId($field, $table_alias);
 
 					array_unshift($sql_parts['select'], $field);
@@ -687,21 +687,13 @@ class CApiService {
 
 		$allowed_sort_fields = $this->sortColumns;
 
-		if (array_key_exists('groupBy', $options) && $options['groupBy']) {
-			foreach (array_unique((array) $options['groupBy']) as $i => $field_name) {
-				if (!is_string($field_name) || !$this->hasField($field_name, $table_name)) {
-					unset($options['groupBy'][$i]);
-				}
-			}
-
+		if (array_key_exists('groupBy', $options) && is_array($options['groupBy']) && $options['groupBy']) {
 			$allowed_sort_fields = array_intersect($this->sortColumns, $options['groupBy']);
 
 			if (array_key_exists('countOutput', $options) && $options['countOutput']) {
 				$allowed_sort_fields[] = 'rowscount';
 			}
 		}
-
-		$common_sort_order = $options['sortorder'] === ZBX_SORT_DOWN ? ' '.ZBX_SORT_DOWN : '';
 
 		foreach (array_unique((array) $options['sortfield']) as $i => $sort_field) {
 			if (!in_array($sort_field, $allowed_sort_fields, true)) {
@@ -714,7 +706,7 @@ class CApiService {
 					: '';
 			}
 			else {
-				$sort_order = $common_sort_order;
+				$sort_order = $options['sortorder'] === ZBX_SORT_DOWN ? ' '.ZBX_SORT_DOWN : '';
 			}
 
 			if ($sort_field === 'rowscount') {
