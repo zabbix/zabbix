@@ -880,11 +880,20 @@ sub process_housekeeper($)
 	{
 		return;
 	}
-	elsif ($output{"database"} eq "mysql" || $output{"database"} eq "sqlite3")
+	elsif ($output{"database"} eq "sqlite3")
 	{
 		$triggers .= "create trigger ${table_name}_housekeeping before delete on ${table_name}${eol}\n";
 		$triggers .= "for each row${eol}\n";
-		$triggers .= "insert into housekeeper(object,objectid)${eol}\n";
+		$triggers .= "begin${eol}\n";
+		$triggers .= "insert into housekeeper (object,objectid)${eol}\n";
+		$triggers .= "values (${object},old.${pkey_name});${eol}\n";
+		$triggers .= "end;${eol}\n";
+	}
+	elsif ($output{"database"} eq "mysql")
+	{
+		$triggers .= "create trigger ${table_name}_housekeeping before delete on ${table_name}${eol}\n";
+		$triggers .= "for each row${eol}\n";
+		$triggers .= "insert into housekeeper (object,objectid)${eol}\n";
 		$triggers .= "values (${object},old.${pkey_name});${eol}\n";
 		$triggers .= "\$\$${eol}\n";
 	}
@@ -892,7 +901,7 @@ sub process_housekeeper($)
 	{
 		$triggers .= "create or replace function ${table_name}_housekeeping_proc() returns trigger as \$\$${eol}\n";
 		$triggers .= "begin${eol}\n";
-		$triggers .= "insert into housekeeper(object,objectid) values(${object},old.${pkey_name});${eol}\n";
+		$triggers .= "insert into housekeeper (object,objectid) values(${object},old.${pkey_name});${eol}\n";
 		$triggers .= "return old;${eol}\n";
 		$triggers .= "end;${eol}\n";
 		$triggers .= "\$\$ language plpgsql;${eol}\n";
