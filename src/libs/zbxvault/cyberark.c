@@ -20,15 +20,13 @@
 
 #include "zbxjson.h"
 
-int	zbx_vault_get_kvs_cyberark(const char *vault_url, const char *prefix, const char *token,
+int	zbx_vault_get_kvs_cyberark(const zbx_config_vault_t *config_vault,
 		const char *ssl_cert_file, const char *ssl_key_file, const char *config_source_ip,
 		const char *config_ssl_ca_location, const char *config_ssl_cert_location,
 		const char *config_ssl_key_location, const char *path, long timeout, zbx_kvs_t *kvs, char **error)
 {
 #ifndef HAVE_LIBCURL
-	ZBX_UNUSED(vault_url);
-	ZBX_UNUSED(prefix);
-	ZBX_UNUSED(token);
+	ZBX_UNUSED(config_vault);
 	ZBX_UNUSED(ssl_cert_file);
 	ZBX_UNUSED(ssl_key_file);
 	ZBX_UNUSED(config_source_ip);
@@ -46,13 +44,12 @@ int	zbx_vault_get_kvs_cyberark(const char *vault_url, const char *prefix, const 
 	struct zbx_json_parse	jp, jp_data;
 	int			ret = FAIL;
 	long			response_code;
-
-	ZBX_UNUSED(token);
+	char			*prefix = config_vault->prefix;
 
 	if (NULL == prefix || '\0' == *prefix)
 		prefix = "/AIMWebService/api/Accounts?";
 
-	url = zbx_dsprintf(NULL, "%s%s%s", vault_url, prefix, path);
+	url = zbx_dsprintf(NULL, "%s%s%s", config_vault->url, prefix, path);
 
 	if (SUCCEED != zbx_http_req(url, "Content-Type: application/json", timeout, ssl_cert_file, ssl_key_file,
 			config_source_ip, config_ssl_ca_location, config_ssl_cert_location, config_ssl_key_location,

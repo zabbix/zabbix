@@ -26,6 +26,8 @@ typedef struct
 	char	*tls_key_file;
 	char	*db_path;
 	char	*prefix;
+	char	*app_role_id;
+	char	*app_secret_id;
 }
 zbx_config_vault_t;
 

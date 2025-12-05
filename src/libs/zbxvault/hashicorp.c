@@ -25,62 +25,28 @@
 #include "zbxtime.h"
 #include "zbxnum.h"
 
-int	zbx_vault_get_kvs_hashicorp(const char *vault_url, const char *prefix, const char *token,
+static char	*approle_token;
+
+static int	zbx_vault_app_role_login(const zbx_config_vault_t *config_vault,
 		const char *ssl_cert_file, const char *ssl_key_file, const char *config_source_ip,
 		const char *config_ssl_ca_location, const char *config_ssl_cert_location,
-		const char *config_ssl_key_location, const char *path, long timeout, zbx_kvs_t *kvs, char **error)
+		const char *config_ssl_key_location, long timeout, char **error)
 {
-#ifndef HAVE_LIBCURL
-	ZBX_UNUSED(vault_url);
-	ZBX_UNUSED(prefix);
-	ZBX_UNUSED(token);
-	ZBX_UNUSED(ssl_cert_file);
-	ZBX_UNUSED(ssl_key_file);
-	ZBX_UNUSED(path);
-	ZBX_UNUSED(timeout);
-	ZBX_UNUSED(config_source_ip);
-	ZBX_UNUSED(config_ssl_ca_location);
-	ZBX_UNUSED(config_ssl_cert_location);
-	ZBX_UNUSED(config_ssl_key_location);
-	ZBX_UNUSED(kvs);
-	*error = zbx_dsprintf(*error, "missing cURL library");
-	return FAIL;
-#else
-	char			*out = NULL, *url, header[MAX_STRING_LEN], *left, *right;
-	struct zbx_json_parse	jp, jp_data, jp_data_data;
+	struct zbx_json		json;
+	char			*out = NULL, *login_url;
+	struct zbx_json_parse	jp, jp_data;
 	int			ret = FAIL;
 	long			response_code;
+	size_t			value_alloc = 0;
 
-	if (NULL == token)
-	{
-		*error = zbx_dsprintf(*error, "\"VaultToken\" configuration parameter or \"VAULT_TOKEN\" environment"
-				" variable should be defined");
-		return FAIL;
-	}
+	login_url = zbx_dsprintf(NULL, "%s/v1/auth/approle/login", config_vault->url);
+	zbx_json_init(&json, 1024);
+	zbx_json_addstring(&json, "role_id", config_vault->app_role_id, ZBX_JSON_TYPE_STRING);
+	zbx_json_addstring(&json, "secret_id", config_vault->app_secret_id, ZBX_JSON_TYPE_STRING);
 
-	if (NULL == prefix || '\0' == *prefix)
-	{
-		zbx_strsplit_first(path, '/', &left, &right);
-
-		if (NULL == right)
-		{
-			*error = zbx_dsprintf(*error, "cannot find separator \"\\\" in path");
-			free(left);
-			return FAIL;
-		}
-		url = zbx_dsprintf(NULL, "%s/v1/%s/data/%s", vault_url, left, right);
-
-		zbx_free(right);
-		zbx_free(left);
-	}
-	else
-		url = zbx_dsprintf(NULL, "%s%s%s", vault_url, prefix, path);
-
-	zbx_snprintf(header, sizeof(header), "X-Vault-Token: %s", token);
-
-	if (SUCCEED != zbx_http_req(url, header, timeout, ssl_cert_file, ssl_key_file, config_source_ip,
-			config_ssl_ca_location, config_ssl_cert_location, config_ssl_key_location, &out, NULL,
-			&response_code, error))
+	if (SUCCEED != zbx_http_req(login_url, NULL, timeout, ssl_cert_file, ssl_key_file, config_source_ip,
+			config_ssl_ca_location, config_ssl_cert_location, config_ssl_key_location, &out,
+			json.buffer, &response_code, error))
 	{
 		goto fail;
 	}
@@ -97,14 +63,134 @@ int	zbx_vault_get_kvs_hashicorp(const char *vault_url, const char *prefix, const
 		goto fail;
 	}
 
-	if (SUCCEED != zbx_json_brackets_by_name(&jp, "data", &jp_data))
+	if (SUCCEED != zbx_json_brackets_by_name(&jp, ZBX_PROTO_TAG_AUTH, &jp_data))
+	{
+		*error = zbx_dsprintf(*error, "cannot find the \"%s\" object in the received JSON object.",
+				ZBX_PROTO_TAG_AUTH);
+		goto fail;
+	}
+
+	zbx_free(approle_token);
+
+	if (SUCCEED != zbx_json_value_by_name_dyn(&jp_data, "client_token", &approle_token, &value_alloc, NULL))
+	{
+		*error = zbx_dsprintf(*error, "cannot find the client_token object in the received JSON object.");
+		goto fail;
+	}
+
+	if (NULL == approle_token || '\0' == *approle_token)
+	{
+		*error = zbx_dsprintf(*error, "unable to receive token");
+		goto fail;
+	}
+
+	ret = SUCCEED;
+fail:
+	zbx_free(out);
+	zbx_json_free(&json);
+	return ret;
+}
+
+int	zbx_vault_get_kvs_hashicorp(const zbx_config_vault_t *config_vault,
+		const char *ssl_cert_file, const char *ssl_key_file, const char *config_source_ip,
+		const char *config_ssl_ca_location, const char *config_ssl_cert_location,
+		const char *config_ssl_key_location, const char *path, long timeout, zbx_kvs_t *kvs, char **error)
+{
+#ifndef HAVE_LIBCURL
+	ZBX_UNUSED(config_vault);
+	ZBX_UNUSED(ssl_cert_file);
+	ZBX_UNUSED(ssl_key_file);
+	ZBX_UNUSED(path);
+	ZBX_UNUSED(timeout);
+	ZBX_UNUSED(config_source_ip);
+	ZBX_UNUSED(config_ssl_ca_location);
+	ZBX_UNUSED(config_ssl_cert_location);
+	ZBX_UNUSED(config_ssl_key_location);
+	ZBX_UNUSED(kvs);
+	*error = zbx_dsprintf(*error, "missing cURL library");
+	return FAIL;
+#else
+	char			*out = NULL, *url, header[MAX_STRING_LEN], *left, *right;
+	struct zbx_json_parse	jp, jp_data, jp_data_data;
+	int			ret = FAIL;
+	long			response_code;
+	int			retry_login = 0;
+
+	if (NULL == approle_token && config_vault->app_role_id != NULL)
+	{
+		if (FAIL == (ret = zbx_vault_app_role_login(config_vault, ssl_cert_file, ssl_key_file, config_source_ip,
+				config_ssl_ca_location, config_ssl_cert_location, config_ssl_key_location, timeout,
+				error)))
+		{
+			return FAIL;
+		}
+	}
+
+	if (NULL == config_vault->prefix || '\0' == *config_vault->prefix)
+	{
+		zbx_strsplit_first(path, '/', &left, &right);
+
+		if (NULL == right)
+		{
+			*error = zbx_dsprintf(*error, "cannot find separator \"\\\" in path");
+			free(left);
+			return FAIL;
+		}
+		url = zbx_dsprintf(NULL, "%s/v1/%s/data/%s", config_vault->url, left, right);
+
+		zbx_free(right);
+		zbx_free(left);
+	}
+	else
+		url = zbx_dsprintf(NULL, "%s%s%s", config_vault->url, config_vault->prefix, path);
+
+	for (;;)
+	{
+		zbx_snprintf(header, sizeof(header), "X-Vault-Token: %s",
+			(NULL != approle_token) ? approle_token : config_vault->token);
+
+		if (SUCCEED != zbx_http_req(url, header, timeout, ssl_cert_file, ssl_key_file, config_source_ip,
+				config_ssl_ca_location, config_ssl_cert_location, config_ssl_key_location, &out, NULL,
+				&response_code, error))
+		{
+			goto fail;
+		}
+
+		if (403 == response_code && 0 == retry_login)
+		{
+			if (FAIL == (ret = zbx_vault_app_role_login(config_vault, ssl_cert_file, ssl_key_file,
+					config_source_ip, config_ssl_ca_location, config_ssl_cert_location,
+					config_ssl_key_location, timeout, error)))
+			{
+				goto fail;
+			}
+
+			retry_login = 1;
+			continue;
+		}
+		break;
+	}
+
+	if (200 != response_code && 204 != response_code)
+	{
+		*error = zbx_dsprintf(*error, "unsuccessful response code \"%ld\"", response_code);
+		goto fail;
+	}
+
+	if (SUCCEED != zbx_json_open(out, &jp))
+	{
+		*error = zbx_dsprintf(*error, "cannot parse secrets from vault: %s", zbx_json_strerror());
+		goto fail;
+	}
+
+	if (SUCCEED != zbx_json_brackets_by_name(&jp, ZBX_PROTO_TAG_DATA, &jp_data))
 	{
 		*error = zbx_dsprintf(*error, "cannot find the \"%s\" object in the received JSON object.",
 				ZBX_PROTO_TAG_DATA);
 		goto fail;
 	}
 
-	if (SUCCEED != zbx_json_brackets_by_name(&jp_data, "data", &jp_data_data))
+	if (SUCCEED != zbx_json_brackets_by_name(&jp_data, ZBX_PROTO_TAG_DATA, &jp_data_data))
 	{
 		*error = zbx_dsprintf(*error, "cannot find the \"%s\" object in the received \"%s\" JSON object.",
 				ZBX_PROTO_TAG_DATA, ZBX_PROTO_TAG_DATA);
@@ -145,7 +231,9 @@ void	zbx_vault_renew_token_hashicorp(const char *vault_url, const char *token, c
 	static int		renewable, last_status = SUCCEED;
 	static double		next_renew, next_try_after_error;
 
-	if (NULL == token)
+	if (NULL != approle_token)
+		token = approle_token;
+	else if (NULL == token)
 		return;
 
 	if (SUCCEED != last_status && zbx_time() < next_try_after_error)
