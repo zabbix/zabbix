@@ -69,9 +69,18 @@ class CNumberValidatorTest extends TestCase {
 			['100.3',		['min' => '100.31'], 												'value must be greater than or equal to 100.31'],
 			['100.31',		['max' => '100.3'], 												'value must be less than or equal to 100.3'],
 			['1e1000',		['max' => '1000'], 													'value must be less than or equal to 1000'],
+			['1e1000',		['max' => 1e3], 													'value must be less than or equal to 1000'],
 			['1e1000',		['max' => '1e3'], 													'value must be less than or equal to 1000'],
 			['1e1000',		['max' => '0.001e6'], 												'value must be less than or equal to 1000'],
-			['1e1000',		['max' => '0.0011e3'], 												'value must be less than or equal to 1.1']
+			['1e1000',		['max' => 0.001e6], 												'value must be less than or equal to 1000'],
+			['1e1000',		['max' => '0.0011e3'], 												'value must be less than or equal to 1.1'],
+			['1e1000',		['max' => 0.0011e3], 												'value must be less than or equal to 1.1'],
+			[1,				['max' => '.01'],													'value must be less than or equal to 0.01'],
+			[1,				['max' => .01],														'value must be less than or equal to 0.01'],
+			[1,				['max' => '.01e-4'],												'value must be less than or equal to 0.000001'],
+			[1,				['max' => .01e-4],													'value must be less than or equal to 0.000001'],
+			[1,				['min' => ZBX_MAX_UINT64],											'value must be greater than or equal to '.ZBX_MAX_UINT64],
+			['.01',			['min' => '.012'],													'value must be greater than or equal to 0.012']
 		];
 	}
 

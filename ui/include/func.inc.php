@@ -1404,7 +1404,7 @@ function getNumDecimals(float $number): int {
 function getStringNumDecimals(string $number): int {
 	preg_match('/^'.ZBX_PREG_NUMBER.'/', $number, $matches);
 
-	$decimals_before_e = array_key_exists('frac', $matches)
+	$decimals_before_e = (array_key_exists('frac', $matches) && strlen($matches['frac']) > 0)
 		? strlen($matches['frac'])
 		: (array_key_exists('frac_only', $matches) ? strlen($matches['frac_only']) : 0);
 

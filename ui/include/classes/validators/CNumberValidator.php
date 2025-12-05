@@ -104,53 +104,61 @@ class CNumberValidator extends CValidator {
 			$this->decimal_scale = $decimal_scale;
 		}
 
-		return $this->convertNumberToString($number, $decimal_scale);
+		if (is_float($number)) {
+			return number_format($number, $decimal_scale, '.', '');
+		}
+
+		return $this->convertNumberToNonScientificNumber($number);
 	}
 
-	/**
-	 * Converts to string and covers cases not supported by sprintf('%.Nf'):
-	 * - value over PHP_FLOAT_MAX
-	 * - decimal digit count is over 53
-	 *
-	 * @param string|float $number
-	 * @param int $decimal_scale
-	 *
-	 * @return string
-	 */
-	private function convertNumberToString(string|float $number, int $decimal_scale): string {
-		preg_match('/^'.ZBX_PREG_NUMBER.'/', (string) $number, $matches);
+	private function convertNumberToNonScientificNumber(string $number): string {
+		preg_match('/^'.ZBX_PREG_NUMBER.'/', $number, $matches);
 
-		$result = (array_key_exists('int', $matches) ? ltrim($matches['int'], '0') : '') .
-			(array_key_exists('frac', $matches) ? $matches['frac'] : '') .
-			(array_key_exists('frac_only', $matches) ? $matches['frac_only'] : '');
-
-		if ($decimal_scale > 0) {
-			$add_zeroes = $decimal_scale - strlen($result);
-
-			if ($add_zeroes == 0) {
-				$result = '0.'.$result;
-			}
-			elseif ($add_zeroes > 0) {
-				$result = '0.'.str_repeat('0', $add_zeroes).$result;
-			}
-			elseif ($add_zeroes < 0) {
-				$result = ltrim(substr($result, 0, -$add_zeroes), '0') . '.' . substr($result, -$add_zeroes);
-			}
+		if (!array_key_exists('exp', $matches)) {
+			return (array_key_exists('frac_only', $matches) ? '0'.$number : $number);
 		}
-		elseif (array_key_exists('exp', $matches)) {
-			$result = ltrim($result, '0');
 
-			$decimal_numbers = array_key_exists('frac', $matches)
-				? strlen($matches['frac'])
-				: (array_key_exists('frac_only', $matches) ? strlen($matches['frac_only']) : 0);
+		$add_zeroes = (int) $matches['exp'];
+		$int_part = (array_key_exists('int', $matches) ? $matches['int'] : '');
 
-			$add_zeroes = (int) $matches['exp'] - $decimal_numbers;
+		$float_part = (array_key_exists('frac', $matches) && strlen($matches['frac']) > 0)
+			? $matches['frac']
+			: (array_key_exists('frac_only', $matches) ? $matches['frac_only'] : '');
+
+		$int_part = ltrim($int_part, '0');
+		$float_part = rtrim($float_part, '0');
+
+		if ($add_zeroes > 0) {
+			$move_length = strlen($float_part) > $add_zeroes ? $add_zeroes : strlen($float_part);
+
+			if ($move_length > 0) {
+				$int_part .= substr($float_part, 0, $move_length);
+				$float_part = substr($float_part, $move_length);
+				$add_zeroes -= $move_length;
+			}
 
 			if ($add_zeroes > 0) {
-				$result .= str_repeat('0', $add_zeroes);
+				$int_part = $int_part.str_repeat('0', $add_zeroes);
+			}
+		}
+		else {
+			$add_zeroes = -$add_zeroes;
+			$move_length = strlen($int_part) > $add_zeroes ? $add_zeroes : strlen($int_part);
+
+			if ($move_length > 0) {
+				$float_part = substr($int_part, -$move_length).$float_part;
+				$int_part = substr($int_part, 0, strlen($int_part) - $move_length);
+				$add_zeroes -= $move_length;
+			}
+
+			if ($add_zeroes > 0) {
+				$float_part = str_repeat('0', $add_zeroes).$float_part;
 			}
 		}
 
-		return $result;
+		$int_part = ltrim($int_part, '0');
+		$float_part = rtrim($float_part, '0');
+
+		return ($int_part === '' ? '0' : $int_part).($float_part === '' ? '' : '.'.$float_part);
 	}
 }
