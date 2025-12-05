@@ -884,7 +884,7 @@ sub process_housekeeper($)
 	{
 		$triggers .= "create trigger ${table_name}_housekeeping before delete on ${table_name}${eol}\n";
 		$triggers .= "for each row${eol}\n";
-		$triggers .= "insert into housekeeper(object,objectid)${eol}\n"
+		$triggers .= "insert into housekeeper(object,objectid)${eol}\n";
 		$triggers .= "values (${object},old.${pkey_name});${eol}\n";
 		$triggers .= "\$\$${eol}\n";
 	}
