@@ -1534,6 +1534,10 @@ class CConfigurationExportBuilder {
 			}
 
 			switch ($widget_field_a['type']) {
+				case ZBX_WIDGET_FIELD_TYPE_GROUP:
+					$value_fields = ['name'];
+					break;
+
 				case ZBX_WIDGET_FIELD_TYPE_HOST:
 					$value_fields = ['host'];
 					break;

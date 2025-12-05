@@ -3757,6 +3757,7 @@ class C80XmlValidator extends CXmlValidatorGeneral {
 			case CXmlConstantName::DASHBOARD_WIDGET_FIELD_TYPE_SLA:
 			case CXmlConstantName::DASHBOARD_WIDGET_FIELD_TYPE_ACTION:
 			case CXmlConstantName::DASHBOARD_WIDGET_FIELD_TYPE_MEDIA_TYPE:
+			case CXmlConstantValue::DASHBOARD_WIDGET_FIELD_TYPE_GROUP:
 			case CXmlConstantValue::DASHBOARD_WIDGET_FIELD_TYPE_MAP:
 			case CXmlConstantValue::DASHBOARD_WIDGET_FIELD_TYPE_SERVICE:
 			case CXmlConstantValue::DASHBOARD_WIDGET_FIELD_TYPE_SLA:

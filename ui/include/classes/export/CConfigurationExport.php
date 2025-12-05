@@ -503,7 +503,7 @@ class CConfigurationExport {
 	}
 
 	/**
-	 * Get dashboards for export from database.
+	 * Get global dashboards for export from database.
 	 *
 	 * @param array $dashboardids
 	 */
@@ -531,8 +531,8 @@ class CConfigurationExport {
 	 * @return array
 	 */
 	protected function prepareDashboardPages(array $dashboard_pages): array {
-		$hostids = [];
 		$hostgroupids = [];
+		$hostids = [];
 		$itemids = [];
 		$graphids = [];
 		$mapids = [];
@@ -593,8 +593,8 @@ class CConfigurationExport {
 			}
 		}
 
+		$host_groups = $this->getGroupsReferences(array_keys($hostgroupids));
 		$hosts = $this->getHostsReferences(array_keys($hostids));
-		$host_groups = $this->getHostGroupsReferences(array_keys($hostgroupids));
 		$items = $this->getItemsReferences(array_keys($itemids));
 		$graphs = $this->getGraphsReferences(array_keys($graphids));
 		$sysmaps = $this->getMapsReferences(array_keys($mapids));
@@ -1811,34 +1811,6 @@ class CConfigurationExport {
 
 		foreach ($hosts as $id => $host) {
 			$ids[$id] = ['host' => $host['host']];
-		}
-
-		return $ids;
-	}
-
-	/**
-	 * Get host group references by host group IDs.
-	 *
-	 * @param array $groupIds
-	 *
-	 * @return array
-	 */
-	protected function getHostGroupsReferences(array $groupIds) {
-		$ids = [];
-
-		$groups = API::HostGroup()->get([
-			'groupids' => $groupIds,
-			'output' => ['name'],
-			'preservekeys' => true
-		]);
-
-		// Access denied for some objects?
-		if (count($groups) != count($groupIds)) {
-			throw new CConfigurationExportException();
-		}
-
-		foreach ($groups as $id => $group) {
-			$ids[$id] = ['name' => $group['name']];
 		}
 
 		return $ids;
