@@ -302,8 +302,8 @@ int	housekeeper_process(int config_max_hk_delete)
 		zbx_vector_hk_housekeeper_create(&ids[i]);
 	}
 
-	result = zbx_db_select_n("select housekeeperid,object,objectid"
-			" from housekeeper", config_max_hk_delete);
+	result = zbx_db_select("select housekeeperid,object,objectid"
+			" from housekeeper");
 
 	while (NULL != (row = zbx_db_fetch(result)))
 	{
