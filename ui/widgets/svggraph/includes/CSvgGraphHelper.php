@@ -73,7 +73,7 @@ class CSvgGraphHelper {
 			$show_hostnames
 		);
 
-		if ($options['show_hostnames'] == SVG_GRAPH_LABELS_IN_HOSTNAMES_AUTO) {
+		if ($options['displaying']['show_hostnames'] == SVG_GRAPH_LABELS_IN_HOSTNAMES_AUTO) {
 			$show_hostnames = self::hasMetricsMultipleHosts($metrics);
 		}
 
