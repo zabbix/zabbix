@@ -44,10 +44,10 @@ class CTimeUnitValidatorTest extends TestCase {
 
 			// Invalid time: out of min/max range.
 			['100s',		['max' => 30], 									'value must be between 0 and 30s'],
-			['100s',		['max' => 60], 									'value must be between 0 and 1m'],
-			['100s',		['max' => 61], 									'value must be between 0 and 1m 1s (61s)'],
-			['100s',		['max' => 90], 									'value must be between 0 and 1m 30s (90s)'],
-			['100s',		['min' => SEC_PER_HOUR, 'max' => SEC_PER_DAY], 	'value must be between 1h (3600s) and 1d (86400s)']
+			['100s',		['max' => 60], 									'value must be between 0 and 60s (1m)'],
+			['100s',		['max' => 61], 									'value must be between 0 and 61s (1m 1s)'],
+			['100s',		['max' => 90], 									'value must be between 0 and 90s (1m 30s)'],
+			['100s',		['min' => SEC_PER_HOUR, 'max' => SEC_PER_DAY], 	'value must be between 3600s (1h) and 86400s (1d)']
 		];
 	}
 
