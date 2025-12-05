@@ -30,14 +30,19 @@ const (
 	pluginName = "Docker"
 )
 
+var (
+	// short or long docker container id.
+	containerIDRegex = regexp.MustCompile(`^[a-f0-9]{12,64}$`)
+	// custom name that starts with a letter and has maximum 63 signs (DNS limit).
+	containerNameRegex = regexp.MustCompile(`^[a-zA-Z0-9][a-zA-Z0-9_.-]{0,62}$`)
+)
+
 // Plugin inherits plugin.Base and store plugin-specific data.
 type Plugin struct {
 	plugin.Base
 
-	options            Options
-	client             *http.Client
-	containerIDRegex   *regexp.Regexp
-	containerNameRegex *regexp.Regexp
+	options Options
+	client  *http.Client
 }
 
 //nolint:gochecknoinits // this is plugin only one init function.
@@ -91,11 +96,13 @@ func (p *Plugin) Export(key string, rawParams []string, _ plugin.ContextProvider
 
 		return handler(p.client, query)
 	case handlers.KeyContainerInfo:
-		if !p.isValidContainerIdentifier(params["container"]) {
+		container := params["Container"]
+
+		if !isValidContainerIdentifier(container) {
 			return nil, errs.New("invalid container identifier")
 		}
 
-		query = fmt.Sprintf(queryPath, params["container"])
+		query = fmt.Sprintf(queryPath, container)
 
 		info := params["Info"]
 		if info != "full" && info != "short" {
@@ -104,11 +111,12 @@ func (p *Plugin) Export(key string, rawParams []string, _ plugin.ContextProvider
 
 		return handler(p.client, query, info)
 	case handlers.KeyContainerStats:
-		if !p.isValidContainerIdentifier(params["container"]) {
+		container := params["Container"]
+		if !isValidContainerIdentifier(container) {
 			return nil, errs.New("invalid container identifier")
 		}
 
-		query = fmt.Sprintf(queryPath, params["container"])
+		query = fmt.Sprintf(queryPath, container)
 
 		return handler(p.client, query)
 	default:
@@ -116,12 +124,12 @@ func (p *Plugin) Export(key string, rawParams []string, _ plugin.ContextProvider
 	}
 }
 
-func (p *Plugin) isValidContainerIdentifier(id string) bool {
-	if p.containerIDRegex.MatchString(id) {
+func isValidContainerIdentifier(id string) bool {
+	if containerIDRegex.MatchString(id) {
 		return true
 	}
 
-	if p.containerNameRegex.MatchString(id) {
+	if containerNameRegex.MatchString(id) {
 		return true
 	}
 

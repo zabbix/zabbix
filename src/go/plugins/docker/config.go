@@ -18,7 +18,6 @@ import (
 	"context"
 	"net"
 	"net/http"
-	"regexp"
 	"strings"
 	"time"
 
@@ -56,9 +55,6 @@ func (p *Plugin) Configure(global *plugin.GlobalOptions, options any) {
 		Transport: transport,
 		Timeout:   time.Duration(p.options.Timeout) * time.Second,
 	}
-
-	p.containerIDRegex = regexp.MustCompile(`^[a-f0-9]{12,64}$`)
-	p.containerNameRegex = regexp.MustCompile(`^[a-zA-Z0-9][a-zA-Z0-9_.-]{0,62}$`)
 }
 
 // Validate implements the plugin.Configurator interface.
