@@ -47,7 +47,7 @@ $html_page = (new CHtmlPage())
 				)
 				->addItem(
 					(new CSimpleButton(_('Import')))
-						->setId('dashboard_import')
+						->addClass('js-import')
 						->setEnabled($data['allowed_edit'])
 				)
 				->addItem(get_icon('kioskmode', ['mode' => $web_layout_mode]))
@@ -148,7 +148,7 @@ $html_page
 	->show();
 
 (new CScriptTag('
-	view.init('.json_encode(['csrf_token' => CCsrfTokenHelper::get('import')]).');
+	view.init('.json_encode(['import_csrf_token' => CCsrfTokenHelper::get('import')]).');
 '))
 	->setOnDocumentReady()
 	->show();

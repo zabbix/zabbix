@@ -21,22 +21,23 @@
 
 <script>
 	const view = new class {
-		#csrf_token;
+		#import_csrf_token;
 
-		init({csrf_token}) {
-			this.#csrf_token = csrf_token;
+		init({import_csrf_token}) {
+			this.#import_csrf_token = import_csrf_token;
 			this.#initEvents();
 		}
 
 		#initEvents () {
-			document.getElementById('dashboard_import').addEventListener('click', () => this.#import());
+			document.querySelector(`.${ZBX_STYLE_HEADER_CONTROLS} .js-import`)
+				.addEventListener('click', () => this.#import());
 		}
 
 		#import() {
 			return PopUp('popup.import',
 				{
 					rules_preset: 'dashboard',
-					[CSRF_TOKEN_NAME]: this.#csrf_token
+					[CSRF_TOKEN_NAME]: this.#import_csrf_token
 				},
 				{
 					dialogueid: 'popup_import',
