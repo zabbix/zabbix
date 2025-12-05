@@ -882,9 +882,10 @@ sub process_housekeeper($)
 	}
 	elsif ($output{"database"} eq "mysql" || $output{"database"} eq "sqlite3")
 	{
-		$triggers .= "create trigger ${table_name}_housekeeping${eol}\n";
-		$triggers .= "before delete on ${table_name} for each row${eol}\n";
-		$triggers .= "insert into housekeeper(object,objectid) values(${object},old.${pkey_name});${eol}\n";
+		$triggers .= "create trigger ${table_name}_housekeeping before delete on ${table_name}${eol}\n";
+		$triggers .= "for each row${eol}\n";
+		$triggers .= "insert into housekeeper(object,objectid)${eol}\n"
+		$triggers .= "values (${object},old.${pkey_name});${eol}\n";
 		$triggers .= "\$\$${eol}\n";
 	}
 	elsif ($output{"database"} eq "postgresql")
