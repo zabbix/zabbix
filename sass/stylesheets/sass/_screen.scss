@@ -2549,6 +2549,22 @@ div {
 		.svg-graph-hintbox-trigger-color {
 			border-radius: 50%;
 		}
+
+		.has-broadcast-data {
+			cursor: pointer;
+
+			&:hover {
+				background-color: $action-hover-color;
+			}
+
+			&.selected {
+				@extend %found-bg;
+
+				&:hover {
+					@extend %found-bg;
+				}
+			}
+		}
 	}
 
 	.header {

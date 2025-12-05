@@ -17,6 +17,10 @@ class CWidgetScatterPlot extends CWidget {
 
 	static DATASET_TYPE_SINGLE_ITEM = 0;
 
+	#selected_itemid = null;
+	#selected_ds = null;
+	#is_default_selected_itemid = true;
+
 	onInitialize() {
 		this._has_contents = false;
 		this._svg_options = {};
@@ -105,6 +109,13 @@ class CWidgetScatterPlot extends CWidget {
 		if (response.svg_options !== undefined) {
 			this._has_contents = true;
 
+			if (this.#is_default_selected_itemid) {
+				const {itemid, ds} = response.svg_options.first_metric_to_broadcast;
+				this.updateItemSelector(itemid, ds, true);
+
+				this.#broadcast();
+			}
+
 			this._initGraph({
 				sbox: false,
 				hint_max_rows: 20,
@@ -118,12 +129,32 @@ class CWidgetScatterPlot extends CWidget {
 		}
 	}
 
+	updateItemSelector(itemid, ds, is_default_selected_itemid = false) {
+		this.#selected_itemid = itemid;
+		this.#selected_ds = ds;
+
+		this.#is_default_selected_itemid = is_default_selected_itemid;
+
+		this.#broadcast();
+	}
+
+	getItemBroadcasting() {
+		return {itemid: this.#selected_itemid, ds: this.#selected_ds}
+	}
+
 	onClearContents() {
 		if (this._has_contents) {
 			this._deactivateGraph();
 
 			this._has_contents = false;
 		}
+	}
+
+	#broadcast() {
+		this.broadcast({
+			[CWidgetsData.DATA_TYPE_ITEM_ID]: [this.#selected_itemid],
+			[CWidgetsData.DATA_TYPE_ITEM_IDS]: [this.#selected_itemid]
+		});
 	}
 
 	_initGraph(options) {

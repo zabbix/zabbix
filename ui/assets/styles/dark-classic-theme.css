@@ -8047,6 +8047,10 @@ z-select[disabled] .focusable, input[disabled], textarea[disabled], select optio
       display: block; }
     .svg-graph-hintbox li .svg-graph-hintbox-trigger-color {
       border-radius: 50%; }
+    .svg-graph-hintbox li .has-broadcast-data {
+      cursor: pointer; }
+      .svg-graph-hintbox li .has-broadcast-data:hover {
+        background-color: #454545; }
   .svg-graph-hintbox .header {
     margin: 0 0 10px 3px; }
 
@@ -8274,7 +8278,7 @@ z-select[disabled] .focusable, input[disabled], textarea[disabled], select optio
 
 .navigation-tree .navigation-tree-node-is-selected > .navigation-tree-node-info, .navigation-tree .navigation-tree-node-is-selected > .navigation-tree-node-info:hover, div.dashboard-widget-itemhistory .list-table tr.selected td,
 div.dashboard-widget-itemhistory .list-table td.selected, div.dashboard-widget-itemhistory .list-table tr.selected td:hover,
-div.dashboard-widget-itemhistory .list-table td.selected:hover, div.dashboard-widget-navtree .navtree .tree .tree-item.selected > .tree-row, div.dashboard-widget-navtree .navtree .tree .tree-item.selected > .tree-row:hover, .drag-drop-area {
+div.dashboard-widget-itemhistory .list-table td.selected:hover, div.dashboard-widget-navtree .navtree .tree .tree-item.selected > .tree-row, div.dashboard-widget-navtree .navtree .tree .tree-item.selected > .tree-row:hover, .drag-drop-area, .svg-graph-hintbox li .has-broadcast-data.selected, .svg-graph-hintbox li .has-broadcast-data.selected:hover {
   background-color: #2f280a; }
 
 @keyframes is-loading-kf {

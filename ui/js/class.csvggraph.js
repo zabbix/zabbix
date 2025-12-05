@@ -532,68 +532,93 @@
 	}
 
 	function getValuesHintboxHtml(included_points, offsetX, data) {
-		let html = jQuery('<ul>');
 		let rows_added = 0;
 
-		for (const point of included_points) {
-			if (data.hintbox_type === GRAPH_HINTBOX_TYPE_SCATTER_PLOT) {
+		const hintbox_container = document.createElement('div');
+		hintbox_container.classList.add('svg-graph-hintbox');
+
+		const html = document.createElement('ul');
+
+		if (data.hintbox_type === GRAPH_HINTBOX_TYPE_SCATTER_PLOT) {
+			for (const point of included_points) {
 				const time_from = new CDate(point.time_from * 1000);
 				const time_to = new CDate(point.time_to * 1000);
 
-				jQuery('<li>')
-					.css('margin-top', rows_added > 0 ? '10px' : null)
-					.text(point.g.getAttribute('data-metric-x') + ': ' + point.vx)
-					.append(
-						jQuery('<span>')
-							.css('color', point.color)
-							.addClass('svg-graph-hintbox-icon-color')
-							.addClass(point.marker_class)
-					)
-					.appendTo(html);
+				const aggregation_name = point.g.getAttribute('data-aggregation-name');
+				const ds_id = point.g.getAttribute('data-ds');
 
-				jQuery('<li>')
-					.text(point.g.getAttribute('data-metric-y') + ': ' + point.vy)
-					.append(
-						jQuery('<span>')
-							.css('color', point.color)
-							.addClass('svg-graph-hintbox-icon-color')
-							.addClass(point.marker_class)
-					)
-					.appendTo(html);
+				for (const key of ['data-x-items', 'data-y-items']) {
+					const items_data = Object.entries(JSON.parse(point.g.getAttribute(key)));
 
-				jQuery('<div>')
-					.text(time_from.format(PHP_ZBX_FULL_DATE_TIME) + ' - ' + time_to.format(PHP_ZBX_FULL_DATE_TIME))
-					.appendTo(html);
-			}
-			else {
-				jQuery('<li>')
-					.text(point.g.getAttribute('data-metric') + ': ' + point.v)
-					.append(
-						jQuery('<span>')
-							.css('background-color', point.g.getAttribute('data-color'))
-							.addClass('svg-graph-hintbox-item-color')
-					)
-					.appendTo(html);
+					const li = document.createElement('li');
+					li.style.marginTop = key === 'data-x-items' && rows_added > 0 ? '10px' : null;
+
+					let count = 0;
+
+					li.append(`${aggregation_name}(`);
+
+					for (const [itemid, name] of items_data) {
+						count++;
+
+						const item_span = document.createElement('span');
+						item_span.classList.add('has-broadcast-data');
+						item_span.setAttribute('data-itemid', itemid);
+						item_span.setAttribute('data-ds', ds_id);
+						item_span.innerText = name.toString();
+
+						li.append(item_span);
+
+						if (count !== items_data.length && count > 0) {
+							li.append(', ');
+						}
+					}
+
+					li.append(`): ${key === 'data-x-items' ? point.vx : point.vy}`)
+
+					const color_span = document.createElement('span');
+					color_span.style.color = point.color;
+					color_span.classList.add('svg-graph-hintbox-icon-color', point.marker_class);
+
+					li.append(color_span);
+
+					html.append(li);
+
+					rows_added++;
+				}
+
+				const row = document.createElement('div');
+				row.append(`${time_from.format(PHP_ZBX_FULL_DATE_TIME)} - ${time_to.format(PHP_ZBX_FULL_DATE_TIME)}`);
+
+				html.append(row);
 			}
 		}
+		else {
+			for (const point of included_points) {
+				const li = document.createElement('li');
 
-		const hintbox_container = jQuery('<div>').addClass('svg-graph-hintbox');
+				const color_span = document.createElement('span');
+				color_span.style.backgroundColor = point.g.getAttribute('data-color');
+				color_span.classList.add('svg-graph-hintbox-item-color');
 
-		if (data.hintbox_type === GRAPH_HINTBOX_TYPE_SVG_GRAPH) {
+				li.append(`${point.g.getAttribute('data-metric')}: ${point.v}`);
+				li.append(color_span);
+
+				html.append(li);
+			}
+
 			// Calculate time at mouse position.
 			const time = new CDate((data.timePeriod.from_ts + (offsetX - data.dimX) * data.spp) * 1000);
 
-			hintbox_container.append(
-				jQuery('<div>')
-					.addClass('header')
-					.html(time.format(PHP_ZBX_FULL_DATE_TIME))
-			);
+			const header = document.createElement('div');
+			header.classList.add('header');
+			header.append(time.format(PHP_ZBX_FULL_DATE_TIME));
+
+			hintbox_container.append(header);
 		}
 
 		hintbox_container.append(html);
-		html = hintbox_container;
 
-		return html;
+		return hintbox_container;
 	}
 
 	// Show problem or value hintbox.
@@ -725,7 +750,7 @@
 		}
 
 		if (html !== null) {
-			graph[0].dataset.hintboxContents = html[0].outerHTML;
+			graph[0].dataset.hintboxContents = html instanceof jQuery ? html[0].outerHTML : html.outerHTML;
 		}
 		else if (in_values_area || in_problem_area) {
 			destroyHintbox(graph);
@@ -848,6 +873,33 @@
 
 	function onStaticHintboxOpen(e, graph) {
 		graph.data('is_static_hintbox_opened', true);
+		const data = graph.data('options');
+
+		if (data.hintbox_type === GRAPH_HINTBOX_TYPE_SCATTER_PLOT) {
+			const hintbox = graph[0].hintBoxItem[0];
+
+			const widget = graph.data('widget');
+
+			for (const element of hintbox.querySelectorAll('.has-broadcast-data')) {
+				element.addEventListener('click', () => {
+					widget.updateItemSelector(element.dataset.itemid, element.dataset.ds);
+
+					markSelectedHintboxItems(hintbox, widget);
+				});
+			}
+
+			markSelectedHintboxItems(hintbox, widget);
+		}
+	}
+
+	function markSelectedHintboxItems(hintbox, widget) {
+		const {itemid, ds} = widget.getItemBroadcasting();
+
+		for (const element of hintbox.querySelectorAll('.has-broadcast-data')) {
+			if (itemid !== null && ds !== null) {
+				element.classList.toggle('selected', element.dataset.itemid == itemid && element.dataset.ds == ds);
+			}
+		}
 	}
 
 	function onStaticHintboxClose(e, graph) {

@@ -99,9 +99,21 @@ class CScatterPlotHelper {
 		// Add mouse following helper line.
 		$scatter_plot->addHelper();
 
+		$first_metric_to_broadcast = null;
+
+		if ($metrics) {
+			$metric = reset($metrics);
+
+			$first_metric_to_broadcast = [
+				'itemid' => array_keys($metric['x_axis_items_name'])[0],
+				'ds' => $metric['data_set']
+			];
+		}
+
 		return [
 			'svg' => $scatter_plot,
 			'legend' => $legend ?? '',
+			'first_metric_to_broadcast' => $first_metric_to_broadcast,
 			'data' => [
 				'dims' => [
 					'x' => $scatter_plot->getCanvasX(),
@@ -591,33 +603,20 @@ class CScatterPlotHelper {
 	 */
 	private static function setMetricNames(array &$metrics, array $legend_options, bool $show_hostnames): void {
 		foreach ($metrics as &$metric) {
-			$aggregation_name = $legend_options['show_aggregation']
-				? CItemHelper::getAggregateFunctionName($metric['options']['aggregate_function']).'('
+			$metric['aggregation_name'] = $legend_options['show_aggregation']
+				? CItemHelper::getAggregateFunctionName($metric['options']['aggregate_function'])
 				: '';
 
 			foreach (['x_axis_items', 'y_axis_items'] as $axis) {
-				$name = $aggregation_name;
-
-				$count = 0;
+				$names = [];
 
 				foreach ($metric[$axis] as $item) {
-					if ($count > 0) {
-						$name .= ', ';
-					}
-
-					$name .= $show_hostnames ? $item['hosts'][0]['name'].NAME_DELIMITER.$item['name'] : $item['name'];
-
-					$count++;
+					$names[$item['itemid']] = $show_hostnames
+						? $item['hosts'][0]['name'].NAME_DELIMITER.$item['name']
+						: $item['name'];
 				}
 
-				if ($legend_options['show_aggregation']) {
-					$name .= ')';
-				}
-				elseif ($count > 1) {
-					$name = '('.$name.')';
-				}
-
-				$metric[$axis.'_name'] = $name;
+				$metric[$axis.'_name'] = $names;
 			}
 		}
 		unset($metric);
@@ -741,6 +740,8 @@ class CScatterPlotHelper {
 			ksort($metric_points, SORT_NUMERIC);
 
 			$metric['points'] = $metric_points;
+
+			unset($metric['x_axis_items'], $metric['y_axis_items']);
 		}
 		unset($metric);
 	}
@@ -844,8 +845,34 @@ class CScatterPlotHelper {
 		$items = [];
 
 		foreach ($metrics as $metric) {
+			$names = [];
+
+			foreach (['x_axis_items_name', 'y_axis_items_name'] as $axis) {
+				$names[$axis] = $metric['aggregation_name'].'(';
+
+				$count = 0;
+
+				foreach ($metric[$axis] as $item_name) {
+					if ($count > 0) {
+						$names[$axis] .= ', ';
+					}
+
+					$names[$axis] .= $item_name;
+
+					$count++;
+				}
+
+				if ($legend_options['show_aggregation']) {
+					$names[$axis] .= ')';
+				}
+				elseif ($count > 1) {
+					$names[$axis] = '('.$names[$axis].')';
+				}
+			}
+
 			$item = [
-				'name' => $metric['x_axis_items_name'].', '.$metric['y_axis_items_name'],
+				'aggregation_name' => $metric['aggregation_name'],
+				'name' => $names['x_axis_items_name'].', '.$names['y_axis_items_name'],
 				'color' => $metric['options']['color'],
 				'marker' => $metric['options']['marker']
 			];
