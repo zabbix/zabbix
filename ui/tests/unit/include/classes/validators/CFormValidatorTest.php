@@ -2531,7 +2531,7 @@ class CFormValidatorTest extends TestCase {
 				[],
 				CFormValidator::ERROR,
 				['/value' => [
-					['message' => 'Value must be between 0 and 1m 1s (61s).',
+					['message' => 'Value must be between 0 and 61s (1m 1s).',
 						'level' => CFormValidator::ERROR_LEVEL_DELAYED
 					]
 				]]
@@ -2544,7 +2544,9 @@ class CFormValidatorTest extends TestCase {
 				[],
 				CFormValidator::ERROR,
 				['/value' => [
-					['message' => 'Value must be between 0 and 1m.', 'level' => CFormValidator::ERROR_LEVEL_DELAYED]
+					['message' => 'Value must be between 0 and 60s (1m).',
+						'level' => CFormValidator::ERROR_LEVEL_DELAYED
+					]
 				]]
 			],
 			[
@@ -2557,7 +2559,7 @@ class CFormValidatorTest extends TestCase {
 				[],
 				CFormValidator::ERROR,
 				['/value' => [
-					['message' => 'Value must be between 1h (3600s) and 1d (86400s).',
+					['message' => 'Value must be between 3600s (1h) and 86400s (1d).',
 						'level' => CFormValidator::ERROR_LEVEL_DELAYED
 					]
 				]]

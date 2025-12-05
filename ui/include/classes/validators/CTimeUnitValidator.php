@@ -67,12 +67,12 @@ class CTimeUnitValidator extends CValidator {
 		$seconds = timeUnitToSeconds($value, false);
 
 		if ($seconds > $this->max || $seconds < $this->min) {
-			$min_text = $this->min > 60
-				? convertUnitsS($this->min).' ('.$this->min._x('s', 'second short').')'
+			$min_text = $this->min >= 60
+				? $this->min._x('s', 'second short').' ('.convertUnitsS($this->min).')'
 				: convertUnitsS($this->min);
 
-			$max_text = $this->max > 60
-				? convertUnitsS($this->max).' ('.$this->max._x('s', 'second short').')'
+			$max_text = $this->max >= 60
+				? $this->max._x('s', 'second short').' ('.convertUnitsS($this->max).')'
 				: convertUnitsS($this->max);
 
 			$this->setError(_s('value must be between %1$s and %2$s', $min_text, $max_text));
