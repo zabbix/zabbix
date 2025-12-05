@@ -128,6 +128,13 @@ static int	housekeeping_history(int now, int config_offline_buffer, int config_l
 	return records;
 }
 
+static int	housekeeper_process(void)
+{
+	int	ret = zbx_db_execute("delete from housekeeper");
+
+	return ZBX_DB_OK <= ret ? ret : 0;
+}
+
 ZBX_THREAD_ENTRY(housekeeper_thread, args)
 {
 	int			records, start, sleeptime;
@@ -219,6 +226,7 @@ ZBX_THREAD_ENTRY(housekeeper_thread, args)
 		sec = zbx_time();
 		records = housekeeping_history(start, housekeeper_args_in->config_proxy_offline_buffer,
 				housekeeper_args_in->config_proxy_local_buffer);
+		records += housekeeper_process();
 		sec = zbx_time() - sec;
 
 		zbx_db_close();

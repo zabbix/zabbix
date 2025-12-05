@@ -895,7 +895,7 @@ int	hk_delete_from_table(const char *tablename, const char *filter, int limit)
 	}
 	else
 	{
-#if defined(HAVE_MYSQL)
+#if defined(HAVE_MYSQL) || defined(HAVE_SQLITE3)
 		return zbx_db_execute(
 				"delete from %s"
 				" where %s limit %d",
@@ -912,12 +912,6 @@ int	hk_delete_from_table(const char *tablename, const char *filter, int limit)
 				tablename,
 				filter,
 				limit);
-#elif defined(HAVE_SQLITE3)
-		return zbx_db_execute(
-				"delete from %s"
-				" where %s",
-				tablename,
-				filter);
 #endif
 	}
 
