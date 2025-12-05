@@ -1069,6 +1069,8 @@ static int	parse_history_data(struct zbx_json_parse *jp_data, const char **pnext
 {
 	struct zbx_json_parse	jp_row;
 	int			ret = FAIL;
+	char			*tmp = NULL;
+	size_t			tmp_alloc = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -1083,8 +1085,7 @@ static int	parse_history_data(struct zbx_json_parse *jp_data, const char **pnext
 			goto out;
 		}
 	}
-	char	*tmp = NULL;
-	size_t	tmp_alloc = 0;
+
 	/* iterate the history data rows */
 	do
 	{
@@ -1104,9 +1105,10 @@ static int	parse_history_data(struct zbx_json_parse *jp_data, const char **pnext
 		(*values_num)++;
 	}
 	while (NULL != (*pnext = zbx_json_next(jp_data, *pnext)) && *values_num < ZBX_HISTORY_VALUES_MAX);
-	zbx_free(tmp);
+
 	ret = SUCCEED;
 out:
+	zbx_free(tmp);
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s processed:%d/%d", __func__, zbx_result_string(ret),
 			*values_num, *parsed_num);
 
@@ -1144,6 +1146,8 @@ static int	parse_history_data_by_itemids(struct zbx_json_parse *jp_data, const c
 {
 	struct zbx_json_parse	jp_row;
 	int			ret = FAIL;
+	char			*tmp = NULL;
+	size_t			tmp_alloc = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -1159,8 +1163,6 @@ static int	parse_history_data_by_itemids(struct zbx_json_parse *jp_data, const c
 		}
 	}
 
-	char	*tmp = NULL;
-	size_t	tmp_alloc = 0;
 	/* iterate the history data rows */
 	do
 	{
@@ -1181,10 +1183,9 @@ static int	parse_history_data_by_itemids(struct zbx_json_parse *jp_data, const c
 	}
 	while (NULL != (*pnext = zbx_json_next(jp_data, *pnext)) && *values_num < ZBX_HISTORY_VALUES_MAX);
 
-	zbx_free(tmp);
-
 	ret = SUCCEED;
 out:
+	zbx_free(tmp);
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s processed:%d/%d", __func__, zbx_result_string(ret),
 			*values_num, *parsed_num);
 
