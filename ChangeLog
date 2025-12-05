@@ -1,6 +1,10 @@
 Changes for 8.0.0alpha2
 
 New features:
+.........T [ZBXNEXT-10169] added Ribbon SBC Edge by HTTP template (akotsegubov)
+.........T [ZBXNEXT-10168] added Ribbon SBC SWe core by HTTP and Ribbon SBC SWe CE by HTTP templates (akotsegubov)
+...G...... [ZBXNEXT-9814] added TCPS (TLS) support in Zabbix agent 2 Oracle plugin (lsurvilo)
+A.......S. [ZBXNEXT-10289] updated maximum supported TimescaleDB version to 2.23 (mprihodko)
 A......PS. [ZBXNEXT-10306] updated maximum supported MySQL version to 9.5 (mprihodko)
 .........T [ZBXNEXT-9492] added VeloCloud SD-WAN Edge by HTTP template (egordymov)
 .....J.... [ZBXNEXT-10364] added commentary to web service config file that indicates that this config can be extended via Include (opucka)
@@ -9,6 +13,10 @@ A.F....... [ZBXNEXT-9595] allowed use of not formally valid JSON or XML in HTTP 
 ........S. [ZBXNEXT-10291] fixed EVENT.RECOVERY.TAGS macro not being resolved when problem is closed manually (wiper)
 
 Bug fixes:
+..F....... [ZBX-27215] prevented Dashboard time period filter activation when Top Hosts widget column being saved without aggregated function (isharha)
+..F....... [ZBX-27199] fixed graph view failing to display dependent item from web scenario (agriscenko)
+A......... [ZBX-26462] updated and minimized the ability to achieve full table lock when deleting different API objects (aluchko)
+A...I..... [ZBX-25284] prevented web scenarios being inherited to host prototypes; fixed inability to delete parent host in such case (jfreibergs)
 .......PS. [ZBX-27271] improved scalability and performance by not calculating hash for uint64 ids (vso)
 .......PS. [ZBX-26946] fixed memory being reserved by pollers due to memory-intensive script items or in async pollers due to large transfers (vso)
 ..F....... [ZBX-27049] corrected constant references in topitems widget view (talbergs)
@@ -89,6 +97,9 @@ Bug fixes:
 Changes for 7.4.6rc1
 
 New features:
+.........T [ZBXNEXT-10169] added Ribbon SBC Edge by HTTP template (akotsegubov)
+.........T [ZBXNEXT-10168] added Ribbon SBC SWe core by HTTP and Ribbon SBC SWe CE by HTTP templates (akotsegubov)
+A.......S. [ZBXNEXT-10289] updated maximum supported TimescaleDB version to 2.23 (mprihodko)
 A......PS. [ZBXNEXT-10306] updated maximum supported MySQL version to 9.5 (mprihodko)
 .........T [ZBXNEXT-9492] added VeloCloud SD-WAN Edge by HTTP template (egordymov)
 .....J.... [ZBXNEXT-10364] added commentary to web service config file that indicates that this config can be extended via Include (opucka)
@@ -96,6 +107,10 @@ A......PS. [ZBXNEXT-10306] updated maximum supported MySQL version to 9.5 (mprih
 ...G...... [ZBXNEXT-10012] added both SHOW SLAVE STATUS and SHOW REPLICA STATUS for Zabbix agent 2 MySQL plugin (lsurvilo)
 
 Bug fixes:
+..F....... [ZBX-27215] prevented Dashboard time period filter activation when Top Hosts widget column being saved without aggregated function (isharha)
+..F....... [ZBX-27199] fixed graph view failing to display dependent item from web scenario (agriscenko)
+A......... [ZBX-26462] updated and minimized the ability to achieve full table lock when deleting different API objects (aluchko)
+A......... [ZBX-25284] prevented web scenarios being inherited to host prototypes; fixed inability to delete parent host in such case (jfreibergs, vmaksimovs)
 .......PS. [ZBX-26946] fixed memory being reserved by pollers due to memory-intensive script items or in async pollers due to large transfers (vso)
 ..F....... [ZBX-27049] corrected constant references in topitems widget view (talbergs)
 A......... [ZBX-26427] fixed resetting of discovery rule filter on import (jfreibergs)
@@ -624,6 +639,7 @@ A.F....PS. [ZBXNEXT-9564] implemented vault macro resolution on proxies (esekace
 Changes for 7.2.15rc1
 
 New features:
+A.......S. [ZBXNEXT-10289] updated maximum supported TimescaleDB version to 2.23 (mprihodko)
 A......PS. [ZBXNEXT-10306] updated maximum supported MySQL version to 9.5 (mprihodko)
 
 Bug fixes:
@@ -1254,6 +1270,9 @@ A.F....... [ZBX-23227] fixed issue where using an empty array or string value fo
 Changes for 7.0.22rc1
 
 New features:
+.........T [ZBXNEXT-10169] added Ribbon SBC Edge by HTTP template (akotsegubov)
+.........T [ZBXNEXT-10168] added Ribbon SBC SWe core by HTTP and Ribbon SBC SWe CE by HTTP templates (akotsegubov)
+A.......S. [ZBXNEXT-10289] updated maximum supported TimescaleDB version to 2.23 (mprihodko)
 A......PS. [ZBXNEXT-10306] updated maximum supported MySQL version to 9.5 (mprihodko)
 .........T [ZBXNEXT-9492] added VeloCloud SD-WAN Edge by HTTP template (egordymov)
 .....J.... [ZBXNEXT-10364] added commentary to web service config file that indicates that this config can be extended via Include (opucka)
@@ -1261,6 +1280,10 @@ A......PS. [ZBXNEXT-10306] updated maximum supported MySQL version to 9.5 (mprih
 ...G...... [ZBXNEXT-10012] added both SHOW SLAVE STATUS and SHOW REPLICA STATUS for Zabbix agent 2 MySQL plugin (lsurvilo)
 
 Bug fixes:
+A......... [ZBX-26951] fixed dashboard template get to filter by provided templateids when using accessible hosts to find dashboard templates without hosts (gberzina)
+..F....... [ZBX-27199] fixed graph view failing to display dependent item from web scenario (agriscenko)
+A......... [ZBX-26462] updated and minimized the ability to achieve full table lock when deleting different API objects (aluchko)
+A......... [ZBX-25284] prevented web scenarios being inherited to host prototypes; fixed inability to delete parent host in such case (jfreibergs, vmaksimovs)
 .......PS. [ZBX-26946] fixed memory being reserved by pollers due to memory-intensive script items or in async pollers due to large transfers (vso)
 A......... [ZBX-26427] fixed resetting of discovery rule filter on import (jfreibergs)
 ...G...... [ZBX-26218] fixed incorrect function name in log for Zabbix agent 2 (esneiders)
@@ -5117,6 +5140,7 @@ A.F....PS. [ZBXNEXT-7402,ZBXNEXT-7413] added support for CyberArk Vault (acikuns
 Changes for 6.0.43rc1
 
 New features:
+A.......S. [ZBXNEXT-10289] updated maximum supported TimescaleDB version to 2.23 (mprihodko)
 A......PS. [ZBXNEXT-10306] updated maximum supported MySQL version to 9.5 (mprihodko)
 A......PS. [ZBXNEXT-10219] updated maximum supported PostgreSQL version to 18 (mprihodko)
 A.......S. [ZBXNEXT-10271] updated maximum supported TimescaleDB version to 2.22 (mprihodko)
