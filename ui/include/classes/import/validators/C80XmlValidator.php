@@ -535,22 +535,6 @@ class C80XmlValidator extends CXmlValidatorGeneral {
 		CXmlConstantValue::CUSTOM_INTERFACES_YES => CXmlConstantName::YES
 	];
 
-	private $DASHBOARD_TEMPLATE_WIDGET_FIELD_TYPE = [
-		CXmlConstantValue::DASHBOARD_WIDGET_FIELD_TYPE_INTEGER => CXmlConstantName::DASHBOARD_WIDGET_FIELD_TYPE_INTEGER,
-		CXmlConstantValue::DASHBOARD_WIDGET_FIELD_TYPE_STRING => CXmlConstantName::DASHBOARD_WIDGET_FIELD_TYPE_STRING,
-		CXmlConstantValue::DASHBOARD_WIDGET_FIELD_TYPE_HOST => CXmlConstantName::DASHBOARD_WIDGET_FIELD_TYPE_HOST,
-		CXmlConstantValue::DASHBOARD_WIDGET_FIELD_TYPE_ITEM => CXmlConstantName::DASHBOARD_WIDGET_FIELD_TYPE_ITEM,
-		CXmlConstantValue::DASHBOARD_WIDGET_FIELD_TYPE_ITEM_PROTOTYPE => CXmlConstantName::DASHBOARD_WIDGET_FIELD_TYPE_ITEM_PROTOTYPE,
-		CXmlConstantValue::DASHBOARD_WIDGET_FIELD_TYPE_GRAPH => CXmlConstantName::DASHBOARD_WIDGET_FIELD_TYPE_GRAPH,
-		CXmlConstantValue::DASHBOARD_WIDGET_FIELD_TYPE_GRAPH_PROTOTYPE => CXmlConstantName::DASHBOARD_WIDGET_FIELD_TYPE_GRAPH_PROTOTYPE,
-		CXmlConstantValue::DASHBOARD_WIDGET_FIELD_TYPE_MAP => CXmlConstantName::DASHBOARD_WIDGET_FIELD_TYPE_MAP,
-		CXmlConstantValue::DASHBOARD_WIDGET_FIELD_TYPE_SERVICE => CXmlConstantName::DASHBOARD_WIDGET_FIELD_TYPE_SERVICE,
-		CXmlConstantValue::DASHBOARD_WIDGET_FIELD_TYPE_SLA => CXmlConstantName::DASHBOARD_WIDGET_FIELD_TYPE_SLA,
-		CXmlConstantValue::DASHBOARD_WIDGET_FIELD_TYPE_USER => CXmlConstantName::DASHBOARD_WIDGET_FIELD_TYPE_USER,
-		CXmlConstantValue::DASHBOARD_WIDGET_FIELD_TYPE_ACTION => CXmlConstantName::DASHBOARD_WIDGET_FIELD_TYPE_ACTION,
-		CXmlConstantValue::DASHBOARD_WIDGET_FIELD_TYPE_MEDIA_TYPE => CXmlConstantName::DASHBOARD_WIDGET_FIELD_TYPE_MEDIA_TYPE
-	];
-
 	private $DASHBOARD_WIDGET_FIELD_TYPE = [
 		CXmlConstantValue::DASHBOARD_WIDGET_FIELD_TYPE_INTEGER => CXmlConstantName::DASHBOARD_WIDGET_FIELD_TYPE_INTEGER,
 		CXmlConstantValue::DASHBOARD_WIDGET_FIELD_TYPE_STRING => CXmlConstantName::DASHBOARD_WIDGET_FIELD_TYPE_STRING,
@@ -3082,7 +3066,7 @@ class C80XmlValidator extends CXmlValidatorGeneral {
 											'hide_header' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
 											'fields' =>						['type' => XML_INDEXED_ARRAY, 'prefix' => 'field', 'rules' => [
 												'field' =>						['type' => XML_ARRAY, 'rules' => [
-													'type' =>						['type' => XML_STRING | XML_REQUIRED, 'in' => $this->DASHBOARD_TEMPLATE_WIDGET_FIELD_TYPE],
+													'type' =>						['type' => XML_STRING | XML_REQUIRED, 'in' => $this->DASHBOARD_WIDGET_FIELD_TYPE],
 													'name' =>						['type' => XML_STRING | XML_REQUIRED],
 													'value' =>						['type' => XML_REQUIRED, 'ex_validate' => [$this, 'validateWidgetFieldValue'], 'ex_rules' => [$this, 'getWidgetFieldValueExtendedRules']]
 												]]
