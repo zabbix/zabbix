@@ -74,8 +74,8 @@ class CScatterPlotHelper {
 			$show_hostnames = false;
 			$unique_hosts = [];
 
-			foreach (['x_axis_items', 'y_axis_items'] as $key) {
-				foreach ($metrics as $metric) {
+			foreach ($metrics as $metric) {
+				foreach (['x_axis_items', 'y_axis_items'] as $key) {
 					foreach ($metric[$key] as $item) {
 						if (!array_key_exists($item['hostid'], $unique_hosts)) {
 							$unique_hosts[$item['hostid']] = true;
