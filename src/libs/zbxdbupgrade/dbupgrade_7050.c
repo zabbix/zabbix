@@ -431,49 +431,31 @@ static int	DBpatch_7050030(void)
 
 static int	DBpatch_7050031(void)
 {
-	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
-		return SUCCEED;
-
 	return DBcreate_housekeeper_trigger("items", "itemid");
 }
 
 static int	DBpatch_7050032(void)
 {
-	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
-		return SUCCEED;
-
 	return DBcreate_housekeeper_trigger("triggers", "triggerid");
 }
 
 static int	DBpatch_7050033(void)
 {
-	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
-		return SUCCEED;
-
 	return DBcreate_housekeeper_trigger("services", "serviceid");
 }
 
 static int	DBpatch_7050034(void)
 {
-	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
-		return SUCCEED;
-
 	return DBcreate_housekeeper_trigger("dhosts", "dhostid");
 }
 
 static int	DBpatch_7050035(void)
 {
-	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
-		return SUCCEED;
-
 	return DBcreate_housekeeper_trigger("dservices", "dserviceid");
 }
 
 static int	DBpatch_7050036(void)
 {
-	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
-		return SUCCEED;
-
 	if (ZBX_DB_OK > zbx_db_execute("delete from ids where table_name='housekeeper'"))
 		return FAIL;
 
