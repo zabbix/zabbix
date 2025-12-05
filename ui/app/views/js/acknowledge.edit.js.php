@@ -117,13 +117,7 @@ window.update_problem_popup = new class {
 		document.getElementById('operation_count').value = checked_operations +
 			this.form.findFieldByName('message').getValue()?.length ? 1 : 0
 
-		this.form.validateChanges(
-			[
-				'message', 'change_severity', 'unsuppress_problem', 'suppress_problem',
-				'unacknowledge_problem', 'acknowledge_problem', 'change_rank', 'close_problem'
-			],
-			true
-		);
+		this.form.validateChanges(['operation_count'], true);
 	}
 
 	#submit() {

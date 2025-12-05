@@ -894,8 +894,7 @@ function getMenuPopupTrigger(options, trigger_element) {
 						body: JSON.stringify({
 							eventids: [options.eventid],
 							change_rank: ZBX_PROBLEM_UPDATE_RANK_TO_CAUSE,
-							[CSRF_TOKEN_NAME]: options.csrf_tokens['acknowledge'],
-							operation_count: 1
+							[CSRF_TOKEN_NAME]: options.csrf_tokens['acknowledge']
 						})
 					})
 						.then((response) => response.json())
@@ -947,8 +946,7 @@ function getMenuPopupTrigger(options, trigger_element) {
 							eventids: options.eventids,
 							cause_eventid: options.eventid,
 							change_rank: ZBX_PROBLEM_UPDATE_RANK_TO_SYMPTOM,
-							[CSRF_TOKEN_NAME]: options.csrf_tokens['acknowledge'],
-							operation_count: 1
+							[CSRF_TOKEN_NAME]: options.csrf_tokens['acknowledge']
 						})
 					})
 						.then((response) => response.json())

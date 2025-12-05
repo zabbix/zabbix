@@ -35,7 +35,6 @@ $form_list = (new CFormList())
 		new CLabel(_('Message'), 'message'),
 		(new CTextArea('message', $data['message']))
 			->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
-			->setErrorContainer('operations-count-error-container-hidden')
 			->setAttribute('maxlength', DB::getFieldLength('acknowledges', 'message'))
 			->setEnabled($data['allowed_add_comments'])
 	);
@@ -74,7 +73,6 @@ $form_list
 		(new CList([
 			(new CCheckBox('change_severity', ZBX_PROBLEM_UPDATE_SEVERITY))
 				->addClass('js-operation-checkbox')
-				->setErrorContainer('operations-count-error-container-hidden')
 				->setChecked($data['change_severity'])
 				->setEnabled($data['allowed_change_severity'] && $data['problem_severity_can_be_changed']),
 			(new CSeverity('severity', (int) $data['severity'], $data['change_severity']))
@@ -89,7 +87,6 @@ $form_list
 			(new CListItem(
 				(new CCheckBox('suppress_problem', ZBX_PROBLEM_UPDATE_SUPPRESS))
 					->addClass('js-operation-checkbox')
-					->setErrorContainer('operations-count-error-container-hidden')
 					->setChecked($data['suppress_problem'])
 					->setEnabled($data['allowed_suppress'] && $data['problem_can_be_suppressed'])
 			))->addClass('align-top'),
@@ -112,7 +109,6 @@ $form_list
 		(new CList([
 			(new CCheckBox('unsuppress_problem', ZBX_PROBLEM_UPDATE_UNSUPPRESS))
 				->addClass('js-operation-checkbox')
-				->setErrorContainer('operations-count-error-container-hidden')
 				->setChecked($data['unsuppress_problem'])
 				->setEnabled($data['allowed_suppress'] && $data['problem_can_be_unsuppressed'])
 		]))->addClass(ZBX_STYLE_HOR_LIST)
@@ -127,14 +123,12 @@ if ($data['has_unack_events']) {
 		], 'acknowledge_problem'),
 		(new CCheckBox('acknowledge_problem', ZBX_PROBLEM_UPDATE_ACKNOWLEDGE))
 			->addClass('js-operation-checkbox')
-			->setErrorContainer('operations-count-error-container-hidden')
 			->onChange("$('#unacknowledge_problem').prop('disabled', this.checked)")
 			->setEnabled($data['allowed_acknowledge'])
 	);
 }
 else {
 	$form->addItem((new CInput('hidden', 'acknowledge_problem', null))
-		->setAttribute('data-error-container', 'operations-count-error-container-hidden')
 		->setAttribute('data-field-type', 'hidden')
 		->setEnabled(false)
 	);
@@ -145,14 +139,12 @@ if ($data['has_ack_events']) {
 		new CLabel([_('Unacknowledge'), makeHelpIcon(_('Undo problem acknowledgement.'))], 'unacknowledge_problem'),
 		(new CCheckBox('unacknowledge_problem', ZBX_PROBLEM_UPDATE_UNACKNOWLEDGE))
 			->addClass('js-operation-checkbox')
-			->setErrorContainer('operations-count-error-container-hidden')
 			->onChange("$('#acknowledge_problem').prop('disabled', this.checked)")
 			->setEnabled($data['allowed_acknowledge'])
 	);
 }
 else {
 	$form->addItem((new CInput('hidden', 'unacknowledge_problem', null))
-		->setAttribute('data-error-container', 'operations-count-error-container-hidden')
 		->setAttribute('data-field-type', 'hidden')
 		->setEnabled(false)
 	);
@@ -165,23 +157,17 @@ $form_list
 		], 'change_rank'),
 		(new CCheckBox('change_rank', ZBX_PROBLEM_UPDATE_RANK_TO_CAUSE))
 			->addClass('js-operation-checkbox')
-			->setErrorContainer('operations-count-error-container-hidden')
 			->setEnabled($data['allowed_change_problem_ranking'] && $data['problem_can_change_rank'])
 	)
 	->addRow(_('Close problem'),
 		(new CCheckBox('close_problem', ZBX_PROBLEM_UPDATE_CLOSE))
 			->addClass('js-operation-checkbox')
-			->setErrorContainer('operations-count-error-container-hidden')
 			->setChecked($data['close_problem'])
 			->setEnabled($data['allowed_close'] && $data['problem_can_be_closed'])
 	)
 	->addRow('',
 		(new CDiv(''))->setId('operations-count-error-container')
 	);
-
-$form->addItem(
-	(new CDiv(''))->setId('operations-count-error-container-hidden')->addStyle('display: none;')
-);
 
 $form->addItem($form_list);
 
