@@ -73,21 +73,8 @@ class CSvgGraphHelper {
 			$show_hostnames
 		);
 
-		if ($options['displaying']['show_hostnames'] == SVG_GRAPH_LABELS_IN_HOSTNAMES_AUTO) {
-			$show_hostnames = false;
-			$unique_hosts = [];
-
-			foreach ($metrics as $metric) {
-				if (!array_key_exists($metric['hostid'], $unique_hosts)) {
-					$unique_hosts[$metric['hostid']] = true;
-
-					if (count($unique_hosts) > 1) {
-						$show_hostnames = true;
-
-						break;
-					}
-				}
-			}
+		if ($options['show_hostnames'] == SVG_GRAPH_LABELS_IN_HOSTNAMES_AUTO) {
+			$show_hostnames = self::hasMetricsMultipleHosts($metrics);
 		}
 
 		CGraphHelper::calculateMetricsDelay($metrics);
@@ -392,6 +379,23 @@ class CSvgGraphHelper {
 			}
 		}
 	}
+
+	private static function hasMetricsMultipleHosts(array $metrics): bool {
+		$unique_hosts = [];
+
+		foreach ($metrics as $metric) {
+			if (!array_key_exists($metric['hostid'], $unique_hosts)) {
+				$unique_hosts[$metric['hostid']] = true;
+
+				if (count($unique_hosts) > 1) {
+					return true;
+				}
+			}
+		}
+
+		return false;
+	}
+
 
 	private static function sortByDataset(array &$metrics): void {
 		usort($metrics, static function(array $a, array $b): int {

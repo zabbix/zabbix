@@ -71,24 +71,7 @@ class CScatterPlotHelper {
 		);
 
 		if ($options['show_hostnames'] == SVG_GRAPH_LABELS_IN_HOSTNAMES_AUTO) {
-			$show_hostnames = false;
-			$unique_hosts = [];
-
-			foreach ($metrics as $metric) {
-				foreach (['x_axis_items', 'y_axis_items'] as $key) {
-					foreach ($metric[$key] as $item) {
-						if (!array_key_exists($item['hostid'], $unique_hosts)) {
-							$unique_hosts[$item['hostid']] = true;
-
-							if (count($unique_hosts) > 1) {
-								$show_hostnames = true;
-
-								break 3;
-							}
-						}
-					}
-				}
-			}
+			$show_hostnames = self::hasMetricsMultipleHosts($metrics);
 		}
 
 		self::sortByDataset($metrics);
@@ -406,6 +389,26 @@ class CScatterPlotHelper {
 				];
 			}
 		}
+	}
+
+	private static function hasMetricsMultipleHosts(array $metrics): bool {
+		$unique_hosts = [];
+
+		foreach ($metrics as $metric) {
+			foreach (['x_axis_items', 'y_axis_items'] as $key) {
+				foreach ($metric[$key] as $item) {
+					if (!array_key_exists($item['hostid'], $unique_hosts)) {
+						$unique_hosts[$item['hostid']] = true;
+
+						if (count($unique_hosts) > 1) {
+							return true;
+						}
+					}
+				}
+			}
+		}
+
+		return false;
 	}
 
 	private static function sortByDataset(array &$metrics): void {
