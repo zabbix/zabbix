@@ -95,7 +95,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 			}
 
 			foreach ($db_column_items as &$item) {
-				$item['combined'] = 0;
+				$item['combined'] = false;
 			}
 			unset($item);
 
@@ -388,7 +388,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 				$item['valuemap'] = [];
 			}
 
-			$item['combined'] = 1;
+			$item['combined'] = true;
 			$item['name'] = $column['combined_column_name'];
 
 			$value_type = $item['value_type'];

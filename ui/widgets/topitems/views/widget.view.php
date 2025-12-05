@@ -136,7 +136,7 @@ function makeTableCellViewsNumeric(array $cell, array $data, $formatted_value, b
 	$value_cell = new CCol(new CDiv($formatted_value));
 	$value_cell->addClass(ZBX_STYLE_NOWRAP);
 
-	$combined = $item['combined'] ?? 0;
+	$combined = $item['combined'] ?? false;
 	if (!$combined) {
 		$value_cell->addClass(ZBX_STYLE_CURSOR_POINTER);
 	}
@@ -225,7 +225,7 @@ function makeTableCellViewFormattedValue(array $cell, array $data): CSpan {
 
 	$span = (new CSpan($formatted_value));
 
-	$combined = $item['combined'] ?? 0;
+	$combined = $item['combined'] ?? false;
 	if (!$combined) {
 		$span->setMenuPopup(
 			CMenuPopupHelper::getItem([

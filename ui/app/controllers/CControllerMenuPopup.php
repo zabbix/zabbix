@@ -325,7 +325,7 @@ class CControllerMenuPopup extends CController {
 			return [
 				'type' => 'item',
 				'backurl' => $data['backurl'],
-				'combined' => (bool)($data['combined'] ?? 0),
+				'combined' => $data['combined'] ?? false,
 				'itemid' => $data['itemid'],
 				'name' => $db_item['name_resolved'],
 				'key' => $db_item['key_'],
