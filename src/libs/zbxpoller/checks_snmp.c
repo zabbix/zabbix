@@ -2975,12 +2975,14 @@ static int	asynch_response(int operation, struct snmp_session *sp, int reqid, st
 				&snmp_context->item.interface, snmp_context->snmp_oid_type, snmp_context->item.itemid,
 				error, sizeof(error))))
 		{
+			snmp_context->item.ret = ret;
 			bulkwalk_context->error = zbx_strdup(bulkwalk_context->error, error);
 		}
 	}
 	else
 	{
 		zbx_free(bulkwalk_context->error);
+		snmp_context->item.ret = NOTSUPPORTED;
 		bulkwalk_context->error = zbx_dsprintf(bulkwalk_context->error, "SNMP error: [%d]", stat);
 	}
 out:
@@ -3338,7 +3340,6 @@ static int	snmp_task_process(short event, void *data, int *fd, zbx_vector_addres
 
 		if (NULL != bulkwalk_context->error)
 		{
-			snmp_context->item.ret = NOTSUPPORTED;
 			SET_MSG_RESULT(&snmp_context->item.result, bulkwalk_context->error);
 			bulkwalk_context->error = NULL;
 			goto stop;
