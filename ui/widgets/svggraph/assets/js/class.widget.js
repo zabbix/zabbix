@@ -17,6 +17,10 @@ class CWidgetSvgGraph extends CWidget {
 
 	static DATASET_TYPE_SINGLE_ITEM = 0;
 
+	#selected_itemid = null;
+	#selected_ds = null;
+	#is_default_selected_itemid = true;
+
 	onInitialize() {
 		this._has_contents = false;
 		this._svg_options = {};
@@ -105,6 +109,11 @@ class CWidgetSvgGraph extends CWidget {
 		if (response.svg_options !== undefined) {
 			this._has_contents = true;
 
+			if (this.#is_default_selected_itemid && response.svg_options.first_metric_to_broadcast !== null) {
+				const {itemid, ds} = response.svg_options.first_metric_to_broadcast;
+				this.updateItemBroadcast(itemid, ds, true);
+			}
+
 			this._initGraph({
 				sbox: false,
 				show_problems: true,
@@ -126,6 +135,22 @@ class CWidgetSvgGraph extends CWidget {
 
 			this._has_contents = false;
 		}
+	}
+
+	updateItemBroadcast(itemid, ds, is_default_selected_itemid = false) {
+		this.#selected_itemid = itemid;
+		this.#selected_ds = ds;
+
+		this.#is_default_selected_itemid = is_default_selected_itemid;
+
+		this.broadcast({
+			[CWidgetsData.DATA_TYPE_ITEM_ID]: [this.#selected_itemid],
+			[CWidgetsData.DATA_TYPE_ITEM_IDS]: [this.#selected_itemid]
+		});
+	}
+
+	getItemBroadcasting() {
+		return {itemid: this.#selected_itemid, ds: this.#selected_ds}
 	}
 
 	_initGraph(options) {

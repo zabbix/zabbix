@@ -109,11 +109,9 @@ class CWidgetScatterPlot extends CWidget {
 		if (response.svg_options !== undefined) {
 			this._has_contents = true;
 
-			if (this.#is_default_selected_itemid) {
+			if (this.#is_default_selected_itemid && response.svg_options.first_metric_to_broadcast !== null) {
 				const {itemid, ds} = response.svg_options.first_metric_to_broadcast;
-				this.updateItemSelector(itemid, ds, true);
-
-				this.#broadcast();
+				this.updateItemBroadcast(itemid, ds, true);
 			}
 
 			this._initGraph({
@@ -129,13 +127,16 @@ class CWidgetScatterPlot extends CWidget {
 		}
 	}
 
-	updateItemSelector(itemid, ds, is_default_selected_itemid = false) {
+	updateItemBroadcast(itemid, ds, is_default_selected_itemid = false) {
 		this.#selected_itemid = itemid;
 		this.#selected_ds = ds;
 
 		this.#is_default_selected_itemid = is_default_selected_itemid;
 
-		this.#broadcast();
+		this.broadcast({
+			[CWidgetsData.DATA_TYPE_ITEM_ID]: [this.#selected_itemid],
+			[CWidgetsData.DATA_TYPE_ITEM_IDS]: [this.#selected_itemid]
+		});
 	}
 
 	getItemBroadcasting() {
@@ -148,13 +149,6 @@ class CWidgetScatterPlot extends CWidget {
 
 			this._has_contents = false;
 		}
-	}
-
-	#broadcast() {
-		this.broadcast({
-			[CWidgetsData.DATA_TYPE_ITEM_ID]: [this.#selected_itemid],
-			[CWidgetsData.DATA_TYPE_ITEM_IDS]: [this.#selected_itemid]
-		});
 	}
 
 	_initGraph(options) {

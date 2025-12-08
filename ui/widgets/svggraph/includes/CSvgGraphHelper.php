@@ -121,9 +121,21 @@ class CSvgGraphHelper {
 		// Add mouse following helper line.
 		$graph->addHelper();
 
+		$first_metric_to_broadcast = null;
+
+		if ($metrics) {
+			$metric = reset($metrics);
+
+			$first_metric_to_broadcast = [
+				'itemid' => $metric['itemid'],
+				'ds' => $metric['data_set']
+			];
+		}
+
 		return [
 			'svg' => $graph,
 			'legend' => $legend ?? '',
+			'first_metric_to_broadcast' => $first_metric_to_broadcast,
 			'data' => [
 				'dims' => [
 					'x' => $graph->getCanvasX(),

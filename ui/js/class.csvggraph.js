@@ -261,30 +261,33 @@
 
 	// Read SVG nodes and find closest past value to the given x in each data set.
 	function findValues(graph, x) {
-		var data_sets = [],
-			nodes = graph.querySelectorAll('[data-set]');
+		const data_sets = [];
+		const nodes = graph.querySelectorAll('[data-set]');
 
-		for (var i = 0, l = nodes.length; l > i; i++) {
-			var px = -10,
-				py = -10,
-				pv = null,
-				pp = 0,
-				ps = 0;
+		for (let i = 0, l = nodes.length; l > i; i++) {
+			let px = -10;
+			let py = -10;
+			let pv = null;
+			let pp = 0;
+			let ps = 0;
+
+			let points = [];
+			let point;
 
 			// Find matching X points.
 			switch (nodes[i].getAttribute('data-set')) {
 				case 'points':
-					var test_x = Math.min(x, +nodes[i].lastChild.getAttribute('cx')),
-						circle_nodes = nodes[i].querySelectorAll('circle'),
-						points = [];
+					const test_x = Math.min(x, +nodes[i].lastChild.getAttribute('cx'));
+					const circle_nodes = nodes[i].querySelectorAll('circle');
 
-					for (var c = 0, cl = circle_nodes.length; cl > c; c++) {
+					for (let c = 0, cl = circle_nodes.length; cl > c; c++) {
 						if (test_x >= parseInt(circle_nodes[c].getAttribute('cx'))) {
 							points.push(circle_nodes[c]);
 						}
 					}
 
-					var point = points.slice(-1)[0];
+					point = points.slice(-1)[0];
+
 					if (typeof point !== 'undefined') {
 						px = point.getAttribute('cx');
 						py = point.getAttribute('cy');
@@ -293,14 +296,13 @@
 					break;
 
 				case 'bar':
-					var polygons_nodes = nodes[i].querySelectorAll('polygon');
-					var points = [];
-					var pp = 0;
+					const polygons_nodes = nodes[i].querySelectorAll('polygon');
 
-					for (var c = 0, cl = polygons_nodes.length; cl > c; c++) {
-						var coord = polygons_nodes[c].getAttribute('points').split(' ').map(function (val) {
+					for (let c = 0, cl = polygons_nodes.length; cl > c; c++) {
+						const coord = polygons_nodes[c].getAttribute('points').split(' ').map(function (val) {
 							return val.split(',');
 						});
+
 						if (polygons_nodes[c].getAttribute('data-px') == coord[0][0]) {
 							if (x >= parseInt(coord[0][0])) {
 								points.push(polygons_nodes[c]);
@@ -316,11 +318,13 @@
 					px = 0;
 					py = 0;
 
-					var point = points.slice(-1)[0];
+					point = points.slice(-1)[0];
+
 					if (typeof point !== 'undefined') {
-						var coord = point.getAttribute('points').split(' ').map(function (val) {
+						const coord = point.getAttribute('points').split(' ').map(function (val) {
 							return val.split(',');
 						});
+
 						px = coord[0][0];
 						py = coord[1][1];
 						pv = point.getAttribute('label');
@@ -331,19 +335,20 @@
 
 				case 'staircase':
 				case 'line':
-					var direction_string = '',
-						labels = [],
-						data_set = nodes[i].getAttribute('data-set'),
-						data_nodes = nodes[i].childNodes,
-						elmnt_label,
-						cx,
-						cy;
+					const data_set = nodes[i].getAttribute('data-set');
+					const data_nodes = nodes[i].childNodes;
 
-					for (var index = 0, len = data_nodes.length; index < len; index++) {
-						elmnt_label = data_nodes[index].getAttribute('label');
+					let direction_string = '';
+					let labels = [];
+					let element_label;
+					let cx;
+					let cy;
 
-						if (elmnt_label) {
-							labels.push(elmnt_label);
+					for (let index = 0, len = data_nodes.length; index < len; index++) {
+						element_label = data_nodes[index].getAttribute('label');
+
+						if (element_label) {
+							labels.push(element_label);
 
 							if (data_nodes[index].tagName.toLowerCase() === 'circle') {
 								cx = data_nodes[index].getAttribute('cx');
@@ -358,12 +363,12 @@
 
 					labels = labels.join(',').split(',');
 
-					var direction = ED // Edge transforms 'd' attribute.
+					const direction = ED // Edge transforms 'd' attribute.
 							? direction_string.substr(1).replace(/([ML])\s(\d+)\s(\d+)/g, '$1$2\,$3').split(' ')
-							: direction_string.substr(1).split(' '),
-						index = direction.length,
-						point,
-						point_label;
+							: direction_string.substr(1).split(' ');
+
+					let index = direction.length;
+					let point_label;
 
 					while (index) {
 						index--;
@@ -425,14 +430,12 @@
 
 	// Find what problems matches in time to the given x.
 	function findProblems(graph, x) {
-		var problems = [],
-			problem_start,
-			problem_width,
-			nodes = graph.querySelectorAll('[data-info]');
+		const problems = [];
+		const nodes = graph.querySelectorAll('[data-info]');
 
-		for (var i = 0, l = nodes.length; l > i; i++) {
-			problem_start = +nodes[i].getAttribute('x');
-			problem_width = +nodes[i].getAttribute('width');
+		for (let i = 0, l = nodes.length; l > i; i++) {
+			const problem_start = +nodes[i].getAttribute('x');
+			const problem_width = +nodes[i].getAttribute('width');
 
 			if (x > problem_start && problem_start + problem_width > x) {
 				problems.push(JSON.parse(nodes[i].getAttribute('data-info')));
@@ -444,7 +447,7 @@
 
 	// Set position of vertical helper line.
 	function setHelperPosition(e, graph) {
-		var data = graph.data('options');
+		const data = graph.data('options');
 		graph.find('.svg-helper').attr({
 			'x1': e.clientX - graph.offset().left,
 			'y1': data.dimY,
@@ -544,14 +547,14 @@
 				const time_from = new CDate(point.time_from * 1000);
 				const time_to = new CDate(point.time_to * 1000);
 
-				const aggregation_name = point.g.getAttribute('data-aggregation-name');
-				const ds_id = point.g.getAttribute('data-ds');
+				const aggregation_name = point.g.dataset.aggregationName;
+				const ds = point.g.dataset.ds;
 
-				for (const key of ['data-x-items', 'data-y-items']) {
-					const items_data = Object.entries(JSON.parse(point.g.getAttribute(key)));
+				for (const key of ['xItems', 'yItems']) {
+					const items_data = Object.entries(JSON.parse(point.g.dataset[key]));
 
 					const li = document.createElement('li');
-					li.style.marginTop = key === 'data-x-items' && rows_added > 0 ? '10px' : null;
+					li.style.marginTop = key === 'xItems' && rows_added > 0 ? '10px' : null;
 
 					let count = 0;
 
@@ -562,8 +565,8 @@
 
 						const item_span = document.createElement('span');
 						item_span.classList.add('has-broadcast-data');
-						item_span.setAttribute('data-itemid', itemid);
-						item_span.setAttribute('data-ds', ds_id);
+						item_span.dataset.itemid = itemid;
+						item_span.dataset.ds = ds;
 						item_span.innerText = name.toString();
 
 						li.append(item_span);
@@ -573,7 +576,7 @@
 						}
 					}
 
-					li.append(`): ${key === 'data-x-items' ? point.vx : point.vy}`)
+					li.append(`): ${key === 'xItems' ? point.vx : point.vy}`)
 
 					const color_span = document.createElement('span');
 					color_span.style.color = point.color;
@@ -595,12 +598,15 @@
 		else {
 			for (const point of included_points) {
 				const li = document.createElement('li');
+				li.classList.add('has-broadcast-data');
+				li.dataset.ds = point.g.dataset.ds;
+				li.dataset.itemid = point.g.dataset.itemid;
 
 				const color_span = document.createElement('span');
-				color_span.style.backgroundColor = point.g.getAttribute('data-color');
+				color_span.style.backgroundColor = point.g.dataset.color;
 				color_span.classList.add('svg-graph-hintbox-item-color');
 
-				li.append(`${point.g.getAttribute('data-metric')}: ${point.v}`);
+				li.append(`${point.g.dataset.metric}: ${point.v}`);
 				li.append(color_span);
 
 				html.append(li);
@@ -873,23 +879,20 @@
 
 	function onStaticHintboxOpen(e, graph) {
 		graph.data('is_static_hintbox_opened', true);
-		const data = graph.data('options');
 
-		if (data.hintbox_type === GRAPH_HINTBOX_TYPE_SCATTER_PLOT) {
-			const hintbox = graph[0].hintBoxItem[0];
+		const hintbox = graph[0].hintBoxItem[0];
 
-			const widget = graph.data('widget');
+		const widget = graph.data('widget');
 
-			for (const element of hintbox.querySelectorAll('.has-broadcast-data')) {
-				element.addEventListener('click', () => {
-					widget.updateItemSelector(element.dataset.itemid, element.dataset.ds);
+		for (const element of hintbox.querySelectorAll('.has-broadcast-data')) {
+			element.addEventListener('click', () => {
+				widget.updateItemBroadcast(element.dataset.itemid, element.dataset.ds);
 
-					markSelectedHintboxItems(hintbox, widget);
-				});
-			}
-
-			markSelectedHintboxItems(hintbox, widget);
+				markSelectedHintboxItems(hintbox, widget);
+			});
 		}
+
+		markSelectedHintboxItems(hintbox, widget);
 	}
 
 	function markSelectedHintboxItems(hintbox, widget) {

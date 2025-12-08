@@ -2523,6 +2523,22 @@ div {
 		box-shadow: none;
 	}
 
+	.has-broadcast-data {
+		cursor: pointer;
+
+		&:hover {
+			background-color: $action-hover-color;
+		}
+
+		&.selected {
+			@extend %found-bg;
+
+			&:hover {
+				@extend %found-bg;
+			}
+		}
+	}
+
 	li {
 		padding-left: 23px;
 
@@ -2548,22 +2564,6 @@ div {
 
 		.svg-graph-hintbox-trigger-color {
 			border-radius: 50%;
-		}
-
-		.has-broadcast-data {
-			cursor: pointer;
-
-			&:hover {
-				background-color: $action-hover-color;
-			}
-
-			&.selected {
-				@extend %found-bg;
-
-				&:hover {
-					@extend %found-bg;
-				}
-			}
 		}
 	}
 
