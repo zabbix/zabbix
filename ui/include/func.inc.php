@@ -674,7 +674,7 @@ function convertUnitsRaw(array $options): array {
 		}
 
 		return [
-			'value' => convertUnitsS($value, $options['ignore_milliseconds']),
+			'value' => convertUnitsS($value, ['ignore_milliseconds' => $options['ignore_milliseconds']]),
 			'units' => '',
 			'is_numeric' => false
 		];
