@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2025-07-02 10:07+0000\n"
+"PO-Revision-Date: 2025-11-17 10:25+0000\n"
 "Last-Translator: NoYoWiFi <1284524409@qq.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: zh_CN\n"
@@ -214,7 +214,7 @@ msgstr "选择了 %1$s 项，您可以使用向上和向下箭头键以及回车
 #, c-format
 msgid "%1$s problem"
 msgid_plural "%1$s problems"
-msgstr[0] "问题发生在 %1$s"
+msgstr[0] "%1$s个问题"
 
 #: include/classes/helpers/CMapHelper.php:319
 #, c-format
@@ -3672,7 +3672,7 @@ msgstr "无法读取YAML: %1$s。"
 #: include/classes/server/CZabbixServer.php:502
 #, c-format
 msgid "Cannot read response from Zabbix server \"%1$s\"."
-msgstr ""
+msgstr "无法从 Zabbix server \\%1$s\" 读取响应。\""
 
 #: include/classes/server/CZabbixServer.php:567
 #, c-format
@@ -3734,6 +3734,10 @@ msgstr "在模板 \"%2$s\" 中无法设置 \"%1$s\""
 #: widgets/piechart/includes/CWidgetFieldDataSet.php:175
 msgid "Cannot set \"Data set aggregation\" when item with type \"Total\" is added to the chart."
 msgstr "当类型为“总计”的监控项添加到图表时，无法设置“数据集聚合”。"
+
+#: include/classes/db/MysqlDbBackend.php:197
+msgid "Cannot set charset."
+msgstr "无法设置字符集。"
 
 #: include/classes/api/services/CItemGeneral.php:2478
 #, c-format
@@ -6684,7 +6688,7 @@ msgstr "检测到的 TimescaleDB 许可证不支持压缩。 TimescaleDB 社区�
 
 #: app/views/administration.housekeeping.edit.php:204
 msgid "Detected license does not support compression. Compression is supported in TimescaleDB Community Edition."
-msgstr ""
+msgstr "检测到的许可证不支持压缩。TimescaleDB 社区版支持压缩功能。"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1130
 msgid "Detection period"
@@ -13165,7 +13169,7 @@ msgstr "所需的最大 %1$s 数据库版本为 %2$s。"
 #: app/partials/administration.system.info.php:221
 #, c-format
 msgid "Maximum required version is %1$s."
-msgstr ""
+msgstr "所需最高版本为 %1$s。"
 
 #: app/controllers/CControllerTimeSelectorUpdate.php:136
 #: include/classes/mvc/CController.php:320
@@ -13502,7 +13506,7 @@ msgstr "所要求的最小PHP post大小是%1$s (配置项\"post_max_size\")。"
 #: app/views/administration.housekeeping.edit.php:183
 #, c-format
 msgid "Minimum required version is %1$s."
-msgstr ""
+msgstr "所需最低版本为 %1$s。"
 
 #: app/views/monitoring.map.view.php:48
 #: include/views/monitoring.sysmap.edit.php:276
@@ -13730,12 +13734,12 @@ msgstr "多重问题事件"
 #: app/partials/administration.system.info.php:235
 #, c-format
 msgid "Must be at least %1$s."
-msgstr ""
+msgstr "必须至少为 %1$s。"
 
 #: app/partials/administration.system.info.php:254
 #, c-format
 msgid "Must not be higher than %1$s."
-msgstr ""
+msgstr "不得高于 %1$s。"
 
 #: jsLoader.php:284
 msgid "Mute"
@@ -14479,63 +14483,63 @@ msgstr "没有调用“%1$s.%2$s”的权限。"
 
 #: include/classes/api/services/CConfiguration.php:312
 msgid "No permissions to import discovery rules."
-msgstr ""
+msgstr "无导入发现规则的权限。"
 
 #: include/classes/api/services/CConfiguration.php:313
 msgid "No permissions to import graphs."
-msgstr ""
+msgstr "无导入图形的权限。"
 
 #: include/classes/api/services/CConfiguration.php:314
 msgid "No permissions to import host groups."
-msgstr ""
+msgstr "无导入主机群组的权限。"
 
 #: include/classes/api/services/CConfiguration.php:316
 msgid "No permissions to import hosts."
-msgstr ""
+msgstr "无导入主机的权限。"
 
 #: include/classes/api/services/CConfiguration.php:318
 msgid "No permissions to import images."
-msgstr ""
+msgstr "无导入图像的权限。"
 
 #: include/classes/api/services/CConfiguration.php:319
 msgid "No permissions to import items."
-msgstr ""
+msgstr "无导入监控项的权限。"
 
 #: include/classes/api/services/CConfiguration.php:320
 msgid "No permissions to import maps."
-msgstr ""
+msgstr "无导入地图的权限。"
 
 #: include/classes/api/services/CConfiguration.php:321
 msgid "No permissions to import media types."
-msgstr ""
+msgstr "无导入媒介类型的权限。"
 
 #: include/classes/api/services/CConfiguration.php:324
 msgid "No permissions to import template dashboards."
-msgstr ""
+msgstr "无导入模板仪表盘的权限。"
 
 #: include/classes/api/services/CConfiguration.php:315
 msgid "No permissions to import template groups."
-msgstr ""
+msgstr "无导入模板群组的权限。"
 
 #: include/classes/api/services/CConfiguration.php:322
 msgid "No permissions to import template links."
-msgstr ""
+msgstr "无导入模板链接的权限。"
 
 #: include/classes/api/services/CConfiguration.php:323
 msgid "No permissions to import templates."
-msgstr ""
+msgstr "无导入模板的权限。"
 
 #: include/classes/api/services/CConfiguration.php:325
 msgid "No permissions to import triggers."
-msgstr ""
+msgstr "无导入触发器的权限。"
 
 #: include/classes/api/services/CConfiguration.php:326
 msgid "No permissions to import value maps."
-msgstr ""
+msgstr "无导入值映射的权限。"
 
 #: include/classes/api/services/CConfiguration.php:317
 msgid "No permissions to import web scenarios."
-msgstr ""
+msgstr "无导入 Web 场景的权限。"
 
 #: app/controllers/CControllerChartsView.php:133
 #: app/controllers/CControllerDashboardPrint.php:99
@@ -17564,7 +17568,7 @@ msgstr "响应时间"
 #: include/classes/server/CZabbixServer.php:498
 #, c-format
 msgid "Response timeout of %1$s exceeded when connecting to Zabbix server \"%2$s\"."
-msgstr ""
+msgstr "连接至 Zabbix server \\%2$s\" 时超出响应超时时间 %1$s。\""
 
 #: app/controllers/CControllerMediatypeTestSend.php:182
 msgid "Response type: JSON"
@@ -18855,13 +18859,13 @@ msgstr "精简"
 #: app/views/administration.housekeeping.edit.php:187
 #, c-format
 msgid "Should be at least %1$s."
-msgstr ""
+msgstr "应至少为 %1$s。"
 
 #: app/partials/administration.system.info.php:262
 #: app/views/administration.housekeeping.edit.php:197
 #, c-format
 msgid "Should not be higher than %1$s."
-msgstr ""
+msgstr "不应高于 %1$s。"
 
 #: app/partials/monitoring.problem.filter.php:27
 #: app/views/monitoring.charts.view.php:80
@@ -20374,7 +20378,7 @@ msgstr "用户属性中缺少参数“%1$s”。"
 
 #: app/views/popup.ldap.edit.php:101
 msgid "The previous password was cleared due to a host change. Please enter the new password."
-msgstr ""
+msgstr "由于主机变更，先前密码已被清除。请输入新密码。"
 
 #: include/classes/core/CJsonRpc.php:206
 msgid "The received JSON is not a valid JSON-RPC request."
@@ -21419,11 +21423,11 @@ msgstr "无法检索 TimescaleDB 版本。"
 
 #: app/views/administration.housekeeping.edit.php:173
 msgid "Unable to retrieve compression support status of TimescaleDB time-series database extension for PostgreSQL."
-msgstr ""
+msgstr "无法检索 PostgreSQL 的 TimescaleDB 时序数据库扩展的压缩支持状态。"
 
 #: app/views/administration.housekeeping.edit.php:178
 msgid "Unable to retrieve version of TimescaleDB time-series database extension for PostgreSQL."
-msgstr ""
+msgstr "无法检索 PostgreSQL 的 TimescaleDB 时序数据库扩展的版本。"
 
 #: include/views/mfa.login.php:65
 #, c-format
@@ -21706,7 +21710,7 @@ msgstr "不支持的 %1$s 数据库服务版本。不得高于 %2$s。"
 #: app/partials/administration.system.info.php:206
 #: app/views/administration.housekeeping.edit.php:169
 msgid "Unsupported TimescaleDB time-series database extension for PostgreSQL is used."
-msgstr ""
+msgstr "使用了不受支持的 PostgreSQL TimescaleDB 时序数据库扩展。"
 
 #: app/views/administration.housekeeping.edit.php:190
 #, c-format
@@ -23119,7 +23123,7 @@ msgstr "告警信息"
 #: app/partials/administration.system.info.php:243
 #: app/partials/administration.system.info.php:262
 msgid "Warning!"
-msgstr ""
+msgstr "警告！"
 
 #: app/partials/administration.system.info.php:198
 msgid "Warning! Support for Oracle DB is deprecated since Zabbix 7.0 and will be removed in future versions."

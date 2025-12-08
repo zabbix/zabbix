@@ -58,6 +58,7 @@ class testPageServicesSlaReport extends testSlaReport {
 			'headers' => ['Name'],
 			'column_data' => [
 				'Name' => [
+					'Multiple spaces in SLA name',
 					'SLA Annual',
 					'SLA Daily',
 					'SLA Monthly',
