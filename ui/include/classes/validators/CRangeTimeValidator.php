@@ -16,6 +16,7 @@
 
 class CRangeTimeValidator extends CValidator {
 	protected ?int $min = null;
+	protected bool $min_in_future = false;
 
 	public function __construct(array $options = []) {
 		if (array_key_exists('min', $options)) {
@@ -23,9 +24,11 @@ class CRangeTimeValidator extends CValidator {
 		}
 
 		if (array_key_exists('min_in_future', $options)) {
-			if ($this->min === null || $this->min < time()) {
-				$this->min = time() + 1;
-			}
+			$this->min_in_future = (bool) $options['min_in_future'];
+		}
+
+		if ($this->min !== null && $this->min_in_future) {
+			exit('Incompatible options.');
 		}
 	}
 
@@ -57,8 +60,12 @@ class CRangeTimeValidator extends CValidator {
 			return false;
 		}
 
-		if ($this->min !== null && $timestamp < $this->min) {
-			$this->setError(_s('value must be greater than or equal to %1$s', date(ZBX_FULL_DATE_TIME, $this->min)));
+		$min_timestamp = ($this->min_in_future) ? time() + 1 : $this->min;
+
+		if ($min_timestamp !== null && $timestamp < $min_timestamp) {
+			$this->setError(_s('value must be greater than or equal to %1$s',
+				date(ZBX_FULL_DATE_TIME, $min_timestamp))
+			);
 
 			return false;
 		}
