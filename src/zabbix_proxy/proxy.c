@@ -1509,7 +1509,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 								zbx_discovery_update_host_proxy,
 								zbx_discovery_update_service_proxy,
 								zbx_discovery_update_service_down_proxy,
-								zbx_discovery_update_drule_proxy};
+								zbx_discovery_update_drule_proxy,
+								zbx_discovery_get_host_status_proxy};
 	zbx_thread_trapper_args			trapper_args = {&config_comms, &zbx_config_vault, get_zbx_program_type,
 								zbx_progname, &events_cbs, &listen_sock,
 								config_startup_time, config_proxydata_frequency,

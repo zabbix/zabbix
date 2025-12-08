@@ -19,6 +19,25 @@
 #include "zbxdbhigh.h"
 #include "zbxcacheconfig.h"
 
+typedef struct
+{
+	char		*ip;
+	char		*dns;
+	char		*snmp_community;
+	char		*snmpv3_securityname;
+	char		*snmpv3_authpassphrase;
+	char		*snmpv3_privpassphrase;
+	char		*snmpv3_contextname;
+	unsigned short	port;
+	unsigned char	type;
+	unsigned char	snmp_version;
+	unsigned char	snmpv3_securitylevel;
+	unsigned char	snmpv3_authprotocol;
+	unsigned char	snmpv3_privprotocol;
+} zbx_op_discovered_interface_t;
+
+ZBX_PTR_VECTOR_DECL(op_discovered_interface_ptr, zbx_op_discovered_interface_t*)
+
 void	op_template_add(const zbx_db_event *event, zbx_config_t *cfg, zbx_vector_uint64_t *lnk_templateids);
 void	op_template_del(const zbx_db_event *event, zbx_vector_uint64_t *del_templateids);
 void	op_groups_add(const zbx_db_event *event,  zbx_config_t *cfg, zbx_vector_uint64_t *groupids);

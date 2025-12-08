@@ -44,6 +44,13 @@ typedef enum
 }
 zbx_host_tag_op_t;
 
+ZBX_PTR_VECTOR_IMPL(op_discovered_interface_ptr, zbx_op_discovered_interface_t*)
+
+static void	discovered_interface_free(zbx_op_discovered_interface_t *d_if)
+{
+	zbx_free(d_if);
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: selects hostid of discovered host                                 *
@@ -269,8 +276,9 @@ static zbx_uint64_t	add_discovered_host(const zbx_db_event *event, int *status, 
 					" where dc.druleid=dr.druleid"
 						" and ds.dcheckid=dc.dcheckid"
 						" and ds.dhostid=" ZBX_FS_UI64
-					" order by ds.dserviceid",
-					event->objectid);
+						" and ds.status=%d"
+					" order by ds.ip,ds.port",
+					event->objectid, DOBJECT_STATUS_UP);
 		}
 		else
 		{
@@ -285,14 +293,23 @@ static zbx_uint64_t	add_discovered_host(const zbx_db_event *event, int *status, 
 						" and ds.dcheckid=dc.dcheckid"
 						" and ds1.dhostid=ds.dhostid"
 						" and ds1.dserviceid=" ZBX_FS_UI64
-					" order by ds.dserviceid",
-					event->objectid);
+						" and ds.status=%d"
+					" order by ds.ip,ds.port",
+					event->objectid, DOBJECT_STATUS_UP);
 		}
+
+		zbx_vector_op_discovered_interface_ptr_t 	d_ifs_agent;
+		zbx_vector_op_discovered_interface_ptr_t 	d_ifs_snmp;
+		zbx_op_discovered_interface_t 			*d_if;
+		zbx_uint64_t					interfaceid;
+
+		zbx_vector_op_discovered_interface_ptr_create(&d_ifs_agent);
+		zbx_vector_op_discovered_interface_ptr_create(&d_ifs_snmp);
 
 		while (NULL != (row = zbx_db_fetch(result)))
 		{
-			zbx_uint64_t	interfaceid, dhostid, druleid, new_proxyid;
-			unsigned char	svc_type, interface_type, monitored_by;
+			zbx_uint64_t	dhostid, druleid, new_proxyid;
+			unsigned char	monitored_by;
 
 			ZBX_STR2UINT64(dhostid, row[0]);
 			ZBX_STR2UINT64(druleid, row[8]);
@@ -300,23 +317,47 @@ static zbx_uint64_t	add_discovered_host(const zbx_db_event *event, int *status, 
 
 			monitored_by = get_host_monitored_by(proxyid, &new_proxyid, &new_proxy_groupid);
 
-			svc_type = (unsigned char)atoi(row[5]);
+			d_if = zbx_malloc(NULL, sizeof(zbx_op_discovered_interface_t));
 
-			switch (svc_type)
+			d_if->ip = row[2];
+			d_if->dns = row[3];
+
+			switch ((unsigned char)atoi(row[5]))
 			{
 				case SVC_AGENT:
-					port = (unsigned short)atoi(row[4]);
-					interface_type = INTERFACE_TYPE_AGENT;
+					d_if->port = (unsigned short)atoi(row[4]);
+					d_if->type = INTERFACE_TYPE_AGENT;
 					break;
 				case SVC_SNMPv1:
+					d_if->port = (unsigned short)atoi(row[4]);
+					d_if->type = INTERFACE_TYPE_SNMP;
+					d_if->snmp_version = ZBX_IF_SNMP_VERSION_1;
+					break;
 				case SVC_SNMPv2c:
+					d_if->port = (unsigned short)atoi(row[4]);
+					d_if->type = INTERFACE_TYPE_SNMP;
+					d_if->snmp_version = ZBX_IF_SNMP_VERSION_2;
+					break;
 				case SVC_SNMPv3:
-					port = (unsigned short)atoi(row[4]);
-					interface_type = INTERFACE_TYPE_SNMP;
+					d_if->port = (unsigned short)atoi(row[4]);
+					d_if->type = INTERFACE_TYPE_SNMP;
+					d_if->snmp_version = ZBX_IF_SNMP_VERSION_3;
 					break;
 				default:
-					port = ZBX_DEFAULT_AGENT_PORT;
-					interface_type = INTERFACE_TYPE_AGENT;
+					d_if->port = ZBX_DEFAULT_AGENT_PORT;
+					d_if->type = INTERFACE_TYPE_AGENT;
+			}
+
+			if (INTERFACE_TYPE_SNMP == d_if->type)
+			{
+				d_if->snmp_community = row[9];
+				d_if->snmpv3_securityname = row[10];
+				d_if->snmpv3_authpassphrase = row[12];
+				d_if->snmpv3_privpassphrase = row[13];
+				d_if->snmpv3_contextname = row[16];
+				ZBX_STR2UCHAR(d_if->snmpv3_securitylevel, row[11]);
+				ZBX_STR2UCHAR(d_if->snmpv3_authprotocol, row[14]);
+				ZBX_STR2UCHAR(d_if->snmpv3_privprotocol, row[15]);
 			}
 
 			if (0 == hostid)
@@ -386,7 +427,7 @@ static zbx_uint64_t	add_discovered_host(const zbx_db_event *event, int *status, 
 					if (SUCCEED == zbx_db_is_null_basic(row3[0]) || '\0' == *row3[0])
 					{
 						zabbix_log(LOG_LEVEL_WARNING, "cannot retrieve service value for"
-								" host name on \"%s\"", row[2]);
+								" host name on \"%s\"", d_if->ip);
 						host_source = ZBX_DISCOVERY_DNS;
 					}
 					else
@@ -397,7 +438,7 @@ static zbx_uint64_t	add_discovered_host(const zbx_db_event *event, int *status, 
 					if (ZBX_DISCOVERY_VALUE == (host_source = atoi(row[6])))
 					{
 						zabbix_log(LOG_LEVEL_WARNING, "cannot retrieve service value for"
-								" host name on \"%s\"", row[2]);
+								" host name on \"%s\"", d_if->ip);
 						host_source = ZBX_DISCOVERY_DNS;
 					}
 				}
@@ -406,10 +447,10 @@ static zbx_uint64_t	add_discovered_host(const zbx_db_event *event, int *status, 
 
 				if (ZBX_DISCOVERY_VALUE == host_source)
 					host = zbx_strdup(NULL, row3[0]);
-				else if (ZBX_DISCOVERY_IP == host_source || '\0' == *row[3])
-					host = zbx_strdup(NULL, row[2]);
+				else if (ZBX_DISCOVERY_IP == host_source || '\0' == *d_if->dns)
+					host = zbx_strdup(NULL, d_if->ip);
 				else
-					host = zbx_strdup(NULL, row[3]);
+					host = zbx_strdup(NULL, d_if->dns);
 
 				zbx_db_free_result(result3);
 
@@ -441,7 +482,7 @@ static zbx_uint64_t	add_discovered_host(const zbx_db_event *event, int *status, 
 					if (SUCCEED == zbx_db_is_null_basic(row3[0]) || '\0' == *row3[0])
 					{
 						zabbix_log(LOG_LEVEL_WARNING, "cannot retrieve service value for"
-								" host visible name on \"%s\"", row[2]);
+								" host visible name on \"%s\"", d_if->ip);
 						name_source = ZBX_DISCOVERY_UNSPEC;
 					}
 					else
@@ -452,7 +493,7 @@ static zbx_uint64_t	add_discovered_host(const zbx_db_event *event, int *status, 
 					if (ZBX_DISCOVERY_VALUE == (name_source = atoi(row[7])))
 					{
 						zabbix_log(LOG_LEVEL_WARNING, "cannot retrieve service value for"
-								" host visible name on \"%s\"", row[2]);
+								" host visible name on \"%s\"", d_if->ip);
 						name_source = ZBX_DISCOVERY_UNSPEC;
 					}
 				}
@@ -460,10 +501,10 @@ static zbx_uint64_t	add_discovered_host(const zbx_db_event *event, int *status, 
 				if (ZBX_DISCOVERY_VALUE == name_source)
 					host_visible = zbx_strdup(NULL, row3[0]);
 				else if (ZBX_DISCOVERY_IP == name_source ||
-						(ZBX_DISCOVERY_DNS == name_source && '\0' == *row[3]))
-					host_visible = zbx_strdup(NULL, row[2]);
+						(ZBX_DISCOVERY_DNS == name_source && '\0' == *d_if->dns))
+					host_visible = zbx_strdup(NULL, d_if->ip);
 				else if (ZBX_DISCOVERY_DNS == name_source)
-					host_visible = zbx_strdup(NULL, row[3]);
+					host_visible = zbx_strdup(NULL, d_if->dns);
 				else
 					host_visible = zbx_strdup(NULL, host_unique);
 
@@ -508,40 +549,124 @@ static zbx_uint64_t	add_discovered_host(const zbx_db_event *event, int *status, 
 						new_proxyid, new_proxy_groupid, host_unique,
 						cfg->default_inventory_mode);
 
-				interfaceid = zbx_db_add_interface(hostid, interface_type, 1, row[2], row[3], port,
-						ZBX_CONN_DEFAULT, zbx_map_db_event_to_audit_context(event));
+				interfaceid = zbx_db_add_interface(hostid, d_if->type, 1, d_if->ip, d_if->dns,
+						d_if->port, ZBX_CONN_DEFAULT, zbx_map_db_event_to_audit_context(event));
 
+				if (INTERFACE_TYPE_SNMP == d_if->type)
+				{
+					zbx_db_add_interface_snmp(interfaceid, d_if->snmp_version, SNMP_BULK_ENABLED,
+							d_if->snmp_community, d_if->snmpv3_securityname,
+							d_if->snmpv3_securitylevel, d_if->snmpv3_authpassphrase,
+							d_if->snmpv3_privpassphrase, d_if->snmpv3_authprotocol,
+							d_if->snmpv3_privprotocol, d_if->snmpv3_contextname,
+							hostid, zbx_map_db_event_to_audit_context(event));
+				}
+
+				zbx_free(d_if);
 				zbx_free(host_unique);
 
 				add_discovered_host_groups(hostid, &groupids, event);
 			}
 			else
 			{
+				if (INTERFACE_TYPE_AGENT == d_if->type)
+				{
+					if (d_ifs_agent.values_num > 0 &&
+							0 == strcmp(d_ifs_agent.values[d_ifs_agent.values_num - 1]->ip,
+									d_if->ip))
+					{
+						zbx_free(d_if);
+					}
+					else
+						zbx_vector_op_discovered_interface_ptr_append(&d_ifs_agent, d_if);
+				}
+				else  // INTERFACE_TYPE_SNMP
+				{
+					if (d_ifs_snmp.values_num > 0 &&
+							0 == strcmp(d_ifs_snmp.values[d_ifs_snmp.values_num - 1]->ip,
+									d_if->ip))
+					{
+						zbx_free(d_if);
+					}
+					else
+						zbx_vector_op_discovered_interface_ptr_append(&d_ifs_snmp, d_if);
+				}
+			}
+		}
+
+		char if_ip[ZBX_INTERFACE_IP_LEN_MAX];
+		int if_idx;
+
+		if (d_ifs_agent.values_num > 0)
+		{
+			if_idx = FAIL;
+			if ( FAIL != zbx_db_get_main_interface_ip(hostid, INTERFACE_TYPE_AGENT,
+					if_ip, sizeof(if_ip)))
+			{
+				for (int i = 0; i < d_ifs_agent.values_num; i++)
+				{
+					if (0 == strcmp(d_ifs_agent.values[i]->ip, if_ip))
+					{
+						if_idx = i;
+						break;
+					}
+				}
+			}
+
+			if (FAIL == if_idx)
+			{
+				d_if = d_ifs_agent.values[0];
+
 				zbx_audit_host_create_entry(zbx_map_db_event_to_audit_context(event),
 						ZBX_AUDIT_ACTION_UPDATE, hostid, hostname);
-				interfaceid = zbx_db_add_interface(hostid, interface_type, 1, row[2], row[3], port,
+
+				zbx_db_add_interface(hostid, d_if->type, 1, d_if->ip, d_if->dns, d_if->port,
 						ZBX_CONN_DEFAULT, zbx_map_db_event_to_audit_context(event));
 			}
 
-			if (INTERFACE_TYPE_SNMP == interface_type)
+			zbx_vector_op_discovered_interface_ptr_clear_ext(&d_ifs_agent, discovered_interface_free);
+		}
+
+		if (d_ifs_snmp.values_num > 0)
+		{
+			if_idx = FAIL;
+			if ( FAIL != zbx_db_get_main_interface_ip(hostid, INTERFACE_TYPE_SNMP,
+					if_ip, sizeof(if_ip)))
 			{
-				unsigned char	securitylevel, authprotocol, privprotocol,
-						version = ZBX_IF_SNMP_VERSION_2;
+				for (int i = 0; i < d_ifs_snmp.values_num; i++)
+				{
+					if (0 == strcmp(d_ifs_snmp.values[i]->ip, if_ip))
+					{
+						if_idx = i;
+						break;
+					}
+				}
+			}
 
-				ZBX_STR2UCHAR(securitylevel, row[11]);
-				ZBX_STR2UCHAR(authprotocol, row[14]);
-				ZBX_STR2UCHAR(privprotocol, row[15]);
+			if (FAIL == if_idx)
+			{
+				d_if = d_ifs_snmp.values[0];
 
-				if (SVC_SNMPv1 == svc_type)
-					version = ZBX_IF_SNMP_VERSION_1;
-				else if (SVC_SNMPv3 == svc_type)
-					version = ZBX_IF_SNMP_VERSION_3;
+				zbx_audit_host_create_entry(zbx_map_db_event_to_audit_context(event),
+						ZBX_AUDIT_ACTION_UPDATE, hostid, hostname);
 
-				zbx_db_add_interface_snmp(interfaceid, version, SNMP_BULK_ENABLED, row[9], row[10],
-						securitylevel, row[12], row[13], authprotocol, privprotocol, row[16],
+				interfaceid = zbx_db_add_interface(hostid, d_if->type, 1, d_if->ip, d_if->dns,
+						d_if->port, ZBX_CONN_DEFAULT, zbx_map_db_event_to_audit_context(event));
+
+				zbx_db_add_interface_snmp(interfaceid, d_if->snmp_version, SNMP_BULK_ENABLED,
+						d_if->snmp_community, d_if->snmpv3_securityname,
+						d_if->snmpv3_securitylevel, d_if->snmpv3_authpassphrase,
+						d_if->snmpv3_privpassphrase, d_if->snmpv3_authprotocol,
+						d_if->snmpv3_privprotocol, d_if->snmpv3_contextname,
 						hostid, zbx_map_db_event_to_audit_context(event));
 			}
+
+			zbx_vector_op_discovered_interface_ptr_clear_ext(&d_ifs_snmp, discovered_interface_free);
 		}
+
+		zbx_vector_op_discovered_interface_ptr_destroy(&d_ifs_agent);
+		zbx_vector_op_discovered_interface_ptr_destroy(&d_ifs_snmp);
+
 		zbx_db_free_result(result);
 	}
 	else if (EVENT_OBJECT_ZABBIX_ACTIVE == event->object)

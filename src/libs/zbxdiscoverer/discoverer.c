@@ -51,6 +51,7 @@ static ZBX_THREAD_LOCAL int	log_worker_id;
 static zbx_get_progname_f	zbx_get_progname_cb = NULL;
 static zbx_get_program_type_f	zbx_get_program_type_cb = NULL;
 
+ZBX_PTR_VECTOR_IMPL(discoverer_downable_host_ptr, zbx_discoverer_downable_host_t*)
 ZBX_PTR_VECTOR_IMPL(discoverer_services_ptr, zbx_discoverer_dservice_t*)
 ZBX_PTR_VECTOR_IMPL(discoverer_results_ptr, zbx_discoverer_results_t*)
 ZBX_PTR_VECTOR_IMPL(discoverer_jobs_ptr, zbx_discoverer_job_t*)
@@ -231,6 +232,14 @@ static int	discoverer_service(const zbx_dc_dcheck_t *dcheck, char *ip, int port,
 	return ret;
 }
 
+static void	downable_host_free(zbx_discoverer_downable_host_t *down_host)
+{
+	zbx_vector_str_clear_ext(down_host->interfaces, zbx_str_free);
+	zbx_vector_str_destroy(down_host->interfaces);
+	zbx_free(down_host->interfaces);
+	zbx_free(down_host);
+}
+
 static void	service_free(zbx_discoverer_dservice_t *service)
 {
 	zbx_free(service);
@@ -309,9 +318,8 @@ static int	process_services(void *handle, zbx_uint64_t druleid, zbx_db_dhost *dh
 		zbx_discoverer_dservice_t	*service = services->values[unique_index];
 
 		host_status = service->status;
-		discovery_update_service_cb(handle, druleid, service->dcheckid, unique_dcheckid, dhost,
-				ip, dns, service->port, service->status, service->value, now, &dserviceids,
-				add_event_cb);
+		discovery_update_service_cb(handle, druleid, service->dcheckid, unique_dcheckid, dhost, ip, dns,
+				service->port, service->status, service->value, now, &dserviceids, add_event_cb);
 	}
 
 	for (int i = 0; i < services->values_num; i++)
@@ -321,12 +329,11 @@ static int	process_services(void *handle, zbx_uint64_t druleid, zbx_db_dhost *dh
 
 		zbx_discoverer_dservice_t	*service = services->values[i];
 
-		if ((-1 == host_status || DOBJECT_STATUS_UP == service->status) && host_status != service->status)
+		if (-1 == host_status || (host_status != service->status && DOBJECT_STATUS_UP == service->status))
 			host_status = service->status;
 
-		discovery_update_service_cb(handle, druleid, service->dcheckid, unique_dcheckid, dhost,
-				ip, dns, service->port, service->status, service->value, now, &dserviceids,
-				add_event_cb);
+		discovery_update_service_cb(handle, druleid, service->dcheckid, unique_dcheckid, dhost, ip, dns,
+				service->port, service->status, service->value, now, &dserviceids, add_event_cb);
 	}
 
 	if (0 == services->values_num)
@@ -336,7 +343,7 @@ static int	process_services(void *handle, zbx_uint64_t druleid, zbx_db_dhost *dh
 	}
 
 	if (0 != dhost->dhostid)
-		discovery_update_service_down_cb(dhost->dhostid, now, &dserviceids);
+		discovery_update_service_down_cb(dhost->dhostid, ip, now, &dserviceids, add_event_cb);
 
 	zbx_vector_uint64_destroy(&dserviceids);
 
@@ -516,12 +523,14 @@ static int	process_results(zbx_discoverer_manager_t *manager, zbx_vector_uint64_
 		zbx_discovery_update_host_func_t discovery_update_host_cb,
 		zbx_discovery_update_service_func_t discovery_update_service_cb,
 		zbx_discovery_update_service_down_func_t discovery_update_service_down_cb,
-		zbx_discovery_find_host_func_t discovery_find_host_cb)
+		zbx_discovery_find_host_func_t discovery_find_host_cb,
+		zbx_discovery_get_host_status_func_t discovery_get_host_status_cb)
 {
 #define DISCOVERER_BATCH_RESULTS_NUM	1000
 	zbx_uint64_t				res_check_total = 0,res_check_count = 0;
 	zbx_vector_discoverer_results_ptr_t	results;
 	zbx_discoverer_results_t		*result, *result_tmp;
+	zbx_discoverer_check_count_t		*dcc;
 	zbx_hashset_iter_t			iter;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() del_druleids:%d", __func__, del_druleids->values_num);
@@ -583,10 +592,16 @@ static int	process_results(zbx_discoverer_manager_t *manager, zbx_vector_uint64_
 	{
 		void	*handle = discovery_open_cb();
 
+		zbx_discoverer_downable_host_t			*down_host;
+		zbx_vector_discoverer_downable_host_ptr_t	down_hosts;
+
+		zbx_vector_discoverer_downable_host_ptr_create(&down_hosts);
+
 		for (int i = 0; i < results.values_num; i++)
 		{
-			zbx_db_dhost	dhost;
-			int		host_status;
+			zbx_db_dhost		dhost;
+			int			host_status;
+			zbx_vector_str_t	*interfaces;
 
 			result = results.values[i];
 
@@ -607,8 +622,139 @@ static int	process_results(zbx_discoverer_manager_t *manager, zbx_vector_uint64_
 					events_cbs->add_event_cb, discovery_update_service_cb,
 					discovery_update_service_down_cb, discovery_find_host_cb);
 
+			if (0 == dhost.dhostid)
+				goto update_host;
+
+			if (DOBJECT_STATUS_UP == host_status)
+			{
+				for (int h = 0; h < down_hosts.values_num; h++)
+				{
+					if (down_hosts.values[h]->dhost.dhostid == dhost.dhostid)
+					{
+						downable_host_free(down_hosts.values[h]);
+						zbx_vector_discoverer_downable_host_ptr_remove_noorder(&down_hosts, h);
+						break;
+					}
+				}
+
+				goto update_host;
+			}
+
+			for (int h = 0; h < down_hosts.values_num; h++)
+			{
+				if (down_hosts.values[h]->dhost.dhostid == dhost.dhostid)
+				{
+					int interface_index;
+
+					if (FAIL != (interface_index = zbx_vector_str_search(
+							down_hosts.values[h]->interfaces,  result->ip,
+							ZBX_DEFAULT_STR_COMPARE_FUNC)))
+					{
+						zbx_free(down_hosts.values[h]->interfaces->values[interface_index]);
+						zbx_vector_str_remove_noorder(down_hosts.values[h]->interfaces,
+								interface_index);
+					}
+
+					if(0 == down_hosts.values[h]->interfaces->values_num)
+					{
+						downable_host_free(down_hosts.values[h]);
+						zbx_vector_discoverer_downable_host_ptr_remove_noorder(&down_hosts, h);
+						goto update_host;
+					}
+
+					down_hosts.values[h]->downed_time = result->now;
+					goto skip_update;
+				}
+			}
+
+			interfaces = (zbx_vector_str_t *)zbx_malloc(NULL, sizeof(zbx_vector_str_t));
+			zbx_vector_str_create(interfaces);
+
+			host_status = discovery_get_host_status_cb(dhost.dhostid, result->ip, host_status, interfaces);
+
+			if(DOBJECT_STATUS_UP == host_status || 0 == interfaces->values_num)
+			{
+				zbx_vector_str_clear_ext(interfaces, zbx_str_free);
+				zbx_vector_str_destroy(interfaces);
+				zbx_free(interfaces);
+				goto update_host;
+			}
+
+			down_host = (zbx_discoverer_downable_host_t *)zbx_malloc(NULL,
+					sizeof(zbx_discoverer_downable_host_t));
+
+			down_host->dhost.dhostid = dhost.dhostid;
+			down_host->dhost.lastdown = dhost.lastdown;
+			down_host->dhost.lastup = dhost.lastup;
+			down_host->dhost.status = dhost.status;
+			down_host->downed_time = result->now;
+			down_host->interfaces = interfaces;
+
+			zbx_vector_discoverer_downable_host_ptr_append(&down_hosts, down_host);
+			goto skip_update;
+update_host:
 			discovery_update_host_cb(handle, result->druleid, &dhost, result->ip, result->dnsname,
 					host_status, result->now, events_cbs->add_event_cb);
+skip_update:
+			if (NULL != events_cbs->process_events_cb)
+				events_cbs->process_events_cb(NULL, NULL, NULL);
+
+			if (NULL != events_cbs->clean_events_cb)
+				events_cbs->clean_events_cb();
+
+			zbx_db_commit();
+		}
+
+		if (0 < down_hosts.values_num)
+		{
+			pthread_mutex_lock(&manager->results_lock);
+
+			zbx_hashset_iter_reset(&manager->results, &iter);
+
+			while (NULL != (result = (zbx_discoverer_results_t *)zbx_hashset_iter_next(&iter)))
+			{
+				for (int h = 0; h < down_hosts.values_num; h++)
+				{
+					int interface_index;
+					if (FAIL != (interface_index = zbx_vector_str_search(
+							down_hosts.values[h]->interfaces,  result->ip,
+							ZBX_DEFAULT_STR_COMPARE_FUNC)))
+					{
+						downable_host_free(down_hosts.values[h]);
+						zbx_vector_discoverer_downable_host_ptr_remove_noorder(&down_hosts, h);
+						break;
+					}
+				}
+			}
+
+			zbx_hashset_iter_reset(&manager->incomplete_checks_count, &iter);
+
+			while (NULL != (dcc = (zbx_discoverer_check_count_t *)zbx_hashset_iter_next(&iter)))
+			{
+				for (int h = 0; h < down_hosts.values_num; h++)
+				{
+					int interface_index;
+					if (FAIL != (interface_index = zbx_vector_str_search(
+							down_hosts.values[h]->interfaces,  dcc->ip,
+							ZBX_DEFAULT_STR_COMPARE_FUNC)))
+					{
+						downable_host_free(down_hosts.values[h]);
+						zbx_vector_discoverer_downable_host_ptr_remove_noorder(&down_hosts, h);
+						break;
+					}
+				}
+			}
+
+			pthread_mutex_unlock(&manager->results_lock);
+
+			zbx_db_begin();
+
+			for (int h = 0; h < down_hosts.values_num; h++)
+			{
+				discovery_update_host_cb(NULL, 0, &down_hosts.values[h]->dhost, NULL, NULL,
+						DOBJECT_STATUS_DOWN, down_hosts.values[h]->downed_time,
+						events_cbs->add_event_cb);
+			}
 
 			if (NULL != events_cbs->process_events_cb)
 				events_cbs->process_events_cb(NULL, NULL, NULL);
@@ -619,6 +765,7 @@ static int	process_results(zbx_discoverer_manager_t *manager, zbx_vector_uint64_
 			zbx_db_commit();
 		}
 
+		zbx_vector_discoverer_downable_host_ptr_destroy(&down_hosts);
 		discovery_close_cb(handle);
 	}
 
@@ -1756,7 +1903,8 @@ ZBX_THREAD_ENTRY(zbx_discoverer_thread, args)
 				discoverer_args_in->discovery_close_cb, discoverer_args_in->discovery_update_host_cb,
 				discoverer_args_in->discovery_update_service_cb,
 				discoverer_args_in->discovery_update_service_down_cb,
-				discoverer_args_in->discovery_find_host_cb);
+				discoverer_args_in->discovery_find_host_cb,
+				discoverer_args_in->discovery_get_host_status_cb);
 
 		process_job_finalize(&del_jobs, &drule_errors, &incomplete_druleids,
 				discoverer_args_in->discovery_open_cb, discoverer_args_in->discovery_close_cb,

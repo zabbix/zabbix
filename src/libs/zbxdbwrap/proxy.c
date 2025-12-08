@@ -2005,7 +2005,7 @@ static int	process_services(const zbx_vector_dservice_ptr_t *services, const cha
 	service = services->values[(*processed_num)++];
 
 	if (0 != dhost.dhostid)
-		discovery_update_service_down_cb(dhost.dhostid, service->itemtime, &dserviceids);
+		discovery_update_service_down_cb(dhost.dhostid, ip, service->itemtime, &dserviceids, add_event_cb);
 
 	discovery_update_host_cb(NULL, 0, &dhost, NULL, NULL, service->status, service->itemtime, add_event_cb);
 out:

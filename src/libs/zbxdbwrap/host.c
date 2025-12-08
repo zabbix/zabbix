@@ -6018,6 +6018,29 @@ clean:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
+int	zbx_db_get_main_interface_ip(zbx_uint64_t hostid, unsigned char type, char *ip_buffer, size_t buffer_size)
+{
+	zbx_db_result_t		result;
+	zbx_db_row_t		row;
+
+	memset(ip_buffer, 0, buffer_size);
+
+	result = zbx_db_select(
+			"select ip"
+			" from interface"
+			" where hostid=" ZBX_FS_UI64
+				" and type=%d"
+				" and main<>0",
+			hostid, (int)type);
+
+	if (NULL != (row = zbx_db_fetch(result)))
+	{
+		return zbx_strlcpy(ip_buffer, row[0], buffer_size);
+	}
+
+	return FAIL;
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: adds new interface to specified host                              *

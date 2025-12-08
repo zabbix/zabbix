@@ -244,7 +244,7 @@ static void	discovery_register_service(zbx_uint64_t dcheckid, zbx_db_dhost *dhos
 
 	if (NULL == (row = zbx_db_fetch(result)))
 	{
-		if (DOBJECT_STATUS_UP == status)	/* add host only if service is up */
+		if (DOBJECT_STATUS_UP == status)	/* add service only if service is up */
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "new service discovered on port %d", port);
 
@@ -577,32 +577,59 @@ void	zbx_discovery_update_service_server(void *handle, zbx_uint64_t druleid, zbx
  * Purpose: mark service status DOWN for all not received service statuses    *
  *                                                                            *
  ******************************************************************************/
-void	zbx_discovery_update_service_down_server(const zbx_uint64_t dhostid, const time_t now,
-		zbx_vector_uint64_t *dserviceids)
+void	zbx_discovery_update_service_down_server(const zbx_uint64_t dhostid, const char *ip, const time_t now,
+		zbx_vector_uint64_t *dserviceids, zbx_add_event_func_t add_event_cb)
 {
-	char	buffer[MAX_STRING_LEN], *sql = NULL;
-	size_t	sql_alloc = 0, sql_offset = 0;
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
+	char		buffer[MAX_STRING_LEN], *sql = NULL, *ip_esc;
+	size_t		sql_alloc = 0, sql_offset = 0;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() dhostid:" ZBX_FS_UI64 " dserviceids:%d now:" ZBX_FS_TIME_T,
-			__func__, dhostid, dserviceids->values_num, (zbx_fs_time_t)now);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() dhostid:" ZBX_FS_UI64 " ip:'%s' dserviceids:%d now:" ZBX_FS_TIME_T,
+			__func__, dhostid, ip, dserviceids->values_num, (zbx_fs_time_t)now);
 
-	zbx_snprintf(buffer, sizeof(buffer),
-			"update dservices"
-			" set status=%d,lastup=%d,lastdown=" ZBX_FS_TIME_T
-			" where (status=%d or lastup<>0)"
-				" and dhostid=" ZBX_FS_UI64
-				" and not",
-			DOBJECT_STATUS_DOWN, 0, (zbx_fs_time_t)now, DOBJECT_STATUS_UP, dhostid);
+	ip_esc = zbx_db_dyn_escape_field("dservices", "ip", ip);
 
-	zbx_vector_uint64_sort(dserviceids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
-	zbx_db_prepare_multiple_query(buffer, "dserviceid", dserviceids, &sql, &sql_alloc, &sql_offset);
-	zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
+	if (0 == dserviceids->values_num)
+	{
+		result = zbx_db_select(
+				"select dserviceid,status,lastup,lastdown,value"
+				" from dservices"
+				" where dhostid=" ZBX_FS_UI64
+					" and ip" ZBX_SQL_STRCMP,
+				dhostid, ZBX_SQL_STRVAL_EQ(ip_esc));
+	}
+	else
+	{
+		zbx_snprintf(buffer, sizeof(buffer),
+				"select dserviceid,status,lastup,lastdown,value"
+				" from dservices"
+				" where dhostid=" ZBX_FS_UI64
+					" and ip" ZBX_SQL_STRCMP
+					" and not",
+				dhostid, ZBX_SQL_STRVAL_EQ(ip_esc));
 
-	if (16 < sql_offset)	/* in ORACLE always present begin..end; */
-		zbx_db_execute("%s", sql);
+		zbx_db_prepare_multiple_query(buffer, "dserviceid", dserviceids, &sql, &sql_alloc, &sql_offset);
+		result = zbx_db_select("%s", sql);
+		zbx_free(sql);
+	}
 
-	zbx_free(sql);
+	zbx_free(ip_esc);
+
+	while (NULL != (row = zbx_db_fetch(result)))
+	{
+		zbx_db_dservice dservice;
+
+		ZBX_STR2UINT64(dservice.dserviceid, row[0]);
+		dservice.status = atoi(row[1]);
+		dservice.lastup = atoi(row[2]);
+		dservice.lastdown = atoi(row[3]);
+		dservice.value = row[4];
+
+		discovery_update_service_status(NULL, &dservice, DOBJECT_STATUS_DOWN, NULL, now, add_event_cb);
+	}
+
+	zbx_db_free_result(result);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
@@ -678,4 +705,39 @@ void	*zbx_discovery_open_server(void)
 void	zbx_discovery_close_server(void *handle)
 {
 	ZBX_UNUSED(handle);
+}
+
+int	zbx_discovery_get_host_status_server(const zbx_uint64_t dhostid, const char *interface_ip, int interface_status,
+		zbx_vector_str_t *downed_interfaces)
+{
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
+	char		*ip_esc;
+	int		host_status = interface_status;
+
+	ip_esc = zbx_db_dyn_escape_field("dservices", "ip", interface_ip);
+
+	result = zbx_db_select(
+			"select distinct ip, status"
+			" from dservices"
+			" where dhostid=" ZBX_FS_UI64
+				" and ip" ZBX_SQL_STRCMP,
+			dhostid, ZBX_SQL_STRVAL_NE(ip_esc));
+
+	zbx_free(ip_esc);
+
+	while (NULL != (row = zbx_db_fetch(result)))
+	{
+		if (DOBJECT_STATUS_UP == atoi(row[1]))
+		{
+			host_status = DOBJECT_STATUS_UP;
+			break;
+		}
+		else
+			zbx_vector_str_append(downed_interfaces, zbx_strdup(NULL, row[0]));
+	}
+
+	zbx_db_free_result(result);
+
+	return host_status;
 }
