@@ -19,7 +19,7 @@ require_once __DIR__.'/behaviors/CMessageBehavior.php';
 /**
  * @backup users, settings
  *
- *  @dataSource MonitoringOverview
+ * @dataSource MonitoringOverview
  */
 class testTimezone extends CWebTest {
 
