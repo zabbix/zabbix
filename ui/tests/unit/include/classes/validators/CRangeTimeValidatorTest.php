@@ -21,33 +21,33 @@ class CRangeTimeValidatorTest extends TestCase {
 	public function dataProvider(): array {
 		return [
 			// Valid absolute times.
-			['2021-01-01',				[],												null],
-			['2021-01-01 00',			[],												null],
-			['2021-01-01 00:00',		[],												null],
-			['2021-01-01 00:00:00',		[],												null],
-			['2021-01-01 00:00:00',		['min' => strtotime('2010-01-01')],		null],
-			['2038-01-01',				['min_in_future' => true],						null],
+			['2021-01-01',				[],									null],
+			['2021-01-01 00',			[],									null],
+			['2021-01-01 00:00',		[],									null],
+			['2021-01-01 00:00:00',		[],									null],
+			['2021-01-01 00:00:00',		['min' => strtotime('2010-01-01')],	null],
+			['2038-01-01',				['min_in_future' => true],			null],
 
 			// Valid relative times.
-			['now-1d',					[],												null],
-			['now+1s',					['min_in_future' => true],						null],
-			['now',						['min' => strtotime('2010-01-01')],		null],
+			['now-1d',					[],									null],
+			['now+1s',					['min_in_future' => true],			null],
+			['now',						['min' => strtotime('2010-01-01')],	null],
 
 			// Invalid absolute or relative time: format.
-			['00:00:00',				[],												'invalid time'],
-			['2021-01-01 99:00:00',		[],												'invalid time'],
-			['2021-01-01 12:00:00a',	[],												'invalid time'],
-			['{$MACRO}',				[],												'invalid time'],
-			['{#MACRO}',				[],												'invalid time'],
-			['{$MACRO}',				[],												'invalid time'],
-			['{MACRO}',					[],												'invalid time'],
-			['zzzz',					[],												'invalid time'],
-			['1000-01-01 00:00:00',		[],												'invalid time'],
-			['2040-01-01',				[],												'invalid time'],
+			['00:00:00',				[],									'invalid time'],
+			['2021-01-01 99:00:00',		[],									'invalid time'],
+			['2021-01-01 12:00:00a',	[],									'invalid time'],
+			['{$MACRO}',				[],									'invalid time'],
+			['{#MACRO}',				[],									'invalid time'],
+			['{$MACRO}',				[],									'invalid time'],
+			['{MACRO}',					[],									'invalid time'],
+			['zzzz',					[],									'invalid time'],
+			['1000-01-01 00:00:00',		[],									'invalid time'],
+			['2040-01-01',				[],									'invalid time'],
 
 			// Invalid time: out of min range.
-			['2010-01-01 00:00:00',		['min' => ZBX_MAX_DATE], 						'value must be greater than or equal to '.date(ZBX_FULL_DATE_TIME, ZBX_MAX_DATE)],
-			['now-5d',					['min' => time()],								'value must be greater than or equal to '.date(ZBX_FULL_DATE_TIME, time())]
+			['2010-01-01 00:00:00',		['min' => ZBX_MAX_DATE], 			'value must be greater than or equal to '.date(ZBX_FULL_DATE_TIME, ZBX_MAX_DATE)],
+			['now-5d',					['min' => time()],					'value must be greater than or equal to '.date(ZBX_FULL_DATE_TIME, time())]
 		];
 	}
 
