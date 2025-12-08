@@ -63,8 +63,8 @@ class CRangeTimeValidator extends CValidator {
 		$min_timestamp = ($this->min_in_future) ? time() + 1 : $this->min;
 
 		if ($min_timestamp !== null && $timestamp < $min_timestamp) {
-			$this->setError(_s('value must be greater than or equal to %1$s',
-				date(ZBX_FULL_DATE_TIME, $min_timestamp))
+			$this->setError(
+				_s('value must be greater than or equal to %1$s', date(ZBX_FULL_DATE_TIME, $min_timestamp))
 			);
 
 			return false;
