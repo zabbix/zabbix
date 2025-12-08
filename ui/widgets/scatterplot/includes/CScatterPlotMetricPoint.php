@@ -74,7 +74,7 @@ class CScatterPlotMetricPoint extends CSvgGroup {
 
 		$this->options = $metric['options'] + [
 			'color' => CSvgGraph::SVG_GRAPH_DEFAULT_COLOR,
-			'order' => 1,
+			'order' => $metric['order'],
 			'key' => $metric['key'],
 			'data_set' => $metric['data_set']
 		];
