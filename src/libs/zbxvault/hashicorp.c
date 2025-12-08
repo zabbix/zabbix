@@ -116,7 +116,7 @@ int	zbx_vault_get_kvs_hashicorp(const zbx_config_vault_t *config_vault,
 	long			response_code;
 	int			retry_login = 0;
 
-	if (NULL == approle_token && config_vault->app_role_id != NULL)
+	if (NULL == approle_token && NULL != config_vault->app_role_id)
 	{
 		if (FAIL == (ret = zbx_vault_app_role_login(config_vault, ssl_cert_file, ssl_key_file, config_source_ip,
 				config_ssl_ca_location, config_ssl_cert_location, config_ssl_key_location, timeout,
