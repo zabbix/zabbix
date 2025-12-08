@@ -43,6 +43,8 @@ class CRangeTimeValidator extends CValidator {
 	 * @return bool
 	 */
 	public function validate($value): bool {
+		$min_timestamp = ($this->min_in_future) ? time() + 1 : $this->min;
+
 		$parser = new CRangeTimeParser();
 		$result = $parser->parse($value);
 
@@ -59,8 +61,6 @@ class CRangeTimeValidator extends CValidator {
 
 			return false;
 		}
-
-		$min_timestamp = ($this->min_in_future) ? time() + 1 : $this->min;
 
 		if ($min_timestamp !== null && $timestamp < $min_timestamp) {
 			$this->setError(

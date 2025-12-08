@@ -30,7 +30,7 @@ class CRangeTimeValidatorTest extends TestCase {
 
 			// Valid relative times.
 			['now-1d',					[],									null],
-			['now+2s',					['min_in_future' => true],			null],
+			['now+1s',					['min_in_future' => true],			null],
 			['now',						['min' => strtotime('2010-01-01')],	null],
 
 			// Invalid absolute or relative time: format.
