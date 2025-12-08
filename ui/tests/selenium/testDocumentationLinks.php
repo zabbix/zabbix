@@ -2625,7 +2625,7 @@ class testDocumentationLinks extends CWebTest {
 	 * @ignoreBrowserErrors
 	 */
 	public function testDocumentationLinks_checkGeneralLinks($data) {
-		if (array_key_exists('replace', $data)) {
+		if (CTestArrayHelper::get($data, 'ŗeplace')) {
 			$replacements = [
 				'{triggerid}' => self::$triggerids['1_trigger_Not_classified'],
 				'{eventid}' => self::$eventids['1_trigger_Not_classified'],
