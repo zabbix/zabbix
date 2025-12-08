@@ -32,7 +32,7 @@ A......... [ZBX-26562] fixed 'Allowed memory size exhausted' issue while importi
 ...GI..... [ZBX-24140] fixed not being able to build Zabbix agent with statically linked curl library and inability to use curl without ssl for "web.page.get[...]" items (aetatsu)
 .........T [ZBX-26949] changed macro names in the NetApp AFF A700 by HTTP template (sbelakovs)
 ...G...... [ZBX-26111] fixed JSON output for vfs.dev.discovery DEVTYPE field (rtrizna)
-..F....... [ZBX-26289] fixed pre-processed result not displaying white spaces correctly (gklavins)
+..F....... [ZBX-26289] fixed preprocessed result not displaying white spaces correctly (gklavins)
 ..F....... [ZBX-27053] added space between tags on Web monitoring list page and in LDAP settings (msnihach)
 A......... [ZBX-26830] fixed undefined array key "host_status" on triggers import (kkuzmina)
 .........T [ZBX-26626] added additional GRANT statements for both MSSQL templates (smansurovs)
@@ -40,13 +40,13 @@ A......... [ZBX-26830] fixed undefined array key "host_status" on triggers impor
 ........S. [ZBX-27032] fixed header executing error from JavaScript request (vsmelovs)
 .........T [ZBX-27155] fixed OID for protected host memory item in Stormshield SNS by SNMP template (knaglis)
 ..F....... [ZBX-27020] fixed user with limited permissions access to map containing submap with inaccessible host or hostgroup (talbergs)
-.......PS. [ZBX-26867] cleared dependent item error message upon master item change (askolmeisters)
+.......PS. [ZBX-26867] fixed dependent item error message upon master item change (askolmeisters)
 .......PS. [ZBX-26900] fixed Zabbix server warning log for out-of-order value identifier detection to clarify data source (rtrizna)
-.........T [ZBX-26623] fixed ODBC pollers error handling in Zabbix server/proxy health templates (kflorowski)
+.........T [ZBX-26623] fixed ODBC poller error handling in Zabbix server/proxy health templates (kflorowski)
 ..F....... [ZBX-26665] fixed widget configuration form layout on narrow screens (isharha)
-..F....... [ZBX-27031] fixed host navigator to load when show problems is set to None (gberzina)
+..F....... [ZBX-27031] fixed Host navigator widget not loading when Show problems is set to None (gberzina)
 .......PS. [ZBX-26702] fixed query failures on Oracle in lld_hosts_remove (dgoloscapov)
-A.F....... [ZBX-25037] fixed slow performance of show queries for dbversion and charset on mysql (dpankins)
+A.F....... [ZBX-25037] fixed slow performance of show queries for dbversion and charset on MySQL (dpankins)
 
 --------------------------------------------------------------------------------
 Changes for 7.0.21
