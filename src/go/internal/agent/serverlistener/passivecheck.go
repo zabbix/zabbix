@@ -224,8 +224,11 @@ func processJSONRequest(conn zbxcomms.ConnectionInterface, sched scheduler.Sched
 
 	var payload []byte
 
-	if strings.HasPrefix(*result, notsupported) {
-		errMessage := (*result)[len(notsupported):]
+	if strings.Compare(*result, notsupported) == 0 || strings.HasPrefix(*result, notsupported+"\x00") {
+		errMessage := ""
+		if len(*result) > len(notsupported)+1 {
+			errMessage = (*result)[len(notsupported)+1:]
+		}
 		payload, err = formatCheckErrorPayload(errMessage, true)
 	} else {
 		payload, err = formatJSONCheckDataPayload(*result)
