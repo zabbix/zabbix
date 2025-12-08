@@ -11,6 +11,12 @@ A......PS. [ZBXNEXT-10306] updated maximum supported MySQL version to 9.5 (mprih
 ...G...... [ZBXNEXT-10012] added both SHOW SLAVE STATUS and SHOW REPLICA STATUS for Zabbix agent 2 MySQL plugin (lsurvilo)
 
 Bug fixes:
+........S. [ZBX-27267] fixed crash when database goes down during low level discovery (vso)
+.......PS. [ZBX-27229] fixed trends not being saved (Andris)
+.......PS. [ZBX-26018] added fping command execution time limit (vsmelovs)
+..F....... [ZBX-27033] fixed incorrect disabling of Execute now option in Latest data item popup for users of type User (jfreibergs)
+........S. [ZBX-27238] improved host low level discovery performance when matching existing hosts (vso)
+A.F....... [ZBX-26303] fixed escaping of special characters in regular expressions (jfreibergs, Sasha)
 ..F....... [ZBX-27215] prevented Dashboard time period filter activation when Top Hosts widget column being saved without aggregated function (isharha)
 ..F....... [ZBX-27199] fixed graph view failing to display dependent item from web scenario (agriscenko)
 A......... [ZBX-26462] updated and minimized the ability to achieve full table lock when deleting different API objects (aluchko)
@@ -1184,6 +1190,10 @@ A......PS. [ZBXNEXT-10306] updated maximum supported MySQL version to 9.5 (mprih
 ...G...... [ZBXNEXT-10012] added both SHOW SLAVE STATUS and SHOW REPLICA STATUS for Zabbix agent 2 MySQL plugin (lsurvilo)
 
 Bug fixes:
+.......PS. [ZBX-26018] added fping command execution time limit (vsmelovs)
+..F....... [ZBX-27033] fixed incorrect disabling of Execute now option in Latest data item popup for users of type User (jfreibergs)
+.......PS. [ZBX-26769] improved performance by removing "or" conditions from "in" statements (vso)
+A.F....... [ZBX-26303] fixed escaping of special characters in regular expressions (jfreibergs, Sasha)
 A......... [ZBX-26951] fixed dashboard template get to filter by provided templateids when using accessible hosts to find dashboard templates without hosts (gberzina)
 ..F....... [ZBX-27199] fixed graph view failing to display dependent item from web scenario (agriscenko)
 A......... [ZBX-26462] updated and minimized the ability to achieve full table lock when deleting different API objects (aluchko)
