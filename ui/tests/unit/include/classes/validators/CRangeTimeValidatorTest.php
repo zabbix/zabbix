@@ -30,7 +30,7 @@ class CRangeTimeValidatorTest extends TestCase {
 
 			// Valid relative times.
 			['now-1d',					[],									null],
-			['now+1s',					['min_in_future' => true],			null],
+			['now+2s',					['min_in_future' => true],			null],
 			['now',						['min' => strtotime('2010-01-01')],	null],
 
 			// Invalid absolute or relative time: format.
@@ -47,7 +47,7 @@ class CRangeTimeValidatorTest extends TestCase {
 
 			// Invalid time: out of min range.
 			['2010-01-01 00:00:00',		['min' => ZBX_MAX_DATE], 			'value must be greater than or equal to '.date(ZBX_FULL_DATE_TIME, ZBX_MAX_DATE)],
-			['now-5d',					['min' => time()],					'value must be greater than or equal to '.date(ZBX_FULL_DATE_TIME, time())]
+			['now-5d',					['min' => $ts = time()],			'value must be greater than or equal to '.date(ZBX_FULL_DATE_TIME, $ts)]
 		];
 	}
 
