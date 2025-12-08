@@ -52,8 +52,11 @@ class CWidgetItemHistory extends CWidget {
 				const content_document = iframe.contentDocument.documentElement.querySelector('body');
 				const iframe_styles = getComputedStyle(iframe);
 
+				content_document.style.width = 'max-content';
+				content_document.style.height = 'max-content';
 				content_document.style.margin = '0px';
 				content_document.style.font = iframe_styles.font;
+				content_document.style.color = iframe_styles.color;
 
 				const resizeIframe = () => {
 					const height = Math.ceil(content_document.scrollHeight);
