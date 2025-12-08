@@ -1501,7 +1501,7 @@ class testFormItem extends CLegacyWebTest {
 					'key' => 'item-history-test',
 					'history' => 3599,
 					'inline_errors' => [
-						'id:history' => 'Value must be between 3600s (1h) and 788400000s (25y).'
+						'id:history' => 'Value must be between 3600s (1h) and 788400000s (9125d).'
 					]
 				]
 			],
@@ -1513,7 +1513,7 @@ class testFormItem extends CLegacyWebTest {
 					'key' => 'item-history-test',
 					'history' => 788400001,
 					'inline_errors' => [
-						'id:history' => 'Value must be between 3600s (1h) and 788400000s (25y).'
+						'id:history' => 'Value must be between 3600s (1h) and 788400000s (9125d).'
 					]
 				]
 			],
@@ -1561,7 +1561,7 @@ class testFormItem extends CLegacyWebTest {
 					'key' => 'item-trends-test',
 					'trends' => 788400001,
 					'inline_errors' => [
-						'id:trends' => 'Value must be between 3600s (1h) and 788400000s (25y).'
+						'id:trends' => 'Value must be between 3600s (1h) and 788400000s (9125d).'
 					]
 				]
 			],
@@ -1573,7 +1573,7 @@ class testFormItem extends CLegacyWebTest {
 					'key' => 'item-trends-test',
 					'trends' => 86399,
 					'inline_errors' => [
-						'id:trends' => 'Value must be between 3600s (1h) and 788400000s (25y).'
+						'id:trends' => 'Value must be between 3600s (1h) and 788400000s (9125d).'
 					]
 				]
 			],
