@@ -3972,6 +3972,14 @@ section {
 
 .svg-graph {
   display: block; }
+  .svg-graph.hovered .svg-graph-points,
+  .svg-graph.hovered .svg-graph-line,
+  .svg-graph.hovered .svg-graph-bar {
+    opacity: 0.15; }
+    .svg-graph.hovered .svg-graph-points.hovered,
+    .svg-graph.hovered .svg-graph-line.hovered,
+    .svg-graph.hovered .svg-graph-bar.hovered {
+      opacity: 1; }
 
 .svg-point-highlight {
   fill: #f2f2f2;

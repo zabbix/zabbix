@@ -881,15 +881,31 @@
 		graph.data('is_static_hintbox_opened', true);
 
 		const hintbox = graph[0].hintBoxItem[0];
-
 		const widget = graph.data('widget');
+		const data = graph.data('options');
 
-		for (const element of hintbox.querySelectorAll('.has-broadcast-data')) {
-			element.addEventListener('click', () => {
-				widget.updateItemBroadcast(element.dataset.itemid, element.dataset.ds);
+		for (const item of hintbox.querySelectorAll('.has-broadcast-data')) {
+			const {itemid, ds} = item.dataset;
+
+			item.addEventListener('click', () => {
+				widget.updateItemBroadcast(itemid, ds);
 
 				markSelectedHintboxItems(hintbox, widget);
 			});
+
+			if (data.hintbox_type === GRAPH_HINTBOX_TYPE_SVG_GRAPH) {
+				item.addEventListener('mouseenter', () => {
+					const graph_element = graph[0].querySelector(`[data-itemid="${itemid}"][data-ds="${ds}"]`);
+					graph_element.classList.add('hovered');
+					graph[0].classList.add('hovered');
+				});
+
+				item.addEventListener('mouseleave', () => {
+					const graph_element = graph[0].querySelector(`[data-itemid="${itemid}"][data-ds="${ds}"]`);
+					graph_element.classList.remove('hovered');
+					graph[0].classList.remove('hovered');
+				});
+			}
 		}
 
 		markSelectedHintboxItems(hintbox, widget);
@@ -898,9 +914,9 @@
 	function markSelectedHintboxItems(hintbox, widget) {
 		const {itemid, ds} = widget.getItemBroadcasting();
 
-		for (const element of hintbox.querySelectorAll('.has-broadcast-data')) {
+		for (const item of hintbox.querySelectorAll('.has-broadcast-data')) {
 			if (itemid !== null && ds !== null) {
-				element.classList.toggle('selected', element.dataset.itemid == itemid && element.dataset.ds == ds);
+				item.classList.toggle('selected', item.dataset.itemid == itemid && item.dataset.ds == ds);
 			}
 		}
 	}
