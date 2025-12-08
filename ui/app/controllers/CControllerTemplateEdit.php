@@ -232,8 +232,8 @@ class CControllerTemplateEdit extends CController {
 				$data['valuemaps'] = array_values($data['dbTemplate']['valuemaps']);
 
 				$vendor_data = [
-					'name' => $data['dbTemplate']['vendor_name'] ?? '',
-					'version' => $data['dbTemplate']['vendor_version'] ?? ''
+					'name' => $data['dbTemplate']['vendor_name'],
+					'version' => $data['dbTemplate']['vendor_version']
 				];
 				$data['vendor'] = array_filter($vendor_data, 'strlen') ? $vendor_data : [];
 
