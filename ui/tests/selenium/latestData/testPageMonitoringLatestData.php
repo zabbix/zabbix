@@ -21,7 +21,7 @@ require_once __DIR__.'/../behaviors/CTableBehavior.php';
 /**
  * @backup history_uint, profiles
  *
- * @dataSource GlobalMacros
+ * @dataSource GlobalMacros, MonitoringOverview
  *
  * @onBefore prepareTestData
  */

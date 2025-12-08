@@ -670,7 +670,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 	public function testPermissionsWithoutCSRF_ElementRemove($data) {
 		$old_hash = CDBHelper::getHash($data['db']);
 
-		if (array_key_exists('replace', $data)) {
+		if (CTestArrayHelper::get($data, 'ŗeplace')) {
 			$replacements = [
 				'{hostid}' => self::$hostids['1_Host_to_check_Monitoring_Overview'],
 				'{groupid}' => self::$groupids['Another group to check Overview']

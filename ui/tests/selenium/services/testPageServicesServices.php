@@ -79,7 +79,7 @@ class testPageServicesServices extends CWebTest {
 
 			// Link child services to the corresponding problem events.
 			if ($service !== self::ROOTCAUSE_PARENT) {
-				// Corresponding events from MonitoringOverview starts with warning trigger.
+				// Add service problem for each eventid from MoitoringOverview data provider. Warning trigger has the smallest ID.
 				DBexecute('INSERT into service_problem (service_problemid, eventid, serviceid, severity) '.
 						'VALUES ('.(1 + $i).', '.(self::$monitoring_overview_eventids['1_trigger_Warning'] + $i).', '.
 						$service_ids[$service].', '.$status.')'
