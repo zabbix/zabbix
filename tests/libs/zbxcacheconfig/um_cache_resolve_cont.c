@@ -55,8 +55,6 @@ static void	mock_step_validate(zbx_mock_step_t *step)
 {
 	int	i;
 
-	zbx_config_wlock_set_locked();
-
 	for (i = 0; i < step->macros.values_num; i++)
 	{
 		const char	*value = NULL;

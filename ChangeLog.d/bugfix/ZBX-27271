@@ -1,1 +1,0 @@
-.......PS. [ZBX-27271] improved scalability and performance by not calculating hash for uint64 ids (vso)

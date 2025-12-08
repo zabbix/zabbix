@@ -234,7 +234,7 @@ in:
   path: $.services..price
 out:
   return: SUCCEED
-  value: '[5, 46, 24.5, 99.49, 154.99]'
+  value: '[154.99, 5, 46, 24.5, 99.49]'
 ---
 test case: Query $.books[?(@.id == 1 + 1)].title
 include: &include zbx_jsonobj_query.inc.yaml
@@ -500,7 +500,7 @@ in:
   path: $.services..[?(@.price > 50)].description
 out:
   return: SUCCEED
-  value: '["Rebinding torn book","Printing and assembling book in A5 format"]'
+  value: '["Printing and assembling book in A5 format", "Rebinding torn book"]'
 ---
 test case: Query $..id.length()
 include: &include zbx_jsonobj_query.inc.yaml
@@ -637,7 +637,7 @@ in:
   path: $.services[?(@.active=="true")].servicegroup
 out:
   return: SUCCEED
-  value: '[1000,1001]'
+  value: '[1001,1000]'
 ---
 test case: Query $.services[?(@.active=="false")].servicegroup
 include: &include zbx_jsonobj_query.inc.yaml
@@ -756,7 +756,7 @@ in:
   path: $.*~
 out:
   return: SUCCEED
-  value: '["filters", "books", "tags", "services", "closed message"]'
+  value: '["filters", "services", "tags", "books", "closed message"]'
 ---
 test case: Query $.*~.first()
 include: &include zbx_jsonobj_query.inc.yaml
