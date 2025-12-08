@@ -843,7 +843,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 		// Get the correct token from form and put it to the direct URL.
 		if (CTestArrayHelper::get($data, 'token')) {
 
-			if(array_key_exists('replace', $data)) {
+			if (CTestArrayHelper::get($data, 'ŗeplace')) {
 				$data['token_url'] = str_replace('{hostid}', self::$hostids['4_Host_to_check_Monitoring_Overview'], $data['token_url']);
 			}
 
