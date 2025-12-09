@@ -39,7 +39,6 @@ int	zbx_event_db_get_host(const zbx_db_event *event, zbx_dc_host_t *host, char *
 	int		ret = SUCCEED;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
-	zabbix_log(LOG_LEVEL_WARNING, "autoreg: entered %s", __func__);
 
 	offset = zbx_snprintf(sql, sizeof(sql), "select distinct h.hostid,h.proxyid,h.host,h.tls_connect");
 #ifdef HAVE_OPENIPMI
