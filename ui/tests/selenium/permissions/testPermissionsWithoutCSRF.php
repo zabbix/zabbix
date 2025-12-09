@@ -670,7 +670,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 	public function testPermissionsWithoutCSRF_ElementRemove($data) {
 		$old_hash = CDBHelper::getHash($data['db']);
 
-		if (CTestArrayHelper::get($data, 'ŗeplace')) {
+		if (CTestArrayHelper::get($data, 'replace')) {
 			$replacements = [
 				'{hostid}' => self::$hostids['1_Host_to_check_Monitoring_Overview'],
 				'{groupid}' => self::$groupids['Another group to check Overview']
@@ -843,7 +843,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 		// Get the correct token from form and put it to the direct URL.
 		if (CTestArrayHelper::get($data, 'token')) {
 
-			if (CTestArrayHelper::get($data, 'ŗeplace')) {
+			if (CTestArrayHelper::get($data, 'replace')) {
 				$data['token_url'] = str_replace('{hostid}', self::$hostids['4_Host_to_check_Monitoring_Overview'], $data['token_url']);
 			}
 
