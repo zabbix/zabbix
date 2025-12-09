@@ -498,66 +498,79 @@
 		}
 	}
 
-	function getProblemHintboxHtml(e, graph) {
-		const problems = findProblems(graph[0], e.offsetX);
-		let problems_total = problems.length;
+	function getProblemHintboxHtml(problems) {
+		const tbody = document.createElement('tbody');
 
-		if (problems_total === 0) {
-			return null;
+		for (const problem of problems) {
+			const tr = document.createElement('tr');
+
+			const clock_link = document.createElement('a');
+			clock_link.setAttribute('href', problem.url);
+			clock_link.innerText = problem.clock;
+
+			const clock_td = document.createElement('td');
+			clock_td.append(clock_link);
+
+			const recovery_clock_td = document.createElement('td');
+
+			if (problem.r_eventid) {
+				const recover_clock_link = document.createElement('a');
+				recover_clock_link.setAttribute('href', problem.url);
+				recover_clock_link.innerText = problem.r_clock;
+				recovery_clock_td.append(recover_clock_link);
+			}
+			else {
+				recovery_clock_td.innerText = problem.r_clock;
+			}
+
+			const color_span = document.createElement('span');
+			color_span.classList.add(problem.status_color);
+			color_span.innerText = problem.status;
+
+			const color_td = document.createElement('td');
+			color_td.append(color_span);
+
+			const severity_td = document.createElement('td');
+			severity_td.classList.add(problem.severity);
+			severity_td.innerText = problem.name;
+
+			tr.append(clock_td, recovery_clock_td, color_td, severity_td);
+
+			tbody.append(tr);
 		}
 
-		const tbody = jQuery('<tbody>');
+		const table = document.createElement('table');
+		table.classList.add('list-table', 'compact-view');
+		table.append(tbody);
 
-		problems.forEach(function(val, i) {
-			tbody.append(
-				jQuery('<tr>')
-					.append(jQuery('<td>').append(jQuery('<a>', {'href': val.url}).text(val.clock)))
-					.append(jQuery('<td>').append(val.r_eventid
-						? jQuery('<a>', {'href': val.url}).text(val.r_clock)
-						: val.r_clock)
-					)
-					.append(jQuery('<td>').append(
-						jQuery('<span>', { 'class': val.status_color }).text(val.status))
-					)
-					.append(jQuery('<td>', {'class': val.severity}).text(val.name))
-			);
-		});
+		const hintbox_body = document.createElement('div')
+		hintbox_body.classList.add('svg-graph-hintbox');
+		hintbox_body.append(table);
 
-		return jQuery('<div>')
-			.addClass('svg-graph-hintbox')
-			.append(
-				jQuery('<table>')
-					.addClass('list-table compact-view')
-					.append(tbody)
-			);
+		return hintbox_body;
 	}
 
-	function getSimpleTriggerHintboxHtml(e, triggers) {
-		if (triggers.length > 0) {
-			const hint_body = jQuery('<ul></ul>');
+	function getSimpleTriggerHintboxHtml(triggers_areas) {
+		const ul = document.createElement('ul');
 
-			const trigger_areas = triggers.filter(t => !(t.begin_position > e.offsetX || e.offsetX > t.end_position));
+		for (const trigger_area of triggers_areas) {
+			const li = document.createElement('li');
+			li.innerText = `${trigger_area.trigger} [${trigger_area.constant}]`;
 
-			if (!trigger_areas.length) {
-				return null;
-			}
+			const span = document.createElement('span');
+			span.style.backgroundColor = trigger_area.color;
+			span.classList.add('svg-graph-hintbox-trigger-color');
 
-			for (const trigger of trigger_areas) {
-				hint_body.append(
-					jQuery('<li>')
-						.text(trigger.trigger + ' [' + trigger.constant + ']')
-						.append(
-							jQuery('<span>')
-								.css('background-color', trigger.color)
-								.addClass('svg-graph-hintbox-trigger-color')
-						)
-				)
-			}
+			li.append(span);
 
-			return jQuery('<div>')
-				.addClass('svg-graph-hintbox')
-				.append(hint_body);
+			ul.append(li);
 		}
+
+		const hintbox_body = document.createElement('div');
+		hintbox_body.classList.add('svg-graph-hintbox');
+		hintbox_body.append(ul);
+
+		return hintbox_body;
 	}
 
 	function getValuesHintboxHtml(included_points, offsetX, data) {
@@ -600,13 +613,11 @@
 						}
 					}
 
-					li.append(`): ${key === 'xItems' ? point.vx : point.vy}`)
-
 					const color_span = document.createElement('span');
 					color_span.style.color = point.color;
 					color_span.classList.add('svg-graph-hintbox-icon-color', point.marker_class);
 
-					li.append(color_span);
+					li.append(`): ${key === 'xItems' ? point.vx : point.vy}`, color_span);
 
 					html.append(li);
 
@@ -630,8 +641,7 @@
 				color_span.style.backgroundColor = point.g.dataset.color;
 				color_span.classList.add('svg-graph-hintbox-item-color');
 
-				li.append(`${point.g.dataset.metric}: ${point.v}`);
-				li.append(color_span);
+				li.append(`${point.g.dataset.metric}: ${point.v}`, color_span);
 
 				html.append(li);
 			}
@@ -674,7 +684,11 @@
 		if (data.showProblems && in_problem_area) {
 			hideHelper(graph);
 
-			html = getProblemHintboxHtml(e, graph);
+			const problems = findProblems(graph[0], e.offsetX);
+
+			if (problems.length > 0) {
+				html = getProblemHintboxHtml(problems);
+			}
 		}
 		// Show graph values or simple triggers if mouse is over the graph canvas.
 		else if (in_values_area) {
@@ -683,7 +697,13 @@
 			if (triggers.length > 0) {
 				hideHelper(graph);
 
-				html = getSimpleTriggerHintboxHtml(e, triggers);
+				const trigger_areas = triggers.filter(
+					t => !(t.begin_position > e.offsetX || e.offsetX > t.end_position)
+				);
+
+				if (trigger_areas.length > 0) {
+					html = getSimpleTriggerHintboxHtml(triggers);
+				}
 			}
 			else {
 				setHelperPosition(e, graph);
@@ -778,7 +798,7 @@
 		}
 
 		if (html !== null) {
-			graph[0].dataset.hintboxContents = html instanceof jQuery ? html[0].outerHTML : html.outerHTML;
+			graph[0].dataset.hintboxContents = html.outerHTML;
 		}
 		else if (in_values_area || in_problem_area) {
 			destroyHintbox(graph);
