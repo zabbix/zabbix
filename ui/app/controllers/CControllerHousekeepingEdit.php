@@ -105,7 +105,8 @@ class CControllerHousekeepingEdit extends CController {
 			'compress_older' => $this->getInput('compress_older', CHousekeepingHelper::get(
 				CHousekeepingHelper::COMPRESS_OLDER
 			)),
-			'db_extension' => CHousekeepingHelper::get(CHousekeepingHelper::DB_EXTENSION)
+			'db_extension' => CHousekeepingHelper::get(CHousekeepingHelper::DB_EXTENSION),
+			'history_providers' => []
 		];
 
 		if ($data['db_extension'] === ZBX_DB_EXTENSION_TIMESCALEDB) {
@@ -131,6 +132,19 @@ class CControllerHousekeepingEdit extends CController {
 
 					break;
 				}
+			}
+		}
+
+		$dbversion_history_status = CSettingsHelper::getDbVersionHistoryStatus();
+
+		foreach ($dbversion_history_status as $provider) {
+			if (!array_key_exists('value_types', $provider) || !is_array($provider['value_types'])
+					|| !array_key_exists('ttl', reset($provider['value_types']))) {
+				continue;
+			}
+
+			foreach ($provider['value_types'] as $type_data) {
+				$data['history_providers'][$provider['database']][$type_data['type']] = $type_data['ttl'];
 			}
 		}
 

@@ -2511,3 +2511,23 @@ function zbx_mb_check_encoding(string $string, string $encoding): bool {
 
 	return $decoded_string === $string;
 }
+
+/**
+ * Converts a Unix timestamp in seconds and optional nanoseconds into a ClickHouse-compatible DateTime64(9) string, e.g.
+ * "2025-11-25 07:56:20.293208897".
+ *
+ * @param int      $clock   Unix timestamp in seconds.
+ * @param int|null $ns      Nanoseconds (0–999999999). If omitted, defaults to 000000000.
+ * @param bool     $quoted  Whether to wrap the result in single quotes.
+ *
+ * @return string
+ */
+function db_utc_to_datetime64(int $clock, ?int $ns = null, bool $quoted = true): string {
+	$ns_str = $ns !== null ? str_pad((string) $ns, 9, '0', STR_PAD_LEFT) : '000000000';
+
+	$date_time = zbx_date2str('Y-m-d H:i:s', $clock, CTimezoneHelper::getSystemTimezone());
+
+	$result = $date_time.'.'.$ns_str;
+
+	return $quoted ? "'".$result."'" : $result;
+}

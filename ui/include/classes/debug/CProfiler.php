@@ -31,6 +31,13 @@ class CProfiler {
 	protected $slowElasticQueryTime = 0.01;
 
 	/**
+	 * Determines time for single Clickhouse query to be considered slow.
+	 *
+	 * @var float
+	 */
+	protected $slowClickhouseQueryTime = 0.01;
+
+	/**
 	 * Contains all api requests info.
 	 *
 	 * @var array
@@ -52,6 +59,13 @@ class CProfiler {
 	protected $elasticQueryLog = [];
 
 	/**
+	 * Contains Clickhouse queries info.
+	 *
+	 * @var array
+	 */
+	protected $clickhouseQueryLog = [];
+
+	/**
 	 * Total time of all performed sql queries.
 	 *
 	 * @var float
@@ -64,6 +78,13 @@ class CProfiler {
 	 * @var float
 	 */
 	protected $elasticTotalTime = 0.0;
+
+	/**
+	 * Total time of all performed Clickhouse queries.
+	 *
+	 * @var float
+	 */
+	protected $clickhouseTotalTime = 0.0;
 
 	/**
 	 * Timestamp of profiling start.
@@ -147,6 +168,11 @@ class CProfiler {
 			$debug[] = BR();
 		}
 
+		if ($this->clickhouseQueryLog) {
+			$debug[] = _s('Total Clickhouse time: %1$s', $this->clickhouseTotalTime);
+			$debug[] = BR();
+		}
+
 		if (isset($DB) && isset($DB['SELECT_COUNT'])) {
 			$debug[] = _s('SQL count: %1$s (selects: %2$s | executes: %3$s)',
 				count($this->sqlQueryLog), $DB['SELECT_COUNT'], $DB['EXECUTE_COUNT']);
@@ -217,8 +243,35 @@ class CProfiler {
 			];
 
 			if ($time > $this->slowElasticQueryTime) {
-				$sql = bold($record);
+				$record = bold($record);
 			}
+
+			$debug[] = $record;
+
+			$debug[] = $this->formatCallStack($query[4]);
+			$debug[] = BR();
+			$debug[] = BR();
+		}
+
+		$debug[] = BR();
+
+		foreach ($this->clickhouseQueryLog as $query) {
+			$time = $query[0];
+
+			$record = [
+				'Clickhouse ('.$time.'): ',
+				$query[1].' ',
+				(new CSpan($query[2]))->addClass(ZBX_STYLE_BLUE),
+				BR(),
+				'Request: ',
+				(new CSpan($query[3]))->addClass(ZBX_STYLE_GREEN),
+				BR()
+			];
+
+			if ($time > $this->slowClickhouseQueryTime) {
+				$record = bold($record);
+			}
+
 			$debug[] = $record;
 
 			$debug[] = $this->formatCallStack($query[4]);
@@ -306,6 +359,27 @@ class CProfiler {
 
 		$this->elasticTotalTime += $time;
 		$this->elasticQueryLog[] = [
+			$time,
+			$method,
+			$endpoint,
+			$query,
+			array_slice(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS), 1)
+		];
+	}
+
+	/**
+	 * Store Clickhouse query data.
+	 */
+	public function profileClickhouse(float $time, string $method, string $endpoint, string $query) {
+		if (!is_null(CWebUser::$data) && isset(CWebUser::$data['debug_mode'])
+			&& CWebUser::$data['debug_mode'] == GROUP_DEBUG_MODE_DISABLED) {
+			return;
+		}
+
+		$time = round($time, 6);
+
+		$this->clickhouseTotalTime += $time;
+		$this->clickhouseQueryLog[] = [
 			$time,
 			$method,
 			$endpoint,

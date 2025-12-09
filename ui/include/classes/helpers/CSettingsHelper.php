@@ -104,6 +104,7 @@ class CSettingsHelper {
 
 	// Read-only parameters.
 	public const SESSION_KEY = 'session_key';
+	public const DBVERSION_HISTORY_STATUS = 'dbversion_history_status';
 	public const DBVERSION_STATUS = 'dbversion_status';
 	public const SERVER_STATUS = 'server_status';
 	public const SOFTWARE_UPDATE_CHECKID = 'software_update_checkid';
@@ -201,6 +202,14 @@ class CSettingsHelper {
 		);
 
 		return $supported_params[$field];
+	}
+
+	public static function getDbVersionHistoryStatus(): array {
+		if (!self::$params_private) {
+			self::$params_private = CSettings::getPrivate();
+		}
+
+		return self::$params_private[self::DBVERSION_HISTORY_STATUS];
 	}
 
 	public static function getDbVersionStatus(): array {

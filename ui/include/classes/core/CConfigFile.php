@@ -184,6 +184,10 @@ class CConfigFile {
 			$this->config['HISTORY'] = $HISTORY;
 		}
 
+		if (isset($HISTORY_PROVIDERS)) {
+			$this->config['HISTORY_PROVIDER'] = $HISTORY_PROVIDERS;
+		}
+
 		if (isset($SSO)) {
 			$this->config['SSO'] = $SSO;
 		}
@@ -224,8 +228,8 @@ class CConfigFile {
 	}
 
 	public function makeGlobal() {
-		global $DB, $ZBX_SERVER, $ZBX_SERVER_PORT, $ZBX_SERVER_NAME, $IMAGE_FORMAT_DEFAULT, $HISTORY, $SSO,
-			$ALLOW_HTTP_AUTH, $ZBX_SERVER_TLS;
+		global $DB, $ZBX_SERVER, $ZBX_SERVER_PORT, $ZBX_SERVER_NAME, $IMAGE_FORMAT_DEFAULT, $HISTORY, $HISTORY_PROVIDERS,
+			$SSO, $ALLOW_HTTP_AUTH, $ZBX_SERVER_TLS;
 
 		$DB = $this->config['DB'];
 		$ZBX_SERVER = $this->config['ZBX_SERVER'];
@@ -233,6 +237,7 @@ class CConfigFile {
 		$ZBX_SERVER_NAME = $this->config['ZBX_SERVER_NAME'];
 		$IMAGE_FORMAT_DEFAULT = $this->config['IMAGE_FORMAT_DEFAULT'];
 		$HISTORY = $this->config['HISTORY'];
+		$HISTORY_PROVIDERS = $this->config['HISTORY_PROVIDER'];
 		$SSO = $this->config['SSO'];
 		$ALLOW_HTTP_AUTH = $this->config['ALLOW_HTTP_AUTH'];
 		$ZBX_SERVER_TLS = $this->config['ZBX_SERVER_TLS'];
@@ -316,14 +321,28 @@ $ZBX_SERVER_NAME		= \''.addcslashes($this->config['ZBX_SERVER_NAME'], "'\\").'\'
 
 $IMAGE_FORMAT_DEFAULT		= IMAGE_FORMAT_PNG;
 
-// Uncomment this block only if you are using Elasticsearch.
-// Elasticsearch url (can be string if same url is used for all types).
-//$HISTORY[\'url\'] = [
-//	\'uint\' => \'http://localhost:9200\',
-//	\'text\' => \'http://localhost:9200\'
+// Uncomment this block if you are using Elasticsearch or ClickHouse for storing history data.
+// The provider configuration consists of one or more array entries with the following parameters:
+// \'types\' - an array with one or more type strings (dbl, str, log, uint, text, binary).
+// \'provider\' - a string containing provider (elastic, clickhouse).
+// \'url\' - a string pointing to the service instance.
+// \'db\' - a string with database name. Required for ClickHouse.
+// \'username\' and \'password\' - service credential strings. Required for ClickHouse.
+//$HISTORY_PROVIDERS = [
+//	[
+//		\'types\' => [\'uint\', \'text\'],
+//		\'provider\' => \'clickhouse\',
+//		\'url\' => \'http://localhost:8123\',
+//		\'db\' => \'zabbix\',
+//		\'username\' =>\'zabbix\',
+//		\'password\' =>\'zabbix\'
+//	],
+//	[
+//		\'types\' => [\'str\'],
+//		\'provider\' => \'elastic\',
+//		\'url\' => \'http://localhost:9200\'
+//	]
 //];
-// Value types stored in Elasticsearch.
-//$HISTORY[\'types\'] = [\'uint\', \'text\'];
 
 // Used for SAML authentication.
 

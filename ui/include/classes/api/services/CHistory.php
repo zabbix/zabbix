@@ -143,6 +143,10 @@ class CHistory extends CApiService {
 				$result = $this->getFromElasticsearch($options);
 				break;
 
+			case ZBX_HISTORY_SOURCE_CLICKHOUSE:
+				$result = $this->getFromClickhouse($options);
+				break;
+
 			default:
 				if (CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY_GLOBAL) == 1) {
 					$hk_history = timeUnitToSeconds(CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY));
@@ -292,6 +296,82 @@ class CHistory extends CApiService {
 		}
 
 		return null;
+	}
+
+	/**
+	 * Clickhouse specific implementation of get.
+	 *
+	 * @see CHistory::get
+	 */
+	private function getFromClickhouse($options) {
+		$endpoints = CHistoryManager::getClickhouseEndpoints($options['history']);
+
+		if (!$endpoints) {
+			return null;
+		}
+
+		$endpoint = reset($endpoints);
+
+		$sql_parts = [
+			'select'	=> ['history' => 'h.itemid'],
+			'from'		=> [
+				'history' => $this->tableName.' h'
+			],
+			'where'		=> [],
+			'group'		=> [],
+			'order'		=> []
+		];
+
+		// itemids
+		if ($options['itemids'] !== null) {
+			$sql_parts['where']['itemid'] = dbConditionId('h.itemid', $options['itemids']);
+		}
+
+		// time_from
+		if ($options['time_from'] !== null) {
+			$sql_parts['where']['clock_from'] = 'h.timestamp>='.db_utc_to_datetime64($options['time_from']);
+		}
+
+		// time_till
+		if ($options['time_till'] !== null) {
+			$sql_parts['where']['clock_till'] = 'h.timestamp<='.db_utc_to_datetime64($options['time_till']);
+		}
+
+		// filter
+		if ($options['filter'] !== null) {
+			$this->dbFilter($sql_parts['from']['history'], $options, $sql_parts);
+		}
+
+		// search
+		if ($options['search'] !== null) {
+			zbx_db_search($sql_parts['from']['history'], $options, $sql_parts);
+		}
+
+		// output
+		if ($options['output'] === API_OUTPUT_EXTEND) {
+			$options['output'] = ['itemid', 'clock', 'ns', 'value'];
+		}
+
+		$sql_parts = $this->applyQueryOutputOptions($this->tableName, $this->tableAlias(), $options, $sql_parts);
+		$sql_parts = $this->applyQuerySortOptions($this->tableName, $this->tableAlias(), $options, $sql_parts);
+
+		$query = self::createSelectQueryFromParts($sql_parts);
+
+		$output_map = [
+			'h.clock' => 'toUnixTimestamp(h.timestamp) AS clock',
+			'h.ns' => 'toUnixTimestamp64Nano(h.timestamp) % 1000000000 AS ns'
+		];
+
+		$query = str_replace(array_keys($output_map), array_values($output_map), $query);
+
+		// limit
+		if ($options['limit'] !== null) {
+			$query .= ' LIMIT '.$options['limit'];
+		}
+
+		return CClickhouseHelper::fetch($query,
+			$endpoint['endpoint'], $endpoint['username'], $endpoint['password']
+		);
 	}
 
 	/**

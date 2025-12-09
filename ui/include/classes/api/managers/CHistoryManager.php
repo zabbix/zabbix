@@ -19,10 +19,75 @@
  */
 class CHistoryManager {
 
-	/**
-	 * @var bool
-	 */
-	private $primary_keys_enabled = false;
+	private bool $primary_keys_enabled = false;
+
+	private static array $providers = [
+		ZBX_HISTORY_SOURCE_CLICKHOUSE => 'ClickHouse',
+		ZBX_HISTORY_SOURCE_ELASTIC => 'ElasticDB',
+	];
+
+	private static array $value_type_mapping = [
+		ITEM_VALUE_TYPE_FLOAT => 'dbl',
+		ITEM_VALUE_TYPE_STR => 'str',
+		ITEM_VALUE_TYPE_LOG => 'log',
+		ITEM_VALUE_TYPE_UINT64 => 'uint',
+		ITEM_VALUE_TYPE_TEXT => 'text',
+		ITEM_VALUE_TYPE_BINARY => 'binary'
+	];
+
+	private static array $value_type_sources = [];
+
+	public function __construct() {
+		self::initSources();
+	}
+
+	private function initSources(): void {
+		global $HISTORY, $HISTORY_PROVIDERS;
+
+		$valid_value_names = array_values(self::$value_type_mapping);
+
+		if (is_array($HISTORY_PROVIDERS)) {
+			foreach ($HISTORY_PROVIDERS as $provider) {
+				if (is_array($provider) && array_key_exists('types', $provider)
+						&& is_array($provider['types']) && array_key_exists('provider', $provider)) {
+					$sanitized_value_names = array_intersect($provider['types'], $valid_value_names);
+
+					if (!$sanitized_value_names || !array_key_exists($provider['provider'], self::$providers)) {
+						continue;
+					}
+
+					$provider_data = [
+						'provider' => $provider['provider'],
+						'url' => array_key_exists('url', $provider) ? rtrim($provider['url'], '/').'/' : null,
+						'db' => array_key_exists('db', $provider) ? $provider['db'] : null,
+						'username' => array_key_exists('username', $provider) ? $provider['username'] : null,
+						'password' => array_key_exists('password', $provider) ? $provider['password'] : null
+					];
+
+					foreach ($sanitized_value_names as $name) {
+						self::$value_type_sources[$name] = $provider_data;
+					}
+				}
+			}
+		}
+		elseif (is_array($HISTORY) && array_key_exists('types', $HISTORY) && is_array($HISTORY['types'])) {
+			$sanitized_value_names = array_intersect($HISTORY['types'], $valid_value_names);
+			$url = array_key_exists('url', $HISTORY) ? $HISTORY['url'] : null;
+
+			foreach ($sanitized_value_names as $name) {
+				$target_url = $url;
+
+				if (is_array($target_url)) {
+					$target_url = array_key_exists($name, $target_url) ? $target_url[$name] : null;
+				}
+
+				self::$value_type_sources[$name] = [
+					'provider' => ZBX_HISTORY_SOURCE_ELASTIC,
+					'url' => $target_url
+				];
+			}
+		}
+	}
 
 	/**
 	 * Whether to enable optimizations that make use of PRIMARY KEY (itemid, clock, ns) on the history tables.
@@ -53,6 +118,10 @@ class CHistoryManager {
 
 		if (array_key_exists(ZBX_HISTORY_SOURCE_ELASTIC, $grouped_items)) {
 			$results += $this->getLastValuesFromElasticsearch($grouped_items[ZBX_HISTORY_SOURCE_ELASTIC], 1, $period);
+		}
+
+		if (array_key_exists(ZBX_HISTORY_SOURCE_CLICKHOUSE, $grouped_items)) {
+			$results += $this->getLastValuesFromClickhouse($grouped_items[ZBX_HISTORY_SOURCE_CLICKHOUSE], 1, $period);
 		}
 
 		if (array_key_exists(ZBX_HISTORY_SOURCE_SQL, $grouped_items)) {
@@ -116,7 +185,13 @@ class CHistoryManager {
 
 		if (array_key_exists(ZBX_HISTORY_SOURCE_ELASTIC, $grouped_items)) {
 			$results += $this->getLastValuesFromElasticsearch($grouped_items[ZBX_HISTORY_SOURCE_ELASTIC], $limit,
-					$period
+				$period
+			);
+		}
+
+		if (array_key_exists(ZBX_HISTORY_SOURCE_CLICKHOUSE, $grouped_items)) {
+			$results += $this->getLastValuesFromClickhouse($grouped_items[ZBX_HISTORY_SOURCE_CLICKHOUSE], $limit,
+				$period
 			);
 		}
 
@@ -357,6 +432,48 @@ class CHistoryManager {
 	}
 
 	/**
+	 * ClickHouse specific implementation of getLastValues.
+	 *
+	 * @see CHistoryManager::getLastValues
+	 */
+	private function getLastValuesFromClickhouse(array $items, int $limit, ?int $period): array {
+		$value_type_itemids = [];
+
+		foreach ($items as $item) {
+			$value_type_itemids[$item['value_type']][] = $item['itemid'];
+		}
+
+		$period_condition = $period === null ? '' : ' AND timestamp>'.db_utc_to_datetime64(time() - $period);
+
+		$results = [];
+
+		foreach (self::getClickhouseEndpoints(array_keys($value_type_itemids)) as $type => $endpoint) {
+			$itemids = $value_type_itemids[$type];
+
+			foreach ($itemids as $itemid) {
+				$values = CClickhouseHelper::fetch(
+					'SELECT itemid,'.
+						'toUnixTimestamp(timestamp) AS clock,'.
+						'toUnixTimestamp64Nano(timestamp) % 1000000000 AS ns,'.
+						'value'.
+					' FROM '.self::getTableName($type).' h'.
+					' WHERE itemid='.zbx_dbstr($itemid).
+						$period_condition.
+					' ORDER BY timestamp DESC'.
+					' LIMIT '.$limit,
+					$endpoint['endpoint'], $endpoint['username'], $endpoint['password']
+				);
+
+				if ($values) {
+					$results[$itemid] = $values;
+				}
+			}
+		}
+
+		return $results;
+	}
+
+	/**
 	 * Returns the history data of the item at the given time. If no data exists at the given time, the function will
 	 * return the previous data.
 	 *
@@ -374,6 +491,9 @@ class CHistoryManager {
 		switch (self::getDataSourceType($item['value_type'])) {
 			case ZBX_HISTORY_SOURCE_ELASTIC:
 				return $this->getValueAtFromElasticsearch($item, $clock, $ns);
+
+			case ZBX_HISTORY_SOURCE_CLICKHOUSE:
+				return $this->getValueAtFromClickhouse($item, $clock, $ns);
 
 			default:
 				return $this->primary_keys_enabled
@@ -589,6 +709,52 @@ class CHistoryManager {
 	}
 
 	/**
+	 * Implementation that uses existence of primary key in history tables.
+	 * @see CHistoryManager->getValueAtFromClickhouse()
+	 *
+	 * @param string $item['itemid']
+	 * @param int    $item['value_type']
+	 * @param int    $clock
+	 * @param int    $ns
+	 *
+	 * @return array|null  Item data at specified time of first data before specified time. null if data is not found.
+	 */
+	private function getValueAtFromClickhouse(array $item, int $clock, int $ns): ?array {
+		$hk_history = self::getClickhouseTtlByTypeId($item['value_type']);
+
+		if ($hk_history === null || ($clock <= time() - $hk_history)) {
+			return null;
+		}
+
+		$endpoints = CHistoryManager::getClickhouseEndpoints($item['value_type']);
+
+		if (!$endpoints) {
+			return null;
+		}
+
+		$endpoint = reset($endpoints);
+
+		$values = CClickhouseHelper::fetch(
+			'SELECT itemid,'.
+				'toUnixTimestamp(timestamp) AS clock,'.
+				'toUnixTimestamp64Nano(timestamp) % 1000000000 AS ns,'.
+				'value'.
+			' FROM '.self::getTableName($item['value_type']).
+			' WHERE itemid='.zbx_dbstr($item['itemid']).
+			' AND timestamp<='.db_utc_to_datetime64($clock, $ns).
+			' ORDER BY timestamp DESC'.
+			' LIMIT 1',
+			$endpoint['endpoint'], $endpoint['username'], $endpoint['password']
+		);
+
+		if (!$values) {
+			return null;
+		}
+
+		return $values;
+	}
+
+	/**
 	 * Get value aggregation by interval within the specified time period.
 	 *
 	 * The $item parameter must have the value_type, itemid and source properties set.
@@ -606,8 +772,15 @@ class CHistoryManager {
 		$grouped_items = $this->getItemsGroupedByStorage($items);
 
 		$results = [];
+
 		if (array_key_exists(ZBX_HISTORY_SOURCE_ELASTIC, $grouped_items)) {
-			$results = $this->getAggregationByIntervalFromElasticsearch($grouped_items[ZBX_HISTORY_SOURCE_ELASTIC],
+			$results += $this->getAggregationByIntervalFromElasticsearch($grouped_items[ZBX_HISTORY_SOURCE_ELASTIC],
+				$time_from, $time_to, $function, $interval
+			);
+		}
+
+		if (array_key_exists(ZBX_HISTORY_SOURCE_CLICKHOUSE, $grouped_items)) {
+			$results += $this->getAggregationByIntervalFromClickhouse($grouped_items[ZBX_HISTORY_SOURCE_CLICKHOUSE],
 				$time_from, $time_to, $function, $interval
 			);
 		}
@@ -750,6 +923,82 @@ class CHistoryManager {
 				if (array_key_exists($item['key'], $results)) {
 					$results[$item['key']]['source'] = 'history';
 				}
+			}
+		}
+
+		return $results;
+	}
+
+	/**
+	 * ClickHouse specific implementation of getAggregationByInterval.
+	 *
+	 * @see CHistoryManager::getAggregationByInterval
+	 */
+	private function getAggregationByIntervalFromClickhouse(array $items, int $time_from, int $time_to,
+			int $function, int $interval): array {
+		$value_type_itemids = [];
+
+		foreach ($items as $item) {
+			$value_type_itemids[$item['value_type']][$item['itemid']] = true;
+		}
+
+		$sql_select = ['itemid', 'toUnixTimestamp(tick) AS tick', 'toUnixTimestamp(ts) AS clock',
+			'toUnixTimestamp64Nano(timestamp) % 1000000000 AS ns'
+		];
+		$sql_sub_select = ['itemid', 'toStartOfInterval(timestamp, toIntervalSecond('.$interval.')) AS tick'];
+
+		switch ($function) {
+			case AGGREGATE_MIN:
+				$sql_sub_select[] = 'min(value) AS value,max(timestamp) AS ts';
+				break;
+			case AGGREGATE_MAX:
+				$sql_sub_select[] = 'max(value) AS value,max(timestamp) AS ts';
+				break;
+			case AGGREGATE_AVG:
+				$sql_sub_select[] = 'avg(value) AS value,max(timestamp) AS ts';
+				break;
+			case AGGREGATE_COUNT:
+				$sql_sub_select[] = 'count() AS value,max(timestamp) AS ts';
+				break;
+			case AGGREGATE_SUM:
+				$sql_sub_select[] = 'sum(value) AS value,max(timestamp) AS ts';
+				break;
+			case AGGREGATE_FIRST:
+				$sql_sub_select[] = 'argMin(value, timestamp) AS value,min(timestamp) AS ts';
+				break;
+			case AGGREGATE_LAST:
+				$sql_sub_select[] = 'argMax(value, timestamp) AS value,max(timestamp) AS ts';
+				break;
+		}
+
+		$results = [];
+
+		$period_condition = ' AND timestamp BETWEEN '.db_utc_to_datetime64($time_from).
+			' AND '.db_utc_to_datetime64($time_to);
+
+		foreach (self::getClickhouseEndpoints(array_keys($value_type_itemids)) as $value_type => $endpoint) {
+			$values = CClickhouseHelper::fetch(
+				'SELECT '.implode(',', $sql_select).
+				' FROM ('.
+					'SELECT '.implode(',', $sql_sub_select).
+					' FROM '.self::getTableName($value_type).
+					' WHERE '.dbConditionId('itemid', array_keys($value_type_itemids[$value_type])).
+					$period_condition.
+					' GROUP BY itemid,tick'.
+				')',
+				$endpoint['endpoint'], $endpoint['username'], $endpoint['password']
+			);
+
+			if ($values) {
+				foreach ($values as $value) {
+					$results[$value['itemid']]['data'][] = $value;
+				}
+			}
+		}
+
+		foreach ($items as $item) {
+			if (array_key_exists($item['itemid'], $results)) {
+				$results[$item['itemid']]['source'] = 'history';
 			}
 		}
 
@@ -946,6 +1195,12 @@ class CHistoryManager {
 			);
 		}
 
+		if (array_key_exists(ZBX_HISTORY_SOURCE_CLICKHOUSE, $grouped_items)) {
+			$results += $this->getGraphAggregationByWidthFromClickhouse($grouped_items[ZBX_HISTORY_SOURCE_CLICKHOUSE],
+				$time_from, $time_to, $width
+			);
+		}
+
 		if (array_key_exists(ZBX_HISTORY_SOURCE_SQL, $grouped_items)) {
 			$results += $this->getGraphAggregationByWidthFromSql($grouped_items[ZBX_HISTORY_SOURCE_SQL],
 				$time_from, $time_to, $width
@@ -1120,6 +1375,69 @@ class CHistoryManager {
 	}
 
 	/**
+	 * ClickHouse specific implementation of getGraphAggregationByWidth.
+	 *
+	 * @see CHistoryManager::getGraphAggregationByWidth
+	 */
+	private function getGraphAggregationByWidthFromClickhouse(array $items, int $time_from, int $time_to,
+			?int $width): array {
+		$value_type_itemids = [];
+
+		foreach ($items as $item) {
+			$value_type_itemids[$item['value_type']][$item['itemid']] = true;
+		}
+
+		$sql_select = ['itemid', 'count', 'avg', 'min', 'max', 'toUnixTimestamp(ts) AS clock'];
+
+		$sql_sub_select = ['itemid', 'count() AS count', 'avg(value) AS avg', 'min(value) AS min', 'max(value) AS max',
+			'max(timestamp) as ts'
+		];
+
+		$group_by = ['itemid'];
+
+		if ($width !== null) {
+			$sql_sub_select[] =
+				'round('.$width.'*(toUnixTimestamp(timestamp)-'.$time_from.')/('.$time_to.'-'.$time_from.')) AS i';
+
+			$sql_select[] = 'i';
+			$group_by[] = 'i';
+		}
+
+		$results = [];
+
+		$period_condition = ' AND timestamp BETWEEN '.db_utc_to_datetime64($time_from).
+			' AND '.db_utc_to_datetime64($time_to);
+
+		foreach (self::getClickhouseEndpoints(array_keys($value_type_itemids)) as $value_type => $endpoint) {
+			$values = CClickhouseHelper::fetch(
+				'SELECT '.implode(',', $sql_select).
+				' FROM ('.
+					'SELECT '.implode(',', $sql_sub_select).
+					' FROM '.self::getTableName($value_type).
+					' WHERE '.dbConditionId('itemid', array_keys($value_type_itemids[$value_type])).
+					$period_condition.
+					' GROUP BY '.implode(',', $group_by).
+				')',
+				$endpoint['endpoint'], $endpoint['username'], $endpoint['password']
+			);
+
+			if ($values) {
+				foreach ($values as $value) {
+					$results[$value['itemid']]['data'][] = $value;
+				}
+			}
+		}
+
+		foreach ($items as $item) {
+			if (array_key_exists($item['itemid'], $results)) {
+				$results[$item['itemid']]['source'] = 'history';
+			}
+		}
+
+		return $results;
+	}
+
+	/**
 	 * SQL specific implementation of getGraphAggregationByWidth.
 	 *
 	 * @see CHistoryManager::getGraphAggregationByWidth
@@ -1220,6 +1538,12 @@ class CHistoryManager {
 
 		if (array_key_exists(ZBX_HISTORY_SOURCE_ELASTIC, $grouped_items)) {
 			$results += $this->getAggregatedValuesFromElasticsearch($grouped_items[ZBX_HISTORY_SOURCE_ELASTIC],
+				$function, $time_from, $time_to
+			);
+		}
+
+		if (array_key_exists(ZBX_HISTORY_SOURCE_CLICKHOUSE, $grouped_items)) {
+			$results += $this->getAggregatedValuesFromClickhouse($grouped_items[ZBX_HISTORY_SOURCE_CLICKHOUSE],
 				$function, $time_from, $time_to
 			);
 		}
@@ -1332,6 +1656,73 @@ class CHistoryManager {
 							: (string) $item_data['value']['value'],
 						'clock' => (string) $item_data['clock']['value_as_string']
 					];
+				}
+			}
+		}
+
+		return $result;
+	}
+
+	/**
+	 * ClickHouse specific implementation of getAggregatedValues.
+	 *
+	 * @see CHistoryManager::getAggregatedValues
+	 */
+	private function getAggregatedValuesFromClickhouse(array $items, int $function, int $time_from,
+			?int $time_to): array {
+		$value_type_itemids = [];
+
+		foreach ($items as $item) {
+			$value_type_itemids[$item['value_type']][$item['itemid']] = true;
+		}
+
+		$sql_select = ['itemid'];
+
+		switch ($function) {
+			case AGGREGATE_MIN:
+				$sql_select[] = 'min(value) AS value,max(timestamp) AS ts';
+				break;
+			case AGGREGATE_MAX:
+				$sql_select[] = 'max(value) AS value,max(timestamp) AS ts';
+				break;
+			case AGGREGATE_AVG:
+				$sql_select[] = 'avg(value) AS value,max(timestamp) AS ts';
+				break;
+			case AGGREGATE_COUNT:
+				$sql_select[] = 'count() AS value,max(timestamp) AS ts';
+				break;
+			case AGGREGATE_SUM:
+				$sql_select[] = 'sum(value) AS value,max(timestamp) AS ts';
+				break;
+			case AGGREGATE_FIRST:
+				$sql_select[] = 'argMin(value, timestamp) AS value,min(timestamp) AS ts';
+				break;
+			case AGGREGATE_LAST:
+				$sql_select[] = 'argMax(value, timestamp) AS value,max(timestamp) AS ts';
+				break;
+		}
+
+		$result = [];
+
+		$period_condition = ' AND timestamp>='.db_utc_to_datetime64($time_from).
+			($time_to !== null ? ' AND timestamp<='.db_utc_to_datetime64($time_to) : '');
+
+		foreach (self::getClickhouseEndpoints(array_keys($value_type_itemids)) as $value_type => $endpoint) {
+			$values = CClickhouseHelper::fetch(
+				'SELECT itemid,value,toUnixTimestamp(ts) AS clock'.
+				' FROM ('.
+					'SELECT '.implode(',', $sql_select).
+					' FROM '.self::getTableName($value_type).
+					' WHERE '.dbConditionId('itemid', array_keys($value_type_itemids[$value_type])).
+					$period_condition.
+					' GROUP BY itemid'.
+				')',
+				$endpoint['endpoint'], $endpoint['username'], $endpoint['password']
+			);
+
+			if ($values) {
+				foreach ($values as $value) {
+					$result[$value['itemid']] = $value;
 				}
 			}
 		}
@@ -1501,7 +1892,8 @@ class CHistoryManager {
 	 * @return bool
 	 */
 	public function deleteHistory(array $items) {
-		return $this->deleteHistoryFromSql($items) && $this->deleteHistoryFromElasticsearch(array_keys($items));
+		return $this->deleteHistoryFromSql($items) && $this->deleteHistoryFromElasticsearch(array_keys($items))
+			&& $this->deleteHistoryFromClickhouse($items);
 	}
 
 	/**
@@ -1510,11 +1902,11 @@ class CHistoryManager {
 	 * @see CHistoryManager::deleteHistory
 	 */
 	private function deleteHistoryFromElasticsearch(array $itemids) {
-		global $HISTORY;
+		$value_names = array_filter(
+			self::$value_type_sources, static fn(array $source) => $source['provider'] == ZBX_HISTORY_SOURCE_ELASTIC
+		);
 
-		if (is_array($HISTORY) && array_key_exists('types', $HISTORY) && is_array($HISTORY['types'])
-				&& count($HISTORY['types']) > 0) {
-
+		if ($value_names) {
 			$query = [
 				'query' => [
 					'terms' => [
@@ -1524,8 +1916,9 @@ class CHistoryManager {
 			];
 
 			$types = [];
-			foreach ($HISTORY['types'] as $type) {
-				$types[] = self::getTypeIdByTypeName($type);
+
+			foreach ($value_names as $name => $foo) {
+				$types[] = self::getTypeIdByTypeName($name);
 			}
 
 			foreach (self::getElasticsearchEndpoints($types, '_delete_by_query') as $endpoint) {
@@ -1577,6 +1970,34 @@ class CHistoryManager {
 	}
 
 	/**
+	 * Clickhouse specific implementation of deleteHistory.
+	 *
+	 * @see CHistoryManager::deleteHistory
+	 */
+	private function deleteHistoryFromClickhouse(array $items): bool {
+		$value_type_endpoints = CHistoryManager::getClickhouseEndpoints($items);
+
+		foreach ($value_type_endpoints as $value_type => $endpoint) {
+			$table_name = self::getTableName($value_type);
+
+			$itemids = array_keys(array_intersect($items, [$value_type]));
+
+			$query = 'DELETE FROM '.$table_name.
+				' WHERE '.dbConditionId('itemid', $itemids);
+
+			$result = CClickhouseHelper::execute($query,
+				$endpoint['endpoint'], $endpoint['username'], $endpoint['password']
+			);
+
+			if ($result === false) {
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	/**
 	 * Get type name by value type id.
 	 *
 	 * @param int $value_type  Value type id.
@@ -1584,21 +2005,12 @@ class CHistoryManager {
 	 * @return string  Value type name.
 	 */
 	public static function getTypeNameByTypeId($value_type) {
-		$mapping = [
-			ITEM_VALUE_TYPE_FLOAT => 'dbl',
-			ITEM_VALUE_TYPE_STR => 'str',
-			ITEM_VALUE_TYPE_LOG => 'log',
-			ITEM_VALUE_TYPE_UINT64 => 'uint',
-			ITEM_VALUE_TYPE_TEXT => 'text',
-			ITEM_VALUE_TYPE_BINARY => 'binary'
-		];
-
-		if (array_key_exists($value_type, $mapping)) {
-			return $mapping[$value_type];
+		if (array_key_exists($value_type, self::$value_type_mapping)) {
+			return self::$value_type_mapping[$value_type];
 		}
 
 		// Fallback to float.
-		return $mapping[ITEM_VALUE_TYPE_FLOAT];
+		return self::$value_type_mapping[ITEM_VALUE_TYPE_FLOAT];
 	}
 
 	/**
@@ -1633,64 +2045,55 @@ class CHistoryManager {
 	 *
 	 * @return string  Data source type.
 	 */
-	public static function getDataSourceType($value_type) {
+	public static function getDataSourceType(int $value_type): string {
 		static $cache = [];
 
 		if (!array_key_exists($value_type, $cache)) {
-			global $HISTORY;
+			$value_name = self::getTypeNameByTypeId($value_type);
 
-			if (is_array($HISTORY) && array_key_exists('types', $HISTORY) && is_array($HISTORY['types'])) {
-				$cache[$value_type] = in_array(self::getTypeNameByTypeId($value_type), $HISTORY['types'])
-						? ZBX_HISTORY_SOURCE_ELASTIC : ZBX_HISTORY_SOURCE_SQL;
-			}
-			else {
-				// SQL is a fallback data source.
-				$cache[$value_type] = ZBX_HISTORY_SOURCE_SQL;
-			}
+			$cache[$value_type] = array_key_exists($value_name, self::$value_type_sources)
+				? self::$value_type_sources[$value_name]['provider']
+				: ZBX_HISTORY_SOURCE_SQL;
 		}
 
 		return $cache[$value_type];
 	}
 
-	private static function getElasticsearchUrl($value_name) {
-		static $urls = [];
+	private static function getSourceConfiguration(string $value_name): ?array {
 		static $invalid = [];
+		static $sources_data = [];
+
+		if (array_key_exists($value_name, $sources_data)) {
+			return $sources_data[$value_name];
+		}
 
 		// Additional check to limit error count produced by invalid configuration.
 		if (array_key_exists($value_name, $invalid)) {
 			return null;
 		}
 
-		if (!array_key_exists($value_name, $urls)) {
-			global $HISTORY;
+		$source = self::$value_type_sources[$value_name];
 
-			if (!is_array($HISTORY) || !array_key_exists('url', $HISTORY)) {
-				$invalid[$value_name] = true;
-				error(_s('Elasticsearch URL is not set for type: %1$s.', $value_name));
+		if ($source['url'] === null) {
+			$invalid[$value_name] = true;
 
-				return null;
-			}
+			error(_s(self::$providers[$source['provider']].' URL is not set for type: %1$s.', $value_name));
 
-			$url = $HISTORY['url'];
-			if (is_array($url)) {
-				if (!array_key_exists($value_name, $url)) {
-					$invalid[$value_name] = true;
-					error(_s('Elasticsearch URL is not set for type: %1$s.', $value_name));
-
-					return null;
-				}
-
-				$url = $url[$value_name];
-			}
-
-			if (substr($url, -1) !== '/') {
-				$url .= '/';
-			}
-
-			$urls[$value_name] = $url;
+			return null;
 		}
 
-		return $urls[$value_name];
+		if ($source['provider'] == ZBX_HISTORY_SOURCE_CLICKHOUSE
+				&& ($source['db'] === null || $source['username'] === null || $source['password'] === null)) {
+			$invalid[$value_name] = true;
+
+			error(_s(self::$providers[$source['provider']].' credentials are not set for type: %1$s.', $value_name));
+
+			return null;
+		}
+
+		$sources_data[$value_name] = $source;
+
+		return $source;
 	}
 
 	/**
@@ -1700,7 +2103,7 @@ class CHistoryManager {
 	 *
 	 * @return array  Elasticsearch query endpoints.
 	 */
-	public static function getElasticsearchEndpoints($value_types, $action = '_search') {
+	public static function getElasticsearchEndpoints($value_types, $action = '_search'): array {
 		if (!is_array($value_types)) {
 			$value_types = [$value_types];
 		}
@@ -1714,9 +2117,32 @@ class CHistoryManager {
 			}
 		}
 
-		foreach ($indices as $type => $index) {
-			if (($url = self::getElasticsearchUrl($index)) !== null) {
-				$endpoints[$type] = $url.$index.'*/'.$action;
+		foreach ($indices as $type => $name) {
+			if (($source_configuration = self::getSourceConfiguration($name)) !== null) {
+				$endpoints[$type] = $source_configuration['url'].$name.'*/'.$action;
+			}
+		}
+
+		return $endpoints;
+	}
+
+	public static function getClickhouseEndpoints($value_types): array {
+		if (!is_array($value_types)) {
+			$value_types = [$value_types];
+		}
+
+		$endpoints = [];
+
+		foreach (array_unique($value_types) as $type) {
+			if (self::getDataSourceType($type) === ZBX_HISTORY_SOURCE_CLICKHOUSE) {
+				$source_configuration = self::getSourceConfiguration(self::getTypeNameByTypeId($type));
+
+				if ($source_configuration !== null) {
+					$source_configuration['endpoint'] =
+						$source_configuration['url'].'?database='.urlencode($source_configuration['db']);
+
+					$endpoints[$type] = $source_configuration;
+				}
 			}
 		}
 
@@ -1759,5 +2185,27 @@ class CHistoryManager {
 		}
 
 		return $grouped_items;
+	}
+
+	private static function getClickhouseTtlByTypeId(int $value_type): ?int {
+		$ttl = null;
+
+		$dbversion_history_status = CSettingsHelper::getDbVersionHistoryStatus();
+
+		foreach ($dbversion_history_status as $provider) {
+			if ($provider['database'] !== self::$providers[ZBX_HISTORY_SOURCE_CLICKHOUSE]) {
+				continue;
+			}
+
+			foreach ($provider['value_types'] as $type ) {
+				if ($type['type'] == self::getTypeNameByTypeId($value_type)) {
+					$ttl = (int) $type['ttl'];
+
+					break 2;
+				}
+			}
+		}
+
+		return $ttl;
 	}
 }
