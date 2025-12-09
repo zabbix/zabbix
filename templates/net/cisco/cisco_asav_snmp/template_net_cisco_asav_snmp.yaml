@@ -1274,7 +1274,7 @@ zabbix_export:
           description: 'Filter to exclude discovered interfaces by name.'
         - macro: '{$CPU.UTIL.CRIT}'
           value: '90'
-          description: 'Critical threshold of the CPU utilization in %.'
+          description: 'Critical threshold of CPU utilization in %.'
         - macro: '{$MEMORY.UTIL.MAX}'
           value: '90'
           description: 'Threshold for maximum memory utilization in %.'

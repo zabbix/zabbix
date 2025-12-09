@@ -31,14 +31,14 @@ Refer to the vendor documentation.
 
 |Name|Description|Default|
 |----|-----------|-------|
-|{$CPU.UTIL.CRIT}|<p>Critical threshold of the CPU utilization in %.</p>|`90`|
-|{$ICMP_LOSS_WARN}|<p>Warning threshold of the ICMP packet loss in %.</p>|`20`|
+|{$CPU.UTIL.CRIT}|<p>Critical threshold of CPU utilization in %.</p>|`90`|
+|{$ICMP_LOSS_WARN}|<p>Warning threshold of ICMP packet loss in %.</p>|`20`|
 |{$ICMP_RESPONSE_TIME_WARN}|<p>Threshold of the average ICMP response time in seconds.</p>|`0.15`|
-|{$IF.ERRORS.WARN}|<p>Threshold for the warning level of interface error packet rate.</p>|`2`|
-|{$IF.UTIL.MAX}|<p>Maximum threshold of interface bandwidth utilization in %. Can be used with interface name as context.</p>|`90`|
-|{$IFCONTROL}|<p>Macro for operational state of the interface for link down trigger. Can be used with interface name as context.</p>|`1`|
+|{$IF.ERRORS.WARN}|<p>Threshold for the warning level of the interface error packet rate.</p>|`2`|
+|{$IF.UTIL.MAX}|<p>Maximum threshold of interface bandwidth utilization in %. Can be used with the interface name as context.</p>|`90`|
+|{$IFCONTROL}|<p>Macro for the operational state of the interface for the link down trigger. Can be used with the interface name as context.</p>|`1`|
 |{$MEMORY.UTIL.MAX}|<p>Threshold for maximum memory utilization in %.</p>|`90`|
-|{$NET.IF.IFADMINSTATUS.MATCHES}|<p>This macro is used to include the network interfaces by their administrative status.</p>|`^.*`|
+|{$NET.IF.IFADMINSTATUS.MATCHES}|<p>This macro is used to include network interfaces by their administrative status.</p>|`^.*`|
 |{$NET.IF.IFADMINSTATUS.NOT_MATCHES}|<p>Ignore down(2) administrative status</p>|`^2$`|
 |{$NET.IF.IFALIAS.MATCHES}|<p>This macro is used to include network interfaces by their alias.</p>|`.*`|
 |{$NET.IF.IFALIAS.NOT_MATCHES}|<p>This macro is used to exclude network interfaces by their alias.</p>|`CHANGE_IF_NEEDED`|
@@ -50,7 +50,7 @@ Refer to the vendor documentation.
 |{$NET.IF.IFOPERSTATUS.NOT_MATCHES}|<p>Ignore notPresent(6)</p>|`^6$`|
 |{$NET.IF.IFTYPE.MATCHES}|<p>This macro is used to include network interfaces by their type.</p>|`.*`|
 |{$NET.IF.IFTYPE.NOT_MATCHES}|<p>This macro is used to exclude network interfaces by their type.</p>|`CHANGE_IF_NEEDED`|
-|{$SNMP.TIMEOUT}|<p>The time interval for SNMP availability trigger.</p>|`5m`|
+|{$SNMP.TIMEOUT}|<p>The time interval for the SNMP availability trigger.</p>|`5m`|
 |{$TEMP_CRIT}|<p>Critical threshold of the temperature in °C.</p>|`60`|
 |{$TEMP_CRIT_LOW}|<p>Critical threshold of the low temperature in °C.</p>|`5`|
 |{$TEMP_WARN}|<p>Warning threshold of the temperature in °C.</p>|`50`|
