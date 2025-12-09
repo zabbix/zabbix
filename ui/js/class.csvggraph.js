@@ -866,8 +866,8 @@
 					hideHelper(graph);
 				})
 				.on('selectstart', false)
-				.on('onShowStaticHint', (e) => onStaticHintboxOpen(e, graph))
-				.on('onDeleteStaticHint', (e) => onStaticHintboxClose(e, graph));
+				.on('onShowStaticHint', e => onStaticHintboxOpen(e, graph))
+				.on('onDeleteStaticHint', e => onStaticHintboxClose(e, graph));
 
 			if (widget._svg_options.sbox) {
 				graph
