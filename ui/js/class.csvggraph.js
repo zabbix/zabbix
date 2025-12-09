@@ -483,7 +483,7 @@
 	}
 
 	/**
-	 * Get tolerance for given data set. Tolerance is used to find which elements are hovered by mouse. Script takes
+	 * Get tolerance for given data set. Tolerance is used to find which elements are highlighted by mouse. Script takes
 	 * actual data point and adds N pixels to all sides. Then looks if mouse is in calculated area. N is calculated by
 	 * this function. Tolerance is used to find exactly matched point only.
 	 */
@@ -909,7 +909,6 @@
 
 		for (const item of hintbox_items) {
 			const {itemid, ds} = item.dataset;
-			const graph_element = graph[0].querySelector(`[data-itemid="${itemid}"][data-ds="${ds}"]`);
 
 			item.addEventListener('click', () => {
 				widget.updateItemBroadcast(itemid, ds);
@@ -918,7 +917,7 @@
 
 			if (data.graph_type === GRAPH_TYPE_SVG_GRAPH) {
 				item.addEventListener('mouseenter', () => {
-					addHighlighting(graph_element, graph);
+					setHighlighting(itemid, ds, graph);
 				});
 
 				item.addEventListener('mouseleave', () => {
@@ -943,18 +942,20 @@
 	function markSelectedHintboxItems(hintbox, widget) {
 		const {itemid, ds} = widget.getItemBroadcasting();
 
-		if (itemid !== null && ds !== null) {
-			for (const item of hintbox.querySelectorAll('.has-broadcast-data')) {
-				item.classList.toggle('selected', item.dataset.itemid == itemid && item.dataset.ds == ds);
-			}
+		for (const item of hintbox.querySelectorAll('.has-broadcast-data')) {
+			item.classList.toggle('selected', item.dataset.itemid == itemid && item.dataset.ds == ds);
 		}
 	}
 
-	function addHighlighting(graph_element, graph) {
+	function setHighlighting(itemid, ds, graph) {
 		removeHighlighting(graph);
 
-		graph_element.classList.add('hovered');
-		graph[0].classList.add('hovered');
+		const graph_element = graph[0].querySelector(`[data-itemid="${itemid}"][data-ds="${ds}"]`);
+
+		if (graph_element) {
+			graph_element.classList.add('highlighted');
+			graph[0].classList.add('highlighted');
+		}
 	}
 
 	function resetHighlighting(hintbox, graph) {
@@ -962,9 +963,8 @@
 
 		if (selected_item) {
 			const {itemid, ds} = selected_item.dataset;
-			const graph_element = graph[0].querySelector(`[data-itemid="${itemid}"][data-ds="${ds}"]`);
 
-			addHighlighting(graph_element, graph);
+			setHighlighting(itemid, ds, graph);
 		}
 		else {
 			removeHighlighting(graph);
@@ -972,11 +972,11 @@
 	}
 
 	function removeHighlighting(graph) {
-		for (const item of graph[0].querySelectorAll('.hovered')) {
-			item.classList.remove('hovered');
+		for (const graph_element of graph[0].querySelectorAll('.highlighted')) {
+			graph_element.classList.remove('highlighted');
 		}
 
-		graph[0].classList.remove('hovered');
+		graph[0].classList.remove('highlighted');
 	}
 
 	jQuery.fn.svggraph = function(method) {

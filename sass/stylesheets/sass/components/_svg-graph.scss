@@ -1,13 +1,13 @@
 .svg-graph {
 	display: block;
 
-	&.hovered {
+	&.highlighted {
 		.svg-graph-points,
 		.svg-graph-line,
 		.svg-graph-bar {
 			opacity: 0.15;
 
-			&.hovered {
+			&.highlighted {
 				opacity: 1;
 			}
 		}

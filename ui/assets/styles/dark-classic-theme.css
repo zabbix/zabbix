@@ -3964,13 +3964,13 @@ section {
 
 .svg-graph {
   display: block; }
-  .svg-graph.hovered .svg-graph-points,
-  .svg-graph.hovered .svg-graph-line,
-  .svg-graph.hovered .svg-graph-bar {
+  .svg-graph.highlighted .svg-graph-points,
+  .svg-graph.highlighted .svg-graph-line,
+  .svg-graph.highlighted .svg-graph-bar {
     opacity: 0.15; }
-    .svg-graph.hovered .svg-graph-points.hovered,
-    .svg-graph.hovered .svg-graph-line.hovered,
-    .svg-graph.hovered .svg-graph-bar.hovered {
+    .svg-graph.highlighted .svg-graph-points.highlighted,
+    .svg-graph.highlighted .svg-graph-line.highlighted,
+    .svg-graph.highlighted .svg-graph-bar.highlighted {
       opacity: 1; }
 
 .svg-point-highlight {
