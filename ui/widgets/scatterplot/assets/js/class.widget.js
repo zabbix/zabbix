@@ -117,7 +117,7 @@ class CWidgetScatterPlot extends CWidget {
 			this._initGraph({
 				sbox: false,
 				hint_max_rows: 20,
-				hintbox_type: GRAPH_HINTBOX_TYPE_SCATTER_PLOT,
+				graph_type: GRAPH_TYPE_SCATTER_PLOT,
 				min_period: 60,
 				...response.svg_options.data
 			});

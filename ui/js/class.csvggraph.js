@@ -91,9 +91,14 @@
 
 	// Hide vertical helper line and highlighted data points.
 	function hideHelper(graph) {
-		graph.find('.svg-helper').attr({'x1': -10, 'x2': -10});
+		for (const helper of graph[0].querySelectorAll('.svg-helper')) {
+			helper.setAttribute('x1', -10);
+			helper.setAttribute('x2', -10);
+			helper.setAttribute('y1', -10);
+			helper.setAttribute('y2', -10);
+		}
 
-		if (graph.data('options').hintbox_type === GRAPH_HINTBOX_TYPE_SCATTER_PLOT) {
+		if (graph.data('options').graph_type === GRAPH_TYPE_SCATTER_PLOT) {
 			const highlighter_points = graph[0].querySelectorAll('g.js-svg-highlight-group');
 
 			for (const highlighter_point of highlighter_points) {
@@ -101,7 +106,10 @@
 			}
 		}
 		else {
-			graph.find('.svg-point-highlight').attr({'cx': -10, 'cy': -10});
+			for (const point of graph[0].querySelectorAll('.svg-point-highlight')) {
+				point.setAttribute('cx', -10);
+				point.setAttribute('cy', -10);
+			}
 		}
 	}
 
@@ -448,12 +456,30 @@
 	// Set position of vertical helper line.
 	function setHelperPosition(e, graph) {
 		const data = graph.data('options');
-		graph.find('.svg-helper').attr({
-			'x1': e.clientX - graph.offset().left,
-			'y1': data.dimY,
-			'x2': e.clientX - graph.offset().left,
-			'y2': data.dimY + data.dimH
-		});
+
+		if (data.graph_type === GRAPH_TYPE_SVG_GRAPH) {
+			const helper = graph[0].querySelector('.svg-helper');
+
+			helper.setAttribute('x1', e.clientX - graph.offset().left);
+			helper.setAttribute('y1', data.dimY);
+			helper.setAttribute('x2', e.clientX - graph.offset().left);
+			helper.setAttribute('y2', data.dimY + data.dimH);
+		}
+		else {
+			const vertical_helper = graph[0].querySelector('.scatter-plot-vertical-helper');
+
+			vertical_helper.setAttribute('x1', e.clientX - graph.offset().left);
+			vertical_helper.setAttribute('y1', data.dimY);
+			vertical_helper.setAttribute('x2', e.clientX - graph.offset().left);
+			vertical_helper.setAttribute('y2', data.dimY + data.dimH);
+
+			const horizontal_helper = graph[0].querySelector('.scatter-plot-horizontal-helper');
+
+			horizontal_helper.setAttribute('x1', data.dimX);
+			horizontal_helper.setAttribute('y1', e.clientY - graph.offset().top);
+			horizontal_helper.setAttribute('x2', data.dimX + data.dimW);
+			horizontal_helper.setAttribute('y2', e.clientY - graph.offset().top);
+		}
 	}
 
 	/**
@@ -542,7 +568,7 @@
 
 		const html = document.createElement('ul');
 
-		if (data.hintbox_type === GRAPH_HINTBOX_TYPE_SCATTER_PLOT) {
+		if (data.graph_type === GRAPH_TYPE_SCATTER_PLOT) {
 			for (const point of included_points) {
 				const time_from = new CDate(point.time_from * 1000);
 				const time_to = new CDate(point.time_to * 1000);
@@ -555,11 +581,9 @@
 
 					const li = document.createElement('li');
 					li.style.marginTop = key === 'xItems' && rows_added > 0 ? '10px' : null;
-
-					let count = 0;
-
 					li.append(`${aggregation_name}(`);
 
+					let count = 0;
 					for (const [itemid, name] of items_data) {
 						count++;
 
@@ -636,8 +660,6 @@
 		let in_values_area = false;
 		let in_problem_area = false;
 
-		const hintbox_type = data.hintbox_type;
-
 		if (data.boxing === true) {
 			hideHelper(graph);
 			return;
@@ -669,7 +691,7 @@
 				let included_points = [];
 				let show_hint = false;
 
-				if (hintbox_type === GRAPH_HINTBOX_TYPE_SCATTER_PLOT) {
+				if (data.graph_type === GRAPH_TYPE_SCATTER_PLOT) {
 					const offsetY = e.clientY - graph.offset().top;
 
 					included_points = findScatterPlotPoints(graph[0], offsetX, offsetY);
@@ -735,7 +757,7 @@
 
 				if (show_hint) {
 					included_points.sort((p1, p2) => {
-						if (hintbox_type === GRAPH_HINTBOX_TYPE_SVG_GRAPH) {
+						if (data.graph_type === GRAPH_TYPE_SVG_GRAPH) {
 							return p1.y - p2.y;
 						}
 						else {
@@ -800,7 +822,7 @@
 						timePeriod: widget._svg_options.time_period,
 						minPeriod: widget._svg_options.min_period,
 						boxing: false,
-						hintbox_type: widget._svg_options.hintbox_type
+						graph_type: widget._svg_options.graph_type
 					})
 					.data('widget', widget)
 					.data('is_static_hintbox_opened', false)
@@ -894,7 +916,7 @@
 				markSelectedHintboxItems(hintbox, widget);
 			});
 
-			if (data.hintbox_type === GRAPH_HINTBOX_TYPE_SVG_GRAPH) {
+			if (data.graph_type === GRAPH_TYPE_SVG_GRAPH) {
 				item.addEventListener('mouseenter', () => {
 					addHighlighting(graph_element, graph);
 				});
@@ -907,7 +929,7 @@
 
 		markSelectedHintboxItems(hintbox, widget);
 
-		if (data.hintbox_type === GRAPH_HINTBOX_TYPE_SVG_GRAPH) {
+		if (data.graph_type === GRAPH_TYPE_SVG_GRAPH) {
 			resetHighlighting(hintbox, graph);
 		}
 	}

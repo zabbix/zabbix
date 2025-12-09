@@ -183,7 +183,16 @@ class CScatterPlot extends CSvg {
 	 * @return self
 	 */
 	public function addHelper(): self {
-		$this->addItem((new CSvgLine(0, 0, 0, 0))->addClass(CSvgTag::ZBX_STYLE_GRAPH_HELPER));
+		$this->addItem(
+			(new CSvgLine(0, 0, 0, 0))
+				->addClass(CSvgTag::ZBX_STYLE_GRAPH_HELPER)
+				->addClass(CSvgTag::ZBX_STYLE_SCATTER_PLOT_VERTICAL_HELPER)
+		)
+		->addItem(
+			(new CSvgLine(0, 0, 0, 0))
+				->addClass(CSvgTag::ZBX_STYLE_GRAPH_HELPER)
+				->addClass(CSvgTag::ZBX_STYLE_SCATTER_PLOT_HORIZONTAL_HELPER)
+		);
 
 		return $this;
 	}
