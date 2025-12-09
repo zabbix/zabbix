@@ -37,6 +37,7 @@ int	zbx_event_db_get_host(const zbx_db_event *event, zbx_dc_host_t *host, char *
 	char		sql[2048];	/* do not forget to adjust size if SQLs change */
 	size_t		offset;
 	int		ret = SUCCEED;
+	zbx_uint64_t	a_proxyid = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -152,8 +153,6 @@ int	zbx_event_db_get_host(const zbx_db_event *event, zbx_dc_host_t *host, char *
 		zbx_strscpy(host->tls_psk, row[7 + ZBX_IPMI_FIELDS_NUM]);
 #endif
 		ZBX_STR2UCHAR(host->monitored_by, row[8 + ZBX_IPMI_FIELDS_NUM]);
-
-		zbx_uint64_t	a_proxyid = 0;
 
 		if (EVENT_SOURCE_AUTOREGISTRATION == event->source)
 			ZBX_DBROW2UINT64(a_proxyid, row[10 + ZBX_IPMI_FIELDS_NUM]);
