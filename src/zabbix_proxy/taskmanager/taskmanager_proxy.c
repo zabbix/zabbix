@@ -111,8 +111,8 @@ static int	tm_execute_remote_command(zbx_uint64_t taskid, int clock, int ttl, ti
 	if (FAIL == zbx_dc_get_host_by_hostid(&host, hostid))
 	{
 		//task->data = zbx_tm_remote_command_result_create(parent_taskid, FAIL, "Unknown host.");
-		zabbix_log(LOG_LEVEL_WARNING, "tm_execute_remote_command: taskid=%llu hostid=%llu not found in proxy cache",
-				(unsigned long long)taskid, (unsigned long long)hostid);
+		zabbix_log(LOG_LEVEL_WARNING, "tm_execute_remote_command: taskid=%llu hostid=%llu not found in proxy "
+				"cache", (unsigned long long)taskid, (unsigned long long)hostid);
 		skip_update = 1;
 		goto finish;
 	}

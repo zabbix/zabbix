@@ -171,10 +171,9 @@ int	zbx_event_db_get_host(const zbx_db_event *event, zbx_dc_host_t *host, char *
 
 		if (EVENT_SOURCE_AUTOREGISTRATION == event->source)
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "autoreg: host \"%s\" monitored_by=%u proxyid=%llu a.proxyid=%llu",
-					host->host, (unsigned int)host->monitored_by,
-					(unsigned long long)host->proxyid,
-					(unsigned long long)a_proxyid);
+			zabbix_log(LOG_LEVEL_WARNING, "autoreg: host \"%s\" monitored_by=%u proxyid=%llu "
+					"a.proxyid=%llu", host->host, (unsigned int)host->monitored_by,
+					(unsigned long long)host->proxyid, (unsigned long long)a_proxyid);
 		}
 
 	}
