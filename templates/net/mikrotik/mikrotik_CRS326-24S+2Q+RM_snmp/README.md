@@ -28,9 +28,9 @@ Refer to the vendor documentation.
 
 |Name|Description|Default|
 |----|-----------|-------|
-|{$VFS.FS.PUSED.MAX.CRIT}|<p>The critical threshold of the filesystem utilization.</p>|`90`|
-|{$VFS.FS.PUSED.MAX.WARN}|<p>The warning threshold of the filesystem utilization.</p>|`80`|
-|{$CPU.UTIL.CRIT}|<p>The critical threshold of the CPU utilization expressed in %.</p>|`90`|
+|{$VFS.FS.PUSED.MAX.CRIT}|<p>The critical threshold of filesystem utilization.</p>|`90`|
+|{$VFS.FS.PUSED.MAX.WARN}|<p>The warning threshold of filesystem utilization.</p>|`80`|
+|{$CPU.UTIL.CRIT}|<p>The critical threshold of CPU utilization expressed in %.</p>|`90`|
 |{$TEMP_CRIT}|<p>Critical threshold for temperature.</p>|`60`|
 |{$TEMP_CRIT_LOW}|<p>Critical threshold for low temperature.</p>|`5`|
 |{$TEMP_WARN}|<p>Warning threshold for temperature.</p>|`50`|

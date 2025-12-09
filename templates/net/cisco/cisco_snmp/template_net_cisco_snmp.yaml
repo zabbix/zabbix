@@ -1495,40 +1495,40 @@ zabbix_export:
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
         - macro: '{$FAN_CRIT_STATUS:"critical"}'
           value: '3'
-          description: 'Value indicating the FAN status for critical condition.'
+          description: 'Value indicating the FAN status for the critical condition.'
           config:
             type: TEXT
             priority: '16'
             section_name: Other
             label: 'Value of FAN status for state of `critical`'
-            description: 'Value indicating the FAN status for critical condition.'
+            description: 'Value indicating the FAN status for the critical condition.'
         - macro: '{$FAN_CRIT_STATUS:"shutdown"}'
           value: '4'
-          description: 'Value indicating the FAN status for shutdown condition.'
+          description: 'Value indicating the FAN status for the shutdown condition.'
           config:
             type: TEXT
             priority: '17'
             section_name: Other
             label: 'Value of FAN status for state of `shutdown`'
-            description: 'Value indicating the FAN status for shutdown condition.'
+            description: 'Value indicating the FAN status for the shutdown condition.'
         - macro: '{$FAN_WARN_STATUS:"notFunctioning"}'
           value: '6'
-          description: 'Value indicating the FAN status for not-functioning condition.'
+          description: 'Value indicating the FAN status for the not-functioning condition.'
           config:
             type: TEXT
             priority: '18'
             section_name: Other
             label: 'Value of FAN status for state of `notFunctioning`'
-            description: 'Value indicating the FAN status for not-functioning condition.'
+            description: 'Value indicating the FAN status for the not-functioning condition.'
         - macro: '{$FAN_WARN_STATUS:"warning"}'
           value: '2'
-          description: 'Value indicating the FAN status for warning condition.'
+          description: 'Value indicating the FAN status for the warning condition.'
           config:
             type: TEXT
             priority: '15'
             section_name: Other
             label: 'Value of FAN status for state of `warning`'
-            description: 'Value indicating the FAN status for warning condition.'
+            description: 'Value indicating the FAN status for the warning condition.'
         - macro: '{$ICMP_LOSS_WARN}'
           value: '20'
           description: 'Warning threshold of ICMP packet loss in %.'
@@ -1699,40 +1699,40 @@ zabbix_export:
             description: 'Regex string to exclude discovered interface by type.'
         - macro: '{$PSU_CRIT_STATUS:"critical"}'
           value: '3'
-          description: 'Value indicating the PSU status for critical condition.'
+          description: 'Value indicating the PSU status for the critical condition.'
           config:
             type: TEXT
             priority: '12'
             section_name: Other
             label: 'Value of PSU status for state of `critical`'
-            description: 'Value indicating the PSU status for critical condition.'
+            description: 'Value indicating the PSU status for the critical condition.'
         - macro: '{$PSU_CRIT_STATUS:"shutdown"}'
           value: '4'
-          description: 'Value indicating the PSU status for shutdown condition.'
+          description: 'Value indicating the PSU status for the shutdown condition.'
           config:
             type: TEXT
             priority: '13'
             section_name: Other
             label: 'Value of PSU status for state of `shutdown`'
-            description: 'Value indicating the PSU status for shutdown condition.'
+            description: 'Value indicating the PSU status for the shutdown condition.'
         - macro: '{$PSU_WARN_STATUS:"notFunctioning"}'
           value: '6'
-          description: 'Value indicating the PSU status for not-functioning condition.'
+          description: 'Value indicating the PSU status for the not-functioning condition.'
           config:
             type: TEXT
             priority: '14'
             section_name: Other
             label: 'Value of PSU status for state of `notFunctioning`'
-            description: 'Value indicating the PSU status for not-functioning condition.'
+            description: 'Value indicating the PSU status for the not-functioning condition.'
         - macro: '{$PSU_WARN_STATUS:"warning"}'
           value: '2'
-          description: 'Value indicating the PSU status for warning condition.'
+          description: 'Value indicating the PSU status for the warning condition.'
           config:
             type: TEXT
             priority: '11'
             section_name: Other
             label: 'Value of PSU status for state of `warning`'
-            description: 'Value indicating the PSU status for warning condition.'
+            description: 'Value indicating the PSU status for the warning condition.'
         - macro: '{$SNMP.TIMEOUT}'
           value: 5m
           description: 'Time interval for the SNMP availability trigger.'
@@ -1774,22 +1774,22 @@ zabbix_export:
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
         - macro: '{$TEMP_CRIT_STATUS}'
           value: '3'
-          description: 'Value indicating the state when temperature is in critical condition.'
+          description: 'Value indicating the state when the temperature is in critical condition.'
           config:
             type: TEXT
             priority: '9'
             section_name: Other
             label: 'Value for state of `Temperature is critical`'
-            description: 'Value indicating the state when temperature is in critical condition.'
+            description: 'Value indicating the state when the temperature is in critical condition.'
         - macro: '{$TEMP_DISASTER_STATUS}'
           value: '4'
-          description: 'Value indicating the state when temperature is in disaster condition.'
+          description: 'Value indicating the state when the temperature is in disaster condition.'
           config:
             type: TEXT
             priority: '10'
             section_name: Other
             label: 'Value for state of `Temperature is disaster`'
-            description: 'Value indicating the state when temperature is in disaster condition.'
+            description: 'Value indicating the state when the temperature is in disaster condition.'
         - macro: '{$TEMP_WARN}'
           value: '50'
           description: 'Warning threshold for temperature.'
@@ -1812,13 +1812,13 @@ zabbix_export:
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
         - macro: '{$TEMP_WARN_STATUS}'
           value: '2'
-          description: 'Value indicating the state when temperature is in warning condition.'
+          description: 'Value indicating the state when the temperature is in the warning condition.'
           config:
             type: TEXT
             priority: '8'
             section_name: Other
             label: 'Value for state of `Temperature is warning`'
-            description: 'Value indicating the state when temperature is in warning condition.'
+            description: 'Value indicating the state when the temperature is in the warning condition.'
       dashboards:
         - uuid: 9b817c34b74842c8a21827e5d84c4692
           name: 'Network interfaces'
@@ -3346,40 +3346,40 @@ zabbix_export:
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
         - macro: '{$FAN_CRIT_STATUS:"critical"}'
           value: '3'
-          description: 'Value indicating the FAN status for critical condition.'
+          description: 'Value indicating the FAN status for the critical condition.'
           config:
             type: TEXT
             priority: '16'
             section_name: Other
             label: 'Value of FAN status for state of `critical`'
-            description: 'Value indicating the FAN status for critical condition.'
+            description: 'Value indicating the FAN status for the critical condition.'
         - macro: '{$FAN_CRIT_STATUS:"shutdown"}'
           value: '4'
-          description: 'Value indicating the FAN status for shutdown condition.'
+          description: 'Value indicating the FAN status for the shutdown condition.'
           config:
             type: TEXT
             priority: '17'
             section_name: Other
             label: 'Value of FAN status for state of `shutdown`'
-            description: 'Value indicating the FAN status for shutdown condition.'
+            description: 'Value indicating the FAN status for the shutdown condition.'
         - macro: '{$FAN_WARN_STATUS:"notFunctioning"}'
           value: '6'
-          description: 'Value indicating the FAN status for not-functioning condition.'
+          description: 'Value indicating the FAN status for the not-functioning condition.'
           config:
             type: TEXT
             priority: '18'
             section_name: Other
             label: 'Value of FAN status for state of `notFunctioning`'
-            description: 'Value indicating the FAN status for not-functioning condition.'
+            description: 'Value indicating the FAN status for the not-functioning condition.'
         - macro: '{$FAN_WARN_STATUS:"warning"}'
           value: '2'
-          description: 'Value indicating the FAN status for warning condition.'
+          description: 'Value indicating the FAN status for the warning condition.'
           config:
             type: TEXT
             priority: '15'
             section_name: Other
             label: 'Value of FAN status for state of `warning`'
-            description: 'Value indicating the FAN status for warning condition.'
+            description: 'Value indicating the FAN status for the warning condition.'
         - macro: '{$ICMP_LOSS_WARN}'
           value: '20'
           description: 'Warning threshold of ICMP packet loss in %.'
@@ -3411,40 +3411,40 @@ zabbix_export:
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
         - macro: '{$PSU_CRIT_STATUS:"critical"}'
           value: '3'
-          description: 'Value indicating the PSU status for critical condition.'
+          description: 'Value indicating the PSU status for the critical condition.'
           config:
             type: TEXT
             priority: '12'
             section_name: Other
             label: 'Value of PSU status for state of `critical`'
-            description: 'Value indicating the PSU status for critical condition.'
+            description: 'Value indicating the PSU status for the critical condition.'
         - macro: '{$PSU_CRIT_STATUS:"shutdown"}'
           value: '4'
-          description: 'Value indicating the PSU status for shutdown condition.'
+          description: 'Value indicating the PSU status for the shutdown condition.'
           config:
             type: TEXT
             priority: '13'
             section_name: Other
             label: 'Value of PSU status for state of `shutdown`'
-            description: 'Value indicating the PSU status for shutdown condition.'
+            description: 'Value indicating the PSU status for the shutdown condition.'
         - macro: '{$PSU_WARN_STATUS:"notFunctioning"}'
           value: '6'
-          description: 'Value indicating the PSU status for not-functioning condition.'
+          description: 'Value indicating the PSU status for the not-functioning condition.'
           config:
             type: TEXT
             priority: '14'
             section_name: Other
             label: 'Value of PSU status for state of `notFunctioning`'
-            description: 'Value indicating the PSU status for not-functioning condition.'
+            description: 'Value indicating the PSU status for the not-functioning condition.'
         - macro: '{$PSU_WARN_STATUS:"warning"}'
           value: '2'
-          description: 'Value indicating the PSU status for warning condition.'
+          description: 'Value indicating the PSU status for the warning condition.'
           config:
             type: TEXT
             priority: '11'
             section_name: Other
             label: 'Value of PSU status for state of `warning`'
-            description: 'Value indicating the PSU status for warning condition.'
+            description: 'Value indicating the PSU status for the warning condition.'
         - macro: '{$SNMP.TIMEOUT}'
           value: 5m
           description: 'Time interval for the SNMP availability trigger.'
@@ -3486,22 +3486,22 @@ zabbix_export:
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
         - macro: '{$TEMP_CRIT_STATUS}'
           value: '3'
-          description: 'Value indicating the state when temperature is in critical condition.'
+          description: 'Value indicating the state when the temperature is in critical condition.'
           config:
             type: TEXT
             priority: '9'
             section_name: Other
             label: 'Value for state of `Temperature is critical`'
-            description: 'Value indicating the state when temperature is in critical condition.'
+            description: 'Value indicating the state when the temperature is in critical condition.'
         - macro: '{$TEMP_DISASTER_STATUS}'
           value: '4'
-          description: 'Value indicating the state when temperature is in disaster condition.'
+          description: 'Value indicating the state when the temperature is in disaster condition.'
           config:
             type: TEXT
             priority: '10'
             section_name: Other
             label: 'Value for state of `Temperature is disaster`'
-            description: 'Value indicating the state when temperature is in disaster condition.'
+            description: 'Value indicating the state when the temperature is in disaster condition.'
         - macro: '{$TEMP_WARN}'
           value: '50'
           description: 'Warning threshold for temperature.'
@@ -3524,13 +3524,13 @@ zabbix_export:
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
         - macro: '{$TEMP_WARN_STATUS}'
           value: '2'
-          description: 'Value indicating the state when temperature is in warning condition.'
+          description: 'Value indicating the state when the temperature is in the warning condition.'
           config:
             type: TEXT
             priority: '8'
             section_name: Other
             label: 'Value for state of `Temperature is warning`'
-            description: 'Value indicating the state when temperature is in warning condition.'
+            description: 'Value indicating the state when the temperature is in the warning condition.'
       valuemaps:
         - uuid: 0e5588b6aa714283b436031ff8ebc93a
           name: 'CISCO-ENVMON-MIB::CiscoEnvMonState'
@@ -4960,40 +4960,40 @@ zabbix_export:
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
         - macro: '{$FAN_CRIT_STATUS:"critical"}'
           value: '3'
-          description: 'Value indicating the FAN status for critical condition.'
+          description: 'Value indicating the FAN status for the critical condition.'
           config:
             type: TEXT
             priority: '16'
             section_name: Other
             label: 'Value of FAN status for state of `critical`'
-            description: 'Value indicating the FAN status for critical condition.'
+            description: 'Value indicating the FAN status for the critical condition.'
         - macro: '{$FAN_CRIT_STATUS:"shutdown"}'
           value: '4'
-          description: 'Value indicating the FAN status for shutdown condition.'
+          description: 'Value indicating the FAN status for the shutdown condition.'
           config:
             type: TEXT
             priority: '17'
             section_name: Other
             label: 'Value of FAN status for state of `shutdown`'
-            description: 'Value indicating the FAN status for shutdown condition.'
+            description: 'Value indicating the FAN status for the shutdown condition.'
         - macro: '{$FAN_WARN_STATUS:"notFunctioning"}'
           value: '6'
-          description: 'Value indicating the FAN status for not-functioning condition.'
+          description: 'Value indicating the FAN status for the not-functioning condition.'
           config:
             type: TEXT
             priority: '18'
             section_name: Other
             label: 'Value of FAN status for state of `notFunctioning`'
-            description: 'Value indicating the FAN status for not-functioning condition.'
+            description: 'Value indicating the FAN status for the not-functioning condition.'
         - macro: '{$FAN_WARN_STATUS:"warning"}'
           value: '2'
-          description: 'Value indicating the FAN status for warning condition.'
+          description: 'Value indicating the FAN status for the warning condition.'
           config:
             type: TEXT
             priority: '15'
             section_name: Other
             label: 'Value of FAN status for state of `warning`'
-            description: 'Value indicating the FAN status for warning condition.'
+            description: 'Value indicating the FAN status for the warning condition.'
         - macro: '{$ICMP_LOSS_WARN}'
           value: '20'
           description: 'Warning threshold of ICMP packet loss in %.'
@@ -5164,40 +5164,40 @@ zabbix_export:
             description: 'Regex string to exclude discovered interface by type.'
         - macro: '{$PSU_CRIT_STATUS:"critical"}'
           value: '3'
-          description: 'Value indicating the PSU status for critical condition.'
+          description: 'Value indicating the PSU status for the critical condition.'
           config:
             type: TEXT
             priority: '12'
             section_name: Other
             label: 'Value of PSU status for state of `critical`'
-            description: 'Value indicating the PSU status for critical condition.'
+            description: 'Value indicating the PSU status for the critical condition.'
         - macro: '{$PSU_CRIT_STATUS:"shutdown"}'
           value: '4'
-          description: 'Value indicating the PSU status for shutdown condition.'
+          description: 'Value indicating the PSU status for the shutdown condition.'
           config:
             type: TEXT
             priority: '13'
             section_name: Other
             label: 'Value of PSU status for state of `shutdown`'
-            description: 'Value indicating the PSU status for shutdown condition.'
+            description: 'Value indicating the PSU status for the shutdown condition.'
         - macro: '{$PSU_WARN_STATUS:"notFunctioning"}'
           value: '6'
-          description: 'Value indicating the PSU status for not-functioning condition.'
+          description: 'Value indicating the PSU status for the not-functioning condition.'
           config:
             type: TEXT
             priority: '14'
             section_name: Other
             label: 'Value of PSU status for state of `notFunctioning`'
-            description: 'Value indicating the PSU status for not-functioning condition.'
+            description: 'Value indicating the PSU status for the not-functioning condition.'
         - macro: '{$PSU_WARN_STATUS:"warning"}'
           value: '2'
-          description: 'Value indicating the PSU status for warning condition.'
+          description: 'Value indicating the PSU status for the warning condition.'
           config:
             type: TEXT
             priority: '11'
             section_name: Other
             label: 'Value of PSU status for state of `warning`'
-            description: 'Value indicating the PSU status for warning condition.'
+            description: 'Value indicating the PSU status for the warning condition.'
         - macro: '{$SNMP.TIMEOUT}'
           value: 5m
           description: 'Time interval for the SNMP availability trigger.'
@@ -5239,22 +5239,22 @@ zabbix_export:
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
         - macro: '{$TEMP_CRIT_STATUS}'
           value: '3'
-          description: 'Value indicating the state when temperature is in critical condition.'
+          description: 'Value indicating the state when the temperature is in critical condition.'
           config:
             type: TEXT
             priority: '9'
             section_name: Other
             label: 'Value for state of `Temperature is critical`'
-            description: 'Value indicating the state when temperature is in critical condition.'
+            description: 'Value indicating the state when the temperature is in critical condition.'
         - macro: '{$TEMP_DISASTER_STATUS}'
           value: '4'
-          description: 'Value indicating the state when temperature is in disaster condition.'
+          description: 'Value indicating the state when the temperature is in disaster condition.'
           config:
             type: TEXT
             priority: '10'
             section_name: Other
             label: 'Value for state of `Temperature is disaster`'
-            description: 'Value indicating the state when temperature is in disaster condition.'
+            description: 'Value indicating the state when the temperature is in disaster condition.'
         - macro: '{$TEMP_WARN}'
           value: '50'
           description: 'Warning threshold for temperature.'
@@ -5277,13 +5277,13 @@ zabbix_export:
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
         - macro: '{$TEMP_WARN_STATUS}'
           value: '2'
-          description: 'Value indicating the state when temperature is in warning condition.'
+          description: 'Value indicating the state when the temperature is in the warning condition.'
           config:
             type: TEXT
             priority: '8'
             section_name: Other
             label: 'Value for state of `Temperature is warning`'
-            description: 'Value indicating the state when temperature is in warning condition.'
+            description: 'Value indicating the state when the temperature is in the warning condition.'
       dashboards:
         - uuid: 19aa552abf004e729044a7af05a5544a
           name: 'Network interfaces'

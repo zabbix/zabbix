@@ -1831,13 +1831,13 @@ zabbix_export:
       macros:
         - macro: '{$CPU.UTIL.CRIT}'
           value: '90'
-          description: 'The critical threshold of the CPU utilization expressed in %.'
+          description: 'The critical threshold of CPU utilization expressed in %.'
           config:
             type: TEXT
             priority: '3'
             section_name: Thresholds
             label: 'Threshold for CPU utilization (critical)'
-            description: 'The critical threshold of the CPU utilization expressed in %. In the range from 0 to 100 inclusive.'
+            description: 'The critical threshold of CPU utilization expressed in %. In the range from 0 to 100 inclusive.'
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
         - macro: '{$ICMP_LOSS_WARN}'
           value: '20'
@@ -2127,23 +2127,23 @@ zabbix_export:
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
         - macro: '{$VFS.FS.PUSED.MAX.CRIT}'
           value: '90'
-          description: 'The critical threshold of the filesystem utilization.'
+          description: 'The critical threshold of filesystem utilization.'
           config:
             type: TEXT
             priority: '1'
             section_name: Thresholds
             label: 'Threshold for filesystem utilization (critical)'
-            description: 'The critical threshold of the filesystem utilization. In the range from 0 to 100 inclusive.'
+            description: 'The critical threshold of filesystem utilization. In the range from 0 to 100 inclusive.'
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
         - macro: '{$VFS.FS.PUSED.MAX.WARN}'
           value: '80'
-          description: 'The warning threshold of the filesystem utilization.'
+          description: 'The warning threshold of filesystem utilization.'
           config:
             type: TEXT
             priority: '2'
             section_name: Thresholds
             label: 'Threshold for filesystem utilization (warning)'
-            description: 'The warning threshold of the filesystem utilization. In the range from 0 to 100 inclusive.'
+            description: 'The warning threshold of filesystem utilization. In the range from 0 to 100 inclusive.'
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
       dashboards:
         - uuid: acd7bf00fdaf47fd8d167aed76a7c63a
