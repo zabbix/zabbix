@@ -169,14 +169,13 @@ class WidgetForm extends CWidgetForm {
 					SVG_GRAPH_DATA_SOURCE_TRENDS => _('Trends')
 				]))->setDefault(SVG_GRAPH_DATA_SOURCE_AUTO)
 			)
-			->addField(
-				$this->isTemplateDashboard()
-					? null
-					: (new CWidgetFieldRadioButtonList('show_hostnames', _('Host names in labels'), [
+			->addField(!$this->isTemplateDashboard()
+				? (new CWidgetFieldRadioButtonList('show_hostnames', _('Host names in labels'), [
 					SVG_GRAPH_LABELS_IN_HOSTNAMES_AUTO => _('Auto'),
 					SVG_GRAPH_LABELS_IN_HOSTNAMES_SHOW => _('Show'),
 					SVG_GRAPH_LABELS_IN_HOSTNAMES_HIDE => _('Hide')
 				]))->setDefault(SVG_GRAPH_LABELS_IN_HOSTNAMES_AUTO)
+				: null
 			);
 	}
 
