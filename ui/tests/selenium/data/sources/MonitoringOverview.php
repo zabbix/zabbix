@@ -216,7 +216,7 @@ class MonitoringOverview {
 
 		$i = 1;
 		foreach (array_values($itemids) as $itemid) {
-			CDataHelper::addItemData($itemid, [$i], 1690884000);
+			CDataHelper::addItemData($itemid, [$i], 1533555726);
 			$i++;
 		}
 
@@ -297,7 +297,7 @@ class MonitoringOverview {
 			'3_trigger_Average',
 			'4_trigger_Average'
 		];
-		CDBHelper::setTriggerProblem($trigger_names, TRIGGER_VALUE_TRUE, ['clock' => 1690884000, 'ns' => 726692808]);
+		CDBHelper::setTriggerProblem($trigger_names, TRIGGER_VALUE_TRUE, ['clock' => 1533555726, 'ns' => 726692808]);
 
 		foreach ($trigger_names as $description) {
 			DBexecute('UPDATE triggers SET value=1 WHERE description='.zbx_dbstr($description));
@@ -322,7 +322,7 @@ class MonitoringOverview {
 		]);
 
 		foreach ($acknowledge as $id) {
-			DBexecute('UPDATE acknowledges SET clock=1690971132 WHERE eventid='.zbx_dbstr($id));
+			DBexecute('UPDATE acknowledges SET clock=1533629135 WHERE eventid='.zbx_dbstr($id));
 
 			// Imitate event acknowledge by other user (guest).
 			if ($id === $eventids['4_trigger_Average']) {
@@ -330,7 +330,7 @@ class MonitoringOverview {
 			}
 
 			$id = CDBHelper::getValue('SELECT acknowledgeid FROM acknowledges WHERE eventid='.zbx_dbstr($id));
-			DBexecute('UPDATE task SET clock=1690974483 WHERE taskid='.zbx_dbstr($id));
+			DBexecute('UPDATE task SET clock=1533631968 WHERE taskid='.zbx_dbstr($id));
 		}
 
 		CDataHelper::call('mediatype.create', [
