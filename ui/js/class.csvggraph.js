@@ -138,11 +138,11 @@
 	function moveSBoxMouse(e) {
 		e.stopPropagation();
 
-		var graph = e.data.graph,
-			data = graph.data('options'),
-			$sbox = jQuery('.svg-graph-selection', graph),
-			$stxt = jQuery('.svg-graph-selection-text', graph),
-			offsetX = e.clientX - graph.offset().left;
+		const graph = e.data.graph;
+		const data = graph.data('options');
+		const sbox = graph[0].querySelector('.svg-graph-selection');
+		const selection_text = graph[0].querySelector('.svg-graph-selection-text');
+		const offsetX = e.clientX - graph.offset().left;
 
 		data.end = offsetX - data.dimX;
 
@@ -157,25 +157,19 @@
 
 		if (data.boxing) {
 			data.end = Math.min(offsetX - data.dimX, data.dimW);
-			data.end = (data.end > 0) ? data.end : 0;
+			data.end = data.end > 0 ? data.end : 0;
 
-			$sbox.attr({
-				'x': (Math.min(data.start, data.end) + data.dimX) + 'px',
-				'y': data.dimY + 'px',
-				'width': Math.abs(data.end - data.start) + 'px',
-				'height': data.dimH
-			});
+			sbox.setAttribute('x', `${Math.min(data.start, data.end) + data.dimX}px`);
+			sbox.setAttribute('y', `${data.dimY}px`);
+			sbox.setAttribute('width', `${Math.abs(data.end - data.start)}px`);
+			sbox.setAttribute('height', `${data.dimH}px`);
 
-			var seconds = Math.round(Math.abs(data.end - data.start) * data.spp),
-				label = formatTimestamp(seconds, false, true)
-					+ (seconds < data.minPeriod ? ' [min 1' + t('S_MINUTE_SHORT') + ']'  : '');
+			const seconds = Math.round(Math.abs(data.end - data.start) * data.spp);
+			const label_end = seconds < data.minPeriod ? ' [min 1' + t('S_MINUTE_SHORT') + ']'  : '';
 
-			$stxt
-				.text(label)
-				.attr({
-					'x': (Math.min(data.start, data.end) + data.dimX + 5) + 'px',
-					'y': (data.dimY + 15) + 'px'
-				});
+			selection_text.innerHTML = `${formatTimestamp(seconds, false, true)}${label_end}`;
+			selection_text.setAttribute('x', `${Math.min(data.start, data.end) + data.dimX + 5}px`);
+			selection_text.setAttribute('y', `${data.dimY + 15}px`);
 		}
 	}
 
@@ -183,19 +177,19 @@
 	function endSBoxDrag(e) {
 		e.stopPropagation();
 
-		var graph = e.data.graph,
-			data = graph.data('options'),
-			offsetX = e.clientX - graph.offset().left,
-			set_date = data && data.boxing;
+		const graph = e.data.graph;
+		const data = graph.data('options');
+		const offsetX = e.clientX - graph.offset().left
+		const set_date = data && data.boxing;
 
 		destroySBox(e, graph);
 
 		if (set_date) {
 			data.end = Math.min(offsetX - data.dimX, data.dimW);
 
-			var seconds = Math.round(Math.abs(data.end - data.start) * data.spp),
-				from_offset = Math.floor(Math.min(data.start, data.end)) * data.spp,
-				to_offset = Math.floor(data.dimW - Math.max(data.start, data.end)) * data.spp;
+			const seconds = Math.round(Math.abs(data.end - data.start) * data.spp);
+			const from_offset = Math.floor(Math.min(data.start, data.end)) * data.spp;
+			const to_offset = Math.floor(data.dimW - Math.max(data.start, data.end)) * data.spp;
 
 			if (seconds > data.minPeriod && (from_offset > 0 || to_offset > 0)) {
 				const widget = graph.data('widget');
@@ -837,7 +831,6 @@
 						dimH: widget._svg_options.dims.h,
 						showProblems: widget._svg_options.show_problems,
 						showSimpleTriggers: widget._svg_options.show_simple_triggers,
-						hintMaxRows: widget._svg_options.hint_max_rows,
 						spp: widget._svg_options.spp || null,
 						timePeriod: widget._svg_options.time_period,
 						minPeriod: widget._svg_options.min_period,

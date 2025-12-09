@@ -148,8 +148,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 					&& !$has_custom_time_period,
 				'show_problems' => $graph_data['problems']['show_problems'],
 				'show_simple_triggers' => $graph_data['displaying']['show_simple_triggers'],
-				'time_period' => $this->fields_values['time_period'],
-				'hint_max_rows' => ZBX_WIDGET_ROWS
+				'time_period' => $this->fields_values['time_period']
 			]);
 		}
 

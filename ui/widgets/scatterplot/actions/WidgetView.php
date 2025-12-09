@@ -138,8 +138,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 		if (!$preview) {
 			$svg_options['data'] = zbx_array_merge($svg_options['data'], [
-				'time_period' => $this->fields_values['time_period'],
-				'hint_max_rows' => ZBX_WIDGET_ROWS
+				'time_period' => $this->fields_values['time_period']
 			]);
 		}
 
