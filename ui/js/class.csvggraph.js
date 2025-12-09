@@ -883,46 +883,78 @@
 		const hintbox = graph[0].hintBoxItem[0];
 		const widget = graph.data('widget');
 		const data = graph.data('options');
+		const hintbox_items = hintbox.querySelectorAll('.has-broadcast-data');
 
-		for (const item of hintbox.querySelectorAll('.has-broadcast-data')) {
+		for (const item of hintbox_items) {
 			const {itemid, ds} = item.dataset;
+			const graph_element = graph[0].querySelector(`[data-itemid="${itemid}"][data-ds="${ds}"]`);
 
 			item.addEventListener('click', () => {
 				widget.updateItemBroadcast(itemid, ds);
-
 				markSelectedHintboxItems(hintbox, widget);
 			});
 
 			if (data.hintbox_type === GRAPH_HINTBOX_TYPE_SVG_GRAPH) {
 				item.addEventListener('mouseenter', () => {
-					const graph_element = graph[0].querySelector(`[data-itemid="${itemid}"][data-ds="${ds}"]`);
-					graph_element.classList.add('hovered');
-					graph[0].classList.add('hovered');
+					addHighlighting(graph_element, graph);
 				});
 
 				item.addEventListener('mouseleave', () => {
-					const graph_element = graph[0].querySelector(`[data-itemid="${itemid}"][data-ds="${ds}"]`);
-					graph_element.classList.remove('hovered');
-					graph[0].classList.remove('hovered');
+					resetHighlighting(hintbox, graph);
 				});
 			}
 		}
 
 		markSelectedHintboxItems(hintbox, widget);
-	}
 
-	function markSelectedHintboxItems(hintbox, widget) {
-		const {itemid, ds} = widget.getItemBroadcasting();
-
-		for (const item of hintbox.querySelectorAll('.has-broadcast-data')) {
-			if (itemid !== null && ds !== null) {
-				item.classList.toggle('selected', item.dataset.itemid == itemid && item.dataset.ds == ds);
-			}
+		if (data.hintbox_type === GRAPH_HINTBOX_TYPE_SVG_GRAPH) {
+			resetHighlighting(hintbox, graph);
 		}
 	}
 
 	function onStaticHintboxClose(e, graph) {
 		graph.data('is_static_hintbox_opened', false);
+
+		removeHighlighting(graph);
+	}
+
+	function markSelectedHintboxItems(hintbox, widget) {
+		const {itemid, ds} = widget.getItemBroadcasting();
+
+		if (itemid !== null && ds !== null) {
+			for (const item of hintbox.querySelectorAll('.has-broadcast-data')) {
+				item.classList.toggle('selected', item.dataset.itemid == itemid && item.dataset.ds == ds);
+			}
+		}
+	}
+
+	function addHighlighting(graph_element, graph) {
+		removeHighlighting(graph);
+
+		graph_element.classList.add('hovered');
+		graph[0].classList.add('hovered');
+	}
+
+	function resetHighlighting(hintbox, graph) {
+		const selected_item = hintbox.querySelector('.has-broadcast-data.selected');
+
+		if (selected_item) {
+			const {itemid, ds} = selected_item.dataset;
+			const graph_element = graph[0].querySelector(`[data-itemid="${itemid}"][data-ds="${ds}"]`);
+
+			addHighlighting(graph_element, graph);
+		}
+		else {
+			removeHighlighting(graph);
+		}
+	}
+
+	function removeHighlighting(graph) {
+		for (const item of graph[0].querySelectorAll('.hovered')) {
+			item.classList.remove('hovered');
+		}
+
+		graph[0].classList.remove('hovered');
 	}
 
 	jQuery.fn.svggraph = function(method) {
