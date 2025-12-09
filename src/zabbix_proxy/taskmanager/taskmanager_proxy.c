@@ -67,7 +67,7 @@ static int	tm_execute_remote_command(zbx_uint64_t taskid, int clock, int ttl, ti
 {
 	zbx_db_row_t	row;
 	zbx_uint64_t	parent_taskid, hostid, alertid;
-	int		ret = FAIL;
+	int		ret = FAIL, skip_update = 0;
 	zbx_script_t	script;
 	char		*info = NULL, error[MAX_STRING_LEN];
 	zbx_dc_host_t	host;
@@ -79,7 +79,6 @@ static int	tm_execute_remote_command(zbx_uint64_t taskid, int clock, int ttl, ti
 				taskid);
 	zbx_tm_task_t	*task = NULL;
 	double		t;
-	int		skip_update = 0;
 
 	if (NULL == (row = zbx_db_fetch(result)))
 		goto finish;
@@ -90,29 +89,18 @@ static int	tm_execute_remote_command(zbx_uint64_t taskid, int clock, int ttl, ti
 			0, 0);
 
 	ZBX_STR2UINT64(parent_taskid, row[9]);
-	ZBX_STR2UINT64(hostid, row[10]);
-	unsigned char execute_on_val;
-	ZBX_STR2UCHAR(execute_on_val, row[1]);
-
-	zabbix_log(LOG_LEVEL_WARNING, "tm_execute_remote_command: taskid=%llu"
-			" parent_taskid=%llu hostid=%llu execute_on=%u command=\"%s\"",
-			(unsigned long long)taskid, (unsigned long long)parent_taskid,
-			(unsigned long long)hostid, (unsigned int)execute_on_val, row[8]);
 
 	if (0 != ttl && clock + ttl < now)
 	{
 		task->data = zbx_tm_remote_command_result_create(parent_taskid, FAIL,
 				"The remote command has been expired.");
-		zabbix_log(LOG_LEVEL_WARNING, "tm_execute_remote_command: taskid=%llu expired (clock=%d ttl=%d now=%d)",
-				(unsigned long long)taskid, clock, ttl, (int)now);
 		goto finish;
 	}
 
+	ZBX_STR2UINT64(hostid, row[10]);
+
 	if (FAIL == zbx_dc_get_host_by_hostid(&host, hostid))
 	{
-		//task->data = zbx_tm_remote_command_result_create(parent_taskid, FAIL, "Unknown host.");
-		zabbix_log(LOG_LEVEL_WARNING, "tm_execute_remote_command: taskid=%llu hostid=%llu not found in proxy cache",
-				(unsigned long long)taskid, (unsigned long long)hostid);
 		skip_update = 1;
 		goto finish;
 	}
@@ -161,19 +149,16 @@ static int	tm_execute_remote_command(zbx_uint64_t taskid, int clock, int ttl, ti
 			program_type, 0 == alertid ? &info : NULL, error, sizeof(error), NULL)))
 	{
 		task->data = zbx_tm_remote_command_result_create(parent_taskid, ret, error);
-		zabbix_log(LOG_LEVEL_WARNING, "tm_execute_remote_command: taskid=%llu host=\"%s\" failed: %s",
-				(unsigned long long)taskid, host.host, error);
 	}
 	else
 	{
 		task->data = zbx_tm_remote_command_result_create(parent_taskid, ret, info);
-		zabbix_log(LOG_LEVEL_WARNING, "tm_execute_remote_command: taskid=%llu host=\"%s\" succeeded",
-				(unsigned long long)taskid, host.host);
 	}
+
 	zbx_free(info);
 finish:
 	zbx_db_free_result(result);
-	/* If host is not yet in proxy cache, leave task status NEW for retry. */
+
 	if (1 == skip_update)
 	{
 		if (NULL != task)
