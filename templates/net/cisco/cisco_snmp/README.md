@@ -37,17 +37,17 @@ Refer to the vendor documentation.
 |{$TEMP_CRIT}|<p>Critical threshold for temperature.</p>|`60`|
 |{$TEMP_WARN:"CPU"}|<p>Warning threshold for CPU temperature.</p>|`70`|
 |{$TEMP_CRIT:"CPU"}|<p>Critical threshold for CPU temperature.</p>|`75`|
-|{$TEMP_WARN_STATUS}|<p>Value indicating the state when temperature is in warning condition.</p>|`2`|
-|{$TEMP_CRIT_STATUS}|<p>Value indicating the state when temperature is in critical condition.</p>|`3`|
-|{$TEMP_DISASTER_STATUS}|<p>Value indicating the state when temperature is in disaster condition.</p>|`4`|
-|{$PSU_WARN_STATUS:"warning"}|<p>Value indicating the PSU status for warning condition.</p>|`2`|
-|{$PSU_CRIT_STATUS:"critical"}|<p>Value indicating the PSU status for critical condition.</p>|`3`|
-|{$PSU_CRIT_STATUS:"shutdown"}|<p>Value indicating the PSU status for shutdown condition.</p>|`4`|
-|{$PSU_WARN_STATUS:"notFunctioning"}|<p>Value indicating the PSU status for not-functioning condition.</p>|`6`|
-|{$FAN_WARN_STATUS:"warning"}|<p>Value indicating the FAN status for warning condition.</p>|`2`|
-|{$FAN_CRIT_STATUS:"critical"}|<p>Value indicating the FAN status for critical condition.</p>|`3`|
-|{$FAN_CRIT_STATUS:"shutdown"}|<p>Value indicating the FAN status for shutdown condition.</p>|`4`|
-|{$FAN_WARN_STATUS:"notFunctioning"}|<p>Value indicating the FAN status for not-functioning condition.</p>|`6`|
+|{$TEMP_WARN_STATUS}|<p>Value indicating the state when the temperature is in the warning condition.</p>|`2`|
+|{$TEMP_CRIT_STATUS}|<p>Value indicating the state when the temperature is in critical condition.</p>|`3`|
+|{$TEMP_DISASTER_STATUS}|<p>Value indicating the state when the temperature is in disaster condition.</p>|`4`|
+|{$PSU_WARN_STATUS:"warning"}|<p>Value indicating the PSU status for the warning condition.</p>|`2`|
+|{$PSU_CRIT_STATUS:"critical"}|<p>Value indicating the PSU status for the critical condition.</p>|`3`|
+|{$PSU_CRIT_STATUS:"shutdown"}|<p>Value indicating the PSU status for the shutdown condition.</p>|`4`|
+|{$PSU_WARN_STATUS:"notFunctioning"}|<p>Value indicating the PSU status for the not-functioning condition.</p>|`6`|
+|{$FAN_WARN_STATUS:"warning"}|<p>Value indicating the FAN status for the warning condition.</p>|`2`|
+|{$FAN_CRIT_STATUS:"critical"}|<p>Value indicating the FAN status for the critical condition.</p>|`3`|
+|{$FAN_CRIT_STATUS:"shutdown"}|<p>Value indicating the FAN status for the shutdown condition.</p>|`4`|
+|{$FAN_WARN_STATUS:"notFunctioning"}|<p>Value indicating the FAN status for the not-functioning condition.</p>|`6`|
 |{$SNMP.TIMEOUT}|<p>Time interval for the SNMP availability trigger.</p>|`5m`|
 |{$ICMP_LOSS_WARN}|<p>Warning threshold of ICMP packet loss in %.</p>|`20`|
 |{$ICMP_RESPONSE_TIME_WARN}|<p>Warning threshold of the average ICMP response time in seconds.</p>|`0.15`|
@@ -304,17 +304,17 @@ Refer to the vendor documentation.
 |{$TEMP_CRIT}|<p>Critical threshold for temperature.</p>|`60`|
 |{$TEMP_WARN:"CPU"}|<p>Warning threshold for CPU temperature.</p>|`70`|
 |{$TEMP_CRIT:"CPU"}|<p>Critical threshold for CPU temperature.</p>|`75`|
-|{$TEMP_WARN_STATUS}|<p>Value indicating the state when temperature is in warning condition.</p>|`2`|
-|{$TEMP_CRIT_STATUS}|<p>Value indicating the state when temperature is in critical condition.</p>|`3`|
-|{$TEMP_DISASTER_STATUS}|<p>Value indicating the state when temperature is in disaster condition.</p>|`4`|
-|{$PSU_WARN_STATUS:"warning"}|<p>Value indicating the PSU status for warning condition.</p>|`2`|
-|{$PSU_CRIT_STATUS:"critical"}|<p>Value indicating the PSU status for critical condition.</p>|`3`|
-|{$PSU_CRIT_STATUS:"shutdown"}|<p>Value indicating the PSU status for shutdown condition.</p>|`4`|
-|{$PSU_WARN_STATUS:"notFunctioning"}|<p>Value indicating the PSU status for not-functioning condition.</p>|`6`|
-|{$FAN_WARN_STATUS:"warning"}|<p>Value indicating the FAN status for warning condition.</p>|`2`|
-|{$FAN_CRIT_STATUS:"critical"}|<p>Value indicating the FAN status for critical condition.</p>|`3`|
-|{$FAN_CRIT_STATUS:"shutdown"}|<p>Value indicating the FAN status for shutdown condition.</p>|`4`|
-|{$FAN_WARN_STATUS:"notFunctioning"}|<p>Value indicating the FAN status for not-functioning condition.</p>|`6`|
+|{$TEMP_WARN_STATUS}|<p>Value indicating the state when the temperature is in the warning condition.</p>|`2`|
+|{$TEMP_CRIT_STATUS}|<p>Value indicating the state when the temperature is in critical condition.</p>|`3`|
+|{$TEMP_DISASTER_STATUS}|<p>Value indicating the state when the temperature is in disaster condition.</p>|`4`|
+|{$PSU_WARN_STATUS:"warning"}|<p>Value indicating the PSU status for the warning condition.</p>|`2`|
+|{$PSU_CRIT_STATUS:"critical"}|<p>Value indicating the PSU status for the critical condition.</p>|`3`|
+|{$PSU_CRIT_STATUS:"shutdown"}|<p>Value indicating the PSU status for the shutdown condition.</p>|`4`|
+|{$PSU_WARN_STATUS:"notFunctioning"}|<p>Value indicating the PSU status for the not-functioning condition.</p>|`6`|
+|{$FAN_WARN_STATUS:"warning"}|<p>Value indicating the FAN status for the warning condition.</p>|`2`|
+|{$FAN_CRIT_STATUS:"critical"}|<p>Value indicating the FAN status for the critical condition.</p>|`3`|
+|{$FAN_CRIT_STATUS:"shutdown"}|<p>Value indicating the FAN status for the shutdown condition.</p>|`4`|
+|{$FAN_WARN_STATUS:"notFunctioning"}|<p>Value indicating the FAN status for the not-functioning condition.</p>|`6`|
 |{$SNMP.TIMEOUT}|<p>Time interval for the SNMP availability trigger.</p>|`5m`|
 |{$ICMP_LOSS_WARN}|<p>Warning threshold of ICMP packet loss in %.</p>|`20`|
 |{$ICMP_RESPONSE_TIME_WARN}|<p>Warning threshold of the average ICMP response time in seconds.</p>|`0.15`|
@@ -552,17 +552,17 @@ Refer to the vendor documentation.
 |{$TEMP_CRIT}|<p>Critical threshold for temperature.</p>|`60`|
 |{$TEMP_WARN:"CPU"}|<p>Warning threshold for CPU temperature.</p>|`70`|
 |{$TEMP_CRIT:"CPU"}|<p>Critical threshold for CPU temperature.</p>|`75`|
-|{$TEMP_WARN_STATUS}|<p>Value indicating the state when temperature is in warning condition.</p>|`2`|
-|{$TEMP_CRIT_STATUS}|<p>Value indicating the state when temperature is in critical condition.</p>|`3`|
-|{$TEMP_DISASTER_STATUS}|<p>Value indicating the state when temperature is in disaster condition.</p>|`4`|
-|{$PSU_WARN_STATUS:"warning"}|<p>Value indicating the PSU status for warning condition.</p>|`2`|
-|{$PSU_CRIT_STATUS:"critical"}|<p>Value indicating the PSU status for critical condition.</p>|`3`|
-|{$PSU_CRIT_STATUS:"shutdown"}|<p>Value indicating the PSU status for shutdown condition.</p>|`4`|
-|{$PSU_WARN_STATUS:"notFunctioning"}|<p>Value indicating the PSU status for not-functioning condition.</p>|`6`|
-|{$FAN_WARN_STATUS:"warning"}|<p>Value indicating the FAN status for warning condition.</p>|`2`|
-|{$FAN_CRIT_STATUS:"critical"}|<p>Value indicating the FAN status for critical condition.</p>|`3`|
-|{$FAN_CRIT_STATUS:"shutdown"}|<p>Value indicating the FAN status for shutdown condition.</p>|`4`|
-|{$FAN_WARN_STATUS:"notFunctioning"}|<p>Value indicating the FAN status for not-functioning condition.</p>|`6`|
+|{$TEMP_WARN_STATUS}|<p>Value indicating the state when the temperature is in the warning condition.</p>|`2`|
+|{$TEMP_CRIT_STATUS}|<p>Value indicating the state when the temperature is in critical condition.</p>|`3`|
+|{$TEMP_DISASTER_STATUS}|<p>Value indicating the state when the temperature is in disaster condition.</p>|`4`|
+|{$PSU_WARN_STATUS:"warning"}|<p>Value indicating the PSU status for the warning condition.</p>|`2`|
+|{$PSU_CRIT_STATUS:"critical"}|<p>Value indicating the PSU status for the critical condition.</p>|`3`|
+|{$PSU_CRIT_STATUS:"shutdown"}|<p>Value indicating the PSU status for the shutdown condition.</p>|`4`|
+|{$PSU_WARN_STATUS:"notFunctioning"}|<p>Value indicating the PSU status for the not-functioning condition.</p>|`6`|
+|{$FAN_WARN_STATUS:"warning"}|<p>Value indicating the FAN status for the warning condition.</p>|`2`|
+|{$FAN_CRIT_STATUS:"critical"}|<p>Value indicating the FAN status for the critical condition.</p>|`3`|
+|{$FAN_CRIT_STATUS:"shutdown"}|<p>Value indicating the FAN status for the shutdown condition.</p>|`4`|
+|{$FAN_WARN_STATUS:"notFunctioning"}|<p>Value indicating the FAN status for the not-functioning condition.</p>|`6`|
 |{$SNMP.TIMEOUT}|<p>Time interval for the SNMP availability trigger.</p>|`5m`|
 |{$ICMP_LOSS_WARN}|<p>Warning threshold of ICMP packet loss in %.</p>|`20`|
 |{$ICMP_RESPONSE_TIME_WARN}|<p>Warning threshold of the average ICMP response time in seconds.</p>|`0.15`|
