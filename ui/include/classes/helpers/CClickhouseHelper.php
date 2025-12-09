@@ -61,7 +61,13 @@ class CClickhouseHelper {
 		curl_close($handle);
 
 		if ($http_code != 200) {
-			error(_s('Clickhouse error: %1$s.', $response));
+			$_response = json_decode($response, true);
+
+			$error_message = is_array($_response) && array_key_exists('exception', $_response)
+				? $_response['exception']
+				: $response;
+
+			error(_s('Clickhouse error: %1$s.', $error_message));
 
 			return false;
 		}

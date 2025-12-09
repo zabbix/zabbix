@@ -942,8 +942,8 @@ class CHistoryManager {
 			$value_type_itemids[$item['value_type']][$item['itemid']] = true;
 		}
 
-		$sql_select = ['itemid', 'toUnixTimestamp(tick) AS tick', 'toUnixTimestamp(ts) AS clock',
-			'toUnixTimestamp64Nano(timestamp) % 1000000000 AS ns'
+		$sql_select = ['itemid', 'value', 'toUnixTimestamp(tick) AS tick', 'toUnixTimestamp(ts) AS clock',
+			'toUnixTimestamp64Nano(ts) % 1000000000 AS ns'
 		];
 		$sql_sub_select = ['itemid', 'toStartOfInterval(timestamp, toIntervalSecond('.$interval.')) AS tick'];
 
