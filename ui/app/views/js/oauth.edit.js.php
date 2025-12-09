@@ -103,7 +103,7 @@ window.oauth_edit_popup = new class {
 				?.addEventListener('input', () => this.#showClientSecretWithWarning());
 
 			this.form.querySelector('#oauth-token-parameters-table')?.addEventListener('click', e => {
-				if (e.target.matches('.element-table-remove')) {
+				if (e.target.matches('.element-table-remove') || e.target.matches('.element-table-add')) {
 					this.#showClientSecretWithWarning();
 				}
 			});
