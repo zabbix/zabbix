@@ -41,8 +41,8 @@ void	zbx_mock_test_entry(void **state)
 	zbx_vector_lld_macro_path_ptr_create(&macros);
 	get_macros("in.macros", &macros);
 
-	if (SUCCEED !=zbx_json_open(buffer, &parse))
-		fail_msg("failed json open\n");
+	if (SUCCEED != zbx_json_open(buffer, &parse))
+		fail_msg("failed json open: %s\n", zbx_json_strerror());
 
 	result_expression = zbx_substitute_expression_lld_macros(&data_expression, ZBX_EVAL_EXPRESSION_MACRO_LLD,
 			&parse, &macros, &error);

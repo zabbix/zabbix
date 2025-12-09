@@ -37,8 +37,8 @@ void	zbx_mock_test_entry(void **state)
 
 	ZBX_UNUSED(state);
 
-	if (SUCCEED !=zbx_json_open(buffer, &parse))
-		fail_msg("failed json open\n");
+	if (SUCCEED != zbx_json_open(buffer, &parse))
+		fail_msg("failed json open: %s\n", zbx_json_strerror());
 
 	zbx_vector_lld_macro_path_ptr_create(&macros);
 	get_macros("in.macros", &macros);
