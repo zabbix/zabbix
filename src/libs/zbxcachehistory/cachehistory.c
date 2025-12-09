@@ -2627,6 +2627,7 @@ void	zbx_dc_add_history_variant(zbx_uint64_t itemid, unsigned char value_type, u
 			}
 			else if (ITEM_VALUE_TYPE_JSON == value_type)
 			{
+				/* JSON item value type when passive agent is used with preprocessing */
 				validate_json_and_add_to_history(itemid, value_type, value, ts, value_flags, mtime,
 						lastlogsize);
 			}
