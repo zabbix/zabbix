@@ -515,8 +515,10 @@ close:
 		}
 		else if (MAX_EXECUTE_OUTPUT_LEN <= offset + rc)
 		{
-			zabbix_log(LOG_LEVEL_ERR, "command output exceeded limit of %d KB",
+			zbx_snprintf(error, max_error_len, "command output exceeded limit of %d KB",
 					MAX_EXECUTE_OUTPUT_LEN / ZBX_KIBIBYTE);
+
+			zabbix_log(LOG_LEVEL_ERR, "%s", error);
 		}
 		else if (0 == WIFEXITED(status) || (ZBX_EXIT_CODE_CHECKS_ENABLED == flag && 0 != WEXITSTATUS(status)))
 		{
