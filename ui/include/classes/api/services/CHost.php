@@ -83,7 +83,7 @@ class CHost extends CHostGeneral {
 
 		$sqlParts = [
 			'select'	=> ['hosts' => 'h.hostid'],
-			'from'		=> ['hosts' => 'hosts h'],
+			'from'		=> 'hosts h',
 			'where'		=> ['flags' => 'h.flags IN ('.ZBX_FLAG_DISCOVERY_NORMAL.','.ZBX_FLAG_DISCOVERY_CREATED.')'],
 			'group'		=> [],
 			'order'		=> [],
@@ -157,10 +157,8 @@ class CHost extends CHostGeneral {
 				return $options['countOutput'] ? '0' : [];
 			}
 
-			$sqlParts['from'][] = 'host_hgset hh';
-			$sqlParts['from'][] = 'permission p1';
-			$sqlParts['where'][] = 'h.hostid=hh.hostid';
-			$sqlParts['where'][] = 'hh.hgsetid=p1.hgsetid';
+			$sqlParts['join']['hh'] = ['table' => 'host_hgset', 'using' => 'hostid'];
+			$sqlParts['join']['p1'] = ['left_table' => 'hh', 'table' => 'permission', 'using' => 'hgsetid'];
 			$sqlParts['where'][] = 'p1.ugsetid='.self::$userData['ugsetid'];
 
 			if ($options['editable']) {
@@ -178,9 +176,8 @@ class CHost extends CHostGeneral {
 		if (!is_null($options['groupids'])) {
 			zbx_value2array($options['groupids']);
 
-			$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
+			$sqlParts['join']['hg'] = ['table' => 'hosts_groups', 'using' => 'hostid'];
 			$sqlParts['where'][] = dbConditionInt('hg.groupid', $options['groupids']);
-			$sqlParts['where']['hgh'] = 'hg.hostid=h.hostid';
 
 			if ($options['groupCount']) {
 				$sqlParts['group']['groupid'] = 'hg.groupid';
@@ -205,9 +202,8 @@ class CHost extends CHostGeneral {
 		if (!is_null($options['templateids'])) {
 			zbx_value2array($options['templateids']);
 
-			$sqlParts['from']['hosts_templates'] = 'hosts_templates ht';
+			$sqlParts['join']['ht'] = ['table' => 'hosts_templates', 'using' => 'hostid'];
 			$sqlParts['where'][] = dbConditionInt('ht.templateid', $options['templateids']);
-			$sqlParts['where']['hht'] = 'h.hostid=ht.hostid';
 
 			if ($options['groupCount']) {
 				$sqlParts['group']['templateid'] = 'ht.templateid';
@@ -218,9 +214,7 @@ class CHost extends CHostGeneral {
 		if (!is_null($options['interfaceids'])) {
 			zbx_value2array($options['interfaceids']);
 
-			$sqlParts['left_join']['interface'] = ['alias' => 'hi', 'table' => 'interface', 'using' => 'hostid'];
-			$sqlParts['left_table'] = ['alias' => $this->tableAlias, 'table' => $this->tableName];
-
+			$sqlParts['join']['hi'] = ['type' => 'left', 'table' => 'interface', 'using' => 'hostid'];
 			$sqlParts['where'][] = dbConditionInt('hi.interfaceid', $options['interfaceids']);
 		}
 
@@ -228,51 +222,43 @@ class CHost extends CHostGeneral {
 		if (!is_null($options['itemids'])) {
 			zbx_value2array($options['itemids']);
 
-			$sqlParts['from']['items'] = 'items i';
+			$sqlParts['join']['i'] = ['table' => 'items', 'using' => 'hostid'];
 			$sqlParts['where'][] = dbConditionInt('i.itemid', $options['itemids']);
-			$sqlParts['where']['hi'] = 'h.hostid=i.hostid';
 		}
 
 		// triggerids
 		if (!is_null($options['triggerids'])) {
 			zbx_value2array($options['triggerids']);
 
-			$sqlParts['from']['functions'] = 'functions f';
-			$sqlParts['from']['items'] = 'items i';
+			$sqlParts['join']['i'] = ['table' => 'items', 'using' => 'hostid'];
+			$sqlParts['join']['f'] = ['left_table' => 'i', 'table' => 'functions', 'using' => 'itemid'];
 			$sqlParts['where'][] = dbConditionInt('f.triggerid', $options['triggerids']);
-			$sqlParts['where']['hi'] = 'h.hostid=i.hostid';
-			$sqlParts['where']['fi'] = 'f.itemid=i.itemid';
 		}
 
 		// httptestids
 		if (!is_null($options['httptestids'])) {
 			zbx_value2array($options['httptestids']);
 
-			$sqlParts['from']['httptest'] = 'httptest ht';
+			$sqlParts['join']['ht'] = ['table' => 'httptest', 'using' => 'hostid'];
 			$sqlParts['where'][] = dbConditionInt('ht.httptestid', $options['httptestids']);
-			$sqlParts['where']['aht'] = 'ht.hostid=h.hostid';
 		}
 
 		// graphids
 		if (!is_null($options['graphids'])) {
 			zbx_value2array($options['graphids']);
 
-			$sqlParts['from']['graphs_items'] = 'graphs_items gi';
-			$sqlParts['from']['items'] = 'items i';
+			$sqlParts['join']['i'] = ['table' => 'items', 'using' => 'hostid'];
+			$sqlParts['join']['gi'] = ['left_table' => 'i', 'table' => 'graphs_items', 'using' => 'itemid'];
 			$sqlParts['where'][] = dbConditionInt('gi.graphid', $options['graphids']);
-			$sqlParts['where']['igi'] = 'i.itemid=gi.itemid';
-			$sqlParts['where']['hi'] = 'h.hostid=i.hostid';
 		}
 
 		// dserviceids
 		if (!is_null($options['dserviceids'])) {
 			zbx_value2array($options['dserviceids']);
 
-			$sqlParts['from']['dservices'] = 'dservices ds';
-			$sqlParts['from']['interface'] = 'interface i';
+			$sqlParts['join']['hi2'] = ['table' => 'interface', 'using' => 'hostid'];
+			$sqlParts['join']['ds'] = ['left_table' => 'hi2', 'table' => 'dservices', 'using' => 'ip'];
 			$sqlParts['where'][] = dbConditionInt('ds.dserviceid', $options['dserviceids']);
-			$sqlParts['where']['dsh'] = 'ds.ip=i.ip';
-			$sqlParts['where']['hi'] = 'h.hostid=i.hostid';
 
 			if ($options['groupCount']) {
 				$sqlParts['group']['dserviceid'] = 'ds.dserviceid';
@@ -283,9 +269,8 @@ class CHost extends CHostGeneral {
 		if (!is_null($options['maintenanceids'])) {
 			zbx_value2array($options['maintenanceids']);
 
-			$sqlParts['from']['maintenances_hosts'] = 'maintenances_hosts mh';
+			$sqlParts['join']['mh'] = ['table' => 'maintenances_hosts', 'using' => 'hostid'];
 			$sqlParts['where'][] = dbConditionInt('mh.maintenanceid', $options['maintenanceids']);
-			$sqlParts['where']['hmh'] = 'h.hostid=mh.hostid';
 
 			if ($options['groupCount']) {
 				$sqlParts['group']['maintenanceid'] = 'mh.maintenanceid';
@@ -419,15 +404,13 @@ class CHost extends CHostGeneral {
 			zbx_db_search('hosts h', $options, $sqlParts);
 
 			if (zbx_db_search('interface hi', $options, $sqlParts)) {
-				$sqlParts['left_join']['interface'] = ['alias' => 'hi', 'table' => 'interface', 'using' => 'hostid'];
-				$sqlParts['left_table'] = ['alias' => $this->tableAlias, 'table' => $this->tableName];
+				$sqlParts['join']['hi'] = ['type' => 'left', 'table' => 'interface', 'using' => 'hostid'];
 			}
 		}
 
 		// search inventory
 		if ($options['searchInventory'] !== null) {
-			$sqlParts['from']['host_inventory'] = 'host_inventory hii';
-			$sqlParts['where']['hii'] = 'h.hostid=hii.hostid';
+			$sqlParts['join']['hii'] = ['table' => 'host_inventory', 'using' => 'hostid'];
 
 			zbx_db_search('host_inventory hii',
 				[
@@ -450,8 +433,7 @@ class CHost extends CHostGeneral {
 			}
 
 			if ($this->dbFilter('interface hi', $options, $sqlParts)) {
-				$sqlParts['left_join']['interface'] = ['alias' => 'hi', 'table' => 'interface', 'using' => 'hostid'];
-				$sqlParts['left_table'] = ['alias' => $this->tableAlias, 'table' => $this->tableName];
+				$sqlParts['join']['hi'] = ['type' => 'left', 'table' => 'interface', 'using' => 'hostid'];
 			}
 
 			if (array_key_exists('active_available', $options['filter'])
@@ -599,7 +581,9 @@ class CHost extends CHostGeneral {
 
 			if (array_key_exists('assigned_proxyid', $options['filter'])
 					&& $options['filter']['assigned_proxyid'] !== null) {
-				$sqlParts['where'][] = dbConditionId('p.proxyid', $options['filter']['assigned_proxyid']);
+				$sqlParts['where'][] = dbConditionId('hp.proxyid', $options['filter']['assigned_proxyid']);
+				// Override host_proxy.proxyid with NULL if hosts.proxy_groupid and proxy.proxy_groupid do not match.
+				$sqlParts['where'][] = 'h.proxy_groupid=p.proxy_groupid';
 			}
 		}
 
@@ -617,25 +601,19 @@ class CHost extends CHostGeneral {
 
 		if ((!$options['countOutput'] && $this->outputIsRequested('inventory_mode', $options['output']))
 				|| ($options['filter'] && array_key_exists('inventory_mode', $options['filter']))) {
-			$sqlParts['left_join'][] = ['alias' => 'hinv', 'table' => 'host_inventory', 'using' => 'hostid'];
-			$sqlParts['left_table'] = ['alias' => $this->tableAlias, 'table' => $this->tableName];
+			$sqlParts['join']['hinv'] = ['type' => 'left', 'table' => 'host_inventory', 'using' => 'hostid'];
 		}
 
 		if ((!$options['countOutput'] && $this->outputIsRequested('active_available', $options['output']))
 				|| (is_array($options['filter']) && array_key_exists('active_available', $options['filter']))) {
-			$sqlParts['left_join'][] = ['alias' => 'hr', 'table' => 'host_rtdata', 'using' => 'hostid'];
-			$sqlParts['left_table'] = ['alias' => $this->tableAlias, 'table' => $this->tableName];
+			$sqlParts['join']['hr'] = ['type' => 'left', 'table' => 'host_rtdata', 'using' => 'hostid'];
 		}
 
 		if ((!$options['countOutput'] && $this->outputIsRequested('assigned_proxyid', $options['output']))
 				|| (is_array($options['filter']) && array_key_exists('assigned_proxyid', $options['filter'])
 					&& $options['filter']['assigned_proxyid'] !== null)) {
-			$sqlParts['left_join'][] = ['alias' => 'hp', 'table' => 'host_proxy', 'using' => 'hostid'];
-			// Override host_proxy.proxyid with NULL if hosts.proxy_groupid and proxy.proxy_groupid do not match.
-			$sqlParts['left_join'][] = ['alias' => 'p', 'table' => 'proxy', 'use_distinct' => false,
-				'condition' => 'h.proxy_groupid=p.proxy_groupid AND hp.proxyid=p.proxyid'
-			];
-			$sqlParts['left_table'] = ['alias' => $this->tableAlias, 'table' => $this->tableName];
+			$sqlParts['join']['hp'] = ['type' => 'left', 'table' => 'host_proxy', 'using' => 'hostid'];
+			$sqlParts['join']['p'] = ['type' => 'left', 'left_table' => 'hp', 'table' => 'proxy', 'using' => 'proxyid'];
 		}
 
 		if (!$options['countOutput']) {
@@ -649,7 +627,10 @@ class CHost extends CHostGeneral {
 			}
 
 			if ($this->outputIsRequested('assigned_proxyid', $options['output'])) {
-				$sqlParts = $this->addQuerySelect('p.proxyid AS assigned_proxyid', $sqlParts);
+				// Override host_proxy.proxyid with NULL if hosts.proxy_groupid and proxy.proxy_groupid do not match.
+				$sqlParts = $this->addQuerySelect('CASE WHEN h.proxy_groupid=p.proxy_groupid'.
+					' THEN hp.proxyid ELSE NULL END AS assigned_proxyid', $sqlParts
+				);
 			}
 		}
 

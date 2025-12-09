@@ -4,8 +4,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2025-06-27 13:12+0000\n"
-"Last-Translator: Tomáš Skočdopole <tomas.skocdopole@initmax.cz>\n"
+"PO-Revision-Date: 2025-12-03 11:43+0000\n"
+"Last-Translator: Tomáš Heřmánek <tomas.hermanek@initmax.cz>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: cs\n"
 "MIME-Version: 1.0\n"
@@ -319,19 +319,19 @@ msgstr "%1$s: %2$s"
 #: include/classes/setup/CSetupWizard.php:1460
 #, c-format
 msgid "%1$s: %2$s."
-msgstr ""
+msgstr "%1$s: %2$s."
 
 #: include/classes/server/CZabbixServer.php:746
 #: include/classes/setup/CSetupWizard.php:1466
 #, c-format
 msgid "%1$s: file is not readable."
-msgstr ""
+msgstr "%1$s: soubor není čitatelný."
 
 #: include/classes/server/CZabbixServer.php:743
 #: include/classes/setup/CSetupWizard.php:1463
 #, c-format
 msgid "%1$s: invalid path or file not found."
-msgstr ""
+msgstr "%1$s: nesprávna cesta k souboru alebo soubor nelze najít."
 
 #: include/classes/graph/CSvgGraph.php:1418
 #, c-format
@@ -1789,7 +1789,7 @@ msgstr "Musí existovat alespoň jeden aktivní uživatel s rolí \"%1$s\"."
 
 #: app/controllers/CControllerMaintenanceTimePeriodCheck.php:40
 msgid "At least one day must be selected."
-msgstr ""
+msgstr "Musí být vybrán alespoň jeden den."
 
 #: include/classes/api/services/CMaintenance.php:686
 msgid "At least one day of the week or day of the month must be specified."
@@ -1797,12 +1797,12 @@ msgstr "Musí být uveden alespoň jeden den v týdnu nebo den v měsíci."
 
 #: app/controllers/CControllerAutoregUpdate.php:30
 msgid "At least one encryption level must be selected."
-msgstr ""
+msgstr "Musí být vybrána alespoň jedna úroveň šifrování."
 
 #: app/controllers/CControllerRegExCreate.php:54
 #: app/controllers/CControllerRegExUpdate.php:55
 msgid "At least one expression must be added."
-msgstr ""
+msgstr "Musí být vybrán alespoň jeded výraz."
 
 #: app/controllers/CControllerMaintenanceCreate.php:62
 #: app/controllers/CControllerMaintenanceUpdate.php:63
@@ -1816,7 +1816,7 @@ msgstr "Minimálně jedna skupina hostů musí být vybrána."
 #: app/controllers/CControllerMaintenanceTimePeriodCheck.php:45
 #: app/controllers/CControllerMaintenanceUpdate.php:58
 msgid "At least one month must be selected."
-msgstr ""
+msgstr "Musí být vybrán alespoň jeden měsíc."
 
 #: include/classes/helpers/CItemGeneralHelper.php:411
 msgid "At least one of \"min\" or \"max\" parameters should be specified."
@@ -1850,7 +1850,7 @@ msgstr "Musí být povolen alespoň jeden parametr."
 #: app/controllers/CControllerMaintenanceCreate.php:40
 #: app/controllers/CControllerMaintenanceUpdate.php:41
 msgid "At least one period must be added."
-msgstr ""
+msgstr "Musí být přidána alespoň jedna perióda."
 
 #: app/controllers/CControllerPopupAcknowledgeCreate.php:283
 msgid "At least one update operation or message is mandatory"
@@ -1874,7 +1874,7 @@ msgstr "Musí být zadán alespoň jeden uživatel nebo skupina uživatelů."
 #: app/controllers/CControllerMaintenanceUpdate.php:62
 #: app/controllers/CControllerMaintenanceUpdate.php:66
 msgid "At least one weekday must be selected."
-msgstr ""
+msgstr "Musí být vybrán alespoň jeden den v týdnu."
 
 #: app/views/administration.mediatype.edit.php:354
 #: app/views/mediatype.edit.php:464
@@ -2120,7 +2120,7 @@ msgstr "Vyhnout se snadno uhodnutelným heslům"
 
 #: app/views/host.wizard.edit.php:473
 msgid "Avoid including sensitive data."
-msgstr ""
+msgstr "Vyhněte se zadávání citlivých údajů."
 
 #: jsLoader.php:172
 msgid "Awaiting data"
@@ -2234,7 +2234,7 @@ msgstr "Modrá"
 
 #: include/classes/core/ZBase.php:376
 msgid "Blue (classic)"
-msgstr ""
+msgstr "Modrá (klasická)"
 
 #: app/views/webscenario.step.edit.php:250
 #: include/views/configuration.host.discovery.edit.php:383
@@ -3736,7 +3736,7 @@ msgstr "Nelze najít mapu hodnot \"%1$s\" použitou pro prototyp itemu \"%2$s\" 
 
 #: app/views/oauth.authorize.php:33
 msgid "Cannot get authentication tokens"
-msgstr ""
+msgstr "Nelze získat autentizační tokeny"
 
 #: app/views/oauth.edit.php:230
 msgid "Cannot get authorization code."
@@ -4275,7 +4275,7 @@ msgstr "Nelze číst YAML: %1$s."
 #: include/classes/server/CZabbixServer.php:511
 #, c-format
 msgid "Cannot read response from Zabbix server \"%1$s\"."
-msgstr ""
+msgstr "Nelze přečíst odpověď ze Zabbix serveru \"%1$s\"."
 
 #: include/classes/server/CZabbixServer.php:567
 #, c-format
@@ -4339,6 +4339,10 @@ msgstr "Nelze nastavit \"%1$s\" pro prototyp grafu \"%2$s\"."
 #: widgets/piechart/includes/CWidgetFieldDataSet.php:175
 msgid "Cannot set \"Data set aggregation\" when item with type \"Total\" is added to the chart."
 msgstr "Nelze nastavit \"Agregaci datové sady\", když je do grafu přidán item typu \"Celkem\"."
+
+#: include/classes/db/MysqlDbBackend.php:197
+msgid "Cannot set charset."
+msgstr "Nelze nastavit znakovú sadu."
 
 #: include/classes/api/services/CItemGeneral.php:2478
 #, c-format
@@ -4868,7 +4872,7 @@ msgstr "Nahradit"
 
 #: app/views/administration.authentication.edit.php:316
 msgid "Change IdP certificate"
-msgstr ""
+msgstr "Změna IdP certifikátu"
 
 #: app/partials/configuration.host.edit.html.php:449
 #: app/views/administration.autoreg.edit.php:82
@@ -4879,11 +4883,11 @@ msgstr "Změňte PSK"
 
 #: app/views/administration.authentication.edit.php:367
 msgid "Change SP certificate"
-msgstr ""
+msgstr "Změna SP certifikátu"
 
 #: app/views/administration.authentication.edit.php:342
 msgid "Change SP private key"
-msgstr ""
+msgstr "Změna SP privátního klíče"
 
 #: app/views/mfa.edit.php:128
 msgid "Change client secret"
@@ -4926,7 +4930,7 @@ msgstr "Změnit typ"
 
 #: app/views/js/administration.authentication.edit.js.php:409
 msgid "Changing the authentication method will reset all sessions, except the current one."
-msgstr ""
+msgstr "Změna metódy autentikace resetuje všechny relace, kromě té aktuální."
 
 #: app/partials/configuration.filter.items.php:144
 #: app/views/popup.massupdate.item.php:149 include/items.inc.php:127
@@ -5066,7 +5070,7 @@ msgstr "Čínsky (zh_TW)"
 #: app/views/administration.authentication.edit.php:354
 #: app/views/administration.authentication.edit.php:379
 msgid "Choose file"
-msgstr ""
+msgstr "Vyberte súbor"
 
 #: include/classes/import/importers/CTemplateImporter.php:294
 #, c-format
@@ -5231,7 +5235,7 @@ msgstr "Zavřete problémy"
 #: widgets/geomap/includes/WidgetForm.php:66
 #: widgets/geomap/views/widget.edit.php:59
 msgid "Clustering"
-msgstr ""
+msgstr "Vytváření klastrů"
 
 #: app/views/mfa.edit.php:90
 msgid "Code length"
@@ -5380,7 +5384,7 @@ msgstr "Podmínka"
 #: app/controllers/CControllerServiceCreate.php:45
 #: app/controllers/CControllerServiceUpdate.php:46
 msgid "Condition, limit and status combination is not unique."
-msgstr ""
+msgstr "Kombinace podmínky, limitu a statusu není jedinečná."
 
 #: app/views/action.list.php:116 app/views/correlation.edit.php:225
 #: app/views/correlation.list.php:83 app/views/popup.action.edit.php:166
@@ -6292,11 +6296,11 @@ msgstr "Aktuální"
 
 #: app/views/js/administration.authentication.edit.js.php:419
 msgid "Current SP certificate will be deleted."
-msgstr ""
+msgstr "Aktuální certifikát SP bude smazán."
 
 #: app/views/js/administration.authentication.edit.js.php:425
 msgid "Current SP private key will be deleted."
-msgstr ""
+msgstr "Aktuální soukromý klíč SP bude smazán."
 
 #: app/views/popup.operation.edit.php:256
 msgid "Current host"
@@ -6454,7 +6458,7 @@ msgstr "Tmavý"
 
 #: include/classes/core/ZBase.php:378
 msgid "Dark (classic)"
-msgstr ""
+msgstr "Tmavý (klasický)"
 
 #: app/controllers/CControllerAuditLogList.php:227
 #: app/controllers/CControllerDashboardPrint.php:71
@@ -6853,7 +6857,7 @@ msgstr "Defaultní mód inventář hostitele"
 
 #: app/views/administration.iconmap.edit.php:87
 msgid "Default icon"
-msgstr ""
+msgstr "Přednastavená ikona"
 
 #: app/views/administration.script.edit.php:358
 msgid "Default input string"
@@ -7016,7 +7020,7 @@ msgstr "Smazat graf?"
 
 #: app/views/host.prototype.edit.php:699
 msgid "Delete host prototype?"
-msgstr ""
+msgstr "Smazat prototyp hosta?"
 
 #: app/views/administration.iconmap.edit.php:145
 msgid "Delete icon map?"
@@ -7519,7 +7523,7 @@ msgstr "Detekovaná licence TimescaleDB nepodporuje kompresi. Komprese je podpor
 
 #: app/views/administration.housekeeping.edit.php:204
 msgid "Detected license does not support compression. Compression is supported in TimescaleDB Community Edition."
-msgstr ""
+msgstr "Detekovaná licence nepodporuje kompresi. Komprese je podporována v TimescaleDB Community Edition."
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1130
 msgid "Detection period"
@@ -8787,7 +8791,7 @@ msgstr "Zadejte řetězec identity sdíleného klíče, který není tajný. Nev
 
 #: app/views/host.wizard.edit.php:470
 msgid "Enter a unique name that Zabbix components will use to recognize the pre-shared key."
-msgstr ""
+msgstr "Zadejte jedinečný název, který komponenty Zabbixu použijí k rozpoznání předsdíleného klíče."
 
 #: app/views/host.wizard.edit.php:609
 msgid "Enter the IP/DNS address and port of the Zabbix agent installed on your monitoring target."
@@ -9211,7 +9215,7 @@ msgstr "Typ výrazu"
 #: app/controllers/CControllerRegExCreate.php:53
 #: app/controllers/CControllerRegExUpdate.php:54
 msgid "Expression type and expression combination is not unique."
-msgstr ""
+msgstr "Typ výrazu a kombinace výrazu není jedinečná."
 
 #: app/views/popup.testtriggerexpr.php:29
 msgid "Expression variable elements"
@@ -9423,6 +9427,10 @@ msgstr "Požadavky na pole:"
 msgid "File checksum, calculated by the UNIX cksum algorithm. Returns integer for crc32 (default) and string for md5, sha256"
 msgstr "Kontrolní součet souboru, vypočítaný UNIX algoritmem cksum. Vrátí celé číslo pro crc32 (výchozí) a řetězec pro md5, sha256"
 
+#: include/classes/validators/CFormValidator.php:1451 jsLoader.php:445
+msgid "File format is unsupported."
+msgstr "Formát souboru není podporovaný."
+
 #: include/classes/import/readers/CYamlImportReader.php:52
 msgid "File is empty"
 msgstr "Soubor je prázdný"
@@ -9439,6 +9447,11 @@ msgstr "Informace o vlastníkovi souboru. Vrátí řetězec"
 #: include/classes/data/CItemData.php:1679
 msgid "File size in bytes (default) or in newlines. Returns integer"
 msgstr "Velikost souboru v bajtech (výchozí) nebo v nových řádcích. Vrátí celé číslo"
+
+#: include/classes/helpers/CUploadFile.php:129 jsLoader.php:444
+#, c-format
+msgid "File size must be less than %1$s."
+msgstr "Velikost souboru musí být menší než %1$s."
 
 #: include/classes/data/CItemData.php:1687
 msgid "File time information. Returns integer (Unix timestamp)"
@@ -10132,7 +10145,7 @@ msgstr "Prototyp skupiny nemůže být založený na zjištěné skupině hostů
 #: app/controllers/CControllerHostPrototypeCreate.php:55
 #: app/controllers/CControllerHostPrototypeUpdate.php:58
 msgid "Group prototype is not unique."
-msgstr ""
+msgstr "Prototyp skupiny není jedinečný."
 
 #: include/views/configuration.host.prototype.edit.php:204
 msgid "Group prototypes"
@@ -10776,7 +10789,7 @@ msgstr[2] "Prototypy hostů byly smazány"
 
 #: app/controllers/CControllerPopup.php:49
 msgid "Host prototype edit"
-msgstr ""
+msgstr "Editovat prototyp hosta"
 
 #: include/views/configuration.host.prototype.edit.php:370
 msgid "Host prototype macros"
@@ -11149,7 +11162,7 @@ msgstr "Ikony"
 
 #: app/views/administration.authentication.edit.php:312
 msgid "IdP certificate"
-msgstr ""
+msgstr "IdP certifikát"
 
 #: app/views/administration.authentication.edit.php:291
 msgid "IdP entity ID"
@@ -11695,7 +11708,7 @@ msgstr "Neplatná hromadná hodnota pro rozhraní."
 
 #: include/classes/validators/CHostGroupNameValidator.php:36
 msgid "Incorrect characters used for host group name."
-msgstr ""
+msgstr "Pro název skupiny hostitelů byly použity nesprávné znaky."
 
 #: include/classes/api/services/CHost.php:1029
 #: include/classes/api/services/CHost.php:2052
@@ -11712,7 +11725,7 @@ msgstr "Pro název hosta byly použity nesprávné znaky."
 #: app/controllers/CControllerProxyCreate.php:34
 #: app/controllers/CControllerProxyUpdate.php:30
 msgid "Incorrect characters used for proxy name."
-msgstr ""
+msgstr "Pro název proxy byly použity nesprávné znaky."
 
 #: app/controllers/CControllerTemplateCreate.php:35
 #: app/controllers/CControllerTemplateUpdate.php:36
@@ -12292,6 +12305,18 @@ msgstr "Makra zděděná a makra hosta"
 msgid "Inherited and host prototype macros"
 msgstr "Makra zděděná a makra prototypu hosta"
 
+#: include/classes/helpers/CTagHelper.php:230
+msgid "Inherited and host tag"
+msgstr "Zděděný tag a tag itemu"
+
+#: app/partials/configuration.tags.tab.php:42
+msgid "Inherited and host tags"
+msgstr "Zděděné tagy a tagy hosta"
+
+#: include/classes/helpers/CTagHelper.php:231
+msgid "Inherited and item tag"
+msgstr "Zděděný tag a tag itemu"
+
 #: app/partials/configuration.tags.tab.php:165
 msgid "Inherited and item tags"
 msgstr "Zděděné tagy a tagy itemů"
@@ -12304,13 +12329,33 @@ msgstr "Zděděné tagy a tagy scénářů"
 msgid "Inherited and template macros"
 msgstr "Makra zděděná a makra šablon"
 
+#: include/classes/helpers/CTagHelper.php:229
+msgid "Inherited and template tag"
+msgstr "Zděděná šablona a šablona itemu"
+
+#: app/partials/configuration.tags.tab.php:33
+msgid "Inherited and template tags"
+msgstr "Zděděné tagy a tagy itemů"
+
+#: include/classes/helpers/CTagHelper.php:232
+msgid "Inherited and trigger tag"
+msgstr "Zděděný a spuštecí tag"
+
 #: app/partials/configuration.tags.tab.php:155
 msgid "Inherited and trigger tags"
 msgstr "Zděděné a spuštěné značky"
 
+#: include/classes/helpers/CTagHelper.php:233
+msgid "Inherited and web scenario tag"
+msgstr ""
+
 #: include/forms.inc.php:311
 msgid "Inherited items"
 msgstr "Zděděné položky"
+
+#: include/classes/helpers/CTagHelper.php:222
+msgid "Inherited tag"
+msgstr ""
 
 #: widgets/geomap/includes/WidgetForm.php:62
 msgid "Initial view"
@@ -12485,7 +12530,7 @@ msgstr "Interval"
 
 #: widgets/itemcard/includes/CWidgetFieldItemSectionsView.php:76
 msgid "Interval and storage"
-msgstr ""
+msgstr "Interval a ukládání"
 
 #: include/classes/api/services/CRole.php:731
 #, c-format
@@ -12569,7 +12614,7 @@ msgstr "Neplatná akce: %1$s."
 #: app/controllers/CControllerProxyUpdate.php:51
 #: app/controllers/CControllerProxyUpdate.php:62
 msgid "Invalid address."
-msgstr ""
+msgstr "Neplatná adresa."
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1629
 #, c-format
@@ -12593,7 +12638,7 @@ msgstr "Neplatná emailová adresa pro typ médií s ID \"%1$s\"."
 #: app/controllers/CControllerHostGroupCreate.php:31
 #: app/controllers/CControllerHostGroupUpdate.php:34
 msgid "Invalid host group name."
-msgstr ""
+msgstr "Neplatný název skupiny hostů."
 
 #: app/controllers/CControllerScriptUserInputCheck.php:43
 msgid "Invalid input"
@@ -12980,7 +13025,7 @@ msgstr "Neplatná značka \"%1$s\": %2$s."
 #: app/controllers/CControllerTemplateGroupCreate.php:31
 #: app/controllers/CControllerTemplateGroupUpdate.php:32
 msgid "Invalid template group name."
-msgstr ""
+msgstr "Neplatný název skupiny šablon."
 
 #: include/classes/validators/CActionCondValidator.php:103
 msgid "Invalid time period."
@@ -13543,7 +13588,7 @@ msgstr "Jazyk \"%1$s\" není podporován."
 
 #: widgets/scatterplot/includes/CWidgetFieldDataSetView.php:445
 msgid "Large"
-msgstr ""
+msgstr "Velký"
 
 #: include/classes/helpers/CPagerHelper.php:232
 msgctxt "page navigation"
@@ -14439,7 +14484,7 @@ msgstr "Označit vybrané za příznaky"
 
 #: widgets/scatterplot/includes/CWidgetFieldDataSetView.php:437
 msgid "Marker"
-msgstr ""
+msgstr "Značkovač"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:408
 #: app/controllers/CControllerPopupTriggerExpr.php:448
@@ -14569,7 +14614,7 @@ msgstr "Maximální požadovaná verze databáze %1$s je %2$s."
 #: app/partials/administration.system.info.php:221
 #, c-format
 msgid "Maximum required version is %1$s."
-msgstr ""
+msgstr "Maximální požadovaná verze je %1$s."
 
 #: app/controllers/CControllerTimeSelectorUpdate.php:136
 #: include/classes/mvc/CController.php:320
@@ -14730,7 +14775,7 @@ msgstr "Typy médií používané akcí \"%1$s\"."
 
 #: widgets/scatterplot/includes/CWidgetFieldDataSetView.php:444
 msgid "Medium"
-msgstr ""
+msgstr "Střední"
 
 #: app/views/usergroup.list.php:78
 msgid "Members"
@@ -14926,7 +14971,7 @@ msgstr "Minimální požadovaný PHP upload limit je %s (Nastavení \"upload_max
 #: app/views/administration.housekeeping.edit.php:183
 #, c-format
 msgid "Minimum required version is %1$s."
-msgstr ""
+msgstr "Minimální požadovaná verze je %1$s."
 
 #: app/views/monitoring.map.view.php:48
 #: include/views/monitoring.sysmap.edit.php:276
@@ -14947,11 +14992,11 @@ msgstr[2] "Minimální doba periody zobrazení je %1$s minuty."
 #: app/controllers/CControllerMaintenanceTimePeriodCheck.php:82
 #, c-format
 msgid "Minimum value of \"Maintenance period length\" is %1$d minutes."
-msgstr ""
+msgstr "Minimální hodnota pro \"Dĺžka údržbové periódy\" je %1$d minút."
 
 #: app/views/maintenance.timeperiod.edit.php:202
 msgid "Minute"
-msgstr ""
+msgstr "Minuta"
 
 #: app/views/maintenance.timeperiod.edit.php:212
 #: app/views/popup.sla.excludeddowntime.edit.php:73
@@ -15177,12 +15222,12 @@ msgstr "Multiple PROBLEM události"
 #: app/partials/administration.system.info.php:235
 #, c-format
 msgid "Must be at least %1$s."
-msgstr ""
+msgstr "Musí být alespoň %1$s."
 
 #: app/controllers/CControllerMaintenanceUpdateGeneral.php:32
 #, c-format
 msgid "Must be greater than \"%1$s\"."
-msgstr ""
+msgstr "Musí být větší než \"%1$s\"."
 
 #: include/classes/validators/CFormValidator.php:340
 msgid "Must be selected."
@@ -15191,7 +15236,7 @@ msgstr "Musí být vybráno."
 #: app/partials/administration.system.info.php:254
 #, c-format
 msgid "Must not be higher than %1$s."
-msgstr ""
+msgstr "Nesmí být vyšší než %1$s."
 
 #: jsLoader.php:284
 msgid "Mute"
@@ -15594,7 +15639,7 @@ msgstr "Nová skupina zařízení"
 
 #: app/views/host.prototype.edit.php:727
 msgid "New host prototype"
-msgstr ""
+msgstr "Nový prototyp hosta"
 
 #: app/views/item.edit.php:218
 msgid "New item"
@@ -15969,63 +16014,63 @@ msgstr "Žádná oprávnění k volání \"%1$s.%2$s“."
 
 #: include/classes/api/services/CConfiguration.php:312
 msgid "No permissions to import discovery rules."
-msgstr ""
+msgstr "Žádná oprávnění k importu pravidel vyhledávání."
 
 #: include/classes/api/services/CConfiguration.php:313
 msgid "No permissions to import graphs."
-msgstr ""
+msgstr "Žádná oprávnění k importu grafů."
 
 #: include/classes/api/services/CConfiguration.php:314
 msgid "No permissions to import host groups."
-msgstr ""
+msgstr "Žádná oprávnění k importu skupin hostitelů."
 
 #: include/classes/api/services/CConfiguration.php:316
 msgid "No permissions to import hosts."
-msgstr ""
+msgstr "Žádná oprávnění k importu hostitelů."
 
 #: include/classes/api/services/CConfiguration.php:318
 msgid "No permissions to import images."
-msgstr ""
+msgstr "Žádná oprávnění k importu obrázků."
 
 #: include/classes/api/services/CConfiguration.php:319
 msgid "No permissions to import items."
-msgstr ""
+msgstr "Žádná oprávnění k importu položek."
 
 #: include/classes/api/services/CConfiguration.php:320
 msgid "No permissions to import maps."
-msgstr ""
+msgstr "Žádná oprávnění k importu map."
 
 #: include/classes/api/services/CConfiguration.php:321
 msgid "No permissions to import media types."
-msgstr ""
+msgstr "Žádná oprávnění k importu typů médií."
 
 #: include/classes/api/services/CConfiguration.php:324
 msgid "No permissions to import template dashboards."
-msgstr ""
+msgstr "Žádná oprávnění k importu šablon dashboardů."
 
 #: include/classes/api/services/CConfiguration.php:315
 msgid "No permissions to import template groups."
-msgstr ""
+msgstr "Žádná oprávnění k importu skupin šablon."
 
 #: include/classes/api/services/CConfiguration.php:322
 msgid "No permissions to import template links."
-msgstr ""
+msgstr "Žádná oprávnění k importu odkazů ze šablon."
 
 #: include/classes/api/services/CConfiguration.php:323
 msgid "No permissions to import templates."
-msgstr ""
+msgstr "Žádná oprávnění k importu šablon."
 
 #: include/classes/api/services/CConfiguration.php:325
 msgid "No permissions to import triggers."
-msgstr ""
+msgstr "Žádná oprávnění k importu triggerů."
 
 #: include/classes/api/services/CConfiguration.php:326
 msgid "No permissions to import value maps."
-msgstr ""
+msgstr "Žádná oprávnění k importu map hodnot."
 
 #: include/classes/api/services/CConfiguration.php:317
 msgid "No permissions to import web scenarios."
-msgstr ""
+msgstr "Žádná oprávnění k importu webových scénářů."
 
 #: app/controllers/CControllerChartsView.php:133
 #: app/controllers/CControllerDashboardPrint.php:99
@@ -17195,15 +17240,15 @@ msgstr "Vlastník"
 
 #: app/views/administration.authentication.edit.php:322
 msgid "PEM-encoded IdP certificate"
-msgstr ""
+msgstr "PEM-encoded IdP certifikát"
 
 #: app/views/administration.authentication.edit.php:373
 msgid "PEM-encoded SP certificate"
-msgstr ""
+msgstr "PEM-encoded SP certifikát"
 
 #: app/views/administration.authentication.edit.php:348
 msgid "PEM-encoded SP private key"
-msgstr ""
+msgstr "PEM-encoded SP privátní klíč"
 
 #: include/classes/setup/CFrontendSetup.php:531
 msgid "PHP LDAP"
@@ -17244,7 +17289,7 @@ msgstr "PHP curl"
 
 #: include/classes/setup/CFrontendSetup.php:733
 msgid "PHP curl extension is missing or outdated."
-msgstr ""
+msgstr "Rozšíření PHP Curl chybí nebo je zastaralé."
 
 #: include/classes/setup/CFrontendSetup.php:691
 msgid "PHP curl extension missing."
@@ -19220,7 +19265,7 @@ msgstr "Odezva"
 #: include/classes/server/CZabbixServer.php:507
 #, c-format
 msgid "Response timeout of %1$s exceeded when connecting to Zabbix server \"%2$s\"."
-msgstr ""
+msgstr "Časový limit odezvy %1$s sekund byl překročen při připojování k Zabbix serveru \"%2$s\"."
 
 #: app/controllers/CControllerMediatypeTestSend.php:182
 msgid "Response type: JSON"
@@ -19321,7 +19366,7 @@ msgstr "Vrátí JSON objekt obsahující Zabbix server nebo interní metriky pro
 
 #: include/classes/data/CItemData.php:2797
 msgid "Returns a JSON object containing database connection pool configuration and statistics."
-msgstr ""
+msgstr "Vrátí objekt JSON obsahující konfiguraci a statistiky fondu (poolu) připojení k databázi."
 
 #: include/classes/data/CItemData.php:2673
 msgid "Returns availability of a particular type of checks on the host. Value of this item corresponds to availability icons in the host list. Valid types are: agent, active_agent, snmp, ipmi, jmx."
@@ -19694,7 +19739,7 @@ msgstr "SNMPv3 agent"
 
 #: app/views/administration.authentication.edit.php:363
 msgid "SP certificate"
-msgstr ""
+msgstr "SP certifikát"
 
 #: app/views/administration.authentication.edit.php:334
 msgid "SP entity ID"
@@ -19706,7 +19751,7 @@ msgstr "Formát ID názvu SP"
 
 #: app/views/administration.authentication.edit.php:338
 msgid "SP private key"
-msgstr ""
+msgstr "SP privátní klíč"
 
 #: include/classes/debug/CProfiler.php:158
 #, c-format
@@ -19851,7 +19896,7 @@ msgstr "Naskenujte tento QR kód"
 
 #: widgets/scatterplot/Widget.php:24
 msgid "Scatter plot"
-msgstr ""
+msgstr "Bodový graf"
 
 #: include/views/configuration.httpconf.edit.php:373
 msgid "Scenario"
@@ -20613,13 +20658,13 @@ msgstr "Zkrácený"
 #: app/views/administration.housekeeping.edit.php:187
 #, c-format
 msgid "Should be at least %1$s."
-msgstr ""
+msgstr "Mělo by být alespoň %1$s."
 
 #: app/partials/administration.system.info.php:262
 #: app/views/administration.housekeeping.edit.php:197
 #, c-format
 msgid "Should not be higher than %1$s."
-msgstr ""
+msgstr "Nemělo by být vyšší než %1$s."
 
 #: app/partials/monitoring.problem.filter.php:27
 #: app/views/monitoring.charts.view.php:80
@@ -20981,7 +21026,7 @@ msgstr "Slovensky (sk_SK)"
 
 #: widgets/scatterplot/includes/CWidgetFieldDataSetView.php:443
 msgid "Small"
-msgstr ""
+msgstr "Malý"
 
 #: jsLoader.php:288
 msgid "Snooze"
@@ -21753,7 +21798,7 @@ msgstr "Kombinace názvu a hodnoty tagu není jedinečná."
 #: app/controllers/CControllerMaintenanceCreate.php:93
 #: app/controllers/CControllerMaintenanceUpdate.php:94
 msgid "Tag name, operator and value combination is not unique."
-msgstr ""
+msgstr "Kombinace názvu tagu, operátora a hodnoty není jedinečná."
 
 #: include/actions.inc.php:68
 msgid "Tag value"
@@ -21963,6 +22008,10 @@ msgstr "Jméno šablony"
 #: app/views/usergroup.edit.php:267
 msgid "Template permissions"
 msgstr "Skupiny práv"
+
+#: app/partials/configuration.tags.tab.php:33
+msgid "Template tags"
+msgstr "Tagy šablón"
 
 #: report2.php:398
 msgid "Template trigger"
@@ -22245,7 +22294,7 @@ msgstr "Host již není objevovaný a bude smazaný při dalším objevování."
 
 #: app/controllers/CControllerHostPrototypeEdit.php:268
 msgid "The host prototype being cloned belongs to a host group you don't have write permissions to. Non-writable group has been removed from the new host prototype."
-msgstr ""
+msgstr "Klonovaný prototyp hostitele patří do skupiny hostitelů, do které nemáte oprávnění k zápisu. Z nového prototypu hostitele byla odebrána nezapisovatelná skupina."
 
 #: include/classes/api/services/CImage.php:555
 #, c-format
@@ -22293,7 +22342,7 @@ msgstr "V uživatelských atributech chybí parametr \"%1$s\"."
 
 #: app/views/popup.ldap.edit.php:101
 msgid "The previous password was cleared due to a host change. Please enter the new password."
-msgstr ""
+msgstr "Předchozí heslo bylo vymazáno z důvodu změny hostitele. Zadejte prosím nové heslo."
 
 #: include/classes/core/CJsonRpc.php:206
 msgid "The received JSON is not a valid JSON-RPC request."
@@ -22475,6 +22524,10 @@ msgstr "Tato hodnota nemůže být jedna z %1$s."
 #: include/classes/validators/CFormValidator.php:946 jsLoader.php:421
 msgid "This value does not match pattern."
 msgstr "Tato hodnota neodpovídá vzoru."
+
+#: jsLoader.php:442
+msgid "This value is not a valid file."
+msgstr "Tato hodnota není platný soubor."
 
 #: include/classes/validators/CFormValidator.php:874 jsLoader.php:424
 msgid "This value is not a valid floating-point value."
@@ -23508,11 +23561,11 @@ msgstr "Nelze získat verzi TimescaleDB."
 
 #: app/views/administration.housekeeping.edit.php:173
 msgid "Unable to retrieve compression support status of TimescaleDB time-series database extension for PostgreSQL."
-msgstr ""
+msgstr "Nelze načíst stav podpory komprese rozšíření časových řad databáze TimescaleDB pro PostgreSQL."
 
 #: app/views/administration.housekeeping.edit.php:178
 msgid "Unable to retrieve version of TimescaleDB time-series database extension for PostgreSQL."
-msgstr ""
+msgstr "Nelze načíst verzi rozšíření časových řad databáze TimescaleDB pro PostgreSQL."
 
 #: include/views/mfa.login.php:65
 #, c-format
@@ -23807,7 +23860,7 @@ msgstr "Nepodporovaná verze databázového serveru %1$s. Nesmí být vyšší n
 #: app/partials/administration.system.info.php:206
 #: app/views/administration.housekeeping.edit.php:169
 msgid "Unsupported TimescaleDB time-series database extension for PostgreSQL is used."
-msgstr ""
+msgstr "Používá se nepodporované rozšíření časových řad databáze TimescaleDB pro PostgreSQL."
 
 #: app/views/administration.housekeeping.edit.php:190
 #, c-format
@@ -25268,7 +25321,7 @@ msgstr "Varovná zpráva"
 #: app/partials/administration.system.info.php:243
 #: app/partials/administration.system.info.php:262
 msgid "Warning!"
-msgstr ""
+msgstr "Varování!"
 
 #: app/partials/administration.system.info.php:198
 msgid "Warning! Support for Oracle DB is deprecated since Zabbix 7.0 and will be removed in future versions."
@@ -25584,11 +25637,11 @@ msgstr "X"
 #: widgets/scatterplot/includes/WidgetForm.php:194
 #: widgets/scatterplot/includes/WidgetForm.php:199
 msgid "X axis"
-msgstr ""
+msgstr "Osa X"
 
 #: widgets/scatterplot/includes/WidgetForm.php:80
 msgid "X axis MAX value must be greater than X axis MIN value"
-msgstr ""
+msgstr "MAX hodnota osy X musí být větší než MIN hodnota osy X"
 
 #: widgets/svggraph/includes/WidgetForm.php:341
 msgid "X-Axis"
@@ -25596,7 +25649,7 @@ msgstr "Osa X"
 
 #: widgets/scatterplot/includes/CWidgetFieldAxisThresholdsView.php:40
 msgid "X-Axis threshold"
-msgstr ""
+msgstr "Prahová hodnota osy X"
 
 #: app/views/administration.miscconfig.edit.php:120
 msgid "X-Frame-Options HTTP header"
@@ -25655,7 +25708,7 @@ msgstr "Y"
 #: widgets/scatterplot/includes/WidgetForm.php:226
 #: widgets/scatterplot/includes/WidgetForm.php:231
 msgid "Y axis"
-msgstr ""
+msgstr "Osa Y"
 
 #: include/views/configuration.graph.edit.php:357
 msgid "Y axis MAX value"
@@ -25684,11 +25737,11 @@ msgstr "Strana osy Y"
 #: widgets/scatterplot/includes/CWidgetFieldDataSetView.php:362
 #: widgets/scatterplot/includes/WidgetForm.php:216
 msgid "Y-Axis"
-msgstr ""
+msgstr "Osa-Y"
 
 #: widgets/scatterplot/includes/CWidgetFieldAxisThresholdsView.php:41
 msgid "Y-Axis threshold"
-msgstr ""
+msgstr "Prahová hodnota osy-Y"
 
 #: widgets/svggraph/includes/CWidgetFieldDataSetView.php:367
 #: widgets/svggraph/includes/CWidgetFieldOverrideView.php:185
@@ -26012,7 +26065,7 @@ msgstr "Zabbix zachytávač"
 #: widgets/geomap/includes/WidgetForm.php:68
 #: widgets/geomap/includes/WidgetForm.php:72
 msgid "Zoom level"
-msgstr ""
+msgstr "Úroveň přiblížení"
 
 #: include/classes/html/CFilter.php:258 include/classes/html/CTabFilter.php:324
 msgid "Zoom out"
@@ -26042,11 +26095,11 @@ msgstr "očekává se název DNS"
 
 #: include/classes/validators/CApiInputValidator.php:4407
 msgid "a PEM-encoded certificate is expected"
-msgstr ""
+msgstr "Je očekávaný PEM-encoded certifikát"
 
 #: include/classes/validators/CApiInputValidator.php:4444
 msgid "a PEM-encoded private key is expected"
-msgstr ""
+msgstr "Je očekávaný PEM-encoded privátní klíč"
 
 #: include/classes/validators/CApiInputValidator.php:1381
 msgid "a boolean is expected"
@@ -26907,7 +26960,7 @@ msgstr "adresář nemůže být prázdný"
 
 #: include/views/configuration.host.discovery.list.php:340
 msgid "discovery rule"
-msgstr ""
+msgstr "pravidlo objevování"
 
 #: app/controllers/CControllerItemMassCheckNow.php:138
 #: include/classes/api/services/CTask.php:562

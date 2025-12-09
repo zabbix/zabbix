@@ -57,13 +57,15 @@ svg *:focus {
   src: url("../fonts/InterVariable.woff2?t=1749715841257") format("woff2");
   font-weight: 100 900;
   font-style: normal;
-  font-display: swap; }
+  font-display: swap;
+  font-feature-settings: "calt" 0; }
 @font-face {
   font-family: 'Inter';
   src: url("../fonts/InterVariable-Italic.woff2?t=1749715841257") format("woff2");
   font-weight: 100 900;
   font-style: italic;
-  font-display: swap; }
+  font-display: swap;
+  font-feature-settings: "calt" 0; }
 @font-face {
   font-family: 'Noto Sans Georgian';
   src: url("../fonts/NotoSansGeorgian-VariableFont.woff2?t=1749715841257") format("woff2");
@@ -2267,13 +2269,6 @@ button {
 
 .dashboard-grid-iterator-contents.is-loading::before {
   margin: calc(.25rem + 1px); }
-
-.dashboard-list .status-green {
-  background-color: #2f9f5e;
-  border-color: #2f9f5e; }
-.dashboard-list .status-yellow {
-  background-color: #e79e0b;
-  border-color: #e79e0b; }
 
 .overlay-dialogue.modal.modal-widget-configuration {
   --modal-width: auto;
@@ -7138,9 +7133,6 @@ select {
     color: #f2f2f2 !important;
     pointer-events: none; }
 
-div .overlay-dialogue.wordbreak {
-  white-space: normal; }
-
 .form-fields-inline label {
   margin: 0 8px 0 3px; }
 
@@ -7612,8 +7604,6 @@ z-select[disabled] .focusable, input[disabled], textarea[disabled], select optio
   border: 1px solid #383838;
   border-bottom-color: #353535;
   box-shadow: 0 4px 20px 0 rgba(0, 0, 0, 0.5); }
-  .overlay-dialogue .wordbreak {
-    white-space: normal; }
   .overlay-dialogue .overlay-dialogue-header {
     margin: -8px -10px 6px -10px;
     padding: 8px 10px;
@@ -8109,6 +8099,9 @@ z-select[disabled] .focusable, input[disabled], textarea[disabled], select optio
   .tags-wrapper .tag {
     margin-top: 1px;
     margin-bottom: 1px; }
+  .tags-wrapper.form-field .tag {
+    margin-top: 4px;
+    margin-bottom: 4px; }
 
 .tag {
   display: inline-block;
