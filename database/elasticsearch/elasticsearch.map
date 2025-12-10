@@ -153,7 +153,6 @@
 
 # json mapping
 
-# Create new index with settings and mappings
 {
   "settings": {
     "number_of_shards": 5,
@@ -162,17 +161,27 @@
   "mappings": {
     "dynamic": false,
     "properties": {
-      "itemid": { "type": "long" },
-      "clock": { "type": "date", "format": "epoch_second" },
-      "ns": { "type": "long" },
-      "value_parsed": { "type": "flattened" },
-      "value_raw": { "type": "keyword", "ignore_above": 1000000 }
+      "itemid": {
+         "type": "long"
+      },
+      "clock": {
+         "type": "date",
+         "format": "epoch_second"
+      },
+      "ns": {
+         "type": "long"
+      },
+      "value_parsed": {
+         "type": "flattened"
+      },
+      "value_raw": {
+         "type": "keyword",
+         "ignore_above": 1000000
+      }
     }
   }
 }
-'
 
-# Create ingest pipeline for parsing JSON
 {
   "processors": [
     {
@@ -199,4 +208,3 @@
     }
   ]
 }
-'
