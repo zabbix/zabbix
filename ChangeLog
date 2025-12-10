@@ -14,6 +14,7 @@ A.F....... [ZBXNEXT-9595] allowed use of not formally valid JSON or XML in HTTP 
 ........S. [ZBXNEXT-10291] fixed EVENT.RECOVERY.TAGS macro not being resolved when problem is closed manually (wiper)
 
 Bug fixes:
+.......PS. [ZBX-27307] fixed items not being scheduled if host is re-enabled after restart and macro is used in update interval (vso)
 ........S. [ZBX-27267] fixed crash when database goes down during low level discovery (vso)
 .......PS. [ZBX-27229] fixed trends not being saved (Andris)
 .......PS. [ZBX-26018] added fping command execution time limit (vsmelovs)
@@ -115,6 +116,7 @@ A......PS. [ZBXNEXT-10306] updated maximum supported MySQL version to 9.5 (mprih
 ...G...... [ZBXNEXT-10012] added both SHOW SLAVE STATUS and SHOW REPLICA STATUS for Zabbix agent 2 MySQL plugin (lsurvilo)
 
 Bug fixes:
+.......PS. [ZBX-27307] fixed items not being scheduled if host is re-enabled after restart and macro is used in update interval (vso)
 ........S. [ZBX-27267] fixed crash when database goes down during low level discovery (vso)
 .......PS. [ZBX-27229] fixed trends not being saved (Andris)
 .......PS. [ZBX-26018] added fping command execution time limit (vsmelovs)
@@ -1290,6 +1292,7 @@ Changes for 7.0.22rc2
 New features:
 
 Bug fixes:
+.......PS. [ZBX-27307] fixed items not being scheduled if host is re-enabled after restart and macro is used in update interval (vso)
 
 --------------------------------------------------------------------------------
 Changes for 7.0.22rc1
