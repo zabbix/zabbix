@@ -897,7 +897,9 @@ typedef struct
 {
 	zbx_uint64_t	itemid;
 	unsigned char	status;
+	unsigned char	cache;
 	int		values_num;
+	zbx_timespec_t	ts;
 
 	zbx_hc_data_t	*tail;
 	zbx_hc_data_t	*head;
