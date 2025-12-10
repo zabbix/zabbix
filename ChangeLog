@@ -154,6 +154,7 @@ A......... [ZBX-24603] fixed MFA TOTP secrets not being deleted when deleting us
 ..F....... [ZBX-25103] replaced legacy hintbox generation for trigger operational data with current (dpankins)
 A......... [ZBX-26025] fixed validation error for default input string value in advanced script configuration (kkuzmina)
 ..F....... [ZBX-25972] optimized Items page performance on hosts with large number of elements (msnihach)
+..F....... [ZBX-27284] fixed resource usage for image resize (gberzina)
 
 --------------------------------------------------------------------------------
 Changes for 7.0.18
@@ -751,6 +752,7 @@ A......... [ZBX-24846] fixed checking for orphaned maintenances when deleting a 
 .......PS. [ZBX-24698] fixed loading of SSL certificate and key in the poller process for HTTP agent checks (Andris)
 ........S. [ZBX-24582] truncated the error message for testing items with a value type mismatch (rtrizna)
 ..F....... [ZBX-25393] fixed unwanted page scrolling when editing text in multiline text fields (averza)
+.......... [ZBX-27283] fixed incorrect library paths when building AIX agents (yurii)
 
 --------------------------------------------------------------------------------
 Changes for 7.0.5
@@ -3902,6 +3904,7 @@ Bug fixes:
 ...G...... [ZBX-26920] fixed wrong time in Zabbix agent for Windows (sboidenko)
 ..F....... [ZBX-22786] fixed trends graph line color issue with PHP 8.1 (isharha)
 ..F....... [ZBX-21975] fixed user autologout not removing user SAML authentication data (gcalenko)
+..F....... [ZBX-27284] fixed resource usage for image resize (gberzina)
 
 --------------------------------------------------------------------------------
 Changes for 6.0.41
@@ -3959,6 +3962,7 @@ A......... [ZBX-24383] fixed PHP fatal error when importing configuration from Z
 .........T [ZBX-26029] added device retrieval loop error exception handling to Meraki template (abiba)
 ..F....... [ZBX-25607] fixed column width in multiple list pages (esekace)
 ..F....... [ZBX-23687] added improvements and fixed bugs related to context menus (dfofanovs)
+.......... [ZBX-27283] fixed incorrect library paths when building AIX agents (yurii)
 
 --------------------------------------------------------------------------------
 Changes for 6.0.39
