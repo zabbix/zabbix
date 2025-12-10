@@ -353,20 +353,33 @@ class testDashboardItemValueWidget extends testWidgets {
 						$hint_text = 'This setting applies only to numeric data. Non-numeric data will always be taken from history.';
 						$warning_button = $form->getLabel($warning_label)->query('xpath:.//button[@data-hintbox]')->one();
 					}
-					if ($warning_label === 'Aggregation function') {
-						$warning_button = $form->getFieldContainer($warning_label)->query('xpath:.//button[@data-hintbox]')->one();
-					}
 
 					foreach ($options as $option => $visible) {
+						$form->fill([$warning_label => $option]);
+
 						if ($warning_label === 'Aggregation function') {
 							$hint_text = in_array($option, ['count', 'first', 'last'])
 								? 'Aggregation function does not affect the sparkline.'
 								: "With this setting only numeric items will be displayed.\n".
 									"Aggregation function does not affect the sparkline.";
-						}
 
-						$form->fill([$warning_label => $option]);
-						$this->assertTrue($warning_button->isVisible($visible));
+							// Check that only one warning button is visible among all three.
+							$warning_buttons = $form->getFieldContainer($warning_label)->query('xpath:.//button[@data-hintbox]')
+									->all()->filter(CElementFilter::VISIBLE);
+
+							// Check that button is displayed.
+							if ($visible) {
+								$warning_button = $warning_buttons->first();
+								$this->assertTrue($warning_button->isVisible());
+							}
+							// Otherwise, there are no visible buttons.
+							else {
+								$this->assertEquals(0, $warning_buttons->count());
+							}
+						}
+						else {
+							$this->assertTrue($warning_button->isVisible($visible));
+						}
 
 						if ($visible) {
 							$warning_button->click();
@@ -2097,7 +2110,7 @@ class testDashboardItemValueWidget extends testWidgets {
 						'Advanced configuration' => true,
 						'Aggregation function' => 'min'
 					],
-					'selector' => 'id:item-aggregate-function-warning',
+					'selector' => 'id:numeric-items-warning',
 					'label' => 'Aggregation function',
 					'warning_message' => 'With this setting only numeric items will be displayed.'
 				]
@@ -2111,7 +2124,7 @@ class testDashboardItemValueWidget extends testWidgets {
 						'Advanced configuration' => true,
 						'Aggregation function' => 'max'
 					],
-					'selector' => 'id:item-aggregate-function-warning',
+					'selector' => 'id:numeric-items-warning',
 					'label' => 'Aggregation function',
 					'warning_message' => 'With this setting only numeric items will be displayed.'
 				]
@@ -2125,7 +2138,7 @@ class testDashboardItemValueWidget extends testWidgets {
 						'Advanced configuration' => true,
 						'Aggregation function' => 'avg'
 					],
-					'selector' => 'id:item-aggregate-function-warning',
+					'selector' => 'id:numeric-items-warning',
 					'label' => 'Aggregation function',
 					'warning_message' => 'With this setting only numeric items will be displayed.'
 				]
@@ -2139,7 +2152,7 @@ class testDashboardItemValueWidget extends testWidgets {
 						'Advanced configuration' => true,
 						'Aggregation function' => 'sum'
 					],
-					'selector' => 'id:item-aggregate-function-warning',
+					'selector' => 'id:numeric-items-warning',
 					'label' => 'Aggregation function',
 					'warning_message' => 'With this setting only numeric items will be displayed.'
 				]
@@ -2196,7 +2209,7 @@ class testDashboardItemValueWidget extends testWidgets {
 						'Advanced configuration' => true,
 						'Aggregation function' => 'not used'
 					],
-					'selector' => 'id:item-aggregate-function-warning',
+					'selector' => 'id:numeric-items-warning',
 					'label' => 'Aggregation function'
 				]
 			],
@@ -2210,7 +2223,7 @@ class testDashboardItemValueWidget extends testWidgets {
 						'Advanced configuration' => true,
 						'Aggregation function' => 'count'
 					],
-					'selector' => 'id:item-aggregate-function-warning',
+					'selector' => 'id:numeric-items-warning',
 					'label' => 'Aggregation function'
 				]
 			],
@@ -2224,7 +2237,7 @@ class testDashboardItemValueWidget extends testWidgets {
 						'Advanced configuration' => true,
 						'Aggregation function' => 'first'
 					],
-					'selector' => 'id:item-aggregate-function-warning',
+					'selector' => 'id:numeric-items-warning',
 					'label' => 'Aggregation function'
 				]
 			],
@@ -2238,7 +2251,7 @@ class testDashboardItemValueWidget extends testWidgets {
 						'Advanced configuration' => true,
 						'Aggregation function' => 'last'
 					],
-					'selector' => 'id:item-aggregate-function-warning',
+					'selector' => 'id:numeric-items-warning',
 					'label' => 'Aggregation function'
 				]
 			],
@@ -2275,7 +2288,7 @@ class testDashboardItemValueWidget extends testWidgets {
 						'Advanced configuration' => true,
 						'Aggregation function' => 'not used'
 					],
-					'selector' => 'id:item-aggregate-function-warning',
+					'selector' => 'id:numeric-items-warning',
 					'label' => 'Aggregation function'
 				]
 			],
@@ -2288,7 +2301,7 @@ class testDashboardItemValueWidget extends testWidgets {
 						'Advanced configuration' => true,
 						'Aggregation function' => 'min'
 					],
-					'selector' => 'id:item-aggregate-function-warning',
+					'selector' => 'id:numeric-items-warning',
 					'label' => 'Aggregation function'
 				]
 			],
@@ -2301,7 +2314,7 @@ class testDashboardItemValueWidget extends testWidgets {
 						'Advanced configuration' => true,
 						'Aggregation function' => 'max'
 					],
-					'selector' => 'id:item-aggregate-function-warning',
+					'selector' => 'id:numeric-items-warning',
 					'label' => 'Aggregation function'
 				]
 			],
@@ -2314,7 +2327,7 @@ class testDashboardItemValueWidget extends testWidgets {
 						'Advanced configuration' => true,
 						'Aggregation function' => 'avg'
 					],
-					'selector' => 'id:item-aggregate-function-warning',
+					'selector' => 'id:numeric-items-warning',
 					'label' => 'Aggregation function'
 				]
 			],
@@ -2327,7 +2340,7 @@ class testDashboardItemValueWidget extends testWidgets {
 						'Advanced configuration' => true,
 						'Aggregation function' => 'count'
 					],
-					'selector' => 'id:item-aggregate-function-warning',
+					'selector' => 'id:numeric-items-warning',
 					'label' => 'Aggregation function'
 				]
 			],
@@ -2340,7 +2353,7 @@ class testDashboardItemValueWidget extends testWidgets {
 						'Advanced configuration' => true,
 						'Aggregation function' => 'sum'
 					],
-					'selector' => 'id:item-aggregate-function-warning',
+					'selector' => 'id:numeric-items-warning',
 					'label' => 'Aggregation function'
 				]
 			],
@@ -2353,7 +2366,7 @@ class testDashboardItemValueWidget extends testWidgets {
 						'Advanced configuration' => true,
 						'Aggregation function' => 'first'
 					],
-					'selector' => 'id:item-aggregate-function-warning',
+					'selector' => 'id:numeric-items-warning',
 					'label' => 'Aggregation function'
 				]
 			],
@@ -2366,7 +2379,7 @@ class testDashboardItemValueWidget extends testWidgets {
 						'Advanced configuration' => true,
 						'Aggregation function' => 'last'
 					],
-					'selector' => 'id:item-aggregate-function-warning',
+					'selector' => 'id:numeric-items-warning',
 					'label' => 'Aggregation function'
 				]
 			],
