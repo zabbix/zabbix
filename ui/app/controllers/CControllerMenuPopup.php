@@ -306,16 +306,13 @@ class CControllerMenuPopup extends CController {
 			$is_executable = false;
 
 			if ($db_item['type'] != ITEM_TYPE_HTTPTEST) {
-				if (CWebUser::getType() == USER_TYPE_SUPER_ADMIN) {
-					$is_writable = true;
-				}
-				elseif (CWebUser::getType() == USER_TYPE_ZABBIX_ADMIN) {
-					$is_writable = (bool) API::Host()->get([
+				$is_writable = CWebUser::getType() == USER_TYPE_SUPER_ADMIN
+					? true
+					: (bool) API::Host()->get([
 						'output' => ['hostid'],
 						'hostids' => $db_item['hostid'],
 						'editable' => true
 					]);
-				}
 			}
 
 			if (in_array($db_item['type'], checkNowAllowedTypes())) {
