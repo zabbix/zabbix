@@ -179,6 +179,8 @@ window.sla_edit_popup = new class {
 		this._removePopupMessages();
 
 		const fields = this.form.getAllValues();
+		const is_empty = o => Object.values(o).filter(o => o !== null).length == 0;
+		fields.schedule = is_empty(fields.schedule) ? null : fields.schedule;
 		this.overlay.setLoading();
 
 		if ('service_tags' in fields) {

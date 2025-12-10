@@ -48,7 +48,7 @@ class CControllerSlaUpdate extends CController {
 			'timezone' => ['db sla.timezone',
 				'in' => array_merge([ZBX_DEFAULT_TIMEZONE], array_keys(CTimezoneHelper::getList()))],
 			'schedule_mode' => ['integer', 'in' => [CSlaHelper::SCHEDULE_MODE_24X7, CSlaHelper::SCHEDULE_MODE_CUSTOM]],
-			'schedule' => ['object', 'fields' => $schedule_fields,
+			'schedule' => ['object', 'required', 'fields' => $schedule_fields,
 				'when' => ['schedule_mode', 'in' => [CSlaHelper::SCHEDULE_MODE_CUSTOM]]
 			],
 			'effective_date' => ['string', 'required', 'not_empty',
