@@ -4537,6 +4537,9 @@ int	check_vcenter_vm_discovery(AGENT_REQUEST *request, const char *username, con
 				zbx_json_addstring(&json_data, "ifbackingdevice", ZBX_NULL2EMPTY_STR(
 						dev->props[ZBX_VMWARE_DEV_PROPS_IFBACKINGDEVICE]),
 						ZBX_JSON_TYPE_STRING);
+				zbx_json_addstring(&json_data, "ifbackingnetwork", ZBX_NULL2EMPTY_STR(
+						dev->props[ZBX_VMWARE_DEV_PROPS_IFBACKINGNETWORK]),
+						ZBX_JSON_TYPE_STRING);
 				zbx_json_addstring(&json_data, "ifdvswitch_uuid", ZBX_NULL2EMPTY_STR(
 						dev->props[ZBX_VMWARE_DEV_PROPS_IFDVSWITCH_UUID]),
 						ZBX_JSON_TYPE_STRING);
@@ -4868,6 +4871,9 @@ static void	check_vcenter_vm_discovery_nic_props_cb(struct zbx_json *j, zbx_vmwa
 			ZBX_JSON_TYPE_STRING);
 	zbx_json_addstring(j, "{#IFBACKINGDEVICE}",
 			ZBX_NULL2EMPTY_STR(dev->props[ZBX_VMWARE_DEV_PROPS_IFBACKINGDEVICE]),
+			ZBX_JSON_TYPE_STRING);
+	zbx_json_addstring(j, "{#IFBACKINGNETWORK}",
+			ZBX_NULL2EMPTY_STR(dev->props[ZBX_VMWARE_DEV_PROPS_IFBACKINGNETWORK]),
 			ZBX_JSON_TYPE_STRING);
 	zbx_json_addstring(j, "{#IFDVSWITCH.UUID}", ZBX_NULL2EMPTY_STR(
 			dev->props[ZBX_VMWARE_DEV_PROPS_IFDVSWITCH_UUID]), ZBX_JSON_TYPE_STRING);

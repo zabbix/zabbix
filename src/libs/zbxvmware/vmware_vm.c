@@ -252,6 +252,8 @@ static char	**vmware_vm_get_nic_device_props(xmlDoc *details, xmlNode *node, xml
 	props[ZBX_VMWARE_DEV_PROPS_IFTYPE] = zbx_xml_node_read_prop(node, "type");
 	props[ZBX_VMWARE_DEV_PROPS_IFBACKINGDEVICE] = zbx_xml_node_read_value(details, node,
 			ZBX_XNN("backing") ZBX_XPATH_LN("deviceName"));
+	props[ZBX_VMWARE_DEV_PROPS_IFBACKINGNETWORK] = zbx_xml_node_read_value(details, node,
+			ZBX_XNN("backing") ZBX_XPATH_LN("network"));
 	props[ZBX_VMWARE_DEV_PROPS_IFDVSWITCH_UUID] = zbx_xml_node_read_value(details, node,
 			ZBX_XNN("backing") ZBX_XPATH_LN2("port", "switchUuid"));
 	props[ZBX_VMWARE_DEV_PROPS_IFDVSWITCH_PORTGROUP] = zbx_xml_node_read_value(details, node,
