@@ -157,6 +157,7 @@ class testPageTemplates extends CLegacyWebTest {
 		$this->assertTableStats(0);
 		$this->zbxTestInputTypeOverwrite('filter_name', '%');
 		$this->zbxTestClickButtonText('Apply');
+		$table->waitUntilReloaded();
 		$this->assertTableStats(0);
 	}
 

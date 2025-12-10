@@ -3786,6 +3786,24 @@ class CApiInputValidatorTest extends TestCase {
 				'/'
 			],
 			[
+				['type' => API_REGEX],
+				'/',
+				'/1/expression',
+				'/'
+			],
+			[
+				['type' => API_REGEX],
+				'[(]',
+				'/1/expression',
+				'[(]'
+			],
+			[
+				['type' => API_REGEX],
+				'[\\/]',
+				'/1/expression',
+				'[\\/]'
+			],
+			[
 				['type' => API_REGEX, 'length' => 8],
 				'/test/i',
 				'/1/expression',

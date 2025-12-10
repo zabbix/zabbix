@@ -2535,7 +2535,7 @@ static int	db_large_query_select(zbx_db_large_query_t *query)
 	if (NULL != query->suffix)
 		zbx_strcpy_alloc(query->sql, query->sql_alloc, query->sql_offset, query->suffix);
 
-	query->result = dbconn_select(query->db, "%s", *query->sql);
+	query->result = zbx_dbconn_select(query->db, "%s", *query->sql);
 
 	return SUCCEED;
 }

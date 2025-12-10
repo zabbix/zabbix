@@ -2171,8 +2171,9 @@ class CApiInputValidator {
 			return true;
 		}
 
-		if (@preg_match('('.$data.')', '') === false) {
+		if (!(new CRegexValidator)->validate($data)) {
 			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('invalid regular expression'));
+
 			return false;
 		}
 

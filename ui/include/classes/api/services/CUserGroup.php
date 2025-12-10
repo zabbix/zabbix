@@ -1187,7 +1187,6 @@ class CUserGroup extends CApiService {
 
 		self::unlinkUsers($db_usrgrps);
 
-		DB::delete('rights', ['groupid' => $usrgrpids]);
 		DB::delete('usrgrp', ['usrgrpid' => $usrgrpids]);
 
 		self::addAuditLog(CAudit::ACTION_DELETE, CAudit::RESOURCE_USER_GROUP, $db_usrgrps);
