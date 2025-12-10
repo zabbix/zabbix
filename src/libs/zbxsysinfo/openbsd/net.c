@@ -30,6 +30,7 @@
 #include <ifaddrs.h>
 #include <sys/sockio.h>
 
+
 #if OpenBSD >= 201405			/* if OpenBSD 5.5 or newer */
 #	if OpenBSD >= 201510		/* if Openbsd 5.8 or newer */
 #		include <sys/malloc.h>	/* Workaround: include malloc.h here without _KERNEL to prevent its */
@@ -531,17 +532,28 @@ int	net_if_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 		if (NULL != rxp && 0 != zbx_regexp_match_precompiled(if_name, rxp))
 			continue;
 
+		zbx_json_addobject(&j, NULL);
+		zbx_json_addstring(&j, "name", if_name, ZBX_JSON_TYPE_STRING);
+		get_link_flags(if_name, &j);
+
 		zbx_strlcpy(ifr.ifr_name, if_name, sizeof(ifr.ifr_name));
 		ifr.ifr_data = (caddr_t)&v;
 
 		if (ioctl(sock, SIOCGIFDATA, &ifr) < 0)
 			continue;
 
-		zbx_json_addobject(&j, NULL);
-		zbx_json_addstring(&j, "name", if_name, ZBX_JSON_TYPE_STRING);
-		get_link_flags(if_name, &j);
-		zbx_json_addint64(&j, "sent", v.ifi_obytes);
-		zbx_json_addint64(&j, "received", v.ifi_ibytes);
+		zbx_json_addobject(&j, "in");
+		zbx_json_adduint64(&j, "bytes", v.ifi_ibytes);
+		zbx_json_adduint64(&j, "packets", v.ifi_ipackets);
+		zbx_json_adduint64(&j, "errors", v.ifi_ierrors);
+		zbx_json_close(&j);
+		zbx_json_addobject(&j, "out");
+		zbx_json_adduint64(&j, "bytes", v.ifi_obytes);
+		zbx_json_adduint64(&j, "packets", v.ifi_opackets);
+		zbx_json_adduint64(&j, "errors", v.ifi_oerrors);
+		zbx_json_adduint64(&j, "collisions", v.ifi_collisions);
+		zbx_json_close(&j);
+
 		if (0 < v.ifi_baudrate)
 			zbx_json_addint64(&j, "speed", v.ifi_baudrate / 1000000);
 
