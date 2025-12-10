@@ -85,7 +85,9 @@ class CControllerSlaExcludedDowntimeValidate extends CController {
 		$period_to = $datetime_to->getTimestamp();
 
 		if ($period_to > ZBX_MAX_DATE) {
-			$data = ['error' => ['messages' => [_('Excluded downtime duration time exceeds upper limit.')]]];
+			$data = ['error' => ['messages' => [_s('Excluded downtime must not extend beyond %1$s.',
+				date(ZBX_FULL_DATE_TIME, ZBX_MAX_DATE)
+			)]]];
 		}
 		else {
 			$data = [
