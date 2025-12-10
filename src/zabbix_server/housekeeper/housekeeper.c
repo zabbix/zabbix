@@ -354,6 +354,8 @@ int	housekeeper_process(int config_max_hk_delete)
 		zbx_db_execute_multiple_query("delete from housekeeper where", "housekeeperid", &deleteids);
 	}
 
+	zbx_vector_uint64_destroy(&deleteids);
+
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 
 	return deleted;
