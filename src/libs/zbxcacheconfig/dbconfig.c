@@ -16489,14 +16489,13 @@ static void	dc_get_items_to_reschedule(const zbx_hashset_t *activated_hosts, zbx
 		if (HOST_STATUS_MONITORED != host->status)
 			continue;
 
+		dc_check_item_activation(item, host, activated_hosts, activated_items);
+
 		if (NULL == strstr(item->delay, "{$"))
 		{
 			/* neither new item revision or the last one had macro in delay */
 			if (NULL == item->delay_ex)
-			{
-				dc_check_item_activation(item, host, activated_hosts, activated_items);
 				continue;
-			}
 
 			delay_ex = NULL;
 		}
@@ -16519,13 +16518,11 @@ static void	dc_get_items_to_reschedule(const zbx_hashset_t *activated_hosts, zbx
 			zbx_vector_item_delay_append(items, item_delay);
 		}
 		else
-		{
 			zbx_free(delay_ex);
-			dc_check_item_activation(item, host, activated_hosts, activated_items);
-		}
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() items:%d", __func__, items->values_num);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() items:%d activated_items:%d", __func__, items->values_num,
+			activated_items->values_num);
 }
 
 static void	dc_reschedule_item(ZBX_DC_ITEM *item, const ZBX_DC_HOST *host, int now)
