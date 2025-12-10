@@ -87,7 +87,7 @@ function parse_schema($path) {
 						break;
 					case 't_json':
 						$type = 'DB::FIELD_TYPE_JSON';
-						$length = 2048;
+						$length = 128*1048576;
 						break;
 				}
 
