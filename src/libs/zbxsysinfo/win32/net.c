@@ -868,7 +868,7 @@ int	net_if_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 	MIB_IFTABLE	*pIfTable = NULL;
 	zbx_ifrow_t	ifrow = {NULL, NULL};
 	struct zbx_json	j;
-	char		*pattern = NULL, *error = NULL, *name, *os = NULL, *text, *alias;
+	char		*pattern = NULL, *error = NULL, *name, *os = NULL, *text, *alias, *wmi_result;
 	size_t		os_alloc = 0, os_offset = 0;
 	char		*wmi_namespace = "root\\StandardCimv2";
 	double		start_time = zbx_time();
@@ -964,21 +964,34 @@ int	net_if_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 		alias = zbx_unicode_to_utf8(ifrow.ifRow2->Alias);
 		zbx_json_addstring(&j, "alias", alias, ZBX_JSON_TYPE_STRING);
-		zbx_json_addint64(&j, "sent", zbx_ifrow_get_out_octets(&ifrow));
-		zbx_json_addint64(&j, "received", ifrow.ifRow2->InOctets);
+		zbx_json_addobject(&j, "in");
+		zbx_json_adduint64(&j, "bytes", zbx_ifrow_get_in_octets(&ifrow));
+		zbx_json_adduint64(&j, "packets", zbx_ifrow_get_in_ucast_pkts(&ifrow) +
+				zbx_ifrow_get_in_nucast_pkts(&ifrow));
+		zbx_json_adduint64(&j, "errors", zbx_ifrow_get_in_errors(&ifrow));
+		zbx_json_adduint64(&j, "dropped", zbx_ifrow_get_in_discards(&ifrow) +
+				zbx_ifrow_get_in_unknown_protos(&ifrow));
+		zbx_json_close(&j);
+		zbx_json_addobject(&j, "out");
+		zbx_json_adduint64(&j, "bytes", zbx_ifrow_get_out_octets(&ifrow));
+		zbx_json_adduint64(&j, "packets", zbx_ifrow_get_out_ucast_pkts(&ifrow) +
+				zbx_ifrow_get_out_nucast_pkts(&ifrow));
+		zbx_json_adduint64(&j, "errors", zbx_ifrow_get_out_errors(&ifrow));
+		zbx_json_adduint64(&j, "dropped", zbx_ifrow_get_out_discards(&ifrow));
+		zbx_json_close(&j);
 		zbx_json_addint64(&j, "type", ifrow.ifRow2->Type);
 		zbx_json_addint64(&j, "carrier", ifrow.ifRow2->InterfaceAndOperStatusFlags.ConnectorPresent);
 
 		/* TODO: optimize, using one call to wmi */
-		result = NULL;
+		wmi_result = NULL;
 		zbx_snprintf_alloc(&os, &os_alloc, &os_offset,
 			"select DisplayValue FROM MSFT_NetAdapterAdvancedPropertySettingData WHERE "
 			"DisplayName = 'Speed & Duplex' AND Name = '%s'", alias);
-		get_wmi_check_timeout(wmi_namespace, os, &result, start_time, &time_previous_query_finished);
+		get_wmi_check_timeout(wmi_namespace, os, &wmi_result, start_time, &time_previous_query_finished);
 
-		if (NULL != result)
+		if (NULL != wmi_result)
 		{
-			if (0 == strcmp(result, "Auto Negotiation"))
+			if (0 == strcmp(wmi_result, "Auto Negotiation"))
 			{
 				zbx_json_addstring(&j, "negotiation", "on", ZBX_JSON_TYPE_STRING);
 			}
@@ -988,45 +1001,45 @@ int	net_if_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 			}
 		}
 
-		zbx_free(result);
-		result = NULL;
+		zbx_free(wmi_result);
+		wmi_result = NULL;
 		zbx_free(os);
 		os_alloc = 0;
 		os_offset = 0;
 
 		zbx_snprintf_alloc(&os, &os_alloc, &os_offset,
 				"select FullDuplex FROM MSFT_NetAdapter where Name ='%s'", alias);
-		get_wmi_check_timeout(wmi_namespace, os, &result, start_time, &time_previous_query_finished);
+		get_wmi_check_timeout(wmi_namespace, os, &wmi_result, start_time, &time_previous_query_finished);
 
-		if (NULL != result)
+		if (NULL != wmi_result)
 		{
 			char	*duplex = "half";
 
-			if (0 == strcmp(result, "True"))
+			if (0 == strcmp(wmi_result, "True"))
 				duplex = "full";
 
 			zbx_json_addstring(&j, "duplex", duplex, ZBX_JSON_TYPE_STRING);
 		}
 
-		zbx_free(result);
+		zbx_free(wmi_result);
 		zbx_free(os);
 		os_alloc = 0;
 		os_offset = 0;
-		result = NULL;
+		wmi_result = NULL;
 		zbx_snprintf_alloc(&os, &os_alloc, &os_offset, "select Speed FROM MSFT_NetAdapter where Name = '%s'",
 				alias);
-		get_wmi_check_timeout(wmi_namespace, os , &result, start_time, &time_previous_query_finished);
+		get_wmi_check_timeout(wmi_namespace, os , &wmi_result, start_time, &time_previous_query_finished);
 
-		if (NULL != result)
+		if (NULL != wmi_result)
 		{
 			zbx_uint64_t	value_ui64;
 
-			if (SUCCEED == zbx_is_uint64(result, &value_ui64))
+			if (SUCCEED == zbx_is_uint64(wmi_result, &value_ui64))
 				zbx_json_adduint64(&j, "speed", value_ui64);
 		}
 
 		zbx_free(os);
-		zbx_free(result);
+		zbx_free(wmi_result);
 		zbx_free(alias);
 		zbx_json_close(&j);
 	}
