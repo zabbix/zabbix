@@ -1,6 +1,6 @@
 module golang.zabbix.com/agent2
 
-go 1.23.0
+go 1.24.10
 
 require (
 	github.com/BurntSushi/locker v0.0.0-20171006230638-a6e239ea1c69
@@ -29,7 +29,7 @@ require (
 	golang.org/x/sync v0.14.0
 	golang.org/x/sys v0.33.0
 	golang.org/x/text v0.25.0
-	golang.zabbix.com/sdk v1.2.2-0.20251007063238-42702926b56d
+	golang.zabbix.com/sdk v1.2.2-0.20251205121637-3b95c058c0e4
 )
 
 require (

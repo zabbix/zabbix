@@ -137,16 +137,16 @@ class CUser extends CApiService {
 
 		$sql_parts = [
 			'select'	=> ['users' => 'u.userid'],
-			'from'		=> ['users' => 'users u'],
+			'from'		=> 'users u',
 			'where'		=> [],
+			'group'		=> [],
 			'order'		=> [],
 			'limit'		=> null
 		];
 
 		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
 			if (!$options['editable']) {
-				$sql_parts['from']['users_groups'] = 'users_groups ug';
-				$sql_parts['where']['uug'] = 'u.userid=ug.userid';
+				$sql_parts['join']['ug'] = ['table' => 'users_groups', 'using' => 'userid'];
 				$sql_parts['where'][] = 'ug.usrgrpid IN ('.
 					' SELECT uug.usrgrpid'.
 					' FROM users_groups uug'.
@@ -163,15 +163,13 @@ class CUser extends CApiService {
 		}
 
 		if ($options['usrgrpids'] !== null) {
-			$sql_parts['from']['users_groups'] = 'users_groups ug';
+			$sql_parts['join']['ug'] = ['table' => 'users_groups', 'using' => 'userid'];
 			$sql_parts['where'][] = dbConditionId('ug.usrgrpid', $options['usrgrpids']);
-			$sql_parts['where']['uug'] = 'u.userid=ug.userid';
 		}
 
 		if ($options['mediaids'] !== null) {
-			$sql_parts['from']['media'] = 'media m';
+			$sql_parts['join']['m'] = ['table' => 'media', 'using' => 'userid'];
 			$sql_parts['where'][] = dbConditionId('m.mediaid', $options['mediaids']);
-			$sql_parts['where']['mu'] = 'm.userid=u.userid';
 
 			if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
 				$sql_parts['where']['userid'] = 'u.userid='.self::$userData['userid'];
@@ -179,9 +177,8 @@ class CUser extends CApiService {
 		}
 
 		if ($options['mediatypeids'] !== null) {
-			$sql_parts['from']['media'] = 'media m';
+			$sql_parts['join']['m'] = ['table' => 'media', 'using' => 'userid'];
 			$sql_parts['where'][] = dbConditionId('m.mediatypeid', $options['mediatypeids']);
-			$sql_parts['where']['mu'] = 'm.userid=u.userid';
 
 			if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
 				$sql_parts['where']['userid'] = 'u.userid='.self::$userData['userid'];
@@ -2027,12 +2024,7 @@ class CUser extends CApiService {
 	public function delete(array $userids) {
 		$this->validateDelete($userids, $db_users);
 
-		DB::delete('media', ['userid' => $userids]);
-		DB::delete('profiles', ['userid' => $userids]);
-
 		self::deleteUgSets($db_users);
-		DB::delete('users_groups', ['userid' => $userids]);
-		DB::delete('mfa_totp_secret', ['userid' => $userids]);
 		DB::update('token', [
 			'values' => ['creator_userid' => null],
 			'where' => ['creator_userid' => $userids]
@@ -2047,7 +2039,7 @@ class CUser extends CApiService {
 			'filter' => ['userid' => $userids],
 			'preservekeys' => true
 		]);
-		CToken::deleteForce(array_keys($tokenids), false);
+		CToken::deleteForce(array_keys($tokenids));
 
 		DB::delete('users', ['userid' => $userids]);
 
