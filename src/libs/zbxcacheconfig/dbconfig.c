@@ -16472,27 +16472,29 @@ static void	zbx_item_delay_free(zbx_item_delay_t *item_delay)
  *                                     being activated                        *
  *                                                                            *
  ******************************************************************************/
-static void	dc_check_item_activation(ZBX_DC_ITEM *item, ZBX_DC_HOST *host,
+static int	dc_check_item_activation(ZBX_DC_ITEM *item, ZBX_DC_HOST *host,
 		const zbx_hashset_t *activated_hosts, zbx_vector_ptr_pair_t *activated_items)
 {
 	zbx_ptr_pair_t	pair;
 
 	if (ZBX_LOC_NOWHERE != item->location)
-		return;
+		return FAIL;
 
 	if (HOST_MONITORED_BY_SERVER != host->monitored_by &&
 			SUCCEED != zbx_is_item_processed_by_server(item->type, item->key))
 	{
-		return;
+		return FAIL;
 	}
 
 	if (NULL == zbx_hashset_search(activated_hosts, &host->hostid))
-		return;
+		return FAIL;
 
 	pair.first = item;
 	pair.second = host;
 
 	zbx_vector_ptr_pair_append(activated_items, pair);
+
+	return SUCCEED;
 }
 /******************************************************************************
  *                                                                            *
@@ -16534,14 +16536,14 @@ static void	dc_get_items_to_reschedule(const zbx_hashset_t *activated_hosts, zbx
 		if (HOST_STATUS_MONITORED != host->status)
 			continue;
 
+		if (SUCCEED == dc_check_item_activation(item, host, activated_hosts, activated_items))
+			continue;
+
 		if (NULL == strstr(item->delay, "{$"))
 		{
 			/* neither new item revision or the last one had macro in delay */
 			if (NULL == item->delay_ex)
-			{
-				dc_check_item_activation(item, host, activated_hosts, activated_items);
 				continue;
-			}
 
 			delay_ex = NULL;
 		}
