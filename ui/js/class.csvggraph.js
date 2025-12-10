@@ -13,258 +13,623 @@
 **/
 
 
-/**
- * JQuery class that initializes interactivity for SVG graph.
- *
- * Supported options:
- *  - SBox - time range selector;
- *  - show_problems - show problems in hintbox when mouse is moved over the problem zone;
- *  - min_period - min period in seconds that must be s-boxed to change the data in dashboard timeselector.
- */
-(function ($) {
-	"use strict";
-
-	// Makes SBox selection cancelable pressing Esc.
-	function sBoxKeyboardInteraction(e) {
-		if (e.keyCode == 27) {
-			destroySBox(e, e.data.graph);
-		}
-	}
-
-	// Disable text selection in document when move mouse pressed cursor.
-	function disableSelect(e) {
-		e.preventDefault();
-	}
-
-	// Cancel SBox and unset its variables.
-	function destroySBox(e, graph = e.data.graph) {
-		const data = graph.data('options');
-		const is_static_hintbox_opened = graph.data('is_static_hintbox_opened');
-
-		if (data) {
-			if (!is_static_hintbox_opened) {
-				graph.data('widget')._resumeUpdating();
-			}
-
-			jQuery('.svg-graph-selection', graph).attr({'width': 0, 'height': 0});
-			jQuery('.svg-graph-selection-text', graph).text('');
-			graph.data('options').boxing = false;
-		}
-
-		dropDocumentListeners(e, graph);
-	}
+class CSvgGraph {
 
 	/**
-	 * Function removes SBox related $(document) event listeners:
-	 * - if no other widget have active SBox;
-	 * - to avoid another call of destroySBox on 'mouseup' (in case if user has pressed ESC).
+	 * @type {SVGElement}
 	 */
-	function dropDocumentListeners(e, graph) {
+	#svg;
+
+	/**
+	 * @type {CWidgetSvgGraph|CWidgetScatterPlot}
+	 */
+	#widget;
+
+	/**
+	 * @type {number}
+	 */
+	#dimX;
+
+	/**
+	 * @type {number}
+	 */
+	#dimY;
+
+	/**
+	 * @type {number}
+	 */
+	#dimW;
+
+	/**
+	 * @type {number}
+	 */
+	#dimH;
+
+	/**
+	 * @type {boolean}
+	 */
+	#show_problems;
+
+	/**
+	 * @type {boolean}
+	 */
+	#show_simple_triggers;
+
+	/**
+	 * @type {number|null}
+	 */
+	#spp;
+
+	/**
+	 * @type {Object}
+	 */
+	#time_period;
+
+	/**
+	 * @type {number}
+	 */
+	#min_period;
+
+	/**
+	 * @type {number}
+	 */
+	#graph_type;
+
+	/**
+	 * @type {boolean}
+	 */
+	#sbox;
+
+	/**
+	 * @type {boolean}
+	 */
+	#is_boxing;
+
+	/**
+	 * @type {boolean}
+	 */
+	#is_static_hintbox_opened;
+
+	/**
+	 * @type {number}
+	 */
+	#start;
+
+	/**
+	 * @type {number}
+	 */
+	#end;
+
+	#event_listeners = {
+		mousemove: e => this.#showHintbox(e),
+		mouseleave: () => {
+			this.#destroyHintbox();
+			this.#hideHelper();
+		},
+		onShowStaticHint: () => this.#onStaticHintboxOpen(),
+		onHideStaticHint: () => this.#onStaticHintboxClose(),
+		dblclick: () => this.#zoomOutTime(),
+		mousedown: e => this.#startSBoxDrag(e)
+	};
+
+	#sbox_event_listeners = {
+		selectstart: e => {
+			e.preventDefault();
+		},
+		keydown: e => {
+			if (e.keyCode === 27) {
+				this.#destroySBox(e);
+			}
+		},
+		mouseup: e => this.#endSBoxDrag(e),
+		mousemove: e => this.#moveSBoxMouse(e)
+	};
+
+	constructor(svg, widget, options) {
+		this.#svg = svg;
+
+		this.#widget = widget;
+
+		this.#dimX = options.dims.x;
+		this.#dimY = options.dims.y;
+		this.#dimW = options.dims.w;
+		this.#dimH = options.dims.h;
+		this.#show_problems = options.show_problems;
+		this.#show_simple_triggers = options.show_simple_triggers;
+		this.#spp = options.spp || null;
+		this.#time_period = options.time_period;
+		this.#min_period = options.min_period;
+		this.#graph_type = options.graph_type;
+		this.#sbox = options.sbox;
+		this.#is_boxing = false;
+		this.#is_static_hintbox_opened = false;
+
+		this.#svg.setAttribute('unselectable', 'true');
+		this.#svg.style.userSelect = 'none';
+
+		if (this.#sbox) {
+			this.#dropDocumentListeners(null);
+		}
+	}
+
+	activate() {
+		this.#svg.dataset.hintbox = '1';
+		this.#svg.dataset.hintboxStatic = '1';
+		this.#svg.dataset.hintboxDelay = '0';
+		this.#svg.dataset.hintboxStaticReopenOnClick = '1';
+
+		this.#svg.addEventListener('mousemove', this.#event_listeners.mousemove);
+		this.#svg.addEventListener('mouseleave', this.#event_listeners.mouseleave);
+		this.#svg.addEventListener('onShowStaticHint', this.#event_listeners.onShowStaticHint);
+		this.#svg.addEventListener('onDeleteStaticHint', this.#event_listeners.onHideStaticHint);
+
+		if (this.#sbox) {
+			this.#svg.addEventListener('dblclick', this.#event_listeners.dblclick);
+			this.#svg.addEventListener('mousedown', this.#event_listeners.mousedown);
+		}
+	}
+
+	deactivate(e) {
+		delete this.#svg.dataset.hintbox;
+		delete this.#svg.dataset.hintboxStatic;
+		delete this.#svg.dataset.hintboxDelay;
+		delete this.#svg.dataset.hintboxStaticReopenOnClick;
+
+		this.#svg.removeEventListener('mousemove', this.#event_listeners.mousemove);
+		this.#svg.removeEventListener('mouseleave', this.#event_listeners.mouseleave);
+		this.#svg.removeEventListener('onShowStaticHint', this.#event_listeners.onShowStaticHint);
+		this.#svg.removeEventListener('onDeleteStaticHint', this.#event_listeners.onHideStaticHint);
+
+		if (this.#sbox) {
+			this.#destroySBox(e);
+
+			this.#svg.removeEventListener('dblclick', this.#event_listeners.dblclick);
+			this.#svg.removeEventListener('mousedown', this.#event_listeners.mousedown);
+		}
+	}
+
+	isBoxing() {
+		return this.#is_boxing;
+	}
+
+	#onStaticHintboxOpen() {
+		this.#is_static_hintbox_opened = true;
+
+		const hintbox = this.#svg.hintBoxItem[0];
+		const hintbox_items = hintbox.querySelectorAll('.has-broadcast-data');
+
+		for (const item of hintbox_items) {
+			const {itemid, ds} = item.dataset;
+
+			item.addEventListener('click', () => {
+				this.#widget.updateItemBroadcast(itemid, ds);
+				this.#markSelectedHintboxItems(hintbox);
+			});
+
+			if (this.#graph_type === GRAPH_TYPE_SVG_GRAPH) {
+				item.addEventListener('mouseenter', () => {
+					this.#setHighlighting(itemid, ds);
+				});
+
+				item.addEventListener('mouseleave', () => {
+					this.#resetHighlighting(hintbox);
+				});
+			}
+		}
+
+		this.#markSelectedHintboxItems(hintbox);
+
+		if (this.#graph_type === GRAPH_TYPE_SVG_GRAPH) {
+			this.#resetHighlighting(hintbox);
+		}
+	}
+
+	#onStaticHintboxClose() {
+		this.#is_static_hintbox_opened = false;
+
+		this.#removeHighlighting();
+	}
+
+	#markSelectedHintboxItems(hintbox) {
+		const {itemid, ds} = this.#widget.getItemBroadcasting();
+
+		for (const item of hintbox.querySelectorAll('.has-broadcast-data')) {
+			item.classList.toggle('selected', item.dataset.itemid == itemid && item.dataset.ds == ds);
+		}
+	}
+
+	#setHighlighting(itemid, ds) {
+		this.#removeHighlighting();
+
+		const graph_element = this.#svg.querySelector(`[data-itemid="${itemid}"][data-ds="${ds}"]`);
+
+		if (graph_element) {
+			graph_element.classList.add('highlighted');
+			this.#svg.classList.add('highlighted');
+		}
+	}
+
+	#resetHighlighting(hintbox) {
+		const selected_item = hintbox.querySelector('.has-broadcast-data.selected');
+
+		if (selected_item) {
+			const {itemid, ds} = selected_item.dataset;
+
+			this.#setHighlighting(itemid, ds);
+		}
+		else {
+			this.#removeHighlighting();
+		}
+	}
+
+	#removeHighlighting() {
+		for (const graph_element of this.#svg.querySelectorAll('.highlighted')) {
+			graph_element.classList.remove('highlighted');
+		}
+
+		this.#svg.classList.remove('highlighted');
+	}
+
+	#dropDocumentListeners(e) {
 		let widgets_boxing = 0; // Number of widgets with active SBox.
 
 		for (const dashboard_page of ZABBIX.Dashboard.getDashboardPages()) {
 			dashboard_page.getWidgets().forEach((widget) => {
-				if (widget.getType() === 'svggraph' && widget._svg !== null) {
-					const options = jQuery(widget._svg).data('options');
-					if (options !== undefined && options.boxing) {
+				if (widget.getType() === 'svggraph' && widget.getGraph() !== null) {
+					const boxing = widget.getGraph().isBoxing();
+					if (boxing !== undefined && boxing) {
 						widgets_boxing++;
 					}
 				}
 			});
 		}
 
-		if (widgets_boxing == 0 || (e && 'keyCode' in e && e.keyCode == 27)) {
-			jQuery(document)
-				.off('selectstart', disableSelect)
-				.off('keydown', sBoxKeyboardInteraction)
-				.off('mouseup', destroySBox)
-				.off('mouseup', endSBoxDrag);
+		if (widgets_boxing === 0 || (e && 'keyCode' in e && e.keyCode === 27)) {
+			document.removeEventListener('selectstart', this.#sbox_event_listeners.selectstart);
+			document.removeEventListener('keydown', this.#sbox_event_listeners.keydown);
+			document.removeEventListener('mouseup', this.#sbox_event_listeners.mouseup);
 
-			graph.off('mousemove', moveSBoxMouse);
+			this.#svg.removeEventListener('mousemove', this.#sbox_event_listeners.mousemove);
 		}
 	}
 
-	// Destroy hintbox, unset its variables and event listeners.
-	function destroyHintbox(graph) {
-		delete graph[0].dataset.hintboxContents;
+	// Method to start selection of some horizontal area in graph.
+	#startSBoxDrag(e) {
+		e.stopPropagation();
+
+		const offsetX = e.clientX - this.#svg.getBoundingClientRect().left;
+
+		if (this.#dimX <= offsetX && offsetX <= this.#dimX + this.#dimW && this.#dimY <= e.offsetY
+				&& e.offsetY <= this.#dimY + this.#dimH) {
+			document.addEventListener('selectstart', this.#sbox_event_listeners.selectstart);
+			document.addEventListener('keydown', this.#sbox_event_listeners.keydown);
+			document.addEventListener('mouseup', this.#sbox_event_listeners.mouseup);
+
+			this.#svg.addEventListener('mousemove', this.#sbox_event_listeners.mousemove);
+
+			this.#start = offsetX - this.#dimX;
+		}
+	}
+
+	// Method to recalculate selected area during mouse move.
+	#moveSBoxMouse(e) {
+		e.stopPropagation();
+
+		const sbox = this.#svg.querySelector('.svg-graph-selection');
+		const selection_text = this.#svg.querySelector('.svg-graph-selection-text');
+		const offsetX = e.clientX - this.#svg.getBoundingClientRect().left;
+
+		this.#end = offsetX - this.#dimX;
+
+		// If mouse movement detected (SBox has dragged), destroy opened hintbox and pause widget refresh.
+		if (this.#start !== this.#end && !this.#is_boxing) {
+			this.#widget._pauseUpdating();
+
+			this.#is_boxing = true;
+
+			this.#destroyHintbox();
+			this.#hideHelper();
+
+			hintBox.hideHint(this.#svg, true);
+		}
+
+		if (this.#is_boxing) {
+			this.#end = Math.min(offsetX - this.#dimX, this.#dimW);
+			this.#end = this.#end > 0 ? this.#end : 0;
+
+			sbox.setAttribute('x', `${Math.min(this.#start, this.#end) + this.#dimX}px`);
+			sbox.setAttribute('y', `${this.#dimY}px`);
+			sbox.setAttribute('width', `${Math.abs(this.#end - this.#start)}px`);
+			sbox.setAttribute('height', `${this.#dimH}px`);
+
+			const seconds = Math.round(Math.abs(this.#end - this.#start) * this.#spp);
+			const label_end = seconds < this.#min_period ? ' [min 1' + t('S_MINUTE_SHORT') + ']'  : '';
+
+			selection_text.innerHTML = `${formatTimestamp(seconds, false, true)}${label_end}`;
+			selection_text.setAttribute('x', `${Math.min(this.#start, this.#end) + this.#dimX + 5}px`);
+			selection_text.setAttribute('y', `${this.#dimY + 15}px`);
+		}
+	}
+
+	// Cancel SBox and unset its variables.
+	#destroySBox(e) {
+		if (!this.#is_static_hintbox_opened) {
+			this.#widget._resumeUpdating();
+		}
+
+		const sbox = this.#svg.querySelector('.svg-graph-selection');
+		sbox.setAttribute('width', 0);
+		sbox.setAttribute('height', 0);
+
+		this.#svg.querySelector('.svg-graph-selection-text').innerHTML = '';
+
+		this.#is_boxing = false;
+
+		this.#dropDocumentListeners(e);
+	}
+
+	// Method to end selection of horizontal area in graph.
+	#endSBoxDrag(e) {
+		e.stopPropagation();
+
+		const set_date = this.#is_boxing;
+
+		this.#destroySBox(e);
+
+		if (set_date) {
+			const offsetX = e.clientX - this.#svg.getBoundingClientRect().left;
+
+			this.#end = Math.min(offsetX - this.#dimX, this.#dimW);
+
+			const seconds = Math.round(Math.abs(this.#end - this.#start) * this.#spp);
+			const from_offset = Math.floor(Math.min(this.#start, this.#end)) * this.#spp;
+			const to_offset = Math.floor(this.#dimW - Math.max(this.#start, this.#end)) * this.#spp;
+
+			if (seconds > this.#min_period && (from_offset > 0 || to_offset > 0)) {
+				this.#widget.updateTimeSelector({
+					method: 'rangeoffset',
+					from: this.#time_period.from,
+					to: this.#time_period.to,
+					from_offset: Math.max(0, Math.ceil(from_offset)),
+					to_offset: Math.ceil(to_offset)
+				});
+			}
+		}
+	}
+
+	#zoomOutTime() {
+		hintBox.hideHint(this.#svg, true);
+
+		this.#widget.updateTimeSelector({
+			method: 'zoomout',
+			from: this.#time_period.from,
+			to: this.#time_period.to,
+		});
+
+		return false;
+	}
+
+	// Set position of vertical helper line.
+	#setHelperPosition(e) {
+		const svg_rect = this.#svg.getBoundingClientRect();
+
+		if (this.#graph_type === GRAPH_TYPE_SVG_GRAPH) {
+			const helper = this.#svg.querySelector('.svg-helper');
+
+			helper.setAttribute('x1', e.clientX - svg_rect.left);
+			helper.setAttribute('y1', this.#dimY);
+			helper.setAttribute('x2', e.clientX - svg_rect.left);
+			helper.setAttribute('y2', this.#dimY + this.#dimH);
+		}
+		else {
+			const vertical_helper = this.#svg.querySelector('.scatter-plot-vertical-helper');
+
+			vertical_helper.setAttribute('x1', e.clientX - svg_rect.left);
+			vertical_helper.setAttribute('y1', this.#dimY);
+			vertical_helper.setAttribute('x2', e.clientX - svg_rect.left);
+			vertical_helper.setAttribute('y2', this.#dimY + this.#dimH);
+
+			const horizontal_helper = this.#svg.querySelector('.scatter-plot-horizontal-helper');
+
+			horizontal_helper.setAttribute('x1', this.#dimX);
+			horizontal_helper.setAttribute('y1', e.clientY - svg_rect.top);
+			horizontal_helper.setAttribute('x2', this.#dimX + this.#dimW);
+			horizontal_helper.setAttribute('y2', e.clientY - svg_rect.top);
+		}
 	}
 
 	// Hide vertical helper line and highlighted data points.
-	function hideHelper(graph) {
-		for (const helper of graph[0].querySelectorAll('.svg-helper')) {
+	#hideHelper() {
+		for (const helper of this.#svg.querySelectorAll('.svg-helper')) {
 			helper.setAttribute('x1', -10);
 			helper.setAttribute('x2', -10);
 			helper.setAttribute('y1', -10);
 			helper.setAttribute('y2', -10);
 		}
 
-		if (graph.data('options').graph_type === GRAPH_TYPE_SCATTER_PLOT) {
-			const highlighter_points = graph[0].querySelectorAll('g.js-svg-highlight-group');
+		if (this.#graph_type === GRAPH_TYPE_SCATTER_PLOT) {
+			const highlighter_points = this.#svg.querySelectorAll('g.js-svg-highlight-group');
 
 			for (const highlighter_point of highlighter_points) {
 				highlighter_point.setAttribute('transform', 'translate(-10, -10)');
 			}
 		}
 		else {
-			for (const point of graph[0].querySelectorAll('.svg-point-highlight')) {
+			for (const point of this.#svg.querySelectorAll('.svg-point-highlight')) {
 				point.setAttribute('cx', -10);
 				point.setAttribute('cy', -10);
 			}
 		}
 	}
 
-	// Method to start selection of some horizontal area in graph.
-	function startSBoxDrag(e) {
-		e.stopPropagation();
+	// Show problem or value hintbox.
+	#showHintbox(e) {
+		const svg_rect = this.#svg.getBoundingClientRect();
+		const offsetX = e.clientX - svg_rect.left;
 
-		const graph = e.data.graph;
-		const offsetX = e.clientX - graph.offset().left;
-		const data = graph.data('options');
+		let html = null;
+		let in_x = false;
+		let in_values_area = false;
+		let in_problem_area = false;
 
-		if (data.dimX <= offsetX && offsetX <= data.dimX + data.dimW && data.dimY <= e.offsetY
-				&& e.offsetY <= data.dimY + data.dimH) {
-			jQuery(document)
-				.on('selectstart', disableSelect)
-				.on('keydown', {graph: graph}, sBoxKeyboardInteraction)
-				.on('mouseup', {graph: graph}, endSBoxDrag);
+		if (this.#is_boxing) {
+			this.#hideHelper();
 
-			graph.on('mousemove', {graph: graph}, moveSBoxMouse);
-
-			data.start = offsetX - data.dimX;
-		}
-	}
-
-	// Method to recalculate selected area during mouse move.
-	function moveSBoxMouse(e) {
-		e.stopPropagation();
-
-		const graph = e.data.graph;
-		const data = graph.data('options');
-		const sbox = graph[0].querySelector('.svg-graph-selection');
-		const selection_text = graph[0].querySelector('.svg-graph-selection-text');
-		const offsetX = e.clientX - graph.offset().left;
-
-		data.end = offsetX - data.dimX;
-
-		// If mouse movement detected (SBox has dragged), destroy opened hintbox and pause widget refresh.
-		if (data.start != data.end && !data.boxing) {
-			graph.data('widget')._pauseUpdating();
-			data.boxing = true;
-			destroyHintbox(graph);
-			hintBox.hideHint(graph[0], true);
-			hideHelper(graph);
+			return;
 		}
 
-		if (data.boxing) {
-			data.end = Math.min(offsetX - data.dimX, data.dimW);
-			data.end = data.end > 0 ? data.end : 0;
+		// Check if mouse in the horizontal area in which hintbox must be shown.
+		in_x = this.#dimX <= offsetX && offsetX <= this.#dimX + this.#dimW;
+		in_problem_area = in_x && this.#dimY + this.#dimH <= e.offsetY && e.offsetY <= this.#dimY + this.#dimH + 15;
+		in_values_area = in_x && this.#dimY <= e.offsetY && e.offsetY <= this.#dimY + this.#dimH;
 
-			sbox.setAttribute('x', `${Math.min(data.start, data.end) + data.dimX}px`);
-			sbox.setAttribute('y', `${data.dimY}px`);
-			sbox.setAttribute('width', `${Math.abs(data.end - data.start)}px`);
-			sbox.setAttribute('height', `${data.dimH}px`);
+		// Show problems when mouse is in the 15px high area under the graph canvas.
+		if (this.#show_problems && in_problem_area) {
+			this.#hideHelper();
 
-			const seconds = Math.round(Math.abs(data.end - data.start) * data.spp);
-			const label_end = seconds < data.minPeriod ? ' [min 1' + t('S_MINUTE_SHORT') + ']'  : '';
+			const problems = this.#findProblems(e.offsetX);
 
-			selection_text.innerHTML = `${formatTimestamp(seconds, false, true)}${label_end}`;
-			selection_text.setAttribute('x', `${Math.min(data.start, data.end) + data.dimX + 5}px`);
-			selection_text.setAttribute('y', `${data.dimY + 15}px`);
-		}
-	}
-
-	// Method to end selection of horizontal area in graph.
-	function endSBoxDrag(e) {
-		e.stopPropagation();
-
-		const graph = e.data.graph;
-		const data = graph.data('options');
-		const offsetX = e.clientX - graph.offset().left
-		const set_date = data && data.boxing;
-
-		destroySBox(e, graph);
-
-		if (set_date) {
-			data.end = Math.min(offsetX - data.dimX, data.dimW);
-
-			const seconds = Math.round(Math.abs(data.end - data.start) * data.spp);
-			const from_offset = Math.floor(Math.min(data.start, data.end)) * data.spp;
-			const to_offset = Math.floor(data.dimW - Math.max(data.start, data.end)) * data.spp;
-
-			if (seconds > data.minPeriod && (from_offset > 0 || to_offset > 0)) {
-				const widget = graph.data('widget');
-
-				updateTimeSelector(widget, {
-					method: 'rangeoffset',
-					from: data.timePeriod.from,
-					to: data.timePeriod.to,
-					from_offset: Math.max(0, Math.ceil(from_offset)),
-					to_offset: Math.ceil(to_offset)
-				})
-					.then((time_period) => {
-						if (time_period === null) {
-							return;
-						}
-
-						widget._startUpdating();
-						widget.feedback({time_period});
-						widget.broadcast({
-							[CWidgetsData.DATA_TYPE_TIME_PERIOD]: time_period
-						});
-					});
+			if (problems.length > 0) {
+				html = this.#getProblemHintboxHtml(problems);
 			}
 		}
-	}
+		// Show graph values or simple triggers if mouse is over the graph canvas.
+		else if (in_values_area) {
+			const triggers = this.#show_simple_triggers ? this.#findTriggers(e.offsetY) : [];
 
-	function updateTimeSelector(widget, data) {
-		widget._schedulePreloader();
+			if (triggers.length > 0) {
+				this.#hideHelper();
 
-		const curl = new Curl('zabbix.php');
+				const trigger_areas = triggers.filter(
+					t => !(t.begin_position > e.offsetX || e.offsetX > t.end_position)
+				);
 
-		curl.setArgument('action', 'timeselector.calc');
-
-		return fetch(curl.getUrl(), {
-			method: 'POST',
-			headers: {'Content-Type': 'application/json'},
-			body: JSON.stringify(data)
-		})
-			.then((response) => response.json())
-			.then((time_period) => {
-				if ('error' in time_period) {
-					throw {error: time_period.error};
+				if (trigger_areas.length > 0) {
+					html = this.#getSimpleTriggerHintboxHtml(triggers);
 				}
+			}
+			else {
+				this.#setHelperPosition(e);
 
-				if ('has_fields_errors' in time_period) {
-					throw new Error();
-				}
+				let included_points = [];
+				let show_hint = false;
 
-				return time_period;
-			})
-			.catch((exception) => {
-				let title;
-				let messages = [];
+				if (this.#graph_type === GRAPH_TYPE_SCATTER_PLOT) {
+					const offsetY = e.clientY - svg_rect.top;
 
-				if (typeof exception === 'object' && 'error' in exception) {
-					title = exception.error.title;
-					messages = exception.error.messages;
+					included_points = this.#findScatterPlotPoints(offsetX, offsetY);
+
+					if (included_points.length > 0) {
+						show_hint = true;
+					}
+
+					for (const highlighter_point of this.#svg.querySelectorAll('g.js-svg-highlight-group')) {
+						highlighter_point.setAttribute('transform', 'translate(-10, -10)');
+					}
+
+					included_points.forEach(point => {
+						const point_highlight = point.g.querySelector('g.js-svg-highlight-group');
+
+						point_highlight.setAttribute('transform', point.transform);
+					});
 				}
 				else {
-					title = t('Unexpected server error.');
+					const points = this.#findValues(offsetX);
+
+					let xy_point = false;
+					let points_total = points.length;
+
+					/**
+					 * Decide if one specific value or list of all matching Xs should be highlighted and either to
+					 * show or hide hintbox.
+					 */
+					points.forEach(point => {
+						if (!show_hint && point.v !== null) {
+							show_hint = true;
+						}
+
+						const tolerance = this.#getDataPointTolerance(point.g);
+
+						if (!xy_point && point.v !== null
+								&& (+point.x + tolerance) > e.offsetX && e.offsetX > (+point.x - tolerance)
+								&& (+point.y + tolerance) > e.offsetY && e.offsetY > (+point.y - tolerance)) {
+							xy_point = point;
+							points_total = 1;
+						}
+					});
+
+					points.forEach(point => {
+						const point_highlight = point.g.querySelector('.svg-point-highlight');
+						const include_point = point.v !== null && (xy_point === false || xy_point === point);
+
+						if (include_point) {
+							point_highlight.setAttribute('cx', point.x);
+							point_highlight.setAttribute('cy', point.y);
+
+							if (point.p > 0) {
+								point_highlight.setAttribute('cx', parseInt(point.x) + parseInt(point.p));
+							}
+
+							included_points.push(point);
+						}
+						else {
+							point_highlight.setAttribute('cx', -10);
+							point_highlight.setAttribute('cy', -10);
+						}
+					});
 				}
 
-				widget._updateMessages(messages, title);
+				if (show_hint) {
+					included_points.sort((p1, p2) => {
+						if (this.#graph_type === GRAPH_TYPE_SVG_GRAPH) {
+							return p1.y - p2.y;
+						}
+						else {
+							if (p1.x !== p2.x) {
+								return p2.x - p1.x;
+							}
 
-				return null;
-			})
-			.finally(() => {
-				widget._hidePreloader();
-			});
+							return p1.y - p2.y;
+						}
+					});
+
+					html = this.#getValuesHintboxHtml(included_points, offsetX);
+				}
+			}
+		}
+		else {
+			this.#hideHelper();
+		}
+
+		if (html !== null) {
+			this.#svg.dataset.hintboxContents = html.outerHTML;
+		}
+		else if (in_values_area || in_problem_area) {
+			this.#destroyHintbox();
+		}
+	}
+
+	// Find what problems matches in time to the given x.
+	#findProblems(graph, x) {
+		const problems = [];
+		const nodes = graph.querySelectorAll('[data-info]');
+
+		for (let i = 0, l = nodes.length; l > i; i++) {
+			const problem_start = +nodes[i].getAttribute('x');
+			const problem_width = +nodes[i].getAttribute('width');
+
+			if (x > problem_start && problem_start + problem_width > x) {
+				problems.push(JSON.parse(nodes[i].getAttribute('data-info')));
+			}
+		}
+
+		return problems;
 	}
 
 	// Read SVG nodes and find closest past value to the given x in each data set.
-	function findValues(graph, x) {
+	#findValues(x) {
 		const data_sets = [];
-		const nodes = graph.querySelectorAll('[data-set]');
+		const nodes = this.#svg.querySelectorAll('[data-set]');
 
 		for (let i = 0, l = nodes.length; l > i; i++) {
 			let px = -10;
@@ -305,7 +670,7 @@
 							return val.split(',');
 						});
 
-						if (polygons_nodes[c].getAttribute('data-px') == coord[0][0]) {
+						if (polygons_nodes[c].getAttribute('data-px') === coord[0][0]) {
 							if (x >= parseInt(coord[0][0])) {
 								points.push(polygons_nodes[c]);
 							}
@@ -366,8 +731,8 @@
 					labels = labels.join(',').split(',');
 
 					const direction = ED // Edge transforms 'd' attribute.
-							? direction_string.substr(1).replace(/([ML])\s(\d+)\s(\d+)/g, '$1$2\,$3').split(' ')
-							: direction_string.substr(1).split(' ');
+						? direction_string.substr(1).replace(/([ML])\s(\d+)\s(\d+)/g, '$1$2\,$3').split(' ')
+						: direction_string.substr(1).split(' ');
 
 					let index = direction.length;
 					let point_label;
@@ -394,8 +759,8 @@
 	}
 
 	// Find metric points that touches the given x and y.
-	function findScatterPlotPoints(graph, x, y) {
-		const nodes = graph.querySelectorAll('[data-set]');
+	#findScatterPlotPoints(x, y) {
+		const nodes = this.#svg.querySelectorAll('[data-set]');
 		const points = [];
 
 		for (let i = 0; i < nodes.length; i++) {
@@ -430,50 +795,25 @@
 		return points;
 	}
 
-	// Find what problems matches in time to the given x.
-	function findProblems(graph, x) {
-		const problems = [];
-		const nodes = graph.querySelectorAll('[data-info]');
+	#findTriggers(y) {
+		const triggers = [];
 
-		for (let i = 0, l = nodes.length; l > i; i++) {
-			const problem_start = +nodes[i].getAttribute('x');
-			const problem_width = +nodes[i].getAttribute('width');
+		for (const node of this.#svg.querySelectorAll('.svg-graph-simple-trigger line')) {
+			const trigger_y = parseInt(node.getAttribute('y1'));
 
-			if (x > problem_start && problem_start + problem_width > x) {
-				problems.push(JSON.parse(nodes[i].getAttribute('data-info')));
+			if (y < trigger_y + 10 && y > trigger_y - 10) {
+				triggers.push({
+					begin_position: parseInt(node.getAttribute('x1')),
+					end_position: parseInt(node.getAttribute('x2')),
+					color: node.parentElement.getAttribute('severity-color'),
+					constant: node.parentElement.getAttribute('constant'),
+					trigger: node.parentElement.getAttribute('description'),
+					elem: node.parentElement
+				});
 			}
 		}
 
-		return problems;
-	}
-
-	// Set position of vertical helper line.
-	function setHelperPosition(e, graph) {
-		const data = graph.data('options');
-
-		if (data.graph_type === GRAPH_TYPE_SVG_GRAPH) {
-			const helper = graph[0].querySelector('.svg-helper');
-
-			helper.setAttribute('x1', e.clientX - graph.offset().left);
-			helper.setAttribute('y1', data.dimY);
-			helper.setAttribute('x2', e.clientX - graph.offset().left);
-			helper.setAttribute('y2', data.dimY + data.dimH);
-		}
-		else {
-			const vertical_helper = graph[0].querySelector('.scatter-plot-vertical-helper');
-
-			vertical_helper.setAttribute('x1', e.clientX - graph.offset().left);
-			vertical_helper.setAttribute('y1', data.dimY);
-			vertical_helper.setAttribute('x2', e.clientX - graph.offset().left);
-			vertical_helper.setAttribute('y2', data.dimY + data.dimH);
-
-			const horizontal_helper = graph[0].querySelector('.scatter-plot-horizontal-helper');
-
-			horizontal_helper.setAttribute('x1', data.dimX);
-			horizontal_helper.setAttribute('y1', e.clientY - graph.offset().top);
-			horizontal_helper.setAttribute('x2', data.dimX + data.dimW);
-			horizontal_helper.setAttribute('y2', e.clientY - graph.offset().top);
-		}
+		return triggers;
 	}
 
 	/**
@@ -481,7 +821,7 @@
 	 * actual data point and adds N pixels to all sides. Then looks if mouse is in calculated area. N is calculated by
 	 * this function. Tolerance is used to find exactly matched point only.
 	 */
-	function getDataPointTolerance(ds) {
+	#getDataPointTolerance(ds) {
 		const data_tag = ds.querySelector(':not(.svg-point-highlight)');
 
 		if (data_tag.tagName.toLowerCase() === 'circle') {
@@ -492,7 +832,7 @@
 		}
 	}
 
-	function getProblemHintboxHtml(problems) {
+	#getProblemHintboxHtml(problems) {
 		const tbody = document.createElement('tbody');
 
 		for (const problem of problems) {
@@ -544,7 +884,7 @@
 		return hintbox_body;
 	}
 
-	function getSimpleTriggerHintboxHtml(triggers_areas) {
+	#getSimpleTriggerHintboxHtml(triggers_areas) {
 		const ul = document.createElement('ul');
 
 		for (const trigger_area of triggers_areas) {
@@ -567,7 +907,7 @@
 		return hintbox_body;
 	}
 
-	function getValuesHintboxHtml(included_points, offsetX, data) {
+	#getValuesHintboxHtml(included_points, offsetX) {
 		let rows_added = 0;
 
 		const hintbox_container = document.createElement('div');
@@ -575,7 +915,7 @@
 
 		const html = document.createElement('ul');
 
-		if (data.graph_type === GRAPH_TYPE_SCATTER_PLOT) {
+		if (this.#graph_type === GRAPH_TYPE_SCATTER_PLOT) {
 			for (const point of included_points) {
 				const time_from = new CDate(point.time_from * 1000);
 				const time_to = new CDate(point.time_to * 1000);
@@ -641,7 +981,9 @@
 			}
 
 			// Calculate time at mouse position.
-			const time = new CDate((data.timePeriod.from_ts + (offsetX - data.dimX) * data.spp) * 1000);
+			const time = new CDate(
+				(this.#time_period.from_ts + (offsetX - this.#dimX) * this.#spp) * 1000
+			);
 
 			const header = document.createElement('div');
 			header.classList.add('header');
@@ -655,348 +997,7 @@
 		return hintbox_container;
 	}
 
-	// Show problem or value hintbox.
-	function showHintbox(e, graph = e.data.graph) {
-		const data = graph.data('options');
-		const offsetX = e.clientX - graph.offset().left;
-		let html = null;
-		let in_x = false;
-		let in_values_area = false;
-		let in_problem_area = false;
-
-		if (data.boxing === true) {
-			hideHelper(graph);
-			return;
-		}
-
-		// Check if mouse in the horizontal area in which hintbox must be shown.
-		in_x = data.dimX <= offsetX && offsetX <= data.dimX + data.dimW;
-		in_problem_area = in_x && data.dimY + data.dimH <= e.offsetY && e.offsetY <= data.dimY + data.dimH + 15;
-		in_values_area = in_x && data.dimY <= e.offsetY && e.offsetY <= data.dimY + data.dimH;
-
-		// Show problems when mouse is in the 15px high area under the graph canvas.
-		if (data.showProblems && in_problem_area) {
-			hideHelper(graph);
-
-			const problems = findProblems(graph[0], e.offsetX);
-
-			if (problems.length > 0) {
-				html = getProblemHintboxHtml(problems);
-			}
-		}
-		// Show graph values or simple triggers if mouse is over the graph canvas.
-		else if (in_values_area) {
-			const triggers = data.showSimpleTriggers ? findTriggers(graph[0], e.offsetY) : [];
-
-			if (triggers.length > 0) {
-				hideHelper(graph);
-
-				const trigger_areas = triggers.filter(
-					t => !(t.begin_position > e.offsetX || e.offsetX > t.end_position)
-				);
-
-				if (trigger_areas.length > 0) {
-					html = getSimpleTriggerHintboxHtml(triggers);
-				}
-			}
-			else {
-				setHelperPosition(e, graph);
-
-				let included_points = [];
-				let show_hint = false;
-
-				if (data.graph_type === GRAPH_TYPE_SCATTER_PLOT) {
-					const offsetY = e.clientY - graph.offset().top;
-
-					included_points = findScatterPlotPoints(graph[0], offsetX, offsetY);
-
-					if (included_points.length > 0) {
-						show_hint = true;
-					}
-
-					for (const highlighter_point of graph[0].querySelectorAll('g.js-svg-highlight-group')) {
-						highlighter_point.setAttribute('transform', 'translate(-10, -10)');
-					}
-
-					included_points.forEach(point => {
-						const point_highlight = point.g.querySelector('g.js-svg-highlight-group');
-
-						point_highlight.setAttribute('transform', point.transform);
-					});
-				}
-				else {
-					const points = findValues(graph[0], offsetX);
-					let xy_point = false;
-					let points_total = points.length;
-
-					/**
-					 * Decide if one specific value or list of all matching Xs should be highlighted and either to
-					 * show or hide hintbox.
-					 */
-					points.forEach(point => {
-						if (!show_hint && point.v !== null) {
-							show_hint = true;
-						}
-
-						const tolerance = getDataPointTolerance(point.g);
-
-						if (!xy_point && point.v !== null
-								&& (+point.x + tolerance) > e.offsetX && e.offsetX > (+point.x - tolerance)
-								&& (+point.y + tolerance) > e.offsetY && e.offsetY > (+point.y - tolerance)) {
-							xy_point = point;
-							points_total = 1;
-						}
-					});
-
-					points.forEach(point => {
-						const point_highlight = point.g.querySelector('.svg-point-highlight');
-						const include_point = point.v !== null && (xy_point === false || xy_point === point);
-
-						if (include_point) {
-							point_highlight.setAttribute('cx', point.x);
-							point_highlight.setAttribute('cy', point.y);
-
-							if (point.p > 0) {
-								point_highlight.setAttribute('cx', parseInt(point.x) + parseInt(point.p));
-							}
-
-							included_points.push(point);
-						}
-						else {
-							point_highlight.setAttribute('cx', -10);
-							point_highlight.setAttribute('cy', -10);
-						}
-					});
-				}
-
-				if (show_hint) {
-					included_points.sort((p1, p2) => {
-						if (data.graph_type === GRAPH_TYPE_SVG_GRAPH) {
-							return p1.y - p2.y;
-						}
-						else {
-							if (p1.x !== p2.x) {
-								return p2.x - p1.x;
-							}
-
-							return p1.y - p2.y;
-						}
-					});
-
-					html = getValuesHintboxHtml(included_points, offsetX, data);
-				}
-			}
-		}
-		else {
-			hideHelper(graph);
-		}
-
-		if (html !== null) {
-			graph[0].dataset.hintboxContents = html.outerHTML;
-		}
-		else if (in_values_area || in_problem_area) {
-			destroyHintbox(graph);
-		}
+	#destroyHintbox() {
+		delete this.#svg.dataset.hintboxContents;
 	}
-
-	function findTriggers(graph, y) {
-		const triggers = [];
-
-		for (const node of graph.querySelectorAll('.svg-graph-simple-trigger line')) {
-			const trigger_y = parseInt(node.getAttribute('y1'));
-
-			if (y < trigger_y + 10 && y > trigger_y - 10) {
-				triggers.push({
-					begin_position: parseInt(node.getAttribute('x1')),
-					end_position: parseInt(node.getAttribute('x2')),
-					color: node.parentElement.getAttribute('severity-color'),
-					constant: node.parentElement.getAttribute('constant'),
-					trigger: node.parentElement.getAttribute('description'),
-					elem: node.parentElement
-				});
-			}
-		}
-
-		return triggers;
-	}
-
-	const methods = {
-		init: function(widget) {
-			this.each(function() {
-				jQuery(widget._svg)
-					.data('options', {
-						dimX: widget._svg_options.dims.x,
-						dimY: widget._svg_options.dims.y,
-						dimW: widget._svg_options.dims.w,
-						dimH: widget._svg_options.dims.h,
-						showProblems: widget._svg_options.show_problems,
-						showSimpleTriggers: widget._svg_options.show_simple_triggers,
-						spp: widget._svg_options.spp || null,
-						timePeriod: widget._svg_options.time_period,
-						minPeriod: widget._svg_options.min_period,
-						boxing: false,
-						graph_type: widget._svg_options.graph_type
-					})
-					.data('widget', widget)
-					.data('is_static_hintbox_opened', false)
-					.attr('unselectable', 'on')
-					.css('user-select', 'none');
-
-				if (widget._svg_options.sbox) {
-					dropDocumentListeners(null, jQuery(widget._svg));
-				}
-			});
-		},
-		activate: function () {
-			const widget = jQuery(this).data('widget');
-			const graph = jQuery(widget._svg);
-			const data = graph.data('options');
-
-			graph[0].dataset.hintbox = '1';
-			graph[0].dataset.hintboxStatic = '1';
-			graph[0].dataset.hintboxDelay = '0';
-			graph[0].dataset.hintboxStaticReopenOnClick = '1';
-
-			graph
-				.on('mousemove', (e) => {
-					showHintbox(e, graph);
-				})
-				.on('mouseleave', function() {
-					destroyHintbox(graph);
-					hideHelper(graph);
-				})
-				.on('selectstart', false)
-				.on('onShowStaticHint', e => onStaticHintboxOpen(e, graph))
-				.on('onDeleteStaticHint', e => onStaticHintboxClose(e, graph));
-
-			if (widget._svg_options.sbox) {
-				graph
-					.on('dblclick', function() {
-						hintBox.hideHint(graph[0], true);
-
-						const widget = graph.data('widget');
-
-						updateTimeSelector(widget, {
-							method: 'zoomout',
-							from: data.timePeriod.from,
-							to: data.timePeriod.to,
-						})
-							.then((time_period) => {
-								if (time_period === null) {
-									return;
-								}
-
-								widget._startUpdating();
-								widget.feedback({time_period});
-								widget.broadcast({
-									[CWidgetsData.DATA_TYPE_TIME_PERIOD]: time_period
-								});
-							});
-
-						return false;
-					})
-					.on('mousedown', {graph}, startSBoxDrag);
-			}
-		},
-		deactivate: function (e) {
-			const widget = jQuery(this).data('widget');
-			const graph = jQuery(widget._svg);
-
-			delete graph[0].dataset.hintbox;
-			delete graph[0].dataset.hintboxStatic;
-			delete graph[0].dataset.hintboxDelay;
-			delete graph[0].dataset.hintboxStaticReopenOnClick;
-
-			destroySBox(e, graph);
-			graph.off('mousemove mouseleave dblclick mousedown selectstart onShowStaticHint onDeleteStaticHint');
-		},
-	};
-
-	function onStaticHintboxOpen(e, graph) {
-		graph.data('is_static_hintbox_opened', true);
-
-		const hintbox = graph[0].hintBoxItem[0];
-		const widget = graph.data('widget');
-		const data = graph.data('options');
-		const hintbox_items = hintbox.querySelectorAll('.has-broadcast-data');
-
-		for (const item of hintbox_items) {
-			const {itemid, ds} = item.dataset;
-
-			item.addEventListener('click', () => {
-				widget.updateItemBroadcast(itemid, ds);
-				markSelectedHintboxItems(hintbox, widget);
-			});
-
-			if (data.graph_type === GRAPH_TYPE_SVG_GRAPH) {
-				item.addEventListener('mouseenter', () => {
-					setHighlighting(itemid, ds, graph);
-				});
-
-				item.addEventListener('mouseleave', () => {
-					resetHighlighting(hintbox, graph);
-				});
-			}
-		}
-
-		markSelectedHintboxItems(hintbox, widget);
-
-		if (data.graph_type === GRAPH_TYPE_SVG_GRAPH) {
-			resetHighlighting(hintbox, graph);
-		}
-	}
-
-	function onStaticHintboxClose(e, graph) {
-		graph.data('is_static_hintbox_opened', false);
-
-		removeHighlighting(graph);
-	}
-
-	function markSelectedHintboxItems(hintbox, widget) {
-		const {itemid, ds} = widget.getItemBroadcasting();
-
-		for (const item of hintbox.querySelectorAll('.has-broadcast-data')) {
-			item.classList.toggle('selected', item.dataset.itemid == itemid && item.dataset.ds == ds);
-		}
-	}
-
-	function setHighlighting(itemid, ds, graph) {
-		removeHighlighting(graph);
-
-		const graph_element = graph[0].querySelector(`[data-itemid="${itemid}"][data-ds="${ds}"]`);
-
-		if (graph_element) {
-			graph_element.classList.add('highlighted');
-			graph[0].classList.add('highlighted');
-		}
-	}
-
-	function resetHighlighting(hintbox, graph) {
-		const selected_item = hintbox.querySelector('.has-broadcast-data.selected');
-
-		if (selected_item) {
-			const {itemid, ds} = selected_item.dataset;
-
-			setHighlighting(itemid, ds, graph);
-		}
-		else {
-			removeHighlighting(graph);
-		}
-	}
-
-	function removeHighlighting(graph) {
-		for (const graph_element of graph[0].querySelectorAll('.highlighted')) {
-			graph_element.classList.remove('highlighted');
-		}
-
-		graph[0].classList.remove('highlighted');
-	}
-
-	jQuery.fn.svggraph = function(method) {
-		if (methods[method]) {
-			return methods[method].apply(this, Array.prototype.slice.call(arguments, 1));
-		}
-
-		return methods.init.apply(this, arguments);
-	};
-})(jQuery);
+}

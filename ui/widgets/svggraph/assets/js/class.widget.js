@@ -17,21 +17,26 @@ class CWidgetSvgGraph extends CWidget {
 
 	static DATASET_TYPE_SINGLE_ITEM = 0;
 
+	/**
+	 * @type {CSvgGraph|null}
+	 */
+	#graph = null;
+
 	#selected_itemid = null;
 	#selected_ds = null;
+
 	#is_default_selected_itemid = true;
 
 	onInitialize() {
 		this._has_contents = false;
-		this._svg_options = {};
 	}
 
 	onActivate() {
-		this._activateGraph();
+		this.#activateGraph();
 	}
 
 	onDeactivate() {
-		this._deactivateGraph();
+		this.#deactivateGraph();
 	}
 
 	onResize() {
@@ -114,7 +119,7 @@ class CWidgetSvgGraph extends CWidget {
 				this.updateItemBroadcast(itemid, ds, true);
 			}
 
-			this._initGraph({
+			this.#initGraph({
 				sbox: false,
 				show_problems: true,
 				show_simple_triggers: true,
@@ -130,7 +135,7 @@ class CWidgetSvgGraph extends CWidget {
 
 	onClearContents() {
 		if (this._has_contents) {
-			this._deactivateGraph();
+			this.#deactivateGraph();
 
 			this._has_contents = false;
 		}
@@ -152,24 +157,63 @@ class CWidgetSvgGraph extends CWidget {
 		return {itemid: this.#selected_itemid, ds: this.#selected_ds}
 	}
 
-	_initGraph(options) {
-		this._svg_options = options;
-		this._svg = this._body.querySelector('svg');
-		jQuery(this._svg).svggraph(this);
+	updateTimeSelector(data) {
+		this._schedulePreloader();
 
-		this._activateGraph();
+		const curl = new Curl('zabbix.php');
+
+		curl.setArgument('action', 'timeselector.calc');
+
+		fetch(curl.getUrl(), {
+			method: 'POST',
+			headers: {'Content-Type': 'application/json'},
+			body: JSON.stringify(data)
+		})
+			.then(response => response.json())
+			.then(time_period => {
+				if ('error' in time_period) {
+					throw {error: time_period.error};
+				}
+
+				if ('has_fields_errors' in time_period) {
+					throw new Error();
+				}
+
+				return time_period;
+			})
+			.then(time_period => {
+				if (time_period === null) {
+					return;
+				}
+
+				this._startUpdating();
+				this.feedback({time_period});
+				this.broadcast({
+					[CWidgetsData.DATA_TYPE_TIME_PERIOD]: time_period
+				});
+			})
+			.catch((exception) => {
+				let title;
+				let messages = [];
+
+				if (typeof exception === 'object' && 'error' in exception) {
+					title = exception.error.title;
+					messages = exception.error.messages;
+				} else {
+					title = t('Unexpected server error.');
+				}
+
+				this._updateMessages(messages, title);
+
+				return null;
+			})
+			.finally(() => {
+				this._hidePreloader();
+			});
 	}
 
-	_activateGraph() {
-		if (this._has_contents) {
-			jQuery(this._svg).svggraph('activate');
-		}
-	}
-
-	_deactivateGraph() {
-		if (this._has_contents) {
-			jQuery(this._svg).svggraph('deactivate');
-		}
+	getGraph() {
+		return this.#graph;
 	}
 
 	getActionsContextMenu({can_copy_widget, can_paste_widget}) {
@@ -211,5 +255,23 @@ class CWidgetSvgGraph extends CWidget {
 
 	hasPadding() {
 		return true;
+	}
+
+	#initGraph(options) {
+		this.#graph = new CSvgGraph(this._body.querySelector('svg'), this, options);
+
+		this.#activateGraph();
+	}
+
+	#activateGraph() {
+		if (this._has_contents && this.#graph !== null) {
+			this.#graph.activate();
+		}
+	}
+
+	#deactivateGraph() {
+		if (this._has_contents && this.#graph !== null) {
+			this.#graph.deactivate();
+		}
 	}
 }

@@ -17,8 +17,14 @@ class CWidgetScatterPlot extends CWidget {
 
 	static DATASET_TYPE_SINGLE_ITEM = 0;
 
+	/**
+	 * @type {CSvgGraph|null}
+	 */
+	#graph = null;
+
 	#selected_itemid = null;
 	#selected_ds = null;
+
 	#is_default_selected_itemid = true;
 
 	onInitialize() {
@@ -27,11 +33,11 @@ class CWidgetScatterPlot extends CWidget {
 	}
 
 	onActivate() {
-		this._activateGraph();
+		this.#activateGraph();
 	}
 
 	onDeactivate() {
-		this._deactivateGraph();
+		this.#deactivateGraph();
 	}
 
 	onResize() {
@@ -114,7 +120,7 @@ class CWidgetScatterPlot extends CWidget {
 				this.updateItemBroadcast(itemid, ds, true);
 			}
 
-			this._initGraph({
+			this.#initGraph({
 				sbox: false,
 				graph_type: GRAPH_TYPE_SCATTER_PLOT,
 				min_period: 60,
@@ -144,29 +150,9 @@ class CWidgetScatterPlot extends CWidget {
 
 	onClearContents() {
 		if (this._has_contents) {
-			this._deactivateGraph();
+			this.#deactivateGraph();
 
 			this._has_contents = false;
-		}
-	}
-
-	_initGraph(options) {
-		this._svg_options = options;
-		this._svg = this._body.querySelector('svg');
-		jQuery(this._svg).svggraph(this);
-
-		this._activateGraph();
-	}
-
-	_activateGraph() {
-		if (this._has_contents) {
-			jQuery(this._svg).svggraph('activate');
-		}
-	}
-
-	_deactivateGraph() {
-		if (this._has_contents) {
-			jQuery(this._svg).svggraph('deactivate');
 		}
 	}
 
@@ -209,5 +195,23 @@ class CWidgetScatterPlot extends CWidget {
 
 	hasPadding() {
 		return true;
+	}
+
+	#initGraph(options) {
+		this.#graph = new CSvgGraph(this._body.querySelector('svg'), this, options);
+
+		this.#activateGraph();
+	}
+
+	#activateGraph() {
+		if (this._has_contents && this.#graph !== null) {
+			this.#graph.activate();
+		}
+	}
+
+	#deactivateGraph() {
+		if (this._has_contents && this.#graph !== null) {
+			this.#graph.deactivate();
+		}
 	}
 }
