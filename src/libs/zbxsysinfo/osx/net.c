@@ -439,9 +439,19 @@ int	net_if_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 		zbx_json_addobject(&j, NULL);
 		zbx_json_addstring(&j, "name", ifa->ifa_name, ZBX_JSON_TYPE_STRING);
 		zbx_get_link_flags(ifa->ifa_name, &j);
-		zbx_json_addint64(&j, "sent", ifmd.ifmd_data.ifi_obytes);
-		zbx_json_addint64(&j, "received", ifmd.ifmd_data.ifi_ibytes);
-
+		zbx_json_addobject(&j, "in");
+		zbx_json_adduint64(&j, "bytes", ifmd.ifmd_data.ifi_ibytes);
+		zbx_json_adduint64(&j, "packets", ifmd.ifmd_data.ifi_ipackets);
+		zbx_json_adduint64(&j, "errors", ifmd.ifmd_data.ifi_ierrors);
+		zbx_json_adduint64(&j, "dropped", ifmd.ifmd_data.ifi_iqdrops);
+		
+		zbx_json_close(&j);
+		zbx_json_addobject(&j, "out");
+		zbx_json_adduint64(&j, "bytes", ifmd.ifmd_data.ifi_obytes);
+		zbx_json_adduint64(&j, "packets", ifmd.ifmd_data.ifi_opackets);
+		zbx_json_adduint64(&j, "errors", ifmd.ifmd_data.ifi_oerrors);
+		zbx_json_adduint64(&j, "collisions", ifmd.ifmd_data.ifi_collisions);
+		zbx_json_close(&j);
 		zbx_json_addint64(&j, "type", ((struct sockaddr_dl *)ifa->ifa_addr)->sdl_type);
 
 		mac = (unsigned char *)LLADDR((struct sockaddr_dl *)ifa->ifa_addr);
