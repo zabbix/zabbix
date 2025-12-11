@@ -1653,7 +1653,7 @@ void	zbx_sync_history_cache_server(const zbx_events_funcs_t *events_cbs, zbx_ipc
 					zbx_vector_escalation_new_ptr_create(&escalations);
 
 					start_time = zbx_time();
-					zbx_db_begin();
+					zbx_db_begin_deferred();
 
 					recalculate_triggers(history, history_num, &itemids, items, errcodes,
 							&trigger_timers, events_cbs->add_event_cb, &trigger_diff,
