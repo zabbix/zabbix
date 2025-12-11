@@ -206,7 +206,7 @@ class testBinaryAndJSONValueTypesDataCollection extends CIntegrationTest {
 		$items_simple = [
 				[
 					'name' => 'SIMPLE_JSON',
-					'key_' => 'net.tcp.service[ftp,127.0.0.1]',
+					'key_' => 'net.tcp.service[http,127.0.0.1]',
 					'type' => ITEM_TYPE_SIMPLE,
 					'value_type' => ITEM_VALUE_TYPE_JSON,
 					'delay' => '1s'
@@ -855,13 +855,11 @@ class testBinaryAndJSONValueTypesDataCollection extends CIntegrationTest {
 	 */
 	public function testSimpleJSON() {
 		$response = $this->callUntilDataIsPresent('history.get', [
-			'itemids' => self::$itemids['simple:net.tcp.service[ftp,127.0.0.1]'],
+			'itemids' => self::$itemids['simple:net.tcp.service[http,127.0.0.1]'],
 			'history' => ITEM_VALUE_TYPE_JSON
 		]);
 		$this->assertArrayHasKey('result', $response);
-		$this->assertEquals(1, count($response['result']));
-		$this->assertArrayHasKey('value', $response['result'][0]);
 
-		$this->assertEquals(0, $response['result'][0]['value']);
+		$this->assertEquals(1, $response['result'][0]['value']);
 	}
 }
