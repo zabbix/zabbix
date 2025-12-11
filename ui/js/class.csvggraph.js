@@ -101,28 +101,28 @@ class CSvgGraph {
 	#end;
 
 	#event_listeners = {
-		mousemove: e => this.#showHintbox(e),
-		mouseleave: () => {
+		mouseMove: e => this.#showHintbox(e),
+		mouseLeave: () => {
 			this.#destroyHintbox();
 			this.#hideHelper();
 		},
 		onShowStaticHint: () => this.#onStaticHintboxOpen(),
 		onHideStaticHint: () => this.#onStaticHintboxClose(),
-		dblclick: () => this.#zoomOutTime(),
-		mousedown: e => this.#startSBoxDrag(e)
+		dblClick: () => this.#zoomOutTime(),
+		mouseDown: e => this.#startSBoxDrag(e)
 	};
 
 	#sbox_event_listeners = {
-		selectstart: e => {
+		selectStart: e => {
 			e.preventDefault();
 		},
-		keydown: e => {
+		keyDown: e => {
 			if (e.keyCode === 27) {
 				this.#destroySBox(e);
 			}
 		},
-		mouseup: e => this.#endSBoxDrag(e),
-		mousemove: e => this.#moveSBoxMouse(e)
+		mouseUp: e => this.#endSBoxDrag(e),
+		mouseMove: e => this.#moveSBoxMouse(e)
 	};
 
 	constructor(svg, widget, options) {
@@ -158,14 +158,14 @@ class CSvgGraph {
 		this.#svg.dataset.hintboxDelay = '0';
 		this.#svg.dataset.hintboxStaticReopenOnClick = '1';
 
-		this.#svg.addEventListener('mousemove', this.#event_listeners.mousemove);
-		this.#svg.addEventListener('mouseleave', this.#event_listeners.mouseleave);
+		this.#svg.addEventListener('mousemove', this.#event_listeners.mouseMove);
+		this.#svg.addEventListener('mouseleave', this.#event_listeners.mouseLeave);
 		this.#svg.addEventListener('onShowStaticHint', this.#event_listeners.onShowStaticHint);
 		this.#svg.addEventListener('onDeleteStaticHint', this.#event_listeners.onHideStaticHint);
 
 		if (this.#sbox) {
-			this.#svg.addEventListener('dblclick', this.#event_listeners.dblclick);
-			this.#svg.addEventListener('mousedown', this.#event_listeners.mousedown);
+			this.#svg.addEventListener('dblclick', this.#event_listeners.dblClick);
+			this.#svg.addEventListener('mousedown', this.#event_listeners.mouseDown);
 		}
 	}
 
@@ -175,16 +175,16 @@ class CSvgGraph {
 		delete this.#svg.dataset.hintboxDelay;
 		delete this.#svg.dataset.hintboxStaticReopenOnClick;
 
-		this.#svg.removeEventListener('mousemove', this.#event_listeners.mousemove);
-		this.#svg.removeEventListener('mouseleave', this.#event_listeners.mouseleave);
+		this.#svg.removeEventListener('mousemove', this.#event_listeners.mouseMove);
+		this.#svg.removeEventListener('mouseleave', this.#event_listeners.mouseLeave);
 		this.#svg.removeEventListener('onShowStaticHint', this.#event_listeners.onShowStaticHint);
 		this.#svg.removeEventListener('onDeleteStaticHint', this.#event_listeners.onHideStaticHint);
 
 		if (this.#sbox) {
 			this.#destroySBox(e);
 
-			this.#svg.removeEventListener('dblclick', this.#event_listeners.dblclick);
-			this.#svg.removeEventListener('mousedown', this.#event_listeners.mousedown);
+			this.#svg.removeEventListener('dblclick', this.#event_listeners.dblClick);
+			this.#svg.removeEventListener('mousedown', this.#event_listeners.mouseDown);
 		}
 	}
 
@@ -285,11 +285,11 @@ class CSvgGraph {
 		}
 
 		if (widgets_boxing === 0 || (e && 'keyCode' in e && e.keyCode === 27)) {
-			document.removeEventListener('selectstart', this.#sbox_event_listeners.selectstart);
-			document.removeEventListener('keydown', this.#sbox_event_listeners.keydown);
-			document.removeEventListener('mouseup', this.#sbox_event_listeners.mouseup);
+			document.removeEventListener('selectstart', this.#sbox_event_listeners.selectStart);
+			document.removeEventListener('keydown', this.#sbox_event_listeners.keyDown);
+			document.removeEventListener('mouseup', this.#sbox_event_listeners.mouseUp);
 
-			this.#svg.removeEventListener('mousemove', this.#sbox_event_listeners.mousemove);
+			this.#svg.removeEventListener('mousemove', this.#sbox_event_listeners.mouseMove);
 		}
 	}
 
@@ -301,11 +301,11 @@ class CSvgGraph {
 
 		if (this.#dimX <= offsetX && offsetX <= this.#dimX + this.#dimW && this.#dimY <= e.offsetY
 				&& e.offsetY <= this.#dimY + this.#dimH) {
-			document.addEventListener('selectstart', this.#sbox_event_listeners.selectstart);
-			document.addEventListener('keydown', this.#sbox_event_listeners.keydown);
-			document.addEventListener('mouseup', this.#sbox_event_listeners.mouseup);
+			document.addEventListener('selectstart', this.#sbox_event_listeners.selectStart);
+			document.addEventListener('keydown', this.#sbox_event_listeners.keyDown);
+			document.addEventListener('mouseup', this.#sbox_event_listeners.mouseUp);
 
-			this.#svg.addEventListener('mousemove', this.#sbox_event_listeners.mousemove);
+			this.#svg.addEventListener('mousemove', this.#sbox_event_listeners.mouseMove);
 
 			this.#start = offsetX - this.#dimX;
 		}
