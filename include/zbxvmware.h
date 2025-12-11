@@ -260,6 +260,8 @@ typedef struct
 	char	*time;
 	int	enabled;
 	int	acknowledged;
+	char	*entity_id;
+	char	*entity_type;
 }
 zbx_vmware_alarm_t;
 ZBX_PTR_VECTOR_DECL(vmware_alarm_ptr, zbx_vmware_alarm_t *)

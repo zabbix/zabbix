@@ -834,6 +834,8 @@ static void	vmware_alarm_free(zbx_vmware_alarm_t *alarm)
 	zbx_str_free(alarm->description);
 	zbx_str_free(alarm->overall_status);
 	zbx_str_free(alarm->time);
+	zbx_str_free(alarm->entity_id);
+	zbx_str_free(alarm->entity_type);
 	zbx_free(alarm);
 }
 
@@ -1387,6 +1389,7 @@ int	vmware_service_get_alarms_data(const char *func_parent, const zbx_vmware_ser
 		int				j;
 		zbx_vmware_alarm_t		*alarm;
 		zbx_vmware_alarm_details_t	detail_cmp;
+		xmlNode				*entity;
 
 		if (NULL == (value = zbx_xml_node_read_value(xdoc, nodeset->nodeTab[i], ZBX_XNN("alarm"))))
 		{
@@ -1435,6 +1438,17 @@ int	vmware_service_get_alarms_data(const char *func_parent, const zbx_vmware_ser
 		value = zbx_xml_node_read_value(xdoc, nodeset->nodeTab[i], ZBX_XNN("acknowledged"));
 		alarm->acknowledged = (NULL != value && 0 == strcmp(value, "true") ? 1 : 0);
 		zbx_free(value);
+
+		if (NULL != (entity = zbx_xml_node_get(xdoc, nodeset->nodeTab[i], ZBX_XNN("entity"))))
+		{
+			alarm->entity_id = zbx_xml_node_read_value(xdoc, entity, ZBX_XNN("."));
+			alarm->entity_type = zbx_xml_node_read_prop(entity, "type");
+		}
+		else
+		{
+			alarm->entity_id = NULL;
+			alarm->entity_type = NULL;
+		}
 
 		zbx_vector_vmware_alarm_ptr_append(alarms_data->alarms, alarm);
 		zbx_vector_str_append(ids, zbx_strdup(NULL, alarm->key));
