@@ -92,21 +92,23 @@ window.oauth_edit_popup = new class {
 			e.target.focus();
 		});
 
-		if (this.form.querySelector('button[name="client_secret_button"]') !== null) {
-			this.form.querySelector('button[name="client_secret_button"]')
-				.addEventListener('click', () => this.#showClientSecretField());
+		const client_secret_button = this.form.querySelector('[name="client_secret_button"]');
 
-			this.form.querySelector('[name="token_url"]')
-				?.addEventListener('input', () => this.#showClientSecretWithWarning());
+		if (client_secret_button !== null) {
+			client_secret_button.addEventListener('click', () => this.#showClientSecretField());
 
-			this.form.querySelector('#oauth-token-parameters-table')
-				?.addEventListener('input', () => this.#showClientSecretWithWarning());
+			if (this.is_advanced_form) {
+				const token_url = this.form.querySelector('[name="token_url"]');
+				token_url.addEventListener('input', () => this.#showClientSecretWithWarning());
 
-			this.form.querySelector('#oauth-token-parameters-table')?.addEventListener('click', e => {
-				if (e.target.matches('.element-table-remove') || e.target.matches('.element-table-add')) {
-					this.#showClientSecretWithWarning();
-				}
-			});
+				const token_parameters_table = this.form.querySelector('#oauth-token-parameters-table');
+				token_parameters_table.addEventListener('input', () => this.#showClientSecretWithWarning());
+				token_parameters_table.addEventListener('click', e => {
+					if (e.target.matches('.element-table-remove') || e.target.matches('.element-table-add')) {
+						this.#showClientSecretWithWarning();
+					}
+				});
+			}
 		}
 	}
 
@@ -116,13 +118,11 @@ window.oauth_edit_popup = new class {
 	}
 
 	#showClientSecretField() {
-		this.form.querySelector('button[name="client_secret_button"]')?.remove();
-		const input_element = this.form.querySelector('[name="client_secret"]');
+		this.form.querySelector('[name="client_secret_button"]')?.remove();
 
-		if (input_element !== null) {
-			input_element.style.display = '';
-			input_element.removeAttribute('disabled');
-		}
+		const input_element = this.form.querySelector('[name="client_secret"]');
+		input_element.style.display = '';
+		input_element.disabled = false;
 	}
 
 	#initDynamicRows(url_selector, parameters_selector, options) {
