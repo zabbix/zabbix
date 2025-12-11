@@ -174,7 +174,7 @@ class testFormUser extends CWebTest {
 						'id:autologout_visible' => false,
 						'id:autologout' => '15m',
 						'Refresh' => '30s',
-						'Rows per page' => '100',
+						'Rows per page' => '150',
 						'URL (after login)' => ''
 					],
 					'disabled' => ['id:autologout', 'button:Delete'],
