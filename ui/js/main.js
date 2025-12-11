@@ -472,6 +472,7 @@ const hintBox = {
 
 			const draggable_header = document.createElement('div');
 			draggable_header.classList.add('hintbox-draggable-handle');
+			draggable_header.addEventListener('mousedown', hintBox.drag_listeners.dragStart);
 
 			const close_link = document.createElement('button');
 			close_link.setAttribute('title', t('S_CLOSE'));
@@ -625,9 +626,6 @@ const hintBox = {
 		if (target.isStatic) {
 			Overlay.prototype.recoverFocus.call({'$dialogue': target.hintBoxItem});
 			Overlay.prototype.containFocus.call({'$dialogue': target.hintBoxItem});
-
-			target.hintBoxItem[0].querySelector('.hintbox-draggable-handle')
-				.addEventListener('mousedown', hintBox.drag_listeners.dragStart);
 
 			target.dispatchEvent(new CustomEvent('onShowStaticHint'));
 		}
