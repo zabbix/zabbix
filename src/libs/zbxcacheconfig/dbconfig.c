@@ -9686,7 +9686,6 @@ static void	DCget_agent_item(zbx_dc_agent_item_t *dst_item, const ZBX_DC_ITEM *s
 	const ZBX_DC_INTERFACE		*dc_interface;
 
 	dst_item->preprocessing = zbx_dc_item_requires_preprocessing(src_item);
-	dst_item->type = src_item->type;
 	dst_item->value_type = src_item->value_type;
 
 	dst_item->state = src_item->state;
@@ -9750,6 +9749,19 @@ void	zbx_dc_config_clean_items(zbx_dc_item_t *items, int *errcodes, size_t num)
 				zbx_free(items[i].formula_bin);
 				break;
 		}
+
+		zbx_free(items[i].delay);
+	}
+}
+
+void	zbx_dc_config_clean_agent_items(zbx_dc_agent_item_t *items, int *errcodes, size_t num)
+{
+	size_t	i;
+
+	for (i = 0; i < num; i++)
+	{
+		if (NULL != errcodes && SUCCEED != errcodes[i])
+			continue;
 
 		zbx_free(items[i].delay);
 	}

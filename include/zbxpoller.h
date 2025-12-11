@@ -66,6 +66,8 @@ ZBX_THREAD_ENTRY(zbx_async_poller_thread, args);
 
 void	zbx_prepare_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESULT *results,
 		unsigned char expand_macros);
+void	zbx_prepare_agent_items(zbx_dc_agent_item_t *items, int *errcodes, int num, AGENT_RESULT *results,
+		unsigned char expand_macros);
 void	zbx_check_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESULT *results,
 		zbx_vector_agent_result_ptr_t *add_results, unsigned char poller_type,
 		const zbx_config_comms_args_t *config_comms, int config_startup_time, unsigned char program_type,
@@ -74,6 +76,7 @@ void	zbx_check_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESULT 
 		zbx_get_value_internal_ext_f get_value_internal_ext_cb, const char *config_ssh_key_location,
 		const char *config_webdriver_url);
 void	zbx_clean_items(zbx_dc_item_t *items, int num, AGENT_RESULT *results);
+void	zbx_clean_agent_items(zbx_dc_agent_item_t *items, int num, AGENT_RESULT *results);
 void	zbx_free_agent_result_ptr(AGENT_RESULT *result);
 
 void	zbx_init_library_mt_snmp(const char *progname);
@@ -135,7 +138,7 @@ zbx_agent_context;
 
 void	zbx_async_check_agent_clean(zbx_agent_context *agent_context);
 
-int	zbx_async_check_agent(zbx_dc_item_t *item, AGENT_RESULT *result,
+int	zbx_async_check_agent(zbx_dc_agent_item_t *item, AGENT_RESULT *result,
 		zbx_async_task_process_result_cb_t async_task_process_result_agent_cb,
 		void *arg, void *arg_action, struct event_base *base, zbx_channel_t *channel,
 		struct evdns_base *dnsbase, const char *config_source_ip,

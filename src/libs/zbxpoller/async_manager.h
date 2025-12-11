@@ -22,12 +22,20 @@
 
 typedef void (*zbx_async_notify_cb_t)(void *data);
 
+/* TODO: should this be in this file? */
+typedef union {
+	zbx_dc_item_t 		*generic_items;
+	zbx_dc_agent_item_t 	*agent_items;
+	void 			*any;
+} zbx_items_ptr_union;
+
 typedef struct
 {
-	zbx_dc_item_t	*items;
-	AGENT_RESULT	*results;
-	int		*errcodes;
-	int		num;
+	unsigned char 		poller_type;
+	zbx_items_ptr_union	items;
+	AGENT_RESULT		*results;
+	int			*errcodes;
+	int			num;
 }
 zbx_poller_item_t;
 

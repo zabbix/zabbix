@@ -732,6 +732,75 @@ void	zbx_prepare_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESUL
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
+/* TODO: should this be in this file? */
+void	zbx_prepare_agent_items(zbx_dc_agent_item_t *items, int *errcodes, int num, AGENT_RESULT *results,
+		unsigned char expand_macros)
+{
+	char			error[ZBX_ITEM_ERROR_LEN_MAX], *timeout = NULL;
+	zbx_dc_um_handle_t	*um_handle, *um_handle_secure;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() num:%d", __func__, num);
+
+	if (ZBX_MACRO_EXPAND_YES == expand_macros)
+	{
+		um_handle = zbx_dc_open_user_macros_masked();
+		um_handle_secure = zbx_dc_open_user_macros_secure();
+	}
+
+	for (int i = 0; i < num; i++)
+	{
+		zbx_init_agent_result(&results[i]);
+		errcodes[i] = SUCCEED;
+
+		if (ZBX_MACRO_EXPAND_YES == expand_macros)
+		{
+			ZBX_STRDUP(items[i].key, items[i].key_orig);
+			if (SUCCEED != zbx_substitute_item_key_params(&items[i].key, error, sizeof(error),
+					zbx_item_key_subst_cb, um_handle_secure, &items[i]))
+			{
+				SET_MSG_RESULT(&results[i], zbx_strdup(NULL, error));
+				errcodes[i] = CONFIG_ERROR;
+				continue;
+			}
+		}
+
+		if (FAIL == zbx_is_ushort(items[i].interface.port_orig, &items[i].interface.port))
+		{
+			SET_MSG_RESULT(&results[i], zbx_dsprintf(NULL, "Invalid port number [%s]",
+						items[i].interface.port_orig));
+			errcodes[i] = CONFIG_ERROR;
+			continue;
+		}
+
+		ZBX_STRDUP(timeout, items[i].timeout_orig);
+
+		if (ZBX_MACRO_EXPAND_YES == expand_macros)
+			zbx_dc_expand_user_and_func_macros(um_handle, &timeout, &items[i].host.hostid, 1, NULL);
+
+		if (NULL != timeout)
+		{
+			int	timeout_sec = 0;
+
+			if (FAIL == zbx_validate_item_timeout(timeout, &timeout_sec, error, sizeof(error)))
+			{
+				SET_MSG_RESULT(&results[i], zbx_strdup(NULL, error));
+				errcodes[i] = CONFIG_ERROR;
+			}
+			else
+				items[i].timeout = timeout_sec;
+		}
+		zbx_free(timeout);
+	}
+
+	if (ZBX_MACRO_EXPAND_YES == expand_macros)
+	{
+		zbx_dc_close_user_macros(um_handle_secure);
+		zbx_dc_close_user_macros(um_handle);
+	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+}
+
 /* Actually this could be called by trapper, without poller being initialized, */
 /* so cannot call poller_get_progname(), need progname to be passed directly. */
 void	zbx_check_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESULT *results,
@@ -834,6 +903,17 @@ void	zbx_clean_items(zbx_dc_item_t *items, int num, AGENT_RESULT *results)
 		zbx_free_agent_result(&results[i]);
 	}
 }
+
+/* TODO: should this be in this file? */
+void	zbx_clean_agent_items(zbx_dc_agent_item_t *items, int num, AGENT_RESULT *results)
+{
+	for (int i = 0; i < num; i++)
+	{
+		zbx_free(items[i].key);
+		zbx_free_agent_result(&results[i]);
+	}
+}
+
 
 ZBX_PTR_VECTOR_IMPL(agent_result_ptr, AGENT_RESULT*)
 

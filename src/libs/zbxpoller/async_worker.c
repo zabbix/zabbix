@@ -37,22 +37,41 @@ static zbx_poller_item_t	*dc_config_async_get_poller_items(zbx_uint64_t processi
 	zbx_poller_item_t	*poller_item;
 
 	poller_item = zbx_malloc(NULL, sizeof(zbx_poller_item_t));
-	poller_item->items = NULL;
+	poller_item->items.any = NULL;
+	poller_item->poller_type = poller_type;
 
-	poller_item->num = zbx_dc_config_get_poller_items(poller_type, config_timeout,
-			processing_num, processing_limit, &poller_item->items);
+	switch (poller_type) {
+		case ZBX_POLLER_TYPE_AGENT:
+			poller_item->num = zbx_dc_config_get_agent_poller_items(config_timeout,
+					processing_num, processing_limit, &poller_item->items.agent_items);
+			break;
+		// TODO: case ZBX_POLLER_TYPE_HTTPAGENT:
+		// TODO: case ZBX_POLLER_TYPE_SNMP:
+		default:
+			poller_item->num = zbx_dc_config_get_poller_items(poller_type, config_timeout,
+					processing_num, processing_limit, &poller_item->items.generic_items);
+	}
 
 	if (0 != poller_item->num)
 	{
 		poller_item->results = zbx_malloc(NULL, (size_t)poller_item->num * sizeof(AGENT_RESULT));
 		poller_item->errcodes = zbx_malloc(NULL, (size_t)poller_item->num * sizeof(int));
 
-		zbx_prepare_items(poller_item->items, poller_item->errcodes, poller_item->num, poller_item->results,
-				ZBX_MACRO_EXPAND_YES);
+		switch (poller_type) {
+			case ZBX_POLLER_TYPE_AGENT:
+				zbx_prepare_agent_items(poller_item->items.agent_items, poller_item->errcodes,
+					poller_item->num, poller_item->results, ZBX_MACRO_EXPAND_YES);
+				break;
+			// TODO: case ZBX_POLLER_TYPE_HTTPAGENT:
+			// TODO: case ZBX_POLLER_TYPE_SNMP:
+			default:
+				zbx_prepare_items(poller_item->items.generic_items, poller_item->errcodes,
+					poller_item->num, poller_item->results, ZBX_MACRO_EXPAND_YES);
+		}
 	}
 	else
 	{
-		zbx_free(poller_item->items);
+		zbx_free(poller_item->items.any);
 		zbx_free(poller_item);
 	}
 

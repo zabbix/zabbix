@@ -333,7 +333,7 @@ void	zbx_async_check_agent_clean(zbx_agent_context *agent_context)
 	zbx_free_agent_result(&agent_context->item.result);
 }
 
-int	zbx_async_check_agent(zbx_dc_item_t *item, AGENT_RESULT *result,
+int	zbx_async_check_agent(zbx_dc_agent_item_t *item, AGENT_RESULT *result,
 		zbx_async_task_process_result_cb_t async_task_process_result_agent_cb,
 		void *arg, void *arg_action, struct event_base *base, zbx_channel_t *channel,
 		struct evdns_base *dnsbase, const char *config_source_ip,

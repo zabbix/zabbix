@@ -288,7 +288,7 @@ static int	discovery_agent(discovery_poller_config_t *poller_config, const zbx_d
 		char *ip, const unsigned short port, zbx_discoverer_results_t *dresult, char **error)
 {
 	int				ret;
-	zbx_dc_item_t			item;
+	zbx_dc_agent_item_t		item;
 	AGENT_RESULT			result;
 	discovery_async_result_t	*async_result;
 
@@ -299,7 +299,7 @@ static int	discovery_agent(discovery_poller_config_t *poller_config, const zbx_d
 
 	zbx_init_agent_result(&result);
 
-	memset(&item, 0, sizeof(zbx_dc_item_t));
+	memset(&item, 0, sizeof(zbx_dc_agent_item_t));
 	zbx_strscpy(item.key_orig, dcheck->key_);
 	item.key = item.key_orig;
 
@@ -309,7 +309,6 @@ static int	discovery_agent(discovery_poller_config_t *poller_config, const zbx_d
 	item.interface.port = port;
 
 	item.value_type = ITEM_VALUE_TYPE_STR;
-	item.type = ITEM_TYPE_ZABBIX;
 
 	item.host.tls_connect = ZBX_TCP_SEC_UNENCRYPTED;
 	item.timeout = dcheck->timeout;
