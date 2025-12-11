@@ -1351,8 +1351,7 @@ class testDocumentationLinks extends CWebTest {
 			[
 				[
 					'replace' => true,
-					'url' => 'zabbix.php?action=popup&popup=host.prototype.edit&parent_discoveryid={discoveryid}'.
-						'&hostid={host_prototypeid}&context=host',
+					'url' => 'host_prototypes.php?form=update&parent_discoveryid={discoveryid}&hostid={host_prototypeid}&context=host',
 					'doc_link' => '/en/manual/discovery/low_level_discovery/host_prototypes'
 				]
 			],
