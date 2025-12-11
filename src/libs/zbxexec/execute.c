@@ -55,11 +55,14 @@ static int	zbx_get_timediff_ms(struct _timeb *time1, struct _timeb *time2)
  *             buf_size      - [IN] buffer size                               *
  *             offset        - [IN/OUT] current position in the buffer        *
  *             timeout_ms    - [IN] timeout in milliseconds                   *
+ *             error         - [OUT] error string if function fails           *
+ *             max_error_len - [IN] length of error buffer                    *
  *                                                                            *
  * Return value: SUCCEED, FAIL or TIMEOUT_ERROR if timeout reached            *
  *                                                                            *
  ******************************************************************************/
-static int	zbx_read_from_pipe(HANDLE hRead, char **buf, size_t *buf_size, size_t *offset, int timeout_ms)
+static int	zbx_read_from_pipe(HANDLE hRead, char **buf, size_t *buf_size, size_t *offset, int timeout_ms,
+			char *error, size_t max_error_len)
 {
 	DWORD		in_buf_size, read_bytes;
 	struct _timeb	start_time, current_time;
@@ -77,6 +80,9 @@ static int	zbx_read_from_pipe(HANDLE hRead, char **buf, size_t *buf_size, size_t
 		{
 			zabbix_log(LOG_LEVEL_ERR, "command output exceeded limit of %d KB",
 					MAX_EXECUTE_OUTPUT_LEN / ZBX_KIBIBYTE);
+			zbx_snprintf(error, max_error_len, "Command output exceeded limit of %d KB",
+				MAX_EXECUTE_OUTPUT_LEN / ZBX_KIBIBYTE);
+
 			return FAIL;
 		}
 
@@ -407,7 +413,7 @@ int	zbx_execute(const char *command, char **output, char *error, size_t max_erro
 	_ftime(&start_time);
 	timeout *= 1000;
 
-	ret = zbx_read_from_pipe(hRead, &buffer, &buf_size, &offset, timeout);
+	ret = zbx_read_from_pipe(hRead, &buffer, &buf_size, &offset, timeout, error, max_error_len);
 
 	if (TIMEOUT_ERROR != ret)
 	{
