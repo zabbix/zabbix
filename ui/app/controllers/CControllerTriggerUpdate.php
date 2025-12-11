@@ -107,34 +107,36 @@ class CControllerTriggerUpdate extends CController {
 			'triggerids' => $this->getInput('triggerid')
 		]);
 
-		$db_trigger = $db_triggers ? reset($db_triggers) : null;
+		$db_trigger = $db_triggers ? reset($db_triggers) : [];
 
 		$trigger = [
 			'triggerid' => $this->getInput('triggerid')
 		];
 
 		if ($db_trigger) {
-			if ($db_trigger['flags'] == ZBX_FLAG_DISCOVERY_NORMAL && $db_trigger['templateid'] == 0) {
-				$trigger += [
-					'description' => $this->getInput('name'),
-					'event_name' => $this->getInput('event_name', ''),
-					'opdata' => $this->getInput('opdata', ''),
-					'expression' => $this->getInput('expression'),
-					'recovery_mode' => $this->getInput('recovery_mode', ZBX_RECOVERY_MODE_EXPRESSION),
-					'manual_close' => $this->getInput('manual_close', ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED)
-				];
+			if ($db_trigger['flags'] == ZBX_FLAG_DISCOVERY_NORMAL) {
+				if ($db_trigger['templateid'] == 0) {
+					$trigger += [
+						'description' => $this->getInput('name'),
+						'event_name' => $this->getInput('event_name', ''),
+						'opdata' => $this->getInput('opdata', ''),
+						'expression' => $this->getInput('expression'),
+						'recovery_mode' => $this->getInput('recovery_mode', ZBX_RECOVERY_MODE_EXPRESSION),
+						'manual_close' => $this->getInput('manual_close', ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED)
+					];
 
-				switch ($trigger['recovery_mode']) {
-					case ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION:
-						$trigger['recovery_expression'] = $this->getInput('recovery_expression', '');
+					switch ($trigger['recovery_mode']) {
+						case ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION:
+							$trigger['recovery_expression'] = $this->getInput('recovery_expression', '');
 						// break; is not missing here.
-					case ZBX_RECOVERY_MODE_EXPRESSION:
-						$trigger['correlation_mode'] = $this->getInput('correlation_mode', ZBX_TRIGGER_CORRELATION_NONE);
+						case ZBX_RECOVERY_MODE_EXPRESSION:
+							$trigger['correlation_mode'] = $this->getInput('correlation_mode', ZBX_TRIGGER_CORRELATION_NONE);
 
-						if ($trigger['correlation_mode'] == ZBX_TRIGGER_CORRELATION_TAG) {
-							$trigger['correlation_tag'] = $this->getInput('correlation_tag', '');
-						}
-						break;
+							if ($trigger['correlation_mode'] == ZBX_TRIGGER_CORRELATION_TAG) {
+								$trigger['correlation_tag'] = $this->getInput('correlation_tag', '');
+							}
+							break;
+					}
 				}
 
 				$trigger += [
@@ -187,12 +189,12 @@ class CControllerTriggerUpdate extends CController {
 			if (array_values($db_trigger['tags']) !== array_values($tags)) {
 				$trigger['tags'] = $tags;
 			}
-		}
 
-		$status = $this->hasInput('status') ? TRIGGER_STATUS_ENABLED : TRIGGER_STATUS_DISABLED;
+			$status = $this->hasInput('status') ? TRIGGER_STATUS_ENABLED : TRIGGER_STATUS_DISABLED;
 
-		if ($db_trigger['status'] != $status) {
-			$trigger['status'] = $status;
+			if ($db_trigger['status'] != $status) {
+				$trigger['status'] = $status;
+			}
 		}
 
 		$result = (bool) API::Trigger()->update($trigger);
