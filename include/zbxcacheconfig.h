@@ -213,6 +213,27 @@ zbx_dc_item_t;
 
 ZBX_PTR_VECTOR_DECL(dc_item, zbx_dc_item_t *)
 
+/* TODO: remove comments */
+/* TODO: what to include here? */
+typedef struct {
+	zbx_dc_host_t		host;
+	zbx_dc_interface_t	interface;
+	zbx_uint64_t		itemid;
+	zbx_uint64_t		lastlogsize;
+	unsigned char		type; /* TODO: decide: is this really needed? */
+	unsigned char		value_type;
+	unsigned char		state;
+	unsigned char		flags;
+	unsigned char		status;
+	char			key_orig[ZBX_ITEM_KEY_LEN * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1], *key;
+	char			*delay;
+	int			mtime;
+	char			timeout_orig[ZBX_ITEM_TIMEOUT_LEN_MAX];
+	int			timeout;
+	char			error_hash[ZBX_SHA512_BINARY_LENGTH];
+	unsigned char		preprocessing;
+} zbx_dc_agent_item_t;
+
 typedef struct
 {
 	zbx_uint64_t	hostid;
@@ -932,6 +953,8 @@ int	zbx_dc_get_interface_value_itemid(zbx_uint64_t itemid, char **replace_to, in
 int	zbx_dc_config_get_poller_nextcheck(unsigned char poller_type);
 int	zbx_dc_config_get_poller_items(unsigned char poller_type, int config_timeout, int processing,
 		int config_max_concurrent_checks, zbx_dc_item_t **items);
+int	zbx_dc_config_get_agent_poller_items(int config_timeout, int processing,
+		int config_max_concurrent_checks, zbx_dc_agent_item_t **items);
 #ifdef HAVE_OPENIPMI
 int	zbx_dc_config_get_ipmi_poller_items(int now, int items_num, int config_timeout, zbx_dc_item_t *items,
 		int *nextcheck);

@@ -9678,6 +9678,44 @@ static void	DCget_item(zbx_dc_item_t *dst_item, const ZBX_DC_ITEM *src_item)
 	}
 }
 
+/* TODO: maybe rename */
+static void	DCget_agent_item(zbx_dc_agent_item_t *dst_item, const ZBX_DC_ITEM *src_item)
+{
+	/* TODO: move to a generic function? (once the analogous function is made for other poller/item types) */
+	const ZBX_DC_LOGITEM		*logitem;
+	const ZBX_DC_INTERFACE		*dc_interface;
+
+	dst_item->preprocessing = zbx_dc_item_requires_preprocessing(src_item);
+	dst_item->type = src_item->type;
+	dst_item->value_type = src_item->value_type;
+
+	dst_item->state = src_item->state;
+	dst_item->lastlogsize = src_item->lastlogsize;
+	dst_item->mtime = src_item->mtime;
+
+	dst_item->status = src_item->status;
+
+	zbx_strscpy(dst_item->key_orig, src_item->key);
+
+	dst_item->itemid = src_item->itemid;
+	dst_item->flags = src_item->flags;
+	dst_item->key = NULL;
+	dst_item->timeout = 0;
+
+	dst_item->delay = zbx_strdup(NULL, src_item->delay);	/* not used, should be initialized */
+
+	memcpy(dst_item->error_hash, src_item->error_hash, sizeof(dst_item->error_hash));
+
+	dc_interface = (ZBX_DC_INTERFACE *)zbx_hashset_search(&config->interfaces, &src_item->interfaceid);
+
+	DCget_interface(&dst_item->interface, dc_interface);
+
+	if ('\0' == *src_item->timeout)
+		zbx_strscpy(dst_item->timeout_orig, dc_get_global_item_type_timeout(src_item->type));
+	else
+		zbx_strscpy(dst_item->timeout_orig, src_item->timeout);
+}
+
 void	zbx_dc_config_clean_items(zbx_dc_item_t *items, int *errcodes, size_t num)
 {
 	size_t	i;
@@ -11554,6 +11592,93 @@ int	zbx_dc_config_get_poller_items(unsigned char poller_type, int config_timeout
 		dc_item->location = ZBX_LOC_POLLER;
 		DCget_host(&(*items)[num].host, dc_host);
 		DCget_item(&(*items)[num], dc_item);
+		num++;
+	}
+
+	UNLOCK_CACHE;
+out:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __func__, num);
+
+	return num;
+}
+
+/* TODO: description? */
+int	zbx_dc_config_get_agent_poller_items(int config_timeout, int processing,
+		int config_max_concurrent_checks, zbx_dc_agent_item_t **items)
+{
+	int			now, num = 0, max_items, items_alloc = 0;
+	zbx_binary_heap_t	*queue;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	if (0 == (max_items = config_max_concurrent_checks - processing))
+		goto out;
+
+	now = time(NULL);
+	queue = &config->queues[ZBX_POLLER_TYPE_AGENT];
+
+	items_alloc = max_items;
+	*items = zbx_malloc(NULL, sizeof(zbx_dc_agent_item_t) * items_alloc);
+
+	WRLOCK_CACHE;
+
+	while (num < max_items && FAIL == zbx_binary_heap_empty(queue))
+	{
+		int				disable_until;
+		const zbx_binary_heap_elem_t	*min;
+		ZBX_DC_HOST			*dc_host;
+		ZBX_DC_INTERFACE		*dc_interface;
+		ZBX_DC_ITEM			*dc_item;
+
+		min = zbx_binary_heap_find_min(queue);
+		dc_item = (ZBX_DC_ITEM *)min->data;
+
+		if (dc_item->nextcheck > now)
+			break;
+
+		zbx_binary_heap_remove_min(queue);
+		dc_item->location = ZBX_LOC_NOWHERE;
+
+		if (NULL == (dc_host = (ZBX_DC_HOST *)zbx_hashset_search(&config->hosts, &dc_item->hostid)))
+			continue;
+
+		dc_interface = (ZBX_DC_INTERFACE *)zbx_hashset_search(&config->interfaces, &dc_item->interfaceid);
+
+		if (HOST_STATUS_MONITORED != dc_host->status ||
+				(HOST_MONITORED_BY_SERVER != dc_host->monitored_by &&
+				SUCCEED != zbx_is_item_processed_by_server(dc_item->type, dc_item->key)))
+		{
+			continue;
+		}
+
+		if (SUCCEED == DCin_maintenance_without_data_collection(dc_host, dc_item))
+		{
+			dc_requeue_item(dc_item, dc_host, dc_interface, ZBX_ITEM_COLLECTED, now);
+			continue;
+		}
+
+		/* don't apply unreachable item/host throttling for prioritized items */
+		if (ZBX_QUEUE_PRIORITY_HIGH != dc_item->queue_priority)
+		{
+			if (0 != (disable_until = DCget_disable_until(dc_item, dc_interface)))
+			{
+				/* move items on unreachable hosts to unreachable pollers or    */
+				/* postpone checks on hosts that have been checked recently and */
+				/* are still unreachable                                        */
+				if (disable_until > now)
+				{
+					dc_requeue_item(dc_item, dc_host, dc_interface,
+							ZBX_ITEM_COLLECTED | ZBX_HOST_UNREACHABLE, now);
+					continue;
+				}
+
+				DCincrease_disable_until(dc_interface, now, config_timeout);
+			}
+		}
+
+		dc_item->location = ZBX_LOC_POLLER;
+		DCget_host(&(*items)[num].host, dc_host);
+		DCget_agent_item(&(*items)[num], dc_item);
 		num++;
 	}
 
