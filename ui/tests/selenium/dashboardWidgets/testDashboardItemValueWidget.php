@@ -364,17 +364,15 @@ class testDashboardItemValueWidget extends testWidgets {
 									"Aggregation function does not affect the sparkline.";
 
 							// Check that only one warning button is visible among all three.
-							$warning_buttons = $form->getFieldContainer($warning_label)->query('xpath:.//button[@data-hintbox]')
+							$warning_button = $form->getFieldContainer($warning_label)->query('xpath:.//button[@data-hintbox]')
 									->all()->filter(CElementFilter::VISIBLE);
+							$this->assertEquals($visible ? 1 : 0, $warning_button->count());
 
-							// Check that button is displayed.
-							if ($visible) {
-								$warning_button = $warning_buttons->first();
-								$this->assertTrue($warning_button->isVisible());
+							if ($option === 'not used') {
+								$this->assertFalse($form->getLabel('Time period')->isDisplayed());
 							}
-							// Otherwise, there are no visible buttons.
 							else {
-								$this->assertEquals(0, $warning_buttons->count());
+								$this->assertTrue($form->getLabel('Time period')->isDisplayed());
 							}
 						}
 						else {
@@ -391,10 +389,6 @@ class testDashboardItemValueWidget extends testWidgets {
 							// Close the hintbox.
 							$hint_dialog->query('xpath:.//button[@class="btn-overlay-close"]')->one()->click();
 							$hint_dialog->waitUntilNotPresent();
-						}
-
-						if ($warning_label === 'Aggregation function' && $option !== 'not used') {
-							$this->assertTrue($form->getLabel('Time period')->isDisplayed());
 						}
 					}
 				}
