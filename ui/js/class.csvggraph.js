@@ -15,6 +15,8 @@
 
 class CSvgGraph {
 
+	static SCATTER_PLOT_MARKER_MIN_SIZE = 6;
+
 	/**
 	 * @type {SVGElement}
 	 */
@@ -103,7 +105,7 @@ class CSvgGraph {
 	#event_listeners = {
 		mouseMove: e => this.#showHintbox(e),
 		mouseLeave: () => {
-			this.#destroyHintbox();
+			this.#removeHintboxContents();
 			this.#hideHelper();
 		},
 		onShowStaticHint: () => this.#onStaticHintboxOpen(),
@@ -270,6 +272,11 @@ class CSvgGraph {
 		this.#svg.classList.remove('highlighted');
 	}
 
+	/**
+	 * Function removes SBox related $(document) event listeners:
+	 * - if no other widget have active SBox;
+	 * - to avoid another call of destroySBox on 'mouseup' (in case if user has pressed ESC).
+	 */
 	#dropDocumentListeners(e) {
 		let widgets_boxing = 0; // Number of widgets with active SBox.
 
@@ -327,7 +334,7 @@ class CSvgGraph {
 
 			this.#is_boxing = true;
 
-			this.#destroyHintbox();
+			this.#removeHintboxContents();
 			this.#hideHelper();
 
 			hintBox.hideHint(this.#svg, true);
@@ -409,7 +416,6 @@ class CSvgGraph {
 		return false;
 	}
 
-	// Set position of vertical helper line.
 	#setHelperPosition(e) {
 		const svg_rect = this.#svg.getBoundingClientRect();
 
@@ -438,7 +444,6 @@ class CSvgGraph {
 		}
 	}
 
-	// Hide vertical helper line and highlighted data points.
 	#hideHelper() {
 		for (const helper of this.#svg.querySelectorAll('.svg-helper')) {
 			helper.setAttribute('x1', -10);
@@ -462,7 +467,6 @@ class CSvgGraph {
 		}
 	}
 
-	// Show problem or value hintbox.
 	#showHintbox(e) {
 		const svg_rect = this.#svg.getBoundingClientRect();
 		const offsetX = e.clientX - svg_rect.left;
@@ -605,14 +609,17 @@ class CSvgGraph {
 			this.#svg.dataset.hintboxContents = html.outerHTML;
 		}
 		else if (in_values_area || in_problem_area) {
-			this.#destroyHintbox();
+			this.#removeHintboxContents();
 		}
 	}
 
-	// Find what problems matches in time to the given x.
-	#findProblems(graph, x) {
+	#removeHintboxContents() {
+		delete this.#svg.dataset.hintboxContents;
+	}
+
+	#findProblems(x) {
 		const problems = [];
-		const nodes = graph.querySelectorAll('[data-info]');
+		const nodes = this.#svg.querySelectorAll('[data-info]');
 
 		for (let i = 0, l = nodes.length; l > i; i++) {
 			const problem_start = +nodes[i].getAttribute('x');
@@ -758,7 +765,7 @@ class CSvgGraph {
 		return data_sets;
 	}
 
-	// Find metric points that touches the given x and y.
+	// Find scatter plot metric points that touches the given x and y.
 	#findScatterPlotPoints(x, y) {
 		const nodes = this.#svg.querySelectorAll('[data-set]');
 		const points = [];
@@ -771,7 +778,8 @@ class CSvgGraph {
 				const cx = ctm.e;
 				const cy = ctm.f;
 
-				if (Math.abs(cx - x) <= 6 && Math.abs(cy - y) <= 6) {
+				if (Math.abs(cx - x) <= CSvgGraph.SCATTER_PLOT_MARKER_MIN_SIZE
+						&& Math.abs(cy - y) <= CSvgGraph.SCATTER_PLOT_MARKER_MIN_SIZE) {
 					if (point[c].getAttribute('value_x') !== null || point[c].getAttribute('value_y') !== null) {
 						points.push({
 							g: nodes[i],
@@ -995,9 +1003,5 @@ class CSvgGraph {
 		hintbox_container.append(html);
 
 		return hintbox_container;
-	}
-
-	#destroyHintbox() {
-		delete this.#svg.dataset.hintboxContents;
 	}
 }
