@@ -397,13 +397,10 @@ function convertUnitsUptime($value) {
  * Only the 3 most significant allowed units will be displayed: #y #m #d, #m #d #h, #d #h #mm and so on, omitting
  * empty ones.
  *
- * @param int  $value            Time period in seconds.
+ * @param int   $value                           Time period in seconds.
  * @param array $options
- *
- *  $options = [
- *		'ignore_milliseconds'	=>	(bool)	Without ms (1s 200 ms = 1.2s). Default: false.
- *		'with_year'				=>  (bool)  Output can contain years (y) and months (M). Default: true.
- *  ]
+ * @param bool  $options['ignore_milliseconds']  Without ms (1s 200 ms = 1.2s). Default: false.
+ * @param bool  $options['with_year']            Output can contain years (y) and months (M). Default: true.
  *
  * @return string
  */
