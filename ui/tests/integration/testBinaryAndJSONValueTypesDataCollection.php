@@ -203,7 +203,15 @@ class testBinaryAndJSONValueTypesDataCollection extends CIntegrationTest {
 				]
 		];
 
-
+		$items_simple = [
+				[
+					'name' => 'SIMPLE_JSON',
+					'key_' => 'net.tcp.service[ftp,127.0.0.1]',
+					'type' => ITEM_TYPE_SIMPLE,
+					'value_type' => ITEM_VALUE_TYPE_JSON,
+					'delay' => '1s'
+				]
+		];
 
 		$result = CDataHelper::createHosts([
 			[
@@ -221,6 +229,13 @@ class testBinaryAndJSONValueTypesDataCollection extends CIntegrationTest {
 				'monitored_by' => ZBX_MONITORED_BY_PROXY,
 				'status' => HOST_STATUS_MONITORED,
 				'items' => $items
+			],
+			[
+				'host' => 'simple',
+				'interfaces' => [],
+				'groups' => $groups,
+				'status' => HOST_STATUS_MONITORED,
+				'items' => $items_simple
 			]
 		]);
 
@@ -811,5 +826,42 @@ class testBinaryAndJSONValueTypesDataCollection extends CIntegrationTest {
 
 		$this->assertEquals(1, count($active_data['result']));
 		$this->assertEquals($json_data_http_response, $active_data['result'][0]['value']);
+	}
+
+	/**
+	 * Component configuration provider for non-agent and non-trapper related tests.
+	 *
+	 * @return array
+	 */
+	public function simpleConfigurationProvider() {
+		return [
+			self::COMPONENT_SERVER => [
+				'UnreachablePeriod' => 5,
+				'UnavailableDelay' => 5,
+				'UnreachableDelay' => 1,
+				'DebugLevel' => 5,
+				'LogFileSize' => 0
+			]
+		];
+	}
+
+	/**
+	 * Test simple items with JSON
+	 *
+	 * @required-components server
+	 * @configurationDataProvider simpleConfigurationProvider
+	 *
+	 * @hosts simple
+	 */
+	public function testSimpleJSON() {
+		$response = $this->callUntilDataIsPresent('history.get', [
+			'itemids' => self::$itemids['simple:net.tcp.service[ftp,127.0.0.1]'],
+			'history' => ITEM_VALUE_TYPE_JSON
+		]);
+		$this->assertArrayHasKey('result', $response);
+		$this->assertEquals(1, count($response['result']));
+		$this->assertArrayHasKey('value', $response['result'][0]);
+
+		$this->assertEquals(0, $response['result'][0]['value']);
 	}
 }
