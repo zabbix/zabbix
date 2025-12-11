@@ -136,10 +136,10 @@ static zbx_uint32_t	message_pack_data(zbx_ipc_message_t *message, zbx_packed_fie
 static void     preprocessor_serialize_value(zbx_uint64_t itemid, unsigned char value_type, unsigned char item_flags,
 		AGENT_RESULT *result, zbx_timespec_t *ts, unsigned char state, const char *error)
 {
-	zbx_uint32_t	data_len = 0, value_len, source_len;
+	zbx_uint32_t	data_len = 0, value_len = 0, source_len = 0;
 	unsigned char	var_type = ZBX_VARIANT_NONE, opt_flags = 0;
 	zbx_timespec_t	ts_local;
-	const char	*errmsg;
+	const char	*errmsg = NULL;
 
 	if (NULL == ts)
 	{
@@ -1165,7 +1165,7 @@ void	zbx_preprocess_item_value(zbx_uint64_t itemid, unsigned char item_value_typ
 			}
 			else
 			{
-				zabbix_log(LOG_LEVEL_CRIT, "unexpected result type: %d and item_value_type: %d combo "
+				zabbix_log(LOG_LEVEL_CRIT, "unexpected result type: %d and item_value_type: %hhu combo "
 						"for itemid: " ZBX_FS_UI64, result->type, item_value_type, itemid);
 				THIS_SHOULD_NEVER_HAPPEN;
 				exit(EXIT_FAILURE);

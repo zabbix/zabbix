@@ -325,7 +325,7 @@ int	zbx_trapper_preproc_test_run(const struct zbx_json_parse *jp_item, const str
 			}
 			else
 			{
-				zabbix_log(LOG_LEVEL_CRIT, "unexpected result value type: %d for"
+				zabbix_log(LOG_LEVEL_CRIT, "unexpected result value type: %hhu for"
 						" ITEM_VALUE_TYPE_JSON value type", result->value.type);
 				THIS_SHOULD_NEVER_HAPPEN;
 				break;

@@ -214,7 +214,7 @@ void	zbx_variant_copy(zbx_variant_t *value, const zbx_variant_t *source)
 			break;
 		default:
 			THIS_SHOULD_NEVER_HAPPEN;
-			exit(1);
+			exit(EXIT_FAILURE);
 	}
 }
 
@@ -331,7 +331,6 @@ int	zbx_variant_convert(zbx_variant_t *value, int type)
 		case ZBX_VARIANT_DBL:
 			return variant_to_dbl(value);
 		case ZBX_VARIANT_STR:
-			return variant_to_str(value);
 		case ZBX_VARIANT_JSON:
 			return variant_to_str(value);
 		case ZBX_VARIANT_NONE:
@@ -605,8 +604,8 @@ static int	variant_compare_str(const zbx_variant_t *value1, const zbx_variant_t 
 /******************************************************************************
  *                                                                            *
  * Purpose: Compares two variant values when at least one is double and the   *
- *          other is double, uint64 or a string representing a valid double   *
- *          value.                                                            *
+ *          other is double, uint64 or a string/JSON representing a valid     *
+ *          double value.                                                     *
  *                                                                            *
  ******************************************************************************/
 static int	variant_compare_dbl(const zbx_variant_t *value1, const zbx_variant_t *value2)
@@ -748,9 +747,9 @@ int	zbx_variant_compare(const zbx_variant_t *value1, const zbx_variant_t *value2
  *               FAIL    - values are different                               *
  *                                                                            *
  * Comments: This function checks if two variants are of the same type and    *
- *           have identical content. For string, error, binary, and vector    *
- *           types, it checks if they point to the same memory location. It   *
- *           does not compare flags used in processing.                       *
+ *           have identical content. For string, error, binary, vector and    *
+ *           JSON types, it checks if they point to the same memory location. *
+ *           It does not compare flags used in processing.                    *
  *                                                                            *
  ******************************************************************************/
 int	zbx_variant_same(const zbx_variant_t *value1, const zbx_variant_t *value2)
