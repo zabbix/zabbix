@@ -1491,7 +1491,9 @@ static void	vmware_service_alarm_uuid_update(zbx_vmware_data_t *data)
 			break;											\
 		}
 
-	int	i;
+	int	i, skipped = 0;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() alerts:%d", __func__, data->alarms.values_num);
 
 	for (i = 0; i < data->alarms.values_num; i++)
 	{
@@ -1527,8 +1529,15 @@ static void	vmware_service_alarm_uuid_update(zbx_vmware_data_t *data)
 
 		}
 		else
+		{
 			alarm->entity_uuid = NULL;
+			skipped++;
+		}
 	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() skipped uuid:%d", __func__, skipped);
+
+#	undef	UUID_UPDATE
 }
 
 /******************************************************************************
