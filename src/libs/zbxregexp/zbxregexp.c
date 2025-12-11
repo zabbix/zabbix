@@ -748,6 +748,11 @@ char	*zbx_regexp_match(const char *string, const char *pattern, int *len)
 	return zbx_regexp(string, pattern, ZBX_REGEXP_MULTILINE, len);
 }
 
+char	*zbx_regexp_match_full(const char *string, const char *pattern, int *len)
+{
+	return zbx_regexp(string, pattern, 0, len);
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: zbx_strncpy_alloc with maximum allocated memory limit.            *
