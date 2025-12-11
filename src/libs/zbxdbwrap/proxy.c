@@ -905,81 +905,104 @@ static void	adjust_time(zbx_timespec_t *unique_shift, zbx_agent_value_t *av)
  *                FAIL    - otherwise                                         *
  *                                                                            *
  ******************************************************************************/
-static int	parse_history_data_row_value(const struct zbx_json_parse *jp_row, zbx_timespec_t *unique_shift,
-		zbx_agent_value_t *av)
+static void	parse_history_data_row_value(const struct zbx_json_parse *jp_row, zbx_timespec_t *unique_shift,
+		zbx_agent_value_t *av, char **tmp, size_t *tmp_alloc)
 {
-	char	*tmp = NULL;
-	size_t	tmp_alloc = 0;
-	int	ret = FAIL;
+	char		buffer[MAX_STRING_LEN];
+	const char	*p = NULL;
+	int		found_clock = FAIL, found_ns = FAIL;
 
 	memset(av, 0, sizeof(zbx_agent_value_t));
 
-	if (SUCCEED == zbx_json_value_by_name_dyn(jp_row, ZBX_PROTO_TAG_CLOCK, &tmp, &tmp_alloc, NULL))
+	while (NULL != (p = zbx_json_pair_next(jp_row, p, buffer, sizeof(buffer))))
 	{
-		if (FAIL == zbx_is_uint31(tmp, &av->ts.sec))
-			goto out;
+		const char	*ptr;
 
-		if (FAIL == zbx_json_value_by_name_dyn(jp_row, ZBX_PROTO_TAG_NS, &tmp, &tmp_alloc, NULL))
+		if (NULL == (ptr = zbx_json_decodevalue_dyn(p, tmp, tmp_alloc, NULL)))
+			continue;
+
+		p = ptr;
+
+		if (0 == strcmp(ZBX_PROTO_TAG_ID, buffer))
+		{
+			if (SUCCEED != zbx_is_uint64(*tmp, &av->id))
+				av->id = 0;
+		}
+		else if (0 == strcmp(ZBX_PROTO_TAG_CLOCK, buffer))
+		{
+			if (SUCCEED == zbx_is_uint31(*tmp, &av->ts.sec))
+				found_clock = SUCCEED;
+			else
+				zabbix_log(LOG_LEVEL_DEBUG, "invalid clock");
+		}
+		else if (0 == strcmp(ZBX_PROTO_TAG_NS, buffer))
+		{
+			if (SUCCEED == zbx_is_uint_n_range(*tmp, *tmp_alloc, &av->ts.ns, sizeof(av->ts.ns), 0LL,
+					999999999LL))
+			{
+				/* adjust ns for older systems where sometimes ns == 0 */
+				if (av->ts.ns == 0)
+					adjust_time(unique_shift, av);
+
+				found_ns = SUCCEED;
+			}
+			else
+				zabbix_log(LOG_LEVEL_DEBUG, "invalid ns");
+		}
+		else if (0 == strcmp(ZBX_PROTO_TAG_STATE, buffer))
+		{
+			av->state = (unsigned char)atoi(*tmp);
+		}
+		else if (0 == strcmp(ZBX_PROTO_TAG_LASTLOGSIZE, buffer))
+		{
+			if (SUCCEED == zbx_is_uint64(*tmp, &av->lastlogsize))
+				av->meta = 1;
+		}
+		else if (0 == strcmp(ZBX_PROTO_TAG_MTIME, buffer))
+		{
+			av->mtime = atoi(*tmp);
+		}
+		else if (0 == strcmp(ZBX_PROTO_TAG_VALUE, buffer))
+		{
+			av->value = zbx_strdup(av->value, *tmp);
+		}
+		else if (0 == strcmp(ZBX_PROTO_TAG_LOGTIMESTAMP, buffer))
+		{
+			av->timestamp = atoi(*tmp);
+		}
+		else if (0 == strcmp(ZBX_PROTO_TAG_LOGSOURCE, buffer))
+		{
+			av->source = zbx_strdup(av->source, *tmp);
+		}
+		else if (0 == strcmp(ZBX_PROTO_TAG_LOGSEVERITY, buffer))
+		{
+			av->severity = atoi(*tmp);
+		}
+		else if (0 == strcmp(ZBX_PROTO_TAG_LOGEVENTID, buffer))
+		{
+			av->logeventid = atoi(*tmp);
+		}
+	}
+
+	if (SUCCEED == found_clock)
+	{
+		if (FAIL == found_ns)
 		{
 			/* ensure unique value timestamp (clock, ns) if only clock is available */
 			adjust_time(unique_shift, av);
 		}
-		else if (SUCCEED == zbx_is_uint_n_range(tmp, tmp_alloc, &av->ts.ns, sizeof(av->ts.ns), 0LL,
-				999999999LL))
-		{
-			/* adjust ns for older systems where sometimes ns == 0 */
-			if (av->ts.ns == 0)
-				adjust_time(unique_shift, av);
-		}
-		else
-			goto out;
 	}
 	else
 		zbx_timespec(&av->ts);
 
-	if (SUCCEED == zbx_json_value_by_name_dyn(jp_row, ZBX_PROTO_TAG_STATE, &tmp, &tmp_alloc, NULL))
-		av->state = (unsigned char)atoi(tmp);
-
 	/* Unsupported item meta information must be ignored for backwards compatibility. */
 	/* New agents will not send meta information for items in unsupported state.      */
-	if (ITEM_STATE_NOTSUPPORTED != av->state)
+	if (ITEM_STATE_NOTSUPPORTED == av->state)
 	{
-		if (SUCCEED == zbx_json_value_by_name_dyn(jp_row, ZBX_PROTO_TAG_LASTLOGSIZE, &tmp, &tmp_alloc, NULL) &&
-				SUCCEED == zbx_is_uint64(tmp, &av->lastlogsize))
-		{
-			av->meta = 1;	/* contains meta information */
-
-			if (SUCCEED == zbx_json_value_by_name_dyn(jp_row, ZBX_PROTO_TAG_MTIME, &tmp, &tmp_alloc, NULL))
-				av->mtime = atoi(tmp);
-		}
+		av->lastlogsize = 0;
+		av->mtime = 0;
+		av->meta = 0;
 	}
-
-	if (SUCCEED == zbx_json_value_by_name_dyn(jp_row, ZBX_PROTO_TAG_VALUE, &tmp, &tmp_alloc, NULL))
-		av->value = zbx_strdup(av->value, tmp);
-
-	if (SUCCEED == zbx_json_value_by_name_dyn(jp_row, ZBX_PROTO_TAG_LOGTIMESTAMP, &tmp, &tmp_alloc, NULL))
-		av->timestamp = atoi(tmp);
-
-	if (SUCCEED == zbx_json_value_by_name_dyn(jp_row, ZBX_PROTO_TAG_LOGSOURCE, &tmp, &tmp_alloc, NULL))
-		av->source = zbx_strdup(av->source, tmp);
-
-	if (SUCCEED == zbx_json_value_by_name_dyn(jp_row, ZBX_PROTO_TAG_LOGSEVERITY, &tmp, &tmp_alloc, NULL))
-		av->severity = atoi(tmp);
-
-	if (SUCCEED == zbx_json_value_by_name_dyn(jp_row, ZBX_PROTO_TAG_LOGEVENTID, &tmp, &tmp_alloc, NULL))
-		av->logeventid = atoi(tmp);
-
-	if (SUCCEED != zbx_json_value_by_name_dyn(jp_row, ZBX_PROTO_TAG_ID, &tmp, &tmp_alloc, NULL) ||
-			SUCCEED != zbx_is_uint64(tmp, &av->id))
-	{
-		av->id = 0;
-	}
-
-	zbx_free(tmp);
-
-	ret = SUCCEED;
-out:
-	return ret;
 }
 
 /******************************************************************************
@@ -1063,6 +1086,8 @@ static int	parse_history_data(struct zbx_json_parse *jp_data, const char **pnext
 {
 	struct zbx_json_parse	jp_row;
 	int			ret = FAIL;
+	char			*tmp = NULL;
+	size_t			tmp_alloc = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -1092,8 +1117,7 @@ static int	parse_history_data(struct zbx_json_parse *jp_data, const char **pnext
 		if (SUCCEED != parse_history_data_row_hostkey(&jp_row, &hostkeys[*values_num]))
 			continue;
 
-		if (SUCCEED != parse_history_data_row_value(&jp_row, unique_shift, &values[*values_num]))
-			continue;
+		parse_history_data_row_value(&jp_row, unique_shift, &values[*values_num], &tmp, &tmp_alloc);
 
 		(*values_num)++;
 	}
@@ -1101,6 +1125,7 @@ static int	parse_history_data(struct zbx_json_parse *jp_data, const char **pnext
 
 	ret = SUCCEED;
 out:
+	zbx_free(tmp);
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s processed:%d/%d", __func__, zbx_result_string(ret),
 			*values_num, *parsed_num);
 
@@ -1138,6 +1163,8 @@ static int	parse_history_data_by_itemids(struct zbx_json_parse *jp_data, const c
 {
 	struct zbx_json_parse	jp_row;
 	int			ret = FAIL;
+	char			*tmp = NULL;
+	size_t			tmp_alloc = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -1167,8 +1194,7 @@ static int	parse_history_data_by_itemids(struct zbx_json_parse *jp_data, const c
 		if (SUCCEED != parse_history_data_row_itemid(&jp_row, &itemids[*values_num]))
 			continue;
 
-		if (SUCCEED != parse_history_data_row_value(&jp_row, unique_shift, &values[*values_num]))
-			continue;
+		parse_history_data_row_value(&jp_row, unique_shift, &values[*values_num], &tmp, &tmp_alloc);
 
 		(*values_num)++;
 	}
@@ -1176,6 +1202,7 @@ static int	parse_history_data_by_itemids(struct zbx_json_parse *jp_data, const c
 
 	ret = SUCCEED;
 out:
+	zbx_free(tmp);
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s processed:%d/%d", __func__, zbx_result_string(ret),
 			*values_num, *parsed_num);
 

@@ -378,6 +378,22 @@ static int	DBpatch_7050026(void)
 
 static int	DBpatch_7050027(void)
 {
+	/* 3 - HOST_STATUS_TEMPLATE */
+	if (ZBX_DB_OK > zbx_db_execute("delete from item_rtdata"
+			" where exists ("
+				"select null from items i,hosts h"
+				" where item_rtdata.itemid=i.itemid"
+					" and i.hostid=h.hostid and h.status=3"
+				")"))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+static int	DBpatch_7050028(void)
+{
 	const zbx_db_table_t	table =
 			{"history_json", "itemid,clock,ns", 0,
 				{
@@ -392,7 +408,6 @@ static int	DBpatch_7050027(void)
 
 	return DBcreate_table(&table);
 }
-
 #endif
 
 DBPATCH_START(7050)
@@ -427,5 +442,6 @@ DBPATCH_ADD(7050024, 0, 1)
 DBPATCH_ADD(7050025, 0, 1)
 DBPATCH_ADD(7050026, 0, 1)
 DBPATCH_ADD(7050027, 0, 1)
+DBPATCH_ADD(7050028, 0, 1)
 
 DBPATCH_END()

@@ -77,6 +77,27 @@ void	zbx_db_close(void)
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: defer start of transaction till actual query is present           *
+ *                                                                            *
+ * Comments: for performance reasons it is better not to start empty          *
+ *           transactions                                                     *
+*                                                                             *
+ ******************************************************************************/
+void	zbx_db_begin_deferred(void)
+{
+	if (NULL == dbconn)
+	{
+		THIS_SHOULD_NEVER_HAPPEN;
+		return;
+	}
+
+	zbx_dbconn_begin_deferred(dbconn);
+
+	return;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: start a transaction                                               *
  *                                                                            *
  * Comments: do nothing if DB does not support transactions                   *

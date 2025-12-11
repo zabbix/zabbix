@@ -148,7 +148,8 @@ else {
 									: $formatted_value;
 
 							foreach ($column_config['highlights'] as $highlight) {
-								if (@preg_match('('.$highlight['pattern'].')', $value_to_check)) {
+								if (@preg_match('/'.CRegexHelper::handleSlashEscaping($highlight['pattern']).'/',
+										$value_to_check)) {
 									$color = $highlight['color'];
 									break;
 								}

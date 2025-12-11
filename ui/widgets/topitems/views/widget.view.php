@@ -244,7 +244,7 @@ function makeTableCellViewsText(array $cell, array $data, $formatted_value, bool
 	$color = '';
 	if (array_key_exists('highlights', $column)) {
 		foreach ($column['highlights'] as $highlight) {
-			if (@preg_match('('.$highlight['pattern'].')', $value)) {
+			if (@preg_match('/'.CRegexHelper::handleSlashEscaping($highlight['pattern']).'/', $value)) {
 				$color = $highlight['color'];
 				break;
 			}
