@@ -126,6 +126,7 @@ class CSvgGraphMetricsLine extends CSvgGroup {
 		$this
 			->setAttribute('data-set', $this->options['type'] == SVG_GRAPH_TYPE_LINE ? 'line' : 'staircase')
 			->setAttribute('data-itemid', $this->metric['itemid'])
+			->setAttribute('data-itemids', $this->metric['itemids'])
 			->setAttribute('data-ds', $this->metric['data_set'])
 			->setAttribute('data-metric', $this->metric['name'])
 			->setAttribute('data-color', $this->options['color'])

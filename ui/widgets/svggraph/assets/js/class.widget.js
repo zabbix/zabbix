@@ -23,6 +23,7 @@ class CWidgetSvgGraph extends CWidget {
 	#graph = null;
 
 	#selected_itemid = null;
+	#selected_itemids = null;
 	#selected_ds = null;
 
 	#is_default_selected_itemid = true;
@@ -115,8 +116,8 @@ class CWidgetSvgGraph extends CWidget {
 			this._has_contents = true;
 
 			if (this.#is_default_selected_itemid && response.svg_options.first_metric_to_broadcast !== null) {
-				const {itemid, ds} = response.svg_options.first_metric_to_broadcast;
-				this.updateItemBroadcast(itemid, ds, true);
+				const {itemids, ds} = response.svg_options.first_metric_to_broadcast;
+				this.updateItemBroadcast(itemids, ds, true);
 			}
 
 			this.#initGraph({
@@ -141,20 +142,21 @@ class CWidgetSvgGraph extends CWidget {
 		}
 	}
 
-	updateItemBroadcast(itemid, ds, is_default_selected_itemid = false) {
-		this.#selected_itemid = itemid;
+	updateItemBroadcast(itemids, ds, is_default_selected_itemid = false) {
+		this.#selected_itemid = itemids[0];
+		this.#selected_itemids = itemids;
 		this.#selected_ds = ds;
 
 		this.#is_default_selected_itemid = is_default_selected_itemid;
 
 		this.broadcast({
 			[CWidgetsData.DATA_TYPE_ITEM_ID]: [this.#selected_itemid],
-			[CWidgetsData.DATA_TYPE_ITEM_IDS]: [this.#selected_itemid]
+			[CWidgetsData.DATA_TYPE_ITEM_IDS]: this.#selected_itemids
 		});
 	}
 
-	getItemBroadcasting() {
-		return {itemid: this.#selected_itemid, ds: this.#selected_ds}
+	getItemBroadcast() {
+		return {itemid: this.#selected_itemid, itemids: this.#selected_itemids, ds: this.#selected_ds}
 	}
 
 	updateTimeSelector(data) {

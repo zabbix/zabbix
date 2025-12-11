@@ -29,7 +29,6 @@ class CWidgetScatterPlot extends CWidget {
 
 	onInitialize() {
 		this._has_contents = false;
-		this._svg_options = {};
 	}
 
 	onActivate() {
@@ -117,7 +116,7 @@ class CWidgetScatterPlot extends CWidget {
 
 			if (this.#is_default_selected_itemid && response.svg_options.first_metric_to_broadcast !== null) {
 				const {itemid, ds} = response.svg_options.first_metric_to_broadcast;
-				this.updateItemBroadcast(itemid, ds, true);
+				this.updateItemBroadcast([itemid], ds, true);
 			}
 
 			this.#initGraph({
@@ -132,8 +131,8 @@ class CWidgetScatterPlot extends CWidget {
 		}
 	}
 
-	updateItemBroadcast(itemid, ds, is_default_selected_itemid = false) {
-		this.#selected_itemid = itemid;
+	updateItemBroadcast(itemids, ds, is_default_selected_itemid = false) {
+		this.#selected_itemid = itemids[0];
 		this.#selected_ds = ds;
 
 		this.#is_default_selected_itemid = is_default_selected_itemid;
@@ -144,8 +143,8 @@ class CWidgetScatterPlot extends CWidget {
 		});
 	}
 
-	getItemBroadcasting() {
-		return {itemid: this.#selected_itemid, ds: this.#selected_ds}
+	getItemBroadcast() {
+		return {itemid: this.#selected_itemid, itemids: [this.#selected_itemid], ds: this.#selected_ds}
 	}
 
 	onClearContents() {

@@ -73,6 +73,7 @@ class CSvgGraphMetricsBar extends CSvgGroup {
 			->setAttribute('data-metric', $this->metric['name'])
 			->setAttribute('data-metric', $this->metric['name'])
 			->setAttribute('data-itemid', $this->metric['itemid'])
+			->setAttribute('data-itemids', $this->metric['itemids'])
 			->setAttribute('data-ds', $this->metric['data_set'])
 			->setAttribute('data-color', $this->options['color'])
 			->draw();

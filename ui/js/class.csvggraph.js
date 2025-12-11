@@ -202,9 +202,10 @@ class CSvgGraph {
 
 		for (const item of hintbox_items) {
 			const {itemid, ds} = item.dataset;
+			const itemids = this.#graph_type === GRAPH_TYPE_SCATTER_PLOT ? [itemid] : JSON.parse(item.dataset.itemids);
 
 			item.addEventListener('click', () => {
-				this.#widget.updateItemBroadcast(itemid, ds);
+				this.#widget.updateItemBroadcast(itemids, ds);
 				this.#markSelectedHintboxItems(hintbox);
 			});
 
@@ -233,7 +234,7 @@ class CSvgGraph {
 	}
 
 	#markSelectedHintboxItems(hintbox) {
-		const {itemid, ds} = this.#widget.getItemBroadcasting();
+		const {itemid, ds} = this.#widget.getItemBroadcast();
 
 		for (const item of hintbox.querySelectorAll('.has-broadcast-data')) {
 			item.classList.toggle('selected', item.dataset.itemid == itemid && item.dataset.ds == ds);
@@ -978,6 +979,7 @@ class CSvgGraph {
 				li.classList.add('has-broadcast-data');
 				li.dataset.ds = point.g.dataset.ds;
 				li.dataset.itemid = point.g.dataset.itemid;
+				li.dataset.itemids = point.g.dataset.itemids;
 
 				const color_span = document.createElement('span');
 				color_span.style.backgroundColor = point.g.dataset.color;
