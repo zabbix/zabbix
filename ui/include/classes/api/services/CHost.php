@@ -1010,7 +1010,7 @@ class CHost extends CHostGeneral {
 	 *
 	 * @return boolean
 	 */
-	public function massUpdate($data, array $options = []): array {
+	private function massUpdate($data, array $options = []): array {
 		$this->validateMassUpdate($data, $hosts, $db_hosts, $options);
 
 		$hostids = array_column($data['hosts'], 'hostid');
@@ -1389,7 +1389,7 @@ class CHost extends CHostGeneral {
 
 		if (array_key_exists('groups', $data)) {
 			$this->checkGroups($hosts, $db_hosts, '/groups', array_flip(array_column($data['groups'], 'groupid')));
-			$this->checkHostsWithoutGroups($hosts, $db_hosts);
+			self::checkHostsWithoutGroups($hosts, $db_hosts);
 		}
 
 		if (array_key_exists('macros', $data) && $data['macros']) {
@@ -1536,7 +1536,7 @@ class CHost extends CHostGeneral {
 
 		if (array_key_exists('groupids', $data) && $data['groupids']) {
 			$this->checkGroups($hosts, $db_hosts, '/groupids', array_flip($data['groupids']));
-			$this->checkHostsWithoutGroups($hosts, $db_hosts);
+			self::checkHostsWithoutGroups($hosts, $db_hosts);
 		}
 
 		if ((array_key_exists('templateids', $data) && $data['templateids'])
@@ -1561,7 +1561,7 @@ class CHost extends CHostGeneral {
 	}
 
 	private function addUnchangedObjects(array &$hosts, array $db_hosts, array $del_objectids = []): void {
-		$this->addUnchangedGroups($hosts, $db_hosts, $del_objectids);
+		self::addUnchangedGroups($hosts, $db_hosts, $del_objectids);
 		$this->addUnchangedMacros($hosts, $db_hosts, $del_objectids);
 		$this->addUnchangedTemplates($hosts, $db_hosts, $del_objectids);
 	}
@@ -2549,7 +2549,7 @@ class CHost extends CHostGeneral {
 	}
 
 	private function addAffectedObjects(array $hosts, array &$db_hosts): void {
-		$this->addAffectedGroups($hosts, $db_hosts);
+		self::addAffectedGroups($hosts, $db_hosts);
 		$this->addAffectedTemplates($hosts, $db_hosts);
 		$this->addAffectedTags($hosts, $db_hosts);
 		self::addAffectedMacros($hosts, $db_hosts);

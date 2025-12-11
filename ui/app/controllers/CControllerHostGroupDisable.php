@@ -49,18 +49,20 @@ class CControllerHostGroupDisable extends CController {
 
 		DBstart();
 		$hosts = API::Host()->get([
-			'output' => ['hostid', 'status', 'host'],
+			'output' => ['hostid'],
 			'groupids' => $groupids,
 			'editable' => true
 		]);
 
+		foreach ($hosts as &$host) {
+			$host['status'] = HOST_STATUS_NOT_MONITORED;
+		}
+		unset($host);
+
 		$result = true;
 
 		if ($hosts) {
-			$result = API::Host()->massUpdate([
-				'hosts' => $hosts,
-				'status' => HOST_STATUS_NOT_MONITORED
-			]);
+			$result = API::Host()->update($hosts);
 		}
 
 		$result = DBend($result);
