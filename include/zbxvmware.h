@@ -261,6 +261,7 @@ typedef struct
 	int	enabled;
 	int	acknowledged;
 	char	*entity_id;
+	char	*entity_uuid;
 	char	*entity_type;
 }
 zbx_vmware_alarm_t;

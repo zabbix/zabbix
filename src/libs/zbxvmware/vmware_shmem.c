@@ -306,6 +306,7 @@ void	vmware_shmem_alarm_free(zbx_vmware_alarm_t *alarm)
 	vmware_shared_strfree(alarm->overall_status);
 	vmware_shared_strfree(alarm->time);
 	vmware_shared_strfree(alarm->entity_id);
+	vmware_shared_strfree(alarm->entity_uuid);
 	vmware_shared_strfree(alarm->entity_type);
 
 	__vm_shmem_free_func(alarm);
@@ -796,6 +797,7 @@ static zbx_vmware_alarm_t	*vmware_alarm_shared_dup(const zbx_vmware_alarm_t *src
 	alarm->enabled = src->enabled;
 	alarm->acknowledged = src->acknowledged;
 	alarm->entity_id = vmware_shared_strdup(src->entity_id);
+	alarm->entity_uuid = vmware_shared_strdup(src->entity_uuid);
 	alarm->entity_type = vmware_shared_strdup(src->entity_type);
 
 	return alarm;

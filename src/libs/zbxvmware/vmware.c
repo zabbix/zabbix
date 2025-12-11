@@ -835,6 +835,7 @@ static void	vmware_alarm_free(zbx_vmware_alarm_t *alarm)
 	zbx_str_free(alarm->overall_status);
 	zbx_str_free(alarm->time);
 	zbx_str_free(alarm->entity_id);
+	zbx_str_free(alarm->entity_uuid);
 	zbx_str_free(alarm->entity_type);
 	zbx_free(alarm);
 }
@@ -1460,6 +1461,74 @@ clean:
 			ids->values_num, alarms_data->alarms->values_num);
 
 	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: find uuid entity of alarm by entity id                            *
+ *                                                                            *
+ * Parameters: data - [IN] all collected data                                 *
+ *                                                                            *
+ ******************************************************************************/
+static void	vmware_service_alarm_uuid_update(zbx_vmware_data_t *data)
+{
+#	define	UUID_UPDATE(entity, alarm)									\
+		zbx_vmware_vm_index_t	*vms;									\
+		zbx_hashset_iter_t	iter;									\
+														\
+		zbx_hashset_iter_reset(&data->vms_index, &iter);						\
+														\
+		while (NULL != (vms = (zbx_vmware_vm_index_t *)zbx_hashset_iter_next(&iter)))			\
+		{												\
+			if (0 != strcmp(vms->entity->id, alarm->entity_id) ||					\
+					FAIL == zbx_vector_str_bsearch(&vms->entity->alarm_ids, alarm->key,	\
+					ZBX_DEFAULT_STR_COMPARE_FUNC))						\
+			{											\
+				continue;									\
+			}											\
+														\
+			alarm->entity_uuid = zbx_strdup(NULL, vms->entity->uuid);				\
+			break;											\
+		}
+
+	int	i;
+
+	for (i = 0; i < data->alarms.values_num; i++)
+	{
+		zbx_vmware_alarm_t	*alarm = data->alarms.values[i];
+
+		if (NULL == alarm->entity_id)
+			continue;
+
+		if (0 == strcmp(alarm->entity_type, ZBX_VMWARE_SOAP_VM))
+		{
+			UUID_UPDATE(vm, alarm);
+		}
+		else if (0 == strcmp(alarm->entity_type, ZBX_VMWARE_SOAP_HV))
+		{
+			UUID_UPDATE(hv, alarm);
+		}
+		else if (0 == strcmp(alarm->entity_type, ZBX_VMWARE_SOAP_DS))
+		{
+			int			j;
+			zbx_vmware_datastore_t	ds_cmp;
+
+			ds_cmp.id = alarm->entity_id;
+
+			if (FAIL == (j = zbx_vector_vmware_datastore_ptr_search(&data->datastores, &ds_cmp,
+					vmware_ds_id_compare)) ||
+					FAIL == zbx_vector_str_bsearch(&data->datastores.values[j]->alarm_ids,
+					alarm->key, ZBX_DEFAULT_STR_COMPARE_FUNC))
+			{
+				continue;
+			}
+
+			alarm->entity_uuid = zbx_strdup(NULL, data->datastores.values[j]->uuid);
+
+		}
+		else
+			alarm->entity_uuid = NULL;
+	}
 }
 
 /******************************************************************************
@@ -2706,6 +2775,7 @@ int	zbx_vmware_service_update(zbx_vmware_service_t *service, const char *config_
 	vmware_service_props_load(easyhandle, get_vmware_service_objects()[service->type].property_collector,
 			&prop_query_values);
 	zbx_vector_vmware_alarm_ptr_sort(&data->alarms, ZBX_DEFAULT_STR_PTR_COMPARE_FUNC);
+	vmware_service_alarm_uuid_update(data);
 
 	if (ZBX_VMWARE_TYPE_VCENTER != service->type)
 	{
