@@ -1895,7 +1895,7 @@ abstract class CTriggerGeneral extends CApiService {
 				}
 
 				$tags_delete = array_filter($tags_delete,
-					static fn(array $tag) => $tag['automatic'] == ZBX_TAG_MANUAL
+					static fn(array $tag) => !array_key_exists('automatic', $tag) || $tag['automatic'] == ZBX_TAG_MANUAL
 				);
 
 				foreach ($tags_delete as $tag_delete) {
