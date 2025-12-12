@@ -378,10 +378,26 @@ static int	DBpatch_7050026(void)
 
 static int	DBpatch_7050027(void)
 {
-	return DBrename_table("housekeeper", "housekeeper_tmp");
+	/* 3 - HOST_STATUS_TEMPLATE */
+	if (ZBX_DB_OK > zbx_db_execute("delete from item_rtdata"
+			" where exists ("
+				"select null from items i,hosts h"
+				" where item_rtdata.itemid=i.itemid"
+					" and i.hostid=h.hostid and h.status=3"
+				")"))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
 }
 
 static int	DBpatch_7050028(void)
+{
+	return DBrename_table("housekeeper", "housekeeper_tmp");
+}
+
+static int	DBpatch_7050029(void)
 {
 	const zbx_db_table_t	table =
 			{"housekeeper", "housekeeperid", 0,
@@ -397,7 +413,7 @@ static int	DBpatch_7050028(void)
 	return DBcreate_table(&table);
 }
 
-static int	DBpatch_7050029(void)
+static int	DBpatch_7050030(void)
 {
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
@@ -424,37 +440,37 @@ static int	DBpatch_7050029(void)
 	return SUCCEED;
 }
 
-static int	DBpatch_7050030(void)
+static int	DBpatch_7050031(void)
 {
 	return DBdrop_table("housekeeper_tmp");
 }
 
-static int	DBpatch_7050031(void)
+static int	DBpatch_7050032(void)
 {
 	return DBcreate_housekeeper_trigger("items", "itemid");
 }
 
-static int	DBpatch_7050032(void)
+static int	DBpatch_7050033(void)
 {
 	return DBcreate_housekeeper_trigger("triggers", "triggerid");
 }
 
-static int	DBpatch_7050033(void)
+static int	DBpatch_7050034(void)
 {
 	return DBcreate_housekeeper_trigger("services", "serviceid");
 }
 
-static int	DBpatch_7050034(void)
+static int	DBpatch_7050035(void)
 {
 	return DBcreate_housekeeper_trigger("dhosts", "dhostid");
 }
 
-static int	DBpatch_7050035(void)
+static int	DBpatch_7050036(void)
 {
 	return DBcreate_housekeeper_trigger("dservices", "dserviceid");
 }
 
-static int	DBpatch_7050036(void)
+static int	DBpatch_7050037(void)
 {
 	if (ZBX_DB_OK > zbx_db_execute("delete from ids where table_name='housekeeper'"))
 		return FAIL;
@@ -505,5 +521,6 @@ DBPATCH_ADD(7050033, 0, 1)
 DBPATCH_ADD(7050034, 0, 1)
 DBPATCH_ADD(7050035, 0, 1)
 DBPATCH_ADD(7050036, 0, 1)
+DBPATCH_ADD(7050037, 0, 1)
 
 DBPATCH_END()
