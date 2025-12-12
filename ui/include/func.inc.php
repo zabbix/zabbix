@@ -1395,25 +1395,6 @@ function getNumDecimals(float $number): int {
 }
 
 /**
- * Get number of digits after the decimal dot for string.
- *
- * @param string $number  Valid number in decimal or scientific notation.
- *
- * @return int
- */
-function getStringNumDecimals(string $number): int {
-	preg_match('/^'.ZBX_PREG_NUMBER.'/', $number, $matches);
-
-	$decimals_before_e = (array_key_exists('frac', $matches) && strlen($matches['frac']) > 0)
-		? strlen($matches['frac'])
-		: (array_key_exists('frac_only', $matches) ? strlen($matches['frac_only']) : 0);
-
-	$exponent = array_key_exists('exp', $matches) ? (int) $matches['exp'] : 0;
-
-	return max(0, $decimals_before_e - $exponent);
-}
-
-/**
  * Converts number to letter representation.
  * From A to Z, then from AA to ZZ etc.
  * Example: 0 => A, 25 => Z, 26 => AA, 27 => AB, 52 => BA, ...
