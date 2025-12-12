@@ -317,7 +317,7 @@ int	net_if_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 	int			rc, ret = SYSINFO_RET_FAIL;
 	perfstat_id_t		ps_id;
 	perfstat_netinterface_t	*ps_netif = NULL;
-	struct zbx_json		j;
+	struct zbx_json		jcfg, jval, j;
 	zbx_regexp_t		*rxp = NULL;
 	char			*error = NULL;
 	char			*pattern;
@@ -337,8 +337,6 @@ int	net_if_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 		return SYSINFO_RET_FAIL;
 	}
 
-	zbx_json_initarray(&j, ZBX_JSON_STAT_BUF_LEN);
-
 	if (1 == request->nparam)
 	{
 		pattern = get_rparam(request, 0);
@@ -347,20 +345,12 @@ int	net_if_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 		{
 			zbx_set_json_strerror("invalid regular expression in JSON path: %s", error);
 			zbx_free(error);
-			zbx_json_close(&j);
-			zbx_json_free(&j);
 			return SYSINFO_RET_FAIL;
 		}
 	}
 
-	if (0 == rc)
-	{
-		ret = SYSINFO_RET_OK;
-		goto end;
-	}
 
 	ps_netif = zbx_malloc(ps_netif, rc * sizeof(perfstat_netinterface_t));
-
 	zbx_strscpy(ps_id.name, FIRST_NETINTERFACE);
 
 	if (-1 != (rc = perfstat_netinterface(&ps_id, ps_netif, sizeof(perfstat_netinterface_t), rc)))
@@ -372,28 +362,33 @@ int	net_if_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 		return SYSINFO_RET_FAIL;
 	}
 
+	zbx_json_initarray(&jval, ZBX_JSON_STAT_BUF_LEN);
+	zbx_json_initarray(&jcfg, ZBX_JSON_STAT_BUF_LEN);
+
 	for (int i = 0; i < rc; i++)
 	{
 		if (NULL != rxp && 0 != zbx_regexp_match_precompiled(ps_netif[i].name, rxp))
 			continue;
 
-		zbx_json_addobject(&j, NULL);
-		zbx_json_addstring(&j, "name", ps_netif[i].name, ZBX_JSON_TYPE_STRING);
-		zbx_json_adduint64(&j, "type", ps_netif[i].type);
+		zbx_json_addobject(&jcfg, NULL);
+		zbx_json_addobject(&jval, NULL);
+		zbx_json_addstring(&jcfg, "name", ps_netif[i].name, ZBX_JSON_TYPE_STRING);
+		zbx_json_addstring(&jcfg, "ifalias", ps_netif[i].description, ZBX_JSON_TYPE_STRING);
 
-		zbx_json_addobject(&j, "in");
-		zbx_json_adduint64(&j, "bytes", ps_netif[i].ibytes);
-		zbx_json_adduint64(&j, "packets", ps_netif[i].ipackets);
-		zbx_json_adduint64(&j, "errors", ps_netif[i].ierrors);
-		zbx_json_close(&j);
-		zbx_json_addobject(&j, "out");
-		zbx_json_adduint64(&j, "bytes", ps_netif[i].obytes);
-		zbx_json_adduint64(&j, "packets", ps_netif[i].opackets);
-		zbx_json_adduint64(&j, "errors", ps_netif[i].oerrors);
-		zbx_json_adduint64(&j, "collisions", ps_netif[i].collisions);
-		zbx_json_close(&j);
+		zbx_json_addstring(&jval, "ifalias", ps_netif[i].description, ZBX_JSON_TYPE_STRING);
 
-		zbx_json_addstring(&j, "ifalias", ps_netif[i].description, ZBX_JSON_TYPE_STRING);
+		zbx_json_adduint64(&jval, "type", ps_netif[i].type);
+		zbx_json_addobject(&jval, "in");
+		zbx_json_adduint64(&jval, "bytes", ps_netif[i].ibytes);
+		zbx_json_adduint64(&jval, "packets", ps_netif[i].ipackets);
+		zbx_json_adduint64(&jval, "errors", ps_netif[i].ierrors);
+		zbx_json_close(&jval);
+		zbx_json_addobject(&jval, "out");
+		zbx_json_adduint64(&jval, "bytes", ps_netif[i].obytes);
+		zbx_json_adduint64(&jval, "packets", ps_netif[i].opackets);
+		zbx_json_adduint64(&jval, "errors", ps_netif[i].oerrors);
+		zbx_json_adduint64(&jval, "collisions", ps_netif[i].collisions);
+		zbx_json_close(&jval);
 
 		if (sock >= 0)
 		{
@@ -402,29 +397,33 @@ int	net_if_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 			if (ioctl(sock, SIOCGIFFLAGS, &ifr) < 0)
 			{
-				zbx_json_addstring(&j, "administrative_state", "unknown", ZBX_JSON_TYPE_STRING);
-				zbx_json_addstring(&j, "operational_state", "unknown", ZBX_JSON_TYPE_STRING);
+				zbx_json_addstring(&jcfg, "administrative_state", "unknown", ZBX_JSON_TYPE_STRING);
+				zbx_json_addstring(&jcfg, "operational_state", "unknown", ZBX_JSON_TYPE_STRING);
 			}
 			else
 			{
-				zbx_json_addstring(&j, "administrative_state",
+				zbx_json_addstring(&jcfg, "administrative_state",
 					(ifr.ifr_flags & IFF_UP) ? "up" : "down", ZBX_JSON_TYPE_STRING);
 
-				zbx_json_addstring(&j, "operational_state",
+				zbx_json_addstring(&jcfg, "operational_state",
 					(ifr.ifr_flags & IFF_RUNNING) ? "up" : "down", ZBX_JSON_TYPE_STRING);
 			}
 		}
 		else
 		{
-			zbx_json_addstring(&j, "administrative_state", "unknown", ZBX_JSON_TYPE_STRING);
-			zbx_json_addstring(&j, "operational_state", "unknown", ZBX_JSON_TYPE_STRING);
+			zbx_json_addstring(&jcfg, "administrative_state", "unknown", ZBX_JSON_TYPE_STRING);
+			zbx_json_addstring(&jcfg, "operational_state", "unknown", ZBX_JSON_TYPE_STRING);
 		}
 
 		/* Get MAC Address */
 		if (SUCCEED == get_mac_address_aix(ps_netif[i].name, mac_addr_str, sizeof(mac_addr_str)))
-			zbx_json_addstring(&j, "mac", mac_addr_str, ZBX_JSON_TYPE_STRING);
+		{
+			zbx_json_addstring(&jval, "mac", mac_addr_str, ZBX_JSON_TYPE_STRING);
+			zbx_json_addstring(&jcfg, "mac", mac_addr_str, ZBX_JSON_TYPE_STRING);
+		}
 
-		zbx_json_close(&j);
+		zbx_json_close(&jval);
+		zbx_json_close(&jcfg);
 	}
 
 	if (sock >= 0)
@@ -434,10 +433,14 @@ int	net_if_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 		zbx_regexp_free(rxp);
 	zbx_free(ps_netif);
 end:
+	zbx_json_init(&j, ZBX_JSON_STAT_BUF_LEN);
+	zbx_json_addraw(&j, "config", jcfg.buffer);
+	zbx_json_addraw(&j, "value", jval.buffer);
 	zbx_json_close(&j);
 
 	SET_STR_RESULT(result, strdup(j.buffer));
-
+	zbx_json_free(&jval);
+	zbx_json_free(&jcfg);
 	zbx_json_free(&j);
 
 	return ret;
