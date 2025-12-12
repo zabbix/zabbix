@@ -276,6 +276,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 			];
 
 			if ($value_type == ITEM_VALUE_TYPE_BINARY || $value_type == ITEM_VALUE_TYPE_JSON) {
+				// Extra byte to trim values that exceeds length limit.
 				$options['maxValueSize'] = 64 * ZBX_KIBIBYTE + 1;
 			}
 

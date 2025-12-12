@@ -137,10 +137,10 @@ function makeTableCellViewsNumeric(array $cell, array $data, $formatted_value, b
 		->addClass(ZBX_STYLE_CURSOR_POINTER)
 		->addClass(ZBX_STYLE_NOWRAP);
 
-	$hintbox_value = $item['value_type'] == ITEM_VALUE_TYPE_JSON
-		? (new CTrim($value, ZBX_HINTBOX_CONTENT_LIMIT)) : (new CDiv($value));
-
 	if ($value !== '') {
+		$hintbox_value = $item['value_type'] == ITEM_VALUE_TYPE_JSON
+			? (new CTrim($value, ZBX_HINTBOX_CONTENT_LIMIT)) : (new CDiv($value));
+
 		$value_cell->setHint(
 			$hintbox_value
 				->addClass(ZBX_STYLE_HINTBOX_WRAP),

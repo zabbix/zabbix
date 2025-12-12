@@ -292,6 +292,7 @@ class CScreenHistory extends CScreenBase {
 					$options['itemids'] = $itemids;
 
 					if ($value_type == ITEM_VALUE_TYPE_JSON) {
+						// Extra byte to trim values that exceeds length limit.
 						$options['maxValueSize'] = 64 * ZBX_KIBIBYTE + 1;
 					}
 					else {
