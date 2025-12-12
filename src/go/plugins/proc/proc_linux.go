@@ -269,12 +269,28 @@ func (err *userNotFoundError) Error() string {
 // Cannot use go user.Lookup() since it (unlike Zabbix agent C.getpwnam()) ignores remote services like SSSD.
 func getUIDByName(userName string) (*uid, error) {
 	userNameC := C.CString(userName)
-
 	defer C.free(unsafe.Pointer(userNameC))
-	passwdC, err := C.getpwnam(userNameC)
+
+	var pwd C.struct_passwd
+	var passwdC *C.struct_passwd
+
+	const bufSize = 4096
+	buf := C.malloc(C.size_t(bufSize))
+	if buf == nil {
+		return nil, errors.New("malloc failed")
+	}
+	defer C.free(buf)
+
+	errCode := C.getpwnam_r(
+		userNameC,
+		&pwd,
+		(*C.char)(buf),
+		C.size_t(bufSize),
+		&passwdC,
+	)
 
 	if passwdC == nil {
-		return nil, err
+		return nil, fmt.Errorf("getpwnam_r failed with code %d", int(errCode))
 	}
 
 	return &uid{uint32(passwdC.pw_uid)}, nil
