@@ -181,7 +181,19 @@ class CSetupWizard extends CForm {
 						$this->getConfig('DB_VAULT_DB_PATH', '')
 					));
 
+					$this->setConfig('DB_VAULT_AUTH_TYPE', getRequest('vault_auth_type',
+						$this->getConfig('DB_VAULT_AUTH_TYPE', DB_VAULT_HASHICORP_AUTH_TYPE_TOKEN)
+					));
+
 					$this->setConfig('DB_VAULT_TOKEN', getRequest('vault_token', $this->getConfig('DB_VAULT_TOKEN')));
+
+					$this->setConfig('DB_VAULT_ROLE_ID', getRequest('vault_role_id',
+						$this->getConfig('DB_VAULT_ROLE_ID'))
+					);
+
+					$this->setConfig('DB_VAULT_SECRET_ID', getRequest('vault_secret_id',
+						$this->getConfig('DB_VAULT_SECRET_ID'))
+					);
 
 					$this->unsetConfig(['DB_USER', 'DB_PASSWORD', 'DB_VAULT_CERTIFICATES', 'DB_VAULT_CERT_FILE',
 						'DB_VAULT_KEY_FILE'
@@ -216,15 +228,18 @@ class CSetupWizard extends CForm {
 						: '';
 					$this->setConfig('DB_VAULT_KEY_FILE', $vault_key_file);
 
-					$this->unsetConfig(['DB_USER', 'DB_PASSWORD', 'DB_VAULT_TOKEN']);
+					$this->unsetConfig(['DB_USER', 'DB_PASSWORD','DB_VAULT_AUTH_TYPE', 'DB_VAULT_TOKEN',
+						'DB_VAULT_ROLE_ID', 'DB_VAULT_SECRET_ID'
+					]);
 					break;
 
 				default:
 					$this->setConfig('DB_USER', getRequest('user', $this->getConfig('DB_USER', 'root')));
 					$this->setConfig('DB_PASSWORD', getRequest('password', $this->getConfig('DB_PASSWORD', '')));
 
-					$this->unsetConfig(['DB_VAULT_URL', 'DB_VAULT_DB_PATH', 'DB_VAULT_TOKEN', 'DB_VAULT_CERTIFICATES',
-						'DB_VAULT_CERT_FILE', 'DB_VAULT_KEY_FILE'
+					$this->unsetConfig(['DB_VAULT_URL', 'DB_VAULT_DB_PATH', 'DB_AUTH_TYPE', 'DB_VAULT_TOKEN',
+						'DB_VAULT_ROLE_ID', 'DB_VAULT_SECRET_ID', 'DB_VAULT_CERTIFICATES', 'DB_VAULT_CERT_FILE',
+						'DB_VAULT_KEY_FILE'
 					]);
 					break;
 			}
@@ -238,7 +253,8 @@ class CSetupWizard extends CForm {
 					case DB_STORE_CREDS_VAULT_HASHICORP:
 						$vault_provider = new CVaultHashiCorp($this->getConfig('DB_VAULT_URL'),
 							$this->getConfig('DB_VAULT_PREFIX'), $this->getConfig('DB_VAULT_DB_PATH'),
-							$this->getConfig('DB_VAULT_TOKEN')
+							$this->getConfig('DB_VAULT_AUTH_TYPE'), $this->getConfig('DB_VAULT_TOKEN'),
+							$this->getConfig('DB_VAULT_ROLE_ID'), $this->getConfig('DB_VAULT_SECRET_ID')
 						);
 						break;
 
@@ -332,7 +348,10 @@ class CSetupWizard extends CForm {
 					'VAULT_URL' => '',
 					'VAULT_PREFIX' => '',
 					'VAULT_DB_PATH' => '',
+					'VAULT_AUTH_TYPE' => DB_VAULT_HASHICORP_AUTH_TYPE_TOKEN,
 					'VAULT_TOKEN' => '',
+					'VAULT_ROLE_ID' => '',
+					'VAULT_SECRET_ID' => '',
 					'VAULT_CERT_FILE' => '',
 					'VAULT_KEY_FILE' => ''
 				];
@@ -348,7 +367,10 @@ class CSetupWizard extends CForm {
 						$vault_config['VAULT_URL'] = $this->getConfig('DB_VAULT_URL');
 						$vault_config['VAULT_PREFIX'] = $this->getConfig('DB_VAULT_PREFIX');
 						$vault_config['VAULT_DB_PATH'] = $this->getConfig('DB_VAULT_DB_PATH');
+						$vault_config['VAULT_AUTH_TYPE'] = $this->getConfig('DB_VAULT_AUTH_TYPE');
 						$vault_config['VAULT_TOKEN'] = $this->getConfig('DB_VAULT_TOKEN');
+						$vault_config['VAULT_ROLE_ID'] = $this->getConfig('DB_VAULT_ROLE_ID');
+						$vault_config['VAULT_SECRET_ID'] = $this->getConfig('DB_VAULT_SECRET_ID');
 						break;
 
 					case DB_STORE_CREDS_VAULT_CYBERARK:
@@ -631,6 +653,8 @@ class CSetupWizard extends CForm {
 
 		$db_creds_storage = (int) $this->getConfig('DB_CREDS_STORAGE', DB_STORE_CREDS_CONFIG);
 
+		$hashicorp_auth_type = (int) $this->getConfig('DB_VAULT_AUTH_TYPE', DB_VAULT_HASHICORP_AUTH_TYPE_TOKEN);
+
 		$table
 			->addRow(_('Store credentials in'),
 				(new CRadioButtonList('creds_storage', $db_creds_storage))
@@ -688,12 +712,47 @@ class CSetupWizard extends CForm {
 				'vault_db_path_row',
 				$db_creds_storage != DB_STORE_CREDS_VAULT_HASHICORP ? ZBX_STYLE_DISPLAY_NONE : null
 			)
+			->addRow(
+				_('Vault authentication type'),
+				(new CRadioButtonList('vault_auth_type',
+					(int) $this->getConfig('DB_VAULT_AUTH_TYPE', DB_VAULT_HASHICORP_AUTH_TYPE_TOKEN)
+				))
+					->addValue(_('Token'), DB_VAULT_HASHICORP_AUTH_TYPE_TOKEN)
+					->addValue(_('AppRole'), DB_VAULT_HASHICORP_AUTH_TYPE_APP_ROLE)
+					->setModern(true)
+				,
+				'vault_auth_type_row',
+				$db_creds_storage != DB_STORE_CREDS_VAULT_HASHICORP ? ZBX_STYLE_DISPLAY_NONE : null
+			)
 			->addRow(_('Vault authentication token'),
 				(new CTextBox('vault_token', $this->getConfig('DB_VAULT_TOKEN')))
 					->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 					->setAttribute('maxlength', 2048),
 				'vault_token_row',
-				$db_creds_storage != DB_STORE_CREDS_VAULT_HASHICORP ? ZBX_STYLE_DISPLAY_NONE : null
+				$db_creds_storage != DB_STORE_CREDS_VAULT_HASHICORP
+						|| $hashicorp_auth_type != DB_VAULT_HASHICORP_AUTH_TYPE_TOKEN
+					? ZBX_STYLE_DISPLAY_NONE
+					: null
+			)
+			->addRow(_('Vault authentication role id'),
+				(new CTextBox('vault_role_id', $this->getConfig('DB_VAULT_ROLE_ID')))
+					->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+					->setAttribute('maxlength', 2048),
+				'vault_role_id_row',
+				$db_creds_storage != DB_STORE_CREDS_VAULT_HASHICORP
+						|| $hashicorp_auth_type != DB_VAULT_HASHICORP_AUTH_TYPE_APP_ROLE
+					? ZBX_STYLE_DISPLAY_NONE
+					: null
+			)
+			->addRow(_('Vault authentication secret id'),
+				(new CTextBox('vault_secret_id', $this->getConfig('DB_VAULT_SECRET_ID')))
+					->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+					->setAttribute('maxlength', 2048),
+				'vault_secret_id_row',
+				$db_creds_storage != DB_STORE_CREDS_VAULT_HASHICORP
+						|| $hashicorp_auth_type != DB_VAULT_HASHICORP_AUTH_TYPE_APP_ROLE
+					? ZBX_STYLE_DISPLAY_NONE
+					: null
 			)
 			// CyberArk Vault - related fields.
 			->addRow(
@@ -976,6 +1035,8 @@ class CSetupWizard extends CForm {
 		}
 
 		if ($this->getConfig('DB_CREDS_STORAGE', DB_STORE_CREDS_CONFIG) == DB_STORE_CREDS_VAULT_HASHICORP) {
+			$auth_type = $this->getConfig('DB_VAULT_AUTH_TYPE');
+
 			$table
 				->addRow(
 					(new CSpan(_('Vault API endpoint')))->addClass(ZBX_STYLE_GREY),
@@ -990,9 +1051,27 @@ class CSetupWizard extends CForm {
 					$this->getConfig('DB_VAULT_DB_PATH')
 				)
 				->addRow(
+					(new CSpan(_('Vault authentication type')))->addClass(ZBX_STYLE_GREY),
+					$auth_type == DB_VAULT_HASHICORP_AUTH_TYPE_TOKEN ? _('Token') : _('AppRole')
+				);
+
+			if ($auth_type == DB_VAULT_HASHICORP_AUTH_TYPE_TOKEN) {
+				$table->addRow(
 					(new CSpan(_('Vault authentication token')))->addClass(ZBX_STYLE_GREY),
 					$this->getConfig('DB_VAULT_TOKEN')
 				);
+			}
+			else {
+				$table
+					->addRow(
+						(new CSpan(_('Vault authentication role id')))->addClass(ZBX_STYLE_GREY),
+						$this->getConfig('DB_VAULT_ROLE_ID')
+					)
+					->addRow(
+						(new CSpan(_('Vault authentication secret id')))->addClass(ZBX_STYLE_GREY),
+						$this->getConfig('DB_VAULT_SECRET_ID')
+					);
+			}
 		}
 
 		if ($this->getConfig('DB_CREDS_STORAGE', DB_STORE_CREDS_CONFIG) == DB_STORE_CREDS_VAULT_CYBERARK) {
@@ -1132,7 +1211,10 @@ class CSetupWizard extends CForm {
 			'VAULT_URL' => '',
 			'VAULT_PREFIX' => '',
 			'VAULT_DB_PATH' => '',
+			'VAULT_AUTH_TYPE' => DB_VAULT_HASHICORP_AUTH_TYPE_TOKEN,
 			'VAULT_TOKEN' => '',
+			'VAULT_ROLE_ID' => '',
+			'VAULT_SECRET_ID' => '',
 			'VAULT_CERT_FILE' => '',
 			'VAULT_KEY_FILE' => ''
 		];
@@ -1150,10 +1232,14 @@ class CSetupWizard extends CForm {
 			$vault_config['VAULT_URL'] = $this->getConfig('DB_VAULT_URL');
 			$vault_config['VAULT_PREFIX'] = $this->getConfig('DB_VAULT_PREFIX');
 			$vault_config['VAULT_DB_PATH'] = $this->getConfig('DB_VAULT_DB_PATH');
+			$vault_config['VAULT_AUTH_TYPE'] = $this->getConfig('VAULT_AUTH_TYPE');
 			$vault_config['VAULT_TOKEN'] = $this->getConfig('DB_VAULT_TOKEN');
+			$vault_config['VAULT_ROLE_ID'] = $this->getConfig('VAULT_ROLE_ID');
+			$vault_config['VAULT_SECRET_ID'] = $this->getConfig('VAULT_SECRET_ID');
 
 			$vault_provider = new CVaultHashiCorp($vault_config['VAULT_URL'], $vault_config['VAULT_PREFIX'],
-				$vault_config['VAULT_DB_PATH'], $vault_config['VAULT_TOKEN']
+				$vault_config['VAULT_DB_PATH'], $vault_config['VAULT_AUTH_TYPE'], $vault_config['VAULT_TOKEN'],
+				$vault_config['VAULT_ROLE_ID'], $vault_config['VAULT_SECRET_ID']
 			);
 
 			$db_credentials = $vault_provider->getCredentials();

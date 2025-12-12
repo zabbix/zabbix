@@ -19,23 +19,32 @@
  */
 class CVaultHashiCorp extends CVault {
 
-	public const TYPE					= ZBX_VAULT_TYPE_HASHICORP;
-	public const NAME					= 'HashiCorp';
-	public const API_ENDPOINT_DEFAULT	= 'https://localhost:8200';
-	public const DB_PREFIX_DEFAULT		= '';
-	public const DB_PREFIX_PLACEHOLDER	= '/v1/secret/data/';
-	public const DB_PATH_PLACEHOLDER	= 'path/to/secret';
+	public const TYPE						= ZBX_VAULT_TYPE_HASHICORP;
+	public const NAME						= 'HashiCorp';
+	public const API_ENDPOINT_DEFAULT		= 'https://localhost:8200';
+	public const DB_PREFIX_DEFAULT			= '';
+	public const DB_PREFIX_PLACEHOLDER		= '/v1/secret/data/';
+	public const DB_PATH_PLACEHOLDER		= 'path/to/secret';
+
+	private const DB_APP_ROLE_LOGIN_PATH 	= '/v1/auth/approle/login';
 
 	private string $api_endpoint;
 	private string $db_prefix;
 	private string $db_path;
+	private int $auth_type;
 	private string $token;
+	private string $role_id;
+	private string $secret_id;
 
-	public function __construct(string $api_endpoint, string $db_prefix, string $db_path, string $token) {
+	public function __construct(string $api_endpoint, string $db_prefix, string $db_path, int $auth_type,
+			string $token = '', string $role_id = '', string $secret_id = '') {
 		$this->api_endpoint = $api_endpoint;
 		$this->db_prefix = $db_prefix;
 		$this->db_path = $db_path;
 		$this->token = $token;
+		$this->auth_type = $auth_type;
+		$this->role_id = $role_id;
+		$this->secret_id = $secret_id;
 	}
 
 	public function validateParameters(): bool {
@@ -53,8 +62,19 @@ class CVaultHashiCorp extends CVault {
 			$this->addError(_s('Provided secret path "%1$s" is invalid.', $this->db_path));
 		}
 
-		if ($this->token === '') {
-			$this->addError(_s('Provided authentication token "%1$s" is empty.', $this->token));
+		if ($this->auth_type === DB_VAULT_HASHICORP_AUTH_TYPE_TOKEN) {
+			if ($this->token === '') {
+				$this->addError(_s('Provided authentication token "%1$s" is empty.', $this->token));
+			}
+		}
+		else {
+			if ($this->role_id === '') {
+				$this->addError(_s('Provided authentication role id "%1$s" is empty.', $this->role_id));
+			}
+
+			if ($this->secret_id === '') {
+				$this->addError(_s('Provided authentication secret id "%1$s" is empty.', $this->role_id));
+			}
 		}
 
 		return !$this->getErrors();
@@ -71,10 +91,47 @@ class CVaultHashiCorp extends CVault {
 			$url = $this->api_endpoint.$this->db_prefix.$this->db_path;
 		}
 
+		if ($this->auth_type == DB_VAULT_HASHICORP_AUTH_TYPE_APP_ROLE) {
+			$login_url = rtrim($this->api_endpoint, '/').self::DB_APP_ROLE_LOGIN_PATH;
+			$data = [
+				'role_id' => $this->role_id,
+				'secret_id' => $this->secret_id
+			];
+
+			$fetch_token = file_get_contents($login_url, false, stream_context_create([
+				'http' => [
+					'method' => 'POST',
+					'header' => "Content-Type: application/json\r\n",
+					'content' => json_encode($data, JSON_THROW_ON_ERROR),
+					'ignore_errors' => true
+				]
+			]));
+
+			if ($fetch_token === false) {
+				$this->addError(_('Vault AppRole login connection failed.'));
+
+				return null;
+			}
+
+			$fetch_token = $fetch_token ? json_decode($fetch_token, true) : null;
+
+			if (!is_array($fetch_token) || !array_key_exists('auth', $fetch_token)
+					|| !array_key_exists('client_token', $fetch_token['auth'])) {
+				$this->addError(_('Unable to load token from Vault.'));
+
+				return null;
+			}
+
+			$token = $fetch_token['auth']['client_token'];
+		}
+		else {
+			$token = $this->token;
+		}
+
 		$secret = @file_get_contents($url, false, stream_context_create([
 			'http' => [
 				'method' => 'GET',
-				'header' => "X-Vault-Token: $this->token\r\n",
+				'header' => "X-Vault-Token: $token\r\n",
 				'ignore_errors' => true
 			]
 		]));

@@ -27,6 +27,10 @@ $DB['VAULT_DB_PATH']		= '';
 $DB['VAULT_TOKEN']		= '';
 $DB['VAULT_CERT_FILE']		= '';
 $DB['VAULT_KEY_FILE']		= '';
+// Uncomment to use role_id and secret_id for Hashicorp vault authentication instead of token.
+// $DB['VAULT_AUTH_TYPE']	= DB_VAULT_HASHICORP_AUTH_TYPE_APP_ROLE;
+// $DB['VAULT_ROLE_ID']		= '';
+// $DB['VAULT_SECRET_ID']	= '';
 // Uncomment to bypass local caching of credentials.
 // $DB['VAULT_CACHE']		= true;
 
