@@ -123,10 +123,6 @@ class CSvgGraph {
 
 		this.#svg.setAttribute('unselectable', 'true');
 		this.#svg.style.userSelect = 'none';
-
-		if (this.#sbox) {
-			this.#dropDocumentListeners(null);
-		}
 	}
 
 	activate() {
@@ -158,15 +154,11 @@ class CSvgGraph {
 		this.#svg.removeEventListener('onDeleteStaticHint', this.#onStaticHintboxClose);
 
 		if (this.#sbox) {
-			this.#destroySBox(e);
+			this.#destroySBox();
 
 			this.#svg.removeEventListener('dblclick', this.#zoomOutTime);
 			this.#svg.removeEventListener('mousedown', this.#startSBoxDrag);
 		}
-	}
-
-	isBoxing() {
-		return this.#is_boxing;
 	}
 
 	#mouseLeaveHandler = () => {
@@ -253,30 +245,6 @@ class CSvgGraph {
 		this.#svg.classList.remove('highlighted');
 	}
 
-	/**
-	 * Function removes SBox related document event listeners:
-	 * - if no other widget have active SBox;
-	 * - to avoid another call of destroySBox on 'mouseup' (in case if user has pressed ESC).
-	 */
-	#dropDocumentListeners(e) {
-		let widgets_boxing = 0; // Number of widgets with active SBox.
-
-		for (const dashboard_page of ZABBIX.Dashboard.getDashboardPages()) {
-			dashboard_page.getWidgets().forEach((widget) => {
-				if (widget.getType() === 'svggraph' && widget.getGraph() !== null) {
-					const boxing = widget.getGraph().isBoxing();
-					if (boxing !== undefined && boxing) {
-						widgets_boxing++;
-					}
-				}
-			});
-		}
-
-		if (widgets_boxing === 0 || (e && 'key' in e && e.key === 'Escape')) {
-			this.#unregisterSBoxEvents();
-		}
-	}
-
 	#registerSBoxEvents() {
 		document.addEventListener('selectstart', this.#selectStart);
 		document.addEventListener('keydown', this.#sBoxKeyDown);
@@ -299,7 +267,7 @@ class CSvgGraph {
 
 	#sBoxKeyDown = e => {
 		if (e.key === 'Escape') {
-			this.#destroySBox(e);
+			this.#destroySBox();
 		}
 	}
 
@@ -358,7 +326,7 @@ class CSvgGraph {
 	}
 
 	// Cancel SBox and unset its variables.
-	#destroySBox(e) {
+	#destroySBox() {
 		if (!this.#is_static_hintbox_opened) {
 			this.#widget._resumeUpdating();
 		}
@@ -371,7 +339,7 @@ class CSvgGraph {
 
 		this.#is_boxing = false;
 
-		this.#dropDocumentListeners(e);
+		this.#unregisterSBoxEvents();
 	}
 
 	// Method to end selection of horizontal area in graph.
@@ -380,7 +348,7 @@ class CSvgGraph {
 
 		const set_date = this.#is_boxing;
 
-		this.#destroySBox(e);
+		this.#destroySBox();
 
 		if (set_date) {
 			const offsetX = e.clientX - this.#svg.getBoundingClientRect().left;
