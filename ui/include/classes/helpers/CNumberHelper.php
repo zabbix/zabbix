@@ -55,7 +55,7 @@ class CNumberHelper {
 	}
 
 	/**
-	 * Compares two strings containing numbers in decimal or scentific notation without losing precision.
+	 * Compares two strings containing numbers in decimal or scientific notation without losing precision.
 	 *
 	 * Returns a value less than 0 if $a is less than $b; a value greater than 0 if $a is greater than $b, and 0 if they
 	 * are equal.
@@ -89,7 +89,7 @@ class CNumberHelper {
 	}
 
 	/**
-	 * Compares two numbers in decimal or scentific notation without losing precision.
+	 * Compares two numbers in decimal or scientific notation without losing precision.
 	 *
 	 * Returns a value less than 0 if $a is less than $b; a value greater than 0 if $a is greater than $b, and 0 if they
 	 * are equal.

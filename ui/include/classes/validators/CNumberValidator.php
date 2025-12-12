@@ -25,11 +25,11 @@ class CNumberValidator extends CValidator {
 
 	public function __construct(array $options = []) {
 		if (array_key_exists('min', $options)) {
-			$this->min = $options['min'];
+			$this->min = (string) $options['min'];
 		}
 
 		if (array_key_exists('max', $options)) {
-			$this->max = $options['max'];
+			$this->max = (string) $options['max'];
 		}
 
 		if (array_key_exists('usermacros', $options)) {
@@ -77,13 +77,13 @@ class CNumberValidator extends CValidator {
 			return true;
 		}
 
-		if ($this->min !== null && CNumberHelper::compareNumbers($value, $this->min) == -1) {
+		if ($this->min !== null && CNumberHelper::compareNumbers($value, $this->min) < 0) {
 			$this->setError(_s('value must be greater than or equal to %1$s', $this->min));
 
 			return false;
 		}
 
-		if ($this->max !== null && CNumberHelper::compareNumbers($value, $this->max) == 1) {
+		if ($this->max !== null && CNumberHelper::compareNumbers($value, $this->max) > 0) {
 			$this->setError(_s('value must be less than or equal to %1$s', $this->max));
 
 			return false;
