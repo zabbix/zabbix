@@ -39,7 +39,7 @@ class ZTextareaFlexible extends HTMLElement {
 		this.#textarea.placeholder = this.getAttribute('placeholder');
 		this.#textarea.disabled = this.hasAttribute('disabled');
 		this.#textarea.readOnly = this.hasAttribute('readonly');
-		this.#textarea.singleline = this.getAttribute('singleline');
+		this.#textarea.singleline = this.hasAttribute('singleline');
 		this.#textarea.spellcheck = this.getAttribute('spellcheck') !== 'false';
 
 		const maxlength = parseInt(this.getAttribute('maxlength'));
