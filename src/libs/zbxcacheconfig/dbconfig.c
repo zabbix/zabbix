@@ -4558,8 +4558,12 @@ static void	DCsync_functions(zbx_dbsync_t *sync, zbx_uint64_t revision)
 
 		function->triggerid = triggerid;
 		function->itemid = itemid;
-		dc_strpool_replace(found, &function->function, row[2]);
-		dc_strpool_replace(found, &function->parameter, row[3]);
+
+		if (SUCCEED == dc_strpool_replace(found, &function->function, row[2]))
+			function->sz_function = strlen(function->function) + 1;
+
+		if (SUCCEED == dc_strpool_replace(found, &function->parameter, row[3]))
+			function->sz_parameter = strlen(function->parameter) + 1;
 
 		function->type = zbx_get_function_type(function->function);
 		function->revision = revision;
@@ -9727,19 +9731,21 @@ void	zbx_dc_config_clean_items(zbx_dc_item_t *items, int *errcodes, size_t num)
 
 void	DCget_function(zbx_dc_function_t *dst_function, const ZBX_DC_FUNCTION *src_function)
 {
-	size_t	sz_function, sz_parameter;
-
 	dst_function->functionid = src_function->functionid;
 	dst_function->triggerid = src_function->triggerid;
 	dst_function->itemid = src_function->itemid;
 	dst_function->type = src_function->type;
 
-	sz_function = strlen(src_function->function) + 1;
-	sz_parameter = strlen(src_function->parameter) + 1;
-	dst_function->function = (char *)zbx_malloc(NULL, sz_function + sz_parameter);
-	dst_function->parameter = dst_function->function + sz_function;
-	memcpy(dst_function->function, src_function->function, sz_function);
-	memcpy(dst_function->parameter, src_function->parameter, sz_parameter);
+	if (ZBX_DC_FUNCTION_PREALOCATED_FUNC_SIZE < (src_function->sz_function + src_function->sz_parameter))
+	{
+		zbx_free(dst_function->function);
+		dst_function->function = (char *)zbx_malloc(NULL,
+				src_function->sz_function + src_function->sz_parameter);
+	}
+
+	dst_function->parameter = dst_function->function + src_function->sz_function;
+	memcpy(dst_function->function, src_function->function, src_function->sz_function);
+	memcpy(dst_function->parameter, src_function->parameter, src_function->sz_parameter);
 }
 
 void	DCget_trigger(zbx_dc_trigger_t *dst_trigger, const ZBX_DC_TRIGGER *src_trigger, unsigned int flags)
@@ -10422,11 +10428,16 @@ void	zbx_dc_config_get_triggers_by_triggerids(zbx_dc_trigger_t *triggers, const 
  *             num         - [IN] number of elements                          *
  *                                                                            *
  ******************************************************************************/
-void	zbx_dc_config_get_functions_by_functionids(zbx_dc_function_t *functions, zbx_uint64_t *functionids, int *errcodes,
-		size_t num)
+void	zbx_dc_config_get_functions_by_functionids(zbx_dc_function_t *functions, zbx_uint64_t *functionids,
+		int *errcodes, size_t num)
 {
 	size_t			i;
 	const ZBX_DC_FUNCTION	*dc_function;
+
+	for (i = 0; i < num; i++)
+	{
+		functions[i].function = (char *)zbx_malloc(NULL, ZBX_DC_FUNCTION_PREALOCATED_FUNC_SIZE);
+	}
 
 	RDLOCK_CACHE;
 
@@ -10445,15 +10456,12 @@ void	zbx_dc_config_get_functions_by_functionids(zbx_dc_function_t *functions, zb
 	UNLOCK_CACHE;
 }
 
-void	zbx_dc_config_clean_functions(zbx_dc_function_t *functions, int *errcodes, size_t num)
+void	zbx_dc_config_clean_functions(zbx_dc_function_t *functions, size_t num)
 {
 	size_t	i;
 
 	for (i = 0; i < num; i++)
 	{
-		if (SUCCEED != errcodes[i])
-			continue;
-
 		zbx_free(functions[i].function);
 	}
 }
