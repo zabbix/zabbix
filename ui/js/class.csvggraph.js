@@ -102,31 +102,6 @@ class CSvgGraph {
 	 */
 	#end;
 
-	#event_listeners = {
-		mouseMove: e => this.#showHintbox(e),
-		mouseLeave: () => {
-			this.#removeHintboxContents();
-			this.#hideHelper();
-		},
-		onShowStaticHint: () => this.#onStaticHintboxOpen(),
-		onHideStaticHint: () => this.#onStaticHintboxClose(),
-		dblClick: () => this.#zoomOutTime(),
-		mouseDown: e => this.#startSBoxDrag(e)
-	};
-
-	#sbox_event_listeners = {
-		selectStart: e => {
-			e.preventDefault();
-		},
-		keyDown: e => {
-			if (e.keyCode === 27) {
-				this.#destroySBox(e);
-			}
-		},
-		mouseUp: e => this.#endSBoxDrag(e),
-		mouseMove: e => this.#moveSBoxMouse(e)
-	};
-
 	constructor(svg, widget, options) {
 		this.#svg = svg;
 
@@ -160,14 +135,14 @@ class CSvgGraph {
 		this.#svg.dataset.hintboxDelay = '0';
 		this.#svg.dataset.hintboxStaticReopenOnClick = '1';
 
-		this.#svg.addEventListener('mousemove', this.#event_listeners.mouseMove);
-		this.#svg.addEventListener('mouseleave', this.#event_listeners.mouseLeave);
-		this.#svg.addEventListener('onShowStaticHint', this.#event_listeners.onShowStaticHint);
-		this.#svg.addEventListener('onDeleteStaticHint', this.#event_listeners.onHideStaticHint);
+		this.#svg.addEventListener('mousemove', this.#showHintbox);
+		this.#svg.addEventListener('mouseleave', this.#mouseLeaveHandler);
+		this.#svg.addEventListener('onShowStaticHint', this.#onStaticHintboxOpen);
+		this.#svg.addEventListener('onDeleteStaticHint', this.#onStaticHintboxClose);
 
 		if (this.#sbox) {
-			this.#svg.addEventListener('dblclick', this.#event_listeners.dblClick);
-			this.#svg.addEventListener('mousedown', this.#event_listeners.mouseDown);
+			this.#svg.addEventListener('dblclick', this.#zoomOutTime);
+			this.#svg.addEventListener('mousedown', this.#startSBoxDrag);
 		}
 	}
 
@@ -177,16 +152,16 @@ class CSvgGraph {
 		delete this.#svg.dataset.hintboxDelay;
 		delete this.#svg.dataset.hintboxStaticReopenOnClick;
 
-		this.#svg.removeEventListener('mousemove', this.#event_listeners.mouseMove);
-		this.#svg.removeEventListener('mouseleave', this.#event_listeners.mouseLeave);
-		this.#svg.removeEventListener('onShowStaticHint', this.#event_listeners.onShowStaticHint);
-		this.#svg.removeEventListener('onDeleteStaticHint', this.#event_listeners.onHideStaticHint);
+		this.#svg.removeEventListener('mousemove', this.#showHintbox);
+		this.#svg.removeEventListener('mouseleave', this.#mouseLeaveHandler);
+		this.#svg.removeEventListener('onShowStaticHint', this.#onStaticHintboxOpen);
+		this.#svg.removeEventListener('onDeleteStaticHint', this.#onStaticHintboxClose);
 
 		if (this.#sbox) {
 			this.#destroySBox(e);
 
-			this.#svg.removeEventListener('dblclick', this.#event_listeners.dblClick);
-			this.#svg.removeEventListener('mousedown', this.#event_listeners.mouseDown);
+			this.#svg.removeEventListener('dblclick', this.#zoomOutTime);
+			this.#svg.removeEventListener('mousedown', this.#startSBoxDrag);
 		}
 	}
 
@@ -194,7 +169,12 @@ class CSvgGraph {
 		return this.#is_boxing;
 	}
 
-	#onStaticHintboxOpen() {
+	#mouseLeaveHandler = () => {
+		this.#removeHintboxContents();
+		this.#hideHelper();
+	}
+
+	#onStaticHintboxOpen = () => {
 		this.#is_static_hintbox_opened = true;
 
 		const hintbox = this.#svg.hintBoxItem[0];
@@ -227,7 +207,7 @@ class CSvgGraph {
 		}
 	}
 
-	#onStaticHintboxClose() {
+	#onStaticHintboxClose = () => {
 		this.#is_static_hintbox_opened = false;
 
 		this.#removeHighlighting();
@@ -274,7 +254,7 @@ class CSvgGraph {
 	}
 
 	/**
-	 * Function removes SBox related $(document) event listeners:
+	 * Function removes SBox related document event listeners:
 	 * - if no other widget have active SBox;
 	 * - to avoid another call of destroySBox on 'mouseup' (in case if user has pressed ESC).
 	 */
@@ -292,35 +272,53 @@ class CSvgGraph {
 			});
 		}
 
-		if (widgets_boxing === 0 || (e && 'keyCode' in e && e.keyCode === 27)) {
-			document.removeEventListener('selectstart', this.#sbox_event_listeners.selectStart);
-			document.removeEventListener('keydown', this.#sbox_event_listeners.keyDown);
-			document.removeEventListener('mouseup', this.#sbox_event_listeners.mouseUp);
+		if (widgets_boxing === 0 || (e && 'key' in e && e.key === 'Escape')) {
+			this.#unregisterSBoxEvents();
+		}
+	}
 
-			this.#svg.removeEventListener('mousemove', this.#sbox_event_listeners.mouseMove);
+	#registerSBoxEvents() {
+		document.addEventListener('selectstart', this.#selectStart);
+		document.addEventListener('keydown', this.#sBoxKeyDown);
+		document.addEventListener('mouseup', this.#endSBoxDrag);
+
+		this.#svg.addEventListener('mousemove', this.#moveSBoxMouse);
+	}
+
+	#unregisterSBoxEvents() {
+		document.removeEventListener('selectstart', this.#selectStart);
+		document.removeEventListener('keydown', this.#sBoxKeyDown);
+		document.removeEventListener('mouseup', this.#endSBoxDrag);
+
+		this.#svg.removeEventListener('mousemove', this.#moveSBoxMouse);
+	}
+
+	#selectStart = e => {
+		e.preventDefault();
+	}
+
+	#sBoxKeyDown = e => {
+		if (e.key === 'Escape') {
+			this.#destroySBox(e);
 		}
 	}
 
 	// Method to start selection of some horizontal area in graph.
-	#startSBoxDrag(e) {
+	#startSBoxDrag = e => {
 		e.stopPropagation();
 
 		const offsetX = e.clientX - this.#svg.getBoundingClientRect().left;
 
 		if (this.#dimX <= offsetX && offsetX <= this.#dimX + this.#dimW && this.#dimY <= e.offsetY
 				&& e.offsetY <= this.#dimY + this.#dimH) {
-			document.addEventListener('selectstart', this.#sbox_event_listeners.selectStart);
-			document.addEventListener('keydown', this.#sbox_event_listeners.keyDown);
-			document.addEventListener('mouseup', this.#sbox_event_listeners.mouseUp);
-
-			this.#svg.addEventListener('mousemove', this.#sbox_event_listeners.mouseMove);
+			this.#registerSBoxEvents();
 
 			this.#start = offsetX - this.#dimX;
 		}
 	}
 
 	// Method to recalculate selected area during mouse move.
-	#moveSBoxMouse(e) {
+	#moveSBoxMouse = e => {
 		e.stopPropagation();
 
 		const sbox = this.#svg.querySelector('.svg-graph-selection');
@@ -377,7 +375,7 @@ class CSvgGraph {
 	}
 
 	// Method to end selection of horizontal area in graph.
-	#endSBoxDrag(e) {
+	#endSBoxDrag = e => {
 		e.stopPropagation();
 
 		const set_date = this.#is_boxing;
@@ -405,7 +403,7 @@ class CSvgGraph {
 		}
 	}
 
-	#zoomOutTime() {
+	#zoomOutTime = () => {
 		hintBox.hideHint(this.#svg, true);
 
 		this.#widget.updateTimeSelector({
@@ -468,7 +466,7 @@ class CSvgGraph {
 		}
 	}
 
-	#showHintbox(e) {
+	#showHintbox = e => {
 		const svg_rect = this.#svg.getBoundingClientRect();
 		const offsetX = e.clientX - svg_rect.left;
 
