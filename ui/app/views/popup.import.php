@@ -168,8 +168,7 @@ $form = (new CForm('post', null, 'multipart/form-data'))
 	->setId('import-form')
 	->addVar('import', 1)
 	->addVar('rules_preset', $data['rules_preset'])
-	->addItem($form_grid)
-	->addItem((new CScriptTag('popup_import.init();'))->setOnDocumentReady());
+	->addItem($form_grid);
 
 $output = [
 	'header' => $data['title'],
@@ -187,7 +186,8 @@ $output = [
 		]
 	],
 	'script_inline' => getPagePostJs().
-		$this->readJsFile('popup.import.js.php')
+		$this->readJsFile('popup.import.js.php').
+		'popup_import.init();'
 ];
 
 if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
