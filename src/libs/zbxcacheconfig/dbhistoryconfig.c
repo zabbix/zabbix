@@ -594,7 +594,7 @@ static void	dc_get_history_recv_item(zbx_history_recv_item_t *dst_item, const ZB
 	dst_item->state = ITEM_STATE_NORMAL;
 	dst_item->status = src_item->status;
 
-	zbx_strscpy(dst_item->key_orig, src_item->key);
+	memcpy(dst_host->host, src_host->host, MIN(sizeof(dst_host->host), src_host->sz_host));
 
 	dst_item->itemid = src_item->itemid;
 	dst_item->flags = src_item->flags;

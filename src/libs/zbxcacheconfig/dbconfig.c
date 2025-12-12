@@ -3236,13 +3236,17 @@ static void	dc_item_value_type_update(int found, ZBX_DC_ITEM *item, zbx_item_val
 			if (SUCCEED == dc_strpool_replace(found, &numitem->trends_period, row[23]))
 			{
 				numitem->sz_trends_period = strlen(numitem->trends_period) + 1;
+
 				if (FAIL == zbx_is_time_suffix(numitem->trends_period,
 						&numitem->trends_sec, ZBX_LENGTH_UNLIMITED))
+				{
 					numitem->trends_sec = 0;
+				}
 			}
 
 			if (SUCCEED == dc_strpool_replace(found, &numitem->units, row[26]))
 				numitem->sz_units = strlen(numitem->units) + 1;
+
 			break;
 		case ITEM_VALUE_TYPE_LOG:
 			if ('\0' == *row[10])
@@ -3461,7 +3465,10 @@ static void	DCsync_items(zbx_dbsync_t *sync, zbx_uint64_t revision, zbx_synced_n
 		else
 		{
 			if (SUCCEED == dc_strpool_replace(found, &item->key, row[5]))
+			{
+				item->sz_key = strlen(item->key) + 1;
 				flags |= ZBX_ITEM_KEY_CHANGED;
+			}
 		}
 
 		/* store new information in item structure */
@@ -9482,7 +9489,7 @@ static void	DCget_item(zbx_dc_item_t *dst_item, const ZBX_DC_ITEM *src_item)
 
 	dst_item->status = src_item->status;
 
-	zbx_strscpy(dst_item->key_orig, src_item->key);
+	memcpy(dst_item->key_orig, src_item->key, MIN(sizeof(dst_item->key_orig), src_item->sz_key));
 
 	dst_item->itemid = src_item->itemid;
 	dst_item->flags = src_item->flags;
