@@ -96,6 +96,7 @@ class CSvgGraphHelper {
 		self::getMetricsAggregatedData($metrics, $width, $options['data_sets'], $options['legend']['show_aggregation'],
 			$show_hostnames
 		);
+		self::setMetricsItemidsForBroadcasting($metrics);
 
 		$legend = self::getLegend($metrics, $options['legend']);
 
@@ -128,7 +129,7 @@ class CSvgGraphHelper {
 
 			$first_metric_to_broadcast = [
 				'itemid' => $metric['itemid'],
-				'itemids' => array_column($metric['items'], 'itemid'),
+				'itemids' => $metric['itemids'],
 				'ds' => $metric['data_set'],
 			];
 		}
@@ -1255,5 +1256,13 @@ class CSvgGraphHelper {
 		}
 
 		return ($a['clock'] < $b['clock']) ? -1 : 1;
+	}
+
+	private static function setMetricsItemidsForBroadcasting(array &$metrics): void {
+		foreach ($metrics as &$metric) {
+			$metric['itemids'] = $metric['options']['aggregate_grouping'] == GRAPH_AGGREGATE_BY_DATASET
+				? array_column($metric['items'], 'itemid')
+				: [$metric['itemid']];
+		}
 	}
 }
