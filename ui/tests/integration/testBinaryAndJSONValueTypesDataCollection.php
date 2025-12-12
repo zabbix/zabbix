@@ -458,6 +458,23 @@ class testBinaryAndJSONValueTypesDataCollection extends CIntegrationTest {
 	}
 
 	/**
+	 * Component configuration provider for non-agent and non-trapper related tests.
+	 *
+	 * @return array
+	 */
+	public function simpleConfigurationProvider() {
+		return [
+			self::COMPONENT_SERVER => [
+				'UnreachablePeriod' => 5,
+				'UnavailableDelay' => 5,
+				'UnreachableDelay' => 1,
+				'DebugLevel' => 5,
+				'LogFileSize' => 0
+			]
+		];
+	}
+
+	/**
 	 * Component configuration provider for agent related tests.
 	 *
 	 * @return array
@@ -826,23 +843,6 @@ class testBinaryAndJSONValueTypesDataCollection extends CIntegrationTest {
 
 		$this->assertEquals(1, count($active_data['result']));
 		$this->assertEquals($json_data_http_response, $active_data['result'][0]['value']);
-	}
-
-	/**
-	 * Component configuration provider for non-agent and non-trapper related tests.
-	 *
-	 * @return array
-	 */
-	public function simpleConfigurationProvider() {
-		return [
-			self::COMPONENT_SERVER => [
-				'UnreachablePeriod' => 5,
-				'UnavailableDelay' => 5,
-				'UnreachableDelay' => 1,
-				'DebugLevel' => 5,
-				'LogFileSize' => 0
-			]
-		];
 	}
 
 	/**
