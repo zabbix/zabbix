@@ -80,7 +80,8 @@ class CConfigurationImport {
 			'maps' => ['updateExisting' => false, 'createMissing' => false],
 			'images' => ['updateExisting' => false, 'createMissing' => false],
 			'mediaTypes' => ['updateExisting' => false, 'createMissing' => false],
-			'valueMaps' => ['updateExisting' => false, 'createMissing' => false, 'deleteMissing' => false]
+			'valueMaps' => ['updateExisting' => false, 'createMissing' => false, 'deleteMissing' => false],
+			'dashboards' => ['updateExisting' => false, 'createMissing' => false]
 		];
 
 		$options += $default_options;
@@ -845,9 +846,7 @@ class CConfigurationImport {
 	}
 
 	protected function processDashboards(bool $testmode = false): void {
-		if (array_key_exists('dashboards', $this->options) &&
-			($this->options['dashboards']['updateExisting'] || $this->options['dashboards']['createMissing'])
-		) {
+		if ($this->options['dashboards']['updateExisting'] || $this->options['dashboards']['createMissing']) {
 			$dashboards = $this->getFormattedDashboards();
 
 			if ($dashboards) {
