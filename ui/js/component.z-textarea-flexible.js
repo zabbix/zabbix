@@ -24,6 +24,10 @@ class ZTextareaFlexible extends HTMLElement {
 	 * @type {ResizeObserver | null}
 	 */
 	#resize_observer = null;
+	/**
+	 * @type {boolean}
+	 */
+	#singleline = true;
 
 	constructor() {
 		super();
@@ -39,8 +43,10 @@ class ZTextareaFlexible extends HTMLElement {
 		this.#textarea.placeholder = this.getAttribute('placeholder');
 		this.#textarea.disabled = this.hasAttribute('disabled');
 		this.#textarea.readOnly = this.hasAttribute('readonly');
-		this.#textarea.singleline = this.hasAttribute('singleline');
 		this.#textarea.spellcheck = this.getAttribute('spellcheck') !== 'false';
+		this.#textarea.autofocus = this.hasAttribute('autofocus');
+
+		this.#singleline = this.hasAttribute('singleline');
 
 		const maxlength = parseInt(this.getAttribute('maxlength'));
 		if (Number.isFinite(maxlength) && maxlength >= 0) {
@@ -52,7 +58,7 @@ class ZTextareaFlexible extends HTMLElement {
 
 		this.#initVisibilityWatch();
 		this.#registerEvents();
-		this.#updateHeight();
+		this.#update();
 	}
 
 	disconnectedCallback() {
@@ -64,7 +70,7 @@ class ZTextareaFlexible extends HTMLElement {
 	}
 
 	static get observedAttributes() {
-		return ['width', 'value', 'maxlength', 'placeholder', 'disabled', 'readonly', 'singleline',	'spellcheck'];
+		return ['value', 'maxlength', 'placeholder', 'disabled', 'readonly', 'autofocus', 'spellcheck', 'singleline'];
 	}
 
 	attributeChangedCallback(name, old_value, new_value) {
@@ -73,10 +79,6 @@ class ZTextareaFlexible extends HTMLElement {
 		}
 
 		switch (name) {
-			case 'width':
-				this.style.width = new_value;
-				break;
-
 			case 'maxlength':
 				const maxlength = parseInt(new_value);
 				if (Number.isFinite(maxlength) && maxlength >= 0) {
@@ -90,10 +92,12 @@ class ZTextareaFlexible extends HTMLElement {
 
 			case 'value':
 				this.#textarea.value = new_value;
+				this.#update();
 				break;
 
 			case 'placeholder':
 				this.#textarea.placeholder = new_value;
+				this.#update();
 				break;
 
 			case 'disabled':
@@ -104,19 +108,22 @@ class ZTextareaFlexible extends HTMLElement {
 				this.#textarea.readOnly = new_value !== null;
 				break;
 
-			case 'singleline':
-				this.#textarea.singleline = new_value;
+			case 'autofocus':
+				this.#textarea.autofocus = new_value !== null;
 				break;
 
 			case 'spellcheck':
 				this.#textarea.spellcheck = new_value !== 'false';
 				break;
 
+			case 'singleline':
+				this.#singleline = new_value !== null;
+				this.#update();
+				break;
+
 			default:
 				return;
 		}
-
-		this.#updateHeight();
 	}
 
 	#registerEvents() {
@@ -134,14 +141,14 @@ class ZTextareaFlexible extends HTMLElement {
 	}
 
 	#keydownHandler = (e) => {
-		if (e.key === 'Enter' && this.#textarea.singleline) {
+		if (e.key === 'Enter' && this.#singleline) {
 			e.preventDefault();
 			this.closest('form')?.requestSubmit();
 		}
 	}
 
 	#blurHandler = () => {
-		this.#updateHeight();
+		this.#update();
 		this.dispatchEvent(new Event('blur', { bubbles: true }));
 	}
 
@@ -150,17 +157,15 @@ class ZTextareaFlexible extends HTMLElement {
 	}
 
 	#inputHandler = () => {
-		let value = this.#textarea.value;
-
-		if ((value.includes('\n') || value.includes('\r')) && this.#textarea.singleline) {
-			this.#textarea.value = value.replace(/[\r\n]+/g, ' ');
-		}
-
-		this.#updateHeight();
+		this.#update();
 		this.dispatchEvent(new Event('input', { bubbles: true }));
 	}
 
-	#updateHeight() {
+	#update() {
+		if (this.#singleline) {
+			this.#textarea.value = this.#textarea.value.replace(/[\r\n]+/g, ' ');
+		}
+
 		this.#textarea.style.height = '0';
 		this.#textarea.style.height = `${this.#textarea.scrollHeight}px`;
 	}
@@ -170,7 +175,7 @@ class ZTextareaFlexible extends HTMLElement {
 			this.#resize_observer = new ResizeObserver(entries => {
 				for (const entry of entries) {
 					if (entry.contentRect.width > 0) {
-						requestAnimationFrame(() => this.#updateHeight());
+						requestAnimationFrame(() => this.#update());
 
 						this.#resize_observer.disconnect();
 						this.#resize_observer = null;
@@ -181,14 +186,6 @@ class ZTextareaFlexible extends HTMLElement {
 
 			this.#resize_observer.observe(this);
 		}
-	}
-
-	get width() {
-		return this.style.width;
-	}
-
-	set width(width) {
-		this.style.width = width;
 	}
 
 	get maxLength() {
@@ -231,12 +228,12 @@ class ZTextareaFlexible extends HTMLElement {
 		this.toggleAttribute('readonly', readonly);
 	}
 
-	get singleline() {
-		return this.#textarea.singleline;
+	get autofocus() {
+		return this.#textarea.autofocus;
 	}
 
-	set singleline(singleline) {
-		this.setAttribute('singleline', singleline);
+	set autofocus(autofocus) {
+		this.toggleAttribute('autofocus', autofocus);
 	}
 
 	get spellcheck() {
@@ -245,6 +242,14 @@ class ZTextareaFlexible extends HTMLElement {
 
 	set spellcheck(spellcheck) {
 		this.setAttribute('spellcheck', String(spellcheck));
+	}
+
+	get singleline() {
+		return this.#singleline;
+	}
+
+	set singleline(singleline) {
+		this.toggleAttribute('singleline', singleline);
 	}
 }
 

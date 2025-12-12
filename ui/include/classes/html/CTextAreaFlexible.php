@@ -40,11 +40,27 @@ class CTextAreaFlexible extends CTag {
 			->setName($name)
 			->setAttribute('value', $value)
 			->setAttribute('data-field-type', 'z-textarea-flexible')
-			->setAttribute('singleline', 'true');
+			->setAttribute('singleline', 'singleline');
 	}
 
 	public function setSingleline(bool $is_singleline = true): self {
-		$this->setAttribute('singleline', $is_singleline);
+		if ($is_singleline) {
+			$this->setAttribute('singleline', 'singleline');
+		}
+		else {
+			$this->removeAttribute('singleline');
+		}
+
+		return $this;
+	}
+
+	public function setAutofocus(bool $is_autofocus = true): self {
+		if ($is_autofocus) {
+			$this->setAttribute('autofocus', 'autofocus');
+		}
+		else {
+			$this->removeAttribute('autofocus');
+		}
 
 		return $this;
 	}
