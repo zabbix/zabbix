@@ -95,11 +95,11 @@ class CNumberValidatorTest extends TestCase {
 	/**
 	 * @dataProvider dataProvider
 	 */
-	public function testNumberValidator($name, $options, $expected_error): void {
+	public function testNumberValidator($value, $options, $expected_error): void {
 		$validator = new CNumberValidator($options);
 
 		$expected_result = $expected_error === null;
-		$this->assertEquals($expected_result, $validator->validate($name));
+		$this->assertEquals($expected_result, $validator->validate($value));
 		$this->assertSame($expected_error, $validator->getError());
 	}
 }
