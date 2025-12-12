@@ -1690,7 +1690,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 					'key' => 'item-trends-test[{#KEY}]',
 					'trends' => 86399,
 					'inline_errors' => [
-						'id:trends' => 'Value must be between 3600s (1h) and 788400000s (9125d).'
+						'id:trends' => 'Value must be between 86400s (1d) and 788400000s (9125d).'
 					]
 				]
 			],
@@ -1702,7 +1702,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 					'key' => 'item-trends-test[{#KEY}]',
 					'trends' => 788400001,
 					'inline_errors' => [
-						'id:trends' => 'Value must be between 3600s (1h) and 788400000s (9125d).'
+						'id:trends' => 'Value must be between 86400s (1d) and 788400000s (9125d).'
 					]
 				]
 			],
