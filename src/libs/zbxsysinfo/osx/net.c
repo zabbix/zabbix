@@ -444,7 +444,7 @@ int	net_if_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 		zbx_json_adduint64(&j, "packets", ifmd.ifmd_data.ifi_ipackets);
 		zbx_json_adduint64(&j, "errors", ifmd.ifmd_data.ifi_ierrors);
 		zbx_json_adduint64(&j, "dropped", ifmd.ifmd_data.ifi_iqdrops);
-		
+
 		zbx_json_close(&j);
 		zbx_json_addobject(&j, "out");
 		zbx_json_adduint64(&j, "bytes", ifmd.ifmd_data.ifi_obytes);

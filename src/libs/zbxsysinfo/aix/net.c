@@ -381,8 +381,17 @@ int	net_if_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 		zbx_json_addstring(&j, "name", ps_netif[i].name, ZBX_JSON_TYPE_STRING);
 		zbx_json_adduint64(&j, "type", ps_netif[i].type);
 
-		zbx_json_adduint64(&j, "sent", ps_netif[i].obytes);
-		zbx_json_adduint64(&j, "received", ps_netif[i].ibytes);
+		zbx_json_addobject(&j, "in");
+		zbx_json_adduint64(&j, "bytes", ps_netif[i].ibytes);
+		zbx_json_adduint64(&j, "packets", ps_netif[i].ipackets);
+		zbx_json_adduint64(&j, "errors", ps_netif[i].ierrors);
+		zbx_json_close(&j);
+		zbx_json_addobject(&j, "out");
+		zbx_json_adduint64(&j, "bytes", ps_netif[i].obytes);
+		zbx_json_adduint64(&j, "packets", ps_netif[i].opackets);
+		zbx_json_adduint64(&j, "errors", ps_netif[i].oerrors);
+		zbx_json_adduint64(&j, "collisions", ps_netif[i].collisions);
+		zbx_json_close(&j);
 
 		zbx_json_addstring(&j, "ifalias", ps_netif[i].description, ZBX_JSON_TYPE_STRING);
 
