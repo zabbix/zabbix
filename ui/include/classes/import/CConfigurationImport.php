@@ -139,7 +139,6 @@ class CConfigurationImport {
 		$this->processTemplates();
 		$this->processHostGroups();
 		$this->processHosts();
-		$this->processDashboards();
 
 		// Delete missing objects from processed hosts and templates.
 		$this->deleteMissingHttpTests();
@@ -157,8 +156,9 @@ class CConfigurationImport {
 		$this->processGraphs();
 		$this->processImages();
 		$this->processMaps();
-		$this->processTemplateDashboards();
 		$this->processMediaTypes();
+		$this->processDashboards();
+		$this->processTemplateDashboards();
 
 		return true;
 	}
