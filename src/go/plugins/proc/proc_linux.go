@@ -47,6 +47,9 @@ const (
 	maxHistory          = 60*15 + 1
 )
 
+var errMallocFailed = errors.New("malloc failed")
+var errGetPwnamRFailed = errors.New("getpwnam_r failed")
+
 // Plugin -
 type Plugin struct {
 	plugin.Base
@@ -277,10 +280,12 @@ func getUIDByName(userName string) (*uid, error) {
 	const bufSize = 4096
 	buf := C.malloc(C.size_t(bufSize))
 	if buf == nil {
-		return nil, errors.New("malloc failed")
+		return nil, errMallocFailed
 	}
+	//nolint:nlreturn
 	defer C.free(buf)
 
+	//nolint:gocritic,nlreturn
 	errCode := C.getpwnam_r(
 		userNameC,
 		&pwd,
@@ -290,7 +295,7 @@ func getUIDByName(userName string) (*uid, error) {
 	)
 
 	if passwdC == nil {
-		return nil, fmt.Errorf("getpwnam_r failed with code %d", int(errCode))
+		return nil, fmt.Errorf("%w getpwnam_r failed with code %d", errGetPwnamRFailed, int(errCode))
 	}
 
 	return &uid{uint32(passwdC.pw_uid)}, nil
