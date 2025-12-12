@@ -100,7 +100,7 @@ zabbix_export:
         3. Set the hostname or IP address of the Proxmox API VE host in the `Proxmox VE Host`. You can also change the API port in the `Proxmox VE Port` if necessary.
       vendor:
         name: Zabbix
-        version: 8.0-2
+        version: 8.0-3
       groups:
         - name: Templates/Applications
       items:
@@ -1015,7 +1015,8 @@ zabbix_export:
                   parameters:
                     - |
                       const idx = {
-                        'OK': 1
+                        'OK': 1,
+                        'PASSED': 1
                       };
                       
                       return typeof idx[value] === 'undefined' ? 0 : idx[value];
