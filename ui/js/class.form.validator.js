@@ -1445,7 +1445,7 @@ class CFormValidator {
 					const message = 'message' in count_rule
 						? count_rule['message']
 						: sprintf(t('At least %1$d items based on field "%2$s" rules'), count_rule.min,
-							Object.keys(field_names).concat('", "')
+							Object.keys(field_names).join(', ')
 						);
 
 					this.#addError(path, message, CFormValidator.ERROR_LEVEL_OBJECTS_COUNT);
@@ -1455,7 +1455,7 @@ class CFormValidator {
 					const message = 'message' in count_rule
 						? count_rule.message
 						: sprintf(t('No more than %1$d items based on field "%2$s" rules'), count_rule.max,
-							Object.keys(field_names).concat('", "')
+							Object.keys(field_names).join(', ')
 						);
 
 					const field_name = Object.keys(field_names).pop();
