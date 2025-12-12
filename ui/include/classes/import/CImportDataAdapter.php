@@ -376,6 +376,7 @@ class CImportDataAdapter {
 		if (array_key_exists('dashboards', $this->data)) {
 			foreach ($this->data['dashboards'] as $dashboard) {
 				foreach ($dashboard['pages'] as &$dashboard_page) {
+					// Rename hide_header to view_mode in widgets.
 					if (array_key_exists('widgets', $dashboard_page)) {
 						$dashboard_page['widgets'] = array_map(function (array $widget): array {
 							$widget = CArrayHelper::renameKeys($widget, ['hide_header' => 'view_mode']);
@@ -384,6 +385,7 @@ class CImportDataAdapter {
 						}, $dashboard_page['widgets']);
 					}
 				}
+				unset($dashboard_page);
 
 				$dashboards[$dashboard['name']] = $dashboard;
 			}
