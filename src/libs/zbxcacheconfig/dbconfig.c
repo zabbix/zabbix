@@ -13776,7 +13776,7 @@ unsigned int	zbx_dc_get_auto_registration_action_count(void)
  ******************************************************************************/
 void	zbx_config_get(zbx_config_t *cfg, zbx_uint64_t flags)
 {
-	RDLOCK_CACHE;
+	RDLOCK_CACHE_CONFIG_HISTORY;
 
 	if (0 != (flags & ZBX_CONFIG_FLAGS_SEVERITY_NAME))
 	{
@@ -13803,6 +13803,10 @@ void	zbx_config_get(zbx_config_t *cfg, zbx_uint64_t flags)
 	if (0 != (flags & ZBX_CONFIG_FLAGS_DB_EXTENSION))
 	{
 		cfg->db.extension = zbx_strdup(NULL, config->config->db.extension);
+	}
+
+	if (0 != (flags & ZBX_CONFIG_FLAGS_DB_HISTORY_COMPRESION))
+	{
 		cfg->db.history_compression_status = config->config->db.history_compression_status;
 		cfg->db.history_compress_older = config->config->db.history_compress_older;
 	}
@@ -13825,7 +13829,7 @@ void	zbx_config_get(zbx_config_t *cfg, zbx_uint64_t flags)
 	if (0 != (flags & ZBX_CONFIG_FLAGS_PROXY_SECRETS_PROVIDER))
 		cfg->proxy_secrets_provider = config->config->proxy_secrets_provider;
 
-	UNLOCK_CACHE;
+	UNLOCK_CACHE_CONFIG_HISTORY;
 
 	cfg->flags = flags;
 }
