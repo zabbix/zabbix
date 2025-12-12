@@ -1358,20 +1358,6 @@ function calculateItemNextCheck($seed, $delay, $flexible_intervals, $now) {
 	return $nextCheck;
 }
 
-/*
- * Description:
- *	Function returns true if http items exists in the $items array.
- *	The array should contain a field 'type'
- */
-function httpItemExists($items) {
-	foreach ($items as $item) {
-		if ($item['type'] == ITEM_TYPE_HTTPTEST) {
-			return true;
-		}
-	}
-	return false;
-}
-
 function getParamFieldNameByType($itemType) {
 	switch ($itemType) {
 		case ITEM_TYPE_SCRIPT:
