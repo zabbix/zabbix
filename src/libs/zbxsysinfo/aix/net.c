@@ -349,7 +349,6 @@ int	net_if_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 		}
 	}
 
-
 	ps_netif = zbx_malloc(ps_netif, rc * sizeof(perfstat_netinterface_t));
 	zbx_strscpy(ps_id.name, FIRST_NETINTERFACE);
 
@@ -375,8 +374,8 @@ int	net_if_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 		zbx_json_addstring(&jcfg, "name", ps_netif[i].name, ZBX_JSON_TYPE_STRING);
 		zbx_json_addstring(&jcfg, "ifalias", ps_netif[i].description, ZBX_JSON_TYPE_STRING);
 
+		zbx_json_addstring(&jval, "name", ps_netif[i].name, ZBX_JSON_TYPE_STRING);
 		zbx_json_addstring(&jval, "ifalias", ps_netif[i].description, ZBX_JSON_TYPE_STRING);
-
 		zbx_json_adduint64(&jval, "type", ps_netif[i].type);
 		zbx_json_addobject(&jval, "in");
 		zbx_json_adduint64(&jval, "bytes", ps_netif[i].ibytes);
@@ -435,7 +434,7 @@ int	net_if_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 end:
 	zbx_json_init(&j, ZBX_JSON_STAT_BUF_LEN);
 	zbx_json_addraw(&j, "config", jcfg.buffer);
-	zbx_json_addraw(&j, "value", jval.buffer);
+	zbx_json_addraw(&j, "values", jval.buffer);
 	zbx_json_close(&j);
 
 	SET_STR_RESULT(result, strdup(j.buffer));
