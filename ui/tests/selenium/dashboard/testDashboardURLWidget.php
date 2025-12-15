@@ -457,7 +457,7 @@ class testDashboardURLWidget extends CWebTest {
 			$this->assertEquals($old_widget_count + ($update ? 0 : 1), $dashboard->getWidgets()->count());
 
 			// Check new widget form fields and values in frontend.
-			// TODO: added workaround, remove after fix ZBX-27231
+			// Workaround aded for unstable test due to ZBX-27231, won't be fixed for 6.0.
 			$widget->query('class:dashboard-grid-widget-head')->one()->click();
 			$saved_form = $widget->edit();
 			$this->assertEquals($values, $saved_form->getValues());
