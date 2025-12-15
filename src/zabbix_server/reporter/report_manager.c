@@ -1862,8 +1862,10 @@ static int	rm_schedule_jobs(zbx_rm_t *manager, int now)
 {
 	zbx_rm_report_t		*report;
 	zbx_binary_heap_elem_t	*elem;
-	int			nextcheck, ret, jobs_num = 0;
+	int			nextcheck, ret, delay_seconds, jobs_num = 0;
 	char			*error = NULL;
+	struct tm		*tm;
+	time_t			now_time_t = now;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() queue:%d", __func__, manager->report_queue.elems_num);
 
@@ -1871,6 +1873,64 @@ static int	rm_schedule_jobs(zbx_rm_t *manager, int now)
 	{
 		elem = zbx_binary_heap_find_min(&manager->report_queue);
 		report = (zbx_rm_report_t *)elem->data;
+
+		if (ZBX_REPORT_CYCLE_MONTHLY == report->cycle || ZBX_REPORT_CYCLE_YEARLY == report->cycle)
+		{
+			tm = zbx_localtime(&now_time_t, NULL);
+			int	is_target_day = 0;
+
+			if (ZBX_REPORT_CYCLE_MONTHLY == report->cycle)
+				is_target_day = (1 == tm->tm_mday);
+			else if (ZBX_REPORT_CYCLE_YEARLY == report->cycle)
+				is_target_day = (1 == tm->tm_mday && 0 == tm->tm_mon);
+
+			if (0 == is_target_day)
+			{
+				const char	*cycle_str;
+
+				if (ZBX_REPORT_CYCLE_MONTHLY == report->cycle)
+					cycle_str = "Monthly";
+				else
+					cycle_str = "Yearly";
+
+				if (now < report->nextcheck)
+				{
+					zabbix_log(LOG_LEVEL_WARNING, "%s report \"%s\" (reportid:" ZBX_FS_UI64
+							") cannot be sent on date %04d-%02d-%02d (not the target day). "
+							"Rescheduling for next period.", cycle_str, report->name,
+							report->reportid, tm->tm_year + 1900, tm->tm_mon + 1,
+							tm->tm_mday);
+
+					zbx_binary_heap_remove_min(&manager->report_queue);
+					report->nextcheck = 0;
+
+					if (-1 != (nextcheck = rm_report_calc_nextcheck(report, now, &error)))
+					{
+						if (SUCCEED == rm_is_report_active(report, nextcheck))
+						{
+							zbx_binary_heap_elem_t	elem_new = {report->reportid, report};
+
+							report->nextcheck = nextcheck;
+							zbx_binary_heap_insert(&manager->report_queue, &elem_new);
+						}
+					}
+					else
+					{
+						rm_update_report(manager, report, ZBX_REPORT_STATE_ERROR, error);
+						zabbix_log(LOG_LEVEL_DEBUG, "Cannot reschedule report: %s", error);
+						zbx_free(error);
+					}
+
+					continue;
+				}
+
+				zabbix_log(LOG_LEVEL_WARNING, "%s report \"%s\" (reportid:" ZBX_FS_UI64
+						") missed scheduled date (target day). Sending catch-up report on "
+						"%04d-%02d-%02d.", cycle_str, report->name, report->reportid,
+						tm->tm_year + 1900, tm->tm_mon + 1, tm->tm_mday);
+			}
+		}
+
 		if (now < report->nextcheck)
 			break;
 
