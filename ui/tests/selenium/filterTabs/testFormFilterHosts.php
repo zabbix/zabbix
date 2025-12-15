@@ -16,6 +16,8 @@
 require_once __DIR__.'/../common/testFormFilter.php';
 
 /**
+ * @dataSource MonitoringOverview
+ *
  * @backup profiles
  */
 class testFormFilterHosts extends testFormFilter {

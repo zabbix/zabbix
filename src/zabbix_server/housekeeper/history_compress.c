@@ -444,7 +444,7 @@ void	hk_history_compression_init(void)
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	zbx_db_connect(ZBX_DB_CONNECT_NORMAL);
-	zbx_config_get(&cfg, ZBX_CONFIG_FLAGS_DB_EXTENSION);
+	zbx_config_get(&cfg, ZBX_CONFIG_FLAGS_DB_EXTENSION | ZBX_CONFIG_FLAGS_DB_HISTORY_COMPRESION);
 
 	compression_status_cache = cfg.db.history_compression_status;
 	compress_older_cache = cfg.db.history_compress_older;

@@ -322,6 +322,8 @@ window.tophosts_column_edit_form = new class {
 
 		// Aggregation function.
 		const aggregation_function_select = document.getElementById('aggregate_function');
+		const aggregation_function = aggregation_function_select.value;
+		const use_aggregation_function = aggregation_function != <?= AGGREGATE_NONE ?>;
 
 		aggregation_function_select.disabled = !data_type_item_value;
 
@@ -331,7 +333,7 @@ window.tophosts_column_edit_form = new class {
 			if (display_item_value_as_text || display_item_as_binary) {
 				option.hidden = true;
 
-				if (aggregation_function_select.value == value) {
+				if (aggregation_function == value) {
 					aggregation_function_select.value = <?= AGGREGATE_NONE ?>;
 				}
 			}
@@ -340,11 +342,16 @@ window.tophosts_column_edit_form = new class {
 			}
 		}
 
-		// Time period.
-		const use_aggregation = aggregation_function_select.value != <?= AGGREGATE_NONE ?>;
+		const aggregate_function_warning = this.#form.querySelector('.js-aggregate-function-warning');
+		if (aggregate_function_warning != null) {
+			const warning_show = use_aggregation_function && display_sparkline;
 
-		this.#form.fields.time_period.disabled = !data_type_item_value || !use_aggregation;
-		this.#form.fields.time_period.hidden = !data_type_item_value || !use_aggregation;
+			aggregate_function_warning.style.display = warning_show ? '' : 'none';
+		}
+
+		// Time period.
+		this.#form.fields.time_period.disabled = !data_type_item_value || !use_aggregation_function;
+		this.#form.fields.time_period.hidden = !data_type_item_value || !use_aggregation_function;
 
 		// History data.
 		for (const element of this.#form.querySelectorAll('.js-history-row')) {
