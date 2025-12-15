@@ -669,7 +669,7 @@ int	zbx_db_trigger_get_itemid(const zbx_db_trigger *trigger, int index, zbx_uint
 			ret = SUCCEED;
 		}
 
-		zbx_dc_config_clean_functions(&function, &errcode, 1);
+		zbx_dc_config_clean_functions(&function, 1);
 		break;
 	}
 
@@ -862,7 +862,7 @@ void	zbx_db_trigger_get_itemids(const zbx_db_trigger *trigger, zbx_vector_uint64
 			}
 		}
 
-		zbx_dc_config_clean_functions(functions, errcodes, functionids.values_num);
+		zbx_dc_config_clean_functions(functions, functionids.values_num);
 		zbx_free(functions);
 		zbx_free(errcodes);
 	}
@@ -994,8 +994,6 @@ static void	db_trigger_get_expression(const zbx_eval_context_t *ctx, char **expr
 				zbx_variant_set_error(&token->value, zbx_dsprintf(NULL, "item id:" ZBX_FS_UI64
 						" deleted", function.itemid));
 			}
-
-			zbx_dc_config_clean_functions(&function, &err_func, 1);
 		}
 		else
 		{
@@ -1003,6 +1001,8 @@ static void	db_trigger_get_expression(const zbx_eval_context_t *ctx, char **expr
 			zbx_variant_set_error(&token->value, zbx_dsprintf(NULL, "function id:" ZBX_FS_UI64 " deleted",
 					functionid));
 		}
+
+		zbx_dc_config_clean_functions(&function, 1);
 	}
 
 	zbx_eval_compose_expression(&local_ctx, expression);
@@ -1087,9 +1087,9 @@ static void	evaluate_function_by_id(zbx_uint64_t functionid, char **value,
 			zbx_free(parameter);
 			zbx_dc_config_clean_items(&item, &err_item, 1);
 		}
-
-		zbx_dc_config_clean_functions(&function, &err_func, 1);
 	}
+
+	zbx_dc_config_clean_functions(&function, 1);
 
 	if (NULL == *value)
 		*value = zbx_strdup(NULL, STR_UNKNOWN_VARIABLE);

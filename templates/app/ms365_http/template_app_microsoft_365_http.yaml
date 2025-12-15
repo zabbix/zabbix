@@ -41,7 +41,7 @@ zabbix_export:
         4. Configure the host wizard configuration fields: `Application ID`, `Password`, `Tenant ID`.
       vendor:
         name: Zabbix
-        version: 8.0-1
+        version: 8.0-2
       groups:
         - name: Templates/Applications
       items:
@@ -382,6 +382,8 @@ zabbix_export:
           tags:
             - tag: component
               value: apps
+            - tag: component
+              value: excel
         - uuid: b82c96446428497f906820ac786be412
           name: 'Apps: Office, OneNote user count'
           type: DEPENDENT
@@ -401,6 +403,8 @@ zabbix_export:
           tags:
             - tag: component
               value: apps
+            - tag: component
+              value: onenote
         - uuid: 09555143c7874e2fa69671501d10c0c5
           name: 'Apps: Office, Outlook user count'
           type: DEPENDENT
@@ -420,6 +424,8 @@ zabbix_export:
           tags:
             - tag: component
               value: apps
+            - tag: component
+              value: outlook
         - uuid: 3f195401fb4241c2bea951e9cae2a6b1
           name: 'Apps: Office, PowerPoint user count'
           type: DEPENDENT
@@ -439,6 +445,8 @@ zabbix_export:
           tags:
             - tag: component
               value: apps
+            - tag: component
+              value: powerpoint
         - uuid: 69134417295047fb9e70d6285fa7a336
           name: 'Apps: Office, user count report date'
           type: DEPENDENT
@@ -479,6 +487,8 @@ zabbix_export:
           tags:
             - tag: component
               value: apps
+            - tag: component
+              value: teams
         - uuid: 6d3fbb21ab084ca6a8795098048fbd11
           name: 'Apps: Office, Word user count'
           type: DEPENDENT
@@ -498,6 +508,8 @@ zabbix_export:
           tags:
             - tag: component
               value: apps
+            - tag: component
+              value: word
         - uuid: c78a87d0d84845d6939126af05b83d95
           name: 'Apps: Platform, Mac user count'
           type: DEPENDENT
@@ -608,7 +620,7 @@ zabbix_export:
             	token: null,
             
             	setParams: function (params) {
-            		['app_id', 'password', 'tenant_id'].forEach(function (field) {
+            		['app_id', 'password', 'tenant_id', 'api_version'].forEach(function (field) {
             			if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
             				throw 'Required param is not set: ' + field + '.';
             			}
@@ -716,7 +728,7 @@ zabbix_export:
             
             		data.metrics = {};
             		endpoints.forEach(function (field) {
-            			link = 'https://graph.microsoft.com/beta/reports/' + field + '(period=\'D7\')?$format=application/json';
+            			link = 'https://graph.microsoft.com/' + encodeURIComponent(ms365.params.api_version) + '/reports/' + field + '(period=\'D7\')?$format=application/json';
             			answer = ms365.getField(ms365.request(link), 'value');
             
             			data.metrics[field] = answer;
@@ -728,7 +740,7 @@ zabbix_export:
             	getServiceData: function () {
             		var data = {},
             
-            		link = 'https://graph.microsoft.com/beta/admin/serviceAnnouncement/healthOverviews/';
+            		link = 'https://graph.microsoft.com/' + encodeURIComponent(ms365.params.api_version) + '/admin/serviceAnnouncement/healthOverviews/';
             		data.services = ms365.request(link);
             
             		return data;
@@ -759,6 +771,8 @@ zabbix_export:
             https://learn.microsoft.com/en-us/graph/api/resources/report?view=graph-rest-beta
           timeout: '{$MS365.API.TIMEOUT}'
           parameters:
+            - name: api_version
+              value: '{$MS365.API.VERSION}'
             - name: app_id
               value: '{$MS365.APP.ID}'
             - name: http_proxy
@@ -926,6 +940,565 @@ zabbix_export:
           tags:
             - tag: component
               value: apps
+        - uuid: f73b124151a1491da39a96327fb5470d
+          name: 'Copilot: User count, active in chat'
+          type: DEPENDENT
+          key: ms365.copilot.active_user_count.chat
+          trends: '0'
+          description: 'The number of users using Copilot Chat.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$.metrics.getMicrosoft365CopilotUserCountSummary[0].adoptionByProduct[0].copilotChatActiveUsers'
+              error_handler: DISCARD_VALUE
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+          master_item:
+            key: ms365.copilot.reports.get
+          tags:
+            - tag: component
+              value: copilot
+        - uuid: d56f0e7a6bc34800bc9f7ed0e8ce312f
+          name: 'Copilot: User count, active in Excel'
+          type: DEPENDENT
+          key: ms365.copilot.active_user_count.excel
+          trends: '0'
+          description: 'The number of users using Copilot in Excel.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$.metrics.getMicrosoft365CopilotUserCountSummary[0].adoptionByProduct[0].excelActiveUsers'
+              error_handler: DISCARD_VALUE
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+          master_item:
+            key: ms365.copilot.reports.get
+          tags:
+            - tag: component
+              value: copilot
+            - tag: component
+              value: excel
+        - uuid: 5af18c6856fb4d979db64a7bb908d11d
+          name: 'Copilot: User count, active in Loop'
+          type: DEPENDENT
+          key: ms365.copilot.active_user_count.loop
+          trends: '0'
+          description: 'The number of users using Copilot in Loop.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$.metrics.getMicrosoft365CopilotUserCountSummary[0].adoptionByProduct[0].loopActiveUsers'
+              error_handler: DISCARD_VALUE
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+          master_item:
+            key: ms365.copilot.reports.get
+          tags:
+            - tag: component
+              value: copilot
+            - tag: component
+              value: loop
+        - uuid: 79901554e7f342528de64a69e4d47a0d
+          name: 'Copilot: User count, active in OneNote'
+          type: DEPENDENT
+          key: ms365.copilot.active_user_count.onenote
+          trends: '0'
+          description: 'The number of users using Copilot in OneNote.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$.metrics.getMicrosoft365CopilotUserCountSummary[0].adoptionByProduct[0].oneNoteActiveUsers'
+              error_handler: DISCARD_VALUE
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+          master_item:
+            key: ms365.copilot.reports.get
+          tags:
+            - tag: component
+              value: copilot
+            - tag: component
+              value: onenote
+        - uuid: 90f0dd2173e447a3b11989aaeb858b51
+          name: 'Copilot: User count, active in Outlook'
+          type: DEPENDENT
+          key: ms365.copilot.active_user_count.outlook
+          trends: '0'
+          description: 'The number of users using Copilot in Outlook.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$.metrics.getMicrosoft365CopilotUserCountSummary[0].adoptionByProduct[0].outlookActiveUsers'
+              error_handler: DISCARD_VALUE
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+          master_item:
+            key: ms365.copilot.reports.get
+          tags:
+            - tag: component
+              value: copilot
+            - tag: component
+              value: outlook
+        - uuid: 8da9d8552fc148ef8bae10abd4d3d086
+          name: 'Copilot: User count, active in PowerPoint'
+          type: DEPENDENT
+          key: ms365.copilot.active_user_count.powerpoint
+          trends: '0'
+          description: 'The number of users using Copilot in PowerPoint.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$.metrics.getMicrosoft365CopilotUserCountSummary[0].adoptionByProduct[0].powerPointActiveUsers'
+              error_handler: DISCARD_VALUE
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+          master_item:
+            key: ms365.copilot.reports.get
+          tags:
+            - tag: component
+              value: copilot
+            - tag: component
+              value: powerpoint
+        - uuid: 96400b0df847450b9e6364447ea8ff07
+          name: 'Copilot: User count, active in Teams'
+          type: DEPENDENT
+          key: ms365.copilot.active_user_count.teams
+          trends: '0'
+          description: 'The number of users using Copilot in Teams.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$.metrics.getMicrosoft365CopilotUserCountSummary[0].adoptionByProduct[0].microsoftTeamsActiveUsers'
+              error_handler: DISCARD_VALUE
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+          master_item:
+            key: ms365.copilot.reports.get
+          tags:
+            - tag: component
+              value: copilot
+            - tag: component
+              value: teams
+        - uuid: 1adb3e6ee7114eb1998b640ec771411f
+          name: 'Copilot: User count, active in Word'
+          type: DEPENDENT
+          key: ms365.copilot.active_user_count.word
+          trends: '0'
+          description: 'The number of users using Copilot in Word.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$.metrics.getMicrosoft365CopilotUserCountSummary[0].adoptionByProduct[0].wordActiveUsers'
+              error_handler: DISCARD_VALUE
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+          master_item:
+            key: ms365.copilot.reports.get
+          tags:
+            - tag: component
+              value: copilot
+            - tag: component
+              value: word
+        - uuid: 5bedba43a08f4905bf0139d75cf0e1fd
+          name: 'Copilot: Get errors'
+          type: DEPENDENT
+          key: ms365.copilot.errors
+          value_type: TEXT
+          description: 'A list of errors from API requests for Copilot metrics.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.error
+              error_handler: CUSTOM_VALUE
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: ms365.copilot.reports.get
+          tags:
+            - tag: component
+              value: copilot
+            - tag: component
+              value: error
+          triggers:
+            - uuid: cc46d736d62b4d06b15a0522375ec916
+              expression: 'length(last(/Microsoft 365 reports by HTTP/ms365.copilot.errors))>0'
+              name: 'Microsoft 365: Copilot: There are errors in requests to API'
+              opdata: '{ITEM.LASTVALUE1}'
+              priority: AVERAGE
+              description: 'Zabbix has received errors in response to API requests.'
+              tags:
+                - tag: scope
+                  value: availability
+        - uuid: fb252bfc5d0244da9bd31a297d7a2396
+          name: 'Copilot: Get reports'
+          type: SCRIPT
+          key: ms365.copilot.reports.get
+          delay: 6h
+          history: '0'
+          value_type: TEXT
+          params: |
+            const ms365 = {
+            	params: {},
+            	token: null,
+            
+            	setParams: function (params) {
+            		['app_id', 'password', 'tenant_id', 'api_version'].forEach(function (field) {
+            			if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
+            				throw 'Required param is not set: ' + field + '.';
+            			}
+            		});
+            
+            		ms365.params = params;
+            	},
+            
+            	login: function () {
+            		const response = new HttpRequest(),
+            			login = new HttpRequest();
+            
+            		if (typeof ms365.params.http_proxy !== 'undefined' && ms365.params.http_proxy !== '') {
+            			login.setProxy(ms365.params.http_proxy);
+            			Zabbix.log(4, '[ Microsoft 365 ] Using HTTP proxy: ' + ms365.params.http_proxy);
+            		}
+            
+            		login.addHeader('Content-Type: application/x-www-form-urlencoded');
+            
+            		response = login.post(
+            			'https://login.microsoftonline.com/' + encodeURIComponent(ms365.params.tenant_id) + '/oauth2/v2.0/token',
+            			'grant_type=client_credentials&scope=https://graph.microsoft.com/.default&client_id=' + encodeURIComponent(ms365.params.app_id) + '&client_secret=' + encodeURIComponent(ms365.params.password)
+            		);
+            
+            		if (login.getStatus() < 200 || login.getStatus() >= 300) {
+            			throw 'Login failed with status code ' + login.getStatus() + ': ' + response;
+            		}
+            
+            		try {
+            			response = JSON.parse(response);
+            		}
+            		catch (error) {
+            			throw 'Failed to parse login session response.';
+            		}
+            
+            		if (!response.hasOwnProperty('access_token')) {
+            			throw 'Authentication response does not contain access token.';
+            		}
+            
+            		ms365.token = response['access_token'];
+            	},
+            
+            	request: function (url) {
+            		const response = new HttpRequest(),
+            			request = new HttpRequest();
+            
+            		if (typeof ms365.params.http_proxy !== 'undefined' && ms365.params.http_proxy !== '') {
+            			request.setProxy(ms365.params.http_proxy);
+            			Zabbix.log(4, '[ Microsoft 365 ] Using HTTP proxy: ' + ms365.params.http_proxy);
+            		}
+            
+            		if (!ms365.token) {
+            			throw 'Request does not contain access token.';
+            		}
+            
+            		request.addHeader('Content-Type: application/json');
+            		request.addHeader('Authorization: Bearer ' + ms365.token);
+            
+            		Zabbix.log(4, '[ Microsoft 365 ] Request url: ' + url);
+            
+            		response = request.get(url);
+            
+            		Zabbix.log(4, '[ Microsoft 365 ] Received response with status code ' + request.getStatus() + ': ' + response);
+            
+            		if (request.getStatus() < 200 || request.getStatus() >= 300) {
+            			throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
+            		}
+            
+            		try {
+            			return JSON.parse(response);
+            		}
+            		catch (error) {
+            			throw 'Failed to parse response received from API.';
+            		}
+            	},
+            
+            	getField: function (data, path) {
+            		const steps = path.split('.');
+            
+            		for (var i = 0; i < steps.length; i++) {
+            			var step = steps[i];
+            			if (typeof data !== 'object' || typeof data[step] === 'undefined') {
+            				throw 'Required field was not found: ' + path;
+            			}
+            			data = data[step];
+            		}
+            
+            		return ms365.nullToZero(data);
+            	},
+            
+            	nullToZero: function (data) {
+            		Object.keys(data).forEach(function (key) {
+            			if (data[key] === null) {
+            				data[key] = 0;
+            			} else if (typeof data[key] === 'object') {
+            				ms365.nullToZero(data[key]);
+            			}
+            		});
+            
+            		return data;
+            	},
+            
+            	getMetricsData: function (endpoints) {
+            		const data = {};
+            
+            		data.metrics = {};
+            		endpoints.forEach(function (field) {
+            			link = 'https://graph.microsoft.com/' + encodeURIComponent(ms365.params.api_version) + '/reports/' + field + '(period=\'D7\')?$format=application/json';
+            			answer = ms365.getField(ms365.request(link), 'value');
+            
+            			data.metrics[field] = answer;
+            		});
+            
+            		return data;
+            	},
+            
+            	getServiceData: function () {
+            		var data = {},
+            
+            		link = 'https://graph.microsoft.com/' + encodeURIComponent(ms365.params.api_version) + '/admin/serviceAnnouncement/healthOverviews/';
+            		data.services = ms365.request(link);
+            
+            		return data;
+            	}
+            };
+            
+            
+            endpoints = [
+            	'getMicrosoft365CopilotUsageUserDetail',
+            	'getMicrosoft365CopilotUserCountSummary'
+            ];
+            
+            try {
+            	ms365.setParams(JSON.parse(value));
+            	ms365.login();
+            	return JSON.stringify(ms365.getMetricsData(endpoints));
+            }
+            catch (error) {
+            	error += (String(error).endsWith('.')) ? '' : '.';
+            	Zabbix.log(3, '[ Microsoft 365 ] ERROR: ' + error);
+            	return JSON.stringify({ 'error': error });
+            }
+          description: |
+            Accumulated data from the Microsoft Graph API "reports" endpoints.
+            More information:
+            https://learn.microsoft.com/en-us/graph/api/resources/report?view=graph-rest-beta
+          timeout: '{$MS365.API.TIMEOUT}'
+          parameters:
+            - name: api_version
+              value: '{$MS365.API.VERSION}'
+            - name: app_id
+              value: '{$MS365.APP.ID}'
+            - name: http_proxy
+              value: '{$MS365.HTTP.PROXY}'
+            - name: password
+              value: '{$MS365.PASSWORD}'
+            - name: tenant_id
+              value: '{$MS365.TENANT.ID}'
+          tags:
+            - tag: component
+              value: copilot
+            - tag: component
+              value: raw
+        - uuid: af840d91ea184b4d86e1be53d04e8d3a
+          name: 'Copilot: Users, report date'
+          type: DEPENDENT
+          key: ms365.copilot.users.report_date
+          value_type: CHAR
+          description: 'The date of the report about users.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$.metrics.getMicrosoft365CopilotUserCountSummary[0].reportRefreshDate'
+              error_handler: DISCARD_VALUE
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+          master_item:
+            key: ms365.copilot.reports.get
+          tags:
+            - tag: component
+              value: copilot
+        - uuid: 775c0133ac624f25b50e11fc573a1c02
+          name: 'Copilot: User count, enabled in chat'
+          type: DEPENDENT
+          key: ms365.copilot.user_count.chat
+          trends: '0'
+          description: 'The number of users allowed to use Copilot Chat.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$.metrics.getMicrosoft365CopilotUserCountSummary[0].adoptionByProduct[0].copilotChatEnabledUsers'
+              error_handler: DISCARD_VALUE
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+          master_item:
+            key: ms365.copilot.reports.get
+          tags:
+            - tag: component
+              value: copilot
+        - uuid: ee659809a5c14fcabefdcf591cdde11e
+          name: 'Copilot: User count, enabled in Excel'
+          type: DEPENDENT
+          key: ms365.copilot.user_count.excel
+          trends: '0'
+          description: 'The number of users allowed to use Copilot in Excel.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$.metrics.getMicrosoft365CopilotUserCountSummary[0].adoptionByProduct[0].excelEnabledUsers'
+              error_handler: DISCARD_VALUE
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+          master_item:
+            key: ms365.copilot.reports.get
+          tags:
+            - tag: component
+              value: copilot
+            - tag: component
+              value: excel
+        - uuid: fa12cd5e48544996924c8e08043da0c2
+          name: 'Copilot: User count, enabled in Loop'
+          type: DEPENDENT
+          key: ms365.copilot.user_count.loop
+          trends: '0'
+          description: 'The number of users allowed to use Copilot in Loop.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$.metrics.getMicrosoft365CopilotUserCountSummary[0].adoptionByProduct[0].loopEnabledUsers'
+              error_handler: DISCARD_VALUE
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+          master_item:
+            key: ms365.copilot.reports.get
+          tags:
+            - tag: component
+              value: copilot
+            - tag: component
+              value: loop
+        - uuid: 49ceaf0c176c4f2499f5c359aa2fc72c
+          name: 'Copilot: User count, enabled in OneNote'
+          type: DEPENDENT
+          key: ms365.copilot.user_count.onenote
+          trends: '0'
+          description: 'The number of users allowed to use Copilot in OneNote.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$.metrics.getMicrosoft365CopilotUserCountSummary[0].adoptionByProduct[0].oneNoteEnabledUsers'
+              error_handler: DISCARD_VALUE
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+          master_item:
+            key: ms365.copilot.reports.get
+          tags:
+            - tag: component
+              value: copilot
+            - tag: component
+              value: onenote
+        - uuid: 0c708d13d55441a683fb855b65bdfcde
+          name: 'Copilot: User count, enabled in Outlook'
+          type: DEPENDENT
+          key: ms365.copilot.user_count.outlook
+          trends: '0'
+          description: 'The number of users allowed to use Copilot in Outlook.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$.metrics.getMicrosoft365CopilotUserCountSummary[0].adoptionByProduct[0].outlookEnabledUsers'
+              error_handler: DISCARD_VALUE
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+          master_item:
+            key: ms365.copilot.reports.get
+          tags:
+            - tag: component
+              value: copilot
+            - tag: component
+              value: outlook
+        - uuid: 44fcabc3d520413f8dd953c61b314c55
+          name: 'Copilot: User count, enabled in PowerPoint'
+          type: DEPENDENT
+          key: ms365.copilot.user_count.powerpoint
+          trends: '0'
+          description: 'The number of users allowed to use Copilot in PowerPoint.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$.metrics.getMicrosoft365CopilotUserCountSummary[0].adoptionByProduct[0].powerPointEnabledUsers'
+              error_handler: DISCARD_VALUE
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+          master_item:
+            key: ms365.copilot.reports.get
+          tags:
+            - tag: component
+              value: copilot
+            - tag: component
+              value: powerpoint
+        - uuid: 03db2ff6604e44d8b15b1f3e5c7c9b9d
+          name: 'Copilot: User count, enabled in Teams'
+          type: DEPENDENT
+          key: ms365.copilot.user_count.teams
+          trends: '0'
+          description: 'The number of users allowed to use Copilot in Teams.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$.metrics.getMicrosoft365CopilotUserCountSummary[0].adoptionByProduct[0].microsoftTeamsEnabledUsers'
+              error_handler: DISCARD_VALUE
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+          master_item:
+            key: ms365.copilot.reports.get
+          tags:
+            - tag: component
+              value: copilot
+            - tag: component
+              value: teams
+        - uuid: c60c4432ba334dd39f6b7c9464875ddf
+          name: 'Copilot: User count, enabled in Word'
+          type: DEPENDENT
+          key: ms365.copilot.user_count.word
+          trends: '0'
+          description: 'The number of users allowed to use Copilot in Word.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$.metrics.getMicrosoft365CopilotUserCountSummary[0].adoptionByProduct[0].wordEnabledUsers'
+              error_handler: DISCARD_VALUE
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+          master_item:
+            key: ms365.copilot.reports.get
+          tags:
+            - tag: component
+              value: copilot
+            - tag: component
+              value: word
         - uuid: 8ed3af9876f94f138a0f6e19ea02235a
           name: 'OneDrive: Get errors'
           type: DEPENDENT
@@ -1126,7 +1699,7 @@ zabbix_export:
             	token: null,
             
             	setParams: function (params) {
-            		['app_id', 'password', 'tenant_id'].forEach(function (field) {
+            		['app_id', 'password', 'tenant_id', 'api_version'].forEach(function (field) {
             			if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
             				throw 'Required param is not set: ' + field + '.';
             			}
@@ -1234,7 +1807,7 @@ zabbix_export:
             
             		data.metrics = {};
             		endpoints.forEach(function (field) {
-            			link = 'https://graph.microsoft.com/beta/reports/' + field + '(period=\'D7\')?$format=application/json';
+            			link = 'https://graph.microsoft.com/' + encodeURIComponent(ms365.params.api_version) + '/reports/' + field + '(period=\'D7\')?$format=application/json';
             			answer = ms365.getField(ms365.request(link), 'value');
             
             			data.metrics[field] = answer;
@@ -1246,7 +1819,7 @@ zabbix_export:
             	getServiceData: function () {
             		var data = {},
             
-            		link = 'https://graph.microsoft.com/beta/admin/serviceAnnouncement/healthOverviews/';
+            		link = 'https://graph.microsoft.com/' + encodeURIComponent(ms365.params.api_version) + '/admin/serviceAnnouncement/healthOverviews/';
             		data.services = ms365.request(link);
             
             		return data;
@@ -1278,6 +1851,8 @@ zabbix_export:
             https://learn.microsoft.com/en-us/graph/api/resources/report?view=graph-rest-beta
           timeout: '{$MS365.API.TIMEOUT}'
           parameters:
+            - name: api_version
+              value: '{$MS365.API.VERSION}'
             - name: app_id
               value: '{$MS365.APP.ID}'
             - name: http_proxy
@@ -1729,7 +2304,7 @@ zabbix_export:
             	token: null,
             
             	setParams: function (params) {
-            		['app_id', 'password', 'tenant_id'].forEach(function (field) {
+            		['app_id', 'password', 'tenant_id', 'api_version'].forEach(function (field) {
             			if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
             				throw 'Required param is not set: ' + field + '.';
             			}
@@ -1837,7 +2412,7 @@ zabbix_export:
             
             		data.metrics = {};
             		endpoints.forEach(function (field) {
-            			link = 'https://graph.microsoft.com/beta/reports/' + field + '(period=\'D7\')?$format=application/json';
+            			link = 'https://graph.microsoft.com/' + encodeURIComponent(ms365.params.api_version) + '/reports/' + field + '(period=\'D7\')?$format=application/json';
             			answer = ms365.getField(ms365.request(link), 'value');
             
             			data.metrics[field] = answer;
@@ -1849,7 +2424,7 @@ zabbix_export:
             	getServiceData: function () {
             		var data = {},
             
-            		link = 'https://graph.microsoft.com/beta/admin/serviceAnnouncement/healthOverviews/';
+            		link = 'https://graph.microsoft.com/' + encodeURIComponent(ms365.params.api_version) + '/admin/serviceAnnouncement/healthOverviews/';
             		data.services = ms365.request(link);
             
             		return data;
@@ -1881,6 +2456,8 @@ zabbix_export:
             https://learn.microsoft.com/en-us/graph/api/resources/report?view=graph-rest-beta
           timeout: '{$MS365.API.TIMEOUT}'
           parameters:
+            - name: api_version
+              value: '{$MS365.API.VERSION}'
             - name: app_id
               value: '{$MS365.APP.ID}'
             - name: http_proxy
@@ -2268,7 +2845,7 @@ zabbix_export:
             	token: null,
             
             	setParams: function (params) {
-            		['app_id', 'password', 'tenant_id'].forEach(function (field) {
+            		['app_id', 'password', 'tenant_id', 'api_version'].forEach(function (field) {
             			if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
             				throw 'Required param is not set: ' + field + '.';
             			}
@@ -2376,7 +2953,7 @@ zabbix_export:
             
             		data.metrics = {};
             		endpoints.forEach(function (field) {
-            			link = 'https://graph.microsoft.com/beta/reports/' + field + '(period=\'D7\')?$format=application/json';
+            			link = 'https://graph.microsoft.com/' + encodeURIComponent(ms365.params.api_version) + '/reports/' + field + '(period=\'D7\')?$format=application/json';
             			answer = ms365.getField(ms365.request(link), 'value');
             
             			data.metrics[field] = answer;
@@ -2388,7 +2965,7 @@ zabbix_export:
             	getServiceData: function () {
             		var data = {},
             
-            		link = 'https://graph.microsoft.com/beta/admin/serviceAnnouncement/healthOverviews/';
+            		link = 'https://graph.microsoft.com/' + encodeURIComponent(ms365.params.api_version) + '/admin/serviceAnnouncement/healthOverviews/';
             		data.services = ms365.request(link);
             
             		return data;
@@ -2412,6 +2989,8 @@ zabbix_export:
             https://learn.microsoft.com/en-us/graph/api/servicehealth-get?view=graph-rest-beta&tabs=http
           timeout: '{$MS365.API.TIMEOUT}'
           parameters:
+            - name: api_version
+              value: '{$MS365.API.VERSION}'
             - name: app_id
               value: '{$MS365.APP.ID}'
             - name: http_proxy
@@ -2705,7 +3284,7 @@ zabbix_export:
             	token: null,
             
             	setParams: function (params) {
-            		['app_id', 'password', 'tenant_id'].forEach(function (field) {
+            		['app_id', 'password', 'tenant_id', 'api_version'].forEach(function (field) {
             			if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
             				throw 'Required param is not set: ' + field + '.';
             			}
@@ -2813,7 +3392,7 @@ zabbix_export:
             
             		data.metrics = {};
             		endpoints.forEach(function (field) {
-            			link = 'https://graph.microsoft.com/beta/reports/' + field + '(period=\'D7\')?$format=application/json';
+            			link = 'https://graph.microsoft.com/' + encodeURIComponent(ms365.params.api_version) + '/reports/' + field + '(period=\'D7\')?$format=application/json';
             			answer = ms365.getField(ms365.request(link), 'value');
             
             			data.metrics[field] = answer;
@@ -2825,7 +3404,7 @@ zabbix_export:
             	getServiceData: function () {
             		var data = {},
             
-            		link = 'https://graph.microsoft.com/beta/admin/serviceAnnouncement/healthOverviews/';
+            		link = 'https://graph.microsoft.com/' + encodeURIComponent(ms365.params.api_version) + '/admin/serviceAnnouncement/healthOverviews/';
             		data.services = ms365.request(link);
             
             		return data;
@@ -2859,6 +3438,8 @@ zabbix_export:
             https://learn.microsoft.com/en-us/graph/api/resources/report?view=graph-rest-beta
           timeout: '{$MS365.API.TIMEOUT}'
           parameters:
+            - name: api_version
+              value: '{$MS365.API.VERSION}'
             - name: app_id
               value: '{$MS365.APP.ID}'
             - name: http_proxy
@@ -4204,7 +4785,7 @@ zabbix_export:
             	token: null,
             
             	setParams: function (params) {
-            		['app_id', 'password', 'tenant_id'].forEach(function (field) {
+            		['app_id', 'password', 'tenant_id', 'api_version'].forEach(function (field) {
             			if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
             				throw 'Required param is not set: ' + field + '.';
             			}
@@ -4312,7 +4893,7 @@ zabbix_export:
             
             		data.metrics = {};
             		endpoints.forEach(function (field) {
-            			link = 'https://graph.microsoft.com/beta/reports/' + field + '(period=\'D7\')?$format=application/json';
+            			link = 'https://graph.microsoft.com/' + encodeURIComponent(ms365.params.api_version) + '/reports/' + field + '(period=\'D7\')?$format=application/json';
             			answer = ms365.getField(ms365.request(link), 'value');
             
             			data.metrics[field] = answer;
@@ -4324,7 +4905,7 @@ zabbix_export:
             	getServiceData: function () {
             		var data = {},
             
-            		link = 'https://graph.microsoft.com/beta/admin/serviceAnnouncement/healthOverviews/';
+            		link = 'https://graph.microsoft.com/' + encodeURIComponent(ms365.params.api_version) + '/admin/serviceAnnouncement/healthOverviews/';
             		data.services = ms365.request(link);
             
             		return data;
@@ -4357,6 +4938,8 @@ zabbix_export:
             https://learn.microsoft.com/en-us/graph/api/resources/report?view=graph-rest-beta
           timeout: '{$MS365.API.TIMEOUT}'
           parameters:
+            - name: api_version
+              value: '{$MS365.API.VERSION}'
             - name: app_id
               value: '{$MS365.APP.ID}'
             - name: http_proxy
@@ -4628,6 +5211,255 @@ zabbix_export:
             - tag: component
               value: teams
       discovery_rules:
+        - uuid: ef6cab6b162d4a178d34391f2088b239
+          name: 'Microsoft Copilot user discovery'
+          type: DEPENDENT
+          key: ms365.copilot.user.discovery
+          filter:
+            evaltype: AND
+            conditions:
+              - macro: '{#KEY}'
+                value: '{$MS365.COPILOT.USER.KEY.MATCHES}'
+              - macro: '{#KEY}'
+                value: '{$MS365.COPILOT.USER.KEY.NOT.MATCHES}'
+                operator: NOT_MATCHES_REGEX
+          description: 'The list of Microsoft Copilot users.'
+          item_prototypes:
+            - uuid: f152b822a93f4229bf09866b86e36eea
+              name: 'User [{#NAME}]: Get data'
+              type: DEPENDENT
+              key: 'ms365.copilot.user.get[{#KEY}]'
+              value_type: TEXT
+              description: 'Item for gathering Copilot users.'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$.metrics.getMicrosoft365CopilotUsageUserDetail.[?(@.userPrincipalName == "{#KEY}")].first()'
+                  error_handler: DISCARD_VALUE
+              master_item:
+                key: ms365.copilot.reports.get
+              tags:
+                - tag: component
+                  value: raw
+                - tag: user
+                  value: '{#NAME}'
+            - uuid: a4eed1cea9424c98bf5072277441adf8
+              name: 'User [{#NAME}]: Copilot Activity, last chat use'
+              type: DEPENDENT
+              key: 'ms365.copilot.user_activity.chat[{#KEY}]'
+              value_type: CHAR
+              description: 'Last date of Copilot Chat use.'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - $.copilotChatLastActivityDate
+                  error_handler: DISCARD_VALUE
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1d
+              master_item:
+                key: 'ms365.copilot.user.get[{#KEY}]'
+              tags:
+                - tag: component
+                  value: copilot
+                - tag: user
+                  value: '{#NAME}'
+            - uuid: c7f5470c18004e9096debd2b3c275b75
+              name: 'User [{#NAME}]: Copilot Activity, last Excel use'
+              type: DEPENDENT
+              key: 'ms365.copilot.user_activity.excel[{#KEY}]'
+              value_type: CHAR
+              description: 'Last date of use Copilot in Microsoft Excel.'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - $.excelCopilotLastActivityDate
+                  error_handler: DISCARD_VALUE
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1d
+              master_item:
+                key: 'ms365.copilot.user.get[{#KEY}]'
+              tags:
+                - tag: component
+                  value: copilot
+                - tag: component
+                  value: excel
+                - tag: user
+                  value: '{#NAME}'
+            - uuid: d71be4d6285f427780dbb8f21e82476d
+              name: 'User [{#NAME}]: Copilot Activity, last Loop use'
+              type: DEPENDENT
+              key: 'ms365.copilot.user_activity.loop[{#KEY}]'
+              value_type: CHAR
+              description: 'Last date of use Copilot in Microsoft Loop.'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - $.loopCopilotLastActivityDate
+                  error_handler: DISCARD_VALUE
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1d
+              master_item:
+                key: 'ms365.copilot.user.get[{#KEY}]'
+              tags:
+                - tag: component
+                  value: copilot
+                - tag: component
+                  value: loop
+                - tag: user
+                  value: '{#NAME}'
+            - uuid: e4f10ea46783495182c24e6598ca6b76
+              name: 'User [{#NAME}]: Copilot Activity, last OneNote use'
+              type: DEPENDENT
+              key: 'ms365.copilot.user_activity.onenote[{#KEY}]'
+              value_type: CHAR
+              description: 'Last date of use Copilot in Microsoft OneNote.'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - $.oneNoteCopilotLastActivityDate
+                  error_handler: DISCARD_VALUE
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1d
+              master_item:
+                key: 'ms365.copilot.user.get[{#KEY}]'
+              tags:
+                - tag: component
+                  value: copilot
+                - tag: component
+                  value: onenote
+                - tag: user
+                  value: '{#NAME}'
+            - uuid: 1a67409aa9e94fbcbadf89127b8d3cc6
+              name: 'User [{#NAME}]: Copilot Activity, last Outlook use'
+              type: DEPENDENT
+              key: 'ms365.copilot.user_activity.outlook[{#KEY}]'
+              value_type: CHAR
+              description: 'Last date of use Copilot in Microsoft Outlook.'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - $.outlookCopilotLastActivityDate
+                  error_handler: DISCARD_VALUE
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1d
+              master_item:
+                key: 'ms365.copilot.user.get[{#KEY}]'
+              tags:
+                - tag: component
+                  value: copilot
+                - tag: component
+                  value: outlook
+                - tag: user
+                  value: '{#NAME}'
+            - uuid: 4e420a2dc0e5439cb27d7a3268243c8a
+              name: 'User [{#NAME}]: Copilot Activity, last PowerPoint use'
+              type: DEPENDENT
+              key: 'ms365.copilot.user_activity.powerpoint[{#KEY}]'
+              value_type: CHAR
+              description: 'Last date of use Copilot in Microsoft PowerPoint.'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - $.powerPointCopilotLastActivityDate
+                  error_handler: DISCARD_VALUE
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1d
+              master_item:
+                key: 'ms365.copilot.user.get[{#KEY}]'
+              tags:
+                - tag: component
+                  value: copilot
+                - tag: component
+                  value: powerpoint
+                - tag: user
+                  value: '{#NAME}'
+            - uuid: 46405049bc514990b8897024854dcfde
+              name: 'User [{#NAME}]: Copilot Activity, report date'
+              type: DEPENDENT
+              key: 'ms365.copilot.user_activity.report_date[{#KEY}]'
+              value_type: CHAR
+              description: 'The date of the report of the user''s activity.'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - $.reportRefreshDate
+                  error_handler: DISCARD_VALUE
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1d
+              master_item:
+                key: 'ms365.copilot.user.get[{#KEY}]'
+              tags:
+                - tag: component
+                  value: copilot
+                - tag: user
+                  value: '{#NAME}'
+            - uuid: 24e8f8b7d71e42a786930a2174f056cc
+              name: 'User [{#NAME}]: Copilot Activity, last Teams use'
+              type: DEPENDENT
+              key: 'ms365.copilot.user_activity.teams[{#KEY}]'
+              value_type: CHAR
+              description: 'Last date of use Copilot in Microsoft Teams.'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - $.microsoftTeamsCopilotLastActivityDate
+                  error_handler: DISCARD_VALUE
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1d
+              master_item:
+                key: 'ms365.copilot.user.get[{#KEY}]'
+              tags:
+                - tag: component
+                  value: copilot
+                - tag: component
+                  value: teams
+                - tag: user
+                  value: '{#NAME}'
+            - uuid: d60df5fb4287450b8999c2552393264d
+              name: 'User [{#NAME}]: Copilot Activity, last Word use'
+              type: DEPENDENT
+              key: 'ms365.copilot.user_activity.word[{#KEY}]'
+              value_type: CHAR
+              description: 'Last date of use Copilot in Microsoft Word.'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - $.wordCopilotLastActivityDate
+                  error_handler: DISCARD_VALUE
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1d
+              master_item:
+                key: 'ms365.copilot.user.get[{#KEY}]'
+              tags:
+                - tag: component
+                  value: copilot
+                - tag: component
+                  value: word
+                - tag: user
+                  value: '{#NAME}'
+          master_item:
+            key: ms365.copilot.reports.get
+          lld_macro_paths:
+            - lld_macro: '{#KEY}'
+              path: $.userPrincipalName
+            - lld_macro: '{#NAME}'
+              path: $.displayName
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.metrics.getMicrosoft365CopilotUsageUserDetail
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
         - uuid: f28e588e81fa4fbdaeb65463843c2c1d
           name: 'Microsoft cloud service discovery'
           type: DEPENDENT
@@ -4747,10 +5579,19 @@ zabbix_export:
           description: 'API response timeout.'
           config:
             type: TEXT
-            priority: '7'
+            priority: '10'
             section_name: Other
             label: 'API response timeout'
             description: 'API response timeout.'
+        - macro: '{$MS365.API.VERSION}'
+          value: beta
+          description: 'Microsoft Graph API version.'
+          config:
+            type: TEXT
+            priority: '9'
+            section_name: Other
+            label: 'API version'
+            description: 'Microsoft Graph API version.'
         - macro: '{$MS365.APP.ID}'
           description: 'Microsoft application ID.'
           config:
@@ -4759,11 +5600,29 @@ zabbix_export:
             label: 'Application ID'
             description: 'Microsoft application ID.'
             required: 'YES'
+        - macro: '{$MS365.COPILOT.USER.KEY.MATCHES}'
+          value: '.*'
+          description: 'This macro is used in the Microsoft Copilot user discovery rule.'
+          config:
+            type: TEXT
+            priority: '6'
+            section_name: Filters
+            label: 'Copilot usernames (include)'
+            description: 'This macro is used in the Microsoft Copilot user discovery rule.'
+        - macro: '{$MS365.COPILOT.USER.KEY.NOT.MATCHES}'
+          value: CHANGE_IF_NEEDED
+          description: 'This macro is used in the Microsoft Copilot user discovery rule.'
+          config:
+            type: TEXT
+            priority: '7'
+            section_name: Filters
+            label: 'Copilot usernames (exclude)'
+            description: 'This macro is used in the Microsoft Copilot user discovery rule.'
         - macro: '{$MS365.HTTP.PROXY}'
           description: 'Sets the HTTP proxy value. If this macro is empty, then no proxy is used.'
           config:
             type: TEXT
-            priority: '6'
+            priority: '8'
             section_name: Other
             label: 'HTTP proxy'
             description: 'Sets the HTTP proxy value. If this macro is empty, then no proxy is used.'
@@ -8519,6 +9378,418 @@ zabbix_export:
                     - type: INTEGER
                       name: value_size
                       value: '70'
+            - name: Copilot
+              widgets:
+                - type: item
+                  name: 'Report date'
+                  width: '12'
+                  fields:
+                    - type: ITEM
+                      name: itemid.0
+                      value:
+                        host: 'Microsoft 365 reports by HTTP'
+                        key: ms365.copilot.users.report_date
+                    - type: INTEGER
+                      name: show.0
+                      value: '2'
+                    - type: INTEGER
+                      name: value_size
+                      value: '50'
+                - type: piechart
+                  name: 'Users by app'
+                  'y': '2'
+                  width: '12'
+                  height: '3'
+                  hide_header: 'YES'
+                  fields:
+                    - type: STRING
+                      name: ds.0.color.0
+                      value: ED1248
+                    - type: STRING
+                      name: ds.0.color.1
+                      value: 385CC7
+                    - type: STRING
+                      name: ds.0.color.2
+                      value: 0EC9AC
+                    - type: STRING
+                      name: ds.0.color.3
+                      value: FF465C
+                    - type: STRING
+                      name: ds.0.color.4
+                      value: 2AB5FF
+                    - type: STRING
+                      name: ds.0.color.5
+                      value: 524BBC
+                    - type: STRING
+                      name: ds.0.color.6
+                      value: FFD54F
+                    - type: STRING
+                      name: ds.0.color.7
+                      value: BAE37D
+                    - type: INTEGER
+                      name: ds.0.dataset_type
+                      value: '0'
+                    - type: ITEM
+                      name: ds.0.itemids.0
+                      value:
+                        host: 'Microsoft 365 reports by HTTP'
+                        key: ms365.copilot.user_count.chat
+                    - type: ITEM
+                      name: ds.0.itemids.1
+                      value:
+                        host: 'Microsoft 365 reports by HTTP'
+                        key: ms365.copilot.user_count.word
+                    - type: ITEM
+                      name: ds.0.itemids.2
+                      value:
+                        host: 'Microsoft 365 reports by HTTP'
+                        key: ms365.copilot.user_count.excel
+                    - type: ITEM
+                      name: ds.0.itemids.3
+                      value:
+                        host: 'Microsoft 365 reports by HTTP'
+                        key: ms365.copilot.user_count.powerpoint
+                    - type: ITEM
+                      name: ds.0.itemids.4
+                      value:
+                        host: 'Microsoft 365 reports by HTTP'
+                        key: ms365.copilot.user_count.outlook
+                    - type: ITEM
+                      name: ds.0.itemids.5
+                      value:
+                        host: 'Microsoft 365 reports by HTTP'
+                        key: ms365.copilot.user_count.teams
+                    - type: ITEM
+                      name: ds.0.itemids.6
+                      value:
+                        host: 'Microsoft 365 reports by HTTP'
+                        key: ms365.copilot.user_count.onenote
+                    - type: ITEM
+                      name: ds.0.itemids.7
+                      value:
+                        host: 'Microsoft 365 reports by HTTP'
+                        key: ms365.copilot.user_count.loop
+                    - type: INTEGER
+                      name: ds.0.type.0
+                      value: '0'
+                    - type: INTEGER
+                      name: ds.0.type.1
+                      value: '0'
+                    - type: INTEGER
+                      name: ds.0.type.2
+                      value: '0'
+                    - type: INTEGER
+                      name: ds.0.type.3
+                      value: '0'
+                    - type: INTEGER
+                      name: ds.0.type.4
+                      value: '0'
+                    - type: INTEGER
+                      name: ds.0.type.5
+                      value: '0'
+                    - type: INTEGER
+                      name: ds.0.type.6
+                      value: '0'
+                    - type: INTEGER
+                      name: ds.0.type.7
+                      value: '0'
+                    - type: INTEGER
+                      name: legend
+                      value: '0'
+                - type: item
+                  name: 'Report date'
+                  'y': '5'
+                  width: '12'
+                  fields:
+                    - type: ITEM
+                      name: itemid.0
+                      value:
+                        host: 'Microsoft 365 reports by HTTP'
+                        key: ms365.copilot.users.report_date
+                    - type: INTEGER
+                      name: show.0
+                      value: '2'
+                    - type: INTEGER
+                      name: value_size
+                      value: '50'
+                - type: piechart
+                  name: 'Users by app'
+                  'y': '7'
+                  width: '12'
+                  height: '3'
+                  hide_header: 'YES'
+                  fields:
+                    - type: STRING
+                      name: ds.0.color.0
+                      value: ED1248
+                    - type: STRING
+                      name: ds.0.color.1
+                      value: 385CC7
+                    - type: STRING
+                      name: ds.0.color.2
+                      value: 0EC9AC
+                    - type: STRING
+                      name: ds.0.color.3
+                      value: FF465C
+                    - type: STRING
+                      name: ds.0.color.4
+                      value: 2AB5FF
+                    - type: STRING
+                      name: ds.0.color.5
+                      value: 524BBC
+                    - type: STRING
+                      name: ds.0.color.6
+                      value: FFD54F
+                    - type: STRING
+                      name: ds.0.color.7
+                      value: BAE37D
+                    - type: INTEGER
+                      name: ds.0.dataset_type
+                      value: '0'
+                    - type: ITEM
+                      name: ds.0.itemids.0
+                      value:
+                        host: 'Microsoft 365 reports by HTTP'
+                        key: ms365.copilot.active_user_count.chat
+                    - type: ITEM
+                      name: ds.0.itemids.1
+                      value:
+                        host: 'Microsoft 365 reports by HTTP'
+                        key: ms365.copilot.active_user_count.word
+                    - type: ITEM
+                      name: ds.0.itemids.2
+                      value:
+                        host: 'Microsoft 365 reports by HTTP'
+                        key: ms365.copilot.active_user_count.excel
+                    - type: ITEM
+                      name: ds.0.itemids.3
+                      value:
+                        host: 'Microsoft 365 reports by HTTP'
+                        key: ms365.copilot.active_user_count.powerpoint
+                    - type: ITEM
+                      name: ds.0.itemids.4
+                      value:
+                        host: 'Microsoft 365 reports by HTTP'
+                        key: ms365.copilot.active_user_count.outlook
+                    - type: ITEM
+                      name: ds.0.itemids.5
+                      value:
+                        host: 'Microsoft 365 reports by HTTP'
+                        key: ms365.copilot.active_user_count.teams
+                    - type: ITEM
+                      name: ds.0.itemids.6
+                      value:
+                        host: 'Microsoft 365 reports by HTTP'
+                        key: ms365.copilot.active_user_count.onenote
+                    - type: ITEM
+                      name: ds.0.itemids.7
+                      value:
+                        host: 'Microsoft 365 reports by HTTP'
+                        key: ms365.copilot.active_user_count.loop
+                    - type: INTEGER
+                      name: ds.0.type.0
+                      value: '0'
+                    - type: INTEGER
+                      name: ds.0.type.1
+                      value: '0'
+                    - type: INTEGER
+                      name: ds.0.type.2
+                      value: '0'
+                    - type: INTEGER
+                      name: ds.0.type.3
+                      value: '0'
+                    - type: INTEGER
+                      name: ds.0.type.4
+                      value: '0'
+                    - type: INTEGER
+                      name: ds.0.type.5
+                      value: '0'
+                    - type: INTEGER
+                      name: ds.0.type.6
+                      value: '0'
+                    - type: INTEGER
+                      name: ds.0.type.7
+                      value: '0'
+                    - type: INTEGER
+                      name: legend
+                      value: '0'
+                - type: svggraph
+                  name: 'User count, enabled by app'
+                  x: '12'
+                  width: '60'
+                  height: '5'
+                  fields:
+                    - type: STRING
+                      name: ds.0.color.0
+                      value: ED1248
+                    - type: STRING
+                      name: ds.0.color.1
+                      value: 385CC7
+                    - type: STRING
+                      name: ds.0.color.2
+                      value: 0EC9AC
+                    - type: STRING
+                      name: ds.0.color.3
+                      value: FF465C
+                    - type: STRING
+                      name: ds.0.color.4
+                      value: 2AB5FF
+                    - type: STRING
+                      name: ds.0.color.5
+                      value: 524BBC
+                    - type: STRING
+                      name: ds.0.color.6
+                      value: FFD54F
+                    - type: STRING
+                      name: ds.0.color.7
+                      value: BAE37D
+                    - type: INTEGER
+                      name: ds.0.dataset_type
+                      value: '0'
+                    - type: INTEGER
+                      name: ds.0.fill
+                      value: '0'
+                    - type: ITEM
+                      name: ds.0.itemids.0
+                      value:
+                        host: 'Microsoft 365 reports by HTTP'
+                        key: ms365.copilot.user_count.chat
+                    - type: ITEM
+                      name: ds.0.itemids.1
+                      value:
+                        host: 'Microsoft 365 reports by HTTP'
+                        key: ms365.copilot.user_count.word
+                    - type: ITEM
+                      name: ds.0.itemids.2
+                      value:
+                        host: 'Microsoft 365 reports by HTTP'
+                        key: ms365.copilot.user_count.excel
+                    - type: ITEM
+                      name: ds.0.itemids.3
+                      value:
+                        host: 'Microsoft 365 reports by HTTP'
+                        key: ms365.copilot.user_count.powerpoint
+                    - type: ITEM
+                      name: ds.0.itemids.4
+                      value:
+                        host: 'Microsoft 365 reports by HTTP'
+                        key: ms365.copilot.user_count.outlook
+                    - type: ITEM
+                      name: ds.0.itemids.5
+                      value:
+                        host: 'Microsoft 365 reports by HTTP'
+                        key: ms365.copilot.user_count.teams
+                    - type: ITEM
+                      name: ds.0.itemids.6
+                      value:
+                        host: 'Microsoft 365 reports by HTTP'
+                        key: ms365.copilot.user_count.onenote
+                    - type: ITEM
+                      name: ds.0.itemids.7
+                      value:
+                        host: 'Microsoft 365 reports by HTTP'
+                        key: ms365.copilot.user_count.loop
+                    - type: INTEGER
+                      name: ds.0.missingdatafunc
+                      value: '3'
+                    - type: INTEGER
+                      name: ds.0.width
+                      value: '3'
+                    - type: INTEGER
+                      name: legend_lines
+                      value: '2'
+                    - type: STRING
+                      name: reference
+                      value: FDFEC
+                - type: svggraph
+                  name: 'User count, active by app'
+                  x: '12'
+                  'y': '5'
+                  width: '60'
+                  height: '5'
+                  fields:
+                    - type: STRING
+                      name: ds.0.color.0
+                      value: ED1248
+                    - type: STRING
+                      name: ds.0.color.1
+                      value: 385CC7
+                    - type: STRING
+                      name: ds.0.color.2
+                      value: 0EC9AC
+                    - type: STRING
+                      name: ds.0.color.3
+                      value: FF465C
+                    - type: STRING
+                      name: ds.0.color.4
+                      value: 2AB5FF
+                    - type: STRING
+                      name: ds.0.color.5
+                      value: 524BBC
+                    - type: STRING
+                      name: ds.0.color.6
+                      value: FFD54F
+                    - type: STRING
+                      name: ds.0.color.7
+                      value: BAE37D
+                    - type: INTEGER
+                      name: ds.0.dataset_type
+                      value: '0'
+                    - type: INTEGER
+                      name: ds.0.fill
+                      value: '0'
+                    - type: ITEM
+                      name: ds.0.itemids.0
+                      value:
+                        host: 'Microsoft 365 reports by HTTP'
+                        key: ms365.copilot.active_user_count.chat
+                    - type: ITEM
+                      name: ds.0.itemids.1
+                      value:
+                        host: 'Microsoft 365 reports by HTTP'
+                        key: ms365.copilot.active_user_count.word
+                    - type: ITEM
+                      name: ds.0.itemids.2
+                      value:
+                        host: 'Microsoft 365 reports by HTTP'
+                        key: ms365.copilot.active_user_count.excel
+                    - type: ITEM
+                      name: ds.0.itemids.3
+                      value:
+                        host: 'Microsoft 365 reports by HTTP'
+                        key: ms365.copilot.active_user_count.powerpoint
+                    - type: ITEM
+                      name: ds.0.itemids.4
+                      value:
+                        host: 'Microsoft 365 reports by HTTP'
+                        key: ms365.copilot.active_user_count.outlook
+                    - type: ITEM
+                      name: ds.0.itemids.5
+                      value:
+                        host: 'Microsoft 365 reports by HTTP'
+                        key: ms365.copilot.active_user_count.teams
+                    - type: ITEM
+                      name: ds.0.itemids.6
+                      value:
+                        host: 'Microsoft 365 reports by HTTP'
+                        key: ms365.copilot.active_user_count.onenote
+                    - type: ITEM
+                      name: ds.0.itemids.7
+                      value:
+                        host: 'Microsoft 365 reports by HTTP'
+                        key: ms365.copilot.active_user_count.loop
+                    - type: INTEGER
+                      name: ds.0.missingdatafunc
+                      value: '3'
+                    - type: INTEGER
+                      name: ds.0.width
+                      value: '3'
+                    - type: INTEGER
+                      name: legend_lines
+                      value: '2'
+                    - type: STRING
+                      name: reference
+                      value: FDEAF
             - name: Services
               widgets:
                 - type: honeycomb
@@ -8721,6 +9992,90 @@ zabbix_export:
           item:
             host: 'Microsoft 365 reports by HTTP'
             key: ms365.apps.users.teams
+    - uuid: 26864e4e51db47fa888d70427dc3b48e
+      name: 'Copilot: User count, active by app'
+      graph_items:
+        - color: 199C0D
+          item:
+            host: 'Microsoft 365 reports by HTTP'
+            key: ms365.copilot.active_user_count.chat
+        - sortorder: '1'
+          color: F63100
+          item:
+            host: 'Microsoft 365 reports by HTTP'
+            key: ms365.copilot.active_user_count.outlook
+        - sortorder: '2'
+          color: 00611C
+          item:
+            host: 'Microsoft 365 reports by HTTP'
+            key: ms365.copilot.active_user_count.word
+        - sortorder: '3'
+          color: F7941D
+          item:
+            host: 'Microsoft 365 reports by HTTP'
+            key: ms365.copilot.active_user_count.excel
+        - sortorder: '4'
+          color: FC6EA3
+          item:
+            host: 'Microsoft 365 reports by HTTP'
+            key: ms365.copilot.active_user_count.powerpoint
+        - sortorder: '5'
+          color: 6C59DC
+          item:
+            host: 'Microsoft 365 reports by HTTP'
+            key: ms365.copilot.active_user_count.onenote
+        - sortorder: '6'
+          color: C7A72D
+          item:
+            host: 'Microsoft 365 reports by HTTP'
+            key: ms365.copilot.active_user_count.teams
+        - sortorder: '7'
+          color: BA2A5D
+          item:
+            host: 'Microsoft 365 reports by HTTP'
+            key: ms365.copilot.active_user_count.loop
+    - uuid: 11cfb04aec324542a7b19ebfaf3716ba
+      name: 'Copilot: User count, total by app'
+      graph_items:
+        - color: 199C0D
+          item:
+            host: 'Microsoft 365 reports by HTTP'
+            key: ms365.copilot.user_count.chat
+        - sortorder: '1'
+          color: F63100
+          item:
+            host: 'Microsoft 365 reports by HTTP'
+            key: ms365.copilot.user_count.outlook
+        - sortorder: '2'
+          color: 00611C
+          item:
+            host: 'Microsoft 365 reports by HTTP'
+            key: ms365.copilot.user_count.word
+        - sortorder: '3'
+          color: F7941D
+          item:
+            host: 'Microsoft 365 reports by HTTP'
+            key: ms365.copilot.user_count.excel
+        - sortorder: '4'
+          color: FC6EA3
+          item:
+            host: 'Microsoft 365 reports by HTTP'
+            key: ms365.copilot.user_count.powerpoint
+        - sortorder: '5'
+          color: 6C59DC
+          item:
+            host: 'Microsoft 365 reports by HTTP'
+            key: ms365.copilot.user_count.onenote
+        - sortorder: '6'
+          color: C7A72D
+          item:
+            host: 'Microsoft 365 reports by HTTP'
+            key: ms365.copilot.user_count.teams
+        - sortorder: '7'
+          color: BA2A5D
+          item:
+            host: 'Microsoft 365 reports by HTTP'
+            key: ms365.copilot.user_count.loop
     - uuid: d7ba1bdfe6534c27a0d01cf9a84c7eb6
       name: 'OneDrive: Business sites, active/total'
       graph_items:
