@@ -2008,17 +2008,12 @@ static char	*dc_expand_host_macros_dyn(const char *text, const ZBX_DC_HOST *dc_h
 #define IF_MACRO_HOST_IP	IF_MACRO_HOST "IP}"
 #define IF_MACRO_HOST_DNS	IF_MACRO_HOST "DNS}"
 #define IF_MACRO_HOST_CONN	IF_MACRO_HOST "CONN}"
-/* deprecated macros */
-#define IF_MACRO_HOSTNAME	"{HOSTNAME}"
-#define IF_MACRO_IPADDRESS	"{IPADDRESS}"
 
 #define IF_MACRO_HOST_HOST_LEN	ZBX_CONST_STRLEN(IF_MACRO_HOST_HOST)
 #define IF_MACRO_HOST_NAME_LEN	ZBX_CONST_STRLEN(IF_MACRO_HOST_NAME)
 #define IF_MACRO_HOST_IP_LEN	ZBX_CONST_STRLEN(IF_MACRO_HOST_IP)
 #define IF_MACRO_HOST_DNS_LEN	ZBX_CONST_STRLEN(IF_MACRO_HOST_DNS)
 #define IF_MACRO_HOST_CONN_LEN	ZBX_CONST_STRLEN(IF_MACRO_HOST_CONN)
-#define IF_MACRO_HOSTNAME_LEN	ZBX_CONST_STRLEN(IF_MACRO_HOSTNAME)
-#define IF_MACRO_IPADDRESS_LEN	ZBX_CONST_STRLEN(IF_MACRO_IPADDRESS)
 
 	zbx_token_t		token;
 	int			pos = 0, last_pos = 0;
@@ -2038,8 +2033,7 @@ static char	*dc_expand_host_macros_dyn(const char *text, const ZBX_DC_HOST *dc_h
 
 		zbx_strncpy_alloc(&str, &str_alloc, &str_offset, text + last_pos, token.loc.l - (size_t)last_pos);
 
-		if (SUCCEED == zbx_strloc_cmp(text, &token.loc, IF_MACRO_HOST_HOST, IF_MACRO_HOST_HOST_LEN) ||
-				SUCCEED == zbx_strloc_cmp(text, &token.loc, IF_MACRO_HOSTNAME, IF_MACRO_HOSTNAME_LEN))
+		if (SUCCEED == zbx_strloc_cmp(text, &token.loc, IF_MACRO_HOST_HOST, IF_MACRO_HOST_HOST_LEN))
 		{
 			value = dc_host->host;
 		}
@@ -2049,9 +2043,7 @@ static char	*dc_expand_host_macros_dyn(const char *text, const ZBX_DC_HOST *dc_h
 		}
 		else if (0 != (flags & EXPAND_INTERFACE_MACROS))
 		{
-			if (SUCCEED == zbx_strloc_cmp(text, &token.loc, IF_MACRO_HOST_IP, IF_MACRO_HOST_IP_LEN) ||
-					SUCCEED == zbx_strloc_cmp(text, &token.loc, IF_MACRO_IPADDRESS,
-							IF_MACRO_IPADDRESS_LEN))
+			if (SUCCEED == zbx_strloc_cmp(text, &token.loc, IF_MACRO_HOST_IP, IF_MACRO_HOST_IP_LEN))
 			{
 				if (SUCCEED == zbx_dc_config_get_interface_by_type(&interface, dc_host->hostid,
 						INTERFACE_TYPE_AGENT))
@@ -2098,14 +2090,11 @@ static char	*dc_expand_host_macros_dyn(const char *text, const ZBX_DC_HOST *dc_h
 
 	return str;
 
-#undef IF_MACRO_HOSTNAME_LEN
 #undef IF_MACRO_HOST_CONN_LEN
 #undef IF_MACRO_HOST_DNS_LEN
 #undef IF_MACRO_HOST_IP_LEN
 #undef IF_MACRO_HOST_NAME_LEN
 #undef IF_MACRO_HOST_HOST_LEN
-#undef IF_MACRO_IPADDRESS
-#undef IF_MACRO_HOSTNAME
 #undef IF_MACRO_HOST_CONN
 #undef IF_MACRO_HOST_DNS
 #undef IF_MACRO_HOST_IP
