@@ -75,7 +75,7 @@ zbx_db_table_changelog_t;
 
 typedef struct
 {
-	const char	*table;
+	const char	*table_name;
 	int		object;
 }
 zbx_db_table_housekeeper_t;
