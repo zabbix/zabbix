@@ -307,11 +307,9 @@ class CHistory extends CApiService {
 				&& in_array('value', $options['output']) && !$options['countOutput']) {
 			$query['_source'] = array_values(array_diff($options['output'], ['value']));
 
-			// Ensure _source is not empty to avoid downstream logic.
 			if (!$query['_source']) {
-				foreach ($options['itemids'] as $itemid) {
-					$query['_source'] = [$itemid];
-				}
+				// Avoid returning the original full-length value when only 'value' is requested.
+				$query['_source'] = false;
 			}
 
 			$query['script_fields'] = [

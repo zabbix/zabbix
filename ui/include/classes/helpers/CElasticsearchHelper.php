@@ -215,9 +215,11 @@ class CElasticsearchHelper {
 							continue;
 						}
 
-						// Elasticsearch returns field values as arrays and first element holds the value.
 						if (array_key_exists('fields', $row)) {
-							$row['_source']['value'] = $row['fields']['value'][0];
+							foreach ($row['fields'] as $name => $value) {
+								// Elasticsearch returns field values as arrays and first element holds the value.
+								$row['_source'][$name] = $value[0];
+							}
 						}
 
 						$values[] = $row['_source'];
