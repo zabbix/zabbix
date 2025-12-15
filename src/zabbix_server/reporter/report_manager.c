@@ -1900,12 +1900,6 @@ static int	rm_schedule_jobs(zbx_rm_t *manager, int now)
 
 				if (now < report->nextcheck)
 				{
-					zabbix_log(LOG_LEVEL_WARNING, "%s report \"%s\" (reportid:" ZBX_FS_UI64
-							") cannot be sent on date %04d-%02d-%02d (not the target day). "
-							"Rescheduling for next period.", cycle_str, report->name,
-							report->reportid, tm->tm_year + 1900, tm->tm_mon + 1,
-							tm->tm_mday);
-
 					zbx_binary_heap_remove_min(&manager->report_queue);
 					report->nextcheck = 0;
 
@@ -1926,11 +1920,11 @@ static int	rm_schedule_jobs(zbx_rm_t *manager, int now)
 						zbx_free(error);
 					}
 
-					continue;
+					break;
 				}
 
 				zabbix_log(LOG_LEVEL_WARNING, "%s report \"%s\" (reportid:" ZBX_FS_UI64
-						") missed scheduled date (target day). Sending catch-up report on "
+						") missed scheduled date (target day). Sending catch-up report on"
 						"%04d-%02d-%02d.", cycle_str, report->name, report->reportid,
 						tm->tm_year + 1900, tm->tm_mon + 1, tm->tm_mday);
 			}
