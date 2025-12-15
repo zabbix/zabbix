@@ -15,7 +15,7 @@
 
 
 /**
- * Ddashboard importer.
+ * Global dashboard importer.
  */
 class CDashboardImporter extends CDashboardImporterGeneral {
 
@@ -38,40 +38,35 @@ class CDashboardImporter extends CDashboardImporterGeneral {
 					$name, true
 				);
 			}
-
 			unset($dashboard_page);
-			$db_dashboard = $this->referencer->findDashboardByName($dashboard['name']);
 
-			if ($db_dashboard !== null) {
-				$dashboard['dashboardid'] = $db_dashboard['dashboardid'];
+			$dashboardid = $this->referencer->findDashboardidByName($dashboard['name']);
+
+			if ($dashboardid !== null) {
+				$dashboard['dashboardid'] = $dashboardid;
 
 				if (array_key_exists('pages', $dashboard)) {
-					$page_idx = 0;
+					foreach ($dashboard['pages'] as $index => &$dashboard_page) {
+						$dashboard_pageid = $this->referencer->findDashboardPageidByIndex($dashboardid, $index);
 
-					foreach ($dashboard['pages'] as &$page) {
-						if (array_key_exists($page_idx, $db_dashboard['pages'])) {
-							$page['dashboard_pageid'] = $db_dashboard['pages'][$page_idx]['dashboard_pageid'];
+						if ($dashboard_pageid !== null) {
+							$dashboard_page['dashboard_pageid'] = $dashboard_pageid;
 
-							if (array_key_exists('widgets', $page)) {
-								$used_widgetids = [];
-								$db_page_widgetsids = $db_dashboard['pages'][$page_idx]['widgetids'];
+							if (array_key_exists('widgets', $dashboard_page)) {
+								foreach ($dashboard_page['widgets'] as &$widget) {
+									$widgetid = $this->referencer->findWidgetidByPosition($dashboard_pageid,
+										(int) $widget['x'], (int) $widget['y']
+									);
 
-								foreach ($page['widgets'] as &$widget) {
-									$x = array_key_exists('x', $widget) ? $widget['x'] : '0';
-									$y = array_key_exists('y', $widget) ? $widget['y'] : '0';
-									$widget_key = $x.'_'.$y;
-
-									if (!array_key_exists($widget_key, $used_widgetids)
-											&& array_key_exists($widget_key, $db_page_widgetsids)) {
-										$widget['widgetid'] = $db_page_widgetsids[$widget_key];
-										$used_widgetids[$widget_key] = true;
+									if ($widgetid !== null) {
+										$widget['widgetid'] = $widgetid;
 									}
 								}
+								unset($widget);
 							}
-
-							$page_idx++;
 						}
 					}
+					unset($dashboard_page);
 				}
 
 				$dashboards_to_update[] = $dashboard;

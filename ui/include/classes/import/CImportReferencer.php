@@ -71,6 +71,8 @@ class CImportReferencer {
 	protected $db_media_types;
 	protected $db_template_dashboards;
 	protected $db_dashboards;
+	protected $db_dashboard_pages;
+	protected $db_widgets;
 	protected $db_template_macros;
 	protected $db_host_macros;
 	protected $db_group_prototypes;
@@ -664,15 +666,65 @@ class CImportReferencer {
 		return null;
 	}
 
-	public function findDashboardByName(string $name): ?array {
+	/**
+	 * Get global dashboard ID by dashboard name.
+	 *
+	 * @param string $name
+	 *
+	 * @return string|null
+	 */
+	public function findDashboardidByName(string $name): ?string {
 		if ($this->db_dashboards === null) {
 			$this->selectDashboards();
 		}
 
-		foreach ($this->db_dashboards as $dashboard) {
+		foreach ($this->db_dashboards as $dashboardid => $dashboard) {
 			if ($dashboard['name'] === $name) {
-				return $dashboard;
+				return $dashboardid;
 			}
+		}
+
+		return null;
+	}
+
+	/**
+	 * Get global dashboard page ID by dashboard ID and dashboard page index.
+	 *
+	 * @param string $dashboardid
+	 * @param int    $index
+	 *
+	 * @return string|null
+	 */
+	public function findDashboardPageidByIndex(string $dashboardid, int $index): ?string {
+		if ($this->db_dashboard_pages === null) {
+			$this->selectDashboards();
+		}
+
+		if (array_key_exists($dashboardid, $this->db_dashboard_pages)) {
+			return $this->db_dashboard_pages[$dashboardid][$index]['dashboard_pageid'];
+		}
+
+		return null;
+	}
+
+	/**
+	 * Get global dashboard widget ID by dashboard page ID and widget position on the dashboard.
+	 *
+	 * @param string $dashboard_pageid
+	 * @param int    $x
+	 * @param int    $y
+	 *
+	 * @return string|null
+	 */
+	public function findWidgetidByPosition(string $dashboard_pageid, int $x, int $y): ?string {
+		if ($this->db_widgets === null) {
+			$this->selectDashboards();
+		}
+
+		if (array_key_exists($dashboard_pageid, $this->db_widgets)
+				&& array_key_exists($x, $this->db_widgets[$dashboard_pageid])
+				&& array_key_exists($y, $this->db_widgets[$dashboard_pageid][$x])) {
+			return $this->db_widgets[$dashboard_pageid][$x][$y]['widgetid'];
 		}
 
 		return null;
@@ -1769,35 +1821,45 @@ class CImportReferencer {
 	}
 
 	/**
-	 * Select dashboard IDs for previously added dashboard names and template IDs.
+	 * Select global dashboards, dashboard pages and widgets for previously added dashboard names.
 	 *
 	 * @throws APIException
 	 */
 	protected function selectDashboards(): void {
 		$this->db_dashboards = [];
+		$this->db_dashboard_pages = [];
+		$this->db_widgets = [];
 
-		$db_dashboards = API::Dashboard()->get([
-			'output' => ['dashboardid', 'name'],
-			'filter' => [],
+		if (!$this->dashboards) {
+			return;
+		}
+
+		$this->db_dashboards = API::Dashboard()->get([
+			'output' => ['name'],
 			'selectPages' => ['dashboard_pageid', 'widgets'],
+			'filter' => [
+				'name' => array_unique(array_column($this->dashboards, 'name'))
+			],
+			'searchByAny' => true,
 			'preservekeys' => true
 		]);
 
-		$this->db_dashboards = array_map(function ($dashboard) {
-			$pages = [];
+		foreach ($this->db_dashboards as $dashboardid => &$dashboard) {
+			foreach ($dashboard['pages'] as $index => $dashboard_page) {
+				$this->db_dashboard_pages[$dashboardid][$index] = [
+					'dashboard_pageid' => $dashboard_page['dashboard_pageid']
+				];
 
-			foreach ($dashboard['pages'] as $page) {
-				$widgetids = [];
-
-				foreach ($page['widgets'] as $widget) {
-					$widgetids[$widget['x'].'_'.$widget['y']] = $widget['widgetid'];
+				foreach ($dashboard_page['widgets'] as $widget) {
+					$this->db_widgets[$dashboard_page['dashboard_pageid']][$widget['x']][$widget['y']] = [
+						'widgetid' => $widget['widgetid']
+					];
 				}
-
-				$pages[] = ['dashboard_pageid' => $page['dashboard_pageid'], 'widgetids' => $widgetids];
 			}
 
-			return ['dashboardid' => $dashboard['dashboardid'], 'name' => $dashboard['name'], 'pages' => $pages];
-		}, $db_dashboards);
+			unset($dashboard['pages']);
+		}
+		unset($dashboard);
 
 		$this->dashboards = [];
 	}
