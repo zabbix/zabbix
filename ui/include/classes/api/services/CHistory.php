@@ -109,7 +109,7 @@ class CHistory extends CApiService {
 			'searchWildcardsEnabled' =>	['type' => API_BOOLEAN, 'default' => false],
 			// output
 			'output' =>					['type' => API_MULTIPLE, 'rules' => [
-											['if' => ['field' => 'history', 'flags' => API_NORMALIZE, 'in' => implode(',', [ITEM_VALUE_TYPE_LOG])], 'type' => API_OUTPUT, 'in' => implode(',', ['itemid', 'clock', 'timestamp', 'source', 'severity', 'value', 'logeventid', 'ns']), 'default' => API_OUTPUT_EXTEND],
+											['if' => ['field' => 'history', 'in' => implode(',', [ITEM_VALUE_TYPE_LOG])], 'type' => API_OUTPUT, 'flags' => API_NORMALIZE, 'in' => implode(',', ['itemid', 'clock', 'timestamp', 'source', 'severity', 'value', 'logeventid', 'ns']), 'default' => API_OUTPUT_EXTEND],
 											['else' => true, 'type' => API_OUTPUT, 'flags' => API_NORMALIZE, 'in' => implode(',', ['itemid', 'clock', 'value', 'ns']), 'default' => API_OUTPUT_EXTEND]
 			]],
 			'countOutput' =>			['type' => API_FLAG, 'default' => false],
