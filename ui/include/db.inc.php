@@ -759,7 +759,7 @@ function zbx_dbcast_2bigint($field) {
  *
  * @return bool|string
  */
-function zbx_dbcast_2text($field) {
+function dbCast2Text($field) {
 	global $DB;
 
 	if (!isset($DB['TYPE'])) {
@@ -783,10 +783,10 @@ function zbx_dbcast_2text($field) {
  *
  * @param $field
  * @param $offset
- * @param $count
+ * @param $length
  *
  * @return string
  */
-function zbx_dbsubstring($field, $offset, $count) {
-	return 'SUBSTRING('.zbx_dbcast_2text($field).','.dbQuoteInt($offset).','.dbQuoteInt($count).') AS '.$field;
+function dbSubstring($field, $offset, $length) {
+	return 'SUBSTRING('.dbCast2Text($field).','.dbQuoteInt($offset).','.dbQuoteInt($length).') AS '.$field;
 }

@@ -233,7 +233,7 @@ class CHistory extends CApiService {
 				&& $options['maxValueSize'] !== null && !$options['countOutput']
 				&& $this->outputIsRequested('value', $options['output'])) {
 			$value_index = array_search($this->fieldId('value', $table_alias), $sql_parts['select']);
-			$sql_parts['select'][$value_index] = zbx_dbsubstring('value', 1, $options['maxValueSize']);
+			$sql_parts['select'][$value_index] = dbSubstring('value', 1, $options['maxValueSize']);
 		}
 
 		return $sql_parts;
