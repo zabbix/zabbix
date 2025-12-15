@@ -867,7 +867,7 @@ int	net_if_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 	zbx_regexp_t	*rxp = NULL;
 	MIB_IFTABLE	*pIfTable = NULL;
 	zbx_ifrow_t	ifrow = {NULL, NULL};
-	struct zbx_json	j;
+	struct zbx_json	jcfg, jval, j;
 	char		*pattern = NULL, *error = NULL, *name, *os = NULL, *text, *alias, *wmi_result;
 	size_t		os_alloc = 0, os_offset = 0;
 	char		*wmi_namespace = "root\\StandardCimv2";
@@ -911,7 +911,8 @@ int	net_if_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 		goto clean;
 	}
 
-	zbx_json_initarray(&j, ZBX_JSON_STAT_BUF_LEN);
+	zbx_json_initarray(&jval, ZBX_JSON_STAT_BUF_LEN);
+	zbx_json_initarray(&jcfg, ZBX_JSON_STAT_BUF_LEN);
 	zbx_ifrow_init(&ifrow);
 
 	for (unsigned int i = 0; i < pIfTable->dwNumEntries; i++)
@@ -939,14 +940,20 @@ int	net_if_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 			continue;
 		}
 
-		zbx_json_addobject(&j, NULL);
-		zbx_json_addstring(&j, "name", name, ZBX_JSON_TYPE_STRING);
+		zbx_json_addobject(&jcfg, NULL);
+		zbx_json_addobject(&jval, NULL);
+		zbx_json_addstring(&jcfg, "name", name, ZBX_JSON_TYPE_STRING);
+		zbx_json_addstring(&jval, "name", name, ZBX_JSON_TYPE_STRING);
 		zbx_free(name);
 
-		zbx_json_addstring(&j, "operational_state",
+		zbx_json_addstring(&jcfg, "operational_state",
 			(ifrow.ifRow2->OperStatus == IfOperStatusUp)? "up" : "down", ZBX_JSON_TYPE_STRING);
-		zbx_json_addstring(&j, "administrative_state",
+		zbx_json_addstring(&jcfg, "administrative_state",
 			(ifrow.ifRow2->AdminStatus == NET_IF_ADMIN_STATUS_UP)? "up" : "down", ZBX_JSON_TYPE_STRING);
+
+		alias = zbx_unicode_to_utf8(ifrow.ifRow2->Alias);
+		zbx_json_addstring(&jcfg, "alias", alias, ZBX_JSON_TYPE_STRING);
+		zbx_json_addstring(&jval, "alias", alias, ZBX_JSON_TYPE_STRING);
 
 		if (0 != ifrow.ifRow2->PhysicalAddressLength)
 		{
@@ -958,29 +965,28 @@ int	net_if_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 							"%02X%s", ifrow.ifRow2->PhysicalAddress[k],
 							(k == ifrow.ifRow2->PhysicalAddressLength - 1) ? "" : ":");
 
-			zbx_json_addstring(&j, "mac", buf, ZBX_JSON_TYPE_STRING);
+			zbx_json_addstring(&jval, "mac", buf, ZBX_JSON_TYPE_STRING);
+			zbx_json_addstring(&jcfg, "mac", buf, ZBX_JSON_TYPE_STRING);
 			zbx_free(buf);
 		}
 
-		alias = zbx_unicode_to_utf8(ifrow.ifRow2->Alias);
-		zbx_json_addstring(&j, "alias", alias, ZBX_JSON_TYPE_STRING);
-		zbx_json_addobject(&j, "in");
-		zbx_json_adduint64(&j, "bytes", zbx_ifrow_get_in_octets(&ifrow));
-		zbx_json_adduint64(&j, "packets", zbx_ifrow_get_in_ucast_pkts(&ifrow) +
+		zbx_json_addobject(&jval, "in");
+		zbx_json_adduint64(&jval, "bytes", zbx_ifrow_get_in_octets(&ifrow));
+		zbx_json_adduint64(&jval, "packets", zbx_ifrow_get_in_ucast_pkts(&ifrow) +
 				zbx_ifrow_get_in_nucast_pkts(&ifrow));
-		zbx_json_adduint64(&j, "errors", zbx_ifrow_get_in_errors(&ifrow));
-		zbx_json_adduint64(&j, "dropped", zbx_ifrow_get_in_discards(&ifrow) +
+		zbx_json_adduint64(&jval, "errors", zbx_ifrow_get_in_errors(&ifrow));
+		zbx_json_adduint64(&jval, "dropped", zbx_ifrow_get_in_discards(&ifrow) +
 				zbx_ifrow_get_in_unknown_protos(&ifrow));
-		zbx_json_close(&j);
-		zbx_json_addobject(&j, "out");
-		zbx_json_adduint64(&j, "bytes", zbx_ifrow_get_out_octets(&ifrow));
-		zbx_json_adduint64(&j, "packets", zbx_ifrow_get_out_ucast_pkts(&ifrow) +
+		zbx_json_close(&jval);
+		zbx_json_addobject(&jval, "out");
+		zbx_json_adduint64(&jval, "bytes", zbx_ifrow_get_out_octets(&ifrow));
+		zbx_json_adduint64(&jval, "packets", zbx_ifrow_get_out_ucast_pkts(&ifrow) +
 				zbx_ifrow_get_out_nucast_pkts(&ifrow));
-		zbx_json_adduint64(&j, "errors", zbx_ifrow_get_out_errors(&ifrow));
-		zbx_json_adduint64(&j, "dropped", zbx_ifrow_get_out_discards(&ifrow));
-		zbx_json_close(&j);
-		zbx_json_addint64(&j, "type", ifrow.ifRow2->Type);
-		zbx_json_addint64(&j, "carrier", ifrow.ifRow2->InterfaceAndOperStatusFlags.ConnectorPresent);
+		zbx_json_adduint64(&jval, "errors", zbx_ifrow_get_out_errors(&ifrow));
+		zbx_json_adduint64(&jval, "dropped", zbx_ifrow_get_out_discards(&ifrow));
+		zbx_json_close(&jval);
+		zbx_json_addint64(&jval, "type", ifrow.ifRow2->Type);
+		zbx_json_addint64(&jval, "carrier", ifrow.ifRow2->InterfaceAndOperStatusFlags.ConnectorPresent);
 
 		/* TODO: optimize, using one call to wmi */
 		wmi_result = NULL;
@@ -993,11 +999,11 @@ int	net_if_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 		{
 			if (0 == strcmp(wmi_result, "Auto Negotiation"))
 			{
-				zbx_json_addstring(&j, "negotiation", "on", ZBX_JSON_TYPE_STRING);
+				zbx_json_addstring(&jval, "negotiation", "on", ZBX_JSON_TYPE_STRING);
 			}
 			else
 			{
-				zbx_json_addstring(&j, "negotiation", "off", ZBX_JSON_TYPE_STRING);
+				zbx_json_addstring(&jval, "negotiation", "off", ZBX_JSON_TYPE_STRING);
 			}
 		}
 
@@ -1018,7 +1024,7 @@ int	net_if_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 			if (0 == strcmp(wmi_result, "True"))
 				duplex = "full";
 
-			zbx_json_addstring(&j, "duplex", duplex, ZBX_JSON_TYPE_STRING);
+			zbx_json_addstring(&jval, "duplex", duplex, ZBX_JSON_TYPE_STRING);
 		}
 
 		zbx_free(wmi_result);
@@ -1035,23 +1041,28 @@ int	net_if_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 			zbx_uint64_t	value_ui64;
 
 			if (SUCCEED == zbx_is_uint64(wmi_result, &value_ui64))
-				zbx_json_adduint64(&j, "speed", value_ui64);
+				zbx_json_adduint64(&jval, "speed", value_ui64);
 		}
 
 		zbx_free(os);
 		zbx_free(wmi_result);
 		zbx_free(alias);
-		zbx_json_close(&j);
+		zbx_json_close(&jval);
+		zbx_json_close(&jcfg);
 	}
 
 	zbx_ifrow_clean(&ifrow);
 
+	zbx_json_init(&j, ZBX_JSON_STAT_BUF_LEN);
+	zbx_json_addraw(&j, "config", jcfg.buffer);
+	zbx_json_addraw(&j, "values", jval.buffer);
 	zbx_json_close(&j);
 
 	SET_STR_RESULT(result, strdup(j.buffer));
 
 	zbx_json_free(&j);
-
+	zbx_json_free(&jval);
+	zbx_json_free(&jcfg);
 	ret = SYSINFO_RET_OK;
 clean:
 	zbx_free(pIfTable);
