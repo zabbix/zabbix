@@ -83,6 +83,15 @@ class testFormUser extends CWebTest {
 				]
 			]
 		]);
+
+		CDataHelper::call('dashboard.create', [
+			[
+				'name' => 'Testing share dashboard',
+				'userid' => '9',
+				'private' => 0,
+				'pages' => [[]]
+			]
+		]);
 	}
 
 	public function getLayoutData() {
@@ -165,7 +174,7 @@ class testFormUser extends CWebTest {
 						'id:autologout_visible' => false,
 						'id:autologout' => '15m',
 						'Refresh' => '30s',
-						'Rows per page' => '100',
+						'Rows per page' => '150',
 						'URL (after login)' => ''
 					],
 					'disabled' => ['id:autologout', 'button:Delete'],
@@ -799,7 +808,7 @@ class testFormUser extends CWebTest {
 					'role' => 'Guest role'
 				]
 			],
-			// Creating a user with optional parameters specified (including autologout) using Cyrillic charatcers.
+			// Creating a user with optional parameters specified (including autologout) using Cyrillic characters.
 			[
 				[
 					'expected' => TEST_GOOD,

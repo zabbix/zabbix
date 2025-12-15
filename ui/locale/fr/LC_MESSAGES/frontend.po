@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2025-09-18 18:30+0000\n"
+"PO-Revision-Date: 2025-11-16 21:08+0000\n"
 "Last-Translator: ERIC <eric78.zabbix@orange.fr>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: fr\n"
@@ -299,6 +299,24 @@ msgstr "La classe %1$s.php doit étendre %2$s pour le module situé à %3$s."
 #, c-format
 msgid "%1$s: %2$s"
 msgstr "%1$s : %2$s"
+
+#: include/classes/server/CZabbixServer.php:740
+#: include/classes/setup/CSetupWizard.php:1459
+#, c-format
+msgid "%1$s: %2$s."
+msgstr "%1$s : %2$s."
+
+#: include/classes/server/CZabbixServer.php:746
+#: include/classes/setup/CSetupWizard.php:1465
+#, c-format
+msgid "%1$s: file is not readable."
+msgstr "%1$s : le fichier n'est pas lisible."
+
+#: include/classes/server/CZabbixServer.php:743
+#: include/classes/setup/CSetupWizard.php:1462
+#, c-format
+msgid "%1$s: invalid path or file not found."
+msgstr "%1$s : chemin non valide ou fichier introuvable."
 
 #: include/classes/graph/CSvgGraph.php:1418
 #, c-format
@@ -4190,6 +4208,10 @@ msgstr "Impossible de configurer \"%1$s\" pour le prototype de graphique \"%2$s\
 msgid "Cannot set \"Data set aggregation\" when item with type \"Total\" is added to the chart."
 msgstr "Impossible de définir l'« Agrégation d'ensembles de données » lorsqu'un élément de type « Total » est ajouté au graphique."
 
+#: include/classes/db/MysqlDbBackend.php:197
+msgid "Cannot set charset."
+msgstr "Impossible de définir l'encodage des caractères."
+
 #: include/classes/api/services/CItemGeneral.php:2478
 #, c-format
 msgid "Cannot set dependency for LLD rule with key \"%1$s\" on the master item with key \"%2$s\" on the host \"%3$s\": %4$s."
@@ -4695,7 +4717,7 @@ msgstr "Certificat"
 #: include/items.inc.php:1581
 msgctxt "noun"
 msgid "Change"
-msgstr "Changer"
+msgstr "Changement"
 
 #: app/partials/hostmacros.inherited.list.html.php:124
 #: app/partials/hostmacros.inherited.list.html.php:141
@@ -12029,7 +12051,7 @@ msgstr "Tags hérités et d'élément"
 
 #: app/partials/configuration.tags.tab.php:160
 msgid "Inherited and scenario tags"
-msgstr "Tags héritées et de scénario"
+msgstr "Tags hérités et de scénario"
 
 #: app/views/template.edit.php:184
 msgid "Inherited and template macros"
@@ -12785,7 +12807,7 @@ msgstr "Élément ajouté"
 
 #: widgets/itemcard/Widget.php:32
 msgid "Item card"
-msgstr ""
+msgstr "Fiche d'élément"
 
 #: app/views/popup.itemtestedit.view.php:433
 msgid "Item contains user-defined macros with secret values. Values of these macros should be entered manually."
@@ -16446,17 +16468,17 @@ msgstr "Un"
 #: app/controllers/CControllerItem.php:166
 #: app/controllers/CControllerItemPrototype.php:168
 msgid "One \"Change\" step allowed per item."
-msgstr ""
+msgstr "Une seule étape \"Changement\" est autorisée par élément."
 
 #: app/controllers/CControllerItem.php:182
 #: app/controllers/CControllerItemPrototype.php:184
 msgid "One \"Prometheus\" step allowed per item."
-msgstr ""
+msgstr "Une seule étape \"Prometheus\" est autorisée par élément."
 
 #: app/controllers/CControllerItem.php:174
 #: app/controllers/CControllerItemPrototype.php:176
 msgid "One \"Throttling\" step allowed per item."
-msgstr ""
+msgstr "Une seule étape \"Limitation\" est autorisée par élément."
 
 #: app/views/maintenance.timeperiod.edit.php:79
 #: include/classes/helpers/CMaintenanceHelper.php:29
@@ -18076,7 +18098,7 @@ msgstr "Pousser"
 
 #: include/views/js/item.preprocessing.js.php:208
 msgid "Qualifier"
-msgstr ""
+msgstr "Qualificatif"
 
 #: include/classes/helpers/CSlaHelper.php:64
 msgid "Quarter"
@@ -18804,7 +18826,7 @@ msgstr "Réinitialiser à la vue initiale"
 
 #: app/views/administration.miscconfig.edit.php:103
 msgid "Resolve secret vault macros by"
-msgstr ""
+msgstr "Résoudre les macros secrètes du coffre-fort par"
 
 #: jsLoader.php:283
 msgid "Resolved"
@@ -21362,7 +21384,7 @@ msgstr "Nom de tag"
 #: app/controllers/CControllerTriggerPrototypeUpdate.php:61
 #: app/controllers/CControllerTriggerUpdate.php:61
 msgid "Tag name and value combination is not unique."
-msgstr ""
+msgstr "La combinaison du nom et de la valeur du tag n'est pas unique."
 
 #: include/actions.inc.php:68
 msgid "Tag value"
@@ -22103,8 +22125,8 @@ msgstr "Cette valeur est trop courte."
 #, c-format
 msgid "This value must be %1$s."
 msgid_plural "This value must be one of %1$s."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Cette valeur doit être %1$s."
+msgstr[1] "Cette valeur doit être l'une des %1$s."
 
 #: include/classes/validators/CFormValidator.php:847
 #: include/classes/validators/CFormValidator.php:898 jsLoader.php:433
@@ -22157,7 +22179,7 @@ msgstr "Seuils"
 
 #: include/items.inc.php:1629 include/items.inc.php:1633
 msgid "Throttling"
-msgstr "Étranglement"
+msgstr "Limitation"
 
 #: include/func.inc.php:216
 msgid "Thu"
@@ -22364,7 +22386,7 @@ msgstr ""
 
 #: app/views/oauth.edit.php:188
 msgid "Token endpoint"
-msgstr ""
+msgstr "Token du point de terminaison"
 
 #: app/views/oauth.edit.php:201
 msgid "Token parameters"
@@ -23663,7 +23685,7 @@ msgstr "Utilisez le filtre pour afficher les résultats"
 
 #: app/views/host.wizard.edit.php:424
 msgid "Use:"
-msgstr ""
+msgstr "Utilisation :"
 
 #: app/views/administration.script.list.php:93 app/views/mediatype.list.php:98
 msgid "Used in actions"

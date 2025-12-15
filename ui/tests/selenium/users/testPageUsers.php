@@ -30,6 +30,18 @@ class testPageUsers extends CLegacyWebTest {
 	public $userRole = 'Super admin role';
 
 	/**
+	 * Attach MessageBehavior, CTableBehavior to the test.
+	 *
+	 * @return array
+	 */
+	public function getBehaviors() {
+		return [
+			CTableBehavior::class,
+			CMessageBehavior::class
+		];
+	}
+
+	/**
 	 * Data for MassDelete scenario.
 	 */
 	public function prepareUserMediaData() {
@@ -54,6 +66,15 @@ class testPageUsers extends CLegacyWebTest {
 				]
 			]
 		]);
+
+		CDataHelper::call('dashboard.create', [
+			[
+				'name' => 'Testing share dashboard',
+				'userid' => '9',
+				'private' => 0,
+				'pages' => [[]]
+			]
+		]);
 	}
 
 	public static function allUsers() {
@@ -64,12 +85,13 @@ class testPageUsers extends CLegacyWebTest {
 		$this->zbxTestLogin('zabbix.php?action=user.list');
 		$this->zbxTestCheckTitle('Configuration of users');
 		$this->zbxTestCheckHeader('Users');
-
+		$table = $this->getTable();
 
 		$form = $this->query('name:zbx_filter')->asForm()->waitUntilVisible()->one();
 		$this->assertEquals(['Username', 'Name', 'Last name', 'User roles', 'User groups'], $form->getLabels()->asText());
 		$form->fill(['User groups' => 'Zabbix administrators']);
 		$form->submit();
+		$table->waitUntilReloaded();
 
 		$this->zbxTestTextNotPresent('guest');
 		$this->zbxTestAssertElementText("//tbody/tr[1]/td[2]/a", $this->userAlias);

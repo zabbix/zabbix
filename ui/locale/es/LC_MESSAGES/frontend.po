@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2025-09-26 12:02+0000\n"
+"PO-Revision-Date: 2025-10-03 11:20+0000\n"
 "Last-Translator: Vicente Salvador <vicentesalvadorcubedo@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: es\n"
@@ -299,6 +299,24 @@ msgstr "La clase %1$s.php debe extenderse a %2$s para el módulo ubicado en %3$s
 #, c-format
 msgid "%1$s: %2$s"
 msgstr "%1$s: %2$s"
+
+#: include/classes/server/CZabbixServer.php:740
+#: include/classes/setup/CSetupWizard.php:1459
+#, c-format
+msgid "%1$s: %2$s."
+msgstr ""
+
+#: include/classes/server/CZabbixServer.php:746
+#: include/classes/setup/CSetupWizard.php:1465
+#, c-format
+msgid "%1$s: file is not readable."
+msgstr ""
+
+#: include/classes/server/CZabbixServer.php:743
+#: include/classes/setup/CSetupWizard.php:1462
+#, c-format
+msgid "%1$s: invalid path or file not found."
+msgstr ""
 
 #: include/classes/graph/CSvgGraph.php:1418
 #, c-format
@@ -4189,6 +4207,10 @@ msgstr "No pude definir \"%1$s\" para el prototipo de gráfico \"%2$s\"."
 #: widgets/piechart/includes/CWidgetFieldDataSet.php:175
 msgid "Cannot set \"Data set aggregation\" when item with type \"Total\" is added to the chart."
 msgstr "No se puede establecer \"Agregación de conjuntos de datos\" cuando se agrega una métrica con el tipo \"Total\" al gráfico."
+
+#: include/classes/db/MysqlDbBackend.php:197
+msgid "Cannot set charset."
+msgstr ""
 
 #: include/classes/api/services/CItemGeneral.php:2478
 #, c-format
@@ -21492,7 +21514,7 @@ msgstr "Tablero de plantilla"
 
 #: app/views/popup.import.php:37
 msgid "Template dashboards"
-msgstr "Tableros de plantilla"
+msgstr "Plantillas de tablero"
 
 #: app/controllers/CControllerTemplateDelete.php:133
 msgid "Template deleted"

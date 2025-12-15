@@ -165,7 +165,7 @@ class testFormAdministrationGeneralAutoregistration extends CWebTest {
 			$this->query('id:ui-id-2')->one()->click();
 		}
 
-		// Reset filter to delete deependencies from previous tests.
+		// Reset filter to delete dependencies from previous tests.
 		$this->query('button:Reset')->waitUntilClickable()->one()->click();
 		$this->page->waitUntilReady();
 		$rows = $this->query('class:list-table')->asTable()->one()->getRows();

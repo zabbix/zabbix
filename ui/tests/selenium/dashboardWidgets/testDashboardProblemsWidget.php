@@ -21,6 +21,8 @@ require_once __DIR__.'/../behaviors/CMessageBehavior.php';
 /**
  * @backup settings, widget
  *
+ * @dataSource HostAvailabilityWidget, MonitoringOverview
+ *
  * @onBefore prepareDashboardData
  */
 class testDashboardProblemsWidget extends CWebTest {
@@ -444,7 +446,7 @@ class testDashboardProblemsWidget extends CWebTest {
 					'tag_fields' => []
 				]
 			],
-			// #9 Cyrillyc and special symbols in inputs.
+			// #9 Cyrillic and special symbols in inputs.
 			[
 				[
 					'fields' => [
