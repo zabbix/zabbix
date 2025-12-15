@@ -224,17 +224,18 @@ typedef struct
 	unsigned char		flags;
 	unsigned char		status;
 	char			key_orig[ZBX_ITEM_KEY_LEN * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1], *key;
-	char			*delay;
 	int			mtime;
 	char			timeout_orig[ZBX_ITEM_TIMEOUT_LEN_MAX];
 	int			timeout;
 	char			error_hash[ZBX_SHA512_BINARY_LENGTH];
 	unsigned char		preprocessing;
-} zbx_dc_agent_item_t;
+}
+zbx_dc_agent_item_t;
 
 typedef struct
 {
-	zbx_dc_host_t		host;
+	zbx_uint64_t		hostid;
+	char			hostname[ZBX_HOSTNAME_BUF_LEN];
 	zbx_dc_interface_t	interface;
 	zbx_uint64_t		itemid;
 	zbx_uint64_t		lastlogsize;
@@ -246,8 +247,7 @@ typedef struct
 	unsigned char		snmpv3_authprotocol;
 	unsigned char		snmpv3_privprotocol;
 	unsigned char		status;
-	char			key_orig[ZBX_ITEM_KEY_LEN * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1], *key;
-	char			*delay;
+	char			*key_orig, *key;
 	int			mtime;
 	char			logtimefmt[ZBX_ITEM_LOGTIMEFMT_LEN_MAX];
 	char			snmp_community_orig[ZBX_ITEM_SNMP_COMMUNITY_LEN_MAX], *snmp_community;
@@ -268,7 +268,7 @@ zbx_dc_snmp_item_t;
 
 typedef struct
 {
-	zbx_dc_host_t		host;
+	zbx_dc_host_t		host; /* TODO: remove, use hostid and hostname (host) instead */
 	zbx_dc_interface_t	interface;
 	zbx_uint64_t		itemid;
 	zbx_uint64_t		lastlogsize;
@@ -286,7 +286,6 @@ typedef struct
 	unsigned char		verify_host;
 	unsigned char		allow_traps;
 	char			key_orig[ZBX_ITEM_KEY_LEN * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1], *key;
-	char			*delay;
 	int			mtime;
 	char			trapper_hosts[ZBX_ITEM_TRAPPER_HOSTS_LEN_MAX];
 	char			username_orig[ZBX_ITEM_USERNAME_LEN_MAX], *username;
@@ -307,12 +306,14 @@ typedef struct
 }
 zbx_dc_httpagent_item_t;
 
-typedef union {
+typedef union
+{
 	zbx_dc_agent_item_t 	*agent_items;
 	zbx_dc_snmp_item_t	*snmp_items;
 	zbx_dc_httpagent_item_t *httpagent_items;
 	void 			*any;
-} zbx_dc_item_ptr_union;
+}
+zbx_dc_item_ptr_union;
 
 typedef struct
 {

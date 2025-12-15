@@ -59,6 +59,7 @@
 #include "zbx_expression_constants.h"
 #include "zbxhash.h"
 #include <stdint.h>
+#include <sys/socket.h>
 
 #define	ZBX_VECTOR_ARRAY_RESERVE	3
 
@@ -9699,8 +9700,6 @@ static void	DCget_agent_item(zbx_dc_agent_item_t *dst_item, const ZBX_DC_ITEM *s
 	dst_item->key = NULL;
 	dst_item->timeout = 0;
 
-	dst_item->delay = zbx_strdup(NULL, src_item->delay);	/* not used, should be initialized */
-
 	memcpy(dst_item->error_hash, src_item->error_hash, sizeof(dst_item->error_hash));
 
 	dc_interface = (ZBX_DC_INTERFACE *)zbx_hashset_search(&config->interfaces, &src_item->interfaceid);
@@ -9728,14 +9727,12 @@ static void	DCget_snmp_item(zbx_dc_snmp_item_t *dst_item, const ZBX_DC_ITEM *src
 
 	dst_item->status = src_item->status;
 
-	zbx_strscpy(dst_item->key_orig, src_item->key);
+	dst_item->key_orig = zbx_strdup(NULL, src_item->key);
 
 	dst_item->itemid = src_item->itemid;
 	dst_item->flags = src_item->flags;
 	dst_item->key = NULL;
 	dst_item->timeout = 0;
-
-	dst_item->delay = zbx_strdup(NULL, src_item->delay);	/* not used, should be initialized */
 
 	memcpy(dst_item->error_hash, src_item->error_hash, sizeof(dst_item->error_hash));
 
@@ -9824,8 +9821,6 @@ static void	DCget_httpagent_item(zbx_dc_httpagent_item_t *dst_item, const ZBX_DC
 	dst_item->flags = src_item->flags;
 	dst_item->key = NULL;
 	dst_item->timeout = 0;
-
-	dst_item->delay = zbx_strdup(NULL, src_item->delay);	/* not used, should be initialized */
 
 	memcpy(dst_item->error_hash, src_item->error_hash, sizeof(dst_item->error_hash));
 
@@ -9919,8 +9914,6 @@ void	zbx_dc_config_clean_agent_items(zbx_dc_agent_item_t *items, int *errcodes, 
 	{
 		if (NULL != errcodes && SUCCEED != errcodes[i])
 			continue;
-
-		zbx_free(items[i].delay);
 	}
 }
 
@@ -9932,8 +9925,6 @@ void	zbx_dc_config_clean_snmp_items(zbx_dc_snmp_item_t *items, int *errcodes, si
 	{
 		if (NULL != errcodes && SUCCEED != errcodes[i])
 			continue;
-
-		zbx_free(items[i].delay);
 	}
 }
 
@@ -9948,8 +9939,6 @@ void	zbx_dc_config_clean_httpagent_items(zbx_dc_httpagent_item_t *items, int *er
 
 		zbx_free(items[i].headers);
 		zbx_free(items[i].posts);
-
-		zbx_free(items[i].delay);
 	}
 }
 
@@ -11906,11 +11895,12 @@ int	zbx_dc_config_get_async_poller_items(unsigned char poller_type, int config_t
 				DCget_agent_item(&(items->agent_items)[num], dc_item);
 				break;
 			case ZBX_POLLER_TYPE_SNMP:
-				DCget_host(&items->agent_items[num].host, dc_host);
 				DCget_snmp_item(&(items->snmp_items)[num], dc_item);
+				items->snmp_items[num].hostid = dc_host->hostid;
+				zbx_strscpy(items->snmp_items[num].hostname, dc_host->host);
 				break;
 			case ZBX_POLLER_TYPE_HTTPAGENT:
-				DCget_host(&items->agent_items[num].host, dc_host);
+				DCget_host(&items->httpagent_items[num].host, dc_host);
 				DCget_httpagent_item(&(items->httpagent_items)[num], dc_item);
 				break;
 			default:

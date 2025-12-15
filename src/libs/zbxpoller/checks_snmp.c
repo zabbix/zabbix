@@ -3728,7 +3728,7 @@ int	zbx_async_check_snmp(zbx_dc_snmp_item_t *item, AGENT_RESULT *result,
 	char			error[MAX_STRING_LEN];
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() itemid:" ZBX_FS_UI64 " key:'%s' host:'%s' addr:'%s' timeout:%d retries:%d"
-			" max_repetitions:%d", __func__, item->itemid, item->key, item->host.host,
+			" max_repetitions:%d", __func__, item->itemid, item->key, item->hostname,
 			item->interface.addr, item->timeout, retries, item->snmp_max_repetitions);
 
 	snmp_context = zbx_malloc(NULL, sizeof(zbx_snmp_context_t));
@@ -3741,15 +3741,16 @@ int	zbx_async_check_snmp(zbx_dc_snmp_item_t *item, AGENT_RESULT *result,
 	snmp_context->item.interface = item->interface;
 	snmp_context->item.interface.addr = (item->interface.addr == item->interface.dns_orig ?
 			snmp_context->item.interface.dns_orig : snmp_context->item.interface.ip_orig);
-	zbx_strlcpy(snmp_context->item.host, item->host.host, sizeof(snmp_context->item.host));
+	zbx_strlcpy(snmp_context->item.host, item->hostname, sizeof(snmp_context->item.host));
 	snmp_context->item.itemid = item->itemid;
-	snmp_context->item.hostid = item->host.hostid;
+	snmp_context->item.hostid = item->hostid;
 	snmp_context->item.value_type = item->value_type;
 	snmp_context->item.flags = item->flags;
-	snmp_context->item.key_orig = zbx_strdup(NULL, item->key_orig);
+	snmp_context->item.key_orig = item->key_orig;
+	item->key_orig = NULL;
 	snmp_context->item.preprocessing = item->preprocessing;
 
-	if (item->key != item->key_orig)
+	if (item->key != snmp_context->item.key_orig)
 	{
 		snmp_context->item.key = item->key;
 		item->key = NULL;
@@ -3884,7 +3885,7 @@ out:
 	return ret;
 }
 
-/* FIXME: a copy of the function above but using zbx_dc_item_t, should probably be removed at some point */
+/* FIXME: a copy (almost) of the function above but using zbx_dc_item_t, should probably be removed at some point */
 int	zbx_async_check_snmp_dc_item(zbx_dc_item_t *item, AGENT_RESULT *result,
 		zbx_async_task_process_result_cb_t async_task_process_result_snmp_cb,
 		void *arg, void *arg_action, struct event_base *base, zbx_channel_t *channel,

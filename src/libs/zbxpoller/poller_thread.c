@@ -226,7 +226,7 @@ static int	macro_http_raw_resolv_no_dc_item(zbx_macro_resolv_data_t *p, va_list 
 	ZBX_UNUSED(error);
 	ZBX_UNUSED(maxerrlen);
 
-	http_raw_resolv_impl(p, replace_with, um_handle, dc_host, itemid, key_orig, key);
+	return http_raw_resolv_impl(p, replace_with, um_handle, dc_host, itemid, key_orig, key);
 }
 
 static int	macro_http_raw_resolv(zbx_macro_resolv_data_t *p, va_list args, char **replace_with, char **data,
@@ -241,7 +241,8 @@ static int	macro_http_raw_resolv(zbx_macro_resolv_data_t *p, va_list args, char 
 	ZBX_UNUSED(error);
 	ZBX_UNUSED(maxerrlen);
 
-	http_raw_resolv_impl(p, replace_with, um_handle, dc_host, dc_item->itemid, dc_item->key_orig, dc_item->key);
+	return http_raw_resolv_impl(p, replace_with, um_handle, dc_host, dc_item->itemid, dc_item->key_orig,
+		dc_item->key);
 }
 
 static int	macro_http_json_resolv(zbx_macro_resolv_data_t *p, va_list args, char **replace_with, char **data,
@@ -879,24 +880,24 @@ void	zbx_prepare_snmp_items(zbx_dc_snmp_item_t *items, int *errcodes, int num, A
 			ZBX_STRDUP(items[i].snmpv3_contextname, items[i].snmpv3_contextname_orig);
 
 			zbx_dc_expand_user_and_func_macros(um_handle_secure,
-				&items[i].snmpv3_securityname, &items[i].host.hostid, 1, NULL);
+				&items[i].snmpv3_securityname, &items[i].hostid, 1, NULL);
 			zbx_dc_expand_user_and_func_macros(um_handle_secure,
-					&items[i].snmpv3_authpassphrase, &items[i].host.hostid, 1,
+					&items[i].snmpv3_authpassphrase, &items[i].hostid, 1,
 					NULL);
 			zbx_dc_expand_user_and_func_macros(um_handle_secure,
-					&items[i].snmpv3_privpassphrase, &items[i].host.hostid, 1,
+					&items[i].snmpv3_privpassphrase, &items[i].hostid, 1,
 					NULL);
 			zbx_dc_expand_user_and_func_macros(um_handle_secure,
-					&items[i].snmpv3_contextname, &items[i].host.hostid, 1, NULL);
+					&items[i].snmpv3_contextname, &items[i].hostid, 1, NULL);
 		}
 
 		ZBX_STRDUP(items[i].snmp_community, items[i].snmp_community_orig);
 		ZBX_STRDUP(items[i].snmp_oid, items[i].snmp_oid_orig);
 
 		zbx_dc_expand_user_and_func_macros(um_handle_secure, &items[i].snmp_community,
-				&items[i].host.hostid, 1, NULL);
+				&items[i].hostid, 1, NULL);
 		if (SUCCEED != zbx_substitute_snmp_oid_params(&items[i].snmp_oid, error, sizeof(error),
-				zbx_snmp_oid_subst_cb, um_handle, &items[i].host.hostid))
+				zbx_snmp_oid_subst_cb, um_handle, &items[i].hostid))
 		{
 			SET_MSG_RESULT(&results[i], zbx_strdup(NULL, error));
 			errcodes[i] = CONFIG_ERROR;
@@ -904,7 +905,7 @@ void	zbx_prepare_snmp_items(zbx_dc_snmp_item_t *items, int *errcodes, int num, A
 			continue;
 		}
 
-		zbx_dc_expand_user_and_func_macros(um_handle, &timeout, &items[i].host.hostid, 1, NULL);
+		zbx_dc_expand_user_and_func_macros(um_handle, &timeout, &items[i].hostid, 1, NULL);
 
 		if (NULL != timeout)
 		{
@@ -1186,6 +1187,10 @@ void	zbx_clean_snmp_items(zbx_dc_snmp_item_t *items, int num, AGENT_RESULT *resu
 {
 	for (int i = 0; i < num; i++)
 	{
+		if (items[i].key == items[i].key_orig)
+			items[i].key = NULL;
+
+		zbx_free(items[i].key_orig);
 		zbx_free(items[i].key);
 
 		if (ZBX_IF_SNMP_VERSION_3 == items[i].snmp_version)
