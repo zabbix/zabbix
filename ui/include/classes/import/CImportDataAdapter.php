@@ -366,7 +366,7 @@ class CImportDataAdapter {
 	}
 
 	/**
-	 * Get dashboards from the imported data.
+	 * Get global dashboards from the imported data.
 	 *
 	 * @return array
 	 */
