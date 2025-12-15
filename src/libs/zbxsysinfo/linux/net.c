@@ -1293,7 +1293,7 @@ static void	get_link_flags(const char *interface, struct zbx_json *j)
 	close(sock);
 }
 
-static void	fill_net_if_get_params(char *name, char *param, struct zbx_json *j, int as_int)
+static void	fill_net_if_get_params(char *name, char *param, char *jsonname, struct zbx_json *j, int as_int)
 {
 	FILE	*f;
 	char	*path, value[MAX_STRING_LEN];
@@ -1306,6 +1306,9 @@ static void	fill_net_if_get_params(char *name, char *param, struct zbx_json *j, 
 		if (NULL != fgets(value, sizeof(value), f))
 		{
 			zbx_rtrim(value, "\n");
+
+			if (NULL != jsonname)
+				param = jsonname;
 
 			if (0 == as_int)
 			{
@@ -1328,7 +1331,7 @@ static void	fill_net_if_get_params(char *name, char *param, struct zbx_json *j, 
 int	net_if_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	FILE			*f;
-	struct zbx_json		j;
+	struct zbx_json		jcfg, jval, j;
 	zbx_regexp_t		*rxp = NULL;
 	char			line[MAX_STRING_LEN], *p, *pattern = NULL, *error = NULL;
 	net_stat_t		ns;
@@ -1338,7 +1341,9 @@ int	net_if_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot open /proc/net/dev: %s", zbx_strerror(errno)));
 		return SYSINFO_RET_FAIL;
 	}
-	zbx_json_initarray(&j, ZBX_JSON_STAT_BUF_LEN);
+	zbx_json_init(&j, ZBX_JSON_STAT_BUF_LEN);
+	zbx_json_initarray(&jval, ZBX_JSON_STAT_BUF_LEN);
+	zbx_json_initarray(&jcfg, ZBX_JSON_STAT_BUF_LEN);
 
 	if (1 == request->nparam)
 	{
@@ -1366,52 +1371,61 @@ int	net_if_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 		if (NULL != rxp && 0 != zbx_regexp_match_precompiled(p, rxp))
 			continue;
 
-		zbx_json_addobject(&j, NULL);
-		zbx_json_addstring(&j, "name", p, ZBX_JSON_TYPE_STRING);
-		get_link_flags(p, &j);
+		zbx_json_addobject(&jcfg, NULL);
+		zbx_json_addobject(&jval, NULL);
+		zbx_json_addstring(&jcfg, "name", p, ZBX_JSON_TYPE_STRING);
+		fill_net_if_get_params(p, "address", "mac", &jcfg, 0);
+		fill_net_if_get_params(p, "ifalias",  NULL, &jcfg, 0);
+		get_link_flags(p, &jcfg);
+
+		zbx_json_addstring(&jval, "name", p, ZBX_JSON_TYPE_STRING);
 
 		if (SYSINFO_RET_OK == get_net_stat(p, &ns, &error))
 		{
-			zbx_json_addobject(&j, "in");
-			zbx_json_adduint64(&j, "bytes", ns.ibytes);
-			zbx_json_adduint64(&j, "packets", ns.ipackets);
-			zbx_json_adduint64(&j, "errors", ns.ierr);
-			zbx_json_adduint64(&j, "dropped", ns.idrop);
-			zbx_json_adduint64(&j, "overruns", ns.ififo);
-			zbx_json_adduint64(&j, "compressed", ns.icompressed);
-			zbx_json_close(&j);
-			zbx_json_addobject(&j, "out");
-			zbx_json_adduint64(&j, "bytes", ns.obytes);
-			zbx_json_adduint64(&j, "packets", ns.opackets);
-			zbx_json_adduint64(&j, "errors", ns.oerr);
-			zbx_json_adduint64(&j, "dropped", ns.odrop);
-			zbx_json_adduint64(&j, "overruns", ns.ofifo);
-			zbx_json_adduint64(&j, "collisions", ns.ocolls);
-			zbx_json_adduint64(&j, "carrier", ns.ocarrier);
-			zbx_json_adduint64(&j, "compressed", ns.ocompressed);
-			zbx_json_close(&j);
+			zbx_json_addobject(&jval, "in");
+			zbx_json_adduint64(&jval, "bytes", ns.ibytes);
+			zbx_json_adduint64(&jval, "packets", ns.ipackets);
+			zbx_json_adduint64(&jval, "errors", ns.ierr);
+			zbx_json_adduint64(&jval, "dropped", ns.idrop);
+			zbx_json_adduint64(&jval, "overruns", ns.ififo);
+			zbx_json_adduint64(&jval, "compressed", ns.icompressed);
+			zbx_json_close(&jval);
+			zbx_json_addobject(&jval, "out");
+			zbx_json_adduint64(&jval, "bytes", ns.obytes);
+			zbx_json_adduint64(&jval, "packets", ns.opackets);
+			zbx_json_adduint64(&jval, "errors", ns.oerr);
+			zbx_json_adduint64(&jval, "dropped", ns.odrop);
+			zbx_json_adduint64(&jval, "overruns", ns.ofifo);
+			zbx_json_adduint64(&jval, "collisions", ns.ocolls);
+			zbx_json_adduint64(&jval, "carrier", ns.ocarrier);
+			zbx_json_adduint64(&jval, "compressed", ns.ocompressed);
+			zbx_json_close(&jval);
 		}
 
-		fill_net_if_get_params(p, "type", &j, 1);
-		fill_net_if_get_params(p, "address", &j, 0);
-		fill_net_if_get_params(p, "ifalias", &j, 0);
-		fill_net_if_get_params(p, "carrier", &j, 1);
-		fill_net_if_get_params(p, "speed", &j, 1);
-		fill_net_if_get_params(p, "duplex", &j, 0);
-		get_link_settings(p, &j);
+		fill_net_if_get_params(p, "type",  NULL, &jval, 1);
+		fill_net_if_get_params(p, "address", "mac", &jval, 0);
+		fill_net_if_get_params(p, "ifalias",  NULL, &jval, 0);
+		fill_net_if_get_params(p, "carrier", NULL, &jval, 1);
+		fill_net_if_get_params(p, "speed", NULL, &jval, 1);
+		fill_net_if_get_params(p, "duplex", NULL, &jval, 0);
+		get_link_settings(p, &jval);
 
-		get_wifi_info(p, &j);
-		zbx_json_close(&j);
+		get_wifi_info(p, &jval);
+		zbx_json_close(&jval);
+		zbx_json_close(&jcfg);
 	}
 
 	zbx_fclose(f);
 
+	zbx_json_addraw(&j, "config", jcfg.buffer);
+	zbx_json_addraw(&j, "values", jval.buffer);
 	zbx_json_close(&j);
 
 	SET_STR_RESULT(result, strdup(j.buffer));
 
 	zbx_json_free(&j);
-
+	zbx_json_free(&jval);
+	zbx_json_free(&jcfg);
 	if (NULL != rxp)
 		zbx_regexp_free(rxp);
 
