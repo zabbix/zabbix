@@ -25,6 +25,7 @@
 #include "zbxip.h"
 #include "zbxtime.h"
 #include "zbxcrypto.h"
+#include "resolver_thread.h"
 
 #ifdef _WINDOWS
 #	ifndef _WIN32_WINNT_WIN7
@@ -211,8 +212,12 @@ void	zbx_gethost_by_ip(const char *ip, char *host, size_t hostlen)
 		host[0] = '\0';
 		goto out;
 	}
-
+#ifdef HAVE_ARES_QUERY_CACHE
+	if (0 != zbx_ares_getnameinfo(ai->ai_addr,  ai->ai_addrlen, host, (socklen_t)hostlen,
+			zbx_socket_strerror_message, sizeof(zbx_socket_strerror_message)))
+#else
 	if (0 != getnameinfo(ai->ai_addr, ai->ai_addrlen, host, (socklen_t)hostlen, NULL, 0, NI_NAMEREQD))
+#endif
 	{
 		host[0] = '\0';
 		goto out;
@@ -254,7 +259,7 @@ int	zbx_inet_pton(int af, const char *src, void *dst)
 	return FAIL;
 }
 
-int	zbx_inet_ntop(struct sockaddr *ai_addr, char *ip, socklen_t len)
+int	zbx_inet_ntop(const struct sockaddr *ai_addr, char *ip, socklen_t len)
 {
 	if (AF_INET == ai_addr->sa_family)
 	{
@@ -297,6 +302,19 @@ int	zbx_inet_ntop(struct sockaddr *ai_addr, char *ip, socklen_t len)
  ******************************************************************************/
 void	zbx_getip_by_host(const char *host, char *ip, size_t iplen)
 {
+#ifdef HAVE_ARES_QUERY_CACHE
+	struct ares_addrinfo	*ares_ai = NULL;
+
+	if (0 != zbx_ares_getaddrinfo(host, NULL, 0, PF_UNSPEC, 0, &ares_ai, zbx_socket_strerror_message,
+			sizeof(zbx_socket_strerror_message)) ||
+			FAIL == zbx_inet_ntop(ares_ai->nodes->ai_addr, ip, (socklen_t)iplen))
+	{
+		ip[0] = '\0';
+	}
+
+	if (NULL != ares_ai)
+		ares_freeaddrinfo(ares_ai);
+#else
 	struct addrinfo	hints, *ai = NULL;
 
 	assert(ip);
@@ -315,6 +333,7 @@ void	zbx_getip_by_host(const char *host, char *ip, size_t iplen)
 out:
 	if (NULL != ai)
 		freeaddrinfo(ai);
+#endif
 }
 
 #endif	/* _WINDOWS */
@@ -515,6 +534,122 @@ int	zbx_socket_pollout(zbx_socket_t *s, int timeout, char **error)
 	return SUCCEED;
 }
 
+static int	zbx_addrinfo_connect(zbx_socket_t *s, const char *source_ip, const char *host,
+		unsigned short port, int timeout, int ai_family, int ai_socktype, int ai_protocol,
+		const struct sockaddr *ai_addr, socklen_t ai_addrlen, short *events)
+{
+	struct addrinfo	*ai_bind = NULL;
+	int		ret = FAIL;
+	char		*error = NULL;
+
+	if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_DEBUG))
+	{
+		char	address[65];
+
+		if (FAIL == zbx_inet_ntop(ai_addr, address, (socklen_t)sizeof(address)))
+			address[0] = '\0';
+
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() address '%s'", __func__, address);
+	}
+
+	zbx_socket_clean(s);
+	s->connection_type = ZBX_TCP_SEC_UNENCRYPTED;
+	s->timeout = timeout;
+
+	if (ZBX_SOCKET_ERROR == (s->socket = socket(ai_family, ai_socktype | SOCK_CLOEXEC, ai_protocol)))
+	{
+		zbx_set_socket_strerror("cannot create socket [[%s]:%hu]: %s",
+				host, port, zbx_strerror_from_system(zbx_socket_last_error()));
+		goto out;
+	}
+
+#if !defined(_WINDOWS) && !SOCK_CLOEXEC
+	if (-1 == fcntl(s->socket, F_SETFD, FD_CLOEXEC))
+	{
+		zbx_set_socket_strerror("failed to set the FD_CLOEXEC file descriptor flag on socket [[%s]:%hu]: %s",
+				host, port, zbx_strerror_from_system(zbx_socket_last_error()));
+	}
+#endif
+	if (NULL != source_ip)
+	{
+		struct addrinfo	hints;
+
+		zbx_tcp_init_hints(&hints, ai_socktype, AI_NUMERICHOST);
+
+		if (0 != getaddrinfo(source_ip, NULL, &hints, &ai_bind))
+		{
+			tcp_set_socket_strerror_from_getaddrinfo(source_ip);
+			goto out;
+		}
+
+		if (ZBX_PROTO_ERROR == zbx_bind(s->socket, ai_bind->ai_addr, ai_bind->ai_addrlen))
+		{
+			zbx_set_socket_strerror("bind() failed: %s", zbx_strerror_from_system(zbx_socket_last_error()));
+			goto out;
+		}
+	}
+
+	if (SUCCEED != socket_set_nonblocking(s->socket))
+	{
+		zbx_set_socket_strerror("setting non-blocking mode for [[%s]:%hu] failed: %s",
+				NULL != host ? host : "-", port,
+				zbx_strerror_from_system(zbx_socket_last_error()));
+		goto out;
+	}
+
+	if (ZBX_PROTO_ERROR == connect(s->socket, ai_addr, ai_addrlen) &&
+			SUCCEED != zbx_socket_had_nonblocking_error())
+	{
+		zbx_set_socket_strerror("cannot connect to address: %s",
+				zbx_strerror_from_system(zbx_socket_last_error()));
+		goto out;
+	}
+
+	zbx_socket_set_deadline(s, timeout);
+
+	if (NULL == events)
+	{
+		int		errnum = 0;
+		socklen_t	optlen = sizeof(int);
+
+		if (SUCCEED != zbx_socket_pollout(s, ZBX_SOCKET_POLL_TIMEOUT, &error))
+		{
+			zbx_set_socket_strerror("cannot connect to [[%s]:%hu]: %s", host, port, error);
+			zbx_free(error);
+			goto out;
+		}
+
+		if (0 == getsockopt(s->socket, SOL_SOCKET, SO_ERROR, &errnum, &optlen) && 0 != errnum)
+		{
+			zbx_set_socket_strerror("cannot connect to [[%s]:%hu]: %s", host, port, strerror(errnum));
+			goto out;
+		}
+	}
+	else
+		*events = POLLOUT;
+
+	ret = SUCCEED;
+	zbx_strlcpy(s->peer, host, sizeof(s->peer));
+out:
+	if (NULL != ai_bind)
+		freeaddrinfo(ai_bind);
+
+	if (FAIL == ret)
+	{
+		if (ZBX_SOCKET_ERROR != s->socket)
+		{
+			if (SOCK_STREAM == ai_socktype)
+				zbx_tcp_close(s);
+			else
+				zbx_udp_close(s);
+		}
+
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() '%s'", __func__, zbx_socket_strerror());
+	}
+
+	return ret;
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: initiate connection to specified address                          *
@@ -530,100 +665,72 @@ int	zbx_socket_pollout(zbx_socket_t *s, int timeout, char **error)
  *               FAIL - an error occurred                                     *
  *                                                                            *
  ******************************************************************************/
-int	zbx_socket_connect(zbx_socket_t *s, int type, const char *source_ip, const char *ip, unsigned short port,
-		int timeout)
+int	zbx_socket_connect(zbx_socket_t *s, int ai_socktype, const char *source_ip, const char *host,
+		unsigned short port, int timeout, short *events)
 {
-	int		flags, ret = FAIL;
-	char		service[8];
-	struct addrinfo	*ai = NULL, hints, *ai_bind = NULL;
-	void		(*func_socket_close)(zbx_socket_t *s);
-
-	zbx_socket_clean(s);
-	s->connection_type = ZBX_TCP_SEC_UNENCRYPTED;
-	s->timeout = timeout;
-
-	if (SUCCEED == zbx_is_ip4(ip))
-		flags = AI_NUMERICHOST;
-#ifdef HAVE_IPV6
-	else if (SUCCEED == zbx_is_ip6(ip))
-		flags = AI_NUMERICHOST;
-#endif
-	else
-		flags = 0;
+	int	ai_flags = 0, ai_family = PF_UNSPEC, ret = FAIL;
+	char	service[8];
 
 	zbx_snprintf(service, sizeof(service), "%hu", port);
-	zbx_tcp_init_hints(&hints, type, flags);
 
-	if (0 != getaddrinfo(ip, service, &hints, &ai))
+	if (SUCCEED == zbx_is_ip4(host))
 	{
-		tcp_set_socket_strerror_from_getaddrinfo(ip);
-		goto out;
+		ai_flags = AI_NUMERICHOST;
+		ai_family = AF_INET;
 	}
-
-	if (ZBX_SOCKET_ERROR == (s->socket = socket(ai->ai_family, ai->ai_socktype | SOCK_CLOEXEC, ai->ai_protocol)))
+#ifdef HAVE_IPV6
+	else if (SUCCEED == zbx_is_ip6(host))
 	{
-		zbx_set_socket_strerror("cannot create socket [[%s]:%hu]: %s",
-				ip, port, zbx_strerror_from_system(zbx_socket_last_error()));
-		goto out;
-	}
-
-#if !defined(_WINDOWS) && !SOCK_CLOEXEC
-	if (-1 == fcntl(s->socket, F_SETFD, FD_CLOEXEC))
-	{
-		zbx_set_socket_strerror("failed to set the FD_CLOEXEC file descriptor flag on socket [[%s]:%hu]: %s",
-				ip, port, zbx_strerror_from_system(zbx_socket_last_error()));
+		ai_flags = AI_NUMERICHOST;
+		ai_family = AF_INET6;
 	}
 #endif
-	func_socket_close = (SOCK_STREAM == type ? zbx_tcp_close : zbx_udp_close);
+	else if (NULL != events)
+		ai_flags = AI_NUMERICHOST;
 
-	if (NULL != source_ip)
+#ifdef HAVE_ARES_QUERY_CACHE
+	/* only start event thread for name resolution if not numeric and not already handled by event loop */
+	if (AI_NUMERICHOST != ai_flags)
 	{
-		zbx_tcp_init_hints(&hints, type, AI_NUMERICHOST);
+		struct ares_addrinfo	*ares_ai = NULL;
 
-		if (0 != getaddrinfo(source_ip, NULL, &hints, &ai_bind))
+		if (0 != zbx_ares_getaddrinfo(host, service, ai_flags, ai_family, ai_socktype, &ares_ai,
+				zbx_socket_strerror_message, sizeof(zbx_socket_strerror_message)))
 		{
-			tcp_set_socket_strerror_from_getaddrinfo(source_ip);
-			func_socket_close(s);
-			goto out;
+			return FAIL;
 		}
 
-		if (ZBX_PROTO_ERROR == zbx_bind(s->socket, ai_bind->ai_addr, ai_bind->ai_addrlen))
+		for (struct ares_addrinfo_node	*ai_node = ares_ai->nodes; NULL != ai_node; ai_node = ai_node->ai_next)
 		{
-			zbx_set_socket_strerror("bind() failed: %s", zbx_strerror_from_system(zbx_socket_last_error()));
-			func_socket_close(s);
-			goto out;
+			if (SUCCEED == (ret = zbx_addrinfo_connect(s, source_ip, host, port, timeout,
+					ai_node->ai_family, ai_node->ai_socktype, ai_node->ai_protocol,
+					ai_node->ai_addr, ai_node->ai_addrlen, events)))
+			{
+				break;
+			}
 		}
-	}
 
-	if (SUCCEED != socket_set_nonblocking(s->socket))
+		ares_freeaddrinfo(ares_ai);
+
+		return ret;
+	}
+#endif
+	struct addrinfo	*ai = NULL, hints;
+
+	zbx_tcp_init_hints(&hints, ai_socktype, ai_flags);
+
+	if (0 != getaddrinfo(host, service, &hints, &ai))
 	{
-		zbx_set_socket_strerror("setting non-blocking mode for [[%s]:%hu] failed: %s",
-				NULL != ip ? ip : "-", port,
-				zbx_strerror_from_system(zbx_socket_last_error()));
-		func_socket_close(s);
-		goto out;
+		tcp_set_socket_strerror_from_getaddrinfo(host);
 	}
-
-	if (ZBX_PROTO_ERROR == connect(s->socket, ai->ai_addr, ai->ai_addrlen) &&
-			SUCCEED != zbx_socket_had_nonblocking_error())
+	else
 	{
-		zbx_set_socket_strerror("cannot connect to address: %s",
-				zbx_strerror_from_system(zbx_socket_last_error()));
-		func_socket_close(s);
-		goto out;
+		ret = zbx_addrinfo_connect(s, source_ip, host, port, timeout, ai->ai_family, ai->ai_socktype,
+				ai->ai_protocol, ai->ai_addr, ai->ai_addrlen, events);
 	}
 
-	zbx_strlcpy(s->peer, ip, sizeof(s->peer));
-
-	zbx_socket_set_deadline(s, timeout);
-
-	ret = SUCCEED;
-out:
 	if (NULL != ai)
 		freeaddrinfo(ai);
-
-	if (NULL != ai_bind)
-		freeaddrinfo(ai_bind);
 
 	return ret;
 }
@@ -679,20 +786,8 @@ static int	zbx_socket_create(zbx_socket_t *s, int type, const char *source_ip, c
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	const char	*server_name = NULL;
 #endif
-	if (SUCCEED != zbx_socket_connect(s, type, source_ip, ip, port, timeout))
+	if (SUCCEED != zbx_socket_connect(s, type, source_ip, ip, port, timeout, NULL))
 		goto out;
-
-	if (SUCCEED != zbx_socket_pollout(s, ZBX_SOCKET_POLL_TIMEOUT, &error))
-	{
-		void		(*func_socket_close)(zbx_socket_t *s);
-
-		func_socket_close = (SOCK_STREAM == type ? zbx_tcp_close : zbx_udp_close);
-		func_socket_close(s);
-
-		zbx_set_socket_strerror("cannot connect to [[%s]:%hu]: %s", ip, port, error);
-		zbx_free(error);
-		goto out;
-	}
 
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	if (SUCCEED != zbx_is_ip(ip))
@@ -1073,25 +1168,25 @@ void	zbx_tcp_close(zbx_socket_t *s)
  *                                                                            *
  ******************************************************************************/
 #ifdef HAVE_IPV6
-int	zbx_get_address_family(const char *addr, int *family, char *error, int max_error_len)
+int	zbx_get_ip_family(const char *ip, int *family, char *error, int max_error_len)
 {
 	struct addrinfo	hints, *ai = NULL;
 	int		err, res = FAIL;
 
 	memset(&hints, 0, sizeof(hints));
 	hints.ai_family = PF_UNSPEC;
-	hints.ai_flags = 0;
+	hints.ai_flags = AI_NUMERICHOST;
 	hints.ai_socktype = SOCK_STREAM;
 
-	if (0 != (err = getaddrinfo(addr, NULL, &hints, &ai)))
+	if (0 != (err = getaddrinfo(ip, NULL, &hints, &ai)))
 	{
-		zbx_snprintf(error, max_error_len, "%s: [%d] %s", addr, err, gai_strerror(err));
+		zbx_snprintf(error, max_error_len, "%s: [%d] %s", ip, err, gai_strerror(err));
 		goto out;
 	}
 
 	if (PF_INET != ai->ai_family && PF_INET6 != ai->ai_family)
 	{
-		zbx_snprintf(error, max_error_len, "%s: unsupported address family", addr);
+		zbx_snprintf(error, max_error_len, "%s: unsupported address family", ip);
 		goto out;
 	}
 
@@ -2623,18 +2718,18 @@ static int	subnet_match(int af, unsigned int prefix_size, const void *address1, 
  *                                                                            *
  ******************************************************************************/
 #ifndef HAVE_IPV6
-int	zbx_ip_cmp(unsigned int prefix_size, const struct addrinfo *current_ai, const ZBX_SOCKADDR *name,
+int	zbx_ip_cmp(int prefix_size, const struct sockaddr *ai_addr, int ai_family, const ZBX_SOCKADDR *name,
 		int ipv6v4_mode)
 {
 	const struct sockaddr_in	*name4 = (const struct sockaddr_in *)name,
-					*ai_addr4 = (const struct sockaddr_in *)current_ai->ai_addr;
+					*ai_addr4 = (const struct sockaddr_in *)ai_addr;
 
 	ZBX_UNUSED(ipv6v4_mode);
 
-	return subnet_match(current_ai->ai_family, prefix_size, &name4->sin_addr.s_addr, &ai_addr4->sin_addr.s_addr);
+	return subnet_match(ai_family, prefix_size, &name4->sin_addr.s_addr, &ai_addr4->sin_addr.s_addr);
 }
 #else
-int	zbx_ip_cmp(unsigned int prefix_size, const struct addrinfo *current_ai, const ZBX_SOCKADDR *name,
+int	zbx_ip_cmp(int prefix_size, const struct sockaddr *ai_addr, int ai_family, const ZBX_SOCKADDR *name,
 		int ipv6v4_mode)
 {
 	/* Network Byte Order is ensured */
@@ -2644,20 +2739,23 @@ int	zbx_ip_cmp(unsigned int prefix_size, const struct addrinfo *current_ai, cons
 	const unsigned char	ipv4_mapped_mask[12] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 255, 255};
 
 	const struct sockaddr_in	*name4 = (const struct sockaddr_in *)name,
-					*ai_addr4 = (const struct sockaddr_in *)current_ai->ai_addr;
+					*ai_addr4 = (const struct sockaddr_in *)ai_addr;
 	const struct sockaddr_in6	*name6 = (const struct sockaddr_in6 *)name,
-					*ai_addr6 = (const struct sockaddr_in6 *)current_ai->ai_addr;
+					*ai_addr6 = (const struct sockaddr_in6 *)ai_addr;
+
+	if (-1 == prefix_size)
+		prefix_size = ai_family == AF_INET ? ZBX_IPV4_MAX_CIDR_PREFIX : ZBX_IPV6_MAX_CIDR_PREFIX;
 
 #ifdef HAVE_SOCKADDR_STORAGE_SS_FAMILY
-	if (current_ai->ai_family == name->ss_family)
+	if (ai_family == name->ss_family)
 #else
-	if (current_ai->ai_family == name->__ss_family)
+	if (ai_family == name->__ss_family)
 #endif
 	{
-		switch (current_ai->ai_family)
+		switch (ai_family)
 		{
 			case AF_INET:
-				if (SUCCEED == subnet_match(current_ai->ai_family, prefix_size, &name4->sin_addr.s_addr,
+				if (SUCCEED == subnet_match(ai_family, prefix_size, &name4->sin_addr.s_addr,
 						&ai_addr4->sin_addr.s_addr))
 				{
 					return SUCCEED;
@@ -2665,7 +2763,7 @@ int	zbx_ip_cmp(unsigned int prefix_size, const struct addrinfo *current_ai, cons
 				break;
 			case AF_INET6:
 				if ((0 == ipv6v4_mode || 0 != memcmp(name6->sin6_addr.s6_addr, ipv4_mapped_mask, 12)) &&
-						SUCCEED == subnet_match(current_ai->ai_family, prefix_size,
+						SUCCEED == subnet_match(ai_family, prefix_size,
 						name6->sin6_addr.s6_addr,
 						ai_addr6->sin6_addr.s6_addr))
 				{
@@ -2678,7 +2776,7 @@ int	zbx_ip_cmp(unsigned int prefix_size, const struct addrinfo *current_ai, cons
 	{
 		unsigned char	ipv6_compat_address[16], ipv6_mapped_address[16];
 
-		if (AF_INET == current_ai->ai_family)
+		if (AF_INET == ai_family)
 		{
 			/* incoming AF_INET6, must see whether it is compatible or mapped */
 
@@ -2690,7 +2788,7 @@ int	zbx_ip_cmp(unsigned int prefix_size, const struct addrinfo *current_ai, cons
 				return SUCCEED;
 			}
 		}
-		else if (AF_INET6 == current_ai->ai_family && 0 == ipv6v4_mode)
+		else if (AF_INET6 == ai_family && 0 == ipv6v4_mode)
 		{
 			/* incoming AF_INET, must see whether the given is compatible or mapped */
 
@@ -2781,7 +2879,7 @@ int	zbx_validate_peer_list(const char *peer_list, char **error)
 int	zbx_tcp_check_allowed_peers_info(const ZBX_SOCKADDR *peer_info, const char *peer_list)
 {
 	char	*start = NULL, *end = NULL, *cidr_sep, tmp[MAX_STRING_LEN];
-	int	prefix_size;
+	int	prefix_size, ret = FAIL;
 
 	/* examine list of allowed peers which may include DNS names, IPv4/6 addresses and addresses in CIDR notation */
 
@@ -2789,7 +2887,7 @@ int	zbx_tcp_check_allowed_peers_info(const ZBX_SOCKADDR *peer_info, const char *
 
 	for (start = tmp; '\0' != *start;)
 	{
-		struct addrinfo	hints, *ai = NULL, *current_ai;
+		struct addrinfo	hints;
 
 		prefix_size = -1;
 
@@ -2810,29 +2908,47 @@ int	zbx_tcp_check_allowed_peers_info(const ZBX_SOCKADDR *peer_info, const char *
 		hints.ai_socktype = SOCK_STREAM;
 		hints.ai_protocol = IPPROTO_TCP;
 
-		if (0 == getaddrinfo(start, NULL, &hints, &ai))
+		if (NULL != end)
+			*end = ',';
+#ifdef HAVE_ARES_QUERY_CACHE
+		struct ares_addrinfo	*ares_ai = NULL;
+
+		if (0 == zbx_ares_getaddrinfo(start, NULL, 0, hints.ai_family, hints.ai_socktype, &ares_ai,
+				zbx_socket_strerror_message, sizeof(zbx_socket_strerror_message)))
 		{
-			if (NULL != end)
-				*end = ',';
-
-			for (current_ai = ai; NULL != current_ai; current_ai = current_ai->ai_next)
+			for (struct ares_addrinfo_node	*ai_node = ares_ai->nodes; NULL != ai_node;
+					ai_node = ai_node->ai_next)
 			{
-				int	prefix_size_current = prefix_size;
-
-				if (-1 == prefix_size_current)
+				if (SUCCEED == zbx_ip_cmp(prefix_size, ai_node->ai_addr, ai_node->ai_family,
+						peer_info, 0))
 				{
-					prefix_size_current = (current_ai->ai_family == AF_INET ?
-							ZBX_IPV4_MAX_CIDR_PREFIX : ZBX_IPV6_MAX_CIDR_PREFIX);
-				}
-
-				if (SUCCEED == zbx_ip_cmp((unsigned int)prefix_size_current, current_ai, peer_info, 0))
-				{
-					freeaddrinfo(ai);
-					return SUCCEED;
+					ret = SUCCEED;
+					break;
 				}
 			}
+
+			ares_freeaddrinfo(ares_ai);
+		}
+#else
+		struct addrinfo	*ai = NULL, *current_ai;
+
+		if (0 == getaddrinfo(start, NULL, &hints, &ai))
+		{
+			for (current_ai = ai; NULL != current_ai; current_ai = current_ai->ai_next)
+			{
+				if (SUCCEED == zbx_ip_cmp(prefix_size, current_ai->ai_addr, current_ai->ai_family,
+						peer_info, 0))
+				{
+					ret = SUCCEED;
+					break;
+				}
+			}
+
 			freeaddrinfo(ai);
 		}
+#endif
+		if (SUCCEED == ret)
+			return SUCCEED;
 
 		if (NULL != end)
 			start = end + 1;

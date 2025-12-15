@@ -567,7 +567,7 @@ static void	async_poller_dns_init(zbx_poller_config_t *poller_config, zbx_thread
 {
 	char			*timeout;
 #ifdef HAVE_ARES
-	struct ares_options	options;
+	struct ares_options	options = {0};
 	int			optmask, status;
 
 	status = ares_library_init(ARES_LIB_INIT_ALL);
@@ -579,6 +579,10 @@ static void	async_poller_dns_init(zbx_poller_config_t *poller_config, zbx_thread
 	}
 
 	optmask = ARES_OPT_SOCK_STATE_CB|ARES_OPT_TIMEOUT;
+#ifdef ARES_OPT_QUERY_CACHE
+	optmask |= ARES_OPT_QUERY_CACHE;
+	options.qcache_max_ttl = SEC_PER_HOUR;
+#endif
 	options.sock_state_cb = sock_state_cb;
 	options.sock_state_cb_data = poller_config;
 	options.timeout = poller_args_in->config_comms->config_timeout;
