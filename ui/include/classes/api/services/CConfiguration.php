@@ -342,9 +342,7 @@ class CConfiguration extends CApiService {
 		}
 	}
 
-	private function getImportConfigurationData(array &$params): array {
-		$this->validateImport($params);
-
+	private function getImportConfigurationData(array $params): array {
 		$import_reader = CImportReaderFactory::getReader($params['format']);
 		$data = $import_reader->read($params['source']);
 
@@ -395,7 +393,10 @@ class CConfiguration extends CApiService {
 	 * @return bool|array
 	 */
 	public function import($params): bool|array {
+		$this->validateImport($params);
+
 		$data = $this->getImportConfigurationData($params);
+
 		$adapter = new CImportDataAdapter();
 		$adapter->load($data);
 
@@ -416,6 +417,9 @@ class CConfiguration extends CApiService {
 
 	private function testimport(array $params): array {
 		$params['returnMissingObjects'] = true;
+
+		$this->validateImport($params);
+
 		$data = $this->getImportConfigurationData($params);
 		$adapter = new CImportDataAdapter();
 		$adapter->load($data);
