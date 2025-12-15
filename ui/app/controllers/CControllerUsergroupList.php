@@ -81,7 +81,7 @@ class CControllerUsergroupList extends CController {
 			'allowed_ui_users' => $this->checkAccess(CRoleHelper::UI_ADMINISTRATION_USERS)
 		];
 
-		$user_groups = API::UserGroup()->get([
+		$data['usergroups'] = API::UserGroup()->get([
 			'output' => ['usrgrpid', 'name', 'debug_mode', 'gui_access', 'users_status'],
 			'search' => ['name' => ($filter['name'] !== '') ? $filter['name'] : null],
 			'filter' => ['users_status' => ($filter['user_status'] != -1) ? $filter['user_status'] : null],
@@ -90,39 +90,29 @@ class CControllerUsergroupList extends CController {
 			'preservekeys' => true
 		]);
 
-		if ($user_groups) {
+		if ($data['usergroups']) {
 			$users = API::User()->get([
 				'output' => ['userid', 'username', 'name', 'surname'],
-				'usrgrpids' => array_keys($user_groups),
+				'usrgrpids' => array_keys($data['usergroups']),
 				'selectUsrgrps' => ['usrgrpid'],
 				'getAccess' => true
 			]);
 
-			foreach ($user_groups as $usrgrpid => &$user_group) {
-				$usergroup_users = [];
-
-				foreach ($users as $user) {
-					if (array_key_exists($usrgrpid, array_flip(array_column($user['usrgrps'], 'usrgrpid')))) {
-						$usergroup_users[] = array_intersect_key($user,
-							array_flip(['userid', 'username', 'name', 'surname', 'gui_access', 'users_status'])
-						);
-					}
-				}
-
-				$user_group['users'] = $usergroup_users;
+			foreach ($data['usergroups'] as $usrgrpid => $foo) {
+				$data['usergroups'][$usrgrpid]['users'] = [];
 			}
-			unset($user_group);
 
-			$data['usergroups'] = $user_groups;
+			foreach ($users as $user) {
+				foreach ($user['usrgrps'] as $usrgrp) {
+					$data['usergroups'][$usrgrp['usrgrpid']]['users'][$user['userid']] = array_intersect_key($user,
+						array_flip(['userid', 'username', 'name', 'surname', 'gui_access', 'users_status'])
+					);
+				}
+			}
 
-			// data sort
 			CArrayHelper::sort($data['usergroups'], [['field' => $sort_field, 'order' => $sort_order]]);
 		}
-		else {
-			$data['usergroups'] = [];
-		}
 
-		// data pager
 		$page_num = getRequest('page', 1);
 		CPagerHelper::savePage('usergroup.list', $page_num);
 		$data['paging'] = CPagerHelper::paginate($page_num, $data['usergroups'], $sort_order,
@@ -130,6 +120,7 @@ class CControllerUsergroupList extends CController {
 		);
 
 		foreach ($data['usergroups'] as &$usergroup) {
+			$usergroup['can_update_group'] = !array_key_exists(CWebUser::$data['userid'], $usergroup['users']);
 			CArrayHelper::sort($usergroup['users'], ['username']);
 
 			$usergroup['user_cnt'] = count($usergroup['users']);
