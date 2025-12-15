@@ -2850,7 +2850,11 @@ class CDiscoveryRule extends CItemGeneral {
 			$upd_item += [
 				'preprocessing' => [],
 				'lld_macro_paths' => [],
-				'filter' => [],
+				'filter' => [
+					'evaltype' => DB::getDefault('items', 'evaltype'),
+					'formula' => DB::getDefault('items', 'formula'),
+					'conditions' => []
+				],
 				'overrides' => [],
 				'parameters' => []
 			];

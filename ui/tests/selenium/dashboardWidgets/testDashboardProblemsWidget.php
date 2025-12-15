@@ -21,6 +21,8 @@ require_once __DIR__.'/../behaviors/CMessageBehavior.php';
 /**
  * @backup config, widget
  *
+ * @dataSource HostAvailabilityWidget, MonitoringOverview
+ *
  * @onBefore prepareDashboardData
  */
 class testDashboardProblemsWidget extends CWebTest {

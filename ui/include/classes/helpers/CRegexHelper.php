@@ -39,4 +39,32 @@ class CRegexHelper {
 			'/' => '/'
 		];
 	}
+
+	/**
+	 * Escape slashes in the regular expression based on preceding backslashes.
+	 *
+	 * @param string $regex
+	 *
+	 * @return string
+	 */
+	public static function handleSlashEscaping(string $regex): string {
+		$formatted_regex = '';
+		$backslash_count = 0;
+
+		for ($p = 0; isset($regex[$p]); $p++) {
+			if ($regex[$p] === '\\') {
+				$backslash_count++;
+			}
+			else {
+				if ($regex[$p] === '/' && $backslash_count % 2 == 0) {
+					$formatted_regex .= '\\';
+				}
+				$backslash_count = 0;
+			}
+
+			$formatted_regex .= $regex[$p];
+		}
+
+		return $formatted_regex;
+	}
 }

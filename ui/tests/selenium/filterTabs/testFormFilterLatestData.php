@@ -17,6 +17,8 @@
 require_once __DIR__.'/../common/testFormFilter.php';
 
 /**
+ * @dataSource MonitoringOverview
+ *
  * @backup profiles
  *
  * @onBefore prepareUserData, pepareFilterTabsData

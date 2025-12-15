@@ -381,7 +381,6 @@ class CProxyGroup extends CApiService {
 
 		self::validateDelete($proxy_groupids, $db_proxy_groups);
 
-		DB::delete('proxy_group_rtdata', ['proxy_groupid' => $proxy_groupids]);
 		DB::delete('proxy_group', ['proxy_groupid' => $proxy_groupids]);
 
 		self::addAuditLog(CAudit::ACTION_DELETE, CAudit::RESOURCE_PROXY_GROUP, $db_proxy_groups);

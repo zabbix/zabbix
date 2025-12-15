@@ -475,8 +475,8 @@ class testPageHostInterfaces extends CWebTest {
 			$host_interfaces[] = $interface_name;
 			// Check interface color in availability column.
 			$this->assertEquals($data['interfaces'][$interface_name]['color'], $interface->getCSSValue('background-color'));
-			// Open interface popup.
-			$interface->waitUntilClickable()->click();
+			// Open interface popup. Unstable test on Jenkins, requires hoverMouse.
+			$interface->hoverMouse()->waitUntilClickable()->click();
 			$overlay = $this->query('xpath://div[@class="overlay-dialogue wordbreak"]')->asOverlayDialog()->waitUntilPresent()->one();
 			$interface_table = $overlay->query('xpath:.//table[@class="list-table"]')->asTable()->one();
 			// Check table headers in popup.

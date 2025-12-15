@@ -266,6 +266,20 @@ class Sla {
 						'value' => 'e'
 					]
 				]
+			],
+			[
+				'name' => 'Multiple   spaces   in SLA name',
+				'period' => 1,
+				'slo' => '33.55',
+				'effective_date' => 1619827200,
+				'timezone' => 'Europe/Riga',
+				'service_tags' => [
+					[
+						'tag' => 'problems',
+						'operator' => 2,
+						'value' => 'e'
+					]
+				]
 			]
 		]);
 

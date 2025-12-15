@@ -123,6 +123,11 @@ class Services {
 				'sortorder' => 13
 			],
 			[
+				'name' => 'Multiple   spaces   in service name',
+				'algorithm' => 1,
+				'sortorder' => 13
+			],
+			[
 				'name' => 'Service for delete 2',
 				'algorithm' => 1,
 				'sortorder' => 14,

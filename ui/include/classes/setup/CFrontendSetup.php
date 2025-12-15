@@ -262,7 +262,7 @@ class CFrontendSetup {
 		$allowed_db = [];
 
 		if (zbx_is_callable(['mysqli_close', 'mysqli_fetch_assoc', 'mysqli_free_result', 'mysqli_init', 'mysqli_query',
-				'mysqli_real_escape_string', 'mysqli_report'])) {
+				'mysqli_real_escape_string', 'mysqli_report', 'mysqli_set_charset'])) {
 			$allowed_db[ZBX_DB_MYSQL] = 'MySQL';
 		}
 

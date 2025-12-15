@@ -21,7 +21,7 @@ require_once __DIR__.'/../../include/helpers/CDataHelper.php';
 /**
  * @backup widget, profiles
  *
- * @dataSource UserPermissions
+ * @dataSource UserPermissions, MonitoringOverview
  *
  * @onBefore prepareData
  */

@@ -20,6 +20,8 @@ require_once __DIR__.'/../../include/helpers/CDataHelper.php';
 
 /**
  * Base class for Value mappings function tests.
+ *
+ * @onBefore prepareData
  */
 class testFormValueMappings extends CWebTest {
 
@@ -35,7 +37,6 @@ class testFormValueMappings extends CWebTest {
 		];
 	}
 
-	const HOSTID = 99134;	// ID of the host for valuemap update.
 	const TEMPLATEID = 40000;	// ID of the template for valuemap update.
 	const UPDATE_VALUEMAP1 = 'Valuemap for update 1';
 	const UPDATE_VALUEMAP2 = 'Valuemap for update 2';
@@ -60,9 +61,13 @@ class testFormValueMappings extends CWebTest {
 		]
 	];
 
-	private static $previous_valuemap_name = self::UPDATE_VALUEMAP1;
+	protected static $previous_valuemap_name = self::UPDATE_VALUEMAP1;
+	protected static $previous_class = null;
+	protected static $hostids;
 
-	private static $previous_class = null;
+	public static function prepareData() {
+		self::$hostids = CDataHelper::get('HostAvailabilityWidget.hostids');
+	}
 
 	/**
 	 * Function that checks the layout of the Value mappings tab in Host or Template configuration forms.
@@ -938,7 +943,7 @@ class testFormValueMappings extends CWebTest {
 	 * @return CFormElement|CFluidFormElemt    $form
 	 */
 	private function openValueMappingTab($source, $login = true, $open_tab = true) {
-		$sourceid = ($source === 'host') ? self::HOSTID : self::TEMPLATEID;
+		$sourceid = ($source === 'host') ? self::$hostids['Available host'] : self::TEMPLATEID;
 		if ($login) {
 			$this->page->login();
 		}

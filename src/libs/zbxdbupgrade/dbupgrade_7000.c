@@ -300,6 +300,138 @@ static int	DBpatch_7000020(void)
 	return SUCCEED;
 }
 
+static int	DBpatch_7000021(void)
+{
+	/* 2 - ZBX_FLAG_DISCOVERY_PROTOTYPE */
+	if (ZBX_DB_OK > zbx_db_execute(
+			"delete from httptestitem"
+			" where httptestid in ("
+				"select ht.httptestid from hosts h,httptest ht"
+				" where h.hostid=ht.hostid and h.flags=2"
+			")"))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+static int	DBpatch_7000022(void)
+{
+	/* 2 - ZBX_FLAG_DISCOVERY_PROTOTYPE */
+	if (ZBX_DB_OK > zbx_db_execute(
+			"delete from httpstepitem"
+			" where httpstepid in ("
+				"select hts.httpstepid"
+				" from hosts h,httptest ht,httpstep hts"
+				" where h.hostid=ht.hostid"
+					" and ht.httptestid=hts.httptestid and h.flags=2"
+				")"))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+static int	DBpatch_7000023(void)
+{
+	/* 2 - ZBX_FLAG_DISCOVERY_PROTOTYPE */
+	if (ZBX_DB_OK > zbx_db_execute(
+			"delete from item_tag"
+			" where itemid in ("
+				"select i.itemid from hosts h,items i"
+				" where h.hostid=i.hostid and h.flags=2"
+			")"))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+static int	DBpatch_7000024(void)
+{
+	/* 2 - ZBX_FLAG_DISCOVERY_PROTOTYPE */
+	if (ZBX_DB_OK > zbx_db_execute(
+			"delete from items"
+			" where exists ("
+				"select null from hosts h"
+				" where h.hostid=items.hostid and h.flags=2"
+			")"))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+static int	DBpatch_7000025(void)
+{
+	/* 2 - ZBX_FLAG_DISCOVERY_PROTOTYPE */
+	if (ZBX_DB_OK > zbx_db_execute(
+			"delete from httpstep_field"
+			" where httpstepid in ("
+				"select hts.httpstepid"
+				" from hosts h,httptest ht,httpstep hts"
+				" where h.hostid=ht.hostid"
+					" and ht.httptestid=hts.httptestid and h.flags=2"
+			")"))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+static int	DBpatch_7000026(void)
+{
+	/* 2 - ZBX_FLAG_DISCOVERY_PROTOTYPE */
+	if (ZBX_DB_OK > zbx_db_execute(
+			"delete from httpstep"
+			" where httptestid in ("
+				"select ht.httptestid from hosts h,httptest ht"
+				" where h.hostid=ht.hostid and h.flags=2"
+			")"))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+static int	DBpatch_7000027(void)
+{
+	/* 2 - ZBX_FLAG_DISCOVERY_PROTOTYPE */
+	if (ZBX_DB_OK > zbx_db_execute(
+			"delete from httptest_field"
+			" where httptestid in ("
+				"select ht.httptestid from hosts h,httptest ht"
+				" where h.hostid=ht.hostid and h.flags=2"
+			")"))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+static int	DBpatch_7000028(void)
+{
+	/* 2 - ZBX_FLAG_DISCOVERY_PROTOTYPE */
+	if (ZBX_DB_OK > zbx_db_execute(
+			"delete from httptest"
+			" where exists ("
+				"select null from hosts h"
+				" where h.hostid=httptest.hostid and h.flags=2"
+			")"))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
 #endif
 
 DBPATCH_START(7000)
@@ -327,5 +459,13 @@ DBPATCH_ADD(7000017, 0, 0)
 DBPATCH_ADD(7000018, 0, 0)
 DBPATCH_ADD(7000019, 0, 0)
 DBPATCH_ADD(7000020, 0, 0)
+DBPATCH_ADD(7000021, 0, 0)
+DBPATCH_ADD(7000022, 0, 0)
+DBPATCH_ADD(7000023, 0, 0)
+DBPATCH_ADD(7000024, 0, 0)
+DBPATCH_ADD(7000025, 0, 0)
+DBPATCH_ADD(7000026, 0, 0)
+DBPATCH_ADD(7000027, 0, 0)
+DBPATCH_ADD(7000028, 0, 0)
 
 DBPATCH_END()

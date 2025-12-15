@@ -62,7 +62,7 @@ class testPageUserRoles extends CWebTest {
 				'type' => 1
 			],
 			[
-				'name' => 'role_with_min end',
+				'name' => 'role_with_min   end',
 				'type' => 1
 			]
 		]);
@@ -229,6 +229,14 @@ class testPageUserRoles extends CWebTest {
 						'role_with_min end',
 						'Super admin role',
 						'User role'
+					]
+				]
+			],
+			[
+				[
+					'name' => '   ',
+					'result' => [
+						'role_with_min end'
 					]
 				]
 			],

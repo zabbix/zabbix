@@ -64,5 +64,7 @@ err:
 	zbx_free(script_bin);
 	zbx_free(error);
 
+	/* avoid memory not being released back to the system if there was memory-intensive script item */
+	zbx_malloc_trim(time(NULL), 0, ZBX_MEBIBYTE);
 	return ret;
 }

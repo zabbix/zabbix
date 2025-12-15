@@ -29,7 +29,7 @@ require_once dirname(__FILE__).'/testEscalations.php';
 require_once dirname(__FILE__).'/testAlertingForServices.php';
 require_once dirname(__FILE__).'/testComplexServiceStatus.php';
 require_once dirname(__FILE__).'/testServiceRoles.php';
-require_once dirname(__FILE__).'/testExpressionMacros.php';
+require_once dirname(__FILE__).'/testMacros.php';
 require_once dirname(__FILE__).'/testExpressionTriggerMacros.php';
 require_once dirname(__FILE__).'/testAgentItems.php';
 require_once dirname(__FILE__).'/testScriptItems.php';
@@ -40,7 +40,7 @@ require_once dirname(__FILE__).'/testUserParametersReload.php';
 require_once dirname(__FILE__).'/testTriggerState.php';
 require_once dirname(__FILE__).'/testActiveAvailability.php';
 require_once dirname(__FILE__).'/testEventsCauseAndSymptoms.php';
-require_once dirname(__FILE__).'/testDiscoveryRules.php';
+/* require_once dirname(__FILE__).'/testDiscoveryRules.php'; snmpsim does not work properly on new Debian */
 require_once dirname(__FILE__).'/testAutoregistration.php';
 require_once dirname(__FILE__).'/testAutoregistrationPSK.php';
 require_once dirname(__FILE__).'/testAutoregistrationHostMetaDataItem.php';
@@ -68,7 +68,7 @@ class IntegrationTests {
 		if  (substr(getenv('DB'), 0, 4) === "tsdb" ) {
 			$suite->addTestSuite('testTimescaleDb');
 		}
-		$suite->addTestSuite('testDiscoveryRules');
+		/*$suite->addTestSuite('testDiscoveryRules'); */
 		$suite->addTestSuite('testAutoregistration');
 		$suite->addTestSuite('testAutoregistrationPSK');
 		$suite->addTestSuite('testAutoregistrationHostMetaDataItem');
@@ -85,7 +85,7 @@ class IntegrationTests {
 		$suite->addTestSuite('testAlertingForServices');
 		$suite->addTestSuite('testComplexServiceStatus');
 		$suite->addTestSuite('testServiceRoles');
-		$suite->addTestSuite('testExpressionMacros');
+		$suite->addTestSuite('testMacros');
 		$suite->addTestSuite('testExpressionTriggerMacros');
 		$suite->addTestSuite('testScriptItems');
 		$suite->addTestSuite('testItemRate');

@@ -178,3 +178,8 @@ void	zbx_pp_item_clear(zbx_pp_item_t *item)
 {
 	zbx_pp_item_preproc_release(item->preproc);
 }
+
+void	zbx_pp_item_clear_wrapper(void *data)
+{
+	zbx_pp_item_clear((zbx_pp_item_t*)data);
+}
