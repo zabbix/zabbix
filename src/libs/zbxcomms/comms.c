@@ -2908,8 +2908,6 @@ int	zbx_tcp_check_allowed_peers_info(const ZBX_SOCKADDR *peer_info, const char *
 		hints.ai_socktype = SOCK_STREAM;
 		hints.ai_protocol = IPPROTO_TCP;
 
-		if (NULL != end)
-			*end = ',';
 #ifdef HAVE_ARES_QUERY_CACHE
 		struct ares_addrinfo	*ares_ai = NULL;
 
@@ -2947,6 +2945,9 @@ int	zbx_tcp_check_allowed_peers_info(const ZBX_SOCKADDR *peer_info, const char *
 			freeaddrinfo(ai);
 		}
 #endif
+		if (NULL != end)
+			*end = ',';
+
 		if (SUCCEED == ret)
 			return SUCCEED;
 
