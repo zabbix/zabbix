@@ -834,63 +834,14 @@ function formatAggregatedHistoryValue($value, array $item, int $function, bool $
  */
 function formatAggregatedHistoryValueRaw($value, array $item, int $function, bool $force_units = false,
 		bool $trim = true, array $convert_options = []): array {
-	$units = $force_units || CAggFunctionData::preservesUnits($function) ? $item['units'] : '';
-
-	$is_numeric_item = in_array($item['value_type'], [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64]);
-	$is_numeric_data = $is_numeric_item || CAggFunctionData::isNumericResult($function);
-
-	if ($is_numeric_data) {
-		$converted_value = convertUnitsRaw([
-			'value' => $value,
-			'units' => $units
-		] + $convert_options);
-
-		$display_value = $converted_value['value'].
-			($converted_value['units'] !== '' ? ' '.$converted_value['units'] : '');
-	}
-	else {
-		switch ($item['value_type']) {
-			case ITEM_VALUE_TYPE_STR:
-			case ITEM_VALUE_TYPE_TEXT:
-			case ITEM_VALUE_TYPE_LOG:
-				$display_value = $trim && mb_strlen($value) > 20 ? mb_substr($value, 0, 20).'...' : $value;
-				break;
-
-			case ITEM_VALUE_TYPE_BINARY:
-				$display_value = _('binary value');
-				break;
-
-			default:
-				$display_value = _('Unknown value type');
-		}
-	}
-
-	if (in_array($item['value_type'], [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_STR])
-			&& CAggFunctionData::preservesValueMapping($function)) {
-		$mapped_value = CValueMapHelper::getMappedValue($item['value_type'], $value, $item['valuemap']);
-
-		if ($mapped_value !== false) {
-			return [
-				'value' => $mapped_value.' ('.$display_value.')',
-				'units' => '',
-				'is_mapped' => true
-			];
-		}
-	}
-
-	if ($is_numeric_data) {
-		return [
-			'value' => $converted_value['value'],
-			'units' => $converted_value['units'],
-			'is_mapped' => false
-		];
-	}
-
-	return [
-		'value' => $display_value,
-		'units' => $units,
-		'is_mapped' => false
+	$options = [
+		'force_units' => $force_units,
+		'trim' => $trim,
+		'convert_options' => $convert_options,
+		'valuemap' => $item['valuemap']
 	];
+
+	return CAggHelper::formatValue($value, $item['value_type'], $function, $item['units'], $options);
 }
 
 /**
