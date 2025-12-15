@@ -541,7 +541,7 @@ static int	zbx_addrinfo_connect(zbx_socket_t *s, const char *source_ip, const ch
 	struct addrinfo	*ai_bind = NULL;
 	int		ret = FAIL;
 	char		*error = NULL;
-
+#if !defined(_WINDOWS) && !defined(__MINGW32__)
 	if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_DEBUG))
 	{
 		char	address[65];
@@ -551,7 +551,7 @@ static int	zbx_addrinfo_connect(zbx_socket_t *s, const char *source_ip, const ch
 
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() address '%s'", __func__, address);
 	}
-
+#endif
 	zbx_socket_clean(s);
 	s->connection_type = ZBX_TCP_SEC_UNENCRYPTED;
 	s->timeout = timeout;
