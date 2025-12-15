@@ -9693,7 +9693,7 @@ static void	DCget_agent_item(zbx_dc_agent_item_t *dst_item, const ZBX_DC_ITEM *s
 
 	dst_item->status = src_item->status;
 
-	zbx_strscpy(dst_item->key_orig, src_item->key);
+	dst_item->key_orig = zbx_strdup(NULL, src_item->key);
 
 	dst_item->itemid = src_item->itemid;
 	dst_item->flags = src_item->flags;

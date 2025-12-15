@@ -17,6 +17,7 @@
 #include "async_manager.h"
 
 #include "zbxalgo.h"
+#include "zbxcommon.h"
 #include "zbxtime.h"
 #include "zbxthreads.h"
 #include "zbxcacheconfig.h"
@@ -40,8 +41,8 @@ static zbx_poller_item_t	*dc_config_async_get_poller_items(zbx_uint64_t processi
 	poller_item->items.any = NULL;
 	poller_item->poller_type = poller_type;
 
-	zbx_dc_config_get_async_poller_items(poller_type, config_timeout, processing_num, processing_limit,
-			&poller_item->items);
+	poller_item->num = zbx_dc_config_get_async_poller_items(poller_type, config_timeout, processing_num,
+			processing_limit, &poller_item->items);
 
 	if (0 != poller_item->num)
 	{

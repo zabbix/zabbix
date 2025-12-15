@@ -3746,9 +3746,10 @@ int	zbx_async_check_snmp(zbx_dc_snmp_item_t *item, AGENT_RESULT *result,
 	snmp_context->item.hostid = item->hostid;
 	snmp_context->item.value_type = item->value_type;
 	snmp_context->item.flags = item->flags;
+	snmp_context->item.preprocessing = item->preprocessing;
+
 	snmp_context->item.key_orig = item->key_orig;
 	item->key_orig = NULL;
-	snmp_context->item.preprocessing = item->preprocessing;
 
 	if (item->key != snmp_context->item.key_orig)
 	{

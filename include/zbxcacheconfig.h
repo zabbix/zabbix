@@ -223,7 +223,7 @@ typedef struct
 	unsigned char		state;
 	unsigned char		flags;
 	unsigned char		status;
-	char			key_orig[ZBX_ITEM_KEY_LEN * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1], *key;
+	char			*key_orig, *key;
 	int			mtime;
 	char			timeout_orig[ZBX_ITEM_TIMEOUT_LEN_MAX];
 	int			timeout;
