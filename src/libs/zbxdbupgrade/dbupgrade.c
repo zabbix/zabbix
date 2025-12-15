@@ -1129,7 +1129,7 @@ static int	DBget_housekeeper_object_by_name(const char *table_name)
 	for (table = zbx_dbschema_get_housekeeper_tables(); NULL != table->table_name; table++)
 	{
 		if (0 == strcmp(table_name, table->table_name))
-			return table->object;
+			return table->object_type;
 	}
 
 	return FAIL;
