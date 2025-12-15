@@ -35,7 +35,7 @@ abstract class CImporter {
 
 	protected bool $testmode = false;
 
-	private array $missing_objects = [
+	protected array $missing_objects = [
 		'items' => [],
 		'actions' => [],
 		'mediatypes' => [],
@@ -76,9 +76,18 @@ abstract class CImporter {
 	 */
 	abstract public function import(array $elements);
 
-	protected function appendMissingObject(string $object_type, array $uniq_config): void {
+	/**
+	 * Register missing referred object.
+	 *
+	 * @param string $object_type
+	 * @param array  $uniq_config
+	 *
+	 * @throws Exception
+	 * @return void
+	 */
+	protected function addMissingObject(string $object_type, array $uniq_config): void {
 		if (!array_key_exists($object_type, $this->missing_objects)) {
-			throw new \Exception('Unknown object type: '.$object_type);
+			throw new Exception('Unknown object type: '.$object_type);
 		}
 
 		$key = str_replace(' ', '_', implode('_', array_values($uniq_config)));
