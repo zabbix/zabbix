@@ -19,7 +19,7 @@ require_once __DIR__.'/../common/testFormFilter.php';
 /**
  * @backup profiles, hosts
  *
- * @dataSource UserPermissions, WidgetCommunication
+ * @dataSource UserPermissions, WidgetCommunication, MonitoringOverview
  *
  * @onBefore prepareProblemsData
  */
