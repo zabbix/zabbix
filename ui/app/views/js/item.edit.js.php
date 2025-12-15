@@ -103,10 +103,7 @@ window.item_edit_form = new class {
 
 		this.updateFieldsVisibility();
 
-		this.initial_tags_state = {
-			tags: Object.values(this.form.findFieldByName('tags')?.getValue() || [{tag: '', value: ''}]),
-			show_inherited_tags: this.form.findFieldByName('show_inherited_tags')?.getValue() || '0'
-		};
+		this.initial_form_fields = this.#getFormFields();
 		this.form_element.style.display = '';
 		this.overlay.recoverFocus();
 	}
@@ -360,10 +357,7 @@ window.item_edit_form = new class {
 	}
 
 	#isConfirmed() {
-		const tags = Object.values(this.form.findFieldByName('tags')?.getValue() || [{tag: '', value: ''}]);
-		const show_inherited_tags = this.form.findFieldByName('show_inherited_tags')?.getValue() || '';
-
-		return JSON.stringify(this.initial_tags_state) === JSON.stringify({tags, show_inherited_tags})
+		return JSON.stringify(this.initial_form_fields) === JSON.stringify(this.#getFormFields())
 			|| window.confirm(<?= json_encode(_('Any changes made in the current form will be lost.')) ?>);
 	}
 
@@ -526,6 +520,8 @@ window.item_edit_form = new class {
 	#getFormFields() {
 		const values = this.form.getAllValues();
 
+		delete values.show_inherited_tags;
+
 		if (values.delay === undefined) {
 			values.delay = '';
 		}
@@ -591,7 +587,17 @@ window.item_edit_form = new class {
 			headers.push({name, value});
 		}
 
-		return {...values, ...{query_fields, headers, delay_flex, parameters}};
+		const tags = [];
+		for (let key in values.tags) {
+			let {tag, value} = values.tags[key];
+
+			if (tag === '' && value === '') {
+				continue;
+			}
+			tags.push({tag, value});
+		}
+
+		return {...values, ...{tags, query_fields, headers, delay_flex, parameters}};
 	}
 
 	#post(url, data, keep_open = false) {
@@ -691,7 +697,7 @@ window.item_edit_form = new class {
 		const fields = this.#getFormFields();
 		const data = {
 			tags: fields.tags,
-			show_inherited_tags: fields.show_inherited_tags,
+			show_inherited_tags,
 			itemid: fields.itemid,
 			hostid: fields.hostid
 		}
