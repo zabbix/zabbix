@@ -35,18 +35,29 @@ class ZSelect extends HTMLElement {
 
 		this._events = {};
 
+		this._is_initialized = false;
 		this._is_connected = false;
 	}
 
 	connectedCallback() {
-		this._is_connected = true;
+		if (!this._is_initialized) {
+			this.init();
+			this._is_initialized = true;
+		}
 
-		this.init();
-		this.registerEvents();
+		if (!this._is_connected) {
+			this.registerEvents();
+			this._is_connected = true;
+		}
 	}
 
 	disconnectedCallback() {
+		if (!this._is_connected) {
+			return;
+		}
+
 		this.unregisterEvents();
+		this._is_connected = false;
 	}
 
 	/**

@@ -1,1 +1,1 @@
-..F....... [ZBX-25509] removed functionality for disabling options in item preprocessing select (dpankins)
+..F....... [ZBX-25509] made original value in item preprocessing select selectable, fixed z-select re-rendering after sorting (dpankins)
