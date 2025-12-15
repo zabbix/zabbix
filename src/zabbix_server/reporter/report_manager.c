@@ -1879,9 +1879,15 @@ static int	rm_schedule_jobs(zbx_rm_t *manager, int now)
 			int		is_target_day = 0;
 
 			if (ZBX_REPORT_CYCLE_MONTHLY == report->cycle)
-				is_target_day = (1 == tm->tm_mday);
+			{
+				if (1 == tm->tm_mday)
+					is_target_day = 1;
+			}
 			else if (ZBX_REPORT_CYCLE_YEARLY == report->cycle)
-				is_target_day = (1 == tm->tm_mday && 0 == tm->tm_mon);
+			{
+				if (1 == tm->tm_mday && 0 == tm->tm_mon)
+					is_target_day = 1;
+			}
 
 			if (0 == is_target_day)
 			{
@@ -1961,7 +1967,6 @@ static int	rm_schedule_jobs(zbx_rm_t *manager, int now)
 			zabbix_log(LOG_LEVEL_DEBUG, "Cannot process report: %s", error);
 			zbx_free(error);
 		}
-
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() jobs:%d", __func__, jobs_num);
