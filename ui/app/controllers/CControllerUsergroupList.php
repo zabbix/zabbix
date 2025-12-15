@@ -104,9 +104,11 @@ class CControllerUsergroupList extends CController {
 
 			foreach ($users as $user) {
 				foreach ($user['usrgrps'] as $usrgrp) {
-					$data['usergroups'][$usrgrp['usrgrpid']]['users'][$user['userid']] = array_intersect_key($user,
-						array_flip(['userid', 'username', 'name', 'surname', 'gui_access', 'users_status'])
-					);
+					if (array_key_exists($usrgrp['usrgrpid'], $data['usergroups'])) {
+						$data['usergroups'][$usrgrp['usrgrpid']]['users'][$user['userid']] = array_intersect_key($user,
+							array_flip(['userid', 'username', 'name', 'surname', 'gui_access', 'users_status'])
+						);
+					}
 				}
 			}
 
