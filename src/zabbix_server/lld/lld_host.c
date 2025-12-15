@@ -5929,8 +5929,7 @@ static int	lld_interface_validate_fields(const zbx_lld_interface_t *interface, c
 		{
 			*error = zbx_strdcatf(*error, "Cannot %s \"%s\" interface on host \"%s\": "
 				"invalid IP Address \"%s\".\n",
-				op, zbx_interface_type_string(interface->type_orig), interface->ip,
-				hostname);
+				op, zbx_interface_type_string(interface->type_orig), hostname, interface->ip);
 
 			return FAIL;
 		}
