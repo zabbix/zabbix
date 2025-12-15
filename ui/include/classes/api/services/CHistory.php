@@ -232,9 +232,10 @@ class CHistory extends CApiService {
 		if (($options['history'] == ITEM_VALUE_TYPE_JSON || $options['history'] == ITEM_VALUE_TYPE_BINARY)
 				&& $options['maxValueSize'] !== null && !$options['countOutput']
 				&& $this->outputIsRequested('value', $options['output'])) {
-			$value_index = array_search('h.value', $sql_parts['select']);
+			$value_index = array_search($this->fieldId('value', $table_alias), $sql_parts['select']);
 			$sql_parts['select'][$value_index] = zbx_dbsubstring('value', 1, $options['maxValueSize']);
 		}
+
 		return $sql_parts;
 	}
 
