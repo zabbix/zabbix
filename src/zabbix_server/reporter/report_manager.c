@@ -1862,10 +1862,8 @@ static int	rm_schedule_jobs(zbx_rm_t *manager, int now)
 {
 	zbx_rm_report_t		*report;
 	zbx_binary_heap_elem_t	*elem;
-	int			nextcheck, ret, delay_seconds, jobs_num = 0;
+	int			nextcheck, ret, jobs_num = 0;
 	char			*error = NULL;
-	struct tm		*tm;
-	time_t			now_time_t = now;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() queue:%d", __func__, manager->report_queue.elems_num);
 
@@ -1876,8 +1874,9 @@ static int	rm_schedule_jobs(zbx_rm_t *manager, int now)
 
 		if (ZBX_REPORT_CYCLE_MONTHLY == report->cycle || ZBX_REPORT_CYCLE_YEARLY == report->cycle)
 		{
-			tm = zbx_localtime(&now_time_t, NULL);
-			int	is_target_day = 0;
+			time_t		now_time_t = now;
+			struct tm	*tm = zbx_localtime(&now_time_t, NULL);
+			int		is_target_day = 0;
 
 			if (ZBX_REPORT_CYCLE_MONTHLY == report->cycle)
 				is_target_day = (1 == tm->tm_mday);
