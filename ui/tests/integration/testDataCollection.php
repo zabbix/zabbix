@@ -235,7 +235,7 @@ class testDataCollection extends CIntegrationTest {
 
 		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, 'zbx_tls_connect() peer certificate' .
 			' issuer:"CN=ZabbixCA" subject:"CN=zabbix_agent"');
-		self::waitForLogLineToBePresent(self::COMPONENT_AGENT, 'End of zbx_tls_connect():SUCCEED');
+		self::waitForLogLineToBePresent(self::COMPONENT_AGENT, 'End of zbx_tls_accept():SUCCEED');
 
 		$passive_data = $this->call('history.get', [
 			'itemids'	=> self::$itemids['agent:agent.ping'],
