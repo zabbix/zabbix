@@ -89,6 +89,12 @@ int	zbx_ares_getaddrinfo(const char *ip, const char *service, int ai_flags, int 
 
 	ares_event_thread_init();
 
+	if (NULL == zbx_channel)
+	{
+		zbx_strlcpy(error, "could not initialize ares event thread", max_error_len);
+		return -1;
+	}
+
 	if (AI_NUMERICHOST == ai_flags)
 		ai_flags = ARES_AI_NUMERICHOST;
 
@@ -155,6 +161,12 @@ int	zbx_ares_getnameinfo(const struct sockaddr *sa, ares_socklen_t salen, char *
 	int		err;
 
 	ares_event_thread_init();
+
+	if (NULL == zbx_channel)
+	{
+		zbx_strlcpy(error, "could not initialize ares event thread", max_error_len);
+		return -1;
+	}
 
 	ares_getnameinfo(zbx_channel, sa, salen, ARES_NI_NAMEREQD, ares_nameinfo_cb, &name_info);
 
