@@ -58,6 +58,7 @@
 #include "zbxhistory.h"
 #include "zbx_expression_constants.h"
 #include "zbxhash.h"
+#include <stdint.h>
 
 #define	ZBX_VECTOR_ARRAY_RESERVE	3
 
@@ -9680,7 +9681,6 @@ static void	DCget_item(zbx_dc_item_t *dst_item, const ZBX_DC_ITEM *src_item)
 
 static void	DCget_agent_item(zbx_dc_agent_item_t *dst_item, const ZBX_DC_ITEM *src_item)
 {
-	/* TODO: move to a generic function? (once the analogous function is made for other poller/item types) */
 	const ZBX_DC_INTERFACE		*dc_interface;
 
 	dst_item->preprocessing = zbx_dc_item_requires_preprocessing(src_item);
@@ -11800,112 +11800,46 @@ out:
 	return num;
 }
 
-/* TODO: probably combine zbx_dc_config_get_..._poller_items(...) functions into 1 as they only differ in one place */
-/* TODO: and not forget to edit the zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__) thing to include the poller type */
-
-int	zbx_dc_config_get_agent_poller_items(int config_timeout, int processing,
-		int config_max_concurrent_checks, zbx_dc_agent_item_t **items)
+/******************************************************************************
+ *                                                                            *
+ * Comments: poller_type must be one of: ZBX_POLLER_TYPE_AGENT,               *
+ *           ZBX_POLLER_TYPE_SNMP, ZBX_POLLER_TYPE_HTTPAGENT                  *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_dc_config_get_async_poller_items(unsigned char poller_type, int config_timeout, int processing,
+		int config_max_concurrent_checks, zbx_dc_item_ptr_union *items)
 {
 	int			now, num = 0, max_items, items_alloc = 0;
 	zbx_binary_heap_t	*queue;
+	size_t			item_sizeof = 0;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() poller_type:%d", __func__, (int)poller_type);
 
 	if (0 == (max_items = config_max_concurrent_checks - processing))
 		goto out;
 
 	now = time(NULL);
-	queue = &config->queues[ZBX_POLLER_TYPE_AGENT];
+	queue = &config->queues[poller_type];
 
 	items_alloc = max_items;
-	*items = zbx_malloc(NULL, sizeof(zbx_dc_agent_item_t) * items_alloc);
 
-	WRLOCK_CACHE;
-
-	while (num < max_items && FAIL == zbx_binary_heap_empty(queue))
+	switch (poller_type)
 	{
-		int				disable_until;
-		const zbx_binary_heap_elem_t	*min;
-		ZBX_DC_HOST			*dc_host;
-		ZBX_DC_INTERFACE		*dc_interface;
-		ZBX_DC_ITEM			*dc_item;
-
-		min = zbx_binary_heap_find_min(queue);
-		dc_item = (ZBX_DC_ITEM *)min->data;
-
-		if (dc_item->nextcheck > now)
+		case ZBX_POLLER_TYPE_AGENT:
+			item_sizeof = sizeof(zbx_dc_agent_item_t);
 			break;
-
-		zbx_binary_heap_remove_min(queue);
-		dc_item->location = ZBX_LOC_NOWHERE;
-
-		if (NULL == (dc_host = (ZBX_DC_HOST *)zbx_hashset_search(&config->hosts, &dc_item->hostid)))
-			continue;
-
-		dc_interface = (ZBX_DC_INTERFACE *)zbx_hashset_search(&config->interfaces, &dc_item->interfaceid);
-
-		if (HOST_STATUS_MONITORED != dc_host->status ||
-				(HOST_MONITORED_BY_SERVER != dc_host->monitored_by &&
-				SUCCEED != zbx_is_item_processed_by_server(dc_item->type, dc_item->key)))
-		{
-			continue;
-		}
-
-		if (SUCCEED == DCin_maintenance_without_data_collection(dc_host, dc_item))
-		{
-			dc_requeue_item(dc_item, dc_host, dc_interface, ZBX_ITEM_COLLECTED, now);
-			continue;
-		}
-
-		/* don't apply unreachable item/host throttling for prioritized items */
-		if (ZBX_QUEUE_PRIORITY_HIGH != dc_item->queue_priority)
-		{
-			if (0 != (disable_until = DCget_disable_until(dc_item, dc_interface)))
-			{
-				/* move items on unreachable hosts to unreachable pollers or    */
-				/* postpone checks on hosts that have been checked recently and */
-				/* are still unreachable                                        */
-				if (disable_until > now)
-				{
-					dc_requeue_item(dc_item, dc_host, dc_interface,
-							ZBX_ITEM_COLLECTED | ZBX_HOST_UNREACHABLE, now);
-					continue;
-				}
-
-				DCincrease_disable_until(dc_interface, now, config_timeout);
-			}
-		}
-
-		dc_item->location = ZBX_LOC_POLLER;
-		DCget_host(&(*items)[num].host, dc_host);
-		DCget_agent_item(&(*items)[num], dc_item);
-		num++;
+		case ZBX_POLLER_TYPE_SNMP:
+			item_sizeof = sizeof(zbx_dc_snmp_item_t);
+			break;
+		case ZBX_POLLER_TYPE_HTTPAGENT:
+			item_sizeof = sizeof(zbx_dc_httpagent_item_t);
+			break;
+		default:
+			/* TODO: unreachable, add err? */
+			goto out;
 	}
 
-	UNLOCK_CACHE;
-out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __func__, num);
-
-	return num;
-}
-
-int	zbx_dc_config_get_snmp_poller_items(int config_timeout, int processing,
-		int config_max_concurrent_checks, zbx_dc_snmp_item_t **items)
-{
-	int			now, num = 0, max_items, items_alloc = 0;
-	zbx_binary_heap_t	*queue;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
-
-	now = time(NULL);
-
-	queue = &config->queues[ZBX_POLLER_TYPE_SNMP];
-
-	if (0 == (max_items = config_max_concurrent_checks - processing))
-		goto out;
-
-	items_alloc = max_items;
-	*items = zbx_malloc(NULL, sizeof(zbx_dc_item_t) * items_alloc);
+	items->any = zbx_malloc(NULL, item_sizeof * items_alloc);
 
 	WRLOCK_CACHE;
 
@@ -11964,95 +11898,24 @@ int	zbx_dc_config_get_snmp_poller_items(int config_timeout, int processing,
 		}
 
 		dc_item->location = ZBX_LOC_POLLER;
-		DCget_host(&(*items)[num].host, dc_host);
-		DCget_snmp_item(&(*items)[num], dc_item);
-		num++;
-	}
 
-	UNLOCK_CACHE;
-out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __func__, num);
-
-	return num;
-}
-
-int	zbx_dc_config_get_httpagent_poller_items(int config_timeout, int processing,
-		int config_max_concurrent_checks, zbx_dc_httpagent_item_t **items)
-{
-	int			now, num = 0, max_items, items_alloc = 0;
-	zbx_binary_heap_t	*queue;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
-
-	now = time(NULL);
-
-	queue = &config->queues[ZBX_POLLER_TYPE_HTTPAGENT];
-
-	if (0 == (max_items = config_max_concurrent_checks - processing))
-		goto out;
-
-	items_alloc = max_items;
-	*items = zbx_malloc(NULL, sizeof(zbx_dc_item_t) * items_alloc);
-
-	WRLOCK_CACHE;
-
-	while (num < max_items && FAIL == zbx_binary_heap_empty(queue))
-	{
-		int				disable_until;
-		const zbx_binary_heap_elem_t	*min;
-		ZBX_DC_HOST			*dc_host;
-		ZBX_DC_INTERFACE		*dc_interface;
-		ZBX_DC_ITEM			*dc_item;
-
-		min = zbx_binary_heap_find_min(queue);
-		dc_item = (ZBX_DC_ITEM *)min->data;
-
-		if (dc_item->nextcheck > now)
-			break;
-
-		zbx_binary_heap_remove_min(queue);
-		dc_item->location = ZBX_LOC_NOWHERE;
-
-		if (NULL == (dc_host = (ZBX_DC_HOST *)zbx_hashset_search(&config->hosts, &dc_item->hostid)))
-			continue;
-
-		dc_interface = (ZBX_DC_INTERFACE *)zbx_hashset_search(&config->interfaces, &dc_item->interfaceid);
-
-		if (HOST_STATUS_MONITORED != dc_host->status ||
-				(HOST_MONITORED_BY_SERVER != dc_host->monitored_by &&
-				SUCCEED != zbx_is_item_processed_by_server(dc_item->type, dc_item->key)))
+		switch (poller_type)
 		{
-			continue;
+			case ZBX_POLLER_TYPE_AGENT:
+				DCget_host(&items->agent_items[num].host, dc_host);
+				DCget_agent_item(&(items->agent_items)[num], dc_item);
+				break;
+			case ZBX_POLLER_TYPE_SNMP:
+				DCget_host(&items->agent_items[num].host, dc_host);
+				DCget_snmp_item(&(items->snmp_items)[num], dc_item);
+				break;
+			case ZBX_POLLER_TYPE_HTTPAGENT:
+				DCget_host(&items->agent_items[num].host, dc_host);
+				DCget_httpagent_item(&(items->httpagent_items)[num], dc_item);
+				break;
+			default:
+				/* TODO: unreachable, add err? */;
 		}
-
-		if (SUCCEED == DCin_maintenance_without_data_collection(dc_host, dc_item))
-		{
-			dc_requeue_item(dc_item, dc_host, dc_interface, ZBX_ITEM_COLLECTED, now);
-			continue;
-		}
-
-		/* don't apply unreachable item/host throttling for prioritized items */
-		if (ZBX_QUEUE_PRIORITY_HIGH != dc_item->queue_priority)
-		{
-			if (0 != (disable_until = DCget_disable_until(dc_item, dc_interface)))
-			{
-				/* move items on unreachable hosts to unreachable pollers or    */
-				/* postpone checks on hosts that have been checked recently and */
-				/* are still unreachable                                        */
-				if (disable_until > now)
-				{
-					dc_requeue_item(dc_item, dc_host, dc_interface,
-							ZBX_ITEM_COLLECTED | ZBX_HOST_UNREACHABLE, now);
-					continue;
-				}
-
-				DCincrease_disable_until(dc_interface, now, config_timeout);
-			}
-		}
-
-		dc_item->location = ZBX_LOC_POLLER;
-		DCget_host(&(*items)[num].host, dc_host);
-		DCget_httpagent_item(&(*items)[num], dc_item);
 		num++;
 	}
 

@@ -155,7 +155,6 @@ static int	get_value(zbx_dc_item_t *item, AGENT_RESULT *result, zbx_vector_agent
 	return res;
 }
 
-// TODO: probably rename
 static int http_raw_resolv_impl(zbx_macro_resolv_data_t *p, char **replace_with,
 		const zbx_dc_um_handle_t *um_handle, const zbx_dc_host_t *dc_host, const zbx_uint64_t itemid,
 		const char *key_orig, const char *key)
@@ -213,7 +212,6 @@ static int http_raw_resolv_impl(zbx_macro_resolv_data_t *p, char **replace_with,
 	return ret;
 }
 
-/* TODO: probably rename */
 static int	macro_http_raw_resolv_no_dc_item(zbx_macro_resolv_data_t *p, va_list args, char **replace_with,
 		char **data, char *error, size_t maxerrlen)
 {
@@ -761,7 +759,6 @@ void	zbx_prepare_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESUL
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-/* TODO: should this be in this file? */
 void	zbx_prepare_agent_items(zbx_dc_agent_item_t *items, int *errcodes, int num, AGENT_RESULT *results,
 		unsigned char expand_macros)
 {
@@ -830,7 +827,6 @@ void	zbx_prepare_agent_items(zbx_dc_agent_item_t *items, int *errcodes, int num,
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-/* TODO: should this be in this file? */
 void	zbx_prepare_snmp_items(zbx_dc_snmp_item_t *items, int *errcodes, int num, AGENT_RESULT *results,
 		unsigned char expand_macros)
 {
@@ -934,7 +930,6 @@ void	zbx_prepare_snmp_items(zbx_dc_snmp_item_t *items, int *errcodes, int num, A
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-/* TODO: should this be in this file? */
 void	zbx_prepare_httpagent_items(zbx_dc_httpagent_item_t *items, int *errcodes, int num, AGENT_RESULT *results,
 		unsigned char expand_macros)
 {
@@ -1178,7 +1173,6 @@ void	zbx_clean_items(zbx_dc_item_t *items, int num, AGENT_RESULT *results)
 	}
 }
 
-/* TODO: should this be in this file? */
 void	zbx_clean_agent_items(zbx_dc_agent_item_t *items, int num, AGENT_RESULT *results)
 {
 	for (int i = 0; i < num; i++)
@@ -1188,7 +1182,6 @@ void	zbx_clean_agent_items(zbx_dc_agent_item_t *items, int num, AGENT_RESULT *re
 	}
 }
 
-/* TODO: should this be in this file? */
 void	zbx_clean_snmp_items(zbx_dc_snmp_item_t *items, int num, AGENT_RESULT *results)
 {
 	for (int i = 0; i < num; i++)
@@ -1210,7 +1203,6 @@ void	zbx_clean_snmp_items(zbx_dc_snmp_item_t *items, int num, AGENT_RESULT *resu
 	}
 }
 
-/* TODO: should this be in this file? */
 void	zbx_clean_httpagent_items(zbx_dc_httpagent_item_t *items, int num, AGENT_RESULT *results)
 {
 	for (int i = 0; i < num; i++)

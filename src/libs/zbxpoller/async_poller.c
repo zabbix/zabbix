@@ -223,7 +223,7 @@ static void	async_wake(evutil_socket_t fd, short events, void *arg)
 
 static void	async_initiate_queued_checks(zbx_poller_config_t *poller_config, const char *zbx_progname)
 {
-	zbx_items_ptr_union 		items = { .any = NULL };
+	zbx_dc_item_ptr_union 		items = { .any = NULL };
 	AGENT_RESULT			*results;
 	int				*errcodes, total = 0;
 	zbx_timespec_t			timespec;
@@ -313,7 +313,7 @@ static void	async_initiate_queued_checks(zbx_poller_config_t *poller_config, con
 					break;
 				default:
 					break;
-					/* TODO: unreachable, add err? */
+					/* unreachable */;
 			}
 			if (SUCCEED == errcodes[i])
 				poller_config->processing++;
@@ -351,8 +351,7 @@ static void	async_initiate_queued_checks(zbx_poller_config_t *poller_config, con
 						preprocessing = items.httpagent_items[i].preprocessing;
 						break;
 					default:
-						/* TODO: unreachable, add err? */
-						break;
+						/* unreachable */;
 				}
 
 				if (ZBX_IS_RUNNING())

@@ -306,6 +306,13 @@ typedef struct
 }
 zbx_dc_httpagent_item_t;
 
+typedef union {
+	zbx_dc_agent_item_t 	*agent_items;
+	zbx_dc_snmp_item_t	*snmp_items;
+	zbx_dc_httpagent_item_t *httpagent_items;
+	void 			*any;
+} zbx_dc_item_ptr_union;
+
 typedef struct
 {
 	zbx_uint64_t	hostid;
@@ -1028,12 +1035,8 @@ int	zbx_dc_get_interface_value_itemid(zbx_uint64_t itemid, char **replace_to, in
 int	zbx_dc_config_get_poller_nextcheck(unsigned char poller_type);
 int	zbx_dc_config_get_poller_items(unsigned char poller_type, int config_timeout, int processing,
 		int config_max_concurrent_checks, zbx_dc_item_t **items);
-int	zbx_dc_config_get_agent_poller_items(int config_timeout, int processing,
-		int config_max_concurrent_checks, zbx_dc_agent_item_t **items);
-int	zbx_dc_config_get_snmp_poller_items(int config_timeout, int processing,
-		int config_max_concurrent_checks, zbx_dc_snmp_item_t **items);
-int	zbx_dc_config_get_httpagent_poller_items(int config_timeout, int processing,
-		int config_max_concurrent_checks, zbx_dc_httpagent_item_t **items);
+int	zbx_dc_config_get_async_poller_items(unsigned char poller_type, int config_timeout, int processing,
+		int config_max_concurrent_checks, zbx_dc_item_ptr_union *items);
 #ifdef HAVE_OPENIPMI
 int	zbx_dc_config_get_ipmi_poller_items(int now, int items_num, int config_timeout, zbx_dc_item_t *items,
 		int *nextcheck);
