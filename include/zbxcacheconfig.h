@@ -213,7 +213,8 @@ zbx_dc_item_t;
 
 ZBX_PTR_VECTOR_DECL(dc_item, zbx_dc_item_t *)
 
-typedef struct {
+typedef struct
+{
 	zbx_dc_host_t		host;
 	zbx_dc_interface_t	interface;
 	zbx_uint64_t		itemid;
