@@ -59,10 +59,13 @@ zabbix_export:
             
             	getField: function (data, path, debug_info) {
             		var steps = path.split('.');
+            
             		for (var i = 0; i < steps.length; i++) {
             			var step = steps[i];
+            
             			if (typeof data !== 'object' || data === null || typeof data[step] === 'undefined') {
             				var error_message = 'Field not found: ' + path;
+            
             				if (typeof debug_info !== 'undefined') {
             					error_message += ' (' + debug_info + ')';
             				}
@@ -94,14 +97,18 @@ zabbix_export:
             		}
             
             		RDAP.services = RDAP.getField(response, 'services', 'IANA RDAP bootstrap data');
+            
+            		if (!Array.isArray(RDAP.services) || RDAP.services.length === 0) {
+            			throw 'No RDAP services found in IANA RDAP bootstrap data.';
+            		}
             	},
             
             	findRdapServer: function (tld) {
             
             		for (var i = 0; i < RDAP.services.length; i++) {
             			var service = RDAP.services[i];
-            			var tlds = service[0];
-            			var urls = service[1];
+            			var tlds = service[0] || [];
+            			var urls = service[1] || [''];
             			if (tlds.indexOf(tld) !== -1) {
             				return urls[0];
             			}
@@ -378,8 +385,10 @@ zabbix_export:
                     - |
                       function getField(data, path, default_value) {
                       	var steps = path.split('.');
+                      
                       	for (var i = 0; i < steps.length; i++) {
                       		var step = steps[i];
+                      
                       		if (typeof data !== 'object' || data === null || typeof data[step] === 'undefined') {
                       			return default_value;
                       		}
@@ -405,10 +414,12 @@ zabbix_export:
                       				});
                       				return el.join(', ');
                       			}
+                      
                       			return el.trim();
                       		});
                       
                       		vcard_clear[j] = vcard_clear[j].filter(function (el) {
+                      			
                       			return el.trim() !== '';
                       		});
                       
@@ -430,6 +441,7 @@ zabbix_export:
                       	}
                       
                       	var vcard_array = getField(entity, 'vcardArray', ['vcard', []]);
+                      
                       	vcard_array = vcard_array[1];
                       
                       	for (var j = 0; j < vcard_array.length; j++) {
@@ -439,8 +451,8 @@ zabbix_export:
                       			continue;
                       		}
                       
-                      		var final_index = parent_index === '' ? index : parent_index + ',' + index;
-                      		var final_roles = parent_roles === '' ? roles : parent_roles + '-' + roles;
+                      		var final_index = parent_index === '' ? index : parent_index + ',' + index,
+                      			final_roles = parent_roles === '' ? roles : parent_roles + '-' + roles;
                       
                       		out_vcard_array.push({
                       			'{#ENTITY_VCARD_NAME}': '[' + final_roles + ']: vCard: [' + vcard_array[j][0] + ']',
@@ -455,6 +467,7 @@ zabbix_export:
                       }
                       
                       var input_data = JSON.parse(value);
+                      
                       input_data['lld_entities'] = [];
                       input_data['lld_notices'] = [];
                       
@@ -469,12 +482,14 @@ zabbix_export:
                       	for (var j = 0; j < sub_entities.length; j++) {
                       		var sub_role = getField(entity, 'roles', []).join(', '),
                       			sub_entity_data = getEntityData(sub_role, i, j, sub_entities[j]);
+                      
                       		input_data['lld_entities'] = input_data['lld_entities'].concat(sub_entity_data);
                       	}
                       }
                       
                       for (var i = 0; i < getField(input_data, 'notices', []).length; i++) {
                       	var notice = getField(input_data, 'notices.' + i, {});
+                      
                       	input_data['lld_notices'].push({
                       		'{#NOTICE_TITLE}': getField(notice, 'title', 'Notice '),
                       		'{#NOTICE_DESCRIPTION}': getField(notice, 'description', ['']).join(', '),
@@ -945,31 +960,6 @@ zabbix_export:
                     - type: INTEGER
                       name: decimal_places
                       value: '0'
-                    - type: STRING
-                      name: itemid._reference
-                      value: VRFTU._itemid
-                    - type: INTEGER
-                      name: rf_rate
-                      value: '0'
-                    - type: INTEGER
-                      name: show.0
-                      value: '2'
-                    - type: INTEGER
-                      name: show.1
-                      value: '1'
-                    - type: INTEGER
-                      name: value_size
-                      value: '35'
-                - type: item
-                  x: '14'
-                  'y': '11'
-                  width: '22'
-                  height: '3'
-                  hide_header: 'YES'
-                  fields:
-                    - type: INTEGER
-                      name: decimal_places
-                      value: '0'
                     - type: INTEGER
                       name: decimal_size
                       value: '45'
@@ -1012,6 +1002,31 @@ zabbix_export:
                     - type: INTEGER
                       name: units_size
                       value: '25'
+                    - type: INTEGER
+                      name: value_size
+                      value: '35'
+                - type: item
+                  x: '14'
+                  'y': '11'
+                  width: '22'
+                  height: '3'
+                  hide_header: 'YES'
+                  fields:
+                    - type: INTEGER
+                      name: decimal_places
+                      value: '0'
+                    - type: STRING
+                      name: itemid._reference
+                      value: VRFTU._itemid
+                    - type: INTEGER
+                      name: rf_rate
+                      value: '0'
+                    - type: INTEGER
+                      name: show.0
+                      value: '2'
+                    - type: INTEGER
+                      name: show.1
+                      value: '1'
                     - type: INTEGER
                       name: value_size
                       value: '35'
