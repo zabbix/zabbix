@@ -213,8 +213,6 @@ zbx_dc_item_t;
 
 ZBX_PTR_VECTOR_DECL(dc_item, zbx_dc_item_t *)
 
-/* TODO: remove comments */
-/* TODO: what to include here? */
 typedef struct {
 	zbx_dc_host_t		host;
 	zbx_dc_interface_t	interface;
@@ -232,6 +230,81 @@ typedef struct {
 	char			error_hash[ZBX_SHA512_BINARY_LENGTH];
 	unsigned char		preprocessing;
 } zbx_dc_agent_item_t;
+
+typedef struct
+{
+	zbx_dc_host_t		host;
+	zbx_dc_interface_t	interface;
+	zbx_uint64_t		itemid;
+	zbx_uint64_t		lastlogsize;
+	unsigned char		snmp_version;
+	unsigned char		value_type;
+	unsigned char		state;
+	unsigned char		snmpv3_securitylevel;
+	unsigned char		flags;
+	unsigned char		snmpv3_authprotocol;
+	unsigned char		snmpv3_privprotocol;
+	unsigned char		status;
+	char			key_orig[ZBX_ITEM_KEY_LEN * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1], *key;
+	char			*delay;
+	int			mtime;
+	char			logtimefmt[ZBX_ITEM_LOGTIMEFMT_LEN_MAX];
+	char			snmp_community_orig[ZBX_ITEM_SNMP_COMMUNITY_LEN_MAX], *snmp_community;
+	char			snmp_oid_orig[ZBX_ITEM_SNMP_OID_LEN_MAX], *snmp_oid;
+	char			snmpv3_securityname_orig[ZBX_ITEM_SNMPV3_SECURITYNAME_LEN_MAX], *snmpv3_securityname;
+	char			snmpv3_authpassphrase_orig[ZBX_ITEM_SNMPV3_AUTHPASSPHRASE_LEN_MAX],
+				*snmpv3_authpassphrase;
+	char			snmpv3_privpassphrase_orig[ZBX_ITEM_SNMPV3_PRIVPASSPHRASE_LEN_MAX],
+				*snmpv3_privpassphrase;
+	char			snmpv3_contextname_orig[ZBX_ITEM_SNMPV3_CONTEXTNAME_LEN_MAX], *snmpv3_contextname;
+	char			timeout_orig[ZBX_ITEM_TIMEOUT_LEN_MAX];
+	int			timeout;
+	char			error_hash[ZBX_SHA512_BINARY_LENGTH];
+	int			snmp_max_repetitions;
+	unsigned char		preprocessing;
+}
+zbx_dc_snmp_item_t;
+
+typedef struct
+{
+	zbx_dc_host_t		host;
+	zbx_dc_interface_t	interface;
+	zbx_uint64_t		itemid;
+	zbx_uint64_t		lastlogsize;
+	unsigned char		value_type;
+	unsigned char		state;
+	unsigned char		authtype;
+	unsigned char		flags;
+	unsigned char		status;
+	unsigned char		follow_redirects;
+	unsigned char		post_type;
+	unsigned char		retrieve_mode;
+	unsigned char		request_method;
+	unsigned char		output_format;
+	unsigned char		verify_peer;
+	unsigned char		verify_host;
+	unsigned char		allow_traps;
+	char			key_orig[ZBX_ITEM_KEY_LEN * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1], *key;
+	char			*delay;
+	int			mtime;
+	char			trapper_hosts[ZBX_ITEM_TRAPPER_HOSTS_LEN_MAX];
+	char			username_orig[ZBX_ITEM_USERNAME_LEN_MAX], *username;
+	char			password_orig[ZBX_ITEM_PASSWORD_LEN_MAX], *password;
+	char			timeout_orig[ZBX_ITEM_TIMEOUT_LEN_MAX];
+	int			timeout;
+	char			url_orig[ZBX_ITEM_URL_LEN_MAX], *url;
+	char			query_fields_orig[ZBX_ITEM_QUERY_FIELDS_LEN_MAX], *query_fields;
+	char			*posts;
+	char			status_codes_orig[ZBX_ITEM_STATUS_CODES_LEN_MAX], *status_codes;
+	char			http_proxy_orig[ZBX_ITEM_HTTP_PROXY_LEN_MAX], *http_proxy;
+	char			*headers;
+	char			ssl_cert_file_orig[ZBX_ITEM_SSL_CERT_FILE_LEN_MAX], *ssl_cert_file;
+	char			ssl_key_file_orig[ZBX_ITEM_SSL_KEY_FILE_LEN_MAX], *ssl_key_file;
+	char			ssl_key_password_orig[ZBX_ITEM_SSL_KEY_PASSWORD_LEN_MAX], *ssl_key_password;
+	char			error_hash[ZBX_SHA512_BINARY_LENGTH];
+	unsigned char		preprocessing;
+}
+zbx_dc_httpagent_item_t;
 
 typedef struct
 {
@@ -830,6 +903,8 @@ void	zbx_dc_config_get_triggers_by_triggerids(zbx_dc_trigger_t *triggers, const 
 		int *errcode, size_t num);
 void	zbx_dc_config_clean_items(zbx_dc_item_t *items, int *errcodes, size_t num);
 void	zbx_dc_config_clean_agent_items(zbx_dc_agent_item_t *items, int *errcodes, size_t num);
+void	zbx_dc_config_clean_snmp_items(zbx_dc_snmp_item_t *items, int *errcodes, size_t num);
+void	zbx_dc_config_clean_httpagent_items(zbx_dc_httpagent_item_t *items, int *errcodes, size_t num);
 int	zbx_dc_get_host_by_hostid(zbx_dc_host_t *host, zbx_uint64_t hostid);
 
 #define ZBX_DC_REQUEST_HOST_ID			101
@@ -955,6 +1030,10 @@ int	zbx_dc_config_get_poller_items(unsigned char poller_type, int config_timeout
 		int config_max_concurrent_checks, zbx_dc_item_t **items);
 int	zbx_dc_config_get_agent_poller_items(int config_timeout, int processing,
 		int config_max_concurrent_checks, zbx_dc_agent_item_t **items);
+int	zbx_dc_config_get_snmp_poller_items(int config_timeout, int processing,
+		int config_max_concurrent_checks, zbx_dc_snmp_item_t **items);
+int	zbx_dc_config_get_httpagent_poller_items(int config_timeout, int processing,
+		int config_max_concurrent_checks, zbx_dc_httpagent_item_t **items);
 #ifdef HAVE_OPENIPMI
 int	zbx_dc_config_get_ipmi_poller_items(int now, int items_num, int config_timeout, zbx_dc_item_t *items,
 		int *nextcheck);

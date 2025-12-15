@@ -161,7 +161,7 @@ static int	discovery_snmp(discovery_poller_config_t *poller_config, const zbx_dc
 		char *ip, const unsigned short port, zbx_discoverer_results_t *dresult, char **error)
 {
 	int				ret;
-	zbx_dc_item_t			item;
+	zbx_dc_snmp_item_t		item;
 	AGENT_RESULT			result;
 	discovery_async_result_t	*async_result;
 
@@ -172,7 +172,7 @@ static int	discovery_snmp(discovery_poller_config_t *poller_config, const zbx_dc
 
 	zbx_init_agent_result(&result);
 
-	memset(&item, 0, sizeof(zbx_dc_item_t));
+	memset(&item, 0, sizeof(zbx_dc_snmp_item_t));
 	zbx_strscpy(item.key_orig, dcheck->key_);
 	item.key = item.key_orig;
 
@@ -187,15 +187,12 @@ static int	discovery_snmp(discovery_poller_config_t *poller_config, const zbx_dc
 	{
 		case SVC_SNMPv1:
 			item.snmp_version = ZBX_IF_SNMP_VERSION_1;
-			item.type = ITEM_TYPE_SNMP;
 			break;
 		case SVC_SNMPv2c:
 			item.snmp_version = ZBX_IF_SNMP_VERSION_2;
-			item.type = ITEM_TYPE_SNMP;
 			break;
 		case SVC_SNMPv3:
 			item.snmp_version = ZBX_IF_SNMP_VERSION_3;
-			item.type = ITEM_TYPE_SNMP;
 	}
 
 	item.snmp_community = zbx_strdup(NULL, dcheck->snmp_community);

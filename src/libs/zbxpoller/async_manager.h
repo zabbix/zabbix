@@ -26,6 +26,8 @@ typedef void (*zbx_async_notify_cb_t)(void *data);
 typedef union {
 	zbx_dc_item_t 		*generic_items;
 	zbx_dc_agent_item_t 	*agent_items;
+	zbx_dc_snmp_item_t	*snmp_items;
+	zbx_dc_httpagent_item_t *httpagent_items;
 	void 			*any;
 } zbx_items_ptr_union;
 

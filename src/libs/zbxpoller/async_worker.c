@@ -45,9 +45,16 @@ static zbx_poller_item_t	*dc_config_async_get_poller_items(zbx_uint64_t processi
 			poller_item->num = zbx_dc_config_get_agent_poller_items(config_timeout,
 					processing_num, processing_limit, &poller_item->items.agent_items);
 			break;
-		// TODO: case ZBX_POLLER_TYPE_HTTPAGENT:
-		// TODO: case ZBX_POLLER_TYPE_SNMP:
+		case ZBX_POLLER_TYPE_SNMP:
+			poller_item->num = zbx_dc_config_get_snmp_poller_items(config_timeout,
+					processing_num, processing_limit, &poller_item->items.snmp_items);
+			break;
+		case ZBX_POLLER_TYPE_HTTPAGENT:
+			poller_item->num = zbx_dc_config_get_httpagent_poller_items(config_timeout,
+					processing_num, processing_limit, &poller_item->items.httpagent_items);
+			break;
 		default:
+			/* TODO: unreachable, maybe remove? */
 			poller_item->num = zbx_dc_config_get_poller_items(poller_type, config_timeout,
 					processing_num, processing_limit, &poller_item->items.generic_items);
 	}
@@ -60,13 +67,20 @@ static zbx_poller_item_t	*dc_config_async_get_poller_items(zbx_uint64_t processi
 		switch (poller_type) {
 			case ZBX_POLLER_TYPE_AGENT:
 				zbx_prepare_agent_items(poller_item->items.agent_items, poller_item->errcodes,
-					poller_item->num, poller_item->results, ZBX_MACRO_EXPAND_YES);
+						poller_item->num, poller_item->results, ZBX_MACRO_EXPAND_YES);
 				break;
-			// TODO: case ZBX_POLLER_TYPE_HTTPAGENT:
-			// TODO: case ZBX_POLLER_TYPE_SNMP:
+			case ZBX_POLLER_TYPE_SNMP:
+				zbx_prepare_snmp_items(poller_item->items.snmp_items, poller_item->errcodes,
+						poller_item->num, poller_item->results, ZBX_MACRO_EXPAND_YES);
+				break;
+			case ZBX_POLLER_TYPE_HTTPAGENT:
+				zbx_prepare_httpagent_items(poller_item->items.httpagent_items, poller_item->errcodes,
+						poller_item->num, poller_item->results, ZBX_MACRO_EXPAND_YES);
+				break;
 			default:
+				/* TODO: unreachable, maybe remove? */
 				zbx_prepare_items(poller_item->items.generic_items, poller_item->errcodes,
-					poller_item->num, poller_item->results, ZBX_MACRO_EXPAND_YES);
+						poller_item->num, poller_item->results, ZBX_MACRO_EXPAND_YES);
 		}
 	}
 	else

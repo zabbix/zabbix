@@ -9678,11 +9678,9 @@ static void	DCget_item(zbx_dc_item_t *dst_item, const ZBX_DC_ITEM *src_item)
 	}
 }
 
-/* TODO: maybe rename */
 static void	DCget_agent_item(zbx_dc_agent_item_t *dst_item, const ZBX_DC_ITEM *src_item)
 {
 	/* TODO: move to a generic function? (once the analogous function is made for other poller/item types) */
-	const ZBX_DC_LOGITEM		*logitem;
 	const ZBX_DC_INTERFACE		*dc_interface;
 
 	dst_item->preprocessing = zbx_dc_item_requires_preprocessing(src_item);
@@ -9713,6 +9711,165 @@ static void	DCget_agent_item(zbx_dc_agent_item_t *dst_item, const ZBX_DC_ITEM *s
 		zbx_strscpy(dst_item->timeout_orig, dc_get_global_item_type_timeout(src_item->type));
 	else
 		zbx_strscpy(dst_item->timeout_orig, src_item->timeout);
+}
+
+static void	DCget_snmp_item(zbx_dc_snmp_item_t *dst_item, const ZBX_DC_ITEM *src_item)
+{
+	const ZBX_DC_LOGITEM		*logitem;
+	const ZBX_DC_SNMPINTERFACE	*snmp;
+	const ZBX_DC_INTERFACE		*dc_interface;
+
+	dst_item->preprocessing = zbx_dc_item_requires_preprocessing(src_item);
+	dst_item->value_type = src_item->value_type;
+
+	dst_item->state = src_item->state;
+	dst_item->lastlogsize = src_item->lastlogsize;
+	dst_item->mtime = src_item->mtime;
+
+	dst_item->status = src_item->status;
+
+	zbx_strscpy(dst_item->key_orig, src_item->key);
+
+	dst_item->itemid = src_item->itemid;
+	dst_item->flags = src_item->flags;
+	dst_item->key = NULL;
+	dst_item->timeout = 0;
+
+	dst_item->delay = zbx_strdup(NULL, src_item->delay);	/* not used, should be initialized */
+
+	memcpy(dst_item->error_hash, src_item->error_hash, sizeof(dst_item->error_hash));
+
+	dc_interface = (ZBX_DC_INTERFACE *)zbx_hashset_search(&config->interfaces, &src_item->interfaceid);
+
+	DCget_interface(&dst_item->interface, dc_interface);
+
+	if ('\0' == *src_item->timeout)
+		zbx_strscpy(dst_item->timeout_orig, dc_get_global_item_type_timeout(src_item->type));
+	else
+		zbx_strscpy(dst_item->timeout_orig, src_item->timeout);
+
+	switch (src_item->value_type)
+	{
+		case ITEM_VALUE_TYPE_LOG:
+			if (NULL != (logitem = src_item->itemvaluetype.logitem))
+			{
+				zbx_strscpy(dst_item->logtimefmt, logitem->logtimefmt);
+			}
+			else
+				*dst_item->logtimefmt = '\0';
+			break;
+	}
+
+	snmp = (ZBX_DC_SNMPINTERFACE *)zbx_hashset_search(&config->interfaces_snmp,
+			&src_item->interfaceid);
+
+	if (NULL != snmp)
+	{
+		zbx_strscpy(dst_item->snmp_community_orig, snmp->community);
+		zbx_strscpy(dst_item->snmp_oid_orig, src_item->itemtype.snmpitem->snmp_oid);
+		zbx_strscpy(dst_item->snmpv3_securityname_orig, snmp->securityname);
+		dst_item->snmpv3_securitylevel = snmp->securitylevel;
+		zbx_strscpy(dst_item->snmpv3_authpassphrase_orig, snmp->authpassphrase);
+		zbx_strscpy(dst_item->snmpv3_privpassphrase_orig, snmp->privpassphrase);
+		dst_item->snmpv3_authprotocol = snmp->authprotocol;
+		dst_item->snmpv3_privprotocol = snmp->privprotocol;
+		zbx_strscpy(dst_item->snmpv3_contextname_orig, snmp->contextname);
+		dst_item->snmp_version = snmp->version;
+		dst_item->snmp_max_repetitions = snmp->max_repetitions;
+	}
+	else
+	{
+		*dst_item->snmp_community_orig = '\0';
+		*dst_item->snmp_oid_orig = '\0';
+		*dst_item->snmpv3_securityname_orig = '\0';
+		dst_item->snmpv3_securitylevel = ZBX_ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV;
+		*dst_item->snmpv3_authpassphrase_orig = '\0';
+		*dst_item->snmpv3_privpassphrase_orig = '\0';
+		dst_item->snmpv3_authprotocol = 0;
+		dst_item->snmpv3_privprotocol = 0;
+		*dst_item->snmpv3_contextname_orig = '\0';
+		dst_item->snmp_version = ZBX_IF_SNMP_VERSION_2;
+		dst_item->snmp_max_repetitions = 0;
+		dst_item->timeout = 0;
+	}
+
+	dst_item->snmp_community = NULL;
+	dst_item->snmp_oid = NULL;
+	dst_item->snmpv3_securityname = NULL;
+	dst_item->snmpv3_authpassphrase = NULL;
+	dst_item->snmpv3_privpassphrase = NULL;
+	dst_item->snmpv3_contextname = NULL;
+}
+
+static void	DCget_httpagent_item(zbx_dc_httpagent_item_t *dst_item, const ZBX_DC_ITEM *src_item)
+{
+	const ZBX_DC_LOGITEM		*logitem;
+	const ZBX_DC_SNMPINTERFACE	*snmp;
+	const ZBX_DC_TRAPITEM		*trapitem;
+	const ZBX_DC_INTERFACE		*dc_interface;
+	int				i;
+
+	dst_item->preprocessing = zbx_dc_item_requires_preprocessing(src_item);
+	dst_item->value_type = src_item->value_type;
+
+	dst_item->state = src_item->state;
+	dst_item->lastlogsize = src_item->lastlogsize;
+	dst_item->mtime = src_item->mtime;
+
+	dst_item->status = src_item->status;
+
+	zbx_strscpy(dst_item->key_orig, src_item->key);
+
+	dst_item->itemid = src_item->itemid;
+	dst_item->flags = src_item->flags;
+	dst_item->key = NULL;
+	dst_item->timeout = 0;
+
+	dst_item->delay = zbx_strdup(NULL, src_item->delay);	/* not used, should be initialized */
+
+	memcpy(dst_item->error_hash, src_item->error_hash, sizeof(dst_item->error_hash));
+
+	dc_interface = (ZBX_DC_INTERFACE *)zbx_hashset_search(&config->interfaces, &src_item->interfaceid);
+
+	DCget_interface(&dst_item->interface, dc_interface);
+
+	if ('\0' == *src_item->timeout)
+		zbx_strscpy(dst_item->timeout_orig, dc_get_global_item_type_timeout(src_item->type));
+	else
+		zbx_strscpy(dst_item->timeout_orig, src_item->timeout);
+
+	zbx_strscpy(dst_item->url_orig, src_item->itemtype.httpitem->url);
+	zbx_strscpy(dst_item->query_fields_orig, src_item->itemtype.httpitem->query_fields);
+	zbx_strscpy(dst_item->status_codes_orig, src_item->itemtype.httpitem->status_codes);
+	dst_item->follow_redirects = src_item->itemtype.httpitem->follow_redirects;
+	dst_item->post_type = src_item->itemtype.httpitem->post_type;
+	zbx_strscpy(dst_item->http_proxy_orig, src_item->itemtype.httpitem->http_proxy);
+	dst_item->headers = zbx_strdup(NULL, src_item->itemtype.httpitem->headers);
+	dst_item->retrieve_mode = src_item->itemtype.httpitem->retrieve_mode;
+	dst_item->request_method = src_item->itemtype.httpitem->request_method;
+	dst_item->output_format = src_item->itemtype.httpitem->output_format;
+	zbx_strscpy(dst_item->ssl_cert_file_orig, src_item->itemtype.httpitem->ssl_cert_file);
+	zbx_strscpy(dst_item->ssl_key_file_orig, src_item->itemtype.httpitem->ssl_key_file);
+	zbx_strscpy(dst_item->ssl_key_password_orig, src_item->itemtype.httpitem->ssl_key_password);
+	dst_item->verify_peer = src_item->itemtype.httpitem->verify_peer;
+	dst_item->verify_host = src_item->itemtype.httpitem->verify_host;
+	dst_item->authtype = src_item->itemtype.httpitem->authtype;
+	zbx_strscpy(dst_item->username_orig, src_item->itemtype.httpitem->username);
+	zbx_strscpy(dst_item->password_orig, src_item->itemtype.httpitem->password);
+	dst_item->posts = zbx_strdup(NULL, src_item->itemtype.httpitem->posts);
+	dst_item->allow_traps = src_item->itemtype.httpitem->allow_traps;
+	zbx_strscpy(dst_item->trapper_hosts, src_item->itemtype.httpitem->trapper_hosts);
+
+	dst_item->timeout = 0;
+	dst_item->url = NULL;
+	dst_item->query_fields = NULL;
+	dst_item->status_codes = NULL;
+	dst_item->http_proxy = NULL;
+	dst_item->ssl_cert_file = NULL;
+	dst_item->ssl_key_file = NULL;
+	dst_item->ssl_key_password = NULL;
+	dst_item->username = NULL;
+	dst_item->password = NULL;
 }
 
 void	zbx_dc_config_clean_items(zbx_dc_item_t *items, int *errcodes, size_t num)
@@ -9762,6 +9919,35 @@ void	zbx_dc_config_clean_agent_items(zbx_dc_agent_item_t *items, int *errcodes, 
 	{
 		if (NULL != errcodes && SUCCEED != errcodes[i])
 			continue;
+
+		zbx_free(items[i].delay);
+	}
+}
+
+void	zbx_dc_config_clean_snmp_items(zbx_dc_snmp_item_t *items, int *errcodes, size_t num)
+{
+	size_t	i;
+
+	for (i = 0; i < num; i++)
+	{
+		if (NULL != errcodes && SUCCEED != errcodes[i])
+			continue;
+
+		zbx_free(items[i].delay);
+	}
+}
+
+void	zbx_dc_config_clean_httpagent_items(zbx_dc_httpagent_item_t *items, int *errcodes, size_t num)
+{
+	size_t	i;
+
+	for (i = 0; i < num; i++)
+	{
+		if (NULL != errcodes && SUCCEED != errcodes[i])
+			continue;
+
+		zbx_free(items[i].headers);
+		zbx_free(items[i].posts);
 
 		zbx_free(items[i].delay);
 	}
@@ -11614,7 +11800,9 @@ out:
 	return num;
 }
 
-/* TODO: description? */
+/* TODO: probably combine zbx_dc_config_get_..._poller_items(...) functions into 1 as they only differ in one place */
+/* TODO: and not forget to edit the zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__) thing to include the poller type */
+
 int	zbx_dc_config_get_agent_poller_items(int config_timeout, int processing,
 		int config_max_concurrent_checks, zbx_dc_agent_item_t **items)
 {
@@ -11691,6 +11879,180 @@ int	zbx_dc_config_get_agent_poller_items(int config_timeout, int processing,
 		dc_item->location = ZBX_LOC_POLLER;
 		DCget_host(&(*items)[num].host, dc_host);
 		DCget_agent_item(&(*items)[num], dc_item);
+		num++;
+	}
+
+	UNLOCK_CACHE;
+out:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __func__, num);
+
+	return num;
+}
+
+int	zbx_dc_config_get_snmp_poller_items(int config_timeout, int processing,
+		int config_max_concurrent_checks, zbx_dc_snmp_item_t **items)
+{
+	int			now, num = 0, max_items, items_alloc = 0;
+	zbx_binary_heap_t	*queue;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	now = time(NULL);
+
+	queue = &config->queues[ZBX_POLLER_TYPE_SNMP];
+
+	if (0 == (max_items = config_max_concurrent_checks - processing))
+		goto out;
+
+	items_alloc = max_items;
+	*items = zbx_malloc(NULL, sizeof(zbx_dc_item_t) * items_alloc);
+
+	WRLOCK_CACHE;
+
+	while (num < max_items && FAIL == zbx_binary_heap_empty(queue))
+	{
+		int				disable_until;
+		const zbx_binary_heap_elem_t	*min;
+		ZBX_DC_HOST			*dc_host;
+		ZBX_DC_INTERFACE		*dc_interface;
+		ZBX_DC_ITEM			*dc_item;
+
+		min = zbx_binary_heap_find_min(queue);
+		dc_item = (ZBX_DC_ITEM *)min->data;
+
+		if (dc_item->nextcheck > now)
+			break;
+
+		zbx_binary_heap_remove_min(queue);
+		dc_item->location = ZBX_LOC_NOWHERE;
+
+		if (NULL == (dc_host = (ZBX_DC_HOST *)zbx_hashset_search(&config->hosts, &dc_item->hostid)))
+			continue;
+
+		dc_interface = (ZBX_DC_INTERFACE *)zbx_hashset_search(&config->interfaces, &dc_item->interfaceid);
+
+		if (HOST_STATUS_MONITORED != dc_host->status ||
+				(HOST_MONITORED_BY_SERVER != dc_host->monitored_by &&
+				SUCCEED != zbx_is_item_processed_by_server(dc_item->type, dc_item->key)))
+		{
+			continue;
+		}
+
+		if (SUCCEED == DCin_maintenance_without_data_collection(dc_host, dc_item))
+		{
+			dc_requeue_item(dc_item, dc_host, dc_interface, ZBX_ITEM_COLLECTED, now);
+			continue;
+		}
+
+		/* don't apply unreachable item/host throttling for prioritized items */
+		if (ZBX_QUEUE_PRIORITY_HIGH != dc_item->queue_priority)
+		{
+			if (0 != (disable_until = DCget_disable_until(dc_item, dc_interface)))
+			{
+				/* move items on unreachable hosts to unreachable pollers or    */
+				/* postpone checks on hosts that have been checked recently and */
+				/* are still unreachable                                        */
+				if (disable_until > now)
+				{
+					dc_requeue_item(dc_item, dc_host, dc_interface,
+							ZBX_ITEM_COLLECTED | ZBX_HOST_UNREACHABLE, now);
+					continue;
+				}
+
+				DCincrease_disable_until(dc_interface, now, config_timeout);
+			}
+		}
+
+		dc_item->location = ZBX_LOC_POLLER;
+		DCget_host(&(*items)[num].host, dc_host);
+		DCget_snmp_item(&(*items)[num], dc_item);
+		num++;
+	}
+
+	UNLOCK_CACHE;
+out:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __func__, num);
+
+	return num;
+}
+
+int	zbx_dc_config_get_httpagent_poller_items(int config_timeout, int processing,
+		int config_max_concurrent_checks, zbx_dc_httpagent_item_t **items)
+{
+	int			now, num = 0, max_items, items_alloc = 0;
+	zbx_binary_heap_t	*queue;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	now = time(NULL);
+
+	queue = &config->queues[ZBX_POLLER_TYPE_HTTPAGENT];
+
+	if (0 == (max_items = config_max_concurrent_checks - processing))
+		goto out;
+
+	items_alloc = max_items;
+	*items = zbx_malloc(NULL, sizeof(zbx_dc_item_t) * items_alloc);
+
+	WRLOCK_CACHE;
+
+	while (num < max_items && FAIL == zbx_binary_heap_empty(queue))
+	{
+		int				disable_until;
+		const zbx_binary_heap_elem_t	*min;
+		ZBX_DC_HOST			*dc_host;
+		ZBX_DC_INTERFACE		*dc_interface;
+		ZBX_DC_ITEM			*dc_item;
+
+		min = zbx_binary_heap_find_min(queue);
+		dc_item = (ZBX_DC_ITEM *)min->data;
+
+		if (dc_item->nextcheck > now)
+			break;
+
+		zbx_binary_heap_remove_min(queue);
+		dc_item->location = ZBX_LOC_NOWHERE;
+
+		if (NULL == (dc_host = (ZBX_DC_HOST *)zbx_hashset_search(&config->hosts, &dc_item->hostid)))
+			continue;
+
+		dc_interface = (ZBX_DC_INTERFACE *)zbx_hashset_search(&config->interfaces, &dc_item->interfaceid);
+
+		if (HOST_STATUS_MONITORED != dc_host->status ||
+				(HOST_MONITORED_BY_SERVER != dc_host->monitored_by &&
+				SUCCEED != zbx_is_item_processed_by_server(dc_item->type, dc_item->key)))
+		{
+			continue;
+		}
+
+		if (SUCCEED == DCin_maintenance_without_data_collection(dc_host, dc_item))
+		{
+			dc_requeue_item(dc_item, dc_host, dc_interface, ZBX_ITEM_COLLECTED, now);
+			continue;
+		}
+
+		/* don't apply unreachable item/host throttling for prioritized items */
+		if (ZBX_QUEUE_PRIORITY_HIGH != dc_item->queue_priority)
+		{
+			if (0 != (disable_until = DCget_disable_until(dc_item, dc_interface)))
+			{
+				/* move items on unreachable hosts to unreachable pollers or    */
+				/* postpone checks on hosts that have been checked recently and */
+				/* are still unreachable                                        */
+				if (disable_until > now)
+				{
+					dc_requeue_item(dc_item, dc_host, dc_interface,
+							ZBX_ITEM_COLLECTED | ZBX_HOST_UNREACHABLE, now);
+					continue;
+				}
+
+				DCincrease_disable_until(dc_interface, now, config_timeout);
+			}
+		}
+
+		dc_item->location = ZBX_LOC_POLLER;
+		DCget_host(&(*items)[num].host, dc_host);
+		DCget_httpagent_item(&(*items)[num], dc_item);
 		num++;
 	}
 
