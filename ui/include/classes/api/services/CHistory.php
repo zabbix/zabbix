@@ -232,10 +232,7 @@ class CHistory extends CApiService {
 		if (($options['history'] == ITEM_VALUE_TYPE_JSON || $options['history'] == ITEM_VALUE_TYPE_BINARY)
 				&& $options['maxValueSize'] !== null && !$options['countOutput']
 				&& $this->outputIsRequested('value', $options['output'])) {
-
-			$value_index = $options['output'] === API_OUTPUT_EXTEND ? count($sql_parts['select'])
-				: array_search('h.value', $sql_parts['select']);
-
+			$value_index = array_search('h.value', $sql_parts['select']);
 			$sql_parts['select'][$value_index] = zbx_dbsubstring('value', 1, $options['maxValueSize']);
 		}
 		return $sql_parts;
@@ -308,7 +305,6 @@ class CHistory extends CApiService {
 
 		if ($options['history'] === ITEM_VALUE_TYPE_JSON && $options['maxValueSize'] !== null
 				&& in_array('value', $options['output']) && !$options['countOutput']) {
-
 			$query['_source'] = array_values(array_diff($options['output'], ['value']));
 
 			// Ensure _source is not empty to avoid downstream logic.
