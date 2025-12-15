@@ -394,7 +394,7 @@ static int	DBpatch_7050027(void)
 
 static int	DBpatch_7050028(void)
 {
-	return DBrename_table("housekeeper", "housekeeper_tmp");
+	return DBrename_table("housekeeper", "housekeeper_old");
 }
 
 static int	DBpatch_7050029(void)
@@ -442,7 +442,7 @@ static int	DBpatch_7050030(void)
 
 static int	DBpatch_7050031(void)
 {
-	return DBdrop_table("housekeeper_tmp");
+	return DBdrop_table("housekeeper_old");
 }
 
 static int	DBpatch_7050032(void)
