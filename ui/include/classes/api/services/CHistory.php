@@ -108,9 +108,9 @@ class CHistory extends CApiService {
 			'excludeSearch' =>			['type' => API_FLAG, 'default' => false],
 			'searchWildcardsEnabled' =>	['type' => API_BOOLEAN, 'default' => false],
 			// output
-			'output' =>					['type' => API_MULTIPLE, 'flags' => API_NORMALIZE, 'default' => API_OUTPUT_EXTEND, 'rules' => [
-											['if' => ['field' => 'history', 'in' => implode(',', [ITEM_VALUE_TYPE_LOG])], 'type' => API_OUTPUT, 'in' => implode(',', ['itemid', 'clock', 'timestamp', 'source', 'severity', 'value', 'logeventid', 'ns'])],
-											['else' => true, 'type' => API_OUTPUT, 'in' => implode(',', ['itemid', 'clock', 'value', 'ns'])]
+			'output' =>					['type' => API_MULTIPLE, 'rules' => [
+											['if' => ['field' => 'history', 'flags' => API_NORMALIZE, 'in' => implode(',', [ITEM_VALUE_TYPE_LOG])], 'type' => API_OUTPUT, 'in' => implode(',', ['itemid', 'clock', 'timestamp', 'source', 'severity', 'value', 'logeventid', 'ns']), 'default' => API_OUTPUT_EXTEND],
+											['else' => true, 'type' => API_OUTPUT, 'flags' => API_NORMALIZE, 'in' => implode(',', ['itemid', 'clock', 'value', 'ns']), 'default' => API_OUTPUT_EXTEND]
 			]],
 			'countOutput' =>			['type' => API_FLAG, 'default' => false],
 			// sort and limit
@@ -306,31 +306,38 @@ class CHistory extends CApiService {
 			$query['size'] = $options['limit'];
 		}
 
-		if ($options['history'] === ITEM_VALUE_TYPE_JSON) {
-			if ($options['maxValueSize'] !== null) {
-				$query['_source'] = true;
+		if ($options['history'] === ITEM_VALUE_TYPE_JSON && $options['maxValueSize'] !== null
+				&& in_array('value', $options['output']) && !$options['countOutput']) {
 
-				$query['script_fields'] = [
-					'truncated_value' => [
-						'script' => [
-							'lang' => 'painless',
-							'source' => "
-								def string;
-								string = params._source.value.toString();
+			$query['_source'] = array_values(array_diff($options['output'], ['value']));
 
-								if (string.length() > params.len) {
-									return string.substring(0, params.len);
-								} else {
-									return string;
-								}
-							",
-							'params' => [
-								'len' => (int)$options['maxValueSize']
-							]
+			// Ensure _source is not empty to avoid downstream logic.
+			if (!$query['_source']) {
+				foreach ($options['itemids'] as $itemid) {
+					$query['_source'] = [$itemid];
+				}
+			}
+
+			$query['script_fields'] = [
+				'value' => [
+					'script' => [
+						'lang' => 'painless',
+						'source' => <<<'SCRIPT'
+							def string;
+							string = params._source.value.toString();
+
+							if (string.length() > params.len) {
+								return string.substring(0, params.len);
+							} else {
+								return string;
+							}
+						SCRIPT,
+						'params' => [
+							'len' => (int) $options['maxValueSize']
 						]
 					]
-				];
-			}
+				]
+			];
 		}
 
 		$endpoints = CHistoryManager::getElasticsearchEndpoints($options['history']);

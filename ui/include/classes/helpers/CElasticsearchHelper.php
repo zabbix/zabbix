@@ -211,12 +211,13 @@ class CElasticsearchHelper {
 					$values = [];
 
 					foreach ($result['hits']['hits'] as $row) {
-						if (!array_key_exists('_source', $row)) {
+						if (!array_key_exists('_source', $row) && !array_key_exists('fields', $row)) {
 							continue;
 						}
 
+						// Elasticsearch returns field values as arrays and first element holds the value.
 						if (array_key_exists('fields', $row)) {
-							$row['_source']['value'] = $row['fields']['truncated_value'][0];
+							$row['_source']['value'] = $row['fields']['value'][0];
 						}
 
 						$values[] = $row['_source'];
