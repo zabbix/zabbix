@@ -390,8 +390,9 @@ int	zbx_socket_start(char **error)
 		*error = zbx_dsprintf(*error, "Cannot initialize Winsock DLL: %s", zbx_strerror_from_system(ret));
 		return FAIL;
 	}
-
+#ifdef HAVE_ARES_QUERY_CACHE
 	zbx_ares_library_init();
+#endif
 
 	return SUCCEED;
 }
