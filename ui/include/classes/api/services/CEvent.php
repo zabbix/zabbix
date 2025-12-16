@@ -304,11 +304,6 @@ class CEvent extends CApiService {
 			}
 		}
 
-		// eventids
-		if ($options['eventids'] !== null) {
-			$sql_parts['where'][] = dbConditionInt('e.eventid', $options['eventids']);
-		}
-
 		// objectids
 		if ($options['objectids'] !== null && in_array($options['object'], [EVENT_OBJECT_TRIGGER, EVENT_OBJECT_ITEM,
 				EVENT_OBJECT_LLDRULE, EVENT_OBJECT_SERVICE])) {
