@@ -11824,7 +11824,7 @@ int	zbx_dc_config_get_async_poller_items(unsigned char poller_type, int config_t
 			item_sizeof = sizeof(zbx_dc_httpagent_item_t);
 			break;
 		default:
-			/* TODO: unreachable, add err? */
+			THIS_SHOULD_NEVER_HAPPEN;
 			goto out;
 	}
 
@@ -11904,11 +11904,12 @@ int	zbx_dc_config_get_async_poller_items(unsigned char poller_type, int config_t
 				DCget_httpagent_item(&(items->httpagent_items)[num], dc_item);
 				break;
 			default:
-				/* TODO: unreachable, add err? */;
+				THIS_SHOULD_NEVER_HAPPEN;
+				goto out_unlock;
 		}
 		num++;
 	}
-
+out_unlock:
 	UNLOCK_CACHE;
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __func__, num);

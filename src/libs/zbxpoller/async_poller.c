@@ -312,8 +312,7 @@ static void	async_initiate_queued_checks(zbx_poller_config_t *poller_config, con
 #endif
 					break;
 				default:
-					break;
-					/* unreachable */;
+					THIS_SHOULD_NEVER_HAPPEN;
 			}
 			if (SUCCEED == errcodes[i])
 				poller_config->processing++;
@@ -351,7 +350,7 @@ static void	async_initiate_queued_checks(zbx_poller_config_t *poller_config, con
 						preprocessing = items.httpagent_items[i].preprocessing;
 						break;
 					default:
-						/* unreachable */;
+						THIS_SHOULD_NEVER_HAPPEN;
 				}
 
 				if (ZBX_IS_RUNNING())

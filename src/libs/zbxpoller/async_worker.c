@@ -63,7 +63,7 @@ static zbx_poller_item_t	*dc_config_async_get_poller_items(zbx_uint64_t processi
 						poller_item->num, poller_item->results, ZBX_MACRO_EXPAND_YES);
 				break;
 			default:
-				/* unreachable */;
+				THIS_SHOULD_NEVER_HAPPEN;
 		}
 	}
 	else
