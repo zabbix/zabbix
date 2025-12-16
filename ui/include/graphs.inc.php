@@ -117,18 +117,6 @@ function getGraphDims($graphid = null) {
 	return $graphDims;
 }
 
-function getGraphByGraphId($graphId) {
-	$dbGraph = DBfetch(DBselect('SELECT g.* FROM graphs g WHERE g.graphid='.zbx_dbstr($graphId)));
-
-	if ($dbGraph) {
-		return $dbGraph;
-	}
-
-	error(_s('No graph item with graph ID "%1$s".', $graphId));
-
-	return false;
-}
-
 /**
  * Get parent templates for each given graph.
  *
@@ -671,7 +659,7 @@ function yieldGraphScaleInterval(float $min, float $max, string $units, int $pow
 
 	$is_binary = isBinaryUnits($units);
 
-	$base = getUnitsBase($units, $power);
+	$base = truncateFloat(getUnitsBase($units, $power));
 
 	// Expression optimized to avoid overflow.
 	$interval = truncateFloat($max / $rows - $min / $rows);

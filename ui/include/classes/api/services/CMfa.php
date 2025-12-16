@@ -405,7 +405,6 @@ class CMfa extends CApiService {
 			API::Authentication()->update(['mfaid' => 0]);
 		}
 
-		DB::delete('mfa_totp_secret', ['mfaid' => array_keys($db_mfas)]);
 		DB::delete('mfa', ['mfaid' => array_keys($db_mfas)]);
 
 		self::addAuditLog(CAudit::ACTION_DELETE, CAudit::RESOURCE_MFA, $db_mfas);

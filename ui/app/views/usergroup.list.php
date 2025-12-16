@@ -102,7 +102,7 @@ foreach ($data['usergroups'] as $usergroup) {
 
 	$gui_access = user_auth_type2str($usergroup['gui_access']);
 
-	if (granted2update_group($usergroup['usrgrpid'])) {
+	if ($usergroup['can_update_group']) {
 		$next_gui_auth = ($usergroup['gui_access'] + 1 > GROUP_GUI_ACCESS_DISABLED)
 			? GROUP_GUI_ACCESS_SYSTEM
 			: $usergroup['gui_access'] + 1;
