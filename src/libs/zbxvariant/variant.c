@@ -625,8 +625,6 @@ static int	variant_compare_dbl(const zbx_variant_t *value1, const zbx_variant_t 
 			value1_dbl = atof(value1->data.str);
 			break;
 		case ZBX_VARIANT_JSON:
-			value1_dbl = atof(value1->data.json);
-			break;
 		default:
 			THIS_SHOULD_NEVER_HAPPEN;
 			exit(EXIT_FAILURE);
