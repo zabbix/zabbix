@@ -425,6 +425,7 @@ static void if_description(const char* interface, struct zbx_json *j1, struct zb
 
 	close(sock);
 #else
+	ZBX_UNUSED(interface);
 	ZBX_UNUSED(j1);
 	ZBX_UNUSED(j2);
 #endif
