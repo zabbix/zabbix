@@ -668,21 +668,27 @@ out:
 int	zbx_socket_connect(zbx_socket_t *s, int ai_socktype, const char *source_ip, const char *host,
 		unsigned short port, int timeout, short *events)
 {
-	int	ai_flags = 0, ai_family = PF_UNSPEC, ret = FAIL;
+	int	ai_flags = 0, ret = FAIL;
 	char	service[8];
-
+#ifdef HAVE_ARES_QUERY_CACHE
+	int	ai_family = PF_UNSPEC;
+#endif
 	zbx_snprintf(service, sizeof(service), "%hu", port);
 
 	if (SUCCEED == zbx_is_ip4(host))
 	{
 		ai_flags = AI_NUMERICHOST;
+#ifdef HAVE_ARES_QUERY_CACHE
 		ai_family = AF_INET;
+#endif
 	}
 #ifdef HAVE_IPV6
 	else if (SUCCEED == zbx_is_ip6(host))
 	{
 		ai_flags = AI_NUMERICHOST;
+#ifdef HAVE_ARES_QUERY_CACHE
 		ai_family = AF_INET6;
+#endif
 	}
 #endif
 	else if (NULL != events)
