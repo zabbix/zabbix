@@ -215,7 +215,6 @@
 			<arg line="--with-postgresql"/>
 			<arg line="--prefix=${basedir}"/>
 			<arg line="--with-libcurl"/>
-			<arg line="--with-ares"/>
 			<arg line="--with-stacksize=512"/>
 			<arg line="--with-openssl"/>
 			<arg line="--with-net-snmp"/>
