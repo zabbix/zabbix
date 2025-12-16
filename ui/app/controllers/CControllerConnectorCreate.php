@@ -91,30 +91,34 @@ class CControllerConnectorCreate extends CControllerConnectorUpdateGeneral {
 			'tags_evaltype' => ['db connector.tags_evaltype', 'required',
 				'in' => [CONDITION_EVAL_TYPE_AND_OR, CONDITION_EVAL_TYPE_OR]
 			],
-			'tags' => ['objects', 'uniq' => ['tag', 'operator', 'value'], 'fields' => [
-				'operator' => ['db connector_tag.operator', 'required',
-					'in' => [CONDITION_OPERATOR_EXISTS, CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_LIKE,
-						CONDITION_OPERATOR_NOT_EXISTS, CONDITION_OPERATOR_NOT_EQUAL, CONDITION_OPERATOR_NOT_LIKE
-					]
-				],
-				'value' => ['db connector_tag.value', 'required',
-					'when' => ['operator',
-						'in' => [CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_LIKE, CONDITION_OPERATOR_NOT_EQUAL,
-							CONDITION_OPERATOR_NOT_LIKE
+			'tags' => ['objects', 'uniq' => ['tag', 'operator', 'value'],
+				'fields' => [
+					'operator' => ['db connector_tag.operator', 'required',
+						'in' => [CONDITION_OPERATOR_EXISTS, CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_LIKE,
+							CONDITION_OPERATOR_NOT_EXISTS, CONDITION_OPERATOR_NOT_EQUAL, CONDITION_OPERATOR_NOT_LIKE
 						]
+					],
+					'value' => ['db connector_tag.value', 'required',
+						'when' => ['operator',
+							'in' => [CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_LIKE, CONDITION_OPERATOR_NOT_EQUAL,
+								CONDITION_OPERATOR_NOT_LIKE
+							]
+						]
+					],
+					'tag' => [
+						['db connector_tag.tag', 'required'],
+						['db connector_tag.tag', 'not_empty', 'when' => [
+							['operator',
+								'in' => [CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_LIKE,
+									CONDITION_OPERATOR_NOT_EQUAL, CONDITION_OPERATOR_NOT_LIKE
+								]
+							],
+							['value', 'not_empty']
+						]]
 					]
 				],
-				'tag' => [
-					['db connector_tag.tag', 'required'],
-					['db connector_tag.tag', 'not_empty', 'when' => [
-						['operator',
-							'in' => [CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_LIKE, CONDITION_OPERATOR_NOT_EQUAL,
-							CONDITION_OPERATOR_NOT_LIKE]
-						],
-						['value', 'not_empty']
-					]]
-				]
-			]]
+				'messages' => ['uniq' => _('Tag filter name, operator and value combination is not unique.')]
+			]
 		]];
 	}
 
