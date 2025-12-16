@@ -162,8 +162,8 @@ class testHistory extends CAPITest {
 					[
 						'itemid' => '158741',
 						'clock' => '1549351002',
-						'ns' => '164888032',
-						'value' => base64_encode('a')
+						'value' => base64_encode('a'),
+						'ns' => '164888032'
 					]
 				],
 				'expected_error' => false
@@ -180,8 +180,8 @@ class testHistory extends CAPITest {
 					[
 						'itemid' => '158742',
 						'clock' => '1549351003',
-						'ns' => '354370019',
-						'value' => '{"name'
+						'value' => '{"name',
+						'ns' => '354370019'
 					]
 				],
 				'expected_error' => false
