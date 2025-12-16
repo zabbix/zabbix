@@ -448,7 +448,7 @@ in:
 out:
   return: less
 ---
-test case: floating > json, WARNING: STRING comparison is used
+test case: floating > json, WARNING - STRING comparison is used
 in:
   value1:
     type: ZBX_VARIANT_DBL
@@ -459,7 +459,7 @@ in:
 out:
   return: greater
 ---
-test case: json > uint64, WARNING: STRING comparison is used
+test case: json > uint64, WARNING - STRING comparison is used
 in:
   value1:
     type: ZBX_VARIANT_JSON
@@ -470,7 +470,7 @@ in:
 out:
   return: greater
 
-test case: uint64 > json, WARNING: STRING comparison is used
+test case: uint64 > json, WARNING - STRING comparison is used
 in:
   value1:
     type: ZBX_VARIANT_UI64
@@ -481,7 +481,7 @@ in:
 out:
   return: greater
 ---
-test case: json < json, WARNING: STRING comparison is used
+test case: json < json, WARNING - STRING comparison is used
 in:
   value1:
     type: ZBX_VARIANT_JSON
@@ -492,7 +492,7 @@ in:
 out:
   return: less
 ---
-test case: json > json, WARNING: STRING comparison is used
+test case: json > json, WARNING - STRING comparison is used
 in:
   value1:
     type: ZBX_VARIANT_JSON
@@ -503,7 +503,7 @@ in:
 out:
   return: greater
 ---
-test case: json = json, WARNING: STRING comparison is used
+test case: json = json, WARNING - STRING comparison is used
 in:
   value1:
     type: ZBX_VARIANT_JSON
@@ -514,7 +514,7 @@ in:
 out:
   return: equal
 ---
-test case: json = json, 2, WARNING: STRING comparison is used
+test case: json = json, 2, WARNING - STRING comparison is used
 in:
   value1:
     type: ZBX_VARIANT_JSON
