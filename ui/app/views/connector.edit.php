@@ -79,6 +79,7 @@ $form_grid = (new CFormGrid())
 				->setId('tags')
 				->addClass('table-tags')
 				->addClass(ZBX_STYLE_TABLE_INITIAL_WIDTH)
+				->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 				->setAttribute('data-field-type', 'set')
 				->setAttribute('data-field-name', 'tags')
 				->setFooter(
@@ -86,14 +87,16 @@ $form_grid = (new CFormGrid())
 						(new CButtonLink(_('Add')))->addClass('element-table-add')
 					)
 				),
-			(new CTemplateTag('tag-row-tmpl'))->addItem(
+			(new CTemplateTag('tag-row-tmpl', [
 				(new CRow([
 					(new CTextBox('tags[#{rowNum}][tag]', '#{tag}', false,
 						DB::getFieldLength('connector_tag', 'tag')
 					))
+						->setErrorContainer('tags-#{rowNum}-error-container')
 						->setAttribute('placeholder', _('tag'))
 						->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
 					(new CSelect('tags[#{rowNum}][operator]'))
+						->setErrorContainer('tags-#{rowNum}-error-container')
 						->addClass('js-tag-operator')
 						->setValue(CONDITION_OPERATOR_EQUAL)
 						->addOptions(CSelect::createOptionsFromArray([
@@ -107,12 +110,16 @@ $form_grid = (new CFormGrid())
 					(new CTextBox('tags[#{rowNum}][value]', '#{value}', false,
 						DB::getFieldLength('connector_tag', 'value')
 					))
+						->setErrorContainer('tags-#{rowNum}-error-container')
 						->addClass('js-tag-value')
 						->setAttribute('placeholder', _('value'))
 						->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
 					(new CButtonLink(_('Remove')))->addClass('element-table-remove')
-				]))->addClass('form_row')
-			)
+				]))->addClass('form_row'),
+				(new CRow())
+					->addClass('error-container-row')
+					->addItem((new CCol())->setId('tags-#{rowNum}-error-container')->setColSpan(4))
+			]))
 		])
 	)
 	->addItem([
