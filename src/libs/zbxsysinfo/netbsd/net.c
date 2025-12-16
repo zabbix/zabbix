@@ -459,9 +459,6 @@ int	net_if_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 		return SYSINFO_RET_FAIL;
 	}
 
-	zbx_json_initarray(&jval, ZBX_JSON_STAT_BUF_LEN);
-	zbx_json_initarray(&jcfg, ZBX_JSON_STAT_BUF_LEN);
-
 	if (1 == request->nparam)
 	{
 		pattern = get_rparam(request, 0);
@@ -476,6 +473,9 @@ int	net_if_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 			return SYSINFO_RET_FAIL;
 		}
 	}
+
+	zbx_json_initarray(&jval, ZBX_JSON_STAT_BUF_LEN);
+	zbx_json_initarray(&jcfg, ZBX_JSON_STAT_BUF_LEN);
 
 	for (int i = 0; 0 != interfaces[i].if_index; i++)
 	{
