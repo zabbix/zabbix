@@ -24,12 +24,12 @@ require_once dirname(__FILE__).'/../include/helpers/CDataHelper.php';
  */
 class testDataCollection extends CIntegrationTest {
 
-	private static $hostid = [];
+	private static $hostids = [];
 	private static $itemids = [];
 	private static $itemidsToDelete = [];
 	private static $certBaseDirProxy;
 	private static $certBaseDirAgent;
-	private static $proxyids;
+	private static $proxyid;
 
 	/**
 	 * @inheritdoc
@@ -41,7 +41,7 @@ class testDataCollection extends CIntegrationTest {
 			'operating_mode' => PROXY_OPERATING_MODE_ACTIVE
 		]);
 
-		self::$proxyids = CDataHelper::getIds('name');
+		self::$proxyid = CDataHelper::getIds('name');
 
 		// Create host "agent", "custom_agent" and "proxy agent".
 		$interfaces = [
@@ -104,7 +104,7 @@ class testDataCollection extends CIntegrationTest {
 				'host' => 'proxy_agent',
 				'interfaces' => $interfaces,
 				'groups' => $groups,
-				'proxyid' => self::$proxyids['proxy'],
+				'proxyid' => self::$proxyid['proxy'],
 				'monitored_by' => ZBX_MONITORED_BY_PROXY,
 				'status' => HOST_STATUS_NOT_MONITORED,
 				'items' => [
@@ -126,7 +126,7 @@ class testDataCollection extends CIntegrationTest {
 			]
 		]);
 
-		self::$hostid = $result['hostids'];
+		self::$hostids = $result['hostids'];
 		self::$itemids = $result['itemids'];
 		self::$itemidsToDelete = array_values($result['itemids']);
 
@@ -173,7 +173,7 @@ class testDataCollection extends CIntegrationTest {
 
 		$data = $this->call('hostinterface.get', [
 			'output' => ['available'],
-			'hostids' => self::$hostid['agent'],
+			'hostids' => self::$hostids['agent'],
 			'filter' => [
 				'type' => 1,
 				'main' => 1
@@ -235,7 +235,10 @@ class testDataCollection extends CIntegrationTest {
 
 		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, 'zbx_tls_connect() peer certificate' .
 			' issuer:"CN=ZabbixCA" subject:"CN=zabbix_agent"');
-		self::waitForLogLineToBePresent(self::COMPONENT_AGENT, 'End of zbx_tls_accept():SUCCEED');
+		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of zbx_tls_connect():SUCCEED ' .
+			'(established TLS');
+		self::waitForLogLineToBePresent(self::COMPONENT_AGENT, 'End of zbx_tls_accept():SUCCEED ' .
+			'(established TLS');
 
 		$passive_data = $this->call('history.get', [
 			'itemids'	=> self::$itemids['agent:agent.ping'],
@@ -270,7 +273,7 @@ class testDataCollection extends CIntegrationTest {
 
 		// Retrieve item data from API.
 		$response = $this->call('item.get', [
-			'hostids'	=> self::$hostid['custom_agent'],
+			'hostids'	=> self::$hostids['custom_agent'],
 			'output'	=> ['itemid', 'name', 'key_', 'type', 'value_type']
 		]);
 
@@ -388,7 +391,7 @@ class testDataCollection extends CIntegrationTest {
 	private function updateProxyHostTLS() {
 
 		$response = $this->call('proxy.update', [
-			'proxyid' => self::$proxyids['proxy'],
+			'proxyid' => self::$proxyid['proxy'],
 			'tls_accept' => HOST_ENCRYPTION_CERTIFICATE,
 			'tls_issuer' => 'CN=ZabbixCA',
 			'tls_subject' => 'CN=zabbix_proxy'
@@ -491,17 +494,20 @@ class testDataCollection extends CIntegrationTest {
 
 		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, 'zbx_tls_accept() peer certificate' .
 			' issuer:"CN=ZabbixCA" subject:"CN=zabbix_proxy"');
-		//self::waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of zbx_tls_connect():SUCCEED');
+		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of zbx_tls_accept():SUCCEED ' .
+			'(established TLS');
 
 		self::waitForLogLineToBePresent(self::COMPONENT_PROXY, 'zbx_tls_connect() peer certificate' .
 			' issuer:"CN=ZabbixCA" subject:"CN=zabbix_agent"');
 		self::waitForLogLineToBePresent(self::COMPONENT_PROXY, 'zbx_tls_connect() peer certificate' .
 			' issuer:"CN=ZabbixCA" subject:"CN=zabbix_server"');
-		self::waitForLogLineToBePresent(self::COMPONENT_PROXY, 'End of zbx_tls_connect():SUCCEED');
+		self::waitForLogLineToBePresent(self::COMPONENT_PROXY, 'End of zbx_tls_connect():SUCCEED ' .
+			'(established TLS');
 
 		self::waitForLogLineToBePresent(self::COMPONENT_AGENT, 'zbx_tls_connect() peer certificate' .
 			' issuer:"CN=ZabbixCA" subject:"CN=zabbix_proxy"');
-		self::waitForLogLineToBePresent(self::COMPONENT_AGENT, 'End of zbx_tls_connect():SUCCEED');
+		self::waitForLogLineToBePresent(self::COMPONENT_AGENT, 'End of zbx_tls_connect():SUCCEED ' .
+			'(established TLS');
 
 		$passive_data = $this->call('history.get', [
 			'itemids'	=> self::$itemids['proxy_agent:agent.ping'],
@@ -547,7 +553,7 @@ class testDataCollection extends CIntegrationTest {
 		$this->assertArrayHasKey('hostids', $response['result']);
 		$this->assertArrayHasKey(0, $response['result']['hostids']);
 		$hostid = $response['result']['hostids'][0];
-		self::$hostid = array_merge(self::$hostid, [$hostid]);
+		self::$hostids = array_merge(self::$hostids, [$hostid]);
 
 		$response = $this->call('item.create', [
 			'hostid' => $hostid,
@@ -635,7 +641,7 @@ class testDataCollection extends CIntegrationTest {
 		$this->assertArrayHasKey('hostids', $response['result']);
 		$this->assertArrayHasKey(0, $response['result']['hostids']);
 		$hostid = $response['result']['hostids'][0];
-		self::$hostid = array_merge(self::$hostid, [$hostid]);
+		self::$hostids = array_merge(self::$hostids, [$hostid]);
 
 		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, "finished forced reloading of the configuration cache", true, 60, 1);
@@ -704,16 +710,16 @@ class testDataCollection extends CIntegrationTest {
 
 	public static function clearData(): void {
 
-		if (!empty(self::$hostid)) {
+		if (!empty(self::$itemidsToDelete)) {
 			CDataHelper::call('item.delete', self::$itemidsToDelete);
 		}
 
-		if (!empty(self::$hostid)) {
-			CDataHelper::call('host.delete', self::$hostid);
+		if (!empty(self::$hostids)) {
+			CDataHelper::call('host.delete', self::$hostids);
 		}
 
-		if (!empty(self::$proxyids)) {
-			CDataHelper::call('proxy.delete', self::$proxyids);
+		if (!empty(self::$proxyid)) {
+			CDataHelper::call('proxy.delete', self::$proxyid);
 		}
 
 		// Cleanup: remove the certificate directory and all its contents
