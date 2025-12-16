@@ -480,6 +480,7 @@ zbx_uint64_t	zbx_variant_size(const zbx_variant_t *value)
 			}
 			break;
 		case ZBX_VARIANT_JSON:
+			size = strlen(value->data.str) + 1;
 			THIS_SHOULD_NEVER_HAPPEN;
 		default:
 			break;
