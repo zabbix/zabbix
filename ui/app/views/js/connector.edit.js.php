@@ -24,6 +24,7 @@ window.connector_edit_popup = new class {
 	init({rules, clone_rules, tags}) {
 		this.overlay = overlays_stack.getById('connector.edit');
 		this.dialogue = this.overlay.$dialogue[0];
+		this.footer = this.overlay.$dialogue.$footer[0];
 		this.form_element = this.overlay.$dialogue.$body[0].querySelector('form');
 		this.form = new CForm(this.form_element, rules);
 		this.clone_rules = clone_rules;
@@ -52,14 +53,9 @@ window.connector_edit_popup = new class {
 			document.getElementById(id).addEventListener('change', () => this.#updateForm());
 		}
 
-		this.overlay.$dialogue.$footer[0].querySelector('.js-submit')
-			.addEventListener('click', () => this.#submit());
-
-		this.overlay.$dialogue.$footer[0].querySelector('.js-clone')
-			?.addEventListener('click', () => this.#clone());
-
-		this.overlay.$dialogue.$footer[0].querySelector('.js-delete')
-			?.addEventListener('click', () => this.#delete());
+		this.footer.querySelector('.js-submit').addEventListener('click', () => this.#submit());
+		this.footer.querySelector('.js-clone')?.addEventListener('click', () => this.#clone());
+		this.footer.querySelector('.js-delete')?.addEventListener('click', () => this.#delete());
 	}
 
 	#updateForm() {
@@ -117,8 +113,7 @@ window.connector_edit_popup = new class {
 		this.overlay.unsetLoading();
 		this.overlay.setProperties({title, buttons});
 
-		this.overlay.$dialogue.$footer[0].querySelector('.js-submit')
-			.addEventListener('click', () => this.#submit());
+		this.footer.querySelector('.js-submit').addEventListener('click', () => this.#submit());
 
 		this.overlay.recoverFocus();
 		this.overlay.containFocus();
