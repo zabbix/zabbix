@@ -100,7 +100,7 @@ static int	hk_table_cleanup(const char *table, const char *filter, int config_ma
 {
 	int	ret = hk_delete_from_table(table, filter, config_max_hk_delete);
 
-	if (ZBX_DB_OK > ret || (0 != config_max_hk_delete && ret >= config_max_hk_delete))
+	if (ZBX_DB_OK > ret || (0 != config_max_hk_delete && ret == config_max_hk_delete))
 		*more = 1;
 
 	return ZBX_DB_OK <= ret ? ret : 0;
