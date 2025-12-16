@@ -373,4 +373,20 @@ class CItemHelper extends CItemGeneralHelper {
 
 		return $items;
 	}
+
+	public static function convertFormInputForApi(array $input): array {
+		if ($input['history_mode'] == ITEM_STORAGE_OFF) {
+			$input['history'] = ITEM_NO_STORAGE_VALUE;
+		}
+
+		if ($input['trends_mode'] == ITEM_STORAGE_OFF) {
+			$input['trends'] = ITEM_NO_STORAGE_VALUE;
+		}
+
+		if ($input['request_method'] == HTTPCHECK_REQUEST_HEAD) {
+			$input['retrieve_mode'] = HTTPTEST_STEP_RETRIEVE_MODE_HEADERS;
+		}
+
+		return parent::convertFormInputForApi($input);
+	}
 }

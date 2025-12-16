@@ -41,8 +41,10 @@ $formgrid = (new CFormGrid())
 			])
 		]),
 		new CFormField(getItemPreprocessing($preprocessing, $data['readonly'], $data['preprocessing_types']))
-	])
-	->addItem([
+	]);
+
+if (array_key_exists('value_types', $data)) {
+	$formgrid->addItem([
 		(new CLabel(_('Type of information'), 'label-value-type-steps'))
 			->addClass('js-item-preprocessing-type'),
 		(new CFormField((new CSelect('value_type_steps'))
@@ -52,5 +54,6 @@ $formgrid = (new CFormGrid())
 			->setReadonly($data['readonly'])
 		))->addClass('js-item-preprocessing-type')
 	]);
+}
 
 $formgrid->show();

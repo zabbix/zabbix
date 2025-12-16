@@ -176,8 +176,9 @@ foreach ($data['graphs'] as $graph) {
 
 	if ($graph['discoveryRule']) {
 		$name[] = (new CLink($graph['discoveryRule']['name'],
-			(new CUrl('host_discovery.php'))
-				->setArgument('form', 'update')
+			(new CUrl('zabbix.php'))
+				->setArgument('action', 'popup')
+				->setArgument('popup', 'lldrule.edit')
 				->setArgument('itemid', $graph['discoveryRule']['itemid'])
 				->setArgument('context', $data['context'])
 		))

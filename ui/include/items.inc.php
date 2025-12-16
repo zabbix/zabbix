@@ -567,12 +567,14 @@ function makeItemTemplatePrefix($itemid, array $parent_templates, $flag, bool $p
 	if ($provide_links && $template['permission'] == PERM_READ_WRITE) {
 		if ($flag & ZBX_FLAG_DISCOVERY_RULE) {
 			if ($flag & ZBX_FLAG_DISCOVERY_PROTOTYPE) {
-				$url = (new CUrl('host_discovery_prototypes.php'))
+				$url = (new CUrl('zabbix.php'))
+					->setArgument('action', 'lldrule.prototype.list')
 					->setArgument('parent_discoveryid', $parent_templates['links'][$itemid]['lld_ruleid'])
 					->setArgument('context', 'template');
 			}
 			else {
-				$url = (new CUrl('host_discovery.php'))
+				$url = (new CUrl('zabbix.php'))
+					->setArgument('action', 'lldrule.list')
 					->setArgument('filter_set', '1')
 					->setArgument('filter_hostids', [$template['hostid']])
 					->setArgument('context', 'template');
@@ -628,17 +630,19 @@ function makeItemTemplatesHtml($itemid, array $parent_templates, $flag, bool $pr
 		if ($provide_links && $template['permission'] == PERM_READ_WRITE) {
 			if ($flag & ZBX_FLAG_DISCOVERY_RULE) {
 				if ($flag & ZBX_FLAG_DISCOVERY_PROTOTYPE) {
-					$url = (new CUrl('host_discovery_prototypes.php'))
-						->setArgument('form', 'update')
+					$url = (new CUrl('zabbix.php'))
+						->setArgument('action', 'lldrule.prototype.edit')
 						->setArgument('itemid', $parent_templates['links'][$itemid]['itemid'])
 						->setArgument('parent_discoveryid', $parent_templates['links'][$itemid]['lld_ruleid'])
 						->setArgument('context', 'template');
 				}
 				else {
-					$url = (new CUrl('host_discovery.php'))
-						->setArgument('form', 'update')
-						->setArgument('itemid', $parent_templates['links'][$itemid]['itemid'])
-						->setArgument('context', 'template');
+					$url = (new CUrl('zabbix.php'))
+						->setArgument('action', 'popup')
+						->setArgument('popup', 'lldrule.edit')
+						->setArgument('context', 'template')
+						->setArgument('hostid', $parent_templates['links'][$itemid]['hostid'])
+						->setArgument('itemid', $parent_templates['links'][$itemid]['itemid']);
 				}
 			}
 			else {

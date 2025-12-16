@@ -48,8 +48,8 @@ class TabIndicators {
 		const AUTHENTICATION = document.querySelector('#authentication-form');
 		const GRAPH = document.querySelector('form.dashboard-widget-svggraph');
 		const HOST = document.querySelector('#host-form');
-		const HOST_DISCOVERY = document.querySelector('#host-discovery-form');
-		const HOST_PROTOTYPE = document.querySelector('#host-prototype-form');
+		const HOST_DISCOVERY = document.querySelector('#lldrule-form');
+		const HOST_PROTOTYPE = document.querySelector('#lldrule-prototype-form');
 		const ITEM = document.querySelector('#item-form');
 		const ITEM_PROTOTYPE = document.querySelector('#item-prototype-form');
 		const MAP = document.querySelector('#sysmap-form');

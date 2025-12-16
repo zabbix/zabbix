@@ -538,7 +538,8 @@ foreach ($data['hosts'] as $host) {
 		],
 		[
 			new CLink(_('Discovery'),
-				(new CUrl('host_discovery.php'))
+				(new CUrl('zabbix.php'))
+					->setArgument('action', 'lldrule.list')
 					->setArgument('filter_set', '1')
 					->setArgument('filter_hostids', [$host['hostid']])
 					->setArgument('context', 'host')

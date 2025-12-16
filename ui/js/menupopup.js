@@ -281,7 +281,8 @@ function getMenuPopupHost(options, trigger_element) {
 			});
 
 			// discovery
-			url = new Curl('host_discovery.php');
+			url = new Curl('zabbix.php');
+			url.setArgument('action', 'lldrule.list');
 			url.setArgument('filter_set', '1');
 			url.setArgument('filter_hostids[]', options.hostid);
 			url.setArgument('context', 'host');
@@ -1175,8 +1176,8 @@ function getMenuPopupItem(options) {
 			});
 		}
 
-		url = new Curl('host_discovery.php');
-		url.setArgument('form', 'create');
+		url = new Curl('zabbix.php');
+		url.setArgument('action', 'lldrule.edit');
 		url.setArgument('hostid', options.hostid);
 		url.setArgument('type', 18); // ITEM_TYPE_DEPENDENT
 		url.setArgument('master_itemid', options.itemid);

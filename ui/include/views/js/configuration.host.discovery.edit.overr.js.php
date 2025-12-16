@@ -160,6 +160,17 @@
 				does_not_contain:           <?= json_encode(_('does not contain')) ?>,
 				matches:                    <?= json_encode(_('matches')) ?>,
 				does_not_match:             <?= json_encode(_('does not match')) ?>
+			},
+			appendFormData: function (form_element) {
+				var hidden_form = form_element.querySelector('#hidden-form');
+
+				hidden_form && hidden_form.remove();
+				hidden_form = document.createElement('div');
+				hidden_form.id = 'hidden-form';
+
+				hidden_form.appendChild(lldoverrides.overrides.toFragment());
+
+				form_element.appendChild(hidden_form);
 			}
 		};
 
@@ -179,18 +190,6 @@
 		window.lldoverrides.actions = ['opstatus', 'opdiscover', 'opperiod', 'ophistory', 'optrends', 'opseverity',
 			'optag', 'optemplate', 'opinventory'
 		];
-
-		window.lldoverrides.$form = $('form[name="itemForm"]').on('submit', function(e) {
-			var hidden_form = this.querySelector('#hidden-form');
-
-			hidden_form && hidden_form.remove();
-			hidden_form = document.createElement('div');
-			hidden_form.id = 'hidden-form';
-
-			hidden_form.appendChild(lldoverrides.overrides.toFragment());
-
-			this.appendChild(hidden_form);
-		});
 	});
 
 	/**
@@ -224,6 +223,7 @@
 		var input = window.document.createElement('input');
 
 		input.type = 'hidden';
+		input.setAttribute('data-field-type', 'hidden');
 		input.value = value;
 		input.name = prefix ? prefix + '[' + name + ']' : name;
 
