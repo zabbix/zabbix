@@ -12,8 +12,8 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-#ifndef ZABBIX_RESOLVER_THREAD_H
-#define ZABBIX_RESOLVER_THREAD_H
+#ifndef ZABBIX_RESOLVER_H
+#define ZABBIX_RESOLVER_H
 #include "config.h"
 #ifdef HAVE_ARES_QUERY_CACHE
 #include <ares.h>
