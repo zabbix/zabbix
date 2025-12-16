@@ -144,10 +144,17 @@ window.widget_form = new class extends CWidgetForm {
 			? ''
 			: 'none';
 
-		document.getElementById('item-aggregate-function-warning').style.display =
-				aggregate_warning_functions.includes(parseInt(aggregate_function.value)) && !this.#is_item_numeric
-			? ''
-			: 'none';
+		const show_numeric_items_warning = aggregate_warning_functions.includes(parseInt(aggregate_function.value))
+			&& !this.#is_item_numeric;
+		const show_sparkline_warning = aggregate_function.value != <?= AGGREGATE_NONE ?> && this._show_sparkline.checked;
+		const show_combined_warning = show_numeric_items_warning && show_sparkline_warning;
+
+		document.getElementById('combined-warning').style.display = show_combined_warning ? '' : 'none';
+
+		document.getElementById('numeric-items-warning').style.display = !show_combined_warning
+			&& show_numeric_items_warning ? '' : 'none';
+		document.getElementById('sparkline-warning').style.display = !show_combined_warning
+			&& show_sparkline_warning ? '' : 'none';
 
 		document.getElementById('item-thresholds-warning').style.display = this.#is_item_numeric ? 'none' : '';
 	}

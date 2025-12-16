@@ -222,8 +222,7 @@ static void	populate_function_items(const zbx_vector_uint64_t *functionids, zbx_
 		zbx_hashset_insert(ifuncs, &ifunc_local, sizeof(ifunc_local));
 	}
 
-	zbx_dc_config_clean_functions(functions, errcodes, functionids->values_num);
-
+	zbx_dc_config_clean_functions(functions, functionids->values_num);
 	zbx_free(errcodes);
 	zbx_free(functions);
 

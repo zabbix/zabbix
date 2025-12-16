@@ -2906,7 +2906,7 @@ class testDashboardGraphWidget extends testWidgets {
 				$this->assertFalse($this->query('id:lefty_static_units')->one()->isEnabled());
 				break;
 
-			case 'Both';
+			case 'Both':
 				$this->assertEnabledFields($lefty_fields, true);
 				$this->assertEnabledFields($righty_fields, true);
 				$this->assertFalse($this->query('id:righty_static_units')->one()->isEnabled());

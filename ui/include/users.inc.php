@@ -75,46 +75,6 @@ function user_auth_type2str($authType) {
 }
 
 /**
- * Get users ids by groups ids.
- *
- * @param array $userGroupIds
- *
- * @return array
- */
-function get_userid_by_usrgrpid($userGroupIds) {
-	zbx_value2array($userGroupIds);
-
-	$userIds = [];
-
-	$dbUsers = DBselect(
-		'SELECT DISTINCT u.userid'.
-		' FROM users u,users_groups ug'.
-		' WHERE u.userid=ug.userid'.
-			' AND '.dbConditionInt('ug.usrgrpid', $userGroupIds)
-	);
-	while ($user = DBFetch($dbUsers)) {
-		$userIds[$user['userid']] = $user['userid'];
-	}
-
-	return $userIds;
-}
-
-/**
- * Check if group has permissions for update.
- *
- * @param array $userGroupIds
- *
- * @return bool
- */
-function granted2update_group($userGroupIds) {
-	zbx_value2array($userGroupIds);
-
-	$users = get_userid_by_usrgrpid($userGroupIds);
-
-	return !isset($users[CWebUser::$data['userid']]);
-}
-
-/**
  * Gets user full name in format "username (name surname)". If both name and surname exist, returns translated string.
  *
  * @param array  $userData

@@ -19,7 +19,7 @@ require_once __DIR__.'/../common/testWidgets.php';
 /**
  * @backup settings, hstgrp, widget
  *
- * @dataSource UserPermissions
+ * @dataSource UserPermissions, MonitoringOverview
  *
  * @onBefore prepareDashboardData, prepareProblemsData
  */

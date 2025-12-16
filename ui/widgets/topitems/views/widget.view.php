@@ -133,9 +133,13 @@ function makeTableCellViewsNumeric(array $cell, array $data, $formatted_value, b
 	$column = $data['configuration'][$cell[Widget::CELL_METADATA]['column_index']];
 	$color = $column['base_color'];
 
-	$value_cell = (new CCol(new CDiv($formatted_value)))
-		->addClass(ZBX_STYLE_CURSOR_POINTER)
-		->addClass(ZBX_STYLE_NOWRAP);
+	$value_cell = new CCol(new CDiv($formatted_value));
+	$value_cell->addClass(ZBX_STYLE_NOWRAP);
+
+	$combined = $item['combined'] ?? false;
+	if (!$combined) {
+		$value_cell->addClass(ZBX_STYLE_CURSOR_POINTER);
+	}
 
 	if ($value !== '') {
 		$value_cell->setHint((new CDiv($value))->addClass(ZBX_STYLE_HINTBOX_WRAP), '', false);
@@ -193,6 +197,8 @@ function makeTableCellViewsNumeric(array $cell, array $data, $formatted_value, b
 
 			return [new CCol($bar_gauge), $value_cell];
 	}
+
+	return [];
 }
 
 function makeTableCellViewFormattedValue(array $cell, array $data): CSpan {
@@ -217,8 +223,11 @@ function makeTableCellViewFormattedValue(array $cell, array $data): CSpan {
 		);
 	}
 
-	return (new CSpan($formatted_value))
-		->setMenuPopup(
+	$span = (new CSpan($formatted_value));
+
+	$combined = $item['combined'] ?? false;
+	if (!$combined) {
+		$span->setMenuPopup(
 			CMenuPopupHelper::getItem([
 				'itemid' => $itemid,
 				'context' => 'host',
@@ -227,6 +236,9 @@ function makeTableCellViewFormattedValue(array $cell, array $data): CSpan {
 					->getUrl()
 			])
 		);
+	}
+
+	return $span;
 }
 
 function makeTableCellViewsText(array $cell, array $data, $formatted_value, bool $is_view_value): array {
@@ -236,7 +248,7 @@ function makeTableCellViewsText(array $cell, array $data, $formatted_value, bool
 	$color = '';
 	if (array_key_exists('highlights', $column)) {
 		foreach ($column['highlights'] as $highlight) {
-			if (@preg_match('('.$highlight['pattern'].')', $value)) {
+			if (@preg_match('/'.CRegexHelper::handleSlashEscaping($highlight['pattern']).'/', $value)) {
 				$color = $highlight['color'];
 				break;
 			}

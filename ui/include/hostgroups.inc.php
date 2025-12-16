@@ -15,21 +15,6 @@
 
 
 /**
- * Check if user has write permissions for host groups.
- *
- * @param array $groupids
- *
- * @return bool
- */
-function isWritableHostGroups(array $groupids) {
-	return count($groupids) == API::HostGroup()->get([
-		'countOutput' => true,
-		'groupids' => $groupids,
-		'editable' => true
-	]);
-}
-
-/**
  * Get sub-groups of selected host groups or template groups.
  *
  * @param array  $groupids

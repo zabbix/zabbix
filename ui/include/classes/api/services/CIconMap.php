@@ -491,7 +491,6 @@ class CIconMap extends CApiService {
 
 		self::validateDelete($iconmapids, $db_iconmaps);
 
-		DB::delete('icon_mapping', ['iconmapid' => $iconmapids]);
 		DB::delete('icon_map', ['iconmapid' => $iconmapids]);
 
 		self::addAuditLog(CAudit::ACTION_DELETE, CAudit::RESOURCE_ICON_MAP, $db_iconmaps);

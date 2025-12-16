@@ -549,8 +549,8 @@ static void	get_pinger_hosts(zbx_hashset_t *pinger_items, int config_timeout)
 
 static int	fping_host_compare(const void *d1, const void *d2)
 {
-	const zbx_fping_host_t        *h1 = (const zbx_fping_host_t *)d1;
-	const zbx_fping_host_t        *h2 = (const zbx_fping_host_t *)d2;
+	const zbx_fping_host_t	*h1 = (const zbx_fping_host_t *)d1;
+	const zbx_fping_host_t	*h2 = (const zbx_fping_host_t *)d2;
 
 	return strcmp(h1->addr, h2->addr);
 }

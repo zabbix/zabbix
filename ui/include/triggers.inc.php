@@ -88,16 +88,6 @@ function get_trigger_by_triggerid($triggerid) {
 	return false;
 }
 
-function get_triggers_by_hostid($hostid) {
-	return DBselect(
-		'SELECT DISTINCT t.*'.
-		' FROM triggers t,functions f,items i'.
-		' WHERE i.hostid='.zbx_dbstr($hostid).
-			' AND f.itemid=i.itemid'.
-			' AND f.triggerid=t.triggerid'
-	);
-}
-
 /**
  * Prepare arrays containing only hosts and triggers that will be shown results table.
  *

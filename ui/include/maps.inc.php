@@ -1198,56 +1198,6 @@ function processAreasCoordinates(array &$map, array $areas, array $mapInfo) {
 }
 
 /**
- * Calculates area connector point on area perimeter
- *
- * @param int $ax      x area coordinate
- * @param int $ay      y area coordinate
- * @param int $aWidth  area width
- * @param int $aHeight area height
- * @param int $x2      x coordinate of connector second element
- * @param int $y2      y coordinate of connector second element
- *
- * @return array contains two values, x and y coordinates of new area connector point
- */
-function calculateMapAreaLinkCoord($ax, $ay, $aWidth, $aHeight, $x2, $y2) {
-	$dY = abs($y2 - $ay);
-	$dX = abs($x2 - $ax);
-
-	$halfHeight = $aHeight / 2;
-	$halfWidth = $aWidth / 2;
-
-	if ($dY == 0) {
-		$ay = $y2;
-		$ax = ($x2 < $ax) ? $ax - $halfWidth : $ax + $halfWidth;
-	}
-	elseif ($dX == 0) {
-		$ay = ($y2 > $ay) ? $ay + $halfHeight : $ay - $halfHeight;
-		$ax = $x2;
-	}
-	else {
-		$koef = $halfHeight / $dY;
-
-		$c = $dX * $koef;
-
-		// If point is further than area diagonal, we should use calculations with width instead of height.
-		if (($halfHeight / $c) > ($halfHeight / $halfWidth)) {
-			$ay = ($y2 > $ay) ? $ay + $halfHeight : $ay - $halfHeight;
-			$ax = ($x2 < $ax) ? $ax - $c : $ax + $c;
-		}
-		else {
-			$koef = $halfWidth / $dX;
-
-			$c = $dY * $koef;
-
-			$ay = ($y2 > $ay) ? $ay + $c : $ay - $c;
-			$ax = ($x2 < $ax) ? $ax - $halfWidth : $ax + $halfWidth;
-		}
-	}
-
-	return [$ax, $ay];
-}
-
-/**
  * Get icon id by mapping.
  *
  * @param array $icon_map

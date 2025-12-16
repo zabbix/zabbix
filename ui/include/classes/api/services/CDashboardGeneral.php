@@ -108,8 +108,6 @@ abstract class CDashboardGeneral extends CApiService {
 			if ($db_widgets) {
 				self::deleteWidgets(array_keys($db_widgets));
 			}
-
-			DB::delete('dashboard_page', ['dashboard_pageid' => array_keys($db_dashboard_pages)]);
 		}
 
 		DB::delete('dashboard', ['dashboardid' => $dashboardids]);

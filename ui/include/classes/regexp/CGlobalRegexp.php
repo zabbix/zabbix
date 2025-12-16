@@ -103,7 +103,7 @@ class CGlobalRegexp {
 			}
 		}
 		else {
-			$result = (bool) @preg_match('/'.str_replace('/', '\/', $this->expression).'/', $string);
+			$result = (bool) @preg_match('/'.CRegexHelper::handleSlashEscaping($this->expression).'/', $string);
 		}
 
 		return $result;
@@ -137,29 +137,11 @@ class CGlobalRegexp {
 	 * @return bool
 	 */
 	private static function _matchRegular(array $expression, $string) {
-		$pattern = self::buildRegularExpression($expression);
+		$expected = $expression['expression_type'] == EXPRESSION_TYPE_TRUE;
+		$pattern = '/'.CRegexHelper::handleSlashEscaping($expression['expression']).'/';
+		$pattern .= $expression['case_sensitive'] ? 'm' : 'mi';
 
-		$expectedResult = ($expression['expression_type'] == EXPRESSION_TYPE_TRUE);
-
-		return preg_match($pattern, $string) == $expectedResult;
-	}
-
-	/**
-	 * Combines regular expression provided as definition array into a string.
-	 *
-	 * @param array $expression
-	 *
-	 * @return string
-	 */
-	private static function buildRegularExpression(array $expression) {
-		$expression['expression'] = str_replace('/', '\/', $expression['expression']);
-
-		$pattern = '/'.$expression['expression'].'/m';
-		if (!$expression['case_sensitive']) {
-			$pattern .= 'i';
-		}
-
-		return $pattern;
+		return preg_match($pattern, $string) == $expected;
 	}
 
 	/**

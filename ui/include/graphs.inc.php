@@ -117,18 +117,6 @@ function getGraphDims($graphid = null) {
 	return $graphDims;
 }
 
-function getGraphByGraphId($graphId) {
-	$dbGraph = DBfetch(DBselect('SELECT g.* FROM graphs g WHERE g.graphid='.zbx_dbstr($graphId)));
-
-	if ($dbGraph) {
-		return $dbGraph;
-	}
-
-	error(_s('No graph item with graph ID "%1$s".', $graphId));
-
-	return false;
-}
-
 /**
  * Get parent templates for each given graph.
  *

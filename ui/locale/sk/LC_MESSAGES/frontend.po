@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2025-10-27 13:05+0000\n"
+"PO-Revision-Date: 2025-12-03 10:32+0000\n"
 "Last-Translator: Tomáš Heřmánek <tomas.hermanek@initmax.cz>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: sk\n"
@@ -4343,7 +4343,7 @@ msgstr "Nie je možné nastaviť \"Agregáciu množiny údajov\", keď je do gra
 
 #: include/classes/db/MysqlDbBackend.php:197
 msgid "Cannot set charset."
-msgstr ""
+msgstr "Nie je možné nastaviť znakovú sadu."
 
 #: include/classes/api/services/CItemGeneral.php:2478
 #, c-format
@@ -9430,7 +9430,7 @@ msgstr "Kontrolný súčet súboru vypočítaný algoritmom cksum UNIX. Vráti c
 
 #: include/classes/validators/CFormValidator.php:1451 jsLoader.php:445
 msgid "File format is unsupported."
-msgstr ""
+msgstr "Formát súboru nie je podporovaný."
 
 #: include/classes/import/readers/CYamlImportReader.php:52
 msgid "File is empty"
@@ -9452,7 +9452,7 @@ msgstr "Veľkosť súboru v bajtoch (predvolené) alebo v nových riadkoch. Vrá
 #: include/classes/helpers/CUploadFile.php:129 jsLoader.php:444
 #, c-format
 msgid "File size must be less than %1$s."
-msgstr ""
+msgstr "Veľkosť súboru musí byť menšia ako %1$s."
 
 #: include/classes/data/CItemData.php:1687
 msgid "File time information. Returns integer (Unix timestamp)"
@@ -12308,15 +12308,15 @@ msgstr "Zdedené a hostiteľské prototypové makrá"
 
 #: include/classes/helpers/CTagHelper.php:230
 msgid "Inherited and host tag"
-msgstr ""
+msgstr "Zdedený tag a tag hosta"
 
 #: app/partials/configuration.tags.tab.php:42
 msgid "Inherited and host tags"
-msgstr ""
+msgstr "Zdedený tagy a tagy hosta"
 
 #: include/classes/helpers/CTagHelper.php:231
 msgid "Inherited and item tag"
-msgstr ""
+msgstr "Zdedený tag a item tag"
 
 #: app/partials/configuration.tags.tab.php:165
 msgid "Inherited and item tags"
@@ -12332,15 +12332,15 @@ msgstr "Zdedené makrá šablón"
 
 #: include/classes/helpers/CTagHelper.php:229
 msgid "Inherited and template tag"
-msgstr ""
+msgstr "Zdedený tag a šablóna tagu"
 
 #: app/partials/configuration.tags.tab.php:33
 msgid "Inherited and template tags"
-msgstr ""
+msgstr "Zdedený tag a šablóna tagov"
 
 #: include/classes/helpers/CTagHelper.php:232
 msgid "Inherited and trigger tag"
-msgstr ""
+msgstr "Zdedený tag a tag spúšťača"
 
 #: app/partials/configuration.tags.tab.php:155
 msgid "Inherited and trigger tags"
@@ -12348,7 +12348,7 @@ msgstr "Zdedené a trigger tagy"
 
 #: include/classes/helpers/CTagHelper.php:233
 msgid "Inherited and web scenario tag"
-msgstr ""
+msgstr "Zdedený web scenár a tag web scenára"
 
 #: include/forms.inc.php:311
 msgid "Inherited items"
@@ -12356,7 +12356,7 @@ msgstr "Zdedené položky"
 
 #: include/classes/helpers/CTagHelper.php:222
 msgid "Inherited tag"
-msgstr ""
+msgstr "Zdedený tag"
 
 #: widgets/geomap/includes/WidgetForm.php:62
 msgid "Initial view"
@@ -22012,7 +22012,7 @@ msgstr "Oprávnenia šablóny"
 
 #: app/partials/configuration.tags.tab.php:33
 msgid "Template tags"
-msgstr ""
+msgstr "Tagy šablóny"
 
 #: report2.php:398
 msgid "Template trigger"
@@ -22528,7 +22528,7 @@ msgstr "Táto hodnota nezodpovedá vzoru."
 
 #: jsLoader.php:442
 msgid "This value is not a valid file."
-msgstr ""
+msgstr "Táto hodnota nie je platný súbor."
 
 #: include/classes/validators/CFormValidator.php:874 jsLoader.php:424
 msgid "This value is not a valid floating-point value."
