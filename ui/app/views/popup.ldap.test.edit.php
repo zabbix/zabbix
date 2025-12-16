@@ -47,15 +47,21 @@ if ($data['ldap_config']['provision_status'] == JIT_PROVISIONING_ENABLED) {
 	$formgrid
 		->addItem([
 			new CLabel(_('User role')),
-			(new CFormField((new CSpan(_('No value')))->addClass(ZBX_STYLE_DISABLED)))->setId('provisioning_role')
+			(new CFormField((new CSpan(_('No value')))->addClass(ZBX_STYLE_DISABLED)))
+				->addClass(ZBX_STYLE_TAGS_WRAPPER)
+				->setId('provisioning_role')
 		])
 		->addItem([
 			new CLabel(_('User groups')),
-			(new CFormField((new CSpan(_('No value')))->addClass(ZBX_STYLE_DISABLED)))->setId('provisioning_groups')
+			(new CFormField((new CSpan(_('No value')))->addClass(ZBX_STYLE_DISABLED)))
+				->addClass(ZBX_STYLE_TAGS_WRAPPER)
+				->setId('provisioning_groups')
 		])
 		->addItem([
 			new CLabel(_('Media type')),
-			(new CFormField((new CSpan(_('No value')))->addClass(ZBX_STYLE_DISABLED)))->setId('provisioning_medias')
+			(new CFormField((new CSpan(_('No value')))->addClass(ZBX_STYLE_DISABLED)))
+				->addClass(ZBX_STYLE_TAGS_WRAPPER)
+				->setId('provisioning_medias')
 		]);
 }
 

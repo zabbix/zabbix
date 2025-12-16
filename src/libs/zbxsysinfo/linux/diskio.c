@@ -371,7 +371,7 @@ static void	process_entry(struct dirent *entries, zbx_stat_t *stat_buf, int sysf
 			zbx_json_addobject(j, NULL);
 			zbx_json_addstring(j, "{#DEVNAME}", entries->d_name, ZBX_JSON_TYPE_STRING);
 			zbx_json_addstring(j, "{#DEVTYPE}", 1 == devtype_found ? tmp + offset :
-					(1 == uevent_found ? sys_blkdev_pfx_uevent : ""),
+					(1 == uevent_found ? sys_blkdev_pfx_uevent + offset : ""),
 					ZBX_JSON_TYPE_STRING);
 			zbx_json_close(j);
 		}

@@ -57,6 +57,7 @@ void			zbx_async_manager_requeue(zbx_async_manager_t *manager, zbx_uint64_t item
 					int lastclock);
 void			zbx_async_manager_requeue_flush(zbx_async_manager_t *manager);
 void			zbx_async_manager_interfaces_flush(zbx_async_manager_t *manager, zbx_hashset_t *interfaces);
+void			zbx_interface_status_clean_wrapper(void *data);
 void			zbx_interface_status_clean(zbx_interface_status_t *interface_status);
 void			zbx_interface_status_free(zbx_interface_status_t *interface_status);
 void			zbx_poller_item_free(zbx_poller_item_t *poller_item);
