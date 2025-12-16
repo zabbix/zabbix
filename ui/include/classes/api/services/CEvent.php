@@ -112,6 +112,9 @@ class CEvent extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
+		$options['has_filter_cause_eventid'] = $options['filter'] !== null
+			&& array_key_exists('cause_eventid', $options['filter']) && $options['filter']['cause_eventid'] !== null;
+
 		if (($options['source'] == EVENT_SOURCE_TRIGGERS && $options['object'] == EVENT_OBJECT_TRIGGER)
 				|| ($options['source'] == EVENT_SOURCE_SERVICE && $options['object'] == EVENT_OBJECT_SERVICE)) {
 			if ($options['value'] === null) {
@@ -376,24 +379,23 @@ class CEvent extends CApiService {
 			')';
 		}
 
-		// suppressed
-		if ($options['suppressed'] !== null) {
-			$sql_parts['where'][] = (!$options['suppressed'] ? 'NOT ' : '').
-				'EXISTS ('.
-					'SELECT NULL'.
-					' FROM event_suppress es'.
-					' WHERE es.eventid=e.eventid'.
-				')';
+		if ($options['suppressed'] === true) {
+			$sql_parts['join']['esup'] = ['table' => 'event_suppress', 'using' => 'eventid'];
+		}
+		elseif ($options['suppressed'] === false) {
+			$sql_parts['join']['esup'] = ['type' => 'left', 'table' => 'event_suppress', 'using' => 'eventid'];
+			$sql_parts['where'][] = 'esup.eventid IS NULL';
 		}
 
-		// symptom
-		if ($options['symptom'] !== null) {
-			$sql_parts['where'][] = (!$options['symptom'] ? 'NOT ' : '').
-				'EXISTS ('.
-					'SELECT NULL'.
-					' FROM event_symptom es'.
-					' WHERE es.eventid=e.eventid'.
-				')';
+		if ($options['symptom'] === true || $options['has_filter_cause_eventid']) {
+			$sql_parts['join']['es'] = ['table' => 'event_symptom', 'using' => 'eventid'];
+		}
+		elseif ($options['symptom'] === false) {
+			$sql_parts['join']['es'] = ['type' => 'left', 'table' => 'event_symptom', 'using' => 'eventid'];
+		}
+
+		if ($options['symptom'] === false) {
+			$sql_parts['where'][] = 'es.eventid IS NULL';
 		}
 
 		// tags
@@ -429,7 +431,7 @@ class CEvent extends CApiService {
 		}
 
 		// filter
-		if (is_array($options['filter'])) {
+		if ($options['filter'] !== null) {
 			$this->applyFilters($options, $sql_parts);
 		}
 
@@ -559,7 +561,7 @@ class CEvent extends CApiService {
 	 */
 	private function applyFilters(array $options, array &$sql_parts): void {
 		// Filter symptom events for given cause.
-		if (array_key_exists('cause_eventid', $options['filter']) && $options['filter']['cause_eventid'] !== null) {
+		if ($options['has_filter_cause_eventid']) {
 			$sql_parts['join']['es'] = ['table' => 'event_symptom', 'using' => 'eventid'];
 			$sql_parts['where']['es'] = dbConditionId('es.cause_eventid', $options['filter']['cause_eventid']);
 		}
@@ -598,14 +600,24 @@ class CEvent extends CApiService {
 			$sql_parts = $this->addQuerySelect('e.objectid', $sql_parts);
 		}
 
-		$left_join_symptom = false;
-		if ($this->outputIsRequested('cause_eventid', $options['output'])) {
-			$sql_parts['select']['cause_eventid'] = 'es1.cause_eventid';
-			$left_join_symptom = true;
+		if ($this->outputIsRequested('suppressed', $options['output'])) {
+			if ($options['suppressed'] === true) {
+				$sql_parts['select'][] = zbx_dbstr((string) ZBX_PROBLEM_SUPPRESSED_TRUE).' AS suppressed';
+				$sql_parts['join']['esup'] = ['table' => 'event_suppress', 'using' => 'eventid'];
+			}
+			else {
+				$sql_parts['select'][] = 'CASE WHEN esup.eventid IS NULL'.
+					' THEN '.zbx_dbstr((string) ZBX_PROBLEM_SUPPRESSED_FALSE).
+					' ELSE '.zbx_dbstr((string) ZBX_PROBLEM_SUPPRESSED_TRUE).' END AS suppressed';
+				$sql_parts['join']['esup'] = ['type' => 'left', 'table' => 'event_suppress', 'using' => 'eventid'];
+			}
 		}
 
-		if ($left_join_symptom) {
-			$sql_parts['join']['es1'] = ['type' => 'left', 'table' => 'event_symptom', 'using' => 'eventid'];
+		if ($this->outputIsRequested('cause_eventid', $options['output'])) {
+			$sql_parts['select']['cause_eventid'] = 'es.cause_eventid';
+			$sql_parts['join']['es'] = $options['symptom'] === true || $options['has_filter_cause_eventid']
+				? ['table' => 'event_symptom', 'using' => 'eventid']
+				: ['type' => 'left', 'table' => 'event_symptom', 'using' => 'eventid'];
 		}
 
 		return $sql_parts;
@@ -655,7 +667,6 @@ class CEvent extends CApiService {
 		self::addRelatedObject($options, $result);
 		$this->addRelatedOpdata($options, $result);
 		self::addRelatedSuppressionData($options, $result);
-		$this->addRelatedSuppressed($options, $result);
 		self::addRelatedTags($options, $result);
 		$this->addRelatedUrls($options, $result);
 
@@ -889,37 +900,6 @@ class CEvent extends CApiService {
 			unset($db_suppression_data['event_suppressid'], $db_suppression_data['eventid']);
 
 			$result[$eventid]['suppression_data'][] = $db_suppression_data;
-		}
-	}
-
-	private function addRelatedSuppressed(array $options, array &$result): void {
-		if (!$this->outputIsRequested('suppressed', $options['output'])) {
-			return;
-		}
-
-		if ($options['selectSuppressionData'] !== null) {
-			foreach ($result as &$row) {
-				$row['suppressed'] = $row['suppression_data']
-					? (string) ZBX_PROBLEM_SUPPRESSED_TRUE
-					: (string) ZBX_PROBLEM_SUPPRESSED_FALSE;
-			}
-			unset($row);
-		}
-		else {
-			foreach ($result as &$row) {
-				$row['suppressed'] = (string) ZBX_PROBLEM_SUPPRESSED_FALSE;
-			}
-			unset($row);
-
-			$sql_options = [
-				'output' => ['eventid'],
-				'filter' => ['eventid' => array_keys($result)]
-			];
-			$db_event_suppress = DBselect(DB::makeSql('event_suppress', $sql_options));
-
-			while ($db_suppression_data = DBfetch($db_event_suppress)) {
-				$result[$db_suppression_data['eventid']]['suppressed'] = (string) ZBX_PROBLEM_SUPPRESSED_TRUE;
-			}
 		}
 	}
 
