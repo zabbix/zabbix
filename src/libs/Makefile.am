@@ -90,7 +90,7 @@ DIST_SUBDIRS = \
 	zbxvmware \
 	zbxprof \
 	zbxxml \
-	zbxresolverthread
+	zbxresolver
 
 if SERVER
 SERVER_SUBDIRS = \
@@ -270,7 +270,7 @@ SUBDIRS = \
 	zbxversion \
 	zbxxml \
 	zbxagentget \
-	zbxresolverthread \
+	zbxresolver \
 	$(PROXY_SUBDIRS) \
 	$(SERVER_SUBDIRS) \
 	$(AGENT_SUBDIRS)

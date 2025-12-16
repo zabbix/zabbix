@@ -25,7 +25,7 @@
 #include "zbxip.h"
 #include "zbxtime.h"
 #include "zbxcrypto.h"
-#include "resolver_thread.h"
+#include "zbxresolver.h"
 
 #ifdef _WINDOWS
 #	ifndef _WIN32_WINNT_WIN7

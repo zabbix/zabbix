@@ -54,7 +54,7 @@
 #	include "zbxipcservice.h"
 #endif
 #ifdef HAVE_ARES_QUERY_CACHE
-#include "resolver_thread.h"
+#include "zbxresolver.h"
 #endif
 
 #define ZBX_MAX_SECTION_ENTRIES		4

@@ -16,7 +16,7 @@
 
 #ifdef HAVE_ARES_QUERY_CACHE
 #define ZBX_SOCKET_STRERROR_LEN	512
-#include "resolver_thread.h"
+#include "zbxresolver.h"
 #include "zbxtypes.h"
 #include "zbxstr.h"
 
