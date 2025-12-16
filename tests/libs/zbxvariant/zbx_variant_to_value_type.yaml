@@ -84,7 +84,7 @@ out:
   return: ""
   ret: SUCCEED
 ---
-test case: 9. invalid JSON empty string converted fine to JSON, as there is no JSON validation in variant convert
+test case: 9. invalid JSON string converted fine to JSON, as there is no JSON validation in variant convert
 in:
   value:
     type: ZBX_VARIANT_STR
