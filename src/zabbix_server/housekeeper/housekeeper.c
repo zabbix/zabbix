@@ -88,8 +88,7 @@ static hk_cleanup_table_t	hk_item_cleanup_order[] = {
  * Purpose: perform generic table cleanup                                     *
  *                                                                            *
  * Parameters: table                - [IN]                                    *
- *             filter_pattern       - [IN]                                    *
- *             objectid             - [IN]                                    *
+ *             filter               - [IN]                                    *
  *             config_max_hk_delete - [IN]                                    *
  *             more                 - [OUT] 1 if there might be more data to  *
  *                     remove, otherwise the value is not changed             *
@@ -97,15 +96,9 @@ static hk_cleanup_table_t	hk_item_cleanup_order[] = {
  * Return value: number of rows deleted                                       *
  *                                                                            *
  ******************************************************************************/
-static int	hk_table_cleanup(const char *table, const char *filter_pattern, zbx_uint64_t objectid,
-		int config_max_hk_delete, int *more)
+static int	hk_table_cleanup(const char *table, const char *filter, int config_max_hk_delete, int *more)
 {
-	char	filter[MAX_STRING_LEN];
-	int	ret;
-
-	zbx_snprintf(filter, sizeof(filter), filter_pattern, objectid);
-
-	ret = hk_delete_from_table(table, filter, config_max_hk_delete);
+	int	ret = hk_delete_from_table(table, filter, config_max_hk_delete);
 
 	if (ZBX_DB_OK > ret || (0 != config_max_hk_delete && ret >= config_max_hk_delete))
 		*more = 1;
@@ -156,9 +149,11 @@ static int	hk_item_cleanup(const zbx_vector_hk_housekeeper_t *hk_entries, int co
 			if (0 == (entry->progress & (1 << i)))
 			{
 				int	 m = 0;
+				char	filter[MAX_STRING_LEN];
 
-				deleted += hk_table_cleanup(table->name, table->filter, objectid,
-						config_max_hk_delete, &m);
+				zbx_snprintf(filter, sizeof(filter), table->filter, objectid);
+
+				deleted += hk_table_cleanup(table->name, filter, config_max_hk_delete, &m);
 
 				if (0 == m)
 					entry->progress |= (1 << i);
