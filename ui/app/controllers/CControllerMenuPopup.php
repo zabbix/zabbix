@@ -286,9 +286,10 @@ class CControllerMenuPopup extends CController {
 	 * Prepare data for item latest data context menu popup.
 	 *
 	 * @param array  $data
-	 * @param string $data['itemid']
+	 *        string $data['itemid']
+	 *        bool   $data['combined']  (optional) is item aggregated using combined function or not
 	 *
-	 * @return mixed
+	 * @return array|null
 	 */
 	private static function getMenuDataItem(array $data) {
 		$db_items = API::Item()->get([
@@ -321,6 +322,7 @@ class CControllerMenuPopup extends CController {
 			return [
 				'type' => 'item',
 				'backurl' => $data['backurl'],
+				'combined' => $data['combined'] ?? false,
 				'itemid' => $data['itemid'],
 				'name' => $db_item['name_resolved'],
 				'key' => $db_item['key_'],

@@ -3393,7 +3393,15 @@ static void	DCsync_items(zbx_dbsync_t *sync, zbx_uint64_t revision, zbx_synced_n
 		if (NULL == host || host->hostid != hostid)
 		{
 			if (NULL == (host = (ZBX_DC_HOST *)zbx_hashset_search(&config->hosts, &hostid)))
+			{
+				if (SUCCEED != zbx_db_is_null(row[12]))
+				{
+					THIS_SHOULD_NEVER_HAPPEN_MSG("item_rtdata entry unexpectedly is present for"
+							" item: " ZBX_FS_UI64 " on not synced hostid: " ZBX_FS_UI64,
+							itemid, hostid);
+				}
 				continue;
+			}
 		}
 
 		item = (ZBX_DC_ITEM *)DCfind_id_ext(&config->items, itemid, sizeof(ZBX_DC_ITEM), &found, uniq);
@@ -4550,8 +4558,12 @@ static void	DCsync_functions(zbx_dbsync_t *sync, zbx_uint64_t revision)
 
 		function->triggerid = triggerid;
 		function->itemid = itemid;
-		dc_strpool_replace(found, &function->function, row[2]);
-		dc_strpool_replace(found, &function->parameter, row[3]);
+
+		if (SUCCEED == dc_strpool_replace(found, &function->function, row[2]))
+			function->sz_function = strlen(function->function) + 1;
+
+		if (SUCCEED == dc_strpool_replace(found, &function->parameter, row[3]))
+			function->sz_parameter = strlen(function->parameter) + 1;
 
 		function->type = zbx_get_function_type(function->function);
 		function->revision = revision;
@@ -9719,19 +9731,21 @@ void	zbx_dc_config_clean_items(zbx_dc_item_t *items, int *errcodes, size_t num)
 
 void	DCget_function(zbx_dc_function_t *dst_function, const ZBX_DC_FUNCTION *src_function)
 {
-	size_t	sz_function, sz_parameter;
-
 	dst_function->functionid = src_function->functionid;
 	dst_function->triggerid = src_function->triggerid;
 	dst_function->itemid = src_function->itemid;
 	dst_function->type = src_function->type;
 
-	sz_function = strlen(src_function->function) + 1;
-	sz_parameter = strlen(src_function->parameter) + 1;
-	dst_function->function = (char *)zbx_malloc(NULL, sz_function + sz_parameter);
-	dst_function->parameter = dst_function->function + sz_function;
-	memcpy(dst_function->function, src_function->function, sz_function);
-	memcpy(dst_function->parameter, src_function->parameter, sz_parameter);
+	if (ZBX_DC_FUNCTION_PREALOCATED_FUNC_SIZE < (src_function->sz_function + src_function->sz_parameter))
+	{
+		zbx_free(dst_function->function);
+		dst_function->function = (char *)zbx_malloc(NULL,
+				src_function->sz_function + src_function->sz_parameter);
+	}
+
+	dst_function->parameter = dst_function->function + src_function->sz_function;
+	memcpy(dst_function->function, src_function->function, src_function->sz_function);
+	memcpy(dst_function->parameter, src_function->parameter, src_function->sz_parameter);
 }
 
 void	DCget_trigger(zbx_dc_trigger_t *dst_trigger, const ZBX_DC_TRIGGER *src_trigger, unsigned int flags)
@@ -10414,11 +10428,16 @@ void	zbx_dc_config_get_triggers_by_triggerids(zbx_dc_trigger_t *triggers, const 
  *             num         - [IN] number of elements                          *
  *                                                                            *
  ******************************************************************************/
-void	zbx_dc_config_get_functions_by_functionids(zbx_dc_function_t *functions, zbx_uint64_t *functionids, int *errcodes,
-		size_t num)
+void	zbx_dc_config_get_functions_by_functionids(zbx_dc_function_t *functions, zbx_uint64_t *functionids,
+		int *errcodes, size_t num)
 {
 	size_t			i;
 	const ZBX_DC_FUNCTION	*dc_function;
+
+	for (i = 0; i < num; i++)
+	{
+		functions[i].function = (char *)zbx_malloc(NULL, ZBX_DC_FUNCTION_PREALOCATED_FUNC_SIZE);
+	}
 
 	RDLOCK_CACHE;
 
@@ -10437,15 +10456,12 @@ void	zbx_dc_config_get_functions_by_functionids(zbx_dc_function_t *functions, zb
 	UNLOCK_CACHE;
 }
 
-void	zbx_dc_config_clean_functions(zbx_dc_function_t *functions, int *errcodes, size_t num)
+void	zbx_dc_config_clean_functions(zbx_dc_function_t *functions, size_t num)
 {
 	size_t	i;
 
 	for (i = 0; i < num; i++)
 	{
-		if (SUCCEED != errcodes[i])
-			continue;
-
 		zbx_free(functions[i].function);
 	}
 }
@@ -13760,7 +13776,7 @@ unsigned int	zbx_dc_get_auto_registration_action_count(void)
  ******************************************************************************/
 void	zbx_config_get(zbx_config_t *cfg, zbx_uint64_t flags)
 {
-	RDLOCK_CACHE;
+	RDLOCK_CACHE_CONFIG_HISTORY;
 
 	if (0 != (flags & ZBX_CONFIG_FLAGS_SEVERITY_NAME))
 	{
@@ -13787,6 +13803,10 @@ void	zbx_config_get(zbx_config_t *cfg, zbx_uint64_t flags)
 	if (0 != (flags & ZBX_CONFIG_FLAGS_DB_EXTENSION))
 	{
 		cfg->db.extension = zbx_strdup(NULL, config->config->db.extension);
+	}
+
+	if (0 != (flags & ZBX_CONFIG_FLAGS_DB_HISTORY_COMPRESION))
+	{
 		cfg->db.history_compression_status = config->config->db.history_compression_status;
 		cfg->db.history_compress_older = config->config->db.history_compress_older;
 	}
@@ -13809,7 +13829,7 @@ void	zbx_config_get(zbx_config_t *cfg, zbx_uint64_t flags)
 	if (0 != (flags & ZBX_CONFIG_FLAGS_PROXY_SECRETS_PROVIDER))
 		cfg->proxy_secrets_provider = config->config->proxy_secrets_provider;
 
-	UNLOCK_CACHE;
+	UNLOCK_CACHE_CONFIG_HISTORY;
 
 	cfg->flags = flags;
 }
@@ -16522,14 +16542,13 @@ static void	dc_get_items_to_reschedule(const zbx_hashset_t *activated_hosts, zbx
 		if (HOST_STATUS_MONITORED != host->status)
 			continue;
 
+		dc_check_item_activation(item, host, activated_hosts, activated_items);
+
 		if (NULL == strstr(item->delay, "{$"))
 		{
 			/* neither new item revision or the last one had macro in delay */
 			if (NULL == item->delay_ex)
-			{
-				dc_check_item_activation(item, host, activated_hosts, activated_items);
 				continue;
-			}
 
 			delay_ex = NULL;
 		}
@@ -16552,13 +16571,11 @@ static void	dc_get_items_to_reschedule(const zbx_hashset_t *activated_hosts, zbx
 			zbx_vector_item_delay_append(items, item_delay);
 		}
 		else
-		{
 			zbx_free(delay_ex);
-			dc_check_item_activation(item, host, activated_hosts, activated_items);
-		}
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() items:%d", __func__, items->values_num);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() items:%d activated_items:%d", __func__, items->values_num,
+			activated_items->values_num);
 }
 
 static void	dc_reschedule_item(ZBX_DC_ITEM *item, const ZBX_DC_HOST *host, int now)

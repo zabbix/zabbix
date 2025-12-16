@@ -23,7 +23,9 @@ use Facebook\WebDriver\WebDriverKeys;
 
 /**
  * @backup role, module, users, report, services
- * @dataSource ExecuteNowAction
+ *
+ * @dataSource ExecuteNowAction, MonitoringOverview
+ *
  * @onBefore prepareUserData, prepareReportData, prepareServiceData, prepareCauseAndSymptomData
  */
 class testUserRolesPermissions extends CWebTest {
