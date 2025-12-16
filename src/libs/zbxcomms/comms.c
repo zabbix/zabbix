@@ -2729,6 +2729,8 @@ int	zbx_ip_cmp(int prefix_size, const struct sockaddr *ai_addr, int ai_family, c
 {
 	const struct sockaddr_in	*name4 = (const struct sockaddr_in *)name,
 					*ai_addr4 = (const struct sockaddr_in *)ai_addr;
+	if (-1 == prefix_size)
+		prefix_size = ai_family == AF_INET ? ZBX_IPV4_MAX_CIDR_PREFIX : ZBX_IPV6_MAX_CIDR_PREFIX;
 
 	ZBX_UNUSED(ipv6v4_mode);
 
