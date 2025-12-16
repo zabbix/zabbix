@@ -2068,7 +2068,7 @@ if test "x$agent2" = "xyes"; then
 		\${abs_top_builddir}/src/libs/zbxalgo/libzbxalgo.a \
 		\${abs_top_builddir}/src/libs/zbxinterface/libzbxinterface.a \
 		\${abs_top_builddir}/src/libs/zbxcommon/libzbxcommon.a \
-		\${abs_top_builddir}/src/libs/zbxcomms/libzbxcomms.a \
+		\${abs_top_builddir}/src/libs/zbxcomms/libzbxagent2comms.a \
 		\${abs_top_builddir}/src/libs/zbxcompress/libzbxcompress.a \
 		\${abs_top_builddir}/src/libs/zbxcrypto/libzbxcrypto.a \
 		\${abs_top_builddir}/src/libs/zbxexec/libzbxexec.a \

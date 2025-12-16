@@ -25,7 +25,12 @@
 #include "zbxip.h"
 #include "zbxtime.h"
 #include "zbxcrypto.h"
+#if defined(WITH_AGENT2_METRICS)
+#undef HAVE_ARES_QUERY_CACHE
+#else
 #include "zbxresolver.h"
+#endif
+
 
 #ifdef _WINDOWS
 #	ifndef _WIN32_WINNT_WIN7
