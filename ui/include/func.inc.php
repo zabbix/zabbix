@@ -2040,11 +2040,16 @@ function parse_period($str) {
 	}
 
 	foreach ($time_periods_parser->getPeriods() as $period) {
-		if (!preg_match('/^([1-7])-([1-7]),([0-9]{1,2}):([0-9]{1,2})-([0-9]{1,2}):([0-9]{1,2})$/', $period, $matches)) {
+		$regex = '/^([1-7])(?:-([1-7]))?,([0-9]{1,2}):([0-9]{1,2})-([0-9]{1,2}):([0-9]{1,2})$/';
+
+		if (!preg_match($regex, $period, $matches)) {
 			return null;
 		}
 
-		for ($i = $matches[1]; $i <= $matches[2]; $i++) {
+		$start_day = (int) $matches[1];
+		$end_day = (int) ($matches[2] ?: $start_day);
+
+		for ($i = $start_day; $i <= $end_day; $i++) {
 			if (!isset($out[$i])) {
 				$out[$i] = [];
 			}
