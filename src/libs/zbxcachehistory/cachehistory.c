@@ -2482,8 +2482,9 @@ void	zbx_dc_add_history(zbx_uint64_t itemid, unsigned char item_value_type, unsi
 	}
 }
 
-static void	validate_json_and_add_to_history(zbx_uint64_t itemid, unsigned char value_type, zbx_variant_t *value,
-		zbx_timespec_t ts, unsigned char value_flags, int mtime, zbx_uint64_t lastlogsize)
+static void	validate_json_and_add_to_history(zbx_uint64_t itemid, unsigned char value_type,
+		const zbx_variant_t *value, zbx_timespec_t ts, unsigned char value_flags, int mtime,
+		zbx_uint64_t lastlogsize)
 {
 	if (ZBX_HISTORY_JSON_VALUE_LEN < strlen(value->data.json))
 	{
