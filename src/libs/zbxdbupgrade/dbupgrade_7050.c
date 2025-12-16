@@ -432,7 +432,7 @@ static int	DBpatch_7050030(void)
 				" when tablename = 'events' and field = 'serviceid' then 2"
 			" end as object,"
 			" value as objectid"
-			" from housekeeper_tmp"))
+			" from housekeeper_old"))
 	{
 		return FAIL;
 	}

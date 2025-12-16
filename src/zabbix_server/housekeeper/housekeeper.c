@@ -43,7 +43,7 @@ typedef struct {
 ZBX_PTR_VECTOR_DECL(hk_housekeeper, hk_housekeeper_t)
 ZBX_PTR_VECTOR_IMPL(hk_housekeeper, hk_housekeeper_t)
 
-/* This structure is used to list tabled to cleanup */
+/* this structure is used to list tables to cleanup */
 typedef struct {
 	/* cleanup table name */
 	const char	*name;
@@ -51,11 +51,11 @@ typedef struct {
 	/* filter in cleanup table */
 	const char	*filter;
 
-	/* relative housekeeping more */
+	/* related housekeeping mode */
 	int	(*get_hk_mode)(void);
 } hk_cleanup_table_t;
 
-/* Cache of housekeeper entries hwich require multiple different operations. */
+/* Cache of housekeeper entries which require multiple different operations. */
 static zbx_hashset_t	hk_cache;
 
 #define ITEM_PROBLEM_FILTER	\
@@ -68,7 +68,7 @@ static zbx_hashset_t	hk_cache;
 	" and object="ZBX_STR(EVENT_OBJECT_LLDRULE) \
 	" and objectid=" ZBX_FS_UI64
 
-/* Table of which database tables should be cleared upon item deletion. */
+/* tables to be cleared upon item deletion */
 static hk_cleanup_table_t	hk_item_cleanup_order[] = {
 	{"history",		"itemid=" ZBX_FS_UI64,	&hk_cfg_history_mode},
 	{"history_str",		"itemid=" ZBX_FS_UI64,	&hk_cfg_history_mode},
@@ -115,7 +115,7 @@ static int	hk_table_cleanup(const char *table, const char *filter_pattern, zbx_u
 
 /******************************************************************************
  *                                                                            *
- * Purpose: perform generic table cleanup                                     *
+ * Purpose: perform cleanup upon item deletion                                *
  *                                                                            *
  * Parameters: hk_entries           - [IN] collected housekeeper entries      *
  *             config_max_hk_delete - [IN]                                    *
@@ -129,7 +129,7 @@ static int	hk_item_cleanup(const zbx_vector_hk_housekeeper_t *hk_entries, int co
 {
 	int	deleted = 0, complete_mask = (1 << ARRSIZE(hk_item_cleanup_order)) - 1;
 
-	/* delete in order of tables to optimaze database cache */
+	/* delete in order of tables to optimize database cache */
 	for (size_t i = 0; i < ARRSIZE(hk_item_cleanup_order); i++)
 	{
 		const hk_cleanup_table_t	*table = &hk_item_cleanup_order[i];
@@ -207,11 +207,11 @@ static int	housekeep_events_by_triggerid(const zbx_vector_hk_housekeeper_t *hk_e
 		char	query[MAX_STRING_LEN];
 
 		zbx_snprintf(query, sizeof(query), "select eventid"
-			" from events"
-			" where source=%d"
-				" and object=%d"
-				" and objectid=" ZBX_FS_UI64 " order by eventid",
-			EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER, triggerid);
+				" from events"
+				" where source=%d"
+					" and object=%d"
+					" and objectid=" ZBX_FS_UI64 " order by eventid",
+				EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER, triggerid);
 
 		deleted = zbx_housekeep_problems_events(query, config_max_hk_delete, events_mode, &more);
 
@@ -259,7 +259,7 @@ static int	hk_problem_cleanup(const zbx_vector_hk_housekeeper_t *hk_entries, con
 		int		ret;
 
 		zbx_snprintf(filter, sizeof(filter), "source=%d and object=%d and objectid=" ZBX_FS_UI64,
-			source, object, objectid);
+				source, object, objectid);
 
 		ret = hk_delete_from_table(table, filter, config_max_hk_delete);
 
