@@ -38,6 +38,9 @@
 #include "zbxipcservice.h"
 #include "zbxjson.h"
 #include "zbxautoreg.h"
+#ifdef HAVE_ARES_QUERY_CACHE
+#include "zbxresolver.h"
+#endif
 
 static zbx_get_program_type_f		zbx_get_program_type_cb = NULL;
 
@@ -700,6 +703,9 @@ ZBX_THREAD_ENTRY(proxypoller_thread, args)
 #define STAT_INTERVAL	5	/* if a process is busy and does not sleep then update status not faster than */
 				/* once in STAT_INTERVAL seconds */
 
+#ifdef HAVE_ARES_QUERY_CACHE
+	zbx_ares_library_init();
+#endif
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	zbx_tls_init_child(proxy_poller_args_in->config_tls, zbx_get_program_type_cb, zbx_dc_get_psk_by_identity);
 #endif

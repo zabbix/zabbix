@@ -1456,13 +1456,14 @@ ZBX_THREAD_ENTRY(zbx_trapper_thread, args)
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(info->program_type),
 			server_num, get_process_type_string(process_type), process_num);
-#ifdef HAVE_ARES_QUERY_CACHE
-	zbx_ares_library_init();
-#endif
+
 	zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
 
 	memcpy(&s, trapper_args_in->listen_sock, sizeof(zbx_socket_t));
 
+#ifdef HAVE_ARES_QUERY_CACHE
+	zbx_ares_library_init();
+#endif
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	zbx_tls_init_child(trapper_args_in->config_comms->config_tls, zbx_get_program_type_cb,
 			zbx_dc_get_psk_by_identity);
