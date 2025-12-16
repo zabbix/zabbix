@@ -203,7 +203,7 @@ static void     preprocessor_serialize_value(zbx_uint64_t itemid, unsigned char 
 		else if (ZBX_ISSET_JSON(result))
 		{
 			var_type = ZBX_VARIANT_JSON;
-			zbx_serialize_prepare_str_len(data_len, result->tjson, value_len);
+			zbx_serialize_prepare_str_len(data_len, result->json, value_len);
 		}
 	}
 
@@ -288,7 +288,7 @@ static void     preprocessor_serialize_value(zbx_uint64_t itemid, unsigned char 
 		else if (ZBX_ISSET_TEXT(result))
 			ptr += zbx_serialize_str(ptr, result->text, value_len);
 		else if (ZBX_ISSET_JSON(result))
-			ptr += zbx_serialize_str(ptr, result->tjson, value_len);
+			ptr += zbx_serialize_str(ptr, result->json, value_len);
 	}
 
 	ptr += zbx_serialize_value(ptr, ts->sec);
@@ -1132,7 +1132,7 @@ void	zbx_preprocess_item_value(zbx_uint64_t itemid, unsigned char item_value_typ
 
 		if (0 != ZBX_ISSET_JSON(result))
 		{
-			if (value_len < (len = strlen(result->tjson)))
+			if (value_len < (len = strlen(result->json)))
 				value_len = len;
 		}
 
@@ -1163,7 +1163,7 @@ void	zbx_preprocess_item_value(zbx_uint64_t itemid, unsigned char item_value_typ
 
 			if (ZBX_ISSET_JSON(result))
 			{
-				json_val = result->tjson;
+				json_val = result->json;
 			}
 			else if (ZBX_ISSET_TEXT(result))
 			{

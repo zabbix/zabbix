@@ -99,7 +99,7 @@ typedef struct
 	int		type;		/* flags: see AR_* above */
 	int		mtime;		/* meta information */
 	char		*bin;
-	char		*tjson;
+	char		*json;
 }
 AGENT_RESULT;
 
@@ -147,7 +147,7 @@ zbx_metric_t;
 #define SET_JSON_RESULT(res, val)		\
 (						\
 	(res)->type |= AR_JSON,			\
-	(res)->tjson = (char *)(val)		\
+	(res)->json = (char *)(val)		\
 )
 
 /* NOTE: always allocate new memory for val! DON'T USE STATIC OR STACK MEMORY!!! */
@@ -266,7 +266,7 @@ do									\
 {									\
 	if ((res)->type & AR_JSON)					\
 	{								\
-		zbx_free((res)->tjson);					\
+		zbx_free((res)->json);					\
 		(res)->type &= ~AR_JSON	;				\
 	}								\
 }									\

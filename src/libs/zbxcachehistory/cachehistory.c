@@ -2463,7 +2463,7 @@ void	zbx_dc_add_history(zbx_uint64_t itemid, unsigned char item_value_type, unsi
 		else if (ZBX_ISSET_JSON(result))
 		{
 			dc_local_add_history_text_bin_json_helper(ITEM_VALUE_TYPE_JSON, itemid, item_value_type, ts,
-					result->tjson, result->lastlogsize, result->mtime, value_flags);
+					result->json, result->lastlogsize, result->mtime, value_flags);
 		}
 		else
 		{

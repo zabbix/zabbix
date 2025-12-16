@@ -306,7 +306,7 @@ void	zbx_history_value2str(char *buffer, size_t size, const zbx_history_value_t 
 			zbx_strlcpy(buffer, value->str, size);
 			break;
 		case ITEM_VALUE_TYPE_JSON:
-			zbx_strlcpy(buffer, value->str, size);
+			zbx_strlcpy_utf8(buffer, value->str, size);
 			break;
 		case ITEM_VALUE_TYPE_LOG:
 			zbx_strlcpy_utf8(buffer, value->log->value, size);
