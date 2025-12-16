@@ -1,6 +1,7 @@
 Changes for 8.0.0alpha2
 
 New features:
+..F....... [ZBXNEXT-10158] implemented group item patterns for top items widget (gklavins)
 .........T [ZBXNEXT-10264] updated Microsoft 365 reports by HTTP template for Copilot monitoring support (aiantsen)
 .........T [ZBXNEXT-10371] updated mapping for SMART status in Proxmox VE by HTTP template (abakaldin)
 .........T [ZBXNEXT-10169] added Ribbon SBC Edge by HTTP template (akotsegubov)
@@ -665,6 +666,7 @@ Changes for 7.2.15rc2
 New features:
 
 Bug fixes:
+.......PS. [ZBX-27307] fixed items not being scheduled if host is re-enabled after restart and macro is used in update interval (vso)
 
 --------------------------------------------------------------------------------
 Changes for 7.2.15rc1
