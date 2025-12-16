@@ -1217,6 +1217,10 @@ void	zbx_clean_httpagent_items(zbx_dc_httpagent_item_t *items, int num, AGENT_RE
 {
 	for (int i = 0; i < num; i++)
 	{
+		if (items[i].key == items[i].key_orig)
+			items[i].key = NULL;
+
+		zbx_free(items[i].key_orig);
 		zbx_free(items[i].key);
 
 		zbx_free(items[i].url);
