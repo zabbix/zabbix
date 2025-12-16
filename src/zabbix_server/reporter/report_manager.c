@@ -1891,13 +1891,6 @@ static int	rm_schedule_jobs(zbx_rm_t *manager, int now)
 
 			if (0 == is_target_day)
 			{
-				const char	*cycle_str;
-
-				if (ZBX_REPORT_CYCLE_MONTHLY == report->cycle)
-					cycle_str = "Monthly";
-				else
-					cycle_str = "Yearly";
-
 				if (now < report->nextcheck)
 				{
 					zbx_binary_heap_remove_min(&manager->report_queue);
@@ -1922,6 +1915,13 @@ static int	rm_schedule_jobs(zbx_rm_t *manager, int now)
 
 					break;
 				}
+
+				const char	*cycle_str;
+
+				if (ZBX_REPORT_CYCLE_MONTHLY == report->cycle)
+					cycle_str = "Monthly";
+				else
+					cycle_str = "Yearly";
 
 				zabbix_log(LOG_LEVEL_WARNING, "%s report \"%s\" (reportid:" ZBX_FS_UI64
 						") missed scheduled date (target day). Sending catch-up report on"
