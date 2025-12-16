@@ -3,8 +3,7 @@
 noinst_LIBRARIES = libzbxresolverthread.a
 
 libzbxresolverthread_a_SOURCES = \
-	resolver_thread.c \
-	resolver_thread.h
+	resolver_thread.c
 
 libzbxresolver_thread_a_CFLAGS = \
 	$(LIBXML2_CFLAGS) \

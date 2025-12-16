@@ -21,29 +21,37 @@
 #include "zbxstr.h"
 
 static ZBX_THREAD_LOCAL zbx_channel_t	*zbx_channel;
-static ZBX_THREAD_LOCAL int		zbx_ares_init_done;
+static int				zbx_ares_init_done;
 
-static void	ares_event_thread_init(void)
+void	zbx_ares_library_init(void)
 {
+	int	status;
+
 	if (1 == zbx_ares_init_done)
 		return;
 
+	zbx_ares_init_done = 1;
+
+	if (ARES_SUCCESS != (status = ares_library_init(ARES_LIB_INIT_ALL)))
+	{
+		zabbix_log(LOG_LEVEL_ERR, "cannot initialise c-ares library: %s", ares_strerror(status));
+		exit(EXIT_FAILURE);
+		return;
+	}
+}
+
+static void	ares_event_thread_init(void)
+{
+	zbx_ares_library_init();
+
 	if (NULL != zbx_channel)
 		return;
-
-	zbx_ares_init_done = 1;
 
 	struct ares_options	options = {0};
 	int			optmask = ARES_OPT_EVENT_THREAD|ARES_OPT_QUERY_CACHE, status;
 
 	options.evsys = ARES_EVSYS_DEFAULT;
 	options.qcache_max_ttl = SEC_PER_HOUR;
-
-	if (ARES_SUCCESS != (status = ares_library_init(ARES_LIB_INIT_ALL)))
-	{
-		zabbix_log(LOG_LEVEL_ERR, "cannot initialise c-ares library: %s", ares_strerror(status));
-		return;
-	}
 
 	if (0 == (status = ares_threadsafety()))
 	{

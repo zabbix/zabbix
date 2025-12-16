@@ -391,6 +391,8 @@ int	zbx_socket_start(char **error)
 		return FAIL;
 	}
 
+	zbx_ares_library_init();
+
 	return SUCCEED;
 }
 #endif
