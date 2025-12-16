@@ -5920,8 +5920,7 @@ return [
 			'object' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
-				'length' => 10,
-				'default' => '0'
+				'length' => 10
 			],
 			'objectid' => [
 				'null' => false,
