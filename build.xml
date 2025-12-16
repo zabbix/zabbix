@@ -219,7 +219,6 @@
 			<arg line="--with-openssl"/>
 			<arg line="--with-net-snmp"/>
 			<arg line="--with-ssh2"/>
-			<arg line="--enable-ipv6 "/>
 		</exec>
 		<exec executable="make" failonerror="on">
 			<arg line="-j4"/>
