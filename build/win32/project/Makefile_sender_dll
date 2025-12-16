@@ -52,7 +52,7 @@ OBJS = \
 	..\..\..\src\libs\zbxexpr\macro.o \
 	..\..\..\src\libs\zbxexpr\token.o \
 	..\..\..\src\libs\zbxcommshigh\commshigh.o \
-	..\..\..\src\libs\zbxresolverthread\resolver_thread.o \
+	..\..\..\src\libs\zbxresolver\resolver.o \
 	..\..\..\src\libs\zbxcomms\comms.o \
 	..\..\..\src\libs\zbxcompress\compress.o \
 	..\..\..\src\libs\zbxcfg\cfg.o \
