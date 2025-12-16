@@ -178,11 +178,6 @@ class CProblem extends CApiService {
 			}
 		}
 
-		// eventids
-		if ($options['eventids'] !== null) {
-			$sql_parts['where'][] = dbConditionInt('p.eventid', $options['eventids']);
-		}
-
 		// objectids
 		if ($options['objectids'] !== null) {
 			$sql_parts['where'][] = dbConditionInt('p.objectid', $options['objectids']);
