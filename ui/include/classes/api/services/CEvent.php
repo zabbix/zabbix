@@ -558,10 +558,6 @@ class CEvent extends CApiService {
 	 * @param array $sql_parts
 	 */
 	private function applyFilters(array $options, array &$sql_parts): void {
-		if ($options['countOutput'] || $options['groupBy']) {
-			return;
-		}
-
 		// Filter symptom events for given cause.
 		if (array_key_exists('cause_eventid', $options['filter']) && $options['filter']['cause_eventid'] !== null) {
 			$sql_parts['join']['es'] = ['table' => 'event_symptom', 'using' => 'eventid'];
