@@ -396,44 +396,44 @@ static void get_link_flags(const char* interface, struct zbx_json *j)
 	close(sock);
 }
 
-static void if_description(const char* interface, struct zbx_json *j)
+static void if_description(const char* interface, struct zbx_json *j1, struct zbx_json *j2)
 {
-	int	sock;
+#ifdef SIOCGIFDESCR
+	int	sock, ret;
 	struct	ifreq ifr;
-	char	desc[100];
-
-	struct ifreq_buffer {
-		size_t	length;
-		void	*buffer;
-	} ifbuf;
+	char	desc[IFDESCRSIZE];
 
 	sock = socket(AF_INET, SOCK_DGRAM, 0);
+
 	if (0 > sock)
 		return;
 
 	memset(&ifr, 0, sizeof(ifr));
 	memset(desc, 0, sizeof(desc));
 	zbx_strlcpy(ifr.ifr_name, interface, sizeof(ifr.ifr_name));
+	ifr.ifr_buflen = IFDESCRSIZE;
+	ifr.ifr_buf = desc;
 
-#ifdef SIOCGIFDESCR
-	ifbuf.length = sizeof(desc);
-	ifbuf.buffer = desc;
-
-	ifr.ifr_data = (caddr_t)&ifbuf;
-
-	if (0 == ioctl(sock, SIOCGIFDESCR, &ifr))
+	if (-1 != (ret = ioctl(sock, SIOCGIFDESCR, &ifr)))
 	{
 		if ('\0' != *desc)
-			zbx_json_addstring(j, "ifalias", desc, ZBX_JSON_TYPE_STRING);
+		{
+			zbx_json_addstring(j1, "ifalias", desc, ZBX_JSON_TYPE_STRING);
+			zbx_json_addstring(j2, "ifalias", desc, ZBX_JSON_TYPE_STRING);
+		}
 	}
-#endif
+
 	close(sock);
+#else
+	ZBX_UNUSED(j1);
+	ZBX_UNUSED(j2);
+#endif
 }
 
 int	net_if_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	struct if_nameindex	*interfaces;
-	struct zbx_json		j;
+	struct zbx_json		jcfg, jval, j;
 	zbx_regexp_t		*rxp = NULL;
 	struct ifaddrs		*ifap, *ifa;
 	char			*value = NULL, *pattern = NULL, *error = NULL;
@@ -459,7 +459,8 @@ int	net_if_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 		return SYSINFO_RET_FAIL;
 	}
 
-	zbx_json_initarray(&j, ZBX_JSON_STAT_BUF_LEN);
+	zbx_json_initarray(&jval, ZBX_JSON_STAT_BUF_LEN);
+	zbx_json_initarray(&jcfg, ZBX_JSON_STAT_BUF_LEN);
 
 	if (1 == request->nparam)
 	{
@@ -487,16 +488,30 @@ int	net_if_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 		memset(&ifdr, 0, sizeof(ifdr));
 		zbx_strlcpy(ifdr.ifdr_name, if_name, sizeof(ifdr.ifdr_name));
 
-		zbx_json_addobject(&j, NULL);
-		zbx_json_addstring(&j, "name", if_name, ZBX_JSON_TYPE_STRING);
-		get_link_flags(if_name, &j);
+		zbx_json_addobject(&jcfg, NULL);
+		zbx_json_addobject(&jval, NULL);
+		zbx_json_addstring(&jcfg, "name", if_name, ZBX_JSON_TYPE_STRING);
+		zbx_json_addstring(&jval, "name", if_name, ZBX_JSON_TYPE_STRING);
+		if_description(if_name, &jcfg, &jval);
+
+		get_link_flags(if_name, &jcfg);
 
 		if (0 == ioctl(sock, SIOCGIFDATA, &ifdr))
 		{
-			zbx_json_addint64(&j, "sent", ifdr.ifdr_data.ifi_obytes);
-			zbx_json_addint64(&j, "received", ifdr.ifdr_data.ifi_ibytes);
+			zbx_json_addobject(&jval, "in");
+			zbx_json_adduint64(&jval, "bytes", ifdr.ifdr_data.ifi_ibytes);
+			zbx_json_adduint64(&jval, "packets", ifdr.ifdr_data.ifi_ipackets);
+			zbx_json_adduint64(&jval, "errors", ifdr.ifdr_data.ifi_ierrors);
+			zbx_json_close(&jval);
+			zbx_json_addobject(&jval, "out");
+			zbx_json_adduint64(&jval, "bytes", ifdr.ifdr_data.ifi_obytes);
+			zbx_json_adduint64(&jval, "packets", ifdr.ifdr_data.ifi_opackets);
+			zbx_json_adduint64(&jval, "errors", ifdr.ifdr_data.ifi_oerrors);
+			zbx_json_adduint64(&jval, "collisions", ifdr.ifdr_data.ifi_collisions);
+			zbx_json_close(&jval);
+
 			if (0 < ifdr.ifdr_data.ifi_baudrate)
-				zbx_json_addint64(&j, "speed", ifdr.ifdr_data.ifi_baudrate / 1000000);
+				zbx_json_addint64(&jval, "speed", ifdr.ifdr_data.ifi_baudrate / 1000000);
 		}
 
 		for (ifa = ifap; ifa != NULL; ifa = ifa->ifa_next)
@@ -507,22 +522,23 @@ int	net_if_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 				struct sockaddr_dl	*sdl = (struct sockaddr_dl *)ifa->ifa_addr;
 				unsigned char		*mac = (unsigned char *)LLADDR(sdl);
 
-				zbx_json_addint64(&j, "type", sdl->sdl_type);
+				zbx_json_addint64(&jval, "type", sdl->sdl_type);
 
 				if (sdl->sdl_alen > 0)
 				{
 					value = zbx_dsprintf(NULL, "%02x:%02x:%02x:%02x:%02x:%02x",
 							mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
-					zbx_json_addstring(&j, "mac", value, ZBX_JSON_TYPE_STRING);
+					zbx_json_addstring(&jval, "mac", value, ZBX_JSON_TYPE_STRING);
+					zbx_json_addstring(&jcfg, "mac", value, ZBX_JSON_TYPE_STRING);
 					zbx_free(value);
 				}
 				break;
 			}
 		}
 
-		if_description(if_name, &j);
-		zbx_get_link_settings(if_name, &j);
-		zbx_json_close(&j);
+		zbx_get_link_settings(if_name, &jval);
+		zbx_json_close(&jval);
+		zbx_json_close(&jcfg);
 	}
 
 	if (NULL != rxp)
@@ -531,10 +547,15 @@ int	net_if_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 	close(sock);
 	if_freenameindex(interfaces);
 	freeifaddrs(ifap);
+	zbx_json_init(&j, ZBX_JSON_STAT_BUF_LEN);
+	zbx_json_addraw(&j, "config", jcfg.buffer);
+	zbx_json_addraw(&j, "values", jval.buffer);
 	zbx_json_close(&j);
 
 	SET_STR_RESULT(result, strdup(j.buffer));
 	zbx_json_free(&j);
+	zbx_json_free(&jval);
+	zbx_json_free(&jcfg);
 
 	return SYSINFO_RET_OK;
 }
