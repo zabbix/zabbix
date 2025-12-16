@@ -548,7 +548,6 @@ static int	zbx_addrinfo_connect(zbx_socket_t *s, const char *source_ip, const ch
 {
 	struct addrinfo	*ai_bind = NULL;
 	int		ret = FAIL;
-	char		*error = NULL;
 #if !defined(_WINDOWS) && !defined(__MINGW32__)
 	if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_DEBUG))
 	{
@@ -619,6 +618,7 @@ static int	zbx_addrinfo_connect(zbx_socket_t *s, const char *source_ip, const ch
 	{
 		int		errnum = 0;
 		socklen_t	optlen = sizeof(int);
+		char		*error = NULL;
 
 		if (SUCCEED != zbx_socket_pollout(s, ZBX_SOCKET_POLL_TIMEOUT, &error))
 		{
@@ -796,7 +796,6 @@ static int	zbx_socket_create(zbx_socket_t *s, int type, const char *source_ip, c
 		unsigned short port, int timeout, unsigned int tls_connect, const char *tls_arg1, const char *tls_arg2)
 {
 	int		ret = FAIL;
-	char		*error = NULL;
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	const char	*server_name = NULL;
 #endif
@@ -809,6 +808,8 @@ static int	zbx_socket_create(zbx_socket_t *s, int type, const char *source_ip, c
 
 	if (ZBX_TCP_SEC_TLS_CERT == tls_connect || ZBX_TCP_SEC_TLS_PSK == tls_connect)
 	{
+		char	*error = NULL;
+
 		if (SUCCEED != zbx_socket_tls_connect(s, tls_connect, tls_arg1, tls_arg2, server_name, NULL, &error))
 		{
 			zbx_tcp_close(s);
