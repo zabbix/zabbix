@@ -66,7 +66,7 @@ var HostInterfaceSelector = class {
 		this.#organizeInterfaces();
 	}
 
-	 #organizeInterfaces() {
+	#organizeInterfaces() {
 		const interface_select = $(this.#container.querySelector('.<?=ZBX_STYLE_ZSELECT_HOST_INTERFACE ?>'));
 		const interface_select_node = interface_select.get(0);
 

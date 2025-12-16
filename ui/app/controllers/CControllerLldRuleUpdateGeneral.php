@@ -304,8 +304,8 @@ abstract class CControllerLldRuleUpdateGeneral extends CController {
 				CONDITION_EVAL_TYPE_OR, CONDITION_EVAL_TYPE_EXPRESSION]
 			],
 			'formula' => ['db items.formula', 'required',
-				//TODO: uncomment when formula parsing merged
-				//'use' => [],
+				// TODO: uncomment when formula parsing merged
+				// 'use' => [],
 				'when' => ['evaltype', 'in' => [CONDITION_EVAL_TYPE_EXPRESSION]]
 			],
 			'conditions' => [
@@ -344,8 +344,8 @@ abstract class CControllerLldRuleUpdateGeneral extends CController {
 							CONDITION_EVAL_TYPE_OR, CONDITION_EVAL_TYPE_EXPRESSION]
 						],
 						'formula' => ['db items.formula', 'required',
-							//TODO: uncomment when formula parsing merged
-							//'use' => [],
+							// TODO: uncomment when formula parsing merged
+							// 'use' => [],
 							'when' => ['evaltype', 'in' => [CONDITION_EVAL_TYPE_EXPRESSION]]
 						],
 						'conditions' => [
