@@ -2024,12 +2024,7 @@ class CUser extends CApiService {
 	public function delete(array $userids) {
 		$this->validateDelete($userids, $db_users);
 
-		DB::delete('media', ['userid' => $userids]);
-		DB::delete('profiles', ['userid' => $userids]);
-
 		self::deleteUgSets($db_users);
-		DB::delete('users_groups', ['userid' => $userids]);
-		DB::delete('mfa_totp_secret', ['userid' => $userids]);
 		DB::update('token', [
 			'values' => ['creator_userid' => null],
 			'where' => ['creator_userid' => $userids]
@@ -2044,7 +2039,7 @@ class CUser extends CApiService {
 			'filter' => ['userid' => $userids],
 			'preservekeys' => true
 		]);
-		CToken::deleteForce(array_keys($tokenids), false);
+		CToken::deleteForce(array_keys($tokenids));
 
 		DB::delete('users', ['userid' => $userids]);
 

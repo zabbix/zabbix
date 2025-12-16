@@ -175,6 +175,7 @@ int	zbx_hc_queue_get_size(void);
 int	zbx_hc_get_history_compression_age(void);
 double	zbx_hc_mem_pused(void);
 double	zbx_hc_mem_pused_lock(void);
+void	zbx_hc_remove_items_by_ids(zbx_vector_uint64_t *itemids);
 
 typedef void (*zbx_sync_history_cache_f)(const zbx_events_funcs_t *events_cbs, zbx_ipc_async_socket_t *rtc,
 		int config_history_storage_pipelines, zbx_history_sync_stats_t *stats);

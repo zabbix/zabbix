@@ -255,7 +255,7 @@ out:
 	return ret;
 }
 
-static unsigned	zbx_audit_hash_func(const void *data)
+static zbx_hash_t	zbx_audit_hash_func(const void *data)
 {
 	zbx_hash_t	hash;
 	const zbx_audit_entry_t	* const *audit_entry = (const zbx_audit_entry_t * const *)data;
