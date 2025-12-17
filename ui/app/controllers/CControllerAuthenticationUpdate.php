@@ -20,9 +20,6 @@ class CControllerAuthenticationUpdate extends CController {
 		global $ALLOW_HTTP_AUTH;
 
 		$rules = ['object', 'fields' => [
-			'authentication_type' => ['setting authentication_type', 'required',
-				'in' => [ZBX_AUTH_INTERNAL, ZBX_AUTH_LDAP]
-			],
 			'disabled_usrgrpid' => ['setting disabled_usrgrpid'],
 			'passwd_min_length' => ['setting passwd_min_length', 'required', 'min' => 1, 'max' => 70],
 			'passwd_check_rules' => ['array', 'field' => ['setting passwd_check_rules',
@@ -30,6 +27,13 @@ class CControllerAuthenticationUpdate extends CController {
 			]],
 			'ldap_auth_enabled' => ['setting ldap_auth_enabled',
 				'in' => [ZBX_AUTH_LDAP_DISABLED, ZBX_AUTH_LDAP_ENABLED]
+			],
+			'authentication_type' => [
+				['setting authentication_type', 'required', 'in' => [ZBX_AUTH_INTERNAL, ZBX_AUTH_LDAP]],
+				['setting authentication_type', 'not_in' => [ZBX_AUTH_LDAP],
+					'when' => ['ldap_auth_enabled', 'in' => [ZBX_AUTH_LDAP_DISABLED]],
+					'messages' => ['not_in' => _('LDAP is not configured.')]
+				]
 			],
 			'ldap_jit_status' => ['setting ldap_jit_status',
 				'in' => [JIT_PROVISIONING_DISABLED, JIT_PROVISIONING_ENABLED],
