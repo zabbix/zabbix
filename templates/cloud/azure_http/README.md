@@ -21,6 +21,7 @@
 - *Azure SQL Managed Instance by HTTP*
 - *Azure Cost Management by HTTP*
 - *Azure Backup Jobs by HTTP*
+- *Azure Sentinel by HTTP*
 
 ## Requirements
 
@@ -98,6 +99,10 @@ This template has been tested on:
 |{$AZURE.COSMOS.MONGO.DB.NAME.NOT.MATCHES}|<p>This macro is used in Microsoft Cosmos DB account discovery rule.</p>|`CHANGE_IF_NEEDED`|
 |{$AZURE.COSMOS.MONGO.DB.LOCATION.MATCHES}|<p>This macro is used in Microsoft Cosmos DB account discovery rule.</p>|`.*`|
 |{$AZURE.COSMOS.MONGO.DB.LOCATION.NOT.MATCHES}|<p>This macro is used in Microsoft Cosmos DB account discovery rule.</p>|`CHANGE_IF_NEEDED`|
+|{$AZURE.WORKSPACE.NAME.MATCHES}|<p>This macro is used in workspace discovery rule.</p>|`.*`|
+|{$AZURE.WORKSPACE.NAME.NOT.MATCHES}|<p>This macro is used in workspace discovery rule.</p>|`CHANGE_IF_NEEDED`|
+|{$AZURE.WORKSPACE.LOCATION.MATCHES}|<p>This macro is used in workspace discovery rule.</p>|`.*`|
+|{$AZURE.WORKSPACE.LOCATION.NOT.MATCHES}|<p>This macro is used in workspace discovery rule.</p>|`CHANGE_IF_NEEDED`|
 
 ### Items
 
@@ -227,6 +232,12 @@ This template has been tested on:
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
 |Cosmos DB account discovery|<p>The list of Cosmos databases provided by the subscription.</p>|Dependent item|azure.cosmos.mongo.db.discovery<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.resources.value`</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+
+### LLD rule Azure Workspace discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Azure Workspace discovery|<p>The list of Azure workspaces provided by the subscription.</p>|Dependent item|azure.workspace.discovery<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.resources.value`</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
 
 # Azure VM Scale Set by HTTP
 
@@ -1470,6 +1481,109 @@ This template has been tested on:
 |Azure backup jobs: Job completed with warnings [{#JOB.NAME}]|<p>Job has received "Completed with warnings" status.</p>|`last(/Azure Backup Jobs by HTTP/azure.vault.job.status[{#JOB.NAME}])=4`|Warning|**Manual close**: Yes|
 |Azure backup jobs: Job expired [{#JOB.NAME}]|<p>Job has received "Expired" status.</p>|`last(/Azure Backup Jobs by HTTP/azure.vault.job.status[{#JOB.NAME}])=7`|Average|**Manual close**: Yes|
 |Azure backup jobs: Job status unknown [{#JOB.NAME}]|<p>Job has received "Unknown" status.</p>|`last(/Azure Backup Jobs by HTTP/azure.vault.job.status[{#JOB.NAME}])=0`|Average|**Manual close**: Yes|
+
+# Azure Sentinel by HTTP
+
+## Overview
+
+This template is designed to monitor Microsoft Azure Sentinel by HTTP.
+It works without any external scripts and uses the script item.
+
+## Requirements
+
+Zabbix version: 8.0 and higher.
+
+## Tested versions
+
+This template has been tested on:
+- Microsoft Azure workspaces with Sentinel
+
+## Configuration
+
+> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/8.0/manual/config/templates_out_of_the_box) section.
+
+## Setup
+
+1. Create an Azure service principal via the Azure command-line interface (Azure CLI) for your subscription.
+
+      `az ad sp create-for-rbac --name zabbix --role reader --scope /subscriptions/<subscription_id>`
+
+> See [Azure documentation](https://docs.microsoft.com/en-us/cli/azure/create-an-azure-service-principal-azure-cli) for more details.
+2. Give created principal "Microsoft Sentinel Reader" role via the Azure command-line interface (Azure CLI).
+
+      `az role assignment create --assignee "zabbix" --role "Microsoft Sentinel Reader" --scope /subscriptions/<subscription_id>`
+
+3. Link the template to a host.
+4. Configure the macros: `{$AZURE.APP.ID}`, `{$AZURE.PASSWORD}`, `{$AZURE.TENANT.ID}`, `{$AZURE.SUBSCRIPTION.ID}`, and `{$AZURE.RESOURCE.ID}`.
+
+### Macros used
+
+|Name|Description|Default|
+|----|-----------|-------|
+|{$AZURE.SUBSCRIPTION.ID}|<p>Microsoft Azure subscription ID.</p>||
+|{$AZURE.TENANT.ID}|<p>Microsoft Azure tenant ID.</p>||
+|{$AZURE.APP.ID}|<p>The App ID of Microsoft Azure.</p>||
+|{$AZURE.PASSWORD}|<p>Microsoft Azure password.</p>||
+|{$AZURE.RESOURCE.ID}|<p>Microsoft Azure scale set ID.</p>||
+|{$AZURE.DATA.TIMEOUT}|<p>API response timeout.</p>|`15s`|
+|{$AZURE.PROXY}|<p>Sets the HTTP proxy value. If this macro is empty, then no proxy is used.</p>||
+|{$AZURE.SENTINEL.PERIOD}|<p>The number of days over which to retrieve modified entities (incidents, alert rules, automation rules).</p>|`30`|
+
+### Items
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Get data|<p>Gathers data of the Azure Sentinel.</p>|Script|azure.sentinel.data.get|
+|Incidents: Total number|<p>The number of incidents.</p>|Dependent item|azure.sentinel.incidents.total<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.incidents.length()`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Incidents: Informational Severity|<p>The number of informational severity incidents.</p>|Dependent item|azure.sentinel.incidents.info<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Incidents: Low Severity|<p>The number of low severity incidents.</p>|Dependent item|azure.sentinel.incidents.low<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Incidents: Medium Severity|<p>The number of medium severity incidents.</p>|Dependent item|azure.sentinel.incidents.medium<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Incidents: High Severity|<p>The number of high severity incidents.</p>|Dependent item|azure.sentinel.incidents.high<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Incidents: New|<p>The number of new incidents.</p>|Dependent item|azure.sentinel.incidents.new<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Incidents: Active|<p>The number of active incidents.</p>|Dependent item|azure.sentinel.incidents.active<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Incidents: Closed|<p>The number of closed incidents.</p>|Dependent item|azure.sentinel.incidents.closed<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Alert rules: Total number|<p>The number of alert rules.</p>|Dependent item|azure.sentinel.alert_rules.total<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.alertRules.length()`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Alert rules: Enabled|<p>The number of enabled alert rules.</p>|Dependent item|azure.sentinel.alert_rules.enabled<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Alert rules: Disabled|<p>The number of disabled alert rules.</p>|Dependent item|azure.sentinel.alert_rules.disabled<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Alert rules: Informational Severity|<p>The number of informational severity alert rules.</p>|Dependent item|azure.sentinel.alert_rules.info<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Alert rules: Low Severity|<p>The number of informational severity alert rules.</p>|Dependent item|azure.sentinel.alert_rules.low<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Alert rules: Medium Severity|<p>The number of informational severity alert rules.</p>|Dependent item|azure.sentinel.alert_rules.medium<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Alert rules: High Severity|<p>The number of informational severity alert rules.</p>|Dependent item|azure.sentinel.alert_rules.high<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Alert rules: Microsoft security incident creation|<p>The number of Microsoft security incident creation kind alert rules.</p>|Dependent item|azure.sentinel.alert_rules.creation<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Alert rules: Scheduled|<p>The number of scheduled kind alert rules.</p>|Dependent item|azure.sentinel.alert_rules.scheduled<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.alertRules[?(@.kind == "Scheduled")].length()`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Alert rules: Fusion|<p>The number of fusion kind alert rules.</p>|Dependent item|azure.sentinel.alert_rules.fusion<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.alertRules[?(@.kind == "Fusion")].length()`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Automation rules: Total|<p>The number of automation rules.</p>|Dependent item|azure.sentinel.automation_rules.total<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.automationRules.length()`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Automation rules: On incidents|<p>The number of automation rules that triggers on incidents.</p>|Dependent item|azure.sentinel.automation_rules.incidents<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Automation rules: On alerts|<p>The number of automation rules that triggers on alerts.</p>|Dependent item|azure.sentinel.automation_rules.alerts<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Automation rules: Modify properties|<p>The number of automation rules that modify an object's properties.</p>|Dependent item|azure.sentinel.automation_rules.modify<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Automation rules: Run playbook|<p>The number of automation rules that run a playbook on an object.</p>|Dependent item|azure.sentinel.automation_rules.playbook<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Automation rules: Add incident task|<p>The number of automation rules that add a task to an incident object.</p>|Dependent item|azure.sentinel.automation_rules.add_incident<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Data connectors: Total|<p>The number of data connectors.</p>|Dependent item|azure.sentinel.data_connectors.total<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.dataConnectors.length()`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Data connectors: Enabled|<p>The number of enabled data connectors.</p>|Dependent item|azure.sentinel.data_connectors.enabled<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Data connectors: Disabled|<p>The number of disabled data connectors.</p>|Dependent item|azure.sentinel.data_connectors.disabled<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Watchlists: Total|<p>The number of watchlists.</p>|Dependent item|azure.sentinel.watchlist.total<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.watchlists.length()`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Watchlists: Canceled|<p>The number of canceled watchlists.</p>|Dependent item|azure.sentinel.watchlist.canceled<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Watchlists: Failed|<p>The number of failed watchlists.</p>|Dependent item|azure.sentinel.watchlist.failed<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Watchlists: Succeeded|<p>The number of succeeded watchlists.</p>|Dependent item|azure.sentinel.watchlist.succeeded<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Watchlists: Deleting|<p>The number of deleting watchlists.</p>|Dependent item|azure.sentinel.watchlist.deleting<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Watchlists: Uploading|<p>The number of uploading watchlists.</p>|Dependent item|azure.sentinel.watchlist.uploading<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Watchlists: In progress|<p>The number of in progress watchlists.</p>|Dependent item|azure.sentinel.watchlist.progress<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Watchlists: New|<p>The number of in new watchlists.</p>|Dependent item|azure.sentinel.watchlist.new<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+
+### Triggers
+
+|Name|Description|Expression|Severity|Dependencies and additional info|
+|----|-----------|----------|--------|--------------------------------|
+|Azure Sentinel: Incidents: The number of incidents has increased.|<p>The number of informational severity incidents has increased.</p>|`change(/Azure Sentinel by HTTP/azure.sentinel.incidents.info)>0`|Info|**Manual close**: Yes|
+|Azure Sentinel: Incidents: The number of incidents has increased.|<p>The number of low severity incidents has increased.</p>|`change(/Azure Sentinel by HTTP/azure.sentinel.incidents.low)>0`|Warning|**Manual close**: Yes|
+|Azure Sentinel: Incidents: The number of incidents has increased.|<p>The number of medium severity incidents has increased.</p>|`change(/Azure Sentinel by HTTP/azure.sentinel.incidents.medium)>0`|Average|**Manual close**: Yes|
+|Azure Sentinel: Incidents: The number of incidents has increased.|<p>The number of high severity incidents has increased.</p>|`change(/Azure Sentinel by HTTP/azure.sentinel.incidents.high)>0`|High|**Manual close**: Yes|
+|Azure Sentinel: Incidents: The number of incidents has increased.|<p>The number of new incidents has increased.</p>|`change(/Azure Sentinel by HTTP/azure.sentinel.incidents.new)>0`|Warning|**Manual close**: Yes|
+|Azure Sentinel: Incidents: The number of incidents has increased.|<p>The number of active incidents has increased.</p>|`change(/Azure Sentinel by HTTP/azure.sentinel.incidents.active)>0`|Warning|**Manual close**: Yes|
+|Azure Sentinel: Alert rules: Total number has changed.|<p>The number of alert rules has increased.</p>|`change(/Azure Sentinel by HTTP/azure.sentinel.alert_rules.total)>0`|Info|**Manual close**: Yes|
+|Azure Sentinel: Automation rules: Total number has changed.|<p>The number of automation rules has increased.</p>|`change(/Azure Sentinel by HTTP/azure.sentinel.automation_rules.total)>0`|Info|**Manual close**: Yes|
+|Azure Sentinel: Data connectors: Total number has changed.|<p>The number of data connectors has increased.</p>|`change(/Azure Sentinel by HTTP/azure.sentinel.data_connectors.total)>0`|Info|**Manual close**: Yes|
+|Azure Sentinel: Watchlists: Total number has changed.|<p>The number of watchlists has increased.</p>|`change(/Azure Sentinel by HTTP/azure.sentinel.watchlist.total)>0`|Info|**Manual close**: Yes|
 
 ## Feedback
 
