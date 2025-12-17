@@ -20,7 +20,6 @@ class CControllerAuthenticationUpdate extends CController {
 		global $ALLOW_HTTP_AUTH;
 
 		$rules = ['object', 'fields' => [
-			'disabled_usrgrpid' => ['setting disabled_usrgrpid'],
 			'passwd_min_length' => ['setting passwd_min_length', 'required', 'min' => 1, 'max' => 70],
 			'passwd_check_rules' => ['array', 'field' => ['setting passwd_check_rules',
 				'in' => [0, PASSWD_CHECK_CASE, PASSWD_CHECK_DIGITS, PASSWD_CHECK_SPECIAL, PASSWD_CHECK_SIMPLE]
@@ -69,6 +68,18 @@ class CControllerAuthenticationUpdate extends CController {
 			'saml_jit_status' => ['setting saml_jit_status',
 				'in' => [JIT_PROVISIONING_DISABLED, JIT_PROVISIONING_ENABLED],
 				'when' => ['saml_auth_enabled', 'in' => [ZBX_AUTH_SAML_ENABLED]]
+			],
+			'disabled_usrgrpid' => [
+				['setting disabled_usrgrpid'],
+				['setting disabled_usrgrpid', 'required', 'when' => [
+					['ldap_auth_enabled', 'in' => [ZBX_AUTH_LDAP_ENABLED]],
+					['ldap_jit_status', 'in' => [JIT_PROVISIONING_ENABLED]]
+				]],
+				['setting disabled_usrgrpid', 'required', 'when' => [
+						['saml_auth_enabled', 'in' => [ZBX_AUTH_SAML_ENABLED]],
+						['saml_jit_status', 'in' => [JIT_PROVISIONING_ENABLED]]
+					],
+				]
 			],
 			'idp_entityid' => ['db userdirectory_saml.idp_entityid', 'required', 'not_empty',
 				'when' => ['saml_auth_enabled', 'in' => [ZBX_AUTH_SAML_ENABLED]]
