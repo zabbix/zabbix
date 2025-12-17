@@ -193,7 +193,6 @@ $sla_tab = (new CFormGrid())
 		new CLabel(_('Description'), 'description'),
 		new CFormField(
 			(new CTextArea('description', $data['form']['description']))
-				->setAttribute('data-notrim', '')
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 				->setMaxlength(DB::getFieldLength('sla', 'description'))
 		)
