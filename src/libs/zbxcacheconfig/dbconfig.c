@@ -11897,11 +11897,14 @@ int	zbx_dc_config_get_async_poller_items(unsigned char poller_type, int config_t
 			case ZBX_POLLER_TYPE_SNMP:
 				DCget_snmp_item(&(items->snmp_items)[num], dc_item);
 				items->snmp_items[num].hostid = dc_host->hostid;
-				zbx_strscpy(items->snmp_items[num].hostname, dc_host->host);
+				zbx_strscpy(items->snmp_items[num].host_host, dc_host->host);
+				zbx_strscpy(items->snmp_items[num].host_name, dc_host->name);
 				break;
 			case ZBX_POLLER_TYPE_HTTPAGENT:
-				DCget_host(&items->httpagent_items[num].host, dc_host);
 				DCget_httpagent_item(&(items->httpagent_items)[num], dc_item);
+				items->httpagent_items[num].hostid = dc_host->hostid;
+				zbx_strscpy(items->httpagent_items[num].host_host, dc_host->host);
+				zbx_strscpy(items->httpagent_items[num].host_name, dc_host->name);
 				break;
 			default:
 				THIS_SHOULD_NEVER_HAPPEN;

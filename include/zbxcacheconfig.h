@@ -235,7 +235,8 @@ zbx_dc_agent_item_t;
 typedef struct
 {
 	zbx_uint64_t		hostid;
-	char			hostname[ZBX_HOSTNAME_BUF_LEN];
+	char			host_host[ZBX_HOSTNAME_BUF_LEN];
+	char			host_name[ZBX_MAX_HOSTNAME_LEN * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1];
 	zbx_dc_interface_t	interface;
 	zbx_uint64_t		itemid;
 	zbx_uint64_t		lastlogsize;
@@ -268,7 +269,9 @@ zbx_dc_snmp_item_t;
 
 typedef struct
 {
-	zbx_dc_host_t		host; /* TODO: remove, use hostid and hostname (host) instead */
+	zbx_uint64_t		hostid;
+	char			host_host[ZBX_HOSTNAME_BUF_LEN];
+	char			host_name[ZBX_MAX_HOSTNAME_LEN * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1];
 	zbx_dc_interface_t	interface;
 	zbx_uint64_t		itemid;
 	zbx_uint64_t		lastlogsize;

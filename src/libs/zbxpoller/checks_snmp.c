@@ -3728,7 +3728,7 @@ int	zbx_async_check_snmp(zbx_dc_snmp_item_t *item, AGENT_RESULT *result,
 	char			error[MAX_STRING_LEN];
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() itemid:" ZBX_FS_UI64 " key:'%s' host:'%s' addr:'%s' timeout:%d retries:%d"
-			" max_repetitions:%d", __func__, item->itemid, item->key, item->hostname,
+			" max_repetitions:%d", __func__, item->itemid, item->key, item->host_host,
 			item->interface.addr, item->timeout, retries, item->snmp_max_repetitions);
 
 	snmp_context = zbx_malloc(NULL, sizeof(zbx_snmp_context_t));
@@ -3741,7 +3741,7 @@ int	zbx_async_check_snmp(zbx_dc_snmp_item_t *item, AGENT_RESULT *result,
 	snmp_context->item.interface = item->interface;
 	snmp_context->item.interface.addr = (item->interface.addr == item->interface.dns_orig ?
 			snmp_context->item.interface.dns_orig : snmp_context->item.interface.ip_orig);
-	zbx_strlcpy(snmp_context->item.host, item->hostname, sizeof(snmp_context->item.host));
+	zbx_strlcpy(snmp_context->item.host, item->host_host, sizeof(snmp_context->item.host));
 	snmp_context->item.itemid = item->itemid;
 	snmp_context->item.hostid = item->hostid;
 	snmp_context->item.value_type = item->value_type;

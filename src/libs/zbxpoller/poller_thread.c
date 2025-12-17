@@ -155,94 +155,96 @@ static int	get_value(zbx_dc_item_t *item, AGENT_RESULT *result, zbx_vector_agent
 	return res;
 }
 
-static int http_raw_resolv_impl(zbx_macro_resolv_data_t *p, char **replace_with,
-		const zbx_dc_um_handle_t *um_handle, const zbx_dc_host_t *dc_host, const zbx_uint64_t itemid,
-		const char *key_orig, const char *key)
+typedef struct
+{
+	const zbx_dc_um_handle_t	*um_handle;
+	zbx_uint64_t			hostid;
+	char				*host_host;
+	char				*host_name;
+	const zbx_uint64_t 		itemid;
+	const char	 		*key_orig;
+	const char	 		*key;
+}
+http_raw_resolv_args_t;
+
+static int	macro_http_raw_resolv(zbx_macro_resolv_data_t *p, va_list args, char **replace_with, char **data,
+		char *error, size_t maxerrlen)
 {
 	int				ret = SUCCEED;
 	zbx_dc_interface_t		interface;
 
+	/* Passed arguments */
+	http_raw_resolv_args_t arg_struct = va_arg(args, http_raw_resolv_args_t);
+
+	ZBX_UNUSED(data);
+	ZBX_UNUSED(error);
+	ZBX_UNUSED(maxerrlen);
+
 	if (ZBX_TOKEN_USER_MACRO == p->token.type || (ZBX_TOKEN_USER_FUNC_MACRO == p->token.type &&
 			0 == strncmp(p->macro, MVAR_USER_MACRO, ZBX_CONST_STRLEN(MVAR_USER_MACRO))))
 	{
-		zbx_dc_get_user_macro(um_handle, p->macro, &dc_host->hostid, 1, replace_with);
+		zbx_dc_get_user_macro(arg_struct.um_handle, p->macro, &arg_struct.hostid, 1, replace_with);
 		p->pos = (int)p->token.loc.r;
 	}
 	else if (0 == strcmp(p->macro, MVAR_HOST_HOST) || 0 == strcmp(p->macro, MVAR_HOSTNAME))
 	{
-		*replace_with = zbx_strdup(*replace_with, dc_host->host);
+		*replace_with = zbx_strdup(*replace_with, arg_struct.host_host);
 	}
 	else if (0 == strcmp(p->macro, MVAR_HOST_NAME))
 	{
-		*replace_with = zbx_strdup(*replace_with, dc_host->name);
+		*replace_with = zbx_strdup(*replace_with, arg_struct.host_name);
 	}
 	else if (0 == strcmp(p->macro, MVAR_HOST_IP) || 0 == strcmp(p->macro, MVAR_IPADDRESS))
 	{
-		if (SUCCEED == (ret = zbx_dc_config_get_interface(&interface, dc_host->hostid, itemid)))
+		if (SUCCEED == (ret = zbx_dc_config_get_interface(&interface, arg_struct.hostid, arg_struct.itemid)))
 			*replace_with = zbx_strdup(*replace_with, interface.ip_orig);
 	}
 	else if	(0 == strcmp(p->macro, MVAR_HOST_DNS))
 	{
-		if (SUCCEED == (ret = zbx_dc_config_get_interface(&interface, dc_host->hostid, itemid)))
+		if (SUCCEED == (ret = zbx_dc_config_get_interface(&interface, arg_struct.hostid, arg_struct.itemid)))
 			*replace_with = zbx_strdup(*replace_with, interface.dns_orig);
 	}
 	else if (0 == strcmp(p->macro, MVAR_HOST_CONN))
 	{
-		if (SUCCEED == (ret = zbx_dc_config_get_interface(&interface, dc_host->hostid, itemid)))
+		if (SUCCEED == (ret = zbx_dc_config_get_interface(&interface, arg_struct.hostid, arg_struct.itemid)))
 			*replace_with = zbx_strdup(*replace_with, interface.addr);
 	}
 	else if (0 == strcmp(p->macro, MVAR_HOST_PORT))
 	{
-		if (SUCCEED == (ret = zbx_dc_config_get_interface(&interface, dc_host->hostid, itemid)))
+		if (SUCCEED == (ret = zbx_dc_config_get_interface(&interface, arg_struct.hostid, arg_struct.itemid)))
 			*replace_with = zbx_strdup(*replace_with, interface.port_orig);
 	}
 	else if (0 == strcmp(p->macro, MVAR_ITEM_ID))
 	{
-		*replace_with = zbx_dsprintf(*replace_with, ZBX_FS_UI64, itemid);
+		*replace_with = zbx_dsprintf(*replace_with, ZBX_FS_UI64, arg_struct.itemid);
 	}
 	else if (0 == strcmp(p->macro, MVAR_ITEM_KEY))
 	{
-		*replace_with = zbx_strdup(*replace_with, key);
+		*replace_with = zbx_strdup(*replace_with, arg_struct.key);
 	}
 	else if (0 == strcmp(p->macro, MVAR_ITEM_KEY_ORIG))
 	{
-		*replace_with = zbx_strdup(*replace_with, key_orig);
+		*replace_with = zbx_strdup(*replace_with, arg_struct.key_orig);
 	}
 
 	return ret;
 }
 
-static int	macro_http_raw_resolv_no_dc_item(zbx_macro_resolv_data_t *p, va_list args, char **replace_with,
-		char **data, char *error, size_t maxerrlen)
+static void 	substitute_macros_http_raw_resolv(char **data, const zbx_dc_um_handle_t *um_handle,
+		zbx_uint64_t hostid, char *host_host, char *host_name, const zbx_uint64_t itemid,
+		const char *key_orig, const char *key)
 {
-	/* Passed arguments */
-	const zbx_dc_um_handle_t	*um_handle = va_arg(args, zbx_dc_um_handle_t *);
-	const zbx_dc_host_t		*dc_host = va_arg(args, const zbx_dc_host_t *);
-	const zbx_uint64_t 		itemid = va_arg(args, zbx_uint64_t);
-	const char	 		*key_orig = va_arg(args, const char *);
-	const char	 		*key = va_arg(args, const char *);
+	http_raw_resolv_args_t args = {
+		.um_handle = um_handle,
+		.hostid = hostid,
+		.host_host = host_host,
+		.host_name = host_name,
+		.itemid = itemid,
+		.key_orig = key_orig,
+		.key = key,
+	};
 
-	ZBX_UNUSED(data);
-	ZBX_UNUSED(error);
-	ZBX_UNUSED(maxerrlen);
-
-	return http_raw_resolv_impl(p, replace_with, um_handle, dc_host, itemid, key_orig, key);
-}
-
-static int	macro_http_raw_resolv(zbx_macro_resolv_data_t *p, va_list args, char **replace_with, char **data,
-		char *error, size_t maxerrlen)
-{
-	/* Passed arguments */
-	const zbx_dc_um_handle_t	*um_handle = va_arg(args, zbx_dc_um_handle_t *);
-	const zbx_dc_host_t		*dc_host = va_arg(args, const zbx_dc_host_t *);
-	const zbx_dc_item_t		*dc_item = va_arg(args, const zbx_dc_item_t *);
-
-	ZBX_UNUSED(data);
-	ZBX_UNUSED(error);
-	ZBX_UNUSED(maxerrlen);
-
-	return http_raw_resolv_impl(p, replace_with, um_handle, dc_host, dc_item->itemid, dc_item->key_orig,
-		dc_item->key);
+	zbx_substitute_macros(data, NULL, 0, macro_http_raw_resolv, args);
 }
 
 static int	macro_http_json_resolv(zbx_macro_resolv_data_t *p, va_list args, char **replace_with, char **data,
@@ -256,8 +258,25 @@ static int	macro_http_json_resolv(zbx_macro_resolv_data_t *p, va_list args, char
 	return ret;
 }
 
-static int	parse_query_fields(const zbx_dc_host_t *host, zbx_uint64_t itemid, const char *key_orig,
-		const char *key, const char *url, char **query_fields, unsigned char expand_macros)
+static void 	substitute_macros_http_json_resolv(char **data, const zbx_dc_um_handle_t *um_handle,
+		zbx_uint64_t hostid, char *host_host, char *host_name, const zbx_uint64_t itemid,
+		const char *key_orig, const char *key)
+{
+	http_raw_resolv_args_t args = {
+		.um_handle = um_handle,
+		.hostid = hostid,
+		.host_host = host_host,
+		.host_name = host_name,
+		.itemid = itemid,
+		.key_orig = key_orig,
+		.key = key,
+	};
+
+	zbx_substitute_macros(data, NULL, 0, macro_http_json_resolv, args);
+}
+
+static int	parse_query_fields(zbx_uint64_t hostid, char *host_host, char *host_name, zbx_uint64_t itemid,
+	const char *key_orig, const char *key, const char *url, char **query_fields, unsigned char expand_macros)
 {
 	struct zbx_json_parse	jp_array, jp_object;
 	char			name[MAX_STRING_LEN], value[MAX_STRING_LEN], *str = NULL;
@@ -314,8 +333,8 @@ static int	parse_query_fields(const zbx_dc_host_t *host, zbx_uint64_t itemid, co
 		data = zbx_strdup(data, name);
 		if (ZBX_MACRO_EXPAND_YES == expand_macros)
 		{
-			zbx_substitute_macros(&data, NULL, 0, macro_http_raw_resolv_no_dc_item,
-				um_handle, host, itemid, key_orig, key);
+			substitute_macros_http_raw_resolv(&data, um_handle, hostid, host_host, host_name, itemid,
+				key_orig, key);
 		}
 
 		zbx_url_encode(data, &data);
@@ -325,8 +344,8 @@ static int	parse_query_fields(const zbx_dc_host_t *host, zbx_uint64_t itemid, co
 		data = zbx_strdup(data, value);
 		if (ZBX_MACRO_EXPAND_YES == expand_macros)
 		{
-			zbx_substitute_macros(&data, NULL, 0, macro_http_raw_resolv_no_dc_item,
-				um_handle_unmasked, host, itemid, key_orig, key);
+			substitute_macros_http_raw_resolv(&data, um_handle_unmasked, hostid, host_host, host_name,
+				itemid, key_orig, key);
 		}
 
 		zbx_url_encode(data, &data);
@@ -456,17 +475,32 @@ static int	macro_jmx_endpoint_resolv(zbx_macro_resolv_data_t *p, va_list args, c
 static int	item_resolver(char **data, char *error, size_t maxerrlen, va_list args)
 {
 	/* Passed arguments */
-	const zbx_dc_um_handle_t	*um_handle = va_arg(args, zbx_dc_um_handle_t *);
-	const zbx_dc_host_t		*dc_host = va_arg(args, const zbx_dc_host_t *);
-	const zbx_dc_item_t		*dc_item = va_arg(args, const zbx_dc_item_t *);
+	http_raw_resolv_args_t arg_struct = va_arg(args, http_raw_resolv_args_t);
 
 	ZBX_UNUSED(error);
 	ZBX_UNUSED(maxerrlen);
 
 	/* error message in substitution is being ignored */
-	zbx_substitute_macros(data, NULL, 0, macro_http_raw_resolv, um_handle, dc_host, dc_item);
+	zbx_substitute_macros(data, NULL, 0, macro_http_raw_resolv, arg_struct);
 
 	return SUCCEED;
+}
+
+static int 	xml_traverse_item_resolver(char **data, char *error, int maxerrlen,
+		const zbx_dc_um_handle_t *um_handle, zbx_uint64_t hostid, char *host_host, char *host_name,
+		const zbx_uint64_t itemid, const char *key_orig, const char *key)
+{
+	http_raw_resolv_args_t args = {
+		.um_handle = um_handle,
+		.hostid = hostid,
+		.host_host = host_host,
+		.host_name = host_name,
+		.itemid = itemid,
+		.key_orig = key_orig,
+		.key = key,
+	};
+
+	return zbx_xml_traverse(data, error, maxerrlen, item_resolver, args);
 }
 
 void	zbx_prepare_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESULT *results,
@@ -666,8 +700,9 @@ void	zbx_prepare_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESUL
 					zbx_dc_expand_user_and_func_macros(um_handle, &timeout, &items[i].host.hostid,
 							1, NULL);
 
-					zbx_substitute_macros(&items[i].url, NULL, 0, macro_http_raw_resolv,
-							um_handle_secure, &items[i].host, &items[i]);
+					substitute_macros_http_raw_resolv(&items[i].url, um_handle_secure,
+						items[i].host.hostid, items[i].host.host, items[i].host.name,
+						items[i].itemid, items[i].key_orig, items[i].key);
 				}
 
 				if (SUCCEED != zbx_http_punycode_encode_url(&items[i].url))
@@ -679,8 +714,9 @@ void	zbx_prepare_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESUL
 					continue;
 				}
 
-				if (FAIL == parse_query_fields(&items[i].host, items[i].itemid, items[i].key_orig,
-					items[i].key, items[i].url, &items[i].query_fields, expand_macros))
+				if (FAIL == parse_query_fields(items[i].host.hostid, items[i].host.host,
+					items[i].host.name, items[i].itemid, items[i].key_orig, items[i].key,
+					items[i].url, &items[i].query_fields, expand_macros))
 				{
 					SET_MSG_RESULT(&results[i], zbx_strdup(NULL, "Invalid query fields"));
 					errcodes[i] = CONFIG_ERROR;
@@ -694,9 +730,10 @@ void	zbx_prepare_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESUL
 				switch (items[i].post_type)
 				{
 					case ZBX_POSTTYPE_XML:
-						if (SUCCEED != zbx_xml_traverse(&items[i].posts, error, sizeof(error),
-								item_resolver, um_handle_secure, &items[i].host,
-								&items[i]))
+						if (SUCCEED != xml_traverse_item_resolver(&items[i].posts, error,
+							sizeof(error), um_handle_secure, items[i].host.hostid,
+							items[i].host.host, items[i].host.name, items[i].itemid,
+							items[i].key_orig, items[i].key))
 						{
 							SET_MSG_RESULT(&results[i], zbx_dsprintf(NULL, "%s.", error));
 							errcodes[i] = CONFIG_ERROR;
@@ -705,27 +742,32 @@ void	zbx_prepare_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESUL
 						}
 						break;
 					case ZBX_POSTTYPE_JSON:
-						zbx_substitute_macros(&items[i].posts, NULL, 0, macro_http_json_resolv,
-							um_handle_secure, &items[i].host, &items[i]);
+						substitute_macros_http_json_resolv(&items[i].posts, um_handle_secure,
+							items[i].host.hostid, items[i].host.host, items[i].host.name,
+							items[i].itemid, items[i].key_orig, items[i].key);
 						break;
 					default:
-						zbx_substitute_macros(&items[i].posts, NULL, 0, macro_http_raw_resolv,
-							um_handle_secure, &items[i].host, &items[i]);
+						substitute_macros_http_raw_resolv(&items[i].posts, um_handle_secure,
+							items[i].host.hostid, items[i].host.host, items[i].host.name,
+							items[i].itemid, items[i].key_orig, items[i].key);
 						break;
 				}
 
-				zbx_substitute_macros(&items[i].headers, NULL, 0, macro_http_raw_resolv,
-							um_handle_secure, &items[i].host, &items[i]);
+				substitute_macros_http_raw_resolv(&items[i].headers, um_handle_secure,
+						items[i].host.hostid, items[i].host.host, items[i].host.name,
+						items[i].itemid, items[i].key_orig, items[i].key);
 
 				zbx_dc_expand_user_and_func_macros(um_handle, &items[i].status_codes,
 						&items[i].host.hostid, 1, NULL);
 				zbx_dc_expand_user_and_func_macros(um_handle, &items[i].http_proxy,
 						&items[i].host.hostid, 1, NULL);
 
-				zbx_substitute_macros(&items[i].ssl_cert_file, NULL, 0, macro_http_raw_resolv,
-							um_handle, &items[i].host, &items[i]);
-				zbx_substitute_macros(&items[i].ssl_key_file, NULL, 0, macro_http_raw_resolv,
-							um_handle, &items[i].host, &items[i]);
+				substitute_macros_http_raw_resolv(&items[i].ssl_cert_file, um_handle,
+						items[i].host.hostid, items[i].host.host, items[i].host.name,
+						items[i].itemid, items[i].key_orig, items[i].key);
+				substitute_macros_http_raw_resolv(&items[i].ssl_key_file, um_handle,
+						items[i].host.hostid, items[i].host.host, items[i].host.name,
+						items[i].itemid, items[i].key_orig, items[i].key);
 
 				zbx_dc_expand_user_and_func_macros(um_handle_secure,  &items[i].ssl_key_password,
 						&items[i].host.hostid, 1, NULL);
@@ -783,7 +825,7 @@ void	zbx_prepare_agent_items(zbx_dc_agent_item_t *items, int *errcodes, int num,
 		{
 			ZBX_STRDUP(items[i].key, items[i].key_orig);
 			if (SUCCEED != zbx_substitute_item_key_params(&items[i].key, error, sizeof(error),
-					zbx_item_key_subst_cb, um_handle_secure, &items[i]))
+					zbx_item_key_subst_cb, um_handle_secure, &items[i])) /* XXX */
 			{
 				SET_MSG_RESULT(&results[i], zbx_strdup(NULL, error));
 				errcodes[i] = CONFIG_ERROR;
@@ -851,7 +893,7 @@ void	zbx_prepare_snmp_items(zbx_dc_snmp_item_t *items, int *errcodes, int num, A
 		{
 			ZBX_STRDUP(items[i].key, items[i].key_orig);
 			if (SUCCEED != zbx_substitute_item_key_params(&items[i].key, error, sizeof(error),
-					zbx_item_key_subst_cb, um_handle_secure, &items[i]))
+					zbx_item_key_subst_cb, um_handle_secure, &items[i])) /* XXX */
 			{
 				SET_MSG_RESULT(&results[i], zbx_strdup(NULL, error));
 				errcodes[i] = CONFIG_ERROR;
@@ -954,7 +996,7 @@ void	zbx_prepare_httpagent_items(zbx_dc_httpagent_item_t *items, int *errcodes, 
 		{
 			ZBX_STRDUP(items[i].key, items[i].key_orig);
 			if (SUCCEED != zbx_substitute_item_key_params(&items[i].key, error, sizeof(error),
-					zbx_item_key_subst_cb, um_handle_secure, &items[i]))
+					zbx_item_key_subst_cb, um_handle_secure, &items[i])) /* XXX */
 			{
 				SET_MSG_RESULT(&results[i], zbx_strdup(NULL, error));
 				errcodes[i] = CONFIG_ERROR;
@@ -976,11 +1018,11 @@ void	zbx_prepare_httpagent_items(zbx_dc_httpagent_item_t *items, int *errcodes, 
 			ZBX_STRDUP(items[i].password, items[i].password_orig);
 			ZBX_STRDUP(items[i].query_fields, items[i].query_fields_orig);
 
-			zbx_dc_expand_user_and_func_macros(um_handle, &timeout, &items[i].host.hostid,
-					1, NULL);
+			zbx_dc_expand_user_and_func_macros(um_handle, &timeout, &items[i].hostid, 1, NULL);
+			substitute_macros_http_raw_resolv(&items[i].url, um_handle_secure,
+					items[i].hostid, items[i].host_host, items[i].host_name,
+					items[i].itemid, items[i].key_orig, items[i].key);
 
-			zbx_substitute_macros(&items[i].url, NULL, 0, macro_http_raw_resolv,
-					um_handle_secure, &items[i].host, &items[i]);
 		}
 
 		if (SUCCEED != zbx_http_punycode_encode_url(&items[i].url))
@@ -992,8 +1034,8 @@ void	zbx_prepare_httpagent_items(zbx_dc_httpagent_item_t *items, int *errcodes, 
 			continue;
 		}
 
-		if (FAIL == parse_query_fields(&items[i].host, items[i].itemid, items[i].key_orig,
-			items[i].key, items[i].url, &items[i].query_fields, expand_macros))
+		if (FAIL == parse_query_fields(items[i].hostid, items[i].host_host, items[i].host_name, items[i].itemid,
+			items[i].key_orig, items[i].key, items[i].url, &items[i].query_fields, expand_macros))
 		{
 			SET_MSG_RESULT(&results[i], zbx_strdup(NULL, "Invalid query fields"));
 			errcodes[i] = CONFIG_ERROR;
@@ -1007,9 +1049,9 @@ void	zbx_prepare_httpagent_items(zbx_dc_httpagent_item_t *items, int *errcodes, 
 		switch (items[i].post_type)
 		{
 			case ZBX_POSTTYPE_XML:
-				if (SUCCEED != zbx_xml_traverse(&items[i].posts, error, sizeof(error),
-						item_resolver, um_handle_secure, &items[i].host,
-						&items[i]))
+				if (SUCCEED != xml_traverse_item_resolver(&items[i].posts, error, sizeof(error),
+					um_handle_secure, items[i].hostid, items[i].host_host, items[i].host_name,
+					items[i].itemid, items[i].key_orig, items[i].key))
 				{
 					SET_MSG_RESULT(&results[i], zbx_dsprintf(NULL, "%s.", error));
 					errcodes[i] = CONFIG_ERROR;
@@ -1018,34 +1060,40 @@ void	zbx_prepare_httpagent_items(zbx_dc_httpagent_item_t *items, int *errcodes, 
 				}
 				break;
 			case ZBX_POSTTYPE_JSON:
-				zbx_substitute_macros(&items[i].posts, NULL, 0, macro_http_json_resolv,
-					um_handle_secure, &items[i].host, &items[i]);
+				substitute_macros_http_json_resolv(&items[i].posts, um_handle_secure,
+					items[i].hostid, items[i].host_host, items[i].host_name,
+					items[i].itemid, items[i].key_orig, items[i].key);
 				break;
 			default:
-				zbx_substitute_macros(&items[i].posts, NULL, 0, macro_http_raw_resolv,
-					um_handle_secure, &items[i].host, &items[i]);
+				substitute_macros_http_raw_resolv(&items[i].posts, um_handle_secure,
+					items[i].hostid, items[i].host_host, items[i].host_name,
+					items[i].itemid, items[i].key_orig, items[i].key);
 				break;
 		}
 
-		zbx_substitute_macros(&items[i].headers, NULL, 0, macro_http_raw_resolv,
-					um_handle_secure, &items[i].host, &items[i]);
+		substitute_macros_http_raw_resolv(&items[i].headers, um_handle_secure,
+				items[i].hostid, items[i].host_host, items[i].host_name,
+				items[i].itemid, items[i].key_orig, items[i].key);
+
 
 		zbx_dc_expand_user_and_func_macros(um_handle, &items[i].status_codes,
-				&items[i].host.hostid, 1, NULL);
+				&items[i].hostid, 1, NULL);
 		zbx_dc_expand_user_and_func_macros(um_handle, &items[i].http_proxy,
-				&items[i].host.hostid, 1, NULL);
+				&items[i].hostid, 1, NULL);
 
-		zbx_substitute_macros(&items[i].ssl_cert_file, NULL, 0, macro_http_raw_resolv,
-					um_handle, &items[i].host, &items[i]);
-		zbx_substitute_macros(&items[i].ssl_key_file, NULL, 0, macro_http_raw_resolv,
-					um_handle, &items[i].host, &items[i]);
+		substitute_macros_http_raw_resolv(&items[i].ssl_cert_file, um_handle,
+					items[i].hostid, items[i].host_host, items[i].host_name,
+					items[i].itemid, items[i].key_orig, items[i].key);
+		substitute_macros_http_raw_resolv(&items[i].ssl_key_file, um_handle,
+					items[i].hostid, items[i].host_host, items[i].host_name,
+					items[i].itemid, items[i].key_orig, items[i].key);
 
 		zbx_dc_expand_user_and_func_macros(um_handle_secure,  &items[i].ssl_key_password,
-				&items[i].host.hostid, 1, NULL);
+				&items[i].hostid, 1, NULL);
 		zbx_dc_expand_user_and_func_macros(um_handle_secure,  &items[i].username,
-				&items[i].host.hostid, 1, NULL);
+				&items[i].hostid, 1, NULL);
 		zbx_dc_expand_user_and_func_macros(um_handle_secure,  &items[i].password,
-				&items[i].host.hostid, 1, NULL);
+				&items[i].hostid, 1, NULL);
 
 		if (NULL != timeout)
 		{
