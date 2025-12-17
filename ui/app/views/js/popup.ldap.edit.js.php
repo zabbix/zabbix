@@ -344,16 +344,16 @@ window.ldap_edit_popup = new class {
 
 	_renderProvisionMediaRow(provision_media) {
 		const template_ldap_media_mapping_row = new Template(
-			document.getElementById('ldap-media-type-mapping-row-tmpl').innerHTML
+			document.getElementById('ldap-media-type-mapping-tmpl').outerHTML
 		);
-		const template = document.createElement('template');
-		template.innerHTML = template_ldap_media_mapping_row.evaluate(provision_media).trim();
+
+		const template = template_ldap_media_mapping_row.evaluateToElement(provision_media);
 
 		if (provision_media.userdirectory_mediaid === undefined) {
-			template.content.firstChild.querySelector('[name$="[userdirectory_mediaid]"]').remove();
+			template.content.querySelector('[name$="[userdirectory_mediaid]"]').remove();
 		}
 
-		return template.content.firstChild;
+		return template.content;
 	}
 
 	#getExistingNames(fieldname, exclude_row_index = null) {

@@ -297,30 +297,61 @@ $form
 						->setAttribute('data-field-type', 'set')
 						->setAttribute('data-field-name', 'provision_media')
 						->addStyle('width: 100%;'),
-					(new CTemplateTag('ldap-media-type-mapping-row-tmpl'))
-						->addItem(
-							(new CRow([
-								[
-									(new CLink('#{name}', 'javascript:void(0);'))
-										->addClass(ZBX_STYLE_WORDWRAP)
-										->addClass('js-edit'),
-									(new CVar('provision_media[#{row_index}][userdirectory_mediaid]',
-										'#{userdirectory_mediaid}'
-									))
-										->removeId(),
-									(new CVar('provision_media[#{row_index}][name]', '#{name}'))->removeId(),
-									(new CVar('provision_media[#{row_index}][mediatypeid]', '#{mediatypeid}'))
-										->removeId(),
-									(new CVar('provision_media[#{row_index}][attribute]', '#{attribute}'))->removeId(),
-									(new CVar('provision_media[#{row_index}][period]', '#{period}'))->removeId(),
-									(new CVar('provision_media[#{row_index}][severity]', '#{severity}'))->removeId(),
-									(new CVar('provision_media[#{row_index}][active]', '#{active}'))->removeId()
-								],
-								(new CCol('#{mediatype_name}'))->addClass(ZBX_STYLE_WORDBREAK),
-								(new CCol('#{attribute}'))->addClass(ZBX_STYLE_WORDBREAK),
-								(new CButtonLink(_('Remove')))->addClass('js-remove')
-							]))->setAttribute('data-row_index', '#{row_index}')
-						)
+					(new CTemplateTag('ldap-media-type-mapping-tmpl', [
+						(new CRow([
+							[
+								(new CLink('#{name}', 'javascript:void(0);'))
+									->addClass(ZBX_STYLE_WORDWRAP)
+									->addClass('js-edit'),
+								(new CVar('provision_media[#{row_index}][userdirectory_mediaid]',
+									'#{userdirectory_mediaid}'
+								))
+									->setAttribute('data-error-container',
+										'provision-media-#{row_index}-error-container'
+									)
+									->removeId(),
+								(new CVar('provision_media[#{row_index}][name]', '#{name}'))
+									->setAttribute('data-error-container',
+										'provision-media-#{row_index}-error-container'
+									)
+									->removeId(),
+								(new CVar('provision_media[#{row_index}][mediatypeid]', '#{mediatypeid}'))
+									->setAttribute('data-error-container',
+										'provision-media-#{row_index}-error-container'
+									)
+									->removeId(),
+								(new CVar('provision_media[#{row_index}][attribute]', '#{attribute}'))
+									->setAttribute('data-error-container',
+										'provision-media-#{row_index}-error-container'
+									)
+									->removeId(),
+								(new CVar('provision_media[#{row_index}][period]', '#{period}'))
+									->setAttribute('data-error-container',
+										'provision-media-#{row_index}-error-container'
+									)
+									->removeId(),
+								(new CVar('provision_media[#{row_index}][severity]', '#{severity}'))
+									->setAttribute('data-error-container',
+										'provision-media-#{row_index}-error-container'
+									)
+									->removeId(),
+								(new CVar('provision_media[#{row_index}][active]', '#{active}'))
+									->setAttribute('data-error-container',
+										'provision-media-#{row_index}-error-container'
+									)
+									->removeId()
+							],
+							(new CCol('#{mediatype_name}'))->addClass(ZBX_STYLE_WORDBREAK),
+							(new CCol('#{attribute}'))->addClass(ZBX_STYLE_WORDBREAK),
+							(new CButtonLink(_('Remove')))->addClass('js-remove')
+						]))->setAttribute('data-row_index', '#{row_index}'),
+						(new CRow())
+							->addClass('error-container-row')
+							->addItem((new CCol())
+								->setId('provision-media-#{row_index}-error-container')
+								->setColSpan(4)
+							)
+					]))
 				]))
 					->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 					->addStyle('width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')

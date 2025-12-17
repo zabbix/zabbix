@@ -754,24 +754,45 @@ $templates['saml_provisioning_group_row'] = (string) (new CRow([
 	(new CButtonLink(_('Remove')))->addClass('js-remove')
 ]))->setAttribute('data-row_index', '#{row_index}');
 // SAML provisioning medias row template.
-$templates['saml_provisioning_media_row'] = (string) (new CRow([
-	[
-		(new CLink('#{name}', 'javascript:void(0);'))
-			->addClass(ZBX_STYLE_WORDWRAP)
-			->addClass('js-edit'),
-		(new CVar('saml_provision_media[#{row_index}][userdirectory_mediaid]', '#{userdirectory_mediaid}'))
-			->removeId(),
-		(new CVar('saml_provision_media[#{row_index}][name]', '#{name}'))->removeId(),
-		(new CVar('saml_provision_media[#{row_index}][mediatypeid]', '#{mediatypeid}'))->removeId(),
-		(new CVar('saml_provision_media[#{row_index}][attribute]', '#{attribute}'))->removeId(),
-		(new CVar('saml_provision_media[#{row_index}][period]', '#{period}'))->removeId(),
-		(new CVar('saml_provision_media[#{row_index}][severity]', '#{severity}'))->removeId(),
-		(new CVar('saml_provision_media[#{row_index}][active]', '#{active}'))->removeId()
-	],
-	(new CCol('#{mediatype_name}'))->addClass(ZBX_STYLE_WORDBREAK),
-	(new CCol('#{attribute}'))->addClass(ZBX_STYLE_WORDBREAK),
-	(new CButtonLink(_('Remove')))->addClass('js-remove')
-]))->setAttribute('data-row_index', '#{row_index}');
+$templates['saml_provisioning_media_row'] = (string) (new CTemplateTag('', [
+	(new CRow([
+		[
+			(new CLink('#{name}', 'javascript:void(0);'))
+				->addClass(ZBX_STYLE_WORDWRAP)
+				->addClass('js-edit'),
+			(new CVar('saml_provision_media[#{row_index}][userdirectory_mediaid]', '#{userdirectory_mediaid}'))
+				->setAttribute('data-error-container', 'saml-provision-media-#{row_index}-error-container')
+				->removeId(),
+			(new CVar('saml_provision_media[#{row_index}][name]', '#{name}'))
+				->setAttribute('data-error-container', 'saml-provision-media-#{row_index}-error-container')
+				->removeId(),
+			(new CVar('saml_provision_media[#{row_index}][mediatypeid]', '#{mediatypeid}'))
+				->setAttribute('data-error-container', 'saml-provision-media-#{row_index}-error-container')
+				->removeId(),
+			(new CVar('saml_provision_media[#{row_index}][attribute]', '#{attribute}'))
+				->setAttribute('data-error-container', 'saml-provision-media-#{row_index}-error-container')
+				->removeId(),
+			(new CVar('saml_provision_media[#{row_index}][period]', '#{period}'))
+				->setAttribute('data-error-container', 'saml-provision-media-#{row_index}-error-container')
+				->removeId(),
+			(new CVar('saml_provision_media[#{row_index}][severity]', '#{severity}'))
+				->setAttribute('data-error-container', 'saml-provision-media-#{row_index}-error-container')
+				->removeId(),
+			(new CVar('saml_provision_media[#{row_index}][active]', '#{active}'))
+				->setAttribute('data-error-container', 'saml-provision-media-#{row_index}-error-container')
+				->removeId()
+		],
+		(new CCol('#{mediatype_name}'))->addClass(ZBX_STYLE_WORDBREAK),
+		(new CCol('#{attribute}'))->addClass(ZBX_STYLE_WORDBREAK),
+		(new CButtonLink(_('Remove')))->addClass('js-remove')
+	]))->setAttribute('data-row_index', '#{row_index}'),
+	(new CRow())
+		->addClass('error-container-row')
+		->addItem((new CCol())
+			->setId('saml-provision-media-#{row_index}-error-container')
+			->setColSpan(4)
+		)
+]));
 // LDAP servers list row.
 $templates['ldap_servers_row'] = (string) (new CRow([
 	[

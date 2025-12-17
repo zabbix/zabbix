@@ -808,15 +808,14 @@
 
 		_renderProvisionMediaRow(saml_media) {
 			const template_saml_media_mapping_row = new Template(this.templates.saml_provisioning_media_row);
-			const template = document.createElement('template');
 
-			template.innerHTML = template_saml_media_mapping_row.evaluate(saml_media).trim();
+			const template = template_saml_media_mapping_row.evaluateToElement(saml_media);
 
 			if (saml_media.userdirectory_mediaid === undefined) {
 				template.content.firstChild.querySelector('[name$="[userdirectory_mediaid]"]').remove();
 			}
 
-			return template.content.firstChild;
+			return template.content;
 		}
 
 		#addMfaMethods(mfa_methods, mfa_default_row_index) {
