@@ -262,7 +262,7 @@
 				this.#setTableVisiblityState(this.mfa_table, is_readonly);
 				this.#disableRemoveLinksWithUserGroups(this.mfa_table);
 
-				document.getElementById('mfa_default_row_index').value = default_index.value;
+				document.getElementById('mfa_default_row_index').value = default_index ? default_index.value : 0;
 			});
 
 			if (this.saml_certs_editable) {
