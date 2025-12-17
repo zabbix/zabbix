@@ -173,8 +173,8 @@ static int	hk_item_cleanup(const zbx_vector_hk_housekeeper_t *hk_entries, int co
 		{
 			if (complete_mask == entry->progress)
 			{
-				zbx_hashset_remove_direct(&hk_cache, entry);
 				zbx_vector_uint64_append(deleteids, entry->housekeeperid);
+				zbx_hashset_remove_direct(&hk_cache, entry);
 			}
 		}
 		else
@@ -210,7 +210,7 @@ static int	housekeep_events_by_triggerid(const zbx_vector_hk_housekeeper_t *hk_e
 					" and objectid=" ZBX_FS_UI64 " order by eventid",
 				EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER, triggerid);
 
-		deleted = zbx_housekeep_problems_events(query, config_max_hk_delete, events_mode, &more);
+		deleted += zbx_housekeep_problems_events(query, config_max_hk_delete, events_mode, &more);
 
 		zbx_snprintf(query, sizeof(query), "select eventid"
 				" from events"

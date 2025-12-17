@@ -124,7 +124,7 @@ int	zbx_housekeep_problems_events(const char *query, int config_max_hk_delete, i
 
 	zbx_vector_uint64_destroy(&eventids);
 
-	if (0 != config_max_hk_delete && deleted >= config_max_hk_delete)
+	if (0 != config_max_hk_delete && deleted == config_max_hk_delete)
 		*more = 1;
 
 	return deleted;
