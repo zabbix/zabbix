@@ -26,7 +26,7 @@ class CVaultHashiCorp extends CVault {
 	public const DB_PREFIX_PLACEHOLDER	= '/v1/secret/data/';
 	public const DB_PATH_PLACEHOLDER	= 'path/to/secret';
 
-	private const DB_APP_ROLE_LOGIN_PATH 	= '/v1/auth/approle/login';
+	private const APP_ROLE_LOGIN_PATH 	= '/v1/auth/approle/login';
 
 	private string $api_endpoint;
 	private string $db_prefix;
@@ -90,7 +90,7 @@ class CVaultHashiCorp extends CVault {
 		}
 
 		if ($this->token === '') {
-			$login_url = rtrim($this->api_endpoint, '/').self::DB_APP_ROLE_LOGIN_PATH;
+			$login_url = rtrim($this->api_endpoint, '/').self::APP_ROLE_LOGIN_PATH;
 			$data = [
 				'role_id' => $this->role_id,
 				'secret_id' => $this->secret_id
