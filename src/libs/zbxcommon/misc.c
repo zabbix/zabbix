@@ -82,15 +82,14 @@ const char	*get_program_name(const char *path)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: allocates nmemb * size bytes of memory and fills it with zeros    *
+ * Purpose: checks result of calloc()                                         *
  *                                                                            *
- * Return value: returns a pointer to the newly allocated memory              *
+ * Return value: returns a pointer to newly allocated memory or terminates    *
+ *               program if out of memory                                     *
  *                                                                            *
  ******************************************************************************/
-void	*zbx_calloc2(const char *filename, int line, void *old, size_t nmemb, size_t size)
+void	*zbx_calloc2(const char *filename, int line, void *old, size_t nmemb, size_t size, void *new_ptr)
 {
-	void	*ptr = NULL;
-
 	/* old pointer must be NULL */
 	if (NULL != old)
 	{
@@ -108,12 +107,9 @@ void	*zbx_calloc2(const char *filename, int line, void *old, size_t nmemb, size_
 				"Please report this to Zabbix developers.",
 				filename, line, (zbx_fs_size_t)nmemb, (zbx_fs_size_t)size);
 	}
-	nmemb = MAX(nmemb, 1);
-	size = MAX(size, 1);
 
-	ptr = calloc(nmemb, size);
-	if (NULL != ptr)
-		return ptr;
+	if (NULL != new_ptr)
+		return new_ptr;
 
 	zabbix_log(LOG_LEVEL_CRIT,
 			"[file:%s,line:%d] zbx_calloc: out of memory. Requested " ZBX_FS_SIZE_T " bytes.",
@@ -124,15 +120,14 @@ void	*zbx_calloc2(const char *filename, int line, void *old, size_t nmemb, size_
 
 /******************************************************************************
  *                                                                            *
- * Purpose: allocates size bytes of memory                                    *
+ * Purpose: checks result of malloc()                                         *
  *                                                                            *
- * Return value: returns a pointer to the newly allocated memory              *
+ * Return value: returns a pointer to newly allocated memory or terminates    *
+ *               program if out of memory                                     *
  *                                                                            *
  ******************************************************************************/
-void	*zbx_malloc2(const char *filename, int line, void *old, size_t size)
+void	*zbx_malloc2(const char *filename, int line, void *old, size_t size, void *new_ptr)
 {
-	void	*ptr = NULL;
-
 	/* old pointer must be NULL */
 	if (NULL != old)
 	{
@@ -145,20 +140,17 @@ void	*zbx_malloc2(const char *filename, int line, void *old, size_t size)
 	if (0 == size)
 	{
 		zabbix_log(LOG_LEVEL_DEBUG,
-				"[file:%s,line:%d] zbx_malloc: "
-				"allocating memory object of size " ZBX_FS_SIZE_T " bytes. "
+				"[file:%s,line:%d] zbx_malloc: allocating 0 bytes. "
 				"Please report this to Zabbix developers.",
-				filename, line, (zbx_fs_size_t)size);
+				filename, line);
 	}
-	size = MAX(size, 1);
 
-	ptr = malloc(size);
-	if (NULL != ptr)
-		return ptr;
+	if (NULL != new_ptr)
+		return new_ptr;
 
 	zabbix_log(LOG_LEVEL_CRIT,
 			"[file:%s,line:%d] zbx_malloc: out of memory. "
-			"Requested " ZBX_FS_SIZE_T " bytes.",
+			"Requested " ZBX_FS_SIZE_T " byte(s).",
 			filename, line, (zbx_fs_size_t)size);
 
 	exit(EXIT_FAILURE);
@@ -166,29 +158,24 @@ void	*zbx_malloc2(const char *filename, int line, void *old, size_t size)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: changes the size of the memory block pointed to by old            *
- *          to size bytes                                                     *
+ * Purpose: checks result of realloc()                                        *
  *                                                                            *
- * Return value: returns a pointer to the newly allocated memory              *
+ * Return value: returns a pointer to reallocated memory or terminates        *
+ *               program if out of memory                                     *
  *                                                                            *
  ******************************************************************************/
-void	*zbx_realloc2(const char *filename, int line, void *old, size_t size)
+void	*zbx_realloc2(const char *filename, int line, size_t size, void *new_ptr)
 {
-	void	*ptr = NULL;
-
 	if (0 == size)
 	{
 		zabbix_log(LOG_LEVEL_DEBUG,
-				"[file:%s,line:%d] zbx_realloc: "
-				"allocating memory object of size " ZBX_FS_SIZE_T " bytes. "
+				"[file:%s,line:%d] zbx_realloc: reallocating to 0 bytes. "
 				"Please report this to Zabbix developers.",
-				filename, line, (zbx_fs_size_t)size);
+				filename, line);
 	}
-	size = MAX(size, 1);
 
-	ptr = realloc(old, size);
-	if (NULL != ptr)
-		return ptr;
+	if (NULL != new_ptr)
+		return new_ptr;
 
 	zabbix_log(LOG_LEVEL_CRIT,
 			"[file:%s,line:%d] zbx_realloc: out of memory. Requested " ZBX_FS_SIZE_T " bytes.",

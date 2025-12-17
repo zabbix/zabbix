@@ -504,36 +504,6 @@ function getHostInterface(?array $interface): string {
 	return $ip_or_dns.':'.$interface['port'];
 }
 
-function get_host_by_itemid($itemids) {
-	$res_array = is_array($itemids);
-	zbx_value2array($itemids);
-	$result = false;
-	$hosts = [];
-
-	$db_hostsItems = DBselect(
-		'SELECT i.itemid,h.*'.
-		' FROM hosts h,items i'.
-		' WHERE i.hostid=h.hostid'.
-			' AND '.dbConditionInt('i.itemid', $itemids)
-	);
-	while ($hostItem = DBfetch($db_hostsItems)) {
-		$result = true;
-		$hosts[$hostItem['itemid']] = $hostItem;
-	}
-
-	if (!$res_array) {
-		foreach ($hosts as $itemid => $host) {
-			$result = $host;
-		}
-	}
-	elseif ($result) {
-		$result = $hosts;
-		unset($hosts);
-	}
-
-	return $result;
-}
-
 function get_host_by_hostid($hostid, $no_error_message = 0) {
 	$row = DBfetch(DBselect('SELECT h.* FROM hosts h WHERE h.hostid='.zbx_dbstr($hostid)));
 
@@ -583,6 +553,7 @@ function getHostPrototypeParentTemplates(array $host_prototypes) {
 		$db_host_prototypes = API::HostPrototype()->get([
 			'output' => ['hostid', 'templateid'],
 			'selectDiscoveryRule' => ['itemid'],
+			'selectDiscoveryRulePrototype' => ['itemid'],
 			'selectParentHost' => ['hostid'],
 			'hostids' => array_keys($parent_host_prototypeids)
 		]);
@@ -593,7 +564,9 @@ function getHostPrototypeParentTemplates(array $host_prototypes) {
 		foreach ($db_host_prototypes as $db_host_prototype) {
 			$data['templates'][$db_host_prototype['parentHost']['hostid']] = [];
 			$hostids[$db_host_prototype['hostid']] = $db_host_prototype['parentHost']['hostid'];
-			$lld_ruleids[$db_host_prototype['hostid']] = $db_host_prototype['discoveryRule']['itemid'];
+
+			$parent_lld = $db_host_prototype['discoveryRule'] ?: $db_host_prototype['discoveryRulePrototype'];
+			$lld_ruleids[$db_host_prototype['hostid']] = $parent_lld['itemid'];
 
 			if ($db_host_prototype['templateid'] != 0) {
 				if (!array_key_exists($db_host_prototype['templateid'], $all_parent_host_prototypeids)) {
@@ -676,7 +649,8 @@ function makeHostPrototypeTemplatePrefix($host_prototypeid, array $parent_templa
 
 	if ($provide_links && $template['permission'] == PERM_READ_WRITE) {
 		$name = (new CLink($template['name'],
-			(new CUrl('host_prototypes.php'))
+			(new CUrl('zabbix.php'))
+				->setArgument('action', 'host.prototype.list')
 				->setArgument('parent_discoveryid', $parent_templates['links'][$host_prototypeid]['lld_ruleid'])
 				->setArgument('context', 'template')
 		))->addClass(ZBX_STYLE_LINK_ALT);
@@ -705,8 +679,9 @@ function makeHostPrototypeTemplatesHtml($host_prototypeid, array $parent_templat
 
 		if ($provide_links && $template['permission'] == PERM_READ_WRITE) {
 			$name = new CLink($template['name'],
-				(new CUrl('host_prototypes.php'))
-					->setArgument('form', 'update')
+				(new CUrl('zabbix.php'))
+					->setArgument('action', 'popup')
+					->setArgument('popup', 'host.prototype.edit')
 					->setArgument('parent_discoveryid', $parent_templates['links'][$host_prototypeid]['lld_ruleid'])
 					->setArgument('hostid', $parent_templates['links'][$host_prototypeid]['hostid'])
 					->setArgument('context', 'template')
@@ -1189,19 +1164,6 @@ function renderInterfaceHeaders() {
 		);
 }
 
-function getHostDashboards(string $hostid, array $dashboard_fields = []): array {
-	$dashboard_fields = array_merge($dashboard_fields, ['dashboardid']);
-	$dashboard_fields = array_keys(array_flip($dashboard_fields));
-
-	$templateids = CApiHostHelper::getParentTemplates([$hostid])[1];
-
-	return API::TemplateDashboard()->get([
-		'output' => $dashboard_fields,
-		'templateids' => $templateids,
-		'preservekeys' => true
-	]);
-}
-
 /**
  * Return macro value to display in the list of inherited macros.
  *
@@ -1288,14 +1250,11 @@ function prepareHostPrototypeTags(array $tags): array {
  * Format host prototype interfaces received via form for API input.
  *
  * @param array $interfaces
- * @param array $main_interfaces
  *
  * @return array
  */
-function prepareHostPrototypeInterfaces(array $interfaces, array $main_interfaces): array {
-	foreach ($interfaces as $i => &$interface) {
-		$interface['main'] = $i == $main_interfaces[$interface['type']] ? INTERFACE_PRIMARY : INTERFACE_SECONDARY;
-
+function prepareHostPrototypeInterfaces(array $interfaces): array {
+	foreach ($interfaces as &$interface) {
 		if (array_key_exists('details', $interface)) {
 			$interface['details'] += ['bulk' => SNMP_BULK_DISABLED];
 		}

@@ -16,7 +16,9 @@
 
 class CControllerImageDelete extends CController {
 
-	protected function checkInput() {
+	private array $image;
+
+	protected function checkInput(): bool {
 		$fields = [
 			'imageid'   => 'required|db images.imageid',
 			'imagetype' => 'required|db images.imagetype'
@@ -31,7 +33,7 @@ class CControllerImageDelete extends CController {
 		return $ret;
 	}
 
-	protected function checkPermissions() {
+	protected function checkPermissions(): bool {
 		if (!$this->checkAccess(CRoleHelper::UI_ADMINISTRATION_GENERAL)) {
 			return false;
 		}
@@ -46,7 +48,7 @@ class CControllerImageDelete extends CController {
 		return true;
 	}
 
-	protected function doAction() {
+	protected function doAction(): void {
 		$result = API::Image()->delete([$this->image['imageid']]);
 
 		if ($result) {

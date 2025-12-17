@@ -21,6 +21,7 @@
 #include "zbxalgo.h"
 #include "zbxregexp.h"
 #include "zbxthreads.h"
+#include "zbxnix.h"
 
 #define PP_WORKER_INIT_NONE	0x00
 #define PP_WORKER_INIT_THREAD	0x01
@@ -103,28 +104,18 @@ static void	*pp_worker_entry(void *args)
 	zbx_pp_queue_t		*queue = worker->queue;
 	zbx_pp_task_t		*in;
 	char			*error = NULL, component[MAX_ID_LEN + 1];
-	sigset_t		mask;
 	int			err;
 
 	zbx_snprintf(component, sizeof(component), "%d", worker->id);
 	zbx_set_log_component(component, &worker->logger);
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "thread started [%s #%d]",
-			get_process_type_string(ZBX_PROCESS_TYPE_PREPROCESSOR), worker->id);
-
 	zbx_init_regexp_env();
 
-	sigemptyset(&mask);
-	sigaddset(&mask, SIGTERM);
-	sigaddset(&mask, SIGUSR1);
-	sigaddset(&mask, SIGUSR2);
-	sigaddset(&mask, SIGHUP);
-	sigaddset(&mask, SIGQUIT);
-	sigaddset(&mask, SIGINT);
-
-	if (0 != (err = pthread_sigmask(SIG_BLOCK, &mask, NULL)))
+	if (0 != (err = zbx_init_thread_signal_handler()))
 		zabbix_log(LOG_LEVEL_WARNING, "cannot block signals: %s", zbx_strerror(err));
 
+	zabbix_log(LOG_LEVEL_INFORMATION, "thread started [%s #%d]",
+			get_process_type_string(ZBX_PROCESS_TYPE_PREPROCESSOR), worker->id);
 	worker->stop = 0;
 
 	pp_context_init(&worker->execute_ctx);
@@ -159,7 +150,7 @@ static void	*pp_worker_entry(void *args)
 					break;
 			}
 
-			zbx_timekeeper_update(worker->timekeeper, worker->id - 1, ZBX_PROCESS_STATE_IDLE);
+			in->time_ms = zbx_timekeeper_update(worker->timekeeper, worker->id - 1, ZBX_PROCESS_STATE_IDLE);
 
 			pp_task_queue_lock(queue);
 			pp_task_queue_push_finished(queue, in);
@@ -183,6 +174,7 @@ static void	*pp_worker_entry(void *args)
 
 	pp_task_queue_deregister_worker(queue);
 	pp_task_queue_unlock(queue);
+	zbx_deinit_regexp_env();
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "thread stopped [%s #%d]",
 			get_process_type_string(ZBX_PROCESS_TYPE_PREPROCESSOR), worker->id);

@@ -372,21 +372,21 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 					]
 				]
 			],
-			// #9 test with Bind DN and Bind password.
+			// #9 test with incorrect Bind DN.
 			[
 				[
 					'servers_settings' => [
 						'Name' => 'Test Name',
-						'Host' => 'ipa.demo1.freeipa.org',
-						'Base DN' => 'cn=users,cn=accounts,dc=demo1,dc=freeipa,dc=org',
+						'Host' => PHPUNIT_LDAP_HOST,
+						'Base DN' => 'dc=zbx,dc=local',
 						'Search attribute' => 'uid',
-						'Bind DN' => 'test_DN',
-						'Bind password' => 'test_password',
+						'Bind DN' => 'incorrect_bind',
+						'Bind password' => PHPUNIT_LDAP_BIND_PASSWORD,
 						'Description' => 'Test description'
 					],
 					'test_settings' => [
-						'Login' => 'employee',
-						'User password' => 'Secret123'
+						'Login' => PHPUNIT_LDAP_USERNAME,
+						'User password' => PHPUNIT_LDAP_USER_PASSWORD
 					],
 					'test_error' => 'Login failed',
 					'test_error_details' => [
@@ -394,7 +394,44 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 					]
 				]
 			],
-			// #10 test with correct LDAP settings and JIT settings.
+			// #10 test with incorrect Bind password.
+			[
+				[
+					'servers_settings' => [
+						'Name' => 'Test Name',
+						'Host' => PHPUNIT_LDAP_HOST,
+						'Base DN' => 'dc=zbx,dc=local',
+						'Search attribute' => 'uid',
+						'Bind DN' => 'cn=admin,dc=zbx,dc=local',
+						'Bind password' => 'zabbix'
+					],
+					'test_settings' => [
+						'Login' => PHPUNIT_LDAP_USERNAME,
+						'User password' => PHPUNIT_LDAP_USER_PASSWORD
+					],
+					'test_error' => 'Login failed',
+					'test_error_details' => [
+						'Cannot bind to LDAP server.'
+					]
+				]
+			],
+			// #11 test with minimum data.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'servers_settings' => [
+						'Name' => 'Test Name',
+						'Host' => PHPUNIT_LDAP_HOST,
+						'Base DN' => 'dc=zbx,dc=local',
+						'Search attribute' => 'uid'
+					],
+					'test_settings' => [
+						'Login' => PHPUNIT_LDAP_USERNAME,
+						'User password' => PHPUNIT_LDAP_USER_PASSWORD
+					]
+				]
+			],
+			// #12 test with correct LDAP settings and JIT settings.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -439,7 +476,7 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 					],
 					'check_provisioning' => [
 						'role' => 'Super admin role',
-						'groups' => 'Zabbix administratorsGuests',
+						'groups' => "Zabbix administrators\nGuests",
 						'medias' => 'mail'
 					]
 				]
@@ -1446,6 +1483,10 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 			// #2 LDAP server without name, Base DN and Search attribute.
 			[
 				[
+					'ldap_fields' => [
+						'Enable JIT provisioning' => true,
+						'Provisioning period' => '1h'
+					],
 					'servers_settings' => [
 						[
 							'fields' => [
@@ -1943,6 +1984,50 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 					],
 					'error' => 'At least one LDAP server must exist.'
 				]
+			],
+			// #20 Time (in seconds) value below the boundary in Provisioning period.
+			[
+				[
+					'ldap_fields' => [
+						'Enable LDAP authentication' => true,
+						'Enable JIT provisioning' => true,
+						'Provisioning period' => '3599'
+					],
+					'error' => 'Incorrect value for field "jit_provision_interval": value must be one of 3600-788400000.'
+				]
+			],
+			// #21 Time (in seconds) value above the boundary in Provisioning period.
+			[
+				[
+					'ldap_fields' => [
+						'Enable LDAP authentication' => true,
+						'Enable JIT provisioning' => true,
+						'Provisioning period' => '788400001'
+					],
+					'error' => 'Incorrect value for field "jit_provision_interval": value must be one of 3600-788400000.'
+				]
+			],
+			// #22 Time (in minutes) value below the boundary in Provisioning period.
+			[
+				[
+					'ldap_fields' => [
+						'Enable LDAP authentication' => true,
+						'Enable JIT provisioning' => true,
+						'Provisioning period' => '59m'
+					],
+					'error' => 'Incorrect value for field "jit_provision_interval": value must be one of 3600-788400000.'
+				]
+			],
+			// #23 Invalid time unit used in Provisioning period.
+			[
+				[
+					'ldap_fields' => [
+						'Enable LDAP authentication' => true,
+						'Enable JIT provisioning' => true,
+						'Provisioning period' => '1q'
+					],
+					'error' => 'Incorrect value for field "jit_provision_interval": a time unit is expected.'
+				]
 			]
 		];
 	}
@@ -2286,9 +2371,8 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 								[
 									'Name' => '   leading.trailing   ',
 									'Media type' => 'Discord',
-									'Attribute' => '   leading.trailing   '
-									// TODO: uncomment When active value, after ZBX-24720 is fixed
-									// 'When active' => '   1-7,00:00-24:00   '
+									'Attribute' => '   leading.trailing   ',
+									'When active' => '   1-7,00:00-24:00   '
 								]
 							]
 						]
@@ -2538,6 +2622,13 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 			[
 				[
 					'expected' => TEST_GOOD,
+					'authentication' => [
+						'Deprovisioned users group' => 'Disabled'
+					],
+					'ldap_fields' => [
+						'Enable JIT provisioning' => true,
+						'Provisioning period' => '3600'
+					],
 					'servers_settings' => [
 						[
 							'fields' => [
@@ -2767,6 +2858,13 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 			[
 				[
 					'expected' => TEST_GOOD,
+					'authentication' => [
+						'Deprovisioned users group' => 'Disabled'
+					],
+					'ldap_fields' => [
+						'Enable JIT provisioning' => true,
+						'Provisioning period' => '788400000'
+					],
 					'servers_settings' => [
 						[
 							'fields' => [
@@ -2881,6 +2979,7 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 		$this->page->open('zabbix.php?action=usergroup.edit&usrgrpid='.$usrgrpid)->waitUntilReady();
 		$this->query('name:userdirectoryid')->asDropdown()->one()->fill($ldap_name);
 		$this->query('button:Update')->one()->click();
+		$this->assertMessage(TEST_GOOD, 'User group updated');
 
 		// Check that value in table is changed and display that there exists group with LDAP server.
 		$this->page->open('zabbix.php?action=authentication.edit')->waitUntilReady();
@@ -2890,15 +2989,78 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 	}
 
 	/**
+	 * Check that Bind password field clears itself after changing Host field.
+	 */
+	public function testUsersAuthenticationLdap_BindPassword() {
+		$values = [
+			'servers_settings' => [
+				[
+					'fields' => [
+						'Name' => 'name_created',
+						'Port' => '123',
+						'Base DN' => 'base_dn_created',
+						'Search attribute' => 'search_attribute_created',
+						'Bind DN' => 'bind_dn_created',
+						'Bind password' => 'bind_password',
+						'Host' => 'host_created'
+					]
+				]
+			]
+		];
+
+		$form = $this->openLdapForm();
+		$this->setLdap($values, 'button:Add');
+		$form->submit();
+		$form->selectTab('LDAP settings');
+		$form->query('link:name_created')->waitUntilClickable()->one()->click();
+
+		// Open newly created LDAP authentication for updates.
+		$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
+		$ldap_form = $dialog->asForm();
+		$bind_password_field = $ldap_form->getFieldContainer('Bind password');
+		unset($values['servers_settings'][0]['fields']['Bind password']);
+
+		// Change fields one by one and check that Bind password field cleared only after Host change.
+		foreach ($values['servers_settings'][0]['fields'] as $field => $value) {
+			$ldap_form->fill([$field => $value.'1']);
+			$this->page->removeFocus();
+
+			if ($field === 'Host') {
+				$ldap_form->checkValue(['Bind password' => '']);
+				$bind_password_field->query('xpath:./button[@data-hintbox]')->one()->click();
+				$hint = $this->query('xpath://div[@class="overlay-dialogue wordbreak"]')->waitUntilPresent()->one();
+				$this->assertEquals('The previous password was cleared due to a host change. Please enter the new password.',
+						$hint->getText()
+				);
+
+				// Check that Change password button is not available.
+				$this->assertFalse($bind_password_field->query('button:Change password')->one(false)->isClickable());
+			}
+			else {
+				$this->assertTrue($bind_password_field->query('button:Change password')->one()->isClickable());
+
+				// Check that hint is not visible.
+				$this->assertFalse($bind_password_field->query('xpath:./button[@data-hintbox]')->one()->isVisible());
+			}
+		}
+	}
+
+	/**
 	 * Function for opening LDAP configuration form.
 	 *
 	 * @param string $auth    default authentication field value
+	 * @param array $data	  data provider to fill Authentication form
 	 */
-	private function openLdapForm($auth = 'Internal') {
-		$this->page->login()->open('zabbix.php?action=authentication.edit');
-		$form = $this->query('id:authentication-form')->asForm()->one();
+	private function openLdapForm($auth = 'Internal', $data = []) {
+		$this->page->login()->open('zabbix.php?action=authentication.edit')->waitUntilReady();
+		$form = $this->query('id:authentication-form')->waitUntilVisible()->asForm()->one();
 		$form->fill(['Default authentication' => $auth]);
+		if (array_key_exists('authentication', $data)) {
+			$form->fill($data['authentication']);
+		}
 		$form->selectTab('LDAP settings');
+		// Wait for the LDAP tab contents to be visible.
+		$form->query('id:ldap')->waitUntilVisible();
 
 		return $form;
 	}
@@ -2911,7 +3073,7 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 	 * @param string $values    simple LDAP server values
 	 */
 	private function setLdap($data, $query, $values = null) {
-		$form = $this->query('id:authentication-form')->asForm()->one();
+		$form = $this->query('id:authentication-form')->waitUntilVisible()->asForm()->one();
 
 		// Select LDAP setting tab if it is not selected.
 		if ($form->getSelectedTab() !== 'LDAP settings') {
@@ -2941,8 +3103,11 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 			$ldap_form->fill($ldap['fields']);
 
 			if (array_key_exists('Bind password', $ldap)) {
-				$ldap_form->getFieldContainer('Bind password')->query('button:Change password')->waitUntilClickable()
-						->one()->click();
+				if (!array_key_exists('Host', $ldap['fields'])) {
+					$ldap_form->getFieldContainer('Bind password')->query('button:Change password')->waitUntilClickable()
+							->one()->click();
+				}
+
 				$ldap_form->query('id:bind_password')->one()->waitUntilVisible()->fill($ldap['Bind password']);
 			}
 
@@ -2979,9 +3144,9 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 	 * @param string    $query    object to click for LDAP creating or updating
 	 */
 	private function checkLdap($data, $query) {
-		$form = $this->openLdapForm('LDAP');
+		$form = $this->openLdapForm('LDAP', $data);
 
-		// Configuration at 'LDAP settings' tab.
+		// Configuration of LDAP servers.
 		if (array_key_exists('servers_settings', $data)) {
 			$this->setLdap($data, $query);
 
@@ -2990,6 +3155,11 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 				$this->assertMessage(TEST_BAD, $data['ldap_error'], $data['ldap_error_details']);
 				COverlayDialogElement::find()->all()->last()->close();
 			}
+		}
+
+		// Configuration of LDAP form.
+		if (array_key_exists('ldap_fields', $data)) {
+			$form->fill($data['ldap_fields']);
 		}
 
 		$form->submit();

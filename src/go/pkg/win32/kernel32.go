@@ -19,6 +19,7 @@ package win32
 
 import (
 	"fmt"
+	"runtime"
 	"syscall"
 	"unsafe"
 
@@ -114,10 +115,16 @@ func GetLogicalProcessorInformationEx(relation int, info []byte) (size uint32, e
 	var buffer uintptr
 	if info != nil {
 		size = uint32(len(info))
-		buffer = uintptr(unsafe.Pointer(&info[0]))
+		buffer = uintptr(unsafe.Pointer(&info[0])) // safe usage due to runtime.KeepAlive(counterName)
 	}
-	ret, _, syserr := syscall.Syscall(getLogicalProcessorInformationEx, 3, uintptr(relation),
-		buffer, uintptr(unsafe.Pointer(&size)))
+	ret, _, syserr := syscall.SyscallN(
+		getLogicalProcessorInformationEx,
+		uintptr(relation),
+		buffer,
+		uintptr(unsafe.Pointer(&size)),
+	)
+	runtime.KeepAlive(info)
+
 	if ret == 0 {
 		if syscall.Errno(syserr) != syscall.ERROR_INSUFFICIENT_BUFFER {
 			return 0, syserr
@@ -173,19 +180,14 @@ func GetVolumePathName(path string, len uint32) (disk string, err error) {
 }
 
 func GetDiskFreeSpace(path string) (c CLUSTER, err error) {
-	var p []uint16
-	p, err = windows.UTF16FromString(path)
+	p, err := windows.UTF16FromString(path)
 	if err != nil {
-		return
+		return CLUSTER{}, err
 	}
 
-	ptrPath := uintptr(unsafe.Pointer(&p[0]))
-	var ret uintptr
-
-	ret, _, err = syscall.Syscall6(
+	ret, _, err := syscall.SyscallN(
 		getDiskFreeSpaceW,
-		6,
-		ptrPath,
+		uintptr(unsafe.Pointer(&p[0])),
 		uintptr(unsafe.Pointer(&c.LpSectorsPerCluster)),
 		uintptr(unsafe.Pointer(&c.LpBytesPerSector)),
 		uintptr(unsafe.Pointer(&c.LpNumberOfFreeClusters)),

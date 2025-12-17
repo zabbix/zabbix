@@ -165,7 +165,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 		$url = 'https://intranet.zabbix.com/secure/admin.jspa';
 
 		return [
-			// Simple parse with name only.
+			// #0 Simple parse with name only.
 			[
 				[
 					'url' => $url.'?login',
@@ -175,6 +175,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 					'parsed_url' => $url
 				]
 			],
+			// #1.
 			[
 				[
 					'url' => $url.'?login',
@@ -188,6 +189,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 					'parsed_url' => $url
 				]
 			],
+			// #2.
 			[
 				[
 					'url' => $url.'?login',
@@ -201,7 +203,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 					'parsed_url' => $url
 				]
 			],
-			// Simple parse with name and value.
+			// #3 Simple parse with name and value.
 			[
 				[
 					'url' => $url.'?login=admin&password=s00p3r%24ecr3%26',
@@ -212,7 +214,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 					'parsed_url' => $url
 				]
 			],
-			// After parse added new query fields.
+			// #4 After parse added new query fields.
 			[
 				[
 					'url' => $url.'?password=s00p3r%24ecr3%26',
@@ -226,6 +228,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 					'parsed_url' => $url
 				]
 			],
+			// #5.
 			[
 				[
 					'url' => $url.'?login=admin&password=s00p3r%24ecr3%26',
@@ -242,6 +245,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 					'parsed_url' => $url
 				]
 			],
+			// #6.
 			[
 				[
 					'url' => $url.'?login=user&password=a123%24bcd4%26',
@@ -258,7 +262,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 					'parsed_url' => $url
 				]
 			],
-			// URL fragment part ignored.
+			// #7 URL fragment part ignored.
 			[
 				[
 					'step_name' => 'Step URL fragment part ignored',
@@ -269,7 +273,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 					'parsed_url' => 'https://www.zabbix.com/enterprise_ready'
 				]
 			],
-			// User macro in url.
+			// #8 User macro in url.
 			[
 				[
 					'step_name' => 'Step URL fragment part ignored',
@@ -281,7 +285,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 					'parsed_url' => $url
 				]
 			],
-			// Host and item macro in url.
+			// #9 Host and item macro in url.
 			[
 				[
 					'step_name' => 'Step URL fragment part ignored',
@@ -293,7 +297,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 					'parsed_url' => $url
 				]
 			],
-			// Call to Prometheus API.
+			// #10 Call to Prometheus API.
 			[
 				[
 					'step_name' => 'Step call to Prometheus API',
@@ -304,7 +308,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 					'parsed_url' => 'http://localhost:9090/api/v1/query'
 				]
 			],
-			// URL parse failed.
+			// #11 URL parse failed.
 			[
 				[
 					'url' => 'http://localhost/zabbix/index.php?test=%11',
@@ -390,34 +394,26 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 			$this->processPairFields($data['headers'], 'headers');
 		}
 
-		// Press action button and check the result in DB.
-		switch ($action) {
-			case 'create':
-				$dialog->getFooter()->query('button:Add')->one()->click();
-				if (!array_key_exists('check_db', $data) || $data['check_db'] === true) {
-					$this->assertEquals(0, CDBHelper::getCount('SELECT NULL FROM items WHERE name='.zbx_dbstr($data['fields']['Name'])));
-				}
-				break;
+		// Trigger the validation error by submitting the form and check the result in DB.
+		$button = ($action === 'update') ? 'Update' : 'Add';
+		$dialog->getFooter()->query('button', $button)->one()->click();
 
-			case 'update':
-				$dialog->getFooter()->query('button:Update')->one()->click();
-				$this->assertEquals($old_hash, CDBHelper::getHash($sql_hash));
-				if (!array_key_exists('error', $data)) {
-					$data['error'] = 'Cannot update item';
-				}
-				break;
-
-			case 'clone':
-				$dialog->getFooter()->query('button:Add')->one()->click();
-				$this->assertEquals($old_hash, CDBHelper::getHash($sql_hash));
-				if (!array_key_exists('error', $data)) {
-					$data['error'] = 'Cannot add item';
-				}
-				break;
+		if ($action === 'create' && CTestArrayHelper::get($data, 'check_db', true)) {
+			$this->assertEquals(0, CDBHelper::getCount('SELECT NULL FROM items WHERE name='
+					.zbx_dbstr($data['fields']['Name'])
+			));
+		}
+		else {
+			$this->assertEquals($old_hash, CDBHelper::getHash($sql_hash));
 		}
 
 		// Check error message on posting the form.
-		$this->assertMessage(TEST_BAD, $data['error'], $data['error_details']);
+		if (array_key_exists('inline_errors', $data)) {
+			$this->assertInlineError($form, $data['inline_errors']);
+		}
+		else {
+			$this->assertMessage(TEST_BAD, 'Cannot '.lcfirst($button).' item', $data['error_details']);
+		}
 
 		$dialog->close();
 	}
@@ -427,23 +423,15 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 			// Check error message on posting the form with empty values.
 			[
 				[
-					'error_details' => [
-						'Incorrect value for field "name": cannot be empty.',
-						'Incorrect value for field "key": cannot be empty.'
-					],
-					'check_db' => false,
-					'error' => 'Cannot add item'
-				]
-			],
-			[
-				[
 					'fields' => [
-						'Name' => 'item without url',
-						'Key' => 'item-without-url'
+						'Name' => '',
+						'Key' => '',
+						'URL' => ''
 					],
-					'error' => 'Cannot add item',
-					'error_details' => [
-						'Invalid parameter "/1/url": cannot be empty.'
+					'inline_errors' => [
+						'Name' => 'This field cannot be empty.',
+						'Key' => 'This field cannot be empty.',
+						'URL' => 'This field cannot be empty.'
 					]
 				]
 			],
@@ -454,9 +442,8 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 						'Key' => 'item-space-url',
 						'URL' => ' '
 					],
-					'error' => 'Cannot add item',
-					'error_details' => [
-						'Invalid parameter "/1/url": cannot be empty.'
+					'inline_errors' => [
+						'URL' => 'This field cannot be empty.'
 					]
 				]
 			],
@@ -469,11 +456,10 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 						'URL' => 'zabbix.com'
 					],
 					'query' => [
-						['value' => 'admin']
+						['name' => '', 'value' => 'value']
 					],
-					'error' => 'Cannot add item',
-					'error_details' => [
-						'Invalid parameter "/1/query_fields/1/name": cannot be empty.'
+					'inline_errors' => [
+						'name:query_fields[0][name]' => 'This field cannot be empty.'
 					]
 				]
 			],
@@ -486,11 +472,10 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 					],
 					'query' => [
 						['name' => 'user', 'value' => 'admin'],
-						['value' => 'admin']
+						['name' => '', 'value' => 'admin']
 					],
-					'error' => 'Cannot add item',
-					'error_details' => [
-						'Invalid parameter "/1/query_fields/2/name": cannot be empty.'
+					'inline_errors' => [
+						'name:query_fields[1][name]' => 'This field cannot be empty.'
 					]
 				]
 			],
@@ -504,9 +489,8 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 					'query' => [
 						['name' => ' ', 'value' => 'admin']
 					],
-					'error' => 'Cannot add item',
-					'error_details' => [
-						'Invalid parameter "/1/query_fields/1/name": cannot be empty.'
+					'inline_errors' => [
+						'name:query_fields[0][name]' => 'This field cannot be empty.'
 					]
 				]
 			],
@@ -519,11 +503,10 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 						'URL' => 'zabbix.com'
 					],
 					'headers' => [
-						['value' => 'admin']
+						['name' => '', 'value'=> 'value']
 					],
-					'error' => 'Cannot add item',
-					'error_details' => [
-						'Invalid parameter "/1/headers/1/name": cannot be empty.'
+					'inline_errors' => [
+						'name:headers[0][name]' => 'This field cannot be empty.'
 					]
 				]
 			],
@@ -536,11 +519,10 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 					],
 					'headers' => [
 						['name' => 'user', 'value' => 'admin'],
-						['value' => 'zabbix']
+						['name' => '', 'value' => 'zabbix']
 					],
-					'error' => 'Cannot add item',
-					'error_details' => [
-						'Invalid parameter "/1/headers/2/name": cannot be empty.'
+					'inline_errors' => [
+						'name:headers[1][name]' => 'This field cannot be empty.'
 					]
 				]
 			],
@@ -554,9 +536,8 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 					'headers' => [
 						['name' => ' ', 'value' => 'admin']
 					],
-					'error' => 'Cannot add item',
-					'error_details' => [
-						'Invalid parameter "/1/headers/1/name": cannot be empty.'
+					'inline_errors' => [
+						'name:headers[0][name]' => 'This field cannot be empty.'
 					]
 				]
 			],
@@ -569,24 +550,8 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 						'URL' => 'zabbix.com'
 					],
 					'request_type' => 'JSON data',
-					'error' => 'Cannot add item',
-					'error_details' => [
-						'Invalid parameter "/1/posts": cannot be empty.'
-					]
-				]
-			],
-			[
-				[
-					'fields' => [
-						'Name' => 'item with wrong JSON request body',
-						'Key' => 'check-json',
-						'URL' => 'zabbix.com',
-						'Request body' => '{"<key>": "<value>"'
-					],
-					'request_type' => 'JSON data',
-					'error' => 'Cannot add item',
-					'error_details' => [
-						'Invalid parameter "/1/posts": JSON is expected.'
+					'inline_errors' => [
+						'Request body' => 'This field cannot be empty.'
 					]
 				]
 			],
@@ -598,39 +563,8 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 						'URL' => 'zabbix.com'
 					],
 					'request_type' => 'XML data',
-					'error' => 'Cannot add item',
-					'error_details' => [
-						'Invalid parameter "/1/posts": cannot be empty.'
-					]
-				]
-			],
-			[
-				[
-					'fields' => [
-						'Name' => 'item with wrong XML request body',
-						'Key' => 'check-wrong-xml',
-						'URL' => 'zabbix.com',
-						'Request body' => 'test'
-					],
-					'request_type' => 'XML data',
-					'error' => 'Cannot add item',
-					'error_details' => [
-						'Invalid parameter "/1/posts": (4) Start tag expected, \'<\' not found'
-					]
-				]
-			],
-			[
-				[
-					'fields' => [
-						'Name' => 'item with wrong XML request body',
-						'Key' => 'check-xml',
-						'URL' => 'zabbix.com',
-						'Request body' => '<foo>bar</foo'
-					],
-					'request_type' => 'XML data',
-					'error' => 'Cannot add item',
-					'error_details' => [
-						'Invalid parameter "/1/posts": (73) expected \'>\''
+					'inline_errors' => [
+						'Request body' => 'This field cannot be empty.'
 					]
 				]
 			],
@@ -643,9 +577,8 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 						'URL' => 'zabbix.com',
 						'Required status codes' => '*'
 					],
-					'error' => 'Cannot add item',
-					'error_details' => [
-						'Invalid parameter "/1/status_codes": invalid range expression.'
+					'inline_errors' => [
+						'Required status codes' => 'Invalid range expression.'
 					]
 				]
 			],
@@ -657,9 +590,8 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 						'URL' => 'zabbix.com',
 						'Required status codes' => 'test'
 					],
-					'error' => 'Cannot add item',
-					'error_details' => [
-						'Invalid parameter "/1/status_codes": invalid range expression.'
+					'inline_errors' => [
+						'Required status codes' => 'Invalid range expression.'
 					]
 				]
 			]
@@ -685,9 +617,10 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 						'Key' => '',
 						'URL' => ''
 					],
-					'error_details' => [
-						'Incorrect value for field "name": cannot be empty.',
-						'Incorrect value for field "key": cannot be empty.'
+					'inline_errors' => [
+						'Name' => 'This field cannot be empty.',
+						'Key' => 'This field cannot be empty.',
+						'URL' => 'This field cannot be empty.'
 					]
 				]
 			],
@@ -697,8 +630,8 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 					'query' => [
 						['name' => '', 'value' => 'admin', 'action' => 'update', 'index' => 0]
 					],
-					'error_details' => [
-						'Invalid parameter "/1/query_fields/1/name": cannot be empty.'
+					'inline_errors' => [
+						'name:query_fields[0][name]' => 'This field cannot be empty.'
 					]
 				]
 			],
@@ -706,10 +639,10 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 				[
 					'query' => [
 						['name' => 'user update', 'value' => 'admin update', 'action' => 'update', 'index' => 0],
-						['value' => 'admin']
+						['name' => '', 'value' => 'admin']
 					],
-					'error_details' => [
-						'Invalid parameter "/1/query_fields/2/name": cannot be empty.'
+					'inline_errors' => [
+						'name:query_fields[1][name]' => 'This field cannot be empty.'
 					]
 				]
 			],
@@ -718,8 +651,8 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 					'headers' => [
 						['name' => '', 'value' => 'admin update', 'action' => 'update', 'index' => 0]
 					],
-					'error_details' => [
-						'Invalid parameter "/1/headers/1/name": cannot be empty.'
+					'inline_errors' => [
+						'name:headers[0][name]' => 'This field cannot be empty.'
 					]
 				]
 			],
@@ -727,38 +660,33 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 				[
 					'headers' => [
 						['name' => 'user update', 'value' => 'admin update', 'action' => 'update', 'index' => 0],
-						['value' => 'admin']
+						['name' => '', 'value' => 'admin']
 					],
-					'error_details' => [
-						'Invalid parameter "/1/headers/2/name": cannot be empty.'
+					'inline_errors' => [
+						'name:headers[1][name]' => 'This field cannot be empty.'
 					]
 				]
 			],
 			// Check request body.
 			[
 				[
+					'fields' => [
+						'Request body' => ''
+					],
 					'request_type' => 'JSON data',
-					'error_details' => [
-						'Invalid parameter "/1/posts": cannot be empty.'
-					]
-				]
-			],
-			[
-				[
-					'request_type' => 'XML data',
-					'error_details' => [
-						'Invalid parameter "/1/posts": cannot be empty.'
+					'inline_errors' => [
+						'Request body' => 'This field cannot be empty.'
 					]
 				]
 			],
 			[
 				[
 					'fields' => [
-						'Request body' => 'test'
+						'Request body' => ''
 					],
 					'request_type' => 'XML data',
-					'error_details' => [
-						'Invalid parameter "/1/posts": (4) Start tag expected, \'<\' not found [Line: 1 | Column: 1].'
+					'inline_errors' => [
+						'Request body' => 'This field cannot be empty.'
 					]
 				]
 			],
@@ -768,8 +696,8 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 					'fields' => [
 						'Required status codes' => '*'
 					],
-					'error_details' => [
-						'Invalid parameter "/1/status_codes": invalid range expression.'
+					'inline_errors' => [
+						'Required status codes' => 'Invalid range expression.'
 					]
 				]
 			],
@@ -778,8 +706,8 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 					'fields' => [
 						'Required status codes' => 'test'
 					],
-					'error_details' => [
-						'Invalid parameter "/1/status_codes": invalid range expression.'
+					'inline_errors' => [
+						'Required status codes' => 'Invalid range expression.'
 					]
 				]
 			]
@@ -804,7 +732,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 		$this->executeValidation($data, 'clone');
 	}
 
-	public static function getCreataData() {
+	public static function getCreateData() {
 		return [
 			// Fill required fields and check default values.
 			[
@@ -830,7 +758,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 					'check_form' => true
 				]
 			],
-			// Symbols in query and headers field
+			// Symbols in query and headers field.
 			[
 				[
 					'fields' => [
@@ -848,7 +776,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 					]
 				]
 			],
-			// JSON body
+			// JSON body.
 			[
 				[
 					'fields' => [
@@ -860,7 +788,20 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 					'request_type' => 'JSON data'
 				]
 			],
-			// XML body
+			// ZBXNEXT-9595: Invalid JSON structure in "Request body" field.
+			[
+				[
+					'fields' => [
+						'Name' => 'item with invalid JSON body',
+						'Key' => 'http.json.123',
+						'URL' => 'zabbix.com',
+						'Request body' => '{"{{{KEY}}}}}{VALUE}"}'
+					],
+					'request_type' => 'JSON data',
+					'check_form' => true
+				]
+			],
+			// XML body.
 			[
 				[
 					'fields' => [
@@ -870,6 +811,19 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 						'Request body' => '<data><macro>{$MACRO}</macro><![CDATA[{$MACRO}<foo></bar>]]></data>'
 					],
 					'request_type' => 'XML data'
+				]
+			],
+			// ZBXNEXT-9595: Invalid XML structure in "Request body" field.
+			[
+				[
+					'fields' => [
+						'Name' => 'item with invalid XML body',
+						'Key' => 'http.xml.123',
+						'URL' => 'zabbix.com',
+						'Request body' => '<data><macro>KEY<ma'
+					],
+					'request_type' => 'XML data',
+					'check_form' => true
 				]
 			],
 			// All possible fields.
@@ -914,7 +868,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 					'screenshot' => true
 				]
 			],
-			// Empty Basic authentication user/password
+			// Empty Basic authentication user/password.
 			[
 				[
 					'fields' => [
@@ -926,7 +880,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 					'check_form' => true
 				]
 			],
-			// Empty NTLM authentication user/password
+			// Empty NTLM authentication user/password.
 			[
 				[
 					'fields' => [
@@ -970,7 +924,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 	/**
 	 * Test creation of a HTTP agent item.
 	 *
-	 * @dataProvider getCreataData
+	 * @dataProvider getCreateData
 	 */
 	public function testFormItemHttpAgent_Create($data) {
 		$this->zbxTestLogin('zabbix.php?action=item.list&context=host&filter_set=1&filter_hostids[0]='.self::$hostid);
@@ -990,8 +944,10 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 		// Take a screenshot to test draggable object position of query and headers fields.
 		if (array_key_exists('screenshot', $data)) {
 			$this->page->removeFocus();
-			$this->assertScreenshot($this->query('id:query-fields-table')->one(), 'Query fields');
-			$this->assertScreenshot($this->query('id:headers-table')->one(), 'Headers fields');
+			// It is necessary because of unexpected viewport shift on Jenkins.
+			$this->page->updateViewport();
+			$this->assertScreenshot($form->query('id:query-fields-table')->one(), 'Query fields');
+			$this->assertScreenshot($form->query('id:headers-table')->one(), 'Headers fields');
 		}
 
 		if (array_key_exists('request_type', $data)) {
@@ -1095,6 +1051,16 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 					'check_form' => true
 				]
 			],
+			// ZBXNEXT-9595: Invalid JSON structure in "Request body" field.
+			[
+				[
+					'fields' => [
+						'Request body' => '{"KEY":"{'
+					],
+					'request_type' => 'JSON data',
+					'check_form' => true
+				]
+			],
 			// XML body with macro.
 			[
 				[
@@ -1105,7 +1071,17 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 					'check_form' => true
 				]
 			],
-			// Empty Basic authentication user/password
+			// ZBXNEXT-9595: Invalid XML structure in "Request body" field.
+			[
+				[
+					'fields' => [
+						'Request body' => '<data><macro>KEY<'
+					],
+					'request_type' => 'XML data',
+					'check_form' => true
+				]
+			],
+			// Empty Basic authentication user/password.
 			[
 				[
 					'fields' => [
@@ -1114,7 +1090,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 					'check_form' => true
 				]
 			],
-			// Empty NTLM authentication user/password
+			// Empty NTLM authentication user/password.
 			[
 				[
 					'fields' => [

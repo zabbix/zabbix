@@ -19,7 +19,10 @@ libzbxdbwrap_a_SOURCES = \
 	item.c \
 	user.c \
 	permission.c \
-	macro_ctx_trigger.c
+	macro_ctx_trigger.c \
+	tag_cache.c \
+	tag_cache.h \
+	macro_ctx_common.c
 
 libzbxdbwrap_a_CFLAGS = \
 	-I$(top_srcdir)/src/zabbix_server/ \

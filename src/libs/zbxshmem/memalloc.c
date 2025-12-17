@@ -532,7 +532,8 @@ int	zbx_shmem_create(zbx_shmem_info_t **info, zbx_uint64_t size, const char *des
 	descr = ZBX_NULL2STR(descr);
 	param = ZBX_NULL2STR(param);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() param:'%s' size:" ZBX_FS_SIZE_T, __func__, param, (zbx_fs_size_t)size);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() param:'%s' description: %s size:" ZBX_FS_SIZE_T, __func__, param,
+			descr, (zbx_fs_size_t)size);
 
 	/* allocate shared memory */
 
@@ -594,6 +595,7 @@ int	zbx_shmem_create(zbx_shmem_info_t **info, zbx_uint64_t size, const char *des
 	base = (void *)((char *)base + strlen(param) + 1);
 
 	(*info)->allow_oom = allow_oom;
+	(*info)->unlock_shmem_on_oom = NULL;
 
 	/* prepare shared memory for further allocation by creating one big chunk */
 	(*info)->lo_bound = ALIGN8(base);
@@ -611,7 +613,7 @@ int	zbx_shmem_create(zbx_shmem_info_t **info, zbx_uint64_t size, const char *des
 	(*info)->used_size = 0;
 	(*info)->free_size = (*info)->total_size;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "valid user addresses: [%p, %p] total size: " ZBX_FS_SIZE_T,
+	zabbix_log(LOG_LEVEL_DEBUG, "shmid: %d valid user addresses: [%p, %p] total size: " ZBX_FS_SIZE_T, shm_id,
 			(void *)((char *)(*info)->lo_bound + SHMEM_SIZE_FIELD),
 			(void *)((char *)(*info)->hi_bound - SHMEM_SIZE_FIELD),
 			(zbx_fs_size_t)(*info)->total_size);
@@ -694,6 +696,10 @@ void	*__zbx_shmem_malloc(const char *file, int line, zbx_shmem_info_t *info, con
 				file, line, __func__, (zbx_fs_size_t)size);
 		zabbix_log(LOG_LEVEL_CRIT, "[file:%s,line:%d] %s(): please increase %s configuration parameter",
 				file, line, __func__, info->mem_param);
+
+		if (NULL != info->unlock_shmem_on_oom)
+			info->unlock_shmem_on_oom();
+
 		exit(EXIT_FAILURE);
 	}
 
@@ -728,6 +734,10 @@ void	*__zbx_shmem_realloc(const char *file, int line, zbx_shmem_info_t *info, vo
 				file, line, __func__, (zbx_fs_size_t)size);
 		zabbix_log(LOG_LEVEL_CRIT, "[file:%s,line:%d] %s(): please increase %s configuration parameter",
 				file, line, __func__, info->mem_param);
+
+		if (NULL != info->unlock_shmem_on_oom)
+			info->unlock_shmem_on_oom();
+
 		exit(EXIT_FAILURE);
 	}
 

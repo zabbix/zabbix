@@ -89,6 +89,14 @@ void	__zbx_mock_assert_int_ne(const char *file, int line, const char *prefix_msg
 void	__zbx_mock_assert_double_eq(const char *file, int line, const char *prefix_msg, double expected_value,
 		double returned_value)
 {
+	if (isinf(expected_value) && isinf(returned_value))
+	{
+		if (expected_value == returned_value)
+			return;
+
+		_FAIL(file, line, prefix_msg, "Expected value \"%f\" while got \"%f\"", expected_value, returned_value);
+	}
+
 	if (zbx_get_double_epsilon() >= fabs(returned_value - expected_value))
 		return;
 

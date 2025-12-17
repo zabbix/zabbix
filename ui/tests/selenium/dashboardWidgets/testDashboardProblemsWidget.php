@@ -21,22 +21,14 @@ require_once __DIR__.'/../behaviors/CMessageBehavior.php';
 /**
  * @backup settings, widget
  *
+ * @dataSource HostAvailabilityWidget, MonitoringOverview
+ *
  * @onBefore prepareDashboardData
  */
 class testDashboardProblemsWidget extends CWebTest {
 
 	private static $dashboardid;
 	private static $update_widget = 'Problem widget for updating';
-
-	/**
-	 * Callback executed before every test case.
-	 *
-	 * @before
-	 */
-	public function onBeforeTestCase() {
-		parent::onBeforeTestCase();
-		CommandExecutor::setAlertStrategy(CommandExecutor::STRATEGY_ACCEPT_ALERT);
-	}
 
 	/**
 	 * Attach MessageBehavior to the test.
@@ -134,7 +126,7 @@ class testDashboardProblemsWidget extends CWebTest {
 		$this->assertEquals(['Type', 'Show header', 'Name', 'Refresh interval', 'Show', 'Host groups',
 				'Exclude host groups', 'Hosts', 'Problem', 'Severity', 'Problem tags', 'Show tags', 'Tag name',
 				'Tag display priority', 'Show operational data', 'Show symptoms', 'Show suppressed problems',
-				'Acknowledgement status', 'Sort entries by', 'Show timeline', 'Show lines'],
+				'Acknowledgement status', 'Sort entries by', 'Show timeline', 'Highlight whole row', 'Show lines'],
 				$form->getLabels()->asText()
 		);
 
@@ -454,7 +446,7 @@ class testDashboardProblemsWidget extends CWebTest {
 					'tag_fields' => []
 				]
 			],
-			// #9 Cyrillyc and special symbols in inputs.
+			// #9 Cyrillic and special symbols in inputs.
 			[
 				[
 					'fields' => [
@@ -652,8 +644,9 @@ class testDashboardProblemsWidget extends CWebTest {
 		}
 
 		COverlayDialogElement::find()->one()->close();
-		$dashboard->cancelEditing();
-		$this->page->waitUntilReady();
+		// Change dashboard from cancelEditing() to save() to check deadlock issue.
+		$dashboard->save();
+		$this->assertMessage(TEST_GOOD, 'Dashboard updated');
 	}
 
 	public function testDashboardProblemsWidget_SimpleUpdate() {

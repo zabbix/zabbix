@@ -483,23 +483,23 @@ function check_db_fields($dbFields, &$args) {
  *
  * @param string $field_name
  * @param array  $values
- * @param bool   $not_in        Create inverse condition.
- * @param bool   $zero_to_null  Cast zero to null.
+ * @param bool   $not_in              Create inverse condition.
+ * @param bool   $zero_includes_null  ID fields may have default DB column value either null or 0. Consider them
+ *                                    equivalent for 0 in the given values.
  *
  * @return string
  */
-function dbConditionInt($field_name, array $values, $not_in = false, $zero_to_null = false) {
+function dbConditionInt($field_name, array $values, $not_in = false, $zero_includes_null = false) {
 	if (is_bool(reset($values))) {
 		return $not_in ? '1=1' : '1=0';
 	}
 
 	$values = array_flip($values);
 
-	$has_zero = false;
+	$condition = '';
 
-	if ($zero_to_null && array_key_exists(0, $values)) {
-		$has_zero = true;
-		unset($values[0]);
+	if ($zero_includes_null && array_key_exists(0, $values)) {
+		$condition .= $field_name.($not_in ? ' IS NOT NULL' : ' IS NULL');
 	}
 
 	$values = array_keys($values);
@@ -510,14 +510,14 @@ function dbConditionInt($field_name, array $values, $not_in = false, $zero_to_nu
 		return dbQuoteInt($value);
 	}, $values);
 
-	$condition = '';
-
 	// Limit maximum number of values for using in "IN (<id1>,<id2>,...,<idN>)".
 	$single_chunks = array_chunk($singles, 950);
+	$multiple_conditions = false;
 
 	foreach ($single_chunks as $chunk) {
 		if ($condition !== '') {
 			$condition .= $not_in ? ' AND ' : ' OR ';
+			$multiple_conditions = true;
 		}
 
 		$condition .= count($chunk) == 1
@@ -525,18 +525,8 @@ function dbConditionInt($field_name, array $values, $not_in = false, $zero_to_nu
 			: $field_name.($not_in ? ' NOT' : '').' IN ('.implode(',', $chunk).')';
 	}
 
-	if ($has_zero) {
-		if ($condition !== '') {
-			$condition .= $not_in ? ' AND ' : ' OR ';
-		}
-
-		$condition .= $field_name.($not_in ? ' IS NOT NULL' : ' IS NULL');
-	}
-
-	if (!$not_in) {
-		if ((int) $has_zero + count($single_chunks) > 1) {
-			$condition = '('.$condition.')';
-		}
+	if (!$not_in && $multiple_conditions) {
+		$condition = '('.$condition.')';
 	}
 
 	return $condition;
@@ -564,27 +554,36 @@ function dbConditionId($fieldName, array $values, $notIn = false) {
  *
  * @return string
  */
-function dbConditionString($fieldName, array $values, $notIn = false) {
-	switch (count($values)) {
-		case 0:
-			return '1=0';
-		case 1:
-			return $notIn
-				? $fieldName.'!='.zbx_dbstr(reset($values))
-				: $fieldName.'='.zbx_dbstr(reset($values));
+function dbConditionString(string $field_name, array $values, bool $not_in = false): string {
+	if (!$values) {
+		return '1=0';
 	}
 
-	$in = $notIn ? ' NOT IN ' : ' IN ';
-	$concat = $notIn ? ' AND ' : ' OR ';
-	$items = array_chunk($values, 950);
-
-	$condition = '';
-	foreach ($items as $values) {
-		$condition .= !empty($condition) ? ')'.$concat.$fieldName.$in.'(' : '';
-		$condition .= implode(',', zbx_dbstr($values));
+	if (count($values) == 1) {
+		return $field_name.($not_in ? '!=' : '=').zbx_dbstr(reset($values));
 	}
 
-	return '('.$fieldName.$in.'('.$condition.'))';
+	$value_index = 0;
+	$in_conditions = [];
+	$chunk = [];
+
+	foreach ($values as $value) {
+		if ($value_index != 0 && $value_index % 950 == 0) {
+			$in_conditions[] = $field_name.($not_in ? ' NOT IN ' : ' IN ').'('.implode(',', $chunk).')';
+			$chunk = [];
+		}
+
+		$chunk[] = zbx_dbstr($value);
+		$value_index++;
+	}
+
+	if ($chunk) {
+		$in_conditions[] = count($chunk) == 1
+			? $field_name.($not_in ? '!=' : '=').$chunk[0]
+			: $field_name.($not_in ? ' NOT IN ' : ' IN ').'('.implode(',', $chunk).')';
+	}
+
+	return count($in_conditions) == 1 ? $in_conditions[0] : '('.implode($not_in ? ' AND ' : ' OR ', $in_conditions).')';
 }
 
 /**

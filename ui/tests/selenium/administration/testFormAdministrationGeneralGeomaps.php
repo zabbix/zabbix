@@ -50,23 +50,7 @@ class testFormAdministrationGeneralGeomaps extends CWebTest {
 					'Max zoom level' => 17
 				]
 			],
-			// #2.
-			[
-				[
-					'Tile provider' => 'Stamen Toner Lite',
-					'Tile URL' => 'https://stamen-tiles-{s}.a.ssl.fastly.net/toner-lite/{z}/{x}/{y}{r}.png',
-					'Max zoom level' => 20
-				]
-			],
-			// #3.
-			[
-				[
-					'Tile provider' => 'Stamen Terrain',
-					'Tile URL' => 'https://stamen-tiles-{s}.a.ssl.fastly.net/terrain/{z}/{x}/{y}{r}.png',
-					'Max zoom level' => 18
-				]
-			],
-			//#4.
+			//#2.
 			[
 				[
 					'Tile provider' => 'USGS US Topo',
@@ -74,7 +58,7 @@ class testFormAdministrationGeneralGeomaps extends CWebTest {
 					'Max zoom level' => 20
 				]
 			],
-			// #5.
+			// #3.
 			[
 				[
 					'Tile provider' => 'USGS US Imagery',
@@ -82,7 +66,7 @@ class testFormAdministrationGeneralGeomaps extends CWebTest {
 					'Max zoom level' => 20
 				]
 			],
-			// #6.
+			// #4.
 			[
 				[
 					'Tile provider' => 'Other',
@@ -109,7 +93,7 @@ class testFormAdministrationGeneralGeomaps extends CWebTest {
 		 */
 		if ($data['Tile provider'] === 'Other') {
 			// Check dropdown options presence.
-			$this->assertEquals(['OpenStreetMap Mapnik', 'OpenTopoMap', 'Stamen Toner Lite', 'Stamen Terrain',
+			$this->assertEquals(['OpenStreetMap Mapnik', 'OpenTopoMap',
 				'USGS US Topo', 'USGS US Imagery', 'Other'], $form->getField('Tile provider')->asDropdown()
 				->getOptions()->asText()
 			);
@@ -185,19 +169,28 @@ class testFormAdministrationGeneralGeomaps extends CWebTest {
 			// #2.
 			[
 				[
+					'expected' => TEST_BAD,
 					'fields' => [
-						'Tile provider' => 'Stamen Toner Lite'
+						'Tile provider' => 'Other'
 					],
-					'db' => 'Stamen.TonerLite'
+					'errors' => [
+						'Tile URL' => 'This field cannot be empty.',
+						'Max zoom level' => 'This value is not a valid integer.'
+					]
 				]
 			],
 			// #3.
 			[
 				[
+					'expected' => TEST_BAD,
 					'fields' => [
-						'Tile provider' => 'Stamen Terrain'
+						'Tile provider' => 'Other',
+						'Tile URL' => '123',
+						'Max zoom level' => ''
 					],
-					'db' => 'Stamen.Terrain'
+					'errors' => [
+						'Max zoom level' => 'This value is not a valid integer.'
+					]
 				]
 			],
 			// #4.
@@ -205,11 +198,12 @@ class testFormAdministrationGeneralGeomaps extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Tile provider' => 'Other'
+						'Tile provider' => 'Other',
+						'Tile URL' => 'bbb',
+						'Max zoom level' => 0
 					],
-					'error' => [
-						'Incorrect value for field "geomaps_tile_url": cannot be empty.',
-						'Incorrect value for field "geomaps_max_zoom": value must be no less than "1".'
+					'errors' => [
+						'Max zoom level' => 'This value must be no less than "1".'
 					]
 				]
 			],
@@ -219,10 +213,12 @@ class testFormAdministrationGeneralGeomaps extends CWebTest {
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Tile provider' => 'Other',
-						'Tile URL' => '123',
-						'Max zoom level' => ''
+						'Tile URL' => 'bbb',
+						'Max zoom level' => 31
 					],
-					'error' => 'Incorrect value for field "geomaps_max_zoom": value must be no less than "1".'
+					'errors' => [
+						'Max zoom level' => 'This value must be no greater than "30".'
+					]
 				]
 			],
 			// #6.
@@ -232,9 +228,11 @@ class testFormAdministrationGeneralGeomaps extends CWebTest {
 					'fields' => [
 						'Tile provider' => 'Other',
 						'Tile URL' => 'bbb',
-						'Max zoom level' => 0
+						'Max zoom level' => 'aa'
 					],
-					'error' => 'Incorrect value for field "geomaps_max_zoom": value must be no less than "1".'
+					'errors' => [
+						'Max zoom level' => 'This value must be no less than "1".'
+					]
 				]
 			],
 			// #7.
@@ -244,9 +242,11 @@ class testFormAdministrationGeneralGeomaps extends CWebTest {
 					'fields' => [
 						'Tile provider' => 'Other',
 						'Tile URL' => 'bbb',
-						'Max zoom level' => 31
+						'Max zoom level' => '!%:'
 					],
-					'error' => 'Incorrect value for field "geomaps_max_zoom": value must be no greater than "30".'
+					'errors' => [
+						'Max zoom level' => 'This value must be no less than "1".'
+					]
 				]
 			],
 			// #8.
@@ -256,36 +256,14 @@ class testFormAdministrationGeneralGeomaps extends CWebTest {
 					'fields' => [
 						'Tile provider' => 'Other',
 						'Tile URL' => 'bbb',
-						'Max zoom level' => 'aa'
+						'Max zoom level' => -1
 					],
-					'error' => 'Incorrect value for field "geomaps_max_zoom": value must be no less than "1".'
+					'errors' => [
+						'Max zoom level' => 'This value must be no less than "1".'
+					]
 				]
 			],
 			// #9.
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'Tile provider' => 'Other',
-						'Tile URL' => 'bbb',
-						'Max zoom level' => '!%:'
-					],
-					'error' => 'Incorrect value for field "geomaps_max_zoom": value must be no less than "1".'
-				]
-			],
-			// #10.
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'Tile provider' => 'Other',
-						'Tile URL' => 'bbb',
-						'Max zoom level' => -1
-					],
-					'error' => 'Incorrect value for field "geomaps_max_zoom": value must be no less than "1".'
-				]
-			],
-			// #11.
 			[
 				[
 					'fields' => [
@@ -295,7 +273,7 @@ class testFormAdministrationGeneralGeomaps extends CWebTest {
 					]
 				]
 			],
-			// #12.
+			// #10.
 			[
 				[
 					'fields' => [
@@ -306,7 +284,7 @@ class testFormAdministrationGeneralGeomaps extends CWebTest {
 					]
 				]
 			],
-			// #13.
+			// #11.
 			[
 				[
 					'fields' => [
@@ -317,7 +295,7 @@ class testFormAdministrationGeneralGeomaps extends CWebTest {
 					]
 				]
 			],
-			// #14.
+			// #12.
 			[
 				[
 					'fields' => [
@@ -328,7 +306,7 @@ class testFormAdministrationGeneralGeomaps extends CWebTest {
 					]
 				]
 			],
-			// #15.
+			// #13.
 			[
 				[
 					'fields' => [
@@ -342,7 +320,7 @@ class testFormAdministrationGeneralGeomaps extends CWebTest {
 					]
 				]
 			],
-			// #16.
+			// #14.
 			[
 				[
 					'fields' => [
@@ -354,7 +332,7 @@ class testFormAdministrationGeneralGeomaps extends CWebTest {
 					'trim' => true
 				]
 			],
-			// #17.
+			// #15.
 			[
 				[
 					'fields' => [
@@ -384,7 +362,7 @@ class testFormAdministrationGeneralGeomaps extends CWebTest {
 		$this->page->waitUntilReady();
 
 		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
-			$this->assertMessage(TEST_BAD, 'Cannot update configuration', $data['error']);
+			$this->assertInlineError($form, $data['errors']);
 
 			// Check that DB hash is not changed.
 			$this->assertEquals($old_hash, CDBHelper::getHash($this->sql));

@@ -103,7 +103,7 @@ int	zbx_macro_query_filter_resolv(zbx_macro_resolv_data_t *p, va_list args, char
 		{
 			if (INTERFACE_TYPE_UNKNOWN != item->interface.type)
 			{
-				zbx_dsprintf(*replace_to, "%hu", item->interface.port);
+				*replace_to = zbx_dsprintf(*replace_to, "%hu", item->interface.port);
 			}
 			else
 			{
@@ -185,7 +185,7 @@ int	zbx_macro_field_params_resolv(zbx_macro_resolv_data_t *p, va_list args, char
 		{
 			if (INTERFACE_TYPE_UNKNOWN != item->interface.type)
 			{
-				zbx_dsprintf(*replace_to, "%hu", item->interface.port);
+				*replace_to = zbx_dsprintf(*replace_to, "%hu", item->interface.port);
 			}
 			else
 			{
@@ -236,7 +236,8 @@ int	zbx_macro_script_params_field_resolv(zbx_macro_resolv_data_t *p, va_list arg
 		{
 			*replace_to = zbx_strdup(*replace_to, item->key_orig);
 		}
-		else if (0 == strncmp(p->macro, MVAR_INVENTORY, ZBX_CONST_STRLEN(MVAR_INVENTORY)))
+		else if (0 == strncmp(p->macro, MVAR_INVENTORY, ZBX_CONST_STRLEN(MVAR_INVENTORY)) ||
+				0 == strncmp(p->macro, MVAR_PROFILE, ZBX_CONST_STRLEN(MVAR_PROFILE)))
 		{
 			ret = zbx_dc_get_host_inventory_by_itemid(p->macro, item->itemid, replace_to);
 		}
@@ -244,7 +245,7 @@ int	zbx_macro_script_params_field_resolv(zbx_macro_resolv_data_t *p, va_list arg
 		{
 			if (INTERFACE_TYPE_UNKNOWN != item->interface.type)
 			{
-				zbx_dsprintf(*replace_to, "%hu", item->interface.port);
+				*replace_to = zbx_dsprintf(*replace_to, "%hu", item->interface.port);
 			}
 			else
 			{

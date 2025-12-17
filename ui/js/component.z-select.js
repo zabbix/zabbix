@@ -72,6 +72,7 @@ class ZSelect extends HTMLElement {
 					if (option && !option.disabled) {
 						this._input.value = option.value;
 						this.dispatchEvent(new Event('change', {bubbles: true}));
+						this.dispatchEvent(new Event('input', {bubbles: true}));
 					}
 					else {
 						this._input.value = null;
@@ -179,7 +180,7 @@ class ZSelect extends HTMLElement {
 
 		li._index = this._options_map.size;
 		li.setAttribute('value', value);
-		li.setAttribute('title', label.trim());
+		li.setAttribute('title', label.trim().replace(/<[^>]*>/g, ''));
 		li.innerHTML = new Template(template || this._option_template).evaluate(
 			Object.assign({label: label.trim()}, extra || {})
 		);

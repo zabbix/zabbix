@@ -126,8 +126,9 @@ foreach ($data['groups'] as $group) {
 				if ($data['allowed_ui_conf_hosts'] && $lld_rule['is_editable']
 						&& array_key_exists($lld_rule['itemid'], $data['ldd_rule_to_host_prototype'])) {
 					$lld_name = (new CLink($lld_rule['name'],
-						(new CUrl('host_prototypes.php'))
-							->setArgument('form', 'update')
+						(new CUrl('zabbix.php'))
+							->setArgument('action', 'popup')
+							->setArgument('popup', 'host.prototype.edit')
 							->setArgument('parent_discoveryid', $lld_rule['itemid'])
 							->setArgument('hostid', reset($data['ldd_rule_to_host_prototype'][$lld_rule['itemid']]))
 							->setArgument('context', 'host')
@@ -169,14 +170,14 @@ foreach ($data['groups'] as $group) {
 	if ($group['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
 		$max = 0;
 
-		foreach ($group['groupDiscoveries'] as $group_discovery) {
-			if ($group_discovery['ts_delete'] == 0) {
+		foreach ($group['discoveryData'] as $discovery_data) {
+			if ($discovery_data['ts_delete'] == 0) {
 				$max = 0;
 				break;
 			}
 
-			if ($group_discovery['status'] == ZBX_LLD_STATUS_LOST) {
-				$max = max($max, (int) $group_discovery['ts_delete']);
+			if ($discovery_data['status'] == ZBX_LLD_STATUS_LOST) {
+				$max = max($max, (int) $discovery_data['ts_delete']);
 			}
 		}
 

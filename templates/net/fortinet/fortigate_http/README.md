@@ -7,16 +7,16 @@ This template is designed for the effortless deployment of FortiGate monitoring 
 
 ## Requirements
 
-Zabbix version: 7.4 and higher.
+Zabbix version: 8.0 and higher.
 
 ## Tested versions
 
 This template has been tested on:
-- FortiGate v7.4.0
+- FortiGate v7.6.4
 
 ## Configuration
 
-> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/7.4/manual/config/templates_out_of_the_box) section.
+> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/8.0/manual/config/templates_out_of_the_box) section.
 
 ## Setup
 
@@ -29,9 +29,14 @@ This template has been tested on:
 7. Put the API token into `{$FGATE.API.TOKEN}` macro.
 8. Set your FortiGate GUI IP/FQDN as `{$FGATE.API.FQDN}` macro value.
 9. If FortiGate GUI uses HTTPS, put **https** value into `{$FGATE.SCHEME}` macro and **443** into `{$FGATE.API.PORT}` macro.
-10. If FortiGate GUI port differs from the standard one, specify it in `{$FGATE.API.PORT}` macro. 
+10. If FortiGate GUI port differs from the standard one, specify it in `{$FGATE.API.PORT}` macro.
 
->Please, refer to the [vendor documentation](https://docs.fortinet.com/document/fortigate/7.4.0/administration-guide/399023/rest-api-administrator) about the FortiGate REST API Authentication.
+NOTE: Starting from template version '8.0-2', the API token is used in the request header. For older template versions (where the API token is passed in the URL query parameter), when using FortiGate v7.4.5+, you must enable the following global setting:
+[Using APIs](https://docs.fortinet.com/document/fortigate/7.6.4/administration-guide/940602/using-apis)
+
+For added security, it is strongly recommended to use the latest template version, which passes the API token in the request header instead of the URL parameter.
+
+>Please, refer to the [vendor documentation](https://docs.fortinet.com/document/fortigate/7.6.4/administration-guide/399023/rest-api-administrator) about the FortiGate REST API Authentication.
 
 ### Macros used
 
@@ -42,7 +47,7 @@ This template has been tested on:
 |{$FGATE.API.TOKEN}|<p>FortiGate API token.</p>||
 |{$FGATE.API.PORT}|<p>The port of FortiGate API endpoint.</p>|`80`|
 |{$FGATE.DATA.TIMEOUT}|<p>Response timeout for an API.</p>|`15s`|
-|{$FGATE.HTTP.PROXY}|<p>HTTP proxy for API requests. You can specify it using the format [protocol://][username[:password]@]proxy.example.com[:port]. See the documentation at https://www.zabbix.com/documentation/7.4/manual/config/items/itemtypes/http</p>||
+|{$FGATE.HTTP.PROXY}|<p>HTTP proxy for API requests. You can specify it using the format [protocol://][username[:password]@]proxy.example.com[:port]. See the documentation at https://www.zabbix.com/documentation/8.0/manual/config/items/itemtypes/http</p>||
 |{$FIRMWARE.UPDATES.CONTROL}|<p>This macro is used in "New available firmware found" trigger.</p>|`1`|
 |{$CPU.UTIL.WARN}|<p>Threshold of CPU utilization for warning trigger in %.</p>|`85`|
 |{$CPU.UTIL.CRIT}|<p>Threshold of CPU utilization for critical trigger in %.</p>|`95`|

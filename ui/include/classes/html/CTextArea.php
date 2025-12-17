@@ -33,6 +33,7 @@ class CTextArea extends CTag {
 			->setId(zbx_formatDomId($name))
 			->setName($name)
 			->setValue($value)
+			->setAttribute('data-field-type', 'textarea')
 			->setRows(array_key_exists('rows', $options) ? $options['rows'] : ZBX_TEXTAREA_STANDARD_ROWS);
 
 		if (array_key_exists('readonly', $options)) {
@@ -99,6 +100,32 @@ class CTextArea extends CTag {
 		else {
 			$this->setAttribute('disabled', 'disabled');
 		}
+
+		return $this;
+	}
+
+	/**
+	 * Specify ID of error container.
+	 *
+	 * @param string|null $container_id    ID of form element where to display field errors.
+	 *
+	 * @return self
+	 */
+	public function setErrorContainer(?string $container_id): self {
+		$this->setAttribute('data-error-container', $container_id);
+
+		return $this;
+	}
+
+	/**
+	 * Specify the field label used for error message.
+	 *
+	 * @param string|null $label    Field label used in error message.
+	 *
+	 * @return self
+	 */
+	public function setErrorLabel(?string $label): self {
+		$this->setAttribute('data-error-label', $label);
 
 		return $this;
 	}

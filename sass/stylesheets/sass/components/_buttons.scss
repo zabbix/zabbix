@@ -3,7 +3,7 @@
 	min-width: 24px;
 	height: 24px;
 	padding: 0 11px;
-	font-family: $font-stack;
+	font-family: var(--font-stack);
 	font-size: $font-form-size;
 	line-height: 22px;
 	text-align: center;
@@ -272,12 +272,70 @@ button {
 		background-color: transparent;
 		border-style: dotted;
 	}
+
+	&[class^="zi-"], &[class*=" zi-"] {
+		height: 18px;
+		border: none;
+
+		&:not(:empty)::before {
+			margin-left: 0;
+			color: $btn-icon-color;
+
+			@if $ui-transitions {
+				transition: color $ui-controls-transition-duration ease-out;
+			}
+		}
+
+		span {
+			border-width: 0 0 1px;
+			border-style: dotted;
+		}
+
+		&:active,
+		&:focus,
+		&:hover {
+			&::before {
+				color: $btn-icon-hover-color;
+			}
+
+			span {
+				border-style: solid;
+				box-shadow: none;
+			}
+		}
+
+		&:active,
+		&:focus {
+			margin-bottom: 0;
+
+			&::before {
+				color: $btn-icon-focus-color;
+			}
+
+			span {
+				margin-bottom: -1px;
+				border-bottom-width: 2px;
+			}
+		}
+
+		&[disabled] {
+			&::before {
+				color: $btn-icon-disabled-color
+			}
+
+			span {
+				background-color: transparent;
+				border-style: dotted;
+			}
+		}
+	}
 }
 
 .btn-tag {
 	height: auto;
 	outline: none;
 	border: none;
+	box-sizing: content-box;
 
 	&:hover {
 		text-decoration: underline;

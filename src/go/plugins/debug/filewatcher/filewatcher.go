@@ -19,10 +19,10 @@ import (
 	"os"
 
 	"github.com/fsnotify/fsnotify"
-	"golang.zabbix.com/agent2/pkg/itemutil"
 	"golang.zabbix.com/agent2/pkg/watch"
 	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/plugin"
+	"golang.zabbix.com/sdk/plugin/itemutil"
 )
 
 var impl Plugin
@@ -136,7 +136,10 @@ func (w *fileWatcher) NewFilter(key string) (filter watch.EventFilter, err error
 
 func (p *Plugin) EventSourceByKey(key string) (es watch.EventSource, err error) {
 	var params []string
-	if _, params, err = itemutil.ParseKey(key); err != nil {
+
+	_, params, err = itemutil.ParseKey(key)
+
+	if err != nil {
 		return
 	}
 	watcher, ok := p.eventSources[params[0]]

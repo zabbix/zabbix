@@ -74,13 +74,13 @@ window.graph_edit_popup = new class {
 
 		document.getElementById('items-table').addEventListener('click', (e) => {
 			if (e.target.classList.contains('js-item-name')) {
-				this.#openItemPopup(e.target);
+				this.#openEditItemPopup(e.target);
 			}
 			else if (e.target.classList.contains('js-add-item')) {
-				this.#openItemSelectPopup();
+				this.#openAddItemPopup();
 			}
 			else if (e.target.classList.contains('js-add-item-prototype')) {
-				this.#openItemPrototypeSelectPopup({writeonly: '1', multiselect: '1', graphtype: this.graph_type});
+				this.#openAddItemPopup(true);
 			}
 			else if (e.target.classList.contains('js-remove')) {
 				this.#removeItem(e.target);
@@ -221,13 +221,9 @@ window.graph_edit_popup = new class {
 
 	#initPreviewTab() {
 		$('#tabs').on('tabscreate tabsactivate', (event, ui) => {
-			document.querySelector('#preview-tab').style.overflow = document.getElementById('width').value > 900
-				? 'auto'
-				: ''
-
 			const $panel = (event.type === 'tabscreate') ? ui.panel : ui.newPanel;
 
-			if ($panel.attr('id') === 'preview-tab') {
+			if ($panel.attr('id') === 'graph-preview-tab') {
 				const $preview_chart = $('#preview-chart');
 				const src = new Curl('chart3.php');
 
@@ -348,58 +344,59 @@ window.graph_edit_popup = new class {
 		});
 	}
 
-	#openItemPopup(target) {
+	#openEditItemPopup(target) {
 		const item_num = target.id.match(/\d+/g);
-		const parameters = {
-			srcfld1: 'itemid',
-			srcfld2: 'name',
-			dstfrm: this.form_name,
-			dstfld1: 'items_' + item_num + '_itemid',
-			dstfld2: 'items_' + item_num + '_name',
-			numeric: 1,
-			writeonly: 1,
-			normal_only: 1
-		};
-
-		if (document.getElementById('items_' + item_num + '_flags').value == <?= ZBX_FLAG_DISCOVERY_PROTOTYPE ?>) {
-			parameters['srctbl'] = 'item_prototypes';
-			parameters['srcfld3'] = 'flags';
-			parameters['dstfld3'] = 'items_' + item_num + '_flags';
-			parameters['parent_discoveryid'] = this.graph.parent_discoveryid;
-		}
-		else {
-			parameters['srctbl'] = 'items';
-		}
-
-		if (!this.graph.parent_discoveryid && this.graph.hostid) {
-			parameters['hostid'] = this.graph.hostid;
-		}
-
-		if (this.graph.is_template) {
-			parameters['only_hostid'] = this.graph.hostid
-		}
-		else {
-			parameters['real_hosts'] = '1';
-			parameters['hostid'] = this.graph.hostid;
-		}
+		const is_prototype = document.getElementById('items_' + item_num + '_flags').value == <?= ZBX_FLAG_DISCOVERY_PROTOTYPE ?>;
+		const parameters = this.#getItemPopupParameters(item_num, is_prototype);
 
 		PopUp('popup.generic', parameters, {dialogue_class: "modal-popup-generic", trigger_element: target});
 	}
 
-	#toggleColorPickerStatus() {
-		const size = document.querySelectorAll('#items-table tbody tr.graph-item').length;
+	#openAddItemPopup(is_prototype = false) {
+		const parameters = this.#getItemPopupParameters(null, is_prototype);
 
-		for (let i = 0; i < size; i++) {
-			const color_element = document.getElementById('items_' + i + '_color');
+		PopUp('popup.generic', parameters, {dialogue_class: 'modal-popup-generic'});
+	}
 
-			color_element.removeAttribute('onchange');
-			color_element.readOnly = true;
+	#getItemPopupParameters(item_num = null, is_prototype = false) {
+		const parameters = {
+			srcfld1: 'itemid',
+			srcfld2: 'name',
+			dstfrm: this.form_name,
+			numeric: 1,
+			writeonly: 1
+		};
 
-			const lbl_color_elem = document.getElementById('lbl_items_' + i + '_color');
-
-			lbl_color_elem.removeAttribute('onclick');
-			lbl_color_elem.readOnly = true;
+		if (item_num === null) {
+			parameters.multiselect = 1;
 		}
+		else {
+			parameters.dstfld1 = 'items_' + item_num + '_itemid';
+			parameters.dstfld2 = 'items_' + item_num + '_name';
+		}
+
+		if (is_prototype) {
+			parameters.srctbl = 'item_prototypes';
+			parameters.parent_discoveryid = this.graph.parent_discoveryid;
+
+			if (item_num !== null) {
+				parameters.srcfld3 = 'flags';
+				parameters.dstfld3 = 'items_' + item_num + '_flags';
+			}
+		}
+		else {
+			parameters.srctbl = 'items';
+		}
+
+		if (this.graph.is_template) {
+			parameters.only_hostid = this.graph.hostid
+		}
+		else {
+			parameters.real_hosts = 1;
+			parameters.hostid = this.graph.hostid;
+		}
+
+		return parameters;
 	}
 
 	#removeItem(target) {
@@ -442,7 +439,6 @@ window.graph_edit_popup = new class {
 
 			const $row = $(new_row);
 			$row.find('#items_' + index + '_calc_fnc').val('<?= CALC_FNC_AVG ?>');
-			$(`#items_${index}_color`).colorpicker();
 		});
 	}
 
@@ -450,30 +446,6 @@ window.graph_edit_popup = new class {
 		const $row = $(template.evaluate(item));
 
 		$('#item-buttons-row').before($row);
-		$row.find(`.${ZBX_STYLE_COLOR_PICKER} input`).colorpicker();
-
-		if (this.readonly) {
-			this.#toggleColorPickerStatus();
-		}
-	}
-
-	#openItemSelectPopup() {
-		const parameters = {
-			srctbl: 'items',
-			srcfld1: 'itemid',
-			srcfld2: 'name',
-			dstfrm: this.form_name,
-			numeric: 1,
-			writeonly: 1,
-			multiselect: 1,
-			hostid: this.hostid
-		};
-
-		if (this.graph.normal_only == 1) {
-			parameters['normal_only'] = this.graph.normal_only;
-		}
-
-		PopUp('popup.generic', parameters, {dialogue_class: 'modal-popup-generic'});
 	}
 
 	#openItemPrototypeSelectPopup(popup_parameters = {}) {
@@ -487,10 +459,6 @@ window.graph_edit_popup = new class {
 		}
 
 		Object.assign(parameters, popup_parameters);
-
-		if (this.graph.normal_only == 1) {
-			parameters['normal_only'] = this.graph.normal_only;
-		}
 
 		PopUp('popup.generic', parameters, {dialogue_class: 'modal-popup-generic'});
 	}
@@ -533,9 +501,9 @@ window.graph_edit_popup = new class {
 		for (let i = 0; i < list.length; i++) {
 			const used_colors = [];
 
-			for (const color of this.form.querySelectorAll(`.${ZBX_STYLE_COLOR_PICKER} input`)) {
-				if (color.value !== '') {
-					used_colors.push(color.value);
+			for (const color_picker of this.form.querySelectorAll(`.${ZBX_STYLE_COLOR_PICKER}`)) {
+				if (color_picker.color !== '') {
+					used_colors.push(color_picker.color);
 				}
 			}
 
@@ -560,7 +528,6 @@ window.graph_edit_popup = new class {
 
 			$('#item-buttons-row').before($row);
 			$row.find('#items_' + number + '_calc_fnc').val('<?= CALC_FNC_AVG ?>');
-			$(`#items_${number}_color`).colorpicker();
 		}
 	}
 

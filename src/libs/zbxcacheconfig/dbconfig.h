@@ -94,6 +94,8 @@ typedef struct
 	zbx_uint64_t	itemid;
 	const char	*function;
 	const char	*parameter;
+	unsigned int	sz_function;
+	unsigned int	sz_parameter;
 	zbx_uint64_t	revision;
 	zbx_uint64_t	timer_revision;
 	unsigned char	type;
@@ -286,7 +288,7 @@ typedef struct
 	zbx_uint64_t		valuemapid;
 	const char		*key;
 	const char		*port;
-	const char		*error;
+	char			error_hash[ZBX_SHA512_BINARY_LENGTH];
 	const char		*delay;
 	const char		*delay_ex;
 	const char		*history_period;
@@ -404,6 +406,7 @@ typedef struct
 	const char	*name;
 	int		maintenance_from;
 	int		data_expected_from;
+	zbx_uint64_t	flags;
 	zbx_uint64_t	revision;
 
 	unsigned char	maintenance_status;
@@ -439,6 +442,7 @@ typedef struct
 	int		flags;
 	int		timestamp;
 	unsigned short	listen_port;
+	unsigned int	connection_type;
 }
 ZBX_DC_AUTOREG_HOST;
 
@@ -511,6 +515,8 @@ typedef struct
 
 	unsigned char			custom_timeouts;
 	zbx_config_item_type_timeouts_t	item_timeouts;
+
+	int				pending_history;
 }
 ZBX_DC_PROXY;
 
@@ -569,6 +575,7 @@ typedef struct
 	/* item statistics per interface */
 	int		items_num;
 	int		version;
+	zbx_uint64_t	revision;
 }
 ZBX_DC_INTERFACE;
 
@@ -1080,10 +1087,38 @@ void	set_dc_config(zbx_dc_config_t *in);
 
 int		zbx_get_sync_in_progress(void);
 zbx_rwlock_t	zbx_get_config_lock(void);
+int		zbx_config_wlock_is_locked(void);
+void		zbx_config_wlock_set_locked(void);
+void		zbx_config_wlock_set_unlocked(void);
 
-#define	RDLOCK_CACHE	do { if (0 == zbx_get_sync_in_progress()) zbx_rwlock_rdlock(zbx_get_config_lock()); } while(0)
-#define	WRLOCK_CACHE	do { if (0 == zbx_get_sync_in_progress()) zbx_rwlock_wrlock(zbx_get_config_lock()); } while(0)
-#define	UNLOCK_CACHE	do { if (0 == zbx_get_sync_in_progress()) zbx_rwlock_unlock(zbx_get_config_lock()); } while(0)
+#define	RDLOCK_CACHE	do								\
+			{								\
+				if (0 == zbx_get_sync_in_progress())			\
+				{							\
+					zbx_rwlock_rdlock(zbx_get_config_lock());	\
+				}							\
+			}								\
+			while(0)
+
+#define	WRLOCK_CACHE	do								\
+			{								\
+				if (0 == zbx_get_sync_in_progress())			\
+				{							\
+					zbx_rwlock_wrlock(zbx_get_config_lock());	\
+					zbx_config_wlock_set_locked();			\
+				}							\
+			}								\
+			while(0)
+
+#define	UNLOCK_CACHE	do								\
+			{								\
+				if (0 == zbx_get_sync_in_progress())			\
+				{							\
+					zbx_config_wlock_set_unlocked();		\
+					zbx_rwlock_unlock(zbx_get_config_lock());	\
+				}							\
+			}								\
+			while(0)
 
 zbx_rwlock_t	zbx_get_config_history_lock(void);
 
@@ -1141,6 +1176,7 @@ void		DCget_function(zbx_dc_function_t *dst_function, const ZBX_DC_FUNCTION *src
 void		DCget_trigger(zbx_dc_trigger_t *dst_trigger, const ZBX_DC_TRIGGER *src_trigger, unsigned int flags);
 int		DCitem_nextcheck_update(ZBX_DC_ITEM *item, const ZBX_DC_INTERFACE *interface, int flags, int now,
 			char **error);
+unsigned char	zbx_dc_item_requires_preprocessing(const ZBX_DC_ITEM *src_item);
 
 #define ZBX_TRIGGER_TIMER_NONE			0x0000
 #define ZBX_TRIGGER_TIMER_TRIGGER		0x0001

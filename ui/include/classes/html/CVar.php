@@ -49,7 +49,7 @@ class CVar {
 		}
 
 		if (strpos($value, "\n") === false) {
-			$hiddenVar = new CInput('hidden', $name, $value);
+			$hiddenVar = (new CInput('hidden', $name, $value))->setAttribute('data-field-type', 'hidden');
 		}
 		else {
 			$hiddenVar = (new CTextArea($name, $value))->addStyle('display: none;');
@@ -94,6 +94,14 @@ class CVar {
 	public function setEnabled($value) {
 		foreach ($this->var_container as $item) {
 			$item->setEnabled($value);
+		}
+
+		return $this;
+	}
+
+	public function setAttribute(string $name, string $value) {
+		foreach ($this->var_container as $item) {
+			$item->setAttribute($name, $value);
 		}
 
 		return $this;

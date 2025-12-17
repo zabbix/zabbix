@@ -21,9 +21,6 @@ use PHPUnit\Framework\TestCase;
 
 class CIPParserTest extends TestCase {
 
-	/**
-	 * An array of trigger functions and parsed results.
-	 */
 	public static function dataProvider() {
 		return [
 			[
@@ -347,5 +344,4 @@ class CIPParserTest extends TestCase {
 		]);
 		$this->assertSame(strlen($expected['match']), $ip_parser->getLength());
 	}
-
 }

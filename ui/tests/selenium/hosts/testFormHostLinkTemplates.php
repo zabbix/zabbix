@@ -192,6 +192,7 @@ class testFormHostLinkTemplates extends CLegacyWebTest {
 			$this->assertEquals(self::LINKED_TEMPLATE, $form->query('class:subfilter-enabled')->one()->getText());
 			$form->submit();
 			$this->assertMessage(TEST_GOOD, $entity.' updated');
+			CMessageElement::find()->one()->close();
 
 			$this->openConfigurationForm($data);
 			$form->invalidate();

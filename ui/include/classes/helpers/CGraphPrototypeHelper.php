@@ -74,6 +74,9 @@ class CGraphPrototypeHelper extends CGraphGeneralHelper {
 				'ymax_type', 'yaxismax', 'ymax_itemid', 'discover'
 			],
 			'selectGraphItems' => ['sortorder', 'itemid', 'type', 'calc_fnc', 'drawtype', 'yaxisside', 'color'],
+			'filter' => [
+				'flags' => [ZBX_FLAG_DISCOVERY_PROTOTYPE]
+			],
 			'preservekeys' => true
 		] + $src_options);
 	}

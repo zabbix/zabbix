@@ -339,14 +339,17 @@ static void	decode_and_escape_binary_value_for_sql(zbx_dbconn_t *db, char **sql_
 
 	zbx_base64_decode(*sql_insert_data, binary_data, binary_data_max_len, &binary_data_len);
 
+	if (0 == binary_data_len)
+		goto out;
 #if defined (HAVE_MYSQL)
-	escaped_binary = (char*)zbx_malloc(NULL, 2 * binary_data_len);
+		escaped_binary = (char*)zbx_malloc(NULL, 2 * binary_data_len);
 #endif
 	dbconn_escape_bin(db, binary_data, &escaped_binary, binary_data_len);
 
-	zbx_free(binary_data);
 	zbx_free(*sql_insert_data);
 	*sql_insert_data = escaped_binary;
+out:
+	zbx_free(binary_data);
 }
 #else
 static void	decode_and_escape_binary_value_for_sql(zbx_dbconn_t *db, char **sql_insert_data)
@@ -494,8 +497,10 @@ int	zbx_db_insert_execute(zbx_db_insert_t *db_insert)
 					break;
 				case ZBX_TYPE_BLOB:
 					zbx_chrcpy_alloc(&sql, &sql_alloc, &sql_offset, '\'');
-					decode_and_escape_binary_value_for_sql(db_insert->db, &(value->str));
-					zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, value->str);
+					if (NULL != value->str)
+						decode_and_escape_binary_value_for_sql(db_insert->db, &(value->str));
+					if (NULL != value->str)
+						zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, value->str);
 					zbx_chrcpy_alloc(&sql, &sql_alloc, &sql_offset, '\'');
 					break;
 				case ZBX_TYPE_INT:
@@ -619,4 +624,14 @@ zbx_uint64_t	zbx_db_insert_get_lastid(zbx_db_insert_t *self)
 void	zbx_db_insert_set_batch_size(zbx_db_insert_t *self, int batch_size)
 {
 	self->batch_size = batch_size;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: get number of rows to be inserted                                 *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_db_insert_get_row_count(zbx_db_insert_t *self)
+{
+	return self->rows.values_num;
 }

@@ -40,49 +40,50 @@ class CHostPrototype extends CHostBase {
 	public function get(array $options) {
 		$hosts_fields = array_keys($this->getTableSchema('hosts')['fields']);
 		$output_fields = ['hostid', 'host', 'name', 'status', 'templateid', 'inventory_mode', 'discover',
-			'custom_interfaces', 'uuid'
+			'custom_interfaces', 'uuid', 'flags'
 		];
-		$discovery_fields = array_keys($this->getTableSchema('items')['fields']);
-		$hostmacro_fields = array_keys($this->getTableSchema('hostmacro')['fields']);
+
 		$interface_fields = ['type', 'useip', 'ip', 'dns', 'port', 'main', 'details'];
 
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
 			// filter
-			'hostids' =>				['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
-			'discoveryids' =>			['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
-			'filter' =>					['type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => ['hostid', 'host', 'name', 'status', 'templateid', 'inventory_mode']],
-			'search' =>					['type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => ['host', 'name']],
-			'searchByAny' =>			['type' => API_BOOLEAN, 'default' => false],
-			'startSearch' =>			['type' => API_FLAG, 'default' => false],
-			'excludeSearch' =>			['type' => API_FLAG, 'default' => false],
-			'searchWildcardsEnabled' =>	['type' => API_BOOLEAN, 'default' => false],
+			'hostids' =>						['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
+			'discoveryids' =>					['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
+			'filter' =>							['type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => ['hostid', 'host', 'name', 'status', 'templateid', 'inventory_mode', 'flags']],
+			'search' =>							['type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => ['host', 'name']],
+			'searchByAny' =>					['type' => API_BOOLEAN, 'default' => false],
+			'startSearch' =>					['type' => API_FLAG, 'default' => false],
+			'excludeSearch' =>					['type' => API_FLAG, 'default' => false],
+			'searchWildcardsEnabled' =>			['type' => API_BOOLEAN, 'default' => false],
 			// output
-			'output' =>					['type' => API_OUTPUT, 'in' => implode(',', $output_fields), 'default' => $output_fields],
-			'countOutput' =>			['type' => API_FLAG, 'default' => false],
-			'groupCount' =>				['type' => API_FLAG, 'default' => false],
-			'selectGroupLinks' =>		['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['groupid']), 'default' => null],
-			'selectGroupPrototypes' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['group_prototypeid', 'name']), 'default' => null],
-			'selectDiscoveryRule' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', $discovery_fields), 'default' => null],
-			'selectParentHost' =>		['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', $hosts_fields), 'default' => null],
-			'selectInterfaces' =>		['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', $interface_fields), 'default' => null],
-			'selectTemplates' =>		['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT, 'in' => implode(',', $hosts_fields), 'default' => null],
-			'selectMacros' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', $hostmacro_fields), 'default' => null],
-			'selectTags' =>				['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['tag', 'value']), 'default' => null],
+			'output' =>							['type' => API_OUTPUT, 'in' => implode(',', $output_fields), 'default' => $output_fields],
+			'countOutput' =>					['type' => API_FLAG, 'default' => false],
+			'groupCount' =>						['type' => API_FLAG, 'default' => false],
+			'selectGroupLinks' =>				['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['groupid']), 'default' => null],
+			'selectGroupPrototypes' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['group_prototypeid', 'name']), 'default' => null],
+			'selectDiscoveryRule' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', CDiscoveryRule::OUTPUT_FIELDS), 'default' => null],
+			'selectDiscoveryRulePrototype' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', CDiscoveryRulePrototype::OUTPUT_FIELDS), 'default' => null],
+			'selectDiscoveryData' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', self::DISCOVERY_DATA_OUTPUT_FIELDS), 'default' => null],
+			'selectParentHost' =>				['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', $hosts_fields), 'default' => null],
+			'selectInterfaces' =>				['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', $interface_fields), 'default' => null],
+			'selectTemplates' =>				['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT, 'in' => implode(',', $hosts_fields), 'default' => null],
+			'selectMacros' =>					['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', CUserMacro::getOutputFieldsOnHostPrototype()), 'default' => null],
+			'selectTags' =>						['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', ['tag', 'value']), 'default' => null],
+			'selectInheritedTags' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', self::INHERITED_TAG_OUTPUT_FIELDS), 'default' => null],
 			// sort and limit
-			'sortfield' =>				['type' => API_STRINGS_UTF8, 'flags' => API_NORMALIZE, 'in' => implode(',', $this->sortColumns), 'uniq' => true, 'default' => []],
-			'sortorder' =>				['type' => API_SORTORDER, 'default' => []],
-			'limit' =>					['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'in' => '1:'.ZBX_MAX_INT32, 'default' => null],
+			'sortfield' =>						['type' => API_STRINGS_UTF8, 'flags' => API_NORMALIZE, 'in' => implode(',', $this->sortColumns), 'uniq' => true, 'default' => []],
+			'sortorder' =>						['type' => API_SORTORDER, 'default' => []],
+			'limit' =>							['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'in' => '1:'.ZBX_MAX_INT32, 'default' => null],
 			// flags
-			'inherited'	=>				['type' => API_BOOLEAN, 'flags' => API_ALLOW_NULL, 'default' => null],
-			'editable' =>				['type' => API_BOOLEAN, 'default' => false],
-			'preservekeys' =>			['type' => API_BOOLEAN, 'default' => false],
-			'nopermissions' =>			['type' => API_BOOLEAN, 'default' => false]	// TODO: This property and frontend usage SHOULD BE removed.
+			'inherited'	=>						['type' => API_BOOLEAN, 'flags' => API_ALLOW_NULL, 'default' => null],
+			'editable' =>						['type' => API_BOOLEAN, 'default' => false],
+			'preservekeys' =>					['type' => API_BOOLEAN, 'default' => false],
+			'nopermissions' =>					['type' => API_BOOLEAN, 'default' => false]	// TODO: This property and frontend usage SHOULD BE removed.
 		]];
+
 		if (!CApiInputValidator::validate($api_input_rules, $options, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
-
-		$options['filter']['flags'] = ZBX_FLAG_DISCOVERY_PROTOTYPE;
 
 		if ($options['output'] === API_OUTPUT_EXTEND) {
 			$options['output'] = $output_fields;
@@ -136,29 +137,26 @@ class CHostPrototype extends CHostBase {
 
 		if ((!$options['countOutput'] && $this->outputIsRequested('inventory_mode', $options['output']))
 				|| ($options['filter'] && array_key_exists('inventory_mode', $options['filter']))) {
-			$sqlParts['left_join'][] = ['alias' => 'hinv', 'table' => 'host_inventory', 'using' => 'hostid'];
-			$sqlParts['left_table'] = ['alias' => $this->tableAlias, 'table' => $this->tableName];
+			$sqlParts['join']['hinv'] = ['type' => 'left', 'table' => 'host_inventory', 'using' => 'hostid'];
 		}
 
 		return $sqlParts;
 	}
 
 	protected function applyQueryFilterOptions($tableName, $tableAlias, array $options, array $sqlParts) {
+		$sqlParts['where'][] = 'h.flags IN('.ZBX_FLAG_DISCOVERY_PROTOTYPE.','.ZBX_FLAG_DISCOVERY_PROTOTYPE_CREATED.')';
+
 		$sqlParts = parent::applyQueryFilterOptions($tableName, $tableAlias, $options, $sqlParts);
 
 		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
 			if (self::$userData['ugsetid'] == 0) {
-				$sql_parts['where'][] = '1=0';
+				$sqlParts['where'][] = '1=0';
 			}
 			else {
-				$sqlParts['from']['hd'] = 'host_discovery hd';
-				$sqlParts['from'][] = 'items i';
-				$sqlParts['from'][] = 'host_hgset hh';
-				$sqlParts['from'][] = 'permission p';
-				$sqlParts['where']['h-hd'] = $this->fieldId('hostid').'=hd.hostid';
-				$sqlParts['where'][] = 'hd.parent_itemid=i.itemid';
-				$sqlParts['where'][] = 'i.hostid=hh.hostid';
-				$sqlParts['where'][] = 'hh.hgsetid=p.hgsetid';
+				$sqlParts['join']['hd'] = ['table' => 'host_discovery', 'using' => 'hostid'];
+				$sqlParts['join']['i'] = ['left_table' => 'hd', 'table' => 'items', 'on' => ['lldruleid' => 'itemid']];
+				$sqlParts['join']['hh'] = ['left_table' => 'i', 'table' => 'host_hgset', 'using' => 'hostid'];
+				$sqlParts['join']['p'] = ['left_table' => 'hh', 'table' => 'permission', 'using' => 'hgsetid'];
 				$sqlParts['where'][] = 'p.ugsetid='.self::$userData['ugsetid'];
 
 				if ($options['editable']) {
@@ -169,12 +167,11 @@ class CHostPrototype extends CHostBase {
 
 		// discoveryids
 		if ($options['discoveryids'] !== null) {
-			$sqlParts['from']['hd'] = 'host_discovery hd';
-			$sqlParts['where']['h-hd'] = $this->fieldId('hostid').'=hd.hostid';
-			$sqlParts['where'][] = dbConditionId('hd.parent_itemid', (array) $options['discoveryids']);
+			$sqlParts['join']['hd'] = ['table' => 'host_discovery', 'using' => 'hostid'];
+			$sqlParts['where'][] = dbConditionId('hd.lldruleid', (array) $options['discoveryids']);
 
 			if ($options['groupCount']) {
-				$sqlParts['group']['hd'] = 'hd.parent_itemid';
+				$sqlParts['group']['hd'] = 'hd.lldruleid';
 			}
 		}
 
@@ -219,31 +216,27 @@ class CHostPrototype extends CHostBase {
 	protected function addRelatedObjects(array $options, array $result) {
 		$result = parent::addRelatedObjects($options, $result);
 
-		$hostids = array_keys($result);
-
-		if ($options['selectDiscoveryRule'] !== null) {
-			$relationMap = $this->createRelationMap($result, 'hostid', 'parent_itemid', 'host_discovery');
-			$discoveryRules = API::DiscoveryRule()->get([
-				'output' => $options['selectDiscoveryRule'],
-				'itemids' => $relationMap->getRelatedIds(),
-				'nopermissions' => true,
-				'preservekeys' => true
-			]);
-			$result = $relationMap->mapOne($result, $discoveryRules, 'discoveryRule');
-		}
-
+		self::addRelatedTags($options, $result);
+		self::addRelatedInheritedTags($options, $result);
+		self::addRelatedMacros($options, $result);
+		self::addRelatedDiscoveryRules($options, $result);
+		self::addRelatedDiscoveryRulePrototypes($options, $result);
+		self::addRelatedDiscoveryData($options, $result);
 		self::addRelatedGroupLinks($options, $result);
 		self::addRelatedGroupPrototypes($options, $result);
+
+		$hostids = array_keys($result);
 
 		if ($options['selectParentHost'] !== null) {
 			$hosts = [];
 			$relationMap = new CRelationMap();
 			$dbRules = DBselect(
 				'SELECT hd.hostid,i.hostid AS parent_hostid'.
-					' FROM host_discovery hd,items i'.
-					' WHERE '.dbConditionId('hd.hostid', $hostids).
-					' AND hd.parent_itemid=i.itemid'
+				' FROM host_discovery hd,items i'.
+				' WHERE '.dbConditionId('hd.hostid', $hostids).
+					' AND hd.lldruleid=i.itemid'
 			);
+
 			while ($relation = DBfetch($dbRules)) {
 				$relationMap->addRelation($relation['hostid'], $relation['parent_hostid']);
 			}
@@ -294,34 +287,6 @@ class CHostPrototype extends CHostBase {
 			}
 		}
 
-		if ($options['selectTags'] !== null) {
-			foreach ($result as &$row) {
-				$row['tags'] = [];
-			}
-			unset($row);
-
-			if ($options['selectTags'] === API_OUTPUT_EXTEND) {
-				$output = ['hosttagid', 'hostid', 'tag', 'value'];
-			}
-			else {
-				$output = array_unique(array_merge(['hosttagid', 'hostid'], $options['selectTags']));
-			}
-
-			$sql_options = [
-				'output' => $output,
-				'filter' => ['hostid' => $hostids]
-			];
-			$db_tags = DBselect(DB::makeSql('host_tag', $sql_options));
-
-			while ($db_tag = DBfetch($db_tags)) {
-				$hostid = $db_tag['hostid'];
-
-				unset($db_tag['hosttagid'], $db_tag['hostid']);
-
-				$result[$hostid]['tags'][] = $db_tag;
-			}
-		}
-
 		if ($options['selectInterfaces'] !== null) {
 			$interfaces = API::HostInterface()->get([
 				'output' => $this->outputExtend($options['selectInterfaces'], ['hostid', 'interfaceid']),
@@ -343,6 +308,46 @@ class CHostPrototype extends CHostBase {
 		}
 
 		return $result;
+	}
+
+	private static function addRelatedDiscoveryRulePrototypes(array $options, array &$result): void {
+		if ($options['selectDiscoveryRulePrototype'] === null) {
+			return;
+		}
+
+		foreach ($result as &$host) {
+			$host['discoveryRulePrototype'] = [];
+		}
+		unset($host);
+
+		$resource = DBselect(
+			'SELECT hd.lldruleid,hd.hostid'.
+			' FROM host_discovery hd'.
+			' JOIN items i ON hd.lldruleid=i.itemid'.
+			' WHERE '.dbConditionId('hd.hostid', array_keys($result)).
+				' AND '.dbConditionId('i.flags',
+					[ZBX_FLAG_DISCOVERY_RULE_PROTOTYPE, ZBX_FLAG_DISCOVERY_RULE_PROTOTYPE_CREATED]
+				)
+		);
+
+		$hostids = [];
+
+		while ($row = DBfetch($resource)) {
+			$hostids[$row['lldruleid']][] = $row['hostid'];
+		}
+
+		$parent_lld_rules = API::DiscoveryRulePrototype()->get([
+			'output' => $options['selectDiscoveryRulePrototype'],
+			'itemids' => array_keys($hostids),
+			'nopermissions' => true,
+			'preservekeys' => true
+		]);
+
+		foreach ($parent_lld_rules as $lldruleid => $parent_lld_rule) {
+			foreach ($hostids[$lldruleid] as $hostid) {
+				$result[$hostid]['discoveryRulePrototype'] = $parent_lld_rule;
+			}
+		}
 	}
 
 	/**
@@ -518,13 +523,19 @@ class CHostPrototype extends CHostBase {
 
 		$hostids = DB::insert('hosts', $hosts);
 
+		$ins_host_template_cache = [];
 		$host_statuses = [];
 
 		foreach ($hosts as &$host) {
 			$host['hostid'] = array_shift($hostids);
 
+			$ins_host_template_cache[] = [
+				'hostid' => $host['hostid'],
+				'link_hostid' => $host['hostid']
+			];
+
 			$host_statuses[] = $host['host_status'];
-			unset($host['host_status'], $host['flags']);
+			unset($host['host_status']);
 		}
 		unset($host);
 
@@ -532,14 +543,17 @@ class CHostPrototype extends CHostBase {
 			$this->checkTemplatesLinks($hosts);
 		}
 
+		DB::insertBatch('host_template_cache', $ins_host_template_cache, false);
+
 		self::createHostDiscoveries($hosts);
 
 		self::updateInterfaces($hosts);
 		self::updateGroupLinks($hosts);
 		self::updateGroupPrototypes($hosts);
-		$this->updateTemplates($hosts);
+		self::updateTemplates($hosts);
+		self::updateHostTemplateCache($hosts);
 		$this->updateTags($hosts);
-		$this->updateMacros($hosts);
+		self::updateMacros($hosts);
 		self::updateHostInventories($hosts);
 
 		self::addAuditLog(CAudit::ACTION_ADD, CAudit::RESOURCE_HOST_PROTOTYPE, $hosts);
@@ -587,6 +601,9 @@ class CHostPrototype extends CHostBase {
 		$db_hosts = $this->get([
 			'output' => ['uuid', 'hostid', 'host', 'name', 'custom_interfaces', 'status', 'discover', 'inventory_mode'],
 			'hostids' => array_column($hosts, 'hostid'),
+			'filter' => [
+				'flags' => [ZBX_FLAG_DISCOVERY_PROTOTYPE]
+			],
 			'editable' => true,
 			'preservekeys' => true
 		]);
@@ -643,10 +660,10 @@ class CHostPrototype extends CHostBase {
 	 */
 	private static function addInternalFields(array &$db_hosts): void {
 		$result = DBselect(
-			'SELECT h.hostid,h.templateid,hd.parent_itemid AS ruleid,hh.status AS host_status'.
+			'SELECT h.hostid,h.templateid,hd.lldruleid AS ruleid,hh.status AS host_status'.
 			' FROM hosts h,host_discovery hd,items i,hosts hh'.
 			' WHERE h.hostid=hd.hostid'.
-				' AND hd.parent_itemid=i.itemid'.
+				' AND hd.lldruleid=i.itemid'.
 				' AND i.hostid=hh.hostid'.
 				' AND '.dbConditionId('h.hostid', array_keys($db_hosts))
 		);
@@ -909,9 +926,10 @@ class CHostPrototype extends CHostBase {
 		self::updateInterfaces($hosts, $db_hosts, $upd_hostids);
 		self::updateGroupLinks($hosts, $db_hosts, $upd_hostids);
 		self::updateGroupPrototypes($hosts, $db_hosts, $upd_hostids);
-		$this->updateTemplates($hosts, $db_hosts, $upd_hostids);
+		self::updateTemplates($hosts, $db_hosts, $upd_hostids);
+		self::updateHostTemplateCache($hosts, $db_hosts);
 		$this->updateTags($hosts, $db_hosts, $upd_hostids);
-		$this->updateMacros($hosts, $db_hosts, $upd_hostids);
+		self::updateMacros($hosts, $db_hosts, $upd_hostids);
 		self::updateHostInventories($hosts, $db_hosts, $upd_hostids);
 
 		$hosts = array_intersect_key($hosts, $upd_hostids);
@@ -924,11 +942,13 @@ class CHostPrototype extends CHostBase {
 	 * @param array $hosts
 	 * @param array $db_hosts
 	 */
-	protected function addAffectedObjects(array $hosts, array &$db_hosts): void {
+	private function addAffectedObjects(array $hosts, array &$db_hosts): void {
 		self::addAffectedInterfaces($hosts, $db_hosts);
 		self::addAffectedGroupLinks($hosts, $db_hosts);
 		self::addAffectedGroupPrototypes($hosts, $db_hosts);
-		parent::addAffectedObjects($hosts, $db_hosts);
+		$this->addAffectedTemplates($hosts, $db_hosts);
+		$this->addAffectedTags($hosts, $db_hosts);
+		self::addAffectedMacros($hosts, $db_hosts);
 	}
 
 	/**
@@ -1095,7 +1115,7 @@ class CHostPrototype extends CHostBase {
 				$duplicates = DBfetchArray(DBselect(
 					'SELECT i.name AS rule,h.host'.
 					' FROM items i,host_discovery hd,hosts h'.
-					' WHERE i.itemid=hd.parent_itemid'.
+					' WHERE i.itemid=hd.lldruleid'.
 						' AND hd.hostid=h.hostid'.
 						' AND ('.implode(' OR ', $where).')',
 					1
@@ -1112,7 +1132,7 @@ class CHostPrototype extends CHostBase {
 				$duplicates = DBfetchArray(DBselect(
 					'SELECT i.name AS rule,h.host,hh.host AS parent_host,hh.status'.
 					' FROM items i,host_discovery hd,hosts h,hosts hh'.
-					' WHERE i.itemid=hd.parent_itemid'.
+					' WHERE i.itemid=hd.lldruleid'.
 						' AND hd.hostid=h.hostid'.
 						' AND i.hostid=hh.hostid'.
 						' AND ('.implode(' OR ', $where).')',
@@ -1144,7 +1164,7 @@ class CHostPrototype extends CHostBase {
 				$duplicates = DBfetchArray(DBselect(
 					'SELECT i.name AS rule,h.name'.
 					' FROM items i,host_discovery hd,hosts h'.
-					' WHERE i.itemid=hd.parent_itemid'.
+					' WHERE i.itemid=hd.lldruleid'.
 						' AND hd.hostid=h.hostid'.
 						' AND ('.implode(' OR ', $where).')',
 					1
@@ -1161,7 +1181,7 @@ class CHostPrototype extends CHostBase {
 				$duplicates = DBfetchArray(DBselect(
 					'SELECT i.name AS rule,h.name,hh.host AS parent_host,hh.status'.
 					' FROM items i,host_discovery hd,hosts h,hosts hh'.
-					' WHERE i.itemid=hd.parent_itemid'.
+					' WHERE i.itemid=hd.lldruleid'.
 						' AND hd.hostid=h.hostid'.
 						' AND i.hostid=hh.hostid'.
 						' AND ('.implode(' OR ', $where).')',
@@ -1251,9 +1271,19 @@ class CHostPrototype extends CHostBase {
 	private static function checkDiscoveryRules(array $hosts, ?array &$db_lld_rules = null): void {
 		$ruleids = array_unique(array_column($hosts, 'ruleid'));
 
-		$count = API::DiscoveryRule()->get([
+		$count = (int) API::DiscoveryRule()->get([
 			'countOutput' => true,
 			'itemids' => $ruleids,
+			'filter' => [
+				'flags' => [ZBX_FLAG_DISCOVERY_RULE]
+			],
+			'editable' => true
+		]) + (int) API::DiscoveryRulePrototype()->get([
+			'countOutput' => true,
+			'itemids' => $ruleids,
+			'filter' => [
+				'flags' => [ZBX_FLAG_DISCOVERY_RULE_PROTOTYPE]
+			],
 			'editable' => true
 		]);
 
@@ -1411,7 +1441,7 @@ class CHostPrototype extends CHostBase {
 		foreach ($hosts as $host) {
 			$host_discoveries[] = [
 				'hostid' => $host['hostid'],
-				'parent_itemid' => $host['ruleid']
+				'lldruleid' => $host['ruleid']
 			];
 		}
 
@@ -1738,6 +1768,97 @@ class CHostPrototype extends CHostBase {
 		unset($host);
 	}
 
+	private static function updateTemplates(array &$hosts, ?array &$db_hosts = null,
+			?array &$upd_hostids = null): void {
+		$ins_hosts_templates = [];
+		$del_hosttemplateids = [];
+
+		foreach ($hosts as $i => &$host) {
+			if (!array_key_exists('templates', $host) && !array_key_exists('templates_clear', $host)) {
+				continue;
+			}
+
+			$db_templates = ($db_hosts !== null)
+				? array_column($db_hosts[$host['hostid']]['templates'], null, 'templateid')
+				: [];
+			$changed = false;
+
+			if (array_key_exists('templates', $host)) {
+				foreach ($host['templates'] as &$template) {
+					if (array_key_exists($template['templateid'], $db_templates)) {
+						$template['hosttemplateid'] = $db_templates[$template['templateid']]['hosttemplateid'];
+						unset($db_templates[$template['templateid']]);
+					}
+					else {
+						$ins_hosts_templates[] = [
+							'hostid' => $host['hostid'],
+							'templateid' => $template['templateid']
+						];
+						$changed = true;
+					}
+				}
+				unset($template);
+
+				$templates_clear_indexes = [];
+
+				if (array_key_exists('templates_clear', $host)) {
+					foreach ($host['templates_clear'] as $index => $template) {
+						$templates_clear_indexes[$template['templateid']] = $index;
+					}
+				}
+
+				foreach ($db_templates as $del_template) {
+					$changed = true;
+					$del_hosttemplateids[] = $del_template['hosttemplateid'];
+
+					if (array_key_exists($del_template['templateid'], $templates_clear_indexes)) {
+						$index = $templates_clear_indexes[$del_template['templateid']];
+						$host['templates_clear'][$index]['hosttemplateid'] = $del_template['hosttemplateid'];
+					}
+				}
+			}
+			elseif (array_key_exists('templates_clear', $host)) {
+				foreach ($host['templates_clear'] as &$template) {
+					$template['hosttemplateid'] = $db_templates[$template['templateid']]['hosttemplateid'];
+					$del_hosttemplateids[] = $db_templates[$template['templateid']]['hosttemplateid'];
+				}
+				unset($template);
+			}
+
+			if ($db_hosts !== null) {
+				if ($changed) {
+					$upd_hostids[$i] = $host['hostid'];
+				}
+				else {
+					unset($host['templates'], $db_hosts[$host['hostid']]['templates']);
+				}
+			}
+		}
+		unset($host);
+
+		if ($del_hosttemplateids) {
+			DB::delete('hosts_templates', ['hosttemplateid' => $del_hosttemplateids]);
+		}
+
+		if ($ins_hosts_templates) {
+			$hosttemplateids = DB::insertBatch('hosts_templates', $ins_hosts_templates);
+		}
+
+		foreach ($hosts as &$host) {
+			if (!array_key_exists('templates', $host)) {
+				continue;
+			}
+
+			foreach ($host['templates'] as &$template) {
+				if (!array_key_exists('hosttemplateid', $template)) {
+					$template['hosttemplateid'] = array_shift($hosttemplateids);
+				}
+			}
+			unset($template);
+		}
+		unset($host);
+	}
+
 	/**
 	 * @param array      $hosts
 	 * @param array|null $db_hosts
@@ -1857,12 +1978,13 @@ class CHostPrototype extends CHostBase {
 	 */
 	public function unlinkTemplateObjects(array $ruleids): void {
 		$result = DBselect(
-			'SELECT hd.hostid,h.host,h.uuid,h.templateid,hd.parent_itemid AS ruleid,hh.status AS host_status'.
+			'SELECT hd.hostid,h.host,h.uuid,h.templateid,hd.lldruleid AS ruleid,hh.status AS host_status'.
 			' FROM host_discovery hd,hosts h,items i,hosts hh'.
 			' WHERE hd.hostid=h.hostid'.
-				' AND hd.parent_itemid=i.itemid'.
+				' AND hd.lldruleid=i.itemid'.
 				' AND i.hostid=hh.hostid'.
-				' AND '.dbConditionId('hd.parent_itemid', $ruleids)
+				' AND '.dbConditionId('hd.lldruleid', $ruleids).
+				' AND '.dbConditionInt('h.flags', [ZBX_FLAG_DISCOVERY_PROTOTYPE])
 		);
 
 		$hosts = [];
@@ -2114,7 +2236,7 @@ class CHostPrototype extends CHostBase {
 			'SELECT h.hostid,h.host,h.templateid,i.itemid AS ruleid,i.templateid AS parent_ruleid,'.
 				'hh.status AS host_status'.
 			' FROM items i,host_discovery hd,hosts h,hosts hh'.
-			' WHERE i.itemid=hd.parent_itemid'.
+			' WHERE i.itemid=hd.lldruleid'.
 				' AND hd.hostid=h.hostid'.
 				' AND i.hostid=hh.hostid'.
 				' AND '.dbConditionId('i.itemid', $ruleids).
@@ -2515,20 +2637,10 @@ class CHostPrototype extends CHostBase {
 			self::deleteGroupPrototypes($del_group_prototypeids);
 		}
 
-		$discovered_hosts = DBfetchArrayAssoc(DBselect(
-			'SELECT hd.hostid,h.host'.
-			' FROM host_discovery hd,hosts h'.
-			' WHERE hd.hostid=h.hostid'.
-				' AND '.dbConditionId('hd.parent_hostid', $hostids)
-		), 'hostid');
+		self::deleteDiscoveredHostPrototypes($hostids);
+		self::deleteDiscoveredHosts($hostids);
 
-		CHost::deleteForce($discovered_hosts);
-
-		DB::delete('interface', ['hostid' => $hostids]);
-		DB::delete('hosts_templates', ['hostid' => $hostids]);
 		DB::delete('host_tag', ['hostid' => $hostids]);
-		DB::delete('hostmacro', ['hostid' => $hostids]);
-		DB::delete('host_inventory', ['hostid' => $hostids]);
 		DB::update('hosts', [
 			'values' => ['templateid' => 0],
 			'where' => ['hostid' => $hostids]
@@ -2574,6 +2686,34 @@ class CHostPrototype extends CHostBase {
 			'where' => ['templateid' => $del_group_prototypeids]
 		]);
 		DB::delete('group_prototype', ['group_prototypeid' => $del_group_prototypeids]);
+	}
+
+	private static function deleteDiscoveredHostPrototypes(array $hostids) {
+		$db_host_prototypes = DBfetchArrayAssoc(DBselect(
+			'SELECT hd.hostid,h.host'.
+			' FROM host_discovery hd,hosts h'.
+			' WHERE hd.hostid=h.hostid'.
+				' AND '.dbConditionId('hd.parent_hostid', $hostids).
+				' AND '.dbConditionInt('h.flags', [ZBX_FLAG_DISCOVERY_PROTOTYPE_CREATED])
+		), 'hostid');
+
+		if ($db_host_prototypes) {
+			self::deleteForce($db_host_prototypes);
+		}
+	}
+
+	private static function deleteDiscoveredHosts(array $hostids) {
+		$db_hosts = DBfetchArrayAssoc(DBselect(
+			'SELECT hd.hostid,h.host'.
+			' FROM host_discovery hd,hosts h'.
+			' WHERE hd.hostid=h.hostid'.
+				' AND '.dbConditionId('hd.parent_hostid', $hostids).
+				' AND '.dbConditionInt('h.flags', [ZBX_FLAG_DISCOVERY_CREATED])
+		), 'hostid');
+
+		if ($db_hosts) {
+			CHost::deleteForce($db_hosts);
+		}
 	}
 
 	/**

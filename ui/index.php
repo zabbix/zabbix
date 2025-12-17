@@ -21,6 +21,11 @@ require_once dirname(__FILE__).'/include/forms.inc.php';
 
 $page['file'] = 'index.php';
 
+// Redirect to the login page when logging out with an invalid CSRF token.
+if (hasRequest('reconnect') && !CWebUser::isLoggedIn()) {
+	redirect('index.php');
+}
+
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = [
 	'name' =>		[T_ZBX_STR, O_NO,	null,	null,	'isset({enter}) && {enter} != "'.ZBX_GUEST_USER.'"', _('Username')],

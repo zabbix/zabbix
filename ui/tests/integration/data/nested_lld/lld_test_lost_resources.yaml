@@ -1,0 +1,73 @@
+zabbix_export:
+  version: '7.4'
+  host_groups:
+    - uuid: f2481361f99448eea617b7b1d4765566
+      name: 'Discovered hosts'
+  hosts:
+    - host: lld_test_lost_resources
+      name: lld_test_lost_resources
+      groups:
+        - name: 'Discovered hosts'
+      interfaces:
+        - interface_ref: if1
+      discovery_rules:
+        - name: main_drule
+          type: TRAP
+          key: main_drule
+          lifetime_type: DELETE_IMMEDIATELY
+          item_prototypes:
+            - name: 'item[{#PARENTNAME}]'
+              type: TRAP
+              key: 'item[{#PARENTNAME}]'
+              trigger_prototypes:
+                - expression: 'last(/lld_test_lost_resources/item[{#PARENTNAME}])>1'
+                  name: 'trigger[{#PARENTNAME}]'
+          graph_prototypes:
+            - name: 'graph[{#PARENTNAME}]'
+              yaxismax: '0'
+              graph_items:
+                - color: 1A7C11
+                  calc_fnc: ALL
+                  item:
+                    host: lld_test_lost_resources
+                    key: 'item[{#PARENTNAME}]'
+          host_prototypes:
+            - host: 'tc.removal.host{#PARENTNAME}'
+              name: 'tc.removal.host{#PARENTNAME}'
+              group_links:
+                - group:
+                    name: 'Discovered hosts'
+        - name: 'nested[{#PARENTNAME}]'
+          type: NESTED
+          key: 'nested[{#PARENTNAME}]'
+          lifetime_type: DELETE_IMMEDIATELY
+          item_prototypes:
+            - name: 'item.nested[{#PARENTNAME},{#NAME}]'
+              type: TRAP
+              key: 'item.nested[{#PARENTNAME},{#NAME}]'
+              trigger_prototypes:
+                - expression: 'last(/lld_test_lost_resources/item.nested[{#PARENTNAME},{#NAME}])>2'
+                  name: 'item.nested[{#PARENTNAME},{#NAME}]'
+          graph_prototypes:
+            - name: 'graph.nested[{#PARENTNAME},{#NAME}]'
+              yaxismax: '0'
+              graph_items:
+                - color: 1A7C11
+                  calc_fnc: ALL
+                  item:
+                    host: lld_test_lost_resources
+                    key: 'item.nested[{#PARENTNAME},{#NAME}]'
+          host_prototypes:
+            - host: 'tc.removal.host.nested_{#PARENTNAME}_{#NAME}'
+              name: 'tc.removal.host.nested_{#PARENTNAME}_{#NAME}'
+              templates:
+                - name: 'lld_test_dbs_template'
+              group_links:
+                - group:
+                    name: 'Discovered hosts'
+          parent_discovery_rule:
+            key: main_drule
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.nested

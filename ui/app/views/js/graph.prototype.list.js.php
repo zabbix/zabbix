@@ -86,7 +86,7 @@
 				callback: ({data, event}) => {
 					uncheckTableRows('graphs_' + this.checkbox_hash, [], false);
 
-					if (data.submit.success.action === 'delete') {
+					if (data.submit.success?.action === 'delete') {
 						const url = new URL('host_discovery.php', location.href);
 
 						url.searchParams.set('context', this.context);

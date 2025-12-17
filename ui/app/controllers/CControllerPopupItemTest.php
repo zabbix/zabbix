@@ -24,6 +24,7 @@ abstract class CControllerPopupItemTest extends CController {
 	const ZBX_TEST_TYPE_ITEM = 0;
 	const ZBX_TEST_TYPE_ITEM_PROTOTYPE = 1;
 	const ZBX_TEST_TYPE_LLD = 2;
+	const ZBX_TEST_TYPE_LLD_PROTOTYPE = 3;
 
 	/**
 	 * Max-length of input fields that can contain resolved macro values. Used in views for input fields.
@@ -94,10 +95,8 @@ abstract class CControllerPopupItemTest extends CController {
 
 	/**
 	 * Item types with mandatory item key.
-	 *
-	 * @var array
 	 */
-	protected $item_types_has_key_mandatory = [ITEM_TYPE_ZABBIX, ITEM_TYPE_SIMPLE, ITEM_TYPE_INTERNAL,
+	public static array $item_types_has_key_mandatory = [ITEM_TYPE_ZABBIX, ITEM_TYPE_SIMPLE, ITEM_TYPE_INTERNAL,
 		ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_HTTPAGENT, ITEM_TYPE_IPMI,
 		ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_JMX, ITEM_TYPE_CALCULATED
 	];
@@ -182,6 +181,30 @@ abstract class CControllerPopupItemTest extends CController {
 		'parameters' => [
 			'host' => ['{HOSTNAME}', '{HOST.HOST}', '{HOST.NAME}'],
 			'interface' => ['{HOST.IP}', '{IPADDRESS}', '{HOST.DNS}', '{HOST.CONN}', '{HOST.PORT}'],
+			'inventory' => ['{INVENTORY.ALIAS}', '{INVENTORY.ASSET.TAG}', '{INVENTORY.CHASSIS}', '{INVENTORY.CONTACT}',
+				'{PROFILE.CONTACT}', '{INVENTORY.CONTRACT.NUMBER}', '{INVENTORY.DEPLOYMENT.STATUS}',
+				'{INVENTORY.HARDWARE}', '{PROFILE.HARDWARE}', '{INVENTORY.HARDWARE.FULL}', '{INVENTORY.HOST.NETMASK}',
+				'{INVENTORY.HOST.NETWORKS}', '{INVENTORY.HOST.ROUTER}', '{INVENTORY.HW.ARCH}',
+				'{INVENTORY.HW.DATE.DECOMM}', '{INVENTORY.HW.DATE.EXPIRY}', '{INVENTORY.HW.DATE.INSTALL}',
+				'{INVENTORY.HW.DATE.PURCHASE}', '{INVENTORY.INSTALLER.NAME}', '{INVENTORY.LOCATION}',
+				'{PROFILE.LOCATION}', '{INVENTORY.LOCATION.LAT}', '{INVENTORY.LOCATION.LON}',
+				'{INVENTORY.MACADDRESS.A}', '{PROFILE.MACADDRESS}', '{INVENTORY.MACADDRESS.B}', '{INVENTORY.MODEL}',
+				'{INVENTORY.NAME}', '{PROFILE.NAME}', '{INVENTORY.NOTES}', '{PROFILE.NOTES}', '{INVENTORY.OOB.IP}',
+				'{INVENTORY.OOB.NETMASK}', '{INVENTORY.OOB.ROUTER}', '{INVENTORY.OS}', '{PROFILE.OS}',
+				'{INVENTORY.OS.FULL}', '{INVENTORY.OS.SHORT}', '{INVENTORY.POC.PRIMARY.CELL}',
+				'{INVENTORY.POC.PRIMARY.EMAIL}', '{INVENTORY.POC.PRIMARY.NAME}', '{INVENTORY.POC.PRIMARY.NOTES}',
+				'{INVENTORY.POC.PRIMARY.PHONE.A}', '{INVENTORY.POC.PRIMARY.PHONE.B}', '{INVENTORY.POC.PRIMARY.SCREEN}',
+				'{INVENTORY.POC.SECONDARY.CELL}', '{INVENTORY.POC.SECONDARY.EMAIL}', '{INVENTORY.POC.SECONDARY.NAME}',
+				'{INVENTORY.POC.SECONDARY.NOTES}', '{INVENTORY.POC.SECONDARY.PHONE.A}',
+				'{INVENTORY.POC.SECONDARY.PHONE.B}', '{INVENTORY.POC.SECONDARY.SCREEN}', '{INVENTORY.SERIALNO.A}',
+				'{PROFILE.SERIALNO}', '{INVENTORY.SERIALNO.B}', '{INVENTORY.SITE.ADDRESS.A}',
+				'{INVENTORY.SITE.ADDRESS.B}', '{INVENTORY.SITE.ADDRESS.C}', '{INVENTORY.SITE.CITY}',
+				'{INVENTORY.SITE.COUNTRY}', '{INVENTORY.SITE.NOTES}', '{INVENTORY.SITE.RACK}', '{INVENTORY.SITE.STATE}',
+				'{INVENTORY.SITE.ZIP}', '{INVENTORY.SOFTWARE}', '{PROFILE.SOFTWARE}', '{INVENTORY.SOFTWARE.APP.A}',
+				'{INVENTORY.SOFTWARE.APP.B}', '{INVENTORY.SOFTWARE.APP.C}', '{INVENTORY.SOFTWARE.APP.D}',
+				'{INVENTORY.SOFTWARE.APP.E}', '{INVENTORY.SOFTWARE.FULL}', '{INVENTORY.TAG}', '{PROFILE.TAG}',
+				'{INVENTORY.TYPE}', '{PROFILE.DEVICETYPE}', '{INVENTORY.TYPE.FULL}', '{INVENTORY.URL.A}',
+				'{INVENTORY.URL.B}', '{INVENTORY.URL.C}', '{INVENTORY.VENDOR}'],
 			'item' => ['{ITEM.ID}', '{ITEM.KEY.ORIG}', '{ITEM.KEY}'],
 			'support_user_macros' => true,
 			'support_lld_macros' => true
@@ -309,6 +332,9 @@ abstract class CControllerPopupItemTest extends CController {
 					'maintenance_status', 'maintenance_type', 'ipmi_authtype', 'ipmi_privilege', 'ipmi_username',
 					'ipmi_password', 'tls_subject', 'tls_issuer', 'tls_connect'
 				],
+				'selectInventory' => in_array($this->item_type, [ITEM_TYPE_SCRIPT, ITEM_TYPE_BROWSER])
+					? array_column(getHostInventories(), 'db_field')
+					: null,
 				'hostids' => [$hostid],
 				'editable' => true
 			]);
@@ -407,7 +433,8 @@ abstract class CControllerPopupItemTest extends CController {
 						$item_flags = [
 							self::ZBX_TEST_TYPE_ITEM => ZBX_FLAG_DISCOVERY_NORMAL,
 							self::ZBX_TEST_TYPE_ITEM_PROTOTYPE => ZBX_FLAG_DISCOVERY_PROTOTYPE,
-							self::ZBX_TEST_TYPE_LLD => ZBX_FLAG_DISCOVERY_RULE
+							self::ZBX_TEST_TYPE_LLD => ZBX_FLAG_DISCOVERY_RULE,
+							self::ZBX_TEST_TYPE_LLD_PROTOTYPE => ZBX_FLAG_DISCOVERY_RULE_PROTOTYPE
 						];
 						$item_flag = $item_flags[$this->getInput('test_type')];
 					}
@@ -769,6 +796,7 @@ abstract class CControllerPopupItemTest extends CController {
 				'{HOST.CONN}' => $interface['address'],
 				'{HOST.PORT}' => $interface['port']
 			],
+			'inventory' => [],
 			'item' => [
 				'{ITEM.ID}' => (array_key_exists('itemid', $inputs) && $inputs['itemid'])
 					? $inputs['itemid']
@@ -778,6 +806,14 @@ abstract class CControllerPopupItemTest extends CController {
 			]
 		];
 
+		if (array_key_exists('inventory', $this->host)) {
+			foreach (CMacrosResolverGeneral::getSupportedHostInventoryMacrosMap() as $macro_name => $db_field_name) {
+				$macros['inventory'][$macro_name] = array_key_exists($db_field_name, $this->host['inventory'])
+					? $this->host['inventory'][$db_field_name]
+					: '';
+			}
+		}
+
 		if (array_key_exists('key', $inputs) && strstr($inputs['key'], '{') !== false) {
 			$usermacros = CMacrosResolverHelper::extractItemTestMacros([
 				'steps' => [],
@@ -785,7 +821,9 @@ abstract class CControllerPopupItemTest extends CController {
 				'supported_macros' => array_diff_key($this->macros_by_item_props['key'],
 					['support_user_macros' => true, 'support_lld_macros' => true]
 				),
-				'support_lldmacros' => ($this->test_type == self::ZBX_TEST_TYPE_ITEM_PROTOTYPE),
+				'support_lldmacros' => in_array($this->test_type,
+					[self::ZBX_TEST_TYPE_ITEM_PROTOTYPE, self::ZBX_TEST_TYPE_LLD_PROTOTYPE]
+				),
 				'texts_support_macros' => [$inputs['key']],
 				'texts_support_lld_macros' => [$inputs['key']],
 				'texts_support_user_macros' => [$inputs['key']],
@@ -810,8 +848,12 @@ abstract class CControllerPopupItemTest extends CController {
 	 */
 	protected function resolvePreprocessingStepMacros(array $steps) {
 		// Resolve macros used in parameter fields.
-		$macros_posted = $this->getInput('macros', []);
-		$macros_types = ($this->test_type == self::ZBX_TEST_TYPE_ITEM_PROTOTYPE)
+		$macros_posted = $this->hasInput('macros')
+			? json_decode($this->getInput('macros'), true)
+			: [];
+		$macros_types = in_array($this->test_type,
+			[self::ZBX_TEST_TYPE_ITEM_PROTOTYPE, self::ZBX_TEST_TYPE_LLD_PROTOTYPE]
+		)
 			? ['usermacros' => true, 'lldmacros' => true]
 			: ['usermacros' => true];
 
@@ -855,7 +897,9 @@ abstract class CControllerPopupItemTest extends CController {
 
 		$expression_parser = new CExpressionParser([
 			'usermacros' => true,
-			'lldmacros' => ($this->test_type == self::ZBX_TEST_TYPE_ITEM_PROTOTYPE),
+			'lldmacros' => in_array($this->test_type,
+				[self::ZBX_TEST_TYPE_ITEM_PROTOTYPE, self::ZBX_TEST_TYPE_LLD_PROTOTYPE]
+			),
 			'calculated' => true,
 			'host_macro' => true,
 			'empty_host' => true
@@ -972,7 +1016,9 @@ abstract class CControllerPopupItemTest extends CController {
 	 */
 	protected function resolveItemPropertyMacros(array $inputs) {
 		// Resolve macros used in parameter fields.
-		$macros_posted = $this->getInput('macros', []);
+		$macros_posted = $this->hasInput('macros')
+			? json_decode($this->getInput('macros'), true)
+			: [];
 
 		foreach (array_keys($this->macros_by_item_props) as $field) {
 			if (!array_key_exists($field, $inputs)) {
@@ -991,11 +1037,11 @@ abstract class CControllerPopupItemTest extends CController {
 				'macros_n' => []
 			];
 
-			if ($this->test_type == self::ZBX_TEST_TYPE_ITEM_PROTOTYPE) {
+			if (in_array($this->test_type, [self::ZBX_TEST_TYPE_ITEM_PROTOTYPE, self::ZBX_TEST_TYPE_LLD_PROTOTYPE])) {
 				$types += ['lldmacros' => true];
 			}
 
-			foreach (['host', 'interface', 'item'] as $type) {
+			foreach (['host', 'interface', 'item', 'inventory'] as $type) {
 				if (array_key_exists($type, $this->macros_by_item_props[$field])) {
 					$types['macros_n'] = array_merge($types['macros_n'], $this->macros_by_item_props[$field][$type]);
 				}

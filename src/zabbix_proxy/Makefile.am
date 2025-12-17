@@ -56,15 +56,16 @@ zabbix_proxy_LDADD = \
 	$(top_builddir)/src/libs/zbxsysinfo/alias/libalias.a \
 	$(top_builddir)/src/libs/zbxscripts/libzbxscripts.a \
 	$(top_builddir)/src/libs/zbxlog/libzbxlog.a \
-	$(top_builddir)/src/libs/zbxexpression/libzbxexpression.a \
+	$(top_builddir)/src/libs/zbxcalc/libzbxcalc.a \
 	$(top_builddir)/src/libs/zbxcacheconfig/libzbxcacheconfig.a \
 	$(top_builddir)/src/libs/zbxpgservice/libzbxpgservice.a \
 	cachehistory/libzbxcachehistory_proxy.a \
 	$(top_builddir)/src/libs/zbxcachehistory/libzbxcachehistory.a \
-	$(top_builddir)/src/libs/zbxexpression/libzbxexpression.a \
 	$(top_builddir)/src/libs/zbxproxybuffer/libzbxproxybuffer.a \
 	$(top_builddir)/src/libs/zbxcachevalue/libzbxcachevalue.a \
 	$(top_builddir)/src/libs/zbxevent/libzbxevent.a \
+	$(top_builddir)/src/libs/zbxcalc/libzbxcalc.a \
+	$(top_builddir)/src/libs/zbxcacheconfig/libzbxcacheconfig.a \
 	stats/libzbxstats_proxy.a \
 	$(top_builddir)/src/libs/zbxeval/libzbxeval.a \
 	$(top_builddir)/src/libs/zbxserialize/libzbxserialize.a \
@@ -93,6 +94,7 @@ zabbix_proxy_LDADD = \
 	$(top_builddir)/src/libs/zbxdbupgrade/libzbxdbupgrade.a \
 	$(top_builddir)/src/libs/zbxdbhigh/libzbxdbhigh.a \
 	$(top_builddir)/src/libs/zbxdbwrap/libzbxdbwrap.a \
+	$(top_builddir)/src/libs/zbxcacheconfig/libzbxcacheconfig.a \
 	autoreg/libzbxautoreg_proxy.a \
 	$(top_builddir)/src/libs/zbxautoreg/libzbxautoreg.a \
 	$(top_builddir)/src/libs/zbxdb/libzbxdb.a \
@@ -146,7 +148,8 @@ zabbix_proxy_CFLAGS = \
 	-DDEFAULT_EXTERNAL_SCRIPTS_PATH="\"$(EXTERNAL_SCRIPTS_PATH)\"" \
 	-DDEFAULT_LOAD_MODULE_PATH="\"$(LOAD_MODULE_PATH)\"" \
 	$(TLS_CFLAGS) \
-	$(ARES_CFLAGS)
+	$(ARES_CFLAGS) \
+	$(LIBEVENT_CFLAGS)
 
 install-data-hook:
 	$(MKDIR_P) "$(DESTDIR)$(PROXY_CONFIG_FILE).d"

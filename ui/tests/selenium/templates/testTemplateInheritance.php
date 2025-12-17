@@ -310,7 +310,7 @@ class testTemplateInheritance extends CLegacyWebTest {
 		$this->zbxTestDropdownSelect('type', 'Simple check');
 		$this->zbxTestInputType('delay', '31s');
 		$this->zbxTestInputType('lifetime', '32d');
-		$this->zbxTestInputType('description', 'description');
+		$this->zbxTestInputType('js-item-description-field', 'description');
 		$this->zbxTestInputType('delay_flex_0_delay', '50s');
 		$this->zbxTestInputType('delay_flex_0_period', '1-7,00:00-24:00');
 		$this->zbxTestClickWait('interval_add');
@@ -548,11 +548,11 @@ class testTemplateInheritance extends CLegacyWebTest {
 	 */
 	private function filterEntriesAndOpenObjects($host, $column, $objects) {
 		$this->query('button:Reset')->one()->click();
+		$table = $this->query('xpath://table[@class="list-table"]')->asTable()->one();
 		$filter = $this->query('name:zbx_filter')->asForm()->waitUntilReady()->one();
 		$filter->fill(['Name' => $host]);
 		$this->query('button:Apply')->one()->waitUntilClickable()->click();
-
-		$this->query('xpath://table[@class="list-table"]')->asTable()->one()->findRow('Name', $host)
-				->getColumn($column)->query('link', $objects)->one()->click();
+		$table->waitUntilReloaded();
+		$table->findRow('Name', $host)->getColumn($column)->query('link', $objects)->one()->click();
 	}
 }

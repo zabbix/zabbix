@@ -19,7 +19,8 @@ namespace Widgets\HostCard\Actions;
 use API,
 	CArrayHelper,
 	CControllerDashboardWidgetView,
-	CControllerResponseData;
+	CControllerResponseData,
+	CTagHelper;
 
 use Widgets\HostCard\Includes\CWidgetFieldHostSections;
 
@@ -173,7 +174,10 @@ class WidgetView extends CControllerDashboardWidgetView {
 				'monitored' => true
 			]);
 
-			$host['dashboard_count'] = count(getHostDashboards($host['hostid']));
+			$host['dashboard_count'] = API::HostDashboard()->get([
+				'countOutput' => true,
+				'hostids' => $host['hostid']
+			]);
 			$host['item_count'] = $db_items_count;
 			$host['graph_count'] = $host['graphs'];
 			$host['web_scenario_count'] = $host['httpTests'];
@@ -250,32 +254,9 @@ class WidgetView extends CControllerDashboardWidgetView {
 		}
 
 		if (in_array(CWidgetFieldHostSections::SECTION_TAGS, $this->fields_values['sections'])) {
-			// Merge host tags with template tags, and skip duplicate tags and values.
-			if (!$host['inheritedTags']) {
-				$tags = $host['tags'];
-			}
-			elseif (!$host['tags']) {
-				$tags = $host['inheritedTags'];
-			}
-			else {
-				$tags = $host['tags'];
+			CTagHelper::mergeOwnAndInheritedTagsForObject($host);
 
-				foreach ($host['inheritedTags'] as $template_tag) {
-					foreach ($tags as $host_tag) {
-						// Skip tags with same name and value.
-						if ($host_tag['tag'] === $template_tag['tag']
-								&& $host_tag['value'] === $template_tag['value']) {
-							continue 2;
-						}
-					}
-
-					$tags[] = $template_tag;
-				}
-			}
-
-			CArrayHelper::sort($tags, ['tag', 'value']);
-
-			$host['tags'] = $tags;
+			CArrayHelper::sort($host['tags'], ['tag', 'value']);
 		}
 
 		return $host;

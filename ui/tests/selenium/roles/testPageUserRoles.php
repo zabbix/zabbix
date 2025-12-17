@@ -62,7 +62,7 @@ class testPageUserRoles extends CWebTest {
 				'type' => 1
 			],
 			[
-				'name' => 'role_with_min end',
+				'name' => 'role_with_min   end',
 				'type' => 1
 			]
 		]);
@@ -234,6 +234,14 @@ class testPageUserRoles extends CWebTest {
 			],
 			[
 				[
+					'name' => '   ',
+					'result' => [
+						'role_with_min end'
+					]
+				]
+			],
+			[
+				[
 					'name' => '',
 					'result' => [
 						'$^&#%*',
@@ -290,8 +298,10 @@ class testPageUserRoles extends CWebTest {
 	 */
 	public function testPageUserRoles_Filter($data) {
 		$this->page->login()->open('zabbix.php?action=userrole.list');
+		$table = $this->getTable();
 		$form = $this->query('name:zbx_filter')->waitUntilPresent()->asForm()->one();
 		$form->fill(['Name' => $data['name']])->submit();
+		$table->waitUntilReloaded();
 		$this->assertTableDataColumn($data['result'], 'Name');
 	}
 

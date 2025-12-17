@@ -161,6 +161,27 @@ void	*zbx_queue_ptr_pop(zbx_queue_ptr_t *queue)
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: peek at the first value in queue without removing it              *
+ *                                                                            *
+ * Parameters: queue - [IN]                                                   *
+ *                                                                            *
+ * Return value: The first queue element or NULL if queue is empty            *
+ *                                                                            *
+ ******************************************************************************/
+void	*zbx_queue_ptr_peek(zbx_queue_ptr_t *queue)
+{
+	void	*value;
+
+	if (queue->tail_pos != queue->head_pos)
+		value = queue->values[queue->tail_pos];
+	else
+		value = NULL;
+
+	return value;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: removes specified value from queue                                *
  *                                                                            *
  * Parameters: queue - [IN]                                                   *

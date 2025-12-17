@@ -65,19 +65,15 @@ class WidgetView extends CControllerDashboardWidgetView {
 			return [];
 		}
 
-		$groupids = null;
-		$evaltype = null;
-		$tags = null;
-
-		if (!$this->isTemplateDashboard()) {
-			if ($this->fields_values['groupids']) {
-				$groupids = getSubGroups($this->fields_values['groupids']);
-			}
-
-			if ($this->fields_values['host_tags']) {
-				$evaltype = $this->fields_values['evaltype_host'];
-				$tags = $this->fields_values['host_tags'];
-			}
+		if ($this->isTemplateDashboard()) {
+			$groupids = null;
+			$evaltype = TAG_EVAL_TYPE_AND_OR;
+			$tags = null;
+		}
+		else {
+			$groupids = $this->fields_values['groupids'] ? getSubGroups($this->fields_values['groupids']) : null;
+			$evaltype = $this->fields_values['evaltype_host'];
+			$tags = $this->fields_values['host_tags'] ?: null;
 		}
 
 		$hostids = $this->fields_values['hostids'] ?: null;
@@ -93,6 +89,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 				'filter' => $filter,
 				'evaltype' => $evaltype,
 				'tags' => $tags,
+				'inheritedTags' => true,
 				'monitored_hosts' => true,
 				'preservekeys' => true
 			]);
@@ -113,6 +110,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 			'hostids' => $hostids,
 			'evaltype' => $this->fields_values['evaltype_item'],
 			'tags' => $this->fields_values['item_tags'] ?: null,
+			'inheritedTags' => true,
 			'selectValueMap' => ['mappings'],
 			'searchWildcardsEnabled' => true,
 			'searchByAny' => true,
@@ -120,7 +118,8 @@ class WidgetView extends CControllerDashboardWidgetView {
 				$search_field => in_array('*', $this->fields_values['items'], true)
 					? null
 					: $this->fields_values['items']
-			]
+			],
+			'filter' => ['status' => ITEM_STATUS_ACTIVE]
 		];
 
 		$db_items = API::Item()->get($options);

@@ -39,7 +39,6 @@ int	zbx_async_check_httpagent(zbx_dc_item_t *item, AGENT_RESULT *result, const c
 	httpagent_context_create(httpagent_context);
 
 	httpagent_context->item_context.itemid = item->itemid;
-	httpagent_context->item_context.hostid = item->host.hostid;
 	httpagent_context->item_context.value_type = item->value_type;
 	httpagent_context->item_context.flags = item->flags;
 	httpagent_context->item_context.state = item->state;
@@ -47,6 +46,7 @@ int	zbx_async_check_httpagent(zbx_dc_item_t *item, AGENT_RESULT *result, const c
 	item->posts = NULL;
 	httpagent_context->item_context.status_codes = item->status_codes;
 	item->status_codes = NULL;
+	httpagent_context->item_context.preprocessing = item->preprocessing;
 
 	if (SUCCEED != zbx_http_request_prepare(&httpagent_context->http_context, item->request_method,
 			item->url, item->query_fields, item->headers, httpagent_context->item_context.posts,

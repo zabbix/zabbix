@@ -25,6 +25,8 @@ class CNumberParser extends CParser {
 	* @var array
 	*/
 	private $options = [
+		'usermacros' => false,
+		'lldmacros' => false,
 		'with_minus' => true,
 		'with_float' => true,
 		'with_size_suffix' => false,
@@ -106,13 +108,13 @@ class CNumberParser extends CParser {
 			: '/^'.$pattern.'/';
 
 		if (!preg_match($pattern, $fragment, $matches)) {
-			return self::PARSE_FAIL;
+			return $this->assertMacros($source) ? self::PARSE_SUCCESS : self::PARSE_FAIL;
 		}
 
 		$number = $this->options['with_float'] ? $matches['number'] : $matches['int'];
 
 		if ($number[0] === '-' && !$this->options['with_minus']) {
-			return self::PARSE_FAIL;
+			return $this->assertMacros($source) ? self::PARSE_SUCCESS : self::PARSE_FAIL;
 		}
 
 		$this->length = strlen($matches[0]);
@@ -122,6 +124,28 @@ class CNumberParser extends CParser {
 		$this->suffix = array_key_exists('suffix', $matches) ? $matches['suffix'] : null;
 
 		return ($pos + $this->length < strlen($source)) ? self::PARSE_SUCCESS_CONT : self::PARSE_SUCCESS;
+	}
+
+	private function assertMacros(string $source): bool {
+		$parsers = [];
+
+		if ($this->options['usermacros']) {
+			$parsers[] = new CUserMacroParser();
+			$parsers[] = new CUserMacroFunctionParser();
+		}
+
+		if ($this->options['lldmacros']) {
+			$parsers[] = new CLLDMacroParser();
+			$parsers[] = new CLLDMacroFunctionParser();
+		}
+
+		foreach ($parsers as $parser) {
+			if ($parser->parse($source) != self::PARSE_FAIL) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	/**

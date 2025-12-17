@@ -1,0 +1,20 @@
+---
+test case: 'Typical use case with size = 25'
+in:
+  size: 25
+out:
+  size: 25
+---
+test case: 'Allocation with size = 0'
+in:
+  size: 0
+out:
+  w1: "zbx_realloc: reallocating to 0 bytes."
+  size: 1
+---
+test case: 'Allocation with size = 0 - out of memory'
+in:
+  size: 0
+  out_of_mem: "yes"
+exit code: failure
+...

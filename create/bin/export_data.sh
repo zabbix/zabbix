@@ -3,7 +3,7 @@
 if [ -z "$1" ] || [ -z "$2" ] || [ -z "$3" ] || [ -z "$4" ] || [ -z "$5" ] || [ -z "$6" ]; then
 	echo "Usage:
 	./export_data.sh -hhost -Pport -uroot -p<password> <DB name> ZBX_DATA > ../src/data.tmpl
-	./export_data.sh -hhost -Pport -uroot -p<password> <DB name> ZBX_TEMPLATE > ../src/templates.tmpl
+	./export_data.sh -hhost -Pport -uroot -p<password> <DB name> ZBX_TEMPLATE | split --line-bytes=48M --additional-suffix=.tmpl - templates- && mv *.tmpl ../src
 	./export_data.sh -hhost -Pport -uroot -p<password> <DB name> ZBX_DASHBOARD > ../src/dashboards.tmpl
 	The script generates data file out of existing MySQL database." && exit 1
 fi

@@ -26,6 +26,11 @@ ZBX_PTR_VECTOR_IMPL(am_db_mediatype_ptr, zbx_am_db_mediatype_t *)
 ZBX_PTR_VECTOR_IMPL(am_db_alert_ptr, zbx_am_db_alert_t *)
 ZBX_PTR_VECTOR_IMPL(am_result_ptr, zbx_am_result_t *)
 
+void	zbx_am_source_stats_free(zbx_am_source_stats_t	*as)
+{
+	zbx_free(as);
+}
+
 void	zbx_am_db_mediatype_clear(zbx_am_db_mediatype_t *mediatype)
 {
 	zbx_free(mediatype->name);
@@ -62,6 +67,7 @@ void	zbx_am_db_alert_free(zbx_am_db_alert_t *alert)
 void	zbx_am_media_clear(zbx_am_media_t *media)
 {
 	zbx_free(media->sendto);
+	zbx_free(media->mediatype_params);
 }
 
 void	zbx_am_media_free(zbx_am_media_t *media)
@@ -239,7 +245,7 @@ void	zbx_alerter_deserialize_email(const unsigned char *data, zbx_uint64_t *aler
 	data += zbx_deserialize_str(data, password, len);
 	data += zbx_deserialize_value(data, message_format);
 	data += zbx_deserialize_str(data, expression, len);
-	data += zbx_deserialize_str(data, recovery_expression, len);
+	(void)zbx_deserialize_str(data, recovery_expression, len);
 }
 
 zbx_uint32_t	zbx_alerter_serialize_sms(unsigned char **data, zbx_uint64_t alertid,  const char *sendto,
@@ -642,12 +648,14 @@ zbx_uint32_t	zbx_alerter_serialize_medias(unsigned char **data, zbx_am_media_t *
 
 	for (int i = 0; i < medias_num; i++)
 	{
-		zbx_uint32_t	data_len = 0, sendto_len;
+		zbx_uint32_t	data_len = 0, sendto_len, params_len;
 		zbx_am_media_t	*media = medias[i];
 
 		zbx_serialize_prepare_value(data_len, media->mediaid);
 		zbx_serialize_prepare_value(data_len, media->mediatypeid);
 		zbx_serialize_prepare_str_len(data_len, media->sendto, sendto_len);
+		zbx_serialize_prepare_value(data_len, media->mediatype_type);
+		zbx_serialize_prepare_str_len(data_len, media->mediatype_params, params_len);
 
 		while (data_len > data_alloc - data_offset)
 		{
@@ -657,7 +665,9 @@ zbx_uint32_t	zbx_alerter_serialize_medias(unsigned char **data, zbx_am_media_t *
 		ptr = *data + data_offset;
 		ptr += zbx_serialize_value(ptr, media->mediaid);
 		ptr += zbx_serialize_value(ptr, media->mediatypeid);
-		(void)zbx_serialize_str(ptr, media->sendto, sendto_len);
+		ptr += zbx_serialize_str(ptr, media->sendto, sendto_len);
+		ptr += zbx_serialize_value(ptr, media->mediatype_type);
+		(void)zbx_serialize_str(ptr, media->mediatype_params, params_len);
 
 		data_offset += data_len;
 	}
@@ -670,6 +680,14 @@ void	zbx_alerter_deserialize_medias(const unsigned char *data, zbx_am_media_t **
 	zbx_uint32_t	len;
 
 	data += zbx_deserialize_value(data, medias_num);
+
+	if (0 == *medias_num)
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "Unexpectedly received 0 medias");
+		THIS_SHOULD_NEVER_HAPPEN;
+		return;
+	}
+
 	*medias = (zbx_am_media_t **)zbx_malloc(NULL, *medias_num * sizeof(zbx_am_media_t *));
 	for (int i = 0; i < *medias_num; i++)
 	{
@@ -679,6 +697,8 @@ void	zbx_alerter_deserialize_medias(const unsigned char *data, zbx_am_media_t **
 		data += zbx_deserialize_value(data, &media->mediaid);
 		data += zbx_deserialize_value(data, &media->mediatypeid);
 		data += zbx_deserialize_str(data, &media->sendto, len);
+		data += zbx_deserialize_value(data, &media->mediatype_type);
+		data += zbx_deserialize_str(data, &media->mediatype_params, len);
 
 		(*medias)[i] = media;
 	}
@@ -733,7 +753,12 @@ void	zbx_alerter_deserialize_results(const unsigned char *data, zbx_am_result_t 
 	zbx_uint32_t	len;
 
 	data += zbx_deserialize_value(data, results_num);
-	*results = (zbx_am_result_t **)zbx_malloc(NULL, *results_num * sizeof(zbx_am_result_t *));
+
+	/* *results num can be 0 in the message, when request for results is sent */
+	if (0 == *results_num)
+		return;
+
+	*results = (zbx_am_result_t **)zbx_malloc(NULL, (size_t)*results_num * sizeof(zbx_am_result_t *));
 
 	for (int i = 0; i < *results_num; i++)
 	{

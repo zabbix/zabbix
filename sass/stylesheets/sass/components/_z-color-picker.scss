@@ -2,6 +2,12 @@ z-color-picker {
 	display: inline-block;
 	line-height: 24px;
 
+	&[readonly] {
+		.color-picker-box {
+			cursor: default;
+		}
+	}
+
 	.color-picker-box {
 		position: relative;
 		vertical-align: top;
@@ -237,6 +243,20 @@ z-color-picker {
 			&:last-of-type {
 				border-top-right-radius: 1px;
 				border-bottom-right-radius: 1px;
+			}
+		}
+	}
+}
+
+// Modifications by themes.
+
+@if $theme-name == 'blue' or $theme-name == 'dark' {
+	z-color-picker {
+		&[readonly] {
+			.color-picker-box {
+				&:focus {
+					box-shadow: none;
+				}
 			}
 		}
 	}

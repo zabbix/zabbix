@@ -17,10 +17,16 @@
 
 #include "zbxcomms.h"
 #include "zbxjson.h"
+#include "zbxcacheconfig.h"
+#include "zbxdbhigh.h"
 
 int	node_process_command(zbx_socket_t *sock, const char *data, const struct zbx_json_parse *jp,
 		int config_timeout, int config_trapper_timeout, const char *config_source_ip,
 		const char *config_ssh_key_location, zbx_get_config_forks_f get_config_forks,
 		int config_enable_global_scripts, unsigned char program_type);
+
+int	substitute_script_macros(char **data, char *error, int maxerrlen, int script_type,
+		zbx_dc_um_handle_t * um_handle, const zbx_db_event *event, const zbx_db_event *r_event,
+		zbx_uint64_t *userid, const zbx_dc_host_t *dc_host, const char *tz);
 
 #endif

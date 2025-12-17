@@ -84,7 +84,7 @@ class CImportDataAdapter {
 
 				$templates[] = CArrayHelper::getByKeys($template, [
 					'uuid', 'groups', 'macros', 'templates', 'host', 'status', 'name', 'description', 'tags',
-					'valuemaps', 'vendor_name', 'vendor_version'
+					'valuemaps', 'vendor_name', 'vendor_version', 'wizard_ready', 'readme'
 				]);
 			}
 		}
@@ -411,7 +411,10 @@ class CImportDataAdapter {
 	 */
 	protected function formatDiscoveryRule(array $discovery_rule, $host) {
 		if (!$discovery_rule['filter']) {
-			unset($discovery_rule['filter']);
+			$discovery_rule['filter'] = [
+				'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
+				'conditions' => []
+			];
 		}
 
 		$discovery_rule = $this->renameItemFields($discovery_rule);
@@ -535,6 +538,16 @@ class CImportDataAdapter {
 							}
 							if (array_key_exists('inventory_mode', $operation) && $operation['inventory_mode'] !== '') {
 								$operation['opinventory']['inventory_mode'] = $operation['inventory_mode'];
+							}
+							break;
+
+						case OPERATION_OBJECT_LLD_RULE_PROTOTYPE:
+							if (array_key_exists('status', $operation) && $operation['status'] !== '') {
+								$operation['opstatus']['status'] = $operation['status'];
+							}
+
+							if (array_key_exists('delay', $operation) && $operation['delay'] !== '') {
+								$operation['opperiod']['delay'] = $operation['delay'];
 							}
 							break;
 					}

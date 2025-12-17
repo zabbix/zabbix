@@ -18,6 +18,60 @@ use PHPUnit\Framework\TestCase;
 
 class CApiInputValidatorTest extends TestCase {
 
+	const SSL_CERTIFICATE = '-----BEGIN CERTIFICATE-----
+MIID+TCCAuGgAwIBAgIUSpDnLjL2DVS0YTRGOQh+MMoUtDowDQYJKoZIhvcNAQEL
+BQAwgYsxCzAJBgNVBAYTAlBMMQ0wCwYDVQQIDARXcm9jMRAwDgYDVQQHDAdXcm9j
+bGF3MQ8wDQYDVQQKDAZaYWJiaXgxCzAJBgNVBAsMAklUMRUwEwYDVQQDDAxJcnlu
+YSBTaGFyaGExJjAkBgkqhkiG9w0BCQEWF2lyeW5hLnNoYXJoYUB6YWJiaXguY29t
+MB4XDTI1MDQyNDE2NDE0M1oXDTI2MDQyNDE2NDE0M1owgYsxCzAJBgNVBAYTAlBM
+MQ0wCwYDVQQIDARXcm9jMRAwDgYDVQQHDAdXcm9jbGF3MQ8wDQYDVQQKDAZaYWJi
+aXgxCzAJBgNVBAsMAklUMRUwEwYDVQQDDAxJcnluYSBTaGFyaGExJjAkBgkqhkiG
+9w0BCQEWF2lyeW5hLnNoYXJoYUB6YWJiaXguY29tMIIBIjANBgkqhkiG9w0BAQEF
+AAOCAQ8AMIIBCgKCAQEAvHwPw8t5wB6e73ciAJ6LrHFSKRjgMQlGP31Sku/g8pTA
+8dFbblBj/yXKPkyqrnO1EvBoZB330HqRnlarXsstCFcC8ESQ+EzlB0737dc0jDdy
+WD3MsN2+YZRisKtaFwdswnYd23D4A6ymEYtjCAgKcpPJ4ciX+aZUkjS6BkMqyeGq
+zm0ig9GYwC8OsfG0ZxWV0s8m8MwC0DDPGnTSeFuCRwVftwqIjZOPocm2xpuWXQzF
+e2k4C5GofJ8BW0hNYeyzxnI+eOJHpgamtNlA5MeIcSTrtpGrqmm3XGz1H8F27kVi
+rrLVdfLcy1BYxb7I0eca4YjByvqqWrWukFq4Xs+/cQIDAQABo1MwUTAdBgNVHQ4E
+FgQUd9PRJ5ORONgZzkgVUE9SpCpeW9IwHwYDVR0jBBgwFoAUd9PRJ5ORONgZzkgV
+UE9SpCpeW9IwDwYDVR0TAQH/BAUwAwEB/zANBgkqhkiG9w0BAQsFAAOCAQEAV8dE
+Al+/w/8eOEqAlSeS9g2+g+4hvAAkTtp8HfWzMiqy56ZoAtzMOY4A/1QINZn4gvUk
+VW+SCr2X/AAqW7rIXFEbng7LyfwPUYJ++L1/aRqlEIuSvCmwa3Ypj6PqtN1RepEL
+jSXIQ/c5h+R+e4MUGU+mhS0evonfGaklB9xVz+amOMhU0Ag04Sp3HH+MayqWrkJP
+ntEXfn6G1X/mRSefF2k3UC5gZRYsWRybYtmtddrZcSApMedpx6YjtpFAd6+Z2UlL
+XlyFUVaZU/mT+orYNshgWEjBR2Mra1m0MKC1yWLG/eS7OUdzYLTyl0rClB5M0YFe
+pYDypczpOVk8mPLcZg==
+-----END CERTIFICATE-----';
+
+	const SSL_PRIVATE_KEY = '-----BEGIN PRIVATE KEY-----
+MIIEvwIBADANBgkqhkiG9w0BAQEFAASCBKkwggSlAgEAAoIBAQC8fA/Dy3nAHp7v
+dyIAnouscVIpGOAxCUY/fVKS7+DylMDx0VtuUGP/Jco+TKquc7US8GhkHffQepGe
+Vqteyy0IVwLwRJD4TOUHTvft1zSMN3JYPcyw3b5hlGKwq1oXB2zCdh3bcPgDrKYR
+i2MICApyk8nhyJf5plSSNLoGQyrJ4arObSKD0ZjALw6x8bRnFZXSzybwzALQMM8a
+dNJ4W4JHBV+3CoiNk4+hybbGm5ZdDMV7aTgLkah8nwFbSE1h7LPGcj544kemBqa0
+2UDkx4hxJOu2kauqabdcbPUfwXbuRWKustV18tzLUFjFvsjR5xrhiMHK+qpata6Q
+Wrhez79xAgMBAAECggEAANK9KIGvl4t57hWbTIex8amdpKrczfY2co+SMAgVtpe8
+UGfmgcOGMwLIweu1Tqb3p7QJTL7UigiM2bVWKe/Y9iVKsj1jcGouo7N5+zzTc7Je
+tclteBvu7j0j3g+l+DcIZWtIT+0EsUyO/8Fc/PEYTXGI9Kef86FEACIrN2DROnn2
+Ek4R1Lg/92dq10bpnYTMT8txctREQ2gQTXRuNUGIUACUzdoXARNqGth6+k9+gWYh
+IpXiCoBz5Sh8bS/QveehEZtdB/j+/iCcVBjuxwsxNcN7Iq9TKuPoC5/pOa+KoxXC
+kss1mU5A+boJMSL0lZHsFaaGJINliNBPqGZRkU2xxwKBgQD5XtqpYrWFRiYrX1YM
+nFfgIzl69h9EufI/DRHwFObFz7gvaDyQf0HMPT52YwEJiZSwaES+E4fFrmPxg53V
+VbdkBL3LsAXGZqJqQjHuWw0Lx756jd7mABAF4CIR2d9hk3YAA1+d8djsSLqN2xl4
+ptQoxehZLAQzCQkiMC0KxFSnowKBgQDBftXDnZWGUTlezunur/HBymiHdMzUTHsk
+7CgUEOEfaA6eu1yA7udyVsSbhss0AFZgqCevb90J8iBnLnQNqte+gY3qglY1L3od
+9Yv4kvDTGgdAesafiivo+TY3g6JD14M/2LbUutN6kWywLeJGSwgnJwAWSjznA6VM
+TW5+WOu92wKBgQC8//ZMYSLg0u0E/GnUfv5fQ3NCTZ4fUatXvEk3JDBQBoI7dA5L
+Ghg9esGHqrvThbHrDevkABtsaSMYnj+WvDOVm75ZzZxi5dD9JhR/6gR2RDqK2lHx
+EmUSfvBzhSS36LKLigMDS5S0aN7zuvaQKiksierzAthf8d45SjgpK+pZbwKBgQCT
+GPctNPldGRaCKs7Qc9VYO6XnhDXLFzFuylFVn9dk5thmd41FP1mYJLpmeby1FaSU
+6oDw8Bub2gQkLL5xPXWyEA9xPhCHckZlzCvSlvKZqWnl7PBejM4A2KQM4/dRl97h
+hMDJTBZFUZTNArTIN3ZFPXLlfx55iN36+cqMJtFgjQKBgQDcffg1rc/ayzuJd7Ym
+OzQ7joemEK5DIDRxryFxWnDXLrAZA1V+iUiKESIX1E8TGSAMymwUW2nWWCuhUps6
+pFw9z8Z3AaerRZA5fl655v500jUqziwBfifSimNL0hzmZfG6XUt6F7y4rxa2HFuu
+uwMrOBKatg7CZ1Uenv1K3ioD5w==
+-----END PRIVATE KEY-----';
+
 	protected $default_timezone;
 
 	protected function setUp(): void {
@@ -3018,6 +3072,24 @@ class CApiInputValidatorTest extends TestCase {
 				]
 			],
 			[
+				['type' => API_OBJECTS, 'flags' => API_PRESERVE_KEYS, 'fields' => []],
+				[
+					10 => [],
+					13 => null
+				],
+				'/',
+				'Invalid parameter "/14": an array is expected.'
+			],
+			[
+				['type' => API_OBJECTS, 'fields' => []],
+				[
+					10 => [],
+					13 => null
+				],
+				'/',
+				'Invalid parameter "/2": an array is expected.'
+			],
+			[
 				['type' => API_OBJECTS, 'fields' => [
 					'hostid' =>	['type' => API_ID],
 					'host' =>	['type'=> API_STRING_UTF8],
@@ -3768,6 +3840,24 @@ class CApiInputValidatorTest extends TestCase {
 				'/'
 			],
 			[
+				['type' => API_REGEX],
+				'/',
+				'/1/expression',
+				'/'
+			],
+			[
+				['type' => API_REGEX],
+				'[(]',
+				'/1/expression',
+				'[(]'
+			],
+			[
+				['type' => API_REGEX],
+				'[\\/]',
+				'/1/expression',
+				'[\\/]'
+			],
+			[
 				['type' => API_REGEX, 'length' => 8],
 				'/test/i',
 				'/1/expression',
@@ -4273,6 +4363,24 @@ class CApiInputValidatorTest extends TestCase {
 				['hostid', 'name', 'name'],
 				'/output',
 				'Invalid parameter "/output/3": value (name) already exists.'
+			],
+			[
+				['type' => API_OUTPUT, 'flags' => API_NORMALIZE, 'in' => 'hostid,name'],
+				'extend',
+				'/output',
+				['hostid', 'name']
+			],
+			[
+				['type' => API_OUTPUT, 'flags' => API_NORMALIZE, 'in' => 'hostid,name'],
+				['name'],
+				'/output',
+				['name']
+			],
+			[
+				['type' => API_OUTPUT, 'flags' => API_NORMALIZE, 'in' => 'hostid,name'],
+				'name',
+				'/output',
+				'Invalid parameter "/output": value must be "extend".'
 			],
 			[
 				['type' => API_PSK],
@@ -5010,7 +5118,7 @@ class CApiInputValidatorTest extends TestCase {
 				['type' => API_PORT, 'flags' => API_ALLOW_USER_MACRO],
 				'{$}',
 				'/1/port',
-				'Invalid parameter "/1/port": an integer is expected.'
+				'Invalid parameter "/1/port": a port number is expected.'
 			],
 			[
 				['type' => API_PORT, 'flags' => API_ALLOW_USER_MACRO],
@@ -5034,7 +5142,7 @@ class CApiInputValidatorTest extends TestCase {
 				['type' => API_PORT, 'flags' => API_ALLOW_LLD_MACRO],
 				'{#}',
 				'/1/port',
-				'Invalid parameter "/1/port": an integer is expected.'
+				'Invalid parameter "/1/port": a port number is expected.'
 			],
 			[
 				['type' => API_PORT, 'flags' => API_ALLOW_LLD_MACRO],
@@ -5052,31 +5160,31 @@ class CApiInputValidatorTest extends TestCase {
 				['type' => API_PORT, 'flags' => API_ALLOW_USER_MACRO],
 				'{$MACRO10}{$MACRO11}',
 				'/1/port',
-				'Invalid parameter "/1/port": an integer is expected.'
+				'Invalid parameter "/1/port": a port number is expected.'
 			],
 			[
 				['type' => API_PORT, 'flags' => API_ALLOW_LLD_MACRO],
 				'{#MACRO8}{#MACRO9}',
 				'/1/port',
-				'Invalid parameter "/1/port": an integer is expected.'
+				'Invalid parameter "/1/port": a port number is expected.'
 			],
 			[
 				['type' => API_PORT],
 				'-1',
 				'/1/port',
-				'Invalid parameter "/1/port": value must be one of 0-65535.'
+				'Invalid parameter "/1/port": a port number is expected.'
 			],
 			[
 				['type' => API_PORT],
 				'9999999999',
 				'/1/port',
-				'Invalid parameter "/1/port": a number is too large.'
+				'Invalid parameter "/1/port": a port number is expected.'
 			],
 			[
 				['type' => API_PORT],
 				'65536',
 				'/1/port',
-				'Invalid parameter "/1/port": value must be one of 0-65535.'
+				'Invalid parameter "/1/port": a port number is expected.'
 			],
 			[
 				['type' => API_TRIGGER_EXPRESSION],
@@ -5215,246 +5323,6 @@ class CApiInputValidatorTest extends TestCase {
 				'{?func({FUNCTION.VALUE},{FUNCTION.VALUE1},{FUNCTION.RECOVERY.VALUE},{FUNCTION.RECOVERY.VALUE9})}',
 				'/1/event_name',
 				'{?func({FUNCTION.VALUE},{FUNCTION.VALUE1},{FUNCTION.RECOVERY.VALUE},{FUNCTION.RECOVERY.VALUE9})}'
-			],
-			[
-				['type' => API_JSON],
-				null,
-				'/1/json',
-				'Invalid parameter "/1/json": a character string is expected.'
-			],
-			[
-				['type' => API_JSON],
-				true,
-				'/1/json',
-				'Invalid parameter "/1/json": a character string is expected.'
-			],
-			[
-				['type' => API_JSON],
-				[],
-				'/1/json',
-				'Invalid parameter "/1/json": a character string is expected.'
-			],
-			[
-				['type' => API_JSON],
-				123,
-				'/1/json',
-				'Invalid parameter "/1/json": a character string is expected.'
-			],
-			[
-				['type' => API_JSON],
-				'123',
-				'/1/json',
-				'123'
-			],
-			[
-				['type' => API_JSON],
-				'',
-				'/1/json',
-				''
-			],
-			[
-				['type' => API_JSON, 'flags' => API_NOT_EMPTY],
-				'',
-				'/1/json',
-				'Invalid parameter "/1/json": cannot be empty.'
-			],
-			[
-				['type' => API_JSON],
-				'{}',
-				'/1/json',
-				'{}'
-			],
-			[
-				['type' => API_JSON],
-				'{"key": "value"}',
-				'/1/json',
-				'{"key": "value"}'
-			],
-			[
-				['type' => API_JSON],
-				'{"key": false}',
-				'/1/json',
-				'{"key": false}'
-			],
-			[
-				['type' => API_JSON],
-				'{"key": null}',
-				'/1/json',
-				'{"key": null}'
-			],
-			[
-				['type' => API_JSON],
-				'{"key": NaN}',
-				'/1/json',
-				'Invalid parameter "/1/json": JSON is expected.'
-			],
-			[
-				['type' => API_JSON, 'length' => 15],
-				'{"key": "value"}',
-				'/1/json',
-				'Invalid parameter "/1/json": value is too long.'
-			],
-			[
-				['type' => API_JSON],
-				'abc',
-				'/1/json',
-				'Invalid parameter "/1/json": JSON is expected.'
-			],
-			[
-				['type' => API_JSON],
-				'{"key": value}',
-				'/1/json',
-				'Invalid parameter "/1/json": JSON is expected.'
-			],
-			[
-				['type' => API_JSON],
-				'{"key": 123}',
-				'/1/json',
-				'{"key": 123}'
-			],
-			[
-				['type' => API_JSON],
-				'{$MACRO}',
-				'/1/json',
-				'Invalid parameter "/1/json": JSON is expected.'
-			],
-			[
-				['type' => API_JSON, 'flags' => API_ALLOW_USER_MACRO],
-				'{$MACRO}',
-				'/1/json',
-				'{$MACRO}'
-			],
-			[
-				['type' => API_JSON],
-				'{"key": {$MACRO}}',
-				'/1/json',
-				'Invalid parameter "/1/json": JSON is expected.'
-			],
-			[
-				['type' => API_JSON, 'flags' => API_ALLOW_USER_MACRO],
-				'{"key": {$MACRO}}',
-				'/1/json',
-				'{"key": {$MACRO}}'
-			],
-			[
-				['type' => API_JSON],
-				'{#LLD}',
-				'/1/json',
-				'Invalid parameter "/1/json": JSON is expected.'
-			],
-			[
-				['type' => API_JSON, 'flags' => API_ALLOW_LLD_MACRO],
-				'{#LLD}',
-				'/1/json',
-				'{#LLD}'
-			],
-			[
-				['type' => API_JSON],
-				'{"key": {#LLD}}',
-				'/1/json',
-				'Invalid parameter "/1/json": JSON is expected.'
-			],
-			[
-				['type' => API_JSON, 'flags' => API_ALLOW_LLD_MACRO],
-				'{"key": {#LLD}}',
-				'/1/json',
-				'{"key": {#LLD}}'
-			],
-			[
-				['type' => API_JSON],
-				'{HOST.IP}',
-				'/1/json',
-				'Invalid parameter "/1/json": JSON is expected.'
-			],
-			[
-				['type' => API_JSON, 'macros_n' => ['{HOST.IP}']],
-				'{HOST.IP}',
-				'/1/json',
-				'{HOST.IP}'
-			],
-			[
-				['type' => API_JSON, 'macros_n' => ['{HOST.IP}']],
-				'{HOST.IP2}',
-				'/1/json',
-				'{HOST.IP2}'
-			],
-			[
-				['type' => API_JSON],
-				'{"key": {HOST.IP}}',
-				'/1/json',
-				'Invalid parameter "/1/json": JSON is expected.'
-			],
-			[
-				['type' => API_JSON, 'macros_n' => ['{HOST.IP}']],
-				'{"key1": {HOST.IP1}, "key2": {HOST.IP2}}',
-				'/1/json',
-				'{"key1": {HOST.IP1}, "key2": {HOST.IP2}}'
-			],
-			[
-				['type' => API_JSON],
-				'[]',
-				'/1/json',
-				'[]'
-			],
-			[
-				['type' => API_JSON],
-				'[[]]',
-				'/1/json',
-				'[[]]'
-			],
-			[
-				['type' => API_JSON],
-				'[[], []]',
-				'/1/json',
-				'[[], []]'
-			],
-			[
-				['type' => API_JSON],
-				'[[1]]',
-				'/1/json',
-				'[[1]]'
-			],
-			[
-				['type' => API_JSON],
-				'[1, 2, 3]',
-				'/1/json',
-				'[1, 2, 3]'
-			],
-			[
-				['type' => API_JSON],
-				'[[true]]',
-				'/1/json',
-				'[[true]]'
-			],
-			[
-				['type' => API_JSON],
-				'[[null]]',
-				'/1/json',
-				'[[null]]'
-			],
-			[
-				['type' => API_JSON],
-				'{null: "value"}',
-				'/1/json',
-				'Invalid parameter "/1/json": JSON is expected.'
-			],
-			[
-				['type' => API_JSON],
-				'[{"key": "value"}]',
-				'/1/json',
-				'[{"key": "value"}]'
-			],
-			[
-				['type' => API_JSON],
-				'[{"key": "value"}, {"key": "value"}]',
-				'/1/json',
-				'[{"key": "value"}, {"key": "value"}]'
-			],
-			[
-				['type' => API_JSON],
-				'["key": "value"]',
-				'/1/json',
-				'Invalid parameter "/1/json": JSON is expected.'
 			],
 
 			[
@@ -6931,132 +6799,6 @@ class CApiInputValidatorTest extends TestCase {
 				'8m;0/1-7,00:10-24:00;10m/1-7,00:07-24:00',
 				'/1/item_delay',
 				'Invalid parameter "/1/item_delay": must have a polling interval not blocked by non-active interval periods.'
-			],
-			[
-				['type' => API_XML],
-				null,
-				'/1/xml',
-				'Invalid parameter "/1/xml": a character string is expected.'
-			],
-			[
-				['type' => API_XML],
-				123,
-				'/1/xml',
-				'Invalid parameter "/1/xml": a character string is expected.'
-			],
-			[
-				['type' => API_XML],
-				'',
-				'/1/xml',
-				''
-			],
-			[
-				['type' => API_XML, 'flags' => API_NOT_EMPTY],
-				'',
-				'/1/xml',
-				'Invalid parameter "/1/xml": cannot be empty.'
-			],
-			[
-				['type' => API_XML],
-				'<?xml version="1.0" encoding="UTF-8"?>',
-				'/1/xml',
-				'Invalid parameter "/1/xml": (4) Start tag expected, \'<\' not found [Line: 1 | Column: 39].'
-			],
-			[
-				['type' => API_XML],
-				'<?xml version="1.0" encoding="UTF-8"?><node>value</node>',
-				'/1/xml',
-				'<?xml version="1.0" encoding="UTF-8"?><node>value</node>'
-			],
-			[
-				['type' => API_XML, 'length' => 10],
-				'<?xml version="1.0" encoding="UTF-8"?><node>value</node>',
-				'/1/xml',
-				'Invalid parameter "/1/xml": value is too long.'
-			],
-			[
-				['type' => API_XML],
-				'<?xml version="1.0" encoding="UTF-8"?><node prop="123">value</node>',
-				'/1/xml',
-				'<?xml version="1.0" encoding="UTF-8"?><node prop="123">value</node>'
-			],
-			[
-				['type' => API_XML],
-				'<?xml version="1.0" encoding="UTF-8"?><node prop="string">value</node>',
-				'/1/xml',
-				'<?xml version="1.0" encoding="UTF-8"?><node prop="string">value</node>'
-			],
-			[
-				['type' => API_XML],
-				'<?xml version="1.0" encoding="UTF-8"?><node prop=string>value</node>',
-				'/1/xml',
-				'Invalid parameter "/1/xml": (39) AttValue: " or \' expected [Line: 1 | Column: 50].'
-			],
-			[
-				['type' => API_XML],
-				'<?xml version="1.0" encoding="UTF-8"?><node prop="string>value</node>',
-				'/1/xml',
-				'Invalid parameter "/1/xml": (38) Unescaped \'<\' not allowed in attributes values [Line: 1 | Column: 63].'
-			],
-			[
-				['type' => API_XML],
-				'<?xml version="1.0" encoding="UTF-8"?><node prop="<">value</node>',
-				'/1/xml',
-				'Invalid parameter "/1/xml": (38) Unescaped \'<\' not allowed in attributes values [Line: 1 | Column: 51].'
-			],
-			[
-				['type' => API_XML],
-				'<?xml version="1.0" encoding="UTF-8"?><node prop="&lt;">value</node>',
-				'/1/xml',
-				'<?xml version="1.0" encoding="UTF-8"?><node prop="&lt;">value</node>'
-			],
-			[
-				['type' => API_XML],
-				'<?xml version="1.0" encoding="UTF-8"?><node><script></node>',
-				'/1/xml',
-				'Invalid parameter "/1/xml": (76) Opening and ending tag mismatch: script line 1 and node [Line: 1 | Column: 60].'
-			],
-			[
-				['type' => API_XML],
-				'<?xml version="1.0" encoding="UTF-8"?><node><script/></node>',
-				'/1/xml',
-				'<?xml version="1.0" encoding="UTF-8"?><node><script/></node>'
-			],
-			[
-				['type' => API_XML],
-				'<?xml version="1.0" encoding="UTF-8"?><node><script /></node>',
-				'/1/xml',
-				'<?xml version="1.0" encoding="UTF-8"?><node><script /></node>'
-			],
-			'Opening and ending tag mismatch' => [
-				['type' => API_XML],
-				'<?xml version="1.0" encoding="UTF-8"?><node></a></node>',
-				'/1/xml',
-				'Invalid parameter "/1/xml": (76) Opening and ending tag mismatch: node line 1 and a [Line: 1 | Column: 49].'
-			],
-			[
-				['type' => API_XML],
-				'<?xml version="1.0" encoding="UTF-8"?><node>/></node>',
-				'/1/xml',
-				'<?xml version="1.0" encoding="UTF-8"?><node>/></node>'
-			],
-			[
-				['type' => API_XML],
-				'<?xml version="1.0" encoding="UTF-8"?><node>/&gt;</node>',
-				'/1/xml',
-				'<?xml version="1.0" encoding="UTF-8"?><node>/&gt;</node>'
-			],
-			[
-				['type' => API_XML],
-				'<?xml version="1.0" encoding="UTF-8"?><node>"</node>',
-				'/1/xml',
-				'<?xml version="1.0" encoding="UTF-8"?><node>"</node>'
-			],
-			[
-				['type' => API_XML],
-				'<?xml version="1.0" encoding="UTF-8"?><node>&quot;</node>',
-				'/1/xml',
-				'<?xml version="1.0" encoding="UTF-8"?><node>&quot;</node>'
 			],
 
 			[
@@ -8927,6 +8669,102 @@ class CApiInputValidatorTest extends TestCase {
 				'Заббикс '."\xd1".'сервер',
 				'/1/selementid',
 				'Invalid parameter "/1/selementid": invalid byte sequence in UTF-8.'
+			],
+			[
+				['type' => API_SSL_CERTIFICATE],
+				'',
+				'/1/idp_certificate',
+				''
+			],
+			[
+				['type' => API_SSL_CERTIFICATE, 'flags' => API_NOT_EMPTY],
+				'',
+				'/1/idp_certificate',
+				'Invalid parameter "/1/idp_certificate": cannot be empty.'
+			],
+			[
+				['type' => API_SSL_CERTIFICATE],
+				self::SSL_CERTIFICATE,
+				'/1/idp_certificate',
+				self::SSL_CERTIFICATE
+			],
+			[
+				['type' => API_SSL_CERTIFICATE],
+				'lorem ipsum dolor sit amet, consectetur adipiscing elit',
+				'/1/idp_certificate',
+				'Invalid parameter "/1/idp_certificate": a PEM-encoded certificate is expected.'
+			],
+			[
+				['type' => API_SSL_CERTIFICATE],
+				123,
+				'/1/idp_certificate',
+				'Invalid parameter "/1/idp_certificate": a character string is expected.'
+			],
+			[
+				['type' => API_SSL_CERTIFICATE],
+				str_repeat('abc123 ', 1429),
+				'/1/idp_certificate',
+				'Invalid parameter "/1/idp_certificate": value is too long.'
+			],
+			[
+				['type' => API_SSL_CERTIFICATE],
+				'',
+				'/1/sp_certificate',
+				''
+			],
+			[
+				['type' => API_SSL_CERTIFICATE],
+				self::SSL_CERTIFICATE,
+				'/1/sp_certificate',
+				self::SSL_CERTIFICATE
+			],
+			[
+				['type' => API_SSL_CERTIFICATE],
+				'lorem ipsum dolor sit amet, consectetur adipiscing elit',
+				'/1/sp_certificate',
+				'Invalid parameter "/1/sp_certificate": a PEM-encoded certificate is expected.'
+			],
+			[
+				['type' => API_SSL_CERTIFICATE],
+				123,
+				'/1/sp_certificate',
+				'Invalid parameter "/1/sp_certificate": a character string is expected.'
+			],
+			[
+				['type' => API_SSL_CERTIFICATE],
+				str_repeat('abc123 ', 1429),
+				'/1/sp_certificate',
+				'Invalid parameter "/1/sp_certificate": value is too long.'
+			],
+			[
+				['type' => API_SSL_PRIVATE_KEY],
+				'',
+				'/1/sp_private_key',
+				''
+			],
+			[
+				['type' => API_SSL_PRIVATE_KEY],
+				self::SSL_PRIVATE_KEY,
+				'/1/sp_private_key',
+				self::SSL_PRIVATE_KEY
+			],
+			[
+				['type' => API_SSL_PRIVATE_KEY],
+				'lorem ipsum dolor sit amet, consectetur adipiscing elit',
+				'/1/sp_private_key',
+				'Invalid parameter "/1/sp_private_key": a PEM-encoded private key is expected.'
+			],
+			[
+				['type' => API_SSL_PRIVATE_KEY],
+				123,
+				'/1/sp_private_key',
+				'Invalid parameter "/1/sp_private_key": a character string is expected.'
+			],
+			[
+				['type' => API_SSL_PRIVATE_KEY],
+				str_repeat('abc123 ', 1429),
+				'/1/sp_private_key',
+				'Invalid parameter "/1/sp_private_key": value is too long.'
 			]
 		];
 	}

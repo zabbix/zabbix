@@ -64,10 +64,10 @@ class CDashboard extends CDashboardGeneral {
 
 		$sql_parts = [
 			'select' => ['dashboard' => 'd.dashboardid'],
-			'from' => ['dashboard' => 'dashboard d'],
+			'from' => 'dashboard d',
 			'where' => ['d.templateid IS NULL'],
-			'order' => [],
-			'group' => []
+			'group' => [],
+			'order' => []
 		];
 
 		if (!$options['countOutput'] && $options['output'] === API_OUTPUT_EXTEND) {

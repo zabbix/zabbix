@@ -17,8 +17,6 @@
 require_once __DIR__.'/../../include/CWebTest.php';
 require_once __DIR__.'/../behaviors/CMessageBehavior.php';
 
-use Facebook\WebDriver\WebDriverKeys;
-
 define('LOGIN', true);
 define('WITHOUT_LOGIN', false);
 define('DEFAULT_PAGE', null);
@@ -221,28 +219,26 @@ class testDashboardPieChartWidget extends testWidgets {
 
 		// Check Data set - Item pattern.
 		$expected_values = [
-			'xpath:.//div[@id="ds_0_hosts_"]/..' => '',        // host pattern
-			'xpath:.//div[@id="ds_0_items_"]/..' => '',        // item pattern
+			'xpath:.//z-color-picker[@color-field-name="ds[0][color]"]' => 0,	// data set color
+			'xpath:.//div[@id="ds_0_hosts_"]/..' => '',							// host pattern
+			'xpath:.//div[@id="ds_0_items_"]/..' => '',							// item pattern
 			'Aggregation function' => 'last',
 			'Data set aggregation' => 'not used',
 			'Data set label' => ''
 		];
 		$form->checkValue($expected_values);
-		$expected_labels = ['Data set #1', 'Aggregation function', 'Data set aggregation', 'Data set label'];
+		$expected_labels = ['Data set #1', 'Aggregation function', 'Data set aggregation', 'Data set label', 'Item tags'];
 		$data_set_tab = $form->query('id:data_set')->one();
 		$this->assertAllVisibleLabels($data_set_tab, $expected_labels);
 		$this->validateDataSetHintboxes($form);
 
-		// Check Data set color picker default setup.
-		$color_picker = $data_set_tab->query('xpath:.//z-color-picker[@color-field-name="ds[0][color]"]')->one();
-		$this->assertEquals(0, $color_picker->getAttribute('palette'));
-
-		foreach ([1 => 'F48485', 2 => '7AD9CC', 3 => '7E7E7E'] as $part => $color) {
-			$this->assertEquals('--color: #'.$color.';', $color_picker
-					->query('xpath:(.//div[@class="color-picker-palette-icon-part"])['.$part.']')->one()
-					->getAttribute('style')
-			);
+		// Check Data set color picker default palette colors setup.
+		$color_picker = $form->getField('xpath:.//z-color-picker[@color-field-name="ds[0][color]"]');
+		$pallete_colors = [];
+		foreach ($color_picker->query('class:color-picker-palette-icon-part')->all() as $part) {
+			$pallete_colors[] = $part->getCSSValue('background-color');
 		}
+		$this->assertEquals(['rgba(244, 132, 133, 1)', 'rgba(122, 217, 204, 1)', 'rgba(126, 126, 126, 1)'], $pallete_colors);
 
 		$buttons = [
 			'id:ds_0_hosts_',                                      // host multiselect
@@ -340,9 +336,10 @@ class testDashboardPieChartWidget extends testWidgets {
 			'Size' => false,
 			'Decimal places' => false,
 			'Units' => false,
-			'Bold' => false
+			'Bold' => false,
+			'Colour' => false
 		];
-		$expected_labels = array_merge($expected_labels, array_keys($inputs_enabled), ['Colour']);
+		$expected_labels = array_merge($expected_labels, array_keys($inputs_enabled));
 		$this->assertAllVisibleLabels($displaying_options_tab, $expected_labels);
 		$this->assertRangeSliderParameters($form, 'Width', ['min' => '20', 'max' => '50', 'step' => '10']);
 		$this->assertRangeSliderParameters($form, 'Stroke width', ['min' => '0', 'max' => '10', 'step' => '1']);
@@ -1350,11 +1347,8 @@ class testDashboardPieChartWidget extends testWidgets {
 
 		// Verify that it is not possible to submit color-picker dialog with invalid color or proceed with form submission.
 		if (CTestArrayHelper::get($data, 'invalid_color')) {
-			$color_picker_dialog = $this->query('class:color-picker-dialog')->one()->asColorPicker();
-			$this->assertTrue($color_picker_dialog->isSubmittionDisabled());
-
-			$color_picker_dialog->close();
-			COverlayDialogElement::find()->one()->close();
+			$this->assertTrue(CColorPickerElement::isSubmitable(false));
+			CColorPickerElement::close();
 		}
 		else {
 			$form->submit();

@@ -20,9 +20,8 @@
 #include "zbxnum.h"
 #include "zbxalgo.h"
 #include "zbxstr.h"
+#include "zbxdbwrap.h"
 
-ZBX_VECTOR_DECL(id_name_pair, zbx_id_name_pair_t)
-ZBX_VECTOR_IMPL(id_name_pair, zbx_id_name_pair_t)
 ZBX_VECTOR_IMPL(lld_discovery_ptr, zbx_lld_discovery_t *)
 
 int	lld_ids_names_compare_func(const void *d1, const void *d2)

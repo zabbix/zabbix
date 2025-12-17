@@ -41,8 +41,8 @@ elseif ($data['item']) {
 				$sections[] = makeSectionError($item['error']);
 				break;
 
-			case CWidgetFieldItemSections::SECTION_METRICS:
-				$sections[] = makeSectionMetrics($item);
+			case CWidgetFieldItemSections::SECTION_INTERVAL_AND_STORAGE:
+				$sections[] = makeSectionIntervalAndStorage($item);
 				break;
 
 			case CWidgetFieldItemSections::SECTION_TYPE_OF_INFORMATION:
@@ -120,13 +120,13 @@ function makeSectionsHeader(array $item, string $context, bool $show_path, bool 
 			$error_text = makeErrorIcon($item['error']);
 		}
 
-		$disable_source = $item['status'] == ITEM_STATUS_DISABLED && $item['itemDiscovery']
-			? $item['itemDiscovery']['disable_source']
+		$disable_source = $item['status'] == ITEM_STATUS_DISABLED && $item['discoveryData']
+			? $item['discoveryData']['disable_source']
 			: '';
 
-		if ($item['flags'] == ZBX_FLAG_DISCOVERY_CREATED && $item['itemDiscovery']['status'] == ZBX_LLD_STATUS_LOST) {
-			$item_discovery = getLldLostEntityIndicator(time(), $item['itemDiscovery']['ts_delete'],
-				$item['itemDiscovery']['ts_disable'], $disable_source, $item['status'] == ITEM_STATUS_DISABLED,
+		if ($item['flags'] == ZBX_FLAG_DISCOVERY_CREATED && $item['discoveryData']['status'] == ZBX_LLD_STATUS_LOST) {
+			$item_discovery = getLldLostEntityIndicator(time(), $item['discoveryData']['ts_delete'],
+				$item['discoveryData']['ts_disable'], $disable_source, $item['status'] == ITEM_STATUS_DISABLED,
 				_('item')
 			);
 		}
@@ -368,7 +368,7 @@ function makeSectionTriggers(array $item_triggers, string $hostid, array $trigge
 		->addClass('section-triggers');
 }
 
-function makeSectionMetrics(array $item): CDiv {
+function makeSectionIntervalAndStorage(array $item): CDiv {
 	$help_icon = null;
 
 	if ($item['custom_intervals']) {
@@ -414,7 +414,7 @@ function makeSectionMetrics(array $item): CDiv {
 		]))->addClass('right-column')
 	]))
 		->addClass(Widget::ZBX_STYLE_SECTION)
-		->addClass('section-metrics');
+		->addClass('section-interval-and-storage');
 }
 
 function makeSectionLatestData(array $item, string $context): CDiv {
@@ -518,11 +518,11 @@ function makeSectionTags(array $item_tags): CDiv {
 	}
 
 	if ($tags) {
-		$tags[] = (new CButtonIcon(ZBX_ICON_MORE))->setHint($tags, ZBX_STYLE_HINTBOX_WRAP);
+		$tags[] = (new CButtonIcon(ZBX_ICON_MORE))->setHint($tags, ZBX_STYLE_HINTBOX_WRAP.' '.ZBX_STYLE_TAGS_WRAPPER);
 	}
 
 	return (new CDiv(
-		(new CDiv($tags))->addClass('tags')
+		(new CDiv($tags))->addClass('tags')->addClass(ZBX_STYLE_TAGS_WRAPPER)
 	))
 		->addClass(Widget::ZBX_STYLE_SECTION)
 		->addClass('section-tags');

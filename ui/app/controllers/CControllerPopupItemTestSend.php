@@ -63,14 +63,14 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 			'http_password'			=> 'string',
 			'http_proxy'			=> 'string',
 			'http_username'			=> 'string',
-			'flags'					=> 'in '. implode(',', [ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_RULE, ZBX_FLAG_DISCOVERY_PROTOTYPE, ZBX_FLAG_DISCOVERY_CREATED]),
+			'flags'					=> 'in '. implode(',', [ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_RULE, ZBX_FLAG_DISCOVERY_PROTOTYPE, ZBX_FLAG_DISCOVERY_CREATED, ZBX_FLAG_DISCOVERY_RULE_CREATED, ZBX_FLAG_DISCOVERY_RULE_PROTOTYPE, ZBX_FLAG_DISCOVERY_RULE_PROTOTYPE_CREATED]),
 			'follow_redirects'		=> 'in 0,1',
 			'key'					=> 'string',
 			'interface'				=> 'array',
 			'ipmi_sensor'			=> 'string',
 			'item_type'				=> 'in '.implode(',', [ITEM_TYPE_ZABBIX, ITEM_TYPE_TRAPPER, ITEM_TYPE_SIMPLE, ITEM_TYPE_INTERNAL, ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_HTTPTEST, ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_IPMI, ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_CALCULATED, ITEM_TYPE_JMX, ITEM_TYPE_SNMPTRAP, ITEM_TYPE_DEPENDENT, ITEM_TYPE_HTTPAGENT, ITEM_TYPE_SNMP, ITEM_TYPE_SCRIPT, ITEM_TYPE_BROWSER]),
 			'jmx_endpoint'			=> 'string',
-			'macros'				=> 'array',
+			'macros'				=> 'string',
 			'output_format'			=> 'in '.implode(',', [HTTPCHECK_STORE_RAW, HTTPCHECK_STORE_JSON]),
 			'params_ap'				=> 'string',
 			'params_es'				=> 'string',
@@ -95,7 +95,7 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 			'ssl_key_file'			=> 'string',
 			'ssl_key_password'		=> 'string',
 			'status_codes'			=> 'string',
-			'test_type'				=> 'required|in '.implode(',', [self::ZBX_TEST_TYPE_ITEM, self::ZBX_TEST_TYPE_ITEM_PROTOTYPE, self::ZBX_TEST_TYPE_LLD]),
+			'test_type'				=> 'required|in '.implode(',', [self::ZBX_TEST_TYPE_ITEM, self::ZBX_TEST_TYPE_ITEM_PROTOTYPE, self::ZBX_TEST_TYPE_LLD, self::ZBX_TEST_TYPE_LLD_PROTOTYPE]),
 			'time_change'			=> 'int32',
 			'timeout'				=> 'string',
 			'username'				=> 'string',
@@ -125,7 +125,7 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 			$this->show_final_result = ($this->getInput('show_final_result') == 1);
 
 			// If 'get value from host' is checked, check if key is valid for item types it's mandatory.
-			if ($this->get_value_from_host && in_array($this->item_type, $this->item_types_has_key_mandatory)) {
+			if ($this->get_value_from_host && in_array($this->item_type, self::$item_types_has_key_mandatory)) {
 				$key = $this->getInput('key', '');
 
 				/*
@@ -171,6 +171,10 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 
 					case self::ZBX_TEST_TYPE_LLD:
 						$api_input_rules = CDiscoveryRule::getPreprocessingValidationRules();
+						break;
+
+					case self::ZBX_TEST_TYPE_LLD_PROTOTYPE:
+						$api_input_rules = CDiscoveryRulePrototype::getPreprocessingValidationRules();
 						break;
 				}
 
@@ -220,7 +224,9 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 			if ($this->item_type == ITEM_TYPE_CALCULATED) {
 				$expression_parser = new CExpressionParser([
 					'usermacros' => true,
-					'lldmacros' => ($this->getInput('test_type') == self::ZBX_TEST_TYPE_ITEM_PROTOTYPE),
+					'lldmacros' => in_array($this->getInput('test_type'),
+						[self::ZBX_TEST_TYPE_ITEM_PROTOTYPE, self::ZBX_TEST_TYPE_LLD_PROTOTYPE]
+					),
 					'calculated' => true,
 					'host_macro' => true,
 					'empty_host' => true
@@ -234,7 +240,9 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 				else {
 					$expression_validator = new CExpressionValidator([
 						'usermacros' => true,
-						'lldmacros' => ($this->getInput('test_type') == self::ZBX_TEST_TYPE_ITEM_PROTOTYPE),
+						'lldmacros' => in_array($this->getInput('test_type'),
+							[self::ZBX_TEST_TYPE_ITEM_PROTOTYPE, self::ZBX_TEST_TYPE_LLD_PROTOTYPE]
+						),
 						'calculated' => true
 					]);
 
@@ -271,6 +279,25 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 		return $ret;
 	}
 
+	public static function getValidationRules(bool $allow_lld_macro): array {
+		return ['object', 'fields' => [
+			'type' => ['db items.type', 'required', 'in' => [ITEM_TYPE_ZABBIX, ITEM_TYPE_ZABBIX_ACTIVE,
+				ITEM_TYPE_SIMPLE, ITEM_TYPE_SNMP, ITEM_TYPE_SNMPTRAP, ITEM_TYPE_INTERNAL, ITEM_TYPE_TRAPPER,
+				ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_HTTPAGENT, ITEM_TYPE_IPMI, ITEM_TYPE_SSH,
+				ITEM_TYPE_TELNET, ITEM_TYPE_JMX, ITEM_TYPE_CALCULATED, ITEM_TYPE_HTTPTEST, ITEM_TYPE_DEPENDENT,
+				ITEM_TYPE_SCRIPT, ITEM_TYPE_BROWSER
+			]],
+			'key' => ['db items.key_', 'required', 'not_empty', 'use' => [CItemKey::class, []], 'when' => [
+				['type', 'in' => self::$item_types_has_key_mandatory]
+			]],
+			'params_f' => ['db items.params', 'required', 'not_empty',
+				'use' => [CCalcFormulaValidator::class, ['lldmacros' => $allow_lld_macro]],
+				'when' => ['type', 'in' => [ITEM_TYPE_CALCULATED]]
+			],
+			'preprocessing' => CItemGeneralHelper::getPreprocessingValidationRules(allow_lld_macro: true)
+		]];
+	}
+
 	protected function doAction() {
 		global $ZBX_SERVER, $ZBX_SERVER_PORT;
 
@@ -281,28 +308,28 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 			]
 		];
 
-		if ($this->use_prev_value) {
-			$prev_value = $this->get_value_from_host ? $this->getInput('value', '') : $this->getInput('prev_value', '');
-			$prev_time = $this->getInput('prev_time', '');
-
-			if ($prev_value !== '' || $prev_time !== '') {
-				$data['options']['history'] = [
-					'value' => $prev_value,
-					'timestamp' => $prev_time
-				];
-			}
-		}
-
 		if ($this->get_value_from_host) {
+			$history = [
+				'value' => $this->getInput('value', ''),
+				'timestamp' => $this->getInput('prev_time', '') === '' ? '' : $this->getPrevTime()
+			];
 			$data += $this->prepareTestData();
 		}
 		else {
+			$history = [
+				'value' => $this->getInput('prev_value', ''),
+				'timestamp' => $this->getInput('prev_time', '')
+			];
 			$data['item']['value'] = $this->getInput('value', '');
 			$data['options']['state'] = (int) $this->getInput('not_supported', self::SUPPORTED_STATE);
 
 			if ($data['options']['state'] == self::NOT_SUPPORTED_STATE) {
 				$data['options']['runtime_error'] = $this->getInput('runtime_error', '');
 			}
+		}
+
+		if ($this->use_prev_value && $history['timestamp'] !== '') {
+			$data['options']['history'] = $history;
 		}
 
 		$data['item']['value_type'] = $this->getInput('value_type', ITEM_VALUE_TYPE_STR);

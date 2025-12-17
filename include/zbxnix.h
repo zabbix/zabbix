@@ -48,6 +48,7 @@ void	zbx_set_exiting_with_fail(void);
 void	zbx_set_exiting_with_succeed(void);
 int	ZBX_IS_RUNNING(void);
 int	ZBX_EXIT_STATUS(void);
+int	zbx_init_thread_signal_handler(void);
 
 int	zbx_daemon_start(int allow_root, const char *user, unsigned int flags,
 		zbx_get_config_str_f get_pid_file_cb, zbx_on_exit_t zbx_on_exit_cb_arg, int config_log_type,
@@ -117,6 +118,7 @@ void	zbx_set_child_signal_handler(void);
 void	zbx_unset_child_signal_handler(void);
 void	zbx_set_metric_thread_signal_handler(void);
 void	zbx_block_signals(sigset_t *orig_mask);
+void	zbx_block_thread_signals(sigset_t *orig_mask);
 void	zbx_unblock_signals(const sigset_t *orig_mask);
 
 void	zbx_set_exit_on_terminate(void);
@@ -124,7 +126,7 @@ void	zbx_unset_exit_on_terminate(void);
 
 void	zbx_log_exit_signal(void);
 void	zbx_set_on_exit_args(void *args);
-void	zbx_set_child_pids(const pid_t *pids, size_t pid_num);
+void	zbx_set_child_pids(pid_t *pids, size_t pid_num);
 /* sighandler end */
 
 int	zbx_parse_rtc_options(const char *opt, int *message);

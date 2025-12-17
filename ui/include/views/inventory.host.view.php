@@ -228,7 +228,7 @@ $overviewFormList->addRow(_('Configuration'),
 		(new CSpan([$itemsLink, CViewHelper::showNum($data['host']['items'])])),
 		(new CSpan([$triggersLink, CViewHelper::showNum($data['host']['triggers'])])),
 		(new CSpan([$graphsLink, CViewHelper::showNum($data['host']['graphs'])])),
-		(new CSpan([$discoveryLink, CViewHelper::showNum($data['host']['discoveries'])])),
+		(new CSpan([$discoveryLink, CViewHelper::showNum($data['host']['discoveryRules'])])),
 		(new CSpan([$webLink, CViewHelper::showNum($data['host']['httpTests'])]))
 	])
 );

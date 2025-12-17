@@ -26,11 +26,11 @@ import (
 	"golang.zabbix.com/agent2/internal/agent"
 	"golang.zabbix.com/agent2/internal/agent/alias"
 	"golang.zabbix.com/agent2/internal/agent/resultcache"
-	"golang.zabbix.com/agent2/pkg/itemutil"
 	"golang.zabbix.com/sdk/conf"
 	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/log"
 	"golang.zabbix.com/sdk/plugin"
+	"golang.zabbix.com/sdk/plugin/itemutil"
 )
 
 // getNextCheck calculates simplified nextcheck based on the specified delay string and current time
@@ -1983,7 +1983,6 @@ func Test_getPluginCapacity(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
@@ -2068,7 +2067,6 @@ func Test_getPluginForceActiveChecks(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 

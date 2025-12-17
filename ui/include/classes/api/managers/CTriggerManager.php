@@ -52,7 +52,14 @@ class CTriggerManager {
 
 		API::Map()->unlinkTriggers($del_triggerids);
 
-		// Remove related events.
+		DB::delete('functions', ['triggerid' => $del_triggerids]);
+		DB::delete('trigger_tag', ['triggerid' => $del_triggerids]);
+		DB::update('triggers', [
+			'values' => ['templateid' => 0],
+			'where' => ['triggerid' => $del_triggerids]
+		]);
+		DB::delete('triggers', ['triggerid' => $del_triggerids]);
+
 		$ins_housekeeper = [];
 
 		foreach ($del_triggerids as $del_triggerid) {
@@ -64,17 +71,6 @@ class CTriggerManager {
 		}
 
 		DB::insertBatch('housekeeper', $ins_housekeeper);
-
-		DB::delete('functions', ['triggerid' => $del_triggerids]);
-		DB::delete('trigger_discovery', ['triggerid' => $del_triggerids]);
-		DB::delete('trigger_depends', ['triggerid_down' => $del_triggerids]);
-		DB::delete('trigger_depends', ['triggerid_up' => $del_triggerids]);
-		DB::delete('trigger_tag', ['triggerid' => $del_triggerids]);
-		DB::update('triggers', [
-			'values' => ['templateid' => 0],
-			'where' => ['triggerid' => $del_triggerids]
-		]);
-		DB::delete('triggers', ['triggerid' => $del_triggerids]);
 	}
 
 	/**

@@ -90,7 +90,7 @@ int	zbx_event_db_get_host(const zbx_db_event *event, zbx_dc_host_t *host, char *
 					" where " ZBX_SQL_NULLCMP("a.proxyid", "h.proxyid")
 						" and a.host=h.host"
 						" and h.status=%d"
-						" and h.flags<>%d"
+						" and h.flags&%d=0"
 						" and a.autoreg_hostid=" ZBX_FS_UI64,
 					HOST_STATUS_MONITORED, ZBX_FLAG_DISCOVERY_PROTOTYPE, event->objectid);
 			break;
@@ -168,6 +168,11 @@ int	zbx_event_db_get_host(const zbx_db_event *event, zbx_dc_host_t *host, char *
 /******************************************************************************
  *                                                                            *
  * Purpose: retrieve discovered host value by event and field name            *
+ *                                                                            *
+ * Parameters: event      - [IN]                                              *
+ *             replace_to - [IN/OUT] pointer to result buffer, can be         *
+ *                                   "(null)" if record is not found          *
+ *             fieldname  - [IN]                                              *
  *                                                                            *
  * Return value: upon successful completion return SUCCEED                    *
  *               otherwise FAIL                                               *
@@ -386,6 +391,11 @@ int	zbx_event_db_get_drule(const zbx_db_event *event, char **replace_to, const c
 /******************************************************************************
  *                                                                            *
  * Purpose: request value from autoreg_host table by event                    *
+ *                                                                            *
+ * Parameters: event      - [IN]                                              *
+ *             replace_to - [IN/OUT] pointer to result buffer, can be         *
+ *                                   "(null)" if record is not found          *
+ *             fieldname  - [IN]                                              *
  *                                                                            *
  * Return value: upon successful completion return SUCCEED                    *
  *               otherwise FAIL                                               *

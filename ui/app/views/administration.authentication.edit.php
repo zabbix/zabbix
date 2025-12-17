@@ -203,7 +203,8 @@ $ldap_tab = (new CFormGrid())
 	->addItem([
 		new CLabel(_('Provisioning period'), 'jit_provision_interval'),
 		new CFormField(
-			(new CTextBox('jit_provision_interval', $data['jit_provision_interval']))
+			(new CTextBox('jit_provision_interval', $data['jit_provision_interval'], false,
+					CSettingsSchema::getFieldLength('jit_provision_interval')))
 				->setWidth(ZBX_TEXTAREA_4DIGITS_WIDTH)
 				->setEnabled($ldap_auth_enabled && $data['ldap_jit_status'] == JIT_PROVISIONING_ENABLED)
 		)
@@ -215,15 +216,19 @@ $view_url = (new CUrl('zabbix.php'))
 	->getUrl();
 $saml_auth_enabled = $data['saml_auth_enabled'] == ZBX_AUTH_SAML_ENABLED;
 $saml_provisioning = $data['saml_provision_status'] == JIT_PROVISIONING_ENABLED;
+
 $saml_tab = (new CFormGrid())
 	->addItem([
 		new CLabel(_('Enable SAML authentication'), 'saml_auth_enabled'),
-		new CFormField($data['saml_error']
-			? (new CLabel($data['saml_error']))->addClass(ZBX_STYLE_RED)
-			: (new CCheckBox('saml_auth_enabled', ZBX_AUTH_SAML_ENABLED))
+		new CFormField([
+			(new CCheckBox('saml_auth_enabled', ZBX_AUTH_SAML_ENABLED))
 				->setChecked($saml_auth_enabled)
 				->setUncheckedValue(ZBX_AUTH_SAML_DISABLED)
-		)
+				->setEnabled($data['saml_error'] === ''),
+			$data['saml_error'] === ''
+				? null
+				: (new CSpan(makeWarningIcon($data['saml_error'])))->addClass('js-hint')
+		])
 	])
 	->addItem([
 		new CLabel(_('Enable JIT provisioning'), 'saml_jit_status'),
@@ -299,8 +304,89 @@ $saml_tab = (new CFormGrid())
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 				->setAttribute('placeholder', 'urn:oasis:names:tc:SAML:2.0:nameid-format:transient')
 		)
-	])
-	->addItem([
+	]);
+
+if ($data['saml_certs_editable']) {
+	$saml_tab
+		->addItem([
+			(new CLabel(_('IdP certificate'), 'idp_certificate'))->setAsteriskMark(),
+			$data['show_idp_certificate_input']
+				? null
+				: (new CFormField([
+					(new CSimpleButton(_('Change IdP certificate')))
+						->addClass(ZBX_STYLE_BTN_GREY)
+						->addClass('saml-enabled')
+			]))->addClass('js-saml-cert-change-button'),
+			(new CFormField([
+				(new CTextArea('idp_certificate', $data['idp_certificate'] ?? ''))
+					->setAttribute('placeholder', _('PEM-encoded IdP certificate'))
+					->setRows(3)
+					->addClass(ZBX_STYLE_FORM_INPUT_MARGIN)
+					->addClass($data['show_idp_certificate_input'] ? 'saml-enabled' : '')
+					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+					->setEnabled($data['show_idp_certificate_input'])
+					->setAriaRequired(),
+				(new CButton('idp_certificate_file', _('Choose file')))
+					->addClass(ZBX_STYLE_BTN_GREY)
+					->addClass('js-saml-cert-file-button')
+					->addClass('saml-enabled')
+			]))
+				->addClass('js-saml-cert-input')
+				->addStyle($data['show_idp_certificate_input'] ? '' : 'display: none')
+		])
+		->addItem([
+			new CLabel(_('SP private key'), 'sp_private_key'),
+			$data['show_sp_private_key_input']
+				? null
+				: (new CFormField([
+					(new CSimpleButton(_('Change SP private key')))
+						->addClass(ZBX_STYLE_BTN_GREY)
+						->addClass('saml-enabled')
+			]))->addClass('js-saml-cert-change-button'),
+			(new CFormField([
+				(new CTextArea('sp_private_key', $data['sp_private_key'] ?? ''))
+					->setAttribute('placeholder', _('PEM-encoded SP private key'))
+					->setRows(3)
+					->addClass(ZBX_STYLE_FORM_INPUT_MARGIN)
+					->addClass($data['show_sp_private_key_input'] ? 'saml-enabled' : '')
+					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+					->setEnabled($data['show_sp_private_key_input']),
+				(new CButton('sp_private_key_file', _('Choose file')))
+					->addClass(ZBX_STYLE_BTN_GREY)
+					->addClass('js-saml-cert-file-button')
+					->addClass('saml-enabled')
+			]))
+				->addClass('js-saml-cert-input')
+				->addStyle($data['show_sp_private_key_input'] ? '' : 'display: none')
+		])
+		->addItem([
+			new CLabel(_('SP certificate'), 'sp_certificate'),
+			$data['show_sp_certificate_input']
+				? null
+				: (new CFormField([
+				(new CSimpleButton(_('Change SP certificate')))
+					->addClass(ZBX_STYLE_BTN_GREY)
+					->addClass('saml-enabled')
+			]))->addClass('js-saml-cert-change-button'),
+			(new CFormField([
+				(new CTextArea('sp_certificate', $data['sp_certificate'] ?? ''))
+					->setAttribute('placeholder', _('PEM-encoded SP certificate'))
+					->setRows(3)
+					->addClass(ZBX_STYLE_FORM_INPUT_MARGIN)
+					->addClass($data['show_sp_certificate_input'] ? 'saml-enabled' : '')
+					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+					->setEnabled($data['show_sp_certificate_input']),
+				(new CButton('sp_certificate_file', _('Choose file')))
+					->addClass(ZBX_STYLE_BTN_GREY)
+					->addClass('js-saml-cert-file-button')
+					->addClass('saml-enabled')
+			]))
+				->addClass('js-saml-cert-input')
+				->addStyle($data['show_sp_certificate_input'] ? '' : 'display: none')
+		]);
+}
+
+$saml_tab->addItem([
 		new CLabel(_('Sign')),
 		new CFormField(
 			(new CList([
@@ -723,7 +809,14 @@ $templates['mfa_methods_row'] = (string) (new CRow([
 		'templates' => $templates,
 		'mfa_methods' => $data['mfa_methods'],
 		'mfa_default_row_index' => $data['mfa_default_row_index'],
-		'is_http_auth_allowed' => $data['is_http_auth_allowed']
+		'is_http_auth_allowed' => $data['is_http_auth_allowed'],
+		'saml_idp_certificate_exists' => $data['saml_certs_editable'] && $data['idp_certificate_hash'] !== '',
+		'saml_sp_certificate_exists' => $data['saml_certs_editable'] && $data['sp_certificate_hash'] !== '',
+		'saml_sp_private_key_exists' => $data['saml_certs_editable'] && $data['sp_private_key_hash'] !== '',
+		'saml_certificate_max_filesize' => CApiInputValidator::SSL_CERTIFICATE_MAX_LENGTH,
+		'saml_private_key_max_filesize' => CApiInputValidator::SSL_PRIVATE_KEY_MAX_LENGTH,
+		'saml_filesize_error_message' => _('File is too big, max upload size is %1$s bytes.'),
+		'saml_certs_editable' => $data['saml_certs_editable']
 	]).');'
 ))
 	->setOnDocumentReady()

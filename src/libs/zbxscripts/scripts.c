@@ -34,11 +34,13 @@
 #include "zbxjson.h"
 #include "zbxstr.h"
 #include "zbxinterface.h"
+#include "zbxtime.h"
 
 #define REMOTE_COMMAND_NEW		0
 #define REMOTE_COMMAND_RESULT_OOM	1
 #define REMOTE_COMMAND_RESULT_WAIT	2
 #define REMOTE_COMMAND_COMPLETED	4
+#define REMOTE_COMMAND_SENT		8
 
 static zbx_uint64_t	remote_command_cache_size = 256 * ZBX_KIBIBYTE;
 
@@ -48,7 +50,6 @@ ZBX_SHMEM_FUNC_IMPL(__remote_commands, remote_commands_mem)
 typedef struct
 {
 	zbx_uint64_t		maxid;
-	int			commands_num;
 	zbx_hashset_t		commands;
 }
 zbx_remote_commands_t;
@@ -112,7 +113,6 @@ int	zbx_init_remote_commands_cache(char **error)
 	memset(remote_commands, 0, sizeof(zbx_remote_commands_t));
 
 	remote_commands->maxid = 0;
-	remote_commands->commands_num = 0;
 
 	zbx_hashset_create_ext(&remote_commands->commands, REMOTE_COMMANS_INITIAL_HASH_SIZE,
 			remote_commands_commands_hash_func,remote_commands_commands_compare_func, NULL,
@@ -219,7 +219,7 @@ void	zbx_process_command_results(struct zbx_json_parse *jp)
 	int			values_num = 0, parsed_num = 0, results_num = 0;
 	const char		*pnext = NULL;
 	struct zbx_json_parse	jp_commands, jp_command;
-	char			*str = NULL, *value = NULL, *error = NULL;
+	char			*str = NULL;
 	size_t			str_alloc = 0;
 	zbx_uint64_t		id;
 
@@ -230,15 +230,15 @@ void	zbx_process_command_results(struct zbx_json_parse *jp)
 
 	while (NULL != (pnext = zbx_json_next(&jp_commands, pnext)))
 	{
+		char	*value = NULL, *error = NULL;
+
 		if (FAIL == zbx_json_brackets_open(pnext, &jp_command))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "%s", zbx_json_strerror());
-			goto out;
+			break;
 		}
 
 		parsed_num++;
-		str_alloc = 0;
-		zbx_free(str);
 
 		if (SUCCEED != zbx_json_value_by_name_dyn(&jp_command, ZBX_PROTO_TAG_ID, &str, &str_alloc, NULL))
 			continue;
@@ -246,21 +246,17 @@ void	zbx_process_command_results(struct zbx_json_parse *jp)
 		if (SUCCEED != zbx_is_uint64(str, &id))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "Wrong command id '%s'", str);
-			goto out;
+			break;
 		}
 
-		str_alloc = 0;
-		zbx_free(value);
-		zbx_free(error);
-
-		if (SUCCEED != zbx_json_value_by_name_dyn(&jp_command, ZBX_PROTO_TAG_VALUE, &value, &str_alloc, NULL))
+		if (SUCCEED == zbx_json_value_by_name_dyn(&jp_command, ZBX_PROTO_TAG_VALUE, &str, &str_alloc, NULL))
 		{
-
-			if (SUCCEED != zbx_json_value_by_name_dyn(&jp_command, ZBX_PROTO_TAG_ERROR, &error, &str_alloc,
-					NULL))
-			{
-				continue;
-			}
+			value = str;
+		}
+		else if (SUCCEED == zbx_json_value_by_name_dyn(&jp_command, ZBX_PROTO_TAG_ERROR, &str, &str_alloc,
+				NULL))
+		{
+			error = str;
 		}
 
 		values_num++;
@@ -269,8 +265,7 @@ void	zbx_process_command_results(struct zbx_json_parse *jp)
 	}
 out:
 	zbx_free(str);
-	zbx_free(value);
-	zbx_free(error);
+
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s(), parsed %d values received %d results inserted %d", __func__,
 			parsed_num, values_num, results_num);
 }
@@ -284,9 +279,6 @@ void	zbx_remote_commands_prepare_to_send(struct zbx_json *json, zbx_uint64_t hos
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	commands_lock();
-
-	if (0 == remote_commands->commands_num)
-		goto out;
 
 	zbx_hashset_iter_reset(&remote_commands->commands, &iter_comands);
 
@@ -309,19 +301,19 @@ void	zbx_remote_commands_prepare_to_send(struct zbx_json *json, zbx_uint64_t hos
 			if (0 != (command->flag & REMOTE_COMMAND_RESULT_WAIT))
 				wait = 1;
 
+			command->flag |= REMOTE_COMMAND_SENT;
+
 			zbx_json_adduint64(json, ZBX_PROTO_TAG_WAIT, (zbx_uint64_t)wait);
 
 			zbx_json_adduint64(json, ZBX_PROTO_TAG_TIMEOUT, (zbx_uint64_t)config_timeout);
 
 			zbx_json_close(json);
-
-			remote_commands->commands_num--;
 		}
 	}
 
 	if (0 != has_commands)
 		zbx_json_close(json);
-out:
+
 	commands_unlock();
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
@@ -330,9 +322,9 @@ out:
 static int	active_command_send_and_result_fetch(const zbx_dc_host_t *host, const char *command, char **result,
 		int config_timeout, zbx_get_config_forks_f get_config_forks, char *error, size_t max_error_len)
 {
-	int			ret = FAIL, completed = 0;
+	int			ret = FAIL, completed = 0, sent = 0;
 	zbx_rc_command_t	cmd, *pcmd;
-	time_t			time_start;
+	double			time_start;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -372,11 +364,15 @@ static int	active_command_send_and_result_fetch(const zbx_dc_host_t *host, const
 		goto out;
 	}
 
-	remote_commands->commands_num++;
 	commands_unlock();
 
-	for (time_start = time(NULL); config_timeout > time(NULL) - time_start; sleep(1))
+	for (time_start = zbx_time(); config_timeout > zbx_time() - time_start;)
 	{
+		sleep(1);
+
+		if (0 != (REMOTE_COMMAND_SENT & pcmd->flag))
+			sent = 1;
+
 		if  (0 != (REMOTE_COMMAND_COMPLETED & pcmd->flag))
 		{
 			commands_lock();
@@ -394,25 +390,34 @@ static int	active_command_send_and_result_fetch(const zbx_dc_host_t *host, const
 
 	if (0 == completed)
 	{
-		zbx_snprintf(error, max_error_len, "timeout while retrieving result for remote command");
+		if (0 == sent)
+		{
+			zbx_snprintf(error, max_error_len, "timed out while requesting remote command in active mode");
+		}
+		else
+		{
+			zbx_snprintf(error, max_error_len, "timed out while waiting for result of remote command in"
+					" active mode");
+		}
 		commands_lock();
 	}
 	else  if (0 != (REMOTE_COMMAND_RESULT_OOM & pcmd->flag))
 	{
 		zbx_snprintf(error, max_error_len, "cannot allocate memory for remote command result");
 	}
-	else if (NULL != pcmd->value)
-	{
-		if (NULL != result)
-			*result = zbx_strdup(*result, pcmd->value);
-
-		__remote_commands_shmem_free_func(pcmd->value);
-		ret = SUCCEED;
-	}
 	else if (NULL != pcmd->error)
 	{
 		zbx_strlcpy(error, pcmd->error, max_error_len);
 		__remote_commands_shmem_free_func(pcmd->error);
+	}
+	else
+	{
+		if (NULL != result)
+			*result = zbx_strdup(*result, ZBX_NULL2EMPTY_STR(pcmd->value));
+
+		if (NULL != pcmd->value)
+			__remote_commands_shmem_free_func(pcmd->value);
+		ret = SUCCEED;
 	}
 
 	__remote_commands_shmem_free_func(pcmd->command);
@@ -420,7 +425,7 @@ static int	active_command_send_and_result_fetch(const zbx_dc_host_t *host, const
 
 	commands_unlock();
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s error:%s", __func__, zbx_result_string(ret), error);
 
 	return ret;
 }
@@ -478,7 +483,6 @@ static int	passive_command_send_and_result_fetch(const zbx_dc_host_t *host, cons
 	{
 		if (ZBX_ISSET_MSG(&agent_result))
 			zbx_strlcpy(error, agent_result.msg, max_error_len);
-		ret = FAIL;
 	}
 	else if (NULL != result && ZBX_ISSET_TEXT(&agent_result))
 		*result = zbx_strdup(*result, agent_result.text);
@@ -493,7 +497,7 @@ fail:
 	zbx_free(port);
 	zbx_free(param);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s error:%s", __func__, zbx_result_string(ret), error);
 
 	return ret;
 }
@@ -503,21 +507,37 @@ static int	zbx_execute_script_on_agent(const zbx_dc_host_t *host, const char *co
 		unsigned char program_type, char *error, size_t max_error_len)
 {
 	zbx_dc_interface_t	interface;
+	int			ret;
 
-	memset(&interface, 0, sizeof(interface));
-
-	if (FAIL == zbx_dc_config_get_interface_by_type(&interface, host->hostid, INTERFACE_TYPE_AGENT))
-		zabbix_log(LOG_LEVEL_DEBUG, "cannot find agent interface on host \"%s\"", host->host);
-
-	if (ZBX_INTERFACE_AVAILABLE_TRUE != interface.available &&
-			ZBX_INTERFACE_AVAILABLE_TRUE == zbx_get_active_agent_availability(host->hostid))
+	if (SUCCEED == (ret = zbx_dc_config_get_interface_by_type(&interface, host->hostid, INTERFACE_TYPE_AGENT)))
 	{
-		return active_command_send_and_result_fetch(host, command, result, config_timeout, get_config_forks,
-				error, max_error_len);
+		ret = passive_command_send_and_result_fetch(host, command, result, config_timeout,
+				config_source_ip, program_type, error, max_error_len);
 	}
 
-	return passive_command_send_and_result_fetch(host, command, result, config_timeout, config_source_ip,
-			program_type, error, max_error_len);
+	switch (ret)
+	{
+		case SUCCEED:
+			return SUCCEED;
+		case TIMEOUT_ERROR:
+		case GATEWAY_ERROR:
+		case NOTSUPPORTED:
+			return FAIL;
+		case NETWORK_ERROR:
+		case CONFIG_ERROR:
+		case FAIL:
+		default:
+			if (ZBX_INTERFACE_AVAILABLE_FALSE == zbx_get_active_agent_availability(host->hostid))
+			{
+				if ('\0' == *error)
+					zbx_snprintf(error, max_error_len, "Zabbix agent is not available");
+
+				return FAIL;
+			}
+
+			return active_command_send_and_result_fetch(host, command, result, SEC_PER_MIN,
+					get_config_forks, error, max_error_len);
+	}
 }
 
 static int	zbx_execute_script_on_terminal(const zbx_dc_host_t *host, const zbx_script_t *script, char **result,
@@ -944,7 +964,7 @@ int	zbx_script_execute(const zbx_script_t *script, const zbx_dc_host_t *host, co
 	if (SUCCEED != ret && NULL != result)
 		*result = zbx_strdup(*result, "");
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s error:%s", __func__, zbx_result_string(ret), error);
 
 	return ret;
 }
@@ -963,9 +983,7 @@ zbx_uint64_t	zbx_script_create_task(const zbx_script_t *script, const zbx_dc_hos
 	unsigned short	port;
 	zbx_uint64_t	taskid;
 
-	if (NULL != script->port && '\0' != script->port[0])
-		zbx_is_ushort(script->port, &port);
-	else
+	if (FAIL == zbx_is_ushort(script->port, &port))
 		port = 0;
 
 	zbx_db_begin();

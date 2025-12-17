@@ -72,6 +72,10 @@ class CWidgetGauge extends CWidget {
 		if (this.gauge !== null) {
 			this.gauge.setValue(value_data);
 
+			if (response.description !== undefined) {
+				this.gauge.setDescription(response.description);
+			}
+
 			return;
 		}
 
@@ -84,8 +88,13 @@ class CWidgetGauge extends CWidget {
 		};
 
 		this.gauge = new CSVGGauge(this.gauge_link, padding, response.config);
+
 		this.gauge.setSize(super._getContentsSize());
 		this.gauge.setValue(value_data);
+
+		if (response.description !== undefined) {
+			this.gauge.setDescription(response.description);
+		}
 	}
 
 	onClearContents() {

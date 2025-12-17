@@ -29,7 +29,9 @@ $table = (new CTable())
 			->addClass('table-col-handle'),
 		(new CTableColumn(_('Action')))
 			->addClass('table-col-handle')
-	]);
+	])
+	->setAttribute('data-field-type', 'set')
+	->setAttribute('data-field-name', 'valuemaps');
 
 if (array_key_exists('with_label', $data) && $data['with_label'] === true) {
 	$table->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR);
@@ -60,5 +62,6 @@ $table->show();
 
 $this->includeJsFile('configuration.valuemap.js.php', [
 	'valuemaps' => $data['valuemaps'],
+	'source' => $data['form'],
 	'table_id' => $data['table_id']
 ]);

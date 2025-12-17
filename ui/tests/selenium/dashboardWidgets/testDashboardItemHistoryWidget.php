@@ -454,7 +454,7 @@ class testDashboardItemHistoryWidget extends testWidgets {
 		$defaults = [
 			'Name' => ['value' => '', 'maxlength' => 255],
 			'Item' => ['value' => ''],
-			'xpath://input[@id="base_color"]/..' => ['value' => ''],
+			self::PATH_TO_COLOR_PICKER.'"base_color"]' => ['value' => ''],
 			'Display' => ['value' => 'As is', 'lables' => ['As is', 'HTML', 'Single line']],
 			'Min' => ['value' => '', 'placeholder' => 'calculated', 'maxlength' => 255],
 			'Max' => ['value' => '', 'placeholder' => 'calculated', 'maxlength' => 255],
@@ -615,9 +615,10 @@ class testDashboardItemHistoryWidget extends testWidgets {
 		// Check parameter 'Override host' true/false state.
 		$host_selector = $dashboard->getControls()->query('class:multiselect-control')->asMultiselect()->one();
 		$this->assertTrue($host_selector->isVisible());
-		$dashboard->getWidget(self::DEFAULT_WIDGET)->edit();
-		$this->assertEquals('Edit widget', $dialog->getTitle());
-		$form->fill(['Override host' => ''])->submit();
+		$widget_form = $dashboard->getWidget(self::DEFAULT_WIDGET)->edit();
+		$overlay = COverlayDialogElement::get('Edit widget');
+		$widget_form->fill(['Override host' => ''])->submit();
+		$overlay->ensureNotPresent();
 		$dashboard->save();
 		$this->assertFalse($host_selector->isVisible());
 	}
@@ -1164,7 +1165,7 @@ class testDashboardItemHistoryWidget extends testWidgets {
 									'context' => ['values' => 'Host for all item value types']
 								]
 							],
-							'xpath://input[@id="base_color"]/..' => '90CAF9',
+							self::PATH_TO_COLOR_PICKER.'"base_color"]/..' => '90CAF9',
 							'Show thumbnail' => true
 						]
 					]
@@ -1184,17 +1185,17 @@ class testDashboardItemHistoryWidget extends testWidgets {
 									'values' => 'Character item',
 									'context' => ['values' => 'Host for all item value types']
 								],
-								'xpath://input[@id="base_color"]/..' => 'AFB42B',
+								self::PATH_TO_COLOR_PICKER.'"base_color"]' => 'AFB42B',
 								'Display' => 'HTML',
 								'Use monospace font' => true
 							],
 							'Highlights' => [
 								[
-									'xpath://input[@id="highlights_0_color"]/..' => '00ACC1',
+									self::PATH_TO_COLOR_PICKER.'"highlights[0][color]"]' => '00ACC1',
 									'id:highlights_0_pattern' => 'pattern_1'
 								],
 								[
-									'xpath://input[@id="highlights_1_color"]/..' => '00ACC1',
+									self::PATH_TO_COLOR_PICKER.'"highlights[1][color]"]' => '00ACC1',
 									'id:highlights_1_pattern' => 12345
 								]
 							]
@@ -1220,11 +1221,11 @@ class testDashboardItemHistoryWidget extends testWidgets {
 							],
 							'Highlights' => [
 								[
-									'xpath://input[@id="highlights_0_color"]/..' => '00ACC1',
+									self::PATH_TO_COLOR_PICKER.'"highlights[0][color]"]' => '00ACC1',
 									'id:highlights_0_pattern' => 'pattern_1'
 								],
 								[
-									'xpath://input[@id="highlights_1_color"]/..' => '0288D1',
+									self::PATH_TO_COLOR_PICKER.'"highlights[1][color]"]' => '0288D1',
 									'id:highlights_1_pattern' => 'pattern_1'
 								]
 							]
@@ -1252,7 +1253,7 @@ class testDashboardItemHistoryWidget extends testWidgets {
 							],
 							'Highlights' => [
 								[
-									'xpath://input[@id="highlights_0_color"]/..' => '00ACC1'
+									self::PATH_TO_COLOR_PICKER.'"highlights[0][color]"]' => '00ACC1'
 								]
 							]
 						]
@@ -1569,15 +1570,15 @@ class testDashboardItemHistoryWidget extends testWidgets {
 							],
 							'Thresholds' => [
 								[
-									'xpath://input[@id="thresholds_0_color"]/..' => '039BE5',
+									self::PATH_TO_COLOR_PICKER.'"thresholds[0][color]"]' => '039BE5',
 									'id:thresholds_0_threshold' => -12
 								],
 								[
-									'xpath://input[@id="thresholds_1_color"]/..' => '039BE5',
+									self::PATH_TO_COLOR_PICKER.'"thresholds[1][color]"]' => '039BE5',
 									'id:thresholds_1_threshold' => -500.99
 								],
 								[
-									'xpath://input[@id="thresholds_2_color"]/..' => '00ACC1',
+									self::PATH_TO_COLOR_PICKER.'"thresholds[2][color]"]' => '00ACC1',
 									'id:thresholds_2_threshold' => 20.0099
 								]
 							]
@@ -1606,11 +1607,11 @@ class testDashboardItemHistoryWidget extends testWidgets {
 							],
 							'Thresholds' => [
 								[
-									'xpath://input[@id="thresholds_0_color"]/..' => 'E91E63',
+									self::PATH_TO_COLOR_PICKER.'"thresholds[0][color]"]' => 'E91E63',
 									'id:thresholds_0_threshold' => 158
 								],
 								[
-									'xpath://input[@id="thresholds_1_color"]/..' => '039BE5',
+									self::PATH_TO_COLOR_PICKER.'"thresholds[1][color]"]' => '039BE5',
 									'id:thresholds_1_threshold' => 19.20
 								]
 							]
@@ -1635,7 +1636,7 @@ class testDashboardItemHistoryWidget extends testWidgets {
 							],
 							'Thresholds' => [
 								[
-									'xpath://input[@id="thresholds_0_color"]/..' => 'E91E63'
+									self::PATH_TO_COLOR_PICKER.'"thresholds[0][color]"]' => 'E91E63'
 								]
 							]
 						]
@@ -2118,6 +2119,7 @@ class testDashboardItemHistoryWidget extends testWidgets {
 				? '1 minute'
 				: $data['fields']['Refresh interval'];
 			$this->assertEquals($refresh, $widget->getRefreshInterval());
+			CPopupMenuElement::find()->one()->close();
 
 			// Check new widget form fields and values in frontend.
 			$saved_form = $widget->edit();
@@ -2823,9 +2825,7 @@ class testDashboardItemHistoryWidget extends testWidgets {
 		$container->query('button:Add')->one()->click();
 		$input = $form->query('xpath:.//input[contains(@id, '.CXPathHelper::escapeQuotes($i.$selector).')]')->one();
 		$this->assertTrue($input->isVisible());
-		$this->assertEquals('E65660', $container->query('xpath:.//div[@class="color-picker"]')
-				->asColorPicker()->one()->getValue()
-		);
+		$this->assertEquals('E65660', $container->query('xpath:.//z-color-picker')->asColorPicker()->one()->getValue());
 		$container->query('xpath:.//button[contains(@id, '.CXPathHelper::escapeQuotes($i.'_remove').')]')
 				->one()->click();
 		$this->assertFalse($input->isVisible());

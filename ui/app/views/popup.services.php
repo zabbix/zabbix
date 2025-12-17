@@ -65,8 +65,8 @@ foreach ($data['services'] as $service) {
 			(new CVar('problem_tags_html', $data['problem_tags_html'][$service['serviceid']]))->removeId(),
 			(new CLink($service['name']))->addClass('js-name')
 		]))->addClass(ZBX_STYLE_WORDBREAK),
-		new CCol($data['tags'][$service['serviceid']]),
-		new CCol($data['problem_tags'][$service['serviceid']])
+		new CCol((new CDiv($data['tags'][$service['serviceid']]))->addClass(ZBX_STYLE_TAGS_WRAPPER)),
+		new CCol((new CDiv($data['problem_tags'][$service['serviceid']]))->addClass(ZBX_STYLE_TAGS_WRAPPER))
 	]);
 }
 

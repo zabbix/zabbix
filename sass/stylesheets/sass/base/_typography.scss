@@ -1,8 +1,69 @@
 // TYPOGRAPHY
-$font-stack: Arial, Tahoma, Verdana, sans-serif;
-$font-stack-mono: "Courier New", Courier, monospace;
+$fonts-path: '../fonts/' !default;
 
-$font-body-size: 75%; // Default 1em/12px
+@font-face {
+	font-family: 'Inter';
+	src: url("#{$fonts-path}InterVariable.woff2?t=1749715841257") format('woff2');
+	font-weight: 100 900;
+	font-style: normal;
+	font-display: swap;
+	font-feature-settings: "calt" 0;
+}
+
+@font-face {
+	font-family: 'Inter';
+	src: url("#{$fonts-path}InterVariable-Italic.woff2?t=1749715841257") format('woff2');
+	font-weight: 100 900;
+	font-style: italic;
+	font-display: swap;
+	font-feature-settings: "calt" 0;
+}
+
+@font-face {
+	font-family: 'Noto Sans Georgian';
+	src: url("#{$fonts-path}NotoSansGeorgian-VariableFont.woff2?t=1749715841257") format('woff2');
+	font-weight: 100 900;
+	font-style: normal;
+	font-display: swap;
+	unicode-range: U+10A0-10FF;
+}
+
+@font-face {
+	font-family: 'Noto Sans Hebrew';
+	src: url("#{$fonts-path}NotoSansHebrew-VariableFont.woff2?t=1749715841257") format('woff2');
+	font-weight: 100 900;
+	font-style: normal;
+	font-display: swap;
+	unicode-range: U+0590-05FF;
+}
+
+@font-face {
+	font-family: 'Noto Sans JP';
+	src: url("#{$fonts-path}NotoSansJP-VariableFont.woff2?t=1749715841257") format('woff2');
+	font-weight: 100 900;
+	font-style: normal;
+	font-display: swap;
+	unicode-range: U+3040-309F, U+30A0-30FF, U+4E00-9FFF;
+}
+
+@font-face {
+	font-family: 'Noto Sans KR';
+	src: url("#{$fonts-path}NotoSansKR-VariableFont.woff2?t=1749715841257") format('woff2');
+	font-weight: 100 900;
+	font-style: normal;
+	font-display: swap;
+	unicode-range: U+AC00-D7A3;
+}
+
+@font-face {
+	font-family: 'Noto Sans SC';
+	src: url("#{$fonts-path}NotoSansSC-VariableFont.woff2?t=1749715841257") format('woff2');
+	font-weight: 100 900;
+	font-style: normal;
+	font-display: swap;
+	unicode-range: U+4E00-9FFF;
+}
+
 $body-line-height: 1.4em;
 
 $font-h1-size: 1.750em; // 21px
@@ -27,5 +88,3 @@ $font-setup-sup-title: .250em; // 21px
 
 $font-form-size: 1em; // Default 1em/12px
 $font-msg-reset-size: .850em; // Default 1em/12px
-
-$font-transform: uppercase;

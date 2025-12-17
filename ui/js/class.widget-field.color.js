@@ -16,20 +16,19 @@
 class CWidgetFieldColor extends CWidgetField {
 
 	/**
-	 * @type {HTMLInputElement}
+	 * @type {ZColorPicker}
 	 */
-	#input;
+	#z_color_picker;
 
 	constructor({name, form_name}) {
 		super({name, form_name});
 
-		this.#input = this.getForm().querySelector(`input[type="hidden"][name="${name}"]`);
+		this.#z_color_picker = this.getForm().querySelector(`z-color-picker[color-field-name="${name}"]`);
 
 		this.#initField();
 	}
 
 	#initField() {
-		// jQuery events can only be caught by jQuery.
-		jQuery(this.#input).on('change', () => this.dispatchUpdateEvent());
+		this.#z_color_picker.addEventListener('change', () => this.dispatchUpdateEvent());
 	}
 }

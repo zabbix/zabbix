@@ -1,0 +1,42 @@
+---
+test case: "values: 1, 2, 3, 4, 5"
+in:
+  values: [1, 2, 3, 4, 5]
+out:
+  return: SUCCEED
+  result: 5
+---
+test case: "values: 4, 4, 4, 4"
+in:
+  values: [4, 4, 4, 4]
+out:
+  return: SUCCEED
+  result: 4
+---
+test case: "values: -1, -2, -3"
+in:
+  values: [-1, -2, -3]
+out:
+  return: SUCCEED
+  result: -1
+---
+test case: "values: 10"
+in:
+  values: [42]
+out:
+  return: SUCCEED
+  result: 42
+---
+test case: "values: 1.5, 2.5, 4, 3.6, 99.9, 100"
+in:
+  values: [1.5, 2.5, 4, 3.6, 99.9, 100]
+out:
+  return: SUCCEED
+  result: 100
+---
+test case: "values: empty value"
+in:
+  values: []
+out:
+  return: FAIL
+...

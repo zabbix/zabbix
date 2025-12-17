@@ -110,23 +110,6 @@ class testFormGraph extends testFormGraphs {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Name' => 'Empty color'
-					],
-					'items' => [
-						[
-							'item' => 'testFormItem',
-							'color' => ''
-						]
-					],
-					'details' => [
-						'Empty colour.'
-					]
-				]
-			],
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
 						'Name' => 'Duplicated graph'
 					],
 					'items' => [

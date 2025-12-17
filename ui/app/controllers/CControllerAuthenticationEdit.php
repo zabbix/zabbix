@@ -70,6 +70,14 @@ class CControllerAuthenticationEdit extends CController {
 			'mfa_removed_mfaids' =>				'array_id'
 		];
 
+		if (CAuthenticationHelper::isSamlCertsStorageDatabase()) {
+			$fields += [
+				'idp_certificate' => 'db userdirectory_saml.idp_certificate',
+				'sp_certificate' => 'db userdirectory_saml.sp_certificate',
+				'sp_private_key' => 'db userdirectory_saml.sp_private_key'
+			];
+		}
+
 		if ($ALLOW_HTTP_AUTH) {
 			$fields += [
 				'http_auth_enabled' =>		'in '.ZBX_AUTH_HTTP_DISABLED.','.ZBX_AUTH_HTTP_ENABLED,
@@ -109,6 +117,7 @@ class CControllerAuthenticationEdit extends CController {
 			'is_http_auth_allowed' => $ALLOW_HTTP_AUTH,
 			'ldap_error' => ($ldap_status['result'] == CFrontendSetup::CHECK_OK) ? '' : $ldap_status['error'],
 			'saml_error' => ($openssl_status['result'] == CFrontendSetup::CHECK_OK) ? '' : $openssl_status['error'],
+			'saml_certs_editable' => CAuthenticationHelper::isSamlCertsStorageDatabase(),
 			'form_refresh' => $this->getInput('form_refresh', 0)
 		];
 
@@ -175,6 +184,29 @@ class CControllerAuthenticationEdit extends CController {
 				'passwd_check_rules' => 0,
 				'mfa_status' => MFA_DISABLED
 			];
+
+			if ($data['saml_certs_editable']) {
+				$userdirectories = API::UserDirectory()->get([
+					'output' => ['idp_certificate_hash', 'sp_certificate_hash', 'sp_private_key_hash'],
+					'filter' => ['idp_type' => IDP_TYPE_SAML]
+				]);
+				$userdirectory = $userdirectories ? reset($userdirectories) : array_fill_keys(['idp_certificate_hash', 'sp_certificate_hash', 'sp_private_key_hash'], '');
+
+				$this->getInputs($config_fields, [
+					'idp_certificate',
+					'sp_certificate',
+					'sp_private_key'
+				]);
+
+				$config_fields += [
+					'idp_certificate_hash' => $userdirectory['idp_certificate_hash'],
+					'sp_certificate_hash' => $userdirectory['sp_certificate_hash'],
+					'sp_private_key_hash' => $userdirectory['sp_private_key_hash'],
+					'show_idp_certificate_input' => $userdirectory['idp_certificate_hash'] === '' || $this->hasInput('idp_certificate'),
+					'show_sp_certificate_input' => $userdirectory['sp_certificate_hash'] === '' || $this->hasInput('sp_certificate'),
+					'show_sp_private_key_input' => $userdirectory['sp_private_key_hash'] === '' || $this->hasInput('sp_private_key')
+				];
+			}
 
 			if ($ALLOW_HTTP_AUTH) {
 				$config_fields += [
@@ -258,7 +290,21 @@ class CControllerAuthenticationEdit extends CController {
 					'saml_user_lastname' => '',
 					'scim_status' => '',
 					'saml_provision_groups' => [],
-					'saml_provision_media' => []
+					'saml_provision_media' => [],
+					'idp_certificate_hash' => '',
+					'sp_certificate_hash' => '',
+					'sp_private_key_hash' => ''
+				];
+			}
+
+			if ($data['saml_certs_editable']) {
+				$saml_configuration += [
+					'idp_certificate' => '',
+					'sp_certificate' => '',
+					'sp_private_key' => '',
+					'show_idp_certificate_input' => $saml_configuration['idp_certificate_hash'] === '',
+					'show_sp_certificate_input' => $saml_configuration['sp_certificate_hash'] === '',
+					'show_sp_private_key_input' => $saml_configuration['sp_private_key_hash'] === ''
 				];
 			}
 

@@ -1,0 +1,115 @@
+---
+test case: "linux-w7x1"
+in:
+  host: "{#L1}linux-w7x1"
+out:
+  return: SUCCEED
+---
+test case: "$$$ {#L1}"
+in:
+  host: "$$$"
+out:
+  return: FAIL
+---
+test case: "linux with newline"
+in:
+  host: "linux {#L1}\n"
+out:
+  return: FAIL
+---
+test case: "linux with quotes"
+in:
+  host: "'linux {#L1}'"
+out:
+  return: FAIL
+---
+test case: "Long host name over ZBX_MAX_HOSTNAME_LEN"
+in:
+  host: "{#L1} linuxlinuxlinuxlinuxlinuxlinuxlinuxlinuxlinuxlinuxlinuxlinuxlinuxlinuxlinuxlinuxlinuxlinuxlinuxlinuxlinuxlinuxlinuxlinuxlinuxlinuxlinuxlinuxlinuxlinuxlinux"
+out:
+  return: FAIL
+---
+test case: "Empty host name"
+in:
+  host: ""
+out:
+  return: FAIL
+---
+test case: "some ASCII"
+in:
+  host: "{#L1} !#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[]^_`abcdefghijklmnopqrstuvwxyz{|}"
+out:
+  return: FAIL
+---
+test case: "only numbers"
+in:
+  host: "{#L1}0123456789"
+out:
+  return: SUCCEED
+---
+test case: "chars with space"
+in:
+  host: "{#L1} abc abc"
+out:
+  return: SUCCEED
+---
+test case: "Capitals"
+in:
+  host: "{#L1}CAPITAL"
+out:
+  return: SUCCEED
+---
+test case: "LLD macro"
+in:
+  host: "{#MACRO}"
+out:
+  return: SUCCEED
+---
+test case: "two LLD macros"
+in:
+  host: "{#MACRO}{#MACRO}"
+out:
+  return: SUCCEED
+---
+test case: broken "LLD macro"
+in:
+  host: "{#MACRO"
+out:
+  return: FAIL
+---
+test case: "LLD macro function"
+in:
+  host: '{{#MACRO}.regsub("[]", "..")}'
+out:
+  return: SUCCEED
+---
+test case: "LLD macro with prefix"
+in:
+  host: "123 {#MACRO}"
+out:
+  return: SUCCEED
+---
+test case: "LLD macro with suffix"
+in:
+  host: "{#MACRO} 123"
+out:
+  return: SUCCEED
+---
+test case: "LLD macro in middle"
+in:
+  host: "123 {#MACRO} 456"
+out:
+  return: SUCCEED
+---
+test case: "User macro"
+in:
+  host: "{#L1} {$MACRO}"
+out:
+  return: FAIL
+---
+  test case: "Valid hostname without LLD macro"
+  in:
+    host: "Host"
+  out:
+    return: FAIL
+...

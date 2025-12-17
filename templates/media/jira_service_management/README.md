@@ -9,7 +9,7 @@ This guide describes how to integrate your Zabbix installation with Jira Service
 
 ## Requirements
 
-Zabbix version: 7.4 and higher.
+Zabbix version: 8.0 and higher.
 
 ## Parameters
 
@@ -151,7 +151,7 @@ Though the *Send to* field is not used in the Jira Service Management webhook, i
 
 Make sure this user has access to all the hosts for which you would like problem notifications to be converted into Jira tasks.
 
-For more information, please see [Zabbix](https://www.zabbix.com/documentation/7.4/manual/config/notifications) and [Jira Service Management](https://confluence.atlassian.com/servicedesk) documentation.
+For more information, please see [Zabbix](https://www.zabbix.com/documentation/8.0/manual/config/notifications) and [Jira Service Management](https://confluence.atlassian.com/servicedesk) documentation.
 
 ## Feedback
 

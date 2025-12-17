@@ -6,10 +6,6 @@ and querying docker API. It can be used in conjunction with the official
 [Docker template](https://git.zabbix.com/projects/ZBX/repos/zabbix/browse/templates/app/docker). 
 You can extend it or create your own template to cater specific needs.
 
-## Requirements
-* Zabbix agent 2
-* Go >= 1.21 (required only to build from source)
-
 ## Tested versions
 * Docker, version 19.03.5
 

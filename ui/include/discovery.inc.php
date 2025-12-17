@@ -120,7 +120,3 @@ function discovery_object_status2str($status = null) {
 		return _('Unknown');
 	}
 }
-
-function get_discovery_rule_by_druleid($druleid) {
-	return DBfetch(DBselect('SELECT d.* FROM drules d WHERE d.druleid='.zbx_dbstr($druleid)));
-}

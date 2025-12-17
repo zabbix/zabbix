@@ -34,6 +34,7 @@ $html_page = (new CHtmlPage())
 					(new CSimpleButton(_('Create graph prototype')))
 						->setId('js-create')
 						->setAttribute('data-parent_discoveryid',$data['parent_discoveryid'])
+						->setEnabled(!$data['is_parent_discovered'])
 				)
 		))->setAttribute('aria-label', _('Content controls'))
 	)
@@ -96,27 +97,42 @@ foreach ($data['graphs'] as $graph) {
 		}
 	}
 
-	$name = [
-		makeGraphTemplatePrefix($graphid, $data['parent_templates'], ZBX_FLAG_DISCOVERY_PROTOTYPE,
-			$data['allowed_ui_conf_templates']
-		),
-		new CLink($graph['name'], (new CUrl('zabbix.php'))
-			->setArgument('action', 'popup')
-			->setArgument('popup', 'graph.prototype.edit')
-			->setArgument('context', $data['context'])
-			->setArgument('parent_discoveryid', $data['parent_discoveryid'])
-			->setArgument('graphid', $graphid)
-		)
-	];
+	$name = [];
+	$name[] = makeGraphTemplatePrefix($graphid, $data['parent_templates'], ZBX_FLAG_DISCOVERY_PROTOTYPE,
+		$data['allowed_ui_conf_templates']
+	);
 
-	$nodiscover = ($graph['discover'] == ZBX_PROTOTYPE_NO_DISCOVER);
+	if ($graph['flags'] & ZBX_FLAG_DISCOVERY_CREATED) {
+		$name[] = (new CLink($data['source_link_data']['name'],
+			(new CUrl('zabbix.php'))
+				->setArgument('action', 'popup')
+				->setArgument('popup', 'graph.prototype.edit')
+				->setArgument('parent_discoveryid', $data['source_link_data']['parent_itemid'])
+				->setArgument('graphid', $graph['discoveryData']['parent_graphid'])
+				->setArgument('context', 'host')
+				->getUrl()
+		))
+			->addClass(ZBX_STYLE_LINK_ALT)
+			->addClass(ZBX_STYLE_ORANGE);
 
-	$discover = (new CLink($nodiscover ? _('No') : _('Yes')))
-		->setAttribute('data-graphid', $graphid)
-		->setAttribute('data-discover', $nodiscover ? ZBX_PROTOTYPE_DISCOVER : ZBX_PROTOTYPE_NO_DISCOVER)
-		->addClass('js-update-discover')
-		->addClass(ZBX_STYLE_LINK_ACTION)
-		->addClass($nodiscover ? ZBX_STYLE_RED : ZBX_STYLE_GREEN);
+		$name[] = NAME_DELIMITER;
+	}
+
+	$name[] = new CLink($graph['name'], (new CUrl('zabbix.php'))
+		->setArgument('action', 'popup')
+		->setArgument('popup', 'graph.prototype.edit')
+		->setArgument('context', $data['context'])
+		->setArgument('parent_discoveryid', $data['parent_discoveryid'])
+		->setArgument('graphid', $graphid));
+
+	$no_discover = $graph['discover'] == ZBX_PROTOTYPE_NO_DISCOVER;
+	$discover_toggle = $data['is_parent_discovered']
+		? (new CSpan($no_discover ? _('No') : _('Yes')))
+		: (new CLink($no_discover ? _('No') : _('Yes')))
+			->setAttribute('data-graphid', $graphid)
+			->setAttribute('data-discover', $no_discover ? ZBX_PROTOTYPE_DISCOVER : ZBX_PROTOTYPE_NO_DISCOVER)
+			->addClass('js-update-discover')
+			->addClass(ZBX_STYLE_LINK_ACTION);
 
 	$graphs_table->addRow([
 		new CCheckBox('group_graphid['.$graphid.']', $graphid),
@@ -125,20 +141,21 @@ foreach ($data['graphs'] as $graph) {
 		$graph['width'],
 		$graph['height'],
 		$graph['graphtype'],
-		$discover
+		$discover_toggle->addClass($no_discover ? ZBX_STYLE_RED : ZBX_STYLE_GREEN)
 	]);
 }
 
-$buttons = [
+$buttons = new CActionButtonList('action', 'group_graphid', [
 	'graph.massdelete' => [
 		'content' => (new CSimpleButton(_('Delete')))
 			->addClass(ZBX_STYLE_BTN_ALT)
 			->addClass('js-no-chkbxrange')
 			->setId('js-massdelete-graph-prototype')
 	]
-];
+], 'graph_prototypes_'.$data['parent_discoveryid']);
 
-$graphs_form->addItem([$graphs_table, new CActionButtonList('action', 'group_graphid', $buttons, 'graph_prototypes')]);
+$graphs_form->addItem([$graphs_table, $buttons]);
+
 $html_page
 	->addItem($graphs_form)
 	->show();

@@ -25,8 +25,11 @@
 
 int	preproc_prepare_value_server(const zbx_variant_t *value, const zbx_pp_value_opt_t *value_opt)
 {
-	if (ZBX_VARIANT_NONE == value->type && 0 == (value_opt->flags & ZBX_PP_VALUE_OPT_META))
+	if (ZBX_VARIANT_NONE == value->type && 0 == (value_opt->flags & ZBX_PP_VALUE_OPT_META) &&
+			0 == (value->data.flags & ZBX_VARIANT_FLAG_CHANGED))
+	{
 		return FAIL;
+	}
 
 	return SUCCEED;
 }
@@ -34,7 +37,7 @@ int	preproc_prepare_value_server(const zbx_variant_t *value, const zbx_pp_value_
 void	preproc_flush_value_server(zbx_pp_manager_t *manager, zbx_uint64_t itemid, unsigned char value_type,
 	unsigned char flags, zbx_variant_t *value, zbx_timespec_t ts, zbx_pp_value_opt_t *value_opt)
 {
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() itemid:" ZBX_FS_UI64, __func__, itemid);
 
 	if (0 == (flags & ZBX_FLAG_DISCOVERY_RULE))
 	{

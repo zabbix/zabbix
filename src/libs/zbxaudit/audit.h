@@ -17,8 +17,6 @@
 
 #include "audit/zbxaudit.h"
 
-#define	AUDIT_DETAILS_KEY_LEN		100
-
 #define ZBX_AUDIT_RESOURCE_TRIGGER_PROTOTYPE		31
 #define ZBX_AUDIT_RESOURCE_GRAPH_PROTOTYPE		35
 #define ZBX_AUDIT_RESOURCE_ITEM_PROTOTYPE		36
@@ -48,5 +46,8 @@ void	zbx_audit_update_json_delete(const zbx_uint64_t id, const int id_table, con
 
 int	audit_field_value_matches_db_default(const char *table_name, const char *field_name, const char *value,
 		uint64_t id);
+
+zbx_audit_entry_t	*audit_get_entry(zbx_uint64_t id, const char *cuid, int id_table);
+
 
 #endif	/* ZABBIX_AUDIT_H */

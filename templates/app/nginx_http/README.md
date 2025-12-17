@@ -17,7 +17,7 @@ Reading: 6 Writing: 179 Waiting: 106
 
 ## Requirements
 
-Zabbix version: 7.4 and higher.
+Zabbix version: 8.0 and higher.
 
 ## Tested versions
 
@@ -26,7 +26,7 @@ This template has been tested on:
 
 ## Configuration
 
-> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/7.4/manual/config/templates_out_of_the_box) section.
+> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/8.0/manual/config/templates_out_of_the_box) section.
 
 ## Setup
 
@@ -59,7 +59,7 @@ Reading: 6 Writing: 179 Waiting: 106
 
 |Name|Description|Default|
 |----|-----------|-------|
-|{$NGINX.STUB_STATUS.HOST}|<p>The hostname or IP address of the Nginx host or Nginx container of a stub_status.</p>|`<SET STUB_STATUS HOST>`|
+|{$NGINX.STUB_STATUS.HOST}|<p>The hostname or IP address of the Nginx host or Nginx container of a stub_status.</p>||
 |{$NGINX.STUB_STATUS.SCHEME}|<p>The protocol http or https of Nginx stub_status host or container.</p>|`http`|
 |{$NGINX.STUB_STATUS.PATH}|<p>The path of the `Nginx stub_status` page.</p>|`basic_status`|
 |{$NGINX.STUB_STATUS.PORT}|<p>The port of the `Nginx stub_status` host or container.</p>|`80`|

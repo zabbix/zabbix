@@ -26,7 +26,6 @@ class ShapeForm {
 		this.triggerids = {};
 		this.domNode = $(new Template(document.getElementById('mapShapeFormTpl').innerHTML).evaluate())
 			.appendTo(form_container);
-		this.domNode.find('.color-picker input').colorpicker();
 	}
 
 	/**
@@ -62,10 +61,17 @@ class ShapeForm {
 	 */
 	setValues(shape) {
 		for (const field in shape) {
-			$(`[name=${field}]`, this.domNode).val([shape[field]]);
-		}
+			const color_picker = this.domNode[1].querySelector(
+				`.${ZBX_STYLE_COLOR_PICKER}[color-field-name="${field}"]`
+			);
 
-		$('.color-picker input', this.domNode).change();
+			if (color_picker !== null) {
+				color_picker.color = shape[field];
+			}
+			else {
+				$(`[name=${field}]`, this.domNode).val([shape[field]]);
+			}
+		}
 
 		document.getElementById('border_type').dispatchEvent(new Event('change'));
 		document.getElementById('last_shape_type').value = shape.type;

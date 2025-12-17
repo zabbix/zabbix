@@ -33,6 +33,7 @@ class CSelect extends CTag {
 		parent::__construct('z-select', true);
 
 		$this->name = $name;
+		$this->setAttribute('data-field-type', 'z-select');
 	}
 
 	/**
@@ -256,6 +257,30 @@ class CSelect extends CTag {
 		}
 
 		return $options;
+	}
+
+	/**
+	 * Specify ID of error container.
+	 *
+	 * @param string|null $container_id    ID of form element where to display field errors.
+	 */
+	public function setErrorContainer(?string $container_id): self {
+		$this->setAttribute('data-error-container', $container_id);
+
+		return $this;
+	}
+
+	/**
+	 * Specify the field label used for error message.
+	 *
+	 * @param string|null $label    Field label used in error message.
+	 *
+	 * @return self
+	 */
+	public function setErrorLabel(?string $label): self {
+		$this->setAttribute('data-error-label', $label);
+
+		return $this;
 	}
 
 	/**

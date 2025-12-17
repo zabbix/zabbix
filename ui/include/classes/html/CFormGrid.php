@@ -19,7 +19,7 @@ class CFormGrid extends CTag {
 	/**
 	 * Default CSS class name for HTML root element.
 	 */
-	private const ZBX_STYLE_CLASS = 'form-grid';
+	public const ZBX_STYLE_CLASS = 'form-grid';
 
 	public const ZBX_STYLE_FIELDS_GROUP       = 'fields-group';
 	public const ZBX_STYLE_FIELDS_GROUP_LABEL = 'fields-group-label';

@@ -2050,7 +2050,7 @@ class testScripts extends CAPITest {
 					'command' => 'reboot server',
 					'port' => 'abc'
 				],
-				'expected_error' => 'Invalid parameter "/1/port": an integer is expected.'
+				'expected_error' => 'Invalid parameter "/1/port": a port number is expected.'
 			],
 			'Test script.create invalid port' => [
 				'script' => [
@@ -2060,7 +2060,7 @@ class testScripts extends CAPITest {
 					'command' => 'reboot server',
 					'port' => 999999
 				],
-				'expected_error' => 'Invalid parameter "/1/port": value must be one of 0-65535.'
+				'expected_error' => 'Invalid parameter "/1/port": a port number is expected.'
 			],
 
 			// Check script auth type.
@@ -3361,6 +3361,20 @@ class testScripts extends CAPITest {
 						'manualinput_validator' => '^([1-9]|[1-9][0-9]{1,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])$',
 						'manualinput_default_value' => '80'
 					]
+				],
+				'expected_error' => null
+			],
+			'Test script.create "manualinput_validator" field for input type string with valid regular expression' => [
+				'script' => [
+					'name' => 'API create script with regular expression for user prompt',
+					'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
+					'scope' => ZBX_SCRIPT_SCOPE_EVENT,
+					'command' => 'reboot server',
+					'manualinput' => ZBX_SCRIPT_MANUALINPUT_ENABLED,
+					'manualinput_prompt' => 'prompt text',
+					'manualinput_validator_type' => ZBX_SCRIPT_MANUALINPUT_TYPE_STRING,
+					'manualinput_validator' => '[(] a\\/b [\\(]',
+					'manualinput_default_value' => ''
 				],
 				'expected_error' => null
 			]
@@ -5308,21 +5322,21 @@ class testScripts extends CAPITest {
 					'scriptid' => 'update_ssh_pwd',
 					'port' => 'abc'
 				],
-				'expected_error' => 'Invalid parameter "/1/port": an integer is expected.'
+				'expected_error' => 'Invalid parameter "/1/port": a port number is expected.'
 			],
 			'Test script.update invalid port (not macro)' => [
 				'script' => [
 					'scriptid' => 'update_ssh_pwd',
 					'port' => '{$NOT_MACRO'
 				],
-				'expected_error' => 'Invalid parameter "/1/port": an integer is expected.'
+				'expected_error' => 'Invalid parameter "/1/port": a port number is expected.'
 			],
 			'Test script.update invalid port' => [
 				'script' => [
 					'scriptid' => 'update_ssh_pwd',
 					'port' => 999999
 				],
-				'expected_error' => 'Invalid parameter "/1/port": value must be one of 0-65535.'
+				'expected_error' => 'Invalid parameter "/1/port": a port number is expected.'
 			],
 			'Test script.update unexpected port field for custom script type (string)' => [
 				'script' => [
@@ -5941,14 +5955,6 @@ class testScripts extends CAPITest {
 					'manualinput_validator_type' => ZBX_SCRIPT_MANUALINPUT_TYPE_STRING,
 					'manualinput_validator' => '\d',
 					'manualinput_default_value' => 'abc'
-				],
-				'expected_error' => 'Invalid parameter "/1/manualinput_default_value": input does not match the provided pattern: \d.'
-			],
-			'Test script.update invalid "manualinput_default_value" value (no value provided)' => [
-				'script' => [
-					'scriptid' => 'update_manualinput_params',
-					'manualinput_validator_type' => ZBX_SCRIPT_MANUALINPUT_TYPE_STRING,
-					'manualinput_validator' => '\d'
 				],
 				'expected_error' => 'Invalid parameter "/1/manualinput_default_value": input does not match the provided pattern: \d.'
 			],
@@ -7103,6 +7109,14 @@ class testScripts extends CAPITest {
 						'manualinput_validator' => '^([1-9]|[1-9][0-9]{1,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])$',
 						'manualinput_default_value' => '80'
 					]
+				],
+				'expected_error' => null
+			],
+			'Test script.update successful "manualinput_default_value" value (no value provided)' => [
+				'script' => [
+					'scriptid' => 'update_manualinput_params',
+					'manualinput_validator_type' => ZBX_SCRIPT_MANUALINPUT_TYPE_STRING,
+					'manualinput_validator' => '\d'
 				],
 				'expected_error' => null
 			]

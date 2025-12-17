@@ -7,7 +7,7 @@
 
 ## Requirements
 
-Zabbix version: 7.4 and higher.
+Zabbix version: 8.0 and higher.
 
 ## Tested versions
 
@@ -16,7 +16,7 @@ This template has been tested on:
 
 ## Configuration
 
-> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/7.4/manual/config/templates_out_of_the_box) section.
+> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/8.0/manual/config/templates_out_of_the_box) section.
 
 ## Setup
 
@@ -27,9 +27,9 @@ Refer to the vendor documentation.
 |Name|Description|Default|
 |----|-----------|-------|
 |{$ARANET.API.ENDPOINT}|<p>Aranet Cloud API endpoint.</p>|`https://aranet.cloud/api`|
-|{$ARANET.API.USERNAME}|<p>Aranet Cloud username.</p>|`<PUT YOUR USERNAME>`|
-|{$ARANET.API.PASSWORD}|<p>Aranet Cloud password.</p>|`<PUT YOUR PASSWORD>`|
-|{$ARANET.API.SPACE_NAME}|<p>Aranet Cloud organization name.</p>|`<PUT YOUR SPACE NAME>`|
+|{$ARANET.API.USERNAME}|<p>Aranet Cloud username.</p>||
+|{$ARANET.API.PASSWORD}|<p>Aranet Cloud password.</p>||
+|{$ARANET.API.SPACE_NAME}|<p>Aranet Cloud organization name.</p>||
 |{$ARANET.LLD.FILTER.SENSOR_NAME.MATCHES}|<p>Filter of discoverable sensors by name.</p>|`.+`|
 |{$ARANET.LLD.FILTER.SENSOR_NAME.NOT_MATCHES}|<p>Filter to exclude discoverable sensors by name.</p>|`CHANGE_IF_NEEDED`|
 |{$ARANET.LLD.FILTER.SENSOR_ID.MATCHES}|<p>Filter of discoverable sensors by id.</p>|`.+`|

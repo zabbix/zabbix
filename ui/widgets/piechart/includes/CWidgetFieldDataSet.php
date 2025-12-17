@@ -60,14 +60,51 @@ class CWidgetFieldDataSet extends CWidgetField {
 				'aggregate_function'	=> ['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [AGGREGATE_MIN, AGGREGATE_MAX, AGGREGATE_AVG, AGGREGATE_COUNT, AGGREGATE_SUM, AGGREGATE_FIRST, AGGREGATE_LAST])],
 				'dataset_aggregation'	=> ['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [AGGREGATE_NONE, AGGREGATE_MIN, AGGREGATE_MAX, AGGREGATE_AVG, AGGREGATE_COUNT, AGGREGATE_SUM])],
 				'type'					=> ['type' => API_INTS32, 'flags' => null, 'in' => implode(',', [self::ITEM_TYPE_NORMAL, self::ITEM_TYPE_TOTAL])],
-				'data_set_label'		=> ['type' => API_STRING_UTF8, 'length' => 255]
+				'data_set_label'		=> ['type' => API_STRING_UTF8, 'length' => 255],
+				'item_tags_evaltype'	=> ['type' => API_INT32, 'in' => implode(',', [TAG_EVAL_TYPE_AND_OR, TAG_EVAL_TYPE_OR])],
+				'item_tags'				=> ['type' => API_OBJECTS, 'fields' => [
+					'tag'					=> ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => 255],
+					'operator'				=> ['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [TAG_OPERATOR_LIKE, TAG_OPERATOR_EQUAL, TAG_OPERATOR_NOT_LIKE, TAG_OPERATOR_NOT_EQUAL, TAG_OPERATOR_EXISTS, TAG_OPERATOR_NOT_EXISTS])],
+					'value'					=> ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => 255]
+				]]
 			]]);
+	}
+
+	public function getValue() {
+		$values = parent::getValue();
+
+		foreach ($values as &$value) {
+			if ($value['dataset_type'] != self::DATASET_TYPE_SINGLE_ITEM) {
+				continue;
+			}
+
+			foreach (array_keys($value['itemids']) as $i) {
+				if (!array_key_exists($i, $value['type'])) {
+					$value['type'][$i] = self::ITEM_TYPE_NORMAL;
+				}
+			}
+		}
+		unset($value);
+
+		return $values;
 	}
 
 	public function setValue($value): self {
 		$data_sets = [];
 
 		foreach ((array) $value as $data_set) {
+			if (array_key_exists('itemids', $data_set)) {
+				$data_set['itemids'] = array_values($data_set['itemids']);
+			}
+
+			if (array_key_exists('item_tags', $data_set)) {
+				foreach ($data_set['item_tags'] as $tag_index => $tag) {
+					if ($tag['tag'] === '' && $tag['value'] === '') {
+						unset($data_set['item_tags'][$tag_index]);
+					}
+				}
+			}
+
 			$data_sets[] = $data_set + self::getDefaults();
 		}
 
@@ -84,7 +121,9 @@ class CWidgetFieldDataSet extends CWidgetField {
 			'aggregate_function' => AGGREGATE_LAST,
 			'dataset_aggregation' => AGGREGATE_NONE,
 			'type' => [],
-			'data_set_label' => ''
+			'data_set_label' => '',
+			'item_tags_evaltype' => TAG_EVAL_TYPE_AND_OR,
+			'item_tags' => []
 		];
 	}
 
@@ -118,16 +157,15 @@ class CWidgetFieldDataSet extends CWidgetField {
 			return [];
 		}
 
-		$errors = [];
 		$total_item_count = 0;
 
 		$validation_rules = $this->getValidationRules($strict);
 		$value = $this->getValue();
 		$label = $this->getErrorLabel();
 
-		if (!count($value)) {
+		if (!$value) {
 			if (!CApiInputValidator::validate($validation_rules, $value, $label, $error)) {
-				$errors[] = $error;
+				return [$error];
 			}
 		}
 		else {
@@ -162,13 +200,18 @@ class CWidgetFieldDataSet extends CWidgetField {
 			}
 
 			if (!CApiInputValidator::validate($validation_rules_by_type, $data, $label.'/'.($index + 1), $error)) {
-				$errors[] = $error;
-				break;
+				return [$error];
 			}
 
 			if ($data['dataset_type'] == self::DATASET_TYPE_SINGLE_ITEM) {
 				foreach ($data['itemids'] as $i => &$item_spec) {
 					if ($item_spec == 0) {
+						if ($data['references'][$i] === '') {
+							return [_s('Invalid parameter "%1$s": %2$s.', $label.'/'.($index + 1),
+								_('referred widget is unavailable')
+							)];
+						}
+
 						$item_spec = [CWidgetField::FOREIGN_REFERENCE_KEY => $data['references'][$i]];
 					}
 				}
@@ -180,24 +223,20 @@ class CWidgetFieldDataSet extends CWidgetField {
 		unset($data);
 
 		if ($total_item_count > 1) {
-			$errors[] = _('Cannot add more than one item with type "Total" to the chart.');
+			return [_('Cannot add more than one item with type "Total" to the chart.')];
 		}
 
 		if ($total_item_count > 0) {
 			foreach ($value as $data) {
 				if ($data['dataset_aggregation'] !== AGGREGATE_NONE) {
-					$errors[] =
-						_('Cannot set "Data set aggregation" when item with type "Total" is added to the chart.');
-					break;
+					return [_('Cannot set "Data set aggregation" when item with type "Total" is added to the chart.')];
 				}
 			}
 		}
 
-		if (!$errors) {
-			$this->setValue($value);
-		}
+		$this->setValue($value);
 
-		return $errors;
+		return [];
 	}
 
 	public function toApi(array &$widget_fields = []): void {
@@ -205,7 +244,8 @@ class CWidgetFieldDataSet extends CWidgetField {
 			'dataset_type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 			'aggregate_function' => ZBX_WIDGET_FIELD_TYPE_INT32,
 			'dataset_aggregation' => ZBX_WIDGET_FIELD_TYPE_INT32,
-			'data_set_label' => ZBX_WIDGET_FIELD_TYPE_STR
+			'data_set_label' => ZBX_WIDGET_FIELD_TYPE_STR,
+			'item_tags_evaltype' => TAG_EVAL_TYPE_AND_OR
 		];
 		$dataset_defaults = self::getDefaults();
 
@@ -242,6 +282,24 @@ class CWidgetFieldDataSet extends CWidgetField {
 						'value' => $item_spec
 					];
 				}
+			}
+
+			foreach ($value['item_tags'] as $tag_index => $tag) {
+				$widget_fields[] = [
+					'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+					'name' => $this->name.'.'.$index.'.item_tags.'.$tag_index.'.tag',
+					'value' => $tag['tag']
+				];
+				$widget_fields[] = [
+					'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+					'name' => $this->name.'.'.$index.'.item_tags.'.$tag_index.'.operator',
+					'value' => $tag['operator']
+				];
+				$widget_fields[] = [
+					'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+					'name' => $this->name.'.'.$index.'.item_tags.'.$tag_index.'.value',
+					'value' => $tag['value']
+				];
 			}
 
 			foreach ($value['type'] as $type_index => $type) {

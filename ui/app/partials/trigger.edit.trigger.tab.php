@@ -19,28 +19,34 @@
  * @var array $data
  */
 
-$discovered_trigger = array_key_exists('discovered_trigger', $data) ? $data['discovered_trigger'] : false;
-$readonly = $data['readonly'];
+$data += [
+	'discovered_trigger' => false,
+	'is_discovered_prototype' => false
+];
+$readonly = $data['readonly'] || $data['discovered_trigger'] || $data['is_discovered_prototype'];
 
 $trigger_form_grid = new CFormGrid();
+
 if ($data['templates']) {
 	$trigger_form_grid->addItem([new CLabel(_('Parent triggers')), new CFormField($data['templates'])]);
 }
 
-if ($discovered_trigger) {
+if ($data['discovered_trigger'] || $data['is_discovered_prototype']) {
+	$parent_lld = $data['discoveryRule'] ?: $data['discoveryRulePrototype'];
+
 	$discovered_trigger_url = (new CUrl('zabbix.php'))
 		->setArgument('action', 'popup')
 		->setArgument('popup', 'trigger.prototype.edit')
-		->setArgument('parent_discoveryid', $data['discoveryRule']['itemid'])
-		->setArgument('triggerid', $data['triggerDiscovery']['parent_triggerid'])
+		->setArgument('parent_discoveryid', $data['discoveryData']['lldruleid'])
+		->setArgument('triggerid', $data['discoveryData']['parent_triggerid'])
 		->setArgument('context', $data['context'])
 		->setArgument('prototype', '1')
 		->getUrl();
 
 	$trigger_form_grid->addItem([new CLabel(_('Discovered by')), new CFormField(
-		(new CLink($data['discoveryRule']['name'], $discovered_trigger_url))
-			->setAttribute('data-parent_discoveryid', $data['discoveryRule']['itemid'])
-			->setAttribute('data-triggerid', $data['triggerDiscovery']['parent_triggerid'])
+		(new CLink($parent_lld['name'], $discovered_trigger_url))
+			->setAttribute('data-parent_discoveryid', $parent_lld['itemid'])
+			->setAttribute('data-triggerid', $data['discoveryData']['parent_triggerid'])
 			->setAttribute('data-context', $data['context'])
 			->setAttribute('data-prototype', '1')
 			->addClass('js-related-trigger-edit')
@@ -68,7 +74,7 @@ $trigger_form_grid
 		new CFormField((new CTextBox('opdata', $data['opdata'], $readonly))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH))
 	]);
 
-if ($discovered_trigger) {
+if ($data['discovered_trigger'] || $data['is_discovered_prototype']) {
 	$trigger_form_grid->addItem([(new CVar('priority', (int) $data['priority']))->removeId()]);
 	$severity = (new CSeverity('priority_names', (int) $data['priority']))->setReadonly($readonly);
 }
@@ -79,11 +85,16 @@ else {
 $trigger_form_grid->addItem([new CLabel(_('Severity'), 'priority'), new CFormField($severity)]);
 
 $expression_row = [
+	(new CInput('hidden', 'expr_temp', $data['expr_temp']))
+		->setId('expr_temp')
+		->setAttribute('data-field-type', 'hidden')
+		->setErrorContainer('expression-constructor-error-container'),
 	(new CTextArea('expression', $data['expression']))
 		->addClass(ZBX_STYLE_MONOSPACE_FONT)
 		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 		->setReadonly($readonly)
 		->disableSpellcheck()
+		->setErrorContainer('expression-error-container')
 		->setAriaRequired(),
 	(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 	(new CButton('insert', _('Add')))
@@ -132,6 +143,9 @@ $expression_constructor_buttons[] = (new CButton('replace_expression', _('Replac
 $input_method_toggle = (new CButtonLink( _('Expression constructor')))->setId('expression-constructor');
 
 $expression_row[] = [
+	(new CDiv())
+		->setId('expression-error-container')
+		->addClass(ZBX_STYLE_ERROR_CONTAINER),
 	(new CDiv($expression_constructor_buttons))
 		->setId('expression-constructor-buttons')
 		->addClass(ZBX_STYLE_FORM_SUBFIELD)
@@ -147,15 +161,20 @@ $trigger_form_grid
 	->addItem((new CFormField())
 		->setId('expression-table')
 		->addStyle('display: none')
+		->addItem((new CDiv())
+			->setId('expression-constructor-error-container')
+			->addClass(ZBX_STYLE_ERROR_CONTAINER)
+		)
 	);
 
 $input_method_toggle = new CDiv(
 	(new CButtonLink(_('Close expression constructor')))->setId('close-expression-constructor')
 );
-$trigger_form_grid->addItem((new CFormField([null, $input_method_toggle]))
-	->addStyle('display: none')
-	->setId('close-expression-constructor-field')
-);
+$trigger_form_grid
+	->addItem((new CFormField([null, $input_method_toggle]))
+		->addStyle('display: none')
+		->setId('close-expression-constructor-field')
+	);
 
 $trigger_form_grid->addItem([new CLabel(_('OK event generation'), 'recovery_mode'),
 	new CFormField((new CRadioButtonList('recovery_mode', (int) $data['recovery_mode']))
@@ -168,10 +187,15 @@ $trigger_form_grid->addItem([new CLabel(_('OK event generation'), 'recovery_mode
 ]);
 
 $recovery_expression_row = [
+	(new CInput('hidden', 'recovery_expr_temp', $data['recovery_expr_temp']))
+		->setId('recovery_expr_temp')
+		->setAttribute('data-field-type', 'hidden')
+		->setErrorContainer('recovery-expression-constructor-error-container'),
 	(new CTextArea('recovery_expression', $data['recovery_expression']))
 		->addClass(ZBX_STYLE_MONOSPACE_FONT)
 		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 		->setReadonly($readonly)
+		->setErrorContainer('recovery-expression-error-container')
 		->disableSpellcheck()
 		->setAriaRequired(),
 	(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
@@ -209,6 +233,9 @@ $input_method_toggle = (new CButtonLink(_('Expression constructor')))
 	->setId('recovery-expression-constructor');
 
 $recovery_expression_row[] = [
+	(new CDiv())
+		->setId('recovery-expression-error-container')
+		->addClass(ZBX_STYLE_ERROR_CONTAINER),
 	(new CDiv($recovery_constructor_buttons))
 		->setId('recovery-constructor-buttons')
 		->addClass(ZBX_STYLE_FORM_SUBFIELD)
@@ -225,6 +252,10 @@ $trigger_form_grid
 		(new CFormField())
 			->setId('recovery-expression-table')
 			->addStyle('display: none')
+			->addItem((new CDiv())
+				->setId('recovery-expression-constructor-error-container')
+				->addClass(ZBX_STYLE_ERROR_CONTAINER)
+			)
 	);
 
 $input_method_toggle = (new CButtonLink(_('Close expression constructor')))
@@ -270,7 +301,7 @@ $trigger_form_grid
 			makeHelpIcon([_('Menu entry name is used as a label for the trigger URL in the event context menu.')])
 		], 'url_name'),
 		new CFormField((new CTextBox('url_name', array_key_exists('url_name', $data) ? $data['url_name'] : '',
-			$discovered_trigger, DB::getFieldLength('triggers', 'url_name')
+			$data['discovered_trigger'] || $data['is_discovered_prototype'], DB::getFieldLength('triggers', 'url_name')
 		))
 			->setAttribute('placeholder', _('Trigger URL'))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
@@ -278,8 +309,8 @@ $trigger_form_grid
 	])
 	->addItem([new CLabel(_('Menu entry URL'), 'url'),
 		new CFormField(
-			(new CTextBox('url', array_key_exists('url', $data) ? $data['url'] : '', $discovered_trigger,
-				DB::getFieldLength('triggers', 'url')
+			(new CTextBox('url', array_key_exists('url', $data) ? $data['url'] : '',
+				$data['discovered_trigger'] || $data['is_discovered_prototype'], DB::getFieldLength('triggers', 'url')
 			))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 		)
 	])
@@ -287,29 +318,32 @@ $trigger_form_grid
 		new CFormField((new CTextArea('description', array_key_exists('comments', $data) ? $data['comments'] : ''))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setMaxlength(DB::getFieldLength('triggers', 'comments'))
-			->setReadonly($discovered_trigger)
+			->setReadonly($data['discovered_trigger'] || $data['is_discovered_prototype'])
 		)
 	]);
-
-$disabled_by_lld_icon = $data['status'] == TRIGGER_STATUS_DISABLED && array_key_exists('triggerDiscovery', $data)
-		&& $data['triggerDiscovery'] && $data['triggerDiscovery']['disable_source'] == ZBX_DISABLE_SOURCE_LLD
-	? makeWarningIcon(_('Disabled automatically by an LLD rule.'))
-	: null;
 
 if (array_key_exists('parent_discoveryid', $data)) {
 	$trigger_form_grid
 		->addItem([new CLabel(_('Create enabled'), 'status'),
 			new CFormField((new CCheckBox('status', TRIGGER_STATUS_ENABLED))
 				->setChecked($data['status'] == TRIGGER_STATUS_ENABLED)
+				->setReadonly($data['is_discovered_prototype'])
 			)
 		])
 		->addItem([new CLabel(_('Discover'), 'discover'),
 			new CFormField(
 				(new CCheckBox('discover', ZBX_PROTOTYPE_DISCOVER))
 					->setChecked($data['discover'] == ZBX_PROTOTYPE_DISCOVER)
+					->setReadonly($data['is_discovered_prototype'])
 			)
 		]);
-} else {
+}
+else {
+	$disabled_by_lld_icon = $data['status'] == TRIGGER_STATUS_DISABLED && array_key_exists('discoveryData', $data)
+			&& $data['discoveryData'] && $data['discoveryData']['disable_source'] == ZBX_DISABLE_SOURCE_LLD
+		? makeWarningIcon(_('Disabled automatically by an LLD rule.'))
+		: null;
+
 	$trigger_form_grid
 		->addItem([
 			new CLabel([_('Enabled'), $disabled_by_lld_icon], 'status'),

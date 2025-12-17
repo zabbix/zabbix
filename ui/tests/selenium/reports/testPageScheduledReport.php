@@ -278,6 +278,17 @@ class testPageScheduledReport extends CWebTest {
 						'Name' => 'No data'
 					]
 				]
+			],
+			// Multiple spaces in filter field "Name".
+			[
+				[
+					'filter' => [
+						'Name' => '   '
+					],
+					'result' => [
+						'Report for filter - disabled'
+					]
+				]
 			]
 		];
 	}
@@ -287,9 +298,10 @@ class testPageScheduledReport extends CWebTest {
 	 */
 	public function testPageScheduledReport_Filter($data) {
 		$this->page->login()->open('zabbix.php?action=scheduledreport.list');
-
+		$table = $this->getTable();
 		$form = $this->query('name:zbx_filter')->asForm()->one();
 		$form->fill($data['filter'])->submit();
+		$table->waitUntilReloaded();
 		$this->page->waitUntilReady();
 
 		$this->assertTableDataColumn(CTestArrayHelper::get($data, 'result', []));
@@ -312,7 +324,7 @@ class testPageScheduledReport extends CWebTest {
 			],
 			[
 				[
-					'Name' => 'Report for filter - disabled',
+					'Name' => 'Report for filter -   disabled',
 					'Status' => 'Disabled'
 				]
 			],
@@ -424,6 +436,7 @@ class testPageScheduledReport extends CWebTest {
 			$names = [$names];
 		}
 		foreach ($names as $name) {
+			$name = ($name === 'Report for filter - disabled') ? 'Report for filter -   disabled' : $name;
 			$this->assertEquals($db_status, CDBHelper::getValue('SELECT status FROM report WHERE name='.zbx_dbstr($name)));
 		}
 	}
@@ -435,7 +448,9 @@ class testPageScheduledReport extends CWebTest {
 		$this->page->login()->open('zabbix.php?action=scheduledreport.list');
 		$table = $this->query('class:list-table')->asTable()->one();
 		$header = $table->query('xpath:.//a[text()="Name"]')->one();
-		$names = $this->getAllReportNames();
+
+		// In the HTML structure the names have several spaces, they need to be removed.
+		$names = preg_replace('/\s+/', ' ',$this->getAllReportNames());
 
 		foreach(['asc', 'desc'] as $sorting) {
 			$expected = ($sorting === 'asc') ? $names : array_reverse($names);

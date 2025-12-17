@@ -73,7 +73,6 @@ class LinkForm {
 		document.getElementById('threshold-add').addEventListener('click', () => this.#addNewThreshold());
 		document.getElementById('highlight-add').addEventListener('click', () => this.#addNewHighlight());
 
-		this.domNode.find('.color-picker input').colorpicker();
 		colorPalette.setThemeColors(LinkForm.DEFAULT_COLOR_PALETTE);
 	}
 
@@ -385,7 +384,16 @@ class LinkForm {
 				return;
 			}
 
-			$(`[name=${name}]`, this.domNode).val([link[name]]);
+			const color_picker = this.domNode[2].querySelector(
+				`.${ZBX_STYLE_COLOR_PICKER}[color-field-name="${name}"]`
+			);
+
+			if (color_picker !== null) {
+				color_picker.color = link[name];
+			}
+			else {
+				$(`[name=${name}]`, this.domNode).val([link[name]]);
+			}
 		});
 
 		let item_data = [];
@@ -427,9 +435,6 @@ class LinkForm {
 			$(tpl.evaluate(trigger)).appendTo($table);
 			$(`#linktrigger_${index}_drawtype`).val(trigger.drawtype);
 		});
-
-		$table.find('.color-picker input').colorpicker();
-		$('.color-picker input', this.domNode).change();
 	}
 
 	/**
@@ -446,9 +451,6 @@ class LinkForm {
 			$(tpl.evaluate(threshold)).appendTo($table);
 			$(`#threshold_${index}_drawtype`).val(threshold.drawtype);
 		});
-
-		$table.find('.color-picker input').colorpicker();
-		$('.color-picker input', this.domNode).change();
 	}
 
 	/**
@@ -465,9 +467,6 @@ class LinkForm {
 			$(tpl.evaluate(highlight)).appendTo($table);
 			$(`#highlight_${index}_drawtype`).val(highlight.drawtype);
 		});
-
-		$table.find('.color-picker input').colorpicker();
-		$('.color-picker input', this.domNode).change();
 	}
 
 	/**
@@ -498,9 +497,6 @@ class LinkForm {
 
 			$(tpl.evaluate(link_trigger)).appendTo($table);
 		}
-
-		$table.find('.color-picker input').colorpicker();
-		$('.color-picker input', this.domNode).change();
 	}
 
 	/**
@@ -514,9 +510,6 @@ class LinkForm {
 			index: getUniqueId(),
 			color: this.#getNextColor()
 		})).appendTo($table);
-
-		$table.find('.color-picker input').colorpicker();
-		$('.color-picker input', this.domNode).change();
 	}
 
 	/**
@@ -530,9 +523,6 @@ class LinkForm {
 			index: getUniqueId(),
 			color: this.#getNextColor(),
 		})).appendTo($table);
-
-		$table.find('.color-picker input').colorpicker();
-		$('.color-picker input', this.domNode).change();
 	}
 
 	/**
@@ -541,12 +531,12 @@ class LinkForm {
 	 * @returns {string}
 	 */
 	#getNextColor() {
-		const colors = this.domNode[2].querySelectorAll('.color-picker input:not([disabled])'),
-			used_colors = [];
+		const color_pickers = this.domNode[2].querySelectorAll(`.${ZBX_STYLE_COLOR_PICKER}:not([disabled])`);
+		const used_colors = [];
 
-		for (const color of colors) {
-			if (color.value !== '') {
-				used_colors.push(color.value);
+		for (const color_picker of color_pickers) {
+			if (color_picker.color !== '') {
+				used_colors.push(color_picker.color);
 			}
 		}
 

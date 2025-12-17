@@ -144,10 +144,16 @@ class testFormGroups extends CWebTest {
 			$this->assertTrue($form->getField('Group name')->isAttributePresent('readonly'));
 			$this->assertEquals(self::LLD, $form->getField('Discovered by')->query('tag:a')->one()->getText());
 			$form->query('link', self::LLD)->one()->click();
+			COverlayDialogElement::find()->waitUntilReady();
 			// TODO: temporarily commented out due webdriver issue #351858989, alert is not displayed while leaving page during test execution
 //			$this->page->acceptAlert();
 //			$this->page->waitUntilReady();
-			$this->page->assertHeader('Host prototypes');
+
+			// Since the form is opened in a dialog, the actual page and it's header doesn't change.
+			$header = ($this->link === 'zabbix.php?action=search&search='.self::DISCOVERED_GROUP)
+				? 'Search: Group created from host prototype 1'
+				: 'Host groups';
+			$this->page->assertHeader($header);
 			$this->query('id:host')->one()->checkValue(self::HOST_PROTOTYPE);
 
 			return;
@@ -211,7 +217,7 @@ class testFormGroups extends CWebTest {
 			[
 				[
 					'expected' => TEST_BAD,
-					'error' => 'Invalid parameter "/1/name": cannot be empty.'
+					'error' => ['Group name' => 'This field cannot be empty.']
 				]
 			],
 			[
@@ -220,7 +226,7 @@ class testFormGroups extends CWebTest {
 					'fields' => [
 						'Group name' => ' '
 					],
-					'error' => 'Invalid parameter "/1/name": cannot be empty.'
+					'error' => ['Group name' => 'This field cannot be empty.']
 				]
 			],
 			[
@@ -229,8 +235,8 @@ class testFormGroups extends CWebTest {
 					'fields' => [
 						'Group name' => 'Test/Test/'
 					],
-					'error' => 'Invalid parameter "/1/name": invalid host group name.',
-					'template_error' => 'Invalid parameter "/1/name": invalid template group name.'
+					'error' => ['Group name' => 'Invalid host group name.'],
+					'template_error' => ['Group name' => 'Invalid template group name.']
 				]
 			],
 			[
@@ -239,8 +245,8 @@ class testFormGroups extends CWebTest {
 					'fields' => [
 						'Group name' => 'Test/Test\/'
 					],
-					'error' => 'Invalid parameter "/1/name": invalid host group name.',
-					'template_error' => 'Invalid parameter "/1/name": invalid template group name.'
+					'error' => ['Group name' => 'Invalid host group name.'],
+					'template_error' => ['Group name' => 'Invalid template group name.']
 				]
 			],
 			[
@@ -304,7 +310,6 @@ class testFormGroups extends CWebTest {
 	 */
 	protected function checkForm($data, $action) {
 		$good_message = ucfirst($this->object).' group '.(($action === 'create') ? 'added' : 'updated');
-		$bad_message = 'Cannot '.(($action === 'create') ? 'add' : 'update').' '.$this->object.' group';
 
 		if ($data['expected'] === TEST_BAD) {
 			$old_hash = CDBHelper::getHash(self::GROUPS_SQL);
@@ -341,10 +346,10 @@ class testFormGroups extends CWebTest {
 		else {
 			$this->assertEquals($old_hash, CDBHelper::getHash(self::GROUPS_SQL));
 			$this->assertEquals($permission_old_hash, CDBHelper::getHash(self::PERMISSION_SQL));
-			$error_details = ($this->object == 'template')
+			$error = ($this->object == 'template')
 				? CTestArrayHelper::get($data, 'template_error', $data['error'])
 				: $data['error'];
-			$this->assertMessage(TEST_BAD, $bad_message, $error_details);
+			$this->assertInlineError($form, $error);
 		}
 
 		COverlayDialogElement::find()->one()->close();
@@ -354,7 +359,7 @@ class testFormGroups extends CWebTest {
 	 * Update group without changing data.
 	 *
 	 * @param string  $name        group name to be opened for check
-	 * @param bollean $discovered  discovered host group or not
+	 * @param boolean $discovered  discovered host group or not
 	 */
 	public function simpleUpdate($name, $discovered = false) {
 		$old_hash = CDBHelper::getHash(self::GROUPS_SQL);
@@ -378,7 +383,7 @@ class testFormGroups extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'name' => self::DELETE_GROUP,
-					'error' => ' group "'.self::DELETE_GROUP.'" already exists.'
+					'error' => ['Group name' => 'This object already exists.']
 				]
 			],
 			[
@@ -412,7 +417,7 @@ class testFormGroups extends CWebTest {
 
 		$form = $this->openForm($data['name'], CTestArrayHelper::get($data, 'discovered', false));
 		$footer = COverlayDialogElement::find()->one()->waitUntilReady()->getFooter();
-		$footer->query('button:Clone')->one()->waitUntilClickable()->click();
+		$footer->query('button:Clone')->one()->waitUntilClickable()->click()->waitUntilNotVisible();
 		$form->invalidate();
 
 		// Check that the group creation form is open after cloning.
@@ -441,7 +446,7 @@ class testFormGroups extends CWebTest {
 		}
 		else {
 			$this->assertEquals($old_hash, CDBHelper::getHash(self::GROUPS_SQL));
-			$this->assertMessage(TEST_BAD, 'Cannot add '.$this->object.' group', ucfirst($this->object).$data['error']);
+			$this->assertInlineError($form, $data['error']);
 		}
 
 		COverlayDialogElement::find()->one()->close();
@@ -492,7 +497,7 @@ class testFormGroups extends CWebTest {
 
 		if (in_array($data['action'], ['Clone', 'Delete'])) {
 			COverlayDialogElement::find()->one()->waitUntilReady()->getFooter()->query('button', $data['action'])
-					->one()->click();
+					->one()->waitUntilClickable()->click();
 		}
 
 		if ($data['action'] === 'Delete') {

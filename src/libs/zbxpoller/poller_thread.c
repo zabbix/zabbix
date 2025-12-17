@@ -36,7 +36,6 @@
 #include "checks_java.h"
 #include "checks_calculated.h"
 
-#include "zbxexpression.h"
 #include "zbxalgo.h"
 #include "zbxcacheconfig.h"
 #include "zbxdbhigh.h"
@@ -948,8 +947,8 @@ static int	get_values(unsigned char poller_type, int *nextcheck, const zbx_confi
 			if (0 == add_results.values_num)
 			{
 				items[i].state = ITEM_STATE_NORMAL;
-				zbx_preprocess_item_value(items[i].itemid, items[i].host.hostid, items[i].value_type,
-						items[i].flags, &results[i], &timespec, items[i].state, NULL);
+				zbx_preprocess_item_value(items[i].itemid, items[i].value_type, items[i].flags,
+						items[i].preprocessing, &results[i], &timespec, items[i].state, NULL);
 			}
 			else
 			{
@@ -964,15 +963,15 @@ static int	get_values(unsigned char poller_type, int *nextcheck, const zbx_confi
 					if (ZBX_ISSET_MSG(add_result))
 					{
 						items[i].state = ITEM_STATE_NOTSUPPORTED;
-						zbx_preprocess_item_value(items[i].itemid, items[i].host.hostid,
-						items[i].value_type, items[i].flags, NULL, &ts_tmp, items[i].state,
-								add_result->msg);
+						zbx_preprocess_item_value(items[i].itemid, items[i].value_type,
+								items[i].flags, items[i].preprocessing, NULL, &ts_tmp,
+								items[i].state, add_result->msg);
 					}
 					else
 					{
 						items[i].state = ITEM_STATE_NORMAL;
-						zbx_preprocess_item_value(items[i].itemid, items[i].host.hostid,
-								items[i].value_type, items[i].flags, add_result,
+						zbx_preprocess_item_value(items[i].itemid, items[i].value_type,
+								items[i].flags, items[i].preprocessing, add_result,
 								&ts_tmp, items[i].state, NULL);
 					}
 
@@ -988,8 +987,8 @@ static int	get_values(unsigned char poller_type, int *nextcheck, const zbx_confi
 		else if (NOTSUPPORTED == errcodes[i] || AGENT_ERROR == errcodes[i] || CONFIG_ERROR == errcodes[i])
 		{
 			items[i].state = ITEM_STATE_NOTSUPPORTED;
-			zbx_preprocess_item_value(items[i].itemid, items[i].host.hostid, items[i].value_type,
-					items[i].flags, NULL, &timespec, items[i].state, results[i].msg);
+			zbx_preprocess_item_value(items[i].itemid, items[i].value_type, items[i].flags,
+					items[i].preprocessing, NULL, &timespec, items[i].state, results[i].msg);
 		}
 
 		zbx_dc_poller_requeue_items(&items[i].itemid, &timespec.sec, &errcodes[i], 1, poller_type,
@@ -1024,7 +1023,7 @@ ZBX_THREAD_ENTRY(zbx_poller_thread, args)
 				server_num = ((zbx_thread_args_t *)args)->info.server_num,
 				process_num = ((zbx_thread_args_t *)args)->info.process_num;
 	double			sec, total_sec = 0.0, old_total_sec = 0.0;
-	time_t			last_stat_time;
+	time_t			last_stat_time, now;
 	unsigned char		poller_type;
 	zbx_ipc_async_socket_t	rtc;
 	const zbx_thread_info_t	*info = &((zbx_thread_args_t *)args)->info;
@@ -1043,8 +1042,6 @@ ZBX_THREAD_ENTRY(zbx_poller_thread, args)
 			server_num, get_process_type_string(process_type), process_num);
 
 	zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
-
-	scriptitem_es_engine_init();
 
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	zbx_tls_init_child(poller_args_in->config_comms->config_tls,
@@ -1097,7 +1094,9 @@ ZBX_THREAD_ENTRY(zbx_poller_thread, args)
 
 		total_sec += zbx_time() - sec;
 
-		if (0 != sleeptime || STAT_INTERVAL <= time(NULL) - last_stat_time)
+		now = time(NULL);
+
+		if (0 != sleeptime || STAT_INTERVAL <= now - last_stat_time)
 		{
 			if (0 == sleeptime)
 			{
@@ -1118,7 +1117,9 @@ ZBX_THREAD_ENTRY(zbx_poller_thread, args)
 			}
 			processed = 0;
 			total_sec = 0.0;
-			last_stat_time = time(NULL);
+			last_stat_time = now;
+
+			zbx_malloc_trim(now, SEC_PER_MIN, ZBX_MEBIBYTE);
 		}
 
 		if (SUCCEED == zbx_rtc_wait(&rtc, info, &rtc_cmd, &rtc_data, sleeptime) && 0 != rtc_cmd)
@@ -1136,16 +1137,18 @@ ZBX_THREAD_ENTRY(zbx_poller_thread, args)
 #ifdef HAVE_NETSNMP
 #define	SNMP_ENGINEID_HK_INTERVAL	86400
 		if ((ZBX_POLLER_TYPE_NORMAL == poller_type || ZBX_POLLER_TYPE_UNREACHABLE == poller_type) &&
-				time(NULL) >= SNMP_ENGINEID_HK_INTERVAL + last_snmp_engineid_hk_time)
+				now >= SNMP_ENGINEID_HK_INTERVAL + last_snmp_engineid_hk_time)
 		{
-			last_snmp_engineid_hk_time = time(NULL);
+			last_snmp_engineid_hk_time = now;
 			zbx_clear_cache_snmp(process_type, process_num);
 		}
 #undef SNMP_ENGINEID_HK_INTERVAL
 #endif
 	}
 
-	scriptitem_es_engine_destroy();
+	zbx_ipc_async_socket_close(&rtc);
+	if (ZBX_POLLER_TYPE_HISTORY == poller_type)
+		zbx_db_close();
 
 	zbx_setproctitle("%s #%d [terminated]", get_process_type_string(process_type), process_num);
 

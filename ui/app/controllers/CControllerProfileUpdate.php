@@ -41,6 +41,7 @@ class CControllerProfileUpdate extends CController {
 				case 'web.dashboard.last_widget_type':
 				case 'web.discovery.filter.active':
 				case 'web.discoveryconf.filter.active':
+				case 'web.host.wizard.show.welcome':
 				case 'web.hostgroups.filter.active':
 				case 'web.hostinventories.filter.active':
 				case 'web.hostinventoriesoverview.filter.active':

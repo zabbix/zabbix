@@ -22,6 +22,7 @@
 #include "zbxnum.h"
 #include "zbxversion.h"
 #include "zbxtime.h"
+#include "zbxregexp.h"
 
 #include "zbxtagfilter.h"
 
@@ -511,7 +512,16 @@ typedef struct
 
 /* events callbacks end */
 
-int	zbx_db_get_user_names(zbx_uint64_t userid, char **username, char **name, char **surname);
+typedef struct
+{
+	zbx_uint64_t	userid;
+	char		*username;
+	char		*name;
+	char		*surname;
+} zbx_user_names_t;
+
+int	zbx_db_get_user_names(zbx_uint64_t userid, zbx_user_names_t **names);
+void	zbx_user_names_clean(zbx_user_names_t **names);
 char	*zbx_db_get_unique_hostname_by_sample(const char *host_name_sample, const char *field_name);
 
 typedef enum
@@ -565,6 +575,7 @@ typedef struct
 	unsigned char	state;
 	int		mtime;
 	const char	*error;
+	char		error_hash[ZBX_SHA512_BINARY_LENGTH];
 
 	zbx_uint64_t	flags;
 #define ZBX_FLAGS_ITEM_DIFF_UNSET			__UINT64_C(0x0000)
@@ -594,7 +605,7 @@ typedef struct
 	time_t				lastaccess;
 	time_t				last_version_error_time;
 	int				proxy_delay;
-	int				more_data;
+	int				pending_history;
 	zbx_proxy_suppress_t		nodata_win;
 
 #define ZBX_FLAGS_PROXY_DIFF_UNSET				__UINT64_C(0x0000)
@@ -604,6 +615,7 @@ typedef struct
 #define ZBX_FLAGS_PROXY_DIFF_UPDATE_PROXYDELAY			__UINT64_C(0x0010)
 #define ZBX_FLAGS_PROXY_DIFF_UPDATE_SUPPRESS_WIN		__UINT64_C(0x0020)
 #define ZBX_FLAGS_PROXY_DIFF_UPDATE_CONFIG			__UINT64_C(0x0080)
+#define ZBX_FLAGS_PROXY_DIFF_UPDATE_PENDING_HISTORY		__UINT64_C(0x0100)
 #define ZBX_FLAGS_PROXY_DIFF_UPDATE (			\
 		ZBX_FLAGS_PROXY_DIFF_UPDATE_VERSION |	\
 		ZBX_FLAGS_PROXY_DIFF_UPDATE_LASTACCESS)
@@ -686,7 +698,8 @@ typedef enum
 	ZBX_LLD_OVERRIDE_OP_OBJECT_ITEM = 0,
 	ZBX_LLD_OVERRIDE_OP_OBJECT_TRIGGER,
 	ZBX_LLD_OVERRIDE_OP_OBJECT_GRAPH,
-	ZBX_LLD_OVERRIDE_OP_OBJECT_HOST
+	ZBX_LLD_OVERRIDE_OP_OBJECT_HOST,
+	ZBX_LLD_OVERRIDE_OP_OBJECT_LLDRULE,
 }
 zbx_lld_override_op_object_t;
 
@@ -711,10 +724,58 @@ zbx_lld_override_operation_t;
 
 ZBX_PTR_VECTOR_DECL(lld_override_operation, zbx_lld_override_operation_t*)
 
+
+/* lld rule filter condition (item_condition table record) */
+typedef struct
+{
+	zbx_uint64_t		id;
+	char			*macro;
+	char			*regexp;
+	zbx_vector_expression_t	regexps;
+	unsigned char		op;
+}
+zbx_lld_condition_t;
+
+ZBX_PTR_VECTOR_DECL(lld_condition_ptr, zbx_lld_condition_t *)
+
+/* lld rule filter */
+typedef struct
+{
+	zbx_vector_lld_condition_ptr_t	conditions;
+	char				*expression;
+	int				evaltype;
+}
+zbx_lld_filter_t;
+
+/* lld rule override */
+typedef struct
+{
+	zbx_uint64_t				overrideid;
+	zbx_uint64_t				itemid;
+	char					*name;
+	zbx_lld_filter_t			filter;
+	zbx_vector_lld_override_operation_t	override_operations;
+	int					step;
+	unsigned char				stop;
+}
+zbx_lld_override_t;
+
+ZBX_PTR_VECTOR_DECL(lld_override_ptr, zbx_lld_override_t *)
+
 void	zbx_lld_override_operation_free(zbx_lld_override_operation_t *override_operation);
 
 void	zbx_load_lld_override_operations(const zbx_vector_uint64_t *overrideids, char **sql, size_t *sql_alloc,
 		zbx_vector_lld_override_operation_t *ops);
+
+void	zbx_lld_override_free(zbx_lld_override_t *override);
+int	zbx_lld_override_compare_func(const void *d1, const void *d2);
+zbx_lld_condition_t	*zbx_lld_filter_condition_create(const char *id, const char *operator, const char *macro,
+		const char *value);
+zbx_lld_override_t	*zbx_lld_override_create(const char *lld_overrideid, const char *itemid, const char *name,
+		const char *step, const char *evaltype, const char *formula, const char *stop);
+
+void	zbx_lld_filter_init(zbx_lld_filter_t *filter);
+void	zbx_lld_filter_clean(zbx_lld_filter_t *filter);
 
 #define ZBX_TIMEZONE_DEFAULT_VALUE	"default"
 
@@ -771,5 +832,49 @@ int	zbx_get_proxy_protocol_version_int(const char *version_str);
 #define PROXY_OPERATING_MODE_PASSIVE	1
 
 int	zbx_db_setting_exists(const char *config_name);
+
+/* rowset sync */
+
+#define ZBX_SYNC_ROW_NONE	0x00000000
+#define ZBX_SYNC_ROW_INSERT	0x40000000
+#define ZBX_SYNC_ROW_DELETE	0x80000000
+
+#define ZBX_SYNC_ROW_UPDATE	(~(ZBX_SYNC_ROW_INSERT | ZBX_SYNC_ROW_DELETE))
+
+typedef struct
+{
+	zbx_uint64_t	rowid;
+	zbx_uint64_t	parent_rowid;
+	char		**cols;
+	char		**cols_orig;
+	int		cols_num;
+	zbx_uint64_t	flags;
+	void		*data;
+}
+zbx_sync_row_t;
+
+ZBX_PTR_VECTOR_DECL(sync_row_ptr, zbx_sync_row_t *)
+
+void	zbx_sync_row_free(zbx_sync_row_t *row);
+
+typedef struct
+{
+	zbx_vector_sync_row_ptr_t	rows;
+	int				cols_num;
+}
+zbx_sync_rowset_t;
+
+void	zbx_sync_row_rollback_col(zbx_sync_row_t *row, int col_num);
+void	zbx_sync_rowset_init(zbx_sync_rowset_t *rowset, int cols_num);
+void	zbx_sync_rowset_clear(zbx_sync_rowset_t *rowset);
+void	zbx_sync_rowset_clear_ext(zbx_sync_rowset_t *rowset, void (*free_func)(void *data));
+zbx_sync_row_t	*zbx_sync_rowset_add_row(zbx_sync_rowset_t *rowset, ...);
+void	zbx_sync_rowset_sort_by_rows(zbx_sync_rowset_t *rowset);
+void	zbx_sync_rowset_sort_by_id(zbx_sync_rowset_t *rowset);
+void	zbx_sync_rowset_merge(zbx_sync_rowset_t *dst, const zbx_sync_rowset_t *src);
+const zbx_sync_row_t	*zbx_sync_rowset_search_by_id(const zbx_sync_rowset_t *rowset, zbx_uint64_t rowid);
+zbx_sync_row_t	*zbx_sync_rowset_search_by_parent(zbx_sync_rowset_t *rowset, zbx_uint64_t parent_rowid);
+void	zbx_sync_rowset_rollback(zbx_sync_rowset_t *rowset);
+void	zbx_sync_rowset_copy(zbx_sync_rowset_t *dst, const zbx_sync_rowset_t *src);
 
 #endif

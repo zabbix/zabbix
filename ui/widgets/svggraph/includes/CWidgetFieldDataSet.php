@@ -73,7 +73,13 @@ class CWidgetFieldDataSet extends CWidgetField {
 				'aggregate_grouping'	=> ['type' => API_INT32, 'in' => implode(',', [GRAPH_AGGREGATE_BY_ITEM, GRAPH_AGGREGATE_BY_DATASET])],
 				'approximation'			=> ['type' => API_INT32, 'in' => implode(',', [APPROXIMATION_MIN, APPROXIMATION_AVG, APPROXIMATION_MAX, APPROXIMATION_ALL])],
 				'data_set_label'		=> ['type' => API_STRING_UTF8, 'length' => 255],
-				'override_hostid'		=> ['type' => API_ANY]
+				'override_hostid'		=> ['type' => API_ANY],
+				'item_tags_evaltype'	=> ['type' => API_INT32, 'in' => implode(',', [TAG_EVAL_TYPE_AND_OR, TAG_EVAL_TYPE_OR])],
+				'item_tags'				=> ['type' => API_OBJECTS, 'fields' => [
+					'tag'					=> ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => 255],
+					'operator'				=> ['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [TAG_OPERATOR_LIKE, TAG_OPERATOR_EQUAL, TAG_OPERATOR_NOT_LIKE, TAG_OPERATOR_NOT_EQUAL, TAG_OPERATOR_EXISTS, TAG_OPERATOR_NOT_EXISTS])],
+					'value'					=> ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => 255]
+				]]
 			]]);
 	}
 
@@ -81,6 +87,18 @@ class CWidgetFieldDataSet extends CWidgetField {
 		$data_sets = [];
 
 		foreach ((array) $value as $data_set) {
+			if (array_key_exists('itemids', $data_set)) {
+				$data_set['itemids'] = array_values($data_set['itemids']);
+			}
+
+			if (array_key_exists('item_tags', $data_set)) {
+				foreach ($data_set['item_tags'] as $tag_index => $tag) {
+					if ($tag['tag'] === '' && $tag['value'] === '') {
+						unset($data_set['item_tags'][$tag_index]);
+					}
+				}
+			}
+
 			$data_sets[] = $data_set + self::getDefaults();
 		}
 
@@ -109,7 +127,9 @@ class CWidgetFieldDataSet extends CWidgetField {
 			'aggregate_grouping'=> GRAPH_AGGREGATE_BY_ITEM,
 			'approximation' => APPROXIMATION_AVG,
 			'data_set_label' => '',
-			'override_hostid' => []
+			'override_hostid' => [],
+			'item_tags_evaltype' => TAG_EVAL_TYPE_AND_OR,
+			'item_tags' => []
 		];
 	}
 
@@ -143,15 +163,13 @@ class CWidgetFieldDataSet extends CWidgetField {
 			return [];
 		}
 
-		$errors = [];
-
 		$validation_rules = $this->getValidationRules($strict);
 		$value = $this->getValue();
 		$label = $this->getErrorLabel();
 
-		if (!count($value)) {
+		if (!$value) {
 			if (!CApiInputValidator::validate($validation_rules, $value, $label, $error)) {
-				$errors[] = $error;
+				return [$error];
 			}
 		}
 		else {
@@ -179,13 +197,18 @@ class CWidgetFieldDataSet extends CWidgetField {
 			}
 
 			if (!CApiInputValidator::validate($validation_rules_by_type, $data, $label.'/'.($index + 1), $error)) {
-				$errors[] = $error;
-				break;
+				return [$error];
 			}
 
 			if ($data['dataset_type'] == self::DATASET_TYPE_SINGLE_ITEM) {
 				foreach ($data['itemids'] as $i => &$item_spec) {
 					if ($item_spec == 0) {
+						if ($data['references'][$i] === '') {
+							return [_s('Invalid parameter "%1$s": %2$s.', $label.'/'.($index + 1),
+								_('referred widget is unavailable')
+							)];
+						}
+
 						$item_spec = [CWidgetField::FOREIGN_REFERENCE_KEY => $data['references'][$i]];
 					}
 				}
@@ -201,10 +224,8 @@ class CWidgetFieldDataSet extends CWidgetField {
 
 				$override_host_field->setValue($data['override_hostid']);
 
-				$errors = $override_host_field->validate($strict);
-
-				if ($errors) {
-					break;
+				if ($errors = $override_host_field->validate($strict)) {
+					return $errors;
 				}
 
 				$data['override_hostid'] = $override_host_field->getValue();
@@ -212,11 +233,9 @@ class CWidgetFieldDataSet extends CWidgetField {
 		}
 		unset($data);
 
-		if (!$errors) {
-			$this->setValue($value);
-		}
+		$this->setValue($value);
 
-		return $errors;
+		return [];
 	}
 
 	public function toApi(array &$widget_fields = []): void {
@@ -235,7 +254,8 @@ class CWidgetFieldDataSet extends CWidgetField {
 			'aggregate_interval' => ZBX_WIDGET_FIELD_TYPE_STR,
 			'aggregate_grouping' => ZBX_WIDGET_FIELD_TYPE_INT32,
 			'approximation' => ZBX_WIDGET_FIELD_TYPE_INT32,
-			'data_set_label' => ZBX_WIDGET_FIELD_TYPE_STR
+			'data_set_label' => ZBX_WIDGET_FIELD_TYPE_STR,
+			'item_tags_evaltype' => TAG_EVAL_TYPE_AND_OR
 		];
 
 		$dataset_defaults = self::getDefaults();
@@ -274,6 +294,24 @@ class CWidgetFieldDataSet extends CWidgetField {
 						'value' => $item_spec
 					];
 				}
+			}
+
+			foreach ($value['item_tags'] as $tag_index => $tag) {
+				$widget_fields[] = [
+					'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+					'name' => $this->name.'.'.$index.'.item_tags.'.$tag_index.'.tag',
+					'value' => $tag['tag']
+				];
+				$widget_fields[] = [
+					'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+					'name' => $this->name.'.'.$index.'.item_tags.'.$tag_index.'.operator',
+					'value' => $tag['operator']
+				];
+				$widget_fields[] = [
+					'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+					'name' => $this->name.'.'.$index.'.item_tags.'.$tag_index.'.value',
+					'value' => $tag['value']
+				];
 			}
 
 			// Field "color" stored as array for dataset type DATASET_TYPE_SINGLE_ITEM (0)

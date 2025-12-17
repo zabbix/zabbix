@@ -1038,7 +1038,7 @@ class testUsersPasswordComplexity extends CWebTest {
 
 		if ($update === false) {
 			$user_form->selectTab('Permissions');
-			$user_form->fill(['Role' => 'User role']);
+			$user_form->fill(['Role' => 'User role'])->waitUntilReloaded();
 		}
 
 		$user_form->submit();
@@ -1046,6 +1046,8 @@ class testUsersPasswordComplexity extends CWebTest {
 		if ($this->page->isAlertPresent()) {
 			$this->page->acceptAlert();
 		}
+		$user_form->waitUntilStalled();
+		$this->page->waitUntilReady();
 
 		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
 			$this->assertMessage(TEST_BAD, 'Cannot '.($update ? 'update' : 'add').' user', $data['error']);
@@ -1087,5 +1089,6 @@ class testUsersPasswordComplexity extends CWebTest {
 		$this->query('button:Change password')->waitUntilClickable()->one()->click();
 		$this->query('id:password1')->waitUntilPresent()->one();
 		$this->query('id:password2')->waitUntilPresent()->one();
+		$this->page->waitUntilReady();
 	}
 }

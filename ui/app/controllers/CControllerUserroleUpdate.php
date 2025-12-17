@@ -105,10 +105,10 @@ class CControllerUserroleUpdate extends CControllerUserroleEditGeneral {
 		];
 
 		$ret = $this->validateInput($fields);
-		$error = $this->getValidationError();
+		$result = $this->getValidationResult();
 
 		if (!$ret) {
-			switch ($error) {
+			switch ($result) {
 				case self::VALIDATION_ERROR:
 					$response = new CControllerResponseRedirect(
 						(new CUrl('zabbix.php'))->setArgument('action', 'userrole.edit')

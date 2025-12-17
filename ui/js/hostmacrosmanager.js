@@ -26,20 +26,22 @@ class HostMacrosManager {
 	static DISCOVERY_STATE_CONVERTING = 0x2;
 	static DISCOVERY_STATE_MANUAL = 0x3;
 
-	constructor({container, readonly, parent_hostid}) {
+	constructor({container, readonly, parent_hostid, load_callback}) {
 		this.$container = container;
 		this.readonly = readonly;
 		this.parent_hostid = parent_hostid ?? null;
+		this.load_callback = load_callback ?? null;
 	}
 
 	load(show_inherited_macros, templateids) {
 		const url = new Curl('zabbix.php');
+
 		url.setArgument('action', 'hostmacros.list');
 
 		const post_data = {
 			macros: this.getMacros(),
 			show_inherited_macros: show_inherited_macros ? 1 : 0,
-			templateids: templateids,
+			templateids,
 			readonly: this.readonly ? 1 : 0
 		};
 
@@ -74,6 +76,10 @@ class HostMacrosManager {
 					}
 					else {
 						this.initMacroTable(show_inherited_macros);
+					}
+
+					if (this.load_callback !== null) {
+						this.load_callback();
 					}
 
 					// Display debug after loaded content if it is enabled for user.
@@ -136,6 +142,7 @@ class HostMacrosManager {
 				const inherited_value_field_state = (macro_type == HostMacrosManager.ZBX_MACRO_TYPE_SECRET)
 					? {'disabled': true}
 					: {'readonly': true};
+				const fields = document.querySelectorAll(`[data-field-type][name^="macros[${macro_num}]"]`);
 
 				if (inherited_type & HostMacrosManager.ZBX_PROPERTY_OWN) {
 					// Switching from ZBX_PROPERTY_BOTH to ZBX_PROPERTY_INHERITED.
@@ -165,6 +172,8 @@ class HostMacrosManager {
 					$('#macros_' + macro_num + '_change_inheritance').text(t('Change'));
 					$('#macros_' + macro_num + '_allow_revert').remove();
 					$('#macros_' + macro_num + '_hostmacroid').remove();
+
+					fields.forEach(field => field.setAttribute('data-skip-from-submit', 1));
 				}
 				else {
 					// Switching from ZBX_PROPERTY_INHERITED to ZBX_PROPERTY_BOTH.
@@ -181,6 +190,8 @@ class HostMacrosManager {
 						.prop('disabled', false)
 						.attr({'aria-haspopup': true});
 					$('#macros_' + macro_num + '_change_inheritance').text(t('Remove'));
+
+					fields.forEach(field => field.removeAttribute('data-skip-from-submit'));
 				}
 
 				$('#macros_' + macro_num + '_discovery_state').val(HostMacrosManager.DISCOVERY_STATE_MANUAL);

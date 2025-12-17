@@ -179,28 +179,27 @@ class testPageGroups extends CWebTest {
 		);
 		$this->page->assertHeader(ucfirst($this->object).'s');
 		CFilterElement::find()->one()->getForm()->checkValue([ucfirst($this->object).' groups' => $links['name']]);
-		$this->assertTableHasData([
-			[
-				'Name' => array_key_exists('lld', $links)
-					? $links['lld'].': '.$links['host_template']
-					: $links['host_template']
-			]
-		]);
+
+		// Host or template name.
+		$name = array_key_exists('lld', $links)
+			? $links['lld'].': '.$links['host_template']
+			: $links['host_template'];
+
+		$host_row = $this->query('class:list-table')->asTable()->one()->findRow('Name',  $name);
+		$this->assertEquals($name, $host_row->getColumn('Name')->getText());
 		$this->page->open($this->link)->waitUntilReady();
 
 		// Check link to host prototype from host group name.
 		if (array_key_exists('lld', $links)) {
 			$row->getColumn('Name')->query('link', $links['lld'])->one()->click();
-			$this->assertStringContainsString('host_prototypes.php?form=update&parent_discoveryid=',
+			$this->assertStringContainsString('zabbix.php?action=popup&popup=host.prototype.edit&parent_discoveryid=',
 					$this->page->getCurrentUrl()
 			);
-			$this->page->assertHeader('Host prototypes');
-			$this->query('id:host-prototype-form')->asForm(['normalized' => true])->waitUntilVisible()->one()
+			$this->page->assertHeader('Host groups');
+			$this->query('id:host-prototype-form')->asForm()->waitUntilVisible()->one()
 					->checkValue(['Host name' => self::HOST_PROTOTYPE]);
 			$this->query('button:Cancel')->one()->click();
-			$this->assertStringContainsString('host_prototypes.php?cancel=1&parent_discoveryid=',
-					$this->page->getCurrentUrl()
-			);
+			$this->assertStringContainsString('zabbix.php?action=hostgroup.list', $this->page->getCurrentUrl());
 			$this->page->open($this->link)->waitUntilReady();
 		}
 	}
@@ -251,18 +250,12 @@ class testPageGroups extends CWebTest {
 			$names = $this->getGroupNames($sorting);
 			$table->query('link:Name')->waitUntilClickable()->one()->click();
 			$table->waitUntilReloaded();
-			$this->assertTableDataColumn($names);
+			$this->assertTableDataColumn(preg_replace('/\s+/', ' ', $names));
 		}
 	}
 
 	public static function getFilterData() {
 		return [
-			// Too many spaces in field.
-			[
-				[
-					'Name' => '  '
-				]
-			],
 			// Special symbols, utf8 and long name.
 			[
 				[

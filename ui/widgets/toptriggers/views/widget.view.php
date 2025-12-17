@@ -28,7 +28,7 @@ $table = (new CTableInfo())
 	->addClass(ZBX_STYLE_LIST_TABLE_STICKY_HEADER);
 
 if ($data['error'] !== null) {
-	$table->setNoDataMessage($data['error']);
+	$table->setNoDataMessage($data['error'], null, ZBX_ICON_SEARCH_LARGE);
 }
 else {
 	foreach ($data['triggers'] as $triggerid => $trigger) {

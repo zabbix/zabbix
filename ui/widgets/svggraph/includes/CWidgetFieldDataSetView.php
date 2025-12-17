@@ -46,10 +46,14 @@ use CButton,
 	CTextBox,
 	CVar,
 	CWidgetFieldMultiSelectOverrideHostView,
+	CWidgetFieldTagsView,
 	CWidgetFieldView;
 
 use Zabbix\Widgets\CWidgetField;
-use Zabbix\Widgets\Fields\CWidgetFieldMultiSelectOverrideHost;
+use Zabbix\Widgets\Fields\{
+	CWidgetFieldMultiSelectOverrideHost,
+	CWidgetFieldTags
+};
 
 class CWidgetFieldDataSetView extends CWidgetFieldView {
 
@@ -232,6 +236,30 @@ class CWidgetFieldDataSetView extends CWidgetFieldView {
 
 			$dataset_head[] = $item_pattern_field;
 			$dataset_head[] = new CScriptTag($item_pattern_field->getPostJS());
+
+			$item_tags_evaltype_field = [
+				new CLabel(_('Item tags')),
+				new CFormField(
+					(new CRadioButtonList($field_name.'['.$row_num.'][item_tags_evaltype]',
+						(int) $value['item_tags_evaltype'])
+					)
+						->addValue(_('And/Or'), TAG_EVAL_TYPE_AND_OR)
+						->addValue(_('Or'), TAG_EVAL_TYPE_OR)
+						->setModern()
+				)
+			];
+			$item_tags_table_field = [];
+			$item_tags_table_view = (new CWidgetFieldTagsView(
+				(new CWidgetFieldTags($field_name.'['.$row_num.'][item_tags]'))->setValue($value['item_tags'])
+			))->setFormName($this->form_name);
+
+			foreach ($item_tags_table_view->getViewCollection() as
+					['label' => $label, 'view' => $view, 'class' => $class]) {
+				$item_tags_table_field[] = [$label, (new CFormField($view))->addClass($class)];
+			}
+
+			$item_tags_table_field[] = $item_tags_table_view->getTemplates();
+			$item_tags_table_field[] = (new CScriptTag($item_tags_table_view->getJavaScript()))->setOnDocumentReady();
 		}
 		else {
 			$item_rows = [];
@@ -280,6 +308,9 @@ class CWidgetFieldDataSetView extends CWidgetFieldView {
 			$dataset_head = array_merge($dataset_head, [
 				(new CDiv([$empty_msg_block, $items_list]))->addClass('items-list table-forms-separator')
 			]);
+
+			$item_tags_evaltype_field = null;
+			$item_tags_table_field = null;
 		}
 
 		$dataset_head[] = (new CDiv(
@@ -504,6 +535,8 @@ class CWidgetFieldDataSetView extends CWidgetFieldView {
 									->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 							)
 						])
+						->addItem($item_tags_evaltype_field)
+						->addItem($item_tags_table_field)
 				])
 		]))
 			->addClass(ZBX_STYLE_LIST_ACCORDION_ITEM)
@@ -535,7 +568,8 @@ class CWidgetFieldDataSetView extends CWidgetFieldView {
 			(new CCol([
 				(new CButton('button', _('Remove')))
 					->addClass(ZBX_STYLE_BTN_LINK)
-					->addClass('element-table-remove'),
+					->addClass('element-table-remove')
+					->addClass('js-remove-item'),
 				new CVar($this->field->getName().'['.$ds_num.'][itemids][]', $itemid,
 					'items_'.$ds_num.'_'.$row_num.'_itemid'
 				),

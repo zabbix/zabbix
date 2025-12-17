@@ -69,7 +69,8 @@ window.copy_popup = new class {
 				helper_options.object_name = 'hostGroup';
 				helper_options.popup.parameters.srctbl = 'host_groups';
 				helper_options.popup.parameters.srcfld1 = 'groupid';
-
+				helper_options.popup.parameters.with_hosts = '1';
+				helper_options.objectOptions.with_hosts = '1';
 				break;
 
 			case <?= COPY_TYPE_TO_HOST ?>:
@@ -89,6 +90,8 @@ window.copy_popup = new class {
 				helper_options.object_name = 'templateGroup';
 				helper_options.popup.parameters.srctbl = 'template_groups';
 				helper_options.popup.parameters.srcfld1 = 'groupid';
+				helper_options.popup.parameters.with_templates = '1';
+				helper_options.objectOptions.with_templates = '1';
 				break;
 		}
 

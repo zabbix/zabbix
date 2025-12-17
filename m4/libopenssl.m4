@@ -131,8 +131,30 @@ AS_HELP_STRING([--with-openssl@<:@=DIR@:>@],[use OpenSSL package @<:@default=no@
          found_openssl="yes"
          LIBOPENSSL_ACCEPT_VERSION([/usr/include/openssl/opensslv.h], [$mt_required])
        else						# libraries are not found in default directories
-         found_openssl="no"
-         AC_MSG_RESULT(no)
+          m4_ifdef([PKG_PROG_PKG_CONFIG], [
+            PKG_PROG_PKG_CONFIG()
+            if test -z "$PKG_CONFIG"; then
+              AC_MSG_ERROR([pkg-config is required but not found. Please install pkg-config.])
+            fi
+          ], [
+            AC_MSG_WARN([pkg-config not found, skipping openssl detection via pkg-config])
+          ])
+
+          if test -n "$PKG_CONFIG"; then
+            OPENSSL_CFLAGS=`$PKG_CONFIG --cflags openssl`
+            OPENSSL_LDFLAGS=`$PKG_CONFIG --libs-only-L openssl`
+            OPENSSL_LIBS=`$PKG_CONFIG --libs-only-l openssl`
+            found_openssl="yes"
+
+            OPENSSL_VERSION=`$PKG_CONFIG --modversion openssl`
+
+            if ! $PKG_CONFIG --atleast-version=3.5.0 openssl; then
+                AC_MSG_ERROR([OpenSSL version 3.5.0 or higher is required. Found version: $OPENSSL_VERSION])
+            fi
+
+            accept_openssl_version=yes
+
+          fi
        fi
      else						# search in the specified OpenSSL directory
        if test -f $_libopenssl_dir/include/openssl/ssl.h -a -f $_libopenssl_dir/include/openssl/crypto.h; then

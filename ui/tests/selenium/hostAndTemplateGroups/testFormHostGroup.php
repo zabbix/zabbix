@@ -45,7 +45,7 @@ class testFormHostGroup extends testFormGroups {
 					'fields' => [
 						'Group name' => self::DISCOVERED_GROUP
 					],
-					'error' => 'Host group "'.self::DISCOVERED_GROUP.'" already exists.'
+					'error' => ['Group name' => 'This object already exists.']
 				]
 			]
 		];
@@ -59,7 +59,7 @@ class testFormHostGroup extends testFormGroups {
 					'fields' => [
 						'Group name' => 'Zabbix servers'
 					],
-					'error' => 'Host group "Zabbix servers" already exists.'
+					'error' => ['Group name' => 'This object already exists.']
 				]
 			],
 			[
@@ -99,7 +99,7 @@ class testFormHostGroup extends testFormGroups {
 						'Group name' => 'Zabbix servers',
 						'Apply permissions and tag filters to all subgroups' => true
 					],
-					'error' => 'Host group "Zabbix servers" already exists.'
+					'error' => ['Group name' => 'This object already exists.']
 				]
 			],
 			[
@@ -277,8 +277,8 @@ class testFormHostGroup extends testFormGroups {
 			$link = $discovered_by->query('link', $lld_name)->one();
 			$this->assertTrue($link->isClickable());
 
-			$link_url = 'host_prototypes.php?form=update&parent_discoveryid='.$link_ids[$lld_name]['lld_id'].'&hostid='.
-					$link_ids[$lld_name]['host_prototype_id'].'&context=host';
+			$link_url = 'zabbix.php?action=popup&popup=host.prototype.edit&parent_discoveryid='.$link_ids[$lld_name]['lld_id'].
+					'&hostid='.$link_ids[$lld_name]['host_prototype_id'].'&context=host';
 			$this->assertEquals($link_url, $link->getAttribute('href'));
 		}
 

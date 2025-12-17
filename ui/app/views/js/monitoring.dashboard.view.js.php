@@ -29,11 +29,6 @@
 		/**
 		 * @type {Object}
 		 */
-		#broadcast_requirements;
-
-		/**
-		 * @type {Object}
-		 */
 		#dashboard_time_period;
 
 		/**
@@ -61,19 +56,22 @@
 		 */
 		#time_selector_toggle_timeout = null;
 
+		/**
+		 * @type {number|null}
+		 */
+		#host_override_toggle_timeout = null;
+
 		init({
 			dashboard,
 			widget_defaults,
 			widget_last_type,
 			configuration_hash,
-			broadcast_requirements,
 			dashboard_host,
 			dashboard_time_period,
 			web_layout_mode,
 			clone
 		}) {
 			this.#dashboard = dashboard;
-			this.#broadcast_requirements = broadcast_requirements;
 			this.#dashboard_time_period = dashboard_time_period;
 			this.#clone = clone;
 
@@ -158,17 +156,21 @@
 				ZABBIX.Dashboard.on(DASHBOARD_EVENT_EDIT, () => this.#edit());
 				ZABBIX.Dashboard.on(DASHBOARD_EVENT_APPLY_PROPERTIES, () => this.#applyProperties());
 
-				if (CWidgetsData.DATA_TYPE_HOST_ID in broadcast_requirements
-						|| CWidgetsData.DATA_TYPE_HOST_IDS in broadcast_requirements) {
-					jQuery('#dashboard_hostid').on('change', this.#listeners.onDashboardHostChange);
+				jQuery('#dashboard_hostid').on('change', () => this.#onDashboardHostChange());
 
+				if (dashboard.dashboardid !== null && !clone) {
 					window.addEventListener('popstate', e => this.#onPopState(e));
 				}
 
 				jQuery.subscribe('timeselector.rangeupdate', (e, data) => this.#onTimeSelectorRangeUpdate(e, data));
 
-				if (CWidgetsData.DATA_TYPE_TIME_PERIOD in broadcast_requirements) {
+				if (ZABBIX.Dashboard.isReferred(CWidgetsData.DATA_TYPE_TIME_PERIOD)) {
 					this.#showTimeSelector();
+				}
+
+				if (ZABBIX.Dashboard.isReferred(CWidgetsData.DATA_TYPE_HOST_ID)
+						|| ZABBIX.Dashboard.isReferred(CWidgetsData.DATA_TYPE_HOST_IDS)) {
+					this.#showHostOverride();
 				}
 
 				if (dashboard.dashboardid === null || clone) {
@@ -183,7 +185,7 @@
 							this.#edit();
 						});
 
-					this.#updateHistory(false);
+					this.#updateHistory({add_new: false});
 				}
 			}
 
@@ -199,23 +201,21 @@
 		}
 
 		#edit() {
-			if (CWidgetsData.DATA_TYPE_HOST_ID in this.#broadcast_requirements
-					|| CWidgetsData.DATA_TYPE_HOST_IDS in this.#broadcast_requirements) {
-				jQuery('#dashboard_hostid').off('change', this.#listeners.onDashboardHostChange);
-			}
-
-			if (!(CWidgetsData.DATA_TYPE_TIME_PERIOD in this.#broadcast_requirements)) {
+			if (!ZABBIX.Dashboard.isReferred(CWidgetsData.DATA_TYPE_TIME_PERIOD)) {
 				this.#showTimeSelector();
 				this.#toggleTimeSelector(false);
 			}
 
+			if (!ZABBIX.Dashboard.isReferred(CWidgetsData.DATA_TYPE_HOST_ID)
+					&& !ZABBIX.Dashboard.isReferred(CWidgetsData.DATA_TYPE_HOST_IDS)) {
+				this.#showHostOverride();
+				this.#toggleHostOverride(false);
+			}
+
 			clearMessages();
 
-			document
-				.querySelectorAll('#dashboard-control > li')
-				.forEach((el) => {
-					el.style.display = (el.nextElementSibling === null) ? '' : 'none';
-				});
+			document.querySelector('#dashboard-control .js-control-view-actions').style.display = 'none';
+			document.querySelector('#dashboard-control .js-control-edit-actions').style.display = '';
 
 			document
 				.getElementById('dashboard-config')
@@ -363,7 +363,7 @@
 			document.getElementById('dashboard-save').disabled = do_disable;
 		}
 
-		#updateHistory(is_new = true)  {
+		#updateHistory({add_new})  {
 			const curl = new Curl('zabbix.php');
 
 			curl.setArgument('action', 'dashboard.view');
@@ -371,8 +371,8 @@
 
 			const state = {};
 
-			if (CWidgetsData.DATA_TYPE_HOST_ID in this.#broadcast_requirements
-					|| CWidgetsData.DATA_TYPE_HOST_IDS in this.#broadcast_requirements) {
+			if (ZABBIX.Dashboard.isReferred(CWidgetsData.DATA_TYPE_HOST_ID)
+					|| ZABBIX.Dashboard.isReferred(CWidgetsData.DATA_TYPE_HOST_IDS)) {
 				const hosts = jQuery('#dashboard_hostid').multiSelect('getData');
 
 				if (hosts.length > 0) {
@@ -382,7 +382,7 @@
 				}
 			}
 
-			if (CWidgetsData.DATA_TYPE_TIME_PERIOD in this.#broadcast_requirements) {
+			if (ZABBIX.Dashboard.isReferred(CWidgetsData.DATA_TYPE_TIME_PERIOD)) {
 				curl.setArgument('from', this.#dashboard_time_period.from);
 				curl.setArgument('to', this.#dashboard_time_period.to);
 			}
@@ -393,7 +393,7 @@
 				curl.setArgument('page', page);
 			}
 
-			if (is_new) {
+			if (add_new) {
 				history.pushState(state, '', curl.getUrl());
 			}
 			else {
@@ -440,6 +440,14 @@
 						button.disabled = true;
 					}
 				});
+		}
+
+		#showHostOverride() {
+			document.querySelector('#dashboard-control .js-control-host-override').style.display = '';
+		}
+
+		#toggleHostOverride(enable) {
+			jQuery('#dashboard_hostid').multiSelect(enable ? 'enable' : 'disable');
 		}
 
 		#enableNavigationWarning() {
@@ -495,12 +503,32 @@
 			});
 		}
 
+		#onDashboardHostChange() {
+			if (this.#dashboard.dashboardid !== null && !this.#clone) {
+				this.#updateHistory({add_new: !ZABBIX.Dashboard.isEditMode()});
+			}
+
+			const hosts = jQuery('#dashboard_hostid').multiSelect('getData');
+			const host = hosts.length > 0 ? hosts[0] : null;
+
+			ZABBIX.Dashboard.broadcast({
+				[CWidgetsData.DATA_TYPE_HOST_ID]: host !== null
+					? [host.id]
+					: CWidgetsData.getDefault(CWidgetsData.DATA_TYPE_HOST_ID),
+				[CWidgetsData.DATA_TYPE_HOST_IDS]: host !== null
+					? [host.id]
+					: CWidgetsData.getDefault(CWidgetsData.DATA_TYPE_HOST_IDS)
+			});
+
+			updateUserProfile('web.dashboard.hostid', host !== null ? host.id : 1, []);
+		}
+
 		#onPopState(e) {
 			const host = (e.state !== null && 'host' in e.state) ? e.state.host : null;
 
 			jQuery('#dashboard_hostid').multiSelect('addData', host ? [host] : [], false);
 
-			this.#updateHistory(false);
+			this.#updateHistory({add_new: false});
 
 			ZABBIX.Dashboard.broadcast({
 				[CWidgetsData.DATA_TYPE_HOST_ID]: host !== null
@@ -516,7 +544,7 @@
 			this.#dashboard_time_period = data;
 
 			if (this.#dashboard.dashboardid !== null && !this.#clone) {
-				this.#updateHistory(false);
+				this.#updateHistory({add_new: false});
 			}
 
 			if (this.#skip_time_selector_range_update) {
@@ -540,15 +568,44 @@
 		}
 
 		#onReferredUpdate(e) {
-			if (e.detail.type === CWidgetsData.DATA_TYPE_TIME_PERIOD) {
-				if (this.#time_selector_toggle_timeout !== null) {
-					clearTimeout(this.#time_selector_toggle_timeout);
-				}
+			switch (e.detail.type) {
+				case CWidgetsData.DATA_TYPE_TIME_PERIOD:
+					if (this.#time_selector_toggle_timeout !== null) {
+						clearTimeout(this.#time_selector_toggle_timeout);
+					}
 
-				this.#time_selector_toggle_timeout = setTimeout(() => {
-					this.#time_selector_toggle_timeout = null;
-					this.#toggleTimeSelector(e.detail.is_referred);
-				});
+					this.#time_selector_toggle_timeout = setTimeout(() => {
+						this.#time_selector_toggle_timeout = null;
+
+						if (this.#dashboard.dashboardid !== null && !this.#clone) {
+							this.#updateHistory({add_new: false});
+						}
+
+						this.#toggleTimeSelector(e.detail.is_referred);
+					});
+
+					break;
+
+				case CWidgetsData.DATA_TYPE_HOST_ID:
+				case CWidgetsData.DATA_TYPE_HOST_IDS:
+					if (this.#host_override_toggle_timeout !== null) {
+						clearTimeout(this.#host_override_toggle_timeout);
+					}
+
+					this.#host_override_toggle_timeout = setTimeout(() => {
+						this.#host_override_toggle_timeout = null;
+
+						if (this.#dashboard.dashboardid !== null && !this.#clone) {
+							this.#updateHistory({add_new: !ZABBIX.Dashboard.isEditMode()});
+						}
+
+						this.#toggleHostOverride(
+							ZABBIX.Dashboard.isReferred(CWidgetsData.DATA_TYPE_HOST_ID)
+								|| ZABBIX.Dashboard.isReferred(CWidgetsData.DATA_TYPE_HOST_IDS)
+						);
+					});
+
+					break;
 			}
 		}
 
@@ -564,24 +621,6 @@
 		}
 
 		#listeners = {
-			onDashboardHostChange: () => {
-				this.#updateHistory();
-
-				const hosts = jQuery('#dashboard_hostid').multiSelect('getData');
-				const host = hosts.length > 0 ? hosts[0] : null;
-
-				ZABBIX.Dashboard.broadcast({
-					[CWidgetsData.DATA_TYPE_HOST_ID]: host !== null
-						? [host.id]
-						: CWidgetsData.getDefault(CWidgetsData.DATA_TYPE_HOST_ID),
-					[CWidgetsData.DATA_TYPE_HOST_IDS]: host !== null
-						? [host.id]
-						: CWidgetsData.getDefault(CWidgetsData.DATA_TYPE_HOST_IDS)
-				});
-
-				updateUserProfile('web.dashboard.hostid', host !== null ? host.id : 1, []);
-			},
-
 			onBeforeUnload: e => {
 				if (ZABBIX.Dashboard.isUnsaved()) {
 					// Display confirmation message.

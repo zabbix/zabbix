@@ -888,8 +888,12 @@ static int	condition_match_metric_value(const char *pattern, const char *value)
 static int	prometheus_metric_parse_labels(const char *data, size_t pos, zbx_vector_prometheus_label_t *labels,
 		zbx_strloc_t *loc, char **error)
 {
+#define PROMETHEUS_LABEL_NUM_RESERVE	2
+
 	zbx_strloc_t		loc_key, loc_value, loc_op;
 	zbx_prometheus_label_t	*label;
+
+	zbx_vector_prometheus_label_reserve(labels, PROMETHEUS_LABEL_NUM_RESERVE);
 
 	pos = skip_spaces(data, pos + 1);
 	loc->l = pos;
@@ -933,6 +937,8 @@ static int	prometheus_metric_parse_labels(const char *data, size_t pos, zbx_vect
 	loc->r = pos;
 
 	return SUCCEED;
+
+#undef PROMETHEUS_LABEL_NUM_RESERVE
 }
 
 /******************************************************************************
@@ -1945,12 +1951,13 @@ int	zbx_prometheus_pattern_ex(zbx_prometheus_t *prom, const char *filter_data, c
 	zbx_vector_prometheus_row_create(&rows);
 
 	if (SUCCEED != prometheus_validate_request(request, output, error))
-		return FAIL;
+		goto cleanup;
 
-	if (SUCCEED != prometheus_get_indexed_rows_by_label(prom, &filter, &prows) || NULL == prows)
+	if (SUCCEED != prometheus_get_indexed_rows_by_label(prom, &filter, &prows))
 		prows = &prom->rows;
 
-	prometheus_filter_rows(prows, &filter, &rows);
+	if (NULL != prows)
+		prometheus_filter_rows(prows, &filter, &rows);
 
 	if (FAIL == (ret = prometheus_query_rows(&rows, request, output, value, &errmsg)))
 	{
@@ -1958,6 +1965,7 @@ int	zbx_prometheus_pattern_ex(zbx_prometheus_t *prom, const char *filter_data, c
 		zbx_free(errmsg);
 	}
 
+cleanup:
 	prometheus_filter_clear(&filter);
 	zbx_vector_prometheus_row_destroy(&rows);
 out:
@@ -2001,7 +2009,7 @@ int	zbx_prometheus_pattern(const char *data, const char *filter_data, const char
 	zbx_vector_prometheus_row_create(&rows);
 
 	if (SUCCEED != prometheus_validate_request(request, output, error))
-		return FAIL;
+		goto cleanup;
 
 	if (FAIL == prometheus_parse_rows(&filter, data, &rows, NULL, error))
 		goto cleanup;
@@ -2103,7 +2111,7 @@ static void	prometheus_to_json(zbx_vector_prometheus_row_t *rows, zbx_hashset_t 
  ******************************************************************************/
 int	zbx_prometheus_to_json_ex(zbx_prometheus_t *prom, const char *filter_data, char **value, char **error)
 {
-	zbx_vector_prometheus_row_t	rows;
+	zbx_vector_prometheus_row_t	rows, *prows;
 	zbx_prometheus_filter_t		filter;
 	char				*errmsg = NULL;
 	int				ret = FAIL;
@@ -2119,7 +2127,11 @@ int	zbx_prometheus_to_json_ex(zbx_prometheus_t *prom, const char *filter_data, c
 
 	zbx_vector_prometheus_row_create(&rows);
 
-	prometheus_filter_rows(&prom->rows, &filter, &rows);
+	if (SUCCEED != prometheus_get_indexed_rows_by_label(prom, &filter, &prows))
+		prows = &prom->rows;
+
+	if (NULL != prows)
+		prometheus_filter_rows(prows, &filter, &rows);
 
 	prometheus_to_json(&rows, &prom->hints, value);
 	zbx_vector_prometheus_row_destroy(&rows);
@@ -2207,7 +2219,3 @@ int	zbx_prometheus_validate_label(const char *label)
 
 	return SUCCEED;
 }
-
-#ifdef HAVE_TESTS
-#	include "../../../tests/libs/zbxprometheus/prometheus_test.c"
-#endif

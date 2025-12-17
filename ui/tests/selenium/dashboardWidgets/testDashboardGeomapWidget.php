@@ -20,6 +20,8 @@ require_once __DIR__.'/../behaviors/CMessageBehavior.php';
 /**
  * @backup settings, widget
  *
+ * @dataSource HostAvailabilityWidget
+ *
  * @onBefore prepareDashboardData
  */
 class testDashboardGeomapWidget extends testWidgets {
@@ -138,12 +140,11 @@ class testDashboardGeomapWidget extends testWidgets {
 
 		$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
 		$this->assertEquals('Add widget', $dialog->getTitle());
-		$form->fill(['Type' => 'Geomap']);
-		$dialog->waitUntilReady();
-		$this->assertEquals(['Type', 'Show header', 'Name', 'Refresh interval', 'Host groups', 'Hosts', 'Tags', 'Initial view'],
-				$form->getLabels()->asText()
+		$form->fill(['Type' => CFormElement::RELOADABLE_FILL('Geomap')]);
+		$this->assertEquals(['Type', 'Show header', 'Name', 'Refresh interval', 'Host groups', 'Hosts', 'Tags',
+				'Initial view', 'Clustering'], $form->getLabels()->asText()
 		);
-		$form->checkValue(['id:show_header' => true, 'Refresh interval' => 'Default (1 minute)']);
+		$form->checkValue(['Show header' => true, 'Refresh interval' => 'Default (1 minute)']);
 
 		// Check fields' lengths and placeholders.
 		foreach (['Name', 'Initial view'] as $field) {

@@ -22,7 +22,7 @@ require_once __DIR__.'/../../include/helpers/CDataHelper.php';
 /**
  * @backup profiles
  *
- * @dataSource TagFilter, UserPermissions, WidgetCommunication, DynamicItemWidgets
+ * @dataSource TagFilter, UserPermissions, WidgetCommunication, DynamicItemWidgets, MonitoringOverview
  */
 class testPageMonitoringHosts extends CWebTest {
 
@@ -377,6 +377,15 @@ class testPageMonitoringHosts extends CWebTest {
 						'Not available host in maintenance',
 						'Unknown host in maintenance'
 					]
+				]
+			],
+			// #20.
+			[
+				[
+					'filter' => [
+						'Name' => '   '
+					],
+					'expected' => ['Multiple spaces in host name']
 				]
 			]
 		];

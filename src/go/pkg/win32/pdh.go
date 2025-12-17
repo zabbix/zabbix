@@ -20,6 +20,7 @@ package win32
 import (
 	"errors"
 	"fmt"
+	"runtime"
 	"sync"
 	"syscall"
 	"time"
@@ -80,14 +81,20 @@ type Instance struct {
 }
 
 func PdhOpenQuery(dataSource *string, userData uintptr) (query PDH_HQUERY, err error) {
-	var source uintptr
+	var (
+		wcharSource []uint16
+		source      uintptr
+	)
+
 	if dataSource != nil {
-		wcharSource := windows.StringToUTF16(*dataSource)
-		source = uintptr(unsafe.Pointer(&wcharSource[0]))
+		wcharSource = windows.StringToUTF16(*dataSource)
+		source = uintptr(unsafe.Pointer(&wcharSource[0])) // safe usage due to runtime.KeepAlive(wcharSource)
 	}
+
 	pdhMu.RLock()
 	defer pdhMu.RUnlock()
 	ret, _, _ := syscall.Syscall(pdhOpenQuery, 3, source, userData, uintptr(unsafe.Pointer(&query)))
+	runtime.KeepAlive(wcharSource)
 
 	if syscall.Errno(ret) != windows.ERROR_SUCCESS {
 		return 0, newPdhError(ret)
@@ -200,17 +207,16 @@ func PdhRemoveCounter(counter PDH_HCOUNTER) (err error) {
 
 func PdhParseCounterPath(path string) (elements *PDH_COUNTER_PATH_ELEMENTS, err error) {
 	wPath := windows.StringToUTF16(path)
-	ptrPath := uintptr(unsafe.Pointer(&wPath[0]))
 	var size uint32
 	pdhMu.RLock()
 	defer pdhMu.RUnlock()
-	ret, _, _ := syscall.Syscall6(pdhParseCounterPath, 4, ptrPath, 0, uintptr(unsafe.Pointer(&size)), 0, 0, 0)
+	ret, _, _ := syscall.Syscall6(pdhParseCounterPath, 4, uintptr(unsafe.Pointer(&wPath[0])), 0, uintptr(unsafe.Pointer(&size)), 0, 0, 0)
 	if ret != PDH_MORE_DATA && syscall.Errno(ret) != windows.ERROR_SUCCESS {
 		return nil, newPdhError(ret)
 	}
 
 	buf := make([]uint16, size/2)
-	ret, _, _ = syscall.Syscall6(pdhParseCounterPath, 4, ptrPath, uintptr(unsafe.Pointer(&buf[0])),
+	ret, _, _ = syscall.Syscall6(pdhParseCounterPath, 4, uintptr(unsafe.Pointer(&wPath[0])), uintptr(unsafe.Pointer(&buf[0])),
 		uintptr(unsafe.Pointer(&size)), 0, 0, 0)
 	if syscall.Errno(ret) != windows.ERROR_SUCCESS {
 		return nil, newPdhError(ret)
@@ -268,10 +274,9 @@ func PdhEnumObjectItems(objectName string) (instances []Instance, err error) {
 	if err != nil {
 		return nil, err
 	}
-	ptrNameUTF16 := uintptr(unsafe.Pointer(&nameUTF16[0]))
 
 	ret, _, _ := syscall.Syscall9(pdhEnumObjectItems, 9, 0, 0,
-		ptrNameUTF16, 0, uintptr(unsafe.Pointer(&counterListSize)), 0,
+		uintptr(unsafe.Pointer(&nameUTF16[0])), 0, uintptr(unsafe.Pointer(&counterListSize)), 0,
 		uintptr(unsafe.Pointer(&instanceListSize)), uintptr(PERF_DETAIL_WIZARD), 0)
 	if ret != PDH_MORE_DATA {
 		if syscall.Errno(ret) == windows.ERROR_SUCCESS {
@@ -279,7 +284,6 @@ func PdhEnumObjectItems(objectName string) (instances []Instance, err error) {
 		}
 		return nil, newPdhError(ret)
 	}
-	var instptr uintptr
 	var instbuf []uint16
 
 	if counterListSize < 1 {
@@ -294,10 +298,16 @@ func PdhEnumObjectItems(objectName string) (instances []Instance, err error) {
 		}
 
 		instbuf = make([]uint16, instanceListSize)
-		instptr = uintptr(unsafe.Pointer(&instbuf[0]))
 
-		ret, _, _ = syscall.Syscall9(pdhEnumObjectItems, 9, 0, 0, ptrNameUTF16, uintptr(unsafe.Pointer(&counterbuf[0])),
-			uintptr(unsafe.Pointer(&counterListSize)), instptr, uintptr(unsafe.Pointer(&instanceListSize)),
+		ret, _, _ = syscall.SyscallN(
+			pdhEnumObjectItems,
+			0,
+			0,
+			uintptr(unsafe.Pointer(&nameUTF16[0])),
+			uintptr(unsafe.Pointer(&counterbuf[0])),
+			uintptr(unsafe.Pointer(&counterListSize)),
+			uintptr(unsafe.Pointer(&instbuf[0])),
+			uintptr(unsafe.Pointer(&instanceListSize)),
 			uintptr(PERF_DETAIL_WIZARD), 0)
 		if ret == PDH_MORE_DATA {
 			continue

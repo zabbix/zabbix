@@ -268,13 +268,13 @@ void	zbx_timekeeper_free(zbx_timekeeper_t *timekeeper)
  *           once per half timekeeper delay interval.                         *
  *                                                                            *
  ******************************************************************************/
-void	zbx_timekeeper_update(zbx_timekeeper_t *timekeeper, int index, unsigned char state)
+zbx_uint64_t	zbx_timekeeper_update(zbx_timekeeper_t *timekeeper, int index, unsigned char state)
 {
 	zbx_timekeeper_unit_t	*unit;
-	clock_t			ticks;
+	clock_t			ticks, elapsed;
 
 	if (0 > index || index >= timekeeper->units_num)
-		return;
+		return 0;
 
 	unit = timekeeper->units + index;
 
@@ -282,7 +282,7 @@ void	zbx_timekeeper_update(zbx_timekeeper_t *timekeeper, int index, unsigned cha
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot get process times: %s", zbx_strerror(errno));
 		unit->cache.state = state;
-		return;
+		return 0;
 	}
 
 	if (0 == unit->cache.ticks_flush)
@@ -290,11 +290,12 @@ void	zbx_timekeeper_update(zbx_timekeeper_t *timekeeper, int index, unsigned cha
 		unit->cache.ticks_flush = ticks;
 		unit->cache.state = state;
 		unit->cache.ticks = ticks;
-		return;
+		return 0;
 	}
 
 	/* update process statistics in local cache */
-	unit->cache.counter[unit->cache.state] += (zbx_uint64_t)(ticks - unit->cache.ticks);
+	elapsed = (ticks - unit->cache.ticks);
+	unit->cache.counter[unit->cache.state] += (zbx_uint64_t)elapsed;
 
 	if (ZBX_TIMEKEEPER_FLUSH_DELAY < (double)(ticks - unit->cache.ticks_flush) / (double)timekeeper->ticks_per_sec)
 	{
@@ -326,6 +327,8 @@ void	zbx_timekeeper_update(zbx_timekeeper_t *timekeeper, int index, unsigned cha
 	/* update local timekeeper cache */
 	unit->cache.state = state;
 	unit->cache.ticks = ticks;
+
+	return (zbx_uint64_t)((double)(elapsed * 1000) / (double)timekeeper->ticks_per_sec);
 }
 
 /******************************************************************************

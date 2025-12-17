@@ -29,10 +29,6 @@ use Widgets\SvgGraph\Includes\{
 
 $form = new CWidgetFormView($data);
 
-$preview = (new CDiv())
-	->addClass(ZBX_STYLE_SVG_GRAPH_PREVIEW)
-	->addItem((new CDiv())->setId('svg-graph-preview'));
-
 $form_tabs = (new CTabView())
 	->addTab('data_set', _('Data set'), getDatasetTab($form, $data['fields']),
 		TAB_INDICATOR_GRAPH_DATASET
@@ -59,7 +55,7 @@ $form_tabs = (new CTabView())
 	->setSelected(0);
 
 $form
-	->addItem([$preview, $form_tabs])
+	->addItem($form_tabs)
 	->addJavaScript($form_tabs->makeJavascript())
 	->includeJsFile('widget.edit.js.php')
 	->initFormJs('widget_form.init('.json_encode([

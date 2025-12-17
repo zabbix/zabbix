@@ -17,21 +17,23 @@
 
 window.service_edit_popup = new class {
 
-	init({tabs_id, serviceid, children, children_problem_tags_html, problem_tags, status_rules, search_limit}) {
-		this.#initTemplates();
-
+	init({rules, tabs_id, serviceid, children, children_problem_tags_html, problem_tags, status_rules, search_limit}) {
 		this.serviceid = serviceid;
-
 		this.search_limit = search_limit;
-
 		this.overlay = overlays_stack.getById('service.edit');
 		this.dialogue = this.overlay.$dialogue[0];
-		this.form = this.overlay.$dialogue.$body[0].querySelector('form');
+		this.form_element = this.overlay.$dialogue.$body[0].querySelector('form');
+		this.form = new CForm(this.form_element, rules);
 		this.footer = this.overlay.$dialogue.$footer[0];
+		this.status_rules = status_rules;
 
 		const return_url = new URL('zabbix.php', location.href);
+
 		return_url.searchParams.set('action', 'service.list');
 		ZABBIX.PopupManager.setReturnUrl(return_url.href);
+
+		this.status_rule_template = new Template(this.form_element.querySelector('#status-rule-tmpl').innerHTML);
+		this.child_template = new Template(this.form_element.querySelector('#child-service-tmpl').innerHTML);
 
 		for (const status_rule of status_rules) {
 			this.#addStatusRule(status_rule);
@@ -50,7 +52,6 @@ window.service_edit_popup = new class {
 		this.#filterChildren();
 
 		// Setup parent services.
-
 		jQuery('#parent_serviceids_')
 			.multiSelect('getSelectButton')
 			.addEventListener('click', () => {
@@ -58,21 +59,26 @@ window.service_edit_popup = new class {
 			});
 
 		// Setup problem tags.
-
 		const $problem_tags = jQuery(document.getElementById('problem_tags'));
 
 		$problem_tags.dynamicRows({
 			template: '#problem-tag-row-tmpl',
 			allow_empty: true,
-			rows: problem_tags,
+			rows: problem_tags
 		});
 
-		$problem_tags.on('tableupdate.dynamicRows', () => this.#update());
+		const table = document.getElementById('problem_tags');
 
-		document.getElementById('problem_tags').addEventListener('change', () => this.#update());
+		table.addEventListener('click', e => {
+			if (['element-table-add', 'element-table-remove'].some(cls => e.target.classList.contains(cls))) {
+				this.form.validateSubmit(this.form.getAllValues());
+				this.#update();
+			}
+		});
+
+		table.addEventListener('change', () => this.#update());
 
 		// Setup service rules.
-
 		document
 			.getElementById('status_rules')
 			.addEventListener('click', (e) => {
@@ -83,12 +89,12 @@ window.service_edit_popup = new class {
 					this.#editStatusRule(e.target.closest('tr'));
 				}
 				else if (e.target.classList.contains('js-remove')) {
+					e.target.closest('tr').nextSibling.remove();
 					e.target.closest('tr').remove();
 				}
 			});
 
 		// Setup tags tab.
-
 		const tabs = jQuery('#' + tabs_id);
 
 		const initialize_tags = (event, ui) => {
@@ -98,7 +104,7 @@ window.service_edit_popup = new class {
 				const $tags = $panel.find('.tags-table');
 
 				$tags
-					.dynamicRows({template: '#tag-row-tmpl', allow_empty: true})
+					.dynamicRows({template: '#tag-row-tmpl', allow_empty: true, remove_next_sibling: true})
 					.on('afteradd.dynamicRows', () => {
 						$tags
 							.find('.<?= ZBX_STYLE_TEXTAREA_FLEXIBLE ?>')
@@ -114,7 +120,6 @@ window.service_edit_popup = new class {
 		tabs.on('tabscreate tabsactivate', initialize_tags);
 
 		// Setup child services.
-
 		document
 			.getElementById('children-filter')
 			.addEventListener('click', (e) => {
@@ -148,7 +153,6 @@ window.service_edit_popup = new class {
 			});
 
 		// Update form field state according to the form data.
-
 		for (const id of ['propagation_rule', 'algorithm']) {
 			document.getElementById(id).addEventListener('change', () => this.#update());
 		}
@@ -156,40 +160,6 @@ window.service_edit_popup = new class {
 		this.#update();
 
 		new CFormFieldsetCollapsible(document.getElementById('advanced-configuration'));
-	}
-
-	#initTemplates() {
-		this.status_rule_template = new Template(`
-			<tr data-row_index="#{row_index}">
-				<td>
-					#{*name}
-					<input type="hidden" id="status_rules_#{row_index}_new_status" name="status_rules[#{row_index}][new_status]" value="#{new_status}">
-					<input type="hidden" id="status_rules_#{row_index}_type" name="status_rules[#{row_index}][type]" value="#{type}">
-					<input type="hidden" id="status_rules_#{row_index}_limit_value" name="status_rules[#{row_index}][limit_value]" value="#{limit_value}">
-					<input type="hidden" id="status_rules_#{row_index}_limit_status" name="status_rules[#{row_index}][limit_status]" value="#{limit_status}">
-				</td>
-				<td>
-					<ul class="<?= ZBX_STYLE_HOR_LIST ?>">
-						<li>
-							<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?> js-edit"><?= _('Edit') ?></button>
-						</li>
-						<li>
-							<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?> js-remove"><?= _('Remove') ?></button>
-						</li>
-					</ul>
-				</td>
-			</tr>
-		`);
-
-		this.child_template = new Template(`
-			<tr data-serviceid="#{serviceid}">
-				<td class="<?= ZBX_STYLE_WORDWRAP ?>" style="max-width: <?= ZBX_TEXTAREA_BIG_WIDTH ?>px;">#{name}</td>
-				<td class="<?= ZBX_STYLE_WORDWRAP ?>">#{*problem_tags_html}</td>
-				<td>
-					<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?> js-remove"><?= _('Remove') ?></button>
-				</td>
-			</tr>
-		`);
 	}
 
 	#update() {
@@ -208,12 +178,11 @@ window.service_edit_popup = new class {
 		document
 			.getElementById('problem_tags')
 			.querySelectorAll('.js-problem-tag-input, .element-table-remove, .element-table-add')
-			.forEach((element) => {
-				element.disabled = this.children.size > 0;
-			});
+			.forEach(element => element.disabled = this.children.size > 0);
 
-		document.getElementById('algorithm-not-applicable-warning').style.display =
-			this.children.size > 0 ? 'none' : '';
+		document.getElementById('algorithm-not-applicable-warning').style.display = this.children.size > 0
+			? 'none'
+			: '';
 
 		switch (propagation_rule) {
 			case '<?= ZBX_SERVICE_STATUS_PROPAGATION_INCREASE ?>':
@@ -236,6 +205,7 @@ window.service_edit_popup = new class {
 		}
 
 		document.querySelector('#children .js-add').disabled = has_problem_tags;
+		this.form.validateChanges(['problem_tags']);
 	}
 
 	#editStatusRule(row = null) {
@@ -285,8 +255,16 @@ window.service_edit_popup = new class {
 	}
 
 	#updateStatusRule(row, status_rule) {
+		this.#removeErrorContainer(row);
 		row.insertAdjacentHTML('afterend', this.status_rule_template.evaluate(status_rule));
 		row.remove();
+	}
+
+	#removeErrorContainer(row) {
+		const error_row = row.parentElement
+			.querySelector(`#additional_rules_error_container_${row.getAttribute('data-row_index')}`);
+
+		error_row.parentElement.remove();
 	}
 
 	#renderChild(service) {
@@ -300,7 +278,7 @@ window.service_edit_popup = new class {
 	}
 
 	#removeChild(serviceid) {
-		const child = this.form.querySelector(`#children tbody tr[data-serviceid="${serviceid}"]`);
+		const child = this.form_element.querySelector(`#children tbody tr[data-serviceid="${serviceid}"]`);
 
 		if (child !== null) {
 			child.remove();
@@ -323,12 +301,11 @@ window.service_edit_popup = new class {
 
 	#filterChildren() {
 		const container = document.querySelector('#children tbody');
-
-		container.innerHTML = '';
-
 		const filter_name = document.getElementById('children-filter-name').value.toLowerCase();
 
 		let count = 0;
+
+		container.innerHTML = '';
 
 		for (const service of this.children.values()) {
 			if (!service.name.toLowerCase().includes(filter_name)) {
@@ -348,7 +325,6 @@ window.service_edit_popup = new class {
 
 	#updateChildrenFilterStats() {
 		const container = document.querySelector('#children tbody');
-
 		const stats_template = <?= json_encode(_('Displaying %1$s of %2$s found')) ?>;
 
 		document.querySelector('#children tfoot .inline-filter-stats').textContent = this.children.size > 0
@@ -369,7 +345,7 @@ window.service_edit_popup = new class {
 			exclude_serviceids.push(this.serviceid);
 		}
 
-		for (const input of this.form.querySelectorAll('#children tbody input')) {
+		for (const input of this.form_element.querySelectorAll('#children tbody input')) {
 			exclude_serviceids.push(input.value);
 		}
 
@@ -419,8 +395,10 @@ window.service_edit_popup = new class {
 		});
 	}
 
-	clone({title, buttons}) {
+	clone({title, buttons, rules}) {
 		this.serviceid = null;
+
+		this.form.reload(rules);
 
 		this.#removeAllChildren();
 
@@ -434,50 +412,62 @@ window.service_edit_popup = new class {
 		this.overlay.setLoading();
 
 		const curl = new Curl('zabbix.php');
+
 		curl.setArgument('action', 'service.delete');
 		curl.setArgument(CSRF_TOKEN_NAME, <?= json_encode(CCsrfTokenHelper::get('service')) ?>);
 
-		this.#post(curl.getUrl(), {serviceids: [this.serviceid]}, (response) => {
-			overlayDialogueDestroy(this.overlay.dialogueid);
-
-			this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response}));
+		this.#post(curl.getUrl(), {serviceids: [this.serviceid]}, response => {
+			if ('form_errors' in response) {
+				this.form.setErrors(response.form_errors, true, true);
+				this.form.renderErrors();
+			}
+			else if ('error' in response) {
+				throw {error: response.error};
+			}
+			else {
+				overlayDialogueDestroy(this.overlay.dialogueid);
+				this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response}));
+			}
 		});
 	}
 
 	submit() {
-		const fields = getFormFields(this.form);
+		const fields = this.form.getAllValues();
 
-		if (this.serviceid !== null) {
-			fields.serviceid = this.serviceid;
-		}
-
-		fields.name = fields.name.trim();
 		fields.child_serviceids = [...this.children.keys()];
-
-		if ('tags' in fields) {
-			for (const tag of Object.values(fields.tags)) {
-				tag.tag = tag.tag.trim();
-				tag.value = tag.value.trim();
-			}
+		if (fields.child_serviceids.length) {
+			delete fields.problem_tags;
 		}
 
-		if ('problem_tags' in fields) {
-			for (const problem_tag of Object.values(fields.problem_tags)) {
-				problem_tag.tag = problem_tag.tag.trim();
-				problem_tag.value = problem_tag.value.trim();
-			}
-		}
-
+		this.overlay.$dialogue.find('.msg-bad').remove();
 		this.overlay.setLoading();
 
 		const curl = new Curl('zabbix.php');
+
 		curl.setArgument('action', this.serviceid !== null ? 'service.update' : 'service.create');
 
-		this.#post(curl.getUrl(), fields, (response) => {
-			overlayDialogueDestroy(this.overlay.dialogueid);
+		this.form.validateSubmit(fields)
+			.then(result => {
+				this.overlay.unsetLoading();
 
-			this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response}));
-		});
+				if (!result) {
+					return;
+				}
+
+				this.#post(curl.getUrl(), fields, response => {
+					if ('form_errors' in response) {
+						this.form.setErrors(response.form_errors, true, true);
+						this.form.renderErrors();
+					}
+					else if ('error' in response) {
+						throw {error: response.error};
+					}
+					else {
+						overlayDialogueDestroy(this.overlay.dialogueid);
+						this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response}));
+					}
+				});
+			});
 	}
 
 	#post(url, data, success_callback) {
@@ -486,17 +476,10 @@ window.service_edit_popup = new class {
 			headers: {'Content-Type': 'application/json'},
 			body: JSON.stringify(data)
 		})
-			.then((response) => response.json())
-			.then((response) => {
-				if ('error' in response) {
-					throw {error: response.error};
-				}
-
-				return response;
-			})
+			.then(response => response.json())
 			.then(success_callback)
-			.catch((exception) => {
-				for (const element of this.form.parentNode.children) {
+			.catch(exception => {
+				for (const element of this.form_element.parentNode.children) {
 					if (element.matches('.msg-good, .msg-bad, .msg-warning')) {
 						element.parentNode.removeChild(element);
 					}
@@ -514,10 +497,8 @@ window.service_edit_popup = new class {
 
 				const message_box = makeMessageBox('bad', messages, title)[0];
 
-				this.form.parentNode.insertBefore(message_box, this.form);
+				this.form_element.parentNode.insertBefore(message_box, this.form_element);
 			})
-			.finally(() => {
-				this.overlay.unsetLoading();
-			});
+			.finally(() => this.overlay.unsetLoading());
 	}
-};
+}

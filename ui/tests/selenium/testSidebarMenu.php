@@ -345,6 +345,7 @@ class testSidebarMenu extends CWebTest {
 			foreach ($data['third_level'] as $third_level) {
 				$submenu->parents('tag:li')->query('xpath://ul/li/a[text()="'.$third_level.'"]')
 						->waitUntilClickable()->one()->click();
+				$this->page->waitUntilReady();
 				$this->assertTrue($this->query('xpath://li[contains(@class, "is-selected")]/a[text()="'.
 						$data['page'].'"]')->exists());
 				$this->page->assertHeader(($third_level === 'Other') ? 'Other configuration parameters' : $third_level);
@@ -352,6 +353,7 @@ class testSidebarMenu extends CWebTest {
 			}
 		}
 		else {
+			$this->page->waitUntilReady();
 			$this->page->assertHeader((array_key_exists('header', $data)) ? $data['header'] : $data['page']);
 		}
 	}
@@ -439,7 +441,8 @@ class testSidebarMenu extends CWebTest {
 					'" and @href="'.$data['link'].'"]')->one()->isVisible());
 		}
 		else {
-			$this->query('xpath://ul[@class="menu-user"]//a[text()="'.$data['section'].'"]')->one()->click();
+			$this->query('xpath://ul[@class="menu-user"]//a[text()="'.$data['section'].'"]')->one()->click()->waitUntilStalled();
+			$this->page->waitUntilReady();
 			$this->page->assertTitle('Zabbix');
 		}
 	}

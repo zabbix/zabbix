@@ -31,7 +31,7 @@ class ScimApiClient extends CLocalApiClient {
 	 */
 	protected function isValidApi($api) {
 		if (!$this->serviceFactory->hasObject($api)) {
-			throw new Exception('The requested endpoint is not supported.', 501);
+			throw new Exception(sprintf('The requested endpoint "%1$s" is not supported.', $api), 501);
 		}
 
 		return true;

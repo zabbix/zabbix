@@ -39,6 +39,7 @@ typedef struct
 	/* Normally allocator forces exit when it runs out of allocatable memory. */
 	/* Set this flag to 1 to allow execution in out of memory situations.     */
 	char		allow_oom;
+	void		(*unlock_shmem_on_oom)(void);
 
 	const char	*mem_descr;
 	const char	*mem_param;

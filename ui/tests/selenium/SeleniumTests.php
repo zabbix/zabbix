@@ -42,6 +42,7 @@ require_once __DIR__.'/authentication/testUsersAuthentication.php';
 require_once __DIR__.'/authentication/testUsersAuthenticationHttp.php';
 require_once __DIR__.'/authentication/testUsersAuthenticationLdap.php';
 require_once __DIR__.'/authentication/testUsersAuthenticationSaml.php';
+require_once __DIR__.'/authentication/testUsersAuthenticationMfa.php';
 require_once __DIR__.'/authentication/testUsersPasswordComplexity.php';
 
 // Connectors.
@@ -73,11 +74,14 @@ require_once __DIR__.'/dashboardWidgets/testDashboardGraphWidget.php';
 require_once __DIR__.'/dashboardWidgets/testDashboardGraphWidgetSelectedHosts.php';
 require_once __DIR__.'/dashboardWidgets/testDashboardHoneycombWidget.php';
 require_once __DIR__.'/dashboardWidgets/testDashboardHostAvailabilityWidget.php';
+require_once __DIR__.'/dashboardWidgets/testDashboardHostCardWidget.php';
 require_once __DIR__.'/dashboardWidgets/testDashboardHostNavigatorWidget.php';
+require_once __DIR__.'/dashboardWidgets/testDashboardItemCardWidget.php';
 require_once __DIR__.'/dashboardWidgets/testDashboardItemHistoryWidget.php';
 require_once __DIR__.'/dashboardWidgets/testDashboardItemNavigatorWidget.php';
 require_once __DIR__.'/dashboardWidgets/testDashboardItemValueWidget.php';
 require_once __DIR__.'/dashboardWidgets/testDashboardPieChartWidget.php';
+require_once __DIR__.'/dashboardWidgets/testDashboardProblemHostsWidget.php';
 require_once __DIR__.'/dashboardWidgets/testDashboardProblemsBySeverityWidget.php';
 require_once __DIR__.'/dashboardWidgets/testDashboardProblemsWidget.php';
 require_once __DIR__.'/dashboardWidgets/testDashboardProblemsWidgetDisplay.php';
@@ -87,6 +91,7 @@ require_once __DIR__.'/dashboardWidgets/testDashboardTopHostsWidget.php';
 require_once __DIR__.'/dashboardWidgets/testDashboardTopTriggersWidget.php';
 require_once __DIR__.'/dashboardWidgets/testDashboardTriggerOverviewWidget.php';
 require_once __DIR__.'/dashboardWidgets/testDashboardURLWidget.php';
+require_once __DIR__.'/dashboardWidgets/testDashboardWebMonitoringWidget.php';
 require_once __DIR__.'/dashboardWidgets/testDashboardWidgetBroadcastedData.php';
 require_once __DIR__.'/dashboardWidgets/testDashboardWidgetCommunication.php';
 
@@ -164,6 +169,7 @@ require_once __DIR__.'/lld/testFormTestLowLevelDiscovery.php';
 require_once __DIR__.'/lld/testInheritanceDiscoveryRule.php';
 require_once __DIR__.'/lld/testLowLevelDiscoveryDisabledObjects.php';
 require_once __DIR__.'/lld/testPageLowLevelDiscovery.php';
+require_once __DIR__.'/lld/testPageLowLevelDiscoveryPrototypes.php';
 
 // Macros.
 require_once __DIR__.'/macros/testFormMacrosAdministrationGeneral.php';
@@ -187,6 +193,10 @@ require_once __DIR__.'/mediaTypes/testFormAdministrationMediaTypeMessageTemplate
 require_once __DIR__.'/mediaTypes/testFormAdministrationMediaTypeWebhook.php';
 require_once __DIR__.'/mediaTypes/testPageAdministrationMediaTypes.php';
 
+// MFA.
+require_once __DIR__.'/mfa/testFormTotpEnroll.php';
+require_once __DIR__.'/mfa/testFormTotpValidate.php';
+
 // Multiselects.
 require_once __DIR__.'/multiselects/testMultiselects.php';
 require_once __DIR__.'/multiselects/testMultiselectsErrorsHostsTemplates.php';
@@ -199,6 +209,7 @@ require_once __DIR__.'/networkDiscovery/testFormNetworkDiscovery.php';
 require_once __DIR__.'/networkDiscovery/testPageNetworkDiscovery.php';
 
 // Permissions.
+require_once __DIR__.'/permissions/testDashboardUserPermissions.php';
 require_once __DIR__.'/permissions/testPermissionsWithoutCSRF.php';
 require_once __DIR__.'/permissions/testTagBasedPermissions.php';
 require_once __DIR__.'/permissions/testUrlUserPermissions.php';
@@ -381,6 +392,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testUsersAuthenticationHttp');
 		$suite->addTestSuite('testUsersAuthenticationLdap');
 		$suite->addTestSuite('testUsersAuthenticationSaml');
+		$suite->addTestSuite('testUsersAuthenticationMfa');
 		$suite->addTestSuite('testUsersPasswordComplexity');
 
 		// Connectors.
@@ -412,11 +424,14 @@ class SeleniumTests {
 		$suite->addTestSuite('testDashboardGraphWidgetSelectedHosts');
 		$suite->addTestSuite('testDashboardHoneycombWidget');
 		$suite->addTestSuite('testDashboardHostAvailabilityWidget');
+		$suite->addTestSuite('testDashboardHostCardWidget');
 		$suite->addTestSuite('testDashboardHostNavigatorWidget');
+		$suite->addTestSuite('testDashboardItemCardWidget');
 		$suite->addTestSuite('testDashboardItemHistoryWidget');
 		$suite->addTestSuite('testDashboardItemNavigatorWidget');
 		$suite->addTestSuite('testDashboardItemValueWidget');
 		$suite->addTestSuite('testDashboardPieChartWidget');
+		$suite->addTestSuite('testDashboardProblemHostsWidget');
 		$suite->addTestSuite('testDashboardProblemsBySeverityWidget');
 		$suite->addTestSuite('testDashboardProblemsWidget');
 		$suite->addTestSuite('testDashboardProblemsWidgetDisplay');
@@ -426,6 +441,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testDashboardTopTriggersWidget');
 		$suite->addTestSuite('testDashboardTriggerOverviewWidget');
 		$suite->addTestSuite('testDashboardURLWidget');
+		$suite->addTestSuite('testDashboardWebMonitoringWidget');
 		$suite->addTestSuite('testDashboardWidgetBroadcastedData');
 		$suite->addTestSuite('testDashboardWidgetCommunication');
 
@@ -503,6 +519,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testInheritanceDiscoveryRule');
 		$suite->addTestSuite('testLowLevelDiscoveryDisabledObjects');
 		$suite->addTestSuite('testPageLowLevelDiscovery');
+		$suite->addTestSuite('testPageLowLevelDiscoveryPrototypes');
 
 		// Macros.
 		$suite->addTestSuite('testFormMacrosAdministrationGeneral');
@@ -526,6 +543,10 @@ class SeleniumTests {
 		$suite->addTestSuite('testFormAdministrationMediaTypeWebhook');
 		$suite->addTestSuite('testPageAdministrationMediaTypes');
 
+		// MFA.
+		$suite->addTestSuite('testFormTotpEnroll');
+		$suite->addTestSuite('testFormTotpValidate');
+
 		// Multiselects.
 		$suite->addTestSuite('testMultiselects');
 		$suite->addTestSuite('testMultiselectsErrorsHostsTemplates');
@@ -538,6 +559,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testPageNetworkDiscovery');
 
 		// Permissions.
+		$suite->addTestSuite('testDashboardUserPermissions');
 		$suite->addTestSuite('testPermissionsWithoutCSRF');
 		$suite->addTestSuite('testTagBasedPermissions');
 		$suite->addTestSuite('testUrlUserPermissions');

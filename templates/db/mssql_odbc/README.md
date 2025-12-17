@@ -7,32 +7,46 @@ This template is designed for the effortless deployment of MSSQL monitoring by Z
 
 ## Requirements
 
-Zabbix version: 7.4 and higher.
+Zabbix version: 8.0 and higher.
 
 ## Tested versions
 
 This template has been tested on:
-- Microsoft SQL, version 2019, 2022
+- Microsoft SQL, version 2017, 2019, 2022
 
 ## Configuration
 
-> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/7.4/manual/config/templates_out_of_the_box) section.
+> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/8.0/manual/config/templates_out_of_the_box) section.
 
 ## Setup
 
-1. Create an MSSQL user for monitoring. For example, "zbx_monitor".
-
-**View Server State** and **View Any Definition** permissions should be granted to the user.
-Grant this user read permissions to the `sysjobschedules`, `sysjobhistory`, and `sysjobs` tables.
-
-For example, using T-SQL commands:
-
-```sql
-GRANT SELECT ON OBJECT::msdb.dbo.sysjobs TO zbx_monitor;
-GRANT SELECT ON OBJECT::msdb.dbo.sysjobservers TO zbx_monitor;
-GRANT SELECT ON OBJECT::msdb.dbo.sysjobactivity TO zbx_monitor;
-GRANT EXECUTE ON OBJECT::msdb.dbo.agent_datetime TO zbx_monitor;
-```
+1. Create a monitoring user on MSSQL for Zabbix to connect to:
+- for MSSQL version 2022
+  ```sql
+  CREATE LOGIN zabbix WITH PASSWORD = 'password'
+  GRANT VIEW SERVER PERFORMANCE STATE TO zabbix
+  GRANT VIEW ANY DEFINITION TO zabbix
+  USE msdb
+  CREATE USER zabbix FOR LOGIN zabbix
+  GRANT EXECUTE ON msdb.dbo.agent_datetime TO zabbix
+  GRANT SELECT ON msdb.dbo.sysjobactivity TO zabbix
+  GRANT SELECT ON msdb.dbo.sysjobservers TO zabbix
+  GRANT SELECT ON msdb.dbo.sysjobs TO zabbix
+  GO
+  ```
+- for MSSQL versions 2017 and 2019
+  ```sql
+  CREATE LOGIN zabbix WITH PASSWORD = 'password'
+  GRANT VIEW SERVER STATE TO zabbix
+  GRANT VIEW ANY DEFINITION TO zabbix
+  USE msdb
+  CREATE USER zabbix FOR LOGIN zabbix
+  GRANT EXECUTE ON msdb.dbo.agent_datetime TO zabbix
+  GRANT SELECT ON msdb.dbo.sysjobactivity TO zabbix
+  GRANT SELECT ON msdb.dbo.sysjobservers TO zabbix
+  GRANT SELECT ON msdb.dbo.sysjobs TO zabbix
+  GO
+  ```
 
 For more information, see MSSQL documentation:
 
@@ -60,18 +74,16 @@ Note: You can use the context macros `{$MSSQL.BACKUP_FULL.USED}`, `{$MSSQL.BACKU
 
 |Name|Description|Default|
 |----|-----------|-------|
-|{$MSSQL.DSN}|<p>System data source name.</p>|`<Put your DSN here>`|
-|{$MSSQL.USER}|<p>MSSQL username.</p>|`<Put your username here>`|
-|{$MSSQL.PASSWORD}|<p>MSSQL user password.</p>|`<Put your password here>`|
+|{$MSSQL.DSN}|<p>System data source name.</p>||
+|{$MSSQL.USER}|<p>MSSQL database username.</p>||
+|{$MSSQL.PASSWORD}|<p>MSSQL database password.</p>||
 |{$MSSQL.HOST}|<p>The hostname or IP address of the MSSQL instance.</p>|`localhost`|
 |{$MSSQL.PORT}|<p>MSSQL TCP port.</p>|`1433`|
-|{$MSSQL.DBNAME.MATCHES}|<p>This macro is used in database discovery. It can be overridden on the host or linked template level.</p>|`.*`|
-|{$MSSQL.DBNAME.NOT_MATCHES}|<p>This macro is used in database discovery. It can be overridden on the host or linked template level.</p>|`master\|tempdb\|model\|msdb`|
 |{$MSSQL.WORK_FILES.MAX}|<p>The maximum number of work files created per second - for the trigger expression.</p>|`20`|
 |{$MSSQL.WORK_TABLES.MAX}|<p>The maximum number of work tables created per second - for the trigger expression.</p>|`20`|
 |{$MSSQL.WORKTABLES_FROM_CACHE_RATIO.MIN.CRIT}|<p>The minimum percentage of work tables from the cache ratio - for the High trigger expression.</p>|`90`|
-|{$MSSQL.BUFFER_CACHE_RATIO.MIN.CRIT}|<p>The minimum buffer cache hit ratio, in percent - for the High trigger expression.</p>|`30`|
 |{$MSSQL.BUFFER_CACHE_RATIO.MIN.WARN}|<p>The minimum buffer cache hit ratio, in percent - for the Warning trigger expression.</p>|`50`|
+|{$MSSQL.BUFFER_CACHE_RATIO.MIN.CRIT}|<p>The minimum buffer cache hit ratio, in percent - for the High trigger expression.</p>|`30`|
 |{$MSSQL.FREE_LIST_STALLS.MAX}|<p>The maximum free list stalls per second - for the trigger expression.</p>|`2`|
 |{$MSSQL.LAZY_WRITES.MAX}|<p>The maximum lazy writes per second - for the trigger expression.</p>|`20`|
 |{$MSSQL.PAGE_LIFE_EXPECTANCY.MIN}|<p>The minimum page life expectancy - for the trigger expression.</p>|`300`|
@@ -87,18 +99,20 @@ Note: You can use the context macros `{$MSSQL.BACKUP_FULL.USED}`, `{$MSSQL.BACKU
 |{$MSSQL.PERCENT_COMPILATIONS.MAX}|<p>The maximum percentage of Transact-SQL compilations - for the trigger expression.</p>|`10`|
 |{$MSSQL.PERCENT_RECOMPILATIONS.MAX}|<p>The maximum percentage of Transact-SQL recompilations - for the trigger expression.</p>|`10`|
 |{$MSSQL.PERCENT_READAHEAD.MAX}|<p>The maximum percentage of pages read per second in anticipation of use - for the trigger expression.</p>|`20`|
-|{$MSSQL.BACKUP_DIFF.CRIT}|<p>The maximum of days without a differential backup - for the High trigger expression.</p>|`6d`|
 |{$MSSQL.BACKUP_DIFF.WARN}|<p>The maximum of days without a differential backup - for the Warning trigger expression.</p>|`3d`|
-|{$MSSQL.BACKUP_FULL.CRIT}|<p>The maximum of days without a full backup - for the High trigger expression.</p>|`10d`|
+|{$MSSQL.BACKUP_DIFF.CRIT}|<p>The maximum of days without a differential backup - for the High trigger expression.</p>|`6d`|
 |{$MSSQL.BACKUP_FULL.WARN}|<p>The maximum of days without a full backup - for the Warning trigger expression.</p>|`9d`|
-|{$MSSQL.BACKUP_LOG.CRIT}|<p>The maximum of days without a log backup - for the High trigger expression.</p>|`8h`|
+|{$MSSQL.BACKUP_FULL.CRIT}|<p>The maximum of days without a full backup - for the High trigger expression.</p>|`10d`|
 |{$MSSQL.BACKUP_LOG.WARN}|<p>The maximum of days without a log backup - for the Warning trigger expression.</p>|`4h`|
-|{$MSSQL.JOB.MATCHES}|<p>This macro is used in job discovery. It can be overridden on the host or linked template level.</p>|`.*`|
-|{$MSSQL.JOB.NOT_MATCHES}|<p>This macro is used in job discovery. It can be overridden on the host or linked template level.</p>|`CHANGE_IF_NEEDED`|
-|{$MSSQL.BACKUP_DURATION.WARN}|<p>The maximum job duration - for the Warning trigger expression.</p>|`1h`|
+|{$MSSQL.BACKUP_LOG.CRIT}|<p>The maximum of days without a log backup - for the High trigger expression.</p>|`8h`|
+|{$MSSQL.JOB_DURATION.WARN}|<p>The maximum job duration - for the Warning trigger expression.</p>|`1h`|
 |{$MSSQL.BACKUP_FULL.USED}|<p>The flag for checking the age of a full backup. If set to a value other than "1", the trigger expression for the full backup age will not fire. Can be used with context for database name.</p>|`1`|
 |{$MSSQL.BACKUP_LOG.USED}|<p>The flag for checking the age of a log backup. If set to a value other than "1", the trigger expression for the log backup age will not fire. Can be used with context for database name.</p>|`1`|
 |{$MSSQL.BACKUP_DIFF.USED}|<p>The flag for checking the age of a differential backup. If set to a value other than "1", the trigger expression for the differential backup age will not fire. Can be used with context for database name.</p>|`1`|
+|{$MSSQL.DBNAME.MATCHES}|<p>This macro is used in database discovery. It can be overridden on the host or linked template level.</p>|`.*`|
+|{$MSSQL.DBNAME.NOT_MATCHES}|<p>This macro is used in database discovery. It can be overridden on the host or linked template level.</p>|`master\|tempdb\|model\|msdb`|
+|{$MSSQL.JOB.MATCHES}|<p>This macro is used in job discovery. It can be overridden on the host or linked template level.</p>|`.*`|
+|{$MSSQL.JOB.NOT_MATCHES}|<p>This macro is used in job discovery. It can be overridden on the host or linked template level.</p>|`CHANGE_IF_NEEDED`|
 |{$MSSQL.QUORUM.MEMBER.DISCOVERY.NAME.MATCHES}|<p>Filter to include discovered quorum member by name.</p>|`.*`|
 |{$MSSQL.QUORUM.MEMBER.DISCOVERY.NAME.NOT_MATCHES}|<p>Filter to exclude discovered quorum member by name.</p>|`CHANGE_IF_NEEDED`|
 
@@ -446,7 +460,7 @@ Note: You can use the context macros `{$MSSQL.BACKUP_FULL.USED}`, `{$MSSQL.BACKU
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
 |MSSQL: Job '{#JOBNAME}': Failed to run|<p>The last run of the job has failed.</p>|`last(/MSSQL by ODBC/mssql.job.runstatus["{#JOBNAME}"])=0`|Warning|**Manual close**: Yes|
-|MSSQL: Job '{#JOBNAME}': Job duration is high|<p>The job is taking too long.</p>|`last(/MSSQL by ODBC/mssql.job.run_duration["{#JOBNAME}"])>{$MSSQL.BACKUP_DURATION.WARN:"{#JOBNAME}"}`|Warning|**Manual close**: Yes|
+|MSSQL: Job '{#JOBNAME}': Job duration is high|<p>The job is taking too long.</p>|`last(/MSSQL by ODBC/mssql.job.run_duration["{#JOBNAME}"])>{$MSSQL.JOB_DURATION.WARN:"{#JOBNAME}"}`|Warning|**Manual close**: Yes|
 
 ## Feedback
 

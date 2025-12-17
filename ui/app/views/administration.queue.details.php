@@ -53,15 +53,24 @@ foreach ($data['queue_data'] as $itemid => $item_queue_data) {
 
 	$item = $data['items'][$itemid];
 	$host = reset($item['hosts']);
+	$item_host = $data['hosts'][$item['hostid']];
+
+	if (array_key_exists($item_host['proxyid'], $data['proxies'])) {
+		$proxy_name = $data['proxies'][$item_host['proxyid']]['name'];
+	}
+	elseif (array_key_exists($item_host['assigned_proxyid'], $data['proxies'])) {
+		$proxy_name = $data['proxies'][$item_host['assigned_proxyid']]['name'];
+	}
+	else {
+		$proxy_name = (new CSpan(_('Proxy is not assigned yet.')))->addClass(ZBX_STYLE_GREY);
+	}
 
 	$table->addRow([
 		zbx_date2str(DATE_TIME_FORMAT_SECONDS, $item_queue_data['nextcheck']),
 		zbx_date2age($item_queue_data['nextcheck']),
 		$host['name'],
 		$item['name'],
-		array_key_exists($data['hosts'][$item['hostid']]['proxyid'], $data['proxies'])
-			? $data['proxies'][$data['hosts'][$item['hostid']]['proxyid']]['name']
-			: ''
+		$proxy_name
 	]);
 }
 

@@ -244,17 +244,19 @@ class CControllerDashboardWidgetEdit extends CController {
 				'output' => ['graphid', 'name'],
 				'selectHosts' => ['hostid', 'name'],
 				'selectDiscoveryRule' => ['hostid'],
+				'selectDiscoveryRulePrototype' => ['hostid'],
 				'graphids' => array_keys($ids[ZBX_WIDGET_FIELD_TYPE_GRAPH_PROTOTYPE]),
 				'preservekeys' => true
 			]);
 
 			foreach ($db_graph_prototypes as $graphid => $graph) {
 				$host_names = array_column($graph['hosts'], 'name', 'hostid');
+				$parent_lld = $graph['discoveryRule'] ?: $graph['discoveryRulePrototype'];
 
 				$captions[ZBX_WIDGET_FIELD_TYPE_GRAPH_PROTOTYPE][$graphid] = [
 					'id' => $graphid,
 					'name' => $graph['name'],
-					'prefix' => $host_names[$graph['discoveryRule']['hostid']].NAME_DELIMITER
+					'prefix' => $host_names[$parent_lld['hostid']].NAME_DELIMITER
 				];
 			}
 		}

@@ -17,164 +17,121 @@
 #include "audit/zbxaudit.h"
 #include "audit/zbxaudit_item.h"
 
-void	zbx_audit_item_update_json_add_data(int audit_context_mode, zbx_uint64_t itemid,
-		const zbx_template_item_t *item, zbx_uint64_t hostid)
+#define AUDIT_TABLE_NAME	"items"
+
+static void	lld_audit_item_add_string(const zbx_template_item_t *item, const char *field, const char *value)
 {
-	int	resource_type;
+	char	prop[AUDIT_DETAILS_KEY_LEN];
+
+	zbx_audit_update_json_append_string(item->itemid, AUDIT_ITEM_ID, AUDIT_DETAILS_ACTION_ADD,
+			lld_audit_item_prop(item->flags, field, prop, sizeof(prop)),
+			value, AUDIT_TABLE_NAME, field);
+}
+
+static void	lld_audit_item_add_uint64(const zbx_template_item_t *item, const char *field, zbx_uint64_t value)
+{
+	char	prop[AUDIT_DETAILS_KEY_LEN];
+
+	zbx_audit_update_json_append_uint64(item->itemid, AUDIT_ITEM_ID, AUDIT_DETAILS_ACTION_ADD,
+			lld_audit_item_prop(item->flags, field, prop, sizeof(prop)),
+			value, AUDIT_TABLE_NAME, field);
+}
+
+void	zbx_audit_item_update_json_add_data(int audit_context_mode, const zbx_template_item_t *item,
+		zbx_uint64_t hostid)
+{
+	char	prop[AUDIT_DETAILS_KEY_LEN];
 
 	RETURN_IF_AUDIT_OFF(audit_context_mode);
 
-	resource_type = zbx_audit_item_flag_to_resource_type(item->flags);
+	lld_audit_item_add_uint64(item, "itemid", item->itemid);
+	lld_audit_item_add_string(item, "delay", item->delay);
+	lld_audit_item_add_uint64(item, "hostid", hostid);
+	lld_audit_item_add_uint64(item, "interfaceid", item->interfaceid);
+	lld_audit_item_add_string(item, "key_", item->key_);
+	lld_audit_item_add_string(item, "name", item->name);
+	lld_audit_item_add_uint64(item, "type", item->type);
+	lld_audit_item_add_string(item, "url", item->url);
+	lld_audit_item_add_uint64(item, "value_type", item->value_type);
 
-#define ADD_JSON_S(x, t, f)	zbx_audit_update_json_append_string(itemid, AUDIT_ITEM_ID, AUDIT_DETAILS_ACTION_ADD,\
-		ZBX_AUDIT_IT_OR_ITP_OR_DR(x), item->x, t, f)
-#define ADD_JSON_UI(x, t, f)	zbx_audit_update_json_append_uint64(itemid, AUDIT_ITEM_ID, AUDIT_DETAILS_ACTION_ADD,\
-		ZBX_AUDIT_IT_OR_ITP_OR_DR(x), item->x, t, f)
-#define AUDIT_TABLE_NAME	"items"
-	zbx_audit_update_json_append_uint64(itemid, AUDIT_ITEM_ID, AUDIT_DETAILS_ACTION_ADD,
-		ZBX_AUDIT_IT_OR_ITP_OR_DR(itemid), itemid, AUDIT_TABLE_NAME, "itemid");
-	ADD_JSON_S(delay, AUDIT_TABLE_NAME, "delay");
-	zbx_audit_update_json_append_uint64(itemid, AUDIT_ITEM_ID, AUDIT_DETAILS_ACTION_ADD,
-			ZBX_AUDIT_IT_OR_ITP_OR_DR(hostid), hostid, AUDIT_TABLE_NAME, "hostid");
-	ADD_JSON_UI(interfaceid, AUDIT_TABLE_NAME, "interfaceid");
-	ADD_JSON_S(key_, AUDIT_TABLE_NAME, "key_");
-	ADD_JSON_S(name, AUDIT_TABLE_NAME, "name");
-	ADD_JSON_UI(type, AUDIT_TABLE_NAME, "type");
-	ADD_JSON_S(url, AUDIT_TABLE_NAME, "url");
+	lld_audit_item_add_uint64(item, "allow_traps", item->allow_traps);
+	lld_audit_item_add_uint64(item, "authtype", item->authtype);
+	lld_audit_item_add_string(item, "description", item->description);
+	lld_audit_item_add_uint64(item, "flags", item->flags);
+	lld_audit_item_add_uint64(item, "follow_redirects", item->follow_redirects);
 
-	/* API intentionally does not provide value_type for LLD rules */
-	if (1 == zbx_audit_item_resource_is_only_item_and_item_prototype(resource_type))
+	zbx_audit_item_update_json_add_headers(audit_context_mode, item->itemid, item->flags, item->headers);
+
+	lld_audit_item_add_string(item, "http_proxy", item->http_proxy);
+	lld_audit_item_add_uint64(item, "inventory_link", item->inventory_link);
+
+	lld_audit_item_add_string(item, "ipmi_sensor", item->ipmi_sensor);
+	lld_audit_item_add_string(item, "jmx_endpoint", item->jmx_endpoint);
+
+	if (0 != (item->flags & ZBX_FLAG_DISCOVERY_RULE))
 	{
-		zbx_audit_update_json_append_uint64(itemid, AUDIT_ITEM_ID, AUDIT_DETAILS_ACTION_ADD,
-				(1 == zbx_audit_item_resource_is_only_item(resource_type)) ? "item.value_type" :
-				"itemprototype.value_type", item->value_type, AUDIT_TABLE_NAME, "value_type");
+		lld_audit_item_add_string(item, "lifetime", item->lifetime);
+		lld_audit_item_add_uint64(item, "lifetime_type", item->lifetime_type);
+
+		lld_audit_item_add_string(item, "enabled_lifetime", item->enabled_lifetime);
+		lld_audit_item_add_uint64(item, "enabled_lifetime_type", item->enabled_lifetime_type);
+
+		lld_audit_item_add_string(item, "formula", item->formula);
+		lld_audit_item_add_uint64(item, "evaltype", item->evaltype);
+	}
+	else
+	{
+		lld_audit_item_add_string(item, "logtimefmt", item->logtimefmt);
+
+		lld_audit_item_add_string(item, "history", item->history);
+		lld_audit_item_add_string(item, "trends", item->trends);
+		lld_audit_item_add_string(item, "units", item->units);
+		lld_audit_item_add_uint64(item, "valuemapid", item->valuemapid);
 	}
 
-	ADD_JSON_UI(allow_traps, AUDIT_TABLE_NAME, "allow_traps");
-	ADD_JSON_UI(authtype, AUDIT_TABLE_NAME, "authtype");
-	ADD_JSON_S(description, AUDIT_TABLE_NAME, "description");
-
-	if (1 == zbx_audit_item_resource_is_only_item(resource_type))
-	{
-		zbx_audit_update_json_append_uint64(itemid, AUDIT_ITEM_ID, AUDIT_DETAILS_ACTION_ADD, "item.flags",
-				item->flags, AUDIT_TABLE_NAME, "flags");
-	}
-
-	ADD_JSON_UI(follow_redirects, AUDIT_TABLE_NAME, "follow_redirects");
-
-	zbx_audit_item_update_json_add_headers(audit_context_mode, itemid, item->flags, item->headers);
-
-	if (1 == zbx_audit_item_resource_is_only_item_and_item_prototype(resource_type))
-	{
-		zbx_audit_update_json_append_string(itemid, AUDIT_ITEM_ID, AUDIT_DETAILS_ACTION_ADD,
-				(1 == zbx_audit_item_resource_is_only_item(resource_type)) ? "item.history" :
-				"itemprototype.history", item->history, AUDIT_TABLE_NAME, "history");
-	}
-
-	ADD_JSON_S(http_proxy, AUDIT_TABLE_NAME, "http_proxy");
-
-	if (1 == zbx_audit_item_resource_is_only_item(resource_type))
-	{
-		zbx_audit_update_json_append_uint64(itemid, AUDIT_ITEM_ID, AUDIT_DETAILS_ACTION_ADD,
-				"item.inventory_link", item->inventory_link, AUDIT_TABLE_NAME, "inventory_link");
-	}
-
-	ADD_JSON_S(ipmi_sensor, AUDIT_TABLE_NAME, "ipmi_sensor");
-	ADD_JSON_S(jmx_endpoint, AUDIT_TABLE_NAME, "jmx_endpoint");
-
-	if (1 == zbx_audit_item_resource_is_only_lld_rule(resource_type))
-	{
-		zbx_audit_update_json_append_string(itemid, AUDIT_ITEM_ID, AUDIT_DETAILS_ACTION_ADD,
-				"discoveryrule.lifetime", item->lifetime, AUDIT_TABLE_NAME, "lifetime");
-		zbx_audit_update_json_append_uint64(itemid, AUDIT_ITEM_ID, AUDIT_DETAILS_ACTION_ADD,
-				"discoveryrule.lifetime_type", item->lifetime_type, AUDIT_TABLE_NAME,
-				"lifetime_type");
-		zbx_audit_update_json_append_string(itemid, AUDIT_ITEM_ID, AUDIT_DETAILS_ACTION_ADD,
-				"discoveryrule.enabled_lifetime", item->enabled_lifetime, AUDIT_TABLE_NAME,
-				"enabled_lifetime");
-		zbx_audit_update_json_append_uint64(itemid, AUDIT_ITEM_ID, AUDIT_DETAILS_ACTION_ADD,
-				"discoveryrule.enabled_lifetime_type", item->enabled_lifetime_type,
-				AUDIT_TABLE_NAME, "enabled_lifetime_type");
-	}
-
-	if (1 == zbx_audit_item_resource_is_only_item_and_item_prototype(resource_type))
-	{
-		zbx_audit_update_json_append_string(itemid, AUDIT_ITEM_ID, AUDIT_DETAILS_ACTION_ADD,
-				(1 == zbx_audit_item_resource_is_only_item(resource_type)) ? "item.logtimefmt" :
-				"itemprototype.logtimefmt", item->logtimefmt, AUDIT_TABLE_NAME, "logtimefmt");
-	}
-
-	ADD_JSON_UI(master_itemid, AUDIT_TABLE_NAME, "master_itemid");
-	ADD_JSON_UI(output_format, AUDIT_TABLE_NAME, "output_format");
-	ADD_JSON_S(params, AUDIT_TABLE_NAME, "params");
+	lld_audit_item_add_uint64(item, "master_itemid", item->master_itemid);
+	lld_audit_item_add_uint64(item, "output_format", item->output_format);
+	lld_audit_item_add_string(item, "params", item->params);
 
 	if (SUCCEED == zbx_audit_item_has_password(item->type))
 	{
-		zbx_audit_update_json_append_string_secret(itemid, AUDIT_ITEM_ID, AUDIT_DETAILS_ACTION_ADD,
-				ZBX_AUDIT_IT_OR_ITP_OR_DR(password));
+		zbx_audit_update_json_append_string_secret(item->itemid, AUDIT_ITEM_ID, AUDIT_DETAILS_ACTION_ADD,
+				lld_audit_item_prop(item->flags, "password", prop, sizeof(prop)));
 	}
 
-	ADD_JSON_UI(post_type, AUDIT_TABLE_NAME, "post_type");
-	ADD_JSON_S(posts, AUDIT_TABLE_NAME, "posts");
-	ADD_JSON_S(privatekey, AUDIT_TABLE_NAME, "privatekey");
-	ADD_JSON_S(publickey, AUDIT_TABLE_NAME, "publickey");
+	lld_audit_item_add_uint64(item, "post_type", item->post_type);
+	lld_audit_item_add_string(item, "posts", item->posts);
+	lld_audit_item_add_string(item, "privatekey", item->privatekey);
+	lld_audit_item_add_string(item, "publickey", item->publickey);
 
-	zbx_audit_item_update_json_add_query_fields_json(audit_context_mode, itemid, item->flags, item->query_fields);
+	zbx_audit_item_update_json_add_query_fields_json(audit_context_mode, item->itemid, item->flags,
+			item->query_fields);
 
-	ADD_JSON_UI(request_method, AUDIT_TABLE_NAME, "request_method");
-	ADD_JSON_UI(retrieve_mode, AUDIT_TABLE_NAME, "retrieve_mode");
-	ADD_JSON_S(snmp_oid, AUDIT_TABLE_NAME, "snmp_oid");
-	ADD_JSON_S(ssl_cert_file, AUDIT_TABLE_NAME, "ssl_cert_file");
-	ADD_JSON_S(ssl_key_file, AUDIT_TABLE_NAME, "ssl_key_file");
+	lld_audit_item_add_uint64(item, "request_method", item->request_method);
+	lld_audit_item_add_uint64(item, "retrieve_mode", item->retrieve_mode);
+	lld_audit_item_add_string(item, "snmp_oid", item->snmp_oid);
+	lld_audit_item_add_string(item, "ssl_cert_file", item->ssl_cert_file);
+	lld_audit_item_add_string(item, "ssl_key_file", item->ssl_key_file);
 
 	if (SUCCEED == zbx_audit_item_has_ssl_key_password(item->type))
 	{
-		zbx_audit_update_json_append_string_secret(itemid, AUDIT_ITEM_ID, AUDIT_DETAILS_ACTION_ADD,
-				ZBX_AUDIT_IT_OR_ITP_OR_DR(ssl_key_password));
+		zbx_audit_update_json_append_string_secret(item->itemid, AUDIT_ITEM_ID, AUDIT_DETAILS_ACTION_ADD,
+				lld_audit_item_prop(item->flags, "ssl_key_password", prop, sizeof(prop)));
 	}
 
-	ADD_JSON_UI(status, AUDIT_TABLE_NAME, "status");
-	ADD_JSON_S(status_codes, AUDIT_TABLE_NAME, "status_codes");
-	ADD_JSON_UI(templateid, AUDIT_TABLE_NAME, "templateid");
-	ADD_JSON_S(timeout, AUDIT_TABLE_NAME, "timeout");
-	ADD_JSON_S(trapper_hosts, AUDIT_TABLE_NAME, "trapper_hosts");
+	lld_audit_item_add_uint64(item, "status", item->status);
+	lld_audit_item_add_string(item, "status_codes", item->status_codes);
+	lld_audit_item_add_uint64(item, "templateid", item->templateid);
+	lld_audit_item_add_string(item, "timeout", item->timeout);
+	lld_audit_item_add_string(item, "trapper_hosts", item->trapper_hosts);
 
-	if (1 == zbx_audit_item_resource_is_only_item_and_item_prototype(resource_type))
+	lld_audit_item_add_string(item, "username", item->username);
+	lld_audit_item_add_uint64(item, "verify_host", item->verify_host);
+	lld_audit_item_add_uint64(item, "verify_peer", item->verify_peer);
+
+	if (0 != (item->flags & ZBX_FLAG_DISCOVERY_PROTOTYPE))
 	{
-		zbx_audit_update_json_append_string(itemid, AUDIT_ITEM_ID, AUDIT_DETAILS_ACTION_ADD,
-				(1 == zbx_audit_item_resource_is_only_item(resource_type)) ? "item.trends" :
-				"itemprototype.trends", item->trends, AUDIT_TABLE_NAME, "trends");
-		zbx_audit_update_json_append_string(itemid, AUDIT_ITEM_ID, AUDIT_DETAILS_ACTION_ADD,
-				(1 == zbx_audit_item_resource_is_only_item(resource_type)) ? "item.units" :
-				"itemprototype.units", item->units, AUDIT_TABLE_NAME, "units");
+		lld_audit_item_add_uint64(item, "discover", item->discover);
 	}
 
-	ADD_JSON_S(username, AUDIT_TABLE_NAME, "username");
-
-	if (1 == zbx_audit_item_resource_is_only_item_and_item_prototype(resource_type))
-	{
-		zbx_audit_update_json_append_uint64(itemid, AUDIT_ITEM_ID, AUDIT_DETAILS_ACTION_ADD,
-				(1 == zbx_audit_item_resource_is_only_item(resource_type)) ? "item.valuemapid" :
-				"itemprototype.valuemapid", item->valuemapid, AUDIT_TABLE_NAME, "valuemapid");
-	}
-
-	ADD_JSON_UI(verify_host, AUDIT_TABLE_NAME, "verify_host");
-	ADD_JSON_UI(verify_peer, AUDIT_TABLE_NAME, "verify_peer");
-
-	if (1 == zbx_audit_item_resource_is_only_item_prototype(resource_type))
-	{
-		zbx_audit_update_json_append_uint64(itemid, AUDIT_ITEM_ID, AUDIT_DETAILS_ACTION_ADD,
-				"itemprototype.discover", item->discover, AUDIT_TABLE_NAME, "discover");
-	}
-
-	if (1 == zbx_audit_item_resource_is_only_lld_rule(resource_type))
-	{
-		zbx_audit_update_json_append_string(itemid, AUDIT_ITEM_ID, AUDIT_DETAILS_ACTION_ADD,
-				"discoveryrule.filter.formula", item->formula, AUDIT_TABLE_NAME, "formula");
-		zbx_audit_update_json_append_uint64(itemid, AUDIT_ITEM_ID, AUDIT_DETAILS_ACTION_ADD,
-				"discoveryrule.filter.evaltype", item->evaltype, AUDIT_TABLE_NAME, "evaltype");
-	}
-#undef AUDIT_TABLE_NAME
-#undef ADD_JSON_UI
-#undef ADD_JSON_S
 }

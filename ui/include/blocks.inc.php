@@ -630,7 +630,7 @@ function makeProblemsPopup(array $problems, array $triggers, array $actions, arr
 	$triggers_hosts = getTriggersHostsList($triggers);
 	$triggers_hosts = makeTriggersHostsList($triggers_hosts);
 
-	$tags = makeTags($problems);
+	$tags = CTagHelper::getTagsHtml($problems, ZBX_TAG_OBJECT_PROBLEM);
 
 	if (array_key_exists('show_suppressed', $filter) && $filter['show_suppressed']) {
 		CScreenProblem::addSuppressionNames($problems);

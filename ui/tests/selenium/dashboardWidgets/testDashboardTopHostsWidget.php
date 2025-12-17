@@ -17,11 +17,11 @@
 require_once __DIR__.'/../common/testWidgets.php';
 
 /**
- * @dataSource AllItemValueTypes, ItemValueWidget, GlobalMacros, TopHostsWidget
+ * @dataSource AllItemValueTypes, ItemValueWidget, TopHostsWidget, MonitoringOverview, GlobalMacros
  *
- * @backup dashboard
+ * @backup profiles
  *
- * @onBefore prepareData
+ * @onBefore prepareSparklineData, prepareData
  */
 class testDashboardTopHostsWidget extends testWidgets {
 
@@ -42,7 +42,9 @@ class testDashboardTopHostsWidget extends testWidgets {
 
 	protected static $updated_name = 'Top hosts update';
 	protected static $aggregation_itemids;
+	protected static $sparkline_itemids;
 	protected static $top_hosts_itemids;
+	protected static $monitoring_overview_itemids;
 	protected static $dashboardids;
 	protected static $other_dashboardids;
 	protected static $dashboardid;
@@ -106,13 +108,56 @@ class testDashboardTopHostsWidget extends testWidgets {
 		self::$other_dashboardids = CDataHelper::get('ItemValueWidget.dashboardids');
 		self::$aggregation_itemids = CDataHelper::get('ItemValueWidget.itemids');
 		self::$top_hosts_itemids = CDataHelper::get('TopHostsWidget.itemids');
+		self::$monitoring_overview_itemids = CDataHelper::get('MonitoringOverview.itemids');
 
 		// Add value to items for CheckTextItems test.
-		CDataHelper::addItemData(99086, 1000); // 1_item.
+		CDataHelper::addItemData(self::$monitoring_overview_itemids['1_item'], 1000);
 		CDataHelper::addItemData(self::$top_hosts_itemids['top_hosts_trap_text'], 'Text for text item');
 		CDataHelper::addItemData(self::$top_hosts_itemids['top_hosts_text2'],  '2.00');
 		CDataHelper::addItemData(self::$top_hosts_itemids['top_hosts_trap_log'], 'Logs for text item');
 		CDataHelper::addItemData(self::$top_hosts_itemids['top_hosts_trap_char'], 'characters_here');
+	}
+
+	public static function prepareSparklineData() {
+		CDataHelper::call('hostgroup.create', [
+			['name' => 'Host group for sparkline tests']
+		]);
+		$groupids = CDataHelper::getIds('name');
+
+		// Host and items for isolated sparkline check via screenshots.
+		CDataHelper::createHosts([
+			[
+				'host' => 'Host for sparkline screenshots',
+				'groups' => [['groupid' => $groupids['Host group for sparkline tests']]],
+				'interfaces' => [
+					[
+						'type' => INTERFACE_TYPE_AGENT,
+						'main' => INTERFACE_PRIMARY,
+						'useip' => INTERFACE_USE_IP,
+						'ip' => '127.1.9.8',
+						'dns' => '',
+						'port' => '10777'
+					]
+				],
+				'items' => [
+					[
+						'name' => 'Sparkline item - numeric (unsigned)',
+						'key_' => 'numeric_unsigned',
+						'type' => ITEM_TYPE_ZABBIX,
+						'value_type' => ITEM_VALUE_TYPE_UINT64,
+						'delay' => '30'
+					],
+					[
+						'name' => 'Sparkline item - numeric (float)',
+						'key_' => 'numeric_float',
+						'type' => ITEM_TYPE_ZABBIX,
+						'value_type' => ITEM_VALUE_TYPE_FLOAT,
+						'delay' => '30'
+					]
+				]
+			]
+		]);
+		self::$sparkline_itemids = CDataHelper::getIds('name');
 	}
 
 	public function prepareTopHostsDisplayData() {
@@ -190,7 +235,6 @@ class testDashboardTopHostsWidget extends testWidgets {
 				'tags' => [['tag' => 'host', 'value' => 'B'], ['tag' => 'host', 'value' => 'C'], ['tag' => 'tag']]
 			]
 		]);
-
 		$hostids = CDataHelper::getIds('host');
 
 		$itemids = [];
@@ -219,7 +263,6 @@ class testDashboardTopHostsWidget extends testWidgets {
 				]
 			]
 		]);
-
 		$maintenance_itemid = $response['itemids']['Host in maintenance:maintenance_trap'];
 		$maintenance_hostid = $response['hostids']['Host in maintenance'];
 
@@ -298,8 +341,8 @@ class testDashboardTopHostsWidget extends testWidgets {
 		$visible_labels = ['Name', 'Data', 'Item name', 'Base colour', 'Display item value as', 'Display', 'Thresholds',
 			'Decimal places', 'Advanced configuration'
 		];
-		$hidden_labels = ['Text', 'Sparkline', 'Min', 'Max', 'Highlights', 'Show thumbnail', 'Aggregation function',
-			'Time period', 'Widget', 'From', 'To', 'History data'
+		$hidden_labels = ['Text', 'Sparkline', 'Min', 'Max', 'Highlights', 'Show thumbnail', 'History data',
+			'Aggregation function', 'Time period', 'Widget', 'From', 'To'
 		];
 		$this->assertEquals($visible_labels, array_values($column_form->getLabels()->filter(CElementFilter::VISIBLE)->asText()));
 		$this->assertEquals($hidden_labels, array_values($column_form->getLabels()->filter(CElementFilter::NOT_VISIBLE)->asText()));
@@ -314,14 +357,15 @@ class testDashboardTopHostsWidget extends testWidgets {
 				'visible' => false, 'enabled' => false
 			],
 			'Item name' => ['value' => ''],
-			'xpath:.//input[@id="base_color"]/..' => ['color' => ''],
+			self::PATH_TO_COLOR_PICKER.'"base_color"]' => ['color' => ''],
 			'Display item value as' => ['value' => 'Numeric', 'labels' => ['Numeric', 'Text', 'Binary']],
 			'Display' => ['value' => 'As is', 'labels' => ['As is', 'Bar', 'Indicators', 'Sparkline']],
 			'Min' => ['value' => '', 'placeholder' => 'calculated', 'maxlength' => 255, 'visible' => false, 'enabled' => false],
 			'Max' => ['value' => '', 'placeholder' => 'calculated', 'maxlength' => 255, 'visible' => false, 'enabled' => false],
 			'id:sparkline_width' => ['value' => 1, 'maxlength' => 2, 'visible' => false, 'enabled' => false],
 			'id:sparkline_fill' => ['value' => 3, 'maxlength' => 2, 'visible' => false, 'enabled' => false],
-			'xpath:.//input[@id="sparkline_color"]/..' => ['color' => '42A5F5', 'visible' => false, 'enabled' => false],
+			// TODO: remove input from the sparkline color picker path when DEV-4512 is fixed.
+			self::PATH_TO_COLOR_PICKER.'"sparkline[color]"]/input' => ['value' => '42A5F5', 'visible' => false, 'enabled' => false],
 			'id:sparkline_time_period_data_source' => ['value' => 'Custom', 'labels' => ['Dashboard', 'Widget', 'Custom'],
 				'visible' => false, 'enabled' => false
 			],
@@ -339,6 +383,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 			'Highlights' => ['visible' => false],
 			'Decimal places' => ['value' => 2, 'maxlength' => 2],
 			'Advanced configuration' => ['visible' => true, 'enabled' => true],
+			'History data' => ['value' => 'Auto', 'labels' => ['Auto', 'History', 'Trends']],
 			'Aggregation function' => ['value' => 'not used', 'options' => ['not used', 'min', 'max', 'avg', 'count', 'sum',
 				'first', 'last']
 			],
@@ -352,7 +397,6 @@ class testDashboardTopHostsWidget extends testWidgets {
 			'id:time_period_to' => ['value' => 'now', 'placeholder' => 'YYYY-MM-DD hh:mm:ss', 'maxlength' => 255,
 				'visible' => false, 'enabled' => false
 			],
-			'History data' => ['value' => 'Auto', 'labels' => ['Auto', 'History', 'Trends']],
 			'Show thumbnail' => ['value' => false, 'visible' => false, 'enabled' => false]
 		];
 		$this->checkFieldsAttributes($column_default_fields, $column_form);
@@ -381,7 +425,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 		$column_form->fill(['Data' => CFormElement::RELOADABLE_FILL('Item value')]);
 
 		// 'Sparkline' displayed fields when Display => Sparkline option is set.
-		$sparkline_fields = ['id:sparkline_width', 'id:sparkline_fill', 'xpath:.//input[@id="sparkline_color"]/..',
+		$sparkline_fields = ['id:sparkline_width', 'id:sparkline_fill', self::PATH_TO_COLOR_PICKER.'"sparkline[color]"]',
 			'id:sparkline_history', 'id:sparkline_time_period_data_source', 'id:sparkline_time_period_from',
 			'id:sparkline_time_period_to'
 		];
@@ -454,6 +498,36 @@ class testDashboardTopHostsWidget extends testWidgets {
 			}
 		}
 
+		// Check hintbox message when "Aggregation function≠not used" and sparkline is selected.
+		$warning_visibility = [
+				'not used' => false,
+				'min' => true,
+				'max' => true,
+				'avg' => true,
+				'count' => true,
+				'sum' => true,
+				'first' => true,
+				'last' => true
+		];
+
+		foreach ($warning_visibility as $option => $visible) {
+			$column_form->fill(['Aggregation function' => $option]);
+			$warning_button = $column_form->getFieldContainer('Aggregation function')->query('xpath:.//button[@data-hintbox]')->one();
+			$this->assertTrue($warning_button->isVisible($visible));
+
+			if ($visible) {
+				$warning_button->click();
+
+				// Check hintbox text.
+				$hint_text = 'Aggregation function does not affect the sparkline.';
+				$hint_dialog = $this->query('xpath://div[@class="overlay-dialogue wordbreak"]')->waitUntilVisible()->one();
+				$this->assertEquals($hint_text, $hint_dialog->getText());
+
+				// Close the hintbox.
+				$hint_dialog->query('xpath:.//button[@class="btn-overlay-close"]')->one()->click()->waitUntilNotPresent();
+			}
+		}
+
 		// Check Display item value as and color Thresholds/Highlights tables dependency.
 		foreach (['Numeric', 'Text', 'Binary'] as $display) {
 			$column_form->fill(['Display item value as' => $display]);
@@ -470,16 +544,16 @@ class testDashboardTopHostsWidget extends testWidgets {
 					? [
 						'label' => 'Thresholds',
 						'header' => 'Threshold',
-						'color_selector' => 'xpath:.//input[@id="thresholds_0_color"]/..',
+						'color_selector' => self::PATH_TO_COLOR_PICKER.'"thresholds[0][color]"]',
 						'input_selector' => 'id:thresholds_0_threshold',
-						'color' => 'FCCB1D'
+						'color' => 'E65660'
 					]
 					: [
 						'label' => 'Highlights',
 						'header' => 'Regular expression',
-						'color_selector' => 'xpath:.//input[@id="highlights_0_color"]/..',
+						'color_selector' => self::PATH_TO_COLOR_PICKER.'"highlights[0][color]"]',
 						'input_selector' => 'id:highlights_0_pattern',
-						'color' => 'E65660'
+						'color' => 'FCCB1D'
 					];
 
 				$color_container = $column_form->getFieldContainer(($color_table['label']));
@@ -487,7 +561,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 				$color_container->query('button:Add')->one()->waitUntilClickable()->click();
 
 				$this->checkFieldsAttributes([
-						$color_table['color_selector'] => [$color_table['color']],
+						$color_table['color_selector'] => ['color' => $color_table['color']],
 						$color_table['input_selector'] => ['value' => '', 'maxlength' => 255]
 					], $column_form
 				);
@@ -573,26 +647,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					]
 				]
 			],
-			// #4 Colour error in host name column.
-			[
-				[
-					'expected' => TEST_BAD,
-					'main_fields' => [
-						'Name' => 'Colour error in Host name column'
-					],
-					'column_fields' => [
-						[
-							'Name' => 'test name',
-							'Data' => 'Host name',
-							'Base colour' => '!@#$%^'
-						]
-					],
-					'column_error' => [
-						'Invalid parameter "/1/base_color": a hexadecimal colour code (6 symbols) is expected.'
-					]
-				]
-			],
-			// #5 Check error adding text column without any value.
+			// #4 Check error adding text column without any value.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -610,27 +665,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					]
 				]
 			],
-			// #6 Colour error in text column.
-			[
-				[
-					'expected' => TEST_BAD,
-					'main_fields' => [
-						'Name' => 'Error in text column colour'
-					],
-					'column_fields' => [
-						[
-							'Name' => 'test name',
-							'Data' => 'Text',
-							'Text' => 'Here is some text',
-							'Base colour' => '!@#$%^'
-						]
-					],
-					'column_error' => [
-						'Invalid parameter "/1/base_color": a hexadecimal colour code (6 symbols) is expected.'
-					]
-				]
-			],
-			// #7 Error when there is no item in item column.
+			// #5 Error when there is no item in item column.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -648,7 +683,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					]
 				]
 			],
-			// #8 Error when time period "From" is below minimum time period.
+			// #6 Error when time period "From" is below minimum time period.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -671,7 +706,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					]
 				]
 			],
-			// #9 Error when time period "From" is above maximum time period.
+			// #7 Error when time period "From" is above maximum time period.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -695,7 +730,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					'days_count' => true
 				]
 			],
-			// #10 Error when time period "To" is below minimum time period.
+			// #8 Error when time period "To" is below minimum time period.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -718,7 +753,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					]
 				]
 			],
-			// #11 Error when time period between "From" and "To" fields is > 730 days (731 days in case of leap year).
+			// #9 Error when time period between "From" and "To" fields is > 730 days (731 days in case of leap year).
 			[
 				[
 					'expected' => TEST_BAD,
@@ -743,7 +778,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					'days_count' => true
 				]
 			],
-			// #12 Error when both time period selectors have invalid values.
+			// #10 Error when both time period selectors have invalid values.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -768,7 +803,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					]
 				]
 			],
-			// #13 Error when both time period selectors are empty.
+			// #11 Error when both time period selectors are empty.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -793,7 +828,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					]
 				]
 			],
-			// #14 Error when widget field is empty.
+			// #12 Error when widget field is empty.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -819,7 +854,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 			 * TODO: At the moment error handling is inconsistent for column fields. Uncomment or replace expected column
 			 *  error(s) after the DEV-3951 fix.
 			 */
-			// #15 Error when Sparkline time period "From" is below minimum time period.
+			// #13 Error when Sparkline time period "From" is below minimum time period.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -841,7 +876,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					]
 				]
 			],
-			// #16 Error when sparkline time period "From" is above maximum time period.
+			// #14 Error when sparkline time period "From" is above maximum time period.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -864,7 +899,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					'days_count' => true
 				]
 			],
-			// #17 Error when sparkline time period "To" is below minimum time period.
+			// #15 Error when sparkline time period "To" is below minimum time period.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -886,7 +921,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					]
 				]
 			],
-			// #18 Error when sparkline time period between "From" and "To" fields is > 730 days (731 days in case of leap year).
+			// #16 Error when sparkline time period between "From" and "To" fields is > 730 days (731 days in case of leap year).
 			[
 				[
 					'expected' => TEST_BAD,
@@ -910,7 +945,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					'days_count' => true
 				]
 			],
-			// #19 Error when sparkline time period fields 'From' and 'To' are empty.
+			// #17 Error when sparkline time period fields 'From' and 'To' are empty.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -935,7 +970,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					]
 				]
 			],
-			// #20 Error when sparkline time period fields 'From' and 'To' with invalid value.
+			// #18 Error when sparkline time period fields 'From' and 'To' with invalid value.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -960,7 +995,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					]
 				]
 			],
-			// #21 Error when sparkline widget field is empty.
+			// #19 Error when sparkline widget field is empty.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -982,51 +1017,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					]
 				]
 			],
-			// #22 Error when invalid colour is picked for sparkline charts.
-			[
-				[
-					'expected' => TEST_BAD,
-					'main_fields' => [
-						'Name' => 'Invalid sparkline colour'
-					],
-					'column_fields' => [
-						[
-							'Name' => 'test name',
-							'Data' => 'Item value',
-							'Display' => 'Sparkline',
-							'Item name' => 'Available memory',
-							'xpath:.//input[@id="sparkline_color"]/..' => '!@#$%^'
-						]
-					],
-					'column_error' => [
-						'Invalid parameter "Colour": a hexadecimal colour code (6 symbols) is expected.'
-//						'Invalid parameter "/1/sparkline/sparkline_color": a hexadecimal colour code (6 symbols) is expected.'
-					]
-				]
-			],
-			// #23 Error when colour picker is empty.
-			[
-				[
-					'expected' => TEST_BAD,
-					'main_fields' => [
-						'Name' => 'Invalid sparkline colour picker is empty'
-					],
-					'column_fields' => [
-						[
-							'Name' => 'test name',
-							'Data' => 'Item value',
-							'Display' => 'Sparkline',
-							'Item name' => 'Available memory',
-							'xpath:.//input[@id="sparkline_color"]/..' => ''
-						]
-					],
-					'column_error' => [
-						'Invalid parameter "Colour": cannot be empty.'
-//						'Invalid parameter "/1/sparkline/sparkline_color": cannot be empty.'
-					]
-				]
-			],
-			// #24 Error when incorrect min value added.
+			// #20 Error when incorrect min value added.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1047,7 +1038,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					]
 				]
 			],
-			// #25 Error when incorrect max value added.
+			// #21 Error when incorrect max value added.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1068,81 +1059,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					]
 				]
 			],
-			// #26 Color error in item column.
-			[
-				[
-					'expected' => TEST_BAD,
-					'main_fields' => [
-						'Name' => 'Error in item column color'
-					],
-					'column_fields' => [
-						[
-							'Name' => 'test name',
-							'Data' => 'Item value',
-							'Item name' => 'Available memory',
-							'Base colour' => '!@#$%^'
-						]
-					],
-					'column_error' => [
-						'Invalid parameter "/1/base_color": a hexadecimal colour code (6 symbols) is expected.'
-					]
-				]
-			],
-			// #27 Color error when incorrect hexadecimal added in first threshold.
-			[
-				[
-					'expected' => TEST_BAD,
-					'main_fields' => [
-						'Name' => 'Error in item column threshold color'
-					],
-					'column_fields' => [
-						[
-							'Name' => 'test name',
-							'Data' => 'Item value',
-							'Item name' => 'Available memory',
-							'Thresholds' => [
-								[
-									'threshold' => '1',
-									'color' => '!@#$%^'
-								]
-							]
-						]
-					],
-					'column_error' => [
-						'Invalid parameter "/1/thresholds/1/color": a hexadecimal colour code (6 symbols) is expected.'
-					]
-				]
-			],
-			// #28 Color error when incorrect hexadecimal added in second threshold.
-			[
-				[
-					'expected' => TEST_BAD,
-					'main_fields' => [
-						'Name' => 'Error in item column second threshold color'
-					],
-					'column_fields' => [
-						[
-							'Name' => 'test name',
-							'Data' => 'Item value',
-							'Item name' => 'Available memory',
-							'Thresholds' => [
-								[
-									'threshold' => '1',
-									'color' => '4000FF'
-								],
-								[
-									'threshold' => '2',
-									'color' => '!@#$%^'
-								]
-							]
-						]
-					],
-					'column_error' => [
-						'Invalid parameter "/1/thresholds/2/color": a hexadecimal colour code (6 symbols) is expected.'
-					]
-				]
-			],
-			// #29 Error message when incorrect value added to threshold.
+			// #22 Error message when incorrect value added to threshold.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1167,7 +1084,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					]
 				]
 			],
-			// #30 Minimum needed values to create and submit widget.
+			// #23 Minimum needed values to create and submit widget.
 			[
 				[
 					'main_fields' => [],
@@ -1180,7 +1097,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					]
 				]
 			],
-			// #31 All fields filled for main form with all tags.
+			// #24 All fields filled for main form with all tags.
 			[
 				[
 					'main_fields' => [
@@ -1209,7 +1126,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					]
 				]
 			],
-			// #32 Change order column for several items.
+			// #25 Change order column for several items.
 			[
 				[
 					'main_fields' => [
@@ -1230,7 +1147,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					]
 				]
 			],
-			// #33 Several item columns with different Aggregation function and custom "From" time period.
+			// #26 Several item columns with different Aggregation function and custom "From" time period.
 			[
 				[
 					'main_fields' => [
@@ -1304,7 +1221,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					'screenshot' => true
 				]
 			],
-			// #34 Several item columns with different display, custom "From" time period, min/max and history data.
+			// #27 Several item columns with different display, custom "From" time period, min/max and history data.
 			[
 				[
 					'main_fields' => [
@@ -1397,7 +1314,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					]
 				]
 			],
-			// #35 Add column with different Base color.
+			// #28 Add column with different Base color.
 			[
 				[
 					'main_fields' => [
@@ -1413,7 +1330,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					]
 				]
 			],
-			// #36 Add sparkline columns with custom configuration.
+			// #29 Add sparkline columns with custom configuration.
 			[
 				[
 					'main_fields' => [
@@ -1436,7 +1353,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 							'Display' => 'Sparkline',
 							'id:sparkline_width' => '0',
 							'id:sparkline_fill' => '10',
-							'xpath:.//input[@id="sparkline_color"]/..' => 'BF00FF',
+							self::PATH_TO_COLOR_PICKER.'"sparkline[color]"]' => 'BF00FF',
 							'id:sparkline_time_period_from' => 'now-33m-33s',
 							'id:sparkline_time_period_to' => 'now-32m-33s',
 							'id:sparkline_history' => 'Auto'
@@ -1448,7 +1365,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 							'Display' => 'Sparkline',
 							'id:sparkline_width' => '10',
 							'id:sparkline_fill' => '0',
-							'xpath:.//input[@id="sparkline_color"]/..' => '000000',
+							self::PATH_TO_COLOR_PICKER.'"sparkline[color]"]' => '000000',
 							'id:sparkline_time_period_from' => 'now-2y',
 							'id:sparkline_time_period_to' => 'now-1y',
 							'id:sparkline_history' => 'History'
@@ -1460,7 +1377,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 							'Display' => 'Sparkline',
 							'id:sparkline_width' => '0',
 							'id:sparkline_fill' => '0',
-							'xpath:.//input[@id="sparkline_color"]/..' => 'FFBF00',
+							self::PATH_TO_COLOR_PICKER.'"sparkline[color]"]' => 'FFBF00',
 							'id:sparkline_time_period_from' => 'now-2h',
 							'id:sparkline_time_period_to' => 'now-1h',
 							'id:sparkline_history' => 'Trends'
@@ -1472,7 +1389,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 							'Display' => 'Sparkline',
 							'id:sparkline_width' => '10',
 							'id:sparkline_fill' => '10',
-							'xpath:.//input[@id="sparkline_color"]/..' => 'BFFF00',
+							self::PATH_TO_COLOR_PICKER.'"sparkline[color]"]' => 'BFFF00',
 							'id:sparkline_time_period_data_source' => 'Widget',
 							'xpath:.//div[@id="sparkline_time_period_reference"]/..' => 'Graph (classic) for time period '.
 								'check via widget'
@@ -1484,14 +1401,14 @@ class testDashboardTopHostsWidget extends testWidgets {
 							'Display' => 'Sparkline',
 							'id:sparkline_width' => '5',
 							'id:sparkline_fill' => '5',
-							'xpath:.//input[@id="sparkline_color"]/..' => '558B2F',
+							self::PATH_TO_COLOR_PICKER.'"sparkline[color]"]' => '558B2F',
 							'id:sparkline_time_period_data_source' => 'Dashboard'
 						]
 					],
 					'replace' => true
 				]
 			],
-			// #37 Add column with Threshold without color change.
+			// #30 Add column with Threshold without color change.
 			[
 				[
 					'main_fields' => [
@@ -1511,7 +1428,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					]
 				]
 			],
-			// #38 Add several columns with Threshold without color change.
+			// #31 Add several columns with Threshold without color change.
 			[
 				[
 					'main_fields' => [
@@ -1537,7 +1454,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					]
 				]
 			],
-			// #39 Add several columns with Threshold with color change and without color.
+			// #32 Add several columns with Threshold with color change and without color.
 			[
 				[
 					'main_fields' => [
@@ -1563,14 +1480,14 @@ class testDashboardTopHostsWidget extends testWidgets {
 								],
 								[
 									'threshold' => '10000',
-									'color' => ''
+									'color' => 'BBBBBB'
 								]
 							]
 						]
 					]
 				]
 			],
-			// #40 Add Host name columns.
+			// #33 Add Host name columns.
 			[
 				[
 					'main_fields' => [
@@ -1594,7 +1511,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					]
 				]
 			],
-			// #41 Add Text columns.
+			// #34 Add Text columns.
 			[
 				[
 					'main_fields' => [
@@ -1625,7 +1542,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					]
 				]
 			],
-			// #42 Spaces in input fields.
+			// #35 Spaces in input fields.
 			[
 				[
 					'trim' => true,
@@ -1682,7 +1599,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					]
 				]
 			],
-			// #43 User macros in input fields.
+			// #36 User macros in input fields.
 			[
 				[
 					'main_fields' => [
@@ -1710,7 +1627,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					]
 				]
 			],
-			// #44 Global macros in input fields.
+			// #37 Global macros in input fields.
 			[
 				[
 					'main_fields' => [
@@ -1738,7 +1655,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					]
 				]
 			],
-			// #45 Error message when empty highlight is passed.
+			// #38 Error message when empty highlight is passed.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1761,7 +1678,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					]
 				]
 			],
-			// #46 Successfully adding item with highlight.
+			// #39 Successfully adding item with highlight.
 			[
 				[
 					'main_fields' => [
@@ -1779,7 +1696,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					]
 				]
 			],
-			// #47 Binary item in column.
+			// #40 Binary item in column.
 			[
 				[
 					'main_fields' => [
@@ -1890,31 +1807,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 
 	public static function getUpdateData() {
 		return [
-			// #0 Incorrect threshold color.
-			[
-				[
-					'expected' => TEST_BAD,
-					'column_fields' => [
-						[
-							'Name' => 'Incorrect threshold color',
-							'Data' => 'Item value',
-							'Item name' => 'Available memory',
-							'Thresholds' => [
-								[
-									'action' => USER_ACTION_UPDATE,
-									'index' => 0,
-									'threshold' => '100',
-									'color' => '#$@#$@'
-								]
-							]
-						]
-					],
-					'column_error' => [
-						'Invalid parameter "/1/thresholds/1/color": a hexadecimal colour code (6 symbols) is expected.'
-					]
-				]
-			],
-			// #1 Incorrect min value.
+			// #0 Incorrect min value.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1933,7 +1826,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					]
 				]
 			],
-			// #2 Incorrect max value.
+			// #1 Incorrect max value.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1952,7 +1845,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					]
 				]
 			],
-			// #3 Error message when update Host limit incorrectly.
+			// #2 Error message when update Host limit incorrectly.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1964,7 +1857,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					]
 				]
 			],
-			// #4 Time period "From" is below minimum time period.
+			// #3 Time period "From" is below minimum time period.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1982,7 +1875,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					]
 				]
 			],
-			// #5 Time period "From" is above maximum time period.
+			// #4 Time period "From" is above maximum time period.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -2001,7 +1894,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					'days_count' => true
 				]
 			],
-			// #6 Error when time period "To" is below minimum time period.
+			// #5 Error when time period "To" is below minimum time period.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -2019,7 +1912,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					]
 				]
 			],
-			// #7 Error when time period between "From" and "To" fields is > 730 days (731 days in case of leap year).
+			// #6 Error when time period between "From" and "To" fields is > 730 days (731 days in case of leap year).
 			[
 				[
 					'expected' => TEST_BAD,
@@ -2039,7 +1932,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					'days_count' => true
 				]
 			],
-			// #8 Error when both time period selectors have invalid values.
+			// #7 Error when both time period selectors have invalid values.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -2059,7 +1952,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					]
 				]
 			],
-			// #9 Error when both time period selectors are empty.
+			// #8 Error when both time period selectors are empty.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -2079,7 +1972,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					]
 				]
 			],
-			// #10 Error when widget field is empty.
+			// #9 Error when widget field is empty.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -2096,7 +1989,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					]
 				]
 			],
-			// #11 No item error in column.
+			// #10 No item error in column.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -2111,27 +2004,11 @@ class testDashboardTopHostsWidget extends testWidgets {
 					]
 				]
 			],
-			// #12 Incorrect base color.
-			[
-				[
-					'expected' => TEST_BAD,
-					'column_fields' => [
-						[
-							'Data' => 'Item value',
-							'Item name' => 'Available memory',
-							'Base colour' => '#$%$@@'
-						]
-					],
-					'column_error' => [
-						'Invalid parameter "/1/base_color": a hexadecimal colour code (6 symbols) is expected.'
-					]
-				]
-			],
 			/**
 			 * TODO: At the moment error handling is inconsistent for column fields. Uncomment or replace expected column
 			 *  error(s) after the DEV-3951 fix.
 			 */
-			// #13 Error when Sparkline time period "From" is below minimum time period.
+			// #11 Error when Sparkline time period "From" is below minimum time period.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -2150,7 +2027,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					]
 				]
 			],
-			// #14 Error when sparkline time period "From" is above maximum time period.
+			// #12 Error when sparkline time period "From" is above maximum time period.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -2170,7 +2047,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					'days_count' => true
 				]
 			],
-			// #15 Error when sparkline time period "To" is below minimum time period.
+			// #13 Error when sparkline time period "To" is below minimum time period.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -2189,7 +2066,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					]
 				]
 			],
-			// #16 Error when sparkline time period between "From" and "To" fields is > 730 days (731 days in case of leap year).
+			// #14 Error when sparkline time period between "From" and "To" fields is > 730 days (731 days in case of leap year).
 			[
 				[
 					'expected' => TEST_BAD,
@@ -2210,7 +2087,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					'days_count' => true
 				]
 			],
-			// #17 Error when sparkline time period From/To are empty.
+			// #15 Error when sparkline time period From/To are empty.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -2232,7 +2109,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					]
 				]
 			],
-			// #18 Error when sparkline time period From/To with invalid value.
+			// #16 Error when sparkline time period From/To with invalid value.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -2254,7 +2131,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					]
 				]
 			],
-			// #19 Error when sparkline widget field is empty.
+			// #17 Error when sparkline widget field is empty.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -2273,45 +2150,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					]
 				]
 			],
-			// #20 Error when invalid colour is picked for sparkline charts.
-			[
-				[
-					'expected' => TEST_BAD,
-					'column_fields' => [
-						[
-							'Name' => 'test name',
-							'Data' => 'Item value',
-							'Display' => 'Sparkline',
-							'Item name' => 'Available memory',
-							'xpath:.//input[@id="sparkline_color"]/..' => '!@#$%^'
-						]
-					],
-					'column_error' => [
-						'Invalid parameter "Colour": a hexadecimal colour code (6 symbols) is expected.'
-//						'Invalid parameter "/1/sparkline/sparkline_color": a hexadecimal colour code (6 symbols) is expected.'
-					]
-				]
-			],
-			// #21 Error when colour picker is empty.
-			[
-				[
-					'expected' => TEST_BAD,
-					'column_fields' => [
-						[
-							'Name' => 'test name',
-							'Data' => 'Item value',
-							'Display' => 'Sparkline',
-							'Item name' => 'Available memory',
-							'xpath:.//input[@id="sparkline_color"]/..' => ''
-						]
-					],
-					'column_error' => [
-						'Invalid parameter "Colour": cannot be empty.'
-//						'Invalid parameter "/1/sparkline/sparkline_color": cannot be empty.'
-					]
-				]
-			],
-			// #22 Update all main fields.
+			// #18 Update all main fields.
 			[
 				[
 					'main_fields' => [
@@ -2326,7 +2165,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					]
 				]
 			],
-			// #23 Update first item column to Text column and add some values.
+			// #19 Update first item column to Text column and add some values.
 			[
 				[
 					'main_fields' => [
@@ -2343,7 +2182,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					]
 				]
 			],
-			// #24 Update first column to Host name column and add some values.
+			// #20 Update first column to Host name column and add some values.
 			[
 				[
 					'main_fields' => [
@@ -2358,7 +2197,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					]
 				]
 			],
-			// #25 Update first column to Item column and check time From/To.
+			// #21 Update first column to Item column and check time From/To.
 			[
 				[
 					'main_fields' => [
@@ -2377,7 +2216,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					]
 				]
 			],
-			// #26 Update time From/To.
+			// #22 Update time From/To.
 			[
 				[
 					'main_fields' => [
@@ -2396,7 +2235,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					]
 				]
 			],
-			// #27 Update time From/To (day before yesterday).
+			// #23 Update time From/To (day before yesterday).
 			[
 				[
 					'main_fields' => [
@@ -2415,7 +2254,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					]
 				]
 			],
-			// #28 Update time From/To.
+			// #24 Update time From/To.
 			[
 				[
 					'main_fields' => [
@@ -2434,7 +2273,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					]
 				]
 			],
-			// #29 Update to sparkline fields.
+			// #25 Update to sparkline fields.
 			[
 				[
 					'main_fields' => [
@@ -2457,7 +2296,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 							'Display' => 'Sparkline',
 							'id:sparkline_width' => '0',
 							'id:sparkline_fill' => '10',
-							'xpath:.//input[@id="sparkline_color"]/..' => '000000',
+							self::PATH_TO_COLOR_PICKER.'"sparkline[color]"]' => '000000',
 							'id:sparkline_time_period_from' => 'now-1w',
 							'id:sparkline_time_period_to' => 'now-1d'
 						],
@@ -2487,7 +2326,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					'replace' => true
 				]
 			],
-			// #30 Spaces in input fields.
+			// #26 Spaces in input fields.
 			[
 				[
 					'trim' => true,
@@ -2547,7 +2386,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					]
 				]
 			],
-			// #31 User macros in input fields.
+			// #27 User macros in input fields.
 			[
 				[
 					'main_fields' => [
@@ -2570,7 +2409,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					]
 				]
 			],
-			// #32 Global macros in input fields.
+			// #28 Global macros in input fields.
 			[
 				[
 					'main_fields' => [
@@ -2593,7 +2432,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					]
 				]
 			],
-			// #33 Update item column adding new values and fields.
+			// #29 Update item column adding new values and fields.
 			[
 				[
 					'main_fields' => [
@@ -2643,7 +2482,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					]
 				]
 			],
-			// #34 Error message when empty highlight is passed.
+			// #30 Error message when empty highlight is passed.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -2663,7 +2502,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					]
 				]
 			],
-			// #35 Successful Highlights update.
+			// #31 Successful Highlights update.
 			[
 				[
 					'main_fields' => [
@@ -2682,7 +2521,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					]
 				]
 			],
-			// #36 Update to Binary item in column.
+			// #32 Update to Binary item in column.
 			[
 				[
 					'main_fields' => [
@@ -2923,8 +2762,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 
 				$form->query('xpath:(.//button[@name="edit"])['.$row_number.']')->one()->click();
 
-				$column_dialog = COverlayDialogElement::find()->waitUntilReady()->all()->last();
-				$this->assertEquals('Update column', $column_dialog->getTitle());
+				$column_dialog = COverlayDialogElement::get('Update column')->waitUntilReady();
 
 				// Check Thresholds values.
 				if (array_key_exists('Thresholds', $values)) {
@@ -2946,7 +2784,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 				// Advanced configuration in saved form is always false.
 				$values['Advanced configuration'] = false;
 				$column_dialog->asForm()->checkValue($values);
-				$this->query('xpath:(//button[text()="Cancel"])[2]')->one()->click();
+				$column_dialog->close();
 
 				// Check next row in a column table.
 				if ($row_number < $row_amount) {
@@ -3202,299 +3040,296 @@ class testDashboardTopHostsWidget extends testWidgets {
 					'screen_name' => 'bar_and_indi'
 				]
 			],
-			/**
-			 * TODO: Sparkline cases should be uncommented after ZBX-25761 fix.
-			 * TODO: Screenshots should be replaced after ZBX-25744 fix.
-			 */
 			// #6 Sparkline with no fluctuations and custom color.
-//			[
-//				[
-//					'main_fields' => [
-//						'Name' => 'No fluctuations'
-//					],
-//					'column_fields' => [
-//						[
-//							'Name' => 'test column 1',
-//							'Data' => 'Item value',
-//							'Item name' => 'Item with type of information - numeric (unsigned)',
-//							'Display' => 'Sparkline',
-//							'xpath:.//input[@id="sparkline_color"]/..' => 'BFFF00',
-//							'id:sparkline_time_period_from' => '2024-12-15 12:00:00',
-//							'id:sparkline_time_period_to' => '2024-12-15 13:00:00'
-//						]
-//					],
-//					'item_data' => [
-//						[
-//							'value' => '1',
-//							'name' => 'Item with type of information - numeric (unsigned)',
-//							'time' => '2024-12-15 13:00:00'
-//						],
-//						[
-//							'value' => '1',
-//							'name' => 'Item with type of information - numeric (unsigned)',
-//							'time' => '2024-12-15 12:00:00'
-//						]
-//					],
-//					'screen_name' => 'sparkline'
-//				]
-//			],
+			[
+				[
+					'main_fields' => [
+						'Name' => 'No fluctuations'
+					],
+					'column_fields' => [
+						[
+							'Name' => 'test column 1',
+							'Data' => 'Item value',
+							'Item name' => 'Sparkline item - numeric (unsigned)',
+							'Display' => 'Sparkline',
+							self::PATH_TO_COLOR_PICKER.'"sparkline[color]"]' => 'BFFF00',
+							'id:sparkline_time_period_from' => (date('Y-m-d', strtotime('-7 days'))).' 12:00:00',
+							'id:sparkline_time_period_to' => (date('Y-m-d', strtotime('-7 days'))).' 13:00:00'
+						]
+					],
+					'item_data' => [
+						[
+							'value' => '1',
+							'name' => 'Sparkline item - numeric (unsigned)',
+							'time' => (date('Y-m-d', strtotime('-7 days'))).' 13:00:00'
+						],
+						[
+							'value' => '1',
+							'name' => 'Sparkline item - numeric (unsigned)',
+							'time' => (date('Y-m-d', strtotime('-7 days'))).' 12:00:00'
+						]
+					],
+					'screen_name' => 'sparkline'
+				]
+			],
 			// #7 Sparkline with uptrend and custom color.
-//			[
-//				[
-//					'main_fields' => [
-//						'Name' => 'Uptrend'
-//					],
-//					'column_fields' => [
-//						[
-//							'Name' => 'test column 1',
-//							'Data' => 'Item value',
-//							'Item name' => 'Item with type of information - numeric (unsigned)',
-//							'Display' => 'Sparkline',
-//							'xpath:.//input[@id="sparkline_color"]/..' => 'B2EBF2',
-//							'id:sparkline_time_period_from' => '2024-12-15 12:00:00',
-//							'id:sparkline_time_period_to' => '2024-12-15 13:00:00'
-//						]
-//					],
-//					'item_data' => [
-//						[
-//							'value' => '1',
-//							'name' => 'Item with type of information - numeric (unsigned)',
-//							'time' => '2024-12-15 13:00:00'
-//						],
-//						[
-//							'value' => '0',
-//							'name' => 'Item with type of information - numeric (unsigned)',
-//							'time' => '2024-12-15 12:00:00'
-//						]
-//					],
-//					'screen_name' => 'sparkline_up'
-//				]
-//			],
+			[
+				[
+					'main_fields' => [
+						'Name' => 'Uptrend'
+					],
+					'column_fields' => [
+						[
+							'Name' => 'test column 1',
+							'Data' => 'Item value',
+							'Item name' => 'Sparkline item - numeric (unsigned)',
+							'Display' => 'Sparkline',
+							self::PATH_TO_COLOR_PICKER.'"sparkline[color]"]' => 'B2EBF2',
+							'id:sparkline_time_period_from' => (date('Y-m-d', strtotime('-15 days'))).' 12:00:00',
+							'id:sparkline_time_period_to' => (date('Y-m-d', strtotime('-15 days'))).' 13:00:00'
+						]
+					],
+					'item_data' => [
+						[
+							'value' => '1',
+							'name' => 'Sparkline item - numeric (unsigned)',
+							'time' => (date('Y-m-d', strtotime('-15 days'))).' 13:00:00'
+						],
+						[
+							'value' => '0',
+							'name' => 'Sparkline item - numeric (unsigned)',
+							'time' => (date('Y-m-d', strtotime('-15 days'))).' 12:00:00'
+						]
+					],
+					'screen_name' => 'sparkline_up'
+				]
+			],
 			// #8 Sparkline with downtrend and custom color.
-//			[
-//				[
-//					'main_fields' => [
-//						'Name' => 'Downtrend'
-//					],
-//					'column_fields' => [
-//						[
-//							'Name' => 'test column 1',
-//							'Data' => 'Item value',
-//							'Item name' => 'Item with type of information - numeric (unsigned)',
-//							'Display' => 'Sparkline',
-//							'xpath:.//input[@id="sparkline_color"]/..' => 'EF5350',
-//							'id:sparkline_time_period_from' => '2024-12-15 12:00:00',
-//							'id:sparkline_time_period_to' => '2024-12-15 13:00:00'
-//						]
-//					],
-//					'item_data' => [
-//						[
-//							'value' => '0',
-//							'name' => 'Item with type of information - numeric (unsigned)',
-//							'time' => '2024-12-15 13:00:00'
-//						],
-//						[
-//							'value' => '1',
-//							'name' => 'Item with type of information - numeric (unsigned)',
-//							'time' => '2024-12-15 12:00:00'
-//						]
-//					],
-//					'screen_name' => 'sparkline_down'
-//				]
-//			],
+			[
+				[
+					'main_fields' => [
+						'Name' => 'Downtrend'
+					],
+					'column_fields' => [
+						[
+							'Name' => 'test column 1',
+							'Data' => 'Item value',
+							'Item name' => 'Sparkline item - numeric (unsigned)',
+							'Display' => 'Sparkline',
+							self::PATH_TO_COLOR_PICKER.'"sparkline[color]"]' => 'EF5350',
+							'id:sparkline_time_period_from' => (date('Y-m-d', strtotime('-20 days'))).' 12:00:00',
+							'id:sparkline_time_period_to' => (date('Y-m-d', strtotime('-20 days'))).' 13:00:00'
+						]
+					],
+					'item_data' => [
+						[
+							'value' => '0',
+							'name' => 'Sparkline item - numeric (unsigned)',
+							'time' => (date('Y-m-d', strtotime('-20 days'))).' 13:00:00'
+						],
+						[
+							'value' => '1',
+							'name' => 'Sparkline item - numeric (unsigned)',
+							'time' => (date('Y-m-d', strtotime('-20 days'))).' 12:00:00'
+						]
+					],
+					'screen_name' => 'sparkline_down'
+				]
+			],
 			// #9 'Fill' and 'Width' fields are equal 0.
-//			[
-//				[
-//					'main_fields' => [
-//						'Name' => 'Invisible sparkline'
-//					],
-//					'column_fields' => [
-//						[
-//							'Name' => 'test column 1',
-//							'Data' => 'Item value',
-//							'Item name' => 'Item with type of information - numeric (unsigned)',
-//							'Display' => 'Sparkline',
-//							'id:sparkline_width' => '0',
-//							'id:sparkline_fill' => '0',
-//							'id:sparkline_time_period_from' => '2024-12-15 12:00:00',
-//							'id:sparkline_time_period_to' => '2024-12-15 13:00:00'
-//						]
-//					],
-//					'item_data' => [
-//						[
-//							'value' => '0',
-//							'name' => 'Item with type of information - numeric (unsigned)',
-//							'time' => '2024-12-15 13:00:00'
-//						],
-//						[
-//							'value' => '1',
-//							'name' => 'Item with type of information - numeric (unsigned)',
-//							'time' => '2024-12-15 12:00:00'
-//						]
-//					],
-//					'screen_name' => 'sparkline_transparent'
-//				]
-//			],
+			[
+				[
+					'main_fields' => [
+						'Name' => 'Invisible sparkline'
+					],
+					'column_fields' => [
+						[
+							'Name' => 'test column 1',
+							'Data' => 'Item value',
+							'Item name' => 'Sparkline item - numeric (unsigned)',
+							'Display' => 'Sparkline',
+							'id:sparkline_width' => '0',
+							'id:sparkline_fill' => '0',
+							'id:sparkline_time_period_from' => (date('Y-m-d', strtotime('-21 days'))).' 12:00:00',
+							'id:sparkline_time_period_to' => (date('Y-m-d', strtotime('-21 days'))).' 13:00:00'
+						]
+					],
+					'item_data' => [
+						[
+							'value' => '0',
+							'name' => 'Sparkline item - numeric (unsigned)',
+							'time' => (date('Y-m-d', strtotime('-21 days'))).' 13:00:00'
+						],
+						[
+							'value' => '1',
+							'name' => 'Sparkline item - numeric (unsigned)',
+							'time' => (date('Y-m-d', strtotime('-21 days'))).' 12:00:00'
+						]
+					],
+					'screen_name' => 'sparkline_transparent'
+				]
+			],
 			// #10 Sparkline with fluctuation and default color.
-//			[
-//				[
-//					'main_fields' => [
-//						'Name' => 'With fluctuation'
-//					],
-//					'column_fields' => [
-//						[
-//							'Name' => 'test column 1',
-//							'Data' => 'Item value',
-//							'Item name' => 'Item with type of information - numeric (unsigned)',
-//							'Display' => 'Sparkline',
-//							'id:sparkline_time_period_from' => '2024-12-15 12:00:00',
-//							'id:sparkline_time_period_to' => '2024-12-15 13:00:00'
-//						]
-//					],
-//					'item_data' => [
-//						[
-//							'value' => '1',
-//							'name' => 'Item with type of information - numeric (unsigned)',
-//							'time' => '2024-12-15 13:00:00'
-//						],
-//						[
-//							'value' => '5',
-//							'name' => 'Item with type of information - numeric (unsigned)',
-//							'time' => '2024-12-15 12:30:00'
-//						],
-//						[
-//							'value' => '1',
-//							'name' => 'Item with type of information - numeric (unsigned)',
-//							'time' => '2024-12-15 12:00:00'
-//						]
-//					],
-//					'screen_name' => 'sparkline_fluctuation'
-//				]
-//			],
+			[
+				[
+					'main_fields' => [
+						'Name' => 'With fluctuation'
+					],
+					'column_fields' => [
+						[
+							'Name' => 'test column 1',
+							'Data' => 'Item value',
+							'Item name' => 'Sparkline item - numeric (unsigned)',
+							'Display' => 'Sparkline',
+							'id:sparkline_time_period_from' => (date('Y-m-d', strtotime('-25 days'))).' 12:00:00',
+							'id:sparkline_time_period_to' => (date('Y-m-d', strtotime('-25 days'))).' 13:00:00'
+						]
+					],
+					'item_data' => [
+						[
+							'value' => '1',
+							'name' => 'Sparkline item - numeric (unsigned)',
+							'time' => (date('Y-m-d', strtotime('-25 days'))).' 13:00:00'
+						],
+						[
+							'value' => '5',
+							'name' => 'Sparkline item - numeric (unsigned)',
+							'time' => (date('Y-m-d', strtotime('-25 days'))).' 12:30:00'
+						],
+						[
+							'value' => '1',
+							'name' => 'Sparkline item - numeric (unsigned)',
+							'time' => (date('Y-m-d', strtotime('-25 days'))).' 12:00:00'
+						]
+					],
+					'screen_name' => 'sparkline_fluctuation'
+				]
+			],
 			// #11 Sparkline with fluctuations and custom color.
-//			[
-//				[
-//					'main_fields' => [
-//						'Name' => 'With fluctuations'
-//					],
-//					'column_fields' => [
-//						[
-//							'Name' => 'test column 1',
-//							'Data' => 'Item value',
-//							'Item name' => 'Item with type of information - numeric (unsigned)',
-//							'Display' => 'Sparkline',
-//							'xpath:.//input[@id="sparkline_color"]/..' => 'FFBF00',
-//							'id:sparkline_time_period_from' => '2024-12-15 12:00:00',
-//							'id:sparkline_time_period_to' => '2024-12-15 13:00:00'
-//						]
-//					],
-//					'item_data' => [
-//						[
-//							'value' => '10',
-//							'name' => 'Item with type of information - numeric (unsigned)',
-//							'time' => '2024-12-15 13:00:00'
-//						],
-//						[
-//							'value' => '15',
-//							'name' => 'Item with type of information - numeric (unsigned)',
-//							'time' => '2024-12-15 12:50:00'
-//						],
-//						[
-//							'value' => '2',
-//							'name' => 'Item with type of information - numeric (unsigned)',
-//							'time' => '2024-12-15 12:40:00'
-//						],
-//						[
-//							'value' => '7',
-//							'name' => 'Item with type of information - numeric (unsigned)',
-//							'time' => '2024-12-15 12:30:00'
-//						],
-//						[
-//							'value' => '1',
-//							'name' => 'Item with type of information - numeric (unsigned)',
-//							'time' => '2024-12-15 12:20:00'
-//						],
-//						[
-//							'value' => '5',
-//							'name' => 'Item with type of information - numeric (unsigned)',
-//							'time' => '2024-12-15 12:10:00'
-//						],
-//						[
-//							'value' => '0',
-//							'name' => 'Item with type of information - numeric (unsigned)',
-//							'time' => '2024-12-15 12:00:00'
-//						]
-//					],
-//					'screen_name' => 'sparkline_fluctuation2'
-//				]
-//			],
+			[
+				[
+					'main_fields' => [
+						'Name' => 'With fluctuations'
+					],
+					'column_fields' => [
+						[
+							'Name' => 'test column 1',
+							'Data' => 'Item value',
+							'Item name' => 'Sparkline item - numeric (unsigned)',
+							'Display' => 'Sparkline',
+							self::PATH_TO_COLOR_PICKER.'"sparkline[color]"]' => 'FFBF00',
+							'id:sparkline_time_period_from' => (date('Y-m-d', strtotime('-28 days'))).' 12:00:00',
+							'id:sparkline_time_period_to' => (date('Y-m-d', strtotime('-28 days'))).' 13:00:00'
+						]
+					],
+					'item_data' => [
+						[
+							'value' => '10',
+							'name' => 'Sparkline item - numeric (unsigned)',
+							'time' => (date('Y-m-d', strtotime('-28 days'))).' 13:00:00'
+						],
+						[
+							'value' => '15',
+							'name' => 'Sparkline item - numeric (unsigned)',
+							'time' => (date('Y-m-d', strtotime('-28 days'))).' 12:50:00'
+						],
+						[
+							'value' => '2',
+							'name' => 'Sparkline item - numeric (unsigned)',
+							'time' => (date('Y-m-d', strtotime('-28 days'))).' 12:40:00'
+						],
+						[
+							'value' => '7',
+							'name' => 'Sparkline item - numeric (unsigned)',
+							'time' => (date('Y-m-d', strtotime('-28 days'))).' 12:30:00'
+						],
+						[
+							'value' => '1',
+							'name' => 'Sparkline item - numeric (unsigned)',
+							'time' => (date('Y-m-d', strtotime('-28 days'))).' 12:20:00'
+						],
+						[
+							'value' => '5',
+							'name' => 'Sparkline item - numeric (unsigned)',
+							'time' => (date('Y-m-d', strtotime('-28 days'))).' 12:10:00'
+						],
+						[
+							'value' => '0',
+							'name' => 'Sparkline item - numeric (unsigned)',
+							'time' => (date('Y-m-d', strtotime('-28 days'))).' 12:00:00'
+						]
+					],
+					'screen_name' => 'sparkline_fluctuation2'
+				]
+			],
 			// #12 Two sparkline columns.
-//			[
-//				[
-//					'main_fields' => [
-//						'Name' => 'Two sparkline columns'
-//					],
-//					'column_fields' => [
-//						[
-//							'Name' => 'test column 1',
-//							'Data' => 'Item value',
-//							'Item name' => 'Item with type of information - numeric (unsigned)',
-//							'Display' => 'Sparkline',
-//							'xpath:.//input[@id="sparkline_color"]/..' => 'BFFF00',
-//							'id:sparkline_time_period_from' => '2024-12-15 12:00:00',
-//							'id:sparkline_time_period_to' => '2024-12-15 13:00:00'
-//						],
-//						[
-//							'Name' => 'test column 2',
-//							'Data' => 'Item value',
-//							'Item name' => 'Item with type of information - numeric (float)',
-//							'Display' => 'Sparkline',
-//							'xpath:.//input[@id="sparkline_color"]/..' => 'FFBF00'
-//						]
-//					],
-//					'item_data' => [
-//						[
-//							'value' => '1',
-//							'name' => 'Item with type of information - numeric (unsigned)',
-//							'time' => '2024-12-15 13:00:00'
-//						],
-//						[
-//							'value' => '1',
-//							'name' => 'Item with type of information - numeric (unsigned)',
-//							'time' => '2024-12-15 12:00:00'
-//						],
-//						[
-//							'value' => '1.11',
-//							'name' => 'Item with type of information - numeric (float)',
-//							'time' => '2024-12-15 13:00:00'
-//						],
-//						[
-//							'value' => '5.55',
-//							'name' => 'Item with type of information - numeric (float)',
-//							'time' => '2024-12-15 12:30:00'
-//						],
-//						[
-//							'value' => '2.22',
-//							'name' => 'Item with type of information - numeric (float)',
-//							'time' => '2024-12-15 12:00:00'
-//						]
-//					],
-//					'screen_name' => 'sparkline_columns'
-//				]
-//			]
+			[
+				[
+					'main_fields' => [
+						'Name' => 'Two sparkline columns'
+					],
+					'column_fields' => [
+						[
+							'Name' => 'test column 1',
+							'Data' => 'Item value',
+							'Item name' => 'Sparkline item - numeric (unsigned)',
+							'Display' => 'Sparkline',
+							self::PATH_TO_COLOR_PICKER.'"sparkline[color]"]' => 'BFFF00',
+							'id:sparkline_time_period_from' => (date('Y-m-d', strtotime('-30 days'))).' 12:00:00',
+							'id:sparkline_time_period_to' => (date('Y-m-d', strtotime('-30 days'))).' 13:00:00'
+						],
+						[
+							'Name' => 'test column 2',
+							'Data' => 'Item value',
+							'Item name' => 'Sparkline item - numeric (float)',
+							'Display' => 'Sparkline',
+							self::PATH_TO_COLOR_PICKER.'"sparkline[color]"]' => 'FFBF00',
+							'id:sparkline_time_period_from' => (date('Y-m-d', strtotime('-30 days'))).' 12:00:00',
+							'id:sparkline_time_period_to' => (date('Y-m-d', strtotime('-30 days'))).' 13:00:00'
+						]
+					],
+					'item_data' => [
+						[
+							'value' => '1',
+							'name' => 'Sparkline item - numeric (unsigned)',
+							'time' => (date('Y-m-d', strtotime('-30 days'))).' 13:00:00'
+						],
+						[
+							'value' => '1',
+							'name' => 'Sparkline item - numeric (unsigned)',
+							'time' => (date('Y-m-d', strtotime('-30 days'))).' 12:00:00'
+						],
+						[
+							'value' => '1.11',
+							'name' => 'Sparkline item - numeric (float)',
+							'time' => (date('Y-m-d', strtotime('-30 days'))).' 13:00:00'
+						],
+						[
+							'value' => '5.55',
+							'name' => 'Sparkline item - numeric (float)',
+							'time' => (date('Y-m-d', strtotime('-30 days'))).' 12:30:00'
+						],
+						[
+							'value' => '2.22',
+							'name' => 'Sparkline item - numeric (float)',
+							'time' => (date('Y-m-d', strtotime('-30 days'))).' 12:00:00'
+						]
+					],
+					'screen_name' => 'sparkline_columns'
+				]
+			]
 		];
 	}
 
 	/**
 	 * Check widget bars, indicators and sparkline with screenshots.
 	 *
-	 * @backup !history, !history_log, !history_str, !history_text, !history_uint
 	 * @dataProvider getScreenshotsData
 	 */
 	public function testDashboardTopHostsWidget_WidgetAppearance($data) {
 		if (array_key_exists('item_data', $data)) {
 			foreach ($data['item_data'] as $params) {
-				CDataHelper::addItemData(self::$aggregation_itemids[$params['name']], $params['value'], strtotime($params['time']));
+				CDataHelper::addItemData(self::$sparkline_itemids[$params['name']], $params['value'], strtotime($params['time']));
 			}
 		}
 
@@ -6060,7 +5895,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					]
 				]
 			],
-			// Check that widget displays bar/idnicators when aggregation function 'count' is used for non-numeric item.
+			// Check that widget displays bar/indicators when aggregation function 'count' is used for non-numeric item.
 			[
 				[
 					'widget_name' => 'Displaying count for non-numeric data via bar indicators',
@@ -6483,6 +6318,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 
 			foreach ($attributes as $attribute => $value) {
 				switch ($attribute) {
+					case 'color':
 					case 'value':
 						$this->assertEquals($value, $field->getValue());
 						break;
@@ -6498,10 +6334,6 @@ class testDashboardTopHostsWidget extends testWidgets {
 
 					case 'options':
 						$this->assertEquals($value, $field->asDropdown()->getOptions()->asText());
-						break;
-
-					case 'color':
-						$this->assertEquals($value, $form->query($label)->asColorPicker()->one()->getValue());
 						break;
 				}
 			}

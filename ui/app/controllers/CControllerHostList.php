@@ -197,7 +197,8 @@ class CControllerHostList extends CController {
 		$hosts = API::Host()->get([
 			'output' => ['hostid', $sort_field],
 			'evaltype' => $filter['evaltype'],
-			'tags' => $filter['tags'],
+			'tags' => $filter['tags'] ?: null,
+			'inheritedTags' => true,
 			'groupids' => $filter_groupids,
 			'templateids' => $filter['templates'] ? array_keys($filter['templates']) : null,
 			'proxyids' => $proxyids,
@@ -244,26 +245,42 @@ class CControllerHostList extends CController {
 				'details'
 			],
 			'selectItems' => API_OUTPUT_COUNT,
-			'selectDiscoveries' => API_OUTPUT_COUNT,
+			'selectDiscoveryRules' => API_OUTPUT_COUNT,
 			'selectTriggers' => API_OUTPUT_COUNT,
 			'selectGraphs' => API_OUTPUT_COUNT,
 			'selectHttpTests' => API_OUTPUT_COUNT,
 			'selectDiscoveryRule' => ['itemid', 'name', 'lifetime_type', 'enabled_lifetime_type'],
-			'selectHostDiscovery' => ['parent_hostid', 'status', 'ts_delete', 'ts_disable', 'disable_source'],
+			'selectDiscoveryData' => ['parent_hostid', 'status', 'ts_delete', 'ts_disable', 'disable_source'],
 			'selectTags' => ['tag', 'value'],
+			'selectInheritedTags' => ['tag', 'value'],
 			'hostids' => array_column($hosts, 'hostid'),
 			'preservekeys' => true
 		]);
 
-		foreach ($hosts as &$host) {
-			$host['is_discovery_rule_editable'] = $host['discoveryRule']
-				&& API::DiscoveryRule()->get([
-					'output' => [],
-					'itemids' => $host['discoveryRule']['itemid'],
-					'editable' => true
-				]);
+		$lld_parentids = [];
+
+		foreach ($hosts as $host) {
+			if ($host['discoveryRule']) {
+				$lld_parentids[$host['discoveryRule']['itemid']] = true;
+			}
 		}
-		unset($host);
+
+		if ($lld_parentids) {
+			$editable_lld_parents = API::DiscoveryRule()->get([
+				'output' => [],
+				'itemids' => array_keys($lld_parentids),
+				'editable' => true,
+				'preservekeys' => true
+			]);
+
+			foreach ($hosts as &$host) {
+				if ($host['discoveryRule']) {
+					$host['is_discovery_rule_editable'] =
+						array_key_exists($host['discoveryRule']['itemid'], $editable_lld_parents);
+				}
+			}
+			unset($host);
+		}
 
 		order_result($hosts, $sort_field, $sort_order);
 
@@ -391,6 +408,8 @@ class CControllerHostList extends CController {
 			$filter['tags'] = [['tag' => '', 'value' => '', 'operator' => TAG_OPERATOR_LIKE]];
 		}
 
+		CTagHelper::mergeOwnAndInheritedTags($hosts, true);
+
 		$data = [
 			'action' => $this->getAction(),
 			'hosts' => $hosts,
@@ -408,7 +427,7 @@ class CControllerHostList extends CController {
 			'proxy_groups_ms' => $proxy_groups_ms,
 			'profileIdx' => 'web.hosts.filter',
 			'active_tab' => CProfile::get('web.hosts.filter.active', 1),
-			'tags' => makeTags($hosts, true, 'hostid', ZBX_TAG_COUNT_DEFAULT, $filter['tags']),
+			'tags' => CTagHelper::getTagsHtml($hosts, ZBX_TAG_OBJECT_HOST, ['filter_tags' => $filter['tags']]),
 			'config' => [
 				'max_in_table' => CSettingsHelper::get(CSettingsHelper::MAX_IN_TABLE)
 			],

@@ -20,8 +20,37 @@ require_once __DIR__ . '/../../include/CWebTest.php';
  * @backup dashboard, profiles
  *
  * @dataSource Actions, AllItemValueTypes, CopyWidgetsDashboards, ItemValueWidget, LoginUsers, Proxies, UserPermissions
+ *
+ * @onBefore prepareData
  */
 class testDashboardsWidgetsPage extends CWebTest {
+
+	protected static $dashboardid;
+
+	public static function prepareData() {
+		// Create dashboard and widget for checkProblemHostsWidget test.
+		self::$dashboardid = CDataHelper::call('dashboard.create', [
+			[
+				'name' => 'Dashboard for Problem hosts widget test',
+				'userid' => '1',
+				'private' => 1,
+				'pages' => [
+					[
+						'widgets' => [
+							[
+								'type' => 'problemhosts',
+								'name' => '',
+								'x' => 0,
+								'y' => 0,
+								'width' => 36,
+								'height' => 16
+							]
+						]
+					]
+				]
+			]
+		])['dashboardids'][0];
+	}
 
 	/**
 	 * Default selected widget type.
@@ -126,29 +155,32 @@ class testDashboardsWidgetsPage extends CWebTest {
 	 */
 	public function testDashboardsWidgetsPage_checkProblemHostsWidget() {
 		// Authorize user and open the page with the desired widget.
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=1000');
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid);
 
 		// Find dashboard element.
 		$dashboard = CDashboardElement::find()->one();
 
 		// Get dashboard widget element by widget title ('Problem hosts').
 		$widget = $dashboard->getWidget('Problem hosts');
+
 		// Check refresh interval of widget.
 		$this->assertEquals('1 minute', $widget->getRefreshInterval());
+		CPopupMenuElement::find()->one()->close();
 
 		// Get widget content as table.
 		$table = $widget->getContent()->asTable();
+
 		// Check text of the table headers.
 		$this->assertSame(['Host group', 'Without problems', 'With problems', 'Total'], $table->getHeadersText());
 
 		// Expected table values.
 		$expected = [
-			'Zabbix servers'					=> 19,
+			'Zabbix servers'					=> 18,
 			'Inheritance test'					=> 1,
 			'Host group for suppression'		=> 1
 		];
 
-		/*
+		/**
 		 * Index rows by column "Host group":
 		 * Get table data as array where values from column 'Host group' are used as array keys.
 		 */

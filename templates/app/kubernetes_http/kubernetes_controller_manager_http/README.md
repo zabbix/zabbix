@@ -10,7 +10,7 @@ Template `Kubernetes Controller manager by HTTP` - collects metrics by HTTP agen
 
 ## Requirements
 
-Zabbix version: 7.4 and higher.
+Zabbix version: 8.0 and higher.
 
 ## Tested versions
 
@@ -19,29 +19,29 @@ This template has been tested on:
 
 ## Configuration
 
-> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/7.4/manual/config/templates_out_of_the_box) section.
+> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/8.0/manual/config/templates_out_of_the_box) section.
 
 ## Setup
 
 Internal service metrics are collected from /metrics endpoint.
-Template needs to use Authorization via API token. 
+Template needs to use Authorization via API token.
 
 Don't forget change macros {$KUBE.CONTROLLER.SERVER.URL}, {$KUBE.API.TOKEN}.
 Also, see the Macros section for a list of macros used to set trigger values.
 
-*NOTE.* You might need to set the `--binding-address` option for Controller Manager to the address where Zabbix proxy can reach it.
+**Note:** You might need to set the `--binding-address` option for Controller Manager to the address where Zabbix proxy can reach it.
 For example, for clusters created with `kubeadm` it can be set in the following manifest file (changes will be applied immediately):
 
 - /etc/kubernetes/manifests/kube-controller-manager.yaml
 
-*NOTE.* Some metrics may not be collected depending on your Kubernetes Controller manager instance version and configuration.
+**Note:** Some metrics may not be collected depending on your Kubernetes Controller manager instance version and configuration.
 
 ### Macros used
 
 |Name|Description|Default|
 |----|-----------|-------|
-|{$KUBE.CONTROLLER.SERVER.URL}|<p>Kubernetes Controller manager metrics endpoint URL.</p>|`https://localhost:10257/metrics`|
 |{$KUBE.API.TOKEN}|<p>API Authorization Token</p>||
+|{$KUBE.CONTROLLER.SERVER.URL}|<p>Kubernetes Controller manager metrics endpoint URL.</p>|`https://localhost:10257/metrics`|
 |{$KUBE.CONTROLLER.HTTP.CLIENT.ERROR}|<p>Maximum number of HTTP client requests failures used for trigger.</p>|`2`|
 
 ### Items

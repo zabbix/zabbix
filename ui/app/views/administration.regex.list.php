@@ -16,10 +16,11 @@
 
 /**
  * @var CView $this
+ * @var array $data
  */
 
 if ($data['uncheck']) {
-	uncheckTableRows('regex');
+	uncheckTableRows('regexp');
 }
 
 $html_page = (new CHtmlPage())
@@ -40,33 +41,33 @@ $form = (new CForm())->setName('regularExpressionsForm');
 $table = (new CTableInfo())
 	->setHeader([
 		(new CColHeader(
-			(new CCheckBox('all-regexes'))->onClick("checkAll('".$form->getName()."', 'all-regexes', 'regexids');")
+			(new CCheckBox('all-regexes'))->onClick("checkAll('".$form->getName()."', 'all-regexes', 'regexpids');")
 		))->addClass(ZBX_STYLE_CELL_WIDTH),
 		_('Name'),
 		_('Expressions')
 	]);
 
-foreach($data['regexs'] as $regexid => $regex) {
+foreach ($data['regexps'] as $regexpid => $regexp) {
 	$numb = 1;
 	$expressions = [];
 
-	foreach($regex['expressions'] as $expression) {
+	foreach ($regexp['expressions'] as $expression) {
 		$expressions[] = (new CTable())->addRow([
 			new CCol($numb++),
 			new CCol([' ', RARR(), ' ']),
 			(new CCol($expression['expression']))->addClass(ZBX_STYLE_WORDWRAP),
-			new CCol(' ['.CRegexHelper::expression_type2str($expression['expression_type']).']')
+			new CCol('['.CRegexHelper::expression_type2str($expression['expression_type']).']')
 		]);
 	}
 
 	$table->addRow([
-		new CCheckBox('regexids['.$regexid.']', $regexid),
+		new CCheckBox('regexpids['.$regexpid.']', $regexpid),
 		(new CCol(
-			new CLink($regex['name'],
+			new CLink($regexp['name'],
 				(new CUrl('zabbix.php'))
 					->setArgument('action', 'regex.edit')
-					->setArgument('regexid', $regexid)
-			),
+					->setArgument('regexpid', $regexpid)
+			)
 		))->addClass(ZBX_STYLE_WORDBREAK),
 		$expressions
 	]);
@@ -74,14 +75,14 @@ foreach($data['regexs'] as $regexid => $regex) {
 
 $form->addItem([
 	$table,
-	new CActionButtonList('action', 'regexids', [
+	new CActionButtonList('action', 'regexpids', [
 		'regex.delete' => [
 			'name' => _('Delete'),
 			'confirm_singular' => _('Delete selected regular expression?'),
 			'confirm_plural' => _('Delete selected regular expressions?'),
 			'csrf_token' => CCsrfTokenHelper::get('regex')
 		]
-	], 'regex')
+	], 'regexp')
 ]);
 
 $html_page->addItem($form)->show();

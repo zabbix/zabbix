@@ -142,12 +142,7 @@ class CProxy extends CApiService {
 			if ($rt_filter) {
 				$this->dbFilter('proxy_rtdata pr', ['filter' => $rt_filter] + $options, $sql_parts);
 
-				$sql_parts['left_join']['proxy_rtdata'] = [
-					'alias' => 'pr',
-					'table' => 'proxy_rtdata',
-					'using' => 'proxyid'
-				];
-				$sql_parts['left_table'] = ['alias' => $this->tableAlias, 'table' => $this->tableName];
+				$sql_parts['join']['pr'] = ['type' => 'left', 'table' => 'proxy_rtdata', 'using' => 'proxyid'];
 			}
 		}
 
@@ -172,12 +167,7 @@ class CProxy extends CApiService {
 			}
 
 			if ($proxy_rtdata) {
-				$sql_parts['left_join']['proxy_rtdata'] = [
-					'alias' => 'pr',
-					'table' => 'proxy_rtdata',
-					'using' => 'proxyid'
-				];
-				$sql_parts['left_table'] = ['alias' => $this->tableAlias, 'table' => $this->tableName];
+				$sql_parts['join']['pr'] = ['type' => 'left', 'table' => 'proxy_rtdata', 'using' => 'proxyid'];
 			}
 		}
 
@@ -420,7 +410,6 @@ class CProxy extends CApiService {
 		$this->validateDelete($proxyids, $db_proxies);
 
 		DB::delete('host_proxy', ['proxyid' => $proxyids]);
-		DB::delete('proxy_rtdata', ['proxyid' => $proxyids]);
 		DB::delete('proxy', ['proxyid' => $proxyids]);
 
 		self::addAuditLog(CAudit::ACTION_DELETE, CAudit::RESOURCE_PROXY, $db_proxies);

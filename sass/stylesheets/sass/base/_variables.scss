@@ -1,0 +1,13 @@
+:root {
+	--font-stack: Inter, "Noto Sans Georgian", "Noto Sans Hebrew", "Noto Sans JP", "Noto Sans KR", "Noto Sans SC", "Apple SD Gothic Neo", "Arial Hebrew", Arial, "DejaVu Sans", Helvetica, "Hiragino Sans", "Liberation Sans", "Malgun Gothic", Meiryo, "Microsoft YaHei", "PingFang SC", Roboto, Sylfaen, sans-serif;
+	--font-stack-mono: "Courier New", Courier, monospace;
+	--font-body-size: 75%; // Default 1em/12px
+}
+
+[lang="zh"] {
+	--font-stack: Inter, "Noto Sans Georgian", "Noto Sans Hebrew", "Noto Sans KR", "Noto Sans SC", "Noto Sans JP", "Apple SD Gothic Neo", "Arial Hebrew", Arial, "DejaVu Sans", Helvetica, "Hiragino Sans", "Liberation Sans", "Malgun Gothic", Meiryo, "Microsoft YaHei", "PingFang SC", Roboto, Sylfaen, sans-serif;
+}
+
+[lang="ka"] {
+	--font-body-size: 70%;
+}

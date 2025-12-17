@@ -116,7 +116,7 @@ class CControllerSlaList extends CController {
 		$options = [
 			'output' => [],
 			'evaltype' => $filter['evaltype'],
-			'service_tags' => $filter['tags'],
+			'service_tags' => $filter['tags'] ?: null,
 			'search' => [
 				'name' => ($filter['name'] === '') ? null : $filter['name']
 			],

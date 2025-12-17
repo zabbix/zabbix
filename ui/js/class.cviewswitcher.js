@@ -374,16 +374,10 @@ ActionProcessor.prototype = {
 					this.actionToggle(action.value, !this.checkConditions(action.cond));
 					break;
 				case 'enable':
-					jQuery(action.value)
-						.prop('disabled', !this.checkConditions(action.cond))
-						.closest('.color-picker')
-						.toggleClass('disabled', !this.checkConditions(action.cond));
+					jQuery(action.value).prop('disabled', !this.checkConditions(action.cond));
 					break;
 				case 'disable':
-					jQuery(action.value)
-						.prop('disabled', this.checkConditions(action.cond))
-						.closest('.color-picker')
-						.toggleClass('disabled', this.checkConditions(action.cond));
+					jQuery(action.value).prop('disabled', this.checkConditions(action.cond));
 					break;
 			}
 		}

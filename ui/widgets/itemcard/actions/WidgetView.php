@@ -28,6 +28,7 @@ use API,
 	CSettingsHelper,
 	CSimpleIntervalParser,
 	CSvgGraph,
+	CTagHelper,
 	CUpdateIntervalParser,
 	CWebUser,
 	Manager;
@@ -84,10 +85,8 @@ class WidgetView extends CControllerDashboardWidgetView {
 			],
 			'selectHosts' => ['hostid', 'name'],
 			'selectTemplates' => ['templateid', 'name'],
-			'selectDiscoveryRule' => ['itemid', 'name', 'templateid'],
-			'selectItemDiscovery' => ['itemdiscoveryid', 'itemid', 'parent_itemid', 'status', 'ts_delete', 'ts_disable',
-				'disable_source'
-			],
+			'selectDiscoveryRule' => ['itemid', 'name', 'templateid', 'flags'],
+			'selectDiscoveryData' => ['parent_itemid', 'status', 'ts_delete', 'ts_disable', 'disable_source'],
 			'selectTriggers' => ['triggerid'],
 			'webitems' => true
 		];
@@ -106,7 +105,8 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 		if (in_array(CWidgetFieldItemSections::SECTION_TAGS, $this->fields_values['sections'])) {
 			$options += [
-				'selectTags' => ['tag', 'value']
+				'selectTags' => ['tag', 'value'],
+				'selectInheritedTags' => ['tag', 'value']
 			];
 		}
 
@@ -179,11 +179,11 @@ class WidgetView extends CControllerDashboardWidgetView {
 			$this->getItemValue($item);
 		}
 
-		if (in_array(CWidgetFieldItemSections::SECTION_METRICS, $this->fields_values['sections'])) {
+		if (in_array(CWidgetFieldItemSections::SECTION_INTERVAL_AND_STORAGE, $this->fields_values['sections'])) {
 			$this->prepareItemDelay($item);
 		}
 
-		if (in_array(CWidgetFieldItemSections::SECTION_METRICS, $this->fields_values['sections'])
+		if (in_array(CWidgetFieldItemSections::SECTION_INTERVAL_AND_STORAGE, $this->fields_values['sections'])
 				|| in_array(CWidgetFieldItemSections::SECTION_LATEST_DATA, $this->fields_values['sections'])) {
 			$this->prepareItemHistoryAndTrends($item);
 		}
@@ -192,6 +192,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 			unset($item['discoveryRule']);
 		}
 		else {
+			$item['parent_lld'] = $item['discoveryRule'];
 			$item['is_discovery_rule_editable'] = (bool) API::DiscoveryRule()->get([
 				'output' => [],
 				'itemids' => $item['discoveryRule']['itemid'],
@@ -200,7 +201,9 @@ class WidgetView extends CControllerDashboardWidgetView {
 		}
 
 		if (in_array(CWidgetFieldItemSections::SECTION_TAGS, $this->fields_values['sections'])) {
-			$item['tags'] = CItemHelper::addInheritedTags($item, $item['tags']);
+			CTagHelper::mergeOwnAndInheritedTagsForObject($item);
+
+			CArrayHelper::sort($item['tags'], ['tag', 'value']);
 		}
 
 		return $item;

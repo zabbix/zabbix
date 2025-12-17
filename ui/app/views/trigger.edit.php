@@ -26,8 +26,6 @@ $trigger_form = (new CForm())
 	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)
 	->addVar('hostid', $data['hostid'])
 	->addVar('context', $data['context'])
-	->addVar('expr_temp', $data['expr_temp'], 'expr_temp')
-	->addVar('recovery_expr_temp', $data['recovery_expr_temp'], 'recovery_expr_temp')
 	->addVar('triggerid', $data['triggerid'])
 	->addStyle('display: none;');
 
@@ -61,7 +59,8 @@ $triggers_tab = (new CTabView())
 			'show_inherited_tags' => $data['show_inherited_tags'],
 			'readonly' => $discovered_trigger,
 			'tabs_id' => 'tabs',
-			'tags_tab_id' => 'tags-tab'
+			'tags_tab_id' => 'tags-tab',
+			'has_inline_validation' => true
 		]),
 		TAB_INDICATOR_TAGS
 	)
@@ -98,7 +97,25 @@ else {
 			'class' => ZBX_STYLE_BTN_ALT,
 			'keepOpen' => true,
 			'isSubmit' => false,
-			'action' => 'trigger_edit_popup.clone();'
+			'action' => 'trigger_edit_popup.clone('.json_encode([
+				'title' => _('New trigger'),
+				'buttons' => [
+					[
+						'title' => _('Add'),
+						'class' => 'js-add',
+						'keepOpen' => true,
+						'isSubmit' => true,
+						'action' => 'trigger_edit_popup.submit();'
+					],
+					[
+						'title' => _('Cancel'),
+						'class' => ZBX_STYLE_BTN_ALT,
+						'cancel' => true,
+						'action' => ''
+					]
+				],
+				'rules' => (new CFormValidator(CControllerTriggerCreate::getValidationRules()))->getRules()
+			]).');'
 		],
 		[
 			'title' => _('Delete'),
@@ -130,6 +147,7 @@ $return_url = (new CUrl('zabbix.php'))
 $trigger_form
 	->addItem($triggers_tab)
 	->addItem((new CScriptTag('trigger_edit_popup.init('.json_encode([
+			'rules' => $data['js_validation_rules'],
 			'triggerid' => $data['triggerid'],
 			'expression_popup_parameters' => $popup_parameters,
 			'readonly' => $readonly,

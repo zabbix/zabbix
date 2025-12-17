@@ -28,17 +28,22 @@ use Widgets\TopItems\Includes\{
 use Widgets\TopItems\Widget;
 
 $table = new CTableInfo();
+$header = [];
+
+if ($data['show_column_header'] != WidgetForm::COLUMN_HEADER_OFF) {
+	$header[] = $data['layout'] == WidgetForm::LAYOUT_VERTICAL
+		? new CColHeader(_('Items'))
+		: new CColHeader(_('Hosts'));
+
+	$table->setHeader($header);
+}
 
 if ($data['error'] !== null) {
-	$table->setNoDataMessage($data['error']);
+	$table->setNoDataMessage($data['error'], null, ZBX_ICON_SEARCH_LARGE);
 }
 else {
 	if ($data['show_column_header'] != WidgetForm::COLUMN_HEADER_OFF) {
-		$header = [];
-
 		if ($data['layout'] == WidgetForm::LAYOUT_VERTICAL) {
-			$header[] = new CColHeader(_('Items'));
-
 			foreach ($data['rows'][0] as $cell) {
 				$hostid = $cell[Widget::CELL_HOSTID];
 				$title = $data['db_hosts'][$hostid]['name'];
@@ -52,8 +57,6 @@ else {
 			}
 		}
 		else {
-			$header[] = new CColHeader(_('Hosts'));
-
 			foreach ($data['rows'][0] as $cell) {
 				['name' => $title, 'is_view_value_in_column' => $is_view_value] = $cell[Widget::CELL_METADATA];
 				$header[] = (new CColHeader(
@@ -130,9 +133,13 @@ function makeTableCellViewsNumeric(array $cell, array $data, $formatted_value, b
 	$column = $data['configuration'][$cell[Widget::CELL_METADATA]['column_index']];
 	$color = $column['base_color'];
 
-	$value_cell = (new CCol(new CDiv($formatted_value)))
-		->addClass(ZBX_STYLE_CURSOR_POINTER)
-		->addClass(ZBX_STYLE_NOWRAP);
+	$value_cell = new CCol(new CDiv($formatted_value));
+	$value_cell->addClass(ZBX_STYLE_NOWRAP);
+
+	$combined = $item['combined'] ?? false;
+	if (!$combined) {
+		$value_cell->addClass(ZBX_STYLE_CURSOR_POINTER);
+	}
 
 	if ($value !== '') {
 		$value_cell->setHint((new CDiv($value))->addClass(ZBX_STYLE_HINTBOX_WRAP), '', false);
@@ -190,6 +197,8 @@ function makeTableCellViewsNumeric(array $cell, array $data, $formatted_value, b
 
 			return [new CCol($bar_gauge), $value_cell];
 	}
+
+	return [];
 }
 
 function makeTableCellViewFormattedValue(array $cell, array $data): CSpan {
@@ -214,8 +223,11 @@ function makeTableCellViewFormattedValue(array $cell, array $data): CSpan {
 		);
 	}
 
-	return (new CSpan($formatted_value))
-		->setMenuPopup(
+	$span = (new CSpan($formatted_value));
+
+	$combined = $item['combined'] ?? false;
+	if (!$combined) {
+		$span->setMenuPopup(
 			CMenuPopupHelper::getItem([
 				'itemid' => $itemid,
 				'context' => 'host',
@@ -224,6 +236,9 @@ function makeTableCellViewFormattedValue(array $cell, array $data): CSpan {
 					->getUrl()
 			])
 		);
+	}
+
+	return $span;
 }
 
 function makeTableCellViewsText(array $cell, array $data, $formatted_value, bool $is_view_value): array {
@@ -233,7 +248,7 @@ function makeTableCellViewsText(array $cell, array $data, $formatted_value, bool
 	$color = '';
 	if (array_key_exists('highlights', $column)) {
 		foreach ($column['highlights'] as $highlight) {
-			if (@preg_match('('.$highlight['pattern'].')', $value)) {
+			if (@preg_match('/'.CRegexHelper::handleSlashEscaping($highlight['pattern']).'/', $value)) {
 				$color = $highlight['color'];
 				break;
 			}

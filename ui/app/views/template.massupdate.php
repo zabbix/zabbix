@@ -82,6 +82,7 @@ $template_tab
 				'name' => 'groups[]',
 				'object_name' => 'templateGroup',
 				'add_new' => (CWebUser::getType() == USER_TYPE_SUPER_ADMIN),
+				'maxlength' => DB::getFieldLength('hstgrp', 'name'),
 				'popup' => [
 					'parameters' => [
 						'srctbl' => 'template_groups',

@@ -22,7 +22,7 @@ It also uses Zabbix agent to collect `Nginx` Linux process statistics, such as C
 
 ## Requirements
 
-Zabbix version: 7.4 and higher.
+Zabbix version: 8.0 and higher.
 
 ## Tested versions
 
@@ -31,7 +31,7 @@ This template has been tested on:
 
 ## Configuration
 
-> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/7.4/manual/config/templates_out_of_the_box) section.
+> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/8.0/manual/config/templates_out_of_the_box) section.
 
 ## Setup
 
@@ -60,7 +60,7 @@ Reading: 6 Writing: 179 Waiting: 106
 
 Note that this template doesn't support https and redirects (limitations of web.page.get).
 
-Install and setup [Zabbix agent](https://www.zabbix.com/documentation/7.4/manual/installation/install_from_packages).
+Install and setup [Zabbix agent](https://www.zabbix.com/documentation/8.0/manual/installation/install_from_packages).
 
 ### Macros used
 
@@ -69,10 +69,10 @@ Install and setup [Zabbix agent](https://www.zabbix.com/documentation/7.4/manual
 |{$NGINX.STUB_STATUS.HOST}|<p>The hostname or IP address of the Nginx host or Nginx container of `astub_status`.</p>|`localhost`|
 |{$NGINX.STUB_STATUS.PATH}|<p>The path of the `Nginx stub_status` page.</p>|`basic_status`|
 |{$NGINX.STUB_STATUS.PORT}|<p>The port of the `Nginx stub_status` host or container.</p>|`80`|
-|{$NGINX.RESPONSE_TIME.MAX.WARN}|<p>The maximum response time of Nginx expressed in seconds for a trigger expression.</p>|`10`|
-|{$NGINX.DROP_RATE.MAX.WARN}|<p>The critical rate of the dropped connections for a trigger expression.</p>|`1`|
 |{$NGINX.PROCESS_NAME}|<p>The process name filter for the Nginx process discovery.</p>|`nginx`|
 |{$NGINX.PROCESS.NAME.PARAMETER}|<p>The process name of the Nginx server used in the item key `proc.get`. It could be specified if the correct process name is known.</p>||
+|{$NGINX.RESPONSE_TIME.MAX.WARN}|<p>The maximum response time of Nginx expressed in seconds for a trigger expression.</p>|`10`|
+|{$NGINX.DROP_RATE.MAX.WARN}|<p>The critical rate of the dropped connections for a trigger expression.</p>|`1`|
 
 ### Items
 

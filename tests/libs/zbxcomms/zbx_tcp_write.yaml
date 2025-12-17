@@ -1,0 +1,25 @@
+---
+test case: "default usage"
+in:
+  poll_mode: "MOCK_POLL_DEFAULT"
+  len: 100
+out:
+  result: 100
+---
+test case: "write error"
+in:
+  poll_mode: "MOCK_POLL_DEFAULT"
+  len: 0
+  write_error: true
+  socket_had_blocking_error: "no"
+out:
+  result: -1
+---
+test case: "revents error"
+in:
+  poll_mode: "MOCK_POLL_REVENTS_ERROR"
+  len: 0
+  write_error: true
+out:
+  result: -1
+...

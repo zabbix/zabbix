@@ -165,6 +165,7 @@ class ZColorPicker extends HTMLElement {
 	#has_default;
 	#has_palette;
 	#disabled;
+	#readonly;
 	#allow_empty;
 
 	#events;
@@ -191,7 +192,12 @@ class ZColorPicker extends HTMLElement {
 			this.#has_default = this.hasAttribute('has-default');
 			this.#has_palette = this.hasAttribute('palette-field-name');
 			this.#disabled = this.hasAttribute('disabled');
+			this.#readonly = this.hasAttribute('readonly');
 			this.#allow_empty = this.hasAttribute('allow-empty') || this.#has_default;
+
+			if (this.#color === null && this.#palette === null) {
+				this.#color = '';
+			}
 
 			this.#hidden_input = new Template(ZColorPicker.#hidden_input_template).evaluateToElement();
 			this.#box = new Template(ZColorPicker.#box_template).evaluateToElement();
@@ -213,7 +219,9 @@ class ZColorPicker extends HTMLElement {
 	}
 
 	static get observedAttributes() {
-		return ['color-field-name', 'palette-field-name', 'color', 'palette', 'has-default', 'disabled', 'allow-empty'];
+		return ['color-field-name', 'palette-field-name', 'color', 'palette', 'has-default', 'disabled', 'readonly',
+			'allow-empty'
+		];
 	}
 
 	attributeChangedCallback(name, old_value, new_value) {
@@ -251,6 +259,10 @@ class ZColorPicker extends HTMLElement {
 				this.#disabled = new_value !== null;
 				break;
 
+			case 'readonly':
+				this.#readonly = new_value !== null;
+				break;
+
 			case 'allow-empty':
 				this.#allow_empty = new_value !== null || this.#has_default;
 				break;
@@ -284,7 +296,7 @@ class ZColorPicker extends HTMLElement {
 		if (isColorHex(`#${this.#color}`)) {
 			this.#box.style.background = `#${this.#color}`;
 		}
-		else if (this.#color === '') {
+		else if (this.#color === '' || this.#color === null) {
 			this.#box.style.background = '';
 		}
 
@@ -296,14 +308,9 @@ class ZColorPicker extends HTMLElement {
 			icon_parts[2].style.setProperty('--color', `#${ZColorPicker.PALETTE_COLORS[this.#palette][17]}`);
 		}
 
-		if (this.#disabled) {
-			this.#hidden_input.setAttribute('disabled', '');
-			this.#box.setAttribute('disabled', '');
-		}
-		else {
-			this.#hidden_input.removeAttribute('disabled');
-			this.#box.removeAttribute('disabled');
-		}
+		this.#hidden_input.toggleAttribute('readonly', this.#readonly);
+		this.#hidden_input.toggleAttribute('disabled', this.#disabled);
+		this.#box.toggleAttribute('disabled', this.#disabled);
 	}
 
 	#registerEvents() {
@@ -439,7 +446,7 @@ class ZColorPicker extends HTMLElement {
 						if (this.#is_dialog_open) {
 							this.#closeDialog();
 						}
-						else {
+						else if (!this.#readonly) {
 							this.#openDialog();
 						}
 					}
@@ -547,18 +554,7 @@ class ZColorPicker extends HTMLElement {
 				input.setAttribute('tabindex', '-1');
 			});
 
-		if (isColorHex(`#${this.#color}`) || this.#color === '') {
-			const tab = this.#dialog.querySelector(`.${ZColorPicker.ZBX_STYLE_TAB_SOLID}`);
-
-			if (tab !== null) {
-				this.#selectTab(tab);
-			}
-
-			this.#input.value = this.#color;
-
-			this.#input.focus();
-		}
-		else if (this.#palette !== null) {
+		if (this.#palette !== null) {
 			const tab = this.#dialog.querySelector(`.${ZColorPicker.ZBX_STYLE_TAB_PALETTE}`);
 
 			if (tab !== null) {
@@ -576,6 +572,17 @@ class ZColorPicker extends HTMLElement {
 				input.setAttribute('tabindex', '0');
 				input.focus();
 			}
+		}
+		else if (isColorHex(`#${this.#color}`) || this.#color === '' || this.#color === null) {
+			const tab = this.#dialog.querySelector(`.${ZColorPicker.ZBX_STYLE_TAB_SOLID}`);
+
+			if (tab !== null) {
+				this.#selectTab(tab);
+			}
+
+			this.#input.value = this.#color || '';
+
+			this.#input.focus();
 		}
 
 		if (this.#dialog.querySelector(`input[name="${ZColorPicker.ZBX_STYLE_PALETTE_INPUT}"]:checked`) === null) {
@@ -868,12 +875,7 @@ class ZColorPicker extends HTMLElement {
 	}
 
 	set hasDefault(has_default) {
-		if (has_default) {
-			this.setAttribute('has-default', '');
-		}
-		else {
-			this.removeAttribute('has-default');
-		}
+		this.toggleAttribute('has-default', has_default);
 	}
 
 	get disabled() {
@@ -881,12 +883,15 @@ class ZColorPicker extends HTMLElement {
 	}
 
 	set disabled(disabled) {
-		if (disabled) {
-			this.setAttribute('disabled', '');
-		}
-		else {
-			this.removeAttribute('disabled');
-		}
+		this.toggleAttribute('disabled', disabled);
+	}
+
+	get readonly() {
+		return this.hasAttribute('readonly');
+	}
+
+	set readonly(readonly) {
+		this.toggleAttribute('readonly', readonly);
 	}
 
 	get allowEmpty() {
@@ -894,12 +899,7 @@ class ZColorPicker extends HTMLElement {
 	}
 
 	set allowEmpty(allow_empty) {
-		if (allow_empty) {
-			this.setAttribute('allow-empty', '');
-		}
-		else {
-			this.removeAttribute('allow-empty');
-		}
+		this.toggleAttribute('allow-empty', allow_empty);
 	}
 }
 

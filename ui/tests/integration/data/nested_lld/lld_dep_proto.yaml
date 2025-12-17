@@ -1,0 +1,26 @@
+zabbix_export:
+  version: '7.4'
+  host_groups:
+    - uuid: f2481361f99448eea617b7b1d4765566
+      name: 'Discovered hosts'
+  hosts:
+    - host: lld_dep_proto
+      name: lld_dep_proto
+      groups:
+        - name: 'Discovered hosts'
+      discovery_rules:
+        - name: 'dep_drule[{#NAME}]'
+          type: DEPENDENT
+          key: 'dep_drule[{#NAME}]'
+          parent_discovery_rule:
+            key: main_drule
+          master_item: 
+            key: 'master_item[{#NAME}]'
+        - name: main_drule
+          type: TRAP
+          key: main_drule
+          item_prototypes:
+            - name: 'master_item[{#NAME}]'
+              type: TRAP
+              key: 'master_item[{#NAME}]'
+              value_type: TEXT

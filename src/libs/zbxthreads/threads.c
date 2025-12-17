@@ -37,6 +37,7 @@ void CALLBACK	ZBXEndThread(ULONG_PTR dwParam)
 	_endthreadex(SUCCEED);
 }
 #else
+#include "zbxtime.h"
 /******************************************************************************
  *                                                                            *
  * Purpose: Flush stdout and stderr before forking.                           *
@@ -85,21 +86,6 @@ void	zbx_child_fork(pid_t *pid)
 		signal(SIGCHLD, SIG_DFL);
 }
 
-int	zbx_is_child_pid(pid_t pid, const pid_t *child_pids, size_t child_pids_num)
-{
-	size_t	i;
-
-	if (NULL == child_pids)
-		return FAIL;
-
-	for (i = 0; i < child_pids_num; i++)
-	{
-		if (pid == child_pids[i])
-			return SUCCEED;
-	}
-
-	return FAIL;
-}
 #endif
 
 /******************************************************************************
@@ -222,7 +208,7 @@ static void	threads_kill(ZBX_THREAD_HANDLE *threads, int threads_num, const int 
 {
 	for (int i = 0; i < threads_num; i++)
 	{
-		if (!threads[i])
+		if (ZBX_THREAD_HANDLE_NULL == threads[i])
 			continue;
 
 		if (SUCCEED != ret)
@@ -237,6 +223,100 @@ static void	threads_kill(ZBX_THREAD_HANDLE *threads, int threads_num, const int 
 		zbx_thread_kill(threads[i]);
 	}
 }
+#if !defined(_WINDOWS) && !defined(__MINGW32__)
+int	zbx_child_cleanup(pid_t pid, pid_t *threads, size_t threads_num)
+{
+	size_t	i;
+
+	if (NULL == threads)
+		return FAIL;
+
+	for (i = 0; i < threads_num; i++)
+	{
+		if (pid == threads[i])
+		{
+			threads[i] = ZBX_THREAD_HANDLE_NULL;
+			return SUCCEED;
+		}
+	}
+
+	return FAIL;
+}
+
+static int	zbx_thread_count(pid_t *threads, size_t threads_num, const int *threads_flags, int priority)
+{
+	int	count = 0;
+
+	for (int i = 0; i < (int)threads_num; i++)
+	{
+		if (ZBX_THREAD_HANDLE_NULL == threads[i] || priority != threads_flags[i])
+			continue;
+
+		count++;
+	}
+
+	return count;
+}
+
+static int	threads_kill_and_wait(ZBX_THREAD_HANDLE *threads, const int *threads_flags, int threads_num,
+		int priority, int ret, int timeout)
+{
+	pid_t	pid;
+	double	time_start = zbx_time();
+
+	threads_kill(threads, threads_num, threads_flags, priority, ret);
+
+	for (int i = 0; 0 != zbx_thread_count(threads, threads_num, threads_flags, priority); i++)
+	{
+		int	status;
+
+		struct timespec	poll_delay = {0, 1e8};
+
+		if (i != 0)
+		{
+			if (zbx_time() - time_start > timeout && 0 != timeout)
+			{
+				zbx_error("timed out while waiting for child processes");
+				return TIMEOUT_ERROR;
+			}
+
+			nanosleep(&poll_delay, NULL);
+		}
+
+		while (0 < (pid = waitpid((pid_t)-1, &status, WNOHANG)))
+		{
+			if (SUCCEED != zbx_child_cleanup(pid, threads, threads_num))
+				continue;
+
+			if (SUCCEED != ret)
+				continue;
+
+			if (0 == WIFEXITED(status) || 0 != WEXITSTATUS(status))
+			{
+				if (WIFEXITED(status))
+				{
+					zbx_error("child process exited (PID:%d,exitcode:%d).",
+							pid, WEXITSTATUS(status));
+				}
+				else if (WIFSIGNALED(status))
+				{
+					zbx_error("child process killed by signal"
+							" (PID:%d,signal:%d).", pid, WTERMSIG(status));
+				}
+			}
+		}
+
+		if (-1 == pid && EINTR != errno)
+		{
+			if (0 != zbx_thread_count(threads, threads_num, threads_flags, priority))
+				zbx_error("failed to wait on child processes: %s", zbx_strerror(errno));
+			break;
+		}
+	}
+
+	return ret;
+}
+#endif
 
 /******************************************************************************
  *                                                                            *
@@ -254,47 +334,52 @@ void	zbx_threads_kill_and_wait(ZBX_THREAD_HANDLE *threads, const int *threads_fl
 {
 #if !defined(_WINDOWS) && !defined(__MINGW32__)
 	sigset_t	set;
+	int		timeout = SUCCEED == ret ? 0 : SEC_PER_MIN;
 
 	/* ignore SIGCHLD signals in order for zbx_sleep() to work */
 	sigemptyset(&set);
 	sigaddset(&set, SIGCHLD);
 	zbx_sigmask(SIG_BLOCK, &set, NULL);
 
-	/* signal all threads to go into idle state and wait for threads with higher priority to exit */
-	threads_kill(threads, threads_num, threads_flags, ZBX_THREAD_PRIORITY_NONE, ret);
+	/* signal non priority threads to go into idle state and wait for threads with higher priority to exit */
+	threads_kill(threads, threads_num, threads_flags, ZBX_THREAD_PRIORITY_NONE, SUCCEED);
 
-	for (int j = ZBX_THREAD_PRIORITY_FIRST; j < ZBX_THREAD_PRIORITY_COUNT; j++)
+	/* always try to exit gracefully */
+	if (TIMEOUT_ERROR == threads_kill_and_wait(threads, threads_flags, threads_num, ZBX_THREAD_PRIORITY_COLLECTOR,
+			SUCCEED, timeout))
 	{
-		threads_kill(threads, threads_num, threads_flags, j, ret);
+		threads_kill_and_wait(threads, threads_flags, threads_num, ZBX_THREAD_PRIORITY_COLLECTOR, FAIL, 0);
+	}
 
-		for (int i = 0; i < threads_num; i++)
-		{
-			if (!threads[i] || j != threads_flags[i])
-				continue;
+	if (TIMEOUT_ERROR == threads_kill_and_wait(threads, threads_flags, threads_num, ZBX_THREAD_PRIORITY_SYNCER,
+			SUCCEED, timeout))
+	{
+		threads_kill_and_wait(threads, threads_flags, threads_num, ZBX_THREAD_PRIORITY_SYNCER, FAIL, 0);
+	}
 
-			zbx_thread_wait(threads[i]);
-
-			threads[i] = ZBX_THREAD_HANDLE_NULL;
-		}
+	if (TIMEOUT_ERROR == threads_kill_and_wait(threads, threads_flags, threads_num, ZBX_THREAD_PRIORITY_WORKER,
+			SUCCEED, timeout))
+	{
+		threads_kill_and_wait(threads, threads_flags, threads_num, ZBX_THREAD_PRIORITY_WORKER, FAIL, 0);
 	}
 
 	/* signal idle threads to exit */
-	threads_kill(threads, threads_num, threads_flags, ZBX_THREAD_PRIORITY_NONE, FAIL);
+	threads_kill_and_wait(threads, threads_flags, threads_num, ZBX_THREAD_PRIORITY_NONE, FAIL, 0);
 #else
 	/* wait for threads to finish first; although listener threads will never end */
 	WaitForMultipleObjectsEx(threads_num, threads, TRUE, 1000, FALSE);
-	threads_kill(threads, threads_num, threads_flags, ZBX_THREAD_PRIORITY_NONE, ret);
-#endif
+	threads_kill(threads, threads_num, threads_flags, ZBX_THREAD_PRIORITY_NONE, FAIL);
 
 	for (int i = 0; i < threads_num; i++)
 	{
-		if (!threads[i])
+		if (ZBX_THREAD_HANDLE_NULL == threads[i])
 			continue;
 
 		zbx_thread_wait(threads[i]);
 
 		threads[i] = ZBX_THREAD_HANDLE_NULL;
 	}
+#endif
 }
 
 #if !defined(_WINDOWS) && !defined(__MINGW32__)

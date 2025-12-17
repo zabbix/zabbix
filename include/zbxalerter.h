@@ -76,6 +76,7 @@ typedef struct
 	zbx_get_config_str_f		get_scripts_path_cb_arg;
 	const zbx_db_config_t		*db_config;
 	const char			*config_source_ip;
+	const char			*config_ssl_ca_location;
 }
 zbx_thread_alert_manager_args;
 
@@ -88,6 +89,8 @@ zbx_thread_alert_syncer_args;
 ZBX_THREAD_ENTRY(zbx_alerter_thread, args);
 ZBX_THREAD_ENTRY(zbx_alert_manager_thread, args);
 ZBX_THREAD_ENTRY(zbx_alert_syncer_thread, args);
+
+void	zbx_am_source_stats_free(zbx_am_source_stats_t *as);
 
 int	zbx_alerter_get_diag_stats(zbx_uint64_t *alerts_num, char **error);
 int	zbx_alerter_get_top_mediatypes(int limit, zbx_vector_uint64_pair_t *mediatypes, char **error);

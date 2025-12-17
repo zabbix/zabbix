@@ -1420,12 +1420,36 @@ class CImportReferencer {
 		}
 
 		$uuids = [];
+		$hosts = [];
 
-		foreach ($this->triggers as $trigger) {
-			foreach ($trigger as $expression) {
-				$uuids += array_flip(array_column($expression, 'uuid'));
+		foreach ($this->triggers as $trigger_references) {
+			foreach ($trigger_references as $expression => $recovery_references) {
+				foreach ($recovery_references as $recovery_expression => $trigger) {
+					if (array_key_exists('uuid', $trigger)) {
+						$uuids[$trigger['uuid']] = true;
+					}
+					else {
+						$trigger += [
+							'expression' => $expression,
+							'recovery_expression' => $recovery_expression
+						];
+
+						$hosts += array_flip(CConfigurationImport::extractHosts($trigger));
+					}
+				}
 			}
 		}
+
+		$db_hosts = $hosts
+			? API::Host()->get([
+				'output' => [],
+				'filter' => [
+					'host' => array_keys($hosts)
+				],
+				'templated_hosts' => true,
+				'preservekeys' => true
+			])
+			: [];
 
 		$db_triggers = $uuids
 			? API::Trigger()->get([
@@ -1442,18 +1466,21 @@ class CImportReferencer {
 			])
 			: [];
 
-		$db_triggers += API::Trigger()->get([
-			'output' => ['uuid', 'description', 'expression', 'recovery_expression', 'templateid'],
-			'filter' => [
-				'description' => array_keys($this->triggers),
-				'flags' => [
-					ZBX_FLAG_DISCOVERY_NORMAL,
-					ZBX_FLAG_DISCOVERY_PROTOTYPE,
-					ZBX_FLAG_DISCOVERY_CREATED
-				]
-			],
-			'preservekeys' => true
-		]);
+		$db_triggers += $db_hosts
+			? API::Trigger()->get([
+				'output' => ['uuid', 'description', 'expression', 'recovery_expression', 'templateid'],
+				'filter' => [
+					'hostid' => array_keys($db_hosts),
+					'description' => array_keys($this->triggers),
+					'flags' => [
+						ZBX_FLAG_DISCOVERY_NORMAL,
+						ZBX_FLAG_DISCOVERY_PROTOTYPE,
+						ZBX_FLAG_DISCOVERY_CREATED
+					]
+				],
+				'preservekeys' => true
+			])
+			: [];
 
 		if (!$db_triggers) {
 			return;
@@ -1810,7 +1837,7 @@ class CImportReferencer {
 				' FROM group_prototype gp,hosts hp,host_discovery hd,items i,hosts h'.
 				' WHERE gp.hostid=hp.hostid'.
 					' AND hp.hostid=hd.hostid'.
-					' AND hd.parent_itemid=i.itemid'.
+					' AND hd.lldruleid=i.itemid'.
 					' AND i.hostid=h.hostid'.
 					' AND ('.implode(' OR ', $sql_where).')'
 			);
@@ -1852,7 +1879,7 @@ class CImportReferencer {
 				' FROM hostmacro hm'.
 					' JOIN hosts hp on hm.hostid=hp.hostid'.
 					' JOIN host_discovery hd on hp.hostid=hd.hostid'.
-					' JOIN items dr on hd.parent_itemid=dr.itemid'.
+					' JOIN items dr on hd.lldruleid=dr.itemid'.
 					' JOIN hosts h on dr.hostid=h.hostid'.
 				' WHERE '.implode(' OR ', $sql_where)
 			);
@@ -1925,10 +1952,10 @@ class CImportReferencer {
 
 		if ($sql_where) {
 			$db_host_prototypes = DBselect(
-				'SELECT hp.host,hp.uuid,hp.hostid,hd.parent_itemid,dr.hostid AS parent_hostid'.
+				'SELECT hp.host,hp.uuid,hp.hostid,hd.lldruleid,dr.hostid AS parent_hostid'.
 				' FROM hosts hp'.
 					' JOIN host_discovery hd ON hp.hostid=hd.hostid'.
-					' JOIN items dr ON hd.parent_itemid=dr.itemid'.
+					' JOIN items dr ON hd.lldruleid=dr.itemid'.
 					' JOIN hosts h on dr.hostid=h.hostid'.
 				' WHERE '.implode(' OR ', $sql_where)
 			);
@@ -1937,7 +1964,7 @@ class CImportReferencer {
 					'uuid' => $db_host_prototype['uuid'],
 					'host' => $db_host_prototype['host'],
 					'parent_hostid' => $db_host_prototype['parent_hostid'],
-					'discovery_ruleid' => $db_host_prototype['parent_itemid']
+					'discovery_ruleid' => $db_host_prototype['lldruleid']
 				];
 			}
 		}

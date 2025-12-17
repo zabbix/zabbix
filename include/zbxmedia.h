@@ -33,22 +33,12 @@ typedef struct
 }
 zbx_mailaddr_t;
 
-typedef struct
-{
-	unsigned char	type;
-
-	char	*username;
-	char	*password;
-
-	char	*oauthbearer;
-}
-zbx_media_auth_t;
-
 int	send_email(const char *smtp_server, unsigned short smtp_port, const char *smtp_helo, const char *smtp_email,
-	const char *mailto, const char *inreplyto, const char *mailsubject, const char *mailbody,
-	unsigned char smtp_security, unsigned char smtp_verify_peer, unsigned char smtp_verify_host,
-	const zbx_media_auth_t *auth, unsigned char message_format, int timeout, const char *config_source_ip,
-	const char *config_ssl_ca_location, char **error);
+		const char *mailto, const char *inreplyto, const char *mailsubject, const char *mailbody,
+		unsigned char smtp_security, unsigned char smtp_verify_peer, unsigned char smtp_verify_host,
+		unsigned char smtp_authentication, const char *smtp_username, const char *smtp_password,
+		unsigned char message_format, int timeout, const char *config_source_ip,
+		const char *config_ssl_ca_location, char **error);
 int	send_sms(const char *device, const char *number, const char *message, char *error, int max_error_len);
 
 char	*zbx_email_make_body(const char *message, unsigned char message_format,  const char *attachment_name,

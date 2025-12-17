@@ -8,7 +8,7 @@ The template to monitor SAN NetApp AFF A700 cluster by Zabbix HTTP agent.
 
 ## Requirements
 
-Zabbix version: 7.4 and higher.
+Zabbix version: 8.0 and higher.
 
 ## Tested versions
 
@@ -17,7 +17,7 @@ This template has been tested on:
 
 ## Configuration
 
-> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/7.4/manual/config/templates_out_of_the_box) section.
+> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/8.0/manual/config/templates_out_of_the_box) section.
 
 ## Setup
 
@@ -33,10 +33,10 @@ This template has been tested on:
 
 |Name|Description|Default|
 |----|-----------|-------|
-|{$URL}|<p>AFF700 cluster URL address.</p>||
-|{$USERNAME}|<p>AFF700 user name.</p>||
-|{$PASSWORD}|<p>AFF700 user password.</p>||
-|{$HTTP.AGENT.TIMEOUT}|<p>The HTTP agent timeout to wait for a response from AFF700.</p>|`5s`|
+|{$NETAPP.URL}|<p>AFF700 cluster URL address.</p>||
+|{$NETAPP.USERNAME}|<p>AFF700 user name.</p>||
+|{$NETAPP.PASSWORD}|<p>AFF700 user password.</p>||
+|{$NETAPP.HTTP.AGENT.TIMEOUT}|<p>The HTTP agent timeout to wait for a response from AFF700.</p>|`5s`|
 
 ### Items
 

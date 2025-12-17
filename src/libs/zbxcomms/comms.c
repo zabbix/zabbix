@@ -74,6 +74,11 @@ zbx_config_tls_t	*zbx_config_tls_new(void)
 	config_tls->cipher_all		= NULL;
 	config_tls->cipher_cmd13	= NULL;
 	config_tls->cipher_cmd		= NULL;
+	config_tls->tls_listen		= NULL;
+	config_tls->frontend_accept	= NULL;
+	config_tls->frontend_cert_issuer	= NULL;
+	config_tls->frontend_cert_subject	= NULL;
+	config_tls->frontend_accept_modes	= ZBX_TCP_SEC_UNENCRYPTED;
 
 	return config_tls;
 }
@@ -98,6 +103,10 @@ void	zbx_config_tls_free(zbx_config_tls_t *config_tls)
 	zbx_free(config_tls->cipher_all);
 	zbx_free(config_tls->cipher_cmd13);
 	zbx_free(config_tls->cipher_cmd);
+	zbx_free(config_tls->frontend_accept);
+	zbx_free(config_tls->tls_listen);
+	zbx_free(config_tls->frontend_cert_issuer);
+	zbx_free(config_tls->frontend_cert_subject);
 
 	zbx_free(config_tls);
 }
@@ -134,7 +143,7 @@ static void	zbx_set_socket_strerror(const char *fmt, ...)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: get peer IP address info from a socket early while it is          *
+ * Purpose: Get peer IP address info from a socket early while it is          *
  *          connected. Connection can be terminated due to various errors at  *
  *          any time and peer IP address will not be available anymore.       *
  *                                                                            *
@@ -173,9 +182,15 @@ static int	zbx_socket_peer_ip_save(zbx_socket_t *s)
 }
 
 #if !defined(_WINDOWS) && !defined(__MINGW32__)
-/******************************************************************************
+/**
+*******************************************************************************
  *                                                                            *
- * Purpose: retrieve 'hostent' by IP address                                  *
+ * Purpose: retrieve host name by IP address                                  *
+ *                                                                            *
+ * Parameters: ip      - [IN] IP address to resolve                           *
+ *             host    - [OUT] Buffer to store resolved host name.            *
+ *                             On failure set to empty string.                *
+ *             hostlen - [IN] size of host buffer                             *
  *                                                                            *
  ******************************************************************************/
 void	zbx_gethost_by_ip(const char *ip, char *host, size_t hostlen)
@@ -274,6 +289,11 @@ int	zbx_inet_ntop(struct sockaddr *ai_addr, char *ip, socklen_t len)
  *                                                                            *
  * Purpose: retrieve IP address by host name                                  *
  *                                                                            *
+ * Parameters: host  - [IN] hostname to resolve                               *
+ *             ip    - [OUT] Buffer to store resolved IP address.             *
+ *                           On failure set to empty string.                  *
+ *             iplen - [IN] size of ip buffer                                 *
+ *                                                                            *
  ******************************************************************************/
 void	zbx_getip_by_host(const char *host, char *ip, size_t iplen)
 {
@@ -335,7 +355,7 @@ static int zbx_is_win_ver_or_greater(zbx_uint32_t major, zbx_uint32_t minor, zbx
  *                                                                            *
  * Purpose: Initialize Windows Sockets APIs                                   *
  *                                                                            *
- * Parameters: error - [OUT] the error message                                *
+ * Parameters: error - [OUT] error message                                    *
  *                                                                            *
  * Return value: SUCCEED or FAIL - an error occurred                          *
  *                                                                            *
@@ -412,7 +432,7 @@ char	*zbx_socket_detach_buffer(zbx_socket_t *s)
  * Purpose: create socket poll error message                                  *
  *                                                                            *
  ******************************************************************************/
-char 	*socket_poll_error(short revents)
+char	*socket_poll_error(short revents)
 {
 	char	*str = NULL;
 	size_t	str_alloc = 0, str_offset = 0;
@@ -444,8 +464,10 @@ char 	*socket_poll_error(short revents)
  *                                                                            *
  * Purpose: wait for socket to become writable and without errors (connected) *
  *                                                                            *
- * Parameters: s       - [IN] socket descriptor                               *
- *             timeout - [OUT]                                                *
+ * Parameters: s       - [IN]                                                 *
+ *             timeout - [IN] The maximum time to wait (in milliseconds) for  *
+ *                            the socket to become writable. Range 0-1000,    *
+ *                            negative value means infinite wait.             *
  *             error   - [OUT] error message                                  *
  *                                                                            *
  * Return value: SUCCEED - connected successfully                             *
@@ -495,15 +517,14 @@ int	zbx_socket_pollout(zbx_socket_t *s, int timeout, char **error)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: initiate connection to the specified address with an optional     *
- *          timeout                                                           *
+ * Purpose: initiate connection to specified address                          *
  *                                                                            *
- * Parameters: s           - [IN] socket descriptor                           *
+ * Parameters: s           - [IN/OUT]                                         *
  *             type        - [IN] TCP or UDP                                  *
- *             source_ip   - [IN] source ip address                           *
- *             ip          - [IN] address                                     *
- *             port        - [IN] port                                        *
- *             timeout     - [IN] timeout                                     *
+ *             source_ip   - [IN]                                             *
+ *             ip          - [IN]                                             *
+ *             port        - [IN]                                             *
+ *             timeout     - [IN]                                             *
  *                                                                            *
  * Return value: SUCCEED - connection initiated successfully                  *
  *               FAIL - an error occurred                                     *
@@ -634,14 +655,14 @@ int	zbx_socket_tls_connect(zbx_socket_t *s, unsigned int tls_connect, const char
 
 /*****************************************************************************
  *                                                                            *
- * Purpose: connect the socket of the specified type to external host         *
+ * Purpose: connect socket of specified type to external host                 *
  *                                                                            *
- * Parameters: s           - [IN] socket descriptor                           *
+ * Parameters: s           - [IN/OUT]                                         *
  *             type        - [IN] TCP or UDP                                  *
- *             source_ip   - [IN] source ip address                           *
- *             ip          - [IN] address                                     *
- *             port        - [IN] port                                        *
- *             timeout     - [IN] timeout                                     *
+ *             source_ip   - [IN]                                             *
+ *             ip          - [IN]                                             *
+ *             port        - [IN]                                             *
+ *             timeout     - [IN]                                             *
  *             tls_connect - [IN] TLS mode (certificate, PSK or unencrypted)  *
  *             tls_arg1    - [IN] TLS argument (issuer or PSK identity)       *
  *             tls_arg2    - [IN] TLS argument (subject or PSK)               *
@@ -712,6 +733,18 @@ int	zbx_tcp_connect(zbx_socket_t *s, const char *source_ip, const char *ip, unsi
 	return zbx_socket_create(s, SOCK_STREAM, source_ip, ip, port, timeout, tls_connect, tls_arg1, tls_arg2);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: write data to TCP socket (with optional TLS support)              *
+ *                                                                            *
+ * Parameters: s    - [IN]                                                    *
+ *             buf  - [IN] data buffer to send                                *
+ *             len  - [IN] length of data to send                             *
+ *             event- [OUT] event flag                                        *
+ *                                                                            *
+ * Return value: number of bytes written, or ZBX_PROTO_ERROR on failure       *
+ *                                                                            *
+ ******************************************************************************/
 ssize_t	zbx_tcp_write(zbx_socket_t *s, const char *buf, size_t len, short *event)
 {
 	zbx_pollfd_t	pd;
@@ -803,6 +836,22 @@ ssize_t	zbx_tcp_write(zbx_socket_t *s, const char *buf, size_t len, short *event
 #define ZBX_TCP_HEADER_DATA	"ZBXD"
 #define ZBX_TCP_HEADER_LEN	ZBX_CONST_STRLEN(ZBX_TCP_HEADER_DATA)
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: initialize TCP send context for sending data over socket          *
+ *                                                                            *
+ * Parameters: data     - [IN] data to send                                   *
+ *             len      - [IN] length of data to send                         *
+ *             reserved - [IN] Original size of the uncompressed data.        *
+ *                             If zero, compression will be applied when      *
+ *                             requested by flags.                            *
+ *             flags    - [IN] protocol and compression flags                 *
+ *             context  - [OUT] send context                                  *
+ *                                                                            *
+ * Return value: SUCCEED - context initialized successfully                   *
+ *               FAIL    - an error occurred                                  *
+ *                                                                            *
+ ******************************************************************************/
 int	zbx_tcp_send_context_init(const char *data, size_t len, size_t reserved, unsigned char flags,
 		zbx_tcp_send_context_t *context)
 {
@@ -896,6 +945,11 @@ void	zbx_tcp_send_context_clear(zbx_tcp_send_context_t *state)
 /******************************************************************************
  *                                                                            *
  * Purpose: send data                                                         *
+ *                                                                            *
+ * Parameters: s       - [IN/OUT]                                             *
+ *             context - [IN/OUT]                                             *
+ *             event   - [OUT] event flag (optional)                          *
+ *                                                                            *
  *                                                                            *
  * Return value: SUCCEED - success                                            *
  *               FAIL - an error occurred                                     *
@@ -1009,19 +1063,17 @@ void	zbx_tcp_close(zbx_socket_t *s)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: return address family                                             *
- *                                                                            *
- * Parameters: addr - [IN] address or hostname                                *
- *             family - [OUT] address family                                  *
- *             error - [OUT] error string                                     *
- *             max_error_len - [IN] error string length                       *
+ * Parameters: addr          - [IN] IP address or hostname                    *
+ *             family        - [OUT] address family                           *
+ *             error         - [OUT]                                          *
+ *             max_error_len - [IN]                                           *
  *                                                                            *
  * Return value: SUCCEED - success                                            *
  *               FAIL - an error occurred                                     *
  *                                                                            *
  ******************************************************************************/
 #ifdef HAVE_IPV6
-int	get_address_family(const char *addr, int *family, char *error, int max_error_len)
+int	zbx_get_address_family(const char *addr, int *family, char *error, int max_error_len)
 {
 	struct addrinfo	hints, *ai = NULL;
 	int		err, res = FAIL;
@@ -1343,6 +1395,15 @@ static int	tcp_err_in_use(void)
  *                                                                            *
  * Purpose: creates socket for listening                                      *
  *                                                                            *
+ * Parameters:                                                                *
+ *     s                           - [OUT]                                    *
+ *     listen_ip                   - [IN] IP address or comma-separated list  *
+ *                                        of addresses to listen on           *
+ *     listen_port                 - [IN] TCP port number (1024 - 32767)      *
+ *     timeout                     - [IN] socket timeout in seconds (1 - 30)  *
+ *     config_tcp_max_backlog_size - [IN] maximum number of pending           *
+ *                                        connections in TCP queue            *
+ *                                                                            *
  * Return value: SUCCEED - success                                            *
  *               FAIL - error occurred                                        *
  *                                                                            *
@@ -1577,19 +1638,23 @@ void	zbx_tcp_unlisten(zbx_socket_t *s)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: permits an incoming connection attempt on a socket                *
+ * Purpose: permits incoming connection attempt on socket                     *
  *                                                                            *
- * Parameters: s              - [IN/OUT] socket to listen                     *
- *             tls_accept     - [IN] TLS configuration                        *
- *             poll_timeout   - [IN] milliseconds to wait for connection      *
- *                                  (0 - don't wait, -1 - wait forever        *
+ * Parameters:                                                                *
+ *     s                      - [IN/OUT]                                      *
+ *     tls_accept             - [IN] TLS configuration                        *
+ *     poll_timeout           - [IN] milliseconds to wait for connection      *
+ *                                   0 - don't wait, -1 - wait forever        *
+ *     tls_listen             - [IN] allow unencrypted inbound                *
+ *     unencrypted_allowed_ip - [IN]                                          *
  *                                                                            *
  * Return value: SUCCEED       - success                                      *
  *               FAIL          - an error occurred                            *
  *               TIMEOUT_ERROR - no connections for the timeout period        *
  *                                                                            *
  ******************************************************************************/
-int	zbx_tcp_accept(zbx_socket_t *s, unsigned int tls_accept, int poll_timeout)
+int	zbx_tcp_accept(zbx_socket_t *s, unsigned int tls_accept, int poll_timeout, char *tls_listen,
+		const char *unencrypted_allowed_ip)
 {
 	ZBX_SOCKADDR	serv_addr;
 	ZBX_SOCKET	accepted_socket;
@@ -1723,6 +1788,23 @@ int	zbx_tcp_accept(zbx_socket_t *s, unsigned int tls_accept, int poll_timeout)
 		s->connection_type = ZBX_TCP_SEC_UNENCRYPTED;
 	}
 
+	s->max_len_limit = 0;
+
+	if (ZBX_TCP_SEC_UNENCRYPTED == s->connection_type && NULL != tls_listen)
+	{
+		if (NULL == unencrypted_allowed_ip || SUCCEED != zbx_tcp_check_allowed_peers(s, unencrypted_allowed_ip))
+		{
+			zbx_set_socket_strerror("from %s: unencrypted connections are not allowed", s->peer);
+			zbx_tcp_unaccept(s);
+			goto out;
+		}
+		else
+		{
+			/* stats request allowed exception when unencrypted connection not allowed */
+			s->max_len_limit = ZBX_MAX_RECV_2KB_DATA_SIZE;
+		}
+	}
+
 	zbx_socket_set_deadline(s, 0);
 
 	ret = SUCCEED;
@@ -1756,9 +1838,9 @@ void	zbx_tcp_unaccept(zbx_socket_t *s)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: finds the next line in socket data buffer                         *
+ * Purpose: finds next line in socket data buffer                             *
  *                                                                            *
- * Parameters: s - [IN] the socket                                            *
+ * Parameters: s - [IN]                                                       *
  *                                                                            *
  * Return value: A pointer to the next line or NULL if the socket data buffer *
  *               contains no more lines.                                      *
@@ -1788,12 +1870,12 @@ static const char	*zbx_socket_find_line(zbx_socket_t *s)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: reads next line from a socket                                     *
+ * Purpose: reads next line from socket                                       *
  *                                                                            *
- * Parameters: s - [IN] the socket                                            *
+ * Parameters: s - [IN]                                                       *
  *                                                                            *
- * Return value: a pointer to the line in socket buffer or NULL if there are  *
- *               no more lines (socket was closed or an error occurred)       *
+ * Return value: A pointer to the line in socket buffer or NULL if there are  *
+ *               no more lines (socket was closed or an error occurred).      *
  *                                                                            *
  * Comments: Lines larger than 64KB are truncated.                            *
  *                                                                            *
@@ -1935,6 +2017,20 @@ ssize_t	zbx_tcp_read(zbx_socket_t *s, char *buf, size_t len, short *events)
 	return tcp_read(s, buf, len, events);
 }
 
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: read TLS close_notify alert from TCP socket                       *
+ *                                                                            *
+ * Parameters: s       - [IN/OUT]                                             *
+ *             timeout - [IN] maximum time to wait for close_notify (sec)     *
+ *                             (range 0-1000)                                 *
+ *             events  - [OUT] event flag (optional)                          *
+ *                                                                            *
+ * Return value: number of bytes read (0 if not TLS)                          *
+ *               ZBX_PROTO_ERROR - an error occurred                          *
+ *                                                                            *
+ ******************************************************************************/
 int	zbx_tcp_read_close_notify(zbx_socket_t *s, int timeout, short *events)
 {
 	int	ret;
@@ -2004,8 +2100,18 @@ void	zbx_tcp_recv_context_init(zbx_socket_t *s, zbx_tcp_recv_context_t *tcp_recv
 #if defined(_WINDOWS)
 	tcp_recv_context->max_len = ZBX_MAX_RECV_DATA_SIZE;
 #else
-	tcp_recv_context->max_len = 0 != (flags & ZBX_TCP_LARGE) ? ZBX_MAX_RECV_LARGE_DATA_SIZE :
-			ZBX_MAX_RECV_DATA_SIZE;
+	if (0 != s->max_len_limit)
+	{
+		tcp_recv_context->max_len = s->max_len_limit;
+	}
+	else if (0 != (flags & ZBX_TCP_LARGE))
+	{
+		tcp_recv_context->max_len = ZBX_MAX_RECV_LARGE_DATA_SIZE;
+	}
+	else
+	{
+		tcp_recv_context->max_len = ZBX_MAX_RECV_DATA_SIZE;
+	}
 #endif
 	zbx_socket_free(s);
 	tcp_recv_context->allocated = 0;
@@ -2335,10 +2441,10 @@ ssize_t	zbx_tcp_recv_raw_ext(zbx_socket_t *s, int timeout)
  *                                                                            *
  * Purpose: receive raw data till socket is full or once                      *
  *                                                                            *
- * Parameters: s       - [IN/OUT] socket descriptor                           *
+ * Parameters: s       - [IN/OUT]                                             *
  *             context - [IN/OUT] state of socket descriptor                  *
  *             events  - [OUT] socket state                                   *
- *             once    - [IN] read the socket once                            *
+ *             once    - [IN] read socket once                                *
  *                                                                            *
  * Return value: number of bytes in socket context - success                  *
  *               ZBX_PROTO_ERROR - an error occurred                          *
@@ -2410,7 +2516,7 @@ out:
  *                                                                            *
  * Purpose: receive next line from socket                                     *
  *                                                                            *
- * Parameters: s       - [IN/OUT] socket descriptor                           *
+ * Parameters: s       - [IN/OUT]                                             *
  *             context - [IN/OUT] state of socket descriptor                  *
  *             events  - [OUT] socket state                                   *
  *                                                                            *
@@ -2504,7 +2610,7 @@ static int	subnet_match(int af, unsigned int prefix_size, const void *address1, 
 
 /******************************************************************************
  *                                                                            *
- * Purpose: check if the address belongs to the given subnet                  *
+ * Purpose: check if address belongs to given subnet                          *
  *                                                                            *
  * Parameters: prefix_size - [IN] subnet prefix size                          *
  *             current_ai  - [IN] subnet                                      *
@@ -2512,7 +2618,7 @@ static int	subnet_match(int af, unsigned int prefix_size, const void *address1, 
  *             ipv6v4_mode - [IN] compare IPv6 IPv4-mapped address with       *
  *                                IPv4 addresses only                         *
  *                                                                            *
- * Return value: SUCCEED - address belongs to the subnet                      *
+ * Return value: SUCCEED - address belongs to subnet                          *
  *               FAIL - otherwise                                             *
  *                                                                            *
  ******************************************************************************/
@@ -2660,8 +2766,8 @@ int	zbx_validate_peer_list(const char *peer_list, char **error)
  *                                                                            *
  * Purpose: check if connection initiator is in list of peers                 *
  *                                                                            *
- * Parameters: s         - [IN] socket descriptor                             *
- *             peer_list - [IN] comma-delimited list of allowed peers.        *
+ * Parameters: peer_info - [IN]                                               *
+ *             peer_list - [IN] Comma-delimited list of allowed peers.        *
  *                              NULL not allowed. Empty string results in     *
  *                              return value FAIL.                            *
  *                                                                            *
@@ -2741,8 +2847,8 @@ int	zbx_tcp_check_allowed_peers_info(const ZBX_SOCKADDR *peer_info, const char *
  *                                                                            *
  * Purpose: check if connection initiator is in list of peers                 *
  *                                                                            *
- * Parameters: s         - [IN] socket descriptor                             *
- *             peer_list - [IN] comma-delimited list of allowed peers.        *
+ * Parameters: s         - [IN]                                               *
+ *             peer_list - [IN] Comma-delimited list of allowed peers.        *
  *                              NULL not allowed. Empty string results in     *
  *                              return value FAIL.                            *
  *                                                                            *
@@ -2788,6 +2894,20 @@ int	zbx_udp_connect(zbx_socket_t *s, const char *source_ip, const char *ip, unsi
 	return zbx_socket_create(s, SOCK_DGRAM, source_ip, ip, port, timeout, ZBX_TCP_SEC_UNENCRYPTED, NULL, NULL);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: send data over UDP socket                                         *
+ *                                                                            *
+ * Parameters: s        - [IN/OUT]                                            *
+ *             data     - [IN] data to send                                   *
+ *             data_len - [IN] length of data to send                         *
+ *             timeout  - [IN] maximum time to wait for send (seconds)        *
+ *                               range: 0 - INT_MAX                           *
+ *                                                                            *
+ * Return value: SUCCEED - data sent successfully                             *
+ *               FAIL    - an error occurred                                  *
+ *                                                                            *
+ ******************************************************************************/
 int	zbx_udp_send(zbx_socket_t *s, const char *data, size_t data_len, int timeout)
 {
 	ssize_t		offset = 0, n;
@@ -2849,6 +2969,18 @@ int	zbx_udp_send(zbx_socket_t *s, const char *data, size_t data_len, int timeout
 	return SUCCEED;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: receive data from UDP socket                                      *
+ *                                                                            *
+ * Parameters: s       - [IN/OUT]                                             *
+ *             timeout - [IN] maximum time to wait for data (seconds)         *
+ *                            range: 0 - INT_MAX                              *
+ *                                                                            *
+ * Return value: SUCCEED - data received successfully                         *
+ *               FAIL    - an error occurred                                  *
+ *                                                                            *
+ ******************************************************************************/
 int	zbx_udp_recv(zbx_socket_t *s, int timeout)
 {
 	char	buffer[65508];	/* maximum payload for UDP over IPv4 is 65507 bytes */

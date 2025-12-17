@@ -197,7 +197,9 @@ class testFormTabIndicators extends CWebTest {
 			// #2 Host prototype configuration form tab data.
 			[
 				[
-					'url' => 'host_prototypes.php?form=create&parent_discoveryid=42275&context=host',
+					// Zabbix server, Discovery rule => Block devices discovery
+					'url' => 'zabbix.php?action=host.prototype.list&parent_discoveryid=66355&context=host',
+					'create_button' => 'Create host prototype',
 					'form' => 'name:hostPrototypeForm',
 					'tabs' => [
 						[
@@ -273,7 +275,8 @@ class testFormTabIndicators extends CWebTest {
 			// #4 Item prototype configuration form tab data.
 			[
 				[
-					'url' => 'zabbix.php?action=item.prototype.list&parent_discoveryid=42275&context=host',
+					// Zabbix server, Discovery rule => Block devices discovery
+					'url' => 'zabbix.php?action=item.prototype.list&parent_discoveryid=66355&context=host',
 					'create_button' => 'Create item prototype',
 					'form' => 'name:itemForm',
 					'close_dialog' => true,
@@ -442,7 +445,75 @@ class testFormTabIndicators extends CWebTest {
 					]
 				]
 			],
-			// #8 Web scenarios configuration form tab data.
+			// #8 LLD rule prototype configuration form tab data.
+			[
+				[
+					'url' => 'host_discovery_prototypes.php?form=create&hostid=40001&parent_discoveryid=133800&context=host',
+					'form' => 'name:itemForm',
+					'tabs' => [
+						[
+							'name' => 'Preprocessing',
+							'entries' => [
+								[
+									'type' => 'JSONPath'
+								],
+								[
+									'type' => 'Replace',
+									'parameter_1' => 'replace me',
+									'parameter_2' => 'the replacement'
+								],
+								[
+									'type' => 'Regular expression'
+								]
+							],
+							'field_type' => 'preprocessing_steps',
+							'count' => 3
+						],
+						[
+							'name' => 'LLD macros',
+							'entries' => [
+									[
+										'lld_macro' => '{#LLD_MACRO}'
+									],
+									[
+										'lld_macro' => ' '
+									]
+							],
+							'table_selector' => 'id:lld_macro_paths',
+							'field_type' => 'multifield_table',
+							'count' => 2
+						],
+						[
+							'name' => 'Filters',
+							'entries' => [
+								[
+									'macro' => '{#MACRO}'
+								],
+								[
+									'macro' => ' '
+								]
+							],
+							'table_selector' => 'id:conditions',
+							'field_type' => 'multifield_table',
+							'count' => 2
+						],
+						[
+							'name' => 'Overrides',
+							'entries' => [
+								[
+									'Name' => '1st override name'
+								],
+								[
+									'Name' => '2nd override name'
+								]
+							],
+							'field_type' => 'overlay_dialogue',
+							'count' => 2
+						]
+					]
+				]
+			],
+			// #9 Web scenarios configuration form tab data.
 			[
 				[
 					'url' => 'httpconf.php?form=create&context=host&hostid=10084',
@@ -473,7 +544,7 @@ class testFormTabIndicators extends CWebTest {
 					]
 				]
 			],
-			// #9 Proxy configuration form tab data.
+			// #10 Proxy configuration form tab data.
 			[
 				[
 					'url' => 'zabbix.php?action=proxy.list',
@@ -493,7 +564,7 @@ class testFormTabIndicators extends CWebTest {
 					]
 				]
 			],
-			// #10 Authentication configuration form tab data.
+			// #11 Authentication configuration form tab data.
 			[
 				[
 					'url' => 'zabbix.php?action=authentication.edit',
@@ -525,11 +596,20 @@ class testFormTabIndicators extends CWebTest {
 								'old_value' => false
 							],
 							'field_type' => 'general_field'
+						],
+						[
+							'name' => 'MFA settings',
+							'entries' => [
+								'selector' => 'id:mfa_status',
+								'value' => true,
+								'old_value' => false
+							],
+							'field_type' => 'general_field'
 						]
 					]
 				]
 			],
-			// #11 User configuration form tab data.
+			// #12 User configuration form tab data.
 			[
 				[
 					'url' => 'zabbix.php?action=user.edit',
@@ -551,7 +631,7 @@ class testFormTabIndicators extends CWebTest {
 					]
 				]
 			],
-			// #12 Media type configuration form tab data.
+			// #13 Media type configuration form tab data.
 			[
 				[
 					'url' => 'zabbix.php?action=mediatype.list',
@@ -579,7 +659,7 @@ class testFormTabIndicators extends CWebTest {
 					]
 				]
 			],
-			// #13 Graph widget configuration form tab data.
+			// #14 Graph widget configuration form tab data.
 			[
 				[
 					'url' => 'zabbix.php?action=dashboard.view',
@@ -642,7 +722,7 @@ class testFormTabIndicators extends CWebTest {
 					]
 				]
 			],
-			// #14 Pie chart widget configuration form tab data.
+			// #15 Pie chart widget configuration form tab data.
 			[
 				[
 					'url' => 'zabbix.php?action=dashboard.view',
@@ -689,7 +769,7 @@ class testFormTabIndicators extends CWebTest {
 					]
 				]
 			],
-			// #15 Map configuration form tab data.
+			// #16 Map configuration form tab data.
 			[
 				[
 					'url' => 'sysmaps.php?form=Create+map',
@@ -707,7 +787,7 @@ class testFormTabIndicators extends CWebTest {
 					]
 				]
 			],
-			// #16 User profile configuration form tab data.
+			// #17 User profile configuration form tab data.
 			[
 				[
 					'url' => 'zabbix.php?action=userprofile.notification.edit',
@@ -799,19 +879,14 @@ class testFormTabIndicators extends CWebTest {
 			$this->page->removeFocus();
 			$this->assertTabIndicator($tab_selector, $new_value);
 
-			// Clear the popullatedfields and check indicator value.
+			// Clear the populated fields and check indicator value.
 			$this->updateTabFields($tab, $form, USER_ACTION_REMOVE);
 			$old_value = (CTestArrayHelper::get($tab, 'count', false)) ? 0 : $old_value;
 			$this->assertTabIndicator($tab_selector, $old_value);
 		}
 
 		if (CTestArrayHelper::get($data, 'close_dialog')) {
-			$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
-			$dialog->query('class:btn-overlay-close')->one()->click();
-			if (CTestArrayHelper::get($data, 'widget_type', false)) {
-				$this->page->acceptAlert();
-			}
-			$dialog->ensureNotPresent();
+			COverlayDialogElement::find()->one()->waitUntilReady()->close();
 		}
 	}
 

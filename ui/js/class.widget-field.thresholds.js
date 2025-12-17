@@ -29,25 +29,19 @@ class CWidgetFieldThresholds extends CWidgetField {
 		window.$thresholds_table
 			.dynamicRows({template: `#${this.getName()}-row-tmpl`, allow_empty: true})
 			.on('afteradd.dynamicRows', () => {
-				const rows = thresholds_table.querySelectorAll('.form_row');
-				const colors = this.getForm().querySelectorAll(`.${ZBX_STYLE_COLOR_PICKER} input`);
+				const color_pickers = thresholds_table.querySelectorAll(`.${ZBX_STYLE_COLOR_PICKER}`);
 				const used_colors = [];
-				for (const color of colors) {
-					if (color.value !== '' && color.name.includes('thresholds')) {
-						used_colors.push(color.value);
+				for (const color_picker of color_pickers) {
+					if (color_picker.color !== '') {
+						used_colors.push(color_picker.color);
 					}
 				}
-
-				jQuery('.color-picker input', rows[rows.length - 1])
-					.val(colorPalette.getNextColor(used_colors))
-					.colorpicker({
-						appendTo: '.overlay-dialogue-body'
-					});
+				color_pickers[color_pickers.length - 1].color = colorPalette.getNextColor(used_colors);
 			})
 			.on('tableupdate.dynamicRows', () => this.dispatchUpdateEvent());
 
 		const observer = new MutationObserver(records => {
-			if (records.some(record => record.type === 'attributes' &&record.target.value !== record.oldValue)) {
+			if (records.some(record => record.type === 'attributes' && record.target.value !== record.oldValue)) {
 				this.dispatchUpdateEvent();
 			}
 		});

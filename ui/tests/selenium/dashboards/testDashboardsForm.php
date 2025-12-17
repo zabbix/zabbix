@@ -377,7 +377,7 @@ class testDashboardsForm extends CWebTest {
 			// Open dashboard from dashboard list.
 			$this->page->login()->open('zabbix.php?action=dashboard.list')->waitUntilReady();
 			$this->query('link', $title)->one()->waitUntilClickable()->click();
-			$this->page->waitUntilReady();
+			$dashboard = CDashboardElement::find()->one()->waitUntilReady();
 			$dashboard->edit();
 
 			if (empty($data['dashboard_properties'])) {
@@ -784,7 +784,7 @@ class testDashboardsForm extends CWebTest {
 				$action = CTestArrayHelper::get($share, 'action', USER_ACTION_ADD);
 
 				switch ($action) {
-					case USER_ACTION_ADD;
+					case USER_ACTION_ADD:
 						$rows = $table->getRows()->count();
 						$table->query('button:Add')->one()->click();
 						$dialog = COverlayDialogElement::find()->all()->last()->waitUntilReady();
@@ -810,12 +810,12 @@ class testDashboardsForm extends CWebTest {
 						}
 						break;
 
-					case USER_ACTION_UPDATE;
+					case USER_ACTION_UPDATE:
 						$row = $table->findRow($list, $share['name']);
 						$row->getColumn('Permissions')->asSegmentedRadio()->fill($share['permissions']);
 						break;
 
-					case USER_ACTION_REMOVE;
+					case USER_ACTION_REMOVE:
 						$row = $table->findRow($list, $share['name']);
 						$row->getColumn('Action')->query('button:Remove')->one()->click();
 						// Wait until table row disappears.

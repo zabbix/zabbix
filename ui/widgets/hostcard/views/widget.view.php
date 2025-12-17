@@ -407,11 +407,11 @@ function makeSectionTags(array $host_tags): CDiv {
 	}
 
 	if ($tags) {
-		$tags[] = (new CButtonIcon(ZBX_ICON_MORE))->setHint($tags, ZBX_STYLE_HINTBOX_WRAP);
+		$tags[] = (new CButtonIcon(ZBX_ICON_MORE))->setHint($tags, ZBX_STYLE_HINTBOX_WRAP.' '.ZBX_STYLE_TAGS_WRAPPER);
 	}
 
 	return (new CDiv(
-		(new CDiv($tags))->addClass('tags')
+		(new CDiv($tags))->addClass('tags')->addClass(ZBX_STYLE_TAGS_WRAPPER)
 	))
 		->addClass(Widget::ZBX_STYLE_SECTION)
 		->addClass('section-tags');

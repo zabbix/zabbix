@@ -11,7 +11,7 @@ See https://www.vaultproject.io/api-docs/system/metrics.
 
 ## Requirements
 
-Zabbix version: 7.4 and higher.
+Zabbix version: 8.0 and higher.
 
 ## Tested versions
 
@@ -20,11 +20,11 @@ This template has been tested on:
 
 ## Configuration
 
-> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/7.4/manual/config/templates_out_of_the_box) section.
+> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/8.0/manual/config/templates_out_of_the_box) section.
 
 ## Setup
 
-> See [Zabbix template operation](https://www.zabbix.com/documentation/7.4/manual/config/templates_out_of_the_box/http) for basic instructions.
+> See [Zabbix template operation](https://www.zabbix.com/documentation/8.0/manual/config/templates_out_of_the_box/http) for basic instructions.
 
 Configure Vault API. See [Vault Configuration](https://www.vaultproject.io/docs/configuration).
 Create a Vault service token and set it to the macro `{$VAULT.TOKEN}`.
@@ -35,13 +35,13 @@ Create a Vault service token and set it to the macro `{$VAULT.TOKEN}`.
 |----|-----------|-------|
 |{$VAULT.API.PORT}|<p>Vault port.</p>|`8200`|
 |{$VAULT.API.SCHEME}|<p>Vault API scheme.</p>|`http`|
-|{$VAULT.HOST}|<p>Vault host name.</p>|`<PUT YOUR VAULT HOST>`|
+|{$VAULT.HOST}|<p>Vault host name.</p>||
 |{$VAULT.OPEN.FDS.MAX.WARN}|<p>Maximum percentage of used file descriptors for trigger expression.</p>|`90`|
 |{$VAULT.LEADERSHIP.SETUP.FAILED.MAX.WARN}|<p>Maximum number of Vault leadership setup failed.</p>|`5`|
 |{$VAULT.LEADERSHIP.LOSSES.MAX.WARN}|<p>Maximum number of Vault leadership losses.</p>|`5`|
 |{$VAULT.LEADERSHIP.STEPDOWNS.MAX.WARN}|<p>Maximum number of Vault leadership step downs.</p>|`5`|
 |{$VAULT.LLD.FILTER.STORAGE.MATCHES}|<p>Filter of discoverable storage backends.</p>|`.+`|
-|{$VAULT.TOKEN}|<p>Vault auth token.</p>|`<PUT YOUR AUTH TOKEN>`|
+|{$VAULT.TOKEN}|<p>Vault auth token.</p>||
 |{$VAULT.TOKEN.ACCESSORS}|<p>Vault accessors separated by spaces for monitoring token expiration time.</p>||
 |{$VAULT.TOKEN.TTL.MIN.CRIT}|<p>Token TTL critical threshold.</p>|`3d`|
 |{$VAULT.TOKEN.TTL.MIN.WARN}|<p>Token TTL warning threshold.</p>|`7d`|

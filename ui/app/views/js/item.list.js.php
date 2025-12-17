@@ -251,7 +251,7 @@
 					}
 
 					// If host or template was deleted while being in item list, redirect to item list.
-					if (descriptor.action !== 'item.delete' && data.submit.success.action === 'delete') {
+					if (descriptor.action !== 'item.delete' && data.submit.success?.action === 'delete') {
 						const url = new URL('zabbix.php', location.href);
 
 						url.searchParams.set('action', 'item.list');

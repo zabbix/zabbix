@@ -18,8 +18,8 @@ require_once dirname(__FILE__).'/../include/CAPITest.php';
 require_once __DIR__.'/../include/helpers/CTestDataHelper.php';
 
 /**
- * @onBefore  prepareTestData
- * @onAfter   cleanTestData
+ * @onBefore getConfFileContent, setSamlCertificatesStorage, prepareTestData
+ * @onAfter   cleanTestData, revertConfFile
  *
  * @backup usrgrp, userdirectory, mfa
  */
@@ -30,6 +30,9 @@ class testUserGroup extends CAPITest {
 		'userdirectoryid' => [],
 		'mfaid' => []
 	];
+
+	const CONF_PATH = __DIR__.'/../../conf/zabbix.conf.php';
+	protected static $conf_file_content;
 
 	/**
 	 * Create data to be used in tests.
@@ -1144,5 +1147,27 @@ class testUserGroup extends CAPITest {
 		}
 
 		return $result;
+	}
+
+	/**
+	 * Set CERT_STORAGE variable to frontend configuration file.
+	 *
+	 * @param string $type	file or database
+	 */
+	public function setSamlCertificatesStorage($type = 'file') {
+		file_put_contents(self::CONF_PATH, '$SSO[\'CERT_STORAGE\']	= \''.$type.'\';'."\n", FILE_APPEND);
+
+		// Wait for frontend to get the new config from updated zabbix.conf.php file.
+		sleep((int)ini_get('opcache.revalidate_freq') + 1);
+	}
+
+	/**
+	 * After test, revert frontend configuration file to its original state.
+	 */
+	public static function revertConfFile() {
+		file_put_contents(self::CONF_PATH, self::$conf_file_content);
+
+		// Wait for frontend to get the new config from updated zabbix.conf.php file.
+		sleep((int)ini_get('opcache.revalidate_freq') + 1);
 	}
 }

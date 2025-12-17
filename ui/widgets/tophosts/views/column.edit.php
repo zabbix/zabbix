@@ -129,7 +129,11 @@ $form_grid->addItem([
 // Base color.
 $form_grid->addItem([
 	new CLabel(_('Base color'), 'lbl_base_color'),
-	new CFormField(new CColor('base_color', $data['base_color']))
+	new CFormField(
+		(new CColorPicker('base_color'))
+			->setColor($data['base_color'])
+			->allowEmpty()
+	)
 ]);
 
 // Display item value as.
@@ -212,7 +216,9 @@ $thresholds = (new CDiv([
 		)),
 	(new CTemplateTag('thresholds-row-tmpl'))
 		->addItem((new CRow([
-			(new CColor('thresholds[#{rowNum}][color]', '#{color}'))->appendColorPickerJs(false),
+			(new CColorPicker('thresholds[#{rowNum}][color]'))
+				->setColor('#{color}')
+				->allowEmpty(),
 			(new CTextBox('thresholds[#{rowNum}][threshold]', '#{threshold}', false))
 				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 				->setAriaRequired(),
@@ -256,7 +262,9 @@ $highlights = (new CDiv([
 		)),
 	(new CTemplateTag('highlights-row-tmpl'))
 		->addItem((new CRow([
-			(new CColor('highlights[#{rowNum}][color]', '#{color}'))->appendColorPickerJs(false),
+			(new CColorPicker('highlights[#{rowNum}][color]'))
+				->setColor('#{color}')
+				->allowEmpty(),
 			(new CTextBox('highlights[#{rowNum}][pattern]', '#{pattern}', false))
 				->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 				->setAriaRequired(),
@@ -291,8 +299,20 @@ $time_period_field_view = (new CWidgetFieldTimePeriodView($data['time_period_fie
 $advanced_configuration_fieldset = (new CFormFieldsetCollapsible(_('Advanced configuration')))
 	->setId('advanced-configuration')
 	->addItem([
+		(new CLabel(_('History data'), 'history'))->addClass('js-history-row'),
+		(new CFormField(
+			(new CRadioButtonList('history', (int) $data['history']))
+				->addValue(_('Auto'), CWidgetFieldColumnsList::HISTORY_DATA_AUTO)
+				->addValue(_('History'), CWidgetFieldColumnsList::HISTORY_DATA_HISTORY)
+				->addValue(_('Trends'), CWidgetFieldColumnsList::HISTORY_DATA_TRENDS)
+				->setModern()
+		))->addClass('js-history-row')
+	]);
+
+$advanced_configuration_fieldset
+	->addItem([
 		new CLabel(_('Aggregation function'), 'column_aggregate_function'),
-		new CFormField(
+		new CFormField([
 			(new CSelect('aggregate_function'))
 				->setId('aggregate_function')
 				->setValue($data['aggregate_function'])
@@ -306,8 +326,10 @@ $advanced_configuration_fieldset = (new CFormFieldsetCollapsible(_('Advanced con
 					AGGREGATE_FIRST => CItemHelper::getAggregateFunctionName(AGGREGATE_FIRST),
 					AGGREGATE_LAST => CItemHelper::getAggregateFunctionName(AGGREGATE_LAST)
 				]))
-				->setFocusableElementId('column_aggregate_function')
-		)
+				->setFocusableElementId('column_aggregate_function'),
+			(makeWarningIcon(_('Aggregation function does not affect the sparkline.')))
+				->addClass('js-aggregate-function-warning')
+		])
 	]);
 
 foreach ($time_period_field_view->getViewCollection() as ['label' => $label, 'view' => $view, 'class' => $class]) {
@@ -316,18 +338,6 @@ foreach ($time_period_field_view->getViewCollection() as ['label' => $label, 'vi
 		(new CFormField($view))->addClass($class)
 	]);
 }
-
-$advanced_configuration_fieldset
-	->addItem([
-		(new CLabel(_('History data'), 'history'))->addClass('js-history-row'),
-		(new CFormField(
-			(new CRadioButtonList('history', (int) $data['history']))
-				->addValue(_('Auto'), CWidgetFieldColumnsList::HISTORY_DATA_AUTO)
-				->addValue(_('History'), CWidgetFieldColumnsList::HISTORY_DATA_HISTORY)
-				->addValue(_('Trends'), CWidgetFieldColumnsList::HISTORY_DATA_TRENDS)
-				->setModern()
-		))->addClass('js-history-row')
-	]);
 
 $form_grid
 	->addItem($advanced_configuration_fieldset)

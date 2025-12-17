@@ -178,17 +178,22 @@ static int	pb_discovery_add_row_mem(zbx_pb_t *pb, zbx_pb_discovery_t *src)
 	{
 		row->dns = NULL;
 		row->value = NULL;
+		row->error = NULL;
 		goto out;
 	}
 
 	if (NULL == (row->dns = pb_strdup(src->dns)))
 	{
 		row->value = NULL;
+		row->error = NULL;
 		goto out;
 	}
 
 	if (NULL == (row->value = pb_strdup(src->value)))
+	{
+		row->error = NULL;
 		goto out;
+	}
 
 	if (NULL == (row->error = pb_strdup(src->error)))
 		goto out;

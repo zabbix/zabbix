@@ -7,7 +7,7 @@ This template is designed for the effortless deployment of F5 Big-IP monitoring 
 
 ## Requirements
 
-Zabbix version: 7.4 and higher.
+Zabbix version: 8.0 and higher.
 
 ## Tested versions
 
@@ -16,7 +16,7 @@ This template has been tested on:
 
 ## Configuration
 
-> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/7.4/manual/config/templates_out_of_the_box) section.
+> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/8.0/manual/config/templates_out_of_the_box) section.
 
 ## Setup
 
@@ -29,7 +29,7 @@ Refer to the vendor documentation.
 |{$SNMP.TIMEOUT}|<p>The time interval for SNMP agent availability trigger expression.</p>|`5m`|
 |{$BIGIP.LLD.FILTER.PART.NAME.MATCHES}|<p>Filter of discoverable mount point names.</p>|`.*`|
 |{$BIGIP.LLD.FILTER.PART.NAME.NOT_MATCHES}|<p>Filter to exclude discovered by mount point names.</p>|`CHANGE_IF_NEEDED`|
-|{$BIGIP.LLD.OVERRIDE.PART.FILTER_LOW_SPACE_TRIGGER}|<p>Partitions that low free space trigger should ignore.</p>|`^/usr$`|
+|{$BIGIP.LLD.OVERRIDE.PART.FILTER_LOW_SPACE_TRIGGER}|<p>Partitions that low free space trigger should ignore.</p>|`^(?:/usr\|/opt/\.sdm/(?:usr\|lib\|lib64))$`|
 |{$BIGIP.CERT.MIN}|<p>Minimum number of days before certificate expiration.</p>|`7`|
 |{$BIGIP.CPU.UTIL.WARN.MAX}|<p>The warning threshold of the CPU utilization expressed in %.</p>|`85`|
 |{$BIGIP.CPU.UTIL.WARN.MIN}|<p>The recovery threshold of the CPU utilization expressed in %.</p>|`65`|

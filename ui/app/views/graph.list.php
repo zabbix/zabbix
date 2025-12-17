@@ -169,9 +169,10 @@ foreach ($data['graphs'] as $graph) {
 		}
 	}
 
-	$flag = ZBX_FLAG_DISCOVERY_NORMAL;
 	$name = [];
-	$name[] = makeGraphTemplatePrefix($graphid, $data['parent_templates'], $flag, $data['allowed_ui_conf_templates']);
+	$name[] = makeGraphTemplatePrefix($graphid, $data['parent_templates'], ZBX_FLAG_DISCOVERY_NORMAL,
+		$data['allowed_ui_conf_templates']
+	);
 
 	if ($graph['discoveryRule']) {
 		$name[] = (new CLink($graph['discoveryRule']['name'],
@@ -194,8 +195,8 @@ foreach ($data['graphs'] as $graph) {
 
 	$info_icons = [];
 
-	if ($graph['graphDiscovery'] && $graph['graphDiscovery']['status'] == ZBX_LLD_STATUS_LOST) {
-		$info_icons[] = getGraphLifetimeIndicator(time(), (int) $graph['graphDiscovery']['ts_delete']);
+	if ($graph['discoveryData'] && $graph['discoveryData']['status'] == ZBX_LLD_STATUS_LOST) {
+		$info_icons[] = getGraphLifetimeIndicator(time(), (int) $graph['discoveryData']['ts_delete']);
 	}
 
 	$graphs_table->addRow([
@@ -221,7 +222,7 @@ $buttons = new CActionButtonList('action', 'group_graphid', [
 			->addClass('js-no-chkbxrange')
 			->setId('js-massdelete-graph')
 	]
-], 'graph');
+], 'graphs'.($data['checkbox_hash'] ? '_'.$data['checkbox_hash'] : ''));
 
 $graphs_form->addItem([$graphs_table, $buttons]);
 

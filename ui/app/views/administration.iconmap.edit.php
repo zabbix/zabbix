@@ -26,136 +26,172 @@ $html_page = (new CHtmlPage())
 	->setTitleSubmenu(getAdministrationGeneralSubmenu())
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::ADMINISTRATION_ICONMAP_EDIT));
 
-$form_list = new CFormList();
-
-$name = (new CTextBox('iconmap[name]', $data['iconmap']['name']))
-	->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-	->setAttribute('maxlength', 64)
-	->setAriaRequired()
-	->setAttribute('autofocus', 'autofocus');
-
-$form_list->addRow((new CLabel(_('Name'), 'iconmap[name]'))->setAsteriskMark(), $name);
-
 $csrf_token = CCsrfTokenHelper::get('iconmap');
 
 $form = (new CForm())
 	->addItem((new CVar(CSRF_TOKEN_NAME, $csrf_token))->removeId())
 	->setId('iconmap')
-	->setAction((new CUrl('zabbix.php'))
-		->setArgument('action', ($data['iconmapid'] != 0) ? 'iconmap.update' : 'iconmap.create')
-		->getUrl()
-	)
-	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)
-	->addVar('form', 1);
+	->setAction((new CUrl('zabbix.php'))->getUrl())
+	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID);
 
 if ($data['iconmapid'] != 0) {
 	$form->addVar('iconmapid', $data['iconmapid']);
 }
 
+$options_inventory = CSelect::createOptionsFromArray($data['inventory_list']);
+$options_icon = CSelect::createOptionsFromArray($data['icon_list']);
+
 $table = (new CTable())
-	->setAttribute('style', 'width: 100%;')
-	->setId('iconMapTable')
+	->setAttribute('data-field-name', 'mappings')
+	->setAttribute('data-field-type', 'set')
+	->setId('icon-mapping-table')
 	->addClass(ZBX_STYLE_LIST_NUMBERED)
 	->setHeader(['', '', _('Inventory field'), _('Expression'), _('Icon'), '', '']);
 
-$i = 0;
 foreach ($data['iconmap']['mappings'] as $mapping) {
-	$table->addRow(
-		(new CRow([
-			(new CCol((new CDiv())->addClass(ZBX_STYLE_DRAG_ICON)))->addClass(ZBX_STYLE_TD_DRAG_ICON),
-			(new CSpan(':'))->addClass(ZBX_STYLE_LIST_NUMBERED_ITEM),
-			(new CSelect('iconmap[mappings]['.$i.'][inventory_link]'))
-				->setValue($mapping['inventory_link'])
-				->addOptions(CSelect::createOptionsFromArray($data['inventory_list'])),
-			(new CTextBox('iconmap[mappings]['.$i.'][expression]', $mapping['expression']))
-				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-				->setAriaRequired()
-				->setAttribute('maxlength', 64),
-			(new CSelect('iconmap[mappings]['.$i.'][iconid]'))
-				->setValue($mapping['iconid'])
-				->addOptions(CSelect::createOptionsFromArray($data['icon_list']))
-				->addClass('js-mapping-icon'),
-			(new CCol(
-				(new CImg('imgstore.php?iconid='.$mapping['iconid'].'&width='.ZBX_ICON_PREVIEW_WIDTH.
-					'&height='.ZBX_ICON_PREVIEW_HEIGHT, _('Preview'), null, null
-				))
-					->addClass('preview')
-					->addClass(ZBX_STYLE_CURSOR_POINTER)
-					->setAttribute('data-image-full', 'imgstore.php?iconid='.$mapping['iconid'])
-			))->setAttribute('style', 'vertical-align: middle;'),
-			(new CCol(
-				(new CButton('remove', _('Remove')))
-					->addClass(ZBX_STYLE_BTN_LINK)
-					->addClass('remove_mapping')
-					->removeId()
-			))->addClass(ZBX_STYLE_NOWRAP)
-		]))->setId('iconmapidRow_'.$i)
-	);
-
-	$i++;
+	$mapping += ['options_inventory' => $options_inventory, 'options_icon' => $options_icon];
+	$table->addRow(getMappingEntryView(...$mapping));
+	$table->addRow(getMappingEntryErrorView($mapping['sortorder']));
 }
 
-$table
-	->addRow((new CRow([
-		(new CCol(
-			(new CButton('addMapping', _('Add')))->addClass(ZBX_STYLE_BTN_LINK)
-		))->setColSpan(7)
-	]))->setId('iconMapListFooter'))
-	->addRow([
-		(new CCol(_('Default')))->setColSpan(4),
-		(new CSelect('iconmap[default_iconid]'))
-			->setValue($data['iconmap']['default_iconid'])
-			->addOptions(CSelect::createOptionsFromArray($data['icon_list']))
-			->addClass('js-mapping-icon'),
-		(new CCol(
-			(new CImg('imgstore.php?iconid='.$data['iconmap']['default_iconid'].
-				'&width='.ZBX_ICON_PREVIEW_WIDTH.'&height='.ZBX_ICON_PREVIEW_HEIGHT, _('Preview'), null, null
-			))
-				->addClass(ZBX_STYLE_CURSOR_POINTER)
-				->addClass('preview')
-				->setAttribute('data-image-full', 'imgstore.php?iconid='.$data['iconmap']['default_iconid'])
-		))->setAttribute('style', 'vertical-align: middle;')
-	]);
-
-$form_list->addRow(
-	(new CLabel(_('Mappings'), 'iconmap_list'))->setAsteriskMark(),
-	(new CDiv($table))
-		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
-		->setId('iconmap_list')
+$table->addRow((new CRow((new CCol((new CButton('add', _('Add')))->addClass(ZBX_STYLE_BTN_LINK)))->setColSpan(7)))
+	->setId('iconmap-list-footer')
 );
 
-$tab = new CTabView();
-$tab->addTab('iconmap_edit', _('Icon map'), $form_list);
+$form_grid = (new CFormGrid())
+	->addItem((new CLabel(_('Name'), 'name'))->setAsteriskMark())
+	->addItem(new CFormField((new CTextBox('name', $data['iconmap']['name']))
+		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		->setAttribute('maxlength', DB::getFieldLength('icon_map', 'name'))
+		->setAriaRequired()
+		->setAttribute('autofocus', 'autofocus')
+	))
+	->addItem((new CLabel(_('Mappings')))->setAsteriskMark())
+	->addItem((new CFormField())
+		->addItem((new CDiv($table))
+			->addStyle('min-width:'.ZBX_TEXTAREA_BIG_WIDTH.'px')
+			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+		)
+		->addItem((new CTemplateTag('icon-mapping-template'))
+			->addItem(getMappingEntryView(...[
+				'sortorder' => '#{sortorder}',
+				'expression' => '#{expression}',
+				'iconid' => '#{iconid}',
+				'inventory_link' => '#{inventory_link}',
+				'options_inventory' => $options_inventory,
+				'options_icon' => $options_icon
+			]))
+			->addItem(getMappingEntryErrorView('#{sortorder}'))
+		)
+	)
+	->addItem((new CLabel(_('Default icon'), 'default-mapping-icon'))->setAsteriskMark())
+	->addItem((new CFormField())
+		->addItem((new CSelect('default_iconid'))
+			->setId('default-mapping-icon')
+			->addOptions($options_icon)
+			->setValue($data['iconmap']['default_iconid'])
+		)
+		->addItem((new CImg('imgstore.php?iconid='.$data['iconmap']['default_iconid'].'&width='.ZBX_ICON_PREVIEW_WIDTH.
+			'&height='.ZBX_ICON_PREVIEW_HEIGHT, _('Preview'))
+		)
+			->setId('default-mapping-icon-preview')
+			->addStyle('vertical-align: middle;margin-left: 10px;')
+			->setAttribute('data-image-full', 'imgstore.php?iconid='.$data['iconmap']['default_iconid'])
+			->addClass(ZBX_STYLE_CURSOR_POINTER)
+			->addClass('preview')
+		)
+	);
 
-if ($data['iconmapid'] != 0) {
-	$tab->setFooter(makeFormFooter(
-		new CSubmit('update', _('Update')),
-		[
-			(new CSimpleButton(_('Clone')))->setId('clone'),
-			(new CRedirectButton(_('Delete'), (new CUrl('zabbix.php'))
-					->setArgument('action', 'iconmap.delete')
-					->setArgument('iconmapid', $data['iconmapid'])
-					->setArgument(CSRF_TOKEN_NAME, $csrf_token),
-				_('Delete icon map?')
-			))->setId('delete'),
-			(new CRedirectButton(_('Cancel'), (new CUrl('zabbix.php'))
-				->setArgument('action', 'iconmap.list')
-			))->setId('cancel')
-		]
-	));
-}
-else {
-	$tab->setFooter(makeFormFooter(
-		new CSubmit('add', _('Add')),
-		[
-			(new CRedirectButton(_('Cancel'), (new CUrl('zabbix.php'))
-				->setArgument('action', 'iconmap.list')
-			))->setId('cancel')
-		]
-	));
-}
-
-$form->addItem($tab);
+$form
+	->addItem((new CTabView())
+		->addTab('iconmap-edit', _('Icon map'), $form_grid)
+		->setFooter($data['iconmapid'] != 0
+			? makeFormFooter(new CSubmit('update', _('Update')), [
+				(new CSimpleButton(_('Clone')))->setId('clone'),
+				(new CSimpleButton(_('Delete')))
+					->setAttribute('data-redirect-url', (new CUrl('zabbix.php'))
+						->setArgument('action', 'iconmap.delete')
+						->setArgument('iconmapid', $data['iconmapid'])
+						->setArgument(CSRF_TOKEN_NAME, $csrf_token)
+					)
+					->setId('delete'),
+				(new CRedirectButton(_('Cancel'), (new CUrl('zabbix.php'))
+					->setArgument('action', 'iconmap.list')
+				))->setId('cancel')
+			])
+			: makeFormFooter(new CSubmit('add', _('Add')), [
+				(new CRedirectButton(_('Cancel'), (new CUrl('zabbix.php'))
+					->setArgument('action', 'iconmap.list')
+				))->setId('cancel')
+			])
+		)
+	)
+	->addItem(new CScriptTag('iconmap_edit.init('.json_encode([
+		'rules' => $data['js_validation_rules'],
+		'default_imageid' => $data['default_imageid']
+	]).');'));
 
 $html_page->addItem($form)->show();
+
+function getMappingEntryView(string $sortorder, string $expression, string $iconid, string $inventory_link,
+		array $options_inventory, array $options_icon): CRow {
+
+	return (new CRow())
+		->addItem((new CCol())
+			->addItem((new CDiv())->addClass(ZBX_STYLE_DRAG_ICON)->addStyle('margin-top:4px;'))
+			->addItem((new CInput('hidden', "mappings[$sortorder][sortorder]", $sortorder))
+				->setAttribute('data-field-type', 'hidden')
+				->removeId()
+			)
+		)
+		->addItem((new CCol())
+			->addItem((new CSpan(':'))->addClass(ZBX_STYLE_LIST_NUMBERED_ITEM))
+		)
+		->addItem((new CCol())
+			->addItem((new CSelect("mappings[$sortorder][inventory_link]"))
+				->setErrorContainer('mapping-'.$sortorder.'-error-container')
+				->setErrorLabel(_('Inventory field'))
+				->addOptions($options_inventory)
+				->setValue($inventory_link)
+			)
+		)
+		->addItem((new CCol())
+			->addItem((new CTextBox("mappings[$sortorder][expression]", $expression, false, 64))
+				->setErrorContainer('mapping-'.$sortorder.'-error-container')
+				->setErrorLabel(_('Expression'))
+				->setAriaRequired()
+				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+			)
+		)
+		->addItem((new CCol())
+			->addItem((new CSelect("mappings[$sortorder][iconid]"))
+				->setErrorContainer('mapping-'.$sortorder.'-error-container')
+				->setErrorLabel(_('Icon'))
+				->addClass('js-mapping-icon')
+				->addOptions($options_icon)
+				->setValue($iconid)
+			)
+		)
+		->addItem((new CCol())
+			->addItem((new CImg('imgstore.php?iconid='.$iconid.'&width='.ZBX_ICON_PREVIEW_WIDTH.
+				'&height='.ZBX_ICON_PREVIEW_HEIGHT, _('Preview'))
+			)
+				->setAttribute('data-image-full', 'imgstore.php?iconid='.$iconid)
+				->addStyle('vertical-align: middle')
+				->addClass(ZBX_STYLE_CURSOR_POINTER)
+				->addClass('preview')
+		))
+		->addItem((new CCol())
+			->addItem((new CButton('remove', _('Remove')))
+				->addClass(ZBX_STYLE_NOWRAP)
+				->addClass(ZBX_STYLE_BTN_LINK)
+				->removeId()
+			)
+	);
+}
+
+function getMappingEntryErrorView(string $sortorder): CRow {
+	return (new CRow())
+		->addClass('error-container-row')
+		->addItem((new CCol())->setId('mapping-'.$sortorder.'-error-container')->setColSpan(7));
+}

@@ -102,9 +102,6 @@ void	set_zbx_config_value_cache_size(zbx_uint64_t cache_size)
 
 zbx_uint64_t	CONFIG_TREND_FUNC_CACHE_SIZE	= 0;
 
-/* not used in tests, defined for linking with comms.c */
-int	CONFIG_TCP_MAX_BACKLOG_SIZE	= SOMAXCONN;
-
 ZBX_GET_CONFIG_VAR2(const char *, const char *, zbx_progname, "mock_progname")
 
 char	*CONFIG_HOSTNAME_ITEM		= NULL;

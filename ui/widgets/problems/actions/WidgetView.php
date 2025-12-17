@@ -21,6 +21,7 @@ use CControllerDashboardWidgetView,
 	CRoleHelper,
 	CScreenProblem,
 	CSettingsHelper,
+	CTagHelper,
 	API;
 
 class WidgetView extends CControllerDashboardWidgetView {
@@ -206,10 +207,16 @@ class WidgetView extends CControllerDashboardWidgetView {
 			}
 
 			if ($this->fields_values['show_tags']) {
-				$data['tags'] = makeTags($data['problems'] + $symptom_data['problems'], true, 'eventid',
-					$this->fields_values['show_tags'], $this->fields_values['tags'], null,
-					$this->fields_values['tag_name_format'], $this->fields_values['tag_priority']
-				);
+				$object_type = $this->fields_values['show'] == TRIGGERS_OPTION_ALL
+					? ZBX_TAG_OBJECT_EVENT
+					: ZBX_TAG_OBJECT_PROBLEM;
+
+				$data['tags'] = CTagHelper::getTagsHtml($data['problems'] + $symptom_data['problems'], $object_type, [
+					'filter_tags' => $this->fields_values['tags'],
+					'tag_priority' => $this->fields_values['tag_priority'],
+					'show_tags_limit' => $this->fields_values['show_tags'],
+					'tag_name_format' => $this->fields_values['tag_name_format']
+				]);
 			}
 
 			$this->setResponse(new CControllerResponseData($data + [
@@ -221,6 +228,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 					'show_lines' => $this->fields_values['show_lines'],
 					'show_tags' => $this->fields_values['show_tags'],
 					'show_timeline' => $this->fields_values['show_timeline'],
+					'highlight_row' => $this->fields_values['highlight_row'],
 					'tags' => $this->fields_values['tags'],
 					'tag_name_format' => $this->fields_values['tag_name_format'],
 					'tag_priority' => $this->fields_values['tag_priority'],

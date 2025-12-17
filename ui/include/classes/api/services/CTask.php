@@ -21,7 +21,7 @@ class CTask extends CApiService {
 
 	public const ACCESS_RULES = [
 		'get' => ['min_user_type' => USER_TYPE_SUPER_ADMIN],
-		'create' => ['min_user_type' => USER_TYPE_SUPER_ADMIN]
+		'create' => ['min_user_type' => USER_TYPE_ZABBIX_USER]
 	];
 
 	protected $tableName = 'task';
@@ -68,26 +68,9 @@ class CTask extends CApiService {
 			'limit'		=> CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT)
 		];
 
-		$sql_parts = [
-			'select'	=> ['task' => 't.taskid'],
-			'from'		=> ['task' => 'task t'],
-			'where'		=> [
-				'type'		=> 't.type='.ZBX_TM_TASK_DATA
-			],
-			'order'     => [],
-			'group'     => []
-		];
-
-		if ($options['taskids'] !== null) {
-			$sql_parts['where']['taskid'] = dbConditionInt('t.taskid', $options['taskids']);
-		}
+		$result = DBselect($this->createSelectQuery($this->tableName, $options), $options['limit']);
 
 		$db_tasks = [];
-
-		$sql_parts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sql_parts);
-		$sql_parts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sql_parts);
-
-		$result = DBselect($this->createSelectQueryFromParts($sql_parts), $options['limit']);
 
 		while ($row = DBfetch($result, false)) {
 			if ($this->outputIsRequested('request', $options['output'])) {
@@ -128,6 +111,14 @@ class CTask extends CApiService {
 		}
 
 		return $db_tasks;
+	}
+
+	protected function applyQueryFilterOptions($table_name, $table_alias, array $options, array $sql_parts): array {
+		$sql_parts = parent::applyQueryFilterOptions($table_name, $table_alias, $options, $sql_parts);
+
+		$sql_parts['where'][] = dbConditionInt('t.type', [ZBX_TM_TASK_DATA]);
+
+		return $sql_parts;
 	}
 
 	/**
@@ -466,15 +457,17 @@ class CTask extends CApiService {
 		$sql_parts = parent::applyQueryOutputOptions($tableName, $tableAlias, $options, $sql_parts);
 
 		if ($this->outputIsRequested('request', $options['output'])) {
-			$sql_parts['left_join'][] = ['alias' => 'req', 'table' => 'task_data', 'using' => 'parent_taskid'];
-			$sql_parts['left_table'] = ['alias' => $this->tableAlias, 'table' => $this->tableName()];
+			$sql_parts['join']['req'] = ['type' => 'left', 'table' => 'task_data',
+				'on' => ['taskid' => 'parent_taskid']
+			];
 
 			$sql_parts = $this->addQuerySelect('req.data AS request_data', $sql_parts);
 		}
 
 		if ($this->outputIsRequested('result', $options['output'])) {
-			$sql_parts['left_join'][] = ['alias' => 'resp', 'table' => 'task_result', 'using' => 'parent_taskid'];
-			$sql_parts['left_table'] = ['alias' => $this->tableAlias, 'table' => $this->tableName()];
+			$sql_parts['join']['resp'] = ['type' => 'left', 'table' => 'task_result',
+				'on' => ['taskid' => 'parent_taskid']
+			];
 
 			$sql_parts = $this->addQuerySelect('resp.info AS result_info', $sql_parts);
 			$sql_parts = $this->addQuerySelect('resp.status AS result_status', $sql_parts);
@@ -521,6 +514,12 @@ class CTask extends CApiService {
 		$itemids_cnt = count($itemids);
 
 		if (count($items) != $itemids_cnt) {
+			if (self::$userData['type'] < USER_TYPE_ZABBIX_ADMIN) {
+				self::exception(ZBX_API_ERROR_PERMISSIONS,
+					_('No permissions to referred object or it does not exist!')
+				);
+			}
+
 			$items += API::DiscoveryRule()->get([
 				'output' => ['type', 'name', 'status', 'flags', 'master_itemid'],
 				'selectHosts' => ['name', 'status'],
@@ -546,7 +545,7 @@ class CTask extends CApiService {
 			if (!in_array($item['type'], $allowed_types)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
 					_s('Cannot send request: %1$s.',
-						($item['flags'] == ZBX_FLAG_DISCOVERY_RULE)
+						in_array($item['flags'], [ZBX_FLAG_DISCOVERY_RULE, ZBX_FLAG_DISCOVERY_RULE_CREATED])
 							? _('wrong discovery rule type')
 							: _('wrong item type')
 					)
@@ -555,7 +554,7 @@ class CTask extends CApiService {
 
 			if ($item['status'] != ITEM_STATUS_ACTIVE || $item['hosts'][0]['status'] != HOST_STATUS_MONITORED) {
 				$host_name = $item['hosts'][0]['name'];
-				$problem = ($item['flags'] == ZBX_FLAG_DISCOVERY_RULE)
+				$problem = in_array($item['flags'], [ZBX_FLAG_DISCOVERY_RULE, ZBX_FLAG_DISCOVERY_RULE_CREATED])
 					? _s('discovery rule "%1$s" on host "%2$s" is not monitored', $item['name'], $host_name)
 					: _s('item "%1$s" on host "%2$s" is not monitored', $item['name'], $host_name);
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot send request: %1$s.', $problem));

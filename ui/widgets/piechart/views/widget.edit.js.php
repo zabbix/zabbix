@@ -155,7 +155,7 @@ window.widget_form = new class extends CWidgetForm {
 				this.#editItem(e.target);
 			}
 
-			if (e.target.classList.contains('element-table-remove')) {
+			if (e.target.classList.contains('js-remove-item')) {
 				this.#removeSingleItem(e.target);
 			}
 
@@ -182,8 +182,7 @@ window.widget_form = new class extends CWidgetForm {
 			for (let i = 0; i < list.values.length; i++) {
 				this.#addSingleItem({
 					itemid: list.values[i].itemid,
-					name: list.values[i].name,
-					type: list.values[i].type
+					name: list.values[i].name
 				});
 			}
 
@@ -525,25 +524,22 @@ window.widget_form = new class extends CWidgetForm {
 			if (row === null) {
 				this.#addSingleItem({
 					reference: e.detail.reference,
-					name: e.detail.name,
-					type: e.detail.type
+					name: e.detail.name
 				});
 			}
 			else {
 				const name_col = row.querySelector('.table-col-name');
 				const name_col_link = name_col.querySelector('a');
-				const type_input = row.querySelector('z-select');
 				const references_input = row.querySelector('[name$="[references][]"');
 
 				name_col.classList.remove('unavailable-widget');
 				name_col_link.textContent = e.detail.name;
-				type_input.textContent = e.detail.type;
 				references_input.value = e.detail.reference;
 			}
 		});
 	}
 
-	#addSingleItem({itemid = '0', reference = '', name, type} = {}) {
+	#addSingleItem({itemid = '0', reference = '', name, type = <?= CWidgetFieldDataSet::ITEM_TYPE_NORMAL ?>} = {}) {
 		const dataset = this.#getOpenedDataset();
 		const dataset_index = dataset.getAttribute('data-set');
 

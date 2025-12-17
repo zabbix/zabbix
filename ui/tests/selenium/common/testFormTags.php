@@ -178,7 +178,10 @@ class testFormTags extends CWebTest {
 							'value' => 'value1'
 						]
 					],
-					'error_details' => 'Invalid parameter "/1/tags/1/tag": cannot be empty.'
+					'error_details' => 'Invalid parameter "/1/tags/1/tag": cannot be empty.',
+					'inline_error' => [
+						'id:tags_{index}_tag' => 'Name: This field cannot be empty.'
+					]
 				]
 			],
 			[
@@ -197,7 +200,10 @@ class testFormTags extends CWebTest {
 							'value' => 'value'
 						]
 					],
-					'error_details' => 'Invalid parameter "/1/tags/2": value (tag, value)=(tag, value) already exists.'
+					'error_details' => 'Invalid parameter "/1/tags/2": value (tag, value)=(tag, value) already exists.',
+					'inline_error' => [
+						'id:tags_{index}_tag' => 'Tag name and value combination is not unique.'
+					]
 				]
 			],
 			[
@@ -242,6 +248,10 @@ class testFormTags extends CWebTest {
 	public function checkTagsCreate($data, $object, $expression = null) {
 		$sql = null;
 		$old_hash = null;
+		$expected = CTestArrayHelper::get($data, 'expected', TEST_GOOD);
+		$inline_validation = in_array($object, ['host', 'host prototype', 'template', 'trigger', 'trigger prototype',
+			'item', 'item prototype', 'service']
+		);
 
 		switch ($object) {
 			case 'trigger':
@@ -280,7 +290,7 @@ class testFormTags extends CWebTest {
 				$fields = [ucfirst($object).' name' => $data['name'], $group_field => $group_name];
 		}
 
-		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
+		if ($expected === TEST_BAD) {
 			$old_hash = CDBHelper::getHash($sql);
 		}
 
@@ -289,7 +299,7 @@ class testFormTags extends CWebTest {
 
 		switch ($object) {
 			case 'host prototype':
-				$form = $this->query('name:hostPrototypeForm')->waitUntilPresent()->asForm(['normalized' => true])->one();
+				$form = COverlayDialogElement::find()->waitUntilReady()->one()->asForm();
 				$data['name'] = $data['name'].' {#KEY}';
 				$form->fill(['Host name' => $data['name']]);
 				$form->fill(['Host groups' => 'Zabbix servers']);
@@ -334,10 +344,15 @@ class testFormTags extends CWebTest {
 			$this->assertScreenshot($screenshot_area, $data['name'].' '.$screen_object);
 		}
 
-		$form->submit();
-		$this->page->waitUntilReady();
+		if ($inline_validation && $expected === TEST_BAD) {
+			$this->page->removeFocus();
+		}
+		else {
+			$form->submit();
+			$this->page->waitUntilReady();
+		}
 
-		$this->checkResult($data, $object, $form, 'add', $sql, $old_hash);
+		$this->checkResult($data, $object, $form, 'add', $sql, $old_hash, $inline_validation);
 
 		return $form;
 
@@ -356,7 +371,10 @@ class testFormTags extends CWebTest {
 							'value' => 'value1'
 						]
 					],
-					'error_details'=>'Invalid parameter "/1/tags/1/tag": cannot be empty.'
+					'error_details' => 'Invalid parameter "/1/tags/1/tag": cannot be empty.',
+					'inline_error' => [
+						'id:tags_0_tag' => 'Name: This field cannot be empty.'
+					]
 				]
 			],
 			[
@@ -370,7 +388,10 @@ class testFormTags extends CWebTest {
 							'value' => 'update'
 						]
 					],
-					'error_details' => 'Invalid parameter "/1/tags/2": value (tag, value)=(action, update) already exists.'
+					'error_details' => 'Invalid parameter "/1/tags/2": value (tag, value)=(action, update) already exists.',
+					'inline_error' => [
+						'id:tags_1_tag' => 'Tag name and value combination is not unique.'
+					]
 				]
 			],
 			[
@@ -384,7 +405,10 @@ class testFormTags extends CWebTest {
 							'value' => ''
 						]
 					],
-					'error_details' => 'Invalid parameter "/1/tags/3": value (tag, value)=(tag without value, ) already exists.'
+					'error_details' => 'Invalid parameter "/1/tags/3": value (tag, value)=(tag without value, ) already exists.',
+					'inline_error' => [
+						'id:tags_2_tag' => 'Tag name and value combination is not unique.'
+					]
 				]
 			],
 			[
@@ -459,6 +483,10 @@ class testFormTags extends CWebTest {
 	public function checkTagsUpdate($data, $object) {
 		$sql = null;
 		$old_hash = null;
+		$expected = CTestArrayHelper::get($data, 'expected', TEST_GOOD);
+		$inline_validation = in_array($object, ['host', 'host prototype', 'template', 'trigger', 'trigger prototype',
+			'item', 'item prototype', 'service'
+		]);
 
 		switch ($object) {
 			case 'trigger':
@@ -491,7 +519,7 @@ class testFormTags extends CWebTest {
 				$locator = ($object === 'host prototype') ? 'name:hostPrototypeForm' : null;
 		}
 
-		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
+		if ($expected === TEST_BAD) {
 			$old_hash = CDBHelper::getHash($sql);
 		}
 
@@ -503,7 +531,7 @@ class testFormTags extends CWebTest {
 			$table->findRow('Name', $data['name'], true)->query(self::EDIT_BUTTON_PATH)->waitUntilClickable()->one()->click();
 		}
 		else {
-			if ($object === 'template') {
+			if (in_array($object, ['template', 'host'])) {
 				$this->query('button:Reset')->one()->click();
 				$form = $this->query('name:zbx_filter')->asForm()->waitUntilReady()->one();
 				$form->fill(['Name' => $this->update_name]);
@@ -513,7 +541,7 @@ class testFormTags extends CWebTest {
 			$this->query('link', $this->update_name)->waitUntilClickable()->one()->click();
 		}
 
-			$form = ($object === 'web scenario' || $object === 'host prototype')
+			$form = ($object === 'web scenario')
 					? $this->query($locator)->asForm()->waitUntilPresent()->one()
 					: COverlayDialogElement::find()->waitUntilVisible()->asForm()->one();
 
@@ -522,26 +550,54 @@ class testFormTags extends CWebTest {
 		}
 
 		$this->query($this->tags_table)->asMultifieldTable()->waitUntilPresent()->one()->fill($data['tags']);
-		$form->submit();
-		$this->page->waitUntilReady();
 
-		$this->checkResult($data, $object, $form, 'update', $sql, $old_hash);
+		if ($inline_validation && $expected === TEST_BAD) {
+			$this->page->removeFocus();
+		}
+		else {
+			$form->submit();
+			$this->page->waitUntilReady();
+		}
+
+		// In discovered host scenario there are tags from the host prototype that will be present after update.
+		if (array_key_exists('existing_tags', $data)) {
+			$data['tags'] = array_merge($data['existing_tags'], $data['tags']);
+		}
+
+		$this->checkResult($data, $object, $form, 'update', $sql, $old_hash, $inline_validation);
 	}
 
 	/**
 	 * Check result after creating or updating object with tags.
 	 *
-	 * @param array     $data        data provider
-	 * @param string    $object      host, template, trigger, item or prototype
-	 * @param element   $form        object configuration form
-	 * @param string    $action      create or update object
-	 * @param string    $sql         selected table from db
-	 * @param string    $old_hash    db hash before changes
+	 * @param array     $data               data provider
+	 * @param string    $object             host, template, trigger, item or prototype
+	 * @param element   $form               object configuration form
+	 * @param string    $action             create or update object
+	 * @param string    $sql                selected table from db
+	 * @param string    $old_hash           db hash before changes
+	 * @param bool      $inline_validation  flag that determines if inline validation is enabled in the form
 	 */
-	private function checkResult($data, $object, $form, $action, $sql = null, $old_hash = null) {
+	private function checkResult($data, $object, $form, $action, $sql = null, $old_hash = null, $inline_validation = false) {
 		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
+			if ($inline_validation) {
+				$inline_error = [];
+				$key = array_key_first($data['inline_error']);
 
-			if ($object === 'service') {
+				// Index of last tag is by 1 less than the count of tags.
+				if (str_contains($key, '{index}')) {
+					$tag_count = $this->query('class:tags-table')->one()->asMultifieldTable()->getRows()->
+							filter(CElementFilter::CLASSES_PRESENT, 'form_row', true)->count();
+					$new_key = str_replace('{index}', $tag_count - 1, $key);
+					$inline_error[$new_key] = $data['inline_error'][$key];
+				}
+				else {
+					$inline_error = $data['inline_error'];
+				}
+
+				$this->assertInlineError($form, $inline_error);
+			}
+			elseif ($object === 'service') {
 				$title = null;
 			}
 			else {
@@ -550,7 +606,9 @@ class testFormTags extends CWebTest {
 					: 'Cannot update '.$object;
 			}
 
-			$this->assertMessage(TEST_BAD, $title, CTestArrayHelper::get($data, 'error_details'));
+			if (!$inline_validation) {
+				$this->assertMessage(TEST_BAD, $title, CTestArrayHelper::get($data, 'error_details'));
+			}
 
 			// Check that DB hash is not changed.
 			$this->assertEquals($old_hash, CDBHelper::getHash($sql));
@@ -651,7 +709,7 @@ class testFormTags extends CWebTest {
 				break;
 
 			case 'host prototype':
-				$form = $this->query('name:hostPrototypeForm')->asForm(['normalized' => true])->waitUntilPresent()->one();
+				$form = COverlayDialogElement::find()->waitUntilReady()->one()->asForm();
 				$form->fill(['Host name' => $new_name]);
 
 				$sql_old_name = 'SELECT NULL FROM hosts WHERE host='.zbx_dbstr($this->clone_name);
@@ -741,7 +799,7 @@ class testFormTags extends CWebTest {
 			$table->findRow('Name',  $new_name)->query(self::EDIT_BUTTON_PATH)->waitUntilClickable()->one()->click();
 		}
 		else {
-			if ($object === 'template') {
+			if ($object === 'template' || $object === 'discovered host') {
 				$this->query('button:Reset')->one()->click();
 				$filter = $this->query('name:zbx_filter')->asForm()->waitUntilReady()->one();
 				$filter->fill(['Name' => $new_name]);
@@ -921,7 +979,7 @@ class testFormTags extends CWebTest {
 		$tags = $element->getValue();
 
 		if (in_array($object, ['connector', 'template', 'trigger', 'item', 'trigger prototype', 'item prototype',
-				'host', 'service'])) {
+				'host', 'host prototype', 'service'])) {
 			COverlayDialogElement::find()->one()->close();
 		}
 
@@ -943,6 +1001,7 @@ class testFormTags extends CWebTest {
 		$this->page->waitUntilReady();
 		$this->query('button:Reset')->one()->click();
 		$form = $this->query('name:zbx_filter')->asForm()->waitUntilReady()->one();
+		$table = $this->query('xpath://table[@class="list-table"]')->asTable()->one();
 		$form->fill(['Name' => $new_name]);
 		$this->query('button:Apply')->one()->waitUntilClickable()->click();
 
@@ -966,8 +1025,7 @@ class testFormTags extends CWebTest {
 				break;
 		}
 
-		$this->query('xpath://table[@class="list-table"]')->asTable()->one()
-				->findRow('Name', $new_name)->getColumn($column)->query('link', $column)->one()->click();
+		$table->waitUntilReloaded()->findRow('Name', $new_name)->getColumn($column)->query('link', $column)->one()->click();
 
 		switch ($object) {
 			case 'trigger':
@@ -989,7 +1047,7 @@ class testFormTags extends CWebTest {
 				break;
 		}
 
-		$new_form = (in_array($object, ['trigger', 'trigger prototype', 'item', 'item prototype']))
+		$new_form = (in_array($object, ['trigger', 'trigger prototype', 'item', 'item prototype', 'host prototype']))
 				? COverlayDialogElement::find()->one()->waitUntilReady()->asForm()
 				: $this->query('xpath://main/form')->asForm()->waitUntilPresent()->one();
 
@@ -1151,6 +1209,7 @@ class testFormTags extends CWebTest {
 		$form->fill(['id:show_inherited_tags' => 'Inherited and '.$field_name.' tags']);
 
 		if ($object === 'web scenario') {
+			$form->waitUntilReloaded();
 			$this->page->waitUntilReady();
 		}
 		else {
@@ -1346,7 +1405,7 @@ class testFormTags extends CWebTest {
 			$table->findRow('Name', $data['name'], true)->query(self::EDIT_BUTTON_PATH)->waitUntilClickable()->one()->click();
 		}
 		else {
-			if ($object === 'template') {
+			if ($object === 'template' || $object === 'host') {
 				$this->query('button:Reset')->one()->click();
 				$filter = $this->query('name:zbx_filter')->asForm()->waitUntilReady()->one();
 				$filter->fill(['Name' => $this->remove_name]);
@@ -1357,11 +1416,10 @@ class testFormTags extends CWebTest {
 		}
 
 		$locators = [
-			'web scenario' => 'name:webscenario_form',
-			'host prototype' => 'name:hostPrototypeForm'
+			'web scenario' => 'name:webscenario_form'
 		];
 
-		$form = ($object === 'web scenario' || $object === 'host prototype')
+		$form = ($object === 'web scenario')
 				? $this->query($locators[$object])->asForm()->waitUntilPresent()->one()
 				: COverlayDialogElement::find()->waitUntilReady()->asForm()->one();
 

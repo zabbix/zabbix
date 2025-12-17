@@ -17,12 +17,16 @@
 #ifndef ZABBIX_MOCK_EXPRESSION_EVAL_H
 #define ZABBIX_MOCK_EXPRESSION_EVAL_H
 
+#include "zbxcacheconfig.h"
+
 zbx_uint64_t	mock_eval_read_rules(const char *path);
 void	mock_eval_read_values(zbx_eval_context_t *ctx, const char *path);
 
 void	mock_compare_stack(const zbx_eval_context_t *ctx, const char *path);
 void	mock_dump_stack(const zbx_eval_context_t *ctx);
+void	extract_yaml_values_dbl(zbx_mock_handle_t hdata, zbx_vector_dbl_t *values);
 int	compare_vectors_uint64(zbx_vector_uint64_t *v1, zbx_vector_uint64_t *v2);
 int	compare_ctx(zbx_eval_context_t *ctx1, zbx_eval_context_t *ctx2);
+int	query_macro_resolver(zbx_token_type_t type, char **value, char **error, va_list args);
 
 #endif

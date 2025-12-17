@@ -16,33 +16,22 @@
 
 /**
  * @var CView $this
+ * @var array $data
  */
 
 $this->includeJsFile('administration.regex.edit.js.php');
 
-$html_page = (new CHtmlPage())
-	->setTitle(_('Regular expressions'))
-	->setTitleSubmenu(getAdministrationGeneralSubmenu())
-	->setDocUrl(CDocHelper::getUrl(CDocHelper::ADMINISTRATION_REGEX_EDIT));
-
-$action = (new CUrl('zabbix.php'))->setArgument('action', ($data['regexid'] == 0) ? 'regex.create' : 'regex.update');
-
-if ($data['regexid'] != 0) {
-	$action->setArgument('regexid', $data['regexid']);
-}
-
 $csrf_token = CCsrfTokenHelper::get('regex');
 
 $form = (new CForm())
-	->addItem((new CVar('form_refresh', $data['form_refresh'] + 1))->removeId())
 	->addItem((new CVar(CSRF_TOKEN_NAME, $csrf_token))->removeId())
-	->setId('regex')
-	->setAction($action->getUrl())
-	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID);
+	->setAction((new CUrl('zabbix.php'))->getUrl())
+	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)
+	->setId('regexp-form')
+	->addVar('regexpid', $data['regexp']['regexpid']);
 
 $table = (new CTable())
-	->setId('tbl_expr')
-	->setAttribute('style', 'width: 100%;')
+	->setId('regular-expressions-table')
 	->setHeader([
 		_('Expression type'),
 		_('Expression'),
@@ -51,128 +40,129 @@ $table = (new CTable())
 		''
 	]);
 
-foreach ($data['expressions'] as $i => $expression) {
-	$exp_delimiter = (new CSelect('expressions['.$i.'][exp_delimiter]'))
-		->setValue($expression['exp_delimiter'])
-		->setId('expressions_'.$i.'_exp_delimiter')
-		->addClass('js-expression-delimiter-select')
-		->addOptions(CSelect::createOptionsFromArray(CRegexHelper::expressionDelimiters()))
-		->setDisabled($expression['expression_type'] != EXPRESSION_TYPE_ANY_INCLUDED);
+$options_delimiter = CSelect::createOptionsFromArray(CRegexHelper::expressionDelimiters());
+$options_expression_type = CSelect::createOptionsFromArray(CRegexHelper::expression_type2str());
 
-	if ($expression['expression_type'] != EXPRESSION_TYPE_ANY_INCLUDED) {
-		$exp_delimiter->addStyle('display: none;');
-	}
-
-	$row = [
-		(new CSelect('expressions['.$i.'][expression_type]'))
-			->setId('expressions_'.$i.'_expression_type')
-			->addClass('js-expression-type-select')
-			->addOptions(CSelect::createOptionsFromArray(CRegexHelper::expression_type2str()))
-			->setValue($expression['expression_type']),
-		(new CTextBox('expressions['.$i.'][expression]', $expression['expression'], false, 255))
-			->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
-			->setAriaRequired(),
-		$exp_delimiter,
-		(new CCheckBox('expressions['.$i.'][case_sensitive]', '1'))->setChecked($expression['case_sensitive'] == 1)
-	];
-
-	$button_cell = [
-		(new CButton('expressions['.$i.'][remove]', _('Remove')))
-			->addClass(ZBX_STYLE_BTN_LINK)
-			->addClass('element-table-remove')
-	];
-	if (array_key_exists('expressionid', $expression)) {
-		$button_cell[] = new CVar('expressions['.$i.'][expressionid]', $expression['expressionid']);
-	}
-
-	$row[] = (new CCol($button_cell))->addClass(ZBX_STYLE_NOWRAP);
-
-	$table->addRow(
-		(new CRow($row))
-			->addClass('form_row')
-			->setAttribute('data-index', $i)
-	);
+foreach ($data['regexp']['expressions'] as $index => $expression) {
+	$table
+		->addItem(new CPartial('administration.regex.entry', [
+			'index' => $index,
+			'case_sensitive' => $expression['case_sensitive'],
+			'type' => $expression['expression_type'],
+			'expression' => $expression['expression'],
+			'delimiter' => $expression['exp_delimiter'],
+			'options_delimiter' => $options_delimiter,
+			'options_expression_type' => $options_expression_type
+		]));
 }
 
-$table->setFooter(
-	(new CButton('expression_add', _('Add')))
-		->addClass(ZBX_STYLE_BTN_LINK)
-		->addClass('element-table-add')
-);
+$table->addRow((new CRow((new CCol(
+	(new CButton('add', _('Add')))->addClass(ZBX_STYLE_BTN_LINK)->removeId()
+))->setColSpan(5)))->setId('expression-list-footer'));
 
-$expr_tab = (new CFormList('exprTab'))
-	->addRow(
-		(new CLabel(_('Name'), 'name'))->setAsteriskMark(),
-		(new CTextBox('name', $data['name'], false, 128))
-			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setAttribute('autofocus', 'autofocus')
-			->setAriaRequired()
+$cancel_button = (new CRedirectButton(_('Cancel'), (new CUrl('zabbix.php'))
+	->setArgument('action', 'regex.list')
+))->setId('cancel');
+
+$tabs = (new CTabView())
+	->addTab('expr', _('Expressions'), (new CFormGrid())
+		->addItem((new CLabel(_('Name'), 'name'))->setAsteriskMark())
+		->addItem((new CFormField())
+			->addItem((new CTextBox('name', $data['regexp']['name'], false, DB::getFieldLength('regexps', 'name')))
+				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				->setAttribute('autofocus', 'autofocus')
+				->setAriaRequired()
+			)
+		)
+		->addItem((new CLabel(_('Expressions'), 'regular-expressions-table'))->setAsteriskMark())
+		->addItem((new CFormField())
+			->addItem((new CDiv($table))
+				->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+				->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
+				->setAttribute('data-field-type', 'set')
+				->setAttribute('data-field-name', 'expressions')
+			)
+		)
 	)
-	->addRow(
-		(new CLabel(_('Expressions'), 'tbl_expr'))->setAsteriskMark(),
-		(new CDiv($table))
-			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
-	);
-
-$test_tab = (new CFormList())
-	->addRow(_('Test string'),
-		(new CTextArea('test_string', $data['test_string']))
-			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->disableSpellcheck()
+	->addTab('test', _('Test'), (new CFormGrid())
+		->addItem(new CLabel(_('Test string')))
+		->addItem((new CFormField())
+			->addItem((new CTextArea('test_string', $data['regexp']['test_string']))
+				->setMaxlength(DB::getFieldLength('regexps', 'test_string'))
+				->setId('test-string')
+				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				->disableSpellcheck()
+				->setAttribute('data-notrim', '')
+			)
+		)
+		->addItem([
+			null,
+			new CFormField((new CButton('test-expression', _('Test expressions')))->addClass(ZBX_STYLE_BTN_ALT))
+		])
+		->addItem(new CLabel(_('Result')))
+		->addItem((new CFormField())
+			->addItem((new CDiv())
+				->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+				->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
+				->addItem((new CTable())
+					->setHeader([_('Expression type'), _('Expression'), _('Result')])
+					->setId('test-result-table')
+					->setAttribute('style', 'width: 100%;')
+				)
+			)
+		)
 	)
-	->addRow('', (new CButton('testExpression', _('Test expressions')))->addClass(ZBX_STYLE_BTN_ALT))
-	->addRow(_('Result'),
-		(new CDiv(
-			(new CTable())
-				->setId('testResultTable')
-				->setAttribute('style', 'width: 100%;')
-				->setHeader([_('Expression type'), _('Expression'), _('Result')])
-		))
-			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
-	);
-
-$reg_exp_view = new CTabView();
-if ($data['form_refresh'] == 0) {
-	$reg_exp_view->setSelected(0);
-}
-
-$reg_exp_view->addTab('expr', _('Expressions'), $expr_tab);
-$reg_exp_view->addTab('test', _('Test'), $test_tab);
-
-// footer
-if ($data['regexid'] != 0) {
-	$reg_exp_view->setFooter(makeFormFooter(
-		new CSubmit('update', _('Update')),
-		[
+	->setFooter($data['regexp']['regexpid'] != 0
+		? makeFormFooter(new CSubmit('update', _('Update')), [
 			(new CSimpleButton(_('Clone')))->setId('clone'),
-			(new CRedirectButton(_('Delete'),
-					(new CUrl('zabbix.php'))
-						->setArgument('action', 'regex.delete')
-						->setArgument('regexids', (array) $data['regexid'])
-						->setArgument(CSRF_TOKEN_NAME, $csrf_token),
-				_('Delete regular expression?')
-			))->setId('delete'),
-			(new CRedirectButton(_('Cancel'), (new CUrl('zabbix.php'))
-				->setArgument('action', 'regex.list')
-			))->setId('cancel')
-		]
-	));
-}
-else {
-	$reg_exp_view->setFooter(makeFormFooter(
-		new CSubmit('add', _('Add')),
-		[
-			(new CRedirectButton(_('Cancel'), (new CUrl('zabbix.php'))
-				->setArgument('action', 'regex.list')
-			))->setId('cancel')
-		]
-	));
-}
+			(new CSimpleButton(_('Delete')))
+				->setAttribute('data-redirect-url', (new CUrl('zabbix.php'))
+					->setArgument('action', 'regex.delete')
+					->setArgument('regexpids', (array) $data['regexp']['regexpid'])
+					->setArgument(CSRF_TOKEN_NAME, $csrf_token)
+				)
+				->setId('delete'),
+			$cancel_button
+		])
+		: makeFormFooter(new CSubmit('add', _('Add')), [$cancel_button])
+	)
+	->setSelected(0);
 
-$form->addItem($reg_exp_view);
+$form
+	->addItem($tabs)
+	->addItem((new CTemplateTag('row-expression-template'))
+		->addItem(new CPartial('administration.regex.entry', [
+			'index' => '#{index}',
+			'case_sensitive' => '0',
+			'type' => '#{type}',
+			'expression' => '#{expression}',
+			'delimiter' => '#{delimiter}',
+			'options_delimiter' => $options_delimiter,
+			'options_expression_type' => $options_expression_type
+		]))
+	)
+	->addItem((new CTemplateTag('combined-result-template'))
+		->addItem((new CRow())
+			->addClass('js-expression-result-row')
+			->addItem((new CCol(_('Combined result')))->setColspan(2))
+			->addItem((new CSpan('#{result}'))->addClass('#{result_class}'))
+	))
+	->addItem((new CTemplateTag('result-row-template'))
+		->addItem((new CRow())
+			->addClass('js-expression-result-row')
+			->addItem(new CCol('#{type}'))
+			->addItem(new CCol('#{expression}'))
+			->addItem(new CCol((new CSpan('#{result}'))->addClass('#{result_class}')))
+	));
 
-$html_page
+(new CHtmlPage())
+	->setTitle(_('Regular expressions'))
+	->setTitleSubmenu(getAdministrationGeneralSubmenu())
+	->setDocUrl(CDocHelper::getUrl(CDocHelper::ADMINISTRATION_REGEX_EDIT))
 	->addItem($form)
+	->addItem(
+		(new CScriptTag('regular_expression_edit.init('.json_encode([
+			'rules' => $data['js_validation_rules']
+		]).');'))->setOnDocumentReady()
+	)
 	->show();

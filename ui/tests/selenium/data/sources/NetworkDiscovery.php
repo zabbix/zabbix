@@ -74,6 +74,17 @@ class NetworkDiscovery {
 				]
 			],
 			[
+				'name' => 'Multiple   spaces   in discovery rule name',
+				'iprange' => '192.168.1.1-255',
+				'status' => DRULE_STATUS_DISABLED,
+				'dchecks' => [
+					[
+						'type' => SVC_IMAP,
+						'ports' => 10050
+					]
+				]
+			],
+			[
 				'name' => 'Discovery rule for changing checks',
 				'iprange' => '192.168.1.1-255',
 				'status' => DRULE_STATUS_DISABLED,

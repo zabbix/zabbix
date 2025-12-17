@@ -23,7 +23,7 @@ class CControllerPopupLldOverride extends CController {
 	protected function checkInput() {
 		$fields = [
 			'no' =>					'int32',
-			'templated' =>			'in 0,1',
+			'readonly' =>			'in 0,1',
 			'name' =>				'string',
 			'old_name' =>			'string',
 			'stop' =>				'in 0,1',
@@ -57,7 +57,7 @@ class CControllerPopupLldOverride extends CController {
 	protected function doAction() {
 		$page_options = [
 			'no' => $this->getInput('no', -1),
-			'templated' => $this->getInput('templated', 0),
+			'readonly' => $this->getInput('readonly', 0),
 			'name' => $this->getInput('name', ''),
 			'old_name' => $this->getInput('old_name', ''),
 			'stop' => $this->getInput('stop', 0),

@@ -111,7 +111,7 @@ class CControllerItemList extends CControllerItem {
 			'sortorder' => $filter['sortorder'],
 			'uncheck' => $this->hasInput('uncheck')
 		];
-		unset($data['types'][ITEM_TYPE_HTTPTEST]);
+		unset($data['types'][ITEM_TYPE_HTTPTEST], $data['types'][ITEM_TYPE_NESTED]);
 
 		$items = $this->getItems($data['context'], $filter);
 		$data['filtered_count'] = count($items);
@@ -144,9 +144,12 @@ class CControllerItemList extends CControllerItem {
 		}
 
 		if ($items) {
+			CTagHelper::mergeOwnAndInheritedTags($items, true);
+
 			$data['items'] = $items;
 			$data['parent_templates'] = getItemParentTemplates($items, ZBX_FLAG_DISCOVERY_NORMAL);
-			$data['tags'] = makeTags($items, true, 'itemid', ZBX_TAG_COUNT_DEFAULT, $filter['filter_tags']);
+			$data['tags'] =
+				CTagHelper::getTagsHtml($items, ZBX_TAG_OBJECT_ITEM, ['filter_tags' => $filter['filter_tags']]);
 		}
 
 		$response = new CControllerResponseData($data);
@@ -234,6 +237,7 @@ class CControllerItemList extends CControllerItem {
 		// Types
 		$subfilters['subfilter_types']['labels'] = item_type2str();
 		unset($subfilters['subfilter_types']['labels'][ITEM_TYPE_HTTPTEST]);
+		unset($subfilters['subfilter_types']['labels'][ITEM_TYPE_NESTED]);
 
 		// Type of information
 		$subfilters['subfilter_value_types']['labels'] = [
@@ -546,11 +550,13 @@ class CControllerItemList extends CControllerItem {
 			'selectHosts' => API_OUTPUT_EXTEND,
 			'selectTriggers' => ['triggerid'],
 			'selectDiscoveryRule' => API_OUTPUT_EXTEND,
-			'selectItemDiscovery' => ['status', 'ts_delete', 'ts_disable', 'disable_source'],
+			'selectDiscoveryData' => ['status', 'ts_delete', 'ts_disable', 'disable_source'],
 			'selectTags' => ['tag', 'value'],
+			'selectInheritedTags' => ['tag', 'value'],
 			'sortfield' => $input['sort'],
 			'evaltype' => $input['filter_evaltype'],
-			'tags' => $input['filter_tags'],
+			'tags' => $input['filter_tags'] ?: null,
+			'inheritedTags' => true,
 			'limit' => CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1
 		];
 
@@ -669,14 +675,24 @@ class CControllerItemList extends CControllerItem {
 		$subfilters_input = [];
 
 		foreach ($schema as &$subfilter) {
-			$values = array_column($items_values, $subfilter['key']);
-			$values = array_reduce($values, 'array_merge', []);
+			$subfilter_key = $subfilter['key'];
+			$values = [];
 
-			if ($subfilter['selected']) {
-				$subfilters_input[$subfilter['key']] = array_keys($subfilter['selected']);
+			foreach ($items_values as $item_values) {
+				if (!array_key_exists($subfilter_key, $item_values)) {
+					continue;
+				}
+
+				foreach ($item_values[$subfilter_key] as $subfilter_value) {
+					$values[$subfilter_value] = 0;
+				}
 			}
 
-			$subfilter['values'] = array_fill_keys($values, 0);
+			if ($subfilter['selected']) {
+				$subfilters_input[$subfilter_key] = array_keys($subfilter['selected']);
+			}
+
+			$subfilter['values'] = $values;
 		}
 		unset($subfilter);
 

@@ -1,0 +1,39 @@
+zabbix_export:
+  version: '7.4'
+  host_groups:
+    - uuid: f2481361f99448eea617b7b1d4765566
+      name: 'Discovered hosts'
+  hosts:
+    - host: host_db_discovery
+      name: host_db_discovery
+      groups:
+        - name: 'Discovered hosts'
+      interfaces:
+        - interface_ref: if1
+      discovery_rules:
+        - name: 'Discover tablespaces for {#DB}'
+          type: NESTED
+          key: 'db.tablespace.discovery[{#DB}]'
+          item_prototypes:
+            - name: 'Size of tablespace {#TSNAME} for {#DB}'
+              key: 'db.ts.size[{#DB},{#TSNAME}]'
+              interface_ref: if1
+          parent_discovery_rule:
+            key: main_drule
+          lld_macro_paths:
+            - lld_macro: '{#TSNAME}'
+              path: $.name
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.tablespaces
+        - name: main_drule
+          type: TRAP
+          key: main_drule
+          item_prototypes:
+            - name: 'Active connections to {#DB}'
+              key: 'db.connections[{#DB}]'
+              interface_ref: if1
+          lld_macro_paths:
+            - lld_macro: '{#DB}'
+              path: $.database

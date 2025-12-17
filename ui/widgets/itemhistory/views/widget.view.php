@@ -263,7 +263,8 @@ function makeValueCell(array $column, array $item_value, bool $text_wordbreak = 
 		case ITEM_VALUE_TYPE_TEXT:
 			if (array_key_exists('highlights', $column)) {
 				foreach ($column['highlights'] as $highlight) {
-					if (@preg_match('('.$highlight['pattern'].')', $item_value['value'])) {
+					if (@preg_match('/'.CRegexHelper::handleSlashEscaping($highlight['pattern']).'/',
+							$item_value['value'])) {
 						$color = $highlight['color'];
 						break;
 					}

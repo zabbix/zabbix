@@ -1043,7 +1043,9 @@ class CScreenProblem extends CScreenBase {
 				$header[] = $header_clock;
 			}
 
-			$table = (new CTableInfo())->setPageNavigation($paging);
+			$table = (new CTableInfo())
+				->setPageNavigation($paging)
+				->addClass($this->data['filter']['highlight_row'] == ZBX_HIGHLIGHT_ON ? 'has-highlighted-rows' : null);
 
 			// Create table.
 			if ($this->data['filter']['compact_view']) {
@@ -1107,14 +1109,21 @@ class CScreenProblem extends CScreenBase {
 				]));
 			}
 
-			$tags = $this->data['filter']['show_tags']
-				? makeTags($data['problems'] + $symptom_data['problems'], true, 'eventid',
-					$this->data['filter']['show_tags'], array_key_exists('tags', $this->data['filter'])
-						? $this->data['filter']['tags']
-						: [],
-					null, $this->data['filter']['tag_name_format'], $this->data['filter']['tag_priority']
-				)
-				: [];
+			$tags = [];
+
+			if ($this->data['filter']['show_tags']) {
+				$object_type = $this->data['filter']['show'] == TRIGGERS_OPTION_ALL
+					? ZBX_TAG_OBJECT_EVENT
+					: ZBX_TAG_OBJECT_PROBLEM;
+
+				$tags = CTagHelper::getTagsHtml($data['problems'] + $symptom_data['problems'], $object_type, [
+					'filter_tags' =>
+						array_key_exists('tags', $this->data['filter']) ? $this->data['filter']['tags'] : [],
+					'tag_priority' => $this->data['filter']['tag_priority'],
+					'show_tags_limit' => $this->data['filter']['show_tags'],
+					'tag_name_format' => $this->data['filter']['tag_name_format']
+				]);
+			}
 
 			$triggers_hosts = $data['problems'] ? makeTriggersHostsList($triggers_hosts) : [];
 
@@ -1164,11 +1173,9 @@ class CScreenProblem extends CScreenBase {
 			return $this->getOutput($form->addItem([$table, $footer]), false, $this->data);
 		}
 
-		/*
-		 * Search limit performs +1 selection to know if limit was exceeded, this will assure that CSV has
-		 * "search_limit" records at most.
-		 */
-		array_splice($data['problems'], $this->data['limit']);
+		if (count($data['problems']) > $this->data['limit']) {
+			array_pop($data['problems']);
+		}
 
 		$csv = [];
 
@@ -1187,8 +1194,7 @@ class CScreenProblem extends CScreenBase {
 			_('Tags')
 		]);
 
-		// Make tags from all events.
-		$tags = makeTags($data['problems'] + $symptom_data['problems'], false);
+		$tags = CTagHelper::getTagsRaw($data['problems'] + $symptom_data['problems']);
 
 		// Get cause event names for symptoms.
 		$causes = [];
@@ -1672,13 +1678,15 @@ class CScreenProblem extends CScreenBase {
 					: zbx_date2age($problem['clock']),
 				$problem_update_link,
 				makeEventActionsIcons($problem['eventid'], $data['actions'], $data['users'], $is_acknowledged),
-				$data['filter']['show_tags'] ? $data['tags'][$problem['eventid']] : null
+				$data['filter']['show_tags']
+					? (new CDiv($data['tags'][$problem['eventid']]))->addClass(ZBX_STYLE_TAGS_WRAPPER)
+					: null
 			]);
 
 			// Add table row.
-			$table->addRow($row, ($data['filter']['highlight_row'] && $value == TRIGGER_VALUE_TRUE)
-					? self::getSeverityFlhStyle($problem['severity'])
-					: null
+			$table->addRow($row, $data['filter']['highlight_row'] == ZBX_HIGHLIGHT_ON && $value == TRIGGER_VALUE_TRUE
+				? CSeverityHelper::getSeverityFlhStyle($problem['severity'])
+				: null
 			);
 
 			if ($problem['cause_eventid'] == 0 && $problem['symptoms']) {
@@ -1830,7 +1838,8 @@ class CScreenProblem extends CScreenBase {
 						: $last_value['value']
 				))
 					->addClass('hint-item')
-					->setAttribute('data-hintbox', '1');
+					->setAttribute('data-hintbox', '1')
+					->addClass(ZBX_STYLE_NO_INDENT);
 				$latest_values[] = ', ';
 			}
 			else {
@@ -1841,45 +1850,14 @@ class CScreenProblem extends CScreenBase {
 		}
 
 		if ($html) {
-			$hint_container = (new CDiv())
-				->addClass(ZBX_STYLE_HINTBOX_WRAP)
-				->addItem($hint_table);
-
 			array_pop($latest_values);
 			array_unshift($latest_values, (new CDiv())
 				->addClass('main-hint')
-				->setHint($hint_container)
+				->setHint($hint_table)
 			);
-
 			return $latest_values;
 		}
 
 		return implode(', ', $latest_values);
-	}
-
-	/**
-	 * Get trigger severity full line height css style name.
-	 *
-	 * @param int $severity  Trigger severity.
-	 *
-	 * @return string|null
-	 */
-	private static function getSeverityFlhStyle($severity) {
-		switch ($severity) {
-			case TRIGGER_SEVERITY_DISASTER:
-				return ZBX_STYLE_FLH_DISASTER_BG;
-			case TRIGGER_SEVERITY_HIGH:
-				return ZBX_STYLE_FLH_HIGH_BG;
-			case TRIGGER_SEVERITY_AVERAGE:
-				return ZBX_STYLE_FLH_AVERAGE_BG;
-			case TRIGGER_SEVERITY_WARNING:
-				return ZBX_STYLE_FLH_WARNING_BG;
-			case TRIGGER_SEVERITY_INFORMATION:
-				return ZBX_STYLE_FLH_INFO_BG;
-			case TRIGGER_SEVERITY_NOT_CLASSIFIED:
-				return ZBX_STYLE_FLH_NA_BG;
-			default:
-				return null;
-		}
 	}
 }

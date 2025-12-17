@@ -18,6 +18,7 @@
 #include "zbxcomms.h"
 #include "zbxjson.h"
 
-int	trapper_process_history_push(zbx_socket_t *sock, const struct zbx_json_parse *jp, int timeout);
+int	trapper_process_history_push(zbx_socket_t *sock, const struct zbx_json_parse *jp, int timeout,
+		const zbx_config_tls_t *config_tls, const char *config_frontend_allowed_ip);
 
 #endif

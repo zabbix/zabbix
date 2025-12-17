@@ -51,9 +51,6 @@ class CGraphManager {
 			'value_id' => $del_graphids
 		]);
 
-		DB::delete('widget_field', ['value_graphid' => $del_graphids]);
-		DB::delete('graph_discovery', ['graphid' => $del_graphids]);
-		DB::delete('graphs_items', ['graphid' => $del_graphids]);
 		DB::delete('graphs', ['graphid' => $del_graphids]);
 	}
 }

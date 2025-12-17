@@ -88,16 +88,6 @@ function get_trigger_by_triggerid($triggerid) {
 	return false;
 }
 
-function get_triggers_by_hostid($hostid) {
-	return DBselect(
-		'SELECT DISTINCT t.*'.
-		' FROM triggers t,functions f,items i'.
-		' WHERE i.hostid='.zbx_dbstr($hostid).
-			' AND f.itemid=i.itemid'.
-			' AND f.triggerid=t.triggerid'
-	);
-}
-
 /**
  * Prepare arrays containing only hosts and triggers that will be shown results table.
  *
@@ -1676,16 +1666,17 @@ function getTriggerParentTemplates(array $triggers, $flag) {
 
 	$all_parent_triggerids = [];
 	$hostids = [];
-	if ($flag == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
+	if ($flag & ZBX_FLAG_DISCOVERY_PROTOTYPE) {
 		$lld_ruleids = [];
 	}
 
 	do {
-		if ($flag == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
+		if ($flag & ZBX_FLAG_DISCOVERY_PROTOTYPE) {
 			$db_triggers = API::TriggerPrototype()->get([
 				'output' => ['triggerid', 'templateid'],
 				'selectHosts' => ['hostid'],
 				'selectDiscoveryRule' => ['itemid'],
+				'selectDiscoveryRulePrototype' => ['itemid'],
 				'triggerids' => array_keys($parent_triggerids)
 			]);
 		}
@@ -1707,8 +1698,9 @@ function getTriggerParentTemplates(array $triggers, $flag) {
 				$hostids[$db_trigger['triggerid']][] = $host['hostid'];
 			}
 
-			if ($flag == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
-				$lld_ruleids[$db_trigger['triggerid']] = $db_trigger['discoveryRule']['itemid'];
+			if ($flag & ZBX_FLAG_DISCOVERY_PROTOTYPE) {
+				$parent_lld = $db_trigger['discoveryRule'] ?: $db_trigger['discoveryRulePrototype'];
+				$lld_ruleids[$db_trigger['triggerid']] = $parent_lld['itemid'];
 			}
 
 			if ($db_trigger['templateid'] != 0) {
@@ -1727,7 +1719,7 @@ function getTriggerParentTemplates(array $triggers, $flag) {
 			? $hostids[$parent_trigger['triggerid']]
 			: [0];
 
-		if ($flag == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
+		if ($flag & ZBX_FLAG_DISCOVERY_PROTOTYPE) {
 			$parent_trigger['lld_ruleid'] = array_key_exists($parent_trigger['triggerid'], $lld_ruleids)
 				? $lld_ruleids[$parent_trigger['triggerid']]
 				: 0;
@@ -1802,7 +1794,7 @@ function makeTriggerTemplatePrefix($triggerid, array $parent_templates, $flag, b
 
 	foreach ($templates as $template) {
 		if ($provide_links && $template['permission'] == PERM_READ_WRITE) {
-			if ($flag == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
+			if ($flag & ZBX_FLAG_DISCOVERY_PROTOTYPE) {
 				$url = (new CUrl('zabbix.php'))
 					->setArgument('action', 'trigger.prototype.list')
 					->setArgument('parent_discoveryid', $parent_templates['links'][$triggerid]['lld_ruleid'])
@@ -1864,7 +1856,7 @@ function makeTriggerTemplatesHtml($triggerid, array $parent_templates, $flag, bo
 
 		foreach ($templates as $template) {
 			if ($provide_links && $template['permission'] == PERM_READ_WRITE) {
-				if ($flag == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
+				if ($flag & ZBX_FLAG_DISCOVERY_PROTOTYPE) {
 					$attribute_name = 'data-parent_discoveryid';
 					$attribute_value = $parent_templates['links'][$triggerid]['lld_ruleid'];
 					$prototype = '1';

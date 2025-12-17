@@ -26,7 +26,7 @@ static int	graph_flag_to_resource_type(int flag)
 	{
 		return ZBX_AUDIT_RESOURCE_GRAPH;
 	}
-	else if (ZBX_FLAG_DISCOVERY_PROTOTYPE == flag)
+	else if (0 != (flag & ZBX_FLAG_DISCOVERY_PROTOTYPE))
 	{
 		return ZBX_AUDIT_RESOURCE_GRAPH_PROTOTYPE;
 	}

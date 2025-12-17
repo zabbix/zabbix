@@ -19,6 +19,9 @@ abstract class CController {
 	protected const POST_CONTENT_TYPE_FORM = 0;
 	protected const POST_CONTENT_TYPE_JSON = 1;
 
+	protected const INPUT_VALIDATION_DEFAULT = 0;
+	protected const INPUT_VALIDATION_FORM = 1;
+
 	protected const VALIDATION_OK = 0;
 	protected const VALIDATION_ERROR = 1;
 	protected const VALIDATION_FATAL_ERROR = 2;
@@ -29,6 +32,13 @@ abstract class CController {
 	 * @var int
 	 */
 	private $post_content_type = self::POST_CONTENT_TYPE_FORM;
+
+	/**
+	 * Input validation method.
+	 *
+	 * @var int
+	 */
+	private $input_validation_method = self::INPUT_VALIDATION_DEFAULT;
 
 	/**
 	 * Action name, so that controller knows which action is being executed.
@@ -52,6 +62,13 @@ abstract class CController {
 	private $validation_result;
 
 	/**
+	 * Errors of input validation if $input_validation_method is INPUT_VALIDATION_FORM.
+	 *
+	 * @var array
+	 */
+	private $validation_errors = [];
+
+	/**
 	 * Non-validated input parameters.
 	 *
 	 * @var array|null
@@ -64,6 +81,20 @@ abstract class CController {
 	 * @var array
 	 */
 	protected $input = [];
+
+	/**
+	 * Non-validated files parameters.
+	 *
+	 * @var array|null
+	 */
+	private ?array $raw_files;
+
+	/**
+	 * Validated files parameters.
+	 *
+	 * @var array|null
+	 */
+	private array $files = [];
 
 	/**
 	 * Validate CSRF token flag, if true CSRF token must be validated.
@@ -99,6 +130,15 @@ abstract class CController {
 	 */
 	protected function setPostContentType(int $post_content_type): void {
 		$this->post_content_type = $post_content_type;
+	}
+
+	/**
+	 * Set input validation method.
+	 *
+	 * @param int $input_validation_method
+	 */
+	protected function setInputValidationMethod(int $input_validation_method): void {
+		$this->input_validation_method = $input_validation_method;
 	}
 
 	/**
@@ -237,6 +277,10 @@ abstract class CController {
 		return $input;
 	}
 
+	private static function getFileInput(): array {
+		return $_FILES;
+	}
+
 	/**
 	 * Validate input parameters.
 	 *
@@ -245,12 +289,77 @@ abstract class CController {
 	 * @return bool
 	 */
 	protected function validateInput(array $validation_rules): bool {
-		if ($this->raw_input === null) {
+		if ($this->raw_input === null && $this->raw_files === null) {
 			$this->validation_result = self::VALIDATION_FATAL_ERROR;
 
 			return false;
 		}
 
+		return $this->input_validation_method == self::INPUT_VALIDATION_FORM
+			? $this->validateWithFormValidator($validation_rules)
+			: $this->validateWithNewValidator($validation_rules);
+	}
+
+	/**
+	 * Validate input using CFormValidator.
+	 *
+	 * @param array    $validation_rules  Validation rules.
+	 *
+	 * @return bool
+	 */
+	protected function validateWithFormValidator(array $validation_rules): bool {
+		$validator = new CFormValidator($validation_rules);
+		$data = $this->raw_input;
+		$files = $this->raw_files;
+
+		switch ($validator->validate($data, $files)) {
+			case CFormValidator::SUCCESS:
+				$this->validation_result = self::VALIDATION_OK;
+				$this->validation_errors = [];
+				$this->input = $data;
+				$this->files = $files;
+				break;
+
+			case CFormValidator::ERROR:
+				$this->validation_errors = $validator->getErrors();
+				$this->validation_result = self::VALIDATION_ERROR;
+				break;
+
+			case CFormValidator::ERROR_FATAL:
+				$this->validation_errors = $validator->getErrors();
+				$this->validation_result = self::VALIDATION_FATAL_ERROR;
+				break;
+		}
+
+		return $this->validation_result == self::VALIDATION_OK;
+	}
+
+	public function addFormError(string $path, string $message, $level = CFormValidator::ERROR_LEVEL_UNKNOWN): void {
+		if (!array_key_exists($path, $this->validation_errors)) {
+			$this->validation_errors[$path] = [];
+		}
+
+		$same_error = array_filter($this->validation_errors[$path],
+			static fn ($error) => $error['message'] === $message && $error['level'] == $level
+		);
+
+		if (!$same_error) {
+			$this->validation_errors[$path][] = [
+				'message' => $message,
+				'level' => $level
+			];
+			$this->validation_result = self::VALIDATION_ERROR;
+		}
+	}
+
+	/**
+	 * Validate input using CNewValidator.
+	 *
+	 * @param array    $validation_rules  Validation rules.
+	 *
+	 * @return bool
+	 */
+	protected function validateWithNewValidator(array $validation_rules): bool {
 		$validator = new CNewValidator($this->raw_input, $validation_rules);
 
 		foreach ($validator->getAllErrors() as $error) {
@@ -325,8 +434,17 @@ abstract class CController {
 	 *
 	 * @return int
 	 */
-	protected function getValidationError() {
+	protected function getValidationResult() {
 		return $this->validation_result;
+	}
+
+	/**
+	 * Return validation errors.
+	 *
+	 * @return array
+	 */
+	protected function getValidationError(): array {
+		return $this->validation_errors;
 	}
 
 	/**
@@ -378,6 +496,14 @@ abstract class CController {
 	 */
 	protected function getInputAll() {
 		return $this->input;
+	}
+
+	protected function hasFile(string $var): bool {
+		return array_key_exists($var, $this->files);
+	}
+
+	protected function getFile(string $var): array {
+		return $this->files[$var];
 	}
 
 	/**
@@ -440,14 +566,17 @@ abstract class CController {
 		switch ($this->getPostContentType()) {
 			case self::POST_CONTENT_TYPE_FORM:
 				$this->raw_input = self::getFormInput();
+				$this->raw_files = self::getFileInput();
 				break;
 
 			case self::POST_CONTENT_TYPE_JSON:
 				$this->raw_input = self::getJsonInput();
+				$this->raw_files = null;
 				break;
 
 			default:
 				$this->raw_input = null;
+				$this->raw_files = null;
 		}
 	}
 

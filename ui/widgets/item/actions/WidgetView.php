@@ -148,7 +148,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 			'webitems' => true
 		];
 
-		if ($this->fields_values['override_hostid']) {
+		if (!$this->isTemplateDashboard() && $this->fields_values['override_hostid']) {
 			$src_items = API::Item()->get([
 				'output' => ['key_'],
 				'itemids' => $this->fields_values['itemid'],

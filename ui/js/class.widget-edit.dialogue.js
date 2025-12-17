@@ -197,9 +197,11 @@ class CWidgetEditDialogue extends EventTarget {
 		}
 
 		this.#validator.stop();
-		this.#open();
+		this.#is_validated = false;
 
 		this.#is_unsaved = true;
+
+		this.#open();
 	}
 
 	#onSubmitRequest() {
@@ -217,12 +219,6 @@ class CWidgetEditDialogue extends EventTarget {
 		const is_submit = e.detail.close_by === Overlay.prototype.CLOSE_BY_SCRIPT;
 
 		if (!is_submit) {
-			if (!this.#is_new && this.#is_unsaved && !confirm(t('Widget configuration will be reverted.'))) {
-				e.preventDefault();
-
-				return;
-			}
-
 			this.#sandbox.cancel();
 		}
 
@@ -237,12 +233,16 @@ class CWidgetEditDialogue extends EventTarget {
 
 	#onInput() {
 		this.#validator.stop();
+		this.#is_validated = false;
 
 		if (this.#input_throttle_timeout !== null) {
 			clearTimeout(this.#input_throttle_timeout);
 		}
 
-		this.#input_throttle_timeout = setTimeout(() => this.#validate(), CWidgetEditDialogue.INPUT_THROTTLE_MS);
+		this.#input_throttle_timeout = setTimeout(() => {
+			this.#input_throttle_timeout = null;
+			this.#validate();
+		}, CWidgetEditDialogue.INPUT_THROTTLE_MS);
 	}
 
 	#onValidatorResult(result) {

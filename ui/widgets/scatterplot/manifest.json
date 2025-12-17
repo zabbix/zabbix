@@ -1,0 +1,32 @@
+{
+	"manifest_version": 2.0,
+	"id": "scatterplot",
+	"type": "widget",
+	"name": "Scatter plot",
+	"namespace": "ScatterPlot",
+	"version": "1.0",
+	"author": "Zabbix",
+	"description": "Displays data of relationships between two different metrics.",
+	"url": "web_interface/frontend_sections/dashboards/widgets/scatter_plot",
+	"widget": {
+		"js_class": "CWidgetScatterPlot",
+		"in": {
+			"time_period": {
+				"type": "_timeperiod"
+			}
+		},
+		"out": [
+			{
+				"type": "_timeperiod"
+			}
+		]
+	},
+	"actions": {
+		"widget.scatterplot.view": {
+			"class": "WidgetView"
+		}
+	},
+	"assets": {
+		"js": ["class.widget.js", "class.widget-field.axis-thresholds.js"]
+	}
+}

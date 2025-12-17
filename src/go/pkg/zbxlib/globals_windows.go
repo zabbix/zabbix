@@ -21,62 +21,9 @@ package zbxlib
 #include "zbxwin32.h"
 #include "../src/zabbix_agent/metrics/metrics.h"
 
-#cgo LDFLAGS: -Wl,--start-group
-#cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/misc.o
-#cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/str.o
-#cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/num.o
-#cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/param.o
-#cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/interval.o
-#cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/bincommon.o
-#cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/common_str.o
-#cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/common_log.o
-#cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/components_strings_representations.o
-#cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/libc_wrappers.o
-#cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/file.o
-#cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/symbols.o
-#cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/win32_file.o
-#cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/time.o
-#cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/expr.o
-#cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/function.o
-#cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/host.o
-#cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/macro.o
-#cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/token.o
-#cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/fatal.o
-#cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/disk.o
-#cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/threads.o
-#cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/ip.o
-#cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/iprange.o
-#cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/zbxhash.o
-#cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/md5.o
-#cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/sysinfo.o
-#cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/vector.o
-#cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/hashset.o
-#cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/zbxregexp.o
-#cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/algodefs.o
-#cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/persistent_state.o
-#cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/logfiles.o
-#cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/json.o
-#cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/json_parser.o
-#cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/jsonpath.o
-#cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/jsonobj.o
-#cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/sha256crypt.o
-#cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/variant.o
-#cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/sysinfo_system.o
-#cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/sysinfo_dns.o
-#cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/sysinfo_ip_reverse.o
-#cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/sysinfo_vfs_file.o
-#cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/sysinfo_dir.o
-#cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/sysinfo_alias.o
-#cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/eventlog.o
-#cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/process_eventslog.o
-#cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/process_eventslog6.o
-#cgo openssl LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/tls_version.o
 #cgo LDFLAGS: -lDbghelp -lpsapi -lws2_32 -lWevtapi -ldnsapi
 #cgo pcre2 LDFLAGS: -lpcre2-8
 #cgo openssl LDFLAGS: -lssl -lcrypto
-#cgo LDFLAGS: -Wl,--end-group
-
-int	CONFIG_TCP_MAX_BACKLOG_SIZE	= SOMAXCONN;
 
 zbx_metric_t	parameters_common[] = {NULL};
 zbx_metric_t	*get_parameters_common(void)

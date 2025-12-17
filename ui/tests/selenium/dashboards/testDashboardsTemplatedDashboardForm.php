@@ -43,16 +43,6 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 	protected static $previous_widget_name = 'Widget for update';
 
 	/**
-	 * Callback executed before every test case. Automatically accept the alert.
-	 *
-	 * @before
-	 */
-	public function onBeforeTestCase() {
-		parent::onBeforeTestCase();
-		CommandExecutor::setAlertStrategy(CommandExecutor::STRATEGY_ACCEPT_ALERT);
-	}
-
-	/**
 	 * Attach MessageBehavior to the test.
 	 *
 	 * @return array
@@ -377,7 +367,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 							[
 								'type' => 'problemhosts',
 								'name' => 'Problem hosts widget',
-								'x' => 48,
+								'x' => 60,
 								'y' => 8,
 								'width' => 12,
 								'height' => 4
@@ -385,15 +375,15 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 							[
 								'type' => 'problems',
 								'name' => 'Problems widget',
-								'x' => 60,
-								'y' => 8,
+								'x' => 0,
+								'y' => 12,
 								'width' => 12,
 								'height' => 4
 							],
 							[
 								'type' => 'problemsbysv',
 								'name' => 'Problems by severity widget',
-								'x' => 0,
+								'x' => 12,
 								'y' => 12,
 								'width' => 12,
 								'height' => 4
@@ -401,7 +391,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 							[
 								'type' => 'slareport',
 								'name' => 'SLA report widget',
-								'x' => 12,
+								'x' => 24,
 								'y' => 12,
 								'width' => 12,
 								'height' => 4,
@@ -421,7 +411,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 							[
 								'type' => 'systeminfo',
 								'name' => 'System info details widget',
-								'x' => 24,
+								'x' => 36,
 								'y' => 12,
 								'width' => 12,
 								'height' => 4
@@ -429,7 +419,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 							[
 								'type' => 'systeminfo',
 								'name' => 'System info HA nodes widget',
-								'x' => 36,
+								'x' => 48,
 								'y' => 12,
 								'width' => 12,
 								'height' => 4,
@@ -444,7 +434,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 							[
 								'type' => 'tophosts',
 								'name' => 'Top hosts widget',
-								'x' => 48,
+								'x' => 60,
 								'y' => 12,
 								'width' => 12,
 								'height' => 4,
@@ -494,15 +484,15 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 							[
 								'type' => 'toptriggers',
 								'name' => 'Top triggers widget',
-								'x' => 60,
-								'y' => 12,
+								'x' => 0,
+								'y' => 16,
 								'width' => 12,
 								'height' => 4
 							],
 							[
 								'type' => 'trigover',
 								'name' => 'Trigger overview widget',
-								'x' => 0,
+								'x' => 12,
 								'y' => 16,
 								'width' => 12,
 								'height' => 4
@@ -510,7 +500,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 							[
 								'type' => 'url',
 								'name' => 'URL widget',
-								'x' => 12,
+								'x' => 24,
 								'y' => 16,
 								'width' => 12,
 								'height' => 4,
@@ -525,7 +515,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 							[
 								'type' => 'web',
 								'name' => 'Web monitoring widget',
-								'x' => 24,
+								'x' => 36,
 								'y' => 16,
 								'width' => 12,
 								'height' => 4
@@ -533,7 +523,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 							[
 								'type' => 'topitems',
 								'name' => 'Top items widget',
-								'x' => 36,
+								'x' => 48,
 								'y' => 16,
 								'width' => 12,
 								'height' => 4,
@@ -548,7 +538,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 							[
 								'type' => 'honeycomb',
 								'name' => 'Honeycomb widget',
-								'x' => 48,
+								'x' => 60,
 								'y' => 16,
 								'width' => 12,
 								'height' => 4,
@@ -557,6 +547,41 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 										'type' => 1,
 										'name' => 'items.0',
 										'value' => 'Test dashboard honeycomb'
+									]
+								]
+							],
+							[
+								'type' => 'hostcard',
+								'name' => 'Host card widget',
+								'x' => 60,
+								'y' => 20,
+								'width' => 12,
+								'height' => 4,
+								'fields' => [
+									[
+										'type' => 3,
+										'name' => 'hostid.0',
+										'value' => 10084 // Zabbix server.
+									]
+								]
+							],
+							[
+								'type'=> 'itemcard',
+								'name'=> 'Item card widget',
+								'x'=> 60,
+								'y'=> 24,
+								'width'=> 12,
+								'height'=> 4,
+								'fields'=> [
+									[
+										'type'=> ZBX_WIDGET_FIELD_TYPE_ITEM,
+										'name'=> 'itemid.0',
+										'value'=> self::$template_itemid
+									],
+									[
+										'type'=> 0,
+										'name'=> 'sections.0',
+										'value'=> 2
 									]
 								]
 							]
@@ -641,6 +666,31 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 		self::$dashboardid_with_widgets = $response['dashboardids'][0];
 		self::$empty_dashboardid = $response['dashboardids'][1];
 		self::$dashboardid_for_update = $response['dashboardids'][2];
+
+		// Insert favorite map and graph into profiles table for checking the data that is displayed by favorite maps and favorite graphs widgets.
+		$insert_favorite = [
+			[
+				'profileid' => 1,
+				'userid' => 1,
+				'idx' => zbx_dbstr('web.favorite.sysmapids'),
+				'value_id' => 1, // Map:Local network.
+				'value_str' => zbx_dbstr(''),
+				'source' => zbx_dbstr('sysmapid'),
+				'type' => 1
+			],
+			[
+				'profileid' => 2,
+				'userid' => 1,
+				'idx' => zbx_dbstr('web.favorite.graphids'),
+				'value_id' => 42258, // Item:CPU iowait time.
+				'value_str' => zbx_dbstr(''),
+				'source' => zbx_dbstr('itemid'),
+				'type' => 1
+			]
+		];
+		foreach ($insert_favorite as $data) {
+			DBexecute('INSERT INTO profiles ('.implode(', ', array_keys($data)).') VALUES ('.implode(', ', $data).')');
+		}
 	}
 
 	/**
@@ -1607,7 +1657,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 									'type' => 'indicator'
 								],
 								[
-									'field_locator' => 'xpath:.//input[@id="up_color"]/..',
+									'field_locator' => 'xpath:.//z-color-picker[@color-field-name="up_color"]',
 									'type' => 'color_picker'
 								],
 								[
@@ -1615,7 +1665,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 									'type' => 'indicator'
 								],
 								[
-									'field_locator' => 'xpath:.//input[@id="down_color"]/..',
+									'field_locator' => 'xpath:.//z-color-picker[@color-field-name="down_color"]',
 									'type' => 'color_picker'
 								],
 								[
@@ -1623,7 +1673,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 									'type' => 'indicator'
 								],
 								[
-									'field_locator' => 'xpath:.//input[@id="updown_color"]/..',
+									'field_locator' => 'xpath:.//z-color-picker[@color-field-name="updown_color"]',
 									'type' => 'color_picker'
 								]
 							]
@@ -2238,6 +2288,79 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 						'Advanced configuration' => true
 					]
 				]
+			],
+			// #24 Host card widget.
+			[
+				[
+					'type' => CFormElement::RELOADABLE_FILL('Host card'),
+					'refresh_interval' => 'Default (1 minute)',
+					'fields' => [
+						[
+							'field' => 'Show suppressed problems',
+							'type' => 'checkbox',
+							'value' => false
+						],
+						[
+							'field' => 'Show',
+							'type' => 'show_table',
+							'headers' => ['', '', 'Name', ''],
+							'field_locator' => 'id:sections-table',
+							'rows' => [
+								1 => 'Monitoring',
+								2 => 'Availability',
+								3 => 'Monitored by'
+							],
+							'option_states' => [
+								'Host groups' => true,
+								'Description' => true,
+								'Monitoring' => false,
+								'Availability' => false,
+								'Monitored by' => false,
+								'Templates' => true,
+								'Inventory' => true,
+								'Tags' => true
+							]
+						]
+					]
+				]
+			],
+			// #25 Item card widget.
+			[
+				[
+					'type' => CFormElement::RELOADABLE_FILL('Item card'),
+					'refresh_interval' => 'Default (1 minute)',
+					'fields' => [
+						[
+							'field' => 'Item',
+							'type' => 'multiselect',
+							'mandatory' => true
+						],
+						[
+							'field' => 'Show',
+							'type' => 'show_table',
+							'headers' => ['', '', 'Name', ''],
+							'field_locator' => 'id:sections-table',
+							'rows' => [
+								1 => 'Interval and storage',
+								2 => 'Type of information',
+								3 => 'Host interface',
+								4 => 'Type'
+							],
+							'option_states' => [
+								'Description' => true,
+								'Error text' => true,
+								'Interval and storage' => false,
+								'Latest data' => true,
+								'Type of information' => false,
+								'Triggers' => true,
+								'Host interface' => false,
+								'Type' => false,
+								'Host inventory' => true,
+								'Tags' => true
+							]
+						]
+					]
+				]
 			]
 		];
 	}
@@ -2491,7 +2614,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 				break;
 
 			case 'color_picker':
-				$field = $field->asColorPicker();
+				$field = $field->query('xpath://z-color-picker')->asColorPicker()->one();
 				$this->assertEquals($default_value, $field->getValue());
 				break;
 
@@ -2531,6 +2654,38 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 			case 'indicator':
 				$this->assertTrue($field->isDisplayed());
 				$this->assertEquals('', $field->query('tag:polygon')->one()->getAttribute('style'));
+				break;
+
+			case 'show_table':
+				$table = $field->asTable();
+				// TODO: Uncomment the below check after ZBX-27000 is merged.
+				// $this->assertEquals($field_details['headers'], $table->getHeadersText());
+				$this->assertTrue($table->query('id:add-row')->one()->isClickable());
+
+				// Check each default row in "Show" field and its contents.
+				$show_rows = $table->getRows()->filter(CElementFilter::CLASSES_PRESENT, 'form_row', true);
+				$i = 1;
+				foreach ($show_rows as $row) {
+					$this->assertTrue($row->getColumn(0)->query('class:drag-icon')->one()->isEnabled());
+
+					// TODO: after ZBX-27000 is merged, change column index "2" to column name "Name".
+					$dropdown = $row->getColumn(2)->query('tag:z-select')->one()->asDropdown();
+					$options = $dropdown->getOptions();
+					$this->assertEquals($field_details['rows'][$i], $dropdown->getText());
+					$this->assertEquals(array_keys($field_details['option_states']), $options->asText());
+
+					// If option is selected in the dropdown, it appears in the list as enabled.
+					$reference_options = array_merge($field_details['option_states'], [$field_details['rows'][$i] => true]);
+
+					// If option does not have a "disabled" attribute, then it is considered enabled.
+					foreach ($options as $option) {
+						$this->assertEquals($reference_options[$option->getText()], !$option->isAttributePresent('disabled'));
+					}
+
+					$this->assertTrue($row->query('button:Remove')->one()->isClickable());
+
+					$i++;
+				}
 				break;
 		}
 
@@ -3102,9 +3257,9 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 						'Item' => self::TEMPLATE_ITEM,
 						'Min' => 11,
 						'Max' => 99,
-						'xpath:.//input[@id="value_arc_color"]/..' => '64B5F6',
-						'xpath:.//input[@id="empty_color"]/..' => 'FFBF00',
-						'xpath:.//input[@id="bg_color"]/..' => 'BA68C8',
+						'xpath:.//z-color-picker[@color-field-name="value_arc_color"]' => '64B5F6',
+						'xpath:.//z-color-picker[@color-field-name="empty_color"]' => 'FFBF00',
+						'xpath:.//z-color-picker[@color-field-name="bg_color"]' => 'BA68C8',
 						'Show' => ['Description', 'Value', 'Value arc', 'Needle', 'Scale'],
 						'Advanced configuration' => true,
 						'Angle' => '270°',
@@ -3112,25 +3267,25 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 						'id:desc_size' => 30,
 						'id:desc_bold' => true,
 						'id:desc_v_pos' => 'Top',
-						'xpath:.//input[@id="desc_color"]/..' => 'FFB300',
+						'xpath:.//z-color-picker[@color-field-name="desc_color"]' => 'FFB300',
 						'id:decimal_places' => 10,
 						'id:value_size' => 50,
 						'id:value_bold' => true,
-						'xpath:.//input[@id="value_color"]/..' => '283593',
+						'xpath:.//z-color-picker[@color-field-name="value_color"]' => '283593',
 						'id:value_arc_size' => 12,
 						'id:units' => 'Bytes 𒀐  😁',
 						'id:units_size' => 27,
 						'id:units_bold' => true,
 						'id:units_pos' => 'Above value',
-						'xpath:.//input[@id="units_color"]/..' => '4E342E',
-						'xpath:.//input[@id="needle_color"]/..' => '4DD0E1',
+						'xpath:.//z-color-picker[@color-field-name="units_color"]' => '4E342E',
+						'xpath:.//z-color-picker[@color-field-name="needle_color"]' => '4DD0E1',
 						'id:scale_size' => 33,
 						'id:scale_decimal_places' => 8
 					],
 					'actions' => [
 						'click' => 'xpath:.//table[@id="thresholds-table"]//button[text()="Add"]',
 						'fill' => [
-							'xpath:.//input[@id="thresholds_0_color"]/..' => 'FFC107',
+							'xpath:.//z-color-picker[@color-field-name="thresholds[0][color]"]' => 'FFC107',
 							'id:thresholds_0_threshold' => '50',
 							'id:th_show_labels' => true,
 							'id:th_show_arc' => true,
@@ -3569,7 +3724,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					'days_count' => true
 				]
 			],
-			// #49 Item value widget with minimal set of parameters.
+			// #48 Item value widget with minimal set of parameters.
 			[
 				[
 					'fields' => [
@@ -3582,7 +3737,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					]
 				]
 			],
-			// #50 Item value widget with all possible parameters.
+			// #49 Item value widget with all possible parameters.
 			[
 				[
 					'fields' => [
@@ -3597,28 +3752,28 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 						'id:desc_size' => 11,
 						'id:desc_v_pos' => 'Top',
 						'id:desc_bold' => true,
-						'xpath:.//input[@id="desc_color"]/..' => '0080FF',
+						'xpath:.//z-color-picker[@color-field-name="desc_color"]' => '0080FF',
 						'id:decimal_places' => 7,
 						'id:decimal_size' => 23,
 						'id:value_h_pos' => 'Left',
 						'id:value_size' => 24,
 						'id:value_v_pos' => 'Bottom',
 						'id:value_bold' => false,
-						'xpath:.//input[@id="value_color"]/..' => 'BF00FF',
+						'xpath:.//z-color-picker[@color-field-name="value_color"]' => 'BF00FF',
 						'id:units' => '!@#$%^&*()_+𒀐😁 units',
 						'Position' => 'Below value',
 						'id:units_size' => 15,
 						'id:units_bold' => false,
-						'xpath:.//input[@id="units_color"]/..' => '00FF00',
+						'xpath:.//z-color-picker[@color-field-name="units_color"]' => '00FF00',
 						'id:time_h_pos' => 'Right',
 						'id:time_size' => 17,
 						'id:time_v_pos' => 'Middle',
 						'id:time_bold' => true,
-						'xpath:.//input[@id="time_color"]/..' => 'B0BEC5',
-						'xpath:.//input[@id="up_color"]/..' => 'FFBF00',
-						'xpath:.//input[@id="down_color"]/..' => '7B1FA2',
-						'xpath:.//input[@id="updown_color"]/..' => 'AFB42B',
-						'xpath:.//input[@id="bg_color"]/..' => '00131D',
+						'xpath:.//z-color-picker[@color-field-name="time_color"]' => 'B0BEC5',
+						'xpath:.//z-color-picker[@color-field-name="up_color"]' => 'FFBF00',
+						'xpath:.//z-color-picker[@color-field-name="down_color"]' => '7B1FA2',
+						'xpath:.//z-color-picker[@color-field-name="updown_color"]' => 'AFB42B',
+						'xpath:.//z-color-picker[@color-field-name="bg_color"]' => '00131D',
 						'Aggregation function' => 'count',
 						'Time period' => 'Custom',
 						'id:time_period_from' => 'now-1M',
@@ -3629,7 +3784,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 						'click' => 'xpath:.//table[@id="thresholds-table"]//button[text()="Add"]',
 						'fill' => [
 							'id:thresholds_0_threshold' => 50,
-							'xpath:.//input[@id="thresholds_0_color"]/..' => '8D6E63'
+							'xpath:.//z-color-picker[@color-field-name="thresholds[0][color]"]' => '8D6E63'
 						]
 					],
 					'swap_expected' => [
@@ -3637,7 +3792,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					]
 				]
 			],
-			// #51 Map widget with missing map.
+			// #50 Map widget with missing map.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -3648,7 +3803,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					'error_message' => 'Invalid parameter "Map": cannot be empty.'
 				]
 			],
-			// #52 Map widget with map.
+			// #51 Map widget with map.
 			[
 				[
 					'fields' => [
@@ -3658,7 +3813,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					]
 				]
 			],
-			// #53 Map navigation tree widget.
+			// #52 Map navigation tree widget.
 			[
 				[
 					'fields' => [
@@ -3669,7 +3824,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					]
 				]
 			],
-			// #54 Item history widget with empty Items parameter.
+			// #53 Item history widget with empty Items parameter.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -3685,7 +3840,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 				]
 			],
 			// TODO: Uncomment and fix when DEV-4069 is ready.
-//			// #55 Item history widget with too high value of Show lines parameter.
+//			// #54 Item history widget with too high value of Show lines parameter.
 //			[
 //				[
 //					'expected' => TEST_BAD,
@@ -3704,7 +3859,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 //					'error_message' => 'Invalid parameter "Show lines": value must be one of 1-100.'
 //				]
 //			],
-//			// #56 Item history widget with negative Show lines parameter.
+//			// #55 Item history widget with negative Show lines parameter.
 //			[
 //				[
 //					'expected' => TEST_BAD,
@@ -3723,7 +3878,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 //					'error_message' => 'Invalid parameter "Show lines": value must be one of 1-100.'
 //				]
 //			],
-			// #57 Item history widget with Values location = Bottom, Show timestamp =true and Column header = Off.
+			// #56 Item history widget with Values location = Bottom, Show timestamp =true and Column header = Off.
 			[
 				[
 					'fields' => [
@@ -3744,7 +3899,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					]
 				]
 			],
-			// #58 Item history widget with Vertical layout and Horizontal header.
+			// #57 Item history widget with Vertical layout and Horizontal header.
 			[
 				[
 					'fields' => [
@@ -3763,7 +3918,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					]
 				]
 			],
-			// #59 Problem hosts widget with default parameters.
+			// #58 Problem hosts widget with default parameters.
 			[
 				[
 
@@ -3773,7 +3928,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					]
 				]
 			],
-			// #60 Problem hosts widget with all possible parameters.
+			// #59 Problem hosts widget with all possible parameters.
 			[
 				[
 
@@ -3792,7 +3947,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					]
 				]
 			],
-			// #61 Problems widget with empty Show lines parameter (reset to 0).
+			// #60 Problems widget with empty Show lines parameter (reset to 0).
 			[
 				[
 					'expected' => TEST_BAD,
@@ -3804,7 +3959,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					'error_message' => 'Invalid parameter "Show lines": value must be one of 1-1000.'
 				]
 			],
-			// #62 Problems widget with too high value of Show lines parameter.
+			// #61 Problems widget with too high value of Show lines parameter.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -3816,7 +3971,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					'error_message' => 'Invalid parameter "Show lines": value must be one of 1-1000.'
 				]
 			],
-			// #63 Problems widget with negative Show lines parameter.
+			// #62 Problems widget with negative Show lines parameter.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -3828,7 +3983,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					'error_message' => 'Invalid parameter "Show lines": value must be one of 1-1000.'
 				]
 			],
-			// #64 Problems widget with default parameters.
+			// #63 Problems widget with default parameters.
 			[
 				[
 					'fields' => [
@@ -3837,7 +3992,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					]
 				]
 			],
-			// #65 Problems widget with all possible parameters.
+			// #64 Problems widget with all possible parameters.
 			[
 				[
 					'fields' => [
@@ -3865,7 +4020,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					]
 				]
 			],
-			// #66 Problems by severity widget with default parameters.
+			// #65 Problems by severity widget with default parameters.
 			[
 				[
 					'fields' => [
@@ -3874,7 +4029,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					]
 				]
 			],
-			// #67 Problems by severity widget with all possible parameters.
+			// #66 Problems by severity widget with all possible parameters.
 			[
 				[
 					'fields' => [
@@ -3895,7 +4050,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					]
 				]
 			],
-			// #68 SLA report widget with missing SLA.
+			// #67 SLA report widget with missing SLA.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -3907,7 +4062,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					'error_message' => 'Invalid parameter "SLA": cannot be empty.'
 				]
 			],
-			// #69 SLA widget with non-numeric show periods.
+			// #68 SLA widget with non-numeric show periods.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -3924,7 +4079,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					'error_message' => 'Invalid parameter "Show periods": value must be one of 1-100.'
 				]
 			],
-			// #70 SLA widget with too large value in show periods.
+			// #69 SLA widget with too large value in show periods.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -3938,7 +4093,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					'error_message' => 'Invalid parameter "Show periods": value must be one of 1-100.'
 				]
 			],
-			// #71 SLA widget with floating point value in show periods.
+			// #70 SLA widget with floating point value in show periods.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -3955,7 +4110,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					'error_message' => 'Invalid parameter "Show periods": value must be one of 1-100.'
 				]
 			],
-			// #72 SLA widget with negative value in show periods.
+			// #71 SLA widget with negative value in show periods.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -3969,7 +4124,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					'error_message' => 'Invalid parameter "Show periods": value must be one of 1-100.'
 				]
 			],
-			// #73 SLA widget with string type From and To dates.
+			// #72 SLA widget with string type From and To dates.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -3987,7 +4142,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					]
 				]
 			],
-			// #74 SLA widget with wrong From date and To date format.
+			// #73 SLA widget with wrong From date and To date format.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -4005,7 +4160,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					]
 				]
 			],
-			// #75 SLA widget with From date and To date too far in the past.
+			// #74 SLA widget with From date and To date too far in the past.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -4023,7 +4178,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					]
 				]
 			],
-			// #76 SLA widget with From date and To date too far in the future.
+			// #75 SLA widget with From date and To date too far in the future.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -4041,7 +4196,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					]
 				]
 			],
-			// #77 SLA widget with minimal set of parameters.
+			// #76 SLA widget with minimal set of parameters.
 			[
 				[
 					'fields' => [
@@ -4052,7 +4207,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					'page' => '2nd page'
 				]
 			],
-			// #78 SLA widget with all possible parameters set.
+			// #77 SLA widget with all possible parameters set.
 			[
 				[
 					'fields' => [
@@ -4068,7 +4223,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					'page' => '2nd page'
 				]
 			],
-			// #79 SLA widget with dynamic From and To.
+			// #78 SLA widget with dynamic From and To.
 			[
 				[
 					'fields' => [
@@ -4081,7 +4236,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					'page' => '2nd page'
 				]
 			],
-			// #80 System information widget with default parameters.
+			// #79 System information widget with default parameters.
 			[
 				[
 					'fields' => [
@@ -4091,7 +4246,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					'page' => '2nd page'
 				]
 			],
-			// #81 System information widget with all parameters specified.
+			// #80 System information widget with all parameters specified.
 			[
 				[
 					'fields' => [
@@ -4103,7 +4258,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					'page' => '2nd page'
 				]
 			],
-			// #82 Top triggers widget with empty Trigger limit.
+			// #81 Top triggers widget with empty Trigger limit.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -4116,7 +4271,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					'error_message' => 'Invalid parameter "Trigger limit": value must be one of 1-1000.'
 				]
 			],
-			// #83 Top triggers widget with non-numeric Trigger limit.
+			// #82 Top triggers widget with non-numeric Trigger limit.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -4132,7 +4287,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					'error_message' => 'Invalid parameter "Trigger limit": value must be one of 1-1000.'
 				]
 			],
-			// #84 Top triggers widget with zero Trigger limit.
+			// #83 Top triggers widget with zero Trigger limit.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -4145,7 +4300,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					'error_message' => 'Invalid parameter "Trigger limit": value must be one of 1-1000.'
 				]
 			],
-			// #85 Top triggers widget with out of range Trigger limit.
+			// #84 Top triggers widget with out of range Trigger limit.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -4158,7 +4313,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					'error_message' => 'Invalid parameter "Trigger limit": value must be one of 1-1000.'
 				]
 			],
-			// #86 Top triggers widget with default parameters.
+			// #85 Top triggers widget with default parameters.
 			[
 				[
 					'fields' => [
@@ -4168,7 +4323,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					'page' => '2nd page'
 				]
 			],
-			// #87 Top triggers widget with all possible parameters.
+			// #86 Top triggers widget with all possible parameters.
 			[
 				[
 					'fields' => [
@@ -4186,7 +4341,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					'page' => '2nd page'
 				]
 			],
-			// #88 Trigger overview widget with default parameters.
+			// #87 Trigger overview widget with default parameters.
 			[
 				[
 					'fields' => [
@@ -4196,7 +4351,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					'page' => '2nd page'
 				]
 			],
-			// #89 Trigger overview widget with all possible parameters.
+			// #88 Trigger overview widget with all possible parameters.
 			[
 				[
 					'fields' => [
@@ -4214,7 +4369,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					'page' => '2nd page'
 				]
 			],
-			// #90 URL widget with special symbols in URL.
+			// #89 URL widget with special symbols in URL.
 			[
 				[
 					'fields' => [
@@ -4226,7 +4381,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					'page' => '2nd page'
 				]
 			],
-			// #91 URL widget with trailing and leading spaces in URL.
+			// #90 URL widget with trailing and leading spaces in URL.
 			[
 				[
 					'fields' => [
@@ -4238,7 +4393,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					'page' => '2nd page'
 				]
 			],
-			// #92 URL widget with empty URL (after trimming).
+			// #91 URL widget with empty URL (after trimming).
 			[
 				[
 					'expected' => TEST_BAD,
@@ -4252,7 +4407,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					'error_message' => 'Invalid parameter "URL": cannot be empty.'
 				]
 			],
-			// #93 Web monitoring widget with default parameters.
+			// #92 Web monitoring widget with default parameters.
 			[
 				[
 					'fields' => [
@@ -4262,7 +4417,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					'page' => '2nd page'
 				]
 			],
-			// #94 Web monitoring widget with all possible parameters.
+			// #93 Web monitoring widget with all possible parameters.
 			[
 				[
 					'fields' => [
@@ -4278,7 +4433,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					'page' => '2nd page'
 				]
 			],
-			// #95 Data overview widget with default parameters. TODO: Update to correct Top Items - DEV-4101
+			// #94 Data overview widget with default parameters. TODO: Update to correct Top Items - DEV-4101
 //			[
 //				[
 //					'fields' => [
@@ -4288,7 +4443,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 //					'page' => '2nd page'
 //				]
 //			],
-			// #96 Data overview widget with all possible parameters. TODO: Update to correct Top Items - DEV-4101
+			// #95 Data overview widget with all possible parameters. TODO: Update to correct Top Items - DEV-4101
 //			[
 //				[
 //					'fields' => [
@@ -4305,7 +4460,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 //					'page' => '2nd page'
 //				]
 //			],
-			// #97 Top hosts widget with default parameters.
+			// #96 Top hosts widget with default parameters.
 			[
 				[
 					'fields' => [
@@ -4322,7 +4477,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					'page' => '2nd page'
 				]
 			],
-			// #98 Top hosts widget with all parameters.
+			// #97 Top hosts widget with all parameters.
 			[
 				[
 					'fields' => [
@@ -4337,7 +4492,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 							'values' => self::TEMPLATE_ITEM,
 							'context' => ['values' => self::TEMPLATE]
 						],
-						'xpath:.//input[@id="base_color"]/..' => '00796B',
+						'xpath:.//z-color-picker[@color-field-name="base_color"]' => '00796B',
 						'Display item value as' => 'Numeric',
 						'Display' => 'Indicators',
 						'Min' => 10,
@@ -4350,6 +4505,197 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 						'To' => 'now-10h',
 						'History data' => 'Trends'
 					],
+					'page' => '2nd page'
+				]
+			],
+			// #98 Item card widget with empty Item field
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Type' => CFormElement::RELOADABLE_FILL('Item card'),
+						'Item' => ''
+					],
+					'error_message' => 'Invalid parameter "Item": cannot be empty.',
+					'page' => '2nd page'
+				]
+			],
+			// #99 Item card widget with empty sparkline date.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Type' => CFormElement::RELOADABLE_FILL('Item card'),
+						'Item' => self::TEMPLATE_ITEM
+					],
+					'swap_expected' => [
+						'Item' => self::TEMPLATE.': '.self::TEMPLATE_ITEM
+					],
+					'Show' => [
+						['action' => USER_ACTION_UPDATE, 'index' => 0, 'section' => 'Latest data']
+					],
+					'Sparkline' => [
+						'id:sparkline_time_period_from' => '',
+						'id:sparkline_time_period_to' => ''
+					],
+					'page' => '2nd page',
+					'error_message' => [
+						'Invalid parameter "Sparkline: Time period/From": cannot be empty.',
+						'Invalid parameter "Sparkline: Time period/To": cannot be empty.'
+					]
+				]
+			],
+			// #100 Item card widget with the wrong sparkline range.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Type' => CFormElement::RELOADABLE_FILL('Item card'),
+						'Name' => 'Selected more than 731 day for graph filter.',
+						'Item' => self::TEMPLATE_ITEM
+					],
+					'swap_expected' => [
+						'Item' => self::TEMPLATE.': '.self::TEMPLATE_ITEM
+					],
+					'Show' => [
+						['action' => USER_ACTION_UPDATE, 'index' => 0, 'section' => 'Latest data']
+					],
+					'Sparkline' => [
+						'id:sparkline_time_period_from' => 'now-1000d',
+						'id:sparkline_time_period_to' => 'now'
+					],
+					'page' => '2nd page',
+					'error_message' => [
+						'Maximum time period to display is 731 days.'
+					]
+				]
+			],
+			// #101 Item card widget with empty widget value.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Type' => CFormElement::RELOADABLE_FILL('Item card'),
+						'Name' => 'Empty widget value',
+						'Item' => self::TEMPLATE_ITEM
+					],
+					'swap_expected' => [
+						'Item' => self::TEMPLATE.': '.self::TEMPLATE_ITEM
+					],
+					'Show' => [
+						['action' => USER_ACTION_UPDATE, 'index' => 0, 'section' => 'Latest data']
+					],
+					'Sparkline' => [
+						'id:sparkline_time_period_data_source' => 'Widget'
+					],
+					'page' => '2nd page',
+					'error_message' => [
+						'Invalid parameter "Sparkline: Time period/Widget": cannot be empty.'
+					]
+				]
+			],
+			// #102 Item card widget with incorrect number for sparkline parameters.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Type' => CFormElement::RELOADABLE_FILL('Item card'),
+						'Show header' => false,
+						'Name' => 'Incorrect number for sparkline parameters',
+						'Refresh interval' => 'No refresh',
+						'Item' => self::TEMPLATE_ITEM
+					],
+					'swap_expected' => [
+						'Item' => self::TEMPLATE.': '.self::TEMPLATE_ITEM
+					],
+					'Show' => [
+						['action' => USER_ACTION_UPDATE, 'index' => 0, 'section' => 'Latest data']
+					],
+					'Sparkline' => [
+						'id:sparkline_width' => 5000,
+						'id:sparkline_fill' => -5
+					],
+					'page' => '2nd page',
+					'error_message' => [
+						'Invalid parameter "Sparkline: Width": value must be one of 0-10.',
+						'Invalid parameter "Sparkline: Fill": value must be one of 0-10.'
+					]
+				]
+			],
+			// #103 Item card widget with incorrect data type for time period fields.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Type' => CFormElement::RELOADABLE_FILL('Item card'),
+						'Name' => 'A time is expected',
+						'Item' => self::TEMPLATE_ITEM
+					],
+					'swap_expected' => [
+						'Item' => self::TEMPLATE.': '.self::TEMPLATE_ITEM
+					],
+					'Show' => [
+						['action' => USER_ACTION_UPDATE, 'index' => 0, 'section' => 'Latest data']
+					],
+					'Sparkline' => [
+						'id:sparkline_time_period_data_source' => 'Custom',
+						'id:sparkline_time_period_from' => 'dsa',
+						'id:sparkline_time_period_to' => '321'
+					],
+					'page' => '2nd page',
+					'error_message' => [
+						'Invalid parameter "Sparkline: Time period/From": a time is expected.',
+						'Invalid parameter "Sparkline: Time period/To": a time is expected.'
+					]
+				]
+			],
+			// #104 Item card widget with all values.
+			[
+				[
+					'fields' => [
+						'Type' => CFormElement::RELOADABLE_FILL('Item card'),
+						'Name' => 'Trying to fill all widget fields',
+						'Refresh interval' => '10 minutes',
+						'Item' => self::TEMPLATE_ITEM
+					],
+					'swap_expected' => [
+						'Item' => self::TEMPLATE.': '.self::TEMPLATE_ITEM
+					],
+					'Show' => [
+						['section' => 'Description'],
+						['section' => 'Error text'],
+						['section' => 'Latest data'],
+						['section' => 'Triggers'],
+						['section' => 'Host inventory'],
+						['section' => 'Tags']
+					],
+					'Sparkline' => [
+						'id:sparkline_width' => 5,
+						'id:sparkline_fill' => 3,
+						'id:sparkline_time_period_data_source' => 'Dashboard',
+						'id:sparkline_history' => 'History',
+						'color' => 'F48FB1'
+					],
+					'page' => '2nd page'
+				]
+			],
+			// #105 Host card widget with all values.
+			[
+				[
+					'fields' => [
+						'Type' => CFormElement::RELOADABLE_FILL('Host card'),
+						'Name' => 'Fully filled host card widget',
+						'Refresh interval' => '10 minutes',
+						'Show suppressed problems' => true
+					],
+					'Show' => [
+						['section' => 'Host groups'],
+						['section' => 'Description'],
+						['section' => 'Templates'],
+						['section' => 'Inventory'],
+						['section' => 'Tags']
+					],
+					'Inventory' => ['Location latitude', 'Location longitude', 'Tag', 'Type'],
 					'page' => '2nd page'
 				]
 			]
@@ -4446,6 +4792,40 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 			// Open Advanced config again because after column filling it becomes collapsed for Item history widget.
 			if ($container === 'Items') {
 				$form->fill(['Advanced configuration' => true]);
+			}
+		}
+
+		if (array_key_exists('Show', $data)) {
+			$this->query('id:sections-table')->asMultifieldTable([
+				'mapping' => [
+					'' => [
+						'name' => 'section',
+						'selector' => 'xpath:./z-select',
+						'class' => 'CDropdownElement'
+					]
+				]
+			])->one()->fill($data['Show']);
+
+			if (array_key_exists('Inventory', $data)) {
+				$form->getField('Inventory fields')->fill($data['Inventory']);
+			}
+		}
+
+		if (array_key_exists('Sparkline', $data)) {
+			foreach ($data['Sparkline'] as $field => $value) {
+				if ($field === 'color') {
+					$color_picker_dialog = $form->query('class:color-picker')->one()->asColorPicker();
+					$color_picker_dialog->fill($value);
+				}
+				elseif ($field === 'widget') {
+					$sparkline = $form->query('class:widget-field-sparkline')->one()->waitUntilVisible();
+					$sparkline->query('button', 'Select')->one()->waitUntilClickable()->click();
+					$dialog = COverlayDialogElement::find()->all()->last()->waitUntilReady();
+					$dialog->query('link:'. $value)->one()->click();
+				}
+				else {
+					$form->getField($field)->fill($value);
+				}
 			}
 		}
 
@@ -4574,8 +4954,8 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 			$all_types = ['Action log', 'Clock', 'Discovery status', 'Favorite graphs', 'Favorite maps', 'Gauge', 'Geomap',
 				'Graph', 'Graph (classic)', 'Graph prototype', 'Honeycomb', 'Host availability', 'Host card',
 				'Host navigator', 'Item card', 'Item history', 'Item navigator', 'Item value', 'Map', 'Map navigation tree',
-				'Pie chart', 'Problem hosts', 'Problems', 'Problems by severity', 'SLA report', 'System information',
-				'Top hosts', 'Top items', 'Top triggers', 'Trigger overview', 'URL', 'Web monitoring'
+				'Pie chart', 'Problem hosts', 'Problems', 'Problems by severity', 'Scatter plot', 'SLA report',
+				'System information', 'Top hosts', 'Top items', 'Top triggers', 'Trigger overview', 'URL', 'Web monitoring'
 			];
 			$this->assertEquals($all_types, $form->getField('Type')->getOptions()->asText());
 		}

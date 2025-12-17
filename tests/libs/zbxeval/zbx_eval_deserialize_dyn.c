@@ -17,14 +17,13 @@
 #include "zbxmockassert.h"
 #include "zbxmockutil.h"
 
-#include "zbxexpression.h"
 #include "zbxcommon.h"
 #include "zbxeval.h"
 #include "mock_eval.h"
 
 static int	compare_ctx_no_rules(zbx_eval_context_t *ctx1, zbx_eval_context_t *ctx2)
 {
-	if (SUCCEED != zbx_strcmp_natural(ctx1->expression, ctx2->expression))
+	if (0 != zbx_strcmp_natural(ctx1->expression, ctx2->expression))
 		return FAIL;
 
 	if (ctx1->stack.values_num != ctx2->stack.values_num)
@@ -49,7 +48,7 @@ static int	compare_ctx_no_rules(zbx_eval_context_t *ctx1, zbx_eval_context_t *ct
 
 void	zbx_mock_test_entry(void **state)
 {
-	zbx_eval_context_t	ctx1;
+	zbx_eval_context_t	ctx1, *ctx2;
 	unsigned char		*data;
 	char			*error = NULL;
 	zbx_uint64_t		rules;
@@ -61,14 +60,18 @@ void	zbx_mock_test_entry(void **state)
 	returned_ret = zbx_eval_parse_expression(&ctx1, zbx_mock_get_parameter_string("in.expression"), rules, &error);
 
 	if (SUCCEED != returned_ret)
-		printf("ERROR: %s\n", error);
+		fail_msg("ERROR: %s\n", error);
 	else
 		mock_dump_stack(&ctx1);
 
 	zbx_eval_serialize(&ctx1, NULL, &data);
 
-	zbx_eval_context_t	*ctx2 = zbx_eval_deserialize_dyn(data, zbx_mock_get_parameter_string("in.expression"),
-			ZBX_EVAL_EXTRACT_ALL);
+	if (ZBX_MOCK_SUCCESS == zbx_mock_parameter_exists("in.skip_ids"))
+		ctx2 = zbx_eval_deserialize_dyn(data, zbx_mock_get_parameter_string("in.expression"),
+				ZBX_EVAL_EXTRACT_VAR_STR);
+	else
+		ctx2 = zbx_eval_deserialize_dyn(data, zbx_mock_get_parameter_string("in.expression"),
+				ZBX_EVAL_EXTRACT_ALL);
 
 	zbx_mock_assert_int_eq("return value:", SUCCEED, compare_ctx_no_rules(&ctx1, ctx2));
 	zbx_free(data);

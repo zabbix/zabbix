@@ -71,34 +71,39 @@ function escapeHtml(string) {
 		.replace(/\'/g,'&apos;');
 }
 
-function validateNumericBox(obj, allowempty, allownegative) {
-	if (obj != null) {
-		if (allowempty) {
-			if (obj.value.length == 0 || obj.value == null) {
-				obj.value = '';
-			}
-			else {
-				if (isNaN(parseInt(obj.value, 10))) {
-					obj.value = 0;
-				}
-				else {
-					obj.value = parseInt(obj.value, 10);
-				}
-			}
+/**
+ * Validates and processes the numeric value in an HTML input element. Leaves negative numbers without leading zeroes.
+ *
+ * @param {HTMLInputElement} input           The HTML input element containing the numeric value.
+ * @param {bool}             allow_empty     If true, the field can be empty; otherwise, empty fields are replaced
+ *                                           with "0".
+ * @param {bool}             allow_negative  If true, negative numbers are allowed; otherwise, negative numbers
+ *                                           are converted to positive.
+ * @param {number}           min_length      Pad number with zeroes to maintain min length.
+ * @param {number|null}      default_value
+ */
+function normalizeNumericBox(input, {allow_empty, allow_negative, min_length, default_value}) {
+	const old_value = input.value;
+	let num = parseInt(input.value, 10);
+
+	if (isNaN(num)) {
+		if (default_value !== null) {
+			input.value = default_value;
 		}
 		else {
-			if (isNaN(parseInt(obj.value, 10))) {
-				obj.value = 0;
-			}
-			else {
-				obj.value = parseInt(obj.value, 10);
-			}
+			input.value = (input.value === '' && allow_empty) ? '' : '0'.repeat(Math.max(min_length, 1));
 		}
 	}
-	if (!allownegative) {
-		if (obj.value < 0) {
-			obj.value = obj.value * -1;
+	else {
+		if (num < 0 && !allow_negative) {
+			num = -num;
 		}
+
+		input.value = num < 0 ? num : num.toString().padStart(min_length, '0');
+	}
+
+	if (old_value !== input.value) {
+		input.dispatchEvent(new Event('input', {bubbles: true}));
 	}
 }
 
@@ -628,8 +633,10 @@ function parseUrlString(url_string) {
  * @return {jQuery}
  */
 function makeMessageBox(type, messages, title = null, show_close_box = true, show_details = null) {
-	const classes = {good: 'msg-good', bad: 'msg-bad', warning: 'msg-warning'};
-	const aria_labels = {good: t('Success message'), bad: t('Error message'), warning: t('Warning message')};
+	const classes = {good: 'msg-good', info: 'msg-info', warning: 'msg-warning', bad: 'msg-bad'};
+	const aria_labels = {good: t('Success message'), info: t('Info message'), warning: t('Warning message'),
+		bad: t('Error message')
+	};
 
 	if (show_details === null) {
 		show_details = type === 'bad' || type === 'warning';
@@ -938,6 +945,35 @@ function objectToSearchParams(object) {
 }
 
 /**
+ * Convert nested data object into Form data object.
+ *
+ * @param {Object|Array} object
+ *
+ * @returns {FormData}
+ */
+function objectToFormData(object) {
+	const combine = (data, form_data = new FormData(), name_prefix = '') => {
+		if (Array.isArray(data)) {
+			for (const [index, datum] of data.entries()) {
+				combine(datum, form_data, name_prefix !== '' ? `${name_prefix}[${index}]` : index);
+			}
+		}
+		else if (data !== null && typeof data === 'object' && !(data instanceof File)) {
+			for (const [name, datum] of Object.entries(data)) {
+				combine(datum, form_data, name_prefix !== '' ? `${name_prefix}[${name}]` : name);
+			}
+		}
+		else {
+			form_data.append(name_prefix, data);
+		}
+
+		return form_data;
+	};
+
+	return combine(object);
+}
+
+/**
  * Convert RGB encoded color into HSL encoded color.
  *
  * @param {number} r  Red component in range of 0-1.
@@ -977,3 +1013,4 @@ function convertHSLToRGB(h, s, l) {
 function isColorHex(value) {
 	return /^#([0-9A-F]{6})$/i.test(value);
 }
+

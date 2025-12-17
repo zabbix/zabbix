@@ -169,11 +169,17 @@ class testPagesWithoutData extends CWebTest {
 			// #9 Host prototypes table.
 			[
 				[
-					'url' => 'host_prototypes.php?context=host&parent_discoveryid='
+					'url' => 'zabbix.php?action=host.prototype.list&context=host&parent_discoveryid='
+				]
+			],
+			// #10 LLD rule prototypes table.
+			[
+				[
+					'url' => 'host_discovery_prototypes.php?context=host&parent_discoveryid='
 				]
 			],
 			//Templates.
-			// #10 Empty templates table.
+			// #11 Empty templates table.
 			[
 				[
 					'page' => 'Templates',
@@ -181,72 +187,102 @@ class testPagesWithoutData extends CWebTest {
 					'filter' => ['Name' => 'zzz']
 				]
 			],
-			// #11 Empty templates' items table.
+			// #12 Empty templates' items table.
 			[
 				[
 					'url' => 'zabbix.php?action=item.list&context=template&filter_set=1&filter_hostids%5B0%5D='
 				]
 			],
-			// #12 Empty templates' triggers table.
+			// #13 Empty templates' triggers table.
 			[
 				[
 					'url' => 'zabbix.php?action=trigger.list&filter_set=1&context=template&filter_hostids%5B0%5D='
 				]
 			],
-			// #13 Empty templates' graphs table.
+			// #14 Empty templates' graphs table.
 			[
 				[
 					'url' => 'zabbix.php?action=graph.list&filter_set=1&context=template&filter_hostids%5B0%5D='
 				]
 			],
-			// #14 Empty templates' LLD table.
+			// #15 Empty templates' LLD table.
 			[
 				[
 					'url' => 'host_discovery.php?filter_set=1&context=template&filter_hostids%5B0%5D='
 				]
 			],
-			// #15 Empty templates' Web scenarios table.
+			// #16 Empty templates' Web scenarios table.
 			[
 				[
 					'url' => 'httpconf.php?filter_set=1&context=template&filter_hostids%5B0%5D='
 				]
 			],
-			// #16 Empty templates' dashboards table.
+			// #17 Empty templates' dashboards table.
 			[
 				[
 					'url' => 'zabbix.php?action=template.dashboard.list&templateid='
 				]
 			],
+			// #18 Item prototypes table.
+			[
+				[
+					'url' => 'zabbix.php?action=item.prototype.list&context=template&parent_discoveryid='
+				]
+			],
+			// #19 Trigger prototypes table.
+			[
+				[
+					'url' => 'zabbix.php?action=trigger.prototype.list&context=template&parent_discoveryid='
+				]
+			],
+			// #20 Graph prototypes table.
+			[
+				[
+					'url' => 'zabbix.php?action=graph.prototype.list&context=template&parent_discoveryid='
+				]
+			],
+			// #21 Host prototypes table.
+			[
+				[
+					'url' => 'zabbix.php?action=host.prototype.list&context=template&parent_discoveryid='
+				]
+			],
+			// #22 LLD rule prototypes table.
+			[
+				[
+					'url' => 'host_discovery_prototypes.php?context=template&parent_discoveryid='
+				]
+			],
 			//Other pages.
-			// #17 Discovery rules table.
+			// #23 Discovery rules table.
 			[
 				[
 					'page' => 'Status of discovery',
 					'url' => 'zabbix.php?action=discovery.view'
 				]
 			],
-			// #18 Empty SLA page.
+			// #24 Empty SLA page.
 			[
 				[
 					'page' => 'SLA',
 					'url' => 'zabbix.php?action=sla.list'
 				]
 			],
-			// #19 Empty SLA report page.
+			// #25 Empty SLA report page.
 			[
 				[
 					'page' => 'SLA report',
 					'url' => 'zabbix.php?action=slareport.list'
 				]
 			],
-			// #20 Empty Top 100 triggers page.
+			// #26 Empty Top 100 triggers page.
 			[
 				[
 					'page' => 'Top 100 triggers',
 					'url' => 'zabbix.php?action=toptriggers.list'
 				]
 			],
-			// #21 Empty Maintenances page.
+			// #27 Empty Maintenances page.
 			[
 				[
 					'page' => 'Maintenance periods',

@@ -1,0 +1,87 @@
+---
+test case: '/host/key?[{$MACRO}] ZBX_EVAL_TOKEN_VAR_USERMACRO'
+in:
+  itemquery: '/host/key?[{$MACRO}]'
+  macro: '{$MACRO}'
+  macro_data: 'MACRO_VALUE'
+out:
+  result: SUCCEED
+  string: '/host/key?["MACRO_VALUE"]'
+---
+test case: '/host/key?["{$MACRO}"] ZBX_EVAL_TOKEN_VAR_STR'
+in:
+  itemquery: '/host/key?["{$MACRO}"]'
+  macro: '{$MACRO}'
+  macro_data: 'MACRO_VALUE'
+out:
+  result: SUCCEED
+  string: '/host/key?["MACRO_VALUE"]'
+---
+test case: '/host/key?[filter] cannot parse item query filter'
+in:
+  itemquery: '/host/key?[filter]'
+  macro: '{$MACRO}'
+  macro_data: 'MACRO_VALUE'
+out:
+  result: SUCCEED
+---
+test case: /host/key?[filter] - error set
+in:
+  itemquery: '/host/key?[filter]'
+  macro: '{$MACRO}'
+  macro_data: 'MACRO_VALUE'
+  error: "error"
+out:
+  result: FAIL
+---
+test case: /host/key
+in:
+  itemquery: '/host/key'
+  macro: '{$MACRO}'
+  macro_data: 'MACRO_VALUE'
+out:
+  result: SUCCEED
+---
+test case: '/("{$MACRO}")/key cannot parse item query'
+in:
+  itemquery: '/("{$MACRO}")/key'
+  macro: '{$MACRO}'
+  macro_data: 'MACRO_VALUE'
+out:
+  result: SUCCEED
+---
+test case: '/("{$MACRO}")/key - error set'
+in:
+  itemquery: '/("{$MACRO}")/key'
+  macro: '{$MACRO}'
+  macro_data: 'MACRO_VALUE'
+  error: "error"
+out:
+  result: FAIL
+---
+test case: '/host/key?[{$MACRO}] ZBX_EVAL_TOKEN_VAR_USERMACRO resolver fail'
+in:
+  itemquery: '/host/key?[{$MACRO}]'
+  macro: '{$MACRO1}'
+  macro_data: 'MACRO_VALUE'
+out:
+  result: FAIL
+---
+test case: '/host/key?["smt"] ZBX_EVAL_TOKEN_VAR_STR no macro'
+in:
+  itemquery: '/host/key?["smt"]'
+  macro: '{$MACRO}'
+  macro_data: 'MACRO_VALUE'
+out:
+  result: SUCCEED
+  string: '/host/key?["smt"]'
+---
+test case: '/*/key?[group="a:\"1\""]'
+in:
+  itemquery: '/*/key?[group="a:\"1\""]'
+  macro: '{$MACRO}'
+  macro_data: 'MACRO_VALUE'
+out:
+  result: SUCCEED
+  string: '/*/key?[group="a:\"1\""]'
+...

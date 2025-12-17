@@ -43,7 +43,8 @@ class CTriggerPrototypeHelper extends CTriggerGeneralHelper {
 					unset($src_triggers[$src_trigger['triggerid']]);
 				}
 				else {
-					$src_host = $src_trigger['hosts'][$src_trigger['discoveryRule']['hostid']];
+					$parent_lld = $src_trigger['discoveryRule'] ?: $src_trigger['discoveryRulePrototype'];
+					$src_host = $src_trigger['hosts'][$parent_lld['hostid']];
 
 					$src_hosts[$master_trigger['triggerid']][$src_trigger['triggerid']] = $src_host;
 				}
@@ -67,9 +68,12 @@ class CTriggerPrototypeHelper extends CTriggerGeneralHelper {
 
 			foreach ($dst_hosts as $dst_hostid => $dst_host) {
 				foreach ($src_triggers as $src_trigger) {
-					$dst_trigger = array_diff_key($src_trigger, array_flip(['triggerid', 'hosts', 'discoveryRule']));
+					$dst_trigger = array_diff_key($src_trigger,
+						array_flip(['triggerid', 'hosts', 'discoveryRule', 'discoveryRulePrototype'])
+					);
 
-					$src_host = $src_trigger['hosts'][$src_trigger['discoveryRule']['hostid']];
+					$parent_lld = $src_trigger['discoveryRule'] ?: $src_trigger['discoveryRulePrototype'];
+					$src_host = $src_trigger['hosts'][$parent_lld['hostid']];
 
 					$dst_trigger['expression'] = self::getExpressionWithReplacedHost(
 						$src_trigger['expression'], $src_host['host'], $dst_host['host']
@@ -159,6 +163,10 @@ class CTriggerPrototypeHelper extends CTriggerGeneralHelper {
 			'selectTags' => ['tag', 'value'],
 			'selectHosts' => ['hostid', 'host'],
 			'selectDiscoveryRule' => ['itemid', 'hostid'],
+			'selectDiscoveryRulePrototype' => ['itemid', 'hostid'],
+			'filter' => [
+				'flags' => [ZBX_FLAG_DISCOVERY_PROTOTYPE]
+			],
 			'preservekeys' => true
 		] + $src_options);
 

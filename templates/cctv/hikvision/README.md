@@ -9,7 +9,7 @@ This template is designed for the effortless deployment of Hikvision cameras mon
 
 ## Requirements
 
-Zabbix version: 7.4 and higher.
+Zabbix version: 8.0 and higher.
 
 ## Tested versions
 
@@ -35,7 +35,7 @@ This template has been tested on:
 
 ## Configuration
 
-> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/7.4/manual/config/templates_out_of_the_box) section.
+> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/8.0/manual/config/templates_out_of_the_box) section.
 
 ## Setup
 
@@ -50,7 +50,7 @@ This template has been tested on:
 |Name|Description|Default|
 |----|-----------|-------|
 |{$CPU.UTIL.CRIT}||`90`|
-|{$HIKVISION_ISAPI_HOST}|<p>The hostname or IP address of the Hikvision ISAPI host.</p>|`<SET ISAPI HOST>`|
+|{$HIKVISION_ISAPI_HOST}|<p>The hostname or IP address of the Hikvision ISAPI host.</p>||
 |{$HIKVISION_ISAPI_PORT}|<p>ISAPI port on device</p>|`80`|
 |{$HIKVISION_MAIN_CHANNEL_ID}|<p>Main video stream ID</p>|`101`|
 |{$HIKVISION_STREAM_HEIGHT}|<p>Main video stream image height</p>|`1080`|

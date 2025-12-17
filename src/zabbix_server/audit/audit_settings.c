@@ -17,30 +17,28 @@
 
 #include "zbxalgo.h"
 
-void	zbx_audit_settings_create_entry(int audit_context_mode, int audit_action)
+zbx_audit_entry_t	*zbx_audit_settings_create_entry(int audit_context_mode, int audit_action)
 {
-	zbx_audit_entry_t	local_audit_entry = {0}, *plocal_audit_entry = &local_audit_entry;
+	int	audit_enabled = 0;
 
-	RETURN_IF_AUDIT_OFF(audit_context_mode);
+	zbx_audit_get_status(audit_context_mode, &audit_enabled);
+
+	if (0 == audit_enabled)
+		return NULL;
+
+	zbx_audit_entry_t	local_audit_entry = {0}, *plocal_audit_entry = &local_audit_entry, **audit_entry;
 
 	local_audit_entry.id_table = AUDIT_CONFIG_ID;
 
-	if (NULL == zbx_hashset_search(zbx_get_audit_hashset(), &plocal_audit_entry))
+	if (NULL == (audit_entry = (zbx_audit_entry_t **)zbx_hashset_search(zbx_get_audit_hashset(),
+			&plocal_audit_entry)))
 	{
 		zbx_audit_entry_t	*new_entry;
 
 		new_entry = zbx_audit_entry_init(0, AUDIT_CONFIG_ID, "", audit_action, ZBX_AUDIT_RESOURCE_SETTINGS);
-		zbx_hashset_insert(zbx_get_audit_hashset(), &new_entry, sizeof(new_entry));
+		audit_entry = (zbx_audit_entry_t **)zbx_hashset_insert(zbx_get_audit_hashset(), &new_entry,
+				sizeof(new_entry));
 	}
-}
 
-void	zbx_audit_settings_update_field_str(int audit_context_mode, const char *key, const char *old_value,
-		const char *new_value)
-{
-	zbx_audit_entry_t	*entry;
-
-	RETURN_IF_AUDIT_OFF(audit_context_mode);
-
-	entry = zbx_audit_get_entry(0, NULL, AUDIT_CONFIG_ID);
-	zbx_audit_entry_append_string(entry, ZBX_AUDIT_ACTION_UPDATE, key, old_value, new_value);
+	return *audit_entry;
 }

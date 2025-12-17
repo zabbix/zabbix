@@ -69,7 +69,8 @@
 				data.push({
 					id: id,
 					name: item.name,
-					prefix: (typeof item.prefix === 'undefined') ? '' : item.prefix
+					prefix: item.prefix === undefined ? '' : item.prefix,
+					isNew: item.isNew !== undefined && item.isNew
 				});
 			}
 
@@ -249,8 +250,11 @@
 					 *      Note: hidden and disabled items will not submit to the server.
 					 *   3. The "change" trigger must fire.
 					 */
+					const new_item_pattern = ms.options.newItemName
+						? `input[name="${ms.options.newItemName}"]`
+						: 'input[name*="[new]"]';
 
-					$('input[name*="[new]"]', $obj)
+					$(new_item_pattern, $obj)
 						.prop('disabled', !ms.options['addNew'])
 						.each(function() {
 							var id = $(this).val();
@@ -393,6 +397,7 @@
 	 *     bool   readonly              turn on/off readonly state (optional)
 	 *     bool   hidden                hide element (optional)
 	 *     bool   addNew                allow user to create new names (optional)
+	 *     int    maxlength             maximum length for new names (optional)
 	 *     int    selectedLimit         how many items can be selected (optional)
 	 *     int    limit                 how many available items can be received from backend (optional)
 	 *     object popup                 popup data {parameters, width, height} (optional)
@@ -436,6 +441,7 @@
 			placeholder: t('type here to search'),
 			data: [],
 			addNew: false,
+			maxlength: null,
 			defaultValue: null,
 			custom_select: false,
 			custom_suggest_list: null,
@@ -460,6 +466,7 @@
 
 			options.required_str = $obj.attr('aria-required') === undefined ? 'false' : $obj.attr('aria-required');
 			$obj.removeAttr('aria-required');
+			$obj.attr('data-field-type', 'multiselect');
 
 			var ms = {
 				options: options,
@@ -624,7 +631,8 @@
 				'autocomplete': 'off',
 				'placeholder': ms.options.placeholder,
 				'aria-label': ($label.length ? $label.text() + '. ' : '') + ms.options.placeholder,
-				'aria-required': ms.options.required_str
+				'aria-required': ms.options.required_str,
+				'maxlength': ms.options.maxlength
 			})
 				.on('keyup', function(e) {
 					switch (e.which) {
@@ -971,9 +979,11 @@
 		var prefix = (item.prefix || ''),
 			item_disabled = (typeof item.disabled !== 'undefined' && item.disabled);
 
+		const new_item_name = ms.options.newItemName ?? ms.options.name + '[new]';
+
 		$obj.append($('<input>', {
 			type: 'hidden',
-			name: (ms.options.addNew && item.isNew) ? ms.options.name + '[new]' : ms.options.name,
+			name: (ms.options.addNew && item.isNew) ? new_item_name : ms.options.name,
 			value: item.id,
 			'data-name': item.name,
 			'data-prefix': prefix
@@ -1426,7 +1436,7 @@
 	function updateSearchFieldVisibility($obj) {
 		var ms = $obj.data('multiSelect'),
 			visible_now = !$obj.hasClass('search-disabled'),
-			visible = !ms.options.disabled
+			visible = !ms.options.disabled && !ms.options.readonly
 				&& (ms.options.selectedLimit == 0 || $('.selected li', $obj).length < ms.options.selectedLimit);
 
 		if (visible === visible_now) {

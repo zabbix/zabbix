@@ -29,6 +29,15 @@ require_once __DIR__.'/../../include/helpers/CDataHelper.php';
  */
 class testDashboardGeomapWidgetScreenshots extends CWebTest {
 
+	/**
+	 * Attach MessageBehavior to the test.
+	 *
+	 * @return array
+	 */
+	public function getBehaviors() {
+		return [CMessageBehavior::class];
+	}
+
 	// Dashboard for zoom screenshot tests.
 	protected static $zoom_dashboardid;
 
@@ -283,6 +292,7 @@ class testDashboardGeomapWidgetScreenshots extends CWebTest {
 		$form = $this->query('id:geomaps-form')->asForm()->one();
 		$form->fill($data);
 		$form->submit();
+		$this->assertMessage(TEST_GOOD, 'Configuration updated');
 
 		$this->page->open('zabbix.php?action=dashboard.view&dashboardid='.self::$zoom_dashboardid);
 		CDashboardElement::find()->waitUntilReady();
@@ -325,13 +335,11 @@ class testDashboardGeomapWidgetScreenshots extends CWebTest {
 			$id = $widget.' '.$data['Tile provider'];
 			$element = $this->query("xpath://div[".CXPathHelper::fromClass('dashboard-grid-widget')."]//h4[text()=".
 					CXPathHelper::escapeQuotes($widget)."]/../..")->waitUntilVisible()->one();
+			// TODO: unstable screenshot on Jenkins. Added border radius and color for zoom elements.
+			$this->page->getDriver()->executeScript('arguments[0].style.cssText +=\'border-radius: 0; border-color: #000;\';',
+				[$element->query('class:leaflet-control-zoom')->one()]);
 
 			$count = count($this->errors);
-			/*
-			 * Zoom in and zoom out icons in the geomap widget are not centred on reference screenshots due to script
-			 * execution in the assertScreenshotExcept() method for text and image rendering. This is expected beahavior
-			 * and can only be reproduced by running a test.
-			 */
 			$this->assertScreenshot($element, $id);
 
 			if ($count !== count($this->errors)) {

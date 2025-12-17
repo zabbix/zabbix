@@ -31,6 +31,14 @@ typedef struct
 }
 zbx_pp_item_task_sequence_t;
 
+typedef struct
+{
+	zbx_uint64_t	itemid;
+	zbx_pp_task_t	*task;
+	zbx_queue_ptr_t	tasks;
+}
+zbx_pp_item_tasks_t;
+
 /******************************************************************************
  *                                                                            *
  * Purpose: initialize task queue                                             *
@@ -42,7 +50,7 @@ zbx_pp_item_task_sequence_t;
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-int	pp_task_queue_init(zbx_pp_queue_t *queue, char **error)
+int	pp_task_queue_init(zbx_pp_queue_t *queue, int slots_num, char **error)
 {
 	int	err, ret = FAIL;
 
@@ -51,10 +59,14 @@ int	pp_task_queue_init(zbx_pp_queue_t *queue, char **error)
 	queue->finished_num = 0;
 	queue->processing_num = 0;
 	zbx_list_create(&queue->pending);
+	zbx_list_init_pool(&queue->pending, slots_num);
 	zbx_list_create(&queue->immediate);
+	zbx_list_init_pool(&queue->immediate, slots_num / 4);
 	zbx_list_create(&queue->finished);
+	zbx_list_init_pool(&queue->finished, slots_num / 2);
 
 	zbx_hashset_create(&queue->sequences, 100, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	zbx_hashset_create(&queue->tasks, 100, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 	if (0 != (err = pthread_mutex_init(&queue->lock, NULL)))
 	{
@@ -103,6 +115,23 @@ void	pp_task_queue_destroy(zbx_pp_queue_t *queue)
 
 	if (0 != (queue->init_flags & PP_TASK_QUEUE_INIT_EVENT))
 		pthread_cond_destroy(&queue->event);
+
+	zbx_hashset_iter_t	iter;
+	zbx_pp_item_tasks_t	*item_tasks;
+
+	zbx_hashset_iter_reset(&queue->tasks, &iter);
+	while (NULL != (item_tasks = (zbx_pp_item_tasks_t *)zbx_hashset_iter_next(&iter)))
+	{
+		zbx_pp_task_t	*task;
+
+		while (NULL != (task = (zbx_pp_task_t *)zbx_queue_ptr_pop(&item_tasks->tasks)))
+		{
+			if (ZBX_PP_TASK_FINISHED == task->state)
+				pp_task_free(task);
+		}
+	}
+
+	zbx_hashset_destroy(&queue->tasks);
 
 	pp_task_queue_clear_tasks(&queue->pending);
 	zbx_list_destroy(&queue->pending);
@@ -196,6 +225,32 @@ static zbx_pp_task_t	*pp_task_queue_add_sequence(zbx_pp_queue_t *queue, zbx_pp_t
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: track items value task creation order                             *
+ *                                                                            *
+ * Parameters: queue - [IN] task queue                                        *
+ *             task  - [IN] task to track                                     *
+ *                                                                            *
+ ******************************************************************************/
+static void	pp_track_value_task(zbx_pp_queue_t *queue, zbx_pp_task_t *task)
+{
+	zbx_pp_item_tasks_t	item_tasks_local, *item_tasks;
+	int			tasks_num = queue->tasks.num_data;
+
+	item_tasks_local.itemid = task->itemid;
+	item_tasks = (zbx_pp_item_tasks_t *)zbx_hashset_insert(&queue->tasks, &item_tasks_local,
+			sizeof(item_tasks_local));
+
+	if (tasks_num != queue->tasks.num_data)
+	{
+		item_tasks->task = task;
+		zbx_queue_ptr_create(&item_tasks->tasks);
+	}
+	else
+		zbx_queue_ptr_push(&item_tasks->tasks, task);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: queue task to be processed before normal tasks                    *
  *                                                                            *
  * Parameters: queue - [IN] task queue                                        *
@@ -216,6 +271,10 @@ void	pp_task_queue_push_immediate(zbx_pp_queue_t *queue, zbx_pp_task_t *task)
 			/* sequence task is just a container for other tasks - it does not affect statistics, */
 			/* so there is no need to increment queue->pending_num                                */
 			break;
+		case ZBX_PP_TASK_VALUE:
+			/* track input value order to have the same output order for non sequential tasks */
+			pp_track_value_task(queue, task);
+			ZBX_FALLTHROUGH;
 		default:
 			queue->pending_num++;
 			break;
@@ -266,6 +325,10 @@ void	pp_task_queue_push(zbx_pp_queue_t *queue, zbx_pp_task_t *task)
 {
 	zbx_pp_task_value_t	*d = (zbx_pp_task_value_t *)PP_TASK_DATA(task);
 	queue->pending_num++;
+
+	/* track input value order to have the same output order for non sequential tasks */
+	if (ZBX_PP_TASK_VALUE == task->type)
+		pp_track_value_task(queue, task);
 
 	if (ITEM_TYPE_INTERNAL != d->preproc->type)
 	{
@@ -344,9 +407,41 @@ zbx_pp_task_t	*pp_task_queue_pop_new(zbx_pp_queue_t *queue)
  ******************************************************************************/
 void	pp_task_queue_push_finished(zbx_pp_queue_t *queue, zbx_pp_task_t *task)
 {
-	queue->finished_num++;
+	zbx_pp_item_tasks_t	*item_tasks;
 	queue->processing_num--;
-	(void)zbx_list_append(&queue->finished, task, NULL);
+	task->state = ZBX_PP_TASK_FINISHED;
+
+	if (ZBX_PP_TASK_VALUE == task->type &&
+			NULL != (item_tasks = (zbx_pp_item_tasks_t *)zbx_hashset_search(&queue->tasks, &task->itemid)))
+	{
+		if (NULL != item_tasks->task)
+		{
+			if (ZBX_PP_TASK_FINISHED != item_tasks->task->state)
+				return;
+
+			(void)zbx_list_append(&queue->finished, item_tasks->task, NULL);
+			item_tasks->task = NULL;
+			queue->finished_num++;
+		}
+
+		while (NULL != (task = (zbx_pp_task_t *)zbx_queue_ptr_peek(&item_tasks->tasks)))
+		{
+			if (ZBX_PP_TASK_FINISHED != task->state)
+				return;
+
+			(void)zbx_queue_ptr_pop(&item_tasks->tasks);
+			(void)zbx_list_append(&queue->finished, task, NULL);
+			queue->finished_num++;
+		}
+
+		zbx_queue_ptr_destroy(&item_tasks->tasks);
+		zbx_hashset_remove_direct(&queue->tasks, item_tasks);
+	}
+	else
+	{
+		(void)zbx_list_append(&queue->finished, task, NULL);
+		queue->finished_num++;
+	}
 }
 
 /******************************************************************************
@@ -459,7 +554,7 @@ void	pp_task_queue_get_sequence_stats(zbx_pp_queue_t *queue, zbx_vector_pp_top_s
 	while (NULL != (sequence = (zbx_pp_item_task_sequence_t *)zbx_hashset_iter_next(&iter)))
 	{
 		stat = (zbx_pp_top_stats_t *)zbx_malloc(NULL, sizeof(zbx_pp_top_stats_t));
-		stat->tasks_num = 0;
+		stat->num = 0;
 		stat->itemid = sequence->itemid;
 
 		zbx_pp_task_sequence_t	*d_seq = (zbx_pp_task_sequence_t *)PP_TASK_DATA(sequence->task);
@@ -470,7 +565,7 @@ void	pp_task_queue_get_sequence_stats(zbx_pp_queue_t *queue, zbx_vector_pp_top_s
 
 			do
 			{
-				stat->tasks_num++;
+				stat->num++;
 			}
 			while (SUCCEED == zbx_list_iterator_next(&li));
 		}
@@ -479,5 +574,4 @@ void	pp_task_queue_get_sequence_stats(zbx_pp_queue_t *queue, zbx_vector_pp_top_s
 	}
 
 	pp_task_queue_unlock(queue);
-
 }

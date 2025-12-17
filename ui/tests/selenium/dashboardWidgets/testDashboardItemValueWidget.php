@@ -166,7 +166,7 @@ class testDashboardItemValueWidget extends testWidgets {
 			'id:desc_v_pos',
 			'id:desc_size',
 			'id:desc_bold',
-			'xpath:.//input[@id="desc_color"]/..'
+			self::PATH_TO_COLOR_PICKER.'"desc_color"]'
 		];
 
 		$values = [
@@ -176,7 +176,7 @@ class testDashboardItemValueWidget extends testWidgets {
 			'id:value_size',
 			'id:value_v_pos',
 			'id:value_bold',
-			'xpath:.//input[@id="value_color"]/..'
+			self::PATH_TO_COLOR_PICKER.'"value_color"]'
 		];
 
 		$units = [
@@ -184,7 +184,7 @@ class testDashboardItemValueWidget extends testWidgets {
 			'id:units_pos',
 			'id:units_size',
 			'id:units_bold',
-			'xpath:.//input[@id="units_color"]/..'
+			self::PATH_TO_COLOR_PICKER.'"units_color"]'
 		];
 
 		$time = [
@@ -192,19 +192,19 @@ class testDashboardItemValueWidget extends testWidgets {
 			'id:time_v_pos',
 			'id:time_size',
 			'id:time_bold',
-			'xpath:.//input[@id="time_color"]/..'
+			self::PATH_TO_COLOR_PICKER.'"time_color"]'
 		];
 
 		$indicator_colors = [
-			'xpath:.//input[@id="up_color"]/..',
-			'xpath:.//input[@id="down_color"]/..',
-			'xpath:.//input[@id="updown_color"]/..'
+			self::PATH_TO_COLOR_PICKER.'"up_color"]',
+			self::PATH_TO_COLOR_PICKER.'"down_color"]',
+			self::PATH_TO_COLOR_PICKER.'"updown_color"]'
 		];
 
 		$sparkline = [
 			'id:sparkline_width',
 			'id:sparkline_fill',
-			'xpath:.//input[@id="sparkline_color"]/..',
+			self::PATH_TO_COLOR_PICKER.'"sparkline[color]"]',
 			'id:sparkline_time_period_data_source',
 			'id:sparkline_time_period_from',
 			'id:sparkline_time_period_to',
@@ -270,7 +270,7 @@ class testDashboardItemValueWidget extends testWidgets {
 					'id:time_bold' => false,
 					'id:sparkline_width' => 1,
 					'id:sparkline_fill' => 3,
-					'id:sparkline_color' => '42A5F5',
+					self::PATH_TO_COLOR_PICKER.'"sparkline[color]"]' => '42A5F5',
 					'id:sparkline_time_period_data_source' => 'Custom',
 					'id:sparkline_time_period_reference' => '',
 					'id:sparkline_time_period_from' => 'now-1h',
@@ -336,10 +336,10 @@ class testDashboardItemValueWidget extends testWidgets {
 						'min' => true,
 						'max' => true,
 						'avg' => true,
-						'count' => false,
+						'count' => true,
 						'sum' => true,
-						'first' => false,
-						'last' => false
+						'first' => true,
+						'last' => true
 					],
 					'History data' => [
 						'Auto' => false,
@@ -349,14 +349,35 @@ class testDashboardItemValueWidget extends testWidgets {
 				];
 
 				foreach ($warning_visibility as $warning_label => $options) {
-					$hint_text = ($warning_label === 'History data')
-						? 'This setting applies only to numeric data. Non-numeric data will always be taken from history.'
-						: 'With this setting only numeric items will be displayed.';
-					$warning_button = $form->getLabel($warning_label)->query('xpath:.//button[@data-hintbox]')->one();
+					if ($warning_label === 'History data') {
+						$hint_text = 'This setting applies only to numeric data. Non-numeric data will always be taken from history.';
+						$warning_button = $form->getLabel($warning_label)->query('xpath:.//button[@data-hintbox]')->one();
+					}
 
 					foreach ($options as $option => $visible) {
 						$form->fill([$warning_label => $option]);
-						$this->assertTrue($warning_button->isVisible($visible));
+
+						if ($warning_label === 'Aggregation function') {
+							$hint_text = in_array($option, ['count', 'first', 'last'])
+								? 'Aggregation function does not affect the sparkline.'
+								: "With this setting only numeric items will be displayed.\n".
+									"Aggregation function does not affect the sparkline.";
+
+							// Check that only one warning button is visible among all three.
+							$warning_button = $form->getFieldContainer($warning_label)->query('xpath:.//button[@data-hintbox]')
+									->all()->filter(CElementFilter::VISIBLE);
+							$this->assertEquals($visible ? 1 : 0, $warning_button->count());
+
+							if ($option === 'not used') {
+								$this->assertFalse($form->getLabel('Time period')->isDisplayed());
+							}
+							else {
+								$this->assertTrue($form->getLabel('Time period')->isDisplayed());
+							}
+						}
+						else {
+							$this->assertTrue($warning_button->isVisible($visible));
+						}
 
 						if ($visible) {
 							$warning_button->click();
@@ -368,10 +389,6 @@ class testDashboardItemValueWidget extends testWidgets {
 							// Close the hintbox.
 							$hint_dialog->query('xpath:.//button[@class="btn-overlay-close"]')->one()->click();
 							$hint_dialog->waitUntilNotPresent();
-						}
-
-						if ($warning_label === 'Aggregation function' && $option !== 'not used') {
-							$this->assertTrue($form->getLabel('Time period')->isDisplayed());
 						}
 					}
 				}
@@ -430,7 +447,7 @@ class testDashboardItemValueWidget extends testWidgets {
 					'id:thresholds_0_threshold' => [
 						'maxlength' => 255
 					],
-					'xpath:.//input[@id="thresholds_0_color"]/..' => [
+					self::PATH_TO_COLOR_PICKER.'"thresholds[0][color]"]' => [
 						'color' => 'E65660'
 					],
 					'id:time_period_from' => [
@@ -451,12 +468,7 @@ class testDashboardItemValueWidget extends testWidgets {
 				];
 				foreach ($inputs as $field => $attributes) {
 					foreach ($attributes as $attribute => $value) {
-						if ($attribute === 'color') {
-							$this->assertEquals($value, $form->query($field)->asColorPicker()->one()->getValue());
-						}
-						else {
-							$this->assertEquals($value, $form->getField($field)->getAttribute($attribute));
-						}
+						$this->assertEquals($value, $form->getField($field)->getAttribute($attribute));
 					}
 				}
 
@@ -483,6 +495,11 @@ class testDashboardItemValueWidget extends testWidgets {
 						$form->fill([$config => $state]);
 
 						foreach ($elements as $element) {
+							// TODO: remove if statement when DEV-4512 is fixed.
+							if (str_contains($element, self::PATH_TO_COLOR_PICKER)) {
+								$element .= '/input';
+							}
+
 							$this->assertTrue($form->getField($element)->isEnabled($state));
 						}
 					}
@@ -836,51 +853,15 @@ class testDashboardItemValueWidget extends testWidgets {
 						'ЗАББИКС Сервер' => 'Available memory in %'
 					],
 					'thresholds' => [
-						['threshold' => '1', 'color' => '']
-					],
-					'error' => [
-						'Invalid parameter "Thresholds/1/color": cannot be empty.'
-					]
-				]
-			],
-			// #16.
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'Advanced configuration' => true
-					],
-					'item' => [
-						'ЗАББИКС Сервер' => 'Available memory in %'
-					],
-					'thresholds' => [
-						['threshold' => '1', 'color' => 'AABBCC'],
-						['threshold' => '2', 'color' => '']
-					],
-					'error' => [
-						'Invalid parameter "Thresholds/2/color": cannot be empty.'
-					]
-				]
-			],
-			// #17.
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'Advanced configuration' => true
-					],
-					'item' => [
-						'ЗАББИКС Сервер' => 'Available memory in %'
-					],
-					'thresholds' => [
-						['threshold' => 'a', 'color' => 'AABBCC']
+						['threshold' => 'a', 'color' => '']
 					],
 					'error' => [
 						'Invalid parameter "Thresholds/1/threshold": a number is expected.'
-					]
+					],
+					'invalid_color' => true
 				]
 			],
-			// #18.
+			// #16.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -901,7 +882,7 @@ class testDashboardItemValueWidget extends testWidgets {
 					]
 				]
 			],
-			// #19.
+			// #17.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -923,7 +904,7 @@ class testDashboardItemValueWidget extends testWidgets {
 					'days_count' => true
 				]
 			],
-			// #20.
+			// #18.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -944,7 +925,7 @@ class testDashboardItemValueWidget extends testWidgets {
 					]
 				]
 			],
-			// #21.
+			// #19.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -965,7 +946,7 @@ class testDashboardItemValueWidget extends testWidgets {
 					]
 				]
 			],
-			// #22.
+			// #20.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -986,7 +967,7 @@ class testDashboardItemValueWidget extends testWidgets {
 					]
 				]
 			],
-			// #23.
+			// #21.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1010,7 +991,7 @@ class testDashboardItemValueWidget extends testWidgets {
 					'days_count' => true
 				]
 			],
-			// #24.
+			// #22.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1031,7 +1012,7 @@ class testDashboardItemValueWidget extends testWidgets {
 					]
 				]
 			],
-			// #25.
+			// #23.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1052,7 +1033,7 @@ class testDashboardItemValueWidget extends testWidgets {
 					]
 				]
 			],
-			// #26.
+			// #24.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1077,13 +1058,14 @@ class testDashboardItemValueWidget extends testWidgets {
 					]
 				]
 			],
-			// #27.
+			// #25.
 			[
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
 						'id:show_5' => true,
 						'Advanced configuration' => true,
+						self::PATH_TO_COLOR_PICKER.'"sparkline[color]"]' => 'FFFFFG',
 						'id:sparkline_time_period_from' => '',
 						'id:sparkline_time_period_to' => '',
 						'Aggregation function' => 'avg',
@@ -1099,16 +1081,18 @@ class testDashboardItemValueWidget extends testWidgets {
 						'Invalid parameter "Sparkline: Time period/To": cannot be empty.',
 						'Invalid parameter "Time period/From": cannot be empty.',
 						'Invalid parameter "Time period/To": cannot be empty.'
-					]
+					],
+					'invalid_color' => true
 				]
 			],
-			// #28.
+			// #26.
 			[
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
 						'id:show_5' => true,
 						'Advanced configuration' => true,
+						self::PATH_TO_COLOR_PICKER.'"sparkline[color]"]' => '',
 						'id:sparkline_time_period_data_source' => 'Widget',
 						'Aggregation function' => 'min',
 						'Time period' => 'Widget'
@@ -1119,44 +1103,11 @@ class testDashboardItemValueWidget extends testWidgets {
 					'error' => [
 						'Invalid parameter "Sparkline: Time period/Widget": cannot be empty.',
 						'Invalid parameter "Time period/Widget": cannot be empty.'
-					]
+					],
+					'invalid_color' => true
 				]
 			],
-			// #29.
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'id:show_5' => true,
-						'Advanced configuration' => true,
-						'xpath:.//input[@id="sparkline_color"]/..' => 'FFFFFG'
-					],
-					'item' => [
-						'ЗАББИКС Сервер' => 'Available memory in %'
-					],
-					'error' => [
-						'Invalid parameter "Sparkline: Colour": a hexadecimal colour code (6 symbols) is expected.'
-					]
-				]
-			],
-			// #30.
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'id:show_5' => true,
-						'Advanced configuration' => true,
-						'xpath:.//input[@id="sparkline_color"]/..' => ''
-					],
-					'item' => [
-						'ЗАББИКС Сервер' => 'Available memory in %'
-					],
-					'error' => [
-						'Invalid parameter "Sparkline: Colour": cannot be empty.'
-					]
-				]
-			],
-			// #31.
+			// #27.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1167,7 +1118,7 @@ class testDashboardItemValueWidget extends testWidgets {
 					]
 				]
 			],
-			// #32.
+			// #28.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1180,7 +1131,7 @@ class testDashboardItemValueWidget extends testWidgets {
 					]
 				]
 			],
-			// #33.
+			// #29.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1217,7 +1168,7 @@ class testDashboardItemValueWidget extends testWidgets {
 					]
 				]
 			],
-			// #34.
+			// #30.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1249,7 +1200,7 @@ class testDashboardItemValueWidget extends testWidgets {
 					]
 				]
 			],
-			// #35.
+			// #31.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1307,7 +1258,7 @@ class testDashboardItemValueWidget extends testWidgets {
 					]
 				]
 			],
-			// #36.
+			// #32.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1333,20 +1284,20 @@ class testDashboardItemValueWidget extends testWidgets {
 						'id:units_size' => '99',
 						'id:units_bold' => true,
 						'Background colour' => 'FFAAAA',
-						'xpath:.//input[@id="desc_color"]/..' => 'AABBCC',
-						'xpath:.//input[@id="value_color"]/..' => 'CC11CC',
-						'xpath:.//input[@id="units_color"]/..' => 'BBCC55',
-						'xpath:.//input[@id="time_color"]/..' => '11AA00',
-						'xpath:.//input[@id="up_color"]/..' => '00FF00',
-						'xpath:.//input[@id="down_color"]/..' => 'FF0000',
-						'xpath:.//input[@id="sparkline_color"]/..' => 'AB47BC'
+						self::PATH_TO_COLOR_PICKER.'"desc_color"]' => 'AABBCC',
+						self::PATH_TO_COLOR_PICKER.'"value_color"]' => 'CC11CC',
+						self::PATH_TO_COLOR_PICKER.'"units_color"]' => 'BBCC55',
+						self::PATH_TO_COLOR_PICKER.'"time_color"]' => '11AA00',
+						self::PATH_TO_COLOR_PICKER.'"up_color"]' => '00FF00',
+						self::PATH_TO_COLOR_PICKER.'"down_color"]' => 'FF0000',
+						self::PATH_TO_COLOR_PICKER.'"sparkline[color]"]' => 'AB47BC'
 					],
 					'item' => [
 						'Simple form test host' => 'Response code for step "step 1 of scenario 1" of scenario "Template_Web_scenario".'
 					]
 				]
 			],
-			// #37.
+			// #33.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1363,7 +1314,7 @@ class testDashboardItemValueWidget extends testWidgets {
 					]
 				]
 			],
-			// #38.
+			// #34.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1380,7 +1331,7 @@ class testDashboardItemValueWidget extends testWidgets {
 					]
 				]
 			],
-			// #39.
+			// #35.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1402,7 +1353,7 @@ class testDashboardItemValueWidget extends testWidgets {
 					'trim' => true
 				]
 			],
-			// #40.
+			// #36.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1417,7 +1368,7 @@ class testDashboardItemValueWidget extends testWidgets {
 					]
 				]
 			],
-			// #41.
+			// #37.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1434,7 +1385,7 @@ class testDashboardItemValueWidget extends testWidgets {
 					]
 				]
 			],
-			// #42.
+			// #38.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1451,7 +1402,7 @@ class testDashboardItemValueWidget extends testWidgets {
 					]
 				]
 			],
-			// #43.
+			// #39.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1469,7 +1420,7 @@ class testDashboardItemValueWidget extends testWidgets {
 					]
 				]
 			],
-			// #44.
+			// #40.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1487,7 +1438,7 @@ class testDashboardItemValueWidget extends testWidgets {
 					]
 				]
 			],
-			// #45.
+			// #41.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1505,7 +1456,7 @@ class testDashboardItemValueWidget extends testWidgets {
 					]
 				]
 			],
-			// #46.
+			// #42.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1522,7 +1473,7 @@ class testDashboardItemValueWidget extends testWidgets {
 					]
 				]
 			],
-			// #47.
+			// #43.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1538,7 +1489,7 @@ class testDashboardItemValueWidget extends testWidgets {
 					]
 				]
 			],
-			// #48.
+			// #44.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1553,7 +1504,7 @@ class testDashboardItemValueWidget extends testWidgets {
 					]
 				]
 			],
-			// #49.
+			// #45.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1569,7 +1520,7 @@ class testDashboardItemValueWidget extends testWidgets {
 					]
 				]
 			],
-			// #50.
+			// #46.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1585,7 +1536,7 @@ class testDashboardItemValueWidget extends testWidgets {
 					]
 				]
 			],
-			// #51.
+			// #47.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1603,7 +1554,7 @@ class testDashboardItemValueWidget extends testWidgets {
 					]
 				]
 			],
-			// #52.
+			// #48.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1621,7 +1572,7 @@ class testDashboardItemValueWidget extends testWidgets {
 					]
 				]
 			],
-			// #53.
+			// #49.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1639,7 +1590,7 @@ class testDashboardItemValueWidget extends testWidgets {
 					]
 				]
 			],
-			// #54.
+			// #50.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1654,7 +1605,7 @@ class testDashboardItemValueWidget extends testWidgets {
 					]
 				]
 			],
-			// #55.
+			// #51.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1670,7 +1621,7 @@ class testDashboardItemValueWidget extends testWidgets {
 					]
 				]
 			],
-			// #56.
+			// #52.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1702,7 +1653,7 @@ class testDashboardItemValueWidget extends testWidgets {
 					'trim' => true
 				]
 			],
-			// #57 Check that there is no errors, when show value option is unchecked (for each data type).
+			// #53 Check that there is no errors, when show value option is unchecked (for each data type).
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1717,7 +1668,7 @@ class testDashboardItemValueWidget extends testWidgets {
 					]
 				]
 			],
-			// #58.
+			// #54.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1732,7 +1683,7 @@ class testDashboardItemValueWidget extends testWidgets {
 					]
 				]
 			],
-			// #59.
+			// #55.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1747,7 +1698,7 @@ class testDashboardItemValueWidget extends testWidgets {
 					]
 				]
 			],
-			// #60.
+			// #56.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1762,7 +1713,7 @@ class testDashboardItemValueWidget extends testWidgets {
 					]
 				]
 			],
-			// #61.
+			// #57.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1871,6 +1822,8 @@ class testDashboardItemValueWidget extends testWidgets {
 
 		if (array_key_exists('thresholds', $data)) {
 			$this->getThresholdTable()->fill($data['thresholds']);
+
+			$this->checkColorPickerState($data);
 		}
 
 		if ($expected === TEST_GOOD) {
@@ -1921,6 +1874,7 @@ class testDashboardItemValueWidget extends testWidgets {
 				? '1 minute'
 				: (CTestArrayHelper::get($data['fields'], 'Refresh interval', '1 minute'));
 			$this->assertEquals($refresh, $widget->getRefreshInterval());
+			CPopupMenuElement::find()->one()->close();
 
 			// Check new widget form fields and values in frontend.
 			$saved_form = $widget->edit();
@@ -2150,7 +2104,7 @@ class testDashboardItemValueWidget extends testWidgets {
 						'Advanced configuration' => true,
 						'Aggregation function' => 'min'
 					],
-					'selector' => 'id:item-aggregate-function-warning',
+					'selector' => 'id:numeric-items-warning',
 					'label' => 'Aggregation function',
 					'warning_message' => 'With this setting only numeric items will be displayed.'
 				]
@@ -2164,7 +2118,7 @@ class testDashboardItemValueWidget extends testWidgets {
 						'Advanced configuration' => true,
 						'Aggregation function' => 'max'
 					],
-					'selector' => 'id:item-aggregate-function-warning',
+					'selector' => 'id:numeric-items-warning',
 					'label' => 'Aggregation function',
 					'warning_message' => 'With this setting only numeric items will be displayed.'
 				]
@@ -2178,7 +2132,7 @@ class testDashboardItemValueWidget extends testWidgets {
 						'Advanced configuration' => true,
 						'Aggregation function' => 'avg'
 					],
-					'selector' => 'id:item-aggregate-function-warning',
+					'selector' => 'id:numeric-items-warning',
 					'label' => 'Aggregation function',
 					'warning_message' => 'With this setting only numeric items will be displayed.'
 				]
@@ -2192,7 +2146,7 @@ class testDashboardItemValueWidget extends testWidgets {
 						'Advanced configuration' => true,
 						'Aggregation function' => 'sum'
 					],
-					'selector' => 'id:item-aggregate-function-warning',
+					'selector' => 'id:numeric-items-warning',
 					'label' => 'Aggregation function',
 					'warning_message' => 'With this setting only numeric items will be displayed.'
 				]
@@ -2249,7 +2203,7 @@ class testDashboardItemValueWidget extends testWidgets {
 						'Advanced configuration' => true,
 						'Aggregation function' => 'not used'
 					],
-					'selector' => 'id:item-aggregate-function-warning',
+					'selector' => 'id:numeric-items-warning',
 					'label' => 'Aggregation function'
 				]
 			],
@@ -2263,7 +2217,7 @@ class testDashboardItemValueWidget extends testWidgets {
 						'Advanced configuration' => true,
 						'Aggregation function' => 'count'
 					],
-					'selector' => 'id:item-aggregate-function-warning',
+					'selector' => 'id:numeric-items-warning',
 					'label' => 'Aggregation function'
 				]
 			],
@@ -2277,7 +2231,7 @@ class testDashboardItemValueWidget extends testWidgets {
 						'Advanced configuration' => true,
 						'Aggregation function' => 'first'
 					],
-					'selector' => 'id:item-aggregate-function-warning',
+					'selector' => 'id:numeric-items-warning',
 					'label' => 'Aggregation function'
 				]
 			],
@@ -2291,7 +2245,7 @@ class testDashboardItemValueWidget extends testWidgets {
 						'Advanced configuration' => true,
 						'Aggregation function' => 'last'
 					],
-					'selector' => 'id:item-aggregate-function-warning',
+					'selector' => 'id:numeric-items-warning',
 					'label' => 'Aggregation function'
 				]
 			],
@@ -2328,7 +2282,7 @@ class testDashboardItemValueWidget extends testWidgets {
 						'Advanced configuration' => true,
 						'Aggregation function' => 'not used'
 					],
-					'selector' => 'id:item-aggregate-function-warning',
+					'selector' => 'id:numeric-items-warning',
 					'label' => 'Aggregation function'
 				]
 			],
@@ -2341,7 +2295,7 @@ class testDashboardItemValueWidget extends testWidgets {
 						'Advanced configuration' => true,
 						'Aggregation function' => 'min'
 					],
-					'selector' => 'id:item-aggregate-function-warning',
+					'selector' => 'id:numeric-items-warning',
 					'label' => 'Aggregation function'
 				]
 			],
@@ -2354,7 +2308,7 @@ class testDashboardItemValueWidget extends testWidgets {
 						'Advanced configuration' => true,
 						'Aggregation function' => 'max'
 					],
-					'selector' => 'id:item-aggregate-function-warning',
+					'selector' => 'id:numeric-items-warning',
 					'label' => 'Aggregation function'
 				]
 			],
@@ -2367,7 +2321,7 @@ class testDashboardItemValueWidget extends testWidgets {
 						'Advanced configuration' => true,
 						'Aggregation function' => 'avg'
 					],
-					'selector' => 'id:item-aggregate-function-warning',
+					'selector' => 'id:numeric-items-warning',
 					'label' => 'Aggregation function'
 				]
 			],
@@ -2380,7 +2334,7 @@ class testDashboardItemValueWidget extends testWidgets {
 						'Advanced configuration' => true,
 						'Aggregation function' => 'count'
 					],
-					'selector' => 'id:item-aggregate-function-warning',
+					'selector' => 'id:numeric-items-warning',
 					'label' => 'Aggregation function'
 				]
 			],
@@ -2393,7 +2347,7 @@ class testDashboardItemValueWidget extends testWidgets {
 						'Advanced configuration' => true,
 						'Aggregation function' => 'sum'
 					],
-					'selector' => 'id:item-aggregate-function-warning',
+					'selector' => 'id:numeric-items-warning',
 					'label' => 'Aggregation function'
 				]
 			],
@@ -2406,7 +2360,7 @@ class testDashboardItemValueWidget extends testWidgets {
 						'Advanced configuration' => true,
 						'Aggregation function' => 'first'
 					],
-					'selector' => 'id:item-aggregate-function-warning',
+					'selector' => 'id:numeric-items-warning',
 					'label' => 'Aggregation function'
 				]
 			],
@@ -2419,7 +2373,7 @@ class testDashboardItemValueWidget extends testWidgets {
 						'Advanced configuration' => true,
 						'Aggregation function' => 'last'
 					],
-					'selector' => 'id:item-aggregate-function-warning',
+					'selector' => 'id:numeric-items-warning',
 					'label' => 'Aggregation function'
 				]
 			],
@@ -2465,19 +2419,26 @@ class testDashboardItemValueWidget extends testWidgets {
 		$form->fill(['Type' => CFormElement::RELOADABLE_FILL('Item value')]);
 		$form->fill($data['fields']);
 
+		if ($data['label'] === 'Aggregation function') {
+			$element = $form->getFieldContainer($data['label']);
+		}
+		else {
+			$element = $form->getLabel($data['label']);
+		}
+
 		if ($data['numeric'] === true || array_key_exists('any_type_of_information', $data)) {
 			// Check that warning item is not displayed.
 			$form->query($data['selector'])->one()->waitUntilNotVisible();
 
 			// Check that info icon is not displayed.
-			$this->assertFalse($form->getLabel($data['label'])->query($info)->one()->isVisible());
+			$this->assertFalse($element->query($info)->one()->isVisible());
 		}
 		else {
 			// Check that warning item is displayed.
 			$form->query($data['selector'])->one()->waitUntilVisible();
 
 			// Check that info icon is displayed.
-			$this->assertTrue($form->getLabel($data['label'])->query($info)->one()->isVisible());
+			$this->assertTrue($element->query($info)->one()->isVisible());
 
 			// Check hint-box.
 			$form->query($data['selector'])->one()->click();
@@ -3330,9 +3291,8 @@ class testDashboardItemValueWidget extends testWidgets {
 		// Close the hint-box.
 		$hint->query('xpath:.//button[@class="btn-overlay-close"]')->one()->click()->waitUntilNotVisible();
 
-		$dashboard->edit()->getWidget($data['Name'])->edit();
-		$form->fill(['Advanced configuration' => true, 'Aggregation function' => 'not used']);
-		$form->submit();
+		$widget_form = $dashboard->edit()->getWidget($data['Name'])->edit();
+		$widget_form->fill(['Advanced configuration' => true, 'Aggregation function' => 'not used'])->submit();
 		COverlayDialogElement::ensureNotPresent();
 		$dashboard->waitUntilReady();
 		$this->assertFalse($dashboard->query($time_icon)->one(false)->isValid());
@@ -4476,31 +4436,30 @@ class testDashboardItemValueWidget extends testWidgets {
 				[
 					'fields' => [
 						'Advanced configuration' => true,
-						'id:description' => '{'.self::USER_MACRO.'.regsub(^[0-9]+, Problem)}, '.
-							'{'.self::USER_MACRO.'.iregsub(^[0-9]+, Problem)}, '.
-							'{'.self::USER_SECRET_MACRO.'.regsub(^[0-9]+, Problem)}, '.
-							'{'.self::USER_SECRET_MACRO.'.iregsub(^[0-9]+, Problem)}, '.
+						'id:description' => '{'.self::USER_MACRO.'.regsub([0-9]+, Problem)}, '.
+							'{'.self::USER_MACRO.'.iregsub([0-9]+, Problem)}, '.
+							'{'.self::USER_SECRET_MACRO.'.regsub([0-9]+, Problem)}, '.
+							'{'.self::USER_SECRET_MACRO.'.iregsub([0-9]+, Problem)}, '.
 							'{{ITEM.NAME}.regsub(CPU, test)}, {{ITEM.NAME}.iregsub(CPU, test)}',
 						'id:desc_size' => 5
 					],
-					'result' => 'Problem, Problem, Problem, Problem, test, test'
+					'result' => 'Problem, Problem, , , test, test'
+				]
+			],
+			'Macro functions regsub(), iregsub() - empty value in case of no match' => [
+				[
+					'fields' => [
+						'Advanced configuration' => true,
+						'id:description' => '{'.self::USER_MACRO.'.regsub(0, Problem)}, '.
+							'{'.self::USER_MACRO.'.iregsub(0, Problem)}, '.
+							'{'.self::USER_SECRET_MACRO.'.regsub(0, Problem)}, '.
+							'{'.self::USER_SECRET_MACRO.'.iregsub(0, Problem)}, '.
+							'{{ITEM.NAME}.regsub(0, test)}, {{ITEM.NAME}.iregsub(0, test)}',
+						'id:desc_size' => 5
+					],
+					'result' => ', , , , ,'
 				]
 			]
-			// TODO: Uncomment and check the test case, after ZBX-25420 fix.
-//			'Macro functions regsub(), iregsub() - empty value in case of no match' => [
-//				[
-//					'fields' => [
-//						'Advanced configuration' => true,
-//						'id:description' => '{'.self::USER_MACRO.'.regsub(0, Problem)}, '.
-//							'{'.self::USER_MACRO.'.iregsub(0, Problem)}, '.
-//							'{'.self::USER_SECRET_MACRO.'.regsub(0, Problem)}, '.
-//							'{'.self::USER_SECRET_MACRO.'.iregsub(0, Problem)}, '.
-//							'{{ITEM.NAME}.regsub(0, test)}, {{ITEM.NAME}.iregsub(0, test)}',
-//						'id:desc_size' => 5
-//					],
-//					'result' => ', , , , ,'
-//				]
-//			]
 		];
 	}
 

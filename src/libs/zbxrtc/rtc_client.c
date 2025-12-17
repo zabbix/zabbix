@@ -23,6 +23,7 @@
 #include "zbxthreads.h"
 #include "zbxjson.h"
 #include "zbxnum.h"
+#include "zbxtime.h"
 
 /******************************************************************************
  *                                                                            *
@@ -246,6 +247,81 @@ int	zbx_rtc_parse_options(const char *opt, zbx_uint32_t *code, struct zbx_json *
 		}
 	}
 
+	if (0 == strcmp(opt, ZBX_DBPOOL_STATUS))
+	{
+		*code = ZBX_RTC_DBPOOL_STATUS;
+		return SUCCEED;
+	}
+
+	if (0 == strncmp(opt, ZBX_DBPOOL_SET_MAX_IDLE, ZBX_CONST_STRLEN(ZBX_DBPOOL_SET_MAX_IDLE)))
+	{
+		const char	*param = opt + ZBX_CONST_STRLEN(ZBX_DBPOOL_SET_MAX_IDLE);
+		zbx_uint64_t	limit;
+
+		if ('=' != *param)
+		{
+			*error = zbx_strdup(NULL, "missing maximum idle connection limit parameter");
+			return FAIL;
+		}
+
+		if (FAIL == zbx_is_uint64(param + 1, &limit))
+		{
+			*error = zbx_strdup(NULL, "invalid maximum idle connection limit parameter");
+			return FAIL;
+		}
+
+		zbx_json_adduint64(j, ZBX_PROTO_TAG_MAX_IDLE, limit);
+
+		*code = ZBX_RTC_DBPOOL_SET_MAX_IDLE;
+		return SUCCEED;
+	}
+
+	if (0 == strncmp(opt, ZBX_DBPOOL_SET_MAX_OPEN, ZBX_CONST_STRLEN(ZBX_DBPOOL_SET_MAX_OPEN)))
+	{
+		const char	*param = opt + ZBX_CONST_STRLEN(ZBX_DBPOOL_SET_MAX_OPEN);
+		zbx_uint64_t	limit;
+
+		if ('=' != *param)
+		{
+			*error = zbx_strdup(NULL, "missing maximum connection limit parameter");
+			return FAIL;
+		}
+
+		if (FAIL == zbx_is_uint64(param + 1, &limit))
+		{
+			*error = zbx_strdup(NULL, "invalid maximum connection limit parameter");
+			return FAIL;
+		}
+
+		zbx_json_adduint64(j, ZBX_PROTO_TAG_MAX_OPEN, limit);
+
+		*code = ZBX_RTC_DBPOOL_SET_MAX_OPEN;
+		return SUCCEED;
+	}
+
+	if (0 == strncmp(opt, ZBX_DBPOOL_SET_IDLE_TIMEOUT, ZBX_CONST_STRLEN(ZBX_DBPOOL_SET_IDLE_TIMEOUT)))
+	{
+		const char	*param = opt + ZBX_CONST_STRLEN(ZBX_DBPOOL_SET_IDLE_TIMEOUT);
+		int		timeout;
+
+		if ('=' != *param)
+		{
+			*error = zbx_strdup(NULL, "missing idle timeout parameter");
+			return FAIL;
+		}
+
+		if (FAIL == zbx_is_time_suffix(param + 1, &timeout, ZBX_LENGTH_UNLIMITED))
+		{
+			*error = zbx_strdup(NULL, "invalid idle timeout parameter");
+			return FAIL;
+		}
+
+		zbx_json_addint64(j, ZBX_PROTO_TAG_IDLE_TIMEOUT, timeout);
+
+		*code = ZBX_RTC_DBPOOL_SET_IDLE_TIMEOUT;
+		return SUCCEED;
+	}
+
 	return SUCCEED;
 }
 
@@ -330,7 +406,7 @@ void	zbx_rtc_subscribe(unsigned char proc_type, int proc_num, zbx_uint32_t *msgs
 
 /******************************************************************************
  *                                                                            *
- * Purpose: subscribe process for RTC notifications                           *
+ * Purpose: subscribe service for RTC notifications                           *
  *                                                                            *
  * Parameters:                                                                *
  *      proc_type      - [IN]                                                 *
@@ -383,6 +459,40 @@ void	zbx_rtc_subscribe_service(unsigned char proc_type, int proc_num, zbx_uint32
 	}
 
 	zbx_free(data);
+	zbx_ipc_socket_close(&sock);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: unsubsribe service from RTC notifications                         *
+ *                                                                            *
+ * Parameters:                                                                *
+ *      config_timeout - [IN]                                                 *
+ *      service        - [IN] the subscriber IPC service                      *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_rtc_unsubscribe_service(int config_timeout, const char *service)
+{
+	zbx_ipc_socket_t	sock;
+	char			*error = NULL;
+	zbx_uint32_t		service_len;
+	unsigned char		data[ZBX_IPC_PATH_MAX], *ptr = data;
+
+	service_len = (zbx_uint32_t)strlen(service);
+	if (ZBX_IPC_PATH_MAX <= service_len + sizeof(zbx_uint32_t))
+		return;
+
+	if (FAIL == zbx_ipc_socket_open(&sock, ZBX_IPC_SERVICE_RTC, config_timeout, &error))
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "cannot connect to RTC service: %s", error);
+		return;
+	}
+
+	ptr += zbx_serialize_str(ptr, service, service_len);
+
+	if (FAIL == zbx_ipc_socket_write(&sock, ZBX_RTC_UNSUBSCRIBE_SERVICE, data, (zbx_uint32_t)(ptr - data)))
+		zabbix_log(LOG_LEVEL_DEBUG, "cannot unsubscribe from RTC service notifications: %s", error);
+
 	zbx_ipc_socket_close(&sock);
 }
 

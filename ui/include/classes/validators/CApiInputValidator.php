@@ -19,6 +19,9 @@
  */
 class CApiInputValidator {
 
+	public const SSL_CERTIFICATE_MAX_LENGTH = 10000;
+	public const SSL_PRIVATE_KEY_MAX_LENGTH = 10000;
+
 	/**
 	 * Base validation function.
 	 *
@@ -253,12 +256,6 @@ class CApiInputValidator {
 			case API_ITEM_DELAY:
 				return self::validateItemDelay($rule, $data, $path, $error);
 
-			case API_JSON:
-				return self::validateJson($rule, $data, $path, $error);
-
-			case API_XML:
-				return self::validateXml($rule, $data, $path, $error);
-
 			case API_PREPROC_PARAMS:
 				return self::validatePreprocParams($rule, $data, $path, $error);
 
@@ -273,6 +270,12 @@ class CApiInputValidator {
 
 			case API_SELEMENTID:
 				return self::validateSelementId($rule, $data, $path, $error);
+
+			case API_SSL_CERTIFICATE:
+				return self::validateSslCertificate($rule, $data, $path, $error);
+
+			case API_SSL_PRIVATE_KEY:
+				return self::validateSslPrivateKey($rule, $data, $path, $error);
 		}
 
 		// This message can be untranslated because warn about incorrect validation rules at a development stage.
@@ -350,13 +353,13 @@ class CApiInputValidator {
 			case API_ANY:
 			case API_ITEM_KEY:
 			case API_ITEM_DELAY:
-			case API_JSON:
-			case API_XML:
 			case API_PREPROC_PARAMS:
 			case API_PROMETHEUS_PATTERN:
 			case API_PROMETHEUS_LABEL:
 			case API_NUMBER:
 			case API_SELEMENTID:
+			case API_SSL_CERTIFICATE:
+			case API_SSL_PRIVATE_KEY:
 				return true;
 
 			case API_OBJECT:
@@ -1562,7 +1565,7 @@ class CApiInputValidator {
 	 * API output validator.
 	 *
 	 * @param array  $rule
-	 * @param int    $rule['flags']   (optional) API_ALLOW_COUNT, API_ALLOW_NULL
+	 * @param int    $rule['flags']   (optional) API_ALLOW_COUNT, API_ALLOW_NULL, API_NORMALIZE
 	 * @param string $rule['in']      (optional) comma-delimited field names, for example: 'hostid,name'
 	 * @param mixed  $data
 	 * @param string $path
@@ -1591,7 +1594,15 @@ class CApiInputValidator {
 		if (is_string($data)) {
 			$in = ($flags & API_ALLOW_COUNT) ? implode(',', [API_OUTPUT_EXTEND, API_OUTPUT_COUNT]) : API_OUTPUT_EXTEND;
 
-			return self::validateData(['type' => API_STRING_UTF8, 'in' => $in], $data, $path, $error);
+			if (!self::validateData(['type' => API_STRING_UTF8, 'in' => $in], $data, $path, $error)) {
+				return false;
+			}
+
+			if ($data === API_OUTPUT_EXTEND && array_key_exists('in', $rule) && $flags & API_NORMALIZE) {
+				$data = explode(',', $rule['in']);
+			}
+
+			return true;
 		}
 
 		$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('an array or a character string is expected'));
@@ -2163,8 +2174,9 @@ class CApiInputValidator {
 			return true;
 		}
 
-		if (@preg_match('('.$data.')', '') === false) {
+		if (!(new CRegexValidator)->validate($data)) {
 			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('invalid regular expression'));
+
 			return false;
 		}
 
@@ -2734,7 +2746,7 @@ class CApiInputValidator {
 			'macros' => array_key_exists('macros', $rule) ? $rule['macros'] : []
 		]);
 
-		if (!$ip_range_parser->parse($data)) {
+		if ($ip_range_parser->parse($data) != CParser::PARSE_SUCCESS) {
 			$error = _s('Invalid parameter "%1$s": %2$s.', $path, $ip_range_parser->getError());
 			return false;
 		}
@@ -2875,23 +2887,13 @@ class CApiInputValidator {
 			return false;
 		}
 
-		$macro_parsers = [];
-		if ($flags & API_ALLOW_USER_MACRO) {
-			$macro_parsers[] = new CUserMacroParser();
-			$macro_parsers[] = new CUserMacroFunctionParser();
-		}
-		if ($flags & API_ALLOW_LLD_MACRO) {
-			$macro_parsers[] = new CLLDMacroParser();
-			$macro_parsers[] = new CLLDMacroFunctionParser();
-		}
+		$port_parser = new CPortParser([
+			'usermacros' => $flags & API_ALLOW_USER_MACRO,
+			'lldmacros' => $flags & API_ALLOW_LLD_MACRO
+		]);
 
-		foreach ($macro_parsers as $macro_parser) {
-			if ($macro_parser->parse($data) == CParser::PARSE_SUCCESS) {
-				return true;
-			}
-		}
-
-		if (!self::validateInt32(['in' => ZBX_MIN_PORT_NUMBER.':'.ZBX_MAX_PORT_NUMBER], $data, $path, $error)) {
+		if ($port_parser->parse($data) != CParser::PARSE_SUCCESS) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('a port number is expected'));
 			return false;
 		}
 
@@ -3953,120 +3955,6 @@ class CApiInputValidator {
 	}
 
 	/**
-	 * JSON validator.
-	 *
-	 * @param array  $rule
-	 * @param int    $rule['flags']     (optional) API_NOT_EMPTY, API_ALLOW_USER_MACRO, API_ALLOW_LLD_MACRO
-	 * @param array  $rule['macros_n']  (optional) An array of supported macros. Example: ['{HOST.IP}', '{ITEM.KEY}'].
-	 * @param int    $rule['length']    (optional)
-	 * @param mixed  $data
-	 * @param string $path
-	 * @param string $error
-	 *
-	 * @return bool
-	 */
-	private static function validateJson($rule, &$data, $path, &$error) {
-		$flags = array_key_exists('flags', $rule) ? $rule['flags'] : 0x00;
-
-		if (self::checkStringUtf8($flags & API_NOT_EMPTY, $data, $path, $error) === false) {
-			return false;
-		}
-
-		if ($data === '') {
-			return true;
-		}
-
-		if (array_key_exists('length', $rule) && mb_strlen($data) > $rule['length']) {
-			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('value is too long'));
-			return false;
-		}
-
-		$json = $data;
-
-		$types = [];
-
-		if ($flags & API_ALLOW_USER_MACRO) {
-			$types['usermacros'] = true;
-		}
-
-		if ($flags & API_ALLOW_LLD_MACRO) {
-			$types['lldmacros'] = true;
-		}
-
-		if (array_key_exists('macros_n', $rule)) {
-			$types['macros_n'] = $rule['macros_n'];
-		}
-
-		if ($types) {
-			$matches = CMacrosResolverGeneral::getMacroPositions($json, $types);
-			$shift = 0;
-
-			foreach ($matches as $pos => $substr) {
-				$json = substr_replace($json, '1', $pos + $shift, strlen($substr));
-				$shift = $shift + 1 - strlen($substr);
-			}
-		}
-
-		json_decode($json);
-
-		if (json_last_error() != JSON_ERROR_NONE) {
-			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('JSON is expected'));
-			return false;
-		}
-
-		return true;
-	}
-
-	/**
-	 * XML validator.
-	 *
-	 * @param array  $rule
-	 * @param int    $rule['flags']   (optional) API_NOT_EMPTY
-	 * @param int    $rule['length']  (optional)
-	 * @param mixed  $data
-	 * @param string $path
-	 * @param string $error
-	 *
-	 * @return bool
-	 */
-	private static function validateXml(array $rule, &$data, string $path, string &$error): bool {
-		$flags = array_key_exists('flags', $rule) ? $rule['flags'] : 0x00;
-
-		if (self::checkStringUtf8($flags & API_NOT_EMPTY, $data, $path, $error) === false) {
-			return false;
-		}
-
-		if ($data === '') {
-			return true;
-		}
-
-		if (array_key_exists('length', $rule) && mb_strlen($data) > $rule['length']) {
-			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('value is too long'));
-			return false;
-		}
-
-		libxml_use_internal_errors(true);
-
-		if (simplexml_load_string($data, null, LIBXML_IMPORT_FLAGS) === false) {
-			$errors = libxml_get_errors();
-			libxml_clear_errors();
-
-			if ($errors) {
-				$error = reset($errors);
-				$error = _s('Invalid parameter "%1$s": %2$s.', $path, _s('%1$s [Line: %2$s | Column: %3$s]',
-					'('.$error->code.') '.trim($error->message), $error->line, $error->column
-				));
-				return false;
-			}
-
-			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('XML is expected'));
-			return false;
-		}
-
-		return true;
-	}
-
-	/**
 	 * @param array  $rule
 	 * @param int    $rule['flags']                  (optional) API_ALLOW_USER_MACRO, API_ALLOW_LLD_MACRO
 	 * @param array  $rule['preproc_type']
@@ -4364,5 +4252,79 @@ class CApiInputValidator {
 		return is_string($data)
 			? self::checkStringUtf8(API_NOT_EMPTY, $data, $path, $error)
 			: self::validateId([], $data, $path, $error);
+	}
+
+	/**
+	 * Validate SSL certificate. The OpenSSL PHP extension is required to be enabled.
+	 *
+	 * @param array  $rule
+	 * @param int    $rule['flags']   (optional) API_NOT_EMPTY
+	 * @param mixed  $data
+	 * @param string $path
+	 * @param string $error
+	 *
+	 * @return bool
+	 */
+	private static function validateSslCertificate(array $rule, &$data, string $path, string &$error): bool {
+		$flags = array_key_exists('flags', $rule) ? $rule['flags'] : 0x00;
+
+		if (self::checkStringUtf8($flags & API_NOT_EMPTY, $data, $path, $error) === false) {
+			return false;
+		}
+
+		if ($data === '') {
+			return true;
+		}
+
+		if (mb_strlen($data) > self::SSL_CERTIFICATE_MAX_LENGTH) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('value is too long'));
+
+			return false;
+		}
+
+		if (!openssl_x509_parse($data)) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('a PEM-encoded certificate is expected'));
+
+			return false;
+		}
+
+		return true;
+	}
+
+	/**
+	 * Validate SSL private key. The OpenSSL PHP extension is required to be enabled.
+	 *
+	 * @param array  $rule
+	 * @param int    $rule['flags']   (optional) API_NOT_EMPTY
+	 * @param mixed  $data
+	 * @param string $path
+	 * @param string $error
+	 *
+	 * @return bool
+	 */
+	private static function validateSslPrivateKey(array $rule, &$data, string $path, string &$error): bool {
+		$flags = array_key_exists('flags', $rule) ? $rule['flags'] : 0x00;
+
+		if (self::checkStringUtf8($flags & API_NOT_EMPTY, $data, $path, $error) === false) {
+			return false;
+		}
+
+		if ($data === '') {
+			return true;
+		}
+
+		if (mb_strlen($data) > self::SSL_PRIVATE_KEY_MAX_LENGTH) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('value is too long'));
+
+			return false;
+		}
+
+		if (!openssl_pkey_get_private($data)) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('a PEM-encoded private key is expected'));
+
+			return false;
+		}
+
+		return true;
 	}
 }

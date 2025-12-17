@@ -25,11 +25,11 @@
 #include "zbxself.h"
 #include "zbxtime.h"
 #include "zbx_item_constants.h"
-#include "zbxstr.h"
 #include "zbxcacheconfig.h"
 #include "zbxdb.h"
 #include "zbxdbhigh.h"
 #include "zbxalgo.h"
+#include "zbxhash.h"
 
 typedef struct
 {
@@ -42,6 +42,7 @@ typedef struct
 	zbx_hashset_t			entries;
 	zbx_vector_lld_entry_ptr_t	entries_sorted;
 	zbx_vector_lld_macro_path_ptr_t	macro_paths;
+	zbx_jsonobj_t			source;
 }
 zbx_lld_value_t;
 
@@ -70,7 +71,7 @@ static void	lld_register_worker(zbx_ipc_socket_t *socket)
 static void	lld_value_init(zbx_lld_value_t *lld_value)
 {
 	zbx_hashset_create_ext(&lld_value->entries, 0, lld_entry_hash, lld_entry_compare,
-			(zbx_clean_func_t)lld_entry_clear, ZBX_DEFAULT_MEM_MALLOC_FUNC, ZBX_DEFAULT_MEM_REALLOC_FUNC,
+			lld_entry_clear_wrapper, ZBX_DEFAULT_MEM_MALLOC_FUNC, ZBX_DEFAULT_MEM_REALLOC_FUNC,
 			ZBX_DEFAULT_MEM_FREE_FUNC);
 
 	zbx_vector_lld_entry_ptr_create(&lld_value->entries_sorted);
@@ -78,6 +79,7 @@ static void	lld_value_init(zbx_lld_value_t *lld_value)
 
 	zbx_vector_lld_macro_path_ptr_create(&lld_value->macro_paths);
 
+	zbx_jsonobj_init(&lld_value->source);
 }
 
 /******************************************************************************
@@ -93,6 +95,8 @@ static void	lld_value_clear(zbx_lld_value_t *lld_value)
 
 	zbx_vector_lld_macro_path_ptr_clear_ext(&lld_value->macro_paths, zbx_lld_macro_path_free);
 	zbx_vector_lld_macro_path_ptr_destroy(&lld_value->macro_paths);
+
+	zbx_jsonobj_clear(&lld_value->source);
 
 	memset(lld_value, 0, sizeof(zbx_lld_value_t));
 }
@@ -140,10 +144,15 @@ static void	lld_flush_value(zbx_lld_value_t *lld_value, unsigned char state, con
 	}
 
 	/* with successful LLD processing LLD error will be set to empty string */
-	if (NULL != error && 0 != strcmp(error, ZBX_NULL2EMPTY_STR(lld_value->item.error)))
+	if (NULL != error)
 	{
-		diff.error = error;
-		diff.flags |= ZBX_FLAGS_ITEM_DIFF_UPDATE_ERROR;
+		zbx_sha512_hash(error, diff.error_hash);
+
+		if (0 != memcmp(lld_value->item.error_hash, diff.error_hash, sizeof(lld_value->item.error_hash)))
+		{
+			diff.error = error;
+			diff.flags |= ZBX_FLAGS_ITEM_DIFF_UPDATE_ERROR;
+		}
 	}
 
 	if (0 != lld_value->meta)
@@ -202,9 +211,7 @@ static int	lld_prepare_value(const zbx_ipc_message_t *message, zbx_lld_value_t *
 
 	if (NULL != value)
 	{
-		zbx_jsonobj_t	json;
-
-		if (FAIL == zbx_jsonobj_open(value, &json))
+		if (FAIL == zbx_jsonobj_open(value, &lld_value->source))
 		{
 			error = zbx_strdup(NULL, zbx_json_strerror());
 		}
@@ -212,11 +219,9 @@ static int	lld_prepare_value(const zbx_ipc_message_t *message, zbx_lld_value_t *
 		{
 			if (SUCCEED == zbx_lld_macro_paths_get(itemid, &lld_value->macro_paths, &error))
 			{
-				lld_extract_entries(&lld_value->entries, &lld_value->entries_sorted, &json,
+				lld_extract_entries(&lld_value->entries, &lld_value->entries_sorted, &lld_value->source,
 						&lld_value->macro_paths, &error);
 			}
-
-			zbx_jsonobj_clear(&json);
 		}
 	}
 
@@ -260,7 +265,7 @@ static int	lld_compare_value(const zbx_ipc_message_t *message, zbx_lld_value_t *
 	zbx_hashset_t	entries;
 
 	zbx_hashset_create_ext(&entries, (size_t)lld_value->entries.num_data, lld_entry_hash, lld_entry_compare,
-			(zbx_clean_func_t)lld_entry_clear, ZBX_DEFAULT_MEM_MALLOC_FUNC, ZBX_DEFAULT_MEM_REALLOC_FUNC,
+			lld_entry_clear_wrapper, ZBX_DEFAULT_MEM_MALLOC_FUNC, ZBX_DEFAULT_MEM_REALLOC_FUNC,
 			ZBX_DEFAULT_MEM_FREE_FUNC);
 
 	zbx_lld_deserialize_value(message->data, &value);

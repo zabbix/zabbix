@@ -42,7 +42,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 		parent::init();
 
 		$this->addValidationRules([
-			'initial_load' => 'in 0,1',
+			'with_config' => 'in 1',
 			'widgetid' => 'db widget.widgetid',
 			'unique_id' => 'required|string'
 		]);
@@ -53,17 +53,19 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 		$data = [
 			'name' => $this->getInput('name', $this->widget->getDefaultName()),
-			'hosts' => self::convertToRFC7946($this->getHosts()),
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
 			],
-			'unique_id' => $this->getInput('unique_id')
+			'unique_id' => $this->getInput('unique_id'),
+			'vars' => [
+				'hosts' => self::convertToRFC7946($this->getHosts())
+			]
 		];
 
-		if ($this->getInput('initial_load', 0)) {
+		if ($this->hasInput('with_config')) {
 			$this->geomap_config = self::getMapConfig();
 
-			$data['config'] = $this->geomap_config + $this->getMapCenter() + [
+			$data['vars']['config'] = $this->geomap_config + $this->getMapCenter() + [
 				'filter' => $this->getUserProfileFilter(),
 				'severities' => self::getSeveritySettings()
 			];
@@ -102,7 +104,8 @@ class WidgetView extends CControllerDashboardWidgetView {
 				'groupids' => $filter_groupids,
 				'hostids' => $this->fields_values['hostids'] ?: null,
 				'evaltype' => $this->fields_values['evaltype'],
-				'tags' => $this->fields_values['tags'],
+				'tags' => $this->fields_values['tags'] ?: null,
+				'inheritedTags' => true,
 				'filter' => [
 					'inventory_mode' => [HOST_INVENTORY_MANUAL, HOST_INVENTORY_AUTOMATIC]
 				],
@@ -253,7 +256,12 @@ class WidgetView extends CControllerDashboardWidgetView {
 			];
 		}
 
-		$tile_provider = getTileProviders()[CSettingsHelper::get(CSettingsHelper::GEOMAPS_TILE_PROVIDER)];
+		$tile_providers = getTileProviders();
+		$geomaps_tile_provider = CSettingsHelper::get(CSettingsHelper::GEOMAPS_TILE_PROVIDER);
+
+		$tile_provider = array_key_exists($geomaps_tile_provider, $tile_providers)
+			? $tile_providers[$geomaps_tile_provider]
+			: reset($tile_providers);
 
 		return [
 			'tile_url' => $tile_provider['geomaps_tile_url'],

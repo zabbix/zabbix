@@ -117,18 +117,6 @@ function getGraphDims($graphid = null) {
 	return $graphDims;
 }
 
-function getGraphByGraphId($graphId) {
-	$dbGraph = DBfetch(DBselect('SELECT g.* FROM graphs g WHERE g.graphid='.zbx_dbstr($graphId)));
-
-	if ($dbGraph) {
-		return $dbGraph;
-	}
-
-	error(_s('No graph item with graph ID "%1$s".', $graphId));
-
-	return false;
-}
-
 /**
  * Get parent templates for each given graph.
  *
@@ -160,16 +148,18 @@ function getGraphParentTemplates(array $graphs, $flag) {
 
 	$all_parent_graphids = [];
 	$hostids = [];
-	if ($flag == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
+
+	if ($flag & ZBX_FLAG_DISCOVERY_PROTOTYPE) {
 		$lld_ruleids = [];
 	}
 
 	do {
-		if ($flag == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
+		if ($flag & ZBX_FLAG_DISCOVERY_PROTOTYPE) {
 			$db_graphs = API::GraphPrototype()->get([
 				'output' => ['graphid', 'templateid'],
 				'selectHosts' => ['hostid'],
 				'selectDiscoveryRule' => ['itemid'],
+				'selectDiscoveryRulePrototype' => ['itemid'],
 				'graphids' => array_keys($parent_graphids)
 			]);
 		}
@@ -189,8 +179,10 @@ function getGraphParentTemplates(array $graphs, $flag) {
 			$data['templates'][$db_graph['hosts'][0]['hostid']] = [];
 			$hostids[$db_graph['graphid']] = $db_graph['hosts'][0]['hostid'];
 
-			if ($flag == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
-				$lld_ruleids[$db_graph['graphid']] = $db_graph['discoveryRule']['itemid'];
+			if ($flag & ZBX_FLAG_DISCOVERY_PROTOTYPE) {
+				$lld_ruleids[$db_graph['graphid']] = $db_graph['discoveryRule']
+					? $db_graph['discoveryRule']['itemid']
+					: $db_graph['discoveryRulePrototype']['itemid'];
 			}
 
 			if ($db_graph['templateid'] != 0) {
@@ -209,7 +201,7 @@ function getGraphParentTemplates(array $graphs, $flag) {
 			? $hostids[$parent_graph['graphid']]
 			: 0;
 
-		if ($flag == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
+		if ($flag & ZBX_FLAG_DISCOVERY_PROTOTYPE) {
 			$parent_graph['lld_ruleid'] = array_key_exists($parent_graph['graphid'], $lld_ruleids)
 				? $lld_ruleids[$parent_graph['graphid']]
 				: 0;
@@ -277,11 +269,11 @@ function makeGraphTemplatePrefix($graphid, array $parent_templates, $flag, bool 
 
 	if ($provide_links && $template['permission'] == PERM_READ_WRITE) {
 		$url = (new CUrl('zabbix.php'))
-			->setArgument('action', 'graph.list')
+			->setArgument('action', ($flag & ZBX_FLAG_DISCOVERY_PROTOTYPE) ? 'graph.prototype.list' : 'graph.list')
 			->setArgument('context', 'template')
 			->setArgument('uncheck', '1');
 
-		if ($flag == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
+		if ($flag & ZBX_FLAG_DISCOVERY_PROTOTYPE) {
 			$url->setArgument('parent_discoveryid', $parent_templates['links'][$graphid]['lld_ruleid']);
 		}
 		// ZBX_FLAG_DISCOVERY_NORMAL
@@ -322,7 +314,7 @@ function makeGraphTemplatesHtml($graphid, array $parent_templates, $flag, bool $
 				->setArgument('context', 'template')
 				->setArgument('graphid', $parent_templates['links'][$graphid]['graphid']);
 
-			if ($flag == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
+			if ($flag & ZBX_FLAG_DISCOVERY_PROTOTYPE) {
 				$url
 					->setArgument('popup', 'graph.prototype.edit')
 					->setArgument('parent_discoveryid', $parent_templates['links'][$graphid]['lld_ruleid']);
@@ -667,7 +659,7 @@ function yieldGraphScaleInterval(float $min, float $max, string $units, int $pow
 
 	$is_binary = isBinaryUnits($units);
 
-	$base = getUnitsBase($units, $power);
+	$base = truncateFloat(getUnitsBase($units, $power));
 
 	// Expression optimized to avoid overflow.
 	$interval = truncateFloat($max / $rows - $min / $rows);
@@ -1190,8 +1182,6 @@ function calculateGraphScaleValues(float $min, float $max, bool $min_calculated,
 		'power' => $power,
 		'ignore_milliseconds' => $min <= -1 || $max >= 1
 	];
-	$options_fixed = $options;
-	$options_calculated = $options;
 
 	$pre_conversion = convertUnitsRaw($options);
 
@@ -1217,13 +1207,7 @@ function calculateGraphScaleValues(float $min, float $max, bool $min_calculated,
 			}
 		}
 
-		$options_fixed += [
-			'precision' => $precision,
-			'decimals' => $precision - 1,
-			'decimals_exact' => false
-		];
-
-		$options_calculated += [
+		$options += [
 			'precision' => $precision,
 			'decimals' => $decimals,
 			'decimals_exact' => $decimals_exact
@@ -1236,7 +1220,7 @@ function calculateGraphScaleValues(float $min, float $max, bool $min_calculated,
 		'relative_pos' => 0,
 		'value' => convertUnits([
 			'value' => $min
-		] + ($min_calculated ? $options_calculated : $options_fixed))
+		] + $options)
 	];
 
 	foreach ($rows as $value) {
@@ -1246,7 +1230,7 @@ function calculateGraphScaleValues(float $min, float $max, bool $min_calculated,
 				: ($value - $min) / ($max - $min),
 			'value' => convertUnits([
 				'value' => $value
-			] + $options_calculated)
+			] + $options)
 		];
 	}
 
@@ -1254,7 +1238,7 @@ function calculateGraphScaleValues(float $min, float $max, bool $min_calculated,
 		'relative_pos' => 1,
 		'value' => convertUnits([
 			'value' => $max
-		] + ($max_calculated ? $options_calculated : $options_fixed))
+		] + $options)
 	];
 
 	return $scale_values;
@@ -1602,7 +1586,9 @@ function getItemTemplateNormal(bool $readonly, array $graph_item_drawtypes): CTa
 						->setReadonly($readonly)
 				),
 				new CCol(
-					(new CColor('items[#{number}][color]', '#{color}', 'items_#{number}_color'))->appendColorPickerJs(false)
+					(new CColorPicker('items[#{number}][color]'))
+						->setColor('#{color}')
+						->setReadonly($readonly)
 				),
 				$readonly ? null : getItemTemplateRemoveColumn()
 			]))
@@ -1656,7 +1642,9 @@ function getItemTemplateStacked(bool $readonly): CTag {
 						->setReadonly($readonly)
 				),
 				new CCol(
-					(new CColor('items[#{number}][color]', '#{color}', 'items_#{number}_color'))->appendColorPickerJs(false)
+					(new CColorPicker('items[#{number}][color]'))
+						->setColor('#{color}')
+						->setReadonly($readonly)
 				),
 				$readonly ? null : getItemTemplateRemoveColumn()
 			]))
@@ -1711,7 +1699,9 @@ function getItemTemplatePieAndExploded(bool $readonly): CTag {
 						->setReadonly($readonly)
 				),
 				new CCol(
-					(new CColor('items[#{number}][color]', '#{color}', 'items_#{number}_color'))->appendColorPickerJs(false)
+					(new CColorPicker('items[#{number}][color]'))
+						->setColor('#{color}')
+						->setReadonly($readonly)
 				),
 				$readonly ? null : getItemTemplateRemoveColumn()
 			]))

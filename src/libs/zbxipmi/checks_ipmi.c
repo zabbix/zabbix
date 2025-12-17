@@ -21,6 +21,7 @@
 #include "zbxjson.h"
 #include "zbxnum.h"
 #include "zbxstr.h"
+#include "zbxip.h"
 
 #include "checks_ipmi.h"
 
@@ -362,6 +363,7 @@ static zbx_ipmi_sensor_t	*zbx_allocate_ipmi_sensor(zbx_ipmi_host_t *h, ipmi_sens
 	int			id_sz;
 	size_t			sz;
 	char			full_name[IPMI_SENSOR_NAME_LEN];
+	char			ip_port[MAX_STRING_LEN];
 	int 			i;
 
 	zbx_get_sensor_id(sensor, id, sizeof(id), &id_sz, &id_type, id_str, sizeof(id_str));
@@ -389,8 +391,9 @@ static zbx_ipmi_sensor_t	*zbx_allocate_ipmi_sensor(zbx_ipmi_host_t *h, ipmi_sens
 	for (i = IPMI_LOWER_NON_CRITICAL; i <= IPMI_UPPER_NON_RECOVERABLE; i++)
 		s->thresholds[i].status = ZBX_IPMI_THRESHOLD_STATUS_DISABLED;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "Added sensor: host:'%s:%d' id_type:%d id_sz:%d id:'%s' reading_type:0x%x "
-			"('%s') type:0x%x ('%s') domain:'%u' name:'%s'", h->ip, h->port, (int)s->id_type, s->id_sz,
+	zabbix_log(LOG_LEVEL_DEBUG, "Added sensor: host:'%s' id_type:%d id_sz:%d id:'%s' reading_type:0x%x "
+			"('%s') type:0x%x ('%s') domain:'%u' name:'%s'",
+			zbx_join_hostport(ip_port, sizeof(ip_port), h->ip, h->port), (int)s->id_type, s->id_sz,
 			zbx_sensor_id_to_str(id_str, sizeof(id_str), s->id, s->id_type, s->id_sz),
 			(unsigned int)s->reading_type, ipmi_sensor_get_event_reading_type_string(s->sensor),
 			(unsigned int)s->type, ipmi_sensor_get_sensor_type_string(s->sensor), h->domain_nr,
@@ -498,6 +501,7 @@ static zbx_ipmi_control_t	*zbx_allocate_ipmi_control(zbx_ipmi_host_t *h, ipmi_co
 	zbx_ipmi_control_t	*c;
 	char			*c_name = NULL;
 	char			full_name[IPMI_SENSOR_NAME_LEN];
+	char			ip_port[MAX_STRING_LEN];
 
 	sz = (size_t)ipmi_control_get_id_length(control);
 	c_name = (char *)zbx_malloc(c_name, sz + 1);
@@ -506,8 +510,9 @@ static zbx_ipmi_control_t	*zbx_allocate_ipmi_control(zbx_ipmi_host_t *h, ipmi_co
 	ipmi_control_get_name(control, full_name, sizeof(full_name));
 	dm_sz = get_domain_offset(h, full_name);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() Added control: host'%s:%d' id:'%s' domain:'%u' name:'%s'",
-			__func__, h->ip, h->port, c_name, h->domain_nr, full_name + dm_sz);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() Added control: host'%s' id:'%s' domain:'%u' name:'%s'", __func__,
+			zbx_join_hostport(ip_port, sizeof(ip_port), h->ip, h->port), c_name, h->domain_nr,
+			full_name + dm_sz);
 
 	h->control_count++;
 	sz = (size_t)h->control_count * sizeof(zbx_ipmi_control_t);
@@ -2051,7 +2056,10 @@ int	zbx_set_ipmi_control_value(zbx_uint64_t hostid, const char *addr, unsigned s
 
 	if (NULL == c)
 	{
-		*error = zbx_dsprintf(*error, "Control \"%s\" at address \"%s:%d\" does not exist.", sensor, h->ip, h->port);
+		char	ip_port[MAX_STRING_LEN];
+
+		*error = zbx_dsprintf(*error, "Control \"%s\" at address \"%s\" does not exist.", sensor,
+				zbx_join_hostport(ip_port, sizeof(ip_port), h->ip, h->port));
 		zabbix_log(LOG_LEVEL_DEBUG, "%s", *error);
 		return NOTSUPPORTED;
 	}

@@ -23,45 +23,24 @@ class CControllerTriggerEdit extends CController {
 	private $trigger;
 
 	protected function init(): void {
+		$this->setInputValidationMethod(self::INPUT_VALIDATION_FORM);
 		$this->disableCsrfValidation();
 	}
 
 	protected function checkInput(): bool {
-		$fields = [
-			'context' =>				'required|in '.implode(',', ['host', 'template']),
-			'correlation_mode' =>		'db triggers.correlation_mode|in '.implode(',', [ZBX_TRIGGER_CORRELATION_NONE, ZBX_TRIGGER_CORRELATION_TAG]),
-			'correlation_tag' =>		'db triggers.correlation_tag',
-			'dependencies' =>			'array',
-			'description' =>			'db triggers.comments',
-			'event_name' =>				'db triggers.event_name',
-			'expression' =>				'string',
-			'hostid' =>					'db hosts.hostid',
-			'manual_close' =>			'db triggers.manual_close|in '.implode(',',[ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED, ZBX_TRIGGER_MANUAL_CLOSE_ALLOWED]),
-			'name' =>					'string',
-			'opdata' =>					'db triggers.opdata',
-			'priority' =>				'db triggers.priority|in 0,1,2,3,4,5',
-			'recovery_expression' =>	'string',
-			'recovery_mode' =>			'db triggers.recovery_mode|in '.implode(',', [ZBX_RECOVERY_MODE_EXPRESSION, ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION, ZBX_RECOVERY_MODE_NONE]),
-			'status' =>					'db triggers.status|in '.implode(',', [TRIGGER_STATUS_ENABLED, TRIGGER_STATUS_DISABLED]),
-			'show_inherited_tags' =>	'in 0,1',
-			'form_refresh' =>			'in 0,1',
-			'tags' =>					'array',
-			'triggerid' =>				'db triggers.triggerid',
-			'type' =>					'db triggers.type|in 0,1',
-			'url' =>					'db triggers.url',
-			'url_name' =>				'db triggers.url_name'
-		];
+		$allow_any = [];
+		foreach (array_keys(CControllerTriggerUpdate::getValidationRules()['fields']) as $name) {
+			$allow_any[$name] = [];
+		}
 
-		$ret = $this->validateInput($fields);
+		$ret = $this->validateInput(['object', 'fields' => [
+			'context' => ['string', 'required', 'in' => ['host', 'template']],
+			'show_inherited_tags' => ['integer', 'in' => [0, 1]],
+			'form_refresh' => ['integer', 'in' => [0, 1]]
+		] + $allow_any]);
 
 		if (!$ret) {
-			$this->setResponse(
-				(new CControllerResponseData(['main_block' => json_encode([
-					'error' => [
-						'messages' => array_column(get_and_clear_messages(), 'message')
-					]
-				])]))->disableView()
-			);
+			$this->setResponse(new CControllerResponseFatal());
 		}
 
 		return $ret;
@@ -96,7 +75,7 @@ class CControllerTriggerEdit extends CController {
 				'triggerids' => $this->getInput('triggerid'),
 				'selectHosts' => ['hostid'],
 				'selectDiscoveryRule' => ['itemid', 'name', 'templateid'],
-				'selectTriggerDiscovery' => ['parent_triggerid', 'disable_source'],
+				'selectDiscoveryData' => ['parent_triggerid', 'disable_source'],
 				'selectDependencies' => ['triggerid'],
 				'selectTags' => ['tag', 'value'],
 				'editable' => true
@@ -177,7 +156,24 @@ class CControllerTriggerEdit extends CController {
 		}
 
 		if ($this->trigger) {
-			$trigger = CTriggerGeneralHelper::getAdditionalTriggerData($this->trigger, $data);
+			$parent_lld = [];
+
+			if ($this->trigger['flags'] & ZBX_FLAG_DISCOVERY_CREATED) {
+				$db_parent = API::TriggerPrototype()->get([
+					'triggerids' => $this->trigger['discoveryData']['parent_triggerid'],
+					'selectDiscoveryRule' => ['itemid', 'templateid', 'flags'],
+					'selectDiscoveryRulePrototype' => ['itemid', 'templateid', 'flags'],
+					'nopermissions' => true
+				]);
+				$db_parent = reset($db_parent);
+
+				$parent_lld = $db_parent['discoveryRule'] ?: $db_parent['discoveryRulePrototype'];
+				$this->trigger['discoveryData']['lldruleid'] = $parent_lld['itemid'];
+			}
+
+			$trigger = $parent_lld
+				? CTriggerGeneralHelper::getAdditionalTriggerData($this->trigger + ['parent_lld' => $parent_lld], $data)
+				: CTriggerGeneralHelper::getAdditionalTriggerData($this->trigger, $data);
 
 			if ($data['form_refresh']) {
 				if ($data['show_inherited_tags']) {
@@ -190,7 +186,7 @@ class CControllerTriggerEdit extends CController {
 					'flags' => $trigger['flags'],
 					'templates' => $trigger['templates'],
 					'discoveryRule' => $trigger['discoveryRule'],
-					'triggerDiscovery' => $trigger['triggerDiscovery']
+					'discoveryData' => $trigger['discoveryData']
 				]);
 			}
 			else {
@@ -212,6 +208,9 @@ class CControllerTriggerEdit extends CController {
 		$data['recovery_expr_temp'] = $data['recovery_expression'];
 		$data['user'] = ['debug_mode' => $this->getDebugMode()];
 		$data['db_trigger'] = $this->trigger ? CTriggerGeneralHelper::convertApiInputForForm($this->trigger) : [];
+		$data['js_validation_rules'] = $this->hasInput('triggerid')
+			? (new CFormValidator(CControllerTriggerUpdate::getValidationRules()))->getRules()
+			: (new CFormValidator(CControllerTriggerCreate::getValidationRules()))->getRules();
 
 		$response = new CControllerResponseData($data);
 		$this->setResponse($response);

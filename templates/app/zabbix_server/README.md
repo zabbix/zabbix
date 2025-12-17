@@ -7,16 +7,16 @@ This template is designed to monitor internal Zabbix metrics on the local Zabbix
 
 ## Requirements
 
-Zabbix version: 7.4 and higher.
+Zabbix version: 8.0 and higher.
 
 ## Tested versions
 
 This template has been tested on:
-- Zabbix server 7.4
+- Zabbix server 8.0
 
 ## Configuration
 
-> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/7.4/manual/config/templates_out_of_the_box) section.
+> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/8.0/manual/config/templates_out_of_the_box) section.
 
 ## Setup
 
@@ -26,13 +26,13 @@ Link this template to the local Zabbix server host.
 
 |Name|Description|Default|
 |----|-----------|-------|
-|{$ZABBIX.PROXY.LAST_SEEN.MAX}|<p>The maximum number of seconds that Zabbix proxy has not been seen.</p>|`600`|
+|{$ZABBIX.SERVER.UTIL.MIN}|<p>Default minimum threshold for percentage utilization triggers (use macro context for specification).</p>|`65`|
+|{$ZABBIX.SERVER.UTIL.MAX}|<p>Default maximum threshold for percentage utilization triggers (use macro context for specification).</p>|`75`|
+|{$ZABBIX.SERVER.UTIL.MAX:"value cache"}|<p>Default minimum threshold for the value cache utilization trigger.</p>|`95`|
 |{$PROXY.GROUP.AVAIL.PERCENT.MIN}|<p>Minimum threshold for the proxy group availability percentage triggers.</p>|`75`|
+|{$ZABBIX.PROXY.LAST_SEEN.MAX}|<p>The maximum number of seconds that Zabbix proxy has not been seen.</p>|`600`|
 |{$PROXY.GROUP.DISCOVERY.NAME.MATCHES}|<p>Filter to include discovered proxy groups by their name.</p>|`.*`|
 |{$PROXY.GROUP.DISCOVERY.NAME.NOT_MATCHES}|<p>Filter to exclude discovered proxy groups by their name.</p>|`CHANGE_IF_NEEDED`|
-|{$ZABBIX.SERVER.UTIL.MAX}|<p>Default maximum threshold for percentage utilization triggers (use macro context for specification).</p>|`75`|
-|{$ZABBIX.SERVER.UTIL.MIN}|<p>Default minimum threshold for percentage utilization triggers (use macro context for specification).</p>|`65`|
-|{$ZABBIX.SERVER.UTIL.MAX:"value cache"}|<p>Maximum threshold for the value cache utilization trigger.</p>|`95`|
 
 ### Items
 
@@ -43,6 +43,7 @@ Link this template to the local Zabbix server host.
 |Zabbix proxy groups stats|<p>The master item of Zabbix proxy groups' statistics.</p>|Zabbix internal|zabbix[proxy group,discovery]|
 |Queue over 10 minutes|<p>The number of monitored items in the queue that are delayed by at least 10 minutes.</p>|Zabbix internal|zabbix[queue,10m]|
 |Queue|<p>The number of monitored items in the queue that are delayed by at least 6 seconds.</p>|Zabbix internal|zabbix[queue]|
+|Zabbix preprocessing|<p>The master item of Zabbix server's preprocessing statistics.</p>|Zabbix internal|zabbix[preprocessing]|
 |Utilization of alert manager internal processes, in %|<p>The average percentage of the time during which the alert manager processes have been busy for the last minute.</p>|Zabbix internal|zabbix[process,alert manager,avg,busy]|
 |Utilization of alert syncer internal processes, in %|<p>The average percentage of the time during which the alert syncer processes have been busy for the last minute.</p>|Zabbix internal|zabbix[process,alert syncer,avg,busy]|
 |Utilization of alerter internal processes, in %|<p>The average percentage of the time during which the alerter processes have been busy for the last minute.</p>|Zabbix internal|zabbix[process,alerter,avg,busy]|
@@ -108,7 +109,11 @@ Link this template to the local Zabbix server host.
 |Number of processed text values per second|<p>The statistics and availability of Zabbix write cache.</p><p>The number of processed text values.</p>|Zabbix internal|zabbix[wcache,values,text]<p>**Preprocessing**</p><ul><li>Change per second</li></ul>|
 |Number of values synchronized with the database per second|<p>Average quantity of values written to the database, recalculated once per minute.</p>|Zabbix internal|zabbix[vps,written]<p>**Preprocessing**</p><ul><li>Change per second</li></ul>|
 |LLD queue|<p>The number of values enqueued in the low-level discovery processing queue.</p>|Zabbix internal|zabbix[lld_queue]|
-|Preprocessing queue|<p>The number of values enqueued in the preprocessing queue.</p>|Zabbix internal|zabbix[preprocessing_queue]|
+|Preprocessing queue|<p>The number of values enqueued in the preprocessing queue.</p>|Dependent item|zabbix[preprocessing_queue]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.data.queue`</p></li></ul>|
+|Preprocessing queued throughput|<p>Reflects the queued throughput of the preprocessing.</p>|Dependent item|zabbix[preprocessing_throughput_queued]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.data.queued.size`</p></li><li>Change per second</li></ul>|
+|Preprocessing direct throughput|<p>Reflects the direct throughput of the preprocessing.</p>|Dependent item|zabbix[preprocessing_throughput_direct]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.data.direct.size`</p></li><li>Change per second</li></ul>|
+|Preprocessing queued VPS|<p>Reflects the count of queued preprocessing values per second.</p>|Dependent item|zabbix[preprocessing_vps_queued]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.data.queued.count`</p></li><li>Change per second</li></ul>|
+|Preprocessing direct VPS|<p>Reflects the count of direct preprocessing values per second.</p>|Dependent item|zabbix[preprocessing_vps_direct]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.data.direct.count`</p></li><li>Change per second</li></ul>|
 |Connector queue|<p>The count of values enqueued in the connector queue.</p>|Zabbix internal|zabbix[connector_queue]|
 |Discovery queue|<p>The count of values enqueued in the discovery queue.</p>|Zabbix internal|zabbix[discovery_queue]|
 
@@ -261,16 +266,16 @@ This template is designed to monitor internal Zabbix metrics on the remote Zabbi
 
 ## Requirements
 
-Zabbix version: 7.4 and higher.
+Zabbix version: 8.0 and higher.
 
 ## Tested versions
 
 This template has been tested on:
-- Zabbix server 7.4
+- Zabbix server 8.0
 
 ## Configuration
 
-> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/7.4/manual/config/templates_out_of_the_box) section.
+> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/8.0/manual/config/templates_out_of_the_box) section.
 
 ## Setup
 
@@ -280,12 +285,12 @@ Specify the address of the remote Zabbix server by changing the `{$ZABBIX.SERVER
 
 |Name|Description|Default|
 |----|-----------|-------|
-|{$ZABBIX.SERVER.ADDRESS}|<p>IP/DNS/network mask list of servers to be remotely queried (default is 127.0.0.1).</p>||
-|{$ZABBIX.SERVER.PORT}|<p>Port of server to be remotely queried (default is 10051).</p>||
+|{$ZABBIX.SERVER.ADDRESS}|<p>IP/DNS of the remote Zabbix server (default is 127.0.0.1).</p>||
+|{$ZABBIX.SERVER.PORT}|<p>Port of the remote Zabbix server (default is 10051).</p>||
 |{$ZABBIX.PROXY.LAST_SEEN.MAX}|<p>The maximum number of seconds that Zabbix proxy has not been seen.</p>|`600`|
 |{$ZABBIX.SERVER.NODATA_TIMEOUT}|<p>The time threshold after which statistics are considered unavailable. Used in trigger expressions.</p>|`5m`|
-|{$ZABBIX.SERVER.UTIL.MAX}|<p>Default maximum threshold for percentage utilization triggers (use macro context for specification).</p>|`75`|
 |{$ZABBIX.SERVER.UTIL.MIN}|<p>Default minimum threshold for percentage utilization triggers (use macro context for specification).</p>|`65`|
+|{$ZABBIX.SERVER.UTIL.MAX}|<p>Default maximum threshold for percentage utilization triggers (use macro context for specification).</p>|`75`|
 |{$ZABBIX.SERVER.UTIL.MAX:"value cache"}|<p>Maximum threshold for value cache utilization triggers.</p>|`95`|
 
 ### Items
@@ -304,7 +309,7 @@ Specify the address of the remote Zabbix server by changing the `{$ZABBIX.SERVER
 |Utilization of configuration syncer worker internal processes, in %|<p>The average percentage of the time during which the configuration syncer worker processes have been busy for the last minute.</p>|Dependent item|process.configuration_syncer_worker.avg.busy<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.data.process['configuration syncer worker'].busy.avg`</p></li></ul>|
 |Utilization of escalator internal processes, in %|<p>The average percentage of the time during which the escalator processes have been busy for the last minute.</p>|Dependent item|process.escalator.avg.busy<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.data.process['escalator'].busy.avg`</p><p>⛔️Custom on fail: Set error to: `No "escalator" processes started.`</p></li></ul>|
 |Utilization of history poller internal processes, in %|<p>The average percentage of the time during which the history poller processes have been busy for the last minute.</p>|Dependent item|process.history_poller.avg.busy<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.data.process['history poller'].busy.avg`</p><p>⛔️Custom on fail: Set error to: `No "history poller" processes started.`</p></li></ul>|
-|Utilization of ODBC poller data collector processes, in %|<p>The average percentage of the time during which the ODBC poller processes have been busy for the last minute.</p>|Dependent item|process.odbc_poller.avg.busy<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.data.process['odbc poller'].busy.avg`</p></li></ul>|
+|Utilization of ODBC poller data collector processes, in %|<p>The average percentage of the time during which the ODBC poller processes have been busy for the last minute.</p>|Dependent item|process.odbc_poller.avg.busy<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.data.process['odbc poller'].busy.avg`</p><p>⛔️Custom on fail: Set error to: `Processes odbc poller not started`</p></li></ul>|
 |Utilization of history syncer internal processes, in %|<p>The average percentage of the time during which the history syncer processes have been busy for the last minute.</p>|Dependent item|process.history_syncer.avg.busy<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.data.process['history syncer'].busy.avg`</p><p>⛔️Custom on fail: Set error to: `No "history syncer" processes started.`</p></li></ul>|
 |Utilization of housekeeper internal processes, in %|<p>The average percentage of the time during which the housekeeper processes have been busy for the last minute.</p>|Dependent item|process.housekeeper.avg.busy<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.data.process['housekeeper'].busy.avg`</p><p>⛔️Custom on fail: Set error to: `No "housekeeper" processes started.`</p></li></ul>|
 |Utilization of http poller data collector processes, in %|<p>The average percentage of the time during which the http poller processes have been busy for the last minute.</p>|Dependent item|process.http_poller.avg.busy<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.data.process['http poller'].busy.avg`</p><p>⛔️Custom on fail: Set error to: `No "http poller" processes started.`</p></li></ul>|
@@ -361,7 +366,11 @@ Specify the address of the remote Zabbix server by changing the `{$ZABBIX.SERVER
 |Number of processed text values per second|<p>The statistics and availability of Zabbix write cache.</p><p>The number of processed text values.</p>|Dependent item|wcache.values.text<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.data.wcache.values.text`</p></li><li>Change per second</li></ul>|
 |Number of values synchronized with the database per second|<p>Average quantity of values written to the database, recalculated once per minute.</p>|Dependent item|vps.written<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.data.vps.written_total`</p></li><li>Change per second</li></ul>|
 |LLD queue|<p>The number of values enqueued in the low-level discovery processing queue.</p>|Dependent item|lld_queue<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.data.lld_queue`</p></li></ul>|
-|Preprocessing queue|<p>The number of values enqueued in the preprocessing queue.</p>|Dependent item|preprocessing_queue<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.data.preprocessing_queue`</p></li></ul>|
+|Preprocessing queue|<p>The number of values enqueued in the preprocessing queue.</p>|Dependent item|preprocessing_queue<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.data.preprocessing.queue`</p></li></ul>|
+|Preprocessing queued throughput|<p>Reflects the queued throughput of the preprocessing.</p>|Dependent item|preprocessing_throughput_queued<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.data.preprocessing.queued.size`</p><p>⛔️Custom on fail: Discard value</p></li><li>Change per second</li></ul>|
+|Preprocessing direct throughput|<p>Reflects the direct throughput of the preprocessing.</p>|Dependent item|preprocessing_throughput_direct<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.data.preprocessing.direct.size`</p><p>⛔️Custom on fail: Discard value</p></li><li>Change per second</li></ul>|
+|Preprocessing queued VPS|<p>Reflects the count of queued preprocessing values per second.</p>|Dependent item|preprocessing_vps_queued<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.data.preprocessing.queued.count`</p><p>⛔️Custom on fail: Discard value</p></li><li>Change per second</li></ul>|
+|Preprocessing direct VPS|<p>Reflects the count of direct preprocessing values per second.</p>|Dependent item|preprocessing_vps_direct<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.data.preprocessing.direct.count`</p><p>⛔️Custom on fail: Discard value</p></li><li>Change per second</li></ul>|
 |Connector queue|<p>The count of values enqueued in the connector queue.</p>|Dependent item|connector_queue<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.data.connector_queue`</p><p>⛔️Custom on fail: Set error to: `No "connector" processes started. Please check "StartConnectors" parameter in the server configuration file.`</p></li></ul>|
 |Discovery queue|<p>The count of values enqueued in the discovery queue.</p>|Dependent item|discovery_queue<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.data.discovery_queue`</p><p>⛔️Custom on fail: Set error to: `No "discoverer" processes started. Please check "StartDiscoverers" parameter in the server configuration file.`</p></li></ul>|
 
@@ -486,16 +495,16 @@ This template is designed to monitor Zabbix server metrics via the passive Zabbi
 
 ## Requirements
 
-Zabbix version: 7.4 and higher.
+Zabbix version: 8.0 and higher.
 
 ## Tested versions
 
 This template has been tested on:
-- Zabbix server 7.4
+- Zabbix server 8.0
 
 ## Configuration
 
-> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/7.4/manual/config/templates_out_of_the_box) section.
+> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/8.0/manual/config/templates_out_of_the_box) section.
 
 ## Setup
 
@@ -505,12 +514,12 @@ Specify the address of the remote Zabbix server by changing the `{$ZABBIX.SERVER
 
 |Name|Description|Default|
 |----|-----------|-------|
-|{$ZABBIX.SERVER.ADDRESS}|<p>IP/DNS/network mask list of servers to be remotely queried (default is 127.0.0.1).</p>||
-|{$ZABBIX.SERVER.PORT}|<p>Port of server to be remotely queried (default is 10051).</p>||
+|{$ZABBIX.SERVER.ADDRESS}|<p>IP/DNS of the remote Zabbix server (default is 127.0.0.1).</p>||
+|{$ZABBIX.SERVER.PORT}|<p>Port of the remote Zabbix server (default is 10051).</p>||
 |{$ZABBIX.PROXY.LAST_SEEN.MAX}|<p>The maximum number of seconds that Zabbix proxy has not been seen.</p>|`600`|
 |{$ZABBIX.SERVER.NODATA_TIMEOUT}|<p>The time threshold after which statistics are considered unavailable. Used in trigger expressions.</p>|`5m`|
-|{$ZABBIX.SERVER.UTIL.MAX}|<p>Default maximum threshold for percentage utilization triggers (use macro context for specification).</p>|`75`|
 |{$ZABBIX.SERVER.UTIL.MIN}|<p>Default minimum threshold for percentage utilization triggers (use macro context for specification).</p>|`65`|
+|{$ZABBIX.SERVER.UTIL.MAX}|<p>Default maximum threshold for percentage utilization triggers (use macro context for specification).</p>|`75`|
 |{$ZABBIX.SERVER.UTIL.MAX:"value cache"}|<p>Maximum threshold for value cache utilization triggers.</p>|`95`|
 
 ### Items
@@ -529,7 +538,7 @@ Specify the address of the remote Zabbix server by changing the `{$ZABBIX.SERVER
 |Utilization of configuration syncer worker internal processes, in %|<p>The average percentage of the time during which the configuration syncer worker processes have been busy for the last minute.</p>|Dependent item|process.configuration_syncer_worker.avg.busy<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.data.process['configuration syncer worker'].busy.avg`</p></li></ul>|
 |Utilization of escalator internal processes, in %|<p>The average percentage of the time during which the escalator processes have been busy for the last minute.</p>|Dependent item|process.escalator.avg.busy<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.data.process['escalator'].busy.avg`</p><p>⛔️Custom on fail: Set error to: `No "escalator" processes started.`</p></li></ul>|
 |Utilization of history poller internal processes, in %|<p>The average percentage of the time during which the history poller processes have been busy for the last minute.</p>|Dependent item|process.history_poller.avg.busy<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.data.process['history poller'].busy.avg`</p><p>⛔️Custom on fail: Set error to: `No "history poller" processes started.`</p></li></ul>|
-|Utilization of ODBC poller data collector processes, in %|<p>The average percentage of the time during which the ODBC poller processes have been busy for the last minute.</p>|Dependent item|process.odbc_poller.avg.busy<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.data.process['odbc poller'].busy.avg`</p></li></ul>|
+|Utilization of ODBC poller data collector processes, in %|<p>The average percentage of the time during which the ODBC poller processes have been busy for the last minute.</p>|Dependent item|process.odbc_poller.avg.busy<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.data.process['odbc poller'].busy.avg`</p><p>⛔️Custom on fail: Set error to: `Processes odbc poller not started`</p></li></ul>|
 |Utilization of history syncer internal processes, in %|<p>The average percentage of the time during which the history syncer processes have been busy for the last minute.</p>|Dependent item|process.history_syncer.avg.busy<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.data.process['history syncer'].busy.avg`</p><p>⛔️Custom on fail: Set error to: `No "history syncer" processes started.`</p></li></ul>|
 |Utilization of housekeeper internal processes, in %|<p>The average percentage of the time during which the housekeeper processes have been busy for the last minute.</p>|Dependent item|process.housekeeper.avg.busy<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.data.process['housekeeper'].busy.avg`</p><p>⛔️Custom on fail: Set error to: `No "housekeeper" processes started.`</p></li></ul>|
 |Utilization of http poller data collector processes, in %|<p>The average percentage of the time during which the http poller processes have been busy for the last minute.</p>|Dependent item|process.http_poller.avg.busy<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.data.process['http poller'].busy.avg`</p><p>⛔️Custom on fail: Set error to: `No "http poller" processes started.`</p></li></ul>|
@@ -586,7 +595,11 @@ Specify the address of the remote Zabbix server by changing the `{$ZABBIX.SERVER
 |Number of processed text values per second|<p>The statistics and availability of Zabbix write cache.</p><p>The number of processed text values.</p>|Dependent item|wcache.values.text<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.data.wcache.values.text`</p></li><li>Change per second</li></ul>|
 |Number of values synchronized with the database per second|<p>Average quantity of values written to the database, recalculated once per minute.</p>|Dependent item|vps.written<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.data.vps.written_total`</p></li><li>Change per second</li></ul>|
 |LLD queue|<p>The number of values enqueued in the low-level discovery processing queue.</p>|Dependent item|lld_queue<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.data.lld_queue`</p></li></ul>|
-|Preprocessing queue|<p>The number of values enqueued in the preprocessing queue.</p>|Dependent item|preprocessing_queue<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.data.preprocessing_queue`</p></li></ul>|
+|Preprocessing queue|<p>The number of values enqueued in the preprocessing queue.</p>|Dependent item|preprocessing_queue<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.data.preprocessing.queue`</p></li></ul>|
+|Preprocessing queued throughput|<p>Reflects the queued throughput of the preprocessing.</p>|Dependent item|preprocessing_throughput_queued<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.data.preprocessing.queued.size`</p><p>⛔️Custom on fail: Discard value</p></li><li>Change per second</li></ul>|
+|Preprocessing direct throughput|<p>Reflects the direct throughput of the preprocessing.</p>|Dependent item|preprocessing_throughput_direct<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.data.preprocessing.direct.size`</p><p>⛔️Custom on fail: Discard value</p></li><li>Change per second</li></ul>|
+|Preprocessing queued VPS|<p>Reflects the count of queued preprocessing values per second.</p>|Dependent item|preprocessing_vps_queued<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.data.preprocessing.queued.count`</p><p>⛔️Custom on fail: Discard value</p></li><li>Change per second</li></ul>|
+|Preprocessing direct VPS|<p>Reflects the count of direct preprocessing values per second.</p>|Dependent item|preprocessing_vps_direct<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.data.preprocessing.direct.count`</p><p>⛔️Custom on fail: Discard value</p></li><li>Change per second</li></ul>|
 |Connector queue|<p>The count of values enqueued in the connector queue.</p>|Dependent item|connector_queue<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.data.connector_queue`</p><p>⛔️Custom on fail: Set error to: `No "connector" processes started. Please check "StartConnectors" parameter in the server configuration file.`</p></li></ul>|
 |Discovery queue|<p>The count of values enqueued in the discovery queue.</p>|Dependent item|discovery_queue<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.data.discovery_queue`</p><p>⛔️Custom on fail: Set error to: `No "discoverer" processes started. Please check "StartDiscoverers" parameter in the server configuration file.`</p></li></ul>|
 
@@ -711,16 +724,16 @@ This template is designed to monitor Zabbix server metrics via the active Zabbix
 
 ## Requirements
 
-Zabbix version: 7.4 and higher.
+Zabbix version: 8.0 and higher.
 
 ## Tested versions
 
 This template has been tested on:
-- Zabbix server 7.4
+- Zabbix server 8.0
 
 ## Configuration
 
-> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/7.4/manual/config/templates_out_of_the_box) section.
+> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/8.0/manual/config/templates_out_of_the_box) section.
 
 ## Setup
 
@@ -730,12 +743,12 @@ Specify the address of the remote Zabbix server by changing the `{$ZABBIX.SERVER
 
 |Name|Description|Default|
 |----|-----------|-------|
-|{$ZABBIX.SERVER.ADDRESS}|<p>IP/DNS/network mask list of servers to be remotely queried (default is 127.0.0.1).</p>||
-|{$ZABBIX.SERVER.PORT}|<p>Port of server to be remotely queried (default is 10051).</p>||
+|{$ZABBIX.SERVER.ADDRESS}|<p>IP/DNS of the remote Zabbix server (default is 127.0.0.1).</p>||
+|{$ZABBIX.SERVER.PORT}|<p>Port of the remote Zabbix server (default is 10051).</p>||
 |{$ZABBIX.PROXY.LAST_SEEN.MAX}|<p>The maximum number of seconds that Zabbix proxy has not been seen.</p>|`600`|
 |{$ZABBIX.SERVER.NODATA_TIMEOUT}|<p>The time threshold after which statistics are considered unavailable. Used in trigger expression.</p>|`5m`|
-|{$ZABBIX.SERVER.UTIL.MAX}|<p>Default maximum threshold for percentage utilization triggers (use macro context for specification).</p>|`75`|
 |{$ZABBIX.SERVER.UTIL.MIN}|<p>Default minimum threshold for percentage utilization triggers (use macro context for specification).</p>|`65`|
+|{$ZABBIX.SERVER.UTIL.MAX}|<p>Default maximum threshold for percentage utilization triggers (use macro context for specification).</p>|`75`|
 |{$ZABBIX.SERVER.UTIL.MAX:"value cache"}|<p>Maximum threshold for value cache utilization triggers.</p>|`95`|
 
 ### Items
@@ -754,7 +767,7 @@ Specify the address of the remote Zabbix server by changing the `{$ZABBIX.SERVER
 |Utilization of configuration syncer worker internal processes, in %|<p>The average percentage of the time during which the configuration syncer worker processes have been busy for the last minute.</p>|Dependent item|process.configuration_syncer_worker.avg.busy<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.data.process['configuration syncer worker'].busy.avg`</p></li></ul>|
 |Utilization of escalator internal processes, in %|<p>The average percentage of the time during which the escalator processes have been busy for the last minute.</p>|Dependent item|process.escalator.avg.busy<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.data.process['escalator'].busy.avg`</p><p>⛔️Custom on fail: Set error to: `No "escalator" processes started.`</p></li></ul>|
 |Utilization of history poller internal processes, in %|<p>The average percentage of the time during which the history poller processes have been busy for the last minute.</p>|Dependent item|process.history_poller.avg.busy<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.data.process['history poller'].busy.avg`</p><p>⛔️Custom on fail: Set error to: `No "history poller" processes started.`</p></li></ul>|
-|Utilization of ODBC poller data collector processes, in %|<p>The average percentage of the time during which the ODBC poller processes have been busy for the last minute.</p>|Dependent item|process.odbc_poller.avg.busy<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.data.process['odbc poller'].busy.avg`</p></li></ul>|
+|Utilization of ODBC poller data collector processes, in %|<p>The average percentage of the time during which the ODBC poller processes have been busy for the last minute.</p>|Dependent item|process.odbc_poller.avg.busy<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.data.process['odbc poller'].busy.avg`</p><p>⛔️Custom on fail: Set error to: `Processes odbc poller not started`</p></li></ul>|
 |Utilization of history syncer internal processes, in %|<p>The average percentage of the time during which the history syncer processes have been busy for the last minute.</p>|Dependent item|process.history_syncer.avg.busy<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.data.process['history syncer'].busy.avg`</p><p>⛔️Custom on fail: Set error to: `No "history syncer" processes started.`</p></li></ul>|
 |Utilization of housekeeper internal processes, in %|<p>The average percentage of the time during which the housekeeper processes have been busy for the last minute.</p>|Dependent item|process.housekeeper.avg.busy<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.data.process['housekeeper'].busy.avg`</p><p>⛔️Custom on fail: Set error to: `No "housekeeper" processes started.`</p></li></ul>|
 |Utilization of http poller data collector processes, in %|<p>The average percentage of the time during which the http poller processes have been busy for the last minute.</p>|Dependent item|process.http_poller.avg.busy<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.data.process['http poller'].busy.avg`</p><p>⛔️Custom on fail: Set error to: `No "http poller" processes started.`</p></li></ul>|
@@ -811,7 +824,11 @@ Specify the address of the remote Zabbix server by changing the `{$ZABBIX.SERVER
 |Number of processed text values per second|<p>The statistics and availability of Zabbix write cache.</p><p>The number of processed text values.</p>|Dependent item|wcache.values.text<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.data.wcache.values.text`</p></li><li>Change per second</li></ul>|
 |Number of values synchronized with the database per second|<p>Average quantity of values written to the database, recalculated once per minute.</p>|Dependent item|vps.written<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.data.vps.written_total`</p></li><li>Change per second</li></ul>|
 |LLD queue|<p>The number of values enqueued in the low-level discovery processing queue.</p>|Dependent item|lld_queue<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.data.lld_queue`</p></li></ul>|
-|Preprocessing queue|<p>The number of values enqueued in the preprocessing queue.</p>|Dependent item|preprocessing_queue<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.data.preprocessing_queue`</p></li></ul>|
+|Preprocessing queue|<p>The number of values enqueued in the preprocessing queue.</p>|Dependent item|preprocessing_queue<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.data.preprocessing.queue`</p></li></ul>|
+|Preprocessing queued throughput|<p>Reflects the queued throughput of the preprocessing.</p>|Dependent item|preprocessing_throughput_queued<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.data.preprocessing.queued.size`</p><p>⛔️Custom on fail: Discard value</p></li><li>Change per second</li></ul>|
+|Preprocessing direct throughput|<p>Reflects the direct throughput of the preprocessing.</p>|Dependent item|preprocessing_throughput_direct<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.data.preprocessing.direct.size`</p><p>⛔️Custom on fail: Discard value</p></li><li>Change per second</li></ul>|
+|Preprocessing queued VPS|<p>Reflects the count of queued preprocessing values per second.</p>|Dependent item|preprocessing_vps_queued<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.data.preprocessing.queued.count`</p><p>⛔️Custom on fail: Discard value</p></li><li>Change per second</li></ul>|
+|Preprocessing direct VPS|<p>Reflects the count of direct preprocessing values per second.</p>|Dependent item|preprocessing_vps_direct<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.data.preprocessing.direct.count`</p><p>⛔️Custom on fail: Discard value</p></li><li>Change per second</li></ul>|
 |Connector queue|<p>The count of values enqueued in the connector queue.</p>|Dependent item|connector_queue<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.data.connector_queue`</p><p>⛔️Custom on fail: Set error to: `No "connector" processes started. Please check "StartConnectors" parameter in the server configuration file.`</p></li></ul>|
 |Discovery queue|<p>The count of values enqueued in the discovery queue.</p>|Dependent item|discovery_queue<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.data.discovery_queue`</p><p>⛔️Custom on fail: Set error to: `No "discoverer" processes started. Please check "StartDiscoverers" parameter in the server configuration file.`</p></li></ul>|
 

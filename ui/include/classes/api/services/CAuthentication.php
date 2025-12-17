@@ -82,6 +82,22 @@ class CAuthentication extends CApiService {
 
 		CApiSettingsHelper::updateParameters($auth, $db_auth);
 
+		if ($auth['saml_auth_enabled'] != $db_auth['saml_auth_enabled']
+				&& $auth['saml_auth_enabled'] == ZBX_AUTH_SAML_DISABLED) {
+			$db_userdirectories = API::UserDirectory()->get([
+				'output' => [],
+				'filter' => ['idp_type' => IDP_TYPE_SAML],
+				'preservekeys' => true
+			]);
+
+			if ($db_userdirectories) {
+				DB::update('userdirectory_saml', [
+					'values' => ['idp_certificate' => '', 'sp_certificate' => '', 'sp_private_key' => ''],
+					'where' => ['userdirectoryid' => array_keys($db_userdirectories)]
+				]);
+			}
+		}
+
 		self::addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_AUTHENTICATION, [$auth], [$db_auth]);
 
 		return array_keys($auth);
@@ -93,7 +109,7 @@ class CAuthentication extends CApiService {
 	 *
 	 * @throws APIException
 	 */
-	protected function validateUpdate(array $auth, ?array &$db_auth): void {
+	protected function validateUpdate(array &$auth, ?array &$db_auth): void {
 		global $ALLOW_HTTP_AUTH;
 
 		$auth += CApiSettingsHelper::getParameters(['authentication_type']);
@@ -137,10 +153,22 @@ class CAuthentication extends CApiService {
 			'disabled_usrgrpid', 'saml_auth_enabled', 'saml_jit_status', 'ldap_jit_status', 'mfa_status', 'mfaid'
 		]));
 
+		self::checkSamlRequirements($auth, $db_auth);
 		self::checkUserDirectoryid($auth, $db_auth);
 		self::checkDeprovisionedUsersGroup($auth);
 		self::checkMfaExists($auth);
 		self::checkMfaid($auth, $db_auth);
+	}
+
+	private static function checkSamlRequirements($auth, $db_auth): void {
+		if ($auth['saml_auth_enabled'] == ZBX_AUTH_SAML_ENABLED
+				&& $auth['saml_auth_enabled'] != $db_auth['saml_auth_enabled']) {
+			$openssl_status = (new CFrontendSetup())->checkPhpOpenSsl();
+
+			if ($openssl_status['result'] != CFrontendSetup::CHECK_OK) {
+				self::exception(ZBX_API_ERROR_INTERNAL, $openssl_status['error']);
+			}
+		}
 	}
 
 	private static function checkUserDirectoryid(array $auth, array $db_auth): void {

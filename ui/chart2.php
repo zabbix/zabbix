@@ -55,7 +55,7 @@ $dbGraph = API::Graph()->get([
 	'selectItems' => ['itemid', 'type', 'master_itemid', $resolve_macros ? 'name_resolved' : 'name', 'delay', 'units',
 		'hostid', 'history', 'trends', 'value_type', 'key_'
 	],
-	'graphids' => $_REQUEST['graphid']
+	'graphids' => getRequest('graphid')
 ]);
 
 if (!$dbGraph) {
@@ -67,6 +67,23 @@ $dbGraph = reset($dbGraph);
 if ($resolve_macros) {
 	$dbGraph['items'] = CArrayHelper::renameObjectsKeys($dbGraph['items'], ['name_resolved' => 'name']);
 }
+
+$hosts = array_column($dbGraph['hosts'], null, 'hostid');
+$items = array_column($dbGraph['items'], null, 'itemid');
+
+$db_items = API::Item()->get([
+	'output' => [],
+	'selectPreprocessing' => ['type', 'params'],
+	'itemids' => array_keys($items),
+	'webitems' => true,
+	'nopermissions' => true,
+	'preservekeys' => true
+]);
+
+foreach ($items as &$item) {
+	$item['preprocessing'] = $db_items[$item['itemid']]['preprocessing'];
+}
+unset($item);
 
 /*
  * Display
@@ -90,9 +107,6 @@ CArrayHelper::sort($dbGraph['gitems'], [
 	['field' => 'sortorder', 'order' => ZBX_SORT_UP],
 	['field' => 'itemid', 'order' => ZBX_SORT_DOWN]
 ]);
-
-$hosts = zbx_toHash($dbGraph['hosts'], 'hostid');
-$items = zbx_toHash($dbGraph['items'], 'itemid');
 
 foreach ($dbGraph['gitems'] as $graph_item) {
 	$item = $items[$graph_item['itemid']];

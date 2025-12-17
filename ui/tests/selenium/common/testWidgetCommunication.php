@@ -88,9 +88,15 @@ class testWidgetCommunication extends testWidgets {
 
 			case 'problemhosts':
 			case 'problemsbysv':
-			case 'web':
 			case 'tophosts':
 				$element = $widget->query('xpath:.//a[text()='.CXPathHelper::escapeQuotes($identifier).']/../..');
+				break;
+
+			// Clicking on a row in the web monitoring widget triggers the web scenario link.
+			// To avoid this, we need to click on the adjacent column instead.
+			case 'web':
+				$element = $widget->query('xpath:.//a[text()='.
+						CXPathHelper::escapeQuotes($identifier).']/../following-sibling::td[1]');
 				break;
 
 			case 'navtree':

@@ -20,11 +20,6 @@ require_once dirname(__FILE__).'/include/forms.inc.php';
 
 $page['title'] = _('Configuration of network maps');
 $page['file'] = 'sysmap.php';
-$page['scripts'] = ['class.linkform.js', 'class.massshapeform.js', 'class.shapeform.js',
-	'class.massform.js', 'class.selementform.js', 'class.selement.js', 'class.shape.js', 'class.link.js',
-	'class.imagecache.js', 'class.svgcanvas.js', 'class.svgtextarea.js', 'class.svgelement.js', 'class.svgmap.js',
-	'class.svgmapelement.js', 'class.svgmaplink.js', 'class.svgmapshape.js', 'class.cmap.js', 'sysmap.js'
-];
 $page['type'] = detect_page_type();
 
 if (!CWebUser::checkAccess(CRoleHelper::ACTIONS_EDIT_MAPS)) {
@@ -374,6 +369,9 @@ $selements_resolved = CMacrosResolverHelper::resolveMacrosInMapElements($data['s
 // Set extended and restore original labels.
 foreach ($data['sysmap']['selements'] as $selementid => &$selement) {
 	$selement['expanded'] = $selements_resolved[$selementid]['label'];
+
+	CArrayHelper::sort($selement['urls'], ['name']);
+	$selement['urls'] = array_values($selement['urls']);
 }
 unset($selement);
 

@@ -20,58 +20,6 @@
 abstract class CControllerHostUpdateGeneral extends CController {
 
 	/**
-	 * Common host field validation rules.
-	 *
-	 * @return array
-	 */
-	protected static function getValidationFields(): array {
-		return [
-			'host'				=> 'required|db hosts.host|not_empty',
-			'visiblename'		=> 'db hosts.name',
-			'description'		=> 'db hosts.description',
-			'status'			=> 'required|db hosts.status|in '.implode(',', [HOST_STATUS_MONITORED,
-										HOST_STATUS_NOT_MONITORED
-									]),
-			'monitored_by'		=> 'db hosts.monitored_by|in '.implode(',', [ZBX_MONITORED_BY_SERVER, ZBX_MONITORED_BY_PROXY, ZBX_MONITORED_BY_PROXY_GROUP]),
-			'proxyid'		    => 'db hosts.proxyid',
-			'proxy_groupid'		=> 'db hosts.proxy_groupid',
-			'interfaces'		=> 'array',
-			'mainInterfaces'	=> 'array',
-			'groups'			=> 'required|array',
-			'tags'				=> 'array',
-			'templates'			=> 'array_db hosts.hostid',
-			'add_templates'		=> 'array_db hosts.hostid',
-			'clear_templates'	=> 'array_db hosts.hostid',
-			'ipmi_authtype'		=> 'in '.implode(',', [IPMI_AUTHTYPE_DEFAULT, IPMI_AUTHTYPE_NONE, IPMI_AUTHTYPE_MD2,
-										IPMI_AUTHTYPE_MD5, IPMI_AUTHTYPE_STRAIGHT, IPMI_AUTHTYPE_OEM,
-										IPMI_AUTHTYPE_RMCP_PLUS
-									]),
-			'ipmi_privilege'	=> 'in '.implode(',', [IPMI_PRIVILEGE_CALLBACK, IPMI_PRIVILEGE_USER,
-										IPMI_PRIVILEGE_OPERATOR, IPMI_PRIVILEGE_ADMIN, IPMI_PRIVILEGE_OEM
-									]),
-			'ipmi_username'		=> 'db hosts.ipmi_username',
-			'ipmi_password'		=> 'db hosts.ipmi_password',
-			'tls_connect'		=> 'db hosts.tls_connect|in '.implode(',', [HOST_ENCRYPTION_NONE, HOST_ENCRYPTION_PSK,
-										HOST_ENCRYPTION_CERTIFICATE
-									]),
-			'tls_accept'		=> 'db hosts.tls_accept|ge 0|le '.
-										(0 | HOST_ENCRYPTION_NONE | HOST_ENCRYPTION_PSK | HOST_ENCRYPTION_CERTIFICATE),
-			'tls_subject'		=> 'db hosts.tls_subject',
-			'tls_issuer'		=> 'db hosts.tls_issuer',
-			'tls_psk_identity'	=> 'db hosts.tls_psk_identity',
-			'tls_psk'			=> 'db hosts.tls_psk',
-			'inventory_mode'	=> 'db host_inventory.inventory_mode|in '.implode(',', [HOST_INVENTORY_DISABLED,
-										HOST_INVENTORY_MANUAL, HOST_INVENTORY_AUTOMATIC
-									]),
-			'host_inventory'	=> 'array',
-			'macros'			=> 'array',
-			'valuemaps'			=> 'array',
-			'clone'				=> 'in 1',
-			'clone_hostid'		=> 'db hosts.hostid'
-		];
-	}
-
-	/**
 	 * Prepare host interfaces.
 	 *
 	 * @param array $interfaces Submitted interfaces.
@@ -82,12 +30,12 @@ abstract class CControllerHostUpdateGeneral extends CController {
 		foreach ($interfaces as $key => $interface) {
 			if ($interface['type'] == INTERFACE_TYPE_SNMP) {
 				if (!array_key_exists('details', $interface)) {
-					$interface['details'] = [];
+					$interfaces[$key]['details'] = [];
 				}
 
-				$interfaces[$key]['details']['bulk'] = array_key_exists('bulk', $interface['details'])
-					? SNMP_BULK_ENABLED
-					: SNMP_BULK_DISABLED;
+				if (!array_key_exists('bulk', $interface['details'])) {
+					$interfaces[$key]['details']['bulk'] = SNMP_BULK_DISABLED;
+				}
 			}
 
 			if ($interface['isNew']) {
@@ -95,15 +43,6 @@ abstract class CControllerHostUpdateGeneral extends CController {
 			}
 
 			unset($interfaces[$key]['isNew']);
-			$interfaces[$key]['main'] = INTERFACE_SECONDARY;
-		}
-
-		$main_interfaces = $this->getInput('mainInterfaces', []);
-
-		foreach (CItem::INTERFACE_TYPES_BY_PRIORITY as $type) {
-			if (array_key_exists($type, $main_interfaces) && array_key_exists($main_interfaces[$type], $interfaces)) {
-				$interfaces[$main_interfaces[$type]]['main'] = INTERFACE_PRIMARY;
-			}
 		}
 
 		return $interfaces;
@@ -177,21 +116,17 @@ abstract class CControllerHostUpdateGeneral extends CController {
 	/**
 	 * Prepare host groups.
 	 *
-	 * @param array $groups Submitted groups.
+	 * @param array $groups      Submitted groups.
+	 * @param array $new_groups  Submitted newly created groups.
 	 *
 	 * @throws Exception
 	 *
 	 * @return array Groups for assigning to host.
 	 */
-	protected function processHostGroups(array $groups): array {
-		$new_groups = [];
-
-		foreach ($groups as $idx => $group) {
-			if (is_array($group) && array_key_exists('new', $group)) {
-				$new_groups[] = ['name' => $group['new']];
-				unset($groups[$idx]);
-			}
-		}
+	protected function processHostGroups(array $groups, array $new_groups): array {
+		$new_groups = array_map(function ($group) {
+			return ['name' => $group];
+		}, $new_groups);
 
 		if ($new_groups) {
 			$new_groupid = API::HostGroup()->create($new_groups);

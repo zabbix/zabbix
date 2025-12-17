@@ -29,14 +29,6 @@ window.widget_form = new class extends CWidgetForm {
 		this._show_time = document.getElementById('show_2');
 		this._show_tzone = document.getElementById('show_3');
 
-		for (const colorpicker of this._form.querySelectorAll(`.${ZBX_STYLE_COLOR_PICKER} input`)) {
-			$(colorpicker).colorpicker({
-				appendTo: '.overlay-dialogue-body',
-				use_default: true,
-				onUpdate: window.setIndicatorColor
-			});
-		}
-
 		this._time_type.addEventListener('change', () => this.updateForm());
 
 		for (const checkbox of this._clock_type.querySelectorAll('input')) {

@@ -16,15 +16,46 @@
 
 class CControllerIconMapCreate extends CController {
 
-	protected function checkInput() {
-		$fields = [
-			'iconmap'   => 'required|array'
+	protected function init(): void {
+		$this->setInputValidationMethod(self::INPUT_VALIDATION_FORM);
+		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
+	}
+
+	public static function getValidationRules() {
+		$api_uniq = [
+			['iconmap.get', ['name' => '{name}']]
 		];
 
-		$ret = $this->validateInput($fields);
+		return ['object', 'api_uniq' => $api_uniq, 'fields' => [
+			'name' => ['db icon_map.name', 'required', 'not_empty'],
+			'mappings' => ['objects', 'required', 'not_empty', 'uniq' => [['inventory_link', 'expression']], 'fields' => [
+				'inventory_link' => ['db icon_mapping.inventory_link', 'required'],
+				'expression' => ['db icon_mapping.expression', 'required', 'not_empty',
+					'use' => [CRegexValidator::class, []]],
+				'iconid' => ['db icon_mapping.iconid', 'required'],
+				'sortorder' => ['integer']
+			]],
+			'default_iconid' => ['db icon_map.default_iconid']
+		]];
+	}
+
+	protected function checkInput() {
+		$ret = $this->validateInput($this->getValidationRules());
 
 		if (!$ret) {
+			$form_errors = $this->getValidationError();
 			$this->setResponse(new CControllerResponseFatal());
+
+			$response = $form_errors
+				? ['form_errors' => $form_errors]
+				: ['error' => [
+					'title' => _('Cannot create icon map'),
+					'messages' => array_column(get_and_clear_messages(), 'message')
+				]];
+
+			$this->setResponse(
+				new CControllerResponseData(['main_block' => json_encode($response)])
+			);
 		}
 
 		return $ret;
@@ -35,22 +66,26 @@ class CControllerIconMapCreate extends CController {
 	}
 
 	protected function doAction() {
-		$result = (bool) API::IconMap()->create($this->getInput('iconmap'));
+		$this->getInputs($iconmap, ['name', 'mappings', 'default_iconid']);
+
+		CArrayHelper::sort($iconmap['mappings'], ['sortorder']);
+		$iconmap['mappings'] = array_map(static function (array $mapping): array {
+			return array_intersect_key($mapping, array_flip(['inventory_link', 'expression', 'iconid']));
+		}, array_values($iconmap['mappings']));
+
+		$result = (bool) API::IconMap()->create($iconmap);
+		$output = [];
 
 		if ($result) {
-			$response = new CControllerResponseRedirect(
-				(new CUrl('zabbix.php'))->setArgument('action', 'iconmap.list')
-			);
-			CMessageHelper::setSuccessTitle(_('Icon map created'));
+			$output['success']['title'] = _('Icon map created');
 		}
 		else {
-			$response = new CControllerResponseRedirect(
-				(new CUrl('zabbix.php'))->setArgument('action', 'iconmap.edit')
-			);
-			$response->setFormData($this->getInputAll());
-			CMessageHelper::setErrorTitle(_('Cannot create icon map'));
+			$output['error'] = [
+				'title' => _('Cannot create icon map'),
+				'messages' => array_column(get_and_clear_messages(), 'message')
+			];
 		}
 
-		$this->setResponse($response);
+		$this->setResponse(new CControllerResponseData(['main_block' => json_encode($output)]));
 	}
 }

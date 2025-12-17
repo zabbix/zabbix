@@ -31,6 +31,7 @@
 #else
 
 #include "zbxcurl.h"
+#include "zbxip.h"
 
 #define HTTPS_SCHEME_STR	"https://"
 
@@ -220,6 +221,7 @@ static int	get_http_page(const char *host, const char *path, const char *port, i
 		/* URL is not detected - compose URL using host, port and path */
 
 		unsigned short	port_n = ZBX_DEFAULT_HTTP_PORT;
+		char		host_port[MAX_STRING_LEN];
 
 		if (NULL != port && '\0' != *port)
 		{
@@ -230,10 +232,8 @@ static int	get_http_page(const char *host, const char *path, const char *port, i
 			}
 		}
 
-		if (NULL != strchr(host, ':'))
-			url = zbx_dsprintf(url, HTTP_SCHEME_STR "[%s]:%u/", host, port_n);
-		else
-			url = zbx_dsprintf(url, HTTP_SCHEME_STR "%s:%u/", host, port_n);
+		url = zbx_dsprintf(url, HTTP_SCHEME_STR "%s/", zbx_join_hostport(host_port, sizeof(host_port), host,
+				port_n));
 
 		if (NULL != path)
 			url = zbx_strdcat(url, path + ('/' == *path ? 1 : 0));

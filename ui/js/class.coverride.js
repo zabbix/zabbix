@@ -23,7 +23,7 @@ jQuery(function ($) {
 	function createOverrideElement($override, option, value) {
 		var close = $('<button>', {'type': 'button'})
 				.on('click', function(e) {
-					$override.overrides('removeOverride', $override, option);
+					$override.overrides('removeOverride', $override, $(e.target));
 					e.stopPropagation();
 					e.preventDefault();
 				})
@@ -188,7 +188,7 @@ jQuery(function ($) {
 		 * - makeOption	- Function extracts given string and returns override option from it.
 		 * - onUpdate	- Function called when override values changes.
 		 *
-		 * @param options
+		 * @param {object} options
 		 */
 		init: function(options) {
 			options = $.extend({}, {
@@ -256,9 +256,9 @@ jQuery(function ($) {
 		 *  - adds new override option (UI element) of type {option} and value {value} for given $override;
 		 *  - changes if specified option of type {option} is already set for given $override.
 		 *
-		 * @param object $override       Object of current override.
-		 * @param string option          String of override option to set (e.g. color, type etc).
-		 * @param string value           Value of option. Can be NULL for options 'color' and 'timeshift'.
+		 * @param {object} $override       Object of current override.
+		 * @param {string} option          String of override option to set (e.g. color, type etc).
+		 * @param {string} value           Value of option. Can be NULL for options 'color' and 'timeshift'.
 		 */
 		addOverride: function($override, option, value) {
 			const opt = $override.data('options');
@@ -326,13 +326,13 @@ jQuery(function ($) {
 		/**
 		 * Removes existing override option from given $override.
 		 *
-		 * @param object $override       Object of current override.
-		 * @param string option          Override option that need to be removed.
+		 * @param {object} $override       Object of current override.
+		 * @param {object} $button         The button to remove the override.
 		 */
-		removeOverride: function($override, option) {
-			var opt = $override.data('options');
-			$('[name="'+opt['makeName'](option, opt.getId($override))+'"]', $(this)).closest('li').remove();
-			opt['onUpdate']();
+		removeOverride: function($override, $button) {
+			const options = $override.data('options');
+			$button.closest('li').remove();
+			options['onUpdate']();
 		}
 	};
 

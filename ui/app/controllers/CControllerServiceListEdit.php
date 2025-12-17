@@ -169,7 +169,8 @@ class CControllerServiceListEdit extends CControllerServiceListGeneral {
 
 		self::extendProblemEvents($data['services']);
 
-		$data['tags'] = makeTags($data['services'], true, 'serviceid', ZBX_TAG_COUNT_DEFAULT, $filter['tags']);
+		$data['tags'] =
+			CTagHelper::getTagsHtml($data['services'], ZBX_TAG_OBJECT_SERVICE, ['filter_tags' => $filter['tags']]);
 
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Services'));

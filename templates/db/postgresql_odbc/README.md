@@ -7,7 +7,7 @@ This template is designed for the effortless deployment of PostgreSQL monitoring
 
 ## Requirements
 
-Zabbix version: 7.4 and higher.
+Zabbix version: 8.0 and higher.
 
 ## Tested versions
 
@@ -16,7 +16,7 @@ This template has been tested on:
 
 ## Configuration
 
-> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/7.4/manual/config/templates_out_of_the_box) section.
+> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/8.0/manual/config/templates_out_of_the_box) section.
 
 ## Setup
 
@@ -38,7 +38,7 @@ GRANT pg_monitor TO zbx_monitor;
 
 For more information please read the PostgreSQL documentation `https://www.postgresql.org/docs/current/auth-pg-hba-conf.html`.
 
-3. Install the PostgreSQL ODBC driver. Check the [`Zabbix documentation`](https://www.zabbix.com/documentation/7.4/manual/config/items/itemtypes/odbc_checks/) for details about ODBC checks and [`recommended parameters page`](https://www.zabbix.com/documentation/7.4/manual/config/items/itemtypes/odbc_checks/unixodbc_postgresql).
+3. Install the PostgreSQL ODBC driver. Check the [`Zabbix documentation`](https://www.zabbix.com/documentation/8.0/manual/config/items/itemtypes/odbc_checks/) for details about ODBC checks and [`recommended parameters page`](https://www.zabbix.com/documentation/8.0/manual/config/items/itemtypes/odbc_checks/unixodbc_postgresql).
 
 4. Set up the connection string with the `{$PG.CONNSTRING.ODBC}` macro. The minimum required parameters are:
 
@@ -62,14 +62,14 @@ Servername=<instanceip>;Port=5432;Driver=/usr/lib64/psqlodbcw.so;SSLmode=require
 
 |Name|Description|Default|
 |----|-----------|-------|
-|{$PG.PASSWORD}|<p>PostgreSQL user password.</p>|`<Put the password here>`|
-|{$PG.USER}|<p>PostgreSQL username.</p>|`zbx_monitor`|
 |{$PG.CONNSTRING.ODBC}|<p>Connection string for the PostgreSQL instance.</p>|`Macro too long. Please see the template.`|
-|{$PG.LLD.FILTER.DBNAME}|<p>Filter of discoverable databases.</p>|`.+`|
-|{$PG.CONN_TOTAL_PCT.MAX.WARN}|<p>Maximum percentage of current connections for trigger expression.</p>|`90`|
+|{$PG.USER}|<p>PostgreSQL username.</p>|`zbx_monitor`|
+|{$PG.PASSWORD}|<p>PostgreSQL user password.</p>||
 |{$PG.DATABASE}|<p>Default PostgreSQL database for the connection.</p>|`postgres`|
-|{$PG.DEADLOCKS.MAX.WARN}|<p>Maximum number of detected deadlocks for trigger expression.</p>|`0`|
+|{$PG.LLD.FILTER.DBNAME}|<p>Filter of discoverable databases.</p>|`.+`|
 |{$PG.LLD.FILTER.APPLICATION}|<p>Filter of discoverable applications.</p>|`.+`|
+|{$PG.DEADLOCKS.MAX.WARN}|<p>Maximum number of detected deadlocks for trigger expression.</p>|`0`|
+|{$PG.CONN_TOTAL_PCT.MAX.WARN}|<p>Maximum percentage of current connections for trigger expression.</p>|`90`|
 |{$PG.CONFLICTS.MAX.WARN}|<p>Maximum number of recovery conflicts for trigger expression.</p>|`0`|
 |{$PG.QUERY_ETIME.MAX.WARN}|<p>Execution time limit for count of slow queries.</p>|`30`|
 |{$PG.SLOW_QUERIES.MAX.WARN}|<p>Slow queries count threshold for a trigger.</p>|`5`|

@@ -15,11 +15,9 @@
 
 class CFormFieldsetCollapsible {
 
-	static ZBX_STYLE_TOGGLE = 'toggle';
-
 	constructor(target) {
 		this._target = target;
-		this._toggle = this._target.querySelector(`.${CFormFieldsetCollapsible.ZBX_STYLE_TOGGLE}`);
+		this._toggle = this._target.querySelector(`.${ZBX_STYLE_TOGGLE}`);
 		this._observed_fields = this._target.querySelectorAll(':scope > .form-field, :scope > .fields-group');
 
 		this._init();

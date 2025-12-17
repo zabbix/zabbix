@@ -24,7 +24,7 @@ PagerDuty integrations with Zabbix require an Events API v2 key. If you do not h
 
 ## Requirements
 
-Zabbix version: 7.4 and higher.
+Zabbix version: 8.0 and higher.
 
 ## Parameters
 
@@ -149,7 +149,7 @@ The configuration includes a media type in Zabbix that invokes a webhook to send
 
 7\. Use the PagerDuty User in any actions of your choice.
 
-For more information, please see the [Zabbix](https://www.zabbix.com/documentation/7.4/manual/config/notifications) and [PagerDuty](https://v2.developer.pagerduty.com/docs/send-an-event-events-api-v2) documentation.
+For more information, please see the [Zabbix](https://www.zabbix.com/documentation/8.0/manual/config/notifications) and [PagerDuty](https://v2.developer.pagerduty.com/docs/send-an-event-events-api-v2) documentation.
 
 ## Feedback
 

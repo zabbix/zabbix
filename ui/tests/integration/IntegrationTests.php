@@ -24,12 +24,13 @@ require_once dirname(__FILE__).'/testGoAgentDataCollection.php';
 require_once dirname(__FILE__).'/testItemState.php';
 require_once dirname(__FILE__).'/testValuemaps.php';
 require_once dirname(__FILE__).'/testTriggerLinking.php';
+require_once dirname(__FILE__).'/testTagInheritance.php';
 require_once dirname(__FILE__).'/testGraphLinking.php';
 require_once dirname(__FILE__).'/testEscalations.php';
 require_once dirname(__FILE__).'/testAlertingForServices.php';
 require_once dirname(__FILE__).'/testComplexServiceStatus.php';
 require_once dirname(__FILE__).'/testServiceRoles.php';
-require_once dirname(__FILE__).'/testExpressionMacros.php';
+require_once dirname(__FILE__).'/testMacros.php';
 require_once dirname(__FILE__).'/testExpressionTriggerMacros.php';
 require_once dirname(__FILE__).'/testAgentItems.php';
 require_once dirname(__FILE__).'/testScriptItems.php';
@@ -38,9 +39,10 @@ require_once dirname(__FILE__).'/testHistoryValueDuplicates.php';
 require_once dirname(__FILE__).'/testHighAvailability.php';
 require_once dirname(__FILE__).'/testUserParametersReload.php';
 require_once dirname(__FILE__).'/testTriggerState.php';
+/* require_once dirname(__FILE__).'/testTlsRequest.php'; */
 require_once dirname(__FILE__).'/testActiveAvailability.php';
 require_once dirname(__FILE__).'/testEventsCauseAndSymptoms.php';
-require_once dirname(__FILE__).'/testDiscoveryRules.php';
+/* require_once dirname(__FILE__).'/testDiscoveryRules.php'; snmpsim does not work properly on new Debian */
 require_once dirname(__FILE__).'/testAutoregistration.php';
 require_once dirname(__FILE__).'/testAutoregistrationPSK.php';
 require_once dirname(__FILE__).'/testAutoregistrationHostMetaDataItem.php';
@@ -59,6 +61,8 @@ require_once dirname(__FILE__).'/testConfigVariables.php';
 require_once dirname(__FILE__).'/testLLDLinking.php';
 require_once dirname(__FILE__).'/testUserMacrosWithContext.php';
 require_once dirname(__FILE__).'/testUserMacrosWithContextRegex.php';
+require_once dirname(__FILE__).'/testNestedLLD.php';
+require_once dirname(__FILE__).'/testCalculatedExpression.php';
 
 use PHPUnit\Framework\TestSuite;
 
@@ -69,7 +73,7 @@ class IntegrationTests {
 		if  (substr(getenv('DB'), 0, 4) === "tsdb" ) {
 			$suite->addTestSuite('testTimescaleDb');
 		}
-		$suite->addTestSuite('testDiscoveryRules');
+		/*$suite->addTestSuite('testDiscoveryRules'); */
 		$suite->addTestSuite('testAutoregistration');
 		$suite->addTestSuite('testAutoregistrationPSK');
 		$suite->addTestSuite('testAutoregistrationHostMetaDataItem');
@@ -81,12 +85,13 @@ class IntegrationTests {
 		$suite->addTestSuite('testItemState');
 		$suite->addTestSuite('testValuemaps');
 		$suite->addTestSuite('testTriggerLinking');
+		$suite->addTestSuite('testTagInheritance');
 		$suite->addTestSuite('testGraphLinking');
 		$suite->addTestSuite('testEscalations');
 		$suite->addTestSuite('testAlertingForServices');
 		$suite->addTestSuite('testComplexServiceStatus');
 		$suite->addTestSuite('testServiceRoles');
-		$suite->addTestSuite('testExpressionMacros');
+		$suite->addTestSuite('testMacros');
 		$suite->addTestSuite('testExpressionTriggerMacros');
 		$suite->addTestSuite('testScriptItems');
 		$suite->addTestSuite('testItemRate');
@@ -94,6 +99,7 @@ class IntegrationTests {
 		$suite->addTestSuite('testHighAvailability');
 		$suite->addTestSuite('testUserParametersReload');
 		$suite->addTestSuite('testTriggerState');
+		/* $suite->addTestSuite('testTlsRequest'); */
 		$suite->addTestSuite('testActiveAvailability');
 		$suite->addTestSuite('testProxyConfSync');
 		$suite->addTestSuite('testInitialConfSync');
@@ -113,7 +119,8 @@ class IntegrationTests {
 		$suite->addTestSuite('testLLDLinking');
 		$suite->addTestSuite('testUserMacrosWithContext');
 		$suite->addTestSuite('testUserMacrosWithContextRegex');
-
+		$suite->addTestSuite('testNestedLLD');
+		$suite->addTestSuite('testCalculatedExpression');
 		return $suite;
 	}
 }

@@ -13,6 +13,8 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
+use Facebook\WebDriver\Exception\TimeoutException;
+
 require_once __DIR__.'/../../include/CBehavior.php';
 
 /**
@@ -36,14 +38,14 @@ class CPreprocessingBehavior extends CBehavior {
 			[
 				'name'		=> 'parameter_1',
 				'selector'	=> 'xpath:.//input[contains(@id, "_params_0")]|.//div[contains(@id, "_params_0")]|'.
-						'.//z-select[contains(@name, "[params][0]")]',
+						'.//z-select[contains(@name, "params_0")]',
 				'detect'	=> true,
 				'value'		=> ['getValue']
 			],
 			[
 				'name'		=> 'parameter_2',
-				'selector'	=> 'xpath:.//input[contains(@id, "_params_1")]|.//z-select[contains(@name, "[params][1]")]|'.
-						'.//input[contains(@name, "[params][1]")]',
+				'selector'	=> 'xpath:.//input[contains(@id, "_params_1")]|.//z-select[contains(@name, "params_1")]|'.
+						'.//input[contains(@name, "params_1")]',
 				'detect'	=> true,
 				'value'		=> ['getValue']
 			],
@@ -128,6 +130,15 @@ class CPreprocessingBehavior extends CBehavior {
 		foreach ($steps as $i => $options) {
 			if (!$mass_update || $i !== 0)  {
 				$add->click();
+
+				// TODO: sometimes inline validation error appears at the same time, and the click on Add doesn't pass.
+				try {
+					$this->test->query('xpath://li[contains(@class, "preprocessing-list-item")]['.$rows.']')
+						->waitUntilPresent()->one();
+				}
+				catch (TimeoutException $e) {
+					$add->click();
+				}
 			}
 
 			$container = $this->test->query('xpath://li[contains(@class, "preprocessing-list-item")]['.$rows.']')

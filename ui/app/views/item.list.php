@@ -72,13 +72,6 @@ foreach ($data['items'] as $item) {
 		$data['allowed_ui_conf_templates']
 	);
 
-	$item_url = (new CUrl('zabbix.php'))
-		->setArgument('action', 'popup')
-		->setArgument('popup', 'item.edit')
-		->setArgument('context', $data['context'])
-		->setArgument('itemid', $item['itemid'])
-		->getUrl();
-
 	if ($item['discoveryRule']) {
 		$name[] = (new CLink($item['discoveryRule']['name'],
 			(new CUrl('zabbix.php'))
@@ -96,7 +89,14 @@ foreach ($data['items'] as $item) {
 			$name[] = $item['master_item']['name'];
 		}
 		else {
-			$name[] = (new CLink($item['master_item']['name'], $item_url))
+			$name[] = (new CLink($item['master_item']['name'],
+				(new CUrl('zabbix.php'))
+					->setArgument('action', 'popup')
+					->setArgument('popup', 'item.edit')
+					->setArgument('context', $data['context'])
+					->setArgument('itemid', $item['master_item']['itemid'])
+					->getUrl()
+			))
 				->addClass(ZBX_STYLE_LINK_ALT)
 				->addClass(ZBX_STYLE_TEAL);
 		}
@@ -104,7 +104,14 @@ foreach ($data['items'] as $item) {
 		$name[] = NAME_DELIMITER;
 	}
 
-	$name[] = new CLink($item['name'], $item_url);
+	$name[] = new CLink($item['name'],
+		(new CUrl('zabbix.php'))
+			->setArgument('action', 'popup')
+			->setArgument('popup', 'item.edit')
+			->setArgument('context', $data['context'])
+			->setArgument('itemid', $item['itemid'])
+			->getUrl()
+	);
 
 	// Trigger information
 	$hint_table = (new CTableInfo())->setHeader([_('Severity'), _('Name'), _('Expression'), _('Status')]);
@@ -156,8 +163,8 @@ foreach ($data['items'] as $item) {
 		$item['trends'] = '';
 	}
 
-	$disable_source = $item['status'] == ITEM_STATUS_DISABLED && $item['itemDiscovery']
-		? $item['itemDiscovery']['disable_source']
+	$disable_source = $item['status'] == ITEM_STATUS_DISABLED && $item['discoveryData']
+		? $item['discoveryData']['disable_source']
 		: '';
 
 	// Info
@@ -171,9 +178,9 @@ foreach ($data['items'] as $item) {
 		}
 
 
-		if ($item['flags'] == ZBX_FLAG_DISCOVERY_CREATED && $item['itemDiscovery']['status'] == ZBX_LLD_STATUS_LOST) {
-			$info_cell[] = getLldLostEntityIndicator(time(), $item['itemDiscovery']['ts_delete'],
-				$item['itemDiscovery']['ts_disable'], $disable_source, $item['status'] == ITEM_STATUS_DISABLED,
+		if ($item['flags'] == ZBX_FLAG_DISCOVERY_CREATED && $item['discoveryData']['status'] == ZBX_LLD_STATUS_LOST) {
+			$info_cell[] = getLldLostEntityIndicator(time(), $item['discoveryData']['ts_delete'],
+				$item['discoveryData']['ts_disable'], $disable_source, $item['status'] == ITEM_STATUS_DISABLED,
 				_('item')
 			);
 		}
@@ -230,7 +237,7 @@ foreach ($data['items'] as $item) {
 			$status,
 			$disabled_by_lld ? makeDescriptionIcon(_('Disabled automatically by an LLD rule.')) : null
 		]))->addClass(ZBX_STYLE_NOWRAP),
-		$data['tags'][$item['itemid']],
+		(new CDiv($data['tags'][$item['itemid']]))->addClass(ZBX_STYLE_TAGS_WRAPPER),
 		$info_cell
 	];
 

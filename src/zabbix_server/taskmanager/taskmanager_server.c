@@ -66,14 +66,7 @@ static void	tm_execute_task_close_problem(zbx_uint64_t taskid, zbx_uint64_t trig
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() eventid:" ZBX_FS_UI64, __func__, eventid);
 
-	zbx_db_result_t	result = zbx_db_select("select null from problem where eventid=" ZBX_FS_UI64
-			" and r_eventid is null", eventid);
-
-	/* check if the task hasn't been already closed by another process */
-	if (NULL != zbx_db_fetch(result))
-		zbx_close_problem(triggerid, eventid, userid, rtc);
-
-	zbx_db_free_result(result);
+	zbx_close_problem(triggerid, eventid, userid, rtc);
 
 	zbx_db_execute("update task set status=%d where taskid=" ZBX_FS_UI64, ZBX_TM_STATUS_DONE, taskid);
 
@@ -1702,6 +1695,9 @@ ZBX_THREAD_ENTRY(taskmanager_thread, args)
 
 	if (SUCCEED == zbx_is_export_enabled(ZBX_FLAG_EXPTYPE_EVENTS))
 		zbx_export_deinit(problems_export);
+
+	zbx_ipc_async_socket_close(&rtc);
+	zbx_db_close();
 
 	zbx_setproctitle("%s #%d [terminated]", get_process_type_string(process_type), process_num);
 
