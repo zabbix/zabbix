@@ -76,6 +76,7 @@ class testDiscoveryRules extends CIntegrationTest {
 		$cmd .= ' --process-user=' . self::SNMPSIM_PROCESS_USER;
 		$cmd .= ' --process-group=' . self::SNMPSIM_PROCESS_GROUP;
 		$cmd .= ' --agent-udpv4-endpoint=' . self::SNMPSIM_DRULE_IP_RANGE . ':' . self::SNMPSIM_HOST_PORT;
+
 		$cmd .= ' --data-dir=' . $datadir;
 		$cmd .= ' > /dev/null 2>&1 &';
 		shell_exec($cmd);
@@ -258,6 +259,56 @@ class testDiscoveryRules extends CIntegrationTest {
 		return $response['result']['druleids'][0];
 	}
 
+
+	private function createDruleSnmpv3Multi($name, $proxyId): string {
+
+		$initial_timeouts = [
+			'timeout_snmp_agent' => '30s'
+		];
+
+		$response = $this->call('settings.update', $initial_timeouts);
+		$this->assertEquals(count($initial_timeouts), count($response['result']));
+
+		$drule = [
+			'iprange' => '127.0.10.1-100',
+			'name' => $name,
+			'delay' => '10s',
+			'status' => 0, /* enabled */
+			'concurrency_max' => ZBX_DISCOVERY_CHECKS_UNLIMITED,
+			'dchecks' => [
+				[
+					'type' => SVC_SNMPv3,
+					'key_' => self::SNMPSIM_VALID_OID,
+					'ports' => self::SNMPSIM_HOST_PORT,
+					'snmpv3_authpassphrase' => self::SNMPSIM_AUTH_KEY,
+					'snmpv3_authprotocol' => self::SNMPSIM_DRULE_AUTH_PROTOCOL,
+					'snmpv3_contextname' => self::SNMPSIM_DRULE_CONTEXT_NAME,
+					'snmpv3_privpassphrase' => self::SNMPSIM_PRIV_KEY,
+					'snmpv3_privprotocol' => self::SNMPSIM_DRULE_PRIVACY_PROTOCOL,
+					'snmpv3_securitylevel' => self::SNMPSIM_DRULE_SECURITY_LEVEL,
+					'snmpv3_securityname' => self::SNMPSIM_USERNAME,
+					'uniq' => 0,
+					'host_source' => 2, /* IP */
+					'name_source' => 2  /* IP */
+				]
+			]
+		];
+
+		if (!is_null($proxyId)) {
+			$drule['proxyid'] = $proxyId;
+		}
+
+		$response = $this->call('drule.create', $drule);
+		$this->assertArrayHasKey('result', $response, 'Failed to create a discovery rule');
+		$this->assertArrayHasKey('druleids', $response['result'], 'Failed to create a discovery rule');
+		$this->assertCount(1, $response['result'], 'Failed to create a discovery rule');
+
+		array_push(self::$drules, $response['result']['druleids'][0]);
+
+		return $response['result']['druleids'][0];
+	}
+
+
 	private function createActionHostAdd($druleId, $actionName): string {
 		$response = $this->call('action.create', [
 			'name' => $actionName,
@@ -292,6 +343,28 @@ class testDiscoveryRules extends CIntegrationTest {
 
 		return $response['result']['actionids'][0];
 	}
+
+
+	private function createActionHostAddMulti($actionName): string {
+		$response = $this->call('action.create', [
+			'name' => $actionName,
+			'eventsource' => EVENT_SOURCE_DISCOVERY,
+			'status' => ACTION_STATUS_ENABLED,
+			'operations' => [
+				[
+					'operationtype' => OPERATION_TYPE_HOST_ADD
+				]
+			]
+		]);
+		$this->assertArrayHasKey('result', $response, 'Failed to create a discovery action "' . $actionName . '"');
+		$this->assertArrayHasKey('actionids', $response['result'], 'Failed to create a discovery action "' . $actionName . '"');
+		$this->assertCount(1, $response['result']['actionids'], 'Failed to create a discovery action "' . $actionName . '"');
+
+		array_push(self::$discoveryActions, $response['result']['actionids'][0]);
+
+		return $response['result']['actionids'][0];
+	}
+
 
 	private function createProxy(): void {
 		$response = $this->call('proxy.create', [
@@ -362,7 +435,9 @@ class testDiscoveryRules extends CIntegrationTest {
 				'Hostname' => self::PROXY_NAME,
 				'ListenPort' => PHPUNIT_PORT_PREFIX.self::PROXY_PORT_SUFFIX,
 				'ProxyBufferMode' => 'memory',
-				'ProxyMemoryBufferSize' => '128K'
+				'ProxyMemoryBufferSize' => '128K',
+				'DebugLevel' => 5,
+				'LogFileSize' => 0
 			]
 		];
 	}
@@ -532,9 +607,19 @@ class testDiscoveryRules extends CIntegrationTest {
 		]);
 	}
 
+	public function defaultConfigurationProvider() {
+		return [
+			self::COMPONENT_SERVER => [
+				'DebugLevel' => 5,
+				'LogFileSize' => 0
+			]
+		];
+	}
+
 	/**
 	 * @depends testDiscoveryRules_opDelHostTags
 	 * @required-components server
+	 * @configurationDataProvider defaultConfigurationProvider
 	 */
 	public function testDiscoveryRules_snmpErrorViaServer(): void  {
 		$this->stopComponent(self::COMPONENT_SERVER);
@@ -554,7 +639,7 @@ class testDiscoveryRules extends CIntegrationTest {
 		$this->waitForDiscovery(self::SNMPSIM_HOST_IP);
 	}
 
-	private function proxyTest(): void {
+	private function proxyTest($doMulti): void {
 		$this->stopComponent(self::COMPONENT_SERVER);
 		$this->stopComponent(self::COMPONENT_PROXY);
 
@@ -564,9 +649,17 @@ class testDiscoveryRules extends CIntegrationTest {
 		$this->deleteProxy();
 
 		$proxyId = $this->createProxy();
+		if ($doMulti) {
+			if (is_null($proxyId)) {
+				$proxyId = end(self::$proxies);
+			}
+			$druleId = $this->createDruleSnmpv3Multi(self::DRULE_NAME , $proxyId);
 
-		$druleId = $this->createDruleSnmpv3(self::DRULE_NAME, $proxyId);
-		$this->createActionHostAdd($druleId, self::DISCOVERY_ACTION_NAME);
+			$this->createActionHostAddMulti("MULTI");
+		} else {
+			$druleId = $this->createDruleSnmpv3(self::DRULE_NAME , $proxyId);
+			$this->createActionHostAdd($druleId, self::DISCOVERY_ACTION_NAME);
+		}
 
 		$druleWithErrId = $this->createDruleSnmpv2(self::DRULE_NAME_ERR, '127.0.0.1', self::SNMPAGENT_INVALID_OID, $proxyId);
 		$this->createActionHostAdd($druleWithErrId, self::DISCOVERY_ACTION_NAME_ERR);
@@ -574,8 +667,11 @@ class testDiscoveryRules extends CIntegrationTest {
 		$this->startComponent(self::COMPONENT_PROXY);
 		$this->startComponent(self::COMPONENT_SERVER);
 
-		$this->waitForDiscoveryErr(self::SNMPAGENT_EXPECTED_INVALID_OID_ERR_MSG);
-		$this->waitForDiscovery(self::SNMPSIM_HOST_IP);
+		if (!$doMulti) {
+			$this->waitForDiscoveryErr(self::SNMPAGENT_EXPECTED_INVALID_OID_ERR_MSG);
+			$this->waitForDiscovery(self::SNMPSIM_HOST_IP);
+		}
+
 	}
 
 	/**
@@ -584,25 +680,53 @@ class testDiscoveryRules extends CIntegrationTest {
 	 * @configurationDataProvider proxyDBModeconfigurationProvider
 	 */
 	public function testDiscoveryRules_snmpErrorViaProxyDBMode(): void {
-		$this->proxyTest();
+		$this->proxyTest(false);
+	}
+
+	/**
+	 * @depends testDiscoveryRules_snmpErrorViaProxyHybridMode
+	 * @required-components server,proxy
+	 * @configurationDataProvider proxyMemoryModeconfigurationProvider
+	 */
+	public function testDiscoveryRules_snmpErrorViaProxyMemoryMode(): void {
+		$this->proxyTest(true);
+		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
+		$this->reloadConfigurationCache(self::COMPONENT_PROXY);
+
+		self::snmpsimStop();
+		$this->stopComponent(self::COMPONENT_SERVER);
+
+		$datadir = realpath(dirname(__FILE__)) . '/' . self::SNMPSIM_DATA_DIR_REL_PATH;
+		$cmd = 'snmpsimd';
+		$cmd .= ' --v3-user=' . self::SNMPSIM_USERNAME;
+		$cmd .= ' --v3-auth-key=' . self::SNMPSIM_AUTH_KEY;
+		$cmd .= ' --v3-priv-key=' . self::SNMPSIM_PRIV_KEY;
+		$cmd .= ' --v3-auth-proto=' . self::SNMPSIM_AUTH_PROTOCOL;
+		$cmd .= ' --v3-priv-proto=' . self::SNMPSIM_PRIV_PROTOCOL;
+		$cmd .= ' --process-user=' . self::SNMPSIM_PROCESS_USER;
+		$cmd .= ' --process-group=' . self::SNMPSIM_PROCESS_GROUP;
+		$cmd .= ' --agent-udpv4-endpoint=' . self::SNMPSIM_DRULE_IP_RANGE . ':' . self::SNMPSIM_HOST_PORT;
+
+
+		for ($i = 4; $i < 100; $i++) {
+			$cmd .= ' --agent-udpv4-endpoint=' . '127.0.10.' . $i . ':' . self::SNMPSIM_HOST_PORT;
+		}
+
+		$cmd .= ' --data-dir=' . $datadir;
+		$cmd .= ' > /dev/null 2>&1 &';
+
+		shell_exec($cmd);
+		sleep(600);
+
 	}
 
 	/**
 	 * @depends testDiscoveryRules_snmpErrorViaProxyDBMode
 	 * @required-components server,proxy
-	 * @configurationDataProvider proxyMemoryModeconfigurationProvider
-	 */
-	public function testDiscoveryRules_snmpErrorViaProxyMemoryMode(): void {
-		$this->proxyTest();
-	}
-
-	/**
-	 * @depends testDiscoveryRules_snmpErrorViaProxyMemoryMode
-	 * @required-components server,proxy
 	 * @configurationDataProvider proxyHybridModeconfigurationProvider
 	 */
 	public function testDiscoveryRules_snmpErrorViaProxyHybridMode(): void {
-		$this->proxyTest();
+		$this->proxyTest(false);
 	}
 
 	/**
