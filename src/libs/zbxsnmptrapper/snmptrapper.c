@@ -83,8 +83,9 @@ static int	process_trap_for_interface(zbx_uint64_t interfaceid, char *trap, zbx_
 		errcodes[i] = FAIL;
 
 		items[i].key = zbx_strdup(items[i].key, items[i].key_orig);
-		if (SUCCEED != zbx_substitute_item_key_params(&items[i].key, error, sizeof(error),
-				zbx_item_key_subst_cb, um_handle, &items[i]))
+		if (SUCCEED != zbx_substitute_item_key_params_default(&items[i].key, error, sizeof(error), um_handle,
+			items[i].host.hostid, items[i].host.host, items[i].host.name, items[i].itemid,
+			&items[i].interface))
 		{
 			SET_MSG_RESULT(&results[i], zbx_strdup(NULL, error));
 			errcodes[i] = NOTSUPPORTED;

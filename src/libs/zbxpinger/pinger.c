@@ -29,7 +29,6 @@
 #include "zbxthreads.h"
 #include "zbxtimekeeper.h"
 #include "zbxalgo.h"
-#include "zbxexpr.h"
 
 typedef struct
 {
@@ -502,8 +501,9 @@ static void	get_pinger_hosts(zbx_hashset_t *pinger_items, int config_timeout)
 		zbx_pinger_t	pinger_local;
 
 		ZBX_STRDUP(items[i].key, items[i].key_orig);
-		int	rc = zbx_substitute_item_key_params(&items[i].key, error, sizeof(error),
-				zbx_item_key_subst_cb, um_handle, &items[i]);
+		int 	rc = zbx_substitute_item_key_params_default(&items[i].key, error, sizeof(error), um_handle,
+				items[i].host.hostid, items[i].host.host, items[i].host.name, items[i].itemid,
+				&items[i].interface);
 
 		if (SUCCEED == rc)
 		{

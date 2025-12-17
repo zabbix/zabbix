@@ -525,8 +525,9 @@ void	zbx_prepare_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESUL
 		if (ZBX_MACRO_EXPAND_YES == expand_macros)
 		{
 			ZBX_STRDUP(items[i].key, items[i].key_orig);
-			if (SUCCEED != zbx_substitute_item_key_params(&items[i].key, error, sizeof(error),
-					zbx_item_key_subst_cb, um_handle_secure, &items[i]))
+			if (SUCCEED != zbx_substitute_item_key_params_default(&items[i].key, error, sizeof(error),
+					um_handle_secure, items[i].host.hostid, items[i].host.host, items[i].host.name,
+					items[i].itemid, &items[i].interface))
 			{
 				SET_MSG_RESULT(&results[i], zbx_strdup(NULL, error));
 				errcodes[i] = CONFIG_ERROR;
@@ -648,11 +649,22 @@ void	zbx_prepare_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESUL
 				ZBX_FALLTHROUGH;
 			case ITEM_TYPE_TELNET:
 			case ITEM_TYPE_DB_MONITOR:
-				if (ZBX_MACRO_EXPAND_NO == expand_macros)
-					break;
+				{
+					if (ZBX_MACRO_EXPAND_NO == expand_macros)
+						break;
 
-				zbx_substitute_macros(&items[i].params, NULL, 0, zbx_macro_field_params_resolv,
-						um_handle_secure, &items[i]);
+					zbx_macro_field_params_resolv_args_t args = {
+						.um_handle = um_handle_secure,
+						.hostid = items[i].host.hostid,
+						.host_host = items[i].host.host,
+						.host_name = items[i].host.name,
+						.itemid = items[i].itemid,
+						.interface = &items[i].interface,
+					};
+
+					zbx_substitute_macros(&items[i].params, NULL, 0, zbx_macro_field_params_resolv,
+						args);
+				}
 				ZBX_FALLTHROUGH;
 			case ITEM_TYPE_SIMPLE:
 				if (ZBX_MACRO_EXPAND_NO == expand_macros)
@@ -824,8 +836,9 @@ void	zbx_prepare_agent_items(zbx_dc_agent_item_t *items, int *errcodes, int num,
 		if (ZBX_MACRO_EXPAND_YES == expand_macros)
 		{
 			ZBX_STRDUP(items[i].key, items[i].key_orig);
-			if (SUCCEED != zbx_substitute_item_key_params(&items[i].key, error, sizeof(error),
-					zbx_item_key_subst_cb, um_handle_secure, &items[i])) /* XXX */
+			if (SUCCEED != zbx_substitute_item_key_params_default(&items[i].key, error, sizeof(error),
+					um_handle_secure, items[i].host.hostid, items[i].host.host, items[i].host.name,
+					items[i].itemid, &items[i].interface))
 			{
 				SET_MSG_RESULT(&results[i], zbx_strdup(NULL, error));
 				errcodes[i] = CONFIG_ERROR;
@@ -892,8 +905,9 @@ void	zbx_prepare_snmp_items(zbx_dc_snmp_item_t *items, int *errcodes, int num, A
 		if (ZBX_MACRO_EXPAND_YES == expand_macros)
 		{
 			ZBX_STRDUP(items[i].key, items[i].key_orig);
-			if (SUCCEED != zbx_substitute_item_key_params(&items[i].key, error, sizeof(error),
-					zbx_item_key_subst_cb, um_handle_secure, &items[i])) /* XXX */
+			if (SUCCEED != zbx_substitute_item_key_params_default(&items[i].key, error, sizeof(error),
+					um_handle_secure, items[i].hostid, items[i].host_host, items[i].host_name,
+					items[i].itemid, &items[i].interface))
 			{
 				SET_MSG_RESULT(&results[i], zbx_strdup(NULL, error));
 				errcodes[i] = CONFIG_ERROR;
@@ -995,8 +1009,9 @@ void	zbx_prepare_httpagent_items(zbx_dc_httpagent_item_t *items, int *errcodes, 
 		if (ZBX_MACRO_EXPAND_YES == expand_macros)
 		{
 			ZBX_STRDUP(items[i].key, items[i].key_orig);
-			if (SUCCEED != zbx_substitute_item_key_params(&items[i].key, error, sizeof(error),
-					zbx_item_key_subst_cb, um_handle_secure, &items[i])) /* XXX */
+			if (SUCCEED != zbx_substitute_item_key_params_default(&items[i].key, error, sizeof(error),
+					um_handle_secure, items[i].hostid, items[i].host_host, items[i].host_name,
+					items[i].itemid, &items[i].interface))
 			{
 				SET_MSG_RESULT(&results[i], zbx_strdup(NULL, error));
 				errcodes[i] = CONFIG_ERROR;

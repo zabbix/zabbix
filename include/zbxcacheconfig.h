@@ -1700,6 +1700,17 @@ void	zbx_dc_sync_unlock(void);
 int	zbx_dc_get_proxy_version(zbx_uint64_t proxyid);
 void	zbx_dc_update_proxy_pending_history(zbx_dc_proxy_t *proxy, int flag);
 
+typedef struct
+{
+	const zbx_dc_um_handle_t	*um_handle;
+	zbx_uint64_t			hostid;
+	const char			*host_host;
+	const char			*host_name;
+	const zbx_uint64_t 		itemid;
+	const zbx_dc_interface_t	*interface;
+}
+zbx_macro_field_params_resolv_args_t;
+
 int	zbx_macro_field_params_resolv(zbx_macro_resolv_data_t *p, va_list args, char **replace_to, char **data,
 		char *error, size_t maxerrlen);
 int	zbx_macro_allowed_hosts_resolv(zbx_macro_resolv_data_t *p, va_list args, char **replace_to, char **data,
@@ -1709,8 +1720,11 @@ int	zbx_macro_script_params_field_resolv(zbx_macro_resolv_data_t *p, va_list arg
 int	zbx_macro_query_filter_resolv(zbx_macro_resolv_data_t *p, va_list args, char **replace_to, char **data,
 		char *error, size_t maxerrlen);
 
-int	zbx_item_key_subst_cb(const char *data, int level, int num, int quoted, char **param, va_list args);
 int	zbx_snmp_oid_subst_cb(const char *data, int level, int num, int quoted, char **param, va_list args);
+
+int 	zbx_substitute_item_key_params_default(char **data, char *error, size_t maxerrlen,
+		const zbx_dc_um_handle_t *um_handle, zbx_uint64_t hostid, char *host_host, char *host_name,
+		const zbx_uint64_t itemid, const zbx_dc_interface_t *interface);
 
 zbx_uint64_t	zbx_dc_get_cache_size(void);
 
