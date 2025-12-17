@@ -70,6 +70,7 @@ static zbx_hashset_t	hk_cache;
 
 /* tables to be cleared upon item deletion */
 static hk_cleanup_table_t	hk_item_cleanup_order[] = {
+/* NOTE: there must be no more than 32 elements in this array as bits of int are used for tracing table cleanup */
 	{"history",		"itemid=" ZBX_FS_UI64,	&hk_cfg_history_mode},
 	{"history_str",		"itemid=" ZBX_FS_UI64,	&hk_cfg_history_mode},
 	{"history_log",		"itemid=" ZBX_FS_UI64,	&hk_cfg_history_mode},
@@ -149,14 +150,14 @@ static int	hk_item_cleanup(const zbx_vector_hk_housekeeper_t *hk_entries, int co
 
 			if (0 == (entry->progress & (1 << i)))
 			{
-				int	 m = 0;
+				int	 more = 0;
 				char	filter[MAX_STRING_LEN];
 
 				zbx_snprintf(filter, sizeof(filter), table->filter, objectid);
 
-				deleted += hk_table_cleanup(table->name, filter, config_max_hk_delete, &m);
+				deleted += hk_table_cleanup(table->name, filter, config_max_hk_delete, &more);
 
-				if (0 == m)
+				if (0 == more)
 					entry->progress |= (1 << i);
 			}
 		}
