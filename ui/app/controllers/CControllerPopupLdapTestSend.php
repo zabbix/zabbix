@@ -35,6 +35,11 @@ class CControllerPopupLdapTestSend extends CController {
 			'provision_status' => ['db userdirectory.provision_status',
 				'in' => [JIT_PROVISIONING_DISABLED, JIT_PROVISIONING_ENABLED]
 			],
+			'group_basedn' => ['db userdirectory_ldap.group_basedn',
+				'when' => [
+					['provision_status', 'in' => [JIT_PROVISIONING_ENABLED]]
+				]
+			],
 			'group_name' => ['db userdirectory_ldap.group_name',
 				'when' => ['provision_status', 'in' => [JIT_PROVISIONING_ENABLED]]
 			],
@@ -64,7 +69,6 @@ class CControllerPopupLdapTestSend extends CController {
 			'user_lastname' => ['db userdirectory_ldap.user_lastname',
 				'when' => ['provision_status', 'in' => [JIT_PROVISIONING_ENABLED]]
 			],
-
 			'provision_groups' => ['objects', 'not_empty',
 				'fields' => CControllerPopupUserGroupMappingCheck::getFieldsValidationRules(),
 				'when' => ['provision_status', 'in' => [JIT_PROVISIONING_ENABLED]]
