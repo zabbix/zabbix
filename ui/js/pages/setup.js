@@ -46,8 +46,9 @@ const view = new class {
 
 				form.addEventListener('submit', () => {
 					const input_ids = ['server', 'database', 'schema', 'vault_url', 'vault_prefix_hashicorp',
-						'vault_prefix_cyberark', 'vault_db_path', 'vault_query_string', 'vault_token', 'vault_role_id',
-						'vault_secret_id', 'vault_cert_file', 'vault_key_file', 'ca_file', 'key_file', 'cert_file'
+						'vault_prefix_cyberark', 'vault_db_path', 'vault_query_string', 'vault_token',
+						'vault_app_role_id', 'vault_app_secret_id', 'vault_cert_file', 'vault_key_file', 'ca_file',
+						'key_file', 'cert_file'
 					];
 
 					for (const id of input_ids) {
@@ -117,9 +118,9 @@ const view = new class {
 			'vault_auth_type_row': vault_selected == DB_STORE_CREDS_VAULT_HASHICORP,
 			'vault_token_row': vault_selected == DB_STORE_CREDS_VAULT_HASHICORP
 				&& vault_auth_type == DB_VAULT_HASHICORP_AUTH_TYPE_TOKEN,
-			'vault_role_id_row': vault_selected == DB_STORE_CREDS_VAULT_HASHICORP
+			'vault_app_role_id_row': vault_selected == DB_STORE_CREDS_VAULT_HASHICORP
 				&& vault_auth_type == DB_VAULT_HASHICORP_AUTH_TYPE_APP_ROLE,
-			'vault_secret_id_row': vault_selected == DB_STORE_CREDS_VAULT_HASHICORP
+			'vault_app_secret_id_row': vault_selected == DB_STORE_CREDS_VAULT_HASHICORP
 				&& vault_auth_type == DB_VAULT_HASHICORP_AUTH_TYPE_APP_ROLE,
 			'db_user': !vault_enabled,
 			'db_password': !vault_enabled,

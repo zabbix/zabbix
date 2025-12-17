@@ -448,7 +448,8 @@ class ZBase {
 			case CVaultHashiCorp::NAME:
 				$this->vault = new CVaultHashiCorp($this->config['DB']['VAULT_URL'],
 					$this->config['DB']['VAULT_PREFIX'], $this->config['DB']['VAULT_DB_PATH'],
-					$this->config['DB']['VAULT_TOKEN']
+					$this->config['DB']['VAULT_TOKEN'], $this->config['DB']['VAULT_ROLE_ID'],
+					$this->config['DB']['VAULT_SECRET_ID']
 				);
 				break;
 		}

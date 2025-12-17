@@ -31,18 +31,16 @@ class CVaultHashiCorp extends CVault {
 	private string $api_endpoint;
 	private string $db_prefix;
 	private string $db_path;
-	private int $auth_type;
 	private string $token;
 	private string $role_id;
 	private string $secret_id;
 
-	public function __construct(string $api_endpoint, string $db_prefix, string $db_path, int $auth_type,
-			string $token = '', string $role_id = '', string $secret_id = '') {
+	public function __construct(string $api_endpoint, string $db_prefix, string $db_path, string $token = '',
+			string $role_id = '', string $secret_id = '') {
 		$this->api_endpoint = $api_endpoint;
 		$this->db_prefix = $db_prefix;
 		$this->db_path = $db_path;
 		$this->token = $token;
-		$this->auth_type = $auth_type;
 		$this->role_id = $role_id;
 		$this->secret_id = $secret_id;
 	}
@@ -62,19 +60,19 @@ class CVaultHashiCorp extends CVault {
 			$this->addError(_s('Provided secret path "%1$s" is invalid.', $this->db_path));
 		}
 
-		if ($this->auth_type === DB_VAULT_HASHICORP_AUTH_TYPE_TOKEN) {
-			if ($this->token === '') {
-				$this->addError(_s('Provided authentication token "%1$s" is empty.', $this->token));
-			}
-		}
-		else {
+		if ($this->token === '') {
 			if ($this->role_id === '') {
 				$this->addError(_s('Provided authentication role id "%1$s" is empty.', $this->role_id));
 			}
 
 			if ($this->secret_id === '') {
-				$this->addError(_s('Provided authentication secret id "%1$s" is empty.', $this->role_id));
+				$this->addError(_s('Provided authentication secret id "%1$s" is empty.', $this->secret_id));
 			}
+		}
+		elseif ($this->role_id !== '' || $this->secret_id !== '') {
+			$this->addError(
+				_s('Provided authentication role id and secret id should be empty if authentication token provided.')
+			);
 		}
 
 		return !$this->getErrors();
@@ -91,7 +89,7 @@ class CVaultHashiCorp extends CVault {
 			$url = $this->api_endpoint.$this->db_prefix.$this->db_path;
 		}
 
-		if ($this->auth_type == DB_VAULT_HASHICORP_AUTH_TYPE_APP_ROLE) {
+		if ($this->token === '') {
 			$login_url = rtrim($this->api_endpoint, '/').self::DB_APP_ROLE_LOGIN_PATH;
 			$data = [
 				'role_id' => $this->role_id,
