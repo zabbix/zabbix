@@ -106,16 +106,27 @@ class CVaultHashiCorp extends CVault {
 			]));
 
 			if ($fetch_token === false) {
-				$this->addError(_('Vault AppRole login connection failed.'));
+				$this->addError(_('Vault AppRole login connection failed'));
 
 				return null;
 			}
 
 			$fetch_token = $fetch_token ? json_decode($fetch_token, true) : null;
 
-			if (!is_array($fetch_token) || !array_key_exists('auth', $fetch_token)
-					|| !array_key_exists('client_token', $fetch_token['auth'])) {
+			if (!is_array($fetch_token)) {
 				$this->addError(_('Unable to load token from Vault.'));
+
+				return null;
+			}
+
+			if (!array_key_exists('auth', $fetch_token)	|| !array_key_exists('client_token', $fetch_token['auth'])) {
+				$this->addError(_('Unable to load token from Vault.'));
+
+				if (array_key_exists('errors', $fetch_token)) {
+					foreach ($fetch_token['errors'] as $error) {
+						$this->addError($error);
+					}
+				}
 
 				return null;
 			}
@@ -142,8 +153,22 @@ class CVaultHashiCorp extends CVault {
 
 		$secret = $secret ? json_decode($secret, true) : null;
 
-		if ($secret === null || !isset($secret['data']['data']) || !is_array($secret['data']['data'])) {
+		if (!is_array($secret)) {
 			$this->addError(_('Unable to load database credentials from Vault.'));
+
+			return null;
+		}
+
+		if (!isset($secret['data']['data']) || !is_array($secret['data']['data'])) {
+			$this->addError(_('Unable to load database credentials from Vault.'));
+
+			sdff($secret, '/home/test/work/logs/zabbix.log');
+
+			if (array_key_exists('errors', $secret)) {
+				foreach ($secret['errors'] as $error) {
+					$this->addError($error);
+				}
+			}
 
 			return null;
 		}

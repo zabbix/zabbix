@@ -185,15 +185,26 @@ class CSetupWizard extends CForm {
 						$this->getConfig('DB_VAULT_AUTH_TYPE', DB_VAULT_HASHICORP_AUTH_TYPE_TOKEN)
 					));
 
-					$this->setConfig('DB_VAULT_TOKEN', getRequest('vault_token', $this->getConfig('DB_VAULT_TOKEN')));
+					if ($this->getConfig('DB_VAULT_AUTH_TYPE') == DB_VAULT_HASHICORP_AUTH_TYPE_TOKEN) {
+						$this->setConfig('DB_VAULT_TOKEN', getRequest('vault_token',
+							$this->getConfig('DB_VAULT_TOKEN', '')
+						));
 
-					$this->setConfig('DB_VAULT_ROLE_ID', getRequest('vault_role_id',
-						$this->getConfig('DB_VAULT_ROLE_ID')
-					));
+						$this->setConfig('DB_VAULT_APP_ROLE_ID', '');
 
-					$this->setConfig('DB_VAULT_SECRET_ID', getRequest('vault_secret_id',
-						$this->getConfig('DB_VAULT_SECRET_ID')
-					));
+						$this->setConfig('DB_VAULT_APP_SECRET_ID', '');
+					}
+					else {
+						$this->setConfig('DB_VAULT_TOKEN', '');
+
+						$this->setConfig('DB_VAULT_APP_ROLE_ID', getRequest('vault_app_role_id',
+							$this->getConfig('DB_VAULT_APP_ROLE_ID', '')
+						));
+
+						$this->setConfig('DB_VAULT_APP_SECRET_ID', getRequest('vault_app_secret_id',
+							$this->getConfig('DB_VAULT_APP_SECRET_ID', '')
+						));
+					}
 
 					$this->unsetConfig(['DB_USER', 'DB_PASSWORD', 'DB_VAULT_CERTIFICATES', 'DB_VAULT_CERT_FILE',
 						'DB_VAULT_KEY_FILE'
@@ -248,21 +259,16 @@ class CSetupWizard extends CForm {
 				$this->setConfig('DB_SERVER', $config->config['DB']['SERVER']);
 			}
 
+			sdff(CSessionHelper::getAll(), '/home/test/work/logs/zabbix.log');
+
 			if (hasRequest('next') && array_key_exists(self::STAGE_DB_CONNECTION, getRequest('next'))) {
 				switch ($this->getConfig('DB_CREDS_STORAGE')) {
 					case DB_STORE_CREDS_VAULT_HASHICORP:
-						if ($this->getConfig('DB_VAULT_AUTH_TYPE') == DB_VAULT_HASHICORP_AUTH_TYPE_TOKEN) {
-							$vault_provider = new CVaultHashiCorp($this->getConfig('DB_VAULT_URL'),
-								$this->getConfig('DB_VAULT_PREFIX'), $this->getConfig('DB_VAULT_DB_PATH'),
-								$this->getConfig('DB_VAULT_TOKEN')
-							);
-						}
-						else {
-							$vault_provider = new CVaultHashiCorp($this->getConfig('DB_VAULT_URL'),
-								$this->getConfig('DB_VAULT_PREFIX'), $this->getConfig('DB_VAULT_DB_PATH'), '',
-								$this->getConfig('DB_VAULT_APP_ROLE_ID'), $this->getConfig('DB_VAULT_APP_SECRET_ID')
-							);
-						}
+						$vault_provider = new CVaultHashiCorp($this->getConfig('DB_VAULT_URL'),
+							$this->getConfig('DB_VAULT_PREFIX'), $this->getConfig('DB_VAULT_DB_PATH'),
+							$this->getConfig('DB_VAULT_TOKEN'), $this->getConfig('DB_VAULT_APP_ROLE_ID'),
+							$this->getConfig('DB_VAULT_APP_SECRET_ID')
+						);
 
 						break;
 
@@ -1221,7 +1227,6 @@ class CSetupWizard extends CForm {
 			'VAULT_URL' => '',
 			'VAULT_PREFIX' => '',
 			'VAULT_DB_PATH' => '',
-			'VAULT_AUTH_TYPE' => DB_VAULT_HASHICORP_AUTH_TYPE_TOKEN,
 			'VAULT_TOKEN' => '',
 			'VAULT_APP_ROLE_ID' => '',
 			'VAULT_APP_SECRET_ID' => '',
@@ -1242,7 +1247,6 @@ class CSetupWizard extends CForm {
 			$vault_config['VAULT_URL'] = $this->getConfig('DB_VAULT_URL');
 			$vault_config['VAULT_PREFIX'] = $this->getConfig('DB_VAULT_PREFIX');
 			$vault_config['VAULT_DB_PATH'] = $this->getConfig('DB_VAULT_DB_PATH');
-			$vault_config['VAULT_AUTH_TYPE'] = $this->getConfig('VAULT_AUTH_TYPE');
 
 			if ($this->getConfig('DB_VAULT_AUTH_TYPE') == DB_VAULT_HASHICORP_AUTH_TYPE_TOKEN){
 				$vault_config['VAULT_TOKEN'] = $this->getConfig('DB_VAULT_TOKEN');
