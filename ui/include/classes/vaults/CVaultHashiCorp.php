@@ -162,8 +162,6 @@ class CVaultHashiCorp extends CVault {
 		if (!isset($secret['data']['data']) || !is_array($secret['data']['data'])) {
 			$this->addError(_('Unable to load database credentials from Vault.'));
 
-			sdff($secret, '/home/test/work/logs/zabbix.log');
-
 			if (array_key_exists('errors', $secret)) {
 				foreach ($secret['errors'] as $error) {
 					$this->addError($error);

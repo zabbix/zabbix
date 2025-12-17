@@ -259,8 +259,6 @@ class CSetupWizard extends CForm {
 				$this->setConfig('DB_SERVER', $config->config['DB']['SERVER']);
 			}
 
-			sdff(CSessionHelper::getAll(), '/home/test/work/logs/zabbix.log');
-
 			if (hasRequest('next') && array_key_exists(self::STAGE_DB_CONNECTION, getRequest('next'))) {
 				switch ($this->getConfig('DB_CREDS_STORAGE')) {
 					case DB_STORE_CREDS_VAULT_HASHICORP:
