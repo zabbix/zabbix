@@ -83,7 +83,7 @@ static int	connect_to_proxy(const zbx_dc_proxy_t *proxy, zbx_socket_t *sock, int
 	}
 
 	if (FAIL == (ret = zbx_tcp_connect(sock, config_source_ip, proxy->addr, proxy->port, timeout,
-			proxy->tls_connect, tls_arg1, tls_arg2)))
+			proxy->tls_connect, tls_arg1, tls_arg2, ZBX_DNS_FAILOVER_ENABLED)))
 	{
 		zabbix_log(LOG_LEVEL_ERR, "cannot connect to proxy \"%s\": %s", proxy->name, zbx_socket_strerror());
 		ret = NETWORK_ERROR;

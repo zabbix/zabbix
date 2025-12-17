@@ -389,7 +389,7 @@ static int	get_http_page(const char *host, const char *path, const char *port, i
 	}
 
 	if (SUCCEED == (ret = zbx_tcp_connect(&s, sysinfo_get_config_source_ip(), hostname, port_num, timeout,
-			ZBX_TCP_SEC_UNENCRYPTED, NULL, NULL)))
+			ZBX_TCP_SEC_UNENCRYPTED, NULL, NULL, ZBX_DNS_FAILOVER_DISABLED)))
 	{
 		char	*request = NULL;
 

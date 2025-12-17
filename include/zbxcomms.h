@@ -21,6 +21,9 @@
 #define ZBX_IPV4_MAX_CIDR_PREFIX	32	/* max number of bits in IPv4 CIDR prefix */
 #define ZBX_IPV6_MAX_CIDR_PREFIX	128	/* max number of bits in IPv6 CIDR prefix */
 
+#define ZBX_DNS_FAILOVER_DISABLED	0
+#define ZBX_DNS_FAILOVER_ENABLED	1
+
 #ifdef _WINDOWS
 #	define zbx_socket_last_error()		WSAGetLastError()
 
@@ -259,12 +262,12 @@ int	zbx_inet_ntop(const struct sockaddr *ai_addr, char *ip, socklen_t len);
 int	zbx_inet_pton(int af, const char *src, void *dst);
 
 int	zbx_tcp_connect(zbx_socket_t *s, const char *source_ip, const char *ip, unsigned short port, int timeout,
-		unsigned int tls_connect, const char *tls_arg1, const char *tls_arg2);
+		unsigned int tls_connect, const char *tls_arg1, const char *tls_arg2, int failover);
 
 void	zbx_socket_clean(zbx_socket_t *s);
 char	*zbx_socket_detach_buffer(zbx_socket_t *s);
 int	zbx_socket_connect(zbx_socket_t *s, int ai_socktype, const char *source_ip, const char *host,
-		unsigned short port, int timeout, short *events);
+		unsigned short port, int timeout, int failover, short *events);
 int	zbx_socket_pollout(zbx_socket_t *s, int timeout, char **error);
 
 int	zbx_socket_tls_connect(zbx_socket_t *s, unsigned int tls_connect, const char *tls_arg1, const char *tls_arg2,

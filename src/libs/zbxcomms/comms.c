@@ -685,7 +685,7 @@ out:
  *                                                                            *
  ******************************************************************************/
 int	zbx_socket_connect(zbx_socket_t *s, int ai_socktype, const char *source_ip, const char *host,
-		unsigned short port, int timeout, short *events)
+		unsigned short port, int timeout, int failover, short *events)
 {
 	int	ai_flags = 0, ret = FAIL;
 	char	service[8];
@@ -733,7 +733,8 @@ int	zbx_socket_connect(zbx_socket_t *s, int ai_socktype, const char *source_ip, 
 		{
 			if (SUCCEED == (ret = zbx_addrinfo_connect(s, source_ip, host, port, timeout,
 					ai_node->ai_family, ai_node->ai_socktype, ai_node->ai_protocol,
-					ai_node->ai_addr, ai_node->ai_addrlen, events)))
+					ai_node->ai_addr, ai_node->ai_addrlen, events)) ||
+					ZBX_DNS_FAILOVER_DISABLED == failover)
 			{
 				break;
 			}
@@ -743,6 +744,8 @@ int	zbx_socket_connect(zbx_socket_t *s, int ai_socktype, const char *source_ip, 
 
 		return ret;
 	}
+#else
+	ZBX_UNUSED(failover);
 #endif
 	struct addrinfo	*ai = NULL, hints;
 
@@ -808,13 +811,14 @@ int	zbx_socket_tls_connect(zbx_socket_t *s, unsigned int tls_connect, const char
  *                                                                            *
  ******************************************************************************/
 static int	zbx_socket_create(zbx_socket_t *s, int type, const char *source_ip, const char *ip,
-		unsigned short port, int timeout, unsigned int tls_connect, const char *tls_arg1, const char *tls_arg2)
+		unsigned short port, int timeout, unsigned int tls_connect, const char *tls_arg1, const char *tls_arg2,
+		int failover)
 {
 	int		ret = FAIL;
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	const char	*server_name = NULL;
 #endif
-	if (SUCCEED != zbx_socket_connect(s, type, source_ip, ip, port, timeout, NULL))
+	if (SUCCEED != zbx_socket_connect(s, type, source_ip, ip, port, timeout, failover, NULL))
 		goto out;
 
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
@@ -846,7 +850,7 @@ out:
 }
 
 int	zbx_tcp_connect(zbx_socket_t *s, const char *source_ip, const char *ip, unsigned short port, int timeout,
-		unsigned int tls_connect, const char *tls_arg1, const char *tls_arg2)
+		unsigned int tls_connect, const char *tls_arg1, const char *tls_arg2, int failover)
 {
 	if (ZBX_TCP_SEC_UNENCRYPTED != tls_connect && ZBX_TCP_SEC_TLS_CERT != tls_connect &&
 			ZBX_TCP_SEC_TLS_PSK != tls_connect)
@@ -855,7 +859,7 @@ int	zbx_tcp_connect(zbx_socket_t *s, const char *source_ip, const char *ip, unsi
 		return FAIL;
 	}
 
-	return zbx_socket_create(s, SOCK_STREAM, source_ip, ip, port, timeout, tls_connect, tls_arg1, tls_arg2);
+	return zbx_socket_create(s, SOCK_STREAM, source_ip, ip, port, timeout, tls_connect, tls_arg1, tls_arg2, failover);
 }
 
 /******************************************************************************
@@ -2845,7 +2849,8 @@ const char	*zbx_tcp_connection_type_name(unsigned int type)
 
 int	zbx_udp_connect(zbx_socket_t *s, const char *source_ip, const char *ip, unsigned short port, int timeout)
 {
-	return zbx_socket_create(s, SOCK_DGRAM, source_ip, ip, port, timeout, ZBX_TCP_SEC_UNENCRYPTED, NULL, NULL);
+	return zbx_socket_create(s, SOCK_DGRAM, source_ip, ip, port, timeout, ZBX_TCP_SEC_UNENCRYPTED, NULL, NULL,
+			ZBX_DNS_FAILOVER_DISABLED);
 }
 
 /******************************************************************************
