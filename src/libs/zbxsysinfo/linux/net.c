@@ -1388,7 +1388,9 @@ int	net_if_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 			zbx_json_adduint64(&jval, "errors", ns.ierr);
 			zbx_json_adduint64(&jval, "dropped", ns.idrop);
 			zbx_json_adduint64(&jval, "overruns", ns.ififo);
+			zbx_json_adduint64(&jval, "frame", ns.iframe);
 			zbx_json_adduint64(&jval, "compressed", ns.icompressed);
+			zbx_json_adduint64(&jval, "multicast", ns.imulticast);
 			zbx_json_close(&jval);
 			zbx_json_addobject(&jval, "out");
 			zbx_json_adduint64(&jval, "bytes", ns.obytes);
