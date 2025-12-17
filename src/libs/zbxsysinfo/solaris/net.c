@@ -35,6 +35,13 @@
 #include <net/if.h>
 #include <net/if_dl.h>
 
+typedef struct
+{
+	char	*name;
+	char	*json_name;
+}
+kstat_values_table_t;
+
 static int	get_kstat_named_field(const char *name, const char *field, zbx_uint64_t *field_value, char **error)
 {
 	int		ret = FAIL, min_instance = -1;
@@ -507,15 +514,11 @@ int	net_if_discovery(AGENT_REQUEST *request, AGENT_RESULT *result)
 	return SYSINFO_RET_OK;
 }
 
-static void	get_carrier(const char* interface, struct zbx_json *j)
+static void	get_carrier(const char* interface, kstat_ctl_t *kc, struct zbx_json *j)
 {
-	kstat_ctl_t	*kc = NULL;
-	kstat_t		*ksp = NULL;
-	kstat_named_t	*knp = NULL;
+	kstat_t		*ksp;
+	kstat_named_t	*knp;
 	int		i;
-
-	if (NULL == (kc = kstat_open()))
-		return;
 
 	for (ksp = kc->kc_chain; NULL != ksp; ksp = ksp->ks_next)
 	{
@@ -538,8 +541,7 @@ static void	get_carrier(const char* interface, struct zbx_json *j)
 						else if (KSTAT_DATA_INT32 == knp->data_type && 1 == knp->value.i32)
 							kstat = 1;
 
-						zbx_json_addstring(j, "carrier", kstat ? "1": "0",
-								ZBX_JSON_TYPE_STRING);
+						zbx_json_addint64(j, "carrier", kstat);
 						break;
 					}
 				}
@@ -547,8 +549,6 @@ static void	get_carrier(const char* interface, struct zbx_json *j)
 			break;
 		}
 	}
-
-	kstat_close(kc);
 }
 
 static void	get_if_flags(const char* interface, struct zbx_json *j)
@@ -602,21 +602,93 @@ static void	get_mac(const char* interface, struct zbx_json *j)
 	}
 }
 
+static void	get_if_statistics(kstat_ctl_t *kc, char *name, struct zbx_json *j)
+{
+	int		min_instance = -1, i;
+	kstat_t		*kp, *min_kp;
+	kstat_named_t	*kn;
+
+	static kstat_values_table_t	tr_table_in[] =
+	{
+		{"rbytes64", "bytes"},
+		{"ipackets64", "packets"},
+		{"ierrors", "errors"}
+	};
+
+	static kstat_values_table_t	tr_table_out[] =
+	{
+		{"obytes64", "bytes"},
+		{"opackets64", "packets"},
+		{"oerrors", "errors"}
+	};
+
+	for (kp = kc->kc_chain; NULL != kp; kp = kp->ks_next)
+	{
+		if (0 != strcmp(name, kp->ks_name))
+			continue;
+
+		if (0 != strcmp("net", kp->ks_class))
+			continue;
+
+		if (-1 == min_instance || kp->ks_instance < min_instance)
+		{
+			min_instance = kp->ks_instance;
+			min_kp = kp;
+		}
+
+		if (0 == min_instance)
+			break;
+	}
+
+	if (-1 != min_instance)
+		kp = min_kp;
+
+	if (NULL == kp || -1 == kstat_read(kc, kp, 0))
+	{
+		return;
+	}
+
+	zbx_json_addobject(j, "in");
+
+	for (i = 0; i < ARRSIZE(tr_table_in); i++)
+	{
+		if (NULL == (kn = (kstat_named_t *)kstat_data_lookup(kp, tr_table_in[i].name)))
+		{
+			continue;
+		}
+		zbx_json_adduint64(j, tr_table_in[i].json_name, (uint64_t)get_kstat_numeric_value(kn));
+
+	}
+	zbx_json_close(j);
+
+	zbx_json_addobject(j, "out");
+
+	for (i = 0; i < ARRSIZE(tr_table_out); i++)
+	{
+		if (NULL == (kn = (kstat_named_t *)kstat_data_lookup(kp, tr_table_out[i].name)))
+		{
+			continue;
+		}
+		zbx_json_adduint64(j, tr_table_out[i].json_name, (uint64_t)get_kstat_numeric_value(kn));
+
+	}
+	zbx_json_close(j);
+}
+
 int	net_if_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	struct zbx_json	j;
-	zbx_regexp_t	*rxp = NULL;
-	char		*error = NULL, *p, *pattern;
+	struct zbx_json		jcfg, jval, j;
+	zbx_regexp_t		*rxp = NULL;
+	char			*error = NULL, *p, *pattern;
 	struct if_nameindex	*ni;
-	int		i;
+	int			i;
+	kstat_ctl_t		*kc;
 
 	if (1 < request->nparam)
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters."));
 		return SYSINFO_RET_FAIL;
 	}
-
-	zbx_json_initarray(&j, ZBX_JSON_STAT_BUF_LEN);
 
 	if (1 == request->nparam)
 	{
@@ -625,7 +697,6 @@ int	net_if_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 		if (FAIL == zbx_regexp_compile(pattern, &rxp, &error))
 		{
 			zbx_free(error);
-			zbx_json_free(&j);
 			return SYSINFO_RET_FAIL;
 		}
 	}
@@ -635,9 +706,18 @@ int	net_if_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain system information: %s", zbx_strerror(errno)));
 		if (NULL != rxp)
 			zbx_regexp_free(rxp);
-		zbx_json_free(&j);
 		return SYSINFO_RET_FAIL;
 	}
+
+	if (NULL == (kc = kstat_open()))
+	{
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot open kernel statistics facility: %s",
+				zbx_strerror(errno)));
+		return SYSINFO_RET_FAIL;
+	}
+
+	zbx_json_initarray(&jval, ZBX_JSON_STAT_BUF_LEN);
+	zbx_json_initarray(&jcfg, ZBX_JSON_STAT_BUF_LEN);
 
 	for (i = 0; 0 != ni[i].if_index; i++)
 	{
@@ -646,12 +726,18 @@ int	net_if_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 		if (NULL != rxp && 0 != zbx_regexp_match_precompiled(p, rxp))
 			continue;
 
-		zbx_json_addobject(&j, NULL);
-		zbx_json_addstring(&j, "name", p, ZBX_JSON_TYPE_STRING);
-		get_if_flags(p, &j);
-		get_mac(p, &j);
-		get_carrier(p, &j);
-		zbx_json_close(&j);
+		zbx_json_addobject(&jcfg, NULL);
+		zbx_json_addobject(&jval, NULL);
+		zbx_json_addstring(&jcfg, "name", p, ZBX_JSON_TYPE_STRING);
+		zbx_json_addstring(&jval, "name", p, ZBX_JSON_TYPE_STRING);
+		get_if_flags(p, &jcfg);
+		get_mac(p, &jcfg);
+		get_mac(p, &jval);
+		get_if_statistics(kc, p, &jval);
+
+		get_carrier(p, kc, &jval);
+		zbx_json_close(&jval);
+		zbx_json_close(&jcfg);
 	}
 
 	if_freenameindex(ni);
@@ -659,11 +745,16 @@ int	net_if_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 	if (NULL != rxp)
 		zbx_regexp_free(rxp);
 
+	zbx_json_init(&j, ZBX_JSON_STAT_BUF_LEN);
+	zbx_json_addraw(&j, "config", jcfg.buffer);
+	zbx_json_addraw(&j, "values", jval.buffer);
 	zbx_json_close(&j);
 
 	SET_STR_RESULT(result, strdup(j.buffer));
 
 	zbx_json_free(&j);
-
+	zbx_json_free(&jval);
+	zbx_json_free(&jcfg);
+	kstat_close(kc);
 	return SYSINFO_RET_OK;
 }
