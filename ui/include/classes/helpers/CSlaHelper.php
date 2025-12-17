@@ -23,7 +23,7 @@ final class CSlaHelper {
 	public const SCHEDULE_MODE_24X7		= 0;
 	public const SCHEDULE_MODE_CUSTOM 	= 1;
 
-	public static function validateCustomScheduleChecked(bool $schedule_mode, array $schedule): bool {
+	public static function validateCustomScheduleChecked(int $schedule_mode, ?array $schedule): bool {
 		if ($schedule_mode == self::SCHEDULE_MODE_24X7) {
 			return true;
 		}
