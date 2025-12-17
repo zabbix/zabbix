@@ -387,7 +387,7 @@ class testMacros extends CIntegrationTest {
 		{USER.USERNAME}"
 		EOT;
 
-	const DEPRICATED_MACRO = <<<'EOT'
+	const DEPRECATED_MACRO = <<<'EOT'
 		{ACK.DATE}
 		{ACK.TIME}
 		{ACK.MESSAGE}
@@ -796,7 +796,7 @@ class testMacros extends CIntegrationTest {
 							'===8===' . "\n" .
 							self::MACRO_FUNCS . "\n" .
 							'===9===' . "\n" .
-							self::DEPRICATED_MACRO
+							self::DEPRECATED_MACRO
 					],
 					'opmessage_grp' => [
 						['usrgrpid' => 7]
@@ -836,7 +836,7 @@ class testMacros extends CIntegrationTest {
 							'===9===' . "\n" .
 							self::MACRO_FUNCS . "\n" .
 							'===10===' . "\n" .
-							self::DEPRICATED_MACRO
+							self::DEPRECATED_MACRO
 					],
 					'opmessage_grp' => [
 						['usrgrpid' => 7]
@@ -967,7 +967,7 @@ class testMacros extends CIntegrationTest {
 			'===8===' . "\n" .
 			self::MACRO_FUNCS_RESOLVED . "\n" .
 			'===9===' . "\n" .
-			self::DEPRICATED_MACRO;
+			self::DEPRECATED_MACRO;
 
 		$this->assertEquals($message_expect, self::$alert_response['result'][0]['message']);
 
@@ -1007,7 +1007,7 @@ class testMacros extends CIntegrationTest {
 			'===9===' . "\n" .
 			self::MACRO_FUNCS_RESOLVED . "\n" .
 			'===10===' . "\n" .
-			self::DEPRICATED_MACRO;
+			self::DEPRECATED_MACRO;
 
 		$this->assertEquals($message_expect, self::$alert_response['result'][1]['message']);
 	}
@@ -1437,7 +1437,7 @@ const SUBJECT_INTERNAL = "Internal";
 							'===7===' . "\n" .
 							self::MACRO_FUNCS . "\n" .
 							'===8===' . "\n" .
-							self::DEPRICATED_MACRO
+							self::DEPRECATED_MACRO
 					],
 					'opmessage_grp' => [
 						['usrgrpid' => 7]
@@ -1544,7 +1544,7 @@ const SUBJECT_INTERNAL = "Internal";
 			'===7===' . "\n" .
 			self::MACRO_FUNCS_RESOLVED . "\n" .
 			'===8===' . "\n" .
-			self::DEPRICATED_MACRO;
+			self::DEPRECATED_MACRO;
 
 			$this->assertEquals($message_expect, $alert_response_internal['result'][1]['message']);
 
@@ -1843,7 +1843,7 @@ const SUBJECT_INTERNAL = "Internal";
 							'===7===' . "\n" .
 							self::MACRO_FUNCS . "\n" .
 							'===8===' . "\n" .
-							self::DEPRICATED_MACRO
+							self::DEPRECATED_MACRO
 					],
 					'opmessage_grp' => [
 						['usrgrpid' => 7]
@@ -1959,7 +1959,7 @@ const SUBJECT_INTERNAL = "Internal";
 			'===7===' . "\n" .
 			self::MACRO_FUNCS_RESOLVED . "\n" .
 			'===8===' . "\n" .
-			self::DEPRICATED_MACRO;
+			self::DEPRECATED_MACRO;
 
 			$this->assertEquals($message_expect, $alert_response_internal_LLD['result'][1]['message']);
 	}
@@ -2213,7 +2213,7 @@ const SUBJECT_INTERNAL = "Internal";
 							'===7===' . "\n" .
 							self::MACRO_FUNCS . "\n" .
 							'===8===' . "\n" .
-							self::DEPRICATED_MACRO
+							self::DEPRECATED_MACRO
 					],
 					'opmessage_grp' => [
 						['usrgrpid' => 7]
@@ -2354,7 +2354,7 @@ const SUBJECT_INTERNAL = "Internal";
 			'===7===' . "\n" .
 			self::MACRO_FUNCS_RESOLVED . "\n" .
 			'===8===' . "\n" .
-			self::DEPRICATED_MACRO;
+			self::DEPRECATED_MACRO;
 
 			$this->assertEquals($message_expect, $alert_response_internal_trigger['result'][1]['message']);
 
@@ -2709,7 +2709,7 @@ const SUBJECT_INTERNAL = "Internal";
 							'===7===' . "\n" .
 							self::MACRO_FUNCS . "\n" .
 							'===8===' . "\n" .
-							self::DEPRICATED_MACRO
+							self::DEPRECATED_MACRO
 					],
 					'opmessage_grp' => [
 						['usrgrpid' => 7]
@@ -2796,7 +2796,7 @@ const SUBJECT_INTERNAL = "Internal";
 			'===7===' . "\n" .
 			self::MACRO_FUNCS_RESOLVED . "\n" .
 			'===8===' . "\n" .
-			self::DEPRICATED_MACRO;
+			self::DEPRECATED_MACRO;
 
 		$this->assertEquals($message_expect, self::$alert_response_service['result'][1]['message']);
 	}
@@ -3109,7 +3109,7 @@ const SUBJECT_INTERNAL = "Internal";
 							'===8===' . "\n" .
 							self::MACRO_FUNCS . "\n" .
 							'===9===' . "\n" .
-							self::DEPRICATED_MACRO . "\n" .
+							self::DEPRECATED_MACRO . "\n" .
 							'===10===' . "\n" .
 							self::BUILTIN_MACROS_INCONSISTENT_RESOLVE_DRULE
 					],
@@ -3170,7 +3170,7 @@ const SUBJECT_INTERNAL = "Internal";
 			'===8===' . "\n" .
 			self::MACRO_FUNCS_RESOLVED . "\n" .
 			'===9===' . "\n" .
-			self::DEPRICATED_MACRO . "\n=";
+			self::DEPRECATED_MACRO . "\n=";
 
 		$this->assertEquals($message_expect, $macros[0]);
 
@@ -3476,7 +3476,7 @@ const SUBJECT_INTERNAL = "Internal";
 							'===7===' . "\n" .
 							self::MACRO_FUNCS . "\n" .
 							'===8===' . "\n" .
-							self::DEPRICATED_MACRO . "\n" .
+							self::DEPRECATED_MACRO . "\n" .
 							'===9===' . "\n" .
 							self::BUILTIN_MACROS_INCONSISTENT_RESOLVE_AUTOREG
 					],
@@ -3534,7 +3534,7 @@ const SUBJECT_INTERNAL = "Internal";
 			'===7===' . "\n" .
 			self::MACRO_FUNCS_RESOLVED . "\n" .
 			'===8===' . "\n" .
-			self::DEPRICATED_MACRO . "\n=";
+			self::DEPRECATED_MACRO . "\n=";
 
 		$this->assertEquals($message_expect, $macros[0]);
 
