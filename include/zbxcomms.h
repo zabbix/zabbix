@@ -92,6 +92,13 @@ typedef int	ZBX_SOCKET;
 #	define ZBX_SOCKADDR struct sockaddr_in
 #endif
 
+int	zbx_ip_cmp(int prefix_size, const struct sockaddr *ai_addr, int ai_family, const ZBX_SOCKADDR *name,
+	int ipv6v4_mode);
+int	zbx_validate_peer_list(const char *peer_list, char **error);
+int	zbx_tcp_check_allowed_peers_info(const ZBX_SOCKADDR *peer_info, const char *peer_list);
+int	validate_cidr(const char *ip, const char *cidr, void *value);
+
+#if !defined(WITH_AGENT2_METRICS)
 typedef enum
 {
 	ZBX_BUF_TYPE_STAT = 0,
@@ -325,12 +332,7 @@ const char	*zbx_tcp_recv_context_line(zbx_socket_t *s, zbx_tcp_recv_context_t *c
 void	zbx_socket_set_deadline(zbx_socket_t *s, int timeout);
 int	zbx_socket_check_deadline(zbx_socket_t *s);
 
-int	zbx_ip_cmp(int prefix_size, const struct sockaddr *ai_addr, int ai_family, const ZBX_SOCKADDR *name,
-		int ipv6v4_mode);
-int	zbx_validate_peer_list(const char *peer_list, char **error);
-int	zbx_tcp_check_allowed_peers_info(const ZBX_SOCKADDR *peer_info, const char *peer_list);
 int	zbx_tcp_check_allowed_peers(const zbx_socket_t *s, const char *peer_list);
-int	validate_cidr(const char *ip, const char *cidr, void *value);
 
 int	zbx_udp_connect(zbx_socket_t *s, const char *source_ip, const char *ip, unsigned short port, int timeout);
 int	zbx_udp_send(zbx_socket_t *s, const char *data, size_t data_len, int timeout);
@@ -483,5 +485,5 @@ typedef struct
 	unsigned char	reset;
 }
 zbx_comms_redirect_t;
-
+#endif
 #endif /* ZABBIX_ZBXCOMMS_H */
