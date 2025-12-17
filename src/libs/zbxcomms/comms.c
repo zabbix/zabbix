@@ -690,7 +690,11 @@ int	zbx_socket_connect(zbx_socket_t *s, int ai_socktype, const char *source_ip, 
 	int	ai_flags = 0, ret = FAIL;
 	char	service[8];
 #ifdef HAVE_ARES_QUERY_CACHE
+#ifdef HAVE_IPV6
 	int	ai_family = PF_UNSPEC;
+#else
+	int	ai_family = AF_INET;
+#endif
 #endif
 	zbx_snprintf(service, sizeof(service), "%hu", port);
 
