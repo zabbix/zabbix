@@ -671,9 +671,14 @@ out:
  * Parameters: s           - [IN/OUT]                                         *
  *             type        - [IN] TCP or UDP                                  *
  *             source_ip   - [IN]                                             *
- *             ip          - [IN]                                             *
+ *             host        - [IN] IP or DNS address if events is not NULL     *
  *             port        - [IN]                                             *
  *             timeout     - [IN]                                             *
+ *             event       - [OUT] may be NULL for blocking connection,       *
+ *                                 otherwise informs caller to wait for       *
+ *                                 POLLOUT, caller must wait in that case to  *
+ *                                 to complete connection and check socket    *
+*                                  state.                                     *
  *                                                                            *
  * Return value: SUCCEED - connection initiated successfully                  *
  *               FAIL - an error occurred                                     *
