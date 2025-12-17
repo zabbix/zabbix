@@ -24,6 +24,12 @@ class CSslCertificateValidator extends CValidator {
 	 * @return bool
 	 */
 	public function validate($value) {
+		if (!extension_loaded('openssl')) {
+			$this->setError(_('OpenSSL extension is not available.'));
+
+			return false;
+		}
+
 		if (!openssl_x509_parse($value)) {
 			$this->setError(_('a PEM-encoded certificate is expected'));
 

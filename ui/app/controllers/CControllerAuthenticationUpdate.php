@@ -243,8 +243,6 @@ class CControllerAuthenticationUpdate extends CController {
 		return $rules;
 	}
 
-
-
 	private const PROVISION_ENABLED_FIELDS = ['group_basedn', 'group_member', 'group_membership',  'group_name',
 		'user_username', 'user_lastname', 'uer_ref_attr', 'provision_groups', 'provision_media'
 	];

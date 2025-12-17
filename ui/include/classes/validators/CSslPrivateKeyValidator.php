@@ -24,6 +24,11 @@ class CSslPrivateKeyValidator extends CValidator {
 	 * @return bool
 	 */
 	public function validate($value) {
+		if (!extension_loaded('openssl')) {
+			$this->setError(_('OpenSSL extension is not available.'));
+
+			return false;
+		}
 
 		if (!openssl_pkey_get_private($value)) {
 			$this->setError(_('a PEM-encoded private key is expected'));
