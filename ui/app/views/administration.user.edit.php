@@ -552,31 +552,48 @@ if ($data['roleid']) {
 
 	$api_access_enabled = CRoleHelper::checkAccess('api.access', $data['roleid']);
 	$permissions_form_list
-		->addRow((new CTag('h4', true, _('Access to API')))->addClass('input-section-header'))
-		->addRow((new CDiv((new CSpan($api_access_enabled ? _('Enabled') : _('Disabled')))->addClass(
-				$api_access_enabled ? ZBX_STYLE_STATUS_GREEN : ZBX_STYLE_STATUS_GREY
-			)))
-			->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
-			->addClass('rules-status-container')
-		);
-
-	$api_methods = CRoleHelper::getRoleApiMethods($data['roleid']);
-
-	if ($api_methods) {
-		$api_access_mode_allowed = CRoleHelper::checkAccess('api.mode', $data['roleid']);
-		$elements = [];
-
-		foreach ($api_methods as $api_method) {
-			$elements[] = (new CSpan($api_method))->addClass(
-				$api_access_mode_allowed ? ZBX_STYLE_STATUS_GREEN : ZBX_STYLE_STATUS_GREY
-			);
-		}
-
-		$permissions_form_list->addRow($api_access_mode_allowed ? _('Allowed methods') : _('Denied methods'),
-			(new CDiv($elements))
+		->addRow(
+			(new CTag('h4', true, _('Access to API')))->addClass('input-section-header')
+		)
+		->addRow(
+			(new CDiv(
+				(new CSpan($api_access_enabled ? _('Enabled') : _('Disabled')))
+					->addClass($api_access_enabled ? ZBX_STYLE_STATUS_GREEN : ZBX_STYLE_STATUS_GREY)
+			))
 				->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
 				->addClass('rules-status-container')
 		);
+
+	if ($api_access_enabled) {
+		$api_methods = CRoleHelper::getRoleApiMethods($data['roleid']);
+		$api_access_mode_allowed = CRoleHelper::checkAccess('api.mode', $data['roleid']);
+
+		if ($api_methods) {
+			$elements = [];
+			$element_class = $api_access_mode_allowed ? ZBX_STYLE_STATUS_GREEN : ZBX_STYLE_STATUS_GREY;
+
+			foreach ($api_methods as $api_method) {
+				$elements[] = (new CSpan($api_method))->addClass($element_class);
+			}
+
+			$permissions_form_list->addRow(
+				$api_access_mode_allowed ? _('Allowed methods') : _('Denied methods'),
+				(new CDiv($elements))
+					->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
+					->addClass('rules-status-container')
+			);
+		}
+		else {
+			$permissions_form_list->addRow(
+				$api_access_mode_allowed ? _('Allowed methods') : _('Denied methods'),
+				(new CDiv(
+					(new CSpan(_('None')))
+						->addClass($api_access_mode_allowed ? ZBX_STYLE_STATUS_GREY : ZBX_STYLE_STATUS_GREEN))
+				)
+					->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
+					->addClass('rules-status-container')
+			);
+		}
 	}
 
 	// Actions section.
