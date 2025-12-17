@@ -227,8 +227,8 @@ $form
 			(new CLabel(_('User group mapping')))
 				->addClass('allow-jit-provisioning')
 				->setAsteriskMark(),
-			(new CFormField(
-				(new CDiv([
+			(new CFormField([
+				(new CDiv(
 					(new CTable())
 						->setId('ldap-user-groups-table')
 						->setHeader(
@@ -243,34 +243,34 @@ $form
 								))->setColSpan(5)
 							)
 						)
-						->setAttribute('data-field-type', 'set')
-						->setAttribute('data-field-name', 'provision_groups')
-						->addStyle('width: 100%;'),
-					(new CTemplateTag('ldap-user-groups-row-tmpl'))
-						->addItem(
-							(new CRow([
-								[
-									(new CLink('#{name}', 'javascript:void(0);'))
-										->addClass(ZBX_STYLE_WORDWRAP)
-										->addClass('js-edit'),
-									(new CVar('provision_groups[#{row_index}][name]', '#{name}'))
-										->removeId(),
-									(new CDiv())
-										->setAttribute('data-field-type', 'array')
-										->setAttribute('data-field-name',
-											'provision_groups[#{row_index}][user_groups]'
-										)
-										->setId('provision-groups-#{row_index}-user-groups')
-								],
-								(new CCol('#{user_group_names}'))->addClass(ZBX_STYLE_WORDBREAK),
-								(new CCol('#{role_name}'))->addClass(ZBX_STYLE_WORDBREAK),
-								(new CButtonLink(_('Remove')))->addClass('js-remove')
-							]))->setAttribute('data-row_index', '#{row_index}')
-						)
-				]))
+						->addStyle('width: 100%;')
+				))
+					->setAttribute('data-field-type', 'set')
+					->setAttribute('data-field-name', 'provision_groups')
 					->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-					->addStyle('width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
-			))->addClass('allow-jit-provisioning')
+					->addStyle('width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;'),
+				(new CTemplateTag('ldap-user-groups-row-tmpl'))
+					->addItem(
+						(new CRow([
+							[
+								(new CLink('#{name}', 'javascript:void(0);'))
+									->addClass(ZBX_STYLE_WORDWRAP)
+									->addClass('js-edit'),
+								(new CVar('provision_groups[#{row_index}][name]', '#{name}'))
+									->removeId(),
+								(new CDiv())
+									->setAttribute('data-field-type', 'array')
+									->setAttribute('data-field-name',
+										'provision_groups[#{row_index}][user_groups]'
+									)
+									->setId('provision-groups-#{row_index}-user-groups')
+							],
+							(new CCol('#{user_group_names}'))->addClass(ZBX_STYLE_WORDBREAK),
+							(new CCol('#{role_name}'))->addClass(ZBX_STYLE_WORDBREAK),
+							(new CButtonLink(_('Remove')))->addClass('js-remove')
+						]))->setAttribute('data-row_index', '#{row_index}')
+					)
+			]))->addClass('allow-jit-provisioning')
 		])
 		->addItem([
 			(new CLabel([
