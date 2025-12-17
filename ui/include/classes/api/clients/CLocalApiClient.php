@@ -303,14 +303,11 @@ class CLocalApiClient extends CApiClient {
 			}
 		}
 
-		if (!$api_methods) {
-			return true;
-		}
-
 		$api_method_masks = [
 			ZBX_ROLE_RULE_API_WILDCARD, ZBX_ROLE_RULE_API_WILDCARD_ALIAS, CRoleHelper::API_ANY_SERVICE.$method,
 			$api.CRoleHelper::API_ANY_METHOD
 		];
+
 		foreach ($api_methods as $api_method) {
 			if ($api_method === $api.'.'.$method || in_array($api_method, $api_method_masks)) {
 				return $api_access_mode;
