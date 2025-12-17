@@ -85,7 +85,7 @@ class testHostConnMacroValidation extends CIntegrationTest {
 					'type' => 1,
 					'main' => 1,
 					'useip' => 1,
-					'ip' => '127.0.0.1',
+					'ip' => '::1',
 					'dns' => '',
 					'port' => $this->getConfigurationValue(self::COMPONENT_AGENT, 'ListenPort')
 				]
@@ -598,7 +598,7 @@ class testHostConnMacroValidation extends CIntegrationTest {
 		$c->sendRequest(self::HOST_NAME, '127.250.250.250;uname');
 
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER,
-			'cannot send list of active checks to "127.0.0.1": "127.250.250.250;uname" is not a valid IP address',
+			'cannot send list of active checks to "::1": "127.250.250.250;uname" is not a valid IP address',
 			true, 30, 2, true
 		);
 	}
