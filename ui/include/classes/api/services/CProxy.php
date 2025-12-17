@@ -410,7 +410,6 @@ class CProxy extends CApiService {
 		$this->validateDelete($proxyids, $db_proxies);
 
 		DB::delete('host_proxy', ['proxyid' => $proxyids]);
-		DB::delete('proxy_rtdata', ['proxyid' => $proxyids]);
 		DB::delete('proxy', ['proxyid' => $proxyids]);
 
 		self::addAuditLog(CAudit::ACTION_DELETE, CAudit::RESOURCE_PROXY, $db_proxies);
