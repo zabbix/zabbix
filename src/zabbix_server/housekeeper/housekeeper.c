@@ -31,7 +31,7 @@
 typedef struct {
 	zbx_uint64_t	housekeeperid;
 	zbx_uint64_t	objectid;
-	int		progress;
+	unsigned int	progress;
 } hk_entry_t;
 
 typedef struct {
@@ -120,7 +120,8 @@ static int	hk_table_cleanup(const char *table, const char *filter, int config_ma
 static int	hk_item_cleanup(const zbx_vector_hk_housekeeper_t *hk_entries, int config_max_hk_delete,
 		zbx_vector_uint64_t *deleteids)
 {
-	int	deleted = 0, complete_mask = (1 << ARRSIZE(hk_item_cleanup_order)) - 1;
+	int		deleted = 0;
+	unsigned int	complete_mask = (1 << ARRSIZE(hk_item_cleanup_order)) - 1;
 
 	/* delete in order of tables to optimize database cache */
 	for (size_t i = 0; i < ARRSIZE(hk_item_cleanup_order); i++)
