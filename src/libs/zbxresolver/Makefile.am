@@ -5,5 +5,5 @@ noinst_LIBRARIES = libzbxresolver.a
 libzbxresolver_a_SOURCES = \
 	resolver.c
 
-libzbxresolver=_a_CFLAGS = \
+libzbxresolver_a_CFLAGS = \
 	$(ARES_CFLAGS)

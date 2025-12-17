@@ -7,4 +7,5 @@ libzbxdatasender_a_SOURCES = \
 	datasender.h
 
 libzbxdatasender_a_CFLAGS = \
-	$(TLS_CFLAGS)
+	$(TLS_CFLAGS) \
+	$(ARES_CFLAGS)
