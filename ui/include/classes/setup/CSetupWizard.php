@@ -760,7 +760,7 @@ class CSetupWizard extends CForm {
 					->setAttribute('maxlength', 2048),
 				'vault_app_secret_id_row',
 				$db_creds_storage != DB_STORE_CREDS_VAULT_HASHICORP
-						|| $hashicorp_auth_type == DB_VAULT_HASHICORP_AUTH_TYPE_APP_TOKEN
+						|| $hashicorp_auth_type == DB_VAULT_HASHICORP_AUTH_TYPE_TOKEN
 					? ZBX_STYLE_DISPLAY_NONE
 					: null
 			)
