@@ -260,8 +260,7 @@ class CSetupWizard extends CForm {
 						else {
 							$vault_provider = new CVaultHashiCorp($this->getConfig('DB_VAULT_URL'),
 								$this->getConfig('DB_VAULT_PREFIX'), $this->getConfig('DB_VAULT_DB_PATH'), '',
-								$this->getConfig('DB_VAULT_APP_ROLE_ID'),
-								$this->getConfig('DB_VAULT_APP_SECRET_ID')
+								$this->getConfig('DB_VAULT_APP_ROLE_ID'), $this->getConfig('DB_VAULT_APP_SECRET_ID')
 							);
 						}
 
@@ -357,7 +356,6 @@ class CSetupWizard extends CForm {
 					'VAULT_URL' => '',
 					'VAULT_PREFIX' => '',
 					'VAULT_DB_PATH' => '',
-					'VAULT_AUTH_TYPE' => DB_VAULT_HASHICORP_AUTH_TYPE_TOKEN,
 					'VAULT_TOKEN' => '',
 					'VAULT_APP_ROLE_ID' => '',
 					'VAULT_APP_SECRET_ID' => '',
@@ -665,8 +663,7 @@ class CSetupWizard extends CForm {
 			);
 
 		$db_creds_storage = (int) $this->getConfig('DB_CREDS_STORAGE', DB_STORE_CREDS_CONFIG);
-
-		$hashicorp_auth_type = $this->getConfig('DB_VAULT_AUTH_TYPE', DB_VAULT_HASHICORP_AUTH_TYPE_TOKEN);
+		$hashicorp_auth_type = (int) $this->getConfig('DB_VAULT_AUTH_TYPE', DB_VAULT_HASHICORP_AUTH_TYPE_TOKEN);
 
 		$table
 			->addRow(_('Store credentials in'),
@@ -727,7 +724,7 @@ class CSetupWizard extends CForm {
 			)
 			->addRow(
 				_('Vault authentication type'),
-				(new CRadioButtonList('vault_auth_type', (int) $hashicorp_auth_type))
+				(new CRadioButtonList('vault_auth_type', $hashicorp_auth_type))
 					->addValue(_('Token'), DB_VAULT_HASHICORP_AUTH_TYPE_TOKEN)
 					->addValue(_('AppRole'), DB_VAULT_HASHICORP_AUTH_TYPE_APP_ROLE)
 					->setModern(true),
@@ -741,7 +738,7 @@ class CSetupWizard extends CForm {
 					->setAttribute('maxlength', 2048),
 				'vault_token_row',
 				$db_creds_storage != DB_STORE_CREDS_VAULT_HASHICORP
-						|| $hashicorp_auth_type != DB_VAULT_HASHICORP_AUTH_TYPE_TOKEN
+						|| $hashicorp_auth_type == DB_VAULT_HASHICORP_AUTH_TYPE_APP_ROLE
 					? ZBX_STYLE_DISPLAY_NONE
 					: null
 			)
@@ -752,7 +749,7 @@ class CSetupWizard extends CForm {
 					->setAttribute('maxlength', 2048),
 				'vault_app_role_id_row',
 				$db_creds_storage != DB_STORE_CREDS_VAULT_HASHICORP
-						|| $hashicorp_auth_type != DB_VAULT_HASHICORP_AUTH_TYPE_APP_ROLE
+						|| $hashicorp_auth_type == DB_VAULT_HASHICORP_AUTH_TYPE_TOKEN
 					? ZBX_STYLE_DISPLAY_NONE
 					: null
 			)
@@ -763,7 +760,7 @@ class CSetupWizard extends CForm {
 					->setAttribute('maxlength', 2048),
 				'vault_app_secret_id_row',
 				$db_creds_storage != DB_STORE_CREDS_VAULT_HASHICORP
-						|| $hashicorp_auth_type != DB_VAULT_HASHICORP_AUTH_TYPE_APP_ROLE
+						|| $hashicorp_auth_type == DB_VAULT_HASHICORP_AUTH_TYPE_APP_TOKEN
 					? ZBX_STYLE_DISPLAY_NONE
 					: null
 			)
