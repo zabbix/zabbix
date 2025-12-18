@@ -901,7 +901,7 @@ sub process_housekeeper($)
 	{
 		$triggers .= "create or replace function ${table_name}_housekeeping_proc() returns trigger as \$\$${eol}\n";
 		$triggers .= "begin${eol}\n";
-		$triggers .= "insert into housekeeper (object,objectid) values(${object},old.${pkey_name});${eol}\n";
+		$triggers .= "insert into housekeeper (object,objectid) values (${object},old.${pkey_name});${eol}\n";
 		$triggers .= "return old;${eol}\n";
 		$triggers .= "end;${eol}\n";
 		$triggers .= "\$\$ language plpgsql;${eol}\n";
