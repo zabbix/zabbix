@@ -700,7 +700,8 @@ class CImportReferencer {
 			$this->selectDashboards();
 		}
 
-		if (array_key_exists($dashboardid, $this->db_dashboard_pages)) {
+		if (array_key_exists($dashboardid, $this->db_dashboard_pages)
+				&& array_key_exists($index, $this->db_dashboard_pages[$dashboardid])) {
 			return $this->db_dashboard_pages[$dashboardid][$index]['dashboard_pageid'];
 		}
 
