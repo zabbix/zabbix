@@ -540,22 +540,22 @@ static void	sock_state_cb(void *data, int s, int read, int write)
 		goto out;
 	}
 
-	struct event	*ev = event_new(poller_config->base, s, events|EV_PERSIST, ares_process_fd_cb,
+	fd_event_local.event = event_new(poller_config->base, s, events|EV_PERSIST, ares_process_fd_cb,
 			poller_config->channel);
 
-	if (NULL == ev)
+	if (NULL == fd_event_local.event)
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot create new event");
 		goto out;
 	}
 
-	if (0 != event_add(ev, NULL))
+	if (0 != event_add(fd_event_local.event, NULL))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot add event");
-		event_free(ev);
+		event_free(fd_event_local.event);
 		goto out;
 	}
-	fd_event_local.event = ev;
+	
 	zbx_hashset_insert(&poller_config->fd_events, &fd_event_local, sizeof(fd_event_local));
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
