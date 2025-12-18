@@ -42,7 +42,7 @@
 #define HK_MIN_CLOCK_UNDEFINED		0
 #define HK_MIN_CLOCK_ALWAYS_RECHECK	-1
 
-/* trends table offsets in the hk_cleanup_tables[] mapping  */
+/* trends table offsets in the hk_history_rules[] mapping  */
 #define HK_UPDATE_CACHE_OFFSET_TREND_FLOAT	(ITEM_VALUE_TYPE_BIN + 1)
 #define HK_UPDATE_CACHE_OFFSET_TREND_UINT	(HK_UPDATE_CACHE_OFFSET_TREND_FLOAT + 1)
 #define HK_UPDATE_CACHE_TREND_COUNT		2
@@ -57,7 +57,7 @@ typedef struct
 	const char	*table;
 
 	/* ID field name, required to select IDs of records that must be deleted */
-	char		*field_name;
+	const char	*field_name;
 
 	/* Optional filter, must be empty string if not used. Only the records matching */
 	/* filter are subject to housekeeping procedures.                               */
@@ -73,7 +73,7 @@ typedef struct
 
 	/* a reference to the settings value specifying number of seconds the records must be kept */
 	int		*phistory;
-	char		*fk_table;
+	const char	*fk_table;
 }
 zbx_hk_rule_t;
 

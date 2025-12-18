@@ -236,7 +236,6 @@ static int	housekeep_events_by_triggerid(const zbx_vector_hk_housekeeper_t *hk_e
  *             table                - [IN] event/problem table name           *
  *             source               - [IN] event/problem source               *
  *             object               - [IN] event/problem object type          *
- *             objectid             - [IN] event/problem object identifier    *
  *             config_max_hk_delete - [IN]                                    *
  *             deleteids            - [IN] housekeeper ids to delete          *
  *                                                                            *
@@ -353,7 +352,7 @@ int	housekeeper_process(int config_max_hk_delete)
 
 	zbx_vector_uint64_destroy(&deleteids);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() deleted:%d", __func__, deleted);
 
 	return deleted;
 }
