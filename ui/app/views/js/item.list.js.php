@@ -101,7 +101,7 @@
 			});
 
 			this.form.querySelectorAll('.list-table thead th a').forEach(link => {
-				link.addEventListener('click', (e) => {
+				link.addEventListener('click', e => {
 					e.preventDefault();
 
 					const search_params = new URLSearchParams(e.currentTarget.href);

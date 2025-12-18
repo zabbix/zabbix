@@ -153,7 +153,7 @@
 			document.querySelector('.<?= ZBX_STYLE_TABLE_PAGING ?>').outerHTML = paging;
 
 			document.querySelectorAll('.<?= ZBX_STYLE_TABLE_PAGING ?> .paging-btn-container a').forEach(link => {
-				link.addEventListener('click', (e) => {
+				link.addEventListener('click', e => {
 					e.preventDefault();
 
 					const search_params = new URLSearchParams(e.currentTarget.href);
