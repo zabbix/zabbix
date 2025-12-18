@@ -588,6 +588,8 @@ class CUserDirectory extends CApiService {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 
+		self::addBindPassword($db_userdirectories);
+
 		foreach ($userdirectories as $i => &$userdirectory) {
 			$db_userdirectory = $db_userdirectories[$userdirectory['userdirectoryid']];
 			$userdirectory += [
@@ -618,6 +620,19 @@ class CUserDirectory extends CApiService {
 		self::checkDuplicates($userdirectories, $db_userdirectories);
 		self::checkProvisionGroups($userdirectories, $db_userdirectories);
 		self::checkMediaTypes($userdirectories, $db_userdirectories);
+		self::checkLdapBindPassword($userdirectories, $db_userdirectories);
+	}
+
+	private static function addBindPassword(array &$db_userdirectories): void {
+		$db_bind_passwords = DB::select('userdirectory_ldap', [
+			'output' => ['bind_password'],
+			'filter' => ['userdirectoryid' => array_keys($db_userdirectories)],
+			'preservekeys' => true
+		]);
+
+		foreach ($db_bind_passwords as $db_userdirectoryid => $db_bind_password) {
+			$db_userdirectories[$db_userdirectoryid] += $db_bind_password;
+		}
 	}
 
 	private static function addRequiredFieldsByType(array &$userdirectories, array $db_userdirectories): void {
@@ -944,6 +959,24 @@ class CUserDirectory extends CApiService {
 		}
 	}
 
+	private static function checkLdapBindPassword(array $userdirectories, array $db_userdirectories): void {
+		foreach ($userdirectories as $i => $userdirectory) {
+			if ($userdirectory['idp_type'] != IDP_TYPE_LDAP) {
+				continue;
+			}
+
+			$db_userdirectory = $db_userdirectories[$userdirectory['userdirectoryid']];
+
+			if (array_key_exists('host', $userdirectory) && $userdirectory['host'] !== $db_userdirectory['host']
+					&& !array_key_exists('bind_password', $userdirectory)
+					&& $db_userdirectory['bind_password'] !== '') {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.', '/'.($i + 1),
+					_s('the parameter "%1$s" is missing', 'bind_password')
+				));
+			}
+		}
+	}
+
 	private static function addFieldDefaultsByType(array &$userdirectories, array $db_userdirectories): void {
 		foreach ($userdirectories as &$userdirectory) {
 			$db_userdirectory = $db_userdirectories[$userdirectory['userdirectoryid']];
@@ -993,11 +1026,6 @@ class CUserDirectory extends CApiService {
 			'where' => ['userdirectoryid' => $userdirectoryids]
 		]]);
 
-		self::deleteAffectedProvisionGroups($userdirectoryids);
-
-		DB::delete('userdirectory_media', ['userdirectoryid' => $userdirectoryids]);
-		DB::delete('userdirectory_ldap', ['userdirectoryid' => $userdirectoryids]);
-		DB::delete('userdirectory_saml', ['userdirectoryid' => $userdirectoryids]);
 		DB::delete('userdirectory', ['userdirectoryid' => $userdirectoryids]);
 
 		self::addAuditLog(CAudit::ACTION_DELETE, CAudit::RESOURCE_USERDIRECTORY, $db_userdirectories);
@@ -1075,17 +1103,6 @@ class CUserDirectory extends CApiService {
 		if (in_array($auth['ldap_userdirectoryid'], $userdirectoryids)) {
 			// If last (default) is removed, reset default userdirectoryid to prevent from foreign key constraint.
 			API::Authentication()->update(['ldap_userdirectoryid' => 0]);
-		}
-	}
-
-	private static function deleteAffectedProvisionGroups(array $userdirectoryids): void {
-		$del_provision_groupids = array_keys(DB::select('userdirectory_idpgroup', [
-			'filter' => ['userdirectoryid' => $userdirectoryids],
-			'preservekeys' => true
-		]));
-
-		if ($del_provision_groupids) {
-			self::deleteProvisionGroups($del_provision_groupids);
 		}
 	}
 
@@ -1354,7 +1371,7 @@ class CUserDirectory extends CApiService {
 		unset($userdirectory);
 
 		if ($del_provision_groupids) {
-			self::deleteProvisionGroups($del_provision_groupids);
+			DB::delete('userdirectory_idpgroup', ['userdirectory_idpgroupid' => $del_provision_groupids]);
 		}
 
 		if ($upd_provision_groups) {
@@ -1400,11 +1417,6 @@ class CUserDirectory extends CApiService {
 		if ($provision_groups) {
 			self::updateProvisionGroupUserGroups($provision_groups, $db_provision_groups);
 		}
-	}
-
-	private static function deleteProvisionGroups(array $del_provision_groupids): void {
-		DB::delete('userdirectory_usrgrp', ['userdirectory_idpgroupid' => $del_provision_groupids]);
-		DB::delete('userdirectory_idpgroup', ['userdirectory_idpgroupid' => $del_provision_groupids]);
 	}
 
 	private static function updateProvisionGroupUserGroups(array &$provision_groups,

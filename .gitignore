@@ -10,6 +10,7 @@
 .deps
 .dirstamp
 .vscode
+.idea
 /.buildpath
 /.idea
 /.project
@@ -189,6 +190,7 @@ tests/libs/zbxexpr/zbx_get_report_nextcheck
 tests/libs/zbxexpr/zbx_interval_preproc
 tests/libs/zbxexpr/zbx_token_find
 tests/libs/zbxexpr/zbx_user_macro_parse
+tests/libs/zbxexpr/zbx_user_macro_parse_dyn
 tests/libs/zbxexpr/zbx_validate_interval
 tests/libs/zbxexpression/evaluate
 tests/libs/zbxexpression/evaluate_function
@@ -203,6 +205,7 @@ tests/libs/zbxexpression/valuemaps
 tests/libs/zbxfile/zbx_buf_readln
 tests/libs/zbxhistory/zbx_history_get_values
 tests/libs/zbxhttp/zbx_determine_charset
+tests/libs/zbxip/zbx_join_hostport
 tests/libs/zbxicmpping/get_interval_option
 tests/libs/zbxicmpping/line_process
 tests/libs/zbxjson/zbx_json_decodevalue
@@ -294,3 +297,4 @@ ui/locale/frontend.pot
 ui/tests/bootstrap.php
 ui/tests/composer.*
 ui/tests/vendor
+ui/tests/.phpunit.result.cache

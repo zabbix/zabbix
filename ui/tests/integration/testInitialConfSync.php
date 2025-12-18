@@ -80,30 +80,15 @@ class testInitialConfSync extends CIntegrationTest
 				'delete' => '0'
 			],
 
-		/* Where the number 95 came from ?
-		Need to go through the confsync_hosts.xml and confsync_tmpl.xml,
+		/* When counting number of expected inserts,
+		need to go through the confsync_hosts.xml and confsync_tmpl.xml,
 		count number of items, item prototypes and discovery rules for hosts
 		and templates that get imported by those hosts.
 		However, the following needs to be accounted:
 		a) every httpstep in web scenarios have 6 hidden items
-		b) item prototypes in discovery rules are ignored by configuration syncer
-			(ZBX_FLAG_DISCOVERY_PROTOTYPE = 2)
+		b) item prototypes in discovery rules are NOT ignored by configuration syncer
+		(ZBX_FLAG_DISCOVERY_PROTOTYPE = 2) */
 
-		With that approach we get the following:
-
-		1) HostInventoryAutomatic -> 3 items
-		2) HostMultilevelTmpl -> 9 items, (1 items, also inherits bbbtmpl, which inherits
-					'SampleTemplate', which has 1 item, 1 item prototype (ignored
-					as it is part of the discovery rule), 1 discovery rule,
-					1 httpstep(6 items)))
-		3) HostWithDiscovery -> 1 items (1 item prototype(ignored as it is part of the discovery
-					rule), 1 discovery rule)
-		4) HostWithItems -> 28 items
-		5) HostWithMacros -> 3 items
-		6) HostWithTemplate -> 8 items (inherits 'SampleTemplate')
-		7) HostWithWebScenario -> 7 items (1 item + httpstep(6 items))
-		8) HostWithComprehensiveTemplate -> 36 items (inherits 'Comprehensive Template')
-		3 + 9 + 1 + 28 + 3 + 8 + 7 + 36 = 95 */
 
 			'items' =>
 			[

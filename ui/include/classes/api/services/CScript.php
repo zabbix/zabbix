@@ -510,9 +510,12 @@ class CScript extends CApiService {
 			if (($script['scope'] == ZBX_SCRIPT_SCOPE_HOST || $script['scope'] == ZBX_SCRIPT_SCOPE_EVENT)
 					&& $script['manualinput'] == ZBX_SCRIPT_MANUALINPUT_ENABLED) {
 				if ($script['manualinput_validator_type'] == ZBX_SCRIPT_MANUALINPUT_TYPE_STRING) {
-					$regular_expression = '/'.str_replace('/', '\/', $script['manualinput_validator']).'/';
+					if ($script['manualinput_default_value'] === '') {
+						continue;
+					}
 
-					if (!preg_match($regular_expression, $script['manualinput_default_value'])) {
+					if (!preg_match('/'.CRegexHelper::handleSlashEscaping($script['manualinput_validator']).'/',
+							$script['manualinput_default_value'])) {
 						self::exception(ZBX_API_ERROR_PARAMETERS,
 							_s('Invalid parameter "%1$s": %2$s.', '/'.($index + 1).'/manualinput_default_value',
 								_s('input does not match the provided pattern: %1$s', $script['manualinput_validator'])

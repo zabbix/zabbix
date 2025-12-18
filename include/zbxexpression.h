@@ -145,6 +145,8 @@ void	zbx_format_value(char *value, size_t max_len, zbx_uint64_t valuemapid,
 void	zbx_determine_items_in_expressions(zbx_vector_dc_trigger_t *trigger_order, const zbx_uint64_t *itemids,
 		int item_num);
 
+int	zbx_um_expand_cb_wrapper(void *data, char **str, const zbx_uint64_t *hostids, int hostids_num, char **error);
+
 void	zbx_expression_eval_init(zbx_expression_eval_t *eval, int mode, zbx_eval_context_t *ctx);
 void	zbx_expression_eval_clear(zbx_expression_eval_t *eval);
 void	zbx_expression_eval_resolve_item_hosts(zbx_expression_eval_t *eval, const zbx_dc_item_t *item);
@@ -183,8 +185,6 @@ int	zbx_substitute_expression_lld_macros(char **data, zbx_uint64_t rules, const 
 
 void	zbx_count_dbl_vector_with_pattern(zbx_eval_count_pattern_data_t *pdata, char *pattern,
 		zbx_vector_dbl_t *values, int *count);
-
-int	zbx_calculate_macro_function(const char *expression, const zbx_token_func_macro_t *func_macro, char **out);
 
 const char	*zbx_dservice_type_string(zbx_dservice_type_t service);
 #endif

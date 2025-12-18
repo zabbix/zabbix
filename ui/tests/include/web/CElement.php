@@ -605,22 +605,41 @@ class CElement extends CBaseElement implements IWaitable {
 			throw new Exception('Cannot wait for element reload on element selected in multi-element query.');
 		}
 
+		return $this->waitUntilStalled($timeout, true);
+	}
+
+	/**
+	 * Wait until element changes it's state to stalled.
+	 *
+	 * @param integer $timeout    timeout in seconds
+	 * @param boolean $reload     if element need to be reloaded
+	 *
+	 * @return $this
+	 * @throws Exception
+	 */
+	public function waitUntilStalled($timeout = null, $reload = false) {
 		$element = $this;
 		$wait = forward_static_call_array([CElementQuery::class, 'wait'], $timeout !== null ? [$timeout] : []);
-		$wait->until(function () use ($element) {
+		$wait->until(function () use ($element, $reload) {
 			try {
+				if (!$reload) {
+					return $element->isStalled();
+				}
+
 				if ($element->isStalled()) {
 					$element->reload();
 
 					return !$element->isStalled();
 				}
+
+				return false;
 			}
 			catch (Exception $e) {
 				// Code is not missing here.
 			}
 
 			return null;
-		}, 'Failed to wait until element reloaded.');
+		}, 'Failed to wait until element '.($reload ? 'reloaded' : 'stalled').'.');
 
 		return $this;
 	}

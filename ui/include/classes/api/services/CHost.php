@@ -490,18 +490,9 @@ class CHost extends CHostGeneral {
 
 		// tags
 		if ($options['tags'] !== null && $options['tags']) {
-			if ($options['inheritedTags']) {
-				$sqlParts['left_join'][] = ['alias' => 'ht2', 'table' => 'hosts_templates', 'using' => 'hostid'];
-				$sqlParts['left_table'] = ['alias' => $this->tableAlias, 'table' => $this->tableName];
-				$sqlParts['where'][] = CApiTagHelper::addInheritedHostTagsWhereCondition($options['tags'],
-					$options['evaltype']
-				);
-			}
-			else {
-				$sqlParts['where'][] = CApiTagHelper::addWhereCondition($options['tags'], $options['evaltype'], 'h',
-					'host_tag', 'hostid'
-				);
-			}
+			$sqlParts['where'][] = $options['inheritedTags']
+				? CApiTagHelper::addInheritedHostTagsWhereCondition($options['tags'], $options['evaltype'], 'h')
+				: CApiTagHelper::addWhereCondition($options['tags'], $options['evaltype'], 'h', 'host_tag', 'hostid');
 		}
 
 		// limit
@@ -1749,26 +1740,16 @@ class CHost extends CHostGeneral {
 		}
 
 		// delete host from maps
-		if (!empty($hostids)) {
-			DB::delete('sysmaps_elements', [
-				'elementtype' => SYSMAP_ELEMENT_TYPE_HOST,
-				'elementid' => $hostids
-			]);
-		}
-
-		// delete host inventory
-		DB::delete('host_inventory', ['hostid' => $hostids]);
+		DB::delete('sysmaps_elements', [
+			'elementtype' => SYSMAP_ELEMENT_TYPE_HOST,
+			'elementid' => $hostids
+		]);
 
 		self::deleteHgSets($db_hosts);
-		DB::delete('hosts_groups', ['hostid' => $hostids]);
 
 		// delete host
 		DB::delete('host_proxy', ['hostid' => $hostids]);
 		DB::delete('host_tag', ['hostid' => $hostids]);
-		DB::update('hosts', [
-			'values' => ['templateid' => 0],
-			'where' => ['hostid' => $hostids, 'flags' => ZBX_FLAG_DISCOVERY_PROTOTYPE]
-		]);
 		DB::delete('hosts', ['hostid' => $hostids]);
 
 		self::addAuditLog(CAudit::ACTION_DELETE, CAudit::RESOURCE_HOST, $db_hosts);
@@ -1840,46 +1821,39 @@ class CHost extends CHostGeneral {
 		}
 
 		if ($options['selectDashboards'] !== null) {
-			[$hosts_templates, $templateids] = CApiHostHelper::getParentTemplates($hostids);
-
 			if ($options['selectDashboards'] != API_OUTPUT_COUNT) {
-				$dashboards = API::TemplateDashboard()->get([
-					'output' => $this->outputExtend($options['selectDashboards'], ['templateid']),
-					'templateids' => $templateids
+				foreach ($result as &$host) {
+					$host['dashboards'] = [];
+				}
+				unset($host);
+
+				$dashboards = API::HostDashboard()->get([
+					'output' => $options['selectDashboards'],
+					'hostids' => $hostids
 				]);
 
-				if (!is_null($options['limitSelects'])) {
+				if ($options['limitSelects'] !== null) {
 					order_result($dashboards, 'name');
 				}
 
-				foreach ($result as &$host) {
-					foreach ($hosts_templates[$host['hostid']] as $templateid) {
-						foreach ($dashboards as $dashboard) {
-							if ($dashboard['templateid'] == $templateid) {
-								$host['dashboards'][] = $dashboard;
-							}
-						}
-					}
+				foreach ($dashboards as $dashboard) {
+					$result[$dashboard['hostid']]['dashboards'][] = $dashboard;
 				}
-				unset($host);
 			}
 			else {
-				$dashboards = API::TemplateDashboard()->get([
-					'templateids' => $templateids,
+				foreach ($result as $hostid => &$host) {
+					$host['dashboards'] = '0';
+				}
+				unset($host);
+
+				$dashboards = API::HostDashboard()->get([
 					'countOutput' => true,
-					'groupCount' => true
+					'groupCount' => true,
+					'hostids' => $hostids
 				]);
 
-				foreach ($result as $hostid => $host) {
-					$result[$hostid]['dashboards'] = 0;
-
-					foreach ($dashboards as $dashboard) {
-						if (in_array($dashboard['templateid'], $hosts_templates[$hostid])) {
-							$result[$hostid]['dashboards'] += $dashboard['rowscount'];
-						}
-					}
-
-					$result[$hostid]['dashboards'] = (string) $result[$hostid]['dashboards'];
+				foreach ($dashboards as $dashboard) {
+					$result[$dashboard['hostid']]['dashboards'] = $dashboard['rowscount'];
 				}
 			}
 		}

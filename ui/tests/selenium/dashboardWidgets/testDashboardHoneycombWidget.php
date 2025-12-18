@@ -2526,44 +2526,43 @@ class testDashboardHoneycombWidget extends testWidgets {
 					'fields' => [
 						'Advanced configuration' => true,
 						'id:primary_label_type' => 'Text',
-						'id:primary_label' => '{'.self::USER_MACRO.'.regsub(^[0-9]+, Problem)}, '.
-							'{'.self::USER_MACRO.'.iregsub(^[0-9]+, Problem)}, {{ITEM.NAME}.regsub(^[0-9]+, Problem)}, '.
-							'{{ITEM.NAME}.iregsub(^[0-9]+, Problem)}, {'.self::USER_SECRET_MACRO.'.regsub(^[0-9]+, Problem)}, '.
-							'{'.self::USER_SECRET_MACRO.'.iregsub(^[0-9]+, Problem)}',
+						'id:primary_label' => '{'.self::USER_MACRO.'.regsub([0-9]+, Problem)}, '.
+							'{'.self::USER_MACRO.'.iregsub([0-9]+, Problem)}, {{ITEM.NAME}.regsub([0-9]+, Problem)}, '.
+							'{{ITEM.NAME}.iregsub([0-9]+, Problem)}, {'.self::USER_SECRET_MACRO.'.regsub([0-9]+, Problem)}, '.
+							'{'.self::USER_SECRET_MACRO.'.iregsub([0-9]+, Problem)}',
 						'id:secondary_label_type' => 'Text',
-						'id:secondary_label' => '{'.self::USER_MACRO.'.regsub(^[0-9]+, Problem)}, '.
-							'{'.self::USER_MACRO.'.iregsub(^[0-9]+, Problem)}, {{ITEM.NAME}.regsub(^[0-9]+, Problem)}, '.
-							'{{ITEM.NAME}.iregsub(^[0-9]+, Problem)}, {'.self::USER_SECRET_MACRO.'.regsub(^[0-9]+, Problem)}, '.
-							'{'.self::USER_SECRET_MACRO.'.iregsub(^[0-9]+, Problem)}'
+						'id:secondary_label' => '{'.self::USER_MACRO.'.regsub([0-9]+, Problem)}, '.
+							'{'.self::USER_MACRO.'.iregsub([0-9]+, Problem)}, {{ITEM.NAME}.regsub([0-9]+, Problem)}, '.
+							'{{ITEM.NAME}.iregsub([0-9]+, Problem)}, {'.self::USER_SECRET_MACRO.'.regsub([0-9]+, Problem)}, '.
+							'{'.self::USER_SECRET_MACRO.'.iregsub([0-9]+, Problem)}'
 					],
 					'result' => [
-						'primary' => 'Problem, Problem, Problem, Problem, Problem, Problem',
-						'secondary' => 'Problem, Problem, Problem, Problem, Problem, Problem'
+						'primary' => 'Problem, Problem, Problem, Problem, ,',
+						'secondary' => 'Problem, Problem, Problem, Problem, ,'
+					]
+				]
+			],
+			'Macro functions regsub(), iregsub() -  empty value in case of no match' => [
+				[
+					'fields' => [
+						'Advanced configuration' => true,
+						'id:primary_label_type' => 'Text',
+						'id:primary_label' => '{'.self::USER_MACRO.'.regsub(0, Problem)}, '.
+							'{'.self::USER_MACRO.'.iregsub(0, Problem)}, {{ITEM.NAME}.regsub(0, Problem)}, '.
+							'{{ITEM.NAME}.iregsub(0, Problem)}, {'.self::USER_SECRET_MACRO.'.regsub(0, Problem)}, '.
+							'{'.self::USER_SECRET_MACRO.'.iregsub(0, Problem)}, ',
+						'id:secondary_label_type' => 'Text',
+						'id:secondary_label' => '{'.self::USER_MACRO.'.regsub(0, Problem)}, '.
+							'{'.self::USER_MACRO.'.iregsub(0, Problem)}, {{ITEM.NAME}.regsub(0, Problem)}, '.
+							'{{ITEM.NAME}.iregsub(0, Problem)}, {'.self::USER_SECRET_MACRO.'.regsub(0, Problem)}, '.
+							'{'.self::USER_SECRET_MACRO.'.iregsub(0, Problem)}, '
+					],
+					'result' => [
+						'primary' => ', , , , , ,',
+						'secondary' => ', , , , , ,'
 					]
 				]
 			]
-			// TODO: Uncomment and check the test case, after ZBX-25420 fix.
-//			'Macro functions regsub(), iregsub() -  empty value in case of no match' => [
-//				[
-//					'fields' => [
-//						'Advanced configuration' => true,
-//						'id:primary_label_type' => 'Text',
-//						'id:primary_label' => '{'.self::USER_MACRO.'.regsub(0, Problem)}, '.
-//							'{'.self::USER_MACRO.'.iregsub(0, Problem)}, {{ITEM.NAME}.regsub(0, Problem)}, '.
-//							'{{ITEM.NAME}.iregsub(0, Problem)}, {'.self::USER_SECRET_MACRO.'.regsub(0, Problem)}, '.
-//							'{'.self::USER_SECRET_MACRO.'.iregsub(0, Problem)}, ',
-//						'id:secondary_label_type' => 'Text',
-//						'id:secondary_label' => '{'.self::USER_MACRO.'.regsub(0, Problem)}, '.
-//							'{'.self::USER_MACRO.'.iregsub(0, Problem)}, {{ITEM.NAME}.regsub(0, Problem)}, '.
-//							'{{ITEM.NAME}.iregsub(0, Problem)}, {'.self::USER_SECRET_MACRO.'.regsub(0, Problem)}, '.
-//							'{'.self::USER_SECRET_MACRO.'.iregsub(0, Problem)}, '
-//					],
-//					'result' => [
-//						'primary' => ', , , , ,',
-//						'secondary' => ', , , , ,'
-//					]
-//				]
-//			]
 		];
 	}
 

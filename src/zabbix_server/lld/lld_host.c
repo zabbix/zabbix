@@ -3759,10 +3759,14 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_lld_host_ptr_t
 				(char *)NULL);
 	}
 
-	if (0 != upd_hosts || 0 != upd_interfaces || 0 != upd_snmp || 0 != upd_hostmacros || 0 != upd_tags ||
-			0 != upd_host_hgsets)
+	if (0 != upd_hosts || 0 != upd_interfaces || 0 != upd_snmp || 0 != upd_tags || 0 != upd_host_hgsets)
 	{
 		zbx_db_begin_multiple_update(&sql1, &sql1_alloc, &sql1_offset);
+	}
+
+	if (0 != upd_hostmacros)
+	{
+		zbx_db_begin_multiple_update(&sql2, &sql2_alloc, &sql2_offset);
 	}
 
 	if (0 != new_hostgroups)
@@ -3981,8 +3985,8 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_lld_host_ptr_t
 
 					zbx_audit_host_update_json_update_ipmi_password(ZBX_AUDIT_LLD_CONTEXT,
 							host->hostid, (0 == strcmp("", host->ipmi_password_orig) ?
-							"" : ZBX_MACRO_SECRET_MASK),
-							(0 == strcmp("", ipmi_password) ? "" : ZBX_MACRO_SECRET_MASK));
+							"" : ZBX_SECRET_MASK),
+							(0 == strcmp("", ipmi_password) ? "" : ZBX_SECRET_MASK));
 
 					zbx_free(value_esc);
 				}
@@ -4041,9 +4045,9 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_lld_host_ptr_t
 
 					zbx_audit_host_update_json_update_tls_psk_identity(ZBX_AUDIT_LLD_CONTEXT,
 							host->hostid, (0 == strcmp("", host->tls_psk_identity_orig) ?
-							"" : ZBX_MACRO_SECRET_MASK),
+							"" : ZBX_SECRET_MASK),
 							(0 == strcmp("", tls_psk_identity) ?
-							"" : ZBX_MACRO_SECRET_MASK));
+							"" : ZBX_SECRET_MASK));
 				}
 				if (0 != (host->flags & ZBX_FLAG_LLD_HOST_UPDATE_TLS_PSK))
 				{
@@ -4056,8 +4060,8 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_lld_host_ptr_t
 
 					zbx_audit_host_update_json_update_tls_psk(ZBX_AUDIT_LLD_CONTEXT, host->hostid,
 							(0 == strcmp("", host->tls_psk_orig) ?
-							"" : ZBX_MACRO_SECRET_MASK),
-							(0 == strcmp("", tls_psk) ? "" : ZBX_MACRO_SECRET_MASK));
+							"" : ZBX_SECRET_MASK),
+							(0 == strcmp("", tls_psk) ? "" : ZBX_SECRET_MASK));
 				}
 				if (0 != (host->flags & ZBX_FLAG_LLD_HOST_UPDATE_CUSTOM_INTERFACES))
 				{
@@ -4251,7 +4255,7 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_lld_host_ptr_t
 						(int)hostmacro->type, (int)hostmacro->automatic);
 				zbx_audit_host_update_json_add_hostmacro(ZBX_AUDIT_LLD_CONTEXT, host->hostid,
 						hostmacroid, hostmacro->macro, (ZBX_MACRO_VALUE_SECRET ==
-						(int)hostmacro->type) ? ZBX_MACRO_SECRET_MASK : hostmacro->value,
+						(int)hostmacro->type) ? ZBX_SECRET_MASK : hostmacro->value,
 						hostmacro->description, (int)hostmacro->type,
 						(int)hostmacro->automatic);
 				hostmacroid++;
@@ -4260,7 +4264,7 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_lld_host_ptr_t
 			{
 				const char	*d = "";
 
-				zbx_strcpy_alloc(&sql1, &sql1_alloc, &sql1_offset, "update hostmacro set ");
+				zbx_strcpy_alloc(&sql2, &sql2_alloc, &sql2_offset, "update hostmacro set ");
 
 				zbx_audit_host_update_json_update_hostmacro_create_entry(ZBX_AUDIT_LLD_CONTEXT,
 						host->hostid, hostmacro->hostmacroid);
@@ -4268,7 +4272,7 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_lld_host_ptr_t
 				if (0 != (hostmacro->flags & ZBX_FLAG_LLD_HMACRO_UPDATE_VALUE))
 				{
 					value_esc = zbx_db_dyn_escape_string(hostmacro->value);
-					zbx_snprintf_alloc(&sql1, &sql1_alloc, &sql1_offset, "value='%s'", value_esc);
+					zbx_snprintf_alloc(&sql2, &sql2_alloc, &sql2_offset, "value='%s'", value_esc);
 					zbx_free(value_esc);
 					d = ",";
 
@@ -4278,14 +4282,14 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_lld_host_ptr_t
 							ZBX_MACRO_VALUE_SECRET == (int)hostmacro->type_orig) ||
 							(0 == (hostmacro->flags & ZBX_FLAG_LLD_HMACRO_UPDATE_TYPE) &&
 							ZBX_MACRO_VALUE_SECRET == (int)hostmacro->type)) ?
-							ZBX_MACRO_SECRET_MASK : hostmacro->value_orig,
+							ZBX_SECRET_MASK : hostmacro->value_orig,
 							(ZBX_MACRO_VALUE_SECRET == (int)hostmacro->type) ?
-							ZBX_MACRO_SECRET_MASK : hostmacro->value);
+							ZBX_SECRET_MASK : hostmacro->value);
 				}
 				if (0 != (hostmacro->flags & ZBX_FLAG_LLD_HMACRO_UPDATE_DESCRIPTION))
 				{
 					value_esc = zbx_db_dyn_escape_string(hostmacro->description);
-					zbx_snprintf_alloc(&sql1, &sql1_alloc, &sql1_offset, "%sdescription='%s'",
+					zbx_snprintf_alloc(&sql2, &sql2_alloc, &sql2_offset, "%sdescription='%s'",
 							d, value_esc);
 					zbx_free(value_esc);
 					d = ",";
@@ -4296,14 +4300,14 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_lld_host_ptr_t
 				}
 				if (0 != (hostmacro->flags & ZBX_FLAG_LLD_HMACRO_UPDATE_TYPE))
 				{
-					zbx_snprintf_alloc(&sql1, &sql1_alloc, &sql1_offset, "%stype=%d",
+					zbx_snprintf_alloc(&sql2, &sql2_alloc, &sql2_offset, "%stype=%d",
 							d, hostmacro->type);
 
 					zbx_audit_host_update_json_update_hostmacro_type(ZBX_AUDIT_LLD_CONTEXT,
 							host->hostid, hostmacro->hostmacroid,
 							hostmacro->type_orig, hostmacro->type);
 				}
-				zbx_snprintf_alloc(&sql1, &sql1_alloc, &sql1_offset,
+				zbx_snprintf_alloc(&sql2, &sql2_alloc, &sql2_offset,
 						" where hostmacroid=" ZBX_FS_UI64 ";\n", hostmacro->hostmacroid);
 			}
 		}
@@ -4415,8 +4419,10 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_lld_host_ptr_t
 
 	if (0 != new_hostmacros)
 	{
+		zbx_db_query_mask_t	old_queries = zbx_db_set_log_masked_values(ZBX_DB_MASK_QUERIES);
 		zbx_db_insert_execute(&db_insert_hmacro);
 		zbx_db_insert_clean(&db_insert_hmacro);
+		zbx_db_set_log_masked_values(old_queries);
 	}
 
 	if (0 != new_interfaces)
@@ -4449,6 +4455,20 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_lld_host_ptr_t
 			zbx_db_execute("%s", sql1);
 
 		zbx_free(sql1);
+	}
+
+	if (NULL != sql2)
+	{
+		zbx_db_end_multiple_update(&sql2, &sql2_alloc, &sql2_offset);
+
+		zbx_db_set_log_masked_values(ZBX_DB_MASK_QUERIES);
+
+		if (16 < sql2_offset)
+			zbx_db_execute("%s", sql2);
+
+		zbx_db_set_log_masked_values(ZBX_DB_DONT_MASK_QUERIES);
+
+		zbx_free(sql2);
 	}
 
 	if (0 != del_hostgroupids->values_num || 0 != del_hostmacroids.values_num ||
@@ -4749,6 +4769,8 @@ static void	lld_hosts_remove(const zbx_vector_lld_host_ptr_t *hosts, const zbx_l
 						" set ts_delete=%d"
 						" where hostid=" ZBX_FS_UI64 ";\n",
 						ts_delete, host->hostid);
+
+				zbx_db_execute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 			}
 
 			if (ZBX_LLD_LIFETIME_TYPE_NEVER == enabled_lifetime->type)
@@ -4765,6 +4787,8 @@ static void	lld_hosts_remove(const zbx_vector_lld_host_ptr_t *hosts, const zbx_l
 						" set ts_disable=%d"
 						" where hostid=" ZBX_FS_UI64 ";\n",
 						ts_disable, host->hostid);
+
+				zbx_db_execute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 			}
 
 			if ((ZBX_LLD_LIFETIME_TYPE_AFTER == enabled_lifetime->type && lastcheck <= ts_disable) ||
@@ -4812,7 +4836,6 @@ static void	lld_hosts_remove(const zbx_vector_lld_host_ptr_t *hosts, const zbx_l
 		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid",
 				discovered_hostids.values, discovered_hostids.values_num);
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
-
 		zbx_db_execute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 	}
 
@@ -4834,7 +4857,6 @@ static void	lld_hosts_remove(const zbx_vector_lld_host_ptr_t *hosts, const zbx_l
 		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid",
 				lc_hostids.values, lc_hostids.values_num);
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
-
 		zbx_db_execute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 	}
 
@@ -4856,7 +4878,6 @@ static void	lld_hosts_remove(const zbx_vector_lld_host_ptr_t *hosts, const zbx_l
 		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid",
 				dis_hostids.values, dis_hostids.values_num);
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
-
 		zbx_db_execute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update hosts set status=%d where",
@@ -4984,6 +5005,8 @@ static void	lld_groups_remove(const zbx_vector_lld_group_ptr_t *groups, const zb
 							" set ts_delete=%d"
 							" where groupdiscoveryid=" ZBX_FS_UI64 ";\n",
 							ts_delete, discovery->groupdiscoveryid);
+
+					zbx_db_execute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 				}
 			}
 			else

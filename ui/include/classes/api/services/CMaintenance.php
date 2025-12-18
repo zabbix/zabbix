@@ -30,6 +30,8 @@ class CMaintenance extends CApiService {
 	protected $tableAlias = 'm';
 	protected $sortColumns = ['maintenanceid', 'name', 'maintenance_type', 'active_till', 'active_since'];
 
+	private const MAX_TIMEPERIOD = 999 * SEC_PER_DAY + 23 * SEC_PER_HOUR + 59 * SEC_PER_MIN;
+
 	/**
 	 * Get maintenances data.
 	 *
@@ -98,8 +100,8 @@ class CMaintenance extends CApiService {
 			}
 
 			$permission_condition = $options['editable']
-				? ' AND (p.permission IS NULL OR p.permission < '.PERM_READ_WRITE.')'
-				: ' AND p.permission IS NULL';
+				? ' AND (p.hgsetid IS NULL OR p.permission < '.PERM_READ_WRITE.')'
+				: ' AND p.hgsetid IS NULL';
 
 			$sqlParts['where'][] = 'NOT EXISTS ('.
 				'SELECT NULL'.
@@ -273,7 +275,7 @@ class CMaintenance extends CApiService {
 				'hostid' =>				['type' => API_ID, 'flags' => API_REQUIRED]
 			]],
 			'timeperiods' =>		['type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_NORMALIZE, 'fields' => [
-				'period' =>				['type' => API_TIME_UNIT, 'in' => implode(':', [5 * SEC_PER_MIN, ZBX_MAX_INT32]), 'default' => SEC_PER_HOUR],
+				'period' =>				['type' => API_TIME_UNIT, 'in' => implode(':', [5 * SEC_PER_MIN, self::MAX_TIMEPERIOD]), 'default' => SEC_PER_HOUR],
 				'timeperiod_type' =>	['type' => API_INT32, 'in' => implode(',', [TIMEPERIOD_TYPE_ONETIME, TIMEPERIOD_TYPE_DAILY, TIMEPERIOD_TYPE_WEEKLY, TIMEPERIOD_TYPE_MONTHLY]), 'default' => DB::getDefault('timeperiods', 'timeperiod_type')],
 				'start_date' =>			['type' => API_MULTIPLE, 'rules' => [
 											['if' => ['field' => 'timeperiod_type', 'in' => implode(',', [TIMEPERIOD_TYPE_ONETIME])], 'type' => API_TIMESTAMP, 'default' => time()],
@@ -284,7 +286,8 @@ class CMaintenance extends CApiService {
 											['else' => true, 'type' => API_UNEXPECTED]
 				]],
 				'every' =>				['type' => API_MULTIPLE, 'rules' => [
-											['if' => ['field' => 'timeperiod_type', 'in' => implode(',', [TIMEPERIOD_TYPE_DAILY, TIMEPERIOD_TYPE_WEEKLY])], 'type' => API_INT32, 'in' => implode(':', [1, ZBX_MAX_INT32]), 'default' => DB::getDefault('timeperiods', 'every')],
+											['if' => ['field' => 'timeperiod_type', 'in' => implode(',', [TIMEPERIOD_TYPE_DAILY])], 'type' => API_INT32, 'in' => implode(':', [1, 999]), 'default' => DB::getDefault('timeperiods', 'every')],
+											['if' => ['field' => 'timeperiod_type', 'in' => implode(',', [TIMEPERIOD_TYPE_WEEKLY])], 'type' => API_INT32, 'in' => implode(':', [1, 99]), 'default' => DB::getDefault('timeperiods', 'every')],
 											['if' => ['field' => 'timeperiod_type', 'in' => implode(',', [TIMEPERIOD_TYPE_MONTHLY])], 'type' => API_INT32, 'in' => implode(',', [MONTH_WEEK_FIRST, MONTH_WEEK_SECOND, MONTH_WEEK_THIRD, MONTH_WEEK_FOURTH, MONTH_WEEK_LAST]), 'default' => DB::getDefault('timeperiods', 'every')],
 											['else' => true, 'type' => API_UNEXPECTED]
 				]],
@@ -469,7 +472,7 @@ class CMaintenance extends CApiService {
 				'hostid' =>				['type' => API_ID, 'flags' => API_REQUIRED]
 			]],
 			'timeperiods' =>		['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'fields' => [
-				'period' =>				['type' => API_TIME_UNIT, 'in' => implode(':', [5 * SEC_PER_MIN, ZBX_MAX_INT32]), 'default' => SEC_PER_HOUR],
+				'period' =>				['type' => API_TIME_UNIT, 'in' => implode(':', [5 * SEC_PER_MIN, self::MAX_TIMEPERIOD]), 'default' => SEC_PER_HOUR],
 				'timeperiod_type' =>	['type' => API_INT32, 'in' => implode(',', [TIMEPERIOD_TYPE_ONETIME, TIMEPERIOD_TYPE_DAILY, TIMEPERIOD_TYPE_WEEKLY, TIMEPERIOD_TYPE_MONTHLY]), 'default' => DB::getDefault('timeperiods', 'timeperiod_type')],
 				'start_date' =>			['type' => API_MULTIPLE, 'rules' => [
 											['if' => ['field' => 'timeperiod_type', 'in' => implode(',', [TIMEPERIOD_TYPE_ONETIME])], 'type' => API_TIMESTAMP, 'default' => time()],
@@ -480,7 +483,8 @@ class CMaintenance extends CApiService {
 											['else' => true, 'type' => API_UNEXPECTED]
 				]],
 				'every' =>				['type' => API_MULTIPLE, 'rules' => [
-											['if' => ['field' => 'timeperiod_type', 'in' => implode(',', [TIMEPERIOD_TYPE_DAILY, TIMEPERIOD_TYPE_WEEKLY])], 'type' => API_INT32, 'in' => implode(':', [1, ZBX_MAX_INT32]), 'default' => DB::getDefault('timeperiods', 'every')],
+											['if' => ['field' => 'timeperiod_type', 'in' => implode(',', [TIMEPERIOD_TYPE_DAILY])], 'type' => API_INT32, 'in' => implode(':', [1, 999]), 'default' => DB::getDefault('timeperiods', 'every')],
+											['if' => ['field' => 'timeperiod_type', 'in' => implode(',', [TIMEPERIOD_TYPE_WEEKLY])], 'type' => API_INT32, 'in' => implode(':', [1, 99]), 'default' => DB::getDefault('timeperiods', 'every')],
 											['if' => ['field' => 'timeperiod_type', 'in' => implode(',', [TIMEPERIOD_TYPE_MONTHLY])], 'type' => API_INT32, 'in' => implode(',', [MONTH_WEEK_FIRST, MONTH_WEEK_SECOND, MONTH_WEEK_THIRD, MONTH_WEEK_FOURTH, MONTH_WEEK_LAST]), 'default' => DB::getDefault('timeperiods', 'every')],
 											['else' => true, 'type' => API_UNEXPECTED]
 				]],
@@ -569,11 +573,7 @@ class CMaintenance extends CApiService {
 			'where' => ['maintenanceid' => $maintenanceids]
 		]);
 
-		DB::delete('maintenances_windows', ['maintenanceid' => $maintenanceids]);
 		DB::delete('timeperiods', ['timeperiodid' => array_column($maintenances_windows, 'timeperiodid')]);
-		DB::delete('maintenances_hosts', ['maintenanceid' => $maintenanceids]);
-		DB::delete('maintenances_groups', ['maintenanceid' => $maintenanceids]);
-		DB::delete('maintenance_tag', ['maintenanceid' => $maintenanceids]);
 		DB::delete('maintenances', ['maintenanceid' => $maintenanceids]);
 
 		self::addAuditLog(CAudit::ACTION_DELETE, CAudit::RESOURCE_MAINTENANCE, $db_maintenances);

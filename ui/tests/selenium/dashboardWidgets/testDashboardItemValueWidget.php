@@ -254,7 +254,6 @@ class testDashboardItemValueWidget extends testWidgets {
 					'id:time_period_to' => 'now',
 					'History data' => 'Auto'
 				];
-
 				foreach ($default_values_advanced as $field => $value) {
 					$this->assertEquals($value, $form->getField($field)->getValue());
 				}
@@ -364,8 +363,8 @@ class testDashboardItemValueWidget extends testWidgets {
 					'id:thresholds_0_threshold' => [
 						'maxlength' => 255
 					],
-					'xpath:.//input[@id="thresholds_0_color"]/..' => [
-						'color' => 'FF465C'
+					'id:thresholds_0_color' => [
+						'value' => 'FF465C'
 					],
 					'id:time_period_from' => [
 						'maxlength' => 255,
@@ -385,12 +384,7 @@ class testDashboardItemValueWidget extends testWidgets {
 				];
 				foreach ($inputs as $field => $attributes) {
 					foreach ($attributes as $attribute => $value) {
-						if ($attribute === 'color') {
-							$this->assertEquals($value, $form->query($field)->asColorPicker()->one()->getValue());
-						}
-						else {
-							$this->assertEquals($value, $form->getField($field)->getAttribute($attribute));
-						}
+						$this->assertEquals($value, $form->getField($field)->getAttribute($attribute));
 					}
 				}
 
@@ -412,6 +406,7 @@ class testDashboardItemValueWidget extends testWidgets {
 						$form->fill([$config => $state]);
 
 						foreach ($elements as $element) {
+							$element = str_replace('/..', '', $element);
 							$this->assertTrue($form->getField($element)->isEnabled($state));
 						}
 					}
@@ -1598,6 +1593,7 @@ class testDashboardItemValueWidget extends testWidgets {
 				? '1 minute'
 				: (CTestArrayHelper::get($data['fields'], 'Refresh interval', '1 minute'));
 			$this->assertEquals($refresh, $widget->getRefreshInterval());
+			CPopupMenuElement::find()->one()->close();
 
 			// Check new widget form fields and values in frontend.
 			$saved_form = $widget->edit();
@@ -1630,7 +1626,9 @@ class testDashboardItemValueWidget extends testWidgets {
 
 			// Close widget window and cancel editing the dashboard.
 			COverlayDialogElement::find()->one()->close();
-			$dashboard->cancelEditing();
+			// Change dashboard from cancelEditing() to save() to check deadlock issue.
+			$dashboard->save();
+			$this->assertMessage(TEST_GOOD, 'Dashboard updated');
 
 			// Write new name to update widget for update scenario.
 			if ($update) {
@@ -3004,9 +3002,8 @@ class testDashboardItemValueWidget extends testWidgets {
 		// Close the hint-box.
 		$hint->query('xpath:.//button[@class="btn-overlay-close"]')->one()->click()->waitUntilNotVisible();
 
-		$dashboard->edit()->getWidget($data['Name'])->edit();
-		$form->fill(['Advanced configuration' => true, 'Aggregation function' => 'not used']);
-		$form->submit();
+		$widget_form = $dashboard->edit()->getWidget($data['Name'])->edit();
+		$widget_form->fill(['Advanced configuration' => true, 'Aggregation function' => 'not used'])->submit();
 		COverlayDialogElement::ensureNotPresent();
 		$dashboard->waitUntilReady();
 		$this->assertFalse($dashboard->query($time_icon)->one(false)->isValid());
@@ -4150,31 +4147,30 @@ class testDashboardItemValueWidget extends testWidgets {
 				[
 					'fields' => [
 						'Advanced configuration' => true,
-						'id:description' => '{'.self::USER_MACRO.'.regsub(^[0-9]+, Problem)}, '.
-							'{'.self::USER_MACRO.'.iregsub(^[0-9]+, Problem)}, '.
-							'{'.self::USER_SECRET_MACRO.'.regsub(^[0-9]+, Problem)}, '.
-							'{'.self::USER_SECRET_MACRO.'.iregsub(^[0-9]+, Problem)}, '.
+						'id:description' => '{'.self::USER_MACRO.'.regsub([0-9]+, Problem)}, '.
+							'{'.self::USER_MACRO.'.iregsub([0-9]+, Problem)}, '.
+							'{'.self::USER_SECRET_MACRO.'.regsub([0-9]+, Problem)}, '.
+							'{'.self::USER_SECRET_MACRO.'.iregsub([0-9]+, Problem)}, '.
 							'{{ITEM.NAME}.regsub(CPU, test)}, {{ITEM.NAME}.iregsub(CPU, test)}',
 						'id:desc_size' => 5
 					],
-					'result' => 'Problem, Problem, Problem, Problem, test, test'
+					'result' => 'Problem, Problem, , , test, test'
+				]
+			],
+			'Macro functions regsub(), iregsub() - empty value in case of no match' => [
+				[
+					'fields' => [
+						'Advanced configuration' => true,
+						'id:description' => '{'.self::USER_MACRO.'.regsub(0, Problem)}, '.
+							'{'.self::USER_MACRO.'.iregsub(0, Problem)}, '.
+							'{'.self::USER_SECRET_MACRO.'.regsub(0, Problem)}, '.
+							'{'.self::USER_SECRET_MACRO.'.iregsub(0, Problem)}, '.
+							'{{ITEM.NAME}.regsub(0, test)}, {{ITEM.NAME}.iregsub(0, test)}',
+						'id:desc_size' => 5
+					],
+					'result' => ', , , , ,'
 				]
 			]
-			// TODO: Uncomment and check the test case, after ZBX-25420 fix.
-//			'Macro functions regsub(), iregsub() - empty value in case of no match' => [
-//				[
-//					'fields' => [
-//						'Advanced configuration' => true,
-//						'id:description' => '{'.self::USER_MACRO.'.regsub(0, Problem)}, '.
-//							'{'.self::USER_MACRO.'.iregsub(0, Problem)}, '.
-//							'{'.self::USER_SECRET_MACRO.'.regsub(0, Problem)}, '.
-//							'{'.self::USER_SECRET_MACRO.'.iregsub(0, Problem)}, '.
-//							'{{ITEM.NAME}.regsub(0, test)}, {{ITEM.NAME}.iregsub(0, test)}',
-//						'id:desc_size' => 5
-//					],
-//					'result' => ', , , , ,'
-//				]
-//			]
 		];
 	}
 

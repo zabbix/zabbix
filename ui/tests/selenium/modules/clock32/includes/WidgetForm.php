@@ -40,13 +40,6 @@ use Modules\Clock2\Widget;
  */
 class WidgetForm extends CWidgetForm {
 
-	private const SIZE_PERCENT_MIN = 1;
-	private const SIZE_PERCENT_MAX = 100;
-
-	private const DEFAULT_DATE_SIZE = 20;
-	private const DEFAULT_TIME_SIZE = 30;
-	private const DEFAULT_TIMEZONE_SIZE = 20;
-
 	public function validate(bool $strict = false): array {
 		$errors = parent::validate($strict);
 
@@ -97,18 +90,10 @@ class WidgetForm extends CWidgetForm {
 				(new CWidgetFieldColor('bg_color', _('Background color')))->allowInherited()
 			)
 			->addField(
-				(new CWidgetFieldIntegerBox('date_size', _('Size'), self::SIZE_PERCENT_MIN, self::SIZE_PERCENT_MAX))
-					->setDefault(self::DEFAULT_DATE_SIZE)
-			)
-			->addField(
 				new CWidgetFieldCheckBox('date_bold', _('Bold'))
 			)
 			->addField(
 				(new CWidgetFieldColor('date_color', _('Color')))->allowInherited()
-			)
-			->addField(
-				(new CWidgetFieldIntegerBox('time_size', _('Size'), self::SIZE_PERCENT_MIN, self::SIZE_PERCENT_MAX))
-					->setDefault(self::DEFAULT_TIME_SIZE)
 			)
 			->addField(
 				new CWidgetFieldCheckBox('time_bold', _('Bold'))
@@ -124,10 +109,6 @@ class WidgetForm extends CWidgetForm {
 					Widget::HOUR_24 => _('24-hour'),
 					Widget::HOUR_12 => _('12-hour')
 				]))->setDefault(Widget::HOUR_24)
-			)
-			->addField(
-				(new CWidgetFieldIntegerBox('tzone_size', _('Size'), self::SIZE_PERCENT_MIN, self::SIZE_PERCENT_MAX))
-					->setDefault(self::DEFAULT_TIMEZONE_SIZE)
 			)
 			->addField(
 				new CWidgetFieldCheckBox('tzone_bold', _('Bold'))

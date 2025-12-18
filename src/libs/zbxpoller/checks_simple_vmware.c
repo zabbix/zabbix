@@ -1067,8 +1067,9 @@ static void	vmware_get_events(const zbx_vector_vmware_event_ptr_t *events,
 	time_t		timestamp;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() last_key:" ZBX_FS_UI64 " last_ts:" ZBX_FS_TIME_T " events:%d top event id:"
-			ZBX_FS_UI64 " top event ts:" ZBX_FS_TIME_T, __func__, evt_state->last_key, evt_state->last_ts,
-			events->values_num, events->values[0]->key, events->values[0]->timestamp);
+			ZBX_FS_UI64 " top event ts:" ZBX_FS_TIME_T, __func__, evt_state->last_key,
+			(zbx_fs_time_t)evt_state->last_ts, events->values_num, events->values[0]->key,
+			(zbx_fs_time_t)(events->values[0]->timestamp));
 
 	/* events were retrieved in reverse chronological order */
 	for (int i = events->values_num - 1; i >= 0; i--)
@@ -1267,7 +1268,7 @@ int	check_vcenter_eventlog(AGENT_REQUEST *request, const zbx_dc_item_t *item, AG
 		SET_MSG_RESULT(result, zbx_strdup(NULL, service->eventlog.data->error));
 		goto unlock;
 	}
-	else if (80 < (hc_pused = zbx_hc_mem_pused_lock()))
+	else if (95 < (hc_pused = zbx_hc_mem_pused_lock()))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG,"%s():eventlog data is suspended due to history cache is overloaded:%.2f%%",
 				__func__, hc_pused);

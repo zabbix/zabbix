@@ -6,11 +6,6 @@ The plugin can monitor several remote or local MySQL instances simultaneously vi
 
 The plugin keeps connections in the open state to reduce network congestion, latency, CPU, and memory usage. It can be used in conjunction with the official [Zabbix MySQL template](https://git.zabbix.com/projects/ZBX/repos/zabbix/browse/templates/db/mysql_agent2), which you can extend; alternatively, you can create your own template for your specific needs.
 
-## Requirements
-
-* Zabbix agent 2
-* Go >= 1.21 (required only to build from source)
-
 ## Supported versions
 
 * MySQL, version 5.7+
@@ -120,31 +115,37 @@ Note that session names are case-sensitive.
 
 ## Supported keys
 
-`mysql.custom.query[\<commonParams\>,queryName,<args...>]`—Returns the result of a custom query.
+`mysql.custom.query[<commonParams>,queryName,<args...>] `— Returns the result of a custom query.
 <br>Parameters:
 <br>`queryName` (required)—the name of a custom query (must be equal to the name of an `sql` file without an extension).
 <br>`args` (optional)—one or more arguments to pass to a query.
 
-`mysql.db.discovery[\<commonParams\>]`—Returns a list of databases in LLD format.
+`mysql.db.discovery[<commonParams>]` — Returns a list of databases in LLD format.
 
-`mysql.db.size[\<commonParams\>,database]`—Returns the size of a given database in bytes.
+`mysql.db.size[<commonParams>,database]`— Returns the size of a given database in bytes.
 <br>Parameters:
 <br>`database` (required) — database name.
 
-`mysql.ping[\<commonParams\>]`—Tests if a connection is alive or not.
+`mysql.ping[<commonParams>]` — Tests if a connection is alive or not.
 <br>Returns:
 <br>- `1` if the connection is alive;
 <br>- `0` if the connection is broken (returned if there was any error during the test, including authentication and configuration issues).
 
-`mysql.replication.discovery[\<commonParams\>]`—Returns replication information in LLD format.
+`mysql.replication.discovery[<commonParams>]` — Returns replication information in LLD format*.
 
-`mysql.replication.get_slave_status[\<commonParams\>,\<masterHost\>]`—Returns the replication status.
+`mysql.replication.get_slave_status[<commonParams>,<masterHost>]` — Returns the replication status.
 <br>Parameters:
-<br>`masterHost` (optional)—The name of the master host.
+<br>`masterHost` (optional) — The name of the master host*.
 
-`mysql.get_status_variables[\<commonParams\>]`—Returns values of global status variables.
+`mysql.get_status_variables[<commonParams>]` — Returns values of global status variables.
 
-`mysql.version[\<commonParams\>]`—Returns the MySQL version.
+`mysql.version[<commonParams>]` — Returns the MySQL version.
+
+\* In some MySQL server versions, the replication status query `SHOW SLAVE STATUS` is deprecated or has been fully replaced by `SHOW REPLICA STATUS`. The result key names have also changed — from `Master` to `Source` and from `Slave` to `Replica`.
+* the old style terminology:	`"Master_Host": "myserver"` or `"Slave_IO_Running": "Yes"`
+* the new style, respectively:  `"Source_Host": "myserver"` or `"Replica_IO_Running": "Yes"`.  
+
+To maintain compatibility, the result set includes duplicated keys using both terminology styles.
 
 ## Custom queries
 

@@ -21,7 +21,6 @@
 #include "zbxeval.h"
 #include "zbxdbwrap.h"
 #include "zbxcachevalue.h"
-#include "macrofunc.h"
 #include "zbxxml.h"
 #include "zbxstr.h"
 #include "zbxexpr.h"
@@ -296,7 +295,7 @@ static int	get_expression_macro_result(const zbx_db_event *event, char *data, zb
 	}
 
 	if (SUCCEED != zbx_eval_expand_user_macros(&ctx, hostids->values, hostids->values_num,
-			(zbx_macro_expand_func_t)zbx_dc_expand_user_and_func_macros, um_handle, NULL))
+			zbx_um_expand_cb_wrapper, um_handle, NULL))
 	{
 		goto out;
 	}
@@ -673,6 +672,7 @@ int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const zbx_db_eve
 	zbx_token_search_t		token_search = ZBX_TOKEN_SEARCH_BASIC;
 	char				*expression = NULL, *user_username = NULL, *user_name = NULL,
 					*user_surname = NULL;
+	unsigned char			macro_env = ZBX_MACRO_ENV_DEFAULT;
 	zbx_dc_um_handle_t		*um_handle;
 	zbx_db_event			*cause_event = NULL, *cause_recovery_event = NULL;
 
@@ -702,7 +702,9 @@ int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const zbx_db_eve
 	if (SUCCEED != zbx_token_find(*data, pos, &token, token_search))
 		goto out;
 
+
 	um_handle = zbx_dc_open_user_macros();
+	macro_env = zbx_dc_get_user_macro_env(um_handle);
 	zbx_vector_uint64_create(&hostids);
 
 	data_alloc = data_len = strlen(*data) + 1;
@@ -741,7 +743,7 @@ int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const zbx_db_eve
 			case ZBX_TOKEN_USER_FUNC_MACRO:
 				raw_value = 1;
 				/* user macros are not indexed */
-				if (NULL == (m_ptr = func_get_macro_from_func(*data, &token.data.func_macro, NULL)) ||
+				if (NULL == (m_ptr = zbx_get_macro_from_func(*data, &token.data.func_macro, NULL)) ||
 						SUCCEED != zbx_token_find(*data, token.data.func_macro.macro.l,
 						&inner_token, token_search))
 				{
@@ -755,7 +757,8 @@ int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const zbx_db_eve
 			case ZBX_TOKEN_FUNC_MACRO:
 				raw_value = 1;
 				indexed_macro = is_indexed_macro(*data, &token);
-				if (NULL == (m_ptr = func_get_macro_from_func(*data, &token.data.func_macro, &N_functionid))
+				if (NULL == (m_ptr = zbx_get_macro_from_func(*data, &token.data.func_macro,
+							&N_functionid))
 						|| SUCCEED != zbx_token_find(*data, token.data.func_macro.macro.l,
 						&inner_token, token_search))
 				{
@@ -2446,7 +2449,8 @@ int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const zbx_db_eve
 				{
 					replace_to = zbx_strdup(replace_to, dc_item->key_orig);
 				}
-				else if (0 == strncmp(m, MVAR_INVENTORY, ZBX_CONST_STRLEN(MVAR_INVENTORY)))
+				else if (0 == strncmp(m, MVAR_INVENTORY, ZBX_CONST_STRLEN(MVAR_INVENTORY)) ||
+						0 == strncmp(m, MVAR_PROFILE, ZBX_CONST_STRLEN(MVAR_PROFILE)))
 				{
 					ret = expr_dc_get_host_inventory_by_itemid(m, dc_item->itemid, &replace_to);
 				}
@@ -2895,7 +2899,14 @@ int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const zbx_db_eve
 	if (NULL != cause_recovery_event)
 		zbx_db_free_event(cause_recovery_event);
 out:
+#ifdef ZBX_DEBUG
 	zabbix_log(LOG_LEVEL_DEBUG, "End %s() data:'%s'", __func__, *data);
+#else
+	if (ZBX_MACRO_ENV_SECURE == macro_env)
+		zabbix_log(LOG_LEVEL_DEBUG, "End %s()", __func__);
+	else
+		zabbix_log(LOG_LEVEL_DEBUG, "End %s() data:'%s'", __func__, *data);
+#endif
 
 	return res;
 }

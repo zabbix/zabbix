@@ -1395,33 +1395,6 @@ function checkTimePeriod($period, $now) {
 }
 
 /**
- * Get item minimum delay.
- *
- * @param string $delay
- * @param array $flexible_intervals
- *
- * @return string
- */
-function getItemDelay($delay, array $flexible_intervals) {
-	$delay = timeUnitToSeconds($delay);
-
-	if ($delay != 0 || !$flexible_intervals) {
-		return $delay;
-	}
-
-	$min_delay = SEC_PER_YEAR;
-
-	foreach ($flexible_intervals as $flexible_interval) {
-		$flexible_interval_parts = explode('/', $flexible_interval);
-		$flexible_delay = timeUnitToSeconds($flexible_interval_parts[0]);
-
-		$min_delay = min($min_delay, $flexible_delay);
-	}
-
-	return $min_delay;
-}
-
-/**
  * Return delay value that is currently applicable
  *
  * @param int $delay					default delay
@@ -2015,20 +1988,20 @@ function normalizeItemPreprocessingSteps(array $preprocessing): array {
 		switch ($step['type']) {
 			case ZBX_PREPROC_MULTIPLIER:
 			case ZBX_PREPROC_PROMETHEUS_TO_JSON:
+			case ZBX_PREPROC_XPATH:
+			case ZBX_PREPROC_JSONPATH:
+			case ZBX_PREPROC_ERROR_FIELD_JSON:
+			case ZBX_PREPROC_ERROR_FIELD_XML:
+			case ZBX_PREPROC_THROTTLE_TIMED_VALUE:
+			case ZBX_PREPROC_SCRIPT:
 				$step['params'] = trim($step['params'][0]);
 				break;
 
 			case ZBX_PREPROC_RTRIM:
 			case ZBX_PREPROC_LTRIM:
 			case ZBX_PREPROC_TRIM:
-			case ZBX_PREPROC_XPATH:
-			case ZBX_PREPROC_JSONPATH:
 			case ZBX_PREPROC_VALIDATE_REGEX:
 			case ZBX_PREPROC_VALIDATE_NOT_REGEX:
-			case ZBX_PREPROC_ERROR_FIELD_JSON:
-			case ZBX_PREPROC_ERROR_FIELD_XML:
-			case ZBX_PREPROC_THROTTLE_TIMED_VALUE:
-			case ZBX_PREPROC_SCRIPT:
 			case ZBX_PREPROC_SNMP_GET_VALUE:
 				$step['params'] = $step['params'][0];
 				break;
@@ -2499,9 +2472,7 @@ function getTypeItemFieldNames(array $input): array {
 			return ['params', 'delay'];
 
 		case ITEM_TYPE_JMX:
-			return $input['templateid'] == 0
-				? ['interfaceid', 'jmx_endpoint', 'username', 'password', 'delay']
-				: ['interfaceid', 'username', 'password', 'delay'];
+			return ['interfaceid', 'jmx_endpoint', 'username', 'password', 'delay'];
 
 		case ITEM_TYPE_SNMPTRAP:
 			return ['interfaceid'];
