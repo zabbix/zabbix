@@ -83,6 +83,20 @@ abstract class CController {
 	protected $input = [];
 
 	/**
+	 * Non-validated files parameters.
+	 *
+	 * @var array|null
+	 */
+	private ?array $raw_files;
+
+	/**
+	 * Validated files parameters.
+	 *
+	 * @var array|null
+	 */
+	private array $files = [];
+
+	/**
 	 * Validate CSRF token flag, if true CSRF token must be validated.
 	 *
 	 * @var bool
@@ -263,6 +277,10 @@ abstract class CController {
 		return $input;
 	}
 
+	private static function getFileInput(): array {
+		return $_FILES;
+	}
+
 	/**
 	 * Validate input parameters.
 	 *
@@ -271,7 +289,7 @@ abstract class CController {
 	 * @return bool
 	 */
 	protected function validateInput(array $validation_rules): bool {
-		if ($this->raw_input === null) {
+		if ($this->raw_input === null && $this->raw_files === null) {
 			$this->validation_result = self::VALIDATION_FATAL_ERROR;
 
 			return false;
@@ -292,12 +310,14 @@ abstract class CController {
 	protected function validateWithFormValidator(array $validation_rules): bool {
 		$validator = new CFormValidator($validation_rules);
 		$data = $this->raw_input;
+		$files = $this->raw_files;
 
-		switch ($validator->validate($data)) {
+		switch ($validator->validate($data, $files)) {
 			case CFormValidator::SUCCESS:
 				$this->validation_result = self::VALIDATION_OK;
 				$this->validation_errors = [];
 				$this->input = $data;
+				$this->files = $files;
 				break;
 
 			case CFormValidator::ERROR:
@@ -478,6 +498,14 @@ abstract class CController {
 		return $this->input;
 	}
 
+	protected function hasFile(string $var): bool {
+		return array_key_exists($var, $this->files);
+	}
+
+	protected function getFile(string $var): array {
+		return $this->files[$var];
+	}
+
 	/**
 	 * Check user permissions.
 	 *
@@ -538,14 +566,17 @@ abstract class CController {
 		switch ($this->getPostContentType()) {
 			case self::POST_CONTENT_TYPE_FORM:
 				$this->raw_input = self::getFormInput();
+				$this->raw_files = self::getFileInput();
 				break;
 
 			case self::POST_CONTENT_TYPE_JSON:
 				$this->raw_input = self::getJsonInput();
+				$this->raw_files = null;
 				break;
 
 			default:
 				$this->raw_input = null;
+				$this->raw_files = null;
 		}
 	}
 

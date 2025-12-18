@@ -38,8 +38,9 @@ class CGraphItem extends CApiService {
 
 		$sqlParts = [
 			'select'	=> ['gitems' => 'gi.gitemid'],
-			'from'		=> ['graphs_items' => 'graphs_items gi'],
+			'from'		=> 'graphs_items gi',
 			'where'		=> [],
+			'group'		=> [],
 			'order'		=> [],
 			'limit'		=> null
 		];
@@ -67,12 +68,9 @@ class CGraphItem extends CApiService {
 				return $options['countOutput'] ? '0' : [];
 			}
 
-			$sqlParts['from'][] = 'items i';
-			$sqlParts['from'][] = 'host_hgset hh';
-			$sqlParts['from'][] = 'permission p';
-			$sqlParts['where'][] = 'gi.itemid=i.itemid';
-			$sqlParts['where'][] = 'i.hostid=hh.hostid';
-			$sqlParts['where'][] = 'hh.hgsetid=p.hgsetid';
+			$sqlParts['join']['i'] = ['table' => 'items', 'using' => 'itemid'];
+			$sqlParts['join']['hh'] = ['left_table' => 'i', 'table' => 'host_hgset', 'using' => 'hostid'];
+			$sqlParts['join']['p'] = ['left_table' => 'hh', 'table' => 'permission', 'using' => 'hgsetid'];
 			$sqlParts['where'][] = 'p.ugsetid='.self::$userData['ugsetid'];
 
 			if ($options['editable']) {
@@ -87,7 +85,7 @@ class CGraphItem extends CApiService {
 				' LEFT JOIN permission p1 ON hh1.hgsetid=p1.hgsetid'.
 					' AND p1.ugsetid=p.ugsetid'.
 				' WHERE gi.graphid=gi1.graphid'.
-					' AND p1.permission IS NULL'.
+					' AND p1.hgsetid IS NULL'.
 			')';
 		}
 
@@ -95,8 +93,7 @@ class CGraphItem extends CApiService {
 		if (!is_null($options['graphids'])) {
 			zbx_value2array($options['graphids']);
 
-			$sqlParts['from']['graphs'] = 'graphs g';
-			$sqlParts['where']['gig'] = 'gi.graphid=g.graphid';
+			$sqlParts['join']['g'] = ['table' => 'graphs', 'using' => 'graphid'];
 			$sqlParts['where'][] = dbConditionInt('g.graphid', $options['graphids']);
 		}
 

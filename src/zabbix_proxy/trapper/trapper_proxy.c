@@ -27,6 +27,8 @@
 #include "zbxcompress.h"
 #include "zbxcacheconfig.h"
 #include "zbxjson.h"
+#include "zbxrtc.h"
+#include "zbx_rtc_constants.h"
 
 #define	LOCK_PROXY_HISTORY	zbx_mutex_lock(proxy_lock)
 #define	UNLOCK_PROXY_HISTORY	zbx_mutex_unlock(proxy_lock)
@@ -101,7 +103,8 @@ static int	send_data_to_server(zbx_socket_t *sock, char **buffer, size_t buffer_
  *                                                                            *
  ******************************************************************************/
 static void	send_proxy_data(zbx_socket_t *sock, const zbx_timespec_t *ts,
-		const zbx_config_comms_args_t *config_comms, zbx_get_program_type_f get_program_type_cb)
+		const zbx_config_comms_args_t *config_comms, zbx_get_program_type_f get_program_type_cb,
+		zbx_ipc_async_socket_t *rtc)
 {
 	struct zbx_json		j;
 	zbx_uint64_t		areg_lastid = 0, history_lastid = 0, discovery_lastid = 0;
@@ -199,6 +202,12 @@ static void	send_proxy_data(zbx_socket_t *sock, const zbx_timespec_t *ts,
 		zbx_pb_update_state(more);
 
 		zbx_dc_set_proxy_lastonline(ts->sec);
+
+		if (0 != tasks.values_num)
+		{
+			zbx_rtc_notify_generic(rtc, ZBX_PROCESS_TYPE_TASKMANAGER, 1, ZBX_RTC_TASK_MANAGER_NOTIFY,
+					NULL, 0);
+		}
 	}
 	else
 	{
@@ -229,7 +238,7 @@ out:
  *                                                                            *
  ******************************************************************************/
 static void	send_task_data(zbx_socket_t *sock, const zbx_timespec_t *ts,
-		const zbx_config_comms_args_t *config_comms)
+		const zbx_config_comms_args_t *config_comms, zbx_ipc_async_socket_t *rtc)
 {
 	struct zbx_json		j;
 	char			*error = NULL, *buffer = NULL;
@@ -289,6 +298,12 @@ static void	send_task_data(zbx_socket_t *sock, const zbx_timespec_t *ts,
 
 		zbx_db_commit();
 
+		if (0 != tasks.values_num)
+		{
+			zbx_rtc_notify_generic(rtc, ZBX_PROCESS_TYPE_TASKMANAGER, 1, ZBX_RTC_TASK_MANAGER_NOTIFY,
+					NULL, 0);
+		}
+
 		zbx_dc_set_proxy_lastonline(ts->sec);
 	}
 	else
@@ -319,7 +334,7 @@ int	trapper_process_request_proxy(const char *request, zbx_socket_t *sock, const
 		const zbx_config_vault_t *config_vault, int proxydata_frequency,
 		zbx_get_program_type_f get_program_type_cb, const zbx_events_funcs_t *events_cbs,
 		zbx_get_config_forks_f get_config_forks, const zbx_config_tls_t *config_tls,
-		const char *config_frontend_allowed_ip)
+		const char *config_frontend_allowed_ip, zbx_ipc_async_socket_t *rtc)
 {
 	ZBX_UNUSED(jp);
 	ZBX_UNUSED(ts);
@@ -354,7 +369,7 @@ int	trapper_process_request_proxy(const char *request, zbx_socket_t *sock, const
 	{
 		if (0 != (get_program_type_cb() & ZBX_PROGRAM_TYPE_PROXY_PASSIVE))
 		{
-			send_proxy_data(sock, ts, config_comms, get_program_type_cb);
+			send_proxy_data(sock, ts, config_comms, get_program_type_cb, rtc);
 			return SUCCEED;
 		}
 		return FAIL;
@@ -363,7 +378,7 @@ int	trapper_process_request_proxy(const char *request, zbx_socket_t *sock, const
 	{
 		if (0 != (get_program_type_cb() & ZBX_PROGRAM_TYPE_PROXY_PASSIVE))
 		{
-			send_task_data(sock, ts, config_comms);
+			send_task_data(sock, ts, config_comms, rtc);
 			return SUCCEED;
 		}
 		return FAIL;

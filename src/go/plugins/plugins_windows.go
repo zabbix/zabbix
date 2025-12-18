@@ -15,7 +15,6 @@
 package plugins
 
 import (
-	_ "golang.zabbix.com/agent2/plugins/ceph"
 	_ "golang.zabbix.com/agent2/plugins/log"
 	_ "golang.zabbix.com/agent2/plugins/memcached"
 	_ "golang.zabbix.com/agent2/plugins/modbus"
@@ -30,6 +29,7 @@ import (
 	_ "golang.zabbix.com/agent2/plugins/redis"
 	_ "golang.zabbix.com/agent2/plugins/smart"
 	_ "golang.zabbix.com/agent2/plugins/system/cpu"
+	_ "golang.zabbix.com/agent2/plugins/system/localtime"
 	_ "golang.zabbix.com/agent2/plugins/system/sw"
 	_ "golang.zabbix.com/agent2/plugins/system/swap"
 	_ "golang.zabbix.com/agent2/plugins/system/uname"
@@ -49,7 +49,6 @@ import (
 	_ "golang.zabbix.com/agent2/plugins/windows/registry"
 	_ "golang.zabbix.com/agent2/plugins/windows/services"
 	_ "golang.zabbix.com/agent2/plugins/windows/wmi"
-	_ "golang.zabbix.com/agent2/plugins/zabbix/async"
 	_ "golang.zabbix.com/agent2/plugins/zabbix/stats"
 	_ "golang.zabbix.com/agent2/plugins/zabbix/sync"
 )

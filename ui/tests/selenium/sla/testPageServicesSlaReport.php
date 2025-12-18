@@ -58,6 +58,7 @@ class testPageServicesSlaReport extends testSlaReport {
 			'headers' => ['Name'],
 			'column_data' => [
 				'Name' => [
+					'Multiple spaces in SLA name',
 					'SLA Annual',
 					'SLA Daily',
 					'SLA Monthly',
@@ -78,7 +79,7 @@ class testPageServicesSlaReport extends testSlaReport {
 			'buttons' => ['Filter', 'Reset', 'Cancel'],
 			'check_row' => [
 				'Name' => 'Simple actions service',
-				'Tags' => 'problem: falsetest: test789',
+				'Tags' => "problem: false\ntest: test789",
 				'Problem tags' => 'problem: true'
 			]
 		];

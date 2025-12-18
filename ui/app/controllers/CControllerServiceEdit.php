@@ -24,16 +24,15 @@ class CControllerServiceEdit extends CController {
 	private $service;
 
 	protected function init() {
+		$this->setInputValidationMethod(self::INPUT_VALIDATION_FORM);
 		$this->disableCsrfValidation();
 	}
 
 	protected function checkInput(): bool {
-		$fields = [
-			'serviceid' =>			'id',
-			'parent_serviceids' =>	'array_id'
-		];
-
-		$ret = $this->validateInput($fields);
+		$ret = $this->validateInput(['object', 'fields' => [
+			'serviceid' => ['db services.serviceid'],
+			'parent_serviceids' => ['array', 'field' => ['db services.serviceid']]
+		]]);
 
 		if (!$ret) {
 			$this->setResponse(
@@ -134,7 +133,7 @@ class CControllerServiceEdit extends CController {
 				];
 			}
 
-			foreach (makeTags($problem_tags, true, 'serviceid') as $serviceid => $tags) {
+			foreach (CTagHelper::getTagsHtml($problem_tags, ZBX_TAG_OBJECT_SERVICE) as $serviceid => $tags) {
 				$children_problem_tags_html[$serviceid] = implode('', $tags);
 			}
 		}
@@ -206,7 +205,12 @@ class CControllerServiceEdit extends CController {
 			];
 		}
 
+		$js_validation_rules = $data['serviceid']
+			? CControllerServiceUpdate::getValidationRules()
+			: CControllerServiceCreate::getValidationRules();
+
 		$data['user'] = ['debug_mode' => $this->getDebugMode()];
+		$data['js_validation_rules'] = (new CFormValidator($js_validation_rules))->getRules();
 
 		$this->setResponse(new CControllerResponseData($data));
 	}

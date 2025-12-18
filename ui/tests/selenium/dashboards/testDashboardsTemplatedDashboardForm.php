@@ -367,7 +367,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 							[
 								'type' => 'problemhosts',
 								'name' => 'Problem hosts widget',
-								'x' => 48,
+								'x' => 60,
 								'y' => 8,
 								'width' => 12,
 								'height' => 4
@@ -375,15 +375,15 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 							[
 								'type' => 'problems',
 								'name' => 'Problems widget',
-								'x' => 60,
-								'y' => 8,
+								'x' => 0,
+								'y' => 12,
 								'width' => 12,
 								'height' => 4
 							],
 							[
 								'type' => 'problemsbysv',
 								'name' => 'Problems by severity widget',
-								'x' => 0,
+								'x' => 12,
 								'y' => 12,
 								'width' => 12,
 								'height' => 4
@@ -391,7 +391,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 							[
 								'type' => 'slareport',
 								'name' => 'SLA report widget',
-								'x' => 12,
+								'x' => 24,
 								'y' => 12,
 								'width' => 12,
 								'height' => 4,
@@ -411,7 +411,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 							[
 								'type' => 'systeminfo',
 								'name' => 'System info details widget',
-								'x' => 24,
+								'x' => 36,
 								'y' => 12,
 								'width' => 12,
 								'height' => 4
@@ -419,7 +419,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 							[
 								'type' => 'systeminfo',
 								'name' => 'System info HA nodes widget',
-								'x' => 36,
+								'x' => 48,
 								'y' => 12,
 								'width' => 12,
 								'height' => 4,
@@ -434,7 +434,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 							[
 								'type' => 'tophosts',
 								'name' => 'Top hosts widget',
-								'x' => 48,
+								'x' => 60,
 								'y' => 12,
 								'width' => 12,
 								'height' => 4,
@@ -484,15 +484,15 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 							[
 								'type' => 'toptriggers',
 								'name' => 'Top triggers widget',
-								'x' => 60,
-								'y' => 12,
+								'x' => 0,
+								'y' => 16,
 								'width' => 12,
 								'height' => 4
 							],
 							[
 								'type' => 'trigover',
 								'name' => 'Trigger overview widget',
-								'x' => 0,
+								'x' => 12,
 								'y' => 16,
 								'width' => 12,
 								'height' => 4
@@ -500,7 +500,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 							[
 								'type' => 'url',
 								'name' => 'URL widget',
-								'x' => 12,
+								'x' => 24,
 								'y' => 16,
 								'width' => 12,
 								'height' => 4,
@@ -515,7 +515,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 							[
 								'type' => 'web',
 								'name' => 'Web monitoring widget',
-								'x' => 24,
+								'x' => 36,
 								'y' => 16,
 								'width' => 12,
 								'height' => 4
@@ -523,7 +523,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 							[
 								'type' => 'topitems',
 								'name' => 'Top items widget',
-								'x' => 36,
+								'x' => 48,
 								'y' => 16,
 								'width' => 12,
 								'height' => 4,
@@ -538,7 +538,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 							[
 								'type' => 'honeycomb',
 								'name' => 'Honeycomb widget',
-								'x' => 48,
+								'x' => 60,
 								'y' => 16,
 								'width' => 12,
 								'height' => 4,
@@ -554,7 +554,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 								'type' => 'hostcard',
 								'name' => 'Host card widget',
 								'x' => 60,
-								'y' => 16,
+								'y' => 20,
 								'width' => 12,
 								'height' => 4,
 								'fields' => [
@@ -562,6 +562,26 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 										'type' => 3,
 										'name' => 'hostid.0',
 										'value' => 10084 // Zabbix server.
+									]
+								]
+							],
+							[
+								'type'=> 'itemcard',
+								'name'=> 'Item card widget',
+								'x'=> 60,
+								'y'=> 24,
+								'width'=> 12,
+								'height'=> 4,
+								'fields'=> [
+									[
+										'type'=> ZBX_WIDGET_FIELD_TYPE_ITEM,
+										'name'=> 'itemid.0',
+										'value'=> self::$template_itemid
+									],
+									[
+										'type'=> 0,
+										'name'=> 'sections.0',
+										'value'=> 2
 									]
 								]
 							]
@@ -646,6 +666,31 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 		self::$dashboardid_with_widgets = $response['dashboardids'][0];
 		self::$empty_dashboardid = $response['dashboardids'][1];
 		self::$dashboardid_for_update = $response['dashboardids'][2];
+
+		// Insert favorite map and graph into profiles table for checking the data that is displayed by favorite maps and favorite graphs widgets.
+		$insert_favorite = [
+			[
+				'profileid' => 1,
+				'userid' => 1,
+				'idx' => zbx_dbstr('web.favorite.sysmapids'),
+				'value_id' => 1, // Map:Local network.
+				'value_str' => zbx_dbstr(''),
+				'source' => zbx_dbstr('sysmapid'),
+				'type' => 1
+			],
+			[
+				'profileid' => 2,
+				'userid' => 1,
+				'idx' => zbx_dbstr('web.favorite.graphids'),
+				'value_id' => 42258, // Item:CPU iowait time.
+				'value_str' => zbx_dbstr(''),
+				'source' => zbx_dbstr('itemid'),
+				'type' => 1
+			]
+		];
+		foreach ($insert_favorite as $data) {
+			DBexecute('INSERT INTO profiles ('.implode(', ', array_keys($data)).') VALUES ('.implode(', ', $data).')');
+		}
 	}
 
 	/**
@@ -2243,6 +2288,79 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 						'Advanced configuration' => true
 					]
 				]
+			],
+			// #24 Host card widget.
+			[
+				[
+					'type' => CFormElement::RELOADABLE_FILL('Host card'),
+					'refresh_interval' => 'Default (1 minute)',
+					'fields' => [
+						[
+							'field' => 'Show suppressed problems',
+							'type' => 'checkbox',
+							'value' => false
+						],
+						[
+							'field' => 'Show',
+							'type' => 'show_table',
+							'headers' => ['', '', 'Name', ''],
+							'field_locator' => 'id:sections-table',
+							'rows' => [
+								1 => 'Monitoring',
+								2 => 'Availability',
+								3 => 'Monitored by'
+							],
+							'option_states' => [
+								'Host groups' => true,
+								'Description' => true,
+								'Monitoring' => false,
+								'Availability' => false,
+								'Monitored by' => false,
+								'Templates' => true,
+								'Inventory' => true,
+								'Tags' => true
+							]
+						]
+					]
+				]
+			],
+			// #25 Item card widget.
+			[
+				[
+					'type' => CFormElement::RELOADABLE_FILL('Item card'),
+					'refresh_interval' => 'Default (1 minute)',
+					'fields' => [
+						[
+							'field' => 'Item',
+							'type' => 'multiselect',
+							'mandatory' => true
+						],
+						[
+							'field' => 'Show',
+							'type' => 'show_table',
+							'headers' => ['', '', 'Name', ''],
+							'field_locator' => 'id:sections-table',
+							'rows' => [
+								1 => 'Interval and storage',
+								2 => 'Type of information',
+								3 => 'Host interface',
+								4 => 'Type'
+							],
+							'option_states' => [
+								'Description' => true,
+								'Error text' => true,
+								'Interval and storage' => false,
+								'Latest data' => true,
+								'Type of information' => false,
+								'Triggers' => true,
+								'Host interface' => false,
+								'Type' => false,
+								'Host inventory' => true,
+								'Tags' => true
+							]
+						]
+					]
+				]
 			]
 		];
 	}
@@ -2496,7 +2614,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 				break;
 
 			case 'color_picker':
-				$field = $field->asColorPicker();
+				$field = $field->query('xpath://z-color-picker')->asColorPicker()->one();
 				$this->assertEquals($default_value, $field->getValue());
 				break;
 
@@ -2536,6 +2654,38 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 			case 'indicator':
 				$this->assertTrue($field->isDisplayed());
 				$this->assertEquals('', $field->query('tag:polygon')->one()->getAttribute('style'));
+				break;
+
+			case 'show_table':
+				$table = $field->asTable();
+				// TODO: Uncomment the below check after ZBX-27000 is merged.
+				// $this->assertEquals($field_details['headers'], $table->getHeadersText());
+				$this->assertTrue($table->query('id:add-row')->one()->isClickable());
+
+				// Check each default row in "Show" field and its contents.
+				$show_rows = $table->getRows()->filter(CElementFilter::CLASSES_PRESENT, 'form_row', true);
+				$i = 1;
+				foreach ($show_rows as $row) {
+					$this->assertTrue($row->getColumn(0)->query('class:drag-icon')->one()->isEnabled());
+
+					// TODO: after ZBX-27000 is merged, change column index "2" to column name "Name".
+					$dropdown = $row->getColumn(2)->query('tag:z-select')->one()->asDropdown();
+					$options = $dropdown->getOptions();
+					$this->assertEquals($field_details['rows'][$i], $dropdown->getText());
+					$this->assertEquals(array_keys($field_details['option_states']), $options->asText());
+
+					// If option is selected in the dropdown, it appears in the list as enabled.
+					$reference_options = array_merge($field_details['option_states'], [$field_details['rows'][$i] => true]);
+
+					// If option does not have a "disabled" attribute, then it is considered enabled.
+					foreach ($options as $option) {
+						$this->assertEquals($reference_options[$option->getText()], !$option->isAttributePresent('disabled'));
+					}
+
+					$this->assertTrue($row->query('button:Remove')->one()->isClickable());
+
+					$i++;
+				}
 				break;
 		}
 
@@ -4357,6 +4507,197 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					],
 					'page' => '2nd page'
 				]
+			],
+			// #98 Item card widget with empty Item field
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Type' => CFormElement::RELOADABLE_FILL('Item card'),
+						'Item' => ''
+					],
+					'error_message' => 'Invalid parameter "Item": cannot be empty.',
+					'page' => '2nd page'
+				]
+			],
+			// #99 Item card widget with empty sparkline date.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Type' => CFormElement::RELOADABLE_FILL('Item card'),
+						'Item' => self::TEMPLATE_ITEM
+					],
+					'swap_expected' => [
+						'Item' => self::TEMPLATE.': '.self::TEMPLATE_ITEM
+					],
+					'Show' => [
+						['action' => USER_ACTION_UPDATE, 'index' => 0, 'section' => 'Latest data']
+					],
+					'Sparkline' => [
+						'id:sparkline_time_period_from' => '',
+						'id:sparkline_time_period_to' => ''
+					],
+					'page' => '2nd page',
+					'error_message' => [
+						'Invalid parameter "Sparkline: Time period/From": cannot be empty.',
+						'Invalid parameter "Sparkline: Time period/To": cannot be empty.'
+					]
+				]
+			],
+			// #100 Item card widget with the wrong sparkline range.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Type' => CFormElement::RELOADABLE_FILL('Item card'),
+						'Name' => 'Selected more than 731 day for graph filter.',
+						'Item' => self::TEMPLATE_ITEM
+					],
+					'swap_expected' => [
+						'Item' => self::TEMPLATE.': '.self::TEMPLATE_ITEM
+					],
+					'Show' => [
+						['action' => USER_ACTION_UPDATE, 'index' => 0, 'section' => 'Latest data']
+					],
+					'Sparkline' => [
+						'id:sparkline_time_period_from' => 'now-1000d',
+						'id:sparkline_time_period_to' => 'now'
+					],
+					'page' => '2nd page',
+					'error_message' => [
+						'Maximum time period to display is 731 days.'
+					]
+				]
+			],
+			// #101 Item card widget with empty widget value.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Type' => CFormElement::RELOADABLE_FILL('Item card'),
+						'Name' => 'Empty widget value',
+						'Item' => self::TEMPLATE_ITEM
+					],
+					'swap_expected' => [
+						'Item' => self::TEMPLATE.': '.self::TEMPLATE_ITEM
+					],
+					'Show' => [
+						['action' => USER_ACTION_UPDATE, 'index' => 0, 'section' => 'Latest data']
+					],
+					'Sparkline' => [
+						'id:sparkline_time_period_data_source' => 'Widget'
+					],
+					'page' => '2nd page',
+					'error_message' => [
+						'Invalid parameter "Sparkline: Time period/Widget": cannot be empty.'
+					]
+				]
+			],
+			// #102 Item card widget with incorrect number for sparkline parameters.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Type' => CFormElement::RELOADABLE_FILL('Item card'),
+						'Show header' => false,
+						'Name' => 'Incorrect number for sparkline parameters',
+						'Refresh interval' => 'No refresh',
+						'Item' => self::TEMPLATE_ITEM
+					],
+					'swap_expected' => [
+						'Item' => self::TEMPLATE.': '.self::TEMPLATE_ITEM
+					],
+					'Show' => [
+						['action' => USER_ACTION_UPDATE, 'index' => 0, 'section' => 'Latest data']
+					],
+					'Sparkline' => [
+						'id:sparkline_width' => 5000,
+						'id:sparkline_fill' => -5
+					],
+					'page' => '2nd page',
+					'error_message' => [
+						'Invalid parameter "Sparkline: Width": value must be one of 0-10.',
+						'Invalid parameter "Sparkline: Fill": value must be one of 0-10.'
+					]
+				]
+			],
+			// #103 Item card widget with incorrect data type for time period fields.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Type' => CFormElement::RELOADABLE_FILL('Item card'),
+						'Name' => 'A time is expected',
+						'Item' => self::TEMPLATE_ITEM
+					],
+					'swap_expected' => [
+						'Item' => self::TEMPLATE.': '.self::TEMPLATE_ITEM
+					],
+					'Show' => [
+						['action' => USER_ACTION_UPDATE, 'index' => 0, 'section' => 'Latest data']
+					],
+					'Sparkline' => [
+						'id:sparkline_time_period_data_source' => 'Custom',
+						'id:sparkline_time_period_from' => 'dsa',
+						'id:sparkline_time_period_to' => '321'
+					],
+					'page' => '2nd page',
+					'error_message' => [
+						'Invalid parameter "Sparkline: Time period/From": a time is expected.',
+						'Invalid parameter "Sparkline: Time period/To": a time is expected.'
+					]
+				]
+			],
+			// #104 Item card widget with all values.
+			[
+				[
+					'fields' => [
+						'Type' => CFormElement::RELOADABLE_FILL('Item card'),
+						'Name' => 'Trying to fill all widget fields',
+						'Refresh interval' => '10 minutes',
+						'Item' => self::TEMPLATE_ITEM
+					],
+					'swap_expected' => [
+						'Item' => self::TEMPLATE.': '.self::TEMPLATE_ITEM
+					],
+					'Show' => [
+						['section' => 'Description'],
+						['section' => 'Error text'],
+						['section' => 'Latest data'],
+						['section' => 'Triggers'],
+						['section' => 'Host inventory'],
+						['section' => 'Tags']
+					],
+					'Sparkline' => [
+						'id:sparkline_width' => 5,
+						'id:sparkline_fill' => 3,
+						'id:sparkline_time_period_data_source' => 'Dashboard',
+						'id:sparkline_history' => 'History',
+						'color' => 'F48FB1'
+					],
+					'page' => '2nd page'
+				]
+			],
+			// #105 Host card widget with all values.
+			[
+				[
+					'fields' => [
+						'Type' => CFormElement::RELOADABLE_FILL('Host card'),
+						'Name' => 'Fully filled host card widget',
+						'Refresh interval' => '10 minutes',
+						'Show suppressed problems' => true
+					],
+					'Show' => [
+						['section' => 'Host groups'],
+						['section' => 'Description'],
+						['section' => 'Templates'],
+						['section' => 'Inventory'],
+						['section' => 'Tags']
+					],
+					'Inventory' => ['Location latitude', 'Location longitude', 'Tag', 'Type'],
+					'page' => '2nd page'
+				]
 			]
 		];
 	}
@@ -4451,6 +4792,40 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 			// Open Advanced config again because after column filling it becomes collapsed for Item history widget.
 			if ($container === 'Items') {
 				$form->fill(['Advanced configuration' => true]);
+			}
+		}
+
+		if (array_key_exists('Show', $data)) {
+			$this->query('id:sections-table')->asMultifieldTable([
+				'mapping' => [
+					'' => [
+						'name' => 'section',
+						'selector' => 'xpath:./z-select',
+						'class' => 'CDropdownElement'
+					]
+				]
+			])->one()->fill($data['Show']);
+
+			if (array_key_exists('Inventory', $data)) {
+				$form->getField('Inventory fields')->fill($data['Inventory']);
+			}
+		}
+
+		if (array_key_exists('Sparkline', $data)) {
+			foreach ($data['Sparkline'] as $field => $value) {
+				if ($field === 'color') {
+					$color_picker_dialog = $form->query('class:color-picker')->one()->asColorPicker();
+					$color_picker_dialog->fill($value);
+				}
+				elseif ($field === 'widget') {
+					$sparkline = $form->query('class:widget-field-sparkline')->one()->waitUntilVisible();
+					$sparkline->query('button', 'Select')->one()->waitUntilClickable()->click();
+					$dialog = COverlayDialogElement::find()->all()->last()->waitUntilReady();
+					$dialog->query('link:'. $value)->one()->click();
+				}
+				else {
+					$form->getField($field)->fill($value);
+				}
 			}
 		}
 
@@ -4579,8 +4954,8 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 			$all_types = ['Action log', 'Clock', 'Discovery status', 'Favorite graphs', 'Favorite maps', 'Gauge', 'Geomap',
 				'Graph', 'Graph (classic)', 'Graph prototype', 'Honeycomb', 'Host availability', 'Host card',
 				'Host navigator', 'Item card', 'Item history', 'Item navigator', 'Item value', 'Map', 'Map navigation tree',
-				'Pie chart', 'Problem hosts', 'Problems', 'Problems by severity', 'SLA report', 'System information',
-				'Top hosts', 'Top items', 'Top triggers', 'Trigger overview', 'URL', 'Web monitoring'
+				'Pie chart', 'Problem hosts', 'Problems', 'Problems by severity', 'Scatter plot', 'SLA report',
+				'System information', 'Top hosts', 'Top items', 'Top triggers', 'Trigger overview', 'URL', 'Web monitoring'
 			];
 			$this->assertEquals($all_types, $form->getField('Type')->getOptions()->asText());
 		}

@@ -24,7 +24,7 @@ require_once __DIR__.'/../../include/helpers/CDataHelper.php';
  *
  * @onBefore prepareUserData
  *
- * @dataSource UserPermissions
+ * @dataSource UserPermissions, MonitoringOverview
  */
 class testFormUserPermissions extends CWebTest {
 
@@ -482,9 +482,10 @@ class testFormUserPermissions extends CWebTest {
 	public function testFormUserPermissions_Module() {
 		$widget_modules = ['Action log', 'Clock', 'Discovery status', 'Favorite graphs', 'Favorite maps',
 			'Gauge', 'Geomap', 'Graph', 'Graph (classic)', 'Graph prototype', 'Honeycomb', 'Host availability',
-			'Host card', 'Host navigator', 'Item card', 'Item history', 'Item navigator', 'Item value', 'Map', 'Map navigation tree',
-			'Pie chart', 'Problem hosts', 'Problems', 'Problems by severity', 'SLA report', 'System information',
-			'Top hosts', 'Top items', 'Top triggers', 'Trigger overview', 'URL', 'Web monitoring'
+			'Host card', 'Host navigator', 'Item card', 'Item history', 'Item navigator', 'Item value', 'Map',
+			'Map navigation tree', 'Pie chart', 'Problem hosts', 'Problems', 'Problems by severity', 'Scatter plot',
+			'SLA report', 'System information', 'Top hosts', 'Top items', 'Top triggers', 'Trigger overview', 'URL',
+			'Web monitoring'
 		];
 
 		$this->page->login()->open('zabbix.php?action=user.edit&userid='.self::$admin_user)->waitUntilReady();

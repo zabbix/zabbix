@@ -17,120 +17,89 @@
 class CControllerMaintenanceTimePeriodCheck extends CController {
 
 	protected function init(): void {
+		$this->setInputValidationMethod(self::INPUT_VALIDATION_FORM);
 		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
 		$this->disableCsrfValidation();
 	}
 
+	public static function getValidationRules(): array {
+		return ['object', 'fields' => [
+			'row_index' => ['integer', 'required'],
+			'timeperiod_type' => ['db timeperiods.timeperiod_type', 'required',
+				'in' => [TIMEPERIOD_TYPE_ONETIME, TIMEPERIOD_TYPE_DAILY, TIMEPERIOD_TYPE_WEEKLY, TIMEPERIOD_TYPE_MONTHLY]
+			],
+			'every_day' => ['integer', 'required', 'min' => 1, 'max' => 999,
+				'when' => ['timeperiod_type', 'in' => [TIMEPERIOD_TYPE_DAILY]]
+			],
+			'every_week' => ['integer', 'required', 'min' => 1, 'max' => 99,
+				'when' => ['timeperiod_type', 'in' => [TIMEPERIOD_TYPE_WEEKLY]]
+			],
+			'weekly_days' => ['array', 'required', 'not_empty',
+				'field' => ['integer'],
+				'when' => ['timeperiod_type', 'in' => [TIMEPERIOD_TYPE_WEEKLY]],
+				'messages' => ['not_empty' => _('At least one day must be selected.')]
+			],
+			'months' => ['array', 'required', 'not_empty',
+				'field' => ['integer'],
+				'when' => ['timeperiod_type', 'in' => [TIMEPERIOD_TYPE_MONTHLY]],
+				'messages' => ['not_empty' => _('At least one month must be selected.')]
+			],
+			'month_date_type' => ['integer', 'required', 'in' => [0, 1],
+				'when' => ['timeperiod_type', 'in' => [TIMEPERIOD_TYPE_MONTHLY]]
+			],
+			'every_dow' => ['integer', 'required', 'in' => [MONTH_WEEK_FIRST, MONTH_WEEK_SECOND, MONTH_WEEK_THIRD,
+				MONTH_WEEK_FOURTH, MONTH_WEEK_LAST],
+				'when' => [['timeperiod_type', 'in' => [TIMEPERIOD_TYPE_MONTHLY]], ['month_date_type', 'in' => [1]]]
+			],
+			'monthly_days' => ['array', 'required', 'not_empty',
+				'field' => ['integer'],
+				'when' => [['month_date_type', 'in' => [1]], ['timeperiod_type', 'in' => [TIMEPERIOD_TYPE_MONTHLY]]],
+				'messages' => ['not_empty' => _('At least one weekday must be selected.')]
+			],
+			'day' => ['integer', 'required', 'min' => 1, 'max' => MONTH_MAX_DAY,
+				'when' => [['month_date_type', 'in' => [0]], ['timeperiod_type', 'in' => [TIMEPERIOD_TYPE_MONTHLY]]]
+			],
+			'start_date' => ['string', 'required', 'not_empty',
+				'use' => [CAbsoluteTimeParser::class, [], ['min' => 0, 'max' => ZBX_MAX_DATE]],
+				'when' => ['timeperiod_type', 'in' => [TIMEPERIOD_TYPE_ONETIME]],
+				'messages' => ['use' => _('Invalid date.')]
+			],
+			'hour' => ['integer', 'required', 'min' => 0, 'max' => 23,
+				'when' => ['timeperiod_type',
+					'in' => [TIMEPERIOD_TYPE_DAILY, TIMEPERIOD_TYPE_WEEKLY, TIMEPERIOD_TYPE_MONTHLY]]
+			],
+			'minute' =>	['integer', 'required', 'min' => 0, 'max' => 59,
+				'when' => ['timeperiod_type',
+					'in' => [TIMEPERIOD_TYPE_DAILY, TIMEPERIOD_TYPE_WEEKLY,TIMEPERIOD_TYPE_MONTHLY]]
+			],
+			'period_days' => ['integer', 'required', 'min' => 0, 'max' => 999],
+			'period_hours' => ['integer', 'required', 'min' => 0, 'max' => 23],
+			'period_minutes' => [
+				['integer', 'required', 'min' => 0, 'max' => 59],
+				['integer', 'required', 'min' => 5,
+					'when' => [['period_days', 'in' => [0]], ['period_hours', 'in' => [0]]],
+					'messages' => ['min' =>
+						_s('Minimum value of "Maintenance period length" is %1$d minutes.', 5)]
+				]
+			]
+		]];
+	}
+
 	protected function checkInput(): bool {
-		$fields = [
-			'row_index' =>			'required|int32',
-			'timeperiod_type' =>	'required|in '.implode(',', [TIMEPERIOD_TYPE_ONETIME, TIMEPERIOD_TYPE_DAILY, TIMEPERIOD_TYPE_WEEKLY, TIMEPERIOD_TYPE_MONTHLY]),
-			'every_day' =>			'required|int32',
-			'every_week' =>			'required|int32',
-			'weekly_days' =>		'array',
-			'months' =>				'array',
-			'month_date_type' =>	'required|in 0,1',
-			'every_dow' =>			'required|in 1,2,3,4,5',
-			'monthly_days' =>		'array',
-			'day' =>				'required|int32',
-			'start_date' =>			'required|string',
-			'hour' =>				'required|ge 0|le 23',
-			'minute' =>				'required|ge 0|le 59',
-			'period_days' =>		'required|ge 0|le 999',
-			'period_hours' =>		'required|ge 0|le 23',
-			'period_minutes' =>		'required|ge 0|le 59'
-		];
-
-		$ret = $this->validateInput($fields);
-
-		if ($ret) {
-			$errors = self::validateTypeSpecificInput($this->getInputAll());
-
-			if ($errors) {
-				foreach ($errors as $error) {
-					error($error);
-				}
-
-				$ret = false;
-			}
-		}
+		$ret = $this->validateInput(self::getValidationRules());
 
 		if (!$ret) {
-			$this->setResponse(
-				new CControllerResponseData(['main_block' => json_encode([
-					'error' => [
-						'messages' => array_column(get_and_clear_messages(), 'message')
-					]
-				])])
-			);
+			$form_errors = $this->getValidationError();
+			$response = $form_errors
+				? ['form_errors' => $form_errors]
+				: ['error' => [
+					'messages' => array_column(get_and_clear_messages(), 'message')
+				]];
+
+			$this->setResponse(new CControllerResponseData(['main_block' => json_encode($response)]));
 		}
 
 		return $ret;
-	}
-
-	private static function validateTypeSpecificInput(array $input): array {
-		$errors = [];
-
-		switch ($input['timeperiod_type']) {
-			case TIMEPERIOD_TYPE_ONETIME:
-				$validator = new CNewValidator($input, [
-					'start_date' => 'abs_time'
-				]);
-
-				$errors = array_merge($errors, $validator->getAllErrors());
-
-				if (!$validator->isErrorFatal() && !$validator->isError()) {
-					$parser = new CAbsoluteTimeParser();
-					$parser->parse($input['start_date']);
-					$start_date = $parser->getDateTime(true);
-
-					if (!validateDateInterval($start_date->format('Y'), $start_date->format('m'),
-							$start_date->format('j'))) {
-						$errors[] = _s('Invalid parameter "%1$s": %2$s.', _('Date'),
-							_s('value must be between "%1$s" and "%2$s"', '1970-01-01', '2038-01-18')
-						);
-					}
-				}
-				break;
-
-			case TIMEPERIOD_TYPE_DAILY:
-				$errors = array_merge($errors, (new CNewValidator($input, [
-					'every_day' => 'ge 1|le 999'
-				]))->getAllErrors());
-				break;
-
-			case TIMEPERIOD_TYPE_WEEKLY:
-				$errors = array_merge($errors, (new CNewValidator($input, [
-					'every_week' => 'ge 1|le 99',
-					'weekly_days' => 'required'
-				]))->getAllErrors());
-				break;
-
-			case TIMEPERIOD_TYPE_MONTHLY:
-				$errors = array_merge($errors, (new CNewValidator($input, [
-					'months' => 'required'
-				]))->getAllErrors());
-
-				switch ($input['month_date_type']) {
-					case 0:
-						$errors = array_merge($errors, (new CNewValidator($input, [
-							'day' => 'ge 1|le 31'
-						]))->getAllErrors());
-						break;
-
-					case 1:
-						$errors = array_merge($errors, (new CNewValidator($input, [
-							'monthly_days' => 'required'
-						]))->getAllErrors());
-						break;
-				}
-		}
-
-		if ($input['period_days'] == 0 && $input['period_hours'] == 0 && $input['period_minutes'] < 5) {
-			$errors[] = _('Incorrect maintenance period (minimum 5 minutes)');
-		}
-
-		return $errors;
 	}
 
 	protected function checkPermissions(): bool {
@@ -172,14 +141,15 @@ class CControllerMaintenanceTimePeriodCheck extends CController {
 
 			case TIMEPERIOD_TYPE_WEEKLY:
 				$timeperiod['every'] = $this->getInput('every_week');
-				$timeperiod['dayofweek'] = array_sum($this->getInput('weekly_days', []));
+				$timeperiod['dayofweek'] = array_sum($this->getInput('weekly_days'));
 				$timeperiod['start_time'] = (int) $this->getInput('hour') * SEC_PER_HOUR
 					+ (int) $this->getInput('minute') * SEC_PER_MIN;
 
 				break;
 
 			case TIMEPERIOD_TYPE_MONTHLY:
-				$timeperiod['month'] = array_sum($this->getInput('months', []));
+				$timeperiod['month'] = array_sum($this->getInput('months'));
+				$timeperiod['month_date_type'] = $this->getInput('month_date_type');
 
 				switch ($this->getInput('month_date_type')) {
 					case 0:

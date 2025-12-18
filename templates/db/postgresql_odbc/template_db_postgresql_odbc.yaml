@@ -80,7 +80,7 @@ zabbix_export:
         5. Set the password that you specified in step 1 in the `PostgreSQL user password` field.
       vendor:
         name: Zabbix
-        version: 8.0-0
+        version: 8.0-1
       groups:
         - name: Templates/Databases
       items:
@@ -2632,6 +2632,7 @@ zabbix_export:
             type: TEXT
             priority: '4'
             label: 'Default PostgreSQL database for the connection'
+            description: 'Default PostgreSQL database.'
             required: 'YES'
         - macro: '{$PG.DEADLOCKS.MAX.WARN}'
           value: '0'
@@ -2668,6 +2669,7 @@ zabbix_export:
             type: TEXT
             priority: '3'
             label: 'PostgreSQL user password'
+            description: 'PostgreSQL password.'
             required: 'YES'
         - macro: '{$PG.QUERY_ETIME.MAX.WARN}'
           value: '30'
@@ -2696,6 +2698,7 @@ zabbix_export:
             type: TEXT
             priority: '2'
             label: 'PostgreSQL username'
+            description: 'PostgreSQL username.'
             required: 'YES'
       dashboards:
         - uuid: 6f15f8b6e90b4d09b9e1d4fb323ac438

@@ -70,6 +70,13 @@ class testFormUserProfile extends CLegacyWebTest {
 
 		$this->page->login()->open('zabbix.php?action=userprofile.edit')->waitUntilReady();
 		$form = $this->query('name:userprofile_form')->asForm()->waitUntilVisible()->one();
+
+		// Check theme fields options.
+		$this->assertEquals(
+			['System default', 'Blue', 'Blue (classic)', 'Dark', 'Dark (classic)', 'High-contrast light', 'High-contrast dark'],
+			$this->query('name:theme')->asDropdown()->waitUntilVisible()->one()->getOptions()->asText()
+		);
+
 		$form->fill(['Theme' => 'Blue'])->submit();
 		$this->page->waitUntilReady();
 		CDashboardElement::find()->waitUntilVisible()->waitUntilReady();
@@ -164,7 +171,7 @@ class testFormUserProfile extends CLegacyWebTest {
 						'"User settings"]')->exists()
 				);
 				self::$old_password = $data['password1'];
-				// TODO: Following test fails on Jenkins with error access denied for Admin to dahsboard page. Logout may help
+				// TODO: Following test fails on Jenkins with error access denied for Admin to dashboard page. Logout may help
 				$this->page->logout();
 				break;
 			case TEST_BAD:

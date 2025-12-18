@@ -65,7 +65,8 @@ builtin_counter_map[] =
 	{ 0,	POI_SYSTEM,			L"System Up Time",		0,	0},
 	{ 0,	POI_PROCESSOR,			L"% Processor Time",		0, 	0},
 	{ 0,	POI_PROCESSOR_INFORMATION,	L"% Processor Time",		6,	1},
-	{ 0,	POI_TERMINAL_SERVICES,		L"Total Sessions",		0,	0}
+	{ 0,	POI_TERMINAL_SERVICES,		L"Total Sessions",		0,	0},
+	{ 0,	POI_TERMINAL_SERVICES,		L"Active Sessions",		0,	0}
 };
 
 PDH_STATUS	zbx_PdhMakeCounterPath(const char *function, PDH_COUNTER_PATH_ELEMENTS *cpe, char *counterpath)

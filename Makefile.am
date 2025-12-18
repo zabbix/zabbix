@@ -93,10 +93,16 @@ gettext:
 	ui/locale/make_mo.sh
 
 css_theme_blue:
-	sass --no-cache --sourcemap=none sass/stylesheets/sass/screen.scss ui/assets/styles/blue-theme.css
+	sass --no-cache --sourcemap=none sass/stylesheets/sass/blue-theme.scss ui/assets/styles/blue-theme.css
+
+css_theme_blue_classic:
+	sass --no-cache --sourcemap=none sass/stylesheets/sass/blue-classic-theme.scss ui/assets/styles/blue-classic-theme.css
 
 css_theme_dark:
 	sass --no-cache --sourcemap=none sass/stylesheets/sass/dark-theme.scss ui/assets/styles/dark-theme.css
+
+css_theme_dark_classic:
+	sass --no-cache --sourcemap=none sass/stylesheets/sass/dark-classic-theme.scss ui/assets/styles/dark-classic-theme.css
 
 css_hc_light:
 	sass --no-cache --sourcemap=none sass/stylesheets/sass/hc-light.scss ui/assets/styles/hc-light.css
@@ -127,7 +133,7 @@ icons_cleanup:
 	cd sass/icons && \
 	npm run cleanup
 
-css: css_theme_blue css_theme_dark css_hc_light css_hc_dark css_images
+css: css_theme_blue css_theme_blue_classic css_theme_dark css_theme_dark_classic css_hc_light css_hc_dark css_images
 
 icons: icons_build css icons_cleanup
 

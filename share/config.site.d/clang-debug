@@ -40,8 +40,11 @@ then
 	CFLAGS+=" -Wformat-security"
 	CFLAGS+=" -Wcast-function-type"
 	CFLAGS+=" -fstrict-aliasing"
+	CFLAGS+=" -Wpedantic"
 
 	# flags for clang
 	CFLAGS+=" -Wno-uninitialized"
 
+	# other
+	CFLAGS+=" -DZBX_DEBUG"
 fi

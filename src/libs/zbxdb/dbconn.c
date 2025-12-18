@@ -27,6 +27,8 @@
 #	define ZBX_PG_DEADLOCK		"40P01"
 #endif
 
+ZBX_PTR_VECTOR_IMPL(dbconn_ptr, zbx_dbconn_t *)
+
 struct zbx_db_result
 {
 #if defined(HAVE_MYSQL)
@@ -47,6 +49,8 @@ struct zbx_db_result
 };
 
 static const zbx_db_config_t	*db_config = NULL;
+
+static zbx_db_query_mask_t	db_log_masked_values = ZBX_DB_DONT_MASK_QUERIES;
 
 #if defined(HAVE_POSTGRESQL)
 static 	ZBX_THREAD_LOCAL char	ZBX_PG_ESCAPE_BACKSLASH = 1;
@@ -117,6 +121,53 @@ void	dbconn_deinit(void)
 #endif
 }
 
+static char	*mask_skip_whitespace(char *s)
+{
+	while ('\0' != *s && 0 != isspace((unsigned char)*s))
+		s++;
+
+	return s;
+}
+
+static char	*mask_skip_tablename(char *s)
+{
+	while ('\0' != *s && (0 != isalnum((unsigned char)*s) || '_' == *s || '.' == *s))
+		s++;
+
+	return s;
+}
+
+static void	db_mask_printable_sql_values(char **sql)
+{
+#define	DB_MASK	"..."
+	char	*p, *end;
+
+	if (0 == strncmp(*sql, "insert into", ZBX_CONST_STRLEN("insert into")))
+	{
+		p = *sql + ZBX_CONST_STRLEN("insert into");
+	}
+	else if (0 == strncmp(*sql, "update", ZBX_CONST_STRLEN("update")))
+	{
+		p = *sql + ZBX_CONST_STRLEN("update");
+	}
+	else if (0 == strncmp(*sql, "select", ZBX_CONST_STRLEN("select")))
+	{
+		if (NULL == (p = strstr(*sql, " from ")))
+			return;
+
+		p += ZBX_CONST_STRLEN(" from ");
+	}
+	else
+		return;
+
+	p = mask_skip_whitespace(p);
+	end = mask_skip_tablename(p);
+	*end = '\0';
+
+	zbx_strlcpy(end, DB_MASK, ZBX_CONST_STRLEN(DB_MASK) + 1);
+#undef DB_MASK
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: replace non-printable characters in SQL query for logging         *
@@ -129,6 +180,9 @@ static char	*db_replace_nonprintable_chars(const char *sql, char **sql_printable
 		*sql_printable = zbx_strdup(NULL, sql);
 		zbx_replace_invalid_utf8_and_nonprintable(*sql_printable);
 	}
+
+	if (ZBX_DB_MASK_QUERIES == db_log_masked_values)
+		db_mask_printable_sql_values(sql_printable);
 
 	return *sql_printable;
 }
@@ -282,7 +336,7 @@ static void	db_get_postgresql_error(char **error, const PGresult *pg_result)
  * Purpose: close database connection                                         *
  *                                                                            *
  ******************************************************************************/
-static void	dbconn_close(zbx_dbconn_t *db)
+void	dbconn_close(zbx_dbconn_t *db)
 {
 #if defined(HAVE_MYSQL)
 	if (NULL != db->conn)
@@ -316,7 +370,9 @@ static void	dbconn_close(zbx_dbconn_t *db)
  ******************************************************************************/
 static int	dbconn_open(zbx_dbconn_t *db)
 {
-	int		ret = ZBX_DB_OK, last_txn_error, last_txn_level;
+	int			ret = ZBX_DB_OK, last_txn_error, last_txn_level;
+	zbx_dbconn_mode_t	last_mode;
+
 #if defined(HAVE_MYSQL)
 	int		err_no = 0;
 #elif defined(HAVE_POSTGRESQL)
@@ -339,9 +395,11 @@ static int	dbconn_open(zbx_dbconn_t *db)
 
 	last_txn_error = db->txn_error;
 	last_txn_level = db->txn_level;
+	last_mode = db->mode;
 
 	db->txn_error = ZBX_DB_OK;
 	db->txn_level = 0;
+	db->mode = DBCONN_MODE_DEFAULT;
 
 #if defined(HAVE_MYSQL)
 	if (NULL == (db->conn = mysql_init(NULL)))
@@ -739,6 +797,7 @@ out:
 
 	db->txn_error = last_txn_error;
 	db->txn_level = last_txn_level;
+	db->mode = last_mode;
 
 	return ret;
 }
@@ -748,9 +807,9 @@ out:
  * Purpose: set connection as managed by connection pool                      *
  *                                                                            *
  ******************************************************************************/
-void	dbconn_set_managed(zbx_dbconn_t *db)
+void	dbconn_set_managed(zbx_dbconn_t *db, zbx_dbconn_type_t type)
 {
-	db->managed = DBCONN_TYPE_MANAGED;
+	db->managed = type;
 }
 
 int	db_is_escape_sequence(char c)
@@ -788,6 +847,8 @@ static int	dbconn_vexecute(zbx_dbconn_t *db, const char *fmt, va_list args)
 	int		err;
 	char		*error = NULL;
 #endif
+	if (DBCONN_MODE_DEFERRED_BEGIN == db->mode && 0 == db->txn_level)
+		zbx_dbconn_begin(db);
 
 	if (0 != db->config->log_slow_queries)
 		sec = zbx_time();
@@ -1023,11 +1084,19 @@ static int	dbconn_commit(zbx_dbconn_t *db)
 
 	if (0 == db->txn_level)
 	{
+		if (DBCONN_MODE_DEFERRED_BEGIN == db->mode)
+		{
+			db->mode = DBCONN_MODE_DEFAULT;
+			return ZBX_DB_OK;
+		}
+
 		zabbix_log(LOG_LEVEL_CRIT, "ERROR: commit without transaction."
 				" Please report it to Zabbix Team.");
 		zbx_this_should_never_happen_backtrace();
 		assert(0);
 	}
+
+	db->mode = DBCONN_MODE_DEFAULT;
 
 	if (ZBX_DB_OK != db->txn_error)
 		return ZBX_DB_FAIL; /* commit called on failed transaction */
@@ -1062,6 +1131,12 @@ static int	dbconn_rollback(zbx_dbconn_t *db)
 
 	if (0 == db->txn_level)
 	{
+		if (DBCONN_MODE_DEFERRED_BEGIN == db->mode)
+		{
+			db->mode = DBCONN_MODE_DEFAULT;
+			return ZBX_DB_OK;
+		}
+
 		zabbix_log(LOG_LEVEL_CRIT, "ERROR: rollback without transaction."
 				" Please report it to Zabbix Team.");
 		zbx_this_should_never_happen_backtrace();
@@ -1072,6 +1147,7 @@ static int	dbconn_rollback(zbx_dbconn_t *db)
 
 	/* allow rollback of failed transaction */
 	db->txn_error = ZBX_DB_OK;
+	db->mode = DBCONN_MODE_DEFAULT;
 
 	rc = dbconn_execute(db, "rollback;");
 
@@ -1110,6 +1186,8 @@ static zbx_db_result_t	dbconn_vselect(zbx_dbconn_t *db, const char *fmt, va_list
 	int		ret = FAIL;
 	char		*error = NULL;
 #endif
+	if (DBCONN_MODE_DEFERRED_BEGIN == db->mode && 0 == db->txn_level)
+		zbx_dbconn_begin(db);
 
 	if (0 != db->config->log_slow_queries)
 		sec = zbx_time();
@@ -1267,6 +1345,91 @@ static zbx_db_result_t	dbconn_select_n(zbx_dbconn_t *db, const char *query, int 
 	return dbconn_select(db, "%s limit %d", query, n);
 }
 
+int	dbconn_is_open(zbx_dbconn_t *db)
+{
+	return (db->conn != NULL ? SUCCEED : FAIL);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: open database connection                                          *
+ *                                                                            *
+ * Return value: ZBX_DB_OK - successfully connected                           *
+ *               ZBX_DB_DOWN - database is down                               *
+ *               ZBX_DB_FAIL - failed to connect                              *
+ *                                                                            *
+ ******************************************************************************/
+int	dbconn_open_retry(zbx_dbconn_t *db)
+{
+#if defined(HAVE_POSTGRESQL)
+#	define ZBX_DB_WAIT_RETRY_COUNT	6
+
+	int	retries = ZBX_DB_WAIT_RETRY_COUNT;
+#endif
+
+	int	err;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() options:%d", __func__, db->connect_options);
+
+	while (ZBX_DB_OK != (err = dbconn_open(db)))
+	{
+		if (ZBX_DB_CONNECT_ONCE == db->connect_options)
+		{
+#if defined(HAVE_POSTGRESQL)
+			if (ZBX_DB_RONLY == err)
+				err = ZBX_DB_DOWN;
+#endif
+			break;
+		}
+
+		if (ZBX_DB_FAIL == err || ZBX_DB_CONNECT_EXIT == db->connect_options)
+		{
+			zabbix_log(LOG_LEVEL_CRIT, "Cannot connect to the database. Exiting...");
+			exit(EXIT_FAILURE);
+		}
+
+#if defined(HAVE_POSTGRESQL)
+		if (ZBX_DB_RONLY == err)
+		{
+			if (0 == db->config->read_only_recoverable && 0 >= retries--)
+			{
+				zabbix_log(LOG_LEVEL_ERR, "database is read-only: Exiting...");
+				exit(EXIT_FAILURE);
+			}
+
+			zabbix_log(LOG_LEVEL_ERR, "database is read-only: reconnecting in %d seconds",
+					ZBX_DB_WAIT_DOWN);
+		}
+		else
+#endif
+		{
+			zabbix_log(LOG_LEVEL_ERR, "database is down: reconnecting in %d seconds", ZBX_DB_WAIT_DOWN);
+		}
+
+		db->connection_failure = 1;
+		zbx_sleep(ZBX_DB_WAIT_DOWN);
+	}
+
+	if (0 != db->connection_failure)
+	{
+		/* wait ZBX_DB_WAIT_AFTER_RECONNECT to allow HA manager recover */
+		zbx_sleep(ZBX_DB_WAIT_AFTER_RECONNECT);
+		zabbix_log(LOG_LEVEL_ERR, "database connection re-established");
+		db->connection_failure = 0;
+#if defined(HAVE_POSTGRESQL)
+		db->last_db_errcode = 0;
+#endif
+	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __func__, err);
+
+#if defined(HAVE_POSTGRESQL)
+#	undef ZBX_DB_WAIT_RETRY_COUNT
+#endif
+
+	return err;
+}
+
 /*
  * Public API
  */
@@ -1358,11 +1521,7 @@ void	zbx_dbconn_free(zbx_dbconn_t *db)
  ******************************************************************************/
 int	zbx_dbconn_open(zbx_dbconn_t *db)
 {
-#define ZBX_DB_WAIT_RETRY_COUNT	6
 	int	err;
-#if defined(HAVE_POSTGRESQL)
-	int	retries = ZBX_DB_WAIT_RETRY_COUNT;
-#endif
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() options:%d", __func__, db->connect_options);
 
@@ -1370,64 +1529,13 @@ int	zbx_dbconn_open(zbx_dbconn_t *db)
 	{
 		THIS_SHOULD_NEVER_HAPPEN_MSG("Cannot open managed connections");
 		err = ZBX_DB_FAIL;
-
-		goto out;
 	}
+	else
+		err = dbconn_open_retry(db);
 
-	while (ZBX_DB_OK != (err = dbconn_open(db)))
-	{
-		if (ZBX_DB_CONNECT_ONCE == db->connect_options)
-		{
-#if defined(HAVE_POSTGRESQL)
-			if (ZBX_DB_RONLY == err)
-				err = ZBX_DB_DOWN;
-#endif
-			break;
-		}
-
-		if (ZBX_DB_FAIL == err || ZBX_DB_CONNECT_EXIT == db->connect_options)
-		{
-			zabbix_log(LOG_LEVEL_CRIT, "Cannot connect to the database. Exiting...");
-			zbx_exit(EXIT_FAILURE);
-		}
-
-#if defined(HAVE_POSTGRESQL)
-		if (ZBX_DB_RONLY == err)
-		{
-			if (0 == db->config->read_only_recoverable && 0 >= retries--)
-			{
-				zabbix_log(LOG_LEVEL_ERR, "database is read-only: Exiting...");
-				zbx_exit(EXIT_FAILURE);
-			}
-
-			zabbix_log(LOG_LEVEL_ERR, "database is read-only: reconnecting in %d seconds",
-					ZBX_DB_WAIT_DOWN);
-		}
-		else
-#endif
-		{
-			zabbix_log(LOG_LEVEL_ERR, "database is down: reconnecting in %d seconds", ZBX_DB_WAIT_DOWN);
-		}
-
-		db->connection_failure = 1;
-		zbx_sleep(ZBX_DB_WAIT_DOWN);
-	}
-
-	if (0 != db->connection_failure)
-	{
-		/* wait ZBX_DB_WAIT_AFTER_RECONNECT to allow HA manager recover */
-		zbx_sleep(ZBX_DB_WAIT_AFTER_RECONNECT);
-		zabbix_log(LOG_LEVEL_ERR, "database connection re-established");
-		db->connection_failure = 0;
-#if defined(HAVE_POSTGRESQL)
-		db->last_db_errcode = 0;
-#endif
-	}
-out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __func__, err);
 
 	return err;
-#undef ZBX_DB_WAIT_RETRY_COUNT
 }
 
 /******************************************************************************
@@ -1477,6 +1585,11 @@ int	zbx_dbconn_begin(zbx_dbconn_t *db)
 	}
 
 	return rc;
+}
+
+void	zbx_dbconn_begin_deferred(zbx_dbconn_t *db)
+{
+	db->mode = DBCONN_MODE_DEFERRED_BEGIN;
 }
 
 /******************************************************************************
@@ -2485,7 +2598,7 @@ static int	db_large_query_select(zbx_db_large_query_t *query)
 	if (NULL != query->suffix)
 		zbx_strcpy_alloc(query->sql, query->sql_alloc, query->sql_offset, query->suffix);
 
-	query->result = dbconn_select(query->db, "%s", *query->sql);
+	query->result = zbx_dbconn_select(query->db, "%s", *query->sql);
 
 	return SUCCEED;
 }
@@ -2667,4 +2780,25 @@ void	zbx_dbconn_large_query_append_sql(zbx_db_large_query_t *query, const char *
 	query->suffix = zbx_strdup(NULL, sql);
 }
 
+zbx_db_query_mask_t	zbx_db_set_log_masked_values(zbx_db_query_mask_t flag)
+{
+#ifdef ZBX_DEBUG
+	ZBX_UNUSED(flag);
+	return ZBX_DB_DONT_MASK_QUERIES;
+#else
+	zbx_db_query_mask_t	prev_flag = db_log_masked_values;
 
+	db_log_masked_values = flag;
+
+	return prev_flag;
+#endif
+}
+
+zbx_db_query_mask_t	zbx_db_get_log_masked_values(void)
+{
+#ifdef ZBX_DEBUG
+	return ZBX_DB_DONT_MASK_QUERIES;
+#else
+	return db_log_masked_values;
+#endif
+}

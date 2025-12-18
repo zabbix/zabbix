@@ -90,7 +90,7 @@ class CItem extends CItemGeneral {
 	public function get($options = []) {
 		$sqlParts = [
 			'select'	=> ['items' => 'i.itemid'],
-			'from'		=> ['items' => 'items i'],
+			'from'		=> 'items i',
 			'where'		=> ['webtype' => 'i.type<>'.ITEM_TYPE_HTTPTEST, 'flags' => 'i.flags IN ('.ZBX_FLAG_DISCOVERY_NORMAL.','.ZBX_FLAG_DISCOVERY_CREATED.')'],
 			'group'		=> [],
 			'order'		=> [],
@@ -115,8 +115,6 @@ class CItem extends CItemGeneral {
 			'group'						=> null,
 			'host'						=> null,
 			'with_triggers'				=> null,
-			'evaltype'					=> TAG_EVAL_TYPE_AND_OR,
-			'tags'						=> null,
 			// filter
 			'filter'					=> null,
 			'search'					=> null,
@@ -128,7 +126,6 @@ class CItem extends CItemGeneral {
 			'output'					=> API_OUTPUT_EXTEND,
 			'selectHosts'				=> null,
 			'selectInterfaces'			=> null,
-			'selectTags'				=> null,
 			'selectTriggers'			=> null,
 			'selectGraphs'				=> null,
 			'selectPreprocessing'		=> null,
@@ -151,10 +148,8 @@ class CItem extends CItemGeneral {
 				return $options['countOutput'] ? '0' : [];
 			}
 
-			$sqlParts['from'][] = 'host_hgset hh';
-			$sqlParts['from'][] = 'permission p';
-			$sqlParts['where'][] = 'i.hostid=hh.hostid';
-			$sqlParts['where'][] = 'hh.hgsetid=p.hgsetid';
+			$sqlParts['join']['hh'] = ['table' => 'host_hgset', 'using' => 'hostid'];
+			$sqlParts['join']['p'] = ['left_table' => 'hh', 'table' => 'permission', 'using' => 'hgsetid'];
 			$sqlParts['where'][] = 'p.ugsetid='.self::$userData['ugsetid'];
 
 			if ($options['editable']) {
@@ -208,9 +203,8 @@ class CItem extends CItemGeneral {
 		if (!is_null($options['groupids'])) {
 			zbx_value2array($options['groupids']);
 
-			$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
+			$sqlParts['join']['hg'] = ['table' => 'hosts_groups', 'using' => 'hostid'];
 			$sqlParts['where'][] = dbConditionInt('hg.groupid', $options['groupids']);
-			$sqlParts['where'][] = 'hg.hostid=i.hostid';
 
 			if ($options['groupCount']) {
 				$sqlParts['group']['hg'] = 'hg.groupid';
@@ -221,9 +215,8 @@ class CItem extends CItemGeneral {
 		if (!is_null($options['proxyids'])) {
 			zbx_value2array($options['proxyids']);
 
-			$sqlParts['from']['hosts'] = 'hosts h';
+			$sqlParts['join']['h'] = ['table' => 'hosts', 'using' => 'hostid'];
 			$sqlParts['where'][] = dbConditionId('h.proxyid', $options['proxyids']);
-			$sqlParts['where'][] = 'h.hostid=i.hostid';
 
 			if ($options['groupCount']) {
 				$sqlParts['group']['h'] = 'h.proxyid';
@@ -234,15 +227,14 @@ class CItem extends CItemGeneral {
 		if (!is_null($options['triggerids'])) {
 			zbx_value2array($options['triggerids']);
 
-			$sqlParts['from']['functions'] = 'functions f';
+			$sqlParts['join']['f'] = ['table' => 'functions', 'using' => 'itemid'];
 			$sqlParts['where'][] = dbConditionInt('f.triggerid', $options['triggerids']);
-			$sqlParts['where']['if'] = 'i.itemid=f.itemid';
 		}
 
 		// tags
-		if ($options['tags'] !== null && $options['tags']) {
-			$sqlParts['where'][] = CApiTagHelper::addWhereCondition($options['tags'], $options['evaltype'], 'i',
-				'item_tag', 'itemid'
+		if ($options['tags'] !== null) {
+			$sqlParts['where'][] = CApiTagHelper::getTagCondition($options['tags'], $options['evaltype'], ['i'],
+				'item_tag', 'itemid', $options['inheritedTags']
 			);
 		}
 
@@ -250,9 +242,8 @@ class CItem extends CItemGeneral {
 		if (!is_null($options['graphids'])) {
 			zbx_value2array($options['graphids']);
 
-			$sqlParts['from']['graphs_items'] = 'graphs_items gi';
+			$sqlParts['join']['gi'] = ['table' => 'graphs_items', 'using' => 'itemid'];
 			$sqlParts['where'][] = dbConditionInt('gi.graphid', $options['graphids']);
-			$sqlParts['where']['igi'] = 'i.itemid=gi.itemid';
 		}
 
 		// webitems
@@ -272,8 +263,7 @@ class CItem extends CItemGeneral {
 
 		// templated
 		if (!is_null($options['templated'])) {
-			$sqlParts['from']['hosts'] = 'hosts h';
-			$sqlParts['where']['hi'] = 'h.hostid=i.hostid';
+			$sqlParts['join']['h'] = ['table' => 'hosts', 'using' => 'hostid'];
 
 			if ($options['templated']) {
 				$sqlParts['where'][] = 'h.status='.HOST_STATUS_TEMPLATE;
@@ -285,8 +275,7 @@ class CItem extends CItemGeneral {
 
 		// monitored
 		if (!is_null($options['monitored'])) {
-			$sqlParts['from']['hosts'] = 'hosts h';
-			$sqlParts['where']['hi'] = 'h.hostid=i.hostid';
+			$sqlParts['join']['h'] = ['table' => 'hosts', 'using' => 'hostid'];
 
 			if ($options['monitored']) {
 				$sqlParts['where'][] = 'h.status='.HOST_STATUS_MONITORED;
@@ -350,8 +339,7 @@ class CItem extends CItemGeneral {
 			if (isset($options['filter']['host'])) {
 				zbx_value2array($options['filter']['host']);
 
-				$sqlParts['from']['hosts'] = 'hosts h';
-				$sqlParts['where']['hi'] = 'h.hostid=i.hostid';
+				$sqlParts['join']['h'] = ['table' => 'hosts', 'using' => 'hostid'];
 				$sqlParts['where']['h'] = dbConditionString('h.host', $options['filter']['host']);
 			}
 
@@ -363,17 +351,14 @@ class CItem extends CItemGeneral {
 
 		// group
 		if (!is_null($options['group'])) {
-			$sqlParts['from']['hstgrp'] = 'hstgrp g';
-			$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
-			$sqlParts['where']['ghg'] = 'g.groupid=hg.groupid';
-			$sqlParts['where']['hgi'] = 'hg.hostid=i.hostid';
+			$sqlParts['join']['hg'] = ['table' => 'hosts_groups', 'using' => 'hostid'];
+			$sqlParts['join']['g'] = ['left_table' => 'hg', 'table' => 'hstgrp', 'using' => 'groupid'];
 			$sqlParts['where'][] = ' g.name='.zbx_dbstr($options['group']);
 		}
 
 		// host
 		if (!is_null($options['host'])) {
-			$sqlParts['from']['hosts'] = 'hosts h';
-			$sqlParts['where']['hi'] = 'h.hostid=i.hostid';
+			$sqlParts['join']['h'] = ['table' => 'hosts', 'using' => 'hostid'];
 			$sqlParts['where'][] = ' h.host='.zbx_dbstr($options['host']);
 		}
 
@@ -452,13 +437,23 @@ class CItem extends CItemGeneral {
 		return $items;
 	}
 
-	private static function validateGet(array &$options) {
+	private static function validateGet(array &$options): void {
 		$api_input_rules = ['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
-			'selectValueMap' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => 'valuemapid,name,mappings'],
-			'evaltype' => 				['type' => API_INT32, 'in' => implode(',', [TAG_EVAL_TYPE_AND_OR, TAG_EVAL_TYPE_OR])],
+			// Filters.
+			'evaltype' =>				['type' => API_INT32, 'in' => implode(',', [TAG_EVAL_TYPE_AND_OR, TAG_EVAL_TYPE_OR]), 'default' => TAG_EVAL_TYPE_AND_OR],
+			'tags' =>					['type' => API_OBJECTS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null, 'fields' => [
+				'tag' =>					['type' => API_STRING_UTF8, 'flags' => API_REQUIRED],
+				'operator' =>				['type' => API_INT32, 'in' => implode(',', [TAG_OPERATOR_LIKE, TAG_OPERATOR_EQUAL, TAG_OPERATOR_NOT_LIKE, TAG_OPERATOR_NOT_EQUAL, TAG_OPERATOR_EXISTS, TAG_OPERATOR_NOT_EXISTS]), 'default' => TAG_OPERATOR_LIKE],
+				'value' =>					['type' => API_STRING_UTF8, 'default' => '']
+			]],
+			'inheritedTags' =>			['type' => API_BOOLEAN, 'default' => false],
+			// Output.
+			'selectValueMap' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['valuemapid', 'name', 'mappings'])],
+			'selectTags' =>				['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', ['tag', 'value']), 'default' => null],
+			'selectInheritedTags' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', self::INHERITED_TAG_OUTPUT_FIELDS), 'default' => null],
+			'selectDiscoveryData' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', self::DISCOVERY_DATA_OUTPUT_FIELDS), 'default' => null],
 			'selectDiscoveryRule' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', CDiscoveryRule::OUTPUT_FIELDS), 'default' => null],
-			'selectItemDiscovery' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_NORMALIZE | API_DEPRECATED, 'in' => implode(',', self::DISCOVERY_DATA_OUTPUT_FIELDS), 'default' => null],
-			'selectDiscoveryData' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', self::DISCOVERY_DATA_OUTPUT_FIELDS), 'default' => null]
+			'selectItemDiscovery' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_NORMALIZE | API_DEPRECATED, 'in' => implode(',', self::DISCOVERY_DATA_OUTPUT_FIELDS), 'default' => null]
 		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $options, '/', $error)) {
@@ -583,6 +578,8 @@ class CItem extends CItemGeneral {
 
 		$ins_items_rtdata = [];
 		$ins_items_rtname = [];
+		$ins_item_template_cache = [];
+		$ins_template_caches = [];
 		$host_statuses = [];
 
 		foreach ($items as &$item) {
@@ -595,6 +592,26 @@ class CItem extends CItemGeneral {
 					'name_resolved' => $item['name']
 				];
 			}
+
+			if (!array_key_exists('ins_template_cache', $item)) {
+				$item['ins_template_cache'] = [$item['hostid']];
+			}
+			else {
+				$item['ins_template_cache'][] = $item['hostid'];
+			}
+
+			foreach ($item['ins_template_cache'] as $link_hostid) {
+				$ins_item_template_cache[] = [
+					'itemid' => $item['itemid'],
+					'link_hostid' => $link_hostid
+				];
+			}
+
+			if ($item['host_status'] == HOST_STATUS_TEMPLATE) {
+				$ins_template_caches[$item['itemid']] = $item['ins_template_cache'];
+			}
+
+			unset($item['ins_template_cache']);
 
 			$host_statuses[] = $item['host_status'];
 			unset($item['host_status']);
@@ -609,6 +626,8 @@ class CItem extends CItemGeneral {
 			DB::insertBatch('item_rtname', $ins_items_rtname, false);
 		}
 
+		DB::insertBatch('item_template_cache', $ins_item_template_cache, false);
+
 		self::updateParameters($items);
 		self::updatePreprocessing($items);
 		self::updateTags($items);
@@ -617,6 +636,10 @@ class CItem extends CItemGeneral {
 
 		foreach ($items as &$item) {
 			$item['host_status'] = array_shift($host_statuses);
+
+			if (array_key_exists($item['itemid'], $ins_template_caches)) {
+				$item['ins_template_cache'] = $ins_template_caches[$item['itemid']];
+			}
 		}
 		unset($item);
 	}
@@ -839,8 +862,14 @@ class CItem extends CItemGeneral {
 		$upd_itemids = [];
 		$upd_items_rtname = [];
 		$upd_item_discoveries = [];
+		$ins_item_template_cache = [];
+		$del_item_template_cache = [];
+		$ins_template_caches = [];
+		$del_template_caches = [];
 
-		$internal_fields = array_flip(['itemid', 'type', 'key_', 'value_type', 'hostid', 'flags', 'host_status']);
+		$internal_fields = array_flip(['itemid', 'type', 'key_', 'value_type', 'hostid', 'flags', 'host_status',
+			'ins_template_cache', 'del_template_cache'
+		]);
 		$nested_object_fields = array_flip(['tags', 'preprocessing', 'parameters']);
 
 		self::prepareItemsForDb($items);
@@ -882,6 +911,43 @@ class CItem extends CItemGeneral {
 			else {
 				$item = array_intersect_key($item, $internal_fields + $nested_object_fields);
 			}
+
+			if (array_key_exists('ins_template_cache', $item)) {
+				$upd_itemids[$i] = $item['itemid'];
+
+				foreach ($item['ins_template_cache'] as $templateid) {
+					$ins_item_template_cache[] = [
+						'itemid' => $item['itemid'],
+						'link_hostid' => $templateid
+					];
+				}
+
+				$ins_template_caches[$i] = $item['ins_template_cache'];
+				unset($item['ins_template_cache']);
+			}
+			elseif (array_key_exists('del_template_cache', $item)) {
+				$upd_itemids[$i] = $item['itemid'];
+
+				usort($item['del_template_cache'], 'bccomp');
+				$key = implode('|', $item['del_template_cache']);
+
+				if (array_key_exists($key, $del_item_template_cache)) {
+					$del_item_template_cache[$key]['itemid'][] = $item['itemid'];
+				}
+				else {
+					$del_item_template_cache[$key] = [
+						'itemid' => [$item['itemid']],
+						'link_hostid' => []
+					];
+
+					foreach ($item['del_template_cache'] as $templateid) {
+						$del_item_template_cache[$key]['link_hostid'][] = $templateid;
+					}
+				}
+
+				$del_template_caches[$i] = $item['del_template_cache'];
+				unset($item['del_template_cache']);
+			}
 		}
 		unset($item);
 
@@ -900,6 +966,14 @@ class CItem extends CItemGeneral {
 			]);
 		}
 
+		if ($ins_item_template_cache) {
+			DB::insertBatch('item_template_cache', $ins_item_template_cache, false);
+		}
+
+		foreach ($del_item_template_cache as $_del_item_template_cache) {
+			DB::delete('item_template_cache', $_del_item_template_cache);
+		}
+
 		self::updateTags($items, $db_items, $upd_itemids);
 		self::updatePreprocessing($items, $db_items, $upd_itemids);
 		self::updateParameters($items, $db_items, $upd_itemids);
@@ -912,6 +986,14 @@ class CItem extends CItemGeneral {
 		self::prepareItemsForApi($db_items);
 
 		self::addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_ITEM, $items, $db_items);
+
+		foreach ($ins_template_caches as $i => $template_cache) {
+			$items[$i]['ins_template_cache'] = $template_cache;
+		}
+
+		foreach ($del_template_caches as $i => $template_cache) {
+			$items[$i]['del_template_cache'] = $template_cache;
+		}
 	}
 
 	private static function updateMapLinks(array $items, array $db_items): void {
@@ -1038,6 +1120,8 @@ class CItem extends CItemGeneral {
 			$item['tags'] = array_values($item['tags']);
 		}
 		unset($item);
+
+		self::addInsTemplateCaches($items);
 
 		self::inherit($items, [], $hostids);
 	}
@@ -1414,23 +1498,15 @@ class CItem extends CItemGeneral {
 			$item = [
 				'itemid' => $row['itemid'],
 				'templateid' => 0
-			];
+			] + array_intersect_key($row, $internal_fields);
 
 			if ($row['host_status'] == HOST_STATUS_TEMPLATE) {
-				$item += ['uuid' => generateUuidV4()];
+				$item['uuid'] = generateUuidV4();
+				$tpl_itemids[$i] = $row['itemid'];
 			}
 
 			if ($row['valuemapid'] != 0) {
-				$item += ['valuemapid' => 0];
-
-				if ($row['host_status'] == HOST_STATUS_TEMPLATE) {
-					$tpl_itemids[$i] = $row['itemid'];
-					$item += array_intersect_key($row, $internal_fields);
-				}
-			}
-
-			if ($row['host_status'] != HOST_STATUS_TEMPLATE || $row['valuemapid'] == 0) {
-				unset($row['type']);
+				$item['valuemapid'] = 0;
 			}
 
 			$items[$i++] = $item;
@@ -1438,6 +1514,8 @@ class CItem extends CItemGeneral {
 		}
 
 		if ($items) {
+			self::addDelTemplateCaches($items, $db_items);
+
 			self::updateForce($items, $db_items);
 
 			if ($tpl_itemids) {
@@ -1726,6 +1804,8 @@ class CItem extends CItemGeneral {
 			}
 		}
 
+		self::addRelatedTags($options, $result);
+		self::addRelatedInheritedTags($options, $result);
 		self::addRelatedDiscoveryRules($options, $result);
 		self::addRelatedItemDiscovery($options, $result);
 		self::addRelatedDiscoveryData($options, $result);
@@ -1771,30 +1851,6 @@ class CItem extends CItemGeneral {
 			unset($item);
 		}
 
-		// Adding item tags.
-		if ($options['selectTags'] !== null) {
-			$options['selectTags'] = ($options['selectTags'] !== API_OUTPUT_EXTEND)
-				? (array) $options['selectTags']
-				: ['tag', 'value'];
-
-			$options['selectTags'] = array_intersect(['tag', 'value'], $options['selectTags']);
-			$requested_output = array_flip($options['selectTags']);
-
-			$db_tags = DBselect(
-				'SELECT '.implode(',', array_merge($options['selectTags'], ['itemid'])).
-				' FROM item_tag'.
-				' WHERE '.dbConditionInt('itemid', $itemids)
-			);
-
-			array_walk($result, function (&$item) {
-				$item['tags'] = [];
-			});
-
-			while ($db_tag = DBfetch($db_tags)) {
-				$result[$db_tag['itemid']]['tags'][] = array_intersect_key($db_tag, $requested_output);
-			}
-		}
-
 		return $result;
 	}
 
@@ -1827,15 +1883,13 @@ class CItem extends CItemGeneral {
 				|| $this->outputIsRequested('error', $options['output'])))
 				|| (is_array($options['search']) && array_key_exists('error', $options['search']))
 				|| (is_array($options['filter']) && array_key_exists('state', $options['filter']))) {
-			$sqlParts['left_join'][] = ['alias' => 'ir', 'table' => 'item_rtdata', 'using' => 'itemid'];
-			$sqlParts['left_table'] = ['alias' => $this->tableAlias, 'table' => $this->tableName];
+			$sqlParts['join']['ir'] = ['type' => 'left', 'table' => 'item_rtdata', 'using' => 'itemid'];
 		}
 
 		if ((!$options['countOutput'] && $this->outputIsRequested('name_resolved', $options['output']))
 				|| (is_array($options['search']) && array_key_exists('name_resolved', $options['search']))
 				|| (is_array($options['filter']) && array_key_exists('name_resolved', $options['filter']))) {
-			$sqlParts['left_join'][] = ['alias' => 'irn', 'table' => 'item_rtname', 'using' => 'itemid'];
-			$sqlParts['left_table'] = ['alias' => $this->tableAlias, 'table' => $this->tableName];
+			$sqlParts['join']['irn'] = ['type' => 'left', 'table' => 'item_rtname', 'using' => 'itemid'];
 		}
 
 		if (!$options['countOutput']) {

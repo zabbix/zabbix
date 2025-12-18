@@ -132,7 +132,11 @@ static void	process_configuration_sync(size_t *data_size, zbx_synced_new_config_
 
 	if (SUCCEED == (ret = zbx_proxyconfig_process(sock.peer, &jp, &status, &error)))
 	{
-		zbx_dc_sync_configuration(ZBX_DBSYNC_UPDATE, *synced, NULL, args->config_vault,
+		zbx_vector_uint64_t	deleted_itemids;
+
+		zbx_vector_uint64_create(&deleted_itemids);
+
+		zbx_dc_sync_configuration(ZBX_DBSYNC_UPDATE, *synced, &deleted_itemids, args->config_vault,
 				args->config_proxyconfig_frequency);
 		*synced = ZBX_SYNCED_NEW_CONFIG_YES;
 
@@ -144,6 +148,8 @@ static void	process_configuration_sync(size_t *data_size, zbx_synced_new_config_
 		}
 
 		zbx_dc_update_interfaces_availability();
+		zbx_hc_remove_items_by_ids(&deleted_itemids);
+		zbx_vector_uint64_destroy(&deleted_itemids);
 	}
 	else
 	{
@@ -312,8 +318,6 @@ void	*zbx_proxyconfig_thread(void *args)
 			proxyconfig_args_in->config_proxyconfig_frequency);
 
 	proxyconfig_update_vault_macros(proxyconfig_args_in);
-	zbx_rtc_notify_finished_sync(proxyconfig_args_in->config_timeout, ZBX_RTC_CONFIG_SYNC_NOTIFY,
-			get_process_type_string(process_type), &rtc);
 
 	sleeptime = (ZBX_PROGRAM_TYPE_PROXY_PASSIVE == info->program_type ? ZBX_IPC_WAIT_FOREVER : 0);
 
@@ -336,23 +340,26 @@ void	*zbx_proxyconfig_thread(void *args)
 		}
 
 		sec = zbx_time();
-		zbx_update_env(get_process_type_string(process_type), sec);
+		zbx_update_env(process_title, sec);
 
 		if (ZBX_PROGRAM_TYPE_PROXY_PASSIVE == info->program_type)
 		{
 			if (0 != config_cache_reload)
 			{
+				zbx_vector_uint64_t	deleted_itemids;
+
 				zbx_setproctitle("%s [loading configuration]", process_title);
 
-				zbx_dc_sync_configuration(ZBX_DBSYNC_UPDATE, synced, NULL,
+				zbx_vector_uint64_create(&deleted_itemids);
+
+				zbx_dc_sync_configuration(ZBX_DBSYNC_UPDATE, synced, &deleted_itemids,
 						proxyconfig_args_in->config_vault,
 						proxyconfig_args_in->config_proxyconfig_frequency);
 				synced = ZBX_SYNCED_NEW_CONFIG_YES;
 				zbx_dc_update_interfaces_availability();
 
 				proxyconfig_update_vault_macros(proxyconfig_args_in);
-				zbx_rtc_notify_finished_sync(proxyconfig_args_in->config_timeout,
-					ZBX_RTC_CONFIG_SYNC_NOTIFY, get_process_type_string(process_type), &rtc);
+				zbx_hc_remove_items_by_ids(&deleted_itemids);
 
 				if (SEC_PER_HOUR < sec - last_template_cleanup_sec)
 				{
@@ -360,6 +367,7 @@ void	*zbx_proxyconfig_thread(void *args)
 					last_template_cleanup_sec = sec;
 				}
 
+				zbx_vector_uint64_destroy(&deleted_itemids);
 				zbx_setproctitle("%s [synced config in " ZBX_FS_DBL " sec]",
 						process_title, zbx_time() - sec);
 			}
@@ -371,7 +379,7 @@ void	*zbx_proxyconfig_thread(void *args)
 		if (1 == config_cache_reload)
 			zabbix_log(LOG_LEVEL_WARNING, "forced reloading of the configuration cache");
 
-		zbx_setproctitle("%s [loading configuration]", get_process_type_string(process_type));
+		zbx_setproctitle("%s [loading configuration]", process_title);
 
 		process_configuration_sync(&data_size, &synced, info, proxyconfig_args_in);
 		proxyconfig_update_vault_macros(proxyconfig_args_in);

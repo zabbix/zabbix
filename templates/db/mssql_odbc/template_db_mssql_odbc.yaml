@@ -44,44 +44,57 @@ zabbix_export:
       readme: |
         ## Setup
         
-        1. Create an MSSQL user for monitoring. For example, "zbx_monitor".
+        1. Create a monitoring user on MSSQL for Zabbix to connect to:
+            - for MSSQL Server 2022
+            ```sql
+            CREATE LOGIN zabbix WITH PASSWORD = 'password'
+            GRANT VIEW SERVER PERFORMANCE STATE TO zabbix
+            GRANT VIEW ANY DEFINITION TO zabbix
+            USE msdb
+            CREATE USER zabbix FOR LOGIN zabbix
+            GRANT EXECUTE ON msdb.dbo.agent_datetime TO zabbix
+            GRANT SELECT ON msdb.dbo.sysjobactivity TO zabbix
+            GRANT SELECT ON msdb.dbo.sysjobservers TO zabbix
+            GRANT SELECT ON msdb.dbo.sysjobs TO zabbix
+            GO
+            ```
+            - for MSSQL versions 2017 and 2019
+            ```sql
+            CREATE LOGIN zabbix WITH PASSWORD = 'password'
+            GRANT VIEW SERVER STATE TO zabbix
+            GRANT VIEW ANY DEFINITION TO zabbix
+            USE msdb
+            CREATE USER zabbix FOR LOGIN zabbix
+            GRANT EXECUTE ON msdb.dbo.agent_datetime TO zabbix
+            GRANT SELECT ON msdb.dbo.sysjobactivity TO zabbix
+            GRANT SELECT ON msdb.dbo.sysjobservers TO zabbix
+            GRANT SELECT ON msdb.dbo.sysjobs TO zabbix
+            GO
+            ```
         
-        **View Server State** and **View Any Definition** permissions should be granted to the user.
-        Grant this user read permissions to the `sysjobschedules`, `sysjobhistory`, and `sysjobs` tables.
+            To allow Zabbix to query SQL Server Agent job information, a dedicated login must be created and granted the required permissions through T-SQL:
+                - **VIEW SERVER STATE** is required for Microsoft SQL Server 2017 and 2019
+                - **VIEW SERVER PERFORMANCE STATE** is required for Microsoft SQL Server 2022
+                - **VIEW ANY DEFINITION** allows access to object definitions and metadata
+                - **SELECT** allows the user to read data from the sysjobschedules, sysjobhistory, and sysjobs tables in the msdb database  
+            
+            
+            For more information, see MSSQL documentation:
+                - [Create a database user](https://docs.microsoft.com/en-us/sql/relational-databases/security/authentication-access/create-a-database-user?view=sql-server-ver16)
+                - [GRANT Server Permissions](https://docs.microsoft.com/en-us/sql/t-sql/statements/grant-server-permissions-transact-sql?view=sql-server-ver16)
+                - [Configure a User to Create and Manage SQL Server Agent Jobs](https://docs.microsoft.com/en-us/sql/ssms/agent/configure-a-user-to-create-and-manage-sql-server-agent-jobs?view=sql-server-ver16)
         
-        For example, using T-SQL commands:
+        2. Set the username and password in the `MSSQL user` and `MSSQL password` host wizard configuration fields.  
+        3. Set the connection string for the MSSQL instance in the `MSSQL URI` host wizard configuration field as a URI, such as `<protocol://host:port>`, or specify the named session - `<sessionname>`.
         
-        ```sql
-        GRANT SELECT ON OBJECT::msdb.dbo.sysjobs TO zbx_monitor;
-        GRANT SELECT ON OBJECT::msdb.dbo.sysjobservers TO zbx_monitor;
-        GRANT SELECT ON OBJECT::msdb.dbo.sysjobactivity TO zbx_monitor;
-        GRANT EXECUTE ON OBJECT::msdb.dbo.agent_datetime TO zbx_monitor;
-        ```
-        
-        For more information, see MSSQL documentation:
-        
-        [Create a database user](https://docs.microsoft.com/en-us/sql/relational-databases/security/authentication-access/create-a-database-user?view=sql-server-ver16)
-        
-        [GRANT Server Permissions](https://docs.microsoft.com/en-us/sql/t-sql/statements/grant-server-permissions-transact-sql?view=sql-server-ver16)
-        
-        [Configure a User to Create and Manage SQL Server Agent Jobs](https://docs.microsoft.com/en-us/sql/ssms/agent/configure-a-user-to-create-and-manage-sql-server-agent-jobs?view=sql-server-ver16)
-        
-        2. Set the username and password in the `MSSQL user` and `MSSQL password` host wizard configuration fields.
-        
-        3. Do not forget to install Microsoft ODBC driver on Zabbix server or Zabbix proxy and specify data source name in the `MSSQL DSN` host wizard configuration field.
-        
-        See Microsoft documentation for instructions: https://docs.microsoft.com/en-us/sql/connect/odbc/linux-mac/installing-the-microsoft-odbc-driver-for-sql-server?view=sql-server-ver16.
-        
-        **Note! Credentials in the `odbc.ini` do not work for MSSQL.**
-        
-        The `Service's TCP port state` item uses the `MSSQL address` and `MSSQL TCP port` host wizard configuration fields to check the availability of the MSSQL instance, change these if necessary. Keep in mind that if dynamic ports are used on the MSSQL server side, this check will not work correctly.
-        
-        If your instance uses a non-default TCP port, set the port in your section of `odbc.ini` in the line Server = IP or FQDN name, port.
-        
-        Note: You can use the `Monitoring of full backup`, `Monitoring of log backup`, and `Monitoring of differential backup` host wizard configuration fields to disable backup age triggers. If set to unselected state, the trigger expression for the backup age will not fire.
+            The `Service's TCP port state` item uses the `MSSQL address` and `MSSQL TCP port` host wizard configuration fields to check the availability of the MSSQL instance, change these if necessary. Keep in mind that if dynamic ports are used on the MSSQL server side, this check will not work correctly.
+            
+            Additional notes:
+            - You can use the `Monitoring of full backup`, `Monitoring of log backup`, and `Monitoring of differential backup` host wizard configuration fields to disable backup age triggers. If set to unselected state, the trigger expression for the backup age will not fire.
+            - Since version 7.2.0, you can also connect to the MSSQL instance using its name. To do this, set the connection string in the `MSSQL URI` host wizard configuration field as `<protocol://host/instance_name>`.
       vendor:
         name: Zabbix
-        version: 8.0-0
+        version: 8.0-2
       groups:
         - name: Templates/Databases
       items:
@@ -2953,9 +2966,9 @@ zabbix_export:
                   value: '{#JOBNAME}'
               trigger_prototypes:
                 - uuid: 7e45cb8f41114388ac8772006d929da2
-                  expression: 'last(/MSSQL by ODBC/mssql.job.run_duration["{#JOBNAME}"])>{$MSSQL.BACKUP_DURATION.WARN:"{#JOBNAME}"}'
+                  expression: 'last(/MSSQL by ODBC/mssql.job.run_duration["{#JOBNAME}"])>{$MSSQL.JOB_DURATION.WARN:"{#JOBNAME}"}'
                   name: 'MSSQL: Job ''{#JOBNAME}'': Job duration is high'
-                  event_name: 'MSSQL: Job ''{#JOBNAME}'': Job duration is greater than {$MSSQL.BACKUP_DURATION.WARN:"{#JOBNAME}"}'
+                  event_name: 'MSSQL: Job ''{#JOBNAME}'': Job duration is greater than {$MSSQL.JOB_DURATION.WARN:"{#JOBNAME}"}'
                   opdata: 'Job duration: {ITEM.LASTVALUE1}'
                   priority: WARNING
                   description: 'The job is taking too long.'
@@ -3933,15 +3946,6 @@ zabbix_export:
             section_name: Thresholds
             label: 'Warning differential backup threshold'
             description: 'Warning threshold of the maximum days without a differential backup.'
-        - macro: '{$MSSQL.BACKUP_DURATION.WARN}'
-          value: 1h
-          description: 'The maximum job duration - for the Warning trigger expression.'
-          config:
-            type: TEXT
-            priority: '32'
-            section_name: Thresholds
-            label: 'Job duration threshold'
-            description: 'Threshold of the maximum job duration.'
         - macro: '{$MSSQL.BACKUP_FULL.CRIT}'
           value: 10d
           description: 'The maximum of days without a full backup - for the High trigger expression.'
@@ -4094,6 +4098,15 @@ zabbix_export:
             section_name: Filters
             label: 'Exclude job filter'
             description: 'Regex string to exclude discovered job by its name.'
+        - macro: '{$MSSQL.JOB_DURATION.WARN}'
+          value: 1h
+          description: 'The maximum job duration - for the Warning trigger expression.'
+          config:
+            type: TEXT
+            priority: '32'
+            section_name: Thresholds
+            label: 'Job duration threshold'
+            description: 'Threshold of the maximum job duration.'
         - macro: '{$MSSQL.LAZY_WRITES.MAX}'
           value: '20'
           description: 'The maximum lazy writes per second - for the trigger expression.'
@@ -4175,11 +4188,12 @@ zabbix_export:
             description: 'Threshold of the maximum number of page writes per second. No less than 0.'
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
         - macro: '{$MSSQL.PASSWORD}'
-          description: 'MSSQL user password.'
+          description: 'MSSQL database password.'
           config:
             type: TEXT
             priority: '3'
             label: 'MSSQL password'
+            description: 'MSSQL database password.'
             required: 'YES'
         - macro: '{$MSSQL.PERCENT_COMPILATIONS.MAX}'
           value: '10'
@@ -4249,11 +4263,12 @@ zabbix_export:
             label: 'Exclude quorum member filter'
             description: 'Regex string to exclude discovered quorum member by name.'
         - macro: '{$MSSQL.USER}'
-          description: 'MSSQL username.'
+          description: 'MSSQL database username.'
           config:
             type: TEXT
             priority: '2'
             label: 'MSSQL user'
+            description: 'MSSQL database username.'
             required: 'YES'
         - macro: '{$MSSQL.WORKTABLES_FROM_CACHE_RATIO.MIN.CRIT}'
           value: '90'

@@ -227,7 +227,7 @@ class testDashboardPieChartWidget extends testWidgets {
 			'Data set label' => ''
 		];
 		$form->checkValue($expected_values);
-		$expected_labels = ['Data set #1', 'Aggregation function', 'Data set aggregation', 'Data set label'];
+		$expected_labels = ['Data set #1', 'Aggregation function', 'Data set aggregation', 'Data set label', 'Item tags'];
 		$data_set_tab = $form->query('id:data_set')->one();
 		$this->assertAllVisibleLabels($data_set_tab, $expected_labels);
 		$this->validateDataSetHintboxes($form);
@@ -336,9 +336,10 @@ class testDashboardPieChartWidget extends testWidgets {
 			'Size' => false,
 			'Decimal places' => false,
 			'Units' => false,
-			'Bold' => false
+			'Bold' => false,
+			'Colour' => false
 		];
-		$expected_labels = array_merge($expected_labels, array_keys($inputs_enabled), ['Colour']);
+		$expected_labels = array_merge($expected_labels, array_keys($inputs_enabled));
 		$this->assertAllVisibleLabels($displaying_options_tab, $expected_labels);
 		$this->assertRangeSliderParameters($form, 'Width', ['min' => '20', 'max' => '50', 'step' => '10']);
 		$this->assertRangeSliderParameters($form, 'Stroke width', ['min' => '0', 'max' => '10', 'step' => '1']);
@@ -1346,11 +1347,8 @@ class testDashboardPieChartWidget extends testWidgets {
 
 		// Verify that it is not possible to submit color-picker dialog with invalid color or proceed with form submission.
 		if (CTestArrayHelper::get($data, 'invalid_color')) {
-			$color_picker_dialog = $this->query('class:color-picker-dialog')->one()->asColorPicker();
-			$this->assertTrue($color_picker_dialog->isSubmittionDisabled());
-
-			$color_picker_dialog->close();
-			COverlayDialogElement::find()->one()->close();
+			$this->assertTrue(CColorPickerElement::isSubmitable(false));
+			CColorPickerElement::close();
 		}
 		else {
 			$form->submit();

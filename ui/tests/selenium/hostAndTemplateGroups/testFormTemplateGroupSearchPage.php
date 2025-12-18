@@ -52,7 +52,7 @@ class testFormTemplateGroupSearchPage extends testFormGroups {
 						'Group name' => 'Templates',
 						'Apply permissions to all subgroups' => true
 					],
-					'error' => 'Template group "Templates" already exists.'
+					'error' => ['Group name' => 'This object already exists.']
 				]
 			],
 			[

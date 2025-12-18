@@ -125,13 +125,6 @@ static ZBX_DC_CACHE	*cache = NULL;
 #define ZBX_STRUCT_REALLOC_STEP	8
 #define ZBX_STRING_REALLOC_STEP	ZBX_KIBIBYTE
 
-typedef enum
-{
-	ZBX_DC_SYNC_TREND_MODE_PARALLEL,
-	ZBX_DC_SYNC_TREND_MODE_FULL
-}
-zbx_dc_sync_trend_mode_t;
-
 typedef struct
 {
 	size_t	pvalue;
@@ -701,7 +694,8 @@ static void	dc_trends_fetch_and_update(ZBX_DC_TREND *trends, int trends_num, zbx
  * Purpose: flush trend to the database                                       *
  *                                                                            *
  ******************************************************************************/
-void	zbx_db_flush_trends(ZBX_DC_TREND *trends, int *trends_num, zbx_vector_uint64_pair_t *trends_diff)
+void	zbx_db_flush_trends(ZBX_DC_TREND *trends, int *trends_num, zbx_vector_uint64_pair_t *trends_diff,
+		zbx_dc_sync_trend_mode_t sync_trend_mode)
 {
 	int		num, clock, selects_num = 0, inserts_num = 0, upserts_num = 0, itemids_alloc, itemids_num = 0;
 	int		trends_to = *trends_num, i;
@@ -747,7 +741,7 @@ void	zbx_db_flush_trends(ZBX_DC_TREND *trends, int *trends_num, zbx_vector_uint6
 		}
 		else
 		{
-			if (NULL != trends_diff)
+			if (ZBX_DC_SYNC_TREND_MODE_NORMAL == sync_trend_mode)
 				uint64_array_add(&itemids, &itemids_alloc, &itemids_num, trend->itemid, 64);
 		}
 
@@ -786,27 +780,23 @@ void	zbx_db_flush_trends(ZBX_DC_TREND *trends, int *trends_num, zbx_vector_uint6
 
 	zbx_free(itemids);
 
-	/* if 'trends' is not a primary trends buffer */
-	if (NULL != trends_diff)
+	/* we update it too */
+	for (i = 0; i < trends_to; i++)
 	{
-		/* we update it too */
-		for (i = 0; i < trends_to; i++)
-		{
-			zbx_uint64_pair_t	pair;
+		zbx_uint64_pair_t	pair;
 
-			if (0 == trends[i].itemid)
-				continue;
+		if (0 == trends[i].itemid)
+			continue;
 
-			if (clock != trends[i].clock || value_type != trends[i].value_type)
-				continue;
+		if (clock != trends[i].clock || value_type != trends[i].value_type)
+			continue;
 
-			if (0 == trends[i].disable_from || trends[i].disable_from > clock)
-				continue;
+		if (0 == trends[i].disable_from || trends[i].disable_from > clock)
+			continue;
 
-			pair.first = trends[i].itemid;
-			pair.second = clock + SEC_PER_HOUR;
-			zbx_vector_uint64_pair_append(trends_diff, pair);
-		}
+		pair.first = trends[i].itemid;
+		pair.second = clock + SEC_PER_HOUR;
+		zbx_vector_uint64_pair_append(trends_diff, pair);
 	}
 
 	if (0 != inserts_num)
@@ -1036,6 +1026,11 @@ static void	zbx_host_info_clean(zbx_host_info_t *host_info)
 	zbx_vector_ptr_destroy(&host_info->groups);
 }
 
+static void	zbx_host_info_clean_wrapper(void *data)
+{
+	zbx_host_info_clean((zbx_host_info_t*)data);
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: get hosts groups names                                            *
@@ -1221,6 +1216,11 @@ static void	zbx_item_info_clean(zbx_item_info_t *item_info)
 	zbx_vector_tags_ptr_clear_ext(&item_info->item_tags, zbx_free_tag);
 	zbx_vector_tags_ptr_destroy(&item_info->item_tags);
 	zbx_free(item_info->name);
+}
+
+static void	zbx_item_info_clean_wrapper(void *data)
+{
+	zbx_item_info_clean((zbx_item_info_t*)data);
 }
 
 /******************************************************************************
@@ -1518,7 +1518,7 @@ void	zbx_dc_export_history_and_trends(const zbx_dc_history_t *history, int histo
 	zbx_vector_uint64_create(&hostids);
 	zbx_vector_uint64_create(&item_info_ids);
 	zbx_hashset_create_ext(&items_info, itemids->values_num, ZBX_DEFAULT_UINT64_HASH_FUNC,
-			ZBX_DEFAULT_UINT64_COMPARE_FUNC, (zbx_clean_func_t)zbx_item_info_clean,
+			ZBX_DEFAULT_UINT64_COMPARE_FUNC, zbx_item_info_clean_wrapper,
 			ZBX_DEFAULT_MEM_MALLOC_FUNC, ZBX_DEFAULT_MEM_REALLOC_FUNC, ZBX_DEFAULT_MEM_FREE_FUNC);
 
 	for (i = 0; i < history_num; i++)
@@ -1615,7 +1615,7 @@ void	zbx_dc_export_history_and_trends(const zbx_dc_history_t *history, int histo
 	zbx_vector_uint64_uniq(&hostids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 	zbx_hashset_create_ext(&hosts_info, hostids.values_num, ZBX_DEFAULT_UINT64_HASH_FUNC,
-			ZBX_DEFAULT_UINT64_COMPARE_FUNC, (zbx_clean_func_t)zbx_host_info_clean,
+			ZBX_DEFAULT_UINT64_COMPARE_FUNC, zbx_host_info_clean_wrapper,
 			ZBX_DEFAULT_MEM_MALLOC_FUNC, ZBX_DEFAULT_MEM_REALLOC_FUNC, ZBX_DEFAULT_MEM_FREE_FUNC);
 
 	db_get_hosts_info_by_hostid(&hosts_info, &hostids);
@@ -1732,20 +1732,29 @@ static void	DCsync_trends(int parallel_num, zbx_dc_sync_trend_mode_t sync_trend_
 
 	zbx_db_begin();
 
+	zbx_vector_uint64_pair_t	trends_diff;
+
+	zbx_vector_uint64_pair_create(&trends_diff);
+
 	while (trends_num > 0)
 	{
 		int	trends_num_last = trends_num;
 
 		zbx_log_sync_trends_cache_progress();
 
-		zbx_db_flush_trends(trends, &trends_num, NULL);
+		zbx_db_flush_trends(trends, &trends_num, &trends_diff, sync_trend_mode);
 
 		LOCK_TRENDS;
 		cache->trends_num -= trends_num_last - trends_num;
 		UNLOCK_TRENDS;
+
+		zbx_dc_update_trends(&trends_diff);
+		zbx_vector_uint64_pair_clear(&trends_diff);
 	}
 
 	zbx_db_commit();
+
+	zbx_vector_uint64_pair_destroy(&trends_diff);
 
 	if (ZBX_DC_SYNC_TREND_MODE_FULL == sync_trend_mode)
 	{
@@ -2588,13 +2597,10 @@ void	zbx_dc_add_history_variant(zbx_uint64_t itemid, unsigned char value_type, u
 
 size_t	zbx_dc_flush_history(void)
 {
-	LOCK_CACHE;
-
 	if (0 == item_values_num)
-	{
-		UNLOCK_CACHE;
 		return 0;
-	}
+
+	LOCK_CACHE;
 
 	hc_add_item_values(item_values, item_values_num);
 
@@ -2634,11 +2640,8 @@ static int	hc_queue_elem_compare_func(const void *d1, const void *d2)
 	const zbx_binary_heap_elem_t	*e1 = (const zbx_binary_heap_elem_t *)d1;
 	const zbx_binary_heap_elem_t	*e2 = (const zbx_binary_heap_elem_t *)d2;
 
-	const zbx_hc_item_t	*item1 = (const zbx_hc_item_t *)e1->data;
-	const zbx_hc_item_t	*item2 = (const zbx_hc_item_t *)e2->data;
-
 	/* compare by timestamp of the oldest value */
-	return zbx_timespec_compare(&item1->tail->ts, &item2->tail->ts);
+	return zbx_timespec_compare(&((const zbx_hc_item_t *)e1->data)->ts, &((const zbx_hc_item_t *)e2->data)->ts);
 }
 
 /******************************************************************************
@@ -2728,9 +2731,33 @@ static zbx_hc_item_t	*hc_get_item(zbx_uint64_t itemid)
  ******************************************************************************/
 static zbx_hc_item_t	*hc_add_item(zbx_uint64_t itemid, zbx_hc_data_t *data)
 {
-	zbx_hc_item_t	item_local = {itemid, ZBX_HC_ITEM_STATUS_NORMAL, 0, data, data};
+	zbx_hc_item_t	item_local = {.itemid = itemid, .status = ZBX_HC_ITEM_STATUS_NORMAL,
+			.cache = ZBX_HC_ITEM_CACHE_TRUE, .values_num = 0, .tail = data, .head = data};
 
 	return (zbx_hc_item_t *)zbx_hashset_insert(&cache->history_items, &item_local, sizeof(item_local));
+}
+
+void	zbx_hc_remove_items_by_ids(zbx_vector_uint64_t *itemids)
+{
+	LOCK_CACHE;
+
+	for (int i = 0; i < itemids->values_num; i++)
+	{
+		zbx_hc_item_t	*item = hc_get_item(itemids->values[i]);
+
+		if (NULL == item)
+			continue;
+
+		if (NULL == item->tail)
+		{
+			zbx_hashset_remove_direct(&cache->history_items, item);
+			continue;
+		}
+
+		item->cache = ZBX_HC_ITEM_CACHE_FALSE;
+	}
+
+	UNLOCK_CACHE;
 }
 
 /******************************************************************************
@@ -2766,6 +2793,8 @@ int	zbx_hc_clear_item_middle(zbx_uint64_t itemid)
 				i++;
 			}
 		}
+		else
+			item->cache = ZBX_HC_ITEM_CACHE_FALSE;
 
 		cache->history_num -= i;
 	}
@@ -3126,6 +3155,14 @@ static void	hc_add_item_values(dc_item_value_t *values, int values_num)
 		if (NULL == item)
 		{
 			item = hc_add_item(item_value->itemid, data);
+			item->ts = data->ts;
+			hc_queue_item(item);
+		}
+		else if (NULL == item->tail)
+		{
+			item->tail = data;
+			item->head = data;
+			item->ts = data->ts;
 			hc_queue_item(item);
 		}
 		else
@@ -3258,6 +3295,21 @@ void	zbx_hc_get_item_values(zbx_dc_history_t *history, zbx_vector_hc_item_ptr_t 
 	}
 }
 
+static void	hc_remove_item(zbx_hc_item_t *item)
+{
+	while (NULL != item->tail)
+	{
+		zbx_hc_data_t	*next = item->tail->next;
+
+		hc_free_data(item->tail);
+		item->tail = next;
+	}
+
+	cache->history_num -= item->values_num - 1;
+
+	zbx_hashset_remove_direct(&cache->history_items, item);
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: push back the processed history items into history cache          *
@@ -3288,14 +3340,25 @@ void	zbx_hc_push_items(zbx_vector_hc_item_ptr_t *history_items)
 				hc_queue_item(item);
 				break;
 			case ZBX_HC_ITEM_STATUS_NORMAL:
+				if (ZBX_HC_ITEM_CACHE_FALSE == item->cache)
+				{
+					hc_remove_item(item);
+					break;
+				}
+
 				item->values_num--;
 				data_free = item->tail;
 				item->tail = item->tail->next;
 				hc_free_data(data_free);
 				if (NULL == item->tail)
-					zbx_hashset_remove(&cache->history_items, item);
+				{
+					item->head = NULL;
+				}
 				else
+				{
+					item->ts = item->tail->ts;
 					hc_queue_item(item);
+				}
 				break;
 		}
 	}
@@ -3319,7 +3382,7 @@ int	zbx_hc_get_history_compression_age(void)
 	zbx_config_t	cfg;
 	int		compression_age = 0;
 
-	zbx_config_get(&cfg, ZBX_CONFIG_FLAGS_DB_EXTENSION);
+	zbx_config_get(&cfg, ZBX_CONFIG_FLAGS_DB_HISTORY_COMPRESION);
 
 	if (ON == cfg.db.history_compression_status && 0 != cfg.db.history_compress_older)
 	{
@@ -3395,7 +3458,7 @@ static int	init_trend_cache(zbx_uint64_t *trends_cache_size, char **error)
 					/* item hashset size in configuration cache.              */
 
 	zbx_hashset_create_ext(&cache->trends, INIT_HASHSET_SIZE,
-			ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC, NULL,
+			ZBX_DEFAULT_ID_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC, NULL,
 			__trend_shmem_malloc_func, __trend_shmem_realloc_func, __trend_shmem_free_func);
 
 #undef INIT_HASHSET_SIZE
@@ -3452,7 +3515,7 @@ int	zbx_init_database_cache(zbx_get_program_type_f get_program_type,
 	memset(ids, 0, sizeof(ZBX_DC_IDS));
 
 	zbx_hashset_create_ext(&cache->history_items, ZBX_HC_ITEMS_INIT_SIZE,
-			ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC, NULL,
+			ZBX_DEFAULT_ID_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC, NULL,
 			__hc_index_shmem_malloc_func, __hc_index_shmem_realloc_func, __hc_index_shmem_free_func);
 
 	zbx_binary_heap_create_ext(&cache->history_queue, hc_queue_elem_compare_func, ZBX_BINARY_HEAP_OPTION_EMPTY,
@@ -3461,7 +3524,7 @@ int	zbx_init_database_cache(zbx_get_program_type_f get_program_type,
 	if (0 != (get_program_type_cb() & ZBX_PROGRAM_TYPE_SERVER))
 	{
 		zbx_hashset_create_ext(&(cache->proxyqueue.index), ZBX_HC_SYNC_MAX,
-			ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC, NULL,
+			ZBX_DEFAULT_ID_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC, NULL,
 			__hc_index_shmem_malloc_func, __hc_index_shmem_realloc_func, __hc_index_shmem_free_func);
 
 		zbx_list_create_ext(&(cache->proxyqueue.list), __hc_index_shmem_malloc_func,
@@ -3681,11 +3744,12 @@ void	zbx_hc_get_mem_stats(zbx_shmem_stats_t *data, zbx_shmem_stats_t *index)
  ******************************************************************************/
 int	zbx_hc_is_itemid_cached(zbx_uint64_t itemid)
 {
-	int	ret = FAIL;
+	int		ret = FAIL;
+	zbx_hc_item_t	*item;
 
 	LOCK_CACHE;
 
-	if (NULL != zbx_hashset_search(&cache->history_items, &itemid))
+	if (NULL != (item = (zbx_hc_item_t *)zbx_hashset_search(&cache->history_items, &itemid)) && NULL != item->tail)
 		ret = SUCCEED;
 
 	UNLOCK_CACHE;
@@ -3708,8 +3772,12 @@ static void	hc_get_items(zbx_vector_uint64_pair_t *items)
 	zbx_hashset_iter_reset(&cache->history_items, &iter);
 	while (NULL != (item = (zbx_hc_item_t *)zbx_hashset_iter_next(&iter)))
 	{
-		zbx_uint64_pair_t	pair = {item->itemid, item->values_num};
-		zbx_vector_uint64_pair_append_ptr(items, &pair);
+		if (0 != item->values_num)
+		{
+			zbx_uint64_pair_t	pair = {item->itemid, item->values_num};
+
+			zbx_vector_uint64_pair_append_ptr(items, &pair);
+		}
 	}
 }
 

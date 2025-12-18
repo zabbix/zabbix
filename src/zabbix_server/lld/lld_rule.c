@@ -353,16 +353,21 @@ void	lld_rule_get_exported_macros(zbx_uint64_t ruleid, zbx_vector_lld_macro_t *m
 
 /******************************************************************************
  *                                                                            *
- * Purpose: Updates existing lld rule macro paths and creates new ones based  *
- *          on rule prototypes.                                               *
+ * Purpose: updates existing LLD rule macro paths and creates new ones based  *
+ *          on rule prototypes                                                *
  *                                                                            *
- * Parameters: item_prototypes - [IN]                                         *
- *             items           - [IN/OUT] sorted list of items                *
+ * Parameters: items - [IN/OUT] sorted list of items                          *
  *                                                                            *
  ******************************************************************************/
 void	lld_rule_macro_paths_make(zbx_vector_lld_item_full_ptr_t *items)
 {
+#define LLD_PROTOTYPE_MACRO_PATH_COL_PATH	1
+
+	zbx_sync_rowset_t	macro_paths_subst;
+
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	zbx_sync_rowset_init(&macro_paths_subst, ZBX_LLD_ITEM_PROTOTYPE_MACRO_PATH_COLS_NUM);
 
 	for (int i = 0; i < items->values_num; i++)
 	{
@@ -374,10 +379,24 @@ void	lld_rule_macro_paths_make(zbx_vector_lld_item_full_ptr_t *items)
 		if (0 == (item->prototype->item_flags & ZBX_FLAG_DISCOVERY_RULE))
 			continue;
 
-		zbx_sync_rowset_merge(&item->macro_paths, &item->prototype->macro_paths);
+		zbx_sync_rowset_copy(&macro_paths_subst, &item->prototype->macro_paths);
+
+		for (int j = 0; j < macro_paths_subst.rows.values_num; j++)
+		{
+			zbx_sync_row_t	*row = macro_paths_subst.rows.values[j];
+
+			zbx_substitute_lld_macros(&row->cols[LLD_PROTOTYPE_MACRO_PATH_COL_PATH], item->lld_row->data,
+					ZBX_MACRO_ANY, NULL, 0);
+		}
+
+		zbx_sync_rowset_merge(&item->macro_paths, &macro_paths_subst);
+		zbx_vector_sync_row_ptr_clear_ext(&macro_paths_subst.rows, zbx_sync_row_free);
 	}
 
+	zbx_sync_rowset_clear(&macro_paths_subst);
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+
+#undef LLD_PROTOTYPE_MACRO_PATH_COL_PATH
 }
 
 /******************************************************************************
@@ -750,7 +769,6 @@ void	lld_rule_filters_make(zbx_vector_lld_item_full_ptr_t *items, char **info)
 
 		if (0 == (item->prototype->item_flags & ZBX_FLAG_DISCOVERY_RULE))
 			continue;
-
 
 		zbx_sync_rowset_merge(&item->filters, &item->prototype->filters);
 	}

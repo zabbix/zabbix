@@ -17,11 +17,11 @@
 require_once __DIR__.'/../common/testWidgets.php';
 
 /**
- * @dataSource AllItemValueTypes, ItemValueWidget, GlobalMacros, TopHostsWidget
+ * @dataSource AllItemValueTypes, ItemValueWidget, TopHostsWidget, MonitoringOverview, GlobalMacros
  *
- * @backup dashboard
+ * @backup profiles
  *
- * @onBefore prepareData
+ * @onBefore prepareSparklineData, prepareData
  */
 class testDashboardTopHostsWidget extends testWidgets {
 
@@ -42,7 +42,9 @@ class testDashboardTopHostsWidget extends testWidgets {
 
 	protected static $updated_name = 'Top hosts update';
 	protected static $aggregation_itemids;
+	protected static $sparkline_itemids;
 	protected static $top_hosts_itemids;
+	protected static $monitoring_overview_itemids;
 	protected static $dashboardids;
 	protected static $other_dashboardids;
 	protected static $dashboardid;
@@ -106,13 +108,56 @@ class testDashboardTopHostsWidget extends testWidgets {
 		self::$other_dashboardids = CDataHelper::get('ItemValueWidget.dashboardids');
 		self::$aggregation_itemids = CDataHelper::get('ItemValueWidget.itemids');
 		self::$top_hosts_itemids = CDataHelper::get('TopHostsWidget.itemids');
+		self::$monitoring_overview_itemids = CDataHelper::get('MonitoringOverview.itemids');
 
 		// Add value to items for CheckTextItems test.
-		CDataHelper::addItemData(99086, 1000); // 1_item.
+		CDataHelper::addItemData(self::$monitoring_overview_itemids['1_item'], 1000);
 		CDataHelper::addItemData(self::$top_hosts_itemids['top_hosts_trap_text'], 'Text for text item');
 		CDataHelper::addItemData(self::$top_hosts_itemids['top_hosts_text2'],  '2.00');
 		CDataHelper::addItemData(self::$top_hosts_itemids['top_hosts_trap_log'], 'Logs for text item');
 		CDataHelper::addItemData(self::$top_hosts_itemids['top_hosts_trap_char'], 'characters_here');
+	}
+
+	public static function prepareSparklineData() {
+		CDataHelper::call('hostgroup.create', [
+			['name' => 'Host group for sparkline tests']
+		]);
+		$groupids = CDataHelper::getIds('name');
+
+		// Host and items for isolated sparkline check via screenshots.
+		CDataHelper::createHosts([
+			[
+				'host' => 'Host for sparkline screenshots',
+				'groups' => [['groupid' => $groupids['Host group for sparkline tests']]],
+				'interfaces' => [
+					[
+						'type' => INTERFACE_TYPE_AGENT,
+						'main' => INTERFACE_PRIMARY,
+						'useip' => INTERFACE_USE_IP,
+						'ip' => '127.1.9.8',
+						'dns' => '',
+						'port' => '10777'
+					]
+				],
+				'items' => [
+					[
+						'name' => 'Sparkline item - numeric (unsigned)',
+						'key_' => 'numeric_unsigned',
+						'type' => ITEM_TYPE_ZABBIX,
+						'value_type' => ITEM_VALUE_TYPE_UINT64,
+						'delay' => '30'
+					],
+					[
+						'name' => 'Sparkline item - numeric (float)',
+						'key_' => 'numeric_float',
+						'type' => ITEM_TYPE_ZABBIX,
+						'value_type' => ITEM_VALUE_TYPE_FLOAT,
+						'delay' => '30'
+					]
+				]
+			]
+		]);
+		self::$sparkline_itemids = CDataHelper::getIds('name');
 	}
 
 	public function prepareTopHostsDisplayData() {
@@ -190,7 +235,6 @@ class testDashboardTopHostsWidget extends testWidgets {
 				'tags' => [['tag' => 'host', 'value' => 'B'], ['tag' => 'host', 'value' => 'C'], ['tag' => 'tag']]
 			]
 		]);
-
 		$hostids = CDataHelper::getIds('host');
 
 		$itemids = [];
@@ -219,7 +263,6 @@ class testDashboardTopHostsWidget extends testWidgets {
 				]
 			]
 		]);
-
 		$maintenance_itemid = $response['itemids']['Host in maintenance:maintenance_trap'];
 		$maintenance_hostid = $response['hostids']['Host in maintenance'];
 
@@ -298,8 +341,8 @@ class testDashboardTopHostsWidget extends testWidgets {
 		$visible_labels = ['Name', 'Data', 'Item name', 'Base colour', 'Display item value as', 'Display', 'Thresholds',
 			'Decimal places', 'Advanced configuration'
 		];
-		$hidden_labels = ['Text', 'Sparkline', 'Min', 'Max', 'Highlights', 'Show thumbnail', 'Aggregation function',
-			'Time period', 'Widget', 'From', 'To', 'History data'
+		$hidden_labels = ['Text', 'Sparkline', 'Min', 'Max', 'Highlights', 'Show thumbnail', 'History data',
+			'Aggregation function', 'Time period', 'Widget', 'From', 'To'
 		];
 		$this->assertEquals($visible_labels, array_values($column_form->getLabels()->filter(CElementFilter::VISIBLE)->asText()));
 		$this->assertEquals($hidden_labels, array_values($column_form->getLabels()->filter(CElementFilter::NOT_VISIBLE)->asText()));
@@ -321,7 +364,8 @@ class testDashboardTopHostsWidget extends testWidgets {
 			'Max' => ['value' => '', 'placeholder' => 'calculated', 'maxlength' => 255, 'visible' => false, 'enabled' => false],
 			'id:sparkline_width' => ['value' => 1, 'maxlength' => 2, 'visible' => false, 'enabled' => false],
 			'id:sparkline_fill' => ['value' => 3, 'maxlength' => 2, 'visible' => false, 'enabled' => false],
-			self::PATH_TO_COLOR_PICKER.'"sparkline[color]"]' => ['color' => '42A5F5', 'visible' => false, 'enabled' => false],
+			// TODO: remove input from the sparkline color picker path when DEV-4512 is fixed.
+			self::PATH_TO_COLOR_PICKER.'"sparkline[color]"]/input' => ['value' => '42A5F5', 'visible' => false, 'enabled' => false],
 			'id:sparkline_time_period_data_source' => ['value' => 'Custom', 'labels' => ['Dashboard', 'Widget', 'Custom'],
 				'visible' => false, 'enabled' => false
 			],
@@ -339,6 +383,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 			'Highlights' => ['visible' => false],
 			'Decimal places' => ['value' => 2, 'maxlength' => 2],
 			'Advanced configuration' => ['visible' => true, 'enabled' => true],
+			'History data' => ['value' => 'Auto', 'labels' => ['Auto', 'History', 'Trends']],
 			'Aggregation function' => ['value' => 'not used', 'options' => ['not used', 'min', 'max', 'avg', 'count', 'sum',
 				'first', 'last']
 			],
@@ -352,7 +397,6 @@ class testDashboardTopHostsWidget extends testWidgets {
 			'id:time_period_to' => ['value' => 'now', 'placeholder' => 'YYYY-MM-DD hh:mm:ss', 'maxlength' => 255,
 				'visible' => false, 'enabled' => false
 			],
-			'History data' => ['value' => 'Auto', 'labels' => ['Auto', 'History', 'Trends']],
 			'Show thumbnail' => ['value' => false, 'visible' => false, 'enabled' => false]
 		];
 		$this->checkFieldsAttributes($column_default_fields, $column_form);
@@ -454,6 +498,36 @@ class testDashboardTopHostsWidget extends testWidgets {
 			}
 		}
 
+		// Check hintbox message when "Aggregation function≠not used" and sparkline is selected.
+		$warning_visibility = [
+				'not used' => false,
+				'min' => true,
+				'max' => true,
+				'avg' => true,
+				'count' => true,
+				'sum' => true,
+				'first' => true,
+				'last' => true
+		];
+
+		foreach ($warning_visibility as $option => $visible) {
+			$column_form->fill(['Aggregation function' => $option]);
+			$warning_button = $column_form->getFieldContainer('Aggregation function')->query('xpath:.//button[@data-hintbox]')->one();
+			$this->assertTrue($warning_button->isVisible($visible));
+
+			if ($visible) {
+				$warning_button->click();
+
+				// Check hintbox text.
+				$hint_text = 'Aggregation function does not affect the sparkline.';
+				$hint_dialog = $this->query('xpath://div[@class="overlay-dialogue wordbreak"]')->waitUntilVisible()->one();
+				$this->assertEquals($hint_text, $hint_dialog->getText());
+
+				// Close the hintbox.
+				$hint_dialog->query('xpath:.//button[@class="btn-overlay-close"]')->one()->click()->waitUntilNotPresent();
+			}
+		}
+
 		// Check Display item value as and color Thresholds/Highlights tables dependency.
 		foreach (['Numeric', 'Text', 'Binary'] as $display) {
 			$column_form->fill(['Display item value as' => $display]);
@@ -472,14 +546,14 @@ class testDashboardTopHostsWidget extends testWidgets {
 						'header' => 'Threshold',
 						'color_selector' => self::PATH_TO_COLOR_PICKER.'"thresholds[0][color]"]',
 						'input_selector' => 'id:thresholds_0_threshold',
-						'color' => 'FCCB1D'
+						'color' => 'E65660'
 					]
 					: [
 						'label' => 'Highlights',
 						'header' => 'Regular expression',
 						'color_selector' => self::PATH_TO_COLOR_PICKER.'"highlights[0][color]"]',
 						'input_selector' => 'id:highlights_0_pattern',
-						'color' => 'E65660'
+						'color' => 'FCCB1D'
 					];
 
 				$color_container = $column_form->getFieldContainer(($color_table['label']));
@@ -487,7 +561,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 				$color_container->query('button:Add')->one()->waitUntilClickable()->click();
 
 				$this->checkFieldsAttributes([
-						$color_table['color_selector'] => [$color_table['color']],
+						$color_table['color_selector'] => ['color' => $color_table['color']],
 						$color_table['input_selector'] => ['value' => '', 'maxlength' => 255]
 					], $column_form
 				);
@@ -2966,299 +3040,296 @@ class testDashboardTopHostsWidget extends testWidgets {
 					'screen_name' => 'bar_and_indi'
 				]
 			],
-			/**
-			 * TODO: Sparkline cases should be uncommented after ZBX-25761 fix.
-			 * TODO: Screenshots should be replaced after ZBX-25744 fix.
-			 */
 			// #6 Sparkline with no fluctuations and custom color.
-//			[
-//				[
-//					'main_fields' => [
-//						'Name' => 'No fluctuations'
-//					],
-//					'column_fields' => [
-//						[
-//							'Name' => 'test column 1',
-//							'Data' => 'Item value',
-//							'Item name' => 'Item with type of information - numeric (unsigned)',
-//							'Display' => 'Sparkline',
-//							self::PATH_TO_COLOR_PICKER.'"sparkline[color]"]' => 'BFFF00',
-//							'id:sparkline_time_period_from' => '2024-12-15 12:00:00',
-//							'id:sparkline_time_period_to' => '2024-12-15 13:00:00'
-//						]
-//					],
-//					'item_data' => [
-//						[
-//							'value' => '1',
-//							'name' => 'Item with type of information - numeric (unsigned)',
-//							'time' => '2024-12-15 13:00:00'
-//						],
-//						[
-//							'value' => '1',
-//							'name' => 'Item with type of information - numeric (unsigned)',
-//							'time' => '2024-12-15 12:00:00'
-//						]
-//					],
-//					'screen_name' => 'sparkline'
-//				]
-//			],
+			[
+				[
+					'main_fields' => [
+						'Name' => 'No fluctuations'
+					],
+					'column_fields' => [
+						[
+							'Name' => 'test column 1',
+							'Data' => 'Item value',
+							'Item name' => 'Sparkline item - numeric (unsigned)',
+							'Display' => 'Sparkline',
+							self::PATH_TO_COLOR_PICKER.'"sparkline[color]"]' => 'BFFF00',
+							'id:sparkline_time_period_from' => (date('Y-m-d', strtotime('-7 days'))).' 12:00:00',
+							'id:sparkline_time_period_to' => (date('Y-m-d', strtotime('-7 days'))).' 13:00:00'
+						]
+					],
+					'item_data' => [
+						[
+							'value' => '1',
+							'name' => 'Sparkline item - numeric (unsigned)',
+							'time' => (date('Y-m-d', strtotime('-7 days'))).' 13:00:00'
+						],
+						[
+							'value' => '1',
+							'name' => 'Sparkline item - numeric (unsigned)',
+							'time' => (date('Y-m-d', strtotime('-7 days'))).' 12:00:00'
+						]
+					],
+					'screen_name' => 'sparkline'
+				]
+			],
 			// #7 Sparkline with uptrend and custom color.
-//			[
-//				[
-//					'main_fields' => [
-//						'Name' => 'Uptrend'
-//					],
-//					'column_fields' => [
-//						[
-//							'Name' => 'test column 1',
-//							'Data' => 'Item value',
-//							'Item name' => 'Item with type of information - numeric (unsigned)',
-//							'Display' => 'Sparkline',
-//							self::PATH_TO_COLOR_PICKER.'"sparkline[color]"]' => 'B2EBF2',
-//							'id:sparkline_time_period_from' => '2024-12-15 12:00:00',
-//							'id:sparkline_time_period_to' => '2024-12-15 13:00:00'
-//						]
-//					],
-//					'item_data' => [
-//						[
-//							'value' => '1',
-//							'name' => 'Item with type of information - numeric (unsigned)',
-//							'time' => '2024-12-15 13:00:00'
-//						],
-//						[
-//							'value' => '0',
-//							'name' => 'Item with type of information - numeric (unsigned)',
-//							'time' => '2024-12-15 12:00:00'
-//						]
-//					],
-//					'screen_name' => 'sparkline_up'
-//				]
-//			],
+			[
+				[
+					'main_fields' => [
+						'Name' => 'Uptrend'
+					],
+					'column_fields' => [
+						[
+							'Name' => 'test column 1',
+							'Data' => 'Item value',
+							'Item name' => 'Sparkline item - numeric (unsigned)',
+							'Display' => 'Sparkline',
+							self::PATH_TO_COLOR_PICKER.'"sparkline[color]"]' => 'B2EBF2',
+							'id:sparkline_time_period_from' => (date('Y-m-d', strtotime('-15 days'))).' 12:00:00',
+							'id:sparkline_time_period_to' => (date('Y-m-d', strtotime('-15 days'))).' 13:00:00'
+						]
+					],
+					'item_data' => [
+						[
+							'value' => '1',
+							'name' => 'Sparkline item - numeric (unsigned)',
+							'time' => (date('Y-m-d', strtotime('-15 days'))).' 13:00:00'
+						],
+						[
+							'value' => '0',
+							'name' => 'Sparkline item - numeric (unsigned)',
+							'time' => (date('Y-m-d', strtotime('-15 days'))).' 12:00:00'
+						]
+					],
+					'screen_name' => 'sparkline_up'
+				]
+			],
 			// #8 Sparkline with downtrend and custom color.
-//			[
-//				[
-//					'main_fields' => [
-//						'Name' => 'Downtrend'
-//					],
-//					'column_fields' => [
-//						[
-//							'Name' => 'test column 1',
-//							'Data' => 'Item value',
-//							'Item name' => 'Item with type of information - numeric (unsigned)',
-//							'Display' => 'Sparkline',
-//							self::PATH_TO_COLOR_PICKER.'"sparkline[color]"]' => 'EF5350',
-//							'id:sparkline_time_period_from' => '2024-12-15 12:00:00',
-//							'id:sparkline_time_period_to' => '2024-12-15 13:00:00'
-//						]
-//					],
-//					'item_data' => [
-//						[
-//							'value' => '0',
-//							'name' => 'Item with type of information - numeric (unsigned)',
-//							'time' => '2024-12-15 13:00:00'
-//						],
-//						[
-//							'value' => '1',
-//							'name' => 'Item with type of information - numeric (unsigned)',
-//							'time' => '2024-12-15 12:00:00'
-//						]
-//					],
-//					'screen_name' => 'sparkline_down'
-//				]
-//			],
+			[
+				[
+					'main_fields' => [
+						'Name' => 'Downtrend'
+					],
+					'column_fields' => [
+						[
+							'Name' => 'test column 1',
+							'Data' => 'Item value',
+							'Item name' => 'Sparkline item - numeric (unsigned)',
+							'Display' => 'Sparkline',
+							self::PATH_TO_COLOR_PICKER.'"sparkline[color]"]' => 'EF5350',
+							'id:sparkline_time_period_from' => (date('Y-m-d', strtotime('-20 days'))).' 12:00:00',
+							'id:sparkline_time_period_to' => (date('Y-m-d', strtotime('-20 days'))).' 13:00:00'
+						]
+					],
+					'item_data' => [
+						[
+							'value' => '0',
+							'name' => 'Sparkline item - numeric (unsigned)',
+							'time' => (date('Y-m-d', strtotime('-20 days'))).' 13:00:00'
+						],
+						[
+							'value' => '1',
+							'name' => 'Sparkline item - numeric (unsigned)',
+							'time' => (date('Y-m-d', strtotime('-20 days'))).' 12:00:00'
+						]
+					],
+					'screen_name' => 'sparkline_down'
+				]
+			],
 			// #9 'Fill' and 'Width' fields are equal 0.
-//			[
-//				[
-//					'main_fields' => [
-//						'Name' => 'Invisible sparkline'
-//					],
-//					'column_fields' => [
-//						[
-//							'Name' => 'test column 1',
-//							'Data' => 'Item value',
-//							'Item name' => 'Item with type of information - numeric (unsigned)',
-//							'Display' => 'Sparkline',
-//							'id:sparkline_width' => '0',
-//							'id:sparkline_fill' => '0',
-//							'id:sparkline_time_period_from' => '2024-12-15 12:00:00',
-//							'id:sparkline_time_period_to' => '2024-12-15 13:00:00'
-//						]
-//					],
-//					'item_data' => [
-//						[
-//							'value' => '0',
-//							'name' => 'Item with type of information - numeric (unsigned)',
-//							'time' => '2024-12-15 13:00:00'
-//						],
-//						[
-//							'value' => '1',
-//							'name' => 'Item with type of information - numeric (unsigned)',
-//							'time' => '2024-12-15 12:00:00'
-//						]
-//					],
-//					'screen_name' => 'sparkline_transparent'
-//				]
-//			],
+			[
+				[
+					'main_fields' => [
+						'Name' => 'Invisible sparkline'
+					],
+					'column_fields' => [
+						[
+							'Name' => 'test column 1',
+							'Data' => 'Item value',
+							'Item name' => 'Sparkline item - numeric (unsigned)',
+							'Display' => 'Sparkline',
+							'id:sparkline_width' => '0',
+							'id:sparkline_fill' => '0',
+							'id:sparkline_time_period_from' => (date('Y-m-d', strtotime('-21 days'))).' 12:00:00',
+							'id:sparkline_time_period_to' => (date('Y-m-d', strtotime('-21 days'))).' 13:00:00'
+						]
+					],
+					'item_data' => [
+						[
+							'value' => '0',
+							'name' => 'Sparkline item - numeric (unsigned)',
+							'time' => (date('Y-m-d', strtotime('-21 days'))).' 13:00:00'
+						],
+						[
+							'value' => '1',
+							'name' => 'Sparkline item - numeric (unsigned)',
+							'time' => (date('Y-m-d', strtotime('-21 days'))).' 12:00:00'
+						]
+					],
+					'screen_name' => 'sparkline_transparent'
+				]
+			],
 			// #10 Sparkline with fluctuation and default color.
-//			[
-//				[
-//					'main_fields' => [
-//						'Name' => 'With fluctuation'
-//					],
-//					'column_fields' => [
-//						[
-//							'Name' => 'test column 1',
-//							'Data' => 'Item value',
-//							'Item name' => 'Item with type of information - numeric (unsigned)',
-//							'Display' => 'Sparkline',
-//							'id:sparkline_time_period_from' => '2024-12-15 12:00:00',
-//							'id:sparkline_time_period_to' => '2024-12-15 13:00:00'
-//						]
-//					],
-//					'item_data' => [
-//						[
-//							'value' => '1',
-//							'name' => 'Item with type of information - numeric (unsigned)',
-//							'time' => '2024-12-15 13:00:00'
-//						],
-//						[
-//							'value' => '5',
-//							'name' => 'Item with type of information - numeric (unsigned)',
-//							'time' => '2024-12-15 12:30:00'
-//						],
-//						[
-//							'value' => '1',
-//							'name' => 'Item with type of information - numeric (unsigned)',
-//							'time' => '2024-12-15 12:00:00'
-//						]
-//					],
-//					'screen_name' => 'sparkline_fluctuation'
-//				]
-//			],
+			[
+				[
+					'main_fields' => [
+						'Name' => 'With fluctuation'
+					],
+					'column_fields' => [
+						[
+							'Name' => 'test column 1',
+							'Data' => 'Item value',
+							'Item name' => 'Sparkline item - numeric (unsigned)',
+							'Display' => 'Sparkline',
+							'id:sparkline_time_period_from' => (date('Y-m-d', strtotime('-25 days'))).' 12:00:00',
+							'id:sparkline_time_period_to' => (date('Y-m-d', strtotime('-25 days'))).' 13:00:00'
+						]
+					],
+					'item_data' => [
+						[
+							'value' => '1',
+							'name' => 'Sparkline item - numeric (unsigned)',
+							'time' => (date('Y-m-d', strtotime('-25 days'))).' 13:00:00'
+						],
+						[
+							'value' => '5',
+							'name' => 'Sparkline item - numeric (unsigned)',
+							'time' => (date('Y-m-d', strtotime('-25 days'))).' 12:30:00'
+						],
+						[
+							'value' => '1',
+							'name' => 'Sparkline item - numeric (unsigned)',
+							'time' => (date('Y-m-d', strtotime('-25 days'))).' 12:00:00'
+						]
+					],
+					'screen_name' => 'sparkline_fluctuation'
+				]
+			],
 			// #11 Sparkline with fluctuations and custom color.
-//			[
-//				[
-//					'main_fields' => [
-//						'Name' => 'With fluctuations'
-//					],
-//					'column_fields' => [
-//						[
-//							'Name' => 'test column 1',
-//							'Data' => 'Item value',
-//							'Item name' => 'Item with type of information - numeric (unsigned)',
-//							'Display' => 'Sparkline',
-//							self::PATH_TO_COLOR_PICKER.'"sparkline[color]"]' => 'FFBF00',
-//							'id:sparkline_time_period_from' => '2024-12-15 12:00:00',
-//							'id:sparkline_time_period_to' => '2024-12-15 13:00:00'
-//						]
-//					],
-//					'item_data' => [
-//						[
-//							'value' => '10',
-//							'name' => 'Item with type of information - numeric (unsigned)',
-//							'time' => '2024-12-15 13:00:00'
-//						],
-//						[
-//							'value' => '15',
-//							'name' => 'Item with type of information - numeric (unsigned)',
-//							'time' => '2024-12-15 12:50:00'
-//						],
-//						[
-//							'value' => '2',
-//							'name' => 'Item with type of information - numeric (unsigned)',
-//							'time' => '2024-12-15 12:40:00'
-//						],
-//						[
-//							'value' => '7',
-//							'name' => 'Item with type of information - numeric (unsigned)',
-//							'time' => '2024-12-15 12:30:00'
-//						],
-//						[
-//							'value' => '1',
-//							'name' => 'Item with type of information - numeric (unsigned)',
-//							'time' => '2024-12-15 12:20:00'
-//						],
-//						[
-//							'value' => '5',
-//							'name' => 'Item with type of information - numeric (unsigned)',
-//							'time' => '2024-12-15 12:10:00'
-//						],
-//						[
-//							'value' => '0',
-//							'name' => 'Item with type of information - numeric (unsigned)',
-//							'time' => '2024-12-15 12:00:00'
-//						]
-//					],
-//					'screen_name' => 'sparkline_fluctuation2'
-//				]
-//			],
+			[
+				[
+					'main_fields' => [
+						'Name' => 'With fluctuations'
+					],
+					'column_fields' => [
+						[
+							'Name' => 'test column 1',
+							'Data' => 'Item value',
+							'Item name' => 'Sparkline item - numeric (unsigned)',
+							'Display' => 'Sparkline',
+							self::PATH_TO_COLOR_PICKER.'"sparkline[color]"]' => 'FFBF00',
+							'id:sparkline_time_period_from' => (date('Y-m-d', strtotime('-28 days'))).' 12:00:00',
+							'id:sparkline_time_period_to' => (date('Y-m-d', strtotime('-28 days'))).' 13:00:00'
+						]
+					],
+					'item_data' => [
+						[
+							'value' => '10',
+							'name' => 'Sparkline item - numeric (unsigned)',
+							'time' => (date('Y-m-d', strtotime('-28 days'))).' 13:00:00'
+						],
+						[
+							'value' => '15',
+							'name' => 'Sparkline item - numeric (unsigned)',
+							'time' => (date('Y-m-d', strtotime('-28 days'))).' 12:50:00'
+						],
+						[
+							'value' => '2',
+							'name' => 'Sparkline item - numeric (unsigned)',
+							'time' => (date('Y-m-d', strtotime('-28 days'))).' 12:40:00'
+						],
+						[
+							'value' => '7',
+							'name' => 'Sparkline item - numeric (unsigned)',
+							'time' => (date('Y-m-d', strtotime('-28 days'))).' 12:30:00'
+						],
+						[
+							'value' => '1',
+							'name' => 'Sparkline item - numeric (unsigned)',
+							'time' => (date('Y-m-d', strtotime('-28 days'))).' 12:20:00'
+						],
+						[
+							'value' => '5',
+							'name' => 'Sparkline item - numeric (unsigned)',
+							'time' => (date('Y-m-d', strtotime('-28 days'))).' 12:10:00'
+						],
+						[
+							'value' => '0',
+							'name' => 'Sparkline item - numeric (unsigned)',
+							'time' => (date('Y-m-d', strtotime('-28 days'))).' 12:00:00'
+						]
+					],
+					'screen_name' => 'sparkline_fluctuation2'
+				]
+			],
 			// #12 Two sparkline columns.
-//			[
-//				[
-//					'main_fields' => [
-//						'Name' => 'Two sparkline columns'
-//					],
-//					'column_fields' => [
-//						[
-//							'Name' => 'test column 1',
-//							'Data' => 'Item value',
-//							'Item name' => 'Item with type of information - numeric (unsigned)',
-//							'Display' => 'Sparkline',
-//							self::PATH_TO_COLOR_PICKER.'"sparkline[color]"]' => 'BFFF00',
-//							'id:sparkline_time_period_from' => '2024-12-15 12:00:00',
-//							'id:sparkline_time_period_to' => '2024-12-15 13:00:00'
-//						],
-//						[
-//							'Name' => 'test column 2',
-//							'Data' => 'Item value',
-//							'Item name' => 'Item with type of information - numeric (float)',
-//							'Display' => 'Sparkline',
-//							self::PATH_TO_COLOR_PICKER.'"sparkline[color]"]' => 'FFBF00'
-//						]
-//					],
-//					'item_data' => [
-//						[
-//							'value' => '1',
-//							'name' => 'Item with type of information - numeric (unsigned)',
-//							'time' => '2024-12-15 13:00:00'
-//						],
-//						[
-//							'value' => '1',
-//							'name' => 'Item with type of information - numeric (unsigned)',
-//							'time' => '2024-12-15 12:00:00'
-//						],
-//						[
-//							'value' => '1.11',
-//							'name' => 'Item with type of information - numeric (float)',
-//							'time' => '2024-12-15 13:00:00'
-//						],
-//						[
-//							'value' => '5.55',
-//							'name' => 'Item with type of information - numeric (float)',
-//							'time' => '2024-12-15 12:30:00'
-//						],
-//						[
-//							'value' => '2.22',
-//							'name' => 'Item with type of information - numeric (float)',
-//							'time' => '2024-12-15 12:00:00'
-//						]
-//					],
-//					'screen_name' => 'sparkline_columns'
-//				]
-//			]
+			[
+				[
+					'main_fields' => [
+						'Name' => 'Two sparkline columns'
+					],
+					'column_fields' => [
+						[
+							'Name' => 'test column 1',
+							'Data' => 'Item value',
+							'Item name' => 'Sparkline item - numeric (unsigned)',
+							'Display' => 'Sparkline',
+							self::PATH_TO_COLOR_PICKER.'"sparkline[color]"]' => 'BFFF00',
+							'id:sparkline_time_period_from' => (date('Y-m-d', strtotime('-30 days'))).' 12:00:00',
+							'id:sparkline_time_period_to' => (date('Y-m-d', strtotime('-30 days'))).' 13:00:00'
+						],
+						[
+							'Name' => 'test column 2',
+							'Data' => 'Item value',
+							'Item name' => 'Sparkline item - numeric (float)',
+							'Display' => 'Sparkline',
+							self::PATH_TO_COLOR_PICKER.'"sparkline[color]"]' => 'FFBF00',
+							'id:sparkline_time_period_from' => (date('Y-m-d', strtotime('-30 days'))).' 12:00:00',
+							'id:sparkline_time_period_to' => (date('Y-m-d', strtotime('-30 days'))).' 13:00:00'
+						]
+					],
+					'item_data' => [
+						[
+							'value' => '1',
+							'name' => 'Sparkline item - numeric (unsigned)',
+							'time' => (date('Y-m-d', strtotime('-30 days'))).' 13:00:00'
+						],
+						[
+							'value' => '1',
+							'name' => 'Sparkline item - numeric (unsigned)',
+							'time' => (date('Y-m-d', strtotime('-30 days'))).' 12:00:00'
+						],
+						[
+							'value' => '1.11',
+							'name' => 'Sparkline item - numeric (float)',
+							'time' => (date('Y-m-d', strtotime('-30 days'))).' 13:00:00'
+						],
+						[
+							'value' => '5.55',
+							'name' => 'Sparkline item - numeric (float)',
+							'time' => (date('Y-m-d', strtotime('-30 days'))).' 12:30:00'
+						],
+						[
+							'value' => '2.22',
+							'name' => 'Sparkline item - numeric (float)',
+							'time' => (date('Y-m-d', strtotime('-30 days'))).' 12:00:00'
+						]
+					],
+					'screen_name' => 'sparkline_columns'
+				]
+			]
 		];
 	}
 
 	/**
 	 * Check widget bars, indicators and sparkline with screenshots.
 	 *
-	 * @backup !history, !history_log, !history_str, !history_text, !history_uint
 	 * @dataProvider getScreenshotsData
 	 */
 	public function testDashboardTopHostsWidget_WidgetAppearance($data) {
 		if (array_key_exists('item_data', $data)) {
 			foreach ($data['item_data'] as $params) {
-				CDataHelper::addItemData(self::$aggregation_itemids[$params['name']], $params['value'], strtotime($params['time']));
+				CDataHelper::addItemData(self::$sparkline_itemids[$params['name']], $params['value'], strtotime($params['time']));
 			}
 		}
 
@@ -5824,7 +5895,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					]
 				]
 			],
-			// Check that widget displays bar/idnicators when aggregation function 'count' is used for non-numeric item.
+			// Check that widget displays bar/indicators when aggregation function 'count' is used for non-numeric item.
 			[
 				[
 					'widget_name' => 'Displaying count for non-numeric data via bar indicators',
@@ -6247,6 +6318,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 
 			foreach ($attributes as $attribute => $value) {
 				switch ($attribute) {
+					case 'color':
 					case 'value':
 						$this->assertEquals($value, $field->getValue());
 						break;
@@ -6262,10 +6334,6 @@ class testDashboardTopHostsWidget extends testWidgets {
 
 					case 'options':
 						$this->assertEquals($value, $field->asDropdown()->getOptions()->asText());
-						break;
-
-					case 'color':
-						$this->assertEquals($value, $form->query($label)->asColorPicker()->one()->getValue());
 						break;
 				}
 			}

@@ -20,6 +20,11 @@ require_once __DIR__.'/../behaviors/CTagBehavior.php';
 
 use Facebook\WebDriver\WebDriverBy;
 
+/**
+ * @onBefore prepareTriggerData
+ *
+ * @backup triggers
+ */
 class testPageTriggers extends CLegacyWebTest {
 
 	/**
@@ -32,6 +37,16 @@ class testPageTriggers extends CLegacyWebTest {
 			CTableBehavior::class,
 			CTagBehavior::class
 		];
+	}
+
+	public static function prepareTriggerData() {
+		CDataHelper::call('trigger.create', [
+			[
+				'description' => 'Multiple   spaces   in trigger name',
+				'expression' => 'last(/Host for triggers filtering/trap)<>0',
+				'priority' => TRIGGER_SEVERITY_WARNING
+			]
+		]);
 	}
 
 	public $hostid = 99050;
@@ -441,11 +456,14 @@ class testPageTriggers extends CLegacyWebTest {
 	 * @dataProvider getTagsFilterData
 	 */
 	public function testPageTriggers_TagsFilter($data) {
-		$this->page->login()->open('zabbix.php?action=trigger.list&filter_set=1&filter_hostids[0]='.$this->hostid.'&context=host');
+		$this->page->login()->open('zabbix.php?action=trigger.list&filter_set=1&filter_hostids[0]='.
+				$this->hostid.'&context=host')->waitUntilReady();
 		$form = $this->query('name:zbx_filter')->waitUntilPresent()->asForm()->one();
+		$table = $this->getTable();
 		$form->fill(['id:filter_evaltype' => $data['tag_options']['type']]);
 		$this->setTags($data['tag_options']['tags']);
 		$form->submit();
+		$table->waitUntilReloaded();
 		$this->page->waitUntilReady();
 		$this->assertTableDataColumn(CTestArrayHelper::get($data, 'result', []), 'Name', $this->selector);
 	}
@@ -461,8 +479,10 @@ class testPageTriggers extends CLegacyWebTest {
 
 		$this->zbxTestLogin('zabbix.php?action=trigger.list&filter_set=1&filter_hostids[0]='.$this->hostid.'&context=host');
 		$form = $this->query('name:zbx_filter')->asForm()->one();
+		$table = $this->getTable();
 		$form->getField('Tags')->query('id:filter_tags_0_tag')->one()->fill('Tag1234');
 		$form->submit();
+		$table->waitUntilReloaded();
 		$this->page->waitUntilReady();
 		$this->assertTableDataColumn([], 'Name', $this->selector);
 
@@ -483,6 +503,7 @@ class testPageTriggers extends CLegacyWebTest {
 						['text' => 'Dependent trigger ONE', 'selector' => 'xpath:./a[@class="wordwrap"]'],
 						['text' => 'Discovered trigger one', 'selector' => 'xpath:./a[@class="wordwrap"]'],
 						['text' => 'Inheritance trigger with tags', 'selector' => 'xpath:./a[@class="wordwrap"]'],
+						'Multiple spaces in trigger name',
 						'Trigger disabled with tags'
 					]
 				]
@@ -508,6 +529,7 @@ class testPageTriggers extends CLegacyWebTest {
 					'result' => [
 						['text' => 'Dependent trigger ONE', 'selector' => 'xpath:./a[@class="wordwrap"]'],
 						['text' => 'Discovered trigger one', 'selector' => 'xpath:./a[@class="wordwrap"]'],
+						'Multiple spaces in trigger name',
 						'Trigger disabled with tags'
 					]
 				]
@@ -520,6 +542,17 @@ class testPageTriggers extends CLegacyWebTest {
 					],
 					'result' => [
 						['text' => 'Discovered trigger one', 'selector' => 'xpath:./a[@class="wordwrap"]']
+					]
+				]
+			],
+			// Multiple spaces in Name field.
+			[
+				[
+					'filter_options' => [
+						'Name' => '   '
+					],
+					'result' => [
+						['text' => 'Multiple spaces in trigger name', 'selector' => 'xpath:./a[@class="wordwrap"]']
 					]
 				]
 			],
@@ -555,7 +588,8 @@ class testPageTriggers extends CLegacyWebTest {
 					],
 					'result' => [
 						['text' => 'Dependent trigger ONE', 'selector' => 'xpath:./a[@class="wordwrap"]'],
-						['text' => 'Discovered trigger one', 'selector' => 'xpath:./a[@class="wordwrap"]']
+						['text' => 'Discovered trigger one', 'selector' => 'xpath:./a[@class="wordwrap"]'],
+						['text' => 'Multiple spaces in trigger name', 'selector' => 'xpath:./a[@class="wordwrap"]']
 					]
 				]
 			],
@@ -568,7 +602,8 @@ class testPageTriggers extends CLegacyWebTest {
 					'result' => [
 						['text' => 'Dependent trigger ONE', 'selector' => 'xpath:./a[@class="wordwrap"]'],
 						['text' => 'Discovered trigger one', 'selector' => 'xpath:./a[@class="wordwrap"]'],
-						['text' => 'Inheritance trigger with tags', 'selector' => 'xpath:./a[@class="wordwrap"]']
+						['text' => 'Inheritance trigger with tags', 'selector' => 'xpath:./a[@class="wordwrap"]'],
+						['text' => 'Multiple spaces in trigger name', 'selector' => 'xpath:./a[@class="wordwrap"]']
 					]
 				]
 			],
@@ -591,6 +626,7 @@ class testPageTriggers extends CLegacyWebTest {
 					'result' => [
 						['text' => 'Dependent trigger ONE', 'selector' => 'xpath:./a[@class="wordwrap"]'],
 						['text' => 'Discovered trigger one', 'selector' => 'xpath:./a[@class="wordwrap"]'],
+						'Multiple spaces in trigger name',
 						'Trigger disabled with tags'
 					]
 				]
@@ -725,6 +761,10 @@ class testPageTriggers extends CLegacyWebTest {
 						],
 						[
 							'Host' => 'Host for triggers filtering',
+							'Name' => 'Multiple spaces in trigger name'
+						],
+						[
+							'Host' => 'Host for triggers filtering',
 							'Name' => 'Trigger disabled with tags'
 						]
 					]
@@ -824,6 +864,10 @@ class testPageTriggers extends CLegacyWebTest {
 							'Name' => ['text' => 'Inheritance trigger with tags', 'selector' => 'xpath:./a[@class="wordwrap"]']
 						],
 						[
+							'Host' => 'Host for triggers filtering',
+							'Name' => 'Multiple spaces in trigger name'
+						],
+						[
 							'Host' => 'Host for trigger tags filtering',
 							'Name' => 'Second trigger for tag filtering'
 						],
@@ -847,6 +891,7 @@ class testPageTriggers extends CLegacyWebTest {
 	public function testPageTriggers_FilterHostAndGroups($data) {
 		$this->page->login()->open('zabbix.php?action=trigger.list&filter_set=1&filter_hostids[0]=99062&context=host');
 		$form = $this->query('name:zbx_filter')->asForm()->one();
+		$table = $this->getTable();
 
 		// Trigger create button enabled and breadcrumbs exist.
 		$this->assertTrue($this->query('button:Create trigger')->one()->isEnabled());
@@ -858,6 +903,7 @@ class testPageTriggers extends CLegacyWebTest {
 
 		$form->fill($data['filter_options']);
 		$form->submit();
+		$table = $this->getTable();
 		$this->page->waitUntilReady();
 
 		// Trigger create button disabled and breadcrumbs not exist.

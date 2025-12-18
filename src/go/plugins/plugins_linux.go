@@ -15,7 +15,6 @@
 package plugins
 
 import (
-	_ "golang.zabbix.com/agent2/plugins/ceph"
 	_ "golang.zabbix.com/agent2/plugins/docker"
 	_ "golang.zabbix.com/agent2/plugins/kernel"
 	_ "golang.zabbix.com/agent2/plugins/log"
@@ -33,6 +32,7 @@ import (
 	_ "golang.zabbix.com/agent2/plugins/smart"
 	_ "golang.zabbix.com/agent2/plugins/system/cpu"
 	_ "golang.zabbix.com/agent2/plugins/system/hw"
+	_ "golang.zabbix.com/agent2/plugins/system/localtime"
 	_ "golang.zabbix.com/agent2/plugins/system/sw"
 	_ "golang.zabbix.com/agent2/plugins/system/swap"
 	_ "golang.zabbix.com/agent2/plugins/system/uname"

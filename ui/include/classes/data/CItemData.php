@@ -362,6 +362,7 @@ final class CItemData {
 		ITEM_TYPE_INTERNAL => [
 			'zabbix[boottime]',
 			'zabbix[connector_queue]',
+			'zabbix[db,pool]',
 			'zabbix[discovery_queue]',
 			'zabbix[host,,items]',
 			'zabbix[host,,items_unsupported]',
@@ -2790,6 +2791,13 @@ final class CItemData {
 				'value_type' => ITEM_VALUE_TYPE_UINT64,
 				'documentation_link' => [
 					ITEM_TYPE_INTERNAL => 'config/items/itemtypes/internal#connector.queue'
+				]
+			],
+			'zabbix[db,pool]' => [
+				'description' => _('Returns a JSON object containing database connection pool configuration and statistics.'),
+				'value_type' => ITEM_VALUE_TYPE_TEXT,
+				'documentation_link' => [
+					ITEM_TYPE_INTERNAL => 'config/items/itemtypes/internal#db.pool'
 				]
 			],
 			'zabbix[discovery_queue]' => [

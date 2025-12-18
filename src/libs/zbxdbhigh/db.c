@@ -16,6 +16,7 @@
 
 #include "zbxcrypto.h"
 #include "zbxnum.h"
+#include "zbxstr.h"
 #include "zbx_host_constants.h"
 #include "zbxalgo.h"
 #include "zbxdb.h"
@@ -363,11 +364,12 @@ out:
 	return ret;
 }
 
-void	zbx_user_names_clean(zbx_user_names_t *names)
+void	zbx_user_names_clean(zbx_user_names_t **names)
 {
-	zbx_free(names->name);
-	zbx_free(names->surname);
-	zbx_free(names->username);
+	zbx_free((*names)->name);
+	zbx_free((*names)->surname);
+	zbx_free((*names)->username);
+	zbx_free(*names);
 }
 
 /******************************************************************************
@@ -572,9 +574,11 @@ int	zbx_db_get_user_by_active_session(const char *sessionid, zbx_user_t *user)
 	zbx_db_result_t	result;
 	zbx_db_row_t	row;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() sessionid:%s", __func__, sessionid);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() sessionid:%s", __func__, ZBX_STRMASK(sessionid));
 
 	sessionid_esc = zbx_db_dyn_escape_string(sessionid);
+
+	zbx_db_query_mask_t	old_queries = zbx_db_set_log_masked_values(ZBX_DB_MASK_QUERIES);
 
 	if (NULL == (result = zbx_db_select(
 			"select u.userid,u.roleid,u.username,r.type"
@@ -600,6 +604,7 @@ int	zbx_db_get_user_by_active_session(const char *sessionid, zbx_user_t *user)
 out:
 	zbx_db_free_result(result);
 	zbx_free(sessionid_esc);
+	zbx_db_set_log_masked_values(old_queries);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 

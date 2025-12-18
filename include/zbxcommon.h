@@ -732,6 +732,8 @@ int	zbx_alarm_timed_out(void);
 #define ZBX_PREPROC_FAIL_SET_VALUE	2
 #define ZBX_PREPROC_FAIL_SET_ERROR	3
 
+#define ZBX_SHA512_BINARY_LENGTH 64
+
 /* includes terminating '\0' */
 #define CUID_LEN	26
 void	zbx_new_cuid(char *cuid);
@@ -829,6 +831,8 @@ void	zbx_init_library_common(zbx_log_cb_t log_func, zbx_log_level_cb_t log_level
 		zbx_get_progname_f get_progname, zbx_backtrace_f backtrace);
 
 #if !defined(_WINDOWS) && !defined(__MINGW32__)
+
+void	zbx_malloc_trim(time_t now, int period, size_t pad);
 
 typedef void (*zbx_exit_cb_t)(int) ZBX_NORETURN;
 

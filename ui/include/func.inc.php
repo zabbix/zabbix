@@ -750,9 +750,10 @@ function convertUnitsRaw(array $options): array {
  * @param string $time       Decimal integer with optional time suffix.
  * @param bool   $with_year  Additionally parse year suffixes.
  *
- * @return int|null  Decimal integer seconds or null on error.
+ * @return int|float|null  Decimal integer seconds or null on error. Returns a floating-point number if the resulting
+ *                         value exceeds PHP_INT_MAX.
  */
-function timeUnitToSeconds($time, $with_year = false) {
+function timeUnitToSeconds($time, $with_year = false): int|float|null {
 	$suffixes = $with_year ? ZBX_TIME_SUFFIXES_WITH_YEAR : ZBX_TIME_SUFFIXES;
 
 	if (!preg_match('/^'.ZBX_PREG_INT.'(?<suffix>['.$suffixes.'])?$/', $time, $matches)) {
@@ -889,33 +890,6 @@ function zbx_formatDomId($value) {
 }
 
 /************* SORT *************/
-function natksort(&$array) {
-	$keys = array_keys($array);
-	natcasesort($keys);
-
-	$new_array = [];
-
-	foreach ($keys as $k) {
-		$new_array[$k] = $array[$k];
-	}
-
-	$array = $new_array;
-
-	return true;
-}
-
-// recursively sort an array by key
-function zbx_rksort(&$array, $flags = null) {
-	if (is_array($array)) {
-		foreach ($array as $id => $data) {
-			zbx_rksort($array[$id]);
-		}
-		ksort($array, $flags);
-	}
-
-	return $array;
-}
-
 /**
  * Sorts the data using a natural sort algorithm.
  *
@@ -1011,16 +985,6 @@ function zbx_array_merge() {
 	return $result;
 }
 
-function uint_in_array($needle, $haystack) {
-	foreach ($haystack as $value) {
-		if (bccomp($needle, $value) == 0) {
-			return true;
-		}
-	}
-
-	return false;
-}
-
 function str_in_array($needle, $haystack, $strict = false) {
 	if (is_array($needle)) {
 		return in_array($needle, $haystack, $strict);
@@ -1053,18 +1017,6 @@ function zbx_value2array(&$values) {
 			$tmp[$values] = $values;
 		}
 		$values = $tmp;
-	}
-}
-
-// creates chain of relation parent -> child, for all chain levels
-function createParentToChildRelation(&$chain, $link, $parentField, $childField) {
-	if (!isset($chain[$link[$parentField]])) {
-		$chain[$link[$parentField]] = [];
-	}
-
-	$chain[$link[$parentField]][$link[$childField]] = $link[$childField];
-	if (isset($chain[$link[$childField]])) {
-		$chain[$link[$parentField]] = zbx_array_merge($chain[$link[$parentField]], $chain[$link[$childField]]);
 	}
 }
 
@@ -1927,10 +1879,6 @@ function get_prepared_messages(array $options = []): ?string {
 	$ZBX_MESSAGES_PREPARED = $restore_messages_prepared;
 
 	return ($html === '') ? null : $html;
-}
-
-function show_message(string $msg): void {
-	show_messages(true, $msg, '');
 }
 
 function show_error_message(string $msg): void {

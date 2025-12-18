@@ -56,6 +56,12 @@ document.addEventListener('click', e => {
 	}
 });
 
+document.addEventListener('mouseover', ({target}) => {
+	if (target.matches('label') && target.scrollWidth > target.clientWidth) {
+		target.title = target.textContent;
+	}
+});
+
 jQuery(function($) {
 
 	$.propHooks.disabled = {

@@ -115,17 +115,19 @@ class CWidgetItemHistory extends CWidget {
 			}
 		});
 
-		if (!this.hasEverUpdated() && this.isReferred()) {
-			const element = this.#getDefaultSelectable();
+		if (this.isReferred() && (this.isFieldsReferredDataUpdated() || !this.hasEverUpdated())) {
+			if (this.#selected_itemid === null || !items_data.has(this.#selected_itemid)) {
+				const element = this.#getDefaultSelectable();
 
-			if (element !== null) {
-				this.#selected_clock = element.dataset.clock;
-				this.#selected_itemid = element.dataset.itemid;
-				this.#selected_key_ = element.dataset.key_;
-
-				this.#broadcast();
-				this.#markSelected();
+				if (element !== null) {
+					this.#selected_clock = element.dataset.clock;
+					this.#selected_itemid = element.dataset.itemid;
+					this.#selected_key_ = element.dataset.key_;
+				}
 			}
+
+			this.#broadcast();
+			this.#markSelected();
 		}
 		else if (this.#selected_itemid !== null) {
 			if (!items_data.has(this.#selected_itemid)) {
