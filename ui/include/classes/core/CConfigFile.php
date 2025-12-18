@@ -306,11 +306,11 @@ $DB[\'VERIFY_HOST\']		= '.($this->config['DB']['VERIFY_HOST'] ? 'true' : 'false'
 $DB[\'CIPHER_LIST\']		= \''.addcslashes($this->config['DB']['CIPHER_LIST'], "'\\").'\';
 
 // Vault configuration. Used if database credentials are stored in Vault secrets manager.
-$DB[\'VAULT\']				= \''.addcslashes($this->config['DB']['VAULT'], "'\\").'\';
-$DB[\'VAULT_URL\']			= \''.addcslashes($this->config['DB']['VAULT_URL'], "'\\").'\';
-$DB[\'VAULT_PREFIX\']			= \''.addcslashes($this->config['DB']['VAULT_PREFIX'], "'\\").'\';
+$DB[\'VAULT\']			= \''.addcslashes($this->config['DB']['VAULT'], "'\\").'\';
+$DB[\'VAULT_URL\']		= \''.addcslashes($this->config['DB']['VAULT_URL'], "'\\").'\';
+$DB[\'VAULT_PREFIX\']		= \''.addcslashes($this->config['DB']['VAULT_PREFIX'], "'\\").'\';
 $DB[\'VAULT_DB_PATH\']		= \''.addcslashes($this->config['DB']['VAULT_DB_PATH'], "'\\").'\';
-$DB[\'VAULT_TOKEN\']			= \''.addcslashes($this->config['DB']['VAULT_TOKEN'], "'\\").'\';
+$DB[\'VAULT_TOKEN\']		= \''.addcslashes($this->config['DB']['VAULT_TOKEN'], "'\\").'\';
 $DB[\'VAULT_APP_ROLE_ID\']	= \''.addcslashes($this->config['DB']['VAULT_APP_ROLE_ID'], "'\\").'\';
 $DB[\'VAULT_APP_SECRET_ID\']	= \''.addcslashes($this->config['DB']['VAULT_APP_SECRET_ID'], "'\\").'\';
 $DB[\'VAULT_CERT_FILE\']		= \''.addcslashes($this->config['DB']['VAULT_CERT_FILE'], "'\\").'\';
