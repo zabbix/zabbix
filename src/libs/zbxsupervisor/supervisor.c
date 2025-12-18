@@ -655,11 +655,19 @@ ZBX_THREAD_ENTRY(zbx_supervisor_thread, args)
 	zbx_timespec_t			sleeptime = {1, 0};
 	zbx_supervisor_t		sv;
 	int				runlevel_last = 0, exit_ret;
+	zbx_dbconn_pool_t		*dbpool;
 
 	zbx_setproctitle("%s #%d starting", get_process_type_string(process_type), process_num);
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(info->program_type),
 			server_num, get_process_type_string(process_type), process_num);
+
+	if (NULL == (dbpool = zbx_dbconn_pool_create(&error)))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "cannot create database connection pool: %s", error);
+		zbx_free(error);
+		zbx_exit(EXIT_FAILURE);
+	}
 
 	if (FAIL == zbx_ipc_service_start(&service, ZBX_IPC_SERVICE_SUPERVISOR, &error))
 	{
@@ -769,6 +777,8 @@ out:
 
 	zbx_ipc_service_close(&service);
 	zbx_proc_startup_free(runlevels);
+
+	zbx_dbconn_pool_free(dbpool);
 
 	zbx_exit(exit_ret);
 
