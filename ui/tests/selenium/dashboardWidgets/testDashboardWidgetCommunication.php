@@ -312,11 +312,11 @@ class testDashboardWidgetCommunication extends testWidgetCommunication {
 
 	public static function getWidgetData() {
 		return [
-			'Broadcasting hostgroups from map - initial selection' => [
+			'Broadcasting hostgroups from map - no selection' => [
 				[
 					'page' => 'Hostgroups page',
 					'broadcaster' => 'Map hostgroup broadcaster',
-					'select_element' => self::FIRST_HOSTGROUP_NAME,
+					'autoselected' => self::FIRST_HOSTGROUP_NAME,
 					'expected' => [
 						'Data overview listener' => [
 							'Hosts' => self::FIRST_HOST_NAME,
@@ -379,6 +379,79 @@ class testDashboardWidgetCommunication extends testWidgetCommunication {
 						'Item navigator listener' => [
 							self::FIRST_HOST_NAME => [
 								'severity' => 'info',
+								'count' => 1
+							]
+						]
+					]
+				]
+			],
+			'Broadcasting hostgroups from map - initial selection' => [
+				[
+					'page' => 'Hostgroups page',
+					'broadcaster' => 'Map hostgroup broadcaster',
+					'select_element' => self::THIRD_HOSTGROUP_NAME,
+					'expected' => [
+						'Data overview listener' => [
+							'Hosts' => self::THIRD_HOST_NAME,
+							'Trapper item' => '5'
+						],
+						'Geomap listener' => [
+							self::GEOMAP_FILTERED_ICON_INDEX => [
+								'Host' => self::THIRD_HOST_NAME,
+								'H' => '1'
+							]
+						],
+						'Honeycomb listener' => [
+							self::THIRD_HOST_NAME => 5
+						],
+						'Host availability listener' => [
+							'Total Hosts' => [
+								'Unknown' => '1',
+								'Total' => '1'
+							],
+							'Agent (passive)' => [
+								'Unknown' => '0',
+								'Total' => '0'
+							],
+							'JMX' => [
+								'Unknown' => '1',
+								'Total' => '1'
+							],
+							'IPMI' => [
+								'Unknown' => '0',
+								'Total' => '0'
+							]
+						],
+						'Problem hosts listener' => [
+							'Host group' => self::THIRD_HOSTGROUP_NAME,
+							'With problems' => '1',
+							'Total' => '1'
+						],
+						'Problems by severity listener' => [
+							'Host group' => self::THIRD_HOSTGROUP_NAME,
+							'High' => '1'
+						],
+						'Top hosts listener' => [
+							'Hostname' => self::THIRD_HOST_NAME,
+							'Item value' => '5.00'
+						],
+						'Trigger overview listener' => [
+							'triggers' => [self::THIRD_HOST_TRIGGER],
+							'headers' => ['Triggers', self::THIRD_HOST_NAME]
+						],
+						'Web monitoring listener' => [
+							'Host group' => self::THIRD_HOSTGROUP_NAME,
+							'Unknown' => '1'
+						],
+						'Host navigator listener' => [
+							self::THIRD_HOST_NAME => [
+								'severity' => 'high',
+								'count' => 1
+							]
+						],
+						'Item navigator listener' => [
+							self::THIRD_HOST_NAME => [
+								'severity' => 'high',
 								'count' => 1
 							]
 						]
@@ -465,11 +538,11 @@ class testDashboardWidgetCommunication extends testWidgetCommunication {
 					'select_element' => self::SECOND_HOST_NAME
 				]
 			],
-			'Broadcasting hostgroups from problem hosts widget - initial selection' => [
+			'Broadcasting hostgroups from problem hosts widget - no selection' => [
 				[
 					'page' => 'Hostgroups page',
 					'broadcaster' => 'Problem hosts hostgroup broadcaster',
-					'select_element' => self::FIRST_HOSTGROUP_NAME,
+					'autoselected' => self::FIRST_HOSTGROUP_NAME,
 					'expected' => [
 						'Data overview listener' => [
 							'Hosts' => self::FIRST_HOST_NAME,
@@ -532,6 +605,79 @@ class testDashboardWidgetCommunication extends testWidgetCommunication {
 						'Item navigator listener' => [
 							self::FIRST_HOST_NAME => [
 								'severity' => 'info',
+								'count' => 1
+							]
+						]
+					]
+				]
+			],
+			'Broadcasting hostgroups from problem hosts widget - initial selection' => [
+				[
+					'page' => 'Hostgroups page',
+					'broadcaster' => 'Problem hosts hostgroup broadcaster',
+					'select_element' => self::SECOND_HOSTGROUP_NAME,
+					'expected' => [
+						'Data overview listener' => [
+							'Hosts' => self::SECOND_HOST_NAME,
+							'Trapper item' => '4'
+						],
+						'Geomap listener' => [
+							self::GEOMAP_FILTERED_ICON_INDEX => [
+								'Host' => self::SECOND_HOST_NAME,
+								'W' => '1'
+							]
+						],
+						'Honeycomb listener' => [
+							self::SECOND_HOST_NAME => 4
+						],
+						'Host availability listener' => [
+							'Total Hosts' => [
+								'Unknown' => '1',
+								'Total' => '1'
+							],
+							'Agent (passive)' => [
+								'Unknown' => '0',
+								'Total' => '0'
+							],
+							'JMX' => [
+								'Unknown' => '0',
+								'Total' => '0'
+							],
+							'IPMI' => [
+								'Unknown' => '1',
+								'Total' => '1'
+							]
+						],
+						'Problem hosts listener' => [
+							'Host group' => self::SECOND_HOSTGROUP_NAME,
+							'With problems' => '1',
+							'Total' => '1'
+						],
+						'Problems by severity listener' => [
+							'Host group' => self::SECOND_HOSTGROUP_NAME,
+							'Warning' => '1'
+						],
+						'Top hosts listener' => [
+							'Hostname' => self::SECOND_HOST_NAME,
+							'Item value' => '4.00'
+						],
+						'Trigger overview listener' => [
+							'triggers' => [self::SECOND_HOST_TRIGGER],
+							'headers' => ['Triggers', self::SECOND_HOST_NAME]
+						],
+						'Web monitoring listener' => [
+							'Host group' => self::SECOND_HOSTGROUP_NAME,
+							'Unknown' => '1'
+						],
+						'Host navigator listener' => [
+							self::SECOND_HOST_NAME => [
+								'severity' => 'warning',
+								'count' => 1
+							]
+						],
+						'Item navigator listener' => [
+							self::SECOND_HOST_NAME => [
+								'severity' => 'warning',
 								'count' => 1
 							]
 						]
@@ -605,6 +751,79 @@ class testDashboardWidgetCommunication extends testWidgetCommunication {
 						'Item navigator listener' => [
 							self::THIRD_HOST_NAME => [
 								'severity' => 'high',
+								'count' => 1
+							]
+						]
+					]
+				]
+			],
+			'Broadcasting hostgroups from problems by severity widget - no selection' => [
+				[
+					'page' => 'Hostgroups page',
+					'broadcaster' => 'Problems by severity hostgroup broadcaster',
+					'autoselected' => self::FIRST_HOSTGROUP_NAME,
+					'expected' => [
+						'Data overview listener' => [
+							'Hosts' => self::FIRST_HOST_NAME,
+							'Trapper item' => '3'
+						],
+						'Geomap listener' => [
+							self::GEOMAP_FILTERED_ICON_INDEX => [
+								'Host' => self::FIRST_HOST_NAME,
+								'I' => '1'
+							]
+						],
+						'Honeycomb listener' => [
+							self::FIRST_HOST_NAME => 3
+						],
+						'Host availability listener' => [
+							'Total Hosts' => [
+								'Unknown' => '1',
+								'Total' => '1'
+							],
+							'Agent (passive)' => [
+								'Unknown' => '1',
+								'Total' => '1'
+							],
+							'JMX' => [
+								'Unknown' => '0',
+								'Total' => '0'
+							],
+							'IPMI' => [
+								'Unknown' => '0',
+								'Total' => '0'
+							]
+						],
+						'Problem hosts listener' => [
+							'Host group' => self::FIRST_HOSTGROUP_NAME,
+							'With problems' => '1',
+							'Total' => '1'
+						],
+						'Problems by severity listener' => [
+							'Host group' => self::FIRST_HOSTGROUP_NAME,
+							'Information' => '1'
+						],
+						'Top hosts listener' => [
+							'Hostname' => self::FIRST_HOST_NAME,
+							'Item value' => '3.00'
+						],
+						'Trigger overview listener' => [
+							'triggers' => [self::FIRST_HOST_TRIGGER],
+							'headers' => ['Triggers', self::FIRST_HOST_NAME]
+						],
+						'Web monitoring listener' => [
+							'Host group' => self::FIRST_HOSTGROUP_NAME,
+							'Unknown' => '1'
+						],
+						'Host navigator listener' => [
+							self::FIRST_HOST_NAME => [
+								'severity' => 'info',
+								'count' => 1
+							]
+						],
+						'Item navigator listener' => [
+							self::FIRST_HOST_NAME => [
+								'severity' => 'info',
 								'count' => 1
 							]
 						]
@@ -757,11 +976,11 @@ class testDashboardWidgetCommunication extends testWidgetCommunication {
 					]
 				]
 			],
-			'Broadcasting hostgroups from web monitoring widget - initial selection' => [
+			'Broadcasting hostgroups from web monitoring widget - no selection' => [
 				[
 					'page' => 'Hostgroups page',
 					'broadcaster' => 'Web monitoring hostgroup broadcaster',
-					'select_element' => self::FIRST_HOSTGROUP_NAME,
+					'autoselected' => self::FIRST_HOSTGROUP_NAME,
 					'expected' => [
 						'Data overview listener' => [
 							'Hosts' => self::FIRST_HOST_NAME,
@@ -824,6 +1043,79 @@ class testDashboardWidgetCommunication extends testWidgetCommunication {
 						'Item navigator listener' => [
 							self::FIRST_HOST_NAME => [
 								'severity' => 'info',
+								'count' => 1
+							]
+						]
+					]
+				]
+			],
+			'Broadcasting hostgroups from web monitoring widget - initial selection' => [
+				[
+					'page' => 'Hostgroups page',
+					'broadcaster' => 'Web monitoring hostgroup broadcaster',
+					'select_element' => self::THIRD_HOSTGROUP_NAME,
+					'expected' => [
+						'Data overview listener' => [
+							'Hosts' => self::THIRD_HOST_NAME,
+							'Trapper item' => '5'
+						],
+						'Geomap listener' => [
+							self::GEOMAP_FILTERED_ICON_INDEX => [
+								'Host' => self::THIRD_HOST_NAME,
+								'H' => '1'
+							]
+						],
+						'Honeycomb listener' => [
+							self::THIRD_HOST_NAME => 5
+						],
+						'Host availability listener' => [
+							'Total Hosts' => [
+								'Unknown' => '1',
+								'Total' => '1'
+							],
+							'Agent (passive)' => [
+								'Unknown' => '0',
+								'Total' => '0'
+							],
+							'JMX' => [
+								'Unknown' => '1',
+								'Total' => '1'
+							],
+							'IPMI' => [
+								'Unknown' => '0',
+								'Total' => '0'
+							]
+						],
+						'Problem hosts listener' => [
+							'Host group' => self::THIRD_HOSTGROUP_NAME,
+							'With problems' => '1',
+							'Total' => '1'
+						],
+						'Problems by severity listener' => [
+							'Host group' => self::THIRD_HOSTGROUP_NAME,
+							'High' => '1'
+						],
+						'Top hosts listener' => [
+							'Hostname' => self::THIRD_HOST_NAME,
+							'Item value' => '5.00'
+						],
+						'Trigger overview listener' => [
+							'triggers' => [self::THIRD_HOST_TRIGGER],
+							'headers' => ['Triggers', self::THIRD_HOST_NAME]
+						],
+						'Web monitoring listener' => [
+							'Host group' => self::THIRD_HOSTGROUP_NAME,
+							'Unknown' => '1'
+						],
+						'Host navigator listener' => [
+							self::THIRD_HOST_NAME => [
+								'severity' => 'high',
+								'count' => 1
+							]
+						],
+						'Item navigator listener' => [
+							self::THIRD_HOST_NAME => [
+								'severity' => 'high',
 								'count' => 1
 							]
 						]
@@ -903,53 +1195,106 @@ class testDashboardWidgetCommunication extends testWidgetCommunication {
 					]
 				]
 			],
-			'Broadcasting hosts from geomap widget - initial selection' => [
+			'Broadcasting hosts from geomap widget - no selection' => [
 				[
 					'page' => 'Hosts page',
 					'broadcaster' => 'Geomap host broadcaster',
-					'select_element' => self::GEOMAP_ICON_INDEXES[self::FIRST_HOST_NAME],
+					'autoselected' => self::GEOMAP_ICON_INDEXES[self::SECOND_HOST_NAME],
 					'expected' => [
 						'Data overview listener' => [
-							'Hosts' => self::FIRST_HOST_NAME,
-							'Trapper item' => '3'
+							'Hosts' => self::SECOND_HOST_NAME,
+							'Trapper item' => '4'
 						],
 						'Geomap listener' => [
 							self::GEOMAP_FILTERED_ICON_INDEX => [
-								'Host' => self::FIRST_HOST_NAME,
-								'I' => '1'
+								'Host' => self::SECOND_HOST_NAME,
+								'W' => '1'
 							]
 						],
 						'Honeycomb listener' => [
-							self::FIRST_HOST_NAME => 3
+							self::SECOND_HOST_NAME => 4
 						],
 						'Problem hosts listener' => [
-							'Host group' => self::FIRST_HOSTGROUP_NAME,
+							'Host group' => self::SECOND_HOSTGROUP_NAME,
 							'With problems' => '1',
 							'Total' => '1'
 						],
 						'Problems listener' => [
-							'Host' => self::FIRST_HOST_NAME,
-							'Problem • Severity' => self::FIRST_HOST_TRIGGER
+							'Host' => self::SECOND_HOST_NAME,
+							'Problem • Severity' => self::SECOND_HOST_TRIGGER
 						],
 						'Problems by severity listener' => [
-							'Host group' => self::FIRST_HOSTGROUP_NAME,
-							'Information' => '1'
+							'Host group' => self::SECOND_HOSTGROUP_NAME,
+							'Warning' => '1'
 						],
 						'Top hosts listener' => [
-							'Hostname' => self::FIRST_HOST_NAME,
-							'Item value' => '3.00'
+							'Hostname' => self::SECOND_HOST_NAME,
+							'Item value' => '4.00'
 						],
 						'Trigger overview listener' => [
-							'triggers' => [self::FIRST_HOST_TRIGGER],
-							'headers' => ['Triggers', self::FIRST_HOST_NAME]
+							'triggers' => [self::SECOND_HOST_TRIGGER],
+							'headers' => ['Triggers', self::SECOND_HOST_NAME]
 						],
 						'Web monitoring listener' => [
-							'Host group' => self::FIRST_HOSTGROUP_NAME,
+							'Host group' => self::SECOND_HOSTGROUP_NAME,
 							'Unknown' => '1'
 						],
 						'Item navigator listener' => [
-							self::FIRST_HOST_NAME => [
-								'severity' => 'info',
+							self::SECOND_HOST_NAME => [
+								'severity' => 'warning',
+								'count' => 1
+							]
+						]
+					]
+				]
+			],
+			'Broadcasting hosts from geomap widget - initial selection' => [
+				[
+					'page' => 'Hosts page',
+					'broadcaster' => 'Geomap host broadcaster',
+					'select_element' => self::GEOMAP_ICON_INDEXES[self::THIRD_HOST_NAME],
+					'expected' => [
+						'Data overview listener' => [
+							'Hosts' => self::THIRD_HOST_NAME,
+							'Trapper item' => '5'
+						],
+						'Geomap listener' => [
+							self::GEOMAP_FILTERED_ICON_INDEX => [
+								'Host' => self::THIRD_HOST_NAME,
+								'H' => '1'
+							]
+						],
+						'Honeycomb listener' => [
+							self::THIRD_HOST_NAME => 5
+						],
+						'Problem hosts listener' => [
+							'Host group' => self::THIRD_HOSTGROUP_NAME,
+							'With problems' => '1',
+							'Total' => '1'
+						],
+						'Problems listener' => [
+							'Host' => self::THIRD_HOST_NAME,
+							'Problem • Severity' => self::THIRD_HOST_TRIGGER
+						],
+						'Problems by severity listener' => [
+							'Host group' => self::THIRD_HOSTGROUP_NAME,
+							'High' => '1'
+						],
+						'Top hosts listener' => [
+							'Hostname' => self::THIRD_HOST_NAME,
+							'Item value' => '5.00'
+						],
+						'Trigger overview listener' => [
+							'triggers' => [self::THIRD_HOST_TRIGGER],
+							'headers' => ['Triggers', self::THIRD_HOST_NAME]
+						],
+						'Web monitoring listener' => [
+							'Host group' => self::THIRD_HOSTGROUP_NAME,
+							'Unknown' => '1'
+						],
+						'Item navigator listener' => [
+							self::THIRD_HOST_NAME => [
+								'severity' => 'high',
 								'count' => 1
 							]
 						]
@@ -1003,6 +1348,59 @@ class testDashboardWidgetCommunication extends testWidgetCommunication {
 						'Item navigator listener' => [
 							self::SECOND_HOST_NAME => [
 								'severity' => 'warning',
+								'count' => 1
+							]
+						]
+					]
+				]
+			],
+			'Broadcasting hosts from honeycomb widget - no selection' => [
+				[
+					'page' => 'Hosts page',
+					'broadcaster' => 'Honeycomb host broadcaster',
+					'autoselected' => self::FIRST_HOST_NAME,
+					'expected' => [
+						'Data overview listener' => [
+							'Hosts' => self::FIRST_HOST_NAME,
+							'Trapper item' => '3'
+						],
+						'Geomap listener' => [
+							self::GEOMAP_FILTERED_ICON_INDEX => [
+								'Host' => self::FIRST_HOST_NAME,
+								'I' => '1'
+							]
+						],
+						'Honeycomb listener' => [
+							self::FIRST_HOST_NAME => 3
+						],
+						'Problem hosts listener' => [
+							'Host group' => self::FIRST_HOSTGROUP_NAME,
+							'With problems' => '1',
+							'Total' => '1'
+						],
+						'Problems listener' => [
+							'Host' => self::FIRST_HOST_NAME,
+							'Problem • Severity' => self::FIRST_HOST_TRIGGER
+						],
+						'Problems by severity listener' => [
+							'Host group' => self::FIRST_HOSTGROUP_NAME,
+							'Information' => '1'
+						],
+						'Top hosts listener' => [
+							'Hostname' => self::FIRST_HOST_NAME,
+							'Item value' => '3.00'
+						],
+						'Trigger overview listener' => [
+							'triggers' => [self::FIRST_HOST_TRIGGER],
+							'headers' => ['Triggers', self::FIRST_HOST_NAME]
+						],
+						'Web monitoring listener' => [
+							'Host group' => self::FIRST_HOSTGROUP_NAME,
+							'Unknown' => '1'
+						],
+						'Item navigator listener' => [
+							self::FIRST_HOST_NAME => [
+								'severity' => 'info',
 								'count' => 1
 							]
 						]
@@ -1066,53 +1464,61 @@ class testDashboardWidgetCommunication extends testWidgetCommunication {
 				[
 					'page' => 'Hosts page',
 					'broadcaster' => 'Honeycomb host broadcaster',
-					'select_element' => self::FIRST_HOST_NAME,
+					'select_element' => self::SECOND_HOST_NAME,
 					'expected' => [
 						'Data overview listener' => [
-							'Hosts' => self::FIRST_HOST_NAME,
-							'Trapper item' => '3'
+							'Hosts' => self::SECOND_HOST_NAME,
+							'Trapper item' => '4'
 						],
 						'Geomap listener' => [
 							self::GEOMAP_FILTERED_ICON_INDEX => [
-								'Host' => self::FIRST_HOST_NAME,
-								'I' => '1'
+								'Host' => self::SECOND_HOST_NAME,
+								'W' => '1'
 							]
 						],
 						'Honeycomb listener' => [
-							self::FIRST_HOST_NAME => 3
+							self::SECOND_HOST_NAME => 4
 						],
 						'Problem hosts listener' => [
-							'Host group' => self::FIRST_HOSTGROUP_NAME,
+							'Host group' => self::SECOND_HOSTGROUP_NAME,
 							'With problems' => '1',
 							'Total' => '1'
 						],
 						'Problems listener' => [
-							'Host' => self::FIRST_HOST_NAME,
-							'Problem • Severity' => self::FIRST_HOST_TRIGGER
+							'Host' => self::SECOND_HOST_NAME,
+							'Problem • Severity' => self::SECOND_HOST_TRIGGER
 						],
 						'Problems by severity listener' => [
-							'Host group' => self::FIRST_HOSTGROUP_NAME,
-							'Information' => '1'
+							'Host group' => self::SECOND_HOSTGROUP_NAME,
+							'Warning' => '1'
 						],
 						'Top hosts listener' => [
-							'Hostname' => self::FIRST_HOST_NAME,
-							'Item value' => '3.00'
+							'Hostname' => self::SECOND_HOST_NAME,
+							'Item value' => '4.00'
 						],
 						'Trigger overview listener' => [
-							'triggers' => [self::FIRST_HOST_TRIGGER],
-							'headers' => ['Triggers', self::FIRST_HOST_NAME]
+							'triggers' => [self::SECOND_HOST_TRIGGER],
+							'headers' => ['Triggers', self::SECOND_HOST_NAME]
 						],
 						'Web monitoring listener' => [
-							'Host group' => self::FIRST_HOSTGROUP_NAME,
+							'Host group' => self::SECOND_HOSTGROUP_NAME,
 							'Unknown' => '1'
 						],
 						'Item navigator listener' => [
-							self::FIRST_HOST_NAME => [
-								'severity' => 'info',
+							self::SECOND_HOST_NAME => [
+								'severity' => 'warning',
 								'count' => 1
 							]
 						]
 					]
+				]
+			],
+			// The first element is selected by default, that is a hostgroup, therefore listeners display infiltered data.
+			'Broadcasting hosts from map widget - no selection' => [
+				[
+					'page' => 'Hosts page',
+					'broadcaster' => 'Map host broadcaster',
+					'autoselected' => self::FIRST_HOSTGROUP_NAME
 				]
 			],
 			'Broadcasting hosts from map widget - initial selection' => [
@@ -1228,6 +1634,59 @@ class testDashboardWidgetCommunication extends testWidgetCommunication {
 					'select_element' => self::SECOND_HOSTGROUP_NAME
 				]
 			],
+			'Broadcasting hosts from top hosts widget - no selection' => [
+				[
+					'page' => 'Hosts page',
+					'broadcaster' => 'Top hosts host broadcaster',
+					'autoselected' => self::THIRD_HOST_NAME,
+					'expected' => [
+						'Data overview listener' => [
+							'Hosts' => self::THIRD_HOST_NAME,
+							'Trapper item' => '5'
+						],
+						'Geomap listener' => [
+							self::GEOMAP_FILTERED_ICON_INDEX => [
+								'Host' => self::THIRD_HOST_NAME,
+								'H' => '1'
+							]
+						],
+						'Honeycomb listener' => [
+							self::THIRD_HOST_NAME => 5
+						],
+						'Problem hosts listener' => [
+							'Host group' => self::THIRD_HOSTGROUP_NAME,
+							'With problems' => '1',
+							'Total' => '1'
+						],
+						'Problems listener' => [
+							'Host' => self::THIRD_HOST_NAME,
+							'Problem • Severity' => self::THIRD_HOST_TRIGGER
+						],
+						'Problems by severity listener' => [
+							'Host group' => self::THIRD_HOSTGROUP_NAME,
+							'High' => '1'
+						],
+						'Top hosts listener' => [
+							'Hostname' => self::THIRD_HOST_NAME,
+							'Item value' => '5.00'
+						],
+						'Trigger overview listener' => [
+							'triggers' => [self::THIRD_HOST_TRIGGER],
+							'headers' => ['Triggers', self::THIRD_HOST_NAME]
+						],
+						'Web monitoring listener' => [
+							'Host group' => self::THIRD_HOSTGROUP_NAME,
+							'Unknown' => '1'
+						],
+						'Item navigator listener' => [
+							self::THIRD_HOST_NAME => [
+								'severity' => 'high',
+								'count' => 1
+							]
+						]
+					]
+				]
+			],
 			'Broadcasting hosts from top hosts widget - initial selection' => [
 				[
 					'page' => 'Hosts page',
@@ -1328,6 +1787,59 @@ class testDashboardWidgetCommunication extends testWidgetCommunication {
 						'Item navigator listener' => [
 							self::SECOND_HOST_NAME => [
 								'severity' => 'warning',
+								'count' => 1
+							]
+						]
+					]
+				]
+			],
+			'Broadcasting hosts from host navigator widget - no selection' => [
+				[
+					'page' => 'Hosts page',
+					'broadcaster' => 'Host navigator broadcaster',
+					'autoselected' => self::FIRST_HOST_NAME,
+					'expected' => [
+						'Data overview listener' => [
+							'Hosts' => self::FIRST_HOST_NAME,
+							'Trapper item' => '3'
+						],
+						'Geomap listener' => [
+							self::GEOMAP_FILTERED_ICON_INDEX => [
+								'Host' => self::FIRST_HOST_NAME,
+								'I' => '1'
+							]
+						],
+						'Honeycomb listener' => [
+							self::FIRST_HOST_NAME => 3
+						],
+						'Problem hosts listener' => [
+							'Host group' => self::FIRST_HOSTGROUP_NAME,
+							'With problems' => '1',
+							'Total' => '1'
+						],
+						'Problems listener' => [
+							'Host' => self::FIRST_HOST_NAME,
+							'Problem • Severity' => self::FIRST_HOST_TRIGGER
+						],
+						'Problems by severity listener' => [
+							'Host group' => self::FIRST_HOSTGROUP_NAME,
+							'Information' => '1'
+						],
+						'Top hosts listener' => [
+							'Hostname' => self::FIRST_HOST_NAME,
+							'Item value' => '3.00'
+						],
+						'Trigger overview listener' => [
+							'triggers' => [self::FIRST_HOST_TRIGGER],
+							'headers' => ['Triggers', self::FIRST_HOST_NAME]
+						],
+						'Web monitoring listener' => [
+							'Host group' => self::FIRST_HOSTGROUP_NAME,
+							'Unknown' => '1'
+						],
+						'Item navigator listener' => [
+							self::FIRST_HOST_NAME => [
+								'severity' => 'info',
 								'count' => 1
 							]
 						]
@@ -1440,6 +1952,34 @@ class testDashboardWidgetCommunication extends testWidgetCommunication {
 					]
 				]
 			],
+			'Broadcasting items from honeycomb widget - no selection' => [
+				[
+					'page' => 'Items page',
+					'broadcaster' => 'Honeycomb item broadcaster',
+					'autoselected' => self::FIRST_HOST_NAME,
+					'expected' => [
+						'Gauge listener' => [
+							'class' => 'svg-gauge-value',
+							'value' => 3
+						],
+						'Graph (classic) listener' => [
+							'hostname' => self::FIRST_HOST_NAME
+						],
+						'Item value listener' => [
+							'class' => 'item-value-content',
+							'value' => 3
+						],
+						'SVG graph listener' => [
+							'class' => 'svg-graph-legend-item',
+							'value' => self::FIRST_HOST_NAME.': Trapper item'
+						],
+						'Pie chart listener' => [
+							'name' => self::FIRST_HOST_NAME.': Trapper item',
+							'value' => 3
+						]
+					]
+				]
+			],
 			'Broadcasting items from honeycomb widget - initial selection' => [
 				[
 					'page' => 'Items page',
@@ -1472,7 +2012,35 @@ class testDashboardWidgetCommunication extends testWidgetCommunication {
 				[
 					'page' => 'Items page',
 					'broadcaster' => 'Honeycomb item broadcaster',
-					'select_element' => self::FIRST_HOST_NAME,
+					'select_element' => self::SECOND_HOST_NAME,
+					'expected' => [
+						'Gauge listener' => [
+							'class' => 'svg-gauge-value',
+							'value' => 4
+						],
+						'Graph (classic) listener' => [
+							'hostname' => self::SECOND_HOST_NAME
+						],
+						'Item value listener' => [
+							'class' => 'item-value-content',
+							'value' => 4
+						],
+						'SVG graph listener' => [
+							'class' => 'svg-graph-legend-item',
+							'value' => self::SECOND_HOST_NAME.': Trapper item'
+						],
+						'Pie chart listener' => [
+							'name' => self::SECOND_HOST_NAME.': Trapper item',
+							'value' => 4
+						]
+					]
+				]
+			],
+			'Broadcasting items from item history widget - no selection' => [
+				[
+					'page' => 'Items page',
+					'broadcaster' => 'Item history item broadcaster',
+					'autoselected' => self::FIRST_HOST_NAME,
 					'expected' => [
 						'Gauge listener' => [
 							'class' => 'svg-gauge-value',
@@ -1552,11 +2120,11 @@ class testDashboardWidgetCommunication extends testWidgetCommunication {
 					]
 				]
 			],
-			'Broadcasting items from item navigator widget - initial selection' => [
+			'Broadcasting items from item navigator widget - no selection' => [
 				[
 					'page' => 'Items page',
 					'broadcaster' => 'Item navigator broadcaster',
-					'select_element' => self::FIRST_HOST_NAME,
+					'autoselected' => self::FIRST_HOST_NAME,
 					'expected' => [
 						'Gauge listener' => [
 							'class' => 'svg-gauge-value',
@@ -1580,7 +2148,35 @@ class testDashboardWidgetCommunication extends testWidgetCommunication {
 					]
 				]
 			],
-			'Broadcasting items from item history widget - selecting another value' => [
+			'Broadcasting items from item navigator widget - initial selection' => [
+				[
+					'page' => 'Items page',
+					'broadcaster' => 'Item navigator broadcaster',
+					'select_element' => self::THIRD_HOST_NAME,
+					'expected' => [
+						'Gauge listener' => [
+							'class' => 'svg-gauge-value',
+							'value' => 5
+						],
+						'Graph (classic) listener' => [
+							'hostname' => self::THIRD_HOST_NAME
+						],
+						'Item value listener' => [
+							'class' => 'item-value-content',
+							'value' => 5
+						],
+						'SVG graph listener' => [
+							'class' => 'svg-graph-legend-item',
+							'value' => self::THIRD_HOST_NAME.': Trapper item'
+						],
+						'Pie chart listener' => [
+							'name' => self::THIRD_HOST_NAME.': Trapper item',
+							'value' => 5
+						]
+					]
+				]
+			],
+			'Broadcasting items from item navigator widget - selecting another value' => [
 				[
 					'page' => 'Items page',
 					'broadcaster' => 'Item navigator broadcaster',
@@ -1608,13 +2204,23 @@ class testDashboardWidgetCommunication extends testWidgetCommunication {
 					]
 				]
 			],
+			'Broadcasting map from navigation tree widget - no selection' => [
+				[
+					'page' => 'Maps page',
+					'broadcaster' => 'Navigation tree map broadcaster',
+					'autoselected' => self::MAP_NAME,
+					'expected' => [
+						'Map listener' => [self::SUBMAP_NAME]
+					]
+				]
+			],
 			'Broadcasting map from navigation tree widget - initial selection' => [
 				[
 					'page' => 'Maps page',
 					'broadcaster' => 'Navigation tree map broadcaster',
-					'select_element' => self::MAP_NAME,
+					'select_element' => self::SUBMAP_NAME,
 					'expected' => [
-						'Map listener' => [self::SUBMAP_NAME]
+						'Map listener' => [self::FIRST_HOSTGROUP_NAME, self::THIRD_HOST_NAME]
 					]
 				]
 			],
@@ -1622,9 +2228,9 @@ class testDashboardWidgetCommunication extends testWidgetCommunication {
 				[
 					'page' => 'Maps page',
 					'broadcaster' => 'Navigation tree map broadcaster',
-					'select_element' => self::SUBMAP_NAME,
+					'select_element' => self::MAP_NAME,
 					'expected' => [
-						'Map listener' => [self::FIRST_HOSTGROUP_NAME, self::THIRD_HOST_NAME]
+						'Map listener' => [self::SUBMAP_NAME]
 					]
 				]
 			]
@@ -1653,10 +2259,126 @@ class testDashboardWidgetCommunication extends testWidgetCommunication {
 			$dashboard->selectPage($data['page']);
 		}
 
-		$this->getWidgetElement($data['select_element'], $dashboard->getWidget($data['broadcaster']))->click();
-		$dashboard->waitUntilReady();
+		$broadcaster = $dashboard->getWidget($data['broadcaster']);
 
-		$this->closeOpenedPopup();
+		/**
+		 * If nothing should be selected on the widget, check that correct element is selected automatically on the
+		 * broadcaster in case if it has at least one listener.
+		 * If that's not the case, select an element on the widget.
+		 */
+		if (CTestArrayHelper::get($data, 'autoselected')) {
+			$broadcaster_type = $this->getWidgetType($broadcaster);
+
+			/**
+			 * Apart from geomap widget all broadcaster types have a certain class added to the element or its parent,
+			 * when this element is selected. So to check if the element is selected, a check that a certain class
+			 * is present on a certain page element is performed.
+			 */
+			if ($broadcaster_type !== 'geomap') {
+				switch ($broadcaster_type) {
+					case 'problemhosts':
+					case 'problemsbysv':
+					case 'tophosts':
+					case 'web':
+						$class = 'row-selected';
+						$selected_element = $this->getWidgetElement($data['autoselected'], $broadcaster);
+						break;
+
+					case 'map':
+						$class = 'selected';
+						$selected_element = $this->getWidgetElement($data['autoselected'], $broadcaster);
+						break;
+
+					case 'navtree':
+						$class = 'selected';
+						$selected_element = $broadcaster->query('xpath:.//a[text()='.
+								CXPathHelper::escapeQuotes($data['autoselected']).']/../../..'
+						)->one();
+						break;
+
+					case 'itemhistory':
+						$class = 'selected';
+						$selected_element = $broadcaster->query('xpath:.//td[text()='.
+								CXPathHelper::escapeQuotes($data['autoselected'].': Trapper item').']/..'
+						)->one();
+						break;
+
+					case 'hostnavigator':
+						$class = 'navigation-tree-node-is-selected';
+						$selected_element = $broadcaster->query('xpath:.//span[text()='.
+								CXPathHelper::escapeQuotes($data['autoselected']).']/../../..'
+						)->one();
+						break;
+
+					case 'itemnavigator':
+						$class = 'navigation-tree-node-is-selected';
+						$itemid = CDataHelper::get('WidgetCommunication.itemids')[$data['autoselected'].':trap.widget.communication'];
+						$selected_element = $broadcaster->query('xpath:.//div[@data-id='.$itemid.']')->one();
+						break;
+
+					case 'honeycomb':
+						$class = 'svg-honeycomb-cell-selected';
+
+						$selected_element = $broadcaster->query('xpath:.//div[text()='.
+								CXPathHelper::escapeQuotes($data['autoselected']).']/../../../..'
+						)->one();
+						break;
+				}
+
+				$this->assertTrue($selected_element->hasClass($class), 'Expected element is not selected by default.');
+			}
+			else {
+				/**
+				 * The only thing that differs between a selected host and a non selected host on a geomap widget is the
+				 * base64 format hash of the icon that represent this host. So to check if host is selected, the icon hash
+				 * is compared to an icon hash of a selected host with warning severity problem color.
+				 */
+				$base64_hash = 'data:image/svg+xml;base64,CgkJCQk8c3ZnIHdpZHRoPSIyNCIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwI'.
+					'DI0IDMyIiBmaWxsPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPgoJCQkJCTxwYXRoIGZpbGw9IiN'.
+					'jOWUzZmMiIGZpbGwtcnVsZT0iZXZlbm9kZCIgY2xpcC1ydWxlPSJldmVub2RkIiBkPSJNMTIgMzBDMTMuNjIgMzAgMjIgMTcuM'.
+					'jEyNCAyMiAxMS44QzIyIDYuMzg3NjEgMTcuNTIyOCAyIDEyIDJDNi40NzcxNSAyIDIgNi4zODc2MSAyIDExLjhDMiAxNy4yMTI'.
+					'0IDEwLjM4IDMwIDEyIDMwWk0xMiAxNkMxNC4yMDkxIDE2IDE2IDE0LjIwOTEgMTYgMTJDMTYgOS43OTA4NiAxNC4yMDkxIDggM'.
+					'TIgOEM5Ljc5MDg2IDggOCA5Ljc5MDg2IDggMTJDOCAxNC4yMDkxIDkuNzkwODYgMTYgMTIgMTZaIi8+CgkJCQkJPHBhdGggZml'.
+					'sbD0iI2NlZDdkYiIgZD0iTTIxLjUgMTEuOEMyMS41IDEzLjA1MDQgMjEuMDA5IDE0Ljc4ODggMjAuMjAzMyAxNi43MzU5QzE5L'.
+					'jQwMzggMTguNjY4MiAxOC4zMTc2IDIwLjc1MjMgMTcuMTc3NSAyMi42NzQ2QzE2LjAzNzEgMjQuNTk3MSAxNC44NTAxIDI2LjM'.
+					'0NTUgMTMuODUzNSAyNy42MDc1QzEzLjM1NDEgMjguMjQgMTIuOTExMyAyOC43MzkxIDEyLjU1MjggMjkuMDc1MkMxMi4zNzI5I'.
+					'DI5LjI0MzkgMTIuMjI1NiAyOS4zNjA3IDEyLjExMjMgMjkuNDMyM0MxMS45ODQ0IDI5LjUxMzEgMTEuOTU2MyAyOS41IDEyIDI'.
+					'5LjVWMzAuNUMxMi4yNDYyIDMwLjUgMTIuNDczNCAzMC4zODcgMTIuNjQ2MyAzMC4yNzc4QzEyLjgzMzcgMzAuMTU5NSAxMy4wM'.
+					'zI1IDI5Ljk5NjMgMTMuMjM2OCAyOS44MDQ3QzEzLjY0NjcgMjkuNDIwMyAxNC4xMjQ0IDI4Ljg3ODEgMTQuNjM4NCAyOC4yMjc'.
+					'yQzE1LjY2ODcgMjYuOTIyNSAxNi44ODA0IDI1LjEzNTYgMTguMDM3NiAyMy4xODQ3QzE5LjE5NDkgMjEuMjMzNSAyMC4zMDQ5I'.
+					'DE5LjEwNTkgMjEuMTI3MyAxNy4xMTgzQzIxLjk0MzYgMTUuMTQ1NSAyMi41IDEzLjI1NTggMjIuNSAxMS44SDIxLjVaTTEyIDI'.
+					'uNUMxNy4yNTYzIDIuNSAyMS41IDYuNjczMjMgMjEuNSAxMS44SDIyLjVDMjIuNSA2LjEwMTk5IDE3Ljc4OTQgMS41IDEyIDEuN'.
+					'VYyLjVaTTIuNSAxMS44QzIuNSA2LjY3MzIzIDYuNzQzNzIgMi41IDEyIDIuNVYxLjVDNi4yMTA1OCAxLjUgMS41IDYuMTAxOTk'.
+					'gMS41IDExLjhIMi41Wk0xMiAyOS41QzEyLjA0MzcgMjkuNSAxMi4wMTU2IDI5LjUxMzEgMTEuODg3NyAyOS40MzIzQzExLjc3N'.
+					'DQgMjkuMzYwNyAxMS42MjcxIDI5LjI0MzkgMTEuNDQ3MiAyOS4wNzUyQzExLjA4ODcgMjguNzM5MSAxMC42NDU5IDI4LjI0IDE'.
+					'wLjE0NjUgMjcuNjA3NUM5LjE0OTg4IDI2LjM0NTUgNy45NjI4NSAyNC41OTcxIDYuODIyNTMgMjIuNjc0NkM1LjY4MjM4IDIwL'.
+					'jc1MjMgNC41OTYxOCAxOC42NjgyIDMuNzk2NyAxNi43MzU5QzIuOTkxMDQgMTQuNzg4OCAyLjUgMTMuMDUwNCAyLjUgMTEuOEg'.
+					'xLjVDMS41IDEzLjI1NTggMi4wNTY0NSAxNS4xNDU1IDIuODcyNjcgMTcuMTE4M0MzLjY5NTA1IDE5LjEwNTkgNC44MDUwOSAyM'.
+					'S4yMzM1IDUuOTYyNDQgMjMuMTg0N0M3LjExOTYxIDI1LjEzNTYgOC4zMzEzMyAyNi45MjI1IDkuMzYxNjMgMjguMjI3MkM5Ljg'.
+					'3NTU5IDI4Ljg3ODEgMTAuMzUzMyAyOS40MjAzIDEwLjc2MzIgMjkuODA0N0MxMC45Njc1IDI5Ljk5NjMgMTEuMTY2MyAzMC4xN'.
+					'Tk1IDExLjM1MzcgMzAuMjc3OEMxMS41MjY2IDMwLjM4NyAxMS43NTM4IDMwLjUgMTIgMzAuNVYyOS41Wk0xNS41IDEyQzE1LjU'.
+					'gMTMuOTMzIDEzLjkzMyAxNS41IDEyIDE1LjVWMTYuNUMxNC40ODUzIDE2LjUgMTYuNSAxNC40ODUzIDE2LjUgMTJIMTUuNVpNM'.
+					'TIgOC41QzEzLjkzMyA4LjUgMTUuNSAxMC4wNjcgMTUuNSAxMkgxNi41QzE2LjUgOS41MTQ3MiAxNC40ODUzIDcuNSAxMiA3LjV'.
+					'WOC41Wk04LjUgMTJDOC41IDEwLjA2NyAxMC4wNjcgOC41IDEyIDguNVY3LjVDOS41MTQ3MiA3LjUgNy41IDkuNTE0NzIgNy41I'.
+					'DEySDguNVpNMTIgMTUuNUMxMC4wNjcgMTUuNSA4LjUgMTMuOTMzIDguNSAxMkg3LjVDNy41IDE0LjQ4NTMgOS41MTQ3MiAxNi4'.
+					'1IDEyIDE2LjVWMTUuNVoiLz4KCQkJCQk8cGF0aCBmaWxsPSIjRkZDODU5IiBmaWxsLXJ1bGU9ImV2ZW5vZGQiIGNsaXAtcnVsZ'.
+					'T0iZXZlbm9kZCIgZD0iTTEyIDI0QzEyLjk3MiAyNCAxOCAxNS43Nzk0IDE4IDEyLjNDMTggOC44MjA2MSAxNS4zMTM3IDYgMTI'.
+					'gNkM4LjY4NjI5IDYgNiA4LjgyMDYxIDYgMTIuM0M2IDE1Ljc3OTQgMTEuMDI4IDI0IDEyIDI0Wk0xMi4wMDAxIDE1LjA3NTVDM'.
+					'TMuNDIwMyAxNS4wNzU1IDE0LjU3MTYgMTMuODU2NSAxNC41NzE2IDEyLjM1MjhDMTQuNTcxNiAxMC44NDkxIDEzLjQyMDMgOS4'.
+					'2MzAxMSAxMi4wMDAxIDkuNjMwMTFDMTAuNTggOS42MzAxMSA5LjQyODcxIDEwLjg0OTEgOS40Mjg3MSAxMi4zNTI4QzkuNDI4N'.
+					'zEgMTMuODU2NSAxMC41OCAxNS4wNzU1IDEyLjAwMDEgMTUuMDc1NVoiLz4KCQkJCTwvc3ZnPg==';
+
+				$this->assertEquals($base64_hash, $this->getWidgetElement($data['autoselected'], $broadcaster)
+						->getAttribute('src')
+				);
+			}
+		}
+		else {
+			$this->getWidgetElement($data['select_element'], $broadcaster)->click();
+			$dashboard->waitUntilReady();
+
+			$this->closeOpenedPopup();
+		}
 
 		if (!array_key_exists('expected', $data)) {
 			$data['expected'] = self::DEFAULT_WIDGET_CONTENT[$data['page']];
@@ -1669,7 +2391,8 @@ class testDashboardWidgetCommunication extends testWidgetCommunication {
 		 * is selected.
 		 */
 		if ($data['page'] === 'Items page') {
-			$this->assertTrue($dashboard->getWidget($data['select_element'].': Trapper item')->isValid());
+			$host_in_name = (array_key_exists('autoselected', $data)) ? $data['autoselected'] : $data['select_element'];
+			$this->assertTrue($dashboard->getWidget($host_in_name.': Trapper item')->isValid());
 		}
 	}
 
@@ -1720,7 +2443,6 @@ class testDashboardWidgetCommunication extends testWidgetCommunication {
 					'broadcasters' => [
 						'Map mixed broadcaster' => self::SECOND_HOSTGROUP_NAME,
 						'Honeycomb mixed broadcaster' => self::SECOND_HOST_NAME
-
 					],
 					'expected' => [
 						'Both host and group from single broadcaster' => [
@@ -1739,7 +2461,6 @@ class testDashboardWidgetCommunication extends testWidgetCommunication {
 					'broadcasters' => [
 						'Map mixed broadcaster' => self::THIRD_HOSTGROUP_NAME,
 						'Honeycomb mixed broadcaster' => self::FIRST_HOST_NAME
-
 					],
 					'expected' => [
 						'Both host and group from single broadcaster' => [
