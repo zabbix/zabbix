@@ -285,7 +285,7 @@ int	housekeeper_process(int config_max_hk_delete)
 	zbx_db_result_t		result;
 	zbx_db_row_t		row;
 	zbx_vector_uint64_t	deleteids;
-	int			deleted = 0, haderror = 1;
+	int			deleted = 0, error_logged = 0;
 
 	zbx_vector_hk_housekeeper_t	ids[ZBX_HK_OBJECT_NUM];
 
@@ -316,11 +316,11 @@ int	housekeeper_process(int config_max_hk_delete)
 		{
 			zbx_vector_hk_housekeeper_append(&ids[hk.object], hk);
 		}
-		else if (0 == haderror) /* limit logging */
+		else if (0 == error_logged) /* limit logging */
 		{
 			THIS_SHOULD_NEVER_HAPPEN_MSG("invalid housekeeperid:" ZBX_FS_UI64 " object: %d",
 					hk.housekeeperid, hk.object);
-			haderror = 1;
+			error_logged = 1;
 		}
 	}
 	zbx_db_free_result(result);
