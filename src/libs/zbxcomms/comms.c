@@ -675,7 +675,7 @@ out:
  *             port        - [IN]                                             *
  *             timeout     - [IN]                                             *
  *             failover    - [IN] enable or disable DNS failover              *
- *             event       - [OUT] may be NULL for blocking connection,       *
+ *             events      - [OUT] may be NULL for blocking connection,       *
  *                                 otherwise informs caller to wait for       *
  *                                 POLLOUT, caller must wait in that case to  *
  *                                 to complete connection and check socket    *
