@@ -1143,7 +1143,6 @@ class CMediatype extends CApiService {
 			}
 		}
 
-		DB::delete('media_type_oauth', ['mediatypeid' => $mediatypeids]);
 		DB::delete('media_type', ['mediatypeid' => $mediatypeids]);
 
 		self::addAuditLog(CAudit::ACTION_DELETE, CAudit::RESOURCE_MEDIA_TYPE, $db_mediatypes);
