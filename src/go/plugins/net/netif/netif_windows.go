@@ -198,7 +198,7 @@ func (p *Plugin) getMacAddress(physAddr [32]byte, physAddrLen uint32) string {
 	return net.HardwareAddr(mac).String()
 }
 
-func (p *Plugin) getDevGet(regexExpr string) (devices []msgIfGet, err error) {
+func (p *Plugin) getDevGet(regexExpr string) (result netIfResult, err error) {
 	var table *win32.MIB_IF_TABLE2
 	var compiledRegex *regexp.Regexp
 
@@ -214,12 +214,17 @@ func (p *Plugin) getDevGet(regexExpr string) (devices []msgIfGet, err error) {
 			return
 		}
 	}
-	devices = make([]msgIfGet, 0, table.NumEntries)
+
+	result.Config = make([]ifConfigData, 0, table.NumEntries)
+	result.Values = make([]IfValuesData, 0, table.NumEntries)
+
 	rows := (*win32.RGMIB_IF_ROW2)(unsafe.Pointer(&table.Table[0]))[:table.NumEntries:table.NumEntries]
 
 	for i := range rows {
+		ifName := windows.UTF16ToString(rows[i].Description[:])
+
 		if compiledRegex != nil {
-			if !compiledRegex.MatchString(windows.UTF16ToString(rows[i].Description[:])) {
+			if !compiledRegex.MatchString(ifName) {
 				continue
 			}
 		}
@@ -231,12 +236,13 @@ func (p *Plugin) getDevGet(regexExpr string) (devices []msgIfGet, err error) {
 			operState = "up"
 		}
 
-		admstate := "down"
+		admStateVal := "down"
 		if rows[i].AdminStatus == 1 {
-			admstate = "up"
+			admStateVal = "up"
 		}
 
-		wmiQuery := fmt.Sprintf("select DisplayValue FROM MSFT_NetAdapterAdvancedPropertySettingData WHERE DisplayName = 'Speed & Duplex' AND Name = '%s'", windows.UTF16ToString(rows[i].Alias[:]))
+		ifAliasVal := windows.UTF16ToString(rows[i].Alias[:])
+		wmiQuery := fmt.Sprintf("select DisplayValue FROM MSFT_NetAdapterAdvancedPropertySettingData WHERE DisplayName = 'Speed & Duplex' AND Name = '%s'", ifAliasVal)
 		negotiationStatus := ""
 		value, wmiErr := wmi.QueryValue("root\\StandardCimv2", wmiQuery)
 
@@ -251,7 +257,7 @@ func (p *Plugin) getDevGet(regexExpr string) (devices []msgIfGet, err error) {
 			}
 		}
 
-		wmiQuery = fmt.Sprintf("select FullDuplex FROM MSFT_NetAdapter where Name ='%s'", windows.UTF16ToString(rows[i].Alias[:]))
+		wmiQuery = fmt.Sprintf("select FullDuplex FROM MSFT_NetAdapter where Name ='%s'", ifAliasVal)
 		duplexStatus := ""
 		value, wmiErr = wmi.QueryValue("root\\StandardCimv2", wmiQuery)
 
@@ -271,32 +277,48 @@ func (p *Plugin) getDevGet(regexExpr string) (devices []msgIfGet, err error) {
 			}
 		}
 
-		wmiQuery = fmt.Sprintf("select Speed FROM MSFT_NetAdapter where Name = '%s'", windows.UTF16ToString(rows[i].Alias[:]))
-
+		wmiQuery = fmt.Sprintf("select Speed FROM MSFT_NetAdapter where Name = '%s'", ifAliasVal)
 		var speedPtr *uint64
 		value, wmiErr = wmi.QueryValue("root\\StandardCimv2", wmiQuery)
 
 		if wmiErr == nil {
 			if s, ok := value.(uint64); ok {
-				speedPtr = &s
+				speedPtr = new(uint64)
+				*speedPtr = s
 			}
 		}
+
+		result.Config = append(result.Config, ifConfigData{
+			Ifname:      ifName,
+			Ifmac:       mac,
+			IfAdmState:  &admStateVal,
+			IfOperState: &operState,
+		})
 
 		ifTypeVal := uint64(rows[i].Type)
 		ifType := &ifTypeVal
 
 		carrierVal := uint64(rows[i].InterfaceAndOperStatusFlags & 1)
+		result.Values = append(result.Values, IfValuesData{
+			Ifname: ifName,
+			Ifmac:  mac,
+			Iftype: ifType,
+			In: IfStatistics{
+				Ifbytes:   rows[i].InOctets,
+				Ifpackets: rows[i].InUcastPkts + rows[i].InNUcastPkts,
+				Iferrors:  rows[i].InErrors,
+				Ifdropped: rows[i].InDiscards + rows[i].InUnknownProtos,
+			},
 
-		devices = append(devices, msgIfGet{
-			Ifname:        windows.UTF16ToString(rows[i].Description[:]),
-			Ifmac:         mac,
-			Iftype:        ifType,
-			Ifinoctets:    &rows[i].InOctets,
-			Ifoutoctets:   &rows[i].OutOctets,
-			Ifoperstatus:  &operState,
-			Ifadmstate:    &admstate,
+			Out: IfStatistics{
+				Ifbytes:   rows[i].OutOctets,
+				Ifpackets: rows[i].OutUcastPkts + rows[i].OutNUcastPkts,
+				Iferrors:  rows[i].OutErrors,
+				Ifdropped: rows[i].OutDiscards,
+			},
+
 			Ifcarrier:     &carrierVal,
-			Ifalias:       windows.UTF16ToString(rows[i].Alias[:]),
+			Ifalias:       ifAliasVal,
 			Ifnegotiation: negotiationStatus,
 			Ifduplex:      duplexStatus,
 			Ifspeed:       speedPtr,
@@ -400,12 +422,13 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 		if len(params) > 0 {
 			expression = params[0]
 		}
-		var devices []msgIfGet
-		if devices, err = p.getDevGet(expression); err != nil {
+
+		var res netIfResult
+		if res, err = p.getDevGet(expression); err != nil {
 			return
 		}
 		var b []byte
-		if b, err = json.Marshal(devices); err != nil {
+		if b, err = json.Marshal(res); err != nil {
 			return
 		}
 		return string(b), nil

@@ -45,22 +45,40 @@ type msgIfDiscovery struct {
 	Ifguid *string `json:"{#IFGUID},omitempty"`
 }
 
-type msgIfGet struct {
-	Ifname        string  `json:"name"`
-	Ifadmstate    *string `json:"administrative_state,omitempty"`
-	Ifoperstatus  *string `json:"operational_state,omitempty"`
-	Ifalias       string  `json:"alias"`
-	Ifoutoctets   *uint64 `json:"sent"`
-	Ifinoctets    *uint64 `json:"received"`
-	Ifmac         string  `json:"mac,omitempty"`
-	Iftype        *uint64 `json:"type,omitempty"`
-	Ifcarrier     *uint64 `json:"carrier,omitempty"`
-	Ifnegotiation string  `json:"negotiation,omitempty"`
-	Ifduplex      string  `json:"duplex,omitempty"`
-	Ifspeed       *uint64 `json:"speed,omitempty"`
-	Ifslevel      *int64  `json:"signal_level,omitempty"`
-	Iflquality    *int64  `json:"link_quality,omitempty"`
-	Ifnoicelevel  *int64  `json:"noise_level,omitempty"`
-	Ifssid        *string `json:"ssid,omitempty"`
-	Ifbitrate     *int64  `json:"bitrate,omitempty"`
+type ifConfigData struct {
+	Ifname      string  `json:"name"`
+	Ifmac       string  `json:"mac,omitempty"`
+	IfAdmState  *string `json:"administrative_state"`
+	IfOperState *string `json:"operational_state"`
+}
+
+type IfStatistics struct {
+	Ifbytes   uint64 `json:"bytes"`
+	Ifpackets uint64 `json:"packets"`
+	Iferrors  uint64 `json:"errors"`
+	Ifdropped uint64 `json:"dropped"`
+}
+
+type IfValuesData struct {
+	Ifname  string `json:"name"`
+	Ifalias string `json:"alias"`
+
+	In            IfStatistics `json:"in"`
+	Out           IfStatistics `json:"out"`
+	Ifmac         string       `json:"mac,omitempty"`
+	Iftype        *uint64      `json:"type,omitempty"`
+	Ifcarrier     *uint64      `json:"carrier,omitempty"`
+	Ifnegotiation string       `json:"negotiation,omitempty"`
+	Ifduplex      string       `json:"duplex,omitempty"`
+	Ifspeed       *uint64      `json:"speed,omitempty"`
+	Ifslevel      *int64       `json:"signal_level,omitempty"`
+	Iflquality    *int64       `json:"link_quality,omitempty"`
+	Ifnoiselevel  *int64       `json:"noise_level,omitempty"`
+	Ifssid        *string      `json:"ssid,omitempty"`
+	Ifbitrate     *int64       `json:"bitrate,omitempty"`
+}
+
+type netIfResult struct {
+	Config []ifConfigData `json:"config"`
+	Values []IfValuesData `json:"values"`
 }
