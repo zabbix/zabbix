@@ -164,7 +164,7 @@ class testLanguage extends CWebTest {
 
 		// Yellow info icon check.
 		$this->query('xpath://button['.CXPathHelper::fromClass('zi-i-warning').']')->one()->click();
-		$this->assertEquals($data['info'], $this->query('class:hintbox-wrap')->one()->getText());
+		$this->assertEquals($data['info'], $this->query('class:hintbox-wrap')->waitUntilVisible()->one()->getText());
 
 		// Change user language to different from System.
 		$form->fill($data['field']);
