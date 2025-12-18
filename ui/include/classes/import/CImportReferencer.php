@@ -1303,6 +1303,17 @@ class CImportReferencer {
 	}
 
 	/**
+	 * Add global dashboard names that need association with a database dashboard ID.
+	 *
+	 * Will associate dashboard pages and widgets with the related database object IDs.
+	 *
+	 * @param array $dashboards
+	 */
+	public function addDashboards(array $dashboards): void {
+		$this->dashboards = $dashboards;
+	}
+
+	/**
 	 * Select template group ids for previously added group names.
 	 */
 	protected function selectTemplateGroups(): void {
