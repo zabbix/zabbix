@@ -555,7 +555,7 @@ static void	sock_state_cb(void *data, int s, int read, int write)
 		event_free(fd_event_local.event);
 		goto out;
 	}
-	
+
 	zbx_hashset_insert(&poller_config->fd_events, &fd_event_local, sizeof(fd_event_local));
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
