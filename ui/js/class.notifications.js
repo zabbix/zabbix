@@ -413,7 +413,13 @@ ZBX_Notifications.prototype.handleTabFocusIn = function() {
  * Close the notification box.
  */
 ZBX_Notifications.prototype.handleCloseClicked = function() {
-	const data = {ids: this.getEventIds()};
+	if (this._closing) return;
+
+	const ids = this.getEventIds();
+	if (!ids.length) return;
+
+	this._closing = true;
+	const data = { ids };
 
 	data[CSRF_TOKEN_NAME] = this._csrf_token;
 
@@ -431,6 +437,7 @@ ZBX_Notifications.prototype.handleCloseClicked = function() {
 
 			this.alarm.reset();
 			this.pushUpdates();
+			this._closing = false;
 		})
 		.catch((exception) => {
 			if (typeof exception === 'object' && 'error' in exception) {
