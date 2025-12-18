@@ -97,7 +97,7 @@ class testLanguage extends CWebTest {
 
 		// Red info icon check.
 		$this->query('xpath://a[@class="icon-info status-red"]')->waitUntilVisible()->one()->click();
-		$this->assertEquals($data['info'], $this->query('class:red')->one()->getText());
+		$this->assertEquals($data['info'], $this->query('class:red')->waitUntilVisible()->one()->getText());
 
 		// After logout, warning message and login menu has system language.
 		$this->page->logout();
@@ -168,7 +168,7 @@ class testLanguage extends CWebTest {
 		$form = $this->query('name:user_form')->one()->asForm();
 
 		// Red info icon check.
-		$this->query('xpath://a[@class="icon-info status-red"]')->one()->click();
+		$this->query('xpath://a[@class="icon-info status-red"]')->waitUntilVisible()->one()->click();
 		$this->assertEquals($data['info'], $this->query('class:red')->waitUntilVisible()->one()->getText());
 
 		// Change user language to different from System.
