@@ -285,11 +285,17 @@ int	housekeeper_process(int config_max_hk_delete)
 	zbx_db_result_t		result;
 	zbx_db_row_t		row;
 	zbx_vector_uint64_t	deleteids;
-	int			deleted = 0;
+	int			deleted = 0, haderror = 1;
 
 	zbx_vector_hk_housekeeper_t	ids[ZBX_HK_OBJECT_NUM];
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	if (NULL == (result = zbx_db_select_n("select housekeeperid,object,objectid from housekeeper",
+			ZBX_HK_OBJECT_NUM * config_max_hk_delete)))
+	{
+		return deleted;
+	}
 
 	zbx_vector_uint64_create(&deleteids);
 
@@ -297,9 +303,6 @@ int	housekeeper_process(int config_max_hk_delete)
 	{
 		zbx_vector_hk_housekeeper_create(&ids[i]);
 	}
-
-	result = zbx_db_select("select housekeeperid,object,objectid"
-			" from housekeeper");
 
 	while (NULL != (row = zbx_db_fetch(result)))
 	{
@@ -309,10 +312,16 @@ int	housekeeper_process(int config_max_hk_delete)
 		hk.object = atoi(row[1]);
 		ZBX_STR2UINT64(hk.objectid, row[2]);
 
-		if (ZBX_HK_OBJECT_NUM > hk.object)
+		if (ZBX_HK_OBJECT_NUM > hk.object && 0 <= hk.object)
+		{
 			zbx_vector_hk_housekeeper_append(&ids[hk.object], hk);
-		else
-			THIS_SHOULD_NEVER_HAPPEN;
+		}
+		else if (0 == haderror) /* limit logging */
+		{
+			THIS_SHOULD_NEVER_HAPPEN_MSG("invalid housekeeperid:" ZBX_FS_UI64 " object: %d",
+					hk.housekeeperid, hk.object);
+			haderror = 1;
+		}
 	}
 	zbx_db_free_result(result);
 
