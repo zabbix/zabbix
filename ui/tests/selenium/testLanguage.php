@@ -92,7 +92,7 @@ class testLanguage extends CWebTest {
 
 		// Yellow info icon check.
 		$this->query('xpath://button['.CXPathHelper::fromClass('zi-i-warning').']')->waitUntilVisible()->one()->click();
-		$this->assertEquals($data['info'], $this->query('class:hintbox-wrap')->one()->getText());
+		$this->assertEquals($data['info'], $this->query('class:hintbox-wrap')->waitUntilVisible()->one()->getText());
 
 		// After logout, warning message and login menu has system language.
 		$this->page->logout();
@@ -163,7 +163,7 @@ class testLanguage extends CWebTest {
 		$form = $this->query('id:userprofile-form')->one()->asForm();
 
 		// Yellow info icon check.
-		$this->query('xpath://button['.CXPathHelper::fromClass('zi-i-warning').']')->one()->click();
+		$this->query('xpath://button['.CXPathHelper::fromClass('zi-i-warning').']')->waitUntilVisible()->one()->click();
 		$this->assertEquals($data['info'], $this->query('class:hintbox-wrap')->waitUntilVisible()->one()->getText());
 
 		// Change user language to different from System.
