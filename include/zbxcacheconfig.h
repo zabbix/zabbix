@@ -916,8 +916,6 @@ void	zbx_free_configuration_cache(void);
 void	zbx_dc_config_get_triggers_by_triggerids(zbx_dc_trigger_t *triggers, const zbx_uint64_t *triggerids,
 		int *errcode, size_t num);
 void	zbx_dc_config_clean_items(zbx_dc_item_t *items, int *errcodes, size_t num);
-void	zbx_dc_config_clean_agent_items(zbx_dc_agent_item_t *items, int *errcodes, size_t num);
-void	zbx_dc_config_clean_snmp_items(zbx_dc_snmp_item_t *items, int *errcodes, size_t num);
 void	zbx_dc_config_clean_httpagent_items(zbx_dc_httpagent_item_t *items, int *errcodes, size_t num);
 int	zbx_dc_get_host_by_hostid(zbx_dc_host_t *host, zbx_uint64_t hostid);
 

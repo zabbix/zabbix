@@ -221,11 +221,9 @@ void	zbx_poller_item_free(zbx_poller_item_t *poller_item)
 	{
 		case ZBX_POLLER_TYPE_AGENT:
 			zbx_clean_agent_items(poller_item->items.agent_items, poller_item->num, poller_item->results);
-			zbx_dc_config_clean_agent_items(poller_item->items.agent_items, NULL, (size_t)poller_item->num);
 			break;
 		case ZBX_POLLER_TYPE_SNMP:
 			zbx_clean_snmp_items(poller_item->items.snmp_items, poller_item->num, poller_item->results);
-			zbx_dc_config_clean_snmp_items(poller_item->items.snmp_items, NULL, (size_t)poller_item->num);
 			break;
 		case ZBX_POLLER_TYPE_HTTPAGENT:
 			zbx_clean_httpagent_items(poller_item->items.httpagent_items, poller_item->num,

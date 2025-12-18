@@ -9918,28 +9918,6 @@ void	zbx_dc_config_clean_items(zbx_dc_item_t *items, int *errcodes, size_t num)
 	}
 }
 
-void	zbx_dc_config_clean_agent_items(zbx_dc_agent_item_t *items, int *errcodes, size_t num)
-{
-	size_t	i;
-
-	for (i = 0; i < num; i++)
-	{
-		if (NULL != errcodes && SUCCEED != errcodes[i])
-			continue;
-	}
-}
-
-void	zbx_dc_config_clean_snmp_items(zbx_dc_snmp_item_t *items, int *errcodes, size_t num)
-{
-	size_t	i;
-
-	for (i = 0; i < num; i++)
-	{
-		if (NULL != errcodes && SUCCEED != errcodes[i])
-			continue;
-	}
-}
-
 void	zbx_dc_config_clean_httpagent_items(zbx_dc_httpagent_item_t *items, int *errcodes, size_t num)
 {
 	size_t	i;
