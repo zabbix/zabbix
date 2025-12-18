@@ -87,7 +87,7 @@
 				e.preventDefault();
 
 				const search_params = new URLSearchParams(new FormData(e.target));
-				const url = new URL('zabbix.php', window.location.origin);
+				const url = new URL('', window.location.origin + window.location.pathname);
 
 				url.searchParams.set('filter_set', '1');
 
@@ -193,7 +193,7 @@
 		}
 
 		getPageUrl() {
-			const url = new URL('zabbix.php', window.location.origin);
+			const url = new URL('', window.location.origin + window.location.pathname);
 
 			url.searchParams.set('action', 'item.list');
 			url.searchParams.set('context', this.context);

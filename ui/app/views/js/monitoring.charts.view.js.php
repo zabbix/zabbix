@@ -66,7 +66,7 @@
 			this._filter_form.addEventListener('submit', e => {
 				e.preventDefault();
 				const search_params = new URLSearchParams(new FormData(e.target));
-				const url = new URL('zabbix.php', window.location.origin);
+				const url = new URL('', window.location.origin + window.location.pathname);
 				url.searchParams.set('filter_set', '1');
 
 				search_params.forEach((filter_value, filter_key) => {
@@ -129,7 +129,7 @@
 		},
 
 		getPageUrl() {
-			const url = new URL('zabbix.php', window.location.origin);
+			const url = new URL('', window.location.origin + window.location.pathname);
 
 			url.searchParams.set('action', 'charts.view');
 			this._init_filter_values.forEach(filter => url.searchParams.append(filter.key, filter.value));
