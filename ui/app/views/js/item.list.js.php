@@ -85,8 +85,10 @@
 
 			this.filter_form.addEventListener('submit', e => {
 				e.preventDefault();
+
 				const search_params = new URLSearchParams(new FormData(e.target));
 				const url = new URL('zabbix.php', window.location.origin);
+
 				url.searchParams.set('filter_set', '1');
 
 				search_params.forEach((filter_value, filter_key) => {
@@ -101,9 +103,14 @@
 			this.form.querySelectorAll('.list-table thead th a').forEach(link => {
 				link.addEventListener('click', (e) => {
 					e.preventDefault();
+
 					const search_params = new URLSearchParams(e.currentTarget.href);
-					this.#loadPageWithFilters(this.getPageUrl(),
-						{subfilter_set: 1, sort: search_params.get('sort'), sortorder: search_params.get('sortorder')});
+
+					this.#loadPageWithFilters(this.getPageUrl(), {
+						subfilter_set: 1,
+						sort: search_params.get('sort'),
+						sortorder: search_params.get('sortorder')
+					});
 				});
 			});
 
@@ -178,6 +185,7 @@
 						filtered.push({key: filter_key, value: filter_values[filter_key]});
 					}
 				}
+
 				return filtered;
 			}, []);
 
@@ -186,12 +194,11 @@
 
 		getPageUrl() {
 			const url = new URL('zabbix.php', window.location.origin);
+
 			url.searchParams.set('action', 'item.list');
 			url.searchParams.set('context', this.context);
 
-			this._init_filter_values.forEach(filter => {
-				url.searchParams.append(filter.key, filter.value);
-			});
+			this._init_filter_values.forEach(filter => url.searchParams.append(filter.key, filter.value));
 
 			return url;
 		}
@@ -259,13 +266,14 @@
 			overlay.$dialogue[0].addEventListener('dialogue.submit', this.elementSuccess.bind(this), {once: true});
 		}
 
-		#loadPageWithFilters (url, overwriteFilters = {}) {
+		#loadPageWithFilters(url, overwriteFilters = {}) {
 			const clear_keys = ['filter_set', 'filter_rst', 'page', 'subfilter_set'];
+
 			clear_keys.forEach(key => url.searchParams.delete(key));
 
-			Object.keys(overwriteFilters).forEach(filter_key => {
-				url.searchParams.set(filter_key, overwriteFilters[filter_key]);
-			});
+			Object.keys(overwriteFilters).forEach(
+				filter_key => url.searchParams.set(filter_key, overwriteFilters[filter_key])
+			);
 
 			window.location.href = url.href;
 		}
