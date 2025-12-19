@@ -98,7 +98,7 @@ class testCalculatedExpression extends CIntegrationTest {
 		$this->assertEquals(1, count($response['result']['itemids']));
 		self::$itemIds = array_merge(self::$itemIds, $response['result']['itemids']);
 
-		return  $response['result']['itemids'];
+		return $response['result']['itemids'];
 	}
 
 	// create calculated item with given formula and return its itemid
@@ -413,7 +413,8 @@ class testCalculatedExpression extends CIntegrationTest {
 		self::$itemIds = array_merge(self::$itemIds, [$itemid]);
 
 		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
-		$this->sendIncrementingSequence(5, self::TRAPPER_ITEM_KEY . self::$iterator); // sum(1,2,3,4,5)-avg(1,2,3,4,5) = 15-3=12
+		// sum(1,2,3,4,5)-avg(1,2,3,4,5) = 15-3=12
+		$this->sendIncrementingSequence(5, self::TRAPPER_ITEM_KEY . self::$iterator);
 
 		$history = $this->historyGet($trapId);
 		$values = $this->extractHistoryValues($history);
@@ -547,8 +548,8 @@ class testCalculatedExpression extends CIntegrationTest {
 		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_KEY . '.bucket[0.1]', 10);
 		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_KEY . '.bucket[0.5]', 25);
 		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_KEY . '.bucket[1]', 30);
-		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_KEY . '.bucket[2]',  32);
-		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_KEY . '.bucket[Inf]',  35);
+		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_KEY . '.bucket[2]', 32);
+		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_KEY . '.bucket[Inf]', 35);
 
 		$history = $this->historyGet($itemids);
 		$values = $this->extractHistoryValues($history);
@@ -579,7 +580,7 @@ class testCalculatedExpression extends CIntegrationTest {
 	{
 		$itemids = [];
 		// create several trapper items simulating disk usage for different filesystems
-		foreach ( ['fs1', 'fs2', 'fs3', 'fs4'] as $i => $fs) {
+		foreach( ['fs1', 'fs2', 'fs3', 'fs4'] as $i => $fs) {
 			$response = $this->call('item.create', [
 				'hostid'	=> self::$hostid,
 				'name'		=> "disk.pused[$fs]",
@@ -634,7 +635,8 @@ class testCalculatedExpression extends CIntegrationTest {
 			$values
 		);
 
-		// We have 4 items: [90, 96, 97, 80]. The formula counts how many have last value greater than 95. So expected result is 2.
+		/* We have 4 items: [90, 96, 97, 80]. The formula counts how many have last value greater than 95. */
+		/* So expected result is 2. */
 		$this->assertEquals('2', $this->getItemLastValue($calcItemId));
 	}
 
