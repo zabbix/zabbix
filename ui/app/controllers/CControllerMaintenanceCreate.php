@@ -95,7 +95,10 @@ class CControllerMaintenanceCreate extends CControllerMaintenanceUpdateGeneral {
 					'operator' => ['db maintenance_tag.operator',
 						'in' => [MAINTENANCE_TAG_OPERATOR_LIKE, MAINTENANCE_TAG_OPERATOR_EQUAL]],
 					'value' => ['db maintenance_tag.value'],
-					'tag' => ['db maintenance_tag.tag', 'required', 'not_empty', 'when' => ['value', 'not_empty']]
+					'tag' => [
+						['db maintenance_tag.tag'],
+						['db maintenance_tag.tag', 'required', 'not_empty', 'when' => ['value', 'not_empty']]
+					]
 				],
 				'when' => ['maintenance_type', 'in' => [MAINTENANCE_TYPE_NORMAL]]
 			],
