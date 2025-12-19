@@ -415,6 +415,19 @@ static int	DBpatch_7050029(void)
 
 static int	DBpatch_7050030(void)
 {
+#ifdef HAVE_POSTGRESQL
+	if (FAIL == zbx_db_index_exists("housekeeper", "housekeeper_pkey1"))
+		return SUCCEED;
+
+	return DBrename_index("housekeeper", "housekeeper_pkey1", "housekeeper_pkey",
+			"housekeeperid", 1);
+#else
+	return SUCCEED;
+#endif
+}
+
+static int	DBpatch_7050031(void)
+{
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
@@ -440,37 +453,37 @@ static int	DBpatch_7050030(void)
 	return SUCCEED;
 }
 
-static int	DBpatch_7050031(void)
+static int	DBpatch_7050032(void)
 {
 	return DBdrop_table("housekeeper_old");
 }
 
-static int	DBpatch_7050032(void)
+static int	DBpatch_7050033(void)
 {
 	return DBcreate_housekeeper_trigger("items", "itemid");
 }
 
-static int	DBpatch_7050033(void)
+static int	DBpatch_7050034(void)
 {
 	return DBcreate_housekeeper_trigger("triggers", "triggerid");
 }
 
-static int	DBpatch_7050034(void)
+static int	DBpatch_7050035(void)
 {
 	return DBcreate_housekeeper_trigger("services", "serviceid");
 }
 
-static int	DBpatch_7050035(void)
+static int	DBpatch_7050036(void)
 {
 	return DBcreate_housekeeper_trigger("dhosts", "dhostid");
 }
 
-static int	DBpatch_7050036(void)
+static int	DBpatch_7050037(void)
 {
 	return DBcreate_housekeeper_trigger("dservices", "dserviceid");
 }
 
-static int	DBpatch_7050037(void)
+static int	DBpatch_7050038(void)
 {
 	if (ZBX_DB_OK > zbx_db_execute("delete from ids where table_name='housekeeper'"))
 		return FAIL;
@@ -522,5 +535,6 @@ DBPATCH_ADD(7050034, 0, 1)
 DBPATCH_ADD(7050035, 0, 1)
 DBPATCH_ADD(7050036, 0, 1)
 DBPATCH_ADD(7050037, 0, 1)
+DBPATCH_ADD(7050038, 0, 1)
 
 DBPATCH_END()
