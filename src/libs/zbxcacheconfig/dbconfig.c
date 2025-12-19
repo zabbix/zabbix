@@ -9813,7 +9813,6 @@ static void	DCget_snmp_item(zbx_dc_snmp_item_t *dst_item, const ZBX_DC_ITEM *src
 static void	DCget_httpagent_item(zbx_dc_httpagent_item_t *dst_item, const ZBX_DC_ITEM *src_item)
 {
 	const ZBX_DC_INTERFACE		*dc_interface;
-	int				i;
 
 	dst_item->preprocessing = zbx_dc_item_requires_preprocessing(src_item);
 	dst_item->value_type = src_item->value_type;
