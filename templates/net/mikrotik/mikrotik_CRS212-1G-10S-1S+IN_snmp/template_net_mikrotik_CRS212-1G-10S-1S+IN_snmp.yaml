@@ -29,7 +29,7 @@ zabbix_export:
         Smart Switch, 1x Gigabit LAN, 10x SFP cages, 1x SFP+ cage, LCD, 400MHz CPU, 64MB RAM, Metal desktop case, RouterOS L5
       vendor:
         name: Zabbix
-        version: 8.0-3
+        version: 8.0-4
       groups:
         - name: 'Templates/Network devices'
       items:
@@ -1831,12 +1831,13 @@ zabbix_export:
       macros:
         - macro: '{$CPU.UTIL.CRIT}'
           value: '90'
+          description: 'The critical threshold of CPU utilization expressed in %.'
           config:
             type: TEXT
             priority: '3'
             section_name: Thresholds
             label: 'Threshold for CPU utilization (critical)'
-            description: 'In the range from 0 to 100 inclusive.'
+            description: 'The critical threshold of CPU utilization expressed in %. In the range from 0 to 100 inclusive.'
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
         - macro: '{$ICMP_LOSS_WARN}'
           value: '20'
@@ -1949,12 +1950,13 @@ zabbix_export:
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
         - macro: '{$MEMORY.UTIL.MAX}'
           value: '90'
+          description: 'Threshold for maximum memory utilization in %.'
           config:
             type: TEXT
             priority: '9'
             section_name: Thresholds
             label: 'Threshold for memory utilization'
-            description: 'In the range from 0 to 100 inclusive.'
+            description: 'Threshold for maximum memory utilization in %. In the range from 0 to 100 inclusive.'
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
         - macro: '{$NET.IF.IFADMINSTATUS.MATCHES}'
           value: '^.*'
@@ -2075,61 +2077,73 @@ zabbix_export:
             description: 'Time interval for the SNMP availability trigger.'
         - macro: '{$TEMP_CRIT}'
           value: '60'
+          description: 'Critical threshold for temperature.'
           config:
             type: TEXT
             priority: '4'
             section_name: Thresholds
             label: 'Threshold for temperature (critical)'
+            description: 'Critical threshold for temperature.'
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
         - macro: '{$TEMP_CRIT:"CPU"}'
           value: '75'
+          description: 'Critical threshold for CPU temperature.'
           config:
             type: TEXT
             priority: '7'
             section_name: Thresholds
             label: 'Threshold for CPU temperature (critical)'
+            description: 'Critical threshold for CPU temperature.'
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
         - macro: '{$TEMP_CRIT_LOW}'
           value: '5'
+          description: 'Critical threshold for low temperature.'
           config:
             type: TEXT
             priority: '5'
             section_name: Thresholds
             label: 'Threshold for low temperature (critical)'
+            description: 'Critical threshold for low temperature.'
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
         - macro: '{$TEMP_WARN}'
           value: '50'
+          description: 'Warning threshold for temperature.'
           config:
             type: TEXT
             priority: '6'
             section_name: Thresholds
             label: 'Threshold for temperature (warning)'
+            description: 'Warning threshold for temperature.'
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
         - macro: '{$TEMP_WARN:"CPU"}'
           value: '70'
+          description: 'Warning threshold for CPU temperature.'
           config:
             type: TEXT
             priority: '8'
             section_name: Thresholds
             label: 'Threshold for CPU temperature (warning)'
+            description: 'Warning threshold for CPU temperature.'
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
         - macro: '{$VFS.FS.PUSED.MAX.CRIT}'
           value: '90'
+          description: 'The critical threshold of filesystem utilization.'
           config:
             type: TEXT
             priority: '1'
             section_name: Thresholds
             label: 'Threshold for filesystem utilization (critical)'
-            description: 'In the range from 0 to 100 inclusive.'
+            description: 'The critical threshold of filesystem utilization. In the range from 0 to 100 inclusive.'
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
         - macro: '{$VFS.FS.PUSED.MAX.WARN}'
           value: '80'
+          description: 'The warning threshold of filesystem utilization.'
           config:
             type: TEXT
             priority: '2'
             section_name: Thresholds
             label: 'Threshold for filesystem utilization (warning)'
-            description: 'In the range from 0 to 100 inclusive.'
+            description: 'The warning threshold of filesystem utilization. In the range from 0 to 100 inclusive.'
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
       dashboards:
         - uuid: acd7bf00fdaf47fd8d167aed76a7c63a

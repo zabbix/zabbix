@@ -101,8 +101,14 @@ class CControllerProxyCreate extends CController {
 					'when' => [['tls_connect', 'in' => [HOST_ENCRYPTION_PSK]], ['update_psk', true]]
 				]
 			],
-			'tls_issuer' => ['db proxy.tls_issuer', 'when' => ['tls_connect', 'in' => [HOST_ENCRYPTION_CERTIFICATE]]],
-			'tls_subject' => ['db proxy.tls_subject', 'when' => ['tls_connect', 'in' => [HOST_ENCRYPTION_CERTIFICATE]]],
+			'tls_issuer' => [
+				['db proxy.tls_issuer', 'when' => ['tls_connect', 'in' => [HOST_ENCRYPTION_CERTIFICATE]]],
+				['db proxy.tls_issuer', 'when' => ['tls_accept_certificate', true]]
+			],
+			'tls_subject' => [
+				['db proxy.tls_subject', 'when' => ['tls_connect', 'in' => [HOST_ENCRYPTION_CERTIFICATE]]],
+				['db proxy.tls_subject', 'when' => ['tls_accept_certificate', true]]
+			],
 			'custom_timeouts' => ['db proxy.custom_timeouts',
 				'in' => [ZBX_PROXY_CUSTOM_TIMEOUTS_DISABLED, ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED]
 			],

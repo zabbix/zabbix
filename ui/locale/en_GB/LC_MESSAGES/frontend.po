@@ -1292,6 +1292,10 @@ msgstr ""
 msgid "Aggregate"
 msgstr ""
 
+#: widgets/topitems/views/column.edit.php:283
+msgid "Aggregate columns"
+msgstr ""
+
 #: app/views/popup.triggerexpr.php:126
 msgid "Aggregate functions"
 msgstr ""
@@ -1308,6 +1312,12 @@ msgstr ""
 #: widgets/svggraph/includes/CWidgetFieldDataSetView.php:384
 #: widgets/tophosts/views/column.edit.php:142
 msgid "Aggregation function"
+msgstr ""
+
+#: widgets/item/views/widget.edit.php:85 widgets/item/views/widget.edit.php:90
+#: widgets/tophosts/views/column.edit.php:330
+#: widgets/topitems/views/column.edit.php:256
+msgid "Aggregation function does not affect the sparkline."
 msgstr ""
 
 #: widgets/svggraph/includes/CWidgetFieldDataSetView.php:406
@@ -5193,9 +5203,17 @@ msgstr "Colour interpolation"
 msgid "Colors"
 msgstr "Colours"
 
+#: widgets/topitems/views/column.edit.php:293
+msgid "Column aggregation function"
+msgstr ""
+
 #: widgets/graphprototype/includes/WidgetForm.php:82
 #: widgets/tophosts/includes/WidgetForm.php:140
 msgid "Columns"
+msgstr ""
+
+#: widgets/topitems/views/column.edit.php:313
+msgid "Combined column name"
 msgstr ""
 
 #: app/views/js/administration.regex.edit.js.php:66

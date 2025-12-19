@@ -25,7 +25,7 @@ require_once __DIR__.'/../../include/helpers/CDataHelper.php';
  *
  * @onBefore prepareData
  *
- * @dataSource DynamicItemWidgets
+ * @dataSource DynamicItemWidgets, MonitoringOverview
  */
 class testDashboardTriggerOverviewWidget extends CWebTest {
 
