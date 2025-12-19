@@ -1051,35 +1051,13 @@ class CFormValidator {
 
 		$error = '';
 
-		[$class_name, $class_options, $more_options] = $rules['use'] + [1 => null, 2 => []];
+		$class = $rules['use'][0];
 
-		switch ($class_name) {
-			case 'CRegexValidator':
-				$class_options = $class_options ?: [
-					'messageInvalid' => _('invalid regular expression'),
-					'messageRegex' => _('invalid regular expression')
-				];
-				break;
+		if (is_subclass_of($class, CParser::class)) {
+			self::validateUseCParser($rules['use'], $class, $value, $error);
 		}
-
-		$instance = $class_options
-			? new $class_name($class_options)
-			: new $class_name();
-
-		if ($instance instanceof CParser) {
-			if (in_array($instance->parse($value), [CParser::PARSE_FAIL, CParser::PARSE_SUCCESS_CONT, false], true)) {
-				$error = $instance->getError();
-
-				// Some parsers may return empty string as error.
-				if ($error === '') {
-					$error = _('Invalid string.');
-				}
-			}
-		}
-		elseif ($instance instanceof CValidator) {
-			if ($instance->validate($value) === false) {
-				$error = $instance->getError() ?? _('Invalid string.');
-			}
+		elseif (is_subclass_of($class, CValidator::class)) {
+			self::validateUseCValidator($rules['use'], $class, $value, $error);
 		}
 		else {
 			throw new Exception('Method not found', -32601);
@@ -1094,31 +1072,71 @@ class CFormValidator {
 		}
 		$error = ucfirst($error);
 
-		// Parser specific checks not supported by parser itself.
-		if ($error === '') {
-			if ($instance instanceof CAbsoluteTimeParser) {
-				if (array_key_exists('min', $more_options)
-						&& $instance->getDateTime(true)->getTimestamp() < $more_options['min']) {
-					$error = _s('Value must be greater than %1$s.', date(ZBX_FULL_DATE_TIME, $more_options['min']));
-				}
+		return $error === '';
+	}
 
-				if (array_key_exists('max', $more_options)
-						&& $instance->getDateTime(true)->getTimestamp() > $more_options['max']) {
-					$error = _s('Value must be smaller than %1$s.', date(ZBX_FULL_DATE_TIME, $more_options['max']));
-				}
-			}
-			elseif ($instance instanceof CSimpleIntervalParser) {
-				if (array_key_exists('min', $more_options) && timeUnitToSeconds($value, true) < $more_options['min']) {
-					$error = _s('Value must be greater than %1$s.', $more_options['min']);
-				}
+	private static function validateUseCParser(array $use, string $parser_class, string $value, string &$error): void {
+		$parser_args = array_key_exists(1, $use) ? $use[1] : [];
+		$options = array_key_exists(2, $use) ? $use[2] : [];
 
-				if (array_key_exists('max', $more_options) && timeUnitToSeconds($value, true) > $more_options['max']) {
-					$error = _s('Value must be smaller than %1$s.', $more_options['max']);
-				}
+		$parser = $parser_args
+			? new $parser_class($parser_args)
+			: new $parser_class();
+
+		if (in_array($parser->parse($value), [CParser::PARSE_FAIL, CParser::PARSE_SUCCESS_CONT, false], true)) {
+			$error = $parser->getError();
+
+			// Some parsers may return empty string as error.
+			if ($error === '') {
+				$error = _('Invalid string.');
 			}
 		}
 
-		return $error === '';
+		// Parser-specific checks not supported by the parser itself.
+		if ($error === '') {
+			if ($parser instanceof CAbsoluteTimeParser) {
+				if (array_key_exists('min', $options)
+						&& $parser->getDateTime(true)->getTimestamp() < $options['min']) {
+					$error = _s('Value must be greater than %1$s.', date(ZBX_FULL_DATE_TIME, $options['min']));
+				}
+
+				if (array_key_exists('max', $options)
+						&& $parser->getDateTime(true)->getTimestamp() > $options['max']) {
+					$error = _s('Value must be smaller than %1$s.', date(ZBX_FULL_DATE_TIME, $options['max']));
+				}
+			}
+			elseif ($parser instanceof CSimpleIntervalParser) {
+				if (array_key_exists('min', $options) && timeUnitToSeconds($value, true) < $options['min']) {
+					$error = _s('Value must be greater than %1$s.', $options['min']);
+				}
+
+				if (array_key_exists('max', $options) && timeUnitToSeconds($value, true) > $options['max']) {
+					$error = _s('Value must be smaller than %1$s.', $options['max']);
+				}
+			}
+		}
+	}
+
+	private static function validateUseCValidator(array $use, string $validator_class, string $value, string &$error)
+			: void {
+		$validator_args = array_key_exists(1, $use) ? $use[1] : [];
+
+		switch ($validator_class) {
+			case CRegexValidator::class:
+				$validator_args = $validator_args ?: [
+					'messageInvalid' => _('invalid regular expression'),
+					'messageRegex' => _('invalid regular expression')
+				];
+				break;
+		}
+
+		$validator = $validator_args
+			? new $validator_class($validator_args)
+			: new $validator_class();
+
+		if ($validator->validate($value) === false) {
+			$error = $validator->getError() ?? _('Invalid string.');
+		}
 	}
 
 	/**
