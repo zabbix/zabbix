@@ -145,7 +145,7 @@ class CUser extends CApiService {
 		];
 
 		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
-			if (!$options['editable']) {
+			if (self::$userData['ugsetid'] != 0 && !$options['editable']) {
 				$sql_parts['join']['ug'] = ['table' => 'users_groups', 'using' => 'userid'];
 				$sql_parts['where'][] = 'ug.usrgrpid IN ('.
 					' SELECT uug.usrgrpid'.
