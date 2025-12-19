@@ -394,14 +394,22 @@ function convertUnitsUptime($value) {
 /**
  * Convert time period to a human-readable format.
  * The following units will be used: years, months, days, hours, minutes, seconds and milliseconds.
- * Only the 3 most significant units will be displayed: #y #m #d, #m #d #h, #d #h #mm and so on, omitting empty ones.
+ * Only the 3 most significant allowed units will be displayed: #y #m #d, #m #d #h, #d #h #mm and so on, omitting
+ * empty ones.
  *
- * @param int  $value            Time period in seconds.
- * @param bool $ignore_millisec  Without ms (1s 200 ms = 1.2s).
+ * @param int   $value                            Time period in seconds.
+ * @param array $options
+ * @param bool  $options ['ignore_milliseconds']  Without ms (1s 200 ms = 1.2s). Default: false.
+ * @param bool  $options ['with_year']            Output can contain years (y) and months (M). Default: true.
  *
  * @return string
  */
-function convertUnitsS($value, $ignore_millisec = false) {
+function convertUnitsS($value, array $options = []) {
+	$options += [
+		'ignore_milliseconds' => false,
+		'with_year' => true
+	];
+
 	$value = (float) $value;
 	$value_abs = abs($value);
 
@@ -410,19 +418,19 @@ function convertUnitsS($value, $ignore_millisec = false) {
 
 	$value_abs_int = floor($value_abs);
 
-	if (($v = floor($value_abs_int / SEC_PER_YEAR)) > 0) {
+	if ($options['with_year'] && ($v = floor($value_abs_int / SEC_PER_YEAR)) > 0) {
 		$parts['years'] = $v;
 		$value_abs_int -= $v * SEC_PER_YEAR;
 		$start = 0;
 	}
 
 	$v = floor($value_abs_int / SEC_PER_MONTH);
-	if ($v == 12) {
+	if ($options['with_year'] && $v == 12) {
 		$parts['years'] = $start === null ? 1 : $parts['years'] + 1;
 		$start = 0;
 	}
 	elseif ($start === null || ceil(log10($parts['years'])) <= ZBX_FLOAT_DIG) {
-		if ($v > 0) {
+		if ($options['with_year'] && $v > 0) {
 			$parts['months'] = $v;
 			$value_abs_int -= $v * SEC_PER_MONTH;
 			$start = $start === null ? 1 : $start;
@@ -449,7 +457,7 @@ function convertUnitsS($value, $ignore_millisec = false) {
 		}
 
 		if ($start === null || $start >= 3) {
-			if ($ignore_millisec) {
+			if ($options['ignore_milliseconds']) {
 				$v = $value_abs_int + round(fmod($value_abs, 1), ZBX_UNITS_ROUNDOFF_SUFFIXED);
 
 				if ($v > 0) {
@@ -663,7 +671,7 @@ function convertUnitsRaw(array $options): array {
 		}
 
 		return [
-			'value' => convertUnitsS($value, $options['ignore_milliseconds']),
+			'value' => convertUnitsS($value, ['ignore_milliseconds' => $options['ignore_milliseconds']]),
 			'units' => '',
 			'is_numeric' => false
 		];
@@ -748,7 +756,7 @@ function convertUnitsRaw(array $options): array {
  * Examples: '100' => '100'; '10m' => '600'; '-10m' => '-600'; '3d' => '259200'.
  *
  * @param string $time       Decimal integer with optional time suffix.
- * @param bool   $with_year  Additionally parse year suffixes.
+ * @param bool   $with_year  Additionally parse year and month suffixes.
  *
  * @return int|float|null  Decimal integer seconds or null on error. Returns a floating-point number if the resulting
  *                         value exceeds PHP_INT_MAX.
