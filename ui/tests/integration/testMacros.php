@@ -875,8 +875,7 @@ class testMacros extends CIntegrationTest {
 		return [
 			self::COMPONENT_SERVER => [
 				'DebugLevel' => 4,
-				'LogFileSize' => 20,
-				'AllowUnsupportedDBVersions' => 1
+				'LogFileSize' => 20
 			]
 		];
 	}

@@ -21,7 +21,7 @@ require_once __DIR__.'/../behaviors/CMessageBehavior.php';
 /**
  * @backup config, widget
  *
- * @dataSource HostAvailabilityWidget
+ * @dataSource HostAvailabilityWidget, MonitoringOverview
  *
  * @onBefore prepareDashboardData
  */
