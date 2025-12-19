@@ -628,18 +628,20 @@ class CFormValidator {
 	}
 
 	/**
-	 * Base field validation method.
+	 * Base field validation method. Returns false if validation is not done.
 	 *
 	 * @param array  $rule    Validation rules.
 	 * @param array  $data    Data to validate.
 	 * @param string $field   Field to validate.
 	 * @param string $path    Path of field.
+	 *
+	 * @return bool
 	 */
-	private function validateField(array $rules, &$data, string $field, string $path): void {
+	private function validateField(array $rules, &$data, string $field, string $path): bool {
 		if (array_key_exists('when', $rules)) {
 			foreach ($rules['when'] as $when) {
 				if ($this->testWhenCondition($when, $path) === false) {
-					return;
+					return false;
 				}
 			}
 		}
@@ -656,7 +658,7 @@ class CFormValidator {
 				);
 			}
 
-			return;
+			return true;
 		}
 
 		if (array_key_exists('type', $rules)) {
@@ -665,7 +667,7 @@ class CFormValidator {
 					if (!self::validateId($rules, $data[$field], $error)) {
 						$this->addError(self::ERROR, $path, $error, self::ERROR_LEVEL_PRIMARY);
 
-						return;
+						return true;
 					}
 					break;
 
@@ -673,7 +675,7 @@ class CFormValidator {
 					if (!self::validateInt32($rules, $data[$field], $error)) {
 						$this->addError(self::ERROR, $path, $error, self::ERROR_LEVEL_PRIMARY);
 
-						return;
+						return true;
 					}
 					break;
 
@@ -681,7 +683,7 @@ class CFormValidator {
 					if (!self::validateFloat($rules, $data[$field], $error)) {
 						$this->addError(self::ERROR, $path, $error, self::ERROR_LEVEL_PRIMARY);
 
-						return;
+						return true;
 					}
 					break;
 
@@ -689,7 +691,7 @@ class CFormValidator {
 					if (!self::validateStringUtf8($rules, $data[$field], $error)) {
 						$this->addError(self::ERROR, $path, $error, self::ERROR_LEVEL_PRIMARY);
 
-						return;
+						return true;
 					}
 
 					if (!self::validateUse($rules, $data[$field], $error)) {
@@ -697,7 +699,7 @@ class CFormValidator {
 
 						$this->addError(self::ERROR, $path, $error, self::ERROR_LEVEL_DELAYED);
 
-						return;
+						return true;
 					}
 					break;
 
@@ -705,7 +707,7 @@ class CFormValidator {
 					if (!$this->validateArray($rules, $data[$field], $error, $path)) {
 						$this->addError(self::ERROR, $path, $error, self::ERROR_LEVEL_PRIMARY);
 
-						return;
+						return true;
 					}
 					break;
 
@@ -713,7 +715,7 @@ class CFormValidator {
 					if (!$this->validateObject($rules, $data[$field], $error, $path)) {
 						$this->addError(self::ERROR, $path, $error, self::ERROR_LEVEL_PRIMARY);
 
-						return;
+						return true;
 					}
 					break;
 
@@ -721,11 +723,13 @@ class CFormValidator {
 					if (!$this->validateObjects($rules, $data[$field], $error, $path)) {
 						$this->addError(self::ERROR, $path, $error, self::ERROR_LEVEL_PRIMARY);
 
-						return;
+						return true;
 					}
 					break;
 			}
 		}
+
+		return true;
 	}
 
 	/**
@@ -1088,8 +1092,18 @@ class CFormValidator {
 		}
 
 		foreach ($rules['fields'] as $field => $rule_sets) {
-			foreach ($rule_sets as $rule_set) {
-				$this->validateField($rule_set, $value, $field, $path.'/'.$field);
+			if (count($rule_sets) > 0) {
+				$validated = false;
+
+				foreach ($rule_sets as $rule_set) {
+					if ($this->validateField($rule_set, $value, $field, $path.'/'.$field)) {
+						$validated = true;
+					}
+				}
+
+				if (!$validated) {
+					unset($value[$field]);
+				}
 			}
 		}
 
@@ -1175,17 +1189,19 @@ class CFormValidator {
 
 		$array_values = array_filter($array_values, fn ($value) => !is_null($value));
 
+		if (array_key_exists('field', $rules)) {
+			foreach (array_keys($array_values) as $index) {
+				if (!$this->validateField($rules['field'], $array_values, $index, $path.'/'.$index)) {
+					unset($array_values[$index]);
+				}
+			}
+			unset($value);
+		}
+
 		if (array_key_exists('not_empty', $rules) && count($array_values) == 0) {
 			$error = self::getMessage($rules, 'not_empty', _('This field cannot be empty.'));
 
 			return false;
-		}
-
-		if (array_key_exists('field', $rules)) {
-			foreach (array_keys($array_values) as $index) {
-				$this->validateField($rules['field'], $array_values, $index, $path.'/'.$index);
-			}
-			unset($value);
 		}
 
 		return true;

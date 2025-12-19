@@ -120,7 +120,10 @@ class CControllerItemPrototypeUpdate extends CControllerItemPrototype {
 			'parameters' => ['objects', 'uniq' => ['name'],
 				'fields' => [
 					'value' => ['db item_parameter.value'],
-					'name' => ['db item_parameter.name', 'required', 'not_empty', 'when' => ['value', 'not_empty']],
+					'name' => [
+						['db item_parameter.name'],
+						['db item_parameter.name', 'required', 'not_empty', 'when' => ['value', 'not_empty']]
+					],
 					'sortorder' => ['integer']
 				],
 				'when' => ['type', 'in' => [ITEM_TYPE_SCRIPT, ITEM_TYPE_BROWSER]]
@@ -130,6 +133,7 @@ class CControllerItemPrototypeUpdate extends CControllerItemPrototype {
 			'request_method' => ['db items.request_method', 'required', 'in' => [HTTPCHECK_REQUEST_GET, HTTPCHECK_REQUEST_POST, HTTPCHECK_REQUEST_PUT, HTTPCHECK_REQUEST_HEAD], 'when' => ['type', 'in' => [ITEM_TYPE_HTTPAGENT]]],
 			'post_type' => ['db items.request_method', 'required', 'in' => [ZBX_POSTTYPE_RAW, ZBX_POSTTYPE_JSON, ZBX_POSTTYPE_XML], 'when' => ['type', 'in' => [ITEM_TYPE_HTTPAGENT]]],
 			'posts' => [
+				['db items.posts'],
 				['db items.posts', 'required', 'not_empty',
 					'when' => ['post_type', 'in' => [ZBX_POSTTYPE_XML]],
 					'use' => [CXmlValidator::class, []]
@@ -301,7 +305,10 @@ class CControllerItemPrototypeUpdate extends CControllerItemPrototype {
 				'messages' => ['uniq' => _('Tag name and value combination is not unique.')],
 				'fields' => [
 					'value' => ['db item_tag.value'],
-					'tag' => ['db item_tag.tag', 'required', 'not_empty', 'when' => ['value', 'not_empty']]
+					'tag' => [
+						['db item_tag.tag'],
+						['db item_tag.tag', 'required', 'not_empty', 'when' => ['value', 'not_empty']]
+					]
 				]
 			],
 			'discover' => ['db items.discover', 'in' => [ZBX_PROTOTYPE_DISCOVER, ZBX_PROTOTYPE_NO_DISCOVER]],
