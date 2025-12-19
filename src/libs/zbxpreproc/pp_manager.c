@@ -50,54 +50,6 @@ static zbx_preproc_prepare_value_func_t	preproc_prepare_value_func_cb = NULL;
 static zbx_preproc_flush_value_func_t	preproc_flush_value_func_cb = NULL;
 static zbx_get_progname_f		get_progname_func_cb = NULL;
 
-/******************************************************************************
- *                                                                            *
- * Purpose: initialize xml library, called before creating worker threads     *
- *                                                                            *
- ******************************************************************************/
-static void	pp_xml_init(void)
-{
-#ifdef HAVE_LIBXML2
-	xmlInitParser();
-#endif
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: release xml library resources                                     *
- *                                                                            *
- ******************************************************************************/
-static void	pp_xml_destroy(void)
-{
-#ifdef HAVE_LIBXML2
-	xmlCleanupParser();
-#endif
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: initialize curl library, called before creating worker threads    *
- *                                                                            *
- ******************************************************************************/
-static void	pp_curl_init(void)
-{
-#ifdef HAVE_LIBCURL
-	curl_global_init(CURL_GLOBAL_DEFAULT);
-#endif
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: release curl library resources                                    *
- *                                                                            *
- ******************************************************************************/
-static void	pp_curl_destroy(void)
-{
-#ifdef HAVE_LIBCURL
-	curl_global_cleanup();
-#endif
-}
-
 void	zbx_init_library_preproc(zbx_preproc_prepare_value_func_t preproc_prepare_value_cb,
 		zbx_preproc_flush_value_func_t preproc_flush_value_cb, zbx_get_progname_f get_progname_cb)
 {
@@ -136,8 +88,6 @@ static zbx_pp_manager_t	*zbx_pp_manager_create(int workers_num, zbx_pp_finished_
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() workers:%d", __func__, workers_num);
 
-	pp_xml_init();
-	pp_curl_init();
 #ifdef HAVE_NETSNMP
 	preproc_init_snmp();
 #endif
@@ -260,9 +210,6 @@ static void	zbx_pp_manager_free(zbx_pp_manager_t *manager)
 #ifdef HAVE_NETSNMP
 	preproc_shutdown_snmp();
 #endif
-	pp_curl_destroy();
-	pp_xml_destroy();
-
 	zbx_ipc_async_socket_close(&manager->rtc);
 
 	zbx_free(manager);
@@ -1478,4 +1425,6 @@ void	*zbx_pp_manager_thread(void *args)
 #undef STAT_INTERVAL
 #undef PP_MANAGER_DELAY_SEC
 #undef PP_MANAGER_DELAY_NS
+
+	return NULL;
 }

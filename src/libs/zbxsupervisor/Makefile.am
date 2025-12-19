@@ -9,3 +9,8 @@ libzbxsupervisor_a_SOURCES = \
 
 libzbxsupervisor_client_a_SOURCES = \
 	supervisor_client.c
+
+libzbxsupervisor_a_CFLAGS = \
+	$(LIBXML2_CFLAGS) \
+	$(TLS_CFLAGS) \
+	$(SNMP_CFLAGS)

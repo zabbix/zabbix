@@ -29,6 +29,11 @@
 #include "zbxtypes.h"
 #include "zbxdb.h"
 
+#ifdef HAVE_LIBXML2
+#	include <libxml/xpath.h>
+#	include <libxml/parser.h>
+#endif
+
 ZBX_VECTOR_IMPL(proc_info, zbx_proc_info_t)
 
 typedef struct
@@ -635,6 +640,29 @@ static int	supervisor_get_exit_thread_info(zbx_supervisor_t *sv, unsigned char *
 	return FAIL;
 }
 
+static void	supervisor_init_libraries(void)
+{
+#ifdef HAVE_LIBXML2
+	xmlInitParser();
+#endif
+
+#ifdef HAVE_LIBCURL
+	curl_global_init(CURL_GLOBAL_DEFAULT);
+#endif
+
+}
+
+static void	supervisor_clear_libraries(void)
+{
+#ifdef HAVE_LIBXML2
+	xmlCleanupParser();
+#endif
+
+#ifdef HAVE_LIBCURL
+	curl_global_cleanup();
+#endif
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: process entry function                                            *
@@ -662,6 +690,8 @@ ZBX_THREAD_ENTRY(zbx_supervisor_thread, args)
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(info->program_type),
 			server_num, get_process_type_string(process_type), process_num);
+
+	supervisor_init_libraries();
 
 	if (NULL == (dbpool = zbx_dbconn_pool_create(&error)))
 	{
@@ -780,6 +810,8 @@ out:
 	zbx_proc_startup_free(runlevels);
 
 	zbx_dbconn_pool_free(dbpool);
+
+	supervisor_clear_libraries();
 
 	zbx_exit(exit_ret);
 
