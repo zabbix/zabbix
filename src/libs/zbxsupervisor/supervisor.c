@@ -27,6 +27,7 @@
 #include "zbxnix.h"
 #include "zbxtime.h"
 #include "zbxtypes.h"
+#include "zbxdb.h"
 
 ZBX_VECTOR_IMPL(proc_info, zbx_proc_info_t)
 
