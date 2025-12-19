@@ -2086,7 +2086,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 				break;
 			}
 
-			if (SUCCEED != zbx_waitpid_nohang(zbx_threads, zbx_threads_num))
+			if (SUCCEED == zbx_waitpid_nohang(zbx_threads, zbx_threads_num))
 			{
 				zabbix_log(LOG_LEVEL_CRIT, "cannot continue proxy startup because of unexpected"
 						" process termination");
