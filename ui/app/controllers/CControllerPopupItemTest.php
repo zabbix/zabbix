@@ -109,38 +109,38 @@ abstract class CControllerPopupItemTest extends CController {
 	protected $macros_by_item_props = [
 		'key' => [
 			'host' => ['{HOSTNAME}', '{HOST.HOST}', '{HOST.NAME}'],
-			'interface' => ['{HOST.IP}', '{IPADDRESS}', '{HOST.DNS}', '{HOST.CONN}', '{HOST.PORT}'],
+			'interface' => ['{HOST.IP}', '{HOST.DNS}', '{HOST.CONN}', '{HOST.PORT}'],
 			'support_user_macros' => true,
 			'support_lld_macros' => true
 		],
 		'params_es' => [
 			'host' => ['{HOSTNAME}', '{HOST.HOST}', '{HOST.NAME}'],
-			'interface' => ['{HOST.IP}', '{IPADDRESS}', '{HOST.DNS}', '{HOST.CONN}', '{HOST.PORT}'],
+			'interface' => ['{HOST.IP}', '{HOST.DNS}', '{HOST.CONN}', '{HOST.PORT}'],
 			'support_user_macros' => true,
 			'support_lld_macros' => true
 		],
 		'params_ap' => [
 			'host' => ['{HOSTNAME}', '{HOST.HOST}', '{HOST.NAME}'],
-			'interface' => ['{HOST.IP}', '{IPADDRESS}', '{HOST.DNS}', '{HOST.CONN}', '{HOST.PORT}'],
+			'interface' => ['{HOST.IP}', '{HOST.DNS}', '{HOST.CONN}', '{HOST.PORT}'],
 			'support_user_macros' => true,
 			'support_lld_macros' => true
 		],
 		'jmx_endpoint' => [
 			'host' => ['{HOSTNAME}', '{HOST.HOST}', '{HOST.NAME}'],
-			'interface' => ['{HOST.IP}', '{IPADDRESS}', '{HOST.DNS}', '{HOST.CONN}', '{HOST.PORT}'],
+			'interface' => ['{HOST.IP}', '{HOST.DNS}', '{HOST.CONN}', '{HOST.PORT}'],
 			'support_user_macros' => true,
 			'support_lld_macros' => true
 		],
 		'url' => [
 			'host' => ['{HOSTNAME}', '{HOST.HOST}', '{HOST.NAME}'],
-			'interface' => ['{HOST.IP}', '{IPADDRESS}', '{HOST.DNS}', '{HOST.CONN}', '{HOST.PORT}'],
+			'interface' => ['{HOST.IP}', '{HOST.DNS}', '{HOST.CONN}', '{HOST.PORT}'],
 			'item' => ['{ITEM.ID}', '{ITEM.KEY.ORIG}', '{ITEM.KEY}'],
 			'support_user_macros' => true,
 			'support_lld_macros' => true
 		],
 		'posts' => [
 			'host' => ['{HOSTNAME}', '{HOST.HOST}', '{HOST.NAME}'],
-			'interface' => ['{HOST.IP}', '{IPADDRESS}', '{HOST.DNS}', '{HOST.CONN}', '{HOST.PORT}'],
+			'interface' => ['{HOST.IP}', '{HOST.DNS}', '{HOST.CONN}', '{HOST.PORT}'],
 			'item' => ['{ITEM.ID}', '{ITEM.KEY.ORIG}', '{ITEM.KEY}'],
 			'support_user_macros' => true,
 			'support_lld_macros' => true
@@ -152,35 +152,35 @@ abstract class CControllerPopupItemTest extends CController {
 		],
 		'ssl_cert_file' => [
 			'host' => ['{HOSTNAME}', '{HOST.HOST}', '{HOST.NAME}'],
-			'interface' => ['{HOST.IP}', '{IPADDRESS}', '{HOST.DNS}', '{HOST.CONN}', '{HOST.PORT}'],
+			'interface' => ['{HOST.IP}', '{HOST.DNS}', '{HOST.CONN}', '{HOST.PORT}'],
 			'item' => ['{ITEM.ID}', '{ITEM.KEY.ORIG}', '{ITEM.KEY}'],
 			'support_user_macros' => true,
 			'support_lld_macros' => true
 		],
 		'ssl_key_file' => [
 			'host' => ['{HOSTNAME}', '{HOST.HOST}', '{HOST.NAME}'],
-			'interface' => ['{HOST.IP}', '{IPADDRESS}', '{HOST.DNS}', '{HOST.CONN}', '{HOST.PORT}'],
+			'interface' => ['{HOST.IP}', '{HOST.DNS}', '{HOST.CONN}', '{HOST.PORT}'],
 			'item' => ['{ITEM.ID}', '{ITEM.KEY.ORIG}', '{ITEM.KEY}'],
 			'support_user_macros' => true,
 			'support_lld_macros' => true
 		],
 		'query_fields' => [
 			'host' => ['{HOSTNAME}', '{HOST.HOST}', '{HOST.NAME}'],
-			'interface' => ['{HOST.IP}', '{IPADDRESS}', '{HOST.DNS}', '{HOST.CONN}', '{HOST.PORT}'],
+			'interface' => ['{HOST.IP}', '{HOST.DNS}', '{HOST.CONN}', '{HOST.PORT}'],
 			'item' => ['{ITEM.ID}', '{ITEM.KEY.ORIG}', '{ITEM.KEY}'],
 			'support_user_macros' => true,
 			'support_lld_macros' => true
 		],
 		'headers' => [
 			'host' => ['{HOSTNAME}', '{HOST.HOST}', '{HOST.NAME}'],
-			'interface' => ['{HOST.IP}', '{IPADDRESS}', '{HOST.DNS}', '{HOST.CONN}', '{HOST.PORT}'],
+			'interface' => ['{HOST.IP}', '{HOST.DNS}', '{HOST.CONN}', '{HOST.PORT}'],
 			'item' => ['{ITEM.ID}', '{ITEM.KEY.ORIG}', '{ITEM.KEY}'],
 			'support_user_macros' => true,
 			'support_lld_macros' => true
 		],
 		'parameters' => [
 			'host' => ['{HOSTNAME}', '{HOST.HOST}', '{HOST.NAME}'],
-			'interface' => ['{HOST.IP}', '{IPADDRESS}', '{HOST.DNS}', '{HOST.CONN}', '{HOST.PORT}'],
+			'interface' => ['{HOST.IP}', '{HOST.DNS}', '{HOST.CONN}', '{HOST.PORT}'],
 			'inventory' => ['{INVENTORY.ALIAS}', '{INVENTORY.ASSET.TAG}', '{INVENTORY.CHASSIS}', '{INVENTORY.CONTACT}',
 				'{PROFILE.CONTACT}', '{INVENTORY.CONTRACT.NUMBER}', '{INVENTORY.DEPLOYMENT.STATUS}',
 				'{INVENTORY.HARDWARE}', '{PROFILE.HARDWARE}', '{INVENTORY.HARDWARE.FULL}', '{INVENTORY.HOST.NETMASK}',
@@ -791,7 +791,6 @@ abstract class CControllerPopupItemTest extends CController {
 			],
 			'interface' => [
 				'{HOST.IP}' => $interface['ip'],
-				'{IPADDRESS}' => $interface['ip'],
 				'{HOST.DNS}' => $interface['dns'],
 				'{HOST.CONN}' => $interface['address'],
 				'{HOST.PORT}' => $interface['port']

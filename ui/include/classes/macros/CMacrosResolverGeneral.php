@@ -825,7 +825,6 @@ class CMacrosResolverGeneral {
 		foreach ($interfaces as $interface) {
 			foreach ($macros[$interface['functionid']] as $macro => $tokens) {
 				switch ($macro) {
-					case 'IPADDRESS':
 					case 'HOST.IP':
 						$value = $interface['ip'];
 						break;
@@ -1827,9 +1826,7 @@ class CMacrosResolverGeneral {
 		}
 		unset($host_interface);
 
-		$interface_macros = ['IPADDRESS' => 'ip', 'HOST.IP' => 'ip', 'HOST.DNS' => 'dns', 'HOST.CONN' => 'conn',
-			'HOST.PORT' => 'port'
-		];
+		$interface_macros = ['HOST.IP' => 'ip', 'HOST.DNS' => 'dns', 'HOST.CONN' => 'conn', 'HOST.PORT' => 'port'];
 
 		foreach ($db_items as $itemid => $db_item) {
 			if ($db_item['interfaceid'] != 0) {
@@ -1906,7 +1903,7 @@ class CMacrosResolverGeneral {
 		}
 		unset($db_interface);
 
-		$interface_macros = ['IPADDRESS' => 'ip', 'HOST.IP' => 'ip', 'HOST.DNS' => 'dns', 'HOST.CONN' => 'conn'];
+		$interface_macros = ['HOST.IP' => 'ip', 'HOST.DNS' => 'dns', 'HOST.CONN' => 'conn'];
 
 		foreach ($db_interfaces as $hostid => $db_interface) {
 			foreach ($macros[$hostid] as $macro => $tokens) {
@@ -1969,9 +1966,7 @@ class CMacrosResolverGeneral {
 		}
 		unset($host_interface);
 
-		$interface_macros = ['IPADDRESS' => 'ip', 'HOST.IP' => 'ip', 'HOST.DNS' => 'dns', 'HOST.CONN' => 'conn',
-			'HOST.PORT' => 'port'
-		];
+		$interface_macros = ['HOST.IP' => 'ip', 'HOST.DNS' => 'dns', 'HOST.CONN' => 'conn', 'HOST.PORT' => 'port'];
 
 		foreach ($host_interfaces as $hostid => $host_interface) {
 			foreach ($macros[$hostid] as $macro => $tokens) {
@@ -2308,9 +2303,7 @@ class CMacrosResolverGeneral {
 		}
 		unset($host_interface);
 
-		$interface_macros = ['IPADDRESS' => 'ip', 'HOST.IP' => 'ip', 'HOST.DNS' => 'dns', 'HOST.CONN' => 'conn',
-			'HOST.PORT' => 'port'
-		];
+		$interface_macros = ['HOST.IP' => 'ip', 'HOST.DNS' => 'dns', 'HOST.CONN' => 'conn', 'HOST.PORT' => 'port'];
 
 		foreach ($macros as $triggerid => $macro_data) {
 			if (!array_key_exists($triggerid, $trigger_hosts_by_f_num)) {

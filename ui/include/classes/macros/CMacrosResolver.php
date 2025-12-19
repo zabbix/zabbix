@@ -70,10 +70,10 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 			$types['macros']['host'][] = '{HOST.ID}';
 		}
 		if (in_array('agentInterface', $config)) {
-			$types['macros']['interface'] = ['{IPADDRESS}', '{HOST.IP}', '{HOST.DNS}', '{HOST.CONN}'];
+			$types['macros']['interface'] = ['{HOST.IP}', '{HOST.DNS}', '{HOST.CONN}'];
 		}
 		if (in_array('interfaceWithPort', $config)) {
-			$types['macros']['interface_with_port'] = ['{IPADDRESS}', '{HOST.IP}', '{HOST.DNS}', '{HOST.CONN}',
+			$types['macros']['interface_with_port'] = ['{HOST.IP}', '{HOST.DNS}', '{HOST.CONN}',
 				'{HOST.PORT}'
 			];
 		}
@@ -134,7 +134,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		$types = [
 			'macros_n' => [
 				'host' => ['{HOSTNAME}', '{HOST.HOST}', '{HOST.NAME}'],
-				'interface' => ['{IPADDRESS}', '{HOST.IP}', '{HOST.DNS}', '{HOST.CONN}', '{HOST.PORT}'],
+				'interface' => ['{HOST.IP}', '{HOST.DNS}', '{HOST.CONN}', '{HOST.PORT}'],
 				'item' => ['{ITEM.LASTVALUE}', '{ITEM.LASTVALUE.DATE}', '{ITEM.LASTVALUE.TIME}',
 					'{ITEM.LASTVALUE.TIMESTAMP}', '{ITEM.LASTVALUE.AGE}', '{ITEM.VALUE}', '{ITEM.VALUE.DATE}',
 					'{ITEM.VALUE.TIME}', '{ITEM.VALUE.TIMESTAMP}', '{ITEM.VALUE.AGE}'
@@ -224,7 +224,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		$types = [
 			'macros_n' => [
 				'host' => ['{HOSTNAME}', '{HOST.HOST}', '{HOST.NAME}'],
-				'interface' => ['{IPADDRESS}', '{HOST.IP}', '{HOST.DNS}', '{HOST.CONN}', '{HOST.PORT}'],
+				'interface' => ['{HOST.IP}', '{HOST.DNS}', '{HOST.CONN}', '{HOST.PORT}'],
 				'item' => ['{ITEM.LASTVALUE}', '{ITEM.LASTVALUE.DATE}', '{ITEM.LASTVALUE.TIME}',
 					'{ITEM.LASTVALUE.TIMESTAMP}', '{ITEM.LASTVALUE.AGE}', '{ITEM.VALUE}', '{ITEM.VALUE.DATE}',
 					'{ITEM.VALUE.TIME}', '{ITEM.VALUE.TIMESTAMP}', '{ITEM.VALUE.AGE}'
@@ -896,7 +896,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		$types = [
 			'macros' => [
 				'host' => ['{HOSTNAME}', '{HOST.HOST}', '{HOST.NAME}'],
-				'interface' => ['{IPADDRESS}', '{HOST.IP}', '{HOST.DNS}', '{HOST.CONN}', '{HOST.PORT}']
+				'interface' => ['{HOST.IP}', '{HOST.DNS}', '{HOST.CONN}', '{HOST.PORT}']
 			],
 			'usermacros' => true
 		];
@@ -990,7 +990,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		$types = [
 			'macros' => [
 				'host' => ['{HOSTNAME}', '{HOST.ID}', '{HOST.NAME}', '{HOST.HOST}', '{HOST.DESCRIPTION}'],
-				'interface' => ['{IPADDRESS}', '{HOST.IP}', '{HOST.DNS}', '{HOST.CONN}', '{HOST.PORT}'],
+				'interface' => ['{HOST.IP}', '{HOST.DNS}', '{HOST.CONN}', '{HOST.PORT}'],
 				'item' => ['{ITEM.DESCRIPTION}', '{ITEM.DESCRIPTION.ORIG}', '{ITEM.ID}', '{ITEM.KEY}',
 					'{ITEM.KEY.ORIG}', '{ITEM.NAME}', '{ITEM.NAME.ORIG}', '{ITEM.STATE}', '{ITEM.VALUETYPE}'
 				],
@@ -1054,7 +1054,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		$types = [
 			'macros' => [
 				'host' => ['{HOSTNAME}', '{HOST.ID}', '{HOST.NAME}', '{HOST.HOST}', '{HOST.DESCRIPTION}'],
-				'interface' => ['{IPADDRESS}', '{HOST.IP}', '{HOST.DNS}', '{HOST.CONN}', '{HOST.PORT}'],
+				'interface' => ['{HOST.IP}', '{HOST.DNS}', '{HOST.CONN}', '{HOST.PORT}'],
 				'inventory' => array_keys(self::getSupportedHostInventoryMacrosMap())
 			],
 			'usermacros' => true
@@ -1331,7 +1331,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 					'expr_macros_host' => true,
 					'macros' => [
 						'host' => ['{HOSTNAME}', '{HOST.ID}', '{HOST.NAME}', '{HOST.HOST}', '{HOST.DESCRIPTION}'],
-						'interface' => ['{IPADDRESS}', '{HOST.IP}', '{HOST.DNS}', '{HOST.CONN}', '{HOST.PORT}'],
+						'interface' => ['{HOST.IP}', '{HOST.DNS}', '{HOST.CONN}', '{HOST.PORT}'],
 						'inventory' => array_keys($inventory_macros),
 						'triggers' => self::aggr_triggers_macros
 					]
@@ -1344,7 +1344,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 					],
 					'macros_n' => [
 						'host_n' => ['{HOSTNAME}', '{HOST.ID}', '{HOST.NAME}', '{HOST.HOST}', '{HOST.DESCRIPTION}'],
-						'interface_n' => ['{IPADDRESS}', '{HOST.IP}', '{HOST.DNS}', '{HOST.CONN}', '{HOST.PORT}'],
+						'interface_n' => ['{HOST.IP}', '{HOST.DNS}', '{HOST.CONN}', '{HOST.PORT}'],
 						'inventory_n' => array_keys($inventory_macros)
 					]
 				]
@@ -1363,7 +1363,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 				SYSMAP_ELEMENT_TYPE_HOST => [
 					'macros' => [
 						'host' => ['{HOSTNAME}', '{HOST.ID}', '{HOST.NAME}', '{HOST.HOST}'],
-						'interface' => ['{IPADDRESS}', '{HOST.IP}', '{HOST.DNS}', '{HOST.CONN}', '{HOST.PORT}'],
+						'interface' => ['{HOST.IP}', '{HOST.DNS}', '{HOST.CONN}', '{HOST.PORT}'],
 						'inventory' => array_keys($inventory_macros)
 					]
 				],
@@ -1373,7 +1373,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 					],
 					'macros_n' => [
 						'host_n' => ['{HOSTNAME}', '{HOST.ID}', '{HOST.NAME}', '{HOST.HOST}'],
-						'interface_n' => ['{IPADDRESS}', '{HOST.IP}', '{HOST.DNS}', '{HOST.CONN}', '{HOST.PORT}'],
+						'interface_n' => ['{HOST.IP}', '{HOST.DNS}', '{HOST.CONN}', '{HOST.PORT}'],
 						'inventory_n' => array_keys($inventory_macros)
 					]
 				]
@@ -1870,7 +1870,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		$types = [
 			'macros' => [
 				'host' => ['{HOSTNAME}', '{HOST.ID}', '{HOST.NAME}', '{HOST.HOST}'],
-				'interface' => ['{IPADDRESS}', '{HOST.IP}', '{HOST.DNS}', '{HOST.CONN}', '{HOST.PORT}'],
+				'interface' => ['{HOST.IP}', '{HOST.DNS}', '{HOST.CONN}', '{HOST.PORT}'],
 				'inventory' => array_keys(self::getSupportedHostInventoryMacrosMap()),
 				'user_data' => ['{USER.ALIAS}', '{USER.USERNAME}', '{USER.FULLNAME}', '{USER.NAME}', '{USER.SURNAME}'],
 				'manualinput' => ['{MANUALINPUT}']
@@ -2007,7 +2007,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 			],
 			'macros_n' => [
 				'host_n' => ['{HOSTNAME}', '{HOST.ID}', '{HOST.HOST}', '{HOST.NAME}'],
-				'interface_n' => ['{IPADDRESS}', '{HOST.IP}', '{HOST.DNS}', '{HOST.CONN}', '{HOST.PORT}'],
+				'interface_n' => ['{HOST.IP}', '{HOST.DNS}', '{HOST.CONN}', '{HOST.PORT}'],
 				'inventory_n' => array_keys(self::getSupportedHostInventoryMacrosMap())
 			],
 			'usermacros' => true
