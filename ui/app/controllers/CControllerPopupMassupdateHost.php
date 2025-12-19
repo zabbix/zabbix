@@ -436,14 +436,25 @@ class CControllerPopupMassupdateHost extends CControllerPopupMassupdateAbstract 
 								break;
 
 							case ZBX_ACTION_REMOVE:
-								if ($macros) {
-									$except_selected = $this->getInput('macros_remove', 0);
-									$host_macros_by_macro = array_column($host['macros'], null, 'macro');
-									$macros_by_macro = array_column($macros, null, 'macro');
+								if ($host['macros'] && $macros) {
+									$host['macros'] = array_column($host['macros'], null, 'macro');
+									$matched_macros = [];
 
-									$host['macros'] = $except_selected
-										? array_intersect_key($host_macros_by_macro, $macros_by_macro)
-										: array_diff_key($host_macros_by_macro, $macros_by_macro);
+									foreach ($host['macros'] as $host_macro => $foo) {
+										$trimmed_macro = CApiInputValidator::trimMacro($host_macro);
+
+										foreach ($macros as $macro) {
+											if (CApiInputValidator::trimMacro($macro['macro']) === $trimmed_macro) {
+												$matched_macros[$host_macro] = true;
+
+												continue 2;
+											}
+										}
+									}
+
+									$host['macros'] = (bool) $this->getInput('macros_remove', 0)
+										? array_intersect_key($host['macros'], $matched_macros)
+										: array_diff_key($host['macros'], $matched_macros);
 								}
 								break;
 

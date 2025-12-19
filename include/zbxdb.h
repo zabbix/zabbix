@@ -318,6 +318,7 @@ zbx_db_result_t	zbx_dbconn_select_n(zbx_dbconn_t *db, const char *query, int n);
 zbx_db_row_t	zbx_db_fetch(zbx_db_result_t result);
 void	zbx_db_free_result(zbx_db_result_t result);
 
+void	zbx_dbconn_begin_deferred(zbx_dbconn_t *db);
 int	zbx_dbconn_begin(zbx_dbconn_t *db);
 int	zbx_dbconn_commit(zbx_dbconn_t *db);
 int	zbx_dbconn_rollback(zbx_dbconn_t *db);
@@ -503,6 +504,7 @@ void	zbx_dbconn_pool_sync(zbx_dbconn_pool_t *pool);
 void	zbx_db_init_autoincrement_options(void);
 int	zbx_db_connect(int flag);
 void	zbx_db_close(void);
+void	zbx_db_begin_deferred(void);
 void	zbx_db_begin(void);
 int	zbx_db_commit(void);
 void	zbx_db_rollback(void);

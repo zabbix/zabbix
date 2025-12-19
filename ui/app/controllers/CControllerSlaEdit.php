@@ -91,7 +91,7 @@ class CControllerSlaEdit extends CController {
 					'row_index' => $row_index,
 					'start_time' => zbx_date2str(DATE_TIME_FORMAT, $excluded_downtime['period_from']),
 					'duration' => convertUnitsS($excluded_downtime['period_to'] - $excluded_downtime['period_from'],
-						true
+						['ignore_milliseconds' => true]
 					)
 				];
 			}

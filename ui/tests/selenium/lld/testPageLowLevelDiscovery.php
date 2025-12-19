@@ -278,10 +278,10 @@ class testPageLowLevelDiscovery extends CWebTest {
 				$this->selectTableRows($data['names'], 'Name', self::SELECTOR);
 				$this->assertFalse($this->query('button:Execute now')->one()->isEnabled());
 				break;
-			case 'template';
+			case 'template':
 				$this->assertFalse($this->query('button:Execute now')->one(false)->isValid());
 				break;
-			case 'trapper';
+			case 'trapper':
 				$this->assertFalse($this->query('button:Execute now')->one()->isEnabled());
 				break;
 			default:
@@ -316,7 +316,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 						'Template groups' => 'Templates/Databases'
 					],
 					'context' => 'template',
-					'rows' => 100
+					'rows' => 113
 				]
 			],
 			// #1.

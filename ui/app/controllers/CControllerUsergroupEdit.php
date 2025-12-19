@@ -144,7 +144,11 @@ class CControllerUsergroupEdit extends CController {
 
 		$data['tag_filters_badges'] = CTagHelper::getTagsHtml($tag_filters_badges, ZBX_TAG_OBJECT_HOST_GROUP);
 		$data['users_ms'] = $this->getUsersMs();
-		$data['can_update_group'] = (!$this->hasInput('usrgrpid') || granted2update_group($this->getInput('usrgrpid')));
+		$data['can_update_group'] = !$this->hasInput('usrgrpid') || !API::User()->get([
+			'output' => [],
+			'usrgrpids' => $this->getInput('usrgrpid'),
+			'userids' => CWebUser::$data['userid']
+		]);
 
 		if ($data['can_update_group']) {
 			$userdirectories = API::UserDirectory()->get([

@@ -1524,7 +1524,7 @@ abstract class testFormPreprocessing extends CWebTest {
 						['type' => 'Discard unchanged with heartbeat', 'parameter_1' => '0']
 					],
 					'inline_errors' => [
-						'id:preprocessing_0_params_0' => 'Seconds: Value must be one of 1-788400000.'
+						'id:preprocessing_0_params_0' => 'Seconds: Value must be between 1s and 788400000s (9125d).'
 					],
 					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": value must be one of 1-788400000.'
 				]
@@ -1540,7 +1540,7 @@ abstract class testFormPreprocessing extends CWebTest {
 						['type' => 'Discard unchanged with heartbeat', 'parameter_1' => '788400001']
 					],
 					'inline_errors' => [
-						'id:preprocessing_0_params_0' => 'Seconds: Value must be one of 1-788400000.'
+						'id:preprocessing_0_params_0' => 'Seconds: Value must be between 1s and 788400000s (9125d).'
 					],
 					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": value must be one of 1-788400000.'
 				]
