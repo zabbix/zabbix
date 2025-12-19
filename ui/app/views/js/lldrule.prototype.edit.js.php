@@ -50,8 +50,14 @@ window.lldrule_prototype_edit = new class {
 				field_switches: field_switches,
 				interface_types: interface_types,
 				lldrule: lldrule,
-				host_interfaces: host.interfaces,
-				update_callback: () => {this.#update()}
+				host_interfaces: host.interfaces
+			}),
+			preprocessing: new ItemEditPreprocessingTab({
+				container: document.getElementById('processing-tab'),
+				preprocessing: lldrule.preprocessing,
+				readonly: lldrule.readonly,
+				form: this.#form,
+				test_rules: test_rules
 			}),
 			lldmacros: new LldRuleEditLldMacrosTab({
 				container: document.getElementById('lldrule-macros-tab'),
@@ -62,6 +68,15 @@ window.lldrule_prototype_edit = new class {
 				conditions: lldrule.filter.conditions
 			})
 		}
+
+		this.#tabs.lldrule.getContainer().addEventListener('update', () => {
+			this.#update();
+		});
+
+		this.#tabs.preprocessing.getContainer().addEventListener('test.validated', () => {
+			this.#overlay.unsetLoading();
+			this.#update();
+		});
 
 		this.#update();
 
@@ -138,26 +153,7 @@ window.lldrule_prototype_edit = new class {
 	}
 
 	#test(button) {
-		this.#form.findFieldByName('key').setChanged();
-		for (const field of Object.values(this.#form.findFieldByName('preprocessing').getFields())) {
-			field.setChanged();
-		}
-		this.#form.validateFieldsForAction(['key', 'preprocessing'], this.#test_rules).then((result) => {
-			this.#overlay.unsetLoading();
-			this.#update();
-
-			if (!result) {
-				return;
-			}
-
-			const indexes = [].map.call(
-				this.#form_element.querySelectorAll('z-select[name^="preprocessing"][name$="[type]"]'),
-				type => type.getAttribute('name').match(/preprocessing\[(?<step>[\d]+)\]/).groups.step
-			);
-
-			// Method requires form name to be set to itemForm.
-			openItemTestDialog(indexes, true, true, button, -2);
-		});
+		this.#tabs.preprocessing.test(true, true, button, -2);
 	}
 
 	#post(url, data, keep_open = false) {

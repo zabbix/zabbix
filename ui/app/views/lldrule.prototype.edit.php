@@ -104,8 +104,6 @@ $tabs = (new CTabView())
 	)
 	->addTab('processing-tab', _('Preprocessing'),
 		new CPartial('item.edit.preprocessing.tab', [
-			'item' => $lldrule,
-			'preprocessing' => $lldrule['preprocessing'],
 			'preprocessing_types' => $data['preprocessing_types'],
 			'readonly' => $data['readonly']
 		]),

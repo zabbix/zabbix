@@ -21,7 +21,6 @@
 
 $dir = '/../../include/views/js/';
 $scripts = [
-	$this->readJsFile('item.preprocessing.js.php', $data, $dir),
 	$this->readJsFile('itemtest.js.php', $data + ['hostid' => $data['host']['hostid']], $dir)
 ];
 $item = $data['item'];
@@ -106,7 +105,7 @@ if ($item['itemid']) {
 		'class' => implode(' ', [ZBX_STYLE_BTN_ALT, 'js-test-item']),
 		'keepOpen' => true,
 		'isSubmit' => false,
-		'action' => 'item_edit_form.test('.json_encode(['rules' => $data['js_test_validation_rules']]).');'
+		'action' => 'item_edit_form.test();'
 	];
 
 	if ($data['host']['status'] == HOST_STATUS_MONITORED || $data['host']['status'] == HOST_STATUS_NOT_MONITORED) {
@@ -181,10 +180,9 @@ $tabs = (new CTabView(['id' => $tabsid]))
 	)
 	->addTab('processing-tab', _('Preprocessing'),
 		new CPartial('item.edit.preprocessing.tab', [
-			'item' => $item,
-			'preprocessing' => $item['preprocessing'],
 			'preprocessing_types' => $data['preprocessing_types'],
 			'readonly' => $item['templated'] || $item['discovered'],
+			'value_type' => $item['value_type'],
 			'value_types' => $value_types
 		]),
 		TAB_INDICATOR_PREPROCESSING
@@ -215,7 +213,8 @@ $form
 			'testable_item_types' => $data['testable_item_types'],
 			'type_with_key_select' => $type_with_key_select,
 			'value_type_keys' => $data['value_type_keys'],
-			'return_url' => $return_url
+			'return_url' => $return_url,
+			'test_rules' =>$data['js_test_validation_rules']
 		]).');'))->setOnDocumentReady()
 	);
 $output = [
@@ -225,6 +224,7 @@ $output = [
 	'buttons' => $buttons,
 	'script_inline' => getPagePostJs().
 		$this->readJsFile('item.edit.js.php').
+		$this->readJsFile('item.edit.preprocessing.tab.js.php', null, '/../partials/js').
 		$this->readJsFile('host.interface.selector.js.php', null, '/../partials/js'),
 	'dialogue_class' => 'modal-popup-large'
 ];

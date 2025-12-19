@@ -21,7 +21,6 @@
 
 $dir = '/../../include/views/js/';
 $scripts = [
-	$this->readJsFile('item.preprocessing.js.php', $data, $dir),
 	$this->readJsFile('itemtest.js.php', $data + ['hostid' => $data['host']['hostid']], $dir)
 ];
 $item = $data['item'];
@@ -156,10 +155,9 @@ $tabs = (new CTabView(['id' => $tabsid]))
 	)
 	->addTab('processing-tab', _('Preprocessing'),
 		new CPartial('item.edit.preprocessing.tab', [
-			'item' => $item,
-			'preprocessing' => $item['preprocessing'],
 			'preprocessing_types' => $data['preprocessing_types'],
 			'readonly' => $item['templated'] || $item['discovered'],
+			'value_type' => $item['value_type'],
 			'value_types' => $value_types
 		]),
 		TAB_INDICATOR_PREPROCESSING
@@ -199,7 +197,9 @@ $output = [
 	'doc_url' => CDocHelper::getUrl(CDocHelper::DATA_COLLECTION_ITEM_PROTOTYPE_EDIT),
 	'body' => $form->toString().implode('', $scripts),
 	'buttons' => $buttons,
-	'script_inline' => getPagePostJs().$this->readJsFile('item.edit.js.php'),
+	'script_inline' => getPagePostJs().
+		$this->readJsFile('item.edit.js.php').
+		$this->readJsFile('item.edit.preprocessing.tab.js.php', null, '/../partials/js'),
 	'dialogue_class' => 'modal-popup-large'
 ];
 

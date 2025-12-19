@@ -42,10 +42,11 @@ const ZBX_STYLE_TEXTAREA_FLEXIBLE = <?= json_encode(ZBX_STYLE_TEXTAREA_FLEXIBLE)
 window.item_edit_form = new class {
 
 	#host_interface_selector;
+	#tabs;
 
 	init({
 		rules, actions, field_switches, form_data, host, interface_types, inherited_timeouts, readonly, testable_item_types,
-		type_with_key_select, value_type_keys, source, return_url
+		type_with_key_select, value_type_keys, source, return_url, test_rules
 	}) {
 		this.actions = actions;
 		this.form_data = form_data;
@@ -80,6 +81,21 @@ window.item_edit_form = new class {
 			interface_types,
 			host_interfaces: host.interfaces,
 			type: this.form_data.type
+		});
+
+		this.#tabs = {
+			preprocessing: new ItemEditPreprocessingTab({
+				container: document.getElementById('processing-tab'),
+				preprocessing: this.form_data.preprocessing,
+				readonly: this.form_readonly,
+				form: this.form,
+				test_rules: test_rules
+			})
+		}
+
+		this.#tabs.preprocessing.getContainer().addEventListener('test.validated', () => {
+			this.overlay.unsetLoading();
+			this.#updateActionButtons();
 		});
 
 		this.initForm(field_switches);
@@ -404,32 +420,9 @@ window.item_edit_form = new class {
 		});
 	}
 
-	#testDialog() {
-		const indexes = [].map.call(
-			this.form_element.querySelectorAll('z-select[name^="preprocessing"][name$="[type]"]'),
-			type => type.getAttribute('name').match(/preprocessing\[(?<step>[\d]+)\]/).groups.step
-		);
-
-		// Method requires form name to be set to itemForm.
-		openItemTestDialog(indexes, true, true, this.footer.querySelector('.js-test-item'), -2);
-	}
-
-	test({rules}) {
-		this.form.findFieldByName('key').setChanged();
+	test() {
 		this.form.findFieldByName('params_f').setChanged();
-		for (const field of Object.values(this.form.findFieldByName('preprocessing').getFields())) {
-			field.setChanged();
-		}
-		this.form.validateFieldsForAction(['key', 'preprocessing', 'params_f'], rules).then((result) => {
-			this.overlay.unsetLoading();
-			this.#updateActionButtons();
-
-			if (!result) {
-				return;
-			}
-
-			this.#testDialog();
-		});
+		this.#tabs.preprocessing.test(true, true, this.footer.querySelector('.js-test-item'), -2, ['params_f']);
 	}
 
 	delete() {

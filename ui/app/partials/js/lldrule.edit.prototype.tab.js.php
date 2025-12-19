@@ -23,12 +23,10 @@ var LldRuleEditPrototypeTab = class {
 	#container;
 	#field_switches;
 	#host_interface_selector;
-	#update_callback
 
-	constructor({container, field_switches, lldrule, interface_types, host_interfaces, update_callback}) {
+	constructor({container, field_switches, lldrule, interface_types, host_interfaces}) {
 		this.#container = container;
 		this.#field_switches = field_switches;
-		this.#update_callback = update_callback;
 
 		if (!(lldrule.templated || lldrule.discovered)) {
 			if (lldrule.parameters.length == 0) {
@@ -112,11 +110,11 @@ var LldRuleEditPrototypeTab = class {
 
 		this.#container.querySelector('[name="type"]').addEventListener('change', (e) => {
 			this.#host_interface_selector.setType(parseInt(e.target.value, 10));
-			this.#update_callback();
+			this.#container.dispatchEvent(new CustomEvent('update'))
 		});
 
 		this.#container.querySelector('[name="key"]').addEventListener('change', () =>
-			this.#update_callback()
+			this.#container.dispatchEvent(new CustomEvent('update'))
 		);
 
 		new CViewSwitcher('authtype', 'change', this.#field_switches.for_authtype);
@@ -132,6 +130,10 @@ var LldRuleEditPrototypeTab = class {
 
 		jQuery('#query-fields-table').on('tableupdate.dynamicRows', (e) => this.#updateSortOrder(e.target, 'query_fields'));
 		jQuery('#headers-table').on('tableupdate.dynamicRows', (e) => this.#updateSortOrder(e.target, 'headers'));
+	}
+
+	getContainer() {
+		return this.#container;
 	}
 
 	#update() {
