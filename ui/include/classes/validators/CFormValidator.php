@@ -244,6 +244,10 @@ class CFormValidator {
 						break;
 
 					case 'use':
+						if (!is_array($value) || count($value) > 2) {
+							throw new Exception('[RULES ERROR] Rule "'.$key.'" should contain an array with up to two elements (Path: '.$rule_path.')');
+						}
+
 						$result[$key] = $value;
 						break;
 
@@ -1081,7 +1085,6 @@ class CFormValidator {
 
 	private static function validateUseCParser(array $use, string $parser_class, string $value, string &$error): void {
 		$parser_args = array_key_exists(1, $use) ? $use[1] : [];
-		$options = array_key_exists(2, $use) ? $use[2] : [];
 
 		$parser = $parser_args
 			? new $parser_class($parser_args)
@@ -1093,30 +1096,6 @@ class CFormValidator {
 			// Some parsers may return empty string as error.
 			if ($error === '') {
 				$error = _('Invalid string.');
-			}
-		}
-
-		// Parser-specific checks not supported by the parser itself.
-		if ($error === '') {
-			if ($parser instanceof CAbsoluteTimeParser) {
-				if (array_key_exists('min', $options)
-						&& $parser->getDateTime(true)->getTimestamp() < $options['min']) {
-					$error = _s('Value must be greater than %1$s.', date(ZBX_FULL_DATE_TIME, $options['min']));
-				}
-
-				if (array_key_exists('max', $options)
-						&& $parser->getDateTime(true)->getTimestamp() > $options['max']) {
-					$error = _s('Value must be smaller than %1$s.', date(ZBX_FULL_DATE_TIME, $options['max']));
-				}
-			}
-			elseif ($parser instanceof CSimpleIntervalParser) {
-				if (array_key_exists('min', $options) && timeUnitToSeconds($value, true) < $options['min']) {
-					$error = _s('Value must be greater than %1$s.', $options['min']);
-				}
-
-				if (array_key_exists('max', $options) && timeUnitToSeconds($value, true) > $options['max']) {
-					$error = _s('Value must be smaller than %1$s.', $options['max']);
-				}
 			}
 		}
 	}
