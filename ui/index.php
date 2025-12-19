@@ -28,14 +28,14 @@ $page['file'] = 'index.php';
 
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = [
-	'name' =>		[T_ZBX_STR, O_NO,	null,	null,	'isset({enter}) && {enter} != "'.ZBX_GUEST_USER.'"', _('Username')],
-	'password' =>	[T_ZBX_STR, O_OPT, P_NO_TRIM,	null,	'isset({enter}) && {enter} != "'.ZBX_GUEST_USER.'"'],
-	'sessionid' =>	[T_ZBX_STR, O_OPT, null,	null,	null],
-	'reconnect' =>	[T_ZBX_INT, O_OPT, P_SYS,	null,	null],
-	'enter' =>		[T_ZBX_STR, O_OPT, P_SYS,	null,	null],
-	'autologin' =>	[T_ZBX_INT, O_OPT, null,	null,	null],
-	'request' =>	[T_ZBX_STR, O_OPT, null,	null,	null],
-	'form' =>		[T_ZBX_STR, O_OPT, null,	null,	null]
+	'name' =>		[T_ZBX_STR, O_NO,	null,		null,		'isset({enter}) && {enter} != "'.ZBX_GUEST_USER.'"', _('Username')],
+	'password' =>	[T_ZBX_STR, O_OPT,	P_NO_TRIM,	null,		'isset({enter}) && {enter} != "'.ZBX_GUEST_USER.'"'],
+	'sessionid' =>	[T_ZBX_STR, O_OPT,	null,		null,		null],
+	'reconnect' =>	[T_ZBX_INT, O_OPT,	P_SYS,		IN([1]),	null],
+	'enter' =>		[T_ZBX_STR, O_OPT,	P_SYS,		null,		null],
+	'autologin' =>	[T_ZBX_INT, O_OPT,	P_SYS,		IN([0,1]),	null],
+	'request' =>	[T_ZBX_STR, O_OPT,	null,		null,		null],
+	'form' =>		[T_ZBX_STR, O_OPT,	null,		null,		null]
 ];
 check_fields($fields);
 
