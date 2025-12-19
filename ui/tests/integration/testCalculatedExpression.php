@@ -32,7 +32,6 @@ class testCalculatedExpression extends CIntegrationTest {
 
 	const HOST_NAME = 'test_calc';
 	const TRAPPER_ITEM_KEY = 'test.calc.trapper';
-	const TRAPPER_ITEM_KEY_2 = 'test.calc.trapper2';
 	const CALCULATED_ITEM_KEY = 'test.calc.calculated';
 	const DBL_MAX = '1.7976931348623157e308';
 	const DBL_MIN = '-1.7976931348623157e308';
@@ -227,7 +226,7 @@ class testCalculatedExpression extends CIntegrationTest {
 				(float)self::DBL_MAX,
 				(float)self::DBL_MAX
 			],
-			$values
+			array_map('floatval', $values)
 		);
 
 		$this->assertEquals((float)self::DBL_MAX, $this->getItemLastValue($itemid));
@@ -276,7 +275,7 @@ class testCalculatedExpression extends CIntegrationTest {
 				(float)self::DBL_MAX,
 				(float)self::DBL_MAX
 			],
-			$values
+			array_map('floatval', $values)
 		);
 
 		$this->assertEquals((float)'1.7976931348623157e308', $this->getItemLastValue($itemid));
@@ -326,7 +325,7 @@ class testCalculatedExpression extends CIntegrationTest {
 				(float)self::DBL_MAX,
 				(float)self::DBL_MAX
 			],
-			$values
+			array_map('floatval', $values)
 		);
 
 		$this->assertEquals((float)self::DBL_MIN, $this->getItemLastValue($itemid));
@@ -374,7 +373,7 @@ class testCalculatedExpression extends CIntegrationTest {
 				(float)self::DBL_MAX,
 				(float)self::DBL_MAX
 			],
-			$values
+			array_map('floatval', $values)
 		);
 
 		$this->assertEquals((float)self::DBL_MAX, $this->getItemLastValue($itemid));
