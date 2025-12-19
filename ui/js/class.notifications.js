@@ -413,13 +413,13 @@ ZBX_Notifications.prototype.handleTabFocusIn = function() {
  * Close the notification box.
  */
 ZBX_Notifications.prototype.handleCloseClicked = function() {
-	if (this._closing)  {
+	if (this._closing) {
 		return;
 	}
 
 	const ids = this.getEventIds();
 
-	if (!ids.length)  {
+	if (!ids.length) {
 		return;
 	}
 
