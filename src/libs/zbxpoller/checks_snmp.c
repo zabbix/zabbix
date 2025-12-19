@@ -3826,7 +3826,6 @@ int	zbx_async_check_snmp(zbx_dc_snmp_item_t *item, AGENT_RESULT *result,
 		zbx_async_resolve_reverse_dns_t resolve_reverse_dns, int retries)
 {
 	zbx_snmp_context_t	*snmp_context;
-	char 			*snmp_oid = item->snmp_oid;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() itemid:" ZBX_FS_UI64 " key:'%s' host:'%s' addr:'%s' timeout:%d retries:%d"
 			" max_repetitions:%d", __func__, item->itemid, item->key, item->host_host,
@@ -3905,7 +3904,6 @@ int	zbx_async_check_snmp_dc_item(zbx_dc_item_t *item, AGENT_RESULT *result,
 		zbx_async_resolve_reverse_dns_t resolve_reverse_dns, int retries)
 {
 	zbx_snmp_context_t	*snmp_context;
-	char 			*snmp_oid = item->snmp_oid;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() itemid:" ZBX_FS_UI64 " key:'%s' host:'%s' addr:'%s' timeout:%d retries:%d"
 			" max_repetitions:%d", __func__, item->itemid, item->key, item->host.host,
