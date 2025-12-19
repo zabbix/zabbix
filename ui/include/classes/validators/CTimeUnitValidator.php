@@ -70,32 +70,33 @@ class CTimeUnitValidator extends CValidator {
 		}
 
 		$seconds = timeUnitToSeconds($value, $this->with_year);
-		$convert_options = ['with_year' => $this->with_year];
 
 		if ($this->max === null && $this->min !== null && $seconds < $this->min) {
-			$this->setError(_s('value must be equal or greater than %1$s.', secondsToPeriod($this->min)));
+			$this->setError(_s('value must be greater than or equal to %1$s', $this->getSecondsText($this->min)));
 
 			return false;
 		}
 		elseif ($this->min === null && $this->max !== null && $seconds > $this->max) {
-			$this->setError(_s('value must be equal or less than %1$s.', secondsToPeriod($this->max)));
+			$this->setError(_s('value must be less than or equal to %1$s', $this->getSecondsText($this->max)));
 
 			return false;
 		}
 		elseif (($this->max !== null && $seconds > $this->max) || ($this->min !== null && $seconds < $this->min)) {
-			$min_text = $this->min >= 60
-				? $this->min._x('s', 'second short').' ('.convertUnitsS($this->min, $convert_options) .')'
-				: convertUnitsS($this->min, $convert_options);
-
-			$max_text = $this->max >= 60
-				? $this->max._x('s', 'second short').' ('.convertUnitsS($this->max, $convert_options).')'
-				: convertUnitsS($this->max, $convert_options);
-
-			$this->setError(_s('value must be between %1$s and %2$s', $min_text, $max_text));
+			$this->setError(_s('value must be between %1$s and %2$s', $this->getSecondsText($this->min),
+				$this->getSecondsText($this->max)
+			));
 
 			return false;
 		}
 
 		return true;
+	}
+
+	private function getSecondsText(int $seconds): string {
+		$convert_options = ['with_year' => $this->with_year];
+
+		return $seconds >= 60
+			? $seconds._x('s', 'second short').' ('.convertUnitsS($seconds, $convert_options) .')'
+			: convertUnitsS($seconds, $convert_options);
 	}
 }
