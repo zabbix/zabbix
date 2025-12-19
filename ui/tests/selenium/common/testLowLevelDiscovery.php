@@ -455,7 +455,7 @@ class testLowLevelDiscovery extends CWebTest {
 					$hint->query('xpath:.//button[@title="Close"]')->waitUntilClickable()->one()->click();
 				}
 
-			case 'Zabbix agent';
+			case 'Zabbix agent':
 			case 'JMX agent':
 			case 'IPMI agent':
 				if (static::$context === 'host') {
