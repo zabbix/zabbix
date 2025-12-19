@@ -1,1 +1,1 @@
-..F....... [ZBX-27087] fixed adding new item tag replaces existing tag if tag list contains inherited tags (agriscenko)
+..F....... [ZBX-27087] fixed incorrect replacement of item tags when adding a new tag through inherited tags form (agriscenko)
