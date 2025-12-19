@@ -48,11 +48,11 @@ class CWidgetItemHistory extends CWidget {
 		for (const iframe of this.#values_table.querySelectorAll('.js-iframe')) {
 			iframe.addEventListener('load', () => {
 				const iframe_content_body = iframe.contentDocument.body;
-				const computed_styles = getComputedStyle(iframe);
+				const computed_style = getComputedStyle(iframe);
 
 				iframe_content_body.style.margin = '0';
-				iframe_content_body.style.font = computed_styles.font;
-				iframe_content_body.style.color = computed_styles.color;
+				iframe_content_body.style.font = computed_style.font;
+				iframe_content_body.style.color = computed_style.color;
 
 				const resizeIframe = () => {
 					const content_scroll_width = iframe_content_body.scrollWidth;
