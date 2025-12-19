@@ -852,6 +852,13 @@ class CFormValidatorTest extends TestCase {
 			],
 			[
 				['object', 'fields' => [
+					'value' => ['string', 'use' => [CAbsoluteTimeValidator::class, [], ['min' => 2147464799]]]
+				]],
+				null,
+				'[RULES ERROR] Rule "use" should contain an array with up to two elements (Path: /value)'
+			],
+			[
+				['object', 'fields' => [
 					'color' => ['string', 'rgb']
 				]],
 				['type' => 'object', 'fields' => [
@@ -1705,8 +1712,7 @@ class CFormValidatorTest extends TestCase {
 					'value' => ''
 				]],
 				['interfaces' => [
-					'status' => 2,
-					'value' => ''
+					'status' => 2
 				]],
 				CFormValidator::SUCCESS,
 				[]
@@ -1756,7 +1762,7 @@ class CFormValidatorTest extends TestCase {
 					'value' => ['string', 'not_empty', 'when' => ['templates', 'not_empty']]
 				]],
 				['templates' => [], 'value' => ''],
-				['templates' => [], 'value' => ''],
+				['templates' => []],
 				CFormValidator::SUCCESS,
 				[]
 			],
@@ -1766,7 +1772,7 @@ class CFormValidatorTest extends TestCase {
 					'value' => ['string', 'not_empty', 'when' => ['templates', 'empty']]
 				]],
 				['templates' => ['1', '2', '3'], 'value' => ''],
-				['templates' => ['1', '2', '3'], 'value' => ''],
+				['templates' => ['1', '2', '3']],
 				CFormValidator::SUCCESS,
 				[]
 			],
@@ -1800,7 +1806,7 @@ class CFormValidatorTest extends TestCase {
 					'value' => ['string', 'not_empty', 'when' => ['host', 'exist']]
 				]],
 				['value' => ''],
-				['value' => ''],
+				[],
 				CFormValidator::SUCCESS,
 				[]
 			],
@@ -1846,7 +1852,7 @@ class CFormValidatorTest extends TestCase {
 					'value' => ['string', 'not_empty', 'when' => ['host', 'not_exist']]
 				]],
 				['host' => '', 'value' => ''],
-				['host' => '', 'value' => ''],
+				['host' => ''],
 				CFormValidator::SUCCESS,
 				[]
 			],
@@ -2186,7 +2192,9 @@ class CFormValidatorTest extends TestCase {
 			],
 			[
 				['object', 'fields' => [
-					'value' => ['string', 'use' => [CAbsoluteTimeParser::class, [], ['min' => 0, 'max' => ZBX_MAX_DATE]]]
+					'value' => ['string',
+						'use' => [CAbsoluteTimeValidator::class, ['min' => 0, 'max' => ZBX_MAX_DATE]]
+					]
 				]],
 				['value' => '2024-01-08 12:00:00'],
 				['value' => '2024-01-08 12:00:00'],
@@ -2195,24 +2203,28 @@ class CFormValidatorTest extends TestCase {
 			],
 			[
 				['object', 'fields' => [
-					'value' => ['string', 'use' => [CAbsoluteTimeParser::class, [], ['max' => 1704700000]]]
+					'value' => ['string', 'use' => [CAbsoluteTimeValidator::class, ['max' => 1704700000]]]
 				]],
 				['value' => '2024-01-08 12:00:00'],
 				['value' => '2024-01-08 12:00:00'],
 				CFormValidator::ERROR,
 				['/value' => [
-					['message' => 'Value must be smaller than 2024-01-08 09:46:40.', 'level' => CFormValidator::ERROR_LEVEL_DELAYED]
+					['message' => 'Value must be less than or equal to 2024-01-08 09:46:40.',
+						'level' => CFormValidator::ERROR_LEVEL_DELAYED
+					]
 				]]
 			],
 			[
 				['object', 'fields' => [
-					'value' => ['string', 'use' => [CAbsoluteTimeParser::class, [], ['min' => 2147464799]]]
+					'value' => ['string', 'use' => [CAbsoluteTimeValidator::class, ['min' => 2147464799]]]
 				]],
 				['value' => '2024-01-08 12:00:00'],
 				['value' => '2024-01-08 12:00:00'],
 				CFormValidator::ERROR,
 				['/value' => [
-					['message' => 'Value must be greater than 2038-01-18 23:59:59.', 'level' => CFormValidator::ERROR_LEVEL_DELAYED]
+					['message' => 'Value must be greater than or equal to 2038-01-18 23:59:59.',
+						'level' => CFormValidator::ERROR_LEVEL_DELAYED
+					]
 				]]
 			],
 			[
@@ -2376,7 +2388,7 @@ class CFormValidatorTest extends TestCase {
 					'field2' => ['integer', 'min' => 3, 'when' => ['field1', 'exist']]
 				]],
 				['field2' => 2],
-				['field2' => 2],
+				[],
 				CFormValidator::SUCCESS,
 				[]
 			],
@@ -2386,7 +2398,7 @@ class CFormValidatorTest extends TestCase {
 					'field2' => ['integer', 'min' => 3, 'when' => ['field1', 'not_exist']]
 				]],
 				['field1' => 1, 'field2' => 2],
-				['field1' => 1, 'field2' => 2],
+				['field1' => 1],
 				CFormValidator::SUCCESS,
 				[]
 			],
@@ -2521,6 +2533,119 @@ class CFormValidatorTest extends TestCase {
 				]],
 				['value' => ['name' => '', 'type' => '', 'tmp_name' => 'phpunit.xml', 'error' => UPLOAD_ERR_OK,
 					'size' => 10
+				]]
+			],
+			[
+				['object', 'fields' => [
+					'test' => ['boolean'],
+					'value' => ['array', 'when' => ['test', 'exist'],
+						'field' => ['integer', 'when' => ['../test', 'in' => [0]]]
+					]
+				]],
+				['test' => 1, 'value' => [1,2,3]],
+				['test' => 1, 'value' => []],
+				CFormValidator::SUCCESS,
+				[]
+			],
+			[
+				['object', 'fields' => [
+					'test' => ['boolean'],
+					'value' => ['array', 'when' => ['test', 'exist'],
+						'field' => ['integer']
+					]
+				]],
+				['value' => [1,2,3]],
+				[],
+				CFormValidator::SUCCESS,
+				[]
+			],
+			[
+				['object', 'fields' => [
+					'test' => ['boolean'],
+					'value' => ['array', 'not_empty', 'when' => ['test', 'exist'],
+						'field' => ['integer', 'when' => ['../test', 'in' => [0]]]
+					]
+				]],
+				['test' => 1, 'value' => [1,2,3]],
+				[],
+				CFormValidator::ERROR,
+				['/value' => [
+					['message' => 'This field cannot be empty.', 'level' => CFormValidator::ERROR_LEVEL_PRIMARY]
+				]]
+			],
+			[
+				['object', 'fields' => [
+					'test' => ['boolean'],
+					'value' => ['array', 'when' => ['test', 'exist'],
+						'field' => ['integer', 'when' => ['../test', 'in' => [0]]]
+					]
+				]],
+				['test' => 0, 'value' => [1,2,3]],
+				['test' => 0, 'value' => [1,2,3]],
+				CFormValidator::SUCCESS,
+				[]
+			],
+			[
+				['object', 'fields' => [
+					'value' => ['string', 'use' => [CTimeUnitValidator::class, ['min' => 0, 'max' => 61]]]
+				]],
+				['value' => 70],
+				[],
+				CFormValidator::ERROR,
+				['/value' => [
+					['message' => 'Value must be between 0 and 61s (1m 1s).',
+						'level' => CFormValidator::ERROR_LEVEL_DELAYED
+					]
+				]]
+			],
+			[
+				['object', 'fields' => [
+					'value' => ['string', 'use' => [CTimeUnitValidator::class, ['min' => 0, 'max' => 60]]]
+				]],
+				['value' => 70],
+				[],
+				CFormValidator::ERROR,
+				['/value' => [
+					['message' => 'Value must be between 0 and 60s (1m).',
+						'level' => CFormValidator::ERROR_LEVEL_DELAYED
+					]
+				]]
+			],
+			[
+				['object', 'fields' => [
+					'value' => ['string',
+						'use' => [CTimeUnitValidator::class, ['min' => SEC_PER_HOUR, 'max' => 86400]]
+					]
+				]],
+				['value' => 10],
+				[],
+				CFormValidator::ERROR,
+				['/value' => [
+					['message' => 'Value must be between 3600s (1h) and 86400s (1d).',
+						'level' => CFormValidator::ERROR_LEVEL_DELAYED
+					]
+				]]
+			],
+			[
+				['object', 'fields' => [
+					'value' => ['string', 'use' => [CTimeUnitValidator::class]]
+				]],
+				['value' => 'zzzz'],
+				['value' => 'zzzz'],
+				CFormValidator::ERROR,
+				['/value' => [
+					['message' => 'A time unit is expected.', 'level' => CFormValidator::ERROR_LEVEL_DELAYED]
+				]]
+			],
+			[
+				['object', 'fields' => [
+					'value' => ['string', 'use' => [CAbsoluteTimeValidator::class]]
+				]],
+				['value' => 'zzzz'],
+				['value' => 'zzzz'],
+				CFormValidator::ERROR,
+				['/value' => [
+					['message' => 'Invalid date.', 'level' => CFormValidator::ERROR_LEVEL_DELAYED]
 				]]
 			]
 		];

@@ -379,7 +379,7 @@ static void	determine_items_in_expressions(zbx_vector_dc_trigger_t *trigger_orde
 		}
 	}
 
-	zbx_dc_config_clean_functions(functions, errcodes, functionids.values_num);
+	zbx_dc_config_clean_functions(functions, functionids.values_num);
 	zbx_free(errcodes);
 	zbx_free(functions);
 out:
@@ -1382,7 +1382,7 @@ void	zbx_sync_history_cache_server(const zbx_events_funcs_t *events_cbs, zbx_ipc
 	static int				module_enabled = FAIL;
 	int					i, history_num, history_float_num, history_integer_num,
 						history_string_num, history_text_num, history_log_num, txn_error,
-						compression_age, connectors_retrieved = FAIL;
+						compression_age = FAIL, connectors_retrieved = FAIL;
 	unsigned int				item_retrieve_mode;
 	time_t					sync_start;
 	zbx_vector_uint64_t			triggerids;
@@ -1440,8 +1440,6 @@ void	zbx_sync_history_cache_server(const zbx_events_funcs_t *events_cbs, zbx_ipc
 				ZBX_HC_SYNC_MAX * sizeof(ZBX_HISTORY_LOG));
 	}
 
-	compression_age = zbx_hc_get_history_compression_age();
-
 	zbx_vector_connector_filter_create(&connector_filters_history);
 	zbx_vector_connector_filter_create(&connector_filters_events);
 	zbx_vector_inventory_value_ptr_create(&inventory_values);
@@ -1460,7 +1458,7 @@ void	zbx_sync_history_cache_server(const zbx_events_funcs_t *events_cbs, zbx_ipc
 	zbx_vector_hc_item_ptr_reserve(&history_items, ZBX_HC_SYNC_MAX);
 
 	zbx_vector_dc_trigger_create(&trigger_order);
-	zbx_hashset_create(&trigger_info, 100, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	zbx_hashset_create(&trigger_info, 100, ZBX_DEFAULT_ID_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 	zbx_vector_uint64_create(&itemids);
 
@@ -1498,6 +1496,11 @@ void	zbx_sync_history_cache_server(const zbx_events_funcs_t *events_cbs, zbx_ipc
 			zbx_dc_um_handle_t	*um_handle;
 
 			stats->values_num += history_num;
+
+			if (FAIL == compression_age)
+			{
+				compression_age = zbx_hc_get_history_compression_age();
+			}
 
 			if (FAIL == connectors_retrieved)
 			{
@@ -1653,7 +1656,7 @@ void	zbx_sync_history_cache_server(const zbx_events_funcs_t *events_cbs, zbx_ipc
 					zbx_vector_escalation_new_ptr_create(&escalations);
 
 					start_time = zbx_time();
-					zbx_db_begin();
+					zbx_db_begin_deferred();
 
 					recalculate_triggers(history, history_num, &itemids, items, errcodes,
 							&trigger_timers, events_cbs->add_event_cb, &trigger_diff,

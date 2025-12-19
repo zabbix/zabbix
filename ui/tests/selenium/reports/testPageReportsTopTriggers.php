@@ -1219,6 +1219,7 @@ class testPageReportsTopTriggers extends CWebTest {
 		if (!CTestArrayHelper::get($data, 'fields.Host groups')) {
 			$filter_form->getField('Host groups')->fill('Common group');
 			$filter_form->submit();
+			$filter_form->waitUntilReloaded();
 		}
 
 		if (array_key_exists('fields', $data)) {

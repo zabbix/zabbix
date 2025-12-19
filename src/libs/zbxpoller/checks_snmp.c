@@ -1048,7 +1048,7 @@ static zbx_snmp_sess_t	zbx_snmp_open_session(unsigned char snmp_version, const c
 	zbx_snmp_sess_t		ssp = NULL;
 	char			addr[128];
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() itemid:" ZBX_FS_UI64, __func__, itemid);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() itemid:" ZBX_FS_UI64 ", version:%d", __func__, itemid, snmp_version);
 
 	snmp_sess_init(&session);
 
@@ -1090,8 +1090,10 @@ static zbx_snmp_sess_t	zbx_snmp_open_session(unsigned char snmp_version, const c
 	{
 		session.community = (u_char *)snmp_community;
 		session.community_len = strlen((char *)session.community);
+#ifdef ZBX_DEBUG
 		zabbix_log(LOG_LEVEL_DEBUG, "itemid:" ZBX_FS_UI64 " SNMP [%s@%s]", itemid,
 				session.community, session.peername);
+#endif
 	}
 	else if (SNMP_VERSION_3 == session.version)
 	{
@@ -1213,8 +1215,10 @@ static zbx_snmp_sess_t	zbx_snmp_open_session(unsigned char snmp_version, const c
 				break;
 		}
 
+#ifdef ZBX_DEBUG
 		zabbix_log(LOG_LEVEL_DEBUG, "itemid:" ZBX_FS_UI64 " SNMPv3 [%s@%s]", itemid, session.securityName,
 				session.peername);
+#endif
 	}
 
 #ifdef HAVE_NETSNMP_SESSION_LOCALNAME

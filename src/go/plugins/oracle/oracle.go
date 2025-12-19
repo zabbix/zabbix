@@ -77,13 +77,13 @@ func (p *Plugin) Export(key string, rawParams []string, pluginCtx plugin.Context
 
 	conn, err := p.connMgr.GetConnection(*connDetails)
 	if err != nil {
+		p.Errf("%s failed: %v\n", key, err.Error())
+
 		// Special logic of processing connection errors should be used if oracle.ping is requested,
 		// because it must return pingFailed if any error occurred.
 		if key == keyPing {
 			return handlers.PingFailed, nil
 		}
-
-		p.Errf(err.Error())
 
 		return nil, errs.Wrap(err, "get connection failed")
 	}
@@ -97,7 +97,10 @@ func (p *Plugin) Export(key string, rawParams []string, pluginCtx plugin.Context
 	defer cancel()
 
 	result, err := handleMetric(ctx, conn, params, extraParams...)
+
 	if err != nil {
+		p.Errf("%s failed: %v\n", key, err.Error())
+
 		ctxErr := ctx.Err()
 		if ctxErr != nil && errors.Is(ctxErr, context.DeadlineExceeded) {
 			p.Errf(

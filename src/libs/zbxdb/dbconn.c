@@ -50,6 +50,8 @@ struct zbx_db_result
 
 static const zbx_db_config_t	*db_config = NULL;
 
+static zbx_db_query_mask_t	db_log_masked_values = ZBX_DB_DONT_MASK_QUERIES;
+
 #if defined(HAVE_POSTGRESQL)
 static 	ZBX_THREAD_LOCAL char	ZBX_PG_ESCAPE_BACKSLASH = 1;
 #elif defined(HAVE_SQLITE3)
@@ -119,6 +121,53 @@ void	dbconn_deinit(void)
 #endif
 }
 
+static char	*mask_skip_whitespace(char *s)
+{
+	while ('\0' != *s && 0 != isspace((unsigned char)*s))
+		s++;
+
+	return s;
+}
+
+static char	*mask_skip_tablename(char *s)
+{
+	while ('\0' != *s && (0 != isalnum((unsigned char)*s) || '_' == *s || '.' == *s))
+		s++;
+
+	return s;
+}
+
+static void	db_mask_printable_sql_values(char **sql)
+{
+#define	DB_MASK	"..."
+	char	*p, *end;
+
+	if (0 == strncmp(*sql, "insert into", ZBX_CONST_STRLEN("insert into")))
+	{
+		p = *sql + ZBX_CONST_STRLEN("insert into");
+	}
+	else if (0 == strncmp(*sql, "update", ZBX_CONST_STRLEN("update")))
+	{
+		p = *sql + ZBX_CONST_STRLEN("update");
+	}
+	else if (0 == strncmp(*sql, "select", ZBX_CONST_STRLEN("select")))
+	{
+		if (NULL == (p = strstr(*sql, " from ")))
+			return;
+
+		p += ZBX_CONST_STRLEN(" from ");
+	}
+	else
+		return;
+
+	p = mask_skip_whitespace(p);
+	end = mask_skip_tablename(p);
+	*end = '\0';
+
+	zbx_strlcpy(end, DB_MASK, ZBX_CONST_STRLEN(DB_MASK) + 1);
+#undef DB_MASK
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: replace non-printable characters in SQL query for logging         *
@@ -131,6 +180,9 @@ static char	*db_replace_nonprintable_chars(const char *sql, char **sql_printable
 		*sql_printable = zbx_strdup(NULL, sql);
 		zbx_replace_invalid_utf8_and_nonprintable(*sql_printable);
 	}
+
+	if (ZBX_DB_MASK_QUERIES == db_log_masked_values)
+		db_mask_printable_sql_values(sql_printable);
 
 	return *sql_printable;
 }
@@ -318,7 +370,9 @@ void	dbconn_close(zbx_dbconn_t *db)
  ******************************************************************************/
 static int	dbconn_open(zbx_dbconn_t *db)
 {
-	int		ret = ZBX_DB_OK, last_txn_error, last_txn_level;
+	int			ret = ZBX_DB_OK, last_txn_error, last_txn_level;
+	zbx_dbconn_mode_t	last_mode;
+
 #if defined(HAVE_MYSQL)
 	int		err_no = 0;
 #elif defined(HAVE_POSTGRESQL)
@@ -341,9 +395,11 @@ static int	dbconn_open(zbx_dbconn_t *db)
 
 	last_txn_error = db->txn_error;
 	last_txn_level = db->txn_level;
+	last_mode = db->mode;
 
 	db->txn_error = ZBX_DB_OK;
 	db->txn_level = 0;
+	db->mode = DBCONN_MODE_DEFAULT;
 
 #if defined(HAVE_MYSQL)
 	if (NULL == (db->conn = mysql_init(NULL)))
@@ -741,6 +797,7 @@ out:
 
 	db->txn_error = last_txn_error;
 	db->txn_level = last_txn_level;
+	db->mode = last_mode;
 
 	return ret;
 }
@@ -790,6 +847,8 @@ static int	dbconn_vexecute(zbx_dbconn_t *db, const char *fmt, va_list args)
 	int		err;
 	char		*error = NULL;
 #endif
+	if (DBCONN_MODE_DEFERRED_BEGIN == db->mode && 0 == db->txn_level)
+		zbx_dbconn_begin(db);
 
 	if (0 != db->config->log_slow_queries)
 		sec = zbx_time();
@@ -1025,11 +1084,19 @@ static int	dbconn_commit(zbx_dbconn_t *db)
 
 	if (0 == db->txn_level)
 	{
+		if (DBCONN_MODE_DEFERRED_BEGIN == db->mode)
+		{
+			db->mode = DBCONN_MODE_DEFAULT;
+			return ZBX_DB_OK;
+		}
+
 		zabbix_log(LOG_LEVEL_CRIT, "ERROR: commit without transaction."
 				" Please report it to Zabbix Team.");
 		zbx_this_should_never_happen_backtrace();
 		assert(0);
 	}
+
+	db->mode = DBCONN_MODE_DEFAULT;
 
 	if (ZBX_DB_OK != db->txn_error)
 		return ZBX_DB_FAIL; /* commit called on failed transaction */
@@ -1064,6 +1131,12 @@ static int	dbconn_rollback(zbx_dbconn_t *db)
 
 	if (0 == db->txn_level)
 	{
+		if (DBCONN_MODE_DEFERRED_BEGIN == db->mode)
+		{
+			db->mode = DBCONN_MODE_DEFAULT;
+			return ZBX_DB_OK;
+		}
+
 		zabbix_log(LOG_LEVEL_CRIT, "ERROR: rollback without transaction."
 				" Please report it to Zabbix Team.");
 		zbx_this_should_never_happen_backtrace();
@@ -1074,6 +1147,7 @@ static int	dbconn_rollback(zbx_dbconn_t *db)
 
 	/* allow rollback of failed transaction */
 	db->txn_error = ZBX_DB_OK;
+	db->mode = DBCONN_MODE_DEFAULT;
 
 	rc = dbconn_execute(db, "rollback;");
 
@@ -1112,6 +1186,8 @@ static zbx_db_result_t	dbconn_vselect(zbx_dbconn_t *db, const char *fmt, va_list
 	int		ret = FAIL;
 	char		*error = NULL;
 #endif
+	if (DBCONN_MODE_DEFERRED_BEGIN == db->mode && 0 == db->txn_level)
+		zbx_dbconn_begin(db);
 
 	if (0 != db->config->log_slow_queries)
 		sec = zbx_time();
@@ -1509,6 +1585,11 @@ int	zbx_dbconn_begin(zbx_dbconn_t *db)
 	}
 
 	return rc;
+}
+
+void	zbx_dbconn_begin_deferred(zbx_dbconn_t *db)
+{
+	db->mode = DBCONN_MODE_DEFERRED_BEGIN;
 }
 
 /******************************************************************************
@@ -2517,7 +2598,7 @@ static int	db_large_query_select(zbx_db_large_query_t *query)
 	if (NULL != query->suffix)
 		zbx_strcpy_alloc(query->sql, query->sql_alloc, query->sql_offset, query->suffix);
 
-	query->result = dbconn_select(query->db, "%s", *query->sql);
+	query->result = zbx_dbconn_select(query->db, "%s", *query->sql);
 
 	return SUCCEED;
 }
@@ -2697,4 +2778,27 @@ void	zbx_db_large_query_clear(zbx_db_large_query_t *query)
 void	zbx_dbconn_large_query_append_sql(zbx_db_large_query_t *query, const char *sql)
 {
 	query->suffix = zbx_strdup(NULL, sql);
+}
+
+zbx_db_query_mask_t	zbx_db_set_log_masked_values(zbx_db_query_mask_t flag)
+{
+#ifdef ZBX_DEBUG
+	ZBX_UNUSED(flag);
+	return ZBX_DB_DONT_MASK_QUERIES;
+#else
+	zbx_db_query_mask_t	prev_flag = db_log_masked_values;
+
+	db_log_masked_values = flag;
+
+	return prev_flag;
+#endif
+}
+
+zbx_db_query_mask_t	zbx_db_get_log_masked_values(void)
+{
+#ifdef ZBX_DEBUG
+	return ZBX_DB_DONT_MASK_QUERIES;
+#else
+	return db_log_masked_values;
+#endif
 }

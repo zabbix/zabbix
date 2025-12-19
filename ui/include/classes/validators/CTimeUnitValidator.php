@@ -49,13 +49,22 @@ class CTimeUnitValidator extends CValidator {
 		}
 	}
 
+	/**
+	 * Checks if the given string is:
+	 * - either macro or time unit text with CSimpleIntervalParser
+	 * - if value is not a macro, then also validates if value is between provided min and max range
+	 *
+	 * @param string $value
+	 *
+	 * @return bool
+	 */
 	public function validate($value) {
 		if ($this->accept_zero && $value === '0') {
 			return true;
 		}
 
 		$interval_parser = new CSimpleIntervalParser(['usermacros' => $this->usermacros,
-			'lldmacros' => $this->lldmacros, 'with_year' =>  $this->with_year
+			'lldmacros' => $this->lldmacros, 'with_year' => $this->with_year
 		]);
 		$result = $interval_parser->parse($value);
 
@@ -70,9 +79,18 @@ class CTimeUnitValidator extends CValidator {
 		}
 
 		$seconds = timeUnitToSeconds($value, $this->with_year);
+		$convert_options = ['with_year' => $this->with_year];
 
 		if ($seconds > $this->max || $seconds < $this->min) {
-			$this->setError(_s('value must be one of %1$s', $this->min.'-'.$this->max));
+			$min_text = $this->min >= 60
+				? $this->min._x('s', 'second short').' ('.convertUnitsS($this->min, $convert_options) .')'
+				: convertUnitsS($this->min, $convert_options);
+
+			$max_text = $this->max >= 60
+				? $this->max._x('s', 'second short').' ('.convertUnitsS($this->max, $convert_options).')'
+				: convertUnitsS($this->max, $convert_options);
+
+			$this->setError(_s('value must be between %1$s and %2$s', $min_text, $max_text));
 
 			return false;
 		}

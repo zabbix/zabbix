@@ -32,7 +32,10 @@ class CControllerServiceCreate extends CController {
 					'operator' => ['db service_problem_tag.operator', 'in' => [
 						ZBX_SERVICE_PROBLEM_TAG_OPERATOR_EQUAL, ZBX_SERVICE_PROBLEM_TAG_OPERATOR_LIKE
 					]],
-					'tag' => ['db service_problem_tag.tag', 'required', 'not_empty', 'when' => ['value', 'not_empty']]
+					'tag' => [
+						['db service_problem_tag.tag'],
+						['db service_problem_tag.tag', 'required', 'not_empty', 'when' => ['value', 'not_empty']]
+					]
 				]
 			],
 			'sortorder' => ['db services.sortorder', 'required', 'min' => 0, 'max' => 999],
@@ -85,7 +88,10 @@ class CControllerServiceCreate extends CController {
 				'messages' => ['uniq' => _('Tag name and value combination is not unique.')],
 				'fields' => [
 					'value' => ['db service_tag.value'],
-					'tag' => ['db service_tag.tag', 'required', 'not_empty', 'when' => ['value', 'not_empty']]
+					'tag' => [
+						['db service_tag.tag'],
+						['db service_tag.tag', 'required', 'not_empty', 'when' => ['value', 'not_empty']]
+					]
 				]
 			],
 			'child_serviceids' => ['array', 'field' => ['db services.serviceid']]

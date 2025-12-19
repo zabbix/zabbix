@@ -531,49 +531,13 @@ class testMassUpdateItems extends CWebTest{
 						'Type' => ['id' => 'type', 'value' => 'HTTP agent'],
 						'Host interface' => ['id' => 'interface-select', 'value' => '127.0.5.1:10051'],
 						'URL' => ['id' => 'url', 'value' => 'https//:zabbix.com'],
-						'Request body type' => ['id' => 'post_type_container', 'value' => 'JSON data'],
-						'Request body' => ['id' => 'posts', 'value' => '"request": "active checks", "host": "host"']
-					],
-					'details' => 'Invalid parameter "/1/posts": JSON is expected.'
-				]
-			],
-			// #24.
-			[
-				[
-					'expected' => TEST_BAD,
-					'names' => [
-						'1_Item',
-						'2_Item'
-					],
-					'change' => [
-						'Type' => ['id' => 'type', 'value' => 'HTTP agent'],
-						'Host interface' => ['id' => 'interface-select', 'value' => '127.0.5.1:10051'],
-						'URL' => ['id' => 'url', 'value' => 'https//:zabbix.com'],
-						'Request body type' => ['id' => 'post_type_container', 'value' => 'XML data'],
-						'Request body' => ['id' => 'posts', 'value' => 'xml version="1.0" encoding="UTF-8"?<zabbix_export></zabbix_export>']
-					],
-					'details' => 'Invalid parameter "/1/posts": (4) Start tag expected, \'<\' not found [Line: 1 | Column: 1].'
-				]
-			],
-			// #25.
-			[
-				[
-					'expected' => TEST_BAD,
-					'names' => [
-						'1_Item',
-						'2_Item'
-					],
-					'change' => [
-						'Type' => ['id' => 'type', 'value' => 'HTTP agent'],
-						'Host interface' => ['id' => 'interface-select', 'value' => '127.0.5.1:10051'],
-						'URL' => ['id' => 'url', 'value' => 'https//:zabbix.com'],
 						'Request body type' => ['id' => 'post_type_container', 'value' => 'XML data'],
 						'Request body' => ['id' => 'posts', 'value' => '']
 					],
 					'details' => 'Invalid parameter "/1/posts": cannot be empty.'
 				]
 			],
-			// #26.
+			// #24.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -589,7 +553,7 @@ class testMassUpdateItems extends CWebTest{
 					'details' => 'Invalid parameter "/1/url": cannot be empty.'
 				]
 			],
-			// #27.
+			// #25.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -605,7 +569,7 @@ class testMassUpdateItems extends CWebTest{
 					'details' => 'Invalid parameter "/1/jmx_endpoint": cannot be empty.'
 				]
 			],
-			// #28.
+			// #26.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -626,7 +590,7 @@ class testMassUpdateItems extends CWebTest{
 					'details' => 'Invalid parameter "/1": both username and password should be either present or empty.'
 				]
 			],
-			// #29.
+			// #27.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -647,7 +611,7 @@ class testMassUpdateItems extends CWebTest{
 					'details' => 'Invalid parameter "/1": both username and password should be either present or empty.'
 				]
 			],
-			// #30.
+			// #28.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -663,7 +627,7 @@ class testMassUpdateItems extends CWebTest{
 					'interface_text_part' => 'SNMPv3, Context name: zabbix'
 				]
 			],
-			// #31.
+			// #29.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -677,7 +641,7 @@ class testMassUpdateItems extends CWebTest{
 					'details' => 'Invalid parameter "/1/timeout": value must be one of 1-600.'
 				]
 			],
-			// #32.
+			// #30.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -691,7 +655,7 @@ class testMassUpdateItems extends CWebTest{
 					'details' => 'Invalid parameter "/1/timeout": value must be one of 1-600.'
 				]
 			],
-			// #33.
+			// #31.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -706,7 +670,7 @@ class testMassUpdateItems extends CWebTest{
 					'details' => 'Incorrect value for field "timeout": cannot be empty.'
 				]
 			],
-			// #34.
+			// #32.
 			[
 				[
 					'names' => [
@@ -718,7 +682,7 @@ class testMassUpdateItems extends CWebTest{
 					]
 				]
 			],
-			// #35.
+			// #33.
 			[
 				[
 					'names' => [
@@ -757,7 +721,7 @@ class testMassUpdateItems extends CWebTest{
 					]
 				]
 			],
-			// #36.
+			// #34.
 			[
 				[
 					'names' => [
@@ -778,7 +742,7 @@ class testMassUpdateItems extends CWebTest{
 					]
 				]
 			],
-			// #37.
+			// #35.
 			[
 				[
 					'names' => [
@@ -799,7 +763,7 @@ class testMassUpdateItems extends CWebTest{
 					]
 				]
 			],
-			// #38.
+			// #36.
 			[
 				[
 					'names' => [
@@ -820,7 +784,7 @@ class testMassUpdateItems extends CWebTest{
 					]
 				]
 			],
-			// #39.
+			// #37.
 			[
 				[
 					'names' => [
@@ -841,7 +805,7 @@ class testMassUpdateItems extends CWebTest{
 					]
 				]
 			],
-			// #40.
+			// #38.
 			[
 				[
 					'names' => [
@@ -862,7 +826,7 @@ class testMassUpdateItems extends CWebTest{
 					]
 				]
 			],
-			// #41.
+			// #39.
 			[
 				[
 					'names' => [
@@ -881,7 +845,7 @@ class testMassUpdateItems extends CWebTest{
 
 				]
 			],
-			// #42.
+			// #40.
 			[
 				[
 					'names' => [
@@ -910,7 +874,7 @@ class testMassUpdateItems extends CWebTest{
 					]
 				]
 			],
-			// #43.
+			// #41.
 			[
 				[
 					'names' => [
@@ -924,7 +888,7 @@ class testMassUpdateItems extends CWebTest{
 					]
 				]
 			],
-			// #44.
+			// #42.
 			[
 				[
 					'names' => [
@@ -937,7 +901,7 @@ class testMassUpdateItems extends CWebTest{
 					]
 				]
 			],
-			// #45.
+			// #43.
 			[
 				[
 					'names' => [
@@ -953,7 +917,7 @@ class testMassUpdateItems extends CWebTest{
 					]
 				]
 			],
-			// #46.
+			// #44.
 			[
 				[
 					'names' => [
@@ -967,7 +931,7 @@ class testMassUpdateItems extends CWebTest{
 					]
 				]
 			],
-			// #47.
+			// #45.
 			[
 				[
 					'names' => [
@@ -1000,7 +964,7 @@ class testMassUpdateItems extends CWebTest{
 				],
 				'screenshot' => true
 			],
-			// #48.
+			// #46.
 			[
 				[
 					'names' => [
@@ -1017,7 +981,7 @@ class testMassUpdateItems extends CWebTest{
 					]
 				]
 			],
-			// #49.
+			// #47.
 			[
 				[
 					'names' => [
@@ -1030,7 +994,7 @@ class testMassUpdateItems extends CWebTest{
 					]
 				]
 			],
-			// #50.
+			// #48.
 			[
 				[
 					'names' => [
@@ -1045,7 +1009,7 @@ class testMassUpdateItems extends CWebTest{
 					]
 				]
 			],
-			// #51.
+			// #49.
 			[
 				[
 					'names' => [
@@ -1067,7 +1031,7 @@ class testMassUpdateItems extends CWebTest{
 					'interface_text_part' => 'SNMPv3, Context name: zabbix'
 				]
 			],
-			// #52.
+			// #50.
 			[
 				[
 					'names' => [
@@ -1082,7 +1046,7 @@ class testMassUpdateItems extends CWebTest{
 					'interface_text_part' => 'SNMPv3, Context name: zabbix'
 				]
 			],
-			// #53.
+			// #51.
 			[
 				[
 					'names' => [
@@ -1098,7 +1062,7 @@ class testMassUpdateItems extends CWebTest{
 					]
 				]
 			],
-			// #54.
+			// #52.
 			[
 				[
 					'names' => [
@@ -1113,7 +1077,7 @@ class testMassUpdateItems extends CWebTest{
 					]
 				]
 			],
-			// #55.
+			// #53.
 			[
 				[
 					'names' => [
@@ -1170,7 +1134,7 @@ class testMassUpdateItems extends CWebTest{
 //					]
 //				]
 //			],
-			// #56.
+			// #54.
 			[
 				[
 					'names' => [

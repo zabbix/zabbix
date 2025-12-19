@@ -28,7 +28,7 @@ zabbix_export:
         The user must be included in the Administrators group.
       vendor:
         name: Zabbix
-        version: 8.0-1
+        version: 8.0-2
       groups:
         - name: Templates/Applications
       items:
@@ -170,7 +170,7 @@ zabbix_export:
           preprocessing:
             - type: JSONPATH
               parameters:
-                - '$.ocs.data.nextcloud.system.cpuload.element[0]'
+                - '$.ocs.data.nextcloud.system.cpuload[0]'
               error_handler: DISCARD_VALUE
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -199,7 +199,7 @@ zabbix_export:
           preprocessing:
             - type: JSONPATH
               parameters:
-                - '$.ocs.data.nextcloud.system.cpuload.element[1]'
+                - '$.ocs.data.nextcloud.system.cpuload[1]'
               error_handler: DISCARD_VALUE
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -218,7 +218,7 @@ zabbix_export:
           preprocessing:
             - type: JSONPATH
               parameters:
-                - '$.ocs.data.nextcloud.system.cpuload.element[2]'
+                - '$.ocs.data.nextcloud.system.cpuload[2]'
               error_handler: DISCARD_VALUE
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -346,11 +346,17 @@ zabbix_export:
             - type: CHECK_NOT_SUPPORTED
               parameters:
                 - '-1'
-              error_handler: CUSTOM_VALUE
-              error_handler_params: '<ocs><meta><status>failure</status><statuscode>999</statuscode><message/></meta><data><message>Unknown error</message></data></ocs>'
-            - type: XML_TO_JSON
+              error_handler: CUSTOM_ERROR
+              error_handler_params: 'Could not get data.'
           timeout: 10s
           url: '{$NEXTCLOUD.SCHEMA}://{$NEXTCLOUD.ADDRESS}/ocs/v2.php/apps/serverinfo/api/v1/info'
+          query_fields:
+            - name: format
+              value: json
+            - name: skipApps
+              value: 'false'
+            - name: skipUpdate
+              value: 'false'
           status_codes: '200,401'
           http_proxy: '{$NEXTCLOUD.PROXY}'
           headers:
@@ -740,6 +746,10 @@ zabbix_export:
                   	swap_free = getField(data,'ocs.data.nextcloud.system.swap_free');
                   
                   return Math.ceil(100 - swap_free / swap_total * 100);
+            - type: STR_REPLACE
+              parameters:
+                - NaN
+                - '0'
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1h
@@ -780,6 +790,37 @@ zabbix_export:
           tags:
             - tag: component
               value: memory
+        - uuid: 202ccbfe8b3748918bdad4ff2d203a2f
+          name: 'Instance update available'
+          type: DEPENDENT
+          key: nextcloud.serverinfo.update
+          description: 'This metric indicates that an update for Nextcloud is available. Note that this metric doesn''t work on Nextcloud version 27 and lower.'
+          valuemap:
+            name: Boolean
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.ocs.data.nextcloud.system.update.available
+              error_handler: DISCARD_VALUE
+            - type: BOOL_TO_DECIMAL
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: nextcloud.serverinfo.get_data
+          tags:
+            - tag: component
+              value: system
+          triggers:
+            - uuid: b31ccb1f04c148e4b4abc7bc6516c2d5
+              expression: 'last(/Nextcloud by HTTP/nextcloud.serverinfo.update)=1'
+              name: 'Nextcloud: Server not up to date'
+              priority: INFO
+              description: 'A new Nextcloud version is available.'
+              manual_close: 'YES'
+              tags:
+                - tag: scope
+                  value: notice
         - uuid: c4939cb87ff8495784e3937c4bc7e34d
           name: Version
           type: DEPENDENT
@@ -863,6 +904,7 @@ zabbix_export:
                   parameters:
                     - $.ocs.data.enabled
                   error_handler: DISCARD_VALUE
+                - type: BOOL_TO_DECIMAL
                 - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1h
@@ -896,11 +938,13 @@ zabbix_export:
                 - type: CHECK_NOT_SUPPORTED
                   parameters:
                     - '-1'
-                  error_handler: CUSTOM_VALUE
-                  error_handler_params: '<ocs><meta><status>failure</status><statuscode>999</statuscode><message/></meta><data><message>Unknown error</message></data></ocs>'
-                - type: XML_TO_JSON
+                  error_handler: CUSTOM_ERROR
+                  error_handler_params: 'Could not get data.'
               timeout: 10s
               url: '{$NEXTCLOUD.SCHEMA}://{$NEXTCLOUD.ADDRESS}/ocs/v1.php/cloud/users/{#NEXTCLOUD.USER}'
+              query_fields:
+                - name: format
+                  value: json
               status_codes: '200,401'
               http_proxy: '{$NEXTCLOUD.PROXY}'
               headers:
@@ -1014,8 +1058,11 @@ zabbix_export:
               name: 'User "{#NEXTCLOUD.USER}": Quota free space'
               type: DEPENDENT
               key: 'nextcloud.user.quota.free[{#NEXTCLOUD.USER}]'
+              value_type: FLOAT
               units: B
               description: 'The size of the free available space in the user''s storage.'
+              valuemap:
+                name: 'Quota type'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -1067,8 +1114,11 @@ zabbix_export:
               name: 'User "{#NEXTCLOUD.USER}": Quota total space'
               type: DEPENDENT
               key: 'nextcloud.user.quota.total[{#NEXTCLOUD.USER}]'
+              value_type: FLOAT
               units: B
               description: 'The size of space available in the user''s storage.'
+              valuemap:
+                name: 'Quota type'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -1503,6 +1553,13 @@ zabbix_export:
                       name: rows
                       value: '4'
       valuemaps:
+        - uuid: b0913f72fb804d5ab9ef0e9ce13dc61a
+          name: Boolean
+          mappings:
+            - value: '0'
+              newvalue: 'False'
+            - value: '1'
+              newvalue: 'True'
         - uuid: 19c5ab8f192d42f4bd35a969bef3c9d6
           name: 'Last activity'
           mappings:
