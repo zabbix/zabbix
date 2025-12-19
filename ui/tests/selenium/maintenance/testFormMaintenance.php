@@ -154,6 +154,58 @@ class testFormMaintenance extends CLegacyWebTest {
 	}
 
 	/**
+	 * Check screenshots of period form.
+	 */
+	public function testFormMaintenance_CheckPeriodForm() {
+		$this->page->login()->open('zabbix.php?action=maintenance.list')->waitUntilReady();
+		$this->query('button:Create maintenance period')->one()->waitUntilClickable()->click();
+
+		$form = COverlayDialogElement::find()->waitUntilReady()->asForm()->one();
+
+		$form->getField('Periods')->query('button:Add')->one()->waitUntilClickable()->click();
+		$period_overlay = COverlayDialogElement::find(1)->waitUntilReady()->one();
+
+		$periods = [
+			'One time only',
+			'Daily',
+			'Weekly',
+			'Monthly',
+			'Monthly with Day of week period'
+		];
+
+		foreach ($periods as $period_type) {
+			if ($period_type === 'Monthly with Day of week period') {
+				$period_overlay->asForm()->fill(['Period type' => 'Monthly', 'Date' => 'Day of week']);
+			}
+			else {
+				$period_overlay->asForm()->fill(['Period type' => $period_type]);
+			}
+
+			$period_overlay->waitUntilReady();
+			$this->page->removeFocus();
+
+			// Remove Add and Cancel buttons edge curling from screenshots as their rendering is unstable.
+			$dialog_footer = $period_overlay->getFooter();
+			foreach (['Add', 'Cancel'] as $button) {
+				$this->page->getDriver()->executeScript('arguments[0].style.borderRadius=0;',
+					[$dialog_footer->query('button', $button)->one()]
+				);
+			}
+
+			if ($period_type === 'One time only') {
+				$this->assertScreenshotExcept($period_overlay, [$period_overlay->query('id:start_date')->one()],
+						$period_type
+				);
+			}
+			else {
+				$this->assertScreenshot($period_overlay, $period_type);
+			}
+		}
+
+		COverlayDialogElement::closeAll();
+	}
+
+	/**
 	 * Changes not preserve when close edit form using cancel button.
 	 *
 	 * @depends testFormMaintenance_Create
