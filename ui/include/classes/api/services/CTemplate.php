@@ -772,10 +772,6 @@ class CTemplate extends CHostGeneral {
 			$this->checkTriggerExpressionsOfDelTemplates($del_templates);
 		}
 
-		if ($del_links_clear) {
-			$this->checkTriggerDependenciesOfHostTriggers($del_links_clear);
-		}
-
 		self::checkUsedInActions($db_templates);
 	}
 
