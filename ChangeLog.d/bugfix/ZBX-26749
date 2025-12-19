@@ -1,0 +1,1 @@
+A......... [ZBX-26749] removed trigger dependency checks for triggers associated with the same template that is unlinked and cleared from host or template (kkuzmina)

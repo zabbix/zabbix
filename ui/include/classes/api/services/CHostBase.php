@@ -256,20 +256,10 @@ abstract class CHostBase extends CApiService {
 					}
 				}
 			}
-
-			if (($this instanceof CHost || $this instanceof CTemplate) && array_key_exists('templates_clear', $host)) {
-				foreach ($host['templates_clear'] as $template) {
-					$del_links_clear[$template['templateid']][$host[$id_field_name]] = true;
-				}
-			}
 		}
 
 		if ($del_templates) {
 			$this->checkTriggerExpressionsOfDelTemplates($del_templates);
-		}
-
-		if ($del_links_clear) {
-			$this->checkTriggerDependenciesOfHostTriggers($del_links_clear);
 		}
 
 		if ($ins_templates) {
