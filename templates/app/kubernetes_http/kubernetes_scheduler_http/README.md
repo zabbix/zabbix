@@ -29,12 +29,12 @@ Template needs to use Authorization via API token.
 Don't forget change macros {$KUBE.SCHEDULER.SERVER.URL}, {$KUBE.API.TOKEN}.
 Also, see the Macros section for a list of macros used to set trigger values.
 
-*NOTE.* You might need to set the `--binding-address` option for Scheduler to the address where Zabbix proxy can reach it.
+**Note:** You might need to set the `--binding-address` option for Scheduler to the address where Zabbix proxy can reach it.
 For example, for clusters created with `kubeadm` it can be set in the following manifest file (changes will be applied immediately):
 
 - /etc/kubernetes/manifests/kube-scheduler.yaml
 
-*NOTE.* Some metrics may not be collected depending on your Kubernetes Scheduler instance version and configuration.
+**Note:** Some metrics may not be collected depending on your Kubernetes Scheduler instance version and configuration.
 
 
 ### Macros used

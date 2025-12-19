@@ -375,7 +375,7 @@ class testFormSetup extends CWebTest {
 		$this->assertScreenshotExcept($this->query('xpath://form')->one(), $this->query('xpath://p')->one(), 'Install');
 
 		// Check that Dashboard view is opened after completing the form.
-		$this->query('button:Finish')->one()->click();
+		$this->query('button:Finish')->one()->click()->waitUntilNotVisible();
 		$this->page->waitUntilReady();
 		$this->assertStringContainsString('index.php', $this->page->getCurrentURL());
 	}

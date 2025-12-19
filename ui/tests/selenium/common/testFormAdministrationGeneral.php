@@ -178,8 +178,8 @@ class testFormAdministrationGeneral extends CWebTest {
 		if (CTestArrayHelper::get($data, 'fields.Default time zone')) {
 			$data['fields']['Default time zone'] = CDateTimeHelper::getTimeZoneFormat($data['fields']['Default time zone']);
 		}
-		$form->fill($data['fields']);
 
+		$form->fill($data['fields']);
 		$form->submit();
 		$this->page->waitUntilReady();
 

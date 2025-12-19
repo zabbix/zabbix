@@ -203,10 +203,6 @@ $compact-view-color: #000000;
 $compact-view-tag-color: #ffffff;
 $compact-view-tag-bg-color: $ui-bg-selected-color;
 
-// Dashboard list table.
-$dashboard-shared-bg-color: #555555;
-$dashboard-my-bg-color: #555555;
-
 // Import compare.
 $toc-title-bg-color: #333333;
 $diff-added-bg-color: transparent;
@@ -628,6 +624,25 @@ a.link-action {
 	}
 
 	&.compact-view {
+		td {
+			&.na-bg,
+			&.normal-bg,
+			&.info-bg,
+			&.warning-bg,
+			&.average-bg,
+			&.high-bg,
+			&.disaster-bg {
+				&::before {
+					font-size: 22px;
+					padding-top: 0;
+					padding-bottom: 0;
+				}
+			}
+		}
+	}
+
+	&.compact-view,
+	&.has-highlighted-rows {
 		.flh-na-bg,
 		.flh-info-bg,
 		.flh-warning-bg,
@@ -640,6 +655,8 @@ a.link-action {
 		}
 
 		td {
+			box-shadow: inset 0 -1px 0 0 $table-border-color;
+
 			&.na-bg,
 			&.normal-bg,
 			&.info-bg,
@@ -649,13 +666,8 @@ a.link-action {
 			&.disaster-bg {
 				&::before {
 					box-shadow: inset 0 -1px 0 0 $table-border-color;
-					font-size: 22px;
-					padding-top: 0;
-					padding-bottom: 0;
 				}
 			}
-
-			box-shadow: inset 0 -1px 0 0 $table-border-color;
 		}
 	}
 }

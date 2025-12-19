@@ -199,7 +199,9 @@ class CNavigationTree {
 			primary.appendChild(this.#createMaintenance(node));
 		}
 
-		if (this.#show_problems) {
+		const has_problems = this.#show_problems ? node.problem_count.some(count => count > 0) : false;
+
+		if (this.#show_problems && has_problems) {
 			secondary.appendChild(this.#createProblems(node));
 		}
 

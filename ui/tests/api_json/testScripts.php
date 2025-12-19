@@ -3363,6 +3363,20 @@ class testScripts extends CAPITest {
 					]
 				],
 				'expected_error' => null
+			],
+			'Test script.create "manualinput_validator" field for input type string with valid regular expression' => [
+				'script' => [
+					'name' => 'API create script with regular expression for user prompt',
+					'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
+					'scope' => ZBX_SCRIPT_SCOPE_EVENT,
+					'command' => 'reboot server',
+					'manualinput' => ZBX_SCRIPT_MANUALINPUT_ENABLED,
+					'manualinput_prompt' => 'prompt text',
+					'manualinput_validator_type' => ZBX_SCRIPT_MANUALINPUT_TYPE_STRING,
+					'manualinput_validator' => '[(] a\\/b [\\(]',
+					'manualinput_default_value' => ''
+				],
+				'expected_error' => null
 			]
 		];
 	}

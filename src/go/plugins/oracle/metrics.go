@@ -17,6 +17,8 @@ package oracle
 import (
 	"context"
 
+	"golang.zabbix.com/agent2/plugins/oracle/dbconn"
+	"golang.zabbix.com/agent2/plugins/oracle/handlers"
 	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/metric"
 	"golang.zabbix.com/sdk/plugin"
@@ -50,90 +52,48 @@ const (
 	keyVersion                = "oracle.version"
 )
 
-// handlerFunc defines an interface must be implemented by handlers.
-type handlerFunc func(
-	ctx context.Context, conn OraClient, params map[string]string, extraParams ...string,
-) (res interface{}, err error)
-
-func init() {
-	err := plugin.RegisterMetrics(&impl, pluginName, metrics.List()...)
-	if err != nil {
-		panic(errs.Wrap(err, "failed to register metrics"))
-	}
+var metricsMeta = map[string]handlerFunc{ //nolint:gochecknoglobals
+	keyASMDiskGroups:          handlers.AsmDiskGroupsHandler,
+	keyASMDiskGroupsDiscovery: handlers.AsmDiskGroupsDiscovery,
+	keyArchive:                handlers.ArchiveHandler,
+	keyArchiveDiscovery:       handlers.ArchiveDiscoveryHandler,
+	keyCDB:                    handlers.CdbHandler,
+	keyCustomQuery:            handlers.CustomQueryHandler,
+	keyDataFiles:              handlers.DataFileHandler,
+	keyDatabasesDiscovery:     handlers.DatabasesDiscoveryHandler,
+	keyFRA:                    handlers.FraHandler,
+	keyInstance:               handlers.InstanceHandler,
+	keyPDB:                    handlers.PdbHandler,
+	keyPDBDiscovery:           handlers.PdbDiscoveryHandler,
+	keyPGA:                    handlers.PgaHandler,
+	keyPing:                   handlers.PingHandler,
+	keyProc:                   handlers.ProcHandler,
+	keyRedoLog:                handlers.RedoLogHandler,
+	keySGA:                    handlers.SgaHandler,
+	keySessions:               handlers.SessionsHandler,
+	keySysMetrics:             handlers.SysMetricsHandler,
+	keySysParams:              handlers.SysParamsHandler,
+	keyTablespaces:            handlers.TablespacesHandler,
+	keyTablespacesDiscovery:   handlers.TablespacesDiscoveryHandler,
+	keyUser:                   handlers.UserHandler,
+	keyVersion:                handlers.VersionHandler,
 }
 
-// getHandlerFunc returns a handlerFunc related to a given key.
-func getHandlerFunc(key string) handlerFunc {
-	switch key {
-	case keyASMDiskGroups:
-		return asmDiskGroupsHandler
-	case keyASMDiskGroupsDiscovery:
-		return asmDiskGroupsDiscovery
-	case keyArchive:
-		return archiveHandler
-	case keyArchiveDiscovery:
-		return archiveDiscoveryHandler
-	case keyCDB:
-		return cdbHandler
-	case keyCustomQuery:
-		return customQueryHandler
-	case keyDataFiles:
-		return dataFileHandler
-	case keyDatabasesDiscovery:
-		return databasesDiscoveryHandler
-	case keyFRA:
-		return fraHandler
-	case keyInstance:
-		return instanceHandler
-	case keyPDB:
-		return pdbHandler
-	case keyPDBDiscovery:
-		return pdbDiscoveryHandler
-	case keyPGA:
-		return pgaHandler
-	case keyPing:
-		return pingHandler
-	case keyProc:
-		return procHandler
-	case keyRedoLog:
-		return redoLogHandler
-	case keySGA:
-		return sgaHandler
-	case keySessions:
-		return sessionsHandler
-	case keySysMetrics:
-		return sysMetricsHandler
-	case keySysParams:
-		return sysParamsHandler
-	case keyTablespaces:
-		return tablespacesHandler
-	case keyTablespacesDiscovery:
-		return tablespacesDiscoveryHandler
-	case keyUser:
-		return userHandler
-	case keyVersion:
-		return versionHandler
-	default:
-		return nil
-	}
-}
-
-var uriDefaults = &uri.Defaults{Scheme: "tcp", Port: "1521"}
-
-// Common params: [URI|Session][,User][,Password][,Service]
+// Common params: [URI|Session][,User][,Password][,Service].
 var (
-	paramURI = metric.NewConnParam("URI", "URI to connect or session name.").
-			WithDefault(uriDefaults.Scheme + "://localhost:" + uriDefaults.Port).
+	paramURI = metric.NewConnParam("URI", "URI to connect or session name."). //nolint:gochecknoglobals
+			WithDefault(dbconn.URIDefaults.Scheme + "://localhost:" + dbconn.URIDefaults.Port).
 			WithSession().
-			WithValidator(uri.URIValidator{Defaults: uriDefaults, AllowedSchemes: []string{"tcp"}})
-	paramUsername = metric.NewConnParam("User", "Oracle user.").WithDefault("")
-	paramPassword = metric.NewConnParam("Password", "User's password.").
+			WithValidator(uri.URIValidator{Defaults: dbconn.URIDefaults, AllowedSchemes: []string{"tcp"}})
+	paramUsername = metric.NewConnParam("User", "Oracle user."). //nolint:gochecknoglobals
 			WithDefault("")
-	paramService = metric.NewConnParam("Service", "Service name to be used for connection.").
+	paramPassword = metric.NewConnParam("Password", "User's password."). //nolint:gochecknoglobals
+			WithDefault("")
+	paramService = metric.NewConnParam("Service", "Service name to be used for connection."). //nolint:gochecknoglobals
 			WithDefault("XE")
 )
 
-var metrics = metric.MetricSet{
+var metrics = metric.MetricSet{ //nolint:gochecknoglobals
 	keyASMDiskGroups: metric.New(
 		"Returns ASM disk groups statistics.",
 		[]*metric.Param{
@@ -323,4 +283,16 @@ var metrics = metric.MetricSet{
 		[]*metric.Param{paramURI, paramUsername, paramPassword, paramService},
 		false,
 	),
+}
+
+// handlerFunc defines an interface must be implemented by handlers.
+type handlerFunc func(
+	ctx context.Context, conn dbconn.OraClient, params map[string]string, extraParams ...string,
+) (res any, err error)
+
+func init() { //nolint:gochecknoinits
+	err := plugin.RegisterMetrics(&impl, pluginName, metrics.List()...)
+	if err != nil {
+		panic(errs.Wrap(err, "failed to register metrics"))
+	}
 }

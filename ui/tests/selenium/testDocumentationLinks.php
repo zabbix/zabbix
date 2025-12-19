@@ -19,7 +19,7 @@ require_once __DIR__.'/../include/CWebTest.php';
 use Facebook\WebDriver\WebDriverKeys;
 
 /**
- * @dataSource Actions, Maps, Proxies
+ * @dataSource Actions, Maps, Proxies, MonitoringOverview
  *
  * @backup profiles, module, services, token, connector
  *
@@ -30,8 +30,12 @@ class testDocumentationLinks extends CWebTest {
 	// LLD and host prototype for case 'Host LLD host prototype edit form'.
 	protected static $lldid;
 	protected static $host_prototypeid;
+	protected static $triggerids;
+	protected static $eventids;
 
 	public function prepareData() {
+		self::$triggerids = CDataHelper::get('MonitoringOverview.triggerids');
+		self::$eventids = CDataHelper::get('MonitoringOverview.eventids');
 		self::$version = substr(ZABBIX_VERSION, 0, 3);
 
 		// Create a service.
@@ -226,7 +230,8 @@ class testDocumentationLinks extends CWebTest {
 			// #8 Event details view.
 			[
 				[
-					'url' => 'tr_events.php?triggerid=100032&eventid=9000',
+					'replace' => true,
+					'url' => 'tr_events.php?triggerid={triggerid}&eventid={eventid}',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/monitoring/problems#viewing-details'
 				]
 			],
@@ -303,7 +308,7 @@ class testDocumentationLinks extends CWebTest {
 					'doc_link' => '/en/manual/web_interface/frontend_sections/monitoring/latest_data'
 				]
 			],
-			// #17 Speccific item graph from latest data view.
+			// #17 Specific item graph from latest data view.
 			[
 				[
 					'url' => 'history.php?action=showgraph&itemids%5B%5D=42237',
@@ -1417,7 +1422,8 @@ class testDocumentationLinks extends CWebTest {
 			// #129 Host LLD host prototype edit form.
 			[
 				[
-					'url' => 'host_prototype',
+					'replace' => true,
+					'url' => 'host_prototypes.php?form=update&parent_discoveryid={discoveryid}&hostid={hostid}&context=host',
 					'doc_link' => '/en/manual/discovery/low_level_discovery/host_prototypes'
 				]
 			],
@@ -2706,9 +2712,14 @@ class testDocumentationLinks extends CWebTest {
 	 * @ignoreBrowserErrors
 	 */
 	public function testDocumentationLinks_checkGeneralLinks($data) {
-		if ($data['url'] === 'host_prototype') {
-			$data['url'] = 'host_prototypes.php?form=update&parent_discoveryid='.self::$lldid.
-					'&hostid='.self::$host_prototypeid.'&context=host';
+		if (CTestArrayHelper::get($data, 'replace')) {
+			$replacements = [
+				'{triggerid}' => self::$triggerids['1_trigger_Not_classified'],
+				'{eventid}' => self::$eventids['1_trigger_Not_classified'],
+				'{hostid}' => self::$host_prototypeid,
+				'{discoveryid}' => self::$lldid
+			];
+			$data['url'] = str_replace(array_keys($replacements), array_values($replacements), $data['url']);
 		}
 
 		$this->page->login()->open($data['url'])->waitUntilReady();

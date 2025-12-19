@@ -263,7 +263,9 @@ var hintBox = {
 	 */
 	bindEvents: function () {
 		jQuery(document).on('keydown click mouseenter mousemove mouseleave', '[data-hintbox=1]', function (e) {
-			const $target = jQuery(this);
+			const $target = jQuery(this).hasClass('hint-item')
+				? jQuery(this).siblings('.main-hint')
+				: jQuery(this);
 
 			if (e.type === 'keydown') {
 				if (e.key !== ' ' && e.key !== 'Enter') {

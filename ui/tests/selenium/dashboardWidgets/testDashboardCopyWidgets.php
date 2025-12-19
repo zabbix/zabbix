@@ -641,6 +641,13 @@ class testDashboardCopyWidgets extends CWebTest {
 			],
 			[
 				[
+					'module_name' => 'Favorite maps',
+					'widget_name' => 'Test copy Favorite maps',
+					'action' => 'copy page'
+				]
+			],
+			[
+				[
 					'module_name' => 'Item history',
 					'widget_name' => 'Item history widget',
 					'action' => 'copy widget',
@@ -706,7 +713,7 @@ class testDashboardCopyWidgets extends CWebTest {
 		$inaccessible_xpath = 'xpath:.//div[contains(@class, "dashboard-widget-inaccessible")]';
 		$count = $dashboard->query($inaccessible_xpath)->waitUntilVisible()->count();
 
-		// Template dashbards are always in edit mode, so entering edit mode is only required for regular dashboards.
+		// Template dashboard are always in edit mode, so entering edit mode is only required for regular dashboards.
 		if(!array_key_exists('template', $data)) {
 			$dashboard->edit();
 		}

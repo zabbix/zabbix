@@ -455,7 +455,7 @@ class testLowLevelDiscovery extends CWebTest {
 					$hint->query('xpath:.//button[@title="Close"]')->waitUntilClickable()->one()->click();
 				}
 
-			case 'Zabbix agent';
+			case 'Zabbix agent':
 			case 'JMX agent':
 			case 'IPMI agent':
 				if (static::$context === 'host') {
@@ -2277,7 +2277,7 @@ class testLowLevelDiscovery extends CWebTest {
 						'Name' => 'Empty parameters in Browser item',
 						'Type' => 'Browser',
 						'Key' => 'browser_check[2]',
-						'Script' => 'test sript'
+						'Script' => 'test script'
 					],
 					'Parameters' => [
 						['Name' => '', 'Value' => 'value_1']
@@ -2293,7 +2293,7 @@ class testLowLevelDiscovery extends CWebTest {
 						'Name' => 'Identical parameters in Browser item',
 						'Type' => 'Browser',
 						'Key' => 'browser_check[2]',
-						'Script' => 'test sript'
+						'Script' => 'test script'
 					],
 					'Parameters' => [
 						['Name' => 'test_name', 'Value' => 'value_1'],
@@ -2309,7 +2309,7 @@ class testLowLevelDiscovery extends CWebTest {
 						'Name' => 'Browser item',
 						'Type' => 'Browser',
 						'Key' => 'browser_check[3]',
-						'Script' => 'test sript'
+						'Script' => 'test script'
 					],
 					'Parameters' => [
 						['Name' => 'param_1', 'Value' => 'value_1']

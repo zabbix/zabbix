@@ -807,7 +807,7 @@ class testFormTabIndicators extends CWebTest {
 			$this->page->removeFocus();
 			$this->assertTabIndicator($tab_selector, $new_value);
 
-			// Clear the popullatedfields and check indicator value.
+			// Clear the populated fields and check indicator value.
 			$this->updateTabFields($tab, $form, USER_ACTION_REMOVE);
 			$old_value = (CTestArrayHelper::get($tab, 'count', false)) ? 0 : $old_value;
 			$this->assertTabIndicator($tab_selector, $old_value);

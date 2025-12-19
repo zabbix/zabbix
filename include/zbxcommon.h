@@ -681,6 +681,8 @@ int	zbx_alarm_timed_out(void);
 #define ZBX_PREPROC_FAIL_SET_VALUE	2
 #define ZBX_PREPROC_FAIL_SET_ERROR	3
 
+#define ZBX_SHA512_BINARY_LENGTH 64
+
 /* includes terminating '\0' */
 #define CUID_LEN	26
 void	zbx_new_cuid(char *cuid);
@@ -782,6 +784,7 @@ zbx_log_component_t;
 
 void	zbx_set_log_component(const char *name, zbx_log_component_t *component);
 void	zbx_change_component_log_level(zbx_log_component_t *component, int direction);
+void	zbx_malloc_trim(time_t now, int period, size_t pad);
 #endif
 
 #endif

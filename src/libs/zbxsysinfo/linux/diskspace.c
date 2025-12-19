@@ -184,6 +184,32 @@ int	vfs_fs_discovery(AGENT_REQUEST *request, AGENT_RESULT *result)
 	return SYSINFO_RET_OK;
 }
 
+ZBX_PTR_VECTOR_DECL(mpoint_ptr, zbx_mpoint_t *)
+ZBX_PTR_VECTOR_IMPL(mpoint_ptr, zbx_mpoint_t *)
+
+static int	mpoint_ptr_fsname_compare(const zbx_mpoint_t *m1, const zbx_fsname_t *f2)
+{
+	int	res;
+
+	if (0 != (res = strcmp(m1->fsname, f2->mpoint)))
+		return res;
+
+	return strcmp(m1->fstype, f2->type);
+}
+
+static int	zbx_vector_mpoint_ptr_search_fsname(const zbx_vector_mpoint_ptr_t *vector, const zbx_fsname_t *value)
+{
+	int	index;
+
+	for (index = 0; index < vector->values_num; index++)
+	{
+		if (0 == mpoint_ptr_fsname_compare(vector->values[index], value))
+			return index;
+	}
+
+	return FAIL;
+}
+
 static int	vfs_fs_get_local(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char			line[MAX_STRING_LEN], *p, *mntopts, *error;
@@ -191,8 +217,8 @@ static int	vfs_fs_get_local(AGENT_REQUEST *request, AGENT_RESULT *result)
 	zbx_uint64_t		total, not_used, used, itotal, inot_used, iused;
 	double			pfree, pused, ipfree, ipused;
 	struct zbx_json		j;
-	zbx_vector_ptr_t	mntpoints;
-	zbx_mpoint_t		*mntpoint;
+	zbx_vector_mpoint_ptr_t	mpoints;
+	zbx_mpoint_t		*mpoint;
 	zbx_fsname_t		fsname;
 	int			ret = SYSINFO_RET_FAIL;
 
@@ -204,7 +230,7 @@ static int	vfs_fs_get_local(AGENT_REQUEST *request, AGENT_RESULT *result)
 		return SYSINFO_RET_FAIL;
 	}
 
-	zbx_vector_ptr_create(&mntpoints);
+	zbx_vector_mpoint_ptr_create(&mpoints);
 
 	while (NULL != fgets(line, sizeof(line), f))
 	{
@@ -244,22 +270,22 @@ static int	vfs_fs_get_local(AGENT_REQUEST *request, AGENT_RESULT *result)
 			continue;
 		}
 
-		mntpoint = (zbx_mpoint_t *)zbx_malloc(NULL, sizeof(zbx_mpoint_t));
-		zbx_strlcpy(mntpoint->fsname, fsname.mpoint, MAX_STRING_LEN);
-		zbx_strlcpy(mntpoint->fstype, fsname.type, MAX_STRING_LEN);
-		mntpoint->bytes.total = total;
-		mntpoint->bytes.used = used;
-		mntpoint->bytes.not_used = not_used;
-		mntpoint->bytes.pfree = pfree;
-		mntpoint->bytes.pused = pused;
-		mntpoint->inodes.total = itotal;
-		mntpoint->inodes.used = iused;
-		mntpoint->inodes.not_used = inot_used;
-		mntpoint->inodes.pfree = ipfree;
-		mntpoint->inodes.pused = ipused;
-		mntpoint->options = zbx_strdup(NULL, mntopts);
+		mpoint = (zbx_mpoint_t *)zbx_malloc(NULL, sizeof(zbx_mpoint_t));
+		zbx_strlcpy(mpoint->fsname, fsname.mpoint, MAX_STRING_LEN);
+		zbx_strlcpy(mpoint->fstype, fsname.type, MAX_STRING_LEN);
+		mpoint->bytes.total = total;
+		mpoint->bytes.used = used;
+		mpoint->bytes.not_used = not_used;
+		mpoint->bytes.pfree = pfree;
+		mpoint->bytes.pused = pused;
+		mpoint->inodes.total = itotal;
+		mpoint->inodes.used = iused;
+		mpoint->inodes.not_used = inot_used;
+		mpoint->inodes.pfree = ipfree;
+		mpoint->inodes.pused = ipused;
+		mpoint->options = zbx_strdup(NULL, mntopts);
 
-		zbx_vector_ptr_append(&mntpoints, mntpoint);
+		zbx_vector_mpoint_ptr_append(&mpoints, mpoint);
 	}
 	zbx_fclose(f);
 
@@ -291,27 +317,27 @@ static int	vfs_fs_get_local(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 		*p = '\0';
 
-		if (FAIL != (idx = zbx_vector_ptr_search(&mntpoints, &fsname, zbx_fsname_compare)))
+		if (FAIL != (idx = zbx_vector_mpoint_ptr_search_fsname(&mpoints, &fsname)))
 		{
-			mntpoint = (zbx_mpoint_t *)mntpoints.values[idx];
+			mpoint = mpoints.values[idx];
 			zbx_json_addobject(&j, NULL);
-			zbx_json_addstring(&j, ZBX_SYSINFO_TAG_FSNAME, mntpoint->fsname, ZBX_JSON_TYPE_STRING);
-			zbx_json_addstring(&j, ZBX_SYSINFO_TAG_FSTYPE, mntpoint->fstype, ZBX_JSON_TYPE_STRING);
+			zbx_json_addstring(&j, ZBX_SYSINFO_TAG_FSNAME, mpoint->fsname, ZBX_JSON_TYPE_STRING);
+			zbx_json_addstring(&j, ZBX_SYSINFO_TAG_FSTYPE, mpoint->fstype, ZBX_JSON_TYPE_STRING);
 			zbx_json_addobject(&j, ZBX_SYSINFO_TAG_BYTES);
-			zbx_json_adduint64(&j, ZBX_SYSINFO_TAG_TOTAL, mntpoint->bytes.total);
-			zbx_json_adduint64(&j, ZBX_SYSINFO_TAG_FREE, mntpoint->bytes.not_used);
-			zbx_json_adduint64(&j, ZBX_SYSINFO_TAG_USED, mntpoint->bytes.used);
-			zbx_json_addfloat(&j, ZBX_SYSINFO_TAG_PFREE, mntpoint->bytes.pfree);
-			zbx_json_addfloat(&j, ZBX_SYSINFO_TAG_PUSED, mntpoint->bytes.pused);
+			zbx_json_adduint64(&j, ZBX_SYSINFO_TAG_TOTAL, mpoint->bytes.total);
+			zbx_json_adduint64(&j, ZBX_SYSINFO_TAG_FREE, mpoint->bytes.not_used);
+			zbx_json_adduint64(&j, ZBX_SYSINFO_TAG_USED, mpoint->bytes.used);
+			zbx_json_addfloat(&j, ZBX_SYSINFO_TAG_PFREE, mpoint->bytes.pfree);
+			zbx_json_addfloat(&j, ZBX_SYSINFO_TAG_PUSED, mpoint->bytes.pused);
 			zbx_json_close(&j);
 			zbx_json_addobject(&j, ZBX_SYSINFO_TAG_INODES);
-			zbx_json_adduint64(&j, ZBX_SYSINFO_TAG_TOTAL, mntpoint->inodes.total);
-			zbx_json_adduint64(&j, ZBX_SYSINFO_TAG_FREE, mntpoint->inodes.not_used);
-			zbx_json_adduint64(&j, ZBX_SYSINFO_TAG_USED, mntpoint->inodes.used);
-			zbx_json_addfloat(&j, ZBX_SYSINFO_TAG_PFREE, mntpoint->inodes.pfree);
-			zbx_json_addfloat(&j, ZBX_SYSINFO_TAG_PUSED, mntpoint->inodes.pused);
+			zbx_json_adduint64(&j, ZBX_SYSINFO_TAG_TOTAL, mpoint->inodes.total);
+			zbx_json_adduint64(&j, ZBX_SYSINFO_TAG_FREE, mpoint->inodes.not_used);
+			zbx_json_adduint64(&j, ZBX_SYSINFO_TAG_USED, mpoint->inodes.used);
+			zbx_json_addfloat(&j, ZBX_SYSINFO_TAG_PFREE, mpoint->inodes.pfree);
+			zbx_json_addfloat(&j, ZBX_SYSINFO_TAG_PUSED, mpoint->inodes.pused);
 			zbx_json_close(&j);
-			zbx_json_addstring(&j, ZBX_SYSINFO_TAG_FSOPTIONS, mntpoint->options, ZBX_JSON_TYPE_STRING);
+			zbx_json_addstring(&j, ZBX_SYSINFO_TAG_FSOPTIONS, mpoint->options, ZBX_JSON_TYPE_STRING);
 			zbx_json_close(&j);
 		}
 	}
@@ -325,8 +351,8 @@ static int	vfs_fs_get_local(AGENT_REQUEST *request, AGENT_RESULT *result)
 	zbx_json_free(&j);
 	ret = SYSINFO_RET_OK;
 out:
-	zbx_vector_ptr_clear_ext(&mntpoints, (zbx_clean_func_t)zbx_mpoints_free);
-	zbx_vector_ptr_destroy(&mntpoints);
+	zbx_vector_mpoint_ptr_clear_ext(&mpoints, zbx_mpoints_free);
+	zbx_vector_mpoint_ptr_destroy(&mpoints);
 
 	return ret;
 }

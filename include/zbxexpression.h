@@ -145,6 +145,8 @@ void	zbx_format_value(char *value, size_t max_len, zbx_uint64_t valuemapid,
 void	zbx_determine_items_in_expressions(zbx_vector_dc_trigger_t *trigger_order, const zbx_uint64_t *itemids,
 		int item_num);
 
+int	zbx_um_expand_cb_wrapper(void *data, char **str, const zbx_uint64_t *hostids, int hostids_num, char **error);
+
 void	zbx_expression_eval_init(zbx_expression_eval_t *eval, int mode, zbx_eval_context_t *ctx);
 void	zbx_expression_eval_clear(zbx_expression_eval_t *eval);
 void	zbx_expression_eval_resolve_item_hosts(zbx_expression_eval_t *eval, const zbx_dc_item_t *item);

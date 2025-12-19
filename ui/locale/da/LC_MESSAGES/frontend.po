@@ -3756,6 +3756,11 @@ msgstr "Kan ikke læse XML: %1$s."
 msgid "Cannot read YAML: %1$s."
 msgstr "Kan ikke læse YAML: %1$s."
 
+#: include/classes/server/CZabbixServer.php:502
+#, c-format
+msgid "Cannot read response from Zabbix server \"%1$s\"."
+msgstr ""
+
 #: include/classes/server/CZabbixServer.php:567
 #, c-format
 msgid "Cannot read the response, check connection with the Zabbix server \"%1$s\"."
@@ -3817,6 +3822,10 @@ msgstr "Kan ikke sætte \"%1$s\" for graf prototype \"%2$s\"."
 #: widgets/piechart/includes/CWidgetFieldDataSet.php:175
 msgid "Cannot set \"Data set aggregation\" when item with type \"Total\" is added to the chart."
 msgstr "Kan ikke indstille \"Datasætaggregation\", når datapunktet med typen \"Total\" føjes til diagrammet."
+
+#: include/classes/db/MysqlDbBackend.php:197
+msgid "Cannot set charset."
+msgstr ""
 
 #: include/classes/api/services/CItemGeneral.php:2478
 #, c-format
@@ -17708,6 +17717,11 @@ msgstr "Svarkode"
 #: httpdetails.php:149 include/classes/screens/CScreenHttpTestDetails.php:83
 msgid "Response time"
 msgstr "Svartid"
+
+#: include/classes/server/CZabbixServer.php:498
+#, c-format
+msgid "Response timeout of %1$s exceeded when connecting to Zabbix server \"%2$s\"."
+msgstr ""
 
 #: app/controllers/CControllerMediatypeTestSend.php:182
 msgid "Response type: JSON"

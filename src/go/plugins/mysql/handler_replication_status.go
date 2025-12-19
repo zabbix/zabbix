@@ -17,48 +17,49 @@ package mysql
 import (
 	"context"
 	"encoding/json"
-	"errors"
-	"fmt"
 
+	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/zbxerr"
 )
 
-const masterKey = "Master_Host"
-
 func replicationSlaveStatusHandler(
-	ctx context.Context, conn MyClient, params map[string]string, _ ...string,
+	ctx context.Context,
+	conn MyClient,
+	params map[string]string,
+	_ ...string,
 ) (any, error) {
-	rows, err := conn.Query(ctx, `SHOW SLAVE STATUS`)
+	data, err := querySlaveOrReplicaStatus(ctx, conn)
 	if err != nil {
-		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
-	}
-
-	data, err := rows2data(rows)
-	if err != nil {
-		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
+		return nil, errs.WrapConst(err, zbxerr.ErrorCannotFetchData)
 	}
 
 	if len(data) == 0 {
-		return nil, zbxerr.ErrorEmptyResult.Wrap(errors.New("replication is not configured"))
+		return nil, errs.Wrap(zbxerr.ErrorEmptyResult, "replication is not configured")
+	}
+
+	rule := substituteRulesNew2Old
+	if isOldSyle(data) {
+		rule = substituteRulesOld2New
 	}
 
 	if params[masterHostParam] != "" {
 		for _, m := range data {
-			if m[masterKey] == params[masterHostParam] {
-				return parseResponse(m)
+			if m[masterKey] == params[masterHostParam] || m[sourceKey] == params[masterHostParam] {
+				return parseResponse(duplicate(m, rule))
 			}
 		}
 
-		return nil, zbxerr.ErrorEmptyResult.Wrap(fmt.Errorf("master host `%s` not found", params[masterHostParam]))
+		return nil, errs.Wrapf(zbxerr.ErrorEmptyResult, "master host `%s` not found", params[masterHostParam])
 	}
 
-	return parseResponse(data)
+	// If no any host passed in the key's parameter, returns status records of all hosts.
+	return parseResponse(duplicateAll(data, rule))
 }
 
 func parseResponse(data any) (any, error) {
 	jsonRes, err := json.Marshal(data)
 	if err != nil {
-		return nil, zbxerr.ErrorCannotMarshalJSON.Wrap(err)
+		return nil, errs.WrapConst(err, zbxerr.ErrorCannotMarshalJSON)
 	}
 
 	return string(jsonRes), nil

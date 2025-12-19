@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2025-08-27 11:21+0000\n"
+"PO-Revision-Date: 2025-12-03 10:01+0000\n"
 "Last-Translator: Tomáš Heřmánek <tomas.hermanek@initmax.cz>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: sk\n"
@@ -3851,6 +3851,11 @@ msgstr "Nie je možné čítať XML: %1$s."
 msgid "Cannot read YAML: %1$s."
 msgstr "Nedá sa prečítať YAML: %1$s."
 
+#: include/classes/server/CZabbixServer.php:502
+#, c-format
+msgid "Cannot read response from Zabbix server \"%1$s\"."
+msgstr "Nie je možné prečítať odpoveď od Zabbix servera \"%1$s\"."
+
 #: include/classes/server/CZabbixServer.php:567
 #, c-format
 msgid "Cannot read the response, check connection with the Zabbix server \"%1$s\"."
@@ -3913,6 +3918,10 @@ msgstr "Nemožno nastaviť \"%1$s\" pre prototyp grafu \"%2$s\"."
 #: widgets/piechart/includes/CWidgetFieldDataSet.php:175
 msgid "Cannot set \"Data set aggregation\" when item with type \"Total\" is added to the chart."
 msgstr "Nie je možné nastaviť \"Agregáciu množiny údajov\", keď je do grafu pridaná položka typu \"Celkom\"."
+
+#: include/classes/db/MysqlDbBackend.php:197
+msgid "Cannot set charset."
+msgstr "Nie je možné nastaviť znakovú sadu."
 
 #: include/classes/api/services/CItemGeneral.php:2478
 #, c-format
@@ -17869,6 +17878,11 @@ msgstr "Návratový kód"
 #: httpdetails.php:149 include/classes/screens/CScreenHttpTestDetails.php:83
 msgid "Response time"
 msgstr "Čas odozvy"
+
+#: include/classes/server/CZabbixServer.php:498
+#, c-format
+msgid "Response timeout of %1$s exceeded when connecting to Zabbix server \"%2$s\"."
+msgstr "Časový limit %1$s sekúnd vypršal pri spájaní so Zabbix serverom \"%2$s\"."
 
 #: app/controllers/CControllerMediatypeTestSend.php:182
 msgid "Response type: JSON"

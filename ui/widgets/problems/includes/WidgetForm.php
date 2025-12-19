@@ -154,6 +154,9 @@ class WidgetForm extends CWidgetForm {
 					)
 			)
 			->addField(
+				(new CWidgetFieldCheckBox('highlight_row', _('Highlight whole row')))->setDefault(ZBX_HIGHLIGHT_OFF)
+			)
+			->addField(
 				(new CWidgetFieldIntegerBox('show_lines', _('Show lines'), ZBX_MIN_WIDGET_LINES,
 					ZBX_MAX_WIDGET_LINES
 				))

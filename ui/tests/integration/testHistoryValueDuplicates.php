@@ -215,6 +215,10 @@ class testHistoryValueDuplicates extends CIntegrationTest {
 			$this->sendDataValues('sender', $sender_values1, self::COMPONENT_SERVER);
 			$this->sendDataValues('sender', $sender_values2, self::COMPONENT_SERVER);
 
+			/* timestamps are being adjusted in a batch  */
+			$this->sendDataValues('sender', $sender_values1, self::COMPONENT_SERVER);
+			$this->sendDataValues('sender', $sender_values2, self::COMPONENT_SERVER);
+
 			$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, '[Z3008]', true, 5, 5);
 			$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'skipped', true, 5, 5);
 
@@ -226,7 +230,7 @@ class testHistoryValueDuplicates extends CIntegrationTest {
 				],
 				'sortfield' => 'itemid'
 			], 5, 5);
-			$this->assertEquals(6, count($response['result']));
+			$this->assertEquals(8, count($response['result']));
 		}
 
 		return true;
