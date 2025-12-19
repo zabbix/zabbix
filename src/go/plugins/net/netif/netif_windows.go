@@ -198,6 +198,10 @@ func (p *Plugin) getMacAddress(physAddr [32]byte, physAddrLen uint32) string {
 	return net.HardwareAddr(mac).String()
 }
 
+func uint64Ptr(v uint64) *uint64 {
+	return &v
+}
+
 func (p *Plugin) getDevGet(regexExpr string) (result netIfResult, err error) {
 	var table *win32.MIB_IF_TABLE2
 	var compiledRegex *regexp.Regexp
@@ -291,6 +295,7 @@ func (p *Plugin) getDevGet(regexExpr string) (result netIfResult, err error) {
 		result.Config = append(result.Config, ifConfigData{
 			Ifname:      ifName,
 			Ifmac:       mac,
+			Ifalias:     ifAliasVal,
 			IfAdmState:  &admStateVal,
 			IfOperState: &operState,
 		})
@@ -304,17 +309,17 @@ func (p *Plugin) getDevGet(regexExpr string) (result netIfResult, err error) {
 			Ifmac:  mac,
 			Iftype: ifType,
 			In: IfStatistics{
-				Ifbytes:   rows[i].InOctets,
-				Ifpackets: rows[i].InUcastPkts + rows[i].InNUcastPkts,
-				Iferrors:  rows[i].InErrors,
-				Ifdropped: rows[i].InDiscards + rows[i].InUnknownProtos,
+				Ifbytes:   uint64Ptr(rows[i].InOctets),
+				Ifpackets: uint64Ptr(rows[i].InUcastPkts + rows[i].InNUcastPkts),
+				Iferrors:  uint64Ptr(rows[i].InErrors),
+				Ifdropped: uint64Ptr(rows[i].InDiscards + rows[i].InUnknownProtos),
 			},
 
 			Out: IfStatistics{
-				Ifbytes:   rows[i].OutOctets,
-				Ifpackets: rows[i].OutUcastPkts + rows[i].OutNUcastPkts,
-				Iferrors:  rows[i].OutErrors,
-				Ifdropped: rows[i].OutDiscards,
+				Ifbytes:   uint64Ptr(rows[i].OutOctets),
+				Ifpackets: uint64Ptr(rows[i].OutUcastPkts + rows[i].OutNUcastPkts),
+				Iferrors:  uint64Ptr(rows[i].OutErrors),
+				Ifdropped: uint64Ptr(rows[i].OutDiscards),
 			},
 
 			Ifcarrier:     &carrierVal,

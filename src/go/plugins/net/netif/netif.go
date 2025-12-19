@@ -48,21 +48,27 @@ type msgIfDiscovery struct {
 type ifConfigData struct {
 	Ifname      string  `json:"name"`
 	Ifmac       string  `json:"mac,omitempty"`
+	Ifalias     string  `json:"ifalias,omitempty"`
 	IfAdmState  *string `json:"administrative_state"`
 	IfOperState *string `json:"operational_state"`
 }
 
 type IfStatistics struct {
-	Ifbytes   uint64 `json:"bytes"`
-	Ifpackets uint64 `json:"packets"`
-	Iferrors  uint64 `json:"errors"`
-	Ifdropped uint64 `json:"dropped"`
+	Ifbytes      *uint64 `json:"bytes,omitempty""`
+	Ifpackets    *uint64 `json:"packets,omitempty""`
+	Iferrors     *uint64 `json:"errors,omitempty""`
+	Ifdropped    *uint64 `json:"dropped,omitempty""`
+	Ifoverrruns  *uint64 `json:"overruns,omitempty""`
+	Ifframe      *uint64 `json:"frame,omitempty""`
+	Ifcompressed *uint64 `json:"compressed,omitempty""`
+	Ifmulticast  *uint64 `json:"multicast,omitempty""`
+	Ifcollisions *uint64 `json:"collisions,omitempty""`
+	Ifcarrier    *uint64 `json:"carrier,omitempty""`
 }
 
 type IfValuesData struct {
-	Ifname  string `json:"name"`
-	Ifalias string `json:"alias"`
-
+	Ifname        string       `json:"name"`
+	Ifalias       string       `json:"ifalias,omitempty"`
 	In            IfStatistics `json:"in"`
 	Out           IfStatistics `json:"out"`
 	Ifmac         string       `json:"mac,omitempty"`
