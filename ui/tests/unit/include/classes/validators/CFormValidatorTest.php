@@ -1671,8 +1671,7 @@ class CFormValidatorTest extends TestCase {
 					'value' => ''
 				]],
 				['interfaces' => [
-					'status' => 2,
-					'value' => ''
+					'status' => 2
 				]],
 				CFormValidator::SUCCESS,
 				[]
@@ -1722,7 +1721,7 @@ class CFormValidatorTest extends TestCase {
 					'value' => ['string', 'not_empty', 'when' => ['templates', 'not_empty']]
 				]],
 				['templates' => [], 'value' => ''],
-				['templates' => [], 'value' => ''],
+				['templates' => []],
 				CFormValidator::SUCCESS,
 				[]
 			],
@@ -1732,7 +1731,7 @@ class CFormValidatorTest extends TestCase {
 					'value' => ['string', 'not_empty', 'when' => ['templates', 'empty']]
 				]],
 				['templates' => ['1', '2', '3'], 'value' => ''],
-				['templates' => ['1', '2', '3'], 'value' => ''],
+				['templates' => ['1', '2', '3']],
 				CFormValidator::SUCCESS,
 				[]
 			],
@@ -1766,7 +1765,7 @@ class CFormValidatorTest extends TestCase {
 					'value' => ['string', 'not_empty', 'when' => ['host', 'exist']]
 				]],
 				['value' => ''],
-				['value' => ''],
+				[],
 				CFormValidator::SUCCESS,
 				[]
 			],
@@ -1812,7 +1811,7 @@ class CFormValidatorTest extends TestCase {
 					'value' => ['string', 'not_empty', 'when' => ['host', 'not_exist']]
 				]],
 				['host' => '', 'value' => ''],
-				['host' => '', 'value' => ''],
+				['host' => ''],
 				CFormValidator::SUCCESS,
 				[]
 			],
@@ -2348,7 +2347,7 @@ class CFormValidatorTest extends TestCase {
 					'field2' => ['integer', 'min' => 3, 'when' => ['field1', 'exist']]
 				]],
 				['field2' => 2],
-				['field2' => 2],
+				[],
 				CFormValidator::SUCCESS,
 				[]
 			],
@@ -2358,7 +2357,7 @@ class CFormValidatorTest extends TestCase {
 					'field2' => ['integer', 'min' => 3, 'when' => ['field1', 'not_exist']]
 				]],
 				['field1' => 1, 'field2' => 2],
-				['field1' => 1, 'field2' => 2],
+				['field1' => 1],
 				CFormValidator::SUCCESS,
 				[]
 			],
@@ -2414,6 +2413,56 @@ class CFormValidatorTest extends TestCase {
 				['/value' => [
 					['message' => 'This value must be "abc".', 'level' => CFormValidator::ERROR_LEVEL_PRIMARY]
 				]]
+			],
+			[
+				['object', 'fields' => [
+					'test' => ['boolean'],
+					'value' => ['array', 'when' => ['test', 'exist'],
+						'field' => ['integer', 'when' => ['../test', 'in' => [0]]]
+					]
+				]],
+				['test' => 1, 'value' => [1,2,3]],
+				['test' => 1, 'value' => []],
+				CFormValidator::SUCCESS,
+				[]
+			],
+			[
+				['object', 'fields' => [
+					'test' => ['boolean'],
+					'value' => ['array', 'when' => ['test', 'exist'],
+						'field' => ['integer']
+					]
+				]],
+				['value' => [1,2,3]],
+				[],
+				CFormValidator::SUCCESS,
+				[]
+			],
+			[
+				['object', 'fields' => [
+					'test' => ['boolean'],
+					'value' => ['array', 'not_empty', 'when' => ['test', 'exist'],
+						'field' => ['integer', 'when' => ['../test', 'in' => [0]]]
+					]
+				]],
+				['test' => 1, 'value' => [1,2,3]],
+				[],
+				CFormValidator::ERROR,
+				['/value' => [
+					['message' => 'This field cannot be empty.', 'level' => CFormValidator::ERROR_LEVEL_PRIMARY]
+				]]
+			],
+			[
+				['object', 'fields' => [
+					'test' => ['boolean'],
+					'value' => ['array', 'when' => ['test', 'exist'],
+						'field' => ['integer', 'when' => ['../test', 'in' => [0]]]
+					]
+				]],
+				['test' => 0, 'value' => [1,2,3]],
+				['test' => 0, 'value' => [1,2,3]],
+				CFormValidator::SUCCESS,
+				[]
 			],
 			[
 				['object', 'fields' => [
