@@ -106,9 +106,9 @@ zabbix_export:
             	findRdapServer: function (tld) {
             
             		for (var i = 0; i < RDAP.services.length; i++) {
-            			var service = RDAP.services[i];
-            			var tlds = service[0] || [];
-            			var urls = service[1] || [''];
+            			var service = RDAP.services[i],
+            				tlds = service[0] || [],
+            				urls = service[1] || [''];
             			if (tlds.indexOf(tld) !== -1) {
             				return urls[0];
             			}
@@ -451,8 +451,8 @@ zabbix_export:
                       			continue;
                       		}
                       
-                      		var final_index = parent_index === '' ? index : parent_index + ',' + index,
-                      			final_roles = parent_roles === '' ? roles : parent_roles + '-' + roles;
+                      		var final_index = (parent_index === '' ? index : parent_index + ',' + index),
+                      			final_roles = (parent_roles === '' ? roles : parent_roles + '-' + roles);
                       
                       		out_vcard_array.push({
                       			'{#ENTITY_VCARD_NAME}': '[' + final_roles + ']: vCard: [' + vcard_array[j][0] + ']',
