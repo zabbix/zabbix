@@ -34,6 +34,8 @@ class testCalculatedExpression extends CIntegrationTest {
 	const TRAPPER_ITEM_KEY = 'test.calc.trapper';
 	const TRAPPER_ITEM_KEY_2 = 'test.calc.trapper2';
 	const CALCULATED_ITEM_KEY = 'test.calc.calculated';
+	const DBL_MAX = '1.7976931348623157e308';
+	const DBL_MIN = '-1.7976931348623157e308';
 
 	/**
 	 * Component configuration provider.
@@ -219,16 +221,16 @@ class testCalculatedExpression extends CIntegrationTest {
 
 		$this->assertSame(
 			[
-				'1.7976931348623157e308',
-				'1.7976931348623157e308',
-				'1.7976931348623157e308',
-				'1.7976931348623157e308',
-				'1.7976931348623157e308'
+				(float)self::DBL_MAX,
+				(float)self::DBL_MAX,
+				(float)self::DBL_MAX,
+				(float)self::DBL_MAX,
+				(float)self::DBL_MAX
 			],
 			$values
 		);
 
-		$this->assertEquals((float)'1.7976931348623157e308', $this->getItemLastValue($itemid));
+		$this->assertEquals((float)self::DBL_MAX, $this->getItemLastValue($itemid));
 	}
 
 	public function testCalculatedExpression_MaxOfLast4()
@@ -269,10 +271,10 @@ class testCalculatedExpression extends CIntegrationTest {
 
 		$this->assertSame(
 			[
-				'-1.7976931348623157e308',
-				'-1.7976931348623157e308',
-				'1.7976931348623157e308',
-				'1.7976931348623157e308'
+				(float)self::DBL_MIN,
+				(float)self::DBL_MIN,
+				(float)self::DBL_MAX,
+				(float)self::DBL_MAX
 			],
 			$values
 		);
@@ -318,16 +320,16 @@ class testCalculatedExpression extends CIntegrationTest {
 
 		$this->assertSame(
 			[
-				'-1.7976931348623157e308',
-				'-1.7976931348623157e308',
-				'1.7976931348623157e308',
-				'1.7976931348623157e308',
-				'1.7976931348623157e308'
+				(float)self::DBL_MIN,
+				(float)self::DBL_MIN,
+				(float)self::DBL_MAX,
+				(float)self::DBL_MAX,
+				(float)self::DBL_MAX
 			],
 			$values
 		);
 
-		$this->assertEquals((float)'-1.7976931348623157e308', $this->getItemLastValue($itemid));
+		$this->assertEquals((float)self::DBL_MIN, $this->getItemLastValue($itemid));
 	}
 
 	public function testCalculatedExpression_LastValue()
@@ -368,14 +370,14 @@ class testCalculatedExpression extends CIntegrationTest {
 
 		$this->assertSame(
 			[
-				'1.7976931348623157e308',
-				'1.7976931348623157e308',
-				'1.7976931348623157e308',
+				(float)self::DBL_MAX,
+				(float)self::DBL_MAX,
+				(float)self::DBL_MAX
 			],
 			$values
 		);
 
-		$this->assertEquals((float)'1.7976931348623157e308', $this->getItemLastValue($itemid));
+		$this->assertEquals((float)self::DBL_MAX, $this->getItemLastValue($itemid));
 	}
 
 	public function testCalculatedExpression_ArithmeticAndScaling()
