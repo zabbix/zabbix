@@ -413,15 +413,19 @@ ZBX_Notifications.prototype.handleTabFocusIn = function() {
  * Close the notification box.
  */
 ZBX_Notifications.prototype.handleCloseClicked = function() {
-	if (this._closing) return;
+	if (this._closing)  {
+		return;
+	}
 
 	const ids = this.getEventIds();
-	if (!ids.length) return;
+
+	if (!ids.length)  {
+		return;
+	}
 
 	this._closing = true;
-	const data = { ids };
 
-	data[CSRF_TOKEN_NAME] = this._csrf_token;
+	const data = {ids, [CSRF_TOKEN_NAME]: this._csrf_token};
 
 	this
 		.fetch('notifications.read', data)
