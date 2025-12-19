@@ -196,7 +196,6 @@ abstract class CHostBase extends CApiService {
 		$is_template_update = $this instanceof CTemplate && $db_hosts !== null;
 		$double_linkage_scope = $is_template_update ? null : [];
 		$del_templates = [];
-		$del_links_clear = [];
 
 		foreach ($hosts as $host) {
 			if (array_key_exists('templates', $host)) {

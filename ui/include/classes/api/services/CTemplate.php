@@ -753,7 +753,6 @@ class CTemplate extends CHostGeneral {
 			$del_templates[$row['del_templateid']][$row['hostid']][] = $row['templateid'];
 		}
 
-		$del_links_clear = [];
 		$options = [
 			'output' => ['templateid', 'hostid'],
 			'filter' => [
@@ -761,12 +760,6 @@ class CTemplate extends CHostGeneral {
 			]
 		];
 		$result = DBselect(DB::makeSql('hosts_templates', $options));
-
-		while ($row = DBfetch($result)) {
-			if (!in_array($row['hostid'], $templateids)) {
-				$del_links_clear[$row['templateid']][$row['hostid']] = true;
-			}
-		}
 
 		if ($del_templates) {
 			$this->checkTriggerExpressionsOfDelTemplates($del_templates);
