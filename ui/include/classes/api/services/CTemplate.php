@@ -753,14 +753,6 @@ class CTemplate extends CHostGeneral {
 			$del_templates[$row['del_templateid']][$row['hostid']][] = $row['templateid'];
 		}
 
-		$options = [
-			'output' => ['templateid', 'hostid'],
-			'filter' => [
-				'templateid' => $templateids
-			]
-		];
-		$result = DBselect(DB::makeSql('hosts_templates', $options));
-
 		if ($del_templates) {
 			$this->checkTriggerExpressionsOfDelTemplates($del_templates);
 		}
