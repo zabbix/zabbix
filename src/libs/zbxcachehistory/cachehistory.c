@@ -158,10 +158,10 @@ typedef struct
 }
 dc_item_value_t;
 
-static char		*string_values = NULL;
-static size_t		string_values_alloc = 0, string_values_offset = 0;
-static dc_item_value_t	*item_values = NULL;
-static size_t		item_values_alloc = 0, item_values_num = 0;
+static ZBX_THREAD_LOCAL char		*string_values = NULL;
+static ZBX_THREAD_LOCAL size_t		string_values_alloc = 0, string_values_offset = 0;
+static ZBX_THREAD_LOCAL dc_item_value_t	*item_values = NULL;
+static ZBX_THREAD_LOCAL size_t		item_values_alloc = 0, item_values_num = 0;
 
 static void	hc_add_item_values(dc_item_value_t *values, int values_num);
 static void	hc_queue_item(zbx_hc_item_t *item);
