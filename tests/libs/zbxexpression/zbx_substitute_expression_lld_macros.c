@@ -28,8 +28,8 @@
 void	zbx_mock_test_entry(void **state)
 {
 	char				*error,
-					*data_expression = zbx_strdup(NULL ,zbx_mock_get_parameter_string("in.data")),
-					*data_calc = zbx_strdup(NULL ,zbx_mock_get_parameter_string("in.data"));
+					*data_expression = zbx_strdup(NULL, zbx_mock_get_parameter_string("in.data")),
+					*data_calc = zbx_strdup(NULL, zbx_mock_get_parameter_string("in.data"));
 	const char			*expected_data = zbx_mock_get_parameter_string("out.data"),
 					*buffer = zbx_mock_get_parameter_string("in.buffer");
 	zbx_vector_lld_macro_path_ptr_t	macros;
