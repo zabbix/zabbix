@@ -23,31 +23,36 @@ class CWidgetPlainText extends CWidget {
 	_setContents(content) {
 		super._setContents(content);
 
-		const iframes = this._content_body.querySelectorAll('.js-iframe');
-
-		for (const iframe of iframes) {
+		for (const iframe of this._content_body.querySelectorAll('.js-iframe')) {
 			iframe.addEventListener('load', () => {
-				const content_document = iframe.contentDocument.documentElement.querySelector('body');
-				const iframe_styles = getComputedStyle(iframe);
+				iframe.width = '100%';
 
-				content_document.style.width = 'max-content';
-				content_document.style.height = 'max-content';
-				content_document.style.margin = '0px';
-				content_document.style.font = iframe_styles.font;
-				content_document.style.color = iframe_styles.color;
+				const iframe_content_body = iframe.contentDocument.body;
+				const computed_styles = getComputedStyle(iframe);
+
+				iframe_content_body.style.margin = '0';
+				iframe_content_body.style.font = computed_styles.font;
+				iframe_content_body.style.color = computed_styles.color;
 
 				const resizeIframe = () => {
-					const height = Math.ceil(content_document.scrollHeight);
-					const width = Math.ceil(content_document.scrollWidth);
+					const content_scroll_width = iframe_content_body.scrollWidth;
 
-					iframe.style.height = `${height}px`;
-					iframe.style.width = `${width}px`;
+					if (content_scroll_width > iframe_content_body.clientWidth) {
+						iframe.style.minWidth = `${content_scroll_width}px`;
+					}
+
+					iframe_content_body.style.width = 'max-content';
+					iframe.style.maxWidth = `${iframe_content_body.scrollWidth + 1}px`;
+
+					iframe_content_body.style.width = '';
+
+					iframe.style.height = `${iframe_content_body.scrollHeight}px`;
 				};
 
-				resizeIframe();
+				const resize_observer = new ResizeObserver(resizeIframe);
+				resize_observer.observe(iframe_content_body);
 
-				iframe.resize_observer = new ResizeObserver(resizeIframe);
-				iframe.resize_observer.observe(content_document);
+				resizeIframe();
 			});
 		}
 	}
