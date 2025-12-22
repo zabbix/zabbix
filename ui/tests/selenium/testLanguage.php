@@ -91,8 +91,8 @@ class testLanguage extends CWebTest {
 		$this->checkLanguage($data['message'], $data['page_title'], $data['html_lang'], $data['defaultdb_lang']);
 
 		// Yellow info icon check.
-		$this->query('xpath://button['.CXPathHelper::fromClass('zi-i-warning').']')->one()->click();
-		$this->assertEquals($data['info'], $this->query('class:hintbox-wrap')->one()->getText());
+		$this->query('xpath://button['.CXPathHelper::fromClass('zi-i-warning').']')->waitUntilVisible()->one()->click();
+		$this->assertEquals($data['info'], $this->query('class:hintbox-wrap')->waitUntilVisible()->one()->getText());
 
 		// After logout, warning message and login menu has system language.
 		$this->page->logout();
@@ -163,8 +163,8 @@ class testLanguage extends CWebTest {
 		$form = $this->query('name:user_form')->one()->asForm();
 
 		// Yellow info icon check.
-		$this->query('xpath://button['.CXPathHelper::fromClass('zi-i-warning').']')->one()->click();
-		$this->assertEquals($data['info'], $this->query('class:hintbox-wrap')->one()->getText());
+		$this->query('xpath://button['.CXPathHelper::fromClass('zi-i-warning').']')->waitUntilVisible()->one()->click();
+		$this->assertEquals($data['info'], $this->query('class:hintbox-wrap')->waitUntilVisible()->one()->getText());
 
 		// Change user language to different from System.
 		$form->fill($data['field']);
@@ -242,6 +242,8 @@ class testLanguage extends CWebTest {
 
 	/**
 	 * @dataProvider getCreateUserData
+	 *
+	 * @depends testLanguage_Gui
 	 */
 	public function testLanguage_CreateUser($data) {
 		$this->page->login();
