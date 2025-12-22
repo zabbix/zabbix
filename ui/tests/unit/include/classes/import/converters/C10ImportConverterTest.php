@@ -1062,7 +1062,7 @@ class C10ImportConverterTest extends CImportConverterTest {
 						],
 						[
 							'description' => 'Macro trigger',
-							'expression' => '{{HOSTNAME}:item.last(0)}>0&{{HOST.HOST}:item.last(0)}>0'
+							'expression' => '{{HOST.HOST}:item.last(0)}>0'
 						]
 					]
 				],
@@ -1104,7 +1104,7 @@ class C10ImportConverterTest extends CImportConverterTest {
 				],
 				[
 					'name' => 'Macro trigger',
-					'expression' => '{host3:item.last(0)}>0&{host3:item.last(0)}>0'
+					'expression' => '{host3:item.last(0)}>0'
 				],
 				[
 					'name' => 'My trigger 2',
@@ -1602,9 +1602,6 @@ class C10ImportConverterTest extends CImportConverterTest {
 									'item' => 'host2:ftp,3'
 								],
 								[
-									'item' => '{HOSTNAME}:ftp,3'
-								],
-								[
 									'item' => '{HOST.HOST}:ftp,3'
 								]
 							]
@@ -1715,12 +1712,6 @@ class C10ImportConverterTest extends CImportConverterTest {
 						'key' => 'net.tcp.service[ftp,,2]'
 					],
 					'graph_items' => [
-						[
-							'item' => [
-								'host' => 'host2',
-								'key' => 'net.tcp.service[ftp,,3]'
-							]
-						],
 						[
 							'item' => [
 								'host' => 'host2',

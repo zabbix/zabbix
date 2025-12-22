@@ -27,10 +27,9 @@ class C54SimpleMacroConverter extends C52TriggerExpressionConverter {
 	 * @return string
 	 */
 	public function convert($text): string {
-		$function_macro_parser = new C10FunctionMacroParser(['host_macro' => [ '{HOST.HOST}', '{HOSTNAME}',
-			'{HOST.HOST1}', '{HOSTNAME1}', '{HOST.HOST2}', '{HOSTNAME2}', '{HOST.HOST3}', '{HOSTNAME3}',
-			'{HOST.HOST4}', '{HOSTNAME4}', '{HOST.HOST5}', '{HOSTNAME5}', '{HOST.HOST6}', '{HOSTNAME6}',
-			'{HOST.HOST7}', '{HOSTNAME7}', '{HOST.HOST8}', '{HOSTNAME8}', '{HOST.HOST9}', '{HOSTNAME9}'
+		$function_macro_parser = new C10FunctionMacroParser(['host_macro' => [
+			'{HOST.HOST}', '{HOST.HOST1}', '{HOST.HOST2}', '{HOST.HOST3}', '{HOST.HOST4}',
+			'{HOST.HOST5}', '{HOST.HOST6}', '{HOST.HOST7}', '{HOST.HOST8}', '{HOST.HOST9}'
 		]]);
 		$function_parser = new C10FunctionParser();
 		$macro_values = [];

@@ -1747,7 +1747,7 @@ class CImportDataAdapterTest extends TestCase {
 				'status' => '0',
 				'priority' => '4',
 				'comments' => 'test comments',
-				'description' => 'Low free disk space on {HOSTNAME} volume /',
+				'description' => 'Low free disk space on {HOST.HOST} volume /',
 				'recovery_mode' => (string) ZBX_RECOVERY_MODE_EXPRESSION,
 				'recovery_expression' => '',
 				'correlation_mode' => (string) ZBX_TRIGGER_CORRELATION_NONE,

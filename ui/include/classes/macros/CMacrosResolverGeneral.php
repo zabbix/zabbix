@@ -1416,7 +1416,7 @@ class CMacrosResolverGeneral {
 			' WHERE '.dbConditionInt('f.functionid', array_keys($macros))
 		);
 
-		$host_macros = ['HOST.ID' => 'hostid', 'HOSTNAME' => 'host', 'HOST.HOST' => 'host', 'HOST.NAME' => 'name'];
+		$host_macros = ['HOST.ID' => 'hostid', 'HOST.HOST' => 'host', 'HOST.NAME' => 'name'];
 
 		while ($row = DBfetch($result)) {
 			foreach ($macros[$row['functionid']] as $macro => $tokens) {
@@ -1669,7 +1669,7 @@ class CMacrosResolverGeneral {
 			'preservekeys' => true
 		]);
 
-		$host_macros = ['HOST.ID' => 'hostid', 'HOSTNAME' => 'host', 'HOST.HOST' => 'host', 'HOST.NAME' => 'name',
+		$host_macros = ['HOST.ID' => 'hostid', 'HOST.HOST' => 'host', 'HOST.NAME' => 'name',
 			'HOST.DESCRIPTION' => 'description'
 		];
 
@@ -1714,7 +1714,7 @@ class CMacrosResolverGeneral {
 			'preservekeys' => true
 		]);
 
-		$host_macros = ['HOST.ID' => 'hostid', 'HOSTNAME' => 'host', 'HOST.HOST' => 'host', 'HOST.NAME' => 'name',
+		$host_macros = ['HOST.ID' => 'hostid', 'HOST.HOST' => 'host', 'HOST.NAME' => 'name',
 			'HOST.DESCRIPTION' => 'description'];
 
 		foreach ($db_items as $itemid => $db_item) {
@@ -2214,7 +2214,7 @@ class CMacrosResolverGeneral {
 			'preservekeys' => true
 		]);
 
-		$host_macros = ['HOST.ID' => 'hostid', 'HOSTNAME' => 'host', 'HOST.HOST' => 'host', 'HOST.NAME' => 'name',
+		$host_macros = ['HOST.ID' => 'hostid', 'HOST.HOST' => 'host', 'HOST.NAME' => 'name',
 			'HOST.DESCRIPTION' => 'description'
 		];
 
