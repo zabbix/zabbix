@@ -291,11 +291,13 @@ int	housekeeper_process(int config_max_hk_delete)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	if (NULL == (result = zbx_db_select_n("select housekeeperid,object,objectid from housekeeper",
-			ZBX_HK_OBJECT_NUM * config_max_hk_delete)))
-	{
-		return deleted;
-	}
+	result = (0 != config_max_hk_delete) ?
+			zbx_db_select_n("select housekeeperid,object,objectid from housekeeper",
+					ZBX_HK_OBJECT_NUM * config_max_hk_delete) :
+		zbx_db_select("select housekeeperid,object,objectid from housekeeper");
+
+	if (NULL == result)
+		goto out;
 
 	zbx_vector_uint64_create(&deleteids);
 
@@ -361,6 +363,7 @@ int	housekeeper_process(int config_max_hk_delete)
 
 	zbx_vector_uint64_destroy(&deleteids);
 
+out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() deleted:%d", __func__, deleted);
 
 	return deleted;
