@@ -54,11 +54,11 @@ static const char	*help_message[] = {
 	"                               and are available in the script via the 'value' variable.",
 	"                               Specify '-' to read from standard input. Mutually",
 	"                               exclusive with -p.",
-	"  -p,--param input-param       Specify the input parameter passed to the script. The value",
+	"  -p,--param input-param       Specify the input parameter passed to the script. Parameter",
 	"                               is passed verbatim as a string and is available in the",
 	"                               script via the 'value' variable. Mutually exclusive with -i.",
 	"  -w,--webdriver url           Specify webdriver URL",
-	"  -l,--loglevel log-level      Specify the log level (Range: 0-5).",
+	"  -l,--loglevel log-level      Specify log level (Range: 0-5).",
 	"  -t --timeout timeout         Specify the timeout in seconds. Valid range: " JS_TIMEOUT_MIN_STR "-"
 			JS_TIMEOUT_MAX_STR " seconds",
 	"                               (default: " JS_TIMEOUT_DEF_STR " seconds)",
