@@ -294,7 +294,7 @@ int	housekeeper_process(int config_max_hk_delete)
 	result = (0 != config_max_hk_delete) ?
 			zbx_db_select_n("select housekeeperid,object,objectid from housekeeper",
 					ZBX_HK_OBJECT_NUM * config_max_hk_delete) :
-		zbx_db_select("select housekeeperid,object,objectid from housekeeper");
+			zbx_db_select("select housekeeperid,object,objectid from housekeeper");
 
 	if (NULL == result)
 		goto out;
