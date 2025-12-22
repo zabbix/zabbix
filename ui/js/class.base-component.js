@@ -40,11 +40,6 @@ class CBaseComponent {
 		return this._target.classList.contains(class_name);
 	}
 
-	setAttr(attribute_name, value) {
-		this._target.setAttribute(attribute_name, value);
-		return this;
-	}
-
 	/**
 	 * Events.
 	 */

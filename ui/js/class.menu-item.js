@@ -31,10 +31,15 @@ class CMenuItem extends CBaseComponent {
 
 		if (this.hasClass('has-submenu')) {
 			this._submenu = new CMenu(this._target.querySelector('.submenu'), ++level);
+			this._submenu._target.id = this._target.id+"-submenu";
+			this._toggle.setAttribute('aria-controls', this._submenu._target.id);
 		}
 
 		this._is_expanded = this.hasClass('is-expanded');
 		this._is_selected = this.hasClass('is-selected');
+
+		this._toggle.setAttribute('aria-role','button');
+		this._toggle.setAttribute('aria-expanded', this._is_expanded ? 'true' : 'false');
 	}
 
 	focus() {
@@ -68,11 +73,11 @@ class CMenuItem extends CBaseComponent {
 	expandSubmenu() {
 		if (!this._is_expanded && this.hasSubmenu()) {
 			this.addClass('is-expanded');
-			this.setAttr('aria-expanded', 'true');
 			this._is_expanded = true;
 			this._submenu.updateHeight();
-
 			this.fire(MENUITEM_EVENT_EXPAND);
+
+			this._toggle.setAttribute('aria-expanded', 'true');
 		}
 
 		return this;
@@ -81,9 +86,10 @@ class CMenuItem extends CBaseComponent {
 	collapseSubmenu(from_level) {
 		if (this._is_expanded && this.hasSubmenu() && this._submenu.collapseExpanded(from_level)) {
 			this.removeClass('is-expanded');
-			this.setAttr('aria-expanded', 'false');
 			this._is_expanded = false;
 			this.fire(MENUITEM_EVENT_COLLAPSE);
+
+			this._toggle.setAttribute('aria-expanded', 'false');
 
 			return true;
 		}

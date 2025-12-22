@@ -70,7 +70,6 @@ class CMenuHelper {
 				(new CMenuItem(_('Monitoring')))
 					->setId('view')
 					->setIcon(ZBX_ICON_MONITORING)
-					->setAttribute('aria-expanded', 'false')
 					->setSubMenu(new CMenu($submenu_monitoring))
 			);
 		}
@@ -98,7 +97,6 @@ class CMenuHelper {
 				(new CMenuItem(_('Services')))
 					->setId('services')
 					->setIcon(ZBX_ICON_SERVICES)
-					->setAttribute('aria-expanded', 'false')
 					->setSubMenu(new CMenu($submenu_services))
 			);
 		}
@@ -119,7 +117,6 @@ class CMenuHelper {
 				(new CMenuItem(_('Inventory')))
 					->setId('cm')
 					->setIcon(ZBX_ICON_INVENTORY)
-					->setAttribute('aria-expanded', 'false')
 					->setSubMenu(new CMenu($submenu_inventory))
 			);
 		}
@@ -158,7 +155,6 @@ class CMenuHelper {
 				(new CMenuItem(_('Reports')))
 					->setId('reports')
 					->setIcon(ZBX_ICON_REPORTS)
-					->setAttribute('aria-expanded', 'false')
 					->setSubMenu(new CMenu($submenu_reports))
 			);
 		}
@@ -214,7 +210,6 @@ class CMenuHelper {
 				(new CMenuItem(_('Data collection')))
 					->setId('config')
 					->setIcon(ZBX_ICON_DATA_COLLECTION)
-					->setAttribute('aria-expanded', 'false')
 					->setSubMenu(new CMenu($submenu_data_collection))
 			);
 		}
@@ -226,6 +221,7 @@ class CMenuHelper {
 			CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_AUTOREGISTRATION_ACTIONS) ||
 			CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_INTERNAL_ACTIONS))
 				? (new CMenuItem(_('Actions')))
+					->setId('actions')
 					->setSubMenu(new CMenu(array_filter([
 						CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TRIGGER_ACTIONS)
 							? (new CMenuItem(_('Trigger actions')))
@@ -292,7 +288,6 @@ class CMenuHelper {
 				(new CMenuItem(_('Alerts')))
 					->setId('alerts')
 					->setIcon(ZBX_ICON_ALERTS)
-					->setAttribute('aria-expanded', 'false')
 					->setSubMenu(new CMenu($submenu_alerts))
 			);
 		}
@@ -330,7 +325,6 @@ class CMenuHelper {
 				(new CMenuItem(_('Users')))
 					->setId('users-menu')
 					->setIcon(ZBX_ICON_USERS)
-					->setAttribute('aria-expanded', 'false')
 					->setSubMenu(new CMenu($submenu_users))
 			);
 		}
@@ -338,6 +332,7 @@ class CMenuHelper {
 		$submenu_administration = [
 			CWebUser::checkAccess(CRoleHelper::UI_ADMINISTRATION_GENERAL)
 				? (new CMenuItem(_('General')))
+					->setId('general')
 					->setSubMenu(new CMenu(array_filter([
 						(new CMenuItem(_('GUI')))
 							->setAction('gui.edit'),
@@ -392,6 +387,7 @@ class CMenuHelper {
 				: null,
 			CWebUser::checkAccess(CRoleHelper::UI_ADMINISTRATION_QUEUE)
 				? (new CMenuItem(_('Queue')))
+					->setId('queue')
 					->setSubMenu(new CMenu([
 						(new CMenuItem(_('Queue overview')))
 							->setAction('queue.overview'),
@@ -409,7 +405,6 @@ class CMenuHelper {
 				(new CMenuItem(_('Administration')))
 					->setId('admin')
 					->setIcon(ZBX_ICON_ADMINISTRATION)
-					->setAttribute('aria-expanded', 'false')
 					->setSubMenu(new CMenu($submenu_administration))
 			);
 		}
@@ -467,6 +462,7 @@ class CMenuHelper {
 		elseif (CWebUser::checkAccess(CRoleHelper::ACTIONS_MANAGE_API_TOKENS)) {
 			$menu->add(
 				(new CMenuItem(_('User settings')))
+					->setId('user-settings')
 					->setIcon(ZBX_ICON_USER_SETTINGS)
 					->setTitle(getUserFullname($user))
 					->setSubMenu(new CMenu([
