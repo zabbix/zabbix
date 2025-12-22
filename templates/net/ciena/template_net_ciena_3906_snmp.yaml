@@ -71,7 +71,7 @@ zabbix_export:
               event_name: 'Ciena: High CPU utilization (over {$CIENA.CPU.UTIL.MAX}%)'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: WARNING
-              description: 'Average CPU utilization for last 15 minutes exceeded {$CIENA.CPU.UTIL.MAX}%.'
+              description: 'Average CPU utilization for the last 15 minutes exceeded ''{$CIENA.CPU.UTIL.MAX}%''.'
               tags:
                 - tag: scope
                   value: capacity
@@ -129,11 +129,11 @@ zabbix_export:
           triggers:
             - uuid: 8a742d755e4242a49390c2591ccbb902
               expression: 'last(/Ciena 3906 by SNMP/ciena.cpu.utilization15m.state)<>1'
-              name: 'Ciena: CPU: Utilization state abnormal (15 min)'
+              name: 'Ciena: CPU: Utilization state abnormal (15m)'
               event_name: 'Ciena: CPU average utilization state is not normal'
               opdata: 'Current state: {ITEM.LASTVALUE}'
               priority: WARNING
-              description: 'CPU utilization 15-minute state indicates abnormal or fault condition.'
+              description: 'The CPU utilization 15-minute state indicates an abnormal or fault condition.'
               tags:
                 - tag: scope
                   value: availability
@@ -226,7 +226,7 @@ zabbix_export:
           units: '%'
           description: |
             MIB: WWP-LEOS-SYSTEM-CONFIG-MIB
-            Current percentage usage of the /mnt/sysfs/ directory.
+            Current utilization of the /mnt/sysfs directory.
           preprocessing:
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -259,7 +259,7 @@ zabbix_export:
           units: '%'
           description: |
             MIB: WWP-LEOS-SYSTEM-CONFIG-MIB
-            Current percentage usage of the /tmp/ directory.
+            Current utilization of the /tmp directory.
           preprocessing:
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
