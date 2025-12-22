@@ -2862,7 +2862,6 @@ class CMacrosResolverGeneral {
 		foreach ($macros as $n => $macro_data) {
 			foreach ($macro_data as $macro => $tokens) {
 				switch ($macro) {
-					case 'USER.ALIAS': // Deprecated in version 5.4.
 					case 'USER.USERNAME':
 						$value = CApiService::$userData['username'];
 						break;

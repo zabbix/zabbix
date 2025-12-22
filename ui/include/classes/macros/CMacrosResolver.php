@@ -1872,7 +1872,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 				'host' => ['{HOST.ID}', '{HOST.NAME}', '{HOST.HOST}'],
 				'interface' => ['{HOST.IP}', '{HOST.DNS}', '{HOST.CONN}', '{HOST.PORT}'],
 				'inventory' => array_keys(self::getSupportedHostInventoryMacrosMap()),
-				'user_data' => ['{USER.ALIAS}', '{USER.USERNAME}', '{USER.FULLNAME}', '{USER.NAME}', '{USER.SURNAME}'],
+				'user_data' => ['{USER.USERNAME}', '{USER.FULLNAME}', '{USER.NAME}', '{USER.SURNAME}'],
 				'manualinput' => ['{MANUALINPUT}']
 			],
 			'usermacros' => true
@@ -2002,7 +2002,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 					'{EVENT.VALUE}', '{EVENT.CAUSE.ID}', '{EVENT.CAUSE.NAME}', '{EVENT.CAUSE.NSEVERITY}',
 					'{EVENT.CAUSE.SEVERITY}', '{EVENT.CAUSE.STATUS}', '{EVENT.CAUSE.VALUE}'
 				],
-				'user_data' => ['{USER.ALIAS}', '{USER.USERNAME}', '{USER.FULLNAME}', '{USER.NAME}', '{USER.SURNAME}'],
+				'user_data' => ['{USER.USERNAME}', '{USER.FULLNAME}', '{USER.NAME}', '{USER.SURNAME}'],
 				'manualinput' => ['{MANUALINPUT}']
 			],
 			'macros_n' => [
