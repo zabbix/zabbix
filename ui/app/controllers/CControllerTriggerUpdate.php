@@ -61,7 +61,10 @@ class CControllerTriggerUpdate extends CController {
 				'messages' => ['uniq' => _('Tag name and value combination is not unique.')],
 				'fields' => [
 					'value' => ['db trigger_tag.value'],
-					'tag' => ['db trigger_tag.tag', 'required', 'not_empty', 'when' => ['value', 'not_empty']]
+					'tag' => [
+						['db trigger_tag.tag'],
+						['db trigger_tag.tag', 'required', 'not_empty', 'when' => ['value', 'not_empty']]
+					]
 				]
 			],
 			'dependencies' => ['array', 'field' => ['db triggers.triggerid']],

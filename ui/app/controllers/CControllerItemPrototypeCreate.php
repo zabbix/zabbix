@@ -157,6 +157,7 @@ class CControllerItemPrototypeCreate extends CControllerItemPrototype {
 				], 'when' => ['type', 'in' => [ITEM_TYPE_HTTPAGENT]]
 			],
 			'posts' => [
+				['db items.posts'],
 				['db items.posts', 'required', 'not_empty',
 					'when' => ['post_type', 'in' => [ZBX_POSTTYPE_XML]],
 					'use' => [CXmlValidator::class, []]
@@ -357,7 +358,10 @@ class CControllerItemPrototypeCreate extends CControllerItemPrototype {
 				'messages' => ['uniq' => _('Tag name and value combination is not unique.')],
 				'fields' => [
 					'value' => ['db item_tag.value'],
-					'tag' => ['db item_tag.tag', 'required', 'not_empty', 'when' => ['value', 'not_empty']]
+					'tag' => [
+						['db item_tag.tag'],
+						['db item_tag.tag', 'required', 'not_empty', 'when' => ['value', 'not_empty']]
+					]
 				]
 			],
 			'discover' => ['db items.discover', 'in' => [ZBX_PROTOTYPE_DISCOVER, ZBX_PROTOTYPE_NO_DISCOVER]],

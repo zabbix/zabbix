@@ -23,7 +23,7 @@ require_once __DIR__.'/../behaviors/CTagBehavior.php';
  *
  * @onBefore prepareProblemsData
  *
- * @dataSource UserPermissions, WidgetCommunication
+ * @dataSource UserPermissions, WidgetCommunication, MonitoringOverview
  */
 class testPageProblems extends CWebTest {
 
@@ -538,7 +538,7 @@ class testPageProblems extends CWebTest {
 							'Host' => '4_Host_to_check_Monitoring_Overview',
 							'Problem' => '4_trigger_Average',
 							'Update' => 'Update',
-							'Tags' => ''
+							'Tags' => 'DataBase: Oracle DB'
 						]
 					]
 				]
@@ -557,7 +557,7 @@ class testPageProblems extends CWebTest {
 							'Host' => '3_Host_to_check_Monitoring_Overview',
 							'Problem' => '3_trigger_Average',
 							'Update' => 'Update',
-							'Tags' => ''
+							'Tags' => 'DataBase: Oracle'
 						]
 					],
 					'check_trigger_description' => [
@@ -609,7 +609,7 @@ class testPageProblems extends CWebTest {
 							'Host' => '1_Host_to_check_Monitoring_Overview',
 							'Problem' => '2_trigger_Information',
 							'Update' => 'Update',
-							'Tags' => ''
+							'Tags' => 'DataBase: PostgreSQL'
 						]
 					],
 					'check_trigger_description' => [

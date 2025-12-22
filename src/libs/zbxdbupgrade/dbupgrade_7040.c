@@ -167,6 +167,22 @@ static int	DBpatch_7040008(void)
 	return SUCCEED;
 }
 
+static int	DBpatch_7040009(void)
+{
+	/* 3 - HOST_STATUS_TEMPLATE */
+	if (ZBX_DB_OK > zbx_db_execute("delete from item_rtdata"
+			" where exists ("
+				"select null from items i,hosts h"
+				" where item_rtdata.itemid=i.itemid"
+					" and i.hostid=h.hostid and h.status=3"
+				")"))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
 #endif
 
 DBPATCH_START(7040)
@@ -182,5 +198,6 @@ DBPATCH_ADD(7040005, 0, 0)
 DBPATCH_ADD(7040006, 0, 0)
 DBPATCH_ADD(7040007, 0, 0)
 DBPATCH_ADD(7040008, 0, 0)
+DBPATCH_ADD(7040009, 0, 0)
 
 DBPATCH_END()
