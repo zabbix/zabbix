@@ -58,7 +58,8 @@ class CTabFilterItem extends CBaseComponent {
 		if (this._expanded) {
 			this.renderContentTemplate();
 			this.updateApplyUrl();
-		}else{
+		}
+		else {
 			this._target.parentNode.setAttribute('aria-expanded', 'false');
 		}
 

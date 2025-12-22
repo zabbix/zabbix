@@ -334,8 +334,8 @@ $translate_strings = [
 		'S_EXPAND' => _('Expand'),
 		'S_COLLAPSE' => _('Collapse'),
 		'S_CLOSE' => _('Close'),
-		'S_EXPAND_SECTION' => _('Expand section'),
-		'S_COLLAPSE_SECTION' => _('Collapse section')
+		'Expand section' => _('Expand section'),
+		'Collapse section' => _('Collapse section')
 	],
 	'hostinterfacemanager.js' => [
 		'Agent' => _('Agent'),
@@ -353,7 +353,7 @@ $translate_strings = [
 	'multilineinput.js' => [
 		'S_N_CHAR_COUNT' => _('%1$s characters'),
 		'S_N_CHAR_COUNT_REMAINING' => _('%1$s characters remaining'),
-		'S_CLICK_TO_VIEW_OR_EDIT' => _('Click to view or edit'),
+		'Click to view or edit' => _('Click to view or edit'),
 		'S_APPLY' => _('Apply'),
 		'S_CANCEL' => _('Cancel')
 	],

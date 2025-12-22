@@ -206,7 +206,7 @@
 						$node: $this,
 						options: $.extend({
 							title: '',
-							hint: t('S_CLICK_TO_VIEW_OR_EDIT'),
+							hint: t('Click to view or edit'),
 							value: '',
 							placeholder: '',
 							placeholder_textarea: '',
@@ -242,9 +242,10 @@
 					class: ZBX_ICON_PENCIL,
 					type: 'button',
 					title: obj.options.hint,
-					'aria-label': t('S_CLICK_TO_VIEW_OR_EDIT'),
 					autofocus: obj.options.autofocus || null
-				}).on('click', obj, openModal);
+				})
+					.attr('aria-label', t('Click to view or edit'))
+					.on('click', obj, openModal);
 
 				$this
 					.data('multilineInput', obj)

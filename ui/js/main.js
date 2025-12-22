@@ -817,7 +817,7 @@ function toggleSection(id, profile_idx) {
 
 	toggle.classList.toggle(ZBX_ICON_CHEVRON_DOWN, !is_collapsed);
 	toggle.classList.toggle(ZBX_ICON_CHEVRON_UP, is_collapsed);
-	toggle.setAttribute('aria-label', is_collapsed ? t('S_COLLAPSE_SECTION') : t('S_EXPAND_SECTION'));
+	toggle.setAttribute('aria-label', is_collapsed ? t('Collapse section') : t('Expand section'));
 	toggle.setAttribute('aria-expanded', is_collapsed ? 'true' : 'false');
 
 	if (profile_idx !== '') {

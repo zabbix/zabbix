@@ -48,7 +48,8 @@ function Overlay(type, dialogueid) {
 	}).click(function(e) {
 		overlayDialogueDestroy(this.dialogueid);
 		e.preventDefault();
-	}.bind(this)).attr('aria-label', t('Close modal window'));
+	}.bind(this))
+		.attr('aria-label', t('Close modal window'));
 
 	this.$dialogue.$controls = jQuery('<div>', {class: 'overlay-dialogue-controls'});
 	this.$dialogue.$head = jQuery('<div>', {class: 'overlay-dialogue-header'});
