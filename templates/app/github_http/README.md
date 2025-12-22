@@ -38,7 +38,7 @@ Additional information about OAuth scopes is available in the [official document
 
 Note that authenticated users must have admin access to the repository and the `repo` scope must be set to get information about [self-hosted runners](https://docs.github.com/en/rest/actions/self-hosted-runners?apiVersion=2022-11-28#list-self-hosted-runners-for-a-repository).
 
-In order to gather [`security` and `analysis` metrics](https://docs.github.com/en/rest/repos/repos?apiVersion=2022-11-28#list-organization-repositories) for a repository the authenticated user must have admin permissions for the repository or be an owner or security manager for the organization that owns the repository.
+In order to gather [`security` and `analysis` metrics](https://docs.github.com/en/rest/repos/repos?apiVersion=2022-11-28#list-organization-repositories) for a repository, the authenticated user must have admin permissions for the repository or be an owner or security manager for the organization that owns the repository.
 
 **Fine-grained personal access token**
 
@@ -59,7 +59,7 @@ The fine-grained token needs to have the following permissions set to provide ac
 4. **Set the organization name** in the `{$GITHUB.ORG.NAME}` macro
 5. **Set the Copilot monitoring flag** to `1` in the `{$GITHUB.COPILOT.USED}` macro if you want to gather Copilot metrics
 
-Note that the Copilot Metrics API access policy must be enabled for the organization. Only organization owners and owners and billing managers of the parent enterprise can [view Copilot metrics](https://docs.github.com/en/rest/copilot/copilot-metrics?apiVersion=2022-11-28#get-copilot-metrics-for-an-organization).
+Note that the Copilot Metrics API access policy must be enabled for the organization. Only organization owners and billing managers of the parent enterprise can [view Copilot metrics](https://docs.github.com/en/rest/copilot/copilot-metrics?apiVersion=2022-11-28#get-copilot-metrics-for-an-organization).
 
 OAuth app tokens and personal access tokens (classic) need either the `manage_billing:copilot`, `read:org`, or `read:enterprise` scopes to use this endpoint.
 
@@ -70,7 +70,7 @@ The fine-grained token needs to have the following permissions set to provide ac
 6. **Set the LLD rule filters** if needed:
 - Filter repositories by name: `{$GITHUB.REPO.NAME.MATCHES}`, `{$GITHUB.REPO.NAME.NOT_MATCHES}`;
 - Filter repositories by owner: `{$GITHUB.REPO.OWNER.MATCHES}`, `{$GITHUB.REPO.OWNER.NOT_MATCHES}`;
-- Filter Copilot IDE's by name: `{$GITHUB.COPILOT.IDE.NAME.MATCHES}`, `{$GITHUB.COPILOT.IDE.NAME.NOT_MATCHES}`;
+- Filter Copilot IDEs by name: `{$GITHUB.COPILOT.IDE.NAME.MATCHES}`, `{$GITHUB.COPILOT.IDE.NAME.NOT_MATCHES}`;
 - Filter Copilot models by name: `{$GITHUB.COPILOT.MODEL.NAME.MATCHES}`, `{$GITHUB.COPILOT.MODEL.NAME.NOT_MATCHES}`;
 - Filter Copilot programming languages by name: `{$GITHUB.COPILOT.LANG.NAME.MATCHES}`, `{$GITHUB.COPILOT.LANG.NAME.NOT_MATCHES}`.
 
@@ -83,7 +83,7 @@ Note: Update intervals and timeouts for script items can be changed individually
 |{$GITHUB.API.URL}|<p>Set the API URL here.</p>|`https://api.github.com/`|
 |{$GITHUB.USER_AGENT}|<p>The user agent that is used in headers for HTTP requests.</p>|`Zabbix/8.0`|
 |{$GITHUB.API_VERSION}|<p>The API version that is used in headers for HTTP requests.</p>|`2022-11-28`|
-|{$GITHUB.COPILOT.USED}|<p>The flag for gathering Copilot metrics. If set to a value other than "1", items for Copilot will not be created. If set to "1", the '{$GITHUB.ORG.NAME}' macro is required.</p>|`0`|
+|{$GITHUB.COPILOT.USED}|<p>The flag for gathering Copilot metrics. If set to a value other than "1", items for Copilot will not be created. If set to "1", the `{$GITHUB.ORG.NAME}` macro is required.</p>|`0`|
 |{$GITHUB.ORG.NAME}|<p>Set the organization name here.</p>||
 |{$GITHUB.API.TOKEN}|<p>Set the access token here.</p>||
 |{$GITHUB.INTERVAL}|<p>The update interval for the script items that retrieve data from the API. Can be used with context if needed (check the context values in relevant items).</p>|`1m`|
@@ -97,22 +97,22 @@ Note: Update intervals and timeouts for script items can be changed individually
 |{$GITHUB.REPO.NAME.NOT_MATCHES}|<p>The repository name regex filter to use in repository discovery - for excluding.</p>|`CHANGE_IF_NEEDED`|
 |{$GITHUB.REPO.OWNER.MATCHES}|<p>The repository owner regex filter to use in repository discovery - for including.</p>|`.+`|
 |{$GITHUB.REPO.OWNER.NOT_MATCHES}|<p>The repository owner regex filter to use in repository discovery - for excluding.</p>|`CHANGE_IF_NEEDED`|
-|{$GITHUB.COPILOT.IDE.NAME.MATCHES}|<p>The Copilot IDE name regex filter to use in copilot-related metric discovery - for including.</p>|`.+`|
-|{$GITHUB.COPILOT.IDE.NAME.NOT_MATCHES}|<p>The Copilot IDE name regex filter to use in copilot-related metric discovery - for excluding.</p>|`CHANGE_IF_NEEDED`|
-|{$GITHUB.COPILOT.MODEL.NAME.MATCHES}|<p>The Copilot model name regex filter to use in copilot-related metric discovery - for including.</p>|`.+`|
-|{$GITHUB.COPILOT.MODEL.NAME.NOT_MATCHES}|<p>The Copilot model name regex filter to use in copilot-related metric discovery - for excluding.</p>|`CHANGE_IF_NEEDED`|
-|{$GITHUB.COPILOT.LANG.NAME.MATCHES}|<p>The Copilot programming language name regex filter to use in copilot-related metric discovery - for including.</p>|`.+`|
-|{$GITHUB.COPILOT.LANG.NAME.NOT_MATCHES}|<p>The Copilot programming language name regex filter to use in copilot-related metric discovery - for excluding.</p>|`CHANGE_IF_NEEDED`|
+|{$GITHUB.COPILOT.IDE.NAME.MATCHES}|<p>The Copilot IDE name regex filter to use in Copilot-related metric discovery - for including.</p>|`.+`|
+|{$GITHUB.COPILOT.IDE.NAME.NOT_MATCHES}|<p>The Copilot IDE name regex filter to use in Copilot-related metric discovery - for excluding.</p>|`CHANGE_IF_NEEDED`|
+|{$GITHUB.COPILOT.MODEL.NAME.MATCHES}|<p>The Copilot model name regex filter to use in Copilot-related metric discovery - for including.</p>|`.+`|
+|{$GITHUB.COPILOT.MODEL.NAME.NOT_MATCHES}|<p>The Copilot model name regex filter to use in Copilot-related metric discovery - for excluding.</p>|`CHANGE_IF_NEEDED`|
+|{$GITHUB.COPILOT.LANG.NAME.MATCHES}|<p>The Copilot programming language name regex filter to use in Copilot-related metric discovery - for including.</p>|`.+`|
+|{$GITHUB.COPILOT.LANG.NAME.NOT_MATCHES}|<p>The Copilot programming language name regex filter to use in Copilot-related metric discovery - for excluding.</p>|`CHANGE_IF_NEEDED`|
 
 ### Items
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Get repositories|<p>Get a list of repositories for the "{$GITHUB.ORG.NAME}" organization.</p><p></p><p>Information about endpoint:</p><p>https://docs.github.com/en/rest/repos/repos?apiVersion=2022-11-28#list-organization-repositories</p>|Script|github.org.repo.get<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+|Get repositories|<p>Get a list of repositories for the `{$GITHUB.ORG.NAME}` organization.</p><p></p><p>Information about endpoint:</p><p>https://docs.github.com/en/rest/repos/repos?apiVersion=2022-11-28#list-organization-repositories</p>|Script|github.org.repo.get<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
 |Get repositories check|<p>Data collection check.</p>|Dependent item|github.org.repo.get.check<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p><p>⛔️Custom on fail: Set value to: ``</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
 |Number of repositories|<p>The number of repositories in the organization.</p>|Dependent item|github.org.repo.number<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.data.length()`</p><p>⛔️Custom on fail: Set value to: `0`</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
 |Total size of repositories|<p>The total size of repositories in the organization.</p>|Dependent item|github.org.repo.total_size<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.data..size.sum()`</p><p>⛔️Custom on fail: Set value to: `0`</p></li><li><p>Custom multiplier: `1024`</p></li></ul>|
-|Open issues count|<p>The total number of issues opened in all repositories.</p>|Dependent item|github.org.repo.open_issues<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.data..open_issues_count.sum()`</p><p>⛔️Custom on fail: Set value to: `0`</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+|Open issue count|<p>The total number of issues opened in all repositories.</p>|Dependent item|github.org.repo.open_issues<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.data..open_issues_count.sum()`</p><p>⛔️Custom on fail: Set value to: `0`</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
 |Number of private repositories|<p>The number of private repositories in the organization.</p>|Dependent item|github.org.repo.number_private<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.data..[?(@.private == "true")].length()`</p><p>⛔️Custom on fail: Set value to: `0`</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
 |Number of archived repositories|<p>The number of archived repositories in the organization.</p>|Dependent item|github.org.repo.number_archived<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.data..[?(@.archived == "true")].length()`</p><p>⛔️Custom on fail: Set value to: `0`</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
 |Number of disabled repositories|<p>The number of disabled repositories in the organization.</p>|Dependent item|github.org.repo.number_disabled<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.data..[?(@.disabled == "true")].length()`</p><p>⛔️Custom on fail: Set value to: `0`</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
@@ -146,11 +146,11 @@ Note: Update intervals and timeouts for script items can be changed individually
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|[{#REPO_OWNER}/{#REPO_NAME}]: Get data|<p>The number of forks of the repository.</p>|Dependent item|github.org.repo.get_data[{#NODE_ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.data[?(@.node_id == '{#NODE_ID}')].first()`</p><p>⛔️Custom on fail: Set value to: `{}`</p></li></ul>|
-|[{#REPO_OWNER}/{#REPO_NAME}]: Forks count|<p>The number of forks of the repository.</p>|Dependent item|github.org.repo.forks_count[{#NODE_ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.forks_count`</p><p>⛔️Custom on fail: Set value to: `0`</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
-|[{#REPO_OWNER}/{#REPO_NAME}]: Stargazers count|<p>The number of stargazers of the repository.</p>|Dependent item|github.org.repo.stargazers_count[{#NODE_ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.stargazers_count`</p><p>⛔️Custom on fail: Set value to: `0`</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
-|[{#REPO_OWNER}/{#REPO_NAME}]: Watchers count|<p>The number of watchers of the repository.</p>|Dependent item|github.org.repo.watchers_count[{#NODE_ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.watchers_count`</p><p>⛔️Custom on fail: Set value to: `0`</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
-|[{#REPO_OWNER}/{#REPO_NAME}]: Open issues count|<p>The number of issues opened in the repository.</p>|Dependent item|github.org.repo.open_issues[{#NODE_ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.open_issues_count`</p><p>⛔️Custom on fail: Set value to: `0`</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+|[{#REPO_OWNER}/{#REPO_NAME}]: Get data|<p>Get `{$GITHUB.REPO.NAME}` repository data.</p>|Dependent item|github.org.repo.get_data[{#NODE_ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.data[?(@.node_id == '{#NODE_ID}')].first()`</p><p>⛔️Custom on fail: Set value to: `{}`</p></li></ul>|
+|[{#REPO_OWNER}/{#REPO_NAME}]: Fork count|<p>The number of repository forks.</p>|Dependent item|github.org.repo.forks_count[{#NODE_ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.forks_count`</p><p>⛔️Custom on fail: Set value to: `0`</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+|[{#REPO_OWNER}/{#REPO_NAME}]: Stargazer count|<p>The number of stargazers in the repository.</p>|Dependent item|github.org.repo.stargazers_count[{#NODE_ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.stargazers_count`</p><p>⛔️Custom on fail: Set value to: `0`</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+|[{#REPO_OWNER}/{#REPO_NAME}]: Watcher count|<p>The number of watchers in the repository.</p>|Dependent item|github.org.repo.watchers_count[{#NODE_ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.watchers_count`</p><p>⛔️Custom on fail: Set value to: `0`</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+|[{#REPO_OWNER}/{#REPO_NAME}]: Open issue count|<p>The number of issues opened in the repository.</p>|Dependent item|github.org.repo.open_issues[{#NODE_ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.open_issues_count`</p><p>⛔️Custom on fail: Set value to: `0`</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
 |[{#REPO_OWNER}/{#REPO_NAME}]: Size|<p>The size of the repository, in kilobytes.</p>|Dependent item|github.org.repo.size[{#NODE_ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.size`</p><p>⛔️Custom on fail: Set value to: `0`</p></li><li><p>Custom multiplier: `1024`</p></li></ul>|
 |[{#REPO_OWNER}/{#REPO_NAME}]: Language|<p>The language of the repository.</p>|Dependent item|github.org.repo.language[{#NODE_ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.language`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Does not match regular expression: `^null$`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
 |[{#REPO_OWNER}/{#REPO_NAME}]: Is private|<p>Whether the repository is private.</p>|Dependent item|github.org.repo.is_private[{#NODE_ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.private`</p><p>⛔️Custom on fail: Discard value</p></li><li>Boolean to decimal</li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
@@ -164,8 +164,8 @@ Note: Update intervals and timeouts for script items can be changed individually
 |[{#REPO_OWNER}/{#REPO_NAME}]: Advanced Security|<p>Whether GitHub Advanced Security for the repository is enabled. For standalone Code Scanning or Secret Protection products, this value cannot be collected.</p>|Dependent item|github.org.repo.advanced_security[{#NODE_ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.security_and_analysis.advanced_security.status`</p><p>⛔️Custom on fail: Set value to: `disabled`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
 |[{#REPO_OWNER}/{#REPO_NAME}]: Secret Scanning|<p>Whether GitHub Secret Scanning for the repository is enabled.</p>|Dependent item|github.org.repo.secret_scanning[{#NODE_ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.security_and_analysis.secret_scanning.status`</p><p>⛔️Custom on fail: Set value to: `disabled`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
 |[{#REPO_OWNER}/{#REPO_NAME}]: Secret Protection|<p>Whether GitHub Secret Protection for the repository is enabled.</p>|Dependent item|github.org.repo.secret_protection[{#NODE_ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Set value to: `disabled`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
-|[{#REPO_OWNER}/{#REPO_NAME}]: Secret Scanning non-provider patterns|<p>Whether GitHub Secret Scanning non-provider patterns for the repository is enabled.</p>|Dependent item|github.org.repo.secret_scanning_non_provider_patterns[{#NODE_ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Set value to: `disabled`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
-|[{#REPO_OWNER}/{#REPO_NAME}]: Secret Scanning Validity Checks|<p>Whether GitHub Secret Scanning validity checks for the repository is enabled.</p>|Dependent item|github.org.repo.secret_scanning_validity_checks[{#NODE_ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Set value to: `disabled`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
+|[{#REPO_OWNER}/{#REPO_NAME}]: Secret Scanning non-provider patterns|<p>Whether GitHub Secret Scanning non-provider patterns for the repository are enabled.</p>|Dependent item|github.org.repo.secret_scanning_non_provider_patterns[{#NODE_ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Set value to: `disabled`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
+|[{#REPO_OWNER}/{#REPO_NAME}]: Secret Scanning Validity Checks|<p>Whether GitHub Secret Scanning validity checks for the repository are enabled.</p>|Dependent item|github.org.repo.secret_scanning_validity_checks[{#NODE_ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Set value to: `disabled`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
 |[{#REPO_OWNER}/{#REPO_NAME}]: Secret Scanning AI Detection|<p>Whether GitHub Secret Scanning AI Detection for the repository is enabled.</p>|Dependent item|github.org.repo.secret_ai_detection[{#NODE_ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.security_and_analysis.secret_scanning_ai_detection.status`</p><p>⛔️Custom on fail: Set value to: `disabled`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
 
 ### LLD rule Copilot IDE chat discovery
@@ -178,22 +178,22 @@ Note: Update intervals and timeouts for script items can be changed individually
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|IDE [{#IDE_NAME}]: Engaged users|<p>The number of engaged users using Copilot in {#IDE_NAME}.</p>|Dependent item|github.org.copilot_ide_chat.engaged_users[{#IDE_NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Set value to: `0`</p></li></ul>|
+|IDE [{#IDE_NAME}]: Engaged users|<p>The number of engaged users using Copilot in `{#IDE_NAME}`.</p>|Dependent item|github.org.copilot_ide_chat.engaged_users[{#IDE_NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Set value to: `0`</p></li></ul>|
 
 ### LLD rule IDE [{#IDE_NAME}]: Model discovery
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|IDE [{#IDE_NAME}]: Model discovery|<p>The discovery of models used in the {#IDE_NAME} Copilot chat.</p>|Dependent item|github.org.copilot_ide_model.discovery[{#IDE_NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|IDE [{#IDE_NAME}]: Model discovery|<p>The discovery of models used in the `{#IDE_NAME}` Copilot chat.</p>|Dependent item|github.org.copilot_ide_model.discovery[{#IDE_NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 
 ### Item prototypes for IDE [{#IDE_NAME}]: Model discovery
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|IDE [{#IDE_NAME}/{#MODEL_NAME}]: Total chats|<p>The number of Copilot chats with the {#MODEL_NAME} model in {#IDE_NAME}.</p>|Dependent item|github.org.copilot_ide_model.total_chats[{#IDE_NAME},{#MODEL_NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li></ul>|
-|IDE [{#IDE_NAME}/{#MODEL_NAME}]: Engaged users|<p>The number of engaged users using Copilot {#MODEL_NAME} model in {#IDE_NAME}.</p>|Dependent item|github.org.copilot_ide_model.engaged_users[{#IDE_NAME},{#MODEL_NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Set value to: `0`</p></li></ul>|
-|IDE [{#IDE_NAME}/{#MODEL_NAME}]: Chat copy events|<p>The number of Copilot chat copy events caused by the {#MODEL_NAME} model in {#IDE_NAME}.</p>|Dependent item|github.org.copilot_ide_model.chat_copy_events[{#IDE_NAME},{#MODEL_NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li></ul>|
-|IDE [{#IDE_NAME}/{#MODEL_NAME}]: Chat insertion events|<p>The number of Copilot chat insertion events caused by the {#MODEL_NAME} model in {#IDE_NAME}.</p>|Dependent item|github.org.copilot_ide_model.chat_insertion_events[{#IDE_NAME},{#MODEL_NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li></ul>|
+|IDE [{#IDE_NAME}/{#MODEL_NAME}]: Total chats|<p>The number of Copilot chats with the `{#MODEL_NAME}` model in `{#IDE_NAME}`.</p>|Dependent item|github.org.copilot_ide_model.total_chats[{#IDE_NAME},{#MODEL_NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li></ul>|
+|IDE [{#IDE_NAME}/{#MODEL_NAME}]: Engaged users|<p>The number of engaged users using the Copilot `{#MODEL_NAME}` model in `{#IDE_NAME}`.</p>|Dependent item|github.org.copilot_ide_model.engaged_users[{#IDE_NAME},{#MODEL_NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Set value to: `0`</p></li></ul>|
+|IDE [{#IDE_NAME}/{#MODEL_NAME}]: Chat copy events|<p>The number of Copilot chat copy events caused by the `{#MODEL_NAME}` model in `{#IDE_NAME}`.</p>|Dependent item|github.org.copilot_ide_model.chat_copy_events[{#IDE_NAME},{#MODEL_NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li></ul>|
+|IDE [{#IDE_NAME}/{#MODEL_NAME}]: Chat insertion events|<p>The number of Copilot chat insertion events caused by the `{#MODEL_NAME}` model in `{#IDE_NAME}`.</p>|Dependent item|github.org.copilot_ide_model.chat_insertion_events[{#IDE_NAME},{#MODEL_NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li></ul>|
 
 ### LLD rule Copilot IDE code completion discovery
 
@@ -205,37 +205,37 @@ Note: Update intervals and timeouts for script items can be changed individually
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|IDE [{#IDE_NAME}]: Engaged users|<p>The number of engaged users using Copilot in {#IDE_NAME}.</p>|Dependent item|github.org.copilot_completion.engaged_users[{#IDE_NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Set value to: `0`</p></li></ul>|
+|IDE [{#IDE_NAME}]: Engaged users|<p>The number of engaged users using Copilot in `{#IDE_NAME}`.</p>|Dependent item|github.org.copilot_completion.engaged_users[{#IDE_NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Set value to: `0`</p></li></ul>|
 
 ### LLD rule IDE [{#IDE_NAME}]: Model discovery
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|IDE [{#IDE_NAME}]: Model discovery|<p>The discovery of models used in the {#IDE_NAME} Copilot chat.</p>|Dependent item|github.org.copilot_completion_model.discovery[{#IDE_NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|IDE [{#IDE_NAME}]: Model discovery|<p>The discovery of models used in the `{#IDE_NAME}` Copilot chat.</p>|Dependent item|github.org.copilot_completion_model.discovery[{#IDE_NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 
 ### Item prototypes for IDE [{#IDE_NAME}]: Model discovery
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|{#IDE_NAME} [{#MODEL_NAME}]: Engaged users|<p>The number of engaged users using the Copilot {#MODEL_NAME} model in {#IDE_NAME}.</p>|Dependent item|github.org.copilot_completion_model.engaged_users[{#IDE_NAME},{#MODEL_NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Set value to: `0`</p></li></ul>|
+|{#IDE_NAME} [{#MODEL_NAME}]: Engaged users|<p>The number of engaged users using the Copilot `{#MODEL_NAME}` model in `{#IDE_NAME}`.</p>|Dependent item|github.org.copilot_completion_model.engaged_users[{#IDE_NAME},{#MODEL_NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Set value to: `0`</p></li></ul>|
 
 ### LLD rule {#IDE_NAME} [{#MODEL_NAME}]: Language discovery
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|{#IDE_NAME} [{#MODEL_NAME}]: Language discovery|<p>The discovery of programming languages used by the {#MODEL_NAME} model in the {#IDE_NAME} Copilot chat.</p>|Dependent item|github.org.copilot_completion_language.discovery[{#IDE_NAME},{#MODEL_NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|{#IDE_NAME} [{#MODEL_NAME}]: Language discovery|<p>The discovery of programming languages used by the `{#MODEL_NAME}` model in the `{#IDE_NAME}` Copilot chat.</p>|Dependent item|github.org.copilot_completion_language.discovery[{#IDE_NAME},{#MODEL_NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 
 ### Item prototypes for {#IDE_NAME} [{#MODEL_NAME}]: Language discovery
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|{#IDE_NAME} [{#MODEL_NAME}/{#LANG_NAME}]: Engaged users|<p>The number of engaged users using the Copilot {#MODEL_NAME} model in {#IDE_NAME} for code in {#LANG_NAME}.</p>|Dependent item|github.org.copilot_completion_language.engaged_users[{#IDE_NAME},{#MODEL_NAME},{#LANG_NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Set value to: `0`</p></li></ul>|
-|{#IDE_NAME} [{#MODEL_NAME}/{#LANG_NAME}]: Code suggestions|<p>The number of code suggestions in {#LANG_NAME} provided by the Copilot {#MODEL_NAME} model in {#IDE_NAME}.</p>|Dependent item|github.org.copilot_completion_language.code_suggestions[{#IDE_NAME},{#MODEL_NAME},{#LANG_NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li></ul>|
-|{#IDE_NAME} [{#MODEL_NAME}/{#LANG_NAME}]: Code acceptances|<p>The number of code acceptances in {#LANG_NAME} by users for suggestions provided by Copilot {#MODEL_NAME} model in {#IDE_NAME}.</p>|Dependent item|github.org.copilot_completion_language.code_acceptances[{#IDE_NAME},{#MODEL_NAME},{#LANG_NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li></ul>|
-|{#IDE_NAME} [{#MODEL_NAME}/{#LANG_NAME}]: Acceptance rate|<p>The percentage of code acceptances in {#LANG_NAME} for Copilot {#MODEL_NAME} model in {#IDE_NAME}.</p>|Calculated|github.org.copilot_completion_language.acceptance_rate[{#IDE_NAME},{#MODEL_NAME},{#LANG_NAME}]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
-|{#IDE_NAME} [{#MODEL_NAME}/{#LANG_NAME}]: Total code lines suggested|<p>The total number of code lines in {#LANG_NAME} suggested by Copilot {#MODEL_NAME} model in {#IDE_NAME}.</p>|Dependent item|github.org.copilot_completion_language.lines_suggested[{#IDE_NAME},{#MODEL_NAME},{#LANG_NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li></ul>|
-|{#IDE_NAME} [{#MODEL_NAME}/{#LANG_NAME}]: Total code lines accepted|<p>The total number of code lines in {#LANG_NAME} suggested by Copilot {#MODEL_NAME} model in {#IDE_NAME} and accepted by users.</p>|Dependent item|github.org.copilot_completion_language.lines_accepted[{#IDE_NAME},{#MODEL_NAME},{#LANG_NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li></ul>|
-|{#IDE_NAME} [{#MODEL_NAME}/{#LANG_NAME}]: Acceptance lines rate|<p>The percentage of code line accepted in {#LANG_NAME} for Copilot {#MODEL_NAME} model in {#IDE_NAME}.</p>|Calculated|github.org.copilot_completion_language.acceptance_lines_rate[{#IDE_NAME},{#MODEL_NAME},{#LANG_NAME}]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|{#IDE_NAME} [{#MODEL_NAME}/{#LANG_NAME}]: Engaged users|<p>The number of engaged users using the Copilot `{#MODEL_NAME}` model in `{#IDE_NAME}` for code in `{#LANG_NAME}`.</p>|Dependent item|github.org.copilot_completion_language.engaged_users[{#IDE_NAME},{#MODEL_NAME},{#LANG_NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Set value to: `0`</p></li></ul>|
+|{#IDE_NAME} [{#MODEL_NAME}/{#LANG_NAME}]: Code suggestions|<p>The number of code suggestions in `{#LANG_NAME}` provided by the Copilot `{#MODEL_NAME}` model in `{#IDE_NAME}`.</p>|Dependent item|github.org.copilot_completion_language.code_suggestions[{#IDE_NAME},{#MODEL_NAME},{#LANG_NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li></ul>|
+|{#IDE_NAME} [{#MODEL_NAME}/{#LANG_NAME}]: Code acceptances|<p>The number of code acceptances in `{#LANG_NAME}` by users for suggestions provided by the Copilot `{#MODEL_NAME}` model in `{#IDE_NAME}`.</p>|Dependent item|github.org.copilot_completion_language.code_acceptances[{#IDE_NAME},{#MODEL_NAME},{#LANG_NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li></ul>|
+|{#IDE_NAME} [{#MODEL_NAME}/{#LANG_NAME}]: Acceptance rate|<p>The percentage of code acceptances in `{#LANG_NAME}` for the Copilot `{#MODEL_NAME}` model in `{#IDE_NAME}`.</p>|Calculated|github.org.copilot_completion_language.acceptance_rate[{#IDE_NAME},{#MODEL_NAME},{#LANG_NAME}]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|{#IDE_NAME} [{#MODEL_NAME}/{#LANG_NAME}]: Total code lines suggested|<p>The total number of code lines in `{#LANG_NAME}` suggested by the Copilot `{#MODEL_NAME}` model in `{#IDE_NAME}`.</p>|Dependent item|github.org.copilot_completion_language.lines_suggested[{#IDE_NAME},{#MODEL_NAME},{#LANG_NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li></ul>|
+|{#IDE_NAME} [{#MODEL_NAME}/{#LANG_NAME}]: Total code lines accepted|<p>The total number of code lines in `{#LANG_NAME}` suggested by the Copilot `{#MODEL_NAME}` model in `{#IDE_NAME}` and accepted by users.</p>|Dependent item|github.org.copilot_completion_language.lines_accepted[{#IDE_NAME},{#MODEL_NAME},{#LANG_NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li></ul>|
+|{#IDE_NAME} [{#MODEL_NAME}/{#LANG_NAME}]: Line acceptance rate|<p>The percentage of code lines accepted in `{#LANG_NAME}` for the Copilot `{#MODEL_NAME}` model in `{#IDE_NAME}`.</p>|Calculated|github.org.copilot_completion_language.line_acceptance_rate[{#IDE_NAME},{#MODEL_NAME},{#LANG_NAME}]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 
 ### LLD rule Copilot.com chat model discovery
 
@@ -247,8 +247,8 @@ Note: Update intervals and timeouts for script items can be changed individually
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Copilot.com [{#MODEL_NAME}]: Total chats|<p>The number of chats with the {#MODEL_NAME} model on copilot.com.</p>|Dependent item|github.org.copilot_web_model.total_chats[{#MODEL_NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li></ul>|
-|Copilot.com [{#MODEL_NAME}]: Engaged users|<p>The number of engaged users using the {#MODEL_NAME} model on copilot.com.</p>|Dependent item|github.org.copilot_web_model.engaged_users[{#MODEL_NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Set value to: `0`</p></li></ul>|
+|Copilot.com [{#MODEL_NAME}]: Total chats|<p>The number of chats with the `{#MODEL_NAME}` model on copilot.com.</p>|Dependent item|github.org.copilot_web_model.total_chats[{#MODEL_NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li></ul>|
+|Copilot.com [{#MODEL_NAME}]: Engaged users|<p>The number of engaged users using the `{#MODEL_NAME}` model on copilot.com.</p>|Dependent item|github.org.copilot_web_model.engaged_users[{#MODEL_NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Set value to: `0`</p></li></ul>|
 
 ### LLD rule Copilot.com PR discovery
 
@@ -272,8 +272,8 @@ Note: Update intervals and timeouts for script items can be changed individually
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|{#REPO_NAME} [{#MODEL_NAME}]: PR summaries created|<p>The number of PR summaries created by Copilot {#MODEL_NAME} model.</p>|Dependent item|github.org.copilot_pr_model.summaries_created[{#REPO_NAME},{#MODEL_NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li></ul>|
-|{#REPO_NAME} [{#MODEL_NAME}]: Engaged users|<p>The number of engaged users using Copilot {#MODEL_NAME} model for work with PRs.</p>|Dependent item|github.org.copilot_pr_model.engaged_users[{#REPO_NAME},{#MODEL_NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Set value to: `0`</p></li></ul>|
+|{#REPO_NAME} [{#MODEL_NAME}]: PR summaries created|<p>The number of PR summaries created by the Copilot `{#MODEL_NAME}` model.</p>|Dependent item|github.org.copilot_pr_model.summaries_created[{#REPO_NAME},{#MODEL_NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li></ul>|
+|{#REPO_NAME} [{#MODEL_NAME}]: Engaged users|<p>The number of engaged users using the Copilot `{#MODEL_NAME}` model for work with PRs.</p>|Dependent item|github.org.copilot_pr_model.engaged_users[{#REPO_NAME},{#MODEL_NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Set value to: `0`</p></li></ul>|
 
 ### LLD rule Copilot IDE code language discovery
 
@@ -285,7 +285,7 @@ Note: Update intervals and timeouts for script items can be changed individually
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Language [{#LANG_NAME}]: Engaged users|<p>The number of engaged users working with code in {#LANG_NAME}.</p>|Dependent item|github.org.copilot_ide_lang.engaged_users[{#LANG_NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Set value to: `0`</p></li></ul>|
+|Language [{#LANG_NAME}]: Engaged users|<p>The number of engaged users working with code in `{#LANG_NAME}`.</p>|Dependent item|github.org.copilot_ide_lang.engaged_users[{#LANG_NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Set value to: `0`</p></li></ul>|
 
 # GitHub repository by HTTP
 

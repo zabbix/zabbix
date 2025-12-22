@@ -785,7 +785,7 @@ zabbix_export:
             	return JSON.stringify({ error: error });
             }
           description: |
-            Get a list of repositories for the "{$GITHUB.ORG.NAME}" organization.
+            Get a list of repositories for the `{$GITHUB.ORG.NAME}` organization.
             
             Information about endpoint:
             https://docs.github.com/en/rest/repos/repos?apiVersion=2022-11-28#list-organization-repositories
@@ -929,7 +929,7 @@ zabbix_export:
             - tag: component
               value: repository
         - uuid: ae4bd3ea08544a4686cbfd9bbc44c0ed
-          name: 'Open issues count'
+          name: 'Open issue count'
           type: DEPENDENT
           key: github.org.repo.open_issues
           description: 'The total number of issues opened in all repositories.'
@@ -986,7 +986,7 @@ zabbix_export:
               name: 'IDE [{#IDE_NAME}]: Engaged users'
               type: DEPENDENT
               key: 'github.org.copilot_completion.engaged_users[{#IDE_NAME}]'
-              description: 'The number of engaged users using Copilot in {#IDE_NAME}.'
+              description: 'The number of engaged users using Copilot in `{#IDE_NAME}`.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -1026,31 +1026,8 @@ zabbix_export:
               - macro: '{#LANG_NAME}'
                 value: '{$GITHUB.COPILOT.LANG.NAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
-          description: 'The discovery of programming languages used by the {#MODEL_NAME} model in the {#IDE_NAME} Copilot chat.'
+          description: 'The discovery of programming languages used by the `{#MODEL_NAME}` model in the `{#IDE_NAME}` Copilot chat.'
           item_prototypes:
-            - uuid: 427e0d382af24227af462f893f6d5285
-              name: '{#IDE_NAME} [{#MODEL_NAME}/{#LANG_NAME}]: Acceptance lines rate'
-              type: CALCULATED
-              key: 'github.org.copilot_completion_language.acceptance_lines_rate[{#IDE_NAME},{#MODEL_NAME},{#LANG_NAME}]'
-              value_type: FLOAT
-              units: '%'
-              params: 'last(//github.org.copilot_completion_language.lines_accepted[{#IDE_NAME},{#MODEL_NAME},{#LANG_NAME}])/last(//github.org.copilot_completion_language.lines_suggested[{#IDE_NAME},{#MODEL_NAME},{#LANG_NAME}])*100'
-              description: 'The percentage of code line accepted in {#LANG_NAME} for Copilot {#MODEL_NAME} model in {#IDE_NAME}.'
-              preprocessing:
-                - type: DISCARD_UNCHANGED_HEARTBEAT
-                  parameters:
-                    - 1h
-              tags:
-                - tag: component
-                  value: copilot
-                - tag: component
-                  value: ide
-                - tag: ide
-                  value: '{#IDE_NAME}'
-                - tag: language
-                  value: '{#LANG_NAME}'
-                - tag: model
-                  value: '{#MODEL_NAME}'
             - uuid: dc47aba6408041248f66ecf9890667f3
               name: '{#IDE_NAME} [{#MODEL_NAME}/{#LANG_NAME}]: Acceptance rate'
               type: CALCULATED
@@ -1058,7 +1035,7 @@ zabbix_export:
               value_type: FLOAT
               units: '%'
               params: 'last(//github.org.copilot_completion_language.code_acceptances[{#IDE_NAME},{#MODEL_NAME},{#LANG_NAME}])/last(//github.org.copilot_completion_language.code_suggestions[{#IDE_NAME},{#MODEL_NAME},{#LANG_NAME}])*100'
-              description: 'The percentage of code acceptances in {#LANG_NAME} for Copilot {#MODEL_NAME} model in {#IDE_NAME}.'
+              description: 'The percentage of code acceptances in `{#LANG_NAME}` for the Copilot `{#MODEL_NAME}` model in `{#IDE_NAME}`.'
               preprocessing:
                 - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
@@ -1078,7 +1055,7 @@ zabbix_export:
               name: '{#IDE_NAME} [{#MODEL_NAME}/{#LANG_NAME}]: Code acceptances'
               type: DEPENDENT
               key: 'github.org.copilot_completion_language.code_acceptances[{#IDE_NAME},{#MODEL_NAME},{#LANG_NAME}]'
-              description: 'The number of code acceptances in {#LANG_NAME} by users for suggestions provided by Copilot {#MODEL_NAME} model in {#IDE_NAME}.'
+              description: 'The number of code acceptances in `{#LANG_NAME}` by users for suggestions provided by the Copilot `{#MODEL_NAME}` model in `{#IDE_NAME}`.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -1100,7 +1077,7 @@ zabbix_export:
               name: '{#IDE_NAME} [{#MODEL_NAME}/{#LANG_NAME}]: Code suggestions'
               type: DEPENDENT
               key: 'github.org.copilot_completion_language.code_suggestions[{#IDE_NAME},{#MODEL_NAME},{#LANG_NAME}]'
-              description: 'The number of code suggestions in {#LANG_NAME} provided by the Copilot {#MODEL_NAME} model in {#IDE_NAME}.'
+              description: 'The number of code suggestions in `{#LANG_NAME}` provided by the Copilot `{#MODEL_NAME}` model in `{#IDE_NAME}`.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -1122,7 +1099,7 @@ zabbix_export:
               name: '{#IDE_NAME} [{#MODEL_NAME}/{#LANG_NAME}]: Engaged users'
               type: DEPENDENT
               key: 'github.org.copilot_completion_language.engaged_users[{#IDE_NAME},{#MODEL_NAME},{#LANG_NAME}]'
-              description: 'The number of engaged users using the Copilot {#MODEL_NAME} model in {#IDE_NAME} for code in {#LANG_NAME}.'
+              description: 'The number of engaged users using the Copilot `{#MODEL_NAME}` model in `{#IDE_NAME}` for code in `{#LANG_NAME}`.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -1146,7 +1123,7 @@ zabbix_export:
               name: '{#IDE_NAME} [{#MODEL_NAME}/{#LANG_NAME}]: Total code lines accepted'
               type: DEPENDENT
               key: 'github.org.copilot_completion_language.lines_accepted[{#IDE_NAME},{#MODEL_NAME},{#LANG_NAME}]'
-              description: 'The total number of code lines in {#LANG_NAME} suggested by Copilot {#MODEL_NAME} model in {#IDE_NAME} and accepted by users.'
+              description: 'The total number of code lines in `{#LANG_NAME}` suggested by the Copilot `{#MODEL_NAME}` model in `{#IDE_NAME}` and accepted by users.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -1168,13 +1145,36 @@ zabbix_export:
               name: '{#IDE_NAME} [{#MODEL_NAME}/{#LANG_NAME}]: Total code lines suggested'
               type: DEPENDENT
               key: 'github.org.copilot_completion_language.lines_suggested[{#IDE_NAME},{#MODEL_NAME},{#LANG_NAME}]'
-              description: 'The total number of code lines in {#LANG_NAME} suggested by Copilot {#MODEL_NAME} model in {#IDE_NAME}.'
+              description: 'The total number of code lines in `{#LANG_NAME}` suggested by the Copilot `{#MODEL_NAME}` model in `{#IDE_NAME}`.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
                     - '$.copilot_ide_code_completions.editors[?(@.name == ''{#IDE_NAME}'')].models[?(@.name == ''{#MODEL_NAME}'')].languages[?(@.name == ''{#LANG_NAME}'')].total_code_lines_suggested.first()'
               master_item:
                 key: github.org.copilot.data_get
+              tags:
+                - tag: component
+                  value: copilot
+                - tag: component
+                  value: ide
+                - tag: ide
+                  value: '{#IDE_NAME}'
+                - tag: language
+                  value: '{#LANG_NAME}'
+                - tag: model
+                  value: '{#MODEL_NAME}'
+            - uuid: 427e0d382af24227af462f893f6d5285
+              name: '{#IDE_NAME} [{#MODEL_NAME}/{#LANG_NAME}]: Line acceptance rate'
+              type: CALCULATED
+              key: 'github.org.copilot_completion_language.line_acceptance_rate[{#IDE_NAME},{#MODEL_NAME},{#LANG_NAME}]'
+              value_type: FLOAT
+              units: '%'
+              params: 'last(//github.org.copilot_completion_language.lines_accepted[{#IDE_NAME},{#MODEL_NAME},{#LANG_NAME}])/last(//github.org.copilot_completion_language.lines_suggested[{#IDE_NAME},{#MODEL_NAME},{#LANG_NAME}])*100'
+              description: 'The percentage of code lines accepted in `{#LANG_NAME}` for the Copilot `{#MODEL_NAME}` model in `{#IDE_NAME}`.'
+              preprocessing:
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
               tags:
                 - tag: component
                   value: copilot
@@ -1237,13 +1237,13 @@ zabbix_export:
               - macro: '{#MODEL_NAME}'
                 value: '{$GITHUB.COPILOT.MODEL.NAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
-          description: 'The discovery of models used in the {#IDE_NAME} Copilot chat.'
+          description: 'The discovery of models used in the `{#IDE_NAME}` Copilot chat.'
           item_prototypes:
             - uuid: b5f214a4e25c457c8c0b08b35c1af048
               name: '{#IDE_NAME} [{#MODEL_NAME}]: Engaged users'
               type: DEPENDENT
               key: 'github.org.copilot_completion_model.engaged_users[{#IDE_NAME},{#MODEL_NAME}]'
-              description: 'The number of engaged users using the Copilot {#MODEL_NAME} model in {#IDE_NAME}.'
+              description: 'The number of engaged users using the Copilot `{#MODEL_NAME}` model in `{#IDE_NAME}`.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -1293,7 +1293,7 @@ zabbix_export:
               name: 'IDE [{#IDE_NAME}]: Engaged users'
               type: DEPENDENT
               key: 'github.org.copilot_ide_chat.engaged_users[{#IDE_NAME}]'
-              description: 'The number of engaged users using Copilot in {#IDE_NAME}.'
+              description: 'The number of engaged users using Copilot in `{#IDE_NAME}`.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -1337,7 +1337,7 @@ zabbix_export:
               name: 'Language [{#LANG_NAME}]: Engaged users'
               type: DEPENDENT
               key: 'github.org.copilot_ide_lang.engaged_users[{#LANG_NAME}]'
-              description: 'The number of engaged users working with code in {#LANG_NAME}.'
+              description: 'The number of engaged users working with code in `{#LANG_NAME}`.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -1375,13 +1375,13 @@ zabbix_export:
               - macro: '{#MODEL_NAME}'
                 value: '{$GITHUB.COPILOT.MODEL.NAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
-          description: 'The discovery of models used in the {#IDE_NAME} Copilot chat.'
+          description: 'The discovery of models used in the `{#IDE_NAME}` Copilot chat.'
           item_prototypes:
             - uuid: f78fda8346ff4dbb8e777d87b570fad3
               name: 'IDE [{#IDE_NAME}/{#MODEL_NAME}]: Chat copy events'
               type: DEPENDENT
               key: 'github.org.copilot_ide_model.chat_copy_events[{#IDE_NAME},{#MODEL_NAME}]'
-              description: 'The number of Copilot chat copy events caused by the {#MODEL_NAME} model in {#IDE_NAME}.'
+              description: 'The number of Copilot chat copy events caused by the `{#MODEL_NAME}` model in `{#IDE_NAME}`.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -1401,7 +1401,7 @@ zabbix_export:
               name: 'IDE [{#IDE_NAME}/{#MODEL_NAME}]: Chat insertion events'
               type: DEPENDENT
               key: 'github.org.copilot_ide_model.chat_insertion_events[{#IDE_NAME},{#MODEL_NAME}]'
-              description: 'The number of Copilot chat insertion events caused by the {#MODEL_NAME} model in {#IDE_NAME}.'
+              description: 'The number of Copilot chat insertion events caused by the `{#MODEL_NAME}` model in `{#IDE_NAME}`.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -1419,7 +1419,7 @@ zabbix_export:
               name: 'IDE [{#IDE_NAME}/{#MODEL_NAME}]: Engaged users'
               type: DEPENDENT
               key: 'github.org.copilot_ide_model.engaged_users[{#IDE_NAME},{#MODEL_NAME}]'
-              description: 'The number of engaged users using Copilot {#MODEL_NAME} model in {#IDE_NAME}.'
+              description: 'The number of engaged users using the Copilot `{#MODEL_NAME}` model in `{#IDE_NAME}`.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -1441,7 +1441,7 @@ zabbix_export:
               name: 'IDE [{#IDE_NAME}/{#MODEL_NAME}]: Total chats'
               type: DEPENDENT
               key: 'github.org.copilot_ide_model.total_chats[{#IDE_NAME},{#MODEL_NAME}]'
-              description: 'The number of Copilot chats with the {#MODEL_NAME} model in {#IDE_NAME}.'
+              description: 'The number of Copilot chats with the `{#MODEL_NAME}` model in `{#IDE_NAME}`.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -1507,7 +1507,7 @@ zabbix_export:
               name: '{#REPO_NAME} [{#MODEL_NAME}]: Engaged users'
               type: DEPENDENT
               key: 'github.org.copilot_pr_model.engaged_users[{#REPO_NAME},{#MODEL_NAME}]'
-              description: 'The number of engaged users using Copilot {#MODEL_NAME} model for work with PRs.'
+              description: 'The number of engaged users using the Copilot `{#MODEL_NAME}` model for work with PRs.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -1529,7 +1529,7 @@ zabbix_export:
               name: '{#REPO_NAME} [{#MODEL_NAME}]: PR summaries created'
               type: DEPENDENT
               key: 'github.org.copilot_pr_model.summaries_created[{#REPO_NAME},{#MODEL_NAME}]'
-              description: 'The number of PR summaries created by Copilot {#MODEL_NAME} model.'
+              description: 'The number of PR summaries created by the Copilot `{#MODEL_NAME}` model.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -1613,7 +1613,7 @@ zabbix_export:
               name: 'Copilot.com [{#MODEL_NAME}]: Engaged users'
               type: DEPENDENT
               key: 'github.org.copilot_web_model.engaged_users[{#MODEL_NAME}]'
-              description: 'The number of engaged users using the {#MODEL_NAME} model on copilot.com.'
+              description: 'The number of engaged users using the `{#MODEL_NAME}` model on copilot.com.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -1631,7 +1631,7 @@ zabbix_export:
               name: 'Copilot.com [{#MODEL_NAME}]: Total chats'
               type: DEPENDENT
               key: 'github.org.copilot_web_model.total_chats[{#MODEL_NAME}]'
-              description: 'The number of chats with the {#MODEL_NAME} model on copilot.com.'
+              description: 'The number of chats with the `{#MODEL_NAME}` model on copilot.com.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -1765,10 +1765,10 @@ zabbix_export:
                 - tag: repository
                   value: '{#REPO_NAME}'
             - uuid: c86211ab4cb4459998104e701d1c94be
-              name: '[{#REPO_OWNER}/{#REPO_NAME}]: Forks count'
+              name: '[{#REPO_OWNER}/{#REPO_NAME}]: Fork count'
               type: DEPENDENT
               key: 'github.org.repo.forks_count[{#NODE_ID}]'
-              description: 'The number of forks of the repository.'
+              description: 'The number of repository forks.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -1791,7 +1791,7 @@ zabbix_export:
               key: 'github.org.repo.get_data[{#NODE_ID}]'
               history: '0'
               value_type: TEXT
-              description: 'The number of forks of the repository.'
+              description: 'Get `{$GITHUB.REPO.NAME}` repository data.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -1903,7 +1903,7 @@ zabbix_export:
                 - tag: repository
                   value: '{#REPO_NAME}'
             - uuid: a64c94b832b94a90a97df7b32237726e
-              name: '[{#REPO_OWNER}/{#REPO_NAME}]: Open issues count'
+              name: '[{#REPO_OWNER}/{#REPO_NAME}]: Open issue count'
               type: DEPENDENT
               key: 'github.org.repo.open_issues[{#NODE_ID}]'
               description: 'The number of issues opened in the repository.'
@@ -2048,7 +2048,7 @@ zabbix_export:
               type: DEPENDENT
               key: 'github.org.repo.secret_scanning_non_provider_patterns[{#NODE_ID}]'
               trends: '0'
-              description: 'Whether GitHub Secret Scanning non-provider patterns for the repository is enabled.'
+              description: 'Whether GitHub Secret Scanning non-provider patterns for the repository are enabled.'
               valuemap:
                 name: 'Flag value'
               preprocessing:
@@ -2080,7 +2080,7 @@ zabbix_export:
               type: DEPENDENT
               key: 'github.org.repo.secret_scanning_validity_checks[{#NODE_ID}]'
               trends: '0'
-              description: 'Whether GitHub Secret Scanning validity checks for the repository is enabled.'
+              description: 'Whether GitHub Secret Scanning validity checks for the repository are enabled.'
               valuemap:
                 name: 'Flag value'
               preprocessing:
@@ -2130,10 +2130,10 @@ zabbix_export:
                 - tag: repository
                   value: '{#REPO_NAME}'
             - uuid: cafac4f8a018493196a6e436c90dd3bd
-              name: '[{#REPO_OWNER}/{#REPO_NAME}]: Stargazers count'
+              name: '[{#REPO_OWNER}/{#REPO_NAME}]: Stargazer count'
               type: DEPENDENT
               key: 'github.org.repo.stargazers_count[{#NODE_ID}]'
-              description: 'The number of stargazers of the repository.'
+              description: 'The number of stargazers in the repository.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -2207,10 +2207,10 @@ zabbix_export:
                 - tag: repository
                   value: '{#REPO_NAME}'
             - uuid: e976ecd4cda247b3a7ea45e989101c07
-              name: '[{#REPO_OWNER}/{#REPO_NAME}]: Watchers count'
+              name: '[{#REPO_OWNER}/{#REPO_NAME}]: Watcher count'
               type: DEPENDENT
               key: 'github.org.repo.watchers_count[{#NODE_ID}]'
-              description: 'The number of watchers of the repository.'
+              description: 'The number of watchers in the repository.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -2317,61 +2317,61 @@ zabbix_export:
             description: 'The API version that is used in headers for HTTP requests.'
         - macro: '{$GITHUB.COPILOT.IDE.NAME.MATCHES}'
           value: .+
-          description: 'The Copilot IDE name regex filter to use in copilot-related metric discovery - for including.'
+          description: 'The Copilot IDE name regex filter to use in Copilot-related metric discovery - for including.'
           config:
             type: TEXT
             priority: '18'
             section_name: Filters
             label: 'Copilot IDE name filter (include)'
-            description: 'The Copilot IDE name regex filter to use in copilot-related metric discovery - for including.'
+            description: 'The Copilot IDE name regex filter to use in Copilot-related metric discovery - for including.'
         - macro: '{$GITHUB.COPILOT.IDE.NAME.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'The Copilot IDE name regex filter to use in copilot-related metric discovery - for excluding.'
+          description: 'The Copilot IDE name regex filter to use in Copilot-related metric discovery - for excluding.'
           config:
             type: TEXT
             priority: '19'
             section_name: Filters
             label: 'Copilot IDE name filter (exclude)'
-            description: 'The Copilot IDE name regex filter to use in copilot-related metric discovery - for excluding.'
+            description: 'The Copilot IDE name regex filter to use in Copilot-related metric discovery - for excluding.'
         - macro: '{$GITHUB.COPILOT.LANG.NAME.MATCHES}'
           value: .+
-          description: 'The Copilot programming language name regex filter to use in copilot-related metric discovery - for including.'
+          description: 'The Copilot programming language name regex filter to use in Copilot-related metric discovery - for including.'
           config:
             type: TEXT
             priority: '22'
             section_name: Filters
             label: 'Copilot language filter (include)'
-            description: 'The Copilot programming language name regex filter to use in copilot-related metric discovery - for including.'
+            description: 'The Copilot programming language name regex filter to use in Copilot-related metric discovery - for including.'
         - macro: '{$GITHUB.COPILOT.LANG.NAME.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'The Copilot programming language name regex filter to use in copilot-related metric discovery - for excluding.'
+          description: 'The Copilot programming language name regex filter to use in Copilot-related metric discovery - for excluding.'
           config:
             type: TEXT
             priority: '23'
             section_name: Filters
             label: 'Copilot language filter (exclude)'
-            description: 'The Copilot programming language name regex filter to use in copilot-related metric discovery - for excluding.'
+            description: 'The Copilot programming language name regex filter to use in Copilot-related metric discovery - for excluding.'
         - macro: '{$GITHUB.COPILOT.MODEL.NAME.MATCHES}'
           value: .+
-          description: 'The Copilot model name regex filter to use in copilot-related metric discovery - for including.'
+          description: 'The Copilot model name regex filter to use in Copilot-related metric discovery - for including.'
           config:
             type: TEXT
             priority: '20'
             section_name: Filters
             label: 'Copilot model name filter (include)'
-            description: 'The Copilot model name regex filter to use in copilot-related metric discovery - for including.'
+            description: 'The Copilot model name regex filter to use in Copilot-related metric discovery - for including.'
         - macro: '{$GITHUB.COPILOT.MODEL.NAME.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'The Copilot model name regex filter to use in copilot-related metric discovery - for excluding.'
+          description: 'The Copilot model name regex filter to use in Copilot-related metric discovery - for excluding.'
           config:
             type: TEXT
             priority: '21'
             section_name: Filters
             label: 'Copilot model name filter (exclude)'
-            description: 'The Copilot model name regex filter to use in copilot-related metric discovery - for excluding.'
+            description: 'The Copilot model name regex filter to use in Copilot-related metric discovery - for excluding.'
         - macro: '{$GITHUB.COPILOT.USED}'
           value: '0'
-          description: 'The flag for gathering Copilot metrics. If set to a value other than "1", items for Copilot will not be created. If set to "1", the ''{$GITHUB.ORG.NAME}'' macro is required.'
+          description: 'The flag for gathering Copilot metrics. If set to a value other than "1", items for Copilot will not be created. If set to "1", the `{$GITHUB.ORG.NAME}` macro is required.'
           config:
             type: CHECKBOX
             priority: '4'
