@@ -173,7 +173,6 @@ $translate_strings = [
 		'Awaiting data' => _('Awaiting data'),
 		'Copy' => _('Copy'),
 		'Delete' => _('Delete'),
-		'Edit' => _('Edit'),
 		'No refresh' => _('No refresh'),
 		'Paste' => _('Paste'),
 		'Refresh interval' => _('Refresh interval'),
@@ -315,7 +314,6 @@ $translate_strings = [
 	],
 	'class.overlay.js' => [
 		'Help' => _('Help'),
-		'S_CLOSE' => _('Close'),
 		'Close modal window' => _('Close modal window'),
 		'Open Zabbix documentation in a new tab' => _('Open Zabbix documentation in a new tab')
 	],
@@ -327,12 +325,10 @@ $translate_strings = [
 		'S_TIME_SHIFT' => _('time shift')
 	],
 	'class.cverticalaccordion.js' => [
-		'S_COLLAPSE' => _('Collapse'),
-		'S_EXPAND' => _('Expand')
+		'Expand section' => _('Expand section'),
+		'Collapse section' => _('Collapse section')
 	],
 	'main.js' => [
-		'S_EXPAND' => _('Expand'),
-		'S_COLLAPSE' => _('Collapse'),
 		'S_CLOSE' => _('Close'),
 		'Expand section' => _('Expand section'),
 		'Collapse section' => _('Collapse section')
