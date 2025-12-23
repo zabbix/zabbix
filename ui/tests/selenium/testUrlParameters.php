@@ -789,7 +789,7 @@ class testUrlParameters extends CLegacyWebTest {
 			],
 			[
 				'title' => 'Configuration of network maps',
-				'check_serer_name' => true,
+				'check_server_name' => true,
 				'server_name_on_page' => false,
 				'test_cases' => [
 					[
