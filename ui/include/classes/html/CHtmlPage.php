@@ -139,7 +139,6 @@ class CHtmlPage {
 				(new CButtonIcon(ZBX_ICON_MENU, _('Show sidebar')))
 					->setId('sidebar-button-toggle')
 					->setAttribute('aria-label', _('Show sidebar'))
-					->setAttribute('aria-expanded', 'false')
 					->setAttribute('aria-controls', 'sidebar')
 			))
 				->addClass('sidebar-nav-toggle')

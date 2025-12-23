@@ -1808,7 +1808,7 @@ jQuery(function($) {
 			// Close other action menus and prevent focus jumping before opening a new popup.
 			$('.menu-popup-top').menuPopup('close', null, false);
 
-			$opener.attr('aria-expanded', 'true');
+			event.target.setAttribute('aria-expanded', 'true');
 
 			let $menu_popup = $('<ul>', {
 				'role': 'menu',
