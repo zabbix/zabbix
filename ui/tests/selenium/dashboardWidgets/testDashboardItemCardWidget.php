@@ -2160,6 +2160,7 @@ class testDashboardItemCardWidget extends testWidgets {
 
 			case 'severity':
 				// PostgreSQL returns a list of triggers in an unclear order, so the database type is also checked here.
+				// TODO: should be checked again, now order is correct for POSTGRESQL.
 				if ($data['widget_name'] === 'Master item from host' && $DB['TYPE'] === ZBX_DB_MYSQL) {
 					$link = 'zabbix.php?action=problem.view&hostids%5B0%5D='.self::$host_ids['hostids']
 							[self::HOST_NAME].'&triggerids%5B0%5D='.
@@ -2173,12 +2174,12 @@ class testDashboardItemCardWidget extends testWidgets {
 				else if ($data['widget_name'] === 'Master item from host' && $DB['TYPE'] === ZBX_DB_POSTGRESQL) {
 					$link = 'zabbix.php?action=problem.view&hostids%5B0%5D='.self::$host_ids['hostids']
 							[self::HOST_NAME].'&triggerids%5B0%5D='.
-							self::$trigger_ids['Warning trigger'].'&triggerids%5B1%5D='.
-							self::$trigger_ids['Average trigger'].'&triggerids%5B2%5D='.
-							self::$trigger_ids['High trigger'].'&triggerids%5B3%5D='.
-							self::$trigger_ids['Disaster trigger'].'&triggerids%5B4%5D='.
-							self::$trigger_ids['Not classified trigger'].'&triggerids%5B5%5D='.
-							self::$trigger_ids['Information trigger'].'&filter_set=1';
+							self::$trigger_ids['Not classified trigger'].'&triggerids%5B1%5D='.
+							self::$trigger_ids['Information trigger'].'&triggerids%5B2%5D='.
+							self::$trigger_ids['Warning trigger'].'&triggerids%5B3%5D='.
+							self::$trigger_ids['Average trigger'].'&triggerids%5B4%5D='.
+							self::$trigger_ids['High trigger'].'&triggerids%5B5%5D='.
+							self::$trigger_ids['Disaster trigger'].'&filter_set=1';
 				}
 				else{
 					$link = 'zabbix.php?action=problem.view&hostids%5B0%5D='.
