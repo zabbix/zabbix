@@ -181,14 +181,12 @@ class testFormLogin extends CWebTest {
 
 	/**
 	 * Function opens login page with fields in URL and checks if autologin checkbox is enabled.
-	 **/
-
+	 */
 	public function testFormLogin_LoginWithField() {
-		foreach (['index.php?reconnect=1', 'index.php?autologin=1', 'index.php?autologin=0'] as $url) {
-			$this->page->open($url);
-			$checked = ($url === 'index.php?autologin=0') ? false : true;
-			$form = $this->query('id:autologin')->asCheckbox()->one();
-			$this->assertTrue($form->isChecked($checked));
+		foreach (['reconnect=1', 'autologin=1', 'autologin=0'] as $url) {
+			$this->page->open('index.php?'.$url);
+			$checked = ('index.php?'.$url === 'index.php?autologin=0') ? false : true;
+			$this->assertTrue($this->query('id:autologin')->asCheckbox()->one()->isChecked($checked));
 		}
 	}
 
