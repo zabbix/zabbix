@@ -1077,7 +1077,7 @@ class testFormGraphs extends CWebTest {
 		$form = $this->query('name:graphForm')->waitUntilVisible()->asForm()->one();
 
 		foreach (['MIN', 'MAX'] as $axis) {
-			$form->fill(['Y axis '.$axis.' value' => 'Item']);
+			$form->fill(['Y axis '.$axis.' value' => CFormElement::RELOADABLE_FILL('Item')]);
 			$this->checkItemsInDialog($form, 'button:Select', self::HOST_WITH_ITEMS, $axis);
 
 			if ($this->prototype) {
