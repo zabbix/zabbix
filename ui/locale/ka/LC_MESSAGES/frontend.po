@@ -26626,6 +26626,11 @@ msgstr "არასწორი UTF-8 სიმბოლოების მი�
 msgid "invalid data type"
 msgstr "მონაცემების არასწორი ტიპი"
 
+#: include/classes/validators/CAbsoluteTimeValidator.php:45
+#: include/classes/validators/CAbsoluteTimeValidator.php:53
+msgid "invalid date"
+msgstr ""
+
 #: include/classes/graphdraw/CLineGraphDraw.php:140 include/items.inc.php:1805
 msgid "invalid delay"
 msgstr "არასწორი დაყოვნება"
@@ -28024,6 +28029,11 @@ msgstr "მნიშვნელობა \"%1$s\"-სა და \"%2$s\"-ს �
 msgid "value must be between \"%1$s\" and \"%2$s\", and have no more than \"%3$s\" digits after the decimal point"
 msgstr ""
 
+#: include/classes/validators/CTimeUnitValidator.php:84
+#, c-format
+msgid "value must be between %1$s and %2$s"
+msgstr ""
+
 #: include/classes/validators/CApiInputValidator.php:676
 msgid "value must be empty"
 msgstr "მნიშვნელობა ცარიელი უნდა იყოს"
@@ -28039,6 +28049,16 @@ msgstr[0] "მნიშვნელობა ცარიელი ან %1$s-�
 #, c-format
 msgid "value must be greater than \"%1$s\""
 msgstr "მნიშვნელობა \"%1$s\"-ზე მეტი უნდა იყოს"
+
+#: include/classes/validators/CAbsoluteTimeValidator.php:59
+#, c-format
+msgid "value must be greater than or equal to %1$s"
+msgstr ""
+
+#: include/classes/validators/CAbsoluteTimeValidator.php:64
+#, c-format
+msgid "value must be less than or equal to %1$s"
+msgstr ""
 
 #: app/controllers/CControllerPopupItemTest.php:1342
 #: include/classes/validators/CNewValidator.php:220
