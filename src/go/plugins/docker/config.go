@@ -39,8 +39,7 @@ func (p *Plugin) Configure(global *plugin.GlobalOptions, options interface{}) {
 		p.options.Timeout = global.Timeout
 	}
 
-	socketPath := strings.Split(p.options.Endpoint, "://")[1]
-	p.client = newClient(socketPath, p.options.Timeout)
+	p.client = newClient(p.options.Endpoint, p.options.Timeout)
 }
 
 // Validate implements the Configurator interface.
@@ -54,7 +53,7 @@ func (p *Plugin) Validate(options interface{}) error {
 	}
 
 	endpointParts := strings.SplitN(opts.Endpoint, "://", 2)
-	if len(endpointParts) == 1 || endpointParts[0] != "unix" {
+	if len(endpointParts) == 1 || (endpointParts[0] != "unix" && endpointParts[0] != "tcp") {
 		return errors.New("invalid endpoint format")
 	}
 
