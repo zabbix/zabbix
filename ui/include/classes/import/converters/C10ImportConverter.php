@@ -631,6 +631,7 @@ class C10ImportConverter extends CConverter {
 
 		// replace host macros with the host name
 		// not sure why this is required, but this has been preserved from when refactoring CXmlImport18
+		$trigger['expression'] = str_replace('{HOSTNAME}', $hostName, $trigger['expression']);
 		$trigger['expression'] = str_replace('{HOST.HOST}', $hostName, $trigger['expression']);
 
 		return $trigger;
@@ -752,7 +753,7 @@ class C10ImportConverter extends CConverter {
 
 			// replace host macros with the host name
 			// not sure why this is required, but this has been preserved from when refactoring CXmlImport18
-			if ($host_name !== null && $host === '{HOST.HOST}') {
+			if ($host_name !== null && ($host === '{HOSTNAME}' || $host === '{HOST.HOST}')) {
 				$host = $host_name;
 			}
 

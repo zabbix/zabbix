@@ -20,8 +20,8 @@ class C54ImportConverterTest extends CImportConverterTest {
 		$simple_macros_source = '{Zabbix server:system.hostname.last()}'.
 			'{Zabbix server:system.hostname.last(0)}{{HOST.HOST}:system.hostname.min(1s)}'.
 			'{{HOST.HOST1}:system.hostname.max(1m)}{{HOST.HOST2}:system.hostname.avg(1h)}'.
-			'{{HOST.HOST}:system.hostname.min(1d)}{{HOST.HOST1}:system.hostname.max(24h)}'.
-			'{{HOST.HOST1}:system.hostname.max(24h,)}{{HOST.HOST2}:system.hostname.avg(3600)}';
+			'{{HOSTNAME}:system.hostname.min(1d)}{{HOSTNAME1}:system.hostname.max(24h)}'.
+			'{{HOSTNAME1}:system.hostname.max(24h,)}{{HOSTNAME2}:system.hostname.avg(3600)}';
 		$simple_macros_expected = '{?last(/Zabbix server/system.hostname)}'.
 			'{?last(/Zabbix server/system.hostname)}{?min(/'.'/system.hostname,1s)}'.
 			'{?max(/'.'/system.hostname,1m)}{?avg(/{HOST.HOST2}/system.hostname,1h)}'.
