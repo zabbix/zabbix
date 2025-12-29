@@ -118,6 +118,10 @@ type Arguments struct {
 	help           bool
 }
 
+func (args *Arguments) isTestCommand() bool {
+	return args.test != "" || args.print || args.testConfig
+}
+
 func main() {
 	err := run()
 	if err != nil {
@@ -255,22 +259,22 @@ func run() error {
 		return nil
 	}
 
-	systemOpt, err := agent.Options.RemovePluginSystemOptions()
+	systemOptions, err := agent.Options.RemovePluginSystemOptions()
 	if err != nil {
 		return errs.Wrap(err, "cannot initialize plugin system option")
 	}
 
-	pluginSocket, err = initExternalPlugins(&agent.Options, systemOpt)
+	pluginSocket, err = initExternalPlugins(&agent.Options, systemOptions, args)
 	if err != nil {
 		return errs.Wrap(err, "cannot register plugins")
 	}
 
 	defer cleanUpExternal()
 
-	if args.test != "" || args.print || args.testConfig {
+	if args.isTestCommand() {
 		var m *scheduler.Manager
 
-		m, err = prepareMetricPrintManager(args.verbose, systemOpt)
+		m, err = prepareMetricPrintManager(args.verbose, systemOptions)
 		if err != nil {
 			return errs.Wrap(err, "failed to prepare metric print manager")
 		}
@@ -296,7 +300,7 @@ func run() error {
 		return errs.New("verbose parameter can be specified only with test or print parameters")
 	}
 
-	err = runAgent(args.foreground, args.configPath, systemOpt)
+	err = runAgent(args.foreground, args.configPath, systemOptions)
 	if err != nil {
 		if agent.Options.LogType == "file" {
 			log.Critf("%s", err.Error())

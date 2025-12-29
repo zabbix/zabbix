@@ -21,17 +21,17 @@ import (
 	"github.com/Microsoft/go-winio"
 )
 
-func getListener(socket string) (listener net.Listener, err error) {
-	listener, err = winio.ListenPipe(socket, nil)
+func getListener(socket string) (net.Listener, error) {
+	listener, err := winio.ListenPipe(socket, nil)
 	if err != nil {
 		err = fmt.Errorf(
 			"failed to create plugin listener with socket path, %s, %s", socket, err.Error(),
 		)
 
-		return
+		return nil, err
 	}
 
-	return
+	return listener, nil
 }
 
 func cleanUpExternal() {}
