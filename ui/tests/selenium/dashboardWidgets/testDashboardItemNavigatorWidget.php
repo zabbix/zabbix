@@ -617,9 +617,8 @@ class testDashboardItemNavigatorWidget extends testWidgets {
 					]
 				]
 			],
-			// TODO: uncomment after fix ZBX-27031
 			// #27.
-/*			[
+			[
 				[
 					'expected' => TEST_GOOD,
 					'fields' => [
@@ -627,7 +626,7 @@ class testDashboardItemNavigatorWidget extends testWidgets {
 						'Show problems' => 'None'
 					]
 				]
-			],*/
+			],
 			// #28.
 			[
 				[

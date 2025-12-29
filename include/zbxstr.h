@@ -117,4 +117,15 @@ void	zbx_rtrim_utf8(char *str, const char *charlist);
 
 void	zbx_strncpy_alloc(char **str, size_t *alloc_len, size_t *offset, const char *src, size_t n);
 void	zbx_replace_string(char **data, size_t l, size_t *r, const char *value);
+
+/* Sensitive text handling */
+#define ZBX_SECRET_MASK		"******"
+
+#if defined(ZBX_DEBUG)
+#	define ZBX_STRMASK(x)	x
+#else
+#	define ZBX_STRMASK(x)	((void)(x), ZBX_SECRET_MASK)
+#endif
+
+
 #endif /* ZABBIX_STR_H */

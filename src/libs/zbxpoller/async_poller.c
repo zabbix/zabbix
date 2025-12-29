@@ -678,7 +678,7 @@ ZBX_THREAD_ENTRY(zbx_async_poller_thread, args)
 {
 	zbx_thread_poller_args		*poller_args_in = (zbx_thread_poller_args *)(((zbx_thread_args_t *)args)->args);
 
-	time_t				last_stat_time;
+	time_t				last_stat_time, now = 0;
 #ifdef HAVE_NETSNMP
 	time_t				last_snmp_engineid_hk_time = 0;
 #endif
@@ -783,9 +783,12 @@ ZBX_THREAD_ENTRY(zbx_async_poller_thread, args)
 		if (ZBX_IS_RUNNING())
 			zbx_preprocessor_flush();
 
-		if (STAT_INTERVAL <= time(NULL) - last_stat_time)
+		now = time(NULL);
+
+		if (STAT_INTERVAL <= now - last_stat_time)
 		{
 			zbx_update_env(get_process_type_string(process_type), zbx_time());
+			zbx_malloc_trim(now, SEC_PER_HOUR, ZBX_MEBIBYTE);
 
 			zbx_setproctitle("%s #%d [got %d values, queued %d in 5 sec, awaiting %d%s]",
 				get_process_type_string(process_type), process_num, poller_config.processed,
@@ -793,7 +796,7 @@ ZBX_THREAD_ENTRY(zbx_async_poller_thread, args)
 
 			poller_config.processed = 0;
 			poller_config.queued = 0;
-			last_stat_time = time(NULL);
+			last_stat_time = now;
 			zabbix_log(LOG_LEVEL_TRACE, "number of active events:%d",
 				event_base_get_num_events(poller_config.base, EVENT_BASE_COUNT_ADDED));
 		}
@@ -816,10 +819,10 @@ ZBX_THREAD_ENTRY(zbx_async_poller_thread, args)
 
 #ifdef HAVE_NETSNMP
 #define	SNMP_ENGINEID_HK_INTERVAL	86400
-		if (ZBX_POLLER_TYPE_SNMP == poller_type && time(NULL) >=
+		if (ZBX_POLLER_TYPE_SNMP == poller_type && now >=
 				SNMP_ENGINEID_HK_INTERVAL + last_snmp_engineid_hk_time)
 		{
-			last_snmp_engineid_hk_time = time(NULL);
+			last_snmp_engineid_hk_time = now;
 			poller_config.clear_cache = ZBX_SNMP_POLLER_HOUSEKEEP_CACHE;
 		}
 #undef SNMP_ENGINEID_HK_INTERVAL

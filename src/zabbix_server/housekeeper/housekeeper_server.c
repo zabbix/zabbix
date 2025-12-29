@@ -1530,7 +1530,8 @@ ZBX_THREAD_ENTRY(housekeeper_thread, args)
 		zbx_setproctitle("%s [connecting to the database]", get_process_type_string(process_type));
 		zbx_db_connect(ZBX_DB_CONNECT_NORMAL);
 
-		zbx_config_get(&cfg, ZBX_CONFIG_FLAGS_HOUSEKEEPER | ZBX_CONFIG_FLAGS_DB_EXTENSION);
+		zbx_config_get(&cfg, ZBX_CONFIG_FLAGS_HOUSEKEEPER | ZBX_CONFIG_FLAGS_DB_EXTENSION |
+				ZBX_CONFIG_FLAGS_DB_HISTORY_COMPRESION);
 
 		if (0 == strcmp(cfg.db.extension, ZBX_DB_EXTENSION_TIMESCALEDB))
 		{

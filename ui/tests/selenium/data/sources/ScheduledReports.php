@@ -215,7 +215,7 @@ class ScheduledReports {
 			],
 			[
 				'userid' => '1',
-				'name' => 'Report for filter - disabled',
+				'name' => 'Report for filter -   disabled',
 				'dashboardid' => '57',
 				'period' => '2',
 				'cycle' => '2',

@@ -32,11 +32,11 @@ class CControllerMaintenanceUpdate extends CControllerMaintenanceUpdateGeneral {
 			'maintenance_type' => ['db maintenances.maintenance_type', 'required',
 				'in' => [MAINTENANCE_TYPE_NORMAL, MAINTENANCE_TYPE_NODATA]],
 			'active_since' => ['string', 'required', 'not_empty',
-				'use' => [CAbsoluteTimeParser::class, [], ['min' => 0, 'max' => ZBX_MAX_DATE]],
-				'messages' => ['use' => _('Invalid date.')]],
+				'use' => [CAbsoluteTimeValidator::class, ['min' => 0, 'max' => ZBX_MAX_DATE]]
+			],
 			'active_till' => ['string', 'required', 'not_empty',
-				'use' => [CAbsoluteTimeParser::class, [], ['min' => 0, 'max' => ZBX_MAX_DATE]],
-				'messages' => ['use' => _('Invalid date.')]],
+				'use' => [CAbsoluteTimeValidator::class, ['min' => 0, 'max' => ZBX_MAX_DATE]]
+			],
 			'timeperiods' => ['objects', 'required', 'not_empty',
 				'messages' => ['not_empty' => _('At least one period must be added.')],
 				'fields' => [
@@ -96,7 +96,10 @@ class CControllerMaintenanceUpdate extends CControllerMaintenanceUpdateGeneral {
 					'operator' => ['db maintenance_tag.operator',
 						'in' => [MAINTENANCE_TAG_OPERATOR_LIKE, MAINTENANCE_TAG_OPERATOR_EQUAL]],
 					'value' => ['db maintenance_tag.value'],
-					'tag' => ['db maintenance_tag.tag', 'required', 'not_empty', 'when' => ['value', 'not_empty']]
+					'tag' => [
+						['db maintenance_tag.tag'],
+						['db maintenance_tag.tag', 'required', 'not_empty', 'when' => ['value', 'not_empty']]
+					]
 				],
 				'when' => ['maintenance_type', 'in' => [MAINTENANCE_TYPE_NORMAL]]
 			],

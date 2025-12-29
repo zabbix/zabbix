@@ -504,36 +504,6 @@ function getHostInterface(?array $interface): string {
 	return $ip_or_dns.':'.$interface['port'];
 }
 
-function get_host_by_itemid($itemids) {
-	$res_array = is_array($itemids);
-	zbx_value2array($itemids);
-	$result = false;
-	$hosts = [];
-
-	$db_hostsItems = DBselect(
-		'SELECT i.itemid,h.*'.
-		' FROM hosts h,items i'.
-		' WHERE i.hostid=h.hostid'.
-			' AND '.dbConditionInt('i.itemid', $itemids)
-	);
-	while ($hostItem = DBfetch($db_hostsItems)) {
-		$result = true;
-		$hosts[$hostItem['itemid']] = $hostItem;
-	}
-
-	if (!$res_array) {
-		foreach ($hosts as $itemid => $host) {
-			$result = $host;
-		}
-	}
-	elseif ($result) {
-		$result = $hosts;
-		unset($hosts);
-	}
-
-	return $result;
-}
-
 function get_host_by_hostid($hostid, $no_error_message = 0) {
 	$row = DBfetch(DBselect('SELECT h.* FROM hosts h WHERE h.hostid='.zbx_dbstr($hostid)));
 

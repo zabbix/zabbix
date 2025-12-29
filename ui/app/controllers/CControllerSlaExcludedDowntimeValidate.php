@@ -80,7 +80,7 @@ class CControllerSlaExcludedDowntimeValidate extends CController {
 				'period_from' => $period_from,
 				'period_to' => $period_to,
 				'start_time' => zbx_date2str(DATE_TIME_FORMAT, $period_from),
-				'duration' => convertUnitsS($period_to - $period_from, true)
+				'duration' => convertUnitsS($period_to - $period_from, ['ignore_milliseconds' => true])
 			]
 		];
 

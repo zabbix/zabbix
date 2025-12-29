@@ -101,8 +101,9 @@ class CScript extends CApiService {
 
 		$sql_parts = [
 			'select' =>	['scripts' => 's.scriptid'],
-			'from' =>	['scripts' => 'scripts s'],
+			'from' =>	'scripts s',
 			'where' =>	[],
+			'group' =>	[],
 			'order' =>	[]
 		];
 
@@ -513,9 +514,8 @@ class CScript extends CApiService {
 						continue;
 					}
 
-					$regular_expression = '/'.str_replace('/', '\/', $script['manualinput_validator']).'/';
-
-					if (!preg_match($regular_expression, $script['manualinput_default_value'])) {
+					if (!preg_match('/'.CRegexHelper::handleSlashEscaping($script['manualinput_validator']).'/',
+							$script['manualinput_default_value'])) {
 						self::exception(ZBX_API_ERROR_PARAMETERS,
 							_s('Invalid parameter "%1$s": %2$s.', '/'.($index + 1).'/manualinput_default_value',
 								_s('input does not match the provided pattern: %1$s', $script['manualinput_validator'])

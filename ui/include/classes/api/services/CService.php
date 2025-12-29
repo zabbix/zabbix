@@ -560,11 +560,8 @@ class CService extends CApiService {
 			}
 
 			if (array_key_exists('slp.serviceupid', $conditions)) {
-				$sql_parts['left_table'] = ['table' => 'services', 'alias' => 's'];
-				$sql_parts['left_join'][] = [
-					'table' => 'services_links',
-					'alias' => 'slp',
-					'using' => 'servicedownid'
+				$sql_parts['join']['slp'] = ['type' => 'left', 'table' => 'services_links',
+					'on' => ['serviceid' => 'servicedownid']
 				];
 			}
 
@@ -572,11 +569,8 @@ class CService extends CApiService {
 		}
 
 		if ($options['childids'] !== null) {
-			$sql_parts['left_table'] = ['table' => 'services', 'alias' => 's'];
-			$sql_parts['left_join'][] = [
-				'table' => 'services_links',
-				'alias' => 'slc',
-				'using' => 'serviceupid'
+			$sql_parts['join']['slc'] = ['type' => 'left', 'table' => 'services_links',
+				'on' => ['serviceid' => 'serviceupid']
 			];
 			$sql_parts['where'][] = dbConditionId('slc.servicedownid', $options['childids']);
 		}
@@ -593,12 +587,7 @@ class CService extends CApiService {
 			);
 		}
 		elseif ($options['without_problem_tags']) {
-			$sql_parts['left_table'] = ['table' => 'services', 'alias' => 's'];
-			$sql_parts['left_join'][] = [
-				'table' => 'service_problem_tag',
-				'alias' => 'spt',
-				'using' => 'serviceid'
-			];
+			$sql_parts['join']['spt'] = ['type' => 'left', 'table' => 'service_problem_tag', 'using' => 'serviceid'];
 			$sql_parts['where'][] = dbConditionId('spt.service_problem_tagid', [0]);
 		}
 

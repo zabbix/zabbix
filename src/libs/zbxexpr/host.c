@@ -160,6 +160,7 @@ int	zbx_check_prototype_hostname(const char *hostname, char **error)
 {
 	zbx_token_t	token;
 	size_t		pos = 0, macro_len = 0;
+	int		lld_macro_num = 0;
 
 	while (SUCCEED == zbx_token_find(hostname, (int)pos, &token, ZBX_TOKEN_SEARCH_BASIC))
 	{
@@ -173,6 +174,8 @@ int	zbx_check_prototype_hostname(const char *hostname, char **error)
 
 			pos = token.loc.r + 1;
 			macro_len += pos - token.loc.l;
+			lld_macro_num++;
+
 			continue;
 		}
 
@@ -203,7 +206,11 @@ int	zbx_check_prototype_hostname(const char *hostname, char **error)
 		return FAIL;
 	}
 
+	if (0 == lld_macro_num)
+	{
+		*error = zbx_strdup(NULL, "name does not contain LLD macro(s)");
+		return FAIL;
+	}
+
 	return SUCCEED;
 }
-
-

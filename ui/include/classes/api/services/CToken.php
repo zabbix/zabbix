@@ -73,10 +73,10 @@ class CToken extends CApiService {
 
 		$sql_parts = [
 			'select' => [],
-			'from'   => [$this->tableName() => $this->tableName().' '.$this->tableAlias()],
+			'from'   => $this->tableName().' '.$this->tableAlias(),
 			'where'  => [],
-			'order'  => [],
-			'group'  => []
+			'group'  => [],
+			'order'  => []
 		];
 
 		// Fix incorrect postgres query when sort is used together with count.

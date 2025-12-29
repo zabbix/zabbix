@@ -78,8 +78,8 @@ int	system_users_num(AGENT_REQUEST *request, AGENT_RESULT *result)
 	ZBX_UNUSED(request);
 
 	zbx_snprintf(counter_path, sizeof(counter_path), "\\%u\\%u",
-			(unsigned int)zbx_get_builtin_object_index(PCI_TOTAL_SESSIONS),
-			(unsigned int)zbx_get_builtin_counter_index(PCI_TOTAL_SESSIONS));
+			(unsigned int)zbx_get_builtin_object_index(PCI_ACTIVE_SESSIONS),
+			(unsigned int)zbx_get_builtin_counter_index(PCI_ACTIVE_SESSIONS));
 
 	request_tmp.nparam = 1;
 	request_tmp.params = zbx_malloc(NULL, request_tmp.nparam * sizeof(char *));

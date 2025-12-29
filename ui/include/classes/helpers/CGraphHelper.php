@@ -275,6 +275,7 @@ class CGraphHelper extends CGraphGeneralHelper {
 			$items = API::Item()->get([
 				'output' => ['itemid', 'hostid', 'type', 'master_itemid', 'delay'],
 				'itemids' => $master_itemids,
+				'webitems' => true,
 				'filter' => [
 					'flags' => [ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_PROTOTYPE, ZBX_FLAG_DISCOVERY_CREATED]
 				]

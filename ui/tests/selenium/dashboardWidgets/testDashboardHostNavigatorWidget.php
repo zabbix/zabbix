@@ -599,8 +599,7 @@ class testDashboardHostNavigatorWidget extends testWidgets {
 				]
 			],
 			// #24.
-			// TODO: uncomment after fix ZBX-27031
-/*			[
+			[
 				[
 					'expected' => TEST_GOOD,
 					'fields' => [
@@ -608,7 +607,7 @@ class testDashboardHostNavigatorWidget extends testWidgets {
 						'Show problems' => 'None'
 					]
 				]
-			],*/
+			],
 			// #25.
 			[
 				[

@@ -311,6 +311,8 @@ class testAlarmNotification extends CWebTest {
 
 	/**
 	 * Check that colors displayed in alarm notification overlay are the same as in configuration.
+	 *
+	 * @onAfter deleteEvents
 	 */
 	public function testAlarmNotification_CheckColorChange() {
 		// Trigger problem.
@@ -346,6 +348,7 @@ class testAlarmNotification extends CWebTest {
 		}
 
 		$form->submit();
+		$this->assertMessage(TEST_GOOD, 'Configuration updated');
 		$this->page->waitUntilReady();
 		$form->invalidate();
 

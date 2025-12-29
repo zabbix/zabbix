@@ -137,6 +137,11 @@ func (conn *OraConn) WhoAmI() string {
 	return conn.username
 }
 
+// GetCallTimeout returns callTimeout.
+func (conn *OraConn) GetCallTimeout() time.Duration {
+	return conn.callTimeout
+}
+
 // normalizeSpaces function replaces all whitespace from a username with one whitespace, if any, and
 // trims a username.
 func normalizeSpaces(s string) string {
@@ -167,7 +172,7 @@ func (conn *OraConn) closeWithLog() {
 
 	err := conn.Client.Close()
 	if err != nil {
-		log.Debugf("Cannot close Oracle connection: %w", err)
+		log.Debugf("[Oracle] cannot close the connection: %w", err)
 	}
 }
 
@@ -227,8 +232,9 @@ func prepareConnectString(tnsType TNSNameType, cd *ConnDetails, connectTimeout t
 		connectString = cd.Uri.Host()
 	case tnsNone:
 		connectString = fmt.Sprintf(
-			`(DESCRIPTION=(ADDRESS=(PROTOCOL=tcp)(HOST=%s)(PORT=%s))`+
+			`(DESCRIPTION=(ADDRESS=(PROTOCOL=%s)(HOST=%s)(PORT=%s))`+
 				`(CONNECT_DATA=(SERVICE_NAME="%s"))(CONNECT_TIMEOUT=%d)(RETRY_COUNT=0))`,
+			cd.Uri.Scheme(),
 			cd.Uri.Host(),
 			cd.Uri.Port(),
 			service,

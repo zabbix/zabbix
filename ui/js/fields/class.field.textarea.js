@@ -27,11 +27,15 @@ class CFieldTextarea extends CField {
 	}
 
 	getValue() {
-		if (this._field.disabled) {
+		if (this.isDisabled()) {
 			return null;
 		}
 
 		return this._field.value.replace(/\r?\n/g, '\r\n');
+	}
+
+	isDisabled() {
+		return this._field.disabled;
 	}
 
 	getValueTrimmed() {

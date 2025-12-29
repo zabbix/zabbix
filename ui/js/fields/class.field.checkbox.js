@@ -26,11 +26,15 @@ class CFieldCheckBox extends CField {
 	}
 
 	getValue() {
-		if (this._field.disabled) {
+		if (this.isDisabled()) {
 			return null;
 		}
 
 		return this._field.checked ? this._field.value : this._field.getAttribute('unchecked-value');
+	}
+
+	isDisabled() {
+		return this._field.disabled;
 	}
 
 	focusErrorField() {

@@ -324,6 +324,13 @@ class WidgetForm extends CWidgetForm {
 				(new CWidgetFieldColor('bg_color', _('Background color')))->allowInherited()
 			)
 			->addField(
+				(new CWidgetFieldRadioButtonList('history', _('History data'), [
+					self::ITEM_VALUE_DATA_SOURCE_AUTO => _('Auto'),
+					self::ITEM_VALUE_DATA_SOURCE_HISTORY => _('History'),
+					self::ITEM_VALUE_DATA_SOURCE_TRENDS => _('Trends')
+				]))->setDefault(self::ITEM_VALUE_DATA_SOURCE_AUTO)
+			)
+			->addField(
 				(new CWidgetFieldSelect('aggregate_function', _('Aggregation function'), [
 					AGGREGATE_NONE => CItemHelper::getAggregateFunctionName(AGGREGATE_NONE),
 					AGGREGATE_MIN => CItemHelper::getAggregateFunctionName(AGGREGATE_MIN),
@@ -344,13 +351,6 @@ class WidgetForm extends CWidgetForm {
 					])
 					->setDefaultPeriod(['from' => 'now-1h', 'to' => 'now'])
 					->setFlags(CWidgetField::FLAG_NOT_EMPTY | CWidgetField::FLAG_LABEL_ASTERISK)
-			)
-			->addField(
-				(new CWidgetFieldRadioButtonList('history', _('History data'), [
-					self::ITEM_VALUE_DATA_SOURCE_AUTO => _('Auto'),
-					self::ITEM_VALUE_DATA_SOURCE_HISTORY => _('History'),
-					self::ITEM_VALUE_DATA_SOURCE_TRENDS => _('Trends')
-				]))->setDefault(self::ITEM_VALUE_DATA_SOURCE_AUTO)
 			)
 			->addField(
 				new CWidgetFieldThresholds('thresholds', _('Thresholds'), $this->is_binary_units)

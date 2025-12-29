@@ -29,6 +29,10 @@
 /* a cached object must be removed from configuration cache */
 #define ZBX_DBSYNC_ROW_REMOVE	3
 
+#define ZBX_DBSYNC_FLAG_INSERT	(1 << (ZBX_DBSYNC_ROW_ADD - 1))
+#define ZBX_DBSYNC_FLAG_UPDATE	(1 << (ZBX_DBSYNC_ROW_UPDATE - 1))
+#define ZBX_DBSYNC_FLAG_DELETE	(1 << (ZBX_DBSYNC_ROW_REMOVE - 1))
+
 #define ZBX_DBSYNC_UPDATE_HOSTS			__UINT64_C(0x0001)
 #define ZBX_DBSYNC_UPDATE_ITEMS			__UINT64_C(0x0002)
 #define ZBX_DBSYNC_UPDATE_FUNCTIONS		__UINT64_C(0x0004)
@@ -43,6 +47,10 @@
 #define ZBX_DBSYNC_TYPE_DIFF		0
 #define ZBX_DBSYNC_TYPE_CHANGELOG	1
 
+/* Changelog objects.                                            */
+/* This list includes virtual objects that are not written into  */
+/* changelog table, but the insert/updates/deletes are copied    */
+/* from the associated object changelog                          */
 #define ZBX_DBSYNC_OBJ_HOST		1
 #define ZBX_DBSYNC_OBJ_HOST_TAG		2
 #define ZBX_DBSYNC_OBJ_ITEM		3
@@ -64,8 +72,9 @@
 #define ZBX_DBSYNC_OBJ_PROXY		19
 #define ZBX_DBSYNC_OBJ_PROXY_GROUP	20
 #define ZBX_DBSYNC_OBJ_HOST_PROXY	21
+#define ZBX_DBSYNC_OBJ_ITEM_DISCOVERY	22	/* virtual object */
 /* number of dbsync objects - keep in sync with above defines */
-#define ZBX_DBSYNC_OBJ_COUNT		21
+#define ZBX_DBSYNC_OBJ_COUNT		22
 
 /******************************************************************************
  *                                                                            *

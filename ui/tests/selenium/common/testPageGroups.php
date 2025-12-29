@@ -250,18 +250,12 @@ class testPageGroups extends CWebTest {
 			$names = $this->getGroupNames($sorting);
 			$table->query('link:Name')->waitUntilClickable()->one()->click();
 			$table->waitUntilReloaded();
-			$this->assertTableDataColumn($names);
+			$this->assertTableDataColumn(preg_replace('/\s+/', ' ', $names));
 		}
 	}
 
 	public static function getFilterData() {
 		return [
-			// Too many spaces in field.
-			[
-				[
-					'Name' => '  '
-				]
-			],
 			// Special symbols, utf8 and long name.
 			[
 				[

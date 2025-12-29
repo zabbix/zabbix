@@ -59,7 +59,7 @@ class CDHost extends CApiService {
 
 		$sqlParts = [
 			'select'	=> ['dhosts' => 'dh.dhostid'],
-			'from'		=> ['dhosts' => 'dhosts dh'],
+			'from'		=> 'dhosts dh',
 			'where'		=> [],
 			'group'		=> [],
 			'order'		=> [],
@@ -118,9 +118,8 @@ class CDHost extends CApiService {
 		if (!is_null($options['dserviceids'])) {
 			zbx_value2array($options['dserviceids']);
 
-			$sqlParts['from']['dservices'] = 'dservices ds';
+			$sqlParts['join']['ds'] = ['table' => 'dservices', 'using' => 'dhostid'];
 			$sqlParts['where'][] = dbConditionInt('ds.dserviceid', $options['dserviceids']);
-			$sqlParts['where']['dhds'] = 'dh.dhostid=ds.dhostid';
 
 			if ($options['groupCount']) {
 				$sqlParts['group']['dserviceids'] = 'ds.dserviceid';

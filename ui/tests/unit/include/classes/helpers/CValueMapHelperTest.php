@@ -169,6 +169,11 @@ class CValueMapHelperTest extends TestCase {
 				true
 			],
 			[
+				'/var/log', ITEM_VALUE_TYPE_STR,
+				['type' => VALUEMAP_MAPPING_TYPE_REGEXP, 'value' => '\/var\/log', 'newvalue' => 'ok'],
+				true
+			],
+			[
 				'12', ITEM_VALUE_TYPE_UINT64,
 				['type' => VALUEMAP_MAPPING_TYPE_REGEXP, 'value' => '\d{2}', 'newvalue' => 'ok'],
 				false

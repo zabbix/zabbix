@@ -15,8 +15,13 @@
 
 class CFieldRadioList extends CField {
 
+	_radiobuttons = [];
+	_hidden_element = null;
+
 	init() {
 		super.init();
+
+		this.updateState();
 
 		this._field.addEventListener('change', () => this.onBlur());
 	}
@@ -26,17 +31,24 @@ class CFieldRadioList extends CField {
 	}
 
 	getValue() {
-		if (this._field.querySelector('input[type="radio"]').disabled) {
-			/**
-			 * Radio-list element's read-only state is simulated by disabling radio element
-			 * and adding a hidden input of actual value.
-			 */
-			const radio = this._field.querySelector('input[type="hidden"]');
-
-			return radio !== null ? radio.value : null;
+		if (this.isDisabled()) {
+			return null;
 		}
+		else if (this._hidden_element !== null) {
+			return this._hidden_element.value;
+		}
+		else {
+			return [...this._radiobuttons].find(radio => radio.checked)?.value ?? null;
+		}
+	}
 
-		return this._field.querySelector('input[type="radio"]:checked').value;
+	isDisabled() {
+		return this._hidden_element === null && [...this._radiobuttons].every(radio => radio.disabled);
+	}
+
+	updateState() {
+		this._radiobuttons = this._field.querySelectorAll('input[type="radio"]');
+		this._hidden_element = this._field.querySelector('input[type="hidden"]');
 	}
 
 	focusErrorField() {

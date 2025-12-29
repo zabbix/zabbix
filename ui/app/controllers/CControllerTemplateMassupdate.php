@@ -306,14 +306,25 @@ class CControllerTemplateMassupdate extends CControllerPopupMassupdateAbstract {
 								break;
 
 							case ZBX_ACTION_REMOVE:
-								if ($macros) {
-									$except_selected = $this->getInput('macros_remove', 0);
-									$template_macros_by_macro = array_column($template['macros'], null, 'macro');
-									$macros_by_macro = array_column($macros, null, 'macro');
+								if ($template['macros'] && $macros) {
+									$template['macros'] = array_column($template['macros'], null, 'macro');
+									$matched_macros = [];
 
-									$template['macros'] = $except_selected
-										? array_intersect_key($template_macros_by_macro, $macros_by_macro)
-										: array_diff_key($template_macros_by_macro, $macros_by_macro);
+									foreach ($template['macros'] as $template_macro => $foo) {
+										$trimmed_macro = CApiInputValidator::trimMacro($template_macro);
+
+										foreach ($macros as $macro) {
+											if (CApiInputValidator::trimMacro($macro['macro']) === $trimmed_macro) {
+												$matched_macros[$template_macro] = true;
+
+												continue 2;
+											}
+										}
+									}
+
+									$template['macros'] = (bool) $this->getInput('macros_remove', 0)
+										? array_intersect_key($template['macros'], $matched_macros)
+										: array_diff_key($template['macros'], $matched_macros);
 								}
 								break;
 

@@ -27,7 +27,7 @@ class CControllerDashboardConfigHash extends CController {
 	protected function checkInput(): bool {
 		$fields = [
 			'dashboardid' =>	'required|db dashboard.dashboardid|not_empty',
-			'templateid' =>		'db dashboard.dashboardid|not_empty'
+			'hostid' =>			'db hosts.hostid|not_empty'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -59,12 +59,13 @@ class CControllerDashboardConfigHash extends CController {
 	protected function doAction(): void {
 		$configuration_hash = null;
 
-		if (($this->hasInput('templateid') && $this->checkAccess(CRoleHelper::UI_MONITORING_HOSTS))
-				|| (!$this->hasInput('templateid') && $this->checkAccess(CRoleHelper::UI_MONITORING_DASHBOARD))) {
-			if ($this->hasInput('templateid')) {
-				$db_dashboards = API::TemplateDashboard()->get([
+		if (($this->hasInput('hostid') && $this->checkAccess(CRoleHelper::UI_MONITORING_HOSTS))
+				|| (!$this->hasInput('hostid') && $this->checkAccess(CRoleHelper::UI_MONITORING_DASHBOARD))) {
+			if ($this->hasInput('hostid')) {
+				$db_dashboards = API::HostDashboard()->get([
 					'output' => ['name', 'display_period', 'auto_start'],
 					'selectPages' => ['dashboard_pageid', 'name', 'display_period', 'widgets'],
+					'hostids' => $this->getInput('hostid'),
 					'dashboardids' => $this->getInput('dashboardid')
 				]);
 			}

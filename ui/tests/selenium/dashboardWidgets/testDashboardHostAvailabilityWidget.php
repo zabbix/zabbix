@@ -19,7 +19,7 @@ require_once __DIR__.'/../common/testWidgets.php';
 /**
  * @backup profiles
  *
- * @dataSource HostAvailabilityWidget
+ * @dataSource HostAvailabilityWidget, MonitoringOverview
  *
  * @onBefore prepareData
  */

@@ -24,7 +24,7 @@ require_once __DIR__.'/../../include/helpers/CDataHelper.php';
  *
  * @onBefore prepareUserData
  *
- * @dataSource UserPermissions
+ * @dataSource UserPermissions, MonitoringOverview
  */
 class testFormUserPermissions extends CWebTest {
 

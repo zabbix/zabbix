@@ -109,7 +109,7 @@ zabbix_export:
         ```
       vendor:
         name: Zabbix
-        version: 8.0-0
+        version: 8.0-3
       groups:
         - name: Templates/Databases
       items:
@@ -1190,7 +1190,7 @@ zabbix_export:
                   error_handler: CUSTOM_ERROR
                   error_handler_params: 'Replication is not performed.'
               master_item:
-                key: 'mysql.slave_status["{$MYSQL.HOST}","{$MYSQL.PORT}","{#MASTER_HOST}"]'
+                key: 'mysql.slave_status["{$MYSQL.HOST}","{$MYSQL.PORT}","{#SQL_STATEMENT}"]'
               tags:
                 - tag: component
                   value: replication
@@ -1211,8 +1211,8 @@ zabbix_export:
               value_type: CHAR
               description: |
                 Whether the I/O thread for reading the master's binary log is running.
-                Normally, you want this to be Yes unless you have not yet started replication or have
-                explicitly stopped it with STOP SLAVE.
+                Normally, you want this to be `Yes` unless you have not yet started replication or have
+                explicitly stopped it with `STOP SLAVE`.
               preprocessing:
                 - type: XMLPATH
                   parameters:
@@ -1221,7 +1221,7 @@ zabbix_export:
                   parameters:
                     - 1h
               master_item:
-                key: 'mysql.slave_status["{$MYSQL.HOST}","{$MYSQL.PORT}","{#MASTER_HOST}"]'
+                key: 'mysql.slave_status["{$MYSQL.HOST}","{$MYSQL.PORT}","{#SQL_STATEMENT}"]'
               tags:
                 - tag: component
                   value: replication
@@ -1252,7 +1252,7 @@ zabbix_export:
               value_type: CHAR
               description: |
                 Whether the SQL thread for executing events in the relay log is running.
-                As with the I/O thread, this should normally be Yes.
+                As with the I/O thread, this should normally be `Yes`.
               preprocessing:
                 - type: XMLPATH
                   parameters:
@@ -1261,7 +1261,7 @@ zabbix_export:
                   parameters:
                     - 1h
               master_item:
-                key: 'mysql.slave_status["{$MYSQL.HOST}","{$MYSQL.PORT}","{#MASTER_HOST}"]'
+                key: 'mysql.slave_status["{$MYSQL.HOST}","{$MYSQL.PORT}","{#SQL_STATEMENT}"]'
               tags:
                 - tag: component
                   value: replication
@@ -1291,29 +1291,58 @@ zabbix_export:
                   parameters:
                     - 6h
               master_item:
-                key: 'mysql.slave_status["{$MYSQL.HOST}","{$MYSQL.PORT}","{#MASTER_HOST}"]'
+                key: 'mysql.slave_status["{$MYSQL.HOST}","{$MYSQL.PORT}","{#SQL_STATEMENT}"]'
               tags:
                 - tag: component
                   value: replication
             - uuid: d87c7c03e5884a43912f60ad91c3b46f
               name: 'Replication Slave status {#MASTER_HOST}'
-              key: 'mysql.slave_status["{$MYSQL.HOST}","{$MYSQL.PORT}","{#MASTER_HOST}"]'
+              key: 'mysql.slave_status["{$MYSQL.HOST}","{$MYSQL.PORT}","{#SQL_STATEMENT}"]'
               history: '0'
               value_type: TEXT
               description: 'The item gets status information on the essential parameters of the slave threads.'
+              preprocessing:
+                - type: JAVASCRIPT
+                  parameters:
+                    - |
+                      if (value.indexOf("Source_Host") !== 0) {
+                      	value = value.replace(/Source/g, "Master");
+                      	value = value.replace(/Replica_/g, "Slave_");
+                      }
+                      
+                      return value;
               tags:
                 - tag: component
                   value: raw
+          lld_macro_paths:
+            - lld_macro: '{#MASTER_HOST}'
+              path: $.master_host
+            - lld_macro: '{#SQL_STATEMENT}'
+              path: $.statement
           preprocessing:
             - type: JAVASCRIPT
               parameters:
                 - |
-                  var matches = value.match(/Master_Host.*>(.*)<.*/);
-                  if (matches) {
-                  	return JSON.stringify([{"{#MASTER_HOST}": matches[1]}]);
+                  if (value.length === 0) {
+                  	return '[]';
                   }
                   
-                  return '[]';
+                  try {
+                  	var matches = value.match(/statement="show (slave|replica) status[\s\S]*(?:Master|Source)_Host[^>]*>([^<]+)</);
+                  
+                  	if (matches && matches[1] && matches[2]) {
+                  		return JSON.stringify([{
+                  			statement: matches[1],
+                  			master_host: matches[2].trim()
+                  		}]);
+                  	}
+                  
+                  	return '[]';
+                  }
+                  catch (e) {
+                  	Zabbix.log(4, 'Replication parser error: ' + e.message);
+                  	return '[]';
+                  }
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1d

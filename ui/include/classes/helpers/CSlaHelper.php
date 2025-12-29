@@ -200,7 +200,8 @@ final class CSlaHelper {
 	 * @return CTag
 	 */
 	public static function getUptimeTag(int $uptime): CTag {
-		return (new CSpan(convertUnitsS($uptime, true)))->addClass($uptime == 0 ? ZBX_STYLE_GREY : null);
+		return (new CSpan(convertUnitsS($uptime, ['ignore_milliseconds' => true])))
+			->addClass($uptime == 0 ? ZBX_STYLE_GREY : null);
 	}
 
 	/**
@@ -209,7 +210,8 @@ final class CSlaHelper {
 	 * @return CTag
 	 */
 	public static function getDowntimeTag(int $downtime): CTag {
-		return (new CSpan(convertUnitsS($downtime, true)))->addClass($downtime == 0 ? ZBX_STYLE_GREY : null);
+		return (new CSpan(convertUnitsS($downtime, ['ignore_milliseconds' => true])))
+			->addClass($downtime == 0 ? ZBX_STYLE_GREY : null);
 	}
 
 	/**
@@ -218,7 +220,7 @@ final class CSlaHelper {
 	 * @return CTag
 	 */
 	public static function getErrorBudgetTag(int $error_budget): CTag {
-		return (new CSpan(convertUnitsS($error_budget, true)))
+		return (new CSpan(convertUnitsS($error_budget, ['ignore_milliseconds' => true])))
 			->addClass($error_budget >= 0 ? ZBX_STYLE_GREY : ZBX_STYLE_RED);
 	}
 

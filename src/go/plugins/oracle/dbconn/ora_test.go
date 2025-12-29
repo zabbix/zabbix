@@ -257,6 +257,20 @@ func Test_prepareConnectString(t *testing.T) {
 			},
 		},
 		{
+			"+tlsTcps",
+			args{
+				tnsNone,
+				newConnDetHostname(t, "tcps://myhost:2484", "XE"),
+				1000000000, //any
+			},
+			want{
+				`(DESCRIPTION=(ADDRESS=(PROTOCOL=tcps)(HOST=myhost)(PORT=2484))` +
+					`(CONNECT_DATA=(SERVICE_NAME="XE"))(CONNECT_TIMEOUT=1)(RETRY_COUNT=0))`,
+				false,
+				false,
+			},
+		},
+		{
 			"-tnsServiceDecodeFail",
 			args{
 				tnsNone,

@@ -12,9 +12,9 @@ Zabbix version: 8.0 and higher.
 ## Tested versions
 
 This template has been tested on:
-- MySQL 5.7, 8.0
-- Percona 8.0
-- MariaDB 10.4
+- MySQL 5.7, 8.0, 9.4
+- Percona 8.4
+- MariaDB 10.6, 11.8
 
 ## Configuration
 
@@ -29,7 +29,7 @@ CREATE USER 'zbx_monitor'@'%' IDENTIFIED BY '<password>';
 GRANT REPLICATION CLIENT,PROCESS,SHOW DATABASES,SHOW VIEW ON *.* TO 'zbx_monitor'@'%';
 ```
 
-For more information, please see MySQL documentation https://dev.mysql.com/doc/refman/8.0/en/grant.html
+For more information, please see MySQL documentation https://dev.mysql.com/doc/refman/8.0/en/grant.html.
 
 **NOTE:** In order to collect replication metrics, MariaDB Enterprise Server 10.5.8-5 and above and MariaDB Community Server 10.5.9 and above require the `SLAVE MONITOR` privilege to be set for the monitoring user:
 
@@ -37,7 +37,7 @@ For more information, please see MySQL documentation https://dev.mysql.com/doc/r
 GRANT REPLICATION CLIENT,PROCESS,SHOW DATABASES,SHOW VIEW,SLAVE MONITOR ON *.* TO 'zbx_monitor'@'%';
 ```
 
-For more information please read the MariaDB documentation https://mariadb.com/docs/server/ref/mdb/privileges/SLAVE_MONITOR/
+For more information please read the MariaDB documentation https://mariadb.com/docs/server/ref/mdb/privileges/SLAVE_MONITOR/.
 
 2. Set the username and password in the host macros `{$MYSQL.USER}` and `{$MYSQL.PASSWORD}`.
 
@@ -66,7 +66,7 @@ For more information please read the MariaDB documentation https://mariadb.com/d
 |----|-----------|----|-----------------------|
 |Get status variables|<p>Gets server global status information.</p>|Database monitor|db.odbc.get[get_status_variables,"{$MYSQL.DSN}"]|
 |Get database|<p>Used for scanning databases in DBMS.</p>|Database monitor|db.odbc.get[get_database,"{$MYSQL.DSN}"]|
-|Get replication|<p>Gets replication status information.</p>|Database monitor|db.odbc.get[get_replication,"{$MYSQL.DSN}"]|
+|Get replication|<p>Gets replication status information.</p>|Database monitor|db.odbc.get[get_replication,"{$MYSQL.DSN}"]<p>**Preprocessing**</p><ul><li><p>Check for not supported value: `any error`</p><p>⛔️Custom on fail: Set value to: `deprecated`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
 |Status|<p>MySQL server status.</p>|Database monitor|db.odbc.select[ping,"{$MYSQL.DSN}"]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `10m`</p></li></ul>|
 |Version|<p>MySQL server version.</p>|Database monitor|db.odbc.select[version,"{$MYSQL.DSN}"]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
 |Uptime|<p>Number of seconds that the server has been up.</p>|Dependent item|mysql.uptime<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.Variable_name=='Uptime')].Value.first()`</p></li></ul>|
@@ -153,20 +153,20 @@ For more information please read the MariaDB documentation https://mariadb.com/d
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Replication Slave status {#MASTER_HOST}|<p>Gets status information on the essential parameters of the slave threads.</p>|Dependent item|mysql.slave_status["{#MASTER_HOST}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.[?(@.Master_Host=='{#MASTER_HOST}')].first()`</p></li></ul>|
-|Replication Slave SQL Running State {#MASTER_HOST}|<p>Shows the state of the SQL driver threads.</p>|Dependent item|mysql.slave_sql_running_state["{#MASTER_HOST}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.Slave_SQL_Running_State`</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
-|Replication Seconds Behind Master {#MASTER_HOST}|<p>The number of seconds the slave SQL thread has been behind processing the master binary log. A high number (or an increasing one) can indicate that the slave is unable to handle events from the master in a timely fashion.</p>|Dependent item|mysql.seconds_behind_master["{#MASTER_HOST}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.Seconds_Behind_Master`</p></li><li><p>Matches regular expression: `\d+`</p><p>⛔️Custom on fail: Set error to: `Replication is not performed.`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
-|Replication Slave IO Running {#MASTER_HOST}|<p>Whether the I/O thread for reading the master's binary log is running. Normally, you want this to be `Yes` unless you have not yet started a replication or have explicitly stopped it with `STOP SLAVE`.</p>|Dependent item|mysql.slave_io_running["{#MASTER_HOST}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.Slave_IO_Running`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
-|Replication Slave SQL Running {#MASTER_HOST}|<p>Whether the SQL thread for executing events in the relay log is running.</p><p>As with the I/O thread, this should normally be `Yes`.</p>|Dependent item|mysql.slave_sql_running["{#MASTER_HOST}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.Slave_SQL_Running`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Replication {#REPLICA.NAME} status|<p>Gets status information on the essential parameters of the {#REPLICA.KEY} threads.</p>|Database monitor|db.odbc.get["get_{#REPLICA.KEY}_status","{$MYSQL.DSN}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.first()`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
+|Replication {#REPLICA.NAME} SQL Running State|<p>Shows the state of the SQL driver threads.</p>|Dependent item|mysql.slave_sql_running_state["{#REPLICA.KEY}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.Slave_SQL_Running_State`</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+|Replication Seconds Behind {#SOURCE.NAME}|<p>The number of seconds the {#REPLICA.KEY} SQL thread has been behind processing the {#SOURCE.KEY} binary log. A high number (or an increasing one) can indicate that the {#REPLICA.KEY} is unable to handle events from the {#SOURCE.KEY} in a timely fashion.</p>|Dependent item|mysql.seconds_behind_master["{#REPLICA.KEY}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.Seconds_Behind_Master`</p></li><li><p>Matches regular expression: `\d+`</p><p>⛔️Custom on fail: Set error to: `Replication is not performed.`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Replication {#REPLICA.NAME} IO Running|<p>Whether the I/O thread for reading the {#SOURCE.KEY}'s binary log is running. Normally, you want this to be `Yes` unless you have not yet started a replication or have explicitly stopped it with `stop {#REPLICA.KEY}`.</p>|Dependent item|mysql.slave_io_running["{#REPLICA.KEY}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.Slave_IO_Running`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Replication {#REPLICA.NAME} SQL Running|<p>Whether the SQL thread for executing events in the relay log is running.</p><p>As with the I/O thread, this should normally be `Yes`.</p>|Dependent item|mysql.slave_sql_running["{#REPLICA.KEY}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.Slave_SQL_Running`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 
 ### Trigger prototypes for Replication discovery
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|MySQL: Replication lag is too high|<p>Replication delay is too long.</p>|`min(/MySQL by ODBC/mysql.seconds_behind_master["{#MASTER_HOST}"],5m)>{$MYSQL.REPL_LAG.MAX.WARN}`|Warning||
-|MySQL: The slave I/O thread is not running|<p>Whether the I/O thread for reading the master's binary log is running.</p>|`count(/MySQL by ODBC/mysql.slave_io_running["{#MASTER_HOST}"],#1,"eq","No")=1`|Average||
-|MySQL: The slave I/O thread is not connected to a replication master|<p>Whether the slave I/O thread is connected to the master.</p>|`count(/MySQL by ODBC/mysql.slave_io_running["{#MASTER_HOST}"],#1,"ne","Yes")=1`|Warning|**Depends on**:<br><ul><li>MySQL: The slave I/O thread is not running</li></ul>|
-|MySQL: The SQL thread is not running|<p>Whether the SQL thread for executing events in the relay log is running.</p>|`count(/MySQL by ODBC/mysql.slave_sql_running["{#MASTER_HOST}"],#1,"eq","No")=1`|Warning|**Depends on**:<br><ul><li>MySQL: The slave I/O thread is not running</li></ul>|
+|MySQL: Replication lag is too high|<p>Replication delay is too long.</p>|`min(/MySQL by ODBC/mysql.seconds_behind_master["{#REPLICA.KEY}"],5m)>{$MYSQL.REPL_LAG.MAX.WARN}`|Warning||
+|MySQL: The {#REPLICA.KEY} I/O thread is not running|<p>Whether the I/O thread for reading the {#SOURCE.KEY}'s binary log is running.</p>|`count(/MySQL by ODBC/mysql.slave_io_running["{#REPLICA.KEY}"],#1,"eq","No")=1`|Average||
+|MySQL: The {#REPLICA.KEY} I/O thread is not connected to a replication {#SOURCE.KEY}|<p>Whether the {#REPLICA.KEY} I/O thread is connected to the {#SOURCE.KEY}.</p>|`count(/MySQL by ODBC/mysql.slave_io_running["{#REPLICA.KEY}"],#1,"ne","Yes")=1`|Warning|**Depends on**:<br><ul><li>MySQL: The {#REPLICA.KEY} I/O thread is not running</li></ul>|
+|MySQL: The SQL thread is not running|<p>Whether the SQL thread for executing events in the relay log is running.</p>|`count(/MySQL by ODBC/mysql.slave_sql_running["{#REPLICA.KEY}"],#1,"eq","No")=1`|Warning|**Depends on**:<br><ul><li>MySQL: The {#REPLICA.KEY} I/O thread is not running</li></ul>|
 
 ### LLD rule MariaDB discovery
 

@@ -46,5 +46,6 @@ void	zbx_mock_extract_yaml_values_str(const char *path, zbx_vector_str_t *values
 void	zbx_mock_extract_yaml_values_ptr (zbx_mock_handle_t hdata, zbx_vector_ptr_t *values);
 void	zbx_mock_extract_yaml_values_uint64(zbx_mock_handle_t hdata, zbx_vector_uint64_t *values);
 void	zbx_mock_extract_yaml_values_int32(zbx_mock_handle_t hdata, zbx_vector_int32_t *values);
+void	zbx_mock_extract_yaml_values_dbl(zbx_mock_handle_t hdata, zbx_vector_dbl_t *values);
 
 #endif
