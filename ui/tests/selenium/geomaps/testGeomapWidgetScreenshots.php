@@ -34,6 +34,15 @@ require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
  */
 class testGeomapWidgetScreenshots extends CWebTest {
 
+	/**
+	 * Attach MessageBehavior to the test.
+	 *
+	 * @return array
+	 */
+	public function getBehaviors() {
+		return [CMessageBehavior::class];
+	}
+
 	// Dashboard for zoom screenshot tests.
 	protected static $zoom_dashboardid;
 
@@ -288,6 +297,7 @@ class testGeomapWidgetScreenshots extends CWebTest {
 		$form = $this->query('id:geomaps-form')->asForm()->one();
 		$form->fill($data);
 		$form->submit();
+		$this->assertMessage(TEST_GOOD, 'Configuration updated');
 
 		$this->page->open('zabbix.php?action=dashboard.view&dashboardid='.self::$zoom_dashboardid);
 		CDashboardElement::find()->waitUntilReady();
