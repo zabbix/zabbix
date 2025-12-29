@@ -58,8 +58,8 @@ class testPageUserGroups extends CLegacyWebTest {
 	}
 
 	/**
-	* @dataProvider allGroups
-	*/
+	 * @dataProvider allGroups
+	 */
 	public function testPageUserGroups_SimpleUpdate($group) {
 		$usrgrpid = $group['usrgrpid'];
 		$name = $group['name'];
@@ -73,9 +73,9 @@ class testPageUserGroups extends CLegacyWebTest {
 		$this->zbxTestCheckTitle('Configuration of user groups');
 		$this->zbxTestClickLinkText($name);
 		$this->zbxTestClickWait('update');
+		$this->assertMessage(TEST_GOOD, 'User group updated');
 		$this->zbxTestCheckHeader('User groups');
 		$this->zbxTestCheckTitle('Configuration of user groups');
-		$this->assertMessage(TEST_GOOD, 'User group updated');
 		$this->zbxTestTextPresent($name);
 
 		$this->assertEquals($oldHashGroup, CDBHelper::getHash($sqlHashGroup));
