@@ -14,6 +14,7 @@
 **/
 
 
+use Facebook\WebDriver\Exception\ElementClickInterceptedException;
 use Facebook\WebDriver\Exception\NoSuchElementException;
 
 require_once __DIR__.'/../../include/CLegacyWebTest.php';
@@ -2105,14 +2106,14 @@ class testFormItem extends CLegacyWebTest {
 				}
 				$itemCount ++;
 
-				$add = $form->query("xpath://div[@id='js-item-flex-intervals-field']//button[@class='btn-link element-table-add']")
-						->one();
+				$add = $form->getFieldContainer('Custom intervals')->query('button:Add')->one();
 				$add->click();
-				// TODO: sometimes inline validation error appears at the same time, and the click on Add doesn't pass.
+				// TODO: sometimes inline validation error appears simultaneously and intercepts the "Add" button click.
 				try {
-					$this->zbxTestAssertVisibleId('delay_flex_'.$itemCount.'_delay');
+					$add->click();
+					$this->query('id', 'delay_flex_'.$itemCount.'_delay')->one();
 				}
-				catch (NoSuchElementException $e) {
+				catch (NoSuchElementException | ElementClickInterceptedException $e) {
 					$add->click();
 				}
 
