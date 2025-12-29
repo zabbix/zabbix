@@ -21,8 +21,15 @@ class CNumberValidator extends CValidator {
 	protected bool $usermacros = false;
 	protected bool $lldmacros = false;
 	protected bool $with_float = true;
-	private int $decimal_scale = 0;
 
+	/**
+	 * @param array $options
+	 * @param int|float|string $options[max]        Maximum value in decimal or scientific notation.
+	 * @param int|float|string $options[min]        Minimum value in decimal or scientific notation.
+	 * @param bool             $options[usermacros] Enable user macros.
+	 * @param bool             $options[lldmacros]  Enable low-level discovery macros.
+	 * @param bool             $options[with_float] Enable floats.
+	 */
 	public function __construct(array $options = []) {
 		if (array_key_exists('min', $options)) {
 			$this->min = (string) $options['min'];
