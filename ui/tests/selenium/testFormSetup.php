@@ -67,7 +67,7 @@ class testFormSetup extends CWebTest {
 
 	public function testFormSetup_prerequisitesSectionLayout() {
 		$this->page->login()->open('setup.php')->waitUntilReady();
-		$this->query('button:Next step')->one()->click();
+		$this->query('button:Next step')->one()->click()->waitUntilStalled();
 
 		// Check Pre-requisites section.
 		$this->checkPageTextElements('Check of pre-requisites');
@@ -883,7 +883,9 @@ class testFormSetup extends CWebTest {
 	 * @param	string	$text		text that should be present in a paragraph of the current setup form section
 	 */
 	private function checkPageTextElements($title, $text = null) {
-		$this->assertTrue($this->query('xpath://h1[text()='.CXPathHelper::escapeQuotes($title).']')->one()->isValid());
+		$this->assertTrue($this->query('xpath://h1[text()='.CXPathHelper::escapeQuotes($title).']')->waitUntilVisible()
+				->one()->isValid()
+		);
 		$this->checkSections($title);
 		if ($text) {
 			$this->assertStringContainsString($text, $this->query('xpath:.//p')->one()->getText());
@@ -968,7 +970,7 @@ class testFormSetup extends CWebTest {
 	 */
 	private function openSpecifiedSection($section) {
 		$this->page->login()->open('setup.php')->waitUntilReady();
-		$this->query('button:Next step')->one()->click();
+		$this->query('button:Next step')->one()->click()->waitUntilStalled();
 		$this->query('button:Next step')->one()->click()->waitUntilStalled();
 		// No actions required in case of Configure DB connection section.
 		if ($section === 'Configure DB connection') {

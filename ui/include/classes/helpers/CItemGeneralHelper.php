@@ -360,13 +360,20 @@ JAVASCRIPT;
 				['db item_preproc.params', 'required', 'not_empty', 'when' => ['type', 'in' => [
 					ZBX_PREPROC_ERROR_FIELD_REGEX
 				]]],
+				['integer', 'required',
+					'in' => [ZBX_PREPROC_SNMP_UNCHANGED, ZBX_PREPROC_SNMP_UTF8_FROM_HEX,
+						ZBX_PREPROC_SNMP_MAC_FROM_HEX, ZBX_PREPROC_SNMP_INT_FROM_BITS
+					],
+					'when' => ['type', 'in' => [ZBX_PREPROC_SNMP_WALK_VALUE]]
+				],
 				['db item_preproc.params', 'required', 'not_empty',
 					'in' => [ZBX_PREPROC_PROMETHEUS_VALUE, ZBX_PREPROC_PROMETHEUS_LABEL, ZBX_PREPROC_PROMETHEUS_SUM,
 						ZBX_PREPROC_PROMETHEUS_MIN, ZBX_PREPROC_PROMETHEUS_MAX, ZBX_PREPROC_PROMETHEUS_AVG,
 						ZBX_PREPROC_PROMETHEUS_COUNT
 					],
 					'when' => ['type', 'in' => [ZBX_PREPROC_PROMETHEUS_PATTERN]]
-				]
+				],
+				['db item_preproc.params', 'when' => ['type', 'in' => [ZBX_PREPROC_CSV_TO_JSON]]]
 			],
 			'params_0' => [
 				['db item_preproc.params', 'required', 'not_empty', 'allow_macro',
@@ -487,6 +494,10 @@ JAVASCRIPT;
 				]
 			],
 			'error_handler_params' => [
+				['string', 'when' => [
+					['error_handler', 'in' => [ZBX_PREPROC_FAIL_SET_VALUE]],
+					['on_fail', 'in' => [1]]
+				]],
 				['string', 'required', 'not_empty', 'when' => [
 					['error_handler', 'in' => [ZBX_PREPROC_FAIL_SET_ERROR]],
 					['on_fail', 'in' => ['1']]
