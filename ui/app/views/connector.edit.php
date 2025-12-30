@@ -79,7 +79,7 @@ $form_grid = (new CFormGrid())
 				->setId('tags')
 				->addClass('table-tags')
 				->addClass(ZBX_STYLE_TABLE_INITIAL_WIDTH)
-				->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+				->addClass(ZBX_STYLE_TABLE_FORMS)
 				->setAttribute('data-field-type', 'set')
 				->setAttribute('data-field-name', 'tags')
 				->setFooter(
