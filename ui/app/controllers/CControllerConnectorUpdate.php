@@ -159,7 +159,7 @@ class CControllerConnectorUpdate extends CControllerConnectorUpdateGeneral {
 		$output = [];
 
 		if ($result) {
-			$output['success']['title'] = _('Connector created');
+			$output['success']['title'] = _('Connector updated');
 
 			if ($messages = get_and_clear_messages()) {
 				$output['success']['messages'] = array_column($messages, 'message');
