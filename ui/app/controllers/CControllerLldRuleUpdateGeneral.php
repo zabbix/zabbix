@@ -87,7 +87,10 @@ abstract class CControllerLldRuleUpdateGeneral extends CController {
 			'parameters' => ['objects', 'uniq' => ['name'],
 				'fields' => [
 					'value' => ['db item_parameter.value'],
-					'name' => ['db item_parameter.name', 'required', 'not_empty', 'when' => ['value', 'not_empty']],
+					'name' => [
+						['db item_parameter.name'],
+						['db item_parameter.name', 'required', 'not_empty', 'when' => ['value', 'not_empty']]
+					],
 					'sortorder' => ['integer']
 				],
 				'when' => ['type', 'in' => [ITEM_TYPE_SCRIPT, ITEM_TYPE_BROWSER]]
@@ -172,10 +175,14 @@ abstract class CControllerLldRuleUpdateGeneral extends CController {
 			'authtype' => ['db items.authtype', 'in' => [ITEM_AUTHTYPE_PASSWORD, ITEM_AUTHTYPE_PUBLICKEY],
 				'when' => ['type', 'in' => [ITEM_TYPE_SSH, ITEM_TYPE_HTTPAGENT]]
 			],
-			'jmx_endpoint' => ['db items.jmx_endpoint', 'required', 'not_empty', 'when' => ['type', 'in' => [ITEM_TYPE_JMX]]],
+			'jmx_endpoint' => ['db items.jmx_endpoint', 'required', 'not_empty',
+				'when' => ['type', 'in' => [ITEM_TYPE_JMX]]
+			],
 			'username' => [
 				['db items.username', 'when' => ['type', 'in' => [ITEM_TYPE_JMX, ITEM_TYPE_SIMPLE]]],
-				['db items.username', 'required', 'not_empty', 'when' => ['type', 'in' => [ITEM_TYPE_SSH, ITEM_TYPE_TELNET]]]
+				['db items.username', 'required', 'not_empty',
+					'when' => ['type', 'in' => [ITEM_TYPE_SSH, ITEM_TYPE_TELNET]]
+				]
 			],
 			'publickey' => ['db items.publickey', 'required', 'not_empty', 'when' => [
 				['type', 'in' => [ITEM_TYPE_SSH]],
@@ -186,8 +193,12 @@ abstract class CControllerLldRuleUpdateGeneral extends CController {
 				['authtype', 'in' => [ITEM_AUTHTYPE_PUBLICKEY]]
 			]],
 			'password' => ['db items.password', 'when' => ['type', 'in' => [ITEM_TYPE_SSH]]],
-			'params_es' => ['db items.params', 'required', 'not_empty', 'when' => ['type', 'in' => [ITEM_TYPE_SSH, ITEM_TYPE_TELNET]]],
-			'params_ap' => ['db items.params', 'required', 'not_empty', 'when' => ['type', 'in' => [ITEM_TYPE_DB_MONITOR]]],
+			'params_es' => ['db items.params', 'required', 'not_empty',
+				'when' => ['type', 'in' => [ITEM_TYPE_SSH, ITEM_TYPE_TELNET]]
+			],
+			'params_ap' => ['db items.params', 'required', 'not_empty',
+				'when' => ['type', 'in' => [ITEM_TYPE_DB_MONITOR]]
+			],
 			'delay_flex' => ['objects', 'fields' => [
 				'type' => ['integer', 'in' => [ITEM_DELAY_FLEXIBLE, ITEM_DELAY_SCHEDULING]],
 				'schedule' => ['string', 'required',
@@ -213,7 +224,8 @@ abstract class CControllerLldRuleUpdateGeneral extends CController {
 				]
 			]],
 			'delay' => [
-				['string', 'not_in' => ['0', ...array_map(fn (string $suffix) => "0$suffix", str_split(ZBX_TIME_SUFFIXES))],
+				['string',
+					'not_in' => ['0', ...array_map(fn (string $suffix) => "0$suffix", str_split(ZBX_TIME_SUFFIXES))],
 					'messages' => ['not_in' => _('This field cannot be set to "0" without defining custom intervals.')],
 					'when' => ['delay_flex', 'empty']
 				],
@@ -221,8 +233,8 @@ abstract class CControllerLldRuleUpdateGeneral extends CController {
 					'use' => [CTimeUnitValidator::class, ['max' => SEC_PER_DAY, 'usermacros' => true]],
 					'when' => ['type', 'in' => [
 						ITEM_TYPE_DB_MONITOR, ITEM_TYPE_EXTERNAL, ITEM_TYPE_HTTPAGENT, ITEM_TYPE_INTERNAL,
-						ITEM_TYPE_IPMI, ITEM_TYPE_JMX, ITEM_TYPE_SCRIPT, ITEM_TYPE_SIMPLE, ITEM_TYPE_SNMP, ITEM_TYPE_SSH,
-						ITEM_TYPE_TELNET, ITEM_TYPE_ZABBIX, ITEM_TYPE_BROWSER
+						ITEM_TYPE_IPMI, ITEM_TYPE_JMX, ITEM_TYPE_SCRIPT, ITEM_TYPE_SIMPLE, ITEM_TYPE_SNMP,
+						ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_ZABBIX, ITEM_TYPE_BROWSER
 					]]
 				],
 				['db items.delay', 'required', 'not_empty',
@@ -233,10 +245,14 @@ abstract class CControllerLldRuleUpdateGeneral extends CController {
 					]
 				]
 			],
-			'custom_timeout' => ['integer', 'in' => [ZBX_ITEM_CUSTOM_TIMEOUT_ENABLED, ZBX_ITEM_CUSTOM_TIMEOUT_DISABLED]],
+			'custom_timeout' => ['integer',
+				'in' => [ZBX_ITEM_CUSTOM_TIMEOUT_ENABLED, ZBX_ITEM_CUSTOM_TIMEOUT_DISABLED]
+			],
 			'timeout' => [
 				['db items.timeout', 'required', 'not_empty',
-					'use' => [CTimeUnitValidator::class, ['min' => 1, 'max' => 10 * SEC_PER_MIN, 'usermacros' => true]],
+					'use' => [CTimeUnitValidator::class, ['min' => 1, 'max' => 10 * SEC_PER_MIN,
+						'usermacros' => true
+					]],
 					'when' => [
 						['type', 'in' => [ITEM_TYPE_SIMPLE]],
 						['custom_timeout', 'in' => [ZBX_ITEM_CUSTOM_TIMEOUT_ENABLED]],
@@ -244,7 +260,9 @@ abstract class CControllerLldRuleUpdateGeneral extends CController {
 					]
 				],
 				['db items.timeout', 'required', 'not_empty',
-					'use' => [CTimeUnitValidator::class, ['min' => 1, 'max' => 10 * SEC_PER_MIN, 'usermacros' => true]],
+					'use' => [CTimeUnitValidator::class, ['min' => 1, 'max' => 10 * SEC_PER_MIN,
+						'usermacros' => true
+					]],
 					'when' => [
 						['type', 'in' => [ITEM_TYPE_SNMP]],
 						['custom_timeout', 'in' => [ZBX_ITEM_CUSTOM_TIMEOUT_ENABLED]],
@@ -252,7 +270,9 @@ abstract class CControllerLldRuleUpdateGeneral extends CController {
 					]
 				],
 				['db items.timeout', 'required', 'not_empty',
-					'use' => [CTimeUnitValidator::class, ['min' => 1, 'max' => 10 * SEC_PER_MIN, 'usermacros' => true]],
+					'use' => [CTimeUnitValidator::class, ['min' => 1, 'max' => 10 * SEC_PER_MIN,
+						'usermacros' => true
+					]],
 					'when' => [
 						['type', 'in' => [ITEM_TYPE_ZABBIX, ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_EXTERNAL,
 							ITEM_TYPE_DB_MONITOR, ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_HTTPAGENT,
@@ -351,18 +371,22 @@ abstract class CControllerLldRuleUpdateGeneral extends CController {
 						'conditions' => [
 							['objects', 'fields' => [
 								'operator' => ['integer', 'required',
-									'in' => [CONDITION_OPERATOR_REGEXP, CONDITION_OPERATOR_NOT_REGEXP, CONDITION_OPERATOR_EXISTS,
-										CONDITION_OPERATOR_NOT_EXISTS
+									'in' => [CONDITION_OPERATOR_REGEXP, CONDITION_OPERATOR_NOT_REGEXP,
+										CONDITION_OPERATOR_EXISTS, CONDITION_OPERATOR_NOT_EXISTS
 									]
 								],
 								'value' => ['db item_condition.value', 'required',
-									'when' => ['operator', 'in' => [CONDITION_OPERATOR_REGEXP, CONDITION_OPERATOR_NOT_REGEXP]]
+									'when' => ['operator',
+										'in' => [CONDITION_OPERATOR_REGEXP, CONDITION_OPERATOR_NOT_REGEXP]
+									]
 								],
 								'macro' => [
 									['db item_condition.macro', 'use' => [CLLDMacroParser::class]],
 									['db item_condition.macro', 'required', 'not_empty',
 										'when' => [
-											['operator', 'in' => [CONDITION_OPERATOR_REGEXP, CONDITION_OPERATOR_NOT_REGEXP]],
+											['operator',
+												'in' => [CONDITION_OPERATOR_REGEXP, CONDITION_OPERATOR_NOT_REGEXP]
+											],
 											['value', 'not_empty']
 										]
 									]

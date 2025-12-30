@@ -16,12 +16,23 @@
 
 class CControllerLldRulePrototypeCreate extends CControllerLldRuleUpdateGeneral {
 
+	/**
+	 * @var array
+	 */
+	private $parent_discovery;
+
 	public static function getValidationRulesApiUniq(): array {
-		return ['discoveryruleprototype.get', ['key_' => '{key}', 'hostid' => '{hostid}']];
+		return [
+			['discoveryrule.get', ['key_' => '{key}', 'hostid' => '{hostid}']],
+			['discoveryruleprototype.get', ['key_' => '{key}', 'hostid' => '{hostid}']]
+		];
 	}
 
 	public static function getFieldsValidationRulesAdditional(): array {
-		return ['discover' => ['db items.discover', 'required', 'in' => [ITEM_DISCOVER, ITEM_NO_DISCOVER]]];
+		return [
+			'parent_discoveryid' => ['db items.itemid', 'required'],
+			'discover' => ['db items.discover', 'required', 'in' => [ITEM_DISCOVER, ITEM_NO_DISCOVER]]
+		];
 	}
 
 	public static function getIsPrototype(): bool {
@@ -43,15 +54,32 @@ class CControllerLldRulePrototypeCreate extends CControllerLldRuleUpdateGeneral 
 			$this->setResponse(
 				new CControllerResponseData(['main_block' => json_encode($response)])
 			);
+
+			return false;
 		}
 
-		return $ret;
+		$options = [
+			'output' => ['itemid', 'name', 'flags'],
+			'selectDiscoveryData' => ['parent_itemid'],
+			'itemids' => $this->getInput('parent_discoveryid'),
+			'selectHosts' => ['hostid', 'name', 'monitored_by', 'proxyid', 'assigned_proxyid', 'status', 'flags'],
+			'editable' => true
+		];
+
+		$parent_discovery = API::DiscoveryRule()->get($options) ?: API::DiscoveryRulePrototype()->get($options);
+
+		if (!$parent_discovery) {
+			return false;
+		}
+
+		$this->parent_discovery = reset($parent_discovery);
+
+		return true;
 	}
 
 	public function doAction(): void {
 		$output = [];
-		$input = $this->getInputForApi();
-		$result = API::DiscoveryRule()->create($input);
+		$result = API::DiscoveryRulePrototype()->create($this->getInputForApi());
 		$messages = array_column(get_and_clear_messages(), 'message');
 
 		if ($result) {
@@ -78,13 +106,11 @@ class CControllerLldRulePrototypeCreate extends CControllerLldRuleUpdateGeneral 
 		$input['templateid'] = 0;
 		$input['itemid'] = 0;
 
-		$input['hosts'] = API::Host()->get([
-			'output' => ['hostid', 'status'],
-			'hostids' => [$this->getInput('hostid')],
-			'templated_hosts' => true,
-			'editable' => true
-		]);
+		$input['hosts'] = $this->parent_discovery['hosts'];
 
-		return ['hostid' => $this->getInput('hostid')] + getSanitizedItemFields($input);
+		return [
+			'ruleid' => $this->parent_discovery['itemid'],
+			'hostid' => $this->parent_discovery['hosts'][0]['hostid']
+		] + getSanitizedItemFields($input);
 	}
 }

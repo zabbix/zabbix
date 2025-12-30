@@ -17,7 +17,10 @@
 class CControllerLldRuleCreate extends CControllerLldRuleUpdateGeneral {
 
 	public static function getValidationRulesApiUniq(): array {
-		return ['discoveryrule.get', ['key_' => '{key}', 'hostid' => '{hostid}']];
+		return [
+			['discoveryrule.get', ['key_' => '{key}', 'hostid' => '{hostid}']],
+			['discoveryruleprototype.get', ['key_' => '{key}', 'hostid' => '{hostid}']],
+		];
 	}
 
 	public static function getFieldsValidationRulesAdditional(): array {

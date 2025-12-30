@@ -44,12 +44,69 @@ class CControllerLldRulePrototypeEdit extends CController
 
 	protected function checkInput(): bool {
 		$fields = [
+			'name'					=> 'db items.name',
+			'type'					=> 'in '.implode(',', CControllerLldRuleUpdateGeneral::getItemTypes()),
+			'key'					=> 'db items.key_',
+			'url'					=> 'db items.url',
+			'query_fields'			=> 'array',
+			'parameters'			=> 'array',
+			'script'				=> 'db items.params',
+			'browser_script'		=> 'db items.params',
+			'request_method'		=> 'in '.implode(',', [HTTPCHECK_REQUEST_GET, HTTPCHECK_REQUEST_POST, HTTPCHECK_REQUEST_PUT, HTTPCHECK_REQUEST_HEAD]),
+			'post_type'				=> 'in '.implode(',', [ZBX_POSTTYPE_RAW, ZBX_POSTTYPE_JSON, ZBX_POSTTYPE_XML]),
+			'posts'					=> 'db items.posts',
+			'headers'				=> 'array',
+			'status_codes'			=> 'db items.status_codes',
+			'follow_redirects'		=> 'in '.implode(',', [HTTPTEST_STEP_FOLLOW_REDIRECTS_OFF, HTTPTEST_STEP_FOLLOW_REDIRECTS_ON]),
+			'retrieve_mode'			=> 'in '.implode(',', [HTTPTEST_STEP_RETRIEVE_MODE_CONTENT, HTTPTEST_STEP_RETRIEVE_MODE_HEADERS, HTTPTEST_STEP_RETRIEVE_MODE_BOTH]),
+			'output_format'			=> 'in '.implode(',', [HTTPCHECK_STORE_RAW, HTTPCHECK_STORE_JSON]),
+			'http_proxy'			=> 'db items.http_proxy',
+			'http_authtype'			=> 'in '.implode(',', array_keys(httptest_authentications())),
+			'http_username'			=> 'db items.username',
+			'http_password'			=> 'db items.password',
+			'verify_peer'			=> 'in '.implode(',', [ZBX_HTTP_VERIFY_PEER_OFF, ZBX_HTTP_VERIFY_PEER_ON]),
+			'verify_host'			=> 'in '.implode(',', [ZBX_HTTP_VERIFY_HOST_OFF, ZBX_HTTP_VERIFY_HOST_ON]),
+			'ssl_cert_file'			=> 'db items.ssl_cert_file',
+			'ssl_key_file'			=> 'db items.ssl_key_file',
+			'ssl_key_password'		=> 'db items.ssl_key_password',
+			'master_itemid'			=> 'id',
+			'interfaceid'			=> 'id',
+			'snmp_oid'				=> 'db items.snmp_oid',
+			'ipmi_sensor'			=> 'db items.ipmi_sensor',
+			'authtype'				=> 'in '.implode(',', [ITEM_AUTHTYPE_PASSWORD, ITEM_AUTHTYPE_PUBLICKEY]),
+			'jmx_endpoint'			=> 'db items.jmx_endpoint',
+			'username'				=> 'db items.username',
+			'publickey'				=> 'db items.publickey',
+			'privatekey'			=> 'db items.privatekey',
+			'password'				=> 'db items.password',
+			'params_es'				=> 'db items.params',
+			'params_ap'				=> 'db items.params',
+			'delay'					=> 'db items.delay',
+			'delay_flex'			=> 'array',
+			'custom_timeout'		=> 'in '.implode(',', [ZBX_ITEM_CUSTOM_TIMEOUT_DISABLED, ZBX_ITEM_CUSTOM_TIMEOUT_ENABLED]),
+			'timeout'				=> 'db items.timeout',
+			'lifetime_type'			=> 'in '.implode(',', [ZBX_LLD_DELETE_NEVER, ZBX_LLD_DELETE_IMMEDIATELY, ZBX_LLD_DELETE_AFTER]),
+			'lifetime'				=> 'db items.lifetime',
+			'enabled_lifetime_type'	=> 'in '.implode(',', [ZBX_LLD_DELETE_NEVER, ZBX_LLD_DELETE_IMMEDIATELY, ZBX_LLD_DELETE_AFTER]),
+			'enabled_lifetime'		=> 'db items.lifetime',
+			'allow_traps'			=> 'in '.implode(',', [HTTPCHECK_ALLOW_TRAPS_OFF, HTTPCHECK_ALLOW_TRAPS_ON]),
+			'trapper_hosts'			=> 'db items.trapper_hosts',
+			'inventory_link'		=> 'db items.inventory_link',
+			'description'			=> 'db items.description',
+			'status'				=> 'in '.implode(',', [ITEM_STATUS_ACTIVE, ITEM_STATUS_DISABLED]),
+			'lld_macro_paths'		=> 'array',
+			'evaltype'				=> 'in '.implode(',', [CONDITION_EVAL_TYPE_AND_OR, CONDITION_EVAL_TYPE_AND, CONDITION_EVAL_TYPE_OR, CONDITION_EVAL_TYPE_EXPRESSION]),
+			'formula'				=> 'db items.formula',
+			'conditions'			=> 'array',
+			'overrides'				=> 'array',
+			'preprocessing'			=> 'array',
 			'context'				=> 'required|in host,template',
+			'discover'				=> 'in '.implode(',', [ITEM_DISCOVER, ITEM_NO_DISCOVER]),
 			'hostid'				=> 'id',
 			'itemid'				=> 'id',
 			'templateid'			=> 'id',
 			'parent_discoveryid'	=> 'id',
-			'clone'					=> 'in 1',
+			'clone'					=> 'in 1'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -202,6 +259,7 @@ class CControllerLldRulePrototypeEdit extends CController
 			$item = CLldRulePrototypeHelper::convertApiInputForForm($this->lldrule);
 
 			if ($this->getInput('clone', 0)) {
+				$item = CLldRulePrototypeHelper::normalizeFormData($this->getInputAll() + $item);
 				$item['itemid'] = null;
 				$item['templateid'] = null;
 				$item['flags'] = ZBX_FLAG_DISCOVERY_NORMAL;

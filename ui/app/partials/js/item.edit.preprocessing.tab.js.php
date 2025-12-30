@@ -77,7 +77,7 @@ var ItemEditPreprocessingTab = class {
 			if (e.target.classList.contains('element-table-add')) {
 				const step = {
 					type: this.#default_type,
-					error_handler: '<?= ZBX_PREPROC_FAIL_DEFAULT; ?>',
+					error_handler: <?= ZBX_PREPROC_FAIL_DEFAULT; ?>,
 					params: this.#getDefaultParamValues(this.#default_type)
 				};
 
@@ -230,7 +230,7 @@ var ItemEditPreprocessingTab = class {
 		const row = preproc_row_tmpl.evaluateToElement(step);
 		row.querySelector('.step-parameters').innerHTML = this.#makeParametersInput(step);
 
-		this.#initRow(row, step.type, step.error_handler !== '<?= ZBX_PREPROC_FAIL_DEFAULT; ?>');
+		this.#initRow(row, step.type, step.error_handler != <?= ZBX_PREPROC_FAIL_DEFAULT; ?>);
 
 		row.querySelector('z-select[name*="type"]').addEventListener('change', (e) => {
 			const row = e.target.closest('.preprocessing-list-item');

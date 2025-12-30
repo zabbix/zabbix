@@ -233,7 +233,8 @@ class CControllerLldRuleEdit extends CController
 			$item = CLldRuleHelper::convertApiInputForForm($this->lldrule);
 
 			if ($this->getInput('clone', 0)) {
-				$item = $this->getInputAll() + $item;
+				$item = CLldRuleHelper::normalizeFormData($this->getInputAll() + $item);
+				$item['itemid'] = null;
 				$item['templateid'] = null;
 				$item['flags'] = ZBX_FLAG_DISCOVERY_NORMAL;
 				$item['parent_items'] = [];

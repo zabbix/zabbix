@@ -199,7 +199,8 @@ $output = [
 	'buttons' => $buttons,
 	'script_inline' => getPagePostJs().
 		$this->readJsFile('item.edit.js.php').
-		$this->readJsFile('item.edit.preprocessing.tab.js.php', null, '/../partials/js'),
+		$this->readJsFile('item.edit.preprocessing.tab.js.php', null, '/../partials/js').
+		$this->readJsFile('host.interface.selector.js.php', null, '/../partials/js'),
 	'dialogue_class' => 'modal-popup-large'
 ];
 

@@ -1984,7 +1984,9 @@ function prepareLldOverrides(array $overrides): array {
 	foreach ($overrides as &$override) {
 		$override['filter'] = prepareLldFilter([
 			'evaltype' => $override['filter']['evaltype'],
-			'formula' => $override['filter']['formula'],
+			'formula' => array_key_exists('formula', $override['filter'])
+				? $override['filter']['formula']
+				: '',
 			'conditions' => array_key_exists('conditions', $override['filter'])
 				? $override['filter']['conditions']
 				: []

@@ -533,12 +533,14 @@ function getHostNavigation(string $current_element, $hostid, $lld_ruleid = 0): ?
 				$db_discovery_rule['name'],
 				$db_lld_prototype_parents
 					? (new CUrl('zabbix.php'))
-						->setArgument('action', 'lldrule.prototype.edit')
+						->setArgument('action', 'popup')
+						->setArgument('popup', 'lldrule.prototype.edit')
 						->setArgument('itemid', $db_discovery_rule['itemid'])
 						->setArgument('parent_discoveryid', $discovery_parent['itemid'])
 						->setArgument('context', $context)
 					: (new CUrl('zabbix.php'))
-						->setArgument('action', 'lldrule.edit')
+						->setArgument('action', 'popup')
+						->setArgument('popup', 'lldrule.edit')
 						->setArgument('itemid', $db_discovery_rule['itemid'])
 						->setArgument('context', $context)
 			)

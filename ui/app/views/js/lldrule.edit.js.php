@@ -118,17 +118,25 @@ window.lldrule_edit = new class {
 
 			this.#post(curl.getUrl(), {itemids: [fields.itemid]});
 		}
+		else {
+			this.#overlay.unsetLoading();
+		}
 	}
 
 	#clone() {
 		window.lldoverrides.appendFormData(this.#form_element);
 		this.#form.discoverAllFields();
 
-		this.#overlay = ZABBIX.PopupManager.open(
-			'lldrule.edit',
-			{clone: 1, ...this.#form.getAllValues()},
-			{reuse_existing: false}
-		);
+		const fields = this.#form.getAllValues();
+		fields.clone = 1;
+
+		Object.entries(fields).forEach(([key, value]) => {
+			if (value === null) {
+				delete fields[key];
+			}
+		})
+
+		this.#overlay = ZABBIX.PopupManager.open('lldrule.edit', fields, {reuse_existing: false});
 	}
 
 	#submit() {

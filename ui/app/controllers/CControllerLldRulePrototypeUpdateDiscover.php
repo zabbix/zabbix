@@ -60,8 +60,6 @@ class CControllerLldRulePrototypeUpdateDiscover extends CController {
 			$items[] = ['itemid' => $itemid, 'discover' => $this->getInput('discover')];
 		}
 
-		error_log(json_encode($items));
-
 		$result = API::DiscoveryRulePrototype()->update($items);
 		$messages = array_column(get_and_clear_messages(), 'message');
 		$count = count($items);

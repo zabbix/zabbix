@@ -237,16 +237,20 @@ class CControllerLldRuleList extends CController {
 				$filter['ms_hosts'] = CArrayHelper::renameObjectsKeys(API::Host()->get([
 					'output' => ['hostid', 'name'],
 					'hostids' => $filter['filter_hostids'],
-					'editable' => true
+					'editable' => true,
+					'preservekeys' => true
 				]), ['hostid' => 'id']);
 			}
 			else {
 				$filter['ms_hosts'] = CArrayHelper::renameObjectsKeys(API::Template()->get([
 					'output' => ['hostid', 'name'],
 					'templateids' => $filter['filter_hostids'],
-					'editable' => true
+					'editable' => true,
+					'preservekeys' => true
 				]), ['templateid' => 'id']);
 			}
+
+			$filter['filter_hostids'] = array_keys($filter['ms_hosts']);
 		}
 
 		if ($filter['filter_groupids']) {

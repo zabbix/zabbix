@@ -654,6 +654,11 @@ JAVASCRIPT;
 	}
 
 	public static function normalizeFormDataPreprocessingStep(array $step): array {
+		$step += [
+			'error_handler' => ZBX_PREPROC_FAIL_DEFAULT,
+			'error_handler_params' => ''
+		];
+
 		if (array_key_exists('params', $step)) {
 			return $step;
 		}

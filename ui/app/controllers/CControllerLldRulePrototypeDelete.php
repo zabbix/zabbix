@@ -61,7 +61,6 @@ class CControllerLldRulePrototypeDelete extends CController {
 
 		if ($result) {
 			$output['success']['title'] = _n('Discovery prototype deleted', 'Discovery prototypes deleted', $count);
-			$output['success']['action'] = 'delete';
 
 			if ($messages) {
 				$output['success']['messages'] = $messages;

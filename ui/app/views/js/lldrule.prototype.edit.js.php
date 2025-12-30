@@ -28,6 +28,7 @@ window.lldrule_prototype_edit = new class {
 	#form;
 	#form_element;
 	#overlay;
+	#return_url;
 	#tabs;
 	#testable_item_types;
 
@@ -39,6 +40,7 @@ window.lldrule_prototype_edit = new class {
 		this.#footer = this.#overlay.$dialogue.$footer[0];
 		this.#test_rules = test_rules;
 		this.#testable_item_types = testable_item_types;
+		this.#return_url = return_url;
 
 		this.#initEvents();
 
@@ -105,7 +107,7 @@ window.lldrule_prototype_edit = new class {
 	}
 
 	#delete() {
-		if (window.confirm(<?= json_encode(_('Delete discovery rule?')) ?>)) {
+		if (window.confirm(<?= json_encode(_('Delete discovery prototype?')) ?>)) {
 			this.#removePopupMessages();
 
 			const fields = this.#form.getAllValues();
@@ -117,17 +119,25 @@ window.lldrule_prototype_edit = new class {
 
 			this.#post(curl.getUrl(), {itemids: [fields.itemid]});
 		}
+		else {
+			this.#overlay.unsetLoading();
+		}
 	}
 
 	#clone() {
 		window.lldoverrides.appendFormData(this.#form_element);
 		this.#form.discoverAllFields();
 
-		this.#overlay = ZABBIX.PopupManager.open(
-			'lldrule.prototype.edit',
-			{clone: 1, ...this.#form.getAllValues()},
-			{reuse_existing: false}
-		);
+		const fields = this.#form.getAllValues();
+		fields.clone = 1;
+
+		Object.entries(fields).forEach(([key, value]) => {
+			if (value === null) {
+				delete fields[key];
+			}
+		})
+
+		this.#overlay = ZABBIX.PopupManager.open('lldrule.prototype.edit', fields, {reuse_existing: false});
 	}
 
 	#submit() {
@@ -186,7 +196,13 @@ window.lldrule_prototype_edit = new class {
 
 					overlayDialogueDestroy(this.#overlay.dialogueid);
 
-					this.#dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: {action, ...response}}));
+					const event_details = {action, ...response};
+
+					if (action === 'lldrule.prototype.delete') {
+						event_details.redirect_url = this.#return_url;
+					}
+
+					this.#dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: event_details}));
 				}
 			})
 			.catch((exception) => this.#ajaxExceptionHandler(exception))

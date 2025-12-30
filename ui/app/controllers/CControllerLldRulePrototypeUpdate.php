@@ -17,7 +17,10 @@
 class CControllerLldRulePrototypeUpdate extends CControllerLldRuleUpdateGeneral {
 
 	public static function getValidationRulesApiUniq(): array {
-		return ['discoveryruleprototype.get', ['key_' => '{key}', 'hostid' => '{hostid}'], 'itemid'];
+		return [
+			['discoveryrule.get', ['key_' => '{key}', 'hostid' => '{hostid}']],
+			['discoveryruleprototype.get', ['key_' => '{key}', 'hostid' => '{hostid}'], 'itemid']
+		];
 	}
 
 	public static function getFieldsValidationRulesAdditional(): array {
@@ -53,7 +56,7 @@ class CControllerLldRulePrototypeUpdate extends CControllerLldRuleUpdateGeneral 
 
 	public function doAction(): void {
 		$output = [];
-		$result = API::DiscoveryRule()->update($this->getInputForApi());
+		$result = API::DiscoveryRulePrototype()->update($this->getInputForApi());
 		$messages = array_column(get_and_clear_messages(), 'message');
 
 		if ($result) {
@@ -74,7 +77,7 @@ class CControllerLldRulePrototypeUpdate extends CControllerLldRuleUpdateGeneral 
 	}
 
 	private function getInputForApi(): array {
-		$input = CLldRulePrototypeHelper::normalizeFormData($this->getInputAll());
+		$input = CLldRulePrototypeHelper::normalizeFormData($this->getInputAll() + ['overrides' => []]);
 		$input = CLldRulePrototypeHelper::convertFormInputForApi($input);
 
 		[$db_item] = API::DiscoveryRulePrototype()->get([

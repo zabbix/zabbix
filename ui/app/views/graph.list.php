@@ -178,9 +178,10 @@ foreach ($data['graphs'] as $graph) {
 		$name[] = (new CLink($graph['discoveryRule']['name'],
 			(new CUrl('zabbix.php'))
 				->setArgument('action', 'popup')
-				->setArgument('popup', 'lldrule.edit')
-				->setArgument('itemid', $graph['discoveryRule']['itemid'])
+				->setArgument('popup', 'graph.prototype.edit')
 				->setArgument('context', $data['context'])
+				->setArgument('parent_discoveryid', $graph['discoveryRule']['itemid'])
+				->setArgument('graphid', $graph['discoveryData']['parent_graphid'])
 		))
 			->addClass(ZBX_STYLE_LINK_ALT)
 			->addClass(ZBX_STYLE_ORANGE);

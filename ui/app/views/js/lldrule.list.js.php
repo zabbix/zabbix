@@ -203,6 +203,15 @@ const view = new class {
 				}
 				else {
 					chkbxRange.clearSelectedOnFilterChange();
+
+					if (data.submit.success?.action === 'delete') {
+						const url = new URL('zabbix.php', location.href);
+
+						url.searchParams.set('action', 'lldrule.list');
+						url.searchParams.set('context', this.#context);
+
+						event.setRedirectUrl(url.href);
+					}
 				}
 			}
 		});

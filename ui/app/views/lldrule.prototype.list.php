@@ -31,14 +31,9 @@ $html_page = (new CHtmlPage())
 		(new CTag('nav', true,
 			(new CList())
 				->addItem(
-					(new CRedirectButton(_('Create discovery prototype'),
-						(new CUrl('zabbix.php'))
-							->setArgument('action', 'popup')
-							->setArgument('popup', 'lldrule.prototype.edit')
-							->setArgument('hostid', $data['hostid'])
-							->setArgument('parent_discoveryid', $data['parent_discoveryid'])
-							->setArgument('context', $data['context'])
-					))->setEnabled(!$data['is_parent_discovered'])
+					(new CSimpleButton(_('Create discovery prototype')))
+						->addClass('js-create-item')
+						->setEnabled(!$data['is_parent_discovered'])
 				)
 		))->setAttribute('aria-label', _('Content controls'))
 	)

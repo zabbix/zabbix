@@ -158,14 +158,30 @@ class CLldRulePrototypeHelper extends CItemGeneralHelper {
 	}
 
 	public static function convertFormInputForApi(array $input): array {
-		$input['filter'] = prepareLldFilter([
-			'evaltype' => $input['evaltype'],
-			'formula' => $input['formula'],
-			'conditions' => $input['conditions']
-		]);
+		$input['filter'] = prepareLldFilter($input['filter']);
 		$input['lld_macro_paths'] = prepareLldMacroPaths($input['lld_macro_paths']);
 		$input['overrides'] = prepareLldOverrides($input['overrides']);
 
 		return parent::convertFormInputForApi($input);
+	}
+
+	public static function normalizeFormData(array $input): array {
+		if (array_key_exists('conditions', $input)) {
+			$input['filter'] = [
+				'evaltype' => array_key_exists('evaltype', $input)
+					? $input['evaltype']
+					: DB::getDefault('items', 'evaltype'),
+				'formula' => array_key_exists('formula', $input)
+					? $input['formula']
+					: DB::getDefault('items', 'formula'),
+				'conditions' => array_key_exists('conditions', $input) ? $input['conditions'] : []
+			];
+		}
+
+		unset($input['evaltype']);
+		unset($input['formula']);
+		unset($input['conditions']);
+
+		return parent::normalizeFormData($input);
 	}
 }
