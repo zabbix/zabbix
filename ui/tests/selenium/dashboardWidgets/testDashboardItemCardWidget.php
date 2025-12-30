@@ -1975,14 +1975,17 @@ class testDashboardItemCardWidget extends testWidgets {
 			$table = $hint->query('class:list-table')->asTable()->one();
 
 			$this->assertEquals(['Severity', 'Name', 'Expression', 'Status'], $table->getHeadersText());
+			$this->assertEquals(count($data['Triggers']), $table->getRows()->count());
 
-			foreach ($data['Triggers'] as $i => $trigger) {
-				$row = $table->getRow($i);
+			// Workaround: PostgreSQL returns unsorted trigger list.
+			foreach ($data['Triggers'] as $trigger) {
+				$row = $table->findRow('Name', $trigger['Name']);
 
-				foreach (['Severity', 'Name', 'Expression', 'Status'] as $column) {
+				foreach (['Severity', 'Expression', 'Status'] as $column) {
 					$this->assertEquals($trigger[$column], $row->getColumn($column)->getText());
 				}
 			}
+
 			$hint->close();
 		}
 
