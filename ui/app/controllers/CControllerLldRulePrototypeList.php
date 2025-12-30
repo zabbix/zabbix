@@ -74,8 +74,8 @@ class CControllerLldRulePrototypeList extends CController {
 
 	private function getProfilePrefix () {
 		return $this->getInput('context') === 'host'
-			? 'web.hosts.lldrules.prototypes'
-			: 'web.templates.lldrules.prototypes';
+			? 'web.hosts.lldrules.prototypes.'
+			: 'web.templates.lldrules.prototypes.';
 	}
 
 	protected function doAction(): void {
