@@ -50,7 +50,7 @@ window.connector_edit_popup = new class {
 
 	#initEvents() {
 		for (const id of ['data_type', 'tags', 'authtype', 'max_records_mode', 'max_attempts']) {
-			document.getElementById(id).addEventListener('change', () => this.#updateForm());
+			document.getElementById(id).addEventListener('input', () => this.#updateForm());
 		}
 
 		this.footer.querySelector('.js-submit').addEventListener('click', () => this.#submit());
