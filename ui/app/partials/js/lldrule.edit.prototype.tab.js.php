@@ -117,6 +117,8 @@ var LldRuleEditPrototypeTab = class {
 			this.#container.dispatchEvent(new CustomEvent('update'))
 		);
 
+		this.#container.querySelector('.js-parseurl').addEventListener('click', (e) => this.#parseUrl(e.target));
+
 		new CViewSwitcher('authtype', 'change', this.#field_switches.for_authtype);
 		new CViewSwitcher('type', 'change', this.#field_switches.for_type);
 		new CViewSwitcher('http_authtype', 'change', this.#field_switches.for_http_auth_type);
@@ -176,5 +178,53 @@ var LldRuleEditPrototypeTab = class {
 		row.querySelector('[name$="[delay]"]').classList.toggle(ZBX_STYLE_DISPLAY_NONE, !flexible);
 		row.querySelector('[name$="[period]"]').classList.toggle(ZBX_STYLE_DISPLAY_NONE, !flexible);
 		row.querySelector('[name$="[schedule]"]').classList.toggle(ZBX_STYLE_DISPLAY_NONE, flexible);
+	}
+
+	#parseUrl(trigger_element) {
+		const field = this.#container.querySelector('[name="url"]');
+		const url = parseUrlString(field.value);
+
+		if (url === false) {
+			return this.#showErrorDialog(
+				<?= json_encode(_('Failed to parse URL.').BR().BR()._('URL is not properly encoded.')) ?>,
+				trigger_element
+			);
+		}
+
+		const has_pairs = url.pairs.length != 0;
+
+		if (has_pairs) {
+			const dynamic_rows = jQuery('#query-fields-table').data('dynamicRows');
+
+			dynamic_rows.addRows(url.pairs);
+			dynamic_rows.removeRows(row => [].filter.call(
+					row.querySelectorAll('[type="text"]'),
+					input => input.value === ''
+				).length == 2
+			);
+		}
+
+		field.value = url.url;
+
+		if (has_pairs) {
+			this.#container.dispatchEvent(new CustomEvent('update'));
+		}
+	}
+
+	#showErrorDialog(body, trigger_element) {
+		overlayDialogue({
+			title: <?= json_encode(_('Error')) ?>,
+			class: 'modal-popup',
+			content: jQuery('<span>').html(body),
+			buttons: [{
+				title: <?= json_encode(_('Ok')) ?>,
+				class: 'btn-alt',
+				focused: true,
+				action: function() {}
+			}]
+		}, {
+			position: Overlay.prototype.POSITION_CENTER,
+			trigger_element: jQuery(trigger_element)
+		});
 	}
 };

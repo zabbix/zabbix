@@ -86,9 +86,8 @@ $formgrid
 			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 			(new CSimpleButton(_('Parse')))
 				->addClass(ZBX_STYLE_BTN_GREY)
-				// TODO: check if can't be prettier
+				->addClass('js-parseurl')
 				->setAttribute('name', 'parseurl')
-				->setAttribute('error-message', _('Failed to parse URL.').BR().BR()._('URL is not properly encoded.'))
 				->setEnabled(!$readonly)
 		]))->setId('js-item-url-field')
 	])

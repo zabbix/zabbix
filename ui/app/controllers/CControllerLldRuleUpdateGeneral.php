@@ -78,8 +78,11 @@ abstract class CControllerLldRuleUpdateGeneral extends CController {
 			'url' => ['db items.url', 'required', 'not_empty', 'when' => ['type', 'in' => [ITEM_TYPE_HTTPAGENT]]],
 			'query_fields' => ['objects',
 				'fields' => [
-					'name' => ['string', 'required', 'not_empty', 'length' => 255],
 					'value' => ['string', 'length' => 255],
+					'name' => [
+						['string', 'length' => 255],
+						['string', 'required', 'not_empty', 'when' => ['value', 'not_empty']]
+					],
 					'sortorder' => ['integer']
 				],
 				'when' => ['type', 'in' => [ITEM_TYPE_HTTPAGENT]]
@@ -113,8 +116,11 @@ abstract class CControllerLldRuleUpdateGeneral extends CController {
 			]],
 			'headers' => ['objects',
 				'fields' => [
-					'name' => ['string', 'required', 'not_empty', 'length' => 255],
-					'value' => ['string', 'length' => 2000]
+					'value' => ['string', 'length' => 2000],
+					'name' => [
+						['string', 'length' => 255],
+						['string', 'required', 'not_empty', 'when' => ['value', 'not_empty']]
+					]
 				],
 				'when' => ['type', 'in' => [ITEM_TYPE_HTTPAGENT]]
 			],
