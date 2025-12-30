@@ -709,7 +709,7 @@ class testPageEventCorrelation extends CWebTest {
 				[
 					'link_button' => true,
 					'action' => 'Disable',
-					'name' => EVENT_WITH_SEVERAL_SPACES
+					'name' => self::EVENT_WITH_SEVERAL_SPACES
 				]
 			],
 			[
