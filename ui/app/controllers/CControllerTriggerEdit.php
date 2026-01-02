@@ -201,22 +201,20 @@ class CControllerTriggerEdit extends CController {
 			$data['tags'][] = ['tag' => '', 'value' => ''];
 		}
 		else {
-			usort($data['tags'], function($a, $b) {
-				$a_automatic = (int) array_key_exists('automatic', $a) ? $a['automatic'] : ZBX_TAG_MANUAL;
-				$b_automatic = (int) array_key_exists('automatic', $b) ? $b['automatic'] : ZBX_TAG_MANUAL;
+			$automatic_tags = [];
 
-				if ($a_automatic != $b_automatic) {
-					return $b_automatic <=> $a_automatic;
+			foreach ($data['tags'] as $key => $tag) {
+				if (array_key_exists('automatic', $tag) && $tag['automatic'] == 1) {
+					$automatic_tags[] = $tag;
+
+					unset($data['tags'][$key]);
 				}
+			}
 
-				if ($a['tag'] != $b['tag']) {
-					return $a['tag'] <=> $b['tag'];
-				}
+			CArrayHelper::sort($automatic_tags, ['tag', 'value']);
+			CArrayHelper::sort($data['tags'], ['tag', 'value']);
 
-				return $a['value'] <=> $b['value'];
-			});
-
-			$data['tags'] = array_values($data['tags']);
+			$data['tags'] = array_values(array_merge($automatic_tags, $data['tags']));
 		}
 
 		$data['expr_temp'] = $data['expression'];
