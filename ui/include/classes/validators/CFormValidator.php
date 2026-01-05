@@ -990,13 +990,13 @@ class CFormValidator {
 			return false;
 		}
 
-		if (array_key_exists('min', $rules) && bccomp($value, $rules['min']) == -1) {
+		if (array_key_exists('min', $rules) && $value < $rules['min']) {
 			$error = self::getMessage($rules, 'min', _s('This value must be no less than "%1$s".', $rules['min']));
 
 			return false;
 		}
 
-		if (array_key_exists('max', $rules) && bccomp($value, $rules['max']) == 1) {
+		if (array_key_exists('max', $rules) && $rules['max'] < $value) {
 			$error = self::getMessage($rules, 'max', _s('This value must be no greater than "%1$s".', $rules['max']));
 
 			return false;
