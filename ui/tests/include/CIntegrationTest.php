@@ -258,6 +258,22 @@ class CIntegrationTest extends CAPITest {
 	public function onAfterTestCase() {
 		$components = array_merge(self::$suite_components, $this->case_components);
 
+		$expectedDiagInfoLogEntries = [
+			'diaginfo=valuecache' => '== value cache diagnostic information ==',
+			'diaginfo=lld' => '== LLD diagnostic information ==',
+			'diaginfo=historycache' => '== history cache diagnostic information ==',
+			'diaginfo=preprocessing' => '== preprocessing diagnostic information ==',
+			'diaginfo=locks' => '== locks diagnostic information ==',
+			'diaginfo=alerting' => '== alerting diagnostic information ==',
+			'diaginfo=connector' => '== connector diagnostic information =='
+		];
+		foreach ($expectedDiagInfoLogEntries as $cmd => $e) {
+			$this->executeRuntimeControlCommand(self::COMPONENT_SERVER, $cmd);
+			$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, $e, true, 20, 3);
+		}
+
+
+
 		foreach ($components as $component) {
 			self::stopComponent($component);
 		}
@@ -291,20 +307,6 @@ class CIntegrationTest extends CAPITest {
 	 * @afterClass
 	 */
 	public static function onAfterTestSuite() {
-		$expectedDiagInfoLogEntries = [
-			'diaginfo=valuecache' => '== value cache diagnostic information ==',
-			'diaginfo=lld' => '== LLD diagnostic information ==',
-			'diaginfo=historycache' => '== history cache diagnostic information ==',
-			'diaginfo=preprocessing' => '== preprocessing diagnostic information ==',
-			'diaginfo=locks' => '== locks diagnostic information ==',
-			'diaginfo=alerting' => '== alerting diagnostic information ==',
-			'diaginfo=connector' => '== connector diagnostic information =='
-		];
-		foreach ($expectedDiagInfoLogEntries as $cmd => $e) {
-			self::executeRuntimeControlCommand2(self::COMPONENT_SERVER, $cmd);
-			self::waitForLogLineToBePresent(self::COMPONENT_SERVER, $e, true, 20, 3);
-		}
-
 		foreach (self::$suite_components as $component) {
 			self::stopComponent($component);
 		}
