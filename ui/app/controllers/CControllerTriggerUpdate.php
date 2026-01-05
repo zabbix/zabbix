@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -61,7 +61,10 @@ class CControllerTriggerUpdate extends CController {
 				'messages' => ['uniq' => _('Tag name and value combination is not unique.')],
 				'fields' => [
 					'value' => ['db trigger_tag.value'],
-					'tag' => ['db trigger_tag.tag', 'required', 'not_empty', 'when' => ['value', 'not_empty']]
+					'tag' => [
+						['db trigger_tag.tag'],
+						['db trigger_tag.tag', 'required', 'not_empty', 'when' => ['value', 'not_empty']]
+					]
 				]
 			],
 			'dependencies' => ['array', 'field' => ['db triggers.triggerid']],

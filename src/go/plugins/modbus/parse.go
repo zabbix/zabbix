@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -22,6 +22,8 @@ import (
 	"runtime"
 	"strconv"
 	"strings"
+
+	"golang.zabbix.com/sdk/errs"
 )
 
 // main parsing
@@ -116,18 +118,18 @@ func getSerial(v string) (addr *Serial, err error) {
 	val = val[inx+1:]
 	if inx = strings.Index(val, ":"); inx < 0 {
 		if speed, err = strconv.ParseUint(val, 10, 32); err != nil {
-			return &a, fmt.Errorf("Unsupported speed value: %w", err)
+			return &a, fmt.Errorf("unsupported speed value: %w", err)
 		}
 		a.Speed = uint32(speed)
 		return &a, nil
 	} else if speed, err = strconv.ParseUint(val[:inx], 10, 32); err != nil {
-		return nil, fmt.Errorf("Unsupported speed value: %w", err)
+		return nil, fmt.Errorf("unsupported speed value: %w", err)
 	}
 	a.Speed = uint32(speed)
 
 	val = val[inx+1:]
 	if len(val) != 3 {
-		return nil, fmt.Errorf("Unsupported params format of serial line")
+		return nil, errs.New("unsupported params format of serial line")
 	}
 
 	switch val[0] {
@@ -140,7 +142,7 @@ func getSerial(v string) (addr *Serial, err error) {
 	case '8':
 		a.DataBits = 8
 	default:
-		return nil, fmt.Errorf("Unsupported data bits value of serial line:" + val[:1])
+		return nil, errs.Errorf("unsupported data bits value of serial line:%s", val[:1])
 	}
 
 	switch val[1] {
@@ -151,7 +153,7 @@ func getSerial(v string) (addr *Serial, err error) {
 	case 'o':
 		a.Parity = "O"
 	default:
-		return nil, fmt.Errorf("Unsupported parity value of serial line:" + val[1:2])
+		return nil, errs.Errorf("unsupported parity value of serial line:%s", val[1:2])
 	}
 
 	switch val[2] {
@@ -160,7 +162,7 @@ func getSerial(v string) (addr *Serial, err error) {
 	case '2':
 		a.StopBit = 2
 	default:
-		return nil, fmt.Errorf("Unsupported stop bit value of serial line:" + val[2:])
+		return nil, errs.Errorf("Unsupported stop bit value of serial line:%s", val[2:])
 	}
 
 	return &a, nil

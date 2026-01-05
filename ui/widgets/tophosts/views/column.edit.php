@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -299,8 +299,20 @@ $time_period_field_view = (new CWidgetFieldTimePeriodView($data['time_period_fie
 $advanced_configuration_fieldset = (new CFormFieldsetCollapsible(_('Advanced configuration')))
 	->setId('advanced-configuration')
 	->addItem([
+		(new CLabel(_('History data'), 'history'))->addClass('js-history-row'),
+		(new CFormField(
+			(new CRadioButtonList('history', (int) $data['history']))
+				->addValue(_('Auto'), CWidgetFieldColumnsList::HISTORY_DATA_AUTO)
+				->addValue(_('History'), CWidgetFieldColumnsList::HISTORY_DATA_HISTORY)
+				->addValue(_('Trends'), CWidgetFieldColumnsList::HISTORY_DATA_TRENDS)
+				->setModern()
+		))->addClass('js-history-row')
+	]);
+
+$advanced_configuration_fieldset
+	->addItem([
 		new CLabel(_('Aggregation function'), 'column_aggregate_function'),
-		new CFormField(
+		new CFormField([
 			(new CSelect('aggregate_function'))
 				->setId('aggregate_function')
 				->setValue($data['aggregate_function'])
@@ -314,8 +326,10 @@ $advanced_configuration_fieldset = (new CFormFieldsetCollapsible(_('Advanced con
 					AGGREGATE_FIRST => CItemHelper::getAggregateFunctionName(AGGREGATE_FIRST),
 					AGGREGATE_LAST => CItemHelper::getAggregateFunctionName(AGGREGATE_LAST)
 				]))
-				->setFocusableElementId('column_aggregate_function')
-		)
+				->setFocusableElementId('column_aggregate_function'),
+			(makeWarningIcon(_('Aggregation function does not affect the sparkline.')))
+				->addClass('js-aggregate-function-warning')
+		])
 	]);
 
 foreach ($time_period_field_view->getViewCollection() as ['label' => $label, 'view' => $view, 'class' => $class]) {
@@ -324,18 +338,6 @@ foreach ($time_period_field_view->getViewCollection() as ['label' => $label, 'vi
 		(new CFormField($view))->addClass($class)
 	]);
 }
-
-$advanced_configuration_fieldset
-	->addItem([
-		(new CLabel(_('History data'), 'history'))->addClass('js-history-row'),
-		(new CFormField(
-			(new CRadioButtonList('history', (int) $data['history']))
-				->addValue(_('Auto'), CWidgetFieldColumnsList::HISTORY_DATA_AUTO)
-				->addValue(_('History'), CWidgetFieldColumnsList::HISTORY_DATA_HISTORY)
-				->addValue(_('Trends'), CWidgetFieldColumnsList::HISTORY_DATA_TRENDS)
-				->setModern()
-		))->addClass('js-history-row')
-	]);
 
 $form_grid
 	->addItem($advanced_configuration_fieldset)

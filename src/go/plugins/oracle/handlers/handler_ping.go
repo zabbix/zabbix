@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -19,6 +19,7 @@ import (
 	"fmt"
 
 	"golang.zabbix.com/agent2/plugins/oracle/dbconn"
+	"golang.zabbix.com/sdk/log"
 )
 
 const (
@@ -34,13 +35,23 @@ func PingHandler(ctx context.Context, conn dbconn.OraClient, _ map[string]string
 
 	row, err := conn.QueryRow(ctx, fmt.Sprintf("SELECT %d FROM DUAL", PingOk))
 	if err != nil {
-		return PingFailed, nil //nolint:nilerr
+		log.Errf("[Oracle] PingHandler failed: %v\n", err.Error())
+
+		return PingFailed, nil
 	}
 
 	err = row.Scan(&res)
 
-	if err != nil || res != PingOk {
-		return PingFailed, nil //nolint:nilerr
+	if err != nil {
+		log.Errf("[Oracle] PingHandler failed: %v\n", err.Error())
+
+		return PingFailed, nil
+	}
+
+	if res != PingOk {
+		log.Errf("[Oracle] PingHandler failed\n")
+
+		return PingFailed, nil
 	}
 
 	return PingOk, nil

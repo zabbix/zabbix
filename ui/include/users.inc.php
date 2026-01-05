@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -72,46 +72,6 @@ function user_auth_type2str($authType) {
 	];
 
 	return isset($authUserType[$authType]) ? $authUserType[$authType] : _('Unknown');
-}
-
-/**
- * Get users ids by groups ids.
- *
- * @param array $userGroupIds
- *
- * @return array
- */
-function get_userid_by_usrgrpid($userGroupIds) {
-	zbx_value2array($userGroupIds);
-
-	$userIds = [];
-
-	$dbUsers = DBselect(
-		'SELECT DISTINCT u.userid'.
-		' FROM users u,users_groups ug'.
-		' WHERE u.userid=ug.userid'.
-			' AND '.dbConditionInt('ug.usrgrpid', $userGroupIds)
-	);
-	while ($user = DBFetch($dbUsers)) {
-		$userIds[$user['userid']] = $user['userid'];
-	}
-
-	return $userIds;
-}
-
-/**
- * Check if group has permissions for update.
- *
- * @param array $userGroupIds
- *
- * @return bool
- */
-function granted2update_group($userGroupIds) {
-	zbx_value2array($userGroupIds);
-
-	$users = get_userid_by_usrgrpid($userGroupIds);
-
-	return !isset($users[CWebUser::$data['userid']]);
 }
 
 /**
