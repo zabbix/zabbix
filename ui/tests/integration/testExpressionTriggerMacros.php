@@ -342,7 +342,7 @@ class testExpressionTriggerMacros extends CIntegrationTest {
 			'diaginfo=lld' => '== LLD diagnostic information ==',
 			'diaginfo=historycache' => '== history cache diagnostic information ==',
 			'diaginfo=preprocessing' => '== preprocessing diagnostic information ==',
-			'diaginfo=locks' => '==== locks diagnostic information ==',
+			'diaginfo=locks' => '== locks diagnostic information ==',
 			'diaginfo=alerting' => '== alerting diagnostic information ==',
 			'diaginfo=connector' => '== connector diagnostic information =='
 		];
