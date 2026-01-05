@@ -29,11 +29,23 @@ import (
 
 const parserLogMessage = "[File Parser]"
 
-var allowedPrefixes = []string{"/proc", "/dev", "/tmp"} //nolint:gochecknoglobals // used as a constant check slice.
+// minimal possible set of allowed paths, add, whenever need to add new path to some parsing.
+//
+//nolint:gochecknoglobals // used as a constant check slice.
+var allowedPrefixes = []string{
+	// Specific /proc
+	"/proc/net/",
+	"/proc/sys/",
+	"/proc/stat",
+	// need to think how to implement /proc/[PID], most likely with sub-allowlist.
+
+	"/tmp/",
+}
 
 // Parser holds the configuration for the file parsing process.
 type Parser struct {
 	maxMatches          int
+	validatePath        bool
 	scanStrategy        ScanStrategy
 	matchMode           MatchMode
 	splitIndex          int
@@ -48,33 +60,27 @@ func NewParser() *Parser {
 	return &Parser{
 		matchMode:    ModeContains,
 		scanStrategy: StrategyOSReadFile,
+		validatePath: true,
 	}
 }
 
 // Parse opens the file at path and returns content string lines that match set rules.
 func (p *Parser) Parse(path string) ([]string, error) {
 	var (
-		cleanPath     = filepath.Clean(path)
-		isValidPrefix = false
+		cleanPath = path
+		err       error
 	)
 
-	for _, prefix := range allowedPrefixes {
-		if strings.HasPrefix(cleanPath, prefix) {
-			isValidPrefix = true
-
-			break
+	if p.validatePath {
+		cleanPath, err = validateAndCleanPath(path)
+		if err != nil {
+			return nil, err
 		}
-	}
-
-	if !isValidPrefix {
-		return nil, errs.Errorf("path %s is not allowed", path)
 	}
 
 	var reg *regexp.Regexp
 
 	if p.matchMode == ModeRegex {
-		var err error
-
 		reg, err = regexp.Compile(p.pattern)
 		if err != nil {
 			return nil, errs.Wrapf(err, "failed to compile regex pattern %s", p.pattern)
@@ -90,6 +96,46 @@ func (p *Parser) Parse(path string) ([]string, error) {
 	default:
 		return nil, errs.Errorf("unknown scan strategy: %d", p.scanStrategy)
 	}
+}
+
+func validateAndCleanPath(path string) (string, error) {
+	var (
+		cleanPath     string
+		canonicalPath string
+		err           error
+	)
+
+	cleanPath = filepath.Clean(path)
+
+	canonicalPath, err = filepath.EvalSymlinks(cleanPath)
+	if err != nil {
+		log.Warningf("%s failed to resolve symlinks for path %s: %s", parserLogMessage, path, err)
+
+		return "", errs.Wrapf(err, "failed to resolve path")
+	}
+
+	canonicalPath, err = filepath.Abs(canonicalPath)
+	if err != nil {
+		return "", errs.Wrapf(err, "failed to get absolute path")
+	}
+
+	if !isAllowedPath(canonicalPath) {
+		log.Debugf("%s attempted access to non-allowed path: %s", parserLogMessage, canonicalPath)
+
+		return "", errs.Errorf("path not in allowed list: %s", path)
+	}
+
+	return canonicalPath, nil
+}
+
+func isAllowedPath(path string) bool {
+	for _, prefix := range allowedPrefixes {
+		if strings.HasPrefix(path, prefix) {
+			return true
+		}
+	}
+
+	return false
 }
 
 // reads all file into memory.

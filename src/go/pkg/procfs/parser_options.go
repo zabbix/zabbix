@@ -93,3 +93,10 @@ func (p *Parser) SetSplitter(separator string, index int) *Parser {
 
 	return p
 }
+
+// SetValidatePath sets if the given path at parse will be validated or not. True by default.
+func (p *Parser) SetValidatePath(validate bool) *Parser {
+	p.validatePath = validate
+
+	return p
+}
