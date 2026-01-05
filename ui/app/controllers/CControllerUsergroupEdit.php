@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -144,7 +144,11 @@ class CControllerUsergroupEdit extends CController {
 
 		$data['tag_filters_badges'] = CTagHelper::getTagsHtml($tag_filters_badges, ZBX_TAG_OBJECT_HOST_GROUP);
 		$data['users_ms'] = $this->getUsersMs();
-		$data['can_update_group'] = (!$this->hasInput('usrgrpid') || granted2update_group($this->getInput('usrgrpid')));
+		$data['can_update_group'] = !$this->hasInput('usrgrpid') || !API::User()->get([
+			'output' => [],
+			'usrgrpids' => $this->getInput('usrgrpid'),
+			'userids' => CWebUser::$data['userid']
+		]);
 
 		if ($data['can_update_group']) {
 			$userdirectories = API::UserDirectory()->get([

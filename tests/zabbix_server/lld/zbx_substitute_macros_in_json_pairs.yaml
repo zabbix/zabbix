@@ -1,0 +1,118 @@
+test case: simple substitution
+in:
+  lld: '{"b1":"[]", "b2":"()"}'
+  data: |
+    [
+      { "{#B1}": "{#B1}" },
+      { "{#B2}": "{#B2}" }
+    ]
+  macros:
+    - { macro: '{#B1}', path: $.b1 }
+    - { macro: '{#B2}', path: $.b2 }
+out:
+  data: '[{"[]":"[]"},{"()":"()"}]'
+  return: SUCCEED
+---
+test case: numbers
+in:
+  lld: '{"id":123, "name":"disk1"}'
+  data: |
+    [
+      { "{#ID}": "{#NAME}" }
+    ]
+  macros:
+    - { macro: '{#ID}', path: $.id }
+    - { macro: '{#NAME}', path: $.name }
+out:
+  data: '[{"123":"disk1"}]'
+  return: SUCCEED
+---
+test case: no substitution needed
+in:
+  lld: '{"unused":"test"}'
+  data: |
+    [
+      { "iface": "eth0" }
+    ]
+  macros:
+    - { macro: '{#NAME}', path: $.unused }
+out:
+  data: '[{"iface":"eth0"}]'
+  return: SUCCEED
+---
+test case: multiple objects
+in:
+  lld: '{"name":"eth0","ip":"192.168.0.1"}'
+  data: |
+    [
+      { "iface": "{#NAME}" },
+      { "addr": "{#IP}" }
+    ]
+  macros:
+    - { macro: '{#NAME}', path: $.name }
+    - { macro: '{#IP}', path: $.ip }
+out:
+  data: '[{"iface":"eth0"},{"addr":"192.168.0.1"}]'
+  return: SUCCEED
+---
+test case: nested macro substitution
+in:
+  lld: '{"interface":{"name":"eth0"}}'
+  data: |
+    [
+      { "iface": "{#IFNAME}" }
+    ]
+  macros:
+    - { macro: '{#IFNAME}', path: $.interface.name }
+out:
+  data: '[{"iface":"eth0"}]'
+  return: SUCCEED
+---
+test case: macro in key and value
+in:
+  lld: '{"id":"abc123"}'
+  data: |
+    [
+      { "{#ID}": "{#ID}" }
+    ]
+  macros:
+    - { macro: '{#ID}', path: $.id }
+out:
+  data: '[{"abc123":"abc123"}]'
+  return: SUCCEED
+---
+test case: data empty line
+in:
+  lld: '{"id":"abc123"}'
+  data: ""
+  macros:
+    - { macro: '{#ID}', path: $.id }
+out:
+  data: ''
+  return: SUCCEED
+---
+test case: macro in key and value all printable ASCII characters
+in:
+  lld: '{"id":"(#$%&()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[]^_`abcdefghijklmnopqrstuvwxyz|~"}'
+  data: |
+    [
+      { "{#ID}": "{#ID}" }
+    ]
+  macros:
+    - { macro: '{#ID}', path: $.id }
+out:
+  data: '[{"(#$%&()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[]^_`abcdefghijklmnopqrstuvwxyz|~":"(#$%&()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[]^_`abcdefghijklmnopqrstuvwxyz|~"}]'
+  return: SUCCEED
+---
+test case: macro in key and value emojis
+in:
+  lld: '{"id":"😀😃😄😁😆😅😂🤣😊😇🙂🙃😉😌😍🥰😘😗😙😚😋😛😝😜🤪🤨🧐🤓😎🥳🤠🤡🤥🤫🤭🧐🤓😎🥳🤠🤡🤥🤫🤭"}'
+  data: |
+    [
+      { "{#ID}": "{#ID}" }
+    ]
+  macros:
+    - { macro: '{#ID}', path: $.id }
+out:
+  data: '[{"😀😃😄😁😆😅😂🤣😊😇🙂🙃😉😌😍🥰😘😗😙😚😋😛😝😜🤪🤨🧐🤓😎🥳🤠🤡🤥🤫🤭🧐🤓😎🥳🤠🤡🤥🤫🤭":"😀😃😄😁😆😅😂🤣😊😇🙂🙃😉😌😍🥰😘😗😙😚😋😛😝😜🤪🤨🧐🤓😎🥳🤠🤡🤥🤫🤭🧐🤓😎🥳🤠🤡🤥🤫🤭"}]'
+  return: SUCCEED

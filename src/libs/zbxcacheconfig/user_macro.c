@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -1082,7 +1082,7 @@ void	um_cache_resolve_const(const zbx_um_cache_t *cache, const zbx_uint64_t *hos
 	if (NULL != um_macro)
 	{
 		if (ZBX_MACRO_ENV_NONSECURE == env && ZBX_MACRO_VALUE_TEXT != um_macro->type)
-			*value = ZBX_MACRO_SECRET_MASK;
+			*value = ZBX_SECRET_MASK;
 		else
 			*value = (NULL != um_macro->value ? um_macro->value : ZBX_MACRO_NO_KVS_VALUE);
 	}
@@ -1115,7 +1115,7 @@ void	um_cache_resolve(const zbx_um_cache_t *cache, const zbx_uint64_t *hostids, 
 	if (NULL != um_macro)
 	{
 		if (ZBX_MACRO_ENV_NONSECURE == env && ZBX_MACRO_VALUE_TEXT != um_macro->type)
-			*value = zbx_strdup(*value, ZBX_MACRO_SECRET_MASK);
+			*value = zbx_strdup(*value, ZBX_SECRET_MASK);
 		else
 			*value = zbx_strdup(NULL, (NULL != um_macro->value ? um_macro->value : ZBX_MACRO_NO_KVS_VALUE));
 	}
@@ -1129,7 +1129,7 @@ void	um_cache_resolve(const zbx_um_cache_t *cache, const zbx_uint64_t *hostids, 
 			if (ZBX_MACRO_VALUE_TEXT == um_macro->type)
 				out = um_macro->value;
 			else
-				out = (NULL != um_macro->value ? ZBX_MACRO_SECRET_MASK : ZBX_MACRO_NO_KVS_VALUE);
+				out = (NULL != um_macro->value ? ZBX_SECRET_MASK : ZBX_MACRO_NO_KVS_VALUE);
 		}
 
 		zabbix_log(LOG_LEVEL_DEBUG, "End of %s(): %s", __func__, ZBX_NULL2EMPTY_STR(out));
@@ -1236,7 +1236,7 @@ void	um_cache_dump(zbx_um_cache_t *cache)
 			{
 				case ZBX_MACRO_VALUE_SECRET:
 				case ZBX_MACRO_VALUE_VAULT:
-					value = ZBX_MACRO_SECRET_MASK;
+					value = ZBX_SECRET_MASK;
 					break;
 				default:
 					value = macro->value;

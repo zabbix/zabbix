@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -676,9 +676,8 @@ class testFormHost extends CWebTest {
 					]
 				]
 			],
-			// TODO: uncomment test cases once issue ZBX-26932 is resolved
 			// #20 Empty proxy multiselect.
-/*			[
+			[
 				[
 					'expected' => TEST_BAD,
 					'host_fields' => [
@@ -706,7 +705,7 @@ class testFormHost extends CWebTest {
 						'xpath:.//div[@id="proxy_groupid"]/..' => 'This field cannot be empty.'
 					]
 				]
-			],*/
+			],
 			// #22 Too high value in Max repetition count.
 			[
 				[
@@ -1396,9 +1395,8 @@ class testFormHost extends CWebTest {
 						'Max repetition count' => 'This value is not a valid integer.'
 					]
 				]
-			]
-			// TODO: uncomment test cases once issue ZBX-26932 is resolved
-/*			// #22 Empty proxy.
+			],
+			// #22 Empty proxy.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1425,7 +1423,7 @@ class testFormHost extends CWebTest {
 						'xpath:.//div[@id="proxy_groupid"]/..' => 'This field cannot be empty.'
 					]
 				]
-			]*/
+			]
 		];
 	}
 

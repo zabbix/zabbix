@@ -1,6 +1,6 @@
 <?php declare(strict_types=0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -157,18 +157,13 @@ class CControllerItemPrototypeCreate extends CControllerItemPrototype {
 				], 'when' => ['type', 'in' => [ITEM_TYPE_HTTPAGENT]]
 			],
 			'posts' => [
+				['db items.posts'],
 				['db items.posts', 'required', 'not_empty',
-					'when' => ['post_type', 'in' => [ZBX_POSTTYPE_XML]],
-					'use' => [CXmlValidator::class, []]
-				],
-				['db items.posts', 'required', 'not_empty',
-					'when' => ['post_type', 'in' => [ZBX_POSTTYPE_JSON]],
-					'use' => [CJsonValidator::class, ['macros_n' => CItemTypeHttpAgent::POSTS_JSON_MACROS_N, 'usermacros' => true, 'lldmacros' => true]]
-				],
-				['db items.posts', 'required', 'not_empty', 'when' => [
-					['post_type', 'in' => [ZBX_POSTTYPE_JSON, ZBX_POSTTYPE_XML]],
-					['type', 'in' => [ITEM_TYPE_HTTPAGENT]]
-				]]
+					'when' => [
+						['post_type', 'in' => [ZBX_POSTTYPE_JSON, ZBX_POSTTYPE_XML]],
+						['type', 'in' => [ITEM_TYPE_HTTPAGENT]]
+					]
+				]
 			],
 			'headers' => ['objects',
 				'fields' => [
@@ -357,7 +352,10 @@ class CControllerItemPrototypeCreate extends CControllerItemPrototype {
 				'messages' => ['uniq' => _('Tag name and value combination is not unique.')],
 				'fields' => [
 					'value' => ['db item_tag.value'],
-					'tag' => ['db item_tag.tag', 'required', 'not_empty', 'when' => ['value', 'not_empty']]
+					'tag' => [
+						['db item_tag.tag'],
+						['db item_tag.tag', 'required', 'not_empty', 'when' => ['value', 'not_empty']]
+					]
 				]
 			],
 			'discover' => ['db items.discover', 'in' => [ZBX_PROTOTYPE_DISCOVER, ZBX_PROTOTYPE_NO_DISCOVER]],

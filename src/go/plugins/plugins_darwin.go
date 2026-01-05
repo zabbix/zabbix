@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -25,6 +25,7 @@ import (
 	_ "golang.zabbix.com/agent2/plugins/oracle"
 	_ "golang.zabbix.com/agent2/plugins/redis"
 	_ "golang.zabbix.com/agent2/plugins/smart"
+	_ "golang.zabbix.com/agent2/plugins/system/localtime"
 	_ "golang.zabbix.com/agent2/plugins/system/sw"
 	_ "golang.zabbix.com/agent2/plugins/system/users"
 	_ "golang.zabbix.com/agent2/plugins/systemrun"

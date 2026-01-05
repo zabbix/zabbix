@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -569,5 +569,7 @@ void	lld_rule_overrides_make(zbx_vector_lld_item_full_ptr_t *items, char **info)
 int	lld_rule_filters_save(zbx_uint64_t hostid, zbx_vector_lld_item_full_ptr_t *items, int *host_locked);
 int	lld_items_overrides_save(zbx_uint64_t hostid, zbx_vector_lld_item_full_ptr_t *items, int *host_locked);
 int	lld_rule_macro_paths_save(zbx_uint64_t hostid, zbx_vector_lld_item_full_ptr_t *items, int *host_locked);
+
+int	lld_text_has_lld_macro(const char *text);
 
 #endif

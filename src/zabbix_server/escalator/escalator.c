@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -2308,7 +2308,7 @@ static int	check_escalation_trigger(zbx_uint64_t triggerid, unsigned char source
 			zbx_vector_uint64_append(&itemids, functions[i].itemid);
 	}
 
-	zbx_dc_config_clean_functions(functions, errcodes, (size_t)functionids.values_num);
+	zbx_dc_config_clean_functions(functions, (size_t)functionids.values_num);
 	zbx_free(functions);
 
 	zbx_vector_uint64_sort(&itemids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);

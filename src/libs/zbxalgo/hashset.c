@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -321,7 +321,7 @@ void	zbx_hashset_remove(zbx_hashset_t *hs, const void *data)
  *          by zbx_hashset_insert[_ext]() and zbx_hashset_search() functions  *
  *                                                                            *
  ******************************************************************************/
-void	zbx_hashset_remove_direct(zbx_hashset_t *hs, void *data)
+void	zbx_hashset_remove_direct(zbx_hashset_t *hs, const void *data)
 {
 	int			slot;
 	ZBX_HASHSET_ENTRY_T	*data_entry, *iter_entry;

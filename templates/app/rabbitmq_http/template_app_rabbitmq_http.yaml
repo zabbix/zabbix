@@ -57,7 +57,7 @@ zabbix_export:
         4. Set the user name and password in the host wizard configuration fields `Username` and `Password`.
       vendor:
         name: Zabbix
-        version: 8.0-1
+        version: 8.0-2
       groups:
         - name: Templates/Applications
       items:
@@ -908,7 +908,7 @@ zabbix_export:
               preprocessing:
                 - type: REGEX
                   parameters:
-                    - HTTP\/1\.1\b\s(\d+)
+                    - 'HTTP\/[\d.]+\s+(\d{3})'
                     - \1
                 - type: JAVASCRIPT
                   parameters:
@@ -1159,7 +1159,7 @@ zabbix_export:
         4. Set the user name and password in the host wizard configuration fields `Username` and `Password`.
       vendor:
         name: Zabbix
-        version: 8.0-1
+        version: 8.0-2
       groups:
         - name: Templates/Applications
       items:
@@ -1654,7 +1654,7 @@ zabbix_export:
               preprocessing:
                 - type: REGEX
                   parameters:
-                    - HTTP\/1\.1\b\s(\d+)
+                    - 'HTTP\/[\d.]+\s+(\d{3})'
                     - \1
                 - type: JAVASCRIPT
                   parameters:
@@ -1699,7 +1699,7 @@ zabbix_export:
               preprocessing:
                 - type: REGEX
                   parameters:
-                    - HTTP\/1\.1\b\s(\d+)
+                    - 'HTTP\/[\d.]+\s+(\d{3})'
                     - \1
                 - type: JAVASCRIPT
                   parameters:
@@ -1745,7 +1745,7 @@ zabbix_export:
               preprocessing:
                 - type: REGEX
                   parameters:
-                    - HTTP\/1\.1\b\s(\d+)
+                    - 'HTTP\/[\d.]+\s+(\d{3})'
                     - \1
                 - type: JAVASCRIPT
                   parameters:
@@ -1791,7 +1791,7 @@ zabbix_export:
               preprocessing:
                 - type: REGEX
                   parameters:
-                    - HTTP\/1\.1\b\s(\d+)
+                    - 'HTTP\/[\d.]+\s+(\d{3})'
                     - \1
                 - type: JAVASCRIPT
                   parameters:
@@ -1836,7 +1836,7 @@ zabbix_export:
               preprocessing:
                 - type: REGEX
                   parameters:
-                    - HTTP\/1\.1\b\s(\d+)
+                    - 'HTTP\/[\d.]+\s+(\d{3})'
                     - \1
                 - type: JAVASCRIPT
                   parameters:

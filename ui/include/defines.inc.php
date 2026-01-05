@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -17,7 +17,7 @@ define('ZABBIX_VERSION',		'8.0.0alpha2');
 define('ZABBIX_API_VERSION',	'8.0.0');
 define('ZABBIX_EXPORT_VERSION',	'8.0');
 
-define('ZABBIX_DB_VERSION',		7050018);
+define('ZABBIX_DB_VERSION',		7050027);
 
 define('DB_VERSION_SUPPORTED',						0);
 define('DB_VERSION_LOWER_THAN_MINIMUM',				1);
@@ -29,7 +29,7 @@ define('DB_VERSION_HIGHER_THAN_MAXIMUM_ERROR',		6);
 define('DB_VERSION_HIGHER_THAN_MAXIMUM_WARNING',	7);
 
 define('ZABBIX_COPYRIGHT_FROM',	'2001');
-define('ZABBIX_COPYRIGHT_TO',	'2025');
+define('ZABBIX_COPYRIGHT_TO',	'2026');
 
 define('ZBX_DOCUMENTATION_URL', 'https://www.zabbix.com/documentation');
 
@@ -1659,8 +1659,6 @@ define('API_COLORS',				57);
 define('API_FILTER',				58);
 define('API_ITEM_KEY',				62);
 define('API_ITEM_DELAY',			63);
-define('API_JSON',					64);
-define('API_XML',					65);
 define('API_PREPROC_PARAMS',		66);
 define('API_PROMETHEUS_PATTERN',	67);
 define('API_PROMETHEUS_LABEL',		68);

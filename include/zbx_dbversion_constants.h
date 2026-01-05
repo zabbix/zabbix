@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -25,8 +25,8 @@
 #define ZBX_MYSQL_MIN_VERSION_STR				"8.00.42"
 #define ZBX_MYSQL_MIN_SUPPORTED_VERSION				80400
 #define ZBX_MYSQL_MIN_SUPPORTED_VERSION_STR			"8.04.00"
-#define ZBX_MYSQL_MAX_VERSION					90099
-#define ZBX_MYSQL_MAX_VERSION_STR				"9.00.x"
+#define ZBX_MYSQL_MAX_VERSION					90599
+#define ZBX_MYSQL_MAX_VERSION_STR				"9.05.x"
 
 #define ZBX_MARIADB_MIN_VERSION					100500
 #define ZBX_MARIADB_MIN_VERSION_STR				"10.05.00"
@@ -51,8 +51,8 @@
 #define ZBX_TIMESCALE_MIN_VERSION_STR				"2.0.1"
 #define ZBX_TIMESCALE_MIN_SUPPORTED_VERSION 			22000
 #define ZBX_TIMESCALE_MIN_SUPPORTED_VERSION_STR 		"2.20.0"
-#define ZBX_TIMESCALE_MAX_VERSION				22299
-#define ZBX_TIMESCALE_MAX_VERSION_STR				"2.22"
+#define ZBX_TIMESCALE_MAX_VERSION				22499
+#define ZBX_TIMESCALE_MAX_VERSION_STR				"2.24"
 #define ZBX_TIMESCALE_LICENSE_APACHE_STR			"TimescaleDB Apache 2 Edition"
 #define ZBX_TIMESCALE_LICENSE_COMMUNITY				"timescale"
 #define ZBX_TIMESCALE_LICENSE_COMMUNITY_STR			"TimescaleDB Community Edition"
