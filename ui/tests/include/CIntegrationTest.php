@@ -301,8 +301,8 @@ class CIntegrationTest extends CAPITest {
 			'diaginfo=connector' => '== connector diagnostic information =='
 		];
 		foreach ($expectedDiagInfoLogEntries as $cmd => $e) {
-			$this->executeRuntimeControlCommand(self::COMPONENT_SERVER, $cmd);
-			$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, $e, true, 20, 3);
+			self::executeRuntimeControlCommand(self::COMPONENT_SERVER, $cmd);
+			self::waitForLogLineToBePresent(self::COMPONENT_SERVER, $e, true, 20, 3);
 		}
 
 		foreach (self::$suite_components as $component) {
