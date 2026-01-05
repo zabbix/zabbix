@@ -4,8 +4,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2025-10-08 09:22+0000\n"
-"Last-Translator: Tomáš Skočdopole <tomas.skocdopole@initmax.cz>\n"
+"PO-Revision-Date: 2025-12-03 10:08+0000\n"
+"Last-Translator: Tomáš Heřmánek <tomas.hermanek@initmax.cz>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: cs\n"
 "MIME-Version: 1.0\n"
@@ -319,19 +319,19 @@ msgstr "%1$s: %2$s"
 #: include/classes/setup/CSetupWizard.php:1459
 #, c-format
 msgid "%1$s: %2$s."
-msgstr ""
+msgstr "%1$s: %2$s."
 
 #: include/classes/server/CZabbixServer.php:746
 #: include/classes/setup/CSetupWizard.php:1465
 #, c-format
 msgid "%1$s: file is not readable."
-msgstr ""
+msgstr "%1$s: soubor není čitatelný."
 
 #: include/classes/server/CZabbixServer.php:743
 #: include/classes/setup/CSetupWizard.php:1462
 #, c-format
 msgid "%1$s: invalid path or file not found."
-msgstr ""
+msgstr "%1$s: nesprávna cesta k souboru alebo soubor nelze najít."
 
 #: include/classes/graph/CSvgGraph.php:1418
 #, c-format
@@ -4306,7 +4306,7 @@ msgstr "Nelze nastavit \"Agregaci datové sady\", když je do grafu přidán ite
 
 #: include/classes/db/MysqlDbBackend.php:197
 msgid "Cannot set charset."
-msgstr ""
+msgstr "Nelze nastavit znakovú sadu."
 
 #: include/classes/api/services/CItemGeneral.php:2478
 #, c-format
@@ -27035,6 +27035,11 @@ msgstr "neplatná bytová sekvence v UTF-8"
 msgid "invalid data type"
 msgstr "Neplatný datový typ"
 
+#: include/classes/validators/CAbsoluteTimeValidator.php:45
+#: include/classes/validators/CAbsoluteTimeValidator.php:53
+msgid "invalid date"
+msgstr ""
+
 #: include/classes/graphdraw/CLineGraphDraw.php:140 include/items.inc.php:1805
 msgid "invalid delay"
 msgstr "neplatné zdržení"
@@ -28435,6 +28440,11 @@ msgstr "hodnota musí být mezi \"%1$s\" a \"%2$s\""
 msgid "value must be between \"%1$s\" and \"%2$s\", and have no more than \"%3$s\" digits after the decimal point"
 msgstr "hodnota musí být mezi \"%1$s\" a \"%2$s\" a nesmí mít více než \"%3$s\" číslic za desetinnou čárkou"
 
+#: include/classes/validators/CTimeUnitValidator.php:84
+#, c-format
+msgid "value must be between %1$s and %2$s"
+msgstr ""
+
 #: include/classes/validators/CApiInputValidator.php:676
 msgid "value must be empty"
 msgstr "hodnota musí být prázdná"
@@ -28452,6 +28462,16 @@ msgstr[2] "hodnota musí být prázdná nebo jedna z %1$s"
 #, c-format
 msgid "value must be greater than \"%1$s\""
 msgstr "hodnota musí být větší než \"%1$s\""
+
+#: include/classes/validators/CAbsoluteTimeValidator.php:59
+#, c-format
+msgid "value must be greater than or equal to %1$s"
+msgstr ""
+
+#: include/classes/validators/CAbsoluteTimeValidator.php:64
+#, c-format
+msgid "value must be less than or equal to %1$s"
+msgstr ""
 
 #: app/controllers/CControllerPopupItemTest.php:1342
 #: include/classes/validators/CNewValidator.php:220

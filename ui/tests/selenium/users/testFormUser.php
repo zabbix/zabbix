@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -174,7 +174,7 @@ class testFormUser extends CWebTest {
 						'id:autologout_visible' => false,
 						'id:autologout' => '15m',
 						'Refresh' => '30s',
-						'Rows per page' => '100',
+						'Rows per page' => '150',
 						'URL (after login)' => ''
 					],
 					'disabled' => ['id:autologout', 'button:Delete'],
