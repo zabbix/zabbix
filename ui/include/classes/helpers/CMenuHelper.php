@@ -186,7 +186,7 @@ class CMenuHelper {
 						'lldrule.list?context=host', 'item.prototype.list?context=host',
 						'trigger.prototype.list?context=host', 'graph.prototype.list?context=host',
 						'host.prototype.list?context=host', 'httpconf.php?context=host',
-						'lldrule.prototype.list?context=host',
+						'lldrule.prototype.list?context=host'
 					])
 				: null,
 			CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_MAINTENANCE)

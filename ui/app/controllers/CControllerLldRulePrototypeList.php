@@ -28,7 +28,7 @@ class CControllerLldRulePrototypeList extends CController {
 			'parent_discoveryid' 			=> 'required|db items.itemid',
 			'sort'							=> 'in delay,key_,name,status,type',
 			'sortorder'						=> 'in '.ZBX_SORT_DOWN.','.ZBX_SORT_UP,
-			'page'							=> 'ge 1',
+			'page'							=> 'ge 1'
 		];
 
 		$ret = $this->validateInput($fields);

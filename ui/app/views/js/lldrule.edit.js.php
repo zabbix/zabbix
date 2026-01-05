@@ -199,6 +199,7 @@ window.lldrule_edit = new class {
 
 					return;
 				}
+
 				if (keep_open) {
 					const message_box = makeMessageBox('good', response.success.messages, response.success.title)[0];
 

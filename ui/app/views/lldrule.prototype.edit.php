@@ -62,7 +62,7 @@ if ($lldrule['itemid']) {
 		'title' => _('Test'),
 		'class' => implode(' ', [ZBX_STYLE_BTN_ALT, 'js-test-item']),
 		'keepOpen' => true,
-		'isSubmit' => false,
+		'isSubmit' => false
 	];
 
 	$buttons[] = [
@@ -79,13 +79,13 @@ else {
 			'title' => _('Add'),
 			'class' => 'js-submit',
 			'keepOpen' => true,
-			'isSubmit' => true,
+			'isSubmit' => true
 		],
 		[
 			'title' => _('Test'),
 			'class' => implode(' ', [ZBX_STYLE_BTN_ALT, 'js-test-item']),
 			'keepOpen' => true,
-			'isSubmit' => false,
+			'isSubmit' => false
 		]
 	];
 }

@@ -65,7 +65,7 @@ if ($lldrule['itemid']) {
 			'isSubmit' => false,
 			'enabled' => $data['host']['status'] == HOST_STATUS_MONITORED
 				&& $lldrule['status'] == ITEM_STATUS_ACTIVE
-				&& in_array($lldrule['type'], $data['executable_item_types']),
+				&& in_array($lldrule['type'], $data['executable_item_types'])
 		];
 	}
 
@@ -73,7 +73,7 @@ if ($lldrule['itemid']) {
 		'title' => _('Test'),
 		'class' => implode(' ', [ZBX_STYLE_BTN_ALT, 'js-test-item']),
 		'keepOpen' => true,
-		'isSubmit' => false,
+		'isSubmit' => false
 	];
 
 	$buttons[] = [
@@ -90,13 +90,13 @@ else {
 			'title' => _('Add'),
 			'class' => 'js-submit',
 			'keepOpen' => true,
-			'isSubmit' => true,
+			'isSubmit' => true
 		],
 		[
 			'title' => _('Test'),
 			'class' => implode(' ', [ZBX_STYLE_BTN_ALT, 'js-test-item']),
 			'keepOpen' => true,
-			'isSubmit' => false,
+			'isSubmit' => false
 		]
 	];
 }

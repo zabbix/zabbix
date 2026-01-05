@@ -330,8 +330,8 @@ abstract class CControllerLldRuleUpdateGeneral extends CController {
 				CONDITION_EVAL_TYPE_OR, CONDITION_EVAL_TYPE_EXPRESSION]
 			],
 			'formula' => ['db items.formula', 'required',
-				// TODO: uncomment when formula parsing merged
-				// 'use' => [],
+				// TODO: uncomment once ZBXNEXT-8791 is merged
+				// 'use' => [CConditionFormulaParser::class, []],
 				'when' => ['evaltype', 'in' => [CONDITION_EVAL_TYPE_EXPRESSION]]
 			],
 			'conditions' => [
@@ -355,7 +355,7 @@ abstract class CControllerLldRuleUpdateGeneral extends CController {
 					]
 				]],
 				['objects', 'uniq' => ['formulaid'], 'required', 'not_empty',
-					'when' => ['evaltype', 'in' => [CONDITION_EVAL_TYPE_EXPRESSION]],
+					'when' => ['evaltype', 'in' => [CONDITION_EVAL_TYPE_EXPRESSION]]
 				]
 			],
 			'overrides' => ['objects', 'uniq' => ['name'], 'fields' => [
@@ -370,8 +370,6 @@ abstract class CControllerLldRuleUpdateGeneral extends CController {
 							CONDITION_EVAL_TYPE_OR, CONDITION_EVAL_TYPE_EXPRESSION]
 						],
 						'formula' => ['db items.formula', 'required',
-							// TODO: uncomment when formula parsing merged
-							// 'use' => [],
 							'when' => ['evaltype', 'in' => [CONDITION_EVAL_TYPE_EXPRESSION]]
 						],
 						'conditions' => [
@@ -386,24 +384,35 @@ abstract class CControllerLldRuleUpdateGeneral extends CController {
 										'in' => [CONDITION_OPERATOR_REGEXP, CONDITION_OPERATOR_NOT_REGEXP]
 									]
 								],
-								'macro' => [
-									['db item_condition.macro', 'use' => [CLLDMacroParser::class]],
-									['db item_condition.macro', 'required', 'not_empty',
-										'when' => [
-											['operator',
-												'in' => [CONDITION_OPERATOR_REGEXP, CONDITION_OPERATOR_NOT_REGEXP]
-											],
-											['value', 'not_empty']
-										]
-									]
-								]
+								'macro' => ['db item_condition.macro']
 							]],
 							['objects', 'uniq' => ['formulaid'], 'required', 'not_empty',
-								'when' => ['evaltype', 'in' => [CONDITION_EVAL_TYPE_EXPRESSION]],
+								'when' => ['evaltype', 'in' => [CONDITION_EVAL_TYPE_EXPRESSION]]
 							]
 						]
 					]
 				],
+				'operations' => ['objects', 'fields' => [
+					'operationobject' => ['string'],
+					'operator' => ['string'],
+					'value' => ['string'],
+					'opstatus' => ['object', 'fields' => [
+						'status' => ['integer', 'in' => [ITEM_STATUS_ACTIVE, ITEM_STATUS_DISABLED]]
+					]],
+					'opdiscover' => ['object', 'fields' => [
+						'discover' => ['integer', 'in' => [ITEM_DISCOVER, ITEM_NO_DISCOVER]]
+					]],
+					'opperiod' => ['object', 'fields' => ['delay' => ['string']]],
+					'ophistory' => ['object', 'fields' => ['history' => ['string']]],
+					'optrends' => ['object', 'fields' => ['trends' => ['string']]],
+					'opseverity' => ['object', 'fields' => ['severity' => ['string']]],
+					'optag' => ['objects', 'fields' => [
+						'tag' => ['string'],
+						'value' => ['string']
+					]],
+					'optemplate' => ['objects', 'fields' => ['templateid' => ['string']]],
+					'opinventory' => ['string']
+				]]
 			]],
 			'preprocessing' => CItemGeneralHelper::getPreprocessingValidationRules(static::getIsPrototype())
 		] + static::getFieldsValidationRulesAdditional()];

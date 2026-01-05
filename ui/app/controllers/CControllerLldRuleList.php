@@ -39,7 +39,7 @@ class CControllerLldRuleList extends CController {
 			'filter_status'					=> 'in '.implode(',', [-1, ZBX_LLD_DELETE_AFTER, ZBX_LLD_DELETE_NEVER, ZBX_LLD_DELETE_IMMEDIATELY]),
 			'sort'							=> 'in delay,key_,name,status,type',
 			'sortorder'						=> 'in '.ZBX_SORT_DOWN.','.ZBX_SORT_UP,
-			'page'							=> 'ge 1',
+			'page'							=> 'ge 1'
 		];
 
 		$ret = $this->validateInput($fields);
