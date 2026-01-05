@@ -231,7 +231,8 @@ void	zbx_print_version(const char *title_message)
  *                                                                            *
  * Purpose: check if string is a valid internet hostname                      *
  *                                                                            *
- * Parameters: hostname - [IN] hostname string to be checked                  *
+ * Parameters: hostname -     [IN] hostname string to be checked              *
+ *             hostname_len - [IN] length of the hostname string              *
  *                                                                            *
  * Return value: SUCCEED - could be a valid hostname,                         *
  *               FAIL - definitely not a valid hostname                       *
