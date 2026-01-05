@@ -296,6 +296,7 @@ class testFormSetup extends CWebTest {
 
 		// Select Dark theme.
 		$this->query('id:default-theme')->one()->asDropdown()->select('Dark');
+		$form->waitUntilReloaded();
 
 		// Check that default theme has changed.
 		$stylesheet = $this->query('xpath://link[@rel="stylesheet"]')->one();
