@@ -45,6 +45,45 @@ class testDashboardWidgetCommunication extends testWidgetCommunication {
 
 	const GEOMAP_FILTERED_ICON_INDEX = 1;
 
+	const GEOMAP_HASH_START = 'data:image/svg+xml;base64,CgkJCQk8c3ZnIHdpZHRoPSIyNCIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDI0IDMy'.
+		'IiBmaWxsPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPgoJCQkJCTxwYXRoIGZpbGw9IiNjOWUzZmMiIGZpbGwtc'.
+		'nVsZT0iZXZlbm9kZCIgY2xpcC1ydWxlPSJldmVub2RkIiBkPSJNMTIgMzBDMTMuNjIgMzAgMjIgMTcuMjEyNCAyMiAxMS44QzIyIDYuMzg3Nj'.
+		'EgMTcuNTIyOCAyIDEyIDJDNi40NzcxNSAyIDIgNi4zODc2MSAyIDExLjhDMiAxNy4yMTI0IDEwLjM4IDMwIDEyIDMwWk0xMiAxNkMxNC4yMDk'.
+		'xIDE2IDE2IDE0LjIwOTEgMTYgMTJDMTYgOS43OTA4NiAxNC4yMDkxIDggMTIgOEM5Ljc5MDg2IDggOCA5Ljc5MDg2IDggMTJDOCAxNC4yMDkx'.
+		'IDkuNzkwODYgMTYgMTIgMTZaIi8+CgkJCQkJPHBhdGggZmlsbD0iI2NlZDdkYiIgZD0iTTIxLjUgMTEuOEMyMS41IDEzLjA1MDQgMjEuMDA5I'.
+		'DE0Ljc4ODggMjAuMjAzMyAxNi43MzU5QzE5LjQwMzggMTguNjY4MiAxOC4zMTc2IDIwLjc1MjMgMTcuMTc3NSAyMi42NzQ2QzE2LjAzNzEgMj'.
+		'QuNTk3MSAxNC44NTAxIDI2LjM0NTUgMTMuODUzNSAyNy42MDc1QzEzLjM1NDEgMjguMjQgMTIuOTExMyAyOC43MzkxIDEyLjU1MjggMjkuMDc'.
+		'1MkMxMi4zNzI5IDI5LjI0MzkgMTIuMjI1NiAyOS4zNjA3IDEyLjExMjMgMjkuNDMyM0MxMS45ODQ0IDI5LjUxMzEgMTEuOTU2MyAyOS41IDEy'.
+		'IDI5LjVWMzAuNUMxMi4yNDYyIDMwLjUgMTIuNDczNCAzMC4zODcgMTIuNjQ2MyAzMC4yNzc4QzEyLjgzMzcgMzAuMTU5NSAxMy4wMzI1IDI5L'.
+		'jk5NjMgMTMuMjM2OCAyOS44MDQ3QzEzLjY0NjcgMjkuNDIwMyAxNC4xMjQ0IDI4Ljg3ODEgMTQuNjM4NCAyOC4yMjcyQzE1LjY2ODcgMjYuOT'.
+		'IyNSAxNi44ODA0IDI1LjEzNTYgMTguMDM3NiAyMy4xODQ3QzE5LjE5NDkgMjEuMjMzNSAyMC4zMDQ5IDE5LjEwNTkgMjEuMTI3MyAxNy4xMTg'.
+		'zQzIxLjk0MzYgMTUuMTQ1NSAyMi41IDEzLjI1NTggMjIuNSAxMS44SDIxLjVaTTEyIDIuNUMxNy4yNTYzIDIuNSAyMS41IDYuNjczMjMgMjEu'.
+		'NSAxMS44SDIyLjVDMjIuNSA2LjEwMTk5IDE3Ljc4OTQgMS41IDEyIDEuNVYyLjVaTTIuNSAxMS44QzIuNSA2LjY3MzIzIDYuNzQzNzIgMi41I'.
+		'DEyIDIuNVYxLjVDNi4yMTA1OCAxLjUgMS41IDYuMTAxOTkgMS41IDExLjhIMi41Wk0xMiAyOS41QzEyLjA0MzcgMjkuNSAxMi4wMTU2IDI5Lj'.
+		'UxMzEgMTEuODg3NyAyOS40MzIzQzExLjc3NDQgMjkuMzYwNyAxMS42MjcxIDI5LjI0MzkgMTEuNDQ3MiAyOS4wNzUyQzExLjA4ODcgMjguNzM'.
+		'5MSAxMC42NDU5IDI4LjI0IDEwLjE0NjUgMjcuNjA3NUM5LjE0OTg4IDI2LjM0NTUgNy45NjI4NSAyNC41OTcxIDYuODIyNTMgMjIuNjc0NkM1'.
+		'LjY4MjM4IDIwLjc1MjMgNC41OTYxOCAxOC42NjgyIDMuNzk2NyAxNi43MzU5QzIuOTkxMDQgMTQuNzg4OCAyLjUgMTMuMDUwNCAyLjUgMTEuO'.
+		'EgxLjVDMS41IDEzLjI1NTggMi4wNTY0NSAxNS4xNDU1IDIuODcyNjcgMTcuMTE4M0MzLjY5NTA1IDE5LjEwNTkgNC44MDUwOSAyMS4yMzM1ID'.
+		'UuOTYyNDQgMjMuMTg0N0M3LjExOTYxIDI1LjEzNTYgOC4zMzEzMyAyNi45MjI1IDkuMzYxNjMgMjguMjI3MkM5Ljg3NTU5IDI4Ljg3ODEgMTA'.
+		'uMzUzMyAyOS40MjAzIDEwLjc2MzIgMjkuODA0N0MxMC45Njc1IDI5Ljk5NjMgMTEuMTY2MyAzMC4xNTk1IDExLjM1MzcgMzAuMjc3OEMxMS41'.
+		'MjY2IDMwLjM4NyAxMS43NTM4IDMwLjUgMTIgMzAuNVYyOS41Wk0xNS41IDEyQzE1LjUgMTMuOTMzIDEzLjkzMyAxNS41IDEyIDE1LjVWMTYuN'.
+		'UMxNC40ODUzIDE2LjUgMTYuNSAxNC40ODUzIDE2LjUgMTJIMTUuNVpNMTIgOC41QzEzLjkzMyA4LjUgMTUuNSAxMC4wNjcgMTUuNSAxMkgxNi'.
+		'41QzE2LjUgOS41MTQ3MiAxNC40ODUzIDcuNSAxMiA3LjVWOC41Wk04LjUgMTJDOC41IDEwLjA2NyAxMC4wNjcgOC41IDEyIDguNVY3LjVDOS4'.
+		'1MTQ3MiA3LjUgNy41IDkuNTE0NzIgNy41IDEySDguNVpNMTIgMTUuNUMxMC4wNjcgMTUuNSA4LjUgMTMuOTMzIDguNSAxMkg3LjVDNy41IDE0L'.
+		'jQ4NTMgOS41MTQ3MiAxNi41IDEyIDE2LjVWMTUuNVoiLz4KCQkJCQk8cGF0aCBmaWxsPSIj';
+
+	const GEOMAP_HAS_END = 'IiBmaWxsLXJ1bGU9ImV2ZW5vZGQiIGNsaXAtcnVsZT0iZXZlbm9kZCIgZD0iTTEyIDI0QzEyLjk3MiAyNCAxOCAxNS4'.
+		'3Nzk0IDE4IDEyLjNDMTggOC44MjA2MSAxNS4zMTM3IDYgMTIgNkM4LjY4NjI5IDYgNiA4LjgyMDYxIDYgMTIuM0M2IDE1Ljc3OTQgMTEuMDI4I'.
+		'DI0IDEyIDI0Wk0xMi4wMDAxIDE1LjA3NTVDMTMuNDIwMyAxNS4wNzU1IDE0LjU3MTYgMTMuODU2NSAxNC41NzE2IDEyLjM1MjhDMTQuNTcxNiA'.
+		'xMC44NDkxIDEzLjQyMDMgOS42MzAxMSAxMi4wMDAxIDkuNjMwMTFDMTAuNTggOS42MzAxMSA5LjQyODcxIDEwLjg0OTEgOS40Mjg3MSAxMi4zN'.
+		'TI4QzkuNDI4NzEgMTMuODU2NSAxMC41OCAxNS4wNzU1IDEyLjAwMDEgMTUuMDc1NVoiLz4KCQkJCTwvc3ZnPg==';
+
+	const GEOMAP_UNIQUE_HASH_PARTS = [
+		'1st host for widgets' => 'NzQ5OUZG',
+		'2nd host for widgets' => 'RkZDODU5',
+		'3rd host for widgets' => 'RTk3NjU5'
+	];
+
 	const DEFAULT_WIDGET_CONTENT = [
 		'Hostgroups page' => [
 			'Data overview listener' => [
@@ -310,9 +349,22 @@ class testDashboardWidgetCommunication extends testWidgetCommunication {
 		]
 	];
 
+	const SELECTED_CLASSES = [
+		'problemhosts' => 'row-selected',
+		'problemsbysv' => 'row-selected',
+		'tophosts' => 'row-selected',
+		'web' => 'row-selected',
+		'map' => 'selected',
+		'navtree' => 'selected',
+		'itemhistory' => 'selected',
+		'hostnavigator' => 'navigation-tree-node-is-selected',
+		'itemnavigator' => 'navigation-tree-node-is-selected',
+		'honeycomb' => 'svg-honeycomb-cell-selected'
+	];
+
 	public static function getWidgetData() {
 		return [
-			'Broadcasting hostgroups from map - no selection' => [
+			'Broadcasting hostgroups from map - default selection' => [
 				[
 					'page' => 'Hostgroups page',
 					'broadcaster' => 'Map hostgroup broadcaster',
@@ -538,7 +590,7 @@ class testDashboardWidgetCommunication extends testWidgetCommunication {
 					'select_element' => self::SECOND_HOST_NAME
 				]
 			],
-			'Broadcasting hostgroups from problem hosts widget - no selection' => [
+			'Broadcasting hostgroups from problem hosts widget - default selection' => [
 				[
 					'page' => 'Hostgroups page',
 					'broadcaster' => 'Problem hosts hostgroup broadcaster',
@@ -757,7 +809,7 @@ class testDashboardWidgetCommunication extends testWidgetCommunication {
 					]
 				]
 			],
-			'Broadcasting hostgroups from problems by severity widget - no selection' => [
+			'Broadcasting hostgroups from problems by severity widget - default selection' => [
 				[
 					'page' => 'Hostgroups page',
 					'broadcaster' => 'Problems by severity hostgroup broadcaster',
@@ -976,7 +1028,7 @@ class testDashboardWidgetCommunication extends testWidgetCommunication {
 					]
 				]
 			],
-			'Broadcasting hostgroups from web monitoring widget - no selection' => [
+			'Broadcasting hostgroups from web monitoring widget - default selection' => [
 				[
 					'page' => 'Hostgroups page',
 					'broadcaster' => 'Web monitoring hostgroup broadcaster',
@@ -1195,11 +1247,11 @@ class testDashboardWidgetCommunication extends testWidgetCommunication {
 					]
 				]
 			],
-			'Broadcasting hosts from geomap widget - no selection' => [
+			'Broadcasting hosts from geomap widget - default selection' => [
 				[
 					'page' => 'Hosts page',
 					'broadcaster' => 'Geomap host broadcaster',
-					'autoselected' => self::GEOMAP_ICON_INDEXES[self::SECOND_HOST_NAME],
+					'autoselected' => self::SECOND_HOST_NAME,
 					'expected' => [
 						'Data overview listener' => [
 							'Hosts' => self::SECOND_HOST_NAME,
@@ -1354,7 +1406,7 @@ class testDashboardWidgetCommunication extends testWidgetCommunication {
 					]
 				]
 			],
-			'Broadcasting hosts from honeycomb widget - no selection' => [
+			'Broadcasting hosts from honeycomb widget - default selection' => [
 				[
 					'page' => 'Hosts page',
 					'broadcaster' => 'Honeycomb host broadcaster',
@@ -1514,7 +1566,7 @@ class testDashboardWidgetCommunication extends testWidgetCommunication {
 				]
 			],
 			// The first element is selected by default, that is a hostgroup, therefore listeners display infiltered data.
-			'Broadcasting hosts from map widget - no selection' => [
+			'Broadcasting hosts from map widget - default selection' => [
 				[
 					'page' => 'Hosts page',
 					'broadcaster' => 'Map host broadcaster',
@@ -1634,7 +1686,7 @@ class testDashboardWidgetCommunication extends testWidgetCommunication {
 					'select_element' => self::SECOND_HOSTGROUP_NAME
 				]
 			],
-			'Broadcasting hosts from top hosts widget - no selection' => [
+			'Broadcasting hosts from top hosts widget - default selection' => [
 				[
 					'page' => 'Hosts page',
 					'broadcaster' => 'Top hosts host broadcaster',
@@ -1793,7 +1845,7 @@ class testDashboardWidgetCommunication extends testWidgetCommunication {
 					]
 				]
 			],
-			'Broadcasting hosts from host navigator widget - no selection' => [
+			'Broadcasting hosts from host navigator widget - default selection' => [
 				[
 					'page' => 'Hosts page',
 					'broadcaster' => 'Host navigator broadcaster',
@@ -1952,7 +2004,7 @@ class testDashboardWidgetCommunication extends testWidgetCommunication {
 					]
 				]
 			],
-			'Broadcasting items from honeycomb widget - no selection' => [
+			'Broadcasting items from honeycomb widget - default selection' => [
 				[
 					'page' => 'Items page',
 					'broadcaster' => 'Honeycomb item broadcaster',
@@ -2036,7 +2088,7 @@ class testDashboardWidgetCommunication extends testWidgetCommunication {
 					]
 				]
 			],
-			'Broadcasting items from item history widget - no selection' => [
+			'Broadcasting items from item history widget - default selection' => [
 				[
 					'page' => 'Items page',
 					'broadcaster' => 'Item history item broadcaster',
@@ -2120,7 +2172,7 @@ class testDashboardWidgetCommunication extends testWidgetCommunication {
 					]
 				]
 			],
-			'Broadcasting items from item navigator widget - no selection' => [
+			'Broadcasting items from item navigator widget - default selection' => [
 				[
 					'page' => 'Items page',
 					'broadcaster' => 'Item navigator broadcaster',
@@ -2204,7 +2256,7 @@ class testDashboardWidgetCommunication extends testWidgetCommunication {
 					]
 				]
 			],
-			'Broadcasting map from navigation tree widget - no selection' => [
+			'Broadcasting map from navigation tree widget - default selection' => [
 				[
 					'page' => 'Maps page',
 					'broadcaster' => 'Navigation tree map broadcaster',
@@ -2280,96 +2332,57 @@ class testDashboardWidgetCommunication extends testWidgetCommunication {
 					case 'problemsbysv':
 					case 'tophosts':
 					case 'web':
-						$class = 'row-selected';
-						$selected_element = $this->getWidgetElement($data['autoselected'], $broadcaster);
-						break;
-
 					case 'map':
-						$class = 'selected';
 						$selected_element = $this->getWidgetElement($data['autoselected'], $broadcaster);
 						break;
 
 					case 'navtree':
-						$class = 'selected';
 						$selected_element = $broadcaster->query('xpath:.//a[text()='.
 								CXPathHelper::escapeQuotes($data['autoselected']).']/../../..'
 						)->one();
 						break;
 
 					case 'itemhistory':
-						$class = 'selected';
 						$selected_element = $broadcaster->query('xpath:.//td[text()='.
 								CXPathHelper::escapeQuotes($data['autoselected'].': Trapper item').']/..'
 						)->one();
 						break;
 
 					case 'hostnavigator':
-						$class = 'navigation-tree-node-is-selected';
 						$selected_element = $broadcaster->query('xpath:.//span[text()='.
 								CXPathHelper::escapeQuotes($data['autoselected']).']/../../..'
 						)->one();
 						break;
 
 					case 'itemnavigator':
-						$class = 'navigation-tree-node-is-selected';
 						$itemid = CDataHelper::get('WidgetCommunication.itemids')[$data['autoselected'].':trap.widget.communication'];
 						$selected_element = $broadcaster->query('xpath:.//div[@data-id='.$itemid.']')->one();
 						break;
 
 					case 'honeycomb':
-						$class = 'svg-honeycomb-cell-selected';
-
 						$selected_element = $broadcaster->query('xpath:.//div[text()='.
 								CXPathHelper::escapeQuotes($data['autoselected']).']/../../../..'
 						)->one();
 						break;
 				}
 
-				$this->assertTrue($selected_element->hasClass($class), 'Expected element is not selected by default.');
+				$this->assertTrue($selected_element->hasClass(self::SELECTED_CLASSES[$broadcaster_type]),
+						'Expected element is not selected by default in '.$broadcaster_type.' widget.'
+				);
 			}
 			else {
 				/**
 				 * The only thing that differs between a selected host and a non selected host on a geomap widget is the
 				 * base64 format hash of the icon that represent this host. So to check if host is selected, the icon hash
-				 * is compared to an icon hash of a selected host with warning severity problem color.
+				 * is compared to an icon hash of a selected host.
+				 * The selected host hash for the 3 hosts differs only by 8 symbols so the hash is composed of 3 parts to
+				 * avoid three huge hashes in the test.
 				 */
-				$base64_hash = 'data:image/svg+xml;base64,CgkJCQk8c3ZnIHdpZHRoPSIyNCIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwI'.
-					'DI0IDMyIiBmaWxsPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPgoJCQkJCTxwYXRoIGZpbGw9IiN'.
-					'jOWUzZmMiIGZpbGwtcnVsZT0iZXZlbm9kZCIgY2xpcC1ydWxlPSJldmVub2RkIiBkPSJNMTIgMzBDMTMuNjIgMzAgMjIgMTcuM'.
-					'jEyNCAyMiAxMS44QzIyIDYuMzg3NjEgMTcuNTIyOCAyIDEyIDJDNi40NzcxNSAyIDIgNi4zODc2MSAyIDExLjhDMiAxNy4yMTI'.
-					'0IDEwLjM4IDMwIDEyIDMwWk0xMiAxNkMxNC4yMDkxIDE2IDE2IDE0LjIwOTEgMTYgMTJDMTYgOS43OTA4NiAxNC4yMDkxIDggM'.
-					'TIgOEM5Ljc5MDg2IDggOCA5Ljc5MDg2IDggMTJDOCAxNC4yMDkxIDkuNzkwODYgMTYgMTIgMTZaIi8+CgkJCQkJPHBhdGggZml'.
-					'sbD0iI2NlZDdkYiIgZD0iTTIxLjUgMTEuOEMyMS41IDEzLjA1MDQgMjEuMDA5IDE0Ljc4ODggMjAuMjAzMyAxNi43MzU5QzE5L'.
-					'jQwMzggMTguNjY4MiAxOC4zMTc2IDIwLjc1MjMgMTcuMTc3NSAyMi42NzQ2QzE2LjAzNzEgMjQuNTk3MSAxNC44NTAxIDI2LjM'.
-					'0NTUgMTMuODUzNSAyNy42MDc1QzEzLjM1NDEgMjguMjQgMTIuOTExMyAyOC43MzkxIDEyLjU1MjggMjkuMDc1MkMxMi4zNzI5I'.
-					'DI5LjI0MzkgMTIuMjI1NiAyOS4zNjA3IDEyLjExMjMgMjkuNDMyM0MxMS45ODQ0IDI5LjUxMzEgMTEuOTU2MyAyOS41IDEyIDI'.
-					'5LjVWMzAuNUMxMi4yNDYyIDMwLjUgMTIuNDczNCAzMC4zODcgMTIuNjQ2MyAzMC4yNzc4QzEyLjgzMzcgMzAuMTU5NSAxMy4wM'.
-					'zI1IDI5Ljk5NjMgMTMuMjM2OCAyOS44MDQ3QzEzLjY0NjcgMjkuNDIwMyAxNC4xMjQ0IDI4Ljg3ODEgMTQuNjM4NCAyOC4yMjc'.
-					'yQzE1LjY2ODcgMjYuOTIyNSAxNi44ODA0IDI1LjEzNTYgMTguMDM3NiAyMy4xODQ3QzE5LjE5NDkgMjEuMjMzNSAyMC4zMDQ5I'.
-					'DE5LjEwNTkgMjEuMTI3MyAxNy4xMTgzQzIxLjk0MzYgMTUuMTQ1NSAyMi41IDEzLjI1NTggMjIuNSAxMS44SDIxLjVaTTEyIDI'.
-					'uNUMxNy4yNTYzIDIuNSAyMS41IDYuNjczMjMgMjEuNSAxMS44SDIyLjVDMjIuNSA2LjEwMTk5IDE3Ljc4OTQgMS41IDEyIDEuN'.
-					'VYyLjVaTTIuNSAxMS44QzIuNSA2LjY3MzIzIDYuNzQzNzIgMi41IDEyIDIuNVYxLjVDNi4yMTA1OCAxLjUgMS41IDYuMTAxOTk'.
-					'gMS41IDExLjhIMi41Wk0xMiAyOS41QzEyLjA0MzcgMjkuNSAxMi4wMTU2IDI5LjUxMzEgMTEuODg3NyAyOS40MzIzQzExLjc3N'.
-					'DQgMjkuMzYwNyAxMS42MjcxIDI5LjI0MzkgMTEuNDQ3MiAyOS4wNzUyQzExLjA4ODcgMjguNzM5MSAxMC42NDU5IDI4LjI0IDE'.
-					'wLjE0NjUgMjcuNjA3NUM5LjE0OTg4IDI2LjM0NTUgNy45NjI4NSAyNC41OTcxIDYuODIyNTMgMjIuNjc0NkM1LjY4MjM4IDIwL'.
-					'jc1MjMgNC41OTYxOCAxOC42NjgyIDMuNzk2NyAxNi43MzU5QzIuOTkxMDQgMTQuNzg4OCAyLjUgMTMuMDUwNCAyLjUgMTEuOEg'.
-					'xLjVDMS41IDEzLjI1NTggMi4wNTY0NSAxNS4xNDU1IDIuODcyNjcgMTcuMTE4M0MzLjY5NTA1IDE5LjEwNTkgNC44MDUwOSAyM'.
-					'S4yMzM1IDUuOTYyNDQgMjMuMTg0N0M3LjExOTYxIDI1LjEzNTYgOC4zMzEzMyAyNi45MjI1IDkuMzYxNjMgMjguMjI3MkM5Ljg'.
-					'3NTU5IDI4Ljg3ODEgMTAuMzUzMyAyOS40MjAzIDEwLjc2MzIgMjkuODA0N0MxMC45Njc1IDI5Ljk5NjMgMTEuMTY2MyAzMC4xN'.
-					'Tk1IDExLjM1MzcgMzAuMjc3OEMxMS41MjY2IDMwLjM4NyAxMS43NTM4IDMwLjUgMTIgMzAuNVYyOS41Wk0xNS41IDEyQzE1LjU'.
-					'gMTMuOTMzIDEzLjkzMyAxNS41IDEyIDE1LjVWMTYuNUMxNC40ODUzIDE2LjUgMTYuNSAxNC40ODUzIDE2LjUgMTJIMTUuNVpNM'.
-					'TIgOC41QzEzLjkzMyA4LjUgMTUuNSAxMC4wNjcgMTUuNSAxMkgxNi41QzE2LjUgOS41MTQ3MiAxNC40ODUzIDcuNSAxMiA3LjV'.
-					'WOC41Wk04LjUgMTJDOC41IDEwLjA2NyAxMC4wNjcgOC41IDEyIDguNVY3LjVDOS41MTQ3MiA3LjUgNy41IDkuNTE0NzIgNy41I'.
-					'DEySDguNVpNMTIgMTUuNUMxMC4wNjcgMTUuNSA4LjUgMTMuOTMzIDguNSAxMkg3LjVDNy41IDE0LjQ4NTMgOS41MTQ3MiAxNi4'.
-					'1IDEyIDE2LjVWMTUuNVoiLz4KCQkJCQk8cGF0aCBmaWxsPSIjRkZDODU5IiBmaWxsLXJ1bGU9ImV2ZW5vZGQiIGNsaXAtcnVsZ'.
-					'T0iZXZlbm9kZCIgZD0iTTEyIDI0QzEyLjk3MiAyNCAxOCAxNS43Nzk0IDE4IDEyLjNDMTggOC44MjA2MSAxNS4zMTM3IDYgMTI'.
-					'gNkM4LjY4NjI5IDYgNiA4LjgyMDYxIDYgMTIuM0M2IDE1Ljc3OTQgMTEuMDI4IDI0IDEyIDI0Wk0xMi4wMDAxIDE1LjA3NTVDM'.
-					'TMuNDIwMyAxNS4wNzU1IDE0LjU3MTYgMTMuODU2NSAxNC41NzE2IDEyLjM1MjhDMTQuNTcxNiAxMC44NDkxIDEzLjQyMDMgOS4'.
-					'2MzAxMSAxMi4wMDAxIDkuNjMwMTFDMTAuNTggOS42MzAxMSA5LjQyODcxIDEwLjg0OTEgOS40Mjg3MSAxMi4zNTI4QzkuNDI4N'.
-					'zEgMTMuODU2NSAxMC41OCAxNS4wNzU1IDEyLjAwMDEgMTUuMDc1NVoiLz4KCQkJCTwvc3ZnPg==';
+				$base64_hash = self::GEOMAP_HASH_START.self::GEOMAP_UNIQUE_HASH_PARTS[$data['autoselected']].
+					self::GEOMAP_HAS_END;
 
-				$this->assertEquals($base64_hash, $this->getWidgetElement($data['autoselected'], $broadcaster)
-						->getAttribute('src')
+				$this->assertEquals($base64_hash, $this->getWidgetElement(self::GEOMAP_ICON_INDEXES[$data['autoselected']],
+						$broadcaster)->getAttribute('src')
 				);
 			}
 		}
@@ -2492,6 +2505,101 @@ class testDashboardWidgetCommunication extends testWidgetCommunication {
 		}
 
 		$this->checkDataOnListener($data['expected']);
+	}
+
+	public static function getNoListenersBroadcasterData() {
+		return [
+			'Hostgroups page with no listeners' => [
+				[
+					'page' => 'Hostgroups page',
+					'broadcasters' => [
+						'Map hostgroup broadcaster',
+						'Problem hosts hostgroup broadcaster',
+						'Problems by severity hostgroup broadcaster',
+						'Web monitoring hostgroup broadcaster'
+					]
+				]
+			],
+			'Hosts page with no listeners' => [
+				[
+					'page' => 'Hosts page',
+					'broadcasters' => [
+						'Geomap host broadcaster',
+						'Honeycomb host broadcaster',
+						'Map host broadcaster',
+						'Top hosts host broadcaster',
+						'Host navigator broadcaster'
+					]
+				]
+			],
+			'Items page with no listeners' => [
+				[
+					'page' => 'Items page',
+					'broadcasters' => [
+						'Honeycomb item broadcaster',
+						'Item history item broadcaster',
+						'Item navigator broadcaster'
+					]
+				]
+			]
+			// TODO: Uncomment the below case once ZBX-27348 is merged.
+			/*
+			'Maps page with no listeners' => [
+				[
+					'page' => 'Maps page',
+					'broadcasters' => [
+						'Navigation tree map broadcaster'
+					]
+				]
+			]
+			 */
+		];
+	}
+
+	protected function removeAllBroadcasters() {
+		$reference_values = implode('\', \'', array_values(self::BROADCASTER_REFERENCES));
+		DBexecute('DELETE FROM widget_field WHERE value_str IN (\''.$reference_values.'\')');
+	}
+
+	/**
+	 * @dataProvider getNoListenersBroadcasterData
+	 *
+	 * @backupOnce !widget_field
+	 *
+	 * @onBeforeOnce removeAllBroadcasters
+	 */
+	public function testDashboardWidgetCommunication_BroadcastersWithNoListeners($data) {
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$entityids['dashboardid'])
+				->waitUntilReady();
+		$dashboard = CDashboardElement::find()->waitUntilReady()->one();
+		$dashboard->selectPage($data['page']);
+		$dashboard->waitUntilReady();
+
+		foreach ($data['broadcasters'] as $broadcaster) {
+			$broadcaster_widget = $dashboard->getWidget($broadcaster);
+			$broadcaster_type = $this->getWidgetType($broadcaster_widget);
+			if ($broadcaster_type !== 'geomap') {
+				$this->assertFalse($broadcaster_widget->query('xpath:.//*[contains(@class, '.
+						CXPathHelper::escapeQuotes(self::SELECTED_CLASSES[$broadcaster_type]).')]')->one(false)->isValid(),
+						'Class "'.self::SELECTED_CLASSES[$broadcaster_type].'" was found on broadcaster with no listeners.'
+				);
+			}
+			else {
+				/**
+				 * On geomap widget, if the host is selected can be determined based on the base64 hash of the corresponding
+				 * icon. To make sure that no element is selected, the test makes sure that none of the 3 selected icon
+				 * hashes are present in widget.
+				 * The selected host hash for the 3 hosts differs only by 8 symbols so the hash is composed of 3 parts to
+				 * avoid three huge hashes in the test.
+				 */
+				foreach ([self::FIRST_HOST_NAME, self::SECOND_HOST_NAME, self::THIRD_HOST_NAME] as $host_name) {
+					$this->assertFalse($broadcaster_widget->query('xpath:.//*[@src='.
+						CXPathHelper::escapeQuotes(self::GEOMAP_HASH_START.self::GEOMAP_UNIQUE_HASH_PARTS[$host_name].
+						self::GEOMAP_HAS_END).']')->one(false)->isValid()
+					);
+				}
+			}
+		}
 	}
 
 	/**
