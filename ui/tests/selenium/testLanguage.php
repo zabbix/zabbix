@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -253,6 +253,7 @@ class testLanguage extends CWebTest {
 		$form->selectTab('Permissions');
 		$form->fill(['Role' => 'Super admin role']);
 		$form->submit();
+		$form->waitUntilReloaded();
 		$this->assertMessage(TEST_GOOD, 'User added');
 		$this->page->logout();
 		$this->page->userLogin($data['fields']['Username'], $data['fields']['Password']);
