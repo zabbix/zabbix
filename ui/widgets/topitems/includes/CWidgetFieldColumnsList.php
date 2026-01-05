@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -18,6 +18,7 @@ namespace Widgets\TopItems\Includes;
 
 use CWidgetsData;
 use DB;
+use Widgets\TopItems\Widget;
 use Zabbix\Widgets\CWidgetField;
 use Zabbix\Widgets\Fields\CWidgetFieldTimePeriod;
 use Zabbix\Widgets\Fields\CWidgetFieldSparkline;
@@ -168,7 +169,10 @@ class CWidgetFieldColumnsList extends CWidgetField {
 			'max' => ZBX_WIDGET_FIELD_TYPE_STR,
 			'decimal_places' => ZBX_WIDGET_FIELD_TYPE_INT32,
 			'aggregate_function' => ZBX_WIDGET_FIELD_TYPE_INT32,
-			'history' => ZBX_WIDGET_FIELD_TYPE_INT32
+			'history' => ZBX_WIDGET_FIELD_TYPE_INT32,
+			'aggregate_columns' => ZBX_WIDGET_FIELD_TYPE_INT32,
+			'column_aggregate_function' => ZBX_WIDGET_FIELD_TYPE_INT32,
+			'combined_column_name' => ZBX_WIDGET_FIELD_TYPE_STR
 		];
 
 		$column_defaults = [
@@ -189,7 +193,10 @@ class CWidgetFieldColumnsList extends CWidgetField {
 					CWidgetField::REFERENCE_DASHBOARD, CWidgetsData::DATA_TYPE_TIME_PERIOD
 				)
 			],
-			'history' => CWidgetFieldColumnsList::HISTORY_DATA_AUTO
+			'history' => CWidgetFieldColumnsList::HISTORY_DATA_AUTO,
+			'aggregate_columns' => 0,
+			'column_aggregate_function' => AGGREGATE_SUM,
+			'combined_column_name' => ''
 		];
 
 		foreach ($this->getValue() as $column_index => $value) {
@@ -279,35 +286,48 @@ class CWidgetFieldColumnsList extends CWidgetField {
 
 	protected function getValidationRules(bool $strict = false): array {
 		$validation_rules = ['type' => API_OBJECTS, 'fields' => [
-			'items'					=> ['type' => API_STRINGS_UTF8, 'default' => [], 'flags' => API_NOT_EMPTY],
-			'item_tags_evaltype'	=> ['type' => API_INT32, 'in' => implode(',', [TAG_EVAL_TYPE_AND_OR, TAG_EVAL_TYPE_OR]), 'default' => TAG_EVAL_TYPE_AND_OR],
-			'item_tags'				=> ['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['tag', 'value']], 'fields' => [
-				'tag'					=> ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('item_tag', 'tag')],
-				'operator'				=> ['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [TAG_OPERATOR_LIKE, TAG_OPERATOR_EQUAL, TAG_OPERATOR_NOT_LIKE, TAG_OPERATOR_NOT_EQUAL, TAG_OPERATOR_EXISTS, TAG_OPERATOR_NOT_EXISTS])],
-				'value'					=> ['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('item_tag', 'value')]
+			'items'							=> ['type' => API_STRINGS_UTF8, 'default' => [], 'flags' => API_NOT_EMPTY],
+			'item_tags_evaltype'			=> ['type' => API_INT32, 'in' => implode(',', [TAG_EVAL_TYPE_AND_OR, TAG_EVAL_TYPE_OR]), 'default' => TAG_EVAL_TYPE_AND_OR],
+			'item_tags'						=> ['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['tag', 'value']], 'fields' => [
+				'tag'							=> ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('item_tag', 'tag')],
+				'operator'						=> ['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [TAG_OPERATOR_LIKE, TAG_OPERATOR_EQUAL, TAG_OPERATOR_NOT_LIKE, TAG_OPERATOR_NOT_EQUAL, TAG_OPERATOR_EXISTS, TAG_OPERATOR_NOT_EXISTS])],
+				'value'							=> ['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('item_tag', 'value')]
 			]],
-			'aggregate_function'	=> ['type' => API_INT32, 'in' => implode(',', [AGGREGATE_NONE, AGGREGATE_MIN, AGGREGATE_MAX, AGGREGATE_AVG, AGGREGATE_COUNT, AGGREGATE_SUM, AGGREGATE_FIRST, AGGREGATE_LAST]), 'default' => AGGREGATE_NONE],
-			'time_period'			=> ['type' => API_ANY],
-			'display_value_as'		=> ['type' => API_INT32, 'in' => implode(',', [self::DISPLAY_VALUE_AS_NUMERIC, self::DISPLAY_VALUE_AS_TEXT]), 'default' => self::DISPLAY_VALUE_AS_NUMERIC],
-			'display'				=> ['type' => API_MULTIPLE, 'rules' => [
-											['if' => ['field' => 'display_value_as', 'in' => self::DISPLAY_VALUE_AS_NUMERIC],
-												'type' => API_INT32, 'default' => self::DISPLAY_AS_IS, 'in' => implode(',', [self::DISPLAY_AS_IS, self::DISPLAY_BAR, self::DISPLAY_INDICATORS, self::DISPLAY_SPARKLINE])],
-											['else' => true,
-												'type' => API_INT32]
+			'aggregate_function'			=> ['type' => API_INT32, 'in' => implode(',', [AGGREGATE_NONE, AGGREGATE_MIN, AGGREGATE_MAX, AGGREGATE_AVG, AGGREGATE_COUNT, AGGREGATE_SUM, AGGREGATE_FIRST, AGGREGATE_LAST]), 'default' => AGGREGATE_NONE],
+			'time_period'					=> ['type' => API_ANY],
+			'display_value_as'				=> ['type' => API_INT32, 'in' => implode(',', [self::DISPLAY_VALUE_AS_NUMERIC, self::DISPLAY_VALUE_AS_TEXT]), 'default' => self::DISPLAY_VALUE_AS_NUMERIC],
+			'display'						=> ['type' => API_MULTIPLE, 'rules' => [
+													['if' => ['field' => 'display_value_as', 'in' => self::DISPLAY_VALUE_AS_NUMERIC],
+														'type' => API_INT32, 'default' => self::DISPLAY_AS_IS, 'in' => implode(',', [self::DISPLAY_AS_IS, self::DISPLAY_BAR, self::DISPLAY_INDICATORS, self::DISPLAY_SPARKLINE])],
+													['else' => true,
+														'type' => API_INT32]
 			]],
-			'history'				=> ['type' => API_INT32, 'default' => self::HISTORY_DATA_AUTO, 'in' => implode(',', [self::HISTORY_DATA_AUTO, self::HISTORY_DATA_HISTORY, self::HISTORY_DATA_TRENDS])],
-			'sparkline'				=> ['type' => API_ANY],
-			'base_color'			=> ['type' => API_COLOR, 'default' => ''],
-			'min'					=> ['type' => API_NUMERIC, 'default' => ''],
-			'max'					=> ['type' => API_NUMERIC, 'default' => ''],
-			'decimal_places'		=> ['type' => API_INT32, 'in' => '0:10', 'default' => self::DEFAULT_DECIMAL_PLACES],
-			'highlights'			=> ['type' =>  API_OBJECTS, 'uniq' => [['pattern']], 'fields' => [
-				'color'					=> ['type' => API_COLOR, 'flags' => API_REQUIRED | API_NOT_EMPTY],
-				'pattern'				=> ['type' => API_REGEX, 'flags' => API_REQUIRED | API_NOT_EMPTY]
+			'history'						=> ['type' => API_INT32, 'default' => self::HISTORY_DATA_AUTO, 'in' => implode(',', [self::HISTORY_DATA_AUTO, self::HISTORY_DATA_HISTORY, self::HISTORY_DATA_TRENDS])],
+			'sparkline'						=> ['type' => API_ANY],
+			'base_color'					=> ['type' => API_COLOR, 'default' => ''],
+			'min'							=> ['type' => API_NUMERIC, 'default' => ''],
+			'max'							=> ['type' => API_NUMERIC, 'default' => ''],
+			'decimal_places'				=> ['type' => API_INT32, 'in' => '0:10', 'default' => self::DEFAULT_DECIMAL_PLACES],
+			'highlights'					=> ['type' =>  API_OBJECTS, 'uniq' => [['pattern']], 'fields' => [
+				'color'							=> ['type' => API_COLOR, 'flags' => API_REQUIRED | API_NOT_EMPTY],
+				'pattern'						=> ['type' => API_REGEX, 'flags' => API_REQUIRED | API_NOT_EMPTY]
 			]],
-			'thresholds'			=> ['type' =>  API_OBJECTS, 'uniq' => [['threshold']], 'fields' => [
-				'color'					=> ['type' => API_COLOR, 'flags' => API_REQUIRED | API_NOT_EMPTY],
-				'threshold'				=> ['type' => API_NUMERIC]
+			'thresholds'					=> ['type' =>  API_OBJECTS, 'uniq' => [['threshold']], 'fields' => [
+				'color'							=> ['type' => API_COLOR, 'flags' => API_REQUIRED | API_NOT_EMPTY],
+				'threshold'						=> ['type' => API_NUMERIC]
+			]],
+			'aggregate_columns'				=> ['type' => API_INT32, 'default' => 0],
+			'column_aggregate_function'		=> ['type' => API_MULTIPLE, 'rules' => [
+													['if' => ['field' => 'aggregate_columns', 'in' => 1],
+														'type' => API_INT32, 'in' => implode(',', [AGGREGATE_NONE, AGGREGATE_MIN, AGGREGATE_MAX, AGGREGATE_AVG, AGGREGATE_COUNT, AGGREGATE_SUM]), 'default' => AGGREGATE_SUM, 'flags' => API_REQUIRED | API_NOT_EMPTY],
+													['else' => AGGREGATE_NONE,
+														'type' => API_INT32]
+			]],
+			'combined_column_name'			=> ['type' => API_MULTIPLE, 'rules' => [
+													['if' => ['field' => 'aggregate_columns', 'in' => 1],
+														'type' => API_STRING_UTF8, 'default' => '', 'flags' => API_REQUIRED | API_NOT_EMPTY],
+													['else' => '',
+														'type' => API_STRING_UTF8]
 			]]
 		]];
 
