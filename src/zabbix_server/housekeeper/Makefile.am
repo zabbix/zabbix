@@ -9,7 +9,7 @@ libzbxhousekeeper_server_a_SOURCES = \
 	history_compress.h \
 	trigger_housekeeper.c \
 	trigger_housekeeper.h \
-	housekeeper.c \
+	housekeeper_table.c \
 	housekeeper.h
 
 libzbxhousekeeper_server_a_CFLAGS = \
