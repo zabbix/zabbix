@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -20,7 +20,71 @@ class CControllerValueMapCheck extends CController {
 		$this->disableCsrfValidation();
 	}
 
-	protected function checkInput() {
+	/**
+	 * Get validation rules for fields. Used in rules for update/create: Host, Template.
+	 *
+	 * @return array
+	 */
+	public static function getFieldsValidationRules(): array {
+		return [
+			'valuemapid' => ['db valuemap.valuemapid'],
+			'name' => ['db valuemap.name', 'not_empty', 'required'],
+			'mappings' => ['objects', 'not_empty', 'uniq' => ['type', 'value'],
+				'messages' => ['uniq' => _('Mapping type and value combination is not unique.')],
+				'fields' => [
+					'type' => ['db valuemap_mapping.type', 'required', 'in' => [VALUEMAP_MAPPING_TYPE_EQUAL,
+						VALUEMAP_MAPPING_TYPE_GREATER_EQUAL, VALUEMAP_MAPPING_TYPE_LESS_EQUAL,
+						VALUEMAP_MAPPING_TYPE_IN_RANGE, VALUEMAP_MAPPING_TYPE_REGEXP, VALUEMAP_MAPPING_TYPE_DEFAULT
+					]],
+					'value' => [
+						['db valuemap_mapping.value', 'required', 'when' => ['type', 'in' => [
+							VALUEMAP_MAPPING_TYPE_EQUAL
+						]]],
+						['db valuemap_mapping.value', 'required', 'not_empty', 'when' => ['type', 'in' => [
+							VALUEMAP_MAPPING_TYPE_GREATER_EQUAL, VALUEMAP_MAPPING_TYPE_LESS_EQUAL,
+							VALUEMAP_MAPPING_TYPE_IN_RANGE, VALUEMAP_MAPPING_TYPE_REGEXP
+						]]],
+						['float', 'when' => ['type', 'in' => [VALUEMAP_MAPPING_TYPE_GREATER_EQUAL,
+							VALUEMAP_MAPPING_TYPE_LESS_EQUAL
+						]]],
+						['db valuemap_mapping.value',
+							'use' => [CRangesParser::class, ['with_minus' => true, 'with_float' => true, 'with_suffix' => true]],
+							'when' => ['type', 'in' => [VALUEMAP_MAPPING_TYPE_IN_RANGE]],
+							'messages' => ['use' => _('Invalid range.')]
+						],
+						['db valuemap_mapping.value', 'use' => [CRegexValidator::class, []],
+							'when' => ['type', 'in' => [VALUEMAP_MAPPING_TYPE_REGEXP]]
+						]
+					],
+					'newvalue' => ['db valuemap_mapping.newvalue', 'required', 'not_empty']
+				]
+			]
+		];
+	}
+
+	/**
+	 * Get validation rules based on provided existing valuemap names to prevent duplicates.
+	 *
+	 * @param array $valuemap_names
+	 *
+	 * @return array
+	 */
+	public static function getValidationRules(?array $valuemap_names): array {
+		$rules = ['object', 'fields' => self::getFieldsValidationRules()];
+
+		if ($valuemap_names) {
+			$rules['fields']['name'] += ['not_in' => $valuemap_names];
+
+			if (!array_key_exists('messages', $rules['fields']['name'])) {
+				$rules['fields']['name']['messages'] = [];
+			}
+			$rules['fields']['name']['messages'] += ['not_in' => _('Given valuemap name is already taken.')];
+		}
+
+		return $rules;
+	}
+
+	protected function checkInput(): bool {
 		$check_source = $this->validateInput([
 			'source' => 'required|in host,template,massupdate',
 			'valuemap_names' => 'array'
@@ -36,18 +100,12 @@ class CControllerValueMapCheck extends CController {
 			);
 		}
 
+		$valuemap_names = $this->hasInput('valuemap_names') ? $this->getInput('valuemap_names') : null;
+
 		switch ($this->getInput('source')) {
 			case 'host':
-				$rules = CControllerHostCreate::getValidationRules()['fields']['valuemaps'];
-
-				if ($this->hasInput('valuemap_names')) {
-					$rules['fields']['name'] += ['not_in' => $this->getInput('valuemap_names')];
-
-					if (!array_key_exists('messages', $rules['fields']['name'])) {
-						$rules['fields']['name']['messages'] = [];
-					}
-					$rules['fields']['name']['messages'] += ['not_in' => _('Given valuemap name is already taken.')];
-				}
+			case 'template':
+				$rules = self::getValidationRules($valuemap_names);
 
 				$this->setInputValidationMethod(self::INPUT_VALIDATION_FORM);
 				$ret = $this->validateInput($rules) && $this->validateValueMap();
@@ -189,11 +247,11 @@ class CControllerValueMapCheck extends CController {
 		return true;
 	}
 
-	protected function checkPermissions() {
+	protected function checkPermissions(): bool {
 		return true;
 	}
 
-	protected function doAction() {
+	protected function doAction(): void {
 		$data = [];
 		$mappings = [];
 		$default = [];
