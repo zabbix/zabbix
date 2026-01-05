@@ -99,54 +99,29 @@ if ($data['proxies']) {
 }
 
 $form
-	->addItem($form_grid)
-	->addItem(
-		(new CScriptTag('proxy_group_edit_popup.init('.json_encode([
-			'proxy_groupid' => $data['proxy_groupid']
-		]).');'))->setOnDocumentReady()
-	);
+	->addItem($form_grid);
 
 if ($data['proxy_groupid'] !== null) {
 	$title = _('Proxy group');
 	$buttons = [
 		[
 			'title' => _('Update'),
-			'class' => 'js-update',
+			'class' => 'js-submit',
 			'keepOpen' => true,
-			'isSubmit' => true,
-			'action' => 'proxy_group_edit_popup.submit();'
+			'isSubmit' => true
 		],
 		[
 			'title' => _('Clone'),
 			'class' => implode(' ', [ZBX_STYLE_BTN_ALT, 'js-clone']),
 			'keepOpen' => true,
-			'isSubmit' => false,
-			'action' => 'proxy_group_edit_popup.clone('.json_encode([
-				'title' => _('New proxy group'),
-				'buttons' => [
-					[
-						'title' => _('Add'),
-						'class' => 'js-add',
-						'keepOpen' => true,
-						'isSubmit' => true,
-						'action' => 'proxy_group_edit_popup.submit();'
-					],
-					[
-						'title' => _('Cancel'),
-						'class' => implode(' ', [ZBX_STYLE_BTN_ALT, 'js-cancel']),
-						'cancel' => true,
-						'action' => ''
-					]
-				]
-			]).');'
+			'isSubmit' => false
 		],
 		[
 			'title' => _('Delete'),
 			'confirmation' => _('Delete selected proxy group?'),
 			'class' => implode(' ', [ZBX_STYLE_BTN_ALT, 'js-delete']),
 			'keepOpen' => true,
-			'isSubmit' => false,
-			'action' => 'proxy_group_edit_popup.delete();'
+			'isSubmit' => false
 		]
 	];
 }
@@ -155,10 +130,9 @@ else {
 	$buttons = [
 		[
 			'title' => _('Add'),
-			'class' => 'js-add',
+			'class' => 'js-submit',
 			'keepOpen' => true,
-			'isSubmit' => true,
-			'action' => 'proxy_group_edit_popup.submit();'
+			'isSubmit' => true
 		]
 	];
 }
@@ -169,7 +143,12 @@ $output = [
 	'body' => $form->toString(),
 	'buttons' => $buttons,
 	'script_inline' => getPagePostJs().
-		$this->readJsFile('proxygroup.edit.js.php'),
+		$this->readJsFile('proxygroup.edit.js.php').
+		'proxy_group_edit_popup.init('.json_encode([
+			'rules' => $data['js_validation_rules'],
+			'rules_for_clone' => $data['js_validation_rules_for_clone'],
+			'proxy_groupid' => $data['proxy_groupid']
+		]).');',
 	'dialogue_class' => 'modal-popup-static'
 ];
 
