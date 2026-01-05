@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -113,6 +113,11 @@ zbx_hk_delete_queue_t;
 
 ZBX_PTR_VECTOR_DECL(hk_delete_queue_ptr, zbx_hk_delete_queue_t *)
 ZBX_PTR_VECTOR_IMPL(hk_delete_queue_ptr, zbx_hk_delete_queue_t *)
+
+static void	hk_delete_queue_free(zbx_hk_delete_queue_t *hdq)
+{
+	zbx_free(hdq);
+}
 
 /* this structure is used to remove old records from history (trends) tables */
 typedef struct
@@ -530,16 +535,14 @@ static void	hk_history_delete_queue_prepare_all(zbx_hk_history_rule_t *rules, in
 
 /******************************************************************************
  *                                                                            *
- * Purpose: clears the history housekeeping delete queue                      *
+ * Purpose: clears history housekeeping delete queue                          *
  *                                                                            *
- * Parameters: rule - [IN/OUT] history housekeeping rule                      *
- *             now  - [IN] current timestamp                                  *
+ * Parameters: rule - [IN] history housekeeping rule                          *
  *                                                                            *
  ******************************************************************************/
 static void	hk_history_delete_queue_clear(zbx_hk_history_rule_t *rule)
 {
-	zbx_vector_hk_delete_queue_ptr_clear_ext(&rule->delete_queue,
-			(zbx_hk_delete_queue_ptr_free_func_t)zbx_ptr_free);
+	zbx_vector_hk_delete_queue_ptr_clear_ext(&rule->delete_queue, hk_delete_queue_free);
 }
 
 /******************************************************************************

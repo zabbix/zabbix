@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -64,5 +64,7 @@ err:
 	zbx_free(script_bin);
 	zbx_free(error);
 
+	/* avoid memory not being released back to the system if there was memory-intensive script item */
+	zbx_malloc_trim(time(NULL), 0, ZBX_MEBIBYTE);
 	return ret;
 }

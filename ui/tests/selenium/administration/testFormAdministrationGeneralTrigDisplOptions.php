@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -89,7 +89,7 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 		'Warning' => 'Custom Warning',
 		'Average' => 'Custom Average',
 		'High' => 'Custom High',
-		'High' => 'Custom Disaster',
+		'Disaster' => 'Custom Disaster',
 		// TODO: This should be changed to really custom values after DEV-1673 is fixed.
 //		'xpath://button[@id="lbl_problem_unack_color"]/..' => 'D81B60',
 //		'xpath://button[@id="lbl_problem_ack_color"]/..' => 'F8BBD0',
@@ -126,30 +126,29 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 			'severity_name_4' => 32,
 			'severity_name_5' => 32
 		];
-
-		$color_limits = [
-			'id:lbl_problem_unack_color' => 6,
-			'id:lbl_problem_ack_color' => 6,
-			'id:lbl_ok_unack_color' => 6,
-			'id:lbl_ok_ack_color' => 6,
-			'id:lbl_severity_color_0' => 6,
-			'id:lbl_severity_color_1' => 6,
-			'id:lbl_severity_color_2' => 6,
-			'id:lbl_severity_color_3' => 6,
-			'id:lbl_severity_color_4' => 6,
-			'id:lbl_severity_color_5' => 6
-		];
-
 		foreach ($limits as $id => $limit) {
 			$this->assertEquals($limit, $this->query('id', $id)->one()->getAttribute('maxlength'));
 		}
 
 		$form->fill(['Use custom event status colours' => true]);
-		foreach ($color_limits as $selector => $limit) {
+
+		$color_pickers = [
+			'id:lbl_problem_unack_color',
+			'id:lbl_problem_ack_color',
+			'id:lbl_ok_unack_color',
+			'id:lbl_ok_ack_color',
+			'id:lbl_severity_color_0',
+			'id:lbl_severity_color_1',
+			'id:lbl_severity_color_2',
+			'id:lbl_severity_color_3',
+			'id:lbl_severity_color_4',
+			'id:lbl_severity_color_5'
+		];
+		foreach ($color_pickers as $selector) {
 			$form->query($selector)->one()->click()->waitUntilReady();
-			$color_pick = $this->query('xpath://div[@id="color_picker"]')->asColorPicker()->one();
-			$this->assertEquals($limit, $color_pick->getInput()->getAttribute('maxlength'));
-			$color_pick->close();
+			$overlay = $this->query('xpath://div[@id="color_picker"]')->asColorPicker()->one();
+			$this->assertEquals(6, $overlay->query('xpath:.//input')->one()->getAttribute('maxlength'));
+			$overlay->close();
 		}
 
 		$checkboxes = [

@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2025-09-19 10:32+0000\n"
+"PO-Revision-Date: 2025-11-06 22:04+0000\n"
 "Last-Translator: Xevi Noè i Nogueiras <xevi.noe@gmail.com>\n"
 "Language-Team: none\n"
 "Language: ca\n"
@@ -3823,6 +3823,10 @@ msgstr "No es pot pas establir \"%1$s\" per al prototip de gràfic \"%2$s\"."
 #: widgets/piechart/includes/CWidgetFieldDataSet.php:175
 msgid "Cannot set \"Data set aggregation\" when item with type \"Total\" is added to the chart."
 msgstr "No es pot pas establir \"Afegit del conjunt de dades\" quan s'afegeix un element de tipus \"Total\" al gràfic."
+
+#: include/classes/db/MysqlDbBackend.php:197
+msgid "Cannot set charset."
+msgstr "No es pot definir el joc de caràcters."
 
 #: include/classes/api/services/CItemGeneral.php:2478
 #, c-format

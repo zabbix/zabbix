@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -25,18 +25,18 @@ const (
 )
 
 // pingHandler queries 'SELECT 1' and returns pingOk if a connection is alive or pingFailed otherwise.
-func pingHandler(ctx context.Context, conn MyClient, params map[string]string, _ ...string) (interface{}, error) {
+func pingHandler(ctx context.Context, conn MyClient, _ map[string]string, _ ...string) (any, error) {
 	var res int
 
 	row, err := conn.QueryRow(ctx, fmt.Sprintf("SELECT %d", pingOk))
 	if err != nil {
-		return pingFailed, nil
+		return pingFailed, nil //nolint:nilerr //No need to return an error by design
 	}
 
 	err = row.Scan(&res)
 
 	if err != nil || res != pingOk {
-		return pingFailed, nil
+		return pingFailed, nil //nolint:nilerr //No need to return an error by design
 	}
 
 	return pingOk, nil

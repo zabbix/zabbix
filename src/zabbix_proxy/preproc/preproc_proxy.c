@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -32,7 +32,7 @@ void	preproc_flush_value_proxy(zbx_pp_manager_t *manager, zbx_uint64_t itemid, u
 {
 	ZBX_UNUSED(manager);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() itemid:" ZBX_FS_UI64, __func__, itemid);
 
 	zbx_dc_add_history_variant(itemid, value_type, flags, value, ts, value_opt);
 

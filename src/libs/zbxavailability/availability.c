@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -111,6 +111,11 @@ int	zbx_get_active_agent_availability(zbx_uint64_t hostid)
 	zbx_free(data);
 
 	return status;
+}
+
+void	zbx_proxy_hostdata_free(zbx_proxy_hostdata_t *ph)
+{
+	zbx_free(ph);
 }
 
 /******************************************************************************

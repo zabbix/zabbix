@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -64,6 +64,11 @@ zbx_trigger_func_position_t;
 
 ZBX_PTR_VECTOR_DECL(trigger_func_position, zbx_trigger_func_position_t *)
 ZBX_PTR_VECTOR_IMPL(trigger_func_position, zbx_trigger_func_position_t *)
+
+static void	free_trigger_func_position(zbx_trigger_func_position_t *tfp)
+{
+	zbx_free(tfp);
+}
 
 /******************************************************************************
  *                                                                            *
@@ -202,9 +207,7 @@ void	zbx_determine_items_in_expressions(zbx_vector_dc_trigger_t *trigger_order, 
 	zbx_dc_config_clean_functions(functions, errcodes, functionids.values_num);
 	zbx_free(errcodes);
 	zbx_free(functions);
-
-	zbx_vector_trigger_func_position_clear_ext(&triggers_func_pos,
-			(zbx_trigger_func_position_free_func_t)zbx_ptr_free);
+	zbx_vector_trigger_func_position_clear_ext(&triggers_func_pos, free_trigger_func_position);
 	zbx_vector_trigger_func_position_destroy(&triggers_func_pos);
 
 	zbx_vector_uint64_clear(&functionids);
@@ -689,6 +692,11 @@ static int	evaluate_expression(zbx_eval_context_t *ctx, const zbx_timespec_t *ts
 	return SUCCEED;
 }
 
+int	zbx_um_expand_cb_wrapper(void *data, char **str, const zbx_uint64_t *hostids, int hostids_num, char **error)
+{
+	return zbx_dc_expand_user_and_func_macros((const zbx_dc_um_handle_t *)data, str, hostids, hostids_num, error);
+}
+
 static int	expand_expression_macros(zbx_eval_context_t *ctx, zbx_dc_um_handle_t *um_handle,
 		const zbx_db_event *db_event, const zbx_uint64_t *hostids, int hostids_num, char **error)
 {
@@ -700,8 +708,7 @@ static int	expand_expression_macros(zbx_eval_context_t *ctx, zbx_dc_um_handle_t 
 		return FAIL;
 	}
 
-	return zbx_eval_expand_user_macros(ctx, hostids, hostids_num,
-			(zbx_macro_expand_func_t)zbx_dc_expand_user_and_func_macros, um_handle, error);
+	return zbx_eval_expand_user_macros(ctx, hostids, hostids_num, zbx_um_expand_cb_wrapper, um_handle, error);
 }
 
 static int	expand_trigger_macros(zbx_dc_trigger_t *tr, zbx_db_event *db_event, zbx_dc_um_handle_t *um_handle,

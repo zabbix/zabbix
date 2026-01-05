@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -314,7 +314,7 @@ static int	validate_manualinput(const char *manualinput, const char *validator,
 	switch (validator_type)
 	{
 		case ZBX_SCRIPT_MANUALINPUT_VALIDATOR_TYPE_REGEX:
-			ret = (NULL != zbx_regexp_match(manualinput, validator, NULL) ? SUCCEED : FAIL);
+			ret = (NULL != zbx_regexp_match_full(manualinput, validator, NULL) ? SUCCEED : FAIL);
 			break;
 		case ZBX_SCRIPT_MANUALINPUT_VALIDATOR_TYPE_LIST:
 			ret = zbx_str_in_list(validator, manualinput, ',');
