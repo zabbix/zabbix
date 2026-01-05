@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -391,13 +391,20 @@ class CDashboard {
 
 		curl.setArgument('action', 'dashboard.config.hash');
 
+		const data = {
+			dashboardid: this._data.dashboardid
+		};
+
+		if (this._data.templateid !== null
+				&& this.#broadcast_cache.get(CWidgetsData.DATA_TYPE_HOST_ID)
+					!== CWidgetsData.getDefault(CWidgetsData.DATA_TYPE_HOST_ID)) {
+			data.hostid = this.#broadcast_cache.get(CWidgetsData.DATA_TYPE_HOST_ID)[0];
+		}
+
 		return fetch(curl.getUrl(), {
 			method: 'POST',
 			headers: {'Content-Type': 'application/json'},
-			body: JSON.stringify({
-				templateid: this._data.templateid ?? undefined,
-				dashboardid: this._data.dashboardid
-			})
+			body: JSON.stringify(data)
 		})
 			.then(response => response.json())
 			.then(response => {

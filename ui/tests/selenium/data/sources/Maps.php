@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -167,10 +167,10 @@ class Maps {
 					// Pink ellipse.
 					[
 						'type' => SYSMAP_SHAPE_TYPE_ELLIPSE,
-						'x' => 425,
-						'y' => 257,
-						'width' => 199,
-						'height' => 135,
+						'x' => 426,
+						'y' => 258,
+						'width' => 200,
+						'height' => 136,
 						'text' => '',
 						'border_width' => 2,
 						'background_color' => 'FFCCCC',

@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -28,6 +28,18 @@ class testPageUsers extends CLegacyWebTest {
 	public $userName = 'Zabbix';
 	public $userSurname = 'Administrator';
 	public $userRole = 'Super admin role';
+
+	/**
+	 * Attach MessageBehavior, CTableBehavior to the test.
+	 *
+	 * @return array
+	 */
+	public function getBehaviors() {
+		return [
+			CTableBehavior::class,
+			CMessageBehavior::class
+		];
+	}
 
 	/**
 	 * Data for MassDelete scenario.
@@ -73,12 +85,13 @@ class testPageUsers extends CLegacyWebTest {
 		$this->zbxTestLogin('zabbix.php?action=user.list');
 		$this->zbxTestCheckTitle('Configuration of users');
 		$this->zbxTestCheckHeader('Users');
-
+		$table = $this->getTable();
 
 		$form = $this->query('name:zbx_filter')->asForm()->waitUntilVisible()->one();
 		$this->assertEquals(['Username', 'Name', 'Last name', 'User roles', 'User groups'], $form->getLabels()->asText());
 		$form->fill(['User groups' => 'Zabbix administrators']);
 		$form->submit();
+		$table->waitUntilReloaded();
 
 		$this->zbxTestTextNotPresent('guest');
 		$this->zbxTestAssertElementText("//tbody/tr[1]/td[2]/a", $this->userAlias);

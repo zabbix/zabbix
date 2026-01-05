@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -1856,6 +1856,11 @@ class CDashboardPage {
 			},
 
 			widgetEnter: e => {
+				// Ignore ghost events caused by animations.
+				if (!e.detail.is_explicit && this._events_data.dashboard_grid_mouse_interaction_timeout_id === null) {
+					return;
+				}
+
 				const widget = e.detail.target;
 
 				if (this._is_edit_mode) {
@@ -1920,6 +1925,16 @@ class CDashboardPage {
 				this.fire(DASHBOARD_PAGE_EVENT_WIDGET_DELETE);
 			},
 
+			dashboardGridMouseInteraction: () => {
+				if (this._events_data.dashboard_grid_mouse_interaction_timeout_id !== null) {
+					clearTimeout(this._events_data.dashboard_grid_mouse_interaction_timeout_id);
+				}
+
+				this._events_data.dashboard_grid_mouse_interaction_timeout_id = setTimeout(() => {
+					this._events_data.dashboard_grid_mouse_interaction_timeout_id = null;
+				}, 100);
+			},
+
 			dashboardGridResize: () => {
 				if (this._events_data.dashboard_grid_resize_first_time) {
 					this._events_data.dashboard_grid_resize_first_time = false;
@@ -1957,6 +1972,8 @@ class CDashboardPage {
 		this._events_data = {
 			last_num_reserved_header_lines: 0,
 
+			dashboard_grid_mouse_interaction_timeout_id: null,
+
 			dashboard_grid_resize_timeout_id: null,
 			dashboard_grid_resize_first_time: true,
 			dashboard_grid_resize_width: null
@@ -1964,11 +1981,17 @@ class CDashboardPage {
 	}
 
 	#activateEvents() {
+		this._dashboard_grid.addEventListener('mousemove', this._events.dashboardGridMouseInteraction);
+		this._dashboard_grid.addEventListener('mouseenter', this._events.dashboardGridMouseInteraction);
+
 		this._events_data.dashboard_grid_resize_observer = new ResizeObserver(this._events.dashboardGridResize);
 		this._events_data.dashboard_grid_resize_observer.observe(this._dashboard_grid);
 	}
 
 	#deactivateEvents() {
+		this._dashboard_grid.removeEventListener('mousemove', this._events.dashboardGridMouseInteraction);
+		this._dashboard_grid.removeEventListener('mouseenter', this._events.dashboardGridMouseInteraction);
+
 		this._events_data.dashboard_grid_resize_observer.disconnect();
 
 		if (this._events_data.dashboard_grid_resize_timeout_id !== null) {

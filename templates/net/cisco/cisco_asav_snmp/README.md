@@ -35,8 +35,8 @@ Refer to the vendor documentation.
 |{$CISCO.LLD.FILTER.IF.ADMIN.MATCHES}|<p>Filter of discoverable interfaces by admin status.</p><p>1 - Up</p><p>2 - Down</p><p>3 - Testing</p>|`1`|
 |{$CISCO.LLD.FILTER.IF.ADMIN.NOT_MATCHES}|<p>Filter to exclude discovered interfaces by admin status.</p>|`CHANGE_IF_NEEDED`|
 |{$CISCO.LLD.FILTER.IF.CONTROL.MATCHES}|<p>Filter triggers by discoverable interface names.</p><p>Used in overrides. Triggers will only be created for interfaces whose names contain the value of the macro.</p>|`.*`|
-|{$CPU.UTIL.CRIT}||`90`|
-|{$MEMORY.UTIL.MAX}||`90`|
+|{$CPU.UTIL.CRIT}|<p>Critical threshold of CPU utilization in %.</p>|`90`|
+|{$MEMORY.UTIL.MAX}|<p>Threshold for maximum memory utilization in %.</p>|`90`|
 
 ### Items
 

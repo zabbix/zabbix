@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -558,7 +558,7 @@ class testFormGroups extends CWebTest {
 		// Refresh element after opening new form after cloning.
 		if ($data['action'] === 'Clone') {
 			$footer = ($this->standalone)
-				? $form->invalidate()
+				? $form->waitUntilStalled()->invalidate()
 				: COverlayDialogElement::find()->one()->waitUntilReady()->getFooter();
 		}
 
