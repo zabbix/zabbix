@@ -715,15 +715,15 @@
 	OverrideEditForm.prototype.filterDynamicRows = function() {
 		var that = this;
 
-		const toggleConditionValue = function(event) {
-			const value = event.currentTarget.closest('.form_row').querySelector('.js-value');
-			const show_value = (event.currentTarget.value == <?= CONDITION_OPERATOR_REGEXP ?>
-				|| event.currentTarget.value == <?= CONDITION_OPERATOR_NOT_REGEXP ?>);
+		const toggleConditionValue = function(target) {
+			const value_input = target.closest('.form_row').querySelector('.js-value');
+			const show_value = (target.value == <?= CONDITION_OPERATOR_REGEXP ?>
+				|| target.value == <?= CONDITION_OPERATOR_NOT_REGEXP ?>);
 
-			value.classList.toggle('<?= ZBX_STYLE_DISPLAY_NONE ?>', !show_value);
+			value_input.classList.toggle('<?= ZBX_STYLE_DISPLAY_NONE ?>', !show_value);
 
 			if (!show_value) {
-				value.value = '';
+				value_input.value = '';
 			}
 		}
 
@@ -754,7 +754,7 @@
 			.on('afteradd.dynamicRows', (event) => {
 				[...event.currentTarget.querySelectorAll('.js-operator')]
 					.pop()
-					.addEventListener('change', toggleConditionValue);
+					.addEventListener('change', (e) => toggleConditionValue(e.currentTarget));
 			})
 			.ready(function() {
 				jQuery('#overrideRow').toggle(jQuery('.form_row', jQuery('#overrides_filters')).length > 1);
@@ -776,7 +776,7 @@
 		jQuery('#overrides-evaltype').trigger('change');
 
 		[...document.getElementById('overrides_filters').querySelectorAll('.js-operator')].map((elem) => {
-			elem.addEventListener('change', toggleConditionValue);
+			elem.addEventListener('change', (e) => toggleConditionValue(e.currentTarget));
 		});
 	};
 

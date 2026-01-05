@@ -83,7 +83,7 @@ class CControllerLldRulePrototypeCreate extends CControllerLldRuleUpdateGeneral 
 		$messages = array_column(get_and_clear_messages(), 'message');
 
 		if ($result) {
-			$output['success']['title'] = _('Discovery rule created');
+			$output['success']['title'] = _('Discovery prototype created');
 
 			if ($messages) {
 				$output['success']['messages'] = $messages;
@@ -91,7 +91,7 @@ class CControllerLldRulePrototypeCreate extends CControllerLldRuleUpdateGeneral 
 		}
 		else {
 			$output['error'] = [
-				'title' => _('Cannot create discovery rule'),
+				'title' => _('Cannot add discovery prototype'),
 				'messages' => $messages
 			];
 		}

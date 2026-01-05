@@ -336,6 +336,9 @@ abstract class CControllerLldRuleUpdateGeneral extends CController {
 			],
 			'conditions' => [
 				['objects', 'required', 'fields' => [
+					'formulaid' => ['string', 'required',
+						'when' => ['../evaltype', 'in' => [CONDITION_EVAL_TYPE_EXPRESSION]]
+					],
 					'operator' => ['integer', 'required',
 						'in' => [CONDITION_OPERATOR_REGEXP, CONDITION_OPERATOR_NOT_REGEXP, CONDITION_OPERATOR_EXISTS,
 							CONDITION_OPERATOR_NOT_EXISTS
@@ -353,10 +356,7 @@ abstract class CControllerLldRuleUpdateGeneral extends CController {
 							]
 						]
 					]
-				]],
-				['objects', 'uniq' => ['formulaid'], 'required', 'not_empty',
-					'when' => ['evaltype', 'in' => [CONDITION_EVAL_TYPE_EXPRESSION]]
-				]
+				]]
 			],
 			'overrides' => ['objects', 'uniq' => ['name'], 'fields' => [
 				'name' => ['db lld_override.name', 'required', 'not_empty'],
@@ -369,27 +369,31 @@ abstract class CControllerLldRuleUpdateGeneral extends CController {
 						'evaltype' => ['integer', 'in' => [CONDITION_EVAL_TYPE_AND_OR, CONDITION_EVAL_TYPE_AND,
 							CONDITION_EVAL_TYPE_OR, CONDITION_EVAL_TYPE_EXPRESSION]
 						],
-						'formula' => ['db items.formula', 'required',
+						'formula' => ['db lld_override.formula', 'required',
 							'when' => ['evaltype', 'in' => [CONDITION_EVAL_TYPE_EXPRESSION]]
 						],
-						'conditions' => [
-							['objects', 'fields' => [
-								'operator' => ['integer', 'required',
-									'in' => [CONDITION_OPERATOR_REGEXP, CONDITION_OPERATOR_NOT_REGEXP,
-										CONDITION_OPERATOR_EXISTS, CONDITION_OPERATOR_NOT_EXISTS
+						'conditions' => ['objects', 'fields' => [
+							'formulaid' => ['string', 'required',
+								'when' => ['../evaltype', 'in' => [CONDITION_EVAL_TYPE_EXPRESSION]]
+							],
+							'operator' => ['integer', 'required',
+								'in' => [CONDITION_OPERATOR_REGEXP, CONDITION_OPERATOR_NOT_REGEXP, CONDITION_OPERATOR_EXISTS,
+									CONDITION_OPERATOR_NOT_EXISTS
+								]
+							],
+							'value' => ['db lld_override_condition.value', 'required',
+								'when' => ['operator', 'in' => [CONDITION_OPERATOR_REGEXP, CONDITION_OPERATOR_NOT_REGEXP]]
+							],
+							'macro' => [
+								['db lld_override_condition.macro', 'use' => [CLLDMacroParser::class]],
+								['db lld_override_condition.macro', 'required', 'not_empty',
+									'when' => [
+										['operator', 'in' => [CONDITION_OPERATOR_REGEXP, CONDITION_OPERATOR_NOT_REGEXP]],
+										['value', 'not_empty']
 									]
-								],
-								'value' => ['db item_condition.value', 'required',
-									'when' => ['operator',
-										'in' => [CONDITION_OPERATOR_REGEXP, CONDITION_OPERATOR_NOT_REGEXP]
-									]
-								],
-								'macro' => ['db item_condition.macro']
-							]],
-							['objects', 'uniq' => ['formulaid'], 'required', 'not_empty',
-								'when' => ['evaltype', 'in' => [CONDITION_EVAL_TYPE_EXPRESSION]]
+								]
 							]
-						]
+						]]
 					]
 				],
 				'operations' => ['objects', 'fields' => [

@@ -66,7 +66,7 @@ class CControllerLldRuleCreate extends CControllerLldRuleUpdateGeneral {
 		}
 		else {
 			$output['error'] = [
-				'title' => _('Cannot create discovery rule'),
+				'title' => _('Cannot add discovery rule'),
 				'messages' => $messages
 			];
 		}

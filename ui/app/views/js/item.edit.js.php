@@ -390,6 +390,7 @@ window.item_edit_form = new class {
 
 	create() {
 		const fields = this.#getFormFields();
+		fields.interfaceid = fields.interfaceid || null;
 		const curl = new Curl('zabbix.php');
 
 		curl.setArgument('action', this.actions.create);
@@ -406,6 +407,7 @@ window.item_edit_form = new class {
 
 	update() {
 		const fields = this.#getFormFields();
+		fields.interfaceid = fields.interfaceid || null;
 		const curl = new Curl('zabbix.php');
 
 		curl.setArgument('action', this.actions.update);

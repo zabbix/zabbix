@@ -60,7 +60,7 @@ class CControllerLldRulePrototypeUpdate extends CControllerLldRuleUpdateGeneral 
 		$messages = array_column(get_and_clear_messages(), 'message');
 
 		if ($result) {
-			$output['success']['title'] = _('Discovery rule updated');
+			$output['success']['title'] = _('Discovery prototype updated');
 
 			if ($messages) {
 				$output['success']['messages'] = $messages;
@@ -68,7 +68,7 @@ class CControllerLldRulePrototypeUpdate extends CControllerLldRuleUpdateGeneral 
 		}
 		else {
 			$output['error'] = [
-				'title' => _('Cannot update discovery rule'),
+				'title' => _('Cannot update discovery prototype'),
 				'messages' => $messages
 			];
 		}

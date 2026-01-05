@@ -145,6 +145,7 @@ window.lldrule_prototype_edit = new class {
 		window.lldoverrides.appendFormData(this.#form_element);
 		this.#form.discoverAllFields();
 		const fields = this.#form.getAllValues();
+		fields.interfaceid = fields.interfaceid || null;
 		this.#overlay.unsetLoading();
 
 		const curl = new Curl('zabbix.php');

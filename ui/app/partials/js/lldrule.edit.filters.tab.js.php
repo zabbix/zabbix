@@ -51,14 +51,15 @@ var LldRuleEditLldFiltersTab = class {
 			.on('afteradd.dynamicRows', (event) => {
 				[...event.currentTarget.querySelectorAll('.js-operator')]
 					.pop()
-					.addEventListener('change', this.#toggleConditionValue);
+					.addEventListener('change', (e) => this.#toggleConditionValue(e.currentTarget));
 			})
 			.ready(() => {
 				this.#toggleTypeOfCalculation();
 
-				this.#container.querySelectorAll('.js-lld-filters .js-operator').forEach(el =>
-					el.addEventListener('change', this.#toggleConditionValue)
-				);
+				this.#container.querySelectorAll('.js-lld-filters .js-operator').forEach(el => {
+					el.addEventListener('change', (e) => this.#toggleConditionValue(e.currentTarget));
+					this.#toggleConditionValue(el);
+				});
 			});
 
 		this.#container.querySelector('.js-evaltype').addEventListener('change', () =>
@@ -76,15 +77,15 @@ var LldRuleEditLldFiltersTab = class {
 		);
 	}
 
-	#toggleConditionValue(event) {
-		const value = event.currentTarget.closest('.form_row').querySelector('.js-value');
-		const show_value = (event.currentTarget.value == <?= CONDITION_OPERATOR_REGEXP ?>
-			|| event.currentTarget.value == <?= CONDITION_OPERATOR_NOT_REGEXP ?>);
+	#toggleConditionValue(target) {
+		const value_input = target.closest('.form_row').querySelector('.js-value');
+		const show_value = (target.value == <?= CONDITION_OPERATOR_REGEXP ?>
+			|| target.value == <?= CONDITION_OPERATOR_NOT_REGEXP ?>);
 
-		value.classList.toggle('<?= ZBX_STYLE_DISPLAY_NONE ?>', !show_value);
+		value_input.classList.toggle('<?= ZBX_STYLE_DISPLAY_NONE ?>', !show_value);
 
 		if (!show_value) {
-			value.value = '';
+			value_input.value = '';
 		}
 	}
 
