@@ -154,8 +154,7 @@ class CTag extends CObject {
 	 *													aria_describedby with this id for the button.
 	 * @return CTag
 	 */
-	public function setHint($text, $span_class = '', $freeze_on_click = true, $styles = '', $delay = null,
-			$aria_describedby = false) {
+	public function setHint($text, $span_class = '', $freeze_on_click = true, $styles = '', $delay = null) {
 		$this->setAttribute('data-hintbox-contents', (new CTag('', false, $text))->bodyToString());
 
 		$this->setAttribute('data-hintbox', '1');
@@ -176,10 +175,6 @@ class CTag extends CObject {
 			$this->setAttribute('data-hintbox-delay', $delay);
 		}
 
-		if ($aria_describedby) {
-			$this->setAttribute('aria-describedby', bin2hex(random_bytes(16)));
-		}
-
 		return $this;
 	}
 
@@ -194,10 +189,10 @@ class CTag extends CObject {
 	 * @return $this
 	 */
 	public function setAjaxHint(array $data, string $span_class = '', bool $freeze_on_click = true,
-			string $styles = '', $aria_describedby = false): CTag {
+			string $styles = ''): CTag {
 		$this
 			->setAttribute('data-hintbox-preload', $data)
-			->setHint('', $span_class, $freeze_on_click, $styles, null, $aria_describedby);
+			->setHint('', $span_class, $freeze_on_click, $styles);
 
 		return $this;
 	}

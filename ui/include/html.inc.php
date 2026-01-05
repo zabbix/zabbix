@@ -1054,7 +1054,7 @@ function makeDescriptionIcon(string $description): CButtonIcon {
 	return (new CButtonIcon(ZBX_ICON_ALERT_WITH_CONTENT))
 		->setAttribute('data-content', '?')
 		->setAttribute('aria-label', 'Show hint')
-		->setHint(zbx_str2links($description), ZBX_STYLE_HINTBOX_WRAP, true, '', null, true);
+		->setHint(zbx_str2links($description), ZBX_STYLE_HINTBOX_WRAP);
 }
 
 /**

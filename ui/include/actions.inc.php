@@ -1753,7 +1753,7 @@ function makeEventSeverityChangesIcon(array $data, array $users): ?CButtonIcon {
 			->setAttribute('aria-label', _x('Problem severity changed', 'screen reader'));
 	}
 
-	return $button->setHint($table, ZBX_STYLE_HINTBOX_WRAP_HORIZONTAL, true, '', null, true);
+	return $button->setHint($table, ZBX_STYLE_HINTBOX_WRAP_HORIZONTAL);
 }
 
 /**
@@ -1842,7 +1842,7 @@ function makeEventActionsIcon(array $data, $eventid): ?CButtonIcon {
 		->setAjaxHint([
 			'type' => 'eventactions',
 			'data' => ['eventid' => $eventid]
-		], ZBX_STYLE_HINTBOX_WRAP_HORIZONTAL, true,	'', true);
+		], ZBX_STYLE_HINTBOX_WRAP_HORIZONTAL);
 }
 
 /**

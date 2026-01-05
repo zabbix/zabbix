@@ -262,7 +262,7 @@ var hintBox = {
 	 * - onDeleteHint.hintBox 	- when removing a hintbox.
 	 */
 	bindEvents: function () {
-		jQuery(document).on('focus keydown click mouseenter mousemove mouseleave', '[data-hintbox=1]', function (e) {
+		jQuery(document).on('keydown click mouseenter mousemove mouseleave', '[data-hintbox=1]', function (e) {
 			const $target = jQuery(this).hasClass('hint-item')
 				? jQuery(this).siblings('.main-hint')
 				: jQuery(this);
@@ -288,7 +288,6 @@ var hintBox = {
 		clearTimeout(hintBox.show_hint_timer);
 
 		switch (e.handleObj.origType) {
-			case 'focus':
 			case 'mouseenter':
 				hintBox.showHintStart(e, $target, delay);
 				break;
@@ -405,11 +404,12 @@ var hintBox = {
 
 	createBox: function(e, target, hintText, className, isStatic, styles, appendTo, reposition_on_resize = true) {
 		var hintboxid = hintBox.getUniqueId(),
-			attrs = {'data-hintboxid': hintboxid},
-			dynamicid = $(target).attr('aria-describedby');
+			attrs = {'data-hintboxid': hintboxid};
 
-		if (dynamicid && !isStatic) {
-			attrs['id'] = dynamicid;
+		if (!isStatic) {
+			id = 'hintbox-'+hintboxid;
+			$(target).attr('aria-describedby', id);
+			attrs['id'] = id;
 			attrs['role'] = 'tooltip';
 		}
 
