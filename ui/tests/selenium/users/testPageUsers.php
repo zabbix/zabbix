@@ -101,7 +101,7 @@ class testPageUsers extends CWebTest {
 		// Remove groups from a user.
 		CDataHelper::call('user.update', [
 			[
-				'userid' => 97,
+				'userid' => CDataHelper::get('LoginUsers.userids.test-user'),
 				'usrgrps' => []
 			]
 		]);
