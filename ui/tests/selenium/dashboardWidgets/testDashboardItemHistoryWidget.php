@@ -2226,6 +2226,7 @@ class testDashboardItemHistoryWidget extends testWidgets {
 		]);
 		$column_overlay->getFooter()->query('button:Add')->waitUntilClickable()->one()->click();
 		$column_overlay->waitUntilNotVisible();
+		$form->waitUntilStalled();
 
 		// Save or cancel widget.
 		if (CTestArrayHelper::get($data, 'save_widget', false)) {
@@ -2238,7 +2239,7 @@ class testDashboardItemHistoryWidget extends testWidgets {
 		}
 		else {
 			$dialog = COverlayDialogElement::find()->one();
-			$dialog->query('button:Cancel')->one()->click();
+			$dialog->query('button:Cancel')->waitUntilClickable()->one()->click();
 			$dialog->ensureNotPresent();
 
 			if (CTestArrayHelper::get($data, 'update', false)) {

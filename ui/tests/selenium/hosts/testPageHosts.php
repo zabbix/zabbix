@@ -357,10 +357,12 @@ class testPageHosts extends CLegacyWebTest {
 
 	public function testPageHosts_FilterByTemplates() {
 		$this->zbxTestLogin(self::HOST_LIST_PAGE);
+		$table = $this->getTable();
 		$filter = $this->query('name:zbx_filter')->asForm()->one();
 		$filter->query('button:Reset')->one()->click();
 		$filter->fill(['Templates' => ['values' =>'Template for web scenario testing', 'context' => 'Templates']]);
 		$filter->submit();
+		$table->waitUntilReloaded();
 		$this->zbxTestWaitForPageToLoad();
 		$this->zbxTestAssertElementPresentXpath("//tbody//a[text()='Simple form test host']");
 		$this->assertTableStats(1);
