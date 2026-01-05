@@ -70,12 +70,6 @@ class CControllerProxyGroupEdit extends CController {
 	protected function doAction(): void {
 		if ($this->proxy_group !== null) {
 			$data = [
-				'js_validation_rules' => (new CFormValidator(
-					CControllerProxyGroupUpdate::getValidationRules()
-				))->getRules(),
-				'js_validation_rules_for_clone' => (new CFormValidator(
-					CControllerProxyGroupCreate::getValidationRules()
-				))->getRules(),
 				'proxy_groupid' => $this->proxy_group['proxy_groupid'],
 				'proxies' => $this->proxy_group['proxies'],
 				'proxy_count_total' => count($this->proxy_group['proxies']),
@@ -94,9 +88,6 @@ class CControllerProxyGroupEdit extends CController {
 		}
 		else {
 			$data = [
-				'js_validation_rules' => (new CFormValidator(
-					CControllerProxyGroupCreate::getValidationRules()
-				))->getRules(),
 				'proxy_groupid' => null,
 				'proxies' => [],
 				'proxy_count_total' => 0,
@@ -107,8 +98,6 @@ class CControllerProxyGroupEdit extends CController {
 					'description' => DB::getDefault('proxy_group', 'description')
 				]
 			];
-
-			$data['js_validation_rules_for_clone'] = $data['js_validation_rules'];
 		}
 
 		$data['user'] = [

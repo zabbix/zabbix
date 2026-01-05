@@ -121,9 +121,7 @@ class testFormAdministrationProxyGroups extends CWebTest {
 					'fields' => [
 						'Name' => ''
 					],
-					'inline_errors' => [
-						'Name' => 'This field cannot be empty.'
-					]
+					'error' => 'Incorrect value for field "name": cannot be empty.'
 				]
 			],
 			# 1.
@@ -134,9 +132,7 @@ class testFormAdministrationProxyGroups extends CWebTest {
 						'Name' => 'Empty failover period',
 						'Failover period' => ''
 					],
-					'inline_errors' => [
-						'Failover period' => 'This field cannot be empty.'
-					]
+					'error' => 'Incorrect value for field "failover_delay": cannot be empty.'
 				]
 			],
 			# 2.
@@ -147,9 +143,7 @@ class testFormAdministrationProxyGroups extends CWebTest {
 						'Name' => 'Failover period below minimum',
 						'Failover period' => 9
 					],
-					'inline_errors' => [
-						'Failover period' => 'Value must be one of 10-900.'
-					]
+					'error' => 'Invalid parameter "/1/failover_delay": value must be one of 10-900.'
 				]
 			],
 			# 3.
@@ -160,9 +154,7 @@ class testFormAdministrationProxyGroups extends CWebTest {
 						'Name' => 'Failover period above maximum',
 						'Failover period' => 901
 					],
-					'inline_errors' => [
-						'Failover period' => 'Value must be one of 10-900.'
-					]
+					'error' => 'Invalid parameter "/1/failover_delay": value must be one of 10-900.'
 				]
 			],
 			# 4.
@@ -173,9 +165,7 @@ class testFormAdministrationProxyGroups extends CWebTest {
 						'Name' => 'Failover period above maximum via suffix',
 						'Failover period' => '1h'
 					],
-					'inline_errors' => [
-						'Failover period' => 'Value must be one of 10-900.'
-					]
+					'error' => 'Invalid parameter "/1/failover_delay": value must be one of 10-900.'
 				]
 			],
 			# 5.
@@ -186,9 +176,7 @@ class testFormAdministrationProxyGroups extends CWebTest {
 						'Name' => 'Float in failover period',
 						'Failover period' => '11.1'
 					],
-					'inline_errors' => [
-						'Failover period' => 'A time unit is expected.'
-					]
+					'error' => 'Invalid parameter "/1/failover_delay": a time unit is expected.'
 				]
 			],
 			# 6.
@@ -199,9 +187,7 @@ class testFormAdministrationProxyGroups extends CWebTest {
 						'Name' => 'Non-numeric failover period',
 						'Failover period' => '10a'
 					],
-					'inline_errors' => [
-						'Failover period' => 'A time unit is expected.'
-					]
+					'error' => 'Invalid parameter "/1/failover_delay": a time unit is expected.'
 				]
 			],
 			# 7.
@@ -212,9 +198,7 @@ class testFormAdministrationProxyGroups extends CWebTest {
 						'Name' => 'LLD macros in Failover period',
 						'Failover period' => '{#MACRO}'
 					],
-					'inline_errors' => [
-						'Failover period' => 'A time unit is expected.'
-					]
+					'error' => 'Invalid parameter "/1/failover_delay": a time unit is expected.'
 				]
 			],
 			# 8.
@@ -226,9 +210,7 @@ class testFormAdministrationProxyGroups extends CWebTest {
 						'Failover period' => '{PROXY.DESCRIPTION}',
 						'Description' => '22'
 					],
-					'inline_errors' => [
-						'Failover period' => 'A time unit is expected.'
-					]
+					'error' => 'Invalid parameter "/1/failover_delay": a time unit is expected.'
 				]
 			],
 			# 9.
@@ -239,9 +221,7 @@ class testFormAdministrationProxyGroups extends CWebTest {
 						'Name' => 'Empty minimum number of proxies',
 						'Minimum number of proxies' => ''
 					],
-					'inline_errors' => [
-						'Minimum number of proxies' => 'This value is not a valid integer.'
-					]
+					'error' => 'Incorrect value for field "min_online": cannot be empty.'
 				]
 			],
 			# 10.
@@ -252,9 +232,7 @@ class testFormAdministrationProxyGroups extends CWebTest {
 						'Name' => 'Minimum number of proxies below minimum',
 						'Minimum number of proxies' => 0
 					],
-					'inline_errors' => [
-						'Minimum number of proxies' => 'This value must be no less than "1".'
-					]
+					'error' => 'Invalid parameter "/1/min_online": value must be one of 1-1000.'
 				]
 			],
 			# 11.
@@ -265,9 +243,7 @@ class testFormAdministrationProxyGroups extends CWebTest {
 						'Name' => 'Minimum number of proxies above maximum',
 						'Minimum number of proxies' => 1001
 					],
-					'inline_errors' => [
-						'Minimum number of proxies' => 'This value must be no greater than "1000".'
-						]
+					'error' => 'Invalid parameter "/1/min_online": value must be one of 1-1000.'
 				]
 			],
 			# 12.
@@ -278,9 +254,7 @@ class testFormAdministrationProxyGroups extends CWebTest {
 						'Name' => 'Minimum number of proxies - should be no suffix support',
 						'Minimum number of proxies' => '1k'
 					],
-					'inline_errors' => [
-						'Minimum number of proxies' => 'This value is not a valid integer.'
-						]
+					'error' => 'Invalid parameter "/1/min_online": incorrect syntax near "1k".'
 				]
 			],
 			# 13.
@@ -291,9 +265,7 @@ class testFormAdministrationProxyGroups extends CWebTest {
 						'Name' => 'Float in minimum number of proxies',
 						'Minimum number of proxies' => '1.1'
 					],
-					'inline_errors' => [
-						'Minimum number of proxies' => 'This value is not a valid integer.'
-					]
+					'error' => 'Invalid parameter "/1/min_online": incorrect syntax near "1.1".'
 				]
 			],
 			# 14.
@@ -304,9 +276,7 @@ class testFormAdministrationProxyGroups extends CWebTest {
 						'Name' => 'LLD macros in Minimum number of proxies',
 						'Minimum number of proxies' => '{#MACRO}'
 					],
-					'inline_errors' => [
-						'Minimum number of proxies' => 'This value is not a valid integer.'
-					]
+					'error' => 'Invalid parameter "/1/min_online": incorrect syntax near "#MACRO}".'
 				]
 			],
 			# 15.
@@ -318,9 +288,7 @@ class testFormAdministrationProxyGroups extends CWebTest {
 						'Minimum number of proxies' => '{PROXY.DESCRIPTION}',
 						'Description' => '33'
 					],
-					'inline_errors' => [
-						'Minimum number of proxies' => 'This value is not a valid integer.'
-					]
+					'error' => 'Invalid parameter "/1/min_online": incorrect syntax near "PROXY.DESCRIPTION}".'
 				]
 			],
 			# 16.
@@ -330,9 +298,7 @@ class testFormAdministrationProxyGroups extends CWebTest {
 					'fields' => [
 						'Name' => 'Degrading proxy group'
 					],
-					'inline_errors' => [
-						'Name' => 'This object already exists.'
-					]
+					'error' => 'Proxy group "Degrading proxy group" already exists.'
 				]
 			],
 			# 17.
@@ -365,9 +331,8 @@ class testFormAdministrationProxyGroups extends CWebTest {
 					],
 					'trim' => true
 				]
-			]
+			],
 			# 20.
-			/* TODO: uncomment after DEV-4248 done
 			[
 				[
 					'fields' => [
@@ -379,7 +344,6 @@ class testFormAdministrationProxyGroups extends CWebTest {
 				]
 			],
 			# 21.
-			//TODO: uncomment after DEV-4248 done
 			[
 				[
 					'fields' => [
@@ -390,7 +354,6 @@ class testFormAdministrationProxyGroups extends CWebTest {
 					]
 				]
 			]
-			*/
 		];
 	}
 
@@ -452,7 +415,7 @@ class testFormAdministrationProxyGroups extends CWebTest {
 		$this->page->waitUntilReady();
 
 		if ($expected === TEST_BAD) {
-			$this->assertInlineError($form, $data['inline_errors']);
+			$this->assertMessage(TEST_BAD, ($update ? 'Cannot update proxy group' : 'Cannot add proxy group'), $data['error']);
 
 			// Check that DB hash is not changed.
 			$this->assertEquals($old_hash, CDBHelper::getHash(self::SQL));

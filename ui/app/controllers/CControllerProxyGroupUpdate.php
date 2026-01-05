@@ -18,37 +18,27 @@ class CControllerProxyGroupUpdate extends CController {
 
 	protected function init(): void {
 		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
-		$this->setInputValidationMethod(self::INPUT_VALIDATION_FORM);
-	}
-
-	public static function getValidationRules(): array {
-		$api_uniq = ['proxygroup.get', ['name' => '{name}'], 'proxy_groupid'];
-
-		return ['object', 'api_uniq' => $api_uniq, 'fields' => [
-			'proxy_groupid' =>	['db proxy_group.proxy_groupid', 'required'],
-			'name' => ['db proxy_group.name', 'required', 'not_empty'],
-			'failover_delay' => ['db proxy_group.failover_delay', 'required', 'not_empty',
-				'use' => [CTimeUnitValidator::class, ['min' => 10, 'max' => 15 * SEC_PER_MIN, 'usermacros' => true]]
-			],
-			'min_online' => ['integer', 'required', 'min' => 1, 'max' => 1000],
-			'description' => ['db proxy_group.description']
-		]];
 	}
 
 	protected function checkInput(): bool {
-		$ret = $this->validateInput(self::getValidationRules());
+		$fields = [
+			'proxy_groupid' =>	'required|db proxy_group.proxy_groupid',
+			'name' =>			'required|not_empty|db proxy_group.name',
+			'failover_delay' =>	'required|not_empty|db proxy_group.failover_delay',
+			'min_online' =>		'required|not_empty|db proxy_group.min_online',
+			'description' =>	'db proxy_group.description'
+		];
+
+		$ret = $this->validateInput($fields);
 
 		if (!$ret) {
-			$form_errors = $this->getValidationError();
-			$response = $form_errors
-				? ['form_errors' => $form_errors]
-				: ['error' => [
-					'title' => _('Cannot update proxy group'),
-					'messages' => array_column(get_and_clear_messages(), 'message')
-				]];
-
 			$this->setResponse(
-				new CControllerResponseData(['main_block' => json_encode($response)])
+				new CControllerResponseData(['main_block' => json_encode([
+					'error' => [
+						'title' => _('Cannot update proxy group'),
+						'messages' => array_column(get_and_clear_messages(), 'message')
+					]
+				])])
 			);
 		}
 

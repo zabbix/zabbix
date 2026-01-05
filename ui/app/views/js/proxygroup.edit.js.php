@@ -28,9 +28,6 @@ window.proxy_group_edit_popup = new class {
 	#dialogue;
 
 	/** @type {HTMLFormElement} */
-	#form_element;
-
-	/** @type {CForm} */
 	#form;
 
 	/** @type {string|null} */
@@ -39,33 +36,19 @@ window.proxy_group_edit_popup = new class {
 	/** @type {Object} */
 	#initial_form_fields;
 
-	/** @type {Object} */
-	#rules_for_clone;
-
-	init({rules, rules_for_clone, proxy_groupid}) {
-		this.#rules_for_clone = rules_for_clone;
+	init({proxy_groupid}) {
 		this.#overlay = overlays_stack.getById('proxygroup.edit');
 		this.#dialogue = this.#overlay.$dialogue[0];
-		this.#form_element = this.#overlay.$dialogue.$body[0].querySelector('form');
-		this.#form = new CForm(this.#form_element, rules);
+		this.#form = this.#overlay.$dialogue.$body[0].querySelector('form');
 
 		this.#proxy_groupid = proxy_groupid;
-		this.#initial_form_fields = getFormFields(this.#form_element);
+		this.#initial_form_fields = getFormFields(this.#form);
 
 		const return_url = new URL('zabbix.php', location.href);
 		return_url.searchParams.set('action', 'proxygroup.list');
 		ZABBIX.PopupManager.setReturnUrl(return_url.href);
 
 		this.#initPopupListeners();
-		this.#initActions();
-	}
-
-	#initActions() {
-		const footer_node = this.#overlay.$dialogue.$footer[0];
-
-		footer_node.querySelector('.js-submit').addEventListener('click', () => this.#submit());
-		footer_node.querySelector('.js-delete')?.addEventListener('click', () => this.#delete());
-		footer_node.querySelector('.js-clone')?.addEventListener('click', () => this.#clone());
 	}
 
 	#initPopupListeners() {
@@ -99,30 +82,14 @@ window.proxy_group_edit_popup = new class {
 	}
 
 	#isConfirmed() {
-		return JSON.stringify(this.#initial_form_fields) === JSON.stringify(getFormFields(this.#form_element))
+		return JSON.stringify(this.#initial_form_fields) === JSON.stringify(getFormFields(this.#form))
 			|| window.confirm(<?= json_encode(_('Any changes made in the current form will be lost.')) ?>);
 	}
 
-	#clone() {
-		const title = <?= json_encode(_('New proxy group')) ?>;
-		const buttons = [
-			{
-				title: <?= json_encode(_('Add')) ?>,
-				class: 'js-submit',
-				keepOpen: true,
-				isSubmit: true
-			},
-			{
-				title: <?= json_encode(_('Cancel')) ?>,
-				class: <?= json_encode(ZBX_STYLE_BTN_ALT) ?>,
-				cancel: true,
-				action: ''
-			}
-		];
-
+	clone({title, buttons}) {
 		this.#proxy_groupid = null;
 
-		for (const element of this.#form_element.querySelectorAll('.js-field-proxies')) {
+		for (const element of this.#form.querySelectorAll('.js-field-proxies')) {
 			element.remove();
 		}
 
@@ -130,11 +97,9 @@ window.proxy_group_edit_popup = new class {
 		this.#overlay.setProperties({title, buttons});
 		this.#overlay.recoverFocus();
 		this.#overlay.containFocus();
-		this.#initActions();
-		this.#form.reload(this.#rules_for_clone);
 	}
 
-	#delete() {
+	delete() {
 		const curl = new Curl('zabbix.php');
 
 		curl.setArgument('action', 'proxygroup.delete');
@@ -147,26 +112,24 @@ window.proxy_group_edit_popup = new class {
 		});
 	}
 
-	#submit() {
-		const fields = this.#form.getAllValues();
+	submit() {
+		const fields = getFormFields(this.#form);
+
+		for (const field of ['name', 'failover_delay', 'min_online', 'description']) {
+			if (field in fields) {
+				fields[field] = fields[field].trim();
+			}
+		}
+
 		const curl = new Curl('zabbix.php');
 
 		curl.setArgument('action', this.#proxy_groupid === null ? 'proxygroup.create' : 'proxygroup.update');
 
-		this.#form.validateSubmit(fields)
-			.then((result) => {
-				if (!result) {
-					this.#overlay.unsetLoading();
+		this.#post(curl.getUrl(), fields, (response) => {
+			overlayDialogueDestroy(this.#overlay.dialogueid);
 
-					return;
-				}
-
-				this.#post(curl.getUrl(), fields, (response) => {
-					overlayDialogueDestroy(this.#overlay.dialogueid);
-
-					this.#dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response}));
-				});
-			});
+			this.#dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response}));
+		});
 	}
 
 	#post(url, data, success_callback) {
@@ -181,22 +144,11 @@ window.proxy_group_edit_popup = new class {
 					throw {error: response.error};
 				}
 
-				if ('form_errors' in response) {
-					throw {form_errors: response.form_errors};
-				}
-
 				return response;
 			})
 			.then(success_callback)
 			.catch((exception) => {
-				if ('form_errors' in exception) {
-					this.#form.setErrors(exception.form_errors, true, true);
-					this.#form.renderErrors();
-
-					return;
-				}
-
-				for (const element of this.#form_element.parentNode.children) {
+				for (const element of this.#form.parentNode.children) {
 					if (element.matches('.msg-good, .msg-bad, .msg-warning')) {
 						element.parentNode.removeChild(element);
 					}
@@ -215,8 +167,8 @@ window.proxy_group_edit_popup = new class {
 
 				const message_box = makeMessageBox('bad', messages, title)[0];
 
-				this.#form_element.parentNode.insertBefore(message_box, this.#form_element);
+				this.#form.parentNode.insertBefore(message_box, this.#form);
 			})
 			.finally(() => this.#overlay.unsetLoading());
 	}
-};
+}
