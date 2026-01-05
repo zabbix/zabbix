@@ -60,5 +60,6 @@ int	history_options_add_common_params(zbx_vector_history_option_t *options, cons
 		int config_log_slow_queries, const char *config_ssl_ca_location, const char *config_ssl_cert_location,
 		const char *config_ssl_key_location, char **error);
 
+void	history_log_options(zbx_history_option_t *options, int options_num);
 #endif
 

@@ -518,3 +518,41 @@ int	history_options_add_common_params(zbx_vector_history_option_t *options, cons
 	return SUCCEED;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: log history provider options for debugging purposes               *
+ *                                                                            *
+ * Parameters: options     - [IN] array of history options                    *
+ *             options_num - [IN] number of options in the array              *
+ *                                                                            *
+ * Comments: Sensitive option values are masked in the log output.            *
+ *                                                                            *
+ ******************************************************************************/
+void	history_log_options(zbx_history_option_t *options, int options_num)
+{
+	const char *unmasked =
+			HISTORY_PROVIDER_OPTION_LOG_SLOW_QUERIES ","
+			HISTORY_PROVIDER_OPTION_VALUE_TYPES ","
+			HISTORY_PROVIDER_OPTION_SOURCE_IP ","
+			HISTORY_PROVIDER_OPTION_PRECACHE ","
+			HISTORY_PROVIDER_OPTION_NAME ","
+			HISTORY_PROVIDER_OPTION_DATE_INDEX ","
+	;
+
+
+	if (SUCCEED != ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_DEBUG))
+		return;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "options:");
+	for (int i = 0; i < options_num; i++)
+	{
+		const char	*value;
+
+		value = options[i].value;
+
+		if (SUCCEED != zbx_str_in_list(unmasked, options[i].name, ','))
+			value = ZBX_STRMASK(options[i].value);
+
+		zabbix_log(LOG_LEVEL_DEBUG, "  %s: %s", options[i].name, value);
+	}
+}

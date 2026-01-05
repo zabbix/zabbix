@@ -139,9 +139,7 @@ static zbx_history_provider_t	*history_provider_open(const char *name, zbx_histo
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() provider:%s", __func__, name);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "options:");
-	for (int i = 0; i < options_num; i++)
-		zabbix_log(LOG_LEVEL_DEBUG, "  %s: %s", options[i].name, options[i].value);
+	history_log_options(options, options_num);
 
 	if (0 == strcmp(name, HISTORY_PROVIDER_SQL))
 		provider = history_sql_open(options, options_num, error);
@@ -181,8 +179,7 @@ static int	history_manager_register_provider(zbx_history_manager_t *manager, con
 	if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_DEBUG))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "registered history provider \"%s\":", name);
-		for (int i = 0; i < options->values_num; i++)
-			zabbix_log(LOG_LEVEL_DEBUG, "  %s: %s", options->values[i].name, options->values[i].value);
+		history_log_options(options->values, options->values_num);
 	}
 
 	zbx_vector_history_option_create(&registry->options);
