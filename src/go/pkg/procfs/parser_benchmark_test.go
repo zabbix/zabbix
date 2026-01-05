@@ -452,3 +452,64 @@ func BenchmarkParser_MemoryAllocation(b *testing.B) {
 		}
 	})
 }
+
+// -------------------------------------------------------------------
+// Path Validation Performance Benchmarks
+// -------------------------------------------------------------------
+
+func BenchmarkParser_ValidationOverhead(b *testing.B) {
+	content := generateBenchLogFile(1000)
+	path := createBenchTempFile(b, content)
+
+	strategies := []ScanStrategy{
+		StrategyReadAll,
+		StrategyOSReadFile,
+		StrategyReadLineByLine,
+	}
+
+	for _, strategy := range strategies {
+		strategyName := ""
+
+		switch strategy {
+		case StrategyReadAll:
+			strategyName = "ReadAll"
+		case StrategyOSReadFile:
+			strategyName = "OSReadFile"
+		case StrategyReadLineByLine:
+			strategyName = "ReadLineByLine"
+		}
+
+		b.Run(strategyName+"_WithValidation", func(b *testing.B) {
+			p := NewParser().
+				SetScanStrategy(strategy).
+				SetMatchMode(ModeContains).
+				SetPattern("[ERROR]")
+
+			b.ResetTimer()
+
+			for range b.N {
+				_, err := p.Parse(path)
+				if err != nil {
+					b.Fatalf("Parse() error = %v", err)
+				}
+			}
+		})
+
+		b.Run(strategyName+"_WithoutValidation", func(b *testing.B) {
+			p := NewParser().
+				SetScanStrategy(strategy).
+				SetMatchMode(ModeContains).
+				SetPattern("[ERROR]").
+				DisablePathValidation()
+
+			b.ResetTimer()
+
+			for range b.N {
+				_, err := p.Parse(path)
+				if err != nil {
+					b.Fatalf("Parse() error = %v", err)
+				}
+			}
+		})
+	}
+}

@@ -67,7 +67,7 @@ func NewParser() *Parser {
 // Parse opens the file at path and returns content string lines that match set rules.
 func (p *Parser) Parse(path string) ([]string, error) {
 	var (
-		cleanPath = path
+		cleanPath string
 		err       error
 	)
 
@@ -76,6 +76,9 @@ func (p *Parser) Parse(path string) ([]string, error) {
 		if err != nil {
 			return nil, err
 		}
+	} else {
+		log.Debugf("%s parsing %s without validation", parserLogMessage, path)
+		cleanPath = path
 	}
 
 	var reg *regexp.Regexp
@@ -100,14 +103,14 @@ func (p *Parser) Parse(path string) ([]string, error) {
 
 func validateAndCleanPath(path string) (string, error) {
 	var (
-		cleanPath     string
+		//cleanPath     string
 		canonicalPath string
 		err           error
 	)
 
-	cleanPath = filepath.Clean(path)
+	//cleanPath = filepath.Clean(path)
 
-	canonicalPath, err = filepath.EvalSymlinks(cleanPath)
+	canonicalPath, err = filepath.EvalSymlinks(path)
 	if err != nil {
 		log.Warningf("%s failed to resolve symlinks for path %s: %s", parserLogMessage, path, err)
 

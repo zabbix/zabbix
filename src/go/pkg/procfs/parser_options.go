@@ -94,9 +94,16 @@ func (p *Parser) SetSplitter(separator string, index int) *Parser {
 	return p
 }
 
-// SetValidatePath sets if the given path at parse will be validated or not. True by default.
-func (p *Parser) SetValidatePath(validate bool) *Parser {
-	p.validatePath = validate
+// DisablePathValidation disables all path security checks.
+//
+// ⚠️  WARNING: SECURITY RISK ⚠️
+//
+// This removes protection against path traversal, symlink attacks, and
+// block device access. Only use with hardcoded, trusted paths.
+//
+// Requires security team approval. Document your justification in code review.
+func (p *Parser) DisablePathValidation() *Parser {
+	p.validatePath = false
 
 	return p
 }
