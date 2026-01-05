@@ -847,7 +847,7 @@ clean:
 	return ret;
 }
 
-static void	get_wmi_check_timeout(const char *wmi_namespace, const char *query, char **var,
+static void	getall_wmi_check_timeout(const char *query, char **var,
 		double time_first_query_started, double *time_previous_query_finished)
 {
 	double	time_left = sysinfo_get_config_timeout() - (*time_previous_query_finished -
@@ -856,8 +856,31 @@ static void	get_wmi_check_timeout(const char *wmi_namespace, const char *query, 
 	if (0 >= time_left)
 		return;
 
-	zbx_wmi_get(wmi_namespace, query, time_left, var);
+	zbx_wmi_getall("root\\StandardCimv2", query, time_left, var);
 	*time_previous_query_finished = zbx_time();
+}
+
+static int	get_wmi_item_by_name(struct zbx_json_parse *jp_array, const char *alias,
+		struct zbx_json_parse *jp_item_out)
+{
+	const char		*p = NULL;
+	struct zbx_json_parse	jp_item;
+	char			name_buf[MAX_STRING_LEN];
+
+	while (NULL != (p = zbx_json_next(jp_array, p)))
+	{
+		if (FAIL == zbx_json_brackets_open(p, &jp_item))
+			continue;
+
+		if (SUCCEED == zbx_json_value_by_name(&jp_item, "Name", name_buf, sizeof(name_buf), NULL) &&
+				0 == strcmp(name_buf, alias))
+		{
+			*jp_item_out = jp_item;
+			return SUCCEED;
+		}
+	}
+
+	return FAIL;
 }
 
 int	net_if_get(AGENT_REQUEST *request, AGENT_RESULT *result)
@@ -868,11 +891,14 @@ int	net_if_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 	MIB_IFTABLE	*pIfTable = NULL;
 	zbx_ifrow_t	ifrow = {NULL, NULL};
 	struct zbx_json	jcfg, jval, j;
-	char		*pattern = NULL, *error = NULL, *name, *os = NULL, *text, *alias, *wmi_result;
-	size_t		os_alloc = 0, os_offset = 0;
-	char		*wmi_namespace = "root\\StandardCimv2";
+	char		*pattern = NULL, *error = NULL, *name, *alias;
+	char		*net_adapter = NULL, *res_net_adapter = NULL;
+	char		*net_advenced = NULL, *res_net_advenced = NULL;
+	struct zbx_json_parse	jp_duplex, jp_negot, jp_item;
+	int		have_net_adapter = FAIL, have_net_advenced = FAIL;
 	double		start_time = zbx_time();
 	double		time_previous_query_finished = start_time;
+	char		val_buf[MAX_STRING_LEN];
 
 	if (1 < request->nparam)
 	{
@@ -915,6 +941,21 @@ int	net_if_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 	zbx_json_initarray(&jcfg, ZBX_JSON_STAT_BUF_LEN);
 	zbx_ifrow_init(&ifrow);
 
+	net_adapter = zbx_strdup(NULL,
+			"SELECT Name, Speed, FullDuplex FROM MSFT_NetAdapter");
+	getall_wmi_check_timeout(net_adapter, &res_net_adapter, start_time, &time_previous_query_finished);
+
+	if (NULL != res_net_adapter)
+		have_net_adapter = zbx_json_open(res_net_adapter, &jp_duplex);
+
+	net_advenced = zbx_strdup(NULL, "SELECT Name, DisplayValue FROM MSFT_NetAdapterAdvancedPropertySettingData"
+			" WHERE DisplayName = 'Speed & Duplex'");
+
+	getall_wmi_check_timeout(net_advenced, &res_net_advenced, start_time, &time_previous_query_finished);
+
+	if (NULL != res_net_advenced)
+		have_net_advenced = zbx_json_open(res_net_advenced, &jp_negot);
+
 	for (unsigned int i = 0; i < pIfTable->dwNumEntries; i++)
 	{
 		zbx_ifrow_set_index(&ifrow, pIfTable->table[i].dwIndex);
@@ -933,7 +974,6 @@ int	net_if_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 			continue;
 		}
 
-		/* TODO: need to implement also for old ifRow ? */
 		if (NULL == ifrow.ifRow2)
 		{
 			zbx_free(name);
@@ -952,8 +992,8 @@ int	net_if_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 			(ifrow.ifRow2->AdminStatus == NET_IF_ADMIN_STATUS_UP)? "up" : "down", ZBX_JSON_TYPE_STRING);
 
 		alias = zbx_unicode_to_utf8(ifrow.ifRow2->Alias);
-		zbx_json_addstring(&jcfg, "alias", alias, ZBX_JSON_TYPE_STRING);
-		zbx_json_addstring(&jval, "alias", alias, ZBX_JSON_TYPE_STRING);
+		zbx_json_addstring(&jcfg, "ifalias", alias, ZBX_JSON_TYPE_STRING);
+		zbx_json_addstring(&jval, "ifalias", alias, ZBX_JSON_TYPE_STRING);
 
 		if (0 != ifrow.ifRow2->PhysicalAddressLength)
 		{
@@ -988,64 +1028,38 @@ int	net_if_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 		zbx_json_addint64(&jval, "type", ifrow.ifRow2->Type);
 		zbx_json_addint64(&jval, "carrier", ifrow.ifRow2->InterfaceAndOperStatusFlags.ConnectorPresent);
 
-		/* TODO: optimize, using one call to wmi */
-		wmi_result = NULL;
-		zbx_snprintf_alloc(&os, &os_alloc, &os_offset,
-			"select DisplayValue FROM MSFT_NetAdapterAdvancedPropertySettingData WHERE "
-			"DisplayName = 'Speed & Duplex' AND Name = '%s'", alias);
-		get_wmi_check_timeout(wmi_namespace, os, &wmi_result, start_time, &time_previous_query_finished);
-
-		if (NULL != wmi_result)
+		if (SUCCEED == have_net_adapter && SUCCEED == get_wmi_item_by_name(&jp_duplex, alias, &jp_item))
 		{
-			if (0 == strcmp(wmi_result, "Auto Negotiation"))
+			if (SUCCEED == zbx_json_value_by_name(&jp_item, "FullDuplex", val_buf, sizeof(val_buf), NULL))
 			{
-				zbx_json_addstring(&jval, "negotiation", "on", ZBX_JSON_TYPE_STRING);
+				char *duplex = "half";
+				if (0 == strcmp(val_buf, "True"))
+					duplex = "full";
+				zbx_json_addstring(&jval, "duplex", duplex, ZBX_JSON_TYPE_STRING);
 			}
-			else
+
+			if (SUCCEED == zbx_json_value_by_name(&jp_item, "Speed", val_buf, sizeof(val_buf), NULL))
 			{
-				zbx_json_addstring(&jval, "negotiation", "off", ZBX_JSON_TYPE_STRING);
+				zbx_uint64_t	speed_bps;
+
+				if (SUCCEED == zbx_is_uint64(val_buf, &speed_bps))
+					zbx_json_adduint64(&jval, "speed", speed_bps / 1000000);
 			}
 		}
 
-		zbx_free(wmi_result);
-		wmi_result = NULL;
-		zbx_free(os);
-		os_alloc = 0;
-		os_offset = 0;
-
-		zbx_snprintf_alloc(&os, &os_alloc, &os_offset,
-				"select FullDuplex FROM MSFT_NetAdapter where Name ='%s'", alias);
-		get_wmi_check_timeout(wmi_namespace, os, &wmi_result, start_time, &time_previous_query_finished);
-
-		if (NULL != wmi_result)
+		if (SUCCEED == have_net_advenced && SUCCEED == get_wmi_item_by_name(&jp_negot, alias, &jp_item))
 		{
-			char	*duplex = "half";
+			if (SUCCEED == zbx_json_value_by_name(&jp_item, "DisplayValue", val_buf, sizeof(val_buf), NULL))
+			{
+				char *negotiation = "off";
 
-			if (0 == strcmp(wmi_result, "True"))
-				duplex = "full";
+				if (0 == strcmp(val_buf, "Auto Negotiation"))
+					negotiation = "on";
 
-			zbx_json_addstring(&jval, "duplex", duplex, ZBX_JSON_TYPE_STRING);
+				zbx_json_addstring(&jval, "negotiation", negotiation, ZBX_JSON_TYPE_STRING);
+			}
 		}
 
-		zbx_free(wmi_result);
-		zbx_free(os);
-		os_alloc = 0;
-		os_offset = 0;
-		wmi_result = NULL;
-		zbx_snprintf_alloc(&os, &os_alloc, &os_offset, "select Speed FROM MSFT_NetAdapter where Name = '%s'",
-				alias);
-		get_wmi_check_timeout(wmi_namespace, os , &wmi_result, start_time, &time_previous_query_finished);
-
-		if (NULL != wmi_result)
-		{
-			zbx_uint64_t	value_ui64;
-
-			if (SUCCEED == zbx_is_uint64(wmi_result, &value_ui64))
-				zbx_json_adduint64(&jval, "speed", value_ui64);
-		}
-
-		zbx_free(os);
-		zbx_free(wmi_result);
 		zbx_free(alias);
 		zbx_json_close(&jval);
 		zbx_json_close(&jcfg);
@@ -1065,7 +1079,14 @@ int	net_if_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 	zbx_json_free(&jcfg);
 	ret = SYSINFO_RET_OK;
 clean:
+	if (NULL != rxp)
+		zbx_regexp_free(rxp);
+
 	zbx_free(pIfTable);
+	zbx_free(net_adapter);
+	zbx_free(net_advenced);
+	zbx_free(res_net_adapter);
+	zbx_free(res_net_advenced);
 
 	return ret;
 }

@@ -20,6 +20,7 @@ import (
 	"fmt"
 	"net"
 	"regexp"
+	"strconv"
 	"unsafe"
 
 	"golang.org/x/sys/windows"
@@ -34,6 +35,17 @@ const (
 	errorCannotFindIf = "Cannot obtain network interface information."
 	guidStringLen     = 38
 )
+
+type wmiAdapterData struct {
+	Name       string
+	Speed      *uint64
+	FullDuplex *bool
+}
+
+type wmiAdvancedData struct {
+	Name         string
+	DisplayValue string
+}
 
 func init() {
 	err := plugin.RegisterMetrics(
@@ -122,8 +134,11 @@ func (p *Plugin) getNetStats(networkIf, statName string, dir dirFlag) (result ui
 	var row *win32.MIB_IF_ROW2
 	for i := range ifs {
 		if len(networkIf) == guidStringLen && networkIf[0] == '{' && networkIf[guidStringLen-1] == '}' &&
-			networkIf == p.getGuidString(ifs[i].InterfaceGuid) ||
-			networkIf == windows.UTF16ToString(ifs[i].Description[:]) {
+			networkIf == p.getGuidString(ifs[i].InterfaceGuid) {
+			row = &ifs[i]
+			break
+		}
+		if networkIf == windows.UTF16ToString(ifs[i].Description[:]) {
 			row = &ifs[i]
 			break
 		}
@@ -202,6 +217,63 @@ func uint64Ptr(v uint64) *uint64 {
 	return &v
 }
 
+func (p *Plugin) getWMIAdapterDataBatch() (map[string]wmiAdapterData, error) {
+	query := "SELECT Name, Speed, FullDuplex FROM MSFT_NetAdapter"
+	results, err := wmi.QueryTable("root\\StandardCimv2", query)
+	if err != nil {
+		return nil, err
+	}
+
+	dataMap := make(map[string]wmiAdapterData)
+	for _, item := range results {
+		data := wmiAdapterData{}
+
+		if name, ok := item["Name"].(string); ok {
+			data.Name = name
+		} else {
+			continue
+		}
+
+		if s, ok := item["Speed"]; ok {
+			if valStr, ok := s.(string); ok {
+				if u, err := strconv.ParseUint(valStr, 10, 64); err == nil {
+					data.Speed = &u
+				}
+			} else if valUint, ok := s.(uint64); ok {
+				data.Speed = &valUint
+			}
+		}
+
+		if duplex, ok := item["FullDuplex"].(bool); ok {
+			data.FullDuplex = &duplex
+		}
+
+		dataMap[data.Name] = data
+	}
+
+	return dataMap, nil
+}
+
+func (p *Plugin) getWMIAdvancedDataBatch() (map[string]string, error) {
+	query := "SELECT Name, DisplayValue FROM MSFT_NetAdapterAdvancedPropertySettingData WHERE DisplayName = 'Speed & Duplex'"
+	results, err := wmi.QueryTable("root\\StandardCimv2", query)
+	if err != nil {
+		return nil, err
+	}
+
+	dataMap := make(map[string]string)
+	for _, item := range results {
+		name, nameOk := item["Name"].(string)
+		displayValue, displayOk := item["DisplayValue"].(string)
+
+		if nameOk && displayOk {
+			dataMap[name] = displayValue
+		}
+	}
+
+	return dataMap, nil
+}
+
 func (p *Plugin) getDevGet(regexExpr string) (result netIfResult, err error) {
 	var table *win32.MIB_IF_TABLE2
 	var compiledRegex *regexp.Regexp
@@ -217,6 +289,16 @@ func (p *Plugin) getDevGet(regexExpr string) (result netIfResult, err error) {
 			err = fmt.Errorf("invalid regex expression '%s': %w", regexExpr, err)
 			return
 		}
+	}
+
+	wmiAdapters, wmiErr := p.getWMIAdapterDataBatch()
+	if wmiErr != nil {
+		wmiAdapters = make(map[string]wmiAdapterData)
+	}
+
+	wmiAdvanced, wmiErr := p.getWMIAdvancedDataBatch()
+	if wmiErr != nil {
+		wmiAdvanced = make(map[string]string)
 	}
 
 	result.Config = make([]ifConfigData, 0, table.NumEntries)
@@ -246,49 +328,31 @@ func (p *Plugin) getDevGet(regexExpr string) (result netIfResult, err error) {
 		}
 
 		ifAliasVal := windows.UTF16ToString(rows[i].Alias[:])
-		wmiQuery := fmt.Sprintf("select DisplayValue FROM MSFT_NetAdapterAdvancedPropertySettingData WHERE DisplayName = 'Speed & Duplex' AND Name = '%s'", ifAliasVal)
+
 		negotiationStatus := ""
-		value, wmiErr := wmi.QueryValue("root\\StandardCimv2", wmiQuery)
-
-		if wmiErr == nil {
-			if s, ok := value.(string); ok {
-				if s == "Auto Negotiation" {
-					negotiationStatus = "on"
-				} else {
-					negotiationStatus = "off"
-				}
-
+		if displayValue, ok := wmiAdvanced[ifAliasVal]; ok {
+			if displayValue == "Auto Negotiation" {
+				negotiationStatus = "on"
+			} else {
+				negotiationStatus = "off"
 			}
 		}
 
-		wmiQuery = fmt.Sprintf("select FullDuplex FROM MSFT_NetAdapter where Name ='%s'", ifAliasVal)
 		duplexStatus := ""
-		value, wmiErr = wmi.QueryValue("root\\StandardCimv2", wmiQuery)
+		var speedPtr *uint64
 
-		if wmiErr == nil {
-			if b, ok := value.(bool); ok {
-				if b {
-					duplexStatus = "full"
-				} else {
-					duplexStatus = "half"
-				}
-			} else if i, ok := value.(int32); ok {
-				if i != 0 {
+		if adapterData, ok := wmiAdapters[ifAliasVal]; ok {
+			if adapterData.FullDuplex != nil {
+				if *adapterData.FullDuplex {
 					duplexStatus = "full"
 				} else {
 					duplexStatus = "half"
 				}
 			}
-		}
 
-		wmiQuery = fmt.Sprintf("select Speed FROM MSFT_NetAdapter where Name = '%s'", ifAliasVal)
-		var speedPtr *uint64
-		value, wmiErr = wmi.QueryValue("root\\StandardCimv2", wmiQuery)
-
-		if wmiErr == nil {
-			if s, ok := value.(uint64); ok {
-				speedPtr = new(uint64)
-				*speedPtr = s
+			if adapterData.Speed != nil {
+				val := *adapterData.Speed / 1000000
+				speedPtr = &val
 			}
 		}
 
