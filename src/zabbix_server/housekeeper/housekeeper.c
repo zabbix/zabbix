@@ -12,12 +12,13 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
+#include "housekeeper.h"
+
 #include "zbxdb.h"
 #include "zbxcacheconfig.h"
 #include "zbxalgo.h"
 #include "zbxnum.h"
 
-#include "housekeeper.h"
 #include "trigger_housekeeper.h"
 
 #define ZBX_HK_OBJECT_ITEM	0
@@ -129,7 +130,8 @@ static int	hk_item_cleanup(const zbx_vector_hk_housekeeper_t *hk_entries, int co
 	{
 		const hk_cleanup_table_t	*table = &hk_item_cleanup_order[i];
 
-		if (NULL != table->get_hk_mode && ZBX_HK_MODE_REGULAR != table->get_hk_mode()) {
+		if (NULL != table->get_hk_mode && ZBX_HK_MODE_REGULAR != table->get_hk_mode())
+		{
 			/* remove this table from expected complete task mask */
 			complete_mask &= ~(1 << i);
 			continue;

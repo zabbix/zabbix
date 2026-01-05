@@ -91,11 +91,15 @@ static int	delete_history(const char *table, const char *lastid_field, const cha
 
 	zbx_db_commit();
 
+	zabbix_log(LOG_LEVEL_DEBUG, "End %s() records:%d", __func__, records);
+
 	return records;
 rollback:
 	zbx_db_free_result(result);
 
 	zbx_db_rollback();
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End %s() rollback", __func__);
 
 	return 0;
 }
