@@ -41,7 +41,13 @@ static void	dc_get_history_sync_host(zbx_history_sync_host_t *dst_host, const ZB
 	dst_host->monitored_by = src_host->monitored_by;
 	dst_host->status = src_host->status;
 
-	memcpy(dst_host->host, src_host->host, MIN(sizeof(dst_host->host), src_host->sz_host));
+	if (sizeof(dst_host->host) < src_host->sz_host)
+	{
+		memcpy(dst_host->host, src_host->host, sizeof(dst_host->host) - 1);
+		dst_host->host[sizeof(dst_host->host) - 1] = '\0';
+	}
+	else
+		memcpy(dst_host->host, src_host->host, src_host->sz_host);
 
 	if (ZBX_ITEM_GET_HOSTNAME & mode)
 		zbx_strlcpy_utf8(dst_host->name, src_host->name, sizeof(dst_host->name));
@@ -81,7 +87,14 @@ static void	dc_get_history_sync_item(zbx_history_sync_item_t *dst_item, const ZB
 	memcpy(dst_item->history_period, src_item->history_period, src_item->sz_history_period);
 	dst_item->history_sec = src_item->history_sec;
 	dst_item->flags = src_item->flags;
-	memcpy(dst_item->key_orig, src_item->key, MIN(sizeof(dst_item->key_orig), src_item->sz_key));
+
+	if (sizeof(dst_item->key_orig) < src_item->sz_key)
+	{
+		memcpy(dst_item->key_orig, src_item->key, sizeof(dst_item->key_orig) - 1);
+		dst_item->key_orig[sizeof(dst_item->key_orig) - 1] = '\0';
+	}
+	else
+		memcpy(dst_item->key_orig, src_item->key, src_item->sz_key);
 
 	switch (src_item->value_type)
 	{
@@ -231,9 +244,9 @@ void	zbx_dc_config_history_sync_get_items_by_itemids(zbx_history_sync_item_t *it
 
 		dc_get_history_sync_host(&items[i].host, dc_host, mode);
 		dc_get_history_sync_item(&items[i], dc_item);
-	}
 
-	config_hk = dc_config->config->hk;
+		config_hk = dc_config->config->hk;
+	}
 
 	UNLOCK_CACHE_CONFIG_HISTORY;
 
@@ -554,7 +567,15 @@ static void	dc_get_history_recv_host(zbx_history_recv_host_t *dst_host, const ZB
 	dst_host->status = src_host->status;
 
 	if (ZBX_ITEM_GET_HOST & mode)
-		zbx_strscpy(dst_host->host, src_host->host);
+	{
+		if (sizeof(dst_host->host) < src_host->sz_host)
+		{
+			memcpy(dst_host->host, src_host->host, sizeof(dst_host->host) - 1);
+			dst_host->host[sizeof(dst_host->host) - 1] = '\0';
+		}
+		else
+			memcpy(dst_host->host, src_host->host, src_host->sz_host);
+	}
 
 	if (ZBX_ITEM_GET_HOSTNAME & mode)
 		zbx_strlcpy_utf8(dst_host->name, src_host->name, sizeof(dst_host->name));
@@ -594,7 +615,13 @@ static void	dc_get_history_recv_item(zbx_history_recv_item_t *dst_item, const ZB
 	dst_item->state = ITEM_STATE_NORMAL;
 	dst_item->status = src_item->status;
 
-	memcpy(dst_host->host, src_host->host, MIN(sizeof(dst_host->host), src_host->sz_host));
+	if (sizeof(dst_item->key_orig) < src_item->sz_key)
+	{
+		memcpy(dst_item->key_orig, src_item->key, sizeof(dst_item->key_orig) - 1);
+		dst_item->key_orig[sizeof(dst_item->key_orig) - 1] = '\0';
+	}
+	else
+		memcpy(dst_item->key_orig, src_item->key, src_item->sz_key);
 
 	dst_item->itemid = src_item->itemid;
 	dst_item->flags = src_item->flags;

@@ -3480,6 +3480,7 @@ static void	DCsync_items(zbx_dbsync_t *sync, zbx_uint64_t revision, zbx_synced_n
 		if (SUCCEED == dc_strpool_replace(found, &item->history_period, row[22]))
 		{
 			item->sz_history_period = strlen(item->history_period) + 1;
+
 			if (FAIL == zbx_is_time_suffix(item->history_period, &item->history_sec, ZBX_LENGTH_UNLIMITED))
 				item->history_sec = 0;
 		}
@@ -9015,7 +9016,13 @@ static void	DCget_host(zbx_dc_host_t *dst_host, const ZBX_DC_HOST *src_host)
 	dst_host->status = src_host->status;
 	dst_host->monitored_by = src_host->monitored_by;
 
-	zbx_strscpy(dst_host->host, src_host->host);
+	if (sizeof(dst_host->host) < src_host->sz_host)
+	{
+		memcpy(dst_host->host, src_host->host, sizeof(dst_host->host) - 1);
+		dst_host->host[sizeof(dst_host->host) - 1] = '\0';
+	}
+	else
+		memcpy(dst_host->host, src_host->host, src_host->sz_host);
 
 	zbx_strlcpy_utf8(dst_host->name, src_host->name, sizeof(dst_host->name));
 
@@ -9489,7 +9496,13 @@ static void	DCget_item(zbx_dc_item_t *dst_item, const ZBX_DC_ITEM *src_item)
 
 	dst_item->status = src_item->status;
 
-	memcpy(dst_item->key_orig, src_item->key, MIN(sizeof(dst_item->key_orig), src_item->sz_key));
+	if (sizeof(dst_item->key_orig) < src_item->sz_key)
+	{
+		memcpy(dst_item->key_orig, src_item->key, sizeof(dst_item->key_orig) - 1);
+		dst_item->key_orig[sizeof(dst_item->key_orig) - 1] = '\0';
+	}
+	else
+		memcpy(dst_item->key_orig, src_item->key, src_item->sz_key);
 
 	dst_item->itemid = src_item->itemid;
 	dst_item->flags = src_item->flags;
