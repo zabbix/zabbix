@@ -180,7 +180,7 @@ class testFormLogin extends CWebTest {
 	public function testFormLogin_LoginWithField() {
 		foreach (['reconnect=1', 'autologin=1', 'autologin=0'] as $url) {
 			$this->page->open('index.php?'.$url);
-			$checked = ('index.php?'.$url === 'index.php?autologin=0') ? false : true;
+			$checked = ($url === 'autologin=0') ? false : true;
 			$this->assertTrue($this->query('id:autologin')->asCheckbox()->one()->isChecked($checked));
 		}
 	}
