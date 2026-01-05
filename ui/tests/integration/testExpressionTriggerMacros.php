@@ -337,16 +337,17 @@ class testExpressionTriggerMacros extends CIntegrationTest {
 	}
 
 	public function testDiagInfo() {
-
-		$this->executeRuntimeControlCommand(self::COMPONENT_SERVER, 'diaginfo=all');
-
 		$expectedDiagInfoLogEntries = [
-			'== history cache diagnostic information ==',
-			'== preprocessing diagnostic information ==',
-			'== locks diagnostic information ==',
-			'== value cache diagnostic information =='
+			'diaginfo=valuecache' => '== value cache diagnostic information ==',
+			'diaginfo=lld' => '== LLD diagnostic information ==',
+			'diaginfo=historycache' => '== history cache diagnostic information ==',
+			'diaginfo=preprocessing' => '== preprocessing diagnostic information ==',
+			'diaginfo=locks' => '==== locks diagnostic information ==',
+			'diaginfo=alerting' => '== alerting diagnostic information ==',
+			'diaginfo=connector' => '== connector diagnostic information =='
 		];
-		foreach ($expectedDiagInfoLogEntries as $e) {
+		foreach ($expectedDiagInfoLogEntries as $cmd => $e) {
+			$this->executeRuntimeControlCommand(self::COMPONENT_SERVER, $cmd);
 			$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, $e, true, 20, 3);
 		}
 	}
