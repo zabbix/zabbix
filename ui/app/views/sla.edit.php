@@ -240,9 +240,7 @@ $excluded_downtimes_row = (new CTemplateTag('excluded-downtime-tmpl'))->addItem(
 				->setErrorContainer('excluded_downtime_error_container_#{row_index}')
 		]),
 		new CCol(new CSpan('#{duration}')),
-		(new CCol(new CSpan('#{name}')))
-				->addStyle('max-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
-				->addClass(ZBX_STYLE_WORDWRAP),
+		(new CCol(new CSpan('#{name}')))->addClass(ZBX_STYLE_WORDWRAP),
 		new CCol([
 			(new CList([
 				(new CButton('edit', _('Edit')))
