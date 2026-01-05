@@ -558,7 +558,7 @@ class testFormGroups extends CWebTest {
 		// Refresh element after opening new form after cloning.
 		if ($data['action'] === 'Clone') {
 			$footer = ($this->standalone)
-				? $form->invalidate()
+				? $form->waitUntilStalled()->invalidate()
 				: COverlayDialogElement::find()->one()->waitUntilReady()->getFooter();
 		}
 

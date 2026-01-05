@@ -292,6 +292,7 @@ class testFormSetup extends CWebTest {
 		$this->assertEquals(['Blue', 'Dark', 'High-contrast light', 'High-contrast dark'], $themes->getOptions()->asText());
 		// Select Dark theme.
 		$form->getField('Default theme')->select('Dark');
+		$form->waitUntilReloaded();
 
 		// Check that default theme has changed.
 		$stylesheet = $this->query('xpath://link[@rel="stylesheet"]')->one();

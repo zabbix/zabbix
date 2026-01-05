@@ -725,6 +725,7 @@ class testPageReportsActionLog extends CWebTest {
 	public function testPageReportsActionLog_CheckResetButton() {
 		$this->page->login()->open('zabbix.php?action=actionlog.list&from=2012-02-20+09:01:00&to=2012-02-20+11:01:00&'.
 				'filter_messages=&filter_set=1')->waitUntilReady();
+		$table = $this->getTable();
 
 		// If the filter is not visible - enable it.
 		$filter_tab = $this->query('xpath:.//li[@aria-labelledby="ui-id-2" and @aria-selected="false"]');
@@ -760,12 +761,14 @@ class testPageReportsActionLog extends CWebTest {
 
 			if ($submit) {
 				$form->submit();
+				$table->waitUntilReloaded();
 				$this->page->waitUntilReady();
 				$this->assertTableStats(0);
 			}
 
 			$form->invalidate()->checkValue($filled_form);
 			$form->query('button:Reset')->one()->click();
+			$table->waitUntilReloaded();
 			$this->page->waitUntilReady();
 			$form->invalidate()->checkValue($empty_form);
 			$this->assertTableStats(10);

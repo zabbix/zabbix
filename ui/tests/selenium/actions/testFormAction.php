@@ -1391,7 +1391,7 @@ class testFormAction extends CLegacyWebTest {
 
 		if (isset($data['operations'])) {
 			$action_form->selectTab('Operations');
-			foreach ($data['operations'] as $operation) {
+			foreach ($data['operations'] as $i => $operation) {
 				$action_form->query('xpath://table[@id="op-table"]//button[text()="Add"]')->waitUntilVisible()->one()->click();
 				COverlayDialogElement::find()->waitUntilReady()->one();
 				$operation_form = $this->query('id:popup-operation')->asForm()->one();
@@ -1423,6 +1423,9 @@ class testFormAction extends CLegacyWebTest {
 
 				$operation_form->submit();
 				$operation_form->waitUntilNotVisible();
+				// Wait until new operation row is visible.
+				$operations_table = $this->query('id:op-table')->waitUntilVisible()->asTable()->one();
+				$operations_table->query('xpath:./tbody/tr['.($i + 1).']')->waitUntilVisible();
 			}
 
 			if (array_key_exists('esc_period', $data)) {
