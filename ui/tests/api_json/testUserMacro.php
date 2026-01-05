@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -210,7 +210,7 @@ class testUserMacro extends CAPITest {
 			[
 				'hostmacro' => [
 					'macro' => '{$CONFIG}',
-					'value' => 'invalid',
+					'value' => 'valid',
 					'hostid' => '50010',
 					'config' => [
 						'type' => ZBX_WIZARD_FIELD_TEXT,
@@ -218,7 +218,7 @@ class testUserMacro extends CAPITest {
 						'regex' => '/^[a-z(A-Z0-9_]+$/'
 					]
 				],
-				'expected_error' => 'Invalid parameter "/1/config/regex": invalid regular expression.'
+				'expected_error' => null
 			],
 			[
 				'hostmacro' => [

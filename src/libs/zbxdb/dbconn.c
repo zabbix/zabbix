@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -2535,7 +2535,7 @@ static int	db_large_query_select(zbx_db_large_query_t *query)
 	if (NULL != query->suffix)
 		zbx_strcpy_alloc(query->sql, query->sql_alloc, query->sql_offset, query->suffix);
 
-	query->result = dbconn_select(query->db, "%s", *query->sql);
+	query->result = zbx_dbconn_select(query->db, "%s", *query->sql);
 
 	return SUCCEED;
 }
