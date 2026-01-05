@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -19,7 +19,7 @@ require_once __DIR__.'/../common/testWidgets.php';
 /**
  * @backup settings, hstgrp, widget
  *
- * @dataSource UserPermissions
+ * @dataSource UserPermissions, MonitoringOverview
  *
  * @onBefore prepareDashboardData, prepareProblemsData
  */
@@ -544,8 +544,7 @@ class testDashboardProblemsWidgetDisplay extends testWidgets {
 				]
 			],
 			// #11 Filtered by Host group, tags, show 3, shortened, tag priority.
-			// TODO: uncomment after fix ZBX-27171
-/*			[
+			[
 				[
 					'fields' => [
 						'Name' => 'Group, tags, show 3, shortened, tag priority',
@@ -579,7 +578,7 @@ class testDashboardProblemsWidgetDisplay extends testWidgets {
 							'Update', 'Actions', 'Tags'
 					]
 				]
-			],*/
+			],
 			// #12 Filtered by Host, operational data - Separately, Show suppressed.
 			[
 				[

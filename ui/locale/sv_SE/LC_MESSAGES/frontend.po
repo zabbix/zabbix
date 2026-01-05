@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2025-09-12 10:38+0000\n"
+"PO-Revision-Date: 2025-11-13 20:16+0000\n"
 "Last-Translator: Daniel Nylander <zabbix@danielnylander.se>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: sv_SE\n"
@@ -304,13 +304,13 @@ msgstr "%1$s: %2$s"
 #: include/classes/setup/CSetupWizard.php:1460
 #, c-format
 msgid "%1$s: %2$s."
-msgstr ""
+msgstr "%1$s: %2$s."
 
 #: include/classes/server/CZabbixServer.php:746
 #: include/classes/setup/CSetupWizard.php:1466
 #, c-format
 msgid "%1$s: file is not readable."
-msgstr ""
+msgstr "%1$s: filen är inte läsbar."
 
 #: include/classes/server/CZabbixServer.php:743
 #: include/classes/setup/CSetupWizard.php:1463
@@ -1290,6 +1290,10 @@ msgstr "Agentlös"
 msgid "Aggregate"
 msgstr "Sammanslagna"
 
+#: widgets/topitems/views/column.edit.php:283
+msgid "Aggregate columns"
+msgstr ""
+
 #: app/views/popup.triggerexpr.php:126
 msgid "Aggregate functions"
 msgstr "Aggregationfunktioner"
@@ -1307,6 +1311,12 @@ msgstr "Sammanställer hela datauppsättningen."
 #: widgets/tophosts/views/column.edit.php:142
 msgid "Aggregation function"
 msgstr "Aggregeringsfunktion"
+
+#: widgets/item/views/widget.edit.php:85 widgets/item/views/widget.edit.php:90
+#: widgets/tophosts/views/column.edit.php:330
+#: widgets/topitems/views/column.edit.php:256
+msgid "Aggregation function does not affect the sparkline."
+msgstr ""
 
 #: widgets/svggraph/includes/CWidgetFieldDataSetView.php:406
 #: widgets/tophosts/views/column.edit.php:165
@@ -5191,10 +5201,18 @@ msgstr "Interpolering av färg"
 msgid "Colors"
 msgstr "Färger"
 
+#: widgets/topitems/views/column.edit.php:293
+msgid "Column aggregation function"
+msgstr ""
+
 #: widgets/graphprototype/includes/WidgetForm.php:82
 #: widgets/tophosts/includes/WidgetForm.php:140
 msgid "Columns"
 msgstr "Kolumner"
+
+#: widgets/topitems/views/column.edit.php:313
+msgid "Combined column name"
+msgstr ""
 
 #: app/views/js/administration.regex.edit.js.php:66
 msgid "Combined result"
@@ -13445,7 +13463,7 @@ msgstr "Språket \"%1$s\" stöds inte."
 
 #: widgets/scatterplot/includes/CWidgetFieldDataSetView.php:445
 msgid "Large"
-msgstr ""
+msgstr "Stor"
 
 #: include/classes/helpers/CPagerHelper.php:232
 msgctxt "page navigation"
@@ -14621,7 +14639,7 @@ msgstr "Medietyper som används av åtgärden \"%1$s\"."
 
 #: widgets/scatterplot/includes/CWidgetFieldDataSetView.php:444
 msgid "Medium"
-msgstr ""
+msgstr "Medel"
 
 #: app/views/usergroup.list.php:78
 msgid "Members"
@@ -14841,7 +14859,7 @@ msgstr ""
 
 #: app/views/maintenance.timeperiod.edit.php:202
 msgid "Minute"
-msgstr ""
+msgstr "Minut"
 
 #: app/views/maintenance.timeperiod.edit.php:212
 #: app/views/popup.sla.excludeddowntime.edit.php:73
@@ -15063,7 +15081,7 @@ msgstr "Flera PROBLEM-händelser"
 #: app/partials/administration.system.info.php:235
 #, c-format
 msgid "Must be at least %1$s."
-msgstr ""
+msgstr "Måste vara minst %1$s."
 
 #: app/controllers/CControllerMaintenanceUpdateGeneral.php:32
 #, c-format
@@ -15479,7 +15497,7 @@ msgstr "Ny värdgrupp"
 
 #: app/views/host.prototype.edit.php:727
 msgid "New host prototype"
-msgstr ""
+msgstr "Ny värdprototyp"
 
 #: app/views/item.edit.php:218
 msgid "New item"
@@ -20854,7 +20872,7 @@ msgstr "Slovakiska (sk_SK)"
 
 #: widgets/scatterplot/includes/CWidgetFieldDataSetView.php:443
 msgid "Small"
-msgstr ""
+msgstr "Liten"
 
 #: jsLoader.php:288
 msgid "Snooze"
@@ -27136,6 +27154,11 @@ msgstr "ogiltig byte-sekvens i UTF-8"
 msgid "invalid data type"
 msgstr "ogiltig datatyp"
 
+#: include/classes/validators/CAbsoluteTimeValidator.php:45
+#: include/classes/validators/CAbsoluteTimeValidator.php:53
+msgid "invalid date"
+msgstr ""
+
 #: include/classes/graphdraw/CLineGraphDraw.php:140 include/items.inc.php:1805
 msgid "invalid delay"
 msgstr "ogiltig fördröjning"
@@ -28535,6 +28558,11 @@ msgstr "värdet måste ligga mellan \"%1$s\" och \"%2$s\""
 msgid "value must be between \"%1$s\" and \"%2$s\", and have no more than \"%3$s\" digits after the decimal point"
 msgstr "värdet måste ligga mellan \"%1$s\" och \"%2$s\" och får inte ha fler än \"%3$s\" siffror efter decimaltecknet"
 
+#: include/classes/validators/CTimeUnitValidator.php:84
+#, c-format
+msgid "value must be between %1$s and %2$s"
+msgstr ""
+
 #: include/classes/validators/CApiInputValidator.php:676
 msgid "value must be empty"
 msgstr "värdet måste vara tomt"
@@ -28551,6 +28579,16 @@ msgstr[1] "värdet måste vara tomt eller ett av %1$s"
 #, c-format
 msgid "value must be greater than \"%1$s\""
 msgstr "värdet måste vara större än \"%1$s\""
+
+#: include/classes/validators/CAbsoluteTimeValidator.php:59
+#, c-format
+msgid "value must be greater than or equal to %1$s"
+msgstr ""
+
+#: include/classes/validators/CAbsoluteTimeValidator.php:64
+#, c-format
+msgid "value must be less than or equal to %1$s"
+msgstr ""
 
 #: app/controllers/CControllerPopupItemTest.php:1342
 #: include/classes/validators/CNewValidator.php:220

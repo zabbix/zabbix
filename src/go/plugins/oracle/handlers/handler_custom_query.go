@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -86,7 +86,7 @@ func CustomQueryHandler(ctx context.Context, conn dbconn.OraClient, //nolint:goc
 	}
 
 	if rows.Err() != nil {
-		log.Errf("CustomQueryHandler rows returned error: %v", err)
+		log.Errf("[Oracle] CustomQueryHandler rows returned error: %v", err)
 	}
 
 	return "[" + strings.Join(data, ",") + "]", nil
@@ -96,7 +96,7 @@ func closeRows(rows *sql.Rows) {
 	if rows != nil {
 		err := rows.Close()
 		if err != nil {
-			log.Errf("CustomQueryHandler closing rows raised error: %v", err)
+			log.Errf("[Oracle] CustomQueryHandler closing rows raised error: %v", err)
 		}
 	}
 }
