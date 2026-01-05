@@ -301,7 +301,7 @@ class CIntegrationTest extends CAPITest {
 			'diaginfo=connector' => '== connector diagnostic information =='
 		];
 		foreach ($expectedDiagInfoLogEntries as $cmd => $e) {
-			self::executeRuntimeControlCommand(self::COMPONENT_SERVER, $cmd);
+			self::executeRuntimeControlCommand2(self::COMPONENT_SERVER, $cmd);
 			self::waitForLogLineToBePresent(self::COMPONENT_SERVER, $e, true, 20, 3);
 		}
 
@@ -1103,6 +1103,16 @@ class CIntegrationTest extends CAPITest {
 	 * @throws Exception    on execution error
 	 */
 	protected function executeRuntimeControlCommand($component, $cmd) {
+		if (!is_array($cmd)) {
+			$cmd = [$cmd];
+		}
+
+		$params = ['-c', PHPUNIT_CONFIG_DIR.'zabbix_'.$component.'.conf', '--runtime-control'];
+		$args = array_merge($params, $cmd);
+
+		self::executeCommand(PHPUNIT_BINARY_DIR.'zabbix_'.$component, $args, '> /dev/null 2>&1');
+	}
+	public static function executeRuntimeControlCommand2($component, $cmd) {
 		if (!is_array($cmd)) {
 			$cmd = [$cmd];
 		}
