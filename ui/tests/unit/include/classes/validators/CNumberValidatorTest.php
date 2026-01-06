@@ -53,18 +53,6 @@ class CNumberValidatorTest extends TestCase {
 			['z10',			[], 																'value is not a valid floating point number'],
 			['',			[], 																'value is not a valid floating point number'],
 
-			// Invalid integer: only one macro is allowed.
-			// TODO: uncomment when ZBX-27064 merged
-//			['{$MA}{$MA}', 	['usermacros' => true, 'with_float' => false], 						'value is not a valid integer'],
-//			['10{$MA}', 	['usermacros' => true, 'with_float' => false],						'value is not a valid integer'],
-//			['{#MA}{$MA}', 	['usermacros' => true, 'lldmacros' => true, 'with_float' => false],	'value is not a valid integer'],
-
-			// Invalid float: only one macro is allowed.
-			// TODO: uncomment when ZBX-27064 merged
-//			['{$MA}{$MA}', 	['usermacros' => true],												'value is not a valid floating point number'],
-//			['10{$MA}', 	['usermacros' => true],												'value is not a valid floating point number'],
-//			['{#MA}{$MA}', 	['usermacros' => true, 'lldmacros' => true],						'value is not a valid floating point number'],
-
 			// Invalid number: out of min/max range.
 			['100',			['max' => 30], 														'value must be less than or equal to 30'],
 			['100',			['min' => 130], 													'value must be greater than or equal to 130'],
