@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -432,6 +432,22 @@ static int	DBpatch_7000028(void)
 	return SUCCEED;
 }
 
+static int	DBpatch_7000029(void)
+{
+	/* 3 - HOST_STATUS_TEMPLATE */
+	if (ZBX_DB_OK > zbx_db_execute("delete from item_rtdata"
+			" where exists ("
+				"select null from items i,hosts h"
+				" where item_rtdata.itemid=i.itemid"
+					" and i.hostid=h.hostid and h.status=3"
+			")"))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
 #endif
 
 DBPATCH_START(7000)
@@ -467,5 +483,6 @@ DBPATCH_ADD(7000025, 0, 0)
 DBPATCH_ADD(7000026, 0, 0)
 DBPATCH_ADD(7000027, 0, 0)
 DBPATCH_ADD(7000028, 0, 0)
+DBPATCH_ADD(7000029, 0, 0)
 
 DBPATCH_END()
