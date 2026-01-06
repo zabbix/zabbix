@@ -246,7 +246,7 @@ class testFormConnectors extends CWebTest {
 		}
 
 		foreach (['2' => true, '1' => false, '9' => true, '0' => false] as $attempts => $state) {
-			$form->getField('Attempts')->fill($attempts)->fireEvent();
+			$form->getField('Attempts')->fill($attempts)->fireEvent('input');
 			$this->assertEquals($state, $form->getField('Attempt interval')->isEnabled());
 			$form->checkValue(['Attempt interval' => '5s']);
 		}
