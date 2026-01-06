@@ -112,9 +112,9 @@ class CNumberParser extends CParser {
 		$this->number = null;
 		$this->suffix = null;
 
-		foreach ($this->macro_parsers as $parser) {
+		foreach ($this->macro_parsers as $macro_parser) {
 			// API_FLOAT validator allows only if the whole source is a macro
-			if ($parser->parse($source) == self::PARSE_SUCCESS) {
+			if ($macro_parser->parse($source) == self::PARSE_SUCCESS) {
 				return self::PARSE_SUCCESS;
 			}
 		}
