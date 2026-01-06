@@ -144,7 +144,7 @@ foreach ($data['hosts'] as $hostid => $host) {
 	$discovery_count = CViewHelper::showNum($host['discoveryRules']);
 	$discovery_link = ($host['editable'] && $data['allowed_ui_conf_hosts'])
 		? [new CLink(_('Discovery'), (new CUrl('zabbix.php'))
-			->setAtgument('action', 'lldrule.list')
+			->setArgument('action', 'lldrule.list')
 			->setArgument('filter_set', '1')
 			->setArgument('filter_hostids', [$hostid])
 			->setArgument('context', 'host')

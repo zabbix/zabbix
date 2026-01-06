@@ -30,15 +30,20 @@ var ItemEditPreprocessingTab = class {
 	#test_type;
 	#test_rules;
 
-	constructor({container, preprocessing, form, test_type, test_rules}) {
+	constructor({container, preprocessing, readonly, form, test_type, test_rules}) {
 		this.#container = container;
-		this.#readonly = false;
+		this.#readonly = readonly;
 		this.#step_index = 0;
 		this.#preprocessing_list = this.#container.querySelector('#preprocessing');
 		this.#default_type = this.#preprocessing_list.dataset.steptype;
 		this.#form = form;
 		this.#test_type = test_type;
 		this.#test_rules = test_rules;
+
+		if (this.#readonly) {
+			this.#container.querySelector('.element-table-add').disabled = true;
+			this.#container.querySelector('.js-item-preprocessing-type z-select').setAttribute('readonly', 'readonly');
+		}
 
 		this.#initEvents();
 
@@ -213,6 +218,10 @@ var ItemEditPreprocessingTab = class {
 				input.disabled = true;
 			}
 		}
+
+		if (this.#readonly) {
+			this.#readonlyAllInputs(row);
+		}
 	}
 
 	#updatePreprocessingListSortorder () {
@@ -311,9 +320,18 @@ var ItemEditPreprocessingTab = class {
 			})
 		}
 
+		if (this.#readonly) {
+			row.querySelector('.element-table-remove').disabled = true;
+		}
+
 		this.#updateRow(row);
 	}
 
+	#readonlyAllInputs(row) {
+		row.querySelectorAll('input, z-select').forEach(input => {
+			input.setAttribute('readonly', 'readonly');
+		});
+	}
 
 	#getParameterTemplateName(type) {
 		switch (type) {

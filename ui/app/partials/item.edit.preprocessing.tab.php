@@ -348,7 +348,6 @@ $formgrid = (new CFormGrid())
 				->setId('preprocessing')
 				->addClass('preprocessing-list')
 				->addClass(ZBX_STYLE_LIST_NUMBERED)
-				->setAttribute('data-readonly', $data['readonly'])
 				->setAttribute('data-field-type', 'set')
 				->setAttribute('data-field-name', 'preprocessing')
 				->setAttribute('data-steptype', $default_step_type)
@@ -369,7 +368,6 @@ $formgrid = (new CFormGrid())
 							(new CButton('param_add', _('Add')))
 								->addClass(ZBX_STYLE_BTN_LINK)
 								->addClass('element-table-add')
-								->setEnabled(!$data['readonly'])
 						))->addClass('step-action'),
 						(new CDiv(
 							(new CButton('preproc_test_all', _('Test all steps')))
@@ -388,7 +386,6 @@ if (array_key_exists('value_types', $data)) {
 			->setFocusableElementId('label-value-type-steps')
 			->setValue($data['value_type'])
 			->addOptions(CSelect::createOptionsFromArray($data['value_types']))
-			->setReadonly($data['readonly'])
 		))->addClass('js-item-preprocessing-type')
 	]);
 }
