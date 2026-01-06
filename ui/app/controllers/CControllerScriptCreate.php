@@ -123,7 +123,7 @@ class CControllerScriptCreate extends CController {
 			],
 			'new_window' => ['db scripts.new_window',
 				'in' => [ZBX_SCRIPT_URL_NEW_WINDOW_NO, ZBX_SCRIPT_URL_NEW_WINDOW_YES],
-				'when' => ['type', 'in' => [ZBX_SCRIPT_URL_NEW_WINDOW_NO, ZBX_SCRIPT_URL_NEW_WINDOW_YES]]
+				'when' => ['type', 'in' => [ZBX_SCRIPT_TYPE_URL]]
 			],
 			'description' => ['db scripts.description'],
 			'host_access' => ['db scripts.host_access',
@@ -154,7 +154,8 @@ class CControllerScriptCreate extends CController {
 			'manualinput_default_value' => ['db scripts.manualinput_default_value', 'required',
 				'when' => [
 					['scope', 'in' => [ZBX_SCRIPT_SCOPE_HOST, ZBX_SCRIPT_SCOPE_EVENT]],
-					['manualinput', 'in' => [ZBX_SCRIPT_MANUALINPUT_ENABLED]]
+					['manualinput', 'in' => [ZBX_SCRIPT_MANUALINPUT_ENABLED]],
+					['manualinput_validator_type', 'in' => [ZBX_SCRIPT_MANUALINPUT_TYPE_STRING]]
 				]
 			],
 			'manualinput_validator' => ['db scripts.manualinput_validator', 'required', 'not_empty',

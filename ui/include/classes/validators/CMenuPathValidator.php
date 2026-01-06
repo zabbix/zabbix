@@ -16,8 +16,7 @@
 
 class CMenuPathValidator extends CValidator {
 
-	public function validate($value): bool
-	{
+	public function validate($value): bool {
 		// If empty is allowed there is only root folder, return early.
 		if ($value === '/') {
 			return true;
