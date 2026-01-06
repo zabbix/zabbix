@@ -284,20 +284,12 @@ window.script_edit_popup = new class {
 	}
 
 	#openManualinputTestPopup() {
-		const input_validation = this.input_type == <?= ZBX_SCRIPT_MANUALINPUT_TYPE_STRING ?>
-			? this.form_element.querySelector('#manualinput_validator').value
-			: this.form_element.querySelector('#dropdown_options').value;
-
-		const default_input = this.input_type == <?= ZBX_SCRIPT_MANUALINPUT_TYPE_STRING ?>
-			? this.form_element.querySelector('#manualinput_default_value').value
-			: '';
+		const {
+			manualinput_prompt, manualinput_default_value, manualinput_validator_type, manualinput_validator
+		} = this.form.getAllValues();
 
 		const parameters = {
-			manualinput_prompt: this.form_element.querySelector('#manualinput_prompt').value,
-			manualinput_default_value: default_input,
-			manualinput_validator_type: this.input_type,
-			manualinput_validator: input_validation,
-			test: 1
+			manualinput_prompt, manualinput_default_value, manualinput_validator_type, manualinput_validator, test: 1
 		};
 
 		PopUp('script.userinput.edit', parameters, {
