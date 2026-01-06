@@ -249,7 +249,7 @@ class testDashboardItemValueWidget extends testWidgets {
 					'id:units_bold' => true,
 					'Aggregation function' => 'not used',
 					'Time period' => 'Dashboard',
-					'id:time_period_reference' => '',
+					'Widget' => '',
 					'id:time_period_from' => 'now-1h',
 					'id:time_period_to' => 'now',
 					'History data' => 'Auto'

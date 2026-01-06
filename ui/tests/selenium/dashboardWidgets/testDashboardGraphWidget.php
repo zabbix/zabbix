@@ -2771,19 +2771,27 @@ class testDashboardGraphWidget extends testWidgets {
 		$form->selectTab('Problems');
 
 		$fields = ['Selected items only', 'Severity', 'Problem', 'Problem tags', 'Problem hosts'];
+		$this->assertEnabledFields($fields, false);
+
 		$tag_elements = [
-			'id:evaltype',													// Tag type.
+			'id:evaltype_0',												// Tag type.
 			'id:tags_0_tag',												// Tag name.
 			'id:tags_0_operator',											// Tag operator.
 			'id:tags_0_value',												// Tag value
 			'id:tags_0_remove',												// Tag remove button.
 			'xpath:.//table[@id="tags_table_tags"]//button[@id="tags_add"]'	// Tag add button.
 		];
-		$this->assertEnabledFields(array_merge($fields, $tag_elements), false);
+		foreach ($tag_elements as $tag_fields) {
+			$this->assertFalse($form->query($tag_fields)->one()->isEnabled());
+		}
 
-		// Set "Show problems" and check that fields enabled now.
+		// Set "Show problems" and check that fields are enabled now.
 		$form->fill(['Show problems' => true]);
-		$this->assertEnabledFields(array_merge($fields, $tag_elements), true);
+		$this->assertEnabledFields($fields, true);
+
+		foreach ($tag_elements as $tag_fields) {
+			$this->assertTrue($form->query($tag_fields)->one()->isEnabled());
+		}
 
 		COverlayDialogElement::find()->one()->close();
 	}

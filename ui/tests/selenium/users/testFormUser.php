@@ -140,7 +140,7 @@ class testFormUser extends CWebTest {
 						'URL (after login)' => ''
 					],
 					// TODO: xpath should be replaced after ZBX-23936 fix.
-					'disabled' => ['Username', 'button:Change password', 'xpath:.//button[@id="label-lang"]/..',
+					'disabled' => ['id:username', 'button:Change password', 'xpath:.//button[@id="label-lang"]/..',
 						'xpath:.//button[@id="label-timezone"]/..', 'xpath:.//button[@id="label-theme"]/..'
 					],
 					'disabled_values' => [
@@ -223,7 +223,7 @@ class testFormUser extends CWebTest {
 		$form->checkValue($data['default']);
 
 		foreach ($data['disabled'] as $locator) {
-			$field = $form->getField($locator);
+			$field = $form->query($locator)->one();
 			$this->assertTrue($field->isDisplayed());
 			$this->assertFalse($field->isEnabled());
 		}
@@ -367,12 +367,12 @@ class testFormUser extends CWebTest {
 			$this->assertFalse($form->isRequired('Role'));
 		}
 		else {
-			$this->assertTrue($form->getField('id:roleid')->isEnabled());
+			$this->assertTrue($form->query('id:roleid')->one()->isEnabled());
 			$this->assertTrue($form->isRequired('Role'));
 		}
 
 		if ($data['role'] === '') {
-			$this->assertTrue($form->getField('id:roleid_ms')->isAttributePresent(['placeholder' => 'type here to search']));
+			$this->assertTrue($form->query('id:roleid_ms')->one()->isAttributePresent(['placeholder' => 'type here to search']));
 		}
 	}
 

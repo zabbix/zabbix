@@ -275,7 +275,14 @@ class testDashboardClockWidget extends testWidgets {
 				// There are two labels "Time zone", so the xpath is used for the container.
 				foreach (['Background colour' => true, 'Date' => false, 'Time' => true,
 							'xpath:.//div[@class="fields-group fields-group-tzone"]' => false] as $name => $visible) {
-					$this->assertTrue($form->getField($name)->isVisible($visible));
+					if ($name === 'xpath:.//div[@class="fields-group fields-group-tzone"]') {
+						$this->assertTrue($form->query($name)->one()->isVisible($visible));
+					}
+					else {
+						$this->assertTrue($form->getField($name)->isVisible($visible));
+
+					}
+					// $this->assertTrue($form->getField($name)->isVisible($visible));
 				}
 
 				// Fill other Show checkboxes and get other Advanced config fields.
