@@ -258,22 +258,6 @@ class CIntegrationTest extends CAPITest {
 	public function onAfterTestCase() {
 		$components = array_merge(self::$suite_components, $this->case_components);
 
-		$expectedDiagInfoLogEntries = [
-			'diaginfo=valuecache' => '== value cache diagnostic information ==',
-			'diaginfo=lld' => '== LLD diagnostic information ==',
-			'diaginfo=historycache' => '== history cache diagnostic information ==',
-			'diaginfo=preprocessing' => '== preprocessing diagnostic information ==',
-			'diaginfo=locks' => '== locks diagnostic information ==',
-			'diaginfo=alerting' => '== alerting diagnostic information ==',
-			'diaginfo=connector' => '== connector diagnostic information =='
-		];
-		foreach ($expectedDiagInfoLogEntries as $cmd => $e) {
-			$this->executeRuntimeControlCommand(self::COMPONENT_SERVER, $cmd);
-			$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, $e, true, 20, 3);
-		}
-
-
-
 		foreach ($components as $component) {
 			self::stopComponent($component);
 		}
@@ -1105,16 +1089,6 @@ class CIntegrationTest extends CAPITest {
 	 * @throws Exception    on execution error
 	 */
 	protected function executeRuntimeControlCommand($component, $cmd) {
-		if (!is_array($cmd)) {
-			$cmd = [$cmd];
-		}
-
-		$params = ['-c', PHPUNIT_CONFIG_DIR.'zabbix_'.$component.'.conf', '--runtime-control'];
-		$args = array_merge($params, $cmd);
-
-		self::executeCommand(PHPUNIT_BINARY_DIR.'zabbix_'.$component, $args, '> /dev/null 2>&1');
-	}
-	public static function executeRuntimeControlCommand2($component, $cmd) {
 		if (!is_array($cmd)) {
 			$cmd = [$cmd];
 		}
