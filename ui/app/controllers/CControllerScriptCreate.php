@@ -104,8 +104,11 @@ class CControllerScriptCreate extends CController {
 				'when' => ['type', 'in' => [ZBX_SCRIPT_TYPE_IPMI]]
 			],
 			'parameters' => ['objects', 'uniq' => ['name'], 'fields' => [
-					'name' => ['db script_param.name', 'required', 'not_empty'],
-					'value' => ['db script_param.value']
+					'value' => ['db script_param.value'],
+					'name' => [
+						['db script_param.name'],
+						['db script_param.name', 'required', 'not_empty', 'when' => ['value', 'not_empty']]
+					]
 				],
 				'when' => ['type', 'in' => [ZBX_SCRIPT_TYPE_WEBHOOK]]
 			],
