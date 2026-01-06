@@ -1114,9 +1114,7 @@ class CFormValidator {
 		}
 
 		if (array_key_exists('regex', $rules) && !preg_match($rules['regex'], $value)) {
-			$error = self::getMessage($rules, 'regex', _s('This value does not match pattern "%1$s".',
-				$rules['regex']
-			));
+			$error = self::getMessage($rules, 'regex', _('This value does not match pattern.'));
 
 			return false;
 		}

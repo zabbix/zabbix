@@ -1247,9 +1247,7 @@ class CFormValidator {
 			if (!re.test(value)) {
 				return {
 					result: CFormValidator.ERROR,
-					error: this.#getMessage(rules, 'regex', sprintf(t('This value does not match pattern "%1$s".'),
-						`/${pattern}/${flags}`
-					))
+					error: this.#getMessage(rules, 'regex', t('This value does not match pattern.'))
 				};
 			}
 		}
