@@ -13,6 +13,7 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
+use Widgets\TrigOver\Includes\WidgetForm;
 
 class WidgetCommunication {
 
@@ -827,7 +828,7 @@ class WidgetCommunication {
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'layout',
-										'value' => STYLE_TOP
+										'value' => WidgetForm::LAYOUT_VERTICAL
 									],
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
@@ -1628,7 +1629,7 @@ class WidgetCommunication {
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'layout',
-										'value' => STYLE_TOP
+										'value' => WidgetForm::LAYOUT_VERTICAL
 									],
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
@@ -3124,10 +3125,10 @@ class WidgetCommunication {
 										'name' => 'hostids._reference',
 										'value' => 'CEPBS._hostids'
 									],
-																		[
+									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'layout',
-										'value' => 1
+										'value' => WidgetForm::LAYOUT_VERTICAL
 									],
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,

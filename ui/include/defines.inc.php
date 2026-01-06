@@ -1036,10 +1036,6 @@ define('VALIGN_BOTTOM',		2);
 define('STYLE_HORIZONTAL',	0);
 define('STYLE_VERTICAL',	1);
 
-// view style [Overview, Plaintext]
-define('STYLE_LEFT',	0);
-define('STYLE_TOP',		1);
-
 // time module type
 define('TIME_TYPE_LOCAL',	0);
 define('TIME_TYPE_SERVER',	1);
