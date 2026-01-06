@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -692,15 +692,14 @@ static void	store_settings(const zbx_setting_value_t *values, int found, zbx_uin
 	if (SUCCEED != setting_get_int(values, "hk_trends_mode", defaults_log_level, &value_int))
 		value_int = ZBX_HK_OPTION_DISABLED;
 
-	if (ZBX_HK_OPTION_ENABLED == value_int &&
+	if (ZBX_HK_OPTION_ENABLED == config->config->hk.trends_global &&
 			SUCCEED != store_hk_setting(values, "hk_trends", 0, ZBX_HK_TRENDS_MIN, defaults_log_level,
 					&config->config->hk.trends, revision))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "trends data housekeeping will be disabled and all numeric items"
 				" will store their history due to invalid global override settings");
 
-		if (ZBX_HK_MODE_DISABLED != config->config->hk.trends_mode)
-			value_int = ZBX_HK_MODE_DISABLED;
+		value_int = ZBX_HK_MODE_DISABLED;
 
 		if (1 != config->config->hk.trends)
 		{

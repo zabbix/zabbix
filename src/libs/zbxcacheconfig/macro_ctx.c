@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -236,7 +236,8 @@ int	zbx_macro_script_params_field_resolv(zbx_macro_resolv_data_t *p, va_list arg
 		{
 			*replace_to = zbx_strdup(*replace_to, item->key_orig);
 		}
-		else if (0 == strncmp(p->macro, MVAR_INVENTORY, ZBX_CONST_STRLEN(MVAR_INVENTORY)))
+		else if (0 == strncmp(p->macro, MVAR_INVENTORY, ZBX_CONST_STRLEN(MVAR_INVENTORY)) ||
+				0 == strncmp(p->macro, MVAR_PROFILE, ZBX_CONST_STRLEN(MVAR_PROFILE)))
 		{
 			ret = zbx_dc_get_host_inventory_by_itemid(p->macro, item->itemid, replace_to);
 		}

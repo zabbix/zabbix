@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -64,10 +64,10 @@ class CDashboard extends CDashboardGeneral {
 
 		$sql_parts = [
 			'select' => ['dashboard' => 'd.dashboardid'],
-			'from' => ['dashboard' => 'dashboard d'],
+			'from' => 'dashboard d',
 			'where' => ['d.templateid IS NULL'],
-			'order' => [],
-			'group' => []
+			'group' => [],
+			'order' => []
 		];
 
 		if (!$options['countOutput'] && $options['output'] === API_OUTPUT_EXTEND) {
