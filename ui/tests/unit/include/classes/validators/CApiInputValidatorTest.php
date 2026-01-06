@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -3018,6 +3018,24 @@ class CApiInputValidatorTest extends TestCase {
 				]
 			],
 			[
+				['type' => API_OBJECTS, 'flags' => API_PRESERVE_KEYS, 'fields' => []],
+				[
+					10 => [],
+					13 => null
+				],
+				'/',
+				'Invalid parameter "/14": an array is expected.'
+			],
+			[
+				['type' => API_OBJECTS, 'fields' => []],
+				[
+					10 => [],
+					13 => null
+				],
+				'/',
+				'Invalid parameter "/2": an array is expected.'
+			],
+			[
 				['type' => API_OBJECTS, 'fields' => [
 					'hostid' =>	['type' => API_ID],
 					'host' =>	['type'=> API_STRING_UTF8],
@@ -3766,6 +3784,24 @@ class CApiInputValidatorTest extends TestCase {
 				'/',
 				'/1/expression',
 				'/'
+			],
+			[
+				['type' => API_REGEX],
+				'/',
+				'/1/expression',
+				'/'
+			],
+			[
+				['type' => API_REGEX],
+				'[(]',
+				'/1/expression',
+				'[(]'
+			],
+			[
+				['type' => API_REGEX],
+				'[\\/]',
+				'/1/expression',
+				'[\\/]'
 			],
 			[
 				['type' => API_REGEX, 'length' => 8],

@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -1661,7 +1661,10 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 
 			foreach ($matched_macros['macros'] as $type => $matches) {
 				foreach ($matches as $token => $_data) {
-					$macros[$token] = $data['macros_values'][$type][$token];
+					$value = $data['macros_values'][$type]['{'.$_data['macro'].'}'];
+					$macros[$token] = array_key_exists('macrofunc', $_data)
+						? CMacroFunction::calcMacrofunc($value, $_data['macrofunc'])
+						: $value;
 				}
 			}
 		}

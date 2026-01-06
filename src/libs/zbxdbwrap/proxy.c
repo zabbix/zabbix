@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -581,7 +581,7 @@ int	zbx_proxy_get_host_active_availability(struct zbx_json *j)
 
 		records_num = hostdata.values_num;
 
-		zbx_vector_proxy_hostdata_ptr_clear_ext(&hostdata, (zbx_proxy_hostdata_ptr_free_func_t)zbx_ptr_free);
+		zbx_vector_proxy_hostdata_ptr_clear_ext(&hostdata, zbx_proxy_hostdata_free);
 		zbx_vector_proxy_hostdata_ptr_destroy(&hostdata);
 	}
 
@@ -2736,7 +2736,7 @@ int	zbx_process_proxy_data(const zbx_dc_proxy_t *proxy, const struct zbx_json_pa
 			zbx_availability_send(ZBX_IPC_AVAILMAN_PROCESS_PROXY_HOSTDATA, data, data_len, NULL);
 
 			zbx_vector_proxy_hostdata_ptr_destroy(&proxy_host_avails);
-			zbx_vector_proxy_hostdata_ptr_clear_ext(&host_avails, (zbx_proxy_hostdata_ptr_free_func_t)zbx_ptr_free);
+			zbx_vector_proxy_hostdata_ptr_clear_ext(&host_avails, zbx_proxy_hostdata_free);
 			zbx_free(data);
 		}
 

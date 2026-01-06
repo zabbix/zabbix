@@ -1,6 +1,6 @@
 <?php declare(strict_types = 1);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -39,7 +39,7 @@ define("REDUCTED_PRINTABLE_ASCII", '!"#$%&\'()*+,-./0123456789:;<=>?@[\\]^_`{|}~
  * @hosts test_macros
  * @onAfter clearData
  */
-class testExpressionMacros extends CIntegrationTest {
+class testMacros extends CIntegrationTest {
 
 	private static $host_id;
 	private static $trigger_id;
@@ -875,13 +875,12 @@ class testExpressionMacros extends CIntegrationTest {
 		return [
 			self::COMPONENT_SERVER => [
 				'DebugLevel' => 4,
-				'LogFileSize' => 20,
-				'AllowUnsupportedDBVersions' => 1
+				'LogFileSize' => 20
 			]
 		];
 	}
 
-	public function testExpressionMacros_getData() {
+	public function testMacros_getData() {
 		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_KEY.'2', self::VALUE_TO_RECOVER_TRIGGER);
 		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_KEY.'1', self::VALUE_TO_RECOVER_TRIGGER);
 		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_KEY.'1', self::VALUE_TO_FIRE_TRIGGER);
@@ -919,7 +918,7 @@ class testExpressionMacros extends CIntegrationTest {
 	/**
 	 * Test macros resolution during the initial operation (when trigger fire first time).
 	 */
-	public function testExpressionMacros_checkProblemMessage() {
+	public function testMacros_checkProblemMessage() {
 		$message_expect = self::MESSAGE_PREFIX . self::VALUE_TO_FIRE_TRIGGER . "\n" .
 			'===1===' . "\n" .
 			self::$BUILTIN_MACROS_CONSISTENT_RESOLVE_COMMON_RESOLVED . "\n" .
@@ -950,7 +949,7 @@ class testExpressionMacros extends CIntegrationTest {
 	/**
 	 * Test macro resolution during the first escalation step (1 minute passed after trigger was fired).
 	 */
-	public function testExpressionMacros_checkProblemMessage2() {
+	public function testMacros_checkProblemMessage2() {
 		$message_expect = self::MESSAGE_PREFIX.self::VALUE_TO_FIRE_TRIGGER . "\n" .
 			'===1===' . "\n" .
 				'/host/macro:' . self::VALUE_TO_FIRE_TRIGGER .
@@ -982,7 +981,7 @@ class testExpressionMacros extends CIntegrationTest {
 	/**
 	 * Test macro resolution during the second escalation step (2 minutes passed after trigger was fired).
 	 */
-	public function testExpressionMacros_checkProblemMessage3_InconsistentMacros() {
+	public function testMacros_checkProblemMessage3_InconsistentMacros() {
 		$inconsistent_macros_resolved = "/ACTION.ID[\s\S]*" .
 			"ESC.HISTORY[\s\S]*" .
 			"DATE[\s\S]*" .
@@ -999,7 +998,7 @@ class testExpressionMacros extends CIntegrationTest {
 		$this->assertRegExp($inconsistent_macros_resolved, self::$alert_response['result'][2]['message']);
 	}
 
-	public function testExpressionMacros_checkRecoveryMessage() {
+	public function testMacros_checkRecoveryMessage() {
 		$trigger_expression_explain = self::VALUE_TO_RECOVER_TRIGGER . '=' . self::VALUE_TO_FIRE_TRIGGER .
 				' or ' .
 				self::VALUE_TO_RECOVER_TRIGGER . '=' . self::VALUE_TO_FIRE_TRIGGER;

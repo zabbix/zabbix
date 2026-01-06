@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -76,6 +76,11 @@ static void	snmp_walk_json_output_obj_clear(zbx_snmp_walk_json_output_obj_t *obj
 	zbx_free(obj->key);
 	zbx_vector_snmp_value_pair_clear_ext(&obj->values, snmp_value_pair_free);
 	zbx_vector_snmp_value_pair_destroy(&obj->values);
+}
+
+static void	snmp_walk_json_output_obj_clear_wrapper(void *data)
+{
+	snmp_walk_json_output_obj_clear((zbx_snmp_walk_json_output_obj_t*)data);
 }
 
 static zbx_hash_t	snmp_walk_json_output_obj_hash_func(const void *d)
@@ -935,7 +940,7 @@ int	item_preproc_snmp_walk_to_json(zbx_variant_t *value, const char *params, cha
 	zbx_vector_snmp_walk_to_json_param_create(&parsed_params);
 
 	zbx_hashset_create_ext(&grouped_prefixes, 100, snmp_walk_json_output_obj_hash_func,
-			snmp_walk_json_output_obj_compare_func, (zbx_clean_func_t)snmp_walk_json_output_obj_clear,
+			snmp_walk_json_output_obj_compare_func, snmp_walk_json_output_obj_clear_wrapper,
 			ZBX_DEFAULT_MEM_MALLOC_FUNC, ZBX_DEFAULT_MEM_REALLOC_FUNC, ZBX_DEFAULT_MEM_FREE_FUNC);
 
 

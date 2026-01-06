@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -59,6 +59,13 @@ class testPageApiTokensUserSettings extends testPageApiTokens {
 				'description' => 'admin token created for filter-create user',
 				'status' => '1',
 				'expires_at' => self::$timestamp
+			],
+			[
+				'name' => 'Checking     sp    aces in names',
+				'userid' => 1,
+				'description' => 'admin token created for filter-create user',
+				'status' => '1',
+				'expires_at' => self::$timestamp
 			]
 		]);
 
@@ -83,12 +90,18 @@ class testPageApiTokensUserSettings extends testPageApiTokens {
 
 			],
 			[
+				'Name' => 'Checking sp aces in names',
+				'Expires at' => date('Y-m-d H:i:s', self::$timestamp),
+				'Created at' => '2021-01-01 00:00:01',
+				'Last accessed at' => '2021-01-01 00:00:06',
+				'Status' => 'Disabled'
+			],
+			[
 				'Name' => 'Expired token for admin',
 				'Expires at' => '2021-01-01 00:06:00',
 				'Created at' => '2021-01-01 00:00:01',
 				'Last accessed at' => '2021-01-01 00:00:03',
 				'Status' => 'Enabled'
-
 			],
 			[
 				'Name' => 'Future token for admin',
@@ -96,7 +109,6 @@ class testPageApiTokensUserSettings extends testPageApiTokens {
 				'Created at' => '2021-01-01 00:00:01',
 				'Last accessed at' => '2021-01-01 00:00:02',
 				'Status' => 'Enabled'
-
 			],
 			[
 				'Name' => 'Token that will expire in 2 days',
@@ -104,7 +116,6 @@ class testPageApiTokensUserSettings extends testPageApiTokens {
 				'Created at' => '2021-01-01 00:00:01',
 				'Last accessed at' => '2021-01-01 00:00:05',
 				'Status' => 'Disabled'
-
 			]
 		];
 
@@ -166,6 +177,28 @@ class testPageApiTokensUserSettings extends testPageApiTokens {
 //					]
 //				]
 //			],
+			// Several empty spaces between words in filter field "Name".
+			[
+				[
+					'filter' => [
+						'Name' => '     sp    '
+					],
+					'expected' => [
+						'Checking sp aces in names'
+					]
+				]
+			],
+			// Several empty spaces between words in filter field "Name".
+			[
+				[
+					'filter' => [
+						'Name' => '    '
+					],
+					'expected' => [
+						'Checking sp aces in names'
+					]
+				]
+			],
 			// Wrong name in filter field "Name".
 			[
 				[
@@ -195,6 +228,7 @@ class testPageApiTokensUserSettings extends testPageApiTokens {
 					],
 					'expected' => [
 						'Aktīvs токен - 頑張って',
+						'Checking sp aces in names',
 						'Token that will expire in 2 days'
 					]
 				]
@@ -205,6 +239,7 @@ class testPageApiTokensUserSettings extends testPageApiTokens {
 					'filter' => [],
 					'Expires in less than' => 12,
 					'expected' => [
+						'Checking sp aces in names',
 						'Future token for admin',
 						'Token that will expire in 2 days'
 					]
@@ -216,6 +251,7 @@ class testPageApiTokensUserSettings extends testPageApiTokens {
 					'filter' => [],
 					'Expires in less than' => 2,
 					'expected' => [
+						'Checking sp aces in names',
 						'Token that will expire in 2 days'
 					]
 				]
@@ -259,6 +295,7 @@ class testPageApiTokensUserSettings extends testPageApiTokens {
 						'Token that will expire in 2 days',
 						'Future token for admin',
 						'Expired token for admin',
+						'Checking sp aces in names',
 						'Aktīvs токен - 頑張って'
 					]
 				]
@@ -269,6 +306,7 @@ class testPageApiTokensUserSettings extends testPageApiTokens {
 					'expected' => [
 						'Never',
 						'2021-01-01 00:06:00',
+						'2 days in the future',
 						'2 days in the future',
 						'12 days in the future'
 					]
@@ -281,7 +319,8 @@ class testPageApiTokensUserSettings extends testPageApiTokens {
 						'2021-01-01 00:00:02',
 						'2021-01-01 00:00:03',
 						'2021-01-01 00:00:04',
-						'2021-01-01 00:00:05'
+						'2021-01-01 00:00:05',
+						'2021-01-01 00:00:06'
 					]
 				]
 			],
@@ -291,6 +330,7 @@ class testPageApiTokensUserSettings extends testPageApiTokens {
 					'expected' => [
 						'Enabled',
 						'Enabled',
+						'Disabled',
 						'Disabled',
 						'Disabled'
 					]
