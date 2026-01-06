@@ -49,9 +49,22 @@ window.connector_edit_popup = new class {
 	}
 
 	#initEvents() {
-		for (const id of ['data_type', 'tags', 'authtype', 'max_records_mode', 'max_attempts']) {
+		for (const id of ['data_type', 'tags', 'authtype', 'max_records_mode']) {
 			document.getElementById(id).addEventListener('input', () => this.#updateForm());
 		}
+
+		document.getElementById('max_attempts').addEventListener('input', () => {
+			this.#updateForm();
+			const field = this.form.findFieldByName('attempt_interval');
+
+			if (field.isDisabled()) {
+				field.unsetErrors();
+				field.showErrors();
+			}
+			else {
+				this.form.validateChanges(['attempt_interval']);
+			}
+		});
 
 		this.footer.querySelector('.js-submit').addEventListener('click', () => this.#submit());
 		this.footer.querySelector('.js-clone')?.addEventListener('click', () => this.#clone());
