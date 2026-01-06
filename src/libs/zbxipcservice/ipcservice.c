@@ -738,7 +738,6 @@ static void	ipc_service_push_client(zbx_ipc_service_t *service, zbx_ipc_client_t
  ******************************************************************************/
 static void	ipc_service_add_client(zbx_ipc_service_t *service, int fd)
 {
-	static zbx_uint64_t	next_clientid = 1;
 	zbx_ipc_client_t	*client;
 	int			flags;
 
@@ -762,7 +761,7 @@ static void	ipc_service_add_client(zbx_ipc_service_t *service, int fd)
 	client->csocket.fd = fd;
 	client->csocket.rx_buffer_bytes = 0;
 	client->csocket.rx_buffer_offset = 0;
-	client->id = next_clientid++;
+	client->id = service->next_clientid++;
 	client->state = ZBX_IPC_CLIENT_STATE_NONE;
 	client->refcount = 1;
 
@@ -1528,6 +1527,8 @@ int	zbx_ipc_service_start(zbx_ipc_service_t *service, const char *service_name, 
 
 	service->ev_timer = event_new(service->ev, -1, 0, ipc_service_timer_cb, service);
 	service->ev_alert = event_new(service->ev, -1, 0, ipc_service_user_cb, NULL);
+
+	service->next_clientid = 1;
 
 	ret = SUCCEED;
 out:
