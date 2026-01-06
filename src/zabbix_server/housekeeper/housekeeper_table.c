@@ -152,7 +152,7 @@ static int	hk_item_cleanup(const zbx_vector_hk_housekeeper_t *hk_entries, int co
 
 			if (0 == (entry->progress & (1 << i)))
 			{
-				int	 more = 0;
+				int	more = 0;
 				char	filter[MAX_STRING_LEN];
 
 				zbx_snprintf(filter, sizeof(filter), table->filter, objectid);

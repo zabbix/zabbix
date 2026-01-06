@@ -12,8 +12,8 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-#ifndef ZABBIX_HOUSEKEEPER_H
-#define ZABBIX_HOUSEKEEPER_H
+#ifndef ZABBIX_HOUSEKEEPER_TABLE_H
+#define ZABBIX_HOUSEKEEPER_TABLE_H
 
 void	housekeeper_init(void);
 void	housekeeper_deinit(void);
