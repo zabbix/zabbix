@@ -342,8 +342,6 @@ class CControllerAuthenticationUpdate extends CController {
 			'sp_entityid'
 		]);
 
-
-
 		return true;
 	}
 
