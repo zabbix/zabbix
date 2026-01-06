@@ -1916,16 +1916,16 @@ static int	rm_schedule_jobs(zbx_rm_t *manager, int now)
 					break;
 				}
 
-				const char	*cycle_str;
+				const char	*cycle;
 
 				if (ZBX_REPORT_CYCLE_MONTHLY == report->cycle)
-					cycle_str = "Monthly";
+					cycle = "Monthly";
 				else
-					cycle_str = "Yearly";
+					cycle = "Yearly";
 
 				zabbix_log(LOG_LEVEL_WARNING, "%s report \"%s\" (reportid:" ZBX_FS_UI64
 						") missed scheduled date (target day). Sending catch-up report on"
-						"%04d-%02d-%02d.", cycle_str, report->name, report->reportid,
+						"%04d-%02d-%02d.", cycle, report->name, report->reportid,
 						tm->tm_year + 1900, tm->tm_mon + 1, tm->tm_mday);
 			}
 		}
