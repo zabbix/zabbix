@@ -14,7 +14,7 @@
 
 #include "dbconfig_server.h"
 
-#include "../../../include/zbxsupervisor_client.h"
+#include "zbxsupervisor_client.h"
 #include "../dbconfigworker/dbconfigworker.h"
 
 #include "zbxtimekeeper.h"
@@ -58,7 +58,7 @@ void	*zbx_dbconfig_thread(void *args)
 	process_title = zbx_dsprintf(NULL, "%s #%d", get_process_type_string(process_type), process_num);
 	zbx_set_log_component(process_title, unit_args->logger);
 
-	zbx_setproctitle("%s starting", process_title);
+	zbx_supervisor_update_activity("%s starting", process_title);
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started", get_program_type_string(info->program_type), server_num);
 
@@ -67,18 +67,18 @@ void	*zbx_dbconfig_thread(void *args)
 	zbx_rtc_subscribe(process_type, process_num, rtc_msgs, ARRSIZE(rtc_msgs), dbconfig_args_in->config_timeout,
 			&rtc);
 
-	zbx_setproctitle("%s [connecting to the database]", process_title);
+	zbx_supervisor_update_activity("%s [connecting to the database]", process_title);
 
 	zbx_db_connect(ZBX_DB_CONNECT_NORMAL);
 
 	sec = zbx_time();
-	zbx_setproctitle("%s [syncing configuration]", process_title);
+	zbx_supervisor_update_activity("%s [syncing configuration]", process_title);
 	zbx_dc_sync_configuration(ZBX_DBSYNC_INIT, ZBX_SYNCED_NEW_CONFIG_NO, NULL, dbconfig_args_in->config_vault,
 			dbconfig_args_in->proxyconfig_frequency);
 	zbx_dc_sync_kvs_paths(NULL, dbconfig_args_in->config_vault, dbconfig_args_in->config_source_ip,
 			dbconfig_args_in->config_ssl_ca_location, dbconfig_args_in->config_ssl_cert_location,
 			dbconfig_args_in->config_ssl_key_location);
-	zbx_setproctitle("%s [synced configuration in " ZBX_FS_DBL " sec, idle %d sec]",
+	zbx_supervisor_update_activity("%s [synced configuration in " ZBX_FS_DBL " sec, idle %d sec]",
 			process_title, (sec = zbx_time() - sec), dbconfig_args_in->config_confsyncer_frequency);
 
 
@@ -130,7 +130,7 @@ void	*zbx_dbconfig_thread(void *args)
 			sleeptime = 0;
 		}
 
-		zbx_setproctitle("%s [synced configuration in " ZBX_FS_DBL " sec, syncing configuration]",
+		zbx_supervisor_update_activity("%s [synced configuration in " ZBX_FS_DBL " sec, syncing configuration]",
 				process_title, sec);
 
 		sec = zbx_time();
@@ -181,14 +181,14 @@ void	*zbx_dbconfig_thread(void *args)
 
 		sec = zbx_time() - sec;
 
-		zbx_setproctitle("%s [synced configuration in " ZBX_FS_DBL " sec, idle %d sec]",
+		zbx_supervisor_update_activity("%s [synced configuration in " ZBX_FS_DBL " sec, idle %d sec]",
 				process_title, sec, dbconfig_args_in->config_confsyncer_frequency);
 	}
 stop:
 	zbx_ipc_async_socket_close(&rtc);
 	zbx_db_close();
 
-	zbx_setproctitle("%s [terminated]", process_title);
+	zbx_supervisor_update_activity("%s [terminated]", process_title);
 
 	zbx_free(process_title);
 

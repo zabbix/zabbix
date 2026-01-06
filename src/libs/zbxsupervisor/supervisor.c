@@ -602,6 +602,25 @@ static void	supervisor_change_loglevel(zbx_supervisor_t *sv, int direction, cons
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: handle runlevel subscription request from client                  *
+ *                                                                            *
+ * Parameters: sv     - [IN] supervisor instance                              *
+ *             client - [IN]     IPC client requesting runlevel subscription  *
+ *             data   - [IN]     serialized runlevel to wait for              *
+ *                                                                            *
+ ******************************************************************************/
+static void	sypervisor_get_activities(zbx_ipc_client_t *client)
+{
+	char	*activities;
+
+	activities = zbx_supervisor_get_activities();
+
+	zbx_ipc_client_send(client, ZBX_SUPERVISOR_GET_ACTIVITIES, activities, strlen(activities) + 1);
+	zbx_free(activities);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: find supervisor unit that matches the exit thread and return its  *
  *          process information                                               *
  *                                                                            *
@@ -692,6 +711,7 @@ ZBX_THREAD_ENTRY(zbx_supervisor_thread, args)
 			server_num, get_process_type_string(process_type), process_num);
 
 	supervisor_init_libraries();
+	zbx_supervisor_worklog_init();
 
 	if (NULL == (dbpool = zbx_dbconn_pool_create(&error)))
 	{
@@ -758,6 +778,9 @@ ZBX_THREAD_ENTRY(zbx_supervisor_thread, args)
 				case ZBX_RTC_LOG_LEVEL_DECREASE:
 					supervisor_change_loglevel(&sv, -1, message->data);
 					break;
+				case ZBX_SUPERVISOR_GET_ACTIVITIES:
+					sypervisor_get_activities(client);
+					break;
 				case ZBX_RTC_SHUTDOWN:
 					goto out;
 				default:
@@ -812,6 +835,7 @@ out:
 	zbx_dbconn_pool_free(dbpool);
 
 	supervisor_clear_libraries();
+	zbx_supervisor_worklog_clear();
 
 	zbx_exit(exit_ret);
 

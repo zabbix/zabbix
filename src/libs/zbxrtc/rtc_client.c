@@ -322,6 +322,12 @@ int	zbx_rtc_parse_options(const char *opt, zbx_uint32_t *code, struct zbx_json *
 		return SUCCEED;
 	}
 
+	if (0 == strcmp(opt, ZBX_STATUS))
+	{
+		*code = ZBX_RTC_STATUS;
+		return SUCCEED;
+	}
+
 	return SUCCEED;
 }
 

@@ -23,6 +23,7 @@
 #define ZBX_IPC_SERVICE_SUPERVISOR	"supervisor"
 
 #define ZBX_SUPERVISOR_PROC_RUNNING	(ZBX_IPC_RTC_MAX + 1)
+#define ZBX_SUPERVISOR_GET_ACTIVITIES	(ZBX_IPC_RTC_MAX + 2)
 #define ZBX_SUPERVISOR_RUNLEVEL_WAIT	(ZBX_IPC_RTC_MAX + 10)
 #define ZBX_SUPERVISOR_RUNLEVEL_OK	(ZBX_IPC_RTC_MAX + 11)
 
@@ -48,5 +49,10 @@ int	zbx_supervisor_client_poll(zbx_supervisor_client_t *svc, int runlevel, char 
 
 void	zbx_supervisor_get_process_info(int process_type, zbx_proc_owner_t *owner, int *runlevel);
 int	zbx_supervisor_get_process_count(const int *config_forks);
+
+void	zbx_supervisor_worklog_init(void);
+void	zbx_supervisor_worklog_clear(void);
+void	zbx_supervisor_update_activity(const char *fmt, ...);
+char	*zbx_supervisor_get_activities(void);
 
 #endif

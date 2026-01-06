@@ -8,7 +8,9 @@ libzbxsupervisor_a_SOURCES = \
 	supervisor.c
 
 libzbxsupervisor_client_a_SOURCES = \
-	supervisor_client.c
+	supervisor_client.c \
+	supervisor_client.h \
+	worklog.c
 
 libzbxsupervisor_a_CFLAGS = \
 	$(LIBXML2_CFLAGS) \

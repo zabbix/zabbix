@@ -12,6 +12,7 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
+#include "supervisor_client.h"
 #include "zbxsupervisor_client.h"
 
 #include "zbxcommon.h"
@@ -329,4 +330,37 @@ int	zbx_supervisor_get_process_count(const int *config_forks)
 	}
 
 	return process_count;
+}
+
+
+char	*supervisor_client_get_activities(void)
+{
+	zbx_ipc_socket_t	sock;
+	char			*error = NULL;
+	zbx_ipc_message_t	message;
+
+	if (FAIL == zbx_ipc_socket_open(&sock, ZBX_IPC_SERVICE_SUPERVISOR, SUPERVISOR_TIMEOUT, &error))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "Cannot connect to supervisor service: %s", error);
+		zbx_free(error);
+		zbx_exit(EXIT_FAILURE);
+	}
+
+	if (FAIL == zbx_ipc_socket_write(&sock, ZBX_SUPERVISOR_GET_ACTIVITIES, NULL, 0))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "Cannot send message to supervisor service: %s", error);
+		zbx_free(error);
+		zbx_exit(EXIT_FAILURE);
+	}
+
+	zbx_ipc_message_init(&message);
+	if (FAIL == zbx_ipc_socket_read(&sock, &message))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "Cannot get response from supervisor service");
+		zbx_exit(EXIT_FAILURE);
+	}
+
+	zbx_ipc_socket_close(&sock);
+
+	return (char *)message.data;
 }

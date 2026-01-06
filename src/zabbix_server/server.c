@@ -160,6 +160,7 @@ static const char	*help_message[] = {
 	"      " ZBX_DBPOOL_SET_MAX_IDLE "=num     Set the maximum number of idle connections retained in",
 	"      "      "                              the database pool",
 	"      " ZBX_DBPOOL_SET_MAX_OPEN "=num     Set the maximum number of open connections in the database pool",
+	"      " ZBX_STATUS "                    Display supervisor component status",
 	"",
 	"      Log level control targets:",
 	"        process-type              All processes of specified type",

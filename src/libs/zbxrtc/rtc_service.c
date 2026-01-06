@@ -29,6 +29,7 @@
 #include "zbxcachehistory.h"
 #include "zbxdb.h"
 #include "zbxlog.h"
+#include "zbxsupervisor_client.h"
 
 ZBX_PTR_VECTOR_IMPL(rtc_sub, zbx_rtc_sub_t *)
 ZBX_PTR_VECTOR_IMPL(rtc_hook, zbx_rtc_hook_t *)
@@ -531,6 +532,18 @@ static void	rtc_process_db_set_idle_timeout(const char *data, char **result)
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: process db_status runtime control option                          *
+ *                                                                            *
+ * Parameters: result - [OUT] runtime control result                          *
+ *                                                                            *
+ ******************************************************************************/
+static void	rtc_process_status(char **result)
+{
+	*result = zbx_supervisor_get_activities();
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: notify client based subscribers                                   *
  *                                                                            *
  ******************************************************************************/
@@ -836,6 +849,9 @@ static void	rtc_process_request(zbx_rtc_t *rtc, zbx_uint32_t code, const unsigne
 			return;
 		case ZBX_RTC_DBPOOL_SET_IDLE_TIMEOUT:
 			rtc_process_db_set_idle_timeout((const char *)data, result);
+			return;
+		case ZBX_RTC_STATUS:
+			rtc_process_status(result);
 			return;
 		default:
 			*result = zbx_strdup(*result, "Unknown runtime control option\n");
