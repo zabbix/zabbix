@@ -185,7 +185,7 @@ class CConfigFile {
 		}
 
 		if (isset($HISTORY_PROVIDERS)) {
-			$this->config['HISTORY_PROVIDER'] = $HISTORY_PROVIDERS;
+			$this->config['HISTORY_PROVIDERS'] = $HISTORY_PROVIDERS;
 		}
 
 		if (isset($SSO)) {
@@ -237,7 +237,7 @@ class CConfigFile {
 		$ZBX_SERVER_NAME = $this->config['ZBX_SERVER_NAME'];
 		$IMAGE_FORMAT_DEFAULT = $this->config['IMAGE_FORMAT_DEFAULT'];
 		$HISTORY = $this->config['HISTORY'];
-		$HISTORY_PROVIDERS = $this->config['HISTORY_PROVIDER'];
+		$HISTORY_PROVIDERS = $this->config['HISTORY_PROVIDERS'];
 		$SSO = $this->config['SSO'];
 		$ALLOW_HTTP_AUTH = $this->config['ALLOW_HTTP_AUTH'];
 		$ZBX_SERVER_TLS = $this->config['ZBX_SERVER_TLS'];
@@ -398,6 +398,7 @@ $ZBX_SERVER_TLS[\'CERTIFICATE_SUBJECT\'] = \''.addcslashes($this->config['ZBX_SE
 		$this->config['ZBX_SERVER_NAME'] = '';
 		$this->config['IMAGE_FORMAT_DEFAULT'] = IMAGE_FORMAT_PNG;
 		$this->config['HISTORY'] = null;
+		$this->config['HISTORY_PROVIDERS'] = null;
 		$this->config['SSO'] = null;
 		$this->config['ALLOW_HTTP_AUTH'] = true;
 		$this->config['ZBX_SERVER_TLS'] = [
