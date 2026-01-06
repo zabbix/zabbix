@@ -26,7 +26,7 @@ $formgrid = (new CFormGrid());
 
 if (!empty($lldrule['templates'])) {
 	$formgrid->addItem([
-		new CLabel(_('Parent discovery rules')),
+		new CLabel(_('Parent discovery prototypes')),
 		new CFormField($lldrule['templates'])
 	]);
 }
