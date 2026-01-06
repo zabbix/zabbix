@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -1143,7 +1143,6 @@ class CMediatype extends CApiService {
 			}
 		}
 
-		DB::delete('media_type_oauth', ['mediatypeid' => $mediatypeids]);
 		DB::delete('media_type', ['mediatypeid' => $mediatypeids]);
 
 		self::addAuditLog(CAudit::ACTION_DELETE, CAudit::RESOURCE_MEDIA_TYPE, $db_mediatypes);

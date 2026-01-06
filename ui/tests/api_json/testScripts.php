@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -3361,6 +3361,20 @@ class testScripts extends CAPITest {
 						'manualinput_validator' => '^([1-9]|[1-9][0-9]{1,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])$',
 						'manualinput_default_value' => '80'
 					]
+				],
+				'expected_error' => null
+			],
+			'Test script.create "manualinput_validator" field for input type string with valid regular expression' => [
+				'script' => [
+					'name' => 'API create script with regular expression for user prompt',
+					'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
+					'scope' => ZBX_SCRIPT_SCOPE_EVENT,
+					'command' => 'reboot server',
+					'manualinput' => ZBX_SCRIPT_MANUALINPUT_ENABLED,
+					'manualinput_prompt' => 'prompt text',
+					'manualinput_validator_type' => ZBX_SCRIPT_MANUALINPUT_TYPE_STRING,
+					'manualinput_validator' => '[(] a\\/b [\\(]',
+					'manualinput_default_value' => ''
 				],
 				'expected_error' => null
 			]

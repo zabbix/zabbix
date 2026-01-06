@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -1765,6 +1765,9 @@ class testMassUpdateItems extends CWebTest{
 
 				// It is necessary because of unexpected viewport shift.
 				$this->page->updateViewport();
+				// TODO: unstable screenshots on Jenkins. Added border radius 0 for checkboxes.
+				$this->page->getDriver()->executeScript('document.querySelectorAll(\'.checkbox-radio[type="checkbox"]'.
+						'+ label span\').forEach(function (e){ e.style.borderRadius = 0; });');
 				$this->assertScreenshot($form->query('id:preprocessing')->waitUntilPresent()->one(),
 						'Item mass update preprocessing'.$prototypes
 				);
