@@ -70,8 +70,7 @@ $messaging_form_list = (new CFormList())
 			->setUncheckedValue(0)
 	)
 	->addRow(_('Message timeout'),
-		(new CTextBox('messages[timeout]', $data['messages']['timeout']))->setWidth(ZBX_TEXTAREA_TINY_WIDTH),
-		'timeout_row'
+		(new CTextBox('messages[timeout]', $data['messages']['timeout']))->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 	)
 	->addRow(new CLabel(_('Play sound'), 'label-sounds'),
 		(new CSelect('messages[sounds.repeat]'))
