@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -30,11 +30,11 @@ const (
 	ZABBIX_REVDATE          = "16 December 2025"
 	ZABBIX_VERSION_MAJOR    = 6
 	ZABBIX_VERSION_MINOR    = 0
-	ZABBIX_VERSION_PATCH    = 43
-	ZABBIX_VERSION_RC       = ""
+	ZABBIX_VERSION_PATCH    = 44
+	ZABBIX_VERSION_RC       = "rc1"
 	ZABBIX_VERSION_RC_NUM   = "{ZABBIX_RC_NUM}"
 	ZABBIX_VERSION_REVISION = "{ZABBIX_REVISION}"
-	copyrightMessage        = "Copyright (C) 2025 Zabbix SIA\n" +
+	copyrightMessage        = "Copyright (C) 2026 Zabbix SIA\n" +
 		"License GPLv2+: GNU GPL version 2 or later <https://www.gnu.org/licenses/>.\n" +
 		"This is free software: you are free to change and redistribute it according to\n" +
 		"the license. There is NO WARRANTY, to the extent permitted by law."

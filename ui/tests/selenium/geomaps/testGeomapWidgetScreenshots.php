@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -33,6 +33,15 @@ require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
  * @ignoreBrowserErrors
  */
 class testGeomapWidgetScreenshots extends CWebTest {
+
+	/**
+	 * Attach MessageBehavior to the test.
+	 *
+	 * @return array
+	 */
+	public function getBehaviors() {
+		return [CMessageBehavior::class];
+	}
 
 	// Dashboard for zoom screenshot tests.
 	protected static $zoom_dashboardid;
@@ -288,6 +297,7 @@ class testGeomapWidgetScreenshots extends CWebTest {
 		$form = $this->query('id:geomaps-form')->asForm()->one();
 		$form->fill($data);
 		$form->submit();
+		$this->assertMessage(TEST_GOOD, 'Configuration updated');
 
 		$this->page->open('zabbix.php?action=dashboard.view&dashboardid='.self::$zoom_dashboardid);
 		CDashboardElement::find()->waitUntilReady();

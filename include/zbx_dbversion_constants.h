@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -64,8 +64,8 @@
 #define ZBX_TIMESCALE_MIN_SUPPORTED_VERSION 			20001
 #define ZBX_TIMESCALE_MIN_SUPPORTED_VERSION_STR 		"2.0.1"
 #define ZBX_TIMESCALE_MIN_VERSION_WITH_LICENSE_PARAM_SUPPORT	20000
-#define ZBX_TIMESCALE_MAX_VERSION				22399
-#define ZBX_TIMESCALE_MAX_VERSION_STR				"2.23"
+#define ZBX_TIMESCALE_MAX_VERSION				22499
+#define ZBX_TIMESCALE_MAX_VERSION_STR				"2.24"
 #define ZBX_TIMESCALE_LICENSE_APACHE				"apache"
 #define ZBX_TIMESCALE_LICENSE_APACHE_STR			"TimescaleDB Apache 2 Edition"
 #define ZBX_TIMESCALE_LICENSE_COMMUNITY				"timescale"
