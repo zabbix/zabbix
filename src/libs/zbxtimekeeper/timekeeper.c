@@ -287,9 +287,14 @@ zbx_uint64_t	zbx_timekeeper_update(zbx_timekeeper_t *timekeeper, int index, unsi
 
 	if (0 == unit->cache.ticks_flush)
 	{
+		timekeeper->sync->lock(timekeeper->sync->data);
+
 		unit->cache.ticks_flush = ticks;
 		unit->cache.state = state;
 		unit->cache.ticks = ticks;
+
+		timekeeper->sync->unlock(timekeeper->sync->data);
+
 		return 0;
 	}
 
