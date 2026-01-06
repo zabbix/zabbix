@@ -186,6 +186,7 @@
 		<exec executable="./configure" failonerror="on">
 			<arg line="--quiet"/>
 			<arg line="--enable-agent2"/>
+			<arg line="--with-libpcre2"/>
 			<arg line="--prefix=${basedir}"/>
 			<arg line="--with-libcurl"/>
 			<arg line="--with-stacksize=128"/>
