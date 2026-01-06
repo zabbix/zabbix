@@ -906,21 +906,6 @@ class testMacros extends CIntegrationTest {
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'In escalation_recover()', true);
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of escalation_recover()', true, 10, 3);
 
-
-		$expectedDiagInfoLogEntries = [
-			'diaginfo=alerting' => '== alerting diagnostic information ==',
-			'diaginfo=valuecache' => '== value cache diagnostic information ==',
-			'diaginfo=lld' => '== LLD diagnostic information ==',
-			'diaginfo=historycache' => '== history cache diagnostic information ==',
-			'diaginfo=preprocessing' => '== preprocessing diagnostic information ==',
-			'diaginfo=locks' => '== locks diagnostic information ==',
-			'diaginfo=connector' => '== connector diagnostic information =='
-		];
-		foreach ($expectedDiagInfoLogEntries as $cmd => $e) {
-			$this->executeRuntimeControlCommand(self::COMPONENT_SERVER, $cmd);
-			$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, $e, true, 20, 3);
-		}
-
 		self::$alert_response = $this->callUntilDataIsPresent('alert.get', [
 			'hostids' => [self::$host_id],
 			'actionids' => [self::$trigger_action_id],

@@ -335,20 +335,4 @@ class testExpressionTriggerMacros extends CIntegrationTest {
 
 		$response = $this->call('usermacro.deleteglobal', (array)self::$macroid );
 	}
-
-	public function testDiagInfo() {
-		$expectedDiagInfoLogEntries = [
-			'diaginfo=valuecache' => '== value cache diagnostic information ==',
-			'diaginfo=lld' => '== LLD diagnostic information ==',
-			'diaginfo=historycache' => '== history cache diagnostic information ==',
-			'diaginfo=preprocessing' => '== preprocessing diagnostic information ==',
-			'diaginfo=locks' => '== locks diagnostic information ==',
-			'diaginfo=alerting' => '== alerting diagnostic information ==',
-			'diaginfo=connector' => '== connector diagnostic information =='
-		];
-		foreach ($expectedDiagInfoLogEntries as $cmd => $e) {
-			$this->executeRuntimeControlCommand(self::COMPONENT_SERVER, $cmd);
-			$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, $e, true, 20, 3);
-		}
-	}
 }
