@@ -2728,8 +2728,6 @@ static void	execute_operations(const zbx_db_event *event, zbx_uint64_t actionid)
 				if (0 != optagid)
 					needs_host = 1;
 				break;
-			default:
-				;
 		}
 
 		if (0 != needs_host && 0 == ensure_discovered_host(event, &cfg, &hostid, &status))
@@ -2816,8 +2814,6 @@ static void	execute_operations(const zbx_db_event *event, zbx_uint64_t actionid)
 				if (0 != optagid)
 					zbx_vector_uint64_append(&del_optagids, optagid);
 				break;
-			default:
-				;
 		}
 	}
 	zbx_db_free_result(result);
