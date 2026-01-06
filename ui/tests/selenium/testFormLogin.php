@@ -180,6 +180,17 @@ class testFormLogin extends CWebTest {
 	}
 
 	/**
+	 * Opens login page with parameter in URL and checks if autologin checkbox is enabled.
+	 */
+	public function testFormLogin_LoginWithField() {
+		foreach (['reconnect=1', 'autologin=1', 'autologin=0'] as $url) {
+			$this->page->open('index.php?'.$url);
+			$checked = ($url === 'autologin=0') ? false : true;
+			$this->assertTrue($this->query('id:autologin')->asCheckbox()->one()->isChecked($checked));
+		}
+	}
+
+	/**
 	 * Guest user needs to be out of "Disabled" group to have access to frontend.
 	 **/
 	public function removeGuestFromDisabledGroup() {
