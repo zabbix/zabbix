@@ -51,8 +51,6 @@ abstract class CControllerLldRuleUpdateGeneral extends CController {
 			'hostid' => ['db items.hostid', 'required'],
 			'templateid' => ['db items.templateid'],
 			'discovered' => ['boolean'],
-
-			// Form.
 			'name' => ['db items.name', 'required', 'not_empty'],
 			'type' => [
 				['db items.type', 'required', 'in' => self::getItemTypes()],

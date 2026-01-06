@@ -47,7 +47,7 @@ class CControllerLldRulePrototypeCreate extends CControllerLldRuleUpdateGeneral 
 			$response = $form_errors
 				? ['form_errors' => $form_errors]
 				: ['error' => [
-					'title' => _('Cannot create discovery rule'),
+					'title' => _('Cannot add discovery prototype'),
 					'messages' => array_column(get_and_clear_messages(), 'message')
 				]];
 

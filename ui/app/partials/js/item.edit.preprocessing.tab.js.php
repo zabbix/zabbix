@@ -498,8 +498,6 @@ var ItemEditPreprocessingTab = class {
 					return;
 				}
 
-				console.log(indexes);
-
 				// Method requires form name to be set to itemForm.
 				openItemTestDialog(indexes, show_final_result, get_value, trigger_element, step_obj_nr);
 			});
