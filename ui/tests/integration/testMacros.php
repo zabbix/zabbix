@@ -908,12 +908,12 @@ class testMacros extends CIntegrationTest {
 
 
 		$expectedDiagInfoLogEntries = [
+			'diaginfo=alerting' => '== alerting diagnostic information ==',
 			'diaginfo=valuecache' => '== value cache diagnostic information ==',
 			'diaginfo=lld' => '== LLD diagnostic information ==',
 			'diaginfo=historycache' => '== history cache diagnostic information ==',
 			'diaginfo=preprocessing' => '== preprocessing diagnostic information ==',
 			'diaginfo=locks' => '== locks diagnostic information ==',
-			'diaginfo=alerting' => '== alerting diagnostic information ==',
 			'diaginfo=connector' => '== connector diagnostic information =='
 		];
 		foreach ($expectedDiagInfoLogEntries as $cmd => $e) {
