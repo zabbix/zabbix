@@ -30,7 +30,7 @@
 #include "zbxdb.h"
 #include "zbxipcservice.h"
 #include "trigger_housekeeper.h"
-#include "housekeeper.h"
+#include "housekeeper_table.h"
 
 #ifdef HAVE_POSTGRESQL
 #include "zbxjson.h"

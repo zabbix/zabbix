@@ -12,7 +12,7 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-#include "housekeeper.h"
+#include "housekeeper_table.h"
 
 #include "zbxdb.h"
 #include "zbxcacheconfig.h"
