@@ -113,34 +113,37 @@ class CNumberParser extends CParser {
 		$this->suffix = null;
 
 		foreach ($this->macro_parsers as $macro_parser) {
-			// API_FLOAT validator allows only if the whole source is a macro
-			if ($macro_parser->parse($source) == self::PARSE_SUCCESS) {
-				return self::PARSE_SUCCESS;
+			if ($macro_parser->parse($source, $pos) != self::PARSE_FAIL) {
+				$this->length = $macro_parser->getLength();
+				$this->match = $macro_parser->getMatch();
+				break;
 			}
 		}
 
-		$fragment = substr($source, $pos);
+		if ($this->length == 0) {
+			$fragment = substr($source, $pos);
 
-		$pattern = $this->options['with_float'] ? ZBX_PREG_NUMBER : ZBX_PREG_INT;
-		$pattern = ($this->options['with_size_suffix'] || $this->options['with_time_suffix'])
-			? '/^'.$pattern.'(?<suffix>['.$this->suffixes.'])?/'
-			: '/^'.$pattern.'/';
+			$pattern = $this->options['with_float'] ? ZBX_PREG_NUMBER : ZBX_PREG_INT;
+			$pattern = ($this->options['with_size_suffix'] || $this->options['with_time_suffix'])
+				? '/^'.$pattern.'(?<suffix>['.$this->suffixes.'])?/'
+				: '/^'.$pattern.'/';
 
-		if (!preg_match($pattern, $fragment, $matches)) {
-			return self::PARSE_FAIL;
+			if (!preg_match($pattern, $fragment, $matches)) {
+				return self::PARSE_FAIL;
+			}
+
+			$number = $this->options['with_float'] ? $matches['number'] : $matches['int'];
+
+			if ($number[0] === '-' && !$this->options['with_minus']) {
+				return self::PARSE_FAIL;
+			}
+
+			$this->length = strlen($matches[0]);
+			$this->match = $matches[0];
+
+			$this->number = $number;
+			$this->suffix = array_key_exists('suffix', $matches) ? $matches['suffix'] : null;
 		}
-
-		$number = $this->options['with_float'] ? $matches['number'] : $matches['int'];
-
-		if ($number[0] === '-' && !$this->options['with_minus']) {
-			return self::PARSE_FAIL;
-		}
-
-		$this->length = strlen($matches[0]);
-		$this->match = $matches[0];
-
-		$this->number = $number;
-		$this->suffix = array_key_exists('suffix', $matches) ? $matches['suffix'] : null;
 
 		return ($pos + $this->length < strlen($source)) ? self::PARSE_SUCCESS_CONT : self::PARSE_SUCCESS;
 	}
