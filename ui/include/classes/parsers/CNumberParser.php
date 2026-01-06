@@ -150,6 +150,9 @@ class CNumberParser extends CParser {
 
 	/**
 	 * Calculate value of parsed number in a decimal notation.
+	 * Method is not compatible when at least one of the following options is enabled:
+	 * - $options['usermacros']
+	 * - $options['lldmacros'].
 	 *
 	 * @return float
 	 */
