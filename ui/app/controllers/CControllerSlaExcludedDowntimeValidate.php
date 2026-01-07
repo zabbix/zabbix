@@ -27,7 +27,7 @@ class CControllerSlaExcludedDowntimeValidate extends CController {
 			'row_index' => ['integer', 'required'],
 			'name' => ['db sla.name', 'required', 'not_empty'],
 			'start_time' => ['string', 'required', 'not_empty',
-				'use' => [CAbsoluteTimeParser::class, [], ['min' => 0, 'max' => ZBX_MAX_DATE]]
+				'use' => [CAbsoluteTimeValidator::class, ['min' => 0, 'max' => ZBX_MAX_DATE]]
 			],
 			'duration_days' => ['integer', 'required', 'min' => 0],
 			'duration_hours' => ['integer', 'required', 'min' => 0, 'max' => 23],
