@@ -80,7 +80,8 @@ class CTimeUnitValidator extends CValidator {
 		if ($this->accept_zero && $seconds == 0) {
 			return true;
 		}
-		elseif ($seconds > $this->max || $seconds < $this->min) {
+
+		if ($seconds > $this->max || $seconds < $this->min) {
 			$min_text = $this->min >= 60
 				? $this->min._x('s', 'second short').' ('.convertUnitsS($this->min, $convert_options) .')'
 				: convertUnitsS($this->min, $convert_options);
