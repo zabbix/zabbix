@@ -145,6 +145,10 @@ class CControllerUserUpdate extends CControllerUserUpdateGeneral {
 			'autologout', 'refresh', 'rows_per_page', 'url', 'roleid'
 		]);
 
+		if ($this->hasInput('autologout_visible') && $this->getInput('autologout_visible') == 0) {
+			$user['autologout'] = 0;
+		}
+
 		$can_edit_media = bccomp(CWebUser::$data['userid'], $user['userid']) == 0
 			? $this->checkAccess(CRoleHelper::ACTIONS_EDIT_OWN_MEDIA)
 			: $this->checkAccess(CRoleHelper::ACTIONS_EDIT_USER_MEDIA);

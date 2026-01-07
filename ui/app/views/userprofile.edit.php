@@ -240,7 +240,8 @@ if ($data['username'] !== ZBX_GUEST_USER) {
 	);
 	$form_list->addRow(_('Auto-logout'), [
 		(new CCheckBox('autologout_visible'))
-			->setChecked($data['autologout'] !== '0'),
+			->setChecked($data['autologout'] !== '0')
+			->setUncheckedValue(0),
 		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 		(new CTextBox('autologout', $autologout, false, DB::getFieldLength('users', 'autologout')))
 			->setWidth(ZBX_TEXTAREA_TINY_WIDTH)

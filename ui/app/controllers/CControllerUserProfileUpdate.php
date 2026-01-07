@@ -104,6 +104,11 @@ class CControllerUserProfileUpdate extends CControllerUserUpdateGeneral {
 		$this->getInputs($user, ['lang', 'timezone', 'theme', 'autologin', 'autologout', 'refresh', 'rows_per_page',
 			'url'
 		]);
+
+		if ($this->getInput('autologout_visible') == 0) {
+			$user['autologout'] = 0;
+		}
+
 		$user['userid'] = CWebUser::$data['userid'];
 
 		if ($this->getInput('current_password', '') !== ''
