@@ -386,7 +386,7 @@ if ($data['add_ldap_server']) {
 	$buttons = [
 		[
 			'title' => _('Add'),
-			'class' => 'js-add js-submit',
+			'class' => 'js-submit',
 			'keepOpen' => true,
 			'isSubmit' => true
 		]
@@ -397,7 +397,7 @@ else {
 	$buttons = [
 		[
 			'title' => _('Update'),
-			'class' => 'js-update js-submit',
+			'class' => 'js-submit',
 			'keepOpen' => true,
 			'isSubmit' => true
 		]
