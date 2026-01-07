@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -506,24 +506,21 @@ function dbConditionInt($field_name, array $values, $not_in = false, $zero_inclu
 	natsort($values);
 	$values = array_values($values);
 
-	$singles = array_map(function($value) {
-		return dbQuoteInt($value);
-	}, $values);
+	foreach ($values as &$value) {
+		$value = dbQuoteInt($value);
+	}
+	unset($value);
 
-	// Limit maximum number of values for using in "IN (<id1>,<id2>,...,<idN>)".
-	$single_chunks = array_chunk($singles, 950);
 	$multiple_conditions = false;
 
-	foreach ($single_chunks as $chunk) {
-		if ($condition !== '') {
-			$condition .= $not_in ? ' AND ' : ' OR ';
-			$multiple_conditions = true;
-		}
-
-		$condition .= count($chunk) == 1
-			? $field_name.($not_in ? '!=' : '=').$chunk[0]
-			: $field_name.($not_in ? ' NOT' : '').' IN ('.implode(',', $chunk).')';
+	if ($condition !== '') {
+		$condition .= $not_in ? ' AND ' : ' OR ';
+		$multiple_conditions = true;
 	}
+
+	$condition .= count($values) == 1
+		? $field_name.($not_in ? '!=' : '=').$values[0]
+		: $field_name.($not_in ? ' NOT' : '').' IN ('.implode(',', $values).')';
 
 	if (!$not_in && $multiple_conditions) {
 		$condition = '('.$condition.')';
@@ -548,33 +545,18 @@ function dbConditionId($fieldName, array $values, $notIn = false) {
 /**
  * Takes an initial part of SQL query and appends a generated WHERE condition.
  *
- * @param string $fieldName		field name to be used in SQL WHERE condition
- * @param array  $values		array of string values sorted in ascending order to be included in WHERE
- * @param bool   $notIn			builds inverted condition
+ * @param string $field_name  Field name to be used in SQL WHERE condition.
+ * @param array  $values      Array of string values to be included in WHERE.
+ * @param bool   $not_in      Builds inverted condition.
  *
  * @return string
  */
-function dbConditionString($fieldName, array $values, $notIn = false) {
-	switch (count($values)) {
-		case 0:
-			return '1=0';
-		case 1:
-			return $notIn
-				? $fieldName.'!='.zbx_dbstr(reset($values))
-				: $fieldName.'='.zbx_dbstr(reset($values));
-	}
-
-	$in = $notIn ? ' NOT IN ' : ' IN ';
-	$concat = $notIn ? ' AND ' : ' OR ';
-	$items = array_chunk($values, 950);
-
-	$condition = '';
-	foreach ($items as $values) {
-		$condition .= !empty($condition) ? ')'.$concat.$fieldName.$in.'(' : '';
-		$condition .= implode(',', zbx_dbstr($values));
-	}
-
-	return '('.$fieldName.$in.'('.$condition.'))';
+function dbConditionString(string $field_name, array $values, bool $not_in = false): string {
+	return match (count($values)) {
+		0 => $not_in ? '1=1' : '1=0',
+		1 => $field_name.($not_in ? '!=' : '=').zbx_dbstr(reset($values)),
+		default => '('.$field_name.($not_in ? ' NOT' : '').' IN ('.implode(',', zbx_dbstr($values)).'))'
+	};
 }
 
 /**
