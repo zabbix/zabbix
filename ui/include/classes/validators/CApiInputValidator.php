@@ -1514,10 +1514,13 @@ class CApiInputValidator {
 
 			if (array_key_exists('compare', $field_rule)) {
 				$compare_field_value = $data[$field_rule['compare']['field']];
+				$compare_field_flags = $rule['fields'][$field_rule['compare']['field']]['flags'];
 
 				if (is_string($compare_field_value)
-						&& ((($flags & API_ALLOW_USER_MACRO) && self::checkValueIsUserMacro($compare_field_value))
-							|| (($flags & API_ALLOW_LLD_MACRO) && self::checkValueIsLldMacro($compare_field_value)))) {
+						&& ((($compare_field_flags & API_ALLOW_USER_MACRO)
+							&& self::checkValueIsUserMacro($compare_field_value))
+						|| (($compare_field_flags & API_ALLOW_LLD_MACRO)
+							&& self::checkValueIsLldMacro($compare_field_value)))) {
 					unset($field_rule['compare']);
 				}
 				else {
