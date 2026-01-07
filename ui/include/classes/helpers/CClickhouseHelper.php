@@ -49,7 +49,7 @@ class CClickhouseHelper {
 		$response = curl_exec($handle);
 
 		if (curl_errno($handle)) {
-			error(_('Clickhouse connection failed.'));
+			error(_('ClickHouse connection failed.'));
 
 			curl_close($handle);
 
@@ -67,7 +67,7 @@ class CClickhouseHelper {
 				? $_response['exception']
 				: $response;
 
-			error(_s('Clickhouse error: %1$s.', $error_message));
+			error(_s('ClickHouse error: %1$s.', $error_message));
 
 			return false;
 		}

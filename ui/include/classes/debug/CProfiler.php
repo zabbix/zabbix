@@ -169,7 +169,7 @@ class CProfiler {
 		}
 
 		if ($this->clickhouseQueryLog) {
-			$debug[] = _s('Total Clickhouse time: %1$s', $this->clickhouseTotalTime);
+			$debug[] = _s('Total ClickHouse time: %1$s', $this->clickhouseTotalTime);
 			$debug[] = BR();
 		}
 
