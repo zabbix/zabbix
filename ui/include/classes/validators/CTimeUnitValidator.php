@@ -77,10 +77,11 @@ class CTimeUnitValidator extends CValidator {
 		$seconds = timeUnitToSeconds($value, $this->with_year);
 		$convert_options = ['with_year' => $this->with_year];
 
-		if ($this->accept_zero && $seconds === 0) {
+		if ($this->accept_zero && $seconds == 0) {
 			return true;
 		}
-		elseif ($seconds > $this->max || $seconds < $this->min) {
+
+		if ($seconds > $this->max || $seconds < $this->min) {
 			$min_text = $this->min >= 60
 				? $this->min._x('s', 'second short').' ('.convertUnitsS($this->min, $convert_options) .')'
 				: convertUnitsS($this->min, $convert_options);
