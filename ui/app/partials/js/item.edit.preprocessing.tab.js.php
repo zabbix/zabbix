@@ -42,7 +42,7 @@ var ItemEditPreprocessingTab = class {
 
 		if (this.#readonly) {
 			this.#container.querySelector('.element-table-add').disabled = true;
-			this.#container.querySelector('.js-item-preprocessing-type z-select').setAttribute('readonly', 'readonly');
+			this.#container.querySelector('.js-item-preprocessing-type z-select')?.setAttribute('readonly', 'readonly');
 		}
 
 		this.#initEvents();

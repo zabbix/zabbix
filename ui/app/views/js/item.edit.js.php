@@ -64,13 +64,6 @@ window.item_edit_form = new class {
 		this.form_element = this.overlay.$dialogue.$body[0].querySelector('form');
 		this.form = new CForm(this.form_element, rules);
 
-		const interface_field = this.form.findFieldByName('interfaceid');
-
-		if (interface_field) {
-			interface_field.setChanged();
-			this.form.validateChanges(['interfaceid']);
-		}
-
 		this.footer = this.overlay.$dialogue.$footer[0];
 		this.tags_table = this.form_element.querySelector('.tags-table');
 

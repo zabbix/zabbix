@@ -26,6 +26,7 @@ window.lldrule_edit = new class {
 	#footer;
 	#form;
 	#form_element;
+	#initial_form_fields;
 	#overlay;
 	#tabs;
 	#testable_item_types;
@@ -39,7 +40,7 @@ window.lldrule_edit = new class {
 		this.#testable_item_types = testable_item_types;
 
 		this.#initEvents();
-		this.#update();
+		this.#initPopupListeners();
 
 		ZABBIX.PopupManager.setReturnUrl(return_url);
 
@@ -54,7 +55,7 @@ window.lldrule_edit = new class {
 			preprocessing: new ItemEditPreprocessingTab({
 				container: document.getElementById('processing-tab'),
 				preprocessing: lldrule.preprocessing,
-				readonly: lldrule.readonly,
+				readonly: (lldrule.templated || lldrule.discovered),
 				form: this.#form,
 				test_rules: test_rules
 			}),
@@ -82,6 +83,12 @@ window.lldrule_edit = new class {
 		this.#form_element.style.display = '';
 		this.#overlay.recoverFocus();
 		this.#form.reload(rules);
+	}
+
+	#formIsReady() {
+		window.lldoverrides.appendFormData(this.#form_element);
+		this.#form.discoverAllFields();
+		this.#initial_form_fields = this.#form.getAllValues();
 	}
 
 	#initEvents() {
@@ -243,5 +250,59 @@ window.lldrule_edit = new class {
 		const message_box = makeMessageBox('bad', messages, title)[0];
 
 		this.#form_element.parentNode.insertBefore(message_box, this.#form_element);
+	}
+
+	#isConfirmed() {
+		return JSON.stringify(this.#initial_form_fields) === JSON.stringify(this.#form.getAllValues())
+			|| window.confirm(<?= json_encode(_('Any changes made in the current form will be lost.')) ?>);
+	}
+
+	#initPopupListeners() {
+		const subscriptions = [];
+
+		for (const action of ['lldrule.edit', 'lldrule.prototype.edit']) {
+			subscriptions.push(
+				ZABBIX.EventHub.subscribe({
+					require: {
+						context: CPopupManager.EVENT_CONTEXT,
+						event: CPopupManagerEvent.EVENT_OPEN,
+						action
+					},
+					callback: ({data, event}) => {
+						const field = this.#form.findFieldByName('itemid')
+						if (!field || data.action_parameters.itemid === field.value) {
+							return;
+						}
+
+						if (!this.#isConfirmed()) {
+							event.preventDefault();
+						}
+					}
+				})
+			);
+		}
+
+		subscriptions.push(
+			ZABBIX.EventHub.subscribe({
+				require: {
+					context: 'configuration.host.discovery.edit.overr',
+					action: 'ready'
+				},
+				callback: () => {
+					this.#formIsReady();
+				}
+			})
+		);
+
+		subscriptions.push(
+			ZABBIX.EventHub.subscribe({
+				require: {
+					context: CPopupManager.EVENT_CONTEXT,
+					event: CPopupManagerEvent.EVENT_END_SCRIPTING,
+					action: this.#overlay.dialogueid
+				},
+				callback: () => ZABBIX.EventHub.unsubscribeAll(subscriptions)
+			})
+		);
 	}
 };

@@ -47,7 +47,6 @@ var HostInterfaceSelector = class {
 			}
 		}
 
-		this.#container.querySelector('[name="type"]').dispatchEvent(new Event('change'));
 		this.setType(type);
 	}
 

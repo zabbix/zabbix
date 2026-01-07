@@ -190,6 +190,14 @@
 		window.lldoverrides.actions = ['opstatus', 'opdiscover', 'opperiod', 'ophistory', 'optrends', 'opseverity',
 			'optag', 'optemplate', 'opinventory'
 		];
+
+		ZABBIX.EventHub.publish(new CEventHubEvent({
+			data: {},
+			descriptor: {
+				context: 'configuration.host.discovery.edit.overr',
+				action: 'ready'
+			}
+		}));
 	});
 
 	/**

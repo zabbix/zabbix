@@ -631,7 +631,8 @@ function makeItemTemplatesHtml($itemid, array $parent_templates, $flag, bool $pr
 			if ($flag & ZBX_FLAG_DISCOVERY_RULE) {
 				if ($flag & ZBX_FLAG_DISCOVERY_PROTOTYPE) {
 					$url = (new CUrl('zabbix.php'))
-						->setArgument('action', 'lldrule.prototype.edit')
+						->setArgument('action', 'popup')
+						->setArgument('popup', 'lldrule.prototype.edit')
 						->setArgument('itemid', $parent_templates['links'][$itemid]['itemid'])
 						->setArgument('parent_discoveryid', $parent_templates['links'][$itemid]['lld_ruleid'])
 						->setArgument('context', 'template');
