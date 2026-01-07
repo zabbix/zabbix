@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -94,6 +94,8 @@ typedef struct
 	zbx_uint64_t	itemid;
 	const char	*function;
 	const char	*parameter;
+	unsigned int	sz_function;
+	unsigned int	sz_parameter;
 	zbx_uint64_t	revision;
 	zbx_uint64_t	timer_revision;
 	unsigned char	type;

@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -27,6 +27,9 @@
 #define ZBX_HC_ITEM_STATUS_NORMAL	0
 #define ZBX_HC_ITEM_STATUS_BUSY		1
 
+#define ZBX_HC_ITEM_CACHE_FALSE		0
+#define ZBX_HC_ITEM_CACHE_TRUE		1
+
 /* discovery rule */
 #define DRULE_STATUS_MONITORED		0
 #define DRULE_STATUS_NOT_MONITORED	1
@@ -39,7 +42,7 @@
 #define ITEM_LOGTYPE_CRITICAL		9
 #define ITEM_LOGTYPE_VERBOSE		10
 
-#define HTTPTEST_STATUS_MONITORED       0
+#define HTTPTEST_STATUS_MONITORED	0
 #define HTTPTEST_STATUS_NOT_MONITORED	1
 
 #endif /*ZABBIX_ZBX_ITEM_CONSTANTS_H*/

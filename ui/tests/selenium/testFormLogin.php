@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -171,6 +171,17 @@ class testFormLogin extends CWebTest {
 			$this->page->userLogin('Admin', 'zabbix', TEST_GOOD, $url);
 			$header = ($url === 'index.php?request=zabbix.php%3Faction%3Dhost.list') ? 'Hosts' : 'Proxies';
 			$this->page->assertHeader($header);
+		}
+	}
+
+	/**
+	 * Opens login page with parameter in URL and checks if autologin checkbox is enabled.
+	 */
+	public function testFormLogin_LoginWithField() {
+		foreach (['reconnect=1', 'autologin=1', 'autologin=0'] as $url) {
+			$this->page->open('index.php?'.$url);
+			$checked = ($url === 'autologin=0') ? false : true;
+			$this->assertTrue($this->query('id:autologin')->asCheckbox()->one()->isChecked($checked));
 		}
 	}
 

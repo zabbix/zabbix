@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -276,11 +276,16 @@ void	zbx_dc_config_history_sync_unset_existing_itemids(zbx_vector_uint64_t *item
  *           blocking each other.                                             *
  *                                                                            *
  ******************************************************************************/
-void	zbx_dc_config_history_sync_get_functions_by_functionids(zbx_dc_function_t *functions, zbx_uint64_t *functionids,
-		int *errcodes, size_t num)
+void	 zbx_dc_config_history_sync_get_functions_by_functionids(zbx_dc_function_t *functions,
+		zbx_uint64_t *functionids, int *errcodes, size_t num)
 {
 	size_t			i;
 	const ZBX_DC_FUNCTION	*dc_function;
+
+	for (i = 0; i < num; i++)
+	{
+		functions[i].function = (char *)zbx_malloc(NULL, ZBX_DC_FUNCTION_PREALOCATED_FUNC_SIZE);
+	}
 
 	RDLOCK_CACHE_CONFIG_HISTORY;
 

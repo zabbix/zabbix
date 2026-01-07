@@ -27,41 +27,41 @@ This template has been tested on:
 
 |Name|Description|Default|
 |----|-----------|-------|
-|{$CPU.UTIL.CRIT}||`90`|
-|{$ICMP_LOSS_WARN}||`20`|
-|{$ICMP_RESPONSE_TIME_WARN}||`0.15`|
-|{$IF.ERRORS.WARN}||`2`|
-|{$IF.UTIL.MAX}||`90`|
-|{$IFCONTROL}||`1`|
-|{$MEMORY.UTIL.MAX}||`90`|
-|{$NET.IF.IFADMINSTATUS.MATCHES}||`^.*`|
+|{$CPU.UTIL.CRIT}|<p>Critical threshold of CPU utilization in %.</p>|`90`|
+|{$ICMP_LOSS_WARN}|<p>Warning threshold of ICMP packet loss in %.</p>|`20`|
+|{$ICMP_RESPONSE_TIME_WARN}|<p>Threshold of the average ICMP response time in seconds.</p>|`0.15`|
+|{$IF.ERRORS.WARN}|<p>Threshold for the warning level of the interface error packet rate.</p>|`2`|
+|{$IF.UTIL.MAX}|<p>Maximum threshold of interface bandwidth utilization in %. Can be used with the interface name as context.</p>|`90`|
+|{$IFCONTROL}|<p>Macro for the operational state of the interface for the link down trigger. Can be used with the interface name as context.</p>|`1`|
+|{$MEMORY.UTIL.MAX}|<p>Threshold for maximum memory utilization in %.</p>|`90`|
+|{$NET.IF.IFADMINSTATUS.MATCHES}|<p>This macro is used to include network interfaces by their administrative status.</p>|`^.*`|
 |{$NET.IF.IFADMINSTATUS.NOT_MATCHES}|<p>If the administrative status is down (2), then an interface is excluded.</p>|`^2$`|
-|{$NET.IF.IFALIAS.MATCHES}||`.*`|
-|{$NET.IF.IFALIAS.NOT_MATCHES}||`CHANGE_IF_NEEDED`|
+|{$NET.IF.IFALIAS.MATCHES}|<p>This macro is used to include network interfaces by their alias.</p>|`.*`|
+|{$NET.IF.IFALIAS.NOT_MATCHES}|<p>This macro is used to exclude network interfaces by their alias.</p>|`CHANGE_IF_NEEDED`|
 |{$CISCO.LLD.FILTER.FAN.NAME.MATCHES}|<p>It leaves only the matching fan names as indicated in the filter string.</p>|`^(?:Fan Module-\d+\|PowerSupply-\d+ Fan-\d+)$`|
 |{$CISCO.LLD.FILTER.PSU.NAME.MATCHES}|<p>It leaves only the matching power supply names as indicated in the filter string.</p>|`^(?:PowerSupply-\d+)$`|
-|{$NET.IF.IFDESCR.MATCHES}||`.*`|
-|{$NET.IF.IFDESCR.NOT_MATCHES}||`CHANGE_IF_NEEDED`|
-|{$NET.IF.IFNAME.MATCHES}||`^.*$`|
+|{$NET.IF.IFDESCR.MATCHES}|<p>This macro is used to include network interfaces by their description.</p>|`.*`|
+|{$NET.IF.IFDESCR.NOT_MATCHES}|<p>This macro is used to exclude network interfaces by their description.</p>|`CHANGE_IF_NEEDED`|
+|{$NET.IF.IFNAME.MATCHES}|<p>This macro is used to include network interfaces by their name.</p>|`^.*$`|
 |{$NET.IF.IFNAME.NOT_MATCHES}|<p>It filters out `loopbacks`, `nulls`, `docker veth` links and `docker0 bridge` by default.</p>|`Macro too long. Please see the template.`|
-|{$NET.IF.IFOPERSTATUS.MATCHES}||`^.*$`|
+|{$NET.IF.IFOPERSTATUS.MATCHES}|<p>This macro is used to include network interfaces by their operational status.</p>|`^.*$`|
 |{$NET.IF.IFOPERSTATUS.NOT_MATCHES}|<p>If the operational status is `notPresent (6)`, then an interface is excluded.</p>|`^6$`|
-|{$NET.IF.IFTYPE.MATCHES}||`.*`|
-|{$NET.IF.IFTYPE.NOT_MATCHES}||`CHANGE_IF_NEEDED`|
-|{$SNMP.TIMEOUT}||`5m`|
-|{$TEMP_WARN:regex:"BACK"}||`42`|
-|{$TEMP_CRIT:regex:"BACK"}||`70`|
-|{$TEMP_WARN:regex:"FRONT"}||`70`|
-|{$TEMP_CRIT:regex:"FRONT"}||`80`|
-|{$TEMP_WARN:regex:"CPU"}||`80`|
-|{$TEMP_CRIT:regex:"CPU"}||`90`|
-|{$TEMP_WARN:regex:"SUN1"}||`90`|
-|{$TEMP_CRIT:regex:"SUN1"}||`110`|
-|{$TEMP_WARN:regex:"Transceiver"}||`70`|
-|{$TEMP_CRIT:regex:"Transceiver"}||`75`|
-|{$TEMP_CRIT_LOW}||`5`|
-|{$TEMP_WARN}||`50`|
-|{$TEMP_CRIT}||`60`|
+|{$NET.IF.IFTYPE.MATCHES}|<p>This macro is used to include network interfaces by their type.</p>|`.*`|
+|{$NET.IF.IFTYPE.NOT_MATCHES}|<p>This macro is used to exclude network interfaces by their type.</p>|`CHANGE_IF_NEEDED`|
+|{$SNMP.TIMEOUT}|<p>The time interval for the SNMP availability trigger.</p>|`5m`|
+|{$TEMP_WARN:regex:"BACK"}|<p>Warning threshold for the back temperature in °C.</p>|`42`|
+|{$TEMP_CRIT:regex:"BACK"}|<p>Critical threshold for the back temperature in °C.</p>|`70`|
+|{$TEMP_WARN:regex:"FRONT"}|<p>Warning threshold for the front temperature in °C.</p>|`70`|
+|{$TEMP_CRIT:regex:"FRONT"}|<p>Critical threshold of the front temperature in °C.</p>|`80`|
+|{$TEMP_WARN:regex:"CPU"}|<p>Warning threshold of the CPU temperature in °C.</p>|`80`|
+|{$TEMP_CRIT:regex:"CPU"}|<p>Critical threshold of the CPU temperature in °C.</p>|`90`|
+|{$TEMP_WARN:regex:"SUN1"}|<p>Warning threshold of the SUN1 temperature in °C.</p>|`90`|
+|{$TEMP_CRIT:regex:"SUN1"}|<p>Critical threshold of the SUN1 temperature in °C.</p>|`110`|
+|{$TEMP_WARN:regex:"Transceiver"}|<p>Warning threshold of the Transceiver temperature in °C.</p>|`70`|
+|{$TEMP_CRIT:regex:"Transceiver"}|<p>Critical threshold of the Transceiver temperature in °C.</p>|`75`|
+|{$TEMP_CRIT_LOW}|<p>Critical threshold of the low temperature in °C.</p>|`5`|
+|{$TEMP_WARN}|<p>Warning threshold of the temperature in °C.</p>|`50`|
+|{$TEMP_CRIT}|<p>Critical threshold of the temperature in °C.</p>|`60`|
 |{$ENT_CLASS.NOT_MATCHES}|<p>The filter excludes chassis (3) class from Serial discovery. The chassis (3) are polled with a regular item.</p>|`3`|
 |{$ENT_SN.MATCHES}|<p>The filter retrieves only existing serial number strings.</p>|`.+`|
 |{$PSU.PROBLEM.STATES}|<p>The PSU states list for average trigger priority.</p>|`^(1\|4\|5\|6\|7\|9\|10\|11\|12)$`|

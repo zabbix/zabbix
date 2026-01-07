@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -31,11 +31,11 @@ class CControllerMaintenanceCreate extends CControllerMaintenanceUpdateGeneral {
 			'maintenance_type' => ['db maintenances.maintenance_type', 'required',
 				'in' => [MAINTENANCE_TYPE_NORMAL, MAINTENANCE_TYPE_NODATA]],
 			'active_since' => ['string', 'required', 'not_empty',
-				'use' => [CAbsoluteTimeParser::class, [], ['min' => 0, 'max' => ZBX_MAX_DATE]],
-				'messages' => ['use' => _('Invalid date.')]],
+				'use' => [CAbsoluteTimeValidator::class, ['min' => 0, 'max' => ZBX_MAX_DATE]]
+			],
 			'active_till' => ['string', 'required', 'not_empty',
-				'use' => [CAbsoluteTimeParser::class, [], ['min' => 0, 'max' => ZBX_MAX_DATE]],
-				'messages' => ['use' => _('Invalid date.')]],
+				'use' => [CAbsoluteTimeValidator::class, ['min' => 0, 'max' => ZBX_MAX_DATE]]
+			],
 			'timeperiods' => ['objects', 'required', 'not_empty',
 				'messages' => ['not_empty' => _('At least one period must be added.')],
 				'fields' => [
@@ -95,7 +95,10 @@ class CControllerMaintenanceCreate extends CControllerMaintenanceUpdateGeneral {
 					'operator' => ['db maintenance_tag.operator',
 						'in' => [MAINTENANCE_TAG_OPERATOR_LIKE, MAINTENANCE_TAG_OPERATOR_EQUAL]],
 					'value' => ['db maintenance_tag.value'],
-					'tag' => ['db maintenance_tag.tag', 'required', 'not_empty', 'when' => ['value', 'not_empty']]
+					'tag' => [
+						['db maintenance_tag.tag'],
+						['db maintenance_tag.tag', 'required', 'not_empty', 'when' => ['value', 'not_empty']]
+					]
 				],
 				'when' => ['maintenance_type', 'in' => [MAINTENANCE_TYPE_NORMAL]]
 			],

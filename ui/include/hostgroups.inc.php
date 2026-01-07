@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -13,21 +13,6 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-
-/**
- * Check if user has write permissions for host groups.
- *
- * @param array $groupids
- *
- * @return bool
- */
-function isWritableHostGroups(array $groupids) {
-	return count($groupids) == API::HostGroup()->get([
-		'countOutput' => true,
-		'groupids' => $groupids,
-		'editable' => true
-	]);
-}
 
 /**
  * Get sub-groups of selected host groups or template groups.
