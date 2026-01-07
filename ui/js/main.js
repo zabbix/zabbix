@@ -679,6 +679,10 @@ const hintBox = {
 			const host_y_min = host.scrollTop;
 			const host_y_max = Math.min(host.scrollHeight, host_rect.height - scrollbar_horizontal_height + host_y_min);
 
+			// Max width needs to be set before getting the rect and computed style, to check if the hint content has
+			// a scroll bar and calculate the correct height.
+			hint.style.maxWidth = `${host_client_width}px`;
+
 			// Hint size.
 			const hint_rect = hint.getBoundingClientRect();
 			const hint_computed_style = getComputedStyle(hint);
@@ -688,6 +692,7 @@ const hintBox = {
 				if positioned further than the width of window when horizontal scrolling is active.
 			*/
 			css.width = Math.ceil(parseFloat(hint_computed_style.width));
+
 			const height = Math.ceil(parseFloat(hint_computed_style.height));
 
 			// Event coordinates relative to host.
@@ -710,9 +715,15 @@ const hintBox = {
 				target.event_y = client_y - host_rect.top + host_y_min;
 			}
 
-			css.left = target.event_x + event_offset + hint_rect.width <= host_x_max
-				? target.event_x + event_offset
-				: host_x_max - hint_rect.width;
+			if (target.event_x + event_offset + css.width <= host_x_max) {
+				css.left = target.event_x + event_offset;
+			}
+			else if (target.event_x - event_offset - css.width >= host_x_min) {
+				css.left = host_x_max - css.width;
+			}
+			else {
+				css.left = Math.min(target.event_x + event_offset, host_x_max - css.width);
+			}
 
 			// Hint fits under event.
 			if (target.event_y + event_offset + hint_rect.height <= host_y_max) {
@@ -729,8 +740,13 @@ const hintBox = {
 					: host_y_min + event_offset
 				);
 
-				if (target.event_x + event_offset + hint_rect.width > host_x_max) {
-					css.left = target.event_x - event_offset - hint_rect.width;
+				if (host_client_width / 2 > target.event_x) {
+					css.width = Math.min(css.width, host_x_max - target.event_x - event_offset);
+					css.left = target.event_x + event_offset;
+				}
+				else {
+					css.width = Math.min(css.width, target.event_x - event_offset - host_x_min);
+					css.left = host_x_min;
 				}
 			}
 

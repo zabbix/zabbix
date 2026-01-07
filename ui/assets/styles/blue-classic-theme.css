@@ -1539,7 +1539,7 @@ button {
 .zi-chevron-up::before, .zi-users-filled-small::before {
   font-size: 16px; }
 
-.zi-arrow-down-small::before, .zi-arrow-up-small::before, .zi-chevron-down-small::before, .zi-copy::before, .zi-help-small::before, .zi-help-filled-small::before, .zi-i-negative::before, .zi-i-positive::before, .zi-i-warning::before, .zi-link-external-small::before, .zi-plus-small::before, .zi-remove-small::before, .zi-tree-top-bottom-small::before, .zi-tree-top-right-small::before, .zi-tree-top-right-bottom-small::before, .zi-user-filled-small::before, .zi-wrench-alt-small::before, form.dashboard-widget-scatterplot .dataset-body .form-grid .marker-config .radio-list-control .icon::before, .overlay-dialogue .overlay-dialogue-header .btn-overlay-close::before, .svg-graph-hintbox li .svg-graph-hintbox-icon-color::before {
+.zi-arrow-down-small::before, .zi-arrow-up-small::before, .zi-chevron-down-small::before, .zi-copy::before, .zi-help-small::before, .zi-help-filled-small::before, .zi-i-negative::before, .zi-i-positive::before, .zi-i-warning::before, .zi-link-external-small::before, .zi-plus-small::before, .zi-remove-small::before, .zi-tree-top-bottom-small::before, .zi-tree-top-right-small::before, .zi-tree-top-right-bottom-small::before, .zi-user-filled-small::before, .zi-wrench-alt-small::before, form.dashboard-widget-scatterplot .dataset-body .form-grid .marker-config .radio-list-control .icon::before, .overlay-dialogue .overlay-dialogue-header .btn-overlay-close::before, .svg-graph-hintbox .scatter-plot-hintbox-row .scatter-plot-hintbox-row-axis .scatter-plot-hintbox-icon-color::before {
   font-size: 12px; }
 
 .btn-overlay-close::before, .zi-remove-smaller::before {
@@ -8031,15 +8031,20 @@ z-select[disabled] .focusable, input[disabled], textarea[disabled], select optio
     cursor: pointer; }
     .svg-graph-hintbox .has-broadcast-data:hover {
       background-color: #e8f5ff; }
-  .svg-graph-hintbox li {
-    padding-left: 23px; }
-    .svg-graph-hintbox li .svg-graph-hintbox-icon-color {
-      display: inline-block;
-      float: left;
+  .svg-graph-hintbox .scatter-plot-hintbox-row:not(:first-child) {
+    margin-top: 10px; }
+  .svg-graph-hintbox .scatter-plot-hintbox-row .scatter-plot-hintbox-row-axis {
+    display: flex;
+    flex-wrap: nowrap;
+    padding-left: 3px; }
+    .svg-graph-hintbox .scatter-plot-hintbox-row .scatter-plot-hintbox-row-axis .scatter-plot-hintbox-icon-color {
+      display: block;
       width: 12px;
       height: 12px;
-      margin-left: -20px;
-      margin-top: -1px; }
+      margin-right: 10px;
+      margin-bottom: 3px; }
+  .svg-graph-hintbox li {
+    padding-left: 23px; }
     .svg-graph-hintbox li .svg-graph-hintbox-item-color,
     .svg-graph-hintbox li .svg-graph-hintbox-trigger-color {
       margin: 3px 10px 3px -20px;

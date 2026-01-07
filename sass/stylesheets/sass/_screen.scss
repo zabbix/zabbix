@@ -2529,19 +2529,31 @@ select {
 		}
 	}
 
+	.scatter-plot-hintbox-row {
+		&:not(:first-child) {
+			margin-top: 10px
+		}
+
+		.scatter-plot-hintbox-row-axis {
+			display: flex;
+			flex-wrap: nowrap;
+			padding-left: 3px;
+
+			.scatter-plot-hintbox-icon-color {
+				@extend %icon-small;
+
+				display: block;
+				width: 12px;
+				height: 12px;
+
+				margin-right: 10px;
+				margin-bottom: 3px;
+			}
+		}
+	}
+
 	li {
 		padding-left: 23px;
-
-		.svg-graph-hintbox-icon-color {
-			@extend %icon-small;
-
-			display: inline-block;
-			float: left;
-			width: 12px;
-			height: 12px;
-			margin-left: -20px;
-			margin-top: -1px;
-		}
 
 		.svg-graph-hintbox-item-color,
 		.svg-graph-hintbox-trigger-color {

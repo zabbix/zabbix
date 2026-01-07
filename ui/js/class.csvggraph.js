@@ -454,8 +454,29 @@ class CSvgGraph {
 		in_problem_area = in_x && this.#dimY + this.#dimH <= e.offsetY && e.offsetY <= this.#dimY + this.#dimH + 15;
 		in_values_area = in_x && this.#dimY <= e.offsetY && e.offsetY <= this.#dimY + this.#dimH;
 
+		if (this.#graph_type === GRAPH_TYPE_SCATTER_PLOT) {
+			if (in_values_area) {
+				const offsetY = e.clientY - svg_rect.top;
+
+				const included_points = this.#findScatterPlotPoints(offsetX, offsetY);
+
+				for (const highlighter_point of this.#svg.querySelectorAll('g.js-svg-highlight-group')) {
+					highlighter_point.setAttribute('transform', 'translate(-10, -10)');
+				}
+
+				if (included_points.length > 0) {
+					included_points.forEach(point => {
+						const point_highlight = point.g.querySelector('g.js-svg-highlight-group');
+
+						point_highlight.setAttribute('transform', point.transform);
+					});
+
+					html = this.#getScatterPlotValuesHintboxHtml(included_points);
+				}
+			}
+		}
 		// Show problems when mouse is in the 15px high area under the graph canvas.
-		if (this.#show_problems && in_problem_area) {
+		else if (this.#show_problems && in_problem_area) {
 			this.#hideHelper();
 
 			const problems = this.#findProblems(e.offsetX);
@@ -483,72 +504,50 @@ class CSvgGraph {
 				this.#setHelperPosition(e);
 
 				let included_points = [];
+				const points = this.#findValues(offsetX);
+
+				let xy_point = false;
+				let points_total = points.length;
 				let show_hint = false;
 
-				if (this.#graph_type === GRAPH_TYPE_SCATTER_PLOT) {
-					const offsetY = e.clientY - svg_rect.top;
-
-					included_points = this.#findScatterPlotPoints(offsetX, offsetY);
-
-					if (included_points.length > 0) {
+				/**
+				 * Decide if one specific value or list of all matching Xs should be highlighted and either to
+				 * show or hide hintbox.
+				 */
+				points.forEach(point => {
+					if (!show_hint && point.v !== null) {
 						show_hint = true;
 					}
 
-					for (const highlighter_point of this.#svg.querySelectorAll('g.js-svg-highlight-group')) {
-						highlighter_point.setAttribute('transform', 'translate(-10, -10)');
+					const tolerance = this.#getDataPointTolerance(point.g);
+
+					if (!xy_point && point.v !== null
+							&& (+point.x + tolerance) > e.offsetX && e.offsetX > (+point.x - tolerance)
+							&& (+point.y + tolerance) > e.offsetY && e.offsetY > (+point.y - tolerance)) {
+						xy_point = point;
+						points_total = 1;
 					}
+				});
 
-					included_points.forEach(point => {
-						const point_highlight = point.g.querySelector('g.js-svg-highlight-group');
+				points.forEach(point => {
+					const point_highlight = point.g.querySelector('.svg-point-highlight');
+					const include_point = point.v !== null && (xy_point === false || xy_point === point);
 
-						point_highlight.setAttribute('transform', point.transform);
-					});
-				}
-				else {
-					const points = this.#findValues(offsetX);
+					if (include_point) {
+						point_highlight.setAttribute('cx', point.x);
+						point_highlight.setAttribute('cy', point.y);
 
-					let xy_point = false;
-					let points_total = points.length;
-
-					/**
-					 * Decide if one specific value or list of all matching Xs should be highlighted and either to
-					 * show or hide hintbox.
-					 */
-					points.forEach(point => {
-						if (!show_hint && point.v !== null) {
-							show_hint = true;
+						if (point.p > 0) {
+							point_highlight.setAttribute('cx', parseInt(point.x) + parseInt(point.p));
 						}
 
-						const tolerance = this.#getDataPointTolerance(point.g);
-
-						if (!xy_point && point.v !== null
-								&& (+point.x + tolerance) > e.offsetX && e.offsetX > (+point.x - tolerance)
-								&& (+point.y + tolerance) > e.offsetY && e.offsetY > (+point.y - tolerance)) {
-							xy_point = point;
-							points_total = 1;
-						}
-					});
-
-					points.forEach(point => {
-						const point_highlight = point.g.querySelector('.svg-point-highlight');
-						const include_point = point.v !== null && (xy_point === false || xy_point === point);
-
-						if (include_point) {
-							point_highlight.setAttribute('cx', point.x);
-							point_highlight.setAttribute('cy', point.y);
-
-							if (point.p > 0) {
-								point_highlight.setAttribute('cx', parseInt(point.x) + parseInt(point.p));
-							}
-
-							included_points.push(point);
-						}
-						else {
-							point_highlight.setAttribute('cx', -10);
-							point_highlight.setAttribute('cy', -10);
-						}
-					});
-				}
+						included_points.push(point);
+					}
+					else {
+						point_highlight.setAttribute('cx', -10);
+						point_highlight.setAttribute('cy', -10);
+					}
+				});
 
 				if (show_hint) {
 					included_points.sort((p1, p2) => {
@@ -564,7 +563,7 @@ class CSvgGraph {
 						}
 					});
 
-					html = this.#getValuesHintboxHtml(included_points, offsetX);
+					html = this.#getSvgGraphValuesHintboxHtml(included_points, offsetX);
 				}
 			}
 		}
@@ -882,93 +881,94 @@ class CSvgGraph {
 		return hintbox_body;
 	}
 
-	#getValuesHintboxHtml(included_points, offsetX) {
-		let rows_added = 0;
-
+	#getScatterPlotValuesHintboxHtml(included_points) {
 		const hintbox_container = document.createElement('div');
 		hintbox_container.classList.add('svg-graph-hintbox');
 
-		const html = document.createElement('ul');
+		for (const point of included_points) {
+			const time_from = new CDate(point.time_from * 1000);
+			const time_to = new CDate(point.time_to * 1000);
 
-		if (this.#graph_type === GRAPH_TYPE_SCATTER_PLOT) {
-			for (const point of included_points) {
-				const time_from = new CDate(point.time_from * 1000);
-				const time_to = new CDate(point.time_to * 1000);
+			const aggregation_name = point.g.dataset.aggregationName;
+			const ds = point.g.dataset.ds;
 
-				const aggregation_name = point.g.dataset.aggregationName;
-				const ds = point.g.dataset.ds;
+			const row = document.createElement('div');
+			row.classList.add('scatter-plot-hintbox-row');
 
-				for (const key of ['xItems', 'yItems']) {
-					const items_data = Object.entries(JSON.parse(point.g.dataset[key]));
+			for (const key of ['xItems', 'yItems']) {
+				const items_data = Object.entries(JSON.parse(point.g.dataset[key]));
 
-					const li = document.createElement('li');
-					li.style.marginTop = key === 'xItems' && rows_added > 0 ? '10px' : null;
-					li.append(`${aggregation_name}(`);
-
-					let count = 0;
-					for (const [itemid, name] of items_data) {
-						count++;
-
-						const item_span = document.createElement('span');
-						item_span.classList.add('has-broadcast-data');
-						item_span.dataset.itemid = itemid;
-						item_span.dataset.ds = ds;
-						item_span.innerText = name.toString();
-
-						li.append(item_span);
-
-						if (count !== items_data.length && count > 0) {
-							li.append(', ');
-						}
-					}
-
-					const color_span = document.createElement('span');
-					color_span.style.color = point.color;
-					color_span.classList.add('svg-graph-hintbox-icon-color', point.marker_class);
-
-					li.append(`): ${key === 'xItems' ? point.vx : point.vy}`, color_span);
-
-					html.append(li);
-
-					rows_added++;
-				}
-
-				const row = document.createElement('div');
-				row.append(`${time_from.format(PHP_ZBX_FULL_DATE_TIME)} - ${time_to.format(PHP_ZBX_FULL_DATE_TIME)}`);
-
-				html.append(row);
-			}
-		}
-		else {
-			for (const point of included_points) {
-				const li = document.createElement('li');
-				li.classList.add('has-broadcast-data');
-				li.dataset.ds = point.g.dataset.ds;
-				li.dataset.itemid = point.g.dataset.itemid;
-				li.dataset.itemids = point.g.dataset.itemids;
+				const axis = document.createElement('div');
+				axis.classList.add('scatter-plot-hintbox-row-axis');
 
 				const color_span = document.createElement('span');
-				color_span.style.backgroundColor = point.g.dataset.color;
-				color_span.classList.add('svg-graph-hintbox-item-color');
+				color_span.style.color = point.color;
+				color_span.classList.add('scatter-plot-hintbox-icon-color', point.marker_class);
 
-				li.append(`${point.g.dataset.metric}: ${point.v}`, color_span);
+				axis.append(color_span, `${aggregation_name}(`);
 
-				html.append(li);
+				let count = 0;
+				for (const [itemid, name] of items_data) {
+					count++;
+
+					const item_span = document.createElement('span');
+					item_span.classList.add('has-broadcast-data');
+					item_span.dataset.itemid = itemid;
+					item_span.dataset.ds = ds;
+					item_span.innerText = name.toString();
+
+					axis.append(item_span);
+
+					if (count !== items_data.length && count > 0) {
+						axis.append(', ');
+					}
+				}
+
+				axis.append(`): ${key === 'xItems' ? point.vx : point.vy}`);
+
+				row.append(axis);
 			}
 
-			// Calculate time at mouse position.
-			const time = new CDate(
-				(this.#time_period.from_ts + (offsetX - this.#dimX) * this.#spp) * 1000
-			);
+			row.append(`${time_from.format(PHP_ZBX_FULL_DATE_TIME)} - ${time_to.format(PHP_ZBX_FULL_DATE_TIME)}`);
 
-			const header = document.createElement('div');
-			header.classList.add('header');
-			header.append(time.format(PHP_ZBX_FULL_DATE_TIME));
-
-			hintbox_container.append(header);
+			hintbox_container.append(row);
 		}
 
-		hintbox_container.append(html);
+		return hintbox_container;
+	}
+
+	#getSvgGraphValuesHintboxHtml(included_points, offsetX) {
+		const hintbox_container = document.createElement('div');
+		hintbox_container.classList.add('svg-graph-hintbox');
+
+		const ul = document.createElement('ul');
+
+		// Calculate time at mouse position.
+		const time = new CDate(
+			(this.#time_period.from_ts + (offsetX - this.#dimX) * this.#spp) * 1000
+		);
+
+		const header = document.createElement('div');
+		header.classList.add('header');
+		header.append(time.format(PHP_ZBX_FULL_DATE_TIME));
+
+		for (const point of included_points) {
+			const li = document.createElement('li');
+			li.classList.add('has-broadcast-data');
+			li.dataset.ds = point.g.dataset.ds;
+			li.dataset.itemid = point.g.dataset.itemid;
+			li.dataset.itemids = point.g.dataset.itemids;
+
+			const color_span = document.createElement('span');
+			color_span.style.backgroundColor = point.g.dataset.color;
+			color_span.classList.add('svg-graph-hintbox-item-color');
+
+			li.append(`${point.g.dataset.metric}: ${point.v}`, color_span);
+
+			ul.append(li);
+		}
+
+		hintbox_container.append(header, ul);
 
 		return hintbox_container;
 	}
