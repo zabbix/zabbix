@@ -343,7 +343,7 @@ void	*zbx_proxyconfig_thread(void *args)
 		}
 
 		sec = zbx_time();
-		zbx_update_env(process_title, sec);
+		zbx_prof_update(process_title, sec);
 
 		if (ZBX_PROGRAM_TYPE_PROXY_PASSIVE == info->program_type)
 		{

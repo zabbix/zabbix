@@ -693,6 +693,25 @@ static void	supervisor_clear_libraries(const char *progname)
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: throttled log redirect sync with log rotation                     *
+ *                                                                            *
+ * Parameters: time_now - [IN] current timestamp                              *
+ *                                                                            *
+ ******************************************************************************/
+static void	supervisor_handle_log(double time_now)
+{
+	static double	time_update = 0;
+
+	/* handle /etc/resolv.conf update and log rotate less often than once a second */
+	if (1.0 < time_now - time_update)
+	{
+		time_update = time_now;
+		zbx_handle_log();
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: process entry function                                            *
  *                                                                            *
  ******************************************************************************/
@@ -807,6 +826,12 @@ ZBX_THREAD_ENTRY(zbx_supervisor_thread, args)
 			supervisor_start_units(&sv, local_args, runlevel_last);
 			runlevel_last = sv.runlevel;
 		}
+
+
+		double	time_now = zbx_time();
+
+		zbx_prof_update(get_process_type_string(process_type), time_now);
+		supervisor_handle_log(time_now);
 	}
 
 out:

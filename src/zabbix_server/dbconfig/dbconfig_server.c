@@ -137,7 +137,7 @@ void	*zbx_dbconfig_thread(void *args)
 				process_title, sec);
 
 		sec = zbx_time();
-		zbx_update_env(get_process_type_string(process_type), sec);
+		zbx_prof_update(get_process_type_string(process_type), sec);
 
 		if (0 == secrets_reload)
 		{

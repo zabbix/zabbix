@@ -1262,7 +1262,7 @@ void	*zbx_pp_manager_thread(void *args)
 
 		double	sec = zbx_time();
 
-		zbx_update_env(get_process_type_string(process_type), sec);
+		zbx_prof_update(get_process_type_string(process_type), sec);
 
 		if (ZBX_IPC_RECV_IMMEDIATE != ret)
 			time_idle += sec - time_now;
