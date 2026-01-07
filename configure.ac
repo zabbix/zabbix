@@ -2238,6 +2238,7 @@ AC_CONFIG_FILES([
 	src/libs/zbxscripts/Makefile
 	src/libs/zbxservice/Makefile
 	src/libs/zbxshmem/Makefile
+	src/libs/zbxsnmp/Makefile
 	src/libs/zbxsnmptrapper/Makefile
 	src/libs/zbxstr/Makefile
 	src/libs/zbxvmware/Makefile

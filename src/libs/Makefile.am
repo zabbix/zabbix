@@ -73,6 +73,7 @@ DIST_SUBDIRS = \
 	zbxserialize \
 	zbxservice \
 	zbxshmem \
+	zbxsnmp \
 	zbxsnmptrapper \
 	zbxsupervisor \
 	zbxsysinfo \
@@ -146,6 +147,7 @@ SERVER_SUBDIRS = \
 	zbxserialize \
 	zbxservice \
 	zbxshmem \
+	zbxsnmp \
 	zbxsnmptrapper \
 	zbxsupervisor \
 	zbxstats \
@@ -215,6 +217,7 @@ PROXY_SUBDIRS = \
 	zbxserialize \
 	zbxscripts \
 	zbxshmem \
+	zbxsnmp \
 	zbxsnmptrapper \
 	zbxsupervisor \
 	zbxstats \

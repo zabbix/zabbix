@@ -88,7 +88,7 @@ typedef void(*zbx_preproc_flush_value_func_t)(zbx_pp_manager_t *manager, zbx_uin
 typedef int(*zbx_preproc_prepare_value_func_t)(const zbx_variant_t *value, const zbx_pp_value_opt_t *value_opt);
 
 void	zbx_init_library_preproc(zbx_preproc_prepare_value_func_t preproc_prepare_value_cb,
-		zbx_preproc_flush_value_func_t preproc_flush_value_cb, zbx_get_progname_f get_progname_cb);
+		zbx_preproc_flush_value_func_t preproc_flush_value_cb);
 
 void	zbx_pp_value_task_get_data(zbx_pp_task_t *task, unsigned char *value_type, unsigned char *flags,
 		zbx_variant_t **value, zbx_timespec_t *ts, zbx_pp_value_opt_t **value_opt);

@@ -28,6 +28,7 @@
 #include "zbxtime.h"
 #include "zbxtypes.h"
 #include "zbxdb.h"
+#include "zbxsnmp.h"
 
 #ifdef HAVE_LIBXML2
 #	include <libxml/xpath.h>
@@ -615,7 +616,7 @@ static void	sypervisor_get_activities(zbx_ipc_client_t *client)
 
 	activities = zbx_supervisor_get_activities();
 
-	zbx_ipc_client_send(client, ZBX_SUPERVISOR_GET_ACTIVITIES, activities, strlen(activities) + 1);
+	zbx_ipc_client_send(client, ZBX_SUPERVISOR_GET_ACTIVITIES, (unsigned char *)activities, strlen(activities) + 1);
 	zbx_free(activities);
 }
 
@@ -659,7 +660,7 @@ static int	supervisor_get_exit_thread_info(zbx_supervisor_t *sv, unsigned char *
 	return FAIL;
 }
 
-static void	supervisor_init_libraries(void)
+static void	supervisor_init_libraries(const char *progname)
 {
 #ifdef HAVE_LIBXML2
 	xmlInitParser();
@@ -669,9 +670,13 @@ static void	supervisor_init_libraries(void)
 	curl_global_init(CURL_GLOBAL_DEFAULT);
 #endif
 
+#ifdef HAVE_NETSNMP
+	zbx_snmp_init(progname);
+#endif
+
 }
 
-static void	supervisor_clear_libraries(void)
+static void	supervisor_clear_libraries(const char *progname)
 {
 #ifdef HAVE_LIBXML2
 	xmlCleanupParser();
@@ -679,6 +684,10 @@ static void	supervisor_clear_libraries(void)
 
 #ifdef HAVE_LIBCURL
 	curl_global_cleanup();
+#endif
+
+#ifdef HAVE_NETSNMP
+	zbx_snmp_clear(progname);
 #endif
 }
 
@@ -710,7 +719,7 @@ ZBX_THREAD_ENTRY(zbx_supervisor_thread, args)
 	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(info->program_type),
 			server_num, get_process_type_string(process_type), process_num);
 
-	supervisor_init_libraries();
+	supervisor_init_libraries(get_program_type_string(info->program_type));
 	zbx_supervisor_worklog_init();
 
 	if (NULL == (dbpool = zbx_dbconn_pool_create(&error)))
@@ -834,7 +843,7 @@ out:
 
 	zbx_dbconn_pool_free(dbpool);
 
-	supervisor_clear_libraries();
+	supervisor_clear_libraries(get_program_type_string(info->program_type));
 	zbx_supervisor_worklog_clear();
 
 	zbx_exit(exit_ret);

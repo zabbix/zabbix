@@ -48,20 +48,14 @@
 
 static zbx_preproc_prepare_value_func_t	preproc_prepare_value_func_cb = NULL;
 static zbx_preproc_flush_value_func_t	preproc_flush_value_func_cb = NULL;
-static zbx_get_progname_f		get_progname_func_cb = NULL;
 
 void	zbx_init_library_preproc(zbx_preproc_prepare_value_func_t preproc_prepare_value_cb,
-		zbx_preproc_flush_value_func_t preproc_flush_value_cb, zbx_get_progname_f get_progname_cb)
+		zbx_preproc_flush_value_func_t preproc_flush_value_cb)
 {
 	preproc_prepare_value_func_cb = preproc_prepare_value_cb;
 	preproc_flush_value_func_cb = preproc_flush_value_cb;
-	get_progname_func_cb = get_progname_cb;
 }
 
-zbx_get_progname_f	preproc_get_progname_cb(void)
-{
-	return get_progname_func_cb;
-}
 
 /******************************************************************************
  *                                                                            *
@@ -88,9 +82,6 @@ static zbx_pp_manager_t	*zbx_pp_manager_create(int workers_num, zbx_pp_finished_
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() workers:%d", __func__, workers_num);
 
-#ifdef HAVE_NETSNMP
-	preproc_init_snmp();
-#endif
 	manager = (zbx_pp_manager_t *)zbx_malloc(NULL, sizeof(zbx_pp_manager_t));
 	memset(manager, 0, sizeof(zbx_pp_manager_t));
 
@@ -207,9 +198,6 @@ static void	zbx_pp_manager_free(zbx_pp_manager_t *manager)
 
 	zbx_dc_um_shared_handle_release(manager->um_handle);
 
-#ifdef HAVE_NETSNMP
-	preproc_shutdown_snmp();
-#endif
 	zbx_ipc_async_socket_close(&manager->rtc);
 
 	zbx_free(manager);
