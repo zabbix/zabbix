@@ -33,8 +33,7 @@ class CControllerTokenCreate extends CController {
 			'admin_mode' => ['boolean'],
 			'expires_state' => ['boolean'],
 			'expires_at' => ['string', 'required', 'not_empty',
-				'use' => [CAbsoluteTimeParser::class, [], ['min' => 0, 'max' => ZBX_MAX_DATE]],
-				'messages' => ['use' => _('Invalid date.')],
+				'use' => [CAbsoluteTimeValidator::class, ['min' => 0, 'max' => ZBX_MAX_DATE]],
 				'when' => ['expires_state', 'in' => [1]]
 			],
 			'status' => ['db token.status', 'required', 'in' => [ZBX_AUTH_TOKEN_ENABLED, ZBX_AUTH_TOKEN_DISABLED]]
