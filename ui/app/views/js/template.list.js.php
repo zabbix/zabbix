@@ -16,6 +16,7 @@
 
 /**
  * @var CView $this
+ * @var array $data
  */
 ?>
 
@@ -25,10 +26,11 @@
 
 <script>
 	const view = new class {
-		init() {
+		init({filter, page, sort_field, sort_order, storage_idx, user_configs}) {
 			this.#initActions();
 			this.#initFilter();
 			this.#initPopupListeners();
+			this.#initDataTable({filter, page, sort_field, sort_order, storage_idx, user_configs});
 		}
 
 		#initActions() {
@@ -83,6 +85,330 @@
 				$(filter).on('change', () => this.#updateMultiselect($(filter)));
 				this.#updateMultiselect($(filter));
 			})
+		}
+
+		#initDataTable({filter, page, sort_field, sort_order, storage_idx, user_configs}) {
+			const data_provider_url = new URL('zabbix.php', location.href);
+			data_provider_url.searchParams.set('action', 'template.list.data');
+
+			const data_provider = new CDefaultDataProvider(data_provider_url.toString());
+
+			this.datatable = new CDataTable(document.getElementById('templates'), data_provider)
+				.setColumns([
+					new CDataTableColumn('name', '<?= _('Name') ?>')
+						.setFields(['templateid', 'name'])
+						.setRenderer('name')
+						.setSortable(true)
+						.setTogglable(false),
+					new CDataTableColumn('hosts', '<?= _('Hosts') ?>')
+						.setFields(['templateid', 'hosts'])
+						.setRenderer('hosts'),
+					new CDataTableColumn('items', '<?= _('Items') ?>')
+						.setFields(['templateid', 'items'])
+						.setRenderer('items'),
+					new CDataTableColumn('triggers', '<?= _('Triggers') ?>')
+						.setFields(['templateid', 'triggers'])
+						.setRenderer('triggers'),
+					new CDataTableColumn('graphs', '<?= _('Graphs') ?>')
+						.setFields(['templateid', 'graphs'])
+						.setRenderer('graphs'),
+					new CDataTableColumn('dashboards', '<?= _('Dashboards') ?>')
+						.setFields(['templateid', 'dashboards'])
+						.setRenderer('dashboards'),
+					new CDataTableColumn('discovery', '<?= _('Discovery') ?>')
+						.setFields(['templateid', 'discovery'])
+						.setRenderer('discovery'),
+					new CDataTableColumn('web', '<?= _('Web') ?>')
+						.setFields(['templateid', 'web'])
+						.setRenderer('web'),
+					new CDataTableColumn('vendor', '<?= _('Vendor') ?>')
+						.setFields(['vendor_name']),
+					new CDataTableColumn('version', '<?= _('Version') ?>')
+						.setFields(['vendor_version']),
+					new CDataTableColumn('linked_templates', '<?= _('Linked templates') ?>')
+						.setFields(['parentTemplates'])
+						.setRenderer('linked_templates'),
+					new CDataTableColumn('linked_to_templates', '<?= _('Linked to templates') ?>')
+						.setFields(['templates'])
+						.setRenderer('linked_to_templates'),
+					new CDataTableColumnTags('tags', '<?= _('Tags') ?>')
+						.setFields(['tags'])
+				])
+				.setPage(page)
+				.setFilter(filter)
+				.setSelectable('templates', 'templates', ['templateid'])
+				.setSortField(sort_field)
+				.setSortOrder(sort_order)
+				.setStorageIdx(storage_idx)
+				.on(CMessageHelper.EVENT_MESSAGE, event => {
+					event.stopPropagation();
+
+					const {type, title, messages} = event.detail;
+
+					if (type == 'clear') {
+						clearMessages();
+					}
+					else {
+						addMessage(makeMessageBox(type, messages, title));
+					}
+				})
+				.setRenderer('name', ({column_data, cell_inner}) => {
+					const [templateid, name] = column_data;
+
+					const url = new URL('zabbix.php', location.href);
+					url.searchParams.set('action', 'popup');
+					url.searchParams.set('popup', 'template.edit');
+					url.searchParams.set('templateid', templateid);
+
+					const edit_link = document.createElement('a');
+					edit_link.setAttribute('href', url.toString())
+					edit_link.innerText = name;
+
+					cell_inner.appendChild(edit_link);
+				})
+				.setRenderer('hosts', ({column_data, cell_inner}) => {
+					const [templateid, editable_hosts] = column_data;
+					const {allowed_ui_conf_hosts} = this.datatable.getDataProvider().getLastResponse();
+
+					let items = Object.keys(editable_hosts).length;
+
+					if (allowed_ui_conf_hosts) {
+						const url = new URL('zabbix.php', location.href);
+						url.searchParams.set('action', 'template.list');
+						url.searchParams.set('filter_set', '1');
+						url.searchParams.set('filter_templates[0]', templateid);
+						url.searchParams.set('context', 'template');
+
+						const item_link = document.createElement('a');
+						item_link.setAttribute('href', url.toString());
+						item_link.innerText = '<?= _('Hosts'); ?>';
+
+						cell_inner.appendChild(item_link);
+					}
+					else {
+						cell_inner.innerHTML += '<?= _('Hosts'); ?>';
+					}
+
+					if (items > 0) {
+						const count = document.createElement('sup');
+						count.innerText = items;
+
+						cell_inner.innerHTML += ' ';
+						cell_inner.appendChild(count);
+					}
+				})
+				.setRenderer('items', ({column_data, cell_inner}) => {
+					const [templateid, items] = column_data;
+
+					const url = new URL('zabbix.php', location.href);
+					url.searchParams.set('action', 'item.list');
+					url.searchParams.set('filter_set', '1');
+					url.searchParams.set('filter_hostids[0]', templateid);
+					url.searchParams.set('context', 'template');
+
+					const item_link = document.createElement('a');
+					item_link.setAttribute('href', url.toString());
+					item_link.innerText = '<?= _('Items'); ?>';
+
+					cell_inner.appendChild(item_link);
+
+					if (items > 0) {
+						const count = document.createElement('sup');
+						count.innerText = items;
+
+						cell_inner.innerHTML += ' ';
+						cell_inner.appendChild(count);
+					}
+				})
+				.setRenderer('triggers', ({column_data, cell_inner}) => {
+					const [templateid, triggers] = column_data;
+
+					const url = new URL('zabbix.php', location.href);
+					url.searchParams.set('action', 'trigger.list');
+					url.searchParams.set('filter_set', '1');
+					url.searchParams.set('filter_hostids[0]', templateid);
+					url.searchParams.set('context', 'template');
+
+					const item_link = document.createElement('a');
+					item_link.setAttribute('href', url.toString());
+					item_link.innerText = '<?= _('Triggers'); ?>';
+
+					cell_inner.appendChild(item_link);
+
+					if (triggers > 0) {
+						const count = document.createElement('sup');
+						count.innerText = triggers;
+
+						cell_inner.innerHTML += ' ';
+						cell_inner.appendChild(count);
+					}
+				})
+				.setRenderer('graphs', ({column_data, cell_inner}) => {
+					const [templateid, graphs] = column_data;
+
+					const url = new URL('zabbix.php', location.href);
+					url.searchParams.set('action', 'graph.list');
+					url.searchParams.set('filter_set', '1');
+					url.searchParams.set('filter_hostids[0]', templateid);
+					url.searchParams.set('context', 'template');
+
+					const item_link = document.createElement('a');
+					item_link.setAttribute('href', url.toString());
+					item_link.innerText = '<?= _('Graphs'); ?>';
+
+					cell_inner.appendChild(item_link);
+
+					if (graphs > 0) {
+						const count = document.createElement('sup');
+						count.innerText = graphs;
+
+						cell_inner.innerHTML += ' ';
+						cell_inner.appendChild(count);
+					}
+				})
+				.setRenderer('dashboards', ({column_data, cell_inner}) => {
+					const [templateid, dashboards] = column_data;
+
+					const url = new URL('zabbix.php', location.href);
+					url.searchParams.set('action', 'template.dashboard.list');
+					url.searchParams.set('templateid', templateid);
+					url.searchParams.set('context', 'template');
+
+					const item_link = document.createElement('a');
+					item_link.setAttribute('href', url.toString());
+					item_link.innerText = '<?= _('Dashboards'); ?>';
+
+					cell_inner.appendChild(item_link);
+
+					if (dashboards > 0) {
+						const count = document.createElement('sup');
+						count.innerText = dashboards;
+
+						cell_inner.innerHTML += ' ';
+						cell_inner.appendChild(count);
+					}
+				})
+				.setRenderer('discovery', ({column_data, cell_inner}) => {
+					const [templateid, discovery] = column_data;
+
+					const url = new URL('zabbix.php', location.href);
+					url.searchParams.set('action', 'template.dashboard.list');
+					url.searchParams.set('templateid', templateid);
+					url.searchParams.set('context', 'template');
+
+					const item_link = document.createElement('a');
+					item_link.setAttribute('href', url.toString());
+					item_link.innerText = '<?= _('Discovery'); ?>';
+
+					cell_inner.appendChild(item_link);
+
+					if (discovery > 0) {
+						const count = document.createElement('sup');
+						count.innerText = discovery;
+
+						cell_inner.innerHTML += ' ';
+						cell_inner.appendChild(count);
+					}
+				})
+				.setRenderer('web', ({column_data, cell_inner}) => {
+					const [templateid, web] = column_data;
+
+					const url = new URL('zabbix.php', location.href);
+					url.searchParams.set('action', 'template.dashboard.list');
+					url.searchParams.set('templateid', templateid);
+					url.searchParams.set('context', 'template');
+
+					const item_link = document.createElement('a');
+					item_link.setAttribute('href', url.toString());
+					item_link.innerText = '<?= _('Web'); ?>';
+
+					cell_inner.appendChild(item_link);
+
+					if (web > 0) {
+						const count = document.createElement('sup');
+						count.innerText = web;
+
+						cell_inner.innerHTML += ' ';
+						cell_inner.appendChild(count);
+					}
+				})
+				.setRenderer('linked_templates', ({column_data, cell_inner}) => {
+					const [parent_templates] = column_data;
+					const {max_in_table} = this.datatable.getDataProvider().getLastResponse();
+					const length = Math.min(max_in_table, parent_templates.length);
+
+					for (let i = 0; i < length; i++) {
+						const template = parent_templates[i];
+
+						if (template.editable) {
+							const url = new URL('zabbix.php', location.href);
+							url.searchParams.set('action', 'popup');
+							url.searchParams.set('popup', 'template.edit');
+							url.searchParams.set('templateid', template.templateid);
+
+							const template_link = document.createElement('a');
+							template_link.classList.add(ZBX_STYLE_LINK_ALT, ZBX_STYLE_GREY);
+							template_link.setAttribute('href', url.toString());
+							template_link.innerText = template.name;
+
+							cell_inner.appendChild(template_link);
+						}
+						else {
+							const template_link = document.createElement('span');
+							template_link.classList.add(ZBX_STYLE_GREY);
+							template_link.innerText = template.name;
+
+							cell_inner.appendChild(template_link);
+						}
+
+						if (i < length - 1) {
+							cell_inner.innerHTML += ', ';
+						}
+					}
+
+					if (parent_templates.length > max_in_table) {
+						cell_inner.innerHTML += ' &hellip;';
+					}
+				})
+				.setRenderer('linked_to_templates', ({column_data, cell_inner}) => {
+					const [templates] = column_data;
+					const {max_in_table} = this.datatable.getDataProvider().getLastResponse();
+					const length = Math.min(max_in_table, templates.length);
+
+					for (let i = 0; i < length; i++) {
+						const template = templates[i];
+
+						if (template.editable) {
+							const url = new URL('zabbix.php', location.href);
+							url.searchParams.set('action', 'popup');
+							url.searchParams.set('popup', 'template.edit');
+							url.searchParams.set('templateid', template.templateid);
+
+							const template_link = document.createElement('a');
+							template_link.classList.add(ZBX_STYLE_LINK_ALT, ZBX_STYLE_GREY);
+							template_link.setAttribute('href', url.toString());
+							template_link.innerText = template.name;
+
+							cell_inner.appendChild(template_link);
+						}
+						else {
+							const template_link = document.createElement('span');
+							template_link.classList.add(ZBX_STYLE_GREY);
+							template_link.innerText = template.name;
+
+							cell_inner.appendChild(template_link);
+						}
+
+						if (i < length - 1) {
+							cell_inner.innerHTML += ', ';
+						}
+					}
+
+					if (templates.length > max_in_table) {
+						cell_inner.innerHTML += ' &hellip;';
+					}
+				})
+				.init(user_configs);
 		}
 
 		#initPopupListeners() {

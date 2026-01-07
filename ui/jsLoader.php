@@ -102,6 +102,22 @@ $available_js = [
 	'class.calendar.js' => '',
 	'class.cdate.js' => '',
 	'class.cdebug.js' => '',
+	'class.dataprovider.js' => 'datatable/',
+	'class.dataprovider.default.js' => 'datatable/',
+	'class.contextpopup.js' => 'datatable/contextpopup/',
+	'class.contextpopup.customizetable.js' => 'datatable/contextpopup/',
+	'class.contextpopup.tags.js' => 'datatable/contextpopup/',
+	'class.contextpopup.tagvalue.js' => 'datatable/contextpopup/',
+	'class.contextpopup.monitoring.problems.time.js' => 'datatable/contextpopup/',
+	'class.contextpopup.monitoring.problems.problem.js' => 'datatable/contextpopup/',
+	'class.contextpopup.monitoring.host.problems.js' => 'datatable/contextpopup/',
+	'class.contextpopup.monitoring.latest.name.js' => 'datatable/contextpopup/',
+	'class.datatable.column.js' => 'datatable/columns/',
+	'class.datatable.column.tags.js' => 'datatable/columns/',
+	'class.datatable.column.tagvalue.js' => 'datatable/columns/',
+	'class.datatable.js' => 'datatable/',
+	'class.message.js' => '',
+	'class.pager.js' => '',
 	'class.expandable.subfilter.js' => '',
 	'class.form.js' => '',
 	'class.form.validator.js' => '',
@@ -197,7 +213,8 @@ $translate_strings = [
 		'Cannot paste inaccessible widget.' => _('Cannot paste inaccessible widget.'),
 		'Copy' => _('Copy'),
 		'Delete' => _('Delete'),
-		'Editing other objects is not allowed in dashboard editing mode.' => _('Editing other objects is not allowed in dashboard editing mode.'),
+		'Editing other objects is not allowed in dashboard editing mode.' =>
+			_('Editing other objects is not allowed in dashboard editing mode.'),
 		'Failed to paste dashboard page.' => _('Failed to paste dashboard page.'),
 		'Failed to paste widget.' => _('Failed to paste widget.'),
 		'Failed to update dashboard page properties.' => _('Failed to update dashboard page properties.'),
@@ -216,6 +233,33 @@ $translate_strings = [
 		'Add a new widget' => _('Add a new widget'),
 		'Click and drag to desired size.' => _('Click and drag to desired size.'),
 		'Release to create a widget.' => _('Release to create a widget.')
+	],
+	'class.pager.js' => [
+		'First' => _x('First', 'page navigation'),
+		'Last' => _x('Last', 'page navigation'),
+		'Go to first page' => _('Go to first page'),
+		'Go to previous page, %1$s' => _('Go to previous page, %1$s'),
+		'Go to page %1$s, current page' => _('Go to page %1$s, current page'),
+		'Go to page %1$s' => _('Go to page %1$s'),
+		'Go to next page, %1$s' => _('Go to next page, %1$s'),
+		'Go to last page, %1$s' => _('Go to last page, %1$s'),
+		'Displaying %1$s of %2$s found' => _('Displaying %1$s of %2$s found'),
+		'Displaying %1$s to %2$s of %3$s found' => _('Displaying %1$s to %2$s of %3$s found')
+	],
+	'class.datatable.js' => [
+		'Enabled' => _('Enabled'),
+		'Disabled' => _('Disabled'),
+		'No data found' => _('No data found'),
+		'Column name' => _('Column name'),
+		'Number of tags' => _('Number of tags'),
+		'Duplicate column' => _('Duplicate column'),
+		'Delete column' => _('Delete column'),
+		'Column list' => _('Column list'),
+		'Reset layout' => _('Reset layout'),
+		'Your table settings will be reset to default, and duplicate columns will be automatically removed.' =>
+			_('Your table settings will be reset to default, and duplicate columns will be automatically removed.'),
+		'Inherited tag' => _('Inherited tag'),
+		'Update' => _('Update'),
 	],
 	'class.geomaps.js' => [
 		'Severity filter' => _('Severity filter')
@@ -262,7 +306,8 @@ $translate_strings = [
 		'Widget configuration will be reverted.' => _('Widget configuration will be reverted.')
 	],
 	'class.widget-edit.sandbox.js' => [
-		'Cannot add widget: not enough free space on the dashboard.' => _('Cannot add widget: not enough free space on the dashboard.')
+		'Cannot add widget: not enough free space on the dashboard.' =>
+			_('Cannot add widget: not enough free space on the dashboard.')
 	],
 	'class.widget-edit.validator.js' => [
 		'Failed to update widget properties.' => _('Failed to update widget properties.')
@@ -329,7 +374,7 @@ $translate_strings = [
 		'S_HOST' => _('Host'),
 		'S_HOST_GROUP' => _('Host group'),
 		'S_IMAGE' => _('Image'),
-		'S_INCORRECT_ITEM_VALUE_TYPE' =>  _('incorrect item value type'),
+		'S_INCORRECT_ITEM_VALUE_TYPE' => _('incorrect item value type'),
 		'S_INCORRECT_VALUE' => _('Incorrect value for field "%1$s": %2$s.'),
 		'S_INDICATORS' => _('Indicators'),
 		'S_INVALID_PARAMETER' => _('Invalid parameter "%1$s": %2$s.'),
@@ -503,7 +548,8 @@ $translate_strings = [
 		'Delete dashboard?' => _('Delete dashboard?'),
 		'Discovery' => _('Discovery'),
 		'Discovery rule' => _('Discovery rule'),
-		'Do you wish to replace the conditional expression?' => _('Do you wish to replace the conditional expression?'),
+		'Do you wish to replace the conditional expression?' =>
+			_('Do you wish to replace the conditional expression?'),
 		'Execute now' => _('Execute now'),
 		'Item' => _('Item'),
 		'Items' => _('Items'),
@@ -623,6 +669,22 @@ if (empty($_GET['files'])) {
 		'class.cdate.js',
 		'class.cookie.js',
 		'class.curl.js',
+		'class.dataprovider.js',
+		'class.dataprovider.default.js',
+		'class.contextpopup.js',
+		'class.contextpopup.tags.js',
+		'class.contextpopup.tagvalue.js',
+		'class.contextpopup.customizetable.js',
+		'class.contextpopup.monitoring.problems.time.js',
+		'class.contextpopup.monitoring.problems.problem.js',
+		'class.contextpopup.monitoring.host.problems.js',
+		'class.contextpopup.monitoring.latest.name.js',
+		'class.datatable.column.js',
+		'class.datatable.column.tags.js',
+		'class.datatable.column.tagvalue.js',
+		'class.datatable.js',
+		'class.pager.js',
+		'class.message.js',
 		'class.field.js',
 		'class.field.array.js',
 		'class.field.checkbox.js',

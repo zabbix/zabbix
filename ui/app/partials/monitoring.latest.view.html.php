@@ -334,24 +334,25 @@ foreach ($data['items'] as $itemid => $item) {
 	$table->addRow($table_row);
 }
 
-$button_list = [
-	GRAPH_TYPE_STACKED => [
-		'name' => _('Display stacked graph'),
-		'attributes' => ['data-required' => 'graph', 'data-required-count' => 2]
-	],
-	GRAPH_TYPE_NORMAL => [
-		'name' => _('Display graph'),
-		'attributes' => ['data-required' => 'graph']
-	],
-	'item.execute' => [
-		'content' => (new CSimpleButton(_('Execute now')))
-			->addClass(ZBX_STYLE_BTN_ALT)
-			->addClass('js-massexecute-item')
-			->addClass('js-no-chkbxrange')
-			->setAttribute('data-required', 'execute')
-	]
-];
-
-$form->addItem([$table, new CActionButtonList('graphtype', 'itemids', $button_list, 'latest')]);
+$form->addItem([
+	(new CDiv())->setId('latest'),
+	(new CActionButtonList('graphtype', 'itemids', [
+		GRAPH_TYPE_STACKED => [
+			'name' => _('Display stacked graph'),
+			'attributes' => ['data-required' => 'graph', 'data-required-count' => 2]
+		],
+		GRAPH_TYPE_NORMAL => [
+			'name' => _('Display graph'),
+			'attributes' => ['data-required' => 'graph']
+		],
+		'item.execute' => [
+			'content' => (new CSimpleButton(_('Execute now')))
+				->addClass(ZBX_STYLE_BTN_ALT)
+				->addClass('js-massexecute-item')
+				->addClass('js-no-chkbxrange')
+				->setAttribute('data-required', 'execute')
+		]
+	], 'latest'))->setAddSelectedCountElement(false)
+]);
 
 echo $form;

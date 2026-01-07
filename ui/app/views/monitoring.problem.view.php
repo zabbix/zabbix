@@ -19,70 +19,143 @@
  * @var array $data
  */
 
-if ($data['action'] === 'problem.view') {
-	$this->addJsFile('gtlc.js');
-	$this->addJsFile('layout.mode.js');
+$this->addJsFile('gtlc.js');
+$this->addJsFile('layout.mode.js');
 
-	$this->enableLayoutModes();
-	$web_layout_mode = $this->getLayoutMode();
+$this->enableLayoutModes();
+$web_layout_mode = $this->getLayoutMode();
 
-	if ($data['uncheck']) {
-		uncheckTableRows('problem');
+if ($data['uncheck']) {
+	uncheckTableRows('problem');
+}
+
+$html_page = (new CHtmlPage())
+	->setTitle(_('Problems'))
+	->setWebLayoutMode($web_layout_mode)
+	->setDocUrl(CDocHelper::getUrl(CDocHelper::MONITORING_PROBLEMS_VIEW))
+	->setControls(
+		(new CTag('nav', true,
+			(new CList())
+				->addItem(
+					(new CLink(_('Export to CSV'), 'javascript:void(0);'))
+						->setId('export_csv')
+						->addClass(ZBX_STYLE_BTN)
+						->setAttribute('onclick', 'view.datatable.export(this, \'zbx_problems_report.csv\')')
+				)
+				->addItem(get_icon('kioskmode', ['mode' => $web_layout_mode]))
+		))->setAttribute('aria-label', _('Content controls'))
+	);
+
+if ($web_layout_mode == ZBX_LAYOUT_NORMAL) {
+	$filter = (new CTabFilter())
+		->setId('monitoring_problem_filter')
+		->setOptions($data['tabfilter_options'])
+		->addTemplate(new CPartial($data['filter_view'], $data['filter_defaults']));
+
+	foreach ($data['filter_tabs'] as $tab) {
+		$tab['tab_view'] = $data['filter_view'];
+		$filter->addTemplatedTab($tab['filter_name'], $tab);
 	}
 
-	$html_page = (new CHtmlPage())
-		->setTitle(_('Problems'))
-		->setWebLayoutMode($web_layout_mode)
-		->setDocUrl(CDocHelper::getUrl(CDocHelper::MONITORING_PROBLEMS_VIEW))
-		->setControls(
-			(new CTag('nav', true,
-				(new CList())
-					->addItem((new CRedirectButton(_('Export to CSV'),
-						(new CUrl())->setArgument('action', 'problem.view.csv')
-					))->setId('export_csv'))
-					->addItem(get_icon('kioskmode', ['mode' => $web_layout_mode]))
-			))->setAttribute('aria-label', _('Content controls'))
-		);
-
-	if ($web_layout_mode == ZBX_LAYOUT_NORMAL) {
-		$filter = (new CTabFilter())
-			->setId('monitoring_problem_filter')
-			->setOptions($data['tabfilter_options'])
-			->addTemplate(new CPartial($data['filter_view'], $data['filter_defaults']));
-
-		foreach ($data['filter_tabs'] as $tab) {
-			$tab['tab_view'] = $data['filter_view'];
-			$filter->addTemplatedTab($tab['filter_name'], $tab);
-		}
-
-		// Set javascript options for tab filter initialization in monitoring.problem.view.js.php file.
-		$data['filter_options'] = $filter->options;
-		$html_page->addItem($filter);
-	}
-	else {
-		$data['filter_options'] = null;
-	}
-
-	$this->includeJsFile('monitoring.problem.view.js.php', $data);
-	$html_page
-		->addItem(new CPartial('monitoring.problem.view.html', array_intersect_key($data,
-			array_flip(['page', 'action', 'sort', 'sortorder', 'filter', 'tabfilter_idx'])
-		)))
-		->show();
-
-	(new CScriptTag('
-		view.init('.json_encode([
-			'filter_options' => $data['filter_options'],
-			'refresh_url' => $data['refresh_url'],
-			'refresh_interval' => $data['refresh_interval'],
-			'filter_defaults' => $data['filter_defaults']
-		]).');
-	'))
-		->setOnDocumentReady()
-		->show();
+	// Set javascript options for tab filter initialization in monitoring.problem.view.js.php file.
+	$data['filter_options'] = $filter->options;
+	$html_page->addItem($filter);
 }
 else {
-	echo (new CPartial('monitoring.problem.view.html', array_intersect_key($data,
-		array_flip(['page', 'action', 'sort', 'sortorder', 'filter', 'tabfilter_idx'])
-	)))->getOutput();
+	$data['filter_options'] = null;
 }
+
+$this->includeJsFile('monitoring.problem.view.js.php', $data);
+$html_page
+	->addItem(new CPartial('monitoring.problem.view.html', array_intersect_key($data,
+		array_flip(['page', 'action', 'sort', 'sortorder', 'filter', 'tabfilter_idx'])
+	)))
+	->show();
+
+(new CTemplateTag('time'))
+	->addItem([
+		new CFormField(
+			(new CCheckBox('show_timeline'))
+				->setLabel(_('Show timeline'))
+				->setLabelPosition(CCheckBox::LABEL_POSITION_RIGHT)
+				->setUncheckedValue(1)
+				->addClass('form-label')
+		)
+	])
+	->show();
+
+(new CTemplateTag('problem'))
+	->addItem([
+		new CFormField(
+			(new CCheckBox('show_opdata'))
+				->setLabel(_('Show operational data'))
+				->setLabelPosition(CCheckBox::LABEL_POSITION_RIGHT)
+		),
+		new CFormField(
+			(new CCheckBox('details'))
+				->setLabel(_('Show trigger expression'))
+				->setLabelPosition(CCheckBox::LABEL_POSITION_RIGHT)
+		),
+		new CFormField(
+			(new CCheckBox('show_suppressed'))
+				->setLabel(_('Show suppressed'))
+				->setLabelPosition(CCheckBox::LABEL_POSITION_RIGHT)
+				->setUncheckedValue(0)
+		)
+	])
+	->show();
+
+(new CTemplateTag('tags'))
+	->addItem([
+		(new CLabel(_('Number of tags'), 'number_of_tags'))
+			->addClass('form-label'),
+		new CFormField(
+			(new CRadioButtonList('number_of_tags'))
+				->setValues([
+					['name' => SHOW_TAGS_1, 'value' => SHOW_TAGS_1],
+					['name' => SHOW_TAGS_2, 'value' => SHOW_TAGS_2],
+					['name' => SHOW_TAGS_3, 'value' => SHOW_TAGS_3],
+				])
+				->setModern()
+		),
+		(new CLabel(_('Tag name display'), 'tag_name_display'))
+			->addClass('form-label'),
+		new CFormField(
+			(new CRadioButtonList('tag_name_display'))
+				->setValues([
+					['name' => _('Full'), 'value' => TAG_NAME_FULL],
+					['name' => _('Shortened'), 'value' => TAG_NAME_SHORTENED],
+					['name' => _('None'), 'value' => TAG_NAME_NONE],
+				])
+				->setModern()
+		),
+		(new CLabel(_('Tag display priority'), 'tag_display_priority'))
+			->addClass('form-label'),
+		new CFormField(new CTextBox('tag_display_priority'))
+	])
+	->show();
+
+(new CTemplateTag('tagvalue'))
+	->addItem([
+		(new CLabel(_('Tag name'), 'tag_name'))
+			->addClass('form-label'),
+		new CFormField(new CTextBox('tag_name')),
+	])
+	->show();
+
+(new CScriptTag('
+	view.init('.json_encode([
+		'filter_options' => $data['filter_options'],
+		'refresh_interval' => $data['refresh_interval'],
+		'filter_defaults' => $data['filter_defaults'],
+		'page' => $data['page'],
+		'filter' => $data['filter'],
+		'sort_field' => $data['sort'],
+		'sort_order' => $data['sortorder'],
+		'storage_idx' => $data['storage_idx'],
+		'user_configs' => $data['user_configs'],
+		'severities' => $data['severities']
+	]).');
+'))
+	->setOnDocumentReady()
+	->show();

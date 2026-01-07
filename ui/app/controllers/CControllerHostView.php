@@ -91,7 +91,7 @@ class CControllerHostView extends CControllerHost {
 
 		foreach ($profile->getTabsWithDefaults() as $index => $filter_tab) {
 			if ($index == $profile->selected) {
-				// Initialize multiselect data for filter_scr to allow tabfilter correctly handle unsaved state.
+				// Initialize multiselect data for filter_src to allow tabfilter to correctly handle unsaved state.
 				$filter_tab['filter_src']['filter_view_data'] = $this->getAdditionalData($filter_tab['filter_src']);
 			}
 
@@ -101,17 +101,20 @@ class CControllerHostView extends CControllerHost {
 		$filter = $filter_tabs[$profile->selected];
 		$filter = self::sanitizeFilter($filter);
 
-		$refresh_curl = new CUrl('zabbix.php');
-		$filter['action'] = 'host.view.refresh';
-		array_map([$refresh_curl, 'setArgument'], array_keys($filter), $filter);
+		$storage_idx = self::FILTER_IDX . '.datatable';
 
 		$data = [
-			'refresh_url' => $refresh_curl->getUrl(),
 			'refresh_interval' => CWebUser::getRefresh() * 1000,
 			'filter_view' => 'monitoring.host.filter',
 			'filter_defaults' => $profile->filter_defaults,
 			'filter_groupids' => $this->getInput('groupids', []),
 			'filter_tabs' => $filter_tabs,
+			'filter' => $filter,
+			'sort_field' => $filter['sort'],
+			'sort_order' => $filter['sortorder'],
+			'storage_idx' => $storage_idx,
+			'user_configs' => array_map(static fn (string $user_config) => json_decode($user_config, true),
+				CProfile::getArray($storage_idx, [])),
 			'can_create_hosts' => $this->checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS),
 			'tabfilter_options' => [
 				'idx' => static::FILTER_IDX,

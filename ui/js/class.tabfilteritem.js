@@ -597,6 +597,58 @@ class CTabFilterItem extends CBaseComponent {
 		this._subfilters_expanded = [];
 	}
 
+	/**
+	 * @returns {Object}
+	 */
+	getFilterParamsObject() {
+		let result = {},
+			filter_params = Object.fromEntries(this.getFilterParams()),
+			parts;
+
+		for (const name of Object.keys(filter_params)) {
+			parts = name.replace(/]/g, '').split('[');
+
+			switch (parts.length) {
+				case 1:
+					result[name] = filter_params[name];
+					break;
+
+				case 2:
+					// name[0]
+					if (!(parts[0] in result)) {
+						result[parts[0]] = [];
+					}
+
+					result[parts[0]].push(filter_params[name]);
+					break;
+
+				case 3:
+					// name[0][property]
+					if (!(parts[0] in result)) {
+						result[parts[0]] = {};
+					}
+
+					if (!(parts[1] in result[parts[0]])) {
+						result[parts[0]][parts[1]] = {};
+					}
+
+					if (parts[2]) {
+						result[parts[0]][parts[1]][parts[2]] = filter_params[name];
+					}
+					else {
+						if (!Array.isArray(result[parts[0]][parts[1]])) {
+							result[parts[0]][parts[1]] = [];
+						}
+
+						result[parts[0]][parts[1]].push(filter_params[name]);
+					}
+					break;
+			}
+		}
+
+		return result;
+	}
+
 	registerEvents() {
 		this._events = {
 			click: () => {

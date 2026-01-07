@@ -278,7 +278,7 @@ abstract class CControllerLatest extends CController {
 	 *
 	 * @return array
 	 */
-	protected static function getSubfilterFields(array $filter): array {
+	public static function getSubfilterFields(array $filter): array {
 		$tags = [];
 
 		foreach ($filter['subfilter_tags'] as $tag => $tag_values) {
@@ -313,7 +313,7 @@ abstract class CControllerLatest extends CController {
 	 *
 	 * @return array
 	 */
-	protected static function getSubfilters(array $subfilters, array &$prepared_data): array {
+	public static function getSubfilters(array $subfilters, array &$prepared_data): array {
 		$subfilter_options = self::getSubfilterOptions($prepared_data, $subfilters);
 		$prepared_data['items'] = self::getItemMatchings($prepared_data['items'], $subfilters);
 
@@ -578,7 +578,7 @@ abstract class CControllerLatest extends CController {
 	 *
 	 * @return array
 	 */
-	protected static function sanitizeFilter(array $filter): array {
+	public static function sanitizeFilter(array $filter): array {
 		if ($filter['hostids']) {
 			$hosts = API::Host()->get([
 				'output' => [],
@@ -704,7 +704,7 @@ abstract class CControllerLatest extends CController {
 	 *
 	 * @return array
 	 */
-	protected static function applySubfilters(array $items): array {
+	public static function applySubfilters(array $items): array {
 		return array_filter($items, function ($item) {
 			$matches = array_intersect_key($item['matching_subfilters'],
 				array_flip(['hostids', 'tagnames', 'tags', 'state', 'data'])

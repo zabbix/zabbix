@@ -929,7 +929,7 @@ function objectToSearchParams(object) {
 				combine(datum, search_params, name_prefix !== '' ? `${name_prefix}[${index}]` : index);
 			}
 		}
-		else if (typeof data === 'object') {
+		else if (typeof data === 'object' && data != null) {
 			for (const [name, datum] of Object.entries(data)) {
 				combine(datum, search_params, name_prefix !== '' ? `${name_prefix}[${name}]` : name);
 			}

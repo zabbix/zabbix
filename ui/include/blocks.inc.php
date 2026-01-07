@@ -301,7 +301,8 @@ function getSystemStatusData(array $filter) {
 		if (array_key_exists('show_opdata', $filter) && $filter['show_opdata'] != OPERATIONAL_DATA_SHOW_NONE) {
 			$maked_data = CScreenProblem::makeData(
 				['problems' => $problems_data, 'triggers' => $data['triggers']],
-				['show' => 0, 'details' => 0, 'show_opdata' => $filter['show_opdata']]
+				['show' => 0],
+				['details' => 0, 'show_opdata' => $filter['show_opdata']]
 			);
 			$data['triggers'] = $maked_data['triggers'];
 		}

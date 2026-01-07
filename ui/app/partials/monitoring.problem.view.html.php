@@ -19,55 +19,29 @@
  * @var array    $data
  */
 
-$options = [
-	'resourcetype' => SCREEN_RESOURCE_PROBLEM,
-	'mode' => SCREEN_MODE_JS,
-	'dataId' => 'problem',
-	'page' => $data['page'],
-	'data' => [
-		'action' => $data['action'],
-		'sort' => $data['sort'],
-		'sortorder' => $data['sortorder'],
-		'filter' => [
-			'show' => $data['filter']['show'],
-			'groupids' => $data['filter']['groupids'],
-			'hostids' => $data['filter']['hostids'],
-			'triggerids' => $data['filter']['triggerids'],
-			'name' => $data['filter']['name'],
-			'severities' => $data['filter']['severities'],
-			'inventory' => $data['filter']['inventory'],
-			'evaltype' => $data['filter']['evaltype'],
-			'tags' => $data['filter']['tags'],
-			'show_tags' => $data['filter']['show_tags'],
-			'tag_name_format' => $data['filter']['tag_name_format'],
-			'tag_priority' => $data['filter']['tag_priority'],
-			'show_symptoms' => $data['filter']['show_symptoms'],
-			'show_suppressed' => $data['filter']['show_suppressed'],
-			'acknowledgement_status' => $data['filter']['acknowledgement_status'],
-			'acknowledged_by_me' => $data['filter']['acknowledged_by_me'],
-			'compact_view' => $data['filter']['compact_view'],
-			'show_timeline' => $data['filter']['show_timeline'],
-			'details' => $data['filter']['details'],
-			'highlight_row' => $data['filter']['highlight_row'],
-			'show_opdata' => $data['filter']['show_opdata']
-		],
-		'limit' => CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT)
-	]
+$allowed = [
+	'add_comments' => CWebUser::checkAccess(CRoleHelper::ACTIONS_ADD_PROBLEM_COMMENTS),
+	'change_severity' => CWebUser::checkAccess(CRoleHelper::ACTIONS_CHANGE_SEVERITY),
+	'acknowledge' => CWebUser::checkAccess(CRoleHelper::ACTIONS_ACKNOWLEDGE_PROBLEMS),
+	'close' => CWebUser::checkAccess(CRoleHelper::ACTIONS_CLOSE_PROBLEMS),
+	'suppress_problems' => CWebUser::checkAccess(CRoleHelper::ACTIONS_SUPPRESS_PROBLEMS),
+	'rank_change' => CWebUser::checkAccess(CRoleHelper::ACTIONS_CHANGE_PROBLEM_RANKING)
 ];
 
-switch ($data['filter']['show']) {
-	case TRIGGERS_OPTION_RECENT_PROBLEM:
-	case TRIGGERS_OPTION_IN_PROBLEM:
-		$options['data']['filter']['age_state'] = $data['filter']['age_state'];
-		$options['data']['filter']['age'] = $data['filter']['age'];
-		break;
-
-	case TRIGGERS_OPTION_ALL:
-		$options['profileIdx'] = $data['tabfilter_idx'];
-		$options['profileIdx2'] = 0;
-		$options['from'] = $data['filter']['from'];
-		$options['to'] = $data['filter']['to'];
-		break;
-}
-
-echo CScreenBuilder::getScreen($options)->get();
+echo (new CForm('post', 'zabbix.php'))
+	->setId('problem_form')
+	->setName('problem')
+	->addItem([
+		(new CDiv())->setId('problems'),
+		(new CActionButtonList('action', 'eventids', [
+			'acknowledge.edit' => [
+				'content' => (new CSimpleButton(_('Mass update')))
+					->addClass(ZBX_STYLE_BTN_ALT)
+					->addClass('js-massupdate-problem')
+					->addClass('js-no-chkbxrange')
+					->setEnabled($allowed['add_comments'] || $allowed['change_severity'] || $allowed['acknowledge']
+						|| $allowed['close'] || $allowed['suppress_problems'] || $allowed['rank_change']
+					)
+			]
+		], 'problem'))->setAddSelectedCountElement(false)
+	]);

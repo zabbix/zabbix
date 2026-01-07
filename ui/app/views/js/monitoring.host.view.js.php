@@ -21,35 +21,40 @@
 ?>
 <script>
 	const view = {
-		host_view_form: null,
-		filter: null,
-		refresh_url: null,
-		refresh_simple_url: null,
 		refresh_interval: null,
-		refresh_counters: null,
-		running: false,
-		timeout: null,
-		deferred: null,
+		refresh_interval_id: null,
+		filter_defaults: {},
+		filter: null,
+		active_filter: null,
 		applied_filter_groupids: [],
+		datatable: null,
 		_refresh_message_box: null,
 		_popup_message_box: null,
 
-		init({filter_options, refresh_url, refresh_interval, applied_filter_groupids}) {
-			this.refresh_url = new Curl(refresh_url);
+		init({
+			filter_defaults,
+			filter_options,
+			refresh_interval,
+			applied_filter_groupids,
+			filter,
+			page,
+			sort_field,
+			sort_order,
+			storage_idx,
+			user_configs
+		}) {
 			this.refresh_interval = refresh_interval;
+			this.filter_defaults = filter_defaults;
 			this.applied_filter_groupids = applied_filter_groupids;
-
-			const url = new Curl('zabbix.php');
-			url.setArgument('action', 'host.view.refresh');
-			this.refresh_simple_url = url.getUrl();
 
 			this.initTabFilter(filter_options);
 			this.initEvents();
 			this.initPopupListeners();
+			this.initDataTable({filter, page, sort_field, sort_order, storage_idx, user_configs});
 
-			this.host_view_form = $('form[name=host_view]');
-			this.running = true;
-			this.refresh();
+			if (this.refresh_interval != 0) {
+				this.scheduleRefresh();
+			}
 		},
 
 		initTabFilter(filter_options) {
@@ -57,10 +62,17 @@
 				return;
 			}
 
-			this.refresh_counters = this.createCountersRefresh(1);
 			this.filter = new CTabFilter($('#monitoring_hosts_filter')[0], filter_options);
+			this.active_filter = this.filter._active_item;
+
 			this.filter.on(TABFILTER_EVENT_URLSET, () => {
-				this.reloadPartialAndTabCounters();
+				if (this.active_filter !== this.filter._active_item) {
+					this.active_filter = this.filter._active_item;
+
+					this.datatable.setTabFilterItem(this.active_filter);
+				}
+
+				this.refresh();
 			});
 		},
 
@@ -101,57 +113,237 @@
 						);
 					}
 
-					this.reloadPartialAndTabCounters();
+					this.refresh();
 				}
 			});
 		},
 
-		createCountersRefresh(timeout) {
-			if (this.refresh_counters) {
-				clearTimeout(this.refresh_counters);
-				this.refresh_counters = null;
-			}
+		initDataTable({filter, page, sort_field, sort_order, storage_idx, user_configs}) {
+			const data_provider_url = new URL('zabbix.php', location.href);
+			data_provider_url.searchParams.set('action', 'host.view.data');
 
-			return setTimeout(() => this.getFiltersCounters(), timeout);
-		},
+			const data_provider = new CDefaultDataProvider(data_provider_url.toString());
 
-		getFiltersCounters() {
-			return $.post(this.refresh_simple_url, {
-				filter_counters: 1
-			})
-			.done((json) => {
-				if (json.filter_counters) {
-					this.filter.updateCounters(json.filter_counters);
-				}
-			})
-			.always(() => {
-				if (this.refresh_interval > 0) {
-					this.refresh_counters = this.createCountersRefresh(this.refresh_interval);
-				}
-			});
-		},
+			this.datatable = new CDataTable(document.getElementById('hosts'), data_provider)
+				.setColumns([
+					new CDataTableColumn('name', '<?= _('Name') ?>')
+						.setFields(['hostid', 'name', 'status', 'maintenance', 'maintenanceid', 'maintenance_type',
+							'maintenance_status'])
+						.setRenderer('name')
+						.setSortable(true)
+						.setTogglable(false),
+					new CDataTableColumn('interface', '<?= _('Interface') ?>')
+						.setFields(['interface']),
+					new CDataTableColumn('availability', '<?= _('Availability') ?>')
+						.setFields(['availability']),
+					new CDataTableColumnTags('tags', '<?= _('Tags') ?>')
+						.setFields(['tags']),
+					new CDataTableColumn('status', '<?= _('Status') ?>')
+						.setFields(['status'])
+						.setRenderer('status'),
+					new CDataTableColumn('latest_data', '<?= _('Latest data') ?>')
+						.setFields(['hostid', 'items_count'])
+						.setRenderer('latest_data'),
+					new CDataTableColumn('problems', '<?= _('Problems') ?>')
+						.setContextPopupData({
+							show_suppressed: false
+						})
+						.setContextPopupHandler('problems')
+						.setFields(['problems']),
+					new CDataTableColumn('graphs', '<?= _('Graphs') ?>')
+						.setFields(['hostid', 'graphs'])
+						.setRenderer('graphs'),
+					new CDataTableColumn('dashboards', '<?= _('Dashboards') ?>')
+						.setFields(['hostid', 'dashboards'])
+						.setRenderer('dashboards'),
+					new CDataTableColumn('web', '<?= _('Web') ?>')
+						.setFields(['hostid', 'httpTests'])
+						.setRenderer('web'),
+				])
+				.setPage(page)
+				.setFilter(filter)
+				.setSortField(sort_field)
+				.setSortOrder(sort_order)
+				.setStorageIdx(storage_idx)
+				.setTabFilterItem(this.active_filter)
+				.setRenderer('name', ({column_data, cell_inner}) => {
+					const [hostid, name, status, maintenance] = column_data;
 
-		reloadPartialAndTabCounters() {
-			this.refresh_url = new Curl('');
+					const url = new URL('zabbix.php', location.href);
+					url.searchParams.set('action', 'popup');
+					url.searchParams.set('popup', 'host.edit');
+					url.searchParams.set('hostid', hostid);
 
-			this.unscheduleRefresh();
-			this.refresh();
+					const name_link = document.createElement('a');
+					name_link.classList.add(ZBX_STYLE_LINK_ACTION);
+					name_link.setAttribute('href', url.toString());
+					name_link.innerText = name;
 
-			// Filter is not present in Kiosk mode.
-			if (this.filter) {
-				const filter_item = this.filter._active_item;
+					cell_inner.appendChild(name_link);
 
-				if (this.filter._active_item.hasCounter()) {
-					$.post(this.refresh_simple_url, {
-						filter_counters: 1,
-						counter_index: filter_item._index
-					}).done((json) => {
-						if (json.filter_counters) {
-							filter_item.updateCounter(json.filter_counters.pop());
+					if (maintenance && status == HOST_STATUS_MONITORED) {
+						if (maintenance.status == HOST_MAINTENANCE_STATUS_ON) {
+							let hint = `${maintenance.name} [${maintenance.type
+								? '<?= _('Maintenance without data collection'); ?>'
+								: '<?= _('Maintenance with data collection'); ?>'}]`;
+
+							if (maintenance.description != '') {
+								hint += "\n" + maintenance.description;
+							}
+
+							const maintenance_icon = document.createElement('button');
+							maintenance_icon.classList.add(ZBX_STYLE_BTN_ICON, ZBX_ICON_WRENCH_ALT_SMALL,
+								ZBX_STYLE_COLOR_WARNING, ZBX_STYLE_NO_INDENT);
+							maintenance_icon.setAttribute('type', 'button');
+							maintenance_icon.setAttribute('role', 'button');
+							maintenance_icon.setAttribute('data-hintbox-contents', hint);
+							maintenance_icon.setAttribute('data-hintbox', '1');
+
+							cell_inner.appendChild(maintenance_icon);
 						}
-					});
-				}
-			}
+						else {
+							const maintenance_icon = document.createElement('button');
+							maintenance_icon.classList.add(ZBX_STYLE_BTN_ICON, ZBX_ICON_WRENCH_ALT_SMALL,
+								ZBX_STYLE_COLOR_WARNING, ZBX_STYLE_NO_INDENT);
+							maintenance_icon.setAttribute('type', 'button');
+							maintenance_icon.setAttribute('role', 'button');
+							maintenance_icon.setAttribute('data-hintbox-contents', '<?= _('Inaccessible maintenance'); ?>');
+							maintenance_icon.setAttribute('data-hintbox', '1');
+
+							cell_inner.appendChild(maintenance_icon);
+						}
+					}
+				})
+				.setRenderer('status', ({column_data, cell_inner}) => {
+					const [status] = column_data;
+
+					const indicator = document.createElement('span');
+
+					if (status == HOST_STATUS_MONITORED) {
+						indicator.classList.add(ZBX_STYLE_GREEN);
+						indicator.innerText = '<?= _('Enabled'); ?>';
+					}
+					else {
+						indicator.classList.add(ZBX_STYLE_RED);
+						indicator.innerText = '<?= _('Disabled'); ?>';
+					}
+
+					cell_inner.appendChild(indicator);
+				})
+				.setRenderer('latest_data', ({column_data, cell_inner}) => {
+					const [hostid, items_count] = column_data;
+					const {allowed_ui_latest_data} = this.datatable.getDataProvider().getLastResponse();
+
+					if (allowed_ui_latest_data) {
+						const url = new URL('zabbix.php', location.href);
+						url.searchParams.set('action', 'latest.view');
+						url.searchParams.set('hostids[0]', hostid);
+						url.searchParams.set('filter_set', '1');
+
+						const latest_data_link = document.createElement('a');
+						latest_data_link.setAttribute('href', url.toString());
+						latest_data_link.innerText = '<?= _('Latest data'); ?>';
+
+						cell_inner.appendChild(latest_data_link);
+					}
+					else {
+						const latest_data_link = document.createElement('span');
+						latest_data_link.classList.add(ZBX_STYLE_DISABLED);
+						latest_data_link.innerText = '<?= _('Latest data'); ?>';
+
+						cell_inner.appendChild(latest_data_link);
+					}
+
+					if (items_count > 0) {
+						const count = document.createElement('sup');
+						count.innerText = items_count;
+
+						cell_inner.innerHTML += ' ';
+						cell_inner.appendChild(count);
+					}
+				})
+				.setRenderer('graphs', ({column_data, cell_inner}) => {
+					const [hostid, graphs] = column_data;
+
+					if (graphs > 0) {
+						const url = new URL('zabbix.php', location.href);
+						url.searchParams.set('action', 'charts.view');
+						url.searchParams.set('hostids[0]', hostid);
+						url.searchParams.set('filter_set', '1');
+
+						const graphs_link = document.createElement('a');
+						graphs_link.setAttribute('href', url.toString());
+						graphs_link.innerText = '<?= _('Graphs'); ?>';
+
+						cell_inner.appendChild(graphs_link);
+
+						const count = document.createElement('sup');
+						count.innerText = graphs;
+
+						cell_inner.innerHTML += ' ';
+						cell_inner.appendChild(count);
+					}
+				})
+				.setRenderer('dashboards', ({column_data, cell_inner}) => {
+					const [hostid, dashboards] = column_data;
+
+					if (dashboards > 0) {
+						const url = new URL('zabbix.php', location.href);
+						url.searchParams.set('action', 'host.dashboard.view');
+						url.searchParams.set('hostid', hostid);
+
+						const dashboards_link = document.createElement('a');
+						dashboards_link.setAttribute('href', url.toString());
+						dashboards_link.innerText = '<?= _('Dashboards'); ?>';
+
+						cell_inner.appendChild(dashboards_link);
+
+						const count = document.createElement('sup');
+						count.innerText = dashboards;
+
+						cell_inner.innerHTML += ' ';
+						cell_inner.appendChild(count);
+					}
+				})
+				.setRenderer('web', ({column_data, cell_inner}) => {
+					const [hostid, httpTests] = column_data;
+
+					if (httpTests > 0) {
+						const url = new URL('zabbix.php', location.href);
+						url.searchParams.set('action', 'web.view');
+						url.searchParams.set('filter_set', '1');
+						url.searchParams.set('filter_hostids[0]', hostid);
+
+						const web_link = document.createElement('a');
+						web_link.setAttribute('href', url.toString());
+						web_link.innerText = '<?= _('Web'); ?>';
+
+						cell_inner.appendChild(web_link);
+
+						const count = document.createElement('sup');
+						count.innerText = httpTests;
+
+						cell_inner.innerHTML += ' ';
+						cell_inner.appendChild(count);
+					}
+				})
+				.setContextPopupHandler('problems', 'CDataTableContextPopupMonitoringHostProblems')
+				.on(CMessageHelper.EVENT_MESSAGE, event => {
+					event.stopPropagation();
+
+					const {type, title, messages} = event.detail;
+
+					if (type == 'clear') {
+						clearMessages();
+					}
+					else {
+						addMessage(makeMessageBox(type, messages, title));
+					}
+				})
+				.on(CDataTable.EVENT_RENDER, () => this.refreshCounters())
+				.on(CDataTable.EVENT_CONTEXT_POPUP_OPEN, () => this.unscheduleRefresh())
+				.on(CDataTable.EVENT_CONTEXT_POPUP_CLOSE, () => this.scheduleRefresh())
+				.init(user_configs);
 		},
 
 		_addRefreshMessage(messages) {
@@ -183,55 +375,41 @@
 		},
 
 		refresh() {
-			this.setLoading();
+			const filter_params = this.active_filter.getFilterParamsObject();
 
-			const params = this.refresh_url.getArgumentsObject();
-			const exclude = ['action', 'filter_src', 'filter_show_counter', 'filter_custom_time', 'filter_name'];
-			const post_data = Object.keys(params)
-				.filter(key => !exclude.includes(key))
-				.reduce((post_data, key) => {
-					post_data[key] = (typeof params[key] === 'object')
-						? [...params[key]].filter(i => i)
-						: params[key];
-					return post_data;
-				}, {});
-
-			this.deferred = $.ajax({
-				url: this.refresh_simple_url,
-				data: post_data,
-				type: 'post',
-				dataType: 'json'
-			});
-
-			return this.bindDataEvents(this.deferred);
+			this.datatable.setFilter({...this.filter_defaults, ...filter_params})
+				.dispatchEvent(CDataTable.EVENT_INIT, {
+					onSuccess: response => this.onDataDone(response)
+				});
 		},
 
-		setLoading() {
-			this.host_view_form.addClass('is-loading is-loading-fadein delayed-15s');
-		},
+		refreshCounters() {
+			// Filter is not present in Kiosk mode.
+			if (this.layout_mode == <?= ZBX_LAYOUT_KIOSKMODE ?>) {
+				return;
+			}
 
-		clearLoading() {
-			this.host_view_form.removeClass('is-loading is-loading-fadein delayed-15s');
-		},
+			const url = new URL('zabbix.php', location.href);
+			url.searchParams.set('action', 'host.view.refresh');
 
-		bindDataEvents(deferred) {
-			deferred
-				.done((response) => {
-					this.onDataDone.call(this, response);
+			fetch(url.toString(), {
+				method: 'POST',
+				body: objectToSearchParams({filter_counters: 1})
+			})
+				.then(response => response.json())
+				.then(response => {
+					if ('filter_counters' in response) {
+						this.filter.updateCounters(response.filter_counters);
+					}
 				})
-				.fail((jqXHR) => {
-					this.onDataFail.call(this, jqXHR);
-				})
-				.always(this.onDataAlways.bind(this));
-
-			return deferred;
+				.catch(error => {
+					CMessageHelper.clear(this.datatable.getElement());
+					CMessageHelper.error(this.datatable.getElement(), [error.message], error.name);
+				});
 		},
 
 		onDataDone(response) {
-			this.clearLoading();
 			this._removeRefreshMessage();
-			this.host_view_form.replaceWith(response.body);
-			this.host_view_form = $('form[name=host_view]');
 
 			if ('groupids' in response) {
 				this.applied_filter_groupids = response.groupids;
@@ -242,51 +420,14 @@
 			}
 		},
 
-		onDataFail(jqXHR) {
-			// Ignore failures caused by page unload.
-			if (jqXHR.status == 0) {
-				return;
-			}
-
-			this.clearLoading();
-
-			const messages = $(jqXHR.responseText).find('.<?= ZBX_STYLE_MSG_GLOBAL ?>');
-
-			if (messages.length) {
-				this.host_view_form.html(messages);
-			}
-			else {
-				this.host_view_form.html(jqXHR.responseText);
-			}
-		},
-
-		onDataAlways() {
-			if (this.running) {
-				this.deferred = null;
-				this.scheduleRefresh();
-			}
-		},
-
 		scheduleRefresh() {
 			this.unscheduleRefresh();
-
-			if (this.refresh_interval > 0) {
-				this.timeout = setTimeout((function () {
-					this.timeout = null;
-					this.refresh();
-				}).bind(this), this.refresh_interval);
-			}
+			this.refresh_interval_id = setInterval(() => this.refresh(), this.refresh_interval);
 		},
 
 		unscheduleRefresh() {
-			if (this.timeout !== null) {
-				clearTimeout(this.timeout);
-				this.timeout = null;
-			}
-
-			if (this.deferred) {
-				this.deferred.abort();
-			}
-		}
+			clearInterval(this.refresh_interval_id);
+			this.refresh_interval_id = null;
+		},
 	};
 </script>

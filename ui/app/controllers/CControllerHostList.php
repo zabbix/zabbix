@@ -16,7 +16,9 @@
 
 class CControllerHostList extends CController {
 
-	protected function init() {
+	public const FILTER_IDX = 'web.hosts';
+
+	protected function init(): void {
 		$this->disableCsrfValidation();
 	}
 
@@ -55,6 +57,10 @@ class CControllerHostList extends CController {
 		return $this->checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS);
 	}
 
+	/**
+	 * @throws APIException
+	 * @throws Exception
+	 */
 	protected function doAction(): void {
 		if ($this->hasInput('filter_set')) {
 			CProfile::update('web.hosts.filter_ip', $this->getInput('filter_ip', ''), PROFILE_TYPE_STR);
@@ -149,12 +155,6 @@ class CControllerHostList extends CController {
 			]), ['groupid' => 'id'])
 			: [];
 
-		$filter_groupids = $filter['groups'] ? array_keys($filter['groups']) : null;
-
-		if ($filter_groupids) {
-			$filter_groupids = getSubGroups($filter_groupids);
-		}
-
 		// Get templates.
 		$filter['templates'] = $filter['templates']
 			? CArrayHelper::renameObjectsKeys(API::Template()->get([
@@ -163,61 +163,6 @@ class CControllerHostList extends CController {
 				'preservekeys' => true
 			]), ['templateid' => 'id'])
 			: [];
-
-		switch ($filter['monitored_by']) {
-			case ZBX_MONITORED_BY_ANY:
-				$proxyids = null;
-				$proxy_groupids = null;
-				break;
-
-			case ZBX_MONITORED_BY_SERVER:
-				$proxyids = 0;
-				$proxy_groupids = 0;
-				break;
-
-			case ZBX_MONITORED_BY_PROXY:
-				$proxyids = $filter['proxyids'] ?: array_keys(API::Proxy()->get([
-					'output' => [],
-					'preservekeys' => true
-				]));
-				$proxy_groupids = 0;
-				break;
-
-			case ZBX_MONITORED_BY_PROXY_GROUP:
-				$proxyids = 0;
-				$proxy_groupids = $filter['proxy_groupids'] ?: array_keys(API::ProxyGroup()->get([
-					'output' => [],
-					'preservekeys' => true
-				]));
-				break;
-		}
-
-		// Select hosts.
-		$limit = CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1;
-		$hosts = API::Host()->get([
-			'output' => ['hostid', $sort_field],
-			'evaltype' => $filter['evaltype'],
-			'tags' => $filter['tags'] ?: null,
-			'inheritedTags' => true,
-			'groupids' => $filter_groupids,
-			'templateids' => $filter['templates'] ? array_keys($filter['templates']) : null,
-			'proxyids' => $proxyids,
-			'proxy_groupids' => $proxy_groupids,
-			'editable' => true,
-			'sortfield' => $sort_field,
-			'limit' => $limit,
-			'search' => [
-				'name' => $filter['host'] === '' ? null : $filter['host'],
-				'ip' => $filter['ip'] === '' ? null : $filter['ip'],
-				'dns' => $filter['dns'] === '' ? null : $filter['dns']
-			],
-			'filter' => [
-				'port' => $filter['port'] === '' ? null : $filter['port'],
-				'status' => $filter['status'] == -1 ? null : $filter['status']
-			]
-		]);
-
-		order_result($hosts, $sort_field, $sort_order);
 
 		if ($this->hasInput('page')) {
 			$page_num = $this->getInput('page');
@@ -230,165 +175,6 @@ class CControllerHostList extends CController {
 		}
 
 		CPagerHelper::savePage($this->getAction(), $page_num);
-
-		$paging = CPagerHelper::paginate($page_num, $hosts, $sort_order,
-			(new CUrl('zabbix.php'))->setArgument('action', $this->getAction())
-		);
-
-		$hosts = API::Host()->get([
-			'output' => ['hostid', 'name', 'monitored_by', 'proxyid', 'proxy_groupid', 'assigned_proxyid',
-				'maintenance_status', 'maintenance_type', 'maintenanceid', 'flags', 'status', 'tls_connect',
-				'tls_accept', 'active_available'
-			],
-			'selectParentTemplates' => ['templateid', 'name'],
-			'selectInterfaces' => ['interfaceid', 'main', 'type', 'useip',  'ip', 'dns', 'port', 'available', 'error',
-				'details'
-			],
-			'selectItems' => API_OUTPUT_COUNT,
-			'selectDiscoveryRules' => API_OUTPUT_COUNT,
-			'selectTriggers' => API_OUTPUT_COUNT,
-			'selectGraphs' => API_OUTPUT_COUNT,
-			'selectHttpTests' => API_OUTPUT_COUNT,
-			'selectDiscoveryRule' => ['itemid', 'name', 'lifetime_type', 'enabled_lifetime_type'],
-			'selectDiscoveryData' => ['parent_hostid', 'status', 'ts_delete', 'ts_disable', 'disable_source'],
-			'selectTags' => ['tag', 'value'],
-			'selectInheritedTags' => ['tag', 'value'],
-			'hostids' => array_column($hosts, 'hostid'),
-			'preservekeys' => true
-		]);
-
-		$lld_parentids = [];
-
-		foreach ($hosts as $host) {
-			if ($host['discoveryRule']) {
-				$lld_parentids[$host['discoveryRule']['itemid']] = true;
-			}
-		}
-
-		if ($lld_parentids) {
-			$editable_lld_parents = API::DiscoveryRule()->get([
-				'output' => [],
-				'itemids' => array_keys($lld_parentids),
-				'editable' => true,
-				'preservekeys' => true
-			]);
-
-			foreach ($hosts as &$host) {
-				if ($host['discoveryRule']) {
-					$host['is_discovery_rule_editable'] =
-						array_key_exists($host['discoveryRule']['itemid'], $editable_lld_parents);
-				}
-			}
-			unset($host);
-		}
-
-		order_result($hosts, $sort_field, $sort_order);
-
-		$hostids = array_column($hosts, 'hostid');
-		$active_item_count_by_hostid = getEnabledItemTypeCountByHostId(ITEM_TYPE_ZABBIX_ACTIVE, $hostids);
-
-		// Selecting linked templates to templates linked to hosts.
-		$templateids = [];
-		$interfaceids = [];
-
-		foreach ($hosts as $host) {
-			$templateids = array_merge($templateids, array_column($host['parentTemplates'], 'templateid'));
-			$interfaceids = array_merge($interfaceids, array_column($host['interfaces'], 'interfaceid'));
-		}
-
-		$templateids = array_keys(array_flip($templateids));
-		$interface_enabled_items_count = getEnabledItemsCountByInterfaceIds($interfaceids);
-
-		$templates = API::Template()->get([
-			'output' => ['templateid', 'name'],
-			'selectParentTemplates' => ['templateid', 'name'],
-			'templateids' => $templateids,
-			'preservekeys' => true
-		]);
-
-		$writable_templates = [];
-
-		if ($templateids) {
-			foreach ($templates as $template) {
-				$templateids = array_merge($templateids, array_column($template['parentTemplates'], 'templateid'));
-			}
-
-			$writable_templates = API::Template()->get([
-				'output' => ['templateid'],
-				'templateids' => array_keys(array_flip($templateids)),
-				'editable' => true,
-				'preservekeys' => true
-			]);
-		}
-
-		$proxyids = [];
-		$proxy_groupids = [];
-		$maintenanceids = [];
-
-		foreach ($hosts as &$host) {
-			// Sort interfaces to be listed starting with one selected as 'main'.
-			CArrayHelper::sort($host['interfaces'], [
-				['field' => 'main', 'order' => ZBX_SORT_DOWN]
-			]);
-
-			foreach ($host['interfaces'] as &$interface) {
-				$interfaceid = $interface['interfaceid'];
-				$interface['has_enabled_items'] = array_key_exists($interfaceid, $interface_enabled_items_count)
-					&& $interface_enabled_items_count[$interfaceid] > 0;
-			}
-			unset($interface);
-
-			// Add active checks interface if host have items with type ITEM_TYPE_ZABBIX_ACTIVE (7).
-			if (array_key_exists($host['hostid'], $active_item_count_by_hostid)
-					&& $active_item_count_by_hostid[$host['hostid']] > 0) {
-				$host['interfaces'][] = [
-					'type' => INTERFACE_TYPE_AGENT_ACTIVE,
-					'available' => $host['active_available'],
-					'has_enabled_items' => true,
-					'error' => ''
-				];
-			}
-			unset($host['active_available']);
-
-			if ($host['monitored_by'] == ZBX_MONITORED_BY_PROXY) {
-				$proxyids[$host['proxyid']] = true;
-			}
-			elseif ($host['monitored_by'] == ZBX_MONITORED_BY_PROXY_GROUP) {
-				$proxy_groupids[$host['proxy_groupid']] = true;
-
-				if ($host['assigned_proxyid'] != 0) {
-					$proxyids[$host['assigned_proxyid']] = true;
-				}
-			}
-
-			if ($host['status'] == HOST_STATUS_MONITORED &&
-					$host['maintenance_status'] == HOST_MAINTENANCE_STATUS_ON) {
-				$maintenanceids[$host['maintenanceid']] = true;
-			}
-		}
-		unset($host);
-
-		$proxies = $proxyids
-			? API::Proxy()->get([
-				'output' => ['name'],
-				'proxyids' => array_keys($proxyids),
-				'preservekeys' => true
-			])
-			: [];
-		$proxy_groups = $proxy_groupids
-			? API::ProxyGroup()->get([
-				'output' => ['name'],
-				'proxy_groupids' => array_keys($proxy_groupids),
-				'preservekeys' => true
-			])
-			: [];
-		$db_maintenances = $maintenanceids
-			? API::Maintenance()->get([
-				'output' => ['name', 'description'],
-				'maintenanceids' => array_keys($maintenanceids),
-				'preservekeys' => true
-			])
-			: [];
 
 		// Prepare data for multiselects.
 		$proxies_ms = $filter['proxyids']
@@ -404,39 +190,22 @@ class CControllerHostList extends CController {
 			]), ['proxy_groupid' => 'id'])
 			: [];
 
-		if (!$filter['tags']) {
-			$filter['tags'] = [['tag' => '', 'value' => '', 'operator' => TAG_OPERATOR_LIKE]];
-		}
-
-		CTagHelper::mergeOwnAndInheritedTags($hosts, true);
+		$storage_idx = self::FILTER_IDX.'.datatable';
 
 		$data = [
 			'action' => $this->getAction(),
-			'hosts' => $hosts,
-			'paging' => $paging,
 			'page' => $page_num,
 			'filter' => $filter,
-			'sortField' => $sort_field,
-			'sortOrder' => $sort_order,
-			'templates' => $templates,
-			'maintenances' => $db_maintenances,
-			'writable_templates' => $writable_templates,
-			'proxies' => $proxies,
+			'sort_field' => $sort_field,
+			'sort_order' => $sort_order,
 			'proxies_ms' => $proxies_ms,
-			'proxy_groups' => $proxy_groups,
 			'proxy_groups_ms' => $proxy_groups_ms,
-			'profileIdx' => 'web.hosts.filter',
-			'active_tab' => CProfile::get('web.hosts.filter.active', 1),
-			'tags' => CTagHelper::getTagsHtml($hosts, ZBX_TAG_OBJECT_HOST, ['filter_tags' => $filter['tags']]),
-			'config' => [
-				'max_in_table' => CSettingsHelper::get(CSettingsHelper::MAX_IN_TABLE)
-			],
-			'user' => [
-				'can_edit_templates' => CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES),
-				'can_edit_proxy_groups' => CWebUser::checkAccess(CRoleHelper::UI_ADMINISTRATION_PROXY_GROUPS),
-				'can_edit_proxies' => CWebUser::checkAccess(CRoleHelper::UI_ADMINISTRATION_PROXIES)
-			],
-			'uncheck' => ($this->getInput('uncheck', 0) == 1)
+			'profileIdx' => self::FILTER_IDX . '.filter',
+			'active_tab' => CProfile::get(self::FILTER_IDX . '.filter.active', 1),
+			'uncheck' => ($this->getInput('uncheck', 0) == 1),
+			'storage_idx' => $storage_idx,
+			'user_configs' => array_map(static fn (string $user_config) => json_decode($user_config, true),
+				CProfile::getArray($storage_idx, []))
 		];
 
 		$response = new CControllerResponseData($data);

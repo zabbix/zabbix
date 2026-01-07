@@ -16,7 +16,13 @@
 
 /**
  * @var CView $this
+ * @var array $data
  */
+
+$show_monitored_by = $data['filter']['monitored_by'] == ZBX_MONITORED_BY_ANY
+		|| $data['filter']['monitored_by'] == ZBX_MONITORED_BY_PROXY
+		|| $data['filter']['monitored_by'] == ZBX_MONITORED_BY_PROXY_GROUP;
+
 ?>
 
 <script type="text/x-jquery-tmpl" id="filter-tag-row-tmpl">
@@ -26,46 +32,58 @@
 <script>
 	const view = {
 		applied_filter_groupids: [],
+		datatable: null,
 
-		init({applied_filter_groupids, csrf_token}) {
+		/**
+		 * @param {array}  applied_filter_groupids
+		 * @param {string} csrf_token
+		 * @param {number} page
+		 * @param {Object} filter
+		 * @param {string} sort_field
+		 * @param {string} sort_order
+		 * @param {string} storage_idx
+		 * @param {array}  user_configs
+		 */
+		init({applied_filter_groupids, csrf_token, filter, page, sort_field, sort_order, storage_idx, user_configs}) {
 			this.applied_filter_groupids = applied_filter_groupids;
 			this.csrf_token = csrf_token;
 
 			this.initFilter();
 			this.initEvents();
 			this.initPopupListeners();
+			this.initDataTable({filter, page, sort_field, sort_order, storage_idx, user_configs});
 		},
 
-		enable(target, parameters) {
-			const curl = new Curl('zabbix.php');
-			curl.setArgument('action', 'host.enable');
+		enable(target, parameters, callback) {
+			const url_params = objectToSearchParams({action: 'host.enable'});
+			const url = new URL(`zabbix.php?${url_params}`, location.href);
 
-			target.classList.add('is-loading');
+			target.classList.add(ZBX_STYLE_LOADING);
 
-			this.postAction(curl, parameters)
-				.then(response => this.reload(response))
+			this.postAction(url.toString(), parameters)
+				.then(response => callback(response))
 				.catch(() => {
-					target.classList.remove('is-loading');
+					target.classList.remove(ZBX_STYLE_LOADING);
 					target.blur();
 				});
 		},
 
-		disable(target, parameters) {
-			const curl = new Curl('zabbix.php');
-			curl.setArgument('action', 'host.disable');
+		disable(target, parameters, callback) {
+			const url_params = objectToSearchParams({action: 'host.disable'});
+			const url = new URL(`zabbix.php?${url_params}`, location.href);
 
-			target.classList.add('is-loading');
+			target.classList.add(ZBX_STYLE_LOADING);
 
-			this.postAction(curl, parameters)
-				.then(response => this.reload(response))
+			this.postAction(url.toString(), parameters)
+				.then(response => callback(response))
 				.catch(() => {
-					target.classList.remove('is-loading');
+					target.classList.remove(ZBX_STYLE_LOADING);
 					target.blur();
 				});
 		},
 
-		postAction(curl, data) {
-			return fetch(curl.getUrl(), {
+		postAction(url, data) {
+			return fetch(url, {
 				method: 'POST',
 				headers: {'Content-Type': 'application/json'},
 				body: JSON.stringify({
@@ -122,7 +140,7 @@
 			});
 
 			$('#filter_monitored_by')
-				.on('change', function() {
+				.on('change', function () {
 					const filter_monitored_by = $('input[name=filter_monitored_by]:checked').val();
 
 					for (const field of document.querySelectorAll('.js-filter-proxyids')) {
@@ -155,15 +173,6 @@
 
 			const form = document.forms['hosts'];
 
-			form.addEventListener('click', e => {
-				if (e.target.classList.contains('js-enable-host')) {
-					this.enable(e.target, {hostids: [e.target.dataset.hostid]});
-				}
-				else if (e.target.classList.contains('js-disable-host')) {
-					this.disable(e.target, {hostids: [e.target.dataset.hostid]});
-				}
-			});
-
 			form.querySelector('.js-massenable-host').addEventListener('click', e => {
 				const hostids = Object.keys(chkbxRange.getSelectedIds());
 
@@ -172,7 +181,7 @@
 					: <?= json_encode(_('Enable selected host?')) ?>;
 
 				if (window.confirm(message)) {
-					this.enable(e.target, {hostids});
+					this.enable(e.target, {hostids}, this.reload);
 				}
 			});
 
@@ -184,7 +193,7 @@
 					: <?= json_encode(_('Disable selected host?')) ?>;
 
 				if (window.confirm(message)) {
-					this.disable(e.target, {hostids});
+					this.disable(e.target, {hostids}, this.reload);
 				}
 			});
 
@@ -231,6 +240,552 @@
 			});
 		},
 
+		initDataTable({filter, page, sort_field, sort_order, storage_idx, user_configs}) {
+			const data_provider_url = new URL('zabbix.php', location.href);
+			data_provider_url.searchParams.set('action', 'host.list.data');
+
+			const data_provider = new CDefaultDataProvider(data_provider_url.toString());
+
+			this.datatable = new CDataTable(document.getElementById('hosts'), data_provider)
+				.setColumns([
+					new CDataTableColumn('name', '<?= _('Name'); ?>')
+						.setFields(['hostid', 'name', 'discovery', 'flags', 'maintenance', 'status'])
+						.setRenderer('name')
+						.setSortable(true)
+						.setTogglable(false),
+					new CDataTableColumn('items', '<?= _('Items'); ?>')
+						.setFields(['hostid', 'items'])
+						.setRenderer('items'),
+					new CDataTableColumn('triggers', '<?= _('Triggers'); ?>')
+						.setFields(['hostid', 'triggers'])
+						.setRenderer('triggers'),
+					new CDataTableColumn('graphs', '<?= _('Graphs'); ?>')
+						.setFields(['hostid', 'graphs'])
+						.setRenderer('graphs'),
+					new CDataTableColumn('discovery', '<?= _('Discovery'); ?>')
+						.setFields(['hostid', 'discoveryRules'])
+						.setRenderer('discovery'),
+					new CDataTableColumn('web', '<?= _('Web'); ?>')
+						.setFields(['hostid', 'httpTests'])
+						.setRenderer('web'),
+					new CDataTableColumn('interface', '<?= _('Interface'); ?>')
+						.setFields(['interface']),
+					new CDataTableColumn('proxy', '<?= _('Proxy'); ?>')
+						.setFields(['monitored_by', 'proxyid', 'proxy_groupid', 'assigned_proxyid', 'proxy',
+							'proxy_group', 'assigned_proxy'])
+						.setRenderer('proxy')
+						.setVisible(<?= $show_monitored_by ? 'true' : 'false'; ?>)
+						.setTogglable(<?= !$show_monitored_by ? 'true' : 'false'; ?>),
+					new CDataTableColumn('templates', '<?= _('Templates'); ?>')
+						.setFields(['templates', 'parentTemplates'])
+						.setRenderer('templates'),
+					new CDataTableColumn('status', '<?= _('Status'); ?>')
+						.setFields(['hostid', 'status', 'disabled_by_lld', 'disable_source', 'flags',
+							'maintenance_status', 'discoveryData'])
+						.setRenderer('status')
+						.setSortable(true),
+					new CDataTableColumn('availability', '<?= _('Availability'); ?>')
+						.setFields(['availability']),
+					new CDataTableColumn('encryption', '<?= _('Agent encryption'); ?>')
+						.setFields(['tls_accept', 'tls_connect'])
+						.setRenderer('encryption'),
+					new CDataTableColumn('info', '<?= _('Info'); ?>')
+						.setFields(['info_icons'])
+						.setRenderer('info'),
+					new CDataTableColumnTags('tags', '<?= _('Tags');?>'),
+					new CDataTableColumnTagValue('tagvalue', '<?= _('Tag value');?>')
+				])
+				.setPage(page)
+				.setFilter(filter)
+				.setSelectable('hosts', 'hostids', ['hostid', 'data_actions'])
+				.setSortField(sort_field)
+				.setSortOrder(sort_order)
+				.setStorageIdx(storage_idx)
+				.setRenderer('name', ({column_data, cell_inner}) => {
+					const [hostid, name, discovery, flags, maintenance, status] = column_data;
+
+					if (flags == ZBX_FLAG_DISCOVERY_CREATED) {
+						if (discovery.rule) {
+							if (discovery.editable) {
+								const host_prototype_url = new URL('zabbix.php', location.href);
+								host_prototype_url.searchParams.set('action', 'popup');
+								host_prototype_url.searchParams.set('popup', 'host.prototype.edit');
+								host_prototype_url.searchParams.set('parent_discoveryid', discovery.rule.itemid);
+								host_prototype_url.searchParams.set('hostid', discovery.data.parent_hostid);
+								host_prototype_url.searchParams.set('context', 'host');
+
+								const discovery_rule_link = document.createElement('a');
+								discovery_rule_link.classList.add(ZBX_STYLE_LINK_ALT, ZBX_STYLE_ORANGE);
+								discovery_rule_link.setAttribute('href', host_prototype_url.toString());
+
+								cell_inner.appendChild(discovery_rule_link);
+							}
+							else {
+								const discovery_rule = document.createElement('span');
+								discovery_rule.classList.add(ZBX_STYLE_ORANGE);
+								discovery_rule.innerText = discovery.rule.name;
+
+								cell_inner.appendChild(discovery_rule);
+							}
+						}
+						else {
+							const discovery_rule = document.createElement('span');
+							discovery_rule.classList.add(ZBX_STYLE_ORANGE);
+							discovery_rule.innerText = '<?= _('Inaccessible discovery rule'); ?>';
+
+							cell_inner.appendChild(discovery_rule);
+						}
+
+						cell_inner.innerHTML += NAME_DELIMITER;
+					}
+
+					const url = new URL('zabbix.php', location.href);
+					url.searchParams.set('action', 'popup');
+					url.searchParams.set('popup', 'host.edit');
+					url.searchParams.set('hostid', hostid);
+
+					const edit_link = document.createElement('a');
+					edit_link.setAttribute('href', url.toString())
+					edit_link.innerText = name;
+
+					cell_inner.appendChild(edit_link);
+
+					if (maintenance && status == HOST_STATUS_MONITORED) {
+						if (maintenance.status == HOST_MAINTENANCE_STATUS_ON) {
+							let hint = `${maintenance.name} [${maintenance.type
+								? '<?= _('Maintenance without data collection'); ?>'
+								: '<?= _('Maintenance with data collection'); ?>'}]`;
+
+							if (maintenance.description != '') {
+								hint += "\n" + maintenance.description;
+							}
+
+							const maintenance_icon = document.createElement('button');
+							maintenance_icon.classList.add(ZBX_STYLE_BTN_ICON, ZBX_ICON_WRENCH_ALT_SMALL,
+								ZBX_STYLE_COLOR_WARNING, ZBX_STYLE_NO_INDENT);
+							maintenance_icon.setAttribute('type', 'button');
+							maintenance_icon.setAttribute('role', 'button');
+							maintenance_icon.setAttribute('data-hintbox-contents', hint);
+							maintenance_icon.setAttribute('data-hintbox', '1');
+
+							cell_inner.appendChild(maintenance_icon);
+						}
+						else {
+							const maintenance_icon = document.createElement('button');
+							maintenance_icon.classList.add(ZBX_STYLE_BTN_ICON, ZBX_ICON_WRENCH_ALT_SMALL,
+								ZBX_STYLE_COLOR_WARNING, ZBX_STYLE_NO_INDENT);
+							maintenance_icon.setAttribute('type', 'button');
+							maintenance_icon.setAttribute('role', 'button');
+							maintenance_icon.setAttribute('data-hintbox-contents', '<?= _('Inaccessible maintenance'); ?>');
+							maintenance_icon.setAttribute('data-hintbox', '1');
+
+							cell_inner.appendChild(maintenance_icon);
+						}
+					}
+				})
+				.setRenderer('items', ({column_data, cell_inner}) => {
+					const [hostid, items] = column_data;
+
+					const url = new URL('zabbix.php', location.href);
+					url.searchParams.set('action', 'item.list');
+					url.searchParams.set('filter_set', '1');
+					url.searchParams.set('filter_hostids[0]', hostid);
+					url.searchParams.set('context', 'host');
+
+					const item_link = document.createElement('a');
+					item_link.setAttribute('href', url.toString());
+					item_link.innerText = '<?= _('Items'); ?>';
+
+					cell_inner.appendChild(item_link);
+
+					if (items > 0) {
+						const count = document.createElement('sup');
+						count.innerText = items;
+
+						cell_inner.innerHTML += ' ';
+						cell_inner.appendChild(count);
+					}
+				})
+				.setRenderer('triggers', ({column_data, cell_inner}) => {
+					const [hostid, items] = column_data;
+
+					const url = new URL('zabbix.php', location.href);
+					url.searchParams.set('action', 'trigger.list');
+					url.searchParams.set('filter_set', '1');
+					url.searchParams.set('filter_hostids[0]', hostid);
+					url.searchParams.set('context', 'host');
+
+					const item_link = document.createElement('a');
+					item_link.setAttribute('href', url.toString());
+					item_link.innerText = '<?= _('Triggers'); ?>';
+
+					cell_inner.appendChild(item_link);
+
+					if (items > 0) {
+						const count = document.createElement('sup');
+						count.innerText = items;
+
+						cell_inner.innerHTML += ' ';
+						cell_inner.appendChild(count);
+					}
+				})
+				.setRenderer('graphs', ({column_data, cell_inner}) => {
+					const [hostid, items] = column_data;
+
+					const url = new URL('zabbix.php', location.href);
+					url.searchParams.set('action', 'graph.list');
+					url.searchParams.set('filter_set', '1');
+					url.searchParams.set('filter_hostids[0]', hostid);
+					url.searchParams.set('context', 'host');
+
+					const item_link = document.createElement('a');
+					item_link.setAttribute('href', url.toString());
+					item_link.innerText = '<?= _('Graphs'); ?>';
+
+					cell_inner.appendChild(item_link);
+
+					if (items > 0) {
+						const count = document.createElement('sup');
+						count.innerText = items;
+
+						cell_inner.innerHTML += ' ';
+						cell_inner.appendChild(count);
+					}
+				})
+				.setRenderer('discovery', ({column_data, cell_inner}) => {
+					const [hostid, items] = column_data;
+
+					const url = new URL('host_discovery.php', location.href);
+					url.searchParams.set('filter_set', '1');
+					url.searchParams.set('filter_hostids[0]', hostid);
+					url.searchParams.set('context', 'host');
+
+					const item_link = document.createElement('a');
+					item_link.setAttribute('href', url.toString());
+					item_link.innerText = '<?= _('Discovery'); ?>';
+
+					cell_inner.appendChild(item_link);
+
+					if (items > 0) {
+						const count = document.createElement('sup');
+						count.innerText = items;
+
+						cell_inner.innerHTML += ' ';
+						cell_inner.appendChild(count);
+					}
+				})
+				.setRenderer('web', ({column_data, cell_inner}) => {
+					const [hostid, items] = column_data;
+
+					const url = new URL('httpconf.php', location.href);
+					url.searchParams.set('filter_set', '1');
+					url.searchParams.set('filter_hostids[0]', hostid);
+					url.searchParams.set('context', 'host');
+
+					const item_link = document.createElement('a');
+					item_link.setAttribute('href', url.toString());
+					item_link.innerText = '<?= _('Web'); ?>';
+
+					cell_inner.appendChild(item_link);
+
+					if (items > 0) {
+						const count = document.createElement('sup');
+						count.innerText = items;
+
+						cell_inner.innerHTML += ' ';
+						cell_inner.appendChild(count);
+					}
+				})
+				.setRenderer('status', ({column_data, cell_inner}) => {
+					const [hostid, status, disabled_by_lld] = column_data;
+					const is_monitored = status == HOST_STATUS_MONITORED;
+
+					const status_link = document.createElement('a');
+					status_link.classList.add(ZBX_STYLE_LINK_ACTION, is_monitored ? ZBX_STYLE_GREEN : ZBX_STYLE_RED);
+					status_link.setAttribute('href', 'javascript:void(0);');
+					status_link.innerText = t(is_monitored ? 'Enabled' : 'Disabled');
+					status_link.addEventListener('click', event => {
+						event.preventDefault();
+
+						status_link.classList.add(ZBX_STYLE_LOADING);
+
+						const parameters = {hostids: [hostid]};
+						const callback = response => {
+							this.datatable.dispatchEvent(CDataTable.EVENT_INIT, {force_load: true});
+
+							CMessageHelper.clear(this.datatable.getElement());
+
+							if (response.error) {
+								const title = response.error.title ?? '';
+								CMessageHelper.error(this.datatable.getElement(), response.error.messages, title);
+							}
+							else {
+								const title = response.success.title ?? '';
+								CMessageHelper.success(this.datatable.getElement(), response.success.messages, title);
+							}
+						};
+
+						if (is_monitored) {
+							this.disable(status_link, parameters, callback);
+						}
+						else {
+							this.enable(status_link, parameters, callback);
+						}
+					});
+
+					cell_inner.appendChild(status_link);
+
+					if (disabled_by_lld != 0) {
+						const description_icon = document.createElement('button');
+						description_icon.classList.add('btn-icon', ZBX_ICON_ALERT_WITH_CONTENT, 'hintbox-wrap');
+						description_icon.setAttribute('role', 'button');
+						description_icon.setAttribute('data-content', '?');
+						description_icon.setAttribute('data-hintbox-contents', t('Disabled automatically by an LLD rule.'));
+						description_icon.setAttribute('data-hintbox', '1');
+
+						cell_inner.innerHTML += ' ';
+						cell_inner.appendChild(description_icon);
+					}
+				})
+				.setRenderer('proxy', ({column_data, cell_inner}) => {
+					const [monitored_by, proxyid, proxy_groupid, assigned_proxyid, proxy, proxy_group,
+						assigned_proxy] = column_data;
+
+					if (!monitored_by) {
+						return;
+					}
+
+					const {can_edit_proxies, can_edit_proxy_groups} = this.datatable.getDataProvider().getLastResponse();
+
+					const proxy_url = new URL('zabbix.php', location.href);
+					proxy_url.searchParams.set('action', 'popup');
+					proxy_url.searchParams.set('popup', 'proxy.edit');
+
+					if (monitored_by == ZBX_MONITORED_BY_PROXY) {
+						if (can_edit_proxies) {
+							proxy_url.searchParams.set('proxyid', proxyid);
+
+							const proxy_link = document.createElement('a');
+							proxy_link.setAttribute('href', proxy_url.toString());
+							proxy_link.classList.add(ZBX_STYLE_LINK_ALT);
+							proxy_link.classList.add(ZBX_STYLE_GREY);
+							proxy_link.innerText = proxy.name;
+
+							cell_inner.appendChild(proxy_link);
+						}
+						else {
+							cell_inner.innerHTML = proxy.name;
+						}
+					}
+					else if (monitored_by == ZBX_MONITORED_BY_PROXY_GROUP) {
+						if (can_edit_proxy_groups) {
+							const proxy_group_url = new URL('zabbix.php', location.href);
+							proxy_group_url.searchParams.set('action', 'popup');
+							proxy_group_url.searchParams.set('popup', 'proxygroup.edit');
+							proxy_group_url.searchParams.set('proxy_groupid', proxy_groupid);
+
+							const proxy_group_link = document.createElement('a');
+							proxy_group_link.setAttribute('href', proxy_group_url.toString());
+							proxy_group_link.classList.add(ZBX_STYLE_LINK_ALT);
+							proxy_group_link.classList.add(ZBX_STYLE_GREY);
+							proxy_group_link.innerText = proxy_group.name;
+
+							cell_inner.appendChild(proxy_group_link);
+						}
+						else {
+							cell_inner.innerHTML = proxy_group.name;
+						}
+
+						if (assigned_proxyid != 0) {
+							cell_inner.innerHTML += NAME_DELIMITER;
+
+							if (can_edit_proxies) {
+								proxy_url.searchParams.set('proxyid', assigned_proxyid);
+
+								const proxy_link = document.createElement('a');
+								proxy_link.setAttribute('href', proxy_url.toString());
+								proxy_link.classList.add(ZBX_STYLE_LINK_ALT);
+								proxy_link.classList.add(ZBX_STYLE_GREY);
+								proxy_link.innerText = assigned_proxy.name;
+
+								cell_inner.appendChild(proxy_link);
+							}
+							else {
+								cell_inner.innerHTML += assigned_proxy.name;
+							}
+						}
+					}
+				})
+				.setRenderer('templates', ({column_data, cell_inner}) => {
+					const [templates] = column_data;
+					const {max_in_table} = this.datatable.getDataProvider().getLastResponse();
+					const max_in_table_exceeded = templates.length > max_in_table;
+					const visible_templates = Object.values(templates).slice(0, max_in_table);
+
+					visible_templates.forEach(({templateid, name, parentTemplates, editable}, i) => {
+						const element = editable ? document.createElement('a') : document.createElement('span');
+
+						if (editable) {
+							const url = new URL('zabbix.php', location.href);
+							url.searchParams.set('action', 'popup');
+							url.searchParams.set('popup', 'template.edit');
+							url.searchParams.set('templateid', templateid);
+
+							element.classList.add(ZBX_STYLE_LINK_ALT);
+							element.setAttribute('href', url.toString());
+						}
+
+						element.classList.add('grey');
+						element.innerText = name;
+
+						cell_inner.appendChild(element);
+
+						if (parentTemplates.length > 0) {
+							cell_inner.innerHTML += ' (';
+
+							parentTemplates.forEach(({templateid, name, editable}, j) => {
+								const element = editable ? document.createElement('a') : document.createElement('span');
+
+								if (editable) {
+									const url = new URL('zabbix.php', location.href);
+									url.searchParams.set('action', 'popup');
+									url.searchParams.set('popup', 'template.edit');
+									url.searchParams.set('templateid', templateid);
+
+									element.classList.add(ZBX_STYLE_LINK_ALT);
+									element.setAttribute('href', url.toString());
+								}
+
+								element.classList.add('grey');
+								element.innerText = name;
+
+								cell_inner.appendChild(element);
+
+								if (j < parentTemplates.length - 1) {
+									cell_inner.innerHTML += ', ';
+								}
+							});
+
+							cell_inner.innerHTML += ')';
+						}
+
+						if (i < visible_templates.length - 1) {
+							cell_inner.innerHTML += ', ';
+						}
+					});
+
+					if (max_in_table_exceeded) {
+						cell_inner.innerHTML += ' &hellip;';
+					}
+				})
+				.setRenderer('info', ({column_data, cell_inner}) => {
+					const [info_icons] = column_data;
+
+					const info = document.createElement('div');
+					info.classList.add(ZBX_STYLE_REL_CONTAINER);
+
+					info_icons.forEach(icon => info.innerHTML += icon);
+
+					cell_inner.appendChild(info);
+				})
+				.setRenderer('encryption', ({column_data, cell_inner}) => {
+					const [tls_accept, tls_connect] = column_data;
+
+					if (tls_connect == HOST_ENCRYPTION_NONE
+						&& (tls_accept & HOST_ENCRYPTION_NONE) == HOST_ENCRYPTION_NONE
+						&& (tls_accept & HOST_ENCRYPTION_PSK) != HOST_ENCRYPTION_PSK
+						&& (tls_accept & HOST_ENCRYPTION_CERTIFICATE) != HOST_ENCRYPTION_CERTIFICATE) {
+
+						const none = document.createElement('span');
+						none.classList.add(ZBX_STYLE_STATUS_GREEN);
+						none.innerText = t('None');
+
+						const encryption = document.createElement('div');
+						encryption.classList.add(ZBX_STYLE_STATUS_CONTAINER);
+						encryption.appendChild(none);
+
+						cell_inner.appendChild(encryption);
+					}
+					else {
+						const in_encryption = document.createElement('span');
+						in_encryption.classList.add(ZBX_STYLE_STATUS_GREEN);
+
+						// Incoming encryption.
+						if (tls_connect == HOST_ENCRYPTION_NONE) {
+							in_encryption.innerText = t('None');
+						}
+						else if (tls_connect == HOST_ENCRYPTION_PSK) {
+							in_encryption.innerText = t('PSK');
+						}
+						else {
+							in_encryption.innerText = t('CERT');
+						}
+
+						in_encryption.classList.add('in');
+
+						const out_encryption = document.createElement('span');
+						out_encryption.classList.add('out');
+
+						const none = document.createElement('span');
+						none.innerText = t('None');
+
+						if ((tls_accept & HOST_ENCRYPTION_NONE) == HOST_ENCRYPTION_NONE) {
+							none.classList.add(ZBX_STYLE_STATUS_GREEN);
+						}
+						else {
+							none.classList.add(ZBX_STYLE_STATUS_GREY);
+						}
+
+						out_encryption.appendChild(none);
+
+						const psk = document.createElement('span');
+						psk.innerText = t('PSK');
+
+						if ((tls_accept & HOST_ENCRYPTION_PSK) == HOST_ENCRYPTION_PSK) {
+							psk.classList.add(ZBX_STYLE_STATUS_GREEN);
+						}
+						else {
+							psk.classList.add(ZBX_STYLE_STATUS_GREY);
+						}
+
+						out_encryption.appendChild(psk);
+
+						const cert = document.createElement('span');
+						cert.innerText = t('CERT');
+
+						if ((tls_accept & HOST_ENCRYPTION_CERTIFICATE) == HOST_ENCRYPTION_CERTIFICATE) {
+							cert.classList.add(ZBX_STYLE_STATUS_GREEN);
+						}
+						else {
+							cert.classList.add(ZBX_STYLE_STATUS_GREY);
+						}
+
+						out_encryption.appendChild(cert);
+
+						const encryption = document.createElement('div');
+						encryption.classList.add(ZBX_STYLE_STATUS_CONTAINER, ZBX_STYLE_NOWRAP);
+						encryption.appendChild(in_encryption);
+						encryption.innerHTML += ' ';
+						encryption.appendChild(out_encryption);
+
+						cell_inner.appendChild(encryption);
+					}
+				})
+				.on(CMessageHelper.EVENT_MESSAGE, event => {
+					event.stopPropagation();
+
+					const {type, title, messages} = event.detail;
+
+					if (type == 'clear') {
+						clearMessages();
+					}
+					else {
+						addMessage(makeMessageBox(type, messages, title));
+					}
+				})
+				.init(user_configs);
+		},
+
 		massDeleteHosts(button) {
 			const confirm_text = Object.keys(chkbxRange.getSelectedIds()).length > 1
 				? <?= json_encode(_('Delete selected hosts?')) ?>
@@ -242,11 +797,11 @@
 
 			button.classList.add('is-loading');
 
-			const curl = new Curl('zabbix.php');
-			curl.setArgument('action', 'host.massdelete');
-			curl.setArgument(CSRF_TOKEN_NAME, this.csrf_token);
+			const url = new URL('zabbix.php', location.href);
+			url.searchParams.set('action', 'host.massdelete');
+			url.searchParams.set(CSRF_TOKEN_NAME, this.csrf_token);
 
-			fetch(curl.getUrl(), {
+			fetch(url.toString(), {
 				method: 'POST',
 				headers: {'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'},
 				body: urlEncodeData({hostids: Object.keys(chkbxRange.getSelectedIds())})

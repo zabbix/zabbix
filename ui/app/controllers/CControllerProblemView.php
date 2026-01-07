@@ -36,18 +36,9 @@ class CControllerProblemView extends CControllerProblem {
 			'inventory' =>				'array',
 			'evaltype' =>				'in '.TAG_EVAL_TYPE_AND_OR.','.TAG_EVAL_TYPE_OR,
 			'tags' =>					'array',
-			'show_tags' =>				'in '.SHOW_TAGS_NONE.','.SHOW_TAGS_1.','.SHOW_TAGS_2.','.SHOW_TAGS_3,
 			'show_symptoms' =>			'in 0,1',
-			'show_suppressed' =>		'in 0,1',
 			'acknowledgement_status' =>	'in '.ZBX_ACK_STATUS_ALL.','.ZBX_ACK_STATUS_UNACK.','.ZBX_ACK_STATUS_ACK,
 			'acknowledged_by_me' =>		'in 0,1',
-			'compact_view' =>			'in 0,1',
-			'show_timeline' =>			'in '.ZBX_TIMELINE_OFF.','.ZBX_TIMELINE_ON,
-			'details' =>				'in 0,1',
-			'highlight_row' =>			'in '.ZBX_HIGHLIGHT_OFF.','.ZBX_HIGHLIGHT_ON,
-			'show_opdata' =>			'in '.OPERATIONAL_DATA_SHOW_NONE.','.OPERATIONAL_DATA_SHOW_SEPARATELY.','.OPERATIONAL_DATA_SHOW_WITH_PROBLEM,
-			'tag_name_format' =>		'in '.TAG_NAME_FULL.','.TAG_NAME_SHORTENED.','.TAG_NAME_NONE,
-			'tag_priority' =>			'string',
 			'from' =>					'range_time',
 			'to' =>						'range_time',
 			'sort' =>					'in clock,host,severity,name',
@@ -109,16 +100,10 @@ class CControllerProblemView extends CControllerProblem {
 		$filter = $filter_tabs[$profile->selected];
 		$filter = self::sanitizeFilter($filter);
 
-		$refresh_curl = new CUrl('zabbix.php');
-		$filter['action'] = 'problem.view.refresh';
-		array_map([$refresh_curl, 'setArgument'], array_keys($filter), $filter);
-
-		if (!$this->hasInput('page')) {
-			$refresh_curl->removeArgument('page');
-		}
-
 		$timeselector_from = $filter['filter_custom_time'] == 1 ? $filter['from'] : $profile->from;
 		$timeselector_to = $filter['filter_custom_time'] == 1 ? $filter['to'] : $profile->to;
+
+		$storage_idx = static::FILTER_IDX.'.datatable';
 
 		$data = [
 			'action' => $this->getAction(),
@@ -141,21 +126,20 @@ class CControllerProblemView extends CControllerProblem {
 				] + getTimeselectorActions($timeselector_from, $timeselector_to)
 			],
 			'filter_tabs' => $filter_tabs,
-			'refresh_url' => $refresh_curl->getUrl(),
 			'refresh_interval' => CWebUser::getRefresh() * 1000,
 			'inventories' => array_column(getHostInventories(), 'title', 'db_field'),
 			'sort' => $filter['sort'],
 			'sortorder' => $filter['sortorder'],
 			'uncheck' => $this->hasInput('filter_reset'),
-			'page' => $this->getInput('page', 1)
+			'page' => $this->getInput('page', 1),
+			'severities' => CSeverityHelper::getSeverities(),
+			'storage_idx' => $storage_idx,
+			'user_configs' => array_map(static fn (string $user_config) => json_decode($user_config, true),
+				CProfile::getArray($storage_idx, []))
 		];
 
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Problems'));
-
-		if ($data['action'] === 'problem.view.csv') {
-			$response->setFileName('zbx_problems_export.csv');
-		}
 
 		$this->setResponse($response);
 	}

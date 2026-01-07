@@ -161,24 +161,6 @@ $tag_format_line = (new CHorList())
 $right_column = (new CFormGrid())
 	->addClass(CFormGrid::ZBX_STYLE_FORM_GRID_LABEL_WIDTH_TRUE)
 	->addItem([
-		new CLabel(_('Tags')),
-		new CFormField($filter_tags_table)
-	])
-	->addItem([
-		new CLabel(_('Show tags')),
-		new CFormField($tag_format_line)
-	])
-	->addItem([
-		new CLabel(_('Tag display priority'), 'tag_priority_#{uniqid}'),
-		new CFormField(
-			(new CTextBox('tag_priority', $data['tag_priority']))
-				->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
-				->setAttribute('placeholder', _('comma-separated list'))
-				->setEnabled((int) $data['show_tags'] !== SHOW_TAGS_NONE)
-				->setId('tag_priority_#{uniqid}')
-		)
-	])
-	->addItem([
 		new CLabel(_('State'), 'state_#{uniqid}'),
 		new CFormField(
 			(new CRadioButtonList('state', (int) $data['state']))
@@ -188,14 +170,6 @@ $right_column = (new CFormGrid())
 				->setModern()
 				->setId('state_#{uniqid}')
 		)
-	])
-	->addItem([
-		new CLabel(_('Show details'), 'show_details'),
-		new CFormField([
-			(new CCheckBox('show_details'))
-				->setChecked($data['show_details'] == 1)
-				->setUncheckedValue(0)
-		])
 	]);
 
 $filter_template = (new CDiv())

@@ -67,16 +67,62 @@ $html_page
 	->addItem(
 		(new CForm())
 			->setName('host_view')
-			->addClass('is-loading')
+			->addItem((new CDiv())->setId('hosts'))
 	)
+	->show();
+
+(new CTemplateTag('problems'))
+	->addItem([
+		new CFormField(
+			(new CCheckBox('show_suppressed'))
+				->setLabel(_('Show suppressed problems'))
+				->setLabelPosition(CCheckBox::LABEL_POSITION_RIGHT)
+		)
+	])
+	->show();
+
+(new CTemplateTag('tags'))
+	->addItem([
+		(new CLabel(_('Number of tags'), 'number_of_tags'))
+			->addClass('form-label'),
+		new CFormField(
+			(new CRadioButtonList('number_of_tags'))
+				->setValues([
+					['name' => SHOW_TAGS_1, 'value' => SHOW_TAGS_1],
+					['name' => SHOW_TAGS_2, 'value' => SHOW_TAGS_2],
+					['name' => SHOW_TAGS_3, 'value' => SHOW_TAGS_3],
+				])
+				->setModern(),
+		),
+		(new CLabel(_('Tag name display'), 'tag_name_display'))
+			->addClass('form-label'),
+		new CFormField(
+			(new CRadioButtonList('tag_name_display'))
+				->setValues([
+					['name' => _('Full'), 'value' => TAG_NAME_FULL],
+					['name' => _('Shortened'), 'value' => TAG_NAME_SHORTENED],
+					['name' => _('None'), 'value' => TAG_NAME_NONE],
+				])
+				->setModern(),
+		),
+		(new CLabel(_('Tag display priority'), 'tag_display_priority'))
+			->addClass('form-label'),
+		new CFormField(new CTextBox('tag_display_priority')),
+	])
 	->show();
 
 (new CScriptTag('
 	view.init('.json_encode([
 		'filter_options' => $data['filter_options'],
-		'refresh_url' => $data['refresh_url'],
 		'refresh_interval' => $data['refresh_interval'],
-		'applied_filter_groupids' => $data['filter_groupids']
+		'applied_filter_groupids' => $data['filter_groupids'],
+		'filter_defaults' => $data['filter_defaults'],
+		'filter' => $data['filter'],
+		'page' => $data['tabfilter_options']['page'],
+		'sort_field' => $data['sort_field'],
+		'sort_order' => $data['sort_order'],
+		'storage_idx' => $data['storage_idx'],
+		'user_configs' => $data['user_configs'],
 	]).');
 '))
 	->setOnDocumentReady()

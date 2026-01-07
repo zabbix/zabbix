@@ -138,16 +138,7 @@ $right_column = (new CFormList())
 		(new CCheckBox('maintenance_status'))
 			->setChecked($data['maintenance_status'] == HOST_MAINTENANCE_STATUS_ON)
 			->setId('maintenance_status_#{uniqid}')
-			->setUncheckedValue(HOST_MAINTENANCE_STATUS_OFF),
-		(new CDiv([
-			(new CLabel(_('Show suppressed problems'), 'show_suppressed_#{uniqid}'))
-				->addClass(ZBX_STYLE_SECOND_COLUMN_LABEL),
-			(new CCheckBox('show_suppressed'))
-				->setId('show_suppressed_#{uniqid}')
-				->setChecked($data['show_suppressed'] == ZBX_PROBLEM_SUPPRESSED_TRUE)
-				->setUncheckedValue(ZBX_PROBLEM_SUPPRESSED_FALSE)
-				->setEnabled($data['maintenance_status'] == HOST_MAINTENANCE_STATUS_ON)
-		]))->addClass(ZBX_STYLE_TABLE_FORMS_SECOND_COLUMN)
+			->setUncheckedValue(HOST_MAINTENANCE_STATUS_OFF)
 	]);
 
 $template = (new CDiv())

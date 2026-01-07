@@ -23,7 +23,7 @@ class CControllerLatestView extends CControllerLatest {
 		$this->disableCsrfValidation();
 	}
 
-	protected function checkInput() {
+	protected function checkInput(): bool {
 		$fields = [
 			// filter fields
 			'groupids' =>				'array_db hosts_groups.groupid',
@@ -153,10 +153,6 @@ class CControllerLatestView extends CControllerLatest {
 		$mandatory_filter_set = self::isMandatoryFilterFieldSet($filter);
 		$subfilter_set = self::isSubfilterSet($filter);
 
-		$refresh_curl = new CUrl('zabbix.php');
-		$refresh_curl_params = ['action' => 'latest.view.refresh'] + $filter;
-		array_map([$refresh_curl, 'setArgument'], array_keys($refresh_curl_params), $refresh_curl_params);
-
 		// data sort and pager
 		$sort_field = $this->getInput('sort', 'name');
 		$sort_order = $this->getInput('sortorder', ZBX_SORT_UP);
@@ -208,11 +204,11 @@ class CControllerLatestView extends CControllerLatest {
 			'page' => $this->hasInput('page') ? $this->getInput('page') : null
 		]);
 
+		$storage_idx = self::FILTER_IDX.'.datatable';
+
 		// display
 		$data = [
-			'refresh_url' => $refresh_curl->getUrl(),
 			'refresh_interval' => CWebUser::getRefresh() * 1000,
-			'refresh_data' => $refresh_data,
 			'filter_defaults' => $profile->filter_defaults,
 			'mandatory_filter_set' => $mandatory_filter_set,
 			'subfilter_set' => $subfilter_set,
@@ -233,6 +229,9 @@ class CControllerLatestView extends CControllerLatest {
 			'view_curl' => $view_url,
 			'paging' => $paging,
 			'uncheck' => $this->hasInput('filter_reset'),
+			'storage_idx' => $storage_idx,
+			'user_configs' => array_map(static fn (string $user_config) => json_decode($user_config, true),
+				CProfile::getArray($storage_idx, [])),
 			'config' => [
 				'hk_trends' => CHousekeepingHelper::get(CHousekeepingHelper::HK_TRENDS),
 				'hk_trends_global' => CHousekeepingHelper::get(CHousekeepingHelper::HK_TRENDS_GLOBAL),

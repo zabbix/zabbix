@@ -123,184 +123,9 @@ $html_page->addItem($filter);
 $form = (new CForm())
 	->setName('templates');
 
-// Create table.
-$table = (new CTableInfo())
-	->setHeader([
-		(new CColHeader(
-			(new CCheckBox('all_templates'))->onClick("checkAll('".$form->getName()."', 'all_templates', 'templates');")
-		))->addClass(ZBX_STYLE_CELL_WIDTH),
-		make_sorting_header(_('Name'), 'name', $data['sort_field'], $data['sort_order'], $action_url->getUrl()),
-		_('Hosts'),
-		_('Items'),
-		_('Triggers'),
-		_('Graphs'),
-		_('Dashboards'),
-		_('Discovery'),
-		_('Web'),
-		_('Vendor'),
-		_('Version'),
-		_('Linked templates'),
-		_('Linked to templates'),
-		_('Tags')
-	])
-	->setPageNavigation($data['paging']);
-
-foreach ($data['templates'] as $template) {
-	$template_url = (new CUrl('zabbix.php'))
-		->setArgument('action', 'popup')
-		->setArgument('popup', 'template.edit')
-		->setArgument('templateid', $template['templateid'])
-		->getUrl();
-
-	$name = new CLink($template['name'], $template_url);
-
-	$linked_templates_output = [];
-	$linked_to_output = [];
-
-	$i = 0;
-	foreach ($template['parentTemplates'] as $parent_template) {
-		$i++;
-
-		if ($i > $data['config']['max_in_table']) {
-			$linked_templates_output[] = [' ', HELLIP()];
-
-			break;
-		}
-
-		if ($linked_templates_output) {
-			$linked_templates_output[] = ', ';
-		}
-
-		if (array_key_exists($parent_template['templateid'], $data['editable_templates'])) {
-			$linked_template_url = (new CUrl('zabbix.php'))
-				->setArgument('action', 'popup')
-				->setArgument('popup', 'template.edit')
-				->setArgument('templateid', $parent_template['templateid'])
-				->getUrl();
-
-			$linked_templates_output[] = (new CLink($parent_template['name'], $linked_template_url))
-				->addClass(ZBX_STYLE_LINK_ALT)
-				->addClass(ZBX_STYLE_GREY);
-		}
-		else {
-			$linked_templates_output[] = (new CSpan($parent_template['name']))
-				->addClass(ZBX_STYLE_GREY);
-		}
-	}
-
-	$i = 0;
-	foreach ($template['templates'] as $child_template) {
-		$i++;
-
-		if ($i > $data['config']['max_in_table']) {
-			$linked_to_output[] = [' ', HELLIP()];
-
-			break;
-		}
-
-		if ($linked_to_output) {
-			$linked_to_output[] = ', ';
-		}
-
-		if (array_key_exists($child_template['templateid'], $data['editable_templates'])) {
-			$linked_to_url = (new CUrl('zabbix.php'))
-				->setArgument('action', 'popup')
-				->setArgument('popup', 'template.edit')
-				->setArgument('templateid', $child_template['templateid'])
-				->getUrl();
-
-			$linked_to_output[] = (new CLink($child_template['name'], $linked_to_url))
-				->addClass(ZBX_STYLE_LINK_ALT)
-				->addClass(ZBX_STYLE_GREY);
-		}
-		else {
-			$linked_to_output[] = (new CSpan($child_template['name']))
-				->addClass(ZBX_STYLE_GREY);
-		}
-	}
-
-	$table->addRow([
-		new CCheckBox('templates['.$template['templateid'].']', $template['templateid']),
-		(new CCol($name))->addClass(ZBX_STYLE_NOWRAP),
-		[
-			$data['allowed_ui_conf_hosts']
-				? new CLink(_('Hosts'),
-					(new CUrl('zabbix.php'))
-						->setArgument('action', 'host.list')
-						->setArgument('filter_set', '1')
-						->setArgument('filter_templates', [$template['templateid']])
-				)
-				: _('Hosts'),
-			CViewHelper::showNum(count(array_intersect_key($template['hosts'], $data['editable_hosts'])))
-		],
-		[
-			new CLink(_('Items'),
-				(new CUrl('zabbix.php'))
-					->setArgument('action', 'item.list')
-					->setArgument('filter_set', '1')
-					->setArgument('filter_hostids', [$template['templateid']])
-					->setArgument('context', 'template')
-			),
-			CViewHelper::showNum($template['items'])
-		],
-		[
-			new CLink(_('Triggers'),
-				(new CUrl('zabbix.php'))
-					->setArgument('action', 'trigger.list')
-					->setArgument('filter_set', '1')
-					->setArgument('filter_hostids', [$template['templateid']])
-					->setArgument('context', 'template')
-			),
-			CViewHelper::showNum($template['triggers'])
-		],
-		[
-			new CLink(_('Graphs'),
-				(new CUrl('zabbix.php'))
-					->setArgument('action', 'graph.list')
-					->setArgument('filter_set', '1')
-					->setArgument('filter_hostids', [$template['templateid']])
-					->setArgument('context', 'template')
-			),
-			CViewHelper::showNum($template['graphs'])
-		],
-		[
-			new CLink(_('Dashboards'),
-				(new CUrl('zabbix.php'))
-					->setArgument('action', 'template.dashboard.list')
-					->setArgument('templateid', $template['templateid'])
-					->setArgument('context', 'template')
-			),
-			CViewHelper::showNum($template['dashboards'])
-		],
-		[
-			new CLink(_('Discovery'),
-				(new CUrl('host_discovery.php'))
-					->setArgument('filter_set', '1')
-					->setArgument('filter_hostids', [$template['templateid']])
-					->setArgument('context', 'template')
-			),
-			CViewHelper::showNum($template['discoveryRules'])
-		],
-		[
-			new CLink(_('Web'),
-				(new CUrl('httpconf.php'))
-					->setArgument('filter_set', '1')
-					->setArgument('filter_hostids', [$template['templateid']])
-					->setArgument('context', 'template')
-			),
-			CViewHelper::showNum($template['httpTests'])
-		],
-		$template['vendor_name'],
-		$template['vendor_version'],
-		$linked_templates_output,
-		$linked_to_output,
-		(new CDiv($data['tags'][$template['templateid']]))->addClass(ZBX_STYLE_TAGS_WRAPPER)
-	]);
-}
-
 $form->addItem([
-	$table,
-	new CActionButtonList('action', 'templates', [
+	(new CDiv())->setId('templates'),
+	(new CActionButtonList('action', 'templates', [
 		'template.export' => [
 			'content' => new CButtonExport('export.templates',
 				(new CUrl('zabbix.php'))
@@ -327,13 +152,53 @@ $form->addItem([
 				->addClass('js-massdelete-clear')
 				->addClass('js-no-chkbxrange')
 		]
-	], 'templates')
+	], 'templates'))
+		->setAddSelectedCountElement(false)
 ]);
 
 $html_page
 	->addItem($form)
 	->show();
 
-(new CScriptTag('view.init();'))
+(new CTemplateTag('tags'))
+	->addItem([
+		(new CLabel(_('Number of tags'), 'number_of_tags'))
+			->addClass('form-label'),
+		new CFormField(
+			(new CRadioButtonList('number_of_tags'))
+				->setValues([
+					['name' => SHOW_TAGS_1, 'value' => SHOW_TAGS_1],
+					['name' => SHOW_TAGS_2, 'value' => SHOW_TAGS_2],
+					['name' => SHOW_TAGS_3, 'value' => SHOW_TAGS_3],
+				])
+				->setModern(),
+		),
+		(new CLabel(_('Tag name display'), 'tag_name_display'))
+			->addClass('form-label'),
+		new CFormField(
+			(new CRadioButtonList('tag_name_display'))
+				->setValues([
+					['name' => _('Full'), 'value' => TAG_NAME_FULL],
+					['name' => _('Shortened'), 'value' => TAG_NAME_SHORTENED],
+					['name' => _('None'), 'value' => TAG_NAME_NONE],
+				])
+				->setModern(),
+		),
+		(new CLabel(_('Tag display priority'), 'tag_display_priority'))
+			->addClass('form-label'),
+		new CFormField(new CTextBox('tag_display_priority')),
+	])
+	->show();
+
+(new CScriptTag('
+	view.init('.json_encode([
+		'filter' => $data['filter'],
+		'page' => $data['page'],
+		'sort_field' => $data['sort_field'],
+		'sort_order' => $data['sort_order'],
+		'storage_idx' => $data['storage_idx'],
+		'user_configs' => $data['user_configs'],
+	]).');
+'))
 	->setOnDocumentReady()
 	->show();

@@ -16,17 +16,22 @@
 /*
  * Automatic checkbox range selection
  */
-var chkbxRange = {
+const chkbxRange = {
 	startbox:			null,	// start checkbox obj
 	chkboxes:			{},		// ckbx list
 	prefix:				null,	// prefix for session storage variable name
-	pageGoName:			null,	// which checkboxes should be counted by Go button and saved to session storage
+	pageGoName:			null,	// which checkboxes should be counted by the Go button and saved to session storage
 	sessionStorageName:	null,
-	event_handlers:     null,
+	event_handlers:		null,
+	selector: 			null,
+	row_selector:		null,
 
-	init: function() {
-		var path = new Curl();
-		var filename = basename(path.getPath(), '.php');
+	init: function({selector = 'main .list-table tbody', row_selector = 'tr'} = {}) {
+		this.selector = selector;
+		this.row_selector = row_selector;
+
+		const path = new Curl();
+		const filename = basename(path.getPath(), '.php');
 		this.sessionStorageName = 'cb_' + filename + (this.prefix ? '_' + this.prefix : '');
 		// Erase old checkboxes.
 		this.chkboxes = {};
@@ -35,9 +40,9 @@ var chkbxRange = {
 		this.resetOtherPage();
 
 		// initialize checkboxes
-		var chkboxes = jQuery('.list-table tbody input[type=checkbox]:not(:disabled)');
+		const chkboxes = jQuery(`${this.selector} input[type=checkbox]:not(:disabled)`);
 		if (chkboxes.length > 0) {
-			for (var i = 0; i < chkboxes.length; i++) {
+			for (let i = 0; i < chkboxes.length; i++) {
 				this.implement(chkboxes[i]);
 			}
 		}
@@ -46,14 +51,16 @@ var chkbxRange = {
 		if (this.pageGoName != null) {
 			const selected_ids = this.getSelectedIds();
 
+			let objectIds;
 			// check if checkboxes should be selected from session storage
 			if (!jQuery.isEmptyObject(selected_ids)) {
-				var objectIds = Object.keys(selected_ids);
+				objectIds = Object.keys(selected_ids);
 			}
-			// no checkboxes selected, check browser cache if checkboxes are still checked and update state
+			// no checkboxes selected, check the browser cache if checkboxes are still checked and update state
 			else {
-				var checkedFromCache = jQuery('main .list-table tbody input[type=checkbox]:checked:not(:disabled)');
-				var objectIds = jQuery.map(checkedFromCache, jQuery.proxy(function(checkbox) {
+				const checkedFromCache = jQuery(`${this.selector} input[type=checkbox]:checked:not(:disabled)`);
+
+				objectIds = jQuery.map(checkedFromCache, jQuery.proxy(function(checkbox) {
 					return this.getObjectIdFromName(checkbox.name);
 				}, this));
 			}
@@ -79,7 +86,7 @@ var chkbxRange = {
 			return;
 		}
 
-		var objName = this.getObjectFromName(obj.name);
+		const objName = this.getObjectFromName(obj.name);
 
 		if (typeof(this.chkboxes[objName]) === 'undefined') {
 			this.chkboxes[objName] = [];
@@ -89,7 +96,7 @@ var chkbxRange = {
 		addListener(obj, 'click', this.handleClick.bindAsEventListener(this), false);
 
 		if (objName == this.pageGoName) {
-			var objId = jQuery(obj).val();
+			const objId = jQuery(obj).val();
 			if (isset(objId, this.getSelectedIds())) {
 				obj.checked = true;
 			}
@@ -108,12 +115,12 @@ var chkbxRange = {
 	 * @param e
 	 */
 	handleClick: function(e) {
-		var checkbox = e.target;
+		const checkbox = e.target;
 
 		PageRefresh.restart();
 
-		var object = this.getObjectFromName(checkbox.name);
-		var objectId = this.getObjectIdFromName(checkbox.name);
+		const object = this.getObjectFromName(checkbox.name);
+		const objectId = this.getObjectIdFromName(checkbox.name);
 
 		// range selection
 		if ((e.ctrlKey || e.shiftKey) && this.startbox != null) {
@@ -148,7 +155,7 @@ var chkbxRange = {
 	 * @returns {string}
 	 */
 	getObjectIdFromName: function(name) {
-		var id = name.split('[')[1];
+		let id = name.split('[')[1];
 		id = id.substring(0, id.lastIndexOf(']'));
 
 		return id;
@@ -157,7 +164,7 @@ var chkbxRange = {
 	/**
 	 * Returns the checkboxes in an object group.
 	 *
-	 * @param string object
+	 * @param {string} object
 	 *
 	 * @returns {Array}
 	 */
@@ -168,7 +175,7 @@ var chkbxRange = {
 	/**
 	 * Toggle all checkboxes of the given objects.
 	 *
-	 * Checks all of the checkboxes that belong to these objects and highlights the table row.
+	 * Checks all the checkboxes that belong to these objects and highlights the table row.
 	 *
 	 * @param {string}   object
 	 * @param {Array}    objectIds     array of objects IDs as integers
@@ -178,14 +185,14 @@ var chkbxRange = {
 		const selected_ids = this.getSelectedIds();
 
 		jQuery.each(this.getObjectCheckboxes(object), jQuery.proxy(function(i, checkbox) {
-			var objectId = this.getObjectIdFromName(checkbox.name);
+			const objectId = this.getObjectIdFromName(checkbox.name);
 
 			if (objectIds.indexOf(objectId) > -1) {
 				checkbox.checked = checked;
 
-				jQuery(checkbox).closest('tr').toggleClass('row-selected', checked);
-				// Remove class attribute if it's empty.
-				jQuery(checkbox).closest('tr').filter('*[class=""]').removeAttr('class');
+				jQuery(checkbox).closest(this.row_selector).toggleClass('row-selected', checked);
+				// Remove the class attribute if it's empty.
+				jQuery(checkbox).closest(this.row_selector).filter('*[class=""]').removeAttr('class');
 
 				if (checked) {
 					const actions = document.getElementById(object + '_' + objectId).getAttribute('data-actions');
@@ -206,33 +213,34 @@ var chkbxRange = {
 	 * @param {string} object
 	 * @param {object} startCheckbox
 	 * @param {object} endCheckbox
-	 * @param {bool} checked
+	 * @param {boolean} checked
 	 */
 	checkObjectRange: function(object, startCheckbox, endCheckbox, checked) {
-		var checkboxes = this.getObjectCheckboxes(object);
+		const checkboxes = this.getObjectCheckboxes(object);
 
-		var startCheckboxIndex = checkboxes.indexOf(startCheckbox);
-		var endCheckboxIndex = checkboxes.indexOf(endCheckbox);
-		var start = Math.min(startCheckboxIndex, endCheckboxIndex);
-		var end = Math.max(startCheckboxIndex, endCheckboxIndex);
+		const startCheckboxIndex = checkboxes.indexOf(startCheckbox);
+		const endCheckboxIndex = checkboxes.indexOf(endCheckbox);
+		const start = Math.min(startCheckboxIndex, endCheckboxIndex);
+		const end = Math.max(startCheckboxIndex, endCheckboxIndex);
 
-		var objectIds = [];
-		for (var i = start; i <= end; i++) {
+		const objectIds = [];
+		for (let i = start; i <= end; i++) {
 			objectIds.push(this.getObjectIdFromName(checkboxes[i].name));
 		}
+
 		this.checkObjects(object, objectIds, checked);
 	},
 
 	/**
-	 * Toggle all of the checkboxes belonging to the given object group.
+	 * Toggle all the checkboxes belonging to the given object group.
 	 *
 	 * @param {string} object
 	 *
 	 * @param {boolean} checked
 	 */
 	checkObjectAll: function(object, checked) {
-		// main checkbox exists and is clickable, but other checkboxes may not exist and object may be empty
-		var objectIds = jQuery.map(this.getObjectCheckboxes(object), jQuery.proxy(function(checkbox) {
+		// the main checkbox exists and is clickable, but other checkboxes may not exist and an object may be empty
+		const objectIds = jQuery.map(this.getObjectCheckboxes(object), jQuery.proxy(function(checkbox) {
 			return this.getObjectIdFromName(checkbox.name);
 		}, this));
 
@@ -245,7 +253,7 @@ var chkbxRange = {
 	 * @param {string} object
 	 */
 	update: function(object) {
-		// update main checkbox state
+		// update the main checkbox state
 		this.updateMainCheckbox(object);
 
 		if (this.pageGoName == object) {
@@ -257,7 +265,6 @@ var chkbxRange = {
 	 * Update the state of the "Go" controls.
 	 */
 	updateGoButton: function() {
-		const object = this.pageGoName;
 		let selected_count = 0;
 		let actions = [];
 
@@ -284,7 +291,7 @@ var chkbxRange = {
 		selected_count_span.innerHTML = selected_count + ' ' + selected_count_span.innerHTML.split(' ')[1];
 
 		document.querySelectorAll('#action_buttons button').forEach((button) => {
-			// In case button is not permanently disabled by view, enable it depending on attributes and count.
+			// In case the view does not permanently disable the button, enable it depending on attributes and count.
 			if (!button.dataset.disabled) {
 				// First disabled the button and then check if it can be enabled.
 				button.disabled = true;
@@ -294,7 +301,7 @@ var chkbxRange = {
 					for (const [action, count] of Object.entries(actions)) {
 						// Checkbox data-actions attribute must match the button attribute.
 						if (button.dataset.required === action) {
-							// Check if there is a minimum amount of checkboxes required to be selected.
+							// Check if there is a minimum number of checkboxes required to be selected.
 							if (button.dataset.requiredCount) {
 								button.disabled = (count < button.dataset.requiredCount);
 							}
@@ -305,7 +312,7 @@ var chkbxRange = {
 					}
 				}
 				else {
-					// No special attributes required, enable the button depending only on selected count.
+					// No special attributes required, enable the button depending only on the selected count.
 					button.disabled = (selected_count == 0);
 				}
 			}
@@ -313,7 +320,7 @@ var chkbxRange = {
 	},
 
 	/**
-	 * Select main checkbox if all other checkboxes are selected.
+	 * Select the main checkbox if all other checkboxes are selected.
 	 *
 	 * @param {string} object
 	 */
@@ -321,7 +328,7 @@ var chkbxRange = {
 		const checkbox_list = this.getObjectCheckboxes(object);
 		const $main_checkbox = $(checkbox_list)
 			.parents('table')
-			.find('thead input[type=checkbox]');
+			.find('thead input[type="checkbox"]');
 
 		if ($main_checkbox.length == 0) {
 			return;
@@ -367,9 +374,9 @@ var chkbxRange = {
 	 * Reset all selections on other pages.
 	 */
 	resetOtherPage: function() {
-		var key_;
+		let key_;
 
-		for (var i = 0; i < sessionStorage.length; i++) {
+		for (let i = 0; i < sessionStorage.length; i++) {
 			key_ = sessionStorage.key(i);
 
 			if (key_.substring(0, 3) === 'cb_' && key_ != this.sessionStorageName) {
@@ -381,7 +388,7 @@ var chkbxRange = {
 	submitFooterButton: function(e) {
 		const checked_count = Object.keys(this.getSelectedIds()).length;
 
-		var footerButton = jQuery(e.target),
+		const footerButton = jQuery(e.target),
 			form = footerButton.closest('form'),
 			confirmText = checked_count > 1
 				? footerButton.attr('confirm_plural')
