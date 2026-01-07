@@ -43,7 +43,7 @@ void	*zbx_dbconfig_thread(void *args)
 {
 	double				sec = 0.0;
 	int				sleeptime, nextcheck = 0,
-					secrets_reload = 0, cache_reload = 0;
+					secrets_reload = 0, cache_reload = 0, err;
 	zbx_ipc_async_socket_t		rtc;
 	zbx_supervisor_unit_args_t	*unit_args = (zbx_supervisor_unit_args_t *)args;
 	const zbx_thread_info_t		*info = &unit_args->args.info;
@@ -63,6 +63,9 @@ void	*zbx_dbconfig_thread(void *args)
 	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started", get_program_type_string(info->program_type), server_num);
 
 	zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
+
+	if (0 != (err = zbx_init_thread_signal_handler()))
+		zabbix_log(LOG_LEVEL_WARNING, "cannot block signals: %s", zbx_strerror(err));
 
 	zbx_rtc_subscribe(process_type, process_num, rtc_msgs, ARRSIZE(rtc_msgs), dbconfig_args_in->config_timeout,
 			&rtc);

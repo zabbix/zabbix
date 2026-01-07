@@ -283,7 +283,7 @@ void	*zbx_proxyconfig_thread(void *args)
 	size_t				data_size;
 	double				sec, last_template_cleanup_sec = 0, interval;
 	zbx_ipc_async_socket_t		rtc;
-	int				sleeptime;
+	int				sleeptime, err;
 	zbx_synced_new_config_t		synced = ZBX_SYNCED_NEW_CONFIG_NO;
 	zbx_supervisor_unit_args_t	*unit_args = (zbx_supervisor_unit_args_t *)args;
 	const zbx_thread_info_t		*info = &unit_args->args.info;
@@ -300,6 +300,9 @@ void	*zbx_proxyconfig_thread(void *args)
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started", get_program_type_string(info->program_type), server_num);
 	zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
+
+	if (0 != (err = zbx_init_thread_signal_handler()))
+		zabbix_log(LOG_LEVEL_WARNING, "cannot block signals: %s", zbx_strerror(err));
 
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	zbx_tls_init_child(proxyconfig_args_in->config_tls, proxyconfig_args_in->zbx_get_program_type_cb_arg,
