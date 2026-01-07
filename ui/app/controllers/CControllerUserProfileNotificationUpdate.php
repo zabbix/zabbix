@@ -26,7 +26,7 @@ class CControllerUserProfileNotificationUpdate extends CControllerUserUpdateGene
 			'userid' => ['db users.userid', 'required'],
 			'messages' => ['object', 'required', 'fields' => [
 				'enabled' => ['boolean'],
-				'timeout' => ['db profiles.value_str', 'required',
+				'timeout' => ['db profiles.value_str', 'required', 'not_empty',
 					'use' => [CTimeUnitValidator::class, ['min' => 30, 'max' => SEC_PER_DAY]],
 					'when' => ['enabled', 'in' => [1]]
 				],
