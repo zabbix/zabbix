@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -23,7 +23,7 @@ require_once __DIR__.'/../behaviors/CTagBehavior.php';
  *
  * @onBefore prepareProblemsData
  *
- * @dataSource UserPermissions, WidgetCommunication
+ * @dataSource UserPermissions, WidgetCommunication, MonitoringOverview
  */
 class testPageProblems extends CWebTest {
 
@@ -538,7 +538,7 @@ class testPageProblems extends CWebTest {
 							'Host' => '4_Host_to_check_Monitoring_Overview',
 							'Problem' => '4_trigger_Average',
 							'Update' => 'Update',
-							'Tags' => ''
+							'Tags' => 'DataBase: Oracle DB'
 						]
 					]
 				]
@@ -557,7 +557,7 @@ class testPageProblems extends CWebTest {
 							'Host' => '3_Host_to_check_Monitoring_Overview',
 							'Problem' => '3_trigger_Average',
 							'Update' => 'Update',
-							'Tags' => ''
+							'Tags' => 'DataBase: Oracle'
 						]
 					],
 					'check_trigger_description' => [
@@ -609,7 +609,7 @@ class testPageProblems extends CWebTest {
 							'Host' => '1_Host_to_check_Monitoring_Overview',
 							'Problem' => '2_trigger_Information',
 							'Update' => 'Update',
-							'Tags' => ''
+							'Tags' => 'DataBase: PostgreSQL'
 						]
 					],
 					'check_trigger_description' => [
@@ -1285,8 +1285,7 @@ class testPageProblems extends CWebTest {
 				]
 			],
 			// #30 Tags priority check 3.
-			// TODO: uncomment after fix ZBX-27171
-/*			[
+			[
 				[
 					'fields' => [
 						'Problem' => 'test trigger with tag priority',
@@ -1312,7 +1311,7 @@ class testPageProblems extends CWebTest {
 						]
 					]
 				]
-			],*/
+			],
 			// #31 Test result with 2 tags, and then result after removing one tag.
 			[
 				[
@@ -1649,7 +1648,7 @@ class testPageProblems extends CWebTest {
 					]
 				]
 			],
-			// #48 Multiple spaces in "Problem" field name.
+			// #49 Multiple spaces in "Problem" field name.
 			[
 				[
 					'fields' => [

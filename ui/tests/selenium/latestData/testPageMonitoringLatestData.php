@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -21,7 +21,7 @@ require_once __DIR__.'/../behaviors/CTableBehavior.php';
 /**
  * @backup history_uint, profiles
  *
- * @dataSource GlobalMacros
+ * @dataSource GlobalMacros, MonitoringOverview
  *
  * @onBefore prepareTestData
  */
@@ -499,8 +499,7 @@ class testPageMonitoringLatestData extends CWebTest {
 				]
 			],
 			// Tag priority: opposite alphabetic.
-			// TODO: uncomment after fix ZBX-27171
-/*			[
+			[
 				[
 					'filter' => [
 						'Name' => 'tag_item_1',
@@ -510,7 +509,7 @@ class testPageMonitoringLatestData extends CWebTest {
 						['Name' => 'tag_item_1', 'Tags' => "tag_number: 0\ntag: filtering_value\ncomponent: name:tag_item_1"]
 					]
 				]
-			],*/
+			],
 			// Tag priority: one first.
 			[
 				[

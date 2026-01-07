@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -944,8 +944,10 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 		// Take a screenshot to test draggable object position of query and headers fields.
 		if (array_key_exists('screenshot', $data)) {
 			$this->page->removeFocus();
-			$this->assertScreenshot($this->query('id:query-fields-table')->one(), 'Query fields');
-			$this->assertScreenshot($this->query('id:headers-table')->one(), 'Headers fields');
+			// It is necessary because of unexpected viewport shift on Jenkins.
+			$this->page->updateViewport();
+			$this->assertScreenshot($form->query('id:query-fields-table')->one(), 'Query fields');
+			$this->assertScreenshot($form->query('id:headers-table')->one(), 'Headers fields');
 		}
 
 		if (array_key_exists('request_type', $data)) {
