@@ -19,6 +19,7 @@ import (
 	"net/http"
 	"regexp"
 	"strconv"
+	"strings"
 
 	"golang.zabbix.com/agent2/plugins/docker/handlers"
 	"golang.zabbix.com/sdk/errs"
@@ -98,6 +99,9 @@ func (p *Plugin) Export(key string, rawParams []string, _ plugin.ContextProvider
 	case handlers.KeyContainerInfo:
 		container := params["Container"]
 
+		// Strip leading slash if present to maintain backwards compatibility with older template discovery.
+		container = strings.TrimPrefix(container, "/")
+
 		if !isValidContainerIdentifier(container) {
 			return nil, errs.New("invalid container identifier")
 		}
@@ -112,6 +116,10 @@ func (p *Plugin) Export(key string, rawParams []string, _ plugin.ContextProvider
 		return handler(p.client, query, info)
 	case handlers.KeyContainerStats:
 		container := params["Container"]
+
+		// Strip leading slash if present to maintain backwards compatibility with older template discovery.
+		container = strings.TrimPrefix(container, "/")
+
 		if !isValidContainerIdentifier(container) {
 			return nil, errs.New("invalid container identifier")
 		}
