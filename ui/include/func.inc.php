@@ -2040,7 +2040,7 @@ function parse_period($str) {
 	}
 
 	foreach ($time_periods_parser->getPeriods() as $period) {
-		$regex = '/^([1-7])(?:-([1-7]))?,([0-9]{1,2}):([0-9]{1,2})-([0-9]{1,2}):([0-9]{1,2})$/';
+		$regex = '/^([1-7])(?:-([1-7]))?,(0?\d|1\d|2[0-3]):([0-5]\d)-(0?\d|1\d|2[0-3]):([0-5]\d)$/';
 
 		if (!preg_match($regex, $period, $matches)) {
 			return null;
