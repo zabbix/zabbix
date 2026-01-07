@@ -9096,9 +9096,9 @@ z-select.z-select-host-interface li[disabled] .description:not(:empty) {
 .form-grid .subscriptions-table .icon {
   margin-right: 3px;
   vertical-align: text-bottom; }
-.form-grid .tags-table, .form-grid #parameters-table {
+.form-grid .tags-table {
   width: auto; }
-  .form-grid .tags-table tr:not(.form_row) td, .form-grid #parameters-table tr:not(.form_row) td {
+  .form-grid .tags-table tr:not(.form_row) td {
     padding-top: 0; }
 
 .import-compare {

@@ -68,7 +68,7 @@ $row_template = (new CTemplateTag('script-parameter-template'))
 			->setColSpan(3)
 			->setId('parameter-#{row_index}-error-container')
 			->addClass(ZBX_STYLE_ERROR_CONTAINER)
-		)
+		)->addClass('error-container-row')
 	);
 
 $form_grid = (new CFormGrid())
