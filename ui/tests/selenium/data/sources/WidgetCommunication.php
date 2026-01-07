@@ -13,7 +13,6 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-use Widgets\TrigOver\Includes\WidgetForm;
 
 class WidgetCommunication {
 
@@ -828,7 +827,7 @@ class WidgetCommunication {
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'layout',
-										'value' => WidgetForm::LAYOUT_VERTICAL
+										'value' => 1 // WidgetForm::LAYOUT_VERTICAL
 									],
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
@@ -1629,7 +1628,7 @@ class WidgetCommunication {
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'layout',
-										'value' => WidgetForm::LAYOUT_VERTICAL
+										'value' => 1 // WidgetForm::LAYOUT_VERTICAL
 									],
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
@@ -3128,7 +3127,7 @@ class WidgetCommunication {
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'layout',
-										'value' => WidgetForm::LAYOUT_VERTICAL
+										'value' => 1 // WidgetForm::LAYOUT_VERTICAL
 									],
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
