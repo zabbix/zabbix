@@ -1513,8 +1513,11 @@ class CApiInputValidator {
 			}
 
 			if (array_key_exists('compare', $field_rule)) {
-				$compare_field_value = $data[$field_rule['compare']['field']];
-				$compare_field_flags = $rule['fields'][$field_rule['compare']['field']]['flags'];
+				$compare_field_name = $field_rule['compare']['field'];
+				$compare_field_value = $data[$compare_field_name];
+				$compare_field_flags = array_key_exists('flags', $rule['fields'][$compare_field_name])
+					? $rule['fields'][$compare_field_name]['flags']
+					: 0x00;
 
 				if (is_string($compare_field_value)
 						&& ((($compare_field_flags & API_ALLOW_USER_MACRO)
@@ -1524,7 +1527,7 @@ class CApiInputValidator {
 					unset($field_rule['compare']);
 				}
 				else {
-					$field_rule['compare']['path'] = ($path === '/' ? $path : $path.'/').$field_rule['compare']['field'];
+					$field_rule['compare']['path'] = ($path === '/' ? $path : $path.'/').$compare_field_name;
 					$field_rule['compare']['value'] = $compare_field_value;
 				}
 			}
