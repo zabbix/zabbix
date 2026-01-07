@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -1169,9 +1169,7 @@ class DB {
 
 		// pks
 		if (array_key_exists($pk_option, $options)) {
-			if (!is_array($options[$pk_option])) {
-				$options[$pk_option] = [$options[$pk_option]];
-			}
+			$options[$pk_option] = (array) $options[$pk_option];
 
 			$field_schema = $table_schema['fields'][$pk];
 			$field_name = self::fieldId($pk, $table_alias);
