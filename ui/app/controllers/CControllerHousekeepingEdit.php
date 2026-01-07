@@ -137,6 +137,8 @@ class CControllerHousekeepingEdit extends CController {
 
 		$dbversion_history_status = CSettingsHelper::getDbVersionHistoryStatus();
 
+		$data['hk_history_providers_enabled'] = (bool) $dbversion_history_status;
+
 		foreach ($dbversion_history_status as $provider) {
 			if (!array_key_exists('value_types', $provider) || !is_array($provider['value_types'])
 					|| !array_key_exists('ttl', reset($provider['value_types']))) {

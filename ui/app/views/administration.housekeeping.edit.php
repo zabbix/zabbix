@@ -133,7 +133,14 @@ $house_keeper_tab = (new CFormList())
 		(new CCheckBox('hk_history_global'))->setChecked($data['hk_history_global'] == 1),
 	)
 	->addRow(
-		(new CLabel(_('Data storage period'), 'hk_history'))
+		(new CLabel([
+			_('Data storage period'),
+			$data['hk_history_providers_enabled']
+				? makeWarningIcon(
+					_('This setting does not affect Elasticsearch and ClickHouse storage periods.')
+				)
+				: null
+		], 'hk_history'))
 			->setAsteriskMark(),
 		(new CTextBox('hk_history', $data['hk_history'], false, CSettingsSchema::getFieldLength('hk_history')))
 			->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
