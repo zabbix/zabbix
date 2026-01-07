@@ -2674,11 +2674,8 @@ clean:
 static int	ensure_host_for_operation(const zbx_db_event *event, const zbx_config_t *cfg, zbx_uint64_t *hostid,
 		int *status, int *host_add_failed)
 {
-	if (0 == *hostid && 0 == *host_add_failed)
-	{
-		if (0 == ensure_discovered_host(event, cfg, hostid, status))
-			*host_add_failed = 1;
-	}
+	if (0 == *hostid && 0 == *host_add_failed && 0 == ensure_discovered_host(event, cfg, hostid, status))
+		*host_add_failed = 1;
 
 	if (0 != *hostid)
 		return SUCCEED;
