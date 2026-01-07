@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -135,7 +135,7 @@ foreach ($data['hosts'] as $hostid => $host) {
 				),
 				CViewHelper::showNum($host['graphs'])
 			]
-			: (new CSpan(_('Graphs')))->addClass(ZBX_STYLE_DISABLED),
+			: '',
 		$host['dashboards']
 			? [
 				new CLink(_('Dashboards'),
@@ -145,7 +145,7 @@ foreach ($data['hosts'] as $hostid => $host) {
 				),
 				CViewHelper::showNum($host['dashboards'])
 			]
-			: (new CSpan(_('Dashboards')))->addClass(ZBX_STYLE_DISABLED),
+			: '',
 		$host['httpTests']
 			? [
 				new CLink(_('Web'),
@@ -156,7 +156,7 @@ foreach ($data['hosts'] as $hostid => $host) {
 				),
 				CViewHelper::showNum($host['httpTests'])
 			]
-			: (new CSpan(_('Web')))->addClass(ZBX_STYLE_DISABLED)
+			: ''
 	]);
 }
 

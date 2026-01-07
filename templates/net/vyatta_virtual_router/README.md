@@ -35,6 +35,7 @@ Refer to the vendor documentation.
 |{$VYATTA.STORAGE.USED.HIGH}|<p>High severity threshold of storage utilization.</p>|`95`|
 |{$VYATTA.CPU.USED.WARN}|<p>Warning threshold of CPU utilization.</p>|`80`|
 |{$VYATTA.CPU.USED.HIGH}|<p>High severity threshold of CPU utilization.</p>|`95`|
+|{$VYATTA.LOAD_AVG_PER_CPU.MAX.WARN}|<p>Load per CPU considered sustainable. Tune if needed.</p>|`1.0`|
 |{$VYATTA.IFCONTROL}|<p>Macro for the operational state of the interface for the link down trigger. Can be used with the interface name as context.</p>|`1`|
 |{$VYATTA.DISCOVERY.STORAGE.NAME.MATCHES}|<p>Sets the name regex filter to use in storage discovery for including.</p>|`.*`|
 |{$VYATTA.DISCOVERY.STORAGE.NAME.NOT_MATCHES}|<p>Sets the name regex filter to use in storage discovery for excluding.</p>|`CHANGE_IF_NEEDED`|
@@ -54,6 +55,8 @@ Refer to the vendor documentation.
 |{$VYATTA.DISCOVERY.IFACE.IFDESCR.NOT_MATCHES}|<p>Sets the description regex filter to use in network interface discovery for excluding.</p>|`CHANGE_IF_NEEDED`|
 |{$VYATTA.DISCOVERY.IFACE.IFTYPE.MATCHES}|<p>Sets the type regex filter to use in network interface discovery for including.</p>|`.*`|
 |{$VYATTA.DISCOVERY.IFACE.IFTYPE.NOT_MATCHES}|<p>Sets the type regex filter to use in network interface discovery for excluding.</p>|`CHANGE_IF_NEEDED`|
+|{$VYATTA.DISCOVERY.BGP.REMOTE.ADDR.MATCHES}|<p>Sets the IP regex filter to use in BGP peer discovery for including.</p>|`.*`|
+|{$VYATTA.DISCOVERY.BGP.REMOTE.ADDR.NOT_MATCHES}|<p>Sets the IP regex filter to use in BGP peer discovery for excluding.</p>|`CHANGE_IF_NEEDED`|
 
 ### Items
 
@@ -76,6 +79,14 @@ Refer to the vendor documentation.
 |Memory (buffers)|<p>MIB: UCD-SNMP-MIB</p><p>The total amount of real or virtual memory currently allocated for use as memory buffers.</p>|SNMP agent|system.memory.buffers[memBuffer.0]<p>**Preprocessing**</p><ul><li><p>Custom multiplier: `1000`</p></li></ul>|
 |Memory (cached)|<p>MIB: UCD-SNMP-MIB</p><p>The total amount of real or virtual memory currently allocated for use as cached memory.</p>|SNMP agent|system.memory.cached[memCached.0]<p>**Preprocessing**</p><ul><li><p>Custom multiplier: `1000`</p></li></ul>|
 |Memory utilization, %||Calculated|system.memory.util<p>**Preprocessing**</p><ul><li><p>JavaScript: `return Math.round(value * 100) / 100;`</p></li></ul>|
+|Load average (1m avg)|<p>MIB: UCD-SNMP-MIB</p><p>Average number of processes being executed or waiting over the last minute.</p>|SNMP agent|system.cpu.load.avg1|
+|Load average (5m avg)|<p>MIB: UCD-SNMP-MIB</p><p>Average number of processes being executed or waiting over the last 5 minutes.</p>|SNMP agent|system.cpu.load.avg5|
+|Load average (15m avg)|<p>MIB: UCD-SNMP-MIB</p><p>Average number of processes being executed or waiting over the last 15 minutes.</p>|SNMP agent|system.cpu.load.avg15|
+|CPU user time|<p>MIB: UCD-SNMP-MIB</p><p>Average time the CPU has spent running user processes that are not niced.</p>|SNMP agent|system.cpu.user|
+|CPU system time|<p>MIB: UCD-SNMP-MIB</p><p>Average time the CPU has spent running the kernel and its processes.</p>|SNMP agent|system.cpu.system|
+|CPU idle time|<p>MIB: UCD-SNMP-MIB</p><p>Average time the CPU has spent doing nothing.</p>|SNMP agent|system.cpu.idle|
+|Number of CPUs|<p>MIB: UCD-SNMP-MIB</p><p>Number of processors.</p>|SNMP agent|system.cpu.num<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
+|SNMP walk BGP peers|<p>MIB: BGP4-MIB</p><p>Scanning `BGP4-MIB::bgpPeerTable`.</p>|SNMP agent|bgp.peers.walk|
 |SNMP walk storage|<p>MIB: HOST-RESOURCES-MIB</p><p>Scanning `HOST-RESOURCES-MIB::hrStorageTable`.</p>|SNMP agent|storage.walk|
 |SNMP walk host devices|<p>MIB: HOST-RESOURCES-MIB</p><p>Scanning `HOST-RESOURCES-MIB::hrDeviceTable`.</p>|SNMP agent|devices.walk|
 |SNMP walk network interfaces|<p>MIB: IF-MIB</p><p>Scanning `IF-MIB::ifTable` and `IF-MIB::ifXTable`.</p>|SNMP agent|net.if.walk|
@@ -91,6 +102,29 @@ Refer to the vendor documentation.
 |Vyatta: Host has been restarted|<p>Uptime is less than 10 minutes.</p>|`(last(/Vyatta Virtual Router by SNMP/system.uptime.hardware[hrSystemUptime.0])>0 and last(/Vyatta Virtual Router by SNMP/system.uptime.hardware[hrSystemUptime.0])<10m) or (last(/Vyatta Virtual Router by SNMP/system.uptime.hardware[hrSystemUptime.0])=0 and last(/Vyatta Virtual Router by SNMP/system.uptime.network[sysUpTimeInstance])<10m)`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Vyatta: No SNMP data collection</li></ul>|
 |Vyatta: Memory utilization is high|<p>Memory utilization is high.</p>|`min(/Vyatta Virtual Router by SNMP/system.memory.util, 5m) > {$VYATTA.MEMORY.USED.WARN}`|Warning|**Depends on**:<br><ul><li>Vyatta: Memory utilization is too high</li></ul>|
 |Vyatta: Memory utilization is too high|<p>Memory utilization is too high.</p>|`min(/Vyatta Virtual Router by SNMP/system.memory.util, 5m) > {$VYATTA.MEMORY.USED.HIGH}`|High||
+|Vyatta: Load average is too high|<p>The load average per CPU is too high. The system may be slow to respond.</p>|`min(/Vyatta Virtual Router by SNMP/system.cpu.load.avg1,5m)/last(/Vyatta Virtual Router by SNMP/system.cpu.num)>{$VYATTA.LOAD_AVG_PER_CPU.MAX.WARN} and last(/Vyatta Virtual Router by SNMP/system.cpu.load.avg5)>0 and last(/Vyatta Virtual Router by SNMP/system.cpu.load.avg15)>0`|Average||
+
+### LLD rule BGP peer discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|BGP peer discovery|<p>BGP4-MIB::bgpPeer discovery.</p>|Dependent item|bgp.peer.discovery<p>**Preprocessing**</p><ul><li><p>SNMP walk to JSON</p><p>⛔️Custom on fail: Set error to: `BGP instance is not running`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+
+### Item prototypes for BGP peer discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|BGP AS [{#BGP_PEER_REMOTE_AS}]: Peer [{#SNMPINDEX}]: Connection state|<p>MIB: BGP4-MIB</p><p>The BGP peer connection state.</p>|Dependent item|bgp.state[bgpPeerState.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>SNMP walk value: `1.3.6.1.2.1.15.3.1.2.{#SNMPINDEX}`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|BGP AS [{#BGP_PEER_REMOTE_AS}]: Peer [{#SNMPINDEX}]: Remote address|<p>MIB: BGP4-MIB</p><p>The BGP peer remote address.</p>|Dependent item|bgp.remote.addr[bgpPeerRemoteAddr.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>SNMP walk value: `1.3.6.1.2.1.15.3.1.7.{#SNMPINDEX}`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|BGP AS [{#BGP_PEER_REMOTE_AS}]: Peer [{#SNMPINDEX}]: Remote AS|<p>MIB: BGP4-MIB</p><p>The remote autonomous system number received in the BGP OPEN message.</p>|Dependent item|bgp.remote.as[bgpPeerRemoteAs.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>SNMP walk value: `1.3.6.1.2.1.15.3.1.9.{#SNMPINDEX}`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|BGP AS [{#BGP_PEER_REMOTE_AS}]: Peer [{#SNMPINDEX}]: FSM established transitions, per second|<p>MIB: BGP4-MIB</p><p>Rate of transitions of the BGP FSM into the Established state for this peer, expressed as transitions per second.</p>|Dependent item|bgp.fsm.established.transitions[bgpPeerFsmEstablishedTransitions.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>SNMP walk value: `1.3.6.1.2.1.15.3.1.15.{#SNMPINDEX}`</p></li><li>Change per second</li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|BGP AS [{#BGP_PEER_REMOTE_AS}]: Peer [{#SNMPINDEX}]: Hold time|<p>MIB: BGP4-MIB</p><p>Time interval in seconds for the Hold Timer established with the peer.</p>|Dependent item|bgp.hold.time[bgpPeerHoldTime.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>SNMP walk value: `1.3.6.1.2.1.15.3.1.18.{#SNMPINDEX}`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+
+### Trigger prototypes for BGP peer discovery
+
+|Name|Description|Expression|Severity|Dependencies and additional info|
+|----|-----------|----------|--------|--------------------------------|
+|Vyatta: BGP AS [{#BGP_PEER_REMOTE_AS}]: Peer [{#SNMPINDEX}]: State is not Established|<p>The peer connection state is not "Established".</p>|`last(/Vyatta Virtual Router by SNMP/bgp.state[bgpPeerState.{#SNMPINDEX}])<>6`|High||
 
 ### LLD rule Storage discovery
 
