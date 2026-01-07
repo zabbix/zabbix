@@ -399,7 +399,6 @@ ui/.project
 ui/conf/zabbix.conf.php
 ui/images/general/*.db
 ui/images/general/tree/*.db
-ui/js/jsDump.js
 ui/local/conf/brand.conf.php
 ui/locale/POTFILES.in
 ui/locale/frontend.pot
