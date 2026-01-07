@@ -225,7 +225,7 @@ class testDashboardClockWidget extends testWidgets {
 		$fields = ['Type', 'Show header', 'Name', 'Refresh interval', 'Time type', 'Clock type'];
 
 		foreach (['Local time', 'Server time', 'Host time'] as $type) {
-			$form->fill(['Time type' => CFormElement::RELOADABLE_FILL($type)]);
+			$form->fill(['Time type' => $type]);
 
 			/**
 			 * If the clock widgets type equals to "Host time", then additional field appears - 'Item',
@@ -282,7 +282,6 @@ class testDashboardClockWidget extends testWidgets {
 						$this->assertTrue($form->getField($name)->isVisible($visible));
 
 					}
-					// $this->assertTrue($form->getField($name)->isVisible($visible));
 				}
 
 				// Fill other Show checkboxes and get other Advanced config fields.
@@ -303,7 +302,7 @@ class testDashboardClockWidget extends testWidgets {
 
 				// Check Advanced config fields depending on Time type.
 				foreach (['Local time', 'Server time', 'Host time'] as $type) {
-					$form->fill(['Time type' => CFormElement::RELOADABLE_FILL($type)]);
+					$form->fill(['Time type' => $type]);
 					$form->fill(['Advanced configuration' => true]);
 
 					// Check that with Host time 'Time zone' and 'Format' fields disappear.
@@ -318,7 +317,9 @@ class testDashboardClockWidget extends testWidgets {
 
 					// Check Advanced fields' visibility and values.
 					foreach ($advanced_configuration as $field => $config) {
-						$advanced_field = $form->getField($field);
+						$advanced_field = ($field === 'xpath:.//div[@class="fields-group fields-group-tzone"]')
+							? $form->query($field)->one()
+							: $form->getField($field);
 						$this->assertTrue($advanced_field->isClickable());
 
 						foreach ($config as $id => $value) {
@@ -337,7 +338,10 @@ class testDashboardClockWidget extends testWidgets {
 
 				foreach ( ['Date' => true, 'Time' => false, 'xpath:.//div[@class="fields-group fields-group-tzone"]' => true]
 						as $name => $visible) {
-					$this->assertTrue($form->getField($name)->isVisible($visible));
+					$locator = ($name === 'xpath:.//div[@class="fields-group fields-group-tzone"]')
+						? $form->query($name)->one()
+						: $form->getField($name);
+					$this->assertTrue($locator->isVisible($visible));
 				}
 			}
 		}

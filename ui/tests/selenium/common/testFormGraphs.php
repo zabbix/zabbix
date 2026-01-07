@@ -246,8 +246,8 @@ class testFormGraphs extends CWebTest {
 				[
 					'set_fields' => [
 						'Graph type' => CFormElement::RELOADABLE_FILL('Normal'),
-						'id:ymin_type' => CFormElement::RELOADABLE_FILL('Fixed'), // Y axis MIN value dropdown.
-						'id:ymax_type' => CFormElement::RELOADABLE_FILL('Fixed') // Y axis MAX value dropdown.
+						'Y axis MIN value' => CFormElement::RELOADABLE_FILL('Fixed'), // Y axis MIN value dropdown.
+						'Y axis MAX value' => CFormElement::RELOADABLE_FILL('Fixed') // Y axis MAX value dropdown.
 					],
 					'check_fields' => [
 						'id:yaxismin' => ['value' => 0, 'visible' => true], // Y axis MIN fixed value input.
@@ -259,8 +259,8 @@ class testFormGraphs extends CWebTest {
 				[
 					'set_fields' => [
 						'Graph type' => CFormElement::RELOADABLE_FILL('Normal'),
-						'id:ymin_type' => CFormElement::RELOADABLE_FILL('Item'), // Y axis MIN value dropdown.
-						'id:ymax_type' => CFormElement::RELOADABLE_FILL('Item') // Y axis MAX value dropdown.
+						'Y axis MIN value' => CFormElement::RELOADABLE_FILL('Item'), // Y axis MIN value dropdown.
+						'Y axis MAX value' => CFormElement::RELOADABLE_FILL('Item') // Y axis MAX value dropdown.
 					],
 					'check_fields' => [
 						'id:ymin_itemid' => ['value' => '', 'visible' => true], // Y axis MIN item input.
@@ -317,11 +317,14 @@ class testFormGraphs extends CWebTest {
 			}
 
 			if (array_key_exists('value', $attribute)) {
-				$this->assertEquals($attribute['value'], $form->query($field)->one()->getValue());
+				$locator = ($attribute['value'] === '')
+					? $form->query($field)->one()
+					: $form->getField($field);
+				$this->assertEquals($attribute['value'], $locator->getValue());
 			}
 
 			if (array_key_exists('maxlength', $attribute)) {
-				$this->assertEquals($attribute['maxlength'], $form->query($field)->one()->getAttribute('maxlength'));
+				$this->assertEquals($attribute['maxlength'], $form->getField($field)->getAttribute('maxlength'));
 			}
 		};
 

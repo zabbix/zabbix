@@ -1925,7 +1925,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 						],
 						[
 							'skip_mandatory_check' => true,
-							'field_locator' => 'id:acknowledged_by_me',
+							'field_locator' => 'xpath://label[@for="acknowledged_by_me"]',
 							'type' => 'checkbox',
 							'value' => false
 						]
@@ -2256,7 +2256,13 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 							: (array_key_exists('field', $no_access_field)
 								? $no_access_field['field']
 								: $no_access_field['field_locator']);
-						$this->assertFalse($widget_form->getField($field_locator)->isEnabled());
+
+						if ($field_locator === 'xpath://label[@for="acknowledged_by_me"]') {
+							$this->assertFalse($widget_form->getField('id:acknowledged_by_me')->isEnabled());
+						}
+						else {
+							$this->assertFalse($widget_form->getField($field_locator)->isEnabled());
+						}
 					}
 				}
 				// Reference values are filled in to defined form fields to access the hidden/disabled fields.
