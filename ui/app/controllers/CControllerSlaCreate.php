@@ -85,7 +85,7 @@ class CControllerSlaCreate extends CController {
 	protected function checkInput(): bool {
 		$ret = $this->validateInput(self::getValidationRules());
 		$ret = $ret && CSlaHelper::validateCustomScheduleChecked($this->getInput('schedule_mode'),
-			$this->getInput('schedule')
+			$this->getInput('schedule', [])
 		);
 
 		if (!$ret) {
