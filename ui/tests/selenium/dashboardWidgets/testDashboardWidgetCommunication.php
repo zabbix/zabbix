@@ -2319,72 +2319,7 @@ class testDashboardWidgetCommunication extends testWidgetCommunication {
 		 * If that's not the case, select an element on the widget.
 		 */
 		if (CTestArrayHelper::get($data, 'autoselected')) {
-			$broadcaster_type = $this->getWidgetType($broadcaster);
-
-			/**
-			 * Apart from geomap widget all broadcaster types have a certain class added to the element or its parent,
-			 * when this element is selected. So to check if the element is selected, a check that a certain class
-			 * is present on a certain page element is performed.
-			 */
-			if ($broadcaster_type !== 'geomap') {
-				switch ($broadcaster_type) {
-					case 'problemhosts':
-					case 'problemsbysv':
-					case 'tophosts':
-					case 'web':
-					case 'map':
-						$selected_element = $this->getWidgetElement($data['autoselected'], $broadcaster);
-						break;
-
-					case 'navtree':
-						$selected_element = $broadcaster->query('xpath:.//a[text()='.
-								CXPathHelper::escapeQuotes($data['autoselected']).']/../../..'
-						)->one();
-						break;
-
-					case 'itemhistory':
-						$selected_element = $broadcaster->query('xpath:.//td[text()='.
-								CXPathHelper::escapeQuotes($data['autoselected'].': Trapper item').']/..'
-						)->one();
-						break;
-
-					case 'hostnavigator':
-						$selected_element = $broadcaster->query('xpath:.//span[text()='.
-								CXPathHelper::escapeQuotes($data['autoselected']).']/../../..'
-						)->one();
-						break;
-
-					case 'itemnavigator':
-						$itemid = CDataHelper::get('WidgetCommunication.itemids')[$data['autoselected'].':trap.widget.communication'];
-						$selected_element = $broadcaster->query('xpath:.//div[@data-id='.$itemid.']')->one();
-						break;
-
-					case 'honeycomb':
-						$selected_element = $broadcaster->query('xpath:.//div[text()='.
-								CXPathHelper::escapeQuotes($data['autoselected']).']/../../../..'
-						)->one();
-						break;
-				}
-
-				$this->assertTrue($selected_element->hasClass(self::SELECTED_CLASSES[$broadcaster_type]),
-						'Expected element is not selected by default in '.$broadcaster_type.' widget.'
-				);
-			}
-			else {
-				/**
-				 * The only thing that differs between a selected host and a non selected host on a geomap widget is the
-				 * base64 format hash of the icon that represent this host. So to check if host is selected, the icon hash
-				 * is compared to an icon hash of a selected host.
-				 * The selected host hash for the 3 hosts differs only by 8 symbols so the hash is composed of 3 parts to
-				 * avoid three huge hashes in the test.
-				 */
-				$base64_hash = self::GEOMAP_HASH_START.self::GEOMAP_UNIQUE_HASH_PARTS[$data['autoselected']].
-					self::GEOMAP_HAS_END;
-
-				$this->assertEquals($base64_hash, $this->getWidgetElement(self::GEOMAP_ICON_INDEXES[$data['autoselected']],
-						$broadcaster)->getAttribute('src')
-				);
-			}
+			$this->checkSelectedElement($broadcaster, $data['autoselected']);
 		}
 		else {
 			$this->getWidgetElement($data['select_element'], $broadcaster)->click();
@@ -2406,6 +2341,89 @@ class testDashboardWidgetCommunication extends testWidgetCommunication {
 		if ($data['page'] === 'Items page') {
 			$host_in_name = (array_key_exists('autoselected', $data)) ? $data['autoselected'] : $data['select_element'];
 			$this->assertTrue($dashboard->getWidget($host_in_name.': Trapper item')->isValid());
+		}
+	}
+
+	/**
+	 * Check the value that is marked as selected on the widget under attention.
+	 *
+	 * @param CWidgetElement   $widget         widget in which the selected element should be checked
+	 * @param string           $selected       indicator of the element that should be marked as selected
+	 * @param string           $override_key   used only in item navigator widget when item key differs from the common one
+	 */
+	protected function checkSelectedElement($widget, $selected, $override_key = null) {
+		$widget_type = $this->getWidgetType($widget);
+
+		/**
+		 * Apart from geomap widget all broadcaster types have a certain class added to the element or its parent,
+		 * when this element is selected. So to check if the element is selected, a check that a certain class
+		 * is present on a certain page element is performed.
+		 */
+		if ($widget_type !== 'geomap') {
+			switch ($widget_type) {
+				case 'problemhosts':
+				case 'problemsbysv':
+				case 'tophosts':
+				case 'web':
+				case 'map':
+					$selected_element = $this->getWidgetElement($selected, $widget);
+					break;
+
+				case 'navtree':
+					$selected_element = $widget->query('xpath:.//a[text()='.CXPathHelper::escapeQuotes($selected).
+							']/../../..'
+					)->one();
+					break;
+
+				case 'itemhistory':
+					$selected_element = $widget->query('xpath:.//td[text()='.
+							CXPathHelper::escapeQuotes($selected.': Trapper item').']/..'
+					)->one();
+					break;
+
+				case 'hostnavigator':
+					$selected_element = $widget->query('xpath:.//span[text()='.CXPathHelper::escapeQuotes($selected).
+							']/../../..'
+					)->one();
+					break;
+
+				case 'itemnavigator':
+					if ($override_key) {
+						$itemid = CDBHelper::getValue('SELECT itemid FROM items WHERE key_ = '.zbx_dbstr($override_key).
+								' AND hostid = '.zbx_dbstr(CDataHelper::get('WidgetCommunication.hostids')[$selected])
+						);
+					}
+					else {
+						$itemid = CDataHelper::get('WidgetCommunication.itemids')[$selected.':trap.widget.communication'];
+					}
+
+					$selected_element = $widget->query('xpath:.//div[@data-id='.$itemid.']')->one();
+					break;
+
+				case 'honeycomb':
+					$selected_element = $widget->query('xpath:.//div[text()='.CXPathHelper::escapeQuotes($selected).
+							']/../../../..'
+					)->one();
+					break;
+			}
+
+			$this->assertTrue($selected_element->hasClass(self::SELECTED_CLASSES[$widget_type]),
+					'Expected element is not selected in '.$widget_type.' widget.'
+			);
+		}
+		else {
+			/**
+			 * The only thing that differs between a selected host and a non selected host on a geomap widget is the
+			 * base64 format hash of the icon that represent this host. So to check if host is selected, the icon hash
+			 * is compared to an icon hash of a selected host.
+			 * The selected host hash for the 3 hosts differs only by 8 symbols so the hash is composed of 3 parts to
+			 * avoid three huge hashes in the test.
+			 */
+			$base64_hash = self::GEOMAP_HASH_START.self::GEOMAP_UNIQUE_HASH_PARTS[$selected].self::GEOMAP_HAS_END;
+
+			$this->assertEquals($base64_hash, $this->getWidgetElement(self::GEOMAP_ICON_INDEXES[$selected], $widget)
+					->getAttribute('src')
+			);
 		}
 	}
 
@@ -3158,6 +3176,126 @@ class testDashboardWidgetCommunication extends testWidgetCommunication {
 		$this->closeOpenedPopup();
 
 		$this->checkDataOnListener($data['expected']);
+	}
+
+	public static function getSavedValueDuringRebroadcastingData() {
+		return [
+			'Item with same key preserved on item navigator' => [
+				[
+					're-broadcaster' => [
+						'title' => 'Item navigator selected item re-broadcaster'
+					],
+					'initial_selection' => self::FIRST_HOST_NAME
+				]
+			],
+			'Item with same key preserved on honeycomb' => [
+				[
+					're-broadcaster' => [
+						'title' => 'Honeycomb selected item re-broadcaster',
+						'reference' => [
+							'old' => 'TQXFD._itemid',
+							'new' => 'EHWTR._itemid'
+						]
+					],
+					'initial_selection' => '3 '
+				]
+			]
+		];
+	}
+
+	/**
+	 * Item navigator or honeycomb widgets remember the item that was selected on them in case if they are listening
+	 * hosts from another widget and then receive a host that has the same key as the previously selected item.
+	 * However, if they receive a host that doesn't have such key, the selection gets dropped to the first item in the list.
+	 * Currently, this feature exists only on item navigator and honeycomb widgets.
+	 *
+	 * @dataProvider getSavedValueDuringRebroadcastingData
+	 */
+	public function testDashboardWidgetCommunication_CheckSelectedItemRemembering($data) {
+		if (array_key_exists('reference', $data['re-broadcaster'])) {
+			DBexecute('UPDATE widget_field SET value_str = '.zbx_dbstr($data['re-broadcaster']['reference']['new']).
+					' WHERE value_str = '.zbx_dbstr($data['re-broadcaster']['reference']['old'])
+			);
+		}
+
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$entityids['dashboardid'])
+				->waitUntilReady();
+		$dashboard = CDashboardElement::find()->waitUntilReady()->one();
+
+		if ($dashboard->getSelectedPageName() !== 'Value re-broadcasting page') {
+			$dashboard->selectPage('Value re-broadcasting page');
+		}
+
+		$broadcaster = $dashboard->getWidget('Host navigator broadcaster');
+		$rebroadcaster = $dashboard->getWidget($data['re-broadcaster']['title']);
+
+		// By default the "1st host for widgets" is selected on broadcaster so we proceed with selecting the trapper item.
+		$this->getWidgetElement($data['initial_selection'], $rebroadcaster)->click();
+		$dashboard->waitUntilReady();
+
+		// Check the name of the listener widget and the value that is displayed on it.
+		$listener = $dashboard->getWidget(self::FIRST_HOST_NAME.': Trapper item');
+		$this->assertEquals('3', $listener->query('class:item-value-content')->one()->getText());
+
+		/**
+		 * Check that selecting a host on the broadcaster that has an item with the same key as currently selected on
+		 * the re-broadcaster. This should result in preserving the selected item (only the host and value changes).
+		 */
+		$this->checkRebroadcastedItemSelection(self::THIRD_HOST_NAME, $broadcaster, $rebroadcaster, $listener);
+
+		// Select host with a different set of items on the broadcaster.
+		$this->checkRebroadcastedItemSelection(self::FORTH_HOST_NAME, $broadcaster, $rebroadcaster, $listener);
+
+		// Check that item key that was previously preserved is no longer remembered.
+		$this->checkRebroadcastedItemSelection(self::FIRST_HOST_NAME, $broadcaster, $rebroadcaster, $listener);
+	}
+
+	/**
+	 * Check which item is selected on the re-broadcaster and which item is displayed on the listener after changing
+	 * host on the broadcaster.
+	 *
+	 * @param string          $host           name of the host to be selected on the broadcaster
+	 * @param CWidgetElement  $broadcaster    broadcaster widget element
+	 * @param CWidgetElement  $rebroadcaster  re-broadcaster widget element
+	 * @param CWidgetElement  $listener       listener widget element
+	 */
+	protected function checkRebroadcastedItemSelection($host, $broadcaster, $rebroadcaster, $listener) {
+		$host_items = [
+			self::FIRST_HOST_NAME => [
+				'name' => 'Download speed for scenario "Web scenario for '.$host.'".',
+				'key' => 'web.test.in[Web scenario for '.$host.',,bps]',
+				'value' => "1000\nBps",
+				'honeycomb_value' => '1000 Bps'
+			],
+			self::THIRD_HOST_NAME => [
+				'name' => 'Trapper item',
+				'key' => 'trap.widget.communication',
+				'value' => '5',
+				'honeycomb_value' => '5 '
+			],
+			self::FORTH_HOST_NAME => [
+				'name' => 'Another item',
+				'key' => 'another.item.widget.communication',
+				'value' => '6',
+				'honeycomb_value' => '6 '
+			]
+		];
+
+		// Select a host on the broadcaster.
+		$this->getWidgetElement($host, $broadcaster)->click();
+		CDashboardElement::find()->one()->waitUntilReady();
+
+		// Check the item that is selected on the re-broadcaster.
+		$rebroadcaster_selected = ($this->getWidgetType($rebroadcaster) === 'honeycomb')
+			? $host_items[$host]['honeycomb_value']
+			: $host;
+
+		$this->checkSelectedElement($rebroadcaster, $rebroadcaster_selected, $host_items[$host]['key']);
+		$listener->invalidate();
+
+		// Check the name of the listener widget and the value that is displayed on it.
+		$this->assertEquals($host.': '.$host_items[$host]['name'], $listener->getHeaderText());
+		$this->assertEquals($host_items[$host]['value'], $listener->query('class:item-value-content')->one()->getText());
 	}
 
 	/**

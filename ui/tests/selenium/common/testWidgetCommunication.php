@@ -52,6 +52,7 @@ class testWidgetCommunication extends testWidgets {
 	const FIRST_HOST_NAME = '1st host for widgets';
 	const SECOND_HOST_NAME = '2nd host for widgets';
 	const THIRD_HOST_NAME = '3rd host for widgets';
+	const FORTH_HOST_NAME = 'Host with other set of items';
 	const FIRST_HOSTGROUP_NAME = '1st hostgroup for widgets';
 	const SECOND_HOSTGROUP_NAME = '2nd hostgroup for widgets';
 	const THIRD_HOSTGROUP_NAME = '3rd hostgroup for widgets';
@@ -124,4 +125,3 @@ class testWidgetCommunication extends testWidgets {
 		return $element->waitUntilClickable()->one();
 	}
 }
-
