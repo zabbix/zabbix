@@ -181,10 +181,6 @@
 						url.searchParams.set('action', 'lldrule.list');
 						url.searchParams.set('context', this.context);
 
-						if (data.submit?.action !== 'lldrule.delete') {
-							url.searchParams.set('filter_set', 1);
-						}
-
 						event.setRedirectUrl(url.href);
 					}
 				}
@@ -215,7 +211,6 @@
 
 					url.searchParams.set('action', 'lldrule.list');
 					url.searchParams.set('context', this.context);
-					list_url.setArgument('filter_set', 1);
 					new_href = list_url.getUrl();
 				}
 			}

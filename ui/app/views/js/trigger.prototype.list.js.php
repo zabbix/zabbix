@@ -192,7 +192,6 @@
 
 						url.searchParams.set('action', 'lldrule.list');
 						url.searchParams.set('context', this.context);
-						url.searchParams.set('context', this.context);
 
 						event.setRedirectUrl(url.href);
 					}

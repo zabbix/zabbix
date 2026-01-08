@@ -186,9 +186,10 @@ foreach (get_preprocessing_types(null, true, $data['preprocessing_types']) as $g
 			->setChecked(true)
 	]))->addClass('preprocessing-steps-parameters-csv-to-json-tmpl'),
 	(new CTemplateTag('', [
-		(new CMultilineInput('preprocessing[#{rowNum}][params_0]', '#{params_0}',
+		(new CMultilineInput('preprocessing[#{rowNum}][params_0]', '',
 			['add_post_js' => false, 'use_tab' => false]
 		))
+			->setAttribute('data-value-init', '#{params[0]}')
 			->setAttribute('data-notrim', '')
 			->setErrorLabel(_('Script'))
 			->setErrorContainer('preprocessing-#{rowNum}-error-container')

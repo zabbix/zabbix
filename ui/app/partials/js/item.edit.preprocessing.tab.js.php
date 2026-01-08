@@ -50,22 +50,6 @@ var ItemEditPreprocessingTab = class {
 		preprocessing.forEach(item => this.#addRow(item));
 
 		this.#update();
-
-		this.#container.querySelectorAll('.multilineinput-control').forEach(el => {
-			$(el).multilineInput(
-				{
-					title: <?= json_encode(_('JavaScript')) ?>,
-					placeholder: <?= json_encode(_('script')) ?>,
-					placeholder_textarea: 'return value',
-					label_before: 'function (value) {',
-					label_after: '}',
-					grow: 'auto',
-					rows: 0,
-					value: 'asdasd',
-					maxlength: <?= DB::getFieldLength('item_preproc', 'params') ?>
-				}
-			);
-		});
 	}
 
 	#initEvents() {
@@ -191,6 +175,7 @@ var ItemEditPreprocessingTab = class {
 			const remove_actions = subtable.querySelectorAll('.js-group-json-action-delete');
 			const disabled = this.#readonly || remove_actions.length < 2;
 			remove_actions.forEach(el => el.disabled = disabled);
+			subtable.querySelector('.js-group-json-action-add').disabled = this.#readonly;
 		}
 
 		const error_matching = row.querySelector('.js-preproc-param-error-matching');
@@ -274,21 +259,21 @@ var ItemEditPreprocessingTab = class {
 			case '<?= ZBX_PREPROC_SCRIPT ?>':
 			case '<?= ZBX_PREPROC_STR_REPLACE ?>':
 				on_fail_input.checked = false;
-				on_fail_input.readonly = false;
+				on_fail_input.removeAttribute('readonly');
 				on_fail_input.disabled = true;
 				test_button.disabled = false;
 				break;
 
 			case '<?= ZBX_PREPROC_VALIDATE_NOT_SUPPORTED ?>':
 				on_fail_input.checked = true;
-				on_fail_input.readonly = true;
+				on_fail_input.setAttribute('readonly', 'readonly');
 				on_fail_input.disabled = false;
 				test_button.disabled = false;
 				break;
 
 			default:
 				on_fail_input.checked = on_fail;
-				on_fail_input.readonly = false;
+				on_fail_input.removeAttribute('readonly');
 				on_fail_input.disabled = false;
 				test_button.disabled = false;
 				break;
@@ -305,10 +290,10 @@ var ItemEditPreprocessingTab = class {
 		row.querySelector('.js-preproc-param-prometheus-pattern-function')
 			?.addEventListener('change', (e) => this.#updateRow(e.target.closest('.preprocessing-list-item')));
 
-		const multiline = row.querySelector('.multilineinput-controler');
+		const multiline = row.querySelector('.multilineinput-control');
 
 		if (multiline) {
-			return $(multiline).multilineInput({
+			const parameters = {
 				title: <?= json_encode(_('JavaScript')) ?>,
 				placeholder: <?= json_encode(_('script')) ?>,
 				placeholder_textarea: 'return value',
@@ -316,8 +301,15 @@ var ItemEditPreprocessingTab = class {
 				label_after: '}',
 				grow: 'auto',
 				rows: 0,
+				value: multiline.getAttribute('data-value-init'),
 				maxlength: <?= DB::getFieldLength('item_preproc', 'params') ?>
-			})
+			};
+
+			if (this.#readonly) {
+				parameters.readonly = true;
+			}
+
+			$(multiline).multilineInput(parameters);
 		}
 
 		if (this.#readonly) {

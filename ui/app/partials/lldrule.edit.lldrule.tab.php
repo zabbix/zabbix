@@ -343,6 +343,7 @@ $formgrid
 		(new CFormField(
 			(new CTextBox('http_password', $lldrule['http_password'], $readonly, DB::getFieldLength('items', 'password')))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				->setAttribute('data-notrim', '')
 				->disableAutocomplete()
 		))->setId('js-item-http-password-field')
 	])
@@ -385,6 +386,7 @@ $formgrid
 				DB::getFieldLength('items', 'ssl_key_password')
 			))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				->setAttribute('data-notrim', '')
 				->disableAutocomplete()
 		))->setId('js-item-ssl-key-password-field')
 	])
@@ -548,6 +550,7 @@ $formgrid
 			(new CTextBox('password', $lldrule['password'], $lldrule['discovered_lld'],
 				DB::getFieldLength('items', 'password')
 			))
+				->setAttribute('data-notrim', '')
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 				->disableAutocomplete()
 		))->setId('js-item-password-field')
