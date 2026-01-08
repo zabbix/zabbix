@@ -1130,7 +1130,7 @@ zabbix_export:
               key: 'docker.container_info["{#NAME}",full]'
               history: '0'
               value_type: CHAR
-              description: 'Return low-level information about a container.'
+              description: 'Returns low-level information about a container.'
               tags:
                 - tag: component
                   value: raw
@@ -1352,7 +1352,7 @@ zabbix_export:
               key: 'docker.container_stats.memory.usage_inactive["{#NAME}"]'
               value_type: FLOAT
               units: B
-              description: 'Get the inactive memory usage of the container.'
+              description: 'Gets the inactive memory usage of the container.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -1369,7 +1369,7 @@ zabbix_export:
               type: DEPENDENT
               key: 'docker.container_stats.memory.usage_total["{#NAME}"]'
               units: B
-              description: 'Get the total memory usage (inactive, active) from the container.'
+              description: 'Gets the total memory usage (inactive, active) from the container.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -1417,7 +1417,7 @@ zabbix_export:
               key: 'docker.container_stats["{#NAME}"]'
               history: '0'
               value_type: CHAR
-              description: 'Get container stats based on resource usage.'
+              description: 'Gets container stats based on resource usage.'
               tags:
                 - tag: component
                   value: raw
