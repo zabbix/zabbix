@@ -150,8 +150,6 @@ class CTag extends CObject {
 	 *													Syntax:
 	 *														property1: value1; property2: value2; property(n): value(n)
 	 * @param int					$delay				Delay in milliseconds before showing hintbox.
-	 * @param bool					$aria_describedby	If set to true, it will be set dynamic id for the hintbox, and
-	 *													aria_describedby with this id for the button.
 	 * @return CTag
 	 */
 	public function setHint($text, $span_class = '', $freeze_on_click = true, $styles = '', $delay = null) {
