@@ -709,4 +709,97 @@ out:
       value: value66
       automatic: ZBX_DB_TAG_AUTOMATIC
       flags: [ZBX_FLAG_DB_TAG_UPDATE_TAG, ZBX_FLAG_DB_TAG_UPDATE_VALUE]
+---
+test case: "Replace tags (using binary data for values)"
+in:
+  buffer_used: yes
+  dst_tags:
+    - tagid: 1
+      tag_buf:
+         - '\x74\x61\x67\x31\x00' # tag1
+      tag_buf_len: 5
+      value_buf:
+        - '\x76\x61\x6C\x75\x65\x31\x00'  # value1
+      value_buf_len: 7
+      automatic: ZBX_DB_TAG_AUTOMATIC
+  src_tags:
+    - tag_buf:
+         - '\x74\x61\x67\x34\x34\x00' # tag44
+      tag_buf_len: 6
+      value_buf:
+        - '\x76\x61\x6C\x75\x65\x34\x34\x00'  # value44
+      value_buf_len: 8
+      automatic: ZBX_DB_TAG_AUTOMATIC
+out:
+  dst_tags:
+    - tagid: 0
+      tag_buf:
+         - '\x74\x61\x67\x34\x34\x00' # tag44
+      tag_buf_len: 6
+      value_buf:
+        - '\x76\x61\x6C\x75\x65\x34\x34\x00'  # value44
+      value_buf_len: 8
+      automatic: ZBX_DB_TAG_AUTOMATIC
+      flags: [ZBX_FLAG_DB_TAG_UPDATE_TAG, ZBX_FLAG_DB_TAG_UPDATE_VALUE]
+---
+test case: "Replace tags (broken utf8 tag)"
+in:
+  buffer_used: yes
+  dst_tags:
+    - tagid: 1
+      tag_buf:
+         - '\x74\x61\x67\x31\x00' # tag1
+      tag_buf_len: 5
+      value_buf:
+        - '\x76\x61\x6C\x75\x65\x31\x00'  # value1
+      value_buf_len: 7
+      automatic: ZBX_DB_TAG_AUTOMATIC
+  src_tags:
+    - tag_buf:
+         - '\xF4\x90\x80\x80\x00' # broken utf8
+      tag_buf_len: 5
+      value_buf:
+        - '\x76\x61\x6C\x75\x65\x34\x34\x00'  # value44
+      value_buf_len: 8
+      automatic: ZBX_DB_TAG_AUTOMATIC
+out:
+  dst_tags:
+    - tagid: 0
+      tag_buf:
+         - '\x74\x61\x67\x31\x00' # tag1
+      tag_buf_len: 5
+      value_buf:
+        - '\x76\x61\x6C\x75\x65\x31\x00'  # value1
+      value_buf_len: 7
+      automatic: ZBX_DB_TAG_AUTOMATIC
+---
+test case: "Replace tags (broken utf8 value)"
+in:
+  buffer_used: yes
+  dst_tags:
+    - tagid: 1
+      tag_buf:
+         - '\x74\x61\x67\x31\x00' # tag1
+      tag_buf_len: 5
+      value_buf:
+        - '\x76\x61\x6C\x75\x65\x31\x31\x00'  # value11
+      value_buf_len: 8
+      automatic: ZBX_DB_TAG_AUTOMATIC
+  src_tags:
+    - tag_buf:
+         - '\x74\x61\x67\x32\x00' # tag2
+      tag_buf_len: 5
+      value_buf:
+        - '\xF4\x90\x80\x80\x00'  # broken utf8
+      value_buf_len: 5
+      automatic: ZBX_DB_TAG_NORMAL
+out:
+  dst_tags:
+    - tagid: 0
+      tag_buf:
+         - '\x74\x61\x67\x31\x00' # tag1
+      tag_buf_len: 5
+      value_buf:
+        - '\x76\x61\x6C\x75\x65\x31\x31\x00'  # value11
+      value_buf_len: 8
 ...
