@@ -1,7 +1,7 @@
-Zabbix History Migration Scripts
+Zabbix ClickHouse schema and history migration scripts
 
-This collection of scripts facilitates the migration of Zabbix history data 
-from MySQL or PostgreSQL to ClickHouse.
+This collection of scripts facilitates creation of clickhouse tables 
+and migration of Zabbix history data from MySQL or PostgreSQL to ClickHouse.
 
 Scripts Overview
 clickhouse.sh - helper script, not to be used directly
@@ -28,11 +28,13 @@ Parameters:
 -h|--help: Display help message
 
 Example:
-./history_schema.sh -u http://localhost:8123 -d zabbix
+./history_schema.sh -u user:password@http://localhost:8123 -d zabbix
 
-The housekeeping interval (TTL) and partition schema are losely linked. When increasing housekeeping
-interval it might be worth increasing also partition schema, for example with year long housekeeping
-interval it might be better to set monthly partitioning:
+The housekeeping interval (TTL) and partition schema are loosely linked.
+When increasing housekeeping interval, it might be worth increasing also
+partition schema, for example with year long housekeeping interval it
+might be better to set monthly partitioning:
+
 ./<history table>_schema.sh -u <ClickHouse URL> -d <database> -t 31536000 -p toYYYYMM
 
 Data Export Scripts:
