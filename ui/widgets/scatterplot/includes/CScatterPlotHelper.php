@@ -847,7 +847,7 @@ class CScatterPlotHelper {
 			$names = [];
 
 			foreach (['x_axis_items_name', 'y_axis_items_name'] as $axis) {
-				$names[$axis] = $metric['aggregation_name'].'(';
+				$names[$axis] = '';
 
 				$count = 0;
 
@@ -862,7 +862,7 @@ class CScatterPlotHelper {
 				}
 
 				if ($legend_options['show_aggregation']) {
-					$names[$axis] .= ')';
+					$names[$axis] = $metric['aggregation_name'].'('.$names[$axis].')';
 				}
 				elseif ($count > 1) {
 					$names[$axis] = '('.$names[$axis].')';
