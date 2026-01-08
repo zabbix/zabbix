@@ -26,7 +26,7 @@ import (
 	"golang.zabbix.com/sdk/log"
 )
 
-const parserLogMessage = "[File Parser]"
+const parserLogPrefix = "[File Parser]"
 
 // Parser holds the configuration for the file parsing process.
 type Parser struct {
@@ -102,7 +102,7 @@ func (p *Parser) parseByReadingAllIntoMemory(path string, reg *regexp.Regexp) ([
 	)
 
 	log.Tracef("%s Opened file %s, with size of %d bytes, of %d lines",
-		parserLogMessage,
+		parserLogPrefix,
 		path,
 		len(content),
 		len(lines),
@@ -140,9 +140,9 @@ func (p *Parser) parseLineByScanning(path string, reg *regexp.Regexp) ([]string,
 
 	stats, err := file.Stat()
 	if err == nil {
-		log.Tracef("%s Opened file %s, with size of %d bytes", parserLogMessage, path, stats.Size())
+		log.Tracef("%s Opened file %s, with size of %d bytes", parserLogPrefix, path, stats.Size())
 	} else {
-		log.Tracef("%s Opened file %s, failed to read size of it", parserLogMessage, path)
+		log.Tracef("%s Opened file %s, failed to read size of it", parserLogPrefix, path)
 	}
 
 	defer file.Close() //nolint:errcheck // standard defer function which error would not change anything.
