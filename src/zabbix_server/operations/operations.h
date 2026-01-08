@@ -32,7 +32,8 @@ void	op_add_del_tags(const zbx_db_event *event, zbx_config_t *cfg, zbx_vector_ui
 		zbx_vector_uint64_t *del_optagids);
 
 zbx_uint64_t	add_discovered_host(const zbx_db_event *event, int *status, const zbx_config_t *cfg);
-int		is_discovery_or_autoregistration(const zbx_db_event *event);
-int		zbx_map_db_event_to_audit_context(const zbx_db_event *event);
+
+int	is_discovery_or_autoregistration(const zbx_db_event *event);
+int	zbx_map_db_event_to_audit_context(const zbx_db_event *event);
 
 #endif
