@@ -855,38 +855,6 @@ int	is_discovery_or_autoregistration(const zbx_db_event *event)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: ensures discovered host exists, attempts to add if needed         *
- *                                                                            *
- * Parameters: event          - [IN] source event                             *
- *             cfg            - [IN] global configuration data                *
- *             hostid         - [IN/OUT] current hostid (0 if not provided,   *
- *                                       updated if host was added)           *
- *             status         - [OUT] host status                             *
- *                                                                            *
- * Return value: hostid - new/existing hostid or 0 if failed                  *
- *                                                                            *
- * Comments: This function checks if hostid is provided. If not, it attempts  *
- *           to add the discovered host. If hostid is already set (non-zero), *
- *           it returns the cached value. This prevents duplicate attempts    *
- *           and excessive warning logging.                                   *
- *                                                                            *
- ******************************************************************************/
-zbx_uint64_t	ensure_discovered_host(const zbx_db_event *event, const zbx_config_t *cfg, zbx_uint64_t *hostid,
-		int *status)
-{
-	if (0 != *hostid)
-		return *hostid;
-
-	if (FAIL == is_discovery_or_autoregistration(event))
-		return 0;
-
-	*hostid = add_discovered_host(event, status, cfg);
-
-	return *hostid;
-}
-
-/******************************************************************************
- *                                                                            *
  * Purpose: auxiliary function for op_add_del_tags()                          *
  *                                                                            *
  * Parameters: op        - [IN] operation type: add or delete                 *
