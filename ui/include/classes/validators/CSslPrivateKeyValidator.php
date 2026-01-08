@@ -25,7 +25,7 @@ class CSslPrivateKeyValidator extends CValidator {
 	 */
 	public function validate($value) {
 		if (!extension_loaded('openssl')) {
-			$this->setError(_('OpenSSL extension is not available.'));
+			$this->setError(_('OpenSSL extension is not available'));
 
 			return false;
 		}
@@ -35,6 +35,7 @@ class CSslPrivateKeyValidator extends CValidator {
 
 			return false;
 		}
+
 		return true;
 	}
 }
