@@ -8048,8 +8048,7 @@ z-select[disabled] .focusable, input[disabled], textarea[disabled], select optio
   .svg-graph-hintbox .scatter-plot-hintbox-row .scatter-plot-hintbox-row-axis {
     display: flex;
     flex-wrap: nowrap;
-    padding-left: 3px;
-    white-space: pre-wrap; }
+    padding-left: 3px; }
     .svg-graph-hintbox .scatter-plot-hintbox-row .scatter-plot-hintbox-row-axis .scatter-plot-hintbox-icon-color {
       display: block;
       width: 12px;
