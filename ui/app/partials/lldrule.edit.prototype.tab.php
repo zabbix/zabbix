@@ -290,6 +290,7 @@ $formgrid
 			(new CCheckBox('follow_redirects', HTTPTEST_STEP_FOLLOW_REDIRECTS_ON))
 				->setReadonly($readonly)
 				->setChecked($lldrule['follow_redirects'] == HTTPTEST_STEP_FOLLOW_REDIRECTS_ON)
+				->setUncheckedValue(HTTPTEST_STEP_FOLLOW_REDIRECTS_OFF)
 		))->setId('js-item-follow-redirects-field')
 	])
 	->addItem([
@@ -309,6 +310,7 @@ $formgrid
 			(new CCheckBox('output_format', HTTPCHECK_STORE_JSON))
 				->setReadonly($readonly)
 				->setChecked($lldrule['output_format'] == HTTPCHECK_STORE_JSON)
+				->setUncheckedValue(HTTPCHECK_STORE_RAW)
 		))->setId('js-item-output-format-field')
 	])
 	->addItem([
@@ -354,6 +356,7 @@ $formgrid
 			(new CCheckBox('verify_peer', ZBX_HTTP_VERIFY_PEER_ON))
 				->setReadonly($readonly)
 				->setChecked($lldrule['verify_peer'] == ZBX_HTTP_VERIFY_PEER_ON)
+				->setUncheckedValue(ZBX_HTTP_VERIFY_PEER_OFF)
 		))->setId('js-item-verify-peer-field')
 	])
 	->addItem([
@@ -362,6 +365,7 @@ $formgrid
 			(new CCheckBox('verify_host', ZBX_HTTP_VERIFY_HOST_ON))
 				->setReadonly($readonly)
 				->setChecked($lldrule['verify_host'] == ZBX_HTTP_VERIFY_HOST_ON)
+				->setUncheckedValue(ZBX_HTTP_VERIFY_HOST_OFF)
 		))->setId('js-item-verify-host-field')
 	])
 	->addItem([
@@ -715,6 +719,7 @@ $formgrid
 		(new CFormField((new CCheckBox('allow_traps', HTTPCHECK_ALLOW_TRAPS_ON))
 			->setChecked($lldrule['allow_traps'] == HTTPCHECK_ALLOW_TRAPS_ON)
 			->setEnabled(!$lldrule['discovered_lld'])
+			->setUncheckedValue(HTTPCHECK_ALLOW_TRAPS_OFF)
 		))->setId('js-item-allow-traps-field')
 	])
 	->addItem([
