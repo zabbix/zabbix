@@ -16,7 +16,7 @@ CREATE TABLE $CH_DB.history_log
 	log_time Int64
 )
 ENGINE = MergeTree()
-PARTITION BY toDate(timestamp)
+PARTITION BY $CH_PARTITION(timestamp)
 PRIMARY KEY (itemid, timestamp)
 TTL timestamp + toIntervalSecond($CH_TTL)
 EOF

@@ -1,17 +1,22 @@
 display_help()
 {
 	echo "Arguments:"
-	echo "  -u|--url	ClickHouse URL ($CH_URL)"
-	echo "  -d|--db		database name ($CH_DB)"
-	echo "  -t|--ttl	housekeeping interval in seconds ($CH_TTL)"
-	echo "  -h|--help	help message"
+	echo "  -u|--url		ClickHouse URL ($CH_URL)"
+	echo "  -d|--db			database name ($CH_DB)"
+	echo "  -t|--ttl		housekeeping interval in seconds ($CH_TTL)"
+	echo "  -p|--partition		partitioning schema ($CH_PARTITION)"
+	echo "  -h|--help		help message"
 
 	exit 0
 }
 
 CH_URL=http://localhost:8123
 CH_DB=zabbix
-CH_TTL="2592000"
+
+# default TTL time - 31 days
+CH_TTL="2678400"
+
+CH_PARTITION="toDate"
 
 if [ $# -eq 0 ]; then
 	display_help
@@ -35,6 +40,10 @@ while [ $# -gt 0 ]; do
 	-t|--ttl)
 		shift
 		CH_TTL=$1
+		;;
+	-p|--partition)
+		shift
+		CH_PARTITION=$1
 		;;
 	-v|--help)
 		display_help

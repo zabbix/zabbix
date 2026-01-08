@@ -12,7 +12,7 @@ CREATE TABLE $CH_DB.history_str
 	value String
 )
 ENGINE = MergeTree()
-PARTITION BY toDate(timestamp)
+PARTITION BY $CH_PARTITION(timestamp)
 PRIMARY KEY (itemid, timestamp)
 TTL timestamp + toIntervalSecond($CH_TTL)
 EOF
