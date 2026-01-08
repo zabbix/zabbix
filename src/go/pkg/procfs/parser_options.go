@@ -93,17 +93,3 @@ func (p *Parser) SetSplitter(separator string, index int) *Parser {
 
 	return p
 }
-
-// DisablePathValidation disables all path security checks.
-//
-// ⚠️  WARNING: SECURITY RISK ⚠️
-//
-// This removes protection against path traversal, symlink attacks, and
-// block device access. Only use with hardcoded, trusted paths.
-//
-// Requires security team approval. Document your justification in code review.
-func (p *Parser) DisablePathValidation() *Parser {
-	p.validatePath = false
-
-	return p
-}

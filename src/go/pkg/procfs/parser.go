@@ -19,7 +19,6 @@ import (
 	"bytes"
 	"fmt"
 	"os"
-	"path/filepath"
 	"regexp"
 	"strings"
 
@@ -29,23 +28,9 @@ import (
 
 const parserLogMessage = "[File Parser]"
 
-// minimal possible set of allowed paths, add, whenever need to add new path to some parsing.
-//
-//nolint:gochecknoglobals // used as a constant check slice.
-var allowedPrefixes = []string{
-	// Specific /proc
-	"/proc/net/",
-	"/proc/sys/",
-	"/proc/stat",
-	// need to think how to implement /proc/[PID], most likely with sub-allowlist.
-
-	"/tmp/",
-}
-
 // Parser holds the configuration for the file parsing process.
 type Parser struct {
 	maxMatches          int
-	validatePath        bool
 	scanStrategy        ScanStrategy
 	matchMode           MatchMode
 	splitIndex          int
@@ -60,28 +45,16 @@ func NewParser() *Parser {
 	return &Parser{
 		matchMode:    ModeContains,
 		scanStrategy: StrategyOSReadFile,
-		validatePath: true,
 	}
 }
 
 // Parse opens the file at path and returns content string lines that match set rules.
+// Validate path before using this function.
 func (p *Parser) Parse(path string) ([]string, error) {
 	var (
-		cleanPath string
-		err       error
+		reg *regexp.Regexp
+		err error
 	)
-
-	if p.validatePath {
-		cleanPath, err = validateAndCleanPath(path)
-		if err != nil {
-			return nil, err
-		}
-	} else {
-		log.Debugf("%s parsing %s without validation", parserLogMessage, path)
-		cleanPath = path
-	}
-
-	var reg *regexp.Regexp
 
 	if p.matchMode == ModeRegex {
 		reg, err = regexp.Compile(p.pattern)
@@ -92,53 +65,13 @@ func (p *Parser) Parse(path string) ([]string, error) {
 
 	switch p.scanStrategy {
 	case StrategyReadAll, StrategyOSReadFile:
-		return p.parseByReadingAllIntoMemory(cleanPath, reg)
+		return p.parseByReadingAllIntoMemory(path, reg)
 	case StrategyReadLineByLine:
-		return p.parseLineByScanning(cleanPath, reg)
+		return p.parseLineByScanning(path, reg)
 
 	default:
 		return nil, errs.Errorf("unknown scan strategy: %d", p.scanStrategy)
 	}
-}
-
-func validateAndCleanPath(path string) (string, error) {
-	var (
-		//cleanPath     string
-		canonicalPath string
-		err           error
-	)
-
-	//cleanPath = filepath.Clean(path)
-
-	canonicalPath, err = filepath.EvalSymlinks(path)
-	if err != nil {
-		log.Warningf("%s failed to resolve symlinks for path %s: %s", parserLogMessage, path, err)
-
-		return "", errs.Wrapf(err, "failed to resolve path")
-	}
-
-	canonicalPath, err = filepath.Abs(canonicalPath)
-	if err != nil {
-		return "", errs.Wrapf(err, "failed to get absolute path")
-	}
-
-	if !isAllowedPath(canonicalPath) {
-		log.Debugf("%s attempted access to non-allowed path: %s", parserLogMessage, canonicalPath)
-
-		return "", errs.Errorf("path not in allowed list: %s", path)
-	}
-
-	return canonicalPath, nil
-}
-
-func isAllowedPath(path string) bool {
-	for _, prefix := range allowedPrefixes {
-		if strings.HasPrefix(path, prefix) {
-			return true
-		}
-	}
-
-	return false
 }
 
 // reads all file into memory.
