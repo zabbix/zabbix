@@ -2747,7 +2747,7 @@ class testDocumentationLinks extends CWebTest {
 			[
 				[
 					'element' => [
-						'xpath://div[contains(@style, "top: 257px")]',
+						'xpath://div[contains(@style, "top: 258px")]',
 						'xpath://div[contains(@style, "top: 82px")]'
 					],
 					'doc_link' => '/en/manual/config/visualization/maps/map#adding-shapes'
