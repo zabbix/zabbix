@@ -905,11 +905,22 @@ class CSvgGraph {
 				color_span.style.color = point.color;
 				color_span.classList.add('scatter-plot-hintbox-icon-color', point.marker_class);
 
-				axis.append(color_span, `${aggregation_name}(`);
+				axis.append(color_span);
+
+				if (aggregation_name) {
+					axis.append(`${aggregation_name}(`);
+				}
+				else if (items_data.length > 1) {
+					axis.append('(');
+				}
 
 				let count = 0;
 				for (const [itemid, name] of items_data) {
 					count++;
+
+					if (count > 1) {
+						axis.append(', ');
+					}
 
 					const item_span = document.createElement('span');
 					item_span.classList.add('has-broadcast-data');
@@ -918,13 +929,13 @@ class CSvgGraph {
 					item_span.innerText = name.toString();
 
 					axis.append(item_span);
-
-					if (count !== items_data.length && count > 0) {
-						axis.append(', ');
-					}
 				}
 
-				axis.append(`): ${key === 'xItems' ? point.vx : point.vy}`);
+				if (aggregation_name || count > 1) {
+					axis.append(')');
+				}
+
+				axis.append(`: ${key === 'xItems' ? point.vx : point.vy}`);
 
 				row.append(axis);
 			}
