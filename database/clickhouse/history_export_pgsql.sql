@@ -1,1 +1,1 @@
-\COPY (SELECT itemid,value,concat(clock,'.',ns) FROM history) TO '/tmp/history.csv' DELIMITER ',' CSV;
+\COPY (SELECT itemid,concat(clock,'.',ns),value FROM history) TO '/tmp/history.csv' DELIMITER ',' CSV;

@@ -1031,31 +1031,31 @@ static const char	*history_clickhouse_parse_itemid(const struct zbx_json_parse *
 static const char	*history_clickhouse_parse_row(const struct zbx_json_parse *jp, const char *p,
 		unsigned char value_type, zbx_history_record_t *record)
 {
-	char	timestamp[MAX_ID_LEN * 2], *ptr;
+	char	clock_ns[MAX_ID_LEN * 2], *ptr;
 
-	if (NULL == (p = zbx_json_next_value(jp, p, timestamp, sizeof(timestamp), NULL)))
+	if (NULL == (p = zbx_json_next_value(jp, p, clock_ns, sizeof(clock_ns), NULL)))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "cannot parse timestamp from row \"%s\"", jp->start);
+		zabbix_log(LOG_LEVEL_WARNING, "cannot parse value timestamp from row \"%s\"", jp->start);
 		return NULL;
 	}
 
-	if (NULL == (ptr = strchr(timestamp, '.')))
+	if (NULL == (ptr = strchr(clock_ns, '.')))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "invalid timestamp format \"%s\"", timestamp);
+		zabbix_log(LOG_LEVEL_WARNING, "invalid value timestamp format \"%s\"", clock_ns);
 		return NULL;
 	}
 
 	*ptr++ = '\0';
 
-	if (FAIL == zbx_is_uint32(timestamp, &record->timestamp.sec))
+	if (FAIL == zbx_is_uint32(clock_ns, &record->timestamp.sec))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "invalid timestamp seconds value \"%s\"", timestamp);
+		zabbix_log(LOG_LEVEL_WARNING, "invalid value timestamp seconds value \"%s\"", clock_ns);
 		return NULL;
 	}
 
 	if (FAIL == zbx_is_uint32(ptr, &record->timestamp.ns))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "invalid timestamp nanoseconds value \"%s\"", ptr);
+		zabbix_log(LOG_LEVEL_WARNING, "invalid value timestamp nanoseconds value \"%s\"", ptr);
 		return NULL;
 	}
 
@@ -1278,9 +1278,9 @@ static int	history_clickhouse_fetch(void *data, zbx_uint64_t itemid, unsigned ch
 
 	conn = history_clickhouse_get_conn(d, value_type);
 
-	zbx_strcpy_alloc(&query, &query_alloc, &query_offset, "select timestamp,value");
+	zbx_strcpy_alloc(&query, &query_alloc, &query_offset, "select clock_ns,value");
 	if (ITEM_VALUE_TYPE_LOG == value_type)
-		zbx_strcpy_alloc(&query, &query_alloc, &query_offset, ",source,severity,logeventid,log_time");
+		zbx_strcpy_alloc(&query, &query_alloc, &query_offset, ",source,severity,logeventid,timestamp");
 
 	zbx_snprintf_alloc(&query, &query_alloc, &query_offset, " from %s where itemid=" ZBX_FS_UI64,
 			clickhouse_history_tables[value_type], itemid);
@@ -1288,17 +1288,17 @@ static int	history_clickhouse_fetch(void *data, zbx_uint64_t itemid, unsigned ch
 	if (0 != start)
 	{
 		zbx_recalc_time_period(&start, ZBX_RECALC_TIME_PERIOD_HISTORY);
-		zbx_snprintf_alloc(&query, &query_alloc, &query_offset, " and timestamp>='" ZBX_FS_TIME_T ".0'",
+		zbx_snprintf_alloc(&query, &query_alloc, &query_offset, " and clock_ns>='" ZBX_FS_TIME_T ".0'",
 				start + 1);
 	}
 
 	if (0 != end)
 	{
-		zbx_snprintf_alloc(&query, &query_alloc, &query_offset, " and timestamp<'" ZBX_FS_TIME_T ".0'",
+		zbx_snprintf_alloc(&query, &query_alloc, &query_offset, " and clock_ns<'" ZBX_FS_TIME_T ".0'",
 				end + 1);
 	}
 
-	zbx_strcpy_alloc(&query, &query_alloc, &query_offset, " order by timestamp desc");
+	zbx_strcpy_alloc(&query, &query_alloc, &query_offset, " order by clock_ns desc");
 
 	if (0 != count)
 		zbx_snprintf_alloc(&query, &query_alloc, &query_offset, " LIMIT %d", count);
@@ -1444,7 +1444,7 @@ static int	history_clickhouse_fetch_batch(void *data, zbx_vector_item_history_t 
 		zbx_vector_history_record_reserve(&results->values[i].rows, MIN(limit, 32));
 	}
 
-	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "select itemid,timestamp,value");
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "select itemid,clock_ns,value");
 	if (ITEM_VALUE_TYPE_LOG == value_type)
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ",source,severity,logeventid,log_time");
 
@@ -1454,9 +1454,9 @@ static int	history_clickhouse_fetch_batch(void *data, zbx_vector_item_history_t 
 	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "itemid", itemids.values, itemids.values_num);
 	zbx_vector_uint64_destroy(&itemids);
 
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " and timestamp>='" ZBX_FS_TIME_T ".0'", start + 1);
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " and clock_ns>='" ZBX_FS_TIME_T ".0'", start + 1);
 
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " order by itemid,timestamp desc limit %d by itemid"
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " order by itemid,clock_ns desc limit %d by itemid"
 			" format JSONCompactEachRow", limit);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "batch query: %s", sql);
@@ -1485,7 +1485,7 @@ static void	history_clickhouse_add_value_type_info(zbx_history_provider_info_t *
 	zbx_history_provider_value_type_info_t	vti = {.value_type = value_type};
 	char					*ttl = NULL;
 
-	if (SUCCEED == zbx_mregexp_sub(schema, "TTL +timestamp +\\+ +toInterval(\\w+)\\((\\d+)\\)", "\\1:\\2",
+	if (SUCCEED == zbx_mregexp_sub(schema, "TTL +clock_ns +\\+ +toInterval(\\w+)\\((\\d+)\\)", "\\1:\\2",
 			ZBX_REGEXP_GROUP_CHECK_DISABLE, &ttl) && NULL != ttl)
 	{
 		char	*value;

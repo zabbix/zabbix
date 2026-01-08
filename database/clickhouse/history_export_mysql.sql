@@ -1,4 +1,4 @@
-SELECT itemid,value,concat(clock,'.',ns) FROM history
+SELECT itemid,concat(clock,'.',ns),value FROM history
 INTO OUTFILE '/tmp/history.csv'
 FIELDS ENCLOSED BY '"'
 TERMINATED BY ','

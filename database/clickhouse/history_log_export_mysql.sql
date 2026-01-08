@@ -1,4 +1,4 @@
-SELECT itemid,value,source,severity,logeventid,timestamp,concat(clock,'.',ns) FROM history_log
+SELECT itemid,concat(clock,'.',ns),value,source,severity,logeventid,timestamp FROM history_log
 INTO OUTFILE '/tmp/history_log.csv'
 FIELDS ENCLOSED BY '"'
 TERMINATED BY ','

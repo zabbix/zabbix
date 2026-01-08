@@ -8,17 +8,17 @@ cat << EOF | curl $CH_URL --data-binary @-
 CREATE TABLE $CH_DB.history_log
 (
 	itemid UInt64,
-	timestamp DateTime64(9),
+	clock_ns DateTime64(9),
 	value String,
 	source String,
 	severity Int32,
 	logeventid Int32,
-	log_time Int64
+	timestamp Int64
 )
 ENGINE = MergeTree()
-PARTITION BY $CH_PARTITION(timestamp)
-PRIMARY KEY (itemid, timestamp)
-TTL timestamp + toIntervalSecond($CH_TTL)
+PARTITION BY $CH_PARTITION(clock_ns)
+PRIMARY KEY (itemid, clock_ns)
+TTL clock_ns + toIntervalSecond($CH_TTL)
 EOF
 
 
