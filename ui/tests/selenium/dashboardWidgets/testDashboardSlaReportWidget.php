@@ -2192,7 +2192,8 @@ class testDashboardSlaReportWidget extends testSlaReport {
 					'fields' => [
 						'SLA' => 'SLA Quarterly',
 						'Service' => 'Simple actions service',
-						'To' => 'now/d-100d',
+						// TODO: Change the value of the "To" field to 'now/d-100d' when ZBX-27363 is fixed.
+						'To' => 'now-100d',
 						'Show periods' => 3
 					],
 					'reporting_period' => 'Quarterly',
