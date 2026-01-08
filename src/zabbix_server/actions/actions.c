@@ -2750,7 +2750,7 @@ static void	execute_operations(const zbx_db_event *event, zbx_uint64_t actionid)
 				if (FAIL == ensure_host_for_operation(event, &hostid, &status, &cfg, &host_add_failed))
 					break;
 
-				op_host_add(event, &cfg, &hostid, &host_add_failed);
+				op_host_add(event, &cfg);
 				break;
 			case ZBX_OPERATION_TYPE_HOST_REMOVE:
 				op_host_del(event);
