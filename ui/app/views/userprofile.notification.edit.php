@@ -59,7 +59,7 @@ $tabs->addTab('mediaTab', _('Media'), $media, TAB_INDICATOR_MEDIA);
 
 // Frontend notifications tab.
 $messaging_form_list = (new CFormList())
-	->addRow(_('Frontend notifications'),
+	->addRow((new CLabel(_('Frontend notifications')))->setAsteriskMark(),
 		(new CCheckBox('messages[enabled]'))
 			->setChecked($data['messages']['enabled'] == 1)
 			->setUncheckedValue(0)
