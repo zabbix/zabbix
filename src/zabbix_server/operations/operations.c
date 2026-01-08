@@ -1023,11 +1023,13 @@ static void	discovered_host_tags_save(zbx_uint64_t hostid, zbx_vector_db_tag_ptr
  *                                                                            *
  * Purpose: adds discovered host                                              *
  *                                                                            *
- * Parameters: event - [IN] source event data                                 *
- *             cfg   - [IN] global configuration data                         *
+ * Parameters: event           - [IN] source event data                       *
+ *             cfg             - [IN] global configuration data               *
+ *             hostid          - [IN/OUT] host ID (updated if host is added)  *
+ *             host_add_failed - [IN/OUT] flag indicating if host add failed  *
  *                                                                            *
  ******************************************************************************/
-void	op_host_add(const zbx_db_event *event, const zbx_config_t *cfg)
+void	op_host_add(const zbx_db_event *event, const zbx_config_t *cfg, zbx_uint64_t *hostid, int *host_add_failed)
 {
 	int	status;
 
@@ -1036,7 +1038,11 @@ void	op_host_add(const zbx_db_event *event, const zbx_config_t *cfg)
 	if (FAIL == is_discovery_or_autoregistration(event))
 		goto out;
 
-	add_discovered_host(event, &status, cfg);
+	if (0 == *hostid && 0 == (*hostid = add_discovered_host(event, &status, cfg)))
+	{
+		*host_add_failed = 1;
+		goto out;
+	}
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
