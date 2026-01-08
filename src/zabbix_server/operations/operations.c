@@ -1061,8 +1061,8 @@ static void	discovered_host_tags_save(zbx_uint64_t hostid, zbx_vector_db_tag_ptr
  ******************************************************************************/
 void	op_host_add(const zbx_db_event *event, const zbx_config_t *cfg)
 {
-	zbx_uint64_t	hostid;
-	int		status;
+	zbx_uint64_t	hostid = 0;
+	int		status = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
