@@ -2539,6 +2539,7 @@ select {
 			display: flex;
 			flex-wrap: nowrap;
 			padding-left: 3px;
+			white-space: pre;
 
 			.scatter-plot-hintbox-icon-color {
 				@extend %icon-small;
