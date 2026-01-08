@@ -55,7 +55,8 @@ class CControllerFavoriteCreate extends CController {
 				var addrm_fav = document.getElementById("addrm_fav");
 
 				if (addrm_fav !== null) {
-					addrm_fav.title = "'._('Remove from favorites').'";
+					addrm_fav.ariaLabel = "'._('Remove map from the Favorite maps widget').'";
+					addrm_fav.setAttribute("data-hintbox-contents", "'._('Remove from favorites').'");
 					addrm_fav.onclick = () => rm4favorites("'.$object.'", "'.$objectid.'");
 					addrm_fav.classList.add("'.ZBX_ICON_STAR_FILLED.'");
 					addrm_fav.classList.remove("'.ZBX_ICON_STAR.'");
