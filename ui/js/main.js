@@ -693,8 +693,6 @@ const hintBox = {
 			*/
 			css.width = Math.ceil(parseFloat(hint_computed_style.width));
 
-			const height = Math.ceil(parseFloat(hint_computed_style.height));
-
 			// Event coordinates relative to host.
 			if (target.event_x === undefined) {
 				let client_x, client_y;
@@ -752,8 +750,6 @@ const hintBox = {
 
 			// Assign css rules to hint.
 			Object.entries(css).forEach(([key, value]) => hint.style[key] = value !== null ? `${value}px` : null);
-
-			hint.style.height = `min(${height}px, calc(100vh - 20px))`;
 		}
 		while (host_client_width > host.clientWidth || host_client_height > host.clientHeight);
 
