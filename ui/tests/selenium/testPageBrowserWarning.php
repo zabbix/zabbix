@@ -18,21 +18,25 @@ require_once __DIR__.'/../include/CWebTest.php';
 
 class testPageBrowserWarning extends CWebTest {
 
-	public function testPageBrowserWarning_WhenNotLoggedIn() {
-		$this->page->open('browserwarning.php');
-		$this->query('link:Continue despite this warning')->one()->click();
-		$this->assertTrue($this->query('button:Sign in')->one()->isClickable());
-	}
-
 	public function testPageBrowserWarning_Layout() {
+
+		// User not logged in.
+		$this->page->open('browserwarning.php')->waitUntilReady();
+		$this->query('link:Continue despite this warning')->waitUntilClickable()->one()->click();
+		$this->assertEquals(PHPUNIT_URL.'index.php', $this->page->getCurrentURL());
+		$this->assertTrue($this->query('button:Sign in')->one()->isClickable());
+		$this->page->login()->open('browserwarning.php')->waitUntilReady();
+
+		// User logged in.
 		$this->page->login()->open('browserwarning.php')->waitUntilReady();
 		$this->assertEquals('You are using an outdated browser.', $this->query('tag:h2')->one()->getText());
+		$this->assertEquals('You are using an outdated browser.', $this->page->getTitle());
 
 		$text = ['Zabbix frontend is built on advanced, modern technologies and does not support old browsers.'.
-		' It is highly recommended that you choose and install a modern browser. It is free of charge'.
-		' and only takes a couple of minutes.', 'New browsers usually come with support for new technologies,'.
-		' increasing web page speed, better privacy'.
-		' settings and so on. They also resolve security and functional issues.'];
+			' It is highly recommended that you choose and install a modern browser. It is free of charge'.
+			' and only takes a couple of minutes.', 'New browsers usually come with support for new technologies,'.
+			' increasing web page speed, better privacy'.
+			' settings and so on. They also resolve security and functional issues.'];
 		$this->assertEquals($text, $this->query('tag:p')->all()->asText());
 
 		$links = [
@@ -43,8 +47,9 @@ class testPageBrowserWarning extends CWebTest {
 			'Apple Safari' => 'http://www.apple.com/safari/download'
 		];
 		foreach ($links as $link => $url) {
-			$this->assertEquals($this->query('link', $link)->one()->getAttribute('href'), $url);
-			$this->assertTrue($this->query('link', $link)->one()->isClickable());
+			$element = $this->query('link', $link)->one();
+			$this->assertEquals($element->getAttribute('href'), $url);
+			$this->assertTrue($element->isClickable());
 		}
 
 		$this->assertScreenshot($this->query('class:browser-warning-container')->one());
