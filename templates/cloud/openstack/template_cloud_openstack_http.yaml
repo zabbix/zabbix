@@ -131,7 +131,7 @@ zabbix_export:
         Access rights are set using policies. Each service has its own policy file, therefore **further steps for setting up policies, are mentioned in the template documentation of each supported service**, e.g., __OpenStack Nova by HTTP__.
       vendor:
         name: Zabbix
-        version: 8.0-1
+        version: 8.0-2
       groups:
         - name: Templates/Cloud
       items:
@@ -194,14 +194,26 @@ zabbix_export:
             }
             
             function parseHttpData(http_data) {
-            	var token;
             	const headers = http_data['request'].getHeaders(true);
             	if (typeof headers === "object") {
             		if (headers !== null) {
             			try {
-            				token = headers["X-Subject-Token"][0];
+            				var found = false;
+            
+            				for (var key in headers) {
+            					if (key.toLowerCase() === "x-subject-token") {
+            						var token = headers[key][0];
+            						
+            						found = true;
+            						break;
+            					}
+            				}
+            
+            				if (!found) {
+            					throw 'X-Subject-Token header not found.';
+            				}
             			} catch (error) {
-            				throw 'Failed to parse response received from OpenStack Identity API. Check debug log for more information.';
+            				throw 'Failed to parse response received from OpenStack Identity API. ' + error;
             			}
             		} else {
             			throw 'Response object is empty. Check debug log for more information.';
