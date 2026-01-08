@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -2226,6 +2226,7 @@ class testDashboardItemHistoryWidget extends testWidgets {
 		]);
 		$column_overlay->getFooter()->query('button:Add')->waitUntilClickable()->one()->click();
 		$column_overlay->waitUntilNotVisible();
+		$form->waitUntilStalled();
 
 		// Save or cancel widget.
 		if (CTestArrayHelper::get($data, 'save_widget', false)) {
@@ -2238,7 +2239,7 @@ class testDashboardItemHistoryWidget extends testWidgets {
 		}
 		else {
 			$dialog = COverlayDialogElement::find()->one();
-			$dialog->query('button:Cancel')->one()->click();
+			$dialog->query('button:Cancel')->waitUntilClickable()->one()->click();
 			$dialog->ensureNotPresent();
 
 			if (CTestArrayHelper::get($data, 'update', false)) {
@@ -2825,9 +2826,7 @@ class testDashboardItemHistoryWidget extends testWidgets {
 		$container->query('button:Add')->one()->click();
 		$input = $form->query('xpath:.//input[contains(@id, '.CXPathHelper::escapeQuotes($i.$selector).')]')->one();
 		$this->assertTrue($input->isVisible());
-		$this->assertEquals('E65660', $container->query('xpath:.//z-color-picker')
-				->asColorPicker()->one()->getValue()
-		);
+		$this->assertEquals('E65660', $container->query('xpath:.//z-color-picker')->asColorPicker()->one()->getValue());
 		$container->query('xpath:.//button[contains(@id, '.CXPathHelper::escapeQuotes($i.'_remove').')]')
 				->one()->click();
 		$this->assertFalse($input->isVisible());

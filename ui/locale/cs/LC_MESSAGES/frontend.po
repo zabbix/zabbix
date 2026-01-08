@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2025-08-27 11:28+0000\n"
+"PO-Revision-Date: 2025-12-03 10:08+0000\n"
 "Last-Translator: Tomáš Heřmánek <tomas.hermanek@initmax.cz>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: cs\n"
@@ -314,6 +314,24 @@ msgstr "Třída %1$s.php musí rozšiřovat %2$s pro modul umístěný v %3$s."
 #, c-format
 msgid "%1$s: %2$s"
 msgstr "%1$s: %2$s"
+
+#: include/classes/server/CZabbixServer.php:740
+#: include/classes/setup/CSetupWizard.php:1459
+#, c-format
+msgid "%1$s: %2$s."
+msgstr "%1$s: %2$s."
+
+#: include/classes/server/CZabbixServer.php:746
+#: include/classes/setup/CSetupWizard.php:1465
+#, c-format
+msgid "%1$s: file is not readable."
+msgstr "%1$s: soubor není čitatelný."
+
+#: include/classes/server/CZabbixServer.php:743
+#: include/classes/setup/CSetupWizard.php:1462
+#, c-format
+msgid "%1$s: invalid path or file not found."
+msgstr "%1$s: nesprávna cesta k souboru alebo soubor nelze najít."
 
 #: include/classes/graph/CSvgGraph.php:1418
 #, c-format
@@ -2070,7 +2088,7 @@ msgstr "Vyhnout se snadno uhodnutelným heslům"
 
 #: app/views/host.wizard.edit.php:473
 msgid "Avoid including sensitive data."
-msgstr ""
+msgstr "Vyhněte se zadávání citlivých údajů."
 
 #: jsLoader.php:172
 msgid "Awaiting data"
@@ -3682,7 +3700,7 @@ msgstr "Nelze najít mapu hodnot \"%1$s\" použitou pro prototyp itemu \"%2$s\" 
 
 #: app/views/oauth.authorize.php:33
 msgid "Cannot get authentication tokens"
-msgstr ""
+msgstr "Nelze získat autentizační tokeny"
 
 #: app/views/oauth.edit.php:230
 msgid "Cannot get authorization code."
@@ -4218,6 +4236,11 @@ msgstr "Nelze číst XML: %1$s."
 msgid "Cannot read YAML: %1$s."
 msgstr "Nelze číst YAML: %1$s."
 
+#: include/classes/server/CZabbixServer.php:511
+#, c-format
+msgid "Cannot read response from Zabbix server \"%1$s\"."
+msgstr "Nelze přečíst odpověď ze Zabbix serveru \"%1$s\"."
+
 #: include/classes/server/CZabbixServer.php:567
 #, c-format
 msgid "Cannot read the response, check connection with the Zabbix server \"%1$s\"."
@@ -4280,6 +4303,10 @@ msgstr "Nelze nastavit \"%1$s\" pro prototyp grafu \"%2$s\"."
 #: widgets/piechart/includes/CWidgetFieldDataSet.php:175
 msgid "Cannot set \"Data set aggregation\" when item with type \"Total\" is added to the chart."
 msgstr "Nelze nastavit \"Agregaci datové sady\", když je do grafu přidán item typu \"Celkem\"."
+
+#: include/classes/db/MysqlDbBackend.php:197
+msgid "Cannot set charset."
+msgstr "Nelze nastavit znakovú sadu."
 
 #: include/classes/api/services/CItemGeneral.php:2478
 #, c-format
@@ -8676,7 +8703,7 @@ msgstr "Zadejte řetězec identity sdíleného klíče, který není tajný. Nev
 
 #: app/views/host.wizard.edit.php:470
 msgid "Enter a unique name that Zabbix components will use to recognize the pre-shared key."
-msgstr ""
+msgstr "Zadejte jedinečný název, který komponenty Zabbixu použijí k rozpoznání předsdíleného klíče."
 
 #: app/views/host.wizard.edit.php:609
 msgid "Enter the IP/DNS address and port of the Zabbix agent installed on your monitoring target."
@@ -12347,7 +12374,7 @@ msgstr "Interval"
 
 #: widgets/itemcard/includes/CWidgetFieldItemSectionsView.php:76
 msgid "Interval and storage"
-msgstr ""
+msgstr "Interval a skladování"
 
 #: include/classes/api/services/CRole.php:731
 #, c-format
@@ -17045,7 +17072,7 @@ msgstr "PHP curl"
 
 #: include/classes/setup/CFrontendSetup.php:733
 msgid "PHP curl extension is missing or outdated."
-msgstr ""
+msgstr "Rozšíření PHP Curl chybí nebo je zastaralé."
 
 #: include/classes/setup/CFrontendSetup.php:691
 msgid "PHP curl extension missing."
@@ -19017,6 +19044,11 @@ msgstr "Kód odpovědi"
 #: httpdetails.php:149 include/classes/screens/CScreenHttpTestDetails.php:83
 msgid "Response time"
 msgstr "Odezva"
+
+#: include/classes/server/CZabbixServer.php:507
+#, c-format
+msgid "Response timeout of %1$s exceeded when connecting to Zabbix server \"%2$s\"."
+msgstr "Časový limit odezvy %1$s sekund byl překročen při připojování k Zabbix serveru \"%2$s\"."
 
 #: app/controllers/CControllerMediatypeTestSend.php:182
 msgid "Response type: JSON"
@@ -26630,7 +26662,7 @@ msgstr "adresář nemůže být prázdný"
 
 #: include/views/configuration.host.discovery.list.php:340
 msgid "discovery rule"
-msgstr ""
+msgstr "pravidlo objevování"
 
 #: app/controllers/CControllerItemMassCheckNow.php:138
 #: include/classes/api/services/CTask.php:562
@@ -27002,6 +27034,11 @@ msgstr "neplatná bytová sekvence v UTF-8"
 #: include/validate.inc.php:191
 msgid "invalid data type"
 msgstr "Neplatný datový typ"
+
+#: include/classes/validators/CAbsoluteTimeValidator.php:45
+#: include/classes/validators/CAbsoluteTimeValidator.php:53
+msgid "invalid date"
+msgstr ""
 
 #: include/classes/graphdraw/CLineGraphDraw.php:140 include/items.inc.php:1805
 msgid "invalid delay"
@@ -28403,6 +28440,11 @@ msgstr "hodnota musí být mezi \"%1$s\" a \"%2$s\""
 msgid "value must be between \"%1$s\" and \"%2$s\", and have no more than \"%3$s\" digits after the decimal point"
 msgstr "hodnota musí být mezi \"%1$s\" a \"%2$s\" a nesmí mít více než \"%3$s\" číslic za desetinnou čárkou"
 
+#: include/classes/validators/CTimeUnitValidator.php:84
+#, c-format
+msgid "value must be between %1$s and %2$s"
+msgstr ""
+
 #: include/classes/validators/CApiInputValidator.php:676
 msgid "value must be empty"
 msgstr "hodnota musí být prázdná"
@@ -28420,6 +28462,16 @@ msgstr[2] "hodnota musí být prázdná nebo jedna z %1$s"
 #, c-format
 msgid "value must be greater than \"%1$s\""
 msgstr "hodnota musí být větší než \"%1$s\""
+
+#: include/classes/validators/CAbsoluteTimeValidator.php:59
+#, c-format
+msgid "value must be greater than or equal to %1$s"
+msgstr ""
+
+#: include/classes/validators/CAbsoluteTimeValidator.php:64
+#, c-format
+msgid "value must be less than or equal to %1$s"
+msgstr ""
 
 #: app/controllers/CControllerPopupItemTest.php:1342
 #: include/classes/validators/CNewValidator.php:220

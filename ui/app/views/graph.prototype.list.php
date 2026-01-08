@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -145,16 +145,17 @@ foreach ($data['graphs'] as $graph) {
 	]);
 }
 
-$buttons = [
+$buttons = new CActionButtonList('action', 'group_graphid', [
 	'graph.massdelete' => [
 		'content' => (new CSimpleButton(_('Delete')))
 			->addClass(ZBX_STYLE_BTN_ALT)
 			->addClass('js-no-chkbxrange')
 			->setId('js-massdelete-graph-prototype')
 	]
-];
+], 'graph_prototypes_'.$data['parent_discoveryid']);
 
-$graphs_form->addItem([$graphs_table, new CActionButtonList('action', 'group_graphid', $buttons, 'graph_prototypes')]);
+$graphs_form->addItem([$graphs_table, $buttons]);
+
 $html_page
 	->addItem($graphs_form)
 	->show();

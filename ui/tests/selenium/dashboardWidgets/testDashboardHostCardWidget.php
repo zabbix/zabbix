@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -1109,7 +1109,7 @@ class testDashboardHostCardWidget extends testWidgets {
 					],
 					'Monitoring' => [
 						'Dashboards' => 8,
-						'Latest data' => 288,
+						'Latest data' => 291,
 						'Graphs' => 29,
 						'Web' => 1
 					],
@@ -1247,7 +1247,7 @@ class testDashboardHostCardWidget extends testWidgets {
 					],
 					'Monitoring' => [
 						'Dashboards' => 4,
-						'Latest data' => 122,
+						'Latest data' => 125,
 						'Graphs' => 8,
 						'Web' => 0
 					]
@@ -1525,20 +1525,21 @@ class testDashboardHostCardWidget extends testWidgets {
 			[
 				[
 					'class'  => 'monitoring-item',
-					'link'   => 'Graphs',
-					'header' => 'Graphs',
-					'title'  => 'Custom graphs',
-					'url' => 'zabbix.php?action=charts.view&filter_hostids%5B0%5D={hostid}&filter_show=1&filter_set=1'
-				]
-			],
-			// #5.
-			[
-				[
-					'class'  => 'monitoring-item',
 					'link'   => 'Web',
 					'header' => 'Web monitoring',
 					'title'  => 'Web monitoring',
 					'url' => 'zabbix.php?action=web.view&filter_hostids%5B0%5D={hostid}&filter_set=1'
+				]
+			],
+			// TODO: Unstable test on Jenkins, if Graphs test case is before Web monitoring.
+			// #5.
+			[
+				[
+					'class'  => 'monitoring-item',
+					'link'   => 'Graphs',
+					'header' => 'Graphs',
+					'title'  => 'Custom graphs',
+					'url' => 'zabbix.php?action=charts.view&filter_hostids%5B0%5D={hostid}&filter_show=1&filter_set=1'
 				]
 			]
 		];
@@ -1691,8 +1692,7 @@ class testDashboardHostCardWidget extends testWidgets {
 
 	public static function getWidgetName() {
 		return [
-			// TODO: uncomment test cases once issue ZBX-24885 is resolved
-/*			[
+			[
 				[
 					'Name' => 'Fully filled host card widget'
 				]
@@ -1701,7 +1701,7 @@ class testDashboardHostCardWidget extends testWidgets {
 				[
 					'Name' => 'Host card'
 				]
-			],*/
+			],
 			[
 				[
 					'Name' => 'Default host card widget'

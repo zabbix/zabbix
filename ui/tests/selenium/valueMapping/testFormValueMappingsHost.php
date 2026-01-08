@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -27,10 +27,11 @@ class testFormValueMappingsHost extends testFormValueMappings {
 	 * Function creates the given value mappings for the specified host.
 	 */
 	public static function prepareHostValueMappings() {
+		self::$hostids = CDataHelper::get('HostAvailabilityWidget.hostids');
 		CDataHelper::call('valuemap.create', [
 			[
 				'name' => self::UPDATE_VALUEMAP1,
-				'hostid' => self::HOSTID,
+				'hostid' => self::$hostids['Available host'],
 				'mappings' => [
 					[
 						'value' => '',
@@ -40,7 +41,7 @@ class testFormValueMappingsHost extends testFormValueMappings {
 			],
 			[
 				'name' => self::UPDATE_VALUEMAP2,
-				'hostid' => self::HOSTID,
+				'hostid' => self::$hostids['Available host'],
 				'mappings' => [
 					[
 						'value' => '',
@@ -62,7 +63,7 @@ class testFormValueMappingsHost extends testFormValueMappings {
 			],
 			[
 				'name' => self::DELETE_VALUEMAP,
-				'hostid' => self::HOSTID,
+				'hostid' => self::$hostids['Available host'],
 				'mappings' => [
 					[
 						'type' => '0',

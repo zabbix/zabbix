@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -1172,33 +1172,6 @@ function checkTimePeriod($period, $now) {
 	$sec2 = SEC_PER_HOUR * $h2 + SEC_PER_MIN * $m2;
 
 	return $d1 <= $day && $day <= $d2 && $sec1 <= $sec && $sec < $sec2;
-}
-
-/**
- * Get item minimum delay.
- *
- * @param string $delay
- * @param array $flexible_intervals
- *
- * @return string
- */
-function getItemDelay($delay, array $flexible_intervals) {
-	$delay = timeUnitToSeconds($delay);
-
-	if ($delay != 0 || !$flexible_intervals) {
-		return $delay;
-	}
-
-	$min_delay = SEC_PER_YEAR;
-
-	foreach ($flexible_intervals as $flexible_interval) {
-		$flexible_interval_parts = explode('/', $flexible_interval);
-		$flexible_delay = timeUnitToSeconds($flexible_interval_parts[0]);
-
-		$min_delay = min($min_delay, $flexible_delay);
-	}
-
-	return $min_delay;
 }
 
 /**

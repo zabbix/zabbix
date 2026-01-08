@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -33,6 +33,26 @@ double	zbx_time(void)
 	zbx_timespec(&ts);
 
 	return (double)ts.sec + 1.0e-9 * (double)ts.ns;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: Nanoseconds should always be in range 0 <= ns < 1'000'000'000     *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_timespec_normalize(zbx_timespec_t *ts)
+{
+	while (1000000000 <= ts->ns)
+	{
+		ts->sec++;
+		ts->ns -= 1000000000;
+	}
+
+	while (0 > ts->ns)
+	{
+		ts->sec--;
+		ts->ns += 1000000000;
+	}
 }
 
 /******************************************************************************

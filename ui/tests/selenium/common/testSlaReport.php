@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -473,7 +473,7 @@ class testSlaReport extends CWebTest {
 							implode(', ', $reference_uptime)
 					);
 
-					// Calculate the error budet based on the actual uptime and compare with actual error budget.
+					// Calculate the error budget based on the actual uptime and compare with actual error budget.
 					$uptime_seconds = 0;
 					foreach (explode(' ', $uptime) as $time_unit) {
 						$uptime_seconds = $uptime_seconds + timeUnitToSeconds($time_unit);

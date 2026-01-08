@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -278,7 +278,7 @@ void	zbx_autoreg_flush_hosts_server(zbx_vector_autoreg_host_ptr_t *autoreg_hosts
 			zbx_db_insert_add_values(&db_insert, autoreg_host->autoreg_hostid, proxyid,
 					autoreg_host->host, autoreg_host->ip, autoreg_host->dns,
 					(int)autoreg_host->port, (int)autoreg_host->connection_type,
-					autoreg_host->host_metadata, autoreg_host->flag);
+					autoreg_host->host_metadata, (int)autoreg_host->flag);
 		}
 		else
 		{

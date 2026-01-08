@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -106,15 +106,19 @@
 		value_len + sizeof(zbx_uint32_t)					\
 	)
 
-#define zbx_deserialize_vector_uint64(buffer, vector_uint64, value_len)			\
-	(										\
-		memcpy(&value_len, buffer, sizeof(zbx_uint32_t)),			\
-		0 < value_len ? 							\
-			zbx_vector_uint64_append_array(vector_uint64,			\
-				(const zbx_uint64_t *)(buffer + sizeof(zbx_uint32_t)),	\
-				(int)(value_len / sizeof(zbx_uint64_t)))		\
-		: (void)0,								\
-		value_len + sizeof(zbx_uint32_t)					\
+#define zbx_deserialize_vector_uint64(buffer, vector_uint64, value_len)					\
+	(												\
+		memcpy(&(value_len), (buffer), sizeof(zbx_uint32_t)),					\
+		0 < value_len ? (									\
+			zbx_vector_uint64_reserve((vector_uint64),					\
+				(size_t)(vector_uint64)->values_num +					\
+				(value_len) / sizeof(zbx_uint64_t)),					\
+			memcpy((vector_uint64)->values + (vector_uint64)->values_num,			\
+				((buffer) + sizeof(zbx_uint32_t)), (value_len)),			\
+			(vector_uint64)->values_num += (int)((value_len) / sizeof(zbx_uint64_t)),	\
+			(value_len) + sizeof(zbx_uint32_t)						\
+		) :											\
+		(value_len) + sizeof(zbx_uint32_t)							\
 	)
 
 #define zbx_deserialize_value(buffer, value) \

@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -28,6 +28,11 @@ zbx_trigger_func_position_t;
 
 ZBX_PTR_VECTOR_DECL(trigger_func_position, zbx_trigger_func_position_t *)
 ZBX_PTR_VECTOR_IMPL(trigger_func_position, zbx_trigger_func_position_t *)
+
+static void	free_trigger_func_position(zbx_trigger_func_position_t *tfp)
+{
+	zbx_free(tfp);
+}
 
 /******************************************************************************
  *                                                                            *
@@ -136,8 +141,7 @@ void	zbx_determine_items_in_expressions(zbx_vector_dc_trigger_t *trigger_order, 
 	zbx_free(errcodes);
 	zbx_free(functions);
 out:
-	zbx_vector_trigger_func_position_clear_ext(&triggers_func_pos,
-			(zbx_trigger_func_position_free_func_t)zbx_ptr_free);
+	zbx_vector_trigger_func_position_clear_ext(&triggers_func_pos, free_trigger_func_position);
 	zbx_vector_trigger_func_position_destroy(&triggers_func_pos);
 
 	zbx_vector_uint64_clear(&functionids);

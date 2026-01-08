@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -451,12 +451,7 @@ class testDashboardItemValueWidget extends testWidgets {
 				];
 				foreach ($inputs as $field => $attributes) {
 					foreach ($attributes as $attribute => $value) {
-						if ($attribute === 'color') {
-							$this->assertEquals($value, $form->query($field)->asColorPicker()->one()->getValue());
-						}
-						else {
-							$this->assertEquals($value, $form->getField($field)->getAttribute($attribute));
-						}
+						$this->assertEquals($value, $form->getField($field)->getAttribute($attribute));
 					}
 				}
 
@@ -483,6 +478,11 @@ class testDashboardItemValueWidget extends testWidgets {
 						$form->fill([$config => $state]);
 
 						foreach ($elements as $element) {
+							// TODO: remove if statement when DEV-4512 is fixed.
+							if (str_contains($element, self::PATH_TO_COLOR_PICKER)) {
+								$element .= '/input';
+							}
+
 							$this->assertTrue($form->getField($element)->isEnabled($state));
 						}
 					}

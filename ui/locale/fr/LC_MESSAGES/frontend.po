@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2025-09-05 18:24+0000\n"
+"PO-Revision-Date: 2025-11-16 21:08+0000\n"
 "Last-Translator: ERIC <eric78.zabbix@orange.fr>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: fr\n"
@@ -299,6 +299,24 @@ msgstr "La classe %1$s.php doit étendre %2$s pour le module situé à %3$s."
 #, c-format
 msgid "%1$s: %2$s"
 msgstr "%1$s : %2$s"
+
+#: include/classes/server/CZabbixServer.php:740
+#: include/classes/setup/CSetupWizard.php:1459
+#, c-format
+msgid "%1$s: %2$s."
+msgstr "%1$s : %2$s."
+
+#: include/classes/server/CZabbixServer.php:746
+#: include/classes/setup/CSetupWizard.php:1465
+#, c-format
+msgid "%1$s: file is not readable."
+msgstr "%1$s : le fichier n'est pas lisible."
+
+#: include/classes/server/CZabbixServer.php:743
+#: include/classes/setup/CSetupWizard.php:1462
+#, c-format
+msgid "%1$s: invalid path or file not found."
+msgstr "%1$s : chemin non valide ou fichier introuvable."
 
 #: include/classes/graph/CSvgGraph.php:1418
 #, c-format
@@ -1262,7 +1280,7 @@ msgstr "Vérification de la variante de l'agent. Retourne 1 - pour agent Zabbix 
 
 #: app/views/host.wizard.edit.php:158 app/views/js/host.wizard.edit.js.php:1781
 msgid "Agent-based"
-msgstr ""
+msgstr "Basé sur un agent"
 
 #: app/views/host.wizard.edit.php:159 app/views/js/host.wizard.edit.js.php:1782
 msgid "Agentless"
@@ -3590,7 +3608,7 @@ msgstr "Impossible de trouver la table de correspondances « %1$s » utilisée
 
 #: app/views/oauth.authorize.php:33
 msgid "Cannot get authentication tokens"
-msgstr ""
+msgstr "Impossible d'obtenir les jetons d'authentification"
 
 #: app/views/oauth.edit.php:230
 msgid "Cannot get authorization code."
@@ -4123,6 +4141,11 @@ msgstr "Impossible de lire du XML : %1$s."
 msgid "Cannot read YAML: %1$s."
 msgstr "Impossible de lire le YAML : %1$s."
 
+#: include/classes/server/CZabbixServer.php:511
+#, c-format
+msgid "Cannot read response from Zabbix server \"%1$s\"."
+msgstr "Impossible de lire la réponse du serveur Zabbix « %1$s »."
+
 #: include/classes/server/CZabbixServer.php:567
 #, c-format
 msgid "Cannot read the response, check connection with the Zabbix server \"%1$s\"."
@@ -4184,6 +4207,10 @@ msgstr "Impossible de configurer \"%1$s\" pour le prototype de graphique \"%2$s\
 #: widgets/piechart/includes/CWidgetFieldDataSet.php:175
 msgid "Cannot set \"Data set aggregation\" when item with type \"Total\" is added to the chart."
 msgstr "Impossible de définir l'« Agrégation d'ensembles de données » lorsqu'un élément de type « Total » est ajouté au graphique."
+
+#: include/classes/db/MysqlDbBackend.php:197
+msgid "Cannot set charset."
+msgstr "Impossible de définir l'encodage des caractères."
 
 #: include/classes/api/services/CItemGeneral.php:2478
 #, c-format
@@ -4690,7 +4717,7 @@ msgstr "Certificat"
 #: include/items.inc.php:1581
 msgctxt "noun"
 msgid "Change"
-msgstr "Changer"
+msgstr "Changement"
 
 #: app/partials/hostmacros.inherited.list.html.php:124
 #: app/partials/hostmacros.inherited.list.html.php:141
@@ -12024,7 +12051,7 @@ msgstr "Tags hérités et d'élément"
 
 #: app/partials/configuration.tags.tab.php:160
 msgid "Inherited and scenario tags"
-msgstr "Tags héritées et de scénario"
+msgstr "Tags hérités et de scénario"
 
 #: app/views/template.edit.php:184
 msgid "Inherited and template macros"
@@ -12211,7 +12238,7 @@ msgstr "Intervalle"
 
 #: widgets/itemcard/includes/CWidgetFieldItemSectionsView.php:76
 msgid "Interval and storage"
-msgstr ""
+msgstr "Intervalle et stockage"
 
 #: include/classes/api/services/CRole.php:731
 #, c-format
@@ -12620,7 +12647,7 @@ msgstr "Période invalide."
 #: app/controllers/CControllerItemPrototypeUpdate.php:155
 #: app/controllers/CControllerItemUpdate.php:154
 msgid "Invalid range expression."
-msgstr ""
+msgstr "Expression de plage non valide."
 
 #: app/controllers/CControllerHostCreate.php:228
 #: app/controllers/CControllerHostUpdate.php:233
@@ -12780,7 +12807,7 @@ msgstr "Élément ajouté"
 
 #: widgets/itemcard/Widget.php:32
 msgid "Item card"
-msgstr ""
+msgstr "Fiche d'élément"
 
 #: app/views/popup.itemtestedit.view.php:433
 msgid "Item contains user-defined macros with secret values. Values of these macros should be entered manually."
@@ -16441,17 +16468,17 @@ msgstr "Un"
 #: app/controllers/CControllerItem.php:166
 #: app/controllers/CControllerItemPrototype.php:168
 msgid "One \"Change\" step allowed per item."
-msgstr ""
+msgstr "Une seule étape \"Changement\" est autorisée par élément."
 
 #: app/controllers/CControllerItem.php:182
 #: app/controllers/CControllerItemPrototype.php:184
 msgid "One \"Prometheus\" step allowed per item."
-msgstr ""
+msgstr "Une seule étape \"Prometheus\" est autorisée par élément."
 
 #: app/controllers/CControllerItem.php:174
 #: app/controllers/CControllerItemPrototype.php:176
 msgid "One \"Throttling\" step allowed per item."
-msgstr ""
+msgstr "Une seule étape \"Limitation\" est autorisée par élément."
 
 #: app/views/maintenance.timeperiod.edit.php:79
 #: include/classes/helpers/CMaintenanceHelper.php:29
@@ -16884,7 +16911,7 @@ msgstr "PHP curl"
 
 #: include/classes/setup/CFrontendSetup.php:733
 msgid "PHP curl extension is missing or outdated."
-msgstr ""
+msgstr "L'extension PHP curl est manquante ou obsolète."
 
 #: include/classes/setup/CFrontendSetup.php:691
 msgid "PHP curl extension missing."
@@ -18071,7 +18098,7 @@ msgstr "Pousser"
 
 #: include/views/js/item.preprocessing.js.php:208
 msgid "Qualifier"
-msgstr ""
+msgstr "Qualificatif"
 
 #: include/classes/helpers/CSlaHelper.php:64
 msgid "Quarter"
@@ -18799,7 +18826,7 @@ msgstr "Réinitialiser à la vue initiale"
 
 #: app/views/administration.miscconfig.edit.php:103
 msgid "Resolve secret vault macros by"
-msgstr ""
+msgstr "Résoudre les macros secrètes du coffre-fort par"
 
 #: jsLoader.php:283
 msgid "Resolved"
@@ -18853,6 +18880,11 @@ msgstr "Code de réponse"
 #: httpdetails.php:149 include/classes/screens/CScreenHttpTestDetails.php:83
 msgid "Response time"
 msgstr "Temps de réponse"
+
+#: include/classes/server/CZabbixServer.php:507
+#, c-format
+msgid "Response timeout of %1$s exceeded when connecting to Zabbix server \"%2$s\"."
+msgstr "Délai de réponse de %1$s dépassé lors de la connexion au serveur Zabbix « %2$s »."
 
 #: app/controllers/CControllerMediatypeTestSend.php:182
 msgid "Response type: JSON"
@@ -21352,7 +21384,7 @@ msgstr "Nom de tag"
 #: app/controllers/CControllerTriggerPrototypeUpdate.php:61
 #: app/controllers/CControllerTriggerUpdate.php:61
 msgid "Tag name and value combination is not unique."
-msgstr ""
+msgstr "La combinaison du nom et de la valeur du tag n'est pas unique."
 
 #: include/actions.inc.php:68
 msgid "Tag value"
@@ -22093,8 +22125,8 @@ msgstr "Cette valeur est trop courte."
 #, c-format
 msgid "This value must be %1$s."
 msgid_plural "This value must be one of %1$s."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Cette valeur doit être %1$s."
+msgstr[1] "Cette valeur doit être l'une des %1$s."
 
 #: include/classes/validators/CFormValidator.php:847
 #: include/classes/validators/CFormValidator.php:898 jsLoader.php:433
@@ -22147,7 +22179,7 @@ msgstr "Seuils"
 
 #: include/items.inc.php:1629 include/items.inc.php:1633
 msgid "Throttling"
-msgstr "Étranglement"
+msgstr "Limitation"
 
 #: include/func.inc.php:216
 msgid "Thu"
@@ -22354,7 +22386,7 @@ msgstr ""
 
 #: app/views/oauth.edit.php:188
 msgid "Token endpoint"
-msgstr ""
+msgstr "Token du point de terminaison"
 
 #: app/views/oauth.edit.php:201
 msgid "Token parameters"
@@ -23653,7 +23685,7 @@ msgstr "Utilisez le filtre pour afficher les résultats"
 
 #: app/views/host.wizard.edit.php:424
 msgid "Use:"
-msgstr ""
+msgstr "Utilisation :"
 
 #: app/views/administration.script.list.php:93 app/views/mediatype.list.php:98
 msgid "Used in actions"
@@ -26433,7 +26465,7 @@ msgstr "le répertoire ne peut pas être vide"
 
 #: include/views/configuration.host.discovery.list.php:340
 msgid "discovery rule"
-msgstr ""
+msgstr "règle de découverte"
 
 #: app/controllers/CControllerItemMassCheckNow.php:138
 #: include/classes/api/services/CTask.php:562
@@ -26805,6 +26837,11 @@ msgstr "séquence d'octets invalide en UTF-8"
 #: include/validate.inc.php:191
 msgid "invalid data type"
 msgstr "type de données invalide"
+
+#: include/classes/validators/CAbsoluteTimeValidator.php:45
+#: include/classes/validators/CAbsoluteTimeValidator.php:53
+msgid "invalid date"
+msgstr ""
 
 #: include/classes/graphdraw/CLineGraphDraw.php:140 include/items.inc.php:1805
 msgid "invalid delay"
@@ -28205,6 +28242,11 @@ msgstr "la valeur doit être comprise entre \"%1$s\" et \"%2$s\""
 msgid "value must be between \"%1$s\" and \"%2$s\", and have no more than \"%3$s\" digits after the decimal point"
 msgstr "la valeur doit être comprise entre « %1$s » et « %2$s », et ne pas comporter plus de « %3$s » chiffres après la virgule"
 
+#: include/classes/validators/CTimeUnitValidator.php:84
+#, c-format
+msgid "value must be between %1$s and %2$s"
+msgstr ""
+
 #: include/classes/validators/CApiInputValidator.php:676
 msgid "value must be empty"
 msgstr "la valeur doit être vide"
@@ -28221,6 +28263,16 @@ msgstr[1] "la valeur doit être vide ou une des valeurs %1$s"
 #, c-format
 msgid "value must be greater than \"%1$s\""
 msgstr "la valeur doit être supérieure à \"%1$s\""
+
+#: include/classes/validators/CAbsoluteTimeValidator.php:59
+#, c-format
+msgid "value must be greater than or equal to %1$s"
+msgstr ""
+
+#: include/classes/validators/CAbsoluteTimeValidator.php:64
+#, c-format
+msgid "value must be less than or equal to %1$s"
+msgstr ""
 
 #: app/controllers/CControllerPopupItemTest.php:1342
 #: include/classes/validators/CNewValidator.php:220

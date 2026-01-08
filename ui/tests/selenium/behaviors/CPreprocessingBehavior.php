@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -12,6 +12,8 @@
 ** You should have received a copy of the GNU Affero General Public License along with this program.
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
+
+use Facebook\WebDriver\Exception\TimeoutException;
 
 require_once __DIR__.'/../../include/CBehavior.php';
 
@@ -128,6 +130,15 @@ class CPreprocessingBehavior extends CBehavior {
 		foreach ($steps as $i => $options) {
 			if (!$mass_update || $i !== 0)  {
 				$add->click();
+
+				// TODO: sometimes inline validation error appears at the same time, and the click on Add doesn't pass.
+				try {
+					$this->test->query('xpath://li[contains(@class, "preprocessing-list-item")]['.$rows.']')
+						->waitUntilPresent()->one();
+				}
+				catch (TimeoutException $e) {
+					$add->click();
+				}
 			}
 
 			$container = $this->test->query('xpath://li[contains(@class, "preprocessing-list-item")]['.$rows.']')

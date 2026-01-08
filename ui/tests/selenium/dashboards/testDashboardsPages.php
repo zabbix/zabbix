@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -472,7 +472,7 @@ class testDashboardsPages extends CWebTest {
 		$next_page = $this->query(self::NEXT_BUTTON)->one();
 		$tab = $this->query('class:selected-tab')->one();
 
-		// If next page button exists and enabled press next tab buttun until the required tab is selected.
+		// If next page button exists and enabled press next tab button until the required tab is selected.
 		if ($next_page->isClickable()) {
 			while ($tab->getText() !== $title && $next_page->isClickable()) {
 				$next_page->click();

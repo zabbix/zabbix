@@ -285,6 +285,24 @@ msgstr "Class %1$s.php phải mở rộng module %2$s nằm tại vị trí %3$s
 msgid "%1$s: %2$s"
 msgstr "%1$s: %2$s"
 
+#: include/classes/server/CZabbixServer.php:740
+#: include/classes/setup/CSetupWizard.php:1459
+#, c-format
+msgid "%1$s: %2$s."
+msgstr ""
+
+#: include/classes/server/CZabbixServer.php:746
+#: include/classes/setup/CSetupWizard.php:1465
+#, c-format
+msgid "%1$s: file is not readable."
+msgstr ""
+
+#: include/classes/server/CZabbixServer.php:743
+#: include/classes/setup/CSetupWizard.php:1462
+#, c-format
+msgid "%1$s: invalid path or file not found."
+msgstr ""
+
 #: include/classes/graph/CSvgGraph.php:1418
 #, c-format
 msgid "%1$sth percentile: %2$s"
@@ -4028,6 +4046,11 @@ msgstr "Không thể đọc XML: %1$s."
 msgid "Cannot read YAML: %1$s."
 msgstr "Không thể đọc YAML: %1$s."
 
+#: include/classes/server/CZabbixServer.php:511
+#, c-format
+msgid "Cannot read response from Zabbix server \"%1$s\"."
+msgstr ""
+
 #: include/classes/server/CZabbixServer.php:567
 #, c-format
 msgid "Cannot read the response, check connection with the Zabbix server \"%1$s\"."
@@ -4088,6 +4111,10 @@ msgstr "Không thể đặt \"%1$s\" cho kiểu đồ thị \"%2$s\"."
 #: widgets/piechart/includes/CWidgetFieldDataSet.php:175
 msgid "Cannot set \"Data set aggregation\" when item with type \"Total\" is added to the chart."
 msgstr "Không thể cài đặt \"Data set aggregation\" khi đã có sẵn một item với kiểu là \"Total\" được thêm vào biểu đồ."
+
+#: include/classes/db/MysqlDbBackend.php:197
+msgid "Cannot set charset."
+msgstr ""
 
 #: include/classes/api/services/CItemGeneral.php:2478
 #, c-format
@@ -18691,6 +18718,11 @@ msgstr "Mã đáp ứng"
 msgid "Response time"
 msgstr "Thời gian đáp ứng"
 
+#: include/classes/server/CZabbixServer.php:507
+#, c-format
+msgid "Response timeout of %1$s exceeded when connecting to Zabbix server \"%2$s\"."
+msgstr ""
+
 #: app/controllers/CControllerMediatypeTestSend.php:182
 msgid "Response type: JSON"
 msgstr ""
@@ -26614,6 +26646,11 @@ msgstr "chuỗi byte không hợp lệ trong UTF-8"
 msgid "invalid data type"
 msgstr ""
 
+#: include/classes/validators/CAbsoluteTimeValidator.php:45
+#: include/classes/validators/CAbsoluteTimeValidator.php:53
+msgid "invalid date"
+msgstr ""
+
 #: include/classes/graphdraw/CLineGraphDraw.php:140 include/items.inc.php:1805
 msgid "invalid delay"
 msgstr "Thời gian trễ không hợp lệ"
@@ -28012,6 +28049,11 @@ msgstr ""
 msgid "value must be between \"%1$s\" and \"%2$s\", and have no more than \"%3$s\" digits after the decimal point"
 msgstr ""
 
+#: include/classes/validators/CTimeUnitValidator.php:84
+#, c-format
+msgid "value must be between %1$s and %2$s"
+msgstr ""
+
 #: include/classes/validators/CApiInputValidator.php:676
 msgid "value must be empty"
 msgstr ""
@@ -28026,6 +28068,16 @@ msgstr[0] ""
 #: widgets/gauge/includes/WidgetForm.php:133
 #, c-format
 msgid "value must be greater than \"%1$s\""
+msgstr ""
+
+#: include/classes/validators/CAbsoluteTimeValidator.php:59
+#, c-format
+msgid "value must be greater than or equal to %1$s"
+msgstr ""
+
+#: include/classes/validators/CAbsoluteTimeValidator.php:64
+#, c-format
+msgid "value must be less than or equal to %1$s"
 msgstr ""
 
 #: app/controllers/CControllerPopupItemTest.php:1342

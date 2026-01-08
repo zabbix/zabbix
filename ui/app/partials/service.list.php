@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -104,7 +104,7 @@ foreach ($data['services'] as $serviceid => $service) {
 			->addClass(CSeverityHelper::getStyle((int) $service['status'])),
 		$root_cause,
 		zbx_date2str(DATE_FORMAT, $service['created_at']),
-		$data['tags'][$serviceid]
+		(new CDiv($data['tags'][$serviceid]))->addClass(ZBX_STYLE_TAGS_WRAPPER)
 	])));
 }
 

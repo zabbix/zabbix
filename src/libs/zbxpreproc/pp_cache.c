@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -19,6 +19,17 @@
 #include "zbxprometheus.h"
 #include "preproc_snmp.h"
 
+int	pp_cache_get_type(int step_type)
+{
+	switch (step_type)
+	{
+		case ZBX_PREPROC_PROMETHEUS_TO_JSON:
+			return ZBX_PREPROC_PROMETHEUS_PATTERN;
+		default:
+			return step_type;
+	}
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: create preprocessing cache                                        *
@@ -36,15 +47,7 @@ zbx_pp_cache_t	*pp_cache_create(const zbx_pp_item_preproc_t *preproc, const zbx_
 
 	if (0 != preproc->steps_num)
 	{
-		switch (preproc->steps[0].type)
-		{
-			/* 'prometheus pattern' cache is reused for 'prometheus to json' */
-			case ZBX_PREPROC_PROMETHEUS_TO_JSON:
-				cache->type = ZBX_PREPROC_PROMETHEUS_PATTERN;
-				break;
-			default:
-				cache->type = preproc->steps[0].type;
-		}
+		cache->type = pp_cache_get_type(preproc->steps[0].type);
 	}
 	else
 		cache->type = ZBX_PREPROC_NONE;
@@ -134,7 +137,7 @@ zbx_pp_cache_t	*pp_cache_copy(zbx_pp_cache_t *cache)
  ******************************************************************************/
 void	pp_cache_prepare_output_value(zbx_pp_cache_t *cache, int step_type, zbx_variant_t *value)
 {
-	if (NULL == cache->data || step_type != cache->type)
+	if (NULL == cache->data || pp_cache_get_type(step_type) != cache->type)
 		zbx_variant_copy(value, &cache->value);
 }
 

@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -199,7 +199,9 @@ class CNavigationTree {
 			primary.appendChild(this.#createMaintenance(node));
 		}
 
-		if (this.#show_problems) {
+		const has_problems = this.#show_problems ? node.problem_count.some(count => count > 0) : false;
+
+		if (this.#show_problems && has_problems) {
 			secondary.appendChild(this.#createProblems(node));
 		}
 
