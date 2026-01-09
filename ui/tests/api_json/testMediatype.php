@@ -123,8 +123,7 @@ class testMediatype extends CAPITest {
 				]],
 				null
 			],
-			'Enable access token' =>
-			[
+			'Enable access token' => [
 				[[
 					'mediatypeid' => ':media_type:OAuth with tokens and tokens_status 0',
 					'tokens_status' => OAUTH_ACCESS_TOKEN_VALID,
@@ -193,10 +192,10 @@ class testMediatype extends CAPITest {
 		if (array_key_exists('access_token_updated', $mediatypes[0])
 				&& $mediatypes[0]['access_token_updated'] === ':time') {
 			$now = time();
-			$mediatypes[0]['access_token_updated'] =  $now - SEC_PER_HOUR;
+			$mediatypes[0]['access_token_updated'] = $now - SEC_PER_HOUR;
 
 			if ($expected_error !== null) {
-				$time_from =date('Y-m-d H:i:s',$now - 600);
+				$time_from = date('Y-m-d H:i:s', $now - 600);
 				$time_to = date('Y-m-d H:i:s', $now);
 				$expected_error = str_replace(':interval', $time_from.'-'.$time_to, $expected_error);
 			}
@@ -270,8 +269,7 @@ class testMediatype extends CAPITest {
 
 	public static function createInvalidDataProvider(): array {
 		return [
-			'OAuth is not supported for Office relay' =>
-			[
+			'OAuth is not supported for Office relay' => [
 				[[
 					'name' => 'OAuth is not supported for Office relay',
 					'type' => MEDIA_TYPE_EMAIL,
@@ -286,8 +284,7 @@ class testMediatype extends CAPITest {
 				]],
 				'Invalid parameter "/1/smtp_authentication": value must be one of 0, 1.'
 			],
-			'OAuth not supported for SMTP_AUTHENTICATION_NONE' =>
-			[
+			'OAuth not supported for SMTP_AUTHENTICATION_NONE' => [
 				[[
 					'name' => 'OAuth not supported for SMTP_AUTHENTICATION_NONE',
 					'type' => MEDIA_TYPE_EMAIL,
@@ -300,8 +297,7 @@ class testMediatype extends CAPITest {
 				]],
 				'Invalid parameter "/1/redirection_url": value must be empty.'
 			],
-			'OAuth not supported for SMTP_AUTHENTICATION_PASSWORD' =>
-			[
+			'OAuth not supported for SMTP_AUTHENTICATION_PASSWORD' => [
 				[[
 					'name' => 'OAuth not supported for SMTP_AUTHENTICATION_PASSWORD',
 					'type' => MEDIA_TYPE_EMAIL,
@@ -314,8 +310,7 @@ class testMediatype extends CAPITest {
 				]],
 				'Invalid parameter "/1/redirection_url": value must be empty.'
 			],
-			'access_token_updated is out of range' =>
-			[
+			'access_token_updated is out of range' => [
 				[[
 					'name' => 'access_token_updated is out of range',
 					'type' => MEDIA_TYPE_EMAIL,
@@ -360,8 +355,7 @@ class testMediatype extends CAPITest {
 
 	public static function createAccessTokenUpdatedDataProvider(): array {
 		return [
-			'access_token set access_token_updated' =>
-			[
+			'access_token set access_token_updated' => [
 				[[
 					'redirection_url' => 'http://example.com',
 					'client_id' => 'clientid',
@@ -373,8 +367,7 @@ class testMediatype extends CAPITest {
 				]],
 				true
 			],
-			'refresh_token do not set access_token_updated' =>
-			[
+			'refresh_token do not set access_token_updated' => [
 				[[
 					'redirection_url' => 'http://example.com',
 					'client_id' => 'clientid',
@@ -386,15 +379,13 @@ class testMediatype extends CAPITest {
 				]],
 				false
 			],
-			'SMTP_AUTHENTICATION_NONE or SMTP_AUTHENTICATION_PASSWORD do not set access_token_updated' =>
-			[
+			'SMTP_AUTHENTICATION_NONE or SMTP_AUTHENTICATION_PASSWORD do not set access_token_updated' => [
 				[[
 					'smtp_authentication' => SMTP_AUTHENTICATION_NONE
 				]],
 				false
 			],
-			'access_token_updated is within the appropriate range' =>
-			[
+			'access_token_updated is within the appropriate range' => [
 				[[
 					'redirection_url' => 'http://example.com',
 					'client_id' => 'clientid',
