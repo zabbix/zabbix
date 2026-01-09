@@ -258,10 +258,10 @@ zabbix_export:
           triggers:
             - uuid: 0a5176877ba24df8b5d38c8cc544f0a8
               expression: 'nodata(/Redis by Zabbix agent 2/redis.info["{$REDIS.CONN.URI}","{$REDIS.PASSWORD}","{$REDIS.SECTION}","{$REDIS.USERNAME}"],30m)=1'
-              name: 'Redis: Failed to fetch info data'
-              event_name: 'Redis: Failed to fetch info data (or no data for 30m)'
+              name: 'Redis: Failed to fetch INFO'
+              event_name: 'Redis: Failed to fetch INFO (or no data for 30m)'
               priority: WARNING
-              description: 'Zabbix has not received any data for items for the last 30 minutes.'
+              description: 'Zabbix has not received any data from the Redis INFO item for the last 30 minutes.'
               manual_close: 'YES'
               dependencies:
                 - name: 'Redis: Service is down'
@@ -962,7 +962,7 @@ zabbix_export:
         - uuid: 51a65fa1d27e4fcd915c5019687e7bc9
           name: 'Slowlog entries per second'
           key: 'redis.slowlog.count["{$REDIS.CONN.URI}","{$REDIS.PASSWORD}","{$REDIS.USERNAME}"]'
-          description: 'Tracks the rate slow log entries from Redis server.'
+          description: 'Tracks the rate of slowlog entries from the Redis server.'
           preprocessing:
             - type: CHANGE_PER_SECOND
           tags:
@@ -1499,7 +1499,7 @@ zabbix_export:
               type: DEPENDENT
               key: 'redis.memory.maxmemory[{#SINGLETON}]'
               units: B
-              description: 'Maximum amount of memory allocated to the Redisdb system.'
+              description: 'Maximum amount of memory allocated to the Redis server.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
