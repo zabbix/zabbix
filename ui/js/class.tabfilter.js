@@ -696,8 +696,7 @@ class CTabFilter extends CBaseComponent {
 					dropdown.push({items: dropdown_items});
 				}
 
-				const id = $(ev.target).attr('aria-controls');
-				$(this._target).menuPopup(dropdown, new jQuery.Event(ev), {id: id});
+				$(this._target).menuPopup(dropdown, new jQuery.Event(ev), {id: $(ev.target).attr('aria-controls')});
 			},
 
 			/**
