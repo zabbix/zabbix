@@ -23,26 +23,6 @@ final class CSlaHelper {
 	public const SCHEDULE_MODE_24X7		= 0;
 	public const SCHEDULE_MODE_CUSTOM 	= 1;
 
-	public static function validateCustomScheduleChecked(int $schedule_mode, ?array $schedule): bool {
-		if ($schedule_mode == self::SCHEDULE_MODE_24X7) {
-			return true;
-		}
-
-		foreach (range(0, 6) as $weekday) {
-			if (array_key_exists('schedule_enabled_' . $weekday, $schedule)
-					&& $schedule['schedule_enabled_' . $weekday] == 1) {
-				return true;
-			}
-		}
-
-		info(_('Incorrect schedule: at least one period should be selected.'));
-
-		return false;
-	}
-
-	/**
-	 * @return array
-	 */
 	public static function getPeriodNames(): array {
 		static $period_names;
 
@@ -286,17 +266,15 @@ final class CSlaHelper {
 		];
 	}
 
-	public static function prepareSchedulePeriods(array $schedule): array {
+	public static function prepareSchedulePeriods(array $schedules): array {
 		$result = [];
 
-		foreach (range(0, 6) as $weekday) {
-			if (!array_key_exists('schedule_enabled_'.$weekday, $schedule)
-					|| $schedule['schedule_enabled_'.$weekday] != 1
-					|| !array_key_exists('schedule_period_'.$weekday, $schedule)) {
+		foreach ($schedules as $schedule) {
+			if (!array_key_exists('enabled', $schedule) || !$schedule['enabled']) {
 				continue;
 			}
 
-			foreach (explode(',', $schedule['schedule_period_'.$weekday]) as $schedule_period) {
+			foreach (explode(',', $schedule['period']) as $schedule_period) {
 				$schedule_period = trim($schedule_period);
 				$period_time_parser = new CTimeRangeParser();
 
@@ -308,8 +286,8 @@ final class CSlaHelper {
 					$day_period_to = $h_till * SEC_PER_HOUR + $m_till * SEC_PER_MIN;
 
 					$result[] = [
-						'period_from' => SEC_PER_DAY * $weekday + $day_period_from,
-						'period_to' => SEC_PER_DAY * $weekday + $day_period_to
+						'period_from' => SEC_PER_DAY * $schedule['day'] + $day_period_from,
+						'period_to' => SEC_PER_DAY * $schedule['day'] + $day_period_to
 					];
 				}
 			}

@@ -25,17 +25,6 @@ class CControllerSlaCreate extends CController {
 		$api_uniq = [
 			['sla.get', ['name' => '{name}']]
 		];
-		$schedule_fields = [];
-
-		for ($i = 0; $i < 7; $i++) {
-			$schedule_fields += [
-				'schedule_enabled_'.$i => ['integer', 'in 1'],
-				'schedule_period_'.$i => ['string', 'not_empty',
-					'use' => [CTimeRangesValidator::class, []],
-					'when' => ['schedule_enabled_'.$i, 'in 1']
-				]
-			];
-		}
 
 		return ['object', 'api_uniq' => $api_uniq, 'fields' => [
 			'name' => ['db sla.name', 'required', 'not_empty'],
@@ -45,10 +34,24 @@ class CControllerSlaCreate extends CController {
 				ZBX_SLA_PERIOD_ANNUALLY
 			]],
 			'timezone' => ['db sla.timezone',
-				'in' => array_merge([ZBX_DEFAULT_TIMEZONE], array_keys(CTimezoneHelper::getList()))],
+				'in' => array_merge([ZBX_DEFAULT_TIMEZONE], array_keys(CTimezoneHelper::getList()))
+			],
 			'schedule_mode' => ['integer', 'in' => [CSlaHelper::SCHEDULE_MODE_24X7, CSlaHelper::SCHEDULE_MODE_CUSTOM]],
-			'schedule' => ['object', 'required', 'fields' => $schedule_fields,
-				'when' => ['schedule_mode', 'in' => [CSlaHelper::SCHEDULE_MODE_CUSTOM]]
+			'schedule_periods' => [ 'objects', 'required', 'uniq' => ['day'],
+				'when' => ['schedule_mode', 'in' => [CSlaHelper::SCHEDULE_MODE_CUSTOM]],
+				'fields' => [
+					'day' => ['integer', 'required', 'in' => range(0, 6)],
+					'enabled' => ['boolean'],
+					'period' => ['string', 'not_empty',
+						'use' => [CTimeRangesValidator::class, []],
+						'when' => ['enabled', 'in' => [1]]
+					]
+				],
+				'count_values' => [
+					'field_rules' => ['enabled', 'in' => [1]],
+					'min' => 1,
+					'message' => _('Must have at least one selected.')
+				]
 			],
 			'effective_date' => ['string', 'required', 'not_empty',
 				'use' => [CAbsoluteTimeValidator::class, ['date_only' => true, 'min' => 0, 'max' => ZBX_MAX_DATE]]
@@ -84,9 +87,6 @@ class CControllerSlaCreate extends CController {
 
 	protected function checkInput(): bool {
 		$ret = $this->validateInput(self::getValidationRules());
-		$ret = $ret && CSlaHelper::validateCustomScheduleChecked($this->getInput('schedule_mode'),
-			$this->getInput('schedule', [])
-		);
 
 		if (!$ret) {
 			$form_errors = $this->getValidationError();
@@ -121,7 +121,7 @@ class CControllerSlaCreate extends CController {
 			->getTimestamp();
 
 		$schedule = $this->getInput('schedule_mode') == CSlaHelper::SCHEDULE_MODE_CUSTOM
-			? CSlaHelper::prepareSchedulePeriods($this->getInput('schedule'))
+			? CSlaHelper::prepareSchedulePeriods($this->getInput('schedule_periods'))
 			: [];
 
 		$sla = [

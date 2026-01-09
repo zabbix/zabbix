@@ -84,6 +84,7 @@ class CControllerSlaEdit extends CController {
 
 		if ($this->sla !== null) {
 			$schedule_periods = CSlaHelper::getSchedulePeriods($this->sla['schedule']);
+			$schedule_periods = self::structureSchedulePeriods($schedule_periods);
 
 			foreach ($this->sla['excluded_downtimes'] as $row_index => &$excluded_downtime) {
 				$excluded_downtime += [
@@ -126,7 +127,7 @@ class CControllerSlaEdit extends CController {
 					'period' => ZBX_SLA_PERIOD_WEEKLY,
 					'timezone' => ZBX_DEFAULT_TIMEZONE,
 					'schedule_mode' => CSlaHelper::SCHEDULE_MODE_24X7,
-					'schedule_periods' => [0 => ''] + array_fill(1, 5, '8:00-17:00') + [6 => ''],
+					'schedule_periods' => self::structureSchedulePeriods([0 => ''] + array_fill(1, 5, '8:00-17:00') + [6 => '']),
 					'effective_date' => zbx_date2str(ZBX_DATE, null, CTimezoneHelper::getSystemTimezone()),
 					'service_tags' => [
 						['tag' => '', 'operator' => ZBX_SLA_SERVICE_TAG_OPERATOR_EQUAL, 'value' => '']
@@ -147,5 +148,15 @@ class CControllerSlaEdit extends CController {
 		$data['js_validation_rules'] = (new CFormValidator($js_validation_rules))->getRules();
 
 		$this->setResponse(new CControllerResponseData($data));
+	}
+
+	protected static function structureSchedulePeriods(array $periods): array {
+		$result = [];
+
+		foreach ($periods as $day => $period_string) {
+			$result[] = ['day' => $day, 'period' => $period_string, 'enabled' => $period_string !== ''];
+		}
+
+		return $result;
 	}
 }

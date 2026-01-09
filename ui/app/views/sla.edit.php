@@ -38,11 +38,13 @@ for ($weekday = 0; $weekday < 7; $weekday++) {
 	$schedule
 		->addRow(
 			new CRow([
-				(new CCheckBox('schedule[schedule_enabled_'.$weekday.']'))
+				(new CVar("schedule_periods[$weekday][day]", $weekday))
+					->setAttribute('data-error-container', 'schedule_'.$weekday.'_error_container'),
+				(new CCheckBox("schedule_periods[$weekday][enabled]"))
 					->setLabel(getDayOfWeekCaption($weekday))
-					->setChecked($data['form']['schedule_periods'][$weekday] !== '')
+					->setChecked($data['form']['schedule_periods'][$weekday]['enabled'])
 					->setErrorContainer('schedule_'.$weekday.'_error_container'),
-				(new CTextBox('schedule[schedule_period_'.$weekday.']', $data['form']['schedule_periods'][$weekday]))
+				(new CTextBox("schedule_periods[$weekday][period]", $data['form']['schedule_periods'][$weekday]['period']))
 					->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 					->setAttribute('placeholder', '8:00-17:00, ...')
 					->setErrorContainer('schedule_'.$weekday.'_error_container')
@@ -119,7 +121,7 @@ $sla_tab = (new CFormGrid())
 				->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 				->setId('schedule-table')
 				->setAttribute('data-field-type', 'set')
-				->setAttribute('data-field-name', 'schedule')
+				->setAttribute('data-field-name', 'schedule_periods')
 		))
 			->setId('schedule')
 			->addStyle('display: none;')

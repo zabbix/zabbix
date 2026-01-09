@@ -89,7 +89,7 @@ window.sla_edit_popup = new class {
 
 		schedule.querySelectorAll('input[type="checkbox"]').forEach((element, i) => {
 			schedule
-				.querySelector(`input[name="schedule[schedule_period_${i}]"]`)
+				.querySelector(`input[name="schedule_periods[${i}][period]"]`)
 				.disabled = element.checked ? '' : 'disabled';
 		});
 	}
@@ -180,7 +180,7 @@ window.sla_edit_popup = new class {
 
 		const fields = this.form.getAllValues();
 		const is_empty = o => Object.values(o).filter(o => o !== null).length == 0;
-		fields.schedule = is_empty(fields.schedule) ? null : fields.schedule;
+		fields.schedule_periods = is_empty(fields.schedule_periods) ? null : fields.schedule_periods;
 		this.overlay.setLoading();
 
 		if ('service_tags' in fields) {
