@@ -2612,8 +2612,8 @@ class testDashboardWidgetCommunication extends testWidgetCommunication {
 				 */
 				foreach ([self::FIRST_HOST_NAME, self::SECOND_HOST_NAME, self::THIRD_HOST_NAME] as $host_name) {
 					$this->assertFalse($broadcaster_widget->query('xpath:.//*[@src='.
-						CXPathHelper::escapeQuotes(self::GEOMAP_HASH_START.self::GEOMAP_UNIQUE_HASH_PARTS[$host_name].
-						self::GEOMAP_HAS_END).']')->one(false)->isValid()
+							CXPathHelper::escapeQuotes(self::GEOMAP_HASH_START.self::GEOMAP_UNIQUE_HASH_PARTS[$host_name].
+							self::GEOMAP_HAS_END).']')->one(false)->isValid()
 					);
 				}
 			}
