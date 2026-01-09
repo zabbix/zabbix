@@ -468,6 +468,10 @@ typedef struct
 	int	trends_global;
 	int	history_mode;
 	int	history_global;
+
+	/* History overrides by external database settings, like ClickHouse table TTL. */
+	/* Overrides all history housekeeping settings for a value type if not 0.      */
+	int	history_override[ITEM_VALUE_TYPE_COUNT];
 }
 zbx_config_hk_t;
 
@@ -1400,7 +1404,7 @@ zbx_maintenance_type_t;
 
 #define ZBX_RECALC_TIME_PERIOD_HISTORY	1
 #define ZBX_RECALC_TIME_PERIOD_TRENDS	2
-void	zbx_recalc_time_period(time_t *ts_from, int table_group);
+void	zbx_recalc_time_period(time_t *ts_from, int table_group, unsigned char value_type);
 
 /* vps tracker */
 typedef struct
@@ -1581,5 +1585,7 @@ int	zbx_item_key_subst_cb(const char *data, int level, int num, int quoted, char
 int	zbx_snmp_oid_subst_cb(const char *data, int level, int num, int quoted, char **param, va_list args);
 
 zbx_uint64_t	zbx_dc_get_cache_size(void);
+
+void	zbx_dc_hk_override(unsigned char value_type, int interval);
 
 #endif

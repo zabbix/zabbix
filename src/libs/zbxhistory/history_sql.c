@@ -328,7 +328,7 @@ static int	db_read_values_by_time(zbx_uint64_t itemid, int value_type, zbx_vecto
 
 	time_from = end_timestamp - seconds;
 
-	zbx_recalc_time_period(&time_from, ZBX_RECALC_TIME_PERIOD_HISTORY);
+	zbx_recalc_time_period(&time_from, ZBX_RECALC_TIME_PERIOD_HISTORY, value_type);
 
 	if (ZBX_JAN_2038 == end_timestamp)
 	{
@@ -517,7 +517,7 @@ static int	db_read_values_by_count(zbx_uint64_t itemid, int value_type, zbx_vect
 
 		if (clock_from != clock_to)
 		{
-			zbx_recalc_time_period(&clock_from, ZBX_RECALC_TIME_PERIOD_HISTORY);
+			zbx_recalc_time_period(&clock_from, ZBX_RECALC_TIME_PERIOD_HISTORY, value_type);
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " and clock>" ZBX_FS_TIME_T,
 					(zbx_fs_time_t)clock_from);
 		}

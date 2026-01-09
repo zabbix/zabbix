@@ -1173,7 +1173,7 @@ static int	elastic_read_values_by_count(zbx_history_elastic_data_t *data, zbx_ui
 		if (clock_from == clock_to)
 			clock_from = 0;
 
-		zbx_recalc_time_period(&clock_from, ZBX_RECALC_TIME_PERIOD_HISTORY);
+		zbx_recalc_time_period(&clock_from, ZBX_RECALC_TIME_PERIOD_HISTORY, value_type);
 
 		if (clock_from > clock_to)
 			return SUCCEED;

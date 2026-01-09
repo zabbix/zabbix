@@ -17169,7 +17169,7 @@ void	zbx_dc_get_unused_macro_templates(zbx_hashset_t *templates, const zbx_vecto
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() templateids_num:%d", __func__, templateids->values_num);
 }
 
-void	zbx_recalc_time_period(time_t *ts_from, int table_group)
+void	zbx_recalc_time_period(time_t *ts_from, int table_group, unsigned char value_type)
 {
 #define HK_CFG_UPDATE_INTERVAL	5
 	time_t			least_ts = 0, now;
@@ -17189,10 +17189,17 @@ void	zbx_recalc_time_period(time_t *ts_from, int table_group)
 
 	if (ZBX_RECALC_TIME_PERIOD_HISTORY == table_group)
 	{
-		if (1 != hk.history_global)
-			return;
+		int	hk_period;
 
-		least_ts = now - hk.history;
+		if (0 == (hk_period = hk.history_override[value_type]))
+		{
+			if (1 != hk.history_global)
+				return;
+
+			hk_period = hk.history;
+		}
+
+		least_ts = now - hk_period;
 	}
 	else if (ZBX_RECALC_TIME_PERIOD_TRENDS == table_group)
 	{
@@ -17411,4 +17418,25 @@ int	zbx_dc_sync_lock(void)
 zbx_uint64_t	zbx_dc_get_cache_size(void)
 {
 	return config_mem->total_size;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: override housekeeping interval for specified value type           *
+ *                                                                            *
+ * Parameters: value_type - [IN] the item value type                          *
+ *             interval   - [IN] the housekeeping interval in seconds         *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_dc_hk_override(unsigned char value_type, int interval)
+{
+	if (ITEM_VALUE_TYPE_COUNT >= value_type)
+	{
+		THIS_SHOULD_NEVER_HAPPEN_MSG("cannot override houskeeeping for invalid value type: %d", value_type);
+		return;
+	}
+
+	WRLOCK_CACHE;
+	config->config->hk.history_override[value_type] = interval;
+	UNLOCK_CACHE;
 }

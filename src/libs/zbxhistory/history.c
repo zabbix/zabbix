@@ -1519,14 +1519,16 @@ void	zbx_history_record_copy(zbx_history_record_t *dst, const zbx_history_record
  ******************************************************************************/
 const char	*history_value_type_desc(unsigned char value_type)
 {
-	static char	*value_types_str[] = {"Numeric (float)", "Character", "Log", "Numeric (unsigned)", "Text",
+	static char	*value_types_desc[] = {"Numeric (float)", "Character", "Log", "Numeric (unsigned)", "Text",
 			"Binary"};
 
-	if (value_type >= ARRSIZE(value_types_str))
+	if (value_type >= ARRSIZE(value_types_desc))
 		return "Unknown";
 
-	return value_types_str[value_type];
+	return value_types_desc[value_type];
 }
+
+static char	*value_types_str[] = {"dbl", "str", "log", "uint", "text", "bin"};
 
 /******************************************************************************
  *                                                                            *
@@ -1539,12 +1541,32 @@ const char	*history_value_type_desc(unsigned char value_type)
  ******************************************************************************/
 const char	*history_value_type_str(unsigned char value_type)
 {
-	static char	*value_types_str[] = {"float", "str", "log", "uint", "text", "bin"};
-
 	if (value_type >= ARRSIZE(value_types_str))
 		return "unknown";
 
 	return value_types_str[value_type];
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: convert history value type string to its numeric representation   *
+ *                                                                            *
+ * Parameters: value_type_str - [IN] the history value type string            *
+ *                                                                            *
+ * Return value: value type or FAIL if unknown                                *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_history_value_type_from_str(const char *value_type_str)
+{
+	for (int i = 0; i < (int)ARRSIZE(value_types_str); i++)
+	{
+		if (0 == strcmp(value_types_str[i], value_type_str))
+			return i;
+	}
+
+	THIS_SHOULD_NEVER_HAPPEN_MSG("unknown history value type \"%s\"", value_type_str);
+
+	return FAIL;
 }
 
 /******************************************************************************

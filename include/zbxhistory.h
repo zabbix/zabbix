@@ -140,4 +140,6 @@ int	zbx_history_get_flush_error(zbx_uint64_t error_mask, unsigned char value_typ
 int	zbx_item_history_compare_by_itemid(const void *d1, const void *d2);
 int	zbx_item_history_compare_by_index_desc(const void *d1, const void *d2);
 
+int	zbx_history_value_type_from_str(const char *value_type_str);
+
 #endif

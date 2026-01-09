@@ -128,7 +128,12 @@ static void	dc_items_convert_hk_periods(const zbx_config_hk_t *config_hk, zbx_hi
 		item->trends = 0;
 	}
 
-	if (NULL != item->history_period)
+	if (0 != config_hk->history_override[item->value_type])
+	{
+		item->history_sec = config_hk->history_override[item->value_type];
+		item->history = 1;
+	}
+	else if (NULL != item->history_period)
 	{
 		zbx_dc_expand_user_and_func_macros(um_handle, &item->history_period, &item->host.hostid, 1, NULL);
 
