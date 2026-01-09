@@ -108,10 +108,15 @@ abstract class CControllerLldRuleUpdateGeneral extends CController {
 				'in' => [ZBX_POSTTYPE_RAW, ZBX_POSTTYPE_JSON, ZBX_POSTTYPE_XML],
 				'when' => ['type', 'in' => [ITEM_TYPE_HTTPAGENT]]
 			],
-			'posts' => ['db items.posts', 'required', 'not_empty', 'when' => [
-				['post_type', 'in' => [ZBX_POSTTYPE_JSON, ZBX_POSTTYPE_XML]],
-				['type', 'in' => [ITEM_TYPE_HTTPAGENT]]
-			]],
+			'posts' => [
+				['db items.posts'],
+				['db items.posts', 'required', 'not_empty',
+					'when' => [
+						['post_type', 'in' => [ZBX_POSTTYPE_JSON, ZBX_POSTTYPE_XML]],
+						['type', 'in' => [ITEM_TYPE_HTTPAGENT]]
+					]
+				]
+			],
 			'headers' => ['objects',
 				'fields' => [
 					'value' => ['string', 'length' => 2000],
@@ -172,10 +177,12 @@ abstract class CControllerLldRuleUpdateGeneral extends CController {
 				]
 			],
 			'snmp_oid' => ['db items.snmp_oid', 'not_empty', 'required', 'when' => ['type', 'in' => [ITEM_TYPE_SNMP]]],
-			'ipmi_sensor' => ['db items.ipmi_sensor', 'not_empty', 'required', 'when' => [
-				['key', 'not_in' => ['ipmi.get']],
-				['type', 'in' => [ITEM_TYPE_IPMI]]
-			]],
+			'ipmi_sensor' => ['db items.ipmi_sensor', 'not_empty', 'required',
+				'when' => [
+					['key', 'not_in' => ['ipmi.get']],
+					['type', 'in' => [ITEM_TYPE_IPMI]]
+				]
+			],
 			'authtype' => ['db items.authtype', 'in' => [ITEM_AUTHTYPE_PASSWORD, ITEM_AUTHTYPE_PUBLICKEY],
 				'when' => ['type', 'in' => [ITEM_TYPE_SSH, ITEM_TYPE_HTTPAGENT]]
 			],
@@ -188,14 +195,18 @@ abstract class CControllerLldRuleUpdateGeneral extends CController {
 					'when' => ['type', 'in' => [ITEM_TYPE_SSH, ITEM_TYPE_TELNET]]
 				]
 			],
-			'publickey' => ['db items.publickey', 'required', 'not_empty', 'when' => [
-				['type', 'in' => [ITEM_TYPE_SSH]],
-				['authtype', 'in' => [ITEM_AUTHTYPE_PUBLICKEY]]
-			]],
-			'privatekey' => ['db items.privatekey', 'required', 'not_empty', 'when' => [
-				['type', 'in' => [ITEM_TYPE_SSH]],
-				['authtype', 'in' => [ITEM_AUTHTYPE_PUBLICKEY]]
-			]],
+			'publickey' => ['db items.publickey', 'required', 'not_empty',
+				'when' => [
+					['type', 'in' => [ITEM_TYPE_SSH]],
+					['authtype', 'in' => [ITEM_AUTHTYPE_PUBLICKEY]]
+				]
+			],
+			'privatekey' => ['db items.privatekey', 'required', 'not_empty',
+				'when' => [
+					['type', 'in' => [ITEM_TYPE_SSH]],
+					['authtype', 'in' => [ITEM_AUTHTYPE_PUBLICKEY]]
+				]
+			],
 			'password' => ['db items.password', 'when' => ['type', 'in' => [ITEM_TYPE_SSH]]],
 			'params_es' => ['db items.params', 'required', 'not_empty',
 				'when' => ['type', 'in' => [ITEM_TYPE_SSH, ITEM_TYPE_TELNET]]
@@ -205,26 +216,20 @@ abstract class CControllerLldRuleUpdateGeneral extends CController {
 			],
 			'delay_flex' => ['objects', 'fields' => [
 				'type' => ['integer', 'in' => [ITEM_DELAY_FLEXIBLE, ITEM_DELAY_SCHEDULING]],
-				'schedule' => ['string', 'required',
+				'schedule' => ['string', 'required', 'not_empty',
 					'use' => [CSchedulingIntervalParser::class, ['usermacros' => true]],
 					'messages' => ['use' => _('Invalid interval.')],
 					'when' => ['type', 'in' => [ITEM_DELAY_SCHEDULING]]
 				],
-				'delay' => ['string', 'required',
+				'delay' => ['string', 'required', 'not_empty',
 					'use' => [CSimpleIntervalParser::class, ['usermacros' => true]],
 					'messages' => ['use' => _('Invalid interval.')],
 					'when' => ['type', 'in' => [ITEM_DELAY_FLEXIBLE]]
 				],
-				'period' => [
-					[
-						'string', 'not_empty',
-						'when' => [['delay', 'not_empty'], ['type', 'in' => [ITEM_DELAY_FLEXIBLE]]]
-					],
-					[
-						'string', 'required', 'use' => [CTimePeriodParser::class, ['usermacros' => true]],
-						'messages' => ['use' => _('Invalid period.')],
-						'when' => ['type', 'in' => [ITEM_DELAY_FLEXIBLE]]
-					]
+				'period' => ['string', 'required', 'not_empty',
+					'use' => [CTimePeriodParser::class, ['usermacros' => true]],
+					'messages' => ['use' => _('Invalid period.')],
+					'when' => ['type', 'in' => [ITEM_DELAY_FLEXIBLE]]
 				]
 			]],
 			'delay' => [

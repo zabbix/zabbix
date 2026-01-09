@@ -86,9 +86,28 @@ window.lldrule_edit = new class {
 	}
 
 	#formIsReady() {
+		this.#initial_form_fields = this.#formGetAllValues();
+	}
+
+	#formGetAllValues() {
 		window.lldoverrides.appendFormData(this.#form_element);
 		this.#form.discoverAllFields();
-		this.#initial_form_fields = this.#form.getAllValues();
+		const fields = this.#form.getAllValues();
+
+		Object.keys(fields.delay_flex).forEach(key => {
+			let { schedule, period, type, delay } = fields.delay_flex[key];
+			type = parseInt(type);
+
+			if (type == <?= ITEM_DELAY_FLEXIBLE ?> && delay === '' && period === '') {
+				delete fields.delay_flex[key];
+			}
+
+			if (type == <?= ITEM_DELAY_SCHEDULING ?> && schedule === '') {
+				delete fields.delay_flex[key];
+			}
+		});
+
+		return fields;
 	}
 
 	#initEvents() {
@@ -131,10 +150,7 @@ window.lldrule_edit = new class {
 	}
 
 	#clone() {
-		window.lldoverrides.appendFormData(this.#form_element);
-		this.#form.discoverAllFields();
-
-		const fields = this.#form.getAllValues();
+		const fields = this.#formGetAllValues();
 		fields.clone = 1;
 
 		Object.entries(fields).forEach(([key, value]) => {
@@ -148,9 +164,7 @@ window.lldrule_edit = new class {
 
 	#submit() {
 		this.#removePopupMessages();
-		window.lldoverrides.appendFormData(this.#form_element);
-		this.#form.discoverAllFields();
-		const fields = this.#form.getAllValues();
+		const fields = this.#formGetAllValues();
 		fields.interfaceid = fields.interfaceid ? fields.interfaceid : null;
 		this.#overlay.unsetLoading();
 
@@ -253,7 +267,7 @@ window.lldrule_edit = new class {
 	}
 
 	#isConfirmed() {
-		return JSON.stringify(this.#initial_form_fields) === JSON.stringify(this.#form.getAllValues())
+		return JSON.stringify(this.#initial_form_fields) === JSON.stringify(this.#formGetAllValues())
 			|| window.confirm(<?= json_encode(_('Any changes made in the current form will be lost.')) ?>);
 	}
 

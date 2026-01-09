@@ -273,6 +273,14 @@ class CControllerLldRuleEdit extends CController
 			$item['timeout'] = $item['inherited_timeout'];
 		}
 
+		if ($item['lifetime_type'] != ZBX_LLD_DELETE_AFTER) {
+			$item['lifetime'] = DB::getDefault('items', 'lifetime');
+		}
+
+		if ($item['enabled_lifetime_type'] != ZBX_LLD_DISABLE_AFTER) {
+			$item['enabled_lifetime'] = ZBX_LLD_RULE_ENABLED_LIFETIME;
+		}
+
 		if ($item['itemid']) {
 			$item['templates'] = makeItemTemplatesHtml($item['itemid'], getItemParentTemplates([$item], $item['flags']),
 				$item['flags'], CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES)
