@@ -395,10 +395,20 @@ static int	history_manager_init(zbx_history_manager_t *manager, const char *conf
 		/* register custom history providers configured with HistoryProvider configuration parameters */
 		for (char **provider = providers; NULL != *provider; provider++)
 		{
-			char	*name = NULL;
+			char	*name = NULL, *errmsg = NULL;
 
 			if (SUCCEED != history_provider_parse_options(*provider, &name, &options, error))
 				goto out;
+
+			if (SUCCEED != history_options_validate_value_type(options.values, options.values_num, &errmsg))
+			{
+				*error = zbx_dsprintf(NULL, "invalid history provider \"%s\" configuration: %s",
+						name, errmsg);
+				zbx_free(name);
+				zbx_free(errmsg);
+
+				goto out;
+			}
 
 			mask = history_options_type_mask(options.values, options.values_num);
 			if (0 != (value_type_mask & mask))

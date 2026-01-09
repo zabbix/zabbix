@@ -368,6 +368,59 @@ zbx_uint64_t	history_options_type_mask(const zbx_history_option_t *options, int 
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: validate value types specified in history provider options        *
+ *                                                                            *
+ * Parameters: options     - [IN] array of history options                    *
+ *             options_num - [IN] number of options in the array              *
+ *             error       - [OUT] error message                              *
+ *                                                                            *
+ * Return value: SUCCEED - all value types are valid                          *
+ *               FAIL    - invalid value type found                           *
+ *                                                                            *
+ ******************************************************************************/
+int	history_options_validate_value_type(const zbx_history_option_t *options, int options_num, char **error)
+{
+	const char	*types;
+
+	if (NULL == (types = history_option_value(options, options_num, HISTORY_PROVIDER_OPTION_VALUE_TYPES)))
+		return SUCCEED;
+
+	const char	*start = types, *end;
+
+	for (;;)
+	{
+		size_t	len, i;
+
+		end = strchr(start, ',');
+
+		len = (NULL == end ? strlen(start) : (size_t)(end - start));
+
+		for (i = 0; i < ARRSIZE(history_options_value_types); i++)
+		{
+			const char	*value_type = history_options_value_types[i];
+
+			if (strlen(value_type) == len && 0 == memcmp(value_type, start, len))
+				break;
+		}
+
+		if (i == ARRSIZE(history_options_value_types))
+		{
+			*error = zbx_dsprintf(NULL, "unknown value type \"%.*s\"",  (int)len, start);
+			return FAIL;
+		}
+
+		if (NULL == end)
+			break;
+
+		start = end + 1;
+	}
+
+	return SUCCEED;
+}
+
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: determine if precaching is required based on provider options     *
  *                                                                            *
  * Parameters: options     - [IN] array of history options                    *
