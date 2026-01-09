@@ -111,7 +111,7 @@ int	zbx_alerter_begin_dispatch(zbx_alerter_dispatch_t *dispatch, const char *sub
 		const char *content_name, const char *message_format, const char *content, zbx_uint32_t content_size,
 		char **error);
 int	zbx_alerter_send_dispatch(zbx_alerter_dispatch_t *dispatch, const zbx_db_mediatype *mediatype,
-		const zbx_vector_str_t *recipients, char **error);
+		const zbx_vector_str_t *recipients, zbx_uint64_t eventid, char **error);
 int	zbx_alerter_end_dispatch(zbx_alerter_dispatch_t *dispatch, char **error);
 void	zbx_alerter_clear_dispatch(zbx_alerter_dispatch_t *dispatch);
 void	zbx_alerter_dispatch_result_free(zbx_alerter_dispatch_result_t *result);

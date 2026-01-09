@@ -107,6 +107,73 @@ static void	alerter_send_result(zbx_ipc_socket_t *socket, const char *value, int
 	zbx_free(data);
 }
 
+static char	*generate_sendto_md5(const char *sendto)
+{
+	const char	*hex = "0123456789abcdef";
+	md5_state_t	state;
+	md5_byte_t	hash[ZBX_MD5_DIGEST_SIZE];
+	char		*sendto_md5;
+	int		i, pos;
+
+	sendto_md5 = zbx_malloc(NULL, ZBX_MD5_DIGEST_SIZE * 2 + 1);
+
+	zbx_md5_init(&state);
+	zbx_md5_append(&state, (const md5_byte_t *)sendto, strlen(sendto));
+	zbx_md5_finish(&state, hash);
+
+	for (i = 0, pos = 0; i < ZBX_MD5_DIGEST_SIZE; i++)
+	{
+		sendto_md5[pos++] = hex[hash[i] >> 4];
+		sendto_md5[pos++] = hex[hash[i] & 15];
+	}
+	sendto_md5[pos] = '\0';
+
+	return sendto_md5;
+}
+
+static char	*create_email_messageid(zbx_uint64_t mediatypeid, const char *sendto_md5, zbx_uint64_t eventid,
+		zbx_uint64_t actionid, zbx_uint64_t alertid)
+{
+	static unsigned short	counter = 0;
+	struct tm		tm;
+	long			ms;
+	char			*str = NULL;
+	size_t			str_alloc = 0, str_offset = 0;
+
+	if (0 == actionid)
+	{
+		zbx_get_time(&tm, &ms, NULL);
+
+		if (0 == eventid)
+		{
+			zbx_snprintf_alloc(&str, &str_alloc, &str_offset, "<%04d%02d%02d-%02d%02d%02d-%hu",
+					1900 + tm.tm_year, 1 + tm.tm_mon, tm.tm_mday,
+					tm.tm_hour, tm.tm_min, tm.tm_sec, counter++);
+		}
+		else
+		{
+			zbx_snprintf_alloc(&str, &str_alloc, &str_offset, "<%04d%02d%02d-%02d%02d%02d-" ZBX_FS_UI64,
+					1900 + tm.tm_year, 1 + tm.tm_mon, tm.tm_mday,
+					tm.tm_hour, tm.tm_min, tm.tm_sec, eventid);
+		}
+	}
+	else
+	{
+		zbx_snprintf_alloc(&str, &str_alloc, &str_offset, "<" ZBX_FS_UI64 "-" ZBX_FS_UI64, eventid, actionid);
+
+		if (0 != alertid)
+		{
+			zbx_snprintf_alloc(&str, &str_alloc, &str_offset, "-" ZBX_FS_UI64, alertid);
+		}
+	}
+
+	zbx_snprintf_alloc(&str, &str_alloc, &str_offset, ".%s.", sendto_md5);
+	zbx_snprintf_alloc(&str, &str_alloc, &str_offset, ZBX_FS_UI64 ".%s@zabbix>", mediatypeid,
+			zbx_dc_get_instanceid());
+
+	return str;
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: create email In-Reply_To field value to group related messages    *
@@ -118,28 +185,19 @@ static void	alerter_send_result(zbx_ipc_socket_t *socket, const char *value, int
  * Return value: In-Reply_To field value                                      *
  *                                                                            *
  ******************************************************************************/
-static char	*create_email_inreplyto(zbx_uint64_t mediatypeid, const char *sendto, zbx_uint64_t eventid)
+static char	*create_email_inreplyto(zbx_uint64_t mediatypeid, const char *sendto_md5, zbx_uint64_t eventid,
+		zbx_uint64_t actionid)
 {
-	const char	*hex = "0123456789abcdef";
 	char		*str = NULL;
-	md5_state_t	state;
-	md5_byte_t	hash[ZBX_MD5_DIGEST_SIZE];
-	int		i;
 	size_t		str_alloc = 0, str_offset = 0;
 
-	zbx_md5_init(&state);
-	zbx_md5_append(&state, (const md5_byte_t *)sendto, strlen(sendto));
-	zbx_md5_finish(&state, hash);
+	if (0 == actionid)
+		zbx_snprintf_alloc(&str, &str_alloc, &str_offset, "<" ZBX_FS_UI64, eventid);
+	else
+		zbx_snprintf_alloc(&str, &str_alloc, &str_offset, "<" ZBX_FS_UI64 "-" ZBX_FS_UI64, eventid, actionid);
 
-	zbx_snprintf_alloc(&str, &str_alloc, &str_offset, "<" ZBX_FS_UI64 ".", eventid);
-
-	for (i = 0; i < ZBX_MD5_DIGEST_SIZE; i++)
-	{
-		zbx_chrcpy_alloc(&str, &str_alloc, &str_offset, hex[hash[i] >> 4]);
-		zbx_chrcpy_alloc(&str, &str_alloc, &str_offset, hex[hash[i] & 15]);
-	}
-
-	zbx_snprintf_alloc(&str, &str_alloc, &str_offset, "." ZBX_FS_UI64 ".%s@zabbix.com>", mediatypeid,
+	zbx_snprintf_alloc(&str, &str_alloc, &str_offset, ".%s.", sendto_md5);
+	zbx_snprintf_alloc(&str, &str_alloc, &str_offset, ZBX_FS_UI64 ".%s@zabbix>", mediatypeid,
 			zbx_dc_get_instanceid());
 
 	return str;
@@ -206,10 +264,10 @@ static int	macro_alert_email_resolv(zbx_macro_resolv_data_t *p, va_list args, ch
 static void	alerter_process_email(zbx_ipc_socket_t *socket, zbx_ipc_message_t *ipc_message,
 		const char *config_source_ip, const char *config_ssl_ca_location)
 {
-	zbx_uint64_t	alertid, mediatypeid, eventid, objectid;
+	zbx_uint64_t	alertid, mediatypeid, eventid, p_eventid, actionid, objectid;
 	char		*sendto, *subject, *message, *smtp_server, *smtp_helo, *smtp_email, *smtp_username,
-			*smtp_password, *inreplyto = NULL, *expression, *recovery_expression, *mediatype_name,
-			*error = NULL;
+			*smtp_password, *sendto_md5 = NULL, *messageid = NULL, *inreplyto = NULL, *expression,
+			*recovery_expression, *mediatype_name, *error = NULL;
 	unsigned short	smtp_port;
 	unsigned char	smtp_authentication, smtp_security, smtp_verify_peer, smtp_verify_host, message_format;
 	int		maxattempts, object, source, ret;
@@ -217,10 +275,10 @@ static void	alerter_process_email(zbx_ipc_socket_t *socket, zbx_ipc_message_t *i
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	zbx_alerter_deserialize_email(ipc_message->data, &alertid, &mediatypeid, &mediatype_name, &maxattempts,
-			&eventid, &source, &object, &objectid, &sendto, &subject, &message, &smtp_server, &smtp_port,
-			&smtp_helo, &smtp_email, &smtp_security, &smtp_verify_peer, &smtp_verify_host,
-			&smtp_authentication, &smtp_username, &smtp_password, &message_format, &expression,
-			&recovery_expression);
+			&eventid, &p_eventid, &actionid, &source, &object, &objectid, &sendto, &subject, &message,
+			&smtp_server, &smtp_port, &smtp_helo, &smtp_email, &smtp_security, &smtp_verify_peer,
+			&smtp_verify_host, &smtp_authentication, &smtp_username, &smtp_password, &message_format,
+			&expression, &recovery_expression);
 
 	if (SMTP_AUTHENTICATION_PASSWORD == smtp_authentication)
 	{
@@ -244,9 +302,19 @@ static void	alerter_process_email(zbx_ipc_socket_t *socket, zbx_ipc_message_t *i
 		zbx_db_trigger_clean(&event.trigger);
 	}
 
-	inreplyto = create_email_inreplyto(mediatypeid, sendto, eventid);
+	sendto_md5 = generate_sendto_md5(sendto);
 
-	ret = send_email(smtp_server, smtp_port, smtp_helo, smtp_email, sendto, inreplyto, subject, message,
+	if (0 != p_eventid)
+	{
+		messageid = create_email_messageid(mediatypeid, sendto_md5, eventid, actionid,
+				eventid == p_eventid ? alertid : 0);
+
+		inreplyto = create_email_inreplyto(mediatypeid, sendto_md5, p_eventid, actionid);
+	}
+	else
+		messageid = create_email_messageid(mediatypeid, sendto_md5, eventid, actionid, 0);
+
+	ret = send_email(smtp_server, smtp_port, smtp_helo, smtp_email, sendto, messageid, inreplyto, subject, message,
 			smtp_security, smtp_verify_peer, smtp_verify_host, smtp_authentication, smtp_username,
 			smtp_password, message_format, ALARM_ACTION_TIMEOUT, config_source_ip, config_ssl_ca_location,
 			&error);
@@ -255,6 +323,8 @@ static void	alerter_process_email(zbx_ipc_socket_t *socket, zbx_ipc_message_t *i
 
 	zbx_free(error);
 	zbx_free(inreplyto);
+	zbx_free(messageid);
+	zbx_free(sendto_md5);
 	zbx_free(sendto);
 	zbx_free(subject);
 	zbx_free(mediatype_name);
