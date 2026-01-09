@@ -2677,7 +2677,7 @@ static void	execute_operations(const zbx_db_event *event, zbx_uint64_t actionid)
 	zbx_vector_uint64_t	lnk_templateids, del_templateids, new_groupids, del_groupids, new_optagids,
 				del_optagids;
 	zbx_config_t		cfg;
-	int			status = 0, host_add_failed = 0;
+	int			host_add_failed = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() actionid:" ZBX_FS_UI64, __func__, actionid);
 
