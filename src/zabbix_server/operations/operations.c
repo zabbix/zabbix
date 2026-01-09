@@ -1192,7 +1192,7 @@ out:
  *                                                                            *
  * Purpose: sets host inventory mode                                          *
  *                                                                            *
- * Parameters: event           - [IN] source event                            *
+ * Parameters: event           - [IN] source event data                       *
  *             cfg             - [IN] global configuration data               *
  *             inventory_mode  - [IN] new inventory mode, see                 *
  *                                   HOST_INVENTORY_ defines                  *

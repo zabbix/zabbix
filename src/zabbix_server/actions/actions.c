@@ -2789,9 +2789,7 @@ static void	execute_operations(const zbx_db_event *event, zbx_uint64_t actionid)
 				break;
 			case ZBX_OPERATION_TYPE_HOST_TAGS_ADD:
 				if (0 != optagid)
-				{
 					zbx_vector_uint64_append(&new_optagids, optagid);
-				}
 				break;
 			case ZBX_OPERATION_TYPE_HOST_TAGS_REMOVE:
 				if (0 != optagid)
