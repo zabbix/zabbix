@@ -36,7 +36,6 @@ class CControllerTokenUpdate extends CController {
 			'regenerate' => ['integer', 'in' => [1]],
 			'expires_at' => ['string', 'required', 'not_empty',
 				'use' => [CAbsoluteTimeValidator::class, ['min' => 0, 'max' => ZBX_MAX_DATE]],
-				'messages' => ['use' => _('Invalid date.')],
 				'when' => ['expires_state', 'in' => [1]]
 			],
 			'status' => ['db token.status', 'required', 'in' => [ZBX_AUTH_TOKEN_ENABLED, ZBX_AUTH_TOKEN_DISABLED]]
