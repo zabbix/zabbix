@@ -2659,36 +2659,6 @@ clean:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: Ensures host is added for operation. Checks if operation should   *
- *          be skipped and attempts to add host if needed.                    *
- *                                                                            *
- * Parameters: event           - [IN] source event data                       *
- *             hostid          - [IN/OUT] host ID (updated if host is added)  *
- *             status          - [OUT] host status                            *
- *             cfg             - [IN] global configuration data               *
- *             host_add_failed - [IN/OUT] flag indicating if host add failed  *
- *                                                                            *
- * Return value: SUCCEED - operation should continue                          *
- *               FAIL    - operation should be skipped                        *
- *                                                                            *
- ******************************************************************************/
-static int	ensure_host_for_operation(const zbx_db_event *event, zbx_uint64_t *hostid, int *status,
-		const zbx_config_t *cfg, int *host_add_failed)
-{
-	if (FAIL == is_discovery_or_autoregistration(event) || 0 != *host_add_failed)
-		return FAIL;
-
-	if (0 == *hostid && 0 == (*hostid = add_discovered_host(event, status, cfg)))
-	{
-		*host_add_failed = 1;
-		return FAIL;
-	}
-
-	return SUCCEED;
-}
-
-/******************************************************************************
- *                                                                            *
  * Purpose: Executes host, group, template operations linked to the action.   *
  *                                                                            *
  * Parameters: event    - [IN]                                                *
@@ -2747,35 +2717,20 @@ static void	execute_operations(const zbx_db_event *event, zbx_uint64_t actionid)
 		switch (operationtype)
 		{
 			case ZBX_OPERATION_TYPE_HOST_ADD:
-				if (FAIL == ensure_host_for_operation(event, &hostid, &status, &cfg, &host_add_failed))
-					break;
-
-				op_host_add(event, &cfg);
+				op_host_add(event, &cfg, &hostid, &host_add_failed);
 				break;
 			case ZBX_OPERATION_TYPE_HOST_REMOVE:
 				op_host_del(event);
 				break;
 			case ZBX_OPERATION_TYPE_HOST_ENABLE:
-				if (FAIL == ensure_host_for_operation(event, &hostid, &status, &cfg, &host_add_failed))
-					break;
-
-				op_host_enable(event, &cfg);
+				op_host_enable(event, &cfg, &hostid, &host_add_failed);
 				break;
 			case ZBX_OPERATION_TYPE_HOST_DISABLE:
-				if (FAIL == ensure_host_for_operation(event, &hostid, &status, &cfg, &host_add_failed))
-					break;
-
-				op_host_disable(event, &cfg);
+				op_host_disable(event, &cfg, &hostid, &host_add_failed);
 				break;
 			case ZBX_OPERATION_TYPE_GROUP_ADD:
 				if (0 != groupid)
 				{
-					if (FAIL == ensure_host_for_operation(event, &hostid, &status, &cfg,
-							&host_add_failed))
-					{
-						break;
-					}
-
 					int	i;
 
 					if (FAIL != (i = zbx_vector_uint64_search(&del_groupids, groupid,
@@ -2804,12 +2759,6 @@ static void	execute_operations(const zbx_db_event *event, zbx_uint64_t actionid)
 			case ZBX_OPERATION_TYPE_TEMPLATE_ADD:
 				if (0 != templateid)
 				{
-					if (FAIL == ensure_host_for_operation(event, &hostid, &status, &cfg,
-							&host_add_failed))
-					{
-						break;
-					}
-
 					int	i;
 
 					if (FAIL != (i = zbx_vector_uint64_search(&del_templateids, templateid,
@@ -2836,20 +2785,11 @@ static void	execute_operations(const zbx_db_event *event, zbx_uint64_t actionid)
 				}
 				break;
 			case ZBX_OPERATION_TYPE_HOST_INVENTORY:
-				if (FAIL == ensure_host_for_operation(event, &hostid, &status, &cfg, &host_add_failed))
-					break;
-
-				op_host_inventory_mode(event, &cfg, inventory_mode);
+				op_host_inventory_mode(event, &cfg, inventory_mode, &hostid, &host_add_failed);
 				break;
 			case ZBX_OPERATION_TYPE_HOST_TAGS_ADD:
 				if (0 != optagid)
 				{
-					if (FAIL == ensure_host_for_operation(event, &hostid, &status, &cfg,
-							&host_add_failed))
-					{
-						break;
-					}
-
 					zbx_vector_uint64_append(&new_optagids, optagid);
 				}
 				break;
@@ -2883,7 +2823,7 @@ static void	execute_operations(const zbx_db_event *event, zbx_uint64_t actionid)
 		zbx_vector_uint64_sort(&new_groupids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 		zbx_vector_uint64_uniq(&new_groupids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 		if (0 == host_add_failed)
-			op_groups_add(event, &cfg, &new_groupids);
+			op_groups_add(event, &cfg, &new_groupids, &hostid, &host_add_failed);
 	}
 
 	if (0 != del_groupids.values_num)
@@ -2896,7 +2836,7 @@ static void	execute_operations(const zbx_db_event *event, zbx_uint64_t actionid)
 	if (0 != new_optagids.values_num || 0 != del_optagids.values_num)
 	{
 		if (0 == host_add_failed)
-			op_add_del_tags(event, &cfg,  &new_optagids, &del_optagids);
+			op_add_del_tags(event, &cfg,  &new_optagids, &del_optagids, &hostid, &host_add_failed);
 	}
 
 	zbx_config_clean(&cfg);
