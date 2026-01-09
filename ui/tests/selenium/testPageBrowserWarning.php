@@ -25,7 +25,6 @@ class testPageBrowserWarning extends CWebTest {
 		$this->query('link:Continue despite this warning')->waitUntilClickable()->one()->click();
 		$this->assertEquals(PHPUNIT_URL.'index.php', $this->page->getCurrentURL());
 		$this->assertTrue($this->query('button:Sign in')->one()->isClickable());
-		$this->page->login()->open('browserwarning.php')->waitUntilReady();
 
 		// User logged in.
 		$this->page->login()->open('browserwarning.php')->waitUntilReady();
@@ -57,6 +56,6 @@ class testPageBrowserWarning extends CWebTest {
 		// Navigate to dashboard page for logged in user.
 		$this->query('link:Continue despite this warning')->one()->click();
 		$this->page->waitUntilReady();
-		$this->page->assertHeader('Dashboard for Copying widgets _1');
+		$this->page->assertHeader('Global view');
 	}
 }
