@@ -76,7 +76,6 @@ class CMenuItem extends CBaseComponent {
 			this._is_expanded = true;
 			this._submenu.updateHeight();
 			this.fire(MENUITEM_EVENT_EXPAND);
-
 			this._toggle.setAttribute('aria-expanded', 'true');
 		}
 
@@ -88,7 +87,6 @@ class CMenuItem extends CBaseComponent {
 			this.removeClass('is-expanded');
 			this._is_expanded = false;
 			this.fire(MENUITEM_EVENT_COLLAPSE);
-
 			this._toggle.setAttribute('aria-expanded', 'false');
 
 			return true;
