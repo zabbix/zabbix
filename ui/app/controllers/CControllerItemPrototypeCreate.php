@@ -348,9 +348,23 @@ class CControllerItemPrototypeCreate extends CControllerItemPrototype {
 			'allow_traps' => ['db items.allow_traps', 'in' => [HTTPCHECK_ALLOW_TRAPS_OFF, HTTPCHECK_ALLOW_TRAPS_ON],
 				'when' => ['type', 'in' => [ITEM_TYPE_HTTPAGENT]]
 			],
-			'trapper_hosts' => ['db items.trapper_hosts',
-				'use' => [CIPRangeParser::class, ['v6' => ZBX_HAVE_IPV6, 'dns' => true, 'usermacros' => true, 'macros' => ['{HOST.HOST}', '{HOSTNAME}', '{HOST.NAME}', '{HOST.CONN}', '{HOST.IP}', '{IPADDRESS}', '{HOST.DNS}']]],
-				'when' => ['allow_traps', 'in' => [HTTPCHECK_ALLOW_TRAPS_ON]]
+			'trapper_hosts' => [
+				['db items.trapper_hosts',
+					'use' => [CIPRangeParser::class, ['v6' => ZBX_HAVE_IPV6, 'dns' => true, 'usermacros' => true,
+						'macros' => ['{HOST.HOST}', '{HOSTNAME}', '{HOST.NAME}', '{HOST.CONN}', '{HOST.IP}',
+							'{IPADDRESS}', '{HOST.DNS}'
+						]
+					]],
+					'when' => ['allow_traps', 'in' => [HTTPCHECK_ALLOW_TRAPS_ON]]
+				],
+				['db items.trapper_hosts',
+					'use' => [CIPRangeParser::class, ['v6' => ZBX_HAVE_IPV6, 'dns' => true, 'usermacros' => true,
+						'macros' => ['{HOST.HOST}', '{HOSTNAME}', '{HOST.NAME}', '{HOST.CONN}', '{HOST.IP}',
+							'{IPADDRESS}', '{HOST.DNS}'
+						]
+					]],
+					'when' => ['type', 'in' => [ITEM_TYPE_TRAPPER]]
+				]
 			],
 			'description' => ['db items.description'],
 			'status' => ['db items.status', 'in' => [ITEM_STATUS_ACTIVE, ITEM_STATUS_DISABLED]],
