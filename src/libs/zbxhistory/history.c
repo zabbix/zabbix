@@ -1528,8 +1528,6 @@ const char	*history_value_type_desc(unsigned char value_type)
 	return value_types_desc[value_type];
 }
 
-static char	*value_types_str[] = {"dbl", "str", "log", "uint", "text", "bin"};
-
 /******************************************************************************
  *                                                                            *
  * Purpose: get description of history value type                             *
@@ -1541,10 +1539,10 @@ static char	*value_types_str[] = {"dbl", "str", "log", "uint", "text", "bin"};
  ******************************************************************************/
 const char	*history_value_type_str(unsigned char value_type)
 {
-	if (value_type >= ARRSIZE(value_types_str))
+	if (value_type >= ARRSIZE(history_options_value_types))
 		return "unknown";
 
-	return value_types_str[value_type];
+	return history_options_value_types[value_type];
 }
 
 /******************************************************************************
@@ -1558,9 +1556,9 @@ const char	*history_value_type_str(unsigned char value_type)
  ******************************************************************************/
 int	zbx_history_value_type_from_str(const char *value_type_str)
 {
-	for (int i = 0; i < (int)ARRSIZE(value_types_str); i++)
+	for (int i = 0; i < (int)ARRSIZE(history_options_value_types); i++)
 	{
-		if (0 == strcmp(value_types_str[i], value_type_str))
+		if (0 == strcmp(history_options_value_types[i], value_type_str))
 			return i;
 	}
 

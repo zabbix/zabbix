@@ -17,7 +17,7 @@
 #include "zbxstr.h"
 #include "zbxhistory.h"
 
-static const char	*history_options_value_types[ITEM_VALUE_TYPE_COUNT] = {
+const char	*history_options_value_types[ITEM_VALUE_TYPE_COUNT] = {
 		"dbl", "str", "log", "uint", "text", "bin"};
 
 ZBX_VECTOR_IMPL(history_option, zbx_history_option_t)
