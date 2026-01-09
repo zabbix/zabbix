@@ -215,7 +215,9 @@ class CControllerItemCreate extends CControllerItem {
 				ITEM_TYPE_JMX
 			]]],
 			'username' => [
-				['db items.username', 'when' => ['type', 'in' => [ITEM_TYPE_JMX, ITEM_TYPE_SIMPLE]]],
+				['db items.username',
+					'when' => ['type', 'in' => [ITEM_TYPE_SIMPLE, ITEM_TYPE_JMX, ITEM_TYPE_DB_MONITOR]]
+				],
 				['db items.username', 'required', 'not_empty', 'when' => ['type', 'in' => [ITEM_TYPE_SSH, ITEM_TYPE_TELNET]]]
 			],
 			'publickey' => ['db items.publickey', 'required', 'not_empty', 'when' => [
@@ -227,7 +229,12 @@ class CControllerItemCreate extends CControllerItem {
 				['authtype', 'in' => [ITEM_AUTHTYPE_PUBLICKEY]]
 			]],
 			'passphrase' => ['db items.password', 'when' => ['type', 'in' => [ITEM_TYPE_SSH]]],
-			'password' => ['db items.password', 'when' => ['type', 'in' => [ITEM_TYPE_SSH]]],
+			'password' => [
+				['db items.password',
+					'when' => ['type', 'in' => [ITEM_TYPE_SIMPLE, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_SSH, ITEM_TYPE_JMX]]
+				],
+				['db items.password', 'required', 'not_empty', 'when' => ['type', 'in' => [ITEM_TYPE_TELNET]]]
+			],
 			'params_es' => ['db items.params', 'required', 'not_empty', 'when' => ['type', 'in' => [ITEM_TYPE_SSH,
 				ITEM_TYPE_TELNET
 			]]],
