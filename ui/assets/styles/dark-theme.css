@@ -2428,6 +2428,7 @@ button {
 z-select.has-error button.focusable:active,
 z-select.has-error button.focusable:hover,
 z-select.has-error button.focusable,
+z-textarea-flexible.has-error textarea,
 input[type="text"].has-error,
 input[type="password"].has-error,
 input[type="search"].has-error,
@@ -2435,12 +2436,12 @@ input[type="number"].has-error,
 input[type="email"].has-error,
 input[type="time"].has-error,
 input[type="file"].has-error,
-z-textarea-flexible.has-error textarea,
 textarea.has-error {
   border: 1px solid #ff5555; }
   z-select.has-error button.focusable:active:focus,
   z-select.has-error button.focusable:hover:focus,
   z-select.has-error button.focusable:focus,
+  z-textarea-flexible.has-error textarea:focus,
   input[type="text"].has-error:focus,
   input[type="password"].has-error:focus,
   input[type="search"].has-error:focus,
@@ -2448,7 +2449,6 @@ textarea.has-error {
   input[type="email"].has-error:focus,
   input[type="time"].has-error:focus,
   input[type="file"].has-error:focus,
-  z-textarea-flexible.has-error textarea:focus,
   textarea.has-error:focus {
     border-color: #ff9b9b; }
 

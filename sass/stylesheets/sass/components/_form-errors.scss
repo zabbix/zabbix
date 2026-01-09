@@ -24,6 +24,7 @@
 z-select.has-error button.focusable:active,
 z-select.has-error button.focusable:hover,
 z-select.has-error button.focusable,
+z-textarea-flexible.has-error textarea,
 input[type="text"].has-error,
 input[type="password"].has-error,
 input[type="search"].has-error,
@@ -31,7 +32,6 @@ input[type="number"].has-error,
 input[type="email"].has-error,
 input[type="time"].has-error,
 input[type="file"].has-error,
-z-textarea-flexible.has-error textarea,
 textarea.has-error {
 	border: 1px solid $error;
 
