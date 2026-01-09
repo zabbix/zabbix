@@ -1162,7 +1162,8 @@ zbx_session_t;
 
 typedef struct
 {
-	zbx_uint64_t	config;			/* configuration cache revision, increased every sync */
+	zbx_atomic_uint64_t	config;			/* configuration cache revision, increased every sync */
+
 	zbx_uint64_t	expression;		/* global expression revision */
 	zbx_uint64_t	autoreg_tls;		/* autoregistration tls revision */
 	zbx_uint64_t	drules;			/* drules revision */
@@ -1609,4 +1610,5 @@ int	zbx_snmp_oid_subst_cb(const char *data, int level, int num, int quoted, char
 
 zbx_uint64_t	zbx_dc_get_cache_size(void);
 
+zbx_uint64_t	zbx_dc_config_get_config_revision(void);
 #endif

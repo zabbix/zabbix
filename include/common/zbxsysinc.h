@@ -421,4 +421,8 @@
 #	include <libgen.h>
 #endif
 
+#ifdef HAVE_STDATOMIC_H
+#	include <stdatomic.h>
+#endif
+
 #endif

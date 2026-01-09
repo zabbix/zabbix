@@ -1205,4 +1205,8 @@ void		*dbconfig_shmem_realloc_func(void *old, size_t size);
 void		*dbconfig_shmem_malloc_func(void *old, size_t size);
 zbx_uint64_t	dbconfig_used_size(void);
 
+void	dc_config_set_config_revision(zbx_uint64_t revision);
+zbx_uint64_t	dc_config_get_config_revision(void);
+void	dc_config_get_revision(zbx_dc_revision_t *revision);
+
 #endif

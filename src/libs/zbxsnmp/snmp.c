@@ -13,6 +13,7 @@
 **/
 
 #include "zbxcommon.h"
+#include "zbxsnmp.h"
 
 #if defined(HAVE_NETSNMP)
 

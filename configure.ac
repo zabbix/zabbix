@@ -211,6 +211,9 @@ AC_CHECK_HEADERS([sys/ipc.h sys/resource.h sys/sem.h sys/shm.h sys/socket.h  \
                   utmpx.h libgen.h                                           \
 ])
 
+dnl atomics
+AC_CHECK_HEADERS([stdatomic.h])
+
 dnl X/Open and SUS
 AC_CHECK_HEADERS([sys/timeb.h])
 

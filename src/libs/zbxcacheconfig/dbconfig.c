@@ -85,7 +85,8 @@ typedef enum
 {
 	ZBX_DB_SYNC_STATUS_UNLOCKED,
 	ZBX_DB_SYNC_STATUS_LOCKED
-}zbx_db_sync_status;
+}
+zbx_db_sync_status;
 
 typedef struct
 {
@@ -155,7 +156,7 @@ static int	dc_item_ref_compare(const void *d1, const void *d2)
 	return 0;
 }
 
-static int	sync_in_progress = 0;
+static ZBX_THREAD_LOCAL int	sync_in_progress = 0;
 
 int	zbx_get_sync_in_progress(void)
 {
@@ -231,7 +232,7 @@ void	set_dc_config(zbx_dc_config_t *in)
 }
 
 static zbx_rwlock_t	config_lock = ZBX_RWLOCK_NULL;
-static int		wlock_is_locked;
+static ZBX_THREAD_LOCAL int	wlock_is_locked;
 
 zbx_rwlock_t	zbx_get_config_lock(void)
 {
@@ -1950,7 +1951,10 @@ void	zbx_dc_sync_kvs_paths(const struct zbx_json_parse *jp_kvs_paths, const zbx_
 		{
 			START_SYNC;
 
-			config->revision.config++;
+			zbx_uint64_t	config_revision = dc_config_get_config_revision();
+
+			config_revision++;
+			dc_config_set_config_revision(config_revision);
 
 			for (j = 0; j < diff.values_num; j++)
 			{
@@ -1970,7 +1974,7 @@ void	zbx_dc_sync_kvs_paths(const struct zbx_json_parse *jp_kvs_paths, const zbx_
 				}
 
 				config->um_cache = um_cache_set_value_to_macros(config->um_cache,
-						config->revision.config, &dc_kv->macros, dc_kv->value);
+						config_revision, &dc_kv->macros, dc_kv->value);
 
 				dc_kv->update = 0;
 			}
@@ -6244,7 +6248,7 @@ static void	dc_sync_drules(zbx_dbsync_t *sync, zbx_uint64_t revision)
 		{
 			int	delay_new = 0;
 
-			if (0 == found && 0 < config->revision.config)
+			if (0 == found && 0 < dc_config_get_config_revision())
 				delay_new = delay > SEC_PER_MIN ? SEC_PER_MIN : delay;
 			else if (ZBX_LOC_NOWHERE == drule->location || delay != drule->delay)
 				delay_new = delay;
@@ -6553,7 +6557,7 @@ static void	dc_sync_httptests(zbx_dbsync_t *sync, zbx_uint64_t revision)
 		{
 			int	delay_new = 0;
 
-			if (0 == found && 0 < config->revision.config)
+			if (0 == found && 0 < dc_config_get_config_revision())
 				delay_new = delay > SEC_PER_MIN ? SEC_PER_MIN : delay;
 			else if (ZBX_LOC_NOWHERE == httptest->location || delay != httptest->delay)
 				delay_new = delay;
@@ -7658,7 +7662,7 @@ zbx_uint64_t	zbx_dc_sync_configuration(unsigned char mode, zbx_synced_new_config
 	zbx_hashset_t			trend_queue;
 	zbx_vector_uint64_t		active_avail_diff;
 	zbx_hashset_t			activated_hosts;
-	zbx_uint64_t			new_revision = config->revision.config + 1;
+	zbx_uint64_t			new_revision = dc_config_get_config_revision() + 1;
 	int				connectors_num = 0;
 	zbx_hashset_t			psk_owners;
 	zbx_vector_objmove_t		pg_host_reloc, *pg_host_reloc_ref;
@@ -8068,7 +8072,7 @@ zbx_uint64_t	zbx_dc_sync_configuration(unsigned char mode, zbx_synced_new_config
 	update_sec = zbx_time() - sec;
 	update_size = dbconfig_used_size() - used_size;
 
-	config->revision.config = new_revision;
+	dc_config_set_config_revision(new_revision);
 
 	if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_DEBUG))
 	{
@@ -9165,8 +9169,10 @@ int	zbx_dc_check_host_conn_permissions(const char *host, const zbx_socket_t *soc
 	um_cache_get_host_revision(config->um_cache, *hostid, revision);
 
 	/* configuration is not yet fully synced */
-	if (*revision > config->revision.config)
-		*revision = config->revision.config;
+	zbx_uint64_t	config_revision = dc_config_get_config_revision();
+
+	if (*revision > config_revision)
+		*revision = config_revision;
 
 	UNLOCK_CACHE;
 
@@ -10190,13 +10196,15 @@ void	zbx_dc_config_get_preprocessable_items(zbx_hashset_t *items, zbx_dc_um_shar
 	zbx_vector_dc_item_ptr_t	items_sync;
 	zbx_dc_um_shared_handle_t	*um_handle_new = NULL;
 
-	if (config->revision.config == *revision)
+	if (dc_config_get_config_revision() == *revision)
 		return;
 
 	zbx_vector_dc_item_ptr_create(&items_sync);
 	zbx_vector_dc_item_ptr_reserve(&items_sync, MAX(items->num_data, 100));
 
 	RDLOCK_CACHE;
+
+	zbx_uint64_t	config_revision = dc_config_get_config_revision();
 
 	um_handle_new = zbx_dc_um_shared_handle_update(*um_handle);
 
@@ -10243,7 +10251,7 @@ void	zbx_dc_config_get_preprocessable_items(zbx_hashset_t *items, zbx_dc_um_shar
 			{
 				if (FAIL == dc_preproc_item_changed(dci, pp_item))
 				{
-					pp_item->revision = config->revision.config;
+					pp_item->revision = config_revision;
 					zbx_vector_dc_item_ptr_remove_noorder(&items_sync, i);
 					continue;
 				}
@@ -10253,12 +10261,12 @@ void	zbx_dc_config_get_preprocessable_items(zbx_hashset_t *items, zbx_dc_um_shar
 		}
 
 		for (i = 0; i < items_sync.values_num; i++)
-			dc_preproc_sync_item(items, items_sync.values[i], config->revision.config);
+			dc_preproc_sync_item(items, items_sync.values[i], config_revision);
 
 		zbx_vector_dc_item_ptr_clear(&items_sync);
 	}
 
-	*revision = config->revision.config;
+	*revision = config_revision;
 
 	UNLOCK_CACHE;
 
@@ -15357,7 +15365,8 @@ int	zbx_dc_register_proxy_config_session(zbx_uint64_t hostid, const char *token,
 		session->last_id = session_config_revision;
 		session->lastaccess = now;
 	}
-	*dc_revision = config->revision;
+
+	dc_config_get_revision(dc_revision);
 
 	*macro_revision = config->um_cache->revision;
 
