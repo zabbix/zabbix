@@ -7984,23 +7984,25 @@ z-select[disabled] .focusable, input[disabled], textarea[disabled], select optio
   .svg-graph-hintbox .scatter-plot-hintbox-row .scatter-plot-hintbox-row-axis {
     display: flex;
     flex-wrap: nowrap;
+    align-items: center;
     padding-left: 3px;
     white-space: pre; }
     .svg-graph-hintbox .scatter-plot-hintbox-row .scatter-plot-hintbox-row-axis .scatter-plot-hintbox-icon-color {
-      display: block;
+      display: inline-block;
       width: 12px;
-      height: 12px;
-      margin-right: 10px;
-      margin-bottom: 3px; }
+      height: 18px;
+      margin-left: 3px;
+      margin-right: 10px; }
   .svg-graph-hintbox li {
-    padding-left: 23px; }
+    display: flex;
+    align-items: center; }
     .svg-graph-hintbox li .svg-graph-hintbox-item-color,
     .svg-graph-hintbox li .svg-graph-hintbox-trigger-color {
-      margin: 3px 10px 3px -20px;
-      width: 10px;
+      display: inline-block;
+      min-width: 10px;
       height: 10px;
-      float: left;
-      display: block; }
+      margin-left: 3px;
+      margin-right: 10px; }
     .svg-graph-hintbox li .svg-graph-hintbox-trigger-color {
       border-radius: 50%; }
   .svg-graph-hintbox .header {

@@ -863,13 +863,12 @@ class CSvgGraph {
 
 		for (const trigger_area of triggers_areas) {
 			const li = document.createElement('li');
-			li.innerText = `${trigger_area.trigger} [${trigger_area.constant}]`;
 
-			const span = document.createElement('span');
-			span.style.backgroundColor = trigger_area.color;
-			span.classList.add('svg-graph-hintbox-trigger-color');
+			const color_span = document.createElement('span');
+			color_span.style.backgroundColor = trigger_area.color;
+			color_span.classList.add('svg-graph-hintbox-trigger-color');
 
-			li.append(span);
+			li.append(color_span, `${trigger_area.trigger} [${trigger_area.constant}]`);
 
 			ul.append(li);
 		}
@@ -974,7 +973,7 @@ class CSvgGraph {
 			color_span.style.backgroundColor = point.g.dataset.color;
 			color_span.classList.add('svg-graph-hintbox-item-color');
 
-			li.append(`${point.g.dataset.metric}: ${point.v}`, color_span);
+			li.append(color_span, `${point.g.dataset.metric}: ${point.v}`);
 
 			ul.append(li);
 		}
