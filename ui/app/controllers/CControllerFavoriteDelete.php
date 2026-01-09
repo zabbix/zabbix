@@ -66,11 +66,12 @@ class CControllerFavoriteDelete extends CController {
 				var addrm_fav = document.getElementById("addrm_fav");
 
 				if (addrm_fav !== null) {
-					addrm_fav.ariaLabel = "'._('Add map to Favorite maps widget').'";
+					addrm_fav.setAttribute("aria-label", "'._('Add map to Favorite maps widget').'");
 					addrm_fav.setAttribute("data-hintbox-contents", "'._('Add to favorites').'");
 					addrm_fav.onclick = () => add2favorites("'.$object.'", "'.$objectid.'");
 					addrm_fav.classList.add("'.ZBX_ICON_STAR.'");
 					addrm_fav.classList.remove("'.ZBX_ICON_STAR_FILLED.'");
+					hintBox.hideHint(addrm_fav, true);
 				}
 				else {
 					ZABBIX.Dashboard.getSelectedDashboardPage().getWidgets().forEach((widget) => {
