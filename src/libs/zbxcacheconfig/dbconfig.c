@@ -10196,7 +10196,7 @@ void	zbx_dc_config_get_preprocessable_items(zbx_hashset_t *items, zbx_dc_um_shar
 	zbx_vector_dc_item_ptr_t	items_sync;
 	zbx_dc_um_shared_handle_t	*um_handle_new = NULL;
 
-	if (dc_config_get_config_revision() == *revision)
+	if (zbx_dc_config_get_config_revision() == *revision)
 		return;
 
 	zbx_vector_dc_item_ptr_create(&items_sync);

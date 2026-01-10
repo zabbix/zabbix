@@ -1162,8 +1162,12 @@ zbx_session_t;
 
 typedef struct
 {
-	zbx_atomic_uint64_t	config;			/* configuration cache revision, increased every sync */
-
+	/* without lockless uint64 atomics use zbx_uint64_t and always lock cache before accessing it */
+#if ATOMIC_LLONG_LOCK_FREE == 2
+	zbx_atomic_uint64_t	config;		/* configuration cache revision, increased every sync */
+#else
+	zbx_uint64_t	config;
+#endif
 	zbx_uint64_t	expression;		/* global expression revision */
 	zbx_uint64_t	autoreg_tls;		/* autoregistration tls revision */
 	zbx_uint64_t	drules;			/* drules revision */

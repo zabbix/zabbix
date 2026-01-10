@@ -22,8 +22,8 @@
  *                                                                            *
  * Parameters: revision - [IN] the configuration revision                     *
  *                                                                            *
- * Comments: For internal usage only. Assumes configuration cache is already  *
- *           locked.                                                          *
+ * Comments: Used only by configuration syncer, configuration cache must be   *
+ *           already locked.                                                  *
  *                                                                            *
  ******************************************************************************/
 void	dc_config_set_config_revision(zbx_uint64_t revision)
@@ -43,8 +43,8 @@ void	dc_config_set_config_revision(zbx_uint64_t revision)
  *                                                                            *
  * Return value: configuration revision                                       *
  *                                                                            *
- * Comments: For internal usage only. Assumes configuration cache is already  *
- *           locked .                                                         *
+ * Comments: Either used by configuration syncer or requires configuration    *
+ *           cache to be already locked.                                      *
  *                                                                            *
  ******************************************************************************/
 zbx_uint64_t	dc_config_get_config_revision(void)
@@ -52,7 +52,7 @@ zbx_uint64_t	dc_config_get_config_revision(void)
 	zbx_dc_config_t	*config = get_dc_config();
 	zbx_uint64_t	revision;
 
-#if defined(HAVE_STDATOMIC_H) && ATOMIC_LLONG_LOCK_FREE == 2
+#if ATOMIC_LLONG_LOCK_FREE == 2
 	revision = atomic_load_explicit(&config->revision.config, memory_order_acquire);
 #else
 	revision = config->revision.config;
@@ -67,12 +67,15 @@ zbx_uint64_t	dc_config_get_config_revision(void)
  *                                                                            *
  * Parameters: revision - [OUT] the configuration revision data               *
  *                                                                            *
+ * Comments: Either used by configuration syncer or requires configuration    *
+ *           cache to be already locked.                                      *
+ *                                                                            *
  ******************************************************************************/
 void	dc_config_get_revision(zbx_dc_revision_t *revision)
 {
 	zbx_dc_config_t	*config = get_dc_config();
 
-#if defined(HAVE_STDATOMIC_H) && ATOMIC_LLONG_LOCK_FREE == 2
+#if ATOMIC_LLONG_LOCK_FREE == 2
 	revision->config = atomic_load_explicit(&config->revision.config, memory_order_acquire);
 
 	revision->expression = config->revision.expression;
@@ -101,14 +104,13 @@ zbx_uint64_t	zbx_dc_config_get_config_revision(void)
 	zbx_dc_config_t	*config = get_dc_config();
 	zbx_uint64_t	revision;
 
-#if defined(HAVE_STDATOMIC_H) && ATOMIC_LLONG_LOCK_FREE == 2
+#if ATOMIC_LLONG_LOCK_FREE == 2
 	revision = atomic_load_explicit(&config->revision.config, memory_order_acquire);
 #else
 	RDLOCK_CACHE_CONFIG_HISTORY;
 	revision = config->revision.config;
 	UNLOCK_CACHE_CONFIG_HISTORY;
 #endif
-
 	return revision;
 }
 
