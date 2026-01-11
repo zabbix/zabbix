@@ -14432,7 +14432,7 @@ zabbix_export:
             key: azure.sentinel.data.get
           tags:
             - tag: component
-              value: application
+              value: alert-rules
             - tag: component
               value: security
         - uuid: bdbb44285ac74cad87f95a5b0f4bc07d
@@ -14452,7 +14452,7 @@ zabbix_export:
             key: azure.sentinel.data.get
           tags:
             - tag: component
-              value: application
+              value: alert-rules
             - tag: component
               value: security
         - uuid: 0ae4bd3c2e2e48589b1e5f58e173a890
@@ -14472,7 +14472,7 @@ zabbix_export:
             key: azure.sentinel.data.get
           tags:
             - tag: component
-              value: application
+              value: alert-rules
             - tag: component
               value: security
         - uuid: 2eaf3c28e2d94b488ee0b8a2256077e0
@@ -14492,11 +14492,11 @@ zabbix_export:
             key: azure.sentinel.data.get
           tags:
             - tag: component
-              value: application
+              value: alert-rules
             - tag: component
               value: security
         - uuid: 497b0f7993a44e2b9ee56a6e16993561
-          name: 'Alert rules: High Severity'
+          name: 'Alert rules: High severity'
           type: DEPENDENT
           key: azure.sentinel.alert_rules.high
           description: 'The number of informational severity alert rules.'
@@ -14512,11 +14512,11 @@ zabbix_export:
             key: azure.sentinel.data.get
           tags:
             - tag: component
-              value: application
+              value: alert-rules
             - tag: component
               value: security
         - uuid: 52f4ac19b8f345e5911092911a052596
-          name: 'Alert rules: Informational Severity'
+          name: 'Alert rules: Informational severity'
           type: DEPENDENT
           key: azure.sentinel.alert_rules.info
           description: 'The number of informational severity alert rules.'
@@ -14532,11 +14532,11 @@ zabbix_export:
             key: azure.sentinel.data.get
           tags:
             - tag: component
-              value: application
+              value: alert-rules
             - tag: component
               value: security
         - uuid: d30b8f4e517e4d03a3ad4b2593337859
-          name: 'Alert rules: Low Severity'
+          name: 'Alert rules: Low severity'
           type: DEPENDENT
           key: azure.sentinel.alert_rules.low
           description: 'The number of informational severity alert rules.'
@@ -14552,11 +14552,11 @@ zabbix_export:
             key: azure.sentinel.data.get
           tags:
             - tag: component
-              value: application
+              value: alert-rules
             - tag: component
               value: security
         - uuid: ccfccfab068a49b48d1f9d562d30f123
-          name: 'Alert rules: Medium Severity'
+          name: 'Alert rules: Medium severity'
           type: DEPENDENT
           key: azure.sentinel.alert_rules.medium
           description: 'The number of informational severity alert rules.'
@@ -14572,7 +14572,7 @@ zabbix_export:
             key: azure.sentinel.data.get
           tags:
             - tag: component
-              value: application
+              value: alert-rules
             - tag: component
               value: security
         - uuid: fa8fc8d34eeb4b2b984db1813f2eee9d
@@ -14592,7 +14592,7 @@ zabbix_export:
             key: azure.sentinel.data.get
           tags:
             - tag: component
-              value: application
+              value: alert-rules
             - tag: component
               value: security
         - uuid: 7db797b87f674de0ab05b0b78d0985e5
@@ -14612,17 +14612,17 @@ zabbix_export:
             key: azure.sentinel.data.get
           tags:
             - tag: component
-              value: application
+              value: alert-rules
             - tag: component
               value: security
           triggers:
             - uuid: d4465fc2a6e845cf86883321411f49b9
-              expression: 'change(/Azure Sentinel by HTTP/azure.sentinel.alert_rules.total)>0'
-              name: 'Azure Sentinel: Alert rules: Total number has changed.'
-              event_name: 'Azure Sentinel: The number of alert rules has increased from {ITEM.LASTVALUE2} to {ITEM.LASTVALUE1}.'
+              expression: 'change(/Azure Sentinel by HTTP/azure.sentinel.alert_rules.total)<>0'
+              name: 'Azure Sentinel: Alert rules total number has changed.'
+              event_name: 'Azure Sentinel: The number of alert rules has changed from {ITEM.LASTVALUE2} to {ITEM.LASTVALUE1}.'
               opdata: 'Current number: {ITEM.LASTVALUE1}'
-              priority: INFO
-              description: 'The number of alert rules has increased.'
+              priority: WARNING
+              description: 'The number of alert rules has changed.'
               manual_close: 'YES'
               tags:
                 - tag: scope
@@ -14644,7 +14644,7 @@ zabbix_export:
             key: azure.sentinel.data.get
           tags:
             - tag: component
-              value: application
+              value: automation-rules
             - tag: component
               value: security
         - uuid: 317df9556f62404bb852f7de224de8ed
@@ -14664,7 +14664,7 @@ zabbix_export:
             key: azure.sentinel.data.get
           tags:
             - tag: component
-              value: application
+              value: automation-rules
             - tag: component
               value: security
         - uuid: 6b30213cac2e4d39917042ae2a17d27f
@@ -14684,7 +14684,7 @@ zabbix_export:
             key: azure.sentinel.data.get
           tags:
             - tag: component
-              value: application
+              value: automation-rules
             - tag: component
               value: security
         - uuid: 106d3241aea54ed2a4a2894a46c449e3
@@ -14704,7 +14704,7 @@ zabbix_export:
             key: azure.sentinel.data.get
           tags:
             - tag: component
-              value: application
+              value: automation-rules
             - tag: component
               value: security
         - uuid: 4e00c3064a4f4517b2e8c0908abac69b
@@ -14724,7 +14724,7 @@ zabbix_export:
             key: azure.sentinel.data.get
           tags:
             - tag: component
-              value: application
+              value: automation-rules
             - tag: component
               value: security
         - uuid: 8a51949a86974699bad84a865e1fe982
@@ -14744,17 +14744,17 @@ zabbix_export:
             key: azure.sentinel.data.get
           tags:
             - tag: component
-              value: application
+              value: automation-rules
             - tag: component
               value: security
           triggers:
             - uuid: 09b5d6f0daff4b93bf3b025feac01cad
-              expression: 'change(/Azure Sentinel by HTTP/azure.sentinel.automation_rules.total)>0'
-              name: 'Azure Sentinel: Automation rules: Total number has changed.'
-              event_name: 'Azure Sentinel: The number of automation rules has increased from {ITEM.LASTVALUE2} to {ITEM.LASTVALUE1}.'
+              expression: 'change(/Azure Sentinel by HTTP/azure.sentinel.automation_rules.total)<>0'
+              name: 'Azure Sentinel: Automation rules total number has changed.'
+              event_name: 'Azure Sentinel: The number of automation rules has changed from {ITEM.LASTVALUE2} to {ITEM.LASTVALUE1}.'
               opdata: 'Current number: {ITEM.LASTVALUE1}'
-              priority: INFO
-              description: 'The number of automation rules has increased.'
+              priority: WARNING
+              description: 'The number of automation rules has changed.'
               manual_close: 'YES'
               tags:
                 - tag: scope
@@ -14763,7 +14763,7 @@ zabbix_export:
           name: 'Get data'
           type: SCRIPT
           key: azure.sentinel.data.get
-          delay: 10m
+          delay: '{$AZURE.SENTINEL.INTERVAL}'
           history: '0'
           value_type: TEXT
           params: |
@@ -14892,21 +14892,20 @@ zabbix_export:
             
             		data.metrics = {};
             
-            		Object.keys(endpoints).forEach(function (field) {
-            			filter = (endpoints[field].filter === "") ? "" : '&$filter=';
-            
-            			var url = 'https://management.azure.com' +
+            		endpoints.forEach(function (endpoint) {
+            			var filter = (endpoint.filter === "") ? "" : '&$filter=',
+            				url = 'https://management.azure.com' +
             				Azure.params.resource_id +
             				'/providers/Microsoft.SecurityInsights/' +
-            				endpoints[field].entity +
+            				endpoint.entity +
             				'?api-version=2025-09-01' +
             				filter +
-            				encodeURIComponent(endpoints[field].filter);
+            				encodeURIComponent(endpoint.filter);
             
-            			data.metrics[endpoints[field].entity] = Azure.getField(Azure.request(url), 'value');
+            			data.metrics[endpoint.entity] = Azure.getField(Azure.request(url), 'value');
             		});
             
-            		return data
+            		return data;
             	}
             };
             
@@ -14957,7 +14956,7 @@ zabbix_export:
             key: azure.sentinel.data.get
           tags:
             - tag: component
-              value: application
+              value: data-connectors
             - tag: component
               value: security
         - uuid: 647d9cb27c524613829e231192fd210b
@@ -14977,7 +14976,7 @@ zabbix_export:
             key: azure.sentinel.data.get
           tags:
             - tag: component
-              value: application
+              value: data-connectors
             - tag: component
               value: security
         - uuid: f70712d9fce04a5083e8455b8f1d0c9e
@@ -14997,17 +14996,17 @@ zabbix_export:
             key: azure.sentinel.data.get
           tags:
             - tag: component
-              value: application
+              value: data-connectors
             - tag: component
               value: security
           triggers:
             - uuid: 85201a2e3b4a48a980c02be2939d0e3e
-              expression: 'change(/Azure Sentinel by HTTP/azure.sentinel.data_connectors.total)>0'
-              name: 'Azure Sentinel: Data connectors: Total number has changed.'
-              event_name: 'Azure Sentinel: The number of data connectors has increased from {ITEM.LASTVALUE2} to {ITEM.LASTVALUE1}.'
+              expression: 'change(/Azure Sentinel by HTTP/azure.sentinel.data_connectors.total)<>0'
+              name: 'Azure Sentinel: Data connectors total number of has changed.'
+              event_name: 'Azure Sentinel: The number of data connectors has changed from {ITEM.LASTVALUE2} to {ITEM.LASTVALUE1}.'
               opdata: 'Current number: {ITEM.LASTVALUE1}'
-              priority: INFO
-              description: 'The number of data connectors has increased.'
+              priority: WARNING
+              description: 'The number of data connectors has changed.'
               manual_close: 'YES'
               tags:
                 - tag: scope
@@ -15029,21 +15028,9 @@ zabbix_export:
             key: azure.sentinel.data.get
           tags:
             - tag: component
-              value: application
+              value: incidents
             - tag: component
               value: security
-          triggers:
-            - uuid: 7680cddcfa7b42e9b9533580a1487b11
-              expression: 'change(/Azure Sentinel by HTTP/azure.sentinel.incidents.active)>0'
-              name: 'Azure Sentinel: Incidents: The number of incidents has increased.'
-              event_name: 'Azure Sentinel: The number of active incidents has increased from {ITEM.LASTVALUE2} to {ITEM.LASTVALUE1}.'
-              opdata: 'Current number: {ITEM.LASTVALUE1}'
-              priority: WARNING
-              description: 'The number of active incidents has increased.'
-              manual_close: 'YES'
-              tags:
-                - tag: scope
-                  value: notice
         - uuid: 19bae8a23edd46deb06be5f9441f06b9
           name: 'Incidents: Closed'
           type: DEPENDENT
@@ -15061,11 +15048,11 @@ zabbix_export:
             key: azure.sentinel.data.get
           tags:
             - tag: component
-              value: application
+              value: incidents
             - tag: component
               value: security
         - uuid: 634db4c5d7ae4557a0080d87c0f4e51f
-          name: 'Incidents: High Severity'
+          name: 'Incidents: High severity'
           type: DEPENDENT
           key: azure.sentinel.incidents.high
           description: 'The number of high severity incidents.'
@@ -15081,23 +15068,11 @@ zabbix_export:
             key: azure.sentinel.data.get
           tags:
             - tag: component
-              value: application
+              value: incidents
             - tag: component
               value: security
-          triggers:
-            - uuid: df67588999424c2bb6e65bea69c0a118
-              expression: 'change(/Azure Sentinel by HTTP/azure.sentinel.incidents.high)>0'
-              name: 'Azure Sentinel: Incidents: The number of incidents has increased.'
-              event_name: 'Azure Sentinel: The number of high severity incidents has increased from {ITEM.LASTVALUE2} to {ITEM.LASTVALUE1}.'
-              opdata: 'Current number: {ITEM.LASTVALUE1}'
-              priority: HIGH
-              description: 'The number of high severity incidents has increased.'
-              manual_close: 'YES'
-              tags:
-                - tag: scope
-                  value: notice
         - uuid: d1e20c4e18c64949bbcd251f6ed571d3
-          name: 'Incidents: Informational Severity'
+          name: 'Incidents: Informational severity'
           type: DEPENDENT
           key: azure.sentinel.incidents.info
           description: 'The number of informational severity incidents.'
@@ -15113,23 +15088,11 @@ zabbix_export:
             key: azure.sentinel.data.get
           tags:
             - tag: component
-              value: application
+              value: incidents
             - tag: component
               value: security
-          triggers:
-            - uuid: 617eb0510ee64147ab0805b5c9d751f1
-              expression: 'change(/Azure Sentinel by HTTP/azure.sentinel.incidents.info)>0'
-              name: 'Azure Sentinel: Incidents: The number of incidents has increased.'
-              event_name: 'Azure Sentinel: The number of informational severity incidents has increased from {ITEM.LASTVALUE2} to {ITEM.LASTVALUE1}.'
-              opdata: 'Current number: {ITEM.LASTVALUE1}'
-              priority: INFO
-              description: 'The number of informational severity incidents has increased.'
-              manual_close: 'YES'
-              tags:
-                - tag: scope
-                  value: notice
         - uuid: 81d9c958794a4431997cccf31dd8ba24
-          name: 'Incidents: Low Severity'
+          name: 'Incidents: Low severity'
           type: DEPENDENT
           key: azure.sentinel.incidents.low
           description: 'The number of low severity incidents.'
@@ -15145,23 +15108,11 @@ zabbix_export:
             key: azure.sentinel.data.get
           tags:
             - tag: component
-              value: application
+              value: incidents
             - tag: component
               value: security
-          triggers:
-            - uuid: 1acee285aef24688a3a352f5e1ff9cf7
-              expression: 'change(/Azure Sentinel by HTTP/azure.sentinel.incidents.low)>0'
-              name: 'Azure Sentinel: Incidents: The number of incidents has increased.'
-              event_name: 'Azure Sentinel: The number of low severity incidents has increased from {ITEM.LASTVALUE2} to {ITEM.LASTVALUE1}.'
-              opdata: 'Current number: {ITEM.LASTVALUE1}'
-              priority: WARNING
-              description: 'The number of low severity incidents has increased.'
-              manual_close: 'YES'
-              tags:
-                - tag: scope
-                  value: notice
         - uuid: f5672de7b77843149ab8bc1405476512
-          name: 'Incidents: Medium Severity'
+          name: 'Incidents: Medium severity'
           type: DEPENDENT
           key: azure.sentinel.incidents.medium
           description: 'The number of medium severity incidents.'
@@ -15177,21 +15128,9 @@ zabbix_export:
             key: azure.sentinel.data.get
           tags:
             - tag: component
-              value: application
+              value: incidents
             - tag: component
               value: security
-          triggers:
-            - uuid: b747d3fbab57498dbfa937e03ed61fe9
-              expression: 'change(/Azure Sentinel by HTTP/azure.sentinel.incidents.medium)>0'
-              name: 'Azure Sentinel: Incidents: The number of incidents has increased.'
-              event_name: 'Azure Sentinel: The number of medium severity incidents has increased from {ITEM.LASTVALUE2} to {ITEM.LASTVALUE1}.'
-              opdata: 'Current number: {ITEM.LASTVALUE1}'
-              priority: AVERAGE
-              description: 'The number of medium severity incidents has increased.'
-              manual_close: 'YES'
-              tags:
-                - tag: scope
-                  value: notice
         - uuid: 52433db78cf240b79e1bc33662340166
           name: 'Incidents: New'
           type: DEPENDENT
@@ -15209,21 +15148,9 @@ zabbix_export:
             key: azure.sentinel.data.get
           tags:
             - tag: component
-              value: application
+              value: incidents
             - tag: component
               value: security
-          triggers:
-            - uuid: b308b2240dc8462f815dee6034200672
-              expression: 'change(/Azure Sentinel by HTTP/azure.sentinel.incidents.new)>0'
-              name: 'Azure Sentinel: Incidents: The number of incidents has increased.'
-              event_name: 'Azure Sentinel: The number of new incidents has increased from {ITEM.LASTVALUE2} to {ITEM.LASTVALUE1}.'
-              opdata: 'Current number: {ITEM.LASTVALUE1}'
-              priority: WARNING
-              description: 'The number of new incidents has increased.'
-              manual_close: 'YES'
-              tags:
-                - tag: scope
-                  value: notice
         - uuid: 6b8f2e4895b6449aa3ab009503820645
           name: 'Incidents: Total number'
           type: DEPENDENT
@@ -15241,7 +15168,7 @@ zabbix_export:
             key: azure.sentinel.data.get
           tags:
             - tag: component
-              value: application
+              value: incidents
             - tag: component
               value: security
         - uuid: 5d292c4cbeb84ae0ad6a90b79874f464
@@ -15261,9 +15188,9 @@ zabbix_export:
             key: azure.sentinel.data.get
           tags:
             - tag: component
-              value: application
-            - tag: component
               value: security
+            - tag: component
+              value: watchlists
         - uuid: 802f3bb70c4a4faea036f8a1aa31dbe6
           name: 'Watchlists: Deleting'
           type: DEPENDENT
@@ -15281,9 +15208,9 @@ zabbix_export:
             key: azure.sentinel.data.get
           tags:
             - tag: component
-              value: application
-            - tag: component
               value: security
+            - tag: component
+              value: watchlists
         - uuid: 34e3927f7b2549b6bd7cf606d47fc8f0
           name: 'Watchlists: Failed'
           type: DEPENDENT
@@ -15301,9 +15228,9 @@ zabbix_export:
             key: azure.sentinel.data.get
           tags:
             - tag: component
-              value: application
-            - tag: component
               value: security
+            - tag: component
+              value: watchlists
         - uuid: 52fe31df3d8245e780a612ea1f5cdd30
           name: 'Watchlists: New'
           type: DEPENDENT
@@ -15321,9 +15248,9 @@ zabbix_export:
             key: azure.sentinel.data.get
           tags:
             - tag: component
-              value: application
-            - tag: component
               value: security
+            - tag: component
+              value: watchlists
         - uuid: d228fcaa4e9f42bfa55586ae96a59874
           name: 'Watchlists: In progress'
           type: DEPENDENT
@@ -15341,9 +15268,9 @@ zabbix_export:
             key: azure.sentinel.data.get
           tags:
             - tag: component
-              value: application
-            - tag: component
               value: security
+            - tag: component
+              value: watchlists
         - uuid: 6d16ab796bab488897aca9b30c687e65
           name: 'Watchlists: Succeeded'
           type: DEPENDENT
@@ -15361,9 +15288,9 @@ zabbix_export:
             key: azure.sentinel.data.get
           tags:
             - tag: component
-              value: application
-            - tag: component
               value: security
+            - tag: component
+              value: watchlists
         - uuid: 504de002251e4acf9559c2323165d329
           name: 'Watchlists: Total'
           type: DEPENDENT
@@ -15381,17 +15308,17 @@ zabbix_export:
             key: azure.sentinel.data.get
           tags:
             - tag: component
-              value: application
-            - tag: component
               value: security
+            - tag: component
+              value: watchlists
           triggers:
             - uuid: 103a16f32d514d85ba9f847931bf694a
-              expression: 'change(/Azure Sentinel by HTTP/azure.sentinel.watchlist.total)>0'
-              name: 'Azure Sentinel: Watchlists: Total number has changed.'
-              event_name: 'Azure Sentinel: The number of watchlists has increased from {ITEM.LASTVALUE2} to {ITEM.LASTVALUE1}.'
+              expression: 'change(/Azure Sentinel by HTTP/azure.sentinel.watchlist.total)<>0'
+              name: 'Azure Sentinel: Watchlists total number has changed.'
+              event_name: 'Azure Sentinel: The number of watchlists has changed from {ITEM.LASTVALUE2} to {ITEM.LASTVALUE1}.'
               opdata: 'Current number: {ITEM.LASTVALUE1}'
-              priority: INFO
-              description: 'The number of watchlists has increased.'
+              priority: WARNING
+              description: 'The number of watchlists has changed.'
               manual_close: 'YES'
               tags:
                 - tag: scope
@@ -15413,9 +15340,9 @@ zabbix_export:
             key: azure.sentinel.data.get
           tags:
             - tag: component
-              value: application
-            - tag: component
               value: security
+            - tag: component
+              value: watchlists
       tags:
         - tag: class
           value: cloud
@@ -15423,6 +15350,8 @@ zabbix_export:
           value: security
         - tag: target
           value: azure
+        - tag: target
+          value: sentinel
       macros:
         - macro: '{$AZURE.APP.ID}'
           description: 'The App ID of Microsoft Azure.'
@@ -15466,6 +15395,71 @@ zabbix_export:
             label: 'Azure scale set ID'
             description: 'Microsoft Azure scale set ID.'
             required: 'YES'
+        - macro: '{$AZURE.SENTINEL.INCIDENTS.NEW}'
+          value: '1'
+          description: 'The threshold for new incidents over interval defined in `{$AZURE.SENTINEL.INTERVAL}` macro. Can be used with context if needed (check the context values in relevant items).'
+          config:
+            type: TEXT
+            priority: '10'
+            section_name: Thresholds
+            label: 'Incidents threshold'
+            description: 'The threshold for new incidents over interval defined in `{$AZURE.SENTINEL.INTERVAL}` macro. No less than 1.'
+            required: 'YES'
+            regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
+        - macro: '{$AZURE.SENTINEL.INCIDENTS.NEW:high}'
+          value: '1'
+          description: 'The threshold for new high severity incidents over interval defined in `{$AZURE.SENTINEL.INTERVAL}` macro.'
+          config:
+            type: TEXT
+            priority: '14'
+            section_name: Thresholds
+            label: 'Incidents threshold'
+            description: 'The threshold for new high severity incidents over interval defined in `{$AZURE.SENTINEL.INTERVAL}` macro. No less than 1.'
+            required: 'YES'
+            regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
+        - macro: '{$AZURE.SENTINEL.INCIDENTS.NEW:info}'
+          value: '10'
+          description: 'The threshold for new informational severity incidents over interval defined in `{$AZURE.SENTINEL.INTERVAL}` macro.'
+          config:
+            type: TEXT
+            priority: '11'
+            section_name: Thresholds
+            label: 'Incidents threshold'
+            description: 'The threshold for new informational severity incidents over interval defined in `{$AZURE.SENTINEL.INTERVAL}` macro. No less than 1.'
+            required: 'YES'
+            regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
+        - macro: '{$AZURE.SENTINEL.INCIDENTS.NEW:low}'
+          value: '5'
+          description: 'The threshold for new low severity incidents over interval defined in `{$AZURE.SENTINEL.INTERVAL}` macro.'
+          config:
+            type: TEXT
+            priority: '12'
+            section_name: Thresholds
+            label: 'Incidents threshold'
+            description: 'The threshold for new low severity incidents over interval defined in `{$AZURE.SENTINEL.INTERVAL}` macro. No less than 1.'
+            required: 'YES'
+            regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
+        - macro: '{$AZURE.SENTINEL.INCIDENTS.NEW:medium}'
+          value: '1'
+          description: 'The threshold for new medium severity incidents over interval defined in `{$AZURE.SENTINEL.INTERVAL}` macro.'
+          config:
+            type: TEXT
+            priority: '13'
+            section_name: Thresholds
+            label: 'Incidents threshold'
+            description: 'The threshold for new medium severity incidents over interval defined in `{$AZURE.SENTINEL.INTERVAL}` macro. No less than 1.'
+            required: 'YES'
+            regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
+        - macro: '{$AZURE.SENTINEL.INTERVAL}'
+          value: 10m
+          description: 'The update interval for the script items that retrieve data from the API.'
+          config:
+            type: TEXT
+            priority: '9'
+            section_name: Other
+            label: 'Data update interval'
+            description: 'The update interval for the script items that retrieve data from the API.'
+            required: 'YES'
         - macro: '{$AZURE.SENTINEL.PERIOD}'
           value: '30'
           description: 'The number of days over which to retrieve modified entities (incidents, alert rules, automation rules).'
@@ -15497,830 +15491,565 @@ zabbix_export:
           name: Overview
           pages:
             - widgets:
-                - type: problemsbysv
-                  width: '32'
-                  height: '3'
-                  fields:
-                    - type: STRING
-                      name: reference
-                      value: KZBPT
-                - type: honeycomb
-                  name: Incidents
-                  'y': '3'
-                  width: '32'
-                  height: '3'
-                  fields:
-                    - type: STRING
-                      name: items.0
-                      value: 'Incidents:*'
-                    - type: STRING
-                      name: primary_label
-                      value: '{{ITEM.NAME}.regsub("Incidents: (.*)", \1)}'
-                    - type: STRING
-                      name: reference
-                      value: EVBQG
-                    - type: INTEGER
-                      name: secondary_label_decimal_places
-                      value: '0'
-                - type: honeycomb
-                  name: 'Alert rules'
-                  'y': '6'
-                  width: '32'
-                  height: '3'
-                  fields:
-                    - type: STRING
-                      name: items.0
-                      value: 'Alert rules:*'
-                    - type: STRING
-                      name: primary_label
-                      value: '{{ITEM.NAME}.regsub("Alert rules:(.*)", \1)}'
-                    - type: STRING
-                      name: reference
-                      value: EIVJI
-                    - type: INTEGER
-                      name: secondary_label_decimal_places
-                      value: '0'
-                - type: honeycomb
-                  name: 'Automation rules'
-                  'y': '9'
-                  width: '32'
-                  height: '3'
-                  fields:
-                    - type: STRING
-                      name: items.0
-                      value: 'Automation rules:*'
-                    - type: STRING
-                      name: primary_label
-                      value: '{{ITEM.NAME}.regsub("Automation rules:(.*)", \1)}'
-                    - type: STRING
-                      name: reference
-                      value: PVAJM
-                    - type: INTEGER
-                      name: secondary_label_decimal_places
-                      value: '0'
-                - type: honeycomb
-                  name: Watchlists
-                  'y': '12'
-                  width: '32'
-                  height: '3'
-                  fields:
-                    - type: STRING
-                      name: items.0
-                      value: 'Watchlists:*'
-                    - type: STRING
-                      name: primary_label
-                      value: '{{ITEM.NAME}.regsub("Watchlists:(.*)", \1)}'
-                    - type: STRING
-                      name: reference
-                      value: DQXEW
-                    - type: INTEGER
-                      name: secondary_label_decimal_places
-                      value: '0'
-                - type: clock
-                  x: '32'
+                - type: piechart
+                  name: 'Incidents by severity'
                   width: '18'
-                  height: '3'
-                  fields:
-                    - type: INTEGER
-                      name: rf_rate
-                      value: '60'
-                - type: itemcard
-                  name: Incidents
-                  x: '32'
-                  'y': '3'
-                  width: '18'
-                  height: '3'
+                  height: '4'
                   fields:
                     - type: STRING
-                      name: itemid._reference
-                      value: EVBQG._itemid
+                      name: ds.0.color.0
+                      value: 7499FF
                     - type: INTEGER
-                      name: sections.0
-                      value: '3'
-                    - type: INTEGER
-                      name: sections.1
-                      value: '9'
-                    - type: STRING
-                      name: sparkline.time_period.from
-                      value: now-30d
-                    - type: INTEGER
-                      name: sparkline.width
-                      value: '2'
-                - type: itemcard
-                  name: 'Alert rules'
-                  x: '32'
-                  'y': '6'
-                  width: '18'
-                  height: '3'
-                  fields:
-                    - type: STRING
-                      name: itemid._reference
-                      value: EIVJI._itemid
-                    - type: INTEGER
-                      name: sections.0
-                      value: '3'
-                    - type: INTEGER
-                      name: sections.1
-                      value: '9'
-                    - type: STRING
-                      name: sparkline.time_period.from
-                      value: now-30d
-                    - type: INTEGER
-                      name: sparkline.width
-                      value: '2'
-                - type: itemcard
-                  name: 'Automation rules'
-                  x: '32'
-                  'y': '9'
-                  width: '18'
-                  height: '3'
-                  fields:
-                    - type: STRING
-                      name: itemid._reference
-                      value: PVAJM._itemid
-                    - type: INTEGER
-                      name: sections.0
-                      value: '3'
-                    - type: INTEGER
-                      name: sections.1
-                      value: '9'
-                    - type: STRING
-                      name: sparkline.time_period.from
-                      value: now-30d
-                    - type: INTEGER
-                      name: sparkline.width
-                      value: '2'
-                - type: itemcard
-                  name: Watchlists
-                  x: '32'
-                  'y': '12'
-                  width: '18'
-                  height: '3'
-                  fields:
-                    - type: STRING
-                      name: itemid._reference
-                      value: DQXEW._itemid
-                    - type: INTEGER
-                      name: sections.0
-                      value: '3'
-                    - type: INTEGER
-                      name: sections.1
-                      value: '9'
-                    - type: STRING
-                      name: sparkline.time_period.from
-                      value: now-30d
-                    - type: INTEGER
-                      name: sparkline.width
-                      value: '2'
-                - type: item
-                  x: '50'
-                  width: '22'
-                  height: '1'
-                  hide_header: 'YES'
-                  fields:
-                    - type: INTEGER
-                      name: decimal_places
-                      value: '0'
-                    - type: INTEGER
-                      name: decimal_size
-                      value: '70'
-                    - type: INTEGER
-                      name: desc_h_pos
-                      value: '0'
-                    - type: INTEGER
-                      name: desc_size
-                      value: '65'
-                    - type: INTEGER
-                      name: desc_v_pos
-                      value: '1'
-                    - type: ITEM
-                      name: itemid.0
-                      value:
-                        host: 'Azure Sentinel by HTTP'
-                        key: azure.sentinel.data_connectors.total
-                    - type: INTEGER
-                      name: show.0
-                      value: '1'
-                    - type: INTEGER
-                      name: show.1
-                      value: '2'
-                    - type: INTEGER
-                      name: show.2
-                      value: '4'
-                    - type: INTEGER
-                      name: value_h_pos
-                      value: '2'
-                    - type: INTEGER
-                      name: value_size
-                      value: '90'
-                - type: item
-                  x: '50'
-                  'y': '1'
-                  width: '11'
-                  hide_header: 'YES'
-                  fields:
-                    - type: INTEGER
-                      name: decimal_places
-                      value: '0'
-                    - type: STRING
-                      name: description
-                      value: '{{ITEM.NAME}.regsub("Data connectors: (.*)", \1)}'
-                    - type: INTEGER
-                      name: desc_h_pos
-                      value: '0'
-                    - type: INTEGER
-                      name: desc_size
-                      value: '30'
-                    - type: INTEGER
-                      name: desc_v_pos
+                      name: ds.0.dataset_type
                       value: '0'
                     - type: ITEM
-                      name: itemid.0
+                      name: ds.0.itemids.0
                       value:
                         host: 'Azure Sentinel by HTTP'
-                        key: azure.sentinel.data_connectors.enabled
+                        key: azure.sentinel.incidents.info
                     - type: INTEGER
-                      name: show.0
-                      value: '1'
-                    - type: INTEGER
-                      name: show.1
-                      value: '2'
-                    - type: INTEGER
-                      name: show.2
-                      value: '4'
-                    - type: STRING
-                      name: thresholds.0.color
-                      value: 3BC97D
-                    - type: STRING
-                      name: thresholds.0.threshold
-                      value: '1'
-                    - type: INTEGER
-                      name: value_h_pos
-                      value: '2'
-                - type: item
-                  x: '50'
-                  'y': '3'
-                  width: '22'
-                  height: '1'
-                  hide_header: 'YES'
-                  fields:
-                    - type: INTEGER
-                      name: decimal_places
+                      name: ds.0.type.0
                       value: '0'
+                    - type: STRING
+                      name: ds.1.color.0
+                      value: FFC859
                     - type: INTEGER
-                      name: decimal_size
-                      value: '70'
-                    - type: INTEGER
-                      name: desc_h_pos
+                      name: ds.1.dataset_type
                       value: '0'
-                    - type: INTEGER
-                      name: desc_size
-                      value: '65'
-                    - type: INTEGER
-                      name: desc_v_pos
-                      value: '1'
                     - type: ITEM
-                      name: itemid.0
+                      name: ds.1.itemids.0
                       value:
                         host: 'Azure Sentinel by HTTP'
-                        key: azure.sentinel.incidents.total
+                        key: azure.sentinel.incidents.low
                     - type: INTEGER
-                      name: show.0
-                      value: '1'
+                      name: ds.1.type.0
+                      value: '0'
+                    - type: STRING
+                      name: ds.2.color.0
+                      value: FFA059
                     - type: INTEGER
-                      name: show.1
-                      value: '2'
+                      name: ds.2.dataset_type
+                      value: '0'
+                    - type: ITEM
+                      name: ds.2.itemids.0
+                      value:
+                        host: 'Azure Sentinel by HTTP'
+                        key: azure.sentinel.incidents.medium
                     - type: INTEGER
-                      name: show.2
+                      name: ds.2.type.0
+                      value: '0'
+                    - type: STRING
+                      name: ds.3.color.0
+                      value: E97659
+                    - type: INTEGER
+                      name: ds.3.dataset_type
+                      value: '0'
+                    - type: ITEM
+                      name: ds.3.itemids.0
+                      value:
+                        host: 'Azure Sentinel by HTTP'
+                        key: azure.sentinel.incidents.high
+                    - type: INTEGER
+                      name: ds.3.type.0
+                      value: '0'
+                    - type: INTEGER
+                      name: legend_lines
                       value: '4'
                     - type: INTEGER
-                      name: value_h_pos
-                      value: '2'
-                    - type: INTEGER
-                      name: value_size
-                      value: '90'
-                - type: item
-                  x: '50'
+                      name: legend_value
+                      value: '1'
+                - type: piechart
+                  name: 'Alert rules by status'
                   'y': '4'
-                  width: '11'
-                  hide_header: 'YES'
-                  fields:
-                    - type: INTEGER
-                      name: decimal_places
-                      value: '0'
-                    - type: STRING
-                      name: description
-                      value: '{{ITEM.NAME}.regsub("Incidents: (.*)", \1)}'
-                    - type: INTEGER
-                      name: desc_h_pos
-                      value: '0'
-                    - type: INTEGER
-                      name: desc_size
-                      value: '30'
-                    - type: INTEGER
-                      name: desc_v_pos
-                      value: '0'
-                    - type: ITEM
-                      name: itemid.0
-                      value:
-                        host: 'Azure Sentinel by HTTP'
-                        key: azure.sentinel.incidents.closed
-                    - type: INTEGER
-                      name: show.0
-                      value: '1'
-                    - type: INTEGER
-                      name: show.1
-                      value: '2'
-                    - type: INTEGER
-                      name: show.2
-                      value: '4'
-                    - type: STRING
-                      name: thresholds.0.color
-                      value: 3BC97D
-                    - type: STRING
-                      name: thresholds.0.threshold
-                      value: '1'
-                    - type: INTEGER
-                      name: value_h_pos
-                      value: '2'
-                - type: item
-                  x: '50'
-                  'y': '6'
-                  width: '22'
-                  height: '1'
-                  hide_header: 'YES'
-                  fields:
-                    - type: INTEGER
-                      name: decimal_places
-                      value: '0'
-                    - type: INTEGER
-                      name: decimal_size
-                      value: '70'
-                    - type: INTEGER
-                      name: desc_h_pos
-                      value: '0'
-                    - type: INTEGER
-                      name: desc_size
-                      value: '65'
-                    - type: INTEGER
-                      name: desc_v_pos
-                      value: '1'
-                    - type: ITEM
-                      name: itemid.0
-                      value:
-                        host: 'Azure Sentinel by HTTP'
-                        key: azure.sentinel.alert_rules.total
-                    - type: INTEGER
-                      name: show.0
-                      value: '1'
-                    - type: INTEGER
-                      name: show.1
-                      value: '2'
-                    - type: INTEGER
-                      name: show.2
-                      value: '4'
-                    - type: INTEGER
-                      name: value_h_pos
-                      value: '2'
-                    - type: INTEGER
-                      name: value_size
-                      value: '90'
-                - type: item
-                  x: '50'
-                  'y': '7'
-                  width: '11'
-                  hide_header: 'YES'
-                  fields:
-                    - type: INTEGER
-                      name: decimal_places
-                      value: '0'
-                    - type: STRING
-                      name: description
-                      value: '{{ITEM.NAME}.regsub("Alert rules: (.*)", \1)}'
-                    - type: INTEGER
-                      name: desc_h_pos
-                      value: '0'
-                    - type: INTEGER
-                      name: desc_size
-                      value: '30'
-                    - type: INTEGER
-                      name: desc_v_pos
-                      value: '0'
-                    - type: ITEM
-                      name: itemid.0
-                      value:
-                        host: 'Azure Sentinel by HTTP'
-                        key: azure.sentinel.alert_rules.enabled
-                    - type: INTEGER
-                      name: show.0
-                      value: '1'
-                    - type: INTEGER
-                      name: show.1
-                      value: '2'
-                    - type: INTEGER
-                      name: show.2
-                      value: '4'
-                    - type: STRING
-                      name: thresholds.0.color
-                      value: 3BC97D
-                    - type: STRING
-                      name: thresholds.0.threshold
-                      value: '1'
-                    - type: INTEGER
-                      name: value_h_pos
-                      value: '2'
-                - type: item
-                  x: '50'
-                  'y': '9'
-                  width: '22'
-                  height: '1'
-                  hide_header: 'YES'
-                  fields:
-                    - type: INTEGER
-                      name: decimal_places
-                      value: '0'
-                    - type: INTEGER
-                      name: decimal_size
-                      value: '70'
-                    - type: INTEGER
-                      name: desc_h_pos
-                      value: '0'
-                    - type: INTEGER
-                      name: desc_size
-                      value: '65'
-                    - type: INTEGER
-                      name: desc_v_pos
-                      value: '1'
-                    - type: ITEM
-                      name: itemid.0
-                      value:
-                        host: 'Azure Sentinel by HTTP'
-                        key: azure.sentinel.automation_rules.total
-                    - type: INTEGER
-                      name: show.0
-                      value: '1'
-                    - type: INTEGER
-                      name: show.1
-                      value: '2'
-                    - type: INTEGER
-                      name: show.2
-                      value: '4'
-                    - type: INTEGER
-                      name: value_h_pos
-                      value: '2'
-                    - type: INTEGER
-                      name: value_size
-                      value: '90'
-                - type: item
-                  x: '50'
-                  'y': '10'
-                  width: '11'
-                  hide_header: 'YES'
-                  fields:
-                    - type: INTEGER
-                      name: decimal_places
-                      value: '0'
-                    - type: STRING
-                      name: description
-                      value: '{{ITEM.NAME}.regsub("Automation rules: (.*)", \1)}'
-                    - type: INTEGER
-                      name: desc_h_pos
-                      value: '0'
-                    - type: INTEGER
-                      name: desc_size
-                      value: '30'
-                    - type: INTEGER
-                      name: desc_v_pos
-                      value: '0'
-                    - type: ITEM
-                      name: itemid.0
-                      value:
-                        host: 'Azure Sentinel by HTTP'
-                        key: azure.sentinel.automation_rules.incidents
-                    - type: INTEGER
-                      name: show.0
-                      value: '1'
-                    - type: INTEGER
-                      name: show.1
-                      value: '2'
-                    - type: INTEGER
-                      name: show.2
-                      value: '4'
-                    - type: INTEGER
-                      name: value_h_pos
-                      value: '2'
-                - type: item
-                  x: '50'
-                  'y': '12'
-                  width: '22'
-                  height: '1'
-                  hide_header: 'YES'
-                  fields:
-                    - type: INTEGER
-                      name: decimal_places
-                      value: '0'
-                    - type: INTEGER
-                      name: decimal_size
-                      value: '70'
-                    - type: INTEGER
-                      name: desc_h_pos
-                      value: '0'
-                    - type: INTEGER
-                      name: desc_size
-                      value: '65'
-                    - type: INTEGER
-                      name: desc_v_pos
-                      value: '1'
-                    - type: ITEM
-                      name: itemid.0
-                      value:
-                        host: 'Azure Sentinel by HTTP'
-                        key: azure.sentinel.watchlist.total
-                    - type: INTEGER
-                      name: show.0
-                      value: '1'
-                    - type: INTEGER
-                      name: show.1
-                      value: '2'
-                    - type: INTEGER
-                      name: show.2
-                      value: '4'
-                    - type: INTEGER
-                      name: value_h_pos
-                      value: '2'
-                    - type: INTEGER
-                      name: value_size
-                      value: '90'
-                - type: item
-                  x: '50'
-                  'y': '13'
-                  width: '11'
-                  hide_header: 'YES'
-                  fields:
-                    - type: INTEGER
-                      name: decimal_places
-                      value: '0'
-                    - type: STRING
-                      name: description
-                      value: '{{ITEM.NAME}.regsub("Watchlists: (.*)", \1)}'
-                    - type: INTEGER
-                      name: desc_h_pos
-                      value: '0'
-                    - type: INTEGER
-                      name: desc_size
-                      value: '30'
-                    - type: INTEGER
-                      name: desc_v_pos
-                      value: '0'
-                    - type: ITEM
-                      name: itemid.0
-                      value:
-                        host: 'Azure Sentinel by HTTP'
-                        key: azure.sentinel.watchlist.succeeded
-                    - type: INTEGER
-                      name: show.0
-                      value: '1'
-                    - type: INTEGER
-                      name: show.1
-                      value: '2'
-                    - type: INTEGER
-                      name: show.2
-                      value: '4'
-                    - type: STRING
-                      name: thresholds.0.color
-                      value: 3BC97D
-                    - type: STRING
-                      name: thresholds.0.threshold
-                      value: '1'
-                    - type: INTEGER
-                      name: value_h_pos
-                      value: '2'
-                - type: item
-                  x: '61'
-                  'y': '1'
-                  width: '11'
-                  hide_header: 'YES'
+                  width: '12'
+                  height: '4'
                   fields:
                     - type: STRING
-                      name: bg_color
-                      value: 3BC97D
-                    - type: INTEGER
-                      name: decimal_places
-                      value: '0'
-                    - type: STRING
-                      name: description
-                      value: '{{ITEM.NAME}.regsub("Data connectors: (.*)", \1)}'
-                    - type: INTEGER
-                      name: desc_h_pos
-                      value: '0'
-                    - type: INTEGER
-                      name: desc_size
-                      value: '30'
-                    - type: INTEGER
-                      name: desc_v_pos
-                      value: '0'
-                    - type: ITEM
-                      name: itemid.0
-                      value:
-                        host: 'Azure Sentinel by HTTP'
-                        key: azure.sentinel.data_connectors.disabled
-                    - type: INTEGER
-                      name: show.0
-                      value: '1'
-                    - type: INTEGER
-                      name: show.1
-                      value: '2'
-                    - type: INTEGER
-                      name: show.2
-                      value: '4'
-                    - type: STRING
-                      name: thresholds.0.color
+                      name: ds.0.color.0
                       value: E65660
-                    - type: STRING
-                      name: thresholds.0.threshold
-                      value: '1'
                     - type: INTEGER
-                      name: value_h_pos
-                      value: '2'
-                - type: item
-                  x: '61'
-                  'y': '4'
-                  width: '11'
-                  hide_header: 'YES'
-                  fields:
-                    - type: STRING
-                      name: bg_color
-                      value: 3BC97D
-                    - type: INTEGER
-                      name: decimal_places
-                      value: '0'
-                    - type: STRING
-                      name: description
-                      value: '{{ITEM.NAME}.regsub("Incidents: (.*)", \1)}'
-                    - type: INTEGER
-                      name: desc_h_pos
-                      value: '0'
-                    - type: INTEGER
-                      name: desc_size
-                      value: '30'
-                    - type: INTEGER
-                      name: desc_v_pos
+                      name: ds.0.dataset_type
                       value: '0'
                     - type: ITEM
-                      name: itemid.0
-                      value:
-                        host: 'Azure Sentinel by HTTP'
-                        key: azure.sentinel.incidents.new
-                    - type: INTEGER
-                      name: show.0
-                      value: '1'
-                    - type: INTEGER
-                      name: show.1
-                      value: '2'
-                    - type: INTEGER
-                      name: show.2
-                      value: '4'
-                    - type: STRING
-                      name: thresholds.0.color
-                      value: E65660
-                    - type: STRING
-                      name: thresholds.0.threshold
-                      value: '1'
-                    - type: INTEGER
-                      name: value_h_pos
-                      value: '2'
-                - type: item
-                  x: '61'
-                  'y': '7'
-                  width: '11'
-                  hide_header: 'YES'
-                  fields:
-                    - type: STRING
-                      name: bg_color
-                      value: 3BC97D
-                    - type: INTEGER
-                      name: decimal_places
-                      value: '0'
-                    - type: STRING
-                      name: description
-                      value: '{{ITEM.NAME}.regsub("Alert rules: (.*)", \1)}'
-                    - type: INTEGER
-                      name: desc_h_pos
-                      value: '0'
-                    - type: INTEGER
-                      name: desc_size
-                      value: '30'
-                    - type: INTEGER
-                      name: desc_v_pos
-                      value: '0'
-                    - type: ITEM
-                      name: itemid.0
+                      name: ds.0.itemids.0
                       value:
                         host: 'Azure Sentinel by HTTP'
                         key: azure.sentinel.alert_rules.disabled
                     - type: INTEGER
-                      name: show.0
-                      value: '1'
-                    - type: INTEGER
-                      name: show.1
-                      value: '2'
-                    - type: INTEGER
-                      name: show.2
-                      value: '4'
-                    - type: STRING
-                      name: thresholds.0.color
-                      value: E65660
-                    - type: STRING
-                      name: thresholds.0.threshold
-                      value: '1'
-                    - type: INTEGER
-                      name: value_h_pos
-                      value: '2'
-                - type: item
-                  x: '61'
-                  'y': '10'
-                  width: '11'
-                  hide_header: 'YES'
-                  fields:
-                    - type: INTEGER
-                      name: decimal_places
+                      name: ds.0.type.0
                       value: '0'
                     - type: STRING
-                      name: description
-                      value: '{{ITEM.NAME}.regsub("Automation rules: (.*)", \1)}'
+                      name: ds.1.color.0
+                      value: 3BC97D
                     - type: INTEGER
-                      name: desc_h_pos
-                      value: '0'
-                    - type: INTEGER
-                      name: desc_size
-                      value: '30'
-                    - type: INTEGER
-                      name: desc_v_pos
+                      name: ds.1.dataset_type
                       value: '0'
                     - type: ITEM
-                      name: itemid.0
+                      name: ds.1.itemids.0
+                      value:
+                        host: 'Azure Sentinel by HTTP'
+                        key: azure.sentinel.alert_rules.enabled
+                    - type: INTEGER
+                      name: ds.1.type.0
+                      value: '0'
+                    - type: INTEGER
+                      name: legend_lines
+                      value: '2'
+                    - type: INTEGER
+                      name: legend_value
+                      value: '1'
+                - type: piechart
+                  name: 'Automation rules by solution'
+                  'y': '8'
+                  width: '18'
+                  height: '4'
+                  fields:
+                    - type: STRING
+                      name: ds.0.color.0
+                      value: 7499FF
+                    - type: INTEGER
+                      name: ds.0.dataset_type
+                      value: '0'
+                    - type: ITEM
+                      name: ds.0.itemids.0
+                      value:
+                        host: 'Azure Sentinel by HTTP'
+                        key: azure.sentinel.automation_rules.add_incident
+                    - type: INTEGER
+                      name: ds.0.type.0
+                      value: '0'
+                    - type: STRING
+                      name: ds.1.color.0
+                      value: 3BC97D
+                    - type: INTEGER
+                      name: ds.1.dataset_type
+                      value: '0'
+                    - type: ITEM
+                      name: ds.1.itemids.0
+                      value:
+                        host: 'Azure Sentinel by HTTP'
+                        key: azure.sentinel.automation_rules.playbook
+                    - type: INTEGER
+                      name: ds.1.type.0
+                      value: '0'
+                    - type: STRING
+                      name: ds.2.color.0
+                      value: FFD54F
+                    - type: INTEGER
+                      name: ds.2.dataset_type
+                      value: '0'
+                    - type: ITEM
+                      name: ds.2.itemids.0
+                      value:
+                        host: 'Azure Sentinel by HTTP'
+                        key: azure.sentinel.automation_rules.modify
+                    - type: INTEGER
+                      name: ds.2.type.0
+                      value: '0'
+                    - type: INTEGER
+                      name: legend_lines
+                      value: '3'
+                    - type: INTEGER
+                      name: legend_value
+                      value: '1'
+                - type: piechart
+                  name: 'Alert rules by severity'
+                  x: '12'
+                  'y': '4'
+                  width: '12'
+                  height: '4'
+                  fields:
+                    - type: STRING
+                      name: ds.0.color.0
+                      value: 7499FF
+                    - type: INTEGER
+                      name: ds.0.dataset_type
+                      value: '0'
+                    - type: STRING
+                      name: ds.0.data_set_label
+                      value: INFO
+                    - type: ITEM
+                      name: ds.0.itemids.0
+                      value:
+                        host: 'Azure Sentinel by HTTP'
+                        key: azure.sentinel.alert_rules.info
+                    - type: INTEGER
+                      name: ds.0.type.0
+                      value: '0'
+                    - type: STRING
+                      name: ds.1.color.0
+                      value: FFC859
+                    - type: INTEGER
+                      name: ds.1.dataset_type
+                      value: '0'
+                    - type: STRING
+                      name: ds.1.data_set_label
+                      value: LOW
+                    - type: ITEM
+                      name: ds.1.itemids.0
+                      value:
+                        host: 'Azure Sentinel by HTTP'
+                        key: azure.sentinel.alert_rules.low
+                    - type: INTEGER
+                      name: ds.1.type.0
+                      value: '0'
+                    - type: STRING
+                      name: ds.2.color.0
+                      value: FFA059
+                    - type: INTEGER
+                      name: ds.2.dataset_type
+                      value: '0'
+                    - type: ITEM
+                      name: ds.2.itemids.0
+                      value:
+                        host: 'Azure Sentinel by HTTP'
+                        key: azure.sentinel.alert_rules.medium
+                    - type: INTEGER
+                      name: ds.2.type.0
+                      value: '0'
+                    - type: STRING
+                      name: ds.3.color.0
+                      value: E97659
+                    - type: INTEGER
+                      name: ds.3.dataset_type
+                      value: '0'
+                    - type: ITEM
+                      name: ds.3.itemids.0
+                      value:
+                        host: 'Azure Sentinel by HTTP'
+                        key: azure.sentinel.alert_rules.high
+                    - type: INTEGER
+                      name: ds.3.type.0
+                      value: '0'
+                    - type: INTEGER
+                      name: legend_lines
+                      value: '4'
+                    - type: INTEGER
+                      name: legend_value
+                      value: '1'
+                - type: piechart
+                  name: 'Incidents by status'
+                  x: '18'
+                  width: '18'
+                  height: '4'
+                  fields:
+                    - type: STRING
+                      name: ds.0.color.0
+                      value: E65660
+                    - type: INTEGER
+                      name: ds.0.dataset_type
+                      value: '0'
+                    - type: ITEM
+                      name: ds.0.itemids.0
+                      value:
+                        host: 'Azure Sentinel by HTTP'
+                        key: azure.sentinel.incidents.new
+                    - type: INTEGER
+                      name: ds.0.type.0
+                      value: '0'
+                    - type: STRING
+                      name: ds.1.color.0
+                      value: 3BC97D
+                    - type: INTEGER
+                      name: ds.1.dataset_type
+                      value: '0'
+                    - type: ITEM
+                      name: ds.1.itemids.0
+                      value:
+                        host: 'Azure Sentinel by HTTP'
+                        key: azure.sentinel.incidents.closed
+                    - type: INTEGER
+                      name: ds.1.type.0
+                      value: '0'
+                    - type: STRING
+                      name: ds.2.color.0
+                      value: FFD54F
+                    - type: INTEGER
+                      name: ds.2.dataset_type
+                      value: '0'
+                    - type: ITEM
+                      name: ds.2.itemids.0
+                      value:
+                        host: 'Azure Sentinel by HTTP'
+                        key: azure.sentinel.incidents.active
+                    - type: INTEGER
+                      name: ds.2.type.0
+                      value: '0'
+                    - type: INTEGER
+                      name: legend_lines
+                      value: '3'
+                    - type: INTEGER
+                      name: legend_value
+                      value: '1'
+                - type: piechart
+                  name: 'Automation rules by type'
+                  x: '18'
+                  'y': '8'
+                  width: '18'
+                  height: '4'
+                  fields:
+                    - type: STRING
+                      name: ds.0.color.0
+                      value: 7499FF
+                    - type: INTEGER
+                      name: ds.0.dataset_type
+                      value: '0'
+                    - type: ITEM
+                      name: ds.0.itemids.0
+                      value:
+                        host: 'Azure Sentinel by HTTP'
+                        key: azure.sentinel.automation_rules.incidents
+                    - type: INTEGER
+                      name: ds.0.type.0
+                      value: '0'
+                    - type: STRING
+                      name: ds.1.color.0
+                      value: FFC859
+                    - type: INTEGER
+                      name: ds.1.dataset_type
+                      value: '0'
+                    - type: ITEM
+                      name: ds.1.itemids.0
                       value:
                         host: 'Azure Sentinel by HTTP'
                         key: azure.sentinel.automation_rules.alerts
                     - type: INTEGER
-                      name: show.0
+                      name: ds.1.type.0
+                      value: '0'
+                    - type: INTEGER
+                      name: legend_lines
+                      value: '2'
+                    - type: INTEGER
+                      name: legend_value
                       value: '1'
-                    - type: INTEGER
-                      name: show.1
-                      value: '2'
-                    - type: INTEGER
-                      name: show.2
-                      value: '4'
-                    - type: INTEGER
-                      name: value_h_pos
-                      value: '2'
-                - type: item
-                  x: '61'
-                  'y': '13'
-                  width: '11'
-                  hide_header: 'YES'
+                - type: piechart
+                  name: 'Alert rules by type'
+                  x: '24'
+                  'y': '4'
+                  width: '12'
+                  height: '4'
                   fields:
                     - type: STRING
-                      name: bg_color
-                      value: 3BC97D
+                      name: ds.0.color.0
+                      value: BF00FF
                     - type: INTEGER
-                      name: decimal_places
-                      value: '0'
-                    - type: STRING
-                      name: description
-                      value: '{{ITEM.NAME}.regsub("Watchlists: (.*)", \1)}'
-                    - type: INTEGER
-                      name: desc_h_pos
-                      value: '0'
-                    - type: INTEGER
-                      name: desc_size
-                      value: '30'
-                    - type: INTEGER
-                      name: desc_v_pos
+                      name: ds.0.dataset_type
                       value: '0'
                     - type: ITEM
-                      name: itemid.0
+                      name: ds.0.itemids.0
+                      value:
+                        host: 'Azure Sentinel by HTTP'
+                        key: azure.sentinel.alert_rules.fusion
+                    - type: INTEGER
+                      name: ds.0.type.0
+                      value: '0'
+                    - type: STRING
+                      name: ds.1.color.0
+                      value: 7499FF
+                    - type: INTEGER
+                      name: ds.1.dataset_type
+                      value: '0'
+                    - type: ITEM
+                      name: ds.1.itemids.0
+                      value:
+                        host: 'Azure Sentinel by HTTP'
+                        key: azure.sentinel.alert_rules.creation
+                    - type: INTEGER
+                      name: ds.1.type.0
+                      value: '0'
+                    - type: STRING
+                      name: ds.2.color.0
+                      value: 3BC97D
+                    - type: INTEGER
+                      name: ds.2.dataset_type
+                      value: '0'
+                    - type: ITEM
+                      name: ds.2.itemids.0
+                      value:
+                        host: 'Azure Sentinel by HTTP'
+                        key: azure.sentinel.alert_rules.scheduled
+                    - type: INTEGER
+                      name: ds.2.type.0
+                      value: '0'
+                    - type: INTEGER
+                      name: legend_lines
+                      value: '3'
+                    - type: INTEGER
+                      name: legend_value
+                      value: '1'
+                - type: problemsbysv
+                  x: '36'
+                  width: '36'
+                  fields:
+                    - type: STRING
+                      name: reference
+                      value: INIKB
+                - type: toptriggers
+                  x: '36'
+                  'y': '2'
+                  width: '36'
+                  height: '6'
+                - type: piechart
+                  name: 'Watchlists by state'
+                  x: '36'
+                  'y': '8'
+                  width: '18'
+                  height: '4'
+                  fields:
+                    - type: STRING
+                      name: ds.0.color.0
+                      value: 7499FF
+                    - type: STRING
+                      name: ds.0.color.1
+                      value: 7499FF
+                    - type: STRING
+                      name: ds.0.color.2
+                      value: 7499FF
+                    - type: INTEGER
+                      name: ds.0.dataset_aggregation
+                      value: '5'
+                    - type: INTEGER
+                      name: ds.0.dataset_type
+                      value: '0'
+                    - type: STRING
+                      name: ds.0.data_set_label
+                      value: Incoming
+                    - type: ITEM
+                      name: ds.0.itemids.0
+                      value:
+                        host: 'Azure Sentinel by HTTP'
+                        key: azure.sentinel.watchlist.new
+                    - type: ITEM
+                      name: ds.0.itemids.1
+                      value:
+                        host: 'Azure Sentinel by HTTP'
+                        key: azure.sentinel.watchlist.uploading
+                    - type: ITEM
+                      name: ds.0.itemids.2
+                      value:
+                        host: 'Azure Sentinel by HTTP'
+                        key: azure.sentinel.watchlist.progress
+                    - type: INTEGER
+                      name: ds.0.type.0
+                      value: '0'
+                    - type: INTEGER
+                      name: ds.0.type.1
+                      value: '0'
+                    - type: INTEGER
+                      name: ds.0.type.2
+                      value: '0'
+                    - type: STRING
+                      name: ds.1.color.0
+                      value: E97659
+                    - type: STRING
+                      name: ds.1.color.1
+                      value: E97659
+                    - type: STRING
+                      name: ds.1.color.2
+                      value: E97659
+                    - type: INTEGER
+                      name: ds.1.dataset_aggregation
+                      value: '5'
+                    - type: INTEGER
+                      name: ds.1.dataset_type
+                      value: '0'
+                    - type: STRING
+                      name: ds.1.data_set_label
+                      value: Outgoing
+                    - type: ITEM
+                      name: ds.1.itemids.0
+                      value:
+                        host: 'Azure Sentinel by HTTP'
+                        key: azure.sentinel.watchlist.canceled
+                    - type: ITEM
+                      name: ds.1.itemids.1
                       value:
                         host: 'Azure Sentinel by HTTP'
                         key: azure.sentinel.watchlist.failed
+                    - type: ITEM
+                      name: ds.1.itemids.2
+                      value:
+                        host: 'Azure Sentinel by HTTP'
+                        key: azure.sentinel.watchlist.deleting
                     - type: INTEGER
-                      name: show.0
+                      name: ds.1.type.0
+                      value: '0'
+                    - type: INTEGER
+                      name: ds.1.type.1
+                      value: '0'
+                    - type: INTEGER
+                      name: ds.1.type.2
+                      value: '0'
+                    - type: STRING
+                      name: ds.2.color.0
+                      value: 3BC97D
+                    - type: INTEGER
+                      name: ds.2.dataset_aggregation
+                      value: '5'
+                    - type: INTEGER
+                      name: ds.2.dataset_type
+                      value: '0'
+                    - type: STRING
+                      name: ds.2.data_set_label
+                      value: Succeeded
+                    - type: ITEM
+                      name: ds.2.itemids.0
+                      value:
+                        host: 'Azure Sentinel by HTTP'
+                        key: azure.sentinel.watchlist.succeeded
+                    - type: INTEGER
+                      name: ds.2.type.0
+                      value: '0'
+                    - type: INTEGER
+                      name: legend_aggregation
                       value: '1'
                     - type: INTEGER
-                      name: show.1
-                      value: '2'
+                      name: legend_lines
+                      value: '3'
                     - type: INTEGER
-                      name: show.2
-                      value: '4'
+                      name: legend_value
+                      value: '1'
+                - type: piechart
+                  name: 'Data connectors by status'
+                  x: '54'
+                  'y': '8'
+                  width: '18'
+                  height: '4'
+                  fields:
                     - type: STRING
-                      name: thresholds.0.color
+                      name: ds.0.color.0
                       value: E65660
-                    - type: STRING
-                      name: thresholds.0.threshold
-                      value: '1'
                     - type: INTEGER
-                      name: value_h_pos
+                      name: ds.0.dataset_type
+                      value: '0'
+                    - type: ITEM
+                      name: ds.0.itemids.0
+                      value:
+                        host: 'Azure Sentinel by HTTP'
+                        key: azure.sentinel.data_connectors.disabled
+                    - type: INTEGER
+                      name: ds.0.type.0
+                      value: '0'
+                    - type: STRING
+                      name: ds.1.color.0
+                      value: 3BC97D
+                    - type: INTEGER
+                      name: ds.1.dataset_type
+                      value: '0'
+                    - type: ITEM
+                      name: ds.1.itemids.0
+                      value:
+                        host: 'Azure Sentinel by HTTP'
+                        key: azure.sentinel.data_connectors.enabled
+                    - type: INTEGER
+                      name: ds.1.type.0
+                      value: '0'
+                    - type: INTEGER
+                      name: legend_lines
                       value: '2'
+                    - type: INTEGER
+                      name: legend_value
+                      value: '1'
     - uuid: a93f57ccc68e442da79bf4a20fe46570
       template: 'Azure SQL Managed Instance by HTTP'
       name: 'Azure SQL Managed Instance by HTTP'
@@ -20864,6 +20593,138 @@ zabbix_export:
               newvalue: Unavailable
             - value: '3'
               newvalue: Unknown
+  triggers:
+    - uuid: f4b2492d4a154c74b79509bc6b08752e
+      expression: 'change(/Azure Sentinel by HTTP/azure.sentinel.alert_rules.disabled)>0 and change(/Azure Sentinel by HTTP/azure.sentinel.alert_rules.total)=0'
+      name: 'Azure Sentinel: Alert rule was disabled.'
+      event_name: 'Azure Sentinel: The number of disabled alert rules has increased from {ITEM.LASTVALUE2} to {ITEM.LASTVALUE1}.'
+      opdata: 'Current number: {ITEM.LASTVALUE1}'
+      priority: WARNING
+      description: 'The number of disabled alert rules has increased.'
+      manual_close: 'YES'
+      tags:
+        - tag: scope
+          value: notice
+    - uuid: 303a3693df714946819ee182a5b51acc
+      expression: 'change(/Azure Sentinel by HTTP/azure.sentinel.alert_rules.enabled)>0 and change(/Azure Sentinel by HTTP/azure.sentinel.alert_rules.total)=0'
+      name: 'Azure Sentinel: Alert rule was enabled.'
+      event_name: 'Azure Sentinel: The number of enabled alert rules has increased from {ITEM.LASTVALUE2} to {ITEM.LASTVALUE1}.'
+      opdata: 'Current number: {ITEM.LASTVALUE1}'
+      priority: WARNING
+      description: 'The number of enabled alert rules has increased.'
+      manual_close: 'YES'
+      tags:
+        - tag: scope
+          value: notice
+    - uuid: 015e4e55aab6437ab04f0551664d59cc
+      expression: 'change(/Azure Sentinel by HTTP/azure.sentinel.data_connectors.disabled)>0 and change(/Azure Sentinel by HTTP/azure.sentinel.data_connectors.total)=0'
+      name: 'Azure Sentinel: Data connector was disabled'
+      event_name: 'Azure Sentinel: The number of disabled data connectors has increased from {ITEM.LASTVALUE2} to {ITEM.LASTVALUE1}.'
+      opdata: 'Current number: {ITEM.LASTVALUE1}'
+      priority: WARNING
+      description: 'The number of disabled data connectors has increased.'
+      manual_close: 'YES'
+      tags:
+        - tag: scope
+          value: notice
+    - uuid: 98d63b4c52e3417aa2796bc2fcdad5c7
+      expression: 'change(/Azure Sentinel by HTTP/azure.sentinel.data_connectors.enabled)>0 and change(/Azure Sentinel by HTTP/azure.sentinel.data_connectors.total)=0'
+      name: 'Azure Sentinel: Data connector was enabled.'
+      event_name: 'Azure Sentinel: The number of enabled data connectors has increased from {ITEM.LASTVALUE2} to {ITEM.LASTVALUE1}.'
+      opdata: 'Current number: {ITEM.LASTVALUE1}'
+      priority: WARNING
+      description: 'The number of enabled data connectors has increased.'
+      manual_close: 'YES'
+      tags:
+        - tag: scope
+          value: notice
+    - uuid: fe60cca0faa14160bf0d94dc67833a0a
+      expression: 'change(/Azure Sentinel by HTTP/azure.sentinel.incidents.high)>={$AZURE.SENTINEL.INCIDENTS.NEW:high} and change(/Azure Sentinel by HTTP/azure.sentinel.incidents.total)>0'
+      name: 'Azure Sentinel: High severity incidents number has increased.'
+      event_name: 'Azure Sentinel: The number of high severity incidents has increased from {ITEM.LASTVALUE2} to {ITEM.LASTVALUE1}.'
+      opdata: 'Current number: {ITEM.LASTVALUE1}'
+      priority: HIGH
+      description: 'The number of high severity incidents has increased.'
+      manual_close: 'YES'
+      tags:
+        - tag: scope
+          value: notice
+    - uuid: 57ff21dd46f142b0ab1f6ab728f290de
+      expression: 'change(/Azure Sentinel by HTTP/azure.sentinel.incidents.active)>0 and change(/Azure Sentinel by HTTP/azure.sentinel.incidents.total)=0'
+      name: 'Azure Sentinel: Incident become active'
+      opdata: 'Current number: {ITEM.LASTVALUE1}'
+      priority: INFO
+      description: 'The number of active incidents has increased.'
+      manual_close: 'YES'
+      tags:
+        - tag: scope
+          value: notice
+    - uuid: 617eb0510ee64147ab0805b5c9d751f1
+      expression: 'change(/Azure Sentinel by HTTP/azure.sentinel.incidents.info)>={$AZURE.SENTINEL.INCIDENTS.NEW:info} and change(/Azure Sentinel by HTTP/azure.sentinel.incidents.total)>0'
+      name: 'Azure Sentinel: Informational severity incidents number has increased.'
+      event_name: 'Azure Sentinel: The number of informational severity incidents has increased from {ITEM.LASTVALUE2} to {ITEM.LASTVALUE1}.'
+      opdata: 'Current number: {ITEM.LASTVALUE1}'
+      priority: INFO
+      description: 'The number of informational severity incidents has increased.'
+      manual_close: 'YES'
+      tags:
+        - tag: scope
+          value: notice
+    - uuid: da793fc1259e444c9bdd01c8230ea42e
+      expression: 'change(/Azure Sentinel by HTTP/azure.sentinel.incidents.low)>={$AZURE.SENTINEL.INCIDENTS.NEW:low} and change(/Azure Sentinel by HTTP/azure.sentinel.incidents.total)>0'
+      name: 'Azure Sentinel: Low severity incidents number has increased.'
+      event_name: 'Azure Sentinel: The number of low severity incidents has increased from {ITEM.LASTVALUE2} to {ITEM.LASTVALUE1}.'
+      opdata: 'Current number: {ITEM.LASTVALUE1}'
+      priority: WARNING
+      description: 'The number of low severity incidents has increased.'
+      manual_close: 'YES'
+      tags:
+        - tag: scope
+          value: notice
+    - uuid: c7e38512100b4ee0aab6e59c83a8f0a7
+      expression: 'change(/Azure Sentinel by HTTP/azure.sentinel.incidents.medium)>={$AZURE.SENTINEL.INCIDENTS.NEW:medium} and change(/Azure Sentinel by HTTP/azure.sentinel.incidents.total)>0'
+      name: 'Azure Sentinel: Medium severity incidents number has increased.'
+      event_name: 'Azure Sentinel: The number of medium severity incidents has increased from {ITEM.LASTVALUE2} to {ITEM.LASTVALUE1}.'
+      opdata: 'Current number: {ITEM.LASTVALUE1}'
+      priority: AVERAGE
+      description: 'The number of medium severity incidents has increased.'
+      manual_close: 'YES'
+      tags:
+        - tag: scope
+          value: notice
+    - uuid: b308b2240dc8462f815dee6034200672
+      expression: 'change(/Azure Sentinel by HTTP/azure.sentinel.incidents.new)>={$AZURE.SENTINEL.INCIDENTS.NEW} and change(/Azure Sentinel by HTTP/azure.sentinel.incidents.total)>0'
+      name: 'Azure Sentinel: New incidents number has increased.'
+      event_name: 'Azure Sentinel: The number of new incidents has increased from {ITEM.LASTVALUE2} to {ITEM.LASTVALUE1}.'
+      opdata: 'Current number: {ITEM.LASTVALUE1}'
+      priority: INFO
+      description: 'The number of new incidents has increased.'
+      manual_close: 'YES'
+      tags:
+        - tag: scope
+          value: notice
+    - uuid: e2f4997866724c8887cbb8e6f8e10c97
+      expression: 'change(/Azure Sentinel by HTTP/azure.sentinel.watchlist.failed)>0 and change(/Azure Sentinel by HTTP/azure.sentinel.watchlist.total)=0'
+      name: 'Azure Sentinel: Watchlist has failed'
+      event_name: 'Azure Sentinel: The number of failed watchlists has increased from {ITEM.LASTVALUE2} to {ITEM.LASTVALUE1}.'
+      opdata: 'Current number: {ITEM.LASTVALUE1}'
+      priority: WARNING
+      description: 'The number of failed watchlists has increased.'
+      manual_close: 'YES'
+      tags:
+        - tag: scope
+          value: notice
+    - uuid: 545d4d35d9024c00b830df762ee84c2a
+      expression: 'change(/Azure Sentinel by HTTP/azure.sentinel.watchlist.canceled)>0 and change(/Azure Sentinel by HTTP/azure.sentinel.watchlist.total)=0'
+      name: 'Azure Sentinel: Watchlist was disabled'
+      event_name: 'Azure Sentinel: The number of cancelled watchlists has increased from {ITEM.LASTVALUE2} to {ITEM.LASTVALUE1}.'
+      opdata: 'Current number: {ITEM.LASTVALUE1}'
+      priority: WARNING
+      description: 'The number of cancelled watchlists has increased.'
+      manual_close: 'YES'
+      tags:
+        - tag: scope
+          value: notice
   graphs:
     - uuid: 73faeee0b6934fb4983c035b60782ca7
       name: 'Average CPU percentage'
