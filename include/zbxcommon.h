@@ -168,6 +168,11 @@ typedef enum
 }
 zbx_item_authtype_t;
 
+#define ALERT_MESSAGE_EVENT		0
+#define ALERT_MESSAGE_REPORT		1
+#define ALERT_MESSAGE_TEST		2
+#define ALERT_MESSAGE_WATCHDOG		3
+
 /* event status */
 #define EVENT_STATUS_RESOLVED		0
 #define EVENT_STATUS_PROBLEM		1

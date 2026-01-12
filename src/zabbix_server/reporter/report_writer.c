@@ -329,7 +329,7 @@ static int	rw_begin_report(zbx_ipc_message_t *msg, zbx_alerter_dispatch_t *dispa
  ******************************************************************************/
 static int	rw_send_report(zbx_ipc_message_t *msg, zbx_alerter_dispatch_t *dispatch, char **error)
 {
-	int			ret = FAIL;
+	int			ret = FAIL, message_type;
 	zbx_vector_str_t	recipients;
 	zbx_db_mediatype	mt;
 	zbx_uint64_t 		reportid;
@@ -344,8 +344,8 @@ static int	rw_send_report(zbx_ipc_message_t *msg, zbx_alerter_dispatch_t *dispat
 	/* then 'dispatch' message could be delivered before 'begin' message.     */
 	/* While sending through writer does add overhead, it also adds           */
 	/* synchronization. And the overhead is only at writer's side.            */
-	report_deserialize_send_report(msg->data, &mt, &recipients, &reportid);
-	ret = zbx_alerter_send_dispatch(dispatch, &mt, &recipients, reportid, error);
+	report_deserialize_send_report(msg->data, &mt, &recipients, &reportid, &message_type);
+	ret = zbx_alerter_send_dispatch(dispatch, &mt, &recipients, reportid, message_type, error);
 
 	zbx_db_mediatype_clean(&mt);
 	zbx_vector_str_clear_ext(&recipients, zbx_str_free);

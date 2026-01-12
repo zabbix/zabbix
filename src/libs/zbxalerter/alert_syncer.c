@@ -52,8 +52,8 @@ zbx_am_db_t;
  ******************************************************************************/
 static zbx_am_db_alert_t	*am_db_create_alert(zbx_uint64_t alertid, zbx_uint64_t mediatypeid, int source,
 		int object, zbx_uint64_t objectid, zbx_uint64_t eventid, zbx_uint64_t p_eventid, zbx_uint64_t actionid,
-		zbx_uint64_t min_alertid, const char *sendto, const char *subject, const char *message,
-		const char *params, int status, int retries)
+		zbx_uint64_t min_alertid, int message_type, const char *sendto, const char *subject,
+		const char *message, const char *params, int status, int retries)
 {
 	zbx_am_db_alert_t	*alert;
 
@@ -67,6 +67,7 @@ static zbx_am_db_alert_t	*am_db_create_alert(zbx_uint64_t alertid, zbx_uint64_t 
 	alert->p_eventid = p_eventid;
 	alert->actionid = actionid;
 	alert->min_alertid = min_alertid;
+	alert->message_type = message_type;
 
 	alert->sendto = zbx_strdup(NULL, sendto);
 	alert->subject = zbx_strdup(NULL, subject);
@@ -184,7 +185,7 @@ static int	am_db_get_alerts(zbx_vector_am_db_alert_ptr_t *alerts)
 		ZBX_STR2UINT64(objectid, row[9]);
 
 		alert = am_db_create_alert(alertid, mediatypeid, source, object, objectid, eventid, p_eventid, actionid,
-			min_alertid, row[2], row[3], row[4], row[10], status, attempts);
+			min_alertid, ALERT_MESSAGE_EVENT, row[2], row[3], row[4], row[10], status, attempts);
 
 		zbx_vector_am_db_alert_ptr_append(alerts, alert);
 

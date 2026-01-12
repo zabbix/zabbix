@@ -1547,7 +1547,9 @@ static int	rm_writer_process_job(zbx_rm_writer_t *writer, zbx_rm_job_t *job, cha
 
 			if (0 != recipients.values_num)
 			{
-				size = report_serialize_send_report(&data, &mt, &recipients, job->reportid);
+				size = report_serialize_send_report(&data, &mt, &recipients, job->reportid,
+						1 == job->is_test_report ? ALERT_MESSAGE_TEST : ALERT_MESSAGE_REPORT);
+
 				ret = zbx_ipc_client_send(writer->client, ZBX_IPC_REPORTER_SEND_REPORT, data, size);
 				zbx_free(data);
 			}
@@ -2105,7 +2107,7 @@ static int	rm_test_report(zbx_rm_t *manager, zbx_ipc_client_t *client, zbx_ipc_m
 		}
 	}
 
-	if (NULL != (job = rm_create_job(manager, name, dashboardid, access_userid, report_time, period, &userid, 1, 0,
+	if (NULL != (job = rm_create_job(manager, name, dashboardid, access_userid, report_time, period, &userid, 0, 1,
 			&params, error)))
 	{
 		job->is_test_report = 1;
