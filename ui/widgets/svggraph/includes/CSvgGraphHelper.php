@@ -130,7 +130,7 @@ class CSvgGraphHelper {
 			$first_metric_to_broadcast = [
 				'itemid' => $metric['itemid'],
 				'itemids' => $metric['itemids'],
-				'ds' => $metric['data_set'],
+				'ds' => $metric['data_set']
 			];
 		}
 

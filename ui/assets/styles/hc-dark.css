@@ -7636,8 +7636,7 @@ z-select[disabled] .focusable, input[disabled], textarea[disabled], select optio
   .overlay-dialogue.hintbox {
     display: flex;
     flex-direction: column;
-    box-sizing: border-box;
-    max-height: calc(100vh - 20px); }
+    box-sizing: border-box; }
     .overlay-dialogue.hintbox:not(.hintbox-static) {
       pointer-events: none; }
     .overlay-dialogue.hintbox.hintbox-static {
