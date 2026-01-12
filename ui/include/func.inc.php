@@ -2039,26 +2039,17 @@ function parse_period($str) {
 		return null;
 	}
 
-	foreach ($time_periods_parser->getPeriods() as $period) {
-		$regex = '/^([1-7])(?:-([1-7]))?,(0?\d|1\d|2[0-3]):([0-5]\d)-(0?\d|1\d|2[0-3]):([0-5]\d)$/';
+	foreach ($time_periods_parser->getPeriodParts() as $period_parts) {
+		$start_day = (int) $period_parts['wd_from'];
+		$end_day = (int) $period_parts['wd_till'];
 
-		if (!preg_match($regex, $period, $matches)) {
-			return null;
-		}
-
-		$start_day = (int) $matches[1];
-		$end_day = (int) ($matches[2] ?: $start_day);
-
-		for ($i = $start_day; $i <= $end_day; $i++) {
-			if (!isset($out[$i])) {
-				$out[$i] = [];
-			}
-			array_push($out[$i], [
-				'start_h' => $matches[3],
-				'start_m' => $matches[4],
-				'end_h' => $matches[5],
-				'end_m' => $matches[6]
-			]);
+		for ($day = $start_day; $day <= $end_day; $day++) {
+			$out[$day][] = [
+				'start_h' => $period_parts['h_from'],
+				'start_m' => $period_parts['m_from'],
+				'end_h' => $period_parts['h_till'],
+				'end_m' => $period_parts['m_till'],
+			];
 		}
 	}
 

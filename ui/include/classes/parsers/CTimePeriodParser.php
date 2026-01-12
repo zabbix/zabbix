@@ -24,6 +24,8 @@ class CTimePeriodParser extends CParser {
 	 */
 	private $macro_parsers = [];
 
+	private $period_parts = [];
+
 	private $options = [
 		'usermacros' => false,
 		'lldmacros' => false
@@ -59,7 +61,7 @@ class CTimePeriodParser extends CParser {
 			}
 		}
 
-		if ($p == $pos && !self::parseTimePeriod($source, $p)) {
+		if ($p == $pos && !$this->parseTimePeriod($source, $p)) {
 			return self::PARSE_FAIL;
 		}
 
@@ -77,15 +79,15 @@ class CTimePeriodParser extends CParser {
 	 *
 	 * @return bool
 	 */
-	private static function parseTimePeriod($source, &$pos) {
-		$pattern_wdays = '(?P<w_from>[1-7])(-(?P<w_till>[1-7]))?';
+	private function parseTimePeriod($source, &$pos) {
+		$pattern_wdays = '(?P<wd_from>[1-7])(-(?P<wd_till>[1-7]))?';
 		$pattern_hours = '(?P<h_from>[0-9]{1,2}):(?P<m_from>[0-9]{2})-(?P<h_till>[0-9]{1,2}):(?P<m_till>[0-9]{2})';
 
 		if (!preg_match('/^'.$pattern_wdays.','.$pattern_hours.'/', substr($source, $pos), $matches)) {
 			return false;
 		}
 
-		if (($matches['w_till'] !== '' && $matches['w_from'] > $matches['w_till'])
+		if (($matches['wd_till'] !== '' && $matches['wd_from'] > $matches['wd_till'])
 				|| $matches['m_from'] > 59 || $matches['m_till'] > 59) {
 			return false;
 		}
@@ -97,8 +99,22 @@ class CTimePeriodParser extends CParser {
 			return false;
 		}
 
+		$this->period_parts = $this->normalizePeriodParts($matches);
+
 		$pos += strlen($matches[0]);
 
 		return true;
+	}
+
+	public function getPeriodParts() {
+		return $this->period_parts;
+	}
+
+	private function normalizePeriodParts(array $matches) {
+		$parts = array_filter($matches, fn($key) => !is_int($key), ARRAY_FILTER_USE_KEY);
+
+		$parts['wd_till'] = $parts['wd_till'] ?: $parts['wd_from'];
+
+		return $parts;
 	}
 }
