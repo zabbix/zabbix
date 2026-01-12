@@ -473,7 +473,7 @@ class CTimePeriodParserTest extends TestCase {
 						'h_till' => '23',
 						'm_till' => '00'
 					]
-				],
+				]
 			],
 			[
 				'7,00:00-23:00', 0, [],
@@ -487,7 +487,7 @@ class CTimePeriodParserTest extends TestCase {
 						'h_till' => '23',
 						'm_till' => '00'
 					]
-				],
+				]
 			],
 			// fail
 			[
@@ -495,14 +495,14 @@ class CTimePeriodParserTest extends TestCase {
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'periods_parts' => []
-				],
+				]
 			],
 			[
 				'1-5,10:60-12:00', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
 					'periods_parts' => []
-				],
+				]
 			],
 			[
 				'1-5,12:00-10:00', 0, [],

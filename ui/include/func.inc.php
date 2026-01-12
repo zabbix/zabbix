@@ -2048,7 +2048,7 @@ function parse_period($str) {
 				'start_h' => $period_parts['h_from'],
 				'start_m' => $period_parts['m_from'],
 				'end_h' => $period_parts['h_till'],
-				'end_m' => $period_parts['m_till'],
+				'end_m' => $period_parts['m_till']
 			];
 		}
 	}
