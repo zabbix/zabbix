@@ -384,7 +384,7 @@ class CControllerUserroleEdit extends CControllerUserroleEditGeneral {
 			'modules.default_access' => true,
 			'api' => [],
 			'api.access' => true,
-			'api.mode' => 'api.mode',
+			'api.mode' => false,
 			'actions' => array_fill_keys(CRoleHelper::getActionsByUserType($user_type), true),
 			'actions.default_access' => true
 		];
