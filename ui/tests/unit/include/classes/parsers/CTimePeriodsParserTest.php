@@ -140,6 +140,67 @@ class CTimePeriodsParserTest extends TestCase {
 		];
 	}
 
+	public static function parseTimePeriodProvider() {
+		return [
+			// success
+			[
+				'1-7,00:00-23:00', 0, [],
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'periods_parts' => [
+						'1-7,00:00-23:00' => [
+							'wd_from' => '1',
+							'wd_till' => '7',
+							'h_from' => '00',
+							'm_from' => '00',
+							'h_till' => '23',
+							'm_till' => '00'
+						]
+					]
+				]
+			],
+			[
+				'3-4,00:05-00:06;4-5,00:07-00:08', 0, [],
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'periods_parts' => [
+						'3-4,00:05-00:06' => [
+							'wd_from' => '3',
+							'wd_till' => '4',
+							'h_from' => '00',
+							'm_from' => '05',
+							'h_till' => '00',
+							'm_till' => '06'
+						],
+						'4-5,00:07-00:08' => [
+							'wd_from' => '4',
+							'wd_till' => '5',
+							'h_from' => '00',
+							'm_from' => '07',
+							'h_till' => '00',
+							'm_till' => '08'
+						]
+					]
+				]
+			],
+			// fail
+			[
+				'8,00:00-24:00', 0, [],
+				[
+					'rc' => CParser::PARSE_FAIL,
+					'periods_parts' => []
+				]
+			],
+			[
+				'1-7,00:00-24:00;;', 0, [],
+				[
+					'rc' => CParser::PARSE_FAIL,
+					'periods_parts' => []
+				]
+			]
+		];
+	}
+
 	/**
 	 * @dataProvider dataProvider
 	 *
@@ -156,5 +217,22 @@ class CTimePeriodsParserTest extends TestCase {
 			'periods' => $parser->getPeriods()
 		]);
 		$this->assertSame(strlen($expected['match']), $parser->getLength());
+	}
+
+	/**
+	 * @dataProvider parseTimePeriodProvider
+	 *
+	 * @param string $source
+	 * @param int    $pos
+	 * @param array  $options
+	 * @param array  $expected
+	 */
+	public function testParseTimePeriod($source, $pos, $options, $expected) {
+		$parser = new CTimePeriodsParser($options);
+
+		$rc = $parser->parse($source, $pos);
+
+		$this->assertSame($expected['rc'], $rc);
+		$this->assertSame($expected['periods_parts'], $parser->getPeriodParts());
 	}
 }

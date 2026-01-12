@@ -458,73 +458,66 @@ class CTimePeriodParserTest extends TestCase {
 		];
 	}
 
-	public static function parseTimePeriodProvider(): array
-	{
+	public static function parseTimePeriodProvider() {
 		return [
 			// success
 			[
-				'1-7,00:00-23:00',
-				0,
+				'1-7,00:00-23:00', 0, [],
 				[
-					'rc' => CParser::PARSE_SUCCESS
-				],
-				[
-					'wd_from' => 1,
-					'wd_till' => 7,
-					'h_from' => '00',
-					'm_from' => '00',
-					'h_till' => '23',
-					'm_till' => '00',
+					'rc' => CParser::PARSE_SUCCESS,
+					'periods_parts' => [
+						'wd_from' => '1',
+						'wd_till' => '7',
+						'h_from' => '00',
+						'm_from' => '00',
+						'h_till' => '23',
+						'm_till' => '00'
+					]
 				],
 			],
 			[
-				'7,00:00-23:00',
-				0,
+				'7,00:00-23:00', 0, [],
 				[
-					'rc' => CParser::PARSE_SUCCESS
-				],
-				[
-					'wd_from' => 7,
-					'wd_till' => 7,
-					'h_from' => '00',
-					'm_from' => '00',
-					'h_till' => '23',
-					'm_till' => '00',
+					'rc' => CParser::PARSE_SUCCESS,
+					'periods_parts' => [
+						'wd_from' => '7',
+						'wd_till' => '7',
+						'h_from' => '00',
+						'm_from' => '00',
+						'h_till' => '23',
+						'm_till' => '00'
+					]
 				],
 			],
 			// fail
 			[
-				'7-1,00:00-23:00',
-				0,
+				'7-1,00:00-23:00', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
+					'periods_parts' => []
 				],
-				[],
 			],
 			[
-				'1-5,10:60-12:00',
-				0,
+				'1-5,10:60-12:00', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
+					'periods_parts' => []
 				],
-				[],
 			],
 			[
-				'1-5,12:00-10:00',
-				0,
+				'1-5,12:00-10:00', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
-				],
-				[],
+					'periods_parts' => []
+				]
 			],
 			[
-				'1-5,25:00-26:00',
-				0,
+				'1-5,25:00-26:00', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
-				],
-				[],
-			],
+					'periods_parts' => []
+				]
+			]
 		];
 	}
 
@@ -555,11 +548,11 @@ class CTimePeriodParserTest extends TestCase {
 	 * @param array  $expected
 	 */
 	public function testParseTimePeriod($source, $pos, $options, $expected) {
-		$parser = new CTimePeriodParser([]);
+		$parser = new CTimePeriodParser($options);
 
 		$rc = $parser->parse($source, $pos);
 
-		$this->assertSame($options['rc'], $rc);
-		$this->assertSame($expected, $parser->getPeriodParts());
+		$this->assertSame($expected['rc'], $rc);
+		$this->assertSame($expected['periods_parts'], $parser->getPeriodParts());
 	}
 }
