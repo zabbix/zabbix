@@ -2668,4 +2668,251 @@ class CFormValidatorTest extends TestCase {
 			$this->assertSame($files, $expected_files);
 		}
 	}
+
+	public function dataProviderFormMacroValidator() {
+		return [
+			// Valid user macros and user macro functions.
+			['{$MACRO}', true,
+				['usermacros' => true, 'lldmacros' => false]
+			],
+			['{$MACRO:/tmp}', true,
+				['usermacros' => true, 'lldmacros' => false]
+			],
+			['{$MACRO:"as}d"}', true,
+				['usermacros' => true, 'lldmacros' => false]
+			],
+			['{$MACRO:regex:^/tmp$}', true,
+				['usermacros' => true, 'lldmacros' => false]
+			],
+			['{$MACRO:regex:"^/tmp$"}', true,
+				['usermacros' => true, 'lldmacros' => false]
+			],
+			['{$LOW_SPACE_LIMIT:regex:"^/var/log/.*$"}', true,
+				['usermacros' => true, 'lldmacros' => false]
+			],
+			['{{$MACRO}.trim()}', true,
+				['usermacros' => true, 'lldmacros' => false]
+			],
+			['{{$MACRO}.tr(abc, xyz)}', true,
+				['usermacros' => true, 'lldmacros' => false]
+			],
+			['{{$MACRO}.tr(, xyz)}', true,
+				['usermacros' => true, 'lldmacros' => false]
+			],
+			['{{$MACRO}.tr(,)}', true,
+				['usermacros' => true, 'lldmacros' => false]
+			],
+			['{{$MACRO}.tr("\n", "*")}', true,
+				['usermacros' => true, 'lldmacros' => false]
+			],
+			['{{$MACRO:/tmp}.tr(abc, xyz)}', true,
+				['usermacros' => true, 'lldmacros' => false]
+			],
+			['{{$MACRO:/tmp}.tr("\n", "*")}', true,
+				['usermacros' => true, 'lldmacros' => false]
+			],
+			['{{$MACRO:/tmp:"^/tmp$"}.tr(abc, xyz)}', true,
+				['usermacros' => true, 'lldmacros' => false]
+			],
+			['{{$MACRO:/tmp:"^/tmp$"}.tr("\n", "*")}', true,
+				['usermacros' => true, 'lldmacros' => false]
+			],
+			['{{$MACRO:/tmp:"^/tmp$"}.regrepl("_v1\.0", "_v2.0", "\(final\)", "")}', true,
+				['usermacros' => true, 'lldmacros' => false]
+			],
+			['{$MACRO:"{{#FSNAME}.regrepl(\"\\$\",\"\")}"}', true,
+				['usermacros' => true, 'lldmacros' => false]
+			],
+
+			// Valid LLD macros and LLD macro functions.
+			['{#MACRO}', true,
+				['usermacros' => false, 'lldmacros' => true]
+			],
+			['{{#MACRO}.trim()}', true,
+				['usermacros' => false, 'lldmacros' => true]
+			],
+			['{{#MACRO}.tr(abc, xyz)}', true,
+				['usermacros' => false, 'lldmacros' => true]
+			],
+			['{{#MACRO}.tr(, xyz)}', true,
+				['usermacros' => false, 'lldmacros' => true]
+			],
+			['{{#MACRO}.tr(,)}', true,
+				['usermacros' => false, 'lldmacros' => true]
+			],
+			['{{#MACRO}.tr("\n", "*")}', true,
+				['usermacros' => false, 'lldmacros' => true]
+			],
+
+			// Macro type is not supported.
+			['{#MACRO}', false,
+				['usermacros' => false, 'lldmacros' => false]
+			],
+			['{#MACRO}', false,
+				['usermacros' => true, 'lldmacros' => false]
+			],
+			['{$MACRO}', false,
+				['usermacros' => false, 'lldmacros' => false]
+			],
+			['{$MACRO}', false,
+				['usermacros' => false, 'lldmacros' => true]
+			],
+
+			// Invalid macro or macro function.
+			['{MACRO}', false,
+				['usermacros' => true, 'lldmacros' => true]
+			],
+			['{$MACRO', false,
+				['usermacros' => true, 'lldmacros' => true]
+			],
+			['{$MACRO}}', false,
+				['usermacros' => true, 'lldmacros' => true]
+			],
+			['{{$MACRO}', false,
+				['usermacros' => true, 'lldmacros' => true]
+			],
+			['{{$MACRO}}', false,
+				['usermacros' => true, 'lldmacros' => true]
+			],
+			['{{$MACRO:context}}', false,
+				['usermacros' => true, 'lldmacros' => true]
+			],
+			['{$MACRO:"context}', false,
+				['usermacros' => true, 'lldmacros' => true]
+			],
+			['{$MACRO}.func()', false,
+				['usermacros' => true, 'lldmacros' => true]
+			],
+			['{$MACRO}.max(2)}', false,
+				['usermacros' => true, 'lldmacros' => true]
+			],
+			['{$MACRO:test}.max(2)}', false,
+				['usermacros' => true, 'lldmacros' => false]
+			],
+			['{#MACRO', false,
+				['usermacros' => true, 'lldmacros' => true]
+			],
+			['{#MACRO}}', false,
+				['usermacros' => true, 'lldmacros' => true]
+			],
+			['{{#MACRO}', false,
+				['usermacros' => true, 'lldmacros' => true]
+			],
+			['{{#MACRO}}', false,
+				['usermacros' => true, 'lldmacros' => true]
+			],
+			['{#MACRO}.func()', false,
+				['usermacros' => true, 'lldmacros' => true]
+			],
+			['{#MACRO}.max(2)}', false,
+				['usermacros' => true, 'lldmacros' => true]
+			],
+
+			// Function names must be lowercase and only letters
+			['{{$MACRO}.MAX(2)}', false,
+				['usermacros' => true, 'lldmacros' => true]
+			],
+			['{{$MACRO}.max2(2)}', false,
+				['usermacros' => true, 'lldmacros' => true]
+			],
+			['{{$MACRO}.(2)}', false,
+				['usermacros' => true, 'lldmacros' => true]
+			],
+			['{{#MACRO}.MAX(2)}', false,
+				['usermacros' => true, 'lldmacros' => true]
+			],
+			['{{#MACRO}.max2(2)}', false,
+				['usermacros' => true, 'lldmacros' => true]
+			],
+			['{{#MACRO}.(2)}', false,
+				['usermacros' => true, 'lldmacros' => true]
+			],
+
+			// No closing brackets, unfinished quotes to function parameters.
+			['{{$MACRO}.tr({{$MACRO}.tr(aa, bb)},cc)}', false,
+				['usermacros' => true, 'lldmacros' => false]
+			],
+			['{{$MACRO}.tr("aaa)\",bbb)}', false,
+				['usermacros' => true, 'lldmacros' => false]
+			],
+			['{$MACRO:"asd{"s"}', false,
+				['usermacros' => true, 'lldmacros' => false]
+			],
+			['{{#MACRO}.tr({{#MACRO}.tr(aa, bb)},cc)}', false,
+				['usermacros' => false, 'lldmacros' => true]
+			],
+			['{{#MACRO}.tr("aaa)\",bbb)}', false,
+				['usermacros' => false, 'lldmacros' => true]
+			],
+			['{#MACRO:"asd{"s"}', false,
+				['usermacros' => false, 'lldmacros' => true]
+			],
+
+			// LLD macro can't have context.
+			['{#MACRO:/tmp}', false,
+				['usermacros' => false, 'lldmacros' => true]
+			],
+			['{#MACRO:regex:"^/tmp$"}', false,
+				['usermacros' => false, 'lldmacros' => true]
+			],
+			['{#LOW_SPACE_LIMIT:regex:"^/var/log/.*$"}', false,
+				['usermacros' => false, 'lldmacros' => true]
+			],
+			['{{#MACRO:/tmp}.tr(abc, xyz)}', false,
+				['usermacros' => false, 'lldmacros' => true]
+			],
+			['{{#MACRO:/tmp}.tr("\n", "*")}', false,
+				['usermacros' => false, 'lldmacros' => true]
+			],
+			['{{#MACRO:/tmp:"^/tmp$"}.tr(abc, xyz)}', false,
+				['usermacros' => false, 'lldmacros' => true]
+			],
+			['{{#MACRO:/tmp:"^/tmp$"}.tr("\n", "*")}', false,
+				['usermacros' => false, 'lldmacros' => true]
+			],
+			['{{#MACRO:/tmp:"^/tmp$"}.regrepl("_v1\.0", "_v2.0", "\(final\)", "")}', false,
+				['usermacros' => false, 'lldmacros' => true]
+			],
+			['{#MACRO:"{{#FSNAME}.regrepl(\"\\$\",\"\")}"}', false,
+				['usermacros' => false, 'lldmacros' => true]
+			]
+		];
+	}
+
+	/**
+	 * Simulates #isMacro validation done in class.form.validator.js and compares to macro parser validation result.
+	 *
+	 * @dataProvider dataProviderFormMacroValidator
+	 *
+	 * @param string $value
+	 * @param bool $expected_result
+	 * @param array $macro_rules
+	 * @return void
+	 */
+	public function testFormMacroValidator(string $value, bool $expected_result, array $macro_rules): void {
+		$this->assertSame(CFormValidator::validateMacro($macro_rules, $value), $expected_result,
+			"Expected result doesn't match validator result"
+		);
+
+		$regexps = [];
+		$value = preg_replace('/"[^"\\\\]*(?:\\\\.[^"\\\\]*)*"/', 'Text', $value);
+
+		if ($macro_rules['usermacros']) {
+			$regexps[] = CUserMacroParser::FRONTEND_VALIDATOR_REGEX;
+			$regexps[] = CUserMacroFunctionParser::FRONTEND_VALIDATOR_REGEX;
+		}
+
+		if ($macro_rules['lldmacros']) {
+			$regexps[] = CLLDMacroParser::FRONTEND_VALIDATOR_REGEX;
+			$regexps[] = CLLDMacroFunctionParser::FRONTEND_VALIDATOR_REGEX;
+		}
+
+		$regex_result = false;
+
+		foreach ($regexps as $regexp) {
+			$regex_result = $regex_result || preg_match($regexp, $value) == 1;
+		}
+
+		$this->assertSame($regex_result, $expected_result, "Regular expression result doesn't match validator result");
+	}
 }

@@ -1618,28 +1618,6 @@ class CFormValidator {
 	}
 
 	/**
-	 * Check if value looks as user macro.
-	 *
-	 * @param {string} value  Value to check.
-	 *
-	 * @returns {boolean}
-	 */
-	#isUserMacro(value) {
-		return value.match(/^\{\$[A-Z0-9._]+(:.*)?\}$/) !== null;
-	}
-
-	/**
-	 * Check if value looks as LLD macro.
-	 *
-	 * @param {string} value  Value to check.
-	 *
-	 * @returns {boolean}
-	 */
-	#isLLDMacro(value) {
-		return value.match(/^\{#[A-Z0-9._]+(:.*)?\}$/) !== null;
-	}
-
-	/**
 	 * Check if value looks like macro based on allowed macro types
 	 *
 	 * @param {array} macro_types
@@ -1648,12 +1626,31 @@ class CFormValidator {
 	 * @returns {boolean}
 	 */
 	#isMacro(macro_types, value) {
-		if (macro_types.usermacros && this.#isUserMacro(value)) {
-			return true;
+		// All quoted texts are replaced with "Text", which neither valid function name or macro.
+		value = value.replace(/"[^"\\]*(?:\\.[^"\\]*)*"/g, 'Text');
+
+		if (macro_types.usermacros) {
+			// CUserMacroParser::FRONTEND_VALIDATOR_REGEX
+			if (value.match(/^\{\$[A-Z0-9._]+(:[^)"]+)?\}$/) !== null) {
+				return true;
+			}
+
+			// CUserMacroFunctionParser::FRONTEND_VALIDATOR_REGEX
+			if (value.match(/^\{{\$[A-Z0-9._]+(:[^)"]+)?\}\.[a-z]+\([^)"]*\)}$/) !== null) {
+				return true;
+			}
 		}
 
-		if (macro_types.lldmacros && this.#isLLDMacro(value)) {
-			return true;
+		if (macro_types.lldmacros) {
+			// CLLDMacroParser::FRONTEND_VALIDATOR_REGEX
+			if (value.match(/^\{#[A-Z0-9._]+}$/) !== null) {
+				return true;
+			}
+
+			// CLLDMacroFunctionParser::FRONTEND_VALIDATOR_REGEX
+			if (value.match(/^\{\{#[A-Z0-9._]+}\.[a-z]+\([^)"]*\)}$/) !== null) {
+				return true;
+			}
 		}
 
 		return false;

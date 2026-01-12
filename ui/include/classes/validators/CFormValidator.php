@@ -79,12 +79,19 @@ class CFormValidator {
 					throw new Exception('[RULES ERROR] For numeric keys, rule value should be a string: (Path: '.$rule_path.', Key: '.$key.')');
 				}
 
-				if (in_array($value, ['required', 'not_empty', 'allow_macro'], true)) {
+				if (in_array($value, ['required', 'not_empty'], true)) {
 					if (array_key_exists($value, $result)) {
 						throw new Exception('[RULES ERROR] Option "'.$value.'" is specified multiple times (Path: '.$rule_path.')');
 					}
 
 					$result[$value] = true;
+				}
+				else if ($value === 'allow_macro') {
+					if (array_key_exists($value, $result)) {
+						throw new Exception('[RULES ERROR] Option "'.$value.'" is specified multiple times (Path: '.$rule_path.')');
+					}
+
+					$result['allow_macro'] = ['usermacros' => true, 'lldmacros' => false];
 				}
 				elseif (in_array($value, ['id', 'integer', 'float', 'string', 'object', 'objects', 'array', 'file'],
 						true)) {
@@ -2118,15 +2125,31 @@ class CFormValidator {
 		}
 	}
 
-	private static function validateMacro(array $macro_rules, $value): bool {
-		$parsers = [
-			'usermacros' => CUserMacroParser::class,
-			'lldmacros' => CLLDMacroParser::class
-		];
+	/**
+	 * Validates if string is a macro or a macro function.
+	 *
+	 * @param array		$macro_rules
+	 * @param bool		$macro_rules['usermacros']
+	 * @param bool		$macro_rules['lldmacros']
+	 * @param string	$value
+	 *
+	 * @return bool
+	 */
+	public static function validateMacro(array $macro_rules, string $value): bool {
+		$macro_parsers = [];
 
-		foreach ($parsers as $parser_key => $parser_class) {
-			if (array_key_exists($parser_key, $macro_rules) &&
-					(new $parser_class())->parse($value) == CParser::PARSE_SUCCESS) {
+		if ($macro_rules['usermacros']) {
+			$macro_parsers[] = new CUserMacroParser();
+			$macro_parsers[] = new CUserMacroFunctionParser();
+		}
+
+		if ($macro_rules['lldmacros']) {
+			$macro_parsers[] = new CLLDMacroParser();
+			$macro_parsers[] = new CLLDMacroFunctionParser();
+		}
+
+		foreach ($macro_parsers as $macro_parser) {
+			if ($macro_parser->parse($value) == CParser::PARSE_SUCCESS) {
 				return true;
 			}
 		}
