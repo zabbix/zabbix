@@ -333,11 +333,11 @@ class testSlaReport extends CWebTest {
 	 * @param boolean	$widget		flag that specifies whether the check is made in the SLA report or SLA report widget.
 	 */
 	public function checkLayoutWithService($data, $widget = false) {
-		$sla_creation_time = CDataHelper::get('Sla.creation_time');
+		$actual_creation_time = CDataHelper::get('Sla.creation_time');
 		$service_creation_time = CDBHelper::getValue(
 				'SELECT created_at FROM services WHERE name='.zbx_dbstr('Service with problem')
 		);
-		$creation_day = date('Y-m-d', $sla_creation_time);
+		$creation_day = date('Y-m-d', $actual_creation_time);
 
 		$table = ($widget)
 			? CDashboardElement::find()->one()->getWidget($data['fields']['Name'])->query('class:list-table')->asTable()->one()
@@ -368,7 +368,7 @@ class testSlaReport extends CWebTest {
 		// This test is written taking into account that only SLA with daily reporting period has ongoing downtimes.
 		if (array_key_exists('downtimes', $data)) {
 			// Downtime starts from min(SLA creation timestamp, Service creation timestamp).
-			$downtime_start = min($sla_creation_time, $service_creation_time);
+			$downtime_start = min($actual_creation_time, $service_creation_time);
 			$downtime_values = [];
 			/**
 			 * If the date has changed since data source was executed, then downtimes will be divided into 2 days.
@@ -447,7 +447,7 @@ class testSlaReport extends CWebTest {
 			 * SLI is displayed for periods from SLA actual creation time to page load time.
 			 * If SLI is expected, then Uptime and Error budget should be calculated and checked.
 			 */
-			if (array_key_exists('SLI', $data['expected']) && $period['end'] > $sla_creation_time) {
+			if (array_key_exists('SLI', $data['expected']) && $period['end'] > $actual_creation_time) {
 				$this->assertEquals($data['expected']['SLI'], $row->getColumn('SLI')->getText());
 
 				// Check Uptime and Error budget values. These values are calculated only from the actual SLA creation time.
@@ -455,7 +455,7 @@ class testSlaReport extends CWebTest {
 				if ($period['end'] > $load_time) {
 					$reference_uptime = [];
 					// If SLA created in current period, calculation starts from creation timestamp, else from period start.
-					$start_time = max($period['start'], min($sla_creation_time, $service_creation_time));
+					$start_time = max($period['start'], min($actual_creation_time, $service_creation_time));
 
 					/**
 					 * Get array of Uptime possible values and check that the correct one is there.
@@ -488,7 +488,7 @@ class testSlaReport extends CWebTest {
 				}
 				else {
 					$reference_uptime = [];
-					$uptime_start = min($sla_creation_time, $service_creation_time);
+					$uptime_start = min($actual_creation_time, $service_creation_time);
 
 					// Sometimes uptime start is by 1 second larger than obtained 2 rows above, so $i counter starts from -1.
 					for ($i = -1; $i <= 3; $i++) {
@@ -558,7 +558,7 @@ class testSlaReport extends CWebTest {
 
 			// For SLA without service periods are shown in ascending order, so reference array should be reversed.
 			foreach (array_reverse($reference_periods) as $period) {
-				if (array_key_exists('SLI', $data['expected']) && $period['end'] > $sla_creation_time) {
+				if (array_key_exists('SLI', $data['expected']) && $period['end'] > CDataHelper::get('Sla.creation_time')) {
 					$this->assertEquals($data['expected']['SLI'], $row->getColumn($period['value'])->getText());
 				}
 				else {
