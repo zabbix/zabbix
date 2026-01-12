@@ -1,1 +1,1 @@
-A.F.I..... [ZBXNEXT-10334] prevented users with an empty API allow list from calling some API methods (agriscenko, askolmeisters)
+A.F.I..... [ZBXNEXT-10334] prevented access to all API methods for users whose role has an empty allow list (agriscenko, askolmeisters)
