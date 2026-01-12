@@ -403,18 +403,16 @@ var hintBox = {
 	},
 
 	createBox: function(e, target, hintText, className, isStatic, styles, appendTo, reposition_on_resize = true) {
-		var hintboxid = hintBox.getUniqueId(),
-			attrs = {'data-hintboxid': hintboxid};
+		var hintboxid = hintBox.getUniqueId();
+		var box = jQuery('<div>', {'data-hintboxid': hintboxid}).addClass('overlay-dialogue wordbreak'),
+			appendTo = appendTo || '.wrapper';
 
 		if (!isStatic) {
 			id = 'hintbox-'+hintboxid;
 			$(target).attr('aria-describedby', id);
-			attrs['id'] = id;
-			attrs['role'] = 'tooltip';
+			box.attr('id', id);
+			box.attr('role', 'tooltip');
 		}
-
-		var box = jQuery('<div>', attrs).addClass('overlay-dialogue wordbreak'),
-			appendTo = appendTo || '.wrapper';
 
 		if (styles) {
 			// property1: value1; property2: value2; property(n): value(n)
