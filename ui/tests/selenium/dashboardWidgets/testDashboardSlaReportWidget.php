@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -2192,7 +2192,8 @@ class testDashboardSlaReportWidget extends testSlaReport {
 					'fields' => [
 						'SLA' => 'SLA Quarterly',
 						'Service' => 'Simple actions service',
-						'To' => 'now/d-100d',
+						// TODO: Change the value of the "To" field to 'now/d-100d' when ZBX-27363 is fixed.
+						'To' => 'now-100d',
 						'Show periods' => 3
 					],
 					'reporting_period' => 'Quarterly',

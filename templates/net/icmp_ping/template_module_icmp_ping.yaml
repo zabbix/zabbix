@@ -15,10 +15,10 @@ zabbix_export:
       readme: |
         ## Setup
         
-        Set `Threshold of ICMP packet loss` and `Threshold of the average ICMP response`
+        Set `Threshold of ICMP packet loss` and `Threshold of the average ICMP response`.
       vendor:
         name: Zabbix
-        version: 8.0-1
+        version: 8.0-2
       groups:
         - name: 'Templates/Network devices'
       items:

@@ -38,7 +38,7 @@ zabbix_export:
         Refer to the vendor documentation.
       vendor:
         name: Zabbix
-        version: 8.0-2
+        version: 8.0-3
       groups:
         - name: 'Templates/Network devices'
       items:
@@ -1199,69 +1199,83 @@ zabbix_export:
       macros:
         - macro: '{$CPU.UTIL.CRIT}'
           value: '90'
+          description: 'Critical threshold of CPU utilization in %.'
           config:
             type: TEXT
             priority: '1'
             section_name: Thresholds
             label: 'Threshold for CPU utilization (critical)'
-            description: 'In the range from 0 to 100 inclusive.'
+            description: 'Critical threshold of CPU utilization in %. In the range from 0 to 100 inclusive.'
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
         - macro: '{$ICMP_LOSS_WARN}'
           value: '20'
+          description: 'Warning threshold of ICMP packet loss in %.'
           config:
             type: TEXT
             priority: '2'
             section_name: Thresholds
             label: 'Threshold of ICMP packet loss'
+            description: 'Warning threshold of ICMP packet loss in %.'
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
         - macro: '{$ICMP_RESPONSE_TIME_WARN}'
           value: '0.15'
+          description: 'Threshold of the average ICMP response time in seconds.'
           config:
             type: TEXT
             priority: '3'
             section_name: Thresholds
             label: 'Threshold of the average ICMP response'
+            description: 'Threshold of the average ICMP response time in seconds.'
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
         - macro: '{$IF.ERRORS.WARN}'
           value: '2'
+          description: 'Threshold for the warning level of the interface error packet rate.'
           config:
             type: TEXT
             priority: '4'
             section_name: Thresholds
             label: 'Threshold of error packet rate'
+            description: 'Threshold for the warning level of the interface error packet rate.'
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
         - macro: '{$IF.UTIL.MAX}'
           value: '90'
+          description: 'Maximum threshold of interface bandwidth utilization in %. Can be used with the interface name as context.'
           config:
             type: TEXT
             priority: '5'
             section_name: Thresholds
             label: 'The threshold in the interface utilization'
+            description: 'Maximum threshold of interface bandwidth utilization in %. Can be used with the interface name as context.'
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
         - macro: '{$IFCONTROL}'
           value: '1'
+          description: 'Macro for the operational state of the interface for the link down trigger. Can be used with the interface name as context.'
           config:
             type: TEXT
             priority: '6'
             section_name: Other
             label: 'Interfaces control'
+            description: 'Macro for the operational state of the interface for the link down trigger. Can be used with the interface name as context.'
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
         - macro: '{$MEMORY.UTIL.MAX}'
           value: '90'
+          description: 'Threshold for maximum memory utilization in %.'
           config:
             type: TEXT
             priority: '7'
             section_name: Thresholds
             label: 'Threshold for memory utilization'
-            description: 'In the range from 0 to 100 inclusive.'
+            description: 'Threshold for maximum memory utilization in %. In the range from 0 to 100 inclusive.'
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
         - macro: '{$NET.IF.IFADMINSTATUS.MATCHES}'
           value: '^.*'
+          description: 'This macro is used to include network interfaces by their administrative status.'
           config:
             type: TEXT
             priority: '8'
             section_name: Filters
             label: 'Filter for network interface by adminstatus'
+            description: 'This macro is used to include network interfaces by their administrative status.'
         - macro: '{$NET.IF.IFADMINSTATUS.NOT_MATCHES}'
           value: ^2$
           description: 'Ignore down(2) administrative status'
@@ -1270,41 +1284,52 @@ zabbix_export:
             priority: '9'
             section_name: Filters
             label: 'Filter for network interface by adminstatus (exclude)'
+            description: 'If the administrative status is down (2), then an interface is excluded.'
         - macro: '{$NET.IF.IFALIAS.MATCHES}'
           value: '.*'
+          description: 'This macro is used to include network interfaces by their alias.'
           config:
             type: TEXT
             priority: '10'
             section_name: Filters
             label: 'Filter for network interfaces by alias'
+            description: 'This macro is used to include network interfaces by their alias.'
         - macro: '{$NET.IF.IFALIAS.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
+          description: 'This macro is used to exclude network interfaces by their alias.'
           config:
             type: TEXT
             priority: '11'
             section_name: Filters
             label: 'Filter for network interfaces by alias (exclude)'
+            description: 'This macro is used to exclude network interfaces by their alias.'
         - macro: '{$NET.IF.IFDESCR.MATCHES}'
           value: '.*'
+          description: 'This macro is used to include network interfaces by their description.'
           config:
             type: TEXT
             priority: '12'
             section_name: Filters
             label: 'Filter for network interfaces by description'
+            description: 'This macro is used to include network interfaces by their description.'
         - macro: '{$NET.IF.IFDESCR.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
+          description: 'This macro is used to exclude network interfaces by their description.'
           config:
             type: TEXT
             priority: '13'
             section_name: Filters
             label: 'Filter for network interfaces by description (exclude)'
+            description: 'This macro is used to exclude network interfaces by their description.'
         - macro: '{$NET.IF.IFNAME.MATCHES}'
           value: '^.*$'
+          description: 'This macro is used to include network interfaces by their name.'
           config:
             type: TEXT
             priority: '14'
             section_name: Filters
             label: 'Filter for network interface by name'
+            description: 'This macro is used to include network interfaces by their name.'
         - macro: '{$NET.IF.IFNAME.NOT_MATCHES}'
           value: '(^Software Loopback Interface|^NULL[0-9.]*$|^[Ll]o[0-9.]*$|^[Ss]ystem$|^Nu[0-9.]*$|^veth[0-9a-z]+$|docker[0-9]+|br-[a-z0-9]{12})'
           description: 'Filter out loopbacks, nulls, docker veth links and docker0 bridge by default'
@@ -1316,11 +1341,13 @@ zabbix_export:
             description: 'Filter out loopbacks, nulls, docker veth links and docker0 bridge by default'
         - macro: '{$NET.IF.IFOPERSTATUS.MATCHES}'
           value: '^.*$'
+          description: 'This macro is used to include network interfaces by their operational status.'
           config:
             type: TEXT
             priority: '16'
             section_name: Filters
             label: 'Filter for network interface by status'
+            description: 'This macro is used to include network interfaces by their operational status.'
         - macro: '{$NET.IF.IFOPERSTATUS.NOT_MATCHES}'
           value: ^6$
           description: 'Ignore notPresent(6)'
@@ -1329,50 +1356,63 @@ zabbix_export:
             priority: '17'
             section_name: Filters
             label: 'Filter for network interface by status (exclude)'
+            description: 'If the operational status is `notPresent (6)`, then an interface is excluded.'
         - macro: '{$NET.IF.IFTYPE.MATCHES}'
           value: '.*'
+          description: 'This macro is used to include network interfaces by their type.'
           config:
             type: TEXT
             priority: '18'
             section_name: Filters
             label: 'Filter for network interfaces by type'
+            description: 'This macro is used to include network interfaces by their type.'
         - macro: '{$NET.IF.IFTYPE.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
+          description: 'This macro is used to exclude network interfaces by their type.'
           config:
             type: TEXT
             priority: '19'
             section_name: Filters
             label: 'Filter for network interfaces by type (exclude)'
+            description: 'This macro is used to exclude network interfaces by their type.'
         - macro: '{$SNMP.TIMEOUT}'
           value: 5m
+          description: 'The time interval for the SNMP availability trigger.'
           config:
             type: TEXT
             priority: '20'
             section_name: Other
             label: 'Time interval'
+            description: 'The time interval for the SNMP availability trigger.'
         - macro: '{$TEMP_CRIT}'
           value: '60'
+          description: 'Critical threshold of the temperature in °C.'
           config:
             type: TEXT
             priority: '21'
             section_name: Thresholds
             label: 'Threshold for temperature (critical)'
+            description: 'Critical threshold of the temperature in °C.'
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
         - macro: '{$TEMP_CRIT_LOW}'
           value: '5'
+          description: 'Critical threshold of the low temperature in °C.'
           config:
             type: TEXT
             priority: '22'
             section_name: Thresholds
             label: 'Threshold for low temperature (critical)'
+            description: 'Critical threshold of the low temperature in °C.'
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
         - macro: '{$TEMP_WARN}'
           value: '50'
+          description: 'Warning threshold of the temperature in °C.'
           config:
             type: TEXT
             priority: '23'
             section_name: Thresholds
             label: 'Threshold for temperature (warning)'
+            description: 'Warning threshold of the temperature in °C.'
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
       dashboards:
         - uuid: f013c9829c064ee6a6933888af993990

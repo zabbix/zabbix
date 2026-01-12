@@ -41,7 +41,7 @@ zabbix_export:
         4. Configure the host wizard configuration fields: `Application ID`, `Password`, `Tenant ID`.
       vendor:
         name: Zabbix
-        version: 8.0-2
+        version: 8.0-3
       groups:
         - name: Templates/Applications
       items:
@@ -5269,7 +5269,7 @@ zabbix_export:
               type: DEPENDENT
               key: 'ms365.copilot.user_activity.excel[{#KEY}]'
               value_type: CHAR
-              description: 'Last date of use Copilot in Microsoft Excel.'
+              description: 'Last date of Copilot use in Microsoft Excel.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -5292,7 +5292,7 @@ zabbix_export:
               type: DEPENDENT
               key: 'ms365.copilot.user_activity.loop[{#KEY}]'
               value_type: CHAR
-              description: 'Last date of use Copilot in Microsoft Loop.'
+              description: 'Last date of Copilot use in Microsoft Loop.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -5315,7 +5315,7 @@ zabbix_export:
               type: DEPENDENT
               key: 'ms365.copilot.user_activity.onenote[{#KEY}]'
               value_type: CHAR
-              description: 'Last date of use Copilot in Microsoft OneNote.'
+              description: 'Last date of Copilot use in Microsoft OneNote.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -5338,7 +5338,7 @@ zabbix_export:
               type: DEPENDENT
               key: 'ms365.copilot.user_activity.outlook[{#KEY}]'
               value_type: CHAR
-              description: 'Last date of use Copilot in Microsoft Outlook.'
+              description: 'Last date of Copilot use in Microsoft Outlook.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -5361,7 +5361,7 @@ zabbix_export:
               type: DEPENDENT
               key: 'ms365.copilot.user_activity.powerpoint[{#KEY}]'
               value_type: CHAR
-              description: 'Last date of use Copilot in Microsoft PowerPoint.'
+              description: 'Last date of Copilot use in Microsoft PowerPoint.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -5384,7 +5384,7 @@ zabbix_export:
               type: DEPENDENT
               key: 'ms365.copilot.user_activity.report_date[{#KEY}]'
               value_type: CHAR
-              description: 'The date of the report of the user''s activity.'
+              description: 'The date of the report of user activity.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -5405,7 +5405,7 @@ zabbix_export:
               type: DEPENDENT
               key: 'ms365.copilot.user_activity.teams[{#KEY}]'
               value_type: CHAR
-              description: 'Last date of use Copilot in Microsoft Teams.'
+              description: 'Last date of Copilot use in Microsoft Teams.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -5428,7 +5428,7 @@ zabbix_export:
               type: DEPENDENT
               key: 'ms365.copilot.user_activity.word[{#KEY}]'
               value_type: CHAR
-              description: 'Last date of use Copilot in Microsoft Word.'
+              description: 'Last date of Copilot use in Microsoft Word.'
               preprocessing:
                 - type: JSONPATH
                   parameters:

@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -21,13 +21,13 @@
 
 window.connector_edit_popup = new class {
 
-	init({connectorid, tags}) {
-		this.connectorid = connectorid;
-
+	init({rules, clone_rules, tags}) {
 		this.overlay = overlays_stack.getById('connector.edit');
 		this.dialogue = this.overlay.$dialogue[0];
-		this.form = this.overlay.$dialogue.$body[0].querySelector('form');
 		this.footer = this.overlay.$dialogue.$footer[0];
+		this.form_element = this.overlay.$dialogue.$body[0].querySelector('form');
+		this.form = new CForm(this.form_element, rules);
+		this.clone_rules = clone_rules;
 
 		const return_url = new URL('zabbix.php', location.href);
 		return_url.searchParams.set('action', 'connector.list');
@@ -39,22 +39,42 @@ window.connector_edit_popup = new class {
 			allow_empty: true
 		});
 
-		for (const id of ['data_type', 'tags', 'authtype', 'max_records_mode', 'max_attempts']) {
-			document.getElementById(id).addEventListener('change', () => this._updateForm());
-		}
-
-		this._updateForm();
+		this.#initEvents();
+		this.#updateForm();
 
 		new CFormFieldsetCollapsible(document.getElementById('advanced-configuration'));
 
-		this.form.style.display = '';
+		this.form_element.style.display = '';
 		this.overlay.recoverFocus();
 	}
 
-	_updateForm() {
-		const data_type = this.form.querySelector('[name="data_type"]:checked').value;
+	#initEvents() {
+		for (const id of ['data_type', 'tags', 'authtype', 'max_records_mode']) {
+			document.getElementById(id).addEventListener('input', () => this.#updateForm());
+		}
 
-		for (const element of this.form.querySelectorAll('.js-field-item-value-types')) {
+		document.getElementById('max_attempts').addEventListener('input', () => {
+			this.#updateForm();
+			const field = this.form.findFieldByName('attempt_interval');
+
+			if (field.isDisabled()) {
+				field.unsetErrors();
+				field.showErrors();
+			}
+			else {
+				this.form.validateChanges(['attempt_interval']);
+			}
+		});
+
+		this.footer.querySelector('.js-submit').addEventListener('click', () => this.#submit());
+		this.footer.querySelector('.js-clone')?.addEventListener('click', () => this.#clone());
+		this.footer.querySelector('.js-delete')?.addEventListener('click', () => this.#delete());
+	}
+
+	#updateForm() {
+		const data_type = this.form_element.querySelector('[name="data_type"]:checked').value;
+
+		for (const element of this.form_element.querySelectorAll('.js-field-item-value-types')) {
 			element.style.display = data_type == <?= ZBX_CONNECTOR_DATA_TYPE_ITEM_VALUES ?> ? '' : 'none';
 		}
 
@@ -70,77 +90,94 @@ window.connector_edit_popup = new class {
 			|| authtype == <?= ZBX_HTTP_AUTH_KERBEROS ?> || authtype == <?= ZBX_HTTP_AUTH_DIGEST ?>;
 		const use_token = authtype == <?= ZBX_HTTP_AUTH_BEARER ?>;
 
-		for (const field of this.form.querySelectorAll('.js-field-username, .js-field-password')) {
+		for (const field of this.form_element.querySelectorAll('.js-field-username, .js-field-password')) {
 			field.style.display = use_username_password ? '' : 'none';
 		}
 
-		for (const field of this.form.querySelectorAll('.js-field-token')) {
+		for (const field of this.form_element.querySelectorAll('.js-field-token')) {
 			field.style.display = use_token ? '' : 'none';
 		}
 
-		const max_records_mode = this.form.querySelector('[name="max_records_mode"]:checked').value;
+		const max_records_mode = this.form_element.querySelector('[name="max_records_mode"]:checked').value;
 		document.getElementById('max_records').style.display = max_records_mode == 0 ? 'none' : '';
 
 		document.getElementById('attempt_interval').disabled = document.getElementById('max_attempts').value <= 1;
 	}
 
-	clone({title, buttons}) {
-		this.connectorid = null;
+	#clone() {
+		document.getElementById('connectorid').remove();
+
+		const title = <?= json_encode(_('New connector')) ?>;
+		const buttons = [
+			{
+				title: <?= json_encode(_('Add')) ?>,
+				class: 'js-submit',
+				keepOpen: true,
+				isSubmit: true
+			},
+			{
+				title: <?= json_encode(_('Cancel')) ?>,
+				class: ZBX_STYLE_BTN_ALT,
+				cancel: true,
+				action: ''
+			}
+		];
 
 		this.overlay.unsetLoading();
 		this.overlay.setProperties({title, buttons});
+
+		this.footer.querySelector('.js-submit').addEventListener('click', () => this.#submit());
+
 		this.overlay.recoverFocus();
 		this.overlay.containFocus();
+		this.form.reload(this.clone_rules);
 	}
 
-	delete() {
-		const curl = new Curl('zabbix.php');
-		curl.setArgument('action', 'connector.delete');
-		curl.setArgument(CSRF_TOKEN_NAME, <?= json_encode(CCsrfTokenHelper::get('connector')) ?>);
+	#delete() {
+		if (window.confirm(<?= json_encode(_('Delete selected connector?')) ?>)) {
+			this.#removePopupMessages();
+			const curl = new Curl('zabbix.php');
+			curl.setArgument('action', 'connector.delete');
+			curl.setArgument(CSRF_TOKEN_NAME, <?= json_encode(CCsrfTokenHelper::get('connector')) ?>);
 
-		this._post(curl.getUrl(), {connectorids: [this.connectorid]}, (response) => {
-			overlayDialogueDestroy(this.overlay.dialogueid);
+			this.#post(curl.getUrl(), {connectorids: [document.getElementById('connectorid').value]}, (response) => {
+				overlayDialogueDestroy(this.overlay.dialogueid);
 
-			this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response}));
-		});
+				this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response}));
+			});
+		}
+		else {
+			this.overlay.unsetLoading();
+		}
 	}
 
-	submit() {
-		const fields = getFormFields(this.form);
+	#submit() {
+		this.#removePopupMessages();
+		const fields = this.form.getAllValues();
 
-		if (this.connectorid != null) {
-			fields.connectorid = this.connectorid;
-		}
+		this.form.validateSubmit(fields)
+			.then((result) => {
+				if (!result) {
+					this.overlay.unsetLoading();
+					return;
+				}
 
-		const fields_to_trim = ['name', 'url', 'username', 'token', 'attempt_interval', 'timeout', 'http_proxy',
-			'ssl_cert_file', 'ssl_key_file', 'description'
-		];
-		for (const field of fields_to_trim) {
-			if (field in fields) {
-				fields[field] = fields[field].trim();
-			}
-		}
+				const curl = new Curl('zabbix.php');
+				const action = document.getElementById('connectorid') !== null
+					? 'connector.update'
+					: 'connector.create';
 
-		if ('tags' in fields) {
-			for (const tag of Object.values(fields.tags)) {
-				tag.tag = tag.tag.trim();
-				tag.value = tag.value.trim();
-			}
-		}
+				curl.setArgument('action', action);
 
-		this.overlay.setLoading();
+				this.#post(curl.getUrl(), fields, (response) => {
+					overlayDialogueDestroy(this.overlay.dialogueid);
 
-		const curl = new Curl('zabbix.php');
-		curl.setArgument('action', this.connectorid !== null ? 'connector.update' : 'connector.create');
-
-		this._post(curl.getUrl(), fields, (response) => {
-			overlayDialogueDestroy(this.overlay.dialogueid);
-
-			this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response}));
-		});
+					this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response}));
+				});
+			});
 	}
 
-	_post(url, data, success_callback) {
+	#post(url, data, success_callback) {
 		fetch(url, {
 			method: 'POST',
 			headers: {'Content-Type': 'application/json'},
@@ -152,32 +189,41 @@ window.connector_edit_popup = new class {
 					throw {error: response.error};
 				}
 
+				if ('form_errors' in response) {
+					this.form.setErrors(response.form_errors, true, true);
+					this.form.renderErrors();
+
+					return;
+				}
+
 				return response;
 			})
 			.then(success_callback)
-			.catch((exception) => {
-				for (const element of this.form.parentNode.children) {
-					if (element.matches('.msg-good, .msg-bad, .msg-warning')) {
-						element.parentNode.removeChild(element);
-					}
-				}
+			.catch((exception) => this.#ajaxExceptionHandler(exception))
+			.finally(() => this.overlay.unsetLoading());
+	}
 
-				let title, messages;
+	#removePopupMessages() {
+		for (const el of this.form_element.parentNode.children) {
+			if (el.matches('.msg-good, .msg-bad, .msg-warning')) {
+				el.parentNode.removeChild(el);
+			}
+		}
+	}
 
-				if (typeof exception === 'object' && 'error' in exception) {
-					title = exception.error.title;
-					messages = exception.error.messages;
-				}
-				else {
-					messages = [<?= json_encode(_('Unexpected server error.')) ?>];
-				}
+	#ajaxExceptionHandler(exception) {
+		let title, messages;
 
-				const message_box = makeMessageBox('bad', messages, title)[0];
+		if (typeof exception === 'object' && 'error' in exception) {
+			title = exception.error.title;
+			messages = exception.error.messages;
+		}
+		else {
+			messages = [<?= json_encode(_('Unexpected server error.')) ?>];
+		}
 
-				this.form.parentNode.insertBefore(message_box, this.form);
-			})
-			.finally(() => {
-				this.overlay.unsetLoading();
-			});
+		const message_box = makeMessageBox('bad', messages, title)[0];
+
+		this.form_element.parentNode.insertBefore(message_box, this.form_element);
 	}
 };
