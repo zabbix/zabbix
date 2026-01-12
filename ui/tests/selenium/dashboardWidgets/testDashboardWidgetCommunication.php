@@ -2403,7 +2403,7 @@ class testDashboardWidgetCommunication extends testWidgetCommunication {
 				case 'honeycomb':
 					$selected_element = $widget->query('xpath:.//div[text()='.CXPathHelper::escapeQuotes($selected).
 							']/../../../..'
-					)->one();
+					)->waitUntilPresent()->one();
 					break;
 			}
 
@@ -3283,7 +3283,7 @@ class testDashboardWidgetCommunication extends testWidgetCommunication {
 
 		// Select a host on the broadcaster.
 		$this->getWidgetElement($host, $broadcaster)->click();
-		CDashboardElement::find()->one()->waitUntilReady();
+		$dashboard = CDashboardElement::find()->one()->waitUntilReady();;
 
 		// Check the item that is selected on the re-broadcaster.
 		$rebroadcaster_selected = ($this->getWidgetType($rebroadcaster) === 'honeycomb')
@@ -3291,6 +3291,7 @@ class testDashboardWidgetCommunication extends testWidgetCommunication {
 			: $host;
 
 		$this->checkSelectedElement($rebroadcaster, $rebroadcaster_selected, $host_items[$host]['key']);
+		$dashboard->waitUntilReady();
 		$listener->invalidate();
 
 		// Check the name of the listener widget and the value that is displayed on it.
