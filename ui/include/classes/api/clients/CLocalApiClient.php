@@ -262,7 +262,7 @@ class CLocalApiClient extends CApiClient {
 			' ORDER by name'
 		);
 
-		$api_access_mode = false;
+		$is_api_allow_list = false;
 		$api_methods = [];
 		$actions_default_access = true;
 		$is_action_allowed = null;
@@ -272,17 +272,17 @@ class CLocalApiClient extends CApiClient {
 
 			switch ($db_rule['name']) {
 				case 'api.access':
-					if ($rule_value == 0) {
+					if ($rule_value == ZBX_ROLE_RULE_DISABLED) {
 						return false;
 					}
 					break;
 
 				case 'api.mode':
-					$api_access_mode = (bool) $rule_value;
+					$is_api_allow_list = $rule_value == ZBX_ROLE_RULE_API_MODE_ALLOW;
 					break;
 
 				case 'actions.default_access':
-					$actions_default_access = (bool) $rule_value;
+					$actions_default_access = $rule_value == ZBX_ROLE_RULE_ENABLED;
 					break;
 
 				default:
@@ -290,13 +290,13 @@ class CLocalApiClient extends CApiClient {
 						$api_methods[] = $rule_value;
 					}
 					elseif ($exists_action_rule && $db_rule['name'] === $method_rules['action']) {
-						$is_action_allowed = (bool) $rule_value;
+						$is_action_allowed = $rule_value == ZBX_ROLE_RULE_ENABLED;
 					}
 			}
 		}
 
 		if ($exists_action_rule) {
-			$is_action_allowed = ($is_action_allowed !== null) ? $is_action_allowed : $actions_default_access;
+			$is_action_allowed = $is_action_allowed !== null ? $is_action_allowed : $actions_default_access;
 
 			if (!$is_action_allowed) {
 				return false;
@@ -310,10 +310,10 @@ class CLocalApiClient extends CApiClient {
 
 		foreach ($api_methods as $api_method) {
 			if ($api_method === $api.'.'.$method || in_array($api_method, $api_method_masks)) {
-				return $api_access_mode;
+				return $is_api_allow_list;
 			}
 		}
 
-		return !$api_access_mode;
+		return $is_api_allow_list ? false : true;
 	}
 }

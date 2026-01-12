@@ -141,6 +141,17 @@ class CRoleHelper {
 	}
 
 	/**
+	 * Returns mode for treating API methods: 0 - deny list; 1 - allow list.
+	 *
+	 * @throws Exception
+	 */
+	public static function getRoleApiListMode(string $roleid): int {
+		self::loadRoleRules($roleid);
+
+		return (int) self::$roles[$roleid]['rules']['api.mode'];
+	}
+
+	/**
 	 * Gets list of API methods (with wildcards if that exists) that are considered allowed or denied (depending on
 	 * API access mode) for specific role.
 	 *
@@ -170,8 +181,12 @@ class CRoleHelper {
 
 		if (!$roleid) {
 			self::$roles[0] = [
-				'type'	=> USER_TYPE_ZABBIX_USER,
-				'rules' => ['api' => []]
+				'type' => USER_TYPE_ZABBIX_USER,
+				'rules' => [
+					'api' => [],
+					'api.access' => (bool) ZBX_ROLE_RULE_DISABLED,
+					'api.mode' => ZBX_ROLE_RULE_API_MODE_DENY
+				]
 			];
 
 			return;
@@ -195,7 +210,7 @@ class CRoleHelper {
 			'ui.default_access' => (bool) $role['rules']['ui.default_access'],
 			'modules.default_access' => (bool) $role['rules']['modules.default_access'],
 			'api.access' => (bool) $role['rules']['api.access'],
-			'api.mode' => (bool) $role['rules']['api.mode'],
+			'api.mode' => (int) $role['rules']['api.mode'],
 			'api' => $role['rules']['api'],
 			'actions.default_access' => (bool) $role['rules']['actions.default_access']
 		];
