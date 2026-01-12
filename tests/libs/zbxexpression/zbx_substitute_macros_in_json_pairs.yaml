@@ -1,0 +1,103 @@
+test case: simple substitution
+in:
+  buffer: '{"b1":"[]", "b2":"()"}'
+  data: |
+    [
+      { "{#B1}": "{#B1}" },
+      { "{#B2}": "{#B2}" }
+    ]
+  macros:
+    - { macro: '{#B1}', path: $.b1 }
+    - { macro: '{#B2}', path: $.b2 }
+out:
+  data: '[{"[]":"[]"},{"()":"()"}]'
+  return: SUCCEED
+---
+test case: numbers
+in:
+  buffer: '{"id":123, "name":"disk1"}'
+  data: |
+    [
+      { "{#ID}": "{#NAME}" }
+    ]
+  macros:
+    - { macro: '{#ID}', path: $.id }
+    - { macro: '{#NAME}', path: $.name }
+out:
+  data: '[{"123":"disk1"}]'
+  return: SUCCEED
+---
+test case: no substitution needed
+in:
+  buffer: '{"unused":"test"}'
+  data: |
+    [
+      { "iface": "eth0" }
+    ]
+  macros:
+    - { macro: '{#NAME}', path: $.unused }
+out:
+  data: '[{"iface":"eth0"}]'
+  return: SUCCEED
+---
+test case: nested macro substitution
+in:
+  buffer: '{"interface":{"name":"eth0"}}'
+  data: |
+    [
+      { "iface": "{#IFNAME}" }
+    ]
+  macros:
+    - { macro: '{#IFNAME}', path: $.interface.name }
+out:
+  data: '[{"iface":"eth0"}]'
+  return: SUCCEED
+---
+test case: macro in key and value
+in:
+  buffer: '{"id":"abc123"}'
+  data: |
+    [
+      { "{#ID}": "{#ID}" }
+    ]
+  macros:
+    - { macro: '{#ID}', path: $.id }
+out:
+  data: '[{"abc123":"abc123"}]'
+  return: SUCCEED
+---
+test case: data empty line
+in:
+  buffer: '{"id":"abc123"}'
+  data: ""
+  macros:
+    - { macro: '{#ID}', path: $.id }
+out:
+  data: ''
+  return: SUCCEED
+---
+test case: macro in key and value all printable ASCII characters
+in:
+  buffer: '{"id":"(#$%&()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[]^_`abcdefghijklmnopqrstuvwxyz|~"}'
+  data: |
+    [
+      { "{#ID}": "{#ID}" }
+    ]
+  macros:
+    - { macro: '{#ID}', path: $.id }
+out:
+  data: '[{"(#$%&()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[]^_`abcdefghijklmnopqrstuvwxyz|~":"(#$%&()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[]^_`abcdefghijklmnopqrstuvwxyz|~"}]'
+  return: SUCCEED
+---
+test case: macro in key and value emojis
+in:
+  buffer: '{"id":"😀😃😄😁😆😅😂🤣😊😇🙂🙃😉😌😍🥰😘😗😙😚😋😛😝😜🤪🤨🧐🤓😎🥳🤠🤡🤥🤫🤭🧐🤓😎🥳🤠🤡🤥🤫🤭"}'
+  data: |
+    [
+      { "{#ID}": "{#ID}" }
+    ]
+  macros:
+    - { macro: '{#ID}', path: $.id }
+out:
+  data: '[{"😀😃😄😁😆😅😂🤣😊😇🙂🙃😉😌😍🥰😘😗😙😚😋😛😝😜🤪🤨🧐🤓😎🥳🤠🤡🤥🤫🤭🧐🤓😎🥳🤠🤡🤥🤫🤭":"😀😃😄😁😆😅😂🤣😊😇🙂🙃😉😌😍🥰😘😗😙😚😋😛😝😜🤪🤨🧐🤓😎🥳🤠🤡🤥🤫🤭🧐🤓😎🥳🤠🤡🤥🤫🤭"}]'
+  return: SUCCEED
