@@ -50,12 +50,15 @@ class CControllerFavoriteCreate extends CController {
 		$result = CFavorite::add($profile[$object], $objectid, $object);
 		$result = DBend($result);
 
+		$aria_label = $object == 'sysmapid' ? _('Remove map from the Favorite maps widget')
+			: _('Remove graph from the Favorite graphs widget');
+
 		if ($result) {
 			$data['main_block'] = '
 				var addrm_fav = document.getElementById("addrm_fav");
 
 				if (addrm_fav !== null) {
-					addrm_fav.setAttribute("aria-label", "'._('Remove map from the Favorite maps widget').'");
+					addrm_fav.setAttribute("aria-label", "'.$aria_label.'");
 					addrm_fav.setAttribute("data-hintbox-contents", "'._('Remove from favorites').'");
 					addrm_fav.onclick = () => rm4favorites("'.$object.'", "'.$objectid.'");
 					addrm_fav.classList.add("'.ZBX_ICON_STAR_FILLED.'");
