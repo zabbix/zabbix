@@ -456,8 +456,9 @@ class CSvgGraph {
 
 		if (this.#graph_type === GRAPH_TYPE_SCATTER_PLOT) {
 			if (in_values_area) {
-				const offsetY = e.clientY - svg_rect.top;
+				this.#setHelperPosition(e);
 
+				const offsetY = e.clientY - svg_rect.top;
 				const included_points = this.#findScatterPlotPoints(offsetX, offsetY);
 
 				for (const highlighter_point of this.#svg.querySelectorAll('g.js-svg-highlight-group')) {
