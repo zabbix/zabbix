@@ -107,15 +107,15 @@ static void	alerter_send_result(zbx_ipc_socket_t *socket, const char *value, int
 	zbx_free(data);
 }
 
-static char	*generate_sendto_md5(const char *sendto)
+static char	*generate_sendto_hash(const char *sendto)
 {
 	const char	*hex = "0123456789abcdef";
 	md5_state_t	state;
 	md5_byte_t	hash[ZBX_MD5_DIGEST_SIZE];
-	char		*sendto_md5;
+	char		*sendto_hash;
 	int		i, pos;
 
-	sendto_md5 = zbx_malloc(NULL, ZBX_MD5_DIGEST_SIZE * 2 + 1);
+	sendto_hash = zbx_malloc(NULL, ZBX_MD5_DIGEST_SIZE * 2 + 1);
 
 	zbx_md5_init(&state);
 	zbx_md5_append(&state, (const md5_byte_t *)sendto, strlen(sendto));
@@ -123,15 +123,15 @@ static char	*generate_sendto_md5(const char *sendto)
 
 	for (i = 0, pos = 0; i < ZBX_MD5_DIGEST_SIZE; i++)
 	{
-		sendto_md5[pos++] = hex[hash[i] >> 4];
-		sendto_md5[pos++] = hex[hash[i] & 15];
+		sendto_hash[pos++] = hex[hash[i] >> 4];
+		sendto_hash[pos++] = hex[hash[i] & 15];
 	}
-	sendto_md5[pos] = '\0';
+	sendto_hash[pos] = '\0';
 
-	return sendto_md5;
+	return sendto_hash;
 }
 
-static char	*create_email_messageid(zbx_uint64_t mediatypeid, const char *sendto_md5, zbx_uint64_t eventid,
+static char	*create_email_messageid(zbx_uint64_t mediatypeid, const char *sendto_hash, zbx_uint64_t eventid,
 		zbx_uint64_t actionid, zbx_uint64_t alertid, int message_type, int process_num)
 {
 	static unsigned short	counter = 0;
@@ -149,7 +149,7 @@ static char	*create_email_messageid(zbx_uint64_t mediatypeid, const char *sendto
 						"<" ZBX_FS_UI64 "-" ZBX_FS_UI64
 						".%s." ZBX_FS_UI64 ".%s@zabbix-events>",
 						eventid, actionid,
-						sendto_md5, mediatypeid, zbx_dc_get_instanceid());
+						sendto_hash, mediatypeid, zbx_dc_get_instanceid());
 			}
 			else
 			{
@@ -157,7 +157,7 @@ static char	*create_email_messageid(zbx_uint64_t mediatypeid, const char *sendto
 						"<" ZBX_FS_UI64 "-" ZBX_FS_UI64 "-" ZBX_FS_UI64
 						".%s." ZBX_FS_UI64 ".%s@zabbix-events>",
 						eventid, actionid, alertid,
-						sendto_md5, mediatypeid, zbx_dc_get_instanceid());
+						sendto_hash, mediatypeid, zbx_dc_get_instanceid());
 			}
 			break;
 		case ALERT_MESSAGE_REPORT:
@@ -168,7 +168,7 @@ static char	*create_email_messageid(zbx_uint64_t mediatypeid, const char *sendto
 					".%s." ZBX_FS_UI64 ".%s@zabbix-reports>",
 					1900 + tm.tm_year, 1 + tm.tm_mon, tm.tm_mday,
 					tm.tm_hour, tm.tm_min, tm.tm_sec, eventid,
-					sendto_md5, mediatypeid, zbx_dc_get_instanceid());
+					sendto_hash, mediatypeid, zbx_dc_get_instanceid());
 			break;
 		default:
 			zbx_get_time(&tm, &ms, NULL);
@@ -178,7 +178,7 @@ static char	*create_email_messageid(zbx_uint64_t mediatypeid, const char *sendto
 					".%s." ZBX_FS_UI64 ".%s@zabbix>",
 					1900 + tm.tm_year, 1 + tm.tm_mon, tm.tm_mday,
 					tm.tm_hour, tm.tm_min, tm.tm_sec, process_num, counter++,
-					sendto_md5, mediatypeid, zbx_dc_get_instanceid());
+					sendto_hash, mediatypeid, zbx_dc_get_instanceid());
 			break;
 	}
 
@@ -196,7 +196,7 @@ static char	*create_email_messageid(zbx_uint64_t mediatypeid, const char *sendto
  * Return value: In-Reply_To field value                                      *
  *                                                                            *
  ******************************************************************************/
-static char	*create_email_inreplyto(zbx_uint64_t mediatypeid, const char *sendto_md5, zbx_uint64_t eventid,
+static char	*create_email_inreplyto(zbx_uint64_t mediatypeid, const char *sendto_hash, zbx_uint64_t eventid,
 		zbx_uint64_t actionid, int message_type)
 {
 	char		*str = NULL;
@@ -209,14 +209,14 @@ static char	*create_email_inreplyto(zbx_uint64_t mediatypeid, const char *sendto
 					"<" ZBX_FS_UI64 "-" ZBX_FS_UI64
 					".%s." ZBX_FS_UI64 ".%s@zabbix-events>",
 					eventid, actionid,
-					sendto_md5, mediatypeid, zbx_dc_get_instanceid());
+					sendto_hash, mediatypeid, zbx_dc_get_instanceid());
 			break;
 		case ALERT_MESSAGE_REPORT:
 			zbx_snprintf_alloc(&str, &str_alloc, &str_offset,
 					"<" ZBX_FS_UI64
 					".%s." ZBX_FS_UI64 ".%s@zabbix-reports>",
 					eventid,
-					sendto_md5, mediatypeid, zbx_dc_get_instanceid());
+					sendto_hash, mediatypeid, zbx_dc_get_instanceid());
 			break;
 		default:
 			break;
@@ -288,7 +288,7 @@ static void	alerter_process_email(zbx_ipc_socket_t *socket, zbx_ipc_message_t *i
 {
 	zbx_uint64_t	alertid, mediatypeid, eventid, p_eventid, actionid, objectid;
 	char		*sendto, *subject, *message, *smtp_server, *smtp_helo, *smtp_email, *smtp_username,
-			*smtp_password, *sendto_md5 = NULL, *messageid = NULL, *inreplyto = NULL, *expression,
+			*smtp_password, *sendto_hash = NULL, *messageid = NULL, *inreplyto = NULL, *expression,
 			*recovery_expression, *mediatype_name, *error = NULL;
 	unsigned short	smtp_port;
 	unsigned char	smtp_authentication, smtp_security, smtp_verify_peer, smtp_verify_host, message_format;
@@ -324,17 +324,17 @@ static void	alerter_process_email(zbx_ipc_socket_t *socket, zbx_ipc_message_t *i
 		zbx_db_trigger_clean(&event.trigger);
 	}
 
-	sendto_md5 = generate_sendto_md5(sendto);
+	sendto_hash = generate_sendto_hash(sendto);
 
 	if (0 != p_eventid)
 	{
-		messageid = create_email_messageid(mediatypeid, sendto_md5, eventid, actionid,
+		messageid = create_email_messageid(mediatypeid, sendto_hash, eventid, actionid,
 				eventid == p_eventid ? alertid : 0, message_type, process_num);
 
-		inreplyto = create_email_inreplyto(mediatypeid, sendto_md5, p_eventid, actionid, message_type);
+		inreplyto = create_email_inreplyto(mediatypeid, sendto_hash, p_eventid, actionid, message_type);
 	}
 	else
-		messageid = create_email_messageid(mediatypeid, sendto_md5, eventid, actionid,
+		messageid = create_email_messageid(mediatypeid, sendto_hash, eventid, actionid,
 				0, message_type, process_num);
 
 	ret = send_email(smtp_server, smtp_port, smtp_helo, smtp_email, sendto, messageid, inreplyto, subject, message,
@@ -347,7 +347,7 @@ static void	alerter_process_email(zbx_ipc_socket_t *socket, zbx_ipc_message_t *i
 	zbx_free(error);
 	zbx_free(inreplyto);
 	zbx_free(messageid);
-	zbx_free(sendto_md5);
+	zbx_free(sendto_hash);
 	zbx_free(sendto);
 	zbx_free(subject);
 	zbx_free(mediatype_name);
