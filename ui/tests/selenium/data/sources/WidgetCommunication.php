@@ -1059,6 +1059,51 @@ class WidgetCommunication {
 										'value' => 0
 									]
 								]
+							],
+							[
+								'type' => 'problems',
+								'name' => 'Problems listener',
+								'x' => 21,
+								'y' => 14,
+								'width' => 19,
+								'height' => 3,
+								'fields' => [
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'groupids._reference',
+										'value' => 'NRDLG._hostgroupids'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_HOST,
+										'name' => 'hostids.0',
+										'value' => $hostids[self::FIRST_HOST_NAME]
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_HOST,
+										'name' => 'hostids.1',
+										'value' => $hostids[self::SECOND_HOST_NAME]
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_HOST,
+										'name' => 'hostids.2',
+										'value' => $hostids[self::THIRD_HOST_NAME]
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'show_timeline',
+										'value' => 0
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'reference',
+										'value' => 'MTXTK'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'rf_rate',
+										'value' => 0
+									]
+								]
 							]
 						]
 					],

@@ -216,6 +216,20 @@ class testDashboardWidgetCommunication extends testWidgetCommunication {
 					'index' => 4,
 					'count' => 1
 				]
+			],
+			'Problems listener' => [
+				[
+					'Host' => self::THIRD_HOST_NAME,
+					'Problem • Severity' => self::THIRD_HOST_TRIGGER
+				],
+				[
+					'Host' => self::SECOND_HOST_NAME,
+					'Problem • Severity' => self::SECOND_HOST_TRIGGER
+				],
+				[
+					'Host' => self::FIRST_HOST_NAME,
+					'Problem • Severity' => self::FIRST_HOST_TRIGGER
+				]
 			]
 		],
 		'Hosts page' => [
@@ -433,6 +447,10 @@ class testDashboardWidgetCommunication extends testWidgetCommunication {
 								'severity' => 'info',
 								'count' => 1
 							]
+						],
+						'Problems listener' => [
+							'Host' => self::FIRST_HOST_NAME,
+							'Problem • Severity' => self::FIRST_HOST_TRIGGER
 						]
 					]
 				]
@@ -506,6 +524,10 @@ class testDashboardWidgetCommunication extends testWidgetCommunication {
 								'severity' => 'high',
 								'count' => 1
 							]
+						],
+						'Problems listener' => [
+							'Host' => self::THIRD_HOST_NAME,
+							'Problem • Severity' => self::THIRD_HOST_TRIGGER
 						]
 					]
 				]
@@ -579,6 +601,10 @@ class testDashboardWidgetCommunication extends testWidgetCommunication {
 								'severity' => 'warning',
 								'count' => 1
 							]
+						],
+						'Problems listener' => [
+							'Host' => self::SECOND_HOST_NAME,
+							'Problem • Severity' => self::SECOND_HOST_TRIGGER
 						]
 					]
 				]
@@ -659,6 +685,10 @@ class testDashboardWidgetCommunication extends testWidgetCommunication {
 								'severity' => 'info',
 								'count' => 1
 							]
+						],
+						'Problems listener' => [
+							'Host' => self::FIRST_HOST_NAME,
+							'Problem • Severity' => self::FIRST_HOST_TRIGGER
 						]
 					]
 				]
@@ -732,6 +762,10 @@ class testDashboardWidgetCommunication extends testWidgetCommunication {
 								'severity' => 'warning',
 								'count' => 1
 							]
+						],
+						'Problems listener' => [
+							'Host' => self::SECOND_HOST_NAME,
+							'Problem • Severity' => self::SECOND_HOST_TRIGGER
 						]
 					]
 				]
@@ -805,6 +839,10 @@ class testDashboardWidgetCommunication extends testWidgetCommunication {
 								'severity' => 'high',
 								'count' => 1
 							]
+						],
+						'Problems listener' => [
+							'Host' => self::THIRD_HOST_NAME,
+							'Problem • Severity' => self::THIRD_HOST_TRIGGER
 						]
 					]
 				]
@@ -878,6 +916,10 @@ class testDashboardWidgetCommunication extends testWidgetCommunication {
 								'severity' => 'info',
 								'count' => 1
 							]
+						],
+						'Problems listener' => [
+							'Host' => self::FIRST_HOST_NAME,
+							'Problem • Severity' => self::FIRST_HOST_TRIGGER
 						]
 					]
 				]
@@ -951,6 +993,10 @@ class testDashboardWidgetCommunication extends testWidgetCommunication {
 								'severity' => 'warning',
 								'count' => 1
 							]
+						],
+						'Problems listener' => [
+							'Host' => self::SECOND_HOST_NAME,
+							'Problem • Severity' => self::SECOND_HOST_TRIGGER
 						]
 					]
 				]
@@ -1024,6 +1070,10 @@ class testDashboardWidgetCommunication extends testWidgetCommunication {
 								'severity' => 'high',
 								'count' => 1
 							]
+						],
+						'Problems listener' => [
+							'Host' => self::THIRD_HOST_NAME,
+							'Problem • Severity' => self::THIRD_HOST_TRIGGER
 						]
 					]
 				]
@@ -1097,6 +1147,10 @@ class testDashboardWidgetCommunication extends testWidgetCommunication {
 								'severity' => 'info',
 								'count' => 1
 							]
+						],
+						'Problems listener' => [
+							'Host' => self::FIRST_HOST_NAME,
+							'Problem • Severity' => self::FIRST_HOST_TRIGGER
 						]
 					]
 				]
@@ -1170,6 +1224,10 @@ class testDashboardWidgetCommunication extends testWidgetCommunication {
 								'severity' => 'high',
 								'count' => 1
 							]
+						],
+						'Problems listener' => [
+							'Host' => self::THIRD_HOST_NAME,
+							'Problem • Severity' => self::THIRD_HOST_TRIGGER
 						]
 					]
 				]
@@ -1243,6 +1301,10 @@ class testDashboardWidgetCommunication extends testWidgetCommunication {
 								'severity' => 'warning',
 								'count' => 1
 							]
+						],
+						'Problems listener' => [
+							'Host' => self::SECOND_HOST_NAME,
+							'Problem • Severity' => self::SECOND_HOST_TRIGGER
 						]
 					]
 				]
