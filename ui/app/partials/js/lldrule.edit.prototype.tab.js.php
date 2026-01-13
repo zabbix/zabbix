@@ -100,7 +100,7 @@ var LldRuleEditPrototypeTab = class {
 
 	#initEvents() {
 		const input_selectors = ['[name="authtype"]', '[name="custom_timeout"]', '[name="lifetime_type"]',
-			'[name="enabled_lifetime_type"]'
+			'[name="enabled_lifetime_type"]', '[name="key"]'
 		];
 		const inputs = this.#container.querySelectorAll(input_selectors.join(','));
 
@@ -109,8 +109,9 @@ var LldRuleEditPrototypeTab = class {
 		});
 
 		this.#container.querySelector('[name="type"]').addEventListener('change', (e) => {
-			this.#host_interface_selector.setType(parseInt(e.target.value, 10));
-			this.#container.dispatchEvent(new CustomEvent('update'))
+			this.#host_interface_selector.setType(parseInt(e.target.value));
+			this.#container.dispatchEvent(new CustomEvent('update'));
+			this.#update();
 		});
 
 		this.#container.querySelector('[name="key"]').addEventListener('change', () =>
@@ -139,6 +140,20 @@ var LldRuleEditPrototypeTab = class {
 	}
 
 	#update() {
+		const type = parseInt(this.#container.querySelector('[name="type"]').value);
+		const key = this.#container.querySelector('[name="key"]').value
+		const username_required = type == <?= ITEM_TYPE_SSH ?> || type == <?= ITEM_TYPE_TELNET ?>;
+		const ipmi_sensor_required = type == <?= ITEM_TYPE_IPMI ?> && key !== 'ipmi.get';
+
+		this.#container.querySelector('[name="username"]')
+			[username_required ? 'setAttribute' : 'removeAttribute']('aria-required', 'true');
+		this.#container.querySelector('label[for="username"]').classList
+			.toggle('<?= ZBX_STYLE_FIELD_LABEL_ASTERISK ?>', username_required);
+		this.#container.querySelector('[name="ipmi_sensor"]')
+			[ipmi_sensor_required ? 'setAttribute' : 'removeAttribute']('aria-required', 'true');
+		this.#container.querySelector('label[for="ipmi_sensor"]').classList
+			.toggle('<?= ZBX_STYLE_FIELD_LABEL_ASTERISK ?>', ipmi_sensor_required);
+
 		const lifetime_type = this.#container.querySelector('[name="lifetime_type"]:checked').value;
 		const enabled_lifetime_type = this.#container.querySelector('[name="enabled_lifetime_type"]:checked').value;
 		const delete_immediately = lifetime_type == <?= ZBX_LLD_DELETE_IMMEDIATELY ?>;
@@ -159,7 +174,6 @@ var LldRuleEditPrototypeTab = class {
 
 		this.#container.querySelector('[name="inherited_timeout"]').classList
 			.toggle('<?= ZBX_STYLE_DISPLAY_NONE ?>', inherited_hidden);
-
 		this.#container.querySelector('[name="timeout"]').classList
 			.toggle('<?= ZBX_STYLE_DISPLAY_NONE ?>', !inherited_hidden);
 	}

@@ -183,6 +183,7 @@ foreach (get_preprocessing_types(null, true, $data['preprocessing_types']) as $g
 			->setErrorContainer('preprocessing-#{rowNum}-error-container'),
 		(new CCheckBox('preprocessing[#{rowNum}][params_2]', ZBX_PREPROC_CSV_HEADER))
 			->setLabel(_('With header row'))
+			->setUncheckedValue(ZBX_PREPROC_CSV_NO_HEADER)
 			->setChecked(true)
 	]))->addClass('preprocessing-steps-parameters-csv-to-json-tmpl'),
 	(new CTemplateTag('', [

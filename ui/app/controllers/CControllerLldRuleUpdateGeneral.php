@@ -190,7 +190,9 @@ abstract class CControllerLldRuleUpdateGeneral extends CController {
 				'when' => ['type', 'in' => [ITEM_TYPE_JMX]]
 			],
 			'username' => [
-				['db items.username', 'when' => ['type', 'in' => [ITEM_TYPE_JMX, ITEM_TYPE_SIMPLE]]],
+				['db items.username',
+					'when' => ['type', 'in' => [ITEM_TYPE_SIMPLE, ITEM_TYPE_JMX, ITEM_TYPE_DB_MONITOR]]
+				],
 				['db items.username', 'required', 'not_empty',
 					'when' => ['type', 'in' => [ITEM_TYPE_SSH, ITEM_TYPE_TELNET]]
 				]
@@ -207,7 +209,15 @@ abstract class CControllerLldRuleUpdateGeneral extends CController {
 					['authtype', 'in' => [ITEM_AUTHTYPE_PUBLICKEY]]
 				]
 			],
-			'password' => ['db items.password', 'when' => ['type', 'in' => [ITEM_TYPE_SSH]]],
+			'password' => [
+				['db items.password', 'when' => ['type',
+					'in' => [ITEM_TYPE_SIMPLE, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_JMX]
+				]],
+				['db items.password', 'required', 'not_empty', 'when' => [
+					['type', 'in' => [ITEM_TYPE_JMX]],
+					['username', 'not_empty']
+				]]
+			],
 			'params_es' => ['db items.params', 'required', 'not_empty',
 				'when' => ['type', 'in' => [ITEM_TYPE_SSH, ITEM_TYPE_TELNET]]
 			],
@@ -312,13 +322,23 @@ abstract class CControllerLldRuleUpdateGeneral extends CController {
 			'allow_traps' => ['db items.allow_traps', 'in' => [HTTPCHECK_ALLOW_TRAPS_OFF, HTTPCHECK_ALLOW_TRAPS_ON],
 				'when' => ['type', 'in' => [ITEM_TYPE_HTTPAGENT]]
 			],
-			'trapper_hosts' => ['db items.trapper_hosts',
-				'use' => [CIPRangeParser::class, ['v6' => ZBX_HAVE_IPV6, 'dns' => true, 'usermacros' => true,
-					'macros' => ['{HOST.HOST}', '{HOSTNAME}', '{HOST.NAME}', '{HOST.CONN}', '{HOST.IP}', '{IPADDRESS}',
-						'{HOST.DNS}'
-					]
-				]],
-				'when' => ['allow_traps', 'in' => [HTTPCHECK_ALLOW_TRAPS_ON]]
+			'trapper_hosts' => [
+				['db items.trapper_hosts',
+					'use' => [CIPRangeParser::class, ['v6' => ZBX_HAVE_IPV6, 'dns' => true, 'usermacros' => true,
+						'macros' => ['{HOST.HOST}', '{HOSTNAME}', '{HOST.NAME}', '{HOST.CONN}', '{HOST.IP}',
+							'{IPADDRESS}', '{HOST.DNS}'
+						]
+					]],
+					'when' => ['allow_traps', 'in' => [HTTPCHECK_ALLOW_TRAPS_ON]]
+				],
+				['db items.trapper_hosts',
+					'use' => [CIPRangeParser::class, ['v6' => ZBX_HAVE_IPV6, 'dns' => true, 'usermacros' => true,
+						'macros' => ['{HOST.HOST}', '{HOSTNAME}', '{HOST.NAME}', '{HOST.CONN}', '{HOST.IP}',
+							'{IPADDRESS}', '{HOST.DNS}'
+						]
+					]],
+					'when' => ['type', 'in' => [ITEM_TYPE_TRAPPER]]
+				]
 			],
 			'description' => ['db items.description'],
 			'status' => ['db items.status', 'in' => [ITEM_STATUS_ACTIVE, ITEM_STATUS_DISABLED]],
