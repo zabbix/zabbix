@@ -439,9 +439,6 @@ class CSvgGraph {
 		const offsetX = e.clientX - svg_rect.left;
 
 		let html = null;
-		let in_x = false;
-		let in_values_area = false;
-		let in_problem_area = false;
 
 		if (this.#is_boxing) {
 			this.#hideHelper();
@@ -450,9 +447,10 @@ class CSvgGraph {
 		}
 
 		// Check if mouse in the horizontal area in which hintbox must be shown.
-		in_x = this.#dimX <= offsetX && offsetX <= this.#dimX + this.#dimW;
-		in_problem_area = in_x && this.#dimY + this.#dimH <= e.offsetY && e.offsetY <= this.#dimY + this.#dimH + 15;
-		in_values_area = in_x && this.#dimY <= e.offsetY && e.offsetY <= this.#dimY + this.#dimH;
+		const in_x = this.#dimX <= offsetX && offsetX <= this.#dimX + this.#dimW;
+		const in_problem_area = in_x && this.#dimY + this.#dimH <= e.offsetY
+			&& e.offsetY <= this.#dimY + this.#dimH + 15;
+		const in_values_area = in_x && this.#dimY <= e.offsetY && e.offsetY <= this.#dimY + this.#dimH;
 
 		if (this.#graph_type === GRAPH_TYPE_SCATTER_PLOT) {
 			if (in_values_area) {
@@ -470,6 +468,14 @@ class CSvgGraph {
 						const point_highlight = point.g.querySelector('g.js-svg-highlight-group');
 
 						point_highlight.setAttribute('transform', point.transform);
+					});
+
+					included_points.sort((p1, p2) => {
+						if (p1.x !== p2.x) {
+							return p2.x - p1.x;
+						}
+
+						return p1.y - p2.y;
 					});
 
 					html = this.#getScatterPlotValuesHintboxHtml(included_points);
@@ -554,18 +560,7 @@ class CSvgGraph {
 				});
 
 				if (show_hint) {
-					included_points.sort((p1, p2) => {
-						if (this.#graph_type === GRAPH_TYPE_SVG_GRAPH) {
-							return p1.y - p2.y;
-						}
-						else {
-							if (p1.x !== p2.x) {
-								return p2.x - p1.x;
-							}
-
-							return p1.y - p2.y;
-						}
-					});
+					included_points.sort((p1, p2) => p1.y - p2.y);
 
 					html = this.#getSvgGraphValuesHintboxHtml(included_points, offsetX);
 				}
