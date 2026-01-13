@@ -475,6 +475,9 @@ class CSvgGraph {
 					html = this.#getScatterPlotValuesHintboxHtml(included_points);
 				}
 			}
+			else {
+				this.#hideHelper();
+			}
 		}
 		// Show problems when mouse is in the 15px high area under the graph canvas.
 		else if (this.#show_problems && in_problem_area) {
