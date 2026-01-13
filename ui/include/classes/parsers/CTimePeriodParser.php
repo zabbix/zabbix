@@ -51,6 +51,7 @@ class CTimePeriodParser extends CParser {
 	public function parse($source, $pos = 0) {
 		$this->length = 0;
 		$this->match = '';
+		$this->period_parts = [];
 
 		$p = $pos;
 
@@ -99,19 +100,24 @@ class CTimePeriodParser extends CParser {
 			return false;
 		}
 
-		$this->period_parts = $this->normalizePeriodParts($matches);
+		$this->period_parts = self::normalizePeriodParts($matches);
 
 		$pos += strlen($matches[0]);
 
 		return true;
 	}
 
-	public function getPeriodParts() {
+	/**
+	 * Retrieve the time period parts.
+	 *
+	 * @return array
+	 */
+	public function getPeriodParts(): array {
 		return $this->period_parts;
 	}
 
-	private function normalizePeriodParts(array $matches) {
-		$parts = array_filter($matches, fn($key) => !is_int($key), ARRAY_FILTER_USE_KEY);
+	private static function normalizePeriodParts(array $matches): array {
+		$parts = array_filter($matches, static fn($key) => !is_int($key), ARRAY_FILTER_USE_KEY);
 
 		$parts['wd_till'] = $parts['wd_till'] ?: $parts['wd_from'];
 

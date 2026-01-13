@@ -2039,7 +2039,7 @@ function parse_period($str) {
 		return null;
 	}
 
-	foreach ($time_periods_parser->getPeriodParts() as $period_parts) {
+	foreach ($time_periods_parser->getPeriodsParts() as $period_parts) {
 		$start_day = (int) $period_parts['wd_from'];
 		$end_day = (int) $period_parts['wd_till'];
 

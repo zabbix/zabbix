@@ -29,132 +29,14 @@ class CTimePeriodsParserTest extends TestCase {
 				[
 					'rc' => CParser::PARSE_SUCCESS,
 					'match' => '1-3,00:01-00:02',
-					'periods' => ['1-3,00:01-00:02']
-				]
-			],
-			[
-				'3-4,00:05-00:06;4-5,00:07-00:08', 0, [],
-				[
-					'rc' => CParser::PARSE_SUCCESS,
-					'match' => '3-4,00:05-00:06;4-5,00:07-00:08',
-					'periods' => ['3-4,00:05-00:06', '4-5,00:07-00:08']
-				]
-			],
-			[
-				'1-7,00:00-24:00;{$MACRO}', 0, ['usermacros' => true],
-				[
-					'rc' => CParser::PARSE_SUCCESS,
-					'match' => '1-7,00:00-24:00;{$MACRO}',
-					'periods' => ['1-7,00:00-24:00', '{$MACRO}']
-				]
-			],
-			[
-				'{$MACRO1};{$MACRO2}', 0, ['usermacros' => true],
-				[
-					'rc' => CParser::PARSE_SUCCESS,
-					'match' => '{$MACRO1};{$MACRO2}',
-					'periods' => ['{$MACRO1}', '{$MACRO2}']
-				]
-			],
-			[
-				'{$MACRO1: ";"};{$MACRO2: ";"}', 0, ['usermacros' => true],
-				[
-					'rc' => CParser::PARSE_SUCCESS,
-					'match' => '{$MACRO1: ";"};{$MACRO2: ";"}',
-					'periods' => ['{$MACRO1: ";"}', '{$MACRO2: ";"}']
-				]
-			],
-			// fail
-			[
-				'', 0, [],
-				[
-					'rc' => CParser::PARSE_FAIL,
-					'match' => '',
-					'periods' => []
-				]
-			],
-			[
-				';', 0, [],
-				[
-					'rc' => CParser::PARSE_FAIL,
-					'match' => '',
-					'periods' => []
-				]
-			],
-			[
-				';;', 0, [],
-				[
-					'rc' => CParser::PARSE_FAIL,
-					'match' => '',
-					'periods' => []
-				]
-			],
-			[
-				';;1-7,00:00-24:00', 0, [],
-				[
-					'rc' => CParser::PARSE_FAIL,
-					'match' => '',
-					'periods' => []
-				]
-			],
-			[
-				'1-7,00:00-24:00;;', 0, [],
-				[
-					'rc' => CParser::PARSE_FAIL,
-					'match' => '',
-					'periods' => []
-				]
-			],
-			[
-				'1-7,00:00-24:00;{$MACRO}', 0, ['user_macros' => false],
-				[
-					'rc' => CParser::PARSE_FAIL,
-					'match' => '',
-					'periods' => []
-				]
-			],
-			[
-				'1-3,00:01-00:02;', 0, [],
-				[
-					'rc' => CParser::PARSE_FAIL,
-					'match' => '',
-					'periods' => []
-				]
-			],
-			[
-				'{$MACRO};1-7,00:00-24:00;', 0, ['usermacros' => true],
-				[
-					'rc' => CParser::PARSE_FAIL,
-					'match' => '',
-					'periods' => []
-				]
-			],
-			[
-				'5-6,00:09-00:10;6-7,00:11-00:12a', 0, [],
-				[
-					'rc' => CParser::PARSE_FAIL,
-					'match' => '',
-					'periods' => []
-				]
-			]
-		];
-	}
-
-	public static function parseTimePeriodProvider() {
-		return [
-			// success
-			[
-				'1-7,00:00-23:00', 0, [],
-				[
-					'rc' => CParser::PARSE_SUCCESS,
 					'periods_parts' => [
-						'1-7,00:00-23:00' => [
+						'1-3,00:01-00:02' => [
 							'wd_from' => '1',
-							'wd_till' => '7',
+							'wd_till' => '3',
 							'h_from' => '00',
-							'm_from' => '00',
-							'h_till' => '23',
-							'm_till' => '00'
+							'm_from' => '01',
+							'h_till' => '00',
+							'm_till' => '02'
 						]
 					]
 				]
@@ -163,6 +45,7 @@ class CTimePeriodsParserTest extends TestCase {
 				'3-4,00:05-00:06;4-5,00:07-00:08', 0, [],
 				[
 					'rc' => CParser::PARSE_SUCCESS,
+					'match' => '3-4,00:05-00:06;4-5,00:07-00:08',
 					'periods_parts' => [
 						'3-4,00:05-00:06' => [
 							'wd_from' => '3',
@@ -183,11 +66,76 @@ class CTimePeriodsParserTest extends TestCase {
 					]
 				]
 			],
+			[
+				'1-7,00:00-24:00;{$MACRO}', 0, ['usermacros' => true],
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => '1-7,00:00-24:00;{$MACRO}',
+					'periods_parts' => [
+						'1-7,00:00-24:00' => [
+							'wd_from' => '1',
+							'wd_till' => '7',
+							'h_from' => '00',
+							'm_from' => '00',
+							'h_till' => '24',
+							'm_till' => '00'
+						],
+						'{$MACRO}' => []
+					]
+				]
+			],
+			[
+				'{$MACRO1};{$MACRO2}', 0, ['usermacros' => true],
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => '{$MACRO1};{$MACRO2}',
+					'periods_parts' => [
+						'{$MACRO1}' => [],
+						'{$MACRO2}' => []
+					]
+				]
+			],
+			[
+				'{$MACRO1: ";"};{$MACRO2: ";"}', 0, ['usermacros' => true],
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => '{$MACRO1: ";"};{$MACRO2: ";"}',
+					'periods_parts' => [
+						'{$MACRO1: ";"}' => [],
+						'{$MACRO2: ";"}' => []
+					]
+				]
+			],
 			// fail
 			[
-				'8,00:00-24:00', 0, [],
+				'', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
+					'match' => '',
+					'periods_parts' => []
+				]
+			],
+			[
+				';', 0, [],
+				[
+					'rc' => CParser::PARSE_FAIL,
+					'match' => '',
+					'periods_parts' => []
+				]
+			],
+			[
+				';;', 0, [],
+				[
+					'rc' => CParser::PARSE_FAIL,
+					'match' => '',
+					'periods_parts' => []
+				]
+			],
+			[
+				';;1-7,00:00-24:00', 0, [],
+				[
+					'rc' => CParser::PARSE_FAIL,
+					'match' => '',
 					'periods_parts' => []
 				]
 			],
@@ -195,6 +143,39 @@ class CTimePeriodsParserTest extends TestCase {
 				'1-7,00:00-24:00;;', 0, [],
 				[
 					'rc' => CParser::PARSE_FAIL,
+					'match' => '',
+					'periods_parts' => []
+				]
+			],
+			[
+				'1-7,00:00-24:00;{$MACRO}', 0, ['user_macros' => false],
+				[
+					'rc' => CParser::PARSE_FAIL,
+					'match' => '',
+					'periods_parts' => []
+				]
+			],
+			[
+				'1-3,00:01-00:02;', 0, [],
+				[
+					'rc' => CParser::PARSE_FAIL,
+					'match' => '',
+					'periods_parts' => []
+				]
+			],
+			[
+				'{$MACRO};1-7,00:00-24:00;', 0, ['usermacros' => true],
+				[
+					'rc' => CParser::PARSE_FAIL,
+					'match' => '',
+					'periods_parts' => []
+				]
+			],
+			[
+				'5-6,00:09-00:10;6-7,00:11-00:12a', 0, [],
+				[
+					'rc' => CParser::PARSE_FAIL,
+					'match' => '',
 					'periods_parts' => []
 				]
 			]
@@ -214,25 +195,8 @@ class CTimePeriodsParserTest extends TestCase {
 		$this->assertSame($expected, [
 			'rc' => $parser->parse($source, $pos),
 			'match' => $parser->getMatch(),
-			'periods' => $parser->getPeriods()
+			'periods_parts' => $parser->getPeriodsParts()
 		]);
 		$this->assertSame(strlen($expected['match']), $parser->getLength());
-	}
-
-	/**
-	 * @dataProvider parseTimePeriodProvider
-	 *
-	 * @param string $source
-	 * @param int    $pos
-	 * @param array  $options
-	 * @param array  $expected
-	 */
-	public function testParseTimePeriod($source, $pos, $options, $expected) {
-		$parser = new CTimePeriodsParser($options);
-
-		$rc = $parser->parse($source, $pos);
-
-		$this->assertSame($expected['rc'], $rc);
-		$this->assertSame($expected['periods_parts'], $parser->getPeriodParts());
 	}
 }
