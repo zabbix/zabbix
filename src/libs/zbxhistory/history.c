@@ -420,7 +420,7 @@ static int	history_manager_init(zbx_history_manager_t *manager, const char *conf
 			}
 			value_type_mask |= mask;
 
-			if (0 != strcmp(name, HISTORY_PROVIDER_SQL))
+			if (0 == strcmp(name, HISTORY_PROVIDER_SQL))
 				manager->default_type_flags |= mask;
 
 			if (FAIL == history_options_add_common_params(&options, config_source_ip,
