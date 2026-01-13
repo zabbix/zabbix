@@ -918,6 +918,11 @@ class CDRule extends CApiService {
 	public function delete(array $druleids): array {
 		$this->validateDelete($druleids, $db_drules);
 
+		DBexecute('DELETE FROM dservices WHERE dhostid IN'.
+			' (SELECT dhostid FROM dhosts WHERE '.dbConditionInt('druleid', $druleids).')');
+
+		DB::delete('dhosts', ['druleid' => $druleids]);
+
 		DB::delete('dchecks', ['druleid' => $druleids]);
 		DB::delete('drules', ['druleid' => $druleids]);
 

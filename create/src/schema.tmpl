@@ -1188,7 +1188,7 @@ INDEX		|1		|clock
 
 TABLE|dhosts|dhostid|0
 FIELD		|dhostid	|t_id		|	|NOT NULL	|0
-FIELD		|druleid	|t_id		|	|NOT NULL	|0			|1|drules
+FIELD		|druleid	|t_id		|	|NOT NULL	|0			|1|drules	|	|RESTRICT
 FIELD		|status		|t_integer	|'0'	|NOT NULL	|0
 FIELD		|lastup		|t_integer	|'0'	|NOT NULL	|0
 FIELD		|lastdown	|t_integer	|'0'	|NOT NULL	|0
@@ -1197,13 +1197,13 @@ HOUSEKEEPER	|3
 
 TABLE|dservices|dserviceid|0
 FIELD		|dserviceid	|t_id		|	|NOT NULL	|0
-FIELD		|dhostid	|t_id		|	|NOT NULL	|0			|1|dhosts
+FIELD		|dhostid	|t_id		|	|NOT NULL	|0			|1|dhosts	|	|RESTRICT
 FIELD		|value		|t_varchar(255)	|''	|NOT NULL	|0
 FIELD		|port		|t_integer	|'0'	|NOT NULL	|0
 FIELD		|status		|t_integer	|'0'	|NOT NULL	|0
 FIELD		|lastup		|t_integer	|'0'	|NOT NULL	|0
 FIELD		|lastdown	|t_integer	|'0'	|NOT NULL	|0
-FIELD		|dcheckid	|t_id		|	|NOT NULL	|0			|2|dchecks
+FIELD		|dcheckid	|t_id		|	|NOT NULL	|0			|2|dchecks	|	|RESTRICT
 FIELD		|ip		|t_varchar(39)	|''	|NOT NULL	|0
 FIELD		|dns		|t_varchar(255)	|''	|NOT NULL	|0
 UNIQUE		|1		|dcheckid,ip,port

@@ -870,6 +870,12 @@ sub process_housekeeper($)
 {
 	my $object = shift;
 
+	if ($delete_cascade)
+	{
+		# MySQL does not execute triggers on cascade delete
+		die("table '$table_name' foreign keys without RESTRICT flag are not compatible with table HOUSEKEEPER token");
+	}
+
 	if (exists($housekeeper_types{$object}) && $housekeeper_types{$object} ne $table_name)
 	{
 		die("cannot use table type '$object' for table '$table_name', it was already used for table '$housekeeper_types{$object}'");
