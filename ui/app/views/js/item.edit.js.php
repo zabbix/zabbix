@@ -133,7 +133,6 @@ window.item_edit_form = new class {
 			type: this.form_element.querySelector('[name="type"]'),
 			url: this.form_element.querySelector('[name="url"]'),
 			username: this.form_element.querySelector('[name=username]'),
-			password: this.form_element.querySelector('[name=password]'),
 			value_type: this.form_element.querySelector('[name="value_type"]'),
 			value_type_steps: this.form_element.querySelector('[name="value_type_steps"]'),
 			ipmi_sensor: this.form_element.querySelector('[name="ipmi_sensor"]'),
@@ -144,7 +143,6 @@ window.item_edit_form = new class {
 			interfaceid: this.form_element.querySelector('[for="interfaceid"]'),
 			value_type_hint: this.form_element.querySelector('[for="label-value-type"] .js-hint'),
 			username: this.form_element.querySelector('[for=username]'),
-			password: this.form_element.querySelector('[for=password]'),
 			ipmi_sensor: this.form_element.querySelector('[for="ipmi_sensor"]'),
 			history_hint: this.form_element.querySelector('[for="history"] .js-hint'),
 			trends_hint: this.form_element.querySelector('[for="trends"] .js-hint')
@@ -482,7 +480,6 @@ window.item_edit_form = new class {
 		const type = parseInt(this.field.type.value, 10);
 		const key = this.field.key.value;
 		const username_required = type == ITEM_TYPE_SSH || type == ITEM_TYPE_TELNET;
-		const password_required = type == ITEM_TYPE_TELNET;
 		const ipmi_sensor_required = type == ITEM_TYPE_IPMI && key !== 'ipmi.get';
 		const interface_optional = this.optional_interfaces.indexOf(type) != -1;
 		const preprocessing_active = this.form_element.querySelector('[name^="preprocessing"][name$="[type]"]') !== null;
@@ -499,8 +496,6 @@ window.item_edit_form = new class {
 		this.field.key_button?.toggleAttribute('disabled', this.type_with_key_select.indexOf(type) == -1);
 		this.field.username[username_required ? 'setAttribute' : 'removeAttribute']('aria-required', 'true');
 		this.label.username.classList.toggle(ZBX_STYLE_FIELD_LABEL_ASTERISK, username_required);
-		this.field.password[password_required ? 'setAttribute' : 'removeAttribute']('aria-required', 'true');
-		this.label.password.classList.toggle(ZBX_STYLE_FIELD_LABEL_ASTERISK, password_required);
 		this.field.interfaceid?.toggleAttribute('aria-required', !interface_optional);
 		this.label.interfaceid?.classList.toggle(ZBX_STYLE_FIELD_LABEL_ASTERISK, !interface_optional);
 		this.field.ipmi_sensor[ipmi_sensor_required ? 'setAttribute' : 'removeAttribute']('aria-required', 'true');

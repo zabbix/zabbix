@@ -201,10 +201,13 @@ class CControllerItemUpdate extends CControllerItem {
 			]],
 			'passphrase' => ['db items.password', 'when' => ['type', 'in' => [ITEM_TYPE_SSH]]],
 			'password' => [
-				['db items.password',
-					'when' => ['type', 'in' => [ITEM_TYPE_SIMPLE, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_SSH, ITEM_TYPE_JMX]]
-				],
-				['db items.password', 'required', 'not_empty', 'when' => ['type', 'in' => [ITEM_TYPE_TELNET]]]
+				['db items.password', 'when' => ['type',
+					'in' => [ITEM_TYPE_SIMPLE, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_JMX]
+				]],
+				['db items.password', 'required', 'not_empty', 'when' => [
+					['type', 'in' => [ITEM_TYPE_JMX]],
+					['username', 'not_empty']
+				]]
 			],
 			'params_es' => ['db items.params', 'required', 'not_empty', 'when' => ['type', 'in' => [ITEM_TYPE_SSH, ITEM_TYPE_TELNET]]],
 			'params_ap' => ['db items.params', 'required', 'not_empty', 'when' => ['type', 'in' => [ITEM_TYPE_DB_MONITOR]]],
