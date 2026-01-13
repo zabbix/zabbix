@@ -1450,9 +1450,14 @@ abstract class CTriggerGeneral extends CApiService {
 		}
 
 		$options = [
-			'output' => ['triggertagid', 'triggerid', 'tag', 'value', 'automatic'],
+			'output' => ['triggertagid', 'triggerid', 'tag', 'value'],
 			'filter' => ['triggerid' => $triggerids]
 		];
+
+		if (self::isTrigger()) {
+			$options['output'][] = 'automatic';
+		}
+
 		$db_tags = DBselect(DB::makeSql('trigger_tag', $options));
 
 		while ($db_tag = DBfetch($db_tags)) {
@@ -1894,9 +1899,11 @@ abstract class CTriggerGeneral extends CApiService {
 					}
 				}
 
-				$tags_delete = array_filter($tags_delete,
-					static fn(array $tag) => !array_key_exists('automatic', $tag) || $tag['automatic'] == ZBX_TAG_MANUAL
-				);
+				if (self::isTrigger()) {
+					$tags_delete = array_filter($tags_delete,
+						static fn(array $tag) => !array_key_exists('automatic', $tag) || $tag['automatic'] == ZBX_TAG_MANUAL
+					);
+				}
 
 				foreach ($tags_delete as $tag_delete) {
 					$del_triggertagids[] = $tag_delete['triggertagid'];
