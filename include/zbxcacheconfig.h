@@ -1585,7 +1585,4 @@ int	zbx_item_key_subst_cb(const char *data, int level, int num, int quoted, char
 int	zbx_snmp_oid_subst_cb(const char *data, int level, int num, int quoted, char **param, va_list args);
 
 zbx_uint64_t	zbx_dc_get_cache_size(void);
-
-void	zbx_dc_hk_override(unsigned char value_type, int interval);
-
 #endif
