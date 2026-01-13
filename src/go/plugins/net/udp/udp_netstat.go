@@ -26,7 +26,7 @@ import (
 	"github.com/sokurenko/go-netstat/netstat"
 )
 
-// exportNetUdpSocketCount - returns number of UDP sockets that match parameters.
+// exportNetUDPSocketCount - returns number of UDP sockets that match parameters.
 //
 //nolint:gocognit,gocyclo,cyclop
 func (*Plugin) exportNetUDPSocketCount(params []string) (int, error) {
