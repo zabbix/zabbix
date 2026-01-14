@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -17,10 +17,13 @@
 namespace Widgets\TopItems\Actions;
 
 use API,
+	CAggFunctionData,
+	CAggHelper,
 	CArrayHelper,
 	CControllerDashboardWidgetView,
 	CControllerResponseData,
 	CItemHelper,
+	CMathHelper,
 	CNumberParser,
 	CSettingsHelper,
 	CWidgetsData,
@@ -91,8 +94,27 @@ class WidgetView extends CControllerDashboardWidgetView {
 				continue;
 			}
 
+			foreach ($db_column_items as &$item) {
+				$item['combined'] = false;
+			}
+			unset($item);
+
 			// Each column has different aggregation function and time period.
 			$db_values = self::getItemValues($db_column_items, $column);
+
+			if ($column['aggregate_columns'] && $column['column_aggregate_function'] != AGGREGATE_NONE) {
+				if (CAggFunctionData::requiresNumericItem($column['column_aggregate_function'])) {
+					foreach ($db_column_items as $item) {
+						if (!in_array($item['value_type'], [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64])) {
+							return [
+								'error' => _('No data found')
+							];
+						}
+					}
+				}
+
+				[$db_column_items, $db_values] = self::getCombinedItemValues($db_column_items, $db_values, $column);
+			}
 
 			if ($column['display'] == CWidgetFieldColumnsList::DISPLAY_SPARKLINE) {
 				$config = $column + ['contents_width' => $this->sparkline_max_samples];
@@ -136,7 +158,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 			$db_item_problem_triggers = $this->getProblemTriggers(array_keys($db_items));
 		}
 
-		$data = [
+		return [
 			'error' => null,
 			'configuration' => $columns,
 			'rows' => $this->fields_values['layout'] == WidgetForm::LAYOUT_VERTICAL
@@ -146,8 +168,6 @@ class WidgetView extends CControllerDashboardWidgetView {
 			'db_items' => $db_items,
 			'db_item_problem_triggers' => $db_item_problem_triggers
 		];
-
-		return $data;
 	}
 
 	private function getHosts(): array {
@@ -337,6 +357,88 @@ class WidgetView extends CControllerDashboardWidgetView {
 		}
 
 		return $result;
+	}
+
+	private static function getCombinedItemValues(array $db_column_items, array $db_values, array $column): array {
+		$grouped_values = [];
+
+		foreach ($db_column_items as $itemid => $item) {
+			$grouped_values[$item['hostid']][$itemid] = $db_values[$itemid] ?? null;
+		}
+
+		$function = $column['aggregate_function'];
+		$combined_function = $column['column_aggregate_function'];
+
+		foreach ($grouped_values as $values) {
+			$itemids = array_keys($values);
+
+			foreach (array_splice($itemids, 1) as $itemid) {
+				unset($db_column_items[$itemid], $db_values[$itemid]);
+			}
+
+			$itemid = array_shift($itemids);
+
+			$item = $db_column_items[$itemid];
+
+			if (!CAggFunctionData::preservesUnits($function) || !CAggFunctionData::preservesUnits($combined_function)) {
+				$item['units'] = '';
+			}
+
+			if (!CAggFunctionData::preservesValueMapping($combined_function)) {
+				$item['valuemap'] = [];
+			}
+
+			$item['combined'] = true;
+			$item['name'] = $column['combined_column_name'];
+
+			$value_type = $item['value_type'];
+			$value_units = $item['units'] == 'unixtime' ? '' : $item['units'];
+
+			$values = array_map(
+				fn ($value) => CAggHelper::formatValue($value, $value_type, $function, $value_units),
+				$values
+			);
+
+			$combined_value = [
+				'value' => $combined_function == AGGREGATE_COUNT ? 0 : null,
+				'units' => ''
+			];
+
+			if ($values = array_filter($values)) {
+				$value = reset($values);
+				$units = $value['units'];
+				$values = array_column($values, 'value');
+
+				$value = match ($combined_function) {
+					AGGREGATE_MIN =>	min($values),
+					AGGREGATE_MAX =>	max($values),
+					AGGREGATE_AVG =>	CMathHelper::safeAvg($values),
+					AGGREGATE_COUNT =>	count($values),
+					AGGREGATE_SUM =>	CMathHelper::safeSum($values)
+				};
+
+				$options = [
+					'valuemap' => $item['valuemap'],
+					'convert_options' => [
+						'decimals' => $column['decimal_places'],
+						'decimals_exact' => true
+					]
+				];
+
+				$combined_value = CAggHelper::formatValue($value, $value_type, $combined_function, $units, $options);
+
+				$item['units'] = $combined_value['units'] != '' ? ' '.$combined_value['units'] : '';
+			}
+
+			if ($combined_value['value']) {
+				$combined_value['value'] .= $item['units'];
+			}
+
+			$db_column_items[$itemid] = $item;
+			$db_values[$itemid] = $combined_value['value'];
+		}
+
+		return [$db_column_items, $db_values];
 	}
 
 	/**

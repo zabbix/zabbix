@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -108,39 +108,39 @@ abstract class CControllerPopupItemTest extends CController {
 	 */
 	protected $macros_by_item_props = [
 		'key' => [
-			'host' => ['{HOSTNAME}', '{HOST.HOST}', '{HOST.NAME}'],
-			'interface' => ['{HOST.IP}', '{IPADDRESS}', '{HOST.DNS}', '{HOST.CONN}', '{HOST.PORT}'],
+			'host' => ['{HOST.HOST}', '{HOST.NAME}'],
+			'interface' => ['{HOST.IP}', '{HOST.DNS}', '{HOST.CONN}', '{HOST.PORT}'],
 			'support_user_macros' => true,
 			'support_lld_macros' => true
 		],
 		'params_es' => [
-			'host' => ['{HOSTNAME}', '{HOST.HOST}', '{HOST.NAME}'],
-			'interface' => ['{HOST.IP}', '{IPADDRESS}', '{HOST.DNS}', '{HOST.CONN}', '{HOST.PORT}'],
+			'host' => ['{HOST.HOST}', '{HOST.NAME}'],
+			'interface' => ['{HOST.IP}', '{HOST.DNS}', '{HOST.CONN}', '{HOST.PORT}'],
 			'support_user_macros' => true,
 			'support_lld_macros' => true
 		],
 		'params_ap' => [
-			'host' => ['{HOSTNAME}', '{HOST.HOST}', '{HOST.NAME}'],
-			'interface' => ['{HOST.IP}', '{IPADDRESS}', '{HOST.DNS}', '{HOST.CONN}', '{HOST.PORT}'],
+			'host' => ['{HOST.HOST}', '{HOST.NAME}'],
+			'interface' => ['{HOST.IP}', '{HOST.DNS}', '{HOST.CONN}', '{HOST.PORT}'],
 			'support_user_macros' => true,
 			'support_lld_macros' => true
 		],
 		'jmx_endpoint' => [
-			'host' => ['{HOSTNAME}', '{HOST.HOST}', '{HOST.NAME}'],
-			'interface' => ['{HOST.IP}', '{IPADDRESS}', '{HOST.DNS}', '{HOST.CONN}', '{HOST.PORT}'],
+			'host' => ['{HOST.HOST}', '{HOST.NAME}'],
+			'interface' => ['{HOST.IP}', '{HOST.DNS}', '{HOST.CONN}', '{HOST.PORT}'],
 			'support_user_macros' => true,
 			'support_lld_macros' => true
 		],
 		'url' => [
-			'host' => ['{HOSTNAME}', '{HOST.HOST}', '{HOST.NAME}'],
-			'interface' => ['{HOST.IP}', '{IPADDRESS}', '{HOST.DNS}', '{HOST.CONN}', '{HOST.PORT}'],
+			'host' => ['{HOST.HOST}', '{HOST.NAME}'],
+			'interface' => ['{HOST.IP}', '{HOST.DNS}', '{HOST.CONN}', '{HOST.PORT}'],
 			'item' => ['{ITEM.ID}', '{ITEM.KEY.ORIG}', '{ITEM.KEY}'],
 			'support_user_macros' => true,
 			'support_lld_macros' => true
 		],
 		'posts' => [
-			'host' => ['{HOSTNAME}', '{HOST.HOST}', '{HOST.NAME}'],
-			'interface' => ['{HOST.IP}', '{IPADDRESS}', '{HOST.DNS}', '{HOST.CONN}', '{HOST.PORT}'],
+			'host' => ['{HOST.HOST}', '{HOST.NAME}'],
+			'interface' => ['{HOST.IP}', '{HOST.DNS}', '{HOST.CONN}', '{HOST.PORT}'],
 			'item' => ['{ITEM.ID}', '{ITEM.KEY.ORIG}', '{ITEM.KEY}'],
 			'support_user_macros' => true,
 			'support_lld_macros' => true
@@ -151,60 +151,58 @@ abstract class CControllerPopupItemTest extends CController {
 			'support_lld_macros' => true
 		],
 		'ssl_cert_file' => [
-			'host' => ['{HOSTNAME}', '{HOST.HOST}', '{HOST.NAME}'],
-			'interface' => ['{HOST.IP}', '{IPADDRESS}', '{HOST.DNS}', '{HOST.CONN}', '{HOST.PORT}'],
+			'host' => ['{HOST.HOST}', '{HOST.NAME}'],
+			'interface' => ['{HOST.IP}', '{HOST.DNS}', '{HOST.CONN}', '{HOST.PORT}'],
 			'item' => ['{ITEM.ID}', '{ITEM.KEY.ORIG}', '{ITEM.KEY}'],
 			'support_user_macros' => true,
 			'support_lld_macros' => true
 		],
 		'ssl_key_file' => [
-			'host' => ['{HOSTNAME}', '{HOST.HOST}', '{HOST.NAME}'],
-			'interface' => ['{HOST.IP}', '{IPADDRESS}', '{HOST.DNS}', '{HOST.CONN}', '{HOST.PORT}'],
+			'host' => ['{HOST.HOST}', '{HOST.NAME}'],
+			'interface' => ['{HOST.IP}', '{HOST.DNS}', '{HOST.CONN}', '{HOST.PORT}'],
 			'item' => ['{ITEM.ID}', '{ITEM.KEY.ORIG}', '{ITEM.KEY}'],
 			'support_user_macros' => true,
 			'support_lld_macros' => true
 		],
 		'query_fields' => [
-			'host' => ['{HOSTNAME}', '{HOST.HOST}', '{HOST.NAME}'],
-			'interface' => ['{HOST.IP}', '{IPADDRESS}', '{HOST.DNS}', '{HOST.CONN}', '{HOST.PORT}'],
+			'host' => ['{HOST.HOST}', '{HOST.NAME}'],
+			'interface' => ['{HOST.IP}', '{HOST.DNS}', '{HOST.CONN}', '{HOST.PORT}'],
 			'item' => ['{ITEM.ID}', '{ITEM.KEY.ORIG}', '{ITEM.KEY}'],
 			'support_user_macros' => true,
 			'support_lld_macros' => true
 		],
 		'headers' => [
-			'host' => ['{HOSTNAME}', '{HOST.HOST}', '{HOST.NAME}'],
-			'interface' => ['{HOST.IP}', '{IPADDRESS}', '{HOST.DNS}', '{HOST.CONN}', '{HOST.PORT}'],
+			'host' => ['{HOST.HOST}', '{HOST.NAME}'],
+			'interface' => ['{HOST.IP}', '{HOST.DNS}', '{HOST.CONN}', '{HOST.PORT}'],
 			'item' => ['{ITEM.ID}', '{ITEM.KEY.ORIG}', '{ITEM.KEY}'],
 			'support_user_macros' => true,
 			'support_lld_macros' => true
 		],
 		'parameters' => [
-			'host' => ['{HOSTNAME}', '{HOST.HOST}', '{HOST.NAME}'],
-			'interface' => ['{HOST.IP}', '{IPADDRESS}', '{HOST.DNS}', '{HOST.CONN}', '{HOST.PORT}'],
+			'host' => ['{HOST.HOST}', '{HOST.NAME}'],
+			'interface' => ['{HOST.IP}', '{HOST.DNS}', '{HOST.CONN}', '{HOST.PORT}'],
 			'inventory' => ['{INVENTORY.ALIAS}', '{INVENTORY.ASSET.TAG}', '{INVENTORY.CHASSIS}', '{INVENTORY.CONTACT}',
-				'{PROFILE.CONTACT}', '{INVENTORY.CONTRACT.NUMBER}', '{INVENTORY.DEPLOYMENT.STATUS}',
-				'{INVENTORY.HARDWARE}', '{PROFILE.HARDWARE}', '{INVENTORY.HARDWARE.FULL}', '{INVENTORY.HOST.NETMASK}',
-				'{INVENTORY.HOST.NETWORKS}', '{INVENTORY.HOST.ROUTER}', '{INVENTORY.HW.ARCH}',
-				'{INVENTORY.HW.DATE.DECOMM}', '{INVENTORY.HW.DATE.EXPIRY}', '{INVENTORY.HW.DATE.INSTALL}',
-				'{INVENTORY.HW.DATE.PURCHASE}', '{INVENTORY.INSTALLER.NAME}', '{INVENTORY.LOCATION}',
-				'{PROFILE.LOCATION}', '{INVENTORY.LOCATION.LAT}', '{INVENTORY.LOCATION.LON}',
-				'{INVENTORY.MACADDRESS.A}', '{PROFILE.MACADDRESS}', '{INVENTORY.MACADDRESS.B}', '{INVENTORY.MODEL}',
-				'{INVENTORY.NAME}', '{PROFILE.NAME}', '{INVENTORY.NOTES}', '{PROFILE.NOTES}', '{INVENTORY.OOB.IP}',
-				'{INVENTORY.OOB.NETMASK}', '{INVENTORY.OOB.ROUTER}', '{INVENTORY.OS}', '{PROFILE.OS}',
-				'{INVENTORY.OS.FULL}', '{INVENTORY.OS.SHORT}', '{INVENTORY.POC.PRIMARY.CELL}',
-				'{INVENTORY.POC.PRIMARY.EMAIL}', '{INVENTORY.POC.PRIMARY.NAME}', '{INVENTORY.POC.PRIMARY.NOTES}',
-				'{INVENTORY.POC.PRIMARY.PHONE.A}', '{INVENTORY.POC.PRIMARY.PHONE.B}', '{INVENTORY.POC.PRIMARY.SCREEN}',
-				'{INVENTORY.POC.SECONDARY.CELL}', '{INVENTORY.POC.SECONDARY.EMAIL}', '{INVENTORY.POC.SECONDARY.NAME}',
-				'{INVENTORY.POC.SECONDARY.NOTES}', '{INVENTORY.POC.SECONDARY.PHONE.A}',
-				'{INVENTORY.POC.SECONDARY.PHONE.B}', '{INVENTORY.POC.SECONDARY.SCREEN}', '{INVENTORY.SERIALNO.A}',
-				'{PROFILE.SERIALNO}', '{INVENTORY.SERIALNO.B}', '{INVENTORY.SITE.ADDRESS.A}',
-				'{INVENTORY.SITE.ADDRESS.B}', '{INVENTORY.SITE.ADDRESS.C}', '{INVENTORY.SITE.CITY}',
-				'{INVENTORY.SITE.COUNTRY}', '{INVENTORY.SITE.NOTES}', '{INVENTORY.SITE.RACK}', '{INVENTORY.SITE.STATE}',
-				'{INVENTORY.SITE.ZIP}', '{INVENTORY.SOFTWARE}', '{PROFILE.SOFTWARE}', '{INVENTORY.SOFTWARE.APP.A}',
+				'{INVENTORY.CONTRACT.NUMBER}', '{INVENTORY.DEPLOYMENT.STATUS}', '{INVENTORY.HARDWARE}',
+				'{INVENTORY.HARDWARE.FULL}', '{INVENTORY.HOST.NETMASK}', '{INVENTORY.HOST.NETWORKS}',
+				'{INVENTORY.HOST.ROUTER}', '{INVENTORY.HW.ARCH}', '{INVENTORY.HW.DATE.DECOMM}',
+				'{INVENTORY.HW.DATE.EXPIRY}', '{INVENTORY.HW.DATE.INSTALL}', '{INVENTORY.HW.DATE.PURCHASE}',
+				'{INVENTORY.INSTALLER.NAME}', '{INVENTORY.LOCATION}', '{INVENTORY.LOCATION.LAT}',
+				'{INVENTORY.LOCATION.LON}', '{INVENTORY.MACADDRESS.A}', '{INVENTORY.MACADDRESS.B}', '{INVENTORY.MODEL}',
+				'{INVENTORY.NAME}', '{INVENTORY.NOTES}', '{INVENTORY.OOB.IP}', '{INVENTORY.OOB.NETMASK}',
+				'{INVENTORY.OOB.ROUTER}', '{INVENTORY.OS}', '{INVENTORY.OS.FULL}', '{INVENTORY.OS.SHORT}',
+				'{INVENTORY.POC.PRIMARY.CELL}', '{INVENTORY.POC.PRIMARY.EMAIL}', '{INVENTORY.POC.PRIMARY.NAME}',
+				'{INVENTORY.POC.PRIMARY.NOTES}', '{INVENTORY.POC.PRIMARY.PHONE.A}', '{INVENTORY.POC.PRIMARY.PHONE.B}',
+				'{INVENTORY.POC.PRIMARY.SCREEN}', '{INVENTORY.POC.SECONDARY.CELL}', '{INVENTORY.POC.SECONDARY.EMAIL}',
+				'{INVENTORY.POC.SECONDARY.NAME}', '{INVENTORY.POC.SECONDARY.NOTES}',
+				'{INVENTORY.POC.SECONDARY.PHONE.A}', '{INVENTORY.POC.SECONDARY.PHONE.B}',
+				'{INVENTORY.POC.SECONDARY.SCREEN}', '{INVENTORY.SERIALNO.A}', '{INVENTORY.SERIALNO.B}',
+				'{INVENTORY.SITE.ADDRESS.A}', '{INVENTORY.SITE.ADDRESS.B}', '{INVENTORY.SITE.ADDRESS.C}',
+				'{INVENTORY.SITE.CITY}', '{INVENTORY.SITE.COUNTRY}', '{INVENTORY.SITE.NOTES}', '{INVENTORY.SITE.RACK}',
+				'{INVENTORY.SITE.STATE}', '{INVENTORY.SITE.ZIP}', '{INVENTORY.SOFTWARE}', '{INVENTORY.SOFTWARE.APP.A}',
 				'{INVENTORY.SOFTWARE.APP.B}', '{INVENTORY.SOFTWARE.APP.C}', '{INVENTORY.SOFTWARE.APP.D}',
-				'{INVENTORY.SOFTWARE.APP.E}', '{INVENTORY.SOFTWARE.FULL}', '{INVENTORY.TAG}', '{PROFILE.TAG}',
-				'{INVENTORY.TYPE}', '{PROFILE.DEVICETYPE}', '{INVENTORY.TYPE.FULL}', '{INVENTORY.URL.A}',
-				'{INVENTORY.URL.B}', '{INVENTORY.URL.C}', '{INVENTORY.VENDOR}'],
+				'{INVENTORY.SOFTWARE.APP.E}', '{INVENTORY.SOFTWARE.FULL}', '{INVENTORY.TAG}', '{INVENTORY.TYPE}',
+				'{INVENTORY.TYPE.FULL}', '{INVENTORY.URL.A}', '{INVENTORY.URL.B}', '{INVENTORY.URL.C}',
+				'{INVENTORY.VENDOR}'],
 			'item' => ['{ITEM.ID}', '{ITEM.KEY.ORIG}', '{ITEM.KEY}'],
 			'support_user_macros' => true,
 			'support_lld_macros' => true
@@ -785,13 +783,11 @@ abstract class CControllerPopupItemTest extends CController {
 
 		$macros = [
 			'host' => [
-				'{HOSTNAME}' => $this->host['host'],
 				'{HOST.HOST}' => $this->host['host'],
 				'{HOST.NAME}' => $this->host['name']
 			],
 			'interface' => [
 				'{HOST.IP}' => $interface['ip'],
-				'{IPADDRESS}' => $interface['ip'],
 				'{HOST.DNS}' => $interface['dns'],
 				'{HOST.CONN}' => $interface['address'],
 				'{HOST.PORT}' => $interface['port']

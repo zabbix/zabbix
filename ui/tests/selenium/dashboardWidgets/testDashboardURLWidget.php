@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -366,6 +366,7 @@ class testDashboardURLWidget extends testWidgets {
 				[
 					'expected' => TEST_GOOD,
 					'fields' => [
+						'Show header' => true,
 						'Refresh interval' => '15 minutes',
 						'URL' => 'tel://zabbix.com'
 					]
@@ -733,6 +734,7 @@ class testDashboardURLWidget extends testWidgets {
 			'id:iframe_sandboxing_exceptions' => 'allow-scripts allow-same-origin allow-forms'
 		]);
 		$other_form->submit();
+		$other_form->waitUntilReloaded();
 		$this->assertMessage(TEST_GOOD, 'Configuration updated');
 
 		$this->page->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboard_for_frame_widget)->waitUntilReady();
