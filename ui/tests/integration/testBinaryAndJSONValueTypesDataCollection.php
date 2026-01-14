@@ -682,7 +682,7 @@ class testBinaryAndJSONValueTypesDataCollection extends CIntegrationTest {
 		$expectedDiagInfoLogEntries = [
 			'diaginfo=historycache' => '== history cache diagnostic information ==',
 			'diaginfo=preprocessing' => '== preprocessing diagnostic information ==',
-			'diaginfo=locks' => '== locks diagnostic information ==',
+			'diaginfo=locks' => '== locks diagnostic information =='
 		];
 		foreach ($expectedDiagInfoLogEntries as $cmd => $e) {
 			$this->executeRuntimeControlCommand(self::COMPONENT_PROXY, $cmd);
