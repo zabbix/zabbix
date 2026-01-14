@@ -71,14 +71,18 @@ static int	housekeep_problems_events(const zbx_vector_uint64_t *eventids, int ev
 
 		do
 		{
+			int	res;
+
 			zbx_db_begin();
 
-			*deleted_problems += zbx_db_execute("delete from problem where%s", sql);
+			if (ZBX_DB_OK <= (res = zbx_db_execute("delete from problem where%s", sql)))
+				*deleted_problems += res;
 
 			if (ZBX_HK_OPTION_DISABLED != events_mode)
 			{
 				zbx_db_execute("delete from event_recovery where%s", sql);
-				*deleted_events += zbx_db_execute("delete from events where%s", sql);
+				if (ZBX_DB_OK <= (res = zbx_db_execute("delete from events where%s", sql)))
+					*deleted_events += res;
 			}
 		}
 		while (ZBX_DB_DOWN == (txn_rc = zbx_db_commit()));
