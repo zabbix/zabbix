@@ -589,6 +589,19 @@ class testBinaryAndJSONValueTypesDataCollection extends CIntegrationTest {
 		$this->assertEquals(2, count($response['result']), json_encode($response['result']));
 		$this->assertEquals(json_encode($response['result'][1]['value']), json_encode("{}"));
 
+		$expectedDiagInfoLogEntries = [
+			'diaginfo=alerting' => '== alerting diagnostic information ==',
+			'diaginfo=valuecache' => '== value cache diagnostic information ==',
+			'diaginfo=lld' => '== LLD diagnostic information ==',
+			'diaginfo=historycache' => '== history cache diagnostic information ==',
+			'diaginfo=preprocessing' => '== preprocessing diagnostic information ==',
+			'diaginfo=locks' => '== locks diagnostic information ==',
+			'diaginfo=connector' => '== connector diagnostic information =='
+		];
+		foreach ($expectedDiagInfoLogEntries as $cmd => $e) {
+			$this->executeRuntimeControlCommand(self::COMPONENT_SERVER, $cmd);
+			$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, $e, true, 20, 3);
+		}
 	}
 
 	/**
@@ -667,7 +680,15 @@ class testBinaryAndJSONValueTypesDataCollection extends CIntegrationTest {
 		$this->assertEquals(2, count($response['result']), json_encode($response['result']));
 		$this->assertEquals($response['result'][0]['value'], "null");
 
-
+		$expectedDiagInfoLogEntries = [
+			'diaginfo=historycache' => '== history cache diagnostic information ==',
+			'diaginfo=preprocessing' => '== preprocessing diagnostic information ==',
+			'diaginfo=locks' => '== locks diagnostic information ==',
+		];
+		foreach ($expectedDiagInfoLogEntries as $cmd => $e) {
+			$this->executeRuntimeControlCommand(self::COMPONENT_PROXY, $cmd);
+			$this->waitForLogLineToBePresent(self::COMPONENT_PROXY, $e, true, 20, 3);
+		}
 	}
 
 	/**
