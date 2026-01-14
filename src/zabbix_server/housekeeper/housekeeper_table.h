@@ -18,7 +18,7 @@
 void	housekeeper_init(void);
 void	housekeeper_deinit(void);
 
-int	housekeeper_process(int config_max_hk_delete);
+void	housekeeper_process(int config_max_hk_delete, int *deleted_history, int *deleted_events, int *deleted_problems);
 
 int	hk_cfg_history_mode(void);
 int	hk_cfg_trends_mode(void);

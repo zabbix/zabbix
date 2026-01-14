@@ -46,7 +46,8 @@ static void	housekeep_service_problems(const zbx_vector_uint64_t *eventids)
 	zbx_free(data);
 }
 
-static int	housekeep_problems_events(const zbx_vector_uint64_t *eventids, int events_mode)
+static int	housekeep_problems_events(const zbx_vector_uint64_t *eventids, int events_mode, int *deleted_events,
+		int *deleted_problems)
 {
 	char	*sql = NULL;
 	size_t	sql_alloc = 0, sql_offset = 0;
@@ -72,12 +73,12 @@ static int	housekeep_problems_events(const zbx_vector_uint64_t *eventids, int ev
 		{
 			zbx_db_begin();
 
-			zbx_db_execute("delete from problem where%s", sql);
+			*deleted_problems += zbx_db_execute("delete from problem where%s", sql);
 
 			if (ZBX_HK_OPTION_DISABLED != events_mode)
 			{
 				zbx_db_execute("delete from event_recovery where%s", sql);
-				zbx_db_execute("delete from events where%s", sql);
+				*deleted_events += zbx_db_execute("delete from events where%s", sql);
 			}
 		}
 		while (ZBX_DB_DOWN == (txn_rc = zbx_db_commit()));
@@ -94,7 +95,8 @@ static int	housekeep_problems_events(const zbx_vector_uint64_t *eventids, int ev
 	return offset;
 }
 
-int	zbx_housekeep_problems_events(const char *query, int config_max_hk_delete, int events_mode, int *more)
+void	zbx_housekeep_problems_events(const char *query, int config_max_hk_delete, int events_mode, int *more,
+		int *deleted_events, int *deleted_problems)
 {
 	zbx_vector_uint64_t	eventids;
 	int			deleted = 0;
@@ -120,19 +122,17 @@ int	zbx_housekeep_problems_events(const char *query, int config_max_hk_delete, i
 	zbx_vector_uint64_sort(&eventids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 	if (0 != eventids.values_num)
-		deleted = housekeep_problems_events(&eventids, events_mode);
+		deleted = housekeep_problems_events(&eventids, events_mode, deleted_events, deleted_problems);
 
 	zbx_vector_uint64_destroy(&eventids);
 
 	if (0 != config_max_hk_delete && deleted == config_max_hk_delete)
 		*more = 1;
-
-	return deleted;
 }
 
-static int	housekeep_problems_without_triggers(int config_max_hk_delete, int *more)
+static void	housekeep_problems_without_triggers(int config_max_hk_delete, int *more, int *deleted_events,
+		int *deleted_problems)
 {
-	int	deleted;
 	char	query[MAX_STRING_LEN];
 
 	zbx_snprintf(query, sizeof(query), "select eventid"
@@ -142,9 +142,8 @@ static int	housekeep_problems_without_triggers(int config_max_hk_delete, int *mo
 				" and not exists (select NULL from triggers where triggerid=objectid) order by eventid",
 				EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER);
 
-	deleted = zbx_housekeep_problems_events(query, config_max_hk_delete, ZBX_HK_OPTION_DISABLED, more);
-
-	return deleted;
+	zbx_housekeep_problems_events(query, config_max_hk_delete, ZBX_HK_OPTION_DISABLED, more, deleted_events,
+			deleted_problems);
 }
 
 ZBX_THREAD_ENTRY(trigger_housekeeper_thread, args)
@@ -198,10 +197,13 @@ ZBX_THREAD_ENTRY(trigger_housekeeper_thread, args)
 		zbx_setproctitle("%s [removing deleted triggers problems]", get_process_type_string(process_type));
 
 		double	sec = zbx_time();
-		int	more = 0, deleted = housekeep_problems_without_triggers(0, &more);
+		int	more = 0, deleted_events = 0, deleted_problems = 0;
 
-		zbx_setproctitle("%s [deleted %d problems records in " ZBX_FS_DBL " sec, idle for %d second(s)]",
-				get_process_type_string(process_type), deleted, zbx_time() - sec,
+		housekeep_problems_without_triggers(0, &more, &deleted_events, &deleted_problems);
+
+		zbx_setproctitle("%s [deleted %d events, %d problems records in " ZBX_FS_DBL " sec,"
+				" idle for %d second(s)]", get_process_type_string(process_type), deleted_events,
+				deleted_problems, zbx_time() - sec,
 				trigger_housekeeper_args_in->config_problemhousekeeping_frequency);
 	}
 

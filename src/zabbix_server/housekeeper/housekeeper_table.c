@@ -53,7 +53,10 @@ typedef struct {
 	const char	*filter;
 
 	/* related housekeeping mode */
-	int	(*get_hk_mode)(void);
+	int		(*get_hk_mode)(void);
+
+	/* statistics type to add deleted entry count */
+	int		stats_type;
 } hk_cleanup_table_t;
 
 /* Cache of housekeeper entries which require multiple different operations. */
@@ -69,20 +72,23 @@ static zbx_hashset_t	hk_cache;
 	" and object="ZBX_STR(EVENT_OBJECT_LLDRULE) \
 	" and objectid=" ZBX_FS_UI64
 
+#define HK_STATS_HISTORY_TRENDS		0
+#define HK_STATS_PROBLEM		1
+
 /* tables to be cleared upon item deletion */
 static hk_cleanup_table_t	hk_item_cleanup_order[] = {
 /* NOTE: there must be no more than 32 elements in this array as bits of int are used for tracing table cleanup */
-	{"history",		"itemid=" ZBX_FS_UI64,	&hk_cfg_history_mode},
-	{"history_str",		"itemid=" ZBX_FS_UI64,	&hk_cfg_history_mode},
-	{"history_log",		"itemid=" ZBX_FS_UI64,	&hk_cfg_history_mode},
-	{"history_uint",	"itemid=" ZBX_FS_UI64,	&hk_cfg_history_mode},
-	{"history_text",	"itemid=" ZBX_FS_UI64,	&hk_cfg_history_mode},
-	{"history_bin",		"itemid=" ZBX_FS_UI64,	&hk_cfg_history_mode},
+	{"history",		"itemid=" ZBX_FS_UI64,	&hk_cfg_history_mode,	HK_STATS_HISTORY_TRENDS},
+	{"history_str",		"itemid=" ZBX_FS_UI64,	&hk_cfg_history_mode,	HK_STATS_HISTORY_TRENDS},
+	{"history_log",		"itemid=" ZBX_FS_UI64,	&hk_cfg_history_mode,	HK_STATS_HISTORY_TRENDS},
+	{"history_uint",	"itemid=" ZBX_FS_UI64,	&hk_cfg_history_mode,	HK_STATS_HISTORY_TRENDS},
+	{"history_text",	"itemid=" ZBX_FS_UI64,	&hk_cfg_history_mode,	HK_STATS_HISTORY_TRENDS},
+	{"history_bin",		"itemid=" ZBX_FS_UI64,	&hk_cfg_history_mode,	HK_STATS_HISTORY_TRENDS},
 	/* TODO: history_json */
-	{"trends",		"itemid=" ZBX_FS_UI64,	&hk_cfg_trends_mode},
-	{"trends_uint",		"itemid=" ZBX_FS_UI64,	&hk_cfg_trends_mode},
-	{"problem",		ITEM_PROBLEM_FILTER, 	NULL},
-	{"problem",		LLDRULE_PROBLEM_FILTER, NULL}
+	{"trends",		"itemid=" ZBX_FS_UI64,	&hk_cfg_trends_mode,	HK_STATS_HISTORY_TRENDS},
+	{"trends_uint",		"itemid=" ZBX_FS_UI64,	&hk_cfg_trends_mode,	HK_STATS_HISTORY_TRENDS},
+	{"problem",		ITEM_PROBLEM_FILTER, 	NULL,			HK_STATS_PROBLEM},
+	{"problem",		LLDRULE_PROBLEM_FILTER, NULL,			HK_STATS_PROBLEM}
 };
 
 /******************************************************************************
@@ -114,15 +120,15 @@ static int	hk_table_cleanup(const char *table, const char *filter, int config_ma
  *                                                                            *
  * Parameters: hk_entries           - [IN] collected housekeeper entries      *
  *             config_max_hk_delete - [IN]                                    *
- *             deleteids            - [IN] housekeeper ids to delete          *
- *                                                                            *
- * Return value: number of rows deleted                                       *
+ *             deleteids            - [IN/OUT] housekeeper ids to delete      *
+ *             deleted_history      - [OUT] count of deleted history and      *
+ *                                          trends entries                    *
+ *             deleted_problems     - [OUT] count of deleted problems entries *
  *                                                                            *
  ******************************************************************************/
-static int	hk_item_cleanup(const zbx_vector_hk_housekeeper_t *hk_entries, int config_max_hk_delete,
-		zbx_vector_uint64_t *deleteids)
+static void	hk_item_cleanup(const zbx_vector_hk_housekeeper_t *hk_entries, int config_max_hk_delete,
+		zbx_vector_uint64_t *deleteids, int *deleted_history, int *deleted_problems)
 {
-	int		deleted = 0;
 	unsigned int	complete_mask = (1 << ARRSIZE(hk_item_cleanup_order)) - 1;
 
 	/* delete in order of tables to optimize database cache */
@@ -152,12 +158,25 @@ static int	hk_item_cleanup(const zbx_vector_hk_housekeeper_t *hk_entries, int co
 
 			if (0 == (entry->progress & (1 << i)))
 			{
-				int	more = 0;
+				int	more = 0, deleted = 0;
 				char	filter[MAX_STRING_LEN];
 
 				zbx_snprintf(filter, sizeof(filter), table->filter, objectid);
 
-				deleted += hk_table_cleanup(table->name, filter, config_max_hk_delete, &more);
+				deleted = hk_table_cleanup(table->name, filter, config_max_hk_delete, &more);
+
+				switch (table->stats_type)
+				{
+					case HK_STATS_HISTORY_TRENDS:
+						*deleted_history += deleted;
+						break;
+					case HK_STATS_PROBLEM:
+						*deleted_problems += deleted;
+						break;
+					default:
+						THIS_SHOULD_NEVER_HAPPEN;
+						break;
+				}
 
 				if (0 == more)
 					entry->progress |= (1 << i);
@@ -185,15 +204,11 @@ static int	hk_item_cleanup(const zbx_vector_hk_housekeeper_t *hk_entries, int co
 			zbx_vector_uint64_append(deleteids, housekeeperid);
 		}
 	}
-
-	return deleted;
 }
 
-static int	housekeep_events_by_triggerid(const zbx_vector_hk_housekeeper_t *hk_entries, int config_max_hk_delete,
-		int events_mode, zbx_vector_uint64_t *deleteids)
+static void	housekeep_events_by_triggerid(const zbx_vector_hk_housekeeper_t *hk_entries, int config_max_hk_delete,
+		int events_mode, zbx_vector_uint64_t *deleteids, int *deleted_events, int *deleted_problems)
 {
-	int	deleted = 0;
-
 	for (int i = 0; i < hk_entries->values_num; i++)
 	{
 		zbx_uint64_t	triggerid = hk_entries->values[i].objectid;
@@ -212,7 +227,8 @@ static int	housekeep_events_by_triggerid(const zbx_vector_hk_housekeeper_t *hk_e
 					" and objectid=" ZBX_FS_UI64 " order by eventid",
 				EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER, triggerid);
 
-		deleted += zbx_housekeep_problems_events(query, config_max_hk_delete, events_mode, &more);
+		zbx_housekeep_problems_events(query, config_max_hk_delete, events_mode, &more, deleted_events,
+				deleted_problems);
 
 		zbx_snprintf(query, sizeof(query), "select eventid"
 				" from events"
@@ -221,13 +237,12 @@ static int	housekeep_events_by_triggerid(const zbx_vector_hk_housekeeper_t *hk_e
 					" and objectid=" ZBX_FS_UI64 " order by eventid",
 					EVENT_SOURCE_INTERNAL, EVENT_OBJECT_TRIGGER, triggerid);
 
-		deleted += zbx_housekeep_problems_events(query, config_max_hk_delete, events_mode, &more);
+		zbx_housekeep_problems_events(query, config_max_hk_delete, events_mode, &more, deleted_events,
+				deleted_problems);
 
 		if (0 == more)
 			zbx_vector_uint64_append(deleteids, housekeeperid);
 	}
-
-	return deleted;
 }
 
 /******************************************************************************
@@ -282,12 +297,12 @@ void	housekeeper_deinit(void)
 	zbx_hashset_destroy(&hk_cache);
 }
 
-int	housekeeper_process(int config_max_hk_delete)
+void	housekeeper_process(int config_max_hk_delete, int *deleted_history, int *deleted_events, int *deleted_problems)
 {
 	zbx_db_result_t		result;
 	zbx_db_row_t		row;
 	zbx_vector_uint64_t	deleteids;
-	int			deleted = 0, error_logged = 0;
+	int			error_logged = 0;
 
 	zbx_vector_hk_housekeeper_t	ids[ZBX_HK_OBJECT_NUM];
 
@@ -333,22 +348,23 @@ int	housekeeper_process(int config_max_hk_delete)
 		switch (object)
 		{
 			case ZBX_HK_OBJECT_ITEM:
-				deleted += hk_item_cleanup(&ids[object], config_max_hk_delete, &deleteids);
+				hk_item_cleanup(&ids[object], config_max_hk_delete, &deleteids, deleted_history,
+						deleted_problems);
 				break;
 			case ZBX_HK_OBJECT_TRIGGER:
-				deleted += housekeep_events_by_triggerid(&ids[object], config_max_hk_delete,
-						hk_cfg_events_mode(), &deleteids);
+				housekeep_events_by_triggerid(&ids[object], config_max_hk_delete,
+						hk_cfg_events_mode(), &deleteids, deleted_events, deleted_problems);
 				break;
 			case ZBX_HK_OBJECT_SERVICE:
-				deleted += hk_problem_cleanup(&ids[object], "problem", EVENT_SOURCE_SERVICE,
+				*deleted_problems += hk_problem_cleanup(&ids[object], "problem", EVENT_SOURCE_SERVICE,
 						EVENT_OBJECT_SERVICE, config_max_hk_delete, &deleteids);
 				break;
 			case ZBX_HK_OBJECT_DHOST:
-				deleted += hk_problem_cleanup(&ids[object],"events", EVENT_SOURCE_DISCOVERY,
+				*deleted_events += hk_problem_cleanup(&ids[object],"events", EVENT_SOURCE_DISCOVERY,
 						EVENT_OBJECT_DHOST, config_max_hk_delete, &deleteids);
 				break;
 			case ZBX_HK_OBJECT_DSERVICE:
-				deleted += hk_problem_cleanup(&ids[object], "events", EVENT_SOURCE_DISCOVERY,
+				*deleted_events += hk_problem_cleanup(&ids[object], "events", EVENT_SOURCE_DISCOVERY,
 						EVENT_OBJECT_DSERVICE, config_max_hk_delete, &deleteids);
 				break;
 		}
@@ -365,7 +381,6 @@ int	housekeeper_process(int config_max_hk_delete)
 	zbx_vector_uint64_destroy(&deleteids);
 
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() deleted:%d", __func__, deleted);
-
-	return deleted;
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() deleted_history:%d deleted_events:%d deleted_problems:%d", __func__,
+			*deleted_history, *deleted_events, *deleted_problems);
 }

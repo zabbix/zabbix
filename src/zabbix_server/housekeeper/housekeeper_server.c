@@ -1335,13 +1335,13 @@ ZBX_THREAD_ENTRY(housekeeper_thread, args)
 		int	records = housekeeping_proxy_dhistory(now);
 
 		zbx_setproctitle("%s [removing deleted items data]", get_process_type_string(process_type));
-		int	d_cleanup = housekeeper_process(housekeeper_args_in->config_max_housekeeper_delete);
+		housekeeper_process(housekeeper_args_in->config_max_housekeeper_delete, &d_history_and_trends,
+				&d_events, &d_problems);
 		sec = zbx_time() - sec;
 
-		zabbix_log(LOG_LEVEL_WARNING, "%s [deleted %d hist/trends, %d items/triggers, %d events, %d problems,"
+		zabbix_log(LOG_LEVEL_WARNING, "%s [deleted %d hist/trends, %d events, %d problems,"
 				" %d sessions, %d alarms, %d audit, %d autoreg_host, %d records in " ZBX_FS_DBL
-				" sec, %s]",
-				get_process_type_string(process_type), d_history_and_trends, d_cleanup, d_events,
+				" sec, %s]", get_process_type_string(process_type), d_history_and_trends, d_events,
 				d_problems, d_sessions, d_services, d_audit, d_autoreg_host, records, sec, sleeptext);
 
 		zbx_config_clean(&cfg);
@@ -1350,9 +1350,9 @@ ZBX_THREAD_ENTRY(housekeeper_thread, args)
 
 		zbx_dc_cleanup_sessions();
 
-		zbx_setproctitle("%s [deleted %d hist/trends, %d items/triggers, %d events, %d sessions, %d alarms,"
+		zbx_setproctitle("%s [deleted %d hist/trends, %d events, %d sessions, %d alarms,"
 				" %d audit items, %d autoreg_host, %d records in " ZBX_FS_DBL " sec, %s]",
-				get_process_type_string(process_type), d_history_and_trends, d_cleanup, d_events,
+				get_process_type_string(process_type), d_history_and_trends, d_events,
 				d_sessions, d_services, d_audit, d_autoreg_host, records, sec, sleeptext);
 	}
 out:
