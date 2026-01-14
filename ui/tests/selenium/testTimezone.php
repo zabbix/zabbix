@@ -195,7 +195,7 @@ class testTimezone extends CWebTest {
 		}
 		$form->fill($data['fields']);
 		$form->selectTab('Permissions');
-		$form->fill(['Role' => 'Super admin role']);
+		$form->fill(['Role' => CFormElement::RELOADABLE_FILL('Super admin role')]);
 		$form->submit();
 		$this->assertMessage(TEST_GOOD, 'User added');
 		$this->page->logout();

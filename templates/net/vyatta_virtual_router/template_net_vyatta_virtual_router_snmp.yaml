@@ -25,10 +25,23 @@ zabbix_export:
         Template for Vyatta Virtual Router 1908e.
       vendor:
         name: Zabbix
-        version: 8.0-1
+        version: 8.0-2
       groups:
         - name: 'Templates/Network devices'
       items:
+        - uuid: 31b95860d1e34a89add4d17fa5be63a0
+          name: 'SNMP walk BGP peers'
+          type: SNMP_AGENT
+          snmp_oid: 'walk[1.3.6.1.2.1.15.3.1.2, 1.3.6.1.2.1.15.3.1.7, 1.3.6.1.2.1.15.3.1.9, 1.3.6.1.2.1.15.3.1.15, 1.3.6.1.2.1.15.3.1.18]'
+          key: bgp.peers.walk
+          history: '0'
+          value_type: TEXT
+          description: |
+            MIB: BGP4-MIB
+            Scanning `BGP4-MIB::bgpPeerTable`.
+          tags:
+            - tag: component
+              value: raw
         - uuid: e61652a7ede744b886289e3b30c50078
           name: 'SNMP walk host devices'
           type: SNMP_AGENT
@@ -117,7 +130,7 @@ zabbix_export:
                 - tag: scope
                   value: availability
                 - tag: scope
-                  value: performanc
+                  value: performance
         - uuid: 180899a053a14a40897ad12d588fb9cf
           name: 'SNMP walk network interfaces'
           type: SNMP_AGENT
@@ -167,6 +180,96 @@ zabbix_export:
           tags:
             - tag: component
               value: system
+        - uuid: 87479da85c584c57a464366db246beaf
+          name: 'CPU idle time'
+          type: SNMP_AGENT
+          snmp_oid: 'get[1.3.6.1.4.1.2021.11.11.0]'
+          key: system.cpu.idle
+          value_type: FLOAT
+          units: '%'
+          description: |
+            MIB: UCD-SNMP-MIB
+            Average time the CPU has spent doing nothing.
+          tags:
+            - tag: component
+              value: cpu
+        - uuid: 5c1a7561151a4de09f5f469d44e5764f
+          name: 'Load average (1m avg)'
+          type: SNMP_AGENT
+          snmp_oid: 'get[1.3.6.1.4.1.2021.10.1.3.1]'
+          key: system.cpu.load.avg1
+          value_type: FLOAT
+          description: |
+            MIB: UCD-SNMP-MIB
+            Average number of processes being executed or waiting over the last minute.
+          tags:
+            - tag: component
+              value: cpu
+        - uuid: 28bd53e15fd94d6a99b3bd542e4c1552
+          name: 'Load average (5m avg)'
+          type: SNMP_AGENT
+          snmp_oid: 'get[1.3.6.1.4.1.2021.10.1.3.2]'
+          key: system.cpu.load.avg5
+          value_type: FLOAT
+          description: |
+            MIB: UCD-SNMP-MIB
+            Average number of processes being executed or waiting over the last 5 minutes.
+          tags:
+            - tag: component
+              value: cpu
+        - uuid: b5faf8fa767f4b588563e8dff9e67587
+          name: 'Load average (15m avg)'
+          type: SNMP_AGENT
+          snmp_oid: 'get[1.3.6.1.4.1.2021.10.1.3.3]'
+          key: system.cpu.load.avg15
+          value_type: FLOAT
+          description: |
+            MIB: UCD-SNMP-MIB
+            Average number of processes being executed or waiting over the last 15 minutes.
+          tags:
+            - tag: component
+              value: cpu
+        - uuid: 6b834e333ee8433697af044589a00ed9
+          name: 'Number of CPUs'
+          type: SNMP_AGENT
+          snmp_oid: 'get[1.3.6.1.4.1.2021.11.67.0]'
+          key: system.cpu.num
+          description: |
+            MIB: UCD-SNMP-MIB
+            Number of processors.
+          preprocessing:
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+          tags:
+            - tag: component
+              value: cpu
+        - uuid: ddb528dc3a4140ce8177c6643159cdee
+          name: 'CPU system time'
+          type: SNMP_AGENT
+          snmp_oid: 'get[1.3.6.1.4.1.2021.11.10.0]'
+          key: system.cpu.system
+          value_type: FLOAT
+          units: '%'
+          description: |
+            MIB: UCD-SNMP-MIB
+            Average time the CPU has spent running the kernel and its processes.
+          tags:
+            - tag: component
+              value: cpu
+        - uuid: 4eb677f3f20c4335894be734e9f8e3ee
+          name: 'CPU user time'
+          type: SNMP_AGENT
+          snmp_oid: 'get[1.3.6.1.4.1.2021.11.9.0]'
+          key: system.cpu.user
+          value_type: FLOAT
+          units: '%'
+          description: |
+            MIB: UCD-SNMP-MIB
+            Average time the CPU has spent running user processes that are not niced.
+          tags:
+            - tag: component
+              value: cpu
         - uuid: 5fd7949bead24697bdfb88fdb3953be8
           name: 'System description'
           type: SNMP_AGENT
@@ -390,6 +493,186 @@ zabbix_export:
                 - tag: scope
                   value: availability
       discovery_rules:
+        - uuid: 89ad5c092c1f4d95a817fe35b10f74d9
+          name: 'BGP peer discovery'
+          type: DEPENDENT
+          key: bgp.peer.discovery
+          filter:
+            evaltype: AND
+            conditions:
+              - macro: '{#BGP_PEER_REMOTE_ADDR}'
+                value: '{$VYATTA.DISCOVERY.BGP.REMOTE.ADDR.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+              - macro: '{#SNMPINDEX}'
+                value: '{$VYATTA.DISCOVERY.BGP.REMOTE.ADDR.MATCHES}'
+              - macro: '{#SNMPINDEX}'
+                value: '{$VYATTA.DISCOVERY.BGP.REMOTE.ADDR.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+          description: 'BGP4-MIB::bgpPeer discovery.'
+          item_prototypes:
+            - uuid: 0f879918305142d689efa0bcc4061bd1
+              name: 'BGP AS [{#BGP_PEER_REMOTE_AS}]: Peer [{#SNMPINDEX}]: FSM established transitions, per second'
+              type: DEPENDENT
+              key: 'bgp.fsm.established.transitions[bgpPeerFsmEstablishedTransitions.{#SNMPINDEX}]'
+              value_type: FLOAT
+              description: |
+                MIB: BGP4-MIB
+                Rate of transitions of the BGP FSM into the Established state for this peer, expressed as transitions per second.
+              preprocessing:
+                - type: SNMP_WALK_VALUE
+                  parameters:
+                    - '1.3.6.1.2.1.15.3.1.15.{#SNMPINDEX}'
+                    - '0'
+                - type: CHANGE_PER_SECOND
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              master_item:
+                key: bgp.peers.walk
+              tags:
+                - tag: address
+                  value: '{#SNMPINDEX}'
+                - tag: as
+                  value: '{#BGP_PEER_REMOTE_AS}'
+                - tag: component
+                  value: bgp
+                - tag: component
+                  value: network
+            - uuid: 33d51b57f6f94d65963b5c137a4a91ff
+              name: 'BGP AS [{#BGP_PEER_REMOTE_AS}]: Peer [{#SNMPINDEX}]: Hold time'
+              type: DEPENDENT
+              key: 'bgp.hold.time[bgpPeerHoldTime.{#SNMPINDEX}]'
+              value_type: FLOAT
+              units: s
+              description: |
+                MIB: BGP4-MIB
+                Time interval in seconds for the Hold Timer established with the peer.
+              preprocessing:
+                - type: SNMP_WALK_VALUE
+                  parameters:
+                    - '1.3.6.1.2.1.15.3.1.18.{#SNMPINDEX}'
+                    - '0'
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              master_item:
+                key: bgp.peers.walk
+              tags:
+                - tag: address
+                  value: '{#SNMPINDEX}'
+                - tag: as
+                  value: '{#BGP_PEER_REMOTE_AS}'
+                - tag: component
+                  value: bgp
+                - tag: component
+                  value: network
+            - uuid: 63569acec667424d9ed3c16deb68266d
+              name: 'BGP AS [{#BGP_PEER_REMOTE_AS}]: Peer [{#SNMPINDEX}]: Remote address'
+              type: DEPENDENT
+              key: 'bgp.remote.addr[bgpPeerRemoteAddr.{#SNMPINDEX}]'
+              value_type: CHAR
+              description: |
+                MIB: BGP4-MIB
+                The BGP peer remote address.
+              preprocessing:
+                - type: SNMP_WALK_VALUE
+                  parameters:
+                    - '1.3.6.1.2.1.15.3.1.7.{#SNMPINDEX}'
+                    - '0'
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              master_item:
+                key: bgp.peers.walk
+              tags:
+                - tag: address
+                  value: '{#SNMPINDEX}'
+                - tag: as
+                  value: '{#BGP_PEER_REMOTE_AS}'
+                - tag: component
+                  value: bgp
+                - tag: component
+                  value: network
+            - uuid: 0d2ea55a220c4fccba9e2e668b800a60
+              name: 'BGP AS [{#BGP_PEER_REMOTE_AS}]: Peer [{#SNMPINDEX}]: Remote AS'
+              type: DEPENDENT
+              key: 'bgp.remote.as[bgpPeerRemoteAs.{#SNMPINDEX}]'
+              description: |
+                MIB: BGP4-MIB
+                The remote autonomous system number received in the BGP OPEN message.
+              preprocessing:
+                - type: SNMP_WALK_VALUE
+                  parameters:
+                    - '1.3.6.1.2.1.15.3.1.9.{#SNMPINDEX}'
+                    - '0'
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              master_item:
+                key: bgp.peers.walk
+              tags:
+                - tag: address
+                  value: '{#SNMPINDEX}'
+                - tag: as
+                  value: '{#BGP_PEER_REMOTE_AS}'
+                - tag: component
+                  value: bgp
+                - tag: component
+                  value: network
+            - uuid: 3a5a8b71be45458ca6520f534df27cb8
+              name: 'BGP AS [{#BGP_PEER_REMOTE_AS}]: Peer [{#SNMPINDEX}]: Connection state'
+              type: DEPENDENT
+              key: 'bgp.state[bgpPeerState.{#SNMPINDEX}]'
+              description: |
+                MIB: BGP4-MIB
+                The BGP peer connection state.
+              valuemap:
+                name: 'BGP peer state'
+              preprocessing:
+                - type: SNMP_WALK_VALUE
+                  parameters:
+                    - '1.3.6.1.2.1.15.3.1.2.{#SNMPINDEX}'
+                    - '0'
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              master_item:
+                key: bgp.peers.walk
+              tags:
+                - tag: address
+                  value: '{#SNMPINDEX}'
+                - tag: as
+                  value: '{#BGP_PEER_REMOTE_AS}'
+                - tag: component
+                  value: bgp
+                - tag: component
+                  value: network
+              trigger_prototypes:
+                - uuid: a1aa65db0c3f443abe09f1f215412e4c
+                  expression: 'last(/Vyatta Virtual Router by SNMP/bgp.state[bgpPeerState.{#SNMPINDEX}])<>6'
+                  name: 'Vyatta: BGP AS [{#BGP_PEER_REMOTE_AS}]: Peer [{#SNMPINDEX}]: State is not Established'
+                  opdata: 'Current state: {ITEM.LASTVALUE}'
+                  priority: HIGH
+                  description: 'The peer connection state is not "Established".'
+                  tags:
+                    - tag: scope
+                      value: availability
+          master_item:
+            key: bgp.peers.walk
+          preprocessing:
+            - type: SNMP_WALK_TO_JSON
+              parameters:
+                - '{#BGP_PEER_REMOTE_ADDR}'
+                - 1.3.6.1.2.1.15.3.1.7
+                - '0'
+                - '{#BGP_PEER_REMOTE_AS}'
+                - 1.3.6.1.2.1.15.3.1.9
+                - '0'
+              error_handler: CUSTOM_ERROR
+              error_handler_params: 'BGP instance is not running'
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
         - uuid: 8a38fbfa070e46cfb7643b9bd91c4817
           name: 'CPU discovery'
           type: DEPENDENT
@@ -442,7 +725,7 @@ zabbix_export:
               name: 'CPU [{#DESCRIPTION}][{#SNMPINDEX}]: Utilization, %'
               type: DEPENDENT
               key: 'cpu.utilization[hrProcessorLoad.{#SNMPINDEX}]'
-              units: B
+              units: '%'
               description: |
                 MIB: HOST-RESOURCES-MIB
                 The average, over the last minute, of the percentage of time that this processor was not idle.
@@ -1109,12 +1392,30 @@ zabbix_export:
             label: 'CPU usage (warning)'
             description: 'Warning threshold of CPU utilization.'
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
+        - macro: '{$VYATTA.DISCOVERY.BGP.REMOTE.ADDR.MATCHES}'
+          value: '.*'
+          description: 'Sets the IP regex filter to use in BGP peer discovery for including.'
+          config:
+            type: TEXT
+            priority: '30'
+            section_name: 'Filters: BGP peers'
+            label: 'Type filter for bgp peers discovery (include)'
+            description: 'Sets the IP regex filter to use in BGP peer discovery for including.'
+        - macro: '{$VYATTA.DISCOVERY.BGP.REMOTE.ADDR.NOT_MATCHES}'
+          value: CHANGE_IF_NEEDED
+          description: 'Sets the IP regex filter to use in BGP peer discovery for excluding.'
+          config:
+            type: TEXT
+            priority: '31'
+            section_name: 'Filters: BGP peers'
+            label: 'Type filter for bgp peers discovery (exclude)'
+            description: 'Sets the IP regex filter to use in BGP peer discovery for excluding.'
         - macro: '{$VYATTA.DISCOVERY.CPU.MATCHES}'
           value: ^.+\.3$
           description: 'Sets the OID regex filter to use in CPU discovery for including. Matches `hrDeviceProcessor` from MIB: HOST-RESOURCES-TYPES - the device type identifier used for a CPU.'
           config:
             type: TEXT
-            priority: '15'
+            priority: '16'
             section_name: 'Filters: CPU'
             label: 'OID filter for CPU discovery (include)'
             description: 'Sets the OID regex filter to use in CPU discovery for including. Matches `hrDeviceProcessor` from MIB: HOST-RESOURCES-TYPES - the device type identifier used for a CPU.'
@@ -1123,7 +1424,7 @@ zabbix_export:
           description: 'Sets the OID regex filter to use in CPU discovery for excluding. Matches `hrDeviceProcessor` from MIB: HOST-RESOURCES-TYPES - the device type identifier used for a CPU.'
           config:
             type: TEXT
-            priority: '16'
+            priority: '17'
             section_name: 'Filters: CPU'
             label: 'OID filter for CPU discovery (exclude)'
             description: 'Sets the OID regex filter to use in CPU discovery for excluding. Matches `hrDeviceProcessor` from MIB: HOST-RESOURCES-TYPES - the device type identifier used for a CPU.'
@@ -1132,7 +1433,7 @@ zabbix_export:
           description: 'Sets the administrative status regex filter to use in network interface discovery for including.'
           config:
             type: TEXT
-            priority: '17'
+            priority: '18'
             section_name: 'Filters: Interfaces'
             label: 'Administrative status filter for interface discovery (include)'
             description: 'Sets the administrative status regex filter to use in network interface discovery for including.'
@@ -1141,7 +1442,7 @@ zabbix_export:
           description: 'Sets the administrative status regex filter to use in network interface discovery for excluding.'
           config:
             type: TEXT
-            priority: '18'
+            priority: '19'
             section_name: 'Filters: Interfaces'
             label: 'Administrative status filter for interface discovery (exclude)'
             description: 'Sets the administrative status regex filter to use in network interface discovery for excluding.'
@@ -1150,7 +1451,7 @@ zabbix_export:
           description: 'Sets the alias regex filter to use in network interface discovery for including.'
           config:
             type: TEXT
-            priority: '23'
+            priority: '24'
             section_name: 'Filters: Interfaces'
             label: 'Alias filter for interface discovery (include)'
             description: 'Sets the alias regex filter to use in network interface discovery for including.'
@@ -1159,7 +1460,7 @@ zabbix_export:
           description: 'Sets the alias regex filter to use in network interface discovery for excluding.'
           config:
             type: TEXT
-            priority: '24'
+            priority: '25'
             section_name: 'Filters: Interfaces'
             label: 'Alias filter for interface discovery (exclude)'
             description: 'Sets the alias regex filter to use in network interface discovery for excluding.'
@@ -1168,7 +1469,7 @@ zabbix_export:
           description: 'Sets the description regex filter to use in network interface discovery for including.'
           config:
             type: TEXT
-            priority: '25'
+            priority: '26'
             section_name: 'Filters: Interfaces'
             label: 'Description filter for interface discovery (include)'
             description: 'Sets the description regex filter to use in network interface discovery for including.'
@@ -1177,7 +1478,7 @@ zabbix_export:
           description: 'Sets the description regex filter to use in network interface discovery for excluding.'
           config:
             type: TEXT
-            priority: '26'
+            priority: '27'
             section_name: 'Filters: Interfaces'
             label: 'Description filter for interface discovery (exclude)'
             description: 'Sets the description regex filter to use in network interface discovery for excluding.'
@@ -1186,7 +1487,7 @@ zabbix_export:
           description: 'Sets the name regex filter to use in network interface discovery for including.'
           config:
             type: TEXT
-            priority: '21'
+            priority: '22'
             section_name: 'Filters: Interfaces'
             label: 'Name filter for interface discovery (include)'
             description: 'Sets the name regex filter to use in network interface discovery for including.'
@@ -1195,7 +1496,7 @@ zabbix_export:
           description: 'Sets the name regex filter to use in network interface discovery for excluding. Filters out `loopbacks`, `nulls`, docker `veth` links, and `docker0 bridge` by default.'
           config:
             type: TEXT
-            priority: '22'
+            priority: '23'
             section_name: 'Filters: Interfaces'
             label: 'Name filter for interface discovery (exclude)'
             description: 'Sets the name regex filter to use in network interface discovery for excluding. Filters out `loopbacks`, `nulls`, docker `veth` links, and `docker0 bridge` by default.'
@@ -1204,7 +1505,7 @@ zabbix_export:
           description: 'Sets the operative status regex filter to use in network interface discovery for including.'
           config:
             type: TEXT
-            priority: '19'
+            priority: '20'
             section_name: 'Filters: Interfaces'
             label: 'Operative status filter for interface discovery (include)'
             description: 'Sets the operative status regex filter to use in network interface discovery for including.'
@@ -1213,7 +1514,7 @@ zabbix_export:
           description: 'Sets the operative status regex filter to use in network interface discovery for excluding. Ignore `notPresent(6)`.'
           config:
             type: TEXT
-            priority: '20'
+            priority: '21'
             section_name: 'Filters: Interfaces'
             label: 'Operative status filter for interface discovery (exclude)'
             description: 'Sets the operative status regex filter to use in network interface discovery for excluding. Ignore `notPresent(6)`.'
@@ -1222,7 +1523,7 @@ zabbix_export:
           description: 'Sets the type regex filter to use in network interface discovery for including.'
           config:
             type: TEXT
-            priority: '27'
+            priority: '28'
             section_name: 'Filters: Interfaces'
             label: 'Type filter for interface discovery (include)'
             description: 'Sets the type regex filter to use in network interface discovery for including.'
@@ -1231,7 +1532,7 @@ zabbix_export:
           description: 'Sets the type regex filter to use in network interface discovery for excluding.'
           config:
             type: TEXT
-            priority: '28'
+            priority: '29'
             section_name: 'Filters: Interfaces'
             label: 'Type filter for interface discovery (exclude)'
             description: 'Sets the type regex filter to use in network interface discovery for excluding.'
@@ -1240,7 +1541,7 @@ zabbix_export:
           description: 'Sets the name regex filter to use in storage discovery for including.'
           config:
             type: TEXT
-            priority: '11'
+            priority: '12'
             section_name: 'Filters: Storage'
             label: 'Name filter for storage discovery (include)'
             description: 'Sets the name regex filter to use in storage discovery for including.'
@@ -1249,7 +1550,7 @@ zabbix_export:
           description: 'Sets the name regex filter to use in storage discovery for excluding.'
           config:
             type: TEXT
-            priority: '12'
+            priority: '13'
             section_name: 'Filters: Storage'
             label: 'Name filter for storage discovery (exclude)'
             description: 'Sets the name regex filter to use in storage discovery for excluding.'
@@ -1258,7 +1559,7 @@ zabbix_export:
           description: 'Sets the type regex filter to use in storage discovery for including.'
           config:
             type: TEXT
-            priority: '13'
+            priority: '14'
             section_name: 'Filters: Storage'
             label: 'Type filter for storage discovery (include)'
             description: 'Sets the type regex filter to use in storage discovery for including.'
@@ -1267,7 +1568,7 @@ zabbix_export:
           description: 'Sets the type regex filter to use in storage discovery for excluding.'
           config:
             type: TEXT
-            priority: '14'
+            priority: '15'
             section_name: 'Filters: Storage'
             label: 'Type filter for storage discovery (exclude)'
             description: 'Sets the type regex filter to use in storage discovery for excluding.'
@@ -1296,12 +1597,22 @@ zabbix_export:
           description: 'Macro for the operational state of the interface for the link down trigger. Can be used with the interface name as context.'
           config:
             type: CHECKBOX
-            priority: '10'
+            priority: '11'
             label: 'Interfaces control'
             description: 'Macro for the operational state of the interface for the link down trigger. Can be used with the interface name as context.'
             options:
               - checked: '1'
                 unchecked: '0'
+        - macro: '{$VYATTA.LOAD_AVG_PER_CPU.MAX.WARN}'
+          value: '1.0'
+          description: 'Load per CPU considered sustainable. Tune if needed.'
+          config:
+            type: TEXT
+            priority: '10'
+            section_name: Thresholds
+            label: 'The CPU load per core'
+            description: 'CPU load per core is considered sustainable. No less than 0.'
+            regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
         - macro: '{$VYATTA.MEMORY.USED.HIGH}'
           value: '95'
           description: 'High severity threshold of memory utilization.'
@@ -1358,7 +1669,7 @@ zabbix_export:
               widgets:
                 - type: item
                   name: 'System name'
-                  width: '23'
+                  width: '20'
                   height: '4'
                   hide_header: 'YES'
                   fields:
@@ -1387,17 +1698,20 @@ zabbix_export:
                       value: '0'
                     - type: INTEGER
                       name: value_size
-                      value: '20'
+                      value: '15'
                 - type: item
                   name: 'System location'
                   'y': '4'
-                  width: '23'
+                  width: '20'
                   height: '3'
                   hide_header: 'YES'
                   fields:
                     - type: STRING
                       name: description
                       value: 'System location'
+                    - type: INTEGER
+                      name: desc_size
+                      value: '10'
                     - type: INTEGER
                       name: desc_v_pos
                       value: '0'
@@ -1417,17 +1731,20 @@ zabbix_export:
                       value: '0'
                     - type: INTEGER
                       name: value_size
-                      value: '25'
+                      value: '15'
                 - type: item
                   name: 'System contact'
                   'y': '7'
-                  width: '23'
+                  width: '20'
                   height: '3'
                   hide_header: 'YES'
                   fields:
                     - type: STRING
                       name: description
                       value: 'System contact'
+                    - type: INTEGER
+                      name: desc_size
+                      value: '10'
                     - type: INTEGER
                       name: desc_v_pos
                       value: '0'
@@ -1447,17 +1764,20 @@ zabbix_export:
                       value: '0'
                     - type: INTEGER
                       name: value_size
-                      value: '25'
+                      value: '15'
                 - type: item
                   name: 'System description'
                   'y': '10'
-                  width: '23'
+                  width: '20'
                   height: '3'
                   hide_header: 'YES'
                   fields:
                     - type: STRING
                       name: description
                       value: 'System description'
+                    - type: INTEGER
+                      name: desc_size
+                      value: '10'
                     - type: INTEGER
                       name: desc_v_pos
                       value: '0'
@@ -1477,11 +1797,11 @@ zabbix_export:
                       value: '0'
                     - type: INTEGER
                       name: value_size
-                      value: '25'
+                      value: '15'
                 - type: item
                   name: 'Uptime (hardware)'
-                  x: '23'
-                  width: '20'
+                  x: '20'
+                  width: '12'
                   height: '3'
                   hide_header: 'YES'
                   fields:
@@ -1504,16 +1824,15 @@ zabbix_export:
                       value: '1'
                     - type: INTEGER
                       name: units_size
-                      value: '25'
+                      value: '20'
                     - type: INTEGER
                       name: value_size
-                      value: '25'
+                      value: '15'
                 - type: item
                   name: 'Uptime (network)'
-                  x: '23'
+                  x: '20'
                   'y': '3'
-                  width: '20'
-                  height: '3'
+                  width: '12'
                   hide_header: 'YES'
                   fields:
                     - type: STRING
@@ -1541,9 +1860,9 @@ zabbix_export:
                       value: '25'
                 - type: item
                   name: 'SNMP agent availability'
-                  x: '23'
-                  'y': '6'
-                  width: '20'
+                  x: '20'
+                  'y': '5'
+                  width: '12'
                   hide_header: 'YES'
                   fields:
                     - type: STRING
@@ -1565,19 +1884,19 @@ zabbix_export:
                       value: '1'
                     - type: STRING
                       name: thresholds.0.color
-                      value: FF465C
+                      value: E45959
                     - type: STRING
                       name: thresholds.0.threshold
                       value: '0'
                     - type: STRING
                       name: thresholds.1.color
-                      value: 0EC9AC
+                      value: 00C48C
                     - type: STRING
                       name: thresholds.1.threshold
                       value: '1'
                     - type: STRING
                       name: thresholds.2.color
-                      value: FFD54F
+                      value: FFBF59
                     - type: STRING
                       name: thresholds.2.threshold
                       value: '2'
@@ -1586,17 +1905,17 @@ zabbix_export:
                       value: '0'
                     - type: INTEGER
                       name: value_size
-                      value: '35'
+                      value: '25'
                 - type: item
                   name: 'ICMP ping'
-                  x: '23'
-                  'y': '8'
-                  width: '20'
+                  x: '20'
+                  'y': '7'
+                  width: '12'
                   hide_header: 'YES'
                   fields:
                     - type: INTEGER
                       name: decimal_size
-                      value: '20'
+                      value: '15'
                     - type: STRING
                       name: description
                       value: 'ICMP ping'
@@ -1616,28 +1935,27 @@ zabbix_export:
                       value: '1'
                     - type: STRING
                       name: thresholds.0.color
-                      value: FF465C
+                      value: E45959
                     - type: STRING
                       name: thresholds.0.threshold
                       value: '0'
                     - type: STRING
                       name: thresholds.1.color
-                      value: 0EC9AC
+                      value: 00C48C
                     - type: STRING
                       name: thresholds.1.threshold
                       value: '1'
                     - type: INTEGER
                       name: units_size
-                      value: '25'
+                      value: '20'
                     - type: INTEGER
                       name: value_size
-                      value: '35'
+                      value: '25'
                 - type: item
                   name: 'ICMP response time'
-                  x: '23'
-                  'y': '10'
-                  width: '10'
-                  height: '3'
+                  x: '20'
+                  'y': '9'
+                  width: '12'
                   hide_header: 'YES'
                   fields:
                     - type: INTEGER
@@ -1646,9 +1964,6 @@ zabbix_export:
                     - type: STRING
                       name: description
                       value: 'ICMP response time'
-                    - type: INTEGER
-                      name: desc_size
-                      value: '12'
                     - type: INTEGER
                       name: desc_v_pos
                       value: '0'
@@ -1671,10 +1986,9 @@ zabbix_export:
                       value: '25'
                 - type: item
                   name: 'ICMP loss'
-                  x: '33'
-                  'y': '10'
-                  width: '10'
-                  height: '3'
+                  x: '20'
+                  'y': '11'
+                  width: '12'
                   hide_header: 'YES'
                   fields:
                     - type: INTEGER
@@ -1683,9 +1997,6 @@ zabbix_export:
                     - type: STRING
                       name: description
                       value: 'ICMP loss'
-                    - type: INTEGER
-                      name: desc_size
-                      value: '12'
                     - type: INTEGER
                       name: desc_v_pos
                       value: '0'
@@ -1706,16 +2017,97 @@ zabbix_export:
                     - type: INTEGER
                       name: value_size
                       value: '25'
+                - type: svggraph
+                  name: 'System load'
+                  x: '32'
+                  width: '40'
+                  height: '5'
+                  fields:
+                    - type: STRING
+                      name: ds.0.color.0
+                      value: 00C48C
+                    - type: STRING
+                      name: ds.0.color.1
+                      value: 7499FF
+                    - type: STRING
+                      name: ds.0.color.2
+                      value: FFBF59
+                    - type: INTEGER
+                      name: ds.0.dataset_type
+                      value: '0'
+                    - type: INTEGER
+                      name: ds.0.fill
+                      value: '0'
+                    - type: ITEM
+                      name: ds.0.itemids.0
+                      value:
+                        host: 'Vyatta Virtual Router by SNMP'
+                        key: system.cpu.load.avg1
+                    - type: ITEM
+                      name: ds.0.itemids.1
+                      value:
+                        host: 'Vyatta Virtual Router by SNMP'
+                        key: system.cpu.load.avg5
+                    - type: ITEM
+                      name: ds.0.itemids.2
+                      value:
+                        host: 'Vyatta Virtual Router by SNMP'
+                        key: system.cpu.load.avg15
+                    - type: INTEGER
+                      name: ds.0.width
+                      value: '2'
+                    - type: INTEGER
+                      name: ds.1.axisy
+                      value: '1'
+                    - type: STRING
+                      name: ds.1.color.0
+                      value: 97AAB3
+                    - type: INTEGER
+                      name: ds.1.dataset_type
+                      value: '0'
+                    - type: INTEGER
+                      name: ds.1.fill
+                      value: '0'
+                    - type: ITEM
+                      name: ds.1.itemids.0
+                      value:
+                        host: 'Vyatta Virtual Router by SNMP'
+                        key: system.cpu.num
+                    - type: INTEGER
+                      name: ds.1.width
+                      value: '2'
+                    - type: STRING
+                      name: lefty_min
+                      value: '0'
+                    - type: INTEGER
+                      name: legend_lines
+                      value: '4'
+                    - type: INTEGER
+                      name: legend_statistic
+                      value: '1'
+                    - type: STRING
+                      name: reference
+                      value: CPULO
+                    - type: INTEGER
+                      name: righty
+                      value: '1'
+                    - type: STRING
+                      name: righty_min
+                      value: '0'
                 - type: gauge
                   name: 'Memory utilization'
-                  x: '43'
-                  width: '29'
+                  x: '32'
+                  'y': '5'
+                  width: '20'
                   height: '4'
                   hide_header: 'YES'
                   fields:
                     - type: STRING
                       name: description
                       value: 'Memory utilization'
+                    - type: INTEGER
+                      name: desc_size
+                      value: '8'
                     - type: INTEGER
                       name: desc_v_pos
                       value: '0'
@@ -1743,28 +2135,27 @@ zabbix_export:
                       name: units_bold
                       value: '1'
                     - type: INTEGER
-                      name: value_arc_size
-                      value: '35'
+                      name: units_size
+                      value: '15'
                     - type: INTEGER
                       name: value_bold
                       value: '1'
+                    - type: INTEGER
+                      name: value_size
+                      value: '20'
                 - type: item
                   name: 'Total memory'
-                  x: '43'
-                  'y': '4'
-                  width: '9'
-                  height: '4'
+                  x: '32'
+                  'y': '9'
+                  width: '20'
                   hide_header: 'YES'
                   fields:
                     - type: INTEGER
                       name: decimal_size
-                      value: '15'
+                      value: '20'
                     - type: STRING
                       name: description
                       value: 'Total memory'
-                    - type: INTEGER
-                      name: desc_size
-                      value: '10'
                     - type: INTEGER
                       name: desc_v_pos
                       value: '0'
@@ -1781,64 +2172,23 @@ zabbix_export:
                       value: '1'
                     - type: INTEGER
                       name: units_size
-                      value: '15'
+                      value: '20'
                     - type: INTEGER
                       name: value_size
-                      value: '20'
-                - type: honeycomb
-                  name: 'CPU utilization'
-                  x: '43'
-                  'y': '8'
-                  width: '29'
-                  height: '5'
-                  fields:
-                    - type: STRING
-                      name: items.0
-                      value: 'CPU [*]: Utilization, %'
-                    - type: STRING
-                      name: primary_label
-                      value: 'CPU .{{ITEM.NAME}.regsub("^.*\]\[(.*)\].*$","\1")}'
-                    - type: STRING
-                      name: reference
-                      value: CPUUT
-                    - type: STRING
-                      name: secondary_label_units
-                      value: '%'
-                    - type: STRING
-                      name: thresholds.0.color
-                      value: 0EC9AC
-                    - type: STRING
-                      name: thresholds.0.threshold
-                      value: '0'
-                    - type: STRING
-                      name: thresholds.1.color
-                      value: FFD54F
-                    - type: STRING
-                      name: thresholds.1.threshold
-                      value: '80'
-                    - type: STRING
-                      name: thresholds.2.color
-                      value: FF465C
-                    - type: STRING
-                      name: thresholds.2.threshold
-                      value: '95'
+                      value: '25'
                 - type: item
                   name: 'Free memory'
-                  x: '52'
-                  'y': '4'
-                  width: '9'
-                  height: '4'
+                  x: '32'
+                  'y': '11'
+                  width: '20'
                   hide_header: 'YES'
                   fields:
                     - type: INTEGER
                       name: decimal_size
-                      value: '15'
+                      value: '20'
                     - type: STRING
                       name: description
                       value: 'Free memory'
-                    - type: INTEGER
-                      name: desc_size
-                      value: '10'
                     - type: INTEGER
                       name: desc_v_pos
                       value: '0'
@@ -1855,17 +2205,57 @@ zabbix_export:
                       value: '1'
                     - type: INTEGER
                       name: units_size
-                      value: '15'
+                      value: '20'
                     - type: INTEGER
                       name: value_size
-                      value: '20'
+                      value: '25'
+                - type: honeycomb
+                  name: 'CPU utilization'
+                  x: '52'
+                  'y': '5'
+                  width: '20'
+                  height: '4'
+                  fields:
+                    - type: STRING
+                      name: items.0
+                      value: 'CPU [*]: Utilization, %'
+                    - type: STRING
+                      name: primary_label
+                      value: 'CPU .{{ITEM.NAME}.regsub("^.*\]\[(.*)\].*$","\1")}'
+                    - type: STRING
+                      name: reference
+                      value: CPUUT
+                    - type: STRING
+                      name: secondary_label_units
+                      value: '%'
+                    - type: STRING
+                      name: thresholds.0.color
+                      value: 00C48C
+                    - type: STRING
+                      name: thresholds.0.threshold
+                      value: '0'
+                    - type: STRING
+                      name: thresholds.1.color
+                      value: FFBF59
+                    - type: STRING
+                      name: thresholds.1.threshold
+                      value: '80'
+                    - type: STRING
+                      name: thresholds.2.color
+                      value: E45959
+                    - type: STRING
+                      name: thresholds.2.threshold
+                      value: '95'
                 - type: item
                   name: 'Cached memory'
-                  x: '61'
-                  'y': '4'
-                  width: '11'
+                  x: '52'
+                  'y': '9'
+                  width: '20'
                   hide_header: 'YES'
                   fields:
+                    - type: INTEGER
+                      name: decimal_size
+                      value: '20'
                     - type: STRING
                       name: description
                       value: 'Cached memory'
@@ -1885,17 +2275,20 @@ zabbix_export:
                       value: '1'
                     - type: INTEGER
                       name: units_size
-                      value: '25'
+                      value: '20'
                     - type: INTEGER
                       name: value_size
-                      value: '35'
+                      value: '25'
                 - type: item
                   name: 'Buffer memory'
-                  x: '61'
-                  'y': '6'
-                  width: '11'
+                  x: '52'
+                  'y': '11'
+                  width: '20'
                   hide_header: 'YES'
                   fields:
+                    - type: INTEGER
+                      name: decimal_size
+                      value: '20'
                     - type: STRING
                       name: description
                       value: 'Buffer memory'
@@ -1915,10 +2308,10 @@ zabbix_export:
                       value: '1'
                     - type: INTEGER
                       name: units_size
-                      value: '25'
+                      value: '20'
                     - type: INTEGER
                       name: value_size
-                      value: '35'
+                      value: '25'
             - name: 'Interfaces: Traffic'
               widgets:
                 - type: honeycomb
@@ -1949,37 +2342,37 @@ zabbix_export:
                       value: '0'
                     - type: STRING
                       name: thresholds.0.color
-                      value: 0EC9AC
+                      value: 00C48C
                     - type: STRING
                       name: thresholds.0.threshold
                       value: '1'
                     - type: STRING
                       name: thresholds.1.color
-                      value: FF465C
+                      value: E45959
                     - type: STRING
                       name: thresholds.1.threshold
                       value: '2'
                     - type: STRING
                       name: thresholds.2.color
-                      value: FFD54F
+                      value: FFBF59
                     - type: STRING
                       name: thresholds.2.threshold
                       value: '4'
                     - type: STRING
                       name: thresholds.3.color
-                      value: FFD54F
+                      value: FFBF59
                     - type: STRING
                       name: thresholds.3.threshold
                       value: '5'
                     - type: STRING
                       name: thresholds.4.color
-                      value: FFD54F
+                      value: FFBF59
                     - type: STRING
                       name: thresholds.4.threshold
                       value: '6'
                     - type: STRING
                       name: thresholds.5.color
-                      value: FFD54F
+                      value: FFBF59
                     - type: STRING
                       name: thresholds.5.threshold
                       value: '7'
@@ -2012,7 +2405,7 @@ zabbix_export:
                       value: bps
                     - type: STRING
                       name: thresholds.0.color
-                      value: 0EC9AC
+                      value: 00C48C
                     - type: STRING
                       name: thresholds.0.threshold
                       value: '100'
@@ -2045,7 +2438,7 @@ zabbix_export:
                       value: bps
                     - type: STRING
                       name: thresholds.0.color
-                      value: 00A2E5
+                      value: 7499FF
                     - type: STRING
                       name: thresholds.0.threshold
                       value: '100'
@@ -2057,10 +2450,10 @@ zabbix_export:
                   fields:
                     - type: STRING
                       name: ds.0.color.0
-                      value: 0EC9AC
+                      value: 00C48C
                     - type: STRING
                       name: ds.0.color.1
-                      value: 00A2E5
+                      value: 7499FF
                     - type: INTEGER
                       name: ds.0.dataset_type
                       value: '0'
@@ -2109,37 +2502,37 @@ zabbix_export:
                       value: '0'
                     - type: STRING
                       name: thresholds.0.color
-                      value: 0EC9AC
+                      value: 00C48C
                     - type: STRING
                       name: thresholds.0.threshold
                       value: '1'
                     - type: STRING
                       name: thresholds.1.color
-                      value: FF465C
+                      value: E45959
                     - type: STRING
                       name: thresholds.1.threshold
                       value: '2'
                     - type: STRING
                       name: thresholds.2.color
-                      value: FFD54F
+                      value: FFBF59
                     - type: STRING
                       name: thresholds.2.threshold
                       value: '4'
                     - type: STRING
                       name: thresholds.3.color
-                      value: FFD54F
+                      value: FFBF59
                     - type: STRING
                       name: thresholds.3.threshold
                       value: '5'
                     - type: STRING
                       name: thresholds.4.color
-                      value: FFD54F
+                      value: FFBF59
                     - type: STRING
                       name: thresholds.4.threshold
                       value: '6'
                     - type: STRING
                       name: thresholds.5.color
-                      value: FFD54F
+                      value: FFBF59
                     - type: STRING
                       name: thresholds.5.threshold
                       value: '7'
@@ -2172,7 +2565,7 @@ zabbix_export:
                       value: '0'
                     - type: STRING
                       name: thresholds.0.color
-                      value: FF465C
+                      value: E45959
                     - type: STRING
                       name: thresholds.0.threshold
                       value: '1'
@@ -2205,7 +2598,7 @@ zabbix_export:
                       value: '0'
                     - type: STRING
                       name: thresholds.0.color
-                      value: FF465C
+                      value: E45959
                     - type: STRING
                       name: thresholds.0.threshold
                       value: '1'
@@ -2217,10 +2610,10 @@ zabbix_export:
                   fields:
                     - type: STRING
                       name: ds.0.color.0
-                      value: 0EC9AC
+                      value: 00C48C
                     - type: STRING
                       name: ds.0.color.1
-                      value: 00A2E5
+                      value: 7499FF
                     - type: INTEGER
                       name: ds.0.dataset_type
                       value: '0'
@@ -2269,37 +2662,37 @@ zabbix_export:
                       value: '0'
                     - type: STRING
                       name: thresholds.0.color
-                      value: 0EC9AC
+                      value: 00C48C
                     - type: STRING
                       name: thresholds.0.threshold
                       value: '1'
                     - type: STRING
                       name: thresholds.1.color
-                      value: FF465C
+                      value: E45959
                     - type: STRING
                       name: thresholds.1.threshold
                       value: '2'
                     - type: STRING
                       name: thresholds.2.color
-                      value: FFD54F
+                      value: FFBF59
                     - type: STRING
                       name: thresholds.2.threshold
                       value: '4'
                     - type: STRING
                       name: thresholds.3.color
-                      value: FFD54F
+                      value: FFBF59
                     - type: STRING
                       name: thresholds.3.threshold
                       value: '5'
                     - type: STRING
                       name: thresholds.4.color
-                      value: FFD54F
+                      value: FFBF59
                     - type: STRING
                       name: thresholds.4.threshold
                       value: '6'
                     - type: STRING
                       name: thresholds.5.color
-                      value: FFD54F
+                      value: FFBF59
                     - type: STRING
                       name: thresholds.5.threshold
                       value: '7'
@@ -2332,7 +2725,7 @@ zabbix_export:
                       value: '0'
                     - type: STRING
                       name: thresholds.0.color
-                      value: FF465C
+                      value: E45959
                     - type: STRING
                       name: thresholds.0.threshold
                       value: '1'
@@ -2365,7 +2758,7 @@ zabbix_export:
                       value: '0'
                     - type: STRING
                       name: thresholds.0.color
-                      value: FF465C
+                      value: E45959
                     - type: STRING
                       name: thresholds.0.threshold
                       value: '1'
@@ -2377,10 +2770,10 @@ zabbix_export:
                   fields:
                     - type: STRING
                       name: ds.0.color.0
-                      value: 0EC9AC
+                      value: 00C48C
                     - type: STRING
                       name: ds.0.color.1
-                      value: 00A2E5
+                      value: 7499FF
                     - type: INTEGER
                       name: ds.0.dataset_type
                       value: '0'
@@ -2399,6 +2792,340 @@ zabbix_export:
                     - type: INTEGER
                       name: working_time
                       value: '1'
+            - name: 'BGP: Peers'
+              widgets:
+                - type: honeycomb
+                  name: 'Connection state'
+                  width: '72'
+                  height: '3'
+                  fields:
+                    - type: STRING
+                      name: items.0
+                      value: 'BGP*Connection state'
+                    - type: STRING
+                      name: primary_label
+                      value: '{{ITEM.NAME}.regsub("(\[\d{1,3}(?:\.\d{1,3}){3}\])","Peer: \1")}'
+                    - type: INTEGER
+                      name: primary_label_size
+                      value: '15'
+                    - type: INTEGER
+                      name: primary_label_size_type
+                      value: '1'
+                    - type: STRING
+                      name: reference
+                      value: BGPCN
+                    - type: INTEGER
+                      name: secondary_label_decimal_places
+                      value: '0'
+                    - type: INTEGER
+                      name: secondary_label_size
+                      value: '25'
+                    - type: INTEGER
+                      name: secondary_label_size_type
+                      value: '1'
+                    - type: INTEGER
+                      name: secondary_label_units_show
+                      value: '0'
+                    - type: STRING
+                      name: thresholds.0.color
+                      value: E45959
+                    - type: STRING
+                      name: thresholds.0.threshold
+                      value: '1'
+                    - type: STRING
+                      name: thresholds.1.color
+                      value: E45959
+                    - type: STRING
+                      name: thresholds.1.threshold
+                      value: '2'
+                    - type: STRING
+                      name: thresholds.2.color
+                      value: E45959
+                    - type: STRING
+                      name: thresholds.2.threshold
+                      value: '4'
+                    - type: STRING
+                      name: thresholds.3.color
+                      value: E45959
+                    - type: STRING
+                      name: thresholds.3.threshold
+                      value: '5'
+                    - type: STRING
+                      name: thresholds.4.color
+                      value: 00C48C
+                    - type: STRING
+                      name: thresholds.4.threshold
+                      value: '6'
+                - type: honeycomb
+                  name: 'FSM established transitions (per second)'
+                  'y': '3'
+                  width: '72'
+                  height: '3'
+                  fields:
+                    - type: STRING
+                      name: items.0
+                      value: 'BGP*FSM established transitions, per second'
+                    - type: STRING
+                      name: primary_label
+                      value: '{{ITEM.NAME}.regsub("(\[\d{1,3}(?:\.\d{1,3}){3}\])","Peer: \1")}'
+                    - type: INTEGER
+                      name: primary_label_size
+                      value: '15'
+                    - type: INTEGER
+                      name: primary_label_size_type
+                      value: '1'
+                    - type: STRING
+                      name: reference
+                      value: BGPFS
+                    - type: INTEGER
+                      name: secondary_label_size
+                      value: '25'
+                    - type: INTEGER
+                      name: secondary_label_size_type
+                      value: '1'
+                    - type: INTEGER
+                      name: secondary_label_units_show
+                      value: '0'
+                    - type: STRING
+                      name: thresholds.0.color
+                      value: 00C48C
+                    - type: STRING
+                      name: thresholds.0.threshold
+                      value: '0'
+                    - type: STRING
+                      name: thresholds.1.color
+                      value: E45959
+                    - type: STRING
+                      name: thresholds.1.threshold
+                      value: '0.01'
+                - type: honeycomb
+                  name: 'Hold time'
+                  'y': '6'
+                  width: '72'
+                  height: '3'
+                  fields:
+                    - type: STRING
+                      name: items.0
+                      value: 'BGP*Hold time'
+                    - type: STRING
+                      name: primary_label
+                      value: '{{ITEM.NAME}.regsub("(\[\d{1,3}(?:\.\d{1,3}){3}\])","Peer: \1")}'
+                    - type: INTEGER
+                      name: primary_label_size
+                      value: '15'
+                    - type: INTEGER
+                      name: primary_label_size_type
+                      value: '1'
+                    - type: STRING
+                      name: reference
+                      value: BGPHT
+                    - type: INTEGER
+                      name: secondary_label_decimal_places
+                      value: '0'
+                    - type: INTEGER
+                      name: secondary_label_size
+                      value: '25'
+                    - type: INTEGER
+                      name: secondary_label_size_type
+                      value: '1'
+                    - type: INTEGER
+                      name: secondary_label_units_show
+                      value: '0'
+                - type: svggraph
+                  name: 'FSM established transitions (per second) and connection state'
+                  'y': '9'
+                  width: '72'
+                  height: '4'
+                  fields:
+                    - type: STRING
+                      name: ds.0.color.0
+                      value: 00C48C
+                    - type: INTEGER
+                      name: ds.0.dataset_type
+                      value: '0'
+                    - type: STRING
+                      name: ds.0.itemids.0._reference
+                      value: BGPCN._itemid
+                    - type: INTEGER
+                      name: ds.0.width
+                      value: '2'
+                    - type: INTEGER
+                      name: ds.1.axisy
+                      value: '1'
+                    - type: STRING
+                      name: ds.1.color.0
+                      value: 7499FF
+                    - type: INTEGER
+                      name: ds.1.dataset_type
+                      value: '0'
+                    - type: STRING
+                      name: ds.1.itemids.0._reference
+                      value: BGPFS._itemid
+                    - type: INTEGER
+                      name: ds.1.width
+                      value: '2'
+                    - type: STRING
+                      name: lefty_max
+                      value: '6'
+                    - type: STRING
+                      name: lefty_min
+                      value: '0'
+                    - type: STRING
+                      name: reference
+                      value: BGPGP
+                    - type: INTEGER
+                      name: righty
+                      value: '1'
+                    - type: STRING
+                      name: righty_min
+                      value: '0'
+                    - type: INTEGER
+                      name: severities.0
+                      value: '4'
+                    - type: INTEGER
+                      name: severities.1
+                      value: '5'
+                    - type: INTEGER
+                      name: show_problems
+                      value: '1'
+            - name: CPU
+              widgets:
+                - type: svggraph
+                  name: 'System load'
+                  width: '72'
+                  height: '4'
+                  fields:
+                    - type: STRING
+                      name: ds.0.color.0
+                      value: 00C48C
+                    - type: STRING
+                      name: ds.0.color.1
+                      value: 7499FF
+                    - type: STRING
+                      name: ds.0.color.2
+                      value: FFBF59
+                    - type: INTEGER
+                      name: ds.0.dataset_type
+                      value: '0'
+                    - type: INTEGER
+                      name: ds.0.fill
+                      value: '0'
+                    - type: ITEM
+                      name: ds.0.itemids.0
+                      value:
+                        host: 'Vyatta Virtual Router by SNMP'
+                        key: system.cpu.load.avg1
+                    - type: ITEM
+                      name: ds.0.itemids.1
+                      value:
+                        host: 'Vyatta Virtual Router by SNMP'
+                        key: system.cpu.load.avg5
+                    - type: ITEM
+                      name: ds.0.itemids.2
+                      value:
+                        host: 'Vyatta Virtual Router by SNMP'
+                        key: system.cpu.load.avg15
+                    - type: INTEGER
+                      name: ds.0.width
+                      value: '2'
+                    - type: INTEGER
+                      name: ds.1.axisy
+                      value: '1'
+                    - type: STRING
+                      name: ds.1.color.0
+                      value: 97AAB3
+                    - type: INTEGER
+                      name: ds.1.dataset_type
+                      value: '0'
+                    - type: INTEGER
+                      name: ds.1.fill
+                      value: '0'
+                    - type: ITEM
+                      name: ds.1.itemids.0
+                      value:
+                        host: 'Vyatta Virtual Router by SNMP'
+                        key: system.cpu.num
+                    - type: INTEGER
+                      name: ds.1.width
+                      value: '2'
+                    - type: STRING
+                      name: lefty_min
+                      value: '0'
+                    - type: STRING
+                      name: reference
+                      value: CPULO
+                    - type: INTEGER
+                      name: righty
+                      value: '1'
+                    - type: STRING
+                      name: righty_min
+                      value: '0'
+                - type: svggraph
+                  name: 'CPU usage'
+                  'y': '4'
+                  width: '72'
+                  height: '4'
+                  fields:
+                    - type: STRING
+                      name: ds.0.color.0
+                      value: 00C48C
+                    - type: STRING
+                      name: ds.0.color.1
+                      value: 7499FF
+                    - type: STRING
+                      name: ds.0.color.2
+                      value: FFBF59
+                    - type: INTEGER
+                      name: ds.0.dataset_type
+                      value: '0'
+                    - type: INTEGER
+                      name: ds.0.fill
+                      value: '0'
+                    - type: ITEM
+                      name: ds.0.itemids.0
+                      value:
+                        host: 'Vyatta Virtual Router by SNMP'
+                        key: system.cpu.system
+                    - type: ITEM
+                      name: ds.0.itemids.1
+                      value:
+                        host: 'Vyatta Virtual Router by SNMP'
+                        key: system.cpu.user
+                    - type: ITEM
+                      name: ds.0.itemids.2
+                      value:
+                        host: 'Vyatta Virtual Router by SNMP'
+                        key: system.cpu.idle
+                    - type: INTEGER
+                      name: ds.0.width
+                      value: '2'
+                    - type: STRING
+                      name: lefty_min
+                      value: '0'
+                    - type: INTEGER
+                      name: legend_columns
+                      value: '3'
+                    - type: STRING
+                      name: reference
+                      value: CPUUG
+                - type: svggraph
+                  name: 'CPU [{#DESCRIPTION}][{#SNMPINDEX}]: CPU utilization'
+                  'y': '8'
+                  width: '72'
+                  height: '6'
+                  fields:
+                    - type: INTEGER
+                      name: ds.0.fill
+                      value: '0'
+                    - type: STRING
+                      name: ds.0.items.0
+                      value: 'CPU [*]: Utilization, %'
+                    - type: INTEGER
+                      name: ds.0.width
+                      value: '2'
+                    - type: STRING
+                      name: reference
+                      value: CPUUT
             - name: 'Storage: Utilization'
               widgets:
                 - type: honeycomb
@@ -2426,19 +3153,19 @@ zabbix_export:
                       value: '%'
                     - type: STRING
                       name: thresholds.0.color
-                      value: 0EC9AC
+                      value: 00C48C
                     - type: STRING
                       name: thresholds.0.threshold
                       value: '0'
                     - type: STRING
                       name: thresholds.1.color
-                      value: FFD54F
+                      value: FFBF59
                     - type: STRING
                       name: thresholds.1.threshold
                       value: '80'
                     - type: STRING
                       name: thresholds.2.color
-                      value: FF465C
+                      value: E45959
                     - type: STRING
                       name: thresholds.2.threshold
                       value: '95'
@@ -2498,10 +3225,10 @@ zabbix_export:
                   fields:
                     - type: STRING
                       name: ds.0.color.0
-                      value: 0EC9AC
+                      value: 00C48C
                     - type: STRING
                       name: ds.0.color.1
-                      value: 00A2E5
+                      value: 7499FF
                     - type: INTEGER
                       name: ds.0.dataset_type
                       value: '0'
@@ -2522,7 +3249,7 @@ zabbix_export:
                       value: '1'
                     - type: STRING
                       name: ds.1.color.0
-                      value: FF465C
+                      value: E45959
                     - type: INTEGER
                       name: ds.1.dataset_type
                       value: '0'
@@ -2554,6 +3281,21 @@ zabbix_export:
                       name: working_time
                       value: '1'
       valuemaps:
+        - uuid: ea6e1f12288943f5890837c8cb38431e
+          name: 'BGP peer state'
+          mappings:
+            - value: '1'
+              newvalue: Idle
+            - value: '2'
+              newvalue: Connect
+            - value: '3'
+              newvalue: Active
+            - value: '4'
+              newvalue: Opensent
+            - value: '5'
+              newvalue: Openconfirm
+            - value: '6'
+              newvalue: Established
         - uuid: 0af4bd0246d3414a946fdb800a964a43
           name: 'HOST-RESOURCES-MIB::hrDeviceStatus'
           mappings:
@@ -3187,7 +3929,42 @@ zabbix_export:
       tags:
         - tag: scope
           value: notice
+    - uuid: 14ad5e7b60624d5bbcd7124278d23a48
+      expression: |
+        min(/Vyatta Virtual Router by SNMP/system.cpu.load.avg1,5m)/last(/Vyatta Virtual Router by SNMP/system.cpu.num)>{$VYATTA.LOAD_AVG_PER_CPU.MAX.WARN}
+        and last(/Vyatta Virtual Router by SNMP/system.cpu.load.avg5)>0
+        and last(/Vyatta Virtual Router by SNMP/system.cpu.load.avg15)>0
+      name: 'Vyatta: Load average is too high'
+      event_name: 'Vyatta: Load average is too high (per CPU load over {$VYATTA.LOAD_AVG_PER_CPU.MAX.WARN} for 5m)'
+      opdata: 'Load averages(1m 5m 15m): ({ITEM.LASTVALUE1} {ITEM.LASTVALUE3} {ITEM.LASTVALUE4}), # of CPUs: {ITEM.LASTVALUE2}'
+      priority: AVERAGE
+      description: 'The load average per CPU is too high. The system may be slow to respond.'
+      tags:
+        - tag: scope
+          value: capacity
+        - tag: scope
+          value: performance
   graphs:
+    - uuid: dfd6533466a74f348ba660166166ce85
+      name: 'CPU usage'
+      type: STACKED
+      ymin_type_1: FIXED
+      ymax_type_1: FIXED
+      graph_items:
+        - color: 199C0D
+          item:
+            host: 'Vyatta Virtual Router by SNMP'
+            key: system.cpu.system
+        - sortorder: '1'
+          color: F63100
+          item:
+            host: 'Vyatta Virtual Router by SNMP'
+            key: system.cpu.user
+        - sortorder: '2'
+          color: 00611C
+          item:
+            host: 'Vyatta Virtual Router by SNMP'
+            key: system.cpu.idle
     - uuid: ab9f0c1098fd46a991ee8afab8987916
       name: 'Memory utilization'
       graph_items:
@@ -3208,3 +3985,27 @@ zabbix_export:
           item:
             host: 'Vyatta Virtual Router by SNMP'
             key: system.memory.util
+    - uuid: 517cd4cc43394fe98ff85c921e32e602
+      name: 'System load'
+      ymin_type_1: FIXED
+      graph_items:
+        - color: 199C0D
+          item:
+            host: 'Vyatta Virtual Router by SNMP'
+            key: system.cpu.load.avg1
+        - sortorder: '1'
+          color: F63100
+          item:
+            host: 'Vyatta Virtual Router by SNMP'
+            key: system.cpu.load.avg5
+        - sortorder: '2'
+          color: 00611C
+          item:
+            host: 'Vyatta Virtual Router by SNMP'
+            key: system.cpu.load.avg15
+        - sortorder: '3'
+          color: F7941D
+          yaxisside: RIGHT
+          item:
+            host: 'Vyatta Virtual Router by SNMP'
+            key: system.cpu.num

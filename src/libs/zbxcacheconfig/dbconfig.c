@@ -1570,7 +1570,9 @@ static void	DCsync_hosts(zbx_dbsync_t *sync, zbx_uint64_t revision, zbx_vector_u
 
 		/* store new information in host structure */
 
-		dc_strpool_replace(found, &host->host, row[2]);
+		if (SUCCEED == dc_strpool_replace(found, &host->host, row[2]))
+			host->sz_host = strlen(host->host) + 1;
+
 		dc_strpool_replace(found, &host->name, row[11]);
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 		dc_strpool_replace(found, &host->tls_issuer, row[14]);
@@ -2008,17 +2010,12 @@ static char	*dc_expand_host_macros_dyn(const char *text, const ZBX_DC_HOST *dc_h
 #define IF_MACRO_HOST_IP	IF_MACRO_HOST "IP}"
 #define IF_MACRO_HOST_DNS	IF_MACRO_HOST "DNS}"
 #define IF_MACRO_HOST_CONN	IF_MACRO_HOST "CONN}"
-/* deprecated macros */
-#define IF_MACRO_HOSTNAME	"{HOSTNAME}"
-#define IF_MACRO_IPADDRESS	"{IPADDRESS}"
 
 #define IF_MACRO_HOST_HOST_LEN	ZBX_CONST_STRLEN(IF_MACRO_HOST_HOST)
 #define IF_MACRO_HOST_NAME_LEN	ZBX_CONST_STRLEN(IF_MACRO_HOST_NAME)
 #define IF_MACRO_HOST_IP_LEN	ZBX_CONST_STRLEN(IF_MACRO_HOST_IP)
 #define IF_MACRO_HOST_DNS_LEN	ZBX_CONST_STRLEN(IF_MACRO_HOST_DNS)
 #define IF_MACRO_HOST_CONN_LEN	ZBX_CONST_STRLEN(IF_MACRO_HOST_CONN)
-#define IF_MACRO_HOSTNAME_LEN	ZBX_CONST_STRLEN(IF_MACRO_HOSTNAME)
-#define IF_MACRO_IPADDRESS_LEN	ZBX_CONST_STRLEN(IF_MACRO_IPADDRESS)
 
 	zbx_token_t		token;
 	int			pos = 0, last_pos = 0;
@@ -2038,8 +2035,7 @@ static char	*dc_expand_host_macros_dyn(const char *text, const ZBX_DC_HOST *dc_h
 
 		zbx_strncpy_alloc(&str, &str_alloc, &str_offset, text + last_pos, token.loc.l - (size_t)last_pos);
 
-		if (SUCCEED == zbx_strloc_cmp(text, &token.loc, IF_MACRO_HOST_HOST, IF_MACRO_HOST_HOST_LEN) ||
-				SUCCEED == zbx_strloc_cmp(text, &token.loc, IF_MACRO_HOSTNAME, IF_MACRO_HOSTNAME_LEN))
+		if (SUCCEED == zbx_strloc_cmp(text, &token.loc, IF_MACRO_HOST_HOST, IF_MACRO_HOST_HOST_LEN))
 		{
 			value = dc_host->host;
 		}
@@ -2049,9 +2045,7 @@ static char	*dc_expand_host_macros_dyn(const char *text, const ZBX_DC_HOST *dc_h
 		}
 		else if (0 != (flags & EXPAND_INTERFACE_MACROS))
 		{
-			if (SUCCEED == zbx_strloc_cmp(text, &token.loc, IF_MACRO_HOST_IP, IF_MACRO_HOST_IP_LEN) ||
-					SUCCEED == zbx_strloc_cmp(text, &token.loc, IF_MACRO_IPADDRESS,
-							IF_MACRO_IPADDRESS_LEN))
+			if (SUCCEED == zbx_strloc_cmp(text, &token.loc, IF_MACRO_HOST_IP, IF_MACRO_HOST_IP_LEN))
 			{
 				if (SUCCEED == zbx_dc_config_get_interface_by_type(&interface, dc_host->hostid,
 						INTERFACE_TYPE_AGENT))
@@ -2098,14 +2092,11 @@ static char	*dc_expand_host_macros_dyn(const char *text, const ZBX_DC_HOST *dc_h
 
 	return str;
 
-#undef IF_MACRO_HOSTNAME_LEN
 #undef IF_MACRO_HOST_CONN_LEN
 #undef IF_MACRO_HOST_DNS_LEN
 #undef IF_MACRO_HOST_IP_LEN
 #undef IF_MACRO_HOST_NAME_LEN
 #undef IF_MACRO_HOST_HOST_LEN
-#undef IF_MACRO_IPADDRESS
-#undef IF_MACRO_HOSTNAME
 #undef IF_MACRO_HOST_CONN
 #undef IF_MACRO_HOST_DNS
 #undef IF_MACRO_HOST_IP
@@ -3212,6 +3203,8 @@ static void	dc_item_value_type_free(ZBX_DC_ITEM *item, zbx_item_value_type_t typ
 static void	dc_item_value_type_update(int found, ZBX_DC_ITEM *item, zbx_item_value_type_t *old_value_type,
 		char **row)
 {
+	ZBX_DC_NUMITEM	*numitem;
+
 	if (1 == found && *old_value_type != item->value_type)
 	{
 		dc_item_value_type_free(item, *old_value_type);
@@ -3228,8 +3221,22 @@ static void	dc_item_value_type_update(int found, ZBX_DC_ITEM *item, zbx_item_val
 						sizeof(ZBX_DC_NUMITEM));
 			}
 
-			dc_strpool_replace(found, &item->itemvaluetype.numitem->trends_period, row[23]);
-			dc_strpool_replace(found, &item->itemvaluetype.numitem->units, row[26]);
+			numitem = item->itemvaluetype.numitem;
+
+			if (SUCCEED == dc_strpool_replace(found, &numitem->trends_period, row[23]))
+			{
+				numitem->sz_trends_period = strlen(numitem->trends_period) + 1;
+
+				if (FAIL == zbx_is_time_suffix(numitem->trends_period,
+						&numitem->trends_sec, ZBX_LENGTH_UNLIMITED))
+				{
+					numitem->trends_sec = 0;
+				}
+			}
+
+			if (SUCCEED == dc_strpool_replace(found, &numitem->units, row[26]))
+				numitem->sz_units = strlen(numitem->units) + 1;
+
 			break;
 		case ITEM_VALUE_TYPE_LOG:
 			if ('\0' == *row[10])
@@ -3438,7 +3445,10 @@ static void	DCsync_items(zbx_dbsync_t *sync, zbx_uint64_t revision, zbx_synced_n
 			}
 
 			if (SUCCEED == dc_strpool_replace(found, &item->key, row[5]))
+			{
+				item->sz_key = strlen(item->key) + 1;
 				flags |= ZBX_ITEM_KEY_CHANGED;
+			}
 
 			item_hk_local.hostid = hostid;
 			item_hk_local.key = item->key;
@@ -3454,7 +3464,10 @@ static void	DCsync_items(zbx_dbsync_t *sync, zbx_uint64_t revision, zbx_synced_n
 		else
 		{
 			if (SUCCEED == dc_strpool_replace(found, &item->key, row[5]))
+			{
+				item->sz_key = strlen(item->key) + 1;
 				flags |= ZBX_ITEM_KEY_CHANGED;
+			}
 		}
 
 		/* store new information in item structure */
@@ -3463,7 +3476,13 @@ static void	DCsync_items(zbx_dbsync_t *sync, zbx_uint64_t revision, zbx_synced_n
 		item->flags = item_flags;
 		ZBX_DBROW2UINT64(interfaceid, row[19]);
 
-		dc_strpool_replace(found, &item->history_period, row[22]);
+		if (SUCCEED == dc_strpool_replace(found, &item->history_period, row[22]))
+		{
+			item->sz_history_period = strlen(item->history_period) + 1;
+
+			if (FAIL == zbx_is_time_suffix(item->history_period, &item->history_sec, ZBX_LENGTH_UNLIMITED))
+				item->history_sec = 0;
+		}
 
 		ZBX_STR2UCHAR(item->inventory_link, row[24]);
 		ZBX_DBROW2UINT64(item->valuemapid, row[25]);
@@ -9000,7 +9019,13 @@ static void	DCget_host(zbx_dc_host_t *dst_host, const ZBX_DC_HOST *src_host)
 	dst_host->status = src_host->status;
 	dst_host->monitored_by = src_host->monitored_by;
 
-	zbx_strscpy(dst_host->host, src_host->host);
+	if (sizeof(dst_host->host) < src_host->sz_host)
+	{
+		memcpy(dst_host->host, src_host->host, sizeof(dst_host->host) - 1);
+		dst_host->host[sizeof(dst_host->host) - 1] = '\0';
+	}
+	else
+		memcpy(dst_host->host, src_host->host, src_host->sz_host);
 
 	zbx_strlcpy_utf8(dst_host->name, src_host->name, sizeof(dst_host->name));
 
@@ -9474,7 +9499,13 @@ static void	DCget_item(zbx_dc_item_t *dst_item, const ZBX_DC_ITEM *src_item)
 
 	dst_item->status = src_item->status;
 
-	zbx_strscpy(dst_item->key_orig, src_item->key);
+	if (sizeof(dst_item->key_orig) < src_item->sz_key)
+	{
+		memcpy(dst_item->key_orig, src_item->key, sizeof(dst_item->key_orig) - 1);
+		dst_item->key_orig[sizeof(dst_item->key_orig) - 1] = '\0';
+	}
+	else
+		memcpy(dst_item->key_orig, src_item->key, src_item->sz_key);
 
 	dst_item->itemid = src_item->itemid;
 	dst_item->flags = src_item->flags;

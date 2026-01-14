@@ -628,7 +628,11 @@ class testPermissionsWithoutCSRF extends CWebTest {
 				[
 					'db' => 'SELECT * FROM connector',
 					'link' => 'zabbix.php?action=connector.list',
-					'overlay' => 'create'
+					'overlay' => 'create',
+					'fields' => [
+						'id:name' => 'CSRF connector test name',
+						'id:url' => 'csrfurl.com'
+					]
 				]
 			],
 			// #60 Connector update.
