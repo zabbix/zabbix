@@ -40,14 +40,8 @@ function get_image_by_imageid($imageid) {
 /**
  * Resizes the given image resource to the specified size keeping the original
  * proportions of the image.
- *
- * @param resource $source
- * @param int $thumbWidth
- * @param int $thumbHeight
- *
- * @return resource
  */
-function imageThumb($source, $thumbWidth = 0, $thumbHeight = 0) {
+function imageThumb(GdImage $source, int $thumbWidth = 0, int $thumbHeight = 0): GdImage {
 	$srcWidth	= imagesx($source);
 	$srcHeight	= imagesy($source);
 
@@ -87,7 +81,6 @@ function imageThumb($source, $thumbWidth = 0, $thumbHeight = 0) {
 			$srcWidth, $srcHeight
 		);
 
-		imagedestroy($source);
 		$source = $thumb;
 	}
 

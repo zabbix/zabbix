@@ -1765,7 +1765,6 @@ function show_messages($good = null, $okmsg = null, $errmsg = null) {
 			}
 
 			imageOut($canvas);
-			imagedestroy($canvas);
 			break;
 
 		default:
