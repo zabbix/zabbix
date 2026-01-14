@@ -480,9 +480,11 @@ zbx_uint64_t	zbx_variant_size(const zbx_variant_t *value)
 			}
 			break;
 		case ZBX_VARIANT_JSON:
-			size = strlen(value->data.str) + 1;
-			THIS_SHOULD_NEVER_HAPPEN;
+			size = strlen(value->data.json) + 1;
+			break;
 		default:
+			zabbix_log(LOG_LEVEL_CRIT, "%s(): unexpected value->type:%hhu", __func__, value->type);
+			THIS_SHOULD_NEVER_HAPPEN;
 			break;
 	}
 
