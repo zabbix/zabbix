@@ -1446,7 +1446,7 @@ static int	history_clickhouse_fetch_batch(void *data, zbx_vector_item_history_t 
 
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "select itemid,clock_ns,value");
 	if (ITEM_VALUE_TYPE_LOG == value_type)
-		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ",source,severity,logeventid,log_time");
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ",source,severity,logeventid,timestamp");
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " from %s where",
 			clickhouse_history_tables[value_type]);
