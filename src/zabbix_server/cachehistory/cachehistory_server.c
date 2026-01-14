@@ -703,16 +703,13 @@ static void	normalize_item_value(const zbx_history_sync_item_t *item, zbx_dc_his
 			break;
 		case ITEM_VALUE_TYPE_STR:
 		case ITEM_VALUE_TYPE_TEXT:
+		case ITEM_VALUE_TYPE_JSON:
 			zbx_variant_set_str(&value_var, hdata->value.str);
 			hdata->value.str = NULL;
 			break;
 		case ITEM_VALUE_TYPE_LOG:
 			zbx_variant_set_str(&value_var, hdata->value.log->value);
 			hdata->value.log->value = NULL;
-			break;
-		case ITEM_VALUE_TYPE_JSON:
-			zbx_variant_set_str(&value_var, hdata->value.str);
-			hdata->value.str = NULL;
 			break;
 		default:
 			THIS_SHOULD_NEVER_HAPPEN;

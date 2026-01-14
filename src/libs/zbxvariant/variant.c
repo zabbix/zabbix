@@ -607,8 +607,8 @@ static int	variant_compare_str(const zbx_variant_t *value1, const zbx_variant_t 
 /******************************************************************************
  *                                                                            *
  * Purpose: Compares two variant values when at least one is double and the   *
- *          other is double, uint64 or a string/JSON representing a valid     *
- *          double value.                                                     *
+ *          other is double, uint64 or a string representing a valid double   *
+ *          value.                                                            *
  *                                                                            *
  ******************************************************************************/
 static int	variant_compare_dbl(const zbx_variant_t *value1, const zbx_variant_t *value2)

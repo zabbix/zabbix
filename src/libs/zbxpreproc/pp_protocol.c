@@ -1153,7 +1153,7 @@ void	zbx_preprocess_item_value(zbx_uint64_t itemid, unsigned char item_value_typ
 			zbx_preprocessor_flush();
 	}
 	else
-{
+	{
 		/* When received value from passive agent, all item value types have TEXT type at this stage. */
 		/* When received from trapper - the value type is correlated with item_value_type.            */
 		/* If item_value_type is JSON, then must use result type, depending on result->type.          */
@@ -1196,8 +1196,7 @@ void	zbx_preprocess_item_value(zbx_uint64_t itemid, unsigned char item_value_typ
 				zabbix_log(LOG_LEVEL_CRIT, "unexpected result type: %d and item_value_type: %hhu combo "
 						"for itemid: " ZBX_FS_UI64, result->type, item_value_type, itemid);
 				THIS_SHOULD_NEVER_HAPPEN;
-
-				return;
+				goto out;
 			}
 
 			if (ZBX_HISTORY_JSON_VALUE_LEN < strlen(json_val))
