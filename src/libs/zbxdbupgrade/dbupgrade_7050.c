@@ -492,6 +492,42 @@ static int	DBpatch_7050038(void)
 	return SUCCEED;
 }
 
+static int	DBpatch_7050039(void)
+{
+	return DBdrop_foreign_key("dhosts", 1);
+}
+
+static int	DBpatch_7050040(void)
+{
+	const zbx_db_field_t	field = {"druleid", NULL, "drules", "druleid", 0, ZBX_TYPE_ID, 0, 0};
+
+	return DBadd_foreign_key("dhosts", 1, &field);
+}
+
+static int	DBpatch_7050041(void)
+{
+	return DBdrop_foreign_key("dservices", 1);
+}
+
+static int	DBpatch_7050042(void)
+{
+	const zbx_db_field_t	field = {"dhostid", NULL, "dhosts", "dhostid", 0, ZBX_TYPE_ID, 0, 0};
+
+	return DBadd_foreign_key("dservices", 1, &field);
+}
+
+static int	DBpatch_7050043(void)
+{
+	return DBdrop_foreign_key("dservices", 2);
+}
+
+static int	DBpatch_7050044(void)
+{
+	const zbx_db_field_t	field = {"dcheckid", NULL, "dchecks", "dcheckid", 0, ZBX_TYPE_ID, 0, 0};
+
+	return DBadd_foreign_key("dservices", 2, &field);
+}
+
 #endif
 
 DBPATCH_START(7050)
@@ -537,5 +573,11 @@ DBPATCH_ADD(7050035, 0, 1)
 DBPATCH_ADD(7050036, 0, 1)
 DBPATCH_ADD(7050037, 0, 1)
 DBPATCH_ADD(7050038, 0, 1)
+DBPATCH_ADD(7050039, 0, 1)
+DBPATCH_ADD(7050040, 0, 1)
+DBPATCH_ADD(7050041, 0, 1)
+DBPATCH_ADD(7050042, 0, 1)
+DBPATCH_ADD(7050043, 0, 1)
+DBPATCH_ADD(7050044, 0, 1)
 
 DBPATCH_END()
