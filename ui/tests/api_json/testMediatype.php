@@ -91,13 +91,6 @@ class testMediatype extends CAPITest {
 					'smtp_authentication' => SMTP_AUTHENTICATION_PASSWORD
 				]],
 				'Invalid parameter "/1/smtp_authentication": value must be 0.'
-			],
-			'access_token_updated is out of range' => [
-				[[
-					'mediatypeid' => ':media_type:OAuth with tokens',
-					'access_token_updated' => ':time'
-				]],
-				'Invalid parameter "/1/access_token_updated": value must be one of :interval.'
 			]
 		];
 	}
@@ -123,7 +116,8 @@ class testMediatype extends CAPITest {
 				]],
 				null
 			],
-			'Enable access token' => [
+			'Enable access token' =>
+			[
 				[[
 					'mediatypeid' => ':media_type:OAuth with tokens and tokens_status 0',
 					'tokens_status' => OAUTH_ACCESS_TOKEN_VALID,
@@ -172,14 +166,6 @@ class testMediatype extends CAPITest {
 					'gsm_modem' => '/dev/ttyS0'
 				]],
 				null
-			],
-			'Update access_token_updated within the appropriate range' => [
-				[[
-					'mediatypeid' => ':media_type:OAuth with tokens',
-					'access_token' => 'token',
-					'access_token_updated' => time() - SEC_PER_MIN
-				]],
-				null
 			]
 		];
 	}
@@ -189,18 +175,6 @@ class testMediatype extends CAPITest {
 	 * @dataProvider updateValidDataProvider
 	 */
 	public function testMediatypeUpdate(array $mediatypes, $expected_error) {
-		if (array_key_exists('access_token_updated', $mediatypes[0])
-				&& $mediatypes[0]['access_token_updated'] === ':time') {
-			$now = time();
-			$mediatypes[0]['access_token_updated'] = $now - SEC_PER_HOUR;
-
-			if ($expected_error !== null) {
-				$time_from = date('Y-m-d H:i:s', $now - 600);
-				$time_to = date('Y-m-d H:i:s', $now);
-				$expected_error = str_replace(':interval', $time_from.'-'.$time_to, $expected_error);
-			}
-		}
-
 		CTestDataHelper::convertMediatypesReferences($mediatypes);
 		$this->call('mediatype.update', $mediatypes, $expected_error);
 	}
@@ -269,7 +243,8 @@ class testMediatype extends CAPITest {
 
 	public static function createInvalidDataProvider(): array {
 		return [
-			'OAuth is not supported for Office relay' => [
+			'OAuth is not supported for Office relay' =>
+			[
 				[[
 					'name' => 'OAuth is not supported for Office relay',
 					'type' => MEDIA_TYPE_EMAIL,
@@ -284,7 +259,8 @@ class testMediatype extends CAPITest {
 				]],
 				'Invalid parameter "/1/smtp_authentication": value must be one of 0, 1.'
 			],
-			'OAuth not supported for SMTP_AUTHENTICATION_NONE' => [
+			'OAuth not supported for SMTP_AUTHENTICATION_NONE' =>
+			[
 				[[
 					'name' => 'OAuth not supported for SMTP_AUTHENTICATION_NONE',
 					'type' => MEDIA_TYPE_EMAIL,
@@ -297,7 +273,8 @@ class testMediatype extends CAPITest {
 				]],
 				'Invalid parameter "/1/redirection_url": value must be empty.'
 			],
-			'OAuth not supported for SMTP_AUTHENTICATION_PASSWORD' => [
+			'OAuth not supported for SMTP_AUTHENTICATION_PASSWORD' =>
+			[
 				[[
 					'name' => 'OAuth not supported for SMTP_AUTHENTICATION_PASSWORD',
 					'type' => MEDIA_TYPE_EMAIL,
@@ -309,27 +286,6 @@ class testMediatype extends CAPITest {
 					'redirection_url' => 'http://example.com'
 				]],
 				'Invalid parameter "/1/redirection_url": value must be empty.'
-			],
-			'access_token_updated is out of range' => [
-				[[
-					'name' => 'access_token_updated is out of range',
-					'type' => MEDIA_TYPE_EMAIL,
-					'smtp_server' => 'smtp.gmail.com',
-					'smtp_helo' => 'example.com',
-					'smtp_email' => 'zabbix@example.com',
-					'smtp_authentication' => SMTP_AUTHENTICATION_OAUTH,
-					'redirection_url' => 'http://example.com',
-					'client_id' => 'clientid',
-					'client_secret' => 'clientsecret',
-					'authorization_url' => 'http://example.com',
-					'token_url' => 'http://example.com',
-					'tokens_status' => OAUTH_REFRESH_TOKEN_VALID,
-					'refresh_token' => 'refreshtoken',
-					'access_token' => 'updated',
-					'access_token_updated' => ':time',
-					'access_expires_in' => 600
-				]],
-				'Invalid parameter "/1/access_token_updated": value must be one of :interval.'
 			]
 		];
 	}
@@ -338,24 +294,13 @@ class testMediatype extends CAPITest {
 	 * @dataProvider createInvalidDataProvider
 	 */
 	public function testMediatypeCreate(array $mediatypes, $expected_error) {
-		if (array_key_exists('access_token_updated', $mediatypes[0])
-				&& $mediatypes[0]['access_token_updated'] === ':time') {
-			$now = time();
-			$mediatypes[0]['access_token_updated'] = $now - SEC_PER_HOUR;
-
-			if ($expected_error !== null) {
-				$time_from = date('Y-m-d H:i:s', $now - $mediatypes[0]['access_expires_in']);
-				$time_to = date('Y-m-d H:i:s', $now);
-				$expected_error = str_replace(':interval', $time_from.'-'.$time_to, $expected_error);
-			}
-		}
-
 		$this->call('mediatype.create', $mediatypes, $expected_error);
 	}
 
 	public static function createAccessTokenUpdatedDataProvider(): array {
 		return [
-			'access_token set access_token_updated' => [
+			'access_token set access_token_updated' =>
+			[
 				[[
 					'redirection_url' => 'http://example.com',
 					'client_id' => 'clientid',
@@ -367,7 +312,8 @@ class testMediatype extends CAPITest {
 				]],
 				true
 			],
-			'refresh_token do not set access_token_updated' => [
+			'refresh_token do not set access_token_updated' =>
+			[
 				[[
 					'redirection_url' => 'http://example.com',
 					'client_id' => 'clientid',
@@ -379,26 +325,12 @@ class testMediatype extends CAPITest {
 				]],
 				false
 			],
-			'SMTP_AUTHENTICATION_NONE or SMTP_AUTHENTICATION_PASSWORD do not set access_token_updated' => [
+			'SMTP_AUTHENTICATION_NONE or SMTP_AUTHENTICATION_PASSWORD do not set access_token_updated' =>
+			[
 				[[
 					'smtp_authentication' => SMTP_AUTHENTICATION_NONE
 				]],
 				false
-			],
-			'access_token_updated is within the appropriate range' => [
-				[[
-					'redirection_url' => 'http://example.com',
-					'client_id' => 'clientid',
-					'client_secret' => 'clientsecret',
-					'authorization_url' => 'http://example.com',
-					'token_url' => 'http://example.com',
-					'tokens_status' => OAUTH_REFRESH_TOKEN_VALID,
-					'refresh_token' => 'refreshtoken',
-					'access_token' => 'updated',
-					'access_token_updated' => time() - SEC_PER_MIN,
-					'access_expires_in' => 600
-				]],
-				true
 			]
 		];
 	}
