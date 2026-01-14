@@ -2739,4 +2739,32 @@ class CHost extends CHostGeneral {
 
 		self::addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_HOST_GROUP, $host_groups, $db_host_groups);
 	}
+
+	public static function unlinkGroups(array $groupids): void {
+		$db_hosts = API::Host()->get([
+			'output' => ['host'],
+			'groupids' => $groupids,
+			'preservekeys' => true
+		]);
+
+		if (!$db_hosts) {
+			return;
+		}
+
+		$hosts = [];
+
+		foreach ($db_hosts as $hostid => $foo) {
+			$hosts[] = [
+				'hostid' => $hostid,
+				'groups' => []
+			];
+		}
+
+		self::addAffectedGroups($hosts, $db_hosts);
+		self::addUnchangedGroups($hosts, $db_hosts, ['groupids' => $groupids]);
+
+		self::checkHostsWithoutGroups($hosts, $db_hosts);
+
+		API::Host()->updateForce($hosts, $db_hosts);
+	}
 }

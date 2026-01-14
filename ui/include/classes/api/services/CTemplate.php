@@ -1246,4 +1246,32 @@ class CTemplate extends CHostGeneral {
 
 		$result = $relation_map->mapMany($result, $groups, 'templategroups');
 	}
+
+	public static function unlinkGroups(array $groupids): void {
+		$db_templates = API::Template()->get([
+			'output' => ['host'],
+			'groupids' => $groupids,
+			'preservekeys' => true
+		]);
+
+		if (!$db_templates) {
+			return;
+		}
+
+		$templates = [];
+
+		foreach ($db_templates as $templateid => $foo) {
+			$templates[] = [
+				'templateid' => $templateid,
+				'groups' => []
+			];
+		}
+
+		self::addAffectedGroups($templates, $db_templates);
+		self::addUnchangedGroups($templates, $db_templates, ['groupids' => $groupids]);
+
+		self::checkHostsWithoutGroups($templates, $db_templates);
+
+		API::Template()->updateForce($templates, $db_templates);
+	}
 }

@@ -432,40 +432,12 @@ class CHostGroup extends CApiService {
 
 		$groupids = array_keys($db_groups);
 
-		self::unlinkHosts($groupids);
+		CHost::unlinkGroups($groupids);
 
 		DB::delete('sysmaps_elements', ['elementtype' => SYSMAP_ELEMENT_TYPE_HOST_GROUP, 'elementid' => $groupids]);
 		DB::delete('hstgrp', ['groupid' => $groupids]);
 
 		self::addAuditLog(CAudit::ACTION_DELETE, CAudit::RESOURCE_HOST_GROUP, $db_groups);
-	}
-
-	private static function unlinkHosts(array $groupids): void {
-		$db_hosts = API::Host()->get([
-			'output' => ['host'],
-			'groupids' => $groupids,
-			'preservekeys' => true
-		]);
-
-		if (!$db_hosts) {
-			return;
-		}
-
-		$hosts = [];
-
-		foreach ($db_hosts as $hostid => $foo) {
-			$hosts[] = [
-				'hostid' => $hostid,
-				'groups' => []
-			];
-		}
-
-		CHost::addAffectedGroups($hosts, $db_hosts);
-		CHost::addUnchangedGroups($hosts, $db_hosts, ['groupids' => $groupids]);
-
-		CHost::checkHostsWithoutGroups($hosts, $db_hosts);
-
-		API::Host()->updateForce($hosts, $db_hosts);
 	}
 
 	/**

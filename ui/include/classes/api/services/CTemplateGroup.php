@@ -362,7 +362,7 @@ class CTemplateGroup extends CApiService {
 	public function delete(array $groupids): array {
 		$this->validateDelete($groupids, $db_groups);
 
-		self::unlinkTemplates($groupids);
+		CTemplate::unlinkGroups($groupids);
 
 		DB::delete('hstgrp', ['groupid' => $groupids]);
 
@@ -453,34 +453,6 @@ class CTemplateGroup extends CApiService {
 		if (count($db_groups) != count($groupids)) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
-	}
-
-	private static function unlinkTemplates(array $groupids): void {
-		$db_templates = API::Template()->get([
-			'output' => ['host'],
-			'groupids' => $groupids,
-			'preservekeys' => true
-		]);
-
-		if (!$db_templates) {
-			return;
-		}
-
-		$templates = [];
-
-		foreach ($db_templates as $templateid => $foo) {
-			$templates[] = [
-				'templateid' => $templateid,
-				'groups' => []
-			];
-		}
-
-		CTemplate::addAffectedGroups($templates, $db_templates);
-		CTemplate::addUnchangedGroups($templates, $db_templates, ['groupids' => $groupids]);
-
-		CTemplate::checkHostsWithoutGroups($templates, $db_templates);
-
-		API::Template()->updateForce($templates, $db_templates);
 	}
 
 	/**
