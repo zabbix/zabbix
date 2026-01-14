@@ -51,11 +51,14 @@ class CTimePeriodsParser extends CParser {
 			if ($this->time_period_parser->parse($source, $p + $offset) == self::PARSE_FAIL) {
 				break;
 			}
+
 			$p += $offset + $this->time_period_parser->getLength();
 			$periods_parts[$this->time_period_parser->getMatch()] = $this->time_period_parser->getPeriodParts();
+
 			if (isset($source[$p]) && $source[$p] !== ';') {
 				break;
 			}
+
 			$offset = 1;
 		}
 
