@@ -19,7 +19,7 @@
 
 int	zbx_is_strict_macro(const char *macro)
 {
-	const char	*strict_macros[] = {MVAR_HOST_IP, MVAR_IPADDRESS, MVAR_HOST_DNS,
+	const char	*strict_macros[] = {MVAR_HOST_IP, MVAR_HOST_DNS,
 			MVAR_HOST_CONN, MVAR_HOST_TARGET_DNS, MVAR_HOST_TARGET_CONN,
 			MVAR_HOST_TARGET_IP};
 
