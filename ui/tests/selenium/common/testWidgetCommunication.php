@@ -42,6 +42,13 @@ class testWidgetCommunication extends testWidgets {
 		'Item navigator broadcaster' => 'ITMNV._itemid',
 		'Navigation tree map broadcaster' => 'TAPOK._mapid'
 	];
+	const OVERRIDE_HOST_REFERENCES = [
+		'Geomap host broadcaster' => 'JRVYU._hostid',
+		'Honeycomb host broadcaster' => 'RICVX._hostid',
+		'Map host broadcaster' => 'BFSOY._hostid',
+		'Top hosts host broadcaster' => 'ACGKU._hostid',
+		'Host navigator broadcaster' => 'HSTNV._hostid'
+	];
 
 	const GEOMAP_ICON_INDEXES = [
 		self::FIRST_HOST_NAME => 3,

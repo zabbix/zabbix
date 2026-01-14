@@ -359,7 +359,23 @@ class testDashboardWidgetCommunication extends testWidgetCommunication {
 					'index' => 4,
 					'count' => 1
 				]
-			]
+			],
+			'Gauge listener' => [
+				'class' => 'svg-gauge-value',
+				'value' => 3
+			],
+			'Graph (classic) listener' => [
+				'hostname' => self::FIRST_HOST_NAME
+			],
+			'Item history listener' => [
+				'Name' => 'Trapper item',
+				'Value' => '3'
+			],
+			'Item value listener' => [
+				'class' => 'item-value-content',
+				'value' => 3
+			],
+			'URL listener' => 'No data'
 		]
 	];
 
@@ -1358,7 +1374,23 @@ class testDashboardWidgetCommunication extends testWidgetCommunication {
 								'severity' => 'warning',
 								'count' => 1
 							]
-						]
+						],
+						'Gauge listener' => [
+							'class' => 'svg-gauge-value',
+							'value' => 4
+						],
+						'Graph (classic) listener' => [
+							'hostname' => self::SECOND_HOST_NAME
+						],
+						'Item history listener' => [
+							'Name' => 'Trapper item',
+							'Value' => '4'
+						],
+						'Item value listener' => [
+							'class' => 'item-value-content',
+							'value' => 4
+						],
+						'URL listener' => self::SECOND_HOST_NAME
 					]
 				]
 			],
@@ -1411,7 +1443,23 @@ class testDashboardWidgetCommunication extends testWidgetCommunication {
 								'severity' => 'high',
 								'count' => 1
 							]
-						]
+						],
+						'Gauge listener' => [
+							'class' => 'svg-gauge-value',
+							'value' => 5
+						],
+						'Graph (classic) listener' => [
+							'hostname' => self::THIRD_HOST_NAME
+						],
+						'Item history listener' => [
+							'Name' => 'Trapper item',
+							'Value' => '5'
+						],
+						'Item value listener' => [
+							'class' => 'item-value-content',
+							'value' => 5
+						],
+						'URL listener' => self::THIRD_HOST_NAME
 					]
 				]
 			],
@@ -1464,7 +1512,23 @@ class testDashboardWidgetCommunication extends testWidgetCommunication {
 								'severity' => 'warning',
 								'count' => 1
 							]
-						]
+						],
+						'Gauge listener' => [
+							'class' => 'svg-gauge-value',
+							'value' => 4
+						],
+						'Graph (classic) listener' => [
+							'hostname' => self::SECOND_HOST_NAME
+						],
+						'Item history listener' => [
+							'Name' => 'Trapper item',
+							'Value' => '4'
+						],
+						'Item value listener' => [
+							'class' => 'item-value-content',
+							'value' => 4
+						],
+						'URL listener' => self::SECOND_HOST_NAME
 					]
 				]
 			],
@@ -1517,7 +1581,23 @@ class testDashboardWidgetCommunication extends testWidgetCommunication {
 								'severity' => 'info',
 								'count' => 1
 							]
-						]
+						],
+						'Gauge listener' => [
+							'class' => 'svg-gauge-value',
+							'value' => 3
+						],
+						'Graph (classic) listener' => [
+							'hostname' => self::FIRST_HOST_NAME
+						],
+						'Item history listener' => [
+							'Name' => 'Trapper item',
+							'Value' => '3'
+						],
+						'Item value listener' => [
+							'class' => 'item-value-content',
+							'value' => 3
+						],
+						'URL listener' => self::FIRST_HOST_NAME
 					]
 				]
 			],
@@ -1570,7 +1650,23 @@ class testDashboardWidgetCommunication extends testWidgetCommunication {
 								'severity' => 'high',
 								'count' => 1
 							]
-						]
+						],
+						'Gauge listener' => [
+							'class' => 'svg-gauge-value',
+							'value' => 5
+						],
+						'Graph (classic) listener' => [
+							'hostname' => self::THIRD_HOST_NAME
+						],
+						'Item history listener' => [
+							'Name' => 'Trapper item',
+							'Value' => '5'
+						],
+						'Item value listener' => [
+							'class' => 'item-value-content',
+							'value' => 5
+						],
+						'URL listener' => self::THIRD_HOST_NAME
 					]
 				]
 			],
@@ -1623,7 +1719,23 @@ class testDashboardWidgetCommunication extends testWidgetCommunication {
 								'severity' => 'warning',
 								'count' => 1
 							]
-						]
+						],
+						'Gauge listener' => [
+							'class' => 'svg-gauge-value',
+							'value' => 4
+						],
+						'Graph (classic) listener' => [
+							'hostname' => self::SECOND_HOST_NAME
+						],
+						'Item history listener' => [
+							'Name' => 'Trapper item',
+							'Value' => '4'
+						],
+						'Item value listener' => [
+							'class' => 'item-value-content',
+							'value' => 4
+						],
+						'URL listener' => self::SECOND_HOST_NAME
 					]
 				]
 			],
@@ -1684,7 +1796,23 @@ class testDashboardWidgetCommunication extends testWidgetCommunication {
 								'severity' => 'warning',
 								'count' => 1
 							]
-						]
+						],
+						'Gauge listener' => [
+							'class' => 'svg-gauge-value',
+							'value' => 4
+						],
+						'Graph (classic) listener' => [
+							'hostname' => self::SECOND_HOST_NAME
+						],
+						'Item history listener' => [
+							'Name' => 'Trapper item',
+							'Value' => '4'
+						],
+						'Item value listener' => [
+							'class' => 'item-value-content',
+							'value' => 4
+						],
+						'URL listener' => self::SECOND_HOST_NAME
 					]
 				]
 			],
@@ -1737,7 +1865,23 @@ class testDashboardWidgetCommunication extends testWidgetCommunication {
 								'severity' => 'high',
 								'count' => 1
 							]
-						]
+						],
+						'Gauge listener' => [
+							'class' => 'svg-gauge-value',
+							'value' => 5
+						],
+						'Graph (classic) listener' => [
+							'hostname' => self::THIRD_HOST_NAME
+						],
+						'Item history listener' => [
+							'Name' => 'Trapper item',
+							'Value' => '5'
+						],
+						'Item value listener' => [
+							'class' => 'item-value-content',
+							'value' => 5
+						],
+						'URL listener' => self::THIRD_HOST_NAME
 					]
 				]
 			],
@@ -1797,7 +1941,23 @@ class testDashboardWidgetCommunication extends testWidgetCommunication {
 								'severity' => 'high',
 								'count' => 1
 							]
-						]
+						],
+						'Gauge listener' => [
+							'class' => 'svg-gauge-value',
+							'value' => 5
+						],
+						'Graph (classic) listener' => [
+							'hostname' => self::THIRD_HOST_NAME
+						],
+						'Item history listener' => [
+							'Name' => 'Trapper item',
+							'Value' => '5'
+						],
+						'Item value listener' => [
+							'class' => 'item-value-content',
+							'value' => 5
+						],
+						'URL listener' => self::THIRD_HOST_NAME
 					]
 				]
 			],
@@ -1850,7 +2010,23 @@ class testDashboardWidgetCommunication extends testWidgetCommunication {
 								'severity' => 'info',
 								'count' => 1
 							]
-						]
+						],
+						'Gauge listener' => [
+							'class' => 'svg-gauge-value',
+							'value' => 3
+						],
+						'Graph (classic) listener' => [
+							'hostname' => self::FIRST_HOST_NAME
+						],
+						'Item history listener' => [
+							'Name' => 'Trapper item',
+							'Value' => '3'
+						],
+						'Item value listener' => [
+							'class' => 'item-value-content',
+							'value' => 3
+						],
+						'URL listener' => self::FIRST_HOST_NAME
 					]
 				]
 			],
@@ -1903,7 +2079,23 @@ class testDashboardWidgetCommunication extends testWidgetCommunication {
 								'severity' => 'warning',
 								'count' => 1
 							]
-						]
+						],
+						'Gauge listener' => [
+							'class' => 'svg-gauge-value',
+							'value' => 4
+						],
+						'Graph (classic) listener' => [
+							'hostname' => self::SECOND_HOST_NAME
+						],
+						'Item history listener' => [
+							'Name' => 'Trapper item',
+							'Value' => '4'
+						],
+						'Item value listener' => [
+							'class' => 'item-value-content',
+							'value' => 4
+						],
+						'URL listener' => self::SECOND_HOST_NAME
 					]
 				]
 			],
@@ -1956,7 +2148,23 @@ class testDashboardWidgetCommunication extends testWidgetCommunication {
 								'severity' => 'info',
 								'count' => 1
 							]
-						]
+						],
+						'Gauge listener' => [
+							'class' => 'svg-gauge-value',
+							'value' => 3
+						],
+						'Graph (classic) listener' => [
+							'hostname' => self::FIRST_HOST_NAME
+						],
+						'Item history listener' => [
+							'Name' => 'Trapper item',
+							'Value' => '3'
+						],
+						'Item value listener' => [
+							'class' => 'item-value-content',
+							'value' => 3
+						],
+						'URL listener' => self::FIRST_HOST_NAME
 					]
 				]
 			],
@@ -2009,7 +2217,23 @@ class testDashboardWidgetCommunication extends testWidgetCommunication {
 								'severity' => 'high',
 								'count' => 1
 							]
-						]
+						],
+						'Gauge listener' => [
+							'class' => 'svg-gauge-value',
+							'value' => 5
+						],
+						'Graph (classic) listener' => [
+							'hostname' => self::THIRD_HOST_NAME
+						],
+						'Item history listener' => [
+							'Name' => 'Trapper item',
+							'Value' => '5'
+						],
+						'Item value listener' => [
+							'class' => 'item-value-content',
+							'value' => 5
+						],
+						'URL listener' => self::THIRD_HOST_NAME
 					]
 				]
 			],
@@ -2062,7 +2286,23 @@ class testDashboardWidgetCommunication extends testWidgetCommunication {
 								'severity' => 'info',
 								'count' => 1
 							]
-						]
+						],
+						'Gauge listener' => [
+							'class' => 'svg-gauge-value',
+							'value' => 3
+						],
+						'Graph (classic) listener' => [
+							'hostname' => self::FIRST_HOST_NAME
+						],
+						'Item history listener' => [
+							'Name' => 'Trapper item',
+							'Value' => '3'
+						],
+						'Item value listener' => [
+							'class' => 'item-value-content',
+							'value' => 3
+						],
+						'URL listener' => self::FIRST_HOST_NAME
 					]
 				]
 			],
@@ -2362,6 +2602,13 @@ class testDashboardWidgetCommunication extends testWidgetCommunication {
 			DBexecute('UPDATE widget_field SET value_str='.zbx_dbstr(self::BROADCASTER_REFERENCES[$data['broadcaster']]).
 					' WHERE value_str='.zbx_dbstr(self::BROADCASTER_REFERENCES[self::$current_broadcasters[$data['page']]])
 			);
+
+			if ($data['page'] === 'Hosts page') {
+				DBexecute('UPDATE widget_field SET value_str='.zbx_dbstr(self::OVERRIDE_HOST_REFERENCES[$data['broadcaster']]).
+						' WHERE value_str='.zbx_dbstr(self::OVERRIDE_HOST_REFERENCES[self::$current_broadcasters[$data['page']]])
+				);
+			}
+
 			self::$current_broadcasters[$data['page']] = $data['broadcaster'];
 		}
 
@@ -2637,7 +2884,9 @@ class testDashboardWidgetCommunication extends testWidgetCommunication {
 	}
 
 	protected function removeAllBroadcasters() {
-		$reference_values = implode('\', \'', array_values(self::BROADCASTER_REFERENCES));
+		$reference_values = implode('\', \'', array_merge(array_values(self::BROADCASTER_REFERENCES),
+				array_values(self::OVERRIDE_HOST_REFERENCES)
+		));
 		DBexecute('DELETE FROM widget_field WHERE value_str IN (\''.$reference_values.'\')');
 	}
 
@@ -3399,8 +3648,13 @@ class testDashboardWidgetCommunication extends testWidgetCommunication {
 					$error_field = 'Data set/1';
 				}
 				else {
-					$this->assertEquals(['Unavailable widget'], $widget_form->getField($field)->getValue());
-					$error_field = $field;
+					$unavailable_field = ($field === 'Hosts' && in_array($listener_name, ['Gauge listener',
+							'Graph (classic) listener', 'Item history listener', 'Item value listener', 'URL listener']))
+						? 'Override host'
+						: $field;
+
+					$this->assertEquals(['Unavailable widget'], $widget_form->getField($unavailable_field)->getValue());
+					$error_field = $unavailable_field;
 				}
 
 				$widget_form->submit();
@@ -3441,6 +3695,7 @@ class testDashboardWidgetCommunication extends testWidgetCommunication {
 				case 'problemsbysv':
 				case 'tophosts':
 				case 'web':
+				case 'itemhistory':
 					if (!CTestArrayHelper::isMultidimensional($values)) {
 						$values = [$values];
 					}
@@ -3557,6 +3812,17 @@ class testDashboardWidgetCommunication extends testWidgetCommunication {
 						$this->assertEquals($details['count'], $listener->query('xpath:.//span[contains(@class, '.
 								CXPathHelper::escapeQuotes('status-'.$details['severity'].'-bg').')]')->one()->getText()
 						);
+					}
+					break;
+
+				case 'url':
+					if ($values === 'No data') {
+						$this->AssertEquals('No host selected.', $listener->query('tag:table')->one()->getText());
+					}
+					else {
+						$this->page->switchTo($listener->query('id:iframe')->one());
+						$this->assertEquals($values, $this->query('xpath://ul[@class="breadcrumbs"]//a[@data-hostid]')->one()->getText());
+						$this->page->switchTo();
 					}
 					break;
 			}
