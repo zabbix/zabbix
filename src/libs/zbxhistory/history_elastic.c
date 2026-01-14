@@ -203,10 +203,10 @@ static void	history_elastic_prepare(zbx_history_elastic_data_t *d)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: check an error from Elastic json response                         *
+ * Purpose: check an error from elasticsearch json response                   *
  *                                                                            *
- * Parameters: page - [IN]  the buffer with json response                     *
- *             err  - [OUT] the parse error message. If the error value is    *
+ * Parameters: page - [IN]  buffer with json response                         *
+ *             err  - [OUT] parse error message. If the error value is        *
  *                           set it must be freed by caller after it has      *
  *                           been used.                                       *
  *                                                                            *
@@ -259,7 +259,7 @@ static int	elastic_is_error_present(zbx_httppage_t *page, char **err)
 
 	*err = zbx_dsprintf(NULL,"index:%s status:%s type:%s reason:%s%s", ZBX_NULL2EMPTY_STR(index),
 			ZBX_NULL2EMPTY_STR(status), ZBX_NULL2EMPTY_STR(type), ZBX_NULL2EMPTY_STR(reason),
-			FAIL == rc_js ? " / elasticsearch version is not fully compatible with zabbix server" : "");
+			FAIL == rc_js ? " / ElasticSearch version is not fully compatible with zabbix server" : "");
 
 	zbx_free(status);
 	zbx_free(type);
@@ -479,10 +479,10 @@ static int	history_elastic_conn_set_delete(zbx_elastic_conn_t *conn, char **erro
 
 /******************************************************************************
  *                                                                            *
- * Purpose: add a new ElasticSearch connection                                *
+ * Purpose: add a new elasticsearch connection                                *
  *                                                                            *
  * Parameters:                                                                *
- *     d          - [IN/OUT] Elasticsearch history data structure             *
+ *     d          - [IN/OUT] elasticsearch history data structure             *
  *     value_type - [IN] value type                                           *
  *     data       - [IN] JSON-formatted historical data to be sent            *
  *                                                                            *
@@ -496,7 +496,7 @@ static void	history_elastic_add_conn(zbx_history_elastic_data_t *d, unsigned cha
 
 	if (SUCCEED != history_elastic_conn_init(conn, d, "_bulk", "application/x-ndjson", data, &error))
 	{
-		zabbix_log(LOG_LEVEL_ERR, "cannot initialize ElasticSarch connection: %s", error);
+		zabbix_log(LOG_LEVEL_ERR, "cannot initialize Elasticsearch connection: %s", error);
 		elastic_conn_free(conn);
 		zbx_free(error);
 		return;
@@ -567,7 +567,7 @@ static int	history_elastic_perform_once(zbx_history_elastic_data_t *d, CURLM *mh
 		ts_now = zbx_time();
 		if (ts_now - ts_last >= long_query_limit)
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "waiting for ElasticSearch response " ZBX_FS_DBL "sec",
+			zabbix_log(LOG_LEVEL_WARNING, "waiting for Elasticsearch response " ZBX_FS_DBL "sec",
 					ts_now - ts_last);
 			ts_last = ts_now;
 		}
@@ -581,7 +581,7 @@ static int	history_elastic_perform_once(zbx_history_elastic_data_t *d, CURLM *mh
 
 		if (CURLE_OK != curl_easy_getinfo(msg->easy_handle, CURLINFO_PRIVATE, (char **)&conn))
 		{
-			zabbix_log(LOG_LEVEL_ERR, "cannot obtain internal elasticsearch data");
+			zabbix_log(LOG_LEVEL_ERR, "cannot obtain internal Elasticsearch data");
 			goto out;
 		}
 
@@ -599,7 +599,7 @@ static int	history_elastic_perform_once(zbx_history_elastic_data_t *d, CURLM *mh
 				/* add retry 'too many requests' response */
 				if (429 == response_code)
 				{
-					zabbix_log(LOG_LEVEL_ERR, "cannot query elasticsearch, %s", http_status);
+					zabbix_log(LOG_LEVEL_ERR, "cannot query Elasticsearch, %s", http_status);
 					zbx_vector_ptr_append(&retries, conn->handle);
 					continue;
 				}
@@ -612,12 +612,12 @@ static int	history_elastic_perform_once(zbx_history_elastic_data_t *d, CURLM *mh
 
 			if ('\0' != *conn->resp.errbuf)
 			{
-				zabbix_log(LOG_LEVEL_ERR, "cannot query elasticsearch, HTTP error message: %s",
+				zabbix_log(LOG_LEVEL_ERR, "cannot query Elasticsearch, HTTP error message: %s",
 						conn->resp.errbuf);
 			}
 			else
 			{
-				zabbix_log(LOG_LEVEL_ERR, "cannot query elasticsearch, %s", http_status);
+				zabbix_log(LOG_LEVEL_ERR, "cannot query Elasticsearch, %s", http_status);
 			}
 
 			if (0 != conn->resp.page.offset)
@@ -627,11 +627,11 @@ static int	history_elastic_perform_once(zbx_history_elastic_data_t *d, CURLM *mh
 		{
 			if ('\0' != *conn->resp.errbuf)
 			{
-				zabbix_log(LOG_LEVEL_WARNING, "cannot query elasticsearch: %s", conn->resp.errbuf);
+				zabbix_log(LOG_LEVEL_WARNING, "cannot query Elasticsearch: %s", conn->resp.errbuf);
 			}
 			else
 			{
-				zabbix_log(LOG_LEVEL_WARNING, "cannot query elasticsearch: %s",
+				zabbix_log(LOG_LEVEL_WARNING, "cannot query Elasticsearch: %s",
 						curl_easy_strerror(msg->data.result));
 			}
 
@@ -642,7 +642,7 @@ static int	history_elastic_perform_once(zbx_history_elastic_data_t *d, CURLM *mh
 		}
 		else if (SUCCEED == elastic_is_error_present(&conn->resp.page, &error))
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "cannot send data to elasticsearch: %s", error);
+			zabbix_log(LOG_LEVEL_WARNING, "cannot send data to Elasticsearch: %s", error);
 			zbx_free(error);
 
 			/* If the error is due to elastic internal problems (for example an index */
@@ -704,14 +704,14 @@ static int	history_elastic_perform(zbx_history_elastic_data_t *d, CURLM *mhandle
 	while (0 < (ret = history_elastic_perform_once(d, mhandle)))
 	{
 		retries_num++;
-		zabbix_log(LOG_LEVEL_ERR, "ClickHouse database is down: reconnecting in %d seconds",
+		zabbix_log(LOG_LEVEL_ERR, "Elasticsearch database is down: reconnecting in %d seconds",
 				ZBX_HISTORY_STORAGE_DOWN_DELAY);
 
 		sleep(ZBX_HISTORY_STORAGE_DOWN_DELAY);
 	}
 
 	if (0 < retries_num)
-		zabbix_log(LOG_LEVEL_ERR, "ElasticSearch database connection re-established");
+		zabbix_log(LOG_LEVEL_ERR, "Elasticsearch database connection re-established");
 
 	return ret;
 }
@@ -828,13 +828,13 @@ static zbx_uint64_t	history_elastic_flush(void *data)
  *                                                                                  *
  * Purpose: get item history data from history storage                              *
  *                                                                                  *
- * Parameters:  data       - [IN] the history storage data                          *
- *              itemid     - [IN] the itemid                                        *
- *              value_type - [IN] the value type                                    *
- *              start      - [IN] the period start timestamp                        *
- *              count      - [IN/OUT] the number of values to read                  *
- *              end        - [IN] the period end timestamp                          *
- *              values     - [OUT] the item history data values                     *
+ * Parameters:  data       - [IN] history storage data                              *
+ *              itemid     - [IN] itemid                                            *
+ *              value_type - [IN] value type                                        *
+ *              start      - [IN] period start timestamp                            *
+ *              count      - [IN/OUT] number of values to read                      *
+ *              end        - [IN]  period end timestamp                             *
+ *              values     - [OUT] item history data values                         *
  *                                                                                  *
  * Return value: SUCCEED - the history data were read successfully                  *
  *               FAIL - otherwise                                                   *
@@ -928,7 +928,7 @@ static int	elastic_get_values_for_period(zbx_history_elastic_data_t *data, zbx_u
 
 	if (SUCCEED != history_elastic_conn_init(&conn, data, post_url, "application/json", NULL, &error))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "cannot initialize elasticsearch connection: %s", error);
+		zabbix_log(LOG_LEVEL_WARNING, "cannot initialize Elasticsearch connection: %s", error);
 		zbx_free(error);
 
 		goto out;
@@ -936,7 +936,7 @@ static int	elastic_get_values_for_period(zbx_history_elastic_data_t *data, zbx_u
 
 	if (FAIL == history_elastic_conn_set_post_data(&conn, query.buffer, query.buffer_size, &error))
 	{
-		zabbix_log(LOG_LEVEL_ERR, "cannot set post data for elasticsearch: %s", error);
+		zabbix_log(LOG_LEVEL_ERR, "cannot set post data for Elasticsearch: %s", error);
 		zbx_free(error);
 
 		goto out;
@@ -955,7 +955,7 @@ static int	elastic_get_values_for_period(zbx_history_elastic_data_t *data, zbx_u
 	{
 		if (SUCCEED != history_elastic_conn_set_url_path(&conn, data, "_search/scroll", &error))
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "cannot set URL for elasticsearch: %s", error);
+			zabbix_log(LOG_LEVEL_WARNING, "cannot set URL for Elasticsearch: %s", error);
 			zbx_free(error);
 
 			goto out;
@@ -974,7 +974,7 @@ static int	elastic_get_values_for_period(zbx_history_elastic_data_t *data, zbx_u
 
 		empty = 1;
 
-		zabbix_log(LOG_LEVEL_TRACE, "received from elasticsearch: %s", conn.resp.page.data);
+		zabbix_log(LOG_LEVEL_TRACE, "received from Elasticsearch: %s", conn.resp.page.data);
 
 		zbx_json_open(conn.resp.page.data, &jp);
 		zbx_json_brackets_open(jp.start, &jp_values);
@@ -985,7 +985,7 @@ static int	elastic_get_values_for_period(zbx_history_elastic_data_t *data, zbx_u
 			if (SUCCEED != zbx_json_value_by_name_dyn(&jp_values, "_scroll_id", &scroll_id, &id_alloc,
 					NULL))
 			{
-				zabbix_log(LOG_LEVEL_WARNING, "elasticsearch version is not compatible with"
+				zabbix_log(LOG_LEVEL_WARNING, "Elasticsearch version is not compatible with"
 						" zabbix server. _scroll_id tag is absent");
 			}
 		}
@@ -1039,7 +1039,7 @@ static int	elastic_get_values_for_period(zbx_history_elastic_data_t *data, zbx_u
 
 		if (FAIL == history_elastic_conn_set_post_data(&conn, scroll_query, scroll_offset, &error))
 		{
-			zabbix_log(LOG_LEVEL_ERR, "cannot set post data for elasticsearch: %s", error);
+			zabbix_log(LOG_LEVEL_ERR, "cannot set post data for Elasticsearch: %s", error);
 			zbx_free(error);
 			break;
 		}
@@ -1056,7 +1056,7 @@ static int	elastic_get_values_for_period(zbx_history_elastic_data_t *data, zbx_u
 
 		if (SUCCEED != (ret = history_elastic_conn_set_url_path(&conn, data, post_url, &error)))
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "cannot set URL for elasticsearch: %s", error);
+			zabbix_log(LOG_LEVEL_WARNING, "cannot set URL for Elasticsearch: %s", error);
 			zbx_free(error);
 
 			goto out;
@@ -1064,7 +1064,7 @@ static int	elastic_get_values_for_period(zbx_history_elastic_data_t *data, zbx_u
 
 		if (SUCCEED != (ret = history_elastic_conn_set_delete(&conn, &error)))
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "cannot set URL for elasticsearch: %s", error);
+			zabbix_log(LOG_LEVEL_WARNING, "cannot set URL for Elasticsearch: %s", error);
 			zbx_free(error);
 
 			goto out;
@@ -1108,7 +1108,6 @@ out:
  *              step            - [IN] period step                                  *
  *              clock_from      - [IN/OUT] period start timestamp                   *
  *              clock_to        - [IN] period end timestamp (including)             *
- *              clock_to_shift  - [OUT] next period end timestamp                   *
  *                                                                                  *
  * Return value: period - current period                                            *
  *               FAIL - otherwise                                                   *
@@ -1117,8 +1116,7 @@ out:
  *           less partitions as possible                                            *
  *                                                                                  *
  ************************************************************************************/
-static int	period_iter_next(const int *periods, int num, int *step, time_t *clock_from, time_t clock_to,
-		time_t *clock_to_shift)
+static int	period_iter_next(const int *periods, int num, int *step, time_t *clock_from, time_t clock_to)
 {
 	int	period = periods[*step];
 
@@ -1127,15 +1125,11 @@ static int	period_iter_next(const int *periods, int num, int *step, time_t *cloc
 
 	if (0 > (*clock_from = clock_to - period))
 	{
-		*clock_from = clock_to;
-
+		*clock_from = 0;
 		*step = num - 1;
-
-		return period;
 	}
-
-	*clock_to_shift = clock_to - period;
-	(*step)++;
+	else
+		(*step)++;
 
 	return period;
 }
@@ -1144,12 +1138,12 @@ static int	period_iter_next(const int *periods, int num, int *step, time_t *cloc
  *                                                                                  *
  * Purpose: get item history data from history storage                              *
  *                                                                                  *
- * Parameters:  data       - [IN] the history storage data                          *
- *              itemid     - [IN] the itemid                                        *
- *              value_type - [IN] the value type                                    *
- *              count      - [IN] the number of values to read                      *
- *              clock_to   - [IN] the period end timestamp (including)              *
- *              values     - [OUT] the item history data values                     *
+ * Parameters:  data       - [IN] history storage data                              *
+ *              itemid     - [IN] itemid                                            *
+ *              value_type - [IN] value type                                        *
+ *              count      - [IN] number of values to read                          *
+ *              clock_to   - [IN] period end timestamp (including)                  *
+ *              values     - [OUT] item history data values                         *
  *                                                                                  *
  * Return value: SUCCEED - the history data were read successfully                  *
  *               FAIL - otherwise                                                   *
@@ -1166,9 +1160,10 @@ static int	elastic_read_values_by_count(zbx_history_elastic_data_t *data, zbx_ui
 	int		step = 0, ret = FAIL;
 	time_t		clock_from, clock_to_shift;
 
-	while (-1 != period_iter_next(periods, ARRSIZE(periods), &step, &clock_from, clock_to, &clock_to_shift) &&
-			1 < count)
+	while (-1 != period_iter_next(periods, ARRSIZE(periods), &step, &clock_from, clock_to) && 1 < count)
 	{
+		clock_to_shift = clock_from;
+
 		if (clock_from == clock_to)
 			clock_from = 0;
 
@@ -1191,15 +1186,15 @@ static int	elastic_read_values_by_count(zbx_history_elastic_data_t *data, zbx_ui
 
 /******************************************************************************
  *                                                                            *
- * Purpose: fetch item history data from ElasticSearch                        *
+ * Purpose: fetch item history data from elasticsearch                        *
  *                                                                            *
  * Parameters: data       - [IN] history provider data                        *
- *             itemid     - [IN] the itemid                                   *
- *             value_type - [IN] the item value type                          *
- *             start      - [IN] the period start timestamp                   *
- *             end        - [IN] the period end timestamp                     *
- *             count      - [IN] the number of values to read                 *
- *             values     - [OUT] the item history records                    *
+ *             itemid     - [IN] itemid                                       *
+ *             value_type - [IN] item value type                              *
+ *             start      - [IN] period start timestamp                       *
+ *             end        - [IN] period end timestamp                         *
+ *             count      - [IN] number of values to read                     *
+ *             values     - [OUT] item history records                        *
  *             error      - [OUT] error message                               *
  *                                                                            *
  * Return value: >=0      - number of records retrieved                       *
@@ -1269,20 +1264,20 @@ static int	history_elastic_parse_bucket(const char *p_bucket, unsigned char valu
 
 	if (SUCCEED != zbx_json_brackets_open(p_bucket, &jp_bucket))
 	{
-		zabbix_log(LOG_LEVEL_ERR, "cannot open items in elasticsearch response starting with '%s'", p_bucket);
+		zabbix_log(LOG_LEVEL_ERR, "cannot open items in Elasticsearch response starting with '%s'", p_bucket);
 		goto out;
 	}
 
 	if (SUCCEED != zbx_json_value_by_name(&jp_bucket, "key", buffer, sizeof(buffer), NULL))
 	{
-		zabbix_log(LOG_LEVEL_ERR, "cannot get itemid from elasticsearch response '%.*s'",
+		zabbix_log(LOG_LEVEL_ERR, "cannot get itemid from Elasticsearch response '%.*s'",
 				(int)(jp_bucket.end - jp_bucket.start + 1), jp_bucket.start);
 		goto out;
 	}
 
 	if (FAIL == zbx_is_uint64(buffer, &hist_local.itemid))
 	{
-		zabbix_log(LOG_LEVEL_ERR, "invalid itemid in elasticsearch response '%s'", buffer);
+		zabbix_log(LOG_LEVEL_ERR, "invalid itemid in Elasticsearch response '%s'", buffer);
 		goto out;
 	}
 
@@ -1294,14 +1289,14 @@ static int	history_elastic_parse_bucket(const char *p_bucket, unsigned char valu
 
 	if (SUCCEED != zbx_json_brackets_by_name(&jp_bucket, "top_values", &jp_top))
 	{
-		zabbix_log(LOG_LEVEL_ERR, "cannot find \"top_values\" tag in elasticsearch response '%.*s'",
+		zabbix_log(LOG_LEVEL_ERR, "cannot find \"top_values\" tag in Elasticsearch response '%.*s'",
 				(int)(jp_bucket.end - jp_bucket.start + 1), jp_bucket.start);
 		goto out;
 	}
 
 	if (SUCCEED != zbx_json_brackets_by_name(&jp_top, "hits", &jp_hits))
 	{
-		zabbix_log(LOG_LEVEL_ERR, "cannot find \"hits\" tag in elasticsearch response '%.*s'",
+		zabbix_log(LOG_LEVEL_ERR, "cannot find \"hits\" tag in Elasticsearch response '%.*s'",
 				(int)(jp_top.end - jp_top.start + 1), jp_top.start);
 		goto out;
 	}
@@ -1309,7 +1304,7 @@ static int	history_elastic_parse_bucket(const char *p_bucket, unsigned char valu
 	if (SUCCEED != zbx_json_brackets_by_name(&jp_hits, "hits", &jp_hits2))
 
 	{
-		zabbix_log(LOG_LEVEL_ERR, "cannot find \"hits\" tag in elasticsearch response '%.*s'",
+		zabbix_log(LOG_LEVEL_ERR, "cannot find \"hits\" tag in Elasticsearch response '%.*s'",
 				(int)(jp_hits.end - jp_hits.start + 1), jp_hits.start);
 		goto out;
 	}
@@ -1320,14 +1315,14 @@ static int	history_elastic_parse_bucket(const char *p_bucket, unsigned char valu
 
 		if (SUCCEED != zbx_json_brackets_open(p, &jp_hit))
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "cannot open \"hits\" array in elasticsearch response starting "
+			zabbix_log(LOG_LEVEL_WARNING, "cannot open \"hits\" array in Elasticsearch response starting "
 					"with '%s'", p);
 			continue;
 		}
 
 		if (SUCCEED != zbx_json_brackets_by_name(&jp_hit, "_source", &jp_source))
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "cannot find \"_source\" tag in elasticsearch response '%.*s'",
+			zabbix_log(LOG_LEVEL_WARNING, "cannot find \"_source\" tag in Elasticsearch response '%.*s'",
 					(int)(jp_hit.end - jp_hit.start + 1), jp_hit.start);
 			continue;
 		}
@@ -1341,7 +1336,7 @@ static int	history_elastic_parse_bucket(const char *p_bucket, unsigned char valu
 		}
 		else
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "cannot parse history value in elasticsearch response '%.*s'",
+			zabbix_log(LOG_LEVEL_WARNING, "cannot parse history value in Elasticsearch response '%.*s'",
 					(int)(jp_source.end - jp_source.start + 1), jp_source.start);
 		}
 	}
@@ -1463,31 +1458,31 @@ static int	history_elastic_fetch_batch(void *data, zbx_vector_item_history_t *re
 		struct zbx_json_parse	jp, jp_aggs, jp_items, jp_buckets;
 		const char		*p = NULL;
 
-		zabbix_log(LOG_LEVEL_TRACE, "received from elasticsearch: %s", conn.resp.page.data);
+		zabbix_log(LOG_LEVEL_TRACE, "received from Elasticsearch: %s", conn.resp.page.data);
 
 		if (SUCCEED != zbx_json_open(conn.resp.page.data, &jp))
 		{
-			zabbix_log(LOG_LEVEL_ERR, "cannot parse elasticsearch error: %s response '%s',"
+			zabbix_log(LOG_LEVEL_ERR, "cannot parse Elasticsearch error: %s response '%s',"
 					" query '%s'", zbx_json_strerror(), conn.resp.page.data, query.buffer);
 			goto out;
 		}
 		if (SUCCEED != zbx_json_brackets_by_name(&jp, "aggregations", &jp_aggs))
 		{
-			zabbix_log(LOG_LEVEL_ERR, "cannot find aggregations in elasticsearch response '%s',"
+			zabbix_log(LOG_LEVEL_ERR, "cannot find aggregations in Elasticsearch response '%s',"
 					" query '%s'", conn.resp.page.data, query.buffer);
 			goto out;
 		}
 
 		if (SUCCEED != zbx_json_brackets_by_name(&jp_aggs, "items", &jp_items))
 		{
-			zabbix_log(LOG_LEVEL_ERR, "cannot find items in elasticsearch response '%s',"
+			zabbix_log(LOG_LEVEL_ERR, "cannot find items in Elasticsearch response '%s',"
 					" query '%s'", conn.resp.page.data, query.buffer);
 			goto out;
 		}
 
 		if (SUCCEED != zbx_json_brackets_by_name(&jp_items, "buckets", &jp_buckets))
 		{
-			zabbix_log(LOG_LEVEL_ERR, "cannot find items in elasticsearch response '%s',"
+			zabbix_log(LOG_LEVEL_ERR, "cannot find items in Elasticsearch response '%s',"
 					" query '%s'", conn.resp.page.data, query.buffer);
 			goto out;
 		}
@@ -1522,7 +1517,7 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: write history data to Elasticsearch storage                       *
+ * Purpose: write history data to elasticsearch storage                       *
  *                                                                            *
  * Parameters: data        - [IN] history provider data                       *
  *             value_type  - [IN] value type of history data                  *
@@ -1600,10 +1595,10 @@ static void	history_elastic_write(void *data, unsigned char value_type,
 
 /******************************************************************************
  *                                                                            *
- * Purpose: populate value type information for ElasticSearch provider        *
+ * Purpose: populate value type information for elasticsearch provider        *
  *                                                                            *
  * Parameters:                                                                *
- *     d    - [IN] ElasticSearch history data structure                       *
+ *     d    - [IN] elasticsearch history data structure                       *
  *     info - [OUT] history provider information structure                    *
  *                                                                            *
  ******************************************************************************/
@@ -1636,7 +1631,7 @@ static int	history_elastic_get_info(void *data, zbx_history_provider_info_t *inf
 	size_t				version_len = 0;
 	char				*version_friendly = NULL;
 	int				major_num, minor_num, increment_num, ret = FAIL;
-	zbx_uint32_t			version;
+	zbx_uint32_t			version = ZBX_DBVERSION_UNDEFINED;
 	zbx_elastic_conn_t		conn;
 	CURLM				*mhandle;
 
@@ -1653,7 +1648,7 @@ static int	history_elastic_get_info(void *data, zbx_history_provider_info_t *inf
 
 	if (FAIL == history_elastic_query(d, mhandle, &conn, ELASTIC_RETRIES_OFF))
 	{
-		*error = zbx_strdup(NULL, "Cannot perform elasticsearch query");
+		*error = zbx_strdup(NULL, "Cannot perform Elasticsearch query");
 		goto out;
 	}
 
@@ -1662,7 +1657,7 @@ static int	history_elastic_get_info(void *data, zbx_history_provider_info_t *inf
 		SUCCEED != zbx_json_brackets_by_name(&jp_values, "version", &jp_sub) ||
 		SUCCEED != zbx_json_value_by_name_dyn(&jp_sub, "number", &version_friendly, &version_len, NULL))
 	{
-		*error = zbx_strdup(NULL, "cannot extract ElasticSearch version information");
+		*error = zbx_strdup(NULL, "cannot extract Elasticsearch version information");
 		goto out;
 	}
 
@@ -1670,22 +1665,21 @@ static int	history_elastic_get_info(void *data, zbx_history_provider_info_t *inf
 out:
 	if (FAIL != ret)
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "ElasticDB version retrieved unparsed: %s", version_friendly);
+		zabbix_log(LOG_LEVEL_DEBUG, "Elasticsearch version retrieved unparsed: %s", version_friendly);
 
 		if (3 != sscanf(version_friendly, "%d.%d.%d", &major_num, &minor_num, &increment_num) ||
 				major_num >= 100 || major_num <= 0 || minor_num >= 100 || minor_num < 0 ||
 				increment_num >= 100 || increment_num < 0)
 		{
-			*error = zbx_dsprintf(NULL, "Failed to detect ElasticDB version from the "
+			*error = zbx_dsprintf(NULL, "Failed to detect Elasticsearch version from the "
 					"following query result: %s", version_friendly);
-			version = ZBX_DBVERSION_UNDEFINED;
 		}
 		else
 		{
 			version = major_num * 10000 + minor_num * 100 + increment_num;
 		}
 
-		info->database = zbx_strdup(NULL, "ElasticDB");
+		info->database = zbx_strdup(NULL, "Elasticsearch");
 		info->current_version = version;
 		info->min_version = ZBX_ELASTIC_MIN_VERSION;
 		info->max_version = ZBX_ELASTIC_MAX_VERSION;
@@ -1713,14 +1707,14 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: create and initialize Elasticsearch history data structure        *
+ * Purpose: create and initialize elasticsearch history data structure        *
  *                                                                            *
  * Parameters:                                                                *
  *     options     - [IN] array of history storage options                    *
  *     options_num - [IN] number of elements in the options array             *
  *     error       - [OUT] error message if function fails                    *
  *                                                                            *
- * Return value: elasticsarch history provider or NULL on failure             *
+ * Return value: elasticsearch history provider or NULL on failure            *
  *                                                                            *
  ******************************************************************************/
 static void	*history_elastic_create_data(const zbx_history_option_t *options, int options_num, char **error)
@@ -1730,7 +1724,7 @@ static void	*history_elastic_create_data(const zbx_history_option_t *options, in
 
 	if (NULL == (value = history_option_value(options, options_num, HISTORY_PROVIDER_OPTION_URL)))
 	{
-		*error = zbx_strdup(*error, "missing \"url\" option for ElasticSearch history backend");
+		*error = zbx_strdup(*error, "missing \"url\" option for Elasticsearch history backend");
 		return NULL;
 	}
 
@@ -1773,7 +1767,7 @@ static void	history_elastic_close(void *data)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: validate configuration options for ElasticSearch history provider  *
+ * Purpose: validate configuration options for elasticsearch history provider *
  *                                                                            *
  * Parameters:                                                                *
  *     options     - [IN] configuration options                               *
@@ -1804,7 +1798,7 @@ static void	history_elastic_validate_options(const zbx_history_option_t *options
 	{
 		if (SUCCEED != zbx_str_in_list(supported_options, options[i].name, ','))
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "Unsupported ElasticSearch history provider option: %s=%s",
+			zabbix_log(LOG_LEVEL_WARNING, "Unsupported Elasticsearch history provider option: %s=%s",
 					options[i].name, options[i].value);
 		}
 	}
@@ -1812,7 +1806,7 @@ static void	history_elastic_validate_options(const zbx_history_option_t *options
 
 /******************************************************************************
  *                                                                            *
- * Purpose: open and initialize the elsticsearch history provider             *
+ * Purpose: open and initialize the elasticsearch history provider            *
  *                                                                            *
  * Parameters:                                                                *
  *     options     - [IN] array of history storage options                    *

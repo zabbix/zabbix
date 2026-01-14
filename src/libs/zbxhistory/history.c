@@ -95,7 +95,7 @@ static void	history_session_clear(zbx_history_session_t *session);
 
 /*******************************************************************************
  *                                                                             *
- * Purpose: clear history proivider info                                       *
+ * Purpose: clear history provider info                                        *
  *                                                                             *
  *******************************************************************************/
 static void	history_provider_info_clear(zbx_history_provider_info_t *info)
@@ -331,7 +331,7 @@ static int	history_manager_get_default_provider(zbx_history_manager_t *manager)
  * Parameters: manager                    - [OUT] history manager              *
  *             config_history_storage_url - [IN] history storage URL           *
  *             config_history_storage_opts- [IN] history storage options       *
- *             config_history_storage_date_index [IN]                          *
+ *             config_history_storage_pipelines - [IN]                         *
  *             providers                  - [IN] array of history provider     *
  *                                               configuration strings         *
  *             config_log_slow_queries    - [IN] slow query logging flag       *

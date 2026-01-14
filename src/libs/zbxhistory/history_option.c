@@ -304,8 +304,8 @@ int	history_provider_parse_options(const char *conf, char **name, zbx_vector_his
 	if (0 != strncmp(conf, HISTORY_PROVIDER_SQL, ZBX_CONST_STRLEN(HISTORY_PROVIDER_SQL)))
 	{
 		/* value_types option is mandatory for non default providers */
-		if (NULL == (ptr = history_option_value(options->values, options->values_num,
-				HISTORY_PROVIDER_OPTION_VALUE_TYPES)))
+		if (NULL == history_option_value(options->values, options->values_num,
+				HISTORY_PROVIDER_OPTION_VALUE_TYPES))
 		{
 			for (int i = 0; i < options->values_num; i++)
 			{
