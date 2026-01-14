@@ -979,6 +979,13 @@ void	dc_strpool_release(const char *str)
 		THIS_SHOULD_NEVER_HAPPEN;
 
 	refcount = (zbx_uint32_t *)(str - REFCOUNT_FIELD_SIZE);
+
+	if (0 == *refcount)
+	{
+		THIS_SHOULD_NEVER_HAPPEN;
+		return;
+	}
+
 	if (0 == --(*refcount))
 		zbx_hashset_remove(&config->strpool, str - REFCOUNT_FIELD_SIZE);
 }
@@ -1922,6 +1929,7 @@ void	zbx_dc_sync_kvs_paths(const struct zbx_json_parse *jp_kvs_paths, const zbx_
 		{
 			START_SYNC;
 			dc_strpool_release(dc_kvs_path->last_error);
+			dc_kvs_path->last_error = NULL;
 			FINISH_SYNC;
 		}
 
