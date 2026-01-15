@@ -12,6 +12,7 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
+#include "zbxstr.h"
 #include "zbxsupervisor.h"
 #include "zbxsupervisor_client.h"
 #include "zbxthreads.h"
@@ -29,6 +30,7 @@
 #include "zbxtypes.h"
 #include "zbxdb.h"
 #include "zbxsnmp.h"
+#include <time.h>
 
 #ifdef HAVE_LIBXML2
 #	include <libxml/xpath.h>
@@ -301,7 +303,11 @@ static void	supervisor_clear(zbx_supervisor_t *sv)
 				zabbix_log(LOG_LEVEL_WARNING, "Failed to join process #%lu thread: %s", i + 1,
 						zbx_strerror(err));
 			}
-
+			else if (EXIT_FAILURE == (zbx_int64_t)retval)
+			{
+				zabbix_log(LOG_LEVEL_WARNING, "Thread #%lu (%s) terminated with failure", i + 1,
+						ZBX_NULL2EMPTY_STR(unit->logger.name));
+			}
 		}
 
 		zbx_free(set->units);
@@ -549,6 +555,21 @@ static void	supervisor_unitset_change_loglevel(zbx_supervisor_unit_set_t *set, i
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: change supervisor process log level                               *
+ *                                                                            *
+ * Parameters: direction - [IN] positive to increase, negative to decrease    *
+ *                                                                            *
+ ******************************************************************************/
+static void	supervisor_change_own_loglevel(int direction)
+{
+	if (0 < direction)
+		zabbix_increase_log_level();
+	else
+		zabbix_decrease_log_level();
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: handle log level change request for supervisor managed threads    *
  *                                                                            *
  * Parameters: sv        - [IN] supervisor instance                           *
@@ -576,8 +597,16 @@ static void	supervisor_change_loglevel(zbx_supervisor_t *sv, int direction, cons
 		return;
 	}
 
+	if (ZBX_PROCESS_TYPE_SUPERVISOR == proc_type)
+	{
+		supervisor_change_own_loglevel(direction);
+		return;
+	}
+
 	if (ZBX_PROCESS_TYPE_UNKNOWN == proc_type)
 	{
+		supervisor_change_own_loglevel(direction);
+
 		for (int i = 0; i < ZBX_PROCESS_TYPE_COUNT; i++)
 		{
 			zbx_supervisor_unit_set_t	*set = &sv->unitsets[i];
@@ -618,46 +647,6 @@ static void	sypervisor_get_activities(zbx_ipc_client_t *client)
 
 	zbx_ipc_client_send(client, ZBX_SUPERVISOR_GET_ACTIVITIES, (unsigned char *)activities, strlen(activities) + 1);
 	zbx_free(activities);
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: find supervisor unit that matches the exit thread and return its  *
- *          process information                                               *
- *                                                                            *
- * Parameters: sv           - [IN]  supervisor instance                       *
- *             process_type - [OUT] process type of the exit thread unit      *
- *             process_num  - [OUT] process number of the exit thread unit    *
- *                                                                            *
- * Return value: SUCCEED - exit thread unit found and information returned    *
- *               FAIL    - no matching unit found                             *
- *                                                                            *
- ******************************************************************************/
-static int	supervisor_get_exit_thread_info(zbx_supervisor_t *sv, unsigned char *process_type, int *process_num)
-{
-	for (int i = 0; i < ZBX_PROCESS_TYPE_COUNT; i++)
-	{
-		zbx_supervisor_unit_set_t	*set = &sv->unitsets[i];
-
-		for (int j = 0; j < set->unit_num; j++)
-		{
-			zbx_supervisor_unit_t	*unit = &set->units[j];
-
-			if (0 == unit->running)
-				continue;
-
-			if (SUCCEED == zbx_is_failed_thread(unit->handle))
-			{
-				*process_type = set->process_type;
-				*process_num = j + 1;
-				return SUCCEED;
-			}
-
-		}
-
-	}
-
-	return FAIL;
 }
 
 static void	supervisor_init_libraries(const char *progname)
@@ -730,7 +719,7 @@ ZBX_THREAD_ENTRY(zbx_supervisor_thread, args)
 	zbx_uint32_t			rtc_msgs[] = {ZBX_RTC_LOG_LEVEL_INCREASE, ZBX_RTC_LOG_LEVEL_DECREASE};
 	zbx_timespec_t			sleeptime = {1, 0};
 	zbx_supervisor_t		sv;
-	int				runlevel_last = 0, exit_ret;
+	int				runlevel_last = 0;
 	zbx_dbconn_pool_t		*dbpool;
 
 	zbx_setproctitle("%s #%d starting", get_process_type_string(process_type), process_num);
@@ -757,6 +746,9 @@ ZBX_THREAD_ENTRY(zbx_supervisor_thread, args)
 
 	supervisor_init(&sv, runlevels);
 
+	zbx_rtc_subscribe_service(ZBX_PROCESS_TYPE_SUPERVISOR, 0, rtc_msgs, ARRSIZE(rtc_msgs),
+			local_args->config_timeout, ZBX_IPC_SERVICE_SUPERVISOR);
+
 	for (int i = 0; i < ZBX_PROCESS_TYPE_COUNT; i++)
 	{
 		zbx_supervisor_unit_set_t	*set = &sv.unitsets[i];
@@ -766,13 +758,16 @@ ZBX_THREAD_ENTRY(zbx_supervisor_thread, args)
 
 		zbx_rtc_subscribe_service(i, 0, rtc_msgs, ARRSIZE(rtc_msgs), local_args->config_timeout,
 				ZBX_IPC_SERVICE_SUPERVISOR);
-
 	}
 
 	zbx_setproctitle("%s #%d started at runlevel %d", get_process_type_string(process_type), process_num,
 			sv.runlevel);
 
 	zbx_supervisor_set_process_running(server_num);
+
+	sigset_t	orig_mask = {0};
+
+	zbx_block_signals(&orig_mask);
 
 	while (ZBX_IS_RUNNING())
 	{
@@ -833,35 +828,11 @@ ZBX_THREAD_ENTRY(zbx_supervisor_thread, args)
 		zbx_prof_update(get_process_type_string(process_type), time_now);
 		supervisor_handle_log(time_now);
 	}
-
 out:
-	if (SUCCEED != ZBX_EXIT_STATUS())
-	{
-		unsigned char	exit_type;
-		int		exit_num;
-
-		if (SUCCEED == supervisor_get_exit_thread_info(&sv, &exit_type, &exit_num))
-		{
-			zabbix_log(LOG_LEVEL_INFORMATION, "[%s #%d] stopped with %s #%d failure",
-					get_process_type_string(process_type), process_num,
-					get_process_type_string(exit_type), exit_num);
-		}
-		else
-		{
-			zabbix_log(LOG_LEVEL_INFORMATION, "[%s #%d] stopped with unit failure",
-					get_process_type_string(process_type), process_num);
-		}
-
-		exit_ret = EXIT_FAILURE;
-	}
-	else
-	{
-		zabbix_log(LOG_LEVEL_INFORMATION, "[%s #%d] stopped", get_process_type_string(process_type),
-				process_num);
-		exit_ret = EXIT_SUCCESS;
-	}
+	zbx_unblock_signals(&orig_mask);
 
 	supervisor_clear(&sv);
+	zabbix_log(LOG_LEVEL_INFORMATION, "[%s #%d] stopped", get_process_type_string(process_type), process_num);
 
 	zbx_ipc_service_close(&service);
 	zbx_proc_startup_free(runlevels);
@@ -871,7 +842,7 @@ out:
 	supervisor_clear_libraries(get_program_type_string(info->program_type));
 	zbx_supervisor_worklog_clear();
 
-	zbx_exit(exit_ret);
+	zbx_exit(SUCCEED == ZBX_EXIT_STATUS() ? EXIT_SUCCESS : EXIT_FAILURE);
 
 #undef DEFAULT_SLEEP_TIME
 }

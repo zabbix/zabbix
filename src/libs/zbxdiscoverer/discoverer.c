@@ -1225,14 +1225,13 @@ int	dcheck_is_async(zbx_ds_dcheck_t *ds_dcheck)
 
 static void	*discoverer_worker_entry(void *net_check_worker)
 {
-	int			err;
 	zbx_discoverer_worker_t	*worker = (zbx_discoverer_worker_t*)net_check_worker;
 	zbx_discoverer_queue_t	*queue = worker->queue;
+	sigjmp_buf		jmp_ret;
 
 	log_worker_id = worker->worker_id;
 
-	if (0 != (err = zbx_init_thread_signal_handler()))
-		zabbix_log(LOG_LEVEL_WARNING, "cannot block signals: %s", zbx_strerror(err));
+	ZBX_INIT_THREAD(jmp_ret);
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "thread started [%s #%d]",
 			get_process_type_string(ZBX_PROCESS_TYPE_DISCOVERER), worker->worker_id);

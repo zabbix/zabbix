@@ -198,7 +198,7 @@ dnl ISO C Standard Library
 dnl
 AC_CHECK_HEADERS([assert.h ctype.h dirent.h dlfcn.h errno.h float.h          \
                   inttypes.h limits.h math.h signal.h stdarg.h stddef.h      \
-                  stdint.h stdio.h stdlib.h string.h time.h                  \
+                  stdint.h stdio.h stdlib.h string.h time.h setjmp.h         \
 ])
 
 dnl POSIX C Standard Library

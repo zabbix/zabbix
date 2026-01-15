@@ -12,11 +12,13 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
+#include "zbxcommon.h"
 #include "zbxnix.h"
 #include "zbxthreads.h"
 
 #include "fatal.h"
 #include "sigcommon.h"
+#include <setjmp.h>
 
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 #	include "zbxcomms.h"
@@ -27,12 +29,10 @@
 #define ZBX_EXIT_FAILURE	2
 
 static int				sig_parent_pid = -1;
-static ZBX_THREAD_LOCAL unsigned long	sig_thread;
+static ZBX_THREAD_LOCAL sigjmp_buf	*sig_jmp_ret = NULL;
 
 static pid_t	*child_pids = NULL;
 static size_t		child_pid_count = 0;
-
-static	pthread_t	exit_thread;
 
 void	set_sig_parent_pid(int in)
 {
@@ -44,34 +44,12 @@ int	get_sig_parent_pid(void)
 	return sig_parent_pid;
 }
 
-/******************************************************************************
- *                                                                            *
- * Purpose: exit thread with specified status code and update global exit    *
- *          state if exiting with failure                                     *
- *                                                                            *
- * Parameters: status - [IN] exit status code                                 *
- *                                                                            *
- ******************************************************************************/
-static ZBX_NORETURN void	thread_exit(int status)
-{
-	if (EXIT_SUCCESS != status)
-	{
-		zbx_set_exiting_with_fail();
-
-		/* This can be overwritten or even corrupted if two threads exit simultaneously. */
-		/* However since it will be used only for comparison and logging - it will not   */
-		/* cause any problems.                                                           */
-		exit_thread = pthread_self();
-	}
-
-	pthread_exit(&status);
-}
-
-int	zbx_init_thread_signal_handler(void)
+int	zbx_init_thread_signal_handler(sigjmp_buf *jmp_ret)
 {
 	sigset_t	mask;
+	int		err;
 
-	sig_thread = 1;
+	sig_jmp_ret = jmp_ret;
 
 	sigemptyset(&mask);
 	sigaddset(&mask, SIGTERM);
@@ -81,10 +59,10 @@ int	zbx_init_thread_signal_handler(void)
 	sigaddset(&mask, SIGQUIT);
 	sigaddset(&mask, SIGINT);
 
-	zbx_set_exit(thread_exit);
-	zbx_set_exit_immediate(thread_exit);
+	if (0 != (err = pthread_sigmask(SIG_BLOCK, &mask, NULL)))
+		zabbix_log(LOG_LEVEL_WARNING, "cannot block signals: %s", zbx_strerror(err));
 
-	return pthread_sigmask(SIG_BLOCK, &mask, NULL);
+	return SUCCEED;
 }
 
 typedef struct
@@ -161,12 +139,10 @@ static void	fatal_signal_handler(int sig, siginfo_t *siginfo, void *context)
 	log_fatal_signal(sig, siginfo, context);
 	zbx_log_fatal_info(context, ZBX_FATAL_LOG_FULL_INFO);
 
-	if (1 == sig_thread)
+	if (NULL != sig_jmp_ret)
 	{
 		zbx_set_exiting_with_fail();
-		int	ret = EXIT_FAILURE;
-
-		pthread_exit(&ret);
+		siglongjmp(*sig_jmp_ret, 1);
 	}
 
 	exit_with_failure();
@@ -487,20 +463,3 @@ void	zbx_set_child_pids(pid_t *pids, size_t pid_num)
 	child_pid_count = pid_num;
 }
 
-/******************************************************************************
- *                                                                            *
- * Purpose: check if specified thread is the one that initiated exit          *
- *                                                                            *
- * Parameters: thread - [IN] thread identifier to check                       *
- *                                                                            *
- * Return value: SUCCEED - thread is the exit thread                          *
- *               FAIL    - otherwise                                          *
- *                                                                            *
- ******************************************************************************/
-int	zbx_is_failed_thread(pthread_t thread)
-{
-	if (0 != pthread_equal(thread, exit_thread))
-		return SUCCEED;
-
-	return FAIL;
-}

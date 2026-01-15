@@ -7692,7 +7692,6 @@ zbx_uint64_t	zbx_dc_sync_configuration(unsigned char mode, zbx_synced_new_config
 		/* track host - proxy group relocations only during incremental sync */
 		zbx_vector_objmove_create(&pg_host_reloc);
 		pg_host_reloc_ref = &pg_host_reloc;
-
 	}
 	else
 		pg_host_reloc_ref = NULL;

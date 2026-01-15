@@ -2149,8 +2149,7 @@ out:
 
 	zbx_log_exit_signal();
 
-	if (SUCCEED == ZBX_EXIT_STATUS())
-		zbx_rtc_shutdown_subs(&rtc);
+	zbx_rtc_shutdown_subs(&rtc);
 
 	zbx_on_exit(ZBX_EXIT_STATUS(), &exit_args);
 

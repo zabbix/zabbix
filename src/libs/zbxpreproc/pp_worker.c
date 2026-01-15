@@ -105,15 +105,14 @@ static void	*pp_worker_entry(void *args)
 	zbx_pp_queue_t		*queue = worker->queue;
 	zbx_pp_task_t		*in;
 	char			*error = NULL, component[ZBX_LOG_COMPONENT_NAME_LEN];
-	int			err;
+	sigjmp_buf		jmp_ret;
 
 	zbx_snprintf(component, sizeof(component), "preprocessing worker #%d", worker->id);
 	zbx_set_log_component(component, &worker->logger);
 
-	zbx_init_regexp_env();
+	ZBX_INIT_THREAD(jmp_ret);
 
-	if (0 != (err = zbx_init_thread_signal_handler()))
-		zabbix_log(LOG_LEVEL_WARNING, "cannot block signals: %s", zbx_strerror(err));
+	zbx_init_regexp_env();
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "thread started");
 	worker->stop = 0;

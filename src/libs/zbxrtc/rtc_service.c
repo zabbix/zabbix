@@ -561,12 +561,13 @@ static void	rtc_notify_client(zbx_rtc_sub_t *sub, zbx_uint32_t code, const unsig
  * Purpose: notify service based subscribers                                  *
  *                                                                            *
  ******************************************************************************/
-static void	rtc_notify_service(zbx_rtc_sub_t *sub, zbx_uint32_t code, const unsigned char *data, zbx_uint32_t size)
+static void	rtc_notify_service(zbx_rtc_sub_t *sub, zbx_uint32_t code, const unsigned char *data, zbx_uint32_t size,
+		int timeout)
 {
 	zbx_ipc_socket_t	sock;
 	char			*error = NULL;
 
-	if (FAIL == zbx_ipc_socket_open(&sock, sub->source.service, SEC_PER_MIN, &error))
+	if (FAIL == zbx_ipc_socket_open(&sock, sub->source.service, timeout, &error))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot send RTC notification to service \"%s\" #%d: %s",
 				get_process_type_string(sub->process_type), sub->process_num, error);
@@ -604,8 +605,8 @@ static int	rtc_match_message(const zbx_vector_uint32_t *msgs, zbx_uint32_t code)
  * Purpose: notify subscribers                                                *
  *                                                                            *
  ******************************************************************************/
-int	zbx_rtc_notify(zbx_rtc_t *rtc, unsigned char process_type, int process_num, zbx_uint32_t code,
-		const char *data, zbx_uint32_t size)
+static int	rtc_notify(zbx_rtc_t *rtc, unsigned char process_type, int process_num, zbx_uint32_t code,
+		const char *data, zbx_uint32_t size, int timeout)
 {
 	int	i, notified_num = 0;
 
@@ -629,13 +630,25 @@ int	zbx_rtc_notify(zbx_rtc_t *rtc, unsigned char process_type, int process_num, 
 				rtc_notify_client(rtc->subs.values[i], code, (const unsigned char *)data, size);
 				break;
 			case ZBX_RTC_SUB_SERVICE:
-				rtc_notify_service(rtc->subs.values[i], code, (const unsigned char *)data, size);
+				rtc_notify_service(rtc->subs.values[i], code, (const unsigned char *)data, size,
+				timeout);
 		}
 
 		notified_num++;
 	}
 
 	return notified_num;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: notify subscribers                                                *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_rtc_notify(zbx_rtc_t *rtc, unsigned char process_type, int process_num, zbx_uint32_t code,
+		const char *data, zbx_uint32_t size)
+{
+	return rtc_notify(rtc, process_type, process_num, code, data, size, SEC_PER_MIN);
 }
 
 /******************************************************************************
@@ -984,7 +997,7 @@ void	zbx_rtc_dispatch(zbx_rtc_t *rtc, zbx_ipc_client_t *client, zbx_ipc_message_
  ******************************************************************************/
 void	zbx_rtc_shutdown_subs(zbx_rtc_t *rtc)
 {
-	zbx_rtc_notify(rtc, ZBX_PROCESS_TYPE_UNKNOWN, 0, ZBX_RTC_SHUTDOWN, NULL, 0);
+	rtc_notify(rtc, ZBX_PROCESS_TYPE_UNKNOWN, 0, ZBX_RTC_SHUTDOWN, NULL, 0, 0);
 }
 
 /******************************************************************************

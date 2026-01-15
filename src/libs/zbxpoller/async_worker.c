@@ -134,14 +134,13 @@ static void	*async_worker_entry(void *args)
 	zbx_async_worker_t		*worker = (zbx_async_worker_t *)args;
 	zbx_async_queue_t		*queue = worker->queue;
 	char				*error = NULL;
-	int				err;
 	zbx_vector_interface_status_t	interfaces;
 	zbx_vector_uint64_t		itemids;
 	zbx_vector_int32_t		errcodes;
 	zbx_vector_int32_t		lastclocks;
+	sigjmp_buf			jmp_ret;
 
-	if (0 != (err = zbx_init_thread_signal_handler()))
-		zabbix_log(LOG_LEVEL_WARNING, "cannot block signals: %s", zbx_strerror(err));
+	ZBX_INIT_THREAD(jmp_ret);
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "thread started");
 	worker->stop = 0;

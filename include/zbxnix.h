@@ -48,7 +48,16 @@ void	zbx_set_exiting_with_fail(void);
 void	zbx_set_exiting_with_succeed(void);
 int	ZBX_IS_RUNNING(void);
 int	ZBX_EXIT_STATUS(void);
-int	zbx_init_thread_signal_handler(void);
+int	zbx_init_thread_signal_handler(sigjmp_buf *jmp_ret);
+
+#define ZBX_THREAD_FAILURE	((void *)EXIT_FAILURE)
+
+#define ZBX_INIT_THREAD(jmp_ret)				\
+		zbx_init_thread_signal_handler(&jmp_ret);	\
+		if (0 != sigsetjmp(jmp_ret, 1))			\
+		{						\
+			return ZBX_THREAD_FAILURE;		\
+		}
 
 int	zbx_daemon_start(int allow_root, const char *user, unsigned int flags,
 		zbx_get_config_str_f get_pid_file_cb, zbx_on_exit_t zbx_on_exit_cb_arg, int config_log_type,
@@ -128,8 +137,6 @@ void	zbx_log_exit_signal(void);
 void	zbx_set_on_exit_args(void *args);
 void	zbx_set_child_pids(pid_t *pids, size_t pid_num);
 /* sighandler end */
-
-int	zbx_is_failed_thread(pthread_t thread);
 
 int	zbx_parse_rtc_options(const char *opt, int *message);
 

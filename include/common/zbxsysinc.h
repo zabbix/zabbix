@@ -425,4 +425,8 @@
 #	include <stdatomic.h>
 #endif
 
+#ifdef HAVE_SETJMP_H
+#	include <setjmp.h>
+#endif
+
 #endif

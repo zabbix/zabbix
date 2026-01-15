@@ -43,7 +43,7 @@ void	*zbx_dbconfig_thread(void *args)
 {
 	double				sec = 0.0;
 	int				sleeptime, nextcheck = 0,
-					secrets_reload = 0, cache_reload = 0, err;
+					secrets_reload = 0, cache_reload = 0;
 	zbx_ipc_async_socket_t		rtc;
 	zbx_supervisor_unit_args_t	*unit_args = (zbx_supervisor_unit_args_t *)args;
 	const zbx_thread_info_t		*info = &unit_args->args.info;
@@ -51,9 +51,9 @@ void	*zbx_dbconfig_thread(void *args)
 	int				server_num = info->server_num;
 	int				process_num = info->process_num;
 	zbx_uint32_t			rtc_msgs[] = {ZBX_RTC_CONFIG_CACHE_RELOAD, ZBX_RTC_SECRETS_RELOAD};
-
 	zbx_thread_dbconfig_args	*dbconfig_args_in = (zbx_thread_dbconfig_args *)unit_args->args.args;
 	char				*process_title;
+	sigjmp_buf			jmp_ret;
 
 	process_title = zbx_dsprintf(NULL, "%s #%d", get_process_type_string(process_type), process_num);
 	zbx_set_log_component(process_title, unit_args->logger);
@@ -62,10 +62,9 @@ void	*zbx_dbconfig_thread(void *args)
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started", get_program_type_string(info->program_type), server_num);
 
-	zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
+	ZBX_INIT_THREAD(jmp_ret);
 
-	if (0 != (err = zbx_init_thread_signal_handler()))
-		zabbix_log(LOG_LEVEL_WARNING, "cannot block signals: %s", zbx_strerror(err));
+	zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
 
 	zbx_rtc_subscribe(process_type, process_num, rtc_msgs, ARRSIZE(rtc_msgs), dbconfig_args_in->config_timeout,
 			&rtc);
@@ -195,6 +194,5 @@ stop:
 
 	zbx_free(process_title);
 
-	while (1)
-		zbx_sleep(SEC_PER_MIN);
+	return NULL;
 }

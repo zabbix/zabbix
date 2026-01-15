@@ -360,10 +360,9 @@ static void	*pg_service_entry(void *data)
 	zbx_timespec_t		timeout = {1, 0};
 	zbx_ipc_client_t	*client;
 	zbx_ipc_message_t	*message;
-	int			err;
+	sigjmp_buf		jmp_ret;
 
-	if (0 != (err = zbx_init_thread_signal_handler()))
-		zabbix_log(LOG_LEVEL_WARNING, "cannot block signals: %s", zbx_strerror(err));
+	ZBX_INIT_THREAD(jmp_ret);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 

@@ -1175,8 +1175,7 @@ void	*zbx_pp_manager_thread(void *args)
 	zbx_supervisor_unit_args_t		*unit_args = (zbx_supervisor_unit_args_t *)args;
 	const zbx_thread_info_t			*info = &unit_args->args.info;
 	int					server_num = info->server_num,
-						process_num = info->process_num,
-						err;
+						process_num = info->process_num;
 	unsigned char				process_type = info->process_type;
 	const zbx_thread_pp_manager_args_t	*pp_args = (const zbx_thread_pp_manager_args_t *)unit_args->args.args;
 	zbx_pp_manager_t			*manager;
@@ -1186,6 +1185,7 @@ void	*zbx_pp_manager_thread(void *args)
 						processing_num = 0, counter_queued_num = 0, counter_queued_sz = 0,
 						counter_direct_num = 0, counter_direct_sz = 0, finished_peak_num = 0,
 						pending_peak_num = 0, counter_processed_num = 0;
+	sigjmp_buf				jmp_ret;
 
 
 #define	STAT_INTERVAL	5	/* if a process is busy and does not sleep then update status not faster than */
@@ -1200,8 +1200,7 @@ void	*zbx_pp_manager_thread(void *args)
 
 	zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
 
-	if (0 != (err = zbx_init_thread_signal_handler()))
-		zabbix_log(LOG_LEVEL_WARNING, "cannot block signals: %s", zbx_strerror(err));
+	ZBX_INIT_THREAD(jmp_ret);
 
 	if (FAIL == zbx_ipc_service_start(&service, ZBX_IPC_SERVICE_PREPROCESSING, &error))
 	{
@@ -1409,7 +1408,6 @@ void	*zbx_pp_manager_thread(void *args)
 	zbx_supervisor_update_activity("%s [terminated]", process_title);
 	zbx_free(process_title);
 
-	zbx_exit(EXIT_SUCCESS);
 #undef STAT_INTERVAL
 #undef PP_MANAGER_DELAY_SEC
 #undef PP_MANAGER_DELAY_NS

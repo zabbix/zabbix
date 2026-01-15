@@ -283,7 +283,7 @@ void	*zbx_proxyconfig_thread(void *args)
 	size_t				data_size;
 	double				sec, last_template_cleanup_sec = 0, interval;
 	zbx_ipc_async_socket_t		rtc;
-	int				sleeptime, err;
+	int				sleeptime;
 	zbx_synced_new_config_t		synced = ZBX_SYNCED_NEW_CONFIG_NO;
 	zbx_supervisor_unit_args_t	*unit_args = (zbx_supervisor_unit_args_t *)args;
 	const zbx_thread_info_t		*info = &unit_args->args.info;
@@ -292,6 +292,7 @@ void	*zbx_proxyconfig_thread(void *args)
 	unsigned char			process_type = info->process_type;
 	zbx_uint32_t			rtc_msgs[] = {ZBX_RTC_CONFIG_CACHE_RELOAD};
 	char				*process_title;
+	sigjmp_buf			jmp_ret;
 
 	process_title = zbx_dsprintf(NULL, "%s #%d", get_process_type_string(process_type), process_num);
 	zbx_set_log_component(process_title, unit_args->logger);
@@ -301,8 +302,7 @@ void	*zbx_proxyconfig_thread(void *args)
 	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started", get_program_type_string(info->program_type), server_num);
 	zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
 
-	if (0 != (err = zbx_init_thread_signal_handler()))
-		zabbix_log(LOG_LEVEL_WARNING, "cannot block signals: %s", zbx_strerror(err));
+	ZBX_INIT_THREAD(jmp_ret);
 
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	zbx_tls_init_child(proxyconfig_args_in->config_tls, proxyconfig_args_in->zbx_get_program_type_cb_arg,

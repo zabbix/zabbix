@@ -2795,8 +2795,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 
 	zbx_log_exit_signal();
 
-	if (SUCCEED == ZBX_EXIT_STATUS())
-		zbx_rtc_shutdown_subs(&rtc);
+	zbx_rtc_shutdown_subs(&rtc);
 
 	if (SUCCEED != zbx_ha_pause(&error))
 	{
