@@ -563,6 +563,8 @@ static void	tm_add_seconds(struct tm *tm, int seconds)
 	time_t		time_new;
 	struct tm	tm_new = *tm;
 
+	tm_new.tm_isdst = -1;	/* we don't know DST state after round(up/down) manipulation */
+
 	if (-1 == (time_new = mktime(&tm_new)))
 	{
 		THIS_SHOULD_NEVER_HAPPEN;
