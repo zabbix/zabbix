@@ -1438,28 +1438,6 @@ abstract class CHostGeneral extends CHostBase {
 		}
 	}
 
-	protected function addHostMacroIds(array &$hosts, array $db_hosts): void {
-		$id_field_name = $this instanceof CTemplate ? 'templateid' : 'hostid';
-
-		foreach ($hosts as &$host) {
-			$db_hostmacroids = [];
-
-			foreach ($db_hosts[$host[$id_field_name]]['macros'] as $db_macro) {
-				$db_hostmacroids[CApiInputValidator::trimMacro($db_macro['macro'])] = $db_macro['hostmacroid'];
-			}
-
-			foreach ($host['macros'] as &$macro) {
-				$trimmed_macro = CApiInputValidator::trimMacro($macro['macro']);
-
-				if (array_key_exists($trimmed_macro, $db_hostmacroids)) {
-					$macro['hostmacroid'] = $db_hostmacroids[$trimmed_macro];
-				}
-			}
-			unset($macro);
-		}
-		unset($host);
-	}
-
 	public static function addUnchangedGroups(array &$hosts, array $db_hosts, array $del_objectids = []): void {
 		$id_field_name = self::isTemplate() ? 'templateid' : 'hostid';
 
