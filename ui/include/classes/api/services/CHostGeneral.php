@@ -86,7 +86,7 @@ abstract class CHostGeneral extends CHostBase {
 		}
 	}
 
-	public static function checkHostsWithoutGroups(array $hosts, array $db_hosts): void {
+	protected static function checkHostsWithoutGroups(array $hosts, array $db_hosts): void {
 		$id_field_name = self::isTemplate() ? 'templateid' : 'hostid';
 
 		foreach ($hosts as $host) {
@@ -1363,7 +1363,7 @@ abstract class CHostGeneral extends CHostBase {
 	 * @param array $hosts
 	 * @param array $db_hosts
 	 */
-	public static function addAffectedGroups(array $hosts, array &$db_hosts): void {
+	protected static function addAffectedGroups(array $hosts, array &$db_hosts): void {
 		$id_field_name = self::isTemplate() ? 'templateid' : 'hostid';
 
 		$hostids = [];
@@ -1438,7 +1438,7 @@ abstract class CHostGeneral extends CHostBase {
 		}
 	}
 
-	public static function addUnchangedGroups(array &$hosts, array $db_hosts, array $del_objectids = []): void {
+	protected static function addUnchangedGroups(array &$hosts, array $db_hosts, array $del_objectids = []): void {
 		$id_field_name = self::isTemplate() ? 'templateid' : 'hostid';
 
 		if (!array_key_exists('groups', reset($hosts))) {
