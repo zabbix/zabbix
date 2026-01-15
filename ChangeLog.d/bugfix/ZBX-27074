@@ -1,1 +1,1 @@
-...G...... [ZBX-27074] fixed zabbix_agentd crashing on windows on startup (mkorotkov)
+...G...... [ZBX-27074] fixed Zabbix agent crashing on startup on Windows (mkorotkov)
