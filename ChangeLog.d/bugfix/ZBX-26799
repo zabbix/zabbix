@@ -1,1 +1,1 @@
-A......... [ZBX-26799] fixed ability to create OAuth when access_token_updated greater than the current Unix timestamp (kkuzmina)
+..F....... [ZBX-26799] adjusted OAuth token field behavior in Media type configuration form when access token update time exceeds current Unix timestamp (kkuzmina)
