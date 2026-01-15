@@ -220,12 +220,10 @@ func getTNSType(host string, onlyHostname, resolveTNS bool) TNSNameType {
 }
 
 func prepareConnectString(tnsType TNSNameType, cd *ConnDetails, connectTimeout time.Duration) (string, error) {
-	service, err := url.QueryUnescape(cd.Uri.GetParam("service"))
-	if err != nil {
-		return "", err //nolint:wrapcheck
-	}
-
-	var connectString string
+	var (
+		service       = url.QueryEscape(cd.Uri.GetParam("service"))
+		connectString string
+	)
 
 	switch tnsType {
 	case tnsKey, tnsValue:
