@@ -1,0 +1,1 @@
+.......PS. [ZBX-27394] fixed crash on \"cannot get secrets for path\" error due to double free when using shared memory (vso)
