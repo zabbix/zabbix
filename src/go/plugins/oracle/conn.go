@@ -217,10 +217,7 @@ func (c *ConnManager) create(cd connDetails) (*OraConn, error) {
 		},
 	)
 
-	service, err := url.QueryUnescape(cd.uri.GetParam("service"))
-	if err != nil {
-		return nil, err
-	}
+	service := url.QueryEscape(cd.uri.GetParam("service"))
 
 	connectString := fmt.Sprintf(
 		`(DESCRIPTION=(ADDRESS=(PROTOCOL=tcp)(HOST=%s)(PORT=%s))`+
