@@ -1,0 +1,59 @@
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: btrc-qos-postgres
+    environment:
+      POSTGRES_USER: btrc_qos
+      POSTGRES_PASSWORD: btrc_qos_2024
+      POSTGRES_DB: btrc_qos_db
+    volumes:
+      - btrc-qos-postgres-data:/var/lib/postgresql/data
+    restart: unless-stopped
+
+  btrc-qos-server:
+    image: zabbix/zabbix-server-pgsql:alpine-7.0-latest
+    container_name: btrc-qos-server
+    environment:
+      DB_SERVER_HOST: postgres
+      POSTGRES_USER: btrc_qos
+      POSTGRES_PASSWORD: btrc_qos_2024
+      POSTGRES_DB: btrc_qos_db
+    ports:
+      - "10051:10051"
+    depends_on:
+      - postgres
+    restart: unless-stopped
+
+  btrc-qos-web:
+    image: zabbix/zabbix-web-nginx-pgsql:alpine-7.0-latest
+    container_name: btrc-qos-web
+    environment:
+      ZBX_SERVER_HOST: btrc-qos-server
+      ZBX_SERVER_NAME: "BTRC QoS Monitor"
+      DB_SERVER_HOST: postgres
+      POSTGRES_USER: btrc_qos
+      POSTGRES_PASSWORD: btrc_qos_2024
+      POSTGRES_DB: btrc_qos_db
+      PHP_TZ: Asia/Dhaka
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./custom-branding/brand.conf.php:/usr/share/zabbix/local/conf/brand.conf.php:ro
+    depends_on:
+      - postgres
+      - btrc-qos-server
+    restart: unless-stopped
+
+  btrc-qos-agent:
+    image: zabbix/zabbix-agent:alpine-7.0-latest
+    container_name: btrc-qos-agent
+    environment:
+      ZBX_HOSTNAME: "BTRC QoS Monitor Server"
+      ZBX_SERVER_HOST: btrc-qos-server
+      ZBX_SERVER_PORT: "10051"
+    depends_on:
+      - btrc-qos-server
+    restart: unless-stopped
+
+volumes:
+  btrc-qos-postgres-data:
