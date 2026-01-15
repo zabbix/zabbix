@@ -1925,7 +1925,7 @@ abstract class CTriggerGeneral extends CApiService {
 				continue;
 			}
 
-			$db_tags = ($db_triggers !== null) ? $db_triggers[$trigger['triggerid']]['tags'] : [];
+			$db_tags = $db_triggers !== null ? $db_triggers[$trigger['triggerid']]['tags'] : [];
 
 			foreach ($trigger['tags'] as &$tag) {
 				$db_triggertagid = key(array_filter($db_tags, static function (array $db_tag) use ($tag): bool {
@@ -1935,6 +1935,7 @@ abstract class CTriggerGeneral extends CApiService {
 
 				if ($db_triggertagid !== null) {
 					$tag['triggertagid'] = $db_triggertagid;
+
 					unset($db_tags[$db_triggertagid]);
 				}
 				else {
