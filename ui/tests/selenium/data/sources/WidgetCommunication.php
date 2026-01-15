@@ -19,9 +19,11 @@ class WidgetCommunication {
 	const FIRST_HOST_NAME = '1st host for widgets';
 	const SECOND_HOST_NAME = '2nd host for widgets';
 	const THIRD_HOST_NAME = '3rd host for widgets';
+	const FORTH_HOST_NAME = 'Host with other set of items';
 	const FIRST_HOSTGROUP_NAME = '1st hostgroup for widgets';
 	const SECOND_HOSTGROUP_NAME = '2nd hostgroup for widgets';
 	const THIRD_HOSTGROUP_NAME = '3rd hostgroup for widgets';
+	const FORTH_HOSTGROUP_NAME = 'Hostgroup with different items';
 	const FIRST_HOST_TRIGGER = 'trigger on host 1';
 	const SECOND_HOST_TRIGGER = 'trigger on host 2';
 	const THIRD_HOST_TRIGGER = 'trigger on host 3';
@@ -33,7 +35,8 @@ class WidgetCommunication {
 		CDataHelper::call('hostgroup.create', [
 			['name' => self::FIRST_HOSTGROUP_NAME],
 			['name' => self::SECOND_HOSTGROUP_NAME],
-			['name' => self::THIRD_HOSTGROUP_NAME]
+			['name' => self::THIRD_HOSTGROUP_NAME],
+			['name' => self::FORTH_HOSTGROUP_NAME]
 		]);
 		$host_groupids = CDataHelper::getIds('name');
 
@@ -158,6 +161,21 @@ class WidgetCommunication {
 						]
 					]
 				]
+			],
+			[
+				'host' => self::FORTH_HOST_NAME,
+				'groups' => [
+					'groupid' => $host_groupids[self::FORTH_HOSTGROUP_NAME]
+				],
+				'status' => HOST_STATUS_MONITORED,
+				'items' => [
+					[
+						'name' => 'Another item',
+						'key_' => 'another.item.widget.communication',
+						'type' => ITEM_TYPE_TRAPPER,
+						'value_type' => ITEM_VALUE_TYPE_UINT64
+					]
+				]
 			]
 		]);
 
@@ -165,9 +183,9 @@ class WidgetCommunication {
 		$itemids = $host_response['itemids'];
 		$item_data_timestamp = time();
 
-		// Send values 3, 4 and 5 to the created items.
+		// Send values 3, 4, 5 and 6 to the created items.
 		foreach (array_values($itemids) as $i => $itemid) {
-			CDataHelper::addItemData($itemid, [$i + 3, $i + 3], [$item_data_timestamp - 1800, $item_data_timestamp]);
+			CDataHelper::addItemData($itemid, $i + 3, $item_data_timestamp);
 		}
 
 		// Create host triggers.
@@ -196,7 +214,7 @@ class WidgetCommunication {
 		// Create host web scenarios.
 		CDataHelper::call('httptest.create', [
 			[
-				'name' => 'Web scenario 1st host for widget communication',
+				'name' => 'Web scenario for '.self::FIRST_HOST_NAME,
 				'hostid' => $hostids[self::FIRST_HOST_NAME],
 				'steps' => [
 					[
@@ -213,7 +231,7 @@ class WidgetCommunication {
 				]
 			],
 			[
-				'name' => 'Web scenario 2nd host for widget communication',
+				'name' => 'Web scenario for '.self::SECOND_HOST_NAME,
 				'hostid' => $hostids[self::SECOND_HOST_NAME],
 				'steps' => [
 					[
@@ -230,7 +248,7 @@ class WidgetCommunication {
 				]
 			],
 			[
-				'name' => 'Web scenario 3rd host for widget communication',
+				'name' => 'Web scenario for '.self::THIRD_HOST_NAME,
 				'hostid' => $hostids[self::THIRD_HOST_NAME],
 				'steps' => [
 					[
@@ -247,6 +265,17 @@ class WidgetCommunication {
 				]
 			]
 		]);
+
+		// Add a value to the "Download speed for scenario" items to check remembering of item key by honeycomb case.
+		$web_itemids = CDataHelper::call('item.get', [
+			'output' => ['itemid'],
+			'webitems' => true,
+			'filter' => ['hostid' => $hostids],
+			'search' => ['name' => 'Download speed for scenario']
+		]);
+		foreach ($web_itemids as $j => $itemid) {
+			CDataHelper::addItemData($itemid['itemid'], $j + 1000, $item_data_timestamp);
+		}
 
 		// Create a map to be displayed on the Map widget.
 		$map_response = CDataHelper::call('map.create', [
@@ -1035,6 +1064,51 @@ class WidgetCommunication {
 										'value' => 0
 									]
 								]
+							],
+							[
+								'type' => 'problems',
+								'name' => 'Problems listener',
+								'x' => 21,
+								'y' => 14,
+								'width' => 19,
+								'height' => 3,
+								'fields' => [
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'groupids._reference',
+										'value' => 'NRDLG._hostgroupids'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_HOST,
+										'name' => 'hostids.0',
+										'value' => $hostids[self::FIRST_HOST_NAME]
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_HOST,
+										'name' => 'hostids.1',
+										'value' => $hostids[self::SECOND_HOST_NAME]
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_HOST,
+										'name' => 'hostids.2',
+										'value' => $hostids[self::THIRD_HOST_NAME]
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'show_timeline',
+										'value' => 0
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'reference',
+										'value' => 'MTXTK'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'rf_rate',
+										'value' => 0
+									]
+								]
 							]
 						]
 					],
@@ -1680,9 +1754,9 @@ class WidgetCommunication {
 							[
 								'type' => 'hostcard',
 								'name' => 'Host card listener',
-								'x' => 29,
+								'x' => 21,
 								'y' => 12,
-								'width' => 24,
+								'width' => 19,
 								'height' => 4,
 								'fields' => [
 									[
@@ -1720,15 +1794,15 @@ class WidgetCommunication {
 							[
 								'type' => 'itemcard',
 								'name' => 'Item card listener',
-								'x' => 53,
+								'x' => 40,
 								'y' => 12,
 								'width' => 19,
-								'height' => 5,
+								'height' => 4,
 								'fields' => [
 									[
-										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
-										'name' => 'itemid._reference',
-										'value' => 'RICVX._itemid'
+										'type' => ZBX_WIDGET_FIELD_TYPE_ITEM,
+										'name' => 'itemid.0',
+										'value' => $itemids[self::FIRST_HOST_NAME.':trap.widget.communication']
 									],
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
@@ -1743,11 +1817,6 @@ class WidgetCommunication {
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'sections.2',
-										'value' => 6
-									],
-									[
-										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
-										'name' => 'sections.3',
 										'value' => 3
 									],
 									[
@@ -1760,10 +1829,10 @@ class WidgetCommunication {
 							[
 								'type' => 'itemnavigator',
 								'name' => 'Item navigator listener',
-								'x' => 21,
-								'y' => 16,
-								'width' => 16,
-								'height' => 3,
+								'x' => 59,
+								'y' => 12,
+								'width' => 13,
+								'height' => 4,
 								'fields' => [
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
@@ -1784,6 +1853,216 @@ class WidgetCommunication {
 										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'group_by.0.attribute',
 										'value' => 1
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'rf_rate',
+										'value' => 0
+									]
+								]
+							],
+							[
+								'type' => 'gauge',
+								'name' => 'Gauge listener',
+								'x' => 21,
+								'y' => 16,
+								'width' => 16,
+								'height' => 3,
+								'fields' => [
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_ITEM,
+										'name' => 'itemid.0',
+										'value' => $itemids[self::FIRST_HOST_NAME.':trap.widget.communication']
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'override_hostid._reference',
+										'value' => 'JRVYU._hostid'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'min',
+										'value' => '0'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'max',
+										'value' => '10'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'rf_rate',
+										'value' => 0
+									]
+								]
+							],
+							[
+								'type' => 'graph',
+								'name' => 'Graph (classic) listener',
+								'x' => 37,
+								'y' => 16,
+								'width' => 18,
+								'height' => 3,
+								'fields' => [
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'source_type',
+										'value' => ZBX_WIDGET_FIELD_RESOURCE_SIMPLE_GRAPH
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_ITEM,
+										'name' => 'itemid.0',
+										'value' => $itemids[self::FIRST_HOST_NAME.':trap.widget.communication']
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'override_hostid._reference',
+										'value' => 'JRVYU._hostid'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'reference',
+										'value' => 'CNWEL'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'rf_rate',
+										'value' => 0
+									]
+								]
+							],
+							[
+								'type' => 'itemhistory',
+								'name' => 'Item history listener',
+								'x' => 55,
+								'y' => 16,
+								'width' => 17,
+								'height' => 3,
+								'fields' => [
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'reference',
+										'value' => 'FEZKC'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'columns.0.name',
+										'value' => 'Trapper item'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_ITEM,
+										'name' => 'columns.0.itemid',
+										'value' => $itemids[self::FIRST_HOST_NAME.':trap.widget.communication']
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'show_lines',
+										'value' => '3'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'override_hostid._reference',
+										'value' => 'JRVYU._hostid'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'rf_rate',
+										'value' => 0
+									]
+								]
+							],
+							[
+								'type' => 'item',
+								'name' => 'Item value listener',
+								'x' => 21,
+								'y' => 19,
+								'width' => 16,
+								'height' => 3,
+								'fields' => [
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_ITEM,
+										'name' => 'itemid.0',
+										'value' => $itemids[self::FIRST_HOST_NAME.':trap.widget.communication']
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'rf_rate',
+										'value' => 0
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'override_hostid._reference',
+										'value' => 'JRVYU._hostid'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'decimal_places',
+										'value' => 0
+									]
+								]
+							],
+							[
+								'type' => 'url',
+								'name' => 'URL listener',
+								'x' => 37,
+								'y' => 19,
+								'width' => 18,
+								'height' => 3,
+								'fields' => [
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'url',
+										'value' => 'zabbix.php?action=item.list&context=host&filter_set=1&filter_hostids[0]={HOST.ID}'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'rf_rate',
+										'value' => 0
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'override_hostid._reference',
+										'value' => 'JRVYU._hostid'
+									]
+								]
+							],
+							[
+								'type' => 'svggraph',
+								'name' => 'SVG graph listener',
+								'x' => 55,
+								'y' => 19,
+								'width' => 17,
+								'height' => 3,
+								'fields' => [
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'ds.0.hosts.0',
+										'value' => '1st host for widgets'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'ds.0.items.0',
+										'value' => 'Trapper item'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'ds.0.color_palette',
+										'value' => 0
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'ds.0.override_hostid._reference',
+										'value' => 'JRVYU._hostid'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'righty',
+										'value' => 0
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'reference',
+										'value' => 'GYNQD'
 									],
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
@@ -3537,6 +3816,135 @@ class WidgetCommunication {
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'rf_rate',
+										'value' => 0
+									]
+								]
+							],
+							[
+								'type' => 'hostnavigator',
+								'name' => 'Host navigator broadcaster',
+								'x' => 0,
+								'y' => 30,
+								'width' => 12,
+								'height' => 5,
+								'fields' => [
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_GROUP,
+										'name' => 'groupids.0',
+										'value' => $host_groupids[self::FIRST_HOSTGROUP_NAME]
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_GROUP,
+										'name' => 'groupids.1',
+										'value' => $host_groupids[self::THIRD_HOSTGROUP_NAME]
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_GROUP,
+										'name' => 'groupids.2',
+										'value' => $host_groupids[self::FORTH_HOSTGROUP_NAME]
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'reference',
+										'value' => 'FWTAW'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'rf_rate',
+										'value' => 0
+									]
+								]
+							],
+							[
+								'type' => 'itemnavigator',
+								'name' => 'Item navigator selected item re-broadcaster',
+								'x' => 17,
+								'y' => 30,
+								'width' => 12,
+								'height' => 5,
+								'fields' => [
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'hostids._reference',
+										'value' => 'FWTAW._hostid'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'reference',
+										'value' => 'TQXFD'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'rf_rate',
+										'value' => 0
+									]
+								]
+							],
+							[
+								'type' => 'item',
+								'x' => 36,
+								'y' => 30,
+								'width' => 18,
+								'height' => 3,
+								'fields' => [
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'itemid._reference',
+										'value' => 'TQXFD._itemid'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'rf_rate',
+										'value' => 0
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'decimal_places',
+										'value' => 0
+									]
+								]
+							],
+							[
+								'type' => 'honeycomb',
+								'name' => 'Honeycomb selected item re-broadcaster',
+								'x' => 17,
+								'y' => 35,
+								'width' => 17,
+								'height' => 3,
+								'fields' => [
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'hostids._reference',
+										'value' => 'FWTAW._hostids'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'items.0',
+										'value' => 'Trapper item'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'items.1',
+										'value' => 'Download*'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'items.2',
+										'value' => 'Another item'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'reference',
+										'value' => 'EHWTR'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'rf_rate',
+										'value' => 0
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'secondary_label_decimal_places',
 										'value' => 0
 									]
 								]

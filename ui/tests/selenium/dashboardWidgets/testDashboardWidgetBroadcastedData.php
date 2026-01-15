@@ -127,7 +127,7 @@ class testDashboardWidgetBroadcastedData extends testWidgetCommunication {
 					'width' => 20,
 					'height' => 6,
 					'x' => 32,
-					'y' => 20,
+					'y' => 23,
 					'fields' => [
 						[
 							'type' => ZBX_WIDGET_FIELD_TYPE_STR,

@@ -43,6 +43,14 @@ class testWidgetCommunication extends testWidgets {
 		'Navigation tree map broadcaster' => 'TAPOK._mapid'
 	];
 
+	const OVERRIDE_HOST_REFERENCES = [
+		'Geomap host broadcaster' => 'JRVYU._hostid',
+		'Honeycomb host broadcaster' => 'RICVX._hostid',
+		'Map host broadcaster' => 'BFSOY._hostid',
+		'Top hosts host broadcaster' => 'ACGKU._hostid',
+		'Host navigator broadcaster' => 'HSTNV._hostid'
+	];
+
 	const GEOMAP_ICON_INDEXES = [
 		self::FIRST_HOST_NAME => 3,
 		self::SECOND_HOST_NAME => 2,
@@ -52,6 +60,7 @@ class testWidgetCommunication extends testWidgets {
 	const FIRST_HOST_NAME = '1st host for widgets';
 	const SECOND_HOST_NAME = '2nd host for widgets';
 	const THIRD_HOST_NAME = '3rd host for widgets';
+	const FORTH_HOST_NAME = 'Host with other set of items';
 	const FIRST_HOSTGROUP_NAME = '1st hostgroup for widgets';
 	const SECOND_HOSTGROUP_NAME = '2nd hostgroup for widgets';
 	const THIRD_HOSTGROUP_NAME = '3rd hostgroup for widgets';
