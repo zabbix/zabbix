@@ -361,7 +361,6 @@ class testDashboardWidgetCommunication extends testWidgetCommunication {
 				]
 			],
 			'Host card listener' => null,
-			// By default Item card widget will display Honeycomb data, because it was selected in Item field.
 			'Item card listener' => [
 				'Hostname' => self::FIRST_HOST_NAME,
 				'Last value' => 3
