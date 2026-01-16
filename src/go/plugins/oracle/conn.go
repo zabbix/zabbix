@@ -222,11 +222,14 @@ func (c *ConnManager) create(cd connDetails) (*OraConn, error) {
 		host    = cd.uri.Host()
 	)
 
-	if strings.ContainsAny(host, "()\"'") { //characters that can cause escape.
-		return nil, errs.WrapConst(
-			fmt.Errorf("invalid characters in hostname: %s", host),
-			zbxerr.ErrorInvalidParams,
-		)
+	err := checkForbiddenCharacters(service)
+	if err != nil {
+		return nil, err
+	}
+
+	err = checkForbiddenCharacters(host)
+	if err != nil {
+		return nil, err
 	}
 
 	connectString := fmt.Sprintf(
@@ -349,4 +352,15 @@ func getConnParams(privilege string) (godror.ConnParams, error) {
 	}
 
 	return out, nil
+}
+
+func checkForbiddenCharacters(s string) error {
+	if strings.ContainsAny(s, "()\"'=#") { //characters that can cause escape.
+		return errs.WrapConst(
+			fmt.Errorf("invalid characters in: %s", s),
+			zbxerr.ErrorInvalidParams,
+		)
+	}
+
+	return nil
 }
