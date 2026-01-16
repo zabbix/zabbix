@@ -109,24 +109,16 @@ static void	alerter_send_result(zbx_ipc_socket_t *socket, const char *value, int
 
 static char	*generate_sendto_hash(const char *sendto)
 {
-	const char	*hex = "0123456789abcdef";
 	md5_state_t	state;
 	md5_byte_t	hash[ZBX_MD5_DIGEST_SIZE];
 	char		*sendto_hash;
-	int		i, pos;
 
 	sendto_hash = zbx_malloc(NULL, ZBX_MD5_DIGEST_SIZE * 2 + 1);
 
 	zbx_md5_init(&state);
 	zbx_md5_append(&state, (const md5_byte_t *)sendto, strlen(sendto));
 	zbx_md5_finish(&state, hash);
-
-	for (i = 0, pos = 0; i < ZBX_MD5_DIGEST_SIZE; i++)
-	{
-		sendto_hash[pos++] = hex[hash[i] >> 4];
-		sendto_hash[pos++] = hex[hash[i] & 15];
-	}
-	sendto_hash[pos] = '\0';
+	zbx_md5buf2str(hash, sendto_hash);
 
 	return sendto_hash;
 }
