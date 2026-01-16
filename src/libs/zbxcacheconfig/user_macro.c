@@ -56,6 +56,13 @@ static zbx_um_cache_t	*um_cache_dup(zbx_um_cache_t *cache)
 
 	dup = (zbx_um_cache_t *)dbconfig_shmem_malloc_func(NULL, sizeof(zbx_um_cache_t));
 	dup->refcount = 1;
+	memset(&dup->hosts, 0, sizeof(dup->hosts));
+
+	if (0 != get_dc_config()->um_hosts.num_slots)
+	{
+		dup->hosts = get_dc_config()->um_hosts;
+		memset(&get_dc_config()->um_hosts, 0 , sizeof(get_dc_config()->um_hosts));
+	}
 
 	zbx_hashset_copy(&dup->hosts, &cache->hosts, sizeof(zbx_um_host_t *));
 	zbx_hashset_iter_reset(&dup->hosts, &iter);
@@ -193,7 +200,11 @@ void	um_cache_release(zbx_um_cache_t *cache)
 	zbx_hashset_iter_reset(&cache->hosts, &iter);
 	while (NULL != (host = (zbx_um_host_t **)zbx_hashset_iter_next(&iter)))
 		um_host_release(*host);
-	zbx_hashset_destroy(&cache->hosts);
+
+	if (0 == get_dc_config()->um_hosts.num_slots)
+		get_dc_config()->um_hosts = cache->hosts;
+	else
+		zbx_hashset_destroy(&cache->hosts);
 
 	dbconfig_shmem_free_func(cache);
 }
