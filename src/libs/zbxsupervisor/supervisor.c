@@ -822,7 +822,6 @@ ZBX_THREAD_ENTRY(zbx_supervisor_thread, args)
 			runlevel_last = sv.runlevel;
 		}
 
-
 		double	time_now = zbx_time();
 
 		zbx_prof_update(get_process_type_string(process_type), time_now);

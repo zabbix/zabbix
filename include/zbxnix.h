@@ -52,7 +52,7 @@ int	zbx_init_thread_signal_handler(sigjmp_buf *jmp_ret);
 
 #define ZBX_THREAD_FAILURE	((void *)EXIT_FAILURE)
 
-#define ZBX_INIT_THREAD(jmp_ret)				\
+#define ZBX_INIT_THREAD_OR_RETURN(jmp_ret)			\
 		zbx_init_thread_signal_handler(&jmp_ret);	\
 		if (0 != sigsetjmp(jmp_ret, 1))			\
 		{						\

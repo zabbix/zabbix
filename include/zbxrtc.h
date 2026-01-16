@@ -74,6 +74,8 @@ void 	zbx_rtc_dispatch(zbx_rtc_t *rtc, zbx_ipc_client_t *client, zbx_ipc_message
 void	zbx_rtc_shutdown_subs(zbx_rtc_t *rtc);
 
 /* client API */
+void	zbx_rtc_notify_finished_sync(int config_timeout, zbx_uint32_t code, const char *process_name,
+	zbx_ipc_async_socket_t *rtc);
 void	zbx_rtc_subscribe(unsigned char proc_type, int proc_num, zbx_uint32_t *msgs, int msgs_num, int config_timeout,
 		zbx_ipc_async_socket_t *rtc);
 void	zbx_rtc_subscribe_service(unsigned char proc_type, int proc_num, zbx_uint32_t *msgs, int msgs_num,

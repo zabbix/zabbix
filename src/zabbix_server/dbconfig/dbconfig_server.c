@@ -42,7 +42,7 @@
 void	*zbx_dbconfig_thread(void *args)
 {
 	double				sec = 0.0;
-	int				sleeptime, nextcheck = 0,
+	int				sleeptime = 1, nextcheck = 0,
 					secrets_reload = 0, cache_reload = 0;
 	zbx_ipc_async_socket_t		rtc;
 	zbx_supervisor_unit_args_t	*unit_args = (zbx_supervisor_unit_args_t *)args;
@@ -62,7 +62,7 @@ void	*zbx_dbconfig_thread(void *args)
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started", get_program_type_string(info->program_type), server_num);
 
-	ZBX_INIT_THREAD(jmp_ret);
+	ZBX_INIT_THREAD_OR_RETURN(jmp_ret);
 
 	zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
 
@@ -95,8 +95,6 @@ void	*zbx_dbconfig_thread(void *args)
 	{
 		zbx_uint32_t	rtc_cmd;
 		unsigned char	*rtc_data;
-
-		sleeptime = nextcheck - (int)time(NULL);
 
 		while (SUCCEED == zbx_rtc_wait(&rtc, info, &rtc_cmd, &rtc_data, sleeptime) && 0 != rtc_cmd)
 		{
@@ -131,6 +129,11 @@ void	*zbx_dbconfig_thread(void *args)
 
 			sleeptime = 0;
 		}
+
+		sleeptime = time(NULL) < (time_t)nextcheck ? 1 : 0;
+
+		if (0 == secrets_reload && 0 == cache_reload && 0 != sleeptime)
+			continue;
 
 		zbx_supervisor_update_activity("%s [synced configuration in " ZBX_FS_DBL " sec, syncing configuration]",
 				process_title, sec);

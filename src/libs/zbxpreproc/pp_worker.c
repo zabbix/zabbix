@@ -110,7 +110,7 @@ static void	*pp_worker_entry(void *args)
 	zbx_snprintf(component, sizeof(component), "preprocessing worker #%d", worker->id);
 	zbx_set_log_component(component, &worker->logger);
 
-	ZBX_INIT_THREAD(jmp_ret);
+	ZBX_INIT_THREAD_OR_RETURN(jmp_ret);
 
 	zbx_init_regexp_env();
 

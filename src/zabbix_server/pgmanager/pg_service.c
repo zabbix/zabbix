@@ -362,7 +362,7 @@ static void	*pg_service_entry(void *data)
 	zbx_ipc_message_t	*message;
 	sigjmp_buf		jmp_ret;
 
-	ZBX_INIT_THREAD(jmp_ret);
+	ZBX_INIT_THREAD_OR_RETURN(jmp_ret);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 

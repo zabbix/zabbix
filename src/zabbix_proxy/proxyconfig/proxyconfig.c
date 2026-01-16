@@ -283,7 +283,7 @@ void	*zbx_proxyconfig_thread(void *args)
 	size_t				data_size;
 	double				sec, last_template_cleanup_sec = 0, interval;
 	zbx_ipc_async_socket_t		rtc;
-	int				sleeptime;
+	int				sleeptime = 1;
 	zbx_synced_new_config_t		synced = ZBX_SYNCED_NEW_CONFIG_NO;
 	zbx_supervisor_unit_args_t	*unit_args = (zbx_supervisor_unit_args_t *)args;
 	const zbx_thread_info_t		*info = &unit_args->args.info;
@@ -293,6 +293,7 @@ void	*zbx_proxyconfig_thread(void *args)
 	zbx_uint32_t			rtc_msgs[] = {ZBX_RTC_CONFIG_CACHE_RELOAD};
 	char				*process_title;
 	sigjmp_buf			jmp_ret;
+	time_t				nextcheck;
 
 	process_title = zbx_dsprintf(NULL, "%s #%d", get_process_type_string(process_type), process_num);
 	zbx_set_log_component(process_title, unit_args->logger);
@@ -302,7 +303,7 @@ void	*zbx_proxyconfig_thread(void *args)
 	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started", get_program_type_string(info->program_type), server_num);
 	zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
 
-	ZBX_INIT_THREAD(jmp_ret);
+	ZBX_INIT_THREAD_OR_RETURN(jmp_ret);
 
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	zbx_tls_init_child(proxyconfig_args_in->config_tls, proxyconfig_args_in->zbx_get_program_type_cb_arg,
@@ -322,7 +323,10 @@ void	*zbx_proxyconfig_thread(void *args)
 
 	proxyconfig_update_vault_macros(proxyconfig_args_in);
 
-	sleeptime = (ZBX_PROGRAM_TYPE_PROXY_PASSIVE == info->program_type ? ZBX_IPC_WAIT_FOREVER : 0);
+	if (ZBX_PROGRAM_TYPE_PROXY_PASSIVE == info->program_type)
+		nextcheck = 0;
+	else
+		nextcheck = time(NULL) + proxyconfig_args_in->config_proxyconfig_frequency;
 
 	zbx_supervisor_set_process_running(server_num);
 
@@ -341,6 +345,11 @@ void	*zbx_proxyconfig_thread(void *args)
 
 			sleeptime = 0;
 		}
+
+		sleeptime = (0 == nextcheck || time(NULL) < nextcheck) ? 1 : 0;
+
+		if (0 == config_cache_reload && 0 != sleeptime)
+			continue;
 
 		sec = zbx_time();
 		zbx_prof_update(process_title, sec);
@@ -364,6 +373,9 @@ void	*zbx_proxyconfig_thread(void *args)
 				proxyconfig_update_vault_macros(proxyconfig_args_in);
 				zbx_hc_remove_items_by_ids(&deleted_itemids);
 
+				zbx_rtc_notify_finished_sync(proxyconfig_args_in->config_timeout,
+					ZBX_RTC_CONFIG_SYNC_NOTIFY, get_process_type_string(process_type), &rtc);
+
 				if (SEC_PER_HOUR < sec - last_template_cleanup_sec)
 				{
 					proxyconfig_remove_unused_templates();
@@ -375,7 +387,6 @@ void	*zbx_proxyconfig_thread(void *args)
 						process_title, zbx_time() - sec);
 			}
 
-			sleeptime = ZBX_IPC_WAIT_FOREVER;
 			continue;
 		}
 
@@ -399,7 +410,7 @@ void	*zbx_proxyconfig_thread(void *args)
 			last_template_cleanup_sec = sec;
 		}
 
-		sleeptime = proxyconfig_args_in->config_proxyconfig_frequency;
+		nextcheck = time(NULL) + proxyconfig_args_in->config_proxyconfig_frequency;
 	}
 stop:
 	zbx_ipc_async_socket_close(&rtc);
@@ -408,6 +419,5 @@ stop:
 
 	zbx_free(process_title);
 
-	while (1)
-		zbx_sleep(SEC_PER_MIN);
+	return NULL;
 }

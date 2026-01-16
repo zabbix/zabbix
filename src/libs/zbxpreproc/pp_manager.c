@@ -1200,7 +1200,7 @@ void	*zbx_pp_manager_thread(void *args)
 
 	zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
 
-	ZBX_INIT_THREAD(jmp_ret);
+	ZBX_INIT_THREAD_OR_RETURN(jmp_ret);
 
 	if (FAIL == zbx_ipc_service_start(&service, ZBX_IPC_SERVICE_PREPROCESSING, &error))
 	{
