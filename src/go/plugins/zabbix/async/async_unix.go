@@ -12,36 +12,34 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-package netif
+package zabbixasync
 
 import (
+	"golang.zabbix.com/agent2/pkg/zbxlib"
+	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/plugin"
 )
 
-const (
-	errorInvalidSecondParam   = "invalid second parameter"
-	errorEmptyIfName          = "network interface name cannot be empty"
-	errorTooManyParams        = "too many parameters"
-	errorUnsupportedMetric    = "unsupported metric"
-	errorParametersNotAllowed = "item does not allow parameters"
-)
-
-const (
-	directionIn networkDirection = iota
-	directionOut
-	directionTotal
-)
-
-// Plugin netif plugin implementation.
+// Plugin structure.
 type Plugin struct {
 	plugin.Base
-
-	netDevFilepath string
 }
 
-type networkDirection uint8
+func init() { //nolint:gochecknoinits // this is our way of registering plugins.
+	impl := &Plugin{}
 
-type msgIfDiscovery struct {
-	Ifname string  `json:"{#IFNAME}"`           //nolint:tagliatelle // legacy compatibility
-	Ifguid *string `json:"{#IFGUID},omitempty"` //nolint:tagliatelle // legacy compatibility
+	err := plugin.RegisterMetrics(impl, "ZabbixAsync", getMetrics()...)
+	if err != nil {
+		panic(errs.Wrap(err, "failed to register metrics"))
+	}
+}
+
+// Export implements exporter interface.
+func (*Plugin) Export(key string, params []string, _ plugin.ContextProvider) (any, error) {
+	result, err := zbxlib.ExecuteCheck(key, params)
+	if err != nil {
+		return nil, errs.Wrap(err, "failed to execute check")
+	}
+
+	return result, nil
 }

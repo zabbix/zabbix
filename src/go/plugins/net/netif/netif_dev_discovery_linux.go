@@ -1,6 +1,3 @@
-//go:build (windows && 386) || darwin
-// +build windows,386 darwin
-
 /*
 ** Copyright (C) 2001-2026 Zabbix SIA
 **
@@ -15,13 +12,29 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-package udp
+package netif
 
 import (
-	"errors"
+	"golang.zabbix.com/agent2/pkg/procfs"
+	"golang.zabbix.com/sdk/errs"
 )
 
-// exportNetUDPSocketCount - returns number of UDP sockets that match parameters.
-func (p *Plugin) exportNetUDPSocketCount(params []string) (result int, err error) {
-	return 0, errors.New("Not supported.")
+func (p *Plugin) getDevDiscovery() ([]msgIfDiscovery, error) {
+	parser := procfs.NewParser().
+		SetScanStrategy(procfs.StrategyOSReadFile).
+		SetMatchMode(procfs.ModeContains).
+		SetPattern(":").
+		SetSplitter(":", 0)
+
+	data, err := parser.Parse(p.netDevFilepath)
+	if err != nil {
+		return nil, errs.Wrapf(err, "failed to parse %s file", p.netDevFilepath)
+	}
+
+	result := make([]msgIfDiscovery, 0, len(data))
+	for _, line := range data {
+		result = append(result, msgIfDiscovery{line, nil})
+	}
+
+	return result, nil
 }
