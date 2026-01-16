@@ -1805,6 +1805,8 @@ abstract class CTriggerGeneral extends CApiService {
 		$new_functions = [];
 		$del_functions_triggerids = [];
 		$triggers_functions = [];
+		$new_tags = [];
+		$del_triggertagids = [];
 		$upd_discovered_triggers = [];
 		$save_triggers = $triggers;
 		$this->implode_expressions($triggers, $db_triggers, $triggers_functions, $inherited);
@@ -1849,7 +1851,7 @@ abstract class CTriggerGeneral extends CApiService {
 			if (array_key_exists('status', $trigger) && $trigger['status'] != $db_trigger['status']) {
 				$upd_trigger['values']['status'] = $trigger['status'];
 			}
-			if (self::isTriggerPrototype()
+			if ($this instanceof CTriggerPrototype
 					&& array_key_exists('discover', $trigger) && $trigger['discover'] != $db_trigger['discover']) {
 				$upd_trigger['values']['discover'] = $trigger['discover'];
 			}
@@ -1879,6 +1881,38 @@ abstract class CTriggerGeneral extends CApiService {
 				$upd_triggers[] = $upd_trigger;
 			}
 
+			if (array_key_exists('tags', $trigger)) {
+				// Add new trigger tags and replace changed ones.
+
+				CArrayHelper::sort($db_trigger['tags'], ['tag', 'value']);
+				CArrayHelper::sort($trigger['tags'], ['tag', 'value']);
+
+				$tags_delete = $db_trigger['tags'];
+				$tags_add = $trigger['tags'];
+
+				foreach ($tags_delete as $dt_key => $tag_delete) {
+					foreach ($tags_add as $nt_key => $tag_add) {
+						if ($tag_delete['tag'] === $tag_add['tag'] && $tag_delete['value'] === $tag_add['value']) {
+							unset($tags_delete[$dt_key], $tags_add[$nt_key]);
+							continue 2;
+						}
+					}
+				}
+
+				$tags_delete = array_filter($tags_delete,
+					static fn(array $tag) => !array_key_exists('automatic', $tag) || $tag['automatic'] == ZBX_TAG_MANUAL
+				);
+
+				foreach ($tags_delete as $tag_delete) {
+					$del_triggertagids[] = $tag_delete['triggertagid'];
+				}
+
+				foreach ($tags_add as $tag_add) {
+					$tag_add['triggerid'] = $trigger['triggerid'];
+					$new_tags[] = $tag_add;
+				}
+			}
+
 			if (array_key_exists('flags', $db_trigger) && $db_trigger['flags'] == ZBX_FLAG_DISCOVERY_CREATED
 					&& array_key_exists('status', $upd_trigger['values'])
 					&& $upd_trigger['values']['status'] == TRIGGER_STATUS_DISABLED
@@ -1896,8 +1930,12 @@ abstract class CTriggerGeneral extends CApiService {
 		if ($new_functions) {
 			DB::insertBatch('functions', $new_functions, false);
 		}
-
-		self::updateTags($triggers, $db_triggers);
+		if ($del_triggertagids) {
+			DB::delete('trigger_tag', ['triggertagid' => $del_triggertagids]);
+		}
+		if ($new_tags) {
+			DB::insert('trigger_tag', $new_tags);
+		}
 
 		if ($upd_discovered_triggers) {
 			DB::update('trigger_discovery', [
@@ -1907,61 +1945,8 @@ abstract class CTriggerGeneral extends CApiService {
 		}
 
 		if (!$inherited) {
-			$resource = self::isTrigger() ? CAudit::RESOURCE_TRIGGER : CAudit::RESOURCE_TRIGGER_PROTOTYPE;
+			$resource = ($this instanceof CTrigger) ? CAudit::RESOURCE_TRIGGER : CAudit::RESOURCE_TRIGGER_PROTOTYPE;
 			$this->addAuditBulk(CAudit::ACTION_UPDATE, $resource, $save_triggers, $db_triggers);
-		}
-	}
-
-	/**
-	 * @param array      $triggers
-	 * @param array|null $db_triggers
-	 */
-	protected static function updateTags(array $triggers, ?array $db_triggers = null): void {
-		$ins_tags = [];
-		$del_triggertagids = [];
-
-		foreach ($triggers as &$trigger) {
-			if (!array_key_exists('tags', $trigger)) {
-				continue;
-			}
-
-			$db_tags = $db_triggers !== null ? $db_triggers[$trigger['triggerid']]['tags'] : [];
-
-			foreach ($trigger['tags'] as &$tag) {
-				$db_triggertagid = key(array_filter($db_tags, static function (array $db_tag) use ($tag): bool {
-					return $tag['tag'] === $db_tag['tag']
-						&& (!array_key_exists('value', $tag) || $tag['value'] === $db_tag['value']);
-				}));
-
-				if ($db_triggertagid !== null) {
-					$tag['triggertagid'] = $db_triggertagid;
-
-					unset($db_tags[$db_triggertagid]);
-				}
-				else {
-					$ins_tags[] = ['triggerid' => $trigger['triggerid']] + $tag;
-				}
-			}
-			unset($tag);
-
-			if (self::isTrigger()) {
-				$db_tags = array_filter($db_tags,
-					static fn(array $tag) => !array_key_exists('automatic', $tag) || $tag['automatic'] == ZBX_TAG_MANUAL
-				);
-			}
-
-			if ($db_tags) {
-				$del_triggertagids = array_merge($del_triggertagids, array_keys($db_tags));
-			}
-		}
-		unset($trigger);
-
-		if ($del_triggertagids) {
-			DB::delete('trigger_tag', ['triggertagid' => $del_triggertagids]);
-		}
-
-		if ($ins_tags) {
-			DB::insert('trigger_tag', $ins_tags);
 		}
 	}
 
