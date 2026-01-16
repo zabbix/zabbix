@@ -59,12 +59,12 @@ $tabs->addTab('mediaTab', _('Media'), $media, TAB_INDICATOR_MEDIA);
 
 // Frontend notifications tab.
 $messaging_form_list = (new CFormList())
-	->addRow((new CLabel(_('Frontend notifications')))->setAsteriskMark(),
+	->addRow(_('Frontend notifications'),
 		(new CCheckBox('messages[enabled]'))
 			->setChecked($data['messages']['enabled'] == 1)
 			->setUncheckedValue(0)
 	)
-	->addRow(_('Message timeout'),
+	->addRow((new CLabel(_('Message timeout')))->setAsteriskMark(),
 		(new CTextBox('messages[timeout]', $data['messages']['timeout']))->setWidth(ZBX_TEXTAREA_TINY_WIDTH),
 		'timeout_row'
 	)
