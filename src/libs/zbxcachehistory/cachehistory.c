@@ -54,8 +54,8 @@ static zbx_mutex_t	cache_lock = ZBX_MUTEX_NULL;
 static zbx_mutex_t	trends_lock = ZBX_MUTEX_NULL;
 static zbx_mutex_t	cache_ids_lock = ZBX_MUTEX_NULL;
 
-static char		*sql = NULL;
-static size_t		sql_alloc = 4 * ZBX_KIBIBYTE;
+static ZBX_THREAD_LOCAL char	*sql = NULL;
+static ZBX_THREAD_LOCAL size_t	sql_alloc = 4 * ZBX_KIBIBYTE;
 
 static zbx_get_program_type_f	get_program_type_cb = NULL;
 static zbx_sync_history_cache_f	sync_history_cache_cb = NULL;

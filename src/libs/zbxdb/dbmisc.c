@@ -1455,9 +1455,9 @@ void	zbx_db_add_str_condition_alloc(char **sql, size_t *sql_alloc, size_t *sql_o
  ******************************************************************************/
 const char	*zbx_db_sql_id_ins(zbx_uint64_t id)
 {
-	static unsigned char	n = 0;
-	static char		buf[4][21];	/* 20 - value size, 1 - '\0' */
-	static const char	null[5] = "null";
+	static ZBX_THREAD_LOCAL unsigned char	n = 0;
+	static ZBX_THREAD_LOCAL char		buf[4][21];	/* 20 - value size, 1 - '\0' */
+	static const char			null[5] = "null";
 
 	if (0 == id)
 		return null;
@@ -1481,8 +1481,8 @@ const char	*zbx_db_sql_id_ins(zbx_uint64_t id)
  ******************************************************************************/
 const char	*zbx_db_sql_id_cmp(zbx_uint64_t id)
 {
-	static char		buf[22];	/* 1 - '=', 20 - value size, 1 - '\0' */
-	static const char	is_null[9] = " is null";
+	static ZBX_THREAD_LOCAL char		buf[22];	/* 1 - '=', 20 - value size, 1 - '\0' */
+	static const char			is_null[9] = " is null";
 
 	if (0 == id)
 		return is_null;
