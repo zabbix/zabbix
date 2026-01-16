@@ -40,7 +40,7 @@ void	zbx_mock_test_entry(void **state)
 	{
 		size_t	skip_for_libssh2_below = zbx_mock_get_parameter_uint64("in.skip_for_libssh2_and_below");
 
-		if (skip_for_libssh2_below >= LIBSSH2_VERSION_NUM)
+		if (skip_for_libssh2_below <= LIBSSH2_VERSION_NUM)
 			skip();
 	}
 #endif

@@ -614,6 +614,11 @@ static void	connector_get_top_items(zbx_connector_manager_t *manager, zbx_ipc_cl
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
+static void	data_point_link_clean_wrap(void *ptr)
+{
+	data_point_link_clean((zbx_data_point_link_t *)ptr);
+}
+
 ZBX_THREAD_ENTRY(connector_manager_thread, args)
 {
 	zbx_ipc_service_t			service;
@@ -690,7 +695,7 @@ ZBX_THREAD_ENTRY(connector_manager_thread, args)
 				case ZBX_IPC_CONNECTOR_REQUEST:
 					zbx_dc_config_history_sync_get_connectors(&manager.connectors, &manager.iter,
 							&manager.config_revision, &manager.connector_revision,
-							(zbx_clean_func_t)data_point_link_clean);
+							data_point_link_clean_wrap);
 					zbx_connector_deserialize_object(message->data, message->size,
 							&connector_objects);
 					connector_enqueue(&manager, &connector_objects);

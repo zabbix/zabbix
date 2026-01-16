@@ -435,6 +435,22 @@ static int	vc_db_read_values_by_time_and_count(zbx_uint64_t itemid, int value_ty
 	return zbx_history_get_values(itemid, value_type, first_timestamp - 1, 0, first_timestamp, values);
 }
 
+static int	history_record_compare_desc_wrap(const void *a, const void *b)
+{
+	const	zbx_history_record_t	*rec_a = (const zbx_history_record_t *)a;
+	const	zbx_history_record_t	*rec_b = (const zbx_history_record_t *)b;
+
+	return zbx_history_record_compare_desc_func(rec_a, rec_b);
+}
+
+static int	history_record_compare_asc_wrap(const void *a, const void *b)
+{
+	const	zbx_history_record_t	*rec_a = (const zbx_history_record_t *)a;
+	const	zbx_history_record_t	*rec_b = (const zbx_history_record_t *)b;
+
+	return zbx_history_record_compare_asc_func(rec_a, rec_b);
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: get item history data for the specified time period directly from *
@@ -472,7 +488,7 @@ static int	vc_db_get_values(zbx_uint64_t itemid, int value_type, zbx_vector_hist
 	if (SUCCEED != ret)
 		return ret;
 
-	zbx_vector_history_record_sort(values, (zbx_compare_func_t)zbx_history_record_compare_desc_func);
+	zbx_vector_history_record_sort(values, history_record_compare_desc_wrap);
 
 	/* History backend returns values by full second intervals. With nanosecond resolution */
 	/* some of returned values might be outside the requested range, for example:          */
@@ -565,6 +581,14 @@ static int	vc_item_weight_compare_func(const zbx_vc_item_weight_t *d1, const zbx
 	ZBX_RETURN_IF_NOT_EQUAL(d1->weight, d2->weight);
 
 	return 0;
+}
+
+static int	vc_item_weight_compare_wrap(const void *a, const void *b)
+{
+	const zbx_vc_item_weight_t	*item_a = (const zbx_vc_item_weight_t *)a;
+	const zbx_vc_item_weight_t	*item_b = (const zbx_vc_item_weight_t *)b;
+
+	return vc_item_weight_compare_func(item_a, item_b);
 }
 
 /******************************************************************************
@@ -888,7 +912,7 @@ static void	vc_release_space(zbx_vc_item_t *source_item, size_t space)
 		}
 	}
 
-	zbx_vector_vc_itemweight_sort(&items, (zbx_compare_func_t)vc_item_weight_compare_func);
+	zbx_vector_vc_itemweight_sort(&items, vc_item_weight_compare_wrap);
 
 	for (i = 0; i < items.values_num && freed < space; i++)
 	{
@@ -1999,10 +2023,7 @@ static int	vch_item_cache_values_by_time(zbx_vc_item_t **item, int range_start)
 	UNLOCK_CACHE;
 
 	if (SUCCEED == (ret = vc_db_read_values_by_time(itemid, value_type, &records, range_start, range_end)))
-	{
-		zbx_vector_history_record_sort(&records,
-				(zbx_compare_func_t)zbx_history_record_compare_asc_func);
-	}
+		zbx_vector_history_record_sort(&records, history_record_compare_asc_wrap);
 
 	WRLOCK_CACHE;
 
@@ -2113,8 +2134,7 @@ static int	vch_item_cache_values_by_time_and_count(zbx_vc_item_t **item, int ran
 	if (SUCCEED == ret && SUCCEED == (ret = vc_db_read_values_by_time_and_count(itemid, value_type, &records,
 			range_start, count - cached_records, range_end, ts)))
 	{
-		zbx_vector_history_record_sort(&records,
-				(zbx_compare_func_t)zbx_history_record_compare_asc_func);
+		zbx_vector_history_record_sort(&records, history_record_compare_asc_wrap);
 	}
 
 	WRLOCK_CACHE;

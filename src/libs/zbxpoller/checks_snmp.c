@@ -2576,9 +2576,17 @@ static void	snmp_bulkwalk_set_options(zbx_snmp_format_opts_t *opts)
 	netsnmp_ds_set_boolean(NETSNMP_DS_LIBRARY_ID, NETSNMP_DS_LIB_DONT_PRINT_UNITS, opts->no_print_units);
 }
 
+static int	zbx_snmp_oid_compare_wrap(const void *a, const void *b)
+{
+	const zbx_snmp_oid_t *const	*oa = (const zbx_snmp_oid_t *const *)a;
+	const zbx_snmp_oid_t *const	*ob = (const zbx_snmp_oid_t *const *)b;
+
+	return zbx_snmp_oid_compare(oa, ob);
+}
+
 static void	snmp_bulkwalk_remove_matching_oids(zbx_vector_snmp_oid_t *oids)
 {
-	zbx_vector_snmp_oid_sort(oids, (zbx_compare_func_t)zbx_snmp_oid_compare);
+	zbx_vector_snmp_oid_sort(oids, zbx_snmp_oid_compare_wrap);
 
 	for (int i = 1; i < oids->values_num; i++)
 	{
@@ -2638,7 +2646,7 @@ static int	snmp_bulkwalk_parse_params(AGENT_REQUEST *request, zbx_vector_snmp_oi
 
 	if (1 < oids_out->values_num)
 	{
-		zbx_vector_snmp_oid_sort(oids_out, (zbx_compare_func_t)zbx_snmp_oid_compare);
+		zbx_vector_snmp_oid_sort(oids_out, zbx_snmp_oid_compare_wrap);
 		snmp_bulkwalk_remove_matching_oids(oids_out);
 	}
 

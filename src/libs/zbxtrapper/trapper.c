@@ -374,6 +374,14 @@ static int	queue_compare_by_nextcheck_asc(zbx_queue_item_t **d1, zbx_queue_item_
 	return i1->nextcheck - i2->nextcheck;
 }
 
+static int	queue_compare_by_nextcheck_asc_wrap(const void *a, const void *b)
+{
+	zbx_queue_item_t *const	*qa = (zbx_queue_item_t *const *)a;
+	zbx_queue_item_t *const	*qb = (zbx_queue_item_t *const *)b;
+
+	return queue_compare_by_nextcheck_asc(qa, qb);
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: processes queue request                                           *
@@ -504,7 +512,7 @@ static int	recv_getqueue(zbx_socket_t *sock, struct zbx_json_parse *jp, int conf
 
 			break;
 		case ZBX_GET_QUEUE_DETAILS:
-			zbx_vector_queue_item_ptr_sort(&queue, (zbx_compare_func_t)queue_compare_by_nextcheck_asc);
+			zbx_vector_queue_item_ptr_sort(&queue, queue_compare_by_nextcheck_asc_wrap);
 			zbx_json_addstring(&json, ZBX_PROTO_TAG_RESPONSE, ZBX_PROTO_VALUE_SUCCESS,
 					ZBX_JSON_TYPE_STRING);
 			zbx_json_addarray(&json, ZBX_PROTO_TAG_DATA);

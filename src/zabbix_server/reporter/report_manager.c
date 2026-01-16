@@ -240,9 +240,14 @@ static void	rm_job_free(zbx_rm_job_t *job)
 	zbx_free(job);
 }
 
+static void	rm_job_free_wrap(void *ptr)
+{
+	rm_job_free((zbx_rm_job_t *)ptr);
+}
+
 static void	rm_batch_clean(zbx_rm_batch_t *batch)
 {
-	zbx_vector_ptr_clear_ext(&batch->jobs, (zbx_ptr_free_func_t)rm_job_free);
+	zbx_vector_ptr_clear_ext(&batch->jobs, rm_job_free_wrap);
 	zbx_vector_ptr_destroy(&batch->jobs);
 	zbx_free(batch->info);
 }
@@ -1393,6 +1398,11 @@ static void	zbx_report_dst_free(zbx_report_dst_t *dst)
 	zbx_free(dst);
 }
 
+static void	zbx_report_dst_free_wrap(void *ptr)
+{
+	zbx_report_dst_free((zbx_report_dst_t *)ptr);
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: processes job by sending it to writer                             *
@@ -1567,7 +1577,7 @@ static int	rm_writer_process_job(zbx_rm_writer_t *writer, zbx_rm_job_t *job, cha
 out:
 	zbx_free(sql);
 	zbx_free(data);
-	zbx_vector_ptr_clear_ext(&dsts, (zbx_ptr_free_func_t)zbx_report_dst_free);
+	zbx_vector_ptr_clear_ext(&dsts, zbx_report_dst_free_wrap);
 	zbx_vector_ptr_destroy(&dsts);
 	zbx_vector_uint64_destroy(&mediatypeids);
 
