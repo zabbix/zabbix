@@ -8351,13 +8351,14 @@ zbx_uint64_t	zbx_dc_sync_configuration(unsigned char mode, zbx_synced_new_config
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() changelog  : sql:" ZBX_FS_DBL " sec (%d records)",
 				__func__, changelog_sec, changelog_num);
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() reindex    : %d num " ZBX_FS_DBL " sec " ZBX_FS_I64 " bytes.",
-				__func__, itemtrigs_num, update_sec, update_size);
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() timers   : %d num " ZBX_FS_DBL " sec " ZBX_FS_I64 " bytes.", __func__,
-				timers_num, timers_sec, timers_size);
+
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() reindex    : " ZBX_FS_DBL " sec " ZBX_FS_I64 " bytes (%d).",
+				__func__, update_sec, update_size, itemtrigs_num);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() timers     : " ZBX_FS_DBL " sec " ZBX_FS_I64 " bytes (%d).", __func__,
+				timers_sec, timers_size, timers_num);
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() topology   : " ZBX_FS_DBL " sec " ZBX_FS_I64 " bytes.", __func__,
 				topology_sec, topology_size);
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() user macro cache dup   : " ZBX_FS_DBL " sec " ZBX_FS_I64 " bytes.",
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() um_cache   : " ZBX_FS_DBL " sec " ZBX_FS_I64 " bytes.",
 			__func__, um_cache_dup_sec, um_cache_dup_size);
 
 		zbx_dcsync_stats_dump(__func__);
