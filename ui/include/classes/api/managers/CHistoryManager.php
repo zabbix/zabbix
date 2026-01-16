@@ -23,7 +23,7 @@ class CHistoryManager {
 
 	private static array $providers = [
 		ZBX_HISTORY_SOURCE_CLICKHOUSE => 'ClickHouse',
-		ZBX_HISTORY_SOURCE_ELASTIC => 'ElasticDB',
+		ZBX_HISTORY_SOURCE_ELASTIC => 'ElasticDB'
 	];
 
 	private static array $value_type_mapping = [
