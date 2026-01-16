@@ -483,10 +483,7 @@ zbx_uint64_t	zbx_variant_size(const zbx_variant_t *value)
 			size = strlen(value->data.json) + 1;
 			break;
 		case ZBX_VARIANT_DBL:
-			size = sizeof(double);
-			break;
 		case ZBX_VARIANT_UI64:
-			size = sizeof(zbx_uint64_t);
 			break;
 		default:
 			zabbix_log(LOG_LEVEL_CRIT, "%s(): unexpected value->type:%hhu", __func__, value->type);
