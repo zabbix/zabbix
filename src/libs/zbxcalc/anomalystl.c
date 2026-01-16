@@ -525,9 +525,17 @@ static void	eval_moving_average(const zbx_vector_history_record_t *x, int n, int
 	}
 }
 
+static int	zbx_history_record_float_compare_wrapper(const void *a, const void *b)
+{
+	const zbx_history_record_t	*ra = (const zbx_history_record_t *)a;
+	const zbx_history_record_t	*rb = (const zbx_history_record_t *)b;
+
+	return zbx_history_record_float_compare(ra, rb);
+}
+
 static double	find_stl_median(zbx_vector_history_record_t *v)
 {
-	zbx_vector_history_record_sort(v, (zbx_compare_func_t)zbx_history_record_float_compare);
+	zbx_vector_history_record_sort(v, zbx_history_record_float_compare_wrapper);
 
 	if (0 == v->values_num % 2)
 		return (v->values[v->values_num / 2 - 1].value.dbl + v->values[v->values_num / 2].value.dbl) / 2.0;

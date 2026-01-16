@@ -678,6 +678,11 @@ static void	host_free(zbx_host_t *host)
 	zbx_free(host);
 }
 
+static void	host_free_wrapper(void *ptr)
+{
+	host_free((zbx_host_t *)ptr);
+}
+
 static int	DBpatch_5030046(void)
 {
 	zbx_db_result_t		result;
@@ -859,7 +864,7 @@ static int	DBpatch_5030046(void)
 		zbx_vector_ptr_pair_destroy(&valuemap->mappings);
 	}
 
-	zbx_vector_ptr_clear_ext(&hosts, (zbx_clean_func_t)host_free);
+	zbx_vector_ptr_clear_ext(&hosts, host_free_wrapper);
 	zbx_vector_ptr_destroy(&hosts);
 	zbx_hashset_destroy(&valuemaps);
 
@@ -2022,11 +2027,21 @@ static void	DBpatch_widget_field_free(zbx_db_widget_field_t *field)
 	zbx_free(field);
 }
 
+static void	DBpatch_widget_field_free_wrap(void *ptr)
+{
+	DBpatch_widget_field_free((zbx_db_widget_field_t *)ptr);
+}
+
 static void	DBpatch_screen_item_free(zbx_db_screen_item_t *si)
 {
 	zbx_free(si->url);
 	zbx_free(si->application);
 	zbx_free(si);
+}
+
+static void	DBpatch_screen_item_free_wrap(void *ptr)
+{
+	DBpatch_screen_item_free((zbx_db_screen_item_t *)ptr);
 }
 
 static size_t	DBpatch_array_max_used_index(char *array, size_t arr_size)
@@ -3199,7 +3214,7 @@ static int	DBpatch_convert_screen_items(zbx_db_result_t result, uint64_t id)
 
 		DBpatch_trace_widget(&w);
 
-		zbx_vector_ptr_clear_ext(&widget_fields, (zbx_clean_func_t)DBpatch_widget_field_free);
+		zbx_vector_ptr_clear_ext(&widget_fields, DBpatch_widget_field_free_wrap);
 		zbx_vector_ptr_destroy(&widget_fields);
 		zbx_free(w.name);
 		zbx_free(w.type);
@@ -3211,7 +3226,7 @@ static int	DBpatch_convert_screen_items(zbx_db_result_t result, uint64_t id)
 		lw_array_free(dim_y);
 	}
 
-	zbx_vector_ptr_clear_ext(&screen_items, (zbx_clean_func_t)DBpatch_screen_item_free);
+	zbx_vector_ptr_clear_ext(&screen_items, DBpatch_screen_item_free_wrap);
 	zbx_vector_ptr_destroy(&screen_items);
 
 	return ret;
@@ -4818,6 +4833,11 @@ static int	dbpatch_convert_trigger(zbx_dbpatch_trigger_t *trigger, zbx_vector_pt
 	return SUCCEED;
 }
 
+static void	dbpatch_function_free_wrap(void *ptr)
+{
+	dbpatch_function_free((zbx_dbpatch_function_t *)ptr);
+}
+
 static int	DBpatch_5030165(void)
 {
 	int			i, ret = SUCCEED;
@@ -4933,7 +4953,7 @@ static int	DBpatch_5030165(void)
 			}
 		}
 
-		zbx_vector_ptr_clear_ext(&functions, (zbx_clean_func_t)dbpatch_function_free);
+		zbx_vector_ptr_clear_ext(&functions, dbpatch_function_free_wrap);
 		dbpatch_trigger_clear(&trigger);
 
 		if (SUCCEED != ret)
@@ -5177,7 +5197,7 @@ static char	*dbpatch_formula_to_expression(zbx_uint64_t itemid, const char *form
 
 			if (FAIL == ret)
 			{
-				zbx_vector_ptr_clear_ext(functions, (zbx_clean_func_t)dbpatch_function_free);
+				zbx_vector_ptr_clear_ext(functions, dbpatch_function_free_wrap);
 				zbx_free(exp);
 				return NULL;
 			}
@@ -5320,7 +5340,7 @@ static int	DBpatch_5030168(void)
 			ret = zbx_db_execute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 		}
 
-		zbx_vector_ptr_clear_ext(&functions, (zbx_clean_func_t)dbpatch_function_free);
+		zbx_vector_ptr_clear_ext(&functions, dbpatch_function_free_wrap);
 		zbx_free(expression);
 		zbx_free(out);
 	}

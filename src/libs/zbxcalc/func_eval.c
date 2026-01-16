@@ -1114,6 +1114,38 @@ int	zbx_execute_count_with_pattern(char *pattern, unsigned char value_type, zbx_
 	return ret;
 }
 
+static int	history_record_uint64_compare_wrap(const void *a, const void *b)
+{
+	const zbx_history_record_t	*ra = (const zbx_history_record_t *)a;
+	const zbx_history_record_t	*rb = (const zbx_history_record_t *)b;
+
+	return history_record_uint64_compare(ra, rb);
+}
+
+static int	history_record_float_compare_wrap(const void *a, const void *b)
+{
+	const zbx_history_record_t	*ra = (const zbx_history_record_t *)a;
+	const zbx_history_record_t	*rb = (const zbx_history_record_t *)b;
+
+	return zbx_history_record_float_compare(ra, rb);
+}
+
+static int	history_record_log_compare_wrap(const void *a, const void *b)
+{
+	const zbx_history_record_t	*ra = (const zbx_history_record_t *)a;
+	const zbx_history_record_t	*rb = (const zbx_history_record_t *)b;
+
+	return history_record_log_compare(ra, rb);
+}
+
+static int	history_record_str_compare_wrap(const void *a, const void *b)
+{
+	const zbx_history_record_t	*ra = (const zbx_history_record_t *)a;
+	const zbx_history_record_t	*rb = (const zbx_history_record_t *)b;
+
+	return history_record_str_compare(ra, rb);
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: evaluate functions 'count' and 'find' for the item.               *
@@ -1215,28 +1247,20 @@ static int	evaluate_COUNT(zbx_variant_t *value, const zbx_dc_evaluate_item_t *it
 		switch (item->value_type)
 		{
 			case ITEM_VALUE_TYPE_UINT64:
-				zbx_vector_history_record_sort(&values,
-						(zbx_compare_func_t)history_record_uint64_compare);
-				zbx_vector_history_record_uniq(&values,
-						(zbx_compare_func_t)history_record_uint64_compare);
+				zbx_vector_history_record_sort(&values, history_record_uint64_compare_wrap);
+				zbx_vector_history_record_uniq(&values, history_record_uint64_compare_wrap);
 				break;
 			case ITEM_VALUE_TYPE_FLOAT:
-				zbx_vector_history_record_sort(&values,
-						(zbx_compare_func_t)zbx_history_record_float_compare);
-				zbx_vector_history_record_uniq(&values,
-						(zbx_compare_func_t)zbx_history_record_float_compare);
+				zbx_vector_history_record_sort(&values, history_record_float_compare_wrap);
+				zbx_vector_history_record_uniq(&values, history_record_float_compare_wrap);
 				break;
 			case ITEM_VALUE_TYPE_LOG:
-				zbx_vector_history_record_sort(&values,
-						(zbx_compare_func_t)history_record_log_compare);
-				zbx_vector_history_record_log_uniq(&values,
-						(zbx_compare_func_t)history_record_log_compare);
+				zbx_vector_history_record_sort(&values, history_record_log_compare_wrap);
+				zbx_vector_history_record_log_uniq(&values, history_record_log_compare_wrap);
 				break;
 			default:
-				zbx_vector_history_record_sort(&values,
-						(zbx_compare_func_t)history_record_str_compare);
-				zbx_vector_history_record_str_uniq(&values,
-						(zbx_compare_func_t)history_record_str_compare);
+				zbx_vector_history_record_sort(&values, history_record_str_compare_wrap);
+				zbx_vector_history_record_str_uniq(&values, history_record_str_compare_wrap);
 		}
 	}
 
@@ -1780,9 +1804,9 @@ static int	evaluate_PERCENTILE(zbx_variant_t  *value, const zbx_dc_evaluate_item
 		int	index;
 
 		if (ITEM_VALUE_TYPE_FLOAT == item->value_type)
-			zbx_vector_history_record_sort(&values, (zbx_compare_func_t)zbx_history_record_float_compare);
+			zbx_vector_history_record_sort(&values, history_record_float_compare_wrap);
 		else
-			zbx_vector_history_record_sort(&values, (zbx_compare_func_t)history_record_uint64_compare);
+			zbx_vector_history_record_sort(&values, history_record_uint64_compare_wrap);
 
 		if (0 == percentage)
 			index = 1;
