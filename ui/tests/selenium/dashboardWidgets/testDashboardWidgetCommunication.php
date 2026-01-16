@@ -2666,7 +2666,7 @@ class testDashboardWidgetCommunication extends testWidgetCommunication {
 					]
 				]
 			],
-			'Broadcasting items from item history widget - selecting another value' => [
+			'Broadcasting items from item navigator widget - selecting another value' => [
 				[
 					'page' => 'Items page',
 					'broadcaster' => 'Item navigator broadcaster',
