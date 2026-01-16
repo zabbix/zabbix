@@ -1,6 +1,3 @@
-//go:build (windows && 386) || darwin
-// +build windows,386 darwin
-
 /*
 ** Copyright (C) 2001-2026 Zabbix SIA
 **
@@ -15,13 +12,16 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-package udp
+package zabbixasync
 
-import (
-	"errors"
-)
-
-// exportNetUDPSocketCount - returns number of UDP sockets that match parameters.
-func (p *Plugin) exportNetUDPSocketCount(params []string) (result int, err error) {
-	return 0, errors.New("Not supported.")
+func getMetrics() []string {
+	return []string{
+		"net.tcp.listen", "Checks if this TCP port is in LISTEN state.",
+		"sensor", "Hardware sensor reading.",
+		"system.cpu.load", "CPU load.",
+		"system.cpu.switches", "Count of context switches.",
+		"system.cpu.intr", "Device interrupts.",
+		"system.hw.cpu", "CPU information.",
+		"system.hw.macaddr", "Listing of MAC addresses.",
+	}
 }
