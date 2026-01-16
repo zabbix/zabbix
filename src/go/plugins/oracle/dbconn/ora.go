@@ -43,6 +43,8 @@ const (
 	tnsValue
 )
 
+const forbiddenCharsInNames = "()\"'=#"
+
 var (
 	_ OraClient = (*OraConn)(nil)
 
@@ -220,25 +222,27 @@ func getTNSType(host string, onlyHostname, resolveTNS bool) TNSNameType {
 }
 
 func prepareConnectString(tnsType TNSNameType, cd *ConnDetails, connectTimeout time.Duration) (string, error) {
-	var (
-		// this should be the place where url.QueryEscape is implemented.
-		service = url.QueryEscape(cd.Uri.GetParam("service"))
-		host    = cd.Uri.Host()
-
-		connectString string
-	)
-
-	if strings.ContainsAny(host, "()\"'") { //characters that can cause escape.
-		return "", errs.WrapConst(
-			fmt.Errorf("invalid characters in hostname: %s", host),
-			zbxerr.ErrorInvalidParams,
-		)
-	}
+	var connectString string
 
 	switch tnsType {
 	case tnsKey, tnsValue:
 		connectString = cd.Uri.Host()
 	case tnsNone:
+		var (
+			service = url.QueryEscape(cd.Uri.GetParam("service"))
+			host    = cd.Uri.Host()
+		)
+
+		err := checkForbiddenCharacters(service)
+		if err != nil {
+			return "", err
+		}
+
+		err = checkForbiddenCharacters(host)
+		if err != nil {
+			return "", err
+		}
+
 		connectString = fmt.Sprintf(
 			`(DESCRIPTION=(ADDRESS=(PROTOCOL=tcp)(HOST=%s)(PORT=%s))`+
 				`(CONNECT_DATA=(SERVICE_NAME="%s"))(CONNECT_TIMEOUT=%d)(RETRY_COUNT=0))`,
@@ -252,4 +256,15 @@ func prepareConnectString(tnsType TNSNameType, cd *ConnDetails, connectTimeout t
 	}
 
 	return connectString, nil
+}
+
+func checkForbiddenCharacters(s string) error {
+	if strings.ContainsAny(s, "()\"'=#") { //characters that can cause escape.
+		return errs.WrapConst(
+			fmt.Errorf("invalid characters in: %s", s),
+			zbxerr.ErrorInvalidParams,
+		)
+	}
+
+	return nil
 }
