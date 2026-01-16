@@ -156,10 +156,8 @@ if ($data['history_providers']) {
 		foreach ($types as $type => $ttl) {
 			$house_keeper_tab
 				->addRow(
-					new CLabel(_('Data storage period').' ('.$type.')'),
-					(new CTextBox(null, getTimeUnitFilters($ttl)[4], true, CSettingsSchema::getFieldLength('hk_history')))
-						->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
-						->setEnabled(false)
+					new CLabel(_('Data storage period').': '.$type),
+					$ttl
 				);
 		}
 	}

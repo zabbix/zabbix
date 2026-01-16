@@ -140,13 +140,17 @@ class CControllerHousekeepingEdit extends CController {
 		$data['hk_history_providers_enabled'] = (bool) $dbversion_history_status;
 
 		foreach ($dbversion_history_status as $provider) {
-			if (!array_key_exists('value_types', $provider) || !is_array($provider['value_types'])
-					|| !array_key_exists('ttl', reset($provider['value_types']))) {
+			if (!array_key_exists('value_types', $provider) || !is_array($provider['value_types'])) {
 				continue;
 			}
 
 			foreach ($provider['value_types'] as $type_data) {
-				$data['history_providers'][$provider['database']][$type_data['type']] = $type_data['ttl'];
+				$type = itemValueTypeString(CHistoryManager::getTypeIdByTypeName($type_data['type']));
+				$ttl_variations = array_key_exists('ttl', $type_data)
+					? getTimeUnitFilters($type_data['ttl'])
+					: [_('Not available')];
+
+				$data['history_providers'][$provider['database']][$type] = array_pop($ttl_variations);
 			}
 		}
 
