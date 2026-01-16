@@ -180,8 +180,21 @@ class CControllerItemEdit extends CControllerItem {
 				'hk_trends_global' => CHousekeepingHelper::get(CHousekeepingHelper::HK_TRENDS_GLOBAL),
 				'hk_trends' => CHousekeepingHelper::get(CHousekeepingHelper::HK_TRENDS)
 			],
-			'user' => ['debug_mode' => $this->getDebugMode()]
+			'user' => ['debug_mode' => $this->getDebugMode()],
+			'provider_value_types' => []
 		];
+
+		$dbversion_history_status = CSettingsHelper::getDbVersionHistoryStatus();
+
+		foreach ($dbversion_history_status as $provider) {
+			if (!array_key_exists('value_types', $provider) || !is_array($provider['value_types'])) {
+				continue;
+			}
+
+			foreach ($provider['value_types'] as $type_data) {
+				$data['provider_value_types'][] = CHistoryManager::getTypeIdByTypeName($type_data['type']);
+			}
+		}
 
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Item'));
