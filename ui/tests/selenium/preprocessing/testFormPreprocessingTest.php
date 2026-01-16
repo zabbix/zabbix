@@ -17,6 +17,7 @@
 require_once __DIR__.'/../../include/CWebTest.php';
 require_once __DIR__.'/../../../include/items.inc.php';
 require_once __DIR__.'/../behaviors/CPreprocessingBehavior.php';
+require_once __DIR__.'/../behaviors/CMessageBehavior.php';
 
 /**
  * @backup items
@@ -34,7 +35,10 @@ class testFormPreprocessingTest extends CWebTest {
 	 * @return array
 	 */
 	public function getBehaviors() {
-		return [CPreprocessingBehavior::class];
+		return [
+			CPreprocessingBehavior::class,
+			CMessageBehavior::class
+		];
 	}
 
 	const HOST_ID = 40001;		//'Simple form test host'
@@ -295,8 +299,9 @@ class testFormPreprocessingTest extends CWebTest {
 						['type' => 'Simple change'],
 						['type' => 'Change per second']
 					],
-					'error' => 'Invalid parameter "/2": only one object can exist within '.
-							'the combinations of (type)=((9, 10)).'
+					'inline_errors' => [
+						'id:preprocessing_1_type' => 'Name: One "Change" step allowed per item.'
+					]
 				]
 			],
 			[
@@ -306,7 +311,9 @@ class testFormPreprocessingTest extends CWebTest {
 						['type' => 'Discard unchanged'],
 						['type' => 'Discard unchanged with heartbeat', 'parameter_1' => '1']
 					],
-					'error' => 'Invalid parameter "/2": only one object can exist within the combinations of (type)=((19, 20)).'
+					'inline_errors' => [
+						'id:preprocessing_1_type' => 'Name: One "Throttling" step allowed per item.'
+					]
 				]
 			],
 			[
@@ -317,7 +324,9 @@ class testFormPreprocessingTest extends CWebTest {
 								'parameter_3' => 'label_name'],
 						['type' => 'Prometheus to JSON', 'parameter_1' => '']
 					],
-					'error' => 'Invalid parameter "/2": only one object can exist within the combinations of (type)=((22, 23)).'
+					'inline_errors' => [
+						'id:preprocessing_1_type' => 'Name: One "Prometheus" step allowed per item.'
+					]
 				]
 			]
 		];
@@ -340,7 +349,14 @@ class testFormPreprocessingTest extends CWebTest {
 				break;
 			}
 		}
-		$this->checkTestOverlay($data, 'button:Test all steps', $prev_enabled);
+
+		if (array_key_exists('inline_errors', $data)) {
+			$this->page->removeFocus();
+			$this->assertInlineError($this->query('id:item-form')->one()->asForm(), $data['inline_errors']);
+		}
+		else {
+			$this->checkTestOverlay($data, 'button:Test all steps', $prev_enabled);
+		}
 
 		COverlayDialogElement::find()->one()->close();
 	}
@@ -447,77 +463,67 @@ class testFormPreprocessingTest extends CWebTest {
 		$this->query($selector)->waitUntilPresent()->one()->click();
 		$dialog = COverlayDialogElement::find(1)->waitUntilPresent()->one()->waitUntilReady();
 
-		switch ($data['expected']) {
-			case TEST_BAD:
-				$message = $dialog->query('tag:output')->asMessage()->waitUntilPresent()->one();
-				$this->assertTrue($message->isBad());
-				$dialog->close();
-				break;
+		$form = $this->query('id:preprocessing-test-form')->asForm()->waitUntilPresent()->one();
+		$this->assertEquals('Test item', $dialog->getTitle());
 
-			case TEST_GOOD:
-				$form = $this->query('id:preprocessing-test-form')->asForm()->waitUntilPresent()->one();
-				$this->assertEquals('Test item', $dialog->getTitle());
+		$time = $dialog->query('id:time')->one();
+		$this->assertTrue($time->getAttribute('readonly') !== null);
 
-				$time = $dialog->query('id:time')->one();
-				$this->assertTrue($time->getAttribute('readonly') !== null);
+		$prev_value = $dialog->query('id:prev_value')->asMultiline()->one();
+		$prev_time = $dialog->query('id:prev_time')->one();
 
-				$prev_value = $dialog->query('id:prev_value')->asMultiline()->one();
-				$prev_time = $dialog->query('id:prev_time')->one();
+		$this->assertTrue($prev_value->isEnabled($prev_enabled));
+		$this->assertTrue($prev_time->isEnabled($prev_enabled));
 
-				$this->assertTrue($prev_value->isEnabled($prev_enabled));
-				$this->assertTrue($prev_time->isEnabled($prev_enabled));
+		$radio = $form->query('id:eol')->one()->waitUntilPresent();
+		$this->assertTrue($radio->isEnabled());
 
-				$radio = $form->query('id:eol')->one()->waitUntilPresent();
-				$this->assertTrue($radio->isEnabled());
+		$macros = [
+			'expected' => ($id === null)
+					? CTestArrayHelper::get($data, 'macros')
+					: CTestArrayHelper::get($data, 'macros.'.$id),
+			'actual' => []
+		];
 
-				$macros = [
-					'expected' => ($id === null)
-							? CTestArrayHelper::get($data, 'macros')
-							: CTestArrayHelper::get($data, 'macros.'.$id),
-					'actual' => []
+		if ($macros['expected']) {
+			foreach ($form->query('class:textarea-flexible-container')->asTable()->one()->getRows() as $row) {
+				$columns = $row->getColumns()->asArray();
+				/*
+				 * Macro columns are represented in following way:
+				 * (0)macro (1)=> (2)value
+				 */
+				$macros['actual'][] = [
+					'macro' => $columns[0]->getText(),
+					'value' => $columns[2]->getText()
 				];
+			}
 
-				if ($macros['expected']) {
-					foreach ($form->query('class:textarea-flexible-container')->asTable()->one()->getRows() as $row) {
-						$columns = $row->getColumns()->asArray();
-						/*
-						 * Macro columns are represented in following way:
-						 * (0)macro (1)=> (2)value
-						 */
-						$macros['actual'][] = [
-							'macro' => $columns[0]->getText(),
-							'value' => $columns[2]->getText()
-						];
-					}
+			foreach ($macros as &$array) {
+				usort($array, function ($a, $b) {
+					return strcmp($a['macro'], $b['macro']);
+				});
+			}
+			unset ($array);
 
-					foreach ($macros as &$array) {
-						usort($array, function ($a, $b) {
-							return strcmp($a['macro'], $b['macro']);
-						});
-					}
-					unset ($array);
-
-					$this->assertEquals($macros['expected'], $macros['actual']);
-				}
-
-				$table = $form->query('id:preprocessing-steps')->asTable()->waitUntilPresent()->one();
-
-				if ($id === null) {
-					foreach ($data['preprocessing'] as $i => $step) {
-						$this->assertEquals(($i+1).': '.$step['type'], $table->getRow($i)->getText());
-
-						$element = $table->query('id:preproc-test-step-'.$i.'-name')->one();
-						$this->assertEquals(1, $element->getCSSValue('opacity'));
-						$this->assertTrue($element->isEnabled());
-					}
-				}
-				else {
-					$this->assertEquals('1: '.$data['preprocessing'][$id]['type'], $table->getRow(0)->getText());
-				}
-
-				$this->chooseDialogActions($data);
-				break;
+			$this->assertEquals($macros['expected'], $macros['actual']);
 		}
+
+		$table = $form->query('id:preprocessing-steps')->asTable()->waitUntilPresent()->one();
+
+		if ($id === null) {
+			foreach ($data['preprocessing'] as $i => $step) {
+				$this->assertEquals(($i+1).': '.$step['type'], $table->getRow($i)->getText());
+
+				$element = $table->query('id:preproc-test-step-'.$i.'-name')->one();
+				$this->assertEquals(1, $element->getCSSValue('opacity'));
+				$this->assertTrue($element->isEnabled());
+			}
+		}
+		else {
+			$this->assertEquals('1: '.$data['preprocessing'][$id]['type'], $table->getRow(0)->getText());
+		}
+
+		$this->chooseDialogActions($data);
 	}
 
 	private function chooseDialogActions($data) {
