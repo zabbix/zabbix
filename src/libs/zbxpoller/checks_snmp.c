@@ -2578,10 +2578,10 @@ static void	snmp_bulkwalk_set_options(zbx_snmp_format_opts_t *opts)
 
 static int	zbx_snmp_oid_compare_wrap(const void *a, const void *b)
 {
-	const zbx_snmp_oid_t *const	*oa = (const zbx_snmp_oid_t *const *)a;
-	const zbx_snmp_oid_t *const	*ob = (const zbx_snmp_oid_t *const *)b;
+	const zbx_snmp_oid_t * const	*ca = (const zbx_snmp_oid_t *const *)a;
+	const zbx_snmp_oid_t * const	*cb = (const zbx_snmp_oid_t *const *)b;
 
-	return zbx_snmp_oid_compare(oa, ob);
+	return zbx_snmp_oid_compare(ca, cb);
 }
 
 static void	snmp_bulkwalk_remove_matching_oids(zbx_vector_snmp_oid_t *oids)

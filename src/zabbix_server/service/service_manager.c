@@ -1424,10 +1424,10 @@ static int	its_updates_compare(const zbx_status_update_t * const *update1,
 
 static int	its_updates_compare_wrap(const void *a, const void *b)
 {
-	const zbx_status_update_t * const	*update_a = (const zbx_status_update_t * const *)a;
-	const zbx_status_update_t * const	*update_b = (const zbx_status_update_t * const *)b;
+	const zbx_status_update_t * const	*ca = (const zbx_status_update_t * const *)a;
+	const zbx_status_update_t * const	*cb = (const zbx_status_update_t * const *)b;
 
-	return its_updates_compare(update_a, update_b);
+	return its_updates_compare(ca, cb);
 }
 
 /******************************************************************************

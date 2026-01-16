@@ -1116,34 +1116,34 @@ int	zbx_execute_count_with_pattern(char *pattern, unsigned char value_type, zbx_
 
 static int	history_record_uint64_compare_wrap(const void *a, const void *b)
 {
-	const zbx_history_record_t	*ra = (const zbx_history_record_t *)a;
-	const zbx_history_record_t	*rb = (const zbx_history_record_t *)b;
+	const zbx_history_record_t	*ca = (const zbx_history_record_t *)a;
+	const zbx_history_record_t	*cb = (const zbx_history_record_t *)b;
 
-	return history_record_uint64_compare(ra, rb);
+	return history_record_uint64_compare(ca, cb);
 }
 
 static int	history_record_float_compare_wrap(const void *a, const void *b)
 {
-	const zbx_history_record_t	*ra = (const zbx_history_record_t *)a;
-	const zbx_history_record_t	*rb = (const zbx_history_record_t *)b;
+	const zbx_history_record_t	*ca = (const zbx_history_record_t *)a;
+	const zbx_history_record_t	*cb = (const zbx_history_record_t *)b;
 
-	return zbx_history_record_float_compare(ra, rb);
+	return zbx_history_record_float_compare(ca, cb);
 }
 
 static int	history_record_log_compare_wrap(const void *a, const void *b)
 {
-	const zbx_history_record_t	*ra = (const zbx_history_record_t *)a;
-	const zbx_history_record_t	*rb = (const zbx_history_record_t *)b;
+	const zbx_history_record_t	*ca = (const zbx_history_record_t *)a;
+	const zbx_history_record_t	*cb = (const zbx_history_record_t *)b;
 
-	return history_record_log_compare(ra, rb);
+	return history_record_log_compare(ca, cb);
 }
 
 static int	history_record_str_compare_wrap(const void *a, const void *b)
 {
-	const zbx_history_record_t	*ra = (const zbx_history_record_t *)a;
-	const zbx_history_record_t	*rb = (const zbx_history_record_t *)b;
+	const zbx_history_record_t	*ca = (const zbx_history_record_t *)a;
+	const zbx_history_record_t	*cb = (const zbx_history_record_t *)b;
 
-	return history_record_str_compare(ra, rb);
+	return history_record_str_compare(ca, cb);
 }
 
 /******************************************************************************

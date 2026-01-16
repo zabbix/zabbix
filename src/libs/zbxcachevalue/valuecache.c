@@ -437,18 +437,18 @@ static int	vc_db_read_values_by_time_and_count(zbx_uint64_t itemid, int value_ty
 
 static int	history_record_compare_desc_wrap(const void *a, const void *b)
 {
-	const	zbx_history_record_t	*rec_a = (const zbx_history_record_t *)a;
-	const	zbx_history_record_t	*rec_b = (const zbx_history_record_t *)b;
+	const	zbx_history_record_t	*ca = (const zbx_history_record_t *)a;
+	const	zbx_history_record_t	*cb = (const zbx_history_record_t *)b;
 
-	return zbx_history_record_compare_desc_func(rec_a, rec_b);
+	return zbx_history_record_compare_desc_func(ca, cb);
 }
 
 static int	history_record_compare_asc_wrap(const void *a, const void *b)
 {
-	const	zbx_history_record_t	*rec_a = (const zbx_history_record_t *)a;
-	const	zbx_history_record_t	*rec_b = (const zbx_history_record_t *)b;
+	const	zbx_history_record_t	*ca = (const zbx_history_record_t *)a;
+	const	zbx_history_record_t	*cb = (const zbx_history_record_t *)b;
 
-	return zbx_history_record_compare_asc_func(rec_a, rec_b);
+	return zbx_history_record_compare_asc_func(ca, cb);
 }
 
 /******************************************************************************
@@ -585,10 +585,10 @@ static int	vc_item_weight_compare_func(const zbx_vc_item_weight_t *d1, const zbx
 
 static int	vc_item_weight_compare_wrap(const void *a, const void *b)
 {
-	const zbx_vc_item_weight_t	*item_a = (const zbx_vc_item_weight_t *)a;
-	const zbx_vc_item_weight_t	*item_b = (const zbx_vc_item_weight_t *)b;
+	const zbx_vc_item_weight_t	*ca = (const zbx_vc_item_weight_t *)a;
+	const zbx_vc_item_weight_t	*cb = (const zbx_vc_item_weight_t *)b;
 
-	return vc_item_weight_compare_func(item_a, item_b);
+	return vc_item_weight_compare_func(ca, cb);
 }
 
 /******************************************************************************

@@ -376,10 +376,10 @@ static int	queue_compare_by_nextcheck_asc(zbx_queue_item_t * const *d1, zbx_queu
 
 static int	queue_compare_by_nextcheck_asc_wrap(const void *a, const void *b)
 {
-	zbx_queue_item_t *const	*qa = (zbx_queue_item_t *const *)a;
-	zbx_queue_item_t *const	*qb = (zbx_queue_item_t *const *)b;
+	zbx_queue_item_t * const	*ca = (zbx_queue_item_t *const *)a;
+	zbx_queue_item_t * const	*cb = (zbx_queue_item_t *const *)b;
 
-	return queue_compare_by_nextcheck_asc(qa, qb);
+	return queue_compare_by_nextcheck_asc(ca, cb);
 }
 
 /******************************************************************************

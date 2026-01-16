@@ -801,10 +801,10 @@ fail:
 
 static int	zbx_eventdata_compare_wrap(const void *a, const void *b)
 {
-	const zbx_eventdata_t	*ea = (const zbx_eventdata_t *)a;
-	const zbx_eventdata_t	*eb = (const zbx_eventdata_t *)b;
+	const zbx_eventdata_t	*ca = (const zbx_eventdata_t *)a;
+	const zbx_eventdata_t	*cb = (const zbx_eventdata_t *)b;
 
-	return zbx_eventdata_compare(ea, eb);
+	return zbx_eventdata_compare(ca, cb);
 }
 
 static int	expr_db_get_event_symptoms(const zbx_db_event *event, char **replace_to)

@@ -621,12 +621,12 @@ static void	elastic_destroy(zbx_history_iface_t *hist)
 	zbx_free(data);
 }
 
-static int zbx_history_record_compare_desc_wrapper(const void *a, const void *b)
+static int	zbx_history_record_compare_desc_wrapper(const void *a, const void *b)
 {
-	const zbx_history_record_t	*ra = (const zbx_history_record_t *)a;
-	const zbx_history_record_t	*rb = (const zbx_history_record_t *)b;
+	const zbx_history_record_t	*ca = (const zbx_history_record_t *)a;
+	const zbx_history_record_t	*cb = (const zbx_history_record_t *)b;
 
-	return zbx_history_record_compare_desc_func(ra, rb);
+	return zbx_history_record_compare_desc_func(ca, cb);
 }
 
 /************************************************************************************
