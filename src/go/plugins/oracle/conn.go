@@ -217,12 +217,22 @@ func (c *ConnManager) create(cd connDetails) (*OraConn, error) {
 		},
 	)
 
-	service := url.QueryEscape(cd.uri.GetParam("service"))
+	var (
+		service = url.QueryEscape(cd.uri.GetParam("service"))
+		host    = cd.uri.Host()
+	)
+
+	if strings.ContainsAny(host, "()\"'") { //characters that can cause escape.
+		return nil, errs.WrapConst(
+			fmt.Errorf("invalid characters in hostname: %s", host),
+			zbxerr.ErrorInvalidParams,
+		)
+	}
 
 	connectString := fmt.Sprintf(
 		`(DESCRIPTION=(ADDRESS=(PROTOCOL=tcp)(HOST=%s)(PORT=%s))`+
 			`(CONNECT_DATA=(SERVICE_NAME="%s"))(CONNECT_TIMEOUT=%d)(RETRY_COUNT=0))`,
-		cd.uri.Host(),
+		host,
 		cd.uri.Port(),
 		service,
 		c.connectTimeout/time.Second,
