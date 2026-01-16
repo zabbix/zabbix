@@ -7894,7 +7894,8 @@ zbx_uint64_t	zbx_dc_sync_configuration(unsigned char mode, zbx_synced_new_config
 	static int	sync_status = ZBX_DBSYNC_STATUS_UNKNOWN;
 
 	int		i, flags, changelog_num, dberr = ZBX_DB_FAIL, itemtrigs_num = 0, timers_num = 0;
-	double		sec, queues_sec, changelog_sec, update_sec = 0, timers_sec = 0, topology_sec = 0;
+	double		sec, queues_sec, changelog_sec, update_sec = 0, timers_sec = 0, topology_sec = 0,
+			um_cache_dup_sec = 0;
 
 	zbx_dbsync_t	config_sync, hosts_sync, hi_sync, htmpl_sync, gmacro_sync, hmacro_sync, if_sync, items_sync,
 			item_discovery_sync, triggers_sync, tdep_sync,
@@ -7906,7 +7907,7 @@ zbx_uint64_t	zbx_dc_sync_configuration(unsigned char mode, zbx_synced_new_config
 			httpstep_field_sync, autoreg_host_sync, connector_sync, connector_tag_sync, proxy_sync,
 			proxy_group_sync, hp_sync, autoreg_config_sync;
 	zbx_uint64_t	update_flags = 0;
-	zbx_int64_t	used_size, update_size = 0, topology_size = 0, timers_size = 0;
+	zbx_int64_t	used_size, update_size = 0, topology_size = 0, timers_size = 0, um_cache_dup_size = 0;
 	unsigned char	changelog_sync_mode = mode;	/* sync mode for objects using incremental sync */
 
 	zbx_hashset_t			trend_queue;
@@ -8059,7 +8060,7 @@ zbx_uint64_t	zbx_dc_sync_configuration(unsigned char mode, zbx_synced_new_config
 	START_SYNC;
 
 	config->um_cache = um_cache_sync(config->um_cache, new_revision, &gmacro_sync, &hmacro_sync, &htmpl_sync,
-			config_vault, get_program_type_cb());
+			config_vault, &um_cache_dup_sec, &um_cache_dup_size,  get_program_type_cb());
 
 	DCsync_host_tags(&host_tag_sync);
 
@@ -8356,6 +8357,8 @@ zbx_uint64_t	zbx_dc_sync_configuration(unsigned char mode, zbx_synced_new_config
 				timers_num, timers_sec, timers_size);
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() topology   : " ZBX_FS_DBL " sec " ZBX_FS_I64 " bytes.", __func__,
 				topology_sec, topology_size);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() user macro cache dup   : " ZBX_FS_DBL " sec " ZBX_FS_I64 " bytes.",
+			__func__, um_cache_dup_sec, um_cache_dup_size);
 
 		zbx_dcsync_stats_dump(__func__);
 
