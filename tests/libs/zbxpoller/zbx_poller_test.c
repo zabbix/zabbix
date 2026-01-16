@@ -34,7 +34,6 @@ void	zbx_mock_test_entry(void **state)
 	char 		*error = NULL;
 
 	ZBX_UNUSED(state);
-
 #if defined(HAVE_SSH2)
 	if (SUCCEED == zbx_mock_parameter_exists("in.skip_for_libssh2_and_below"))
 	{
