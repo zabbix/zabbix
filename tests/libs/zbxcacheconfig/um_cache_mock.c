@@ -146,6 +146,11 @@ static void	um_mock_kvset_init(zbx_um_mock_kvset_t *kvset, zbx_mock_handle_t han
 	}
 }
 
+static void	zbx_um_mock_kv_free_wrap(zbx_um_mock_kv_t *kv)
+{
+	zbx_ptr_free(kv);
+}
+
 /*********************************************************************************
  *                                                                               *
  * Purpose: free mock mock kv path                                               *
@@ -153,7 +158,7 @@ static void	um_mock_kvset_init(zbx_um_mock_kvset_t *kvset, zbx_mock_handle_t han
  *********************************************************************************/
 static void	um_mock_kvset_free(zbx_um_mock_kvset_t *kvset)
 {
-	zbx_vector_um_mock_kv_clear_ext(&kvset->kvs, (zbx_um_mock_kv_free_func_t)zbx_ptr_free);
+	zbx_vector_um_mock_kv_clear_ext(&kvset->kvs, zbx_um_mock_kv_free_wrap);
 	zbx_vector_um_mock_kv_destroy(&kvset->kvs);
 	zbx_free(kvset);
 }
@@ -670,6 +675,11 @@ static void	um_mock_kv_path_free(zbx_dc_kvs_path_t *kvspath)
 	zbx_free(kvspath);
 }
 
+static void	um_mock_kv_path_free_wrap(void *p)
+{
+	um_mock_kv_path_free((zbx_dc_kvs_path_t *)p);
+}
+
 /*********************************************************************************
  *                                                                               *
  * Purpose: destroy configuration cache                                          *
@@ -690,7 +700,7 @@ void	um_mock_config_destroy(void)
 	while (NULL != (pmacro = (zbx_um_macro_t **)zbx_hashset_iter_next(&iter)))
 		um_macro_release(*pmacro);
 
-	zbx_vector_ptr_clear_ext(&config->kvs_paths, (zbx_ptr_free_func_t)um_mock_kv_path_free);
+	zbx_vector_ptr_clear_ext(&config->kvs_paths, um_mock_kv_path_free_wrap);
 	zbx_vector_ptr_destroy(&config->kvs_paths);
 
 	zbx_hashset_destroy(&config->gmacro_kv);

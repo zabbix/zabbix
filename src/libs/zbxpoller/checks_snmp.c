@@ -720,7 +720,7 @@ static void	__snmpidx_mapping_clean(void *data)
 	zbx_free(mapping->index);
 }
 
-static int	zbx_snmp_oid_compare(const zbx_snmp_oid_t **s1, const zbx_snmp_oid_t **s2)
+static int	zbx_snmp_oid_compare(const zbx_snmp_oid_t * const *s1, const zbx_snmp_oid_t * const *s2)
 {
 	return strcmp((*s1)->str_oid, (*s2)->str_oid);
 }

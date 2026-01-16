@@ -297,6 +297,11 @@ static int	vc_history_record_compare_desc_func(const zbx_history_record_t *d1, c
 	return d2->timestamp.sec - d1->timestamp.sec;
 }
 
+static int	vc_history_record_compare_desc_wrap(const void *a, const void *b)
+{
+	return vc_history_record_compare_desc_func((const zbx_history_record_t*)a, (const zbx_history_record_t*)b);
+}
+
 void	zbx_mock_test_entry(void **state)
 {
 	char				*error = NULL;
@@ -328,7 +333,7 @@ void	zbx_mock_test_entry(void **state)
 	err = zbx_history_get_values(itemid, value_type, start, count, end, &values_received);
 	zbx_mock_assert_result_eq("zbx_history_get_values()", SUCCEED, err);
 
-	zbx_vector_history_record_sort(&values_received, (zbx_compare_func_t)vc_history_record_compare_desc_func);
+	zbx_vector_history_record_sort(&values_received, vc_history_record_compare_desc_wrap);
 
 	zbx_vcmock_read_values(zbx_mock_get_parameter_handle("out.values"), value_type, &values_expected);
 	zbx_vcmock_check_records("Returned values", value_type,  &values_expected, &values_received);

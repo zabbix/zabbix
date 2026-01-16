@@ -142,6 +142,10 @@ static int 	callback_cb(const char *name, size_t len, int args_num, zbx_variant_
 	return FAIL;
 }
 
+static void	mock_callback_free_wrap(void *p)
+{
+	mock_callback_free((zbx_mock_callback_t *)p);
+}
 
 void	zbx_mock_test_entry(void **state)
 {
@@ -187,7 +191,7 @@ void	zbx_mock_test_entry(void **state)
 
 out:
 	zbx_free(error);
-	zbx_vector_ptr_clear_ext(&callbacks, (zbx_clean_func_t)mock_callback_free);
+	zbx_vector_ptr_clear_ext(&callbacks, mock_callback_free_wrap);
 	zbx_vector_ptr_destroy(&callbacks);
 	zbx_eval_clear(&ctx);
 }

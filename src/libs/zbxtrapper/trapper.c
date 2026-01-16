@@ -367,7 +367,7 @@ static void	queue_stats_export(zbx_hashset_t *queue_stats, const char *id_name, 
 }
 
 /* queue item comparison function used to sort queue by nextcheck */
-static int	queue_compare_by_nextcheck_asc(zbx_queue_item_t **d1, zbx_queue_item_t **d2)
+static int	queue_compare_by_nextcheck_asc(zbx_queue_item_t * const *d1, zbx_queue_item_t * const *d2)
 {
 	zbx_queue_item_t	*i1 = *d1, *i2 = *d2;
 

@@ -1414,7 +1414,8 @@ static zbx_service_update_t	*update_service(zbx_hashset_t *service_updates, zbx_
  * Purpose: sorts service updates by source id                                *
  *                                                                            *
  ******************************************************************************/
-static int	its_updates_compare(const zbx_status_update_t **update1, const zbx_status_update_t **update2)
+static int	its_updates_compare(const zbx_status_update_t * const *update1,
+		const zbx_status_update_t * const *update2)
 {
 	ZBX_RETURN_IF_NOT_EQUAL((*update1)->sourceid, (*update2)->sourceid);
 

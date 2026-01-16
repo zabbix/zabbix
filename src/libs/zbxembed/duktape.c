@@ -74660,7 +74660,6 @@ DUK_LOCAL void duk__parse_switch_stmt(duk_compiler_ctx *comp_ctx, duk_ivalue *re
 	temp_at_loop = DUK__GETTEMP(comp_ctx);
 
 	for (;;) {
-		duk_int_t num_stmts;
 		duk_small_uint_t tok;
 
 		/* sufficient for keeping temp reg numbers in check */
@@ -74735,7 +74734,6 @@ DUK_LOCAL void duk__parse_switch_stmt(duk_compiler_ctx *comp_ctx, duk_ivalue *re
 		 *  test-bug-case-fallthrough.js.
 		 */
 
-		num_stmts = 0;
 		if (pc_default == -2) {
 			pc_default = duk__get_current_pc(comp_ctx);
 		}
@@ -74753,7 +74751,6 @@ DUK_LOCAL void duk__parse_switch_stmt(duk_compiler_ctx *comp_ctx, duk_ivalue *re
 			if (tok == DUK_TOK_CASE || tok == DUK_TOK_DEFAULT || tok == DUK_TOK_RCURLY) {
 				break;
 			}
-			num_stmts++;
 			duk__parse_stmt(comp_ctx, res, 0 /*allow_source_elem*/);
 		}
 

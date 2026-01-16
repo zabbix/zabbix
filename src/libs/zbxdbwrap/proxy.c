@@ -1844,9 +1844,14 @@ static void	zbx_drule_ip_free(zbx_drule_ip_t *ip)
 	zbx_free(ip);
 }
 
+static void	zbx_drule_ip_free_wrap(void *p)
+{
+	zbx_drule_ip_free((zbx_drule_ip_t *)p);
+}
+
 static void	zbx_drule_free(zbx_drule_t *drule)
 {
-	zbx_vector_ptr_clear_ext(&drule->ips, (zbx_clean_func_t)zbx_drule_ip_free);
+	zbx_vector_ptr_clear_ext(&drule->ips, zbx_drule_ip_free_wrap);
 	zbx_vector_ptr_destroy(&drule->ips);
 	zbx_vector_uint64_destroy(&drule->dcheckids);
 	zbx_free(drule);
@@ -2043,6 +2048,11 @@ fail:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
+}
+
+static void	zbx_drule_free_wrap(void *p)
+{
+	zbx_drule_free((zbx_drule_t *)p);
 }
 
 /*********************************************************************************
@@ -2262,7 +2272,7 @@ json_parse_error:
 json_parse_return:
 	zbx_free(value);
 
-	zbx_vector_ptr_clear_ext(&drules, (zbx_clean_func_t)zbx_drule_free);
+	zbx_vector_ptr_clear_ext(&drules, zbx_drule_free_wrap);
 	zbx_vector_ptr_destroy(&drules);
 	zbx_vector_discoverer_drule_error_clear_ext(&drule_errors, zbx_discoverer_drule_error_free);
 	zbx_vector_discoverer_drule_error_destroy(&drule_errors);
