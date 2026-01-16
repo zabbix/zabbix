@@ -16,8 +16,10 @@
 
 class CUrlValidator extends CValidator {
 
+	protected bool $allow_user_macro = true;
+
 	public function validate($value) {
-		if (!CHtmlUrlValidator::validate((string) $value)) {
+		if (!CHtmlUrlValidator::validate((string) $value, ['allow_user_macro' => $this->allow_user_macro])) {
 			$this->setError(_('unacceptable URL'));
 
 			return false;
