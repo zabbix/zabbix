@@ -400,7 +400,8 @@ static int	history_manager_init(zbx_history_manager_t *manager, const char *conf
 			if (SUCCEED != history_provider_parse_options(*provider, &name, &options, error))
 				goto out;
 
-			if (SUCCEED != history_options_validate_value_type(options.values, options.values_num, &errmsg))
+			if (SUCCEED != history_options_validate_common_settings(options.values, options.values_num,
+					&errmsg))
 			{
 				*error = zbx_dsprintf(NULL, "invalid history provider \"%s\" configuration: %s",
 						name, errmsg);

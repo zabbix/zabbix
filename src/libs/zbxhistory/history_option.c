@@ -378,14 +378,14 @@ zbx_uint64_t	history_options_type_mask(const zbx_history_option_t *options, int 
  *               FAIL    - invalid value type found                           *
  *                                                                            *
  ******************************************************************************/
-int	history_options_validate_value_type(const zbx_history_option_t *options, int options_num, char **error)
+static int	history_options_validate_value_type(const zbx_history_option_t *options, int options_num, char **error)
 {
-	const char	*types;
+	const char	*value_types;
 
-	if (NULL == (types = history_option_value(options, options_num, HISTORY_PROVIDER_OPTION_VALUE_TYPES)))
-		return SUCCEED;
+	if (NULL == (value_types = history_option_value(options, options_num, HISTORY_PROVIDER_OPTION_VALUE_TYPES)))
+		return FAIL;
 
-	const char	*start = types, *end;
+	const char	*start = value_types, *end;
 
 	for (;;)
 	{
@@ -418,7 +418,54 @@ int	history_options_validate_value_type(const zbx_history_option_t *options, int
 	return SUCCEED;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: validate precache setting specified in history provider options   *
+ *                                                                            *
+ * Parameters: options     - [IN] array of history options                    *
+ *             options_num - [IN] number of options in the array              *
+ *             error       - [OUT] error message                              *
+ *                                                                            *
+ * Return value: SUCCEED - precache is not specified or correct               *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+static int	history_options_validate_precache(const zbx_history_option_t *options, int options_num, char **error)
+{
+	const char	*precache, *valid_values = "0,1,on,off";
 
+	if (NULL == (precache = history_option_value(options, options_num, HISTORY_PROVIDER_OPTION_PRECACHE)))
+		return SUCCEED;
+
+	if (SUCCEED == zbx_str_in_list(valid_values, precache, ','))
+		return SUCCEED;
+
+	*error = zbx_dsprintf(NULL, "invalid precache option value \"%s\"", precache);
+	return FAIL;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: validate value types specified in history provider options        *
+ *                                                                            *
+ * Parameters: options     - [IN] array of history options                    *
+ *             options_num - [IN] number of options in the array              *
+ *             error       - [OUT] error message                              *
+ *                                                                            *
+ * Return value: SUCCEED - all value types are valid                          *
+ *               FAIL    - invalid value type found                           *
+ *                                                                            *
+ ******************************************************************************/
+int	history_options_validate_common_settings(const zbx_history_option_t *options, int options_num, char **error)
+{
+	if (SUCCEED != history_options_validate_value_type(options, options_num, error))
+		return FAIL;
+
+	if (SUCCEED != history_options_validate_precache(options, options_num, error))\
+		return FAIL;
+
+	return SUCCEED;
+}
 /******************************************************************************
  *                                                                            *
  * Purpose: determine if precaching is required based on provider options     *
