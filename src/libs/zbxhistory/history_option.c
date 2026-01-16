@@ -386,6 +386,7 @@ static int	history_options_validate_value_type(const zbx_history_option_t *optio
 		return FAIL;
 
 	const char	*start = value_types, *end;
+	zbx_uint64_t	mask = 0;
 
 	for (;;)
 	{
@@ -408,6 +409,14 @@ static int	history_options_validate_value_type(const zbx_history_option_t *optio
 			*error = zbx_dsprintf(NULL, "unknown value type \"%.*s\"",  (int)len, start);
 			return FAIL;
 		}
+
+		if (0 != (mask & (__UINT64_C(1) << i)))
+		{
+			*error = zbx_dsprintf(NULL, "value type \"%.*s\" has already been set",  (int)len, start);
+			return FAIL;
+		}
+
+		mask |= (__UINT64_C(1) << i);
 
 		if (NULL == end)
 			break;
