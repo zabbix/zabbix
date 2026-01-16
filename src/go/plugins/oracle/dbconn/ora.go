@@ -221,9 +221,19 @@ func getTNSType(host string, onlyHostname, resolveTNS bool) TNSNameType {
 
 func prepareConnectString(tnsType TNSNameType, cd *ConnDetails, connectTimeout time.Duration) (string, error) {
 	var (
-		service       = url.QueryEscape(cd.Uri.GetParam("service"))
+		// this should be the place where url.QueryEscape is implemented.
+		service = url.QueryEscape(cd.Uri.GetParam("service"))
+		host    = cd.Uri.Host()
+
 		connectString string
 	)
+
+	if strings.ContainsAny(host, "()\"'") { //characters that can cause escape.
+		return "", errs.WrapConst(
+			fmt.Errorf("invalid characters in hostname: %s", host),
+			zbxerr.ErrorInvalidParams,
+		)
+	}
 
 	switch tnsType {
 	case tnsKey, tnsValue:
@@ -232,7 +242,7 @@ func prepareConnectString(tnsType TNSNameType, cd *ConnDetails, connectTimeout t
 		connectString = fmt.Sprintf(
 			`(DESCRIPTION=(ADDRESS=(PROTOCOL=tcp)(HOST=%s)(PORT=%s))`+
 				`(CONNECT_DATA=(SERVICE_NAME="%s"))(CONNECT_TIMEOUT=%d)(RETRY_COUNT=0))`,
-			cd.Uri.Host(),
+			host,
 			cd.Uri.Port(),
 			service,
 			connectTimeout/time.Second,
