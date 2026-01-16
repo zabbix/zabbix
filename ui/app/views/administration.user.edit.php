@@ -628,7 +628,8 @@ if ($data['userid'] != 0) {
 }
 else {
 	$tabs->setFooter(makeFormFooter(
-		new CSubmit('add', _('Add'))
+		new CSubmit('add', _('Add')),
+		[$cancel_button]
 	));
 }
 
