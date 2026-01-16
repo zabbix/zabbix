@@ -44,46 +44,34 @@ class CHistoryManager {
 	private function initSources(): void {
 		global $HISTORY, $HISTORY_PROVIDERS;
 
-		$valid_value_names = array_values(self::$value_type_mapping);
-
-		if (is_array($HISTORY_PROVIDERS)) {
+		if ($HISTORY_PROVIDERS) {
 			foreach ($HISTORY_PROVIDERS as $provider) {
-				if (is_array($provider) && array_key_exists('types', $provider)
-						&& is_array($provider['types']) && array_key_exists('provider', $provider)) {
-					$sanitized_value_names = array_intersect($provider['types'], $valid_value_names);
+				$provider_data = [
+					'provider' => $provider['provider'],
+					'url' => array_key_exists('url', $provider) ? rtrim($provider['url'], '/').'/' : null,
+					'db' => array_key_exists('db', $provider) ? $provider['db'] : null,
+					'username' => array_key_exists('username', $provider) ? $provider['username'] : null,
+					'password' => array_key_exists('password', $provider) ? $provider['password'] : null
+				];
 
-					if (!$sanitized_value_names || !array_key_exists($provider['provider'], self::$providers)) {
-						continue;
-					}
-
-					$provider_data = [
-						'provider' => $provider['provider'],
-						'url' => array_key_exists('url', $provider) ? rtrim($provider['url'], '/').'/' : null,
-						'db' => array_key_exists('db', $provider) ? $provider['db'] : null,
-						'username' => array_key_exists('username', $provider) ? $provider['username'] : null,
-						'password' => array_key_exists('password', $provider) ? $provider['password'] : null
-					];
-
-					foreach ($sanitized_value_names as $name) {
-						self::$value_type_sources[$name] = $provider_data;
-					}
+				foreach ($provider['types'] as $type) {
+					self::$value_type_sources[$type] = $provider_data;
 				}
 			}
 		}
-		elseif (is_array($HISTORY) && array_key_exists('types', $HISTORY) && is_array($HISTORY['types'])) {
-			$sanitized_value_names = array_intersect($HISTORY['types'], $valid_value_names);
+		elseif ($HISTORY) {
 			$url = array_key_exists('url', $HISTORY) ? $HISTORY['url'] : null;
 
-			foreach ($sanitized_value_names as $name) {
+			foreach ($HISTORY['types'] as $type) {
 				$target_url = $url;
 
 				if (is_array($target_url)) {
-					$target_url = array_key_exists($name, $target_url) ? $target_url[$name] : null;
+					$target_url = array_key_exists($type, $target_url) ? $target_url[$type] : null;
 				}
 
-				self::$value_type_sources[$name] = [
+				self::$value_type_sources[$type] = [
 					'provider' => ZBX_HISTORY_SOURCE_ELASTIC,
-					'url' => $target_url
+					'url' => $target_url !== null ? rtrim($target_url, '/').'/' : null
 				];
 			}
 		}
@@ -2207,5 +2195,84 @@ class CHistoryManager {
 		}
 
 		return $ttl;
+	}
+
+	public static function isHistoryProvidersDataValid($history_providers, &$error): bool {
+		if (!is_array($history_providers) || !$history_providers) {
+			$error = _s('Unsupported format of %1$s.', '$HISTORY_PROVIDERS');
+
+			return false;
+		}
+
+		$providers_value_types = [];
+
+		foreach ($history_providers as $provider) {
+			if (!is_array($provider) || !array_key_exists('types', $provider) || !is_array($provider['types'])
+					|| !$provider['types'] || !array_key_exists('provider', $provider)) {
+				$error = _s('Unsupported format of %1$s.', '$HISTORY_PROVIDERS');
+
+				return false;
+			}
+
+			if (!array_key_exists($provider['provider'], self::$providers)) {
+				$error = _s('Unsupported history storage provider %1$s.', $provider['provider']);
+
+				return false;
+			}
+
+			foreach ($provider['types'] as $type) {
+				if (!in_array($type, self::$value_type_mapping)) {
+					$error = _s('Unsupported value type %1$s for history provider %2$s.', $type, $provider['provider']);
+
+					return false;
+				}
+
+				if (array_key_exists($provider['provider'], $providers_value_types)
+						&& array_key_exists($type, $providers_value_types[$provider['provider']])) {
+					$error = _s('Duplicate value type %1$s configured for history provider %2$s.',
+						$type, $provider['provider']
+					);
+
+					return false;
+				}
+
+				$providers_value_types[$provider['provider']][$type] = true;
+			}
+		}
+
+		return true;
+	}
+
+	public static function isHistoryDataValid($history, &$error): bool {
+		if (!is_array($history) || !array_key_exists('types', $history) || !is_array($history['types'])
+				|| !$history['types']) {
+			$error = _s('Unsupported format of %1$s.', '$HISTORY');
+
+			return false;
+		}
+
+		$value_types = [];
+
+		foreach ($history['types'] as $type) {
+			if (!in_array($type, self::$value_type_mapping)) {
+				$error = _s('Unsupported value type %1$s for history provider %2$s.',
+					$type, ZBX_HISTORY_SOURCE_ELASTIC
+				);
+
+				return false;
+			}
+
+			if (array_key_exists($type, $value_types)) {
+				$error = _s('Duplicate value type %1$s configured for history provider %2$s.',
+					$type, ZBX_HISTORY_SOURCE_ELASTIC
+				);
+
+				return false;
+			}
+
+			$value_types[$type] = true;
+		}
+
+		return true;
 	}
 }

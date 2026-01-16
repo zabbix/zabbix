@@ -180,11 +180,23 @@ class CConfigFile {
 			$this->config['IMAGE_FORMAT_DEFAULT'] = $IMAGE_FORMAT_DEFAULT;
 		}
 
+		if (isset($HISTORY) && isset($HISTORY_PROVIDERS)) {
+			self::exception('Can not use both $HISTORY_PROVIDERS and $HISTORY at the same time.');
+		}
+
 		if (isset($HISTORY)) {
+			if (!CHistoryManager::isHistoryDataValid($HISTORY, $error)) {
+				self::exception($error);
+			}
+
 			$this->config['HISTORY'] = $HISTORY;
 		}
 
 		if (isset($HISTORY_PROVIDERS)) {
+			if (!CHistoryManager::isHistoryProvidersDataValid($HISTORY_PROVIDERS, $error)) {
+				self::exception($error);
+			}
+
 			$this->config['HISTORY_PROVIDERS'] = $HISTORY_PROVIDERS;
 		}
 
