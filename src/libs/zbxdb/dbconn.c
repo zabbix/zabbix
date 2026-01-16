@@ -54,7 +54,9 @@ static const zbx_db_config_t	*db_config = NULL;
 static zbx_db_query_mask_t	db_log_masked_values = ZBX_DB_DONT_MASK_QUERIES;
 
 #if defined(HAVE_POSTGRESQL)
-static 	ZBX_THREAD_LOCAL char	ZBX_PG_ESCAPE_BACKSLASH = 1;
+static ZBX_THREAD_LOCAL char	ZBX_PG_ESCAPE_BACKSLASH = 1;
+static ZBX_THREAD_LOCAL char	*dbhost_hosts;
+static ZBX_THREAD_LOCAL char	*dbhost_ports;
 #elif defined(HAVE_SQLITE3)
 static zbx_mutex_t		db_sqlite_access = ZBX_MUTEX_NULL;
 #endif
@@ -360,6 +362,69 @@ void	dbconn_close(zbx_dbconn_t *db)
 #endif
 }
 
+#if defined(HAVE_POSTGRESQL)
+int	zbx_dbconn_parse_and_validate_dbhost(zbx_db_config_t *config)
+{
+	char		*start = NULL, *end = NULL, *tmp;
+	size_t		result_alloc = 0, result_offset = 0;
+	int		multiple_hosts = 0;
+
+	zbx_free(dbhost_hosts);
+	zbx_free(dbhost_ports);
+
+	if (NULL != config->dbhost)
+	{
+		unsigned short	parsed_port, def_port = (0 != config->dbport ? config->dbport : 5432);
+		char		*parsed_ip;
+
+		tmp = zbx_strdup(NULL, config->dbhost);
+
+		for (start = tmp; '\0' != *start;)
+		{
+			if (NULL != (end = strchr(start, ',')))
+				*end = '\0';
+
+			if (SUCCEED != zbx_parse_serveractive_element(start, &parsed_ip, &parsed_port, def_port))
+			{
+				zbx_free(tmp);
+				return FAIL;
+			}
+
+			if (NULL != dbhost_ports)
+				dbhost_ports = zbx_dsprintf(dbhost_ports, "%s,%u", dbhost_ports, parsed_port);
+			else
+				dbhost_ports = zbx_dsprintf(NULL, "%d", parsed_port);
+
+			if (NULL != dbhost_hosts)
+			{
+				multiple_hosts = 1;
+				zbx_strcpy_alloc(&dbhost_hosts, &result_alloc, &result_offset, ",");
+			}
+
+			zbx_strcpy_alloc(&dbhost_hosts, &result_alloc, &result_offset, parsed_ip);
+
+			zbx_free(parsed_ip);
+
+			if (NULL != end)
+				start = end + 1;
+			else
+				break;
+		}
+
+		zbx_free(tmp);
+
+		if (0 == multiple_hosts)
+		{
+			zbx_free(dbhost_hosts);
+			zbx_free(dbhost_ports);
+		}
+	}
+
+	return SUCCEED;
+}
+
+#endif
+
 /******************************************************************************
  *                                                                            *
  * Purpose: open database connection                                          *
@@ -379,14 +444,13 @@ static int	dbconn_open(zbx_dbconn_t *db)
 #elif defined(HAVE_POSTGRESQL)
 #	define ZBX_DB_MAX_PARAMS	10
 
-	int		rc, multiple_hosts = 0;
-	char		*cport = NULL, *start = NULL, *end = NULL, *tmp, *hosts = NULL, *ports = NULL;
+	int		rc;
+	char		*cport = NULL;
 	zbx_db_result_t	result;
 	zbx_db_row_t	row;
 	const char	*keywords[ZBX_DB_MAX_PARAMS + 1];
 	const char	*values[ZBX_DB_MAX_PARAMS + 1];
 	unsigned int	i = 0;
-	size_t		result_alloc = 0, result_offset = 0;
 #elif defined(HAVE_SQLITE3)
 	char		*p, *path = NULL;
 #endif
@@ -616,47 +680,11 @@ static int	dbconn_open(zbx_dbconn_t *db)
 
 	if (NULL != db->config->dbhost)
 	{
-		unsigned short	parsed_port, def_port = (0 != db->config->dbport ? db->config->dbport : 5432);
-		char		*parsed_ip;
-
-		tmp = zbx_strdup(NULL, db->config->dbhost);
-
-		for (start = tmp; '\0' != *start;)
-		{
-			if (NULL != (end = strchr(start, ',')))
-				*end = '\0';
-
-			if (SUCCEED == zbx_parse_serveractive_element(start, &parsed_ip, &parsed_port, def_port))
-			{
-				if (NULL != ports)
-					ports = zbx_dsprintf(ports, "%s,%u", ports, parsed_port);
-				else
-					ports = zbx_dsprintf(NULL, "%d", parsed_port);
-
-				if (NULL != hosts)
-				{
-					multiple_hosts = 1;
-					zbx_strcpy_alloc(&hosts, &result_alloc, &result_offset, ",");
-				}
-
-				zbx_strcpy_alloc(&hosts, &result_alloc, &result_offset, parsed_ip);
-
-				zbx_free(parsed_ip);
-			}
-
-			if (NULL != end)
-				start = end + 1;
-			else
-				break;
-		}
-
-		zbx_free(tmp);
 		keywords[i] = "host";
 
-		if (0 != multiple_hosts)
+		if (NULL != dbhost_hosts)
 		{
-			values[i++] = hosts;
-
+			values[i++] = dbhost_hosts;
 			keywords[i] = "target_session_attrs";
 			values[i++] = "read-write";
 		}
@@ -684,12 +712,12 @@ static int	dbconn_open(zbx_dbconn_t *db)
 		values[i++] = db->config->dbpassword;
 	}
 
-	if (0 != db->config->dbport || (NULL != ports && 0 != multiple_hosts))
+	if (0 != db->config->dbport || (NULL != dbhost_ports))
 	{
 		keywords[i] = "port";
 
-		if (NULL != ports)
-			values[i++] = ports;
+		if (NULL != dbhost_ports)
+			values[i++] = dbhost_ports;
 		else
 			values[i++] = cport = zbx_dsprintf(cport, "%u", db->config->dbport);
 
@@ -701,8 +729,6 @@ static int	dbconn_open(zbx_dbconn_t *db)
 	db->conn = PQconnectdbParams(keywords, values, 0);
 
 	zbx_free(cport);
-	zbx_free(ports);
-	zbx_free(hosts);
 
 	/* check to see that the backend connection was successfully made */
 	if (CONNECTION_OK != PQstatus(db->conn))

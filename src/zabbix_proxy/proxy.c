@@ -831,7 +831,9 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 	}
 
 	err |= (FAIL == zbx_db_config_validate_features(zbx_db_config, zbx_program_type));
-
+#if defined(HAVE_POSTGRESQL)
+	err |= (FAIL == zbx_dbconn_parse_and_validate_dbhost(zbx_db_config));
+#endif
 	if (0 != err)
 		exit(EXIT_FAILURE);
 }
