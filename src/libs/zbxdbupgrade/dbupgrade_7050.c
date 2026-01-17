@@ -409,7 +409,7 @@ static int	DBpatch_7050028(void)
 					{"enrollment_token", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
 					{"enrollment_token_expiration", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL,
 						0},
-					{"enrollment_token_used", "0", NULL, NULL, 0, ZBX_TYPE_INT, 0, 0},
+					{"enrollment_token_used", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
 					{0}
 				},
 				NULL
