@@ -537,25 +537,30 @@ void	zbx_odbc_query_result_free(zbx_odbc_query_result_t *query_result)
  * Purpose: fetch single row of ODBC query result                             *
  *                                                                            *
  * Parameters: query_result - [IN] pointer to query result structure          *
+ *             row          - [OUT] array of strings or NULL                  *
+ *                                  (see Return value and Comments)           *
+ *             error        - [OUT] error message                             *
  *                                                                            *
- * Return value: array of strings or NULL (see Comments)                      *
+ * Return value: SUCCEED - function call was successful, row value is NULL if *
+ *                         and only if there are no more rows                 *
+ *               FAIL    - otherwise, error message is written to error,      *
+ *                         row value is NULL                                  *
  *                                                                            *
- * Comments: NULL result can signify both end of rows (which is normal) and   *
- *           failure. There is currently no way to distinguish these cases.   *
- *           There is no need to free strings returned by this function.      *
- *           Lifetime of strings is limited to next call of zbx_odbc_fetch()  *
- *           or zbx_odbc_query_result_free(), caller needs to make a copy if  *
+ * Comments: There is no need to free strings written to row. Their lifetime  *
+ *           is limited to next call of zbx_odbc_fetch() or                   *
+ *           zbx_odbc_query_result_free(), caller needs to make a copy if     *
  *           result is needed for longer.                                     *
  *                                                                            *
  ******************************************************************************/
-static const char	*const *zbx_odbc_fetch(zbx_odbc_query_result_t *query_result)
+static int zbx_odbc_fetch(zbx_odbc_query_result_t *query_result, const char *const **row, char **error)
 {
-	char		*diag = NULL;
 	SQLRETURN	rc;
 	SQLSMALLINT	i;
-	const char	*const *row = NULL;
+	int 		ret = SUCCEED;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	*row = NULL;
 
 	if (SQL_NO_DATA == (rc = SQLFetch(query_result->hstmt)))
 	{
@@ -563,9 +568,10 @@ static const char	*const *zbx_odbc_fetch(zbx_odbc_query_result_t *query_result)
 		goto out;
 	}
 
-	if (SUCCEED != zbx_odbc_diag(SQL_HANDLE_STMT, query_result->hstmt, rc, &diag))
+	if (SUCCEED != zbx_odbc_diag(SQL_HANDLE_STMT, query_result->hstmt, rc, error))
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "Cannot fetch row: %s", diag);
+		zabbix_log(LOG_LEVEL_DEBUG, "Cannot fetch row: %s", *error);
+		ret = FAIL;
 		goto out;
 	}
 
@@ -582,9 +588,10 @@ static const char	*const *zbx_odbc_fetch(zbx_odbc_query_result_t *query_result)
 		{
 			rc = SQLGetData(query_result->hstmt, i + 1, SQL_C_CHAR, buffer, MAX_STRING_LEN, &len);
 
-			if (SUCCEED != zbx_odbc_diag(SQL_HANDLE_STMT, query_result->hstmt, rc, &diag))
+			if (SUCCEED != zbx_odbc_diag(SQL_HANDLE_STMT, query_result->hstmt, rc, error))
 			{
-				zabbix_log(LOG_LEVEL_DEBUG, "Cannot get column data: %s", diag);
+				zabbix_log(LOG_LEVEL_DEBUG, "Cannot get column data: %s", *error);
+				ret = FAIL;
 				goto out;
 			}
 
@@ -601,13 +608,11 @@ static const char	*const *zbx_odbc_fetch(zbx_odbc_query_result_t *query_result)
 		zabbix_log(LOG_LEVEL_DEBUG, "column #%d value:'%s'", (int)i + 1, ZBX_NULL2STR(query_result->row[i]));
 	}
 
-	row = (const char *const *)query_result->row;
-out:
-	zbx_free(diag);
-
+	*row = (const char *const *)query_result->row;
+	out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 
-	return row;
+	return ret;
 }
 
 /******************************************************************************
@@ -618,9 +623,10 @@ out:
  *             string       - [OUT] the first column of the first row         *
  *             error        - [OUT] error message                             *
  *                                                                            *
- * Return value: SUCCEED - result wasn't empty, the first column of the first *
- *                         result row is not NULL and is returned in string   *
- *                         parameter, error remains untouched in this case    *
+ * Return value: SUCCEED - function call succeeded result wasn't empty, the   *
+ *                         first column of the first result row is not NULL   *
+ *                         and is returned in string parameter, error remains *
+ *                         untouched in this case                             *
  *               FAIL    - otherwise, allocated error message is returned in  *
  *                         error parameter, string remains untouched          *
  *                                                                            *
@@ -631,22 +637,33 @@ int	zbx_odbc_query_result_to_string(zbx_odbc_query_result_t *query_result, char 
 {
 	const char	*const *row;
 	int		ret = FAIL;
+	char 		*fetch_error = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	if (NULL != (row = zbx_odbc_fetch(query_result)))
+	if (SUCCEED != zbx_odbc_fetch(query_result, &row, &fetch_error))
 	{
-		if (NULL != row[0])
-		{
-			*string = zbx_strdup(*string, row[0]);
-			zbx_replace_invalid_utf8(*string);
-			ret = SUCCEED;
-		}
-		else
-			*error = zbx_strdup(*error, "SQL query returned NULL value.");
+		*error = zbx_dsprintf(*error, "SQL fetch failed: %s", fetch_error);
+		goto out;
 	}
-	else
+
+	if (NULL == row)
+	{
 		*error = zbx_strdup(*error, "SQL query returned empty result.");
+		goto out;
+	}
+
+	if (NULL == row[0])
+	{
+		*error = zbx_strdup(*error, "SQL query returned NULL value.");
+		goto out;
+	}
+
+	*string = zbx_strdup(*string, row[0]);
+	zbx_replace_invalid_utf8(*string);
+	ret = SUCCEED;
+out:
+	zbx_free(fetch_error);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
@@ -679,6 +696,8 @@ static int	odbc_query_result_to_json(zbx_odbc_query_result_t *query_result, int 
 	struct zbx_json		json;
 	zbx_vector_str_t	names;
 	int			ret = FAIL, i, j;
+	int 			fetch_ret = SUCCEED;
+	char			*fetch_error = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -738,8 +757,13 @@ static int	odbc_query_result_to_json(zbx_odbc_query_result_t *query_result, int 
 
 	zbx_json_initarray(&json, ZBX_JSON_STAT_BUF_LEN);
 
-	while (NULL != (row = zbx_odbc_fetch(query_result)))
+	while (1)
 	{
+		fetch_ret = zbx_odbc_fetch(query_result, &row, &fetch_error);
+
+		if (SUCCEED != fetch_ret || NULL == row)
+			break;
+
 		zbx_json_addobject(&json, NULL);
 
 		for (i = 0; i < query_result->col_num; i++)
@@ -761,11 +785,15 @@ static int	odbc_query_result_to_json(zbx_odbc_query_result_t *query_result, int 
 
 	zbx_json_close(&json);
 
-	*out_json = zbx_strdup(*out_json, json.buffer);
+	if (SUCCEED == fetch_ret)
+	{
+		*out_json = zbx_strdup(*out_json, json.buffer);
+		ret = SUCCEED;
+	}
+	else
+		*error = zbx_dsprintf(*error, "SQL fetch failed: %s", fetch_error);
 
 	zbx_json_free(&json);
-
-	ret = SUCCEED;
 out:
 	zbx_vector_str_clear_ext(&names, zbx_str_free);
 	zbx_vector_str_destroy(&names);
