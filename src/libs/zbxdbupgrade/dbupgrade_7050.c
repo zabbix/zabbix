@@ -446,7 +446,7 @@ static int	DBpatch_7050032(void)
 
 static int	DBpatch_7050033(void)
 {
-	const zbx_db_field_t	field = {"auth_scheme", "0", NULL, NULL, 0, ZBX_TYPE_INT, NULL, 0};
+	const zbx_db_field_t	field = {"auth_scheme", "0", NULL, NULL, 0, ZBX_TYPE_INT, 0, 0};
 
 	return DBadd_field("token", &field);
 }
