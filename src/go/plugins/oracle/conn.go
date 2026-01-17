@@ -36,6 +36,9 @@ import (
 	"golang.zabbix.com/sdk/zbxerr"
 )
 
+// characters that can cause escape.
+const forbiddenCharsInNames = "()\"'=#"
+
 var errInvalidPrivilege = errs.New("invalid connection privilege")
 
 type OraClient interface {
@@ -355,9 +358,9 @@ func getConnParams(privilege string) (godror.ConnParams, error) {
 }
 
 func checkForbiddenCharacters(s string) error {
-	if strings.ContainsAny(s, "()\"'=#") { //characters that can cause escape.
+	if strings.ContainsAny(s, forbiddenCharsInNames) {
 		return errs.WrapConst(
-			fmt.Errorf("invalid characters in: %s", s),
+			errs.New("invalid characters in: "+s),
 			zbxerr.ErrorInvalidParams,
 		)
 	}
