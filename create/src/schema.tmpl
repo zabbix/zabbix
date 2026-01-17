@@ -2283,12 +2283,6 @@ FIELD		|lld_macro	|t_varchar(255)	|''	|NOT NULL	|0
 FIELD		|value		|t_text		|''	|NOT NULL	|0
 INDEX		|1		|itemid
 
-TABLE|dbversion|dbversionid|
-FIELD		|dbversionid	|t_id		|	|NOT NULL	|0
-FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
-FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|1		|7050027	|7050027
-
 TABLE|devices|id|0
 FIELD		|id			|t_id		|	|NOT NULL	|0
 FIELD		|user_ref		|t_id		|	|NOT NULL	|0|1|users|userid
@@ -2302,3 +2296,9 @@ FIELD		|last_access_time	|t_time		|'0'	|NOT NULL	|0
 FIELD		|enrollment_token	|t_varchar(255)	|''	|NOT NULL	|0
 FIELD		|enrollment_token_expiration|t_time	|'0'	|NOT NULL	|0
 FIELD		|enrollment_token_used	|t_integer	|'0'	|NOT NULL	|0
+
+TABLE|dbversion|dbversionid|
+FIELD		|dbversionid	|t_id		|	|NOT NULL	|0
+FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
+FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
+ROW		|1		|7050031	|7050031
