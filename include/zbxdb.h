@@ -360,7 +360,7 @@ void	zbx_db_config_validate(zbx_db_config_t *config);
 int	zbx_dbconn_check_extension(zbx_dbconn_t *db, struct zbx_db_version_info_t *info, int allow_unsupported);
 
 #if defined(HAVE_POSTGRESQL)
-int	zbx_dbconn_parse_and_validate_dbhost(zbx_db_config_t *config);
+int	zbx_dbconn_parse_and_validate_dbhost(zbx_db_config_t *config, char **error);
 void	zbx_dbconn_tsdb_extract_compressed_chunk_flags(zbx_dbconn_t *db, struct zbx_db_version_info_t *version_info);
 void	zbx_dbconn_tsdb_info_extract(zbx_dbconn_t *db, struct zbx_db_version_info_t *version_info);
 int	zbx_dbconn_tsdb_get_version(zbx_dbconn_t *db);

@@ -852,6 +852,16 @@ static void	check_cfg_empty_str(const char *parameter, const char *value)
  ******************************************************************************/
 void	zbx_db_config_validate(zbx_db_config_t *config)
 {
+#ifdef HAVE_POSTGRESQL
+	char *error = NULL;
+
+	if (SUCCEED != zbx_dbconn_parse_and_validate_dbhost(config, &error))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, error);
+		zbx_free(error);
+		exit(EXIT_FAILURE);
+	}
+#endif
 	check_cfg_empty_str("DBTLSConnect", config->db_tls_connect);
 	check_cfg_empty_str("DBTLSCertFile", config->db_tls_cert_file);
 	check_cfg_empty_str("DBTLSKeyFile", config->db_tls_key_file);
