@@ -857,7 +857,7 @@ void	zbx_db_config_validate(zbx_db_config_t *config)
 
 	if (SUCCEED != zbx_dbconn_parse_and_validate_dbhost(config, &error))
 	{
-		zabbix_log(LOG_LEVEL_CRIT, error);
+		zabbix_log(LOG_LEVEL_CRIT, "%s", error);
 		zbx_free(error);
 		exit(EXIT_FAILURE);
 	}
