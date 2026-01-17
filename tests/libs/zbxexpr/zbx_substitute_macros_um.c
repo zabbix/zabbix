@@ -91,7 +91,8 @@ static void	load_um_cache(zbx_um_mock_cache_t *mock_cache, zbx_mock_handle_t hco
 				*config_ssl_key_location = NULL;
 
 	char			*vault = mock_get_vault(zbx_mock_get_object_member_handle(hconfig, "vault"));
-
+	double			um_cache_dup_sec = 0;
+	zbx_int64_t		um_cache_dup_size = 0;
 	um_mock_config_init();
 	config = get_dc_config();
 
@@ -105,7 +106,8 @@ static void	load_um_cache(zbx_um_mock_cache_t *mock_cache, zbx_mock_handle_t hco
 
 	um_mock_cache_diff(&mock_cache0, mock_cache, &gmacros, &hmacros, &htmpls);
 	config->um_cache = um_cache_create();
-	config->um_cache = um_cache_sync(config->um_cache, 0, &gmacros, &hmacros, &htmpls, &config_vault);
+	config->um_cache = um_cache_sync(config->um_cache, 0, &gmacros, &hmacros, &htmpls, &config_vault,
+			&um_cache_dup_sec, &um_cache_dup_size);
 
 	mock_dbsync_clear(&gmacros);
 	mock_dbsync_clear(&hmacros);
