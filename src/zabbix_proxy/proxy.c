@@ -200,6 +200,8 @@ ZBX_GET_CONFIG_VAR2(char *, const char *, zbx_config_fping6_location, NULL)
 static int	config_proxymode		= ZBX_PROXYMODE_ACTIVE;
 static sigset_t	orig_mask;
 
+static int	proxy_has_started = 0;
+
 int	config_forks[ZBX_PROCESS_TYPE_COUNT] = {
 	5, /* ZBX_PROCESS_TYPE_POLLER */
 	1, /* ZBX_PROCESS_TYPE_UNREACHABLE */
@@ -1793,6 +1795,8 @@ static void	start_processes(zbx_socket_t *listen_sock, const zbx_config_comms_ar
 				break;
 		}
 	}
+
+	proxy_has_started = 1;
 }
 
 int	MAIN_ZABBIX_ENTRY(int flags)

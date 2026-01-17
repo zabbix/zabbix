@@ -398,6 +398,8 @@ static zbx_config_log_t	log_file_cfg			= {NULL, NULL, ZBX_LOG_TYPE_UNDEFINED, 1}
 
 struct zbx_db_version_info_t	db_version_info;
 
+static int	server_has_started = 0;
+
 static	const zbx_events_funcs_t	events_cbs = {
 	.add_event_cb			= zbx_add_event,
 	.process_events_cb		= zbx_process_events,
@@ -1251,7 +1253,10 @@ static void	zbx_on_exit(int ret, void *on_exit_args)
 		zbx_ipc_service_free_env();
 
 		zbx_db_connect(ZBX_DB_CONNECT_EXIT);
-		zbx_free_database_cache(ZBX_SYNC_ALL, &events_cbs, config_history_storage_pipelines);
+
+		int	sync_mode = (0 == server_has_started ? ZBX_SYNC_NONE : ZBX_SYNC_ALL);
+
+		zbx_free_database_cache(sync_mode, &events_cbs, config_history_storage_pipelines);
 		zbx_db_close();
 
 		zbx_free_configuration_cache();
@@ -2049,7 +2054,6 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 	int			ret = FAIL;
 	zbx_proc_startup_t	*runlevels = NULL;
 
-
 	if (SUCCEED != zbx_init_database_cache(get_zbx_program_type, zbx_sync_history_cache_server,
 			config_history_cache_size, config_history_index_cache_size, &config_trends_cache_size, &error))
 	{
@@ -2191,6 +2195,8 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 		zabbix_log(LOG_LEVEL_CRIT, "cannot obtain HA status: %s", error);
 		zbx_free(error);
 	}
+	else
+		server_has_started = 1;
 out:
 	if (NULL != runlevels)
 		zbx_proc_startup_free(runlevels);
@@ -2226,6 +2232,8 @@ static void	server_teardown(zbx_rtc_t *rtc, zbx_socket_t *listen_sock)
 	zbx_ha_config_t	*ha_config = zbx_malloc(NULL, sizeof(zbx_ha_config_t));
 
 	/* hard kill all zabbix processes, no logging or other  */
+
+	server_has_started = 0;
 
 	zbx_unset_child_signal_handler();
 
