@@ -24,6 +24,7 @@
 #include "zbx_rtc_constants.h"
 #include "zbxipcservice.h"
 #include "zbxdbhigh.h"
+#include "zbxstr.h"
 #include "zbxdb.h"
 
 /******************************************************************************
@@ -75,6 +76,55 @@ static int	delete_history(const char *table, const char *lastid_field, const cha
 	ZBX_STR2UINT64(maxid, row[0]);
 	zbx_db_free_result(result);
 
+#if defined(HAVE_POSTGRESQL)
+	const char* enable_timescale  = getenv("ENABLE_TIMESCALEDB");
+
+	if (0 == strcmp(table,"proxy_history") && 0 == zbx_strcmp_null(enable_timescale, "true"))
+	{
+		zbx_uint64_t	keep_from;
+
+		if (0 != config_local_buffer)
+			condition = zbx_dsprintf(NULL, " or %s>=%d", clock_field, now - config_local_buffer * SEC_PER_HOUR);
+
+		result = zbx_db_select(
+				"select floor(coalesce(min(id)," ZBX_FS_UI64 ")/1000000)*1000000 from %s"
+				" where (id>" ZBX_FS_UI64 " and %s>=%d) %s",
+				maxid + 1, table, lastid,
+				clock_field, now - config_offline_buffer * SEC_PER_HOUR,
+				ZBX_NULL2EMPTY_STR(condition));
+		zbx_free(condition);
+
+		if (NULL == (row = zbx_db_fetch(result)) || SUCCEED == zbx_db_is_null(row[0]))
+			goto rollback;
+
+		ZBX_STR2UINT64(keep_from, row[0]);
+		zbx_db_free_result(result);
+
+		zabbix_log(LOG_LEVEL_TRACE, "%s: table=%s keep_from=" ZBX_FS_UI64, __func__, table, keep_from);
+
+		result = zbx_db_select("select count(id) from %s where id < " ZBX_FS_UI64, table, keep_from);
+
+		if (NULL == (row = zbx_db_fetch(result)) || SUCCEED == zbx_db_is_null(row[0]))
+			goto rollback;
+
+		ZBX_STR2UINT64(records, row[0]);
+		zbx_db_free_result(result);
+
+		result = zbx_db_select("select drop_chunks(relation=>'%s',older_than=>" ZBX_FS_UI64 ")", table, keep_from);
+
+		if (NULL == result)
+		{
+			zabbix_log(LOG_LEVEL_ERR, "cannot drop chunks for %s", table);
+			goto rollback;
+		}
+
+		zbx_db_commit();
+
+		zbx_db_free_result(result);
+		goto skip;
+	}
+#endif
+
 	if (0 != config_local_buffer)
 		condition = zbx_dsprintf(NULL, " and %s<%d", clock_field, now - config_local_buffer * SEC_PER_HOUR);
 
@@ -89,7 +139,7 @@ static int	delete_history(const char *table, const char *lastid_field, const cha
 	zbx_free(condition);
 
 	zbx_db_commit();
-
+skip:
 	return records;
 rollback:
 	zbx_db_free_result(result);
