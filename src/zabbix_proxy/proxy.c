@@ -1186,7 +1186,10 @@ static void	zbx_on_exit(int ret, void *on_exit_args)
 	zbx_ipc_service_free_env();
 
 	zbx_db_connect(ZBX_DB_CONNECT_EXIT);
-	zbx_free_database_cache(ZBX_SYNC_ALL, &events_cbs, config_history_storage_pipelines);
+
+	int	sync_mode = (0 == proxy_has_started ? ZBX_SYNC_NONE : ZBX_SYNC_ALL);
+
+	zbx_free_database_cache(sync_mode, &events_cbs, config_history_storage_pipelines);
 	zbx_pb_flush();
 	zbx_pb_destroy();
 	zbx_free_configuration_cache();

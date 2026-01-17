@@ -1407,6 +1407,7 @@ void	*zbx_pp_manager_thread(void *args)
 
 	zbx_supervisor_update_activity("%s [terminated]", process_title);
 	zbx_free(process_title);
+	zbx_free(args);
 
 #undef STAT_INTERVAL
 #undef PP_MANAGER_DELAY_SEC

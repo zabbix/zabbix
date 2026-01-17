@@ -196,6 +196,7 @@ stop:
 	zbx_supervisor_update_activity("%s [terminated]", process_title);
 
 	zbx_free(process_title);
+	zbx_free(args);
 
 	return NULL;
 }
