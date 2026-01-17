@@ -805,6 +805,7 @@ ZBX_THREAD_ENTRY(zbx_supervisor_thread, args)
 					sypervisor_get_activities(client);
 					break;
 				case ZBX_RTC_SHUTDOWN:
+					zbx_set_exiting_with_succeed();
 					goto out;
 				default:
 					continue;
