@@ -391,6 +391,32 @@ static int	DBpatch_7050027(void)
 
 	return SUCCEED;
 }
+
+static int	DBpatch_7050028(void)
+{
+	const zbx_db_table_t	table =
+			{"devices", "id", 0,
+				{
+					{"id", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"user_ref", NULL, "users", "userid", 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"token_ref", NULL, "token", "tokenid", 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"name", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{"status", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"app_identity_key", "", NULL, NULL, 0, ZBX_TYPE_BLOB, ZBX_NOTNULL, 0},
+					{"app_encryption_key", "", NULL, NULL, 0, ZBX_TYPE_BLOB, ZBX_NOTNULL, 0},
+					{"push_token", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{"last_access_time", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"enrollment_token", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{"enrollment_token_expiration", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL,
+						0},
+					{"enrollment_token_used", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{0}
+				},
+				NULL
+			};
+
+	return DBcreate_table(&table);
+}
 #endif
 
 DBPATCH_START(7050)
@@ -425,5 +451,6 @@ DBPATCH_ADD(7050024, 0, 1)
 DBPATCH_ADD(7050025, 0, 1)
 DBPATCH_ADD(7050026, 0, 1)
 DBPATCH_ADD(7050027, 0, 1)
+DBPATCH_ADD(7050028, 0, 1)
 
 DBPATCH_END()
