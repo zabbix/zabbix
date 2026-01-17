@@ -266,8 +266,9 @@ func Test_prepareConnectString(t *testing.T) {
 				1, //any
 			},
 			want{
-				"(DESCRIPTION=(ADDRESS=(PROTOCOL=tcp)(HOST=localhost)(PORT=))(CONNECT_DATA=(SERVICE_NAME=\"XE%25ZZ\"))(CONNECT_TIMEOUT=0)(RETRY_COUNT=0))",
-				false,
+				"(DESCRIPTION=(ADDRESS=(PROTOCOL=tcp)(HOST=localhost)(PORT=))" +
+					"(CONNECT_DATA=(SERVICE_NAME=\"XE%25ZZ\"))" +
+					"(CONNECT_TIMEOUT=0)(RETRY_COUNT=0))", false,
 				false,
 			},
 		},

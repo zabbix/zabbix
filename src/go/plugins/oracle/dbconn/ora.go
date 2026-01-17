@@ -43,6 +43,7 @@ const (
 	tnsValue
 )
 
+// characters that can cause escape.
 const forbiddenCharsInNames = "()\"'=#"
 
 var (
@@ -259,9 +260,9 @@ func prepareConnectString(tnsType TNSNameType, cd *ConnDetails, connectTimeout t
 }
 
 func checkForbiddenCharacters(s string) error {
-	if strings.ContainsAny(s, "()\"'=#") { //characters that can cause escape.
+	if strings.ContainsAny(s, forbiddenCharsInNames) {
 		return errs.WrapConst(
-			fmt.Errorf("invalid characters in: %s", s),
+			errs.New("invalid characters in: "+s),
 			zbxerr.ErrorInvalidParams,
 		)
 	}
