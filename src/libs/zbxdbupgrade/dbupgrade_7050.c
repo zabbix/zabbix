@@ -409,13 +409,36 @@ static int	DBpatch_7050028(void)
 					{"enrollment_token", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
 					{"enrollment_token_expiration", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL,
 						0},
-					{"enrollment_token_used", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"enrollment_token_used", "0", NULL, NULL, 0, ZBX_TYPE_INT, 0, 0},
 					{0}
 				},
 				NULL
 			};
 
 	return DBcreate_table(&table);
+}
+
+static int	DBpatch_7050029(void)
+{
+	const zbx_db_field_t	field = {"user_ref", NULL, "users", "userid", 0, 0, 0,
+			ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("devices", 1, &field);
+}
+
+static int	DBpatch_7050030(void)
+{
+	const zbx_db_field_t	field = {"token_ref", NULL, "token", "tokenid", 0, 0, 0,
+			ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("devices", 2, &field);
+}
+
+static int	DBpatch_7050031(void)
+{
+	const zbx_db_field_t	field = {"auth_scheme", "0", NULL, NULL, 0, ZBX_TYPE_INT, NULL, 0};
+
+	return DBadd_field("token", &field);
 }
 #endif
 
@@ -452,5 +475,8 @@ DBPATCH_ADD(7050025, 0, 1)
 DBPATCH_ADD(7050026, 0, 1)
 DBPATCH_ADD(7050027, 0, 1)
 DBPATCH_ADD(7050028, 0, 1)
+DBPATCH_ADD(7050029, 0, 1)
+DBPATCH_ADD(7050030, 0, 1)
+DBPATCH_ADD(7050031, 0, 1)
 
 DBPATCH_END()
