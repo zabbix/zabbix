@@ -420,13 +420,23 @@ static int	DBpatch_7050028(void)
 
 static int	DBpatch_7050029(void)
 {
+	return DBcreate_index("devices", "devices_1", "user_ref", 0);
+}
+
+static int	DBpatch_7050030(void)
+{
+	return DBcreate_index("devices", "devices_2", "token_ref", 0);
+}
+
+static int	DBpatch_7050031(void)
+{
 	const zbx_db_field_t	field = {"user_ref", NULL, "users", "userid", 0, 0, 0,
 			ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("devices", 1, &field);
 }
 
-static int	DBpatch_7050030(void)
+static int	DBpatch_7050032(void)
 {
 	const zbx_db_field_t	field = {"token_ref", NULL, "token", "tokenid", 0, 0, 0,
 			ZBX_FK_CASCADE_DELETE};
@@ -434,7 +444,7 @@ static int	DBpatch_7050030(void)
 	return DBadd_foreign_key("devices", 2, &field);
 }
 
-static int	DBpatch_7050031(void)
+static int	DBpatch_7050033(void)
 {
 	const zbx_db_field_t	field = {"auth_scheme", "0", NULL, NULL, 0, ZBX_TYPE_INT, NULL, 0};
 
@@ -478,5 +488,7 @@ DBPATCH_ADD(7050028, 0, 1)
 DBPATCH_ADD(7050029, 0, 1)
 DBPATCH_ADD(7050030, 0, 1)
 DBPATCH_ADD(7050031, 0, 1)
+DBPATCH_ADD(7050032, 0, 1)
+DBPATCH_ADD(7050033, 0, 1)
 
 DBPATCH_END()
