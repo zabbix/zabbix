@@ -4430,7 +4430,7 @@ static void	dc_schedule_trigger_timer(zbx_trigger_timer_t *timer, int now, const
  *          old trend function queue                                          *
  *                                                                            *
  ******************************************************************************/
-static void	dc_schedule_trigger_timers(zbx_hashset_t *trend_queue, int now)
+static void	dc_schedule_trigger_timers(zbx_hashset_t *trend_queue, int now, int *timers_num)
 {
 	ZBX_DC_FUNCTION		*function;
 	ZBX_DC_TRIGGER		*trigger;
@@ -4467,6 +4467,8 @@ static void	dc_schedule_trigger_timers(zbx_hashset_t *trend_queue, int now)
 
 		if (NULL == (timer = dc_trigger_function_timer_create(function, now)))
 			continue;
+
+		(*timers_num)++;
 
 		if (NULL != trend_queue && NULL != (old = (zbx_trigger_timer_t *)zbx_hashset_search(trend_queue,
 				&timer->objectid)) && old->eval_ts.sec < now + 10 * SEC_PER_MIN)
@@ -4516,6 +4518,8 @@ static void	dc_schedule_trigger_timers(zbx_hashset_t *trend_queue, int now)
 
 		if (NULL == (timer = dc_trigger_timer_create(trigger)))
 			continue;
+
+		(*timers_num)++;
 
 		if (0 == (ts.sec = (int)dc_function_calculate_nextcheck(NULL, timer, now + offset, timer->triggerid)))
 		{
@@ -6941,7 +6945,7 @@ static void	dc_item_reset_triggers(ZBX_DC_ITEM *item, ZBX_DC_TRIGGER *trigger_ex
  *              3) list of triggers each item is used by                      *
  *                                                                            *
  ******************************************************************************/
-static void	dc_trigger_update_cache(void)
+static void	dc_trigger_update_cache(int *itemtrigs_num)
 {
 	zbx_hashset_iter_t	iter;
 	ZBX_DC_TRIGGER		*trigger;
@@ -7048,6 +7052,8 @@ static void	dc_trigger_update_cache(void)
 
 		zbx_vector_uint64_destroy(&itemids);
 	}
+
+	*itemtrigs_num = itemtrigs.values_num;
 
 	zbx_vector_ptr_pair_destroy(&itemtrigs);
 }
@@ -7665,8 +7671,9 @@ zbx_uint64_t	zbx_dc_sync_configuration(unsigned char mode, zbx_synced_new_config
 {
 	static int	sync_status = ZBX_DBSYNC_STATUS_UNKNOWN;
 
-	int		i, changelog_num, dberr = ZBX_DB_FAIL;
-	double		sec, update_sec, queues_sec, changelog_sec;
+	int		i, changelog_num, dberr = ZBX_DB_FAIL, itemtrigs_num = 0, timers_num = 0;
+	double		sec, queues_sec, changelog_sec, update_sec = 0, timers_sec = 0, topology_sec = 0,
+			um_cache_dup_sec = 0;
 
 	zbx_dbsync_t	settings_sync, hosts_sync, hi_sync, htmpl_sync, gmacro_sync, hmacro_sync, if_sync, items_sync,
 			item_discovery_sync, triggers_sync, tdep_sync,
@@ -7678,7 +7685,7 @@ zbx_uint64_t	zbx_dc_sync_configuration(unsigned char mode, zbx_synced_new_config
 			httpstep_field_sync, autoreg_host_sync, connector_sync, connector_tag_sync, proxy_sync,
 			proxy_group_sync, hp_sync, autoreg_config_sync;
 	zbx_uint64_t	update_flags = 0;
-	zbx_int64_t	used_size, update_size;
+	zbx_int64_t	used_size, update_size = 0, topology_size = 0, timers_size = 0, um_cache_dup_size = 0;
 	unsigned char	changelog_sync_mode = mode;	/* sync mode for objects using incremental sync */
 
 	zbx_hashset_t			trend_queue;
@@ -7823,7 +7830,7 @@ zbx_uint64_t	zbx_dc_sync_configuration(unsigned char mode, zbx_synced_new_config
 	START_SYNC;
 
 	config->um_cache = um_cache_sync(config->um_cache, new_revision, &gmacro_sync, &hmacro_sync, &htmpl_sync,
-			config_vault);
+		config_vault, &um_cache_dup_sec, &um_cache_dup_size);
 
 	DCsync_host_tags(&host_tag_sync);
 
@@ -8046,8 +8053,6 @@ zbx_uint64_t	zbx_dc_sync_configuration(unsigned char mode, zbx_synced_new_config
 	dc_sync_httpsteps(&httpstep_sync, new_revision);
 	dc_sync_httpstep_fields(&httpstep_field_sync, new_revision);
 
-	sec = zbx_time();
-	used_size = dbconfig_used_size();
 
 	if (0 != hosts_sync.add_num + hosts_sync.update_num + hosts_sync.remove_num)
 		update_flags |= ZBX_DBSYNC_UPDATE_HOSTS;
@@ -8081,18 +8086,36 @@ zbx_uint64_t	zbx_dc_sync_configuration(unsigned char mode, zbx_synced_new_config
 
 	/* update trigger topology if trigger dependency was changed */
 	if (0 != (update_flags & ZBX_DBSYNC_UPDATE_TRIGGER_DEPENDENCY))
+	{
+		sec = zbx_time();
+		used_size = dbconfig_used_size();
+
 		dc_trigger_update_topology();
+
+		topology_sec = zbx_time() - sec;
+		topology_size = dbconfig_used_size() - used_size;
+	}
 
 	/* update various trigger related links in cache */
 	if (0 != (update_flags & (ZBX_DBSYNC_UPDATE_HOSTS | ZBX_DBSYNC_UPDATE_ITEMS | ZBX_DBSYNC_UPDATE_FUNCTIONS |
 			ZBX_DBSYNC_UPDATE_TRIGGERS | ZBX_DBSYNC_UPDATE_MACROS)))
 	{
-		dc_trigger_update_cache();
-		dc_schedule_trigger_timers((ZBX_DBSYNC_INIT == mode ? &trend_queue : NULL), time(NULL));
-	}
+		sec = zbx_time();
+		used_size = dbconfig_used_size();
 
-	update_sec = zbx_time() - sec;
-	update_size = dbconfig_used_size() - used_size;
+		dc_trigger_update_cache(&itemtrigs_num);
+
+		update_sec = zbx_time() - sec;
+		update_size = dbconfig_used_size() - used_size;
+
+		sec = zbx_time();
+		used_size = dbconfig_used_size();
+
+		dc_schedule_trigger_timers((ZBX_DBSYNC_INIT == mode ? &trend_queue : NULL), time(NULL), &timers_num);
+
+		timers_sec = zbx_time() - sec;
+		timers_size = dbconfig_used_size() - used_size;
+	}
 
 	config->revision.config = new_revision;
 
@@ -8101,8 +8124,14 @@ zbx_uint64_t	zbx_dc_sync_configuration(unsigned char mode, zbx_synced_new_config
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() changelog  : sql:" ZBX_FS_DBL " sec (%d records)",
 				__func__, changelog_sec, changelog_num);
 
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() reindex    : " ZBX_FS_DBL " sec " ZBX_FS_I64 " bytes.", __func__,
-				update_sec, update_size);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() reindex    : " ZBX_FS_DBL " sec " ZBX_FS_I64 " bytes (%d).",
+				__func__, update_sec, update_size, itemtrigs_num);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() timers     : " ZBX_FS_DBL " sec " ZBX_FS_I64 " bytes (%d).", __func__,
+				timers_sec, timers_size, timers_num);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() topology   : " ZBX_FS_DBL " sec " ZBX_FS_I64 " bytes.", __func__,
+				topology_sec, topology_size);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() um_cache   : " ZBX_FS_DBL " sec " ZBX_FS_I64 " bytes.",
+			__func__, um_cache_dup_sec, um_cache_dup_size);
 
 		zbx_dcsync_stats_dump(__func__);
 
@@ -8912,6 +8941,7 @@ int	zbx_init_configuration_cache(zbx_get_program_type_f get_program_type, zbx_ge
 	memset(&config->revision, 0, sizeof(config->revision));
 
 	config->um_cache = um_cache_create();
+	memset(&config->um_hosts, 0 , sizeof(config->um_hosts));
 
 	/* maintenance data are used only when timers are defined (server) */
 	if (0 != get_config_forks_cb(ZBX_PROCESS_TYPE_TIMER))
