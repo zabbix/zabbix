@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -1838,7 +1838,7 @@ void	zbx_sync_history_cache_server(const zbx_events_funcs_t *events_cbs, zbx_ipc
 		if (0 != history_num)
 		{
 			zbx_free(trends);
-			zbx_dc_config_clean_history_sync_items(items, errcodes, (size_t)history_num);
+			zbx_dc_config_clean_history_sync_items(items, (size_t)history_num);
 
 			zbx_vector_hc_item_ptr_clear(&history_items);
 			zbx_hc_free_item_values(history, history_num);

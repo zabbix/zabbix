@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -253,6 +253,9 @@ typedef struct
 {
 	const char	*units;
 	const char	*trends_period;
+	unsigned int	sz_units;
+	unsigned int	sz_trends_period;
+	int		trends_sec;
 }
 ZBX_DC_NUMITEM;
 
@@ -292,6 +295,8 @@ typedef struct
 	const char		*delay;
 	const char		*delay_ex;
 	const char		*history_period;
+	unsigned int		sz_key;
+	unsigned int		sz_history_period;
 	const char		*timeout;
 	ZBX_DC_TRIGGER		**triggers;
 	ZBX_DC_ITEMTYPE		itemtype;
@@ -301,6 +306,7 @@ typedef struct
 	ZBX_DC_PREPROCITEM	*preproc_item;
 	ZBX_DC_MASTERITEM	*master_item;
 	zbx_vector_dc_item_tag_t	tags;
+	int			history_sec;
 	int			nextcheck;
 	int			mtime;
 	int			data_expected_from;
@@ -408,6 +414,7 @@ typedef struct
 	int		data_expected_from;
 	zbx_uint64_t	flags;
 	zbx_uint64_t	revision;
+	unsigned int	sz_host;
 
 	unsigned char	maintenance_status;
 	unsigned char	maintenance_type;
