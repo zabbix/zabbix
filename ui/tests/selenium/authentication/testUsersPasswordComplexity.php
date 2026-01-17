@@ -249,7 +249,10 @@ class testUsersPasswordComplexity extends CWebTest {
 							"\nmust contain at least one special character ( !\"#$%&'()*+,-./:;<=>?@[\]^_`{|}~)".
 							"\nmust not contain user's name, surname or username".
 							"\nmust not be one of common or context-specific passwords",
-					'error' => 'Incorrect value for field "Password": cannot be empty.'
+					'error' => 'Incorrect value for field "Password": cannot be empty.',
+					'inline_errors' => [
+						'id:password1' => 'This field cannot be empty.'
+					]
 				]
 			],
 			// #4.
@@ -289,7 +292,10 @@ class testUsersPasswordComplexity extends CWebTest {
 					],
 					'db_passwd_check_rules' => 0,
 					'Password' => '',
-					'error' => 'Incorrect value for field "Password": cannot be empty.'
+					'error' => 'Incorrect value for field "Password": cannot be empty.',
+					'inline_errors' => [
+						'id:password1' => 'This field cannot be empty.'
+					]
 				]
 			],
 			// #6.
@@ -829,7 +835,9 @@ class testUsersPasswordComplexity extends CWebTest {
 							"\nmust be at least 4 characters long".
 							"\nmust not contain user's name, surname or username".
 							"\nmust not be one of common or context-specific passwords",
-					'error' => "Incorrect value for field \"/1/passwd\": must not contain user's name, surname or username."
+					'inline_errors' => [
+						'id:password1' => 'Must not be one of common or context-specific passwords.'
+					]
 				]
 			],
 			[
@@ -848,7 +856,9 @@ class testUsersPasswordComplexity extends CWebTest {
 							"\nmust be at least 4 characters long".
 							"\nmust not contain user's name, surname or username".
 							"\nmust not be one of common or context-specific passwords",
-					'error' => "Incorrect value for field \"/1/passwd\": must not contain user's name, surname or username."
+					'inline_errors' => [
+						'id:password1' => 'Must not be one of common or context-specific passwords.'
+					]
 				]
 			],
 			[
@@ -867,7 +877,9 @@ class testUsersPasswordComplexity extends CWebTest {
 							"\nmust be at least 4 characters long".
 							"\nmust not contain user's name, surname or username".
 							"\nmust not be one of common or context-specific passwords",
-					'error' => "Incorrect value for field \"/1/passwd\": must not contain user's name, surname or username."
+					'inline_errors' => [
+						'id:password1' => 'Must not be one of common or context-specific passwords.'
+					]
 				]
 			],
 			[
@@ -886,7 +898,9 @@ class testUsersPasswordComplexity extends CWebTest {
 							"\nmust be at least 8 characters long".
 							"\nmust not contain user's name, surname or username".
 							"\nmust not be one of common or context-specific passwords",
-					'error' => "Incorrect value for field \"/1/passwd\": must be at least 8 characters long."
+					'inline_errors' => [
+						'id:password1' => 'Must be at least 8 characters long.'
+					]
 				]
 			],
 			[
@@ -905,7 +919,9 @@ class testUsersPasswordComplexity extends CWebTest {
 							"\nmust be at least 4 characters long".
 							"\nmust not contain user's name, surname or username".
 							"\nmust not be one of common or context-specific passwords",
-					'error' => "Incorrect value for field \"/1/passwd\": must not contain user's name, surname or username."
+					'inline_errors' => [
+						'id:password1' => 'Must not be one of common or context-specific passwords.'
+					]
 				]
 			],
 			[
@@ -924,7 +940,9 @@ class testUsersPasswordComplexity extends CWebTest {
 							"\nmust be at least 4 characters long".
 							"\nmust not contain user's name, surname or username".
 							"\nmust not be one of common or context-specific passwords",
-					'error' => "Incorrect value for field \"/1/passwd\": must not be one of common or context-specific passwords."
+					'inline_errors' => [
+						'id:password1' => 'Must not be one of common or context-specific passwords.'
+					]
 				]
 			],
 			[
@@ -943,7 +961,9 @@ class testUsersPasswordComplexity extends CWebTest {
 							"\nmust be at least 4 characters long".
 							"\nmust not contain user's name, surname or username".
 							"\nmust not be one of common or context-specific passwords",
-					'error' => "Incorrect value for field \"/1/passwd\": must not be one of common or context-specific passwords."
+					'inline_errors' => [
+						'id:password1' => 'Must not be one of common or context-specific passwords.'
+					]
 				]
 			],
 			[
@@ -1108,21 +1128,27 @@ class testUsersPasswordComplexity extends CWebTest {
 			$this->page->acceptAlert();
 		}
 
-		$this->page->waitUntilReady();
+		//$this->page->waitUntilReady();
 
 		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
-			if (CTestArrayHelper::get($data, 'error')) {
-				$this->assertMessage(TEST_BAD, 'Cannot '.($update ? 'update' : 'add').' user', $data['error']);
-				$this->assertEquals($old_hash, CDBHelper::getHash('SELECT * FROM users ORDER BY userid'));
-			}
-			else {
+			if ($own) {
 				$this->assertInlineError($user_form, $data['inline_errors']);
 				$this->assertEquals($old_hash, CDBHelper::getHash('SELECT * FROM users ORDER BY userid'));
 			}
+			elseif (!$own && $data['Password'] !== '') {
+				$this->assertInlineError($user_form, $data['inline_errors']);
+				$this->assertEquals($old_hash, CDBHelper::getHash('SELECT * FROM users ORDER BY userid'));
+			}
+			else {
+				$this->assertMessage(TEST_BAD, 'Cannot '.($update ? 'update' : 'add').' user', $data['error']);
+				$this->assertEquals($old_hash, CDBHelper::getHash('SELECT * FROM users ORDER BY userid'));
+			}
 		}
+
 		else {
 			if ($own || $userid === 1) {
-				// If user updates their own password they will be logged out, so check login screen.
+				// If user updates their own password they will be logged out, so check login screen
+				$this->query('button:Sign in')->waitUntilVisible();
 				$this->page->assertTitle('Zabbix');
 				$this->assertTrue($this->query('button:Sign in')->one()->isClickable());
 			}
