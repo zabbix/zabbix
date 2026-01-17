@@ -11,29 +11,22 @@
 ** You should have received a copy of the GNU Affero General Public License along with this program.
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
-#if defined(WITH_AGENT2_METRICS)
+
 #include "zbxcomms.h"
 #include "comms.h"
 #include "zbxstr.h"
 #include "zbxlog.h"
 #include "zbxip.h"
-#else
-#include "zbxcomms.h"
-#include "comms.h"
-#include "zbxstr.h"
-#include "zbxlog.h"
-#include "zbxip.h"
+
+#if !defined(WITH_AGENT2_METRICS)
+
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 #include "tls.h"
 #endif
-#include "zbxlog.h"
+
 #include "zbxcompress.h"
-#include "zbxstr.h"
-#include "zbxnum.h"
-#include "zbxip.h"
 #include "zbxtime.h"
 #include "zbxcrypto.h"
-#include "zbxresolver.h"
 #endif
 
 #if !defined(WITH_AGENT2_METRICS)
