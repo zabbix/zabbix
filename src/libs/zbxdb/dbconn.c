@@ -454,7 +454,7 @@ static int	dbconn_open(zbx_dbconn_t *db)
 #if defined(HAVE_MYSQL)
 	int		err_no = 0;
 #elif defined(HAVE_POSTGRESQL)
-#	define ZBX_DB_MAX_PARAMS	10
+#	define ZBX_DB_MAX_PARAMS	11
 
 	int		rc;
 	char		*cport = NULL;
@@ -699,6 +699,8 @@ static int	dbconn_open(zbx_dbconn_t *db)
 			values[i++] = dbhost_hosts;
 			keywords[i] = "target_session_attrs";
 			values[i++] = "read-write";
+			keywords[i] = "connect_timeout";
+			values[i++] = "3";
 		}
 		else
 		{
