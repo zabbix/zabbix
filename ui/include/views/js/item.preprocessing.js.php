@@ -374,9 +374,9 @@
 				ZBX_PREPROC_MATCH_ERROR_REGEX => _('error matches'),
 				ZBX_PREPROC_MATCH_ERROR_NOT_REGEX => _('error does not match')
 			]))
-				->setAttribute('data-prevent-validation-on-change', '')
 				->setAttribute('placeholder', _('error-matching'))
 				->addClass('js-preproc-param-error-matching')
+				->setErrorContainer('preprocessing-#{rowNum}-error-container')
 				->setValue(ZBX_PREPROC_MATCH_ERROR_ANY).
 		(new CTextBox('preprocessing[#{rowNum}][params_1_not_supported]', ''))
 			->setAttribute('data-notrim', '')
