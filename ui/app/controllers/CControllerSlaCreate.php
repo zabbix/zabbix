@@ -50,7 +50,7 @@ class CControllerSlaCreate extends CController {
 				'count_values' => [
 					'field_rules' => ['enabled', 'in' => [1]],
 					'min' => 1,
-					'message' => _('Must have at least one selected.')
+					'message' => _('At least one entry should be selected.')
 				]
 			],
 			'effective_date' => ['string', 'required', 'not_empty',
