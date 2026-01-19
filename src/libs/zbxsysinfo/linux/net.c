@@ -15,6 +15,7 @@
 #include "../sysinfo.h"
 
 #include "zbxjson.h"
+#include "zbxcomms.h"
 #include "zbxnum.h"
 #include "zbxip.h"
 

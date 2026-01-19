@@ -17,7 +17,9 @@
 
 #include "zbxalgo.h"
 #include "zbxtime.h"
-#include "zbxip.h"
+
+#define ZBX_IPV4_MAX_CIDR_PREFIX	32	/* max number of bits in IPv4 CIDR prefix */
+#define ZBX_IPV6_MAX_CIDR_PREFIX	128	/* max number of bits in IPv6 CIDR prefix */
 
 #define ZBX_DNS_FAILOVER_DISABLED	0
 #define ZBX_DNS_FAILOVER_ENABLED	1
@@ -87,8 +89,18 @@ typedef SOCKET	ZBX_SOCKET;
 typedef int	ZBX_SOCKET;
 #endif
 
+#if defined(HAVE_IPV6)
+#	define ZBX_SOCKADDR struct sockaddr_storage
+#else
+#	define ZBX_SOCKADDR struct sockaddr_in
+#endif
+
+int	zbx_ip_cmp(int prefix_size, const struct sockaddr *ai_addr, int ai_family, const ZBX_SOCKADDR *name,
+	int ipv6v4_mode);
+
 int	zbx_validate_peer_list(const char *peer_list, char **error);
 int	zbx_tcp_check_allowed_peers_info(const ZBX_SOCKADDR *peer_info, const char *peer_list);
+int	zbx_validate_cidr(const char *ip, const char *cidr, void *value);
 
 #if !defined(WITH_AGENT2_METRICS)
 typedef enum

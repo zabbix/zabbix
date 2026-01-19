@@ -71,17 +71,4 @@ int	zbx_portrange_uniq_iter(const zbx_range_t *ranges, const int num, int *idx, 
 int	zbx_iprange_validate(const zbx_iprange_t *iprange, const int *address);
 zbx_uint64_t	zbx_iprange_volume(const zbx_iprange_t *iprange);
 
-#if defined(HAVE_IPV6)
-#	define ZBX_SOCKADDR struct sockaddr_storage
-#else
-#	define ZBX_SOCKADDR struct sockaddr_in
-#endif
-
-#define ZBX_IPV4_MAX_CIDR_PREFIX	32	/* max number of bits in IPv4 CIDR prefix */
-#define ZBX_IPV6_MAX_CIDR_PREFIX	128	/* max number of bits in IPv6 CIDR prefix */
-
-int	zbx_ip_cmp(int prefix_size, const struct sockaddr *ai_addr, int ai_family, const ZBX_SOCKADDR *name,
-	int ipv6v4_mode);
-int	zbx_validate_cidr(const char *ip, const char *cidr, void *value);
-
 #endif /* ZABBIX_IP_H */
