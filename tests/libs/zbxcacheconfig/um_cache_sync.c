@@ -128,6 +128,8 @@ void	zbx_mock_test_entry(void **state)
 	for (i = 0; i < steps.values_num; i++)
 	{
 		zbx_dbsync_t	gmacros, hmacros, htmpls;
+		double		um_cache_dup_sec = 0;
+		zbx_int64_t	um_cache_dup_size = 0;
 
 		printf("=== STEP %d ===\n", i + 1);
 
@@ -136,7 +138,8 @@ void	zbx_mock_test_entry(void **state)
 		zbx_dbsync_init(&htmpls, NULL, ZBX_DBSYNC_UPDATE);
 
 		um_mock_cache_diff(mock_cache, &steps.values[i]->mock_cache, &gmacros, &hmacros, &htmpls);
-		umc = steps.values[i]->cache = um_cache_sync(umc, 0, &gmacros, &hmacros, &htmpls, &config_vault);
+		umc = steps.values[i]->cache = um_cache_sync(umc, 0, &gmacros, &hmacros, &htmpls, &config_vault,
+				&um_cache_dup_sec, &um_cache_dup_size);
 		umc->refcount += steps.values[i]->refs;
 
 		mock_dbsync_clear(&gmacros);
