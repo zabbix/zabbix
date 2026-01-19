@@ -131,7 +131,10 @@ class CControllerItemPrototypeCreate extends CControllerItemPrototype {
 			'query_fields' => ['objects',
 				'fields' => [
 					'value' => ['string', 'length' => 255],
-					'name' => ['string', 'required', 'not_empty', 'length' => 255, 'when' => ['value', 'not_empty']],
+					'name' => [
+						['string', 'required', 'length' => 255],
+						['string', 'required', 'length' => 255, 'not_empty', 'when' => ['value', 'not_empty']]
+					],
 					'sortorder' => ['integer']
 				],
 				'when' => ['type', 'in' => [ITEM_TYPE_HTTPAGENT]]
@@ -168,7 +171,10 @@ class CControllerItemPrototypeCreate extends CControllerItemPrototype {
 			'headers' => ['objects',
 				'fields' => [
 					'value' => ['string', 'length' => 2000],
-					'name' => ['string', 'required', 'not_empty', 'length' => 255, 'when' => ['value', 'not_empty']]
+					'name' => [
+						['string', 'required', 'length' => 255],
+						['string', 'required', 'length' => 255, 'not_empty', 'when' => ['value', 'not_empty']]
+					]
 				],
 				'when' => ['type', 'in' => [ITEM_TYPE_HTTPAGENT]]
 			],
