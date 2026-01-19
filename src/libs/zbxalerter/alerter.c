@@ -280,7 +280,7 @@ static void	alerter_process_email(zbx_ipc_socket_t *socket, zbx_ipc_message_t *i
 {
 	zbx_uint64_t	alertid, mediatypeid, eventid, p_eventid, actionid, objectid;
 	char		*sendto, *subject, *message, *smtp_server, *smtp_helo, *smtp_email, *smtp_username,
-			*smtp_password, *sendto_hash = NULL, *messageid = NULL, *inreplyto = NULL, *expression,
+			*smtp_password, *sendto_hash, *messageid, *inreplyto = NULL, *expression,
 			*recovery_expression, *mediatype_name, *error = NULL;
 	unsigned short	smtp_port;
 	unsigned char	smtp_authentication, smtp_security, smtp_verify_peer, smtp_verify_host, message_format;
@@ -326,8 +326,10 @@ static void	alerter_process_email(zbx_ipc_socket_t *socket, zbx_ipc_message_t *i
 		inreplyto = create_email_inreplyto(mediatypeid, sendto_hash, p_eventid, actionid, message_type);
 	}
 	else
+	{
 		messageid = create_email_messageid(mediatypeid, sendto_hash, eventid, actionid,
 				0, message_type, process_num);
+	}
 
 	ret = send_email(smtp_server, smtp_port, smtp_helo, smtp_email, sendto, messageid, inreplyto, subject, message,
 			smtp_security, smtp_verify_peer, smtp_verify_host, smtp_authentication, smtp_username,
