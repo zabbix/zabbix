@@ -1429,22 +1429,21 @@ static int	get_housekeeping_period(double time_slept)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: refresh housekeeping configuration and adjust housekeeping rules  *
- *          based on history provider capabilities                            *
+ * Purpose: adjust housekeeping rules based on history provider capabilities  *
  *                                                                            *
- * Parameters: flags - [IN] configuration flags specifying which settings     *
- *                          to refresh                                        *
+ * Parameters:  cfg   - [IN/OUT] configuration to adjust                      *
+ *                                                                            *
+ * Comments: Must be done after refreshing configuration seetings             *
+ *           (zbx_config_get function)                                        *
  *                                                                            *
  ******************************************************************************/
-static void	housekeeping_refresh_config(zbx_uint64_t flags)
+static void	housekeeping_adjust_config(void)
 {
 	zbx_uint64_t	hk_flags = zbx_history_get_housekeep_flags();
 
-	zbx_config_get(&cfg, flags);
-
 	for (int i = 0; i < ITEM_VALUE_TYPE_BIN; i++)
 	{
-		if (SUCCEED == ZBX_HISTORY_CHECK_TYPE_FLAGS(hk_flags, i))
+		if (SUCCEED != ZBX_HISTORY_CHECK_TYPE_FLAGS(hk_flags, i))
 			*hk_history_rules[i].poption = ZBX_HK_MODE_DISABLED;
 	}
 }
@@ -1496,7 +1495,7 @@ ZBX_THREAD_ENTRY(housekeeper_thread, args)
 
 	if (0 < tsdb_version)
 	{
-		housekeeping_refresh_config(ZBX_CONFIG_FLAGS_HOUSEKEEPER);
+		zbx_config_get(&cfg, ZBX_CONFIG_FLAGS_HOUSEKEEPER);
 		hk_tsdb_check_config();
 	}
 #endif
@@ -1555,6 +1554,8 @@ ZBX_THREAD_ENTRY(housekeeper_thread, args)
 
 		zbx_config_get(&cfg, ZBX_CONFIG_FLAGS_HOUSEKEEPER | ZBX_CONFIG_FLAGS_DB_EXTENSION |
 				ZBX_CONFIG_FLAGS_DB_HISTORY_COMPRESION);
+
+		housekeeping_adjust_config();
 
 		if (0 == strcmp(cfg.db.extension, ZBX_DB_EXTENSION_TIMESCALEDB))
 		{

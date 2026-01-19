@@ -24,8 +24,6 @@
 #include "zbxnum.h"
 #include "zbxstr.h"
 #include "zbxtypes.h"
-#include "zbxdbschema.h"
-#include "zbxtime.h"
 
 ZBX_PTR_VECTOR_DECL(db_insert_ptr, zbx_db_insert_t *)
 ZBX_PTR_VECTOR_IMPL(db_insert_ptr, zbx_db_insert_t *)

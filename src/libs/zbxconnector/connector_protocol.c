@@ -13,10 +13,11 @@
 **/
 
 #include "zbxconnector.h"
+#include "zbxcommon.h"
+#include "zbxtypes.h"
 #include "zbxserialize.h"
 #include "zbxalgo.h"
 #include "zbxcacheconfig.h"
-#include "zbxtime.h"
 
 void	zbx_connector_serialize_object(unsigned char **data, size_t *data_alloc, size_t *data_offset,
 		const zbx_connector_object_t *connector_object)

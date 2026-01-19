@@ -14,9 +14,10 @@
 
 #include "anomalystl.h"
 
+#include "zbxcommon.h"
+#include "zbxtypes.h"
 #include "zbxnum.h"
 #include "zbxeval.h"
-#include "zbxtime.h"
 #include "zbxalgo.h"
 #include "zbxhistory.h"
 

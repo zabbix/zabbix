@@ -15,9 +15,8 @@
 #include "async_queue.h"
 
 #include "async_manager.h"
-
+#include "zbxcommon.h"
 #include "zbxalgo.h"
-#include "zbxcomms.h"
 
 #define ASYNC_TASK_QUEUE_INIT_NONE	0x00
 #define ASYNC_TASK_QUEUE_INIT_LOCK	0x01
