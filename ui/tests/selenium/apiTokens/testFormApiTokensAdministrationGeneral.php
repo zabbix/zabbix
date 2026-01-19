@@ -207,7 +207,7 @@ class testFormApiTokensAdministrationGeneral extends testFormApiTokens {
 						'User' => 'Admin',
 						'Description' => 'Token that is already expired when created',
 						'Set expiration date and time' => true,
-						'Expires at' => '1970-01-01 00:00:00',
+						'Expires at' => '1970-01-02 00:00:00',
 						'Enabled' => true
 					],
 					'already_expired' => true,
