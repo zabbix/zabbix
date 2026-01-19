@@ -28,10 +28,10 @@ class CClickhouseHelper {
 	public static function execute(string $sql, string $endpoint, string $username, string $password): bool {
 		$response = self::request($endpoint, $username, $password, $sql);
 
-		return $response === false ? false : true;
+		return !($response === false);
 	}
 
-	private static function request($endpoint, $username, $password, $sql) {
+	private static function request(string $endpoint, string $username, string $password, string $sql) {
 		$time_start = microtime(true);
 
 		$handle = curl_init();

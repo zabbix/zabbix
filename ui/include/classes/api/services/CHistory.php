@@ -329,12 +329,12 @@ class CHistory extends CApiService {
 
 		// time_from
 		if ($options['time_from'] !== null) {
-			$sql_parts['where']['clock_from'] = 'h.timestamp>='.db_utc_to_datetime64($options['time_from']);
+			$sql_parts['where']['clock_from'] = 'h.clock_ns>='.db_utc_to_datetime64($options['time_from']);
 		}
 
 		// time_till
 		if ($options['time_till'] !== null) {
-			$sql_parts['where']['clock_till'] = 'h.timestamp<='.db_utc_to_datetime64($options['time_till']);
+			$sql_parts['where']['clock_till'] = 'h.clock_ns<='.db_utc_to_datetime64($options['time_till']);
 		}
 
 		// filter
@@ -347,19 +347,14 @@ class CHistory extends CApiService {
 			zbx_db_search($sql_parts['from']['history'], $options, $sql_parts);
 		}
 
-		// output
-		if ($options['output'] === API_OUTPUT_EXTEND) {
-			$options['output'] = ['itemid', 'clock', 'ns', 'value'];
-		}
-
 		$sql_parts = $this->applyQueryOutputOptions($this->tableName, $this->tableAlias(), $options, $sql_parts);
 		$sql_parts = $this->applyQuerySortOptions($this->tableName, $this->tableAlias(), $options, $sql_parts);
 
 		$query = self::createSelectQueryFromParts($sql_parts);
 
 		$output_map = [
-			'h.clock' => 'toUnixTimestamp(h.timestamp) AS clock',
-			'h.ns' => 'toUnixTimestamp64Nano(h.timestamp) % 1000000000 AS ns'
+			'h.clock' => 'toUnixTimestamp(h.clock_ns) AS clock',
+			'h.ns' => 'toUnixTimestamp64Nano(h.clock_ns) % 1000000000 AS ns'
 		];
 
 		$query = str_replace(array_keys($output_map), array_values($output_map), $query);

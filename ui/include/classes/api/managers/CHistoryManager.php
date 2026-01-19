@@ -431,7 +431,7 @@ class CHistoryManager {
 			$value_type_itemids[$item['value_type']][] = $item['itemid'];
 		}
 
-		$period_condition = $period === null ? '' : ' AND timestamp>'.db_utc_to_datetime64(time() - $period);
+		$period_condition = $period === null ? '' : ' AND clock_ns>'.db_utc_to_datetime64(time() - $period);
 
 		$results = [];
 
@@ -441,13 +441,13 @@ class CHistoryManager {
 			foreach ($itemids as $itemid) {
 				$values = CClickhouseHelper::fetch(
 					'SELECT itemid,'.
-						'toUnixTimestamp(timestamp) AS clock,'.
-						'toUnixTimestamp64Nano(timestamp) % 1000000000 AS ns,'.
+						'toUnixTimestamp(clock_ns) AS clock,'.
+						'toUnixTimestamp64Nano(clock_ns) % 1000000000 AS ns,'.
 						'value'.
 					' FROM '.self::getTableName($type).' h'.
 					' WHERE itemid='.zbx_dbstr($itemid).
 						$period_condition.
-					' ORDER BY timestamp DESC'.
+					' ORDER BY clock_ns DESC'.
 					' LIMIT '.$limit,
 					$endpoint['endpoint'], $endpoint['username'], $endpoint['password']
 				);
@@ -724,13 +724,13 @@ class CHistoryManager {
 
 		$values = CClickhouseHelper::fetch(
 			'SELECT itemid,'.
-				'toUnixTimestamp(timestamp) AS clock,'.
-				'toUnixTimestamp64Nano(timestamp) % 1000000000 AS ns,'.
+				'toUnixTimestamp(clock_ns) AS clock,'.
+				'toUnixTimestamp64Nano(clock_ns) % 1000000000 AS ns,'.
 				'value'.
 			' FROM '.self::getTableName($item['value_type']).
 			' WHERE itemid='.zbx_dbstr($item['itemid']).
-			' AND timestamp<='.db_utc_to_datetime64($clock, $ns).
-			' ORDER BY timestamp DESC'.
+			' AND clock_ns<='.db_utc_to_datetime64($clock, $ns).
+			' ORDER BY clock_ns DESC'.
 			' LIMIT 1',
 			$endpoint['endpoint'], $endpoint['username'], $endpoint['password']
 		);
@@ -933,35 +933,35 @@ class CHistoryManager {
 		$sql_select = ['itemid', 'value', 'toUnixTimestamp(tick) AS tick', 'toUnixTimestamp(ts) AS clock',
 			'toUnixTimestamp64Nano(ts) % 1000000000 AS ns'
 		];
-		$sql_sub_select = ['itemid', 'toStartOfInterval(timestamp, toIntervalSecond('.$interval.')) AS tick'];
+		$sql_sub_select = ['itemid', 'toStartOfInterval(clock_ns, toIntervalSecond('.$interval.')) AS tick'];
 
 		switch ($function) {
 			case AGGREGATE_MIN:
-				$sql_sub_select[] = 'min(value) AS value,max(timestamp) AS ts';
+				$sql_sub_select[] = 'min(value) AS value,max(clock_ns) AS ts';
 				break;
 			case AGGREGATE_MAX:
-				$sql_sub_select[] = 'max(value) AS value,max(timestamp) AS ts';
+				$sql_sub_select[] = 'max(value) AS value,max(clock_ns) AS ts';
 				break;
 			case AGGREGATE_AVG:
-				$sql_sub_select[] = 'avg(value) AS value,max(timestamp) AS ts';
+				$sql_sub_select[] = 'avg(value) AS value,max(clock_ns) AS ts';
 				break;
 			case AGGREGATE_COUNT:
-				$sql_sub_select[] = 'count() AS value,max(timestamp) AS ts';
+				$sql_sub_select[] = 'count() AS value,max(clock_ns) AS ts';
 				break;
 			case AGGREGATE_SUM:
-				$sql_sub_select[] = 'sum(value) AS value,max(timestamp) AS ts';
+				$sql_sub_select[] = 'sum(value) AS value,max(clock_ns) AS ts';
 				break;
 			case AGGREGATE_FIRST:
-				$sql_sub_select[] = 'argMin(value, timestamp) AS value,min(timestamp) AS ts';
+				$sql_sub_select[] = 'argMin(value, clock_ns) AS value,min(clock_ns) AS ts';
 				break;
 			case AGGREGATE_LAST:
-				$sql_sub_select[] = 'argMax(value, timestamp) AS value,max(timestamp) AS ts';
+				$sql_sub_select[] = 'argMax(value, clock_ns) AS value,max(clock_ns) AS ts';
 				break;
 		}
 
 		$results = [];
 
-		$period_condition = ' AND timestamp BETWEEN '.db_utc_to_datetime64($time_from).
+		$period_condition = ' AND clock_ns BETWEEN '.db_utc_to_datetime64($time_from).
 			' AND '.db_utc_to_datetime64($time_to);
 
 		foreach (self::getClickhouseEndpoints(array_keys($value_type_itemids)) as $value_type => $endpoint) {
@@ -1378,14 +1378,14 @@ class CHistoryManager {
 		$sql_select = ['itemid', 'count', 'avg', 'min', 'max', 'toUnixTimestamp(ts) AS clock'];
 
 		$sql_sub_select = ['itemid', 'count() AS count', 'avg(value) AS avg', 'min(value) AS min', 'max(value) AS max',
-			'max(timestamp) as ts'
+			'max(clock_ns) as ts'
 		];
 
 		$group_by = ['itemid'];
 
 		if ($width !== null) {
 			$sql_sub_select[] =
-				'round('.$width.'*(toUnixTimestamp(timestamp)-'.$time_from.')/('.$time_to.'-'.$time_from.')) AS i';
+				'round('.$width.'*(toUnixTimestamp(clock_ns)-'.$time_from.')/('.$time_to.'-'.$time_from.')) AS i';
 
 			$sql_select[] = 'i';
 			$group_by[] = 'i';
@@ -1393,7 +1393,7 @@ class CHistoryManager {
 
 		$results = [];
 
-		$period_condition = ' AND timestamp BETWEEN '.db_utc_to_datetime64($time_from).
+		$period_condition = ' AND clock_ns BETWEEN '.db_utc_to_datetime64($time_from).
 			' AND '.db_utc_to_datetime64($time_to);
 
 		foreach (self::getClickhouseEndpoints(array_keys($value_type_itemids)) as $value_type => $endpoint) {
@@ -1668,32 +1668,32 @@ class CHistoryManager {
 
 		switch ($function) {
 			case AGGREGATE_MIN:
-				$sql_select[] = 'min(value) AS value,max(timestamp) AS ts';
+				$sql_select[] = 'min(value) AS value,max(clock_ns) AS ts';
 				break;
 			case AGGREGATE_MAX:
-				$sql_select[] = 'max(value) AS value,max(timestamp) AS ts';
+				$sql_select[] = 'max(value) AS value,max(clock_ns) AS ts';
 				break;
 			case AGGREGATE_AVG:
-				$sql_select[] = 'avg(value) AS value,max(timestamp) AS ts';
+				$sql_select[] = 'avg(value) AS value,max(clock_ns) AS ts';
 				break;
 			case AGGREGATE_COUNT:
-				$sql_select[] = 'count() AS value,max(timestamp) AS ts';
+				$sql_select[] = 'count() AS value,max(clock_ns) AS ts';
 				break;
 			case AGGREGATE_SUM:
-				$sql_select[] = 'sum(value) AS value,max(timestamp) AS ts';
+				$sql_select[] = 'sum(value) AS value,max(clock_ns) AS ts';
 				break;
 			case AGGREGATE_FIRST:
-				$sql_select[] = 'argMin(value, timestamp) AS value,min(timestamp) AS ts';
+				$sql_select[] = 'argMin(value, clock_ns) AS value,min(clock_ns) AS ts';
 				break;
 			case AGGREGATE_LAST:
-				$sql_select[] = 'argMax(value, timestamp) AS value,max(timestamp) AS ts';
+				$sql_select[] = 'argMax(value, clock_ns) AS value,max(clock_ns) AS ts';
 				break;
 		}
 
 		$result = [];
 
-		$period_condition = ' AND timestamp>='.db_utc_to_datetime64($time_from).
-			($time_to !== null ? ' AND timestamp<='.db_utc_to_datetime64($time_to) : '');
+		$period_condition = ' AND clock_ns>='.db_utc_to_datetime64($time_from).
+			($time_to !== null ? ' AND clock_ns<='.db_utc_to_datetime64($time_to) : '');
 
 		foreach (self::getClickhouseEndpoints(array_keys($value_type_itemids)) as $value_type => $endpoint) {
 			$values = CClickhouseHelper::fetch(
