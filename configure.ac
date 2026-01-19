@@ -2079,8 +2079,7 @@ if test "x$agent2" = "xyes"; then
 		\${abs_top_builddir}/src/libs/zbxparam/libzbxparam.a \
 		\${abs_top_builddir}/src/libs/zbxexpr/libzbxexpr.a \
 		\${abs_top_builddir}/src/libs/zbxtime/libzbxtime.a \
-		\${abs_top_builddir}/src/libs/zbxip/libzbxip.a \
-		\${abs_top_builddir}/src/libs/zbxsysinfo/"$ARCH"/libspecsysinfo.a \
+		\${abs_top_builddir}/src/libs/zbxsysinfo/"$ARCH"/libzbxagent2specsysinfo.a \
 		\${abs_top_builddir}/src/libs/zbxsysinfo/alias/libalias.a \
 		\${abs_top_builddir}/src/libs/zbxsysinfo/libzbxagent2sysinfo.a \
 		\${abs_top_builddir}/src/libs/zbxthreads/libzbxthreads.a \

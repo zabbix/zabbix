@@ -912,6 +912,7 @@ static void	get_proc_net_count_ipv6(const char *filename, unsigned char state, n
 }
 #endif
 
+#if !defined(WITH_AGENT2_METRICS)
 static void	get_proc_net_count_ipv4(const char *filename, unsigned char state, net_count_info_t *exp_l,
 		net_count_info_t *exp_r, zbx_uint64_t *count)
 {
@@ -1161,3 +1162,4 @@ int	net_udp_socket_count(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	return net_socket_count(NET_CONN_TYPE_UDP, request, result);
 }
+#endif
