@@ -273,7 +273,7 @@ class testFormUser extends CWebTest {
 				$this->assertTrue($form->getField('Current password')->isAttributePresent(['maxlength' => '255']));
 			}
 
-			// Remove focus from 'Username' field to activate inline validation error fot futher click on hintbox //TODO
+			// Activate inline validation error to be able to click on hintbox with one mouse click.
 			if (CTestArrayHelper::get($data, 'inline_errors')) {
 				$this->page->removeFocus();
 				$this->assertInlineError($form, $data['inline_errors']);
