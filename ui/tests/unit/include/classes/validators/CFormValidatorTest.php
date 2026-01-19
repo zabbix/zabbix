@@ -2124,7 +2124,7 @@ class CFormValidatorTest extends TestCase {
 				[],
 				CFormValidator::ERROR,
 				['/value' => [
-					['message' => 'This value does not match pattern "/^([0-9]{1,})$/i".',
+					['message' => 'This value does not match pattern.',
 						'level' => CFormValidator::ERROR_LEVEL_PRIMARY
 					]
 				]]
