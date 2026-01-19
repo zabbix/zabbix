@@ -143,12 +143,27 @@ window.ldap_edit_popup = new class {
 	}
 
 	#openTestPopup() {
-		let fields = {...{provision_status: <?= JIT_PROVISIONING_DISABLED ?>}, ...this.#form.getAllValues()};
+		const test_fields = ['host', 'port', 'base_dn', 'search_attribute', 'provision_status',
+			'provision_groups', 'provision_media'
+		];
 
-		const test_overlay = PopUp('popup.ldap.test.edit', fields,
-			{dialogueid: 'ldap_test_edit', dialogue_class: 'modal-popup-medium'}
-		);
-		test_overlay.xhr.then(() => this.#overlay.unsetLoading());
+		test_fields.forEach(fieldname => {
+			this.#form.findFieldByName(fieldname).setChanged();
+		});
+
+		this.#form.validateFieldsForAction(test_fields).then((result) => {
+			if (!result) {
+				this.#overlay.unsetLoading();
+				return;
+			}
+
+			const fields = this.#form.getAllValues();
+
+			const test_overlay = PopUp('popup.ldap.test.edit', fields,
+				{dialogueid: 'ldap_test_edit', dialogue_class: 'modal-popup-medium'}
+			);
+			test_overlay.xhr.then(() => this.#overlay.unsetLoading());
+		});
 	}
 
 	#submit() {

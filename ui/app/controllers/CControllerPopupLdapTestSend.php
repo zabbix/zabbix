@@ -69,11 +69,11 @@ class CControllerPopupLdapTestSend extends CController {
 			'user_lastname' => ['db userdirectory_ldap.user_lastname',
 				'when' => ['provision_status', 'in' => [JIT_PROVISIONING_ENABLED]]
 			],
-			'provision_groups' => ['objects', 'not_empty',
+			'provision_groups' => ['objects', 'required', 'not_empty', 'uniq' => ['name'],
 				'fields' => CControllerPopupUserGroupMappingCheck::getFieldsValidationRules(),
 				'when' => ['provision_status', 'in' => [JIT_PROVISIONING_ENABLED]]
 			],
-			'provision_media' => ['objects',
+			'provision_media' => ['objects', 'uniq' => ['attribute', 'mediatypeid'],
 				'fields' => [
 					'userdirectory_mediaid' => ['db userdirectory_media.userdirectory_mediaid'],
 					'mediatypeid' => ['db media_type.mediatypeid', 'required'],
