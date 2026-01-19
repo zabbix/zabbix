@@ -794,10 +794,16 @@ static int	process_discovery(int *nextcheck, zbx_hashset_t *incomplete_druleids,
 
 				dcheck->timeout = tmt_simple;
 			}
+		}
 
-			if (0 != dcheck->uniq && 0 == drule->unique_dcheckid)
+		for (i = 0; i < drule->dchecks.values_num; i++)
+		{
+			zbx_dc_dcheck_t	*dcheck = (zbx_dc_dcheck_t*)drule->dchecks.values[i];
+
+			if (0 != dcheck->uniq)
 			{
 				drule->unique_dcheckid = dcheck->dcheckid;
+				break;
 			}
 		}
 
