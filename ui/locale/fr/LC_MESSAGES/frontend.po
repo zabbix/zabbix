@@ -26838,6 +26838,11 @@ msgstr "séquence d'octets invalide en UTF-8"
 msgid "invalid data type"
 msgstr "type de données invalide"
 
+#: include/classes/validators/CAbsoluteTimeValidator.php:45
+#: include/classes/validators/CAbsoluteTimeValidator.php:53
+msgid "invalid date"
+msgstr ""
+
 #: include/classes/graphdraw/CLineGraphDraw.php:140 include/items.inc.php:1805
 msgid "invalid delay"
 msgstr "délai invalide"
@@ -28237,6 +28242,11 @@ msgstr "la valeur doit être comprise entre \"%1$s\" et \"%2$s\""
 msgid "value must be between \"%1$s\" and \"%2$s\", and have no more than \"%3$s\" digits after the decimal point"
 msgstr "la valeur doit être comprise entre « %1$s » et « %2$s », et ne pas comporter plus de « %3$s » chiffres après la virgule"
 
+#: include/classes/validators/CTimeUnitValidator.php:84
+#, c-format
+msgid "value must be between %1$s and %2$s"
+msgstr ""
+
 #: include/classes/validators/CApiInputValidator.php:676
 msgid "value must be empty"
 msgstr "la valeur doit être vide"
@@ -28253,6 +28263,16 @@ msgstr[1] "la valeur doit être vide ou une des valeurs %1$s"
 #, c-format
 msgid "value must be greater than \"%1$s\""
 msgstr "la valeur doit être supérieure à \"%1$s\""
+
+#: include/classes/validators/CAbsoluteTimeValidator.php:59
+#, c-format
+msgid "value must be greater than or equal to %1$s"
+msgstr ""
+
+#: include/classes/validators/CAbsoluteTimeValidator.php:64
+#, c-format
+msgid "value must be less than or equal to %1$s"
+msgstr ""
 
 #: app/controllers/CControllerPopupItemTest.php:1342
 #: include/classes/validators/CNewValidator.php:220
