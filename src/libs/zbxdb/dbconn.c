@@ -55,8 +55,7 @@ static zbx_db_query_mask_t	db_log_masked_values = ZBX_DB_DONT_MASK_QUERIES;
 
 #if defined(HAVE_POSTGRESQL)
 static ZBX_THREAD_LOCAL char	ZBX_PG_ESCAPE_BACKSLASH = 1;
-static ZBX_THREAD_LOCAL char	*dbhost_hosts;
-static ZBX_THREAD_LOCAL char	*dbhost_ports;
+static char			*dbhost_hosts, *dbhost_ports;
 #elif defined(HAVE_SQLITE3)
 static zbx_mutex_t		db_sqlite_access = ZBX_MUTEX_NULL;
 #endif
@@ -369,9 +368,6 @@ int	zbx_dbconn_parse_and_validate_dbhost(zbx_db_config_t *config, char **error)
 	size_t		result_alloc = 0, result_offset = 0;
 	int		multiple_hosts = 0;
 
-	zbx_free(dbhost_hosts);
-	zbx_free(dbhost_ports);
-
 	if (NULL != config->dbhost)
 	{
 		unsigned short	parsed_port, def_port = (0 != config->dbport ? config->dbport : 5432);
@@ -403,9 +399,9 @@ int	zbx_dbconn_parse_and_validate_dbhost(zbx_db_config_t *config, char **error)
 			}
 
 			if (NULL != dbhost_ports)
-				dbhost_ports = zbx_dsprintf(dbhost_ports, "%s,%u", dbhost_ports, parsed_port);
+				dbhost_ports = zbx_strdcatf(dbhost_ports, ",%u", parsed_port);
 			else
-				dbhost_ports = zbx_dsprintf(NULL, "%d", parsed_port);
+				dbhost_ports = zbx_strdcatf(NULL, "%u", parsed_port);
 
 			if (NULL != dbhost_hosts)
 			{

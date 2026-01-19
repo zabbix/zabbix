@@ -1,1 +1,1 @@
-.......PS. [ZBXNEXT-6492] added DBHost configuration option to support PostgreSQL High Availability clusters (sboidenko)
+.......PS. [ZBXNEXT-6492] added DBHost configuration option to support PostgreSQL connection to first read-write database from list. (sboidenko)
