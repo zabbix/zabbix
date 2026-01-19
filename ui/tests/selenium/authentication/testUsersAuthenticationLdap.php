@@ -268,10 +268,9 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 						'Login' => '',
 						'User password' => ''
 					],
-					'test_error' => 'Invalid LDAP configuration',
-					'test_error_details' => [
-						'Incorrect value for field "test_username": cannot be empty.',
-						'Incorrect value for field "test_password": cannot be empty.'
+					'inline_errors' => [
+						'Login' => 'This field cannot be empty.',
+						'User password' => 'This field cannot be empty.'
 					]
 				]
 			],
@@ -287,9 +286,8 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 						'Login' => 'galieleo',
 						'User password' => ''
 					],
-					'test_error' => 'Invalid LDAP configuration',
-					'test_error_details' => [
-						'Incorrect value for field "test_password": cannot be empty.'
+					'inline_errors' => [
+						'User password' => 'This field cannot be empty.'
 					]
 				]
 			],
@@ -305,9 +303,8 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 						'Login' => '',
 						'User password' => 'password'
 					],
-					'test_error' => 'Invalid LDAP configuration',
-					'test_error_details' => [
-						'Incorrect value for field "test_username": cannot be empty.'
+					'inline_errors' => [
+						'Login' => 'This field cannot be empty.'
 					]
 				]
 			],
@@ -375,6 +372,7 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 			// #9 test with incorrect Bind DN.
 			[
 				[
+					'expected' => TEST_BAD,
 					'servers_settings' => [
 						'Name' => 'Test Name',
 						'Host' => PHPUNIT_LDAP_HOST,
@@ -397,6 +395,7 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 			// #10 test with incorrect Bind password.
 			[
 				[
+					'expected' => TEST_BAD,
 					'servers_settings' => [
 						'Name' => 'Test Name',
 						'Host' => PHPUNIT_LDAP_HOST,
@@ -521,8 +520,9 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 			$this->assertMessage(TEST_GOOD, 'Login successful');
 		}
 		else {
-			$this->assertMessage(TEST_BAD, $data['test_error'], $data['test_error_details']);
+			$this->assertInlineError($test_form_dialog->asForm(), $data['inline_errors']);
 		}
+		$this->assertMessage(TEST_BAD, $data['test_error'], $data['test_error_details']);
 
 		if (array_key_exists('check_provisioning', $data)) {
 			foreach ($data['check_provisioning'] as $id => $text) {
