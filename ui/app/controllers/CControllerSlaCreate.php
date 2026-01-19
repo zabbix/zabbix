@@ -63,7 +63,10 @@ class CControllerSlaCreate extends CController {
 					'operator' => ['db sla_service_tag.operator', 'in' => [
 						ZBX_SERVICE_PROBLEM_TAG_OPERATOR_EQUAL, ZBX_SERVICE_PROBLEM_TAG_OPERATOR_LIKE
 					]],
-					'tag' => ['db sla_service_tag.tag', 'required', 'not_empty', 'when' => ['value', 'not_empty']]
+					'tag' => [
+						['db sla_service_tag.tag', 'required'],
+						['db sla_service_tag.tag', 'required', 'not_empty', 'when' => ['value', 'not_empty']]
+					]
 				]
 			],
 			'description' => ['db sla.description'],
