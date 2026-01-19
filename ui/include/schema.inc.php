@@ -10253,7 +10253,7 @@ return [
 				'ref_field' => 'tokenid'
 			],
 			'name' => [
-				'null' => false,
+				'null' => true,
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 255,
 				'default' => ''
@@ -10265,25 +10265,25 @@ return [
 				'default' => '0'
 			],
 			'app_identity_key' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_BLOB,
-				'length' => 2048,
+				'null' => true,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
 				'default' => ''
 			],
 			'app_encryption_key' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_BLOB,
-				'length' => 2048,
+				'null' => true,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
 				'default' => ''
 			],
 			'push_token' => [
-				'null' => false,
+				'null' => true,
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 255,
 				'default' => ''
 			],
 			'last_access_time' => [
-				'null' => false,
+				'null' => true,
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
 				'default' => '0'
