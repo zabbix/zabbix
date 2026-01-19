@@ -122,6 +122,9 @@ class testFormUser extends CWebTest {
 					'hintbox_warning' => [
 						'Language' => 'You are not able to choose some of the languages,'.
 								' because locales for them are not installed on the web server.'
+					],
+					'inline_errors' => [
+						'id:username' => 'This field cannot be empty.'
 					]
 				]
 			],
@@ -211,13 +214,12 @@ class testFormUser extends CWebTest {
 
 		// Check default values.
 		if ($user === 'Admin') {
-			foreach (['id:current_password', 'id:password1', 'id:password2'] as $field) {
-				$this->assertFalse($form->query($field)->one(false)->isValid());
-			}
+				$this->assertEquals(3, $this->query('id', ['current_password', 'password1', 'password2'])->all()
+					->filter(CElementFilter::NOT_VISIBLE)->count()
+				);
 
 			$form->query('button:Change password')->one()->click();
-			$form->waitUntilReloaded();
-			$this->assertFalse($form->query('button:Change password')->one(false)->isValid());
+			$this->assertTrue($form->query('button:Change password')->one()->isVisible(false));
 		}
 
 		$form->checkValue($data['default']);
@@ -269,6 +271,12 @@ class testFormUser extends CWebTest {
 
 			if ($user === 'Admin') {
 				$this->assertTrue($form->getField('Current password')->isAttributePresent(['maxlength' => '255']));
+			}
+
+			// Remove focus from 'Username' field to activate inline validation error fot futher click on hintbox //TODO
+			if (CTestArrayHelper::get($data, 'inline_errors')) {
+				$this->page->removeFocus();
+				$this->assertInlineError($form, $data['inline_errors']);
 			}
 
 			$form->getLabel('Password')->query('xpath:.//button[@data-hintbox]')->one()->click();
