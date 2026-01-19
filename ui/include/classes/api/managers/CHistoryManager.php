@@ -35,14 +35,16 @@ class CHistoryManager {
 		ITEM_VALUE_TYPE_BINARY => 'binary'
 	];
 
-	private static array $value_type_sources = [];
+	private static ?array $value_type_sources = null;
 
-	public function __construct() {
-		self::initSources();
-	}
+	private static function initSources(): void {
+		if (self::$value_type_sources !== null) {
+			return;
+		}
 
-	private function initSources(): void {
 		global $HISTORY, $HISTORY_PROVIDERS;
+
+		self::$value_type_sources = [];
 
 		if ($HISTORY_PROVIDERS) {
 			foreach ($HISTORY_PROVIDERS as $provider) {
@@ -2035,6 +2037,8 @@ class CHistoryManager {
 	 */
 	public static function getDataSourceType(int $value_type): string {
 		static $cache = [];
+
+		self::initSources();
 
 		if (!array_key_exists($value_type, $cache)) {
 			$value_name = self::getTypeNameByTypeId($value_type);

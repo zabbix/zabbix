@@ -314,50 +314,49 @@ class CHistory extends CApiService {
 
 		$sql_parts = [
 			'select'	=> ['history' => 'h.itemid'],
-			'from'		=> [
-				'history' => $this->tableName.' h'
-			],
+			'from'		=> $this->tableName.' h',
 			'where'		=> [],
 			'group'		=> [],
 			'order'		=> []
 		];
 
-		// itemids
 		if ($options['itemids'] !== null) {
 			$sql_parts['where']['itemid'] = dbConditionId('h.itemid', $options['itemids']);
 		}
 
-		// time_from
 		if ($options['time_from'] !== null) {
 			$sql_parts['where']['clock_from'] = 'h.clock_ns>='.db_utc_to_datetime64($options['time_from']);
 		}
 
-		// time_till
 		if ($options['time_till'] !== null) {
 			$sql_parts['where']['clock_till'] = 'h.clock_ns<='.db_utc_to_datetime64($options['time_till']);
 		}
 
-		// filter
 		if ($options['filter'] !== null) {
 			$this->dbFilter($sql_parts['from']['history'], $options, $sql_parts);
 		}
 
-		// search
 		if ($options['search'] !== null) {
 			zbx_db_search($sql_parts['from']['history'], $options, $sql_parts);
+		}
+
+		if ($options['output'] === API_OUTPUT_EXTEND) {
+			$options['output'] = array_keys(DB::getSchema($this->tableName)['fields']);
 		}
 
 		$sql_parts = $this->applyQueryOutputOptions($this->tableName, $this->tableAlias(), $options, $sql_parts);
 		$sql_parts = $this->applyQuerySortOptions($this->tableName, $this->tableAlias(), $options, $sql_parts);
 
+		foreach ($sql_parts['select'] as &$field) {
+			$field = match ($field) {
+				'h.clock' => 'toUnixTimestamp(h.clock_ns) AS clock',
+				'h.ns' => 'toUnixTimestamp64Nano(h.clock_ns) % 1000000000 AS ns',
+				default => $field
+			};
+		}
+		unset($field);
+
 		$query = self::createSelectQueryFromParts($sql_parts);
-
-		$output_map = [
-			'h.clock' => 'toUnixTimestamp(h.clock_ns) AS clock',
-			'h.ns' => 'toUnixTimestamp64Nano(h.clock_ns) % 1000000000 AS ns'
-		];
-
-		$query = str_replace(array_keys($output_map), array_values($output_map), $query);
 
 		// limit
 		if ($options['limit'] !== null) {
@@ -367,6 +366,16 @@ class CHistory extends CApiService {
 		return CClickhouseHelper::fetch($query,
 			$endpoint['endpoint'], $endpoint['username'], $endpoint['password']
 		);
+	}
+
+	protected function applyQuerySortField($sortfield, $sortorder, $alias, array $sqlParts) {
+		$sortfield = match ($sortfield) {
+			'clock',
+			'ns' => 'clock_ns',
+			default => $sortfield
+		};
+
+		return parent::applyQuerySortField($sortfield, $sortorder, $alias, $sqlParts);
 	}
 
 	/**
