@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -2812,7 +2812,7 @@ class testDocumentationLinks extends CWebTest {
 			[
 				[
 					'element' => [
-						'xpath://div[contains(@style, "top: 257px")]',
+						'xpath://div[contains(@style, "top: 258px")]',
 						'xpath://div[contains(@style, "top: 82px")]'
 					],
 					'doc_link' => '/en/manual/config/visualization/maps/map#adding-shapes'
