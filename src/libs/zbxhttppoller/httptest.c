@@ -255,7 +255,7 @@ static int	macro_httptest_field_resolv(zbx_macro_resolv_data_t *p, va_list args,
 		zbx_dc_get_user_macro(um_handle, p->macro, &dc_host->hostid, 1, replace_with);
 		p->pos = p->token.loc.r;
 	}
-	else if (0 == strcmp(p->macro, MVAR_HOST_HOST) || 0 == strcmp(p->macro, MVAR_HOSTNAME))
+	else if (0 == strcmp(p->macro, MVAR_HOST_HOST))
 	{
 		*replace_with = zbx_strdup(*replace_with, dc_host->host);
 	}
@@ -263,7 +263,7 @@ static int	macro_httptest_field_resolv(zbx_macro_resolv_data_t *p, va_list args,
 	{
 		*replace_with = zbx_strdup(*replace_with, dc_host->name);
 	}
-	else if (0 == strcmp(p->macro, MVAR_HOST_IP) || 0 == strcmp(p->macro, MVAR_IPADDRESS))
+	else if (0 == strcmp(p->macro, MVAR_HOST_IP))
 	{
 		if (SUCCEED == (ret = zbx_dc_config_get_interface(&interface, dc_host->hostid, 0)))
 			*replace_with = zbx_strdup(*replace_with, interface.ip_orig);
