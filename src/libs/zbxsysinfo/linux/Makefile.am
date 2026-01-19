@@ -32,29 +32,13 @@ libspecsysinfo_a_SOURCES = \
 
 libzbxagent2specsysinfo_a_CFLAGS = \
 	-I$(top_srcdir)/src/zabbix_agent \
-	-DWITH_AGENT2_METRICS \
-	$(TLS_CFLAGS)
+	-DWITH_AGENT2_METRICS
 
 libzbxagent2specsysinfo_a_SOURCES = \
-	boottime.c \
 	cpu.c \
-	diskio.c \
-	diskspace.c \
 	hardware.c \
-	hardware.h \
-	inodes.c \
-	inodes.h \
-	kernel.c \
-	memory.c \
 	net.c \
-	proc.c \
-	proc.h \
-	sensors.c \
-	software.c \
-	software.h \
-	system.c \
-	swap.c \
-	uptime.c
+	sensors.c
 
 libspechostnamesysinfo_a_SOURCES = \
 	hostname.c
