@@ -2734,8 +2734,8 @@ int	zbx_tcp_check_allowed_peers_info(const ZBX_SOCKADDR *peer_info, const char *
 		{
 			*cidr_sep = '\0';
 
-			/* validate_cidr() may overwrite 'prefix_size' */
-			if (SUCCEED != validate_cidr(start, cidr_sep + 1, &prefix_size))
+			/* zbx_validate_cidr() may overwrite 'prefix_size' */
+			if (SUCCEED != zbx_validate_cidr(start, cidr_sep + 1, &prefix_size))
 				*cidr_sep = '/';	/* CIDR is only supported for IP */
 		}
 
@@ -3052,7 +3052,7 @@ int	zbx_validate_peer_list(const char *peer_list, char **error)
 		{
 			*cidr_sep = '\0';
 
-			if (FAIL == validate_cidr(start, cidr_sep + 1, NULL))
+			if (FAIL == zbx_validate_cidr(start, cidr_sep + 1, NULL))
 			{
 				*cidr_sep = '/';
 				*error = zbx_dsprintf(NULL, "\"%s\"", start);

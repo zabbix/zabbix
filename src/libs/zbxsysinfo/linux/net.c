@@ -985,7 +985,7 @@ static int	get_addr_info(const char *ip_in, const char *port_in, struct addrinfo
 		{
 			*cidr_sep = '\0';
 
-			if (FAIL == validate_cidr(ip, cidr_sep + 1, &prefix_sz_local))
+			if (FAIL == zbx_validate_cidr(ip, cidr_sep + 1, &prefix_sz_local))
 			{
 				*error = zbx_dsprintf(*error, "Cannot validate CIDR \"%s/%s\"", ip, cidr_sep + 1);
 				goto err;

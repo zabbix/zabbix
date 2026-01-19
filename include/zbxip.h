@@ -82,6 +82,6 @@ zbx_uint64_t	zbx_iprange_volume(const zbx_iprange_t *iprange);
 
 int	zbx_ip_cmp(int prefix_size, const struct sockaddr *ai_addr, int ai_family, const ZBX_SOCKADDR *name,
 	int ipv6v4_mode);
-int	validate_cidr(const char *ip, const char *cidr, void *value);
+int	zbx_validate_cidr(const char *ip, const char *cidr, void *value);
 
 #endif /* ZABBIX_IP_H */

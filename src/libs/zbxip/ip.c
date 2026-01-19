@@ -456,7 +456,7 @@ int	zbx_ip_cmp(int prefix_size, const struct sockaddr *ai_addr, int ai_family, c
 }
 #endif
 
-int	validate_cidr(const char *ip, const char *cidr, void *value)
+int	zbx_validate_cidr(const char *ip, const char *cidr, void *value)
 {
 	if (SUCCEED == zbx_is_ip4(ip))
 		return zbx_is_uint_range(cidr, value, 0, ZBX_IPV4_MAX_CIDR_PREFIX);
