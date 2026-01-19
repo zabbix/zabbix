@@ -872,7 +872,7 @@ class CFormValidatorTest extends TestCase {
 					'items' => [['type' => 'objects',
 						'fields' => [
 							'field1' => [['type' => 'string']],
-							'field2' => [['type' => 'integer']],
+							'field2' => [['type' => 'integer']]
 						],
 						'count_values' => [[
 							'field_rules' => [['field2', 'in' => [1,2]]],
@@ -2676,7 +2676,7 @@ class CFormValidatorTest extends TestCase {
 								'field1' => ['string'],
 								'field2' => ['integer'],
 								'field3' => ['integer']
-							],
+							]
 						],
 						['objects', 'when' => ['items_enabled', 'in' => [1]],
 							'count_values' => [
@@ -2709,7 +2709,7 @@ class CFormValidatorTest extends TestCase {
 								'field1' => ['string'],
 								'field2' => ['integer'],
 								'field3' => ['integer']
-							],
+							]
 						],
 						['objects', 'when' => ['items_enabled', 'in' => [1]],
 							'count_values' => [
@@ -2740,7 +2740,7 @@ class CFormValidatorTest extends TestCase {
 							'fields' => [
 								'field1' => ['string'],
 								'field2' => ['integer']
-							],
+							]
 						],
 						['objects', 'when' => ['items_enabled', 'in' => [1]],
 							'count_values' => [
