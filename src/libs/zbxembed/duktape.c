@@ -74742,6 +74742,7 @@ DUK_LOCAL void duk__parse_switch_stmt(duk_compiler_ctx *comp_ctx, duk_ivalue *re
 		 *  test-bug-case-fallthrough.js.
 		 */
 
+		num_stmts = 0;
 		if (pc_default == -2) {
 			pc_default = duk__get_current_pc(comp_ctx);
 		}
