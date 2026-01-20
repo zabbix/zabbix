@@ -6,7 +6,7 @@
 	<!-- oracle oci library has functions declarations without arguments: f() instead of f(void), so it triggers -Wstrict-prototypes warning -->
 	<property name="COMP_FLAGS_ORACLE" value="-g -std=gnu99 -pedantic -Wall -Wextra -Wunused -Wshadow -Wdeclaration-after-statement -Wpointer-arith -Wno-null-pointer-subtraction -Wno-maybe-uninitialized -Wno-overlength-strings -Wformat -Wmissing-prototypes -Wunreachable-code -Wformat-extra-args -Wno-missing-field-initializers -Wno-missing-field-initializers -Wincompatible-pointer-types"/>
 	<property name="COMP_FLAGS" value="-Wstrict-prototypes ${COMP_FLAGS_ORACLE}"/>
-	<property name="ZBX_BASE_FLAGS" value="--enable-server --enable-agent --enable-proxy --with-libxml2 --with-unixodbc --with-net-snmp --with-ssh2 --with-libevent  --with-ldap  --with-libcurl"/>
+	<property name="ZBX_BASE_FLAGS" value="--enable-server --enable-agent --enable-proxy --with-libxml2 --with-unixodbc --with-net-snmp --with-ssh2 --with-libevent --with-ldap --with-libcurl --with-libpcre2"/>
 
 	<!-- Initialize database related options based on the database type -->
 	<switch value="${DBTYPE}" caseinsensitive="true">
@@ -26,19 +26,19 @@
 
 	<!-- Zabbix various configuration parameters -->
 	<target name="init-conf-options">
-		<property name="conf1" value="--enable-agent"/>
-		<property name="conf2" value="--enable-server ${with.db}"/>
-		<property name="conf3" value="--enable-proxy ${with.db}"/>
-		<property name="conf4" value="--enable-server --enable-agent --enable-proxy ${with.db}"/>
+		<property name="conf1" value="--enable-agent --with-libpcre2"/>
+		<property name="conf2" value="--enable-server ${with.db} --with-libpcre2"/>
+		<property name="conf3" value="--enable-proxy ${with.db} --with-libpcre2"/>
+		<property name="conf4" value="--enable-server --enable-agent --enable-proxy ${with.db} --with-libpcre2"/>
 		<property name="conf6" value="${ZBX_BASE_FLAGS} ${with.db} --with-openipmi --with-openssl"/>
 		<property name="conf7" value="${ZBX_BASE_FLAGS} ${with.db} --with-openipmi --with-gnutls"/>
 	</target>
 
 	<!-- Additional Zabbix configuration parameters -->
 	<target name="init-conf-options-2">
-		<property name="conf8" value="--enable-agent2"/>
-		<property name="conf9" value="--enable-server --enable-agent --enable-proxy ${with.db} --with-ssh"/>
-		<property name="conf10" value="--enable-agent --with-libmodbus"/>
+		<property name="conf8" value="--enable-agent2 --with-libpcre2"/>
+		<property name="conf9" value="--enable-server --enable-agent --enable-proxy ${with.db} --with-ssh --with-libpcre2"/>
+		<property name="conf10" value="--enable-agent --with-libmodbus --with-libpcre2"/>
 	</target>
 
 	<!-- Cppcheck static analyzer target -->
@@ -226,11 +226,11 @@
 		<!-- Zabbix various configuration parameters for cmocka tests -->
 		<!-- Configuration option name must consist of prefix 'cmocka-', configuration order number
 			and configuration title: cmocka-<number>-<title> -->
-		<property name="cmocka-1-default" value="-q CFLAGS='${COMP_FLAGS}' ${ZBX_BASE_FLAGS} --enable-ipv6 --with-mysql --with-openipmi --with-openssl --with-iconv --with-libpcre2"/>
+		<property name="cmocka-1-default" value="-q CFLAGS='${COMP_FLAGS}' ${ZBX_BASE_FLAGS} --enable-ipv6 --with-mysql --with-openipmi --with-openssl --with-iconv"/>
 		<property name="cmocka-2-agent-only" value="-q CFLAGS='${COMP_FLAGS}' --enable-agent --with-libpcre2"/>
 		<property name="cmocka-3-server-only" value="-q CFLAGS='${COMP_FLAGS}' --enable-server --with-mysql --with-libcurl --with-libpcre2"/>
 		<property name="cmocka-4-proxy-only" value="-q CFLAGS='${COMP_FLAGS}' --enable-proxy --with-sqlite3 --with-libcurl --with-libpcre2"/>
-		<property name="cmocka-5-sanitizer" value="CC=clang CFLAGS='${COMP_FLAGS} -Wenum-conversion -fsanitize=leak,address' LDFLAGS='-fsanitize=leak,address' -q ${ZBX_BASE_FLAGS} --with-openssl --with-openipmi --enable-ipv6 --with-mysql --with-iconv --with-libpcre2"/>
+		<property name="cmocka-5-sanitizer" value="CC=clang CFLAGS='${COMP_FLAGS} -Wenum-conversion -fsanitize=leak,address' LDFLAGS='-fsanitize=leak,address' -q ${ZBX_BASE_FLAGS} --with-openssl --with-openipmi --enable-ipv6 --with-mysql --with-iconv"/>
 	</target>
 
 	<target name="cmocka-tests" depends="init-cmocka-test-conf-options">
@@ -256,10 +256,10 @@
 		<!-- Zabbix various configuration parameters for cmocka Oracle tests -->
 		<!-- Configuration option name must consist of prefix 'cmocka-ora-', configuration order number
 			and configuration title: cmocka-<number>-<title> -->
-		<property name="cmocka-ora-1-default" value="-q CFLAGS='${COMP_FLAGS_ORACLE}' ${ZBX_BASE_FLAGS} --enable-ipv6 --with-openipmi --with-openssl --with-iconv --with-libpcre2 --with-oracle --with-oracle-include=${ORA_INCLUDE} --with-oracle-lib=${ORA_LIB}"/>
+		<property name="cmocka-ora-1-default" value="-q CFLAGS='${COMP_FLAGS_ORACLE}' ${ZBX_BASE_FLAGS} --enable-ipv6 --with-openipmi --with-openssl --with-iconv --with-oracle --with-oracle-include=${ORA_INCLUDE} --with-oracle-lib=${ORA_LIB}"/>
 		<property name="cmocka-ora-2-server-only" value="-q CFLAGS='${COMP_FLAGS_ORACLE}' --enable-server --with-oracle --with-oracle-include=${ORA_INCLUDE} --with-oracle-lib=${ORA_LIB} --with-libpcre2"/>
 		<property name="cmocka-ora-3-proxy-only" value="-q CFLAGS='${COMP_FLAGS_ORACLE}' --enable-proxy --with-oracle --with-oracle-include=${ORA_INCLUDE} --with-oracle-lib=${ORA_LIB} --with-libpcre2"/>
-		<property name="cmocka-ora-4-sanitizer" value="CC=clang CFLAGS='${COMP_FLAGS_ORACLE} -Wenum-conversion -O2 -fsanitize=leak,address' LDFLAGS='-fsanitize=leak,address' -q ${ZBX_BASE_FLAGS}  --enable-ipv6 --with-openipmi --with-openssl --with-iconv --with-libpcre2 --with-oracle --with-oracle-include=${ORA_INCLUDE} --with-oracle-lib=${ORA_LIB}"/>
+		<property name="cmocka-ora-4-sanitizer" value="CC=clang CFLAGS='${COMP_FLAGS_ORACLE} -Wenum-conversion -O2 -fsanitize=leak,address' LDFLAGS='-fsanitize=leak,address' -q ${ZBX_BASE_FLAGS}  --enable-ipv6 --with-openipmi --with-openssl --with-iconv --with-oracle --with-oracle-include=${ORA_INCLUDE} --with-oracle-lib=${ORA_LIB}"/>
 	</target>
 
 	<target name="cmocka-ora-tests" depends="init-cmocka-ora-test-conf-options">
@@ -289,7 +289,7 @@
 		<exec executable="./bootstrap.sh" failonerror="on">
 			<arg line="tests"/>
 		</exec>
-		<make-tests conf="CFLAGS='--coverage' -q --enable-server --enable-agent --enable-proxy --enable-ipv6 --with-mysql" conf-name="gen-test-coverage-report"/>
+		<make-tests conf="CFLAGS='--coverage' -q --enable-server --enable-agent --enable-proxy --enable-ipv6 --with-mysql --with-libpcre2" conf-name="gen-test-coverage-report"/>
 		<exec executable="lcov" failonerror="on">
 			<arg line="--directory"/>
 			<arg line="src"/>

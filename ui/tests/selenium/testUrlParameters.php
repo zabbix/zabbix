@@ -789,7 +789,7 @@ class testUrlParameters extends CLegacyWebTest {
 			],
 			[
 				'title' => 'Configuration of network maps',
-				'check_serer_name' => true,
+				'check_server_name' => true,
 				'server_name_on_page' => false,
 				'test_cases' => [
 					[
@@ -1062,6 +1062,61 @@ class testUrlParameters extends CLegacyWebTest {
 					[
 						'url' => 'hostinventories.php',
 						'text_present' => 'Host inventory'
+					]
+				]
+			],
+			[
+				'title' => 'Zabbix',
+				'check_server_name' => true,
+				'server_name_on_page' => true,
+				'test_cases' => [
+					[
+						'url' => 'index.php?autologin[]=1',
+						'text_not_present' => 'Global view',
+						'text_present' => [
+							'Zabbix has received an incorrect request.',
+							'Field "autologin" is not correct: invalid data type.'
+						]
+					],
+					[
+						'url' => 'index.php?autologin=kkk',
+						'text_not_present' => 'Global view',
+						'text_present' => [
+							'Zabbix has received an incorrect request.',
+							'Field "autologin" is not integer.'
+						]
+					],
+					[
+						'url' => 'index.php?autologin=2',
+						'text_not_present' => 'Global view',
+						'text_present' => [
+							'Zabbix has received an incorrect request.',
+							'Incorrect value "2" for "autologin" field.'
+						]
+					],
+					[
+						'url' => 'index.php?reconnect[]=1',
+						'text_not_present' => 'Global view',
+						'text_present' => [
+							'Zabbix has received an incorrect request.',
+							'Field "reconnect" is not correct: invalid data type.'
+						]
+					],
+					[
+						'url' => 'index.php?reconnect=ggg',
+						'text_not_present' => 'Global view',
+						'text_present' => [
+							'Zabbix has received an incorrect request.',
+							'Field "reconnect" is not integer.'
+						]
+					],
+					[
+						'url' => 'index.php?reconnect=0',
+						'text_not_present' => 'Global view',
+						'text_present' => [
+							'Zabbix has received an incorrect request.',
+							'Incorrect value "0" for "reconnect" field.'
+						]
 					]
 				]
 			]
