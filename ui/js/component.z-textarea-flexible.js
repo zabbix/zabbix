@@ -70,7 +70,16 @@ class ZTextareaFlexible extends HTMLElement {
 	}
 
 	static get observedAttributes() {
-		return ['value', 'maxlength', 'placeholder', 'disabled', 'readonly', 'autofocus', 'spellcheck', 'singleline'];
+		return [
+			'autofocus',
+			'disabled',
+			'maxlength',
+			'placeholder',
+			'readonly',
+			'singleline',
+			'spellcheck',
+			'value'
+		];
 	}
 
 	attributeChangedCallback(name, old_value, new_value) {
@@ -79,20 +88,23 @@ class ZTextareaFlexible extends HTMLElement {
 		}
 
 		switch (name) {
+			case 'autofocus':
+				this.#textarea.autofocus = new_value !== null;
+				break;
+
+			case 'disabled':
+				this.#textarea.disabled = new_value !== null;
+				break;
+
 			case 'maxlength':
 				const maxlength = parseInt(new_value);
+
 				if (Number.isFinite(maxlength) && maxlength >= 0) {
 					this.#textarea.maxLength = maxlength;
 				}
 				else {
 					this.#textarea.removeAttribute('maxlength');
 				}
-
-				break;
-
-			case 'value':
-				this.#textarea.value = new_value;
-				this.#update();
 				break;
 
 			case 'placeholder':
@@ -100,24 +112,21 @@ class ZTextareaFlexible extends HTMLElement {
 				this.#update();
 				break;
 
-			case 'disabled':
-				this.#textarea.disabled = new_value !== null;
-				break;
-
 			case 'readonly':
 				this.#textarea.readOnly = new_value !== null;
 				break;
 
-			case 'autofocus':
-				this.#textarea.autofocus = new_value !== null;
+			case 'singleline':
+				this.#singleline = new_value !== null;
+				this.#update();
 				break;
 
 			case 'spellcheck':
 				this.#textarea.spellcheck = new_value !== 'false';
 				break;
 
-			case 'singleline':
-				this.#singleline = new_value !== null;
+			case 'value':
+				this.#textarea.value = new_value;
 				this.#update();
 				break;
 
@@ -188,28 +197,12 @@ class ZTextareaFlexible extends HTMLElement {
 		}
 	}
 
-	get maxLength() {
-		return this.#textarea.maxLength;
+	get autofocus() {
+		return this.#textarea.autofocus;
 	}
 
-	set maxLength(maxlength) {
-		this.setAttribute('maxlength', maxlength);
-	}
-
-	get value() {
-		return this.#textarea.value;
-	}
-
-	set value(value) {
-		this.setAttribute('value', value);
-	}
-
-	get placeholder() {
-		return this.#textarea.placeholder;
-	}
-
-	set placeholder(placeholder) {
-		this.setAttribute('placeholder', placeholder);
+	set autofocus(autofocus) {
+		this.toggleAttribute('autofocus', autofocus);
 	}
 
 	get disabled() {
@@ -220,6 +213,22 @@ class ZTextareaFlexible extends HTMLElement {
 		this.toggleAttribute('disabled', disabled);
 	}
 
+	get maxLength() {
+		return this.#textarea.maxLength;
+	}
+
+	set maxLength(maxlength) {
+		this.setAttribute('maxlength', maxlength);
+	}
+
+	get placeholder() {
+		return this.#textarea.placeholder;
+	}
+
+	set placeholder(placeholder) {
+		this.setAttribute('placeholder', placeholder);
+	}
+
 	get readonly() {
 		return this.#textarea.readOnly;
 	}
@@ -228,12 +237,12 @@ class ZTextareaFlexible extends HTMLElement {
 		this.toggleAttribute('readonly', readonly);
 	}
 
-	get autofocus() {
-		return this.#textarea.autofocus;
+	get singleline() {
+		return this.#singleline;
 	}
 
-	set autofocus(autofocus) {
-		this.toggleAttribute('autofocus', autofocus);
+	set singleline(singleline) {
+		this.toggleAttribute('singleline', singleline);
 	}
 
 	get spellcheck() {
@@ -244,12 +253,12 @@ class ZTextareaFlexible extends HTMLElement {
 		this.setAttribute('spellcheck', String(spellcheck));
 	}
 
-	get singleline() {
-		return this.#singleline;
+	get value() {
+		return this.#textarea.value;
 	}
 
-	set singleline(singleline) {
-		this.toggleAttribute('singleline', singleline);
+	set value(value) {
+		this.setAttribute('value', value);
 	}
 }
 
