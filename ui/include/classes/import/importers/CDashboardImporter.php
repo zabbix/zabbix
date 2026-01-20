@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -19,14 +19,10 @@
  */
 class CDashboardImporter extends CDashboardImporterGeneral {
 
-	protected const ALLOW_TESTMODE = true;
-
 	/**
-	 * Import dashboard.
+	 * Import global dashboard.
 	 *
 	 * @param array $dashboards
-	 *
-	 * @throws Exception
 	 */
 	public function import(array $dashboards): void {
 		$dashboards_to_create = [];
@@ -34,9 +30,7 @@ class CDashboardImporter extends CDashboardImporterGeneral {
 
 		foreach ($dashboards as $name => $dashboard) {
 			foreach ($dashboard['pages'] as &$dashboard_page) {
-				$dashboard_page['widgets'] = $this->resolveDashboardWidgetReferences($dashboard_page['widgets'],
-					$name, true
-				);
+				$dashboard_page['widgets'] = $this->resolveWidgetReferences($dashboard_page['widgets'], $name, true);
 			}
 			unset($dashboard_page);
 
@@ -76,14 +70,29 @@ class CDashboardImporter extends CDashboardImporterGeneral {
 			}
 		}
 
-		if (!$this->testmode) {
-			if ($this->options['dashboards']['updateExisting'] && $dashboards_to_update) {
-				API::Dashboard()->update($dashboards_to_update);
-			}
+		if ($this->options['dashboards']['updateExisting'] && $dashboards_to_update) {
+			API::Dashboard()->update($dashboards_to_update);
+		}
 
-			if ($this->options['dashboards']['createMissing'] && $dashboards_to_create) {
-				API::Dashboard()->create($dashboards_to_create);
+		if ($this->options['dashboards']['createMissing'] && $dashboards_to_create) {
+			API::Dashboard()->create($dashboards_to_create);
+		}
+	}
+
+	/**
+	 * Collect missing referred objects.
+	 *
+	 * @param array $dashboards
+	 *
+	 * @return $this
+	 */
+	public function collectMissingObjects(array $dashboards): static {
+		foreach ($dashboards as $name => $dashboard) {
+			foreach ($dashboard['pages'] as $dashboard_page) {
+				$this->resolveWidgetReferences($dashboard_page['widgets'], $name, true);
 			}
 		}
+
+		return $this;
 	}
 }

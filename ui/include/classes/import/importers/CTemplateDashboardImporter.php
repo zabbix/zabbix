@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -39,8 +39,8 @@ class CTemplateDashboardImporter extends CDashboardImporterGeneral {
 
 			foreach ($dashboards as $name => $dashboard) {
 				foreach ($dashboard['pages'] as &$dashboard_page) {
-					$dashboard_page['widgets'] = $this->resolveDashboardWidgetReferences($dashboard_page['widgets'],
-						$name
+					$dashboard_page['widgets'] = $this->resolveWidgetReferences($dashboard_page['widgets'],
+						$name, false
 					);
 				}
 				unset($dashboard_page);
