@@ -74759,6 +74759,7 @@ DUK_LOCAL void duk__parse_switch_stmt(duk_compiler_ctx *comp_ctx, duk_ivalue *re
 			if (tok == DUK_TOK_CASE || tok == DUK_TOK_DEFAULT || tok == DUK_TOK_RCURLY) {
 				break;
 			}
+			num_stmts++;
 			duk__parse_stmt(comp_ctx, res, 0 /*allow_source_elem*/);
 		}
 
