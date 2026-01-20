@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -698,6 +698,7 @@ void	um_mock_config_destroy(void)
 	zbx_hashset_destroy(&config->gmacros);
 	zbx_hashset_destroy(&config->hmacros);
 	zbx_hashset_destroy(&config->strpool);
+	zbx_hashset_destroy(&config->um_hosts);
 
 	zbx_free(config);
 }

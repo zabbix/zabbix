@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -478,8 +478,10 @@ class testPageTriggers extends CLegacyWebTest {
 
 		$this->zbxTestLogin('zabbix.php?action=trigger.list&filter_set=1&filter_hostids[0]='.$this->hostid.'&context=host');
 		$form = $this->query('name:zbx_filter')->asForm()->one();
+		$table = $this->getTable();
 		$form->getField('Tags')->query('id:filter_tags_0_tag')->one()->fill('Tag1234');
 		$form->submit();
+		$table->waitUntilReloaded();
 		$this->page->waitUntilReady();
 		$this->assertTableDataColumn([], 'Name', $this->selector);
 
@@ -888,6 +890,7 @@ class testPageTriggers extends CLegacyWebTest {
 	public function testPageTriggers_FilterHostAndGroups($data) {
 		$this->page->login()->open('zabbix.php?action=trigger.list&filter_set=1&filter_hostids[0]=99062&context=host');
 		$form = $this->query('name:zbx_filter')->asForm()->one();
+		$table = $this->getTable();
 
 		// Trigger create button enabled and breadcrumbs exist.
 		$this->assertTrue($this->query('button:Create trigger')->one()->isEnabled());
@@ -899,6 +902,7 @@ class testPageTriggers extends CLegacyWebTest {
 
 		$form->fill($data['filter_options']);
 		$form->submit();
+		$table = $this->getTable();
 		$this->page->waitUntilReady();
 
 		// Trigger create button disabled and breadcrumbs not exist.

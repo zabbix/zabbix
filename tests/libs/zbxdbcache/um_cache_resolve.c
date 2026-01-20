@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -49,6 +49,8 @@ void	zbx_mock_test_entry(void **state)
 	zbx_vector_uint64_t	hostids;
 	int			ret;
 	zbx_config_vault_t	config_vault = {NULL, NULL, NULL, NULL, NULL, NULL, NULL};
+	double			um_cache_dup_sec = 0;
+	zbx_int64_t		um_cache_dup_size = 0;
 
 	ZBX_UNUSED(state);
 
@@ -65,7 +67,8 @@ void	zbx_mock_test_entry(void **state)
 
 	um_mock_cache_diff(&mock_cache0, &mock_cache, &gmacros, &hmacros, &htmpls);
 	cache = um_cache_create();
-	cache = um_cache_sync(cache, 0, &gmacros, &hmacros, &htmpls, &config_vault, get_program_type());
+	cache = um_cache_sync(cache, 0, &gmacros, &hmacros, &htmpls, &config_vault, &um_cache_dup_sec,
+			&um_cache_dup_size, get_program_type());
 
 	mock_dbsync_clear(&gmacros);
 	mock_dbsync_clear(&hmacros);
