@@ -1444,7 +1444,7 @@ static void	housekeeping_adjust_config(void)
 	for (int i = 0; i < ITEM_VALUE_TYPE_BIN; i++)
 	{
 		if (SUCCEED != ZBX_HISTORY_CHECK_TYPE_FLAGS(hk_flags, i))
-			*hk_history_rules[i].poption = ZBX_HK_MODE_DISABLED;
+			*hk_history_rules[i].poption_mode = ZBX_HK_MODE_DISABLED;
 	}
 }
 
