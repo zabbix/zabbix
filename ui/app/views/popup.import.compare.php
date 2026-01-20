@@ -63,7 +63,8 @@ else {
 								'message' => CImportHelper::missingObjectsToString($data['missing_objects'])."\n".
 									$data['missing_objects_warning_foot_note']
 							]],
-							$data['missing_objects_warning_title']
+							$data['missing_objects_warning_title'],
+							false
 						)
 						: null
 				)
