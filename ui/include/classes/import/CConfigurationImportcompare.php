@@ -208,7 +208,7 @@ class CConfigurationImportcompare {
 	 * @return array
 	 */
 	protected function getDashboardInnerEntityOptions(array $actions): array {
-		static $dashboards_options = $this->getOptions('dashboards');
+		$dashboards_options = $this->getOptions('dashboards');
 
 		$rule = $actions[0] === ['dashboards', 'updated'] ? 'updateExisting' : 'createMissing';
 
