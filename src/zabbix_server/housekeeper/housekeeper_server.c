@@ -88,9 +88,6 @@ typedef struct
 
 	/* a reference to housekeeping configuration enable value for this table */
 	int		*poption_mode;
-
-	/* a reference to the housekeeping configuration overwrite option for this table */
-	int		*poption_global;
 }
 zbx_hk_cleanup_table_t;
 
@@ -159,7 +156,7 @@ static int	tsdb_version = 0;
 static int	hk_period;
 
 static int	poption_mode_regular	= ZBX_HK_MODE_REGULAR;
-static int	poption_global_disabled	= ZBX_HK_OPTION_DISABLED;
+static int	poption_mode_disabled	= ZBX_HK_OPTION_DISABLED;
 
 /* global configuration data containing housekeeping configuration */
 static zbx_config_t	cfg;
@@ -168,16 +165,16 @@ static zbx_config_t	cfg;
 /* This mapping is used to exclude disabled tables from housekeeping  */
 /* cleanup procedure.                                                 */
 static zbx_hk_cleanup_table_t	hk_cleanup_tables[] = {
-	{"history",		&cfg.hk.history_mode,	&cfg.hk.history_global},
-	{"history_log",		&cfg.hk.history_mode,	&cfg.hk.history_global},
-	{"history_str",		&cfg.hk.history_mode,	&cfg.hk.history_global},
-	{"history_text",	&cfg.hk.history_mode,	&cfg.hk.history_global},
-	{"history_bin",		&cfg.hk.history_mode,	&cfg.hk.history_global},
-	{"history_uint",	&cfg.hk.history_mode,	&cfg.hk.history_global},
-	{"trends",		&cfg.hk.trends_mode,	&cfg.hk.trends_global},
-	{"trends_uint",		&cfg.hk.trends_mode,	&cfg.hk.trends_global},
+	{"history",		&cfg.hk.history_mode},
+	{"history_str",		&cfg.hk.history_mode},
+	{"history_log",		&cfg.hk.history_mode},
+	{"history_uint",	&cfg.hk.history_mode},
+	{"history_text",	&cfg.hk.history_mode},
+	{"history_bin",		&cfg.hk.history_mode},
+	{"trends",		&cfg.hk.trends_mode},
+	{"trends_uint",		&cfg.hk.trends_mode},
 	/* force events housekeeping mode on to perform problem cleanup when events housekeeping is disabled */
-	{"events",		&poption_mode_regular,	&poption_global_disabled},
+	{"events",		&poption_mode_regular},
 	{0}
 };
 
@@ -1429,22 +1426,34 @@ static int	get_housekeeping_period(double time_slept)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: adjust housekeeping rules based on history provider capabilities  *
- *                                                                            *
- * Parameters:  cfg   - [IN/OUT] configuration to adjust                      *
- *                                                                            *
- * Comments: Must be done after refreshing configuration seetings             *
- *           (zbx_config_get function)                                        *
+ * Purpose: disable housekeeping rules based on history provider capabilities *
  *                                                                            *
  ******************************************************************************/
-static void	housekeeping_adjust_config(void)
+static void	housekeeping_disable_unsupported_types(void)
 {
-	zbx_uint64_t	hk_flags = zbx_history_get_housekeep_flags();
+	zbx_uint64_t	hk_history = zbx_history_get_housekeep_flags();
 
 	for (int i = 0; i < ITEM_VALUE_TYPE_BIN; i++)
 	{
-		if (SUCCEED != ZBX_HISTORY_CHECK_TYPE_FLAGS(hk_flags, i))
-			*hk_history_rules[i].poption_mode = ZBX_HK_MODE_DISABLED;
+		if (SUCCEED != ZBX_HISTORY_CHECK_TYPE_FLAGS(hk_history, i))
+		{
+			hk_history_rules[i].poption_mode = &poption_mode_disabled;
+			hk_cleanup_tables[i].poption_mode = &poption_mode_disabled;
+		}
+	}
+
+	zbx_uint64_t	hk_trends = zbx_history_get_trends_flags();
+
+	if (SUCCEED != ZBX_HISTORY_CHECK_TYPE_FLAGS(hk_trends, ITEM_VALUE_TYPE_FLOAT))
+	{
+		hk_history_rules[HK_UPDATE_CACHE_OFFSET_TREND_FLOAT].poption_mode = &poption_mode_disabled;
+		hk_cleanup_tables[HK_UPDATE_CACHE_OFFSET_TREND_FLOAT].poption_mode = &poption_mode_disabled;
+	}
+
+	if (SUCCEED != ZBX_HISTORY_CHECK_TYPE_FLAGS(hk_trends, ITEM_VALUE_TYPE_UINT64))
+	{
+		hk_history_rules[HK_UPDATE_CACHE_OFFSET_TREND_UINT].poption_mode = &poption_mode_disabled;
+		hk_cleanup_tables[HK_UPDATE_CACHE_OFFSET_TREND_UINT].poption_mode = &poption_mode_disabled;
 	}
 }
 
@@ -1500,6 +1509,8 @@ ZBX_THREAD_ENTRY(housekeeper_thread, args)
 	}
 #endif
 
+	housekeeping_disable_unsupported_types();
+
 	while (ZBX_IS_RUNNING())
 	{
 		zbx_uint32_t	rtc_cmd;
@@ -1554,8 +1565,6 @@ ZBX_THREAD_ENTRY(housekeeper_thread, args)
 
 		zbx_config_get(&cfg, ZBX_CONFIG_FLAGS_HOUSEKEEPER | ZBX_CONFIG_FLAGS_DB_EXTENSION |
 				ZBX_CONFIG_FLAGS_DB_HISTORY_COMPRESION);
-
-		housekeeping_adjust_config();
 
 		if (0 == strcmp(cfg.db.extension, ZBX_DB_EXTENSION_TIMESCALEDB))
 		{
