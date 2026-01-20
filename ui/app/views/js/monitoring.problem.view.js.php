@@ -247,10 +247,6 @@
 			return document.getElementById('flickerfreescreen_problem');
 		},
 
-		getCurrentDebugBlock() {
-			return document.querySelector('.wrapper > .debug-output');
-		},
-
 		setLoading() {
 			this.getCurrentResultsTable().classList.add('is-loading', 'is-loading-fadein', 'delayed-15s');
 		},
@@ -267,8 +263,8 @@
 			this.initExpandables();
 		},
 
-		refreshDebug(debug) {
-			this.getCurrentDebugBlock().replaceWith(
+		_refreshDebug(debug) {
+			document.querySelector('.wrapper > .debug-output')?.replaceWith(
 				new DOMParser().parseFromString(debug, 'text/html').body.firstElementChild
 			);
 		},
@@ -345,7 +341,7 @@
 				addMessage(makeMessageBox('good', [], response.messages, true, false));
 			}
 
-			('debug' in response) && this.refreshDebug(response.debug);
+			('debug' in response) && this._refreshDebug(response.debug);
 		},
 
 		/**

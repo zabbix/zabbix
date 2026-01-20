@@ -246,7 +246,7 @@
 		},
 
 		_refreshDebug(debug) {
-			document.querySelector('.wrapper > .debug-output').replaceWith(
+			document.querySelector('.wrapper > .debug-output')?.replaceWith(
 				new DOMParser().parseFromString(debug, 'text/html').body.firstElementChild
 			);
 		},
@@ -342,7 +342,7 @@
 			}
 
 			if ('debug' in response) {
-				this_refreshDebug(response.debug);
+				this._refreshDebug(response.debug);
 			}
 
 			this.initExpandableSubfilter();

@@ -139,7 +139,7 @@
 		},
 
 		_refreshDebug(debug) {
-			document.querySelector('.wrapper > .debug-output').replaceWith(
+			document.querySelector('.wrapper > .debug-output')?.replaceWith(
 				new DOMParser().parseFromString(debug, 'text/html').body.firstElementChild
 			);
 		},
