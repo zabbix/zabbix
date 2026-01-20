@@ -323,6 +323,10 @@ int	zbx_trapper_preproc_test_run(const struct zbx_json_parse *jp_item, const str
 			{
 				src_json_check = result->value.data.str;
 			}
+			else if (ZBX_VARIANT_NONE == result->value.type)
+			{
+				break;
+			}
 			else
 			{
 				zabbix_log(LOG_LEVEL_CRIT, "unexpected result value type: %hhu for"
