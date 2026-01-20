@@ -559,15 +559,10 @@ class CConfigurationImport {
 			foreach ($dashboards as $dashboard) {
 				$template_dashboards_refs[$dashboard['uuid']]['name'] = $dashboard['name'];
 
-				if (!$dashboard['pages']) {
-					continue;
-				}
-
 				$this->gatherDashboardReferences($dashboard, $items_refs, $graphs_refs, $maps_refs,
 					$services_refs, $slas_refs, $users_refs, $actions_refs, $media_types_refs,
 					$host_groups_refs, $hosts_refs, $templates_refs
 				);
-
 			}
 		}
 
