@@ -363,9 +363,9 @@ void	dbconn_close(zbx_dbconn_t *db)
 #if defined(HAVE_POSTGRESQL)
 int	zbx_dbconn_parse_and_validate_dbhost(zbx_db_config_t *config, char **error)
 {
-	char		*start = NULL, *end = NULL, *dbhost_hosts = NULL, *tmp, *parsed_ip;
+	char		*start, *tmp, *result = NULL;
 	size_t		result_alloc = 0, result_offset = 0;
-	unsigned short	parsed_port, def_port = (0 != config->dbport ? (unsigned short)config->dbport : 5432);
+	unsigned short	def_port = (0 != config->dbport ? (unsigned short)config->dbport : 5432);
 
 	if (NULL == config->dbhost || '\0' == *config->dbhost)
 		return SUCCEED;
@@ -377,10 +377,11 @@ int	zbx_dbconn_parse_and_validate_dbhost(zbx_db_config_t *config, char **error)
 
 	for (start = tmp; '\0' != *start;)
 	{
+		char		*parsed_ip = NULL, *end;
+		unsigned short	parsed_port;
+
 		if (NULL != (end = strchr(start, ',')))
-		{
 			*end = '\0';
-		}
 
 		if ('\0' == *start ||
 			SUCCEED != zbx_parse_serveractive_element(start, &parsed_ip, &parsed_port, def_port))
@@ -389,7 +390,7 @@ int	zbx_dbconn_parse_and_validate_dbhost(zbx_db_config_t *config, char **error)
 					"invalid", config->dbhost, start);
 
 			zbx_free(tmp);
-			zbx_free(dbhost_hosts);
+			zbx_free(result);
 			zbx_free(config->dbports);
 
 			return FAIL;
@@ -400,10 +401,10 @@ int	zbx_dbconn_parse_and_validate_dbhost(zbx_db_config_t *config, char **error)
 		else
 			config->dbports = zbx_strdcatf(NULL, "%u", parsed_port);
 
-		if (NULL != dbhost_hosts)
-			zbx_strcpy_alloc(&dbhost_hosts, &result_alloc, &result_offset, ",");
+		if (NULL != result)
+			zbx_strcpy_alloc(&result, &result_alloc, &result_offset, ",");
 
-		zbx_strcpy_alloc(&dbhost_hosts, &result_alloc, &result_offset, parsed_ip);
+		zbx_strcpy_alloc(&result, &result_alloc, &result_offset, parsed_ip);
 
 		zbx_free(parsed_ip);
 
@@ -416,7 +417,7 @@ int	zbx_dbconn_parse_and_validate_dbhost(zbx_db_config_t *config, char **error)
 	zbx_free(tmp);
 
 	zbx_free(config->dbhost);
-	config->dbhost = dbhost_hosts;
+	config->dbhost = result;
 
 	return SUCCEED;
 }
