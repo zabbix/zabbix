@@ -70,7 +70,7 @@ typedef struct
 	int		min_clock;
 
 	/* a reference to the housekeeping configuration mode (enable) option for this table */
-	int		*poption_mode;
+	const int	*poption_mode;
 
 	/* a reference to the settings value specifying number of seconds the records must be kept */
 	int		*phistory;
@@ -87,7 +87,7 @@ typedef struct
 	const char	*name;
 
 	/* a reference to housekeeping configuration enable value for this table */
-	int		*poption_mode;
+	const int	*poption_mode;
 }
 zbx_hk_cleanup_table_t;
 
@@ -128,13 +128,13 @@ typedef struct
 	const char				*history;
 
 	/* a reference to the housekeeping configuration mode (enable) option for this table */
-	int					*poption_mode;
+	const int				*poption_mode;
 
 	/* a reference to the housekeeping configuration overwrite option for this table */
-	int					*poption_global;
+	const int				*poption_global;
 
 	/* a reference to the housekeeping configuration history value for this table */
-	int					*poption;
+	const int				*poption;
 
 	/* type for checking which values are sent to the history storage */
 	unsigned char				type;
