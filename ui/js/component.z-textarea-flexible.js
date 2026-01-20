@@ -47,40 +47,6 @@ class ZTextareaFlexible extends HTMLElement {
 		this.#textarea = document.createElement('textarea');
 	}
 
-	connectedCallback() {
-		this.appendChild(this.#textarea);
-
-		this.#textarea.name = this.getAttribute('name');
-		this.#textarea.value = this.getAttribute('value');
-		this.#textarea.placeholder = this.getAttribute('placeholder');
-		this.#textarea.disabled = this.hasAttribute('disabled');
-		this.#textarea.readOnly = this.hasAttribute('readonly');
-		this.#textarea.spellcheck = this.getAttribute('spellcheck') !== 'false';
-		this.#textarea.autofocus = this.hasAttribute('autofocus');
-
-		this.#singleline = this.hasAttribute('singleline');
-
-		const maxlength = parseInt(this.getAttribute('maxlength'));
-		if (Number.isFinite(maxlength) && maxlength >= 0) {
-			this.#textarea.maxLength = maxlength;
-		}
-		else {
-			this.#textarea.removeAttribute('maxlength');
-		}
-
-		this.#initVisibilityWatch();
-		this.#registerEvents();
-		this.#update();
-	}
-
-	disconnectedCallback() {
-		this.#unregisterEvents();
-		if (this.#resize_observer !== null) {
-			this.#resize_observer.disconnect();
-			this.#resize_observer = null;
-		}
-	}
-
 	static get observedAttributes() {
 		return [
 			'autofocus',
@@ -94,25 +60,55 @@ class ZTextareaFlexible extends HTMLElement {
 		];
 	}
 
-	attributeChangedCallback(name, old_value, new_value) {
-		if (old_value === new_value) {
-			return;
+	connectedCallback() {
+		if (!this.contains(this.#textarea)) {
+			this.appendChild(this.#textarea);
 		}
 
+		this.#applyAttributes();
+		this.#syncAria();
+		this.#registerEvents();
+
+		this.#resize_observer = new ResizeObserver(() => this.#updateHeight());
+		this.#resize_observer.observe(this);
+
+		requestAnimationFrame(() => this.#updateHeight());
+	}
+
+	disconnectedCallback() {
+		this.#resize_observer?.disconnect();
+		this.#resize_observer = null;
+
+		this.#unregisterEvents();
+	}
+
+	attributeChangedCallback(name, old_value, new_value) {
+		if (old_value !== new_value) {
+			this.#applyAttribute(name, new_value);
+		}
+	}
+
+	#applyAttributes() {
+		for (const attr of this.constructor.observedAttributes) {
+			this.#applyAttribute(attr, this.getAttribute(attr));
+		}
+	}
+
+	#applyAttribute(name, value) {
 		switch (name) {
 			case 'autofocus':
-				this.#textarea.autofocus = new_value !== null;
+				this.#textarea.autofocus = value !== null;
 				break;
 
 			case 'disabled':
-				this.#textarea.disabled = new_value !== null;
+				this.#textarea.disabled = value !== null;
 				break;
 
 			case 'maxlength':
-				const maxlength = parseInt(new_value);
+				const max_length = parseInt(value);
 
-				if (Number.isFinite(maxlength) && maxlength >= 0) {
-					this.#textarea.maxLength = maxlength;
+				if (Number.isFinite(max_length) && max_length >= 0) {
+					this.#textarea.maxLength = max_length;
 				}
 				else {
 					this.#textarea.removeAttribute('maxlength');
@@ -120,32 +116,31 @@ class ZTextareaFlexible extends HTMLElement {
 				break;
 
 			case 'placeholder':
-				this.#textarea.placeholder = new_value;
-				this.#update();
+				this.#textarea.placeholder = value;
 				break;
 
 			case 'readonly':
-				this.#textarea.readOnly = new_value !== null;
+				this.#textarea.readOnly = value !== null;
 				break;
 
 			case 'singleline':
-				this.#singleline = new_value !== null;
-				this.#update();
+				this.#singleline = value !== null;
+				this.#updateHeight();
 				break;
 
 			case 'spellcheck':
-				this.#textarea.spellcheck = new_value !== 'false';
+				this.#textarea.spellcheck = value !== 'false';
 				break;
 
 			case 'value':
 				const normalized = this.#singleline
-					? (new_value ?? '').replace(/[\r\n\t]+/g, ' ')
-					: new_value ?? '';
+					? (value ?? '').replace(/[\r\n\t]+/g, ' ')
+					: value ?? '';
 
 				this.#textarea.value = normalized;
 				this.#internals.setFormValue(normalized);
 
-				this.#update();
+				this.#updateHeight();
 				break;
 
 			default:
@@ -153,18 +148,33 @@ class ZTextareaFlexible extends HTMLElement {
 		}
 	}
 
+	#syncAria() {
+		for (const aria_attr of this.getAttributeNames().filter(attr => attr.startsWith('aria-'))) {
+			this.#textarea.setAttribute(aria_attr, this.getAttribute(aria_attr));
+		}
+	}
+
+	#updateHeight() {
+		this.#textarea.style.height = '0';
+		this.#textarea.style.height = `${this.#textarea.scrollHeight}px`;
+	}
+
 	#registerEvents() {
-		this.#textarea.addEventListener('keydown', this.#keydownHandler);
-		this.#textarea.addEventListener('blur', this.#blurHandler);
-		this.#textarea.addEventListener('focus', this.#focusHandler);
 		this.#textarea.addEventListener('input', this.#inputHandler);
+		this.#textarea.addEventListener('keydown', this.#keydownHandler);
+		this.#textarea.addEventListener('blur', this.#reemit);
+		this.#textarea.addEventListener('focus', this.#reemit);
 	}
 
 	#unregisterEvents() {
-		this.#textarea.removeEventListener('keydown', this.#keydownHandler);
-		this.#textarea.removeEventListener('blur', this.#blurHandler);
-		this.#textarea.removeEventListener('focus', this.#focusHandler);
 		this.#textarea.removeEventListener('input', this.#inputHandler);
+		this.#textarea.removeEventListener('keydown', this.#keydownHandler);
+		this.#textarea.removeEventListener('blur', this.#reemit);
+		this.#textarea.removeEventListener('focus', this.#reemit);
+	}
+
+	#inputHandler = (e) => {
+		this.value = e.target.value;
 	}
 
 	#keydownHandler = (e) => {
@@ -174,41 +184,8 @@ class ZTextareaFlexible extends HTMLElement {
 		}
 	}
 
-	#blurHandler = () => {
-		this.#update();
-		this.dispatchEvent(new Event('blur', { bubbles: true }));
-	}
-
-	#focusHandler = () => {
-		this.dispatchEvent(new Event('focus', { bubbles: true }));
-	}
-
-	#inputHandler = (e) => {
-		this.value = e.target.value;
-		this.dispatchEvent(new Event('input', { bubbles: true }));
-	}
-
-	#update() {
-		this.#textarea.style.height = '0';
-		this.#textarea.style.height = `${this.#textarea.scrollHeight}px`;
-	}
-
-	#initVisibilityWatch() {
-		if (this.#resize_observer === null){
-			this.#resize_observer = new ResizeObserver(entries => {
-				for (const entry of entries) {
-					if (entry.contentRect.width > 0) {
-						requestAnimationFrame(() => this.#update());
-
-						this.#resize_observer.disconnect();
-						this.#resize_observer = null;
-						break;
-					}
-				}
-			});
-
-			this.#resize_observer.observe(this);
-		}
+	#reemit = (e) => {
+		this.dispatchEvent(new Event(e.type, { bubbles: true }));
 	}
 
 	get autofocus() {
