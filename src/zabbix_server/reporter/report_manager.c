@@ -1548,7 +1548,8 @@ static int	rm_writer_process_job(zbx_rm_writer_t *writer, zbx_rm_job_t *job, cha
 			if (0 != recipients.values_num)
 			{
 				size = report_serialize_send_report(&data, &mt, &recipients, job->reportid,
-						1 == job->is_test_report ? ALERT_MESSAGE_TEST : ALERT_MESSAGE_REPORT);
+						0 == job->is_test_report ?
+						ZBX_ALERT_MESSAGE_REPORT : ZBX_ALERT_MESSAGE_TEST);
 
 				ret = zbx_ipc_client_send(writer->client, ZBX_IPC_REPORTER_SEND_REPORT, data, size);
 				zbx_free(data);

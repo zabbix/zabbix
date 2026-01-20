@@ -1227,7 +1227,7 @@ static void	am_queue_watchdog_alerts(zbx_am_t *manager, const zbx_db_config_t *d
 
 		alert_params = am_substitute_mediatype_params(media->mediatype_params, alert_subject, alert_message);
 
-		alert = am_create_alert(0, media->mediatypeid, 0, 0, 0, 0, 0, ALERT_MESSAGE_WATCHDOG, media->sendto,
+		alert = am_create_alert(0, media->mediatypeid, 0, 0, 0, 0, 0, ZBX_ALERT_MESSAGE_WATCHDOG, media->sendto,
 			alert_subject, shared_str_new(alert_message), alert_params, mediatype->message_format, 0, 0, 0);
 
 		alertpool = am_get_alertpool(manager, alert->mediatypeid, alert->alertpoolid);

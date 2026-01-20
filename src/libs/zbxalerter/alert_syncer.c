@@ -185,7 +185,7 @@ static int	am_db_get_alerts(zbx_vector_am_db_alert_ptr_t *alerts)
 		ZBX_STR2UINT64(objectid, row[9]);
 
 		alert = am_db_create_alert(alertid, mediatypeid, source, object, objectid, eventid, p_eventid, actionid,
-			min_alertid, ALERT_MESSAGE_EVENT, row[2], row[3], row[4], row[10], status, attempts);
+			min_alertid, ZBX_ALERT_MESSAGE_EVENT, row[2], row[3], row[4], row[10], status, attempts);
 
 		zbx_vector_am_db_alert_ptr_append(alerts, alert);
 

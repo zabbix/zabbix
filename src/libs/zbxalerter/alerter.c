@@ -134,7 +134,7 @@ static char	*create_email_messageid(zbx_uint64_t mediatypeid, const char *sendto
 
 	switch (message_type)
 	{
-		case ALERT_MESSAGE_EVENT:
+		case ZBX_ALERT_MESSAGE_EVENT:
 			if (0 == alertid)
 			{
 				zbx_snprintf_alloc(&str, &str_alloc, &str_offset,
@@ -152,7 +152,7 @@ static char	*create_email_messageid(zbx_uint64_t mediatypeid, const char *sendto
 						sendto_hash, mediatypeid, zbx_dc_get_instanceid());
 			}
 			break;
-		case ALERT_MESSAGE_REPORT:
+		case ZBX_ALERT_MESSAGE_REPORT:
 			zbx_get_time(&tm, &ms, NULL);
 
 			zbx_snprintf_alloc(&str, &str_alloc, &str_offset,
@@ -196,14 +196,14 @@ static char	*create_email_inreplyto(zbx_uint64_t mediatypeid, const char *sendto
 
 	switch (message_type)
 	{
-		case ALERT_MESSAGE_EVENT:
+		case ZBX_ALERT_MESSAGE_EVENT:
 			zbx_snprintf_alloc(&str, &str_alloc, &str_offset,
 					"<" ZBX_FS_UI64 "-" ZBX_FS_UI64
 					".%s." ZBX_FS_UI64 ".%s@zabbix-events>",
 					eventid, actionid,
 					sendto_hash, mediatypeid, zbx_dc_get_instanceid());
 			break;
-		case ALERT_MESSAGE_REPORT:
+		case ZBX_ALERT_MESSAGE_REPORT:
 			zbx_snprintf_alloc(&str, &str_alloc, &str_offset,
 					"<" ZBX_FS_UI64
 					".%s." ZBX_FS_UI64 ".%s@zabbix-reports>",
