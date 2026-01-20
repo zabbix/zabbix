@@ -33,8 +33,6 @@ window.popup_import_compare = new class {
 	#form;
 
 	init() {
-console.log(overlays_stack.stack);
-
 		this.#overlay = overlays_stack.getById('popup_import_compare');
 		this.#form = this.#overlay.$dialogue.$body[0].querySelector('form');
 
