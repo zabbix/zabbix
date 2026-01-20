@@ -88,7 +88,8 @@
 		},
 
 		reloadPartialAndTabCounters() {
-			this._refreshResults();
+			this.refresh_url = new Curl('');
+
 			this.unscheduleRefresh();
 			this.refresh();
 
@@ -141,40 +142,6 @@
 			document.querySelector('.wrapper > .debug-output').replaceWith(
 				new DOMParser().parseFromString(debug, 'text/html').body.firstElementChild
 			);
-		},
-
-		_refreshResults() {
-			const url = new Curl();
-			const refresh_url = new Curl('zabbix.php');
-			const data = Object.assign({}, this.filter_defaults, this.global_timerange, url.getArgumentsObject());
-
-			// Modify filter data.
-			data.inventory = data.inventory
-				? data.inventory.filter(inventory => 'value' in inventory && inventory.value !== '')
-				: data.inventory;
-			data.tags = data.tags
-				? data.tags.filter(tag => !(tag.tag === '' && tag.value === ''))
-				: data.tags;
-			data.severities = data.severities
-				? data.severities.filter((value, key) => value == key)
-				: data.severities;
-			data.page = this.refresh_url.getArgument('page') ?? 1;
-
-			if (!data.filter_custom_time) {
-				data.from = this.global_timerange.from;
-				data.to = this.global_timerange.to;
-			}
-
-			Object.entries(data).forEach(([key, value]) => {
-				if (['filter_show_counter', 'filter_custom_time', 'action'].indexOf(key) !== -1) {
-					return;
-				}
-
-				refresh_url.setArgument(key, value);
-			});
-
-			refresh_url.setArgument('action', 'host.view.refresh');
-			this.refresh_url = refresh_url;
 		},
 
 		refresh() {
@@ -272,7 +239,6 @@
 			if (this.refresh_interval > 0) {
 				this.timeout = setTimeout((function () {
 					this.timeout = null;
-					this._refreshResults();
 					this.refresh();
 				}).bind(this), this.refresh_interval);
 			}
