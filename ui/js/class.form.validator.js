@@ -502,13 +502,14 @@ class CFormValidator {
 			.then(response => response.json())
 			.then(response => {
 				if ('error' in response) {
-					throw {error: response.error};
+					console.error('validate.api.exists error', response.error);
+					throw new Error();
 				}
 
 				return response;
 			})
 			.catch(() => {
-				return { result: false };
+				return {result: false};
 			});
 	}
 
