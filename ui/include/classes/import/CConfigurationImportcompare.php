@@ -150,7 +150,7 @@ class CConfigurationImportcompare {
 									static function(array $widget): string {
 										return ($widget['x'] ?? '0').'_'.($widget['y'] ?? '0');
 									}
-								],
+								]
 							]
 						]
 					]
