@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -19,223 +19,334 @@
  */
 class CConfigurationImportcompare {
 	/**
-	 * @var array
+	 * @var array  Options for creating, updating or deleting entities.
 	 */
-	protected $options;
+	protected array $options;
 
 	/**
-	 * @var array  shows which elements in import array tree contains uuid
+	 * @var array  Structure and uniqueness rules of the importable entities.
 	 */
-	protected $uuid_structure;
-
-	/**
-	 * @var array  contains unique fields path for import entities
-	 */
-	protected $unique_fields_keys_by_type;
+	protected array $rules;
 
 	/**
 	 * CConfigurationImportcompare constructor.
 	 *
-	 * @param array $options  import options "createMissing", "updateExisting" and "deleteMissing"
+	 * @param array $options
 	 */
 	public function __construct(array $options) {
-		$this->uuid_structure = [
-			'template_groups' => [],
-			'host_groups' => [],
-			'templates' => [
-				'items' => [
-					'triggers' => []
-				],
-				'discovery_rules' => [
-					'item_prototypes' => [
-						'trigger_prototypes' => []
-					],
-					'trigger_prototypes' => [],
-					'graph_prototypes' => [],
-					'host_prototypes' => []
-				],
-				'dashboards' => [],
-				'httptests' => [],
-				'valuemaps' => []
+		$this->options = $options;
+
+		$this->rules = [
+			'template_groups' => [
+				'options' => $this->getOptions('template_groups'),
+				'uuid' => true,
+				'unique' => ['name']
 			],
-			'triggers' => [],
-			'graphs' => [],
+			'host_groups' => [
+				'options' => $this->getOptions('host_groups'),
+				'uuid' => true,
+				'unique' => ['name']
+			],
+			'templates' => [
+				'options' => $this->getOptions('templates'),
+				'uuid' => true,
+				'unique' => ['template'],
+				'rules' => [
+					'items' => [
+						'options' => $this->getOptions('items'),
+						'uuid' => true,
+						'unique' => ['name', 'key'],
+						'rules' => [
+							'triggers' => [
+								'options' => $this->getOptions('triggers'),
+								'uuid' => true,
+								'unique' => ['name', 'expression', 'recovery_expression']
+							]
+						]
+					],
+					'discovery_rules' => [
+						'options' => $this->getOptions('discoveryRules'),
+						'uuid' => true,
+						'unique' => ['name', 'key'],
+						'rules' => [
+							'item_prototypes' => [
+								'options' => $this->getOptions('discoveryRules'),
+								'uuid' => true,
+								'unique' => ['name', 'key'],
+								'rules' => [
+									'trigger_prototypes' => [
+										'options' => $this->getOptions('discoveryRules'),
+										'uuid' => true,
+										'unique' => ['name', 'expression', 'recovery_expression']
+									]
+								]
+							],
+							'trigger_prototypes' => [
+								'options' => $this->getOptions('discoveryRules'),
+								'uuid' => true,
+								'unique' => ['name', 'expression', 'recovery_expression']
+							],
+							'graph_prototypes' => [
+								'options' => $this->getOptions('discoveryRules'),
+								'uuid' => true,
+								'unique' => ['name', 'graph_items' => [['item' => ['host']]]]
+							],
+							'host_prototypes' => [
+								'options' => $this->getOptions('discoveryRules'),
+								'uuid' => true,
+								'unique' => ['host']
+							]
+						]
+					],
+					'dashboards' => [
+						'options' => $this->getOptions('templateDashboards'),
+						'uuid' => true,
+						'unique' => ['name']
+					],
+					'httptests' => [
+						'options' => $this->getOptions('httptests'),
+						'uuid' => true,
+						'unique' => ['name']
+					],
+					'valuemaps' => [
+						'options' => $this->getOptions('valueMaps'),
+						'uuid' => true,
+						'unique' => ['name']
+					]
+				]
+			],
+			'triggers' => [
+				'options' => $this->getOptions('triggers'),
+				'uuid' => true,
+				'unique' => ['name', 'expression', 'recovery_expression']
+			],
+			'graphs' => [
+				'options' => $this->getOptions('graphs'),
+				'uuid' => true,
+				'unique' => ['name', 'graph_items' => [['item' => ['host']]]]
+			],
 			'dashboards' => [
-				'pages' => [
-					'widgets' => []
+				'options' => $this->getOptions('dashboards'),
+				'uuid' => false,
+				'unique' => ['name'],
+				'rules' => [
+					'pages' => [
+						'options' => function (array $actions): array {
+							return $this->getDashboardInnerEntityOptions($actions);
+						},
+						'uuid' => false,
+						'unique' => [
+							static function(array $page, int $page_index): string {
+								return (string) $page_index;
+							}
+						],
+						'rules' => [
+							'widgets' => [
+								'options' => function (array $actions): array {
+									return $this->getDashboardInnerEntityOptions($actions);
+								},
+								'uuid' => false,
+								'unique' => [
+									static function(array $widget): string {
+										return ($widget['x'] ?? '0').'_'.($widget['y'] ?? '0');
+									}
+								],
+							]
+						]
+					]
 				]
 			]
 		];
-
-		$this->unique_fields_keys_by_type = [
-			'template_groups' => ['name'],
-			'host_groups' => ['name'],
-			'templates' => ['template'],
-			'items' => ['name', 'key'],
-			'triggers' => ['name', 'expression', 'recovery_expression'],
-			'dashboards' => ['name'],
-			'httptests' => ['name'],
-			'valuemaps' => ['name'],
-			'discovery_rules' => ['name', 'key'],
-			'item_prototypes' => ['name', 'key'],
-			'trigger_prototypes' => ['name', 'expression', 'recovery_expression'],
-			'graph_prototypes' => ['name', ['graph_items' => ['numeric_keys' => ['item' => 'host']]]],
-			'host_prototypes' => ['host'],
-			'graphs' => ['name', ['graph_items' => ['numeric_keys' => ['item' => 'host']]]],
-			'pages' => ['_index'],
-			'widgets' => ['_index']
-		];
-
-		$this->options = $options;
 	}
 
 	/**
-	 * Performs comparison of import and export arrays and returns combined array that shows what was changed.
+	 * Perform a comparison of the export and import data and return the difference.
 	 *
-	 * @param array $export  data exported from current system
-	 * @param array $import  data from import file
+	 * @param array $export  Current data.
+	 * @param array $import  New data.
 	 *
 	 * @return array
 	 */
 	public function importcompare(array $export, array $import): array {
-		// Leave only template related keys.
-		$export = array_intersect_key($export, $this->uuid_structure);
-		$import = array_intersect_key($import, $this->uuid_structure);
+		// Leave only the supported entities.
+		$export = array_intersect_key($export, $this->rules);
+		$import = array_intersect_key($import, $this->rules);
 
-		return $this->compareByStructure($this->uuid_structure, $export, $import, $this->options);
-	}
+		$result = $this->compareByRules($this->rules, $export, $import);
 
-	/**
-	 * Create separate comparison for each structured object.
-	 * Warning: Recursion.
-	 *
-	 * @param array $structure
-	 * @param array $before
-	 * @param array $after
-	 * @param array $options
-	 *
-	 * @return array
-	 */
-	protected function compareByStructure(array $structure, array $before, array $after, array $options,
-			?string $parent_key = null): array {
-		$result = [];
-
-		foreach ($structure as $key => $sub_structure) {
-			if ((!array_key_exists($key, $before) || !$before[$key])
-				&& (!array_key_exists($key, $after) || !$after[$key])) {
-				continue;
-			}
-
-			// Make sure, $key exists in both arrays.
-			$before += [$key => []];
-			$after += [$key => []];
-
-			$diff = $this->compareArrayByUniqueness($before[$key], $after[$key], $key);
-
-			if (array_key_exists('added', $diff)) {
-				foreach ($diff['added'] as &$entity) {
-					$entity = $this->compareByStructure($sub_structure, [], $entity, $options, $key);
-				}
-				unset($entity);
-			}
-
-			if (array_key_exists('removed', $diff)) {
-				foreach ($diff['removed'] as &$entity) {
-					$entity = $this->compareByStructure($sub_structure, $entity, [], $options, $key);
-				}
-				unset($entity);
-			}
-
-			if ($sub_structure && array_key_exists('updated', $diff)) {
-				foreach ($diff['updated'] as &$entity) {
-					$entity = $this->compareByStructure($sub_structure, $entity['before'], $entity['after'],
-						$options, $key
-					);
-				}
-				unset($entity);
-			}
-
-			$diff = $this->applyOptions($options, $key, $diff, $parent_key);
-
-			unset($before[$key], $after[$key]);
-
-			if ($diff) {
-				$result[$key] = $diff;
-			}
-		}
-
-		$object = [];
-
-		if ($before) {
-			$object['before'] = $before;
-		}
-
-		if ($after) {
-			$object['after'] = $after;
-		}
-
-		if ($object) {
-			// Insert 'before' and/or 'after' at the beginning of array.
-			$result = array_merge($object, $result);
-		}
+		unset($result['before'], $result['after']);
 
 		return $result;
 	}
 
 	/**
-	 * Compare two entities and separate all their keys into added/removed/updated.
-	 * First entities gets compared by uuid then by its unique field values.
+	 * Get import options for the specified entity group (like templates, dashboards, etc.)
 	 *
-	 * @param array  $before
-	 * @param array  $after
-	 * @param string $type
+	 * @param string $entity_group
 	 *
 	 * @return array
 	 */
-	protected function compareArrayByUniqueness(array $before, array $after, string $type): array {
-		if (!$before && !$after) {
-			return [];
+	protected function getOptions(string $entity_group): array {
+		return [
+			'updateExisting' => array_key_exists($entity_group, $this->options)
+				&& array_key_exists('updateExisting', $this->options[$entity_group])
+				&& $this->options[$entity_group]['updateExisting'],
+			'createMissing' => array_key_exists($entity_group, $this->options)
+				&& array_key_exists('createMissing', $this->options[$entity_group])
+				&& $this->options[$entity_group]['createMissing'],
+			'deleteMissing' => array_key_exists($entity_group, $this->options)
+				&& array_key_exists('deleteMissing', $this->options[$entity_group])
+				&& $this->options[$entity_group]['deleteMissing']
+		];
+	}
+
+	/**
+	 * Get import options for pages and widgets of the global dashboards.
+	 *
+	 * @param array  $actions
+	 *
+	 * @return array
+	 */
+	protected function getDashboardInnerEntityOptions(array $actions): array {
+		static $dashboards_options = $this->getOptions('dashboards');
+
+		$rule = $actions[0] === ['dashboards', 'updated'] ? 'updateExisting' : 'createMissing';
+
+		return 	[
+			'updateExisting' => $dashboards_options[$rule],
+			'createMissing' => $dashboards_options[$rule],
+			'deleteMissing' => $dashboards_options[$rule]
+		];
+	}
+
+	/**
+	 * Recursively compare entities by rules.
+	 *
+	 * @param array $rules
+	 * @param array $before
+	 * @param array $after
+	 * @param array $actions
+	 *
+	 * @return array
+	 */
+	protected function compareByRules(array $rules, array $before, array $after, array $actions = []): array {
+		$result = [];
+
+		foreach ($rules as $entity_group => $rule) {
+			$before += [$entity_group => []];
+			$after += [$entity_group => []];
+
+			if (!$before[$entity_group] && !$after[$entity_group]) {
+				continue;
+			}
+
+			$diff = $this->compareByUniqueness($before[$entity_group], $after[$entity_group], $rule['uuid'],
+				$rule['unique']
+			);
+
+			if (array_key_exists('added', $diff)) {
+				$_actions = [...$actions, [$entity_group, 'added']];
+
+				foreach ($diff['added'] as &$entity) {
+					$entity = $this->compareByRules($rule['rules'] ?? [], [], $entity, $_actions);
+				}
+				unset($entity);
+			}
+
+			if (array_key_exists('removed', $diff)) {
+				$_actions = [...$actions, [$entity_group, 'removed']];
+
+				foreach ($diff['removed'] as &$entity) {
+					$entity = $this->compareByRules($rule['rules'] ?? [], $entity, [], $_actions);
+				}
+				unset($entity);
+			}
+
+			if (array_key_exists('updated', $diff) && array_key_exists('rules', $rule)) {
+				$_actions = [...$actions, [$entity_group, 'updated']];
+
+				foreach ($diff['updated'] as &$entity) {
+					$entity = $this->compareByRules($rule['rules'], $entity['before'], $entity['after'], $_actions);
+				}
+				unset($entity);
+			}
+
+			$options = $rule['options'] instanceof Closure ? $rule['options']($actions) : $rule['options'];
+
+			$diff = $this->applyOptions($entity_group, $options, $diff);
+
+			unset($before[$entity_group], $after[$entity_group]);
+
+			if ($diff) {
+				$result[$entity_group] = $diff;
+			}
 		}
 
+		$object = [];
+
+		$parent_action = $actions ? end($actions)[1] : null;
+
+		if ($parent_action === 'removed' || $parent_action === 'updated') {
+			$object['before'] = $before;
+		}
+
+		if ($parent_action === 'added' || $parent_action === 'updated') {
+			$object['after'] = $after;
+		}
+
+		return $object + $result;
+	}
+
+	/**
+	 * Compare two arrays by UUID or uniqueness criteria.
+	 *
+	 * @param array $before
+	 * @param array $after
+	 * @param bool  $has_uuid
+	 * @param array $unique    Specification of the entity unique data.
+	 *
+	 * @return array
+	 */
+	protected function compareByUniqueness(array $before, array $after, bool $has_uuid, array $unique): array {
 		$diff = [
 			'added' => [],
 			'removed' => [],
 			'updated' => []
 		];
 
-		$before = $this->addUniquenessParameterByEntityType($before, $type);
-		$after = $this->addUniquenessParameterByEntityType($after, $type);
+		$before = $this->addUniqueIds($before, $unique);
+		$after = $this->addUniqueIds($after, $unique);
 
 		$same_entities = [];
-		$uniq_key = $this->getUniquenessKey($type);
-
 		foreach ($after as $a_key => $after_entity) {
-			if (!array_key_exists($uniq_key, $after_entity)) {
-				unset($after[$a_key]);
-				continue;
-			}
+			if ($has_uuid) {
+				foreach ($before as $b_key => $before_entity) {
+					if ($before_entity['uuid'] === $after_entity['uuid']) {
+						unset($before_entity['_unique_id'], $after_entity['_unique_id']);
 
-			foreach ($before as $b_key => $before_entity) {
-				if (array_key_exists($uniq_key, $before_entity) && $before_entity[$uniq_key] === $after_entity[$uniq_key]) {
-					unset($before_entity['uniqueness'], $after_entity['uniqueness']);
+						$same_entities[$b_key]['before'] = $before_entity;
+						$same_entities[$b_key]['after'] = $after_entity;
 
-					$same_entities[$b_key]['before'] = $before_entity;
-					$same_entities[$b_key]['after'] = $after_entity;
+						unset($before[$b_key], $after[$a_key]);
 
-					unset($before[$b_key], $after[$a_key]);
-					continue 2;
+						continue 2;
+					}
 				}
 			}
 
 			foreach ($before as $b_key => $before_entity) {
-				if ($before_entity['uniqueness'] === $after_entity['uniqueness']) {
-					unset($before_entity['uniqueness'], $after_entity['uniqueness']);
-					$before_entity[$uniq_key] = $after_entity[$uniq_key];
+				if ($before_entity['_unique_id'] === $after_entity['_unique_id']) {
+					if ($has_uuid) {
+						$before_entity['uuid'] = $after_entity['uuid'];
+
+						unset($before_entity['_unique_id'], $after_entity['_unique_id']);
+					}
 
 					$same_entities[$b_key]['before'] = $before_entity;
 					$same_entities[$b_key]['after'] = $after_entity;
 
 					unset($before[$b_key], $after[$a_key]);
+
 					break;
 				}
 			}
@@ -245,21 +356,19 @@ class CConfigurationImportcompare {
 		$added_entities = $after;
 
 		foreach ($added_entities as $entity) {
-			unset($entity['uniqueness']);
+			unset($entity['_unique_id']);
 
 			$diff['added'][] = $entity;
 		}
 
 		foreach ($removed_entities as $entity) {
-			unset($entity['uniqueness']);
+			unset($entity['_unique_id']);
 
 			$diff['removed'][] = $entity;
 		}
 
 		foreach ($same_entities as $entity) {
-			$uuid = [$uniq_key => null];
-
-			if (array_diff_key($entity['before'], $uuid) != array_diff_key($entity['after'], $uuid)) {
+			if ($entity['before'] != $entity['after']) {
 				$diff['updated'][] = [
 					'before' => $entity['before'],
 					'after' => $entity['after']
@@ -276,18 +385,23 @@ class CConfigurationImportcompare {
 		return $diff;
 	}
 
-	private function addUniquenessParameterByEntityType(array $entities, string $type): array {
-		foreach ($entities as &$entity) {
-			foreach ($this->unique_fields_keys_by_type[$type] as $unique_field_key) {
-				$unique_values = $this->getUniqueValuesByFieldPath($entity, $unique_field_key);
+	/**
+	 * Calculate and add unique ID strings to the entities.
+	 *
+	 * @param array $entities
+	 * @param array $unique    Specification of the entity unique data.
+	 *
+	 * @return array
+	 */
+	private function addUniqueIds(array $entities, array $unique): array {
+		foreach ($entities as $entity_key => &$entity) {
+			$entity['_unique_id'] = $this->getUniqueData($entity, $unique, $entity_key);
 
-				$entity['uniqueness'][] = $unique_values;
-			}
-			// To make unique entity string, get result values, get rid of value duplicates and sort them.
-			$entity['uniqueness'] = array_unique($this->flatten($entity['uniqueness']));
-			sort($entity['uniqueness']);
+			// To make a unique entity a string, get result values, get rid of value duplicates and sort them.
+			$entity['_unique_id'] = array_unique($this->flatten($entity['_unique_id']));
+			sort($entity['_unique_id']);
 
-			$entity['uniqueness'] = implode('/', $entity['uniqueness']);
+			$entity['_unique_id'] = implode('/', $entity['_unique_id']);
 		}
 		unset($entity);
 
@@ -295,41 +409,33 @@ class CConfigurationImportcompare {
 	}
 
 	/**
-	 * Get entity field values by giving field key path constructed.
+	 * Get unique data of the entity.
 	 *
-	 * @param array        $entity    Entity.
-	 * @param string|array $field_key Field key or field key path given.
+	 * @param array $entity
+	 * @param array $unique      Specification of the entity unique data.
+	 * @param mixed $entity_key
+	 *
+	 * @return array
 	 */
-	private function getUniqueValuesByFieldPath(array $entity, $field_key_path) {
-		if (is_array($field_key_path)) {
-			foreach ($field_key_path as $sub_key => $sub_field) {
-				if ($sub_key !== 'numeric_keys') {
-					$sub_entities = $entity[$sub_key];
+	private function getUniqueData(array $entity, array $unique, mixed $entity_key): array {
+		$result = [];
+
+		foreach ($unique as $unique_key => $unique_value) {
+			if (is_array($unique_value)) {
+				if (is_int($unique_key)) {
+					foreach ($entity as $sub_entity_key => $sub_entity) {
+						$result[] = $this->getUniqueData($sub_entity, $unique_value, $sub_entity_key);
+					}
 				}
 				else {
-					if (is_array($sub_field)) {
-						foreach ($sub_field as $key => $field) {
-							foreach ($entity as $sub_entity) {
-								$sub_entities[] = $sub_entity[$key];
-							}
-
-							$sub_field = $field;
-						}
-					}
-					else {
-						$sub_entities = $entity;
-					}
+					$result[] = $this->getUniqueData($entity[$unique_key], $unique_value, $unique_key);
 				}
-
-				$result = $this->getUniqueValuesByFieldPath($sub_entities, $sub_field);
 			}
-		}
-		else {
-			if (array_key_exists($field_key_path, $entity)){
-				$result = $entity[$field_key_path];
+			elseif ($unique_value instanceof Closure) {
+				$result[] = call_user_func($unique_value, $entity, $entity_key);
 			}
 			else {
-				$result = array_column($entity, $field_key_path);
+				$result[] = $entity[$unique_value];
 			}
 		}
 
@@ -361,57 +467,18 @@ class CConfigurationImportcompare {
 	/**
 	 * Compare two entities and separate all their keys into added/removed/updated.
 	 *
-	 * @param array  $options     import options
-	 * @param string $entity_key  key of entity being processed
-	 * @param array  $diff        diff for this entity
+	 * @param string $entity_group
+	 * @param array  $options
+	 * @param array  $diff
 	 *
 	 * @return array
 	 */
-	protected function applyOptions(array $options, string $entity_key, array $diff,
-			?string $parent_key = null): array {
-		$option_key_map = [
-			'template_groups' => ['template_groups'],
-			'host_groups' => ['host_groups'],
-			'group_links' => ['host_groups'],
-			'groups' => ['template_groups'],
-			'templates' => ['templates'],
-			'items' => ['items'],
-			'triggers' => ['triggers'],
-			'discovery_rules' => ['discoveryRules'],
-			'item_prototypes' => ['discoveryRules'],
-			'trigger_prototypes' => ['discoveryRules'],
-			'graph_prototypes' => ['discoveryRules'],
-			'host_prototypes' => ['discoveryRules'],
-			'dashboards' => ['dashboards', 'templates' => 'templateDashboards'],
-			'httptests' => ['httptests'],
-			'valuemaps' => ['valueMaps'],
-			'graphs' => ['graphs']
-		];
-
-		$sub_entity_options = [
-			'pages' => ['dashboards' => ['updateExisting' => true, 'createMissing' => true, 'deleteMissing' => true]],
-			'widgets' => ['pages' => ['updateExisting' => true, 'createMissing' => true, 'deleteMissing' => true]]
-		];
-
-		if ($parent_key !== null && array_key_exists($entity_key, $sub_entity_options) &&
-				array_key_exists($parent_key, $sub_entity_options[$entity_key])) {
-			$entity_options = $sub_entity_options[$entity_key][$parent_key];
-		}
-		elseif (array_key_exists($entity_key, $option_key_map)) {
-			$option_key = array_key_exists($parent_key, $option_key_map[$entity_key])
-				? $option_key_map[$entity_key][$parent_key]
-				: $option_key_map[$entity_key][0];
-
-			if (!array_key_exists($option_key, $options)) {
-				return [];
-			}
-
-			$entity_options = $options[$option_key];
-		}
+	protected function applyOptions(string $entity_group, array $options, array $diff): array {
+		static $template_linkage = $this->getOptions('templateLinkage');
 
 		$stored_changes = [];
 
-		if ($entity_key === 'templates' && array_key_exists('updated', $diff)) {
+		if ($entity_group === 'templates' && array_key_exists('updated', $diff)) {
 			$updated_count = count($diff['updated']);
 			for ($key = 0; $key < $updated_count; $key++) {
 				$entity = $diff['updated'][$key];
@@ -438,16 +505,18 @@ class CConfigurationImportcompare {
 					continue;
 				}
 
-				if (!$options['templateLinkage']['createMissing'] && !$options['templateLinkage']['deleteMissing']) {
+				if (!$template_linkage['createMissing'] && !$template_linkage['deleteMissing']) {
 					$entity['after']['templates'] = $entity['before']['templates'];
 				}
-				elseif ($options['templateLinkage']['createMissing'] && !$options['templateLinkage']['deleteMissing']) {
+				elseif ($template_linkage['createMissing'] && !$template_linkage['deleteMissing']) {
 					$entity['after']['templates'] = $this->afterForInnerCreateMissing($entity['before']['templates'],
-						$entity['after']['templates']);
+						$entity['after']['templates']
+					);
 				}
-				elseif ($options['templateLinkage']['deleteMissing'] && !$options['templateLinkage']['createMissing']) {
+				elseif ($template_linkage['deleteMissing'] && !$template_linkage['createMissing']) {
 					$entity['after']['templates'] = $this->afterForInnerDeleteMissing($entity['before']['templates'],
-						$entity['after']['templates']);
+						$entity['after']['templates']
+					);
 				}
 
 				if ($entity['before'] === $entity['after'] && count($entity) === 2) {
@@ -464,11 +533,11 @@ class CConfigurationImportcompare {
 			}
 		}
 
-		if (!array_key_exists('createMissing', $entity_options) || !$entity_options['createMissing']) {
+		if (!$options['createMissing']) {
 			unset($diff['added']);
 		}
 
-		if (!array_key_exists('deleteMissing', $entity_options) || !$entity_options['deleteMissing']) {
+		if (!$options['deleteMissing']) {
 			unset($diff['removed']);
 		}
 
@@ -481,8 +550,8 @@ class CConfigurationImportcompare {
 				$has_inner_entities = count($has_inner_entities) > 0;
 
 				if ($has_inner_entities || array_key_exists($key, $stored_changes)
-					|| $entity['after'] !== $entity['before']) {
-					if (!array_key_exists('updateExisting', $entity_options) || !$entity_options['updateExisting']) {
+						|| $entity['after'] !== $entity['before']) {
+					if (!$options['updateExisting']) {
 						$entity['after'] = $entity['before'];
 					}
 					$new_updated[] = $entity;
@@ -583,17 +652,5 @@ class CConfigurationImportcompare {
 		}
 
 		return $new_after;
-	}
-
-	private function getUniquenessKey(string $type): string {
-		switch ($type) {
-			case 'dashboards':
-				return 'name';
-			case 'pages':
-			case 'widgets':
-				return '_index';
-			default:
-				return 'uuid';
-		}
 	}
 }
