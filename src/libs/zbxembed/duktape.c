@@ -74662,7 +74662,7 @@ DUK_LOCAL void duk__parse_switch_stmt(duk_compiler_ctx *comp_ctx, duk_ivalue *re
 	for (;;) {
 #if defined(DUK_USE_GCC_PRAGMAS) || defined(DUK_USE_CLANG_PRAGMAS)
 #pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wunused-variable"
+#pragma GCC diagnostic ignored "-Wunused-but-set-variable"
 #endif
 		duk_int_t num_stmts;
 #if defined(DUK_USE_GCC_PRAGMAS) || defined(DUK_USE_CLANG_PRAGMAS)
