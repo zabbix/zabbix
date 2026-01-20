@@ -710,7 +710,8 @@ static int	dbconn_open(zbx_dbconn_t *db)
 
 		keywords[i] = "connect_timeout";
 		values[i++] = "3";
-	} else if (0 != db->config->dbport)
+	}
+	else if (0 != db->config->dbport)
 	{
 		keywords[i] = "port";
 		values[i++] = cport = zbx_dsprintf(cport, "%u", db->config->dbport);
