@@ -459,7 +459,7 @@ class testDashboardSlaReportWidget extends testSlaReport {
 
 		// Save or cancel widget.
 		if (CTestArrayHelper::get($data, 'save_widget', false)) {
-			$form->submit();
+			$form->submit()->waitUntilNotVisible();
 
 			// Check that changes took place on the unsaved dashboard.
 			$this->assertTrue($dashboard->getWidget($new_name)->isVisible());
