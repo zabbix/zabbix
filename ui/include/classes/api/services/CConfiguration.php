@@ -26,10 +26,6 @@ class CConfiguration extends CApiService {
 	];
 
 	private const IMPORT_ACCESS_RULES = [
-		'dashboards' => [
-			'createMissing' => CDashboard::ACCESS_RULES['create'],
-			'updateExisting' => CDashboard::ACCESS_RULES['update']
-		],
 		'discoveryRules' => [
 			'createMissing' => CDiscoveryRule::ACCESS_RULES['create'],
 			'updateExisting' => CDiscoveryRule::ACCESS_RULES['update'],
@@ -96,6 +92,10 @@ class CConfiguration extends CApiService {
 			'createMissing' => CValueMap::ACCESS_RULES['create'],
 			'updateExisting' => CValueMap::ACCESS_RULES['update'],
 			'deleteMissing' => CValueMap::ACCESS_RULES['delete']
+		],
+		'dashboards' => [
+			'createMissing' => CDashboard::ACCESS_RULES['create'],
+			'updateExisting' => CDashboard::ACCESS_RULES['update']
 		]
 	];
 
@@ -209,10 +209,6 @@ class CConfiguration extends CApiService {
 			'source' =>					['type' => API_STRING_UTF8, 'flags' => API_REQUIRED],
 			'returnMissingObjects' =>	['type' => API_BOOLEAN, 'default' => false],
 			'rules' =>					['type' => API_OBJECT, 'flags' => API_REQUIRED, 'fields' => [
-				'dashboards' =>				['type' => API_OBJECT, 'fields' => [
-					'createMissing' =>			['type' => API_BOOLEAN, 'default' => false],
-					'updateExisting' =>			['type' => API_BOOLEAN, 'default' => false]
-				]],
 				'discoveryRules' =>			['type' => API_OBJECT, 'fields' => [
 					'createMissing' =>			['type' => API_BOOLEAN, 'default' => false],
 					'updateExisting' =>			['type' => API_BOOLEAN, 'default' => false],
@@ -279,6 +275,10 @@ class CConfiguration extends CApiService {
 					'createMissing' =>			['type' => API_BOOLEAN, 'default' => false],
 					'updateExisting' =>			['type' => API_BOOLEAN, 'default' => false],
 					'deleteMissing' =>			['type' => API_BOOLEAN, 'default' => false]
+				]],
+				'dashboards' =>				['type' => API_OBJECT, 'fields' => [
+					'createMissing' =>			['type' => API_BOOLEAN, 'default' => false],
+					'updateExisting' =>			['type' => API_BOOLEAN, 'default' => false]
 				]]
 			]]
 		]];
@@ -319,7 +319,6 @@ class CConfiguration extends CApiService {
 								&& !self::checkAccess($access_rules[$option]['action'])))) {
 					self::exception(ZBX_API_ERROR_PERMISSIONS,
 						match ($object_tag) {
-							'dashboards' => _('No permissions to import dashboards.'),
 							'discoveryRules' => _('No permissions to import discovery rules.'),
 							'graphs' => _('No permissions to import graphs.'),
 							'host_groups' => _('No permissions to import host groups.'),
@@ -334,7 +333,8 @@ class CConfiguration extends CApiService {
 							'templates' => _('No permissions to import templates.'),
 							'templateDashboards' => _('No permissions to import template dashboards.'),
 							'triggers' => _('No permissions to import triggers.'),
-							'valueMaps' => _('No permissions to import value maps.')
+							'valueMaps' => _('No permissions to import value maps.'),
+							'dashboards' => _('No permissions to import dashboards.')
 						}
 					);
 				}
@@ -342,95 +342,18 @@ class CConfiguration extends CApiService {
 		}
 	}
 
-	private function getImportConfigurationData(array $params): array {
-		$import_reader = CImportReaderFactory::getReader($params['format']);
-		$data = $import_reader->read($params['source']);
-
-		$import_validator_factory = new CImportValidatorFactory($params['format']);
-		$import_converter_factory = new CImportConverterFactory();
-
-		$validator = new CImportXmlValidator($import_validator_factory, $params['format']);
-
-		$data = $validator
-			->setStrict(true)
-			->validate($data, '/');
-
-		foreach ($import_converter_factory::getSequentialVersions() as $version) {
-			if ($data['zabbix_export']['version'] !== $version) {
-				continue;
-			}
-
-			$data = $import_converter_factory
-				->getObject($version)
-				->convert($data);
-
-			$data = $validator
-				// Must not use XML_INDEXED_ARRAY key validation for the converted data.
-				->setStrict(false)
-				->validate($data, '/');
-		}
-
-		// Get schema for converters.
-		$schema = $import_validator_factory
-			->getObject(ZABBIX_EXPORT_VERSION)
-			->getSchema();
-
-		// Convert human readable import constants to values Zabbix API can work with.
-		$data = (new CConstantImportConverter($schema))->convert($data);
-
-		// Add default values in place of missed tags.
-		$data = (new CDefaultImportConverter($schema))->convert($data);
-
-		// Normalize array keys and strings.
-		$data = (new CImportDataNormalizer($schema))->normalize($data);
-
-		return $data;
-	}
-
 	/**
 	 * @param array $params
 	 *
 	 * @return bool|array
 	 */
-	public function import($params): bool|array {
+	public function import(array $params): bool|array {
 		$this->validateImport($params);
 
-		$data = $this->getImportConfigurationData($params);
+		$import_reader = CImportReaderFactory::getReader($params['format']);
+		$data_raw = $import_reader->read($params['source']);
 
-		$adapter = new CImportDataAdapter();
-		$adapter->load($data);
-
-		$configuration_import = new CConfigurationImport(
-			$params['rules'],
-			new CImportReferencer(),
-			new CImportedObjectContainer()
-		);
-
-		$result = $configuration_import->import($adapter);
-
-		if ($result && $params['returnMissingObjects']) {
-			return ['result' => true, 'missing' => $configuration_import->getMissingObjects()];
-		}
-
-		return $result;
-	}
-
-	private function testimport(array $params): array {
-		$params['returnMissingObjects'] = true;
-
-		$this->validateImport($params);
-
-		$data = $this->getImportConfigurationData($params);
-		$adapter = new CImportDataAdapter();
-		$adapter->load($data);
-
-		$configuration_import = new CConfigurationImport(
-			$params['rules'],
-			new CImportReferencer(),
-			new CImportedObjectContainer()
-		);
-
-		return $configuration_import->testimport($adapter);
+		return $this->importForce($data_raw, $params, false);
 	}
 
 	/**
@@ -447,7 +370,7 @@ class CConfiguration extends CApiService {
 		$this->validateImport($params);
 
 		$import_reader = CImportReaderFactory::getReader($params['format']);
-		$data = $import_reader->read($params['source']);
+		$data_raw = $import_reader->read($params['source']);
 
 		$import_validator_factory = new CImportValidatorFactory($params['format']);
 		$import_converter_factory = new CImportConverterFactory();
@@ -457,7 +380,7 @@ class CConfiguration extends CApiService {
 		$data = $validator
 			->setStrict(true)
 			->setPreview(true)
-			->validate($data, '/');
+			->validate($data_raw, '/');
 
 		foreach ($import_converter_factory::getSequentialVersions() as $version) {
 			if ($data['zabbix_export']['version'] !== $version) {
@@ -569,8 +492,8 @@ class CConfiguration extends CApiService {
 					];
 
 					$db_dashboards = API::Dashboard()->get($options);
-					$imported_ids['dashboards'] = array_keys($db_dashboards);
 
+					$imported_ids['dashboards'] = array_keys($db_dashboards);
 					break;
 
 				default:
@@ -629,41 +552,82 @@ class CConfiguration extends CApiService {
 
 		$export = $export['zabbix_export'];
 
-		if (array_key_exists('dashboards', $import)) {
-			$this->addDashboardDynamicIndexes($import['dashboards']);
-		}
-
-		if (array_key_exists('dashboards', $export)) {
-			$this->addDashboardDynamicIndexes($export['dashboards']);
-
-		}
-
 		$importcompare = new CConfigurationImportcompare($params['rules']);
 
 		$result = $importcompare->importcompare($export, $import);
 
 		if ($params['returnMissingObjects']) {
-			$result['missing'] = $this->testimport($params);
+			$result['missing_objects'] = $this->importForce($data_raw, $params, true)['missing_objects'];
 		}
 
 		return $result;
 	}
 
-	private function addDashboardDynamicIndexes(array &$dashboards) {
-		foreach ($dashboards as &$dashboard) {
-			if (array_key_exists('pages', $dashboard)) {
-				foreach ($dashboard['pages'] as $key => &$page) {
-					$page['_index'] = $key;
+	private function importForce(array $data, array $params, bool $dry_run): bool|array {
+		$import_validator_factory = new CImportValidatorFactory($params['format']);
+		$import_converter_factory = new CImportConverterFactory();
 
-					if (array_key_exists('widgets', $page)) {
-						foreach ($page['widgets'] as &$widget) {
-							$x = array_key_exists('x', $widget) ? $widget['x'] : '0';
-							$y = array_key_exists('y', $widget) ? $widget['y'] : '0';
-							$widget['_index'] = $x.'_'.$y;
-						}
-					}
-				}
+		$validator = new CImportXmlValidator($import_validator_factory, $params['format']);
+
+		$data = $validator
+			->setStrict(true)
+			->validate($data, '/');
+
+		foreach ($import_converter_factory::getSequentialVersions() as $version) {
+			if ($data['zabbix_export']['version'] !== $version) {
+				continue;
 			}
+
+			$data = $import_converter_factory
+				->getObject($version)
+				->convert($data);
+
+			$data = $validator
+				// Must not use XML_INDEXED_ARRAY key validation for the converted data.
+				->setStrict(false)
+				->validate($data, '/');
 		}
+
+		// Get schema for converters.
+		$schema = $import_validator_factory
+			->getObject(ZABBIX_EXPORT_VERSION)
+			->getSchema();
+
+		// Convert human readable import constants to values Zabbix API can work with.
+		$data = (new CConstantImportConverter($schema))->convert($data);
+
+		// Add default values in place of missed tags.
+		$data = (new CDefaultImportConverter($schema))->convert($data);
+
+		// Normalize array keys and strings.
+		$data = (new CImportDataNormalizer($schema))->normalize($data);
+
+		$configuration_import = new CConfigurationImport(
+			$params['rules'],
+			new CImportReferencer(),
+			new CImportedObjectContainer()
+		);
+
+		$missing_object_collector = $params['returnMissingObjects']
+			? new CMissingObjectCollector()
+			: null;
+
+		$configuration_import->setMissingObjectCollector($missing_object_collector);
+
+		$adapter = new CImportDataAdapter();
+		$adapter->load($data);
+
+		if ($dry_run) {
+			$configuration_import->collectMissingObjects($adapter);
+		}
+		else {
+			$configuration_import->import($adapter);
+		}
+
+		if ($params['returnMissingObjects']) {
+			return ['missing_objects' => $missing_object_collector->getMissingObjects()];
+		}
+
+		return true;
 	}
 }
