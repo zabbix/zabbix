@@ -365,10 +365,12 @@ int	zbx_dbconn_parse_and_validate_dbhost(zbx_db_config_t *config, char **error)
 {
 	char		*start = NULL, *end = NULL, *dbhost_hosts = NULL, *tmp, *parsed_ip;
 	size_t		result_alloc = 0, result_offset = 0;
-	int		multiple_hosts = 0;
 	unsigned short	parsed_port, def_port = (0 != config->dbport ? (unsigned short)config->dbport : 5432);
 
-	if (NULL == config->dbhost || '\0' == config->dbhost)
+	if (NULL == config->dbhost || '\0' == *config->dbhost)
+		return SUCCEED;
+
+	if (NULL == strchr(config->dbhost, ','))
 		return SUCCEED;
 
 	tmp = zbx_strdup(NULL, config->dbhost);
@@ -378,10 +380,6 @@ int	zbx_dbconn_parse_and_validate_dbhost(zbx_db_config_t *config, char **error)
 		if (NULL != (end = strchr(start, ',')))
 		{
 			*end = '\0';
-		}
-		else if (NULL == dbhost_hosts)
-		{
-			break;
 		}
 
 		if (SUCCEED != zbx_parse_serveractive_element(start, &parsed_ip, &parsed_port, def_port))
@@ -402,10 +400,7 @@ int	zbx_dbconn_parse_and_validate_dbhost(zbx_db_config_t *config, char **error)
 			config->dbports = zbx_strdcatf(NULL, "%u", parsed_port);
 
 		if (NULL != dbhost_hosts)
-		{
-			multiple_hosts = 1;
 			zbx_strcpy_alloc(&dbhost_hosts, &result_alloc, &result_offset, ",");
-		}
 
 		zbx_strcpy_alloc(&dbhost_hosts, &result_alloc, &result_offset, parsed_ip);
 
@@ -419,15 +414,8 @@ int	zbx_dbconn_parse_and_validate_dbhost(zbx_db_config_t *config, char **error)
 
 	zbx_free(tmp);
 
-	if (0 == multiple_hosts)
-	{
-		zbx_free(dbhost_hosts);
-		zbx_free(config->dbports);
-	} else {
-		zbx_free(config->dbhost);
-		config->dbhost = dbhost_hosts;
-		config->dbport = 0;
-	}
+	zbx_free(config->dbhost);
+	config->dbhost = dbhost_hosts;
 
 	return SUCCEED;
 }
@@ -693,18 +681,6 @@ static int	dbconn_open(zbx_dbconn_t *db)
 		values[i++] = db->config->dbhost;
 	}
 
-	if (NULL != db->config->dbports)
-	{
-		keywords[i] = "port";
-		values[i++] = db->config->dbports;
-
-		keywords[i] = "target_session_attrs";
-		values[i++] = "read-write";
-
-		keywords[i] = "connect_timeout";
-		values[i++] = "3";
-	}
-
 	if (NULL != db->config->dbname)
 	{
 		keywords[i] = "dbname";
@@ -723,16 +699,28 @@ static int	dbconn_open(zbx_dbconn_t *db)
 		values[i++] = db->config->dbpassword;
 	}
 
-	if (0 != db->config->dbport)
+	if (NULL != db->config->dbports)
+	{
+		keywords[i] = "port";
+		values[i++] = db->config->dbports;
+
+		keywords[i] = "target_session_attrs";
+		values[i++] = "read-write";
+
+		keywords[i] = "connect_timeout";
+		values[i++] = "3";
+	} else if (0 != db->config->dbport)
 	{
 		keywords[i] = "port";
 		values[i++] = cport = zbx_dsprintf(cport, "%u", db->config->dbport);
-
 	}
 
 	keywords[i] = NULL;
 	values[i] = NULL;
-
+	zabbix_log(LOG_LEVEL_WARNING, "________________ connection params:");
+	for(unsigned int idx = 0; idx < i; idx++)
+		zabbix_log(LOG_LEVEL_WARNING, "%s=%s", keywords[idx],values[idx]);
+	zabbix_log(LOG_LEVEL_WARNING, "________________");
 	db->conn = PQconnectdbParams(keywords, values, 0);
 
 	zbx_free(cport);
