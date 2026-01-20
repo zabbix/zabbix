@@ -567,7 +567,6 @@ class CConfiguration extends CApiService {
 						'filter' => [
 							'name' => $data['name']
 						],
-						'selectPages' => ['dashboard_pageid', 'widgets'],
 						'preservekeys' => true
 					];
 
