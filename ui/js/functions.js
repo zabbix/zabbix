@@ -508,12 +508,12 @@ function overlayDialogueDestroy(dialogueid, close_by = Overlay.prototype.CLOSE_B
 function overlayDialogue(properties, options = {}) {
 	const overlay = overlays_stack.getById(options.dialogueid) || new Overlay({...options, type: 'popup'});
 
+	addToOverlaysStack(overlay);
+
 	overlay.setProperties(properties);
 	overlay.mount();
 	overlay.recoverFocus();
 	overlay.containFocus();
-
-	addToOverlaysStack(overlay);
 
 	return overlay;
 }
