@@ -19,14 +19,11 @@
  */
 class CTimePeriodParser extends CParser {
 
-	/**
-	 * @var array
-	 */
-	private $macro_parsers = [];
+	private array $macro_parsers = [];
 
-	private $period_parts = [];
+	private array $period_parts = [];
 
-	private $options = [
+	private array $options = [
 		'usermacros' => false,
 		'lldmacros' => false
 	];
@@ -88,8 +85,9 @@ class CTimePeriodParser extends CParser {
 			return false;
 		}
 
-		if (($matches['wd_till'] !== '' && $matches['wd_from'] > $matches['wd_till'])
-				|| $matches['m_from'] > 59 || $matches['m_till'] > 59) {
+		$matches['wd_till'] = $matches['wd_till'] ?: $matches['wd_from'];
+
+		if ($matches['wd_from'] > $matches['wd_till'] || $matches['m_from'] > 59 || $matches['m_till'] > 59) {
 			return false;
 		}
 
@@ -100,7 +98,7 @@ class CTimePeriodParser extends CParser {
 			return false;
 		}
 
-		$this->period_parts = self::normalizePeriodParts($matches);
+		$this->period_parts = array_filter($matches, static fn($key) => !is_int($key), ARRAY_FILTER_USE_KEY);
 
 		$pos += strlen($matches[0]);
 
@@ -114,13 +112,5 @@ class CTimePeriodParser extends CParser {
 	 */
 	public function getPeriodParts(): array {
 		return $this->period_parts;
-	}
-
-	private static function normalizePeriodParts(array $matches): array {
-		$parts = array_filter($matches, static fn($key) => !is_int($key), ARRAY_FILTER_USE_KEY);
-
-		$parts['wd_till'] = $parts['wd_till'] ?: $parts['wd_from'];
-
-		return $parts;
 	}
 }

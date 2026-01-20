@@ -19,10 +19,10 @@
  */
 class CTimePeriodsParser extends CParser {
 
-	private $time_period_parser;
+	private CTimePeriodParser $time_period_parser;
 
-	private $periods_parts = [];
-	private $options = ['usermacros' => false];
+	private array $periods_parts = [];
+	private array $options = ['usermacros' => false];
 
 	public function __construct($options = []) {
 		if (array_key_exists('usermacros', $options)) {
