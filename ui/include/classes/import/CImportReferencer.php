@@ -2157,7 +2157,7 @@ class CImportReferencer {
 			'output' => ['name'],
 			'selectPages' => ['dashboard_pageid', 'widgets'],
 			'filter' => [
-				'name' => array_unique(array_column($this->dashboards, 'name'))
+				'name' => array_keys($this->dashboards)
 			],
 			'searchByAny' => true,
 			'preservekeys' => true
