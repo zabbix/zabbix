@@ -84,10 +84,9 @@ pattern — Glob-style pattern. The default value is "*".
 - JSON if a glob-style pattern is specified.
 - Single value if a pattern did not contain any wildcard character.
 
-Comments:
--   Security warning: `redis.config` runs the Redis `CONFIG GET` command and may return sensitive configuration parameters (for example `requirepass`, `masterauth`, TLS-related settings, and other secrets).
-
-Using the default pattern (`*`) or wide patterns may expose these secrets to anyone with permission to view item values in Zabbix.
+*Note:*
+-   Security warning: `redis.config` runs the Redis `CONFIG GET` command and may return sensitive configuration parameters (for example `requirepass`, `masterauth`, TLS-related settings, and other secrets).  
+    Using the default pattern (`*`) or wide patterns may expose these secrets to anyone with permission to view item values in Zabbix.
 
 
 **redis.info[\<commonParams\>[,section]]** — Returns an output of the INFO command serialized to JSON.  
