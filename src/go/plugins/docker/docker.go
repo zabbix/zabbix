@@ -32,10 +32,8 @@ const (
 )
 
 var (
-	// short or long docker container id.
-	containerIDRegex = regexp.MustCompile(`^[a-f0-9]{12,64}$`)
 	// custom name that starts with a letter and has maximum 63 signs (DNS limit).
-	containerNameRegex = regexp.MustCompile(`^[a-zA-Z0-9][a-zA-Z0-9_.-]{0,62}$`)
+	containerNameRegex = regexp.MustCompile(`^[a-zA-Z0-9][a-zA-Z0-9_.-]*$`)
 )
 
 // Plugin inherits plugin.Base and store plugin-specific data.
@@ -102,7 +100,7 @@ func (p *Plugin) Export(key string, rawParams []string, _ plugin.ContextProvider
 		// Strip leading slash if present to maintain backwards compatibility with older template discovery.
 		container = strings.TrimPrefix(container, "/")
 
-		if !isValidContainerIdentifier(container) {
+		if !containerNameRegex.MatchString(container) {
 			return nil, errs.New("invalid container identifier")
 		}
 
@@ -120,7 +118,7 @@ func (p *Plugin) Export(key string, rawParams []string, _ plugin.ContextProvider
 		// Strip leading slash if present to maintain backwards compatibility with older template discovery.
 		container = strings.TrimPrefix(container, "/")
 
-		if !isValidContainerIdentifier(container) {
+		if !containerNameRegex.MatchString(container) {
 			return nil, errs.New("invalid container identifier")
 		}
 
@@ -130,16 +128,4 @@ func (p *Plugin) Export(key string, rawParams []string, _ plugin.ContextProvider
 	default:
 		return nil, zbxerr.ErrorUnsupportedMetric
 	}
-}
-
-func isValidContainerIdentifier(id string) bool {
-	if containerIDRegex.MatchString(id) {
-		return true
-	}
-
-	if containerNameRegex.MatchString(id) {
-		return true
-	}
-
-	return false
 }
