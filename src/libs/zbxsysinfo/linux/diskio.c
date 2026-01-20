@@ -475,7 +475,7 @@ int	vfs_dev_discovery(AGENT_REQUEST *request, AGENT_RESULT *result)
 #undef DEVTYPE_STR_LEN
 }
 
-static void	*dev_path_add(const char *d_name, struct zbx_json *j)
+static void	dev_path_add(const char *d_name, struct zbx_json *j)
 {
 	char	path[MAX_STRING_LEN];
 
@@ -483,22 +483,22 @@ static void	*dev_path_add(const char *d_name, struct zbx_json *j)
 	zbx_json_addstring(j, "path", path, ZBX_JSON_TYPE_STRING);
 }
 
-static void	*dev_name_add(const char *d_name, struct zbx_json *j)
+static void	dev_name_add(const char *d_name, struct zbx_json *j)
 {
 	zbx_json_addstring(j, "name", d_name, ZBX_JSON_TYPE_STRING);
 }
 
-static void	*dev_type_add(const char *type, struct zbx_json *j)
+static void	dev_type_add(const char *type, struct zbx_json *j)
 {
 	zbx_json_addstring(j, "type", type, ZBX_JSON_TYPE_STRING);
 }
 
-static void	*dev_model_add(const char *model, struct zbx_json *j)
+static void	dev_model_add(const char *model, struct zbx_json *j)
 {
 	zbx_json_addstring(j, "model", model, ZBX_JSON_TYPE_STRING);
 }
 
-static void	*dev_serial_add(const zbx_stat_t *stat_buf, struct zbx_json *j)
+static void	dev_serial_add(const zbx_stat_t *stat_buf, struct zbx_json *j)
 {
 	FILE	*f;
 	int	found = FAIL;
@@ -520,7 +520,7 @@ static void	*dev_serial_add(const zbx_stat_t *stat_buf, struct zbx_json *j)
 	zbx_json_addstring(j, "serial", (SUCCEED == found ? buf : ""), ZBX_JSON_TYPE_STRING);
 }
 
-static void	*dev_wwn_add(const zbx_stat_t *stat_buf, struct zbx_json *j)
+static void	dev_wwn_add(const zbx_stat_t *stat_buf, struct zbx_json *j)
 {
 	FILE	*f;
 	int	found = FAIL;
@@ -570,7 +570,7 @@ static char	*dev_model_get(zbx_stat_t *stat_buf)
 	return model;
 }
 
-static void	*dev_size_bytes_add(const zbx_stat_t *stat_buf, struct zbx_json *j)
+static void	dev_size_bytes_add(const zbx_stat_t *stat_buf, struct zbx_json *j)
 {
 	FILE		*f;
 	char		buf[MAX_STRING_LEN];
@@ -593,7 +593,7 @@ static void	*dev_size_bytes_add(const zbx_stat_t *stat_buf, struct zbx_json *j)
 	zbx_json_adduint64(j, "size_bytes", size);
 }
 
-static void	*dev_logical_blksize_add(const zbx_stat_t *stat_buf, struct zbx_json *j)
+static void	dev_logical_blksize_add(const zbx_stat_t *stat_buf, struct zbx_json *j)
 {
 	FILE		*f;
 	char		buf[MAX_STRING_LEN];
@@ -614,7 +614,7 @@ static void	*dev_logical_blksize_add(const zbx_stat_t *stat_buf, struct zbx_json
 	zbx_json_adduint64(j, "logical_block_size", size);
 }
 
-static void	*dev_physical_blksize_add(const zbx_stat_t *stat_buf, struct zbx_json *j)
+static void	dev_physical_blksize_add(const zbx_stat_t *stat_buf, struct zbx_json *j)
 {
 	FILE		*f;
 	char		buf[MAX_STRING_LEN];
@@ -747,8 +747,8 @@ static void	device_free(zbx_device_t *device)
 
 static int	device_compare(const void *d1, const void *d2)
 {
-	zbx_device_t	*p1 = *(zbx_device_t **)d1;
-	zbx_device_t	*p2 = *(zbx_device_t **)d2;
+	const zbx_device_t	*p1 = *(zbx_device_t * const *)d1;
+	const zbx_device_t	*p2 = *(zbx_device_t * const *)d2;
 
 	ZBX_RETURN_IF_NOT_EQUAL(p1->major, p2->major);
 	ZBX_RETURN_IF_NOT_EQUAL(p1->minor, p2->minor);
@@ -769,7 +769,6 @@ static void	devids_init(zbx_vector_device_ptr_t *devices)
 
 	while (NULL != (entry = readdir(dir)))
 	{
-		ssize_t		len;
 		zbx_device_t	*device;
 		zbx_stat_t	stat_buf;
 		char		*real;
@@ -879,7 +878,7 @@ static void	vfs_dev_get_devid_add(const zbx_vector_device_ptr_t *devices, const 
 
 	i = j = 0;
 
-	while (model[i] != '\0' && j < sizeof(norm_model) - 1)
+	while ('\0' != model[i] && j < (int)sizeof(norm_model) - 1)
 	{
 		char c = model[i];
 
@@ -932,8 +931,6 @@ static void	vfs_dev_get_process_entry(const char *dev_name, const zbx_regexp_t *
 {
 	zbx_stat_t	stat_buf;
 	char		*type, *model;
-	int		res;
-	char		buf[MAX_STRING_LEN];
 
 	if (0 != zbx_regexp_match_precompiled(dev_name, devnames_rxp))
 		return;
