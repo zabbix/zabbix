@@ -116,8 +116,6 @@ class CControllerTemplateUpdate extends CController {
 	}
 
 	protected function doAction(): void {
-		$result = false;
-
 		try {
 			DBstart();
 			$templateid = $this->getInput('templateid');
@@ -127,7 +125,8 @@ class CControllerTemplateUpdate extends CController {
 			// Linked templates.
 			$templates = [];
 
-			foreach (array_merge($this->getInput('templates', []), $this->getInput('template_add_templates', [])) as $linked_id) {
+			foreach (array_merge($this->getInput('templates', []), $this->getInput('template_add_templates', []))
+					as $linked_id) {
 				$templates[] = ['templateid' => $linked_id];
 			}
 
@@ -236,8 +235,10 @@ class CControllerTemplateUpdate extends CController {
 			$result = DBend(true);
 		}
 		catch (Exception $e) {
+			$result = false;
 			DBend(false);
 		}
+
 		$output = [];
 
 		if ($result) {
