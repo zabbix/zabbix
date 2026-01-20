@@ -496,7 +496,19 @@ const void	*zbx_hashset_const_iter_next(zbx_hashset_const_iter_t *iter)
  *********************************************************************************/
 void	zbx_hashset_copy(zbx_hashset_t *dst, const zbx_hashset_t *src, size_t size)
 {
-	ZBX_HASHSET_ENTRY_T	*entry, **ref, **tmp = dst->slots;
+	ZBX_HASHSET_ENTRY_T	*entry, *next_entry, **ref, **tmp = dst->slots;
+
+	for (int i = 0; i < dst->num_slots; i++)
+	{
+		entry = dst->slots[i];
+
+		while (NULL != entry)
+		{
+			next_entry = entry->next;
+			__hashset_free_entry(dst, entry);
+			entry = next_entry;
+		}
+	}
 
 	*dst = *src;
 
