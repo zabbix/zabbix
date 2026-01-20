@@ -26,18 +26,13 @@ class ZTextareaFlexible extends HTMLElement {
 	 */
 	#internals;
 
-	/**
-	 * @type {HTMLTextAreaElement | null}
-	 */
+	/** @type {HTMLTextAreaElement} */
 	#textarea;
 
-	/**
-	 * @type {ResizeObserver | null}
-	 */
+	/** @type {ResizeObserver | null} */
 	#resize_observer = null;
-	/**
-	 * @type {boolean}
-	 */
+
+	/** @type {boolean} */
 	#singleline = true;
 
 	constructor() {
