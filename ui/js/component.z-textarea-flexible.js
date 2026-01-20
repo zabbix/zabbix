@@ -16,6 +16,17 @@
 class ZTextareaFlexible extends HTMLElement {
 
 	/**
+	 * Enables this custom element to behave like a native form control (<input>/<textarea>),
+	 * participate in forms, handle validity, and respond to form resets.
+	 */
+	static formAssociated = true;
+
+	/**
+	 * ElementInternals gives access to form-related APIs (form value, validity, and form participation)
+	 */
+	#internals;
+
+	/**
 	 * @type {HTMLTextAreaElement | null}
 	 */
 	#textarea;
@@ -32,6 +43,7 @@ class ZTextareaFlexible extends HTMLElement {
 	constructor() {
 		super();
 
+		this.#internals = this.attachInternals();
 		this.#textarea = document.createElement('textarea');
 	}
 
@@ -126,7 +138,13 @@ class ZTextareaFlexible extends HTMLElement {
 				break;
 
 			case 'value':
-				this.#textarea.value = new_value;
+				const normalized = this.#singleline
+					? (new_value ?? '').replace(/[\r\n\t]+/g, ' ')
+					: new_value ?? '';
+
+				this.#textarea.value = normalized;
+				this.#internals.setFormValue(normalized);
+
 				this.#update();
 				break;
 
@@ -165,16 +183,12 @@ class ZTextareaFlexible extends HTMLElement {
 		this.dispatchEvent(new Event('focus', { bubbles: true }));
 	}
 
-	#inputHandler = () => {
-		this.#update();
+	#inputHandler = (e) => {
+		this.value = e.target.value;
 		this.dispatchEvent(new Event('input', { bubbles: true }));
 	}
 
 	#update() {
-		if (this.#singleline) {
-			this.#textarea.value = this.#textarea.value.replace(/[\r\n]+/g, ' ');
-		}
-
 		this.#textarea.style.height = '0';
 		this.#textarea.style.height = `${this.#textarea.scrollHeight}px`;
 	}
