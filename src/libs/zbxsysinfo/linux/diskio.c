@@ -17,6 +17,7 @@
 
 #include "zbxjson.h"
 #include "zbxstr.h"
+#include "zbxregexp.h"
 
 #include "../common/stats.h"
 #include "../common/diskdevices.h"
@@ -926,13 +927,16 @@ static int	dev_is_partition(const char *dev_type)
 	return FAIL;
 }
 
-static void	vfs_dev_get_process_entry(const char *dev_name, int mode, zbx_vector_device_ptr_t *devices,
-		struct zbx_json *cfg, struct zbx_json *val)
+static void	vfs_dev_get_process_entry(const char *dev_name, const zbx_regexp_t *devnames_rxp, int mode,
+		zbx_vector_device_ptr_t *devices, struct zbx_json *cfg, struct zbx_json *val)
 {
 	zbx_stat_t	stat_buf;
 	char		*type, *model;
 	int		res;
 	char		buf[MAX_STRING_LEN];
+
+	if (0 != zbx_regexp_match_precompiled(dev_name, devnames_rxp))
+		return;
 
 	if (NULL == (type = dev_type_get(dev_name, 1, &stat_buf)))
 		return;
@@ -1028,13 +1032,14 @@ static void	vfs_dev_get_process_entry(const char *dev_name, int mode, zbx_vector
 int	vfs_dev_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 
-	char			*regexp, *mode;
-	int			has_vals;
+	char			*devnames, *mode, *rxp_error = NULL;
+	int			has_vals, ret = SYSINFO_RET_OK;;
 	DIR			*dir;
 	zbx_stat_t		stat_buf;
 	struct dirent		*entry;
 	struct zbx_json		j, cfg, val;
 	zbx_vector_device_ptr_t devices;
+	zbx_regexp_t		*devnames_rxp = NULL;
 
 	int	imode;
 
@@ -1044,21 +1049,23 @@ int	vfs_dev_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 		return SYSINFO_RET_FAIL;
 	}
 
-	regexp = get_rparam(request, 0);
+	devnames = get_rparam(request, 0);
 	mode = get_rparam(request, 1);
 
-	if (NULL == regexp || '\0' == *regexp)
+	if (NULL == devnames || '\0' == *devnames)
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid first parameter."));
 		return SYSINFO_RET_FAIL;
 	}
 
-	/* check if sys fs with block devices is available */
-	if (0 != zbx_stat(ZBX_SYS_BLKDEV_PFX, &stat_buf) || 0 == S_ISDIR(stat_buf.st_mode))
+	if (SUCCEED != zbx_regexp_compile(devnames, &devnames_rxp, &rxp_error))
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain device information: directory "
-				ZBX_SYS_BLKDEV_PFX " is not found."));
-		return SYSINFO_RET_FAIL;
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Invalid regular expression in first parameter: %s",
+				rxp_error));
+
+		zbx_free(rxp_error);
+		ret = SYSINFO_RET_FAIL;
+		goto clean;
 	}
 
 	if (NULL == mode || '\0' == *mode || 0 == strcmp(mode, "disks"))	/* default parameter */
@@ -1084,14 +1091,25 @@ int	vfs_dev_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 	else
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
-		return SYSINFO_RET_FAIL;
+		ret = SYSINFO_RET_FAIL;
+		goto clean;
+	}
+
+	/* check if sysfs with block devices is available */
+	if (0 != zbx_stat(ZBX_SYS_BLKDEV_PFX, &stat_buf) || 0 == S_ISDIR(stat_buf.st_mode))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain device information: directory "
+				ZBX_SYS_BLKDEV_PFX " is not found."));
+		ret = SYSINFO_RET_FAIL;
+		goto clean;
 	}
 
 	if (NULL == (dir = opendir(ZBX_DEV_PFX)))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL,
 				"Cannot obtain device list: failed to open " ZBX_DEV_PFX " directory."));
-		return SYSINFO_RET_FAIL;
+		ret = SYSINFO_RET_FAIL;
+		goto clean;
 	}
 
 	devids_init(&devices);
@@ -1100,16 +1118,13 @@ int	vfs_dev_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 		zbx_json_init(&val, ZBX_JSON_STAT_BUF_LEN);
 
 	while (NULL != (entry = readdir(dir)))
-		vfs_dev_get_process_entry(entry->d_name, imode, &devices, &cfg, &val);
+		vfs_dev_get_process_entry(entry->d_name, devnames_rxp, imode, &devices, &cfg, &val);
 	closedir(dir);
-
-
 
 	zbx_json_init(&j, ZBX_JSON_STAT_BUF_LEN);
 	zbx_json_addraw(&j, "config", cfg.buffer);
 	if (1 == has_vals)
 		zbx_json_addraw(&j, "values", val.buffer);
-
 
 	SET_STR_RESULT(result, zbx_strdup(NULL, j.buffer));
 
@@ -1119,6 +1134,9 @@ int	vfs_dev_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 	zbx_json_free(&j);
 	zbx_vector_device_ptr_clear_ext(&devices, device_free);
 	zbx_vector_device_ptr_destroy(&devices);
+clean:
+	if (NULL != devnames_rxp)
+		zbx_regexp_free(devnames_rxp);
 
-	return SYSINFO_RET_OK;
+	return ret;
 }
