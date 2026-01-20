@@ -474,7 +474,7 @@ class CConfigurationImportcompare {
 	 * @return array
 	 */
 	protected function applyOptions(string $entity_group, array $options, array $diff): array {
-		static $template_linkage = $this->getOptions('templateLinkage');
+		$template_linkage = $this->getOptions('templateLinkage');
 
 		$stored_changes = [];
 
