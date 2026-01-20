@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -37,8 +37,8 @@ elseif (!$data['has_serviceid']) {
 
 	foreach ($data['sli']['periods'] as $period) {
 		$header[] = CSlaHelper::getPeriodTag((int) $data['sla']['period'], $period['period_from'], $period['period_to'],
-			$data['sla']['timezone']
-		)->addClass($data['sla']['period'] != ZBX_SLA_PERIOD_ANNUALLY ? ZBX_STYLE_TEXT_VERTICAL : null);
+			$data['sla']['timezone'], $data['sla']['period'] != ZBX_SLA_PERIOD_ANNUALLY
+		);
 	}
 
 	$report->setHeader($header);

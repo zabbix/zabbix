@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -39,13 +39,11 @@ else {
 	if ($data['show_column_header'] != WidgetForm::COLUMN_HEADER_OFF) {
 		$table_header = [];
 
-		$column_title_class = $data['show_column_header'] == WidgetForm::COLUMN_HEADER_VERTICAL
-			? ZBX_STYLE_TEXT_VERTICAL
-			: null;
-
 		if ($data['show_timestamp']) {
 			$table_header[] = (new CColHeader(
-				(new CSpan(_x('Timestamp', 'compact table header')))->addClass($column_title_class)
+				$data['show_column_header'] == WidgetForm::COLUMN_HEADER_VERTICAL
+					? new CVertical(_x('Timestamp', 'compact table header'))
+					: new CSpan(_x('Timestamp', 'compact table header'))
 			))
 				->addClass(ZBX_STYLE_CELL_WIDTH)
 				->addClass(ZBX_STYLE_NOWRAP);
@@ -53,22 +51,28 @@ else {
 
 		if ($is_layout_vertical) {
 			foreach ($data['columns'] as $column) {
+				$tag = $data['show_column_header'] == WidgetForm::COLUMN_HEADER_VERTICAL
+					? new CVertical($column['name'])
+					: new CSpan($column['name']);
+
 				$table_header[] = (new CColHeader(
-					(new CSpan($column['name']))
-						->addClass($column_title_class)
-						->setTitle($column['name'])
+					$tag->setTitle($column['name'])
 				))->setColSpan(2);
 			}
 		}
 		else {
 			$table_header[] = (new CColHeader(
-				(new CSpan(_x('Name', 'compact table header')))->addClass($column_title_class)
+				$data['show_column_header'] == WidgetForm::COLUMN_HEADER_VERTICAL
+					? new CVertical(_x('Name', 'compact table header'))
+					: new CSpan(_x('Name', 'compact table header'))
 			))
 				->addClass(ZBX_STYLE_NOWRAP)
 				->addClass(ZBX_STYLE_CELL_WIDTH);
 
 			$table_header[] = (new CColHeader(
-				(new CSpan(_x('Value', 'compact table header')))->addClass($column_title_class)
+				$data['show_column_header'] == WidgetForm::COLUMN_HEADER_VERTICAL
+					? new CVertical(_x('Value', 'compact table header'))
+					: new CSpan(_x('Value', 'compact table header'))
 			))->setColSpan(2);
 		}
 
@@ -259,7 +263,8 @@ function makeValueCell(array $column, array $item_value, bool $text_wordbreak = 
 		case ITEM_VALUE_TYPE_TEXT:
 			if (array_key_exists('highlights', $column)) {
 				foreach ($column['highlights'] as $highlight) {
-					if (@preg_match('('.$highlight['pattern'].')', $item_value['value'])) {
+					if (@preg_match('/'.CRegexHelper::handleSlashEscaping($highlight['pattern']).'/',
+							$item_value['value'])) {
 						$color = $highlight['color'];
 						break;
 					}

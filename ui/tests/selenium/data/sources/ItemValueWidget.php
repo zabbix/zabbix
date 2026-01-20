@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -77,6 +77,44 @@ class ItemValueWidget {
 						'value_type' => ITEM_VALUE_TYPE_FLOAT,
 						'units' => '%',
 						'delay' => '30'
+					]
+				]
+			],
+			[
+				'host' => 'Host for checking widget without show value option',
+				'groups' => [
+					'groupid' => '4' // 'Zabbix servers' group.
+				],
+				'items' => [
+					[
+						'name' => 'Indicator - Numeric (float)',
+						'key_' => 'numeric_float',
+						'type' => ITEM_TYPE_TRAPPER,
+						'value_type' => ITEM_VALUE_TYPE_FLOAT
+					],
+					[
+						'name' => 'Indicator - Character',
+						'key_' => 'character',
+						'type' => ITEM_TYPE_TRAPPER,
+						'value_type' => ITEM_VALUE_TYPE_STR
+					],
+					[
+						'name' => 'Indicator - Log',
+						'key_' => 'log',
+						'type' => ITEM_TYPE_TRAPPER,
+						'value_type' => ITEM_VALUE_TYPE_LOG
+					],
+					[
+						'name' => 'Indicator - Numeric (unsigned)',
+						'key_' => 'numeric_unsigned',
+						'type' => ITEM_TYPE_TRAPPER,
+						'value_type' => ITEM_VALUE_TYPE_UINT64
+					],
+					[
+						'name' => 'Indicator - Text',
+						'key_' => 'text',
+						'type' => ITEM_TYPE_TRAPPER,
+						'value_type' => ITEM_VALUE_TYPE_TEXT
 					]
 				]
 			],

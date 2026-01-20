@@ -14,4 +14,5 @@ libzbxipmi_a_SOURCES = \
 
 libzbxipmi_a_CFLAGS = \
 	$(OPENIPMI_CFLAGS) \
-	$(TLS_CFLAGS)
+	$(TLS_CFLAGS) \
+	$(ARES_CFLAGS)

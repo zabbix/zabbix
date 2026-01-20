@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -1610,6 +1610,9 @@ int	DBcopy_template_triggers(zbx_uint64_t hostid, const zbx_vector_uint64_t *tem
 #undef TRIGGER_FUNCS_HASHSET_DEF_SIZE
 	res = get_templates_triggers_data(hostid, templateids, &trigger_copies_templates,
 			&templates_triggers_descriptions, &temp_templates_triggerids);
+
+	if (FAIL == res)
+		*error = zbx_strdup(NULL, "failed to get templates trigger data");
 
 	if (0 == templates_triggers_descriptions.values_num)
 		goto end;

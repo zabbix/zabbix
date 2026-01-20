@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -14,7 +14,7 @@
 **/
 
 
-require_once dirname(__FILE__).'/../../include/CWebTest.php';
+require_once __DIR__.'/../../include/CWebTest.php';
 
 /**
  * @backup media_type
@@ -896,12 +896,14 @@ class testFormAdministrationMediaTypeMessageTemplates extends CWebTest {
 		$templates_list = $this->query('id:messageTemplatesFormlist')->asTable()->one();
 
 		$templates_list->findRow('Message type', 'Problem')->query('button:Edit')->one()->click();
+		$message_overlay = COverlayDialogElement::find()->all()->last()->waitUntilReady();
 		$form = $this->query('id:mediatype-message-form')->waitUntilVisible()->asForm()->one();
 		$form->fill([
 			'Message type' => 'Internal problem',
 			'Subject' => 'New subject',
 			'Message' => 'New message'
 		])->submit();
+		$message_overlay->waitUntilNotVisible();
 		$templates_list->invalidate();
 		$templates_list->findRow('Message type', 'Discovery')->query('button:Remove')->one()->click();
 		// Cancel all previously made modifications.

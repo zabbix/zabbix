@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -118,7 +118,9 @@ class CControllerModuleScan extends CController {
 			}
 		}
 
-		$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))->setArgument('action', 'module.list'));
+		$response = new CControllerResponseRedirect(
+			(new CUrl('zabbix.php'))->setArgument('action', 'module.list')
+		);
 
 		$message = ($db_modules_create || $db_modules_delete)
 			? _('Modules updated')

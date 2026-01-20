@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -13,11 +13,13 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-require_once dirname(__FILE__).'/../include/CWebTest.php';
-require_once dirname(__FILE__).'/behaviors/CMessageBehavior.php';
+require_once __DIR__.'/../include/CWebTest.php';
+require_once __DIR__.'/behaviors/CMessageBehavior.php';
 
 /**
  * @backup users, config
+ *
+ * @dataSource MonitoringOverview
  */
 class testTimezone extends CWebTest {
 
@@ -193,7 +195,7 @@ class testTimezone extends CWebTest {
 		}
 		$form->fill($data['fields']);
 		$form->selectTab('Permissions');
-		$form->fill(['Role' => 'Super admin role']);
+		$form->fill(['Role' => CFormElement::RELOADABLE_FILL('Super admin role')]);
 		$form->submit();
 		$this->assertMessage(TEST_GOOD, 'User added');
 		$this->page->logout();

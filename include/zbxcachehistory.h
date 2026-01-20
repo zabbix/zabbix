@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -111,14 +111,24 @@ typedef struct
 }
 zbx_pp_value_opt_t;
 
+typedef enum
+{
+	ZBX_DC_SYNC_TREND_MODE_NORMAL,
+	ZBX_DC_SYNC_TREND_MODE_PARALLEL,
+	ZBX_DC_SYNC_TREND_MODE_FULL
+}
+zbx_dc_sync_trend_mode_t;
+
 void	zbx_pp_value_opt_clear(zbx_pp_value_opt_t *opt);
 void	zbx_dc_get_stats_all(zbx_wcache_info_t *wcache_info);
 void	*zbx_dc_get_stats(int request);
 void	zbx_trend_add_new_items(const zbx_vector_uint64_t *itemids);
 void	zbx_dc_update_trends(zbx_vector_uint64_pair_t *trends_diff);
-void	zbx_db_flush_trends(ZBX_DC_TREND *trends, int *trends_num, zbx_vector_uint64_pair_t *trends_diff);
+void	zbx_db_flush_trends(ZBX_DC_TREND *trends, int *trends_num, zbx_vector_uint64_pair_t *trends_diff,
+		zbx_dc_sync_trend_mode_t sync_trend_mode);
 void	zbx_dc_mass_update_trends(const zbx_dc_history_t *history, int history_num, ZBX_DC_TREND **trends,
 		int *trends_num, int compression_age);
+void	zbx_dc_sync_trends(int parallel_num);
 int	zbx_trend_compare(const void *d1, const void *d2);
 void	zbx_dc_export_history_and_trends(const zbx_dc_history_t *history, int history_num,
 		const zbx_vector_uint64_t *itemids, zbx_history_sync_item_t *items, const int *errcodes,
@@ -176,4 +186,7 @@ zbx_shmem_info_t	*zbx_dbcache_get_hc_mem(void);
 
 void	zbx_dbcache_setproxyqueue_state(int proxyqueue_state);
 int	zbx_dbcache_getproxyqueue_state(void);
+void	zbx_hc_acquire(void);
+int	zbx_hc_release(void);
+int	zbx_hc_refcount_peek(void);
 #endif

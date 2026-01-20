@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -189,6 +189,10 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 
 		// Get item and host properties and values from cache.
 		$data = $this->getInput('data', []);
+		if (array_key_exists('macros', $data)) {
+			$data['macros'] = json_decode($data['macros'], true);
+		}
+
 		$inputs = $this->getItemTestProperties($this->getInputAll());
 
 		// Work with preprocessing steps.

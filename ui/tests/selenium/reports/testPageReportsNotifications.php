@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -14,7 +14,7 @@
 **/
 
 
-require_once dirname(__FILE__).'/../../include/CLegacyWebTest.php';
+require_once __DIR__.'/../../include/CLegacyWebTest.php';
 
 use Facebook\WebDriver\WebDriverBy;
 
@@ -61,7 +61,7 @@ class testPageReportsNotifications extends CLegacyWebTest {
 		sort($user_alias);
 
 		$users = [];
-		$elements = $this->webDriver->findElements(WebDriverBy::xpath('//th/span[@class="text-vertical"]'));
+		$elements = $this->webDriver->findElements(WebDriverBy::xpath('//th/z-vertical'));
 		foreach ($elements as $i => $element) {
 			$users[] = $element->getText();
 		}
@@ -196,7 +196,7 @@ class testPageReportsNotifications extends CLegacyWebTest {
 
 		// Get user column number in table
 		$user_column_number = [];
-		$elements = $this->webDriver->findElements(WebDriverBy::xpath('//th/span[@class="text-vertical"]'));
+		$elements = $this->webDriver->findElements(WebDriverBy::xpath('//th/z-vertical'));
 		foreach ($elements as $index => $element) {
 			// 2 is column of month plus column count begin from 1 not from 0
 			$user_column_number[$element->getText()] = $index + 2;

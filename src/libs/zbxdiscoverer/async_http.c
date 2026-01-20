@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -15,11 +15,12 @@
 #include "async_http.h"
 #include "zbxcommon.h"
 #include "zbxsysinc.h"
+#include "zbxcurl.h"
 #include "zbxip.h"
 #include "zbx_discoverer_constants.h"
 #ifdef HAVE_LIBCURL
-static int	http_task_process(short event, void *data, int *fd, struct evutil_addrinfo **current_ai,
-		const char *addr, char *dnserr, struct event *timeout_event)
+static int	http_task_process(short event, void *data, int *fd, zbx_vector_address_t *addresses,
+		const char *reverse_dns, char *dnserr, struct event *timeout_event)
 {
 	int					 task_ret = ZBX_ASYNC_TASK_STOP;
 	zbx_discovery_async_http_context_t	*http_context = (zbx_discovery_async_http_context_t *)data;
@@ -27,12 +28,12 @@ static int	http_task_process(short event, void *data, int *fd, struct evutil_add
 	ZBX_UNUSED(fd);
 	ZBX_UNUSED(dnserr);
 	ZBX_UNUSED(timeout_event);
-	ZBX_UNUSED(current_ai);
+	ZBX_UNUSED(addresses);
 
 	if (ZBX_ASYNC_HTTP_STEP_RDNS == http_context->step)
 	{
-		if (NULL != addr)
-			http_context->reverse_dns = zbx_strdup(NULL, addr);
+		if (NULL != reverse_dns)
+			http_context->reverse_dns = zbx_strdup(NULL, reverse_dns);
 
 		goto stop;
 	}
@@ -69,7 +70,7 @@ void	process_http_response(CURL *easy_handle, CURLcode err, void *arg)
 	else
 	{
 		http_context->res = SUCCEED;
-		zbx_async_poller_add_task(poller_config->base, poller_config->dnsbase,
+		zbx_async_poller_add_task(poller_config->base, NULL, poller_config->dnsbase,
 				http_context->async_result->dresult->ip, http_context, http_context->config_timeout,
 				http_task_process, process_http_result);
 	}
@@ -117,20 +118,8 @@ int	zbx_discovery_async_check_http(CURLM *curl_mhandle, const char *config_sourc
 		goto fail;
 	}
 
-#if LIBCURL_VERSION_NUM >= 0x071304
-	/* CURLOPT_PROTOCOLS is supported starting with version 7.19.4 (0x071304) */
-	/* CURLOPT_PROTOCOLS was deprecated in favor of CURLOPT_PROTOCOLS_STR starting with version 7.85.0 (0x075500) */
-#	if LIBCURL_VERSION_NUM >= 0x075500
-	if (CURLE_OK != (err = curl_easy_setopt(http_ctx->easyhandle, CURLOPT_PROTOCOLS_STR, "HTTP,HTTPS")))
-#	else
-	if (CURLE_OK != (err = curl_easy_setopt(http_ctx->easyhandle, CURLOPT_PROTOCOLS,
-			CURLPROTO_HTTP | CURLPROTO_HTTPS)))
-#	endif
-	{
-		*error = zbx_dsprintf(*error, "cannot set allowed protocols: %s", curl_easy_strerror(err));
+	if (SUCCEED != zbx_curl_setopt_https(http_ctx->easyhandle, error))
 		goto fail;
-	}
-#endif
 
 	if (CURLE_OK != (err = curl_easy_setopt(http_ctx->easyhandle, CURLOPT_PRIVATE, http_ctx)))
 	{

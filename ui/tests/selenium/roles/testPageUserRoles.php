@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -14,10 +14,10 @@
 **/
 
 
-require_once dirname(__FILE__).'/../../include/CWebTest.php';
-require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
-require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
-require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
+require_once __DIR__.'/../../include/CWebTest.php';
+require_once __DIR__.'/../../include/helpers/CDataHelper.php';
+require_once __DIR__.'/../behaviors/CMessageBehavior.php';
+require_once __DIR__.'/../behaviors/CTableBehavior.php';
 
 /**
  * @dataSource ExecuteNowAction, LoginUsers, ScheduledReports, UserPermissions
@@ -62,7 +62,7 @@ class testPageUserRoles extends CWebTest {
 				'type' => 1
 			],
 			[
-				'name' => 'role_with_min end',
+				'name' => 'role_with_min   end',
 				'type' => 1
 			]
 		]);
@@ -234,6 +234,14 @@ class testPageUserRoles extends CWebTest {
 			],
 			[
 				[
+					'name' => '   ',
+					'result' => [
+						'role_with_min end'
+					]
+				]
+			],
+			[
+				[
 					'name' => '',
 					'result' => [
 						'$^&#%*',
@@ -290,8 +298,10 @@ class testPageUserRoles extends CWebTest {
 	 */
 	public function testPageUserRoles_Filter($data) {
 		$this->page->login()->open('zabbix.php?action=userrole.list');
+		$table = $this->getTable();
 		$form = $this->query('name:zbx_filter')->waitUntilPresent()->asForm()->one();
 		$form->fill(['Name' => $data['name']])->submit();
+		$table->waitUntilReloaded();
 		$this->assertTableDataColumn($data['result'], 'Name');
 	}
 

@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -215,6 +215,16 @@ abstract class CControllerHost extends CController {
 			}
 		}
 
+		if ($hosts) {
+			$dashboard_count = API::HostDashboard()->get([
+				'countOutput' => true,
+				'groupCount' => true,
+				'hostids' => array_keys($hosts)
+			]);
+
+			$dashboard_count = array_column($dashboard_count, 'rowscount', 'hostid');
+		}
+
 		foreach ($hosts as &$host) {
 			foreach ($host['interfaces'] as &$interface) {
 				$interfaceid = $interface['interfaceid'];
@@ -236,9 +246,7 @@ abstract class CControllerHost extends CController {
 			unset($host['active_available']);
 
 			$host['items_count'] = array_key_exists($host['hostid'], $items_count) ? $items_count[$host['hostid']] : 0;
-
-			// Count number of dashboards for each host.
-			$host['dashboards'] = count(getHostDashboards($host['hostid']));
+			$host['dashboards'] = $dashboard_count[$host['hostid']];
 
 			CArrayHelper::sort($host['interfaces'], [['field' => 'main', 'order' => ZBX_SORT_DOWN]]);
 

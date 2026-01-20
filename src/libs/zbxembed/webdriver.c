@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -765,7 +765,6 @@ int	webdriver_clear_element(zbx_webdriver_t *wd, const char *element, char **err
 
 	ret = webdriver_session_query(wd, "POST", command, json.buffer, NULL, error);
 
-
 	zbx_free(command);
 	zbx_json_free(&json);
 
@@ -1186,7 +1185,7 @@ int	webdriver_get_alert(zbx_webdriver_t *wd, char **text, char **error)
 		}
 
 		/* otherwise log the error and return NULL alert */
-		zabbix_log(LOG_LEVEL_DEBUG, "cannot get alert text: %s", error);
+		zabbix_log(LOG_LEVEL_DEBUG, "cannot get alert text: %s", *error);
 
 		webdriver_discard_error(wd);
 		zbx_free(*error);

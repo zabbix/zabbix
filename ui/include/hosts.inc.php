@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -1201,19 +1201,6 @@ function renderInterfaceHeaders() {
 					)
 				])
 		);
-}
-
-function getHostDashboards(string $hostid, array $dashboard_fields = []): array {
-	$dashboard_fields = array_merge($dashboard_fields, ['dashboardid']);
-	$dashboard_fields = array_keys(array_flip($dashboard_fields));
-
-	$templateids = CApiHostHelper::getParentTemplates([$hostid])[1];
-
-	return API::TemplateDashboard()->get([
-		'output' => $dashboard_fields,
-		'templateids' => $templateids,
-		'preservekeys' => true
-	]);
 }
 
 /**

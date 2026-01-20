@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -80,7 +80,17 @@ func checkMetrics(s scheduler.Scheduler) {
 		`vm.memory.size[total]`,
 		`proc.cpu.util[inetd]`,
 		`proc.num[inetd]`,
+		`proc.num[inetd,]`,
+		`proc.num[inetd,NONEXISTING_USER]`,
+		`proc.num[NONEXISTING_PROCESS]`,
 		`proc.mem[inetd]`,
+		`proc.mem[inetd,]`,
+		`proc.mem[inetd,NONEXISTING_USER]`,
+		`proc.mem[NONEXISTING_PROCESS]`,
+		`proc.get[inetd]`,
+		`proc.get[inetd,]`,
+		`proc.get[inetd,NONEXISTING_USER]`,
+		`proc.get[NONEXISTING_PROCESS]`,
 		`system.cpu.switches`,
 		`system.cpu.intr`,
 		`system.cpu.util[all,user,avg1]`,

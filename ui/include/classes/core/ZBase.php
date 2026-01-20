@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -553,7 +553,10 @@ class ZBase {
 			throw new Exception(_('Session initialization error.'));
 		}
 
-		CSessionHelper::set('sessionid', CWebUser::$data['sessionid']);
+		if (CSessionHelper::get('sessionid') !== CWebUser::$data['sessionid']) {
+			CSessionHelper::unset(['saml_data']);
+			CSessionHelper::set('sessionid', CWebUser::$data['sessionid']);
+		}
 
 		// Set the authentication token for the API.
 		API::getWrapper()->auth = [
@@ -697,12 +700,21 @@ class ZBase {
 				'stylesheet' => [
 					'files' => []
 				],
-				'web_layout_mode' => ZBX_LAYOUT_NORMAL,
-				'config' => [
+				'web_layout_mode' => ZBX_LAYOUT_NORMAL
+			];
+
+			try {
+				$layout_data_defaults['config'] = [
 					'server_check_interval' => CSettingsHelper::get(CSettingsHelper::SERVER_CHECK_INTERVAL),
 					'x_frame_options' => CSettingsHelper::get(CSettingsHelper::X_FRAME_OPTIONS)
-				]
-			];
+				];
+			}
+			catch (Throwable $e) {
+				$layout_data_defaults['config'] = [
+					'server_check_interval' => DB::getDefault('config', 'server_check_interval'),
+					'x_frame_options' => DB::getDefault('config', 'x_frame_options')
+				];
+			}
 
 			if ($router->getView() !== null && $response->isViewEnabled()) {
 				$this->view = new CView($router->getView(), $response->getData());

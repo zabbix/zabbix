@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -36,6 +36,9 @@ const (
 
 	inAddrSuffix   = ".in-addr.arpa"
 	inAddrV6Suffix = ".ip6.arpa"
+
+	defaultCount      = 2
+	defaultRecordType = dns.TypeSOA
 )
 
 const (
@@ -476,6 +479,7 @@ func (o *options) setDNSType(dnsType string) error {
 }
 
 func (o *options) setDefaults() error {
+
 	if o.ip == "" {
 		err := o.setDefaultIP()
 		if err != nil {
@@ -488,7 +492,7 @@ func (o *options) setDefaults() error {
 	}
 
 	if o.dnsType == dns.TypeNone {
-		o.dnsType = dns.TypeSOA
+		o.dnsType = defaultRecordType
 	}
 
 	if o.timeout < 1 {
@@ -496,7 +500,7 @@ func (o *options) setDefaults() error {
 	}
 
 	if o.count < 1 {
-		o.count = 2
+		o.count = defaultCount
 	}
 
 	if o.protocol == "" {

@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -19,6 +19,7 @@
 
 #include "zbxalgo.h"
 #include "zbxthreads.h"
+#include "zbxasyncpoller.h"
 
 typedef struct
 {
@@ -42,9 +43,14 @@ typedef struct
 	const char		*config_ssl_key_location;
 	struct event		*async_wake_timer;
 	struct event		*async_timer;
+#ifdef HAVE_ARES
+	struct event		*async_timeout_timer;
+#endif
 	struct event_base	*base;
 	struct evdns_base	*dnsbase;
+	zbx_channel_t		*channel;
 	zbx_hashset_t		interfaces;
+	zbx_hashset_t		fd_events;
 #ifdef HAVE_LIBCURL
 	CURLM			*curl_handle;
 #endif

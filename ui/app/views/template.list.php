@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -210,7 +210,7 @@ foreach ($data['templates'] as $template) {
 
 	$table->addRow([
 		new CCheckBox('templates['.$template['templateid'].']', $template['templateid']),
-		(new CCol($name))->addClass(ZBX_STYLE_WORDBREAK),
+		(new CCol($name))->addClass(ZBX_STYLE_NOWRAP),
 		[
 			$data['allowed_ui_conf_hosts']
 				? new CLink(_('Hosts'),
@@ -278,11 +278,11 @@ foreach ($data['templates'] as $template) {
 			),
 			CViewHelper::showNum($template['httpTests'])
 		],
-		(new CCol($template['vendor_name']))->addClass(ZBX_STYLE_WORDBREAK),
+		$template['vendor_name'],
 		$template['vendor_version'],
-		(new CCol($linked_templates_output))->addClass(ZBX_STYLE_WORDBREAK),
-		(new CCol($linked_to_output))->addClass(ZBX_STYLE_WORDBREAK),
-		$data['tags'][$template['templateid']]
+		$linked_templates_output,
+		$linked_to_output,
+		(new CDiv($data['tags'][$template['templateid']]))->addClass(ZBX_STYLE_TAGS_WRAPPER)
 	]);
 }
 

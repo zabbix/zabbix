@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -414,7 +414,7 @@ do														\
 	THIS_SHOULD_NEVER_HAPPEN;										\
 	zbx_error(fmt, ##__VA_ARGS__);										\
 }														\
-while(0)
+while (0)
 
 #define ARRSIZE(a)	(sizeof(a) / sizeof(*a))
 
@@ -564,7 +564,7 @@ int	zbx_vsnprintf_check_len(const char *fmt, va_list args);
 char	*zbx_dsprintf(char *dest, const char *f, ...) __zbx_attr_format_printf(2, 3);
 
 /* used by zbxcommon, setproctitle */
-size_t	zbx_strlcpy(char *dst, const char *src, size_t size);
+size_t	zbx_strlcpy(char *dst, const char *src, size_t siz);
 
 /* used by dsprintf, which is used by log */
 char	*zbx_dvsprintf(char *dest, const char *f, va_list args);
@@ -587,6 +587,7 @@ void	zbx_setproctitle_deinit(void);
 void	zbx_error(const char *fmt, ...) __zbx_attr_format_printf(1, 2);
 
 /* misc functions */
+int	zbx_validate_hostname_len(const char *hostname, size_t hostname_len);
 int	zbx_validate_hostname(const char *hostname);
 
 int	get_nearestindex(const void *p, size_t sz, int num, zbx_uint64_t id);
@@ -681,7 +682,7 @@ int	zbx_alarm_timed_out(void);
 #define ZBX_PREPROC_FAIL_SET_VALUE	2
 #define ZBX_PREPROC_FAIL_SET_ERROR	3
 
-
+#define ZBX_SHA512_BINARY_LENGTH 64
 
 /* includes terminating '\0' */
 #define CUID_LEN	26
@@ -764,7 +765,7 @@ static	type2	get_##varname(void) \
 typedef void (*zbx_log_func_t)(int level, const char *fmt, va_list args);
 
 void	zbx_init_library_common(zbx_log_func_t log_func, zbx_get_progname_f get_progname, zbx_backtrace_f backtrace);
-void	zbx_log_handle(int level, const char *fmt, ...);
+void	zbx_log_handle(int level, const char *fmt, ...) __zbx_attr_format_printf(2, 3);
 int	zbx_get_log_level(void);
 void	zbx_set_log_level(int level);
 const char	*zbx_get_log_component_name(void);
@@ -784,6 +785,7 @@ zbx_log_component_t;
 
 void	zbx_set_log_component(const char *name, zbx_log_component_t *component);
 void	zbx_change_component_log_level(zbx_log_component_t *component, int direction);
+void	zbx_malloc_trim(time_t now, int period, size_t pad);
 #endif
 
 #endif

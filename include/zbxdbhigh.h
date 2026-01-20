@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -592,6 +592,8 @@ void	zbx_db_add_condition_alloc(char **sql, size_t *sql_alloc, size_t *sql_offse
 		const zbx_uint64_t *values, const int num);
 void	zbx_db_add_str_condition_alloc(char **sql, size_t *sql_alloc, size_t *sql_offset, const char *fieldname,
 		const char * const *values, const int num);
+void	add_batch_select_condition(char **sql, size_t *sql_alloc, size_t *sql_offset, const char* column,
+		const zbx_vector_uint64_t *itemids, int *index);
 
 int	zbx_check_user_permissions(const zbx_uint64_t *userid, const zbx_uint64_t *recipient_userid);
 
@@ -705,6 +707,7 @@ typedef struct
 	int				autoincrement;
 	/* the last id assigned by autoincrement */
 	zbx_uint64_t			lastid;
+	char				*clause;
 }
 zbx_db_insert_t;
 
@@ -716,6 +719,7 @@ void	zbx_db_insert_add_values(zbx_db_insert_t *self, ...);
 int	zbx_db_insert_execute(zbx_db_insert_t *self);
 void	zbx_db_insert_clean(zbx_db_insert_t *self);
 void	zbx_db_insert_autoincrement(zbx_db_insert_t *self, const char *field_name);
+void	zbx_db_insert_clause(zbx_db_insert_t *self, const char *clause);
 zbx_uint64_t	zbx_db_insert_get_lastid(zbx_db_insert_t *self);
 
 int	zbx_db_get_database_type(void);
@@ -748,6 +752,7 @@ typedef struct
 	unsigned char	state;
 	int		mtime;
 	const char	*error;
+	char		error_hash[ZBX_SHA512_BINARY_LENGTH];
 
 	zbx_uint64_t	flags;
 #define ZBX_FLAGS_ITEM_DIFF_UNSET			__UINT64_C(0x0000)

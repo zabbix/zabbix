@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -482,7 +482,7 @@ foreach ($data['hosts'] as $host) {
 
 	$table->addRow([
 		new CCheckBox('hostids['.$host['hostid'].']', $host['hostid']),
-		(new CCol($description))->addClass(ZBX_STYLE_WORDBREAK),
+		(new CCol($description))->addClass(ZBX_STYLE_NOWRAP),
 		[
 			new CLink(_('Items'),
 				(new CUrl('zabbix.php'))
@@ -530,9 +530,9 @@ foreach ($data['hosts'] as $host) {
 			),
 			CViewHelper::showNum($host['httpTests'])
 		],
-		(new CCol(getHostInterface($interface)))->addClass(ZBX_STYLE_WORDBREAK),
-		(new CCol($monitored_by))->addClass(ZBX_STYLE_WORDBREAK),
-		(new CCol($hostTemplates))->addClass(ZBX_STYLE_WORDBREAK),
+		getHostInterface($interface),
+		$monitored_by,
+		$hostTemplates,
 		[
 			$toggle_status_link,
 			$disabled_by_lld ? makeDescriptionIcon(_('Disabled automatically by an LLD rule.')) : null
@@ -540,7 +540,7 @@ foreach ($data['hosts'] as $host) {
 		getHostAvailabilityTable($host['interfaces']),
 		$encryption,
 		makeInformationList($info_icons),
-		$data['tags'][$host['hostid']]
+		(new CDiv($data['tags'][$host['hostid']]))->addClass(ZBX_STYLE_TAGS_WRAPPER)
 	]);
 }
 

@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -1054,11 +1054,19 @@ function formatAggregatedHistoryValue($value, array $item, int $function, bool $
  */
 function formatAggregatedHistoryValueRaw($value, array $item, int $function, bool $force_units = false,
 		bool $trim = true, array $convert_options = []): array {
+	$units = $force_units || CAggFunctionData::preservesUnits($function) ? $item['units'] : '';
+
 	$is_numeric_item = in_array($item['value_type'], [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64]);
 	$is_numeric_data = $is_numeric_item || CAggFunctionData::isNumericResult($function);
 
 	if ($is_numeric_data) {
-		$display_value = $value;
+		$converted_value = convertUnitsRaw([
+			'value' => $value,
+			'units' => $units
+		] + $convert_options);
+
+		$display_value = $converted_value['value'].
+			($converted_value['units'] !== '' ? ' '.$converted_value['units'] : '');
 	}
 	else {
 		switch ($item['value_type']) {
@@ -1090,14 +1098,7 @@ function formatAggregatedHistoryValueRaw($value, array $item, int $function, boo
 		}
 	}
 
-	$units = $force_units || CAggFunctionData::preservesUnits($function) ? $item['units'] : '';
-
 	if ($is_numeric_data) {
-		$converted_value = convertUnitsRaw([
-			'value' => $value,
-			'units' => $units
-		] + $convert_options);
-
 		return [
 			'value' => $converted_value['value'],
 			'units' => $converted_value['units'],
@@ -1154,18 +1155,19 @@ function formatHistoryValueRaw($value, array $item, bool $trim = true, array $co
 	switch ($item['value_type']) {
 		case ITEM_VALUE_TYPE_FLOAT:
 		case ITEM_VALUE_TYPE_UINT64:
-			if ($mapped_value !== false) {
-				return [
-					'value' => $mapped_value.' ('.$value.')',
-					'units' => '',
-					'is_mapped' => true
-				];
-			}
-
 			$converted_value = convertUnitsRaw([
 				'value' => $value,
 				'units' => $item['units']
 			] + $convert_options);
+
+			if ($mapped_value !== false) {
+				return [
+					'value' => $mapped_value.' ('.$converted_value['value'].
+						($converted_value['units'] !== '' ? ' '.$converted_value['units'] : '').')',
+					'units' => '',
+					'is_mapped' => true
+				];
+			}
 
 			return [
 				'value' => $converted_value['value'],
@@ -1390,33 +1392,6 @@ function checkTimePeriod($period, $now) {
 	$sec2 = SEC_PER_HOUR * $h2 + SEC_PER_MIN * $m2;
 
 	return $d1 <= $day && $day <= $d2 && $sec1 <= $sec && $sec < $sec2;
-}
-
-/**
- * Get item minimum delay.
- *
- * @param string $delay
- * @param array $flexible_intervals
- *
- * @return string
- */
-function getItemDelay($delay, array $flexible_intervals) {
-	$delay = timeUnitToSeconds($delay);
-
-	if ($delay != 0 || !$flexible_intervals) {
-		return $delay;
-	}
-
-	$min_delay = SEC_PER_YEAR;
-
-	foreach ($flexible_intervals as $flexible_interval) {
-		$flexible_interval_parts = explode('/', $flexible_interval);
-		$flexible_delay = timeUnitToSeconds($flexible_interval_parts[0]);
-
-		$min_delay = min($min_delay, $flexible_delay);
-	}
-
-	return $min_delay;
 }
 
 /**
@@ -2013,20 +1988,20 @@ function normalizeItemPreprocessingSteps(array $preprocessing): array {
 		switch ($step['type']) {
 			case ZBX_PREPROC_MULTIPLIER:
 			case ZBX_PREPROC_PROMETHEUS_TO_JSON:
+			case ZBX_PREPROC_XPATH:
+			case ZBX_PREPROC_JSONPATH:
+			case ZBX_PREPROC_ERROR_FIELD_JSON:
+			case ZBX_PREPROC_ERROR_FIELD_XML:
+			case ZBX_PREPROC_THROTTLE_TIMED_VALUE:
+			case ZBX_PREPROC_SCRIPT:
 				$step['params'] = trim($step['params'][0]);
 				break;
 
 			case ZBX_PREPROC_RTRIM:
 			case ZBX_PREPROC_LTRIM:
 			case ZBX_PREPROC_TRIM:
-			case ZBX_PREPROC_XPATH:
-			case ZBX_PREPROC_JSONPATH:
 			case ZBX_PREPROC_VALIDATE_REGEX:
 			case ZBX_PREPROC_VALIDATE_NOT_REGEX:
-			case ZBX_PREPROC_ERROR_FIELD_JSON:
-			case ZBX_PREPROC_ERROR_FIELD_XML:
-			case ZBX_PREPROC_THROTTLE_TIMED_VALUE:
-			case ZBX_PREPROC_SCRIPT:
 			case ZBX_PREPROC_SNMP_GET_VALUE:
 				$step['params'] = $step['params'][0];
 				break;
@@ -2497,9 +2472,7 @@ function getTypeItemFieldNames(array $input): array {
 			return ['params', 'delay'];
 
 		case ITEM_TYPE_JMX:
-			return $input['templateid'] == 0
-				? ['interfaceid', 'jmx_endpoint', 'username', 'password', 'delay']
-				: ['interfaceid', 'username', 'password', 'delay'];
+			return ['interfaceid', 'jmx_endpoint', 'username', 'password', 'delay'];
 
 		case ITEM_TYPE_SNMPTRAP:
 			return ['interfaceid'];
@@ -2697,7 +2670,10 @@ function getEnabledItemsCountByInterfaceIds(array $interfaceids): array {
 		'countOutput' => true,
 		'groupCount' => true,
 		'interfaceids' => $interfaceids,
-		'filter' => ['status' => ITEM_STATUS_ACTIVE]
+		'filter' => [
+			'type' => [ITEM_TYPE_ZABBIX, ITEM_TYPE_IPMI, ITEM_TYPE_JMX, ITEM_TYPE_SNMP],
+			'status' => ITEM_STATUS_ACTIVE
+		]
 	]);
 
 	return $items_count ? array_column($items_count, 'rowscount', 'interfaceid') : [];

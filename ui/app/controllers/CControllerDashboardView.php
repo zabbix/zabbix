@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -92,9 +92,13 @@ class CControllerDashboardView extends CController {
 		}
 
 		if ($dashboard === null) {
-			$this->setResponse(new CControllerResponseRedirect((new CUrl('zabbix.php'))
-				->setArgument('action', 'dashboard.list')
-				->setArgument('page', $this->hasInput('cancel') ? CPagerHelper::loadPage('dashboard.list', null) : null)
+			$this->setResponse(new CControllerResponseRedirect(
+				(new CUrl('zabbix.php'))
+					->setArgument('action', 'dashboard.list')
+					->setArgument('page', $this->hasInput('cancel')
+						? CPagerHelper::loadPage('dashboard.list', null)
+						: null
+					)
 			));
 
 			return;

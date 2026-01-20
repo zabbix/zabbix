@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -25,6 +25,7 @@ class HttpResponse {
 
 	protected $http_codes = [
 		ZBX_API_ERROR_INTERNAL		=> 500,
+		ZBX_API_ERROR_DB			=> 500,
 		ZBX_API_ERROR_PARAMETERS	=> 400,
 		ZBX_API_ERROR_NO_ENTITY		=> 404,
 		ZBX_API_ERROR_PERMISSIONS	=> 403,

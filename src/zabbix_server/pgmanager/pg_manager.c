@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -27,6 +27,7 @@
 #include "zbxstr.h"
 #include "zbxtime.h"
 #include "zbxtypes.h"
+#include "zbxlog.h"
 /******************************************************************************
  *                                                                            *
  * Purpose: initialize proxy group manager                                    *
@@ -171,9 +172,8 @@ static void	pgm_db_flush_group_updates(char **sql, size_t *sql_alloc, size_t *sq
 		zbx_snprintf_alloc(sql, sql_alloc, sql_offset,
 				"update proxy_group_rtdata set state=%d where proxy_groupid=" ZBX_FS_UI64 ";\n",
 				group_updates->values[i].state, group_updates->values[i].objectid);
+		zbx_db_execute_overflowed_sql(sql, sql_alloc, sql_offset);
 	}
-
-	zbx_db_execute_overflowed_sql(sql, sql_alloc, sql_offset);
 }
 
 /******************************************************************************
@@ -546,6 +546,7 @@ ZBX_THREAD_ENTRY(pg_manager_thread, args)
 		{
 			pgm_update(&cache);
 			time_update = time_now;
+			zbx_handle_log();
 		}
 
 		zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_IDLE);

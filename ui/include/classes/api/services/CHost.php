@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -490,18 +490,9 @@ class CHost extends CHostGeneral {
 
 		// tags
 		if ($options['tags'] !== null && $options['tags']) {
-			if ($options['inheritedTags']) {
-				$sqlParts['left_join'][] = ['alias' => 'ht2', 'table' => 'hosts_templates', 'using' => 'hostid'];
-				$sqlParts['left_table'] = ['alias' => $this->tableAlias, 'table' => $this->tableName];
-				$sqlParts['where'][] = CApiTagHelper::addInheritedHostTagsWhereCondition($options['tags'],
-					$options['evaltype']
-				);
-			}
-			else {
-				$sqlParts['where'][] = CApiTagHelper::addWhereCondition($options['tags'], $options['evaltype'], 'h',
-					'host_tag', 'hostid'
-				);
-			}
+			$sqlParts['where'][] = $options['inheritedTags']
+				? CApiTagHelper::addInheritedHostTagsWhereCondition($options['tags'], $options['evaltype'], 'h')
+				: CApiTagHelper::addWhereCondition($options['tags'], $options['evaltype'], 'h', 'host_tag', 'hostid');
 		}
 
 		// limit
@@ -761,6 +752,8 @@ class CHost extends CHostGeneral {
 
 		$this->addAuditBulk(CAudit::ACTION_ADD, CAudit::RESOURCE_HOST, $hosts);
 
+		self::addHostGroupAuditLog($hosts);
+
 		return ['hostids' => array_column($hosts, 'hostid')];
 	}
 
@@ -878,6 +871,9 @@ class CHost extends CHostGeneral {
 		}
 
 		$this->updateGroups($hosts, $db_hosts);
+
+		self::addHostGroupAuditLog($hosts, $db_hosts);
+
 		$this->updateHgSets($hosts, $db_hosts);
 		$this->updateTemplates($hosts, $db_hosts);
 	}
@@ -1744,26 +1740,16 @@ class CHost extends CHostGeneral {
 		}
 
 		// delete host from maps
-		if (!empty($hostids)) {
-			DB::delete('sysmaps_elements', [
-				'elementtype' => SYSMAP_ELEMENT_TYPE_HOST,
-				'elementid' => $hostids
-			]);
-		}
-
-		// delete host inventory
-		DB::delete('host_inventory', ['hostid' => $hostids]);
+		DB::delete('sysmaps_elements', [
+			'elementtype' => SYSMAP_ELEMENT_TYPE_HOST,
+			'elementid' => $hostids
+		]);
 
 		self::deleteHgSets($db_hosts);
-		DB::delete('hosts_groups', ['hostid' => $hostids]);
 
 		// delete host
 		DB::delete('host_proxy', ['hostid' => $hostids]);
 		DB::delete('host_tag', ['hostid' => $hostids]);
-		DB::update('hosts', [
-			'values' => ['templateid' => 0],
-			'where' => ['hostid' => $hostids, 'flags' => ZBX_FLAG_DISCOVERY_PROTOTYPE]
-		]);
 		DB::delete('hosts', ['hostid' => $hostids]);
 
 		self::addAuditLog(CAudit::ACTION_DELETE, CAudit::RESOURCE_HOST, $db_hosts);
@@ -1835,46 +1821,39 @@ class CHost extends CHostGeneral {
 		}
 
 		if ($options['selectDashboards'] !== null) {
-			[$hosts_templates, $templateids] = CApiHostHelper::getParentTemplates($hostids);
-
 			if ($options['selectDashboards'] != API_OUTPUT_COUNT) {
-				$dashboards = API::TemplateDashboard()->get([
-					'output' => $this->outputExtend($options['selectDashboards'], ['templateid']),
-					'templateids' => $templateids
+				foreach ($result as &$host) {
+					$host['dashboards'] = [];
+				}
+				unset($host);
+
+				$dashboards = API::HostDashboard()->get([
+					'output' => $options['selectDashboards'],
+					'hostids' => $hostids
 				]);
 
-				if (!is_null($options['limitSelects'])) {
+				if ($options['limitSelects'] !== null) {
 					order_result($dashboards, 'name');
 				}
 
-				foreach ($result as &$host) {
-					foreach ($hosts_templates[$host['hostid']] as $templateid) {
-						foreach ($dashboards as $dashboard) {
-							if ($dashboard['templateid'] == $templateid) {
-								$host['dashboards'][] = $dashboard;
-							}
-						}
-					}
+				foreach ($dashboards as $dashboard) {
+					$result[$dashboard['hostid']]['dashboards'][] = $dashboard;
 				}
-				unset($host);
 			}
 			else {
-				$dashboards = API::TemplateDashboard()->get([
-					'templateids' => $templateids,
+				foreach ($result as $hostid => &$host) {
+					$host['dashboards'] = '0';
+				}
+				unset($host);
+
+				$dashboards = API::HostDashboard()->get([
 					'countOutput' => true,
-					'groupCount' => true
+					'groupCount' => true,
+					'hostids' => $hostids
 				]);
 
-				foreach ($result as $hostid => $host) {
-					$result[$hostid]['dashboards'] = 0;
-
-					foreach ($dashboards as $dashboard) {
-						if (in_array($dashboard['templateid'], $hosts_templates[$hostid])) {
-							$result[$hostid]['dashboards'] += $dashboard['rowscount'];
-						}
-					}
-
-					$result[$hostid]['dashboards'] = (string) $result[$hostid]['dashboards'];
+				foreach ($dashboards as $dashboard) {
+					$result[$dashboard['hostid']]['dashboards'] = $dashboard['rowscount'];
 				}
 			}
 		}
@@ -2801,5 +2780,69 @@ class CHost extends CHostGeneral {
 		}
 
 		return $hosts;
+	}
+
+	private static function addHostGroupAuditLog(array $hosts, ?array $db_hosts = null): void {
+		$host_groups = [];
+		$db_host_groups = [];
+
+		foreach ($hosts as $host) {
+			if (!array_key_exists('groups', $host)) {
+				continue;
+			}
+
+			$db_groups = $db_hosts !== null
+				? array_column($db_hosts[$host['hostid']]['groups'], null, 'groupid')
+				: [];
+
+			foreach ($host['groups'] as $group) {
+				if (array_key_exists($group['groupid'], $db_groups)) {
+					unset($db_groups[$group['groupid']]);
+				}
+				else {
+					$host_groups[$group['groupid']]['groupid'] = $group['groupid'];
+					$host_groups[$group['groupid']]['hosts'][] = [
+						'hostgroupid' => $group['hostgroupid'],
+						'hostid' => $host['hostid']
+					];
+
+					$db_host_groups[$group['groupid']]['groupid'] = $group['groupid'];
+					$db_host_groups[$group['groupid']] += ['hosts' => []];
+				}
+			}
+
+			foreach ($db_groups as $db_group) {
+				if ($db_group['permission'] != PERM_READ_WRITE) {
+					continue;
+				}
+
+				$host_groups[$db_group['groupid']]['groupid'] = $db_group['groupid'];
+				$host_groups[$db_group['groupid']] += ['hosts' => []];
+
+				$db_host_groups[$db_group['groupid']]['groupid'] = $db_group['groupid'];
+				$db_host_groups[$db_group['groupid']]['hosts'][$db_group['hostgroupid']] = [
+					'hostgroupid' => $db_group['hostgroupid'],
+					'hostid' => $host['hostid']
+				];
+			}
+		}
+
+		if (!$db_host_groups) {
+			return;
+		}
+
+		$host_groups = array_values($host_groups);
+
+		$options = [
+			'output' => ['groupid', 'name'],
+			'filter' => ['groupid' => array_keys($db_host_groups)]
+		];
+		$result = DBselect(DB::makeSql('hstgrp', $options));
+
+		while ($row = DBfetch($result)) {
+			$db_host_groups[$row['groupid']]['name'] = $row['name'];
+		}
+
+		self::addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_HOST_GROUP, $host_groups, $db_host_groups);
 	}
 }

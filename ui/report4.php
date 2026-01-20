@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -132,9 +132,7 @@ if ($media_types) {
 
 	foreach ($db_users as $user_data) {
 		$full_name = getUserFullname($user_data);
-		$header[] = (new CSpan($full_name))
-			->addClass(ZBX_STYLE_TEXT_VERTICAL)
-			->setTitle($full_name);
+		$header[] = (new CVertical($full_name))->setTitle($full_name);
 		$users[] = $user_data['userid'];
 	}
 

@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -38,6 +38,7 @@ void	vmware_dsname_free(zbx_vmware_dsname_t *dsname)
 	zbx_vector_vmware_hvdisk_destroy(&dsname->hvdisks);
 	zbx_free(dsname->name);
 	zbx_free(dsname->uuid);
+	zbx_free(dsname->id);
 	zbx_free(dsname);
 }
 

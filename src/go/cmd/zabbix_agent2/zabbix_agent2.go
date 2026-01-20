@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -116,6 +116,10 @@ type Arguments struct {
 	version        bool
 	runtimeCommand string
 	help           bool
+}
+
+func (args *Arguments) isTestCommand() bool {
+	return args.test != "" || args.print || args.testConfig
 }
 
 func main() {
@@ -250,27 +254,27 @@ func run() error {
 			return errs.Wrap(err, "cannot send remote command")
 		}
 
-		fmt.Fprintf(os.Stderr, "%s\n", reply)
+		fmt.Fprintf(os.Stdout, "%s\n", reply)
 
 		return nil
 	}
 
-	systemOpt, err := agent.Options.RemovePluginSystemOptions()
+	systemOptions, err := agent.Options.RemovePluginSystemOptions()
 	if err != nil {
 		return errs.Wrap(err, "cannot initialize plugin system option")
 	}
 
-	pluginSocket, err = initExternalPlugins(&agent.Options, systemOpt)
+	pluginSocket, err = initExternalPlugins(&agent.Options, systemOptions, args)
 	if err != nil {
 		return errs.Wrap(err, "cannot register plugins")
 	}
 
 	defer cleanUpExternal()
 
-	if args.test != "" || args.print || args.testConfig {
+	if args.isTestCommand() {
 		var m *scheduler.Manager
 
-		m, err = prepareMetricPrintManager(args.verbose, systemOpt)
+		m, err = prepareMetricPrintManager(args.verbose, systemOptions)
 		if err != nil {
 			return errs.Wrap(err, "failed to prepare metric print manager")
 		}
@@ -296,7 +300,7 @@ func run() error {
 		return errs.New("verbose parameter can be specified only with test or print parameters")
 	}
 
-	err = runAgent(args.foreground, args.configPath, systemOpt)
+	err = runAgent(args.foreground, args.configPath, systemOptions)
 	if err != nil {
 		if agent.Options.LogType == "file" {
 			log.Critf("%s", err.Error())
@@ -331,12 +335,23 @@ func runAgent(isForeground bool, configPath string, systemOpt agent.PluginSystem
 		return errs.Wrap(err, "cannot initialize logger")
 	}
 
+	if logType == log.File {
+		go func() {
+			t := time.NewTicker(15 * time.Second)
+			defer t.Stop()
+
+			for range t.C {
+				log.RefreshLogFile()
+			}
+		}()
+	}
+
 	zbxlib.SetLogLevel(agent.Options.DebugLevel)
 
 	greeting := fmt.Sprintf("Starting Zabbix Agent 2 (%s)", version.Long())
 	log.Infof(greeting)
 
-	addresses, err := serverconnector.ParseServerActive()
+	addresses, err := agent.ParseServerActive(agent.Options.ServerActive)
 	if err != nil {
 		return errs.Wrap(err, "cannot parse the \"ServerActive\" parameter")
 	}
@@ -785,7 +800,7 @@ func processRemoteCommand(c *runtimecontrol.Client) (err error) {
 	switch len(params) {
 	case 0:
 		return errors.New("Empty command")
-	case 2: //nolint:gomnd
+	case 2: //nolint:mnd
 		return errors.New("Too many commands")
 	default:
 	}
@@ -824,7 +839,8 @@ func waitStop() error {
 
 	for {
 		select {
-		case <-sigs:
+		case sig := <-sigs:
+			log.Debugf("syscall signal '%s' received", getSignalName(sig))
 			sendServiceStop()
 
 			return nil
@@ -843,5 +859,16 @@ func waitStop() error {
 				return nil
 			}
 		}
+	}
+}
+
+func getSignalName(sig os.Signal) string {
+	switch sig {
+	case syscall.SIGINT:
+		return "SIGINT"
+	case syscall.SIGTERM:
+		return "SIGTERM"
+	default:
+		return "unknown"
 	}
 }

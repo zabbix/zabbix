@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -30,9 +30,7 @@ class CControllerAuditSettingsUpdate extends CController {
 			switch ($this->getValidationError()) {
 				case self::VALIDATION_ERROR:
 					$response = new CControllerResponseRedirect(
-						(new CUrl('zabbix.php'))
-							->setArgument('action', 'audit.settings.edit')
-							->getUrl()
+						(new CUrl('zabbix.php'))->setArgument('action', 'audit.settings.edit')
 					);
 					$response->setFormData($this->getInputAll() + [
 						'auditlog_enabled' => '0',
@@ -41,6 +39,7 @@ class CControllerAuditSettingsUpdate extends CController {
 					CMessageHelper::setErrorTitle(_('Cannot update configuration'));
 					$this->setResponse($response);
 					break;
+
 				case self::VALIDATION_FATAL_ERROR:
 					$this->setResponse(new CControllerResponseFatal());
 					break;

@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -14,9 +14,9 @@
 **/
 
 
-require_once dirname(__FILE__).'/../../include/CWebTest.php';
-require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
-require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
+require_once __DIR__.'/../../include/CWebTest.php';
+require_once __DIR__.'/../behaviors/CMessageBehavior.php';
+require_once __DIR__.'/../behaviors/CTableBehavior.php';
 
 /**
  * @backup module, widget
@@ -508,6 +508,20 @@ class testPageAdministrationGeneralModules extends CWebTest {
 				'Status' => 'Disabled'
 			],
 			[
+				'Name' => 'Test Broadcaster',
+				'Version' => '1.0',
+				'Author' => 'Zabbix',
+				'Description' => 'Allows to test listening functionality of other widgets.',
+				'Status' => 'Disabled'
+			],
+			[
+				'Name' => 'Test Listener',
+				'Version' => '1.0',
+				'Author' => 'Zabbix',
+				'Description' => 'Allows to test broadcasting functionality of other widgets.',
+				'Status' => 'Disabled'
+			],
+			[
 				'Name' => 'шестой модуль',
 				'Version' => 'бета 2',
 				'Author' => 'Работник Заббикса',
@@ -697,7 +711,7 @@ class testPageAdministrationGeneralModules extends CWebTest {
 		$this->query('link', $data['Name'])->waitUntilVisible()->one()->click();
 		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
 		$form = $dialog->asForm();
-		// Check value af every field in Module details form.
+		// Check value of every field in Module details form.
 		foreach ($data as $key => $value) {
 			$this->assertEquals($value, $form->getFieldContainer($key)->getText());
 		}
@@ -958,7 +972,9 @@ class testPageAdministrationGeneralModules extends CWebTest {
 						'5th Module',
 						'Clock2',
 						'Empty widget',
+						'Test Broadcaster',
 						'Test CSRF token',
+						'Test Listener',
 						'шестой модуль'
 					]
 				]
@@ -991,12 +1007,14 @@ class testPageAdministrationGeneralModules extends CWebTest {
 		$row = $table->findRow('Name', '2nd Module name !@#$%^&*()_+');
 		if ($row->getColumn('Status')->getText() !== 'Enabled') {
 			$row->query('link:Disabled')->one()->click();
+			$this->assertMessage(TEST_GOOD, 'Module enabled');
 		}
 
 		// Apply and submit the filter from data provider.
 		$form = $this->query('name:zbx_filter')->asForm()->one();
 		$form->fill($data['filter']);
 		$form->submit();
+		$table->waitUntilReloaded();
 		$this->page->waitUntilReady();
 		// Check (using module name) that only the expected filters are returned in the list.
 		$this->assertTableDataColumn(CTestArrayHelper::get($data, 'expected'));
@@ -1350,7 +1368,7 @@ class testPageAdministrationGeneralModules extends CWebTest {
 		}
 
 		if ($status === 'enabled') {
-			// Check that widget with required name is shown and that is doesn't have the inaccessilbe widget string in it.
+			// Check that widget with required name is shown and that is doesn't have the inaccessible widget string in it.
 			$widget = $dashboard->getWidget($module['widget_name']);
 			$this->assertFalse($widget->query("xpath:.//div[text()=".CXPathHelper::escapeQuotes(self::INACCESSIBLE_TEXT).
 					"]")->one(false)->isValid()

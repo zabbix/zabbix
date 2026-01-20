@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -143,6 +143,12 @@ class CJsonRpc {
 
 	public function processResult(array $call, CApiClientResponse $response) {
 		if ($response->errorCode) {
+			$user_type = CUser::$userData === null ? USER_TYPE_ZABBIX_USER : CUser::$userData['type'];
+
+			if ($response->errorCode == ZBX_API_ERROR_DB && $user_type != USER_TYPE_SUPER_ADMIN) {
+				$response->errorMessage = _('System error occurred. Please contact Zabbix administrator.');
+			}
+
 			$errno = $this->_zbx2jsonErrors[$response->errorCode];
 
 			$this->jsonError($call, $errno, $response->errorMessage, $response->debug);
@@ -237,7 +243,8 @@ class CJsonRpc {
 			ZBX_API_ERROR_PARAMETERS => '-32602',
 			ZBX_API_ERROR_NO_AUTH => '-32602',
 			ZBX_API_ERROR_PERMISSIONS => '-32500',
-			ZBX_API_ERROR_INTERNAL => '-32500'
+			ZBX_API_ERROR_INTERNAL => '-32500',
+			ZBX_API_ERROR_DB => '-32500'
 		];
 	}
 }

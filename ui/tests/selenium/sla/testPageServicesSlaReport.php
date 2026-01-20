@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -14,14 +14,12 @@
 **/
 
 
-require_once dirname(__FILE__).'/../common/testSlaReport.php';
+require_once __DIR__.'/../common/testSlaReport.php';
 
 /**
  * @backup profiles
  *
  * @dataSource Services, Sla
- *
- * @onBefore getDateTimeData
  */
 class testPageServicesSlaReport extends testSlaReport {
 
@@ -46,6 +44,10 @@ class testPageServicesSlaReport extends testSlaReport {
 		foreach ([false, true] as $status) {
 			$filter->expand($status);
 			$this->assertTrue($filter->isExpanded($status));
+
+			// Refresh the page to make sure the filter state is still saved.
+			$this->page->refresh()->waitUntilReady();
+			$this->assertTrue($filter->isExpanded($status));
 		}
 
 		// Check the list of available SLAs (disabled SLAs should not be present).
@@ -54,6 +56,7 @@ class testPageServicesSlaReport extends testSlaReport {
 			'headers' => ['Name'],
 			'column_data' => [
 				'Name' => [
+					'Multiple spaces in SLA name',
 					'SLA Annual',
 					'SLA Daily',
 					'SLA Monthly',
@@ -74,7 +77,7 @@ class testPageServicesSlaReport extends testSlaReport {
 			'buttons' => ['Filter', 'Reset', 'Cancel'],
 			'check_row' => [
 				'Name' => 'Simple actions service',
-				'Tags' => 'problem: falsetest: test789',
+				'Tags' => "problem: false\ntest: test789",
 				'Problem tags' => 'problem: true'
 			]
 		];
@@ -1401,8 +1404,11 @@ class testPageServicesSlaReport extends testSlaReport {
 		// Usage of Select mode is required as in Type mode a service that contains the name of required service is chosen.
 		CMultiselectElement::setDefaultFillMode(CMultiselectElement::MODE_SELECT);
 		$filter_form->query('button:Reset')->one()->click();
+		$table = $this->getTable();
 		$filter_form->fill($filter_data);
 		$filter_form->submit();
+		$table->waitUntilReloaded();
+
 		CMultiselectElement::setDefaultFillMode(CMultiselectElement::MODE_TYPE);
 	}
 
@@ -1411,10 +1417,12 @@ class testPageServicesSlaReport extends testSlaReport {
 	 * are covered by data provider).
 	 *
 	 * @param	array	$data	data provider
+	 *
 	 * @return	array
 	 */
 	public function getPeriodDataWithCustomDates($data) {
-		foreach (self::$reporting_periods[$data['reporting_period']] as $period) {
+		$reporting_periods = $this->getDateTimeData($data['reporting_period']);
+		foreach ($reporting_periods as $period) {
 			// Write all periods that end after the value in From field into the reference array.
 			if ($period['end'] >= strtotime($data['fields']['From'])) {
 				$expected_periods[] = $period['value'];
@@ -1443,13 +1451,12 @@ class testPageServicesSlaReport extends testSlaReport {
 
 			return;
 		}
-		$table = $this->query('class:list-table')->asTable()->one();
 
 		if (array_key_exists('Service', $data['fields'])) {
 			$this->assertTableDataColumn($data['expected_periods'], self::$period_headers[$data['reporting_period']]);
 		}
 		else {
-			$headers = $table->getHeadersText();
+			$headers = $this->getTable()->getHeadersText();
 
 			unset($headers[0], $headers[1]);
 			$this->assertEquals($data['expected_periods'], array_values($headers));

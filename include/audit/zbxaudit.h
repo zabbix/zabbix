@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -138,6 +138,7 @@ zbx_audit_entry_t	*zbx_audit_entry_init(zbx_uint64_t id, const int id_table, con
 #define ZBX_AUDIT_RESOURCE_HOST_PROTOTYPE		37
 #define ZBX_AUDIT_RESOURCE_SETTINGS			40
 #define ZBX_AUDIT_RESOURCE_HA_NODE			47
+#define ZBX_AUDIT_RESOURCE_LLD_RULE			52
 #define ZBX_AUDIT_RESOURCE_HISTORY			53
 
 zbx_audit_entry_t	*zbx_audit_get_entry(zbx_uint64_t id, const char *cuid, int id_table);

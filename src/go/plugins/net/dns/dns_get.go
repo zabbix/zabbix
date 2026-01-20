@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -206,7 +206,7 @@ func exportDnsGet(params []string) (result any, err error) {
 
 	timeDNSResponseReceived := time.Since(timeBeforeQuery).Seconds()
 	queryTimeSection := map[string]any{
-		"query_time": fmt.Sprintf("%.2f", timeDNSResponseReceived),
+		"query_time": fmt.Sprintf("%.6f", timeDNSResponseReceived),
 	}
 
 	// Now, resp from the DNS library is ready to be processed:
@@ -395,6 +395,14 @@ func parseParamsGet(params []string) (*dnsGetOptions, error) {
 		if err != nil {
 			return nil, err
 		}
+
+		if o.flags == nil {
+			err := o.setFlags("")
+			if err != nil {
+				return nil, err
+			}
+		}
+
 	default:
 		err := zbxerr.ErrorTooManyParameters
 

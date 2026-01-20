@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -90,7 +90,7 @@ func (a *addressPool) reset() {
 	a.nextAddress()
 }
 
-func (a *addressPool) addRedirect(addr string, revision uint64) bool {
+func (a *addressPool) addRedirect(address string, revision uint64) bool {
 	a.mu.Lock()
 	defer a.mu.Unlock()
 
@@ -109,7 +109,7 @@ func (a *addressPool) addRedirect(addr string, revision uint64) bool {
 	}
 
 	a.pool = append(a.pool[:1], a.pool...)
-	a.pool[0].addr = addr
+	a.pool[0].addr = address
 	a.pool[0].revision = revision
 
 	return true

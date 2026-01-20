@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -58,13 +58,8 @@ $form
 	->show();
 
 function getDateFieldsGroupViews(CWidgetFormView $form, array $fields): CWidgetFieldsGroupView {
-	$date_size = $form->registerField(new CWidgetFieldIntegerBoxView($fields['date_size']));
 
 	return (new CWidgetFieldsGroupView(_('Date')))
-		->addItem([
-			$date_size->getLabel(),
-			(new CFormField([$date_size->getView(), '%']))->addClass('field-size')
-		])
 		->addField(
 			new CWidgetFieldCheckBoxView($fields['date_bold'])
 		)
@@ -75,13 +70,8 @@ function getDateFieldsGroupViews(CWidgetFormView $form, array $fields): CWidgetF
 }
 
 function getTimeFieldsGroupViews(CWidgetFormView $form, array $fields): CWidgetFieldsGroupView {
-	$time_size = $form->registerField(new CWidgetFieldIntegerBoxView($fields['time_size']));
 
 	return (new CWidgetFieldsGroupView(_('Time')))
-		->addItem([
-			$time_size->getLabel(),
-			(new CFormField([$time_size->getView(), '%']))->addClass('field-size')
-		])
 		->addField(
 			new CWidgetFieldCheckBoxView($fields['time_bold'])
 		)
@@ -98,13 +88,8 @@ function getTimeFieldsGroupViews(CWidgetFormView $form, array $fields): CWidgetF
 }
 
 function getTimeZoneFieldsGroupViews(CWidgetFormView $form, array $fields): CWidgetFieldsGroupView {
-	$tzone_size = $form->registerField(new CWidgetFieldIntegerBoxView($fields['tzone_size']));
 
 	return (new CWidgetFieldsGroupView(_('Time zone')))
-		->addItem([
-			$tzone_size->getLabel(),
-			(new CFormField([$tzone_size->getView(), '%']))->addClass('field-size')
-		])
 		->addField(
 			new CWidgetFieldCheckBoxView($fields['tzone_bold'])
 		)

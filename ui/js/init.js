@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -253,15 +253,16 @@ jQuery(function($) {
 					my: 'left top',
 					at: 'left bottom',
 					using: (pos, data) => {
-						let max_left = data.horizontal === 'left'
-							? document.querySelector('.wrapper').clientWidth
-							: document.querySelector('.wrapper').clientWidth - data.element.width;
+						const wrapper = document.querySelector('.wrapper');
+						const menu = data.element.element[0];
+						const wrapper_rect = document.querySelector('.wrapper').getBoundingClientRect();
+						const margin_right = Math.max(WRAPPER_PADDING_RIGHT, wrapper_rect.width - wrapper.clientWidth);
+						const max_left = wrapper_rect.right - menu.offsetWidth - margin_right;
 
-						pos.top = Math.max(0, pos.top);
-						pos.left = Math.max(0, Math.min(max_left, pos.left));
+						pos.left = Math.max(wrapper_rect.left, Math.min(max_left, pos.left));
 
-						data.element.element[0].style.top = `${pos.top}px`;
-						data.element.element[0].style.left = `${pos.left}px`;
+						menu.style.left = `${pos.left}px`;
+						menu.style.top = `${pos.top}px`;
 					}
 				};
 		}

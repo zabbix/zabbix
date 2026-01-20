@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -14,12 +14,17 @@
 **/
 
 
-require_once dirname(__FILE__).'/../../include/CLegacyWebTest.php';
-require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
-require_once dirname(__FILE__).'/../behaviors/CTagBehavior.php';
+require_once __DIR__.'/../../include/CLegacyWebTest.php';
+require_once __DIR__.'/../behaviors/CTableBehavior.php';
+require_once __DIR__.'/../behaviors/CTagBehavior.php';
 
 use Facebook\WebDriver\WebDriverBy;
 
+/**
+ * @onBefore prepareTriggerData
+ *
+ * @backup triggers
+ */
 class testPageTriggers extends CLegacyWebTest {
 
 	/**
@@ -44,6 +49,16 @@ class testPageTriggers extends CLegacyWebTest {
 			' FROM hosts'.
 			' WHERE host LIKE \'%-layout-test%\''
 		);
+	}
+
+	public static function prepareTriggerData() {
+		CDataHelper::call('trigger.create', [
+			[
+				'description' => 'Multiple   spaces   in trigger name',
+				'expression' => 'last(/Host for triggers filtering/trap)<>0',
+				'priority' => TRIGGER_SEVERITY_WARNING
+			]
+		]);
 	}
 
 	/**
@@ -444,8 +459,10 @@ class testPageTriggers extends CLegacyWebTest {
 		$this->page->login()->open('zabbix.php?action=trigger.list&filter_set=1&filter_hostids[0]='.$this->hostid.'&context=host');
 		$form = $this->query('name:zbx_filter')->waitUntilPresent()->asForm()->one();
 		$form->fill(['id:filter_evaltype' => $data['tag_options']['type']]);
+		$table = $this->getTable();
 		$this->setTags($data['tag_options']['tags']);
 		$form->submit();
+		$table->waitUntilReloaded();
 		$this->page->waitUntilReady();
 		$this->assertTableDataColumn(CTestArrayHelper::get($data, 'result', []), 'Name', $this->selector);
 	}
@@ -461,8 +478,10 @@ class testPageTriggers extends CLegacyWebTest {
 
 		$this->zbxTestLogin('zabbix.php?action=trigger.list&filter_set=1&filter_hostids[0]='.$this->hostid.'&context=host');
 		$form = $this->query('name:zbx_filter')->asForm()->one();
+		$table = $this->getTable();
 		$form->getField('Tags')->query('id:filter_tags_0_tag')->one()->fill('Tag1234');
 		$form->submit();
+		$table->waitUntilReloaded();
 		$this->page->waitUntilReady();
 		$this->assertTableDataColumn([], 'Name', $this->selector);
 
@@ -480,9 +499,10 @@ class testPageTriggers extends CLegacyWebTest {
 						'Severity' => ['Not classified', 'Information', 'Warning', 'Average', 'High', 'Disaster']
 					],
 					'result' => [
-						['text' => 'Dependent trigger ONE', 'selector' => 'xpath:./a[@class="js-trigger-edit wordbreak"]'],
-						['text' => 'Discovered trigger one', 'selector' => 'xpath:./a[@class="js-trigger-edit wordbreak"]'],
-						['text' => 'Inheritance trigger with tags', 'selector' => 'xpath:./a[@class="js-trigger-edit wordbreak"]'],
+						['text' => 'Dependent trigger ONE', 'selector' => 'xpath:./a[@class="js-trigger-edit wordwrap"]'],
+						['text' => 'Discovered trigger one', 'selector' => 'xpath:./a[@class="js-trigger-edit wordwrap"]'],
+						['text' => 'Inheritance trigger with tags', 'selector' => 'xpath:./a[@class="js-trigger-edit wordwrap"]'],
+						'Multiple spaces in trigger name',
 						'Trigger disabled with tags'
 					]
 				]
@@ -494,7 +514,7 @@ class testPageTriggers extends CLegacyWebTest {
 						'Severity' => ['Average', 'Disaster']
 					],
 					'result' => [
-						['text' => 'Discovered trigger one', 'selector' => 'xpath:./a[@class="js-trigger-edit wordbreak"]'],
+						['text' => 'Discovered trigger one', 'selector' => 'xpath:./a[@class="js-trigger-edit wordwrap"]'],
 						'Trigger disabled with tags'
 					]
 				]
@@ -506,8 +526,9 @@ class testPageTriggers extends CLegacyWebTest {
 						'Inherited' => 'No'
 					],
 					'result' => [
-						['text' => 'Dependent trigger ONE', 'selector' => 'xpath:./a[@class="js-trigger-edit wordbreak"]'],
-						['text' => 'Discovered trigger one', 'selector' => 'xpath:./a[@class="js-trigger-edit wordbreak"]'],
+						['text' => 'Dependent trigger ONE', 'selector' => 'xpath:./a[@class="js-trigger-edit wordwrap"]'],
+						['text' => 'Discovered trigger one', 'selector' => 'xpath:./a[@class="js-trigger-edit wordwrap"]'],
+						'Multiple spaces in trigger name',
 						'Trigger disabled with tags'
 					]
 				]
@@ -519,7 +540,7 @@ class testPageTriggers extends CLegacyWebTest {
 						'Discovered' => 'Yes'
 					],
 					'result' => [
-						['text' => 'Discovered trigger one', 'selector' => 'xpath:./a[@class="js-trigger-edit wordbreak"]']
+						['text' => 'Discovered trigger one', 'selector' => 'xpath:./a[@class="js-trigger-edit wordwrap"]']
 					]
 				]
 			],
@@ -530,8 +551,8 @@ class testPageTriggers extends CLegacyWebTest {
 						'With dependencies' => 'Yes'
 					],
 					'result' => [
-						['text' => 'Dependent trigger ONE', 'selector' => 'xpath:./a[@class="js-trigger-edit wordbreak"]'],
-						['text' => 'Inheritance trigger with tags', 'selector' => 'xpath:./a[@class="js-trigger-edit wordbreak"]']
+						['text' => 'Dependent trigger ONE', 'selector' => 'xpath:./a[@class="js-trigger-edit wordwrap"]'],
+						['text' => 'Inheritance trigger with tags', 'selector' => 'xpath:./a[@class="js-trigger-edit wordwrap"]']
 					]
 				]
 			],
@@ -542,8 +563,19 @@ class testPageTriggers extends CLegacyWebTest {
 						'Name' => 'One'
 					],
 					'result' => [
-						['text' => 'Dependent trigger ONE', 'selector' => 'xpath:./a[@class="js-trigger-edit wordbreak"]'],
-						['text' => 'Discovered trigger one', 'selector' => 'xpath:./a[@class="js-trigger-edit wordbreak"]']
+						['text' => 'Dependent trigger ONE', 'selector' => 'xpath:./a[@class="js-trigger-edit wordwrap"]'],
+						['text' => 'Discovered trigger one', 'selector' => 'xpath:./a[@class="js-trigger-edit wordwrap"]']
+					]
+				]
+			],
+			// Multiple spaces in Name field.
+			[
+				[
+					'filter_options' => [
+						'Name' => '   '
+					],
+					'result' => [
+						['text' => 'Multiple spaces in trigger name', 'selector' => 'xpath:./a[@class="js-trigger-edit wordwrap"]']
 					]
 				]
 			],
@@ -554,8 +586,9 @@ class testPageTriggers extends CLegacyWebTest {
 						'State' => 'Normal'
 					],
 					'result' => [
-						['text' => 'Dependent trigger ONE', 'selector' => 'xpath:./a[@class="js-trigger-edit wordbreak"]'],
-						['text' => 'Discovered trigger one', 'selector' => 'xpath:./a[@class="js-trigger-edit wordbreak"]']
+						['text' => 'Dependent trigger ONE', 'selector' => 'xpath:./a[@class="js-trigger-edit wordwrap"]'],
+						['text' => 'Discovered trigger one', 'selector' => 'xpath:./a[@class="js-trigger-edit wordwrap"]'],
+						['text' => 'Multiple spaces in trigger name', 'selector' => 'xpath:./a[@class="js-trigger-edit wordwrap"]']
 					]
 				]
 			],
@@ -566,9 +599,10 @@ class testPageTriggers extends CLegacyWebTest {
 						'Status' => 'Enabled'
 					],
 					'result' => [
-						['text' => 'Dependent trigger ONE', 'selector' => 'xpath:./a[@class="js-trigger-edit wordbreak"]'],
-						['text' => 'Discovered trigger one', 'selector' => 'xpath:./a[@class="js-trigger-edit wordbreak"]'],
-						['text' => 'Inheritance trigger with tags', 'selector' => 'xpath:./a[@class="js-trigger-edit wordbreak"]']
+						['text' => 'Dependent trigger ONE', 'selector' => 'xpath:./a[@class="js-trigger-edit wordwrap"]'],
+						['text' => 'Discovered trigger one', 'selector' => 'xpath:./a[@class="js-trigger-edit wordwrap"]'],
+						['text' => 'Inheritance trigger with tags', 'selector' => 'xpath:./a[@class="js-trigger-edit wordwrap"]'],
+						['text' => 'Multiple spaces in trigger name', 'selector' => 'xpath:./a[@class="js-trigger-edit wordwrap"]']
 					]
 				]
 			],
@@ -589,8 +623,9 @@ class testPageTriggers extends CLegacyWebTest {
 						'Value' => 'Ok'
 					],
 					'result' => [
-						['text' => 'Dependent trigger ONE', 'selector' => 'xpath:./a[@class="js-trigger-edit wordbreak"]'],
-						['text' => 'Discovered trigger one', 'selector' => 'xpath:./a[@class="js-trigger-edit wordbreak"]'],
+						['text' => 'Dependent trigger ONE', 'selector' => 'xpath:./a[@class="js-trigger-edit wordwrap"]'],
+						['text' => 'Discovered trigger one', 'selector' => 'xpath:./a[@class="js-trigger-edit wordwrap"]'],
+						'Multiple spaces in trigger name',
 						'Trigger disabled with tags'
 					]
 				]
@@ -601,7 +636,7 @@ class testPageTriggers extends CLegacyWebTest {
 						'Value' => 'Problem'
 					],
 					'result' => [
-						['text' => 'Inheritance trigger with tags', 'selector' => 'xpath:./a[@class="js-trigger-edit wordbreak"]']
+						['text' => 'Inheritance trigger with tags', 'selector' => 'xpath:./a[@class="js-trigger-edit wordwrap"]']
 					]
 				]
 			],
@@ -626,7 +661,7 @@ class testPageTriggers extends CLegacyWebTest {
 						]
 					],
 					'result' => [
-						['text' => 'Inheritance trigger with tags', 'selector' => 'xpath:./a[@class="js-trigger-edit wordbreak"]']
+						['text' => 'Inheritance trigger with tags', 'selector' => 'xpath:./a[@class="js-trigger-edit wordwrap"]']
 					]
 				]
 			],
@@ -688,7 +723,7 @@ class testPageTriggers extends CLegacyWebTest {
 	public function testPageTriggers_Filter($data) {
 		$this->page->login()->open('zabbix.php?action=trigger.list&filter_set=1&filter_hostids[0]=99062&context=host');
 		$form = $this->query('name:zbx_filter')->asForm()->one();
-
+		$table = $this->getTable();
 		$form->fill($data['filter_options']);
 
 		if (array_key_exists('tag_options', $data)) {
@@ -697,6 +732,7 @@ class testPageTriggers extends CLegacyWebTest {
 		}
 
 		$form->submit();
+		$table->waitUntilReloaded();
 		$this->page->waitUntilReady();
 		$this->assertTableDataColumn(CTestArrayHelper::get($data, 'result', []), 'Name', $this->selector);
 	}
@@ -712,15 +748,19 @@ class testPageTriggers extends CLegacyWebTest {
 					'result' => [
 						[
 							'Host' => 'Host for triggers filtering',
-							'Name' => ['text' => 'Dependent trigger ONE', 'selector' => 'xpath:./a[@class="js-trigger-edit wordbreak"]']
+							'Name' => ['text' => 'Dependent trigger ONE', 'selector' => 'xpath:./a[@class="js-trigger-edit wordwrap"]']
 						],
 						[
 							'Host' => 'Host for triggers filtering',
-							'Name' => ['text' => 'Discovered trigger one', 'selector' => 'xpath:./a[@class="js-trigger-edit wordbreak"]']
+							'Name' => ['text' => 'Discovered trigger one', 'selector' => 'xpath:./a[@class="js-trigger-edit wordwrap"]']
 						],
 						[
 							'Host' => 'Host for triggers filtering',
-							'Name' => ['text' => 'Inheritance trigger with tags', 'selector' => 'xpath:./a[@class="js-trigger-edit wordbreak"]']
+							'Name' => ['text' => 'Inheritance trigger with tags', 'selector' => 'xpath:./a[@class="js-trigger-edit wordwrap"]']
+						],
+						[
+							'Host' => 'Host for triggers filtering',
+							'Name' => 'Multiple spaces in trigger name'
 						],
 						[
 							'Host' => 'Host for triggers filtering',
@@ -800,11 +840,11 @@ class testPageTriggers extends CLegacyWebTest {
 					'result' => [
 						[
 							'Host' => 'Host for triggers filtering',
-							'Name' => ['text' => 'Dependent trigger ONE', 'selector' => 'xpath:./a[@class="js-trigger-edit wordbreak"]']
+							'Name' => ['text' => 'Dependent trigger ONE', 'selector' => 'xpath:./a[@class="js-trigger-edit wordwrap"]']
 						],
 						[
 							'Host' => 'Host for triggers filtering',
-							'Name' => ['text' => 'Discovered trigger one', 'selector' => 'xpath:./a[@class="js-trigger-edit wordbreak"]']
+							'Name' => ['text' => 'Discovered trigger one', 'selector' => 'xpath:./a[@class="js-trigger-edit wordwrap"]']
 						],
 						[
 							'Host' => 'Host for trigger tags filtering',
@@ -820,7 +860,11 @@ class testPageTriggers extends CLegacyWebTest {
 						],
 						[
 							'Host' => 'Host for triggers filtering',
-							'Name' => ['text' => 'Inheritance trigger with tags', 'selector' => 'xpath:./a[@class="js-trigger-edit wordbreak"]']
+							'Name' => ['text' => 'Inheritance trigger with tags', 'selector' => 'xpath:./a[@class="js-trigger-edit wordwrap"]']
+						],
+						[
+							'Host' => 'Host for triggers filtering',
+							'Name' => 'Multiple spaces in trigger name'
 						],
 						[
 							'Host' => 'Host for trigger tags filtering',
@@ -846,6 +890,7 @@ class testPageTriggers extends CLegacyWebTest {
 	public function testPageTriggers_FilterHostAndGroups($data) {
 		$this->page->login()->open('zabbix.php?action=trigger.list&filter_set=1&filter_hostids[0]=99062&context=host');
 		$form = $this->query('name:zbx_filter')->asForm()->one();
+		$table = $this->getTable();
 
 		// Trigger create button enabled and breadcrumbs exist.
 		$this->assertTrue($this->query('button:Create trigger')->one()->isEnabled());
@@ -857,6 +902,7 @@ class testPageTriggers extends CLegacyWebTest {
 
 		$form->fill($data['filter_options']);
 		$form->submit();
+		$table = $this->getTable();
 		$this->page->waitUntilReady();
 
 		// Trigger create button disabled and breadcrumbs not exist.

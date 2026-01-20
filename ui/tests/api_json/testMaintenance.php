@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -771,7 +771,7 @@ class testMaintenance extends CAPITest {
 						]
 					]
 				],
-				'expected_error' => 'Invalid parameter "/1/timeperiods/1/period": value must be one of 300-2147483647.'
+				'expected_error' => 'Invalid parameter "/1/timeperiods/1/period": value must be one of 300-86399940.'
 			],
 			// Fail. One time period.
 			[
@@ -1019,7 +1019,7 @@ class testMaintenance extends CAPITest {
 						]
 					]
 				],
-				'expected_error' => 'Invalid parameter "/1/timeperiods/1/every": value must be one of 1-2147483647.'
+				'expected_error' => 'Invalid parameter "/1/timeperiods/1/every": value must be one of 1-999.'
 			],
 			// Fail. Daily period.
 			[
@@ -1149,6 +1149,24 @@ class testMaintenance extends CAPITest {
 					]
 				],
 				'expected_error' => null
+			],
+			// Fail. Weekly period.
+			[
+				'request_data' => [
+					'name' => 'M'.++$n,
+					'active_since' => '1514757600',
+					'active_till' => '1546207200',
+					'groups' => [
+						['groupid' => 2]
+					],
+					'timeperiods' => [
+						[
+							'timeperiod_type' => 3,
+							'every' => 0
+						]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/timeperiods/1/every": value must be one of 1-99.'
 			],
 			// Fail. Weekly period.
 			[

@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -14,9 +14,9 @@
 **/
 
 
-require_once dirname(__FILE__).'/../../include/CWebTest.php';
-require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
-require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
+require_once __DIR__.'/../../include/CWebTest.php';
+require_once __DIR__.'/../behaviors/CMessageBehavior.php';
+require_once __DIR__.'/../behaviors/CTableBehavior.php';
 
 /**
  * @backup items
@@ -43,7 +43,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 	const SELECTOR = 'xpath://form[@name="discovery"]/table[contains(@class, "list-table")]';
 
 	public static function prepareLLDData() {
-		CDataHelper::createHosts([
+		$host_responce = CDataHelper::createHosts([
 			[
 				'host' => 'Host with LLD',
 				'groups' => [['groupid' => 4]], // Zabbix servers.
@@ -55,6 +55,13 @@ class testPageLowLevelDiscovery extends CWebTest {
 					]
 				]
 			]
+		]);
+
+		CDataHelper::call('discoveryrule.create', [
+			'name' => 'Multiple   spaces   in LLD name',
+			'key_' => '123lld_rule321',
+			'hostid' =>  $host_responce['hostids']['Host with LLD'],
+			'type' => ITEM_TYPE_TRAPPER
 		]);
 	}
 
@@ -68,18 +75,15 @@ class testPageLowLevelDiscovery extends CWebTest {
 		];
 		$this->assertEquals($fields, $form->getLabels()->asText());
 
-		// Check filter collapse/expand.
-		foreach (['true', 'false'] as $status) {
-			$filter_space = $this->query('xpath://div['.CXPathHelper::fromClass('filter-space').']')->one();
-			$filter_tab = $this->query('xpath://a[contains(@class, "filter-trigger")]')->one();
-			$filter_tab->parents('xpath:/li[@aria-expanded="'.$status.'"]')->one()->click();
-
-			if ($status === 'true') {
-				$filter_space->query('id:tab_0')->one()->waitUntilNotVisible();
-			}
-			else {
-				$filter_space->query('id:tab_0')->one()->waitUntilVisible();
-			}
+		// Check displaying and hiding the filter.
+		$filter = CFilterElement::find()->one();
+		$this->assertEquals('Filter', $filter->getSelectedTabName());
+		// Check that filter is expanded by default.
+		$this->assertTrue($filter->isExpanded());
+		// Check that filter is collapsing/expanding on click.
+		foreach ([false, true] as $status) {
+			$filter->expand($status);
+			$this->assertTrue($filter->isExpanded($status));
 		}
 
 		// Check all dropdowns.
@@ -143,6 +147,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 		// Filling fields with needed discovery rule info.
 		$form->fill(['Name' => 'Discovery rule 3']);
 		$form->submit();
+		$table->waitUntilReloaded();
 
 		// Check that filtered count matches expected.
 		$this->assertEquals(1, $table->getRows()->count());
@@ -170,13 +175,14 @@ class testPageLowLevelDiscovery extends CWebTest {
 		$discovery_status = ['Enabled' => 1, 'Disabled' => 0];
 		foreach ($discovery_status as $action => $expected_status) {
 			$row->query('link', $action)->one()->click();
+			$message_action = ($action === 'Enabled') ? 'disabled' : 'enabled';
+			$this->assertMessage(TEST_GOOD, 'Discovery rule '.$message_action);
 			$status = CDBHelper::getValue('SELECT status FROM items WHERE name='.zbx_dbstr('Discovery rule 2').' and hostid='
 				.self::HOST_ID);
 			$this->assertEquals($expected_status, $status);
-			$message_action = ($action === 'Enabled') ? 'disabled' : 'enabled';
-			$this->assertEquals('Discovery rule '.$message_action, CMessageElement::find()->one()->getTitle());
 			$link_color = ($action === 'Enabled') ? 'red' : 'green';
 			$this->assertTrue($row->query('xpath://td/a[@class="link-action '.$link_color.'"]')->one()->isPresent());
+			CMessageElement::find()->one()->close();
 		}
 	}
 
@@ -272,10 +278,10 @@ class testPageLowLevelDiscovery extends CWebTest {
 				$this->selectTableRows($data['names'], 'Name', self::SELECTOR);
 				$this->assertFalse($this->query('button:Execute now')->one()->isEnabled());
 				break;
-			case 'template';
+			case 'template':
 				$this->assertFalse($this->query('button:Execute now')->one(false)->isValid());
 				break;
-			case 'trapper';
+			case 'trapper':
 				$this->assertFalse($this->query('button:Execute now')->one()->isEnabled());
 				break;
 			default:
@@ -310,7 +316,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 						'Template groups' => 'Templates/Databases'
 					],
 					'context' => 'template',
-					'rows' => 100
+					'rows' => 113
 				]
 			],
 			// #1.
@@ -375,6 +381,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 						]
 					],
 					'expected' => [
+						'Multiple spaces in LLD name',
 						'Test discovery rule',
 						'Trapper LLD for filter'
 					]
@@ -473,6 +480,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 						'LLD rule for item types',
 						'LLD 🙂🙃 !@#$%^&*()_+ 祝你今天过得愉快',
 						'Linux by Zabbix agent: Get filesystems: Mounted filesystem discovery',
+						'Multiple spaces in LLD name',
 						'Mūsu desmitais LLD',
 						'Linux by Zabbix agent: Network interface discovery',
 						'sevenths LLD',
@@ -508,7 +516,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 						'Type' => 'Dependent item'
 					],
 					'context' => 'template',
-					'rows' => 23
+					'rows' => 33
 				]
 			],
 			// #13.
@@ -574,6 +582,15 @@ class testPageLowLevelDiscovery extends CWebTest {
 					'expected' => [
 						'Test discovery rule'
 					]
+				]
+			],
+			// #18.
+			[
+				[
+					'filter' => [
+						'Name' => '   '
+					],
+					'expected' => ['Multiple spaces in LLD name']
 				]
 			]
 		];
@@ -657,7 +674,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 		// Delete all discovery rules.
 		$form = $this->query('name:zbx_filter')->one()->asForm();
 		$form->fill($data['filter']);
-		$form->submit();
+		$form->submit()->waitUntilStalled();
 		$this->selectTableRows($data['keys'], 'Key', self::SELECTOR);
 		$this->query('button:Delete')->one()->click();
 		$this->page->acceptAlert();

@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -44,14 +44,6 @@ class testEscalations extends CIntegrationTest {
 		// Create host "testhost".
 		$response = $this->call('host.create', [
 			'host' => self::HOST_NAME,
-			'interfaces' => [
-				'type' => 1,
-				'main' => 1,
-				'useip' => 1,
-				'ip' => '127.0.0.1',
-				'dns' => '',
-				'port' => $this->getConfigurationValue(self::COMPONENT_AGENT, 'ListenPort')
-			],
 			'groups' => ['groupid' => 4]
 		]);
 
@@ -59,16 +51,13 @@ class testEscalations extends CIntegrationTest {
 		$this->assertArrayHasKey(0, $response['result']['hostids']);
 		self::$hostid = $response['result']['hostids'][0];
 
-		// Get host interface ids.
+		// Get host.
 		$response = $this->call('host.get', [
 			'output' => ['host'],
-			'hostids' => [self::$hostid],
-			'selectInterfaces' => ['interfaceid']
+			'hostids' => [self::$hostid]
 		]);
 
 		$this->assertArrayHasKey(0, $response['result']);
-		$this->assertArrayHasKey('interfaces', $response['result'][0]);
-		$this->assertArrayHasKey(0, $response['result'][0]['interfaces']);
 
 		// Create trapper item
 		$response = $this->call('item.create', [

@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -51,7 +51,8 @@ int	__wrap_zbx_history_get_values(zbx_uint64_t itemid, int value_type, int start
 		zbx_vector_history_record_t *values);
 int	__wrap_zbx_history_add_values(const zbx_vector_ptr_t *history);
 void	__wrap_zbx_history_sql_init(zbx_history_iface_t *hist, unsigned char value_type);
-int	__wrap_zbx_history_elastic_init(zbx_history_iface_t *hist, unsigned char value_type, int config_log_slow_queries, char **error);
+int	__wrap_zbx_history_elastic_init(zbx_history_iface_t *hist, unsigned char value_type,
+		int config_log_slow_queries, char **error);
 void	__wrap_zbx_elastic_version_extract(void);
 int	__wrap_zbx_elastic_version_get(void);
 time_t	__wrap_time(time_t *ptr);

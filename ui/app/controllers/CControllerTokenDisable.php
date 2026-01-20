@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -48,9 +48,10 @@ class CControllerTokenDisable extends CController {
 
 		$result = API::Token()->update($tokens);
 		$updated = count($tokens);
-		$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
-			->setArgument('action', $this->getInput('action_src'))
-			->setArgument('page', CPagerHelper::loadPage($this->getInput('action_src'), null))
+		$response = new CControllerResponseRedirect(
+			(new CUrl('zabbix.php'))
+				->setArgument('action', $this->getInput('action_src'))
+				->setArgument('page', CPagerHelper::loadPage($this->getInput('action_src'), null))
 		);
 
 		if ($result) {

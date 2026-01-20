@@ -3,10 +3,10 @@
 
 ## Overview
 
-The template to monitor HashiCorp Consul by Zabbix that works without any external scripts.  
+The template to monitor HashiCorp Consul by Zabbix that works without any external scripts.
 Most of the metrics are collected in one go, thanks to Zabbix bulk data collection.
 
-Template `HashiCorp Consul Cluster by HTTP` — collects metrics by HTTP agent from API endpoints.  
+Template `HashiCorp Consul Cluster by HTTP` — collects metrics by HTTP agent from API endpoints.
 More information about metrics you can find in [official documentation](https://www.consul.io/docs/agent/telemetry).
 
 ## Requirements
@@ -26,13 +26,13 @@ This template has been tested on:
 
 Template need to use Authorization via API token.
 
-Don't forget to change macros {$CONSUL.CLUSTER.URL}, {$CONSUL.TOKEN}.  
-Also, see the Macros section for a list of macros used to set trigger values.  
+Don't forget to change macros {$CONSUL.CLUSTER.URL}, {$CONSUL.TOKEN}.
+Also, see the Macros section for a list of macros used to set trigger values.
 
-This template support [Consul namespaces](https://www.consul.io/docs/enterprise/namespaces). You can set macro {$CONSUL.NAMESPACE}, if you are interested in only one service namespace. Do not specify this macro to get all of services.  
+This template support [Consul namespaces](https://www.consul.io/docs/enterprise/namespaces). You can set macro {$CONSUL.NAMESPACE}, if you are interested in only one service namespace. Do not specify this macro to get all of services.
 In case of Open Source version leave this macro empty.
 
-*NOTE.* Some metrics may not be collected depending on your HashiCorp Consul instance version and configuration.  
+*NOTE.* Some metrics may not be collected depending on your HashiCorp Consul instance version and configuration.
 *NOTE.* You maybe are interested in Envoy Proxy by HTTP [template](../../envoy_proxy_http).
 
 ### Macros used
@@ -104,7 +104,7 @@ In case of Open Source version leave this macro empty.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|HashiCorp Consul Cluster: Service ["{#SERVICE_NAME}"]: Too many nodes with service status 'critical'|<p>One or more nodes with service status 'critical'.</p>|`last(/HashiCorp Consul Cluster by HTTP/consul.service.nodes_critical["{#SERVICE_NAME}"])>{$CONSUL.CLUSTER.SERVICE_NODES.CRITICAL.MAX.AVG:"{#SERVICE_NAME}"}`|Average||
+|HashiCorp Consul Cluster: Service ["{#SERVICE_NAME}"]: Too many nodes with service status 'critical'|<p>One or more nodes with service status 'critical'.</p>|`last(/HashiCorp Consul Cluster by HTTP/consul.service.nodes_critical["{#SERVICE_NAME}"])>{$CONSUL.SERVICE_NODES.CRITICAL.MAX.AVG:"{#SERVICE_NAME}"}`|Average||
 
 ## Feedback
 

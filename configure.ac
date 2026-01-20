@@ -1,5 +1,5 @@
 dnl
-dnl Copyright (C) 2001-2025 Zabbix SIA
+dnl Copyright (C) 2001-2026 Zabbix SIA
 dnl
 dnl This program is free software: you can redistribute it and/or modify it under the terms of
 dnl the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -14,7 +14,7 @@ dnl
 
 dnl Process this file with autoconf to produce a configure script.
 
-AC_INIT([Zabbix],[7.0.10])
+AC_INIT([Zabbix],[7.0.23rc1])
 AC_CONFIG_SRCDIR(src/zabbix_server/server.c)
 AM_INIT_AUTOMAKE([subdir-objects tar-pax])
 
@@ -36,6 +36,31 @@ dnl *****************************************************************
 
 AC_PROG_CC([cc c99 gcc clang])
 AM_PROG_CC_C_O
+
+dnl A C99 compliant compiler must support this.
+dnl
+dnl The implementations differ across compilers and platforms.
+dnl GCC allocates the storage blocks in bss during compilation,
+dnl while others elect for the runtime loader to handle the allocation.
+dnl
+dnl This means the proper test would be to run the executable,
+dnl but that would make no sense when cross-compiling,
+dnl so the best we can do is just reject compilers that don't even
+dnl recognize the keyword.
+AC_MSG_CHECKING(whether compiler supports thread-local storage)
+AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
+    #include <stdio.h>
+    ]], [[
+    static __thread int a = 0;
+    (void)a;
+    ]])],
+    [
+        AC_MSG_RESULT(yes)
+    ], [
+        AC_MSG_RESULT(no)
+        AC_MSG_ERROR([compiler does not recognize the __thread keyword])
+    ]
+)
 
 dnl *****************************************************************
 dnl *                                                               *
@@ -628,11 +653,6 @@ AC_MSG_RESULT(yes)],[AC_MSG_RESULT(no)
 ])
 LDFLAGS="$saved_LDFLAGS"
 
-AC_MSG_CHECKING(for '__thread' compiler support)
-AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[#include <stdio.h>]], [[static __thread int a = 0;]])],[AC_DEFINE(HAVE_THREAD_LOCAL,1,Define to 1 if compiler keyword '__thread' supported.)
-AC_MSG_RESULT(yes)],[AC_MSG_RESULT(no)
-HAVE_THREAD_LOCAL="no"])
-
 AC_MSG_CHECKING(for field updates in struct vminfo_t)
 AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
 #include <sys/sysinfo.h>
@@ -1133,6 +1153,7 @@ dnl *****************************************************************
 AC_ARG_ENABLE(static,[  --enable-static         Build statically linked binaries],
 [case "${enableval}" in
   yes)
+    enable_static=yes
     LDFLAGS="${LDFLAGS} -static"
     AC_MSG_CHECKING(if static linking is possible)
     AC_LINK_IFELSE([AC_LANG_PROGRAM(,)],
@@ -1151,7 +1172,7 @@ esac])
 AC_ARG_ENABLE(static-libs,[  --enable-static-libs    Build statically linked binaries with selected libs from default folders],
 [case "${enableval}" in
   yes)
-    static_linking_libs=yes
+    enable_static_libs=yes
     saved_LIBS="$LIBS"
     LIBS="${saved_LIBS} -Wl,-bstatic -Wl,-bdynamic"
     AC_MSG_CHECKING([if libs static linking with "-Wl,-b" is possible])
@@ -1172,13 +1193,21 @@ AC_ARG_ENABLE(static-libs,[  --enable-static-libs    Build statically linked bin
           static_linking_support=no])
           LIBS="$saved_LIBS"
     fi
+
+    if test "x$static_linking_support" = "xno"; then
+      AC_MSG_ERROR([static linking with selected libs is not possible on this system])
+    fi
     ;;
   no) ;;
   *) AC_MSG_ERROR([bad value ${enableval} for --enable-static-libs]) ;;
 esac])
 
-if test "x#static_linking" = "xyes" && test "x$static_linking_libs" = "xyes"; then
-  AC_MSG_ERROR([cannot use --static and --static-libs at the same time])
+if test "x$enable_static" = "xyes" && test "x$enable_static_libs" = "xyes"; then
+  AC_MSG_ERROR([cannot use --enable-static and --enable-static-libs at the same time])
+fi
+
+if test "x$enable_static" = "xyes" || test "x$enable_static_libs" = "xyes"; then
+  AC_DEFINE(STATIC_LINKING,1,[Define to 1 if libraries are linked statically.])
 fi
 
 AC_ARG_ENABLE(server,[  --enable-server         Turn on build of Zabbix server],
@@ -1214,7 +1243,6 @@ AC_ARG_ENABLE(agent2,[  --enable-agent2         Turn on build of Zabbix agent 2]
   no)  agent2=no ;;
   *) AC_MSG_ERROR([bad value ${enableval} for --enable-agent2]) ;;
 esac
-test "x$agent2" = "xyes" -a "x$HAVE_THREAD_LOCAL" = "xno" && AC_MSG_ERROR([C compiler is not compatible with agent2 assembly])
 ],
 [agent2=no])
 AM_CONDITIONAL(AGENT2, test "x$agent2" = "xyes")
@@ -1225,7 +1253,6 @@ AC_ARG_ENABLE(webservice,[  --enable-webservice         Turn on build of Zabbix 
   no)  webservice=no ;;
   *) AC_MSG_ERROR([bad value ${enableval} for --enable-webservice]) ;;
 esac
-test "x$webservice" = "xyes" -a "x$HAVE_THREAD_LOCAL" = "xno" && AC_MSG_ERROR([C compiler is not compatible with webservice assembly])
 ],
 [webservice=no])
 AM_CONDITIONAL(WEBSERVICE, test "x$webservice" = "xyes")
@@ -1516,6 +1543,22 @@ if test "x$server" = "xyes" || test "x$proxy" = "xyes"; then
 	fi
 
 	AC_SUBST(ZLIB_CFLAGS)
+
+	dnl Checking for c-ares support
+	ARES_CHECK_CONFIG([no])
+	if test "x$want_ares" = "xyes"; then
+		if test "x$found_ares" != "xyes"; then
+			AC_MSG_ERROR([Unable to use ares (ares check failed)])
+		fi
+		have_ares="yes"
+	fi
+	SERVER_LDFLAGS="$SERVER_LDFLAGS $ARES_LDFLAGS"
+	SERVER_LIBS="$SERVER_LIBS $ARES_LIBS"
+
+	PROXY_LDFLAGS="$PROXY_LDFLAGS $ARES_LDFLAGS"
+	PROXY_LIBS="$PROXY_LIBS $ARES_LIBS"
+
+	AC_SUBST(ARES_CFLAGS)
 
 	dnl Check for 'libpthread' library that supports PTHREAD_PROCESS_SHARED flag
 	LIBPTHREAD_CHECK_CONFIG([no])
@@ -2231,6 +2274,10 @@ fi
 
 if test "x$UNIXODBC_CFLAGS" != "x"; then
 	echo "    unixODBC:              ${UNIXODBC_CFLAGS}"
+fi
+
+if test "x$ARES_CFLAGS" != "x"; then
+	echo "    c-ares:              ${ARES_CFLAGS}"
 fi
 
 if test "x$SNMP_CFLAGS" != "x"; then

@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -13,10 +13,10 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-require_once dirname(__FILE__).'/../../include/CWebTest.php';
-require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
-require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
-require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
+require_once __DIR__.'/../../include/CWebTest.php';
+require_once __DIR__.'/../behaviors/CMessageBehavior.php';
+require_once __DIR__.'/../behaviors/CTableBehavior.php';
+require_once __DIR__.'/../../include/helpers/CDataHelper.php';
 
 /**
  * @dataSource ScheduledReports
@@ -161,6 +161,10 @@ class testPageScheduledReport extends CWebTest {
 		foreach ($expired_report as $column => $value) {
 			$this->assertEquals($value, $row->getColumn($column)->getText());
 		}
+
+		// Check that the filter is still expanded after page refresh.
+		$this->page->refresh()->waitUntilReady();
+		$this->assertTrue($filter->isExpanded());
 	}
 
 	public static function getFilterData() {
@@ -274,6 +278,17 @@ class testPageScheduledReport extends CWebTest {
 						'Name' => 'No data'
 					]
 				]
+			],
+			// Multiple spaces in filter field "Name".
+			[
+				[
+					'filter' => [
+						'Name' => '   '
+					],
+					'result' => [
+						'Report for filter - disabled'
+					]
+				]
 			]
 		];
 	}
@@ -283,9 +298,10 @@ class testPageScheduledReport extends CWebTest {
 	 */
 	public function testPageScheduledReport_Filter($data) {
 		$this->page->login()->open('zabbix.php?action=scheduledreport.list');
-
+		$table = $this->getTable();
 		$form = $this->query('name:zbx_filter')->asForm()->one();
 		$form->fill($data['filter'])->submit();
+		$table->waitUntilReloaded();
 		$this->page->waitUntilReady();
 
 		$this->assertTableDataColumn(CTestArrayHelper::get($data, 'result', []));
@@ -308,7 +324,7 @@ class testPageScheduledReport extends CWebTest {
 			],
 			[
 				[
-					'Name' => 'Report for filter - disabled',
+					'Name' => 'Report for filter -   disabled',
 					'Status' => 'Disabled'
 				]
 			],
@@ -420,6 +436,7 @@ class testPageScheduledReport extends CWebTest {
 			$names = [$names];
 		}
 		foreach ($names as $name) {
+			$name = ($name === 'Report for filter - disabled') ? 'Report for filter -   disabled' : $name;
 			$this->assertEquals($db_status, CDBHelper::getValue('SELECT status FROM report WHERE name='.zbx_dbstr($name)));
 		}
 	}
@@ -431,7 +448,9 @@ class testPageScheduledReport extends CWebTest {
 		$this->page->login()->open('zabbix.php?action=scheduledreport.list');
 		$table = $this->query('class:list-table')->asTable()->one();
 		$header = $table->query('xpath:.//a[text()="Name"]')->one();
-		$names = $this->getAllReportNames();
+
+		// in the HTML structure the names have several spaces, they need to be removed.
+		$names = preg_replace('/\s+/', ' ',$this->getAllReportNames());
 
 		foreach(['asc', 'desc'] as $sorting) {
 			$expected = ($sorting === 'asc') ? $names : array_reverse($names);

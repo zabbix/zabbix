@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -67,9 +67,9 @@ class testAutoregistration extends CIntegrationTest {
 				$this->assertArrayHasKey('result', $response,
 						'Failed to autoregister host before timeout');
 				$this->assertCount(1, $response['result'],
-						'Failed to autoregister host before timeout');
+						'Failed to autoregister host before timeout, response result: '. json_encode($response['result']));
 				$this->assertArrayHasKey('tags', $response['result'][0],
-						'Failed to autoregister host before timeout');
+						'Failed to autoregister host before timeout: response result: '. json_encode($response['result']));
 
 				$autoregHost = $response['result'][0];
 				$this->assertArrayHasKey('hostid', $autoregHost,
@@ -365,5 +365,4 @@ class testAutoregistration extends CIntegrationTest {
 			['tag' => 'tag1', 'value' => 'value 1']
 		]);
 	}
-
 }

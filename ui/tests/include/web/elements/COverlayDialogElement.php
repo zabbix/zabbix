@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -35,6 +35,17 @@ class COverlayDialogElement extends CElement {
 
 		return (new CElementQuery('xpath://div['.CXPathHelper::fromClass('overlay-dialogue modal').']'.
 				$suffix))->asOverlayDialog();
+	}
+
+	/**
+	 * Get overlay dialog by title text.
+	 *
+	 * @param string $name    overlay dialog title
+	 */
+	public static function get($name) {
+		return (new CElementQuery('xpath://div['.CXPathHelper::fromClass('overlay-dialogue-header').']/h4[text()='.
+				CXPathHelper::escapeQuotes($name).']/../..'))->waitUntilPresent()->asOverlayDialog()->one()
+				->waitUntilReady();
 	}
 
 	/**

@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -147,6 +147,11 @@ static void	event_free(zbx_event_t *event)
 static void	event_ptr_free(zbx_event_t **event)
 {
 	event_free(*event);
+}
+
+static void	event_ptr_free_wrapper(void *data)
+{
+	event_ptr_free((zbx_event_t**)data);
 }
 
 static zbx_hash_t	default_uint64_ptr_hash_func(const void *d)
@@ -1199,16 +1204,31 @@ static void	service_clean(zbx_service_t *service)
 	zbx_vector_service_problem_ptr_destroy(&service->service_problems);
 }
 
+static void	service_clean_wrapper(void *data)
+{
+	service_clean((zbx_service_t*)data);
+}
+
 static void	service_tag_clean(zbx_service_tag_t *tag)
 {
 	zbx_free(tag->name);
 	zbx_free(tag->value);
 }
 
+static void	service_tag_clean_wrapper(void *data)
+{
+	service_tag_clean((zbx_service_tag_t*)data);
+}
+
 static void	service_problem_tag_clean(zbx_service_problem_tag_t *service_problem_tag)
 {
 	zbx_free(service_problem_tag->tag);
 	zbx_free(service_problem_tag->value);
+}
+
+static void	service_problem_tag_clean_wrapper(void *data)
+{
+	service_problem_tag_clean((zbx_service_problem_tag_t*)data);
 }
 
 static void	service_diff_clean(void *data)
@@ -1227,10 +1247,20 @@ static void	service_action_clean(zbx_service_action_t *action)
 	zbx_vector_service_action_condition_ptr_destroy(&action->conditions);
 }
 
+static void	service_action_clean_wrapper(void *data)
+{
+	service_action_clean((zbx_service_action_t*)data);
+}
+
 static void	service_action_condition_clean(zbx_service_action_condition_t *condition)
 {
 	zbx_free(condition->value);
 	zbx_free(condition->value2);
+}
+
+static void	service_action_condition_clean_wrapper(void *data)
+{
+	service_action_condition_clean((zbx_service_action_condition_t*)data);
 }
 
 static zbx_hash_t	tag_services_hash(const void *data)
@@ -3232,11 +3262,11 @@ out:
 static void	service_manager_create_event_cache(zbx_service_manager_t *service_manager)
 {
 	zbx_hashset_create_ext(&service_manager->problem_events, 1000, default_uint64_ptr_hash_func,
-			ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC, (zbx_clean_func_t)event_ptr_free,
+			ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC, event_ptr_free_wrapper,
 			ZBX_DEFAULT_MEM_MALLOC_FUNC, ZBX_DEFAULT_MEM_REALLOC_FUNC, ZBX_DEFAULT_MEM_FREE_FUNC);
 
 	zbx_hashset_create_ext(&service_manager->recovery_events, 1, default_uint64_ptr_hash_func,
-			ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC, (zbx_clean_func_t)event_ptr_free,
+			ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC, event_ptr_free_wrapper,
 			ZBX_DEFAULT_MEM_MALLOC_FUNC, ZBX_DEFAULT_MEM_REALLOC_FUNC, ZBX_DEFAULT_MEM_FREE_FUNC);
 
 	zbx_hashset_create(&service_manager->deleted_eventids, 1000, ZBX_DEFAULT_UINT64_HASH_FUNC,
@@ -3255,18 +3285,18 @@ static void	service_manager_init(zbx_service_manager_t *service_manager)
 	service_manager_create_event_cache(service_manager);
 
 	zbx_hashset_create_ext(&service_manager->services, 1000, ZBX_DEFAULT_UINT64_HASH_FUNC,
-			ZBX_DEFAULT_UINT64_COMPARE_FUNC, (zbx_clean_func_t)service_clean,
+			ZBX_DEFAULT_UINT64_COMPARE_FUNC, service_clean_wrapper,
 			ZBX_DEFAULT_MEM_MALLOC_FUNC, ZBX_DEFAULT_MEM_REALLOC_FUNC, ZBX_DEFAULT_MEM_FREE_FUNC);
 
 	zbx_hashset_create(&service_manager->service_rules, 1000, ZBX_DEFAULT_UINT64_HASH_FUNC,
 			ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 	zbx_hashset_create_ext(&service_manager->service_tags, 1000, ZBX_DEFAULT_UINT64_HASH_FUNC,
-			ZBX_DEFAULT_UINT64_COMPARE_FUNC, (zbx_clean_func_t)service_tag_clean,
+			ZBX_DEFAULT_UINT64_COMPARE_FUNC, service_tag_clean_wrapper,
 			ZBX_DEFAULT_MEM_MALLOC_FUNC, ZBX_DEFAULT_MEM_REALLOC_FUNC, ZBX_DEFAULT_MEM_FREE_FUNC);
 
 	zbx_hashset_create_ext(&service_manager->service_problem_tags, 1000, ZBX_DEFAULT_UINT64_HASH_FUNC,
-			ZBX_DEFAULT_UINT64_COMPARE_FUNC, (zbx_clean_func_t)service_problem_tag_clean,
+			ZBX_DEFAULT_UINT64_COMPARE_FUNC, service_problem_tag_clean_wrapper,
 			ZBX_DEFAULT_MEM_MALLOC_FUNC, ZBX_DEFAULT_MEM_REALLOC_FUNC, ZBX_DEFAULT_MEM_FREE_FUNC);
 
 	zbx_hashset_create_ext(&service_manager->service_problem_tags_index, 1000, tag_services_hash,
@@ -3285,11 +3315,11 @@ static void	service_manager_init(zbx_service_manager_t *service_manager)
 			ZBX_DEFAULT_MEM_REALLOC_FUNC, ZBX_DEFAULT_MEM_FREE_FUNC);
 
 	zbx_hashset_create_ext(&service_manager->actions, 1000, ZBX_DEFAULT_UINT64_HASH_FUNC,
-			ZBX_DEFAULT_UINT64_COMPARE_FUNC, (zbx_clean_func_t)service_action_clean,
+			ZBX_DEFAULT_UINT64_COMPARE_FUNC, service_action_clean_wrapper,
 			ZBX_DEFAULT_MEM_MALLOC_FUNC, ZBX_DEFAULT_MEM_REALLOC_FUNC, ZBX_DEFAULT_MEM_FREE_FUNC);
 
 	zbx_hashset_create_ext(&service_manager->action_conditions, 1000, ZBX_DEFAULT_UINT64_HASH_FUNC,
-			ZBX_DEFAULT_UINT64_COMPARE_FUNC, (zbx_clean_func_t)service_action_condition_clean,
+			ZBX_DEFAULT_UINT64_COMPARE_FUNC, service_action_condition_clean_wrapper,
 			ZBX_DEFAULT_MEM_MALLOC_FUNC, ZBX_DEFAULT_MEM_REALLOC_FUNC, ZBX_DEFAULT_MEM_FREE_FUNC);
 
 	memset(&service_manager->severities, 0, sizeof(service_manager->severities));
@@ -3503,13 +3533,13 @@ ZBX_THREAD_ENTRY(service_manager_thread, args)
 	int				ret, events_num = 0, tags_update_num = 0, problems_delete_num = 0,
 					service_update_num = 0, service_cache_reload_requested = 0,
 					server_num = ((zbx_thread_args_t *)args)->info.server_num,
-					process_num = ((zbx_thread_args_t *)args)->info.process_num, services_num;
+					process_num = ((zbx_thread_args_t *)args)->info.process_num, services_num,
+					running = 1;
 	double				time_stat, time_idle = 0, time_now, time_flush = 0, time_cleanup = 0, sec;
 	zbx_service_manager_t		service_manager;
 	zbx_timespec_t			timeout = {1, 0};
 	const zbx_thread_info_t		*info = &((zbx_thread_args_t *)args)->info;
 	unsigned char			process_type = ((zbx_thread_args_t *)args)->info.process_type;
-	zbx_ipc_async_socket_t		rtc;
 	zbx_thread_service_manager_args *service_manager_args_in = (zbx_thread_service_manager_args *)
 			(((zbx_thread_args_t *)args)->args);
 
@@ -3542,8 +3572,6 @@ ZBX_THREAD_ENTRY(service_manager_thread, args)
 		zbx_dc_set_itservices_num(services_num);
 		db_get_events(&service_manager.problem_events);
 	}
-
-	zbx_rtc_subscribe(process_type, process_num, NULL, 0, service_manager_args_in->config_timeout, &rtc);
 
 	zbx_setproctitle("%s #%d started", get_process_type_string(process_type), process_num);
 
@@ -3611,12 +3639,26 @@ ZBX_THREAD_ENTRY(service_manager_thread, args)
 				/* load service problems once during startup */
 				if (0 == (int)time_flush)
 				{
+					zbx_ipc_async_socket_t	rtc;
+
 					sync_service_problems(&service_manager.services,
 							&service_manager.service_problems_index);
+
+					if (FAIL == zbx_ipc_async_socket_open(&rtc, ZBX_IPC_SERVICE_RTC, 30, &error))
+					{
+						zabbix_log(LOG_LEVEL_CRIT, "cannot open socket from service manager to"
+								" rtc: %s", error);
+						zbx_free(error);
+						goto out;
+					}
 
 					zbx_rtc_notify_finished_sync(30,
 							ZBX_RTC_SERVICE_SYNC_NOTIFY,
 							get_process_type_string(process_type), &rtc);
+					zbx_ipc_async_socket_close(&rtc);
+
+					zbx_rtc_subscribe_service(ZBX_PROCESS_TYPE_SERVICEMAN, 0, NULL, 0, SEC_PER_MIN,
+						ZBX_IPC_SERVICE_SERVICE);
 				}
 			}
 			while (ZBX_DB_DOWN == zbx_db_commit());
@@ -3706,6 +3748,11 @@ ZBX_THREAD_ENTRY(service_manager_thread, args)
 					else
 						service_cache_reload_requested = 1;
 					break;
+				case ZBX_RTC_SHUTDOWN:
+					zabbix_log(LOG_LEVEL_DEBUG, "shutdown message received, terminating...");
+					timeout.sec = 0;
+					timeout.ns = 1e8;
+					break;
 				default:
 					THIS_SHOULD_NEVER_HAPPEN;
 			}
@@ -3722,16 +3769,21 @@ ZBX_THREAD_ENTRY(service_manager_thread, args)
 		if (NULL != message)
 			continue;
 
-		if (0 == timeout.sec)
+		if (0 == running)
 			break;
 
 		if (!ZBX_IS_RUNNING())
-			timeout.sec = 0;
+		{
+			running = 0;
+			timeout.ns = 0;
+		}
 	}
-
+out:
 	service_manager_free(&service_manager);
 
 	zbx_db_close();
+
+	zbx_setproctitle("%s #%d [terminated]", get_process_type_string(process_type), process_num);
 
 	exit(EXIT_SUCCESS);
 #undef STAT_INTERVAL

@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -272,7 +272,6 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 			if (in_array(Widget::SHOW_DATE, $show)) {
 				$cells['date'] = [
-					'size' => $this->fields_values['date_size'],
 					'bold' => ($this->fields_values['date_bold'] == 1),
 					'color' => $this->fields_values['date_color']
 				];
@@ -280,7 +279,6 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 			if (in_array(Widget::SHOW_TIME, $show)) {
 				$cells['time'] = [
-					'size' => $this->fields_values['time_size'],
 					'bold' => ($this->fields_values['time_bold'] == 1),
 					'color' => $this->fields_values['time_color']
 				];
@@ -288,7 +286,6 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 			if (in_array(Widget::SHOW_TIMEZONE, $show)) {
 				$cells['timezone'] = [
-					'size' => $this->fields_values['tzone_size'],
 					'bold' => ($this->fields_values['tzone_bold'] == 1),
 					'color' => $this->fields_values['tzone_color']
 				];

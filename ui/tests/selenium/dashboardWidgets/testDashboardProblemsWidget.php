@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -14,12 +14,14 @@
 **/
 
 
-require_once dirname(__FILE__).'/../../include/CWebTest.php';
-require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
-require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
+require_once __DIR__.'/../../include/CWebTest.php';
+require_once __DIR__.'/../../include/helpers/CDataHelper.php';
+require_once __DIR__.'/../behaviors/CMessageBehavior.php';
 
 /**
  * @backup config, widget
+ *
+ * @dataSource HostAvailabilityWidget, MonitoringOverview
  *
  * @onBefore prepareDashboardData
  */
@@ -124,7 +126,7 @@ class testDashboardProblemsWidget extends CWebTest {
 		$this->assertEquals(['Type', 'Show header', 'Name', 'Refresh interval', 'Show', 'Host groups',
 				'Exclude host groups', 'Hosts', 'Problem', 'Severity', 'Problem tags', 'Show tags', 'Tag name',
 				'Tag display priority', 'Show operational data', 'Show symptoms', 'Show suppressed problems',
-				'Acknowledgement status', 'Sort entries by', 'Show timeline', 'Show lines'],
+				'Acknowledgement status', 'Sort entries by', 'Show timeline', 'Highlight whole row', 'Show lines'],
 				$form->getLabels()->asText()
 		);
 
@@ -444,7 +446,7 @@ class testDashboardProblemsWidget extends CWebTest {
 					'tag_fields' => []
 				]
 			],
-			// #9 Cyrillyc and special symbols in inputs.
+			// #9 Cyrillic and special symbols in inputs.
 			[
 				[
 					'fields' => [
@@ -642,6 +644,9 @@ class testDashboardProblemsWidget extends CWebTest {
 		}
 
 		COverlayDialogElement::find()->one()->close();
+		// Change dashboard from cancelEditing() to save() to check deadlock issue.
+		$dashboard->save();
+		$this->assertMessage(TEST_GOOD, 'Dashboard updated');
 	}
 
 	public function testDashboardProblemsWidget_SimpleUpdate() {

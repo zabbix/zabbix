@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -13,7 +13,7 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-require_once dirname(__FILE__).'/../../include/CLegacyWebTest.php';
+require_once __DIR__.'/../../include/CLegacyWebTest.php';
 
 /**
  * Test the creation of inheritance of new objects on a previously linked template.
@@ -26,6 +26,15 @@ class testInheritanceDiscoveryRule extends CLegacyWebTest {
 
 	private $hostid = 15001;		// 'Template inheritance test host'
 	private $host = 'Template inheritance test host';
+
+	/**
+	 * Attach Behaviors to the test.
+	 *
+	 * @return array
+	 */
+	public function getBehaviors() {
+		return ['class' => CMessageBehavior::class];
+	}
 
 	// Returns list of discovery rules from a template.
 	public static function update() {
@@ -47,7 +56,8 @@ class testInheritanceDiscoveryRule extends CLegacyWebTest {
 		$this->zbxTestLogin('host_discovery.php?form=update&context=host&itemid='.$data['itemid']);
 		$this->zbxTestClickWait('update');
 		$this->zbxTestCheckTitle('Configuration of discovery rules');
-		$this->zbxTestTextPresent('Discovery rule updated');
+		$this->assertMessage(TEST_GOOD, 'Discovery rule updated');
+
 		$this->assertEquals($oldHashDiscovery, CDBHelper::getHash($sqlDiscovery));
 	}
 

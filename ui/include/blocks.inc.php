@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -203,10 +203,12 @@ function getSystemStatusData(array $filter) {
 			}
 		}
 
-		$visible_problems = [];
+		CArrayHelper::sort($problems, [
+			['field' => 'clock', 'order' => ZBX_SORT_DOWN],
+			['field' => 'ns', 'order' => ZBX_SORT_DOWN]
+		]);
 
-		$limit = CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT);
-		$problems = CScreenProblem::sortData(['problems' => $problems], $limit, 'clock', ZBX_SORT_DOWN)['problems'];
+		$visible_problems = [];
 
 		foreach ($problems as $eventid => $problem) {
 			$trigger = $data['triggers'][$problem['objectid']];

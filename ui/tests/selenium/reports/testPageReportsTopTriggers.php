@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -14,9 +14,9 @@
 **/
 
 
-require_once dirname(__FILE__).'/../../include/CWebTest.php';
-require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
-require_once dirname(__FILE__).'/../behaviors/CTagBehavior.php';
+require_once __DIR__.'/../../include/CWebTest.php';
+require_once __DIR__.'/../behaviors/CTableBehavior.php';
+require_once __DIR__.'/../behaviors/CTagBehavior.php';
 
 use Facebook\WebDriver\WebDriverBy;
 
@@ -46,6 +46,7 @@ class testPageReportsTopTriggers extends CWebTest {
 	public function prepareData() {
 		// Create hostgroups for hosts.
 		CDataHelper::call('hostgroup.create', [
+			['name' => 'Common group'],
 			['name' => 'Empty Group for Reports->TOP 100 triggers check'],
 			['name' => 'First Group for Reports->TOP 100 triggers check'],
 			['name' => 'Second Group for Reports->TOP 100 triggers check'],
@@ -69,7 +70,8 @@ class testPageReportsTopTriggers extends CWebTest {
 					]
 				],
 				'groups' => [
-					'groupid' => self::$groupids['Empty Group for Reports->TOP 100 triggers check']
+					['groupid' => self::$groupids['Empty Group for Reports->TOP 100 triggers check']],
+					['groupid' => self::$groupids['Common group']]
 				]
 			],
 			[
@@ -85,7 +87,8 @@ class testPageReportsTopTriggers extends CWebTest {
 					]
 				],
 				'groups' => [
-					'groupid' => self::$groupids['First Group for Reports->TOP 100 triggers check']
+					['groupid' => self::$groupids['First Group for Reports->TOP 100 triggers check']],
+					['groupid' => self::$groupids['Common group']]
 				],
 				'items' => [
 					[
@@ -109,7 +112,8 @@ class testPageReportsTopTriggers extends CWebTest {
 					]
 				],
 				'groups' => [
-					'groupid' => self::$groupids['Second Group for Reports->TOP 100 triggers check']
+					['groupid' => self::$groupids['Second Group for Reports->TOP 100 triggers check']],
+					['groupid' => self::$groupids['Common group']]
 				],
 				'items' => [
 					[
@@ -133,7 +137,8 @@ class testPageReportsTopTriggers extends CWebTest {
 					]
 				],
 				'groups' => [
-					'groupid' => self::$groupids['Second Group for Reports->TOP 100 triggers check']
+					['groupid' => self::$groupids['Second Group for Reports->TOP 100 triggers check']],
+					['groupid' => self::$groupids['Common group']]
 				],
 				'items' => [
 					[
@@ -157,7 +162,8 @@ class testPageReportsTopTriggers extends CWebTest {
 					]
 				],
 				'groups' => [
-					'groupid' => self::$groupids['Third Group for special ¢ⒽąŘαⒸⓣⒺⓇⓢ 🌍']
+					['groupid' => self::$groupids['Third Group for special ¢ⒽąŘαⒸⓣⒺⓇⓢ 🌍']],
+					['groupid' => self::$groupids['Common group']]
 				],
 				'items' => [
 					[
@@ -181,7 +187,8 @@ class testPageReportsTopTriggers extends CWebTest {
 					]
 				],
 				'groups' => [
-					'groupid' => self::$groupids['Group for problem tags check']
+					['groupid' => self::$groupids['Group for problem tags check']],
+					['groupid' => self::$groupids['Common group']]
 				],
 				'items' => [
 					[
@@ -1202,11 +1209,19 @@ class testPageReportsTopTriggers extends CWebTest {
 		$table = $this->getTable();
 
 		$filter = CFilterElement::find()->one();
-		if ($filter->getSelectedTabName() !== 'Filter' && !array_key_exists('date', $data)) {
+
+		if ($filter->getSelectedTabName() !== 'Filter') {
 			$filter->selectTab('Filter');
 		}
-
 		$filter_form = $filter->getForm();
+
+		// If test case doesn't filter by hostgroup, then filter by common hostgroup to get rid of external data.
+		if (!CTestArrayHelper::get($data, 'fields.Host groups')) {
+			$filter_form->getField('Host groups')->fill('Common group');
+			$filter_form->submit();
+			$filter_form->waitUntilReloaded();
+		}
+
 		if (array_key_exists('fields', $data)) {
 			$filter_form->fill($data['fields']);
 		}
@@ -1263,6 +1278,14 @@ class testPageReportsTopTriggers extends CWebTest {
 		CDBHelper::setTriggerProblem('First test trigger with tag priority', TRIGGER_VALUE_TRUE);
 
 		$this->page->login()->open(self::LINK)->waitUntilReady();
+
+		// Remove unnecessary filtering in case if some filter is still in place after previous cases.
+		if (!$this->query('link:ЗАББИКС Сервер')->one(false)->isValid()) {
+			$filter = CFilterElement::find()->one();
+			$filter->selectTab('Filter');
+			$filter->query('button:Reset')->one()->click();
+			$this->page->waitUntilReady();
+		}
 
 		$data = [
 			'trigger_menu' => [

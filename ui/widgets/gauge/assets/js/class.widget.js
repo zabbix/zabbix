@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -72,6 +72,10 @@ class CWidgetGauge extends CWidget {
 		if (this.gauge !== null) {
 			this.gauge.setValue(value_data);
 
+			if (response.description !== undefined) {
+				this.gauge.setDescription(response.description);
+			}
+
 			return;
 		}
 
@@ -84,8 +88,13 @@ class CWidgetGauge extends CWidget {
 		};
 
 		this.gauge = new CSVGGauge(this.gauge_link, padding, response.config);
+
 		this.gauge.setSize(super._getContentsSize());
 		this.gauge.setValue(value_data);
+
+		if (response.description !== undefined) {
+			this.gauge.setDescription(response.description);
+		}
 	}
 
 	onClearContents() {

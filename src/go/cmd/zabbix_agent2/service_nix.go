@@ -1,8 +1,7 @@
 //go:build !windows
-// +build !windows
 
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -58,7 +57,8 @@ func validateExclusiveFlags(args *Arguments) error {
 		if exclusiveFlagSet {
 			count++
 		}
-		if count >= 2 { //nolint:gomnd
+
+		if count >= 2 { //nolint:mnd
 			return errors.New("mutually exclusive options used, see -h, --help for more information")
 		}
 	}

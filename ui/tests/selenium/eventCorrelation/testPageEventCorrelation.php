@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -14,9 +14,9 @@
 **/
 
 
-require_once dirname(__FILE__).'/../../include/CWebTest.php';
-require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
-require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
+require_once __DIR__.'/../../include/CWebTest.php';
+require_once __DIR__.'/../behaviors/CMessageBehavior.php';
+require_once __DIR__.'/../behaviors/CTableBehavior.php';
 
 /**
  * @backup correlation
@@ -46,7 +46,8 @@ class testPageEventCorrelation extends CWebTest {
 	const EVENT_OLD_VALUE = 'Old event tag value';
 	const EVENT_NEW_VALUE = 'New event tag value';
 	const MULTIPLE_CONDITIONS = 'Conditions';
-	const EVENT_FOR_FILTER = '📌€√Σnt correlation for filter and deletion';
+	const EVENT_WITH_SEVERAL_SPACES = '📌€√Σnt correlation for   filter   and deletion';
+	const EVENT_WITHOUT_SEVERAL_SPACES = '📌€√Σnt correlation for filter and deletion';
 
 	public function prepareEventData() {
 		CDataHelper::call('correlation.create', [
@@ -224,7 +225,7 @@ class testPageEventCorrelation extends CWebTest {
 				]
 			],
 			[
-				'name' => self::EVENT_FOR_FILTER,
+				'name' => self::EVENT_WITH_SEVERAL_SPACES,
 				'filter' => [
 					'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
 					'conditions' => [
@@ -301,7 +302,7 @@ class testPageEventCorrelation extends CWebTest {
 						'Status' => 'Enabled'
 					],
 					[
-						'Name' => self::EVENT_FOR_FILTER,
+						'Name' => self::EVENT_WITHOUT_SEVERAL_SPACES,
 						'Conditions' => 'Old event tag name equals tag for filter',
 						'Operations' => 'Close old events',
 						'Status' => 'Enabled'
@@ -371,6 +372,10 @@ class testPageEventCorrelation extends CWebTest {
 
 		// Check Event correlation table content.
 		$this->assertTableHasData($data);
+
+		// Check that the filter is still expanded after page refresh.
+		$this->page->refresh()->waitUntilReady();
+		$this->assertTrue($filter->isExpanded());
 	}
 
 	public function getFilterData() {
@@ -382,7 +387,7 @@ class testPageEventCorrelation extends CWebTest {
 						'Name' => '€√Σnt'
 					],
 					'expected' => [
-						self::EVENT_FOR_FILTER
+						self::EVENT_WITHOUT_SEVERAL_SPACES
 					]
 				]
 			],
@@ -422,7 +427,7 @@ class testPageEventCorrelation extends CWebTest {
 						self::EVENT_PAIR,
 						self::EVENT_NEW_VALUE,
 						self::EVENT_OLD_VALUE,
-						self::EVENT_FOR_FILTER
+						self::EVENT_WITHOUT_SEVERAL_SPACES
 					]
 				]
 			],
@@ -447,6 +452,15 @@ class testPageEventCorrelation extends CWebTest {
 						self::EVENT_NEW_OPERATIONS,
 						self::EVENT_OLD_OPERATIONS
 					]
+				]
+			],
+			// Multiple spaces in name field.
+			[
+				[
+					'filter' => [
+						'Name' => '   '
+					],
+					'expected' => [self::EVENT_WITHOUT_SEVERAL_SPACES]
 				]
 			],
 			// Search should not be case sensitive.
@@ -481,7 +495,7 @@ class testPageEventCorrelation extends CWebTest {
 						self::EVENT_PAIR,
 						self::EVENT_NEW_VALUE,
 						self::EVENT_OLD_VALUE,
-						self::EVENT_FOR_FILTER
+						self::EVENT_WITHOUT_SEVERAL_SPACES
 					]
 				]
 			],
@@ -494,7 +508,7 @@ class testPageEventCorrelation extends CWebTest {
 					],
 					'expected' => [
 						self::EVENT_NEW_OPERATIONS,
-						self::EVENT_FOR_FILTER
+						self::EVENT_WITHOUT_SEVERAL_SPACES
 					]
 				]
 			],
@@ -557,10 +571,12 @@ class testPageEventCorrelation extends CWebTest {
 	public function testPageEventCorrelation_Filter($data) {
 		$this->page->login()->open('zabbix.php?action=correlation.list');
 		$form = $this->query('name:zbx_filter')->asForm()->waitUntilVisible()->one();
+		$table = $this->getTable();
 
 		// Fill filter fields if such present in data provider.
 		$form->fill(CTestArrayHelper::get($data, 'filter'));
 		$form->submit();
+		$table->waitUntilReloaded();
 		$this->page->waitUntilReady();
 
 		// Check that expected Event correlations are returned in the list.
@@ -576,7 +592,7 @@ class testPageEventCorrelation extends CWebTest {
 				[
 					'sort_field' => 'Name',
 					'expected' => [
-						self::EVENT_FOR_FILTER,
+						self::EVENT_WITHOUT_SEVERAL_SPACES,
 						self::EVENT_OLD_VALUE,
 						self::EVENT_NEW_VALUE,
 						self::EVENT_PAIR,
@@ -643,7 +659,7 @@ class testPageEventCorrelation extends CWebTest {
 			[
 				[
 					'action' => 'Disable',
-					'name' => self::EVENT_FOR_FILTER
+					'name' => self::EVENT_WITHOUT_SEVERAL_SPACES
 				]
 			],
 			[
@@ -654,7 +670,7 @@ class testPageEventCorrelation extends CWebTest {
 			[
 				[
 					'action' => 'Delete',
-					'name' => self::EVENT_FOR_FILTER
+					'name' => self::EVENT_WITHOUT_SEVERAL_SPACES
 				]
 			]
 		];
@@ -693,7 +709,7 @@ class testPageEventCorrelation extends CWebTest {
 				[
 					'link_button' => true,
 					'action' => 'Disable',
-					'name' => self::EVENT_FOR_FILTER
+					'name' => self::EVENT_WITH_SEVERAL_SPACES
 				]
 			],
 			[
@@ -801,7 +817,7 @@ class testPageEventCorrelation extends CWebTest {
 	}
 
 	public function testPageEventCorrelation_Delete() {
-		$this->deleteAction([self::EVENT_FOR_FILTER]);
+		$this->deleteAction([self::EVENT_WITHOUT_SEVERAL_SPACES]);
 	}
 
 	public function testPageEventCorrelation_MassDelete() {

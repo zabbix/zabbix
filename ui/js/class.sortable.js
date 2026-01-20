@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -1044,15 +1044,18 @@ class CSortable {
 				return;
 			}
 
-			let direction;
+			let direction = null;
 
-			if (e.ctrlKey && (e.key === 'ArrowLeft' || e.key === 'ArrowUp')) {
-				direction = -1;
+			if (e.ctrlKey || e.metaKey) {
+				if (e.key === (this.#is_horizontal ? 'ArrowLeft' : 'ArrowUp')) {
+					direction = -1;
+				}
+				else if (e.key === (this.#is_horizontal ? 'ArrowRight' : 'ArrowDown')) {
+					direction = 1;
+				}
 			}
-			else if (e.ctrlKey && (e.key === 'ArrowRight' || e.key === 'ArrowDown')) {
-				direction = 1;
-			}
-			else {
+
+			if (direction === null) {
 				return;
 			}
 

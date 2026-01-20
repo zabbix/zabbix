@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -301,7 +301,9 @@ final class CHistFunctionData {
 		'avg_foreach' => [
 			[
 				'type' => 'require_math_parent',
-				'in' => ['avg', 'max', 'min', 'sum'],
+				'in' => ['avg', 'kurtosis', 'mad', 'max', 'min', 'skewness', 'stddevpop', 'stddevsamp', 'sum',
+					'sumofsquares', 'varpop', 'varsamp'
+				],
 				'parameters' => ['count' => 1],
 				'position' => 0
 			],
@@ -321,7 +323,9 @@ final class CHistFunctionData {
 		'count_foreach' => [
 			[
 				'type' => 'require_math_parent',
-				'in' => ['avg', 'max', 'min', 'sum'],
+				'in' => ['avg', 'kurtosis', 'mad', 'max', 'min', 'skewness', 'stddevpop', 'stddevsamp', 'sum',
+					'sumofsquares', 'varpop', 'varsamp'
+				],
 				'parameters' => ['count' => 1],
 				'position' => 0
 			],
@@ -335,7 +339,9 @@ final class CHistFunctionData {
 		'exists_foreach' => [
 			[
 				'type' => 'require_math_parent',
-				'in' => ['avg', 'max', 'min', 'sum'],
+				'in' => ['avg', 'kurtosis', 'mad', 'max', 'min', 'skewness', 'stddevpop', 'stddevsamp', 'sum',
+					'sumofsquares', 'varpop', 'varsamp'
+				],
 				'parameters' => ['count' => 1],
 				'position' => 0
 			],
@@ -365,7 +371,9 @@ final class CHistFunctionData {
 		'max_foreach' => [
 			[
 				'type' => 'require_math_parent',
-				'in' => ['avg', 'max', 'min', 'sum'],
+				'in' => ['avg', 'kurtosis', 'mad', 'max', 'min', 'skewness', 'stddevpop', 'stddevsamp', 'sum',
+					'sumofsquares', 'varpop', 'varsamp'
+				],
 				'parameters' => ['count' => 1],
 				'position' => 0
 			],
@@ -379,7 +387,9 @@ final class CHistFunctionData {
 		'min_foreach' => [
 			[
 				'type' => 'require_math_parent',
-				'in' => ['avg', 'max', 'min', 'sum'],
+				'in' => ['avg', 'kurtosis', 'mad', 'max', 'min', 'skewness', 'stddevpop', 'stddevsamp', 'sum',
+					'sumofsquares', 'varpop', 'varsamp'
+				],
 				'parameters' => ['count' => 1],
 				'position' => 0
 			],
@@ -393,7 +403,9 @@ final class CHistFunctionData {
 		'sum_foreach' => [
 			[
 				'type' => 'require_math_parent',
-				'in' => ['avg', 'max', 'min', 'sum'],
+				'in' => ['avg', 'kurtosis', 'mad', 'max', 'min', 'skewness', 'stddevpop', 'stddevsamp', 'sum',
+					'sumofsquares', 'varpop', 'varsamp'
+				],
 				'parameters' => ['count' => 1],
 				'position' => 0
 			],

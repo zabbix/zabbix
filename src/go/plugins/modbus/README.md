@@ -3,10 +3,6 @@ This plugin provides a native solution for monitoring modbus devices by Zabbix.
 The plugin can monitor several modbus devices simultaneously via Zabbix agent 2. Both TCP and 
 RTU connections are supported.
 
-## Requirements
-- Zabbix Agent 2
-- Go >= 1.21 (required only to build from source)
-
 ## Installation
 The plugin is supplied as part of the Zabbix Agent 2 and does not require any special installation steps. Once 
 Zabbix Agent 2 is installed, the plugin is ready to work. Now you need to make sure that a modbus device is 

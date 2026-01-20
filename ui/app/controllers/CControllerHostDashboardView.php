@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -74,10 +74,11 @@ class CControllerHostDashboardView extends CController {
 				$dashboardid = $host_dashboards[0]['dashboardid'];
 			}
 
-			$db_dashboards = API::TemplateDashboard()->get([
-				'output' => ['dashboardid', 'name', 'templateid', 'display_period', 'auto_start'],
+			$db_dashboards = API::HostDashboard()->get([
+				'output' => ['dashboardid', 'name', 'display_period', 'auto_start', 'templateid'],
 				'selectPages' => ['dashboard_pageid', 'name', 'display_period', 'widgets'],
-				'dashboardids' => [$dashboardid]
+				'hostids' => $this->getInput('hostid'),
+				'dashboardids' => $dashboardid
 			]);
 
 			if ($db_dashboards) {
@@ -133,7 +134,10 @@ class CControllerHostDashboardView extends CController {
 	}
 
 	private function getSortedHostDashboards(): array {
-		$dashboards = getHostDashboards($this->host['hostid'], ['dashboardid', 'name']);
+		$dashboards = API::HostDashboard()->get([
+			'output' => ['dashboardid', 'name'],
+			'hostids' => $this->host['hostid']
+		]);
 
 		CArrayHelper::sort($dashboards, [['field' => 'name', 'order' => ZBX_SORT_UP]]);
 

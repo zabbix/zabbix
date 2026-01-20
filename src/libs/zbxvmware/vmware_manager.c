@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -229,7 +229,7 @@ static void	vmware_job_schedule(zbx_vmware_t *vmw, zbx_vmware_job_t *job, time_t
 	zbx_vmware_unlock();
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() type:%s nextcheck:%s ttl:" ZBX_FS_TIME_T, __func__,
-			vmware_job_type_string(job), zbx_time2str(job->nextcheck, NULL), job->ttl);
+			vmware_job_type_string(job), zbx_time2str(job->nextcheck, NULL), (zbx_fs_time_t)job->ttl);
 
 #undef ZBX_VMWARE_EVENTLOG_MIN_INTERVAL
 #undef ZBX_VMWARE_SERVICE_TTL

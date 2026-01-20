@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -256,7 +256,7 @@ class C20ImportConverter extends CConverter {
 			$screen_item['application'] = '';
 
 			if (!array_key_exists('max_columns', $screen_item)) {
-				$screen_item['max_columns'] = (string) SCREEN_SURROGATE_MAX_COLUMNS_DEFAULT;
+				$screen_item['max_columns'] = '3'; // SCREEN_SURROGATE_MAX_COLUMNS_DEFAULT
 			}
 		}
 		unset($screen_item);

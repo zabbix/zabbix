@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -166,7 +166,8 @@ next:
 
 				items[i].state = ITEM_STATE_NORMAL;
 				zbx_preprocess_item_value(items[i].itemid, items[i].host.hostid, items[i].value_type,
-						items[i].flags, &results[i], ts, items[i].state, NULL);
+						items[i].flags, items[i].preprocessing, &results[i], ts,
+						items[i].state, NULL);
 
 				itemids[i] = items[i].itemid;
 				lastclocks[i] = ts->sec;
@@ -174,7 +175,8 @@ next:
 			case NOTSUPPORTED:
 				items[i].state = ITEM_STATE_NOTSUPPORTED;
 				zbx_preprocess_item_value(items[i].itemid, items[i].host.hostid, items[i].value_type,
-						items[i].flags, NULL, ts, items[i].state, results[i].msg);
+						items[i].flags, items[i].preprocessing, NULL, ts, items[i].state,
+						results[i].msg);
 
 				itemids[i] = items[i].itemid;
 				lastclocks[i] = ts->sec;

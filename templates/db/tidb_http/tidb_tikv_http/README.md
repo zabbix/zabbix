@@ -88,7 +88,7 @@ Also, see the Macros section for a list of macros used to set trigger values.
 |TiDB TiKV: Too many coprocessor request error||`min(/TiDB TiKV by HTTP/tikv.coprocessor_request_error.rate,5m)>{$TIKV.COPROCESSOR.ERRORS.MAX.WARN}`|Warning||
 |TiDB TiKV: Too many pending commands||`min(/TiDB TiKV by HTTP/tikv.scheduler_contex,5m)>{$TIKV.PENDING_COMMANDS.MAX.WARN}`|Average||
 |TiDB TiKV: Too many pending tasks||`min(/TiDB TiKV by HTTP/tikv.worker_pending_task,5m)>{$TIKV.PENDING_TASKS.MAX.WARN}`|Average||
-|TiDB TiKV: has been restarted|<p>Uptime is less than 10 minutes.</p>|`last(/TiDB TiKV by HTTP/tikv.uptime)<10m`|Info|**Manual close**: Yes|
+|TiDB TiKV: Instance has been restarted|<p>Uptime is less than 10 minutes.</p>|`last(/TiDB TiKV by HTTP/tikv.uptime)<10m`|Info|**Manual close**: Yes|
 
 ### LLD rule QPS metrics discovery
 

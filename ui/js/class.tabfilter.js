@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -696,13 +696,7 @@ class CTabFilter extends CBaseComponent {
 					dropdown.push({items: dropdown_items});
 				}
 
-				$(this._target).menuPopup(dropdown, new jQuery.Event(ev), {
-					position: {
-						of: ev.target,
-						my: 'left bottom',
-						at: 'left top'
-					}
-				});
+				$(this._target).menuPopup(dropdown, new jQuery.Event(ev));
 			},
 
 			/**

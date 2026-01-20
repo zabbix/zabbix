@@ -78,4 +78,13 @@ in:
 out:
   expression: '09:05:04'
   return: SUCCEED
+---
+test case: Expand '{{$USERMACRO_1}.fmttime(%H:%M:%S)} 3'
+in:
+  macro: '{$USERMACRO_1}'
+  macro_value: '2023-10-13T09:05:04+0200'
+  expression: '{{$USERMACRO_1}.fmttime(%H:%M:%S)}'
+out:
+  expression: '09:05:04'
+  return: SUCCEED
 ...

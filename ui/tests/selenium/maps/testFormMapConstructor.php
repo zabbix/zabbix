@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -14,16 +14,20 @@
 **/
 
 
-require_once dirname(__FILE__).'/../../include/CLegacyWebTest.php';
+require_once __DIR__.'/../../include/CLegacyWebTest.php';
 
 /**
+ * @dataSource Maps
+ *
  * @backup sysmaps, globalmacro
  *
  * @onBefore prepareMapForMacrofunctions
  */
 
 class testFormMapConstructor extends CLegacyWebTest {
+
 	protected static $macro_map_id;
+	const MAP_NAME = 'Map for form testing';
 	const MAP_MACRO_FUNCTIONS = 'Map for testing macro functions';
 	const HOST_MACRO_FUNCTIONS = 'Testing macro functions 12345';
 	const ITEM_KEY = 'trapmacrofunctions';
@@ -74,7 +78,6 @@ class testFormMapConstructor extends CLegacyWebTest {
 				'selements' => [
 					// For testing the built-in macros with macro functions.
 					[
-						'selementid' => 1,
 						'elementtype' => SYSMAP_ELEMENT_TYPE_HOST,
 						'iconid_off' => 182,
 						'label' => '{{HOST.HOST}.btoa()}, {{HOST.HOST}.htmldecode()}, {{HOST.HOST}.htmlencode()}',
@@ -83,7 +86,6 @@ class testFormMapConstructor extends CLegacyWebTest {
 						'elements' => [['hostid' => $host['hostids'][self::HOST_MACRO_FUNCTIONS]]]
 					],
 					[
-						'selementid' => 1,
 						'elementtype' => SYSMAP_ELEMENT_TYPE_HOST,
 						'iconid_off' => 182,
 						'label' => '{{HOST.HOST}.lowercase()}, {{HOST.HOST}.uppercase()}, '.
@@ -93,7 +95,6 @@ class testFormMapConstructor extends CLegacyWebTest {
 						'elements' => [['hostid' => $host['hostids'][self::HOST_MACRO_FUNCTIONS]]]
 					],
 					[
-						'selementid' => 1,
 						'elementtype' => SYSMAP_ELEMENT_TYPE_HOST,
 						'iconid_off' => 182,
 						'label' => '{{HOST.HOST}.tr(0-9abcA-L,*)}, {{HOST.HOST}.urlencode()}, {{HOST.HOST}.urldecode()}, '.
@@ -104,7 +105,6 @@ class testFormMapConstructor extends CLegacyWebTest {
 					],
 					// For testing the expression macros with macro functions.
 					[
-						'selementid' => 2,
 						'elementtype' => SYSMAP_ELEMENT_TYPE_TRIGGER,
 						'iconid_off' => 152,
 						'label' => '{{?last(//'.self::ITEM_KEY.')}.btoa()}, {{?last(//'.self::ITEM_KEY.')}.fmtnum(0)}, '.
@@ -115,7 +115,6 @@ class testFormMapConstructor extends CLegacyWebTest {
 						'elements' => [['triggerid' => $triggers['triggerids'][0]]]
 					],
 					[
-						'selementid' => 2,
 						'elementtype' => SYSMAP_ELEMENT_TYPE_TRIGGER,
 						'iconid_off' => 152,
 						'label' => '{{?last(//'.self::ITEM_KEY.')}.uppercase()}, '.
@@ -129,7 +128,6 @@ class testFormMapConstructor extends CLegacyWebTest {
 					],
 					// For testing incorrectly used arguments of macro functions.
 					[
-						'selementid' => 2,
 						'elementtype' => SYSMAP_ELEMENT_TYPE_TRIGGER,
 						'iconid_off' => 152,
 						'label' => '{{?last(//'.self::ITEM_KEY.')}.btoa(\)}, {{HOST.HOST}.htmldecode(/)}, '.
@@ -140,7 +138,6 @@ class testFormMapConstructor extends CLegacyWebTest {
 						'elements' => [['triggerid' => $triggers['triggerids'][1]]]
 					],
 					[
-						'selementid' => 2,
 						'elementtype' => SYSMAP_ELEMENT_TYPE_TRIGGER,
 						'iconid_off' => 152,
 						'label' => '{{?last(//'.self::ITEM_KEY.')}.regsub()}, {{HOST.HOST}.lowercase(///)}, '.
@@ -153,7 +150,6 @@ class testFormMapConstructor extends CLegacyWebTest {
 					],
 					// Check that regsub and iregsub functions working correctly without match.
 					[
-						'selementid' => 2,
 						'elementtype' => SYSMAP_ELEMENT_TYPE_TRIGGER,
 						'iconid_off' => 152,
 						'label' => '{{?last(//'.self::ITEM_KEY.')}.regsub(0, test)}, {{HOST.HOST}.regsub(0, test)}, '.
@@ -202,20 +198,25 @@ class testFormMapConstructor extends CLegacyWebTest {
 		];
 	}
 
-	public static function allMaps() {
-		return CDBHelper::getDataProvider('SELECT * FROM sysmaps');
+	public static function getSimpleUpdateData() {
+		return [
+			[['name' => 'Local network']],
+			[['name' => 'Map for form testing']],
+			[['name' => 'Map with icon mapping']],
+			[['name' => 'Map with links']],
+			[['name' => 'Public map with image']],
+			[['name' => 'Test map for Properties']]
+		];
 	}
 
 	/**
-	 * @dataProvider allMaps
+	 * @dataProvider getSimpleUpdateData
 	 *
 	 * @browsers chrome
 	 */
 	public function testFormMapConstructor_SimpleUpdateConstructor($map) {
-		$sysmapid = $map['sysmapid'];
-
-		$sql_maps_elements = 'SELECT * FROM sysmaps sm INNER JOIN sysmaps_elements sme ON'.
-				' sme.sysmapid = sm.sysmapid ORDER BY sme.selementid';
+		$sql_maps_elements = 'SELECT * FROM sysmaps sm INNER JOIN sysmaps_elements se ON'.
+				' se.sysmapid = sm.sysmapid ORDER BY se.selementid';
 		$sql_links_triggers = 'SELECT * FROM sysmaps_links sl INNER JOIN sysmaps_link_triggers slt ON'.
 				' slt.linkid = sl.linkid ORDER BY slt.linktriggerid';
 		$hash_maps_elements = CDBHelper::getHash($sql_maps_elements);
@@ -232,11 +233,11 @@ class testFormMapConstructor extends CLegacyWebTest {
 			'query'	=> 'class:map-timestamp',
 			'color'	=> '#ffffff'
 		];
-		$this->assertScreenshotExcept($element, $exclude, 'view_'.$sysmapid);
+		$this->assertScreenshotExcept($element, $exclude, 'view_'.$map['name']);
 
 		$this->query('button:Edit map')->one()->click();
 		$this->page->waitUntilReady();
-		$this->assertScreenshot($this->query('id:map-area')->waitUntilPresent()->one(), 'edit_'.$sysmapid);
+		$this->assertScreenshot($this->query('id:map-area')->waitUntilPresent()->one(), 'edit_'.$map['name']);
 		$this->query('button:Update')->one()->click();
 
 		$this->page->waitUntilAlertIsPresent();
@@ -262,8 +263,7 @@ class testFormMapConstructor extends CLegacyWebTest {
 	 * @dataProvider possibleGridOptions
 	 */
 	public function testFormMapConstructor_UpdateGridOptions($gridSize, $showGrid, $autoAlign) {
-
-		$map_name = 'Test map 1';
+		$map_name = self::MAP_NAME;
 
 		// getting map options from DB as they are at the beginning of the test
 		$db_map = CDBHelper::getRow('SELECT * FROM sysmaps WHERE name='.zbx_dbstr($map_name));
@@ -378,12 +378,11 @@ class testFormMapConstructor extends CLegacyWebTest {
 			[
 				'label' => '*UNKNOWN*, *UNKNOWN*, *UNKNOWN*, *UNKNOWN*, *UNKNOWN*, *UNKNOWN*, *UNKNOWN*',
 				'id' => 14
+			],
+			[
+				'label' => ', , ,',
+				'id' => 16
 			]
-			// TODO: Uncomment and check the test case, after ZBX-25420 fix.
-//			[
-//				'label' => ', , ,',
-//				'id' => 16
-//			]
 		];
 
 		foreach ($objects as $object) {
@@ -397,11 +396,11 @@ class testFormMapConstructor extends CLegacyWebTest {
 	 * Check the screenshot of the trigger container in trigger map element.
 	 */
 	public function testFormMapConstructor_MapElementScreenshot() {
-		// Open map "Test map 1" in edit mode.
-		$this->page->login()->open('sysmap.php?sysmapid=3')->waitUntilReady();
+		// Open map in edit mode.
+		$this->page->login()->open('sysmap.php?sysmapid='.CDataHelper::get('Maps.form_test_mapid'))->waitUntilReady();
 
-		// Click on map element "Trigger element (CPU load)".
-		$this->query('xpath://div[@data-id="5"]')->waitUntilVisible()->one()->click();
+		// Click on map element 'Trigger for map' (in prepareMapData this trigger has icon id = 146).
+		$this->query('xpath://div[contains(@class, "sysmap_iconid_146")]')->waitUntilVisible()->one()->click();
 
 		$form = $this->query('id:map-window')->asForm()->one()->waitUntilVisible();
 		$form->getField('New triggers')->selectMultiple([
@@ -413,7 +412,6 @@ class testFormMapConstructor extends CLegacyWebTest {
 		$form->query('button:Add')->one()->click();
 
 		// Take a screenshot to test draggable object position for triggers of trigger type map element.
-		// TODO: screenshot should be changed after fix ZBX-22528
 		$this->page->removeFocus();
 		$this->assertScreenshot($this->query('id:triggerContainer')->waitUntilVisible()->one(), 'Map element');
 	}

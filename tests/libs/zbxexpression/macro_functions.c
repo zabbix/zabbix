@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -68,6 +68,15 @@ void	__wrap_zbx_dc_get_user_macro(const zbx_dc_um_handle_t *um_handle, const cha
 	ZBX_UNUSED(macro);
 	ZBX_UNUSED(hostids);
 	ZBX_UNUSED(hostids_num);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() macro:%s", __func__, macro);
+
+	const char *macro_name = zbx_mock_get_optional_parameter_string("in.macro");
+
+	if (NULL != macro_name && 0 != strcmp(macro, macro_name))
+	{
+		zbx_mock_assert_str_eq("expected macro", macro_name, macro);
+	}
 
 	*value = zbx_strdup(NULL, zbx_mock_get_parameter_string("in.macro_value"));
 }

@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -95,17 +95,15 @@ foreach ($data['hosts'] as $host) {
 	natsort($hostgroups);
 
 	$row = [
-		(new CCol(
-			(new CLink($host['name'], (new CUrl('hostinventories.php'))->setArgument('hostid', $host['hostid'])))
-				->addClass($host['status'] == HOST_STATUS_NOT_MONITORED ? ZBX_STYLE_RED : null)
-		))->addClass(ZBX_STYLE_WORDBREAK),
-		(new CCol(implode(', ', $hostgroups)))->addClass(ZBX_STYLE_WORDBREAK),
-		(new CCol(zbx_str2links($host['inventory']['name'])))->addClass(ZBX_STYLE_WORDBREAK),
-		(new CCol(zbx_str2links($host['inventory']['type'])))->addClass(ZBX_STYLE_WORDBREAK),
-		(new CCol(zbx_str2links($host['inventory']['os'])))->addClass(ZBX_STYLE_WORDBREAK),
-		(new CCol(zbx_str2links($host['inventory']['serialno_a'])))->addClass(ZBX_STYLE_WORDBREAK),
-		(new CCol(zbx_str2links($host['inventory']['tag'])))->addClass(ZBX_STYLE_WORDBREAK),
-		(new CCol(zbx_str2links($host['inventory']['macaddress_a'])))->addClass(ZBX_STYLE_WORDBREAK)
+		(new CLink($host['name'], (new CUrl('hostinventories.php'))->setArgument('hostid', $host['hostid'])))
+			->addClass($host['status'] == HOST_STATUS_NOT_MONITORED ? ZBX_STYLE_RED : null),
+		implode(', ', $hostgroups),
+		zbx_str2links($host['inventory']['name']),
+		zbx_str2links($host['inventory']['type']),
+		zbx_str2links($host['inventory']['os']),
+		zbx_str2links($host['inventory']['serialno_a']),
+		zbx_str2links($host['inventory']['tag']),
+		zbx_str2links($host['inventory']['macaddress_a'])
 	];
 
 	$table->addRow($row);

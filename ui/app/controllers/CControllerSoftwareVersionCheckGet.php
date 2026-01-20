@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -34,13 +34,23 @@ class CControllerSoftwareVersionCheckGet extends CController {
 		];
 
 		if ($data['is_software_update_check_enabled']) {
-			$check_data = CSettingsHelper::getSoftwareUpdateCheckData() + ['nextcheck' => 0];
 			$now = time();
+			$check_data = CSettingsHelper::getSoftwareUpdateCheckData() + [
+				'lastcheck' => 0,
+				'lastcheck_success' => 0,
+				'nextcheck' => 0,
+				'lastcheck_success_version' => ZABBIX_VERSION,
+				'versions' => []
+			];
 
-			if ($check_data['nextcheck'] > $now) {
-				$data['delay'] = $check_data['nextcheck'] - $now + random_int(1, SEC_PER_MIN);
+			if ($check_data['nextcheck'] > $now	&& $check_data['lastcheck_success_version'] === ZABBIX_VERSION) {
+				$data['delay'] = $check_data['nextcheck'] - $now + mt_rand(1, SEC_PER_MIN);
 			}
 			else {
+				$check_data['nextcheck'] = $now + SEC_PER_MIN;
+
+				CSettings::updatePrivate(['software_update_check_data' => $check_data]);
+
 				$data['version'] = CSettingsHelper::getServerStatus()['version'];
 				$data['check_hash'] = CSettingsHelper::getPrivate(CSettingsHelper::SOFTWARE_UPDATE_CHECKID);
 				$data['csrf_token'] = CCsrfTokenHelper::get('softwareversioncheck');

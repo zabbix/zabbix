@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -171,6 +171,9 @@ ZBX_THREAD_ENTRY(dbconfig_thread, args)
 				dbconfig_args_in->config_confsyncer_frequency);
 	}
 stop:
+	zbx_ipc_async_socket_close(&rtc);
+	zbx_db_close();
+
 	zbx_setproctitle("%s #%d [terminated]", get_process_type_string(process_type), process_num);
 
 	while (1)

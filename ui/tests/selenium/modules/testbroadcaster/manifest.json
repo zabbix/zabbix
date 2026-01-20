@@ -1,0 +1,68 @@
+{
+	"manifest_version": 2.0,
+	"id": "testbroadcaster",
+	"type": "widget",
+	"name": "Test Broadcaster",
+	"namespace": "TestBroadcaster",
+	"version": "1.0",
+	"author": "Zabbix",
+	"description": "Allows to test listening functionality of other widgets.",
+	"widget": {
+		"size": {
+			"width": 32,
+			"height": 8
+		},
+		"js_class": "CTestBroadcaster",
+		"refresh_rate": 0,
+		"out": [
+			{
+				"type": "_hostgroupid"
+			},
+			{
+				"type": "_hostgroupids"
+			},
+			{
+				"type": "_hostid"
+			},
+			{
+				"type": "_hostids"
+			},
+			{
+				"type": "_itemid"
+			},
+			{
+				"type": "_itemids"
+			},
+			{
+				"type": "_itemprototypeid"
+			},
+			{
+				"type": "_graphid"
+			},
+			{
+				"type": "_graphprototypeid"
+			},
+			{
+				"type": "_mapid"
+			},
+			{
+				"type": "_serviceid"
+			},
+			{
+				"type": "_slaid"
+			},
+			{
+				"type": "_timeperiod"
+			}
+		]
+	},
+	"actions": {
+		"widget.testbroadcaster.view": {
+			"class": "WidgetView"
+		}
+	},
+	"assets": {
+		"js": ["class.widget.js"],
+		"css": ["widget.css"]
+	}
+}

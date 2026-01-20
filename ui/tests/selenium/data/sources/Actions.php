@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -27,6 +27,28 @@ class Actions {
 	 * @return array
 	 */
 	public static function load() {
+		// Create hostgroups for hosts.
+		CDataHelper::call('hostgroup.create', [
+			['name' => 'Host group for Actions related test data']
+		]);
+		$groupids = CDataHelper::getIds('name');
+
+		// Create hosts that will be used for action conditions.
+		$hostids = CDataHelper::createHosts([
+			[
+				'host' => 'Host for action condition operator NOT EQUAL',
+				'groups' => [
+					'groupid' => $groupids['Host group for Actions related test data']
+				]
+			],
+			[
+				'host' => 'Host for action condition operator EQUAL',
+				'groups' => [
+					'groupid' => $groupids['Host group for Actions related test data']
+				]
+			]
+		])['hostids'];
+
 		CDataHelper::call('proxy.create',
 			[
 				[
@@ -41,7 +63,7 @@ class Actions {
 		);
 		$proxyids = CDataHelper::getIds('name');
 
-		$scripts = CDataHelper::call('script.create', [
+		$reboot_scriptid = CDataHelper::call('script.create', [
 			[
 				'name' => 'Reboot',
 				'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
@@ -50,8 +72,7 @@ class Actions {
 				'groupid' => 4, // Zabbix servers.
 				'description' => 'This command reboots server.'
 			]
-		]);
-		$reboot_scriptid = $scripts['scriptids'][0];
+		])['scriptids'][0];
 
 		CDataHelper::call('action.create', [
 			// Service action.
@@ -213,12 +234,12 @@ class Actions {
 						[
 							'conditiontype' => ZBX_CONDITION_TYPE_HOST,
 							'operator' => CONDITION_OPERATOR_NOT_EQUAL,
-							'value' => 10084 // ЗАББИКС Сервер.
+							'value' => $hostids['Host for action condition operator NOT EQUAL']
 						],
 						[
 							'conditiontype' => ZBX_CONDITION_TYPE_HOST,
 							'operator' => CONDITION_OPERATOR_EQUAL,
-							'value' => 99134 // Available host.
+							'value' => $hostids['Host for action condition operator EQUAL']
 						],
 						[
 							'conditiontype' => ZBX_CONDITION_TYPE_HOST_GROUP,
@@ -471,7 +492,7 @@ class Actions {
 				'\'Command: H1:ls -la\', 1, 0, \'\', 1, 1, \'\'),'.
 				'(130, '.zbx_dbstr($actionids['Trigger action 2']).', 101, 9, 1597440000, 3, \'igor.danoshaites@zabbix.com\','.
 				'\'time_subject_2\', \'time_message_\', 1, 0, \'\', 1, 0, \'\'),'.
-				'(131, '.zbx_dbstr($actionids['Trigger action 3']).', 101, 1, 1329724870, 10, \'test.test@zabbix.com\','.
+				'(131, '.zbx_dbstr($actionids['Trigger action 3']).', 101, 1, 1329724870, 39, \'test.test@zabbix.com\','.
 				'\'subject here\', \'message here\', 1, 0, \'\', 1, 0, \'\'),'.
 				'(132, '.zbx_dbstr($actionids['Trigger action 3']).', 101, 9, 1329724880, 3, \'77777777\', \'subject here\','.
 				'\'message here\', 1, 0, \'\', 1, 0, \'\'),'.

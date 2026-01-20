@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -120,7 +120,7 @@ foreach ($data['items'] as $item) {
 			->setAttribute('data-itemid', $item['itemid'])
 			->setAttribute('data-field', 'discover')
 			->setAttribute('data-context', $data['context']),
-		$data['tags'][$item['itemid']]
+		(new CDiv($data['tags'][$item['itemid']]))->addClass(ZBX_STYLE_TAGS_WRAPPER)
 	]);
 }
 

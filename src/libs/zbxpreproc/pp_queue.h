@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -27,6 +27,7 @@ typedef struct
 	zbx_uint64_t	processing_num;
 
 	zbx_hashset_t	sequences;
+	zbx_hashset_t	tasks;
 
 	zbx_list_t	pending;
 	zbx_list_t	immediate;

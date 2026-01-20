@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -123,7 +123,7 @@ class CControllerMediatypeCreate extends CController {
 					}
 
 					if ($mediatype['provider'] == CMediatypeHelper::EMAIL_PROVIDER_OFFICE365_RELAY) {
-						$formatted_domain = substr_replace($domain, '-', strrpos($domain, '.'), 1);
+						$formatted_domain = str_replace('.', '-', $domain);
 						$static_part = CMediatypeHelper::getEmailProviders($mediatype['provider'])['smtp_server'];
 
 						$mediatype['smtp_server'] = $formatted_domain.$static_part;

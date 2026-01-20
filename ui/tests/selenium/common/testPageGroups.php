@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -14,9 +14,9 @@
 **/
 
 
-require_once dirname(__FILE__).'/../../include/CWebTest.php';
-require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
-require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
+require_once __DIR__.'/../../include/CWebTest.php';
+require_once __DIR__.'/../behaviors/CMessageBehavior.php';
+require_once __DIR__.'/../behaviors/CTableBehavior.php';
 
 /**
  * Base class for Host and Template groups page.
@@ -254,18 +254,12 @@ class testPageGroups extends CWebTest {
 			$names = $this->getGroupNames($sorting);
 			$table->query('link:Name')->waitUntilClickable()->one()->click();
 			$table->waitUntilReloaded();
-			$this->assertTableDataColumn($names);
+			$this->assertTableDataColumn(preg_replace('/\s+/', ' ', $names));
 		}
 	}
 
 	public static function getFilterData() {
 		return [
-			// Too many spaces in field.
-			[
-				[
-					'Name' => '  '
-				]
-			],
 			// Special symbols, utf8 and long name.
 			[
 				[

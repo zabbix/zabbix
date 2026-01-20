@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -25,7 +25,6 @@ use Zabbix\Widgets\Fields\{
 	CWidgetFieldCheckBox,
 	CWidgetFieldCheckBoxList,
 	CWidgetFieldColor,
-	CWidgetFieldIntegerBox,
 	CWidgetFieldMultiSelectItem,
 	CWidgetFieldMultiSelectOverrideHost,
 	CWidgetFieldRadioButtonList,
@@ -39,13 +38,6 @@ use Widgets\Clock\Widget;
  * Clock widget form.
  */
 class WidgetForm extends CWidgetForm {
-
-	private const SIZE_PERCENT_MIN = 1;
-	private const SIZE_PERCENT_MAX = 100;
-
-	private const DEFAULT_DATE_SIZE = 20;
-	public const DEFAULT_TIME_SIZE = 30;
-	private const DEFAULT_TIMEZONE_SIZE = 20;
 
 	public function validate(bool $strict = false): array {
 		$errors = parent::validate($strict);
@@ -100,18 +92,10 @@ class WidgetForm extends CWidgetForm {
 				(new CWidgetFieldColor('bg_color', _('Background color')))->allowInherited()
 			)
 			->addField(
-				(new CWidgetFieldIntegerBox('date_size', _('Size'), self::SIZE_PERCENT_MIN, self::SIZE_PERCENT_MAX))
-					->setDefault(self::DEFAULT_DATE_SIZE)
-			)
-			->addField(
 				new CWidgetFieldCheckBox('date_bold', _('Bold'))
 			)
 			->addField(
 				(new CWidgetFieldColor('date_color', _('Color')))->allowInherited()
-			)
-			->addField(
-				(new CWidgetFieldIntegerBox('time_size', _('Size'), self::SIZE_PERCENT_MIN, self::SIZE_PERCENT_MAX))
-					->setDefault(self::DEFAULT_TIME_SIZE)
 			)
 			->addField(
 				new CWidgetFieldCheckBox('time_bold', _('Bold'))
@@ -127,10 +111,6 @@ class WidgetForm extends CWidgetForm {
 					Widget::HOUR_24 => _('24-hour'),
 					Widget::HOUR_12 => _('12-hour')
 				]))->setDefault(Widget::HOUR_24)
-			)
-			->addField(
-				(new CWidgetFieldIntegerBox('tzone_size', _('Size'), self::SIZE_PERCENT_MIN, self::SIZE_PERCENT_MAX))
-					->setDefault(self::DEFAULT_TIMEZONE_SIZE)
 			)
 			->addField(
 				new CWidgetFieldCheckBox('tzone_bold', _('Bold'))

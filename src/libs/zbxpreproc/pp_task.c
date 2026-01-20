@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -119,6 +119,7 @@ zbx_pp_task_t	*pp_task_value_create(zbx_uint64_t itemid, zbx_pp_item_preproc_t *
 
 	task->itemid = itemid;
 	task->type = ZBX_PP_TASK_VALUE;
+	task->state = ZBX_PP_TASK_PENDING;
 
 	if (NULL != value)
 		d->value = *value;

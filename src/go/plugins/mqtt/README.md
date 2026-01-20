@@ -6,11 +6,6 @@ supports active checks only.
 
 This plugin works using "Eclipse Paho MQTT Go client library" (https://github.com/eclipse/paho.mqtt.golang)
 
-
-## Requirements
-- Zabbix Agent 2
-- Go >= 1.21 (required only to build from source)
-
 ## Installation
 The plugin is supplied as part of the Zabbix Agent 2 and does not require any special installation steps. Once 
 Zabbix Agent 2 is installed, the plugin is ready to work. Now you need to make sure that an MQTT broker is available.

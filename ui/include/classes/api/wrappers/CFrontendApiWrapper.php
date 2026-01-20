@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -69,10 +69,12 @@ class CFrontendApiWrapper extends CApiWrapper {
 		else {
 			// add an error message
 			$trace = $response->errorMessage;
+
 			if ($response->debug) {
 				$trace .= ' ['.$this->profiler->formatCallStack($response->debug).']';
 			}
-			error($trace);
+
+			error($trace, $response->errorCode == ZBX_API_ERROR_DB);
 
 			return false;
 		}

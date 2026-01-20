@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -13,14 +13,16 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-require_once dirname(__FILE__).'/../../include/CWebTest.php';
-require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
-require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
+require_once __DIR__.'/../../include/CWebTest.php';
+require_once __DIR__.'/../behaviors/CMessageBehavior.php';
+require_once __DIR__.'/../behaviors/CTableBehavior.php';
 
 /**
- *  @dataSource TopHostsWidget, ItemValueWidget, DynamicItemWidgets
+ * @dataSource TopHostsWidget, ItemValueWidget, DynamicItemWidgets, CopyWidgetsDashboards, HostAvailabilityWidget
  *
  * @backup dashboard, dashboard_user, dashboard_usrgrp
+ *
+ * @onBefore prepareData
  */
 class testDashboardsListPage extends CWebTest {
 
@@ -34,6 +36,41 @@ class testDashboardsListPage extends CWebTest {
 			CMessageBehavior::class,
 			CTableBehavior::class
 		];
+	}
+
+	public static function prepareData() {
+		CDataHelper::call('dashboard.create', [
+			[
+				'name' => 'Testing share dashboard',
+				'userid' => '9',
+				'private' => 0,
+				'pages' => [[]]
+			],
+			[
+				'name' => 'Dashboard for Admin share testing',
+				'userid' => '1',
+				'private' => 1,
+				'pages' => [[]],
+				'users' => [
+					[
+						'userid' => '9',
+						'permission' => 2
+					]
+				]
+			],
+			[
+				'name' => 'The Graph dashboard without widgets',
+				'userid' => '1',
+				'private' => 1,
+				'pages' => [[]]
+			],
+			[
+				'name' => 'The Graph prototype dashboard without widgets',
+				'userid' => '1',
+				'private' => 1,
+				'pages' => [[]]
+			]
+		]);
 	}
 
 	public function testDashboardsListPage_CheckLayout() {
@@ -75,7 +112,7 @@ class testDashboardsListPage extends CWebTest {
 					'fields' => [
 						'Show' => 'All'
 					],
-					'result_count' => 26
+					'result_count' => 23
 				]
 			],
 			[
@@ -83,7 +120,7 @@ class testDashboardsListPage extends CWebTest {
 					'fields' => [
 						'Show' => 'Created by me'
 					],
-					'result_count' => 25
+					'result_count' => 22
 				]
 			],
 			[
@@ -92,7 +129,7 @@ class testDashboardsListPage extends CWebTest {
 						'Name' => 'graph',
 						'Show' => 'All'
 					],
-					'result_count' => 3
+					'result_count' => 2
 				]
 			],
 			[
@@ -101,7 +138,7 @@ class testDashboardsListPage extends CWebTest {
 						'Name' => 'widget',
 						'Show' => 'Created by me'
 					],
-					'result_count' => 10
+					'result_count' => 7
 				]
 			],
 			[
@@ -127,6 +164,14 @@ class testDashboardsListPage extends CWebTest {
 						'Show' => 'Created by me'
 					],
 					'result_count' => 0
+				]
+			],
+			[
+				[
+					'fields' => [
+						'Name' => '   '
+					],
+					'result_count' => 1
 				]
 			]
 		];

@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -14,7 +14,7 @@
 **/
 
 
-require_once dirname(__FILE__).'/../../include/CWebTest.php';
+require_once __DIR__.'/../../include/CWebTest.php';
 
 /**
  * @backup media_type
@@ -58,6 +58,45 @@ class testPageAdministrationMediaTypes extends CWebTest {
 						'operationtype' => OPERATION_TYPE_MESSAGE,
 						'opmessage' => ['mediatypeid' => self::EMAIL_MEDIATYPEID],
 						'opmessage_grp' => [['usrgrpid' => self::ZABBIX_ADMIN_GROUPID]]
+					]
+				]
+			]
+		]);
+
+		CDataHelper::call('mediatype.create', [
+			[
+				'type' => MEDIA_TYPE_EXEC,
+				'name' => 'Test script',
+				'exec_path' => 'selenium_test_script.sh',
+				'parameters' => [
+					[
+						'sortorder' => '0',
+						'value' => '{ALERT.SUBJECT}'
+					]
+				]
+			],
+			[
+				'type' => MEDIA_TYPE_WEBHOOK,
+				'name' => 'Multiple spaces in   webhook   123',
+				'script' => 'test.sh',
+				'parameters' => [
+					[
+						'name' => 'HTTPProxy'
+					],
+					[
+						'name' => 'Message',
+						'value' => '{ALERT.MESSAGE}'
+					],
+					[
+						'name' => 'Subject',
+						'value' => '{ALERT.SUBJECT}'
+					],
+					[
+						'name' => 'To',
+						'value' => '{ALERT.SENDTO}'
+					],
+					[
+						'name' => 'URL'
 					]
 				]
 			]
@@ -143,12 +182,12 @@ class testPageAdministrationMediaTypes extends CWebTest {
 
 			// Sort column contents ascending.
 			usort($values_asc, function($a, $b) {
-				return strcasecmp($a, $b);
+				return strnatcasecmp($a, $b);
 			});
 
 			// Sort column contents descending.
 			usort($values_desc, function($a, $b) {
-				return strcasecmp($b, $a);
+				return strnatcasecmp($b, $a);
 			});
 
 			// Check ascending and descending sorting in column.
@@ -176,7 +215,7 @@ class testPageAdministrationMediaTypes extends CWebTest {
 					'filter' => [
 						'Name' => 'Jira '
 					],
-					'result' => ['Jira ServiceDesk']
+					'result' => ['Jira Service Management']
 				]
 			],
 			[
@@ -189,9 +228,25 @@ class testPageAdministrationMediaTypes extends CWebTest {
 			[
 				[
 					'filter' => [
+						'Name' => '   webhook   '
+					],
+					'result' => ['Multiple spaces in webhook 123']
+				]
+			],
+			[
+				[
+					'filter' => [
+						'Name' => '   '
+					],
+					'result' => ['Multiple spaces in webhook 123']
+				]
+			],
+			[
+				[
+					'filter' => [
 						'Name' => 'a S'
 					],
-					'result' => ['Jira ServiceDesk']
+					'result' => ['Jira Service Management']
 				]
 			],
 			// Filter by status.
@@ -270,6 +325,7 @@ class testPageAdministrationMediaTypes extends CWebTest {
 	public function testPageAdministrationMediaTypes_Filter($data) {
 		$this->page->login()->open('zabbix.php?action=mediatype.list');
 		$this->query('button:Reset')->waitUntilClickable()->one()->click();
+		$table = $this->query('class:list-table')->asTable()->one();
 
 		$form = $this->query('name:zbx_filter')->asForm()->one();
 		$form->fill($data['filter']);
@@ -283,7 +339,9 @@ class testPageAdministrationMediaTypes extends CWebTest {
 
 			foreach (CDBHelper::getAll('SELECT name FROM media_type WHERE status='.$db_status.
 					' ORDER BY LOWER(name) ASC') as $name) {
-				$data['result'][] = $name['name'];
+				$data['result'][] = ($name['name'] === 'Multiple spaces in   webhook   123')
+						? str_replace('  ', '', $name['name'])
+						: $name['name'];
 			}
 		}
 
@@ -296,6 +354,7 @@ class testPageAdministrationMediaTypes extends CWebTest {
 			$this->assertEquals(CDBHelper::getColumn($sql, 'name'), explode(', ', $actions));
 		}
 		else {
+			$table->waitUntilReloaded();
 			$this->assertTableDataColumn(CTestArrayHelper::get($data, 'result', []));
 		}
 	}
@@ -324,7 +383,7 @@ class testPageAdministrationMediaTypes extends CWebTest {
 
 			$this->page->waitUntilReady();
 
-			// Check result on fronted.
+			// Check result on frontend.
 			$this->assertMessage(TEST_GOOD, 'Media type '.lcfirst($new_status));
 			CMessageElement::find()->one()->close();
 
@@ -765,10 +824,10 @@ class testPageAdministrationMediaTypes extends CWebTest {
 			// #1 Used in action operation directly.
 			[
 				[
-					'name' => 'Github',
+					'name' => 'GitHub',
 					'actions' => [
 						[
-							'name' => 'Github action operation',
+							'name' => 'GitHub action operation',
 							'operation' => 'operations'
 						]
 					]
@@ -817,14 +876,14 @@ class testPageAdministrationMediaTypes extends CWebTest {
 			// #5 Used in two actions update operations directly.
 			[
 				[
-					'name' => 'OTRS',
+					'name' => 'OTRS CE',
 					'actions' => [
 						[
-							'name' => 'OTRS acton update operation 1',
+							'name' => 'OTRS CE acton update operation 1',
 							'operation' => 'update_operations'
 						],
 						[
-							'name' => 'OTRS acton update operation 2',
+							'name' => 'OTRS CE acton update operation 2',
 							'operation' => 'update_operations'
 						]
 					]

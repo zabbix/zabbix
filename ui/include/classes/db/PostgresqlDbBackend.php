@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -240,14 +240,25 @@ class PostgresqlDbBackend extends DbBackend {
 			return false;
 		}
 
-		$query = implode(' UNION ', array_map(function ($table) {
-			return 'SELECT number_compressed_chunks chunks'.
-				' FROM hypertable_compression_stats('.zbx_dbstr($table).')'.
+		$res = DBfetch(DBselect(
+			'SELECT extversion'.
+			' FROM pg_extension'.
+			' WHERE extname='.zbx_dbstr(ZBX_DB_EXTENSION_TIMESCALEDB)
+		));
+
+		$stats_function = version_compare($res['extversion'], '2.18.0', '<')
+			? 'hypertable_compression_stats'
+			: 'hypertable_columnstore_stats';
+		$chunk_queries = [];
+
+		foreach ($tables as $table) {
+			$chunk_queries[] = 'SELECT number_compressed_chunks'.
+				' FROM '.$stats_function.'('.zbx_dbstr($table).')'.
 				' WHERE number_compressed_chunks != 0';
-		}, $tables));
+		}
 
-		$result = DBfetch(DBselect($query));
+		$result = DBfetch(DBselect(implode(' UNION ', $chunk_queries)));
 
-		return $result && $result['chunks'];
+		return (bool) $result;
 	}
 }

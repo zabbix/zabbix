@@ -7,11 +7,10 @@ This template collects Linux metrics from Node Exporter 0.18 and above. Support 
 
 ### Known Issues
 
-  - Node Exporter 0.16.0 renamed many metrics. CPU utilization for "guest" and "guest_nice" metrics are not supported in this template with Node Exporter < 0.16. Disk IO metrics are not supported. Other metrics provided as best effort. See https://github.com/prometheus/node_exporter/releases/tag/v0.16.0 for details
-See https://github.com/prometheus/node_exporter/releases/tag/v0.16.0 for details.
-    - version: below 0.16.0
-  - metric node_network_info with label 'device' cannot be found, so network discovery is not possible.
-    - version: below 0.18
+  - Node Exporter 0.16.0 renamed many metrics. CPU utilization for "guest" and "guest_nice" metrics are not supported in this template with Node Exporter < 0.16. Disk IO metrics are not supported. Other metrics provided as best effort. See https://github.com/prometheus/node_exporter/releases/tag/v0.16.0 for details.
+    - Version: below 0.16.0
+  - Metric node_network_info with label 'device' cannot be found, so network discovery is not possible.
+    - Version: below 0.18
 
 #### Notes on filesystem (FS) discovery:
   - The ext4/3/2 FS reserves space for privileged usage, typically set at 5% by default.
@@ -177,7 +176,7 @@ This template has been tested on:
 |----|-----------|----|-----------------------|
 |FS [{#FSNAME}]: Space: Available|<p>Available storage space expressed in bytes.</p>|Dependent item|vfs.fs.free[node_exporter,"{#FSNAME}"]<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `The text is too long. Please see the template.`</p></li></ul>|
 |FS [{#FSNAME}]: Space: Total|<p>Total space expressed in bytes.</p>|Dependent item|vfs.fs.total[node_exporter,"{#FSNAME}"]<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `The text is too long. Please see the template.`</p></li></ul>|
-|FS [{#FSNAME}]: Space: Used|<p>Used storage expressed in bytes.</p><p>Reserverd space is not counted in.</p>|Dependent item|vfs.fs.used[node_exporter,"{#FSNAME}"]<p>**Preprocessing**</p><ul><li><p>Prometheus to JSON: `The text is too long. Please see the template.`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
+|FS [{#FSNAME}]: Space: Used|<p>Used storage expressed in bytes.</p><p>Reserved space is not counted in.</p>|Dependent item|vfs.fs.used[node_exporter,"{#FSNAME}"]<p>**Preprocessing**</p><ul><li><p>Prometheus to JSON: `The text is too long. Please see the template.`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
 |FS [{#FSNAME}]: Space: Used, in %|<p>Calculated as the percentage of currently used space compared to the maximum available space.</p>|Dependent item|vfs.fs.pused[node_exporter,"{#FSNAME}"]<p>**Preprocessing**</p><ul><li><p>Prometheus to JSON: `The text is too long. Please see the template.`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
 |FS [{#FSNAME}]: Inodes: Free, in %|<p>Free metadata space expressed as a percentage.</p>|Dependent item|vfs.fs.inode.pfree[node_exporter,"{#FSNAME}"]<p>**Preprocessing**</p><ul><li><p>Prometheus to JSON: `{__name__=~"node_filesystem_files.*",mountpoint="{#FSNAME}"}`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
 |FS [{#FSNAME}]: Filesystem is read-only|<p>The filesystem is mounted as read-only. It is available only for Zabbix agents 6.4 and higher.</p>|Dependent item|vfs.fs.[node_exporter,"{#FSNAME}"]<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `The text is too long. Please see the template.`</p></li></ul>|

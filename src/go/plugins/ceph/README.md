@@ -5,10 +5,6 @@ Best for use in conjunction with the official
 [Ceph template.](https://git.zabbix.com/projects/ZBX/repos/zabbix/browse/templates/app/ceph_agent2)
 You can extend it or create your template for your specific needs.
 
-## Requirements
-* Zabbix Agent 2
-* Go >= 1.21 (required only to build from source)
-
 ## Supported versions
 * Ceph, version 14+
 

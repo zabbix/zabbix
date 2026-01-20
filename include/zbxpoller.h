@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -80,5 +80,8 @@ void	zbx_init_library_mt_snmp(const char *progname);
 void	zbx_shutdown_library_mt_snmp(const char *progname);
 
 void	zbx_clear_cache_snmp(unsigned char process_type, int process_num);
+
+#define ZBX_SNMP_POLLER_CLEAR_CACHE	1
+#define ZBX_SNMP_POLLER_HOUSEKEEP_CACHE	2
 
 #endif /* ZABBIX_ZBX_POLLER_H*/

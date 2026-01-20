@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -151,7 +151,7 @@ class CScreenHttpTest extends CScreenBase {
 				$httptest['steps'],
 				$lastcheck,
 				(new CCol($status))->addClass(ZBX_STYLE_WORDBREAK),
-				array_key_exists($key, $tags) ? $tags[$key] : ''
+				array_key_exists($key, $tags) ? (new CDiv($tags[$key]))->addClass(ZBX_STYLE_TAGS_WRAPPER) : ''
 			]));
 		}
 

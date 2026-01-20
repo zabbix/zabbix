@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -14,7 +14,7 @@
 
 package proc
 
-func addNonNegative(dst *int64, val int64) () {
+func addNonNegative(dst *int64, val int64) {
 	if *dst == -1 {
 		return
 	}
@@ -28,7 +28,7 @@ func addNonNegative(dst *int64, val int64) () {
 	return
 }
 
-func addNonNegativeFloat(dst *float64, val float64) () {
+func addNonNegativeFloat(dst *float64, val float64) {
 	if *dst == -1.0 {
 		return
 	}
@@ -41,4 +41,3 @@ func addNonNegativeFloat(dst *float64, val float64) () {
 	*dst += val
 	return
 }
-

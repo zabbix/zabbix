@@ -75,7 +75,7 @@ Test availability: `zabbix_get -s memcached-host -k memcached.ping`
 |Memcached: Too many throttled connections|<p>Number of times a client connection was throttled is too high.<br>When sending GETs in batch mode and the connection contains too many requests (limited by -R parameter) the connection might be throttled to prevent starvation.</p>|`min(/Memcached by Zabbix agent 2/memcached.connections.throttled.rate,5m)>{$MEMCACHED.CONN.THROTTLED.MAX.WARN}`|Warning||
 |Memcached: Total number of connected clients is too high|<p>When the number of connections reaches the value of the "max_connections" parameter, new connections will be rejected.</p>|`min(/Memcached by Zabbix agent 2/memcached.connections.current,5m)/last(/Memcached by Zabbix agent 2/memcached.connections.max)*100>{$MEMCACHED.CONN.PRC.MAX.WARN}`|Warning||
 |Memcached: Version has changed|<p>The Memcached version has changed. Acknowledge to close the problem manually.</p>|`last(/Memcached by Zabbix agent 2/memcached.version,#1)<>last(/Memcached by Zabbix agent 2/memcached.version,#2) and length(last(/Memcached by Zabbix agent 2/memcached.version))>0`|Info|**Manual close**: Yes|
-|Memcached: has been restarted|<p>Uptime is less than 10 minutes.</p>|`last(/Memcached by Zabbix agent 2/memcached.uptime)<10m`|Info|**Manual close**: Yes|
+|Memcached: Service has been restarted|<p>Uptime is less than 10 minutes.</p>|`last(/Memcached by Zabbix agent 2/memcached.uptime)<10m`|Info|**Manual close**: Yes|
 |Memcached: Memory usage is too high||`min(/Memcached by Zabbix agent 2/memcached.stats.bytes,5m)/last(/Memcached by Zabbix agent 2/memcached.config.limit_maxbytes)*100>{$MEMCACHED.MEM.PUSED.MAX.WARN}`|Warning||
 
 ## Feedback

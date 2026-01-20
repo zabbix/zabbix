@@ -844,6 +844,20 @@ form {
 	.wordbreak {
 		white-space: normal;
 	}
+
+	.tags-wrapper {
+		@media screen and (min-width: 1200px) {
+			max-width: 266px;
+		}
+
+		@media screen and (min-width: 1400px) {
+			max-width: 359px;
+		}
+
+		@media screen and (min-width: 1600px) {
+			max-width: 452px;
+		}
+	}
 }
 
 .border-left {
@@ -1046,12 +1060,6 @@ select {
 		color: $font-color !important;
 		pointer-events: none;
 		@extend %form-disabled;
-	}
-}
-
-div {
-	.overlay-dialogue.wordbreak {
-		white-space: normal;
 	}
 }
 
@@ -1663,8 +1671,6 @@ div {
 	height: 190px;
 	width: 190px;
 	margin: 20px auto;
-	color: #{$font-color};
-	background-color: #{$ui-bg-color};
 }
 
 .qr-code img {
@@ -1682,15 +1688,20 @@ div {
 }
 
 .menu-popup {
-	position: absolute;
+	position: fixed;
 	z-index: 1001;
 	padding: 5px 15px 5px 25px;
+	box-sizing: border-box;
 	min-width: 166px;
 	max-width: 250px;
+	max-height: calc(100vh - 20px);
+	overflow-y: auto;
 	background-color: $ui-bg-color;
 	border: 1px solid $overlay-border-color;
 	border-bottom-color: darken($overlay-border-color, 1%);
 	box-shadow: 0 4px 20px 0 $action-shadow-color;
+
+	@extend %webkit-scrollbar;
 
 	&:focus {
 		outline: none;
@@ -1714,7 +1725,7 @@ div {
 		text-decoration: none;
 		border: 0;
 		outline: 0;
-		padding: 0 15px 0 25px;
+		padding: 0 25px 0 25px;
 		margin: 0 -15px 0 -25px;
 		position: relative;
 		@extend %overflow-ellipsis;
@@ -1784,10 +1795,6 @@ div {
 	border: 1px solid $overlay-border-color;
 	border-bottom-color: darken($overlay-border-color, 1%);
 	box-shadow: 0 4px 20px 0 $action-shadow-color;
-
-	.wordbreak {
-		white-space: normal;
-	}
 
 	.overlay-dialogue-header {
 		margin: -8px -10px 6px -10px;
@@ -2544,17 +2551,34 @@ div {
 	background-attachment: local, local, scroll, scroll;
 }
 
+.tags-wrapper {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 2px 3px;
+
+	.tag {
+		margin-top: 1px;
+		margin-bottom: 1px;
+	}
+
+	&.form-field {
+		.tag {
+			margin-top: 4px;
+			margin-bottom: 4px;
+		}
+	}
+}
+
 .tag {
 	display: inline-block;
 	color: $font-selected-color;
 	background-color: $ui-bg-selected-color;
-	margin: 1px 3px 1px 0;
 	padding: 2px 3px;
 	line-height: 1em;
-	max-width: 133px;
 	vertical-align: middle;
 	@extend %overflow-ellipsis;
 	border-radius: 2px;
+	box-sizing: border-box;
 
 	a.link-action {
 		color: inherit !important;
@@ -2589,23 +2613,6 @@ div {
 
 .yellow-bg {
 	background-color: $alt-yellow;
-}
-
-// Severity statuses.
-@if $theme-name == 'blue' or $theme-name == 'dark' {
-	td[class] {
-		+ {
-			td.na-bg,
-			td.normal-bg,
-			td.info-bg,
-			td.average-bg,
-			td.warning-bg,
-			td.high-bg,
-			td.disaster-bg {
-				border-left: 1px dotted $table-border-color;
-			}
-		}
-	}
 }
 
 @each $severity-type, $color in (
@@ -3301,6 +3308,11 @@ svg {
 			max-width: $name-width + $drag-icon;
 			padding-left: 30px;
 		}
+
+		.step-on-fail {
+			@extend %overflow-ellipsis;
+			display: inline-block;
+		}
 	}
 
 	.preprocessing-list-foot {
@@ -3844,7 +3856,7 @@ z-select {
 }
 
 .modal-popup-preprocessing {
-	.preprocessing-list-head{
+	.preprocessing-list-head {
 		.step-name {
 			flex: 0 0 190px;
 		}

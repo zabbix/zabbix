@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -13,7 +13,7 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-require_once dirname(__FILE__).'/../../include/CLegacyWebTest.php';
+require_once __DIR__.'/../../include/CLegacyWebTest.php';
 
 /**
  * @backup hosts
@@ -155,7 +155,7 @@ class testFormHostLinkTemplates extends CLegacyWebTest {
 			// #0 Attach template to template
 			[
 				[
-					'link' => 'zabbix.php?action=template.list',
+					'link' => 'zabbix.php?action=template.list&filter_name=Form+test+template&filter_set=1',
 					'entity' => 'Template'
 				]
 			],
@@ -217,6 +217,7 @@ class testFormHostLinkTemplates extends CLegacyWebTest {
 			$this->assertEquals(self::LINKED_TEMPLATE, $form->query('class:subfilter-enabled')->one()->getText());
 			$form->submit();
 			$this->assertMessage(TEST_GOOD, $entity.' updated');
+			CMessageElement::find()->one()->close();
 
 			$this->openConfigurationForm($data);
 			$form->invalidate();

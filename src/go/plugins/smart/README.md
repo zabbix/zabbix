@@ -4,12 +4,8 @@
 
 The Zabbix SMART plugin for `zabbix_agent2` provides monitoring of storage devices' health and performance. It utilizes the `smartctl` utility to collect and report SMART metrics, helping to identify potential hardware issues before they result in failures.
 
-## Requirements
-
-The following requirements must be met:
-
+## Supported versions
 - **Smartmontools**: Version 7.1 or later is required to provide the `smartctl` utility for SMART data retrieval.
-- **Golang**: Version 1.21 or higher is required only when building the plugin from source.
 
 ## Configuration
 
@@ -29,7 +25,7 @@ Plugins.Smart.Path=/usr/sbin/smartctl
 ```
 - **Example for Windows:**
 ```
-Plugins.Smart.Path="C:\Program Files\smartctl\smartctl.exe"
+Plugins.Smart.Path=C:\Program Files\smartctl\smartctl.exe
 ```
 - **Usage:** Use this parameter to specify the location of the `smartctl` binary.
 - **Note:**  
@@ -51,9 +47,11 @@ The plugin provides specific items for monitoring disk health.
 
 ### `smart.disk.discovery`
 - **Description:** Performs low-level discovery of all SMART-capable disks on the system.
-- **Key:** `smart.disk.discovery`
+- **Key:** `smart.disk.discovery["<type>"]`
+  - `<type>`: By what to scan for the drives (default: `name`).
+    -  accepted values: `name`, `id`
 - **Output:** Returns a JSON array containing details for each discovered disk, including:
-  - `{#NAME}`: Disk name.
+  - `{#NAME}`: Disk name or smart ID.
   - `{#DISKTYPE}`: Disk type (e.g., `nvme`, `ata`).
   - `{#MODEL}`: Disk model.
   - `{#SN}`: Serial number.
@@ -72,7 +70,7 @@ The plugin provides specific items for monitoring disk health.
   - `{#THRESH}`: Threshold value for the attribute, representing the critical limit.
 
 ### `smart.disk.get`
-- **Description:** Retrieves detailed SMART attributes for a specified disk or all disks if no parameters are provided.
+- **Description:** Retrieves detailed SMART attributes, including both raw and normalized values, for a specified disk or all disks if no parameters are provided.
 - **Key:** `smart.disk.get["<device_path>","<raid_type>"]`
   - `<device_path>`: Path to the disk device (e.g., `/dev/sda`).
   - `<raid_type>`: RAID type, if applicable (e.g., `megaraid,0`); use an empty string if not applicable.

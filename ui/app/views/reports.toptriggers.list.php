@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -131,17 +131,15 @@ foreach ($data['triggers'] as $triggerid => $trigger) {
 	array_pop($hosts);
 
 	$table->addRow([
-		(new CCol($hosts))->addClass(ZBX_STYLE_WORDBREAK),
-		(new CCol(
-			(new CLinkAction($trigger['description']))->setMenuPopup(
-				CMenuPopupHelper::getTrigger([
-					'triggerid' => $trigger['triggerid'],
-					'backurl' => (new CUrl('zabbix.php'))
-						->setArgument('action', 'toptriggers.list')
-						->getUrl()
-				])
-			)
-		))->addClass(ZBX_STYLE_WORDBREAK),
+		$hosts,
+		(new CLinkAction($trigger['description']))->setMenuPopup(
+			CMenuPopupHelper::getTrigger([
+				'triggerid' => $trigger['triggerid'],
+				'backurl' => (new CUrl('zabbix.php'))
+					->setArgument('action', 'toptriggers.list')
+					->getUrl()
+			])
+		),
 		CSeverityHelper::makeSeverityCell((int) $trigger['priority']),
 		$trigger['problem_count']
 	]);

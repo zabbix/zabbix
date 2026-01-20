@@ -31,29 +31,29 @@ Refer to the vendor documentation.
 
 |Name|Description|Default|
 |----|-----------|-------|
-|{$CPU.UTIL.CRIT}||`90`|
-|{$ICMP_LOSS_WARN}||`20`|
-|{$ICMP_RESPONSE_TIME_WARN}||`0.15`|
-|{$IF.ERRORS.WARN}||`2`|
-|{$IF.UTIL.MAX}||`90`|
-|{$IFCONTROL}||`1`|
-|{$MEMORY.UTIL.MAX}||`90`|
-|{$NET.IF.IFADMINSTATUS.MATCHES}||`^.*`|
+|{$CPU.UTIL.CRIT}|<p>Critical threshold of CPU utilization in %.</p>|`90`|
+|{$ICMP_LOSS_WARN}|<p>Warning threshold of ICMP packet loss in %.</p>|`20`|
+|{$ICMP_RESPONSE_TIME_WARN}|<p>Threshold of the average ICMP response time in seconds.</p>|`0.15`|
+|{$IF.ERRORS.WARN}|<p>Threshold for the warning level of the interface error packet rate.</p>|`2`|
+|{$IF.UTIL.MAX}|<p>Maximum threshold of interface bandwidth utilization in %. Can be used with the interface name as context.</p>|`90`|
+|{$IFCONTROL}|<p>Macro for the operational state of the interface for the link down trigger. Can be used with interface name as context.</p>|`1`|
+|{$MEMORY.UTIL.MAX}|<p>Threshold for maximum memory utilization in %.</p>|`90`|
+|{$NET.IF.IFADMINSTATUS.MATCHES}|<p>This macro is used to include network interfaces by their administrative status.</p>|`^.*`|
 |{$NET.IF.IFADMINSTATUS.NOT_MATCHES}|<p>Ignore down(2) administrative status</p>|`^2$`|
-|{$NET.IF.IFALIAS.MATCHES}||`.*`|
-|{$NET.IF.IFALIAS.NOT_MATCHES}||`CHANGE_IF_NEEDED`|
-|{$NET.IF.IFDESCR.MATCHES}||`.*`|
-|{$NET.IF.IFDESCR.NOT_MATCHES}||`CHANGE_IF_NEEDED`|
-|{$NET.IF.IFNAME.MATCHES}||`^.*$`|
+|{$NET.IF.IFALIAS.MATCHES}|<p>This macro is used to include network interfaces by their alias.</p>|`.*`|
+|{$NET.IF.IFALIAS.NOT_MATCHES}|<p>This macro is used to exclude network interfaces by their alias.</p>|`CHANGE_IF_NEEDED`|
+|{$NET.IF.IFDESCR.MATCHES}|<p>This macro is used to include network interfaces by their description.</p>|`.*`|
+|{$NET.IF.IFDESCR.NOT_MATCHES}|<p>This macro is used to exclude network interfaces by their description.</p>|`CHANGE_IF_NEEDED`|
+|{$NET.IF.IFNAME.MATCHES}|<p>This macro is used to include network interfaces by their name.</p>|`^.*$`|
 |{$NET.IF.IFNAME.NOT_MATCHES}|<p>Filter out loopbacks, nulls, docker veth links and docker0 bridge by default</p>|`Macro too long. Please see the template.`|
-|{$NET.IF.IFOPERSTATUS.MATCHES}||`^.*$`|
+|{$NET.IF.IFOPERSTATUS.MATCHES}|<p>This macro is used to include network interfaces by their operational status.</p>|`^.*$`|
 |{$NET.IF.IFOPERSTATUS.NOT_MATCHES}|<p>Ignore notPresent(6)</p>|`^6$`|
-|{$NET.IF.IFTYPE.MATCHES}||`.*`|
-|{$NET.IF.IFTYPE.NOT_MATCHES}||`CHANGE_IF_NEEDED`|
-|{$SNMP.TIMEOUT}||`5m`|
-|{$TEMP_CRIT}||`60`|
-|{$TEMP_CRIT_LOW}||`5`|
-|{$TEMP_WARN}||`50`|
+|{$NET.IF.IFTYPE.MATCHES}|<p>This macro is used to include network interfaces by their type.</p>|`.*`|
+|{$NET.IF.IFTYPE.NOT_MATCHES}|<p>This macro is used to exclude network interfaces by their type.</p>|`CHANGE_IF_NEEDED`|
+|{$SNMP.TIMEOUT}|<p>The time interval for the SNMP availability trigger.</p>|`5m`|
+|{$TEMP_CRIT}|<p>Critical threshold of the temperature in °C.</p>|`60`|
+|{$TEMP_CRIT_LOW}|<p>Critical threshold of the low temperature in °C.</p>|`5`|
+|{$TEMP_WARN}|<p>Warning threshold of the temperature in °C.</p>|`50`|
 
 ### Items
 

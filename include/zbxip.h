@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -26,6 +26,8 @@ int	zbx_ip_in_list(const char *list, const char *ip);
 
 int	zbx_parse_serveractive_element(const char *str, char **host, unsigned short *port,
 		unsigned short port_default);
+
+char	*zbx_join_hostport(char *hostport, size_t hostport_sz, const char *host, unsigned short port);
 
 #define ZBX_IPRANGE_V4	0
 #define ZBX_IPRANGE_V6	1

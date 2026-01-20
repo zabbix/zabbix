@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -192,8 +192,7 @@ class CMediatype extends CApiService {
 			$add_content_type = $options['output'] === API_OUTPUT_EXTEND
 				|| (is_array($options['output']) && in_array('content_type', $options['output']));
 
-			$remove_message_format = $options['output'] !== API_OUTPUT_EXTEND || !is_array($options['output'])
-				|| !in_array('message_format', $options['output']);
+			$remove_message_format = is_array($options['output']) && !in_array('message_format', $options['output']);
 		}
 
 		while ($mediatype = DBfetch($res)) {
@@ -208,6 +207,7 @@ class CMediatype extends CApiService {
 			else {
 				if ($add_content_type) {
 					$mediatype['content_type'] = $mediatype['message_format'];
+
 					if ($remove_message_format) {
 						unset($mediatype['message_format']);
 					}

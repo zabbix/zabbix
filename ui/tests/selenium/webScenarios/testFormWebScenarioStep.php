@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -14,8 +14,8 @@
 **/
 
 
-require_once dirname(__FILE__).'/../../include/CWebTest.php';
-require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
+require_once __DIR__.'/../../include/CWebTest.php';
+require_once __DIR__.'/../behaviors/CMessageBehavior.php';
 
 /**
  * @dataSource WebScenarios
@@ -34,7 +34,8 @@ class testFormWebScenarioStep extends CWebTest {
 	const TEMPLATE_SCENARIO = 'Template_Web_scenario';
 	const UPDATE_SCENARIO = 'Scenario for Clone';
 	const CREATE_SCENARIO = 'Scenario for Update';
-	const SQL = 'SELECT * FROM httpstep hs INNER JOIN httpstep_field hsf ON hsf.httpstepid = hs.httpstepid';
+	const SQL = 'SELECT * FROM httpstep hs INNER JOIN httpstep_field hsf ON hsf.httpstepid = hs.httpstepid'.
+			' ORDER BY hsf.httpstepid, hsf.name';
 
 	/**
 	 * Attach MessageBehavior to the test.
@@ -206,7 +207,7 @@ class testFormWebScenarioStep extends CWebTest {
 			foreach ($post_fields as $post_field) {
 				/*
 				 * Post fields table has the disabled class even when enabled to disable the drag icon if table has only
-				 * one row. Therefore, the state of all four interactable elements is checked induvidually.
+				 * one row. Therefore, the state of all four interactable elements is checked individually.
 				 */
 				if ($post_field === 'Post fields') {
 					$post_fields_table = $step_form->getField($post_field);

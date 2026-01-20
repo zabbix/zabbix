@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -139,3 +139,5 @@ const GROUP_GUI_ACCESS_LDAP = 2;
 const GROUP_GUI_ACCESS_DISABLED = 3;
 
 const NAME_DELIMITER = ': ';
+
+const WRAPPER_PADDING_RIGHT = 10;

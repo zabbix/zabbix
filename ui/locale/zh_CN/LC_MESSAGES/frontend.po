@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2025-01-11 16:35+0000\n"
+"PO-Revision-Date: 2025-11-17 10:25+0000\n"
 "Last-Translator: NoYoWiFi <1284524409@qq.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: zh_CN\n"
@@ -214,7 +214,7 @@ msgstr "选择了 %1$s 项，您可以使用向上和向下箭头键以及回车
 #, c-format
 msgid "%1$s problem"
 msgid_plural "%1$s problems"
-msgstr[0] "问题发生在 %1$s"
+msgstr[0] "%1$s个问题"
 
 #: include/classes/helpers/CMapHelper.php:319
 #, c-format
@@ -1137,11 +1137,11 @@ msgstr "后值"
 
 #: include/events.inc.php:339
 msgid "Age"
-msgstr "持续时间"
+msgstr "总时长"
 
 #: app/partials/monitoring.problem.filter.php:120
 msgid "Age less than"
-msgstr "持续时间小于"
+msgstr "总时长小于"
 
 #: app/views/administration.script.list.php:196 include/hosts.inc.php:1195
 #: include/items.inc.php:350 include/views/configuration.httpconf.edit.php:109
@@ -2655,7 +2655,7 @@ msgstr "无法删除默认用户目录"
 #: include/classes/api/services/CDRule.php:773
 #, c-format
 msgid "Cannot delete discovery check \"%1$s\" of discovery rule \"%2$s\": %3$s."
-msgstr ""
+msgstr "无法删除发现规则“%2$s”的发现检查“%1$s”：%3$s。"
 
 #: app/controllers/CControllerDiscoveryDelete.php:68 host_discovery.php:390
 #: host_discovery.php:597
@@ -2666,7 +2666,7 @@ msgstr[0] "无法删除自动发现规则"
 #: include/classes/api/services/CDRule.php:980
 #, c-format
 msgid "Cannot delete discovery rule \"%1$s\": %2$s."
-msgstr ""
+msgstr "无法删除发现规则“%1$s”：%2$s。"
 
 #: app/controllers/CControllerCorrelationDelete.php:68
 msgid "Cannot delete event correlation"
@@ -2691,7 +2691,7 @@ msgstr[0] "无法删除主机"
 #: include/classes/api/services/CHost.php:1636
 #, c-format
 msgid "Cannot delete host \"%1$s\": %2$s."
-msgstr ""
+msgstr "无法删除主机“%1$s”：%2$s。"
 
 #: include/classes/api/services/CHost.php:1461
 #, c-format
@@ -2707,7 +2707,7 @@ msgstr[0] "无法删除主机组"
 #: include/classes/api/services/CHostGroup.php:769
 #, c-format
 msgid "Cannot delete host group \"%1$s\": %2$s."
-msgstr ""
+msgstr "无法删除主机组“%1$s”：%2$s。"
 
 #: include/classes/api/services/CHostGroup.php:858
 #, c-format
@@ -2839,7 +2839,7 @@ msgstr[0] "无法删除模板"
 #: include/classes/api/services/CTemplate.php:809
 #, c-format
 msgid "Cannot delete template \"%1$s\": %2$s."
-msgstr ""
+msgstr "无法删除模板“%1$s”：%2$s。"
 
 #: app/controllers/CControllerTemplateGroupDelete.php:75
 msgid "Cannot delete template group"
@@ -2877,7 +2877,7 @@ msgstr[0] "无法删除触发器"
 #: include/classes/api/managers/CTriggerManager.php:126
 #, c-format
 msgid "Cannot delete trigger \"%1$s\": %2$s."
-msgstr ""
+msgstr "无法删除触发器“%1$s”：%2$s。"
 
 #: app/controllers/CControllerTriggerPrototypeDelete.php:72
 msgid "Cannot delete trigger prototype"
@@ -3669,6 +3669,11 @@ msgstr "无法读取XML： %1$s 。"
 msgid "Cannot read YAML: %1$s."
 msgstr "无法读取YAML: %1$s。"
 
+#: include/classes/server/CZabbixServer.php:502
+#, c-format
+msgid "Cannot read response from Zabbix server \"%1$s\"."
+msgstr "无法从 Zabbix server \\%1$s\" 读取响应。\""
+
 #: include/classes/server/CZabbixServer.php:567
 #, c-format
 msgid "Cannot read the response, check connection with the Zabbix server \"%1$s\"."
@@ -3729,6 +3734,10 @@ msgstr "在模板 \"%2$s\" 中无法设置 \"%1$s\""
 #: widgets/piechart/includes/CWidgetFieldDataSet.php:175
 msgid "Cannot set \"Data set aggregation\" when item with type \"Total\" is added to the chart."
 msgstr "当类型为“总计”的监控项添加到图表时，无法设置“数据集聚合”。"
+
+#: include/classes/db/MysqlDbBackend.php:197
+msgid "Cannot set charset."
+msgstr "无法设置字符集。"
 
 #: include/classes/api/services/CItemGeneral.php:2478
 #, c-format
@@ -5834,6 +5843,11 @@ msgstr "数据库 TLS 加密"
 msgid "Database TLS key file"
 msgstr "数据库 TLS 密钥文件"
 
+#: include/classes/api/clients/CLocalApiClient.php:133
+#: include/classes/api/clients/CLocalApiClient.php:147
+msgid "Database error occurred."
+msgstr "数据库错误。"
+
 #: app/partials/administration.system.info.php:130
 msgid "Database history tables use primary key"
 msgstr "数据库历史数据表使用主键"
@@ -6532,19 +6546,19 @@ msgstr "已删除"
 
 #: include/actions.inc.php:143
 msgid "Deleted host"
-msgstr ""
+msgstr "已删除主机"
 
 #: include/actions.inc.php:125
 msgid "Deleted host group"
-msgstr ""
+msgstr "已删除主机组"
 
 #: include/actions.inc.php:710
 msgid "Deleted host group(s)"
-msgstr ""
+msgstr "已删除主机组"
 
 #: include/actions.inc.php:134
 msgid "Deleted trigger"
-msgstr ""
+msgstr "已删除触发器"
 
 #: app/views/administration.regex.edit.php:54
 msgid "Delimiter"
@@ -6671,6 +6685,10 @@ msgstr "Web 场景详情"
 #: app/views/administration.housekeeping.edit.php:206
 msgid "Detected TimescaleDB license does not support compression. Compression is supported in TimescaleDB Community Edition."
 msgstr "检测到的 TimescaleDB 许可证不支持压缩。 TimescaleDB 社区版支持压缩。"
+
+#: app/views/administration.housekeeping.edit.php:204
+msgid "Detected license does not support compression. Compression is supported in TimescaleDB Community Edition."
+msgstr "检测到的许可证不支持压缩。TimescaleDB 社区版支持压缩功能。"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1130
 msgid "Detection period"
@@ -7032,6 +7050,10 @@ msgstr "自动发现对象"
 msgid "Discovery of VMware clusters, \"url\" - VMware service URL. Returns JSON"
 msgstr "VMware 发现的集群，“url”- VMware 服务 URL。返回 JSON"
 
+#: include/classes/data/CItemData.php:1931
+msgid "Discovery of VMware datastores, \"url\" - VMware service URL, \"filter_uuid\" - one hv uuid or vm uuid (empty by default). Returns JSON"
+msgstr "发现 VMware 数据存储，\"url\" - VMware 服务 URL，\"filter_uuid\" - 一个主机（HV）UUID 或虚拟机（VM）UUID（默认为空）。返回 JSON"
+
 #: include/classes/data/CItemData.php:1799
 msgid "Discovery of VMware datastores, \"url\" - VMware service URL. Returns JSON"
 msgstr "VMware 发现的数据存储，“url”- VMware 服务 URL。返回 JSON"
@@ -7168,7 +7190,7 @@ msgstr "显示本地时间"
 
 #: widgets/itemhistory/views/column.edit.php:240
 msgid "Display log time"
-msgstr ""
+msgstr "显示日志时间"
 
 #: widgets/svggraph/includes/WidgetForm.php:364
 msgid "Display min/avg/max"
@@ -9329,7 +9351,7 @@ msgstr "历史数据函数"
 
 #: app/views/administration.housekeeping.edit.php:218
 msgid "History, trends and audit log compression"
-msgstr ""
+msgstr "历史、趋势和审计日志压缩"
 
 #: include/classes/html/CTabFilter.php:167
 msgid "Home"
@@ -13144,6 +13166,11 @@ msgstr "最大行数"
 msgid "Maximum required %1$s database version is %2$s."
 msgstr "所需的最大 %1$s 数据库版本为 %2$s。"
 
+#: app/partials/administration.system.info.php:221
+#, c-format
+msgid "Maximum required version is %1$s."
+msgstr "所需最高版本为 %1$s。"
+
 #: app/controllers/CControllerTimeSelectorUpdate.php:136
 #: include/classes/mvc/CController.php:320
 #: include/classes/widgets/fields/CWidgetFieldTimePeriod.php:203
@@ -13475,6 +13502,12 @@ msgstr "所要求的PHP脚本最小解析时间是%1$s (配置项\"max_input_tim
 msgid "Minimum required size of PHP post is %1$s (configuration option \"post_max_size\")."
 msgstr "所要求的最小PHP post大小是%1$s (配置项\"post_max_size\")。"
 
+#: app/partials/administration.system.info.php:212
+#: app/views/administration.housekeeping.edit.php:183
+#, c-format
+msgid "Minimum required version is %1$s."
+msgstr "所需最低版本为 %1$s。"
+
 #: app/views/monitoring.map.view.php:48
 #: include/views/monitoring.sysmap.edit.php:276
 msgid "Minimum severity"
@@ -13604,7 +13637,7 @@ msgstr "周一"
 
 #: app/views/configuration.host.list.php:145
 msgid "Monitored by"
-msgstr "要监控什么"
+msgstr "从哪监控"
 
 #: app/partials/configuration.host.edit.html.php:255
 #: app/views/popup.massupdate.host.php:124
@@ -13697,6 +13730,16 @@ msgstr "多重"
 #: include/triggers.inc.php:611
 msgid "Multiple PROBLEM events"
 msgstr "多重问题事件"
+
+#: app/partials/administration.system.info.php:235
+#, c-format
+msgid "Must be at least %1$s."
+msgstr "必须至少为 %1$s。"
+
+#: app/partials/administration.system.info.php:254
+#, c-format
+msgid "Must not be higher than %1$s."
+msgstr "不得高于 %1$s。"
 
 #: jsLoader.php:284
 msgid "Mute"
@@ -14437,6 +14480,66 @@ msgstr "没有系统访问权限。"
 #, c-format
 msgid "No permissions to call \"%1$s.%2$s\"."
 msgstr "没有调用“%1$s.%2$s”的权限。"
+
+#: include/classes/api/services/CConfiguration.php:312
+msgid "No permissions to import discovery rules."
+msgstr "无导入发现规则的权限。"
+
+#: include/classes/api/services/CConfiguration.php:313
+msgid "No permissions to import graphs."
+msgstr "无导入图形的权限。"
+
+#: include/classes/api/services/CConfiguration.php:314
+msgid "No permissions to import host groups."
+msgstr "无导入主机群组的权限。"
+
+#: include/classes/api/services/CConfiguration.php:316
+msgid "No permissions to import hosts."
+msgstr "无导入主机的权限。"
+
+#: include/classes/api/services/CConfiguration.php:318
+msgid "No permissions to import images."
+msgstr "无导入图像的权限。"
+
+#: include/classes/api/services/CConfiguration.php:319
+msgid "No permissions to import items."
+msgstr "无导入监控项的权限。"
+
+#: include/classes/api/services/CConfiguration.php:320
+msgid "No permissions to import maps."
+msgstr "无导入地图的权限。"
+
+#: include/classes/api/services/CConfiguration.php:321
+msgid "No permissions to import media types."
+msgstr "无导入媒介类型的权限。"
+
+#: include/classes/api/services/CConfiguration.php:324
+msgid "No permissions to import template dashboards."
+msgstr "无导入模板仪表盘的权限。"
+
+#: include/classes/api/services/CConfiguration.php:315
+msgid "No permissions to import template groups."
+msgstr "无导入模板群组的权限。"
+
+#: include/classes/api/services/CConfiguration.php:322
+msgid "No permissions to import template links."
+msgstr "无导入模板链接的权限。"
+
+#: include/classes/api/services/CConfiguration.php:323
+msgid "No permissions to import templates."
+msgstr "无导入模板的权限。"
+
+#: include/classes/api/services/CConfiguration.php:325
+msgid "No permissions to import triggers."
+msgstr "无导入触发器的权限。"
+
+#: include/classes/api/services/CConfiguration.php:326
+msgid "No permissions to import value maps."
+msgstr "无导入值映射的权限。"
+
+#: include/classes/api/services/CConfiguration.php:317
+msgid "No permissions to import web scenarios."
+msgstr "无导入 Web 场景的权限。"
 
 #: app/controllers/CControllerChartsView.php:133
 #: app/controllers/CControllerDashboardPrint.php:99
@@ -16392,7 +16495,7 @@ msgstr "问题显示"
 
 #: app/views/js/trigger.edit.js.php:268 include/triggers.inc.php:603
 msgid "Problem expression"
-msgstr "问题表现形式"
+msgstr "问题表达式"
 
 #: widgets/problemhosts/Widget.php:29
 #: widgets/svggraph/includes/WidgetForm.php:386
@@ -17462,6 +17565,11 @@ msgstr "响应代码"
 msgid "Response time"
 msgstr "响应时间"
 
+#: include/classes/server/CZabbixServer.php:498
+#, c-format
+msgid "Response timeout of %1$s exceeded when connecting to Zabbix server \"%2$s\"."
+msgstr "连接至 Zabbix server \\%2$s\" 时超出响应超时时间 %1$s。\""
+
 #: app/controllers/CControllerMediatypeTestSend.php:182
 msgid "Response type: JSON"
 msgstr "响应类型：JSON"
@@ -17664,7 +17772,7 @@ msgstr "在当前主机上运行脚本“%1$s”"
 #: include/actions.inc.php:601
 #, c-format
 msgid "Run script \"%1$s\" on deleted object(s)"
-msgstr ""
+msgstr "在已删除的对象上运行脚本“%1$s”"
 
 #: include/actions.inc.php:622
 #, c-format
@@ -18747,6 +18855,18 @@ msgstr "短针"
 msgid "Shortened"
 msgstr "精简"
 
+#: app/partials/administration.system.info.php:243
+#: app/views/administration.housekeeping.edit.php:187
+#, c-format
+msgid "Should be at least %1$s."
+msgstr "应至少为 %1$s。"
+
+#: app/partials/administration.system.info.php:262
+#: app/views/administration.housekeeping.edit.php:197
+#, c-format
+msgid "Should not be higher than %1$s."
+msgstr "不应高于 %1$s。"
+
 #: app/partials/monitoring.problem.filter.php:27
 #: app/views/monitoring.charts.view.php:80
 #: app/views/monitoring.dashboard.list.php:64
@@ -19274,6 +19394,10 @@ msgstr "Zabbix 写缓存的统计和可用性。缓存 - 值之一（模式：al
 #: include/classes/data/CItemData.php:2848
 msgid "Statistics and availability of proxy memory buffer. Mode (modes: pfree, free, total, used, pused)."
 msgstr "代理内存缓冲区的统计信息和可用性。模式（模式：pfree、free、total、used、pused）。"
+
+#: include/classes/data/CItemData.php:2854
+msgid "Statistics of values received by the preprocessing manager."
+msgstr "preprocessing manager接收的值的统计信息。"
 
 #: app/controllers/CControllerPopupGeneric.php:237
 #: app/controllers/CControllerPopupGeneric.php:251
@@ -20252,6 +20376,10 @@ msgstr "进程数。返回整数"
 msgid "The parameter \"%1$s\" is missing from the user attributes."
 msgstr "用户属性中缺少参数“%1$s”。"
 
+#: app/views/popup.ldap.edit.php:101
+msgid "The previous password was cleared due to a host change. Please enter the new password."
+msgstr "由于主机变更，先前密码已被清除。请输入新密码。"
+
 #: include/classes/core/CJsonRpc.php:206
 msgid "The received JSON is not a valid JSON-RPC request."
 msgstr "收到的 JSON 不是有效的 JSON-RPC 请求。"
@@ -20296,17 +20424,17 @@ msgstr "这些参数将按指定顺序作为命令行参数传递给脚本。"
 
 #: app/views/action.list.php:156
 msgid "This action has conditions or operations referencing deleted object(s)."
-msgstr ""
+msgstr "此操作具有引用已删除对象的条件或操作。"
 
 #: app/views/action.list.php:151
 msgid "This action has missing conditions or operations due to previously deleted object(s)."
-msgstr ""
+msgstr "由于先前删除的对象，此操作缺少条件或操作。"
 
 #: app/controllers/CControllerDiscoveryEdit.php:175
 #, c-format
 msgid "This check cannot be removed, as it is used as a condition in %1$s discovery action."
 msgid_plural "This check cannot be removed, as it is used as a condition in %1$s discovery actions."
-msgstr[0] ""
+msgstr[0] "此检查无法删除，因为它在%1$s发现操作中被用作一个条件。"
 
 #: include/func.inc.php:2566
 msgid "This day last week"
@@ -20353,7 +20481,7 @@ msgstr "此设置将显示本地时间而不是时间戳。在高级配置中也
 
 #: widgets/itemhistory/views/column.edit.php:241
 msgid "This setting will display log time instead of item's timestamp. \"Show timestamp\" must also be checked in the advanced configuration."
-msgstr ""
+msgstr "此设置将显示日志时间而不是项目的时间戳。“显示时间戳”也必须在高级配置中选中。"
 
 #: include/views/configuration.item.edit.php:129
 #: include/views/configuration.item.prototype.edit.php:114
@@ -21293,6 +21421,14 @@ msgstr "无法检索 TimescaleDB 压缩支持状态。"
 msgid "Unable to retrieve TimescaleDB version."
 msgstr "无法检索 TimescaleDB 版本。"
 
+#: app/views/administration.housekeeping.edit.php:173
+msgid "Unable to retrieve compression support status of TimescaleDB time-series database extension for PostgreSQL."
+msgstr "无法检索 PostgreSQL 的 TimescaleDB 时序数据库扩展的压缩支持状态。"
+
+#: app/views/administration.housekeeping.edit.php:178
+msgid "Unable to retrieve version of TimescaleDB time-series database extension for PostgreSQL."
+msgstr "无法检索 PostgreSQL 的 TimescaleDB 时序数据库扩展的版本。"
+
 #: include/views/mfa.login.php:65
 #, c-format
 msgid "Unable to scan? You can use %1$s secret key to manually configure your authenticator app:"
@@ -21570,6 +21706,11 @@ msgstr "不支持的 %1$s 数据库服务版本。必须至少为 %2$s。"
 #, c-format
 msgid "Unsupported %1$s database server version. Must not be higher than %2$s."
 msgstr "不支持的 %1$s 数据库服务版本。不得高于 %2$s。"
+
+#: app/partials/administration.system.info.php:206
+#: app/views/administration.housekeeping.edit.php:169
+msgid "Unsupported TimescaleDB time-series database extension for PostgreSQL is used."
+msgstr "使用了不受支持的 PostgreSQL TimescaleDB 时序数据库扩展。"
 
 #: app/views/administration.housekeeping.edit.php:190
 #, c-format
@@ -22979,6 +23120,11 @@ msgstr "告警"
 msgid "Warning message"
 msgstr "告警信息"
 
+#: app/partials/administration.system.info.php:243
+#: app/partials/administration.system.info.php:262
+msgid "Warning!"
+msgstr "警告！"
+
 #: app/partials/administration.system.info.php:198
 msgid "Warning! Support for Oracle DB is deprecated since Zabbix 7.0 and will be removed in future versions."
 msgstr "警告！自 Zabbix 7.0 起已弃用对 Oracle DB 的支持，并将在未来版本中删除。"
@@ -23347,15 +23493,15 @@ msgstr "Y轴"
 
 #: include/translateDefines.inc.php:34
 msgid "Y-m-d"
-msgstr "Y/m/d"
+msgstr "Y-m-d"
 
 #: include/translateDefines.inc.php:32
 msgid "Y-m-d h:i A"
-msgstr "Y/m/d H:i:s"
+msgstr "Y-m-d h:i A"
 
 #: include/translateDefines.inc.php:31
 msgid "Y-m-d h:i:s A"
-msgstr "Y-m-d H:i:s"
+msgstr "Y-m-d h:i:s A"
 
 #: include/translateDefines.inc.php:40
 msgid "Y-n-d"
@@ -23788,37 +23934,37 @@ msgstr "acos() - 以角度表示的值的反余弦值，以弧度表示"
 #: include/classes/api/services/CDRule.php:774
 #, c-format
 msgid "action \"%1$s\" uses this discovery check"
-msgstr ""
+msgstr "操作“%1$s”使用此发现检查"
 
 #: include/classes/api/services/CDRule.php:981
 #, c-format
 msgid "action \"%1$s\" uses this discovery rule"
-msgstr ""
+msgstr "操作“%1$s”使用此发现规则"
 
 #: include/classes/api/services/CHost.php:1637
 #, c-format
 msgid "action \"%1$s\" uses this host"
-msgstr ""
+msgstr "操作“%1$s”使用此主机"
 
 #: include/classes/api/services/CHostGroup.php:770
 #, c-format
 msgid "action \"%1$s\" uses this host group"
-msgstr ""
+msgstr "操作“%1$s”使用此主机组"
 
 #: include/classes/api/services/CService.php:487
 #, c-format
 msgid "action \"%1$s\" uses this service"
-msgstr ""
+msgstr "操作“%1$s”使用此服务"
 
 #: include/classes/api/services/CTemplate.php:810
 #, c-format
 msgid "action \"%1$s\" uses this template"
-msgstr ""
+msgstr "操作“%1$s”使用此模板"
 
 #: include/classes/api/managers/CTriggerManager.php:127
 #, c-format
 msgid "action \"%1$s\" uses this trigger"
-msgstr ""
+msgstr "操作“%1$s”使用此触发器"
 
 #: app/partials/monitoring.charts.subfilter.php:182
 #: app/partials/monitoring.latest.subfilter.php:186 include/forms.inc.php:144

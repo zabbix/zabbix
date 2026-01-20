@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -133,12 +133,6 @@ if ($page['type'] == PAGE_TYPE_HTML) {
 
 				if (CSettingsHelper::isSoftwareUpdateCheckEnabled()) {
 					$page['scripts'][] = 'class.software-version-check.js';
-
-					$check_data = CSettingsHelper::getSoftwareUpdateCheckData() + ['nextcheck' => 0];
-					$now = time();
-					$delay = $check_data['nextcheck'] > $now ? $check_data['nextcheck'] - $now : 0;
-
-					$page_header->addJavaScript('const ZBX_SOFTWARE_VERSION_CHECK_DELAY = '.$delay.';');
 				}
 			}
 		}

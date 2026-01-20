@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -16,7 +16,7 @@
 
 require_once 'vendor/autoload.php';
 
-require_once dirname(__FILE__).'/../CElement.php';
+require_once __DIR__.'/../CElement.php';
 
 /**
  * Filter tabs element
@@ -122,8 +122,8 @@ class CFilterElement extends CElement {
 						->one();
 			}
 
-			// TODO: fix formatting after git-hook improvements DEV-2396
-			$tab = $this->query('xpath:.//a[('.CXPathHelper::fromClass('tabfilter-item-link').') and text()='.CXPathHelper::escapeQuotes($name).']')->one(false);
+			$tab = $this->query('xpath:.//a[('.CXPathHelper::fromClass('tabfilter-item-link').
+					') and text()='.CXPathHelper::escapeQuotes($name).']')->one(false);
 
 			if (!$tab->isValid() && is_numeric($name)) {
 				$tab = $this->query('xpath:(.//a[@class="tabfilter-item-link"])['.$name.']')->one(false);

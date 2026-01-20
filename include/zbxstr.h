@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -55,7 +55,7 @@ void	zbx_strsplit_last(const char *src, char delimiter, char **left, char **righ
 /* secure string copy */
 #define zbx_strscpy(x, y)	zbx_strlcpy(x, y, sizeof(x))
 #define zbx_strscat(x, y)	zbx_strlcat(x, y, sizeof(x))
-void	zbx_strlcat(char *dst, const char *src, size_t size);
+void	zbx_strlcat(char *dst, const char *src, size_t siz);
 size_t	zbx_strlcpy_utf8(char *dst, const char *src, size_t size);
 
 char	*zbx_strdcat(char *dest, const char *src);
@@ -117,4 +117,15 @@ void	zbx_rtrim_utf8(char *str, const char *charlist);
 
 void	zbx_strncpy_alloc(char **str, size_t *alloc_len, size_t *offset, const char *src, size_t n);
 void	zbx_replace_string(char **data, size_t l, size_t *r, const char *value);
+
+/* Sensitive text handling */
+#define ZBX_SECRET_MASK		"******"
+
+#if defined(ZBX_DEBUG)
+#	define ZBX_STRMASK(x)	x
+#else
+#	define ZBX_STRMASK(x)	ZBX_SECRET_MASK
+#endif
+
+
 #endif /* ZABBIX_STR_H */

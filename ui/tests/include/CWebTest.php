@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -280,8 +280,9 @@ class CWebTest extends CTest {
 	protected static function closePage() {
 		try {
 			if (self::$shared_page !== null) {
-				self::$shared_page->destroy();
+				$page = self::$shared_page;
 				self::$shared_page = null;
+				$page->destroy();
 			}
 		}
 		catch (Exception $exception) {
@@ -402,11 +403,22 @@ class CWebTest extends CTest {
 		}
 
 		$script = 'var tag = document.createElement("style");tag.setAttribute("id", "selenium-injected-style");'.
-				'tag.textContent = "* {text-rendering: geometricPrecision; image-rendering: pixelated} .selenium-hide {opacity: 0 !important}";'.
-				'(document.head||document.documentElement).appendChild(tag);';
+				'tag.textContent = "* {text-rendering: geometricPrecision; image-rendering: pixelated}'.
+				' .sysmap-scroll-container line, .sysmap-scroll-container circle, .sysmap-scroll-container ellipse {shape-rendering: crispedges;}'.
+				' .sysmap-widget-container line, .sysmap-widget-container circle, .sysmap-widget-container ellipse {shape-rendering: crispedges;}'.
+				' .selenium-hide {opacity: 0 !important;transition: opacity 0s !important;}'.
+				' #selenium-injected-pixel {position:absolute;right:0;bottom:0;width:1px;height:1px;opacity:0}";'.
+				'(document.head||document.documentElement).appendChild(tag);'.
+				'var pix = document.createElement("div");pix.setAttribute("id", "selenium-injected-pixel");'.
+				'(document.body||document.documentElement).appendChild(pix);';
 
 		try {
 			$this->page->getDriver()->executeScript($script);
+
+			$pixel = $this->query('id:selenium-injected-pixel')->one(false);
+			if ($pixel->isValid()) {
+				$pixel->moveMouse();
+			}
 		} catch (Exception $exception) {
 			// Code is not missing here.
 		}
@@ -501,7 +513,8 @@ class CWebTest extends CTest {
 		}
 
 		try {
-			$this->page->getDriver()->executeScript('document.getElementById("selenium-injected-style").remove();');
+			$this->page->getDriver()->executeScript('document.getElementById("selenium-injected-style").remove();'.
+					'document.getElementById("selenium-injected-pixel").remove();');
 		} catch (Exception $exception) {
 			// Code is not missing here.
 		}

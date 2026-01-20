@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -89,6 +89,10 @@ class CControllerPopupMassupdateHost extends CControllerPopupMassupdateAbstract 
 			);
 		}
 
+		if ($this->hasInput('backurl') && !CHtmlUrlValidator::validateSameSite($this->getInput('backurl'))) {
+			throw new CAccessDeniedException();
+		}
+
 		return $ret;
 	}
 
@@ -115,6 +119,8 @@ class CControllerPopupMassupdateHost extends CControllerPopupMassupdateAbstract 
 					return $tag['tag'] !== '' || $tag['value'] !== '';
 				}
 			);
+
+			$result = false;
 
 			try {
 				DBstart();
@@ -176,7 +182,9 @@ class CControllerPopupMassupdateHost extends CControllerPopupMassupdateAbstract 
 							}
 
 							if ($ins_groups) {
-								if (!$result = API::HostGroup()->create($ins_groups)) {
+								$result = API::HostGroup()->create($ins_groups);
+
+								if (!$result) {
 									throw new Exception();
 								}
 
@@ -428,14 +436,25 @@ class CControllerPopupMassupdateHost extends CControllerPopupMassupdateAbstract 
 								break;
 
 							case ZBX_ACTION_REMOVE:
-								if ($macros) {
-									$except_selected = $this->getInput('macros_remove', 0);
-									$host_macros_by_macro = array_column($host['macros'], null, 'macro');
-									$macros_by_macro = array_column($macros, null, 'macro');
+								if ($host['macros'] && $macros) {
+									$host['macros'] = array_column($host['macros'], null, 'macro');
+									$matched_macros = [];
 
-									$host['macros'] = $except_selected
-										? array_intersect_key($host_macros_by_macro, $macros_by_macro)
-										: array_diff_key($host_macros_by_macro, $macros_by_macro);
+									foreach ($host['macros'] as $host_macro => $foo) {
+										$trimmed_macro = CApiInputValidator::trimMacro($host_macro);
+
+										foreach ($macros as $macro) {
+											if (CApiInputValidator::trimMacro($macro['macro']) === $trimmed_macro) {
+												$matched_macros[$host_macro] = true;
+
+												continue 2;
+											}
+										}
+									}
+
+									$host['macros'] = (bool) $this->getInput('macros_remove', 0)
+										? array_intersect_key($host['macros'], $matched_macros)
+										: array_diff_key($host['macros'], $matched_macros);
 								}
 								break;
 
@@ -478,14 +497,12 @@ class CControllerPopupMassupdateHost extends CControllerPopupMassupdateAbstract 
 				if (array_key_exists('valuemaps', $visible)) {
 					$this->updateValueMaps($hostids);
 				}
-
-				DBend();
 			}
 			catch (Exception $e) {
-				DBend(false);
-
 				$result = false;
 			}
+
+			$result = DBend($result);
 
 			if ($this->hasInput('backurl')) {
 				$upd_status = ($this->getInput('status', HOST_STATUS_NOT_MONITORED) == HOST_STATUS_MONITORED);
@@ -506,7 +523,7 @@ class CControllerPopupMassupdateHost extends CControllerPopupMassupdateAbstract 
 					);
 				}
 
-				$this->setResponse(new CControllerResponseRedirect($backurl->getUrl()));
+				$this->setResponse(new CControllerResponseRedirect($backurl));
 			}
 			else {
 				if ($result) {

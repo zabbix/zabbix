@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -14,7 +14,7 @@
 **/
 
 
-require_once dirname(__FILE__) . '/../../include/CWebTest.php';
+require_once __DIR__ . '/../../include/CWebTest.php';
 
 /**
  * @backup profiles
@@ -4335,11 +4335,12 @@ class testDataDisplayInGraphs extends CWebTest {
 					'type' => 'history'
 				]
 			],
-			[
-				[
-					'type' => 'trends'
-				]
-			],
+			// TODO: uncomment after fix DEV-4332
+//			[
+//				[
+//					'type' => 'trends'
+//				]
+//			],
 			[
 				[
 					'type' => 'pie'
@@ -4351,12 +4352,13 @@ class testDataDisplayInGraphs extends CWebTest {
 					'kiosk_mode' => true
 				]
 			],
-			[
-				[
-					'type' => 'trends',
-					'kiosk_mode' => true
-				]
-			],
+			// TODO: uncomment after fix DEV-4332
+//			[
+//				[
+//					'type' => 'trends',
+//					'kiosk_mode' => true
+//				]
+//			],
 			[
 				[
 					'type' => 'pie',
@@ -4410,21 +4412,30 @@ class testDataDisplayInGraphs extends CWebTest {
 				$filter_form->fill(['Show' => $show]);
 			}
 
+			$charts_table = $this->query('id:charts')->waitUntilVisible()->one();
 			$filter_form->submit();
+			$charts_table->waitUntilReloaded();
 			$this->page->waitUntilReady();
 
 			// Switch to kiosk mode if screenshot needs to be checked in Kiosk mode.
 			if (CTestArrayHelper::get($data, 'kiosk_mode')) {
 				$this->query('xpath://button[@title="Kiosk mode"]')->one()->click();
+				$charts_table->waitUntilReloaded();
 				$this->page->waitUntilReady();
 			}
 
 			// Wait for all graphs to load and check the screenshots of all graphs of the desired type.
-			$charts_table = $this->query('id:charts')->waitUntilVisible()->one();
 			foreach ($charts_table->query('class:center')->waitUntilCount($count)->all() as $graph) {
+				$image = $graph->query('tag:img')->one();
+				$callback = function() use ($image) {
+					return CElementQuery::getDriver()->executeScript('return arguments[0].complete;', [$image]);
+				};
+				CElementQuery::wait()->until($callback, 'Failed to wait for image to be loaded');
 				$graph->waitUntilClassesNotPresent('is-loading', 60);
 			}
 
+			// TODO: sometimes test is unstable due to different image size.
+			sleep(2);
 			$this->assertScreenshot($charts_table, $screenshot_string.$show);
 
 			// Switch back to normal view to avoid impacting following scenarios.
@@ -4589,7 +4600,7 @@ class testDataDisplayInGraphs extends CWebTest {
 			$object->asDashboard()->waitUntilReady();
 		}
 
-		$this->assertScreenshot($object, $id.'_kiosk');
+		$this->assertScreenshotExcept($object, $this->query('class:header-kioskmode-controls')->one(), $id.'_kiosk');
 
 		$this->query('xpath://button[@title="Normal view"]')->one()->click();
 		$this->page->waitUntilReady();

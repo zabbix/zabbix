@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -68,8 +68,6 @@ class CTriggerPrototypeManager {
 		}
 
 		DB::delete('functions', ['triggerid' => $del_triggerids]);
-		DB::delete('trigger_depends', ['triggerid_down' => $del_triggerids]);
-		DB::delete('trigger_depends', ['triggerid_up' => $del_triggerids]);
 		DB::delete('trigger_tag', ['triggerid' => $del_triggerids]);
 		DB::update('triggers', [
 			'values' => ['templateid' => 0],

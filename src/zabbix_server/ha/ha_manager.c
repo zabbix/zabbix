@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -1086,6 +1086,14 @@ static void	ha_check_nodes(zbx_ha_info_t *info, zbx_ha_config_t *ha_config)
 	{
 		if (ZBX_NODE_STATUS_ACTIVE == info->ha_status)
 		{
+			if (node->status != info->ha_status)
+			{
+				zabbix_log(LOG_LEVEL_WARNING, "HA node split brain detected");
+				ha_status = ZBX_NODE_STATUS_STANDBY;
+
+				goto out;
+			}
+
 			if (SUCCEED != ha_check_standby_nodes(info, &nodes, db_time))
 				goto out;
 		}
@@ -1215,15 +1223,14 @@ static int	ha_db_get_nodes_json(zbx_ha_info_t *info, char **nodes_json, char **e
 
 		for (int i = 0; i < nodes.values_num; i++)
 		{
-			zbx_snprintf(address, sizeof(address), "%s:%hu", nodes.values[i]->address,
-					nodes.values[i]->port);
 			zbx_json_addobject(&j, NULL);
 
 			zbx_json_addstring(&j, ZBX_PROTO_TAG_ID, nodes.values[i]->ha_nodeid.str, ZBX_JSON_TYPE_STRING);
 			zbx_json_addstring(&j, ZBX_PROTO_TAG_NAME, nodes.values[i]->name, ZBX_JSON_TYPE_STRING);
 			zbx_json_addint64(&j, ZBX_PROTO_TAG_STATUS, (zbx_int64_t)nodes.values[i]->status);
 			zbx_json_addint64(&j, ZBX_PROTO_TAG_LASTACCESS, (zbx_int64_t)nodes.values[i]->lastaccess);
-			zbx_json_addstring(&j, ZBX_PROTO_TAG_ADDRESS, address, ZBX_JSON_TYPE_STRING);
+			zbx_json_addstring(&j, ZBX_PROTO_TAG_ADDRESS, zbx_join_hostport(address, sizeof(address),
+					nodes.values[i]->address, nodes.values[i]->port), ZBX_JSON_TYPE_STRING);
 			zbx_json_addint64(&j, ZBX_PROTO_TAG_DB_TIMESTAMP, (zbx_int64_t)db_time);
 			zbx_json_addint64(&j, ZBX_PROTO_TAG_LASTACCESS_AGE,
 					(zbx_int64_t)(db_time -nodes.values[i]->lastaccess));
@@ -1926,6 +1933,8 @@ ZBX_THREAD_ENTRY(ha_manager_thread, args)
 
 				while (nextcheck <= ticks_num)
 					nextcheck += delay;
+
+				zbx_handle_log();
 			}
 
 			if (ZBX_DB_OK <= info.db_status || ZBX_NODE_STATUS_ACTIVE != info.ha_status)

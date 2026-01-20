@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -48,6 +48,7 @@ int	item_preproc_script(zbx_es_t *es, zbx_variant_t *value, const char *params, 
 int	item_preproc_csv_to_json(zbx_variant_t *value, const char *params, char **errmsg);
 int	item_preproc_xml_to_json(zbx_variant_t *value, char **errmsg);
 int	item_preproc_str_replace(zbx_variant_t *value, const char *params, char **errmsg);
-int	item_preproc_check_error_regex(const zbx_variant_t *value, const char *params, char **error);
+int	item_preproc_check_error_regex(const zbx_variant_t *value, const char *params, const char *output_template,
+		char **error);
 
 #endif

@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -127,11 +127,9 @@ foreach ($data['groups'] as $group) {
 
 	$table->addRow([
 		new CCheckBox('groupids['.$group['groupid'].']', $group['groupid']),
-		(new CCol($name))
-			->addClass(ZBX_STYLE_WORDBREAK)
-			->setWidth('15%'),
+		(new CCol($name))->addClass(ZBX_STYLE_NOWRAP),
 		(new CCol($count))->addClass(ZBX_STYLE_CELL_WIDTH),
-		$templates_output ? (new CCol($templates_output))->addClass(ZBX_STYLE_WORDBREAK) : ''
+		$templates_output ?: ''
 	]);
 }
 

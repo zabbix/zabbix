@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -125,19 +125,19 @@ char	*zbx_dsprintf(char *dest, const char *f, ...)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: Copy src to string dst of size size. At most size - 1 characters  *
- *          will be copied. Always null terminates (unless size == 0).        *
+ * Purpose: Copy src to string dst of size siz. At most siz - 1 characters    *
+ *          will be copied. Always null terminates (unless siz == 0).         *
  *                                                                            *
  * Return value: the number of characters copied (excluding the null byte)    *
  *                                                                            *
  ******************************************************************************/
-size_t	zbx_strlcpy(char *dst, const char *src, size_t size)
+size_t	zbx_strlcpy(char *dst, const char *src, size_t siz)
 {
 	const char	*s = src;
 
-	if (0 != size)
+	if (0 != siz)
 	{
-		while (0 != --size && '\0' != *s)
+		while (0 != --siz && '\0' != *s)
 			*dst++ = *s++;
 
 		*dst = '\0';

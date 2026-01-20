@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -270,11 +270,11 @@ foreach ($data['users'] as $user) {
 	// Append user to table.
 	$table->addRow([
 		$checkbox,
-		(new CCol($username))->addClass(ZBX_STYLE_WORDBREAK),
-		(new CCol($user['name']))->addClass(ZBX_STYLE_WORDBREAK),
-		(new CCol($user['surname']))->addClass(ZBX_STYLE_WORDBREAK),
-		(new CCol($user['role_name']))->addClass(ZBX_STYLE_WORDBREAK),
-		(new CCol($users_groups))->addClass(ZBX_STYLE_WORDBREAK),
+		(new CCol($username))->addClass(ZBX_STYLE_NOWRAP),
+		$user['name'],
+		$user['surname'],
+		$user['role_name'],
+		$users_groups,
 		$online,
 		$blocked,
 		$gui_access,

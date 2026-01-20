@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -30,7 +30,7 @@
 		step_nums.forEach(function(num) {
 			var type = jQuery('[name="preprocessing[' + num + '][type]"]', $preprocessing).val(),
 				error_handler = jQuery('[name="preprocessing[' + num + '][on_fail]"]').is(':checked')
-					? jQuery('[name="preprocessing[' + num + '][error_handler]"]:checked').val()
+					? jQuery('[name="preprocessing[' + num + '][error_handler]"]').val()
 					: <?= ZBX_PREPROC_FAIL_DEFAULT ?>,
 				params = [];
 

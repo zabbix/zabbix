@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -25,9 +25,7 @@ $header[] = $data['is_template_dashboard'] ? _('Host') : _('Hosts');
 
 foreach ($data['items'] as $item_name => $item_data) {
 	foreach ($item_data as $columns_data) {
-		$header[] = (new CSpan($item_name))
-			->addClass(ZBX_STYLE_TEXT_VERTICAL)
-			->setTitle($item_name);
+		$header[] = (new CVertical($item_name))->setTitle($item_name);
 	}
 }
 $table->setHeader($header);

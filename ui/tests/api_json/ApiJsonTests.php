@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -31,6 +31,7 @@ require_once dirname(__FILE__).'/testAuditlogMediaType.php';
 require_once dirname(__FILE__).'/testAuditlogProxy.php';
 require_once dirname(__FILE__).'/testAuditlogRegexp.php';
 require_once dirname(__FILE__).'/testAuditlogScheduledReport.php';
+require_once dirname(__FILE__).'/testAuditlogScript.php';
 require_once dirname(__FILE__).'/testAuditlogService.php';
 require_once dirname(__FILE__).'/testAuditlogSettings.php';
 require_once dirname(__FILE__).'/testAuditlogSLA.php';
@@ -110,6 +111,7 @@ class ApiJsonTests {
 		$suite->addTestSuite('testAuditlogProxy');
 		$suite->addTestSuite('testAuditlogRegexp');
 		$suite->addTestSuite('testAuditlogScheduledReport');
+		$suite->addTestSuite('testAuditlogScript');
 		$suite->addTestSuite('testAuditlogService');
 		$suite->addTestSuite('testAuditlogSettings');
 		$suite->addTestSuite('testAuditlogSLA');

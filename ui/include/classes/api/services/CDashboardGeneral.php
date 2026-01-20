@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -34,7 +34,7 @@ abstract class CDashboardGeneral extends CApiService {
 		ZBX_WIDGET_FIELD_TYPE_MEDIA_TYPE => 'value_mediatypeid'
 	];
 
-	protected const WIDGET_FIELD_TYPE_COLUMNS = [
+	public const WIDGET_FIELD_TYPE_COLUMNS = [
 		ZBX_WIDGET_FIELD_TYPE_INT32 => 'value_int',
 		ZBX_WIDGET_FIELD_TYPE_STR => 'value_str'
 	] + self::WIDGET_FIELD_TYPE_COLUMNS_FK;
@@ -108,8 +108,6 @@ abstract class CDashboardGeneral extends CApiService {
 			if ($db_widgets) {
 				self::deleteWidgets(array_keys($db_widgets));
 			}
-
-			DB::delete('dashboard_page', ['dashboard_pageid' => array_keys($db_dashboard_pages)]);
 		}
 
 		DB::delete('dashboard', ['dashboardid' => $dashboardids]);
@@ -221,10 +219,9 @@ abstract class CDashboardGeneral extends CApiService {
 
 				if ($widgetids) {
 					$options = [
-						'output' => ['widget_fieldid', 'widgetid', 'type', 'name', 'value_int', 'value_str',
-							'value_groupid', 'value_hostid', 'value_itemid', 'value_graphid', 'value_serviceid',
-							'value_slaid', 'value_userid', 'value_actionid', 'value_mediatypeid', 'value_sysmapid'
-						],
+						'output' => array_merge(['widget_fieldid', 'widgetid', 'type', 'name'],
+							array_unique(array_values(CDashboardGeneral::WIDGET_FIELD_TYPE_COLUMNS))
+						),
 						'filter' => ['widgetid' => $widgetids]
 					];
 					$db_widget_fields = DBselect(DB::makeSql('widget_field', $options));
@@ -1064,10 +1061,9 @@ abstract class CDashboardGeneral extends CApiService {
 						unset($db_widget);
 
 						$db_widget_fields = DB::select('widget_field', [
-							'output' => ['widget_fieldid', 'widgetid', 'type', 'name', 'value_int', 'value_str',
-								'value_groupid', 'value_hostid', 'value_itemid', 'value_graphid', 'value_serviceid',
-								'value_slaid', 'value_userid', 'value_actionid', 'value_mediatypeid', 'value_sysmapid'
-							],
+							'output' => array_merge(['widget_fieldid', 'widgetid', 'type', 'name'],
+								array_unique(array_values(CDashboardGeneral::WIDGET_FIELD_TYPE_COLUMNS))
+							),
 							'filter' => [
 								'widgetid' => array_keys($db_widgets),
 								'type' => array_keys(self::WIDGET_FIELD_TYPE_COLUMNS)

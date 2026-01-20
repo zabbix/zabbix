@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -221,7 +221,7 @@ window.drule_edit_popup = new class {
 			this.#addInputFields(input);
 		}
 
-		this.#updateRadioButtonRows(input, update, row);
+		this.#updateRadioButtonRows(input, update);
 	}
 
 	#updateCheckWarningIcon(input) {
@@ -253,44 +253,39 @@ window.drule_edit_popup = new class {
 		}
 	}
 
-	#updateRadioButtonRows(input, update, row = null) {
+	#updateRadioButtonRows(input, update) {
 		const templates = {
-			unique_template: ['#unique-row-tmpl', '#device-uniqueness-list', 'uniqueness_criteria_', 'ip'],
-			host_template: ['#host-source-row-tmpl', '#host_source', 'host_source_', 'chk_dns'],
-			name_template: ['#name-source-row-tmpl', '#name_source', 'name_source_', 'chk_host']
+			unique_template: ['unique-row-tmpl', 'device-uniqueness-list', 'uniqueness_criteria_', 'ip'],
+			host_template: ['host-source-row-tmpl', 'host_source', 'host_source_', 'chk_dns'],
+			name_template: ['name-source-row-tmpl', 'name_source', 'name_source_', 'chk_host']
 		};
 
 		const need_to_add_row = this.available_device_types.includes(parseInt(input.type));
 
-		for (const [template, list, key, def] of Object.values(templates)) {
+		for (const [template_id, list_id, key, def] of Object.values(templates)) {
 			if (need_to_add_row) {
-				if (update === false) {
-					const template_html = document.querySelector(template).innerHTML;
+				const row = new Template(document.getElementById(template_id).innerHTML).evaluateToElement(input);
 
-					document.querySelector(list)
-						.insertAdjacentHTML('beforeend', new Template(template_html).evaluate(input));
+				if (update === false) {
+					document.getElementById(list_id).append(row);
 				}
 				else {
-					const template_html = document.querySelector(template).innerHTML;
-					const list_item = document.querySelector(`${list} input[value$="${input.dcheckid}"]`)
-						?.closest('li');
+					const list_item = document.getElementById(`${key}${input.dcheckid}`)?.closest('li');
 
 					if (list_item) {
-						list_item.outerHTML = new Template(template_html).evaluate(input);
+						list_item.replaceWith(row);
 					}
 					else {
-						document.querySelector(list).insertAdjacentHTML('beforeend',
-							new Template(template_html).evaluate(input)
-						);
+						document.getElementById(list_id).append(row);
 					}
 				}
 			}
 			else {
-				const dcheck_checkbox = document.querySelector(`${list} input[value$="${input.dcheckid}"]`);
+				const dcheck_checkbox = document.querySelector(`#${list_id} input[value$="${input.dcheckid}"]`);
 
 				if (dcheck_checkbox !== null) {
 					if (dcheck_checkbox.checked) {
-						document.querySelector(`#${key}${def}`).checked = true;
+						document.getElementById(`${key + def}`).checked = true;
 					}
 
 					dcheck_checkbox.closest('li')?.remove();

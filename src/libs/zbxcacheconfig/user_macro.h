@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -74,6 +74,8 @@ void	um_cache_resolve(const zbx_um_cache_t *cache, const zbx_uint64_t *hostids, 
 int	um_cache_get_host_revision(const zbx_um_cache_t *cache, zbx_uint64_t hostid, zbx_uint64_t *revision);
 void	um_cache_get_macro_updates(const zbx_um_cache_t *cache, const zbx_uint64_t *hostids, int hostids_num,
 		zbx_uint64_t revision, zbx_vector_uint64_t *macro_hostids, zbx_vector_uint64_t *del_macro_hostids);
+int	um_cache_check_macro_updates(const zbx_um_cache_t *cache, const zbx_uint64_t *hostids, int hostids_num,
+		zbx_uint64_t revision);
 
 void	um_cache_get_unused_templates(zbx_um_cache_t *cache, zbx_hashset_t *templates,
 		const zbx_vector_uint64_t *hostids, zbx_vector_uint64_t *templateids);
