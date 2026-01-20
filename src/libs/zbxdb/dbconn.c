@@ -717,10 +717,7 @@ static int	dbconn_open(zbx_dbconn_t *db)
 
 	keywords[i] = NULL;
 	values[i] = NULL;
-	zabbix_log(LOG_LEVEL_WARNING, "________________ connection params:");
-	for(unsigned int idx = 0; idx < i; idx++)
-		zabbix_log(LOG_LEVEL_WARNING, "%s=%s", keywords[idx],values[idx]);
-	zabbix_log(LOG_LEVEL_WARNING, "________________");
+
 	db->conn = PQconnectdbParams(keywords, values, 0);
 
 	zbx_free(cport);
