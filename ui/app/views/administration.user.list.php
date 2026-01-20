@@ -251,19 +251,28 @@ foreach ($data['users'] as $user) {
 		else {
 			$api_access = (new CSpan(_('Enabled')))->addClass(ZBX_STYLE_GREEN);
 			$api_methods = CRoleHelper::getRoleApiMethods($user['roleid']);
+			$is_api_allow_list = CRoleHelper::getRoleApiListMode($user['roleid']) == ZBX_ROLE_RULE_API_MODE_ALLOW;
+			$hint_api_methods = [];
 
 			if ($api_methods) {
-				$hint_api_methods = [];
-				$status_class = CRoleHelper::checkAccess('api.mode', $user['roleid'])
-					? ZBX_STYLE_STATUS_GREEN
-					: ZBX_STYLE_STATUS_GREY;
-
 				foreach ($api_methods as $api_method) {
-					$hint_api_methods[] = (new CSpan($api_method))->addClass($status_class);
+					$hint_api_methods[] = (new CSpan($api_method))
+						->addClass($is_api_allow_list ? ZBX_STYLE_STATUS_GREEN : ZBX_STYLE_STATUS_GREY);
 				}
-
-				$api_access->setHint((new CDiv($hint_api_methods))->addClass('rules-status-container'));
 			}
+			else {
+				$hint_api_methods[] = (new CSpan(_('None')))
+					->addClass($is_api_allow_list ? ZBX_STYLE_STATUS_GREY : ZBX_STYLE_STATUS_GREEN);
+			}
+
+			$api_access->setHint(new CDiv([
+				(new CDiv(
+					$is_api_allow_list ? _('Allowed methods') : _('Denied methods')
+				))->addClass('rules-status-title'),
+				(new CDiv($hint_api_methods))
+					->addClass('rules-status-container')
+					->addClass(ZBX_STYLE_HINTBOX_WRAP)
+			]));
 		}
 	}
 
