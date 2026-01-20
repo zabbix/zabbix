@@ -400,6 +400,12 @@ while (0)
 
 void	zbx_this_should_never_happen_backtrace(void);
 
+#ifdef ZBX_DEBUG
+#define ZBX_TSNH_EXIT() exit(1)
+#else
+#define ZBX_TSNH_EXIT() ((void)0)
+#endif
+
 #define THIS_SHOULD_NEVER_HAPPEN										\
 														\
 do														\
@@ -407,6 +413,7 @@ do														\
 	zbx_this_should_never_happen_backtrace();								\
 	zbx_error("ERROR [file and function: <%s,%s>, revision:%s, line:%d] Something unexpected has just "	\
 			"happened.", __FILE__, __func__, ZABBIX_REVISION, __LINE__);				\
+	ZBX_TSNH_EXIT();											\
 }														\
 while (0)
 
