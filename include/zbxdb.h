@@ -57,6 +57,9 @@ typedef struct
 	char		*db_tls_ca_file;
 	char		*db_tls_cipher;
 	char		*db_tls_cipher_13;
+#if defined(HAVE_POSTGRESQL)
+	char		*dbports;
+#endif
 	unsigned int	dbport;
 	int		log_slow_queries;
 	int		read_only_recoverable;
@@ -360,10 +363,10 @@ void	zbx_db_config_validate(zbx_db_config_t *config);
 int	zbx_dbconn_check_extension(zbx_dbconn_t *db, struct zbx_db_version_info_t *info, int allow_unsupported);
 
 #if defined(HAVE_POSTGRESQL)
-int	zbx_dbconn_parse_and_validate_dbhost(zbx_db_config_t *config, char **error);
 void	zbx_dbconn_tsdb_extract_compressed_chunk_flags(zbx_dbconn_t *db, struct zbx_db_version_info_t *version_info);
 void	zbx_dbconn_tsdb_info_extract(zbx_dbconn_t *db, struct zbx_db_version_info_t *version_info);
 int	zbx_dbconn_tsdb_get_version(zbx_dbconn_t *db);
+int	zbx_dbconn_parse_and_validate_dbhost(zbx_db_config_t *config, char **error);
 #endif
 int	zbx_dbconn_table_exists(zbx_dbconn_t *db, const char *table_name);
 int	zbx_dbconn_field_exists(zbx_dbconn_t *db, const char *table_name, const char *field_name);

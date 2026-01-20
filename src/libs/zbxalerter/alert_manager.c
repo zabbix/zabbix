@@ -1094,6 +1094,13 @@ static char	*am_create_db_alert_message(const zbx_db_config_t *db_config)
 			zbx_snprintf_alloc(&alert_message, &alert_message_alloc, &alert_message_offset, ":%u\"",
 					db_config->dbport);
 		}
+#if defined(HAVE_POSTGRESQL)
+		else if (NULL != db_config->dbports)
+		{
+			zbx_snprintf_alloc(&alert_message, &alert_message_alloc, &alert_message_offset, ' ports:%s\"',
+					db_config->dbports);
+		}
+#endif
 		else
 			zbx_chrcpy_alloc(&alert_message, &alert_message_alloc, &alert_message_offset, '\"');
 	}

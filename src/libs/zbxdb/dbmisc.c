@@ -772,6 +772,9 @@ zbx_db_config_t	*zbx_db_config_create(void)
 void	zbx_db_config_free(zbx_db_config_t *config)
 {
 	zbx_free(config->dbhost);
+#if defined(HAVE_POSTGRESQL)
+	zbx_free(config->dbports);
+#endif
 	zbx_free(config->dbname);
 	zbx_free(config->dbschema);
 	zbx_free(config->dbuser);
