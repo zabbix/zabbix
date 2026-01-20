@@ -32,14 +32,11 @@ window.popup_import_compare = new class {
 	 */
 	#form;
 
-	init({messages}) {
+	init() {
+console.log(overlays_stack.stack);
+
 		this.#overlay = overlays_stack.getById('popup_import_compare');
 		this.#form = this.#overlay.$dialogue.$body[0].querySelector('form');
-
-		messages.forEach((message) => {
-			const message_box = makeMessageBox(message.error, message.messages, message.title, false);
-			$('form.import-compare > .messages').prepend(message_box);
-		})
 
 		this.#addEventListeners();
 	}

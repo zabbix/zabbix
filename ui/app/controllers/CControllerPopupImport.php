@@ -53,12 +53,17 @@ class CControllerPopupImport extends CController {
 				return $user_type === USER_TYPE_SUPER_ADMIN;
 
 			case 'dashboard':
-				return $this->checkAccess(CRoleHelper::ACTIONS_EDIT_DASHBOARDS);
+				return $this->checkAccess(CRoleHelper::UI_MONITORING_DASHBOARD)
+					&& $this->checkAccess(CRoleHelper::ACTIONS_EDIT_DASHBOARDS);
 		}
 	}
 
 	protected function doAction() {
 		$user_type = $this->getUserType();
+
+		$return_missing_objects = false;
+		$missing_objects_warning_title = '';
+		$missing_objects_warning_foot_note = '';
 
 		// Adjust defaults for given rule preset, if specified.
 		switch ($this->getInput('rules_preset')) {
@@ -126,6 +131,10 @@ class CControllerPopupImport extends CController {
 				break;
 
 			case 'dashboard':
+				$return_missing_objects = true;
+				$missing_objects_warning_title = _('References to missing objects were ignored:');
+				$missing_objects_warning_foot_note = _('Check and reconfigure widgets.');
+
 				$rules = [
 					'dashboards' => ['updateExisting' => true, 'createMissing' => true]
 				];
@@ -156,7 +165,7 @@ class CControllerPopupImport extends CController {
 					$result = API::Configuration()->import([
 						'format' => CImportReaderFactory::fileExt2ImportFormat($file->getExtension()),
 						'source' => $file->getContent(),
-						'returnMissingObjects' => true,
+						'returnMissingObjects' => $return_missing_objects,
 						'rules' => $request_rules
 					]);
 				}
@@ -166,23 +175,27 @@ class CControllerPopupImport extends CController {
 			}
 
 			$output = [];
-			if ($result === false) {
-				$output['error'] = [
-					'title' => _('Import failed'),
-					'messages' => array_column(get_and_clear_messages(), 'message')
-				];
-			}
-			else {
+
+			if ($result) {
 				$output['success']['title'] = _('Imported successfully');
 
 				if ($messages = get_and_clear_messages()) {
 					$output['success']['messages'] = array_column($messages, 'message');
 				}
 
-				if (is_array($result) && count($result['missing']) > 0) {
-					$output['success']['messages'][] = _('Import file had references to missing objects:')."\n".
-						CConfigurationImport::missingObjectsToDetailsInfo($result['missing']);
+				if ($return_missing_objects && $result['missing_objects']) {
+					$output['success']['messages'][] = implode("\n", [
+						$missing_objects_warning_title,
+						CImportHelper::missingObjectsToString($result['missing_objects']),
+						$missing_objects_warning_foot_note
+					]);
 				}
+			}
+			else {
+				$output['error'] = [
+					'title' => _('Import failed'),
+					'messages' => array_column(get_and_clear_messages(), 'message')
+				];
 			}
 
 			$this->setResponse((new CControllerResponseData(['main_block' => json_encode($output)]))->disableView());

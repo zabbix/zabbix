@@ -47,24 +47,31 @@ else {
 
 	$output = [
 		'header' => $data['title'],
-		'script_inline' => trim($this->readJsFile('popup.import.compare.js.php')),
+		'script_inline' => implode('', [
+			$this->readJsFile('popup.import.compare.js.php'),
+			'popup_import_compare.init();'
+		]),
 		'body' => !$data['diff']
 			? (new CTableInfo())
 				->setNoDataMessage(_('No changes.'))
 				->toString()
-			: (new CForm())
-				->addClass('import-compare')
-				->addItem((new CDiv())->addClass('messages'))
-				->addItem((new CDiv())
-					->addClass('import-compare-blocks')
-					->addItem((new CDiv())
-						->addItem(drawToc($data['diff_toc']))
-						->addItem(drawDiff($data['diff']))
-					)
+			: (new CObject())
+				->addItem(
+					array_key_exists('missing_objects', $data) && $data['missing_objects']
+						? makeMessageBox(ZBX_STYLE_MSG_WARNING,
+							[[
+								'message' => CImportHelper::missingObjectsToString($data['missing_objects'])."\n".
+									$data['missing_objects_warning_foot_note']
+							]],
+							$data['missing_objects_warning_title']
+						)
+						: null
 				)
 				->addItem(
-					(new CScriptTag('popup_import_compare.init('.json_encode(['messages' => $data['messages']]).');'))
-						->setOnDocumentReady()
+					(new CForm())
+						->addClass('import-compare')
+						->addItem(drawToc($data['diff_toc']))
+						->addItem(drawDiff($data['diff']))
 				)
 				->toString(),
 		'buttons' => $buttons,
