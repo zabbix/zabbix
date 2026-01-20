@@ -563,7 +563,7 @@ class CConfiguration extends CApiService {
 
 				case 'dashboards':
 					$options = [
-						'output' => ['name'],
+						'output' => [],
 						'filter' => [
 							'name' => $data['name']
 						],
