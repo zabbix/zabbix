@@ -40,19 +40,16 @@ class CConfigurationImport {
 	protected $options;
 
 	/**
-	 * @var array with data read from source string
+	 * @var array  Data read from the source string.
 	 */
 	protected $data;
 
 	/**
-	 * @var array  cached data from the adapter
+	 * @var array  Cached data from the adapter.
 	 */
 	protected $formattedData = [];
 
-	/**
-	 * @var array with missing references during import
-	 */
-	private array $missing_objects = [];
+	protected ?CMissingObjectCollector $missing_object_collector = null;
 
 	/**
 	 * Constructor.
@@ -121,15 +118,24 @@ class CConfigurationImport {
 	}
 
 	/**
+	 * Collect missing referred objects using the provided collector.
+	 *
+	 * @param ?CMissingObjectCollector $missing_object_collector
+	 *
+	 * @return $this
+	 */
+	public function setMissingObjectCollector(?CMissingObjectCollector $missing_object_collector): static {
+		$this->missing_object_collector = $missing_object_collector;
+
+		return $this;
+	}
+
+	/**
 	 * Import configuration data.
 	 *
-	 * @param CImportDataAdapter $adapter an object to provide access to the imported data
-	 *
-	 * @return bool
-	 *
-	 * @throws Exception
+	 * @param CImportDataAdapter $adapter  Import data provider.
 	 */
-	public function import(CImportDataAdapter $adapter): bool {
+	public function import(CImportDataAdapter $adapter): void {
 		$this->adapter = $adapter;
 
 		// Parse all import for references to resolve them all together with less sql count.
@@ -157,29 +163,23 @@ class CConfigurationImport {
 		$this->processImages();
 		$this->processMaps();
 		$this->processMediaTypes();
-		$this->processDashboards();
 		$this->processTemplateDashboards();
 
-		return true;
+		$this->processDashboards(false);
 	}
 
 	/**
-	 * Test import configuration data. Supported only for dashboards
+	 * Collect missing referred objects.
 	 *
-	 * @param CImportDataAdapter $adapter an object to provide access to the imported data
-	 *
-	 * @return array
-	 *
-	 * @throws Exception
+	 * @param CImportDataAdapter $adapter  Import data provider.
 	 */
-	public function testimport(CImportDataAdapter $adapter): array {
+	public function collectMissingObjects(CImportDataAdapter $adapter): void {
 		$this->adapter = $adapter;
 
 		// Parse all import for references to resolve them all together with less sql count.
 		$this->gatherReferences();
-		$this->processDashboards(true);
 
-		return $this->getMissingObjects();
+		$this->processDashboards(true);
 	}
 
 	/**
@@ -216,6 +216,7 @@ class CConfigurationImport {
 		$host_prototypes_refs = [];
 		$httptests_refs = [];
 		$httpsteps_refs = [];
+		$dashboards_refs = [];
 
 		foreach ($this->getFormattedTemplateGroups() as $group) {
 			$template_groups_refs[$group['name']] = ['uuid' => $group['uuid']];
@@ -566,13 +567,6 @@ class CConfigurationImport {
 			}
 		}
 
-		foreach ($this->getFormattedDashboards() as $dashboard) {
-			$this->gatherDashboardReferences($dashboard, $items_refs, $graphs_refs, $maps_refs,
-				$services_refs, $slas_refs, $users_refs, $actions_refs, $media_types_refs,
-				$host_groups_refs, $hosts_refs
-			);
-		}
-
 		foreach ($this->getFormattedHttpTests() as $host => $httptests) {
 			foreach ($httptests as $httptest) {
 				$httptests_refs[$host][$httptest['name']] = array_key_exists('uuid', $httptest)
@@ -591,6 +585,15 @@ class CConfigurationImport {
 
 		foreach ($this->getFormattedImages() as $image) {
 			$images_refs[$image['name']] = [];
+		}
+
+		foreach ($this->getFormattedDashboards() as $dashboard) {
+			$dashboards_refs[$dashboard['name']] = [];
+
+			$this->gatherDashboardReferences($dashboard, $items_refs, $graphs_refs, $maps_refs,
+				$services_refs, $slas_refs, $users_refs, $actions_refs, $media_types_refs,
+				$host_groups_refs, $hosts_refs
+			);
 		}
 
 		$this->referencer->addTemplateGroups($template_groups_refs);
@@ -619,13 +622,14 @@ class CConfigurationImport {
 		$this->referencer->addHostPrototypes($host_prototypes_refs);
 		$this->referencer->addHttpTests($httptests_refs);
 		$this->referencer->addHttpSteps($httpsteps_refs);
+		$this->referencer->addDashboards($dashboards_refs);
 	}
 
 	private function gatherDashboardReferences(array $dashboard, array &$items_refs, array &$graphs_refs,
 			array &$maps_refs, array &$services_refs, array &$slas_refs, array &$users_refs, array &$actions_refs,
 			array &$media_types_refs, array &$host_groups_refs = [], array &$hosts_refs = [],
 			array &$templates_refs = []): void {
-		if(!array_key_exists('pages', $dashboard)) {
+		if (!array_key_exists('pages', $dashboard)) {
 			return;
 		}
 
@@ -836,20 +840,6 @@ class CConfigurationImport {
 				// Get list of imported host IDs and add them processed host ID list.
 				$hostids = $host_importer->getProcessedHostIds();
 				$this->importedObjectContainer->addHostIds($hostids);
-			}
-		}
-	}
-
-	protected function processDashboards(bool $testmode = false): void {
-		if ($this->options['dashboards']['updateExisting'] || $this->options['dashboards']['createMissing']) {
-			$dashboards = $this->getFormattedDashboards();
-
-			if ($dashboards) {
-				$dashboard_importer = new CDashboardImporter($this->options, $this->referencer,
-					$this->importedObjectContainer, $testmode
-				);
-				$dashboard_importer->import($dashboards);
-				$this->mergeMissingObjects($dashboard_importer->getMissingObjects());
 			}
 		}
 	}
@@ -2345,6 +2335,30 @@ class CConfigurationImport {
 	}
 
 	/**
+	 * Import global dashboards.
+	 */
+	protected function processDashboards(bool $dry_run): void {
+		if ($this->options['dashboards']['updateExisting'] || $this->options['dashboards']['createMissing']) {
+			$dashboards = $this->getFormattedDashboards();
+
+			if ($dashboards) {
+				$dashboard_importer = new CDashboardImporter($this->options, $this->referencer,
+					$this->importedObjectContainer
+				);
+
+				$dashboard_importer->setMissingObjectCollector($this->missing_object_collector);
+
+				if ($dry_run) {
+					$dashboard_importer->collectMissingObjects($dashboards);
+				}
+				else {
+					$dashboard_importer->import($dashboards);
+				}
+			}
+		}
+	}
+
+	/**
 	 * Deletes items from DB that are missing in import file.
 	 */
 	protected function deleteMissingItems(): void {
@@ -3333,79 +3347,5 @@ class CConfigurationImport {
 		unset($item_indexes);
 
 		return $tree;
-	}
-
-	private function mergeMissingObjects(array $missing_objets) {
-		$result = [];
-
-		foreach ($missing_objets as $key => $object_data) {
-			$current = array_key_exists($key, $this->missing_objects) ? $this->missing_objects[$key] : [];
-
-			if (count($object_data) > 0) {
-				$result[$key] = array_merge($current, $object_data);
-			}
-			elseif ($current) {
-				$result[$key] = $current;
-			}
-		}
-
-		$this->missing_objects = $result;
-	}
-
-	/**
-	 * Get missing objects that were skipped during import
-	 *
-	 * @return array
-	 */
-	public function getMissingObjects() {
-		return $this->missing_objects;
-	}
-
-	/**
-	 *
-	 *
-	 * @param $missing_objects
-	 * @return string
-	 */
-	public static function missingObjectsToDetailsInfo($missing_objects): string {
-		$details = [];
-
-		$translation_map = [
-			'items' => _('Items'),
-			'actions' => _('Actions'),
-			'mediatypes' =>  _('Media types'),
-			'host' =>  _('Hosts'),
-			'hostgroups' =>  _('Host groups'),
-			'graphs' =>  _('Graphs'),
-			'sysmaps' =>  _('Maps'),
-			'sla' =>  _('SLA'),
-			'services' =>  _('Services'),
-			'users' =>  _('Users')
-		];
-
-		foreach ($missing_objects as $mode => $objects) {
-			$names = [];
-
-			foreach ($objects as $object) {
-				switch ($mode) {
-					case 'items':
-						$names[] = $object['host'].NAME_DELIMITER.$object['key'];
-						break;
-					case 'graphs':
-						$names[] = $object['host'].NAME_DELIMITER.$object['name'];
-						break;
-					case 'hosts':
-						$names[] = $object['host'];
-						break;
-					default:
-						$names[] = $object['name'];
-
-				}
-			}
-
-			$details[] = '- ' . $translation_map[$mode] . ': ' . implode(', ', $names);
-		}
-
-		return implode("\n", $details);
 	}
 }
