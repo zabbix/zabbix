@@ -557,7 +557,7 @@ class CConfiguration extends CApiService {
 		$result = $importcompare->importcompare($export, $import);
 
 		if ($params['returnMissingObjects']) {
-			$result['missing_objects'] = $this->importForce($data_raw, $params, true)['missing_objects'];
+			$result['missingObjects'] = $this->importForce($data_raw, $params, true)['missingObjects'];
 		}
 
 		return $result;
@@ -625,7 +625,7 @@ class CConfiguration extends CApiService {
 		}
 
 		if ($params['returnMissingObjects']) {
-			return ['missing_objects' => $missing_object_collector->getMissingObjects()];
+			return ['missingObjects' => $missing_object_collector->getMissingObjects()];
 		}
 
 		return true;

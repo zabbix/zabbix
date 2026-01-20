@@ -183,10 +183,10 @@ class CControllerPopupImport extends CController {
 					$output['success']['messages'] = array_column($messages, 'message');
 				}
 
-				if ($return_missing_objects && $result['missing_objects']) {
+				if ($return_missing_objects && $result['missingObjects']) {
 					$output['success']['messages'][] = implode("\n", [
 						$missing_objects_warning_title,
-						CImportHelper::missingObjectsToString($result['missing_objects']),
+						CImportHelper::missingObjectsToString($result['missingObjects']),
 						$missing_objects_warning_foot_note
 					]);
 				}

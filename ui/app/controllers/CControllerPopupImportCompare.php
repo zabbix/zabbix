@@ -170,11 +170,11 @@ class CControllerPopupImportCompare extends CController {
 		}
 		else {
 			if ($return_missing_objects) {
-				$data['missing_objects'] = $result['missing_objects'];
+				$data['missing_objects'] = $result['missingObjects'];
 				$data['missing_objects_warning_title'] = $missing_objects_warning_title;
 				$data['missing_objects_warning_foot_note'] = $missing_objects_warning_foot_note;
 
-				unset($result['missing_objects']);
+				unset($result['missingObjects']);
 			}
 
 			$data['diff'] = $this->blocksToDiff($result, 1);
