@@ -30,6 +30,4 @@ libzbxembed_a_SOURCES = \
 	browser_alert.c \
 	browser_alert.h
 
-duktape.o: CFLAGS += -w
-
 libzbxembed_a_CFLAGS = $(LIBXML2_CFLAGS)
