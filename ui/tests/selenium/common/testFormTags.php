@@ -1151,6 +1151,7 @@ class testFormTags extends CWebTest {
 		$form->fill(['id:show_inherited_tags' => 'Inherited and '.$field_name.' tags']);
 
 		if ($object === 'web scenario') {
+			$form->waitUntilStalled();
 			$this->page->waitUntilReady();
 		}
 		else {

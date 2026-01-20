@@ -119,7 +119,9 @@ class testFormLogin extends CWebTest {
 		else {
 			$this->page->assertHeader('Global view');
 			$this->query('class:zi-sign-out')->one()->click();
-			$this->assertEquals('Remember me for 30 days', $this->query('xpath://label[@for="autologin"]')->one()->getText());
+			$this->assertEquals('Remember me for 30 days', $this->query('xpath://label[@for="autologin"]')
+				->waitUntilVisible()->one()->getText()
+			);
 		}
 
 		if (CTestArrayHelper::get($data, 'dbCheck', false)) {
@@ -171,6 +173,17 @@ class testFormLogin extends CWebTest {
 			$this->page->userLogin('Admin', 'zabbix', TEST_GOOD, $url);
 			$header = ($url === 'index.php?request=zabbix.php%3Faction%3Dhost.list') ? 'Hosts' : 'Proxies';
 			$this->page->assertHeader($header);
+		}
+	}
+
+	/**
+	 * Opens login page with parameter in URL and checks if autologin checkbox is enabled.
+	 */
+	public function testFormLogin_LoginWithField() {
+		foreach (['reconnect=1', 'autologin=1', 'autologin=0'] as $url) {
+			$this->page->open('index.php?'.$url);
+			$checked = ($url === 'autologin=0') ? false : true;
+			$this->assertTrue($this->query('id:autologin')->asCheckbox()->one()->isChecked($checked));
 		}
 	}
 
