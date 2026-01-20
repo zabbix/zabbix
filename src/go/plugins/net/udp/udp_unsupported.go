@@ -21,7 +21,7 @@ import (
 	"errors"
 )
 
-// exportNetUdpSocketCount - returns number of UDP sockets that match parameters.
-func (p *Plugin) exportNetUdpSocketCount(params []string) (result int, err error) {
+// exportNetUDPSocketCount - returns number of UDP sockets that match parameters.
+func (p *Plugin) exportNetUDPSocketCount(params []string) (result int, err error) {
 	return 0, errors.New("Not supported.")
 }

@@ -26,14 +26,20 @@ import (
 	"github.com/sokurenko/go-netstat/netstat"
 )
 
-// exportNetUdpSocketCount - returns number of UDP sockets that match parameters.
-func (p *Plugin) exportNetUdpSocketCount(params []string) (result int, err error) {
+// exportNetUDPSocketCount - returns number of UDP sockets that match parameters.
+//
+//nolint:gocognit,gocyclo,cyclop
+func (*Plugin) exportNetUDPSocketCount(params []string) (int, error) {
 	if len(params) > 5 {
 		return 0, errors.New(errorTooManyParams)
 	}
 
-	var laddres net.IP
-	var lNet *net.IPNet
+	var (
+		laddres net.IP
+		lNet    *net.IPNet
+		err     error
+	)
+
 	if len(params) > 0 && len(params[0]) > 0 {
 		if ip := net.ParseIP(params[0]); ip != nil {
 			laddres = ip

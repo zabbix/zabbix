@@ -325,7 +325,7 @@ class CControllerItemCreate extends CControllerItem {
 				'when' => ['type', 'in' => [ITEM_TYPE_HTTPAGENT]]
 			],
 			'trapper_hosts' => ['db items.trapper_hosts',
-				'use' => [CIPRangeParser::class, ['v6' => ZBX_HAVE_IPV6, 'dns' => true, 'usermacros' => true, 'macros' => ['{HOST.HOST}', '{HOSTNAME}', '{HOST.NAME}', '{HOST.CONN}', '{HOST.IP}', '{IPADDRESS}', '{HOST.DNS}']]],
+				'use' => [CIPRangeParser::class, ['v6' => ZBX_HAVE_IPV6, 'dns' => true, 'usermacros' => true, 'macros' => ['{HOST.HOST}', '{HOST.NAME}', '{HOST.CONN}', '{HOST.IP}', '{HOST.DNS}']]],
 				'when' => ['allow_traps', 'in' => [HTTPCHECK_ALLOW_TRAPS_ON]]
 			],
 			'inventory_link' => ['db items.inventory_link', 'in' => array_keys([0 => null] + getHostInventories())],

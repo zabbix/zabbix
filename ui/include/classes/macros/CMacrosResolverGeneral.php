@@ -825,7 +825,6 @@ class CMacrosResolverGeneral {
 		foreach ($interfaces as $interface) {
 			foreach ($macros[$interface['functionid']] as $macro => $tokens) {
 				switch ($macro) {
-					case 'IPADDRESS':
 					case 'HOST.IP':
 						$value = $interface['ip'];
 						break;
@@ -1417,7 +1416,7 @@ class CMacrosResolverGeneral {
 			' WHERE '.dbConditionInt('f.functionid', array_keys($macros))
 		);
 
-		$host_macros = ['HOST.ID' => 'hostid', 'HOSTNAME' => 'host', 'HOST.HOST' => 'host', 'HOST.NAME' => 'name'];
+		$host_macros = ['HOST.ID' => 'hostid', 'HOST.HOST' => 'host', 'HOST.NAME' => 'name'];
 
 		while ($row = DBfetch($result)) {
 			foreach ($macros[$row['functionid']] as $macro => $tokens) {
@@ -1670,7 +1669,7 @@ class CMacrosResolverGeneral {
 			'preservekeys' => true
 		]);
 
-		$host_macros = ['HOST.ID' => 'hostid', 'HOSTNAME' => 'host', 'HOST.HOST' => 'host', 'HOST.NAME' => 'name',
+		$host_macros = ['HOST.ID' => 'hostid', 'HOST.HOST' => 'host', 'HOST.NAME' => 'name',
 			'HOST.DESCRIPTION' => 'description'
 		];
 
@@ -1715,7 +1714,7 @@ class CMacrosResolverGeneral {
 			'preservekeys' => true
 		]);
 
-		$host_macros = ['HOST.ID' => 'hostid', 'HOSTNAME' => 'host', 'HOST.HOST' => 'host', 'HOST.NAME' => 'name',
+		$host_macros = ['HOST.ID' => 'hostid', 'HOST.HOST' => 'host', 'HOST.NAME' => 'name',
 			'HOST.DESCRIPTION' => 'description'];
 
 		foreach ($db_items as $itemid => $db_item) {
@@ -1827,9 +1826,7 @@ class CMacrosResolverGeneral {
 		}
 		unset($host_interface);
 
-		$interface_macros = ['IPADDRESS' => 'ip', 'HOST.IP' => 'ip', 'HOST.DNS' => 'dns', 'HOST.CONN' => 'conn',
-			'HOST.PORT' => 'port'
-		];
+		$interface_macros = ['HOST.IP' => 'ip', 'HOST.DNS' => 'dns', 'HOST.CONN' => 'conn', 'HOST.PORT' => 'port'];
 
 		foreach ($db_items as $itemid => $db_item) {
 			if ($db_item['interfaceid'] != 0) {
@@ -1906,7 +1903,7 @@ class CMacrosResolverGeneral {
 		}
 		unset($db_interface);
 
-		$interface_macros = ['IPADDRESS' => 'ip', 'HOST.IP' => 'ip', 'HOST.DNS' => 'dns', 'HOST.CONN' => 'conn'];
+		$interface_macros = ['HOST.IP' => 'ip', 'HOST.DNS' => 'dns', 'HOST.CONN' => 'conn'];
 
 		foreach ($db_interfaces as $hostid => $db_interface) {
 			foreach ($macros[$hostid] as $macro => $tokens) {
@@ -1969,9 +1966,7 @@ class CMacrosResolverGeneral {
 		}
 		unset($host_interface);
 
-		$interface_macros = ['IPADDRESS' => 'ip', 'HOST.IP' => 'ip', 'HOST.DNS' => 'dns', 'HOST.CONN' => 'conn',
-			'HOST.PORT' => 'port'
-		];
+		$interface_macros = ['HOST.IP' => 'ip', 'HOST.DNS' => 'dns', 'HOST.CONN' => 'conn', 'HOST.PORT' => 'port'];
 
 		foreach ($host_interfaces as $hostid => $host_interface) {
 			foreach ($macros[$hostid] as $macro => $tokens) {
@@ -2000,11 +1995,9 @@ class CMacrosResolverGeneral {
 			'{INVENTORY.ASSET.TAG}' => 'asset_tag',
 			'{INVENTORY.CHASSIS}' => 'chassis',
 			'{INVENTORY.CONTACT}' => 'contact',
-			'{PROFILE.CONTACT}' => 'contact', // deprecated
 			'{INVENTORY.CONTRACT.NUMBER}' => 'contract_number',
 			'{INVENTORY.DEPLOYMENT.STATUS}' => 'deployment_status',
 			'{INVENTORY.HARDWARE}' => 'hardware',
-			'{PROFILE.HARDWARE}' => 'hardware', // deprecated
 			'{INVENTORY.HARDWARE.FULL}' => 'hardware_full',
 			'{INVENTORY.HOST.NETMASK}' => 'host_netmask',
 			'{INVENTORY.HOST.NETWORKS}' => 'host_networks',
@@ -2016,22 +2009,17 @@ class CMacrosResolverGeneral {
 			'{INVENTORY.HW.DATE.PURCHASE}' => 'date_hw_purchase',
 			'{INVENTORY.INSTALLER.NAME}' => 'installer_name',
 			'{INVENTORY.LOCATION}' => 'location',
-			'{PROFILE.LOCATION}' => 'location', // deprecated
 			'{INVENTORY.LOCATION.LAT}' => 'location_lat',
 			'{INVENTORY.LOCATION.LON}' => 'location_lon',
 			'{INVENTORY.MACADDRESS.A}' => 'macaddress_a',
-			'{PROFILE.MACADDRESS}' => 'macaddress_a', // deprecated
 			'{INVENTORY.MACADDRESS.B}' => 'macaddress_b',
 			'{INVENTORY.MODEL}' => 'model',
 			'{INVENTORY.NAME}' => 'name',
-			'{PROFILE.NAME}' => 'name', // deprecated
 			'{INVENTORY.NOTES}' => 'notes',
-			'{PROFILE.NOTES}' => 'notes', // deprecated
 			'{INVENTORY.OOB.IP}' => 'oob_ip',
 			'{INVENTORY.OOB.NETMASK}' => 'oob_netmask',
 			'{INVENTORY.OOB.ROUTER}' => 'oob_router',
 			'{INVENTORY.OS}' => 'os',
-			'{PROFILE.OS}' => 'os', // deprecated
 			'{INVENTORY.OS.FULL}' => 'os_full',
 			'{INVENTORY.OS.SHORT}' => 'os_short',
 			'{INVENTORY.POC.PRIMARY.CELL}' => 'poc_1_cell',
@@ -2049,7 +2037,6 @@ class CMacrosResolverGeneral {
 			'{INVENTORY.POC.SECONDARY.PHONE.B}' => 'poc_2_phone_b',
 			'{INVENTORY.POC.SECONDARY.SCREEN}' => 'poc_2_screen',
 			'{INVENTORY.SERIALNO.A}' => 'serialno_a',
-			'{PROFILE.SERIALNO}' => 'serialno_a', // deprecated
 			'{INVENTORY.SERIALNO.B}' => 'serialno_b',
 			'{INVENTORY.SITE.ADDRESS.A}' => 'site_address_a',
 			'{INVENTORY.SITE.ADDRESS.B}' => 'site_address_b',
@@ -2061,7 +2048,6 @@ class CMacrosResolverGeneral {
 			'{INVENTORY.SITE.STATE}' => 'site_state',
 			'{INVENTORY.SITE.ZIP}' => 'site_zip',
 			'{INVENTORY.SOFTWARE}' => 'software',
-			'{PROFILE.SOFTWARE}' => 'software', // deprecated
 			'{INVENTORY.SOFTWARE.APP.A}' => 'software_app_a',
 			'{INVENTORY.SOFTWARE.APP.B}' => 'software_app_b',
 			'{INVENTORY.SOFTWARE.APP.C}' => 'software_app_c',
@@ -2069,9 +2055,7 @@ class CMacrosResolverGeneral {
 			'{INVENTORY.SOFTWARE.APP.E}' => 'software_app_e',
 			'{INVENTORY.SOFTWARE.FULL}' => 'software_full',
 			'{INVENTORY.TAG}' => 'tag',
-			'{PROFILE.TAG}' => 'tag', // deprecated
 			'{INVENTORY.TYPE}' => 'type',
-			'{PROFILE.DEVICETYPE}' => 'type', // deprecated
 			'{INVENTORY.TYPE.FULL}' => 'type_full',
 			'{INVENTORY.URL.A}' => 'url_a',
 			'{INVENTORY.URL.B}' => 'url_b',
@@ -2219,7 +2203,7 @@ class CMacrosResolverGeneral {
 			'preservekeys' => true
 		]);
 
-		$host_macros = ['HOST.ID' => 'hostid', 'HOSTNAME' => 'host', 'HOST.HOST' => 'host', 'HOST.NAME' => 'name',
+		$host_macros = ['HOST.ID' => 'hostid', 'HOST.HOST' => 'host', 'HOST.NAME' => 'name',
 			'HOST.DESCRIPTION' => 'description'
 		];
 
@@ -2308,9 +2292,7 @@ class CMacrosResolverGeneral {
 		}
 		unset($host_interface);
 
-		$interface_macros = ['IPADDRESS' => 'ip', 'HOST.IP' => 'ip', 'HOST.DNS' => 'dns', 'HOST.CONN' => 'conn',
-			'HOST.PORT' => 'port'
-		];
+		$interface_macros = ['HOST.IP' => 'ip', 'HOST.DNS' => 'dns', 'HOST.CONN' => 'conn', 'HOST.PORT' => 'port'];
 
 		foreach ($macros as $triggerid => $macro_data) {
 			if (!array_key_exists($triggerid, $trigger_hosts_by_f_num)) {
@@ -2880,7 +2862,6 @@ class CMacrosResolverGeneral {
 		foreach ($macros as $n => $macro_data) {
 			foreach ($macro_data as $macro => $tokens) {
 				switch ($macro) {
-					case 'USER.ALIAS': // Deprecated in version 5.4.
 					case 'USER.USERNAME':
 						$value = CApiService::$userData['username'];
 						break;

@@ -1859,27 +1859,27 @@ class C10TriggerExpressionTest extends TestCase {
 			],
 			['{host:key["{$USERMACRO1}",{$USERMACRO2}].str()}', null, true],
 			['{host:key[].str("{$USERMACRO1}",{$USERMACRO2})}', null, true],
-			['{host:key["{HOSTNAME1}",{HOSTNAME2}].str()}', null, true],
+			['{host:key["{HOST.HOST1}",{HOST.HOST2}].str()}', null, true],
 			[
-				'{host:key[].str("{HOSTNAME1}",{HOSTNAME2})}',
+				'{host:key[].str("{HOST.HOST1}",{HOST.HOST2})}',
 				[
 					'error' => '',
 					'expressions' => [
 						0 => [
-							'expression' => '{host:key[].str("{HOSTNAME1}",{HOSTNAME2})}',
+							'expression' => '{host:key[].str("{HOST.HOST1}",{HOST.HOST2})}',
 							'pos' => 0,
 							'host' => 'host',
 							'item' => 'key[]',
-							'function' => 'str("{HOSTNAME1}",{HOSTNAME2})',
+							'function' => 'str("{HOST.HOST1}",{HOST.HOST2})',
 							'functionName' => 'str',
-							'functionParam' => '"{HOSTNAME1}",{HOSTNAME2}',
-							'functionParamList' => ['{HOSTNAME1}', '{HOSTNAME2}']
+							'functionParam' => '"{HOST.HOST1}",{HOST.HOST2}',
+							'functionParamList' => ['{HOST.HOST1}', '{HOST.HOST2}']
 						]
 					]
 				],
 				true
 			],
-			['{host:key[].count(1,"{HOSTNAME1}",{HOSTNAME2})}', null, true],
+			['{host:key[].count(1,"{HOST.HOST1}",{HOST.HOST2})}', null, true],
 			['{host:key[].str()}=-1=--2=---3=----4=-----5', null, false],
 			['{host:key[].str()}=-1=--2=---3=----4=-----5', null, false],
 			['{host:key[].str()}=-1', null, true],
@@ -1895,10 +1895,10 @@ class C10TriggerExpressionTest extends TestCase {
 			['{host:key[{$USERMACRO1},"{$USERMACRO2}abc"].str()}', null, true],
 			['{host:key[].count(1,{$USERMACRO1}abc,"{$USERMACRO2}")}', null, true],
 			['{host:key[].count(1,{$USERMACRO1},"{$USERMACRO2}abc")}', null, true],
-			['{host:key[abc{HOSTNAME1},"{HOSTNAME2}"].str()}', null, true],
-			['{host:key[{HOSTNAME1},"abc{HOSTNAME2}"].str()}', null, true],
-			['{host:key[].count(1,abc{HOSTNAME1},"{HOSTNAME2}")}', null, true],
-			['{host:key[].count(1,{HOSTNAME1},"abc{HOSTNAME2}")}', null, true],
+			['{host:key[abc{HOST.HOST1},"{HOST.HOST2}"].str()}', null, true],
+			['{host:key[{HOST.HOST1},"abc{HOST.HOST2}"].str()}', null, true],
+			['{host:key[].count(1,abc{HOST.HOST1},"{HOST.HOST2}")}', null, true],
+			['{host:key[].count(1,{HOST.HOST1},"abc{HOST.HOST2}")}', null, true],
 			['{host:key[{host:key.last(0)},"{host:key.last(0)}"].str()}', null, true],
 			['{host:key[].count(1,{host:key.last(0)},"{host:key.last(0)}")}', null, false],
 			['{host:key[].count(1,{host:key.last(0},"{host:key.last(0)}")}', null, true],
