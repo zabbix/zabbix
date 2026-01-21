@@ -463,6 +463,8 @@ void	zbx_hashset_copy(zbx_hashset_t *dst, const zbx_hashset_t *src, size_t size)
 {
 	ZBX_HASHSET_ENTRY_T	*entry, **ref, **tmp = dst->slots;
 
+	zbx_hashset_clear(dst);
+
 	*dst = *src;
 
 	dst->slots = (ZBX_HASHSET_ENTRY_T **)dst->mem_realloc_func(tmp, (size_t)dst->num_slots *
