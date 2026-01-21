@@ -222,11 +222,11 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 			[
 				[
 					'servers_settings' => [],
-					'test_error' => 'Invalid LDAP configuration',
-					'test_error_details' => [
-						'Incorrect value for field "host": cannot be empty.',
-						'Incorrect value for field "base_dn": cannot be empty.',
-						'Incorrect value for field "search_attribute": cannot be empty.'
+					'inline_errors' => [
+						'Name' => 'This field cannot be empty.',
+						'Host' => 'This field cannot be empty.',
+						'Base DN' => 'This field cannot be empty.',
+						'Search attribute' => 'This field cannot be empty.'
 					]
 				]
 			],
@@ -236,10 +236,10 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 					'servers_settings' => [
 						'Host' => 'ldap.forumsys.com'
 					],
-					'test_error' => 'Invalid LDAP configuration',
-					'test_error_details' => [
-						'Incorrect value for field "base_dn": cannot be empty.',
-						'Incorrect value for field "search_attribute": cannot be empty.'
+					'inline_errors' => [
+						'Name' => 'This field cannot be empty.',
+						'Base DN' => 'This field cannot be empty.',
+						'Search attribute' => 'This field cannot be empty.'
 					]
 				]
 			],
@@ -250,9 +250,9 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 						'Host' => 'ldap.forumsys.com',
 						'Base DN' => 'dc=example,dc=com'
 					],
-					'test_error' => 'Invalid LDAP configuration',
-					'test_error_details' => [
-						'Incorrect value for field "search_attribute": cannot be empty.'
+					'inline_errors' => [
+						'Name' => 'This field cannot be empty.',
+						'Search attribute' => 'This field cannot be empty.'
 					]
 				]
 			],
@@ -322,7 +322,8 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 					],
 					'test_error' => 'Login failed',
 					'test_error_details' => [
-						'Incorrect user name or password or account is temporarily blocked.'
+						'Cannot bind anonymously to LDAP server.'
+//						'Incorrect user name or password or account is temporarily blocked.'
 					]
 				]
 			],
@@ -519,11 +520,13 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 		if (CTestArrayHelper::get($data, 'expected', TEST_BAD) === TEST_GOOD) {
 			$this->assertMessage(TEST_GOOD, 'Login successful');
 		}
-		else {
-			$this->assertInlineError($test_form_dialog->asForm(), $data['inline_errors']);
-		}
-		$this->assertMessage(TEST_BAD, $data['test_error'], $data['test_error_details']);
-
+		else
+			if (array_key_exists('inline_errors', $data)) {
+				$this->assertInlineError($test_form_dialog->asForm(), $data['inline_errors']);
+			}
+			if (array_key_exists('test_error', $data)) {
+				$this->assertMessage(TEST_BAD, $data['test_error'], $data['test_error_details']);
+			}
 		if (array_key_exists('check_provisioning', $data)) {
 			foreach ($data['check_provisioning'] as $id => $text) {
 				$this->assertEquals($text, $test_form_dialog->query('id:provisioning_'.$id)->waitUntilVisible()
@@ -534,7 +537,7 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 
 		$test_form_dialog->query('button:Cancel')->waitUntilClickable()->one()->click();
 		$test_form_dialog->waitUntilNotVisible();
-		$server_form_dialog->close();
+		// $server_form_dialog->close();
 	}
 
 	/**
@@ -1459,7 +1462,9 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 			// #0 Only default authentication added.
 			[
 				[
-					'error' => 'Incorrect value for field "authentication_type": LDAP is not configured.'
+					'inline_errors' => [
+						'Default authentication' => 'LDAP is not configured.'
+					]
 				]
 			],
 			// #1 LDAP server without any parameters.
@@ -1470,14 +1475,12 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 							'fields' => []
 						]
 					],
-					'ldap_error' => 'Invalid LDAP configuration',
-					'ldap_error_details' => [
-						'Incorrect value for field "name": cannot be empty.',
-						'Incorrect value for field "host": cannot be empty.',
-						'Incorrect value for field "base_dn": cannot be empty.',
-						'Incorrect value for field "search_attribute": cannot be empty.'
-					],
-					'error' => 'At least one LDAP server must exist.'
+					'inline_errors' => [
+						'Name' => 'This field cannot be empty.',
+						'Host' => 'This field cannot be empty.',
+						'Base DN' => 'This field cannot be empty.',
+						'Search attribute' => 'This field cannot be empty.'
+					]
 				]
 			],
 			// #2 LDAP server without name, Base DN and Search attribute.
@@ -1494,13 +1497,11 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 							]
 						]
 					],
-					'ldap_error' => 'Invalid LDAP configuration',
-					'ldap_error_details' => [
-						'Incorrect value for field "name": cannot be empty.',
-						'Incorrect value for field "base_dn": cannot be empty.',
-						'Incorrect value for field "search_attribute": cannot be empty.'
-					],
-					'error' => 'At least one LDAP server must exist.'
+					'inline_errors' => [
+						'Name' => 'This field cannot be empty.',
+						'Base DN' => 'This field cannot be empty.',
+						'Search attribute' => 'This field cannot be empty.'
+					]
 				]
 			],
 			// #3 LDAP server without name and search attribute.
@@ -1514,12 +1515,10 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 							]
 						]
 					],
-					'ldap_error' => 'Invalid LDAP configuration',
-					'ldap_error_details' => [
-						'Incorrect value for field "name": cannot be empty.',
-						'Incorrect value for field "search_attribute": cannot be empty.'
-					],
-					'error' => 'At least one LDAP server must exist.'
+					'inline_errors' => [
+						'Name' => 'This field cannot be empty.',
+						'Search attribute' => 'This field cannot be empty.'
+					]
 				]
 			],
 			// #4 LDAP server without name.
@@ -1534,11 +1533,9 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 							]
 						]
 					],
-					'ldap_error' => 'Invalid LDAP configuration',
-					'ldap_error_details' => [
-						'Incorrect value for field "name": cannot be empty.'
-					],
-					'error' => 'At least one LDAP server must exist.'
+					'inline_errors' => [
+						'Name' => 'This field cannot be empty.'
+					]
 				]
 			],
 			// #5 LDAP server with too big integer in Port.
@@ -1555,11 +1552,9 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 							]
 						]
 					],
-					'ldap_error' => 'Invalid LDAP configuration',
-					'ldap_error_details' => [
-						'Incorrect value for field "port": value must be no greater than "65535".'
-					],
-					'error' => 'At least one LDAP server must exist.'
+					'inline_errors' => [
+						'Port' => 'This value must be no greater than "65535".',
+					]
 				]
 			],
 			// #6 Two LDAP servers with same names.
@@ -1584,7 +1579,9 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 						]
 					],
 					'dialog_submit' => true,
-					'error' => 'Invalid parameter "/2": value (name)=(TEST) already exists.'
+					'inline_errors' => [
+						'Name' => 'Name already exists.',
+					]
 				]
 			],
 			// #7 LDAP server with JIT, but without Group mapping.
@@ -1602,11 +1599,9 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 							]
 						]
 					],
-					'ldap_error' => 'Invalid LDAP configuration',
-					'ldap_error_details' => [
-						'Invalid user group mapping configuration.'
-					],
-					'error' => 'At least one LDAP server must exist.'
+					'inline_errors' => [
+						'User group mapping' => 'This field cannot be empty.',
+					]
 				]
 			],
 			// #8 Group mapping dialog form validation.
@@ -2950,7 +2945,12 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 			}
 		}
 		else {
-			$this->assertMessage(TEST_BAD, 'Cannot update authentication', $data['error']);
+//			 $this->assertMessage(TEST_BAD, 'Cannot update authentication', $data['error']);
+
+			$form = $this->query('id:authentication-form')->asForm()->one();
+			$this->assertInlineError($form, $data['inline_errors']); // Main auth window
+
+//			$this->assertInlineError($test_form_dialog->asForm(), $data['inline_errors']);
 		}
 	}
 
