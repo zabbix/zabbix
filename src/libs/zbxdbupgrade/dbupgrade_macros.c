@@ -172,8 +172,10 @@ out:
 	return ret;
 }
 
-void	dbpatch_function_free(zbx_dbpatch_function_t *func)
+void	dbpatch_function_free(void *ptr)
 {
+	zbx_dbpatch_function_t	*func = (zbx_dbpatch_function_t*)ptr;
+
 	zbx_free(func->name);
 	zbx_free(func->parameter);
 	zbx_free(func->arg0);
@@ -880,11 +882,6 @@ static void	dbpatch_replace_functionids(char **expression, const zbx_vector_ptr_
 	}
 }
 
-static void	dbpatch_function_free_wrap(void *ptr)
-{
-	dbpatch_function_free((zbx_dbpatch_function_t *)ptr);
-}
-
 /******************************************************************************
  *                                                                            *
  * Purpose: convert simple macro {host.key:func(params)} to the new syntax    *
@@ -962,7 +959,7 @@ void	dbpatch_convert_simple_macro(const char *expression, const zbx_token_simple
 
 	zbx_free(key);
 	zbx_free(host);
-	zbx_vector_ptr_clear_ext(&functions, dbpatch_function_free_wrap);
+	zbx_vector_ptr_clear_ext(&functions, dbpatch_function_free);
 	zbx_vector_ptr_destroy(&functions);
 
 #undef HOSTHOST_IDX_POS

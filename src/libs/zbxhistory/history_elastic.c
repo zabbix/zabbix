@@ -621,14 +621,6 @@ static void	elastic_destroy(zbx_history_iface_t *hist)
 	zbx_free(data);
 }
 
-static int	zbx_history_record_compare_desc_wrapper(const void *a, const void *b)
-{
-	const zbx_history_record_t	*ca = (const zbx_history_record_t *)a;
-	const zbx_history_record_t	*cb = (const zbx_history_record_t *)b;
-
-	return zbx_history_record_compare_desc_func(ca, cb);
-}
-
 /************************************************************************************
  *                                                                                  *
  * Purpose: gets item history data from history storage                             *
@@ -897,7 +889,7 @@ out:
 	zbx_free(scroll_query);
 	zbx_free(error);
 
-	zbx_vector_history_record_sort(values, zbx_history_record_compare_desc_wrapper);
+	zbx_vector_history_record_sort(values, zbx_history_record_compare_desc);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() values:%d", __func__, values->values_num);
 

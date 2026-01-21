@@ -720,8 +720,11 @@ static void	__snmpidx_mapping_clean(void *data)
 	zbx_free(mapping->index);
 }
 
-static int	zbx_snmp_oid_compare(const zbx_snmp_oid_t * const *s1, const zbx_snmp_oid_t * const *s2)
+static int	zbx_snmp_oid_compare(const void *a1, const void *a2)
 {
+	const zbx_snmp_oid_t * const	*s1 = (const zbx_snmp_oid_t *const *)a1;
+	const zbx_snmp_oid_t * const	*s2 = (const zbx_snmp_oid_t *const *)a2;
+
 	return strcmp((*s1)->str_oid, (*s2)->str_oid);
 }
 
@@ -2576,17 +2579,9 @@ static void	snmp_bulkwalk_set_options(zbx_snmp_format_opts_t *opts)
 	netsnmp_ds_set_boolean(NETSNMP_DS_LIBRARY_ID, NETSNMP_DS_LIB_DONT_PRINT_UNITS, opts->no_print_units);
 }
 
-static int	zbx_snmp_oid_compare_wrap(const void *a, const void *b)
-{
-	const zbx_snmp_oid_t * const	*ca = (const zbx_snmp_oid_t *const *)a;
-	const zbx_snmp_oid_t * const	*cb = (const zbx_snmp_oid_t *const *)b;
-
-	return zbx_snmp_oid_compare(ca, cb);
-}
-
 static void	snmp_bulkwalk_remove_matching_oids(zbx_vector_snmp_oid_t *oids)
 {
-	zbx_vector_snmp_oid_sort(oids, zbx_snmp_oid_compare_wrap);
+	zbx_vector_snmp_oid_sort(oids, zbx_snmp_oid_compare);
 
 	for (int i = 1; i < oids->values_num; i++)
 	{
@@ -2646,7 +2641,7 @@ static int	snmp_bulkwalk_parse_params(AGENT_REQUEST *request, zbx_vector_snmp_oi
 
 	if (1 < oids_out->values_num)
 	{
-		zbx_vector_snmp_oid_sort(oids_out, zbx_snmp_oid_compare_wrap);
+		zbx_vector_snmp_oid_sort(oids_out, zbx_snmp_oid_compare);
 		snmp_bulkwalk_remove_matching_oids(oids_out);
 	}
 

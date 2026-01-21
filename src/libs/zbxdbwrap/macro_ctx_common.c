@@ -799,12 +799,19 @@ fail:
 	}
 }
 
-static int	zbx_eventdata_compare_wrap(const void *a, const void *b)
+/******************************************************************************
+ *                                                                            *
+ * Purpose: compare events to sort by highest severity and host name          *
+ *                                                                            *
+ ******************************************************************************/
+static int	zbx_eventdata_compare(const void *a1, const void *a2)
 {
-	const zbx_eventdata_t	*ca = (const zbx_eventdata_t *)a;
-	const zbx_eventdata_t	*cb = (const zbx_eventdata_t *)b;
+	const zbx_eventdata_t	*d1 = (const zbx_eventdata_t *)a1;
+	const zbx_eventdata_t	*d2 = (const zbx_eventdata_t *)a2;
 
-	return zbx_eventdata_compare(ca, cb);
+	ZBX_RETURN_IF_NOT_EQUAL(d2->nseverity, d1->nseverity);
+
+	return strcmp(d1->host, d2->host);
 }
 
 static int	expr_db_get_event_symptoms(const zbx_db_event *event, char **replace_to)
@@ -841,7 +848,7 @@ static int	expr_db_get_event_symptoms(const zbx_db_event *event, char **replace_
 
 		zbx_db_get_events_by_eventids(&symptom_eventids, &symptom_events);
 		eventdata_compose(&symptom_events, &symptoms);
-		zbx_vector_eventdata_sort(&symptoms, zbx_eventdata_compare_wrap);
+		zbx_vector_eventdata_sort(&symptoms, zbx_eventdata_compare);
 		ret = zbx_eventdata_to_str(&symptoms, replace_to);
 
 		for (int i = 0; i < symptoms.values_num; i++)
@@ -1226,7 +1233,7 @@ static void	expr_db_get_rootcause(const zbx_db_service *service, char **replace_
 	zbx_vector_eventdata_create(&rootcauses);
 
 	eventdata_compose(&service->events, &rootcauses);
-	zbx_vector_eventdata_sort(&rootcauses, zbx_eventdata_compare_wrap);
+	zbx_vector_eventdata_sort(&rootcauses, zbx_eventdata_compare);
 	zbx_eventdata_to_str(&rootcauses, replace_to);
 
 	for (int i = 0; i < rootcauses.values_num; i++)

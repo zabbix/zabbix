@@ -662,10 +662,11 @@ void	um_mock_config_init(void)
 	set_dc_config(config);
 }
 
-static void	um_mock_kv_path_free(zbx_dc_kvs_path_t *kvspath)
+static void	um_mock_kv_path_free(void *ptr)
 {
 	zbx_hashset_iter_t	iter;
 	zbx_dc_kv_t		*kv;
+	zbx_dc_kvs_path_t	*kvspath = (zbx_dc_kvs_path_t *)ptr;
 
 	zbx_hashset_iter_reset(&kvspath->kvs, &iter);
 	while (NULL != (kv = (zbx_dc_kv_t *)zbx_hashset_iter_next(&iter)))
@@ -675,10 +676,10 @@ static void	um_mock_kv_path_free(zbx_dc_kvs_path_t *kvspath)
 	zbx_free(kvspath);
 }
 
-static void	um_mock_kv_path_free_wrap(void *p)
-{
-	um_mock_kv_path_free((zbx_dc_kvs_path_t *)p);
-}
+/* static void	um_mock_kv_path_free_wrap(void *p) */
+/* { */
+/* 	um_mock_kv_path_free((zbx_dc_kvs_path_t *)p); */
+/* } */
 
 /*********************************************************************************
  *                                                                               *
@@ -700,7 +701,7 @@ void	um_mock_config_destroy(void)
 	while (NULL != (pmacro = (zbx_um_macro_t **)zbx_hashset_iter_next(&iter)))
 		um_macro_release(*pmacro);
 
-	zbx_vector_ptr_clear_ext(&config->kvs_paths, um_mock_kv_path_free_wrap);
+	zbx_vector_ptr_clear_ext(&config->kvs_paths, um_mock_kv_path_free);
 	zbx_vector_ptr_destroy(&config->kvs_paths);
 
 	zbx_hashset_destroy(&config->gmacro_kv);

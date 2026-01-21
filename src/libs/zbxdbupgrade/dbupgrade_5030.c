@@ -672,15 +672,12 @@ static void	get_template_itemids_by_templateids(zbx_vector_uint64_t *templateids
 	get_template_itemids_by_templateids(templateids, itemids, discovered_itemids);
 }
 
-static void	host_free(zbx_host_t *host)
+static void	host_free(void *ptr)
 {
+	zbx_host_t	*host = (zbx_host_t *)ptr;
+
 	zbx_vector_uint64_destroy(&host->itemids);
 	zbx_free(host);
-}
-
-static void	host_free_wrapper(void *ptr)
-{
-	host_free((zbx_host_t *)ptr);
 }
 
 static int	DBpatch_5030046(void)
@@ -864,7 +861,7 @@ static int	DBpatch_5030046(void)
 		zbx_vector_ptr_pair_destroy(&valuemap->mappings);
 	}
 
-	zbx_vector_ptr_clear_ext(&hosts, host_free_wrapper);
+	zbx_vector_ptr_clear_ext(&hosts, host_free);
 	zbx_vector_ptr_destroy(&hosts);
 	zbx_hashset_destroy(&valuemaps);
 
