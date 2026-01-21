@@ -1867,7 +1867,7 @@ static void	start_processes(zbx_socket_t *listen_sock, zbx_proc_startup_t *runle
 		switch (thread_args.info.process_type)
 		{
 			case ZBX_PROCESS_TYPE_SUPERVISOR:
-				threads_flags[i] = ZBX_THREAD_PRIORITY_NONE;
+				threads_flags[i] = ZBX_THREAD_PRIORITY_SUPERVISOR;
 				thread_args.args = &supervisor_args;
 				zbx_thread_start(zbx_supervisor_thread, &thread_args, &zbx_threads[i]);
 				break;
