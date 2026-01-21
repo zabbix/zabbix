@@ -2542,13 +2542,14 @@ select {
 			white-space: pre;
 
 			.scatter-plot-hintbox-icon-color {
-				@extend %icon-small;
-
 				display: inline-block;
 				width: 12px;
 				height: 18px;
-				margin-left: 3px;
 				margin-right: 10px;
+
+				&::before {
+					font-size: 14px;
+				}
 			}
 		}
 	}
