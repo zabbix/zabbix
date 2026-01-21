@@ -4189,17 +4189,21 @@ void	zbx_init_library_mt_snmp(const char *progname)
 void	zbx_shutdown_library_mt_snmp(const char *progname)
 {
 	if (1 == snmp_rwlock_init_done)
+		pthread_rwlock_wrlock(&snmp_exec_rwlock);
+
+	zbx_shutdown_snmp(progname);
+
+	if (1 == snmp_rwlock_init_done)
 	{
 		int	err;
 
-		pthread_rwlock_wrlock(&snmp_exec_rwlock);
+		pthread_rwlock_unlock(&snmp_exec_rwlock);
 
 		if (0 != (err = pthread_rwlock_destroy(&snmp_exec_rwlock)))
 			zabbix_log(LOG_LEVEL_WARNING, "cannot destroy snmp execute mutex: %s", zbx_strerror(err));
 		else
 			snmp_rwlock_init_done = 0;
 	}
-	zbx_shutdown_snmp(progname);
 }
 
 static void	process_snmp_result(void *data)
