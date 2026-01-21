@@ -30,7 +30,7 @@ class testGeneric extends CWebTest {
 		return [CMessageBehavior::class];
 	}
 
-	public static function provider() {
+	public static function getPagesData() {
 		return [
 			// Search.
 			[
@@ -43,6 +43,7 @@ class testGeneric extends CWebTest {
 			// Dashboard.
 			[
 				[
+					//TODO: testGeneric#1 fails, if it runs alone due to another dashboard being opened, would be fixed in DEV-4728
 					'url' => 'zabbix.php?action=dashboard.view',
 					'title' => 'Dashboard',
 					'header' => 'Global view'
@@ -722,33 +723,26 @@ class testGeneric extends CWebTest {
 	}
 
 	/**
-	 * @dataProvider provider
+	 * @dataProvider getPagesData
 	 */
 	public function testGeneric_Pages($data) {
 		$this->page->login()->open($data['url'])->waitUntilReady();
 		$this->page->assertTitle($data['title']);
 		$this->page->assertHeader($data['header']);
 
-		// Error message is expected for 'Queue' pages as case is checked without running server.
 		if (CTestArrayHelper::get($data, 'error', false)) {
+			// Error message is expected for 'Queue' pages as case is checked without running server.
+
 			$this->assertMessage(TEST_BAD, 'Cannot display item queue.');
 		}
 		else {
-			$this->assertFalse($this->query('class:msg-bad')->one(false)->isValid());
+			$this->assertFalse($this->query('class:msg-bad')->one(false)->isValid(), 'Unexpected error on page.');
 		}
 
 		// Verify that user menu contains default sections.
-		$menu_user = [
-			'zi-support' => 'Zabbix Technical Support',
-			'zi-integrations' => 'Zabbix Integrations',
-			'zi-help-circled' => 'Help',
-			'zi-user-settings' => 'Admin (Zabbix Administrator)',
-			'zi-sign-out' => 'Sign out'
-		];
-		foreach ($menu_user as $locator => $text){
-			$this->assertEquals($this->query('xpath://a[contains(@class, "'.$locator.'")]')->one()
-					->getAttribute('title'), $text
-			);
+		$menu_user = ['Support', 'Integrations', 'Help', 'User settings', 'Sign out'];
+		foreach ($menu_user as $text){
+			$this->assertTrue($this->query('link', $text)->exists());
 		}
 	}
 }
