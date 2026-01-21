@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -16,6 +16,7 @@
 #define ZABBIX_MOCK_UTIL_H
 
 #include "zbxmockdata.h"
+#include "zbxalgo.h"
 
 const char	*zbx_mock_get_parameter_string(const char *path);
 const char	*zbx_mock_get_optional_parameter_string(const char *path);
@@ -39,5 +40,8 @@ void	zbx_mock_str_to_token_type(const char *str, int *out);
 void	zbx_mock_str_to_token_search(const char *str, int *out);
 int	zbx_mock_str_to_item_type(const char *str);
 int	zbx_mock_str_to_family(const char *str);
+
+void	zbx_mock_extract_yaml_values_uint64(zbx_mock_handle_t hdata, zbx_vector_uint64_t *values);
+void	zbx_mock_extract_yaml_values_dbl(zbx_mock_handle_t hdata, zbx_vector_dbl_t *values);
 
 #endif

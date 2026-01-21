@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -133,7 +133,7 @@ class CUser extends CApiService {
 
 		// permission check
 		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
-			if (!$options['editable']) {
+			if (self::$userData['ugsetid'] != 0 && !$options['editable']) {
 				$sqlParts['from']['users_groups'] = 'users_groups ug';
 				$sqlParts['where']['uug'] = 'u.userid=ug.userid';
 				$sqlParts['where'][] = 'ug.usrgrpid IN ('.
