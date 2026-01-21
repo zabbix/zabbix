@@ -676,11 +676,6 @@ static void	um_mock_kv_path_free(void *ptr)
 	zbx_free(kvspath);
 }
 
-/* static void	um_mock_kv_path_free_wrap(void *p) */
-/* { */
-/* 	um_mock_kv_path_free((zbx_dc_kvs_path_t *)p); */
-/* } */
-
 /*********************************************************************************
  *                                                                               *
  * Purpose: destroy configuration cache                                          *

@@ -1424,14 +1424,6 @@ static int	its_updates_compare(const void *a1, const void *a2)
 	return 0;
 }
 
-/* static int	its_updates_compare_wrap(const void *a, const void *b) */
-/* { */
-/* 	const zbx_status_update_t * const	*ca = (const zbx_status_update_t * const *)a; */
-/* 	const zbx_status_update_t * const	*cb = (const zbx_status_update_t * const *)b; */
-
-/* 	return its_updates_compare(ca, cb); */
-/* } */
-
 /******************************************************************************
  *                                                                            *
  * Purpose: Writes service status changes, generated service alarms and       *

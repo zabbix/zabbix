@@ -1400,11 +1400,6 @@ static void	zbx_report_dst_free(void *ptr)
 	zbx_free(dst);
 }
 
-/* static void	zbx_report_dst_free_wrap(void *ptr) */
-/* { */
-/* 	zbx_report_dst_free((zbx_report_dst_t *)ptr); */
-/* } */
-
 /******************************************************************************
  *                                                                            *
  * Purpose: processes job by sending it to writer                             *
