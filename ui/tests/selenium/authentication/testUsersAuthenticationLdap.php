@@ -507,12 +507,15 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 		}
 
 		$this->query('button:Test')->waitUntilClickable()->one()->click();
-		$test_form_dialog = COverlayDialogElement::find(1)->waitUntilReady()->one();
 
 		// Fill login and user password in Test authentication form.
 		if (array_key_exists('test_settings', $data)) {
-			$test_form_dialog->asForm()->fill($data['test_settings'])->submit();
-			$test_form_dialog->waitUntilReady();
+			$last_dialog = COverlayDialogElement::find(1)->waitUntilReady()->one();
+			$last_dialog->asForm()->fill($data['test_settings'])->submit();
+			$last_dialog->waitUntilReady();
+		}
+		else {
+			$last_dialog = $server_form_dialog;
 		}
 
 		// Check error messages testing LDAP settings.
@@ -521,22 +524,20 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 		}
 		else
 			if (array_key_exists('inline_errors', $data)) {
-				$this->assertInlineError($test_form_dialog->asForm(), $data['inline_errors']);
+				$this->assertInlineError($last_dialog->asForm(), $data['inline_errors']);
 			}
 			if (array_key_exists('test_error', $data)) {
 				$this->assertMessage(TEST_BAD, $data['test_error'], $data['test_error_details']);
 			}
 		if (array_key_exists('check_provisioning', $data)) {
 			foreach ($data['check_provisioning'] as $id => $text) {
-				$this->assertEquals($text, $test_form_dialog->query('id:provisioning_'.$id)->waitUntilVisible()
+				$this->assertEquals($text, $last_dialog->query('id:provisioning_'.$id)->waitUntilVisible()
 						->one()->getText()
 				);
 			}
 		}
 
-		$test_form_dialog->query('button:Cancel')->waitUntilClickable()->one()->click();
-		$test_form_dialog->waitUntilNotVisible();
-		// $server_form_dialog->close();
+		COverlayDialogElement::closeAll();
 	}
 
 	/**
