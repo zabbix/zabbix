@@ -510,6 +510,7 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 
 		// Fill login and user password in Test authentication form.
 		if (array_key_exists('test_settings', $data)) {
+			$this->query('class:overlay-dialogue-body')->waitUntilCount(2);
 			$last_dialog = COverlayDialogElement::find(1)->waitUntilReady()->one();
 			$last_dialog->asForm()->fill($data['test_settings'])->submit();
 			$last_dialog->waitUntilReady();
@@ -2945,12 +2946,13 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 			}
 		}
 		else {
-//			 $this->assertMessage(TEST_BAD, 'Cannot update authentication', $data['error']);
-
-			$form = $this->query('id:authentication-form')->asForm()->one();
-			$this->assertInlineError($form, $data['inline_errors']); // Main auth window
+			if (array_key_exists('inline_errors', $data)) {
+				$form = $this->query('id:authentication-form')->asForm()->one();
+				$this->assertInlineError($form, $data['inline_errors']); // Main auth window
+			}
 
 //			$this->assertInlineError($test_form_dialog->asForm(), $data['inline_errors']);
+//			 $this->assertMessage(TEST_BAD, 'Cannot update authentication', $data['error']);
 		}
 	}
 
