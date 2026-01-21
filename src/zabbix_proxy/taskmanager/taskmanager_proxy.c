@@ -67,7 +67,7 @@ static int	tm_execute_remote_command(zbx_uint64_t taskid, int clock, int ttl, ti
 {
 	zbx_db_row_t	row;
 	zbx_uint64_t	parent_taskid, hostid, alertid;
-	int		ret = FAIL, skip_update = 0;
+	int		ret = FAIL, host_found;
 	zbx_script_t	script;
 	char		*info = NULL, error[MAX_STRING_LEN];
 	zbx_dc_host_t	host;
@@ -85,24 +85,40 @@ static int	tm_execute_remote_command(zbx_uint64_t taskid, int clock, int ttl, ti
 
 	t = zbx_time();
 
-	task = zbx_tm_task_create(0, ZBX_TM_TASK_REMOTE_COMMAND_RESULT, ZBX_TM_STATUS_NEW, (time_t)t,
-			0, 0);
+	task = zbx_tm_task_create(0, ZBX_TM_TASK_REMOTE_COMMAND_RESULT, ZBX_TM_STATUS_NEW, (time_t)t, 0, 0);
 
 	ZBX_STR2UINT64(parent_taskid, row[9]);
+	ZBX_STR2UINT64(hostid, row[10]);
+
+	host_found = zbx_dc_get_host_by_hostid(&host, hostid);
 
 	if (0 != ttl && clock + ttl < now)
 	{
-		task->data = zbx_tm_remote_command_result_create(parent_taskid, FAIL,
-				"The remote command has been expired.");
+		const char	*expired_msg = "The remote command has been expired.";
+		char		*message = NULL;
+
+		if (FAIL == host_found)
+		{
+			message = zbx_dsprintf(NULL, "%s Unknown host.", expired_msg);
+		}
+		else
+		{
+			message = zbx_strdup(NULL, expired_msg);
+		}
+
+		task->data = zbx_tm_remote_command_result_create(parent_taskid, FAIL, message);
+
+		zbx_free(message);
+
 		goto finish;
 	}
 
-	ZBX_STR2UINT64(hostid, row[10]);
-
-	if (FAIL == zbx_dc_get_host_by_hostid(&host, hostid))
+	if (FAIL == host_found)
 	{
-		skip_update = 1;
-		goto finish;
+		zbx_tm_task_free(task);
+		zbx_db_free_result(result);
+
+		return ret;
 	}
 
 	zbx_script_init(&script);
@@ -158,14 +174,6 @@ static int	tm_execute_remote_command(zbx_uint64_t taskid, int clock, int ttl, ti
 	zbx_free(info);
 finish:
 	zbx_db_free_result(result);
-
-	if (1 == skip_update)
-	{
-		if (NULL != task)
-			zbx_tm_task_free(task);
-
-		return ret;
-	}
 
 	zbx_db_begin();
 
