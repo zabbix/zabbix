@@ -29,6 +29,8 @@ class CHistory extends CApiService {
 	protected $tableAlias = 'h';
 	protected $sortColumns = ['itemid', 'clock', 'ns'];
 
+	private string $history_source = ZBX_HISTORY_SOURCE_SQL;
+
 	public function __construct() {
 		// considering the quirky nature of the history API,
 		// the parent::__construct() method should not be called.
@@ -138,7 +140,9 @@ class CHistory extends CApiService {
 
 		$this->tableName = CHistoryManager::getTableName($options['history']);
 
-		switch (CHistoryManager::getDataSourceType($options['history'])) {
+		$this->history_source = CHistoryManager::getDataSourceType($options['history']);
+
+		switch ($this->history_source) {
 			case ZBX_HISTORY_SOURCE_ELASTIC:
 				$result = $this->getFromElasticsearch($options);
 				break;
@@ -290,7 +294,8 @@ class CHistory extends CApiService {
 			$query['size'] = $options['limit'];
 		}
 
-		$endpoints = CHistoryManager::getElasticsearchEndpoints($options['history']);
+		$endpoints = CHistoryManager::getElasticsearchEndpoints([$options['history']]);
+
 		if ($endpoints) {
 			return CElasticsearchHelper::query('POST', reset($endpoints), $query);
 		}
@@ -304,7 +309,7 @@ class CHistory extends CApiService {
 	 * @see CHistory::get
 	 */
 	private function getFromClickhouse($options) {
-		$endpoints = CHistoryManager::getClickhouseEndpoints($options['history']);
+		$endpoints = CHistoryManager::getClickhouseEndpoints([$options['history']]);
 
 		if (!$endpoints) {
 			return null;
@@ -369,11 +374,13 @@ class CHistory extends CApiService {
 	}
 
 	protected function applyQuerySortField($sortfield, $sortorder, $alias, array $sqlParts) {
-		$sortfield = match ($sortfield) {
-			'clock',
-			'ns' => 'clock_ns',
-			default => $sortfield
-		};
+		if ($this->history_source === ZBX_HISTORY_SOURCE_CLICKHOUSE) {
+			$sortfield = match ($sortfield) {
+				'clock',
+				'ns' => 'clock_ns',
+				default => $sortfield
+			};
+		}
 
 		return parent::applyQuerySortField($sortfield, $sortorder, $alias, $sqlParts);
 	}

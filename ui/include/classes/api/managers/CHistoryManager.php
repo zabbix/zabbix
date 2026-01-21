@@ -550,7 +550,7 @@ class CHistoryManager {
 
 		foreach ($filters as $filter) {
 			$query['query']['bool']['must'] = $filter;
-			$endpoints = self::getElasticsearchEndpoints($item['value_type']);
+			$endpoints = self::getElasticsearchEndpoints([$item['value_type']]);
 
 			if (count($endpoints) !== 1) {
 				break;
@@ -721,7 +721,7 @@ class CHistoryManager {
 			return null;
 		}
 
-		$endpoints = CHistoryManager::getClickhouseEndpoints($item['value_type']);
+		$endpoints = CHistoryManager::getClickhouseEndpoints([$item['value_type']]);
 
 		if (!$endpoints) {
 			return null;
@@ -1891,13 +1891,15 @@ class CHistoryManager {
 	/**
 	 * Clear item history and trends by provided item IDs. History is deleted from both SQL and Elasticsearch.
 	 *
-	 * @param array $items  Key - itemid, value - value_type.
+	 * @param array $itemid_types  Key - itemid, value - value_type.
 	 *
 	 * @return bool
 	 */
-	public function deleteHistory(array $items) {
-		return $this->deleteHistoryFromSql($items) && $this->deleteHistoryFromElasticsearch(array_keys($items))
-			&& $this->deleteHistoryFromClickhouse($items);
+	public function deleteHistory(array $itemid_types) {
+		self::initSources();
+
+		return $this->deleteHistoryFromSql($itemid_types) && $this->deleteHistoryFromElasticsearch($itemid_types)
+			&& $this->deleteHistoryFromClickhouse($itemid_types);
 	}
 
 	/**
@@ -1905,30 +1907,28 @@ class CHistoryManager {
 	 *
 	 * @see CHistoryManager::deleteHistory
 	 */
-	private function deleteHistoryFromElasticsearch(array $itemids) {
-		$value_names = array_filter(
-			self::$value_type_sources, static fn(array $source) => $source['provider'] == ZBX_HISTORY_SOURCE_ELASTIC
+	private function deleteHistoryFromElasticsearch(array $itemid_types) {
+		$value_type_endpoints = self::getElasticsearchEndpoints($itemid_types, '_delete_by_query');
+
+		if (!$value_type_endpoints) {
+			return true;
+		}
+
+		$itemid_types = array_filter($itemid_types,
+			static fn(int $value_type) => array_key_exists($value_type, $value_type_endpoints)
 		);
 
-		if ($value_names) {
-			$query = [
-				'query' => [
-					'terms' => [
-						'itemid' => array_values($itemids)
-					]
+		$query = [
+			'query' => [
+				'terms' => [
+					'itemid' => array_keys($itemid_types)
 				]
-			];
+			]
+		];
 
-			$types = [];
-
-			foreach ($value_names as $name => $foo) {
-				$types[] = self::getTypeIdByTypeName($name);
-			}
-
-			foreach (self::getElasticsearchEndpoints($types, '_delete_by_query') as $endpoint) {
-				if (!CElasticsearchHelper::query('POST', $endpoint, $query)) {
-					return false;
-				}
+		foreach ($value_type_endpoints as $endpoint) {
+			if (!CElasticsearchHelper::query('POST', $endpoint, $query)) {
+				return false;
 			}
 		}
 
@@ -1940,18 +1940,18 @@ class CHistoryManager {
 	 *
 	 * @see CHistoryManager::deleteHistory
 	 */
-	private function deleteHistoryFromSql(array $items) {
+	private function deleteHistoryFromSql(array $itemid_types) {
 		global $DB;
 
-		$item_tables = array_map([self::class, 'getTableName'], array_unique($items));
+		$item_tables = array_map([self::class, 'getTableName'], array_unique($itemid_types));
 		$table_names = array_flip(self::getTableName());
 
-		if (in_array(ITEM_VALUE_TYPE_UINT64, $items)) {
+		if (in_array(ITEM_VALUE_TYPE_UINT64, $itemid_types)) {
 			$item_tables[] = 'trends_uint';
 			$table_names['trends_uint'] = ITEM_VALUE_TYPE_UINT64;
 		}
 
-		if (in_array(ITEM_VALUE_TYPE_FLOAT, $items)) {
+		if (in_array(ITEM_VALUE_TYPE_FLOAT, $itemid_types)) {
 			$item_tables[] = 'trends';
 			$table_names['trends'] = ITEM_VALUE_TYPE_FLOAT;
 		}
@@ -1963,7 +1963,7 @@ class CHistoryManager {
 		}
 
 		foreach ($item_tables as $table_name) {
-			$itemids = array_keys(array_intersect($items, [(string) $table_names[$table_name]]));
+			$itemids = array_keys(array_intersect($itemid_types, [(string) $table_names[$table_name]]));
 
 			if (!DBexecute('DELETE FROM '.$table_name.' WHERE '.dbConditionInt('itemid', $itemids))) {
 				return false;
@@ -1978,15 +1978,18 @@ class CHistoryManager {
 	 *
 	 * @see CHistoryManager::deleteHistory
 	 */
-	private function deleteHistoryFromClickhouse(array $items): bool {
-		$value_type_endpoints = CHistoryManager::getClickhouseEndpoints($items);
+	private function deleteHistoryFromClickhouse(array $itemid_types): bool {
+		$value_type_endpoints = self::getClickhouseEndpoints($itemid_types);
+
+		if ($value_type_endpoints) {
+			$itemid_types = array_filter($itemid_types,
+				static fn(int $value_type) => array_key_exists($value_type, $value_type_endpoints)
+			);
+		}
 
 		foreach ($value_type_endpoints as $value_type => $endpoint) {
-			$table_name = self::getTableName($value_type);
-
-			$itemids = array_keys(array_intersect($items, [$value_type]));
-
-			$query = 'DELETE FROM '.$table_name.' h WHERE '.dbConditionId('h.itemid', $itemids);
+			$query = 'DELETE FROM '.self::getTableName($value_type).' h'.
+				' WHERE '.dbConditionId('h.itemid', array_keys($itemid_types));
 
 			$result = CClickhouseHelper::execute($query,
 				$endpoint['endpoint'], $endpoint['username'], $endpoint['password']
@@ -2097,15 +2100,11 @@ class CHistoryManager {
 	/**
 	 * Get endpoints for Elasticsearch requests.
 	 *
-	 * @param mixed $value_types  Value type(s).
+	 * @param array $value_types  Value type(s).
 	 *
 	 * @return array  Elasticsearch query endpoints.
 	 */
-	public static function getElasticsearchEndpoints($value_types, $action = '_search'): array {
-		if (!is_array($value_types)) {
-			$value_types = [$value_types];
-		}
-
+	public static function getElasticsearchEndpoints(array $value_types, $action = '_search'): array {
 		$indices = [];
 		$endpoints = [];
 
@@ -2124,11 +2123,7 @@ class CHistoryManager {
 		return $endpoints;
 	}
 
-	public static function getClickhouseEndpoints($value_types): array {
-		if (!is_array($value_types)) {
-			$value_types = [$value_types];
-		}
-
+	public static function getClickhouseEndpoints(array $value_types): array {
 		$endpoints = [];
 
 		foreach (array_unique($value_types) as $type) {
