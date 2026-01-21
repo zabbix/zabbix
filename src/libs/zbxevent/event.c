@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -300,7 +300,7 @@ void	zbx_event_get_macro_value(const char *macro, const zbx_db_event *event, cha
 	}
 	else if (EVENT_SOURCE_TRIGGERS == event->source)
 	{
-		if (0 == strcmp(macro, MVAR_EVENT_ACK_HISTORY) || 0 == strcmp(macro, MVAR_EVENT_UPDATE_HISTORY))
+		if (0 == strcmp(macro, MVAR_EVENT_UPDATE_HISTORY))
 		{
 			zbx_event_db_get_history(event, replace_to, recipient_userid, tz);
 		}

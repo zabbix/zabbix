@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -23,6 +23,7 @@ use CController,
 	CWidgetsData;
 
 use Widgets\TopItems\Includes\CWidgetFieldColumnsList;
+use Widgets\TopItems\Widget;
 use Zabbix\Widgets\CWidgetField;
 
 use Zabbix\Widgets\Fields\{
@@ -40,24 +41,27 @@ class ColumnEdit extends CController {
 	protected function checkInput(): bool {
 		// Validation is done by CWidgetFieldColumnsList
 		$fields = [
-			'items' =>					'array',
-			'item_tags_evaltype' =>		'int32',
-			'item_tags' =>				'array',
-			'base_color' =>				'string',
-			'display_value_as' =>		'int32',
-			'display' =>				'int32',
-			'sparkline' =>				'array',
-			'min' =>					'string',
-			'max' =>					'string',
-			'thresholds' =>				'array',
-			'highlights' =>				'array',
-			'decimal_places' =>			'string',
-			'aggregate_function' =>		'int32',
-			'time_period' =>			'array',
-			'history' =>				'int32',
-			'edit' =>					'in 1',
-			'update' =>					'in 1',
-			'templateid' =>				'string'
+			'items' =>						'array',
+			'item_tags_evaltype' =>			'int32',
+			'item_tags' =>					'array',
+			'base_color' =>					'string',
+			'display_value_as' =>			'int32',
+			'display' =>					'int32',
+			'sparkline' =>					'array',
+			'min' =>						'string',
+			'max' =>						'string',
+			'thresholds' =>					'array',
+			'highlights' =>					'array',
+			'decimal_places' =>				'string',
+			'aggregate_function' =>			'int32',
+			'time_period' =>				'array',
+			'history' =>					'int32',
+			'aggregate_columns' =>			'int32',
+			'column_aggregate_function' =>	'int32',
+			'combined_column_name' =>		'string',
+			'edit' =>						'in 1',
+			'update' =>						'in 1',
+			'templateid' =>					'string'
 		];
 
 		$ret = $this->validateInput($fields) && $this->validateFields();
@@ -206,7 +210,10 @@ class ColumnEdit extends CController {
 						CWidgetField::REFERENCE_DASHBOARD, CWidgetsData::DATA_TYPE_TIME_PERIOD
 					)
 				],
-				'history' => CWidgetFieldColumnsList::HISTORY_DATA_AUTO
+				'history' => CWidgetFieldColumnsList::HISTORY_DATA_AUTO,
+				'aggregate_columns' => 0,
+				'column_aggregate_function' => AGGREGATE_SUM,
+				'combined_column_name' => ''
 			];
 		}
 

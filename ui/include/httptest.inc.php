@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -104,18 +104,8 @@ function deleteHistoryByHttpTestIds(array $httptestids): bool {
 	return DBend($result);
 }
 
-function get_httptest_by_httptestid($httptestid) {
-	return DBfetch(DBselect('SELECT ht.* FROM httptest ht WHERE ht.httptestid='.zbx_dbstr($httptestid)));
-}
-
 function get_httpstep_by_no($httptestid, $no) {
 	return DBfetch(DBselect('SELECT hs.* FROM httpstep hs WHERE hs.httptestid='.zbx_dbstr($httptestid).' AND hs.no='.zbx_dbstr($no)));
-}
-
-function get_httptests_by_hostid($hostids) {
-	zbx_value2array($hostids);
-
-	return DBselect('SELECT DISTINCT ht.* FROM httptest ht WHERE '.dbConditionInt('ht.hostid', $hostids));
 }
 
 /**

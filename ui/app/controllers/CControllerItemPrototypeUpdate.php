@@ -1,6 +1,6 @@
 <?php declare(strict_types=0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -129,10 +129,15 @@ class CControllerItemPrototypeUpdate extends CControllerItemPrototype {
 			'browser_script' => ['db items.params', 'required', 'not_empty', 'when' => ['type', 'in' => [ITEM_TYPE_BROWSER]]],
 			'request_method' => ['db items.request_method', 'required', 'in' => [HTTPCHECK_REQUEST_GET, HTTPCHECK_REQUEST_POST, HTTPCHECK_REQUEST_PUT, HTTPCHECK_REQUEST_HEAD], 'when' => ['type', 'in' => [ITEM_TYPE_HTTPAGENT]]],
 			'post_type' => ['db items.request_method', 'required', 'in' => [ZBX_POSTTYPE_RAW, ZBX_POSTTYPE_JSON, ZBX_POSTTYPE_XML], 'when' => ['type', 'in' => [ITEM_TYPE_HTTPAGENT]]],
-			'posts' => ['db items.posts', 'required', 'not_empty', 'when' => [
-				['post_type', 'in' => [ZBX_POSTTYPE_JSON, ZBX_POSTTYPE_XML]],
-				['type', 'in' => [ITEM_TYPE_HTTPAGENT]]
-			]],
+			'posts' => [
+				['db items.posts'],
+				['db items.posts', 'required', 'not_empty',
+					'when' => [
+						['post_type', 'in' => [ZBX_POSTTYPE_JSON, ZBX_POSTTYPE_XML]],
+						['type', 'in' => [ITEM_TYPE_HTTPAGENT]]
+					]
+				]
+			],
 			'headers' => ['objects',
 				'fields' => [
 					'name' => ['string', 'required', 'not_empty', 'length' => 255],
@@ -282,7 +287,7 @@ class CControllerItemPrototypeUpdate extends CControllerItemPrototype {
 				'when' => ['type', 'in' => [ITEM_TYPE_HTTPAGENT]]
 			],
 			'trapper_hosts' => ['db items.trapper_hosts',
-				'use' => [CIPRangeParser::class, ['v6' => ZBX_HAVE_IPV6, 'dns' => true, 'usermacros' => true, 'macros' => ['{HOST.HOST}', '{HOSTNAME}', '{HOST.NAME}', '{HOST.CONN}', '{HOST.IP}', '{IPADDRESS}', '{HOST.DNS}']]],
+				'use' => [CIPRangeParser::class, ['v6' => ZBX_HAVE_IPV6, 'dns' => true, 'usermacros' => true, 'macros' => ['{HOST.HOST}', '{HOST.NAME}', '{HOST.CONN}', '{HOST.IP}', '{HOST.DNS}']]],
 				'when' => ['allow_traps', 'in' => [HTTPCHECK_ALLOW_TRAPS_ON]]
 			],
 			'description' => ['db items.description'],
@@ -291,7 +296,10 @@ class CControllerItemPrototypeUpdate extends CControllerItemPrototype {
 				'messages' => ['uniq' => _('Tag name and value combination is not unique.')],
 				'fields' => [
 					'value' => ['db item_tag.value'],
-					'tag' => ['db item_tag.tag', 'required', 'not_empty', 'when' => ['value', 'not_empty']]
+					'tag' => [
+						['db item_tag.tag'],
+						['db item_tag.tag', 'required', 'not_empty', 'when' => ['value', 'not_empty']]
+					]
 				]
 			],
 			'discover' => ['db items.discover', 'in' => [ZBX_PROTOTYPE_DISCOVER, ZBX_PROTOTYPE_NO_DISCOVER]],
