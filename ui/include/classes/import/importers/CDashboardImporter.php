@@ -20,7 +20,7 @@
 class CDashboardImporter extends CDashboardImporterGeneral {
 
 	/**
-	 * Import global dashboard.
+	 * Import global dashboards.
 	 *
 	 * @param array $dashboards
 	 */
@@ -29,52 +29,48 @@ class CDashboardImporter extends CDashboardImporterGeneral {
 		$dashboards_to_update = [];
 
 		foreach ($dashboards as $name => $dashboard) {
-			foreach ($dashboard['pages'] as &$dashboard_page) {
-				$dashboard_page['widgets'] = $this->resolveWidgetReferences($dashboard_page['widgets'], $name, true);
-			}
-			unset($dashboard_page);
-
 			$dashboardid = $this->referencer->findDashboardidByName($dashboard['name']);
 
-			if ($dashboardid !== null) {
+			if ($dashboardid !== null && $this->options['dashboards']['updateExisting']) {
 				$dashboard['dashboardid'] = $dashboardid;
 
-				if (array_key_exists('pages', $dashboard)) {
-					foreach ($dashboard['pages'] as $index => &$dashboard_page) {
-						$dashboard_pageid = $this->referencer->findDashboardPageidByIndex($dashboardid, $index);
+				foreach ($dashboard['pages'] as $index => &$dashboard_page) {
+					// Missing referred objects will be registered while resolving widget references.
+					$dashboard_page['widgets'] = $this->resolveWidgetReferences($dashboard_page['widgets'], $name,
+						true
+					);
 
-						if ($dashboard_pageid !== null) {
-							$dashboard_page['dashboard_pageid'] = $dashboard_pageid;
+					$dashboard_pageid = $this->referencer->findDashboardPageidByIndex($dashboardid, $index);
 
-							if (array_key_exists('widgets', $dashboard_page)) {
-								foreach ($dashboard_page['widgets'] as &$widget) {
-									$widgetid = $this->referencer->findWidgetidByPosition($dashboard_pageid,
-										(int) $widget['x'], (int) $widget['y']
-									);
+					if ($dashboard_pageid !== null) {
+						$dashboard_page['dashboard_pageid'] = $dashboard_pageid;
 
-									if ($widgetid !== null) {
-										$widget['widgetid'] = $widgetid;
-									}
-								}
-								unset($widget);
+						foreach ($dashboard_page['widgets'] as &$widget) {
+							$widgetid = $this->referencer->findWidgetidByPosition($dashboard_pageid,
+								(int) $widget['x'], (int) $widget['y']
+							);
+
+							if ($widgetid !== null) {
+								$widget['widgetid'] = $widgetid;
 							}
 						}
+						unset($widget);
 					}
-					unset($dashboard_page);
 				}
+				unset($dashboard_page);
 
 				$dashboards_to_update[] = $dashboard;
 			}
-			else {
+			elseif ($dashboardid === null && $this->options['dashboards']['createMissing']) {
 				$dashboards_to_create[] = $dashboard;
 			}
 		}
 
-		if ($this->options['dashboards']['updateExisting'] && $dashboards_to_update) {
+		if ($dashboards_to_update) {
 			API::Dashboard()->update($dashboards_to_update);
 		}
 
-		if ($this->options['dashboards']['createMissing'] && $dashboards_to_create) {
+		if ($dashboards_to_create) {
 			API::Dashboard()->create($dashboards_to_create);
 		}
 	}
@@ -88,8 +84,16 @@ class CDashboardImporter extends CDashboardImporterGeneral {
 	 */
 	public function collectMissingObjects(array $dashboards): static {
 		foreach ($dashboards as $name => $dashboard) {
-			foreach ($dashboard['pages'] as $dashboard_page) {
-				$this->resolveWidgetReferences($dashboard_page['widgets'], $name, true);
+			$dashboardid = $this->referencer->findDashboardidByName($dashboard['name']);
+
+			if ($dashboardid !== null && $this->options['dashboards']['updateExisting']
+					|| $dashboardid === null && $this->options['dashboards']['createMissing']) {
+				foreach ($dashboard['pages'] as &$dashboard_page) {
+					// Missing referred objects will be registered while resolving widget references.
+					$dashboard_page['widgets'] = $this->resolveWidgetReferences($dashboard_page['widgets'], $name,
+						true
+					);
+				}
 			}
 		}
 
