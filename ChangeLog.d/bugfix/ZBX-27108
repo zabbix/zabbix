@@ -1,1 +1,1 @@
-..F....... [ZBX-27108] disabled the reloading the whole graphs page on time selector change (msnihach)
+..F....... [ZBX-27108] fixed an issue where the graph time selector caused a full page refresh and lost the current pagination (msnihach)
