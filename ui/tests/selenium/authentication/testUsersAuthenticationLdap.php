@@ -322,8 +322,7 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 					],
 					'test_error' => 'Login failed',
 					'test_error_details' => [
-						'Cannot bind anonymously to LDAP server.'
-//						'Incorrect user name or password or account is temporarily blocked.'
+						'Incorrect user name or password or account is temporarily blocked.'
 					]
 				]
 			],
@@ -508,7 +507,7 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 		}
 
 		$this->query('button:Test')->waitUntilClickable()->one()->click();
-		$test_form_dialog = COverlayDialogElement::find()->waitUntilReady()->all()->last();
+		$test_form_dialog = COverlayDialogElement::find(1)->waitUntilReady()->one();
 
 		// Fill login and user password in Test authentication form.
 		if (array_key_exists('test_settings', $data)) {
