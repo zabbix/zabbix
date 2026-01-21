@@ -1,0 +1,1 @@
+.......PS. [ZBX-26712] fixed errors that occurred when polling snmp agent items for walk on BITS values (mkorotkov)
