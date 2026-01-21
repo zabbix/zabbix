@@ -62,19 +62,19 @@ class ZTextareaFlexible extends HTMLElement {
 
 		this.#applyAttributes();
 		this.#syncAria();
-		this.#registerEvents();
+		this.#addEventListeners();
 
 		this.#resize_observer = new ResizeObserver(() => this.#updateHeight());
 		this.#resize_observer.observe(this);
 
-		requestAnimationFrame(() => this.#updateHeight());
+		this.#updateHeight();
 	}
 
 	disconnectedCallback() {
 		this.#resize_observer?.disconnect();
 		this.#resize_observer = null;
 
-		this.#unregisterEvents();
+		this.#removeEventListeners();
 	}
 
 	attributeChangedCallback(name, old_value, new_value) {
@@ -129,7 +129,7 @@ class ZTextareaFlexible extends HTMLElement {
 
 			case 'value':
 				const normalized = this.#singleline
-					? (value ?? '').replace(/[\r\n\t]+/g, ' ')
+					? (value ?? '').replace(/[\r\n]+/g, ' ')
 					: value ?? '';
 
 				this.#textarea.value = normalized;
@@ -154,18 +154,18 @@ class ZTextareaFlexible extends HTMLElement {
 		this.#textarea.style.height = `${this.#textarea.scrollHeight}px`;
 	}
 
-	#registerEvents() {
+	#addEventListeners() {
 		this.#textarea.addEventListener('input', this.#inputHandler);
 		this.#textarea.addEventListener('keydown', this.#keydownHandler);
-		this.#textarea.addEventListener('blur', this.#reemit);
-		this.#textarea.addEventListener('focus', this.#reemit);
+		this.#textarea.addEventListener('blur', this.#reemitFocus);
+		this.#textarea.addEventListener('focus', this.#reemitFocus);
 	}
 
-	#unregisterEvents() {
+	#removeEventListeners() {
 		this.#textarea.removeEventListener('input', this.#inputHandler);
 		this.#textarea.removeEventListener('keydown', this.#keydownHandler);
-		this.#textarea.removeEventListener('blur', this.#reemit);
-		this.#textarea.removeEventListener('focus', this.#reemit);
+		this.#textarea.removeEventListener('blur', this.#reemitFocus);
+		this.#textarea.removeEventListener('focus', this.#reemitFocus);
 	}
 
 	#inputHandler = (e) => {
@@ -179,8 +179,8 @@ class ZTextareaFlexible extends HTMLElement {
 		}
 	}
 
-	#reemit = (e) => {
-		this.dispatchEvent(new Event(e.type, { bubbles: true }));
+	#reemitFocus = (e) => {
+		this.dispatchEvent(new FocusEvent(e.type));
 	}
 
 	get autofocus() {
