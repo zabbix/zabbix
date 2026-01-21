@@ -958,7 +958,7 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 				ZBX_CONF_PARM_OPT,	0,			1024},
 		{"ExternalScripts",		&config_externalscripts,		ZBX_CFG_TYPE_STRING,
 				ZBX_CONF_PARM_OPT,	0,			0},
-		{"DBHost",			&(zbx_db_config->dbhost),	ZBX_CFG_TYPE_STRING,
+		{"DBHost",			&(zbx_db_config->dbhost),	ZBX_CFG_TYPE_STRING_LIST,
 				ZBX_CONF_PARM_OPT,	0,			0},
 		{"DBName",			&(zbx_db_config->dbname),	ZBX_CFG_TYPE_STRING,
 				ZBX_CONF_PARM_MAND,	0,			0},
