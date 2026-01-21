@@ -1038,6 +1038,25 @@ static int	housekeep_events_by_triggerid(zbx_uint64_t triggerid, int config_max_
 	return deleted;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: find housekeeping cleanup table by name                           *
+ *                                                                            *
+ * Parameters: name - [IN] table name                                         *
+ *                                                                            *
+ * Return value: pointer to cleanup table or NULL if not found                *
+ *                                                                            *
+ ******************************************************************************/
+static zbx_hk_cleanup_table_t	*housekeeping_get_table_by_name(const char *name)
+{
+	for (zbx_hk_cleanup_table_t *table = hk_cleanup_tables; NULL != table->name; table++)
+	{
+		if (0 == strcmp(table->name, name))
+			return table;
+	}
+
+	return NULL;
+}
 
 /******************************************************************************
  *                                                                            *
@@ -1071,9 +1090,6 @@ static int	housekeeping_cleanup(int config_max_hk_delete)
 	/* assemble list of tables included in the housekeeping procedure */
 	for (zbx_hk_cleanup_table_t *table = hk_cleanup_tables; NULL != table->name; table++)
 	{
-		if (ZBX_HK_MODE_REGULAR != *table->poption_mode)
-			continue;
-
 		char	*table_name_esc = zbx_db_dyn_escape_string(table->name);
 
 		zbx_chrcpy_alloc(&sql, &sql_alloc, &sql_offset, '\'');
@@ -1095,11 +1111,19 @@ static int	housekeeping_cleanup(int config_max_hk_delete)
 
 	while (NULL != (row = zbx_db_fetch(result)))
 	{
-		int		more = 0;
-		zbx_uint64_t	housekeeperid, objectid;
+		int			more = 0;
+		zbx_uint64_t		housekeeperid, objectid;
+		zbx_hk_cleanup_table_t	*table;
 
 		ZBX_STR2UINT64(housekeeperid, row[0]);
 		ZBX_STR2UINT64(objectid, row[3]);
+
+		if (NULL != (table = housekeeping_get_table_by_name(row[1])) &&
+				ZBX_HK_MODE_REGULAR != *table->poption_mode)
+		{
+			zbx_vector_uint64_append(&housekeeperids, housekeeperid);
+			continue;
+		}
 
 		if (0 == strcmp(row[1], "events")) /* events name is used for backwards compatibility with frontend */
 		{
@@ -1127,7 +1151,9 @@ static int	housekeeping_cleanup(int config_max_hk_delete)
 			}
 		}
 		else
+		{
 			deleted += hk_table_cleanup(row[1], row[2], objectid, config_max_hk_delete, &more);
+		}
 
 		if (0 == more)
 			zbx_vector_uint64_append(&housekeeperids, housekeeperid);
