@@ -369,9 +369,8 @@ static void	queue_stats_export(zbx_hashset_t *queue_stats, const char *id_name, 
 /* queue item comparison function used to sort queue by nextcheck */
 static int	queue_compare_by_nextcheck_asc(const void *a1, const void *a2)
 {
-	const zbx_queue_item_t * const	*d1 = (const zbx_queue_item_t * const *)a1;
-	const zbx_queue_item_t * const	*d2 = (const zbx_queue_item_t * const *)a2;
-	zbx_queue_item_t		*i1 = *d1, *i2 = *d2;
+	const zbx_queue_item_t	*i1 = *(const zbx_queue_item_t * const *)a1;
+	const zbx_queue_item_t	*i2 = *(const zbx_queue_item_t * const *)a2;
 
 	return i1->nextcheck - i2->nextcheck;
 }
