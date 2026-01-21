@@ -156,7 +156,7 @@ if ($data['history_providers']) {
 		foreach ($types as $type => $ttl) {
 			$house_keeper_tab
 				->addRow(
-					new CLabel(_('Data storage period').': '.$type),
+					new CLabel(_('Data storage period').' ('.$type.')'),
 					$ttl
 				);
 		}
