@@ -95,21 +95,16 @@ static int	tm_execute_remote_command(zbx_uint64_t taskid, int clock, int ttl, ti
 
 	if (0 != ttl && clock + ttl < now)
 	{
-		const char	*expired_msg = "The remote command has been expired.";
-		char		*message = NULL;
-
 		if (FAIL == host_found)
 		{
-			message = zbx_dsprintf(NULL, "%s Unknown host.", expired_msg);
+			task->data = zbx_tm_remote_command_result_create(parent_taskid, FAIL,
+					"The remote command has been expired. Unknown host.");
 		}
 		else
 		{
-			message = zbx_strdup(NULL, expired_msg);
+			task->data = zbx_tm_remote_command_result_create(parent_taskid, FAIL,
+					"The remote command has been expired.");
 		}
-
-		task->data = zbx_tm_remote_command_result_create(parent_taskid, FAIL, message);
-
-		zbx_free(message);
 
 		goto finish;
 	}
