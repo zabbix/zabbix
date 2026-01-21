@@ -43,7 +43,6 @@ function Overlay({
 	this._position = position;
 	this._position_fix = position_fix;
 	this.element = trigger_element;
-	this.has_custom_cancel = false;
 
 	this.headerid = `overlay-dialogue-header-title-${this.dialogueid}`;
 
@@ -131,14 +130,7 @@ Overlay.prototype._initListeners = function() {
 		close_button_click: e => {
 			e.preventDefault();
 
-			if (this.has_custom_cancel) {
-				this.$dialogue[0].dispatchEvent(new CustomEvent('dialogue.cancel', {detail: {
-					dialogueid: this.dialogueid
-				}}));
-			}
-			else {
-				overlayDialogueDestroy(this.dialogueid, this.CLOSE_BY_USER);
-			}
+			overlayDialogueDestroy(this.dialogueid, this.CLOSE_BY_USER);
 		},
 		form_submit: e => {
 			e.preventDefault();
@@ -567,14 +559,7 @@ Overlay.prototype.makeButton = function(obj) {
 			this._block_cancel_action = true;
 
 			if (!obj.keepOpen) {
-				if (this.has_custom_cancel) {
-					this.$dialogue[0].dispatchEvent(new CustomEvent('dialogue.cancel', {detail: {
-						dialogueid: this.dialogueid
-					}}));
-				}
-				else {
-					overlayDialogueDestroy(this.dialogueid, this.CLOSE_BY_USER);
-				}
+				overlayDialogueDestroy(this.dialogueid, this.CLOSE_BY_USER);
 			}
 		}
 

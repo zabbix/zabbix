@@ -258,7 +258,15 @@ window.host_wizard_edit = new class {
 			}
 		});
 
-		this.#dialogue.addEventListener('dialogue.cancel', () => {
+		this.#dialogue.addEventListener('dialogue.close', e => {
+			const { close_by } = e.detail;
+
+			if (close_by === Overlay.prototype.CLOSE_BY_USER) {
+				return;
+			}
+
+			e.preventDefault();
+
 			if (this.#getCurrentStep() === this.STEP_COMPLETE) {
 				overlayDialogueDestroy(this.#overlay.dialogueid);
 
@@ -1214,7 +1222,6 @@ window.host_wizard_edit = new class {
 
 				if ((step_init || path === 'selected_template') && this.#getSelectedTemplate()) {
 					this.#updateProgress();
-					this.#overlay.has_custom_cancel = true;
 				}
 
 				if (path === 'show_info_by_template') {
