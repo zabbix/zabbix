@@ -827,7 +827,16 @@ class CHost extends CHostGeneral {
 		$inventories = zbx_toHash($inventories, 'hostid');
 
 		foreach ($hosts as $host) {
-			$host = array_diff_key($host, array_flip(['templates', 'templates_clear', 'groups', 'tags', 'macros']));
+			$hostid = $host['hostid'];
+			$host = array_diff_key($host,
+				array_flip(['hostid', 'templates', 'templates_clear', 'groups', 'tags', 'macros'])
+			);
+
+			if (!$host) {
+				continue;
+			}
+
+			$host = ['hostid' => $hostid] + $host;
 
 			// Extend host inventory with the required data.
 			if (array_key_exists('inventory', $host) && $host['inventory']) {
@@ -856,13 +865,7 @@ class CHost extends CHostGeneral {
 				];
 			}
 
-			$data = array_diff_key($host, array_flip(['hostid']));
-			$data['hosts'] = [['hostid' => $host['hostid']]];
-			$result = $this->massUpdate($data, $db_hosts);
-
-			if (!$result) {
-				self::exception(ZBX_API_ERROR_INTERNAL, _('Host update failed.'));
-			}
+			$this->updateByData($host, [$hostid => $db_hosts[$hostid]]);
 		}
 
 		$this->updateGroups($hosts, $db_hosts);
@@ -932,7 +935,7 @@ class CHost extends CHostGeneral {
 		}
 
 		$db_hosts = $this->get([
-			'output' => ['hostid', 'host', 'status', 'flags'],
+			'output' => ['hostid', 'host', 'flags'],
 			'hostids' => array_column($data['hosts'], 'hostid'),
 			'editable' => true,
 			'preservekeys' => true
@@ -986,21 +989,8 @@ class CHost extends CHostGeneral {
 		}
 	}
 
-	private function massUpdate($data, array $db_hosts): array {
-		$hostids = array_column($data['hosts'], 'hostid');
-
-		sort($hostids);
-
-		// Check inventory mode value.
-		if (array_key_exists('inventory_mode', $data)) {
-			$valid_inventory_modes = [HOST_INVENTORY_DISABLED, HOST_INVENTORY_MANUAL, HOST_INVENTORY_AUTOMATIC];
-			$inventory_mode = new CLimitedSetValidator([
-				'values' => $valid_inventory_modes,
-				'messageInvalid' => _s('Incorrect value for field "%1$s": %2$s.', 'inventory_mode',
-					_s('value must be one of %1$s', implode(', ', $valid_inventory_modes)))
-			]);
-			$this->checkValidator($data['inventory_mode'], $inventory_mode);
-		}
+	private function updateByData(array $data, array $db_hosts): void {
+		$hostids = [$data['hostid']];
 
 		if (array_key_exists('monitored_by', $data)) {
 			if ($data['monitored_by'] != ZBX_MONITORED_BY_PROXY) {
@@ -1027,68 +1017,11 @@ class CHost extends CHostGeneral {
 			}
 		}
 
-		// Property 'auto_compress' is not supported for hosts.
-		if (array_key_exists('auto_compress', $data)) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect input parameters.'));
-		}
-
-		/*
-		 * Update hosts properties
-		 */
-		if (isset($data['name'])) {
-			if (count($data['hosts']) > 1) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot mass update visible host name.'));
-			}
-		}
-
-		if (array_key_exists('host', $data)) {
-			$host_name_parser = new CHostNameParser();
-
-			if ($host_name_parser->parse($data['host']) != CParser::PARSE_SUCCESS) {
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Incorrect characters used for host name "%1$s".', $data['host'])
-				);
-			}
-
-			if (count($data['hosts']) > 1) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot mass update host name.'));
-			}
-
-			$curHost = reset($data['hosts']);
-
-			$sameHostnameHost = $this->get([
-				'output' => ['hostid'],
-				'filter' => ['host' => $data['host']],
-				'nopermissions' => true,
-				'limit' => 1
-			]);
-			$sameHostnameHost = reset($sameHostnameHost);
-			if ($sameHostnameHost && (bccomp($sameHostnameHost['hostid'], $curHost['hostid']) != 0)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Host "%1$s" already exists.', $data['host']));
-			}
-
-			// can't add host with the same name as existing template
-			$sameHostnameTemplate = API::Template()->get([
-				'output' => ['templateid'],
-				'filter' => ['host' => $data['host']],
-				'nopermissions' => true,
-				'limit' => 1
-			]);
-			if ($sameHostnameTemplate) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Template "%1$s" already exists.', $data['host']));
-			}
-		}
-
 		if (isset($data['interfaces'])) {
 			$updateInterfaces = $data['interfaces'];
 		}
 
-		// second check is necessary, because import incorrectly inputs unset 'inventory' as empty string rather than null
 		if (isset($data['inventory']) && $data['inventory']) {
-			if (isset($data['inventory_mode']) && $data['inventory_mode'] == HOST_INVENTORY_DISABLED) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot set inventory fields for disabled inventory.'));
-			}
-
 			$updateInventory = $data['inventory'];
 			$updateInventory['inventory_mode'] = null;
 		}
@@ -1100,8 +1033,7 @@ class CHost extends CHostGeneral {
 			$updateInventory['inventory_mode'] = $data['inventory_mode'];
 		}
 
-		unset($data['hosts'], $data['groups'], $data['interfaces'], $data['templates_clear'], $data['templates'],
-			$data['macros'], $data['inventory'], $data['inventory_mode']);
+		unset($data['hostid'], $data['interfaces'], $data['inventory'], $data['inventory_mode']);
 
 		if ($data) {
 			DB::update('hosts', [
@@ -1236,8 +1168,6 @@ class CHost extends CHostGeneral {
 		}
 
 		$this->addAuditBulk(CAudit::ACTION_UPDATE, CAudit::RESOURCE_HOST, $new_hosts, $db_hosts);
-
-		return ['hostids' => $hostids];
 	}
 
 	/**
@@ -1283,7 +1213,7 @@ class CHost extends CHostGeneral {
 		}
 
 		$db_hosts = $this->get([
-			'output' => ['hostid', 'host', 'status', 'flags'],
+			'output' => ['hostid', 'host', 'flags'],
 			'hostids' => $data['hostids'],
 			'editable' => true,
 			'preservekeys' => true
@@ -1907,12 +1837,10 @@ class CHost extends CHostGeneral {
 	/**
 	 * @param array       $hosts
 	 * @param array|null  $db_hosts
-	 * @param string|null $path
 	 *
 	 * @throws APIException
 	 */
-	private static function checkProxiesAndProxyGroups(array $hosts, ?array $db_hosts = null,
-			?string $path = null): void {
+	private static function checkProxiesAndProxyGroups(array $hosts, ?array $db_hosts = null): void {
 		$host_indexes = [
 			'proxyids' => [],
 			'proxy_groupids' => []
@@ -1923,14 +1851,14 @@ class CHost extends CHostGeneral {
 				continue;
 			}
 
+			$path = '/'.($i + 1);
+
 			if ($host['monitored_by'] == ZBX_MONITORED_BY_PROXY) {
 				if (!array_key_exists('proxyid', $host)) {
 					continue;
 				}
 
 				if ($host['proxyid'] == 0) {
-					$path = $path === null ? '/'.($i + 1) : '';
-
 					self::exception(ZBX_API_ERROR_PERMISSIONS, _s('Invalid parameter "%1$s": %2$s.',
 						$path.'/proxyid', _('object does not exist, or you have no permissions to it')
 					));
@@ -1947,8 +1875,6 @@ class CHost extends CHostGeneral {
 				}
 
 				if ($host['proxy_groupid'] == 0) {
-					$path = $path === null ? '/'.($i + 1) : '';
-
 					self::exception(ZBX_API_ERROR_PERMISSIONS, _s('Invalid parameter "%1$s": %2$s.',
 						$path.'/proxy_groupid', _('object does not exist, or you have no permissions to it')
 					));
@@ -1970,8 +1896,6 @@ class CHost extends CHostGeneral {
 
 			foreach ($host_indexes['proxyids'] as $proxyid => $i) {
 				if (!array_key_exists($proxyid, $db_proxies)) {
-					$path = $path === null ? '/'.($i + 1) : '';
-
 					self::exception(ZBX_API_ERROR_PERMISSIONS, _s('Invalid parameter "%1$s": %2$s.',
 						$path.'/proxyid', _('object does not exist, or you have no permissions to it')
 					));
@@ -1988,8 +1912,6 @@ class CHost extends CHostGeneral {
 
 			foreach ($host_indexes['proxy_groupids'] as $proxy_groupid => $i) {
 				if (!array_key_exists($proxy_groupid, $db_proxy_groups)) {
-					$path = $path === null ? '/'.($i + 1) : '';
-
 					self::exception(ZBX_API_ERROR_PERMISSIONS, _s('Invalid parameter "%1$s": %2$s.',
 						$path.'/proxy_groupid', _('object does not exist, or you have no permissions to it')
 					));
@@ -2061,13 +1983,12 @@ class CHost extends CHostGeneral {
 		self::checkProxiesAndProxyGroups($hosts, $db_hosts);
 		self::checkTlsPskPairs($hosts, $db_hosts);
 
-		foreach ($hosts as &$host) {
+		foreach ($hosts as $host) {
 			// Property 'auto_compress' is not supported for hosts.
 			if (array_key_exists('auto_compress', $host)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect input parameters.'));
 			}
 		}
-		unset($host);
 
 		$this->addAffectedObjects($hosts, $db_hosts);
 
@@ -2525,7 +2446,7 @@ class CHost extends CHostGeneral {
 
 	public static function unlinkGroups(array $groupids): void {
 		$db_hosts = API::Host()->get([
-			'output' => ['host', 'status'],
+			'output' => ['host'],
 			'groupids' => $groupids,
 			'preservekeys' => true
 		]);
