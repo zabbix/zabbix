@@ -2444,8 +2444,8 @@ class CHost extends CHostGeneral {
 		self::addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_HOST_GROUP, $host_groups, $db_host_groups);
 	}
 
-	public static function unlinkGroups(array $groupids): void {
-		$db_hosts = API::Host()->get([
+	public function unlinkGroups(array $groupids): void {
+		$db_hosts = $this->get([
 			'output' => ['host'],
 			'groupids' => $groupids,
 			'preservekeys' => true
@@ -2469,6 +2469,6 @@ class CHost extends CHostGeneral {
 
 		self::checkHostsWithoutGroups($hosts, $db_hosts);
 
-		API::Host()->updateForce($hosts, $db_hosts);
+		$this->updateForce($hosts, $db_hosts);
 	}
 }

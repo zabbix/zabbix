@@ -362,7 +362,7 @@ class CTemplateGroup extends CApiService {
 	public function delete(array $groupids): array {
 		$this->validateDelete($groupids, $db_groups);
 
-		CTemplate::unlinkGroups($groupids);
+		API::Template()->unlinkGroups($groupids);
 
 		DB::delete('hstgrp', ['groupid' => $groupids]);
 

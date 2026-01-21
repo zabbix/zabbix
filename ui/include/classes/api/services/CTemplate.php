@@ -1247,8 +1247,8 @@ class CTemplate extends CHostGeneral {
 		$result = $relation_map->mapMany($result, $groups, 'templategroups');
 	}
 
-	public static function unlinkGroups(array $groupids): void {
-		$db_templates = API::Template()->get([
+	public function unlinkGroups(array $groupids): void {
+		$db_templates = $this->get([
 			'output' => ['host'],
 			'groupids' => $groupids,
 			'preservekeys' => true
@@ -1272,6 +1272,6 @@ class CTemplate extends CHostGeneral {
 
 		self::checkHostsWithoutGroups($templates, $db_templates);
 
-		API::Template()->updateForce($templates, $db_templates);
+		$this->updateForce($templates, $db_templates);
 	}
 }

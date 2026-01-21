@@ -434,7 +434,7 @@ class CHostGroup extends CApiService {
 
 		DB::delete('sysmaps_elements', ['elementtype' => SYSMAP_ELEMENT_TYPE_HOST_GROUP, 'elementid' => $groupids]);
 
-		CHost::unlinkGroups($groupids);
+		API::Host()->unlinkGroups($groupids);
 
 		DB::delete('hstgrp', ['groupid' => $groupids]);
 
