@@ -163,9 +163,7 @@ if ($data['mediatypeid'] && $data['smtp_authentication'] == SMTP_AUTHENTICATION_
 		}
 
 		$oauth_status[] = ($data['access_token_updated'] > time())
-			? makeErrorIcon([
-				(new CList([$refresh_token_error, $access_token_error]))->addClass(ZBX_STYLE_LIST_DASHED)
-			])
+			? makeErrorIcon([(new CList([$refresh_token_error, $access_token_error]))->addClass(ZBX_STYLE_LIST_DASHED)])
 			: makeErrorIcon([$refresh_token_error]);
 	}
 	elseif ($data['access_token_updated'] > time()) {
