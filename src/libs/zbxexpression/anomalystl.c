@@ -13,7 +13,7 @@
 **/
 
 #include "anomalystl.h"
-#include "eval.h"
+#include "evalfunc.h"
 
 #include "zbxnum.h"
 #include "zbxeval.h"
