@@ -1144,7 +1144,6 @@ class testUsersPasswordComplexity extends CWebTest {
 				$this->assertEquals($old_hash, CDBHelper::getHash('SELECT * FROM users ORDER BY userid'));
 			}
 		}
-
 		else {
 			if ($own || $userid === 1) {
 				// If user updates their own password they will be logged out, so check login screen
