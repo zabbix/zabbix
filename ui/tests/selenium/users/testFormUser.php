@@ -449,7 +449,7 @@ class testFormUser extends CWebTest {
 						'Password (once again)' => 'test5678'
 					],
 					'inline_errors' => [
-						'id:roleid_ms' => 'This object already exists.'
+						'xpath:.//div[@id="roleid"]/..' => 'This field cannot be empty.'
 					]
 				]
 			],
@@ -461,7 +461,6 @@ class testFormUser extends CWebTest {
 					'fields' => [
 						'Username' => ''
 					],
-					'error_title' => 'Cannot add user',
 					'inline_errors' => [
 						'id:username' => 'This field cannot be empty.'
 					]
@@ -478,7 +477,7 @@ class testFormUser extends CWebTest {
 					],
 					'role' => 'Super admin role',
 					'error_title' => 'Cannot add user',
-					'error_details' => 'Incorrect value for field "Password": cannot be empty.',
+					'error_details' => 'Incorrect value for field "Password": cannot be empty.'
 				]
 			],
 			// #6.
@@ -494,7 +493,7 @@ class testFormUser extends CWebTest {
 					],
 					'role' => 'Super admin role',
 					'error_title' => 'Cannot add user',
-					'error_details' => 'Both passwords must be equal.',
+					'error_details' => 'Both passwords must be equal.'
 				]
 			],
 			// #7.
@@ -509,7 +508,7 @@ class testFormUser extends CWebTest {
 					],
 					'role' => 'Super admin role',
 					'error_title' => 'Cannot add user',
-					'error_details' => 'Both passwords must be equal.',
+					'error_details' => 'Both passwords must be equal.'
 				]
 			],
 			// #8.
@@ -525,7 +524,7 @@ class testFormUser extends CWebTest {
 					],
 					'role' => 'Super admin role',
 					'error_title' => 'Cannot add user',
-					'error_details' => 'Both passwords must be equal.',
+					'error_details' => 'Both passwords must be equal.'
 				]
 			],
 			// #9.
