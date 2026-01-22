@@ -873,7 +873,7 @@ function getMenuPopupTrigger(options, trigger_element) {
 		let items = [];
 		const curl = new Curl('zabbix.php');
 
-		curl.setArgument('action', 'popup.acknowledge.create');
+		curl.setArgument('action', 'acknowledge.rank.change');
 
 		/*
 		 * Some widgets cannot show symptoms. So it is not possible to convert to symptoms cause if only cause events
@@ -891,7 +891,7 @@ function getMenuPopupTrigger(options, trigger_element) {
 					fetch(curl.getUrl(), {
 						method: 'POST',
 						headers: {'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'},
-						body: JSON.stringify({
+						body: urlEncodeData({
 							eventids: [options.eventid],
 							change_rank: ZBX_PROBLEM_UPDATE_RANK_TO_CAUSE,
 							[CSRF_TOKEN_NAME]: options.csrf_tokens['acknowledge']
@@ -906,9 +906,6 @@ function getMenuPopupTrigger(options, trigger_element) {
 								addMessage(makeMessageBox('bad', [response.error.messages], response.error.title, true,
 									true
 								));
-							}
-							else if ('form_errors' in response) {
-								throw new Error();
 							}
 							else if ('success' in response) {
 								addMessage(makeMessageBox('good', [], response.success.title, true, false));
@@ -941,7 +938,7 @@ function getMenuPopupTrigger(options, trigger_element) {
 					fetch(curl.getUrl(), {
 						method: 'POST',
 						headers: {'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'},
-						body: JSON.stringify({
+						body: urlEncodeData({
 							eventids: options.eventids,
 							cause_eventid: options.eventid,
 							change_rank: ZBX_PROBLEM_UPDATE_RANK_TO_SYMPTOM,
@@ -957,9 +954,6 @@ function getMenuPopupTrigger(options, trigger_element) {
 								addMessage(makeMessageBox('bad', [response.error.messages], response.error.title, true,
 									true
 								));
-							}
-							else if ('form_errors' in response) {
-								throw new Error();
 							}
 							else if ('success' in response) {
 								addMessage(makeMessageBox('good', [], response.success.title, true, false));
