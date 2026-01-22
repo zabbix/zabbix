@@ -24,65 +24,58 @@ class CMenuPathValidatorTest extends TestCase {
 		$this->validator = new CMenuPathValidator();
 	}
 
-	public function dataProviderValidPaths(): array {
+	public function dataProvider(): array {
 		return [
-			'root folder' => ['/'],
-			'leading slash with folder' => ['/folder'],
-			'trailing slash' => ['folder/'],
-			'multiple folders' => ['folder1/folder2'],
-			'leading and trailing slashes' => ['/folder1/folder2/'],
-			'empty string' => [''],
-			'single folder' => ['folder'],
-			'multiple levels with slashes' => ['/folder/sub/'],
-			'deeply nested path' => ['/a/b/c/d/e/'],
-			'folder with leading slash only' => ['/folder1/folder2'],
-			'folder with trailing slash only' => ['folder1/folder2/'],
-			'folder with trailing slash escaped' => ['folder1/folder2\/'],
-			'escaped slash in folder name' => ['folder1\/name'],
-			'escaped slash with subfolder' => ['folder\/name/sub'],
-			'spaces in folder names (trimmed)' => [' folder / sub '],
-			'single space folder' => [' '],
-			'leading slash with spaces' => ['/ folder /'],
-			'special characters in folder' => ['folder-name_123'],
-			'unicode folder name' => ['фолдер/sub'],
-			'path with only escaped slash' => ['\/']
-		];
-	}
+			// Valid paths.
+			['/', null],
+			['/folder', null],
+			['folder/', null],
+			['folder1/folder2', null],
+			['/folder1/folder2/', null],
+			['', null],
+			['folder', null],
+			['/folder/sub/', null],
+			['/a/b/c/d/e/', null],
+			['/folder1/folder2', null],
+			['folder1/folder2/', null],
+			['folder1/folder2\/', null],
+			['folder1\/name', null],
+			['folder\/name/sub', null],
+			[' folder / sub ', null],
+			[' ', null],
+			['/ folder /', null],
+			['folder-name_123', null],
+			['фолдер/sub', null],
+			['\/', null],
 
-	public function dataProviderInvalidPaths(): array {
-		return [
-			'double slash in middle' => ['folder1//folder2'],
-			'double leading slash' => ['//folder'],
-			'empty middle segment in longer path' => ['/folder//sub'],
-			'triple leading slash' => ['///folder'],
-			'multiple empty segments' => ['folder1///folder2'],
-			'empty segment at start and middle' => ['//folder//sub'],
-			'double slash with trailing' => ['folder//sub/'],
-			'double slash near end' => ['/folder/sub//name'],
-			'only double slash' => ['//'],
-			'triple slash' => ['///'],
-			'empty middle with spaces' => ['folder/ /sub'],
-			'folder with escaped space' => ['/ \ / /']
+			// Invalid paths.
+			['folder1//folder2', _('Incorrect menu path.')],
+			['//folder', _('Incorrect menu path.')],
+			['/folder//sub', _('Incorrect menu path.')],
+			['///folder', _('Incorrect menu path.')],
+			['folder1///folder2', _('Incorrect menu path.')],
+			['//folder//sub', _('Incorrect menu path.')],
+			['folder//sub/', _('Incorrect menu path.')],
+			['/folder/sub//name', _('Incorrect menu path.')],
+			['//', _('Incorrect menu path.')],
+			['///', _('Incorrect menu path.')],
+			['folder/ /sub', _('Incorrect menu path.')],
+			['/ \ / /', _('Incorrect menu path.')]
 		];
 	}
 
 	/**
-	 * @dataProvider dataProviderValidPaths
+	 * @dataProvider dataProvider
 	 */
-	public function testValidPaths(string $path): void {
-		$this->assertTrue(
-			$this->validator->validate($path),
-			sprintf('Path "%s" should be valid', $path)
-		);
-	}
+	public function testPaths(string $path, ?string $error): void {
+		$result = $this->validator->validate($path);
 
-	/**
-	 * @dataProvider dataProviderInvalidPaths
-	 */
-	public function testInvalidPaths(string $path): void {
-		$this->assertFalse(
-			$this->validator->validate($path),
-			sprintf('Path "%s" should be invalid', $path)
-		);
+		if ($error === null) {
+			$this->assertTrue($result, sprintf('Path "%s" should be valid', $path));
+		}
+		else {
+			$this->assertFalse($result, sprintf('Path "%s" should be invalid', $path));
+			$this->assertEquals($this->validator->getError());
+		}
 	}
 }
