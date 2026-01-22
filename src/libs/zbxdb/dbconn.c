@@ -361,17 +361,37 @@ void	dbconn_close(zbx_dbconn_t *db)
 }
 
 #if defined(HAVE_POSTGRESQL)
+/******************************************************************************
+ *                                                                            *
+ * Purpose: parse and validate database host configuration for PostgreSQL     *
+ *                                                                            *
+ * Parameters: config - [IN/OUT] database configuration                       *
+ *             error  - [OUT] error message                                   *
+ *                                                                            *
+ * Return value: SUCCEED - host string is valid or empty                      *
+ *               FAIL - host string contains invalid address or port          *
+ *                                                                            *
+ * Comments: This function handles multiple comma-separated addresses for     *
+ *           PostgreSQL. It extracts ports from the addresses and updates     *
+ *           the config->dbports and config->dbhost fields.                   *
+ *                                                                            *
+ ******************************************************************************/
 int	zbx_dbconn_parse_and_validate_dbhost(zbx_db_config_t *config, char **error)
 {
 	char		*start, *result = NULL;
 	size_t		result_alloc = 0, result_offset = 0;
 	unsigned short	def_port = (0 != config->dbport ? (unsigned short)config->dbport : 5432);
 
-	if (NULL == config->dbhost || '\0' == *config->dbhost)
+	if ('\0' == *config->dbhost)
 		return SUCCEED;
 
-	if (NULL == strchr(config->dbhost, ','))
+	if (NULL == strchr(config->dbhost, ',') && NULL == strchr(config->dbhost, ':'))
+	{
+		if (0 != config->dbport)
+			config->dbports = zbx_strdcatf(NULL, "%u", config->dbport);
+
 		return SUCCEED;
+	}
 
 	for (start = config->dbhost; '\0' != *start;)
 	{
@@ -381,8 +401,7 @@ int	zbx_dbconn_parse_and_validate_dbhost(zbx_db_config_t *config, char **error)
 		if (NULL != (end = strchr(start, ',')))
 			*end = '\0';
 
-		if ('\0' == *start ||
-			SUCCEED != zbx_parse_serveractive_element(start, &parsed_ip, &parsed_port, def_port))
+		if (SUCCEED != zbx_parse_serveractive_element(start, &parsed_ip, &parsed_port, def_port))
 		{
 			*error = zbx_dsprintf(NULL, "error parsing the \"%s\" parameter: address \"%s\" is "
 					"invalid", config->dbhost, start);
@@ -701,16 +720,14 @@ static int	dbconn_open(zbx_dbconn_t *db)
 		keywords[i] = "port";
 		values[i++] = db->config->dbports;
 
-		keywords[i] = "target_session_attrs";
-		values[i++] = "read-write";
+		if (NULL != strchr(db->config->dbports, ','))
+		{
+			keywords[i] = "target_session_attrs";
+			values[i++] = "read-write";
 
-		keywords[i] = "connect_timeout";
-		values[i++] = "3";
-	}
-	else if (0 != db->config->dbport)
-	{
-		keywords[i] = "port";
-		values[i++] = cport = zbx_dsprintf(cport, "%u", db->config->dbport);
+			keywords[i] = "connect_timeout";
+			values[i++] = "3";
+		}
 	}
 
 	keywords[i] = NULL;
