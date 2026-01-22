@@ -865,7 +865,11 @@ static int	zbx_get_snmp_response_error(const zbx_snmp_sess_t ssp, const zbx_dc_i
 	if (STAT_SUCCESS == status)
 	{
 		zbx_snprintf(error, max_error_len, "SNMP error: %s", snmp_errstring(response->errstat));
-		ret = NOTSUPPORTED;
+		
+		if (SNMP_ERR_AUTHORIZATIONERROR == response->errstat)
+			ret = NETWORK_ERROR;
+		else
+			ret = NOTSUPPORTED;
 	}
 	else if (STAT_ERROR == status)
 	{
@@ -2731,7 +2735,8 @@ static int	snmp_bulkwalk_handle_response(int status, struct snmp_pdu *response,
 		ret = zbx_get_snmp_response_error(ssp, interface, status, response, error, max_error_len,
 				(int)*results_offset);
 
-		zabbix_log(LOG_LEVEL_DEBUG, "itemid:" ZBX_FS_UI64 " response error: %s", itemid, error);
+		zabbix_log(LOG_LEVEL_DEBUG, "itemid:" ZBX_FS_UI64 " response error: %s errstat:%ld", itemid, error,
+				response->errstat);
 
 		bulkwalk_context->running = 0;
 		goto out;
