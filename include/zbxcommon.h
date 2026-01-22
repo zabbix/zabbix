@@ -400,10 +400,11 @@ while (0)
 
 void	zbx_this_should_never_happen_backtrace(void);
 
+/* what to do if THIS_SHOULD_NEVER_HAPPEN occurs */
 #ifdef ZBX_DEBUG
-#define ZBX_TSNH_EXIT() exit(1)
+#define ZBX_TSNH_EXIT()	exit(1)
 #else
-#define ZBX_TSNH_EXIT() ((void)0)
+#define ZBX_TSNH_EXIT()	((void)0)
 #endif
 
 #define THIS_SHOULD_NEVER_HAPPEN										\
