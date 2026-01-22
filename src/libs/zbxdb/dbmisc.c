@@ -25,6 +25,7 @@
 #include "zbxtypes.h"
 #if defined(HAVE_POSTGRESQL)
 #	include "zbx_dbversion_constants.h"
+#	include "zbxip.h"
 #endif
 
 #define ZBX_MAX_SQL_SIZE	262144	/* 256KB */
@@ -856,6 +857,7 @@ int	zbx_db_config_validate_features(zbx_db_config_t *config, unsigned char progr
  ******************************************************************************/
 static int	zbx_dbconn_parse_and_validate_dbhost(zbx_db_config_t *config, char **error)
 {
+
 	char		*start, *result = NULL;
 	size_t		result_alloc = 0, result_offset = 0;
 	unsigned short	def_port = (0 != config->dbport ? (unsigned short)config->dbport : 5432);
