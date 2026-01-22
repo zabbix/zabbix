@@ -1837,6 +1837,11 @@ msgstr "Au moins un paramètre doit être activé."
 msgid "At least one period must be added."
 msgstr "Au moins une période doit être ajoutée."
 
+#: app/controllers/CControllerConnectorCreate.php:44
+#: app/controllers/CControllerConnectorUpdate.php:45
+msgid "At least one type of information must be selected."
+msgstr ""
+
 #: app/controllers/CControllerPopupAcknowledgeCreate.php:283
 msgid "At least one update operation or message is mandatory"
 msgstr "Au moins une opération ou un message de mise à jour est obligatoire"
@@ -21611,6 +21616,11 @@ msgstr "Priorité d'affichage des tags"
 #: app/views/connector.edit.php:71
 msgid "Tag filter"
 msgstr "Filtre de tag"
+
+#: app/controllers/CControllerConnectorCreate.php:120
+#: app/controllers/CControllerConnectorUpdate.php:121
+msgid "Tag filter name, operator and value combination is not unique."
+msgstr ""
 
 #: app/partials/trigger.edit.trigger.tab.php:253
 msgid "Tag for matching"

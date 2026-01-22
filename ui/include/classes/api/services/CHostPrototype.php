@@ -2359,7 +2359,7 @@ class CHostPrototype extends CHostBase {
 			foreach ($lld_links[$host['ruleid']] as $lld_rule) {
 				if (!in_array($lld_rule['itemid'], $ruleids)
 						|| (array_key_exists($lld_rule['itemid'], $upd_host_names)
-							&& in_array($host['name'], $upd_host_names[$lld_rule['itemid']]))) {
+							&& in_array($host['host'], $upd_host_names[$lld_rule['itemid']]))) {
 					continue;
 				}
 
