@@ -163,6 +163,8 @@ static void	mock_read_steps(zbx_vector_mock_step_t *steps, zbx_mock_handle_t hst
 		const char		*config_source_ip = "";
 		char			*config_ssl_ca_location = NULL, *config_ssl_cert_location = NULL,
 					*config_ssl_key_location = NULL;
+		double			um_cache_dup_sec = 0;
+		zbx_int64_t		um_cache_dup_size = 0;
 
 		step = (zbx_mock_step_t *)zbx_malloc(NULL, sizeof(zbx_mock_step_t));
 
@@ -174,7 +176,7 @@ static void	mock_read_steps(zbx_vector_mock_step_t *steps, zbx_mock_handle_t hst
 		um_mock_cache_init(&step->mock_cache, hconfig);
 		um_mock_cache_diff(mock_cache_last, &step->mock_cache, &gmacros, &hmacros, &htmpls);
 		config->um_cache = step->cache = um_cache_sync(config->um_cache, 0, &gmacros, &hmacros, &htmpls,
-				&config_vault);
+				&config_vault, &um_cache_dup_sec, &um_cache_dup_size);
 
 		mock_dbsync_clear(&gmacros);
 		mock_dbsync_clear(&hmacros);

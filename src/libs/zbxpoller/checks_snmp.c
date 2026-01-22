@@ -2751,6 +2751,7 @@ static int	snmp_quote_string_value(char *buffer, size_t buffer_size, struct vari
 {
 #define TYPE_STR_HEX_STRING	"Hex-STRING: "
 #define TYPE_STR_STRING		"STRING: "
+#define TYPE_STR_BITS		"BITS: "
 	int	ret;
 	char	*buf;
 	char	quoted_buf[MAX_STRING_LEN];
@@ -2766,6 +2767,12 @@ static int	snmp_quote_string_value(char *buffer, size_t buffer_size, struct vari
 	buf += 3;
 
 	if (0 == var->val_len && 0 == strcmp(buf, "\"\""))
+	{
+		ret = SUCCEED;
+		goto out;
+	}
+
+	if (0 == strncmp(buf, TYPE_STR_BITS, sizeof(TYPE_STR_BITS) - 1))
 	{
 		ret = SUCCEED;
 		goto out;
@@ -2847,6 +2854,7 @@ out:
 	return ret;
 #undef TYPE_STR_HEX_STRING
 #undef TYPE_STR_STRING
+#undef TYPE_STR_BITS
 }
 
 static void	snmp_bulkwalk_trace_variable(zbx_uint64_t itemid, const struct variable_list *var)
