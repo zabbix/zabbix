@@ -850,7 +850,7 @@ class CSvgGraph {
 		table.classList.add('list-table', 'compact-view');
 		table.append(tbody);
 
-		const hintbox_body = document.createElement('div')
+		const hintbox_body = document.createElement('div');
 		hintbox_body.classList.add('svg-graph-hintbox');
 		hintbox_body.append(table);
 
