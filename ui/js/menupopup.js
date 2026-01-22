@@ -908,8 +908,7 @@ function getMenuPopupTrigger(options, trigger_element) {
 								));
 							}
 							else if ('form_errors' in response) {
-								console.error(response.form_errors);
-								throw {error: true};
+								throw new Error();
 							}
 							else if ('success' in response) {
 								addMessage(makeMessageBox('good', [], response.success.title, true, false));
@@ -960,8 +959,7 @@ function getMenuPopupTrigger(options, trigger_element) {
 								));
 							}
 							else if ('form_errors' in response) {
-								console.error(response.form_errors);
-								throw {error: true};
+								throw new Error();
 							}
 							else if ('success' in response) {
 								addMessage(makeMessageBox('good', [], response.success.title, true, false));
