@@ -106,6 +106,7 @@ void	zbx_mock_test_entry(void **state)
 	zbx_config_vault_t	config_vault = {NULL, NULL, NULL, NULL, NULL, NULL, NULL};
 
 	ZBX_UNUSED(state);
+	zbx_config_wlock_set_locked();
 
 	zbx_vector_mock_step_create(&steps);
 
