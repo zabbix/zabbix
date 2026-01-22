@@ -224,8 +224,10 @@ static void	rm_session_close(zbx_rm_session_t *session)
 	zbx_free(session);
 }
 
-static void	rm_job_free(zbx_rm_job_t *job)
+static void	rm_job_free(void *ptr)
 {
+	zbx_rm_job_t	*job = (zbx_rm_job_t *)ptr;
+
 	if (NULL != job->client)
 		zbx_ipc_client_release(job->client);
 
@@ -240,14 +242,9 @@ static void	rm_job_free(zbx_rm_job_t *job)
 	zbx_free(job);
 }
 
-static void	rm_job_free_wrap(void *ptr)
-{
-	rm_job_free((zbx_rm_job_t *)ptr);
-}
-
 static void	rm_batch_clean(zbx_rm_batch_t *batch)
 {
-	zbx_vector_ptr_clear_ext(&batch->jobs, rm_job_free_wrap);
+	zbx_vector_ptr_clear_ext(&batch->jobs, rm_job_free);
 	zbx_vector_ptr_destroy(&batch->jobs);
 	zbx_free(batch->info);
 }
