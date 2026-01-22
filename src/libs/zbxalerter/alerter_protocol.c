@@ -312,10 +312,11 @@ static void	alerter_serialize_mediatype(unsigned char **data, zbx_uint32_t *data
 		const char *username, const char *passwd, unsigned short smtp_port, unsigned char smtp_security,
 		unsigned char smtp_verify_peer, unsigned char smtp_verify_host, unsigned char smtp_authentication,
 		int maxsessions, int maxattempts, const char *attempt_interval, unsigned char message_format,
-		const char *script, const char *timeout)
+		const char *script, const char *timeout, const char *adapter_address, const char *adapter_psk)
 {
 	zbx_uint32_t	data_len = 0, name_len, smtp_server_len, smtp_helo_len, smtp_email_len, exec_path_len,
-			gsm_modem_len, username_len, passwd_len, script_len, attempt_interval_len, timeout_len;
+			gsm_modem_len, username_len, passwd_len, script_len, attempt_interval_len, timeout_len,
+			adapter_address_len, adapter_psk_len;
 	unsigned char	*ptr;
 
 	zbx_serialize_prepare_value(data_len, mediatypeid);
@@ -339,6 +340,8 @@ static void	alerter_serialize_mediatype(unsigned char **data, zbx_uint32_t *data
 	zbx_serialize_prepare_value(data_len, message_format);
 	zbx_serialize_prepare_str_len(data_len, script, script_len);
 	zbx_serialize_prepare_str_len(data_len, timeout, timeout_len);
+	zbx_serialize_prepare_str_len(data_len, adapter_address, adapter_address_len);
+	zbx_serialize_prepare_str_len(data_len, adapter_psk, adapter_psk_len);
 
 	while (data_len > *data_alloc - *data_offset)
 	{
@@ -367,7 +370,9 @@ static void	alerter_serialize_mediatype(unsigned char **data, zbx_uint32_t *data
 	ptr += zbx_serialize_str(ptr, attempt_interval, attempt_interval_len);
 	ptr += zbx_serialize_value(ptr, message_format);
 	ptr += zbx_serialize_str(ptr, script, script_len);
-	(void)zbx_serialize_str(ptr, timeout, timeout_len);
+	ptr += zbx_serialize_str(ptr, timeout, timeout_len);
+	ptr += zbx_serialize_str(ptr, adapter_address, adapter_address_len);
+	(void)zbx_serialize_str(ptr, adapter_psk, adapter_address_len);
 
 	*data_offset += data_len;
 }
@@ -413,7 +418,8 @@ zbx_uint32_t	zbx_alerter_serialize_alert_send(unsigned char **data, zbx_uint64_t
 		unsigned short smtp_port, unsigned char smtp_security, unsigned char smtp_verify_peer,
 		unsigned char smtp_verify_host, unsigned char smtp_authentication, int maxsessions, int maxattempts,
 		const char *attempt_interval, unsigned char message_format, const char *script, const char *timeout,
-		const char *sendto, const char *subject, const char *message, const char *params)
+		const char *sendto, const char *subject, const char *message, const char *params,
+		const char *adapter_address, const char *adapter_psk)
 {
 	unsigned char	*ptr;
 	zbx_uint32_t	data_len = 0, data_alloc = 1024, data_offset = 0, sendto_len, subject_len, message_len,
@@ -423,7 +429,7 @@ zbx_uint32_t	zbx_alerter_serialize_alert_send(unsigned char **data, zbx_uint64_t
 	alerter_serialize_mediatype(data, &data_alloc, &data_offset, mediatypeid, type, name, smtp_server, smtp_helo,
 			smtp_email, exec_path, gsm_modem, username, passwd, smtp_port, smtp_security, smtp_verify_peer,
 			smtp_verify_host, smtp_authentication, maxsessions, maxattempts, attempt_interval,
-			message_format, script, timeout);
+			message_format, script, timeout, adapter_address, adapter_psk);
 
 	zbx_serialize_prepare_str(data_len, sendto);
 	zbx_serialize_prepare_str(data_len, subject);
@@ -520,7 +526,8 @@ zbx_uint32_t	zbx_alerter_serialize_mediatypes(unsigned char **data, zbx_am_db_me
 				mt->smtp_server, mt->smtp_helo, mt->smtp_email, mt->exec_path, mt->gsm_modem,
 				mt->username, mt->passwd, mt->smtp_port, mt->smtp_security, mt->smtp_verify_peer,
 				mt->smtp_verify_host, mt->smtp_authentication, mt->maxsessions, mt->maxattempts,
-				mt->attempt_interval, mt->message_format, mt->script, mt->timeout);
+				mt->attempt_interval, mt->message_format, mt->script, mt->timeout,
+				mt->adapter.adapter_address, mt->adapter.adapter_psk);
 	}
 
 	return data_offset;

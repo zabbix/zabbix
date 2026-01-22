@@ -69,6 +69,8 @@ typedef struct
 	int			script_bin_sz;
 	unsigned char		message_format;
 	unsigned char		flags;
+
+	zbx_am_adapter_t	adapter;
 }
 zbx_am_mediatype_t;
 
@@ -117,6 +119,8 @@ typedef struct
 	unsigned char		message_format;
 	unsigned char		process_tags;
 	time_t			last_access;
+
+	zbx_am_db_adapter_t	adapter;
 }
 zbx_am_db_mediatype_t;
 
@@ -160,6 +164,20 @@ typedef struct
 	char		*error;
 }
 zbx_am_result_t;
+
+typedef struct
+{
+	char		*adapter_address;
+	char		*adapter_psk;
+}
+zbx_am_db_adapter_t;
+
+typedef struct
+{
+	char		*adapter_address;
+	char		*adapter_psk;
+}
+zbx_am_adapter_t;
 
 ZBX_PTR_VECTOR_DECL(am_result_ptr, zbx_am_result_t *)
 

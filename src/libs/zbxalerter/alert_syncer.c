@@ -331,7 +331,7 @@ static zbx_am_db_mediatype_t	*am_db_update_mediatype(zbx_am_db_t *amdb, time_t n
 		unsigned short smtp_port, unsigned char smtp_security, unsigned char smtp_verify_peer,
 		unsigned char smtp_verify_host, unsigned char smtp_authentication, int maxsessions, int maxattempts,
 		const char *attempt_interval, unsigned char message_format, const char *script, const char *timeout,
-		int process_tags)
+		int process_tags, const char *adapter_address, const char *adapter_psk)
 {
 	zbx_am_db_mediatype_t	*mediatype;
 	int			ret = FAIL;
@@ -373,6 +373,9 @@ static zbx_am_db_mediatype_t	*am_db_update_mediatype(zbx_am_db_t *amdb, time_t n
 
 	ZBX_UPDATE_VALUE(mediatype->process_tags, process_tags, ret);
 
+	ZBX_UPDATE_STR(mediatype->adapter.adapter_address, adapter_address, ret);
+	ZBX_UPDATE_STR(mediatype->adapter.adapter_psk, adapter_psk, ret);
+
 	return SUCCEED == ret ? mediatype : NULL;
 }
 
@@ -403,8 +406,9 @@ static void	am_db_update_mediatypes(zbx_am_db_t *amdb, const zbx_uint64_t *media
 			"select mediatypeid,type,smtp_server,smtp_helo,smtp_email,exec_path,gsm_modem,username,"
 				"passwd,smtp_port,smtp_security,smtp_verify_peer,smtp_verify_host,smtp_authentication,"
 				"maxsessions,maxattempts,attempt_interval,message_format,script,timeout,process_tags,"
-				"name"
+				"name, ba.adapter_address,ba.adapter_psk"
 			" from media_type"
+			" left join lateral (select * from bridge_adapter limit 1) ba on true"
 			" where");
 
 	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "mediatypeid", mediatypeids, mediatypeids_num);
@@ -441,7 +445,7 @@ static void	am_db_update_mediatypes(zbx_am_db_t *amdb, const zbx_uint64_t *media
 		mediatype = am_db_update_mediatype(amdb, now, mediatypeid, type, row[21], row[2], row[3], row[4],
 				row[5], row[6], row[7], row[8], smtp_port, smtp_security, smtp_verify_peer,
 				smtp_verify_host, smtp_authentication, maxsessions, maxattempts, row[16],
-				message_format, row[18], row[19], atoi(row[20]));
+				message_format, row[18], row[19], atoi(row[20]), row[21], row[22]);
 
 		if (NULL != mediatype)
 			zbx_vector_am_db_mediatype_ptr_append(mediatypes, mediatype);
