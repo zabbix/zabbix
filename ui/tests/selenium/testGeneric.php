@@ -16,6 +16,9 @@
 
 require_once __DIR__.'/../include/CWebTest.php';
 
+/**
+ * @backup !profiles
+ */
 class testGeneric extends CWebTest {
 
 	/**
