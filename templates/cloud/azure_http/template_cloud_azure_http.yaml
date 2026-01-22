@@ -15512,7 +15512,7 @@ zabbix_export:
                       value: '0'
                     - type: STRING
                       name: ds.1.color.0
-                      value: FFC859
+                      value: FFBF59
                     - type: INTEGER
                       name: ds.1.dataset_type
                       value: '0'
@@ -15566,7 +15566,7 @@ zabbix_export:
                   fields:
                     - type: STRING
                       name: ds.0.color.0
-                      value: E65660
+                      value: E45959
                     - type: INTEGER
                       name: ds.0.dataset_type
                       value: '0'
@@ -15580,7 +15580,7 @@ zabbix_export:
                       value: '0'
                     - type: STRING
                       name: ds.1.color.0
-                      value: 3BC97D
+                      value: 00C48C
                     - type: INTEGER
                       name: ds.1.dataset_type
                       value: '0'
@@ -15620,7 +15620,7 @@ zabbix_export:
                       value: '0'
                     - type: STRING
                       name: ds.1.color.0
-                      value: 3BC97D
+                      value: 00C48C
                     - type: INTEGER
                       name: ds.1.dataset_type
                       value: '0'
@@ -15634,7 +15634,7 @@ zabbix_export:
                       value: '0'
                     - type: STRING
                       name: ds.2.color.0
-                      value: FFD54F
+                      value: FFBF59
                     - type: INTEGER
                       name: ds.2.dataset_type
                       value: '0'
@@ -15678,7 +15678,7 @@ zabbix_export:
                       value: '0'
                     - type: STRING
                       name: ds.1.color.0
-                      value: FFC859
+                      value: FFBF59
                     - type: INTEGER
                       name: ds.1.dataset_type
                       value: '0'
@@ -15735,7 +15735,7 @@ zabbix_export:
                   fields:
                     - type: STRING
                       name: ds.0.color.0
-                      value: E65660
+                      value: E45959
                     - type: INTEGER
                       name: ds.0.dataset_type
                       value: '0'
@@ -15749,7 +15749,7 @@ zabbix_export:
                       value: '0'
                     - type: STRING
                       name: ds.1.color.0
-                      value: 3BC97D
+                      value: 00C48C
                     - type: INTEGER
                       name: ds.1.dataset_type
                       value: '0'
@@ -15763,7 +15763,7 @@ zabbix_export:
                       value: '0'
                     - type: STRING
                       name: ds.2.color.0
-                      value: FFD54F
+                      value: FFBF59
                     - type: INTEGER
                       name: ds.2.dataset_type
                       value: '0'
@@ -15804,7 +15804,7 @@ zabbix_export:
                       value: '0'
                     - type: STRING
                       name: ds.1.color.0
-                      value: FFC859
+                      value: FFBF59
                     - type: INTEGER
                       name: ds.1.dataset_type
                       value: '0'
@@ -15859,7 +15859,7 @@ zabbix_export:
                       value: '0'
                     - type: STRING
                       name: ds.2.color.0
-                      value: 3BC97D
+                      value: 00C48C
                     - type: INTEGER
                       name: ds.2.dataset_type
                       value: '0'
@@ -15982,7 +15982,7 @@ zabbix_export:
                       value: '0'
                     - type: STRING
                       name: ds.2.color.0
-                      value: 3BC97D
+                      value: 00C48C
                     - type: INTEGER
                       name: ds.2.dataset_aggregation
                       value: '5'
@@ -16018,7 +16018,7 @@ zabbix_export:
                   fields:
                     - type: STRING
                       name: ds.0.color.0
-                      value: E65660
+                      value: E45959
                     - type: INTEGER
                       name: ds.0.dataset_type
                       value: '0'
@@ -16032,7 +16032,7 @@ zabbix_export:
                       value: '0'
                     - type: STRING
                       name: ds.1.color.0
-                      value: 3BC97D
+                      value: 00C48C
                     - type: INTEGER
                       name: ds.1.dataset_type
                       value: '0'
