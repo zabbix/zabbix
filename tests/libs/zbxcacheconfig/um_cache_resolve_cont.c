@@ -174,6 +174,8 @@ static void	mock_read_steps(zbx_vector_mock_step_t *steps, zbx_mock_handle_t hst
 
 		hconfig = zbx_mock_get_object_member_handle(hstep, "config");
 		um_mock_cache_init(&step->mock_cache, hconfig);
+		zbx_config_wlock_set_locked();
+
 		um_mock_cache_diff(mock_cache_last, &step->mock_cache, &gmacros, &hmacros, &htmpls);
 		config->um_cache = step->cache = um_cache_sync(config->um_cache, 0, &gmacros, &hmacros, &htmpls,
 				&config_vault, &um_cache_dup_sec, &um_cache_dup_size);
@@ -206,7 +208,6 @@ static void	mock_read_steps(zbx_vector_mock_step_t *steps, zbx_mock_handle_t hst
 	}
 
 	um_mock_cache_clear(mock_cache_last);
-
 }
 
 void	zbx_mock_test_entry(void **state)
@@ -218,8 +219,9 @@ void	zbx_mock_test_entry(void **state)
 
 	zbx_vector_mock_step_create(&steps);
 
-	um_mock_config_init();
+	zbx_config_wlock_set_locked();
 
+	um_mock_config_init();
 	mock_read_steps(&steps, zbx_mock_get_parameter_handle("in.steps"));
 
 	for (i = 0; i < steps.values_num; i++)
