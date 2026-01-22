@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -687,7 +687,7 @@ void	zbx_evaluate_expressions(zbx_vector_dc_trigger_t *triggers, const zbx_vecto
 
 	if (0 != items_num)
 	{
-		zbx_dc_config_clean_history_sync_items(items, items_err, (size_t)items_num);
+		zbx_dc_config_clean_history_sync_items(items, (size_t)items_num);
 		zbx_free(items);
 		zbx_free(items_err);
 	}
