@@ -2299,8 +2299,12 @@ FIELD		|enrollment_token_used	|t_integer	|'0'	|NOT NULL	|0
 INDEX		|1			|user_ref
 INDEX		|2			|token_ref
 
+TABLE|bridge_adapter
+FIELD		|adapter_address	|t_varchar(255)	|''	|NOT NULL |0
+FIELD		|adapter_psk		|t_varchar(255)	|''	|NOT NULL |0
+
 TABLE|dbversion|dbversionid|
 FIELD		|dbversionid	|t_id		|	|NOT NULL	|0
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|1		|7050033	|7050033
+ROW		|1		|7050034	|7050034

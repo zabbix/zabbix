@@ -450,6 +450,20 @@ static int	DBpatch_7050033(void)
 
 	return DBadd_field("token", &field);
 }
+
+static int	DBpatch_7050034(void)
+{
+	const zbx_db_table_t	table =
+			{"bridge_adapter",
+				{
+					{"adapter_address", NULL, NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{"adapter_psk", NULL, NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				},
+				NULL
+			};
+
+	return DBcreate_table(&table);
+}
 #endif
 
 DBPATCH_START(7050)
@@ -490,5 +504,6 @@ DBPATCH_ADD(7050030, 0, 1)
 DBPATCH_ADD(7050031, 0, 1)
 DBPATCH_ADD(7050032, 0, 1)
 DBPATCH_ADD(7050033, 0, 1)
+DBPATCH_ADD(7050034, 0, 1)
 
 DBPATCH_END()
