@@ -924,7 +924,7 @@ class CSvgGraph {
 					item_span.classList.add('has-broadcast-data');
 					item_span.dataset.itemid = itemid;
 					item_span.dataset.ds = ds;
-					item_span.innerText = name.toString();
+					item_span.innerText = name;
 
 					axis.append(item_span);
 				}
