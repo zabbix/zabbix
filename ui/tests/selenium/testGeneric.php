@@ -16,9 +16,6 @@
 
 require_once __DIR__.'/../include/CWebTest.php';
 
-/**
- * @backup profiles
- */
 class testGeneric extends CWebTest {
 
 	/**
@@ -741,7 +738,7 @@ class testGeneric extends CWebTest {
 
 		// Verify that user menu contains default sections.
 		$menu_user = ['Support', 'Integrations', 'Help', 'User settings', 'Sign out'];
-		foreach ($menu_user as $text){
+		foreach ($menu_user as $text) {
 			$this->assertTrue($this->query('link', $text)->exists());
 		}
 	}
