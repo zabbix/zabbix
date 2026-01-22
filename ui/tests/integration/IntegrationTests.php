@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -62,6 +62,7 @@ require_once dirname(__FILE__).'/testLLDLinking.php';
 require_once dirname(__FILE__).'/testUserMacrosWithContext.php';
 require_once dirname(__FILE__).'/testUserMacrosWithContextRegex.php';
 require_once dirname(__FILE__).'/testNestedLLD.php';
+require_once dirname(__FILE__).'/testCalculatedExpression.php';
 
 use PHPUnit\Framework\TestSuite;
 
@@ -119,7 +120,7 @@ class IntegrationTests {
 		$suite->addTestSuite('testUserMacrosWithContext');
 		$suite->addTestSuite('testUserMacrosWithContextRegex');
 		$suite->addTestSuite('testNestedLLD');
-
+		$suite->addTestSuite('testCalculatedExpression');
 		return $suite;
 	}
 }

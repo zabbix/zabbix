@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -3840,6 +3840,24 @@ uwMrOBKatg7CZ1Uenv1K3ioD5w==
 				'/'
 			],
 			[
+				['type' => API_REGEX],
+				'/',
+				'/1/expression',
+				'/'
+			],
+			[
+				['type' => API_REGEX],
+				'[(]',
+				'/1/expression',
+				'[(]'
+			],
+			[
+				['type' => API_REGEX],
+				'[\\/]',
+				'/1/expression',
+				'[\\/]'
+			],
+			[
 				['type' => API_REGEX, 'length' => 8],
 				'/test/i',
 				'/1/expression',
@@ -5305,246 +5323,6 @@ uwMrOBKatg7CZ1Uenv1K3ioD5w==
 				'{?func({FUNCTION.VALUE},{FUNCTION.VALUE1},{FUNCTION.RECOVERY.VALUE},{FUNCTION.RECOVERY.VALUE9})}',
 				'/1/event_name',
 				'{?func({FUNCTION.VALUE},{FUNCTION.VALUE1},{FUNCTION.RECOVERY.VALUE},{FUNCTION.RECOVERY.VALUE9})}'
-			],
-			[
-				['type' => API_JSON],
-				null,
-				'/1/json',
-				'Invalid parameter "/1/json": a character string is expected.'
-			],
-			[
-				['type' => API_JSON],
-				true,
-				'/1/json',
-				'Invalid parameter "/1/json": a character string is expected.'
-			],
-			[
-				['type' => API_JSON],
-				[],
-				'/1/json',
-				'Invalid parameter "/1/json": a character string is expected.'
-			],
-			[
-				['type' => API_JSON],
-				123,
-				'/1/json',
-				'Invalid parameter "/1/json": a character string is expected.'
-			],
-			[
-				['type' => API_JSON],
-				'123',
-				'/1/json',
-				'123'
-			],
-			[
-				['type' => API_JSON],
-				'',
-				'/1/json',
-				''
-			],
-			[
-				['type' => API_JSON, 'flags' => API_NOT_EMPTY],
-				'',
-				'/1/json',
-				'Invalid parameter "/1/json": cannot be empty.'
-			],
-			[
-				['type' => API_JSON],
-				'{}',
-				'/1/json',
-				'{}'
-			],
-			[
-				['type' => API_JSON],
-				'{"key": "value"}',
-				'/1/json',
-				'{"key": "value"}'
-			],
-			[
-				['type' => API_JSON],
-				'{"key": false}',
-				'/1/json',
-				'{"key": false}'
-			],
-			[
-				['type' => API_JSON],
-				'{"key": null}',
-				'/1/json',
-				'{"key": null}'
-			],
-			[
-				['type' => API_JSON],
-				'{"key": NaN}',
-				'/1/json',
-				'Invalid parameter "/1/json": JSON is expected.'
-			],
-			[
-				['type' => API_JSON, 'length' => 15],
-				'{"key": "value"}',
-				'/1/json',
-				'Invalid parameter "/1/json": value is too long.'
-			],
-			[
-				['type' => API_JSON],
-				'abc',
-				'/1/json',
-				'Invalid parameter "/1/json": JSON is expected.'
-			],
-			[
-				['type' => API_JSON],
-				'{"key": value}',
-				'/1/json',
-				'Invalid parameter "/1/json": JSON is expected.'
-			],
-			[
-				['type' => API_JSON],
-				'{"key": 123}',
-				'/1/json',
-				'{"key": 123}'
-			],
-			[
-				['type' => API_JSON],
-				'{$MACRO}',
-				'/1/json',
-				'Invalid parameter "/1/json": JSON is expected.'
-			],
-			[
-				['type' => API_JSON, 'flags' => API_ALLOW_USER_MACRO],
-				'{$MACRO}',
-				'/1/json',
-				'{$MACRO}'
-			],
-			[
-				['type' => API_JSON],
-				'{"key": {$MACRO}}',
-				'/1/json',
-				'Invalid parameter "/1/json": JSON is expected.'
-			],
-			[
-				['type' => API_JSON, 'flags' => API_ALLOW_USER_MACRO],
-				'{"key": {$MACRO}}',
-				'/1/json',
-				'{"key": {$MACRO}}'
-			],
-			[
-				['type' => API_JSON],
-				'{#LLD}',
-				'/1/json',
-				'Invalid parameter "/1/json": JSON is expected.'
-			],
-			[
-				['type' => API_JSON, 'flags' => API_ALLOW_LLD_MACRO],
-				'{#LLD}',
-				'/1/json',
-				'{#LLD}'
-			],
-			[
-				['type' => API_JSON],
-				'{"key": {#LLD}}',
-				'/1/json',
-				'Invalid parameter "/1/json": JSON is expected.'
-			],
-			[
-				['type' => API_JSON, 'flags' => API_ALLOW_LLD_MACRO],
-				'{"key": {#LLD}}',
-				'/1/json',
-				'{"key": {#LLD}}'
-			],
-			[
-				['type' => API_JSON],
-				'{HOST.IP}',
-				'/1/json',
-				'Invalid parameter "/1/json": JSON is expected.'
-			],
-			[
-				['type' => API_JSON, 'macros_n' => ['{HOST.IP}']],
-				'{HOST.IP}',
-				'/1/json',
-				'{HOST.IP}'
-			],
-			[
-				['type' => API_JSON, 'macros_n' => ['{HOST.IP}']],
-				'{HOST.IP2}',
-				'/1/json',
-				'{HOST.IP2}'
-			],
-			[
-				['type' => API_JSON],
-				'{"key": {HOST.IP}}',
-				'/1/json',
-				'Invalid parameter "/1/json": JSON is expected.'
-			],
-			[
-				['type' => API_JSON, 'macros_n' => ['{HOST.IP}']],
-				'{"key1": {HOST.IP1}, "key2": {HOST.IP2}}',
-				'/1/json',
-				'{"key1": {HOST.IP1}, "key2": {HOST.IP2}}'
-			],
-			[
-				['type' => API_JSON],
-				'[]',
-				'/1/json',
-				'[]'
-			],
-			[
-				['type' => API_JSON],
-				'[[]]',
-				'/1/json',
-				'[[]]'
-			],
-			[
-				['type' => API_JSON],
-				'[[], []]',
-				'/1/json',
-				'[[], []]'
-			],
-			[
-				['type' => API_JSON],
-				'[[1]]',
-				'/1/json',
-				'[[1]]'
-			],
-			[
-				['type' => API_JSON],
-				'[1, 2, 3]',
-				'/1/json',
-				'[1, 2, 3]'
-			],
-			[
-				['type' => API_JSON],
-				'[[true]]',
-				'/1/json',
-				'[[true]]'
-			],
-			[
-				['type' => API_JSON],
-				'[[null]]',
-				'/1/json',
-				'[[null]]'
-			],
-			[
-				['type' => API_JSON],
-				'{null: "value"}',
-				'/1/json',
-				'Invalid parameter "/1/json": JSON is expected.'
-			],
-			[
-				['type' => API_JSON],
-				'[{"key": "value"}]',
-				'/1/json',
-				'[{"key": "value"}]'
-			],
-			[
-				['type' => API_JSON],
-				'[{"key": "value"}, {"key": "value"}]',
-				'/1/json',
-				'[{"key": "value"}, {"key": "value"}]'
-			],
-			[
-				['type' => API_JSON],
-				'["key": "value"]',
-				'/1/json',
-				'Invalid parameter "/1/json": JSON is expected.'
 			],
 
 			[
@@ -7022,132 +6800,6 @@ uwMrOBKatg7CZ1Uenv1K3ioD5w==
 				'/1/item_delay',
 				'Invalid parameter "/1/item_delay": must have a polling interval not blocked by non-active interval periods.'
 			],
-			[
-				['type' => API_XML],
-				null,
-				'/1/xml',
-				'Invalid parameter "/1/xml": a character string is expected.'
-			],
-			[
-				['type' => API_XML],
-				123,
-				'/1/xml',
-				'Invalid parameter "/1/xml": a character string is expected.'
-			],
-			[
-				['type' => API_XML],
-				'',
-				'/1/xml',
-				''
-			],
-			[
-				['type' => API_XML, 'flags' => API_NOT_EMPTY],
-				'',
-				'/1/xml',
-				'Invalid parameter "/1/xml": cannot be empty.'
-			],
-			[
-				['type' => API_XML],
-				'<?xml version="1.0" encoding="UTF-8"?>',
-				'/1/xml',
-				'Invalid parameter "/1/xml": (4) Start tag expected, \'<\' not found [Line: 1 | Column: 39].'
-			],
-			[
-				['type' => API_XML],
-				'<?xml version="1.0" encoding="UTF-8"?><node>value</node>',
-				'/1/xml',
-				'<?xml version="1.0" encoding="UTF-8"?><node>value</node>'
-			],
-			[
-				['type' => API_XML, 'length' => 10],
-				'<?xml version="1.0" encoding="UTF-8"?><node>value</node>',
-				'/1/xml',
-				'Invalid parameter "/1/xml": value is too long.'
-			],
-			[
-				['type' => API_XML],
-				'<?xml version="1.0" encoding="UTF-8"?><node prop="123">value</node>',
-				'/1/xml',
-				'<?xml version="1.0" encoding="UTF-8"?><node prop="123">value</node>'
-			],
-			[
-				['type' => API_XML],
-				'<?xml version="1.0" encoding="UTF-8"?><node prop="string">value</node>',
-				'/1/xml',
-				'<?xml version="1.0" encoding="UTF-8"?><node prop="string">value</node>'
-			],
-			[
-				['type' => API_XML],
-				'<?xml version="1.0" encoding="UTF-8"?><node prop=string>value</node>',
-				'/1/xml',
-				'Invalid parameter "/1/xml": (39) AttValue: " or \' expected [Line: 1 | Column: 50].'
-			],
-			[
-				['type' => API_XML],
-				'<?xml version="1.0" encoding="UTF-8"?><node prop="string>value</node>',
-				'/1/xml',
-				'Invalid parameter "/1/xml": (38) Unescaped \'<\' not allowed in attributes values [Line: 1 | Column: 63].'
-			],
-			[
-				['type' => API_XML],
-				'<?xml version="1.0" encoding="UTF-8"?><node prop="<">value</node>',
-				'/1/xml',
-				'Invalid parameter "/1/xml": (38) Unescaped \'<\' not allowed in attributes values [Line: 1 | Column: 51].'
-			],
-			[
-				['type' => API_XML],
-				'<?xml version="1.0" encoding="UTF-8"?><node prop="&lt;">value</node>',
-				'/1/xml',
-				'<?xml version="1.0" encoding="UTF-8"?><node prop="&lt;">value</node>'
-			],
-			[
-				['type' => API_XML],
-				'<?xml version="1.0" encoding="UTF-8"?><node><script></node>',
-				'/1/xml',
-				'Invalid parameter "/1/xml": (76) Opening and ending tag mismatch: script line 1 and node [Line: 1 | Column: 60].'
-			],
-			[
-				['type' => API_XML],
-				'<?xml version="1.0" encoding="UTF-8"?><node><script/></node>',
-				'/1/xml',
-				'<?xml version="1.0" encoding="UTF-8"?><node><script/></node>'
-			],
-			[
-				['type' => API_XML],
-				'<?xml version="1.0" encoding="UTF-8"?><node><script /></node>',
-				'/1/xml',
-				'<?xml version="1.0" encoding="UTF-8"?><node><script /></node>'
-			],
-			'Opening and ending tag mismatch' => [
-				['type' => API_XML],
-				'<?xml version="1.0" encoding="UTF-8"?><node></a></node>',
-				'/1/xml',
-				'Invalid parameter "/1/xml": (76) Opening and ending tag mismatch: node line 1 and a [Line: 1 | Column: 49].'
-			],
-			[
-				['type' => API_XML],
-				'<?xml version="1.0" encoding="UTF-8"?><node>/></node>',
-				'/1/xml',
-				'<?xml version="1.0" encoding="UTF-8"?><node>/></node>'
-			],
-			[
-				['type' => API_XML],
-				'<?xml version="1.0" encoding="UTF-8"?><node>/&gt;</node>',
-				'/1/xml',
-				'<?xml version="1.0" encoding="UTF-8"?><node>/&gt;</node>'
-			],
-			[
-				['type' => API_XML],
-				'<?xml version="1.0" encoding="UTF-8"?><node>"</node>',
-				'/1/xml',
-				'<?xml version="1.0" encoding="UTF-8"?><node>"</node>'
-			],
-			[
-				['type' => API_XML],
-				'<?xml version="1.0" encoding="UTF-8"?><node>&quot;</node>',
-				'/1/xml',
-				'<?xml version="1.0" encoding="UTF-8"?><node>&quot;</node>'
-			],
 
 			[
 				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_MULTIPLIER]],
@@ -7361,6 +7013,102 @@ uwMrOBKatg7CZ1Uenv1K3ioD5w==
 				"1\n10\nabc",
 				'/1/params',
 				'Invalid parameter "/1/params": unexpected parameter "3".'
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_VALIDATE_RANGE], 'flags' => API_ALLOW_USER_MACRO],
+				"{\$MACRO}\n",
+				'/1/params',
+				"{\$MACRO}\n"
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_VALIDATE_RANGE], 'flags' => API_ALLOW_USER_MACRO],
+				"\n{\$MACRO}",
+				'/1/params',
+				"\n{\$MACRO}"
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_VALIDATE_RANGE]],
+				"{\$MACRO}\n",
+				'/1/params',
+				'Invalid parameter "/1/params/1": a floating point value is expected.'
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_VALIDATE_RANGE]],
+				"\n{\$MACRO}",
+				'/1/params',
+				'Invalid parameter "/1/params/2": a floating point value is expected.'
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_VALIDATE_RANGE], 'flags' => API_ALLOW_USER_MACRO],
+				"{\$MACRO}\n10",
+				'/1/params',
+				"{\$MACRO}\n10"
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_VALIDATE_RANGE], 'flags' => API_ALLOW_USER_MACRO],
+				"1\n{\$MACRO}",
+				'/1/params',
+				"1\n{\$MACRO}"
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_VALIDATE_RANGE], 'flags' => API_ALLOW_USER_MACRO],
+				"{\$MACRO}\n{\$MACRO}",
+				'/1/params',
+				"{\$MACRO}\n{\$MACRO}"
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_VALIDATE_RANGE]],
+				"{\$MACRO}\n10",
+				'/1/params',
+				'Invalid parameter "/1/params/1": a floating point value is expected.'
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_VALIDATE_RANGE]],
+				"1\n{\$MACRO}",
+				'/1/params',
+				'Invalid parameter "/1/params/2": a floating point value is expected.'
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_VALIDATE_RANGE]],
+				"{\$MACRO}\n{\$MACRO}",
+				'/1/params',
+				'Invalid parameter "/1/params/1": a floating point value is expected.'
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_VALIDATE_RANGE], 'flags' => API_ALLOW_LLD_MACRO],
+				"{#MACRO}\n10",
+				'/1/params',
+				"{#MACRO}\n10"
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_VALIDATE_RANGE], 'flags' => API_ALLOW_LLD_MACRO],
+				"1\n{#MACRO}",
+				'/1/params',
+				"1\n{#MACRO}"
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_VALIDATE_RANGE], 'flags' => API_ALLOW_LLD_MACRO],
+				"{#MACRO}\n{#MACRO}",
+				'/1/params',
+				"{#MACRO}\n{#MACRO}"
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_VALIDATE_RANGE]],
+				"{#MACRO}\n10",
+				'/1/params',
+				'Invalid parameter "/1/params/1": a floating point value is expected.'
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_VALIDATE_RANGE]],
+				"1\n{#MACRO}",
+				'/1/params',
+				'Invalid parameter "/1/params/2": a floating point value is expected.'
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_VALIDATE_RANGE]],
+				"{#MACRO}\n{#MACRO}",
+				'/1/params',
+				'Invalid parameter "/1/params/1": a floating point value is expected.'
 			],
 			[
 				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_VALIDATE_REGEX]],

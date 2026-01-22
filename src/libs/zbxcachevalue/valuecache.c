@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -2428,7 +2428,7 @@ int	zbx_vc_init(zbx_uint64_t value_cache_size, char **error)
 	memset(vc_cache, 0, sizeof(zbx_vc_cache_t));
 
 	zbx_hashset_create_ext(&vc_cache->items, VC_ITEMS_INIT_SIZE,
-			ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC, NULL,
+			ZBX_DEFAULT_ID_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC, NULL,
 			__vc_shmem_malloc_func, __vc_shmem_realloc_func, __vc_shmem_free_func);
 
 	if (NULL == vc_cache->items.slots)

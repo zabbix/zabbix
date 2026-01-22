@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -173,9 +173,7 @@ class CHistory extends CApiService {
 		$result = [];
 		$sql_parts = [
 			'select'	=> ['history' => 'h.itemid'],
-			'from'		=> [
-				'history' => $this->tableName.' h'
-			],
+			'from'		=> $this->tableName.' h',
 			'where'		=> [],
 			'group'		=> [],
 			'order'		=> []
@@ -198,12 +196,12 @@ class CHistory extends CApiService {
 
 		// filter
 		if ($options['filter'] !== null) {
-			$this->dbFilter($sql_parts['from']['history'], $options, $sql_parts);
+			$this->dbFilter($sql_parts['from'], $options, $sql_parts);
 		}
 
 		// search
 		if ($options['search'] !== null) {
-			zbx_db_search($sql_parts['from']['history'], $options, $sql_parts);
+			zbx_db_search($sql_parts['from'], $options, $sql_parts);
 		}
 
 		$sql_parts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sql_parts);

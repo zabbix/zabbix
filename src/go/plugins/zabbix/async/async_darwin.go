@@ -1,7 +1,5 @@
-//go:build !windows
-
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -18,7 +16,6 @@ package zabbixasync
 
 func getMetrics() []string {
 	return []string{
-		"system.localtime", "Returns system local time.",
 		"system.boottime", "Returns system boot time.",
 		"net.tcp.listen", "Checks if this TCP port is in LISTEN state.",
 		"net.udp.listen", "Checks if this UDP port is in LISTEN state.",

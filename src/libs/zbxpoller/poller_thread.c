@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -176,7 +176,7 @@ static int	macro_http_raw_resolv(zbx_macro_resolv_data_t *p, va_list args, char 
 		zbx_dc_get_user_macro(um_handle, p->macro, &dc_host->hostid, 1, replace_with);
 		p->pos = (int)p->token.loc.r;
 	}
-	else if (0 == strcmp(p->macro, MVAR_HOST_HOST) || 0 == strcmp(p->macro, MVAR_HOSTNAME))
+	else if (0 == strcmp(p->macro, MVAR_HOST_HOST))
 	{
 		*replace_with = zbx_strdup(*replace_with, dc_host->host);
 	}
@@ -184,7 +184,7 @@ static int	macro_http_raw_resolv(zbx_macro_resolv_data_t *p, va_list args, char 
 	{
 		*replace_with = zbx_strdup(*replace_with, dc_host->name);
 	}
-	else if (0 == strcmp(p->macro, MVAR_HOST_IP) || 0 == strcmp(p->macro, MVAR_IPADDRESS))
+	else if (0 == strcmp(p->macro, MVAR_HOST_IP))
 	{
 		if (SUCCEED == (ret = zbx_dc_config_get_interface(&interface, dc_host->hostid, dc_item->itemid)))
 			*replace_with = zbx_strdup(*replace_with, interface.ip_orig);
@@ -365,7 +365,7 @@ static int	macro_jmx_endpoint_resolv(zbx_macro_resolv_data_t *p, va_list args, c
 			zbx_dc_get_user_macro(um_handle, p->macro, &dc_item->host.hostid, 1, replace_with);
 			p->pos = (int)p->token.loc.r;
 		}
-		else if (0 == strcmp(p->macro, MVAR_HOST_HOST) || 0 == strcmp(p->macro, MVAR_HOSTNAME))
+		else if (0 == strcmp(p->macro, MVAR_HOST_HOST))
 		{
 			*replace_with = zbx_strdup(*replace_with, dc_item->host.host);
 		}
@@ -373,7 +373,7 @@ static int	macro_jmx_endpoint_resolv(zbx_macro_resolv_data_t *p, va_list args, c
 		{
 			*replace_with = zbx_strdup(*replace_with, dc_item->host.name);
 		}
-		else if (0 == strcmp(p->macro, MVAR_HOST_IP) || 0 == strcmp(p->macro, MVAR_IPADDRESS))
+		else if (0 == strcmp(p->macro, MVAR_HOST_IP))
 		{
 			if (INTERFACE_TYPE_UNKNOWN != dc_item->interface.type)
 			{
@@ -1023,7 +1023,7 @@ ZBX_THREAD_ENTRY(zbx_poller_thread, args)
 				server_num = ((zbx_thread_args_t *)args)->info.server_num,
 				process_num = ((zbx_thread_args_t *)args)->info.process_num;
 	double			sec, total_sec = 0.0, old_total_sec = 0.0;
-	time_t			last_stat_time;
+	time_t			last_stat_time, now;
 	unsigned char		poller_type;
 	zbx_ipc_async_socket_t	rtc;
 	const zbx_thread_info_t	*info = &((zbx_thread_args_t *)args)->info;
@@ -1094,7 +1094,9 @@ ZBX_THREAD_ENTRY(zbx_poller_thread, args)
 
 		total_sec += zbx_time() - sec;
 
-		if (0 != sleeptime || STAT_INTERVAL <= time(NULL) - last_stat_time)
+		now = time(NULL);
+
+		if (0 != sleeptime || STAT_INTERVAL <= now - last_stat_time)
 		{
 			if (0 == sleeptime)
 			{
@@ -1115,7 +1117,9 @@ ZBX_THREAD_ENTRY(zbx_poller_thread, args)
 			}
 			processed = 0;
 			total_sec = 0.0;
-			last_stat_time = time(NULL);
+			last_stat_time = now;
+
+			zbx_malloc_trim(now, SEC_PER_MIN, ZBX_MEBIBYTE);
 		}
 
 		if (SUCCEED == zbx_rtc_wait(&rtc, info, &rtc_cmd, &rtc_data, sleeptime) && 0 != rtc_cmd)
@@ -1133,9 +1137,9 @@ ZBX_THREAD_ENTRY(zbx_poller_thread, args)
 #ifdef HAVE_NETSNMP
 #define	SNMP_ENGINEID_HK_INTERVAL	86400
 		if ((ZBX_POLLER_TYPE_NORMAL == poller_type || ZBX_POLLER_TYPE_UNREACHABLE == poller_type) &&
-				time(NULL) >= SNMP_ENGINEID_HK_INTERVAL + last_snmp_engineid_hk_time)
+				now >= SNMP_ENGINEID_HK_INTERVAL + last_snmp_engineid_hk_time)
 		{
-			last_snmp_engineid_hk_time = time(NULL);
+			last_snmp_engineid_hk_time = now;
 			zbx_clear_cache_snmp(process_type, process_num);
 		}
 #undef SNMP_ENGINEID_HK_INTERVAL

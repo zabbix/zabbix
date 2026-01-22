@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -12,28 +12,29 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-package zabbixasync
+package netif
 
 import (
-	"golang.zabbix.com/agent2/pkg/zbxlib"
+	"golang.zabbix.com/agent2/pkg/procfs"
 	"golang.zabbix.com/sdk/errs"
-	"golang.zabbix.com/sdk/plugin"
 )
 
-var impl Plugin
+func (p *Plugin) getDevDiscovery() ([]msgIfDiscovery, error) {
+	parser := procfs.NewParser().
+		SetScanStrategy(procfs.StrategyOSReadFile).
+		SetMatchMode(procfs.ModeContains).
+		SetPattern(":").
+		SetSplitter(":", 0)
 
-// Plugin -
-type Plugin struct {
-	plugin.Base
-}
-
-func init() {
-	err := plugin.RegisterMetrics(&impl, "ZabbixAsync", getMetrics()...)
+	data, err := parser.Parse(p.netDevFilepath)
 	if err != nil {
-		panic(errs.Wrap(err, "failed to register metrics"))
+		return nil, errs.Wrapf(err, "failed to parse %s file", p.netDevFilepath)
 	}
-}
 
-func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
-	return zbxlib.ExecuteCheck(key, params)
+	result := make([]msgIfDiscovery, 0, len(data))
+	for _, line := range data {
+		result = append(result, msgIfDiscovery{line, nil})
+	}
+
+	return result, nil
 }

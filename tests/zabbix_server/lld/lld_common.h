@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -12,10 +12,11 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-package zabbixasync
+#ifndef LLD_COMMON
+#define LLD_COMMON
 
-func getMetrics() []string {
-	return []string{
-		"system.localtime", "Returns system local time.",
-	}
-}
+#include "../../../src/zabbix_server/lld/lld.h"
+
+void	get_macros(const char *path, zbx_vector_lld_macro_path_ptr_t *macros);
+
+#endif

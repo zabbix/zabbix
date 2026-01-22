@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -256,12 +256,6 @@ class CApiInputValidator {
 			case API_ITEM_DELAY:
 				return self::validateItemDelay($rule, $data, $path, $error);
 
-			case API_JSON:
-				return self::validateJson($rule, $data, $path, $error);
-
-			case API_XML:
-				return self::validateXml($rule, $data, $path, $error);
-
 			case API_PREPROC_PARAMS:
 				return self::validatePreprocParams($rule, $data, $path, $error);
 
@@ -359,8 +353,6 @@ class CApiInputValidator {
 			case API_ANY:
 			case API_ITEM_KEY:
 			case API_ITEM_DELAY:
-			case API_JSON:
-			case API_XML:
 			case API_PREPROC_PARAMS:
 			case API_PROMETHEUS_PATTERN:
 			case API_PROMETHEUS_LABEL:
@@ -1030,23 +1022,11 @@ class CApiInputValidator {
 			if ($number_parser->parse($data) == CParser::PARSE_SUCCESS) {
 				$value = (float) $number_parser->getMatch();
 			}
+			elseif ((($flags & API_ALLOW_USER_MACRO) && self::checkValueIsUserMacro($data))
+					|| (($flags & API_ALLOW_LLD_MACRO) && self::checkValueIsLldMacro($data))) {
+				return true;
+			}
 			else {
-				$macro_parsers = [];
-				if ($flags & API_ALLOW_USER_MACRO) {
-					$macro_parsers[] = new CUserMacroParser();
-					$macro_parsers[] = new CUserMacroFunctionParser();
-				}
-				if ($flags & API_ALLOW_LLD_MACRO) {
-					$macro_parsers[] = new CLLDMacroParser();
-					$macro_parsers[] = new CLLDMacroFunctionParser();
-				}
-
-				foreach ($macro_parsers as $macro_parser) {
-					if ($macro_parser->parse($data) == CParser::PARSE_SUCCESS) {
-						return true;
-					}
-				}
-
 				$value = NAN;
 			}
 		}
@@ -1540,8 +1520,23 @@ class CApiInputValidator {
 			}
 
 			if (array_key_exists('compare', $field_rule)) {
-				$field_rule['compare']['path'] = ($path === '/' ? $path : $path.'/').$field_rule['compare']['field'];
-				$field_rule['compare']['value'] = $data[$field_rule['compare']['field']];
+				$compare_field_name = $field_rule['compare']['field'];
+				$compare_field_value = $data[$compare_field_name];
+				$compare_field_flags = array_key_exists('flags', $rule['fields'][$compare_field_name])
+					? $rule['fields'][$compare_field_name]['flags']
+					: 0x00;
+
+				if (is_string($compare_field_value)
+						&& ((($compare_field_flags & API_ALLOW_USER_MACRO)
+							&& self::checkValueIsUserMacro($compare_field_value))
+						|| (($compare_field_flags & API_ALLOW_LLD_MACRO)
+							&& self::checkValueIsLldMacro($compare_field_value)))) {
+					unset($field_rule['compare']);
+				}
+				else {
+					$field_rule['compare']['path'] = ($path === '/' ? $path : $path.'/').$compare_field_name;
+					$field_rule['compare']['value'] = $compare_field_value;
+				}
 			}
 
 			if (array_key_exists('preproc_type', $field_rule)) {
@@ -2182,8 +2177,9 @@ class CApiInputValidator {
 			return true;
 		}
 
-		if (@preg_match('('.$data.')', '') === false) {
+		if (!(new CRegexValidator)->validate($data)) {
 			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('invalid regular expression'));
+
 			return false;
 		}
 
@@ -3962,120 +3958,6 @@ class CApiInputValidator {
 	}
 
 	/**
-	 * JSON validator.
-	 *
-	 * @param array  $rule
-	 * @param int    $rule['flags']     (optional) API_NOT_EMPTY, API_ALLOW_USER_MACRO, API_ALLOW_LLD_MACRO
-	 * @param array  $rule['macros_n']  (optional) An array of supported macros. Example: ['{HOST.IP}', '{ITEM.KEY}'].
-	 * @param int    $rule['length']    (optional)
-	 * @param mixed  $data
-	 * @param string $path
-	 * @param string $error
-	 *
-	 * @return bool
-	 */
-	private static function validateJson($rule, &$data, $path, &$error) {
-		$flags = array_key_exists('flags', $rule) ? $rule['flags'] : 0x00;
-
-		if (self::checkStringUtf8($flags & API_NOT_EMPTY, $data, $path, $error) === false) {
-			return false;
-		}
-
-		if ($data === '') {
-			return true;
-		}
-
-		if (array_key_exists('length', $rule) && mb_strlen($data) > $rule['length']) {
-			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('value is too long'));
-			return false;
-		}
-
-		$json = $data;
-
-		$types = [];
-
-		if ($flags & API_ALLOW_USER_MACRO) {
-			$types['usermacros'] = true;
-		}
-
-		if ($flags & API_ALLOW_LLD_MACRO) {
-			$types['lldmacros'] = true;
-		}
-
-		if (array_key_exists('macros_n', $rule)) {
-			$types['macros_n'] = $rule['macros_n'];
-		}
-
-		if ($types) {
-			$matches = CMacrosResolverGeneral::getMacroPositions($json, $types);
-			$shift = 0;
-
-			foreach ($matches as $pos => $substr) {
-				$json = substr_replace($json, '1', $pos + $shift, strlen($substr));
-				$shift = $shift + 1 - strlen($substr);
-			}
-		}
-
-		json_decode($json);
-
-		if (json_last_error() != JSON_ERROR_NONE) {
-			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('JSON is expected'));
-			return false;
-		}
-
-		return true;
-	}
-
-	/**
-	 * XML validator.
-	 *
-	 * @param array  $rule
-	 * @param int    $rule['flags']   (optional) API_NOT_EMPTY
-	 * @param int    $rule['length']  (optional)
-	 * @param mixed  $data
-	 * @param string $path
-	 * @param string $error
-	 *
-	 * @return bool
-	 */
-	private static function validateXml(array $rule, &$data, string $path, string &$error): bool {
-		$flags = array_key_exists('flags', $rule) ? $rule['flags'] : 0x00;
-
-		if (self::checkStringUtf8($flags & API_NOT_EMPTY, $data, $path, $error) === false) {
-			return false;
-		}
-
-		if ($data === '') {
-			return true;
-		}
-
-		if (array_key_exists('length', $rule) && mb_strlen($data) > $rule['length']) {
-			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('value is too long'));
-			return false;
-		}
-
-		libxml_use_internal_errors(true);
-
-		if (simplexml_load_string($data, null, LIBXML_IMPORT_FLAGS) === false) {
-			$errors = libxml_get_errors();
-			libxml_clear_errors();
-
-			if ($errors) {
-				$error = reset($errors);
-				$error = _s('Invalid parameter "%1$s": %2$s.', $path, _s('%1$s [Line: %2$s | Column: %3$s]',
-					'('.$error->code.') '.trim($error->message), $error->line, $error->column
-				));
-				return false;
-			}
-
-			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('XML is expected'));
-			return false;
-		}
-
-		return true;
-	}
-
-	/**
 	 * @param array  $rule
 	 * @param int    $rule['flags']                  (optional) API_ALLOW_USER_MACRO, API_ALLOW_LLD_MACRO
 	 * @param array  $rule['preproc_type']
@@ -4447,5 +4329,29 @@ class CApiInputValidator {
 		}
 
 		return true;
+	}
+
+	private static function checkValueIsUserMacro(string $value): bool {
+		$macro_parsers = [new CUserMacroParser(), new CUserMacroFunctionParser()];
+
+		foreach ($macro_parsers as $macro_parser) {
+			if ($macro_parser->parse($value) == CParser::PARSE_SUCCESS) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	private static function checkValueIsLldMacro(string $value): bool {
+		$macro_parsers = [new CLLDMacroParser(), new CLLDMacroFunctionParser()];
+
+		foreach ($macro_parsers as $macro_parser) {
+			if ($macro_parser->parse($value) == CParser::PARSE_SUCCESS) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 }

@@ -1,6 +1,5 @@
-<?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -13,30 +12,16 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
+package zabbixasync
 
-class CXmlValidator extends CValidator {
-
-	public function validate($value) {
-		libxml_use_internal_errors(true);
-
-		if (simplexml_load_string($value, null, LIBXML_IMPORT_FLAGS) === false) {
-			$errors = libxml_get_errors();
-			libxml_clear_errors();
-
-			if ($errors) {
-				$error = reset($errors);
-				$this->setError(_s('%1$s [Line: %2$s | Column: %3$s]', '('.$error->code.') '.trim($error->message),
-					$error->line, $error->column
-				));
-
-				return false;
-			}
-
-			$this->setError(_('XML is expected'));
-
-			return false;
-		}
-
-		return true;
+func getMetrics() []string {
+	return []string{
+		"net.tcp.listen", "Checks if this TCP port is in LISTEN state.",
+		"sensor", "Hardware sensor reading.",
+		"system.cpu.load", "CPU load.",
+		"system.cpu.switches", "Count of context switches.",
+		"system.cpu.intr", "Device interrupts.",
+		"system.hw.cpu", "CPU information.",
+		"system.hw.macaddr", "Listing of MAC addresses.",
 	}
 }
