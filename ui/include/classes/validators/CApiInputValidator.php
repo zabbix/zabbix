@@ -4203,10 +4203,6 @@ class CApiInputValidator {
 				break;
 
 			case ZBX_PREPROC_CSV_TO_JSON:
-				if ($params[3] === '') {
-					$params[3] = ZBX_PREPROC_CSV_NO_HEADER;
-				}
-
 				$api_input_rules = ['type' => API_OBJECT, 'fields' => [
 					'1' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => 1],
 					'2' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => 1],
