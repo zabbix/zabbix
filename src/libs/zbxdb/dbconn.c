@@ -363,7 +363,7 @@ void	dbconn_close(zbx_dbconn_t *db)
 #if defined(HAVE_POSTGRESQL)
 int	zbx_dbconn_parse_and_validate_dbhost(zbx_db_config_t *config, char **error)
 {
-	char		*start, *tmp, *result = NULL;
+	char		*start, *result = NULL;
 	size_t		result_alloc = 0, result_offset = 0;
 	unsigned short	def_port = (0 != config->dbport ? (unsigned short)config->dbport : 5432);
 
@@ -373,9 +373,7 @@ int	zbx_dbconn_parse_and_validate_dbhost(zbx_db_config_t *config, char **error)
 	if (NULL == strchr(config->dbhost, ','))
 		return SUCCEED;
 
-	tmp = zbx_strdup(NULL, config->dbhost);
-
-	for (start = tmp; '\0' != *start;)
+	for (start = config->dbhost; '\0' != *start;)
 	{
 		char		*parsed_ip = NULL, *end;
 		unsigned short	parsed_port;
@@ -389,7 +387,6 @@ int	zbx_dbconn_parse_and_validate_dbhost(zbx_db_config_t *config, char **error)
 			*error = zbx_dsprintf(NULL, "error parsing the \"%s\" parameter: address \"%s\" is "
 					"invalid", config->dbhost, start);
 
-			zbx_free(tmp);
 			zbx_free(result);
 			zbx_free(config->dbports);
 
@@ -413,8 +410,6 @@ int	zbx_dbconn_parse_and_validate_dbhost(zbx_db_config_t *config, char **error)
 		else
 			break;
 	}
-
-	zbx_free(tmp);
 
 	zbx_free(config->dbhost);
 	config->dbhost = result;
