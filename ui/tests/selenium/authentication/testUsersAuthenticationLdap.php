@@ -1939,7 +1939,9 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 						'Enable JIT provisioning' => true,
 						'Provisioning period' => '788400001'
 					],
-					'error' => 'Incorrect value for field "jit_provision_interval": value must be one of 3600-788400000.'
+					'ldapbase_inline_errors' => [
+						'id:jit_provision_interval' => 'Value must be between 3600s (1h) and 788400000s (9125d).'
+					]
 				]
 			],
 			// #22 Time (in minutes) value below the boundary in Provisioning period.
@@ -1950,7 +1952,9 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 						'Enable JIT provisioning' => true,
 						'Provisioning period' => '59m'
 					],
-					'error' => 'Incorrect value for field "jit_provision_interval": value must be one of 3600-788400000.'
+					'ldapbase_inline_errors' => [
+						'id:jit_provision_interval' => 'Value must be between 3600s (1h) and 788400000s (9125d).'
+					]
 				]
 			],
 			// #23 Invalid time unit used in Provisioning period.
@@ -1961,7 +1965,9 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 						'Enable JIT provisioning' => true,
 						'Provisioning period' => '1q'
 					],
-					'error' => 'Incorrect value for field "jit_provision_interval": a time unit is expected.'
+					'ldapbase_inline_errors' => [
+						'id:jit_provision_interval' => 'A time unit is expected.'
+					]
 				]
 			]
 		];
@@ -2908,7 +2914,8 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 			}
 
 			if (array_key_exists('ldapbase_inline_errors', $data)) {
-				$form = $this->query('id:jit_provision_interval')->asForm()->one();
+				$this->page->removeFocus();
+				$form = $this->query('id:authentication-form')->asForm()->one();
 				$this->assertInlineError($form, $data['ldapbase_inline_errors']);
 			}
 
@@ -3119,14 +3126,13 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 			}
 		}
 
-		if (!array_key_exists('server_inline_errors', $data) && !array_key_exists('jit_inline_errors', $data)
-				&& !array_key_exists('mapping_inline_errors', $data))
-		{
-			// Configuration of LDAP form.
-			if (array_key_exists('ldap_fields', $data)) {
-				$form->fill($data['ldap_fields']);
-			}
+		// Configuration of LDAP form.
+		if (array_key_exists('ldap_fields', $data)) {
+			$form->fill($data['ldap_fields']);
+		}
 
+		if (!array_key_exists('server_inline_errors', $data) && !array_key_exists('jit_inline_errors', $data)
+				&& !array_key_exists('mapping_inline_errors', $data) && !array_key_exists('ldapbase_inline_errors', $data)) {
 			$form->submit();
 
 			if ($this->page->isAlertPresent()) {
