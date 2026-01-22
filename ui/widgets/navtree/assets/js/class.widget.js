@@ -75,6 +75,10 @@ class CWidgetNavTree extends CWidget {
 	}
 
 	onActivate() {
+		if (!this.isReferred()) {
+			this.#updateUserProfileItemSelected();
+		}
+
 		this.#activateContentEvents();
 	}
 
@@ -521,7 +525,7 @@ class CWidgetNavTree extends CWidget {
 
 	#updateUserProfileItemSelected() {
 		updateUserProfile('web.dashboard.widget.navtree.item.selected',
-			this.#navtree_item_selected, [this.getWidgetId()]
+			this.#navtree_item_selected ?? 0, [this.getWidgetId()]
 		);
 	}
 
