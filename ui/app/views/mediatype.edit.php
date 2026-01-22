@@ -148,10 +148,9 @@ $mediatype_form_grid = (new CFormGrid())
 $oauth_status = [];
 
 if ($data['mediatypeid'] && $data['smtp_authentication'] == SMTP_AUTHENTICATION_OAUTH) {
-	$oauth_status = [];
 
 	// Do not show "Configured ago" label for imported media types without defined tokens.
-	if ($data['access_token_updated'] > 0 && $data['access_token_updated'] <= time()) {
+	if ($data['access_token_updated'] >= 0 && $data['access_token_updated'] <= time()) {
 		$oauth_status[] = italic(_s('Configured %1$s ago', zbx_date2age($data['access_token_updated'])));
 	}
 
@@ -165,8 +164,7 @@ if ($data['mediatypeid'] && $data['smtp_authentication'] == SMTP_AUTHENTICATION_
 
 		$oauth_status[] = ($data['access_token_updated'] > time())
 			? makeErrorIcon([
-				(new CList([$refresh_token_error, $access_token_error]))
-					->addClass(ZBX_STYLE_LIST_DASHED)
+				(new CList([$refresh_token_error, $access_token_error]))->addClass(ZBX_STYLE_LIST_DASHED)
 			])
 			: makeErrorIcon([$refresh_token_error]);
 	}
