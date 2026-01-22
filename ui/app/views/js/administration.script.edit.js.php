@@ -340,7 +340,6 @@ window.script_edit_popup = new class {
 
 		curl.setArgument('action', this.scriptid === null ? 'script.create' : 'script.update');
 
-		fields.parameters = Object.fromEntries(Object.entries(fields.parameters).filter(([, {value}]) => value !== ''));
 		this.form.validateSubmit(fields)
 			.then((result) => {
 				if (!result) {
