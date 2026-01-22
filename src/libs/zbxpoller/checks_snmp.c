@@ -865,7 +865,7 @@ static int	zbx_get_snmp_response_error(const zbx_snmp_sess_t ssp, const zbx_dc_i
 	if (STAT_SUCCESS == status)
 	{
 		zbx_snprintf(error, max_error_len, "SNMP error: %s", snmp_errstring(response->errstat));
-		
+
 		if (SNMP_ERR_AUTHORIZATIONERROR == response->errstat)
 			ret = NETWORK_ERROR;
 		else
