@@ -152,7 +152,9 @@ static void	mock_read_steps(zbx_vector_mock_step_t *steps, zbx_mock_handle_t hst
 
 	um_mock_cache_init(&mock_cache0, -1);
 
+	zbx_config_wlock_set_locked();
 	config->um_cache = um_cache_create();
+	zbx_config_wlock_set_unlocked();
 
 	while (ZBX_MOCK_END_OF_VECTOR != zbx_mock_vector_element(hsteps, &hstep))
 	{
@@ -174,11 +176,14 @@ static void	mock_read_steps(zbx_vector_mock_step_t *steps, zbx_mock_handle_t hst
 
 		hconfig = zbx_mock_get_object_member_handle(hstep, "config");
 		um_mock_cache_init(&step->mock_cache, hconfig);
-		zbx_config_wlock_set_locked();
 
 		um_mock_cache_diff(mock_cache_last, &step->mock_cache, &gmacros, &hmacros, &htmpls);
+
+		zbx_config_wlock_set_locked();
 		config->um_cache = step->cache = um_cache_sync(config->um_cache, 0, &gmacros, &hmacros, &htmpls,
 				&config_vault, &um_cache_dup_sec, &um_cache_dup_size);
+
+		zbx_config_wlock_set_unlocked();
 
 		mock_dbsync_clear(&gmacros);
 		mock_dbsync_clear(&hmacros);
@@ -189,8 +194,10 @@ static void	mock_read_steps(zbx_vector_mock_step_t *steps, zbx_mock_handle_t hst
 		if (FAIL == zbx_json_open(vault, &jp))
 			fail_msg("invalid vault json");
 
+		/* zbx_dc_sync_kvs_paths() locks and unlocks config on his own */
 		zbx_dc_sync_kvs_paths(&jp, &config_vault, config_source_ip, config_ssl_ca_location,
 				config_ssl_cert_location, config_ssl_key_location);
+
 		step->cache->refcount++;
 
 		zbx_free(vault);
@@ -205,9 +212,12 @@ static void	mock_read_steps(zbx_vector_mock_step_t *steps, zbx_mock_handle_t hst
 
 		um_mock_cache_clear(mock_cache_last);
 		mock_cache_last = &step->mock_cache;
+
 	}
 
 	um_mock_cache_clear(mock_cache_last);
+
+	zbx_config_wlock_set_unlocked();
 }
 
 void	zbx_mock_test_entry(void **state)
@@ -219,8 +229,6 @@ void	zbx_mock_test_entry(void **state)
 
 	zbx_vector_mock_step_create(&steps);
 
-	zbx_config_wlock_set_locked();
-
 	um_mock_config_init();
 	mock_read_steps(&steps, zbx_mock_get_parameter_handle("in.steps"));
 
@@ -230,8 +238,10 @@ void	zbx_mock_test_entry(void **state)
 		mock_step_validate(steps.values[i]);
 	}
 
+	zbx_config_wlock_set_locked();
 	zbx_vector_mock_step_clear_ext(&steps, mock_step_free);
 	zbx_vector_mock_step_destroy(&steps);
 
 	um_mock_config_destroy();
+	zbx_config_wlock_set_unlocked();
 }
