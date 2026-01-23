@@ -46,8 +46,7 @@ class CControllerAuthenticationUpdate extends CController {
 			],
 			'ldap_default_row_index' =>	['integer', 'required',
 				'when' => [
-					['ldap_auth_enabled', 'in' => [ZBX_AUTH_LDAP_ENABLED]],
-					['ldap_jit_status', 'in' => [JIT_PROVISIONING_ENABLED]]
+					['ldap_auth_enabled', 'in' => [ZBX_AUTH_LDAP_ENABLED]]
 				]
 			],
 			'ldap_case_sensitive' => ['setting ldap_case_sensitive',
