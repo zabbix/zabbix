@@ -148,7 +148,7 @@ class CControllerPopupLdapCheck extends CController {
 
 	protected function doAction(): void {
 		$data = [
-			'body' => [
+			'body' => $this->getInputAll() + [
 				'name' => '',
 				'host' => '',
 				'port' => '',
@@ -172,24 +172,6 @@ class CControllerPopupLdapCheck extends CController {
 				'provision_media' => []
 			]
 		];
-		$fields = array_flip(array_keys($data['body']));
-
-		if ($this->getInput('group_configuration') == CControllerPopupLdapEdit::LDAP_MEMBER_OF) {
-			unset($fields['group_basedn'], $fields['group_member'], $fields['user_ref_attr'], $fields['group_filter']);
-		}
-		else {
-			unset($fields['group_membership']);
-		}
-
-		$this->getInputs($data['body'], array_keys($fields));
-
-		if ($this->hasInput('userdirectoryid')) {
-			$data['body']['userdirectoryid'] = $this->getInput('userdirectoryid');
-		}
-
-		if ($this->hasInput('bind_password')) {
-			$data['body']['bind_password'] = $this->getInput('bind_password');
-		}
 
 		if ($this->hasInput('provision_groups')) {
 			foreach ($data['body']['provision_groups'] as &$group) {
