@@ -2278,19 +2278,20 @@ class CUser extends CApiService {
 			'refresh', 'theme', 'attempt_failed', 'attempt_ip', 'attempt_clock', 'rows_per_page', 'timezone', 'roleid'
 		];
 
-		$fields_for_validation = ['userid', 'username'];
-
 		if ($case_sensitive) {
-			$db_users = DB::select('users', [
-				'output' => $fields_for_validation,
-				'filter' => ['username' => $username]
-			]);
+			$db_users  = DBfetchArray(DBselect(
+				'SELECT '.implode(',', $fields).
+				' FROM users'.
+				' WHERE username='.zbx_dbstr($username).
+				' FOR UPDATE'
+			));
 		}
 		else {
 			$db_users_rows = DBfetchArray(DBselect(
-				'SELECT '.implode(',', $fields_for_validation).
+				'SELECT '.implode(',', $fields).
 				' FROM users'.
-					' WHERE LOWER(username)='.zbx_dbstr(strtolower($username))
+				' WHERE LOWER(username)='.zbx_dbstr(strtolower($username)).
+				' FOR UPDATE'
 			));
 
 			if ($do_group_check) {
@@ -2321,16 +2322,7 @@ class CUser extends CApiService {
 			);
 		}
 
-		$db_user = reset($db_users);
-
-		$db_user = DBfetchArray(DBselect(
-			'SELECT '.implode(',', $fields).
-			' FROM users'.
-			' WHERE '.dbConditionId('userid', [$db_user['userid']]).
-			' FOR UPDATE')
-		)[0];
-
-		return $db_user;
+		return reset($db_users);
 	}
 
 	/**
