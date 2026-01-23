@@ -731,7 +731,7 @@ const hintBox = {
 			// Hint fits neither under nor above event - then show it in the biggest part of the screen.
 			else {
 				css.top = Math.ceil(window.innerHeight / 2 - e.clientY > 0
-					? host_y_max - EVENT_OFFSET - hint_rect.height - SCREEN_Y_PADDING
+					? host_y_max - hint_rect.height - SCREEN_Y_PADDING
 					: host_y_min + SCREEN_Y_PADDING
 				);
 
