@@ -139,9 +139,13 @@
 		},
 
 		_refreshDebug(debug) {
-			document.querySelector('.wrapper > .debug-output')?.replaceWith(
-				new DOMParser().parseFromString(debug, 'text/html').body.firstElementChild
-			);
+			const debug_output = document
+				.querySelector('.wrapper > main > .<?= ZBX_STYLE_DEBUG_OUTPUT_TABLE_REFRESH;?>');
+
+			if (debug_output) {
+				debug_output.innerHTML = new DOMParser().parseFromString(debug, 'text/html')
+				.querySelector('.<?= ZBX_STYLE_DEBUG_OUTPUT; ?>').innerHTML;
+			}
 		},
 
 		refresh() {
