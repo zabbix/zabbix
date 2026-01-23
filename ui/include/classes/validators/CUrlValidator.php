@@ -27,7 +27,7 @@ class CUrlValidator extends CValidator {
 	protected bool $allow_event_tags_macro = false;
 
 	/**
-	 * @var bool If set to be true, URLs containing {EVENT.TAGS.<ref>} macros will be considered as valid.
+	 * @var bool If set to be true, URLs containing {MANUALINPUT} macros will be considered as valid.
 	 */
 	protected bool $allow_manualinput_macro = false;
 
