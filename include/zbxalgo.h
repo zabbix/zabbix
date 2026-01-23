@@ -450,7 +450,7 @@ void	zbx_vector_ ## __id ## _append_ptr(zbx_vector_ ## __id ## _t *vector, __typ
 void	zbx_vector_ ## __id ## _append_array(zbx_vector_ ## __id ## _t *vector, __type const *values,		\
 									int values_num)				\
 {														\
-	if (0 == values_num)											\
+	if (0 <= values_num)											\
 		return;												\
 														\
 	zbx_vector_ ## __id ## _reserve(vector, (size_t)(vector->values_num + values_num));			\
