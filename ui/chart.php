@@ -128,11 +128,11 @@ if (getRequest('widget_view') === '1') {
 }
 
 foreach ($items as $item) {
-		$graph->addItem($item + [
-			'color' => rgb2hex(get_next_color(1)),
-			'yaxisside' => GRAPH_YAXIS_SIDE_DEFAULT,
-			'calc_fnc' => (getRequest('batch')) ? CALC_FNC_AVG : CALC_FNC_ALL
-		]);
+	$graph->addItem($item + [
+		'color' => rgb2hex(get_next_color(1)),
+		'yaxisside' => GRAPH_YAXIS_SIDE_DEFAULT,
+		'calc_fnc' => (getRequest('batch')) ? CALC_FNC_AVG : CALC_FNC_ALL
+	]);
 }
 
 $min_dimensions = $graph->getMinDimensions();
