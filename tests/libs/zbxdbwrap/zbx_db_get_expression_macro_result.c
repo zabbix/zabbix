@@ -125,7 +125,7 @@ static int	expression_resolv(zbx_macro_resolv_data_t *p, va_list args, char **re
 				zbx_free(errmsg);
 			}
 		}
-		else if (0 == strcmp(p->macro, MVAR_HOST_HOST) || 0 == strcmp(p->macro, MVAR_HOSTNAME))
+		else if (0 == strcmp(p->macro, MVAR_HOST_HOST))
 		{
 			ret = zbx_db_with_trigger_itemid(&event->trigger, replace_to, p->index, &zbx_dc_get_host_value,
 					ZBX_DC_REQUEST_HOST_HOST);

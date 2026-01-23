@@ -498,7 +498,7 @@ class CFormValidator {
 	/**
 	 * Call API request to validate all api based validations.
 	 *
-	 * @param {Array} validatons
+	 * @param {Array} validations
 	 *
 	 * @returns {Promise}
 	 */

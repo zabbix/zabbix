@@ -1812,6 +1812,11 @@ msgstr "하나 이상의 매개변수를 활성화해야 합니다."
 msgid "At least one period must be added."
 msgstr ""
 
+#: app/controllers/CControllerConnectorCreate.php:44
+#: app/controllers/CControllerConnectorUpdate.php:45
+msgid "At least one type of information must be selected."
+msgstr ""
+
 #: app/controllers/CControllerPopupAcknowledgeCreate.php:283
 msgid "At least one update operation or message is mandatory"
 msgstr "하나 이상의 업데이트 작업 또는 메시지가 필수입니다."
@@ -21440,6 +21445,11 @@ msgstr "태그 표시 우선도"
 #: app/views/connector.edit.php:71
 msgid "Tag filter"
 msgstr "태그 필터"
+
+#: app/controllers/CControllerConnectorCreate.php:120
+#: app/controllers/CControllerConnectorUpdate.php:121
+msgid "Tag filter name, operator and value combination is not unique."
+msgstr ""
 
 #: app/partials/trigger.edit.trigger.tab.php:253
 msgid "Tag for matching"

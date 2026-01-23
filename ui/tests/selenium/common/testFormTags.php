@@ -250,7 +250,7 @@ class testFormTags extends CWebTest {
 		$old_hash = null;
 		$expected = CTestArrayHelper::get($data, 'expected', TEST_GOOD);
 		$inline_validation = in_array($object, ['host', 'host prototype', 'template', 'trigger', 'trigger prototype',
-			'item', 'item prototype', 'service']
+			'item', 'item prototype', 'service', 'connector']
 		);
 
 		switch ($object) {
@@ -485,7 +485,7 @@ class testFormTags extends CWebTest {
 		$old_hash = null;
 		$expected = CTestArrayHelper::get($data, 'expected', TEST_GOOD);
 		$inline_validation = in_array($object, ['host', 'host prototype', 'template', 'trigger', 'trigger prototype',
-			'item', 'item prototype', 'service'
+			'item', 'item prototype', 'service', 'connector'
 		]);
 
 		switch ($object) {
@@ -614,7 +614,7 @@ class testFormTags extends CWebTest {
 			$this->assertEquals($old_hash, CDBHelper::getHash($sql));
 
 			if (in_array($object, ['connector', 'template', 'trigger', 'trigger prototype', 'item', 'item prototype',
-				'host', 'service'])) {
+				'host', 'service', 'connector'])) {
 				COverlayDialogElement::find()->one()->close();
 			}
 		}
