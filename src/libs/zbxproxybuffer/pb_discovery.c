@@ -127,6 +127,9 @@ static void	pb_discovery_write_row(zbx_pb_discovery_data_t *data, zbx_uint64_t d
 		row->clock = clock;
 		row->error = zbx_strdup(NULL, ZBX_NULL2EMPTY_STR(error));
 
+		/* no real value for handleid for now */
+		row->handleid = 0;
+
 		zbx_list_append(&data->rows, row, NULL);
 		data->rows_num++;
 	}
