@@ -181,9 +181,7 @@ class CControllerAuthenticationUpdate extends CController {
 					'clientid' => ['db mfa.clientid', 'required', 'not_empty',
 						'when' => ['type', 'in' => [MFA_TYPE_DUO]]
 					],
-					'client_secret' => ['db mfa.clientid', 'required', 'not_empty',
-						'when' => ['type', 'in' => [MFA_TYPE_DUO]]
-					]
+					'client_secret' => ['db mfa.client_secret', 'not_empty', 'when' => ['type', 'in' => [MFA_TYPE_DUO]]]
 				],
 				'when' => ['mfa_status', 'in' => [MFA_ENABLED]]
 			],
