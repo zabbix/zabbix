@@ -2573,7 +2573,6 @@ int	zbx_vmware_service_update(zbx_vmware_service_t *service, const char *config_
 
 	data = (zbx_vmware_data_t *)zbx_malloc(NULL, sizeof(zbx_vmware_data_t));
 	memset(data, 0, sizeof(zbx_vmware_data_t));
-	page.alloc = 0;
 
 	zbx_hashset_create(&data->hvs, 1, vmware_hv_hash, vmware_hv_compare);
 	zbx_vector_vmware_cluster_ptr_create(&data->clusters);
@@ -2609,6 +2608,7 @@ int	zbx_vmware_service_update(zbx_vmware_service_t *service, const char *config_
 	page.alloc = ZBX_INIT_UPD_XML_SIZE;
 	page.data = (char *)zbx_malloc(NULL, page.alloc);
 	page.data[0] = '\0';
+	page.offset = 0;
 
 	if (SUCCEED != vmware_curl_set_header(easyhandle, service->major_version, &headers, &data->error))
 		goto clean;
