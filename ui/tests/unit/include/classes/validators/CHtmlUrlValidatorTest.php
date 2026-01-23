@@ -63,7 +63,7 @@ class CHtmlUrlValidatorTest extends TestCase {
 			['/zabbix.php',												[],															true],
 			['subdir/zabbix.php',										[],															true],
 			['subdir/hosts/id/10084',									[],															true],
-			['subdir/'.'/100500/',										[],															true], // Comment hook does not allow "//".
+			['subdir//100500/',											[],															true],
 			['zabbix.php/..',											[],															true],
 			['hosts/..php',												[],															true],
 			['subdir1/../subdir2/../subdir3/',							[],															true],

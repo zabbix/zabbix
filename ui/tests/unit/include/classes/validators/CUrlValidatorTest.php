@@ -63,7 +63,7 @@ class CUrlValidatorTest extends TestCase {
 			['/zabbix.php',												[],															null],
 			['subdir/zabbix.php',										[],															null],
 			['subdir/hosts/id/10084',									[],															null],
-			['subdir/'.'/100500/',										[],															null], // Comment hook does not allow "//".
+			['subdir//100500/',											[],															null],
 			['zabbix.php/..',											[],															null],
 			['hosts/..php',												[],															null],
 			['subdir1/../subdir2/../subdir3/',							[],															null],
