@@ -121,8 +121,6 @@ class CControllerScriptUpdate extends CController {
 				'when' => ['type', 'in' => [ZBX_SCRIPT_TYPE_WEBHOOK]]
 			],
 			'url' => ['db scripts.url', 'required', 'not_empty',
-				'use' => [CHtmlUrlValidator::class, ['allow_user_macro' => true, 'allow_manualinput_macro' => true]],
-				'messages' => ['use' => _('Invalid URL')],
 				'when' => ['type', 'in' => [ZBX_SCRIPT_TYPE_URL]]
 			],
 			'new_window' => ['db scripts.new_window',

@@ -1067,11 +1067,6 @@ class CFormValidator {
 		elseif (is_subclass_of($class, CValidator::class)) {
 			self::validateUseCValidator($rules['use'], $class, $value, $error);
 		}
-		elseif ($instance instanceof CHtmlUrlValidator) {
-			if ($instance->validate($value, $class_options) === false) {
-				$error = _('Invalid string.');
-			}
-		}
 		else {
 			throw new Exception('Method not found', -32601);
 		}
