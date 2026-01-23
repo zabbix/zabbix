@@ -33,8 +33,6 @@ class CHtmlUrlValidator {
 	 *                                                    set to INVENTORY_URL_MACRO_HOST;
 	 * @param bool   $options[allow_event_tags_macro]  If set to be true, URLs containing {EVENT.TAGS.<ref>} macros will
 	 *                                                 be considered as valid.
-	 * @param bool   $options[allow_manualinput_macro] If set to be true, URLs containing {MANUALINPUT} macros will be
-	 *                                                 considered as valid.
 	 * @param bool   $options[validate_uri_schemes]    Parameter allows to overwrite global switch
 	 *                                                 CSettingsHelper::VALIDATE_URI_SCHEMES for specific uses.
 	 *

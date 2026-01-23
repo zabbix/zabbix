@@ -16,29 +16,8 @@
 
 class CUrlValidator extends CValidator {
 
-	/**
-	 * If set to be true, URLs containing user macros will be considered as valid.
-	 */
-	protected bool $allow_user_macro = true;
-
-	/**
-	 * If set to be true, URLs containing {EVENT.TAGS.<ref>} macros will be considered as valid.
-	 */
-	protected bool $allow_event_tags_macro = false;
-
-	/**
-	 * If set to be true, URLs containing {MANUALINPUT} macros will be considered as valid.
-	 */
-	protected bool $allow_manualinput_macro = false;
-
 	public function validate($value) {
-		$options = [
-			'allow_user_macro' => $this->allow_user_macro,
-			'allow_event_tags_macro' => $this->allow_event_tags_macro,
-			'allow_manualinput_macro' => $this->allow_manualinput_macro
-		];
-
-		if (!CHtmlUrlValidator::validate((string) $value, $options)) {
+		if (!CHtmlUrlValidator::validate((string) $value)) {
 			$this->setError(_('unacceptable URL'));
 
 			return false;
