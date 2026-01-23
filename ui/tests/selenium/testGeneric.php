@@ -181,21 +181,21 @@ class testGeneric extends CWebTest {
 			],
 			[
 				[
-					'url' => 'zabbix.php?action=availabilityreport.list',
+					'url' => 'report2.php',
 					'title' => 'Availability report',
 					'header' => 'Availability report'
 				]
 			],
 			[
 				[
-					'url' => 'zabbix.php?action=availabilityreport.list&mode=0',
+					'url' => 'report2.php?mode=0',
 					'title' => 'Availability report',
 					'header' => 'Availability report'
 				]
 			],
 			[
 				[
-					'url' => 'zabbix.php?action=availabilityreport.list&mode=1',
+					'url' => 'report2.php?mode=1',
 					'title' => 'Availability report',
 					'header' => 'Availability report'
 				]
@@ -350,7 +350,7 @@ class testGeneric extends CWebTest {
 			],
 			[
 				[
-					'url' => 'zabbix.php?action=graph.list&&context=template',
+					'url' => 'graphs.php?filter_set=1&context=template',
 					'title' => 'Configuration of graphs',
 					'header' => 'Graphs'
 				]
@@ -378,7 +378,7 @@ class testGeneric extends CWebTest {
 			],
 			[
 				[
-					'url' => 'zabbix.php?action=graph.list&context=host',
+					'url' => 'graphs.php?filter_set=1&context=host',
 					'title' => 'Configuration of graphs',
 					'header' => 'Graphs'
 				]
@@ -701,15 +701,8 @@ class testGeneric extends CWebTest {
 			[
 				[
 					'url' => 'zabbix.php?action=userprofile.edit',
-					'title' => 'Profile',
-					'header' => 'Profile'
-				]
-			],
-			[
-				[
-					'url' => 'zabbix.php?action=userprofile.notification.edit',
-					'title' => 'Notifications',
-					'header' => 'Notifications'
+					'title' => 'User profile',
+					'header' => 'User profile: Zabbix Administrator'
 				]
 			],
 			[
