@@ -37,7 +37,10 @@ char	*zbx_yaml_assemble_binary_sequence(const char *path, size_t *expected)
 			fail_msg("Cannot read data '%s'", zbx_mock_error_string(error));
 
 		if (0 != *expected && offset + length > *expected)
-			fail_msg("Incorrect message size, expected:%ld actual:%ld", *expected, offset + length);
+		{
+			fail_msg("Incorrect message size, expected:" ZBX_FS_UI64 " actual:" ZBX_FS_UI64, *expected,
+					offset + length);
+		}
 
 		buffer = zbx_realloc(buffer, offset + length);
 

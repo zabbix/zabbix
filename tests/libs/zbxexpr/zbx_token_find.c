@@ -206,8 +206,8 @@ void	zbx_mock_test_entry(void **state)
 
 		if (expected_token_type != token.type)
 		{
-			fail_msg("Expected token type 0x%02X does not match type found 0x%02X", expected_token_type,
-					token.type);
+			fail_msg("Expected token type 0x%02X does not match type found 0x%02X",
+					(unsigned int)expected_token_type, (unsigned int)token.type);
 		}
 
 		switch (expected_token_type)

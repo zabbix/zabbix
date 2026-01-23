@@ -269,7 +269,7 @@ void	mock_compare_stack(const zbx_eval_context_t *ctx, const char *path)
 		if (expected_opt != token->opt)
 		{
 			mock_dump_stack(ctx);
-			fail_msg("expected token optional data %d while got %d", expected_opt, token->opt);
+			fail_msg("expected token optional data %u while got %u", expected_opt, token->opt);
 		}
 
 		len = token->loc.r - token->loc.l + 1;
