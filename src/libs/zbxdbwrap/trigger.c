@@ -282,7 +282,7 @@ int	zbx_db_trigger_supplement_eval_resolv(zbx_token_type_t token_type, char **va
 static int	expr_macro_index(const char *macro)
 {
 	/* macros that are supported in expression macro */
-	static const char	*expr_macros[] = {MVAR_HOST_HOST, MVAR_HOSTNAME, MVAR_ITEM_KEY, NULL};
+	static const char	*expr_macros[] = {MVAR_HOST_HOST, MVAR_ITEM_KEY, NULL};
 
 	zbx_strloc_t	loc;
 	int		func_num;

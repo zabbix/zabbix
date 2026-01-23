@@ -708,6 +708,11 @@ window.item_edit_form = new class {
 			.then((response) => response.json())
 			.then((response) => {
 				this.tags_table.innerHTML = response.body;
+
+				const $tags_table = jQuery(this.tags_table);
+
+				$tags_table.data('dynamicRows').counter = this.tags_table.querySelectorAll('tr.form_row').length;
+				$tags_table.find(`.${ZBX_STYLE_TEXTAREA_FLEXIBLE}`).textareaFlexible();
 			})
 			.catch((message) => {
 				this.form.addGeneralErrors({[t('Unexpected server error.')]: message});

@@ -94,8 +94,10 @@ static void	connector_clear_wrapper(void *data)
 	connector_clear((zbx_connector_t*)data);
 }
 
-static void	data_point_link_clean(zbx_data_point_link_t *data_point_link)
+static void	data_point_link_clean(void *ptr)
 {
+	zbx_data_point_link_t	*data_point_link = (zbx_data_point_link_t*)ptr;
+
 	zbx_vector_connector_data_point_clear_ext(&data_point_link->connector_data_points,
 			zbx_connector_data_point_free);
 	zbx_vector_connector_data_point_destroy(&data_point_link->connector_data_points);
@@ -690,7 +692,7 @@ ZBX_THREAD_ENTRY(connector_manager_thread, args)
 				case ZBX_IPC_CONNECTOR_REQUEST:
 					zbx_dc_config_history_sync_get_connectors(&manager.connectors, &manager.iter,
 							&manager.config_revision, &manager.connector_revision,
-							(zbx_clean_func_t)data_point_link_clean);
+							data_point_link_clean);
 					zbx_connector_deserialize_object(message->data, message->size,
 							&connector_objects);
 					connector_enqueue(&manager, &connector_objects);

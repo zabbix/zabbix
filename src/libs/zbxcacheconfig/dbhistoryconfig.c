@@ -41,7 +41,13 @@ static void	dc_get_history_sync_host(zbx_history_sync_host_t *dst_host, const ZB
 	dst_host->monitored_by = src_host->monitored_by;
 	dst_host->status = src_host->status;
 
-	zbx_strscpy(dst_host->host, src_host->host);
+	if (sizeof(dst_host->host) < src_host->sz_host)
+	{
+		memcpy(dst_host->host, src_host->host, sizeof(dst_host->host) - 1);
+		dst_host->host[sizeof(dst_host->host) - 1] = '\0';
+	}
+	else
+		memcpy(dst_host->host, src_host->host, src_host->sz_host);
 
 	if (ZBX_ITEM_GET_HOSTNAME & mode)
 		zbx_strlcpy_utf8(dst_host->name, src_host->name, sizeof(dst_host->name));
@@ -72,10 +78,23 @@ static void	dc_get_history_sync_item(zbx_history_sync_item_t *dst_item, const ZB
 	dst_item->valuemapid = src_item->valuemapid;
 	dst_item->status = src_item->status;
 
-	dst_item->history_period = zbx_strdup(NULL, src_item->history_period);
+	if (ZBX_HYSTORY_SYNC_PREALOCATED_PERIOD_SIZE < src_item->sz_history_period)
+	{
+		zbx_free(dst_item->history_period);
+		dst_item->history_period = (char *)zbx_malloc(NULL, src_item->sz_history_period);
+	}
+
+	memcpy(dst_item->history_period, src_item->history_period, src_item->sz_history_period);
+	dst_item->history_sec = src_item->history_sec;
 	dst_item->flags = src_item->flags;
 
-	zbx_strscpy(dst_item->key_orig, src_item->key);
+	if (sizeof(dst_item->key_orig) < src_item->sz_key)
+	{
+		memcpy(dst_item->key_orig, src_item->key, sizeof(dst_item->key_orig) - 1);
+		dst_item->key_orig[sizeof(dst_item->key_orig) - 1] = '\0';
+	}
+	else
+		memcpy(dst_item->key_orig, src_item->key, src_item->sz_key);
 
 	switch (src_item->value_type)
 	{
@@ -83,16 +102,31 @@ static void	dc_get_history_sync_item(zbx_history_sync_item_t *dst_item, const ZB
 		case ITEM_VALUE_TYPE_UINT64:
 			numitem = src_item->itemvaluetype.numitem;
 
-			dst_item->trends_period = zbx_strdup(NULL, numitem->trends_period);
+			if (ZBX_HYSTORY_SYNC_PREALOCATED_PERIOD_SIZE < numitem->sz_trends_period)
+			{
+				zbx_free(dst_item->trends_period);
+				dst_item->trends_period = (char *)zbx_malloc(NULL, numitem->sz_trends_period);
+			}
+
+			memcpy(dst_item->trends_period, numitem->trends_period, numitem->sz_trends_period);
+			dst_item->trends_sec = numitem->trends_sec;
 
 			if ('\0' != *numitem->units)
-				dst_item->units = zbx_strdup(NULL, numitem->units);
+			{
+				if (ZBX_HYSTORY_SYNC_PREALOCATED_UNITS_SIZE < numitem->sz_units)
+				{
+					zbx_free(dst_item->units);
+					dst_item->units = (char *)zbx_malloc(NULL, numitem->sz_units);
+				}
+
+				memcpy(dst_item->units, numitem->units, numitem->sz_units);
+			}
 			else
-				dst_item->units = NULL;
+				zbx_free(dst_item->units);
 			break;
 		default:
-			dst_item->trends_period = NULL;
-			dst_item->units = NULL;
+			zbx_free(dst_item->trends_period);
+			zbx_free(dst_item->units);
 	}
 
 	/* check also for update_triggers flag to avoid race condition when value is being added */
@@ -109,16 +143,22 @@ static void	dc_get_history_sync_item(zbx_history_sync_item_t *dst_item, const ZB
  *          expanding user macros and applying global housekeeping settings   *
  *                                                                            *
  ******************************************************************************/
-static void	dc_items_convert_hk_periods(const zbx_config_hk_t *config_hk, zbx_history_sync_item_t *item)
+static void	dc_items_convert_hk_periods(const zbx_dc_um_handle_t *um_handle, const zbx_config_hk_t *config_hk,
+	zbx_history_sync_item_t *item)
 {
-	zbx_dc_um_handle_t	*um_handle = zbx_dc_open_user_macros();
-
 	if (NULL != item->trends_period)
 	{
-		zbx_dc_expand_user_and_func_macros(um_handle, &item->trends_period, &item->host.hostid, 1, NULL);
+		if (0 == item->trends_sec)
+		{
+			zbx_dc_expand_user_and_func_macros(um_handle, &item->trends_period, &item->host.hostid,
+					1, NULL);
 
-		item->trends_sec = zbx_dc_config_history_get_trends_sec(item->trends_period, config_hk->trends_global,
-				config_hk->trends);
+			if (FAIL == zbx_is_time_suffix(item->trends_period, &item->trends_sec, ZBX_LENGTH_UNLIMITED))
+				item->trends_sec = ZBX_HK_PERIOD_MAX;
+		}
+
+		if (0 != item->trends_sec && ZBX_HK_OPTION_ENABLED == config_hk->trends_global)
+			item->trends_sec = config_hk->trends;
 
 		item->trends = (0 != item->trends_sec);
 	}
@@ -130,18 +170,20 @@ static void	dc_items_convert_hk_periods(const zbx_config_hk_t *config_hk, zbx_hi
 
 	if (NULL != item->history_period)
 	{
-		zbx_dc_expand_user_and_func_macros(um_handle, &item->history_period, &item->host.hostid, 1, NULL);
+		if (0 == item->history_sec)
+		{
+			zbx_dc_expand_user_and_func_macros(um_handle, &item->history_period, &item->host.hostid,
+					1, NULL);
 
-		if (SUCCEED != zbx_is_time_suffix(item->history_period, &item->history_sec, ZBX_LENGTH_UNLIMITED))
-			item->history_sec = ZBX_HK_PERIOD_MAX;
+			if (FAIL == zbx_is_time_suffix(item->history_period, &item->history_sec, ZBX_LENGTH_UNLIMITED))
+				item->history_sec = ZBX_HK_PERIOD_MAX;
+		}
 
 		if (0 != item->history_sec && ZBX_HK_OPTION_ENABLED == config_hk->history_global)
 			item->history_sec = config_hk->history;
 
 		item->history = (0 != item->history_sec);
 	}
-
-	zbx_dc_close_user_macros(um_handle);
 }
 
 /******************************************************************************
@@ -172,6 +214,13 @@ void	zbx_dc_config_history_sync_get_items_by_itemids(zbx_history_sync_item_t *it
 	zbx_dc_config_t		*dc_config = get_dc_config();
 
 	memset(errcodes, 0, sizeof(int) * num);
+
+	for (i = 0; i < num; i++)
+	{
+		items[i].history_period = (char *)zbx_malloc(NULL, ZBX_HYSTORY_SYNC_PREALOCATED_PERIOD_SIZE);
+		items[i].trends_period = (char *)zbx_malloc(NULL, ZBX_HYSTORY_SYNC_PREALOCATED_PERIOD_SIZE);
+		items[i].units = (char *)zbx_malloc(NULL, ZBX_HYSTORY_SYNC_PREALOCATED_UNITS_SIZE);
+	}
 
 	RDLOCK_CACHE_CONFIG_HISTORY;
 
@@ -211,26 +260,21 @@ void	zbx_dc_config_history_sync_get_items_by_itemids(zbx_history_sync_item_t *it
 
 		items[i].itemid = itemids[i];
 
-		dc_items_convert_hk_periods(&config_hk, &items[i]);
+		dc_items_convert_hk_periods(um_handle, &config_hk, &items[i]);
 	}
 
 	zbx_dc_close_user_macros(um_handle);
 }
 
-void	zbx_dc_config_clean_history_sync_items(zbx_history_sync_item_t *items, int *errcodes, size_t num)
+void	zbx_dc_config_clean_history_sync_items(zbx_history_sync_item_t *items, size_t num)
 {
 	size_t	i;
 
 	for (i = 0; i < num; i++)
 	{
-		if (NULL != errcodes && SUCCEED != errcodes[i])
-			continue;
-
-		if (ITEM_VALUE_TYPE_FLOAT == items[i].value_type || ITEM_VALUE_TYPE_UINT64 == items[i].value_type)
-			zbx_free(items[i].units);
-
-		zbx_free(items[i].history_period);
+		zbx_free(items[i].units);
 		zbx_free(items[i].trends_period);
+		zbx_free(items[i].history_period);
 	}
 }
 
@@ -528,7 +572,15 @@ static void	dc_get_history_recv_host(zbx_history_recv_host_t *dst_host, const ZB
 	dst_host->status = src_host->status;
 
 	if (ZBX_ITEM_GET_HOST & mode)
-		zbx_strscpy(dst_host->host, src_host->host);
+	{
+		if (sizeof(dst_host->host) < src_host->sz_host)
+		{
+			memcpy(dst_host->host, src_host->host, sizeof(dst_host->host) - 1);
+			dst_host->host[sizeof(dst_host->host) - 1] = '\0';
+		}
+		else
+			memcpy(dst_host->host, src_host->host, src_host->sz_host);
+	}
 
 	if (ZBX_ITEM_GET_HOSTNAME & mode)
 		zbx_strlcpy_utf8(dst_host->name, src_host->name, sizeof(dst_host->name));
@@ -568,7 +620,13 @@ static void	dc_get_history_recv_item(zbx_history_recv_item_t *dst_item, const ZB
 	dst_item->state = ITEM_STATE_NORMAL;
 	dst_item->status = src_item->status;
 
-	zbx_strscpy(dst_item->key_orig, src_item->key);
+	if (sizeof(dst_item->key_orig) < src_item->sz_key)
+	{
+		memcpy(dst_item->key_orig, src_item->key, sizeof(dst_item->key_orig) - 1);
+		dst_item->key_orig[sizeof(dst_item->key_orig) - 1] = '\0';
+	}
+	else
+		memcpy(dst_item->key_orig, src_item->key, src_item->sz_key);
 
 	dst_item->itemid = src_item->itemid;
 	dst_item->flags = src_item->flags;
@@ -916,32 +974,24 @@ void	zbx_connector_filter_free(zbx_connector_filter_t connector_filter)
 	zbx_vector_match_tags_ptr_destroy(&connector_filter.connector_tags);
 }
 
-static void	substitute_orig_unmasked(const char *orig, char **data)
+static void	substitute_orig_unmasked(const zbx_dc_um_handle_t *um_handle, const char *orig, char **data)
 {
-	zbx_dc_um_handle_t	*um_handle = zbx_dc_open_user_macros_secure();
-
 	if (NULL != strstr(orig, "{$"))
 	{
 		*data = zbx_strdup(*data, orig);
 
 		zbx_dc_expand_user_and_func_macros(um_handle, data, NULL, 0, NULL);
 	}
-
-	zbx_dc_close_user_macros(um_handle);
 }
 
-static void	substitute_orig(const char *orig, char **data)
+static void	substitute_orig(const zbx_dc_um_handle_t *um_handle, const char *orig, char **data)
 {
-	zbx_dc_um_handle_t	*um_handle = zbx_dc_open_user_macros();
-
 	if (NULL != strstr(orig, "{$"))
 	{
 		*data = zbx_strdup(*data, orig);
 
 		zbx_dc_expand_user_and_func_macros(um_handle, data, NULL, 0, NULL);
 	}
-
-	zbx_dc_close_user_macros(um_handle);
 }
 
 void	zbx_dc_config_history_sync_get_connectors(zbx_hashset_t *connectors, zbx_hashset_iter_t *connector_iter,
@@ -1057,16 +1107,17 @@ void	zbx_dc_config_history_sync_get_connectors(zbx_hashset_t *connectors, zbx_ha
 		zbx_hashset_iter_reset(connectors, &iter);
 		while (NULL != (connector = (zbx_connector_t *)zbx_hashset_iter_next(&iter)))
 		{
-			substitute_orig_unmasked(connector->url_orig, &connector->url);
-			substitute_orig_unmasked(connector->token_orig, &connector->token);
-			substitute_orig_unmasked(connector->http_proxy_orig, &connector->http_proxy);
-			substitute_orig_unmasked(connector->username_orig, &connector->username);
-			substitute_orig_unmasked(connector->password_orig, &connector->password);
-			substitute_orig_unmasked(connector->ssl_cert_file_orig, &connector->ssl_cert_file);
-			substitute_orig_unmasked(connector->ssl_key_file_orig, &connector->ssl_key_file);
-			substitute_orig_unmasked(connector->ssl_key_password_orig, &connector->ssl_key_password);
+			substitute_orig_unmasked(um_handle, connector->url_orig, &connector->url);
+			substitute_orig_unmasked(um_handle, connector->token_orig, &connector->token);
+			substitute_orig_unmasked(um_handle, connector->http_proxy_orig, &connector->http_proxy);
+			substitute_orig_unmasked(um_handle, connector->username_orig, &connector->username);
+			substitute_orig_unmasked(um_handle, connector->password_orig, &connector->password);
+			substitute_orig_unmasked(um_handle, connector->ssl_cert_file_orig, &connector->ssl_cert_file);
+			substitute_orig_unmasked(um_handle, connector->ssl_key_file_orig, &connector->ssl_key_file);
+			substitute_orig_unmasked(um_handle, connector->ssl_key_password_orig,
+					&connector->ssl_key_password);
 
-			substitute_orig(connector->timeout_orig, &connector->timeout);
+			substitute_orig(um_handle, connector->timeout_orig, &connector->timeout);
 		}
 
 		zbx_dc_close_user_macros(um_handle);
