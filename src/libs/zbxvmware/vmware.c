@@ -2573,6 +2573,7 @@ int	zbx_vmware_service_update(zbx_vmware_service_t *service, const char *config_
 
 	data = (zbx_vmware_data_t *)zbx_malloc(NULL, sizeof(zbx_vmware_data_t));
 	memset(data, 0, sizeof(zbx_vmware_data_t));
+	page.alloc = 0;
 
 	zbx_hashset_create(&data->hvs, 1, vmware_hv_hash, vmware_hv_compare);
 	zbx_vector_vmware_cluster_ptr_create(&data->clusters);

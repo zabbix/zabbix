@@ -70,7 +70,7 @@ class testDiagInfo extends CIntegrationTest {
 			'medias' => [
 				[
 					'mediatypeid' => 1,
-					'sendto' => 'test@local.local',
+					'sendto' => 'test@local.local'
 				]
 			]
 		]);
@@ -91,7 +91,7 @@ class testDiagInfo extends CIntegrationTest {
 				[
 					'groupid' => 4
 				]
-			],
+			]
 		]);
 
 		$this->assertArrayHasKey('hostids', $response['result']);
