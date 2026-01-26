@@ -3131,13 +3131,17 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 			$form->fill($data['ldap_fields']);
 		}
 
-		if (!array_key_exists('server_inline_errors', $data) && !array_key_exists('jit_inline_errors', $data)
-				&& !array_key_exists('mapping_inline_errors', $data) && !array_key_exists('ldapbase_inline_errors', $data)) {
+		if (CTestArrayHelper::get($data, 'expected', TEST_BAD) === TEST_GOOD) {
+//		if (!array_key_exists('server_inline_errors', $data) && !array_key_exists('jit_inline_errors', $data)
+//				&& !array_key_exists('mapping_inline_errors', $data) && !array_key_exists('ldapbase_inline_errors', $data)) {
+
 			$form->submit();
 
-			if ($this->page->isAlertPresent()) {
-				$this->page->acceptAlert();
-			}
+
+			$this->page->waitUntilAlertIsPresent();
+//			$this->page->isAlertPresent() {
+			$this->page->acceptAlert();
+//			}
 		}
 	}
 }
