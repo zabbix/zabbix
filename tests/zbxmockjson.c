@@ -32,8 +32,6 @@ do 											\
 }											\
 while(0)
 
-void cm_print_error(const char * const format, ...);
-
 static void	json_flatten_contents(struct zbx_json_parse *jp, const char *prefix, zbx_vector_ptr_pair_t *props);
 
 static void	json_append_prop(zbx_vector_ptr_pair_t *props, const char *key, const char *value)
