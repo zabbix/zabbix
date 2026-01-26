@@ -35,6 +35,9 @@ class ZTextareaFlexible extends HTMLElement {
 	/** @type {boolean} */
 	#singleline = true;
 
+	/** @type {string} */
+	#last_height = "";
+
 	constructor() {
 		super();
 
@@ -55,6 +58,12 @@ class ZTextareaFlexible extends HTMLElement {
 		];
 	}
 
+	attributeChangedCallback(name, old_value, new_value) {
+		if (old_value !== new_value) {
+			this.#applyAttribute(name, new_value);
+		}
+	}
+
 	connectedCallback() {
 		if (!this.contains(this.#textarea)) {
 			this.appendChild(this.#textarea);
@@ -65,22 +74,14 @@ class ZTextareaFlexible extends HTMLElement {
 		this.#addEventListeners();
 
 		this.#resize_observer = new ResizeObserver(() => this.#updateHeight());
-		this.#resize_observer.observe(this);
-
-		this.#updateHeight();
+		this.#resize_observer.observe(this.#textarea);
 	}
 
 	disconnectedCallback() {
-		this.#resize_observer?.disconnect();
+		this.#resize_observer.disconnect();
 		this.#resize_observer = null;
 
 		this.#removeEventListeners();
-	}
-
-	attributeChangedCallback(name, old_value, new_value) {
-		if (old_value !== new_value) {
-			this.#applyAttribute(name, new_value);
-		}
 	}
 
 	#applyAttributes() {
@@ -150,8 +151,13 @@ class ZTextareaFlexible extends HTMLElement {
 	}
 
 	#updateHeight() {
+		if (!this.isConnected || this.#last_height === `${this.#textarea.scrollHeight}px`) {
+			return;
+		}
+
 		this.#textarea.style.height = '0';
 		this.#textarea.style.height = `${this.#textarea.scrollHeight}px`;
+		this.#last_height = `${this.#textarea.scrollHeight}px`;
 	}
 
 	#addEventListeners() {
