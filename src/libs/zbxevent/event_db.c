@@ -34,10 +34,9 @@ int	zbx_event_db_get_host(const zbx_db_event *event, zbx_dc_host_t *host, char *
 {
 	zbx_db_result_t	result;
 	zbx_db_row_t	row;
-	char		sql[2048];	/* do not forget to adjust size if SQLs change */
+	char		sql[512];	/* do not forget to adjust size if SQLs change */
 	size_t		offset;
 	int		ret = SUCCEED;
-	zbx_uint64_t	a_proxyid = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -86,22 +85,15 @@ int	zbx_event_db_get_host(const zbx_db_event *event, zbx_dc_host_t *host, char *
 			break;
 		case EVENT_SOURCE_AUTOREGISTRATION:
 			zbx_snprintf(sql + offset, sizeof(sql) - offset,
-				",a.proxyid"
-				" from autoreg_host a,hosts h"
-				" left join host_proxy hp on h.hostid=hp.hostid"
-				" left join proxy p on a.proxyid=p.proxyid"
-				" where a.host=h.host"
-					" and h.status=%d"
-					" and h.flags&%d=0"
-					" and a.autoreg_hostid=" ZBX_FS_UI64
-					" and (" ZBX_SQL_NULLCMP("a.proxyid", "h.proxyid")
-						" or " ZBX_SQL_NULLCMP("a.proxyid", "hp.proxyid")
-						" or (h.proxyid is null and a.proxyid is not null)"
-						" or (h.monitored_by=%d and p.proxyid is not null"
-						" and p.proxy_groupid=h.proxy_groupid)"
-					")",
-			HOST_STATUS_MONITORED, (int)ZBX_FLAG_DISCOVERY_PROTOTYPE, event->objectid,
-			HOST_MONITORED_BY_PROXY_GROUP);
+					" from autoreg_host a,hosts h"
+					" left join host_proxy hp on h.hostid=hp.hostid"
+					" where (" ZBX_SQL_NULLCMP("a.proxyid", "h.proxyid")
+						" or " ZBX_SQL_NULLCMP("a.proxyid", "hp.proxyid")")"
+						" and a.host=h.host"
+						" and h.status=%d"
+						" and h.flags&%d=0"
+						" and a.autoreg_hostid=" ZBX_FS_UI64,
+					HOST_STATUS_MONITORED, ZBX_FLAG_DISCOVERY_PROTOTYPE, event->objectid);
 			break;
 		default:
 			zbx_snprintf(error, max_error_len, "Unsupported event source [%d]", event->source);
@@ -147,16 +139,10 @@ int	zbx_event_db_get_host(const zbx_db_event *event, zbx_dc_host_t *host, char *
 #endif
 		ZBX_STR2UCHAR(host->monitored_by, row[8 + ZBX_IPMI_FIELDS_NUM]);
 
-		if (EVENT_SOURCE_AUTOREGISTRATION == event->source)
-			ZBX_DBROW2UINT64(a_proxyid, row[10 + ZBX_IPMI_FIELDS_NUM]);
-
 		if (HOST_MONITORED_BY_PROXY_GROUP != host->monitored_by)
 			ZBX_DBROW2UINT64(host->proxyid, row[1]);
 		else
 			ZBX_DBROW2UINT64(host->proxyid, row[9 + ZBX_IPMI_FIELDS_NUM]);
-
-		if (EVENT_SOURCE_AUTOREGISTRATION == event->source && 0 == host->proxyid)
-			host->proxyid = a_proxyid;
 	}
 	zbx_db_free_result(result);
 
