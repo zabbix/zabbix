@@ -2279,7 +2279,7 @@ class CUser extends CApiService {
 		];
 
 		if ($case_sensitive) {
-			$db_users  = DBfetchArray(DBselect(
+			$db_users = DBfetchArray(DBselect(
 				'SELECT '.implode(',', $fields).
 				' FROM users'.
 				' WHERE username='.zbx_dbstr($username).
