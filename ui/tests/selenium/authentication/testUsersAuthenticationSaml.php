@@ -304,7 +304,7 @@ class testUsersAuthenticationSaml extends testFormAuthentication {
 					],
 					'error' => [
 						'Group name attribute' => 'This field cannot be empty.',
-						'User group mapping' => 'This field cannot be empty.'
+						'xpath:.//div[@data-field-name="saml_provision_groups"]' => 'This field cannot be empty.'
 					]
 				]
 			],
@@ -321,7 +321,7 @@ class testUsersAuthenticationSaml extends testFormAuthentication {
 						'Configure JIT provisioning' => true,
 						'Group name attribute' => 'group name attribute'
 					],
-					'error' => ['User group mapping' => 'This field cannot be empty.']
+					'error' => ['xpath:.//div[@data-field-name="saml_provision_groups"]' => 'This field cannot be empty.']
 				]
 			],
 			// #6 Group mapping dialog form validation.
