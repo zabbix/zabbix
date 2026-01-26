@@ -35,7 +35,7 @@ class testCalculatedExpression extends CIntegrationTest {
 	const CALCULATED_ITEM_KEY = 'test.calc.calculated';
 
 	/* According to our 'Upgrading to numeric values of extended range' docs supported limits are */
-	/* 1.79E+308 and 1.79E+308, NOT -1.7976931348623157e308 and 1.7976931348623157e308.           */
+	/* -1.79E+308 and 1.79E+308, NOT -1.7976931348623157e308 and 1.7976931348623157e308.          */
 	const DBL_MAX = '1.79e308';
 	const DBL_MIN = '-1.79e308';
 
