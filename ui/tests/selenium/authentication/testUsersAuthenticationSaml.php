@@ -357,7 +357,7 @@ class testUsersAuthenticationSaml extends testFormAuthentication {
 						'Configure JIT provisioning' => true,
 						'Group name attribute' => 'group name attribute'
 					],
-					'User group mapping' => [[]],
+					'Media type mapping' => [[]],
 					'mapping_error' => true,
 					'error' => [
 						'Name' => 'This field cannot be empty.',
@@ -482,7 +482,7 @@ class testUsersAuthenticationSaml extends testFormAuthentication {
 						'id:encrypt_nameid' => true
 
 					],
-					'error' => ['SP cartificate' => 'This field cannot be empty.']
+					'error' => ['SP certificate' => 'This field cannot be empty.']
 				]
 			],
 			// #15 SP certificate encoding validation.
