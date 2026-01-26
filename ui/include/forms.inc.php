@@ -935,10 +935,11 @@ function renderTagTableRow($index, array $tag, array $options = []) {
 		'parent_templates' => []
 	];
 
-	$tag_field = (new CTextAreaFlexible($options['field_name'].'['.$index.'][tag]', $tag['tag'], $textarea_options))
+	$tag_field = (new CTextAreaFlexible($options['field_name'].'['.$index.'][tag]', $tag['tag']))
 		->setErrorContainer($options['has_inline_validation'] ? 'tag_'.$index.'_error_container' : null)
 		->setErrorLabel($options['has_inline_validation'] ? _('Name') : null)
 		->setAdaptiveWidth(ZBX_TEXTAREA_TAG_WIDTH)
+		->setMaxlength(DB::getFieldLength('host_tag', 'tag'))
 		->setAttribute('placeholder', _('tag'))
 		->setReadonly($textarea_options['readonly']);
 
@@ -954,6 +955,7 @@ function renderTagTableRow($index, array $tag, array $options = []) {
 		->setErrorContainer($options['has_inline_validation'] ? 'tag_'.$index.'_error_container' : null)
 		->setErrorLabel($options['has_inline_validation'] ? _('Value') : null)
 		->setAdaptiveWidth(ZBX_TEXTAREA_TAG_VALUE_WIDTH)
+		->setMaxlength(DB::getFieldLength('host_tag', 'value'))
 		->setAttribute('placeholder', _('value'))
 		->setReadonly($textarea_options['readonly']);
 

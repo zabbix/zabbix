@@ -16,16 +16,6 @@
 
 class CTextAreaFlexible extends CTag {
 	/**
-	 * An options array.
-	 *
-	 * @var array
-	 */
-	protected $options = [
-		'maxlength' => 255,
-		'readonly' => false
-	];
-
-	/**
 	 * CTextAreaFlexible constructor.
 	 *
 	 * @param string $name
