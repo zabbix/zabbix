@@ -87,11 +87,11 @@ int	zbx_event_db_get_host(const zbx_db_event *event, zbx_dc_host_t *host, char *
 			zbx_snprintf(sql + offset, sizeof(sql) - offset,
 					" from autoreg_host a,hosts h"
 					" left join host_proxy hp on h.hostid=hp.hostid"
-					" where (case"
+					" where case"
 						" when h.monitored_by=%d"
-						" then " ZBX_SQL_NULLCMP("a.proxyid", "hp.proxyid")
-						" else " ZBX_SQL_NULLCMP("a.proxyid", "h.proxyid")
-						"end)=1"
+							" then " ZBX_SQL_NULLCMP("a.proxyid", "hp.proxyid")
+							" else " ZBX_SQL_NULLCMP("a.proxyid", "h.proxyid")
+						" end"
 						" and a.host=h.host"
 						" and h.status=%d"
 						" and h.flags&%d=0"
