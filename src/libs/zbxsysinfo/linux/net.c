@@ -58,6 +58,8 @@ net_count_info_t;
 #define NET_CONN_TYPE_TCP	0
 #define NET_CONN_TYPE_UDP	1
 
+#define ZBX_PROC_NET_DEV_PRX	"/proc/net/dev"
+
 #if HAVE_INET_DIAG
 #	include <sys/socket.h>
 #	include <linux/netlink.h>
@@ -249,9 +251,9 @@ static int	get_net_stat(const char *if_name, net_stat_t *result, char **error)
 		return SYSINFO_RET_FAIL;
 	}
 
-	if (NULL == (f = fopen("/proc/net/dev", "r")))
+	if (NULL == (f = fopen(ZBX_PROC_NET_DEV_PRX, "r")))
 	{
-		*error = zbx_dsprintf(NULL, "Cannot open /proc/net/dev: %s", zbx_strerror(errno));
+		*error = zbx_dsprintf(NULL, "Cannot open %s: %s", ZBX_PROC_NET_DEV_PRX, zbx_strerror(errno));
 		return SYSINFO_RET_FAIL;
 	}
 
@@ -594,9 +596,10 @@ int	net_if_discovery(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	ZBX_UNUSED(request);
 
-	if (NULL == (f = fopen("/proc/net/dev", "r")))
+	if (NULL == (f = fopen(ZBX_PROC_NET_DEV_PRX, "r")))
 	{
-		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot open /proc/net/dev: %s", zbx_strerror(errno)));
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot open %s: %s",
+				ZBX_PROC_NET_DEV_PRX, zbx_strerror(errno)));
 		return SYSINFO_RET_FAIL;
 	}
 
@@ -1269,8 +1272,8 @@ static void	get_link_settings(const char *interface, struct zbx_json *j)
 
 static void	get_link_flags(const char *interface, struct zbx_json *j)
 {
-	int sock;
-	struct ifreq ifr;
+	int		sock;
+	struct ifreq	ifr;
 
 	sock = socket(AF_INET, SOCK_DGRAM, 0);
 	if (sock < 0)
@@ -1336,14 +1339,11 @@ int	net_if_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 	char			line[MAX_STRING_LEN], *p, *pattern = NULL, *error = NULL;
 	net_stat_t		ns;
 
-	if (NULL == (f = fopen("/proc/net/dev", "r")))
+	if (1 < request->nparam)
 	{
-		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot open /proc/net/dev: %s", zbx_strerror(errno)));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters."));
 		return SYSINFO_RET_FAIL;
 	}
-	zbx_json_init(&j, ZBX_JSON_STAT_BUF_LEN);
-	zbx_json_initarray(&jval, ZBX_JSON_STAT_BUF_LEN);
-	zbx_json_initarray(&jcfg, ZBX_JSON_STAT_BUF_LEN);
 
 	if (1 == request->nparam)
 	{
@@ -1353,9 +1353,25 @@ int	net_if_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 		{
 			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "invalid regular expression: %s", error));
 			zbx_free(error);
-			return FAIL;
+
+			return SYSINFO_RET_FAIL;
 		}
 	}
+
+	if (NULL == (f = fopen(ZBX_PROC_NET_DEV_PRX, "r")))
+	{
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot open %s: %s",
+				ZBX_PROC_NET_DEV_PRX, zbx_strerror(errno)));
+
+		if (NULL != rxp)
+			zbx_regexp_free(rxp);
+
+		return SYSINFO_RET_FAIL;
+	}
+
+	zbx_json_init(&j, ZBX_JSON_STAT_BUF_LEN);
+	zbx_json_initarray(&jval, ZBX_JSON_STAT_BUF_LEN);
+	zbx_json_initarray(&jcfg, ZBX_JSON_STAT_BUF_LEN);
 
 	while (NULL != fgets(line, sizeof(line), f))
 	{
@@ -1428,6 +1444,7 @@ int	net_if_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 	zbx_json_free(&j);
 	zbx_json_free(&jval);
 	zbx_json_free(&jcfg);
+
 	if (NULL != rxp)
 		zbx_regexp_free(rxp);
 
