@@ -1,0 +1,1 @@
+.......PS. [ZBX-27421] improved SNMPv3 performance by reducing CPU usage through using cached user after initial discovery (vso)
