@@ -35,8 +35,11 @@ class ZTextareaFlexible extends HTMLElement {
 	/** @type {boolean} */
 	#singleline = true;
 
-	/** @type {string} */
-	#last_height = "";
+	/** @type {boolean} */
+	#is_resize_locked = false;
+
+	/** @type {number | null} */
+	#animation_frame_id = null;
 
 	constructor() {
 		super();
@@ -82,6 +85,7 @@ class ZTextareaFlexible extends HTMLElement {
 		this.#resize_observer = null;
 
 		this.#removeEventListeners();
+		cancelAnimationFrame(this.#animation_frame_id);
 	}
 
 	#applyAttributes() {
@@ -151,13 +155,20 @@ class ZTextareaFlexible extends HTMLElement {
 	}
 
 	#updateHeight() {
-		if (!this.isConnected || this.#last_height === `${this.#textarea.scrollHeight}px`) {
+		if (!this.isConnected || this.#is_resize_locked) {
 			return;
 		}
 
-		this.#textarea.style.height = '0';
-		this.#textarea.style.height = `${this.#textarea.scrollHeight}px`;
-		this.#last_height = `${this.#textarea.scrollHeight}px`;
+		this.#is_resize_locked = true;
+
+		this.#animation_frame_id = requestAnimationFrame(() => {
+			const styles = getComputedStyle(this.#textarea);
+
+			this.#textarea.style.height = '0';
+			this.#textarea.style.height = `${this.#textarea.scrollHeight + parseInt(styles.borderWidth) * 2}px`;
+			this.#is_resize_locked = false;
+		});
+
 	}
 
 	#addEventListeners() {
