@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -1274,6 +1274,9 @@ int	item_preproc_script(zbx_es_t *es, zbx_variant_t *value, const char *params, 
 	if (SUCCEED != zbx_es_is_env_initialized(es))
 	{
 		if (SUCCEED != zbx_es_init_env(es, config_source_ip, errmsg))
+			return FAIL;
+
+		if (SUCCEED != zbx_es_globals_make_readonly(es, errmsg))
 			return FAIL;
 	}
 

@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -1079,7 +1079,7 @@ int	zbx_dbsync_compare_autoreg_host(zbx_dbsync_t *sync)
 	zbx_dcsync_sql_start(sync);
 
 	if (NULL == (sync->dbresult = zbx_db_select(
-			"select host,listen_ip,listen_dns,host_metadata,flags,listen_port"
+			"select host,listen_ip,listen_dns,host_metadata,flags,listen_port,tls_accepted"
 			" from autoreg_host"
 			" where proxyid is null")))
 	{

@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -405,7 +405,6 @@ class CMfa extends CApiService {
 			API::Authentication()->update(['mfaid' => 0]);
 		}
 
-		DB::delete('mfa_totp_secret', ['mfaid' => array_keys($db_mfas)]);
 		DB::delete('mfa', ['mfaid' => array_keys($db_mfas)]);
 
 		self::addAuditLog(CAudit::ACTION_DELETE, CAudit::RESOURCE_MFA, $db_mfas);
@@ -431,18 +430,17 @@ class CMfa extends CApiService {
 		}
 
 		self::checkDeleteDefaultMfa($db_mfas);
-		self::cehckMfaUsedByUserGroup($db_mfas);
+		self::checkMfaUsedByUserGroup($db_mfas);
 	}
 
 	private static function checkDeleteDefaultMfa(array $db_mfas): void {
 		if (in_array(CAuthenticationHelper::get(CAuthenticationHelper::MFAID), array_keys($db_mfas))
-				&& CAuthenticationHelper::get(CAuthenticationHelper::MFA_STATUS) == MFA_ENABLED
-				&& !self::checkOtherMfaExists(array_keys($db_mfas))) {
+				&& CAuthenticationHelper::get(CAuthenticationHelper::MFA_STATUS) == MFA_ENABLED) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot delete default MFA method.'));
 		}
 	}
 
-	private static function cehckMfaUsedByUserGroup(array $db_mfas) {
+	private static function checkMfaUsedByUserGroup(array $db_mfas): void {
 		$db_groups = API::UserGroup()->get([
 			'output' => ['name', 'mfaid'],
 			'mfaids' => array_keys($db_mfas),

@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -44,7 +44,7 @@ class CControllerProblemView extends CControllerProblem {
 			'compact_view' =>			'in 0,1',
 			'show_timeline' =>			'in '.ZBX_TIMELINE_OFF.','.ZBX_TIMELINE_ON,
 			'details' =>				'in 0,1',
-			'highlight_row' =>			'in 0,1',
+			'highlight_row' =>			'in '.ZBX_HIGHLIGHT_OFF.','.ZBX_HIGHLIGHT_ON,
 			'show_opdata' =>			'in '.OPERATIONAL_DATA_SHOW_NONE.','.OPERATIONAL_DATA_SHOW_SEPARATELY.','.OPERATIONAL_DATA_SHOW_WITH_PROBLEM,
 			'tag_name_format' =>		'in '.TAG_NAME_FULL.','.TAG_NAME_SHORTENED.','.TAG_NAME_NONE,
 			'tag_priority' =>			'string',

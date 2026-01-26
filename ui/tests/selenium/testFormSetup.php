@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -67,7 +67,7 @@ class testFormSetup extends CWebTest {
 
 	public function testFormSetup_prerequisitesSectionLayout() {
 		$this->page->login()->open('setup.php')->waitUntilReady();
-		$this->query('button:Next step')->one()->click();
+		$this->query('button:Next step')->one()->click()->waitUntilStalled();
 
 		// Check Pre-requisites section.
 		$this->checkPageTextElements('Check of pre-requisites');
@@ -292,6 +292,7 @@ class testFormSetup extends CWebTest {
 		$this->assertEquals(['Blue', 'Dark', 'High-contrast light', 'High-contrast dark'], $themes->getOptions()->asText());
 		// Select Dark theme.
 		$form->getField('Default theme')->select('Dark');
+		$form->waitUntilReloaded();
 
 		// Check that default theme has changed.
 		$stylesheet = $this->query('xpath://link[@rel="stylesheet"]')->one();
@@ -316,7 +317,7 @@ class testFormSetup extends CWebTest {
 		$this->query('button:Back')->one()->click();
 		// Fill in the Zabbix server name field and proceed with checking Pre-installation summary.
 		$this->query('id:setup-form')->asForm()->one()->getField('Zabbix server name')->fill('Zabbix server name');
-		$this->query('button:Next step')->one()->click();
+		$this->query('button:Next step')->one()->click()->waitUntilStalled();
 		$db_parameters = $this->getDbParameters();
 		$text = 'Please check configuration parameters. If all is correct, press "Next step" button, or "Back" button '.
 				'to change configuration parameters.';
@@ -355,10 +356,14 @@ class testFormSetup extends CWebTest {
 
 		// Check screenshot of the Pre-installation summary section.
 		$skip_fields = [];
-		foreach(['Database server', 'Database port', 'Database name'] as $skip_field) {
+		foreach(['Database server', 'Database port'] as $skip_field) {
 			$xpath = 'xpath://span[text()='.CXPathHelper::escapeQuotes($skip_field).']/../../div[@class="table-forms-td-right"]';
 			$skip_fields[] = $this->query($xpath)->one();
 		}
+		// Remove database name due to unstable screenshot, one pixel visible.
+		CElementQuery::getDriver()->executeScript("arguments[0].textContent = '';",
+				[$this->query('xpath://span[text()="Database name"]/../../div[@class="table-forms-td-right"]')->one()]
+		);
 		$this->assertScreenshotExcept($this->query('xpath://form')->one(), $skip_fields, 'PreInstall_'.$db_parameters['Database type']);
 	}
 
@@ -371,7 +376,7 @@ class testFormSetup extends CWebTest {
 		$this->assertScreenshotExcept($this->query('xpath://form')->one(), $this->query('xpath://p')->one(), 'Install');
 
 		// Check that Dashboard view is opened after completing the form.
-		$this->query('button:Finish')->one()->click();
+		$this->query('button:Finish')->one()->click()->waitUntilNotVisible();
 		$this->page->waitUntilReady();
 		$this->assertStringContainsString('index.php', $this->page->getCurrentURL());
 	}
@@ -657,7 +662,7 @@ class testFormSetup extends CWebTest {
 		}
 
 		// Check the outcome for the specified database configuration.
-		$this->query('button:Next step')->one()->click();
+		$this->query('button:Next step')->one()->click()->waitUntilStalled();
 		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
 			// Define the reference error message details and assert error message.
 			if (array_key_exists('error_details', $data)) {
@@ -845,19 +850,19 @@ class testFormSetup extends CWebTest {
 		$this->openSpecifiedSection('Pre-installation summary');
 
 		// Proceed back to the 1st section of the setup form.
-		$this->query('button:Back')->one()->click();
+		$this->query('button:Back')->one()->click()->waitUntilStalled();
 		$this->assertEquals('Settings', $this->query('xpath://h1')->one()->getText());
-		$this->query('button:Back')->one()->click();
+		$this->query('button:Back')->one()->click()->waitUntilStalled();
 		$this->assertEquals('Configure DB connection', $this->query('xpath://h1')->one()->getText());
-		$this->query('button:Back')->one()->click();
+		$this->query('button:Back')->one()->click()->waitUntilStalled();
 		$this->assertEquals('Check of pre-requisites', $this->query('xpath://h1')->one()->getText());
-		$this->query('button:Back')->one()->click();
+		$this->query('button:Back')->one()->click()->waitUntilStalled();
 		$this->assertEquals("Welcome to\nZabbix ".ZABBIX_EXPORT_VERSION, $this->query('xpath://div[@class="setup-title"]')->one()->getText());
 		$this->checkSections('Welcome');
 		$this->checkButtons('first section');
 
 		// Cancel setup form update.
-		$this->query('button:Cancel')->one()->click();
+		$this->query('button:Cancel')->one()->click()->waitUntilStalled();
 		$this->assertStringContainsString('zabbix.php?action=dashboard.view', $this->page->getCurrentURL());
 	}
 
@@ -868,7 +873,9 @@ class testFormSetup extends CWebTest {
 	 * @param	string	$text		text that should be present in a paragraph of the current setup form section
 	 */
 	private function checkPageTextElements($title, $text = null) {
-		$this->assertTrue($this->query('xpath://h1[text()='.CXPathHelper::escapeQuotes($title).']')->one()->isValid());
+		$this->assertTrue($this->query('xpath://h1[text()='.CXPathHelper::escapeQuotes($title).']')->waitUntilVisible()
+				->one()->isValid()
+		);
 		$this->checkSections($title);
 		if ($text) {
 			$this->assertStringContainsString($text, $this->query('xpath:.//p')->one()->getText());
@@ -953,8 +960,8 @@ class testFormSetup extends CWebTest {
 	 */
 	private function openSpecifiedSection($section) {
 		$this->page->login()->open('setup.php')->waitUntilReady();
-		$this->query('button:Next step')->one()->click();
-		$this->query('button:Next step')->one()->click();
+		$this->query('button:Next step')->one()->click()->waitUntilStalled();
+		$this->query('button:Next step')->one()->click()->waitUntilStalled();
 		// No actions required in case of Configure DB connection section.
 		if ($section === 'Configure DB connection') {
 			return;

@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -920,7 +920,7 @@ class testFormServicesSla extends CWebTest {
 			'Effective date' => '2022-09-10',
 			'id:service_tags_0_tag' => 'tag',
 			'id:service_tags_0_value' => 'value',
-			'Description' => 'SLA descruption',
+			'Description' => 'SLA description',
 			'Enabled' => false
 		];
 		$old_hash = CDBHelper::getHash(self::$sla_sql);

@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -168,7 +168,7 @@ function make_event_details(array $event, array $allowed) {
 	$tags = makeTags([$event]);
 
 	$table
-		->addRow([_('Tags'), $tags[$event['eventid']]])
+		->addRow([_('Tags'), (new CDiv($tags[$event['eventid']]))->addClass(ZBX_STYLE_TAGS_WRAPPER)])
 		->addRow([_('Description'), (new CDiv(zbx_str2links($event['comments'])))->addClass(ZBX_STYLE_WORDBREAK)]);
 
 	if ($event['cause_eventid'] == 0) {
@@ -756,7 +756,7 @@ function makeTags(array $list, bool $html = true, string $key = 'eventid', int $
 				}
 
 				$tags[$element[$key]][] = (new CButtonIcon(ZBX_ICON_MORE))
-					->setHint($hint_content, ZBX_STYLE_HINTBOX_WRAP);
+					->setHint($hint_content, ZBX_STYLE_HINTBOX_WRAP . ' ' . ZBX_STYLE_TAGS_WRAPPER);
 			}
 		}
 		else {

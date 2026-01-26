@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -54,6 +54,7 @@ $items = API::Item()->get([
 	'output' => ['itemid', 'type', 'master_itemid', $resolve_macros ? 'name_resolved' : 'name', 'delay', 'units',
 		'hostid', 'history', 'trends', 'value_type', 'key_'
 	],
+	'selectPreprocessing' => ['type', 'params'],
 	'selectHosts' => ['name', 'host'],
 	'itemids' => $itemIds,
 	'webitems' => true,
@@ -73,6 +74,7 @@ $hostNames = [];
 foreach ($items as &$item) {
 	$item['hostname'] = $item['hosts'][0]['name'];
 	$item['host'] = $item['hosts'][0]['host'];
+	unset($item['hosts']);
 	if (!in_array($item['hostname'], $hostNames)) {
 		$hostNames[] = $item['hostname'];
 	}

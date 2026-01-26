@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -19,7 +19,7 @@ require_once __DIR__.'/../common/testWidgets.php';
 /**
  * @backup config, hstgrp, widget
  *
- * @dataSource UserPermissions
+ * @dataSource UserPermissions, MonitoringOverview
  *
  * @onBefore prepareDashboardData, prepareProblemsData
  */
@@ -483,16 +483,16 @@ class testDashboardProblemsWidgetDisplay extends testWidgets {
 					'result' => [
 						[
 							'Problem • Severity' => 'Fourth test trigger with tag priority',
-							'Tags' => 'Eta: eDelta: t'
+							'Tags' => "Eta: e\nDelta: t"
 						],
 						[
 							'Problem • Severity' => 'Second test trigger with tag priority',
-							'Tags' => 'Eta: eBeta: b'
+							'Tags' => "Eta: e\nBeta: b"
 						]
 					],
 					'check_tag_ellipsis' => [
-						'Fourth test trigger with tag priority' => 'Delta: tEta: eGamma: gTheta: t',
-						'Second test trigger with tag priority' => 'Beta: bEpsilon: eEta: eZeta: z'
+						'Fourth test trigger with tag priority' => "Delta: t\nEta: e\nGamma: g\nTheta: t",
+						'Second test trigger with tag priority' => "Beta: b\nEpsilon: e\nEta: e\nZeta: z"
 					],
 					'headers' => ['Time', '', '', 'Recovery time', 'Status', 'Info', 'Host', 'Problem • Severity',
 							'Duration', 'Update', 'Actions', 'Tags'
@@ -527,15 +527,15 @@ class testDashboardProblemsWidgetDisplay extends testWidgets {
 					'result' => [
 						[
 							'Problem • Severity' => 'Test trigger to check tag filter on problem page',
-							'Tags' => 'DatSer: abcser: abcdef'
+							'Tags' => "Dat\nSer: abc\nser: abcdef"
 						],
 						[
 							'Problem • Severity' => 'Fourth test trigger with tag priority',
-							'Tags' => 'The: tDel: tEta: e'
+							'Tags' => "The: t\nDel: t\nEta: e"
 						],
 						[
 							'Problem • Severity' => 'Third test trigger with tag priority',
-							'Tags' => 'The: tAlp: aIot: i'
+							'Tags' => "The: t\nAlp: a\nIot: i"
 						]
 					],
 					'headers' => ['Time', 'Recovery time', 'Status', 'Info', 'Host', 'Problem • Severity', 'Duration',
@@ -571,7 +571,7 @@ class testDashboardProblemsWidgetDisplay extends testWidgets {
 					'result' => [
 						[
 							'Problem • Severity' => 'Fourth test trigger with tag priority',
-							'Tags' => 'get'
+							'Tags' => "g\ne\nt"
 						]
 					],
 					'headers' => ['Time', 'Recovery time', 'Status', 'Info', 'Host', 'Problem • Severity', 'Duration',
@@ -775,12 +775,13 @@ class testDashboardProblemsWidgetDisplay extends testWidgets {
 
 		// Check saved dashboard.
 		$form->waitUntilNotVisible();
+		$table = $this->query('class:list-table')->waitUntilVisible()->asTable()->one();
 		$dashboard->save();
 		$this->assertMessage(TEST_GOOD, 'Dashboard updated');
 
 		// Assert widget's table.
-		$dashboard->getWidget($data['fields']['Name'])->waitUntilReady();
-		$table = $this->query('class:list-table')->asTable()->one();
+		$dashboard->getWidget($data['fields']['Name']);
+		$table->waitUntilReloaded();
 
 		// Change time for actual value, because it cannot be used in data provider.
 		foreach ($data['result'] as &$row) {

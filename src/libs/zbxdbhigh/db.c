@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -1197,11 +1197,44 @@ void	zbx_db_version_info_clear(struct zbx_db_version_info_t *version_info)
 }
 
 #if defined(HAVE_MYSQL) || defined(HAVE_POSTGRESQL)
-#define MAX_EXPRESSIONS	1000	/* tune according to batch size to avoid unnecessary or conditions */
+/******************************************************************************
+ *                                                                            *
+ * Purpose: Takes an initial part of SQL query and appends a generated        *
+ *          WHERE condition. The WHERE condition is generated from the given  *
+ *          list of values.                                                   *
+ *                                                                            *
+ * Parameters: sql        - [IN/OUT] buffer for SQL query construction        *
+ *             sql_alloc  - [IN/OUT] size of the 'sql' buffer                 *
+ *             sql_offset - [IN/OUT] current position in the 'sql' buffer     *
+ *             fieldname  - [IN] field name to be used in SQL WHERE condition *
+ *             values     - [IN] array of numerical values sorted in          *
+ *                               ascending order to be included in WHERE      *
+ *             num        - [IN] number of elements in 'values' array         *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_db_add_condition_alloc(char **sql, size_t *sql_alloc, size_t *sql_offset, const char *fieldname,
+		const zbx_uint64_t *values, const int num)
+{
+	if (0 == num)
+		return;
+
+	if (1 == num)
+	{
+		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, " %s=" ZBX_FS_UI64, fieldname, values[0]);
+		return;
+	}
+
+	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, " %s in (", fieldname);
+
+	for (int i = 0; i < num; i++)
+		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, ZBX_FS_UI64 ",", values[i]);
+
+	(*sql_offset)--;
+	zbx_chrcpy_alloc(sql, sql_alloc, sql_offset, ')');
+}
+
 #else
 #define MAX_EXPRESSIONS	950
-#endif
-
 #ifdef HAVE_ORACLE
 #define MIN_NUM_BETWEEN	5	/* minimum number of consecutive values for using "between <id1> and <idN>" */
 
@@ -1429,6 +1462,7 @@ void	zbx_db_add_condition_alloc(char **sql, size_t *sql_alloc, size_t *sql_offse
 #undef MIN_NUM_BETWEEN
 #endif
 }
+#endif
 
 void	add_batch_select_condition(char **sql, size_t *sql_alloc, size_t *sql_offset, const char* column,
 		const zbx_vector_uint64_t *itemids, int *index)
@@ -1459,20 +1493,16 @@ void	add_batch_select_condition(char **sql, size_t *sql_alloc, size_t *sql_offse
  *             values     - [IN] array of string values                          *
  *             num        - [IN] number of elements in 'values' array            *
  *                                                                               *
- * Comments: To support Oracle empty values are checked separately (is null      *
- *           for Oracle and ='' for the other databases).                        *
  *                                                                               *
  *********************************************************************************/
 void	zbx_db_add_str_condition_alloc(char **sql, size_t *sql_alloc, size_t *sql_offset, const char *fieldname,
 		const char * const *values, const int num)
 {
-#if defined(HAVE_MYSQL) || defined(HAVE_POSTGRESQL)
-#define MAX_EXPRESSIONS	1000	/* tune according to batch size to avoid unnecessary or conditions */
-#else
+#if defined(HAVE_SQLITE3) || defined(HAVE_ORACLE)
 #define MAX_EXPRESSIONS	950
 #endif
 
-	int	i, cnt = 0;
+	int	i;
 	char	*value_esc;
 	int	values_num = 0, empty_num = 0;
 
@@ -1488,8 +1518,13 @@ void	zbx_db_add_str_condition_alloc(char **sql, size_t *sql_alloc, size_t *sql_o
 		else
 			values_num++;
 	}
+#if defined(HAVE_SQLITE3) || defined(HAVE_ORACLE)
+	int	cnt = 0;
 
 	if (MAX_EXPRESSIONS < values_num || (0 != values_num && 0 != empty_num))
+#else
+	if (0 != values_num && 0 != empty_num)
+#endif
 		zbx_chrcpy_alloc(sql, sql_alloc, sql_offset, '(');
 
 	if (0 != empty_num)
@@ -1526,7 +1561,7 @@ void	zbx_db_add_str_condition_alloc(char **sql, size_t *sql_alloc, size_t *sql_o
 	{
 		if ('\0' == *values[i])
 			continue;
-
+#if defined(HAVE_SQLITE3) || defined(HAVE_ORACLE)
 		if (MAX_EXPRESSIONS == cnt)
 		{
 			cnt = 0;
@@ -1535,20 +1570,22 @@ void	zbx_db_add_str_condition_alloc(char **sql, size_t *sql_alloc, size_t *sql_o
 			zbx_strcpy_alloc(sql, sql_alloc, sql_offset, fieldname);
 			zbx_strcpy_alloc(sql, sql_alloc, sql_offset, " in (");
 		}
-
+		cnt++;
+#endif
 		value_esc = zbx_db_dyn_escape_string(values[i]);
 		zbx_chrcpy_alloc(sql, sql_alloc, sql_offset, '\'');
 		zbx_strcpy_alloc(sql, sql_alloc, sql_offset, value_esc);
 		zbx_strcpy_alloc(sql, sql_alloc, sql_offset, "',");
 		zbx_free(value_esc);
-
-		cnt++;
 	}
 
 	(*sql_offset)--;
 	zbx_chrcpy_alloc(sql, sql_alloc, sql_offset, ')');
-
+#if defined(HAVE_SQLITE3) || defined(HAVE_ORACLE)
 	if (MAX_EXPRESSIONS < values_num || 0 != empty_num)
+#else
+	if (0 != empty_num)
+#endif
 		zbx_chrcpy_alloc(sql, sql_alloc, sql_offset, ')');
 
 #undef MAX_EXPRESSIONS
@@ -3201,15 +3238,26 @@ retry_oracle:
 
 	if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_DEBUG))
 	{
-		for (i = 0; i < self->rows.values_num; i++)
+		if (ZBX_DB_MASK_QUERIES == zbx_db_get_log_masked_values())
 		{
-			zbx_db_value_t	*values = (zbx_db_value_t *)self->rows.values[i];
-			char	*str;
+			zabbix_log(LOG_LEVEL_DEBUG, "insert [txnlev:%d] %d value(s)", zbx_db_txn_level(),
+					self->rows.values_num);
+		}
+		else
+		{
+			for (i = 0; i < self->rows.values_num; i++)
+			{
+				zbx_db_value_t	*values = (zbx_db_value_t *)self->rows.values[i];
+				char	*str;
 
-			str = zbx_db_format_values((zbx_db_field_t **)self->fields.values, values,
-					self->fields.values_num);
-			zabbix_log(LOG_LEVEL_DEBUG, "insert [txnlev:%d] [%s]", zbx_db_txn_level(), ZBX_NULL2EMPTY_STR(str));
-			zbx_free(str);
+				str = zbx_db_format_values((zbx_db_field_t **)self->fields.values, values,
+						self->fields.values_num);
+
+				zabbix_log(LOG_LEVEL_DEBUG, "insert [txnlev:%d] [%s]", zbx_db_txn_level(),
+						ZBX_NULL2EMPTY_STR(str));
+
+				zbx_free(str);
+			}
 		}
 	}
 
@@ -3620,9 +3668,11 @@ int	zbx_db_get_user_by_active_session(const char *sessionid, zbx_user_t *user)
 	zbx_db_result_t	result;
 	zbx_db_row_t	row;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() sessionid:%s", __func__, sessionid);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() sessionid:%s", __func__, ZBX_STRMASK(sessionid));
 
 	sessionid_esc = zbx_db_dyn_escape_string(sessionid);
+
+	zbx_db_query_mask_t	old_queries = zbx_db_set_log_masked_values(ZBX_DB_MASK_QUERIES);
 
 	if (NULL == (result = zbx_db_select(
 			"select u.userid,u.roleid,u.username,r.type"
@@ -3648,6 +3698,7 @@ int	zbx_db_get_user_by_active_session(const char *sessionid, zbx_user_t *user)
 out:
 	zbx_db_free_result(result);
 	zbx_free(sessionid_esc);
+	zbx_db_set_log_masked_values(old_queries);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 

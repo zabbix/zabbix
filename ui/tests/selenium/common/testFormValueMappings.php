@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -20,6 +20,8 @@ require_once __DIR__.'/../../include/helpers/CDataHelper.php';
 
 /**
  * Base class for Value mappings function tests.
+ *
+ * @onBefore prepareData
  */
 class testFormValueMappings extends CWebTest {
 
@@ -35,7 +37,6 @@ class testFormValueMappings extends CWebTest {
 		];
 	}
 
-	const HOSTID = 99134;	// ID of the host for valuemap update.
 	const TEMPLATEID = 40000;	// ID of the template for valuemap update.
 	const UPDATE_VALUEMAP1 = 'Valuemap for update 1';
 	const UPDATE_VALUEMAP2 = 'Valuemap for update 2';
@@ -60,9 +61,13 @@ class testFormValueMappings extends CWebTest {
 		]
 	];
 
-	private static $previous_valuemap_name = self::UPDATE_VALUEMAP1;
+	protected static $previous_valuemap_name = self::UPDATE_VALUEMAP1;
+	protected static $previous_class = null;
+	protected static $hostids;
 
-	private static $previous_class = null;
+	public static function prepareData() {
+		self::$hostids = CDataHelper::get('HostAvailabilityWidget.hostids');
+	}
 
 	/**
 	 * Function that checks the layout of the Value mappings tab in Host or Template configuration forms.
@@ -132,7 +137,7 @@ class testFormValueMappings extends CWebTest {
 	public function checkClone($source) {
 		// Create a clone of an existing host/template with value mappings.
 		$this->openValueMappingTab($source, true, false);
-		$this->query('button', 'Clone')->one()->click();
+		$this->query('button', 'Clone')->one()->click()->waitUntilNotVisible();
 		$form = COverlayDialogElement::find()->asForm()->waitUntilReady()->one();
 		$form->getField(ucfirst($source).' name')->fill('Clone Valuemap Test');
 		$form->submit();
@@ -938,7 +943,7 @@ class testFormValueMappings extends CWebTest {
 	 * @return CFormElement|CFluidFormElemt    $form
 	 */
 	private function openValueMappingTab($source, $login = true, $open_tab = true) {
-		$sourceid = ($source === 'host') ? self::HOSTID : self::TEMPLATEID;
+		$sourceid = ($source === 'host') ? self::$hostids['Available host'] : self::TEMPLATEID;
 		if ($login) {
 			$this->page->login();
 		}

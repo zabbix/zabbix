@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -42,7 +42,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 		parent::init();
 
 		$this->addValidationRules([
-			'initial_load' => 'in 0,1',
+			'with_config' => 'in 1',
 			'widgetid' => 'db widget.widgetid',
 			'unique_id' => 'required|string'
 		]);
@@ -53,17 +53,19 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 		$data = [
 			'name' => $this->getInput('name', $this->widget->getDefaultName()),
-			'hosts' => self::convertToRFC7946($this->getHosts()),
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
 			],
-			'unique_id' => $this->getInput('unique_id')
+			'unique_id' => $this->getInput('unique_id'),
+			'vars' => [
+				'hosts' => self::convertToRFC7946($this->getHosts())
+			]
 		];
 
-		if ($this->getInput('initial_load', 0)) {
+		if ($this->hasInput('with_config')) {
 			$this->geomap_config = self::getMapConfig();
 
-			$data['config'] = $this->geomap_config + $this->getMapCenter() + [
+			$data['vars']['config'] = $this->geomap_config + $this->getMapCenter() + [
 				'filter' => $this->getUserProfileFilter(),
 				'severities' => self::getSeveritySettings()
 			];

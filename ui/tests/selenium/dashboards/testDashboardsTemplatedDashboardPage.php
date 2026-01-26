@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -26,12 +26,12 @@ require_once __DIR__.'/../behaviors/CTableBehavior.php';
 class testDashboardsTemplatedDashboardPage extends CWebTest {
 
 	/**
-	 * Attach TableBehavior to the test.
+	 * Attach TableBehavior, CMessageBehavior to the test.
 	 *
 	 * @return array
 	 */
 	public function getBehaviors() {
-		return [CTableBehavior::class];
+		return [CTableBehavior::class, CMessageBehavior::class];
 	}
 
 	const TEMPLATEID = 99022;	// ID of the template for with a list of dashboards.
@@ -126,7 +126,7 @@ class testDashboardsTemplatedDashboardPage extends CWebTest {
 
 		$this->query('button:Delete')->one()->waitUntilClickable()->click();
 		$this->page->acceptAlert();
-		$this->page->waitUntilReady();
+		$this->assertMessage(TEST_GOOD, 'Dashboards deleted');
 
 		// Check that dashboards were deleted and that other dashboards are still there.
 		$remaining_dashboards = array_diff(self::DASHBOARDS, self::DASHBOARDS_2_DELETE);

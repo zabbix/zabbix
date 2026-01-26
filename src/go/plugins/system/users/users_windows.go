@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -16,14 +16,14 @@ package users
 
 import (
 	"golang.zabbix.com/agent2/pkg/pdh"
+	"golang.zabbix.com/sdk/errs"
 )
 
-func (p *Plugin) getUsersNum(timeout int) (num int, err error) {
-	var value *int64
-	value, err = pdh.GetCounterInt64(pdh.CounterPath(pdh.ObjectTerminalServices, pdh.CounterTotalSessions))
+func (*Plugin) getUsersNum(_ int) (int, error) {
+	value, err := pdh.GetCounterInt64(pdh.CounterPath(pdh.ObjectTerminalServices, pdh.CounterActiveSessions))
 	if err != nil || value == nil {
-		return
+		return 0, errs.Wrap(err, "can't get counter")
 	}
-	return int(*value), nil
 
+	return int(*value), nil
 }

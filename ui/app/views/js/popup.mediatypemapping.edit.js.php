@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -77,7 +77,7 @@ window.media_type_mapping_edit_popup = new class {
 	}
 
 	trimFields(fields) {
-		const fields_to_trim = ['name', 'attribute'];
+		const fields_to_trim = ['name', 'attribute', 'period'];
 
 		for (const field of fields_to_trim) {
 			if (field in fields) {

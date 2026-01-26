@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -363,7 +363,7 @@ foreach ($data['triggers'] as $tnum => $trigger) {
 			$disabled_by_lld ? makeDescriptionIcon(_('Disabled automatically by an LLD rule.')) : null
 		]))->addClass(ZBX_STYLE_NOWRAP),
 		$data['show_info_column'] ? makeInformationList($info_icons) : null,
-		$data['tags'][$triggerid]
+		(new CDiv($data['tags'][$triggerid]))->addClass(ZBX_STYLE_TAGS_WRAPPER)
 	]);
 }
 

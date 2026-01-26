@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -294,8 +294,8 @@ class testPageSearch extends CWebTest {
 		$this->assertFalse($search_button->isClickable());
 
 		$search_field->fill($this->search_string);
-		$search_button->waitUntilClickable()->click();
-		$this->page->assertHeader('Search: ' . $this->search_string);
+		$search_button->waitUntilClickable()->click()->waitUntilStalled();
+		$this->page->assertHeader('Search: '.$this->search_string);
 	}
 
 	/**
@@ -497,8 +497,9 @@ class testPageSearch extends CWebTest {
 			}
 			else {
 				$footer_text = $widget->query('xpath:.//div[@class="section-foot"]')->one()->getText();
-				// Only a maximum of 100 records are displayed at once.
-				$this->assertEquals('Displaying '.(min($expected_count, 100)).' of '.$expected_count.' found', $footer_text);
+
+				// Only a maximum of 150 records are displayed at once.
+				$this->assertEquals('Displaying '.(min($expected_count, 150)).' of '.$expected_count.' found', $footer_text);
 			}
 		}
 	}
@@ -619,7 +620,7 @@ class testPageSearch extends CWebTest {
 				continue;
 			}
 
-			$table_row = $this->query($widget_params['table_selector'])->asTable()->one()->getRow(0);
+			$table_row = $this->query($widget_params['table_selector'])->waitUntilVisible()->asTable()->one()->getRow(0);
 
 			// For each expected column.
 			foreach ($data[$widget_params['key']] as $column_name => $column_data) {
@@ -768,7 +769,7 @@ class testPageSearch extends CWebTest {
 	 * @param string  $search_string    text that will be entered in the search field
 	 */
 	protected function openSearchResults($search_string, $send_keyup = false) {
-		$this->page->login()->open('zabbix.php?action=dashboard.view');
+		$this->page->login()->open('zabbix.php?action=dashboard.view')->waitUntilReady();
 		$form = $this->query('class:form-search')->waitUntilVisible()->asForm()->one();
 		$form->fill(['id:search' => $search_string]);
 
@@ -777,6 +778,7 @@ class testPageSearch extends CWebTest {
 			$form->getField('id:search')->fireEvent('keyup');
 		}
 
-		$form->submit();
+		$form->submit()->waitUntilStalled();
+		$this->page->waitUntilReady();
 	}
 }

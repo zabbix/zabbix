@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -943,6 +943,7 @@ class testFormTags extends CWebTest {
 		$this->page->waitUntilReady();
 		$this->query('button:Reset')->one()->click();
 		$form = $this->query('name:zbx_filter')->asForm()->waitUntilReady()->one();
+		$table = $this->query('xpath://table[@class="list-table"]')->asTable()->one();
 		$form->fill(['Name' => $new_name]);
 		$this->query('button:Apply')->one()->waitUntilClickable()->click();
 
@@ -966,8 +967,7 @@ class testFormTags extends CWebTest {
 				break;
 		}
 
-		$this->query('xpath://table[@class="list-table"]')->asTable()->one()
-				->findRow('Name', $new_name)->getColumn($column)->query('link', $column)->one()->click();
+		$table->waitUntilReloaded()->findRow('Name', $new_name)->getColumn($column)->query('link', $column)->one()->click();
 
 		switch ($object) {
 			case 'trigger':
@@ -1151,6 +1151,7 @@ class testFormTags extends CWebTest {
 		$form->fill(['id:show_inherited_tags' => 'Inherited and '.$field_name.' tags']);
 
 		if ($object === 'web scenario') {
+			$form->waitUntilStalled();
 			$this->page->waitUntilReady();
 		}
 		else {

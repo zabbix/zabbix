@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -89,6 +89,7 @@ require_once __DIR__.'/dashboardWidgets/testDashboardTopHostsWidget.php';
 require_once __DIR__.'/dashboardWidgets/testDashboardTopTriggersWidget.php';
 require_once __DIR__.'/dashboardWidgets/testDashboardTriggerOverviewWidget.php';
 require_once __DIR__.'/dashboardWidgets/testDashboardURLWidget.php';
+require_once __DIR__.'/dashboardWidgets/testDashboardWebMonitoringWidget.php';
 require_once __DIR__.'/dashboardWidgets/testDashboardWidgetBroadcastedData.php';
 require_once __DIR__.'/dashboardWidgets/testDashboardWidgetCommunication.php';
 
@@ -208,6 +209,7 @@ require_once __DIR__.'/networkDiscovery/testFormNetworkDiscovery.php';
 require_once __DIR__.'/networkDiscovery/testPageNetworkDiscovery.php';
 
 // Permissions.
+require_once __DIR__.'/permissions/testDashboardUserPermissions.php';
 require_once __DIR__.'/permissions/testPermissionsWithoutCSRF.php';
 require_once __DIR__.'/permissions/testTagBasedPermissions.php';
 require_once __DIR__.'/permissions/testUrlUserPermissions.php';
@@ -437,6 +439,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testDashboardTopTriggersWidget');
 		$suite->addTestSuite('testDashboardTriggerOverviewWidget');
 		$suite->addTestSuite('testDashboardURLWidget');
+		$suite->addTestSuite('testDashboardWebMonitoringWidget');
 		$suite->addTestSuite('testDashboardWidgetBroadcastedData');
 		$suite->addTestSuite('testDashboardWidgetCommunication');
 
@@ -556,6 +559,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testPageNetworkDiscovery');
 
 		// Permissions.
+		$suite->addTestSuite('testDashboardUserPermissions');
 		$suite->addTestSuite('testPermissionsWithoutCSRF');
 		$suite->addTestSuite('testTagBasedPermissions');
 		$suite->addTestSuite('testUrlUserPermissions');

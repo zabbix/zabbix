@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -23,7 +23,6 @@ require_once __DIR__.'/../../include/helpers/CDataHelper.php';
  * @dataSource Services, Sla
  *
  * @onBefore prepareDashboardData
- * @onBefore getDateTimeData
  */
 class testDashboardSlaReportWidget extends testSlaReport {
 
@@ -171,6 +170,7 @@ class testDashboardSlaReportWidget extends testSlaReport {
 				'Name' => [
 					'Disabled SLA',
 					'Disabled SLA Annual',
+					'Multiple spaces in SLA name',
 					'SLA Annual',
 					'SLA Daily',
 					'SLA Monthly',
@@ -182,6 +182,7 @@ class testDashboardSlaReportWidget extends testSlaReport {
 				'Status' => [
 					'Disabled',
 					'Disabled',
+					'Enabled',
 					'Enabled',
 					'Enabled',
 					'Enabled',
@@ -203,7 +204,7 @@ class testDashboardSlaReportWidget extends testSlaReport {
 			'buttons' => ['Filter', 'Reset', 'Cancel'],
 			'check_row' => [
 				'Name' => 'Simple actions service',
-				'Tags' => 'problem: falsetest: test789',
+				'Tags' => "problem: false\ntest: test789",
 				'Problem tags' => 'problem: true'
 			]
 		];
@@ -458,7 +459,7 @@ class testDashboardSlaReportWidget extends testSlaReport {
 
 		// Save or cancel widget.
 		if (CTestArrayHelper::get($data, 'save_widget', false)) {
-			$form->submit();
+			$form->submit()->waitUntilNotVisible();
 
 			// Check that changes took place on the unsaved dashboard.
 			$this->assertTrue($dashboard->getWidget($new_name)->isVisible());
@@ -540,7 +541,7 @@ class testDashboardSlaReportWidget extends testSlaReport {
 				&& CTestArrayHelper::get($data['fields'], 'Service', '') === ''
 				&& !array_key_exists('no_data', $data)
 				&& in_array($data['reporting_period'], ['Monthly', 'Quarterly', 'Annually'])) {
-			$data['fields']['Show periods'] = count(self::$reporting_periods[$data['reporting_period']]);
+			$data['fields']['Show periods'] = count($this->getDateTimeData($data['reporting_period']));
 		}
 
 		// Type mode chooses the 1st entry in the list, which for some cases in data provider is incorrect.
@@ -1998,7 +1999,10 @@ class testDashboardSlaReportWidget extends testSlaReport {
 					],
 					'reporting_period' => 'Daily',
 					'equivalent_timestamps' => [
-						'From' => date('Y-m-d', strtotime('first day of this month'))
+						'From' => [
+							'format' => 'Y-m-d',
+							'string' => 'first day of this month'
+						]
 					]
 				]
 			],
@@ -2077,7 +2081,10 @@ class testDashboardSlaReportWidget extends testSlaReport {
 					],
 					'reporting_period' => 'Daily',
 					'equivalent_timestamps' => [
-						'To' => date('Y-m-d', strtotime('last day of this month'))
+						'To' => [
+							'format' => 'Y-m-d',
+							'string' => 'last day of this month'
+						]
 					]
 				]
 			],
@@ -2131,24 +2138,14 @@ class testDashboardSlaReportWidget extends testSlaReport {
 					],
 					'reporting_period' => 'Monthly',
 					'equivalent_timestamps' => [
-						'From' => date('Y-m', strtotime('first day of this month')).' - 1 month'
+						'From' => [
+							'format' => 'Y-m',
+							'string' => 'first day of this month',
+							'additional_string' => ' - 1 month'
+						]
 					]
 				]
 			],
-			// TODO: uncomment the below case when ZBX-21821 is fixed.
-//			[
-//				[
-//					'fields' => [
-//						'SLA' => 'SLA Monthly',
-//						'To' => 'now/M+1M',
-//						'Show periods' => 3
-//					],
-//					'reporting_period' => 'Monthly',
-//					'equivalent_timestamps' => [
-//						'To' => date('Y-m', strtotime('last day of this month')).' + 1 month'
-//					]
-//				]
-//			],
 			[
 				[
 					'fields' => [
@@ -2194,7 +2191,8 @@ class testDashboardSlaReportWidget extends testSlaReport {
 					'fields' => [
 						'SLA' => 'SLA Quarterly',
 						'Service' => 'Simple actions service',
-						'To' => 'now/d-100d',
+						// TODO: Change the value of the "To" field to 'now/d-100d' when ZBX-27363 is fixed.
+						'To' => 'now-100d',
 						'Show periods' => 3
 					],
 					'reporting_period' => 'Quarterly',
@@ -2216,6 +2214,13 @@ class testDashboardSlaReportWidget extends testSlaReport {
 			$data_for_period = $data;
 			if (array_key_exists('equivalent_timestamps', $data)) {
 				foreach ($data_for_period['equivalent_timestamps'] as $field => $value) {
+					if (is_array($value)) {
+						$additional_string = (array_key_exists('additional_string', $value))
+							? $value['additional_string']
+							: '';
+						$value = date($value['format'], strtotime($value['string'])).$additional_string;
+					}
+
 					$data_for_period['fields'][$field] = $value;
 				}
 			}
@@ -2346,6 +2351,15 @@ class testDashboardSlaReportWidget extends testSlaReport {
 				'Annually' => 'years'
 			];
 			$multiplier = ($data['reporting_period'] === 'Quarterly') ? 3 : 1;
+
+			/**
+			 * For monthly, quarterly and annual reporting periods the "days" related information is not needed,
+			 * and even causes issues when tests run at the end of the month. Therefore, for this type of period the
+			 * "days" related information can be discarded.
+			 */
+			if (in_array($data['reporting_period'], ['Monthly', 'Quarterly', 'Annually'])) {
+				$data['fields']['From'] = date('Y-m', strtotime($data['fields']['From']));
+			}
 
 			$to_date = date('Y-m-d', strtotime($data['fields']['From'].' + '.($multiplier * ($show_periods - 1)).
 					' '.$units[$data['reporting_period']])

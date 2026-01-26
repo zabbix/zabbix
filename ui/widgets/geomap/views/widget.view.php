@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -21,9 +21,14 @@
  * @var array $data
  */
 
-(new CWidgetView($data))
+$view = new CWidgetView($data);
+
+foreach ($data['vars'] as $name => $value) {
+	$view->setVar($name, $value);
+}
+
+$view
 	->addItem(
 		(new CDiv())->setId($data['unique_id'])
 	)
-	->setVar('geomap', array_intersect_key($data, array_flip(['config', 'hosts'])))
 	->show();

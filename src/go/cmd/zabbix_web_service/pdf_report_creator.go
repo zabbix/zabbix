@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -117,7 +117,7 @@ func (h *handler) report(w http.ResponseWriter, r *http.Request) {
 
 	var remoteIP net.IP
 
-	remoteTcpAddr, err := net.ResolveTCPAddr("tcp", r.RemoteAddr)
+	remoteTCPAddr, err := net.ResolveTCPAddr("tcp", r.RemoteAddr)
 	if err != nil {
 		log.Debugf("Error '%s' happened while resolving tcp addr: '%s'", err.Error(), r.RemoteAddr)
 		// This is a workaround.
@@ -127,7 +127,7 @@ func (h *handler) report(w http.ResponseWriter, r *http.Request) {
 		// The bug was registered here https://github.com/golang/go/issues/73071.
 		remoteIP, err = extractIPv4AddrFromHTTPReq(r)
 	} else {
-		remoteIP = remoteTcpAddr.IP
+		remoteIP = remoteTCPAddr.IP
 	}
 
 	if err != nil {

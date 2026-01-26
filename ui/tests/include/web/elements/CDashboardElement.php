@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -116,7 +116,7 @@ class CDashboardElement extends CElement {
 	 */
 	public function editProperties() {
 		$this->checkIfEditable();
-		$this->getControls()->query('id:dashboard-config')->one()->click();
+		$this->getControls()->query('id:dashboard-config')->waitUntilClickable()->one()->hoverMouse()->click();
 
 		return $this->query('xpath://div[contains(@class, "overlay-dialogue")][@data-dialogueid="dashboard_properties"]')
 				->waitUntilVisible()->asOverlayDialog()->one()->waitUntilReady();

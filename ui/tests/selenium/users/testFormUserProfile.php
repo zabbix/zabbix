@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -147,8 +147,8 @@ class testFormUserProfile extends CLegacyWebTest {
 						'"User settings"]')->exists()
 				);
 				self::$old_password = $data['password1'];
-				// TODO: Following test ThemeChange fails on Jenkins with error access denied for Admin to dahsboard page. Wait may help
-				CDashboardElement::find()->waitUntilVisible()->waitUntilReady();
+				// TODO: Following test fails on Jenkins with error access denied for Admin to dashboard page. Logout may help
+				$this->page->logout();
 				break;
 			case TEST_BAD:
 				$this->zbxTestWaitUntilMessageTextPresent('msg-bad' , $data['error_msg']);
@@ -257,6 +257,7 @@ class testFormUserProfile extends CLegacyWebTest {
 
 		switch ($data['expected']) {
 			case TEST_GOOD:
+				$this->assertMessage(TEST_GOOD, 'User updated');
 				$this->zbxTestCheckHeader('Global view');
 				$row = DBfetch(DBselect("select refresh from users where username='".PHPUNIT_LOGIN_NAME."'"));
 				$this->assertEquals($data['refresh'] , $row['refresh']);
@@ -365,6 +366,7 @@ class testFormUserProfile extends CLegacyWebTest {
 
 		switch ($data['expected']) {
 			case TEST_GOOD:
+				$this->assertMessage(TEST_GOOD, 'User updated');
 				$this->zbxTestCheckHeader('Global view');
 				$row = DBfetch(DBselect("select autologout from users where username='".PHPUNIT_LOGIN_NAME."'"));
 				$this->assertEquals($data['autologout'] , $row['autologout']);
@@ -513,6 +515,7 @@ class testFormUserProfile extends CLegacyWebTest {
 
 		switch ($data['expected']) {
 			case TEST_GOOD:
+				$this->assertMessage(TEST_GOOD, 'User updated');
 				$this->zbxTestCheckHeader('Global view');
 				break;
 			case TEST_BAD:
@@ -595,6 +598,7 @@ class testFormUserProfile extends CLegacyWebTest {
 				$this->zbxTestWaitForPageToLoad();
 				COverlayDialogElement::ensureNotPresent();
 				$this->zbxTestClickWait('update');
+				$this->assertMessage(TEST_GOOD, 'User updated');
 				$this->zbxTestCheckHeader('Global view');
 				$sql = "SELECT * FROM media WHERE sendto = '".$data['send_to']."'";
 				$this->assertEquals(1, CDBHelper::getCount($sql));

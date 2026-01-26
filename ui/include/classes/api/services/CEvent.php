@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -83,7 +83,7 @@ class CEvent extends CApiService {
 			// output
 			'output' =>					['type' => API_OUTPUT, 'in' => implode(',', self::OUTPUT_FIELDS), 'default' => API_OUTPUT_EXTEND],
 			'countOutput' =>			['type' => API_FLAG, 'default' => false],
-			'groupBy' =>				['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => 'objectid', 'uniq' => true, 'default' => null],
+			'groupBy' =>				['type' => API_STRINGS_UTF8, 'flags' => API_NORMALIZE, 'in' => 'objectid', 'uniq' => true, 'default' => []],
 			'select_acknowledges' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT | API_DEPRECATED, 'replacement' => 'selectAcknowledges', 'in' => implode(',', $acknowledge_output_fields), 'default' => null],
 			'selectAcknowledges' =>		['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT, 'in' => implode(',', $acknowledge_output_fields), 'default' => null],
 			'select_alerts' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_DEPRECATED, 'replacement' => 'selectAlerts', 'in' => implode(',', $alert_output_fields), 'default' => null],
@@ -243,9 +243,10 @@ class CEvent extends CApiService {
 					' JOIN items i1 ON f1.itemid=i1.itemid'.
 					' JOIN host_hgset hh1 ON i1.hostid=hh1.hostid'.
 					' LEFT JOIN permission p1 ON p1.hgsetid=hh1.hgsetid'.
-						' AND p1.ugsetid=p.ugsetid'.
-					' WHERE e.objectid=f1.triggerid'.
-						' AND p1.permission IS NULL'.
+						' AND p1.ugsetid='.self::$userData['ugsetid'].
+					' WHERE f.triggerid=f1.triggerid'.
+						' AND i.itemid!=f1.itemid'.
+						' AND p1.hgsetid IS NULL'.
 				')';
 
 				if ($options['source'] == EVENT_SOURCE_TRIGGERS) {

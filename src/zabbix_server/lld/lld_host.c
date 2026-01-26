@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -31,6 +31,7 @@
 #include "zbxexpr.h"
 #include "zbxhash.h"
 #include "zbxinterface.h"
+#include "zbxip.h"
 #include "../server_constants.h"
 
 /* host macro discovery state */
@@ -323,6 +324,13 @@ zbx_lld_host_t;
 
 ZBX_PTR_VECTOR_DECL(lld_host_ptr, zbx_lld_host_t*)
 ZBX_PTR_VECTOR_IMPL(lld_host_ptr, zbx_lld_host_t*)
+
+typedef struct
+{
+	const char	*host_proto;
+	zbx_hashset_t	host_hosts;
+}
+zbx_lld_proto_t;
 
 static int	lld_host_compare_func(const void *d1, const void *d2)
 {
@@ -732,6 +740,21 @@ static void	lld_hosts_get(zbx_uint64_t parent_hostid, zbx_vector_lld_host_ptr_t 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
+static zbx_hash_t	lld_proto_hash(const void *d)
+{
+	const zbx_lld_proto_t	*host = (zbx_lld_proto_t *)d;
+
+	return ZBX_DEFAULT_STRING_HASH_FUNC(host->host_proto);
+}
+
+static int	lld_proto_compare(const void *d1, const void *d2)
+{
+	const zbx_lld_proto_t	*host1 = (zbx_lld_proto_t *)d1;
+	const zbx_lld_proto_t	*host2 = (zbx_lld_proto_t *)d2;
+
+	return strcmp(host1->host_proto, host2->host_proto);
+}
+
 static zbx_hash_t	lld_host_host_hash(const void *d)
 {
 	const zbx_lld_host_t	*host = *(const zbx_lld_host_t *const *)d;
@@ -1056,7 +1079,7 @@ static void	lld_hosts_validate(zbx_vector_lld_host_ptr_t *hosts, char **error)
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-static zbx_lld_host_t	*lld_host_make(zbx_vector_lld_host_ptr_t *hosts, zbx_vector_lld_host_ptr_t *hosts_old,
+static zbx_lld_host_t	*lld_host_make(zbx_vector_lld_host_ptr_t *hosts, zbx_hashset_t *protos,
 		const char *host_proto, const char *name_proto,
 		signed char inventory_mode_proto, unsigned char status_proto, unsigned char discover_proto,
 		zbx_vector_db_tag_ptr_t *tags, const zbx_lld_row_t *lld_row,
@@ -1068,31 +1091,30 @@ static zbx_lld_host_t	*lld_host_make(zbx_vector_lld_host_ptr_t *hosts, zbx_vecto
 	zbx_vector_db_tag_ptr_t	override_tags;
 	zbx_vector_uint64_t	lnk_templateids;
 	zbx_vector_db_tag_ptr_t	new_tags;
+	zbx_lld_proto_t		*proto;
+	zbx_hashset_iter_t	iter;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	zbx_vector_uint64_create(&lnk_templateids);
 	zbx_vector_db_tag_ptr_create(&new_tags);
 
-	for (int i = 0; i < hosts_old->values_num; i++)
+	zbx_hashset_iter_reset(protos, &iter);
+	while (NULL != (proto = (zbx_lld_proto_t *)zbx_hashset_iter_next(&iter)))
 	{
-		host = hosts_old->values[i];
+		zbx_lld_host_t	host_local, *phost_local = &host_local, **phost;
 
-		if (0 != (host->flags & ZBX_FLAG_LLD_HOST_DISCOVERED))
-			continue;
-
-		if (0 == host->hostid)
-			continue;
-
-		buffer = zbx_strdup(buffer, host->host_proto);
+		buffer = zbx_strdup(buffer, proto->host_proto);
 		zbx_substitute_lld_macros(&buffer, &lld_row->jp_row, lld_macros, ZBX_MACRO_ANY, NULL, 0);
 		zbx_lrtrim(buffer, ZBX_WHITESPACE);
 
-		if (0 == strcmp(host->host, buffer))
+		host_local.host = buffer;
+
+		if (NULL != (phost = zbx_hashset_search(&proto->host_hosts, &phost_local)))
 		{
-			zbx_vector_lld_host_ptr_remove(hosts_old, i);
 			host_found = 1;
-			break;
+			host = *phost;
+			zbx_hashset_remove_direct(&proto->host_hosts, phost);
 		}
 	}
 
@@ -3759,10 +3781,14 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_lld_host_ptr_t
 				(char *)NULL);
 	}
 
-	if (0 != upd_hosts || 0 != upd_interfaces || 0 != upd_snmp || 0 != upd_hostmacros || 0 != upd_tags ||
-			0 != upd_host_hgsets)
+	if (0 != upd_hosts || 0 != upd_interfaces || 0 != upd_snmp || 0 != upd_tags || 0 != upd_host_hgsets)
 	{
 		zbx_db_begin_multiple_update(&sql1, &sql1_alloc, &sql1_offset);
+	}
+
+	if (0 != upd_hostmacros)
+	{
+		zbx_db_begin_multiple_update(&sql2, &sql2_alloc, &sql2_offset);
 	}
 
 	if (0 != new_hostgroups)
@@ -3981,8 +4007,8 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_lld_host_ptr_t
 
 					zbx_audit_host_update_json_update_ipmi_password(ZBX_AUDIT_LLD_CONTEXT,
 							host->hostid, (0 == strcmp("", host->ipmi_password_orig) ?
-							"" : ZBX_MACRO_SECRET_MASK),
-							(0 == strcmp("", ipmi_password) ? "" : ZBX_MACRO_SECRET_MASK));
+							"" : ZBX_SECRET_MASK),
+							(0 == strcmp("", ipmi_password) ? "" : ZBX_SECRET_MASK));
 
 					zbx_free(value_esc);
 				}
@@ -4041,9 +4067,9 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_lld_host_ptr_t
 
 					zbx_audit_host_update_json_update_tls_psk_identity(ZBX_AUDIT_LLD_CONTEXT,
 							host->hostid, (0 == strcmp("", host->tls_psk_identity_orig) ?
-							"" : ZBX_MACRO_SECRET_MASK),
+							"" : ZBX_SECRET_MASK),
 							(0 == strcmp("", tls_psk_identity) ?
-							"" : ZBX_MACRO_SECRET_MASK));
+							"" : ZBX_SECRET_MASK));
 				}
 				if (0 != (host->flags & ZBX_FLAG_LLD_HOST_UPDATE_TLS_PSK))
 				{
@@ -4056,8 +4082,8 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_lld_host_ptr_t
 
 					zbx_audit_host_update_json_update_tls_psk(ZBX_AUDIT_LLD_CONTEXT, host->hostid,
 							(0 == strcmp("", host->tls_psk_orig) ?
-							"" : ZBX_MACRO_SECRET_MASK),
-							(0 == strcmp("", tls_psk) ? "" : ZBX_MACRO_SECRET_MASK));
+							"" : ZBX_SECRET_MASK),
+							(0 == strcmp("", tls_psk) ? "" : ZBX_SECRET_MASK));
 				}
 				if (0 != (host->flags & ZBX_FLAG_LLD_HOST_UPDATE_CUSTOM_INTERFACES))
 				{
@@ -4251,7 +4277,7 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_lld_host_ptr_t
 						(int)hostmacro->type, (int)hostmacro->automatic);
 				zbx_audit_host_update_json_add_hostmacro(ZBX_AUDIT_LLD_CONTEXT, host->hostid,
 						hostmacroid, hostmacro->macro, (ZBX_MACRO_VALUE_SECRET ==
-						(int)hostmacro->type) ? ZBX_MACRO_SECRET_MASK : hostmacro->value,
+						(int)hostmacro->type) ? ZBX_SECRET_MASK : hostmacro->value,
 						hostmacro->description, (int)hostmacro->type,
 						(int)hostmacro->automatic);
 				hostmacroid++;
@@ -4260,7 +4286,7 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_lld_host_ptr_t
 			{
 				const char	*d = "";
 
-				zbx_strcpy_alloc(&sql1, &sql1_alloc, &sql1_offset, "update hostmacro set ");
+				zbx_strcpy_alloc(&sql2, &sql2_alloc, &sql2_offset, "update hostmacro set ");
 
 				zbx_audit_host_update_json_update_hostmacro_create_entry(ZBX_AUDIT_LLD_CONTEXT,
 						host->hostid, hostmacro->hostmacroid);
@@ -4268,7 +4294,7 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_lld_host_ptr_t
 				if (0 != (hostmacro->flags & ZBX_FLAG_LLD_HMACRO_UPDATE_VALUE))
 				{
 					value_esc = zbx_db_dyn_escape_string(hostmacro->value);
-					zbx_snprintf_alloc(&sql1, &sql1_alloc, &sql1_offset, "value='%s'", value_esc);
+					zbx_snprintf_alloc(&sql2, &sql2_alloc, &sql2_offset, "value='%s'", value_esc);
 					zbx_free(value_esc);
 					d = ",";
 
@@ -4278,14 +4304,14 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_lld_host_ptr_t
 							ZBX_MACRO_VALUE_SECRET == (int)hostmacro->type_orig) ||
 							(0 == (hostmacro->flags & ZBX_FLAG_LLD_HMACRO_UPDATE_TYPE) &&
 							ZBX_MACRO_VALUE_SECRET == (int)hostmacro->type)) ?
-							ZBX_MACRO_SECRET_MASK : hostmacro->value_orig,
+							ZBX_SECRET_MASK : hostmacro->value_orig,
 							(ZBX_MACRO_VALUE_SECRET == (int)hostmacro->type) ?
-							ZBX_MACRO_SECRET_MASK : hostmacro->value);
+							ZBX_SECRET_MASK : hostmacro->value);
 				}
 				if (0 != (hostmacro->flags & ZBX_FLAG_LLD_HMACRO_UPDATE_DESCRIPTION))
 				{
 					value_esc = zbx_db_dyn_escape_string(hostmacro->description);
-					zbx_snprintf_alloc(&sql1, &sql1_alloc, &sql1_offset, "%sdescription='%s'",
+					zbx_snprintf_alloc(&sql2, &sql2_alloc, &sql2_offset, "%sdescription='%s'",
 							d, value_esc);
 					zbx_free(value_esc);
 					d = ",";
@@ -4296,14 +4322,14 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_lld_host_ptr_t
 				}
 				if (0 != (hostmacro->flags & ZBX_FLAG_LLD_HMACRO_UPDATE_TYPE))
 				{
-					zbx_snprintf_alloc(&sql1, &sql1_alloc, &sql1_offset, "%stype=%d",
+					zbx_snprintf_alloc(&sql2, &sql2_alloc, &sql2_offset, "%stype=%d",
 							d, hostmacro->type);
 
 					zbx_audit_host_update_json_update_hostmacro_type(ZBX_AUDIT_LLD_CONTEXT,
 							host->hostid, hostmacro->hostmacroid,
 							hostmacro->type_orig, hostmacro->type);
 				}
-				zbx_snprintf_alloc(&sql1, &sql1_alloc, &sql1_offset,
+				zbx_snprintf_alloc(&sql2, &sql2_alloc, &sql2_offset,
 						" where hostmacroid=" ZBX_FS_UI64 ";\n", hostmacro->hostmacroid);
 			}
 		}
@@ -4415,8 +4441,10 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_lld_host_ptr_t
 
 	if (0 != new_hostmacros)
 	{
+		zbx_db_query_mask_t	old_queries = zbx_db_set_log_masked_values(ZBX_DB_MASK_QUERIES);
 		zbx_db_insert_execute(&db_insert_hmacro);
 		zbx_db_insert_clean(&db_insert_hmacro);
+		zbx_db_set_log_masked_values(old_queries);
 	}
 
 	if (0 != new_interfaces)
@@ -4449,6 +4477,20 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_lld_host_ptr_t
 			zbx_db_execute("%s", sql1);
 
 		zbx_free(sql1);
+	}
+
+	if (NULL != sql2)
+	{
+		zbx_db_end_multiple_update(&sql2, &sql2_alloc, &sql2_offset);
+
+		zbx_db_set_log_masked_values(ZBX_DB_MASK_QUERIES);
+
+		if (16 < sql2_offset)
+			zbx_db_execute("%s", sql2);
+
+		zbx_db_set_log_masked_values(ZBX_DB_DONT_MASK_QUERIES);
+
+		zbx_free(sql2);
 	}
 
 	if (0 != del_hostgroupids->values_num || 0 != del_hostmacroids.values_num ||
@@ -4749,6 +4791,8 @@ static void	lld_hosts_remove(const zbx_vector_lld_host_ptr_t *hosts, const zbx_l
 						" set ts_delete=%d"
 						" where hostid=" ZBX_FS_UI64 ";\n",
 						ts_delete, host->hostid);
+
+				zbx_db_execute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 			}
 
 			if (ZBX_LLD_LIFETIME_TYPE_NEVER == enabled_lifetime->type)
@@ -4765,6 +4809,8 @@ static void	lld_hosts_remove(const zbx_vector_lld_host_ptr_t *hosts, const zbx_l
 						" set ts_disable=%d"
 						" where hostid=" ZBX_FS_UI64 ";\n",
 						ts_disable, host->hostid);
+
+				zbx_db_execute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 			}
 
 			if ((ZBX_LLD_LIFETIME_TYPE_AFTER == enabled_lifetime->type && lastcheck <= ts_disable) ||
@@ -4812,7 +4858,6 @@ static void	lld_hosts_remove(const zbx_vector_lld_host_ptr_t *hosts, const zbx_l
 		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid",
 				discovered_hostids.values, discovered_hostids.values_num);
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
-
 		zbx_db_execute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 	}
 
@@ -4834,7 +4879,6 @@ static void	lld_hosts_remove(const zbx_vector_lld_host_ptr_t *hosts, const zbx_l
 		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid",
 				lc_hostids.values, lc_hostids.values_num);
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
-
 		zbx_db_execute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 	}
 
@@ -4856,7 +4900,6 @@ static void	lld_hosts_remove(const zbx_vector_lld_host_ptr_t *hosts, const zbx_l
 		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid",
 				dis_hostids.values, dis_hostids.values_num);
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
-
 		zbx_db_execute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update hosts set status=%d where",
@@ -4984,6 +5027,8 @@ static void	lld_groups_remove(const zbx_vector_lld_group_ptr_t *groups, const zb
 							" set ts_delete=%d"
 							" where groupdiscoveryid=" ZBX_FS_UI64 ";\n",
 							ts_delete, discovery->groupdiscoveryid);
+
+					zbx_db_execute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 				}
 			}
 			else
@@ -5474,6 +5519,26 @@ static void	lld_host_interfaces_make(zbx_uint64_t hostid, zbx_vector_lld_host_pt
 	zbx_vector_if_update_destroy(&updates);
 }
 
+static void	lld_interface_port_trim(char *port)
+{
+	unsigned short	value;
+
+	zbx_lrtrim(port, ZBX_WHITESPACE);
+
+	if (SUCCEED != zbx_is_ushort(port, &value))
+		return;
+
+	if (0 == value)
+	{
+		*port++ = '0';
+		*port = '\0';
+
+		return;
+	}
+
+	zbx_ltrim(port, "0");
+}
+
 /******************************************************************************
  *                                                                            *
  * Parameters: interfaces - [IN] Sorted list of interfaces which should be    *
@@ -5527,11 +5592,16 @@ static void	lld_interfaces_make(const zbx_vector_lld_interface_ptr_t *interfaces
 			new_interface->port = zbx_strdup(NULL, interface->port);
 			new_interface->port_orig = NULL;
 
+
 			zbx_substitute_lld_macros(&new_interface->ip, host->jp_row, lld_macros, ZBX_MACRO_ANY, NULL, 0);
+			zbx_lrtrim(new_interface->ip, ZBX_WHITESPACE);
 			zbx_substitute_lld_macros(&new_interface->dns, host->jp_row, lld_macros, ZBX_MACRO_ANY, NULL,
 					0);
+			zbx_lrtrim(new_interface->dns, ZBX_WHITESPACE);
 			zbx_substitute_lld_macros(&new_interface->port, host->jp_row, lld_macros, ZBX_MACRO_ANY, NULL,
 					0);
+			lld_interface_port_trim(new_interface->port);
+
 
 			if (INTERFACE_TYPE_SNMP == interface->type)
 			{
@@ -5566,14 +5636,19 @@ static void	lld_interfaces_make(const zbx_vector_lld_interface_ptr_t *interfaces
 
 				zbx_substitute_lld_macros(&snmp->community, host->jp_row, lld_macros, ZBX_MACRO_ANY,
 						NULL, 0);
+				zbx_lrtrim(snmp->community, ZBX_WHITESPACE);
 				zbx_substitute_lld_macros(&snmp->securityname, host->jp_row, lld_macros, ZBX_MACRO_ANY,
 						NULL, 0);
+				zbx_lrtrim(snmp->securityname, ZBX_WHITESPACE);
 				zbx_substitute_lld_macros(&snmp->authpassphrase, host->jp_row, lld_macros,
 						ZBX_MACRO_ANY, NULL, 0);
+				zbx_lrtrim(snmp->authpassphrase, ZBX_WHITESPACE);
 				zbx_substitute_lld_macros(&snmp->privpassphrase, host->jp_row, lld_macros,
 						ZBX_MACRO_ANY, NULL, 0);
+				zbx_lrtrim(snmp->privpassphrase, ZBX_WHITESPACE);
 				zbx_substitute_lld_macros(&snmp->contextname, host->jp_row, lld_macros, ZBX_MACRO_ANY,
 						NULL, 0);
+				zbx_lrtrim(snmp->contextname, ZBX_WHITESPACE);
 			}
 			else
 			{
@@ -5716,6 +5791,191 @@ static int	another_main_interface_exists(const zbx_vector_lld_interface_ptr_t *i
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: validate DNS name containing macros                               *
+ *                                                                            *
+ * Parameters: dns - [IN] DNS name string to validate                         *
+ *                                                                            *
+ * Return value: SUCCEED - DNS name is valid                                  *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ * Comments: Possible macro values are ignored.                               *
+ *                                                                            *
+ ******************************************************************************/
+static int	lld_validate_dns(const char *dns)
+{
+	zbx_token_t	token;
+	int		pos = 0, start = 0, len = 0, end = 0;
+
+	while (SUCCEED == zbx_token_find(dns, pos, &token, ZBX_TOKEN_SEARCH_REFERENCES))
+	{
+		switch (token.type)
+		{
+			case ZBX_TOKEN_MACRO:
+			case ZBX_TOKEN_FUNC_MACRO:
+			case ZBX_TOKEN_USER_MACRO:
+			case ZBX_TOKEN_USER_FUNC_MACRO:
+				if (0 != start && '.' == dns[start])
+				{
+					start++;
+					len++;
+				}
+				if ((int)token.loc.l != start)
+				{
+					if (SUCCEED != zbx_validate_hostname_len(dns + start, (int)token.loc.l - start))
+						return FAIL;
+				}
+
+				len += (int)token.loc.l - start;
+				pos = (int)token.loc.r + 1;
+				start = pos;
+				continue;
+			default:
+				pos++;
+				continue;
+		}
+	}
+
+	if (0 != start && '.' == dns[start])
+		start++;
+
+	end = (int)strlen(dns);
+
+	if (ZBX_MAX_DNSNAME_LEN < len + end - start)
+		return FAIL;
+
+	if (start >= end)
+		return SUCCEED;
+
+	return zbx_validate_hostname_len(dns + start, end - start);
+}
+
+static int	lld_interface_validate_fields(const zbx_lld_interface_t *interface, const char *hostname, char **error)
+{
+	const char	*op;
+
+	op = (0 == interface->interfaceid ? "create" : "update");
+
+	if (ZBX_INTERFACE_PORT_LEN < zbx_strlen_utf8(interface->port))
+	{
+		*error = zbx_strdcatf(*error, "Cannot %s \"%s\" interface on host \"%s\": "
+				"port is too long.\n",
+				op, zbx_interface_type_string(interface->type_orig),
+				hostname);
+
+		return FAIL;
+	}
+
+	if ('\0' == *interface->port)
+	{
+		*error = zbx_strdcatf(*error, "Cannot %s \"%s\" interface on host \"%s\": "
+				"port cannot be empty.\n",
+				op, zbx_interface_type_string(interface->type_orig),
+				hostname);
+
+		return FAIL;
+	}
+
+	unsigned short	port_n;
+
+	if (FAIL == zbx_is_ushort(interface->port, &port_n) && FAIL == zbx_is_user_macro(interface->port))
+	{
+		*error = zbx_strdcatf(*error, "Cannot %s \"%s\" interface on host \"%s\": "
+				"invalid port value \"%s\".\n",
+				op, zbx_interface_type_string(interface->type_orig),
+				hostname, interface->port);
+
+		return FAIL;
+	}
+
+	if ('\0' == *interface->dns)
+	{
+		if (0 == interface->useip)
+		{
+			*error = zbx_strdcatf(*error, "Cannot %s \"%s\" interface on host \"%s\": "
+					"DNS name cannot be empty.\n",
+					op, zbx_interface_type_string(interface->type_orig),
+					hostname);
+
+			return FAIL;
+		}
+	}
+	else
+	{
+		if (ZBX_INTERFACE_DNS_LEN < zbx_strlen_utf8(interface->dns))
+		{
+			*error = zbx_strdcatf(*error, "Cannot %s \"%s\" interface on host \"%s\": "
+					"DNS name is too long.\n",
+					op, zbx_interface_type_string(interface->type_orig),
+					hostname);
+
+			return FAIL;
+		}
+
+		if (FAIL == lld_validate_dns(interface->dns))
+		{
+			*error = zbx_strdcatf(*error, "Cannot %s \"%s\" interface on host \"%s\": "
+				"invalid DNS name \"%s\".\n",
+				op, zbx_interface_type_string(interface->type_orig),
+				hostname, interface->dns);
+
+			return FAIL;
+		}
+	}
+
+	if ('\0' == *interface->ip)
+	{
+		if (0 != interface->useip)
+		{
+			*error = zbx_strdcatf(*error, "Cannot %s \"%s\" interface on host \"%s\": "
+					"IP address cannot be empty.\n",
+					op, zbx_interface_type_string(interface->type_orig),
+					hostname);
+
+			return FAIL;
+		}
+	}
+	else
+	{
+		if (ZBX_INTERFACE_IP_LEN < zbx_strlen_utf8(interface->ip))
+		{
+			*error = zbx_strdcatf(*error, "Cannot %s \"%s\" interface on host \"%s\": "
+					"IP address is too long.\n",
+					op, zbx_interface_type_string(interface->type_orig),
+					hostname);
+
+			return FAIL;
+		}
+
+		if (SUCCEED != zbx_is_ip(interface->ip) && SUCCEED != zbx_is_user_macro(interface->ip))
+		{
+			*error = zbx_strdcatf(*error, "Cannot %s \"%s\" interface on host \"%s\": "
+				"invalid IP Address \"%s\".\n",
+				op, zbx_interface_type_string(interface->type_orig), hostname, interface->ip);
+
+			return FAIL;
+		}
+	}
+
+	if (INTERFACE_TYPE_SNMP == interface->type)
+	{
+		if (ZBX_IF_SNMP_VERSION_3 > interface->data.snmp->version)
+		{
+			if ('\0' == *interface->data.snmp->community)
+			{
+				*error = zbx_strdcatf(*error, "Cannot %s \"%s\" interface on host \"%s\": "
+						"empty SNMP community.\n",
+						op, zbx_interface_type_string(interface->type_orig), hostname);
+
+				return FAIL;
+			}
+		}
+	}
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Parameters: hosts - [IN/OUT]                                               *
  *             error - [OUT]                                                  *
  *                                                                            *
@@ -5800,6 +6060,30 @@ static void	lld_interfaces_validate(zbx_vector_lld_host_ptr_t *hosts, char **err
 			}
 		}
 		zbx_db_free_result(result);
+	}
+
+	/* exclude interfaces with invalid fields */
+
+	for (int i = 0; i < hosts->values_num; i++)
+	{
+		host = hosts->values[i];
+
+		for (int j = 0; j < host->interfaces.values_num; )
+		{
+			interface = host->interfaces.values[j];
+
+			if (0 == (interface->flags & ZBX_FLAG_LLD_INTERFACE_REMOVE))
+			{
+				if (FAIL == lld_interface_validate_fields(interface, host->host, error))
+				{
+					lld_interface_free(interface);
+					zbx_vector_lld_interface_ptr_remove(&host->interfaces, j);
+					continue;
+				}
+			}
+
+			j++;
+		}
 	}
 
 	/* validate interfaces which should be deleted */
@@ -5888,6 +6172,39 @@ static void	lld_interfaces_validate(zbx_vector_lld_host_ptr_t *hosts, char **err
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
+static void	lld_prepare_protos(zbx_hashset_t *protos, zbx_vector_lld_host_ptr_t *hosts)
+{
+	for (int i = 0; i < hosts->values_num; i++)
+	{
+		zbx_lld_host_t	*host = hosts->values[i];
+		zbx_lld_proto_t	*proto_ptr, proto_host_host_local = {.host_proto = host->host_proto};
+		int		num = protos->num_data;
+
+		if (0 != (host->flags & ZBX_FLAG_LLD_HOST_DISCOVERED))
+			continue;
+
+		if (0 == host->hostid)
+			continue;
+
+		proto_ptr = zbx_hashset_insert(protos, &proto_host_host_local, sizeof(proto_host_host_local));
+
+		if (num != protos->num_data)
+		{
+			zbx_hashset_create(&proto_ptr->host_hosts, (size_t)hosts->values_num,
+					lld_host_host_hash, lld_host_host_compare);
+		}
+
+		zbx_hashset_insert(&proto_ptr->host_hosts, &host, sizeof(zbx_lld_host_t *));
+	}
+}
+
+static void	lld_proto_hash_clear(void *data)
+{
+	zbx_lld_proto_t	*proto = (zbx_lld_proto_t *)data;
+
+	zbx_hashset_destroy(&proto->host_hosts);
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: adds or updates LLD hosts                                         *
@@ -5899,6 +6216,7 @@ void	lld_update_hosts(zbx_uint64_t lld_ruleid, const zbx_vector_lld_row_ptr_t *l
 {
 	zbx_db_result_t				result;
 	zbx_db_row_t				row;
+	zbx_hashset_t				protos;
 	zbx_vector_lld_host_ptr_t		hosts, hosts_old;
 	zbx_vector_lld_group_prototype_ptr_t	group_prototypes;
 	zbx_vector_lld_interface_ptr_t		interfaces;
@@ -5979,6 +6297,9 @@ void	lld_update_hosts(zbx_uint64_t lld_ruleid, const zbx_vector_lld_row_ptr_t *l
 	lld_interfaces_get(lld_ruleid, &interfaces, 0);
 	lld_masterhostmacros_get(lld_ruleid, &masterhostmacros);
 
+	zbx_hashset_create_ext(&protos, 10, lld_proto_hash, lld_proto_compare, lld_proto_hash_clear,
+			ZBX_DEFAULT_MEM_MALLOC_FUNC, ZBX_DEFAULT_MEM_REALLOC_FUNC, ZBX_DEFAULT_MEM_FREE_FUNC);
+
 	result = zbx_db_select(
 			"select h.hostid,h.host,h.name,h.status,h.discover,hi.inventory_mode,h.custom_interfaces"
 			" from hosts h,host_discovery hd"
@@ -6015,7 +6336,7 @@ void	lld_update_hosts(zbx_uint64_t lld_ruleid, const zbx_vector_lld_row_ptr_t *l
 		if (0 != hosts.values_num)
 		{
 			lld_hosts_get_tags(&hosts);
-			zbx_vector_lld_host_ptr_append_array(&hosts_old, hosts.values, hosts.values_num);
+			lld_prepare_protos(&protos, &hosts);
 		}
 
 		lld_proto_tags_get(parent_hostid, &tags);
@@ -6032,7 +6353,7 @@ void	lld_update_hosts(zbx_uint64_t lld_ruleid, const zbx_vector_lld_row_ptr_t *l
 		{
 			const zbx_lld_row_t	*lld_row = lld_rows->values[i];
 
-			if (NULL == (host = lld_host_make(&hosts, &hosts_old, host_proto, name_proto, inventory_mode_proto,
+			if (NULL == (host = lld_host_make(&hosts, &protos, host_proto, name_proto, inventory_mode_proto,
 					status, discover, &tags, lld_row, lld_macro_paths, use_custom_interfaces,
 					error)))
 			{
@@ -6093,6 +6414,7 @@ void	lld_update_hosts(zbx_uint64_t lld_ruleid, const zbx_vector_lld_row_ptr_t *l
 		zbx_vector_lld_group_prototype_ptr_clear_ext(&group_prototypes, lld_group_prototype_free);
 		zbx_vector_lld_host_ptr_clear_ext(&hosts, lld_host_free);
 		zbx_vector_lld_host_ptr_clear(&hosts_old);
+		zbx_hashset_clear(&protos);
 
 		zbx_vector_uint64_clear(&groupids);
 		zbx_vector_uint64_clear(&del_hostgroupids);
@@ -6126,6 +6448,7 @@ void	lld_update_hosts(zbx_uint64_t lld_ruleid, const zbx_vector_lld_row_ptr_t *l
 	zbx_vector_uint64_destroy(&groupids);
 	zbx_vector_lld_host_ptr_destroy(&hosts);
 	zbx_vector_lld_host_ptr_destroy(&hosts_old);
+	zbx_hashset_destroy(&protos);
 
 	zbx_free(tls_psk);
 	zbx_free(tls_psk_identity);

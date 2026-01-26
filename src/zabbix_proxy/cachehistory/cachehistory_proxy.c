@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -25,6 +25,7 @@
 #include "zbxstr.h"
 #include "zbx_item_constants.h"
 #include "zbxproxybuffer.h"
+#include "zbxhash.h"
 
 static char	*sql = NULL;
 static size_t	sql_alloc = 4 * ZBX_KIBIBYTE;
@@ -306,12 +307,17 @@ static void	proxy_prepare_history(zbx_dc_history_t *history, int history_num, zb
 			diff->state = h->state;
 			diff->error = (ITEM_STATE_NOTSUPPORTED == h->state ? h->value.err : "");
 			diff->flags |= ZBX_FLAGS_ITEM_DIFF_UPDATE_STATE | ZBX_FLAGS_ITEM_DIFF_UPDATE_ERROR;
+			zbx_sha512_hash(diff->error, diff->error_hash);
 		}
-		else if (ITEM_STATE_NOTSUPPORTED == h->state &&
-				0 != strcmp(ZBX_NULL2EMPTY_STR(items[i].error), h->value.err))
+		else if (ITEM_STATE_NOTSUPPORTED == h->state)
 		{
-			diff->error = h->value.err;
-			diff->flags |= ZBX_FLAGS_ITEM_DIFF_UPDATE_ERROR;
+			zbx_sha512_hash(h->value.err, diff->error_hash);
+
+			if (0 != memcmp(items[i].error_hash, diff->error_hash, sizeof(items[i].error_hash)))
+			{
+				diff->error = h->value.err;
+				diff->flags |= ZBX_FLAGS_ITEM_DIFF_UPDATE_ERROR;
+			}
 		}
 
 		if (0 != (ZBX_DC_FLAG_META & history[i].flags))

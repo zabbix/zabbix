@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -280,8 +280,9 @@ class CWebTest extends CTest {
 	protected static function closePage() {
 		try {
 			if (self::$shared_page !== null) {
-				self::$shared_page->destroy();
+				$page = self::$shared_page;
 				self::$shared_page = null;
+				$page->destroy();
 			}
 		}
 		catch (Exception $exception) {

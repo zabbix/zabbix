@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -104,8 +104,7 @@ static duk_ret_t	wd_alert_ctor(duk_context *ctx, zbx_webdriver_t *wd, const char
 
 	duk_push_string(ctx, "browser");
 	duk_push_heapptr(ctx, wd->browser);
-	duk_def_prop(ctx, -3, DUK_DEFPROP_HAVE_VALUE | DUK_DEFPROP_CLEAR_WRITABLE | DUK_DEFPROP_HAVE_ENUMERABLE |
-			DUK_DEFPROP_HAVE_CONFIGURABLE);
+	duk_def_prop(ctx, -3, ZBX_ES_DEFPROP_READONLY);
 
 	duk_push_c_function(ctx, wd_alert_dtor, 1);
 	duk_set_finalizer(ctx, -2);
@@ -183,7 +182,7 @@ static const duk_function_list_entry	alert_methods[] = {
 void	wd_alert_create(duk_context *ctx, zbx_webdriver_t *wd, const char *text)
 {
 	wd_alert_ctor(ctx, wd, text);
-	duk_put_function_list(ctx, -1, alert_methods);
+	es_put_function_list(ctx, -1, alert_methods);
 }
 
 #endif

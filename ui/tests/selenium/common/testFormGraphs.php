@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -93,7 +93,7 @@ class testFormGraphs extends CWebTest {
 				[
 					'check_defaults' => true,
 					'set_fields' => [
-						'Graph type' => 'Normal'
+						'Graph type' => CFormElement::RELOADABLE_FILL('Normal')
 					],
 					'check_fields' => [
 						'id:name' =>  ['value' => '', 'maxlength' => 128],
@@ -128,7 +128,7 @@ class testFormGraphs extends CWebTest {
 			[
 				[
 					'set_fields' => [
-						'Graph type' => 'Stacked'
+						'Graph type' => CFormElement::RELOADABLE_FILL('Stacked')
 					],
 					'check_fields' => [
 						'id:name' =>  ['value' => ''],
@@ -162,7 +162,7 @@ class testFormGraphs extends CWebTest {
 			[
 				[
 					'set_fields' => [
-						'Graph type' => 'Pie'
+						'Graph type' => CFormElement::RELOADABLE_FILL('Pie')
 					],
 					'check_fields' => [
 						'id:name' =>  ['value' => ''],
@@ -197,7 +197,7 @@ class testFormGraphs extends CWebTest {
 			[
 				[
 					'set_fields' => [
-						'Graph type' => 'Exploded'
+						'Graph type' => CFormElement::RELOADABLE_FILL('Exploded')
 					],
 					'check_fields' => [
 						'id:name' =>  ['value' => ''],
@@ -814,7 +814,7 @@ class testFormGraphs extends CWebTest {
 		$name = 'Graph'.$this->getGraphSuffix().' for clone';
 		$this->query('link', $name)->waitUntilClickable()->one()->click();
 		$form = $this->query('name:graphForm')->waitUntilVisible()->asForm()->one();
-		$form->query('button:Clone')->waitUntilClickable()->one()->click();
+		$form->query('button:Clone')->waitUntilClickable()->one()->click()->waitUntilNotVisible();
 		$form->invalidate();
 
 		if (CTestArrayHelper::get($data, 'check_buttons')) {
@@ -1077,7 +1077,7 @@ class testFormGraphs extends CWebTest {
 		$form = $this->query('name:graphForm')->waitUntilVisible()->asForm()->one();
 
 		foreach (['MIN', 'MAX'] as $axis) {
-			$form->fill(['Y axis '.$axis.' value' => 'Item']);
+			$form->fill(['Y axis '.$axis.' value' => CFormElement::RELOADABLE_FILL('Item')]);
 			$this->checkItemsInDialog($form, 'button:Select', self::HOST_WITH_ITEMS, $axis);
 
 			if ($this->prototype) {

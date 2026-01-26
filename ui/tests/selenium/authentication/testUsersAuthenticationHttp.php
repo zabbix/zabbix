@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -231,10 +231,10 @@ class testUsersAuthenticationHttp extends CLegacyWebTest {
 							'action' => self::LOGIN_HTTP,
 							'target' => 'Global view'
 						],
-						// Sign in through zabbix login form after logout.
+						// Sign in through zabbix login form after logout - should redirect to index.php.
 						[
 							'page' => 'index.php?reconnect=1&form=default',
-							'error' => 'Zabbix has received an incorrect request.',
+							'redirect' => 'index.php',
 							'no_login' => true
 						],
 						// Couldn't open Hosts page due access.
@@ -595,6 +595,12 @@ class testUsersAuthenticationHttp extends CLegacyWebTest {
 
 				continue;
 			}
+			elseif (array_key_exists('redirect', $check)) {
+				$this->page->open($check['page'])->waitUntilReady();
+				$this->assertEquals(PHPUNIT_URL.$check['redirect'], $this->page->getCurrentUrl());
+
+				continue;
+			}
 			// Check page header after successful login.
 			else {
 				$this->assertEquals($check['target'], $this->query('tag:h1')->one()->getText());
@@ -719,6 +725,7 @@ class testUsersAuthenticationHttp extends CLegacyWebTest {
 
 		$this->createConfigurationFiles($data);
 		$form->submit();
+		$this->assertMessage(TEST_GOOD, 'Authentication settings updated');
 
 		// Check DB configuration.
 		$default_values = [

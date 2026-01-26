@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -71,7 +71,7 @@ class testMultiselectDialogs extends CWebTest {
 	}
 
 	/**
-	 * Function for asserting additional filter in multeselect's overlay.
+	 * Function for asserting additional filter in multiselect's overlay.
 	 *
 	 * @param COverlayDialogElement    $dialog    dialog form where checks are performed
 	 * @param string                   $title     title of a dialog

@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -393,6 +393,7 @@
 	 *     bool   readonly              turn on/off readonly state (optional)
 	 *     bool   hidden                hide element (optional)
 	 *     bool   addNew                allow user to create new names (optional)
+	 *     int    maxlength             maximum length for new names (optional)
 	 *     int    selectedLimit         how many items can be selected (optional)
 	 *     int    limit                 how many available items can be received from backend (optional)
 	 *     object popup                 popup data {parameters, width, height} (optional)
@@ -436,6 +437,7 @@
 			placeholder: t('type here to search'),
 			data: [],
 			addNew: false,
+			maxlength: null,
 			defaultValue: null,
 			custom_select: false,
 			custom_suggest_list: null,
@@ -624,7 +626,8 @@
 				'autocomplete': 'off',
 				'placeholder': ms.options.placeholder,
 				'aria-label': ($label.length ? $label.text() + '. ' : '') + ms.options.placeholder,
-				'aria-required': ms.options.required_str
+				'aria-required': ms.options.required_str,
+				'maxlength': ms.options.maxlength
 			})
 				.on('keyup', function(e) {
 					switch (e.which) {

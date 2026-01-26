@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -26,8 +26,6 @@ static const char	*usage_message[] = {NULL};
 static const char	*help_message[] = {NULL};
 
 unsigned char	program_type	= ZBX_PROGRAM_TYPE_SENDER;
-
-int	CONFIG_TCP_MAX_BACKLOG_SIZE	= SOMAXCONN;
 
 static int	sender_add_serveractive_host_cb(const zbx_vector_addr_ptr_t *addrs, zbx_vector_str_t *hostnames,
 		void *data)

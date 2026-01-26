@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -307,9 +307,8 @@ $right_column = (new CFormList())
 		(new CDiv([
 			(new CLabel(_('Highlight whole row'), 'highlight_row_#{uniqid}'))->addClass(ZBX_STYLE_SECOND_COLUMN_LABEL),
 			(new CCheckBox('highlight_row'))
-				->setChecked($data['highlight_row'] == 1)
-				->setEnabled($data['compact_view'] == 1)
-				->setUncheckedValue(0)
+				->setChecked($data['highlight_row'] == ZBX_HIGHLIGHT_ON)
+				->setUncheckedValue(ZBX_HIGHLIGHT_OFF)
 				->setId('highlight_row_#{uniqid}')
 		]))
 			->addClass(ZBX_STYLE_FILTER_HIGHLIGHT_ROW_CB)
@@ -451,7 +450,6 @@ if (array_key_exists('render_html', $data)) {
 					$('[name="show_timeline"]', container).prop('disabled', checked);
 					$('[name="details"]', container).prop('disabled', checked);
 					$('[name="show_opdata"]', container).prop('disabled', checked);
-					$('[name="highlight_row"]', container).prop('disabled', !checked);
 				},
 				show_tags: () => {
 					let disabled = ($('[name="show_tags"]:checked', container).val() == <?= SHOW_TAGS_NONE ?>);
@@ -550,7 +548,7 @@ if (array_key_exists('render_html', $data)) {
 					dstfrm: 'zbx_filter',
 					dstfld1: 'groupids_' + data.uniqid,
 					multiselect: 1,
-					real_hosts: 1,
+					with_hosts: 1,
 					enrich_parent_groups: 1
 				}
 			}
@@ -671,7 +669,7 @@ if (array_key_exists('render_html', $data)) {
 			return;
 		}
 
-		$('[name="highlight_row"],[name="details"],[name="show_timeline"]', container)
+		$('[name="details"],[name="show_timeline"]', container)
 			.filter(':disabled')
 			.prop('checked', false);
 

@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -658,6 +658,7 @@ function getActionOperationDescriptions(array $operations, int $eventsource, arr
 
 			case OPERATION_TYPE_HOST_TAGS_ADD:
 			case OPERATION_TYPE_HOST_TAGS_REMOVE:
+				$operation_title = bold(_('Add host tags').': ');
 				$tags = [];
 				if (array_key_exists('optag', $operation) && $operation['optag']) {
 					CArrayHelper::sort($operation['optag'], ['tag', 'value']);
@@ -672,15 +673,12 @@ function getActionOperationDescriptions(array $operations, int $eventsource, arr
 						}
 					}
 
-					if ($operation['operationtype'] == OPERATION_TYPE_HOST_TAGS_ADD) {
-						$result[$i][] = bold(_('Add host tags').': ');
-					}
-					else {
-						$result[$i][] = bold(_('Remove host tags').': ');
+					if ($operation['operationtype'] == OPERATION_TYPE_HOST_TAGS_REMOVE) {
+						$operation_title = bold(_('Remove host tags').': ');
 					}
 				}
 
-				$result[$i][] = [$tags, BR()];
+				$result[$i][] = (new CDiv([$operation_title, $tags]))->addClass(ZBX_STYLE_TAGS_WRAPPER);
 				break;
 
 			case OPERATION_TYPE_HOST_ENABLE:

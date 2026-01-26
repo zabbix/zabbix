@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -300,7 +300,9 @@ foreach ($data['items'] as $itemid => $item) {
 			(new CCol($change))
 				->addClass($state_css)
 				->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS),
-			($data['filter']['show_tags'] != SHOW_TAGS_NONE) ? $data['tags'][$itemid] : null,
+			($data['filter']['show_tags'] != SHOW_TAGS_NONE)
+				? (new CDiv($data['tags'][$itemid]))->addClass(ZBX_STYLE_TAGS_WRAPPER)
+				: null,
 			$actions,
 			makeInformationList($item_icons)
 		]);
@@ -321,7 +323,9 @@ foreach ($data['items'] as $itemid => $item) {
 			(new CCol($change))
 				->addClass($state_css)
 				->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS),
-			($data['filter']['show_tags'] != SHOW_TAGS_NONE) ? $data['tags'][$itemid] : null,
+			($data['filter']['show_tags'] != SHOW_TAGS_NONE)
+				? (new CDiv($data['tags'][$itemid]))->addClass(ZBX_STYLE_TAGS_WRAPPER)
+				: null,
 			$actions,
 			makeInformationList($item_icons)
 		]);
