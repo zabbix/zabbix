@@ -96,7 +96,7 @@ class HostMacrosManager {
 	 * Get macros from UI.
 	 */
 	getMacros() {
-		const $macros = $('input[name^="macros"], textarea[name^="macros"]', this.$container).not(':disabled');
+		const $macros = $('input[name^="macros"], z-textarea-flexible[name^="macros"]', this.$container).not(':disabled');
 		const macros = {};
 
 		// Find the correct macro inputs and prepare to submit them via AJAX.
