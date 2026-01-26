@@ -19,21 +19,12 @@
 
 #include "zbxregexp.h"
 #include "zbxjson.h"
-#include "zbxcomms.h"
 #include "zbxnum.h"
-#include "zbxip.h"
 #include "zbxstr.h"
-
-#include <sys/types.h>
-#include <sys/socket.h>
 #include <sys/ioctl.h>
-#include <sys/sysctl.h>
-#include <net/if.h>
 #include <net/if_dl.h>
 #include <net/if_media.h>
-#include <net/route.h>
 #include <ifaddrs.h>
-#include <net/if_types.h>
 
 static struct ifmibdata	ifmd;
 

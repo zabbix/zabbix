@@ -21,6 +21,9 @@
 #include "zbxregexp.h"
 #include "zbxstr.h"
 
+#ifdef HAVE_NET_IF_H
+	#define _LINUX_IF_H
+#endif
 #include <linux/wireless.h>
 #include <linux/ethtool.h>
 #include <linux/sockios.h>
@@ -1244,9 +1247,9 @@ static void	get_wifi_info(const char *interface, struct zbx_json *j)
 
 static void	get_link_settings(const char *interface, struct zbx_json *j)
 {
-	int sock;
-	struct ifreq ifr;
-	struct ethtool_cmd ecmd;
+	int			sock;
+	struct ifreq		ifr;
+	struct ethtool_cmd	ecmd;
 
 	sock = socket(AF_INET, SOCK_DGRAM, 0);
 	if (0 > sock)
