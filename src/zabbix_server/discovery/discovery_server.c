@@ -74,9 +74,9 @@ static zbx_db_result_t	discovery_get_dhost_by_ip_port(zbx_uint64_t druleid, cons
  *    ip       - [IN]                                                         *
  *    value    - [IN] unique dcheck value (NULL to separate by IP only)       *
  *                                                                            *
- * Comments: When dcheckid=0 and value=NULL, separates if dhost contains      *
- *           other IPs. When dcheckid!=0 and value!=NULL, separates only if   *
- *           dhost contains other IPs with different values for unique dcheck.*
+ * Comments: Separates when dhost has services with different IPs.            *
+ *           When dcheckid!=0 and value!=NULL, separates only if different    *
+ *           IPs contain different values for the unique check.               *
  *                                                                            *
  ******************************************************************************/
 static void	discovery_separate_host(zbx_uint64_t druleid, zbx_uint64_t dcheckid, zbx_db_dhost *dhost,
@@ -212,7 +212,7 @@ static void	discovery_register_host(zbx_uint64_t druleid, zbx_uint64_t dcheckid,
 
 		if (0 == match_value)
 			discovery_separate_host(druleid, 0, dhost, ip, NULL);
-		else if (0 != unique_dcheckid)
+		else
 			discovery_separate_host(druleid, unique_dcheckid, dhost, ip, value);
 	}
 
