@@ -37,7 +37,7 @@ const (
 )
 
 var (
-	// custom name that starts with a letter and has maximum 63 signs (DNS limit).
+	// name that starts with alphanumeric and continues with alphanumeric, dot or underscore.
 	containerNameRegex = regexp.MustCompile(`^[a-zA-Z0-9][a-zA-Z0-9_.-]*$`)
 )
 
