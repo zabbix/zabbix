@@ -101,11 +101,11 @@ static int	macro_message_update_resolv(zbx_macro_resolv_data_t *p, va_list args,
 	{
 		if (NULL != ack)
 		{
-			if (0 == strcmp(p->macro, MVAR_ACK_MESSAGE) || 0 == strcmp(p->macro, MVAR_EVENT_UPDATE_MESSAGE))
+			if (0 == strcmp(p->macro, MVAR_EVENT_UPDATE_MESSAGE))
 			{
 				*replace_to = zbx_strdup(*replace_to, ack->message);
 			}
-			else if (0 == strcmp(p->macro, MVAR_ACK_TIME) || 0 == strcmp(p->macro, MVAR_EVENT_UPDATE_TIME))
+			else if (0 == strcmp(p->macro, MVAR_EVENT_UPDATE_TIME))
 			{
 				*replace_to = zbx_strdup(*replace_to, zbx_time2str(ack->clock, tz));
 			}
@@ -113,7 +113,7 @@ static int	macro_message_update_resolv(zbx_macro_resolv_data_t *p, va_list args,
 			{
 				*replace_to = zbx_dsprintf(*replace_to, "%d", ack->clock);
 			}
-			else if (0 == strcmp(p->macro, MVAR_ACK_DATE) || 0 == strcmp(p->macro, MVAR_EVENT_UPDATE_DATE))
+			else if (0 == strcmp(p->macro, MVAR_EVENT_UPDATE_DATE))
 			{
 				*replace_to = zbx_strdup(*replace_to, zbx_date2str(ack->clock, tz));
 			}

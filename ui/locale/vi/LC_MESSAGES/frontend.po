@@ -1812,6 +1812,11 @@ msgstr "Ít nhất 1 tham số phải được bật."
 msgid "At least one period must be added."
 msgstr ""
 
+#: app/controllers/CControllerConnectorCreate.php:44
+#: app/controllers/CControllerConnectorUpdate.php:45
+msgid "At least one type of information must be selected."
+msgstr ""
+
 #: app/controllers/CControllerPopupAcknowledgeCreate.php:283
 msgid "At least one update operation or message is mandatory"
 msgstr "Ít nhất một hoạt động cập nhật hoặc tin nhắn là bắt buộc"
@@ -21441,6 +21446,11 @@ msgstr "Thẻ hiển thị ưu tiên"
 #: app/views/connector.edit.php:71
 msgid "Tag filter"
 msgstr "Thẻ bộ lọc"
+
+#: app/controllers/CControllerConnectorCreate.php:120
+#: app/controllers/CControllerConnectorUpdate.php:121
+msgid "Tag filter name, operator and value combination is not unique."
+msgstr ""
 
 #: app/partials/trigger.edit.trigger.tab.php:253
 msgid "Tag for matching"

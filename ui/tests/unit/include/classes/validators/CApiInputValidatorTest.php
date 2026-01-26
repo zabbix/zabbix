@@ -7015,6 +7015,102 @@ uwMrOBKatg7CZ1Uenv1K3ioD5w==
 				'Invalid parameter "/1/params": unexpected parameter "3".'
 			],
 			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_VALIDATE_RANGE], 'flags' => API_ALLOW_USER_MACRO],
+				"{\$MACRO}\n",
+				'/1/params',
+				"{\$MACRO}\n"
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_VALIDATE_RANGE], 'flags' => API_ALLOW_USER_MACRO],
+				"\n{\$MACRO}",
+				'/1/params',
+				"\n{\$MACRO}"
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_VALIDATE_RANGE]],
+				"{\$MACRO}\n",
+				'/1/params',
+				'Invalid parameter "/1/params/1": a floating point value is expected.'
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_VALIDATE_RANGE]],
+				"\n{\$MACRO}",
+				'/1/params',
+				'Invalid parameter "/1/params/2": a floating point value is expected.'
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_VALIDATE_RANGE], 'flags' => API_ALLOW_USER_MACRO],
+				"{\$MACRO}\n10",
+				'/1/params',
+				"{\$MACRO}\n10"
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_VALIDATE_RANGE], 'flags' => API_ALLOW_USER_MACRO],
+				"1\n{\$MACRO}",
+				'/1/params',
+				"1\n{\$MACRO}"
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_VALIDATE_RANGE], 'flags' => API_ALLOW_USER_MACRO],
+				"{\$MACRO}\n{\$MACRO}",
+				'/1/params',
+				"{\$MACRO}\n{\$MACRO}"
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_VALIDATE_RANGE]],
+				"{\$MACRO}\n10",
+				'/1/params',
+				'Invalid parameter "/1/params/1": a floating point value is expected.'
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_VALIDATE_RANGE]],
+				"1\n{\$MACRO}",
+				'/1/params',
+				'Invalid parameter "/1/params/2": a floating point value is expected.'
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_VALIDATE_RANGE]],
+				"{\$MACRO}\n{\$MACRO}",
+				'/1/params',
+				'Invalid parameter "/1/params/1": a floating point value is expected.'
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_VALIDATE_RANGE], 'flags' => API_ALLOW_LLD_MACRO],
+				"{#MACRO}\n10",
+				'/1/params',
+				"{#MACRO}\n10"
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_VALIDATE_RANGE], 'flags' => API_ALLOW_LLD_MACRO],
+				"1\n{#MACRO}",
+				'/1/params',
+				"1\n{#MACRO}"
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_VALIDATE_RANGE], 'flags' => API_ALLOW_LLD_MACRO],
+				"{#MACRO}\n{#MACRO}",
+				'/1/params',
+				"{#MACRO}\n{#MACRO}"
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_VALIDATE_RANGE]],
+				"{#MACRO}\n10",
+				'/1/params',
+				'Invalid parameter "/1/params/1": a floating point value is expected.'
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_VALIDATE_RANGE]],
+				"1\n{#MACRO}",
+				'/1/params',
+				'Invalid parameter "/1/params/2": a floating point value is expected.'
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_VALIDATE_RANGE]],
+				"{#MACRO}\n{#MACRO}",
+				'/1/params',
+				'Invalid parameter "/1/params/1": a floating point value is expected.'
+			],
+			[
 				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_VALIDATE_REGEX]],
 				"^[a-z]$",
 				'/1/params',
