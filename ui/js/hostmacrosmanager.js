@@ -145,7 +145,7 @@ class HostMacrosManager {
 					$('#macros_' + macro_num + '_inherited_type')
 						.val(inherited_type & ~HostMacrosManager.ZBX_PROPERTY_OWN);
 					$('#macros_' + macro_num + '_description')
-						.prop('readonly', true)
+						.attr('readonly', true)
 						.val($('#macros_' + macro_num + '_inherited_description').val())
 						.trigger('input');
 					$('#macros_' + macro_num + '_type_button')
@@ -157,7 +157,7 @@ class HostMacrosManager {
 						.val(macro_type)
 						.trigger('change');
 					$('#macros_' + macro_num + '_value')
-						.prop(inherited_value_field_state)
+						.attr(inherited_value_field_state)
 						.val($('#macros_' + macro_num + '_inherited_value').val())
 						.trigger('input');
 					$('#macros_' + macro_num + '_value')
@@ -176,12 +176,12 @@ class HostMacrosManager {
 					$('#macros_' + macro_num + '_inherited_type')
 						.val(inherited_type | HostMacrosManager.ZBX_PROPERTY_OWN);
 					$('#macros_' + macro_num + '_value')
-						.prop('disabled', false)
-						.prop('readonly', false)
+						.attr('disabled', false)
+						.attr('readonly', false)
 						.attr({'placeholder': t('value')})
 						.val('')
 						.focus();
-					$('#macros_' + macro_num + '_description').prop('readonly', false);
+					$('#macros_' + macro_num + '_description').attr('readonly', false);
 					$('#macros_' + macro_num + '_type_button')
 						.prop('disabled', false)
 						.attr({'aria-haspopup': true});
