@@ -865,7 +865,11 @@ static int	zbx_get_snmp_response_error(const zbx_snmp_sess_t ssp, const zbx_dc_i
 	if (STAT_SUCCESS == status)
 	{
 		zbx_snprintf(error, max_error_len, "SNMP error: %s", snmp_errstring(response->errstat));
-		ret = NOTSUPPORTED;
+
+		if (SNMP_ERR_AUTHORIZATIONERROR == response->errstat)
+			ret = NETWORK_ERROR;
+		else
+			ret = NOTSUPPORTED;
 	}
 	else if (STAT_ERROR == status)
 	{
@@ -2623,6 +2627,7 @@ static int	snmp_quote_string_value(char *buffer, size_t buffer_size, struct vari
 {
 #define TYPE_STR_HEX_STRING	"Hex-STRING: "
 #define TYPE_STR_STRING		"STRING: "
+#define TYPE_STR_BITS		"BITS: "
 	int	ret;
 	char	*buf;
 	char	quoted_buf[MAX_STRING_LEN];
@@ -2638,6 +2643,12 @@ static int	snmp_quote_string_value(char *buffer, size_t buffer_size, struct vari
 	buf += 3;
 
 	if (0 == var->val_len && 0 == strcmp(buf, "\"\""))
+	{
+		ret = SUCCEED;
+		goto out;
+	}
+
+	if (0 == strncmp(buf, TYPE_STR_BITS, sizeof(TYPE_STR_BITS) - 1))
 	{
 		ret = SUCCEED;
 		goto out;
@@ -2719,6 +2730,7 @@ out:
 	return ret;
 #undef TYPE_STR_HEX_STRING
 #undef TYPE_STR_STRING
+#undef TYPE_STR_BITS
 }
 
 static void	snmp_bulkwalk_trace_variable(zbx_uint64_t itemid, const struct variable_list *var)
@@ -2748,7 +2760,8 @@ static int	snmp_bulkwalk_handle_response(int status, struct snmp_pdu *response,
 		ret = zbx_get_snmp_response_error(ssp, interface, status, response, error, max_error_len,
 				(int)*results_offset);
 
-		zabbix_log(LOG_LEVEL_DEBUG, "itemid:" ZBX_FS_UI64 " response error: %s", itemid, error);
+		zabbix_log(LOG_LEVEL_DEBUG, "itemid:" ZBX_FS_UI64 " response error: %s errstat:%ld", itemid, error,
+				response->errstat);
 
 		bulkwalk_context->running = 0;
 		goto out;
@@ -2996,12 +3009,14 @@ static int	asynch_response(int operation, struct snmp_session *sp, int reqid, st
 				&snmp_context->item.interface, snmp_context->snmp_oid_type, snmp_context->item.itemid,
 				error, sizeof(error))))
 		{
+			snmp_context->item.ret = ret;
 			bulkwalk_context->error = zbx_strdup(bulkwalk_context->error, error);
 		}
 	}
 	else
 	{
 		zbx_free(bulkwalk_context->error);
+		snmp_context->item.ret = NOTSUPPORTED;
 		bulkwalk_context->error = zbx_dsprintf(bulkwalk_context->error, "SNMP error: [%d]", stat);
 	}
 out:
@@ -3378,7 +3393,6 @@ static int	async_task_process_task_snmp_cb(short event, void *data, int *fd, zbx
 
 		if (NULL != bulkwalk_context->error)
 		{
-			snmp_context->item.ret = NOTSUPPORTED;
 			SET_MSG_RESULT(&snmp_context->item.result, bulkwalk_context->error);
 			bulkwalk_context->error = NULL;
 			goto stop;
