@@ -54,19 +54,21 @@ type ifConfigData struct {
 	IfOperState *string `json:"operational_state"`
 }
 
+// IfStatistics aggregates incoming and outgoing network interface traffic data.
 type IfStatistics struct {
-	Ifbytes      *uint64 `json:"bytes,omitempty""`
-	Ifpackets    *uint64 `json:"packets,omitempty""`
-	Iferrors     *uint64 `json:"errors,omitempty""`
-	Ifdropped    *uint64 `json:"dropped,omitempty""`
-	Ifoverrruns  *uint64 `json:"overruns,omitempty""`
-	Ifframe      *uint64 `json:"frame,omitempty""`
-	Ifcompressed *uint64 `json:"compressed,omitempty""`
-	Ifmulticast  *uint64 `json:"multicast,omitempty""`
-	Ifcollisions *uint64 `json:"collisions,omitempty""`
-	Ifcarrier    *uint64 `json:"carrier,omitempty""`
+	Ifbytes      *uint64 `json:"bytes,omitempty"`
+	Ifpackets    *uint64 `json:"packets,omitempty"`
+	Iferrors     *uint64 `json:"errors,omitempty"`
+	Ifdropped    *uint64 `json:"dropped,omitempty"`
+	Ifoverrruns  *uint64 `json:"overruns,omitempty"`
+	Ifframe      *uint64 `json:"frame,omitempty"`
+	Ifcompressed *uint64 `json:"compressed,omitempty"`
+	Ifmulticast  *uint64 `json:"multicast,omitempty"`
+	Ifcollisions *uint64 `json:"collisions,omitempty"`
+	Ifcarrier    *uint64 `json:"carrier,omitempty"`
 }
 
+// IfValuesData contains the combined configuration and statistical values for an interface.
 type IfValuesData struct {
 	Ifname        string       `json:"name"`
 	Ifalias       string       `json:"ifalias,omitempty"`
