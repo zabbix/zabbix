@@ -86,29 +86,22 @@ int	zbx_event_db_get_host(const zbx_db_event *event, zbx_dc_host_t *host, char *
 			break;
 		case EVENT_SOURCE_AUTOREGISTRATION:
 			zbx_snprintf(sql + offset, sizeof(sql) - offset,
-					",a.proxyid"
-					" from hosts h"
-					" join autoreg_host a on a.host=h.host"
-					" left join host_proxy hp on h.hostid=hp.hostid"
-					" left join proxy p on a.proxyid=p.proxyid"
-					" where ("
-						"(h.monitored_by!=%d and ("
-							ZBX_SQL_NULLCMP("a.proxyid", "h.proxyid")
-							" or " ZBX_SQL_NULLCMP("a.proxyid", "hp.proxyid")
-							" or (h.proxyid is null"
-							" and a.proxyid is not null)"
-						"))"
-						" or "
-						"(h.monitored_by=%d and ("
-							ZBX_SQL_NULLCMP("a.proxyid", "hp.proxyid")
-							" or (p.proxyid is not null"
-							" and p.proxy_groupid=h.proxy_groupid)"
-						")))"
-						" and h.status=%d"
-						" and h.flags&%d=0"
-						" and a.autoreg_hostid=" ZBX_FS_UI64,
-					HOST_MONITORED_BY_PROXY_GROUP, HOST_MONITORED_BY_PROXY_GROUP,
-					HOST_STATUS_MONITORED, ZBX_FLAG_DISCOVERY_PROTOTYPE, event->objectid);
+				",a.proxyid"
+				" from autoreg_host a,hosts h"
+				" left join host_proxy hp on h.hostid=hp.hostid"
+				" left join proxy p on a.proxyid=p.proxyid"
+				" where a.host=h.host"
+					" and h.status=%d"
+					" and h.flags&%d=0"
+					" and a.autoreg_hostid=" ZBX_FS_UI64
+					" and (" ZBX_SQL_NULLCMP("a.proxyid", "h.proxyid")
+						" or " ZBX_SQL_NULLCMP("a.proxyid", "hp.proxyid")
+						" or (h.proxyid is null and a.proxyid is not null)"
+						" or (h.monitored_by=%d and p.proxyid is not null"
+						" and p.proxy_groupid=h.proxy_groupid)"
+					")",
+			HOST_STATUS_MONITORED, (int)ZBX_FLAG_DISCOVERY_PROTOTYPE, event->objectid,
+			HOST_MONITORED_BY_PROXY_GROUP);
 			break;
 		default:
 			zbx_snprintf(error, max_error_len, "Unsupported event source [%d]", event->source);
