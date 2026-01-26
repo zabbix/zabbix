@@ -143,6 +143,7 @@ int	zbx_event_db_get_host(const zbx_db_event *event, zbx_dc_host_t *host, char *
 			ZBX_DBROW2UINT64(host->proxyid, row[1]);
 		else
 			ZBX_DBROW2UINT64(host->proxyid, row[9 + ZBX_IPMI_FIELDS_NUM]);
+
 	}
 	zbx_db_free_result(result);
 
