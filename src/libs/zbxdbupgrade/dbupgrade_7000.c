@@ -448,7 +448,6 @@ static int	DBpatch_7000029(void)
 	return SUCCEED;
 }
 
-
 static int	DBpatch_7000030(void)
 {
 	int			ret = SUCCEED;
@@ -459,7 +458,7 @@ static int	DBpatch_7000030(void)
 		return SUCCEED;
 
 	zbx_db_result_t	result = zbx_db_select("select i.itemid,t.tag,t.value from httptest_tag t"
-		"join ("
+		" join ("
 			"select hsi.itemid, hs.httptestid from httpstepitem hsi"
 			" join httpstep hs on hs.httpstepid = hsi.httpstepid"
 			" union"
@@ -475,16 +474,16 @@ static int	DBpatch_7000030(void)
 	{
 		zbx_uint64_t	itemid;
 
-		ZBX_STR2UINT64(itemid, row[0]);
+		ZBX_DBROW2UINT64(itemid, row[0]);
 		zbx_db_insert_add_values(&db_insert, __UINT64_C(0), itemid, row[1], row[2]);
 	}
 
-	zbx_db_free_result(result);
-
-	zbx_db_insert_autoincrement(&db_insert, "item_tag");
+	zbx_db_insert_autoincrement(&db_insert, "itemtagid");
 	ret = zbx_db_insert_execute(&db_insert);
 
 	zbx_db_insert_clean(&db_insert);
+
+	zbx_db_free_result(result);
 
 	return ret;
 }
