@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -787,6 +787,11 @@ function getSelementsInfo(array $sysmap, array $options = []): array {
 		$selement_info['maintenance'] = getTriggerMaintenance($selement, $selement_info, $sysmaps_data, $trigger_hosts);
 
 		foreach ($selement['hosts'] as $hostid) {
+			// If selement host is not readable via API, it's maintenance information is also not readable.
+			if (!array_key_exists($hostid, $hosts)) {
+				continue;
+			}
+
 			$host = $hosts[$hostid];
 
 			if ($host['status'] == HOST_STATUS_NOT_MONITORED) {
@@ -962,7 +967,9 @@ function getElementHosts($selement, $sysmaps_data, $hosts_by_groupids): array {
 	}
 	elseif ($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST_GROUP) {
 		$groupid = $selement['elements'][0]['groupid'];
-		$host_ids = $hosts_by_groupids[$groupid];
+		if (array_key_exists($groupid, $hosts_by_groupids)) {
+			$host_ids = $hosts_by_groupids[$groupid];
+		}
 	}
 	elseif ($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_MAP) {
 		$sysmapid = $selement['elements'][0]['sysmapid'];
@@ -1188,56 +1195,6 @@ function processAreasCoordinates(array &$map, array $areas, array $mapInfo) {
 			}
 		}
 	}
-}
-
-/**
- * Calculates area connector point on area perimeter
- *
- * @param int $ax      x area coordinate
- * @param int $ay      y area coordinate
- * @param int $aWidth  area width
- * @param int $aHeight area height
- * @param int $x2      x coordinate of connector second element
- * @param int $y2      y coordinate of connector second element
- *
- * @return array contains two values, x and y coordinates of new area connector point
- */
-function calculateMapAreaLinkCoord($ax, $ay, $aWidth, $aHeight, $x2, $y2) {
-	$dY = abs($y2 - $ay);
-	$dX = abs($x2 - $ax);
-
-	$halfHeight = $aHeight / 2;
-	$halfWidth = $aWidth / 2;
-
-	if ($dY == 0) {
-		$ay = $y2;
-		$ax = ($x2 < $ax) ? $ax - $halfWidth : $ax + $halfWidth;
-	}
-	elseif ($dX == 0) {
-		$ay = ($y2 > $ay) ? $ay + $halfHeight : $ay - $halfHeight;
-		$ax = $x2;
-	}
-	else {
-		$koef = $halfHeight / $dY;
-
-		$c = $dX * $koef;
-
-		// If point is further than area diagonal, we should use calculations with width instead of height.
-		if (($halfHeight / $c) > ($halfHeight / $halfWidth)) {
-			$ay = ($y2 > $ay) ? $ay + $halfHeight : $ay - $halfHeight;
-			$ax = ($x2 < $ax) ? $ax - $c : $ax + $c;
-		}
-		else {
-			$koef = $halfWidth / $dX;
-
-			$c = $dY * $koef;
-
-			$ay = ($y2 > $ay) ? $ay + $c : $ay - $c;
-			$ax = ($x2 < $ax) ? $ax - $halfWidth : $ax + $halfWidth;
-		}
-	}
-
-	return [$ax, $ay];
 }
 
 /**

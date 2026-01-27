@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -38,7 +38,7 @@ foreach ($data['tag_filters'] as $key => $tag_filter) {
 		$badges = italic(_('All tags'));
 	}
 	else {
-		$badges = $data['tag_filters_badges'][$tag_filter['groupid']];
+		$badges = (new CDiv($data['tag_filters_badges'][$tag_filter['groupid']]))->addClass(ZBX_STYLE_TAGS_WRAPPER);
 	}
 
 	$tag_filter_table->addRow([

@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -222,21 +222,20 @@ class CScatterPlotHelper {
 				}
 			}
 
+			$items_by_hosts = array_filter($items_by_hosts,
+				static fn ($h) => array_key_exists('x_axis_items', $h) && array_key_exists('y_axis_items', $h)
+			);
+
 			$colors = array_key_exists('color', $data_set)
-				? CColorPicker::getColorVariations($data_set['color'])
+				? CColorPicker::getColorVariations($data_set['color'], count($items_by_hosts))
 				: CColorPicker::getPaletteColors($data_set['color_palette'], count($items_by_hosts));
 
 			$data_set = array_diff_key($data_set, array_flip(['x_axis_itemids, y_axis_itemids', 'x_axis_references',
-				'y_axis_references'
+				'y_axis_references', 'color_palette'
 			]));
 
 			foreach ($items_by_hosts as $items_by_host) {
-				if (!array_key_exists('x_axis_items', $items_by_host)
-						|| !array_key_exists('y_axis_items', $items_by_host)) {
-					continue;
-				}
-
-				$data_set['color'] = array_key_exists('color', $data_set) ? $colors[0] : array_shift($colors);
+				$data_set['color'] = array_shift($colors);
 				$metrics[] = [
 					'x_axis_items' => $items_by_host['x_axis_items'],
 					'y_axis_items' => $items_by_host['y_axis_items'],

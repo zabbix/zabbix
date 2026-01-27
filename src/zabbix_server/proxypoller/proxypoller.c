@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -38,6 +38,9 @@
 #include "zbxipcservice.h"
 #include "zbxjson.h"
 #include "zbxautoreg.h"
+#ifdef HAVE_ARES_QUERY_CACHE
+#include "zbxresolver.h"
+#endif
 
 static zbx_get_program_type_f		zbx_get_program_type_cb = NULL;
 
@@ -80,7 +83,7 @@ static int	connect_to_proxy(const zbx_dc_proxy_t *proxy, zbx_socket_t *sock, int
 	}
 
 	if (FAIL == (ret = zbx_tcp_connect(sock, config_source_ip, proxy->addr, proxy->port, timeout,
-			proxy->tls_connect, tls_arg1, tls_arg2)))
+			proxy->tls_connect, tls_arg1, tls_arg2, ZBX_DNS_FAILOVER_ENABLED)))
 	{
 		zabbix_log(LOG_LEVEL_ERR, "cannot connect to proxy \"%s\": %s", proxy->name, zbx_socket_strerror());
 		ret = NETWORK_ERROR;
@@ -700,6 +703,9 @@ ZBX_THREAD_ENTRY(proxypoller_thread, args)
 #define STAT_INTERVAL	5	/* if a process is busy and does not sleep then update status not faster than */
 				/* once in STAT_INTERVAL seconds */
 
+#ifdef HAVE_ARES_QUERY_CACHE
+	zbx_ares_library_init();
+#endif
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	zbx_tls_init_child(proxy_poller_args_in->config_tls, zbx_get_program_type_cb, zbx_dc_get_psk_by_identity);
 #endif

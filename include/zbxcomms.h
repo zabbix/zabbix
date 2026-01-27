@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -20,6 +20,9 @@
 
 #define ZBX_IPV4_MAX_CIDR_PREFIX	32	/* max number of bits in IPv4 CIDR prefix */
 #define ZBX_IPV6_MAX_CIDR_PREFIX	128	/* max number of bits in IPv6 CIDR prefix */
+
+#define ZBX_DNS_FAILOVER_DISABLED	0
+#define ZBX_DNS_FAILOVER_ENABLED	1
 
 #ifdef _WINDOWS
 #	define zbx_socket_last_error()		WSAGetLastError()
@@ -92,6 +95,13 @@ typedef int	ZBX_SOCKET;
 #	define ZBX_SOCKADDR struct sockaddr_in
 #endif
 
+int	zbx_ip_cmp(int prefix_size, const struct sockaddr *ai_addr, int ai_family, const ZBX_SOCKADDR *name,
+	int ipv6v4_mode);
+int	zbx_validate_peer_list(const char *peer_list, char **error);
+int	zbx_tcp_check_allowed_peers_info(const ZBX_SOCKADDR *peer_info, const char *peer_list);
+int	validate_cidr(const char *ip, const char *cidr, void *value);
+
+#if !defined(WITH_AGENT2_METRICS)
 typedef enum
 {
 	ZBX_BUF_TYPE_STAT = 0,
@@ -247,17 +257,17 @@ const char	*zbx_socket_strerror(void);
 #if !defined(_WINDOWS) && !defined(__MINGW32__)
 void	zbx_gethost_by_ip(const char *ip, char *host, size_t hostlen);
 void	zbx_getip_by_host(const char *host, char *ip, size_t iplen);
-int	zbx_inet_ntop(struct sockaddr *ai_addr, char *ip, socklen_t len);
+int	zbx_inet_ntop(const struct sockaddr *ai_addr, char *ip, socklen_t len);
 #endif
 int	zbx_inet_pton(int af, const char *src, void *dst);
 
 int	zbx_tcp_connect(zbx_socket_t *s, const char *source_ip, const char *ip, unsigned short port, int timeout,
-		unsigned int tls_connect, const char *tls_arg1, const char *tls_arg2);
+		unsigned int tls_connect, const char *tls_arg1, const char *tls_arg2, int failover);
 
 void	zbx_socket_clean(zbx_socket_t *s);
 char	*zbx_socket_detach_buffer(zbx_socket_t *s);
-int	zbx_socket_connect(zbx_socket_t *s, int type, const char *source_ip, const char *ip, unsigned short port,
-		int timeout);
+int	zbx_socket_connect(zbx_socket_t *s, int ai_socktype, const char *source_ip, const char *host,
+		unsigned short port, int timeout, int failover, short *events);
 int	zbx_socket_pollout(zbx_socket_t *s, int timeout, char **error);
 
 int	zbx_socket_tls_connect(zbx_socket_t *s, unsigned int tls_connect, const char *tls_arg1, const char *tls_arg2,
@@ -292,7 +302,7 @@ int	zbx_tcp_send_context(zbx_socket_t *s, zbx_tcp_send_context_t *context, short
 void	zbx_tcp_close(zbx_socket_t *s);
 
 #ifdef HAVE_IPV6
-int	zbx_get_address_family(const char *addr, int *family, char *error, int max_error_len);
+int	zbx_get_ip_family(const char *ip, int *family, char *error, int max_error_len);
 #endif
 
 int	zbx_tcp_listen(zbx_socket_t *s, const char *listen_ip, unsigned short listen_port, int timeout,
@@ -325,12 +335,7 @@ const char	*zbx_tcp_recv_context_line(zbx_socket_t *s, zbx_tcp_recv_context_t *c
 void	zbx_socket_set_deadline(zbx_socket_t *s, int timeout);
 int	zbx_socket_check_deadline(zbx_socket_t *s);
 
-int	zbx_ip_cmp(unsigned int prefix_size, const struct addrinfo *current_ai, const ZBX_SOCKADDR *name,
-		int ipv6v4_mode);
-int	zbx_validate_peer_list(const char *peer_list, char **error);
-int	zbx_tcp_check_allowed_peers_info(const ZBX_SOCKADDR *peer_info, const char *peer_list);
 int	zbx_tcp_check_allowed_peers(const zbx_socket_t *s, const char *peer_list);
-int	validate_cidr(const char *ip, const char *cidr, void *value);
 
 int	zbx_udp_connect(zbx_socket_t *s, const char *source_ip, const char *ip, unsigned short port, int timeout);
 int	zbx_udp_send(zbx_socket_t *s, const char *data, size_t data_len, int timeout);
@@ -483,5 +488,5 @@ typedef struct
 	unsigned char	reset;
 }
 zbx_comms_redirect_t;
-
+#endif
 #endif /* ZABBIX_ZBXCOMMS_H */

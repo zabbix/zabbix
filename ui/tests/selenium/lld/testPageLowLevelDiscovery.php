@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -43,7 +43,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 	const SELECTOR = 'xpath://form[@name="discovery"]/table[contains(@class, "list-table")]';
 
 	public static function prepareLLDData() {
-		CDataHelper::createHosts([
+		$host_responce = CDataHelper::createHosts([
 			[
 				'host' => 'Host with LLD',
 				'groups' => [['groupid' => 4]], // Zabbix servers.
@@ -55,6 +55,13 @@ class testPageLowLevelDiscovery extends CWebTest {
 					]
 				]
 			]
+		]);
+
+		CDataHelper::call('discoveryrule.create', [
+			'name' => 'Multiple   spaces   in LLD name',
+			'key_' => '123lld_rule321',
+			'hostid' =>  $host_responce['hostids']['Host with LLD'],
+			'type' => ITEM_TYPE_TRAPPER
 		]);
 	}
 
@@ -271,10 +278,10 @@ class testPageLowLevelDiscovery extends CWebTest {
 				$this->selectTableRows($data['names'], 'Name', self::SELECTOR);
 				$this->assertFalse($this->query('button:Execute now')->one()->isEnabled());
 				break;
-			case 'template';
+			case 'template':
 				$this->assertFalse($this->query('button:Execute now')->one(false)->isValid());
 				break;
-			case 'trapper';
+			case 'trapper':
 				$this->assertFalse($this->query('button:Execute now')->one()->isEnabled());
 				break;
 			default:
@@ -309,7 +316,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 						'Template groups' => 'Templates/Databases'
 					],
 					'context' => 'template',
-					'rows' => 100
+					'rows' => 113
 				]
 			],
 			// #1.
@@ -374,6 +381,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 						]
 					],
 					'expected' => [
+						'Multiple spaces in LLD name',
 						'Test discovery rule',
 						'Trapper LLD for filter'
 					]
@@ -472,6 +480,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 						'LLD rule for item types',
 						'LLD 🙂🙃 !@#$%^&*()_+ 祝你今天过得愉快',
 						'Linux by Zabbix agent: Get filesystems: Mounted filesystem discovery',
+						'Multiple spaces in LLD name',
 						'Mūsu desmitais LLD',
 						'Linux by Zabbix agent: Network interface discovery',
 						'sevenths LLD',
@@ -573,6 +582,15 @@ class testPageLowLevelDiscovery extends CWebTest {
 					'expected' => [
 						'Test discovery rule'
 					]
+				]
+			],
+			// #18.
+			[
+				[
+					'filter' => [
+						'Name' => '   '
+					],
+					'expected' => ['Multiple spaces in LLD name']
 				]
 			]
 		];
