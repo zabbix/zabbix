@@ -1636,7 +1636,7 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 								'Port' => '001',
 								'Base DN' => 'test',
 								'Search attribute' => 'test'
-							],
+							]
 						]
 					],
 					'inline_errors' => [

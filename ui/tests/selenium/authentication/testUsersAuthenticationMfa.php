@@ -849,7 +849,7 @@ class testUsersAuthenticationMfa extends testFormAuthentication {
 						'Name' => 'This field cannot be empty.',
 						'Client ID' => 'This field cannot be empty.',
 						'API hostname' => 'This field cannot be empty.',
-						'Client secret' => 'This field cannot be empty.',
+						'Client secret' => 'This field cannot be empty.'
 					],
 					'fields' => [
 						'Type' => 'Duo Universal Prompt',
