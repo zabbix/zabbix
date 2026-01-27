@@ -116,7 +116,7 @@ class ZTextareaFlexible extends HTMLElement {
 				break;
 
 			case 'placeholder':
-				this.#textarea.placeholder = value;
+				this.#textarea.placeholder = value ?? '';
 				break;
 
 			case 'readonly':
