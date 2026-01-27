@@ -998,7 +998,8 @@ class CSvgGraphHelper {
 					'units' => $metric['units'],
 					'min' => min($values),
 					'avg' => array_sum($values) / count($values),
-					'max' => max($values)
+					'max' => max($values),
+					'invert_values' => $metric['options']['invert_values']
 				];
 			}
 
