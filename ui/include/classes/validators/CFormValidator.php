@@ -34,11 +34,11 @@ class CFormValidator {
 	const ERROR_FATAL = 2;
 
 	const ERROR_LEVEL_PRIMARY = 0;
-	const ERROR_LEVEL_DELAYED = 1;
-	const ERROR_LEVEL_UNIQ = 2;
-	const ERROR_LEVEL_API = 3;
-	const ERROR_LEVEL_UNKNOWN = 4;
-	const ERROR_LEVEL_OBJECTS_COUNT = 5;
+	const ERROR_LEVEL_OBJECTS_COUNT = 1;
+	const ERROR_LEVEL_DELAYED = 2;
+	const ERROR_LEVEL_UNIQ = 3;
+	const ERROR_LEVEL_API = 4;
+	const ERROR_LEVEL_UNKNOWN = 1000;
 
 	public function __construct(array $rules) {
 		$this->rules = $this->normalizeRules($rules);

@@ -19,11 +19,11 @@ class CFormValidator {
 	static ERROR = 1;
 
 	static ERROR_LEVEL_PRIMARY = 0;
-	static ERROR_LEVEL_DELAYED = 1;
-	static ERROR_LEVEL_UNIQ = 2;
-	static ERROR_LEVEL_API = 3;
-	static ERROR_LEVEL_UNKNOWN = 4;
-	static ERROR_LEVEL_OBJECTS_COUNT = 5;
+	static ERROR_LEVEL_OBJECTS_COUNT = 1;
+	static ERROR_LEVEL_DELAYED = 2;
+	static ERROR_LEVEL_UNIQ = 3;
+	static ERROR_LEVEL_API = 4;
+	static ERROR_LEVEL_UNKNOWN = 1000;
 
 	/**
 	 * AbortSignal object instance used to abort currently running validation.
