@@ -38,17 +38,151 @@ class CControllerAuthenticationUpdate extends CController {
 				'in' => [JIT_PROVISIONING_DISABLED, JIT_PROVISIONING_ENABLED],
 				'when' => ['ldap_auth_enabled', 'in' => [ZBX_AUTH_LDAP_ENABLED]]
 			],
-			'ldap_servers' => ['objects', 'required', 'not_empty', 'uniq' => ['name'],
-				'fields' => CControllerPopupLdapCheck::getFieldsValidationRules(),
-				'when' => [
-					['ldap_auth_enabled', 'in' => [ZBX_AUTH_LDAP_ENABLED]]
+			'ldap_servers' => [
+				[
+					'objects', 'uniq' => ['name'],
+					'fields' =>  [
+						'userdirectoryid' => ['db userdirectory.userdirectoryid'],
+						'name' => ['db userdirectory.name', 'required', 'not_empty'],
+						'host' => ['db userdirectory_ldap.host', 'required', 'not_empty'],
+						'port' => ['db userdirectory_ldap.port', 'required', 'min' => ZBX_MIN_PORT_NUMBER,
+							'max' => ZBX_MAX_PORT_NUMBER
+						],
+						'base_dn' => ['db userdirectory_ldap.base_dn', 'required', 'not_empty'],
+						'search_attribute' => ['db userdirectory_ldap.search_attribute', 'required', 'not_empty'],
+						'bind_dn' => ['db userdirectory_ldap.bind_dn'],
+						'bind_password' => ['db userdirectory_ldap.bind_password'],
+						'description' => ['db userdirectory.description'],
+						'provision_status' => ['db userdirectory.provision_status',
+							'in' => [JIT_PROVISIONING_DISABLED, JIT_PROVISIONING_ENABLED]
+						],
+						'group_basedn' => ['db userdirectory_ldap.group_basedn',
+							'when' => ['provision_status', 'in' => [JIT_PROVISIONING_ENABLED]]
+						],
+						'group_name' => ['db userdirectory_ldap.group_name',
+							'when' => ['provision_status', 'in' => [JIT_PROVISIONING_ENABLED]]
+						],
+						'group_membership' => ['db userdirectory_ldap.group_membership',
+							'when' => ['provision_status', 'in' => [JIT_PROVISIONING_ENABLED]]
+						],
+						'group_member' => ['db userdirectory_ldap.group_member',
+							'when' => ['provision_status', 'in' => [JIT_PROVISIONING_ENABLED]]
+						],
+						'user_ref_attr' => ['db userdirectory_ldap.user_ref_attr',
+							'when' => ['provision_status', 'in' => [JIT_PROVISIONING_ENABLED]]
+						],
+						'group_filter' => ['db userdirectory_ldap.group_filter',
+							'when' => ['provision_status', 'in' => [JIT_PROVISIONING_ENABLED]]
+						],
+						'user_username' => ['db userdirectory_ldap.user_username',
+							'when' => ['provision_status', 'in' => [JIT_PROVISIONING_ENABLED]]
+						],
+						'user_lastname' => ['db userdirectory_ldap.user_lastname',
+							'when' => ['provision_status', 'in' => [JIT_PROVISIONING_ENABLED]]
+						],
+						'provision_groups' => ['objects', 'not_empty', 'uniq' => ['name'],
+							'fields' => CControllerPopupUserGroupMappingCheck::getFieldsValidationRules(),
+							'when' => ['provision_status', 'in' => [JIT_PROVISIONING_ENABLED]]
+						],
+						'provision_media' => ['objects', 'uniq' => ['attribute', 'mediatypeid'],
+							'fields' => [
+								'userdirectory_mediaid' => ['db userdirectory_media.userdirectory_mediaid'],
+								'mediatypeid' => ['db media_type.mediatypeid', 'required'],
+								'name' => ['db userdirectory_media.name', 'required', 'not_empty'],
+								'attribute' => ['db userdirectory_media.attribute', 'required', 'not_empty'],
+								'period' => ['db userdirectory_media.period', 'required', 'not_empty',
+									'use' => [CTimePeriodParser::class, ['usermacros' => true]]
+								],
+								'severity' => ['db userdirectory_media.severity', 'min' => 0,
+									'max' => (pow(2, TRIGGER_SEVERITY_COUNT) - 1)
+								],
+								'active' => ['db userdirectory_media.active', 'required',
+									'in' => [MEDIA_STATUS_ACTIVE, MEDIA_STATUS_DISABLED]
+								]
+							],
+							'when' => ['provision_status', 'in' => [JIT_PROVISIONING_ENABLED]],
+							'messages' => ['uniq' => _('Media type and attribute is not unique.')]
+						],
+						'start_tls' => ['db userdirectory_ldap.start_tls',
+							'in' => [ZBX_AUTH_START_TLS_OFF, ZBX_AUTH_START_TLS_ON]
+						],
+						'search_filter' => ['db userdirectory_ldap.search_filter']
+					],
+					'when' => ['ldap_auth_enabled', 'in' => [ZBX_AUTH_LDAP_DISABLED]]
+				],
+				[
+					'objects', 'required', 'not_empty', 'uniq' => ['name'],
+					'fields' =>  [
+						'userdirectoryid' => ['db userdirectory.userdirectoryid'],
+						'name' => ['db userdirectory.name', 'required', 'not_empty'],
+						'host' => ['db userdirectory_ldap.host', 'required', 'not_empty'],
+						'port' => ['db userdirectory_ldap.port', 'required', 'min' => ZBX_MIN_PORT_NUMBER,
+							'max' => ZBX_MAX_PORT_NUMBER
+						],
+						'base_dn' => ['db userdirectory_ldap.base_dn', 'required', 'not_empty'],
+						'search_attribute' => ['db userdirectory_ldap.search_attribute', 'required', 'not_empty'],
+						'bind_dn' => ['db userdirectory_ldap.bind_dn'],
+						'bind_password' => ['db userdirectory_ldap.bind_password'],
+						'description' => ['db userdirectory.description'],
+						'provision_status' => ['db userdirectory.provision_status',
+							'in' => [JIT_PROVISIONING_DISABLED, JIT_PROVISIONING_ENABLED]
+						],
+						'group_basedn' => ['db userdirectory_ldap.group_basedn',
+							'when' => ['provision_status', 'in' => [JIT_PROVISIONING_ENABLED]]
+						],
+						'group_name' => ['db userdirectory_ldap.group_name',
+							'when' => ['provision_status', 'in' => [JIT_PROVISIONING_ENABLED]]
+						],
+						'group_membership' => ['db userdirectory_ldap.group_membership',
+							'when' => ['provision_status', 'in' => [JIT_PROVISIONING_ENABLED]]
+						],
+						'group_member' => ['db userdirectory_ldap.group_member',
+							'when' => ['provision_status', 'in' => [JIT_PROVISIONING_ENABLED]]
+						],
+						'user_ref_attr' => ['db userdirectory_ldap.user_ref_attr',
+							'when' => ['provision_status', 'in' => [JIT_PROVISIONING_ENABLED]]
+						],
+						'group_filter' => ['db userdirectory_ldap.group_filter',
+							'when' => ['provision_status', 'in' => [JIT_PROVISIONING_ENABLED]]
+						],
+						'user_username' => ['db userdirectory_ldap.user_username',
+							'when' => ['provision_status', 'in' => [JIT_PROVISIONING_ENABLED]]
+						],
+						'user_lastname' => ['db userdirectory_ldap.user_lastname',
+							'when' => ['provision_status', 'in' => [JIT_PROVISIONING_ENABLED]]
+						],
+						'provision_groups' => ['objects', 'not_empty', 'uniq' => ['name'],
+							'fields' => CControllerPopupUserGroupMappingCheck::getFieldsValidationRules(),
+							'when' => ['provision_status', 'in' => [JIT_PROVISIONING_ENABLED]]
+						],
+						'provision_media' => ['objects', 'uniq' => ['attribute', 'mediatypeid'],
+							'fields' => [
+								'userdirectory_mediaid' => ['db userdirectory_media.userdirectory_mediaid'],
+								'mediatypeid' => ['db media_type.mediatypeid', 'required'],
+								'name' => ['db userdirectory_media.name', 'required', 'not_empty'],
+								'attribute' => ['db userdirectory_media.attribute', 'required', 'not_empty'],
+								'period' => ['db userdirectory_media.period', 'required', 'not_empty',
+									'use' => [CTimePeriodParser::class, ['usermacros' => true]]
+								],
+								'severity' => ['db userdirectory_media.severity', 'min' => 0,
+									'max' => (pow(2, TRIGGER_SEVERITY_COUNT) - 1)
+								],
+								'active' => ['db userdirectory_media.active', 'required',
+									'in' => [MEDIA_STATUS_ACTIVE, MEDIA_STATUS_DISABLED]
+								]
+							],
+							'when' => ['provision_status', 'in' => [JIT_PROVISIONING_ENABLED]],
+							'messages' => ['uniq' => _('Media type and attribute is not unique.')]
+						],
+						'start_tls' => ['db userdirectory_ldap.start_tls',
+							'in' => [ZBX_AUTH_START_TLS_OFF, ZBX_AUTH_START_TLS_ON]
+						],
+						'search_filter' => ['db userdirectory_ldap.search_filter']
+					],
+					'when' => ['ldap_auth_enabled', 'in' => [ZBX_AUTH_LDAP_ENABLED]]
 				]
 			],
-			'ldap_default_row_index' =>	['integer', 'required',
-				'when' => [
-					['ldap_auth_enabled', 'in' => [ZBX_AUTH_LDAP_ENABLED]]
-				]
-			],
+			'ldap_default_row_index' =>	['integer', 'required'],
 			'ldap_case_sensitive' => ['setting ldap_case_sensitive',
 				'in' => [ZBX_AUTH_CASE_INSENSITIVE, ZBX_AUTH_CASE_SENSITIVE],
 				'when' => ['ldap_auth_enabled', 'in' => [ZBX_AUTH_LDAP_ENABLED]]
