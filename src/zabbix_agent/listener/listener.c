@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -28,6 +28,9 @@
 #	include "zbxwinservice.h"
 #elif !defined(_WINDOWS)
 #	include "zbxnix.h"
+#endif
+#ifdef HAVE_ARES_QUERY_CACHE
+#include "zbxresolver.h"
 #endif
 
 #ifndef _WINDOWS
@@ -246,6 +249,9 @@ ZBX_THREAD_ENTRY(listener_thread, args)
 #endif
 
 #ifndef _WINDOWS
+#ifdef HAVE_ARES_QUERY_CACHE
+	zbx_ares_library_init();
+#endif
 	zbx_set_sigusr_handler(zbx_listener_sigusr_handler);
 #endif
 	zbx_cfg_set_process_num(process_num);

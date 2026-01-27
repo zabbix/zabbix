@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -379,7 +379,7 @@ static void	determine_items_in_expressions(zbx_vector_dc_trigger_t *trigger_orde
 		}
 	}
 
-	zbx_dc_config_clean_functions(functions, errcodes, functionids.values_num);
+	zbx_dc_config_clean_functions(functions, functionids.values_num);
 	zbx_free(errcodes);
 	zbx_free(functions);
 out:
@@ -1382,7 +1382,7 @@ void	zbx_sync_history_cache_server(const zbx_events_funcs_t *events_cbs, zbx_ipc
 	static int				module_enabled = FAIL;
 	int					i, history_num, history_float_num, history_integer_num,
 						history_string_num, history_text_num, history_log_num, txn_error,
-						compression_age, connectors_retrieved = FAIL;
+						compression_age = FAIL, connectors_retrieved = FAIL;
 	unsigned int				item_retrieve_mode;
 	time_t					sync_start;
 	zbx_vector_uint64_t			triggerids;
@@ -1440,8 +1440,6 @@ void	zbx_sync_history_cache_server(const zbx_events_funcs_t *events_cbs, zbx_ipc
 				ZBX_HC_SYNC_MAX * sizeof(ZBX_HISTORY_LOG));
 	}
 
-	compression_age = zbx_hc_get_history_compression_age();
-
 	zbx_vector_connector_filter_create(&connector_filters_history);
 	zbx_vector_connector_filter_create(&connector_filters_events);
 	zbx_vector_inventory_value_ptr_create(&inventory_values);
@@ -1498,6 +1496,11 @@ void	zbx_sync_history_cache_server(const zbx_events_funcs_t *events_cbs, zbx_ipc
 			zbx_dc_um_handle_t	*um_handle;
 
 			stats->values_num += history_num;
+
+			if (FAIL == compression_age)
+			{
+				compression_age = zbx_hc_get_history_compression_age();
+			}
 
 			if (FAIL == connectors_retrieved)
 			{
@@ -1835,7 +1838,7 @@ void	zbx_sync_history_cache_server(const zbx_events_funcs_t *events_cbs, zbx_ipc
 		if (0 != history_num)
 		{
 			zbx_free(trends);
-			zbx_dc_config_clean_history_sync_items(items, errcodes, (size_t)history_num);
+			zbx_dc_config_clean_history_sync_items(items, (size_t)history_num);
 
 			zbx_vector_hc_item_ptr_clear(&history_items);
 			zbx_hc_free_item_values(history, history_num);

@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -87,7 +87,7 @@ int	zbx_agent_get_value(const zbx_dc_item_t *item, const char *config_source_ip,
 	}
 
 	if (SUCCEED == zbx_tcp_connect(&s, config_source_ip, item->interface.addr, item->interface.port,
-			item->timeout + 1, item->host.tls_connect, tls_arg1, tls_arg2))
+			item->timeout + 1, item->host.tls_connect, tls_arg1, tls_arg2, ZBX_DNS_FAILOVER_ENABLED))
 	{
 		struct zbx_json	j;
 		char		*ptr;
