@@ -168,7 +168,7 @@
 					'data-error-container': $input.attr('data-error-container'),
 					'data-error-label': $input.attr('data-error-label')
 				})
-				.text($input.is(':disabled') ? '' : $input.val())
+				.val($input.is(':disabled') ? '' : $input.val())
 				.on('focus blur', btnUndoFocusEventHandle)
 
 			$curr_control.replaceWith($textarea);
