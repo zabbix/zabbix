@@ -163,31 +163,54 @@ class CControllerAuthenticationUpdate extends CController {
 				'when' => ['saml_auth_enabled', 'in' => [ZBX_AUTH_SAML_ENABLED]]
 			],
 			'mfa_status' => ['setting mfa_status', 'in' => [MFA_DISABLED, MFA_ENABLED]],
-			'mfa_methods' => ['objects', 'not_empty', 'uniq' => ['name'],
-				'fields' => [
-					'mfaid' => ['db mfa.mfaid'],
-					'type' => ['db mfa.type', 'required', 'in' => [MFA_TYPE_TOTP, MFA_TYPE_DUO]],
-					'name' => ['db mfa.name', 'required', 'not_empty'],
-					'hash_function' => ['db mfa.hash_function', 'required',
-						'in' => [TOTP_HASH_SHA1, TOTP_HASH_SHA256, TOTP_HASH_SHA512],
-						'when' => ['type', 'in' => [MFA_TYPE_TOTP]]
-					],
-					'code_length' => ['db mfa.code_length', 'required', 'in' => [TOTP_CODE_LENGTH_6, TOTP_CODE_LENGTH_8],
-						'when' => ['type', 'in' => [MFA_TYPE_TOTP]]
-					],
-					'api_hostname' => ['db mfa.api_hostname', 'required', 'not_empty',
-						'when' => ['type', 'in' => [MFA_TYPE_DUO]]
-					],
-					'clientid' => ['db mfa.clientid', 'required', 'not_empty',
-						'when' => ['type', 'in' => [MFA_TYPE_DUO]]
-					],
-					'client_secret' => ['db mfa.client_secret', 'not_empty', 'when' => ['type', 'in' => [MFA_TYPE_DUO]]]
+			'mfa_methods' => [
+				[
+					'objects', 'uniq' => ['name'],
+					'fields' => [
+						'mfaid' => ['db mfa.mfaid'],
+						'type' => ['db mfa.type', 'required', 'in' => [MFA_TYPE_TOTP, MFA_TYPE_DUO]],
+						'name' => ['db mfa.name', 'required', 'not_empty'],
+						'hash_function' => ['db mfa.hash_function', 'required',
+							'in' => [TOTP_HASH_SHA1, TOTP_HASH_SHA256, TOTP_HASH_SHA512],
+							'when' => ['type', 'in' => [MFA_TYPE_TOTP]]
+						],
+						'code_length' => ['db mfa.code_length', 'required', 'in' => [TOTP_CODE_LENGTH_6, TOTP_CODE_LENGTH_8],
+							'when' => ['type', 'in' => [MFA_TYPE_TOTP]]
+						],
+						'api_hostname' => ['db mfa.api_hostname', 'required', 'not_empty',
+							'when' => ['type', 'in' => [MFA_TYPE_DUO]]
+						],
+						'clientid' => ['db mfa.clientid', 'required', 'not_empty',
+							'when' => ['type', 'in' => [MFA_TYPE_DUO]]
+						],
+						'client_secret' => ['db mfa.client_secret', 'not_empty', 'when' => ['type', 'in' => [MFA_TYPE_DUO]]]
+					]
 				],
-				'when' => ['mfa_status', 'in' => [MFA_ENABLED]]
+				[
+					'objects', 'required', 'not_empty', 'uniq' => ['name'],
+					'fields' => [
+						'mfaid' => ['db mfa.mfaid'],
+						'type' => ['db mfa.type', 'required', 'in' => [MFA_TYPE_TOTP, MFA_TYPE_DUO]],
+						'name' => ['db mfa.name', 'required', 'not_empty'],
+						'hash_function' => ['db mfa.hash_function', 'required',
+							'in' => [TOTP_HASH_SHA1, TOTP_HASH_SHA256, TOTP_HASH_SHA512],
+							'when' => ['type', 'in' => [MFA_TYPE_TOTP]]
+						],
+						'code_length' => ['db mfa.code_length', 'required', 'in' => [TOTP_CODE_LENGTH_6, TOTP_CODE_LENGTH_8],
+							'when' => ['type', 'in' => [MFA_TYPE_TOTP]]
+						],
+						'api_hostname' => ['db mfa.api_hostname', 'required', 'not_empty',
+							'when' => ['type', 'in' => [MFA_TYPE_DUO]]
+						],
+						'clientid' => ['db mfa.clientid', 'required', 'not_empty',
+							'when' => ['type', 'in' => [MFA_TYPE_DUO]]
+						],
+						'client_secret' => ['db mfa.client_secret', 'not_empty', 'when' => ['type', 'in' => [MFA_TYPE_DUO]]]
+					],
+					'when' => ['mfa_status', 'in' => [MFA_ENABLED]]
+				]
 			],
-			'mfa_default_row_index' => ['integer', 'required',
-				'when' => ['mfa_status', 'in' => [MFA_ENABLED]]
-			],
+			'mfa_default_row_index' => ['integer', 'required'],
 			'mfa_removed_mfaids' =>	['array', 'field' => ['db mfa.mfaid']]
 		]];
 
