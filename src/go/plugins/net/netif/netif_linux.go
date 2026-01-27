@@ -200,18 +200,22 @@ func (p *Plugin) Export(key string, params []string, _ plugin.ContextProvider) (
 		if len(params) > 1 {
 			return nil, errs.New(errorTooManyParams)
 		}
+
 		expression := ""
 		if len(params) > 0 {
 			expression = params[0]
 		}
+
 		devices, err := p.getIfGet(expression)
 		if err != nil {
 			return nil, err
 		}
+
 		b, err := json.Marshal(devices)
 		if err != nil {
 			return nil, err
 		}
+
 		return string(b), nil
 
 	case "net.if.collisions":
@@ -268,7 +272,8 @@ func validateParams(params []string, minParams, maxParams int) error {
 	return nil
 }
 
-func (p *Plugin) fillNetIfGetParams(ifName, param string) string {
+// fillNetIfGetParams reads sysfs parameters.
+func (_ *Plugin) fillNetIfGetParams(ifName, param string) string {
 	path := fmt.Sprintf("/sys/class/net/%s/%s", ifName, param)
 
 	data, err := os.ReadFile(path)
@@ -279,12 +284,25 @@ func (p *Plugin) fillNetIfGetParams(ifName, param string) string {
 	return strings.TrimSpace(string(data))
 }
 
+// parseUintPointer attempts to parse a string into a uint64.
+func parseUintPointer(s string) *uint64 {
+	val, err := strconv.ParseUint(s, 10, 64)
+	if err != nil {
+		return nil
+	}
+
+	return &val
+}
+
+// getIfGet retrieves interface data.
+//
+//nolint:gocognit,gocyclo // Complexity is high due to CGo integration and data aggregation.
 func (p *Plugin) getIfGet(regexExpr string) (result netIfResult, err error) {
 	var compiledRegex *regexp.Regexp
 
 	f, err := os.Open(netDevFilepath)
 	if err != nil {
-		return result, fmt.Errorf("Cannot open %s: %w", netDevFilepath, err)
+		return result, fmt.Errorf("cannot open %s: %w", netDevFilepath, err)
 	}
 	defer f.Close()
 
@@ -324,6 +342,7 @@ func (p *Plugin) getIfGet(regexExpr string) (result netIfResult, err error) {
 		if llresult != 0 {
 			C.free(unsafe.Pointer(cIface))
 			C.free(unsafe.Pointer(cInfo))
+
 			continue
 		}
 
@@ -332,20 +351,9 @@ func (p *Plugin) getIfGet(regexExpr string) (result netIfResult, err error) {
 			isAutonegEnabled = "on"
 		}
 
-		var speedPtr *uint64
-		if speedVal, errSpeed := strconv.ParseUint(p.fillNetIfGetParams(ifName, "speed"), 10, 64); errSpeed == nil {
-			speedPtr = &speedVal
-		}
-
-		var typePtr *uint64
-		if typeVal, errType := strconv.ParseUint(p.fillNetIfGetParams(ifName, "type"), 10, 64); errType == nil {
-			typePtr = &typeVal
-		}
-
-		var carrierPtr *uint64
-		if carrierVal, errCarrier := strconv.ParseUint(p.fillNetIfGetParams(ifName, "carrier"), 10, 64); errCarrier == nil {
-			carrierPtr = &carrierVal
-		}
+		speedPtr := parseUintPointer(p.fillNetIfGetParams(ifName, "speed"))
+		typePtr := parseUintPointer(p.fillNetIfGetParams(ifName, "type"))
+		carrierPtr := parseUintPointer(p.fillNetIfGetParams(ifName, "carrier"))
 
 		var operstatusPtr *string
 		if int(cInfo.operational_state) == 1 {
@@ -386,28 +394,6 @@ func (p *Plugin) getIfGet(regexExpr string) (result netIfResult, err error) {
 			noiselevelPtr = &noiselevelVal
 		}
 
-		var inBytes, inPackets, inErrors, inDropped, inOverruns, inFrame, inCompressed, inMulticast uint64
-		var outBytes, outPackets, outErrors, outDropped, outOverruns, outCollisions, outCarrier,
-			outCompressed uint64
-
-		inBytes, _ = strconv.ParseUint(stats[0], 10, 64)
-		inPackets, _ = strconv.ParseUint(stats[1], 10, 64)
-		inErrors, _ = strconv.ParseUint(stats[2], 10, 64)
-		inDropped, _ = strconv.ParseUint(stats[3], 10, 64)
-		inOverruns, _ = strconv.ParseUint(stats[4], 10, 64)
-		inFrame, _ = strconv.ParseUint(stats[5], 10, 64)
-		inCompressed, _ = strconv.ParseUint(stats[6], 10, 64)
-		inMulticast, _ = strconv.ParseUint(stats[7], 10, 64)
-
-		outBytes, _ = strconv.ParseUint(stats[8], 10, 64)
-		outPackets, _ = strconv.ParseUint(stats[9], 10, 64)
-		outErrors, _ = strconv.ParseUint(stats[10], 10, 64)
-		outDropped, _ = strconv.ParseUint(stats[11], 10, 64)
-		outOverruns, _ = strconv.ParseUint(stats[12], 10, 64)
-		outCollisions, _ = strconv.ParseUint(stats[13], 10, 64)
-		outCarrier, _ = strconv.ParseUint(stats[14], 10, 64)
-		outCompressed, _ = strconv.ParseUint(stats[15], 10, 64)
-
 		valSSID := C.GoString((*C.char)(unsafe.Pointer(&cInfo.ssid[0])))
 		var ssidPtr *string
 
@@ -427,26 +413,24 @@ func (p *Plugin) getIfGet(regexExpr string) (result netIfResult, err error) {
 			Iftype:  typePtr,
 
 			In: IfStatistics{
-				Ifbytes:   &inBytes,
-				Ifpackets: &inPackets,
-				Iferrors:  &inErrors,
-				Ifdropped: &inDropped,
-
-				Ifoverrruns:  &inOverruns,
-				Ifframe:      &inFrame,
-				Ifcompressed: &inCompressed,
-				Ifmulticast:  &inMulticast,
+				Ifbytes:      parseUintPointer(stats[0]),
+				Ifpackets:    parseUintPointer(stats[1]),
+				Iferrors:     parseUintPointer(stats[2]),
+				Ifdropped:    parseUintPointer(stats[3]),
+				Ifoverrruns:  parseUintPointer(stats[4]),
+				Ifframe:      parseUintPointer(stats[5]),
+				Ifcompressed: parseUintPointer(stats[6]),
+				Ifmulticast:  parseUintPointer(stats[7]),
 			},
 			Out: IfStatistics{
-				Ifbytes:   &outBytes,
-				Ifpackets: &outPackets,
-				Iferrors:  &outErrors,
-				Ifdropped: &outDropped,
-
-				Ifoverrruns:  &outOverruns,
-				Ifcollisions: &outCollisions,
-				Ifcarrier:    &outCarrier,
-				Ifcompressed: &outCompressed,
+				Ifbytes:      parseUintPointer(stats[8]),
+				Ifpackets:    parseUintPointer(stats[9]),
+				Iferrors:     parseUintPointer(stats[10]),
+				Ifdropped:    parseUintPointer(stats[11]),
+				Ifoverrruns:  parseUintPointer(stats[12]),
+				Ifcollisions: parseUintPointer(stats[13]),
+				Ifcarrier:    parseUintPointer(stats[14]),
+				Ifcompressed: parseUintPointer(stats[15]),
 			},
 			Ifcarrier:     carrierPtr,
 			Ifnegotiation: isAutonegEnabled,
