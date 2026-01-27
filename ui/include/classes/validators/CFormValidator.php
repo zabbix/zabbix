@@ -565,10 +565,6 @@ class CFormValidator {
 		$results = [];
 
 		foreach ($count_fields_rules as $count_rule) {
-			if (count($count_rule) != 2) {
-				throw new Exception('[RULES ERROR] Invalid number of parameters for "field_rules" option of "count_values" check (Path: ' . $rule_path . ')');
-			}
-
 			if (!array_key_exists(0, $count_rule)) {
 				throw new Exception('[RULES ERROR] Missing field name parameter for "field_rules" option of "count_values" check (Path: ' . $rule_path . ')');
 			}

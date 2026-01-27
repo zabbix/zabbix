@@ -1044,7 +1044,7 @@ class CFormValidatorTest extends TestCase {
 					]
 				]],
 				null,
-				'[RULES ERROR] Invalid number of parameters for "field_rules" option of "count_values" check (Path: /items)'
+				'[RULES ERROR] Missing field name parameter for "field_rules" option of "count_values" check (Path: /items)'
 			],
 			[
 				['object', 'fields' => [
@@ -2987,6 +2987,41 @@ class CFormValidatorTest extends TestCase {
 					['field1' => 'abc', 'field2' => 1],
 					['field1' => 'abc', 'field2' => 2],
 					['field1' => 'abc', 'field2' => 10],
+					['field1' => 'abc2', 'field2' => 1]
+				]],
+				CFormValidator::SUCCESS,
+				[]
+			],
+			[
+				['object', 'fields' => [
+					'items' => [
+						['objects',
+							'fields' => [
+								'field1' => ['string'],
+								'field2' => ['integer']
+							],
+							'count_values' => [
+								'field_rules' => ['field2'],
+								'min' => 3, 'max' => 5,
+								'message' => 'Must have 3-5 items with field2.'
+							]
+						]
+					]
+				]],
+				['items' => [
+					['field1' => 'abc', 'field2' => 1],
+					['field1' => 'abc1'],
+					['field1' => 'abc', 'field2' => 2],
+					['field1' => 'abc', 'field2' => 10],
+					['field1' => 'abc2'],
+					['field1' => 'abc2', 'field2' => 1]
+				]],
+				['items' => [
+					['field1' => 'abc', 'field2' => 1],
+					['field1' => 'abc1'],
+					['field1' => 'abc', 'field2' => 2],
+					['field1' => 'abc', 'field2' => 10],
+					['field1' => 'abc2'],
 					['field1' => 'abc2', 'field2' => 1]
 				]],
 				CFormValidator::SUCCESS,
