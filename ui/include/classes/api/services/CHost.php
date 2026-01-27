@@ -806,66 +806,26 @@ class CHost extends CHostGeneral {
 		$this->updateTags($hosts, $db_hosts);
 		self::updateMacros($hosts, $db_hosts);
 
-		$inventories = [];
 		foreach ($hosts as &$host) {
 			// If visible name is not given or empty it should be set to host name.
 			if (array_key_exists('host', $host) && (!array_key_exists('name', $host) || trim($host['name']) === '')) {
 				$host['name'] = $host['host'];
 			}
-
-			// Fetch fields required to update host inventory.
-			if (array_key_exists('inventory', $host)) {
-				$inventory = $host['inventory'];
-				$inventory['hostid'] = $host['hostid'];
-
-				$inventories[] = $inventory;
-			}
 		}
 		unset($host);
 
-		$inventories = $this->extendObjects('host_inventory', $inventories, ['inventory_mode']);
-		$inventories = zbx_toHash($inventories, 'hostid');
-
 		foreach ($hosts as $host) {
-			$hostid = $host['hostid'];
-			$host = array_diff_key($host,
-				array_flip(['hostid', 'templates', 'templates_clear', 'groups', 'tags', 'macros'])
+			$host = array_intersect_key($host,
+				array_flip(['hostid', 'host', 'name', 'interfaces', 'description', 'monitored_by', 'proxyid',
+					'proxy_groupid', 'status', 'ipmi_authtype', 'ipmi_privilege', 'ipmi_username', 'ipmi_password',
+					'inventory_mode', 'inventory', 'tls_connect', 'tls_accept', 'tls_psk_identity', 'tls_psk',
+					'tls_issuer', 'tls_subject'
+				])
 			);
 
-			if (!$host) {
-				continue;
+			if (array_diff_key($host, array_flip(['hostid']))) {
+				$this->massUpdate($host, $db_hosts[$host['hostid']]);
 			}
-
-			$host = ['hostid' => $hostid] + $host;
-
-			// Extend host inventory with the required data.
-			if (array_key_exists('inventory', $host) && $host['inventory']) {
-				// If inventory mode is HOST_INVENTORY_DISABLED, database record is not created.
-				if (array_key_exists('inventory_mode', $inventories[$host['hostid']])
-						&& ($inventories[$host['hostid']]['inventory_mode'] == HOST_INVENTORY_MANUAL
-							|| $inventories[$host['hostid']]['inventory_mode'] == HOST_INVENTORY_AUTOMATIC)) {
-					$host['inventory'] = $inventories[$host['hostid']];
-				}
-			}
-
-			if (array_key_exists('monitored_by', $host)) {
-				if ($host['monitored_by'] == ZBX_MONITORED_BY_PROXY) {
-					$host += ['proxyid' => $db_hosts[$host['hostid']]['proxyid']];
-				}
-				elseif ($host['monitored_by'] == ZBX_MONITORED_BY_PROXY_GROUP) {
-					$host += ['proxy_groupid' => $db_hosts[$host['hostid']]['proxy_groupid']];
-				}
-			}
-
-			if (array_key_exists('tls_connect', $host)
-					&& ($host['tls_connect'] == HOST_ENCRYPTION_PSK || $host['tls_accept'] & HOST_ENCRYPTION_PSK)) {
-				$host += [
-					'tls_psk_identity' => $db_hosts[$host['hostid']]['tls_psk_identity'],
-					'tls_psk' => $db_hosts[$host['hostid']]['tls_psk']
-				];
-			}
-
-			$this->updateByData($host, [$hostid => $db_hosts[$hostid]]);
 		}
 
 		$this->updateGroups($hosts, $db_hosts);
@@ -989,7 +949,7 @@ class CHost extends CHostGeneral {
 		}
 	}
 
-	private function updateByData(array $data, array $db_hosts): void {
+	private function massUpdate(array $data, array $db_host): void {
 		$hostids = [$data['hostid']];
 
 		if (array_key_exists('monitored_by', $data)) {
@@ -1042,18 +1002,10 @@ class CHost extends CHostGeneral {
 			]);
 
 			if (array_key_exists('status', $data) && $data['status'] == HOST_STATUS_NOT_MONITORED) {
-				$discovered_hostids = [];
-
-				foreach ($db_hosts as $db_host) {
-					if ($db_host['flags'] == ZBX_FLAG_DISCOVERY_CREATED && $data['status'] != $db_host['status']) {
-						$discovered_hostids[] = $db_host['hostid'];
-					}
-				}
-
-				if ($discovered_hostids) {
+				if ($db_host['flags'] == ZBX_FLAG_DISCOVERY_CREATED && $data['status'] != $db_host['status']) {
 					DB::update('host_discovery', [
 						'values' => ['disable_source' => ZBX_DISABLE_DEFAULT],
-						'where' => ['hostid' => $discovered_hostids]
+						'where' => ['hostid' => $db_host['hostid']]
 					]);
 				}
 			}
@@ -1157,17 +1109,12 @@ class CHost extends CHostGeneral {
 			}
 		}
 
-		$new_hosts = [];
-		foreach ($db_hosts as $hostid => $db_host) {
-			$new_host = $data + $db_host;
-			if ($new_host['status'] != $db_host['status']) {
-				info(_s('Updated status of host "%1$s".', $new_host['host']));
-			}
-
-			$new_hosts[] = $new_host;
+		$new_host = $data + $db_host;
+		if ($new_host['status'] != $db_host['status']) {
+			info(_s('Updated status of host "%1$s".', $new_host['host']));
 		}
 
-		$this->addAuditBulk(CAudit::ACTION_UPDATE, CAudit::RESOURCE_HOST, $new_hosts, $db_hosts);
+		$this->addAuditBulk(CAudit::ACTION_UPDATE, CAudit::RESOURCE_HOST, [$new_host], [$db_host['hostid'] => $db_host]);
 	}
 
 	/**
@@ -1851,8 +1798,6 @@ class CHost extends CHostGeneral {
 				continue;
 			}
 
-			$path = '/'.($i + 1);
-
 			if ($host['monitored_by'] == ZBX_MONITORED_BY_PROXY) {
 				if (!array_key_exists('proxyid', $host)) {
 					continue;
@@ -1860,7 +1805,7 @@ class CHost extends CHostGeneral {
 
 				if ($host['proxyid'] == 0) {
 					self::exception(ZBX_API_ERROR_PERMISSIONS, _s('Invalid parameter "%1$s": %2$s.',
-						$path.'/proxyid', _('object does not exist, or you have no permissions to it')
+						'/'.($i + 1).'/proxyid', _('object does not exist, or you have no permissions to it')
 					));
 				}
 
@@ -1876,7 +1821,7 @@ class CHost extends CHostGeneral {
 
 				if ($host['proxy_groupid'] == 0) {
 					self::exception(ZBX_API_ERROR_PERMISSIONS, _s('Invalid parameter "%1$s": %2$s.',
-						$path.'/proxy_groupid', _('object does not exist, or you have no permissions to it')
+						'/'.($i + 1).'/proxy_groupid', _('object does not exist, or you have no permissions to it')
 					));
 				}
 
@@ -1897,7 +1842,7 @@ class CHost extends CHostGeneral {
 			foreach ($host_indexes['proxyids'] as $proxyid => $i) {
 				if (!array_key_exists($proxyid, $db_proxies)) {
 					self::exception(ZBX_API_ERROR_PERMISSIONS, _s('Invalid parameter "%1$s": %2$s.',
-						$path.'/proxyid', _('object does not exist, or you have no permissions to it')
+						'/'.($i + 1).'/proxyid', _('object does not exist, or you have no permissions to it')
 					));
 				}
 			}
@@ -1913,7 +1858,7 @@ class CHost extends CHostGeneral {
 			foreach ($host_indexes['proxy_groupids'] as $proxy_groupid => $i) {
 				if (!array_key_exists($proxy_groupid, $db_proxy_groups)) {
 					self::exception(ZBX_API_ERROR_PERMISSIONS, _s('Invalid parameter "%1$s": %2$s.',
-						$path.'/proxy_groupid', _('object does not exist, or you have no permissions to it')
+						'/'.($i + 1).'/proxy_groupid', _('object does not exist, or you have no permissions to it')
 					));
 				}
 			}
