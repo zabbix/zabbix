@@ -181,7 +181,7 @@ static const char	*mock_token_type2str(zbx_uint32_t type)
 		ZBX_MOCK_TOKEN_CASE(NOP)
 	}
 
-	fail_msg("unknown token type: %u", type);
+	fail_msg("unknown token type: %" PRIu32, type);
 	return NULL;
 
 #undef ZBX_MOCK_TOKEN_CASE
