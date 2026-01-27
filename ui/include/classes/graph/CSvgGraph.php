@@ -1781,7 +1781,8 @@ class CSvgGraph extends CSvg {
 			if ($simple_triggers['value'] >= $y_min && $simple_triggers['value'] <= $y_max) {
 				$this->addItem(
 					(new CSvgGraphSimpleTrigger($simple_triggers['constant'], $simple_triggers['description'],
-						$simple_triggers['value'], $y_min, $y_max))
+						$simple_triggers['label_suffix'], $simple_triggers['value'], $y_min, $y_max
+					))
 						->setPosition($this->canvas_x, $this->canvas_y)
 						->setIndex($index)
 						->setSize($this->canvas_width, $this->canvas_height)

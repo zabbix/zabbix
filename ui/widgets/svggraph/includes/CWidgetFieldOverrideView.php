@@ -154,6 +154,9 @@ class CWidgetFieldOverrideView extends CWidgetFieldView {
 			'axisy' => _('Y-axis'),
 			'axisy'.GRAPH_YAXIS_SIDE_LEFT => _('Left'),
 			'axisy'.GRAPH_YAXIS_SIDE_RIGHT => _('Right'),
+			'inverted' => _('Invert values'),
+			'inverted'.SVG_GRAPH_INVERT_VALUES_OFF => _('Off'),
+			'inverted'.SVG_GRAPH_INVERT_VALUES_ON => _('On'),
 			'timeshift' => _('Time shift')
 		];
 	}
@@ -228,6 +231,9 @@ class CWidgetFieldOverrideView extends CWidgetFieldView {
 
 						['name' => _('Y-axis').'/'._('Left'), 'callback' => 'addOverride', 'args' => ['axisy', GRAPH_YAXIS_SIDE_LEFT]],
 						['name' => _('Y-axis').'/'._('Right'), 'callback' => 'addOverride', 'args' => ['axisy', GRAPH_YAXIS_SIDE_RIGHT]],
+
+						['name' => _('Invert values').'/'._('Off'), 'callback' => 'addOverride', 'args' => ['inverted', SVG_GRAPH_INVERT_VALUES_OFF]],
+						['name' => _('Invert values').'/'._('On'), 'callback' => 'addOverride', 'args' => ['inverted', SVG_GRAPH_INVERT_VALUES_ON]],
 
 						['name' => _('Time shift'), 'callback' => 'addOverride', 'args' => ['timeshift']]
 					]
