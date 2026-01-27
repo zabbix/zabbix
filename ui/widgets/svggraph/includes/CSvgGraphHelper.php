@@ -703,7 +703,7 @@ class CSvgGraphHelper {
 			if ($results) {
 				foreach ($tr_group['items'] as $index => $item) {
 					$metric = &$metrics[$index];
-					$multiplier = $metric['options']['invert_values'] ? -1 : 1;
+					$multiplier = $metric['options']['invert_values'] == SVG_GRAPH_INVERT_VALUES_ON ? -1 : 1;
 
 					// Collect and sort data points.
 					if (array_key_exists($item['itemid'], $results)) {
@@ -893,7 +893,7 @@ class CSvgGraphHelper {
 				}
 			}
 
-			$multiplier = $metric['options']['invert_values'] ? -1 : 1;
+			$multiplier = $metric['options']['invert_values'] == SVG_GRAPH_INVERT_VALUES_ON ? -1 : 1;
 			$approximation_functions = ['min', 'avg', 'max'];
 
 			switch ($metric['options']['aggregate_function']) {
@@ -1070,7 +1070,7 @@ class CSvgGraphHelper {
 				$value = $number_parser->calcValue();
 				$label_suffix = '';
 
-				if ($metric['options']['invert_values']) {
+				if ($metric['options']['invert_values'] == SVG_GRAPH_INVERT_VALUES_ON) {
 					$description .= ' ('._('inverted').')';
 					$value *= -1;
 					$label_suffix = ' ('._('inverted').')';

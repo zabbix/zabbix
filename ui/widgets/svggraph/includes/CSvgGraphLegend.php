@@ -111,7 +111,7 @@ class CSvgGraphLegend extends CDiv {
 
 			if ($this->show_statistic) {
 				if (array_key_exists('units', $item)) {
-					$multiplier = $item['invert_values'] ? -1 : 1;
+					$multiplier = $item['invert_values'] == SVG_GRAPH_INVERT_VALUES_ON ? -1 : 1;
 
 					$this->addItem([
 						(new CDiv(convertUnits([
