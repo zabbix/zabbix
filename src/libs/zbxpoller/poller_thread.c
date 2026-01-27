@@ -62,6 +62,9 @@
 #include "zbx_expression_constants.h"
 #include "zbxinterface.h"
 #include "zbxxml.h"
+#ifdef HAVE_ARES_QUERY_CACHE
+#include "zbxresolver.h"
+#endif
 
 void	zbx_free_agent_result_ptr(AGENT_RESULT *result)
 {
@@ -1042,7 +1045,9 @@ ZBX_THREAD_ENTRY(zbx_poller_thread, args)
 			server_num, get_process_type_string(process_type), process_num);
 
 	zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
-
+#ifdef HAVE_ARES_QUERY_CACHE
+	zbx_ares_library_init();
+#endif
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	zbx_tls_init_child(poller_args_in->config_comms->config_tls,
 			poller_args_in->zbx_get_program_type_cb_arg, zbx_dc_get_psk_by_identity);
