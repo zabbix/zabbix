@@ -854,6 +854,232 @@ class CFormValidatorTest extends TestCase {
 			],
 			[
 				['object', 'fields' => [
+					'items' => ['objects',
+						'fields' => [
+							'field1' => ['string']
+						],
+						'count_values' => 'string'
+					]
+				]],
+				null,
+				'[RULES ERROR] Count values condition should be an array (Path: /items)'
+			],
+			[
+				['object', 'fields' => [
+					'items' => ['objects',
+						'fields' => [
+							'field1' => ['string']
+						],
+						'count_values' => []
+					]
+				]],
+				['type' => 'object', 'fields' => [
+					'items' => [['type' => 'objects',
+						'fields' => [
+							'field1' => [['type' => 'string']]
+						],
+						'count_values' => []
+					]]
+				]]
+			],
+			[
+				['object', 'fields' => [
+					'items' => ['objects',
+						'fields' => [
+							'field1' => ['string']
+						],
+						'count_values' => ['string']
+					]
+				]],
+				null,
+				'[RULES ERROR] Count values rule should be an array (Path: /items)'
+			],
+			[
+				['object', 'fields' => [
+					'items' => ['objects',
+						'fields' => [
+							'field1' => ['string']
+						],
+						'count_values' => [['string']]
+					]
+				]],
+				null,
+				'[RULES ERROR] Unknown count values rule "0" (Path: /items)'
+			],
+			[
+				['object', 'fields' => [
+					'items' => ['objects',
+						'fields' => [
+							'field1' => ['string']
+						],
+						'count_values' => ['field_rules' => []]
+					]
+				]],
+				null,
+				'[RULES ERROR] Invalid number of parameters for "field_rules" option of "count_values" check (Path: /items)'
+			],
+			[
+				['object', 'fields' => [
+					'items' => ['objects',
+						'fields' => [
+							'field1' => ['string']
+						],
+						'count_values' => ['field_rules' => [1 => null]]
+					]
+				]],
+				null,
+				'[RULES ERROR] Invalid number of parameters for "field_rules" option of "count_values" check (Path: /items)'
+			],
+			[
+				['object', 'fields' => [
+					'items' => ['objects',
+						'fields' => [
+							'field1' => ['string']
+						],
+						'count_values' => [[]]
+					]
+				]],
+				null,
+				'[RULES ERROR] Counted field_rules is required (Path: /items)'
+			],
+			[
+				['object', 'fields' => [
+					'items' => ['objects',
+						'fields' => [
+							'field1' => ['string']
+						],
+						'count_values' => ['field_rules' => ['field', 'in']]
+					]
+				]],
+				null,
+				'[RULES ERROR] Only fields defined prior to this can be used for "count_values" checks (Path: /items, Field path: /items/field)'
+			],
+			[
+				['object', 'fields' => [
+					'items' => ['objects',
+						'fields' => [
+							'field1' => ['string']
+						],
+						'count_values' => ['field_rules' => ['field1', 'in']]
+					]
+				]],
+				null,
+				'[RULES ERROR] Unknown count values field rule "1" (Path: /items)'
+			],
+			[
+				['object', 'fields' => [
+					'items' => ['objects',
+						'fields' => [
+							'field1' => ['string']
+						],
+						'count_values' => ['field_rules' => ['field1', 'in' => 'string']]
+					]
+				]],
+				null,
+				'[RULES ERROR] Invalid value for rule "in" or "not_in" in "count_values" check (Path: /items, Field path: field1)'
+			],
+			[
+				['object', 'fields' => [
+					'items' => ['objects',
+						'fields' => [
+							'field1' => ['string']
+						],
+						'count_values' => ['field_rules' => ['field1', 'in' => []]]
+					]
+				]],
+				null,
+				'[RULES ERROR] Counted field requires min or max rule (Path: /items)'
+			],
+			[
+				['object', 'fields' => [
+					'items' => ['objects',
+						'fields' => [
+							'field1' => ['string']
+						],
+						'count_values' => [
+							'field_rules' => ['field1', 'in' => []],
+							'min' => 0
+						]
+					]
+				]],
+				['type' => 'object', 'fields' => [
+					'items' => [['type' => 'objects',
+						'fields' => [
+							'field1' => [['type' => 'string']]
+						],
+						'count_values' => [[
+							'field_rules' => [['field1', 'in' => []]],
+							'min' => 0
+						]]
+					]]
+				]]
+			],
+			[
+				['object', 'fields' => [
+					'items' => ['objects',
+						'fields' => [
+							'field1' => ['string']
+						],
+						'count_values' => [
+							'field_rules' => ['field1', 'in' => []],
+							'min' => null
+						]
+					]
+				]],
+				null,
+				'[RULES ERROR] Rule "min" should contain a number (Path: /items)'
+			],
+			[
+				['object', 'fields' => [
+					'items' => ['objects',
+						'fields' => [
+							'field1' => ['string']
+						],
+						'count_values' => [
+							'field_rules' => [
+								['field1', 'in' => []],
+								[]
+							]
+						]
+					]
+				]],
+				null,
+				'[RULES ERROR] Invalid number of parameters for "field_rules" option of "count_values" check (Path: /items)'
+			],
+			[
+				['object', 'fields' => [
+					'items' => ['objects',
+						'fields' => [
+							'field1' => ['string']
+						],
+						'count_values' => [
+							'field_rules' => [
+								['', 'in' => []]
+							]
+						]
+					]
+				]],
+				null,
+				'[RULES ERROR] Invalid field name for "field_rules" option of "count_values" check (Path: /items)'
+			],
+			[
+				['object', 'fields' => [
+					'items' => ['objects',
+						'fields' => [
+							'field1' => ['string']
+						],
+						'count_values' => [
+							'field_rules' => [
+								[1 => 'field1', 'in' => []]
+							]
+						]
+					]
+				]],
+				null,
+				'[RULES ERROR] Missing field name parameter for "field_rules" option of "count_values" check (Path: /items)'
+			],
+			[
+				['object', 'fields' => [
 					'items_enabled' => ['boolean'],
 					'items' => ['objects',
 						'fields' => [
