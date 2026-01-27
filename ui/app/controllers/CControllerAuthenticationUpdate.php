@@ -308,7 +308,8 @@ class CControllerAuthenticationUpdate extends CController {
 							'in' => [TOTP_HASH_SHA1, TOTP_HASH_SHA256, TOTP_HASH_SHA512],
 							'when' => ['type', 'in' => [MFA_TYPE_TOTP]]
 						],
-						'code_length' => ['db mfa.code_length', 'required', 'in' => [TOTP_CODE_LENGTH_6, TOTP_CODE_LENGTH_8],
+						'code_length' => ['db mfa.code_length', 'required',
+							'in' => [TOTP_CODE_LENGTH_6, TOTP_CODE_LENGTH_8],
 							'when' => ['type', 'in' => [MFA_TYPE_TOTP]]
 						],
 						'api_hostname' => ['db mfa.api_hostname', 'required', 'not_empty',
@@ -317,8 +318,11 @@ class CControllerAuthenticationUpdate extends CController {
 						'clientid' => ['db mfa.clientid', 'required', 'not_empty',
 							'when' => ['type', 'in' => [MFA_TYPE_DUO]]
 						],
-						'client_secret' => ['db mfa.client_secret', 'not_empty', 'when' => ['type', 'in' => [MFA_TYPE_DUO]]]
-					]
+						'client_secret' => ['db mfa.client_secret', 'not_empty',
+							'when' => ['type', 'in' => [MFA_TYPE_DUO]]
+						]
+					],
+					'when' => ['mfa_status', 'in' => [MFA_DISABLED]]
 				],
 				[
 					'objects', 'required', 'not_empty', 'uniq' => ['name'],
@@ -330,7 +334,8 @@ class CControllerAuthenticationUpdate extends CController {
 							'in' => [TOTP_HASH_SHA1, TOTP_HASH_SHA256, TOTP_HASH_SHA512],
 							'when' => ['type', 'in' => [MFA_TYPE_TOTP]]
 						],
-						'code_length' => ['db mfa.code_length', 'required', 'in' => [TOTP_CODE_LENGTH_6, TOTP_CODE_LENGTH_8],
+						'code_length' => ['db mfa.code_length', 'required',
+							'in' => [TOTP_CODE_LENGTH_6, TOTP_CODE_LENGTH_8],
 							'when' => ['type', 'in' => [MFA_TYPE_TOTP]]
 						],
 						'api_hostname' => ['db mfa.api_hostname', 'required', 'not_empty',
@@ -339,7 +344,9 @@ class CControllerAuthenticationUpdate extends CController {
 						'clientid' => ['db mfa.clientid', 'required', 'not_empty',
 							'when' => ['type', 'in' => [MFA_TYPE_DUO]]
 						],
-						'client_secret' => ['db mfa.client_secret', 'not_empty', 'when' => ['type', 'in' => [MFA_TYPE_DUO]]]
+						'client_secret' => ['db mfa.client_secret', 'not_empty',
+							'when' => ['type', 'in' => [MFA_TYPE_DUO]]
+						]
 					],
 					'when' => ['mfa_status', 'in' => [MFA_ENABLED]]
 				]
