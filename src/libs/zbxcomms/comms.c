@@ -15,8 +15,8 @@
 #include "zbxcomms.h"
 #include "comms.h"
 #include "zbxstr.h"
-
 #include "zbxip.h"
+#include "zbxnum.h"
 #else
 #include "zbxcomms.h"
 #include "comms.h"
@@ -33,7 +33,6 @@
 #ifdef HAVE_ARES_QUERY_CACHE
 #include "zbxresolver.h"
 #endif
-#include "zbxnum.h"
 #endif
 
 #if !defined(WITH_AGENT2_METRICS)
