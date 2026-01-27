@@ -115,7 +115,7 @@ class testDiscoveryRule extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/1/lifetime_type": value must be one of '.implode(', ', [ZBX_LLD_DELETE_AFTER, ZBX_LLD_DELETE_NEVER, ZBX_LLD_DELETE_IMMEDIATELY]).'.'
 			],
-			'Test invalid lifetime value when deletin immediately' => [
+			'Test invalid lifetime value when deleting immediately' => [
 				'discoveryrule' => [
 					'name' => 'API LLD rule delete immediately',
 					'key_' => 'apillddeletenow',
