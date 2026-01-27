@@ -40,7 +40,7 @@
 		var $this = $(this),
 			$container = $this.closest('.macro-input-group'),
 			$input_container = $('.input-secret, .textarea-flexible', $container),
-			$input = $('.input-secret input[type=password], .textarea-flexible', $container),
+			$input = $('.input-secret input[type=password], z-textarea-flexible', $container),
 			$dropdown_value = $('.dropdown-value', $container);
 
 		$input_container.replaceWith(
