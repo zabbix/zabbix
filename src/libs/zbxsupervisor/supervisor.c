@@ -651,6 +651,10 @@ static void	sypervisor_get_activities(zbx_ipc_client_t *client)
 
 static void	supervisor_init_libraries(const char *progname)
 {
+#ifndef HAVE_NETSNMP
+	ZBX_UNUSED(progname);
+#endif
+
 #ifdef HAVE_LIBXML2
 	xmlInitParser();
 #endif
@@ -667,6 +671,10 @@ static void	supervisor_init_libraries(const char *progname)
 
 static void	supervisor_clear_libraries(const char *progname)
 {
+#ifndef HAVE_NETSNMP
+	ZBX_UNUSED(progname);
+#endif
+
 #ifdef HAVE_LIBXML2
 	xmlCleanupParser();
 #endif

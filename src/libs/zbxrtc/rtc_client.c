@@ -438,6 +438,8 @@ void	zbx_rtc_subscribe_service(unsigned char proc_type, int proc_num, zbx_uint32
 		zbx_exit(EXIT_FAILURE);
 	}
 
+	zbx_serialize_prepare_str_len(data_len, service, service_len);
+
 	zbx_serialize_prepare_value(data_len, proc_type);
 	zbx_serialize_prepare_value(data_len, proc_num);
 	zbx_serialize_prepare_value(data_len, msgs_num);
@@ -445,9 +447,9 @@ void	zbx_rtc_subscribe_service(unsigned char proc_type, int proc_num, zbx_uint32
 	for (int i = 0; i < msgs_num; i++)
 		zbx_serialize_prepare_value(data_len, msgs[i]);
 
-	zbx_serialize_prepare_str_len(data_len, service, service_len);
-
 	ptr = data = (unsigned char *)zbx_malloc(NULL, (size_t)data_len);
+
+	ptr += zbx_serialize_str(ptr, service, service_len);
 
 	ptr += zbx_serialize_value(ptr, proc_type);
 	ptr += zbx_serialize_value(ptr, proc_num);
@@ -455,8 +457,6 @@ void	zbx_rtc_subscribe_service(unsigned char proc_type, int proc_num, zbx_uint32
 
 	for (int i = 0; i < msgs_num; i++)
 		ptr += zbx_serialize_value(ptr, msgs[i]);
-
-	(void)zbx_serialize_str(ptr, service, service_len);
 
 	if (FAIL == zbx_ipc_socket_write(&sock, ZBX_RTC_SUBSCRIBE_SERVICE, data, data_len))
 	{

@@ -38,11 +38,19 @@ zbx_rtc_sub_source_t;
 
 typedef struct
 {
+	unsigned char	process_type;
+	int		process_num;
+	zbx_uint32_t	code;
+}
+zbx_rtc_msg_t;
+
+ZBX_VECTOR_DECL(rtc_msg, zbx_rtc_msg_t)
+
+typedef struct
+{
 	zbx_rtc_sub_type_t	type;
 	zbx_rtc_sub_source_t	source;
-	unsigned char		process_type;
-	int			process_num;
-	zbx_vector_uint32_t	msgs;
+	zbx_vector_rtc_msg_t	msgs;
 }
 zbx_rtc_sub_t;
 
