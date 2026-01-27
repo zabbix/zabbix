@@ -123,10 +123,6 @@ jQuery(function($) {
 		var sections;
 
 		switch (data.type) {
-			case 'history':
-				sections = getMenuPopupHistory(data);
-				break;
-
 			case 'host':
 				sections = getMenuPopupHost(data, $obj);
 				break;
