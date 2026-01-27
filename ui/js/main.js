@@ -875,7 +875,17 @@ const hintBox = {
 			document.addEventListener('mouseup', hintBox.drag_listeners.dragStop);
 		},
 		dragMove: function(e) {
-			if (hintBox.draggable_element !== null && !hintBox.is_dragging) {
+			if (hintBox.is_dragging) {
+				return;
+			}
+
+			hintBox.is_dragging = true;
+
+			requestAnimationFrame(() => {
+				if (hintBox.draggable_element === null) {
+					return;
+				}
+
 				const parent = hintBox.draggable_element.offsetParent;
 				const hintbox_rect = hintBox.draggable_element.getBoundingClientRect();
 
@@ -885,15 +895,11 @@ const hintBox = {
 				const left = Math.min(Math.max(0, e.clientX - hintBox.offsetX), max_left);
 				const top = Math.min(Math.max(0, e.clientY - hintBox.offsetY), max_top);
 
-				hintBox.is_dragging = true;
+				hintBox.draggable_element.style.left = `${left}px`;
+				hintBox.draggable_element.style.top = `${top}px`;
 
-				requestAnimationFrame(() => {
-					hintBox.draggable_element.style.left = `${left}px`;
-					hintBox.draggable_element.style.top = `${top}px`;
-
-					hintBox.is_dragging = false;
-				});
-			}
+				hintBox.is_dragging = false;
+			});
 		},
 		dragStop: function () {
 			hintBox.drag_style.remove();
