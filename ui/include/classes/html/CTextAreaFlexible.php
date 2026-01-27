@@ -16,6 +16,13 @@
 
 class CTextAreaFlexible extends CTag {
 	/**
+	 * Default maxlength of textarea.
+	 *
+	 * @var int
+	 */
+	protected $default_maxlength = 255;
+
+	/**
 	 * CTextAreaFlexible constructor.
 	 *
 	 * @param string $name
@@ -30,7 +37,8 @@ class CTextAreaFlexible extends CTag {
 			->setName($name)
 			->setAttribute('value', $value)
 			->setAttribute('data-field-type', 'z-textarea-flexible')
-			->setAttribute('singleline', 'singleline');
+			->setAttribute('singleline', 'singleline')
+			->setAttribute('maxlength', $this->default_maxlength);
 	}
 
 	public function setSingleline(bool $is_singleline = true): self {
