@@ -549,12 +549,17 @@ class CConfigurationImportcompare {
 				unset($has_inner_entities['before'], $has_inner_entities['after']);
 				$has_inner_entities = count($has_inner_entities) > 0;
 
-				if ($has_inner_entities || array_key_exists($key, $stored_changes)
-						|| $entity['after'] !== $entity['before']) {
+				if ($has_inner_entities || array_key_exists($key, $stored_changes)) {
 					if (!$options['updateExisting']) {
 						$entity['after'] = $entity['before'];
 					}
+
 					$new_updated[] = $entity;
+				}
+				else {
+					if ($options['updateExisting'] && $entity['after'] !== $entity['before']) {
+						$new_updated[] = $entity;
+					}
 				}
 			}
 
