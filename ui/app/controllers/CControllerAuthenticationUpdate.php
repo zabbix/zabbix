@@ -204,14 +204,17 @@ class CControllerAuthenticationUpdate extends CController {
 			],
 			'disabled_usrgrpid' => [
 				['setting disabled_usrgrpid'],
-				['setting disabled_usrgrpid', 'required', 'when' => [
-					['ldap_auth_enabled', 'in' => [ZBX_AUTH_LDAP_ENABLED]],
-					['ldap_jit_status', 'in' => [JIT_PROVISIONING_ENABLED]]
-				]],
-				['setting disabled_usrgrpid', 'required', 'when' => [
+				['setting disabled_usrgrpid', 'required',
+					'when' => [
+						['ldap_auth_enabled', 'in' => [ZBX_AUTH_LDAP_ENABLED]],
+						['ldap_jit_status', 'in' => [JIT_PROVISIONING_ENABLED]]
+					]
+				],
+				['setting disabled_usrgrpid', 'required',
+					'when' => [
 						['saml_auth_enabled', 'in' => [ZBX_AUTH_SAML_ENABLED]],
 						['saml_jit_status', 'in' => [JIT_PROVISIONING_ENABLED]]
-					],
+					]
 				]
 			],
 			'idp_entityid' => ['db userdirectory_saml.idp_entityid', 'required', 'not_empty',
