@@ -81,8 +81,7 @@ $messaging_form_list = (new CFormList())
 				1 => _('Once'),
 				10 => _n('%1$s second', '%1$s seconds', 10),
 				-1 => _('Message timeout')
-			])),
-		'repeat_row'
+			]))
 	);
 
 $zbx_sounds = array_flip(getSounds());
@@ -140,7 +139,7 @@ for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_C
 }
 
 $messaging_form_list
-	->addRow(_('Trigger severity'), $triggers_table, 'triggers_row')
+	->addRow(_('Trigger severity'), $triggers_table)
 	->addRow(_('Show suppressed problems'),
 		(new CCheckBox('messages[show_suppressed]'))
 			->setChecked($data['messages']['show_suppressed'] == ZBX_PROBLEM_SUPPRESSED_TRUE)
