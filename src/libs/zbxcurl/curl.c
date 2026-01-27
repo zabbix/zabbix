@@ -55,8 +55,8 @@ CURLMcode	zbx_curl_multi_wait(CURLM *multi_handle, int timeout_ms, int *numfds)
 		short		revents;
 	};
 #endif
-	static void		*handle;
-	static CURLMcode	(*fptr)(CURLM *, struct curl_waitfd *, unsigned int, int, int *) = NULL;
+	static ZBX_THREAD_LOCAL void		*handle;
+	static ZBX_THREAD_LOCAL CURLMcode	(*fptr)(CURLM *, struct curl_waitfd *, unsigned int, int, int *) = NULL;
 
 	if (NULL == fptr)
 	{
@@ -139,8 +139,9 @@ const char	*zbx_curl_content_type(CURL *easyhandle)
 		void		*anchor;
 	};
 #endif
-	static void		*handle;
-	static CURLHcode	(*fptr)(CURL *, const char *, size_t, unsigned int, int, struct curl_header **) = NULL;
+	static ZBX_THREAD_LOCAL void		*handle;
+	static ZBX_THREAD_LOCAL CURLHcode	(*fptr)(CURL *, const char *, size_t, unsigned int, int,
+			struct curl_header **) = NULL;
 
 	struct curl_header	*type;
 	unsigned int		origin;
