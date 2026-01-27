@@ -15,7 +15,7 @@
 #include "zbxcomms.h"
 #include "comms.h"
 #include "zbxstr.h"
-#include "zbxlog.h"
+
 #include "zbxip.h"
 #else
 #include "zbxcomms.h"
@@ -26,14 +26,14 @@
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 #include "tls.h"
 #endif
-#include "zbxlog.h"
 #include "zbxcompress.h"
-#include "zbxstr.h"
 #include "zbxnum.h"
-#include "zbxip.h"
 #include "zbxtime.h"
 #include "zbxcrypto.h"
+#ifdef HAVE_ARES_QUERY_CACHE
 #include "zbxresolver.h"
+#endif
+#include "zbxnum.h"
 #endif
 
 #if !defined(WITH_AGENT2_METRICS)
