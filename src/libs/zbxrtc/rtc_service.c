@@ -748,10 +748,12 @@ static void	rtc_subscribe(zbx_rtc_t *rtc, zbx_ipc_client_t *client, const unsign
 	int		process_num;
 
 	sub = (zbx_rtc_sub_t *)zbx_malloc(NULL, sizeof(zbx_rtc_sub_t));
+	sub->type = ZBX_RTC_SUB_CLIENT;
 	zbx_vector_rtc_msg_create(&sub->msgs);
 
-	sub->type = ZBX_RTC_SUB_CLIENT;
 	sub->source.client = client;
+	zbx_ipc_client_addref(client);
+
 	data += zbx_deserialize_value(data, &process_type);
 	data += zbx_deserialize_value(data, &process_num);
 	rtc_deserialize_msgs(data, process_type, process_num, &sub->msgs);
@@ -825,6 +827,7 @@ static void	rtc_unsubscribe_service(zbx_rtc_t *rtc, const unsigned char *data)
 	zbx_uint32_t	service_len;
 
 	(void)zbx_deserialize_str(data, &service, service_len);
+
 
 	for (int i = 0; i < rtc->subs.values_num; i++)
 	{
