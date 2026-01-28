@@ -340,9 +340,7 @@ class testTagBasedPermissions extends CLegacyWebTest {
 						$this->query('link', $hostgroup)->waitUntilVisible()->one()->click();
 
 						if ($tag !== '' || $value !== '') {
-							$form->fill(['Filter' => 'Tag list', 'id:new_tag_filter_0_tag' => $tag,
-									'id:new_tag_filter_0_value' => $value]
-							);
+							$form->fill(['id:new_tag_filter_0_tag' => $tag, 'id:new_tag_filter_0_value' => $value]);
 						}
 
 						$form->submit();
