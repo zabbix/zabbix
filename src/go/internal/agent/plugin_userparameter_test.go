@@ -31,67 +31,71 @@ var results = []Result{ //nolint:gochecknoglobals // const for tests.
 				"do partitionlist=\"$partitionlist,\"'{\"{#PARTITION}\":\"'$partition'\"}'; " +
 				"done; echo '{\"data\":['${partitionlist#,}']}'",
 			"vfs.partitions.discovery.solaris,/somewhere/solaris_partitions.sh"},
+		failed: false,
 	},
 	{
-		failed: true,
 		data:   []string{""},
+		failed: true,
 	},
 	{
-		failed: true,
 		data:   []string{","},
+		failed: true,
 	},
 	{
-		failed: true,
 		data:   []string{"a"},
+		failed: true,
 	},
 	{
-		failed: true,
 		data:   []string{"a,"},
+		failed: true,
 	},
 	{
-		failed: true,
 		data:   []string{"a,"},
+		failed: true,
 	},
 	{
-		failed: true,
 		data:   []string{"!,a"},
-	},
-	{
-		data: []string{"a,a"},
-	},
-	{
 		failed: true,
+	},
+	{
+		data:   []string{"a,a"},
+		failed: false,
+	},
+	{
 		data:   []string{"a[,a"},
+		failed: true,
 	},
 	{
-		failed: true,
 		data:   []string{"a[],a"},
+		failed: true,
 	},
 	{
-		failed: true,
 		data:   []string{"a[b],a"},
+		failed: true,
 	},
 	{
-		failed: true,
 		data:   []string{"a[*,a"},
+		failed: true,
 	},
 	{
-		failed: true,
 		data:   []string{"a*],a"},
-	},
-	{
-		data: []string{"a[*],a"},
-	},
-	{
-		data: []string{"a[ *],a"},
-	},
-	{
 		failed: true,
+	},
+	{
+		data:   []string{"a[*],a"},
+		failed: false,
+	},
+	{
+		data:   []string{"a[ *],a"},
+		failed: false,
+	},
+	{
 		data:   []string{"a[* ],a"},
+		failed: true,
 	},
 	{
-		failed: true,
 		data:   []string{"a[ * ],a"},
+		failed: true,
 	},
 }
 
@@ -349,7 +353,8 @@ var resultsCmd = []Result{ //nolint:gochecknoglobals // const for tests.
 		data: []string{"a[*],echo $1"},
 		input: []Input{
 			{
-				failed: true, key: "a",
+				failed: true,
+				key:    "a",
 				params: []string{"\\'\"`*?[]{}~$!&;()<>|#@\n"},
 				cmd:    "",
 			},
