@@ -20,21 +20,7 @@ import (
 	"golang.zabbix.com/sdk/plugin"
 )
 
-type Input struct {
-	key    string
-	params []string
-	cmd    string
-	failed bool
-}
-
-type Result struct {
-	data                 []string
-	failed               bool
-	input                []Input
-	unsafeUserParameters int
-}
-
-var results = []Result{
+var results = []Result{ //nolint:gochecknoglobals // const for tests.
 	{
 		data: []string{"system.test,who | wc -l",
 			"vfs.dir.size[*],dir=\"$1\"; du -s -B 1 \"${dir:-/tmp}\" | cut -f1",
@@ -109,24 +95,7 @@ var results = []Result{
 	},
 }
 
-func TestUserParameterPlugin(t *testing.T) { //nolint:paralleltest // not possible because of plugin.Metrics.
-	for i := range results { //nolint:paralleltest // not possible because of plugin.Metrics.
-		t.Run(results[i].data[0], func(t *testing.T) {
-			plugin.Metrics = make(map[string]*plugin.Metric)
-
-			_, err := InitUserParameterPlugin(results[i].data, results[i].unsafeUserParameters, "")
-			if err != nil {
-				if !results[i].failed {
-					t.Errorf("Expected success while got error %s", err)
-				}
-			} else if results[i].failed {
-				t.Errorf("Expected error while got success")
-			}
-		})
-	}
-}
-
-var resultsCmd = []Result{
+var resultsCmd = []Result{ //nolint:gochecknoglobals // const for tests.
 	{
 		data: []string{"system.test,who | wc -l",
 			"vfs.dir.size[*],dir=\"$1\"; du -s -B 1 \"${dir:-/tmp}\" | cut -f1",
@@ -416,6 +385,37 @@ var resultsCmd = []Result{
 			},
 		},
 	},
+}
+
+type Input struct {
+	key    string
+	params []string
+	cmd    string
+	failed bool
+}
+
+type Result struct {
+	data                 []string
+	failed               bool
+	input                []Input
+	unsafeUserParameters int
+}
+
+func TestUserParameterPlugin(t *testing.T) { //nolint:paralleltest // not possible because of plugin.Metrics.
+	for i := range results { //nolint:paralleltest // not possible because of plugin.Metrics.
+		t.Run(results[i].data[0], func(t *testing.T) {
+			plugin.Metrics = make(map[string]*plugin.Metric)
+
+			_, err := InitUserParameterPlugin(results[i].data, results[i].unsafeUserParameters, "")
+			if err != nil {
+				if !results[i].failed {
+					t.Errorf("Expected success while got error %s", err)
+				}
+			} else if results[i].failed {
+				t.Errorf("Expected error while got success")
+			}
+		})
+	}
 }
 
 func TestCmd(t *testing.T) { //nolint:paralleltest // not possible because of plugin.Metrics.
