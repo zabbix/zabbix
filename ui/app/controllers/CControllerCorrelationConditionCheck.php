@@ -24,25 +24,70 @@ class CControllerCorrelationConditionCheck extends CController {
 
 	public static function getValidationRules(): array {
 		return ['object', 'fields' => [
-			'type' => ['db corr_condition.type', 'required', 'in' => [ZBX_CORR_CONDITION_OLD_EVENT_TAG, ZBX_CORR_CONDITION_NEW_EVENT_TAG, ZBX_CORR_CONDITION_NEW_EVENT_HOSTGROUP, ZBX_CORR_CONDITION_EVENT_TAG_PAIR, ZBX_CORR_CONDITION_OLD_EVENT_TAG_VALUE, ZBX_CORR_CONDITION_NEW_EVENT_TAG_VALUE]],
+			'type' => ['db corr_condition.type', 'required',
+				'in' => [ZBX_CORR_CONDITION_OLD_EVENT_TAG, ZBX_CORR_CONDITION_NEW_EVENT_TAG,
+					ZBX_CORR_CONDITION_NEW_EVENT_HOSTGROUP, ZBX_CORR_CONDITION_EVENT_TAG_PAIR,
+					ZBX_CORR_CONDITION_OLD_EVENT_TAG_VALUE, ZBX_CORR_CONDITION_NEW_EVENT_TAG_VALUE
+				]
+			],
 			'operator' => [
-				['db conditions.operator', 'required', 'in' => [CONDITION_OPERATOR_EQUAL], 'when' => ['type', 'in' => [ZBX_CORR_CONDITION_OLD_EVENT_TAG, ZBX_CORR_CONDITION_NEW_EVENT_TAG, ZBX_CORR_CONDITION_EVENT_TAG_PAIR]]],
-				['db corr_condition_group.operator', 'required', 'in' => [CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL], 'when' => ['type', 'in' => [ZBX_CORR_CONDITION_NEW_EVENT_HOSTGROUP]]],
-				['db corr_condition_tagvalue.operator', 'required', 'in' => [CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL, CONDITION_OPERATOR_LIKE, CONDITION_OPERATOR_NOT_LIKE], 'when' => ['type', 'in' => [ZBX_CORR_CONDITION_OLD_EVENT_TAG_VALUE, ZBX_CORR_CONDITION_NEW_EVENT_TAG_VALUE]]]
+				['db conditions.operator', 'required', 'in' => [CONDITION_OPERATOR_EQUAL],
+					'when' => ['type',
+						'in' => [ZBX_CORR_CONDITION_OLD_EVENT_TAG, ZBX_CORR_CONDITION_NEW_EVENT_TAG,
+							ZBX_CORR_CONDITION_EVENT_TAG_PAIR
+						]
+					]
+				],
+				['db corr_condition_group.operator', 'required',
+					'in' => [CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL],
+					'when' => ['type', 'in' => [ZBX_CORR_CONDITION_NEW_EVENT_HOSTGROUP]]
+				],
+				['db corr_condition_tagvalue.operator', 'required',
+					'in' => [CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL, CONDITION_OPERATOR_LIKE,
+						CONDITION_OPERATOR_NOT_LIKE
+					],
+					'when' => ['type', 'in' => [ZBX_CORR_CONDITION_OLD_EVENT_TAG_VALUE,
+						ZBX_CORR_CONDITION_NEW_EVENT_TAG_VALUE
+					]]
+				]
 			],
 			'tag' => [
-				['db corr_condition_tag.tag', 'required', 'not_empty', 'when' => ['type', 'in' => [ZBX_CORR_CONDITION_OLD_EVENT_TAG, ZBX_CORR_CONDITION_NEW_EVENT_TAG]]],
-				['db corr_condition_tagvalue.tag', 'required', 'not_empty', 'when' => ['type', 'in' => [ZBX_CORR_CONDITION_OLD_EVENT_TAG_VALUE, ZBX_CORR_CONDITION_NEW_EVENT_TAG_VALUE]]]
+				['db corr_condition_tag.tag', 'required', 'not_empty',
+					'when' => ['type', 'in' => [ZBX_CORR_CONDITION_OLD_EVENT_TAG,
+						ZBX_CORR_CONDITION_NEW_EVENT_TAG
+					]]
+				],
+				['db corr_condition_tagvalue.tag', 'required', 'not_empty',
+					'when' => ['type', 'in' => [ZBX_CORR_CONDITION_OLD_EVENT_TAG_VALUE,
+						ZBX_CORR_CONDITION_NEW_EVENT_TAG_VALUE
+					]]
+				]
 			],
-			'oldtag' => ['db corr_condition_tagpair.oldtag', 'required', 'not_empty', 'when' => ['type', 'in' => [ZBX_CORR_CONDITION_EVENT_TAG_PAIR]]],
-			'newtag' => ['db corr_condition_tagpair.newtag', 'required', 'not_empty', 'when' => ['type', 'in' => [ZBX_CORR_CONDITION_EVENT_TAG_PAIR]]],
-			'value' => ['db corr_condition_tagvalue.value', 'required', 'not_empty', 'when' => [
-				['type', 'in' => [ZBX_CORR_CONDITION_OLD_EVENT_TAG_VALUE, ZBX_CORR_CONDITION_NEW_EVENT_TAG_VALUE]],
-				['operator', 'in' => [CONDITION_OPERATOR_LIKE, CONDITION_OPERATOR_NOT_LIKE]]
-			]],
-			'groupid' => ['array', 'field' => [
-				'db corr_condition_group.groupid', 'required'
-			], 'required', 'not_empty', 'when' => ['type', 'in' => [ZBX_CORR_CONDITION_NEW_EVENT_HOSTGROUP]]],
+			'oldtag' => ['db corr_condition_tagpair.oldtag', 'required', 'not_empty',
+				'when' => ['type', 'in' => [ZBX_CORR_CONDITION_EVENT_TAG_PAIR]]
+			],
+			'newtag' => ['db corr_condition_tagpair.newtag', 'required', 'not_empty',
+				'when' => ['type', 'in' => [ZBX_CORR_CONDITION_EVENT_TAG_PAIR]]
+			],
+			'value' => [
+				['db corr_condition_tagvalue.value', 'required',
+					'when' => ['type', 'in' => [ZBX_CORR_CONDITION_OLD_EVENT_TAG_VALUE,
+						ZBX_CORR_CONDITION_NEW_EVENT_TAG_VALUE
+					]]
+				],
+				['db corr_condition_tagvalue.value', 'required', 'not_empty',
+					'when' => [
+						['type', 'in' => [ZBX_CORR_CONDITION_OLD_EVENT_TAG_VALUE,
+							ZBX_CORR_CONDITION_NEW_EVENT_TAG_VALUE
+						]],
+						['operator', 'in' => [CONDITION_OPERATOR_LIKE, CONDITION_OPERATOR_NOT_LIKE]]
+					]
+				]
+			],
+			'groupid' => ['array', 'required', 'not_empty',
+				'field' => ['db corr_condition_group.groupid', 'required'],
+				'when' => ['type', 'in' => [ZBX_CORR_CONDITION_NEW_EVENT_HOSTGROUP]]
+			],
 			'formulaid' => ['string']
 		]];
 	}
