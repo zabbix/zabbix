@@ -679,6 +679,30 @@ static zbx_uint64_t	add_discovered_host(const zbx_db_event *event, int *status, 
 				zbx_db_insert_execute(&db_insert);
 				zbx_db_insert_clean(&db_insert);
 
+				if (HOST_MONITORED_BY_PROXY_GROUP == new_monitored_by && 0 != proxyid)
+				{
+					zbx_db_insert_t	db_insert_host_proxy;
+					zbx_uint64_t	hostproxyid;
+					zbx_db_result_t	hp_result;
+
+					hp_result = zbx_db_select("select hostproxyid from host_proxy where "
+							"hostid=" ZBX_FS_UI64, hostid);
+
+					if (NULL == zbx_db_fetch(hp_result))
+					{
+						hostproxyid = zbx_db_get_maxid("host_proxy");
+
+						zbx_db_insert_prepare(&db_insert_host_proxy, "host_proxy",
+								"hostproxyid", "hostid", "proxyid", "revision", NULL);
+						zbx_db_insert_add_values(&db_insert_host_proxy, hostproxyid, hostid,
+								proxyid, 0);
+						zbx_db_insert_execute(&db_insert_host_proxy);
+						zbx_db_insert_clean(&db_insert_host_proxy);
+					}
+
+					zbx_db_free_result(hp_result);
+				}
+
 				zbx_db_insert_prepare(&db_insert_host_rtdata, "host_rtdata", "hostid",
 						"active_available", (char *)NULL);
 
