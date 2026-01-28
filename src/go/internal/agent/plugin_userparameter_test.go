@@ -75,8 +75,6 @@ func TestUserParameterPlugin(t *testing.T) {
 	}
 }
 
-const notAllowedCharacters = "\\'\"`*?[]{}~$!&;()<>|#@\n"
-
 var resultsCmd = []Result{
 	Result{data: []string{"system.test,who | wc -l",
 		"vfs.dir.size[*],dir=\"$1\"; du -s -B 1 \"${dir:-/tmp}\" | cut -f1",
