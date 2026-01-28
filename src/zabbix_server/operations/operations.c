@@ -675,13 +675,21 @@ static zbx_uint64_t	add_discovered_host(const zbx_db_event *event, int *status, 
 				if (HOST_MONITORED_BY_PROXY_GROUP == new_monitored_by && 0 != proxyid)
 				{
 					zbx_db_insert_t	db_insert_host_proxy;
-					zbx_uint64_t	hostproxyid;
+					zbx_uint64_t	hostproxyid, existing_proxyid = 0;
 					zbx_db_result_t	hp_result;
+					zbx_db_row_t	hp_row;
 
-					hp_result = zbx_db_select("select hostproxyid from host_proxy where "
-							"hostid=" ZBX_FS_UI64, hostid);
+					hp_result = zbx_db_select("select hostproxyid,proxyid from host_proxy where"
+							" hostid=" ZBX_FS_UI64, hostid);
 
-					if (NULL == zbx_db_fetch(hp_result))
+					if (NULL != (hp_row = zbx_db_fetch(hp_result)))
+					{
+						ZBX_DBROW2UINT64(existing_proxyid, hp_row[1]);
+					}
+
+					zbx_db_free_result(hp_result);
+
+					if (0 == existing_proxyid)
 					{
 						hostproxyid = zbx_db_get_maxid("host_proxy");
 
@@ -692,8 +700,11 @@ static zbx_uint64_t	add_discovered_host(const zbx_db_event *event, int *status, 
 						zbx_db_insert_execute(&db_insert_host_proxy);
 						zbx_db_insert_clean(&db_insert_host_proxy);
 					}
-
-					zbx_db_free_result(hp_result);
+					else if (existing_proxyid != proxyid)
+					{
+						zbx_db_execute("update host_proxy set proxyid=" ZBX_FS_UI64" where"
+								" hostid=" ZBX_FS_UI64, proxyid, hostid);
+					}
 				}
 
 				zbx_db_insert_prepare(&db_insert_host_rtdata, "host_rtdata", "hostid",
