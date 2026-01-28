@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 0);
 /*
 ** Copyright (C) 2001-2026 Zabbix SIA
 **
@@ -20,7 +20,7 @@ class CTextAreaFlexible extends CTag {
 	 *
 	 * @var int
 	 */
-	protected $default_maxlength = 255;
+	protected int $default_maxlength = 255;
 
 	/**
 	 * CTextAreaFlexible constructor.
