@@ -391,6 +391,26 @@ static int	DBpatch_7050027(void)
 
 	return SUCCEED;
 }
+
+static int	DBpatch_7050028(void)
+{
+	if (ZBX_DB_OK > zbx_db_execute("delete from role_rule"
+			" where name like 'api.method.%%'"
+				" and value_str in ("
+					"'*.massupdate',"
+					"'host.massupdate',"
+					"'hostgroup.massupdate',"
+					"'template.massupdate',"
+					"'templategroup.massupdate',"
+					"'*.replacehostinterfaces',"
+					"'hostinterface.replacehostinterfaces'"
+				")"))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
 #endif
 
 DBPATCH_START(7050)
@@ -425,5 +445,6 @@ DBPATCH_ADD(7050024, 0, 1)
 DBPATCH_ADD(7050025, 0, 1)
 DBPATCH_ADD(7050026, 0, 1)
 DBPATCH_ADD(7050027, 0, 1)
+DBPATCH_ADD(7050028, 0, 1)
 
 DBPATCH_END()
