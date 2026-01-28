@@ -328,24 +328,14 @@ var resultsCmd = []Result{ //nolint:gochecknoglobals // const for tests.
 			},
 		},
 	},
-
 	{
-		data: []string{"a,echo \\'\"`*?[]{}~$!&;()<>|#@\n"},
+		data: []string{"a[*],echo $1"},
 		input: []Input{
 			{
+				failed: true,
 				key:    "a",
-				params: []string{},
-				cmd:    "echo \\'\"`*?[]{}~$!&;()<>|#@\n",
-			},
-		},
-	},
-	{
-		data: []string{"a[*],echo $1 \\'\"`*?[]{}~$!&;()<>|#@\n"},
-		input: []Input{
-			{
-				key:    "a",
-				params: []string{"foo"},
-				cmd:    "echo foo \\'\"`*?[]{}~$!&;()<>|#@\n",
+				params: []string{"%"},
+				cmd:    "",
 			},
 		},
 	},
@@ -355,7 +345,60 @@ var resultsCmd = []Result{ //nolint:gochecknoglobals // const for tests.
 			{
 				failed: true,
 				key:    "a",
-				params: []string{"\\'\"`*?[]{}~$!&;()<>|#@\n"},
+				params: []string{"foo%bar"},
+				cmd:    "",
+			},
+		},
+	},
+	{
+		data:                 []string{"a[*],echo $1"},
+		unsafeUserParameters: 1,
+		input: []Input{
+			{
+				key:    "a",
+				params: []string{"%"},
+				cmd:    "echo %",
+			},
+		},
+	},
+	{
+		data:                 []string{"a[*],echo $1"},
+		unsafeUserParameters: 1,
+		input: []Input{
+			{
+				key:    "a",
+				params: []string{"foo%bar"},
+				cmd:    "echo foo%bar",
+			},
+		},
+	},
+	{
+		data: []string{"a,echo " + notAllowedCharacters},
+		input: []Input{
+			{
+				key:    "a",
+				params: []string{},
+				cmd:    "echo " + notAllowedCharacters,
+			},
+		},
+	},
+	{
+		data: []string{"a[*],echo $1 " + notAllowedCharacters},
+		input: []Input{
+			{
+				key:    "a",
+				params: []string{"foo"},
+				cmd:    "echo foo " + notAllowedCharacters,
+			},
+		},
+	},
+	{
+		data: []string{"a[*],echo $1"},
+		input: []Input{
+			{
+				failed: true,
+				key:    "a",
+				params: []string{notAllowedCharacters},
 				cmd:    "",
 			},
 		},
@@ -365,8 +408,8 @@ var resultsCmd = []Result{ //nolint:gochecknoglobals // const for tests.
 		input: []Input{
 			{
 				key:    "a",
-				params: []string{"\\'\"`*?[]{}~$!&;()<>|#@\n"},
-				cmd:    "echo \\'\"`*?[]{}~$!&;()<>|#@\n",
+				params: []string{notAllowedCharacters},
+				cmd:    "echo " + notAllowedCharacters,
 			},
 		},
 	},
@@ -407,16 +450,16 @@ type Result struct {
 }
 
 func TestUserParameterPlugin(t *testing.T) { //nolint:paralleltest // not possible because of plugin.Metrics.
-	for i := range results { //nolint:paralleltest // not possible because of plugin.Metrics.
-		t.Run(results[i].data[0], func(t *testing.T) {
+	for _, result := range results { //nolint:paralleltest // not possible because of plugin.Metrics.
+		t.Run(result.data[0], func(t *testing.T) {
 			plugin.Metrics = make(map[string]*plugin.Metric)
 
-			_, err := InitUserParameterPlugin(results[i].data, results[i].unsafeUserParameters, "")
+			_, err := InitUserParameterPlugin(result.data, result.unsafeUserParameters, "")
 			if err != nil {
-				if !results[i].failed {
+				if !result.failed {
 					t.Errorf("Expected success while got error %s", err)
 				}
-			} else if results[i].failed {
+			} else if result.failed {
 				t.Errorf("Expected error while got success")
 			}
 		})
@@ -424,30 +467,30 @@ func TestUserParameterPlugin(t *testing.T) { //nolint:paralleltest // not possib
 }
 
 func TestCmd(t *testing.T) { //nolint:paralleltest // not possible because of plugin.Metrics.
-	for i := range resultsCmd { //nolint:paralleltest // not possible because of plugin.Metrics.
-		t.Run(resultsCmd[i].data[0], func(t *testing.T) {
+	for _, resultCmd := range resultsCmd { //nolint:paralleltest // not possible because of plugin.Metrics.
+		t.Run(resultCmd.data[0], func(t *testing.T) {
 			plugin.Metrics = make(map[string]*plugin.Metric)
 
-			_, err := InitUserParameterPlugin(resultsCmd[i].data, resultsCmd[i].unsafeUserParameters, "")
+			_, err := InitUserParameterPlugin(resultCmd.data, resultCmd.unsafeUserParameters, "")
 			if err != nil {
 				t.Errorf("Plugin init failed: %s", err)
 			}
 
-			for j := range resultsCmd[i].input {
-				cmd, err := userParameter.cmd(resultsCmd[i].input[j].key, resultsCmd[i].input[j].params)
+			for j := range resultCmd.input {
+				cmd, err := userParameter.cmd(resultCmd.input[j].key, resultCmd.input[j].params)
 				if err != nil {
-					if !resultsCmd[i].input[j].failed {
-						t.Errorf("cmd test %s failed %s", resultsCmd[i].input[j].key, err)
+					if !resultCmd.input[j].failed {
+						t.Errorf("cmd test %s failed %s", resultCmd.input[j].key, err)
 					}
 				} else {
-					if resultsCmd[i].input[j].failed {
+					if resultCmd.input[j].failed {
 						t.Errorf("Expected error while got success")
 					}
 
-					if resultsCmd[i].input[j].cmd != cmd {
+					if resultCmd.input[j].cmd != cmd {
 						t.Errorf("cmd test %s failed: expected command: [%s] got: [%s]",
-							resultsCmd[i].input[j].key,
-							resultsCmd[i].input[j].cmd,
+							resultCmd.input[j].key,
+							resultCmd.input[j].cmd,
 							cmd,
 						)
 					}
