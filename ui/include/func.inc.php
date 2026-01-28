@@ -1035,6 +1035,10 @@ function zbx_toHash($value, $field = null) {
 	}
 	$result = [];
 
+	if ($field === null) {
+		$field = '';
+	}
+
 	if (!is_array($value)) {
 		$result = [$value => $value];
 	}
