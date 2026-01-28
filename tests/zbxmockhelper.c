@@ -38,8 +38,8 @@ char	*zbx_yaml_assemble_binary_sequence(const char *path, size_t *expected)
 
 		if (0 != *expected && offset + length > *expected)
 		{
-			fail_msg("Incorrect message size, expected:" ZBX_FS_UI64 " actual:" ZBX_FS_UI64, *expected,
-					offset + length);
+			fail_msg("Incorrect message size, expected:" ZBX_FS_SIZE_T " actual:" ZBX_FS_SIZE_T,
+					(zbx_fs_size_t)(*expected), (zbx_fs_size_t)(offset + length));
 		}
 
 		buffer = zbx_realloc(buffer, offset + length);
@@ -49,7 +49,10 @@ char	*zbx_yaml_assemble_binary_sequence(const char *path, size_t *expected)
 	}
 
 	if (0 != *expected && offset != *expected)
-		fail_msg("Assembled message is smaller:" ZBX_FS_UI64 " than expected:" ZBX_FS_UI64, offset, *expected);
+	{
+		fail_msg("Assembled message is smaller:" ZBX_FS_SIZE_T " than expected:" ZBX_FS_SIZE_T,
+				(zbx_fs_size_t)offset, (zbx_fs_size_t)(*expected));
+	}
 
 	*expected = offset;
 
