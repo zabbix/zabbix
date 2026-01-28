@@ -309,7 +309,9 @@ int	zbx_trapper_preproc_test_run(const struct zbx_json_parse *jp_item, const str
 			}
 		}
 
-		if (ITEM_VALUE_TYPE_JSON == value_type)
+		/* When throttling is used - do not validate the old historical value, since it may be truncated. */
+		/* So, if old value was invalid JSON - it will be not be validated.                               */
+		if (ITEM_VALUE_TYPE_JSON == value_type && ((1 == values_num) || (2 == values_num && 1 == i)))
 		{
 			char	*src_json_check;
 
