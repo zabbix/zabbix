@@ -90,6 +90,7 @@ $form
 						->addClass(ZBX_STYLE_BTN_GREY)
 						->setId('bind-password-btn'),
 					(new CPassBox('bind_password', '', DB::getFieldLength('userdirectory_ldap', 'bind_password')))
+						->setAttribute('data-notrim', '')
 						->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 						->addStyle('display: none;')
 						->setAttribute('disabled', 'disabled'),
@@ -100,6 +101,7 @@ $form
 						->addClass('js-bind-password-warning')
 				]
 				: (new CPassBox('bind_password', '', DB::getFieldLength('userdirectory_ldap', 'bind_password')))
+					->setAttribute('data-notrim', '')
 					->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 			)
 		])

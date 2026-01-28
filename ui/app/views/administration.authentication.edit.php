@@ -808,7 +808,9 @@ $templates['ldap_servers_row'] = (string) (new CRow([
 		(new CVar('ldap_servers[#{row_index}][search_filter]', '#{search_filter}'))->removeId(),
 		(new CVar('ldap_servers[#{row_index}][start_tls]', '#{start_tls}'))->removeId(),
 		(new CVar('ldap_servers[#{row_index}][bind_dn]', '#{bind_dn}'))->removeId(),
-		(new CVar('ldap_servers[#{row_index}][bind_password]', '#{bind_password}'))->removeId(),
+		(new CVar('ldap_servers[#{row_index}][bind_password]', '#{bind_password}'))
+			->setAttribute('data-notrim', '')
+			->removeId(),
 		(new CVar('ldap_servers[#{row_index}][description]', '#{description}'))->removeId(),
 		(new CVar('ldap_servers[#{row_index}][provision_status]', '#{provision_status}'))->removeId(),
 		(new CVar('ldap_servers[#{row_index}][group_basedn]', '#{group_basedn}'))->removeId(),
