@@ -18,6 +18,7 @@
  * Class for preparing difference between import file and system.
  */
 class CConfigurationImportcompare {
+
 	/**
 	 * @var array  Options for creating, updating or deleting entities.
 	 */
@@ -140,6 +141,7 @@ class CConfigurationImportcompare {
 								return (string) $page_index;
 							}
 						],
+						'diff_order' => ['updated', 'added', 'removed'],
 						'rules' => [
 							'widgets' => [
 								'options' => function (array $actions): array {
@@ -245,6 +247,11 @@ class CConfigurationImportcompare {
 			$diff = $this->compareByUniqueness($before_entity_group, $after_entity_group, $rule['uuid'],
 				$rule['unique']
 			);
+
+			if (array_key_exists('diff_order', $rule)) {
+				$diff_order = array_flip($rule['diff_order']);
+				uksort($diff, fn (string $key_1, string $key_2): int => $diff_order[$key_1] <=> $diff_order[$key_2]);
+			}
 
 			if (array_key_exists('added', $diff)) {
 				$_actions = [...$actions, [$entity_group, 'added']];
