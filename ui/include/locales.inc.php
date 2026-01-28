@@ -81,7 +81,13 @@ function getSupportUrl(?string $language = null): string {
 		'zh' => 'https://www.zabbix.com/cn/support'
 	];
 
-	return array_key_exists($language, $urls) ? $urls[$language] : 'https://www.zabbix.com/support';
+	$fallback_url = 'https://www.zabbix.com/support';
+
+	if ($language === null || !array_key_exists($language, $urls)) {
+		return $fallback_url;
+	}
+
+	return $urls[$language];
 }
 
 /**
@@ -101,7 +107,13 @@ function getIntegrationsUrl(?string $language = null): string {
 		'zh' => 'https://www.zabbix.com/cn/integrations'
 	];
 
-	return array_key_exists($language, $urls) ? $urls[$language] : 'https://www.zabbix.com/integrations';
+	$fallback_url = 'https://www.zabbix.com/integrations';
+
+	if ($language === null || !array_key_exists($language, $urls)) {
+		return $fallback_url;
+	}
+
+	return $urls[$language];
 }
 
 /**

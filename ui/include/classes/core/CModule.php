@@ -108,6 +108,8 @@ class CModule {
 	 * @return mixed  Configuration option (if exists) or the $default value.
 	 */
 	public function getOption(?string $name = null, $default = null) {
+		$name = (string) $name;
+
 		return array_key_exists($name, $this->manifest['config']) ? $this->manifest['config'][$name] : $default;
 	}
 
