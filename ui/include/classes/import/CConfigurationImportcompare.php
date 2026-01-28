@@ -233,14 +233,16 @@ class CConfigurationImportcompare {
 		$result = [];
 
 		foreach ($rules as $entity_group => $rule) {
-			$before += [$entity_group => []];
-			$after += [$entity_group => []];
+			$before_entity_group = array_key_exists($entity_group, $before) ? $before[$entity_group] : [];
+			$after_entity_group = array_key_exists($entity_group, $after) ? $after[$entity_group] : [];
 
-			if (!$before[$entity_group] && !$after[$entity_group]) {
+			unset($before[$entity_group], $after[$entity_group]);
+
+			if (!$before_entity_group && !$after_entity_group) {
 				continue;
 			}
 
-			$diff = $this->compareByUniqueness($before[$entity_group], $after[$entity_group], $rule['uuid'],
+			$diff = $this->compareByUniqueness($before_entity_group, $after_entity_group, $rule['uuid'],
 				$rule['unique']
 			);
 
@@ -274,8 +276,6 @@ class CConfigurationImportcompare {
 			$options = $rule['options'] instanceof Closure ? $rule['options']($actions) : $rule['options'];
 
 			$diff = $this->applyOptions($entity_group, $options, $diff);
-
-			unset($before[$entity_group], $after[$entity_group]);
 
 			if ($diff) {
 				$result[$entity_group] = $diff;
