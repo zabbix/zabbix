@@ -1441,6 +1441,10 @@ int	net_if_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 			zbx_json_adduint64(&jval, "compressed", ns.ocompressed);
 			zbx_json_close(&jval);
 		}
+		else
+		{
+			zbx_free(error);
+		}
 
 		fill_net_if_get_params(p, "type",  NULL, &jval, 1);
 		fill_net_if_get_params(p, "address", "mac", &jval, 0);
