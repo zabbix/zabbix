@@ -176,7 +176,9 @@ $form
 			(new CFormField(
 				(new CTextBox('user_ref_attr', $data['user_ref_attr'], false,
 					DB::getFieldLength('userdirectory_ldap', 'user_ref_attr')
-				))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				))
+					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+					->setAttribute('data-notrim', '')
 			))
 				->addClass('allow-jit-provisioning')
 				->addClass('group-of-names')
