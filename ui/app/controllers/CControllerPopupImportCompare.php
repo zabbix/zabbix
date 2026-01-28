@@ -138,7 +138,8 @@ class CControllerPopupImportCompare extends CController {
 
 		if (!isset($_FILES['import_file'])) {
 			error(_('No file was uploaded.'));
-		} else {
+		}
+		else {
 			// CUploadFile throws exceptions, so we need to catch them
 			try {
 				$file = new CUploadFile($_FILES['import_file']);
