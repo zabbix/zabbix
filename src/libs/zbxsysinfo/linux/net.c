@@ -1247,29 +1247,48 @@ static void	get_wifi_info(const char *interface, struct zbx_json *j)
 
 static void	get_link_settings(const char *interface, struct zbx_json *j)
 {
-	int			sock;
-	struct ifreq		ifr;
-	struct ethtool_cmd	ecmd;
+	int				sock;
+	struct ifreq			ifr;
+	int				autoneg = -1;
+#ifdef ETHTOOL_GLINKSETTINGS
+	struct ethtool_link_settings	edata;
+#endif
 
 	sock = socket(AF_INET, SOCK_DGRAM, 0);
 	if (0 > sock)
 		return;
 
 	memset(&ifr, 0, sizeof(ifr));
-	memset(&ecmd, 0, sizeof(ecmd));
-
 	zbx_strlcpy(ifr.ifr_name, interface, IFNAMSIZ - 1);
 
-	ecmd.cmd = ETHTOOL_GSET;
-	ifr.ifr_data = (char *)&ecmd;
+#ifdef ETHTOOL_GLINKSETTINGS
+	memset(&edata, 0, sizeof(edata));
+	edata.cmd = ETHTOOL_GLINKSETTINGS;
+	ifr.ifr_data = (char *)&edata;
 
-	if (0 > ioctl(sock, SIOCETHTOOL, &ifr))
+	if (0 == ioctl(sock, SIOCETHTOOL, &ifr))
+		autoneg = edata.autoneg;
+#endif
+
+	if (-1 == autoneg)
 	{
-		close(sock);
-		return;
+		struct ethtool_cmd	ecmd;
+
+		memset(&ecmd, 0, sizeof(ecmd));
+		ecmd.cmd = ETHTOOL_GSET;
+		ifr.ifr_data = (char *)&ecmd;
+
+		if (0 == ioctl(sock, SIOCETHTOOL, &ifr))
+			autoneg = ecmd.autoneg;
 	}
 
-	zbx_json_addstring(j, "negotiation", ecmd.autoneg == AUTONEG_ENABLE ? "on" : "off", ZBX_JSON_TYPE_STRING);
+	if (-1 != autoneg)
+	{
+		zbx_json_addstring(j, "negotiation",
+				autoneg == AUTONEG_ENABLE ? "on" : "off",
+				ZBX_JSON_TYPE_STRING);
+	}
+
 	close(sock);
 }
 
