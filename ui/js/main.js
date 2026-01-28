@@ -438,6 +438,13 @@ const hintBox = {
 		const hintboxid = hintBox.getUniqueId();
 		const box = jQuery('<div>', {'data-hintboxid': hintboxid}).addClass('overlay-dialogue hintbox wordbreak');
 
+		for (let el = target; el && el !== document.body; el = el.parentElement) {
+			if (getComputedStyle(el).position === 'fixed') {
+				box.addClass('hintbox-position-fixed');
+				break;
+			}
+		}
+
 		if (styles) {
 			// property1: value1; property2: value2; property(n): value(n)
 
@@ -638,7 +645,9 @@ const hintBox = {
 		const SCREEN_Y_PADDING = 10;
 
 		const hint = $elem[0];
-		const host = hint.offsetParent;
+		const host = hint.classList.contains('hintbox-position-fixed')
+			? document.body
+			: hint.offsetParent;
 
 		const host_rect = host.getBoundingClientRect();
 
@@ -886,7 +895,9 @@ const hintBox = {
 					return;
 				}
 
-				const parent = hintBox.draggable_element.offsetParent;
+				const parent = hintBox.draggable_element.classList.contains('hintbox-position-fixed')
+					? document.body
+					: hintBox.draggable_element.offsetParent;
 				const hintbox_rect = hintBox.draggable_element.getBoundingClientRect();
 
 				const max_left = parent.scrollWidth - hintbox_rect.width;

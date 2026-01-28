@@ -1967,6 +1967,10 @@ select {
 		flex-direction: column;
 		box-sizing: border-box;
 
+		&.hintbox-position-fixed {
+			position: fixed;
+		}
+
 		&:not(.hintbox-static) {
 			pointer-events: none;
 		}
