@@ -248,7 +248,7 @@ class CFormElement extends CElement {
 			$element = $this->getFieldByLabelElement($label);
 
 			if ($element->isValid()) {
-				$fields[$label->getText()] = $element;
+				$fields[(string) $label->getText()] = $element;
 			}
 		}
 

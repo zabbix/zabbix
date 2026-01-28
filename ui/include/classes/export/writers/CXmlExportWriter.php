@@ -79,12 +79,8 @@ class CXmlExportWriter extends CExportWriter {
 
 	/**
 	 * Returns sub node name based on parent node name.
-	 *
-	 * @param string $name
-	 *
-	 * @return bool
 	 */
-	private function mapName($name) {
+	private function mapName(?string $name): bool|string {
 		$map = [
 			'conditions' => 'condition',
 			'dashboards' => 'dashboard',
@@ -138,6 +134,10 @@ class CXmlExportWriter extends CExportWriter {
 			'widgets' => 'widget'
 		];
 
-		return isset($map[$name]) ? $map[$name] : false;
+		if ($name === null || !array_key_exists($name, $map)) {
+			return false;
+		}
+
+		return $map[$name];
 	}
 }
