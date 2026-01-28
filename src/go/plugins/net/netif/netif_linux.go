@@ -134,7 +134,7 @@ int	get_ll_info(const char* interface, ll_info_t* info)
 	return 0;
 }
 */
-import "C"
+import "C" //nolint:gocritic
 
 import (
 	"bufio"
@@ -144,7 +144,7 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
-	"unsafe"
+	"unsafe" //nolint:gocritic
 
 	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/plugin"
@@ -213,7 +213,7 @@ func (p *Plugin) Export(key string, params []string, _ plugin.ContextProvider) (
 
 		b, err := json.Marshal(devices)
 		if err != nil {
-			return nil, err
+			return nil, errs.Wrap(err, "failed to marshal devices")
 		}
 
 		return string(b), nil
@@ -273,7 +273,7 @@ func validateParams(params []string, minParams, maxParams int) error {
 }
 
 // fillNetIfGetParams reads sysfs parameters.
-func (_ *Plugin) fillNetIfGetParams(ifName, param string) string {
+func (*Plugin) fillNetIfGetParams(ifName, param string) string {
 	path := fmt.Sprintf("/sys/class/net/%s/%s", ifName, param)
 
 	data, err := os.ReadFile(path)
@@ -296,9 +296,10 @@ func parseUintPointer(s string) *uint64 {
 
 // getIfGet retrieves interface data.
 //
-//nolint:gocognit,gocyclo // Complexity is high due to CGo integration and data aggregation.
-func (p *Plugin) getIfGet(regexExpr string) (result netIfResult, err error) {
+//nolint:gocyclo,cyclop // Complexity is high due to CGo integration and data aggregation.
+func (p *Plugin) getIfGet(regexExpr string) (netIfResult, error) {
 	var compiledRegex *regexp.Regexp
+	var result netIfResult
 
 	f, err := os.Open(netDevFilepath)
 	if err != nil {
