@@ -24,6 +24,7 @@
 #include "zbxregexp.h"
 #include "zbxnum.h"
 #include "zbx_expression_constants.h"
+#include "zbxtime.h"
 
 ZBX_PTR_VECTOR_IMPL(um_macro, zbx_um_macro_t *)
 ZBX_PTR_VECTOR_IMPL(um_host, zbx_um_host_t *)
