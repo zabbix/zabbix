@@ -185,7 +185,10 @@ class CControllerMediatypeUpdate extends CControllerMediatypeUpdateGeneral {
 			'parameters_webhook' =>	['objects', 'required', 'uniq' => ['name'],
 				'fields' => [
 					'value' => ['string', 'required'],
-					'name' => ['string', 'required', 'not_empty', 'when' => ['value', 'not_empty']]
+					'name' => [
+						['string', 'required'],
+						['string', 'required', 'not_empty', 'when' => ['value', 'not_empty']]
+					]
 				],
 				'when' => ['type', 'in' => [MEDIA_TYPE_WEBHOOK]],
 				'messages' => ['uniq' => _('Name is not unique.')]

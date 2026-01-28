@@ -61,7 +61,9 @@ abstract class CControllerMediatypeUpdateGeneral extends CController {
 			$mediatype['maxsessions'] = 1;
 		}
 		elseif ($mediatype['type'] == MEDIA_TYPE_WEBHOOK) {
-			$mediatype['parameters'] = $mediatype['parameters_webhook'];
+			$mediatype['parameters'] = array_filter($mediatype['parameters_webhook'], function ($parameter) {
+				return !($parameter['name'] === '' && $parameter['value'] === '');
+			});
 		}
 		elseif ($mediatype['type'] == MEDIA_TYPE_EXEC) {
 			$mediatype['parameters'] = [];
