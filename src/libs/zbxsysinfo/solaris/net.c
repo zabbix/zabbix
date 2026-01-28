@@ -602,7 +602,7 @@ static void	get_mac(const char* interface, struct zbx_json *j)
 	}
 }
 
-static void	get_if_statistics(kstat_ctl_t *kc, char *name, struct zbx_json *j)
+static void	get_if_statistics(const char *name, kstat_ctl_t *kc, struct zbx_json *j)
 {
 	int		min_instance = -1, i;
 	kstat_t		*kp, *min_kp;
@@ -733,7 +733,7 @@ int	net_if_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 		get_if_flags(p, &jcfg);
 		get_mac(p, &jcfg);
 		get_mac(p, &jval);
-		get_if_statistics(kc, p, &jval);
+		get_if_statistics(p, kc, &jval);
 
 		get_carrier(p, kc, &jval);
 		zbx_json_close(&jval);

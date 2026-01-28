@@ -847,8 +847,8 @@ clean:
 	return ret;
 }
 
-static void	getall_wmi_check_timeout(const char *query, char **var,
-		double time_first_query_started, double *time_previous_query_finished)
+static void	getall_wmi_check_timeout(const char *query, const double time_first_query_started,
+			double *time_previous_query_finished, char **var)
 {
 	double	time_left = sysinfo_get_config_timeout() - (*time_previous_query_finished -
 			time_first_query_started);
@@ -860,7 +860,7 @@ static void	getall_wmi_check_timeout(const char *query, char **var,
 	*time_previous_query_finished = zbx_time();
 }
 
-static int	get_wmi_item_by_name(struct zbx_json_parse *jp_array, const char *alias,
+static int	get_wmi_item_by_name(const struct zbx_json_parse *jp_array, const char *alias,
 		struct zbx_json_parse *jp_item_out)
 {
 	const char		*p = NULL;
@@ -943,7 +943,8 @@ int	net_if_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	net_adapter = zbx_strdup(NULL,
 			"SELECT Name, Speed, FullDuplex FROM MSFT_NetAdapter");
-	getall_wmi_check_timeout(net_adapter, &res_net_adapter, start_time, &time_previous_query_finished);
+
+	getall_wmi_check_timeout(net_adapter, start_time, &time_previous_query_finished, &res_net_adapter);
 
 	if (NULL != res_net_adapter)
 		have_net_adapter = zbx_json_open(res_net_adapter, &jp_duplex);
@@ -951,7 +952,7 @@ int	net_if_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 	net_advenced = zbx_strdup(NULL, "SELECT Name, DisplayValue FROM MSFT_NetAdapterAdvancedPropertySettingData"
 			" WHERE DisplayName = 'Speed & Duplex'");
 
-	getall_wmi_check_timeout(net_advenced, &res_net_advenced, start_time, &time_previous_query_finished);
+	getall_wmi_check_timeout(net_advenced, start_time, &time_previous_query_finished, &res_net_advenced);
 
 	if (NULL != res_net_advenced)
 		have_net_advenced = zbx_json_open(res_net_advenced, &jp_negot);
