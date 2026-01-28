@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -35,6 +35,9 @@
 #include "zbxdbhigh.h"
 #include "zbxthreads.h"
 #include "zbxexpr.h"
+#ifdef HAVE_ARES_QUERY_CACHE
+#include "zbxresolver.h"
+#endif
 
 #define	ALARM_ACTION_TIMEOUT	40
 
@@ -394,7 +397,9 @@ ZBX_THREAD_ENTRY(zbx_alerter_thread, args)
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(info->program_type),
 			server_num, get_process_type_string(process_type), process_num);
-
+#ifdef HAVE_ARES_QUERY_CACHE
+	zbx_ares_library_init();
+#endif
 	zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
 
 	zbx_ipc_message_init(&message);

@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -91,8 +91,8 @@ class testLanguage extends CWebTest {
 		$this->checkLanguage($data['message'], $data['page_title'], $data['html_lang'], $data['defaultdb_lang']);
 
 		// Yellow info icon check.
-		$this->query('xpath://button['.CXPathHelper::fromClass('zi-i-warning').']')->one()->click();
-		$this->assertEquals($data['info'], $this->query('class:hintbox-wrap')->one()->getText());
+		$this->query('xpath://button['.CXPathHelper::fromClass('zi-i-warning').']')->waitUntilVisible()->one()->click();
+		$this->assertEquals($data['info'], $this->query('class:hintbox-wrap')->waitUntilVisible()->one()->getText());
 
 		// After logout, warning message and login menu has system language.
 		$this->page->logout();
@@ -163,8 +163,8 @@ class testLanguage extends CWebTest {
 		$form = $this->query('id:userprofile-form')->one()->asForm();
 
 		// Yellow info icon check.
-		$this->query('xpath://button['.CXPathHelper::fromClass('zi-i-warning').']')->one()->click();
-		$this->assertEquals($data['info'], $this->query('class:hintbox-wrap')->one()->getText());
+		$this->query('xpath://button['.CXPathHelper::fromClass('zi-i-warning').']')->waitUntilVisible()->one()->click();
+		$this->assertEquals($data['info'], $this->query('class:hintbox-wrap')->waitUntilVisible()->one()->getText());
 
 		// Change user language to different from System.
 		$form->fill($data['field']);
@@ -242,6 +242,8 @@ class testLanguage extends CWebTest {
 
 	/**
 	 * @dataProvider getCreateUserData
+	 *
+	 * @depends testLanguage_Gui
 	 */
 	public function testLanguage_CreateUser($data) {
 		$this->page->login();
@@ -249,9 +251,8 @@ class testLanguage extends CWebTest {
 		$form = $this->query('name:user_form')->asForm()->waitUntilVisible()->one();
 		$form->fill($data['fields']);
 		$form->selectTab('Permissions');
-		$form->fill(['Role' => 'Super admin role']);
+		$form->fill(['Role' => CFormElement::RELOADABLE_FILL('Super admin role')]);
 		$form->submit();
-		$form->waitUntilReloaded();
 		$this->assertMessage(TEST_GOOD, 'User added');
 		$this->page->logout();
 		$this->page->userLogin($data['fields']['Username'], $data['fields']['Password']);

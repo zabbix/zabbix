@@ -74660,7 +74660,14 @@ DUK_LOCAL void duk__parse_switch_stmt(duk_compiler_ctx *comp_ctx, duk_ivalue *re
 	temp_at_loop = DUK__GETTEMP(comp_ctx);
 
 	for (;;) {
+#if defined(DUK_USE_GCC_PRAGMAS) || defined(DUK_USE_CLANG_PRAGMAS)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-but-set-variable"
+#endif
 		duk_int_t num_stmts;
+#if defined(DUK_USE_GCC_PRAGMAS) || defined(DUK_USE_CLANG_PRAGMAS)
+#pragma GCC diagnostic pop
+#endif
 		duk_small_uint_t tok;
 
 		/* sufficient for keeping temp reg numbers in check */

@@ -20,7 +20,7 @@
 			</groups>
 			<triggers>
 				<trigger>
-					<description>Low free disk space on {HOSTNAME} volume /</description>
+					<description>Low free disk space on {HOST.HOST} volume /</description>
 					<type>0</type>
 					<expression>{Template_Linux:vfs.fs.size[/,pfree].last(0)}&lt;10</expression>
 					<url>http://www.zabbix.com/</url>

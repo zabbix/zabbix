@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -57,7 +57,16 @@
 			else {
 				['params_0', 'params_1', 'params_2'].forEach(function(name) {
 					const node = $preprocessing[0].querySelector(`input[name^="preprocessing[${num}][${name}]"]`);
-					node && !node.disabled && params.push(node.value);
+
+					if (node && !node.disabled) {
+						let value = node.value;
+
+						if (node.type === 'checkbox' && !node.checked) {
+							value = node.getAttribute('unchecked-value');
+						}
+
+						params.push(value)
+					}
 				});
 			}
 

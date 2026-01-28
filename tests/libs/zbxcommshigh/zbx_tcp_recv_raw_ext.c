@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -32,7 +32,8 @@ void	zbx_mock_test_entry(void **state)
 	ZBX_UNUSED(state);
 
 	zbx_mock_assert_result_eq("zbx_tcp_connect() return code", SUCCEED,
-			zbx_tcp_connect(&s, NULL, "127.0.0.1", 10050, 0, ZBX_TCP_SEC_UNENCRYPTED, NULL, NULL));
+			zbx_tcp_connect(&s, NULL, "127.0.0.1", 10050, 0, ZBX_TCP_SEC_UNENCRYPTED, NULL, NULL,
+			ZBX_DNS_FAILOVER_ENABLED));
 
 	expected_ret = zbx_mock_str_to_return_code(zbx_mock_get_parameter_string("out.return"));
 	received = zbx_tcp_recv_raw_ext(&s, 0);

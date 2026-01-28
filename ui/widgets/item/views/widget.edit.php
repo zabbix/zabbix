@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -24,6 +24,8 @@
 use Widgets\Item\Widget;
 
 $form = new CWidgetFormView($data);
+
+$aggregate_function_field = $form->registerField(new CWidgetFieldSelectView($data['fields']['aggregate_function']));
 
 $form
 	->addField(
@@ -67,25 +69,35 @@ $form
 				getThresholdFieldsGroupView($data['fields'])->addRowClass('js-row-thresholds')
 			)
 			->addField(
-				(new CWidgetFieldSelectView($data['fields']['aggregate_function']))
-					->setFieldHint(
-						makeWarningIcon(_('With this setting only numeric items will be displayed.'))
-							->addStyle('display: none')
-							->setId('item-aggregate-function-warning')
-					)
-			)
-			->addField(
-				(new CWidgetFieldTimePeriodView($data['fields']['time_period']))
-					->setDateFormat(ZBX_FULL_DATE_TIME)
-					->setFromPlaceholder(_('YYYY-MM-DD hh:mm:ss'))
-					->setToPlaceholder(_('YYYY-MM-DD hh:mm:ss'))
-			)
-			->addField(
 				(new CWidgetFieldRadioButtonListView($data['fields']['history']))->setFieldHint(
 					makeWarningIcon(
 						_('This setting applies only to numeric data. Non-numeric data will always be taken from history.')
 					)->setId('item-history-data-warning')
 				)
+			)
+			->addItem([
+				$aggregate_function_field->getLabel(),
+				new CFormField([
+					$aggregate_function_field->getView(),
+					makeWarningIcon(_('With this setting only numeric items will be displayed.'))
+						->addStyle('display: none')
+						->setId('numeric-items-warning'),
+					makeWarningIcon(_('Aggregation function does not affect the sparkline.'))
+						->addStyle('display: none')
+						->setId('sparkline-warning'),
+					makeWarningIcon([
+						new CDiv(_('With this setting only numeric items will be displayed.')),
+						new CDiv(_('Aggregation function does not affect the sparkline.'))
+					])
+						->addStyle('display: none')
+						->setId('combined-warning')
+				])
+			])
+			->addField(
+				(new CWidgetFieldTimePeriodView($data['fields']['time_period']))
+					->setDateFormat(ZBX_FULL_DATE_TIME)
+					->setFromPlaceholder(_('YYYY-MM-DD hh:mm:ss'))
+					->setToPlaceholder(_('YYYY-MM-DD hh:mm:ss'))
 			)
 	)
 	->includeJsFile('widget.edit.js.php')

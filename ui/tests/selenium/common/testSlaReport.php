@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -32,7 +32,6 @@ class testSlaReport extends CWebTest {
 		];
 	}
 
-	public static $reporting_periods = [];
 	public static $period_headers = [
 		'Daily' => 'Day',
 		'Weekly' => 'Week',
@@ -40,9 +39,6 @@ class testSlaReport extends CWebTest {
 		'Quarterly' => 'Quarter',
 		'Annually' => 'Year'
 	];
-
-	private static $actual_creation_time;	// Actual timestamp when data source was executed.
-	private static $service_creation_time;	// Service "Service with problem" creation time, needed for downtime calculation.
 
 	const SLA_CREATION_TIME = 1619827200; // SLA creation timestamp as per scenario - 01.05.2021
 
@@ -237,101 +233,97 @@ class testSlaReport extends CWebTest {
 	}
 
 	/**
-	 * Create the reference array with reporting periods based on the SLA creation time and current date.
+	 * Get a reference array with expected reporting periods based on period type, SLA creation time and current date.
+	 *
+	 * @param string $period_type    reporting period type
+	 *
+	 * @return array
 	 */
-	public function getDateTimeData() {
-		self::$actual_creation_time = CDataHelper::get('Sla.creation_time');
-		self::$service_creation_time = CDBHelper::getValue(
-				'SELECT created_at FROM services WHERE name='.zbx_dbstr('Service with problem')
-		);
+	public function getDateTimeData($period_type) {
+		$period_values = [];
 
-		// Construct the reference reporting period array based on the period type.
-		foreach (['Daily', 'Weekly', 'Monthly', 'Quarterly', 'Annually'] as $reporting_period) {
-			$period_values = [];
+		switch ($period_type) {
+			case 'Daily':
+				// By default the last 20 periods are displayed.
+				for ($i = 0; $i < 20; $i++) {
+					$day = strtotime('today '.-$i.' day');
+					$period_values[$i]['value'] = date('Y-m-d', $day);
+					$period_values[$i]['start'] = $day;
+					$period_values[$i]['end'] = strtotime('tomorrow '.-$i.' day - 1 second');
+				}
+				break;
 
-			switch ($reporting_period) {
-				case 'Daily':
-					// By default the last 20 periods are displayed.
-					for ($i = 0; $i < 20; $i++) {
-						$day = strtotime('today '.-$i.' day');
-						$period_values[$i]['value'] = date('Y-m-d', $day);
-						$period_values[$i]['start'] = $day;
-						$period_values[$i]['end'] = strtotime('tomorrow '.-$i.' day - 1 second');
-					}
-					break;
+			case 'Weekly':
+				for ($i = 1; $i <= 20; $i++) {
+					// Next Sunday should be taken as period start date in case if today is Sunday (0 represents Sunday).
+					$start_string = (date('w', time()) == 0) ? 'Sunday next week ' : 'next Sunday ';
 
-				case 'Weekly':
-					for ($i = 1; $i <= 20; $i++) {
-						// Next Sunday should be taken as period start date in case if today is Sunday (0 represents Sunday).
-						$start_string = (date('w', time()) == 0) ? 'Sunday next week ' : 'next Sunday ';
+					$period_values[$i]['start'] = strtotime($start_string.-$i.' week');
+					$period_values[$i]['end'] = strtotime(date('Y-m-d', $period_values[$i]['start']).' + 7 days - 1 second');
 
-						$period_values[$i]['start'] = strtotime($start_string.-$i.' week');
-						$period_values[$i]['end'] = strtotime(date('Y-m-d', $period_values[$i]['start']).' + 7 days - 1 second');
+					$period_values[$i]['value'] = date('Y-m-d', $period_values[$i]['start']).' – '.
+							date('m-d', $period_values[$i]['end']);
+				}
+				break;
 
-						$period_values[$i]['value'] = date('Y-m-d', $period_values[$i]['start']).' – '.
-								date('m-d', $period_values[$i]['end']);
-					}
-					break;
+			case 'Monthly':
+				// Get the number of Months to be displayed as difference between today and SLA creation day in months.
+				$months = CDateTimeHelper::countMonthsBetweenDates(self::SLA_CREATION_TIME, time());
 
-				case 'Monthly':
-					// Get the number of Months to be displayed as difference between today and SLA creation day in months.
-					$months = CDateTimeHelper::countMonthsBetweenDates(self::SLA_CREATION_TIME, time());
+				$months = ($months > 20) ? 20 : $months;
 
-					$months = ($months > 20) ? 20 : $months;
+				for ($i = 0; $i < $months; $i++) {
+					$month = strtotime('first day of this month '.-$i.' month');
+					$period_values[$i]['value'] = date('Y-m', $month);
+					$period_values[$i]['start'] = strtotime(date('Y-m').' '.-$i.' month');
+					$period_values[$i]['end'] = strtotime(date('Y-m').' '.(-$i+1).' month - 1 second');
+				}
+				break;
 
-					for ($i = 0; $i < $months; $i++) {
-						$month = strtotime('first day of this month '.-$i.' month');
-						$period_values[$i]['value'] = date('Y-m', $month);
-						$period_values[$i]['start'] = strtotime(date('Y-m').' '.-$i.' month');
-						$period_values[$i]['end'] = strtotime(date('Y-m').' '.(-$i+1).' month - 1 second');
-					}
-					break;
+			case 'Quarterly':
+				$quarters = ['01 – 03', '04 – 06', '07 – 09', '10 – 12'];
+				$current_year = date('Y');
+				$current_month = date('m');
 
-				case 'Quarterly':
-					$quarters = ['01 – 03', '04 – 06', '07 – 09', '10 – 12'];
-					$current_year = date('Y');
-					$current_month = date('m');
+				$i = 0;
+				for ($year = date('Y', self::SLA_CREATION_TIME); $year <= date('Y'); $year++) {
+					foreach ($quarters as $quarter) {
+						// Get the last and the first month of the quarter under attention.
+						$period_end = ltrim(stristr($quarter, '– '), '– ');
+						$period_start = substr($quarter, 0, strpos($quarter, " –"));
 
-					$i = 0;
-					for ($year = date('Y', self::SLA_CREATION_TIME); $year <= date('Y'); $year++) {
-						foreach ($quarters as $quarter) {
-							// Get the last and the first month of the quarter under attention.
-							$period_end = ltrim(stristr($quarter, '– '), '– ');
-							$period_start = substr($quarter, 0, strpos($quarter, " –"));
+						// Skip the quarters before SLA creation quarter in SLA creation year.
+						if ($year === date('Y', self::SLA_CREATION_TIME) && $period_end < date("m", self::SLA_CREATION_TIME)) {
+							continue;
+						}
 
-							// Skip the quarters before SLA creation quarter in SLA creation year.
-							if ($year === date('Y', self::SLA_CREATION_TIME) && $period_end < date("m", self::SLA_CREATION_TIME)) {
-								continue;
-							}
+						// Write periods into reference array if period start is not later than current month.
+						if ($year < $current_year || ($year == $current_year && $period_start <= $current_month)) {
+							$period_values[$i]['value'] = $year.'-'.$quarter;
+							$period_values[$i]['start'] = strtotime($year.'-'.$period_start);
+							$period_values[$i]['end'] = strtotime($year.'-'.$period_end.' + 1 month - 1 second');
 
-							// Write periods into reference array if period start is not later than current month.
-							if ($year < $current_year || ($year == $current_year && $period_start <= $current_month)) {
-								$period_values[$i]['value'] = $year.'-'.$quarter;
-								$period_values[$i]['start'] = strtotime($year.'-'.$period_start);
-								$period_values[$i]['end'] = strtotime($year.'-'.$period_end.' + 1 month - 1 second');
-
-								$i++;
-							}
+							$i++;
 						}
 					}
-					$period_values = array_reverse($period_values);
-					break;
+				}
+				$period_values = array_reverse($period_values);
+				break;
 
-				case 'Annually':
-					// Get the number of Years to be displayed as difference between this year and SLA creation year.
-					$years = (date('Y') - date('Y', self::SLA_CREATION_TIME));
+			case 'Annually':
+				// Get the number of Years to be displayed as difference between this year and SLA creation year.
+				$years = (date('Y') - date('Y', self::SLA_CREATION_TIME));
 
-					for ($i = 0; $i <= $years; $i++) {
-						$year = strtotime('this year '.-$i.' years');
-						$period_values[$i]['value'] = date('Y', $year);
-						$period_values[$i]['start'] = strtotime(date('Y', $year).'-01-01');
-						$period_values[$i]['end'] = strtotime(date('Y', $year).'-01-01 +1 year -1 second');
-					}
-					break;
-			}
-
-			self::$reporting_periods[$reporting_period] = $period_values;
+				for ($i = 0; $i <= $years; $i++) {
+					$year = strtotime('this year '.-$i.' years');
+					$period_values[$i]['value'] = date('Y', $year);
+					$period_values[$i]['start'] = strtotime(date('Y', $year).'-01-01');
+					$period_values[$i]['end'] = strtotime(date('Y', $year).'-01-01 +1 year -1 second');
+				}
+				break;
 		}
+
+		return $period_values;
 	}
 
 	/**
@@ -341,7 +333,11 @@ class testSlaReport extends CWebTest {
 	 * @param boolean	$widget		flag that specifies whether the check is made in the SLA report or SLA report widget.
 	 */
 	public function checkLayoutWithService($data, $widget = false) {
-		$creation_day = date('Y-m-d', self::$actual_creation_time);
+		$actual_creation_time = CDataHelper::get('Sla.creation_time');
+		$service_creation_time = CDBHelper::getValue(
+				'SELECT created_at FROM services WHERE name='.zbx_dbstr('Service with problem')
+		);
+		$creation_day = date('Y-m-d', $actual_creation_time);
 
 		$table = ($widget)
 			? CDashboardElement::find()->one()->getWidget($data['fields']['Name'])->query('class:list-table')->asTable()->one()
@@ -358,7 +354,7 @@ class testSlaReport extends CWebTest {
 
 		// Get the timestamp when screen was loaded and the reference reporting periods.
 		$load_time = time();
-		$reference_periods = self::$reporting_periods[$data['reporting_period']];
+		$reference_periods = $this->getDateTimeData($data['reporting_period']);
 
 		// Check table headers text and check that none of them are clickable.
 		$this->assertEquals([self::$period_headers[$data['reporting_period']], 'SLO', 'SLI', 'Uptime', 'Downtime',
@@ -372,7 +368,7 @@ class testSlaReport extends CWebTest {
 		// This test is written taking into account that only SLA with daily reporting period has ongoing downtimes.
 		if (array_key_exists('downtimes', $data)) {
 			// Downtime starts from min(SLA creation timestamp, Service creation timestamp).
-			$downtime_start = min(self::$actual_creation_time, self::$service_creation_time);
+			$downtime_start = min($actual_creation_time, $service_creation_time);
 			$downtime_values = [];
 			/**
 			 * If the date has changed since data source was executed, then downtimes will be divided into 2 days.
@@ -451,7 +447,7 @@ class testSlaReport extends CWebTest {
 			 * SLI is displayed for periods from SLA actual creation time to page load time.
 			 * If SLI is expected, then Uptime and Error budget should be calculated and checked.
 			 */
-			if (array_key_exists('SLI', $data['expected']) && $period['end'] > self::$actual_creation_time) {
+			if (array_key_exists('SLI', $data['expected']) && $period['end'] > $actual_creation_time) {
 				$this->assertEquals($data['expected']['SLI'], $row->getColumn('SLI')->getText());
 
 				// Check Uptime and Error budget values. These values are calculated only from the actual SLA creation time.
@@ -459,7 +455,7 @@ class testSlaReport extends CWebTest {
 				if ($period['end'] > $load_time) {
 					$reference_uptime = [];
 					// If SLA created in current period, calculation starts from creation timestamp, else from period start.
-					$start_time = max($period['start'], min(self::$actual_creation_time, self::$service_creation_time));
+					$start_time = max($period['start'], min($actual_creation_time, $service_creation_time));
 
 					/**
 					 * Get array of Uptime possible values and check that the correct one is there.
@@ -480,10 +476,12 @@ class testSlaReport extends CWebTest {
 					}
 
 					// In rare cases expected and actual error budget can slightly differ due to calculation precision.
+					$calculated_error_budget = intval($uptime_seconds / floatval($data['expected']['SLO']) * 100) - $uptime_seconds;
+					$till_period_end = $period['end'] - $load_time;
+					$resulting_error_budget = min($calculated_error_budget, $till_period_end);
+
 					foreach([-1, 0, 1] as $delta) {
-						$error_budget[] = convertUnitsS(intval($uptime_seconds / floatval($data['expected']['SLO']) * 100)
-							- $uptime_seconds + $delta
-						);
+						$error_budget[] = convertUnitsS($resulting_error_budget + $delta);
 					}
 
 					$this->assertTrue(in_array($actual_budget = $row->getColumn('Error budget')->getText(), $error_budget),
@@ -492,7 +490,7 @@ class testSlaReport extends CWebTest {
 				}
 				else {
 					$reference_uptime = [];
-					$uptime_start = min(self::$actual_creation_time, self::$service_creation_time);
+					$uptime_start = min($actual_creation_time, $service_creation_time);
 
 					// Sometimes uptime start is by 1 second larger than obtained 2 rows above, so $i counter starts from -1.
 					for ($i = -1; $i <= 3; $i++) {
@@ -530,7 +528,7 @@ class testSlaReport extends CWebTest {
 
 			return;
 		}
-		$reference_periods = self::$reporting_periods[$data['reporting_period']];
+		$reference_periods = $this->getDateTimeData($data['reporting_period']);
 		$count = count($data['expected']['services']);
 
 		if ($widget) {
@@ -562,7 +560,7 @@ class testSlaReport extends CWebTest {
 
 			// For SLA without service periods are shown in ascending order, so reference array should be reversed.
 			foreach (array_reverse($reference_periods) as $period) {
-				if (array_key_exists('SLI', $data['expected']) && $period['end'] > self::$actual_creation_time) {
+				if (array_key_exists('SLI', $data['expected']) && $period['end'] > CDataHelper::get('Sla.creation_time')) {
 					$this->assertEquals($data['expected']['SLI'], $row->getColumn($period['value'])->getText());
 				}
 				else {
