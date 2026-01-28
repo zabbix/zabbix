@@ -657,8 +657,7 @@ class testUsersAuthenticationMfa extends testFormAuthentication {
 		$mfa_form = $this->openMfaForm();
 		$this->assertScreenshot($this->query('id:tabs')->one(), 'empty_mfa_form');
 		$mfa_form->query('button:Update')->one()->click();
-		$this->assertMessage(TEST_BAD, 'Cannot update authentication', 'Default MFA method must be specified.');
-		CMessageElement::find()->one()->close();
+		$this->assertInlineError($mfa_form, ['xpath:.//div[@data-field-name="mfa_methods"]' => 'This field cannot be empty.']);
 
 		// Take screenshots.
 		$mfa_form->getFieldContainer('Methods')->query('button:Add')->one()->click();
