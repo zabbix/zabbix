@@ -124,7 +124,7 @@ class testFormUser extends CWebTest {
 								' because locales for them are not installed on the web server.'
 					],
 					'inline_errors' => [
-						'id:username' => 'This field cannot be empty.'
+						'Username' => 'This field cannot be empty.'
 					]
 				]
 			],
@@ -399,7 +399,7 @@ class testFormUser extends CWebTest {
 					],
 					'role' => 'Super admin role',
 					'inline_errors' => [
-						'id:username' => 'This object already exists.'
+						'Username' => 'This object already exists.'
 					]
 				]
 			],
@@ -416,7 +416,7 @@ class testFormUser extends CWebTest {
 					],
 					'role' => 'Super admin role',
 					'inline_errors' => [
-						'id:username' => 'This field cannot be empty.'
+						'Username' => 'This field cannot be empty.'
 					]
 				]
 			],
@@ -433,7 +433,7 @@ class testFormUser extends CWebTest {
 					],
 					'role' => 'Super admin role',
 					'inline_errors' => [
-						'id:username' => 'This field cannot be empty.'
+						'Username' => 'This field cannot be empty.'
 					]
 				]
 			],
@@ -449,7 +449,7 @@ class testFormUser extends CWebTest {
 						'Password (once again)' => 'test5678'
 					],
 					'inline_errors' => [
-						'xpath:.//div[@id="roleid"]/..' => 'This field cannot be empty.'
+						'Role' => 'This field cannot be empty.'
 					]
 				]
 			],
@@ -462,7 +462,7 @@ class testFormUser extends CWebTest {
 						'Username' => ''
 					],
 					'inline_errors' => [
-						'id:username' => 'This field cannot be empty.'
+						'Username' => 'This field cannot be empty.'
 					]
 				]
 			],
@@ -541,7 +541,7 @@ class testFormUser extends CWebTest {
 					],
 					'role' => 'Super admin role',
 					'inline_errors' => [
-						'id:refresh' => 'This field cannot be empty.'
+						'Refresh' => 'This field cannot be empty.'
 					]
 				]
 			],
@@ -559,7 +559,7 @@ class testFormUser extends CWebTest {
 					],
 					'role' => 'Super admin role',
 					'inline_errors' => [
-						'id:refresh' => 'A time unit is expected.'
+						'Refresh' => 'A time unit is expected.'
 					]
 				]
 			],
@@ -577,7 +577,7 @@ class testFormUser extends CWebTest {
 					],
 					'role' => 'Super admin role',
 					'inline_errors' => [
-						'id:refresh' => 'Value must be between 0 and 3600s (1h).'
+						'Refresh' => 'Value must be between 0 and 3600s (1h).'
 					]
 				]
 			],
@@ -594,7 +594,7 @@ class testFormUser extends CWebTest {
 					],
 					'role' => 'Super admin role',
 					'inline_errors' => [
-						'id:refresh' => 'Value must be between 0 and 3600s (1h).'
+						'Refresh' => 'Value must be between 0 and 3600s (1h).'
 					]
 				]
 			],
@@ -611,7 +611,7 @@ class testFormUser extends CWebTest {
 					],
 					'role' => 'Super admin role',
 					'inline_errors' => [
-						'id:refresh' => 'Value must be between 0 and 3600s (1h).'
+						'Refresh' => 'Value must be between 0 and 3600s (1h).'
 					]
 				]
 			],
@@ -629,7 +629,7 @@ class testFormUser extends CWebTest {
 					],
 					'role' => 'Super admin role',
 					'inline_errors' => [
-						'id:refresh' => 'A time unit is expected.'
+						'Refresh' => 'A time unit is expected.'
 					]
 				]
 			],
@@ -647,7 +647,7 @@ class testFormUser extends CWebTest {
 					],
 					'role' => 'Super admin role',
 					'inline_errors' => [
-						'id:rows_per_page' => 'This value must be no less than "1".'
+						'Rows per page' => 'This value must be no less than "1".'
 					]
 				]
 			],
@@ -665,7 +665,7 @@ class testFormUser extends CWebTest {
 					],
 					'role' => 'Super admin role',
 					'inline_errors' => [
-						'id:rows_per_page' => 'This value must be no less than "1".'
+						'Rows per page' => 'This value must be no less than "1".'
 					]
 				]
 			],
@@ -686,7 +686,7 @@ class testFormUser extends CWebTest {
 					],
 					'role' => 'Super admin role',
 					'inline_errors' => [
-						'id:autologout' => 'Value must be between 90s (1m 30s) and 86400s (1d).'
+						'Auto-logout' => 'Value must be between 90s (1m 30s) and 86400s (1d).'
 					]
 				]
 			],
@@ -706,7 +706,7 @@ class testFormUser extends CWebTest {
 					],
 					'role' => 'Super admin role',
 					'inline_errors' => [
-						'id:autologout' => 'Value must be between 90s (1m 30s) and 86400s (1d).'
+						'Auto-logout' => 'Value must be between 90s (1m 30s) and 86400s (1d).'
 					]
 				]
 			],
@@ -727,7 +727,7 @@ class testFormUser extends CWebTest {
 					],
 					'role' => 'Super admin role',
 					'inline_errors' => [
-						'id:autologout' => 'Value must be between 90s (1m 30s) and 86400s (1d).'
+						'Auto-logout' => 'Value must be between 90s (1m 30s) and 86400s (1d).'
 					]
 				]
 			],
@@ -747,7 +747,7 @@ class testFormUser extends CWebTest {
 					],
 					'role' => 'Super admin role',
 					'inline_errors' => [
-						'id:autologout' => 'Value must be between 90s (1m 30s) and 86400s (1d).'
+						'Auto-logout' => 'Value must be between 90s (1m 30s) and 86400s (1d).'
 					]
 				]
 			],
@@ -767,7 +767,7 @@ class testFormUser extends CWebTest {
 					],
 					'role' => 'Super admin role',
 					'inline_errors' => [
-						'id:autologout' => 'Value must be between 90s (1m 30s) and 86400s (1d).'
+						'Auto-logout' => 'Value must be between 90s (1m 30s) and 86400s (1d).'
 					]
 				]
 			],
@@ -788,7 +788,7 @@ class testFormUser extends CWebTest {
 					],
 					'role' => 'Super admin role',
 					'inline_errors' => [
-						'id:autologout' => 'A time unit is expected.'
+						'Auto-logout' => 'A time unit is expected.'
 					]
 				]
 			],
@@ -809,7 +809,7 @@ class testFormUser extends CWebTest {
 					],
 					'role' => 'Super admin role',
 					'inline_errors' => [
-						'id:autologout' => 'This field cannot be empty.'
+						'Auto-logout' => 'This field cannot be empty.'
 					]
 				]
 			],
@@ -826,9 +826,8 @@ class testFormUser extends CWebTest {
 						'URL (after login)' => 'javascript:alert(123);'
 					],
 					'role' => 'Super admin role',
-					'inline_errors' => [
-						'id:url' => 'Unacceptable URL.'
-					]
+					'error_title' => 'Cannot add user',
+					'error_details' => 'Invalid parameter "/1/url": unacceptable URL.'
 				]
 			],
 			// #25.
@@ -844,9 +843,8 @@ class testFormUser extends CWebTest {
 						'URL (after login)' => 'snmp://zabbix.com'
 					],
 					'role' => 'Super admin role',
-					'inline_errors' => [
-						'id:url' => 'Unacceptable URL.'
-					]
+					'error_title' => 'Cannot add user',
+					'error_details' => 'Invalid parameter "/1/url": unacceptable URL.'
 				]
 			],
 			// #26.
@@ -982,13 +980,13 @@ class testFormUser extends CWebTest {
 		if ($data['expected'] === TEST_BAD) {
 			if (array_key_exists('error_title', $data)) {
 				$this->assertMessage(TEST_BAD, $data['error_title'], $data['error_details']);
-				$this->assertEquals($old_hash, CDBHelper::getHash(self::SQL));
 			}
 			// Condition for inline validation error.
 			elseif (array_key_exists('inline_errors', $data)) {
 				$this->assertInlineError($form, $data['inline_errors']);
-				$this->assertEquals($old_hash, CDBHelper::getHash(self::SQL));
 			}
+
+			$this->assertEquals($old_hash, CDBHelper::getHash(self::SQL));
 		}
 		else {
 			$this->assertMessage(TEST_GOOD, 'User added');
@@ -1141,7 +1139,7 @@ class testFormUser extends CWebTest {
 						'Username' => 'Admin'
 					],
 					'inline_errors' => [
-						'id:username' => 'This object already exists.'
+						'Username' => 'This object already exists.'
 					]
 				]
 			],
@@ -1153,7 +1151,7 @@ class testFormUser extends CWebTest {
 						'Username' => ''
 					],
 					'inline_errors' => [
-						'id:username' => 'This field cannot be empty.'
+						'Username' => 'This field cannot be empty.'
 					]
 				]
 			],
@@ -1227,7 +1225,7 @@ class testFormUser extends CWebTest {
 						'Refresh' => ''
 					],
 					'inline_errors' => [
-						'id:refresh' => 'This field cannot be empty.'
+						'Refresh' => 'This field cannot be empty.'
 					]
 				]
 			],
@@ -1239,7 +1237,7 @@ class testFormUser extends CWebTest {
 						'Refresh' => '123abc'
 					],
 					'inline_errors' => [
-						'id:refresh' => 'A time unit is expected.'
+						'Refresh' => 'A time unit is expected.'
 					]
 				]
 			],
@@ -1251,7 +1249,7 @@ class testFormUser extends CWebTest {
 						'Refresh' => '3601'
 					],
 					'inline_errors' => [
-						'id:refresh' => 'Value must be between 0 and 3600s (1h).'
+						'Refresh' => 'Value must be between 0 and 3600s (1h).'
 					]
 				]
 			],
@@ -1263,7 +1261,7 @@ class testFormUser extends CWebTest {
 						'Refresh' => '61m'
 					],
 					'inline_errors' => [
-						'id:refresh' => 'Value must be between 0 and 3600s (1h).'
+						'Refresh' => 'Value must be between 0 and 3600s (1h).'
 					]
 				]
 			],
@@ -1275,7 +1273,7 @@ class testFormUser extends CWebTest {
 						'Refresh' => '00000000000001'
 					],
 					'inline_errors' => [
-						'id:refresh' => 'A time unit is expected.'
+						'Refresh' => 'A time unit is expected.'
 					]
 				]
 			],
@@ -1287,7 +1285,7 @@ class testFormUser extends CWebTest {
 						'Rows per page' => '0'
 					],
 					'inline_errors' => [
-						'id:rows_per_page' => 'This value must be no less than "1".'
+						'Rows per page' => 'This value must be no less than "1".'
 					]
 				]
 			],
@@ -1299,7 +1297,7 @@ class testFormUser extends CWebTest {
 						'Rows per page' => 'abc123'
 					],
 					'inline_errors' => [
-						'id:rows_per_page' => 'This value must be no less than "1".'
+						'Rows per page' => 'This value must be no less than "1".'
 					]
 				]
 			],
@@ -1313,7 +1311,7 @@ class testFormUser extends CWebTest {
 						'value' => '89'
 					],
 					'inline_errors' => [
-						'id:autologout' => 'Value must be between 90s (1m 30s) and 86400s (1d).'
+						'Auto-logout' => 'Value must be between 90s (1m 30s) and 86400s (1d).'
 					]
 				]
 			],
@@ -1327,7 +1325,7 @@ class testFormUser extends CWebTest {
 						'value' => '86401'
 					],
 					'inline_errors' => [
-						'id:autologout' => 'Value must be between 90s (1m 30s) and 86400s (1d).'
+						'Auto-logout' => 'Value must be between 90s (1m 30s) and 86400s (1d).'
 					]
 				]
 			],
@@ -1341,7 +1339,7 @@ class testFormUser extends CWebTest {
 						'value' => '1m'
 					],
 					'inline_errors' => [
-						'id:autologout' => 'Value must be between 90s (1m 30s) and 86400s (1d).'
+						'Auto-logout' => 'Value must be between 90s (1m 30s) and 86400s (1d).'
 					]
 				]
 			],
@@ -1355,7 +1353,7 @@ class testFormUser extends CWebTest {
 						'value' => '1441m'
 					],
 					'inline_errors' => [
-						'id:autologout' => 'Value must be between 90s (1m 30s) and 86400s (1d).'
+						'Auto-logout' => 'Value must be between 90s (1m 30s) and 86400s (1d).'
 					]
 				]
 			],
@@ -1369,7 +1367,7 @@ class testFormUser extends CWebTest {
 						'value' => '25h'
 					],
 					'inline_errors' => [
-						'id:autologout' => 'Value must be between 90s (1m 30s) and 86400s (1d).'
+						'Auto-logout' => 'Value must be between 90s (1m 30s) and 86400s (1d).'
 					]
 				]
 			],
@@ -1383,7 +1381,7 @@ class testFormUser extends CWebTest {
 						'value' => 'ninety'
 					],
 					'inline_errors' => [
-						'id:autologout' => 'A time unit is expected.'
+						'Auto-logout' => 'A time unit is expected.'
 					]
 				]
 			],
@@ -1397,7 +1395,7 @@ class testFormUser extends CWebTest {
 						'value' => ''
 					],
 					'inline_errors' => [
-						'id:autologout' => 'This field cannot be empty.'
+						'Auto-logout' => 'This field cannot be empty.'
 					]
 				]
 			],
@@ -1408,9 +1406,8 @@ class testFormUser extends CWebTest {
 					'fields' => [
 						'URL (after login)' => 'javascript:alert(123);'
 					],
-					'inline_errors' => [
-						'id:url' => 'Unacceptable URL.'
-					]
+					'error_title' => 'Cannot update user',
+					'error_details' => 'Invalid parameter "/1/url": unacceptable URL.'
 				]
 			],
 			// #26 Incorrect URL protocol.
@@ -1420,9 +1417,8 @@ class testFormUser extends CWebTest {
 					'fields' => [
 						'URL (after login)' => 'snmp://zabbix.com'
 					],
-					'inline_errors' => [
-						'id:url' => 'Unacceptable URL.'
-					]
+					'error_title' => 'Cannot update user',
+					'error_details' => 'Invalid parameter "/1/url": unacceptable URL.'
 				]
 			],
 			// #27 Updating LDAP user with empty password fields.
@@ -1571,13 +1567,14 @@ class testFormUser extends CWebTest {
 			// Condition for old style error message.
 			if (array_key_exists('error_title', $data)) {
 					$this->assertMessage(TEST_BAD, $data['error_title'], $data['error_details']);
-					$this->assertEquals($old_hash, CDBHelper::getHash(self::SQL));
+
 			}
 			// Condition for inline validation error.
 			else {
 				$this->assertInlineError($form, $data['inline_errors']);
-				$this->assertEquals($old_hash, CDBHelper::getHash(self::SQL));
 			}
+
+			$this->assertEquals($old_hash, CDBHelper::getHash(self::SQL));
 		}
 		else {
 			$this->assertMessage(TEST_GOOD, 'User updated');
@@ -1664,6 +1661,13 @@ class testFormUser extends CWebTest {
 				$this->page->getAlertText()
 		);
 		$this->page->acceptAlert();
+
+		if ($update_user === 'Admin') {
+			$this->query('button:Sign in')->waitUntilVisible();
+		}
+		else {
+			$this->assertMessage(TEST_GOOD, 'User updated');
+		}
 
 		try {
 			$this->page->logout();

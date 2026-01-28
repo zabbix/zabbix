@@ -523,8 +523,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 			[
 				[
 					'db' => 'SELECT * FROM users',
-					'link' => 'zabbix.php?action=user.edit&userid=1',
-					'return_button' => true
+					'link' => 'zabbix.php?action=user.edit&userid=1'
 				]
 			],
 			// #47 User create.
@@ -532,7 +531,18 @@ class testPermissionsWithoutCSRF extends CWebTest {
 				[
 					'db' => 'SELECT * FROM users',
 					'link' => 'zabbix.php?action=user.edit',
-					'return_button' => true
+					'form' => [
+						'selector' => 'id:user-form',
+						'tab' => 'Permissions',
+						'fields' => [
+							'Role' => 'Admin role'
+						]
+					],
+					'fields' => [
+						'id:username' => 'CSRF user test',
+						'id:password1' => 'ZaBB1x26',
+						'id:password2' => 'ZaBB1x26'
+					]
 				]
 			],
 			// #48 Media update.
@@ -571,8 +581,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 			[
 				[
 					'db' => 'SELECT * FROM profiles',
-					'link' => 'zabbix.php?action=userprofile.edit',
-					'return_button' => true
+					'link' => 'zabbix.php?action=userprofile.edit'
 				]
 			],
 			// #53 User role update.
@@ -761,6 +770,16 @@ class testPermissionsWithoutCSRF extends CWebTest {
 			foreach ($data['fields'] as $field => $value) {
 				$this->query($field)->one()->detect()->fill($value);
 			}
+		}
+
+		if (CTestArrayHelper::get($data, 'form')) {
+			$form = $this->query($data['form']['selector'])->asForm()->one();
+
+			if (CTestArrayHelper::get($data, 'form.tab')) {
+				$form->selectTab($data['form']['tab']);
+			}
+
+			$form->fill(CTestArrayHelper::get($data, 'form.fields'));
 		}
 
 		// Fill in mandatory fields in a secondary form if it contains fields that are required for form submission.
