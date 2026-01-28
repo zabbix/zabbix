@@ -77,7 +77,7 @@ class CValidationRule {
 								break 3;
 							}
 
-							if (array_key_exists(key($rule), $rules)) {
+							if (array_key_exists((string) key($rule), $rules)) {
 								// the message can be not translated because it is an internal error
 								$this->error = 'Validation rule "'.key($rule).'" already exists.';
 								return false;
