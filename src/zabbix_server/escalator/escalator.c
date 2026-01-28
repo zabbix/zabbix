@@ -1405,12 +1405,37 @@ static void	execute_commands(const zbx_db_event *event, const zbx_db_event *r_ev
 		else
 		{
 			/* get host details */
-
 			if (0 == host.hostid)
 			{
 				/* target is "Current host" */
-				if (SUCCEED != (rc = zbx_event_db_get_host((NULL != r_event ? r_event : event), &host,
-						error, sizeof(error))))
+				int	wait_retries = 1;
+
+				if (EVENT_SOURCE_AUTOREGISTRATION == event->source)
+					wait_retries = 10;
+
+				for (i = 0; i < wait_retries; i++)
+				{
+					if (SUCCEED == (rc = zbx_event_db_get_host((NULL != r_event ? r_event : event),
+							&host, error, sizeof(error))))
+					{
+						if (EVENT_SOURCE_AUTOREGISTRATION != event->source ||
+								HOST_MONITORED_BY_PROXY_GROUP != host.monitored_by ||
+								0 != host.proxyid)
+						{
+							break;
+						}
+					}
+					else if (EVENT_SOURCE_AUTOREGISTRATION != event->source)
+					{
+						goto fail;
+					}
+
+					zbx_sleep(1);
+				}
+
+				if (SUCCEED != rc || (EVENT_SOURCE_AUTOREGISTRATION == event->source &&
+						HOST_MONITORED_BY_PROXY_GROUP == host.monitored_by &&
+						0 == host.proxyid))
 				{
 					goto fail;
 				}
