@@ -1235,7 +1235,7 @@ void	*zbx_pp_manager_thread(void *args)
 
 	zbx_supervisor_set_process_running(server_num);
 
-	while (ZBX_IS_RUNNING())
+	while (1)
 	{
 		int		shutdown = 0;
 		double		time_now = zbx_time();
@@ -1391,7 +1391,12 @@ void	*zbx_pp_manager_thread(void *args)
 #endif
 			time_trim = sec;
 		}
+
+		if (!ZBX_IS_RUNNING() && 0 == pending_num && 0 == processing_num)
+			break;
 	}
+
+	zbx_dc_flush_history();
 
 	zbx_supervisor_update_activity("%s [terminating]", process_title);
 
