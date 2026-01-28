@@ -56,13 +56,6 @@ class CControllerCorrelationUpdate extends CController {
 						]
 					],
 					'operator' => [
-						['db conditions.operator', 'required', 'in' => [CONDITION_OPERATOR_EQUAL],
-							'when' => ['type',
-								'in' => [ZBX_CORR_CONDITION_OLD_EVENT_TAG, ZBX_CORR_CONDITION_NEW_EVENT_TAG,
-									ZBX_CORR_CONDITION_EVENT_TAG_PAIR
-								]
-							]
-						],
 						['db corr_condition_group.operator', 'required',
 							'in' => [CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL],
 							'when' => ['type', 'in' => [ZBX_CORR_CONDITION_NEW_EVENT_HOSTGROUP]]
@@ -109,8 +102,7 @@ class CControllerCorrelationUpdate extends CController {
 							]
 						]
 					],
-					'groupid' => ['array', 'required', 'not_empty',
-						'field' => ['db corr_condition_group.groupid', 'required'],
+					'groupid' => ['db corr_condition_group.groupid', 'required',
 						'when' => ['type', 'in' => [ZBX_CORR_CONDITION_NEW_EVENT_HOSTGROUP]]
 					],
 					'formulaid' => ['string']
