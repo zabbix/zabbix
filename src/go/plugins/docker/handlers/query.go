@@ -17,60 +17,58 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-package docker
+package handlers
 
 import (
 	"context"
 	"encoding/json"
-	"io/ioutil"
-	"net"
+	"io"
 	"net/http"
 	"path"
-	"time"
 
+	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/zbxerr"
 )
 
-type client struct {
-	client http.Client
+const dockerVersion = "1.28"
+
+// errorMessage represents the API error.
+type errorMessage struct {
+	Message string `json:"message"`
 }
 
-func newClient(socketPath string, timeout int) *client {
-	transport := &http.Transport{
-		DialContext: func(_ context.Context, _, _ string) (net.Conn, error) {
-			return net.Dial("unix", socketPath)
-		},
-	}
+func queryDockerAPI(client *http.Client, query string) ([]byte, error) {
+	req, err := http.NewRequestWithContext(
+		context.Background(),
+		http.MethodGet,
+		"http://"+path.Join(dockerVersion, query),
+		http.NoBody,
+	)
 
-	client := client{}
-	client.client = http.Client{
-		Transport: transport,
-		Timeout:   time.Duration(timeout) * time.Second,
-	}
-
-	return &client
-}
-
-func (cli *client) Query(queryPath string) ([]byte, error) {
-	resp, err := cli.client.Get("http://" + path.Join(dockerVersion, queryPath))
 	if err != nil {
-		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
+		return nil, errs.Wrap(err, "failed to create request")
 	}
-	defer resp.Body.Close()
 
-	body, err := ioutil.ReadAll(resp.Body)
+	resp, err := client.Do(req)
 	if err != nil {
-		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
+		return nil, errs.Wrap(err, "failed to do request")
+	}
+	defer resp.Body.Close() //nolint:errcheck // typical defer close.
+
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, errs.WrapConst(err, zbxerr.ErrorCannotFetchData)
 	}
 
 	if resp.StatusCode != http.StatusOK {
-		var apiErr ErrorMessage
+		var apiErr errorMessage
 
-		if err = json.Unmarshal(body, &apiErr); err != nil {
-			return nil, zbxerr.ErrorCannotUnmarshalJSON.Wrap(err)
+		err = json.Unmarshal(body, &apiErr)
+		if err != nil {
+			return nil, errs.WrapConst(err, zbxerr.ErrorCannotUnmarshalJSON)
 		}
 
-		return nil, zbxerr.New(apiErr.Message)
+		return nil, errs.New(apiErr.Message)
 	}
 
 	return body, nil
