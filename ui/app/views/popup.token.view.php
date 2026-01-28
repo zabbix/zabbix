@@ -29,7 +29,7 @@ $token_from_grid = (new CFormGrid())
 		new CLabel(_('Name').':'),
 		new CFormField($data['name'])
 	])
-	->addItem($data['admin_mode'] === '1'
+	->addItem($data['admin_mode'] == 1
 		? [
 			new CLabel(_('User').':'),
 			new CFormField($data['user_name'])

@@ -18,7 +18,6 @@
 #include "zbxdb.h"
 #include "zbxhistory.h"
 #include "zbxtypes.h"
-#include "zbxvariant.h"
 #include "zbxalgo.h"
 #include "zbxcacheconfig.h"
 #include "zbxdbhigh.h"
@@ -361,7 +360,7 @@ static void	proxy_prepare_history(zbx_dc_history_t *history, int history_num, zb
 		}
 	}
 
-	zbx_dc_config_clean_history_sync_items(items, errcodes, (size_t)history_num);
+	zbx_dc_config_clean_history_sync_items(items, (size_t)history_num);
 	zbx_free(items);
 	zbx_free(errcodes);
 	zbx_vector_uint64_destroy(&itemids);
