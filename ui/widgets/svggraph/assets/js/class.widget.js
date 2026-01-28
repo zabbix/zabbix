@@ -22,6 +22,12 @@ class CWidgetSvgGraph extends CWidget {
 	 */
 	#graph = null;
 
+	/**
+	 *
+	 * @type {SVGSVGElement|null}
+	 */
+	#svg = null;
+
 	#selected_itemid = null;
 	#selected_itemids = null;
 	#selected_ds = null;
@@ -248,7 +254,7 @@ class CWidgetSvgGraph extends CWidget {
 			label: t('Download image'),
 			disabled: !this._has_contents,
 			clickCallback: () => {
-				downloadSvgImage(this._svg, 'image.png', '.svg-graph-legend');
+				downloadSvgImage(this.#svg, 'image.png', '.svg-graph-legend');
 			}
 		});
 
@@ -260,7 +266,8 @@ class CWidgetSvgGraph extends CWidget {
 	}
 
 	#initGraph(options) {
-		this.#graph = new CSvgGraph(this._body.querySelector('svg'), this, options);
+		this.#svg = this._body.querySelector('svg');
+		this.#graph = new CSvgGraph(this.#svg, this, options);
 
 		this.#activateGraph();
 	}

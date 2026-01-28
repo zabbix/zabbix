@@ -22,6 +22,12 @@ class CWidgetScatterPlot extends CWidget {
 	 */
 	#graph = null;
 
+	/**
+	 *
+	 * @type {SVGSVGElement|null}
+	 */
+	#svg = null;
+
 	#selected_itemid = null;
 	#selected_ds = null;
 
@@ -185,7 +191,7 @@ class CWidgetScatterPlot extends CWidget {
 			label: t('Download image'),
 			disabled: !this._has_contents,
 			clickCallback: () => {
-				downloadSvgImage(this._svg, 'image.png', '.svg-scatter-plot-legend');
+				downloadSvgImage(this.#svg, 'image.png', '.svg-scatter-plot-legend');
 			}
 		});
 
@@ -197,7 +203,8 @@ class CWidgetScatterPlot extends CWidget {
 	}
 
 	#initGraph(options) {
-		this.#graph = new CSvgGraph(this._body.querySelector('svg'), this, options);
+		this.#svg = this._body.querySelector('svg');
+		this.#graph = new CSvgGraph(this.#svg, this, options);
 
 		this.#activateGraph();
 	}
