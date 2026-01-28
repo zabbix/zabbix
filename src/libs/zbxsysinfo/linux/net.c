@@ -1318,7 +1318,8 @@ static void	get_link_flags(const char *interface, struct zbx_json *j)
 	close(sock);
 }
 
-static void	fill_net_if_get_params(char *name, char *param, char *jsonname, struct zbx_json *j, int as_int)
+static void	fill_net_if_get_params(const char *name, const char *param,
+			const char *jsonname, const int as_int, struct zbx_json *j)
 {
 	FILE	*f;
 	char	*path, value[MAX_STRING_LEN];
@@ -1412,8 +1413,8 @@ int	net_if_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 		zbx_json_addobject(&jcfg, NULL);
 		zbx_json_addobject(&jval, NULL);
 		zbx_json_addstring(&jcfg, "name", p, ZBX_JSON_TYPE_STRING);
-		fill_net_if_get_params(p, "address", "mac", &jcfg, 0);
-		fill_net_if_get_params(p, "ifalias",  NULL, &jcfg, 0);
+		fill_net_if_get_params(p, "address", "mac", 0, &jcfg);
+		fill_net_if_get_params(p, "ifalias",  NULL, 0, &jcfg);
 		get_link_flags(p, &jcfg);
 
 		zbx_json_addstring(&jval, "name", p, ZBX_JSON_TYPE_STRING);
@@ -1446,12 +1447,12 @@ int	net_if_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 			zbx_free(error);
 		}
 
-		fill_net_if_get_params(p, "type",  NULL, &jval, 1);
-		fill_net_if_get_params(p, "address", "mac", &jval, 0);
-		fill_net_if_get_params(p, "ifalias",  NULL, &jval, 0);
-		fill_net_if_get_params(p, "carrier", NULL, &jval, 1);
-		fill_net_if_get_params(p, "speed", NULL, &jval, 1);
-		fill_net_if_get_params(p, "duplex", NULL, &jval, 0);
+		fill_net_if_get_params(p, "type",  NULL, 1, &jval);
+		fill_net_if_get_params(p, "address", "mac", 0, &jval);
+		fill_net_if_get_params(p, "ifalias",  NULL, 0, &jval);
+		fill_net_if_get_params(p, "carrier", NULL, 1, &jval);
+		fill_net_if_get_params(p, "speed", NULL, 1, &jval);
+		fill_net_if_get_params(p, "duplex", NULL, 0, &jval);
 		get_link_settings(p, &jval);
 
 		get_wifi_info(p, &jval);
