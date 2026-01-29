@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -311,6 +311,8 @@ class testAlarmNotification extends CWebTest {
 
 	/**
 	 * Check that colors displayed in alarm notification overlay are the same as in configuration.
+	 *
+	 * @onAfter deleteEvents
 	 */
 	public function testAlarmNotification_CheckColorChange() {
 		// Trigger problem.
@@ -346,6 +348,7 @@ class testAlarmNotification extends CWebTest {
 		}
 
 		$form->submit();
+		$this->assertMessage(TEST_GOOD, 'Configuration updated');
 		$this->page->waitUntilReady();
 		$form->invalidate();
 
