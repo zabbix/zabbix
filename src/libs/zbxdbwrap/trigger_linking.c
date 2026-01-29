@@ -460,7 +460,7 @@ static int	DBcopy_template_trigger_tags(const zbx_vector_uint64_t *new_triggerid
 	if (0 != insert_num)
 	{
 		zbx_db_insert_prepare(&db_insert, "trigger_tag", "triggertagid", "triggerid", "tag", "value",
-				(char *)NULL);
+				"automatic", (char *)NULL);
 		tagid = zbx_db_get_maxid_num("trigger_tag", insert_num);
 	}
 
@@ -483,11 +483,11 @@ static int	DBcopy_template_trigger_tags(const zbx_vector_uint64_t *new_triggerid
 			if (0 == db_tag->tagid)
 			{
 				zbx_db_insert_add_values(&db_insert, tagid, trigger_tags->triggerid,
-						db_tag->tag, db_tag->value);
+						db_tag->tag, db_tag->value, ZBX_DB_TAG_NORMAL);
 
 				zbx_audit_trigger_update_json_add_tags_and_values(audit_context_mode,
 						trigger_tags->triggerid, trigger_tags->flags, tagid, db_tag->tag,
-						db_tag->value);
+						db_tag->value, ZBX_DB_TAG_NORMAL);
 
 				tagid++;
 			}
