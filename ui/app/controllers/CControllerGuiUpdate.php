@@ -87,8 +87,7 @@ class CControllerGuiUpdate extends CController {
 
 		if ($result) {
 			$output['success'] = [
-				'title' => _('Configuration updated'),
-				'redirect' => (new CUrl('zabbix.php'))->setArgument('action', 'gui.edit')->getUrl()
+				'title' => _('Configuration updated')
 			];
 		}
 		else {

@@ -55,7 +55,7 @@ class CControllerHousekeepingEdit extends CController {
 		$default_values = $this->getDefaultValues();
 		$data = [];
 
-		foreach ($default_values as $key => $default_value) {
+		foreach (array_keys($default_values) as $key) {
 			$data[$key] = CHousekeepingHelper::get($key);
 		}
 

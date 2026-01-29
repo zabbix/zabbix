@@ -71,8 +71,7 @@ class CControllerAuditSettingsUpdate extends CController {
 
 		if ($result_housekeeping && $result_settings) {
 			$output['success'] = [
-				'title' => _('Configuration updated'),
-				'redirect' => (new CUrl('zabbix.php'))->setArgument('action', 'audit.settings.edit')->getUrl()
+				'title' => _('Configuration updated')
 			];
 		}
 		else {

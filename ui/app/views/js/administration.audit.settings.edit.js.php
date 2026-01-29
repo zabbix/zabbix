@@ -125,7 +125,7 @@ const view = new class {
 								postMessageDetails('success', response.success.messages);
 							}
 
-							location.href = new URL(response.success.redirect, location.href).href;
+							location.href = location.href;
 						}
 					})
 					.catch((exception) => this.#ajaxExceptionHandler(exception))

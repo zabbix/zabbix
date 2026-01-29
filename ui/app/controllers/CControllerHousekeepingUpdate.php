@@ -109,8 +109,7 @@ class CControllerHousekeepingUpdate extends CController {
 
 		if ($result) {
 			$output['success'] = [
-				'title' => _('Configuration updated'),
-				'redirect' => (new CUrl('zabbix.php'))->setArgument('action', 'housekeeping.edit')->getUrl()
+				'title' => _('Configuration updated')
 			];
 		}
 		else {
