@@ -291,7 +291,7 @@ class CConfigurationExportBuilder {
 	 * @param array $schema      Tag schema from validation class.
 	 * @param array $dashboards  Export data.
 	 */
-	public function buildDashboards(array $schema, array $dashboards) {
+	public function buildDashboards(array $schema, array $dashboards): void {
 		$dashboards = $this->formatDashboards($dashboards);
 
 		$this->data['dashboards'] = self::build($schema, $dashboards, 'dashboards');
@@ -1424,7 +1424,7 @@ class CConfigurationExportBuilder {
 	 *
 	 * @return array
 	 */
-	protected function formatTemplateDashboards(array $dashboards) {
+	protected function formatTemplateDashboards(array $dashboards): array {
 		$result = [];
 
 		CArrayHelper::sort($dashboards, ['name']);
