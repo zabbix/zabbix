@@ -817,7 +817,6 @@ static unsigned char	get_connection_state_tcp(const char *name)
 
 	return state;
 }
-#endif
 
 static unsigned char	get_connection_state_udp(const char *name)
 {
@@ -832,6 +831,7 @@ static unsigned char	get_connection_state_udp(const char *name)
 
 	return state;
 }
+#endif
 
 #ifdef HAVE_IPV6
 static int	scan_ipv6_addr(const char *addr, struct sockaddr_in6 *sa6)
