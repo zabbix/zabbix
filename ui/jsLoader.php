@@ -257,9 +257,6 @@ $translate_strings = [
 		'No compatible widgets.' => _('No compatible widgets.'),
 		'Widget' => _('Widget')
 	],
-	'class.widget-edit.dialogue.js' => [
-		'Widget configuration will be reverted.' => _('Widget configuration will be reverted.')
-	],
 	'class.widget-edit.sandbox.js' => [
 		'Cannot add widget: not enough free space on the dashboard.' => _('Cannot add widget: not enough free space on the dashboard.')
 	],
@@ -417,12 +414,10 @@ $translate_strings = [
 	],
 	'class.form.validator.js' => [
 		'An array is expected.' => _('An array is expected.'),
-		'Required field is missing.' => _('Required field is missing.'),
 		'This value does not match pattern.' => _('This value does not match pattern.'),
 		'This value is not a valid identifier.' => _('This value is not a valid identifier.'),
 		'This value is not a valid integer.' => _('This value is not a valid integer.'),
 		'This value is not a valid floating-point value.' => _('This value is not a valid floating-point value.'),
-		'This object already exists.' => _('This object already exists.'),
 		'This value is not a valid string.' => _('This value is not a valid string.'),
 		'This field cannot be empty.' => _('This field cannot be empty.'),
 		'This value is too long.' => _('This value is too long.'),
@@ -516,10 +511,6 @@ $translate_strings = [
 		'Host Wizard' => _('Host Wizard'),
 		'Inventory' => _('Inventory'),
 		'Latest data' => _('Latest data'),
-		'Latest values' => _('Latest values'),
-		'Last hour graph' => _('Last hour graph'),
-		'Last month graph' => _('Last month graph'),
-		'Last week graph' => _('Last week graph'),
 		'Links' => _('Links'),
 		'Mark as cause' => _('Mark as cause'),
 		'Mark selected as symptoms' => _('Mark selected as symptoms'),
