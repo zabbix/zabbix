@@ -73,7 +73,7 @@ class testUsersAuthenticationHttp extends CLegacyWebTest {
 
 		// Check hintbox.
 		$form->getLabel('Enable HTTP authentication')->query('class:zi-help-filled-small')->one()->click();
-		$hintbox = $form->query('xpath://div[@class="overlay-dialogue wordbreak"]')->waitUntilPresent();
+		$hintbox = $form->query('xpath://div[@class="overlay-dialogue hintbox wordbreak hintbox-static"]')->waitUntilPresent();
 		$this->assertEquals('If HTTP authentication is enabled, all users (even with frontend access set to LDAP/Internal)'.
 			' will be authenticated by the web server, not by Zabbix.', $hintbox->one()->getText());
 

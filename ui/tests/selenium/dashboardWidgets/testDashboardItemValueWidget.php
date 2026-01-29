@@ -3285,7 +3285,8 @@ class testDashboardItemValueWidget extends testWidgets {
 
 		// Check hint-box.
 		$dashboard->query($time_icon)->one()->click();
-		$hint = $this->query('xpath://div[@class="overlay-dialogue wordbreak"]')->one()->waitUntilVisible();
+		$hint = $this->query('xpath://div[@class="overlay-dialogue hintbox wordbreak hintbox-position-fixed hintbox-static"]')
+			->one()->waitUntilVisible();
 		$this->assertEquals('Last 1 hour', $hint->getText());
 
 		// Close the hint-box.
