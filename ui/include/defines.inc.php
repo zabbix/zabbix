@@ -2133,6 +2133,7 @@ define('ZBX_STYLE_INLINE_FILTER_STATS', 'inline-filter-stats');
 define('ZBX_STYLE_LAYOUT_KIOSKMODE', 'layout-kioskmode');
 define('ZBX_STYLE_CONTAINER', 'container');
 define('ZBX_STYLE_LAYOUT_WRAPPER', 'wrapper');
+define('ZBX_STYLE_LEFT', 'left');
 define('ZBX_STYLE_LINE_CLAMP', 'line-clamp');
 define('ZBX_STYLE_LINK', 'link');
 define('ZBX_STYLE_LINK_ACTION', 'link-action');
