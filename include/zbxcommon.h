@@ -617,6 +617,7 @@ void	zbx_unsetenv(const char *envname);
 void	zbx_error(const char *fmt, ...) __zbx_attr_format_printf(1, 2);
 
 /* misc functions */
+int	zbx_validate_hostname_len(const char *hostname, size_t hostname_len);
 int	zbx_validate_hostname(const char *hostname);
 
 int	get_nearestindex(const void *p, size_t sz, int num, zbx_uint64_t id);

@@ -26,7 +26,7 @@ class CControllerValidateApiExists extends CController {
 		$api_services = ['dashboard', 'discoveryrule', 'discoveryruleprototype', 'host', 'hostgroup', 'hostprototype',
 			'httptest', 'image', 'iconmap', 'item', 'itemprototype', 'maintenance', 'mediatype', 'proxy', 'proxygroup',
 			'report', 'regexp', 'role', 'service', 'sla', 'template', 'templatedashboard', 'templategroup', 'token',
-			'user', 'usergroup', 'usermacro'
+			'user', 'usergroup', 'usermacro', 'connector'
 		];
 
 		return ['object', 'fields' => [

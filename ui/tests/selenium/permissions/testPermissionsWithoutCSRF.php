@@ -454,7 +454,12 @@ class testPermissionsWithoutCSRF extends CWebTest {
 				[
 					'db' => 'SELECT * FROM token',
 					'link' => 'zabbix.php?action=token.list',
-					'overlay' => 'create'
+					'overlay' => 'create',
+					'fields' => [
+						'id:name' => 'API token create',
+						'xpath://div[@id="userid"]/..' => 'Admin',
+						'id:expires_at' => '2038-01-01 00:00:00'
+					]
 				]
 			],
 			// #39 API token update.
@@ -605,7 +610,11 @@ class testPermissionsWithoutCSRF extends CWebTest {
 				[
 					'db' => 'SELECT * FROM token',
 					'link' => 'zabbix.php?action=user.token.list',
-					'overlay' => 'create'
+					'overlay' => 'create',
+					'fields' => [
+						'id:name' => 'User API token create',
+						'id:expires_at' => '2038-01-01 00:00:00'
+					]
 				]
 			],
 			// #56 User API token update.
@@ -637,7 +646,11 @@ class testPermissionsWithoutCSRF extends CWebTest {
 				[
 					'db' => 'SELECT * FROM connector',
 					'link' => 'zabbix.php?action=connector.list',
-					'overlay' => 'create'
+					'overlay' => 'create',
+					'fields' => [
+						'id:name' => 'CSRF connector test name',
+						'id:url' => 'csrfurl.com'
+					]
 				]
 			],
 			// #60 Connector update.
