@@ -553,7 +553,7 @@ class CLdap {
 
 	protected function setOption(int $option, mixed $value): bool {
 		try {
-			return @ldap_set_option($this->ds, $option, $value);
+			return ldap_set_option($this->ds, $option, $value);
 		}
 		catch (ValueError) {
 			return false;
