@@ -26,6 +26,10 @@
 #include "zbxcompress.h"
 #include "zbxtime.h"
 #include "zbxcrypto.h"
+
+#ifdef HAVE_ARES_QUERY_CACHE
+#include "zbxresolver.h"
+#endif
 #endif
 
 #if !defined(WITH_AGENT2_METRICS)

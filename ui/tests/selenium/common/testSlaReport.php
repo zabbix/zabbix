@@ -476,10 +476,12 @@ class testSlaReport extends CWebTest {
 					}
 
 					// In rare cases expected and actual error budget can slightly differ due to calculation precision.
+					$calculated_error_budget = intval($uptime_seconds / floatval($data['expected']['SLO']) * 100) - $uptime_seconds;
+					$till_period_end = $period['end'] - $load_time;
+					$resulting_error_budget = min($calculated_error_budget, $till_period_end);
+
 					foreach([-1, 0, 1] as $delta) {
-						$error_budget[] = convertUnitsS(intval($uptime_seconds / floatval($data['expected']['SLO']) * 100)
-							- $uptime_seconds + $delta
-						);
+						$error_budget[] = convertUnitsS($resulting_error_budget + $delta);
 					}
 
 					$this->assertTrue(in_array($actual_budget = $row->getColumn('Error budget')->getText(), $error_budget),
