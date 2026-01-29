@@ -465,7 +465,7 @@ static int	DBpatch_7000030(void)
 			" select hti.itemid, hti.httptestid from httptestitem hti) as i"
 			" on i.httptestid = t.httptestid"
 		" where not exists ("
-			"select 1 from item_tag it"
+			"select NULL from item_tag it"
 			" where it.itemid = i.itemid and it.tag = t.tag)");
 
 	zbx_db_insert_prepare(&db_insert, "item_tag", "itemtagid", "itemid", "tag", "value", (char *)NULL);
