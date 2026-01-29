@@ -30,7 +30,6 @@
 #include "zbxnum.h"
 #include "zbxtime.h"
 #include "zbxexpr.h"
-#include "zbxip.h"
 
 #define INVALID_ITEM_OR_NO_PERMISSION_ERROR	"No permissions to referred object or it does not exist."
 

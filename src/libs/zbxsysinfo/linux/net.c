@@ -17,7 +17,10 @@
 #include "zbxjson.h"
 #include "zbxcomms.h"
 #include "zbxnum.h"
-#include "zbxip.h"
+
+#if !defined(WITH_AGENT2_METRICS)
+#	include "zbxip.h"
+#endif
 
 typedef struct
 {
@@ -782,6 +785,7 @@ out:
 	return ret;
 }
 
+#if !defined(WITH_AGENT2_METRICS)
 static unsigned char	get_connection_state_tcp(const char *name)
 {
 	unsigned char	state;
@@ -813,6 +817,7 @@ static unsigned char	get_connection_state_tcp(const char *name)
 
 	return state;
 }
+#endif
 
 static unsigned char	get_connection_state_udp(const char *name)
 {

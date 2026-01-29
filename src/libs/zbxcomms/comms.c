@@ -16,6 +16,7 @@
 #include "zbxstr.h"
 #include "zbxlog.h"
 #include "zbxip.h"
+#include "zbxnum.h"
 
 #if !defined(WITH_AGENT2_METRICS)
 
