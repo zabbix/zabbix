@@ -39,18 +39,6 @@ void	zbx_eventdata_free(zbx_eventdata_t *eventdata)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: compare events to sort by highest severity and host name          *
- *                                                                            *
- ******************************************************************************/
-int	zbx_eventdata_compare(const zbx_eventdata_t *d1, const zbx_eventdata_t *d2)
-{
-	ZBX_RETURN_IF_NOT_EQUAL(d2->nseverity, d1->nseverity);
-
-	return strcmp(d1->host, d2->host);
-}
-
-/******************************************************************************
- *                                                                            *
  * Purpose: build string from event data                                      *
  *                                                                            *
  ******************************************************************************/
