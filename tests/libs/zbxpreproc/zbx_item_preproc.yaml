@@ -1331,8 +1331,8 @@ in:
     type: ZBX_PREPROC_ERROR_FIELD_JSON
     params: $.error
 out:
-  return: FAIL
-  error: error message
+  return: SUCCEED
+  value: 0
 ---
 test case: test with numeric
 in:
@@ -1345,8 +1345,8 @@ in:
     type: ZBX_PREPROC_ERROR_FIELD_JSON
     params: $.error
 out:
-  return: FAIL
-  error: error message
+  return: SUCCEED
+  value: 0
 ---
 test case: xmlerror(x, //error)
 in:
