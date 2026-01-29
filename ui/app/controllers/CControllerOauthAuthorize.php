@@ -156,13 +156,11 @@ class CControllerOauthAuthorize extends CController {
 
 		if (curl_errno($handle)) {
 			error(curl_error($handle), true);
-			curl_close($handle);
 
 			return [];
 		}
 
 		$http_code = curl_getinfo($handle, CURLINFO_HTTP_CODE);
-		curl_close($handle);
 
 		if ($http_code != 200) {
 			error(_('Unexpected HTTP response status code.'), true);
