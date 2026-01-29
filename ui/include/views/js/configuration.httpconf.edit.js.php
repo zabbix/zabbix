@@ -99,7 +99,7 @@
 				.on('tableupdate.dynamicRows', (e) => {
 					e.target.querySelectorAll('.form_row').forEach((row, index) => {
 						for (const field of row.querySelectorAll('[name^="headers["]')) {
-							field.name = field.name.replace(/\[\d+]/g, `[${index}]`);
+							field.setAttribute('name', field.getAttribute('name').replace(/\[\d+]/g, `[${index}]`));
 						}
 					});
 				});
