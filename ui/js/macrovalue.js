@@ -39,10 +39,9 @@
 	function btnUndoClickEventHandle() {
 		var $this = $(this),
 			$container = $this.closest('.macro-input-group'),
-			$input_container = $('.input-secret, .textarea-flexible', $container),
+			$input_container = $('.input-secret, z-textarea-flexible', $container),
 			$input = $('.input-secret input[type=password], z-textarea-flexible', $container),
 			$dropdown_value = $('.dropdown-value', $container);
-
 		$input_container.replaceWith(
 			$('<div>')
 				.addClass('input-secret')
