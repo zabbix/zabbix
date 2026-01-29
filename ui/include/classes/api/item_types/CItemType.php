@@ -199,12 +199,12 @@ abstract class CItemType {
 				switch (static::TYPE) {
 					case ITEM_TYPE_HTTPAGENT:
 						return ['type' => API_MULTIPLE, 'rules' => [
-							['if' => ['field' => 'allow_traps', 'in' => HTTPCHECK_ALLOW_TRAPS_ON], 'type' => API_IP_RANGES, 'flags' => API_ALLOW_DNS | API_ALLOW_USER_MACRO, 'macros' => ['{HOST.HOST}', '{HOSTNAME}', '{HOST.NAME}', '{HOST.CONN}', '{HOST.IP}', '{IPADDRESS}', '{HOST.DNS}'], 'length' => DB::getFieldLength('items', 'trapper_hosts')],
+							['if' => ['field' => 'allow_traps', 'in' => HTTPCHECK_ALLOW_TRAPS_ON], 'type' => API_IP_RANGES, 'flags' => API_ALLOW_DNS | API_ALLOW_USER_MACRO, 'macros' => ['{HOST.HOST}', '{HOST.NAME}', '{HOST.CONN}', '{HOST.IP}', '{HOST.DNS}'], 'length' => DB::getFieldLength('items', 'trapper_hosts')],
 							['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('items', 'trapper_hosts')]
 						]];
 
 					case  ITEM_TYPE_TRAPPER:
-						return ['type' => API_IP_RANGES, 'flags' => API_ALLOW_DNS | API_ALLOW_USER_MACRO, 'macros' => ['{HOST.HOST}', '{HOSTNAME}', '{HOST.NAME}', '{HOST.CONN}', '{HOST.IP}', '{IPADDRESS}', '{HOST.DNS}'], 'length' => DB::getFieldLength('items', 'trapper_hosts')];
+						return ['type' => API_IP_RANGES, 'flags' => API_ALLOW_DNS | API_ALLOW_USER_MACRO, 'macros' => ['{HOST.HOST}', '{HOST.NAME}', '{HOST.CONN}', '{HOST.IP}', '{HOST.DNS}'], 'length' => DB::getFieldLength('items', 'trapper_hosts')];
 				}
 
 			case 'parameters':
@@ -323,12 +323,12 @@ abstract class CItemType {
 				switch (static::TYPE) {
 					case ITEM_TYPE_HTTPAGENT:
 						return ['type' => API_MULTIPLE, 'rules' => [
-							['if' => ['field' => 'allow_traps', 'in' => HTTPCHECK_ALLOW_TRAPS_ON], 'type' => API_IP_RANGES, 'flags' => API_ALLOW_DNS | API_ALLOW_USER_MACRO, 'macros' => ['{HOST.HOST}', '{HOSTNAME}', '{HOST.NAME}', '{HOST.CONN}', '{HOST.IP}', '{IPADDRESS}', '{HOST.DNS}'], 'length' => DB::getFieldLength('items', 'trapper_hosts')],
+							['if' => ['field' => 'allow_traps', 'in' => HTTPCHECK_ALLOW_TRAPS_ON], 'type' => API_IP_RANGES, 'flags' => API_ALLOW_DNS | API_ALLOW_USER_MACRO, 'macros' => ['{HOST.HOST}', '{HOST.NAME}', '{HOST.CONN}', '{HOST.IP}', '{HOST.DNS}'], 'length' => DB::getFieldLength('items', 'trapper_hosts')],
 							['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('items', 'trapper_hosts')]
 						]];
 
 					case  ITEM_TYPE_TRAPPER:
-						return ['type' => API_IP_RANGES, 'flags' => API_ALLOW_DNS | API_ALLOW_USER_MACRO, 'macros' => ['{HOST.HOST}', '{HOSTNAME}', '{HOST.NAME}', '{HOST.CONN}', '{HOST.IP}', '{IPADDRESS}', '{HOST.DNS}'], 'length' => DB::getFieldLength('items', 'trapper_hosts')];
+						return ['type' => API_IP_RANGES, 'flags' => API_ALLOW_DNS | API_ALLOW_USER_MACRO, 'macros' => ['{HOST.HOST}', '{HOST.NAME}', '{HOST.CONN}', '{HOST.IP}', '{HOST.DNS}'], 'length' => DB::getFieldLength('items', 'trapper_hosts')];
 				}
 
 			case 'parameters':
@@ -423,12 +423,12 @@ abstract class CItemType {
 				switch (static::TYPE) {
 					case ITEM_TYPE_HTTPAGENT:
 						return ['type' => API_MULTIPLE, 'rules' => [
-							['if' => ['field' => 'allow_traps', 'in' => HTTPCHECK_ALLOW_TRAPS_ON], 'type' => API_IP_RANGES, 'flags' => API_ALLOW_DNS | API_ALLOW_USER_MACRO, 'macros' => ['{HOST.HOST}', '{HOSTNAME}', '{HOST.NAME}', '{HOST.CONN}', '{HOST.IP}', '{IPADDRESS}', '{HOST.DNS}'], 'length' => DB::getFieldLength('items', 'trapper_hosts')],
+							['if' => ['field' => 'allow_traps', 'in' => HTTPCHECK_ALLOW_TRAPS_ON], 'type' => API_IP_RANGES, 'flags' => API_ALLOW_DNS | API_ALLOW_USER_MACRO, 'macros' => ['{HOST.HOST}', '{HOST.NAME}', '{HOST.CONN}', '{HOST.IP}', '{HOST.DNS}'], 'length' => DB::getFieldLength('items', 'trapper_hosts')],
 							['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('items', 'trapper_hosts')]
 						]];
 
 					case  ITEM_TYPE_TRAPPER:
-						return ['type' => API_IP_RANGES, 'flags' => API_ALLOW_DNS | API_ALLOW_USER_MACRO, 'macros' => ['{HOST.HOST}', '{HOSTNAME}', '{HOST.NAME}', '{HOST.CONN}', '{HOST.IP}', '{IPADDRESS}', '{HOST.DNS}'], 'length' => DB::getFieldLength('items', 'trapper_hosts')];
+						return ['type' => API_IP_RANGES, 'flags' => API_ALLOW_DNS | API_ALLOW_USER_MACRO, 'macros' => ['{HOST.HOST}', '{HOST.NAME}', '{HOST.CONN}', '{HOST.IP}', '{HOST.DNS}'], 'length' => DB::getFieldLength('items', 'trapper_hosts')];
 				}
 
 			case 'parameters':

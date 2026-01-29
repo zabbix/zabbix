@@ -79,12 +79,8 @@ import (
 
 func resolveMetric(key string) (cfunc unsafe.Pointer) {
 	switch key {
-	case "system.boottime":
-		cfunc = unsafe.Pointer(C.system_boottime)
 	case "net.tcp.listen":
 		cfunc = unsafe.Pointer(C.net_tcp_listen)
-	case "net.udp.listen":
-		cfunc = unsafe.Pointer(C.net_udp_listen)
 	case "sensor":
 		cfunc = unsafe.Pointer(C.get_sensor)
 	case "system.cpu.load":

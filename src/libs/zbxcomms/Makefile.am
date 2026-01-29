@@ -1,6 +1,6 @@
 ## Process this file with automake to produce Makefile.in
 
-noinst_LIBRARIES = libzbxcomms.a
+noinst_LIBRARIES = libzbxcomms.a libzbxagent2comms.a
 
 libzbxcomms_a_SOURCES = \
 	comms.h \
@@ -10,6 +10,11 @@ libzbxcomms_a_SOURCES = \
 	tls_version.c \
 	tls_validate.c
 
+libzbxcomms_a_CFLAGS = \
+		$(LIBXML2_CFLAGS) \
+		$(TLS_CFLAGS) \
+		$(ARES_CFLAGS)
+
 if HAVE_OPENSSL
 libzbxcomms_a_SOURCES += tls.c tls_openssl.c
 else
@@ -18,6 +23,10 @@ libzbxcomms_a_SOURCES += tls.c tls_gnutls.c
 endif
 endif
 
-libzbxcomms_a_CFLAGS = \
-		$(LIBXML2_CFLAGS) \
-		$(TLS_CFLAGS)
+# AGENT2 version of comms library
+libzbxagent2comms_a_CFLAGS = \
+	-DWITH_AGENT2_METRICS
+
+libzbxagent2comms_a_SOURCES = \
+	comms.h \
+	comms.c
