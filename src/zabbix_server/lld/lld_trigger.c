@@ -903,6 +903,8 @@ static void	lld_tags_get(const zbx_vector_lld_trigger_prototype_ptr_t *trigger_p
 	char				*sql = NULL;
 	size_t				sql_alloc = 256, sql_offset = 0;
 
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
 	zbx_vector_uint64_create(&triggerids);
 
 	for (int i = 0; i < trigger_prototypes->values_num; i++)
@@ -924,7 +926,7 @@ static void	lld_tags_get(const zbx_vector_lld_trigger_prototype_ptr_t *trigger_p
 	sql = (char *)zbx_malloc(sql, sql_alloc);
 
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
-			"select triggertagid,triggerid,tag,value"
+			"select triggertagid,triggerid,tag,value,automatic"
 			" from trigger_tag"
 			" where");
 
@@ -939,6 +941,7 @@ static void	lld_tags_get(const zbx_vector_lld_trigger_prototype_ptr_t *trigger_p
 		zbx_uint64_t	triggerid;
 
 		tag = zbx_db_tag_create(row[2], row[3]);
+		tag->automatic = atoi(row[4]);
 		ZBX_STR2UINT64(triggerid, row[1]);
 
 		zbx_lld_trigger_prototype_t	lld_trigger_prototype_cmp = {.triggerid = triggerid};
@@ -2768,7 +2771,7 @@ static int	lld_triggers_save(zbx_uint64_t hostid, const zbx_vector_lld_trigger_p
 		triggertagid = zbx_db_get_maxid_num("trigger_tag", new_tags);
 
 		zbx_db_insert_prepare(&db_insert_ttags, "trigger_tag", "triggertagid", "triggerid", "tag", "value",
-				(char *)NULL);
+				"automatic", (char *)NULL);
 	}
 
 	if (0 != new_dependencies)
@@ -3136,10 +3139,11 @@ static int	lld_triggers_save(zbx_uint64_t hostid, const zbx_vector_lld_trigger_p
 			{
 				tag->tagid = triggertagid++;
 				zbx_db_insert_add_values(&db_insert_ttags, tag->tagid, trigger->triggerid,
-						tag->tag, tag->value);
+						tag->tag, tag->value, tag->automatic);
 
 				zbx_audit_trigger_update_json_add_tags_and_values(ZBX_AUDIT_LLD_CONTEXT,
-						trigger->triggerid, dflags, tag->tagid, tag->tag, tag->value);
+						trigger->triggerid, dflags, tag->tagid, tag->tag, tag->value,
+						tag->automatic);
 			}
 			else if (0 != (tag->flags & ZBX_FLAG_DB_TAG_UPDATE))
 			{
@@ -3164,10 +3168,21 @@ static int	lld_triggers_save(zbx_uint64_t hostid, const zbx_vector_lld_trigger_p
 					value_esc = zbx_db_dyn_escape_string(tag->value);
 					zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%svalue='%s'", d, value_esc);
 					zbx_free(value_esc);
+					d = ",";
 
 					zbx_audit_trigger_update_json_update_tag_value(ZBX_AUDIT_LLD_CONTEXT,
 							trigger->triggerid, dflags, tag->tagid, tag->value_orig,
 							tag->value);
+				}
+
+				if (0 != (tag->flags & ZBX_FLAG_DB_TAG_UPDATE_AUTOMATIC))
+				{
+					zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%sautomatic=%d", d,
+							tag->automatic);
+
+					zbx_audit_trigger_update_json_update_tag_automatic(ZBX_AUDIT_LLD_CONTEXT,
+							trigger->triggerid, dflags, tag->tagid, tag->automatic_orig,
+							tag->automatic);
 				}
 
 				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
