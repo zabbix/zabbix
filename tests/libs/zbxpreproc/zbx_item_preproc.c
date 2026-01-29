@@ -125,6 +125,11 @@ static void	read_value(const char *path, unsigned char *value_type, zbx_variant_
 		fail_msg("Invalid 'time' format");
 
 	zbx_variant_set_str(value, zbx_strdup(NULL, zbx_mock_get_object_member_string(handle, "data")));
+
+	const char	*variant = zbx_mock_get_optional_parameter_string("in.value.variant");
+	
+	if (NULL != variant)
+		zbx_variant_convert(value, zbx_mock_str_to_variant(variant));
 }
 
 static void	read_history_value(const char *path, zbx_variant_t *value, zbx_timespec_t *ts)
