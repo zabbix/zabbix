@@ -1066,23 +1066,19 @@ class CSvgGraphHelper {
 					continue;
 				}
 
-				$description = _('Trigger');
 				$value = $number_parser->calcValue();
 				$label_suffix = '';
 
 				if ($metric['options']['invert_values'] == SVG_GRAPH_INVERT_VALUES_ON) {
-					$description .= ' ('._('inverted').')';
 					$value *= -1;
 					$label_suffix = ' ('._('inverted').')';
 				}
-
-				$description .= NAME_DELIMITER.CMacrosResolverHelper::resolveTriggerName($trigger);
 
 				$simple_triggers[] = [
 					'axisy' => $metric['options']['axisy'],
 					'value' => $value,
 					'color' => CSeverityHelper::getColor((int) $trigger['priority']),
-					'description' => $description,
+					'description' => _('Trigger').NAME_DELIMITER.CMacrosResolverHelper::resolveTriggerName($trigger),
 					'constant' => $matches['operator'].' '.$matches['constant'],
 					'label_suffix' => $label_suffix
 				];
