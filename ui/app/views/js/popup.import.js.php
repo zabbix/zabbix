@@ -36,13 +36,31 @@ window.popup_import = new class {
 	 */
 	#form;
 
-	init() {
+	/**
+	 * @type {HTMLDivElement}
+	 */
+	#footer;
+
+	init({submit_compare}) {
 		this.#overlay = overlays_stack.getById('popup_import');
 		this.#dialogue = this.#overlay.$dialogue[0];
 		this.#form = this.#overlay.$dialogue.$body[0].querySelector('form');
+		this.#footer = this.#overlay.$dialogue.$footer[0];
 
+		this.#initActions({submit_compare});
 		this.#initWarningListeners();
 		this.#initAdvancedConfigurationListeners();
+	}
+
+	#initActions({submit_compare}) {
+		this.#footer.querySelector('.js-import').addEventListener('click', () => {
+			if (submit_compare) {
+				this.#openImportComparePopup();
+			}
+			else {
+				this.#submitPopup();
+			}
+		});
 	}
 
 	#initWarningListeners() {

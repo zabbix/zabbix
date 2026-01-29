@@ -177,17 +177,15 @@ $output = [
 	'buttons' => [
 		[
 			'title' => _('Import'),
-			'class' => '',
-			'keepOpen' => true,
-			'isSubmit' => true,
-			'action' => $data['submit_compare']
-				? 'popup_import.openImportComparePopup();'
-				: 'popup_import.submitPopup();'
+			'class' => 'js-import',
+			'isSubmit' => true
 		]
 	],
 	'script_inline' => getPagePostJs().
 		$this->readJsFile('popup.import.js.php').
-		'popup_import.init();'
+		'popup_import.init('.json_encode([
+			'submit_compare' => $data['submit_compare']
+		]).');'
 ];
 
 if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
