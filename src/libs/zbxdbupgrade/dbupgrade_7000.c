@@ -459,14 +459,15 @@ static int	DBpatch_7000030(void)
 
 	zbx_db_result_t	result = zbx_db_select("select i.itemid,t.tag,t.value from httptest_tag t"
 		" join ("
-			"select hsi.itemid, hs.httptestid from httpstepitem hsi"
-			" join httpstep hs on hs.httpstepid = hsi.httpstepid"
+			"select hsi.itemid,hs.httptestid from httpstepitem hsi"
+			" join httpstep hs on hs.httpstepid=hsi.httpstepid"
 			" union"
-			" select hti.itemid, hti.httptestid from httptestitem hti) as i"
-			" on i.httptestid = t.httptestid"
+			" select hti.itemid,hti.httptestid from httptestitem hti) as i"
+			" on i.httptestid=t.httptestid"
 		" where not exists ("
-			"select NULL from item_tag it"
-			" where it.itemid = i.itemid and it.tag = t.tag)");
+			"select null from item_tag it"
+			" where it.itemid=i.itemid and it.tag=t.tag"
+		")");
 
 	zbx_db_insert_prepare(&db_insert, "item_tag", "itemtagid", "itemid", "tag", "value", (char *)NULL);
 
