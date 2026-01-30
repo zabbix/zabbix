@@ -785,6 +785,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 			}
 		}
 
+		// Set user role in permissions tab to avoid inline validation errors.
 		if (CTestArrayHelper::get($data, 'form')) {
 			$form = $this->query($data['form']['selector'])->asForm()->one();
 

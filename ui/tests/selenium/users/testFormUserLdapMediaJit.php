@@ -302,7 +302,7 @@ class testFormUserLdapMediaJit extends CWebTest {
 					'fields' => [
 						'When active' => ' '
 					],
-					'message' => ['When active' => 'This field cannot be empty'],
+					'message' => ['When active' => 'This field cannot be empty.'],
 					'media' => 'MS Teams Workflow'
 				]
 			],

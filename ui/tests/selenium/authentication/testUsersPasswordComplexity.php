@@ -1124,7 +1124,6 @@ class testUsersPasswordComplexity extends CWebTest {
 
 		$user_form->submit();
 
-
 		if ($this->page->isAlertPresent()) {
 			$this->page->acceptAlert();
 		}
