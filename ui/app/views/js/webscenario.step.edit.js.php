@@ -90,7 +90,7 @@ window.webscenario_step_edit_popup = new class {
 	#updateSortOrder(table, name_field) {
 		table.querySelectorAll('.form_row').forEach((row, index) => {
 			for (const field of row.querySelectorAll(`[name^="${name_field}["]`)) {
-				field.name = field.name.replace(/\[\d+]/g, `[${index}]`);
+				field.setAttribute('name', field.getAttribute('name').replace(/\[\d+]/g, `[${index}]`));
 			}
 		});
 	}
