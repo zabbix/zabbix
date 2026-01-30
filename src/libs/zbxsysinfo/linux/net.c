@@ -242,10 +242,49 @@ out:
 }
 #endif
 
+static int	parse_net_dev_line(const char *line, char *if_name, net_stat_t *result)
+{
+	char	*p;
+
+	if (17 != sscanf(line, "%2047s\t" ZBX_FS_UI64 "\t" ZBX_FS_UI64 "\t"
+			ZBX_FS_UI64 "\t" ZBX_FS_UI64 "\t"
+			ZBX_FS_UI64 "\t" ZBX_FS_UI64 "\t"
+			ZBX_FS_UI64 "\t" ZBX_FS_UI64 "\t"
+			ZBX_FS_UI64 "\t" ZBX_FS_UI64 "\t"
+			ZBX_FS_UI64 "\t" ZBX_FS_UI64 "\t"
+			ZBX_FS_UI64 "\t" ZBX_FS_UI64 "\t"
+			ZBX_FS_UI64 "\t" ZBX_FS_UI64 "\n",
+			if_name,
+			&result->ibytes,	/* bytes */
+			&result->ipackets,	/* packets */
+			&result->ierr,		/* errs */
+			&result->idrop,		/* drop */
+			&result->ififo,		/* fifo (overruns) */
+			&result->iframe,	/* frame */
+			&result->icompressed,	/* compressed */
+			&result->imulticast,	/* multicast */
+			&result->obytes,	/* bytes */
+			&result->opackets,	/* packets */
+			&result->oerr,		/* errs */
+			&result->odrop,		/* drop */
+			&result->ofifo,		/* fifo (overruns)*/
+			&result->ocolls,	/* colls (collisions) */
+			&result->ocarrier,	/* carrier */
+			&result->ocompressed))	/* compressed */
+	{
+		return FAIL;
+	}
+
+	if (NULL != (p = strchr(if_name, ':')))
+		*p = '\0';
+
+	return SUCCEED;
+}
+
 static int	get_net_stat(const char *if_name, net_stat_t *result, char **error)
 {
+	char	line[MAX_STRING_LEN], name[MAX_STRING_LEN];
 	int	ret = SYSINFO_RET_FAIL;
-	char	line[MAX_STRING_LEN], name[MAX_STRING_LEN], *p;
 	FILE	*f;
 
 	if (NULL == if_name || '\0' == *if_name)
@@ -262,42 +301,13 @@ static int	get_net_stat(const char *if_name, net_stat_t *result, char **error)
 
 	while (NULL != fgets(line, sizeof(line), f))
 	{
-		if (NULL == (p = strstr(line, ":")))
+		if (NULL == strchr(line, ':'))
 			continue;
 
-		*p = '\t';
-
-		if (17 == sscanf(line, "%s\t" ZBX_FS_UI64 "\t" ZBX_FS_UI64 "\t"
-				ZBX_FS_UI64 "\t" ZBX_FS_UI64 "\t"
-				ZBX_FS_UI64 "\t" ZBX_FS_UI64 "\t"
-				ZBX_FS_UI64 "\t" ZBX_FS_UI64 "\t"
-				ZBX_FS_UI64 "\t" ZBX_FS_UI64 "\t"
-				ZBX_FS_UI64 "\t" ZBX_FS_UI64 "\t"
-				ZBX_FS_UI64 "\t" ZBX_FS_UI64 "\t"
-				ZBX_FS_UI64 "\t" ZBX_FS_UI64 "\n",
-				name,
-				&result->ibytes,	/* bytes */
-				&result->ipackets,	/* packets */
-				&result->ierr,		/* errs */
-				&result->idrop,		/* drop */
-				&result->ififo,		/* fifo (overruns) */
-				&result->iframe,	/* frame */
-				&result->icompressed,	/* compressed */
-				&result->imulticast,	/* multicast */
-				&result->obytes,	/* bytes */
-				&result->opackets,	/* packets */
-				&result->oerr,		/* errs */
-				&result->odrop,		/* drop */
-				&result->ofifo,		/* fifo (overruns)*/
-				&result->ocolls,	/* colls (collisions) */
-				&result->ocarrier,	/* carrier */
-				&result->ocompressed))	/* compressed */
+		if (SUCCEED == parse_net_dev_line(line, name, result) && 0 == strcmp(name, if_name))
 		{
-			if (0 == strcmp(name, if_name))
-			{
-				ret = SYSINFO_RET_OK;
-				break;
-			}
+			ret = SYSINFO_RET_OK;
+			break;
 		}
 	}
 
@@ -305,11 +315,11 @@ static int	get_net_stat(const char *if_name, net_stat_t *result, char **error)
 
 	if (SYSINFO_RET_FAIL == ret)
 	{
-		*error = zbx_strdup(NULL, "Cannot find information for this network interface in /proc/net/dev.");
-		return SYSINFO_RET_FAIL;
+		*error = zbx_dsprintf(NULL, "Cannot find information for this network interface in %s.",
+				ZBX_PROC_NET_DEV_PRX);
 	}
 
-	return SYSINFO_RET_OK;
+	return ret;
 }
 
 /******************************************************************************
@@ -1359,7 +1369,7 @@ int	net_if_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 	FILE			*f;
 	struct zbx_json		jcfg, jval, j;
 	zbx_regexp_t		*rxp = NULL;
-	char			line[MAX_STRING_LEN], *p, *pattern = NULL, *error = NULL;
+	char			line[MAX_STRING_LEN], if_name[MAX_STRING_LEN], *pattern = NULL, *error = NULL;
 	net_stat_t		ns;
 
 	if (1 < request->nparam)
@@ -1398,64 +1408,53 @@ int	net_if_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	while (NULL != fgets(line, sizeof(line), f))
 	{
-		if (NULL == (p = strstr(line, ":")))
+		if (FAIL == parse_net_dev_line(line, if_name, &ns))
 			continue;
 
-		*p = '\0';
-
-		/* trim left spaces */
-		for (p = line; ' ' == *p && '\0' != *p; p++)
-			;
-
-		if (NULL != rxp && 0 != zbx_regexp_match_precompiled(p, rxp))
+		if (NULL != rxp && 0 != zbx_regexp_match_precompiled(if_name, rxp))
 			continue;
 
 		zbx_json_addobject(&jcfg, NULL);
 		zbx_json_addobject(&jval, NULL);
-		zbx_json_addstring(&jcfg, "name", p, ZBX_JSON_TYPE_STRING);
-		fill_net_if_get_params(p, "address", "mac", 0, &jcfg);
-		fill_net_if_get_params(p, "ifalias",  NULL, 0, &jcfg);
-		get_link_flags(p, &jcfg);
+		zbx_json_addstring(&jcfg, "name", if_name, ZBX_JSON_TYPE_STRING);
 
-		zbx_json_addstring(&jval, "name", p, ZBX_JSON_TYPE_STRING);
+		fill_net_if_get_params(if_name, "address", "mac", 0, &jcfg);
+		fill_net_if_get_params(if_name, "ifalias",  NULL, 0, &jcfg);
+		get_link_flags(if_name, &jcfg);
 
-		if (SYSINFO_RET_OK == get_net_stat(p, &ns, &error))
-		{
-			zbx_json_addobject(&jval, "in");
-			zbx_json_adduint64(&jval, "bytes", ns.ibytes);
-			zbx_json_adduint64(&jval, "packets", ns.ipackets);
-			zbx_json_adduint64(&jval, "errors", ns.ierr);
-			zbx_json_adduint64(&jval, "dropped", ns.idrop);
-			zbx_json_adduint64(&jval, "overruns", ns.ififo);
-			zbx_json_adduint64(&jval, "frame", ns.iframe);
-			zbx_json_adduint64(&jval, "compressed", ns.icompressed);
-			zbx_json_adduint64(&jval, "multicast", ns.imulticast);
-			zbx_json_close(&jval);
-			zbx_json_addobject(&jval, "out");
-			zbx_json_adduint64(&jval, "bytes", ns.obytes);
-			zbx_json_adduint64(&jval, "packets", ns.opackets);
-			zbx_json_adduint64(&jval, "errors", ns.oerr);
-			zbx_json_adduint64(&jval, "dropped", ns.odrop);
-			zbx_json_adduint64(&jval, "overruns", ns.ofifo);
-			zbx_json_adduint64(&jval, "collisions", ns.ocolls);
-			zbx_json_adduint64(&jval, "carrier", ns.ocarrier);
-			zbx_json_adduint64(&jval, "compressed", ns.ocompressed);
-			zbx_json_close(&jval);
-		}
-		else
-		{
-			zbx_free(error);
-		}
+		zbx_json_addstring(&jval, "name", if_name, ZBX_JSON_TYPE_STRING);
 
-		fill_net_if_get_params(p, "type",  NULL, 1, &jval);
-		fill_net_if_get_params(p, "address", "mac", 0, &jval);
-		fill_net_if_get_params(p, "ifalias",  NULL, 0, &jval);
-		fill_net_if_get_params(p, "carrier", NULL, 1, &jval);
-		fill_net_if_get_params(p, "speed", NULL, 1, &jval);
-		fill_net_if_get_params(p, "duplex", NULL, 0, &jval);
-		get_link_settings(p, &jval);
+		zbx_json_addobject(&jval, "in");
+		zbx_json_adduint64(&jval, "bytes", ns.ibytes);
+		zbx_json_adduint64(&jval, "packets", ns.ipackets);
+		zbx_json_adduint64(&jval, "errors", ns.ierr);
+		zbx_json_adduint64(&jval, "dropped", ns.idrop);
+		zbx_json_adduint64(&jval, "overruns", ns.ififo);
+		zbx_json_adduint64(&jval, "frame", ns.iframe);
+		zbx_json_adduint64(&jval, "compressed", ns.icompressed);
+		zbx_json_adduint64(&jval, "multicast", ns.imulticast);
+		zbx_json_close(&jval);
 
-		get_wifi_info(p, &jval);
+		zbx_json_addobject(&jval, "out");
+		zbx_json_adduint64(&jval, "bytes", ns.obytes);
+		zbx_json_adduint64(&jval, "packets", ns.opackets);
+		zbx_json_adduint64(&jval, "errors", ns.oerr);
+		zbx_json_adduint64(&jval, "dropped", ns.odrop);
+		zbx_json_adduint64(&jval, "overruns", ns.ofifo);
+		zbx_json_adduint64(&jval, "collisions", ns.ocolls);
+		zbx_json_adduint64(&jval, "carrier", ns.ocarrier);
+		zbx_json_adduint64(&jval, "compressed", ns.ocompressed);
+		zbx_json_close(&jval);
+
+		fill_net_if_get_params(if_name, "type",  NULL, 1, &jval);
+		fill_net_if_get_params(if_name, "address", "mac", 0, &jval);
+		fill_net_if_get_params(if_name, "ifalias",  NULL, 0, &jval);
+		fill_net_if_get_params(if_name, "carrier", NULL, 1, &jval);
+		fill_net_if_get_params(if_name, "speed", NULL, 1, &jval);
+		fill_net_if_get_params(if_name, "duplex", NULL, 0, &jval);
+		get_link_settings(if_name, &jval);
+
+		get_wifi_info(if_name, &jval);
 		zbx_json_close(&jval);
 		zbx_json_close(&jcfg);
 	}
