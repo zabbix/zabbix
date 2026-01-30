@@ -58,8 +58,6 @@ typedef	void(*zbx_discovery_update_service_func_t)(void *handle, zbx_uint64_t dr
 typedef	void(*zbx_discovery_update_service_down_func_t)(const zbx_uint64_t dhostid, const char *ip, const time_t now,
 		zbx_vector_uint64_t *dserviceids, zbx_add_event_func_t add_event_cb);
 typedef	void(*zbx_discovery_update_drule_func_t)(void *handle, zbx_uint64_t druleid, const char *error, time_t now);
-typedef	int(*zbx_discovery_get_host_status_func_t)(const zbx_uint64_t dhostid, const char *interface_ip,
-		int interface_status, zbx_vector_str_t *downed_interfaces);
 
 void	zbx_discovery_dcheck_free(zbx_dc_dcheck_t *dcheck);
 void	zbx_discovery_drule_free(zbx_dc_drule_t *drule);

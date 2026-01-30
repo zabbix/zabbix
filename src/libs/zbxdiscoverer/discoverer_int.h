@@ -67,16 +67,6 @@ zbx_discoverer_manager_t;
 
 typedef struct
 {
-	zbx_db_dhost		dhost;
-	int			downed_time;
-	zbx_vector_str_t	*interfaces;
-}
-zbx_discoverer_downable_host_t;
-
-ZBX_PTR_VECTOR_DECL(discoverer_downable_host_ptr, zbx_discoverer_downable_host_t*)
-
-typedef struct
-{
 	zbx_uint64_t	dcheckid;
 	unsigned short	port;
 	char		value[ZBX_MAX_DISCOVERED_VALUE_SIZE];

@@ -76,14 +76,3 @@ void	zbx_discovery_update_drule_proxy(void *handle, zbx_uint64_t druleid, const 
 	zbx_pb_discovery_write_host((zbx_pb_discovery_data_t *)handle, druleid, "", "", DOBJECT_STATUS_FINALIZED,
 			(int)now, error);
 }
-
-int	zbx_discovery_get_host_status_proxy(const zbx_uint64_t dhostid, const char *interface_ip, int interface_status,
-		zbx_vector_str_t *downed_interfaces)
-{
-	ZBX_UNUSED(dhostid);
-	ZBX_UNUSED(interface_ip);
-	ZBX_UNUSED(interface_status);
-	ZBX_UNUSED(downed_interfaces);
-
-	return interface_status;
-}
