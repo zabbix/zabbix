@@ -1,4 +1,4 @@
-<?php
+	<?php
 /*
 ** Copyright (C) 2001-2026 Zabbix SIA
 **
@@ -1380,7 +1380,7 @@ class testDashboardPieChartWidget extends testWidgets {
 		foreach ($hints as $field => $text) {
 			$form->getLabel($field)->query('xpath:./button[@data-hintbox]')->one()->waitUntilClickable()->click();
 			$hint = $this->query('xpath://div[@class="overlay-dialogue hintbox wordbreak hintbox-position-fixed hintbox-static"]')
-				->asOverlayDialog()->waitUntilPresent()->one();
+					->asOverlayDialog()->waitUntilPresent()->one();
 			$this->assertEquals($text, $hint->getText());
 			$hint->query('xpath:./button')->one()->click();
 		}

@@ -294,7 +294,8 @@ class testFormUser extends CWebTest {
 		// Check hintbox contains correct text message.
 		foreach ($data['hintbox_warning'] as $field => $text) {
 			$form->getField($field)->query('xpath:./..//button[@data-hintbox]')->one()->waitUntilClickable()->click();
-			$hint = $this->query('xpath://div[@class="overlay-dialogue hintbox wordbreak hintbox-static"]')->asOverlayDialog()->waitUntilReady()->one();
+			$hint = $this->query('xpath://div[@class="overlay-dialogue hintbox wordbreak hintbox-static"]')
+					->asOverlayDialog()->waitUntilReady()->one();
 			$this->assertEquals($text, $hint->getText());
 			$hint->close();
 		}

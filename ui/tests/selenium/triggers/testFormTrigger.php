@@ -423,7 +423,7 @@ class testFormTrigger extends CLegacyWebTest {
 		// Check hintbox.
 		$this->query('class:zi-help-filled-small')->one()->click();
 		$hint = $this->query('xpath:.//div[@class="overlay-dialogue hintbox wordbreak hintbox-position-fixed hintbox-static"]')
-			->waitUntilPresent()->one();
+				->waitUntilPresent()->one();
 
 		// Assert text.
 		$this->assertEquals('Menu entry name is used as a label for the trigger URL in the event context menu.',

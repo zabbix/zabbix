@@ -3029,7 +3029,7 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 				$ldap_form->checkValue(['Bind password' => '']);
 				$bind_password_field->query('xpath:./button[@data-hintbox]')->one()->click();
 				$hint = $this->query('xpath://div[@class="overlay-dialogue hintbox wordbreak hintbox-position-fixed hintbox-static"]')
-					->waitUntilPresent()->one();
+						->waitUntilPresent()->one();
 				$this->assertEquals('The previous password was cleared due to a host change. Please enter the new password.',
 						$hint->getText()
 				);

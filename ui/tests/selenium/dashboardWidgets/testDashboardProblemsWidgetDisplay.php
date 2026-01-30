@@ -803,8 +803,8 @@ class testDashboardProblemsWidgetDisplay extends testWidgets {
 					if ($class !== 'color-positive') {
 						// Click on icon and open hint.
 						$icon->click();
-						$hint = $this->query('xpath://div[@class="overlay-dialogue wordbreak"]')->asOverlayDialog()
-								->waitUntilReady()->one();
+						$hint = $this->query('xpath://div[@class="overlay-dialogue hintbox wordbreak hintbox-static"]')
+								->asOverlayDialog()->waitUntilReady()->one();
 						$hint_table = $hint->query('class:list-table')->asTable()->waitUntilVisible()->one();
 
 						// Check rows in hint's table.

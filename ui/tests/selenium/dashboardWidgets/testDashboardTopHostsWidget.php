@@ -521,7 +521,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 				// Check hintbox text.
 				$hint_text = 'Aggregation function does not affect the sparkline.';
 				$hint_dialog = $this->query('xpath://div[@class="overlay-dialogue hintbox wordbreak hintbox-position-fixed hintbox-static"]')
-					->waitUntilVisible()->one();
+						->waitUntilVisible()->one();
 				$this->assertEquals($hint_text, $hint_dialog->getText());
 
 				// Close the hintbox.
@@ -6650,8 +6650,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 			foreach ($data['check_maintenance'] as $host => $hint_text) {
 				$this->query('xpath://td/a[text()='.CXPathHelper::escapeQuotes($host).
 						']/..//button[contains(@class,"wrench")]')->waitUntilClickable()->one()->click();
-				$hint = $this->query('xpath://div[@class="overlay-dialogue hintbox wordbreak hintbox-position-fixed hintbox-static"]')
-					->waitUntilPresent();
+				$hint = $this->query('xpath://div[@class="overlay-dialogue hintbox wordbreak hintbox-static"]')->waitUntilPresent();
 				$this->assertEquals($hint_text, $hint->one()->getText());
 				$hint->one()->query('xpath:.//button[@class="btn-overlay-close"]')->one()->click();
 				$hint->waitUntilNotPresent();
