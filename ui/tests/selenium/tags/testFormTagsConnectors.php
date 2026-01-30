@@ -118,7 +118,9 @@ class testFormTagsConnectors extends testFormTags {
 							'value' => 'value1'
 						]
 					],
-					'error_details' => 'Invalid parameter "/1/tags/1/tag": cannot be empty.'
+					'inline_error' => [
+						'id:tags_0_tag' => 'This field cannot be empty.'
+					]
 				]
 			],
 			[
@@ -139,7 +141,9 @@ class testFormTagsConnectors extends testFormTags {
 							'value' => 'value'
 						]
 					],
-					'error_details' => 'Invalid parameter "/1/tags/2": value (tag, operator, value)=(tag, 0, value) already exists.'
+					'inline_error' => [
+						'id:tags_1_tag' => 'Tag filter name, operator and value combination is not unique.'
+					]
 				]
 			],
 			[
@@ -199,7 +203,9 @@ class testFormTagsConnectors extends testFormTags {
 							'value' => 'value1'
 						]
 					],
-					'error_details'=>'Invalid parameter "/1/tags/1/tag": cannot be empty.'
+					'inline_error' => [
+						'id:tags_0_tag' => 'This field cannot be empty.'
+					]
 				]
 			],
 			[
@@ -214,8 +220,9 @@ class testFormTagsConnectors extends testFormTags {
 							'value' => 'connector update'
 						]
 					],
-					'error_details' => 'Invalid parameter "/1/tags/2": value (tag, operator, value)=(connector action,'.
-						' 2, connector update) already exists.'
+					'inline_error' => [
+						'id:tags_1_tag' => 'Tag filter name, operator and value combination is not unique.'
+					]
 				]
 			],
 			[
@@ -230,8 +237,9 @@ class testFormTagsConnectors extends testFormTags {
 							'value' => ''
 						]
 					],
-					'error_details' => 'Invalid parameter "/1/tags/3": value (tag, operator, value)'.
-						'=(connector tag without value, 0, ) already exists.'
+					'inline_error' => [
+						'id:tags_2_tag' => 'Tag filter name, operator and value combination is not unique.'
+					]
 				]
 			],
 			[

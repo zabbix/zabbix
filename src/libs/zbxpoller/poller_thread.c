@@ -62,6 +62,9 @@
 #include "zbx_expression_constants.h"
 #include "zbxinterface.h"
 #include "zbxxml.h"
+#ifdef HAVE_ARES_QUERY_CACHE
+#include "zbxresolver.h"
+#endif
 
 void	zbx_free_agent_result_ptr(AGENT_RESULT *result)
 {
@@ -176,7 +179,7 @@ static int	macro_http_raw_resolv(zbx_macro_resolv_data_t *p, va_list args, char 
 		zbx_dc_get_user_macro(um_handle, p->macro, &dc_host->hostid, 1, replace_with);
 		p->pos = (int)p->token.loc.r;
 	}
-	else if (0 == strcmp(p->macro, MVAR_HOST_HOST) || 0 == strcmp(p->macro, MVAR_HOSTNAME))
+	else if (0 == strcmp(p->macro, MVAR_HOST_HOST))
 	{
 		*replace_with = zbx_strdup(*replace_with, dc_host->host);
 	}
@@ -184,7 +187,7 @@ static int	macro_http_raw_resolv(zbx_macro_resolv_data_t *p, va_list args, char 
 	{
 		*replace_with = zbx_strdup(*replace_with, dc_host->name);
 	}
-	else if (0 == strcmp(p->macro, MVAR_HOST_IP) || 0 == strcmp(p->macro, MVAR_IPADDRESS))
+	else if (0 == strcmp(p->macro, MVAR_HOST_IP))
 	{
 		if (SUCCEED == (ret = zbx_dc_config_get_interface(&interface, dc_host->hostid, dc_item->itemid)))
 			*replace_with = zbx_strdup(*replace_with, interface.ip_orig);
@@ -365,7 +368,7 @@ static int	macro_jmx_endpoint_resolv(zbx_macro_resolv_data_t *p, va_list args, c
 			zbx_dc_get_user_macro(um_handle, p->macro, &dc_item->host.hostid, 1, replace_with);
 			p->pos = (int)p->token.loc.r;
 		}
-		else if (0 == strcmp(p->macro, MVAR_HOST_HOST) || 0 == strcmp(p->macro, MVAR_HOSTNAME))
+		else if (0 == strcmp(p->macro, MVAR_HOST_HOST))
 		{
 			*replace_with = zbx_strdup(*replace_with, dc_item->host.host);
 		}
@@ -373,7 +376,7 @@ static int	macro_jmx_endpoint_resolv(zbx_macro_resolv_data_t *p, va_list args, c
 		{
 			*replace_with = zbx_strdup(*replace_with, dc_item->host.name);
 		}
-		else if (0 == strcmp(p->macro, MVAR_HOST_IP) || 0 == strcmp(p->macro, MVAR_IPADDRESS))
+		else if (0 == strcmp(p->macro, MVAR_HOST_IP))
 		{
 			if (INTERFACE_TYPE_UNKNOWN != dc_item->interface.type)
 			{
@@ -1042,7 +1045,9 @@ ZBX_THREAD_ENTRY(zbx_poller_thread, args)
 			server_num, get_process_type_string(process_type), process_num);
 
 	zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
-
+#ifdef HAVE_ARES_QUERY_CACHE
+	zbx_ares_library_init();
+#endif
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	zbx_tls_init_child(poller_args_in->config_comms->config_tls,
 			poller_args_in->zbx_get_program_type_cb_arg, zbx_dc_get_psk_by_identity);

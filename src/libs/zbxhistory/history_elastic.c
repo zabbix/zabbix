@@ -889,7 +889,7 @@ out:
 	zbx_free(scroll_query);
 	zbx_free(error);
 
-	zbx_vector_history_record_sort(values, (zbx_compare_func_t)zbx_history_record_compare_desc_func);
+	zbx_vector_history_record_sort(values, zbx_history_record_compare_desc);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() values:%d", __func__, values->values_num);
 

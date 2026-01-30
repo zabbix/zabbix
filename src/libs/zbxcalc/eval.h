@@ -54,4 +54,6 @@ int	zbx_execute_count_with_pattern(char *pattern, unsigned char value_type, zbx_
 
 const char	*zbx_type_string(zbx_value_type_t type);
 
+int	history_record_float_compare(const void *a1, const void *a2);
+
 #endif

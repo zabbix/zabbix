@@ -34,7 +34,6 @@
 #include "zbxcacheconfig.h"
 #include "zbxcomms.h"
 #include "zbxdbhigh.h"
-#include "zbxip.h"
 #include "zbxstr.h"
 
 #ifndef EVDNS_BASE_INITIALIZE_NAMESERVERS

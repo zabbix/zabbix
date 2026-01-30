@@ -18,50 +18,44 @@ class CControllerTokenUpdate extends CController {
 
 	protected function init(): void {
 		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
+		$this->setInputValidationMethod(self::INPUT_VALIDATION_FORM);
 	}
 
-	protected function checkInput() {
-		$fields = [
-			'tokenid'       => 'db token.tokenid|required|fatal',
-			'name'          => 'db token.name|required|not_empty',
-			'description'   => 'db token.description',
-			'expires_state' => 'in 0,1|required',
-			'expires_at'    => 'abs_time',
-			'status'        => 'db token.status|required|in '.ZBX_AUTH_TOKEN_ENABLED.','.ZBX_AUTH_TOKEN_DISABLED,
-			'admin_mode'    => 'required|in 0,1',
-			'regenerate'    => 'in 1'
+	public static function getValidationRules(): array {
+		$api_uniq = [
+			['token.get', ['name' => '{name}', 'userid' => '{userid}'], 'tokenid']
 		];
 
-		$ret = $this->validateInput($fields);
+		return ['object', 'api_uniq' => $api_uniq, 'fields' => [
+			'userid' => ['db users.userid', 'required'],
+			'tokenid' => ['db token.tokenid', 'required'],
+			'name' => ['db token.name', 'required', 'not_empty'],
+			'description' => ['db token.description'],
+			'admin_mode' => ['boolean'],
+			'expires_state' => ['boolean'],
+			'regenerate' => ['integer', 'in' => [1]],
+			'expires_at' => ['string', 'required', 'not_empty',
+				'use' => [CAbsoluteTimeValidator::class, ['min' => 0, 'max' => ZBX_MAX_DATE]],
+				'when' => ['expires_state', 'in' => [1]]
+			],
+			'status' => ['db token.status', 'required', 'in' => [ZBX_AUTH_TOKEN_ENABLED, ZBX_AUTH_TOKEN_DISABLED]]
+		]];
+	}
 
-		if ($ret) {
-			$fields = [];
-
-			if ($this->getInput('expires_state') == 1) {
-				$fields['expires_at'] = 'required';
-			}
-
-			if ($fields) {
-				$validator = new CNewValidator($this->getInputAll(), $fields);
-
-				foreach ($validator->getAllErrors() as $error) {
-					info($error);
-				}
-
-				if ($validator->isErrorFatal() || $validator->isError()) {
-					$ret = false;
-				}
-			}
-		}
+	protected function checkInput(): bool {
+		$ret = $this->validateInput(self::getValidationRules());
 
 		if (!$ret) {
+			$form_errors = $this->getValidationError();
+			$response = $form_errors
+				? ['form_errors' => $form_errors]
+				: ['error' => [
+					'title' => _('Cannot update API token'),
+					'messages' => array_column(get_and_clear_messages(), 'message')
+				]];
+
 			$this->setResponse(
-				new CControllerResponseData(['main_block' => json_encode([
-					'error' => [
-						'title' => _('Cannot update API token'),
-						'messages' => array_column(get_and_clear_messages(), 'message')
-					]
-				])])
+				new CControllerResponseData(['main_block' => json_encode($response)])
 			);
 		}
 

@@ -19,28 +19,29 @@ import (
 )
 
 const (
-	errorInvalidSecondParam   = "Invalid second parameter."
-	errorEmptyIfName          = "Network interface name cannot be empty."
-	errorTooManyParams        = "Too many parameters."
-	errorUnsupportedMetric    = "Unsupported metric."
-	errorParametersNotAllowed = "Item does not allow parameters."
+	errorInvalidSecondParam   = "invalid second parameter"
+	errorEmptyIfName          = "network interface name cannot be empty"
+	errorTooManyParams        = "too many parameters"
+	errorUnsupportedMetric    = "unsupported metric"
+	errorParametersNotAllowed = "item does not allow parameters"
 )
-
-// Plugin -
-type Plugin struct {
-	plugin.Base
-}
-
-var impl Plugin
-
-type dirFlag uint8
 
 const (
-	dirIn dirFlag = 1 << iota
-	dirOut
+	directionIn networkDirection = iota
+	directionOut
+	directionTotal
 )
 
+// Plugin netif plugin implementation.
+type Plugin struct {
+	plugin.Base
+
+	netDevFilepath string
+}
+
+type networkDirection uint8
+
 type msgIfDiscovery struct {
-	Ifname string  `json:"{#IFNAME}"`
-	Ifguid *string `json:"{#IFGUID},omitempty"`
+	Ifname string  `json:"{#IFNAME}"`           //nolint:tagliatelle // legacy compatibility
+	Ifguid *string `json:"{#IFGUID},omitempty"` //nolint:tagliatelle // legacy compatibility
 }

@@ -50,7 +50,7 @@ static int	zbx_tcp_connect_failover(zbx_socket_t *s, const char *source_ip, zbx_
 		addr = (zbx_addr_t *)addrs->values[0];
 
 		if (FAIL != (ret = zbx_tcp_connect(s, source_ip, addr->ip, addr->port, connect_timeout, tls_connect,
-				tls_arg1, tls_arg2)))
+				tls_arg1, tls_arg2, ZBX_DNS_FAILOVER_ENABLED)))
 		{
 			zbx_socket_set_deadline(s, timeout);
 			break;
