@@ -1655,6 +1655,9 @@ static void	update_trigger_changes(zbx_vector_trigger_diff_ptr_t *trigger_diff)
 			continue;
 		}
 
+		if (0 == (diff->flags & ZBX_FLAGS_TRIGGER_DIFF_UPDATE_VALUE))
+			continue;
+
 		/* always update trigger last change whenever a trigger event has been created */
 		diff->lastchange = event->clock;
 		diff->flags |= ZBX_FLAGS_TRIGGER_DIFF_UPDATE_LASTCHANGE;
@@ -2668,6 +2671,10 @@ static void	process_trigger_events(const zbx_vector_ptr_t *trigger_events,
 			/* Problem events always sets problem value to trigger.    */
 			/* if the trigger is affected by global correlation rules, */
 			/* its value is recalculated later.                        */
+	
+			if (TRIGGER_VALUE_PROBLEM == diff->value)
+				continue;
+
 			diff->value = TRIGGER_VALUE_PROBLEM;
 			diff->lastchange = event->clock;
 			diff->flags |= (ZBX_FLAGS_TRIGGER_DIFF_UPDATE_VALUE | ZBX_FLAGS_TRIGGER_DIFF_UPDATE_LASTCHANGE);
