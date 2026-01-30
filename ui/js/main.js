@@ -548,7 +548,7 @@ const hintBox = {
 				hintText = target.dataset.hintboxContents;
 			}
 
-			if (!target.dataset.hintboxContents) {
+			if (!target.dataset.hintboxContents && !target.dataset.hintboxPreload) {
 				return;
 			}
 
