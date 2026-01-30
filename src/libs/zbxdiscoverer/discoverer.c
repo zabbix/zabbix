@@ -520,7 +520,6 @@ static int	process_results(zbx_discoverer_manager_t *manager, zbx_vector_uint64_
 	zbx_uint64_t				res_check_total = 0,res_check_count = 0;
 	zbx_vector_discoverer_results_ptr_t	results;
 	zbx_discoverer_results_t		*result, *result_tmp;
-	zbx_discoverer_check_count_t		*dcc;
 	zbx_hashset_iter_t			iter;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() del_druleids:%d", __func__, del_druleids->values_num);

@@ -2027,9 +2027,9 @@ fail:
  *                                                                               *
  * Parameters:                                                                   *
  *    jp_data                     - [IN] JSON with discovery data                *
+ *    proxyid                     - [IN]                                         *
  *    events_cbs                  - [IN]                                         *
- *    discovery_update_host_cb    - [IN]                                         *
- *    discovery_update_service_cb - [IN]                                         *
+ *    ...                         - [IN]                                         *
  *    error                       - [OUT] address of pointer to info string      *
  *                                        (should be freed by the caller)        *
  *                                                                               *
@@ -2044,8 +2044,6 @@ static int	process_discovery_data_contents(struct zbx_json_parse *jp_data, zbx_u
 		zbx_discovery_find_host_func_t discovery_find_host_cb,
 		zbx_discovery_update_drule_func_t discovery_update_drule_cb, char **error)
 {
-	zbx_db_result_t				result;
-	zbx_db_row_t				row;
 	zbx_uint64_t				dcheckid, druleid;
 	struct zbx_json_parse			jp_row;
 	int					status, ret = SUCCEED, i, j, vdr_idx;

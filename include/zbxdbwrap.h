@@ -103,7 +103,8 @@ void	zbx_host_groups_remove(zbx_uint64_t hostid, zbx_vector_uint64_t *groupids);
 
 void	zbx_hgset_hash_calculate(zbx_vector_uint64_t *groupids, char *hash_str, size_t hash_len);
 
-int	zbx_db_get_main_interface_ip(zbx_uint64_t hostid, unsigned char type, char *ip_buffer, size_t buffer_size);
+int	zbx_db_get_main_interface_ip(const zbx_uint64_t hostid, const unsigned char type,
+		char *ip_buffer, const size_t sz_ip_buffer);
 zbx_uint64_t	zbx_db_add_interface(zbx_uint64_t hostid, unsigned char type, unsigned char useip,
 		const char *ip, const char *dns, unsigned short port, zbx_conn_flags_t flags, int audit_context_mode);
 void	zbx_db_add_interface_snmp(const zbx_uint64_t interfaceid, const unsigned char version,

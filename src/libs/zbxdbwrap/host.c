@@ -6018,12 +6018,24 @@ clean:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-int	zbx_db_get_main_interface_ip(zbx_uint64_t hostid, unsigned char type, char *ip_buffer, size_t buffer_size)
+/******************************************************************************
+ *                                                                            *
+ * Purpose: retrieves IP of main interface of correct type for specified host *
+ *                                                                            *
+ * Parameters:                                                                *
+ *             hostid             - [IN] host id from database                *
+ *             type               - [IN] interface type                       *
+ *             ip_buffer          - [OUT] buffer for main interface IP         *
+ *             sz_ip_buffer       - [IN] size of ip_buffer                    *
+ *                                                                            *
+ * Return value: SUCCEED or FAIL                                              *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_db_get_main_interface_ip(const zbx_uint64_t hostid, const unsigned char type,
+			char *ip_buffer, const size_t sz_ip_buffer)
 {
-	zbx_db_result_t		result;
-	zbx_db_row_t		row;
-
-	memset(ip_buffer, 0, buffer_size);
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
 
 	result = zbx_db_select(
 			"select ip"
@@ -6035,7 +6047,8 @@ int	zbx_db_get_main_interface_ip(zbx_uint64_t hostid, unsigned char type, char *
 
 	if (NULL != (row = zbx_db_fetch(result)))
 	{
-		return zbx_strlcpy(ip_buffer, row[0], buffer_size);
+		zbx_strlcpy(ip_buffer, row[0], sz_ip_buffer);
+		return SUCCEED;
 	}
 
 	return FAIL;

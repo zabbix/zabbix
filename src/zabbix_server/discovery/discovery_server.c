@@ -78,6 +78,15 @@ static zbx_db_result_t	discovery_get_dhost_by_ip_port(zbx_uint64_t druleid, cons
 	return result;
 }
 
+/*********************************************************************************
+ *                                                                               *
+ * Purpose: prepares interface list for specified host                           *
+ *                                                                               *
+ * Parameters:                                                                   *
+ *    dhostid    - [IN]                                                          *
+ *    interfaces - [OUT]                                                         *
+ *                                                                               *
+ *********************************************************************************/
 static void	discovery_get_host_interfaces(const zbx_uint64_t dhostid,
 		zbx_vector_discoverer_interface_ptr_t *interfaces)
 {
@@ -118,7 +127,19 @@ static void	discovery_get_host_interfaces(const zbx_uint64_t dhostid,
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-static int	discovery_get_host_status(const char *interface_ip, zbx_vector_discoverer_interface_ptr_t *interfaces)
+/*********************************************************************************
+ *                                                                               *
+ * Purpose: Determines host status based on known interfaces.                    *
+ *          Host is considered DOWN only if all interfaces are DOWN              *
+ *          and interface_ip has IP of last interface.                           *
+ *                                                                               *
+ * Parameters:                                                                   *
+ *    interface_ip - [IN]                                                        *
+ *    interfaces   - [IN]                                                        *
+ *                                                                               *
+ *********************************************************************************/
+static int	discovery_get_host_status(const char *interface_ip,
+		const zbx_vector_discoverer_interface_ptr_t *interfaces)
 {
 	int	host_status = DOBJECT_STATUS_DOWN, last_idx;
 
@@ -161,8 +182,8 @@ static void	discovery_update_dhost(const zbx_db_dhost *dhost)
  * Purpose: updates new host status                                           *
  *                                                                            *
  ******************************************************************************/
-static void	discovery_update_host_status(zbx_db_dhost *dhost, int status, int now,
-		zbx_add_event_func_t add_event_cb)
+static void	discovery_update_host_status(zbx_db_dhost *dhost, const int status, const int now,
+		const zbx_add_event_func_t add_event_cb)
 {
 	zbx_timespec_t	ts = {.sec = now, .ns = 0};
 
@@ -216,13 +237,15 @@ static void	discovery_update_host_status(zbx_db_dhost *dhost, int status, int no
  * Purpose: separates multiple-IP hosts                                       *
  *                                                                            *
  * Parameters:                                                                *
- *    druleid - [IN] host ip address                                          *
- *    dhost   - [OUT]                                                         *
- *    ip      - [IN]                                                          *
+ *    druleid      - [IN] ID of discovery rule                                *
+ *    dhost        - [IN/OUT]                                                 *
+ *    ip           - [IN] host ip address                                     *
+ *    now          - [IN]                                                     *
+ *    add_event_cb - [IN]                                                     *
  *                                                                            *
  ******************************************************************************/
-static void	discovery_separate_host(zbx_uint64_t druleid, zbx_db_dhost *dhost, const char *ip, int now,
-		zbx_add_event_func_t add_event_cb)
+static void	discovery_separate_host(const zbx_uint64_t druleid, zbx_db_dhost *dhost, const char *ip, const int now,
+		const zbx_add_event_func_t add_event_cb)
 {
 	zbx_db_result_t				result;
 	char					*ip_esc, *sql = NULL;
@@ -291,16 +314,18 @@ static void	discovery_separate_host(zbx_uint64_t druleid, zbx_db_dhost *dhost, c
  *    druleid         - [IN]                                                  *
  *    dcheckid        - [IN]                                                  *
  *    unique_dcheckid - [IN]                                                  *
- *    dhost           - [IN]                                                  *
- *    ip              - [OUT] host ip address                                 *
+ *    dhost           - [OUT]                                                  *
+ *    ip              - [IN] host ip address                                 *
  *    port            - [IN]                                                  *
  *    status          - [IN]                                                  *
  *    value           - [IN]                                                  *
+ *    now             - [IN]                                                  *
+ *    add_event_cb    - [IN]                                                  *
  *                                                                            *
  ******************************************************************************/
-static void	discovery_register_host(zbx_uint64_t druleid, zbx_uint64_t dcheckid, zbx_uint64_t unique_dcheckid,
-		zbx_db_dhost *dhost, const char *ip, int port, int status, const char *value, int now,
-		zbx_add_event_func_t add_event_cb)
+static void	discovery_register_host(const zbx_uint64_t druleid, const zbx_uint64_t dcheckid,
+		const zbx_uint64_t unique_dcheckid, zbx_db_dhost *dhost, const char *ip, const int port,
+		const int status, const char *value, const int now, const zbx_add_event_func_t add_event_cb)
 {
 	zbx_db_result_t	result;
 	zbx_db_row_t	row;
@@ -690,10 +715,11 @@ void	zbx_discovery_update_service_server(void *handle, zbx_uint64_t druleid, zbx
 /******************************************************************************
  *                                                                            *
  * Purpose: mark service status DOWN for all not received service statuses    *
+ *          on specified IP                                                   *
  *                                                                            *
  ******************************************************************************/
 void	zbx_discovery_update_service_down_server(const zbx_uint64_t dhostid, const char *ip, const time_t now,
-		zbx_vector_uint64_t *dserviceids, zbx_add_event_func_t add_event_cb)
+		const zbx_vector_uint64_t *dserviceids, const zbx_add_event_func_t add_event_cb)
 {
 	zbx_db_result_t	result;
 	zbx_db_row_t	row;

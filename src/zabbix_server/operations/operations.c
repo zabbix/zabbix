@@ -44,9 +44,27 @@ typedef enum
 }
 zbx_host_tag_op_t;
 
-ZBX_PTR_VECTOR_IMPL(op_discovered_interface_ptr, zbx_op_discovered_interface_t*)
+typedef struct
+{
+	char		*ip;
+	char		*dns;
+	char		*snmp_community;
+	char		*snmpv3_securityname;
+	char		*snmpv3_authpassphrase;
+	char		*snmpv3_privpassphrase;
+	char		*snmpv3_contextname;
+	unsigned short	port;
+	unsigned char	type;
+	unsigned char	snmp_version;
+	unsigned char	snmpv3_securitylevel;
+	unsigned char	snmpv3_authprotocol;
+	unsigned char	snmpv3_privprotocol;
+} zbx_op_dinterface_t;
 
-static void	discovered_interface_free(zbx_op_discovered_interface_t *d_if)
+ZBX_PTR_VECTOR_DECL(op_dinterface_ptr, zbx_op_dinterface_t*)
+ZBX_PTR_VECTOR_IMPL(op_dinterface_ptr, zbx_op_dinterface_t*)
+
+static void	dinterface_free(zbx_op_dinterface_t *d_if)
 {
 	zbx_free(d_if);
 }
@@ -298,13 +316,13 @@ static zbx_uint64_t	add_discovered_host(const zbx_db_event *event, int *status, 
 					event->objectid, DOBJECT_STATUS_UP);
 		}
 
-		zbx_vector_op_discovered_interface_ptr_t 	d_ifs_agent;
-		zbx_vector_op_discovered_interface_ptr_t 	d_ifs_snmp;
-		zbx_op_discovered_interface_t 			*d_if;
-		zbx_uint64_t					interfaceid;
+		zbx_vector_op_dinterface_ptr_t 	d_ifs_agent;
+		zbx_vector_op_dinterface_ptr_t 	d_ifs_snmp;
+		zbx_op_dinterface_t 		*d_if;
+		zbx_uint64_t			interfaceid;
 
-		zbx_vector_op_discovered_interface_ptr_create(&d_ifs_agent);
-		zbx_vector_op_discovered_interface_ptr_create(&d_ifs_snmp);
+		zbx_vector_op_dinterface_ptr_create(&d_ifs_agent);
+		zbx_vector_op_dinterface_ptr_create(&d_ifs_snmp);
 
 		while (NULL != (row = zbx_db_fetch(result)))
 		{
@@ -317,7 +335,7 @@ static zbx_uint64_t	add_discovered_host(const zbx_db_event *event, int *status, 
 
 			monitored_by = get_host_monitored_by(proxyid, &new_proxyid, &new_proxy_groupid);
 
-			d_if = zbx_malloc(NULL, sizeof(zbx_op_discovered_interface_t));
+			d_if = zbx_malloc(NULL, sizeof(zbx_op_dinterface_t));
 
 			d_if->ip = row[2];
 			d_if->dns = row[3];
@@ -571,25 +589,23 @@ static zbx_uint64_t	add_discovered_host(const zbx_db_event *event, int *status, 
 			{
 				if (INTERFACE_TYPE_AGENT == d_if->type)
 				{
-					if (d_ifs_agent.values_num > 0 &&
-							0 == strcmp(d_ifs_agent.values[d_ifs_agent.values_num - 1]->ip,
-									d_if->ip))
+					if (d_ifs_agent.values_num > 0 && 0 == strcmp(
+							d_ifs_agent.values[d_ifs_agent.values_num - 1]->ip, d_if->ip))
 					{
 						zbx_free(d_if);
 					}
 					else
-						zbx_vector_op_discovered_interface_ptr_append(&d_ifs_agent, d_if);
+						zbx_vector_op_dinterface_ptr_append(&d_ifs_agent, d_if);
 				}
 				else  // INTERFACE_TYPE_SNMP
 				{
-					if (d_ifs_snmp.values_num > 0 &&
-							0 == strcmp(d_ifs_snmp.values[d_ifs_snmp.values_num - 1]->ip,
-									d_if->ip))
+					if (d_ifs_snmp.values_num > 0 && 0 == strcmp(
+							d_ifs_snmp.values[d_ifs_snmp.values_num - 1]->ip, d_if->ip))
 					{
 						zbx_free(d_if);
 					}
 					else
-						zbx_vector_op_discovered_interface_ptr_append(&d_ifs_snmp, d_if);
+						zbx_vector_op_dinterface_ptr_append(&d_ifs_snmp, d_if);
 				}
 			}
 		}
@@ -600,8 +616,7 @@ static zbx_uint64_t	add_discovered_host(const zbx_db_event *event, int *status, 
 		if (d_ifs_agent.values_num > 0)
 		{
 			if_idx = FAIL;
-			if ( FAIL != zbx_db_get_main_interface_ip(hostid, INTERFACE_TYPE_AGENT,
-					if_ip, sizeof(if_ip)))
+			if ( FAIL != zbx_db_get_main_interface_ip(hostid, INTERFACE_TYPE_AGENT, if_ip, sizeof(if_ip)))
 			{
 				for (int i = 0; i < d_ifs_agent.values_num; i++)
 				{
@@ -624,14 +639,13 @@ static zbx_uint64_t	add_discovered_host(const zbx_db_event *event, int *status, 
 						ZBX_CONN_DEFAULT, zbx_map_db_event_to_audit_context(event));
 			}
 
-			zbx_vector_op_discovered_interface_ptr_clear_ext(&d_ifs_agent, discovered_interface_free);
+			zbx_vector_op_dinterface_ptr_clear_ext(&d_ifs_agent, dinterface_free);
 		}
 
 		if (d_ifs_snmp.values_num > 0)
 		{
 			if_idx = FAIL;
-			if ( FAIL != zbx_db_get_main_interface_ip(hostid, INTERFACE_TYPE_SNMP,
-					if_ip, sizeof(if_ip)))
+			if ( FAIL != zbx_db_get_main_interface_ip(hostid, INTERFACE_TYPE_SNMP, if_ip, sizeof(if_ip)))
 			{
 				for (int i = 0; i < d_ifs_snmp.values_num; i++)
 				{
@@ -661,11 +675,11 @@ static zbx_uint64_t	add_discovered_host(const zbx_db_event *event, int *status, 
 						hostid, zbx_map_db_event_to_audit_context(event));
 			}
 
-			zbx_vector_op_discovered_interface_ptr_clear_ext(&d_ifs_snmp, discovered_interface_free);
+			zbx_vector_op_dinterface_ptr_clear_ext(&d_ifs_snmp, dinterface_free);
 		}
 
-		zbx_vector_op_discovered_interface_ptr_destroy(&d_ifs_agent);
-		zbx_vector_op_discovered_interface_ptr_destroy(&d_ifs_snmp);
+		zbx_vector_op_dinterface_ptr_destroy(&d_ifs_agent);
+		zbx_vector_op_dinterface_ptr_destroy(&d_ifs_snmp);
 
 		zbx_db_free_result(result);
 	}

@@ -64,6 +64,7 @@ void	zbx_discovery_update_service_down_proxy(const zbx_uint64_t dhostid, const c
 	ZBX_UNUSED(ip);
 	ZBX_UNUSED(now);
 	ZBX_UNUSED(dserviceids);
+	ZBX_UNUSED(add_event_cb);
 }
 
 /******************************************************************************
