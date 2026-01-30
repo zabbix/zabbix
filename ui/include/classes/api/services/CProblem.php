@@ -323,13 +323,14 @@ class CProblem extends CApiService {
 		if (!$options['countOutput'] && $this->outputIsRequested('suppressed', $options['output'])) {
 			if ($options['suppressed'] === true) {
 				$sql_parts['select'][] = zbx_dbstr((string) ZBX_PROBLEM_SUPPRESSED_TRUE).' AS suppressed';
-				$sql_parts['from']['esup'] = 'event_suppress esup';
-				$sql_parts['where']['p-esup'] = 'p.eventid=esup.eventid';
 			}
 			else {
 				$sql_parts['select'][] = 'CASE WHEN esup.eventid IS NULL'.
 					' THEN '.zbx_dbstr((string) ZBX_PROBLEM_SUPPRESSED_FALSE).
 					' ELSE '.zbx_dbstr((string) ZBX_PROBLEM_SUPPRESSED_TRUE).' END AS suppressed';
+			}
+
+			if ($options['suppressed'] === null) {
 				$sql_parts['left_join']['esup']
 					= ['alias' => 'esup', 'table' => 'event_suppress', 'using' => 'eventid'];
 				$sql_parts['left_table'] = ['alias' => 'p', 'table' => 'problem'];
