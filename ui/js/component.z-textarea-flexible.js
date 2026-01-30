@@ -168,7 +168,6 @@ class ZTextareaFlexible extends HTMLElement {
 			this.#textarea.style.height = `${this.#textarea.scrollHeight + parseInt(styles.borderWidth) * 2}px`;
 			this.#is_resize_locked = false;
 		});
-
 	}
 
 	#addEventListeners() {

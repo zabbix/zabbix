@@ -112,7 +112,7 @@
 		else {
 			$container.removeClass(ZBX_STYLE_MACRO_VALUE_TEXT + ' ' + ZBX_STYLE_MACRO_VALUE_VAULT);
 
-			var $curr_control = $('.textarea-flexible', $container),
+			var $curr_control = $('z-textarea-flexible', $container),
 				$input = $curr_control;
 		}
 

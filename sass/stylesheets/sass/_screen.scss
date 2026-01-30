@@ -2185,6 +2185,10 @@ select {
 			line-height: normal;
 		}
 	}
+
+	input[type="password"] {
+		min-height: 26px;
+	}
 }
 
 .overlay-dialogue-body {

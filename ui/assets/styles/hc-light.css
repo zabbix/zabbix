@@ -7768,6 +7768,8 @@ z-select[disabled] .focusable, z-textarea-flexible textarea[disabled], input[dis
     margin-left: 10px; }
   .textarea-flexible-container td button {
     line-height: normal; }
+.textarea-flexible-container input[type="password"] {
+  min-height: 26px; }
 
 .overlay-dialogue-body {
   margin: 0 0 25px;
