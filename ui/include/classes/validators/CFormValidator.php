@@ -181,7 +181,7 @@ class CFormValidator {
 						throw new Exception('[RULES ERROR] Rule "regex" is specified multiple times (Path: '.$rule_path.')');
 					}
 
-					$result['regex'] = '/^[A-F0-9]{6}$/';
+					$result['regex'] = '/^[0-9a-f]{6}$/i';
 				}
 				else {
 					throw new Exception('[RULES ERROR] Unknown rule "'.$value.'" (Path: '.$rule_path.')');

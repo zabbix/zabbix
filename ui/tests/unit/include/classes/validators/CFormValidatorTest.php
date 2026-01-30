@@ -862,7 +862,7 @@ class CFormValidatorTest extends TestCase {
 					'color' => ['string', 'rgb']
 				]],
 				['type' => 'object', 'fields' => [
-					'color' => [['type' => 'string', 'regex' => '/^[A-F0-9]{6}$/']]
+					'color' => [['type' => 'string', 'regex' => '/^[0-9a-f]{6}$/i']]
 				]]
 			]
 		];
@@ -2646,6 +2646,35 @@ class CFormValidatorTest extends TestCase {
 				CFormValidator::ERROR,
 				['/value' => [
 					['message' => 'Invalid date.', 'level' => CFormValidator::ERROR_LEVEL_DELAYED]
+				]]
+			],
+			[
+				['object', 'fields' => [
+					'value' => ['string', 'rgb']
+				]],
+				['value' => '00FFBF'],
+				['value' => '00FFBF'],
+				CFormValidator::SUCCESS,
+				[]
+			],
+			[
+				['object', 'fields' => [
+					'value' => ['string', 'rgb']
+				]],
+				['value' => '00ffbf'],
+				['value' => '00ffbf'],
+				CFormValidator::SUCCESS,
+				[]
+			],
+			[
+				['object', 'fields' => [
+					'value' => ['string', 'rgb']
+				]],
+				['value' => '00f'],
+				['value' => '00f'],
+				CFormValidator::ERROR,
+				['/value' => [
+					['message' => 'This value does not match pattern.', 'level' => CFormValidator::ERROR_LEVEL_PRIMARY]
 				]]
 			]
 		];

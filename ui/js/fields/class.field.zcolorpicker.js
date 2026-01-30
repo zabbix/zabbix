@@ -15,14 +15,17 @@
 
 class CFieldZColorPicker extends CField {
 
+	#hidden_input;
+
 	init() {
+		this.#hidden_input = this._field.querySelector('input[type="hidden"]');
 		super.init();
 
 		this._field.addEventListener('change', () => this.onBlur());
 	}
 
 	getName() {
-		return this._field.getAttribute('color-field-name');
+		return this.#hidden_input.getAttribute('name');
 	}
 
 	getValue() {
@@ -30,11 +33,11 @@ class CFieldZColorPicker extends CField {
 			return null;
 		}
 
-		return this._field.getAttribute('color');
+		return this.#hidden_input.value;
 	}
 
 	isDisabled () {
-		return this._field.disabled;
+		return this.#hidden_input.disabled;
 	}
 
 	focusErrorField() {
