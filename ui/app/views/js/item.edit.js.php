@@ -794,7 +794,7 @@ window.item_edit_form = new class {
 
 		// check selected value type if external history providers are used
 		if (Array.isArray(this.provider_value_types) && !disabled) {
-			this.label.history_hint.classList.toggle(ZBX_STYLE_DISPLAY_NONE,
+			this.label.history_hint?.classList.toggle(ZBX_STYLE_DISPLAY_NONE,
 				!this.provider_value_types.includes(parseInt(this.field.value_type.value))
 			);
 		}
