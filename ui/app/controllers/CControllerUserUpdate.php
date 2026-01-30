@@ -59,7 +59,7 @@ class CControllerUserUpdate extends CControllerUserUpdateGeneral {
 					]
 				],
 				'period' => ['string', 'required', 'not_empty',
-					'use' => [CTimePeriodParser::class, ['usermacros' => true]],
+					'use' => [CTimePeriodsParser::class, ['usermacros' => true]],
 					'messages' => ['use' => _('Invalid period.')]
 				],
 				'severity' => ['db media.severity', 'required'],

@@ -42,7 +42,7 @@ class CControllerPopupMediaCheck extends CController {
 				'when' => ['mediatype_type', 'in' => [MEDIA_TYPE_EMAIL]]
 			],
 			'period' => ['string', 'required', 'not_empty',
-				'use' => [CTimePeriodParser::class, ['usermacros' => true]],
+				'use' => [CTimePeriodsParser::class, ['usermacros' => true]],
 				'messages' => ['use' => _('Invalid period.')]
 			],
 			'severities' => ['array',
