@@ -114,7 +114,7 @@ $html_page
 				->setValues([
 					['name' => SHOW_TAGS_1, 'value' => SHOW_TAGS_1],
 					['name' => SHOW_TAGS_2, 'value' => SHOW_TAGS_2],
-					['name' => SHOW_TAGS_3, 'value' => SHOW_TAGS_3],
+					['name' => SHOW_TAGS_3, 'value' => SHOW_TAGS_3]
 				])
 				->setModern()
 		),
@@ -125,7 +125,7 @@ $html_page
 				->setValues([
 					['name' => _('Full'), 'value' => TAG_NAME_FULL],
 					['name' => _('Shortened'), 'value' => TAG_NAME_SHORTENED],
-					['name' => _('None'), 'value' => TAG_NAME_NONE],
+					['name' => _('None'), 'value' => TAG_NAME_NONE]
 				])
 				->setModern()
 		),
@@ -139,7 +139,7 @@ $html_page
 	->addItem([
 		(new CLabel(_('Tag name'), 'tag_name'))
 			->addClass('form-label'),
-		new CFormField(new CTextBox('tag_name')),
+		new CFormField(new CTextBox('tag_name'))
 	])
 	->show();
 

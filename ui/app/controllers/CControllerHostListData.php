@@ -256,7 +256,7 @@ class CControllerHostListData extends CControllerDataTable {
 					&& isset($host['maintenanceid']) && array_key_exists($host['maintenanceid'], $maintenances)) {
 				$host['maintenance'] = $maintenances[$host['maintenanceid']] + [
 					'type' => $host['maintenance_type'],
-					'status' => $host['maintenance_status'],
+					'status' => $host['maintenance_status']
 				];
 			}
 
@@ -342,7 +342,7 @@ class CControllerHostListData extends CControllerDataTable {
 			'rows' => array_values(array_map(static fn (array $host) => [[], $host], $hosts)),
 			'max_in_table' => (int) CSettingsHelper::get(CSettingsHelper::MAX_IN_TABLE),
 			'can_edit_proxies' => CWebUser::checkAccess(CRoleHelper::UI_ADMINISTRATION_PROXIES),
-			'can_edit_proxy_groups' => CWebUser::checkAccess(CRoleHelper::UI_ADMINISTRATION_PROXY_GROUPS),
+			'can_edit_proxy_groups' => CWebUser::checkAccess(CRoleHelper::UI_ADMINISTRATION_PROXY_GROUPS)
 		];
 	}
 }

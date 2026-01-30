@@ -255,7 +255,7 @@ $html_page
 				->setValues([
 					['name' => SHOW_TAGS_1, 'value' => SHOW_TAGS_1],
 					['name' => SHOW_TAGS_2, 'value' => SHOW_TAGS_2],
-					['name' => SHOW_TAGS_3, 'value' => SHOW_TAGS_3],
+					['name' => SHOW_TAGS_3, 'value' => SHOW_TAGS_3]
 				])
 				->setModern(),
 		),
@@ -266,13 +266,13 @@ $html_page
 				->setValues([
 					['name' => _('Full'), 'value' => TAG_NAME_FULL],
 					['name' => _('Shortened'), 'value' => TAG_NAME_SHORTENED],
-					['name' => _('None'), 'value' => TAG_NAME_NONE],
+					['name' => _('None'), 'value' => TAG_NAME_NONE]
 				])
 				->setModern(),
 		),
 		(new CLabel(_('Tag display priority'), 'tag_display_priority'))
 			->addClass('form-label'),
-		new CFormField(new CTextBox('tag_display_priority')),
+		new CFormField(new CTextBox('tag_display_priority'))
 	])
 	->show();
 
@@ -280,7 +280,7 @@ $html_page
 	->addItem([
 		(new CLabel(_('Tag name'), 'tag_name'))
 			->addClass('form-label'),
-		new CFormField(new CTextBox('tag_name')),
+		new CFormField(new CTextBox('tag_name'))
 	])
 	->show();
 
@@ -293,7 +293,7 @@ $html_page
 		'sort_field' => $data['sort_field'],
 		'sort_order' => $data['sort_order'],
 		'storage_idx' => $data['storage_idx'],
-		'user_configs' => $data['user_configs'],
+		'user_configs' => $data['user_configs']
 	]).');
 '))
 	->setOnDocumentReady()

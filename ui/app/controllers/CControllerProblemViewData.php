@@ -571,7 +571,7 @@ class CControllerProblemViewData extends CControllerDataTable
 				$_symptom_data = CScreenProblem::getData([
 					'show_symptoms' => true,
 					'cause_eventid' => $cause_eventid,
-					'show' => $filter['show'],
+					'show' => $filter['show']
 				], $context_popup_data, ZBX_PROBLEM_SYMPTOM_LIMIT, true);
 
 				if ($_symptom_data['problems']) {

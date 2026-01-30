@@ -62,13 +62,13 @@ class WidgetView extends CControllerDashboardWidgetView {
 				'acknowledgement_status' => $this->fields_values['acknowledgement_status'],
 				'acknowledged_by_me' => $this->fields_values['acknowledgement_status'] == ZBX_ACK_STATUS_ACK
 					? $this->fields_values['acknowledged_by_me']
-					: 0,
+					: 0
 			], [
 				'show_opdata' => in_array($this->fields_values['show_opdata'],
 					[OPERATIONAL_DATA_SHOW_SEPARATELY, OPERATIONAL_DATA_SHOW_WITH_PROBLEM])
 						? 1
 						: 0,
-				'show_suppressed' => $this->fields_values['show_suppressed'],
+				'show_suppressed' => $this->fields_values['show_suppressed']
 			], $search_limit);
 
 			[$sortfield, $sortorder] = self::getSorting($this->fields_values['sort_triggers']);
@@ -92,7 +92,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 				'show_opdata' => in_array($this->fields_values['show_opdata'],
 					[OPERATIONAL_DATA_SHOW_SEPARATELY, OPERATIONAL_DATA_SHOW_WITH_PROBLEM])
 					? 1
-					: 0,
+					: 0
 			]);
 
 			$data += [
@@ -161,7 +161,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 							'show_opdata' => in_array($this->fields_values['show_opdata'],
 								[OPERATIONAL_DATA_SHOW_SEPARATELY, OPERATIONAL_DATA_SHOW_WITH_PROBLEM])
 									? 1
-									: 0,
+									: 0
 						], ZBX_PROBLEM_SYMPTOM_LIMIT, true);
 
 						if ($_symptom_data['problems']) {
@@ -186,7 +186,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 								'show_opdata' => in_array($this->fields_values['show_opdata'],
 									[OPERATIONAL_DATA_SHOW_SEPARATELY, OPERATIONAL_DATA_SHOW_WITH_PROBLEM])
 									? 1
-									: 0,
+									: 0
 							], true);
 
 							$data['users'] += $_symptom_data['users'];
@@ -246,7 +246,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 					'tags' => $this->fields_values['tags'],
 					'tag_name_format' => $this->fields_values['tag_name_format'],
 					'tag_priority' => $this->fields_values['tag_priority'],
-					'show_opdata' => $this->fields_values['show_opdata'],
+					'show_opdata' => $this->fields_values['show_opdata']
 				],
 				'info' => $info,
 				'sortfield' => $sortfield,

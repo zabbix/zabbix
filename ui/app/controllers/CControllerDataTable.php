@@ -73,7 +73,7 @@ abstract class CControllerDataTable extends CController {
 		if (!$ret) {
 			$this->setResponse(
 				new CControllerResponseData(['main_block' => json_encode([
-					'error' => _('Invalid request'),
+					'error' => _('Invalid request')
 				])])
 			);
 		}

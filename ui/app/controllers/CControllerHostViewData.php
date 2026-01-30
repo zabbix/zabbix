@@ -230,7 +230,7 @@ class CControllerHostViewData extends CControllerDataTable {
 					&& isset($host['maintenanceid']) && array_key_exists($host['maintenanceid'], $maintenances)) {
 				$host['maintenance'] = $maintenances[$host['maintenanceid']] + [
 					'type' => $host['maintenance_type'],
-					'status' => $host['maintenance_status'],
+					'status' => $host['maintenance_status']
 				];
 			}
 

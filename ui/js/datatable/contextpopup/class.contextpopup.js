@@ -239,7 +239,7 @@ class CDataTableContextPopup {
 			const form_label = document.createElement('label');
 			form_label.classList.add(ZBX_STYLE_FORM_LABEL);
 			form_label.setAttribute('for', `column_name_${column_index}`);
-			form_label.textContent = t('Column name');
+			form_label.innerText = t('Column name');
 
 			const form_input = document.createElement('input');
 			form_input.classList.add(ZBX_STYLE_FORM_FIELD);

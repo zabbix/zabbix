@@ -1,16 +1,16 @@
 /*
- ** Copyright (C) 2001-2026 Zabbix SIA
- **
- ** This program is free software: you can redistribute it and/or modify it under the terms of
- ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
- **
- ** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- ** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- ** See the GNU Affero General Public License for more details.
- **
- ** You should have received a copy of the GNU Affero General Public License along with this program.
- ** If not, see <https://www.gnu.org/licenses/>.
- **/
+** Copyright (C) 2001-2026 Zabbix SIA
+**
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
+**
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
+**
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
+**/
 
 
 class CDataTable {
@@ -261,7 +261,7 @@ class CDataTable {
 				else if (![this.#checkboxid, CDataTableColumn.CUSTOMIZE_TABLE].includes(column_config.getId())) {
 					const cell_inner = document.createElement('span');
 					cell_inner.classList.add(CDataTable.ZBX_STYLE_CELL_INNER);
-					cell_inner.textContent = column_config.getName();
+					cell_inner.innerText = column_config.getName();
 
 					cell.appendChild(cell_inner);
 				}
@@ -319,7 +319,7 @@ class CDataTable {
 		});
 
 		this.setRenderer(CDataTableColumn.RENDERER_TEXT, ({column_data, cell_inner}) => {
-			cell_inner.textContent = column_data.toString();
+			cell_inner.innerText = column_data.toString();
 		});
 
 		this.setRenderer(CDataTableColumn.CHECKBOX, ({column_config, column_data, cell, cell_inner}) => {
@@ -371,7 +371,7 @@ class CDataTable {
 
 			const tag_label = document.createElement('span');
 			tag_label.classList.add(ZBX_STYLE_TAG);
-			tag_label.textContent = tags[0].value;
+			tag_label.innerText = tags[0].value;
 
 			if (tags[0].type == ZBX_PROPERTY_INHERITED) {
 				tag_label.classList.add(ZBX_STYLE_TAG_INHERITED);
@@ -382,7 +382,7 @@ class CDataTable {
 			if (tags[0].type == ZBX_PROPERTY_INHERITED) {
 				const inherited_title = document.createElement('div');
 				inherited_title.classList.add(ZBX_STYLE_TAG_INHERITED_TITLE);
-				inherited_title.textContent = t('Inherited tag');
+				inherited_title.innerText = t('Inherited tag');
 
 				tag_label_hintbox.appendChild(inherited_title);
 			}
@@ -525,7 +525,7 @@ class CDataTable {
 					}
 
 					const tag_label_clone = tag_label.cloneNode(true);
-					tag_label_clone.textContent = name;
+					tag_label_clone.innerText = name;
 
 					tags_wrapper.appendChild(tag_label_clone);
 				}
@@ -577,7 +577,7 @@ class CDataTable {
 		selected_count.setAttribute('id', 'selected_count');
 
 		if (this.#selectable) {
-			selected_count.textContent = '0 selected';
+			selected_count.innerText = '0 ' + t('selected');
 		}
 
 		this.#footer.appendChild(selected_count);
@@ -950,6 +950,13 @@ class CDataTable {
 
 		const column_config = this.getColumnConfig(column_index);
 		if (!column_config) {
+			return;
+		}
+
+		const message = sprintf(t('Are you sure you want to delete %1$s? This action cannot be undone.'),
+			column_config.getName());
+
+		if (!confirm(message)) {
 			return;
 		}
 
@@ -1751,7 +1758,7 @@ class CDataTable {
 	#duplicateColumnConfig(column_config, user_column_config = {}) {
 		const defaults = column_config.clone()
 			.setDuplicate(false)
-			.setName(`${column_config.getName()} duplicate`)
+			.setName(`${column_config.getName()} ` + t('duplicate'))
 			.setSpan(1);
 
 		return defaults.clone()

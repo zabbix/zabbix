@@ -250,16 +250,23 @@ $translate_strings = [
 		'Enabled' => _('Enabled'),
 		'Disabled' => _('Disabled'),
 		'No data found' => _('No data found'),
+		'Inherited tag' => _('Inherited tag'),
+		'Are you sure you want to delete %1$s? This action cannot be undone.' =>
+			_('Are you sure you want to delete %1$s? This action cannot be undone.'),
+		'duplicate' => _('duplicate'),
+		'selected' => _('selected')
+	],
+	'class.contextpopup.js' => [
 		'Column name' => _('Column name'),
-		'Number of tags' => _('Number of tags'),
 		'Duplicate column' => _('Duplicate column'),
-		'Delete column' => _('Delete column'),
+		'Delete column' => _('Delete column')
+	],
+	'class.contextpopup.customizetable.js' => [
+		'Table options' => _('Table options'),
 		'Column list' => _('Column list'),
 		'Reset layout' => _('Reset layout'),
-		'Your table settings will be reset to default, and duplicate columns will be automatically removed.' =>
-			_('Your table settings will be reset to default, and duplicate columns will be automatically removed.'),
-		'Inherited tag' => _('Inherited tag'),
-		'Update' => _('Update'),
+		'Your table settings will be reset to default and duplicated columns will be removed.' =>
+			_('Your table settings will be reset to default and duplicated columns will be removed.')
 	],
 	'class.geomaps.js' => [
 		'Severity filter' => _('Severity filter')

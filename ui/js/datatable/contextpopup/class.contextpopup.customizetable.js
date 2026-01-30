@@ -79,7 +79,7 @@ class CDataTableCustomizeTablePopup extends CDataTableContextPopup {
 		reset_button.innerText = t('Reset layout');
 		reset_button.setAttribute('type', 'button');
 		reset_button.addEventListener('click', () => {
-			const message = t('Your table settings will be reset to default, and duplicate columns will be automatically removed.');
+			const message = t('Your table settings will be reset to default and duplicated columns will be removed.');
 
 			if (confirm(message)) {
 				this.getDataTable().dispatchEvent(CDataTable.EVENT_RESET);
