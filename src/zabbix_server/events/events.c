@@ -2671,7 +2671,7 @@ static void	process_trigger_events(const zbx_vector_ptr_t *trigger_events,
 			/* Problem events always sets problem value to trigger.    */
 			/* if the trigger is affected by global correlation rules, */
 			/* its value is recalculated later.                        */
-	
+
 			if (TRIGGER_VALUE_PROBLEM == diff->value)
 				continue;
 
