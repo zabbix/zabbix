@@ -126,7 +126,7 @@ abstract class CControllerDataTable extends CController {
 	 * @throws Exception
 	 */
 	protected function doAction(): void {
-		$export = $this->getInput('export_file');
+		$export = $this->getInput('export_file', '');
 		if ($export == 'csv') {
 			$data = $this->export($export);
 
@@ -146,7 +146,7 @@ abstract class CControllerDataTable extends CController {
 			foreach ($data['rows'] as $row_index => [$row_config, &$row_data]) {
 				$prepared_row_data = [];
 
-				if ($row_config['renderer'] && $row_config['raw_data']) {
+				if (array_key_exists('renderer', $row_config) && array_key_exists('raw_data', $row_config)) {
 					$rows[$row_index] = [$row_config, $row_data];
 
 					continue;
