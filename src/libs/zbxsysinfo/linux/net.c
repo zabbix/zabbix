@@ -1329,39 +1329,36 @@ static void	get_link_flags(const char *interface, struct zbx_json *j)
 }
 
 static void	fill_net_if_get_params(const char *name, const char *param,
-			const char *jsonname, const int as_int, struct zbx_json *j)
+		const char *jsonname, const int as_int, struct zbx_json *j)
 {
 	FILE	*f;
-	char	*path, value[MAX_STRING_LEN];
+	char	buf[MAX_STRING_LEN];
 
-	if (NULL == (path = zbx_dsprintf(NULL, "/sys/class/net/%s/%s", name, param)))
-		return;
+	zbx_snprintf(buf, sizeof(buf), "/sys/class/net/%s/%s", name, param);
 
-	if (NULL != (f = fopen(path, "r")))
+	if (NULL != (f = fopen(buf, "r")))
 	{
-		if (NULL != fgets(value, sizeof(value), f))
+		if (NULL != fgets(buf, sizeof(buf), f))
 		{
-			zbx_rtrim(value, "\n");
+			zbx_rtrim(buf, "\n");
 
 			if (NULL != jsonname)
 				param = jsonname;
 
 			if (0 == as_int)
 			{
-				zbx_json_addstring(j, param, value, ZBX_JSON_TYPE_STRING);
+				zbx_json_addstring(j, param, buf, ZBX_JSON_TYPE_STRING);
 			}
 			else
 			{
 				zbx_uint64_t	uintvalue;
 
-				if (SUCCEED == zbx_is_uint64(value, &uintvalue))
+				if (SUCCEED == zbx_is_uint64(buf, &uintvalue))
 					zbx_json_adduint64(j, param, uintvalue);
 			}
 		}
 		zbx_fclose(f);
 	}
-
-	zbx_free(path);
 }
 
 int	net_if_get(AGENT_REQUEST *request, AGENT_RESULT *result)
