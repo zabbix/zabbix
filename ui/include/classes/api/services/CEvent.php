@@ -112,9 +112,6 @@ class CEvent extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		$options['has_filter_cause_eventid'] = $options['filter'] !== null
-			&& array_key_exists('cause_eventid', $options['filter']) && $options['filter']['cause_eventid'] !== null;
-
 		if (($options['source'] == EVENT_SOURCE_TRIGGERS && $options['object'] == EVENT_OBJECT_TRIGGER)
 				|| ($options['source'] == EVENT_SOURCE_SERVICE && $options['object'] == EVENT_OBJECT_SERVICE)) {
 			if ($options['value'] === null) {
@@ -387,11 +384,18 @@ class CEvent extends CApiService {
 			$sql_parts['where'][] = 'esup.eventid IS NULL';
 		}
 
-		if ($options['symptom'] === true || $options['has_filter_cause_eventid']) {
+		$has_cause_eventid_filter = $options['filter'] !== null
+			&& array_key_exists('cause_eventid', $options['filter']) && $options['filter']['cause_eventid'] !== null;
+
+		if ($options['symptom'] === true || $has_cause_eventid_filter) {
 			$sql_parts['join']['es'] = ['table' => 'event_symptom', 'using' => 'eventid'];
 		}
 		elseif ($options['symptom'] === false) {
 			$sql_parts['join']['es'] = ['type' => 'left', 'table' => 'event_symptom', 'using' => 'eventid'];
+		}
+
+		if ($has_cause_eventid_filter) {
+			$sql_parts['where'][] = dbConditionId('es.cause_eventid', $options['filter']['cause_eventid']);
 		}
 
 		if ($options['symptom'] === false) {
@@ -428,11 +432,6 @@ class CEvent extends CApiService {
 		// value
 		if ($options['value'] !== null) {
 			$sql_parts['where'][] = dbConditionInt('e.value', $options['value']);
-		}
-
-		// filter
-		if ($options['filter'] !== null) {
-			$this->applyFilters($options, $sql_parts);
 		}
 
 		return $sql_parts;
@@ -552,21 +551,6 @@ class CEvent extends CApiService {
 		return $sql_parts;
 	}
 
-	/**
-	 * Apply filter conditions to SQL built query.
-	 *
-	 * @param array $options
-	 *        array $options['filter']['cause_eventids']  Cause event IDs to filter by.
-	 * @param array $sql_parts
-	 */
-	private function applyFilters(array $options, array &$sql_parts): void {
-		// Filter symptom events for given cause.
-		if ($options['has_filter_cause_eventid']) {
-			$sql_parts['join']['es'] = ['table' => 'event_symptom', 'using' => 'eventid'];
-			$sql_parts['where']['es'] = dbConditionId('es.cause_eventid', $options['filter']['cause_eventid']);
-		}
-	}
-
 	protected function applyQueryOutputOptions($table_name, $table_alias, array $options, array $sql_parts): array {
 		$sql_parts = parent::applyQueryOutputOptions($table_name, $table_alias, $options, $sql_parts);
 
@@ -603,21 +587,28 @@ class CEvent extends CApiService {
 		if ($this->outputIsRequested('suppressed', $options['output'])) {
 			if ($options['suppressed'] === true) {
 				$sql_parts['select'][] = zbx_dbstr((string) ZBX_PROBLEM_SUPPRESSED_TRUE).' AS suppressed';
-				$sql_parts['join']['esup'] = ['table' => 'event_suppress', 'using' => 'eventid'];
 			}
 			else {
 				$sql_parts['select'][] = 'CASE WHEN esup.eventid IS NULL'.
 					' THEN '.zbx_dbstr((string) ZBX_PROBLEM_SUPPRESSED_FALSE).
 					' ELSE '.zbx_dbstr((string) ZBX_PROBLEM_SUPPRESSED_TRUE).' END AS suppressed';
+			}
+
+			if ($options['suppressed'] === null) {
 				$sql_parts['join']['esup'] = ['type' => 'left', 'table' => 'event_suppress', 'using' => 'eventid'];
 			}
 		}
 
 		if ($this->outputIsRequested('cause_eventid', $options['output'])) {
 			$sql_parts['select']['cause_eventid'] = 'es.cause_eventid';
-			$sql_parts['join']['es'] = $options['symptom'] === true || $options['has_filter_cause_eventid']
-				? ['table' => 'event_symptom', 'using' => 'eventid']
-				: ['type' => 'left', 'table' => 'event_symptom', 'using' => 'eventid'];
+
+			$has_cause_eventid_filter = $options['filter'] !== null
+				&& array_key_exists('cause_eventid', $options['filter'])
+				&& $options['filter']['cause_eventid'] !== null;
+
+			if ($options['symptom'] === null && !$has_cause_eventid_filter) {
+				$sql_parts['join']['es'] = ['type' => 'left', 'table' => 'event_symptom', 'using' => 'eventid'];
+			}
 		}
 
 		return $sql_parts;
