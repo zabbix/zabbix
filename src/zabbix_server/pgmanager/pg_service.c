@@ -397,7 +397,7 @@ static void	*pg_service_entry(void *data)
 		if (NULL != client)
 			zbx_ipc_client_release(client);
 	}
-out:
+
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 
 	return NULL;
