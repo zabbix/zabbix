@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -33,8 +33,11 @@ class testCalculatedExpression extends CIntegrationTest {
 	const HOST_NAME = 'test_calc';
 	const TRAPPER_ITEM_KEY = 'test.calc.trapper';
 	const CALCULATED_ITEM_KEY = 'test.calc.calculated';
-	const DBL_MAX = '1.7976931348623157e308';
-	const DBL_MIN = '-1.7976931348623157e308';
+
+	/* According to our 'Upgrading to numeric values of extended range' docs supported limits are */
+	/* -1.79E+308 and 1.79E+308, NOT -1.7976931348623157e308 and 1.7976931348623157e308.          */
+	const DBL_MAX = '1.79e308';
+	const DBL_MIN = '-1.79e308';
 
 	/**
 	 * Component configuration provider.
@@ -128,11 +131,11 @@ class testCalculatedExpression extends CIntegrationTest {
 	private function sendExtremeValues($sendMax, $sendMin, $itemkey)
 	{
 		for ($i = 1; $i <= $sendMax; $i++) {
-			$this->sendSenderValue(self::HOST_NAME, $itemkey, 1.7976931348623157e308);
+			$this->sendSenderValue(self::HOST_NAME, $itemkey, (float)self::DBL_MAX);
 		}
 
 		for ($i = 1; $i <= $sendMin; $i++) {
-			$this->sendSenderValue(self::HOST_NAME, $itemkey, -1.7976931348623157e308);
+			$this->sendSenderValue(self::HOST_NAME, $itemkey, (float)self::DBL_MIN);
 		}
 	}
 
@@ -278,7 +281,7 @@ class testCalculatedExpression extends CIntegrationTest {
 			array_map('floatval', $values)
 		);
 
-		$this->assertEquals((float)'1.7976931348623157e308', $this->getItemLastValue($itemid));
+		$this->assertEquals((float)self::DBL_MAX, $this->getItemLastValue($itemid));
 	}
 
 	public function testCalculatedExpression_MinOfLast3()
