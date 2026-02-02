@@ -1277,10 +1277,6 @@ define('TAG_OPERATOR_NOT_EQUAL',	3);
 define('TAG_OPERATOR_EXISTS',		4);
 define('TAG_OPERATOR_NOT_EXISTS',	5);
 
-// Problem tag filter constants.
-define('TAG_FILTER_ALL',	0);
-define('TAG_FILTER_LIST',	1);
-
 define('GRAPH_FILTER_ALL',		0);
 define('GRAPH_FILTER_HOST',		1);
 define('GRAPH_FILTER_SIMPLE',	2);
