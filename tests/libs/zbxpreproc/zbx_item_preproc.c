@@ -28,104 +28,13 @@
 #include "libs/zbxpreproc/pp_cache.h"
 #include "libs/zbxpreproc/pp_error.h"
 
+#include "pp_mock.h"
+
 #ifdef HAVE_NETSNMP
 #define SNMP_NO_DEBUGGING
 #include <net-snmp/net-snmp-config.h>
 #include <net-snmp/net-snmp-includes.h>
 #endif
-
-static int	str_to_preproc_type(const char *str)
-{
-	if (0 == strcmp(str, "ZBX_PREPROC_MULTIPLIER"))
-		return ZBX_PREPROC_MULTIPLIER;
-	if (0 == strcmp(str, "ZBX_PREPROC_RTRIM"))
-		return ZBX_PREPROC_RTRIM;
-	if (0 == strcmp(str, "ZBX_PREPROC_LTRIM"))
-		return ZBX_PREPROC_LTRIM;
-	if (0 == strcmp(str, "ZBX_PREPROC_TRIM"))
-		return ZBX_PREPROC_TRIM;
-	if (0 == strcmp(str, "ZBX_PREPROC_REGSUB"))
-		return ZBX_PREPROC_REGSUB;
-	if (0 == strcmp(str, "ZBX_PREPROC_BOOL2DEC"))
-		return ZBX_PREPROC_BOOL2DEC;
-	if (0 == strcmp(str, "ZBX_PREPROC_OCT2DEC"))
-		return ZBX_PREPROC_OCT2DEC;
-	if (0 == strcmp(str, "ZBX_PREPROC_HEX2DEC"))
-		return ZBX_PREPROC_HEX2DEC;
-	if (0 == strcmp(str, "ZBX_PREPROC_DELTA_VALUE"))
-		return ZBX_PREPROC_DELTA_VALUE;
-	if (0 == strcmp(str, "ZBX_PREPROC_DELTA_SPEED"))
-		return ZBX_PREPROC_DELTA_SPEED;
-	if (0 == strcmp(str, "ZBX_PREPROC_XPATH"))
-		return ZBX_PREPROC_XPATH;
-	if (0 == strcmp(str, "ZBX_PREPROC_JSONPATH"))
-		return ZBX_PREPROC_JSONPATH;
-	if (0 == strcmp(str, "ZBX_PREPROC_VALIDATE_RANGE"))
-		return ZBX_PREPROC_VALIDATE_RANGE;
-	if (0 == strcmp(str, "ZBX_PREPROC_VALIDATE_REGEX"))
-		return ZBX_PREPROC_VALIDATE_REGEX;
-	if (0 == strcmp(str, "ZBX_PREPROC_VALIDATE_NOT_REGEX"))
-		return ZBX_PREPROC_VALIDATE_NOT_REGEX;
-	if (0 == strcmp(str, "ZBX_PREPROC_ERROR_FIELD_JSON"))
-		return ZBX_PREPROC_ERROR_FIELD_JSON;
-	if (0 == strcmp(str, "ZBX_PREPROC_ERROR_FIELD_XML"))
-		return ZBX_PREPROC_ERROR_FIELD_XML;
-	if (0 == strcmp(str, "ZBX_PREPROC_ERROR_FIELD_REGEX"))
-		return ZBX_PREPROC_ERROR_FIELD_REGEX;
-	if (0 == strcmp(str, "ZBX_PREPROC_THROTTLE_VALUE"))
-		return ZBX_PREPROC_THROTTLE_VALUE;
-	if (0 == strcmp(str, "ZBX_PREPROC_THROTTLE_TIMED_VALUE"))
-		return ZBX_PREPROC_THROTTLE_TIMED_VALUE;
-	if (0 == strcmp(str, "ZBX_PREPROC_PROMETHEUS_PATTERN"))
-		return ZBX_PREPROC_PROMETHEUS_PATTERN;
-	if (0 == strcmp(str, "ZBX_PREPROC_PROMETHEUS_TO_JSON"))
-		return ZBX_PREPROC_PROMETHEUS_TO_JSON;
-	if (0 == strcmp(str, "ZBX_PREPROC_CSV_TO_JSON"))
-		return ZBX_PREPROC_CSV_TO_JSON;
-	if (0 == strcmp(str, "ZBX_PREPROC_STR_REPLACE"))
-		return ZBX_PREPROC_STR_REPLACE;
-	if (0 == strcmp(str, "ZBX_PREPROC_SNMP_WALK_TO_JSON"))
-		return ZBX_PREPROC_SNMP_WALK_TO_JSON;
-	if (0 == strcmp(str, "ZBX_PREPROC_SNMP_WALK_VALUE"))
-		return ZBX_PREPROC_SNMP_WALK_VALUE;
-	if (0 == strcmp(str, "ZBX_PREPROC_SNMP_GET_VALUE"))
-		return ZBX_PREPROC_SNMP_GET_VALUE;
-	if (0 == strcmp(str, "ZBX_PREPROC_SCRIPT"))
-		return ZBX_PREPROC_SCRIPT;
-	if (0 == strcmp(str, "ZBX_PREPROC_VALIDATE_NOT_SUPPORTED"))
-		return ZBX_PREPROC_VALIDATE_NOT_SUPPORTED;
-
-	fail_msg("unknown preprocessing step type: %s", str);
-	return FAIL;
-}
-
-static int	str_to_preproc_error_handler(const char *str)
-{
-	if (0 == strcmp(str, "ZBX_PREPROC_FAIL_DEFAULT"))
-		return ZBX_PREPROC_FAIL_DEFAULT;
-	if (0 == strcmp(str, "ZBX_PREPROC_FAIL_DISCARD_VALUE"))
-		return ZBX_PREPROC_FAIL_DISCARD_VALUE;
-	if (0 == strcmp(str, "ZBX_PREPROC_FAIL_SET_VALUE"))
-		return ZBX_PREPROC_FAIL_SET_VALUE;
-	if (0 == strcmp(str, "ZBX_PREPROC_FAIL_SET_ERROR"))
-		return ZBX_PREPROC_FAIL_SET_ERROR;
-
-	fail_msg("unknown preprocessing error handler: %s", str);
-	return FAIL;
-}
-
-static void	read_value(const char *path, unsigned char *value_type, zbx_variant_t *value, zbx_timespec_t *ts)
-{
-	zbx_mock_handle_t	handle;
-
-	handle = zbx_mock_get_parameter_handle(path);
-	if (NULL != value_type)
-		*value_type = zbx_mock_str_to_value_type(zbx_mock_get_object_member_string(handle, "value_type"));
-	if (ZBX_MOCK_SUCCESS != zbx_strtime_to_timespec(zbx_mock_get_object_member_string(handle, "time"), ts))
-		fail_msg("Invalid 'time' format");
-
-	zbx_variant_set_str(value, zbx_strdup(NULL, zbx_mock_get_object_member_string(handle, "data")));
-}
 
 static void	read_history_value(const char *path, zbx_variant_t *value, zbx_timespec_t *ts)
 {
@@ -148,30 +57,6 @@ static void	read_error(const char *path, zbx_variant_t *value, zbx_timespec_t *t
 		fail_msg("Invalid 'time' format");
 
 	zbx_variant_set_error(value, zbx_strdup(NULL, zbx_mock_get_object_member_string(handle, "data")));
-}
-
-static void	read_step(const char *path, zbx_pp_step_t *step)
-{
-	zbx_mock_handle_t	hop, hop_params, herror, herror_params;
-
-	hop = zbx_mock_get_parameter_handle(path);
-	step->type = str_to_preproc_type(zbx_mock_get_object_member_string(hop, "type"));
-
-	if (ZBX_MOCK_SUCCESS == zbx_mock_object_member(hop, "params", &hop_params))
-		step->params = (char *)zbx_mock_get_object_member_string(hop, "params");
-	else
-		step->params = "";
-
-	if (ZBX_MOCK_SUCCESS == zbx_mock_object_member(hop, "error_handler", &herror))
-		step->error_handler = str_to_preproc_error_handler(
-				zbx_mock_get_object_member_string(hop, "error_handler"));
-	else
-		step->error_handler = ZBX_PREPROC_FAIL_DEFAULT;
-
-	if (ZBX_MOCK_SUCCESS == zbx_mock_object_member(hop, "error_handler_params", &herror_params))
-		step->error_handler_params = (char *)zbx_mock_get_object_member_string(hop, "error_handler_params");
-	else
-		step->error_handler_params = "";
 }
 
 static void	duplicate_step(zbx_pp_step_t *step_src, zbx_pp_step_t *step_dst)
@@ -305,7 +190,7 @@ void	zbx_mock_test_entry(void **state)
 
 	ZBX_UNUSED(state);
 
-	read_step("in.step", &step_orig);
+	mock_pp_read_step(zbx_mock_get_parameter_handle("in.step"), &step_orig);
 	duplicate_step(&step_orig, &step);
 
 #ifdef HAVE_NETSNMP
@@ -328,7 +213,7 @@ void	zbx_mock_test_entry(void **state)
 		value_type = value_in.type;
 	}
 	else
-		read_value("in.value", &value_type, &value_in, &ts);
+		mock_pp_read_value(zbx_mock_get_parameter_handle("in.value"), &value_type, &value_in, &ts);
 
 	if (ZBX_MOCK_SUCCESS == zbx_mock_parameter_exists("in.history"))
 	{
