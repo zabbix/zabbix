@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -436,3 +436,46 @@ int	zbx_mock_str_to_family(const char *str)
 	return AF_UNSPEC;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Parameters: hdata  - [IN]  data handle                                     *
+ *             values - [OUT]                                                 *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_mock_extract_yaml_values_uint64(zbx_mock_handle_t hdata, zbx_vector_uint64_t *values)
+{
+	zbx_mock_error_t	err;
+	zbx_mock_handle_t	hvalue;
+
+	while (ZBX_MOCK_END_OF_VECTOR != zbx_mock_vector_element(hdata, &hvalue))
+	{
+		zbx_uint64_t	value;
+
+		if (ZBX_MOCK_SUCCESS != (err = zbx_mock_uint64(hvalue, &value)))
+			fail_msg("Cannot read vector member: %s", zbx_mock_error_string(err));
+
+		zbx_vector_uint64_append(values, value);
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Parameters: hdata  - [IN]  data handle                                     *
+ *             values - [OUT]                                                 *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_mock_extract_yaml_values_dbl(zbx_mock_handle_t hdata, zbx_vector_dbl_t *values)
+{
+	zbx_mock_error_t	err;
+	zbx_mock_handle_t	hvalue;
+
+	while (ZBX_MOCK_END_OF_VECTOR != zbx_mock_vector_element(hdata, &hvalue))
+	{
+		double	value;
+
+		if (ZBX_MOCK_SUCCESS != (err = zbx_mock_float(hvalue, &value)))
+			fail_msg("Cannot read vector member: %s", zbx_mock_error_string(err));
+
+		zbx_vector_dbl_append(values, value);
+	}
+}

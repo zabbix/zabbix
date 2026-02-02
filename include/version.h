@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -22,7 +22,7 @@
 #define ZABBIX_REVDATE		"16 December 2025"
 #define ZABBIX_VERSION_MAJOR	7
 #define ZABBIX_VERSION_MINOR	0
-#define ZABBIX_VERSION_PATCH	22
+#define ZABBIX_VERSION_PATCH	23
 #ifndef ZABBIX_VERSION_REVISION
 #	define ZABBIX_VERSION_REVISION	{ZABBIX_REVISION}
 #endif
@@ -31,7 +31,7 @@
 #		define ZABBIX_VERSION_RC_NUM	{ZABBIX_RC_NUM}
 #	endif
 #endif
-#define ZABBIX_VERSION_RC	""
+#define ZABBIX_VERSION_RC	"rc1"
 #define ZABBIX_VERSION		ZBX_STR(ZABBIX_VERSION_MAJOR) "." ZBX_STR(ZABBIX_VERSION_MINOR) "." \
 				ZBX_STR(ZABBIX_VERSION_PATCH) ZABBIX_VERSION_RC
 #define ZABBIX_VERSION_SHORT	ZBX_STR(ZABBIX_VERSION_MAJOR) "." ZBX_STR(ZABBIX_VERSION_MINOR) "." \
