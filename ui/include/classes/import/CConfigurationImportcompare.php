@@ -366,9 +366,9 @@ class CConfigurationImportcompare {
 		}
 
 		foreach ($same_entities as $entity) {
-			if ($entity['before'] != $entity['after']) {
-				unset($entity['before']['_unique_id'], $entity['after']['_unique_id']);
+			unset($entity['before']['_unique_id'], $entity['after']['_unique_id']);
 
+			if ($entity['before'] != $entity['after']) {
 				$diff['updated'][] = [
 					'before' => $entity['before'],
 					'after' => $entity['after']
