@@ -366,7 +366,7 @@ static void	*pg_service_entry(void *data)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	while (ZBX_IS_RUNNING())
+	while (0 == atomic_load(&pgs->stop))
 	{
 		(void)zbx_ipc_service_recv(&pgs->service, &timeout, &client, &message);
 
@@ -420,6 +420,7 @@ int	pg_service_init(zbx_pg_service_t *pgs, zbx_pg_cache_t *cache, char **error)
 		goto out;
 
 	pgs->cache = cache;
+	pgs->stop = 0;
 
 	pthread_attr_t	attr;
 	int		err;
@@ -445,21 +446,9 @@ out:
  ******************************************************************************/
 void	pg_service_destroy(zbx_pg_service_t *pgs)
 {
-	zbx_ipc_socket_t	sock;
-	char			*error = NULL;
-
-	if (FAIL == zbx_ipc_socket_open(&sock, ZBX_IPC_SERVICE_PGSERVICE, ZBX_PG_SERVICE_TIMEOUT, &error))
-	{
-		zabbix_log(LOG_LEVEL_ERR, "cannot connect to to proxy group manager service: %s", error);
-		zbx_free(error);
-		return;
-	}
-
-	zbx_ipc_socket_write(&sock, ZBX_IPC_PGM_STOP, NULL, 0);
-	zbx_ipc_socket_close(&sock);
-
 	void	*retval;
 
+	atomic_store(&pgs->stop, 1);
 	pthread_join(pgs->thread, &retval);
 
 	zbx_ipc_service_close(&pgs->service);

@@ -813,7 +813,6 @@ ZBX_THREAD_ENTRY(zbx_supervisor_thread, args)
 					sypervisor_get_activities(client);
 					break;
 				case ZBX_RTC_SHUTDOWN:
-					zbx_set_exiting_with_succeed();
 					goto out;
 				default:
 					continue;
@@ -837,8 +836,6 @@ ZBX_THREAD_ENTRY(zbx_supervisor_thread, args)
 		supervisor_handle_log(time_now);
 	}
 out:
-	zbx_unblock_signals(&orig_mask);
-
 	supervisor_clear(&sv);
 	zabbix_log(LOG_LEVEL_INFORMATION, "[%s #%d] stopped", get_process_type_string(process_type), process_num);
 

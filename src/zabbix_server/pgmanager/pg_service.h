@@ -23,6 +23,7 @@ typedef struct
 	zbx_pg_cache_t		*cache;
 	zbx_ipc_service_t	service;
 	pthread_t		thread;
+	zbx_atomic_uint32_t	stop;
 }
 zbx_pg_service_t;
 

@@ -1392,7 +1392,7 @@ void	*zbx_pp_manager_thread(void *args)
 			time_trim = sec;
 		}
 
-		if (!ZBX_IS_RUNNING() && 0 == pending_num && 0 == processing_num)
+		if ((!ZBX_IS_RUNNING() || 0 != shutdown) && 0 == pending_num && 0 == processing_num)
 			break;
 	}
 
