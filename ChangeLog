@@ -1,6 +1,7 @@
 Changes for 8.0.0alpha2
 
 New features:
+..F....... [ZBXNEXT-10301] simplified user experience when editing problem filter tags by removing extra radio buttons and making an empty tags list equivalent to "All tags" (Ivo)
 A.F.I...S. [ZBXNEXT-5467] added possibility to add custom tags to triggers created from trigger prototypes (mprihodko, wczerneha)
 ...G...PS. [ZBXNEXT-1002] added ability to use c-ares with DNS caching and failover for all DNS requests on Zabbix server, Zabbix proxy and Zabbix agent (vso)
 ..F....... [ZBXNEXT-10414] set minimum supported PHP version to 8.2 (Ivo)
