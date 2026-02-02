@@ -387,8 +387,6 @@ class CConfigurationImportcompare {
 	/**
 	 * Calculate and add unique ID strings to the entities.
 	 *
-	 * Note: The Frontend depends on the "_unique_id" fields' data.
-	 *
 	 * @param array $entities
 	 * @param array $unique    Specification of the entity unique data.
 	 *
