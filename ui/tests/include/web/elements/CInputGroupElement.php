@@ -32,8 +32,7 @@ class CInputGroupElement extends CElement {
 	 * @return string
 	 */
 	public function getValue() {
-		return $this->query('xpath:.//textarea[contains(@class, "textarea-flexible")]|.//input[@type="password"]')
-				->one()->getValue();
+		return $this->query('xpath:.//z-textarea-flexible/textarea|.//input[@type="password"]')->one()->getValue();
 	}
 
 	/**

@@ -46,7 +46,7 @@ class CMacrosBehavior extends CBehavior {
 			'mapping' => [
 				'Macro' => [
 					'name' => 'macro',
-					'selector' => 'xpath:./textarea',
+					'selector' => 'xpath:./z-textarea-flexible/textarea',
 					'class' => 'CElement'
 				],
 				$value_column => [
@@ -56,7 +56,7 @@ class CMacrosBehavior extends CBehavior {
 				],
 				'Description' => [
 					'name' => 'description',
-					'selector' => 'xpath:./textarea',
+					'selector' => 'xpath:./z-textarea-flexible/textarea',
 					'class' => 'CElement'
 				]
 			]
@@ -164,7 +164,7 @@ class CMacrosBehavior extends CBehavior {
 	 * @return CElement
 	 */
 	public function getValueField($macro) {
-		return $this->test->query('xpath://textarea[text()='.CXPathHelper::escapeQuotes($macro).
+		return $this->test->query('xpath://z-textarea-flexible[@value='.CXPathHelper::escapeQuotes($macro).
 				']/../..//div[contains(@class, "macro-value")]')->asInputGroup()->waitUntilVisible()->one();
 	}
 }
