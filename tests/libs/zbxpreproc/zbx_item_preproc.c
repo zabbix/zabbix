@@ -59,14 +59,6 @@ static void	read_error(const char *path, zbx_variant_t *value, zbx_timespec_t *t
 	zbx_variant_set_error(value, zbx_strdup(NULL, zbx_mock_get_object_member_string(handle, "data")));
 }
 
-static void	duplicate_step(zbx_pp_step_t *step_src, zbx_pp_step_t *step_dst)
-{
-	step_dst->type = step_src->type;
-	step_dst->params = zbx_strdup(NULL, step_src->params);
-	step_dst->error_handler = step_src->error_handler;
-	step_dst->error_handler_params = zbx_strdup(NULL, step_src->error_handler_params);
-}
-
 static void	release_step(zbx_pp_step_t *step)
 {
 	zbx_free(step->params);
@@ -163,7 +155,7 @@ void	zbx_mock_test_entry(void **state)
 	zbx_variant_t		value, value_in, history_value_in;
 	unsigned char		value_type;
 	zbx_timespec_t		ts, history_ts, history_ts_in, expected_history_ts;
-	zbx_pp_step_t		step, step_orig;
+	zbx_pp_step_t		step;
 	int			returned_ret, expected_ret, i;
 	zbx_pp_context_t	ctx = {0};
 	zbx_pp_cache_t		*cache, *step_cache;
