@@ -138,13 +138,15 @@ static int	str_to_preproc_error_handler(const char *str)
 void	mock_pp_read_step(zbx_mock_handle_t hop, zbx_pp_step_t *step)
 {
 	zbx_mock_handle_t	hop_params, herror, herror_params;
+	const char		*step_params, *error_handler_params;
 
 	step->type = str_to_preproc_type(zbx_mock_get_object_member_string(hop, "type"));
 
 	if (ZBX_MOCK_SUCCESS == zbx_mock_object_member(hop, "params", &hop_params))
-		step->params = (char *)zbx_mock_get_object_member_string(hop, "params");
+		step_params = zbx_mock_get_object_member_string(hop, "params");
 	else
-		step->params = "";
+		step_params = "";
+	step->params = zbx_strdup(NULL, step_params);
 
 	if (ZBX_MOCK_SUCCESS == zbx_mock_object_member(hop, "error_handler", &herror))
 		step->error_handler = str_to_preproc_error_handler(
@@ -153,7 +155,8 @@ void	mock_pp_read_step(zbx_mock_handle_t hop, zbx_pp_step_t *step)
 		step->error_handler = ZBX_PREPROC_FAIL_DEFAULT;
 
 	if (ZBX_MOCK_SUCCESS == zbx_mock_object_member(hop, "error_handler_params", &herror_params))
-		step->error_handler_params = (char *)zbx_mock_get_object_member_string(hop, "error_handler_params");
+		error_handler_params = zbx_mock_get_object_member_string(hop, "error_handler_params");
 	else
-		step->error_handler_params = "";
+		error_handler_params = "";
+	step->error_handler_params = zbx_strdup(NULL, error_handler_params);
 }
