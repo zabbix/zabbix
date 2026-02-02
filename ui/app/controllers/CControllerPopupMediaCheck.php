@@ -29,6 +29,7 @@ class CControllerPopupMediaCheck extends CController {
 		return ['object', 'fields' => [
 			'row_index' => ['integer', 'required'],
 			'userid' => ['db users.userid', 'required'],
+			'mediaid' => ['db media.mediaid'],
 			'mediatypeid' => ['db media.mediatypeid', 'required'],
 			'mediatype_type' => ['integer', 'required'],
 			'sendto' => ['db media.sendto', 'not_empty',
