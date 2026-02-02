@@ -1023,50 +1023,50 @@ out:
 	return ret;
 }
 
-int	zbx_history_record_float_compare(const void *d1, const void *d2)
+int	history_record_float_compare(const void *a1, const void *a2)
 {
-	const zbx_history_record_t	*h1 = (const zbx_history_record_t *)d1;
-	const zbx_history_record_t	*h2 = (const zbx_history_record_t *)d2;
+	const zbx_history_record_t	*d1 = (const zbx_history_record_t *)a1;
+	const zbx_history_record_t	*d2 = (const zbx_history_record_t *)a2;
 
-	ZBX_RETURN_IF_NOT_EQUAL(h1->value.dbl, h2->value.dbl);
+	ZBX_RETURN_IF_NOT_EQUAL(d1->value.dbl, d2->value.dbl);
 
 	return 0;
 }
 
-static int	history_record_uint64_compare(const void *d1, const void *d2)
+static int	history_record_uint64_compare(const void *a1, const void *a2)
 {
-	const zbx_history_record_t	*h1 = (const zbx_history_record_t *)d1;
-	const zbx_history_record_t	*h2 = (const zbx_history_record_t *)d2;
+	const zbx_history_record_t	*d1 = (const zbx_history_record_t *)a1;
+	const zbx_history_record_t	*d2 = (const zbx_history_record_t *)a2;
 
-	ZBX_RETURN_IF_NOT_EQUAL(h1->value.ui64, h2->value.ui64);
+	ZBX_RETURN_IF_NOT_EQUAL(d1->value.ui64, d2->value.ui64);
 
 	return 0;
 }
 
-static int	history_record_str_compare(const void *d1, const void *d2)
+static int	history_record_str_compare(const void *a1, const void *a2)
 {
-	const zbx_history_record_t	*h1 = (const zbx_history_record_t *)d1;
-	const zbx_history_record_t	*h2 = (const zbx_history_record_t *)d2;
+	const zbx_history_record_t	*d1 = (const zbx_history_record_t *)a1;
+	const zbx_history_record_t	*d2 = (const zbx_history_record_t *)a2;
 
-	return strcmp(h1->value.str, h2->value.str);
+	return strcmp(d1->value.str, d2->value.str);
 }
 
-static int	history_record_log_compare(const void *d1, const void *d2)
+static int	history_record_log_compare(const void *a1, const void *a2)
 {
-	const zbx_history_record_t	*h1 = (const zbx_history_record_t *)d1;
-	const zbx_history_record_t	*h2 = (const zbx_history_record_t *)d2;
 	int				value_match;
+	const zbx_history_record_t	*d1 = (const zbx_history_record_t *)a1;
+	const zbx_history_record_t	*d2 = (const zbx_history_record_t *)a2;
 
-	if (0 != (value_match = strcmp(h1->value.log->value, h2->value.log->value)))
+	if (0 != (value_match = strcmp(d1->value.log->value, d2->value.log->value)))
 		return value_match;
 
-	if (NULL != h1->value.log->source && NULL != h2->value.log->source)
-		return strcmp(h1->value.log->source, h2->value.log->source);
+	if (NULL != d1->value.log->source && NULL != d2->value.log->source)
+		return strcmp(d1->value.log->source, d2->value.log->source);
 
-	if (NULL != h2->value.log->source)
+	if (NULL != d2->value.log->source)
 		return -1;
 
-	if (NULL != h1->value.log->source)
+	if (NULL != d1->value.log->source)
 		return 1;
 
 	return 0;
@@ -1279,8 +1279,8 @@ static int	evaluate_COUNT(zbx_variant_t *value, const zbx_dc_evaluate_item_t *it
 				zbx_vector_history_record_uniq(&values, history_record_uint64_compare);
 				break;
 			case ITEM_VALUE_TYPE_FLOAT:
-				zbx_vector_history_record_sort(&values, zbx_history_record_float_compare);
-				zbx_vector_history_record_uniq(&values, zbx_history_record_float_compare);
+				zbx_vector_history_record_sort(&values, history_record_float_compare);
+				zbx_vector_history_record_uniq(&values, history_record_float_compare);
 				break;
 			case ITEM_VALUE_TYPE_LOG:
 				zbx_vector_history_record_sort(&values, history_record_log_compare);
@@ -1874,7 +1874,7 @@ static int	evaluate_PERCENTILE(zbx_variant_t  *value, const zbx_dc_evaluate_item
 		int	index;
 
 		if (ITEM_VALUE_TYPE_FLOAT == item->value_type)
-			zbx_vector_history_record_sort(&values, zbx_history_record_float_compare);
+			zbx_vector_history_record_sort(&values, history_record_float_compare);
 		else
 			zbx_vector_history_record_sort(&values, history_record_uint64_compare);
 

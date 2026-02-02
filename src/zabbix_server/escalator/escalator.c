@@ -46,6 +46,9 @@
 #include "zbx_rtc_constants.h"
 #include "zbxserialize.h"
 #include "zbxcurl.h"
+#ifdef HAVE_ARES_QUERY_CACHE
+#include "zbxresolver.h"
+#endif
 
 #define CONFIG_ESCALATOR_FREQUENCY	3
 
@@ -3750,7 +3753,9 @@ ZBX_THREAD_ENTRY(escalator_thread, args)
 		zbx_free(error);
 		exit(EXIT_FAILURE);
 	}
-
+#ifdef HAVE_ARES_QUERY_CACHE
+	zbx_ares_library_init();
+#endif
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	zbx_tls_init_child(escalator_args_in->zbx_config_tls, escalator_args_in->zbx_get_program_type_cb_arg,
 			zbx_dc_get_psk_by_identity);

@@ -1716,22 +1716,6 @@ if test "x$server" = "xyes" || test "x$proxy" = "xyes"; then
 
 	AC_SUBST(ZLIB_CFLAGS)
 
-	dnl Checking for c-ares support
-	ARES_CHECK_CONFIG([no])
-	if test "x$want_ares" = "xyes"; then
-		if test "x$found_ares" != "xyes"; then
-			AC_MSG_ERROR([Unable to use ares (ares check failed)])
-		fi
-		have_ares="yes"
-	fi
-	SERVER_LDFLAGS="$SERVER_LDFLAGS $ARES_LDFLAGS"
-	SERVER_LIBS="$SERVER_LIBS $ARES_LIBS"
-
-	PROXY_LDFLAGS="$PROXY_LDFLAGS $ARES_LDFLAGS"
-	PROXY_LIBS="$PROXY_LIBS $ARES_LIBS"
-
-	AC_SUBST(ARES_CFLAGS)
-
 	dnl Check for 'libpthread' library that supports PTHREAD_PROCESS_SHARED flag
 	LIBPTHREAD_CHECK_CONFIG([no])
 	if test "x$found_libpthread" != "xyes"; then
@@ -1937,6 +1921,32 @@ AGENT_LIBS="$AGENT_LIBS $LDAP_LIBS"
 
 AC_SUBST(LDAP_CPPFLAGS)
 
+
+dnl Checking for c-ares support
+ARES_CHECK_CONFIG([no])
+if test "x$want_ares" = "xyes"; then
+	if test "x$found_ares" != "xyes"; then
+		AC_MSG_ERROR([Unable to use ares (ares check failed)])
+	fi
+	have_ares="yes"
+fi
+SERVER_LDFLAGS="$SERVER_LDFLAGS $ARES_LDFLAGS"
+SERVER_LIBS="$SERVER_LIBS $ARES_LIBS"
+
+PROXY_LDFLAGS="$PROXY_LDFLAGS $ARES_LDFLAGS"
+PROXY_LIBS="$PROXY_LIBS $ARES_LIBS"
+
+AGENT_LDFLAGS="$AGENT_LDFLAGS $ARES_LDFLAGS"
+AGENT_LIBS="$AGENT_LIBS $ARES_LIBS"
+
+ZBXGET_LDFLAGS="$ZBXGET_LDFLAGS $ARES_LDFLAGS"
+ZBXGET_LIBS="$ZBXGET_LIBS $ARES_LIBS"
+
+SENDER_LDFLAGS="$SENDER_LDFLAGS $ARES_LDFLAGS"
+SENDER_LIBS="$SENDER_LIBS $ARES_LIBS"
+
+AC_SUBST(ARES_CFLAGS)
+
 dnl Currently required cURL library version is 7.19.1 . When it is
 dnl increased all the functionality in zbxcurl.h must be revised.
 found_curl="no"
@@ -2058,7 +2068,7 @@ if test "x$agent2" = "xyes"; then
 		\${abs_top_builddir}/src/libs/zbxalgo/libzbxalgo.a \
 		\${abs_top_builddir}/src/libs/zbxinterface/libzbxinterface.a \
 		\${abs_top_builddir}/src/libs/zbxcommon/libzbxcommon.a \
-		\${abs_top_builddir}/src/libs/zbxcomms/libzbxcomms.a \
+		\${abs_top_builddir}/src/libs/zbxcomms/libzbxagent2comms.a \
 		\${abs_top_builddir}/src/libs/zbxcompress/libzbxcompress.a \
 		\${abs_top_builddir}/src/libs/zbxcrypto/libzbxcrypto.a \
 		\${abs_top_builddir}/src/libs/zbxexec/libzbxexec.a \
@@ -2270,6 +2280,7 @@ AC_CONFIG_FILES([
 	src/libs/zbxalerter/Makefile
 	src/libs/zbxpinger/Makefile
 	src/libs/zbxescalations/Makefile
+	src/libs/zbxresolver/Makefile
 	src/zabbix_agent/Makefile
 	src/zabbix_agent/logfiles/Makefile
 	src/zabbix_agent/active_checks/Makefile
