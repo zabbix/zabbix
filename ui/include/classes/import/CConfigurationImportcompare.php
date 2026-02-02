@@ -329,6 +329,8 @@ class CConfigurationImportcompare {
 			if ($has_uuid) {
 				foreach ($before as $b_key => $before_entity) {
 					if ($before_entity['uuid'] === $after_entity['uuid']) {
+						unset($before_entity['_unique_id'], $after_entity['_unique_id']);
+
 						$same_entities[$b_key]['before'] = $before_entity;
 						$same_entities[$b_key]['after'] = $after_entity;
 
@@ -343,6 +345,8 @@ class CConfigurationImportcompare {
 				if ($before_entity['_unique_id'] === $after_entity['_unique_id']) {
 					if ($has_uuid) {
 						$before_entity['uuid'] = $after_entity['uuid'];
+
+						unset($before_entity['_unique_id'], $after_entity['_unique_id']);
 					}
 
 					$same_entities[$b_key]['before'] = $before_entity;
@@ -359,10 +363,14 @@ class CConfigurationImportcompare {
 		$added_entities = $after;
 
 		foreach ($added_entities as $entity) {
+			unset($entity['_unique_id']);
+
 			$diff['added'][] = $entity;
 		}
 
 		foreach ($removed_entities as $entity) {
+			unset($entity['_unique_id']);
+
 			$diff['removed'][] = $entity;
 		}
 
