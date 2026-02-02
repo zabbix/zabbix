@@ -389,8 +389,6 @@ static void	*pg_service_entry(void *data)
 				case ZBX_IPC_PGM_GET_ALL_PGROUP_RTDATA:
 					pg_get_all_pgroup_rtdata(pgs, client);
 					break;
-				case ZBX_IPC_PGM_STOP:
-					goto out;
 			}
 
 			zbx_ipc_message_free(message);
