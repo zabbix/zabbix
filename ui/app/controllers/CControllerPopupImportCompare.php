@@ -388,7 +388,7 @@ class CControllerPopupImportCompare extends CController {
 		}
 
 		unset($all_keys['uuid']);
-		unset($all_keys['_unique_id']);
+		unset($all_keys['_index']);
 
 		$rows = [];
 
@@ -506,7 +506,7 @@ class CControllerPopupImportCompare extends CController {
 				$dashboard_name = $outer_names[count($outer_names) - 1][1];
 				$dashboard_page_name = array_key_exists('name', $object)
 					? $object['name']
-					: _s('Page %1$d', $object['_unique_id'] + 1);
+					: _s('Page %1$d', $object['_index'] + 1);
 
 				return $dashboard_page_name.' ('.$dashboard_name.')';
 			case 'widgets':

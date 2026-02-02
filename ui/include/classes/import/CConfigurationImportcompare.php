@@ -135,13 +135,7 @@ class CConfigurationImportcompare {
 						'options' => function (array $actions): array {
 							return $this->getDashboardInnerEntityOptions($actions);
 						},
-						'uuid' => false,
-						'unique' => [
-							static function(array $page, int $page_index): string {
-								return (string) $page_index;
-							}
-						],
-						'diff_order' => ['updated', 'added', 'removed'],
+						'unique_index' => true,
 						'rules' => [
 							'widgets' => [
 								'options' => function (array $actions): array {
@@ -244,13 +238,16 @@ class CConfigurationImportcompare {
 				continue;
 			}
 
-			$diff = $this->compareByUniqueness($before_entity_group, $after_entity_group, $rule['uuid'],
-				$rule['unique']
-			);
+			if (array_key_exists('unique_index', $rule) && $rule['unique_index']) {
+				$before_entity_group = self::addIndex($before_entity_group);
+				$after_entity_group = self::addIndex($after_entity_group);
 
-			if (array_key_exists('diff_order', $rule)) {
-				$diff_order = array_flip($rule['diff_order']);
-				uksort($diff, fn (string $key_1, string $key_2): int => $diff_order[$key_1] <=> $diff_order[$key_2]);
+				$diff = $this->compareByIndex($before_entity_group, $after_entity_group);
+			}
+			else {
+				$diff = $this->compareByUniqueness($before_entity_group, $after_entity_group, $rule['uuid'],
+					$rule['unique']
+				);
 			}
 
 			if (array_key_exists('added', $diff)) {
@@ -315,11 +312,8 @@ class CConfigurationImportcompare {
 	 * @return array
 	 */
 	protected function compareByUniqueness(array $before, array $after, bool $has_uuid, array $unique): array {
-		$diff = [
-			'added' => [],
-			'removed' => [],
-			'updated' => []
-		];
+		// Key order is important.
+		$diff = ['added' => [], 'removed' => [], 'updated' => []];
 
 		$before = $this->addUniqueIds($before, $unique);
 		$after = $this->addUniqueIds($after, $unique);
@@ -330,8 +324,6 @@ class CConfigurationImportcompare {
 			if ($has_uuid) {
 				foreach ($before as $b_key => $before_entity) {
 					if ($before_entity['uuid'] === $after_entity['uuid']) {
-						unset($before_entity['_unique_id'], $after_entity['_unique_id']);
-
 						$same_entities[$b_key]['before'] = $before_entity;
 						$same_entities[$b_key]['after'] = $after_entity;
 
@@ -346,8 +338,6 @@ class CConfigurationImportcompare {
 				if ($before_entity['_unique_id'] === $after_entity['_unique_id']) {
 					if ($has_uuid) {
 						$before_entity['uuid'] = $after_entity['uuid'];
-
-						unset($before_entity['_unique_id'], $after_entity['_unique_id']);
 					}
 
 					$same_entities[$b_key]['before'] = $before_entity;
@@ -377,6 +367,8 @@ class CConfigurationImportcompare {
 
 		foreach ($same_entities as $entity) {
 			if ($entity['before'] != $entity['after']) {
+				unset($entity['before']['_unique_id'], $entity['after']['_unique_id']);
+
 				$diff['updated'][] = [
 					'before' => $entity['before'],
 					'after' => $entity['after']
@@ -391,6 +383,58 @@ class CConfigurationImportcompare {
 		}
 
 		return $diff;
+	}
+
+	/**
+	 * Compare two arrays by index.
+	 *
+	 * @param array $before
+	 * @param array $after
+	 *
+	 * @return array
+	 */
+	protected function compareByIndex(array $before, array $after): array {
+		$intersection = array_intersect_key($before, $after);
+
+		// Key order is important.
+		$diff = [
+			'updated' => [],
+			'added' => array_values(array_diff_key($after, $intersection)),
+			'removed' => array_values(array_diff_key($before, $intersection))
+		];
+
+		foreach (array_keys($intersection) as $key) {
+			if ($before[$key] != $after[$key]) {
+				$diff['updated'][] = [
+					'before' => $before[$key],
+					'after' => $after[$key]
+				];
+			}
+		}
+
+		foreach (['added', 'removed', 'updated'] as $key) {
+			if (!$diff[$key]) {
+				unset($diff[$key]);
+			}
+		}
+
+		return $diff;
+	}
+
+	/**
+	 * Add index to the entities as the only uniqueness criteria.
+	 *
+	 * @param array $entities
+	 *
+	 * @return array
+	 */
+	private static function addIndex(array $entities): array {
+		foreach ($entities as $index => &$entity) {
+			$entity['_index'] = $index;
+		}
+		unset($entity);
+
+		return $entities;
 	}
 
 	/**
