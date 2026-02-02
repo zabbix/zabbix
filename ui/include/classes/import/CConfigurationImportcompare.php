@@ -325,6 +325,7 @@ class CConfigurationImportcompare {
 		$after = $this->addUniqueIds($after, $unique);
 
 		$same_entities = [];
+
 		foreach ($after as $a_key => $after_entity) {
 			if ($has_uuid) {
 				foreach ($before as $b_key => $before_entity) {
@@ -400,12 +401,12 @@ class CConfigurationImportcompare {
 	 *
 	 * @return array
 	 */
-	private function addUniqueIds(array $entities, array $unique): array {
+	private static function addUniqueIds(array $entities, array $unique): array {
 		foreach ($entities as $entity_key => &$entity) {
-			$entity['_unique_id'] = $this->getUniqueData($entity, $unique, $entity_key);
+			$entity['_unique_id'] = self::getUniqueData($entity, $unique, $entity_key);
 
 			// To make a unique entity a string, get result values, get rid of value duplicates and sort them.
-			$entity['_unique_id'] = array_unique($this->flatten($entity['_unique_id']));
+			$entity['_unique_id'] = array_unique(self::flatten($entity['_unique_id']));
 			sort($entity['_unique_id']);
 
 			$entity['_unique_id'] = implode('/', $entity['_unique_id']);
@@ -424,18 +425,18 @@ class CConfigurationImportcompare {
 	 *
 	 * @return array
 	 */
-	private function getUniqueData(array $entity, array $unique, mixed $entity_key): array {
+	private static function getUniqueData(array $entity, array $unique, mixed $entity_key): array {
 		$result = [];
 
 		foreach ($unique as $unique_key => $unique_value) {
 			if (is_array($unique_value)) {
 				if (is_int($unique_key)) {
 					foreach ($entity as $sub_entity_key => $sub_entity) {
-						$result[] = $this->getUniqueData($sub_entity, $unique_value, $sub_entity_key);
+						$result[] = self::getUniqueData($sub_entity, $unique_value, $sub_entity_key);
 					}
 				}
 				else {
-					$result[] = $this->getUniqueData($entity[$unique_key], $unique_value, $unique_key);
+					$result[] = self::getUniqueData($entity[$unique_key], $unique_value, $unique_key);
 				}
 			}
 			elseif ($unique_value instanceof Closure) {
@@ -456,7 +457,7 @@ class CConfigurationImportcompare {
 	 *
 	 * @return array
 	 */
-	private function flatten(array $array): array {
+	private static function flatten(array $array): array {
 		$result = [];
 
 		foreach ($array as $value) {
