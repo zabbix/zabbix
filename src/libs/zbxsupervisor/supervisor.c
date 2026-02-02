@@ -847,7 +847,7 @@ out:
 	supervisor_clear_libraries(get_program_type_string(info->program_type));
 	zbx_supervisor_worklog_clear();
 
-	zbx_exit(SUCCEED == ZBX_EXIT_STATUS() ? EXIT_SUCCESS : EXIT_FAILURE);
+	zbx_exit(SUCCEED == ZBX_IS_NORMAL_EXIT() ? EXIT_SUCCESS : EXIT_FAILURE);
 
 #undef DEFAULT_SLEEP_TIME
 }

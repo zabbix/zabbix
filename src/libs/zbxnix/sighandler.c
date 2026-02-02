@@ -111,6 +111,11 @@ int	ZBX_EXIT_STATUS(void)
 	return ZBX_EXIT_SUCCESS == sig_exiting ? SUCCEED : FAIL;
 }
 
+int	ZBX_IS_NORMAL_EXIT(void)
+{
+	return ZBX_EXIT_FAILURE != sig_exiting ? SUCCEED : FAIL;
+}
+
 static void	log_fatal_signal(int sig, siginfo_t *siginfo, void *context)
 {
 	SIG_CHECK_PARAMS(sig, siginfo, context);
@@ -252,7 +257,8 @@ static void	terminate_signal_handler(int sig, siginfo_t *siginfo, void *context)
 			if (0 != sig_exit_on_terminate)
 			{
 				zbx_log_exit_signal();
-				zbx_on_exit_cb(SUCCEED, zbx_on_exit_args);
+				/* shutdown during startup must be handled as exit with failure */
+				zbx_on_exit_cb(FAIL, zbx_on_exit_args);
 			}
 		}
 	}

@@ -48,6 +48,7 @@ void	zbx_set_exiting_with_fail(void);
 void	zbx_set_exiting_with_succeed(void);
 int	ZBX_IS_RUNNING(void);
 int	ZBX_EXIT_STATUS(void);
+int	ZBX_IS_NORMAL_EXIT(void);
 int	zbx_init_thread_signal_handler(sigjmp_buf *jmp_ret);
 
 #define ZBX_THREAD_FAILURE	((void *)EXIT_FAILURE)

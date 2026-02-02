@@ -300,7 +300,7 @@ void	*zbx_proxyconfig_thread(void *args)
 
 	zbx_supervisor_update_activity("%s starting", process_title);
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started", get_program_type_string(info->program_type), server_num);
+	zabbix_log(LOG_LEVEL_INFORMATION, "thread started");
 	zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
 
 	ZBX_INIT_THREAD_OR_RETURN(jmp_ret);

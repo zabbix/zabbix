@@ -1196,7 +1196,7 @@ void	*zbx_pp_manager_thread(void *args)
 
 	zbx_supervisor_update_activity("%s starting", process_title);
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started", get_program_type_string(info->program_type), server_num);
+	zabbix_log(LOG_LEVEL_INFORMATION, "thread started");
 
 	zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
 
@@ -1326,9 +1326,6 @@ void	*zbx_pp_manager_thread(void *args)
 		if (NULL != client)
 			zbx_ipc_client_release(client);
 
-		if (1 == shutdown)
-			break;
-
 		zbx_pp_manager_process_finished(manager, &tasks, &pending_num, &processing_num, &finished_num);
 
 		if (pending_peak_num < pending_num)
@@ -1392,7 +1389,7 @@ void	*zbx_pp_manager_thread(void *args)
 			time_trim = sec;
 		}
 
-		if ((!ZBX_IS_RUNNING() || 0 != shutdown) && 0 == pending_num && 0 == processing_num)
+		if (!ZBX_IS_RUNNING() || (1 == shutdown && 0 == pending_num && 0 == processing_num))
 			break;
 	}
 
@@ -1401,7 +1398,7 @@ void	*zbx_pp_manager_thread(void *args)
 	zbx_supervisor_update_activity("%s [terminating]", process_title);
 
 	/* on normal exit the shutdown message already has been processed and no more messages will be sent */
-	if (SUCCEED != ZBX_EXIT_STATUS())
+	if (SUCCEED != ZBX_IS_NORMAL_EXIT())
 		zbx_rtc_unsubscribe_service(pp_args->config_timeout, ZBX_IPC_SERVICE_PREPROCESSING);
 
 	zbx_vector_pp_task_ptr_destroy(&tasks);
