@@ -88,6 +88,18 @@ class ZTextareaFlexible extends HTMLElement {
 		cancelAnimationFrame(this.#animation_frame_id);
 	}
 
+	blur() {
+		this.isConnected && this.#textarea.blur();
+	}
+
+	focus(options) {
+		this.isConnected && this.#textarea.focus(options);
+	}
+
+	select() {
+		this.isConnected && this.#textarea.select();
+	}
+
 	#applyAttributes() {
 		for (const attr of this.constructor.observedAttributes) {
 			this.#applyAttribute(attr, this.getAttribute(attr));
