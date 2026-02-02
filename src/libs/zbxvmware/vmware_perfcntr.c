@@ -1354,6 +1354,7 @@ int	zbx_vmware_service_update_perf(zbx_vmware_service_t *service, const char *co
 	page.alloc = INIT_PERF_XML_SIZE;
 	page.offset = 0;
 	page.data = (char *)zbx_malloc(NULL, page.alloc);
+	page.data[0] = '\0';
 
 	headers = curl_slist_append(headers, ZBX_XML_HEADER1_V4);
 	headers = curl_slist_append(headers, ZBX_XML_HEADER2);
