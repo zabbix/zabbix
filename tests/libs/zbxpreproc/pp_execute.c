@@ -49,7 +49,10 @@ static zbx_pp_item_preproc_t	*read_pp_item_preproc(void)
 
 		preproc->steps = zbx_malloc(NULL, (size_t)step_vec.values_num * sizeof(zbx_pp_step_t));
 		for (int i = 0; i < step_vec.values_num; i++)
+		{
 			preproc->steps[i] = *step_vec.values[i];
+			zbx_free(step_vec.values[i]);
+		}
 		preproc->steps_num = step_vec.values_num;
 
 		zbx_vector_pp_step_ptr_destroy(&step_vec);
@@ -117,5 +120,15 @@ void	zbx_mock_test_entry(void **state)
 		}
 	}
 
+	for (int i = 0; i < results_num; i++)
+	{
+		zbx_pp_result_free(&results_out[i]);
+	}
+
+	zbx_variant_clear(&value_in);
+	zbx_variant_clear(&value_out);
+
+	pp_cache_release(cache);
+	zbx_pp_item_preproc_release(preproc);
 	pp_context_destroy(&ctx);
 }
