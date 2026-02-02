@@ -190,8 +190,7 @@ void	zbx_mock_test_entry(void **state)
 
 	ZBX_UNUSED(state);
 
-	mock_pp_read_step(zbx_mock_get_parameter_handle("in.step"), &step_orig);
-	duplicate_step(&step_orig, &step);
+	mock_pp_read_step(zbx_mock_get_parameter_handle("in.step"), &step);
 
 #ifdef HAVE_NETSNMP
 	preproc_init_snmp();
