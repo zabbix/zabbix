@@ -1064,11 +1064,15 @@ int	pp_execute_step(zbx_pp_context_t *ctx, zbx_pp_cache_t *cache, zbx_dc_um_shar
 		const zbx_pp_step_t *step, const zbx_variant_t *history_value_in, zbx_variant_t *history_value_out,
 		zbx_timespec_t *history_ts, const char *config_source_ip, char **error)
 {
-	int	ret, user_macros = 0;
+	int	ret = SUCCEED, user_macros = 0;
 	char	*params = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() step:%d params:'%s' value:'%.*s' cache:%p", __func__,
 			step->type, step->params, PP_VALUE_LOG_LIMIT, zbx_variant_value_desc(value), (void *)cache);
+
+	/* Special case: nothing to do - just clear error message. */
+	if (ZBX_VARIANT_NONE == value->type)
+		goto out;
 
 	params = step->params;
 	if (NULL != um_handle)
