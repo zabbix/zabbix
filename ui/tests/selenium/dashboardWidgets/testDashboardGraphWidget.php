@@ -2947,6 +2947,9 @@ class testDashboardGraphWidget extends testWidgets {
 					'Aggregate' => 'Data set'
 				]
 			],
+			'Displaying options' => [
+				'Host names in labels' => 'Show'
+			],
 			'Legend' => [
 				'Show aggregation function' => true
 			]

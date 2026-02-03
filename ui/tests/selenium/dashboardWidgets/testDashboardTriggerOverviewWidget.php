@@ -725,7 +725,7 @@ class testDashboardTriggerOverviewWidget extends CWebTest {
 		foreach ($popup_content as $trigger => $dependency) {
 			// Hover hint and check table headers in hint.
 			$row->getColumn($trigger)->query('tag:button')->one()->hoverMouse();
-			$hint_table = $this->query('xpath://div[@class="overlay-dialogue hintbox wordbreak hintbox-position-fixed hintbox-static"]')
+			$hint_table = $this->query('xpath://div[@class="overlay-dialogue hintbox wordbreak hintbox-static"]')
 					->waitUntilVisible()->one()->query('class:list-table')->one()->asTable();
 			$this->assertEquals(array_keys($dependency), $hint_table->getHeadersText());
 

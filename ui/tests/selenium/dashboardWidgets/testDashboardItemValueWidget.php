@@ -2444,7 +2444,7 @@ class testDashboardItemValueWidget extends testWidgets {
 
 			// Check hint-box.
 			$form->query($data['selector'])->one()->click();
-			$hint = $form->query('xpath://div[@class="overlay-dialogue hintbox wordbreak hintbox-static"]')
+			$hint = $form->query('xpath://div[@class="overlay-dialogue hintbox wordbreak hintbox-position-fixed hintbox-static"]')
 				->one()->waitUntilVisible();
 			$this->assertEquals($data['warning_message'], $hint->getText());
 
@@ -3288,7 +3288,7 @@ class testDashboardItemValueWidget extends testWidgets {
 
 		// Check hint-box.
 		$dashboard->query($time_icon)->one()->click();
-		$hint = $this->query('xpath://div[@class="overlay-dialogue hintbox wordbreak hintbox-position-fixed hintbox-static"]')
+		$hint = $this->query('xpath://div[@class="overlay-dialogue hintbox wordbreak hintbox-static"]')
 				->one()->waitUntilVisible();
 		$this->assertEquals('Last 1 hour', $hint->getText());
 
