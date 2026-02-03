@@ -474,16 +474,20 @@ class CControllerPopupImportCompare extends CController {
 					$object = $before ?: $after;
 					unset($entity['before'], $entity['after']);
 
-					$id = $this->id_counter++;
-
 					$name = $this->nameForToc($entity_type, $object, $outer_names);
 
 					$this->toc[$change_type][$entity_type][] = [
 						'name' => $name,
-						'id' => $id
+						'id' => $this->id_counter
 					];
 
-					$rows = array_merge($rows, $this->objectToRows($before, $after, $depth + 1, $id));
+					$new_rows = $this->objectToRows($before, $after, $depth + 1, $this->id_counter);
+
+					if ($new_rows) {
+						$rows = array_merge($rows, $new_rows);
+
+						$this->id_counter++;
+					}
 
 					// Process any sub-entities.
 					if ($entity) {
