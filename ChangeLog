@@ -4,6 +4,7 @@ New features:
 A.......S. [ZBXNEXT-10394] updated maximum supported TimescaleDB version to 2.24 (mprihodko)
 
 Bug fixes:
+...G...... [ZBX-26276] fixed issue with failed oracle connections causing memory leak in Zabbix agent 2 (opucka)
 ...G...... [ZBX-27329] fixed net.tcp.service key not working for Zabbix agent 2 (esneiders)
 ..F....... [ZBX-26485] fixed validation for "reconnect" and "autologin" parameters in "index.php" file (averza)
 
