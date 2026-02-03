@@ -63,16 +63,7 @@ $form_grid
 		)
 	])
 	->addItem([
-		new CLabel(_('Filter'), 'filter_type'),
-		new CFormField(
-			(new CRadioButtonList('filter_type', TAG_FILTER_ALL))
-				->addValue(_('All tags'), TAG_FILTER_ALL)
-				->addValue(_('Tag list'), TAG_FILTER_LIST)
-				->setModern(true)
-		)
-	])
-	->addItem([
-		(new CLabel(_('Tags'), 'tag_filters'))->setAsteriskMark(),
+		(new CLabel(_('Tags'), 'tag_filters')),
 		(new CFormField(
 			(new CDiv($new_tag_filter_table))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 		))
