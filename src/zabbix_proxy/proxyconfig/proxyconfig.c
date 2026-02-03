@@ -413,6 +413,7 @@ void	*zbx_proxyconfig_thread(void *args)
 		nextcheck = time(NULL) + proxyconfig_args_in->config_proxyconfig_frequency;
 	}
 stop:
+	zbx_history_cache_destroy_local_cache();
 	zbx_ipc_async_socket_close(&rtc);
 
 	zbx_supervisor_update_activity("%s [terminated]", process_title);
