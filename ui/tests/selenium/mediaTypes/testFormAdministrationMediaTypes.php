@@ -687,7 +687,7 @@ class testFormAdministrationMediaTypes extends CWebTest {
 						'Authentication' => 'OAuth'
 					],
 					'inline_errors' => [
-						'id:oauth-token-field' => 'Invalid OAuth configuration'
+						'name:tokens_status' => 'Invalid OAuth configuration'
 					]
 				]
 			],
