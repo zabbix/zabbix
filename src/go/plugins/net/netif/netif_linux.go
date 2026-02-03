@@ -145,43 +145,10 @@ func init() { //nolint:gochecknoinits // legacy implementation
 func (p *Plugin) Export(key string, params []string, _ plugin.ContextProvider) (any, error) {
 	switch key {
 	case "net.if.discovery":
-		if len(params) > 0 {
-			return nil, errs.New(errorParametersNotAllowed)
-		}
-
-		devices, err := p.getDevDiscovery()
-		if err != nil {
-			return nil, err
-		}
-
-		b, err := json.Marshal(devices)
-		if err != nil {
-			return nil, errs.Wrap(err, "failed to marshal devices")
-		}
-
-		return string(b), nil
+		return p.exportDiscovery(params)
 
 	case "net.if.get":
-		if len(params) > 1 {
-			return nil, errs.New(errorTooManyParams)
-		}
-
-		expression := ""
-		if len(params) > 0 {
-			expression = params[0]
-		}
-
-		devices, err := p.getIfGet(expression)
-		if err != nil {
-			return nil, err
-		}
-
-		b, err := json.Marshal(devices)
-		if err != nil {
-			return nil, errs.Wrap(err, "failed to marshal devices")
-		}
-
-		return string(b), nil
+		return p.exportGet(params)
 
 	case "net.if.collisions":
 		err := validateParams(params, 1, 1)
@@ -203,6 +170,47 @@ func (p *Plugin) Export(key string, params []string, _ plugin.ContextProvider) (
 		/* SHOULD_NEVER_HAPPEN */
 		return nil, errs.New(errorUnsupportedMetric)
 	}
+}
+
+func (p *Plugin) exportDiscovery(params []string) (any, error) {
+	if len(params) > 0 {
+		return nil, errs.New(errorParametersNotAllowed)
+	}
+
+	devices, err := p.getDevDiscovery()
+	if err != nil {
+		return nil, err
+	}
+
+	b, err := json.Marshal(devices)
+	if err != nil {
+		return nil, errs.Wrap(err, "failed to marshal devices")
+	}
+
+	return string(b), nil
+}
+
+func (p *Plugin) exportGet(params []string) (any, error) {
+	if len(params) > 1 {
+		return nil, errs.New(errorTooManyParams)
+	}
+
+	expression := ""
+	if len(params) > 0 {
+		expression = params[0]
+	}
+
+	devices, err := p.getIfGet(expression)
+	if err != nil {
+		return nil, err
+	}
+
+	b, err := json.Marshal(devices)
+	if err != nil {
+		return nil, errs.Wrap(err, "failed to marshal devices")
+	}
+
+	return string(b), nil
 }
 
 func (p *Plugin) handleNetIfMetric(
@@ -239,8 +247,13 @@ func validateParams(params []string, minParams, maxParams int) error {
 
 // fillNetIfGetParams reads sysfs parameters.
 func (*Plugin) fillNetIfGetParams(ifName, param string) string {
+	if strings.Contains(ifName, "/") {
+		return ""
+	}
+
 	path := fmt.Sprintf("/sys/class/net/%s/%s", ifName, param)
 
+	//nolint:gosec // G304: The path is sanitized
 	data, err := os.ReadFile(path)
 	if err != nil {
 		return ""
