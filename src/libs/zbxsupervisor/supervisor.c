@@ -66,17 +66,16 @@ zbx_runlevel_index_t;
 
 static zbx_hash_t	runlevel_index_hash(const void *d)
 {
-	const zbx_runlevel_index_t        *ri = (const zbx_runlevel_index_t *)d;
-
-	zbx_uint64_t	index = (zbx_uint64_t)ri->proc_index;
+	const zbx_runlevel_index_t	*ri = (const zbx_runlevel_index_t *)d;
+	zbx_uint64_t			index = (zbx_uint64_t)ri->proc_index;
 
 	return ZBX_DEFAULT_UINT64_HASH_FUNC(&index);
 }
 
 static int	runlevel_index_compare(const void *d1, const void *d2)
 {
-	const zbx_runlevel_index_t        *ri1 = (const zbx_runlevel_index_t *)d1;
-	const zbx_runlevel_index_t        *ri2 = (const zbx_runlevel_index_t *)d2;
+	const zbx_runlevel_index_t	*ri1 = (const zbx_runlevel_index_t *)d1;
+	const zbx_runlevel_index_t	*ri2 = (const zbx_runlevel_index_t *)d2;
 
 	ZBX_RETURN_IF_NOT_EQUAL(ri1->proc_index, ri2->proc_index);
 	return 0;
@@ -276,7 +275,6 @@ static void	supervisor_init(zbx_supervisor_t *sv, const zbx_proc_startup_t *runl
  * Purpose: initialize supervisor instance with process startup configuration *
  *                                                                            *
  * Parameters: sv        - [OUT] supervisor instance to initialize            *
- *             runlevels - [IN]  process startup configuration                *
  *                                                                            *
  ******************************************************************************/
 static void	supervisor_clear(zbx_supervisor_t *sv)

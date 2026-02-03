@@ -15,8 +15,9 @@
 #ifndef ZABBIX_DBCONFIG_H
 #define ZABBIX_DBCONFIG_H
 
-#include "zbxcommon.h"
 #include "zbxcacheconfig.h"
+
+#include "zbxcommon.h"
 #include "vps_monitor.h"
 #include "zbxalgo.h"
 #include "zbxversion.h"

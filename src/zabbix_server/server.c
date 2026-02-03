@@ -644,8 +644,6 @@ static int	get_process_info_by_thread(int local_server_num, unsigned char *local
 		return FAIL;
 
 	return SUCCEED;
-
-#undef RUNLEVEL_COMMON
 }
 
 /******************************************************************************

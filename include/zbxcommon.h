@@ -785,7 +785,7 @@ static	type2	get_##varname(void) \
 	return varname; \
 }
 
-/* loggger interface */
+/* logger interface */
 
 typedef void (*zbx_log_cb_t)(int level, const char *fmt, ...);
 typedef int (*zbx_log_level_cb_t)(void);

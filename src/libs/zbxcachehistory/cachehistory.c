@@ -2129,6 +2129,16 @@ static dc_item_value_t	*dc_local_get_history_slot(void)
 	return &item_values[item_values_num++];
 }
 
+void	zbx_history_cache_destroy_local_cache(void)
+{
+	zabbix_log(LOG_LEVEL_ERR, "[WDN] items:%lu strings:%lu", item_values_num, string_values_offset);
+	zbx_free(item_values);
+	item_values_num = item_values_alloc = 0;
+
+	zbx_free(string_values);
+	string_values_offset = string_values_alloc = 0;
+}
+
 static void	dc_local_add_history_dbl(zbx_uint64_t itemid, unsigned char item_value_type, const zbx_timespec_t *ts,
 		double value_orig, zbx_uint64_t lastlogsize, int mtime, unsigned char flags)
 {

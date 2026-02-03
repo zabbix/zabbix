@@ -12,8 +12,8 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-#ifndef ZABBIX_DBCONFIG_H
-#define ZABBIX_DBCONFIG_H
+#ifndef ZABBIX_DBCONFIG_SERVER_H
+#define ZABBIX_DBCONFIG_SERVER_H
 
 #include "zbxvault.h"
 

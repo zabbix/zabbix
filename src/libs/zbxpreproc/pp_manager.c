@@ -1402,6 +1402,7 @@ void	*zbx_pp_manager_thread(void *args)
 	}
 
 	zbx_dc_flush_history();
+	zbx_history_cache_destroy_local_cache();
 
 	zbx_supervisor_update_activity("%s [terminating]", process_title);
 

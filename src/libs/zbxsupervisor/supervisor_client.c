@@ -20,7 +20,7 @@
 #include "zbxserialize.h"
 #include "zbxipcservice.h"
 
-#define SUPERVISOR_TIMEOUT        5
+#define SUPERVISOR_TIMEOUT	5
 
 /******************************************************************************
  *                                                                            *
@@ -298,7 +298,7 @@ void	zbx_supervisor_get_process_info(int process_type, zbx_proc_owner_t *owner, 
 			break;
 
 		default:
-			THIS_SHOULD_NEVER_HAPPEN_MSG("Unknow process type: %d", process_type);
+			THIS_SHOULD_NEVER_HAPPEN_MSG("Unknown process type: %d", process_type);
 			zbx_exit(EXIT_FAILURE);
 			break;
 		}
@@ -331,7 +331,6 @@ int	zbx_supervisor_get_process_count(const int *config_forks)
 
 	return process_count;
 }
-
 
 char	*supervisor_client_get_activities(void)
 {

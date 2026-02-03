@@ -57,7 +57,7 @@ zbx_thread_supervisor_args_t;
 
 zbx_proc_startup_t	*zbx_proc_startup_create(int threads_num,
 		zbx_get_process_info_by_thread_f get_process_info_by_thread_cb);
-void        zbx_proc_startup_free(zbx_proc_startup_t *runlevels);
+void	zbx_proc_startup_free(zbx_proc_startup_t *runlevels);
 
 ZBX_THREAD_ENTRY(zbx_supervisor_thread, args);
 
