@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -23,7 +23,7 @@
 int	preproc_prepare_value_server(const zbx_variant_t *value, const zbx_pp_value_opt_t *value_opt)
 {
 	if (ZBX_VARIANT_NONE == value->type && 0 == (value_opt->flags & ZBX_PP_VALUE_OPT_META) &&
-			0 == (value->flags & ZBX_VARIANT_FLAG_CHANGED))
+			0 == (value->data.flags & ZBX_VARIANT_FLAG_CHANGED))
 	{
 		return FAIL;
 	}

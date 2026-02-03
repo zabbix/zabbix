@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -55,6 +55,14 @@ class testPageMaintenance extends CWebTest {
 		CDataHelper::call('maintenance.create', [
 			[
 				'name' => self::APPROACHING_MAINTENANCE,
+				'maintenance_type' => MAINTENANCE_TYPE_NODATA,
+				'active_since' => 2017008000,
+				'active_till' => 2019600000,
+				'groups' => [['groupid' => CDataHelper::get('HostTemplateGroups.hostgroups.Group for Maintenance')]],
+				'timeperiods' => [[]]
+			],
+			[
+				'name' => 'Multiple   spaces   in maintenance name',
 				'maintenance_type' => MAINTENANCE_TYPE_NODATA,
 				'active_since' => 2017008000,
 				'active_till' => 2019600000,
@@ -271,6 +279,14 @@ class testPageMaintenance extends CWebTest {
 						'Active till' => '2023-07-06 03:00',
 						'State' => 'Expired',
 						'Description' => ''
+					],
+					[
+						'Name' => 'Multiple spaces in maintenance name',
+						'Type' => 'No data collection',
+						'Active since' => '2033-12-01 02:00',
+						'Active till' => '2033-12-31 02:00',
+						'State' => 'Approaching',
+						'Description' => ''
 					]
 				]
 			]
@@ -377,7 +393,8 @@ class testPageMaintenance extends CWebTest {
 				[
 					'filter' => [
 						'Name' => '  '
-					]
+					],
+					'expected' => ['Multiple spaces in maintenance name']
 				]
 			],
 			// #3 Name with special symbols.
@@ -419,7 +436,8 @@ class testPageMaintenance extends CWebTest {
 						'State' => 'Approaching'
 					],
 					'expected' => [
-						self::APPROACHING_MAINTENANCE
+						self::APPROACHING_MAINTENANCE,
+						'Multiple spaces in maintenance name'
 					]
 				]
 			],
@@ -459,7 +477,8 @@ class testPageMaintenance extends CWebTest {
 						'Maintenance period 2 (no data collection)',
 						self::MULTIPLE_GROUPS_MAINTENANCE,
 						self::HOST_MAINTENANCE,
-						self::FILTER_NAME_MAINTENANCE
+						self::FILTER_NAME_MAINTENANCE,
+						'Multiple spaces in maintenance name'
 					]
 				]
 			],

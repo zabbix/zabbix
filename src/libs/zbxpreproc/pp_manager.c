@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -161,7 +161,7 @@ static zbx_pp_manager_t	*zbx_pp_manager_create(int workers_num, zbx_pp_notify_cb
 	}
 
 	zbx_hashset_create_ext(&manager->items, 100, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC,
-			(zbx_clean_func_t)zbx_pp_item_clear, ZBX_DEFAULT_MEM_MALLOC_FUNC, ZBX_DEFAULT_MEM_REALLOC_FUNC,
+			zbx_pp_item_clear_wrapper, ZBX_DEFAULT_MEM_MALLOC_FUNC, ZBX_DEFAULT_MEM_REALLOC_FUNC,
 			ZBX_DEFAULT_MEM_FREE_FUNC);
 
 	if (FAIL == zbx_ipc_async_socket_open(&manager->rtc, ZBX_IPC_SERVICE_RTC, config_timeout, error))
@@ -442,7 +442,7 @@ static void	pp_manager_queue_value_task_result(zbx_pp_manager_t *manager, zbx_pp
 	d->preproc->time_ms = task->time_ms;
 	d->preproc->total_ms += task->time_ms;
 
-	if (ZBX_VARIANT_NONE == d->result.type && 0 == (d->result.flags & ZBX_VARIANT_FLAG_CHANGED))
+	if (ZBX_VARIANT_NONE == d->result.type && 0 == (d->result.data.flags & ZBX_VARIANT_FLAG_CHANGED))
 		return;
 
 	if (NULL != (item = pp_manager_get_cacheable_dependent_item(manager, d->preproc->dep_itemids,
@@ -1231,7 +1231,7 @@ static void	preprocessor_reply_top_stats(zbx_pp_manager_t *manager, zbx_ipc_clie
 	zbx_ipc_client_send(client, ZBX_IPC_PREPROCESSOR_TOP_STATS_RESULT, data, data_len);
 
 	zbx_free(data);
-	zbx_vector_pp_top_stats_ptr_clear_ext(&stats, (zbx_pp_top_stats_ptr_free_func_t)zbx_ptr_free);
+	zbx_vector_pp_top_stats_ptr_clear_ext(&stats, zbx_pp_top_stats_free);
 	zbx_vector_pp_top_stats_ptr_destroy(&stats);
 }
 

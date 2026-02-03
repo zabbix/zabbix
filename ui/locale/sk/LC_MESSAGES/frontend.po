@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2025-10-27 12:36+0000\n"
+"PO-Revision-Date: 2025-12-03 10:01+0000\n"
 "Last-Translator: Tomáš Heřmánek <tomas.hermanek@initmax.cz>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: sk\n"
@@ -3918,6 +3918,10 @@ msgstr "Nemožno nastaviť \"%1$s\" pre prototyp grafu \"%2$s\"."
 #: widgets/piechart/includes/CWidgetFieldDataSet.php:175
 msgid "Cannot set \"Data set aggregation\" when item with type \"Total\" is added to the chart."
 msgstr "Nie je možné nastaviť \"Agregáciu množiny údajov\", keď je do grafu pridaná položka typu \"Celkom\"."
+
+#: include/classes/db/MysqlDbBackend.php:197
+msgid "Cannot set charset."
+msgstr "Nie je možné nastaviť znakovú sadu."
 
 #: include/classes/api/services/CItemGeneral.php:2478
 #, c-format

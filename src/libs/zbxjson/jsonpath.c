@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -23,6 +23,8 @@
 #include "jsonobj.h"
 #include "zbxalgo.h"
 #define ZBX_VECTOR_ARRAY_RESERVE	3
+
+ZBX_PTR_VECTOR_IMPL(jsonpath_token_ptr, zbx_jsonpath_token_t *)
 
 typedef struct
 {
@@ -498,9 +500,8 @@ static void	jsonpath_segment_clear(zbx_jsonpath_segment_t *segment)
 			jsonpath_list_free(segment->data.list.values);
 			break;
 		case ZBX_JSONPATH_SEGMENT_MATCH_EXPRESSION:
-			zbx_vector_ptr_clear_ext(&segment->data.expression.tokens,
-					(zbx_clean_func_t)jsonpath_token_free);
-			zbx_vector_ptr_destroy(&segment->data.expression.tokens);
+			zbx_vector_jsonpath_token_ptr_clear_ext(&segment->data.expression.tokens, jsonpath_token_free);
+			zbx_vector_jsonpath_token_ptr_destroy(&segment->data.expression.tokens);
 			break;
 		default:
 			break;
@@ -999,7 +1000,7 @@ static int	jsonpath_parse_expression(const char *expression, zbx_jsonpath_t *jso
 {
 	int				nesting = 1, ret = FAIL;
 	zbx_jsonpath_token_t		*optoken, *token;
-	zbx_vector_ptr_t		output, operators;
+	zbx_vector_jsonpath_token_ptr_t	output, operators;
 	zbx_strloc_t			loc = {0, 0};
 	zbx_jsonpath_token_type_t	token_type;
 	zbx_jsonpath_token_group_t	prev_group = ZBX_JSONPATH_TOKEN_GROUP_NONE;
@@ -1007,8 +1008,8 @@ static int	jsonpath_parse_expression(const char *expression, zbx_jsonpath_t *jso
 	if ('(' != *expression)
 		return zbx_jsonpath_error(expression);
 
-	zbx_vector_ptr_create(&output);
-	zbx_vector_ptr_create(&operators);
+	zbx_vector_jsonpath_token_ptr_create(&output);
+	zbx_vector_jsonpath_token_ptr_create(&operators);
 
 	while (SUCCEED == jsonpath_expression_next_token(expression, loc.r + 1, prev_group, &token_type, &loc))
 	{
@@ -1048,7 +1049,7 @@ static int	jsonpath_parse_expression(const char *expression, zbx_jsonpath_t *jso
 			if (NULL == (token = jsonpath_create_token(token_type, expression, &loc)))
 				goto cleanup;
 
-			zbx_vector_ptr_append(&operators, token);
+			zbx_vector_jsonpath_token_ptr_append(&operators, token);
 			prev_group = jsonpath_token_group(token_type);
 			continue;
 		}
@@ -1085,13 +1086,13 @@ static int	jsonpath_parse_expression(const char *expression, zbx_jsonpath_t *jso
 				if (ZBX_JSONPATH_TOKEN_PAREN_LEFT == optoken->type)
 					break;
 
-				zbx_vector_ptr_append(&output, optoken);
+				zbx_vector_jsonpath_token_ptr_append(&output, optoken);
 			}
 
 			if (NULL == (token = jsonpath_create_token(token_type, expression, &loc)))
 				goto cleanup;
 
-			zbx_vector_ptr_append(&operators, token);
+			zbx_vector_jsonpath_token_ptr_append(&operators, token);
 			prev_group = jsonpath_token_group(token_type);
 			continue;
 		}
@@ -1101,7 +1102,7 @@ static int	jsonpath_parse_expression(const char *expression, zbx_jsonpath_t *jso
 			if (NULL == (token = jsonpath_create_token(token_type, expression, &loc)))
 				goto cleanup;
 
-			zbx_vector_ptr_append(&operators, token);
+			zbx_vector_jsonpath_token_ptr_append(&operators, token);
 			prev_group = ZBX_JSONPATH_TOKEN_GROUP_NONE;
 			continue;
 		}
@@ -1125,7 +1126,7 @@ static int	jsonpath_parse_expression(const char *expression, zbx_jsonpath_t *jso
 					break;
 				}
 
-				zbx_vector_ptr_append(&output, optoken);
+				zbx_vector_jsonpath_token_ptr_append(&output, optoken);
 			}
 
 			if (NULL == optoken)
@@ -1155,14 +1156,15 @@ out:
 				goto cleanup;
 			}
 
-			zbx_vector_ptr_append(&output, optoken);
+			zbx_vector_jsonpath_token_ptr_append(&output, optoken);
 		}
 
 		jsonpath_reserve(jsonpath, 1);
 		segment = &jsonpath->segments[jsonpath->segments_num++];
 		segment->type = ZBX_JSONPATH_SEGMENT_MATCH_EXPRESSION;
-		zbx_vector_ptr_create(&segment->data.expression.tokens);
-		zbx_vector_ptr_append_array(&segment->data.expression.tokens, output.values, output.values_num);
+		zbx_vector_jsonpath_token_ptr_create(&segment->data.expression.tokens);
+		zbx_vector_jsonpath_token_ptr_append_array(&segment->data.expression.tokens, output.values,
+				output.values_num);
 
 		/* index only json path that has been definite until this point */
 		if (0 != jsonpath->definite)
@@ -1173,12 +1175,12 @@ out:
 cleanup:
 	if (SUCCEED != ret)
 	{
-		zbx_vector_ptr_clear_ext(&operators, (zbx_clean_func_t)jsonpath_token_free);
-		zbx_vector_ptr_clear_ext(&output, (zbx_clean_func_t)jsonpath_token_free);
+		zbx_vector_jsonpath_token_ptr_clear_ext(&operators, jsonpath_token_free);
+		zbx_vector_jsonpath_token_ptr_clear_ext(&output, jsonpath_token_free);
 	}
 
-	zbx_vector_ptr_destroy(&operators);
-	zbx_vector_ptr_destroy(&output);
+	zbx_vector_jsonpath_token_ptr_destroy(&operators);
+	zbx_vector_jsonpath_token_ptr_destroy(&output);
 
 	return ret;
 }

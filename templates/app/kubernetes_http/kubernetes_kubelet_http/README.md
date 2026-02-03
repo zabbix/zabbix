@@ -10,7 +10,7 @@ Template `Kubernetes Kubelet by HTTP` - collects metrics by HTTP agent from Kube
 
 Don't forget change macros {$KUBE.KUBELET.URL}, {$KUBE.API.TOKEN}.
 
-*NOTE.* Some metrics may not be collected depending on your Kubernetes instance version and configuration.
+**Note:** Some metrics may not be collected depending on your Kubernetes instance version and configuration.
 
 ## Requirements
 
@@ -32,7 +32,7 @@ Template needs to use Authorization via API token.
 
 Don't forget change macros {$KUBE.KUBELET.URL}, {$KUBE.API.TOKEN}.
 
-*NOTE.* Some metrics may not be collected depending on your Kubernetes instance version and configuration.
+**Note:** Some metrics may not be collected depending on your Kubernetes instance version and configuration.
 
 ### Macros used
 

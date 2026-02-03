@@ -1017,19 +1017,6 @@
 	}
 }
 
-// Dashboard list table.
-.dashboard-list {
-	.status-green {
-		background-color: $dashboard-my-bg-color;
-		border-color: $dashboard-my-bg-color;
-	}
-
-	.status-yellow {
-		background-color: $dashboard-shared-bg-color;
-		border-color: $dashboard-shared-bg-color;
-	}
-}
-
 .overlay-dialogue {
 	&.modal-popup.modal-widget-configuration {
 		width: auto;

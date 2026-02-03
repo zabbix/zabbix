@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -313,8 +313,7 @@ int	pp_error_on_fail(zbx_dc_um_shared_handle_t *um_handle, zbx_uint64_t hostid, 
 	switch (step->error_handler)
 	{
 		case ZBX_PREPROC_FAIL_DISCARD_VALUE:
-			zbx_variant_clear(value);
-			value->flags |= ZBX_VARIANT_FLAG_CHANGED;
+			zbx_variant_clear_ext(value, ZBX_VARIANT_FLAG_CHANGED);
 			break;
 		case ZBX_PREPROC_FAIL_SET_VALUE:
 		case ZBX_PREPROC_FAIL_SET_ERROR:

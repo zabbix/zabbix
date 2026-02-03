@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -17,7 +17,7 @@
 require_once __DIR__.'/../common/testWidgets.php';
 
 /**
- * @dataSource AllItemValueTypes, ItemValueWidget, GlobalMacros, TopHostsWidget
+ * @dataSource AllItemValueTypes, ItemValueWidget, TopHostsWidget, MonitoringOverview, GlobalMacros
  *
  * @backup dashboard
  *
@@ -43,6 +43,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 	protected static $updated_name = 'Top hosts update';
 	protected static $aggregation_itemids;
 	protected static $top_hosts_itemids;
+	protected static $monitoring_overview_itemids;
 	protected static $dashboardids;
 	protected static $other_dashboardids;
 	protected static $dashboardid;
@@ -85,9 +86,10 @@ class testDashboardTopHostsWidget extends testWidgets {
 		self::$other_dashboardids = CDataHelper::get('ItemValueWidget.dashboardids');
 		self::$aggregation_itemids = CDataHelper::get('ItemValueWidget.itemids');
 		self::$top_hosts_itemids = CDataHelper::get('TopHostsWidget.itemids');
+		self::$monitoring_overview_itemids = CDataHelper::get('MonitoringOverview.itemids');
 
 		// Add value to items for CheckTextItems test.
-		CDataHelper::addItemData(99086, 1000); // 1_item.
+		CDataHelper::addItemData(self::$monitoring_overview_itemids['1_item'], 1000);
 		CDataHelper::addItemData(self::$top_hosts_itemids['top_hosts_trap_text'], 'Text for text item');
 		CDataHelper::addItemData(self::$top_hosts_itemids['top_hosts_trap_log'], 'Logs for text item');
 		CDataHelper::addItemData(self::$top_hosts_itemids['top_hosts_trap_char'], 'characters_here');
@@ -5322,6 +5324,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 
 			foreach ($attributes as $attribute => $value) {
 				switch ($attribute) {
+					case 'color':
 					case 'value':
 						$this->assertEquals($value, $field->getValue());
 						break;
@@ -5337,10 +5340,6 @@ class testDashboardTopHostsWidget extends testWidgets {
 
 					case 'options':
 						$this->assertEquals($value, $field->asDropdown()->getOptions()->asText());
-						break;
-
-					case 'color':
-						$this->assertEquals($value,  $form->query($label)->asColorPicker()->one()->getValue());
 						break;
 				}
 			}

@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -80,6 +80,8 @@ void	zbx_variant_clear(zbx_variant_t *value)
 			zbx_free(value->data.vector);
 			break;
 		case ZBX_VARIANT_NONE:
+			value->data.flags = 0;
+			break;
 		case ZBX_VARIANT_DBL:
 		case ZBX_VARIANT_UI64:
 			break;
@@ -89,7 +91,12 @@ void	zbx_variant_clear(zbx_variant_t *value)
 	}
 
 	value->type = ZBX_VARIANT_NONE;
-	value->flags = 0;
+}
+
+void	zbx_variant_clear_ext(zbx_variant_t *value, unsigned char flags)
+{
+	zbx_variant_clear(value);
+	value->data.flags = flags;
 }
 
 /******************************************************************************
@@ -124,6 +131,7 @@ void	zbx_variant_set_ui64(zbx_variant_t *value, zbx_uint64_t value_ui64)
 
 void	zbx_variant_set_none(zbx_variant_t *value)
 {
+	value->data.flags = 0;
 	value->type = ZBX_VARIANT_NONE;
 }
 
@@ -175,6 +183,7 @@ void	zbx_variant_copy(zbx_variant_t *value, const zbx_variant_t *source)
 			zbx_variant_set_bin(value, zbx_variant_data_bin_copy(source->data.bin));
 			break;
 		case ZBX_VARIANT_NONE:
+			value->data.flags = source->data.flags;
 			value->type = ZBX_VARIANT_NONE;
 			break;
 		case ZBX_VARIANT_ERR:
@@ -192,8 +201,6 @@ void	zbx_variant_copy(zbx_variant_t *value, const zbx_variant_t *source)
 			zbx_variant_set_vector(value, var_vector);
 			break;
 	}
-
-	value->flags = source->flags;
 }
 
 static int	variant_to_dbl(zbx_variant_t *value)

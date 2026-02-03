@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -15,6 +15,8 @@
 package oracle
 
 import (
+	"context"
+	"errors"
 	"strings"
 	"time"
 
@@ -42,7 +44,9 @@ type Plugin struct {
 }
 
 // Export implements the Exporter interface.
-func (p *Plugin) Export(key string, rawParams []string, _ plugin.ContextProvider) (any, error) {
+//
+//nolint:gocyclo,cyclop // Complex code that currently has no unit tests and hence is not safe for refactoring.
+func (p *Plugin) Export(key string, rawParams []string, pluginCtx plugin.ContextProvider) (any, error) {
 	if strings.TrimSpace(key) == "" {
 		return nil, errs.Errorf("key cannot be empty")
 	}
@@ -80,16 +84,40 @@ func (p *Plugin) Export(key string, rawParams []string, _ plugin.ContextProvider
 		return nil, errs.Wrap(err, "get connection failed")
 	}
 
-	ctx, cancel := conn.GetContextWithTimeout()
+	timeout := conn.GetCallTimeout()
+	if timeout < time.Second*time.Duration(pluginCtx.Timeout()) {
+		timeout = time.Second * time.Duration(pluginCtx.Timeout())
+	}
+
+	ctx, cancel := conn.GetContextWithTimeout(timeout)
 	defer cancel()
 
 	result, err := handleMetric(ctx, conn, params, extraParams...)
-
 	if err != nil {
-		p.Errf(err.Error())
+		ctxErr := ctx.Err()
+		if ctxErr != nil && errors.Is(ctxErr, context.DeadlineExceeded) {
+			p.Errf(
+				"failed to handle metric %q: query execution timeout %s exceeded: %s",
+				key,
+				timeout.String(),
+				err.Error(),
+			)
+
+			return nil, errs.Wrap(ctxErr, "query execution timeout exceeded")
+		}
+
+		if ctxErr != nil {
+			p.Errf("failed to handle metric %q: %s", key, ctxErr.Error())
+
+			return nil, errs.Wrap(ctxErr, "failed to handle metric")
+		}
+
+		p.Errf("failed to handle metric %q: %s", key, err.Error())
+
+		return nil, errs.Wrap(err, "failed to handle metric")
 	}
 
-	return result, err
+	return result, nil
 }
 
 // Start implements the Runner interface and performs an initialization when the plugin is activated.

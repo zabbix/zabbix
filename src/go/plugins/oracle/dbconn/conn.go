@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -159,8 +159,13 @@ func (c *ConnManager) GetConnection(cd ConnDetails) (*OraConn, error) { //nolint
 	return c.setConn(cd, conn)
 }
 
-// GetContextWithTimeout function returns context with timeout = conn.callTimeout.
-func (conn *OraConn) GetContextWithTimeout() (context.Context, context.CancelFunc) {
+// GetContextWithTimeout function returns context with specified timeout.
+func (conn *OraConn) GetContextWithTimeout(timeout time.Duration) (context.Context, context.CancelFunc) {
+	return context.WithTimeout(conn.ctx, timeout)
+}
+
+// GetContextWithCallTimeout function returns context with timeout = conn.callTimeout.
+func (conn *OraConn) GetContextWithCallTimeout() (context.Context, context.CancelFunc) {
 	return context.WithTimeout(conn.ctx, conn.callTimeout)
 }
 
@@ -228,15 +233,18 @@ func (c *ConnManager) createConn(cd *ConnDetails) (*OraConn, error) {
 
 	var serverVersion godror.VersionInfo
 
-	var errVer error
-
 	if c.versionCheckF == nil {
 		panic("unassigned Oracle server version check function")
 	}
 
-	serverVersion, errVer = c.versionCheckF(ctx, client)
-	if errVer != nil {
-		return nil, errs.Wrap(errVer, "server version check failed")
+	serverVersion, err = c.versionCheckF(ctx, client)
+	if err != nil {
+		clientCloseErr := client.Close()
+		if clientCloseErr != nil {
+			c.logr.Debugf("Error closing connection: %s", clientCloseErr.Error())
+		}
+
+		return nil, errs.Wrap(err, "server version check failed")
 	}
 
 	log.Debugf("[Oracle] Created new connection: %s", cd.Uri.Addr())

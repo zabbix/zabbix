@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -16,7 +16,25 @@
 
 require_once __DIR__.'/../../include/CLegacyWebTest.php';
 
+/**
+ * @backup items
+ *
+ * @onBefore prepareItemData
+ */
 class testPageItems extends CLegacyWebTest {
+
+	public static function prepareItemData() {
+		$hostid = CDBHelper::getValue("SELECT hostid FROM hosts WHERE host='Host for trigger tags filtering'");
+		CDataHelper::call('item.create', [
+			[
+				'hostid' => $hostid,
+				'name' => 'Multiple   spaces   in item name',
+				'key_' => 'customItemkey123',
+				'type' => ITEM_TYPE_TRAPPER,
+				'value_type' => 0
+			]
+		]);
+	}
 
 	public static function data() {
 		return CDBHelper::getDataProvider(
@@ -170,7 +188,19 @@ class testPageItems extends CLegacyWebTest {
 						['Host for triggers filtering' => 'Discovered item one'],
 						['Host for triggers filtering' => 'Inheritance item for triggers filtering'],
 						['Host for triggers filtering' => 'Item for triggers filtering'],
+						['Host for trigger tags filtering' => 'Multiple spaces in item name'],
 						['Host for trigger tags filtering' => 'Trapper']
+					]
+				]
+			],
+			// Multiple spaces in Name field.
+			[
+				[
+					'filter_options' => [
+						'Name' => '   '
+					],
+					'result' => [
+						['Host for trigger tags filtering' => 'Multiple spaces in item name']
 					]
 				]
 			]

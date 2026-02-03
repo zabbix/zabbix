@@ -2155,13 +2155,6 @@ button {
 .dashboard-grid-iterator-contents.is-loading::before {
   margin: calc(.25rem + 1px); }
 
-.dashboard-list .status-green {
-  background-color: #2f9f5e;
-  border-color: #2f9f5e; }
-.dashboard-list .status-yellow {
-  background-color: #e79e0b;
-  border-color: #e79e0b; }
-
 .overlay-dialogue.modal-popup.modal-widget-configuration {
   width: auto;
   max-width: calc(100vw - 20px);
@@ -5772,9 +5765,6 @@ select {
     color: #1f2c33 !important;
     pointer-events: none; }
 
-div .overlay-dialogue.wordbreak {
-  white-space: normal; }
-
 .form-fields-inline label {
   margin: 0 8px 0 3px; }
 
@@ -6244,8 +6234,6 @@ z-select[disabled] .focusable, input[disabled], textarea[disabled], select optio
   border: 1px solid #ccd5d9;
   border-bottom-color: #c9d3d7;
   box-shadow: 0 4px 20px 0 rgba(118, 141, 153, 0.5); }
-  .overlay-dialogue .wordbreak {
-    white-space: normal; }
   .overlay-dialogue .overlay-dialogue-header {
     margin: -8px -10px 6px -10px;
     padding: 8px 10px;
@@ -6717,6 +6705,9 @@ z-select[disabled] .focusable, input[disabled], textarea[disabled], select optio
   .tags-wrapper .tag {
     margin-top: 1px;
     margin-bottom: 1px; }
+  .tags-wrapper.form-field .tag {
+    margin-top: 4px;
+    margin-bottom: 4px; }
 
 .tag {
   display: inline-block;

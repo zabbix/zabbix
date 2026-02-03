@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -25,6 +25,11 @@ ZBX_PTR_VECTOR_IMPL(am_media_ptr, zbx_am_media_t *)
 ZBX_PTR_VECTOR_IMPL(am_db_mediatype_ptr, zbx_am_db_mediatype_t *)
 ZBX_PTR_VECTOR_IMPL(am_db_alert_ptr, zbx_am_db_alert_t *)
 ZBX_PTR_VECTOR_IMPL(am_result_ptr, zbx_am_result_t *)
+
+void	zbx_am_source_stats_free(zbx_am_source_stats_t	*as)
+{
+	zbx_free(as);
+}
 
 void	zbx_am_db_mediatype_clear(zbx_am_db_mediatype_t *mediatype)
 {

@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -263,7 +263,8 @@ function makeValueCell(array $column, array $item_value, bool $text_wordbreak = 
 		case ITEM_VALUE_TYPE_TEXT:
 			if (array_key_exists('highlights', $column)) {
 				foreach ($column['highlights'] as $highlight) {
-					if (@preg_match('('.$highlight['pattern'].')', $item_value['value'])) {
+					if (@preg_match('/'.CRegexHelper::handleSlashEscaping($highlight['pattern']).'/',
+							$item_value['value'])) {
 						$color = $highlight['color'];
 						break;
 					}
