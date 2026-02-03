@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -124,10 +124,12 @@ class testPageTemplates extends CLegacyWebTest {
 
 	public function testPageTemplates_FilterTemplateByName() {
 		$this->zbxTestLogin('templates.php');
+		$table = $this->getTable();
 		$filter = $this->query('name:zbx_filter')->asForm()->one();
 		$filter->getField('Host groups')->select('Templates/SAN');
 		$filter->getField('Name')->fill($this->templateName);
 		$filter->submit();
+		$table->waitUntilReloaded();
 		$this->assertTableDataColumn([$this->templateName]);
 		$this->assertTableStats(1);
 	}
@@ -160,6 +162,7 @@ class testPageTemplates extends CLegacyWebTest {
 		$this->assertTableStats(0);
 		$this->zbxTestInputTypeOverwrite('filter_name', '%');
 		$this->zbxTestClickButtonText('Apply');
+		$table->waitUntilReloaded();
 		$this->assertTableStats(0);
 	}
 

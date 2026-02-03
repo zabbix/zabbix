@@ -101,7 +101,7 @@ golang.org/x/xerrors v0.0.0-20191011141410-1b5146add898/go.mod h1:I/5z698sn9Ka8T
 golang.org/x/xerrors v0.0.0-20191204190536-9bdfabe68543/go.mod h1:I/5z698sn9Ka8TeJc9MKroUUfqBBauWjQqLJ2OPfmY0=
 golang.org/x/xerrors v0.0.0-20220907171357-04be3eba64a2 h1:H2TDz8ibqkAF6YGhCdN3jS9O0/s90v0rJh3X/OLHEUk=
 golang.org/x/xerrors v0.0.0-20220907171357-04be3eba64a2/go.mod h1:K8+ghG5WaK9qNqU5K3HdILfMLy1f3aNYFI/wnl100a8=
-golang.zabbix.com/sdk v1.2.2-0.20250619074725-903eb9ae27a5 h1:KmDMBqA23M3yfcuJ1RhQbSJmY9g4X5Gm+DSjxAZhoj8=
-golang.zabbix.com/sdk v1.2.2-0.20250619074725-903eb9ae27a5/go.mod h1:yFQqd5fQTj4jiulSKfDx/vZkuTjiiSm2G0YVXI0Nxdw=
+golang.zabbix.com/sdk v1.2.2-0.20251205122203-eb823db2c4bf h1:bG1ewBFK9HGGsYP18wCLe8r0t4bAeff/rIvHRJXcHEs=
+golang.zabbix.com/sdk v1.2.2-0.20251205122203-eb823db2c4bf/go.mod h1:ugXIGbO7PRPVducHITbVWZnPM7bsvjljbWufPPk5ZFA=
 gopkg.in/asn1-ber.v1 v1.0.0-20181015200546-f715ec2f112d h1:TxyelI5cVkbREznMhfzycHdkp5cLA7DpE+GKjSslYhM=
 gopkg.in/asn1-ber.v1 v1.0.0-20181015200546-f715ec2f112d/go.mod h1:cuepJuh7vyXfUyUwEgHQXw849cJrilpS5NeIjOWESAw=

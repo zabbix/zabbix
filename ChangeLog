@@ -1,6 +1,24 @@
+Changes for 6.0.44rc1
+
+New features:
+A.......S. [ZBXNEXT-10394] updated maximum supported TimescaleDB version to 2.24 (mprihodko)
+
+Bug fixes:
+...G...... [ZBX-26276] fixed issue with failed Oracle connections causing memory leak in Zabbix agent 2 (opucka)
+...G...... [ZBX-27329] fixed net.tcp.service key not working for Zabbix agent 2 (esneiders)
+..F....... [ZBX-26485] fixed validation for "reconnect" and "autologin" parameters in "index.php" file (averza)
+
+--------------------------------------------------------------------------------
+Changes for 6.0.43
+
+6.0.43rc1 was released as 6.0.43 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 6.0.43rc1
 
 New features:
+A.......S. [ZBXNEXT-10289] updated maximum supported TimescaleDB version to 2.23 (mprihodko)
+A......PS. [ZBXNEXT-10306] updated maximum supported MySQL version to 9.5 (mprihodko)
 A......PS. [ZBXNEXT-10219] updated maximum supported PostgreSQL version to 18 (mprihodko)
 A.......S. [ZBXNEXT-10271] updated maximum supported TimescaleDB version to 2.22 (mprihodko)
 
@@ -26,6 +44,7 @@ Bug fixes:
 ...G...... [ZBX-26920] fixed wrong time in Zabbix agent for Windows (sboidenko)
 ..F....... [ZBX-22786] fixed trends graph line color issue with PHP 8.1 (isharha)
 ..F....... [ZBX-21975] fixed user autologout not removing user SAML authentication data (gcalenko)
+..F....... [ZBX-27284] fixed resource usage for image resize (gberzina)
 
 --------------------------------------------------------------------------------
 Changes for 6.0.41
@@ -83,6 +102,7 @@ A......... [ZBX-24383] fixed PHP fatal error when importing configuration from Z
 .........T [ZBX-26029] added device retrieval loop error exception handling to Meraki template (abiba)
 ..F....... [ZBX-25607] fixed column width in multiple list pages (esekace)
 ..F....... [ZBX-23687] added improvements and fixed bugs related to context menus (dfofanovs)
+.......... [ZBX-27283] fixed incorrect library paths when building AIX agents (yurii)
 
 --------------------------------------------------------------------------------
 Changes for 6.0.39

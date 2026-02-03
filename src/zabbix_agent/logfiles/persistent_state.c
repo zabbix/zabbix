@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -376,10 +376,16 @@ static int	zbx_write_persistent_file(const char *filename, const char *data, cha
 	FILE	*fp;
 	size_t	sz, alloc_bytes = 0, offset = 0;
 	int	ret = SUCCEED;
+	mode_t	old_umask;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%s(): filename:[%s] data:[%s]", __func__, filename, data);
 
-	if (NULL == (fp = fopen(filename, "w")))
+	old_umask = umask(0026);
+
+	fp = fopen(filename, "w");
+	umask(old_umask);
+
+	if (NULL == fp)
 	{
 		zbx_snprintf_alloc(error, &alloc_bytes, &offset, "cannot open file: %s", zbx_strerror(errno));
 		return FAIL;

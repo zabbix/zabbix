@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -29,6 +29,7 @@ int	create_pid_file(const char *pidfile)
 	int		fd;
 	zbx_stat_t	buf;
 	struct flock	fl;
+	mode_t		old_umask;
 
 	fl.l_type = F_WRLCK;
 	fl.l_whence = SEEK_SET;
@@ -50,8 +51,13 @@ int	create_pid_file(const char *pidfile)
 		close(fd);
 	}
 
+	old_umask = umask(0026);
+
 	/* open pid file */
-	if (NULL == (fpid = fopen(pidfile, "w")))
+	fpid = fopen(pidfile, "w");
+	umask(old_umask);
+
+	if (NULL == fpid)
 	{
 		zbx_error("cannot create PID file [%s]: %s", pidfile, zbx_strerror(errno));
 		return FAIL;
@@ -61,7 +67,7 @@ int	create_pid_file(const char *pidfile)
 	if (-1 != (fdpid = fileno(fpid)) && (-1 == fcntl(fdpid, F_SETLK, &fl) || -1 == fcntl(fdpid,
 			F_SETFD, FD_CLOEXEC)))
 	{
-		zbx_error("error in setting the status flag: %s", zbx_strerror(errno));
+		zbx_error("error in setting the status flag for PID file: [%s] %s", pidfile, zbx_strerror(errno));
 	}
 
 	/* write pid to file */

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -384,6 +384,7 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 	double		sec;
 	int 		i, ret = NOTSUPPORTED, index, rc;
 	sigset_t	mask, orig_mask;
+	mode_t		old_umask = 0026;
 
 #ifdef HAVE_IPV6
 	int		family;
@@ -623,7 +624,11 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 	zbx_snprintf(tmp, tmp_size, "%s %s 2>&1 <%s", CONFIG_FPING_LOCATION, params, filename);
 #endif	/* HAVE_IPV6 */
 
-	if (NULL == (f = fopen(filename, "w")))
+	old_umask = umask(0026);
+	f = fopen(filename, "w");
+	umask(old_umask);
+
+	if (NULL == f)
 	{
 		zbx_snprintf(error, max_error_len, "%s: %s", filename, zbx_strerror(errno));
 		goto out;

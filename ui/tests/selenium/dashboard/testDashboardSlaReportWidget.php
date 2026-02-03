@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -28,7 +28,6 @@ require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
  * @dataSource Services, Sla
  *
  * @onBefore prepareDashboardData
- * @onBefore getDateTimeData
  */
 class testDashboardSlaReportWidget extends testSlaReport {
 
@@ -543,7 +542,7 @@ class testDashboardSlaReportWidget extends testSlaReport {
 				&& CTestArrayHelper::get($data['fields'], 'Service', '') === ''
 				&& !array_key_exists('no_data', $data)
 				&& in_array($data['reporting_period'], ['Monthly', 'Quarterly', 'Annually'])) {
-			$data['fields']['Show periods'] = count(self::$reporting_periods[$data['reporting_period']]);
+			$data['fields']['Show periods'] = count($this->getDateTimeData($data['reporting_period']));
 		}
 
 		// Type mode chooses the 1st entry in the list, which for some cases in data provider is incorrect.

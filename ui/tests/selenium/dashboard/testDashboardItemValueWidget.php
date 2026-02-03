@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -305,6 +305,7 @@ class testDashboardItemValueWidget extends CWebTest {
 						$form->fill([$config => $state]);
 
 						foreach ($elements as $element)  {
+							$element = str_replace('/..', '', $element);
 							$this->assertTrue($form->getField($element)->isEnabled($state));
 						}
 					}

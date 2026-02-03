@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -252,6 +252,11 @@ func (c *ConnManager) create(cd connDetails) (*OraConn, error) {
 
 	serverVersion, err := godror.ServerVersion(ctx, client)
 	if err != nil {
+		clientCloseErr := client.Close()
+		if clientCloseErr != nil {
+			log.Debugf("[%s] Error closing connection: %s", pluginName, clientCloseErr.Error())
+		}
+
 		return nil, err
 	}
 

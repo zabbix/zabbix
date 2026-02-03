@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -194,7 +194,12 @@ int	zbx_export_init(char **error)
 
 static int	open_export_file(zbx_export_file_t *file, char **error)
 {
-	if (NULL == (file->file = fopen(file->name, "a")))
+	mode_t	old_umask = umask(0026);
+
+	file->file = fopen(file->name, "a");
+	umask(old_umask);
+
+	if (NULL == (file->file))
 	{
 		*error = zbx_dsprintf(*error, "cannot open export file '%s': %s", file->name, zbx_strerror(errno));
 		return FAIL;
