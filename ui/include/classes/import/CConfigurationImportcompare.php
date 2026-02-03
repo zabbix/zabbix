@@ -391,12 +391,12 @@ class CConfigurationImportcompare {
 
 		$intersection = array_intersect_key($before, $after);
 
-		if ($added = array_values(array_diff_key($after, $intersection))) {
-			$diff['added'] = $added;
+		if ($added = array_diff_key($after, $intersection)) {
+			$diff['added'] = array_values($added);
 		}
 
-		if ($removed = array_values(array_diff_key($before, $intersection))) {
-			$diff['removed'] = $removed;
+		if ($removed = array_diff_key($before, $intersection)) {
+			$diff['removed'] = array_values($removed);
 		}
 
 		foreach (array_keys($intersection) as $key) {
