@@ -1606,7 +1606,7 @@ static void	history_elastic_get_value_type_data(zbx_history_elastic_data_t *d, z
 {
 	zbx_vector_history_provider_value_type_info_reserve(&info->value_types, ITEM_VALUE_TYPE_COUNT);
 
-	for (unsigned char i = 0; i < ITEM_VALUE_TYPE_BIN; i++)
+	for (unsigned char i = 0; i < ITEM_VALUE_TYPE_JSON; i++)
 	{
 		if (FAIL == ZBX_HISTORY_CHECK_TYPE_FLAGS(d->value_type_flags, i))
 			continue;

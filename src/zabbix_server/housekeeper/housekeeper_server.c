@@ -1463,7 +1463,7 @@ static void	housekeeping_disable_unsupported_types(void)
 {
 	zbx_uint64_t	hk_history = zbx_history_get_housekeep_flags();
 
-	for (int i = 0; i < ITEM_VALUE_TYPE_BIN; i++)
+	for (int i = 0; i < ITEM_VALUE_TYPE_JSON; i++)
 	{
 		if (SUCCEED != ZBX_HISTORY_CHECK_TYPE_FLAGS(hk_history, i))
 		{
