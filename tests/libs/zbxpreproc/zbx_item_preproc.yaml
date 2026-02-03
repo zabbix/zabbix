@@ -2232,9 +2232,7 @@ in:
   step:
     type: ZBX_PREPROC_STR_REPLACE
     params: "OK"
-out:
-  return: FAIL
-  value: "a"
+exit code: failure
 ---
 test case: Missing first parameter
 in:
