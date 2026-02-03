@@ -29,8 +29,11 @@
 #include "zbxtime.h"
 #include "zbxtypes.h"
 #include "zbxdb.h"
+#include "zbxprof.h"
+
+#ifdef HAVE_SNMP
 #include "zbxsnmp.h"
-#include <time.h>
+#endif
 
 #ifdef HAVE_LIBXML2
 #	include <libxml/xpath.h>

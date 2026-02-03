@@ -31,6 +31,7 @@
 #include "zbxdb.h"
 #include "zbxipcservice.h"
 #include "zbxthreads.h"
+#include "zbxprof.h"
 
 /******************************************************************************
  *                                                                            *

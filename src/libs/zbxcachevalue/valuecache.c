@@ -16,7 +16,6 @@
 
 #include "zbxmutexs.h"
 #include "zbxtime.h"
-#include "zbxvariant.h"
 #include "zbxalgo.h"
 #include "zbxhistory.h"
 #include "zbxshmem.h"
