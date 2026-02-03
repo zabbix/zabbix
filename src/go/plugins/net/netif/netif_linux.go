@@ -142,8 +142,6 @@ func init() { //nolint:gochecknoinits // legacy implementation
 }
 
 // Export implements plugin.Exporter interface.
-//
-//nolint:cyclop // export function delegates its requests, so high cyclo is expected.
 func (p *Plugin) Export(key string, params []string, _ plugin.ContextProvider) (any, error) {
 	switch key {
 	case "net.if.discovery":
@@ -341,10 +339,7 @@ func (p *Plugin) getInterfaceMetrics(ifName string, stats []string) (ifConfigDat
 
 	wData := p.getWirelessDetails(ifName)
 
-	autoneg := "off"
-	if p.getAutoneg(ifName) {
-		autoneg = "on"
-	}
+	autoneg := p.getAutoneg(ifName)
 
 	speedPtr := parseUintPointer(p.fillNetIfGetParams(ifName, "speed"))
 	typePtr := parseUintPointer(p.fillNetIfGetParams(ifName, "type"))
@@ -548,14 +543,14 @@ func (*Plugin) getWirelessBitrate(fd int, ifName string) *int64 {
 }
 
 // retrieves autonegotiation using SIOCETHTOOL.
-func (*Plugin) getAutoneg(ifName string) bool {
+func (*Plugin) getAutoneg(ifName string) *string {
 	if len(ifName) >= ifNamSiz {
-		return false
+		return nil
 	}
 
 	fd, err := syscall.Socket(syscall.AF_INET, syscall.SOCK_DGRAM, 0)
 	if err != nil {
-		return false
+		return nil
 	}
 
 	//nolint:errcheck
@@ -579,5 +574,14 @@ func (*Plugin) getAutoneg(ifName string) bool {
 		uintptr(unsafe.Pointer(&ifr)),
 	)
 
-	return errno == 0 && ec.Autoneg != 0
+	if errno != 0 {
+		return nil
+	}
+
+	result := "off"
+	if ec.Autoneg != 0 {
+		result = "on"
+	}
+
+	return &result
 }

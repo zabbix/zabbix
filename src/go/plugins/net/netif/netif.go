@@ -79,7 +79,7 @@ type IfValuesData struct {
 	Ifcarrier     *uint64      `json:"carrier,omitempty"`
 	Ifspeed       *uint64      `json:"speed,omitempty"`
 	Ifduplex      string       `json:"duplex,omitempty"`
-	Ifnegotiation string       `json:"negotiation,omitempty"`
+	Ifnegotiation *string      `json:"negotiation,omitempty"`
 	Ifslevel      *int64       `json:"signal_level,omitempty"`
 	Iflquality    *int64       `json:"link_quality,omitempty"`
 	Ifnoiselevel  *int64       `json:"noise_level,omitempty"`
