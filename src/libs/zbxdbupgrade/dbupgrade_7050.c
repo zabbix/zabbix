@@ -394,10 +394,33 @@ static int	DBpatch_7050027(void)
 
 static int	DBpatch_7050028(void)
 {
-	return DBrename_table("housekeeper", "housekeeper_old");
+	const zbx_db_field_t	field = {"automatic", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("trigger_tag", &field);
 }
 
 static int	DBpatch_7050029(void)
+{
+	if (ZBX_DB_OK > zbx_db_execute(
+			"update trigger_tag"
+			" set automatic=1"	/* ZBX_TAG_AUTOMATIC */
+			" where triggerid in ("
+				"select triggerid"
+				" from trigger_discovery"
+			")"))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+static int	DBpatch_7050030(void)
+{
+	return DBrename_table("housekeeper", "housekeeper_old");
+}
+
+static int	DBpatch_7050031(void)
 {
 	const zbx_db_table_t	table =
 			{"housekeeper", "housekeeperid", 0,
@@ -413,7 +436,7 @@ static int	DBpatch_7050029(void)
 	return DBcreate_table(&table);
 }
 
-static int	DBpatch_7050030(void)
+static int	DBpatch_7050032(void)
 {
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
@@ -441,12 +464,12 @@ static int	DBpatch_7050030(void)
 	return SUCCEED;
 }
 
-static int	DBpatch_7050031(void)
+static int	DBpatch_7050033(void)
 {
 	return DBdrop_table("housekeeper_old");
 }
 
-static int	DBpatch_7050032(void)
+static int	DBpatch_7050034(void)
 {
 #ifdef HAVE_POSTGRESQL
 	if (FAIL == zbx_db_index_exists("housekeeper", "housekeeper_pkey1"))
@@ -459,32 +482,32 @@ static int	DBpatch_7050032(void)
 #endif
 }
 
-static int	DBpatch_7050033(void)
+static int	DBpatch_7050035(void)
 {
 	return DBcreate_housekeeper_trigger("items", "itemid");
 }
 
-static int	DBpatch_7050034(void)
+static int	DBpatch_7050036(void)
 {
 	return DBcreate_housekeeper_trigger("triggers", "triggerid");
 }
 
-static int	DBpatch_7050035(void)
+static int	DBpatch_7050037(void)
 {
 	return DBcreate_housekeeper_trigger("services", "serviceid");
 }
 
-static int	DBpatch_7050036(void)
+static int	DBpatch_7050038(void)
 {
 	return DBcreate_housekeeper_trigger("dhosts", "dhostid");
 }
 
-static int	DBpatch_7050037(void)
+static int	DBpatch_7050039(void)
 {
 	return DBcreate_housekeeper_trigger("dservices", "dserviceid");
 }
 
-static int	DBpatch_7050038(void)
+static int	DBpatch_7050040(void)
 {
 	if (ZBX_DB_OK > zbx_db_execute("delete from ids where table_name='housekeeper'"))
 		return FAIL;
@@ -492,36 +515,36 @@ static int	DBpatch_7050038(void)
 	return SUCCEED;
 }
 
-static int	DBpatch_7050039(void)
+static int	DBpatch_7050041(void)
 {
 	return DBdrop_foreign_key("dhosts", 1);
 }
 
-static int	DBpatch_7050040(void)
+static int	DBpatch_7050042(void)
 {
 	const zbx_db_field_t	field = {"druleid", NULL, "drules", "druleid", 0, ZBX_TYPE_ID, 0, 0};
 
 	return DBadd_foreign_key("dhosts", 1, &field);
 }
 
-static int	DBpatch_7050041(void)
+static int	DBpatch_7050043(void)
 {
 	return DBdrop_foreign_key("dservices", 1);
 }
 
-static int	DBpatch_7050042(void)
+static int	DBpatch_7050044(void)
 {
 	const zbx_db_field_t	field = {"dhostid", NULL, "dhosts", "dhostid", 0, ZBX_TYPE_ID, 0, 0};
 
 	return DBadd_foreign_key("dservices", 1, &field);
 }
 
-static int	DBpatch_7050043(void)
+static int	DBpatch_7050045(void)
 {
 	return DBdrop_foreign_key("dservices", 2);
 }
 
-static int	DBpatch_7050044(void)
+static int	DBpatch_7050046(void)
 {
 	const zbx_db_field_t	field = {"dcheckid", NULL, "dchecks", "dcheckid", 0, ZBX_TYPE_ID, 0, 0};
 
@@ -579,5 +602,7 @@ DBPATCH_ADD(7050041, 0, 1)
 DBPATCH_ADD(7050042, 0, 1)
 DBPATCH_ADD(7050043, 0, 1)
 DBPATCH_ADD(7050044, 0, 1)
+DBPATCH_ADD(7050045, 0, 1)
+DBPATCH_ADD(7050046, 0, 1)
 
 DBPATCH_END()

@@ -53,6 +53,9 @@
 #ifdef HAVE_NETSNMP
 #	include "zbxipcservice.h"
 #endif
+#ifdef HAVE_ARES_QUERY_CACHE
+#include "zbxresolver.h"
+#endif
 
 #define ZBX_MAX_SECTION_ENTRIES		4
 #define ZBX_MAX_ENTRY_ATTRIBUTES	3
@@ -1459,6 +1462,9 @@ ZBX_THREAD_ENTRY(zbx_trapper_thread, args)
 
 	memcpy(&s, trapper_args_in->listen_sock, sizeof(zbx_socket_t));
 
+#ifdef HAVE_ARES_QUERY_CACHE
+	zbx_ares_library_init();
+#endif
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	zbx_tls_init_child(trapper_args_in->config_comms->config_tls, zbx_get_program_type_cb,
 			zbx_dc_get_psk_by_identity);
