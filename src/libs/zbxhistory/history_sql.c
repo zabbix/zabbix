@@ -20,7 +20,6 @@
 #include "zbxdb.h"
 #include "zbxnum.h"
 #include "zbxstr.h"
-#include "zbxtime.h"
 #include "zbxvariant.h"
 
 typedef struct

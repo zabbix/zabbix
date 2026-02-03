@@ -21,7 +21,7 @@ test case: "Time outside range because of time zone"
 in:
   period: "1,09:00-10:00"
   time: "2024-12-16T9:30:00"
-  time_zone: "EST"
+  time_zone: "America/New_York"
 out:
   return: SUCCEED
   res: FAIL

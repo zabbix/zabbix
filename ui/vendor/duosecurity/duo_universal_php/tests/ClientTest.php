@@ -514,4 +514,144 @@ final class ClientTest extends TestCase
         $this->assertStringContainsString("scope=openid", $duo_uri);
         $this->assertStringContainsString($expected_redir_uri, $duo_uri);
     }
+
+    /**
+     * Test that the user agent extension can be set and is included in requests.
+     */
+    public function testAppendToUserAgent(): void
+    {
+        $custom_extension = "MyApp/1.0.0";
+        $id_token = $this->createIdToken();
+        $result = $this->createTokenResult($id_token);
+
+        // Mock the client to capture the user agent sent in HTTP requests
+        $client = $this->getMockBuilder(Client::class)
+            ->setConstructorArgs([$this->client_id, $this->client_secret, $this->api_host, $this->redirect_url])
+            ->setMethods(['makeHttpsCall'])
+            ->getMock();
+
+        // Set up the mock to capture the user agent parameter
+        $captured_user_agent = null;
+        $client->method('makeHttpsCall')
+            ->willReturnCallback(function ($endpoint, $request, $user_agent = null) use (&$captured_user_agent, $result) {
+                $captured_user_agent = $user_agent;
+                return $result;
+            });
+
+        // Append custom user agent extension
+        $client->appendToUserAgent($custom_extension);
+
+        // Make a call that uses the user agent
+        $client->exchangeAuthorizationCodeFor2FAResult($this->code, $this->username);
+
+        // Verify the user agent includes our custom extension
+        $this->assertNotNull($captured_user_agent);
+        $this->assertStringContainsString($custom_extension, $captured_user_agent);
+        $this->assertStringContainsString(Client::USER_AGENT, $captured_user_agent);
+        $this->assertStringContainsString("php/" . phpversion(), $captured_user_agent);
+    }
+
+    /**
+     * Test that user agent works correctly without any extension.
+     */
+    public function testUserAgentWithoutExtension(): void
+    {
+        $id_token = $this->createIdToken();
+        $result = $this->createTokenResult($id_token);
+
+        // Mock the client to capture the user agent sent in HTTP requests
+        $client = $this->getMockBuilder(Client::class)
+            ->setConstructorArgs([$this->client_id, $this->client_secret, $this->api_host, $this->redirect_url])
+            ->setMethods(['makeHttpsCall'])
+            ->getMock();
+
+        // Set up the mock to capture the user agent parameter
+        $captured_user_agent = null;
+        $client->method('makeHttpsCall')
+            ->willReturnCallback(function ($endpoint, $request, $user_agent = null) use (&$captured_user_agent, $result) {
+                $captured_user_agent = $user_agent;
+                return $result;
+            });
+
+        // Make a call without setting any custom user agent extension
+        $client->exchangeAuthorizationCodeFor2FAResult($this->code, $this->username);
+
+        // Verify the user agent contains default information but no custom extension
+        $this->assertNotNull($captured_user_agent);
+        $this->assertStringContainsString(Client::USER_AGENT, $captured_user_agent);
+        $this->assertStringContainsString("php/" . phpversion(), $captured_user_agent);
+        $this->assertStringContainsString(php_uname(), $captured_user_agent);
+    }
+
+    /**
+     * Test that empty user agent extension is handled correctly.
+     */
+    public function testAppendToUserAgentEmpty(): void
+    {
+        $id_token = $this->createIdToken();
+        $result = $this->createTokenResult($id_token);
+
+        // Mock the client to capture the user agent sent in HTTP requests
+        $client = $this->getMockBuilder(Client::class)
+            ->setConstructorArgs([$this->client_id, $this->client_secret, $this->api_host, $this->redirect_url])
+            ->setMethods(['makeHttpsCall'])
+            ->getMock();
+
+        // Set up the mock to capture the user agent parameter
+        $captured_user_agent = null;
+        $client->method('makeHttpsCall')
+            ->willReturnCallback(function ($endpoint, $request, $user_agent = null) use (&$captured_user_agent, $result) {
+                $captured_user_agent = $user_agent;
+                return $result;
+            });
+
+        // Append empty user agent extension
+        $client->appendToUserAgent("");
+
+        // Make a call
+        $client->exchangeAuthorizationCodeFor2FAResult($this->code, $this->username);
+
+        // Verify the user agent contains default information but no trailing space
+        $this->assertNotNull($captured_user_agent);
+        $this->assertStringContainsString(Client::USER_AGENT, $captured_user_agent);
+        $this->assertStringContainsString("php/" . phpversion(), $captured_user_agent);
+        $this->assertStringContainsString(php_uname(), $captured_user_agent);
+        // Ensure no trailing spaces from empty extension
+        $expected_base = Client::USER_AGENT . " php/" . phpversion() . " " . php_uname();
+        $this->assertEquals($expected_base, $captured_user_agent);
+    }
+
+    /**
+     * Test that whitespace-only user agent extension is handled correctly.
+     */
+    public function testAppendToUserAgentWhitespace(): void
+    {
+        $id_token = $this->createIdToken();
+        $result = $this->createTokenResult($id_token);
+
+        // Mock the client to capture the user agent sent in HTTP requests
+        $client = $this->getMockBuilder(Client::class)
+            ->setConstructorArgs([$this->client_id, $this->client_secret, $this->api_host, $this->redirect_url])
+            ->setMethods(['makeHttpsCall'])
+            ->getMock();
+
+        // Set up the mock to capture the user agent parameter
+        $captured_user_agent = null;
+        $client->method('makeHttpsCall')
+            ->willReturnCallback(function ($endpoint, $request, $user_agent = null) use (&$captured_user_agent, $result) {
+                $captured_user_agent = $user_agent;
+                return $result;
+            });
+
+        // Append whitespace-only user agent extension
+        $client->appendToUserAgent("   ");
+
+        // Make a call
+        $client->exchangeAuthorizationCodeFor2FAResult($this->code, $this->username);
+
+        // Verify the user agent contains default information but no extra whitespace
+        $this->assertNotNull($captured_user_agent);
+        $expected_base = Client::USER_AGENT . " php/" . phpversion() . " " . php_uname();
+        $this->assertEquals($expected_base, $captured_user_agent);
+    }
 }

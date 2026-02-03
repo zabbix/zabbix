@@ -1,6 +1,12 @@
 Changes for 8.0.0alpha2
 
 New features:
+..F....... [ZBXNEXT-10301] simplified user experience when editing problem filter tags by removing extra radio buttons and making an empty tags list equivalent to "All tags" (Ivo)
+A.F.I...S. [ZBXNEXT-5467] added possibility to add custom tags to triggers created from trigger prototypes (mprihodko, wczerneha)
+...G...PS. [ZBXNEXT-1002] added ability to use c-ares with DNS caching and failover for all DNS requests on Zabbix server, Zabbix proxy and Zabbix agent (vso)
+..F....... [ZBXNEXT-10414] set minimum supported PHP version to 8.2 (Ivo)
+.........T [ZBXNEXT-10310] added Azure Sentinel by HTTP template (abrosimovs)
+..F....... [ZBXNEXT-9749] added inline validation to API token form (talbergs)
 A.F....PS. [ZBXNEXT-2260] removed support for deprecated macros ACK.DATE, ACK.TIME, ACK.MESSAGE, EVENT.ACK.HISTORY, IPADDRESS, HOSTNAME, TRIGGER.KEY, TRIGGER.COMMENT, STATUS, PROFILE.*, USER.ALIAS (dpankins, rtrizna)
 .........T [ZBXNEXT-10322] added template to monitor domain expiration date (abakaldin)
 ..F....... [ZBXNEXT-9753] implemented inline validation for connectors form (gberzina)
@@ -24,6 +30,16 @@ A.F....... [ZBXNEXT-9595] allowed use of not formally valid JSON or XML in HTTP 
 ........S. [ZBXNEXT-10291] fixed EVENT.RECOVERY.TAGS macro not being resolved when problem is closed manually (wiper)
 
 Bug fixes:
+..F....... [ZBX-22722] updated the time period format to support both single-day (d) and interval (d–d) (msnihach)
+.......PS. [ZBX-27421] improved SNMPv3 performance by reducing CPU usage through using cached user after initial discovery (vso)
+...G...... [ZBX-27329] fixed net.tcp.service key not working for Zabbix agent 2 (esneiders)
+.......PS. [ZBX-21645] fixed SNMP availability icon staying green when all SNMP agent items are not supported (vso)
+..F....... [ZBX-27092] fixed csv to json without header row (talbergs)
+...G...... [ZBX-27074] fixed Zabbix agent crashing on startup on Windows (mkorotkov)
+.......PS. [ZBX-26712] fixed errors that occurred when polling snmp agent items for walk on BITS values (mkorotkov)
+.......PS. [ZBX-27391] fixed memory fragmentation when adding new hosts, global macros or user macros (vso)
+A......... [ZBX-27083] implemented full macros support for "In range" preprocessing step, now available for all fields (dpankins)
+A......... [ZBX-26749] removed inability to unlink and clear the template which has triggers that other host/template triggers depend on (kkuzmina)
 ........S. [ZBX-26664] added interface field validation in LLD (wiper)
 .D........ [ZBX-26754] improved ServerActive configuration option description (sboidenko)
 .......PS. [ZBX-27394] fixed crash on \"cannot get secrets for path\" error due to double free when using shared memory (vso)
@@ -138,6 +154,17 @@ New features:
 A.......S. [ZBXNEXT-10394] updated maximum supported TimescaleDB version to 2.24 (mprihodko)
 
 Bug fixes:
+..F....... [ZBX-22722] updated the time period format to support both single-day (d) and interval (d–d) (msnihach)
+........S. [ZBX-25080] optimized item_discovery table sync to use copy of items table changelog (wiper)
+...G...... [ZBX-27329] fixed net.tcp.service key not working for Zabbix agent 2 (esneiders)
+.......PS. [ZBX-21645] fixed SNMP availability icon staying green when all SNMP agent items are not supported (vso)
+..F....... [ZBX-27092] fixed csv to json without header row (talbergs)
+...G...... [ZBX-27074] fixed Zabbix agent crashing on startup on Windows (mkorotkov)
+.......PS. [ZBX-26712] fixed errors that occurred when polling snmp agent items for walk on BITS values (mkorotkov)
+.......PS. [ZBX-27391] fixed memory fragmentation when adding new hosts, global macros or user macros (vso)
+.D........ [ZBX-26754] improved ServerActive configuration option description (sboidenko)
+A......... [ZBX-27083] implemented full macros support for "In range" preprocessing step, now available for all fields (dpankins)
+A......... [ZBX-26749] removed inability to unlink and clear the template which has triggers that other host/template triggers depend on (kkuzmina)
 ........S. [ZBX-26664] added interface field validation in LLD (wiper)
 .......PS. [ZBX-27394] fixed crash on \"cannot get secrets for path\" error due to double free when using shared memory (vso)
 .........T [ZBX-27235] fixed MS Teams workflow webhook handling success message (kflorowski)
@@ -1370,6 +1397,15 @@ New features:
 A.......S. [ZBXNEXT-10394] updated maximum supported TimescaleDB version to 2.24 (mprihodko)
 
 Bug fixes:
+..F....... [ZBX-27459] updated MFA library duosecurity/duo_universal_php to version 1.1.1 (gcalenko)
+..F....... [ZBX-22722] updated the time period format to support both single-day (d) and interval (d–d) (msnihach)
+........S. [ZBX-25080] optimized item_discovery table sync to use copy of items table changelog (wiper)
+...G...... [ZBX-27329] fixed net.tcp.service key not working for Zabbix agent 2 (esneiders)
+.......PS. [ZBX-21645] fixed SNMP availability icon staying green when all SNMP agent items are not supported (vso)
+.......PS. [ZBX-26712] fixed errors that occurred when polling snmp agent items for walk on BITS values (mkorotkov)
+.......PS. [ZBX-27391] fixed memory fragmentation when adding new hosts, global macros or user macros (vso)
+.D........ [ZBX-26754] improved ServerActive configuration option description (sboidenko)
+A......... [ZBX-26749] removed inability to unlink and clear the template which has triggers that other host/template triggers depend on (kkuzmina)
 ........S. [ZBX-26664] added interface field validation in LLD (wiper)
 .........T [ZBX-27235] fixed MS Teams workflow webhook handling success message (kflorowski)
 A......... [ZBX-25974] prevented creation of duplicate host prototype on re-linking template (jfreibergs)
@@ -5286,6 +5322,7 @@ New features:
 A.......S. [ZBXNEXT-10394] updated maximum supported TimescaleDB version to 2.24 (mprihodko)
 
 Bug fixes:
+...G...... [ZBX-27329] fixed net.tcp.service key not working for Zabbix agent 2 (esneiders)
 ..F....... [ZBX-26485] fixed validation for "reconnect" and "autologin" parameters in "index.php" file (averza)
 
 --------------------------------------------------------------------------------
