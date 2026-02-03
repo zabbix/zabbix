@@ -563,13 +563,9 @@ static void	log_impl(int level, const char *component, const char *fmt, va_list 
 	}
 }
 
-void	zabbix_log_impl(int level, const char *fmt, ...)
+void	zabbix_log_impl(int level, const char *fmt, va_list args)
 {
-	va_list	args;
-
-	va_start(args, fmt);
 	log_impl(level, zbx_get_log_component_name(), fmt, args);
-	va_end(args);
 }
 
 static void	log_component(int level, const char *component, const char *fmt, ...)

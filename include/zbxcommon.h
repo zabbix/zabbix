@@ -787,11 +787,11 @@ static	type2	get_##varname(void) \
 
 /* logger interface */
 
-typedef void (*zbx_log_cb_t)(int level, const char *fmt, ...);
+typedef void (*zbx_log_cb_t)(int level, const char *fmt, va_list args);
 typedef int (*zbx_log_level_cb_t)(void);
 
-extern zbx_log_cb_t	zbx_log_handle  __zbx_attr_format_printf(2, 3);
-extern zbx_log_level_cb_t	zbx_get_log_level;
+void	zbx_log_handle(int level, const char *fmt, ...);
+int	zbx_get_log_level(void);
 
 #define LOG_LEVEL_EMPTY		0	/* printing nothing (if not LOG_LEVEL_INFORMATION set) */
 #define LOG_LEVEL_CRIT		1

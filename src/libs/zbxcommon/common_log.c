@@ -24,16 +24,11 @@ static void	log_errorv(const char *fmt, va_list args)
 	fflush(stderr);
 }
 
-
-static void	log_handle_stub(int level, const char *fmt, ...)
+static void	log_handle_stub(int level, const char *fmt, va_list args)
 {
 	ZBX_UNUSED(level);
 
-	va_list	args;
-
-	va_start(args, fmt);
 	log_errorv(fmt, args);
-	va_end(args);
 }
 
 static int	log_level_stub(void)
@@ -41,16 +36,16 @@ static int	log_level_stub(void)
 	return LOG_LEVEL_WARNING;
 }
 
-zbx_log_cb_t	zbx_log_handle = log_handle_stub;
-zbx_log_level_cb_t	zbx_get_log_level = log_level_stub;
+static zbx_log_cb_t	zbx_log_handle_impl = log_handle_stub;
+static zbx_log_level_cb_t	zbx_get_log_level_impl = log_level_stub;
 
 static zbx_backtrace_f		backtrace_cb = NULL;
 
 void	zbx_init_library_common(zbx_log_cb_t log_func, zbx_log_level_cb_t log_level_func,
 		zbx_get_progname_f get_progname, zbx_backtrace_f backtrace)
 {
-	zbx_log_handle = log_func;
-	zbx_get_log_level = log_level_func;
+	zbx_log_handle_impl = log_func;
+	zbx_get_log_level_impl = log_level_func;
 	get_progname_cb = get_progname;
 	backtrace_cb = backtrace;
 }
@@ -59,6 +54,20 @@ void	zbx_this_should_never_happen_backtrace(void)
 {
 	if (NULL != backtrace_cb)
 		backtrace_cb();
+}
+
+void	zbx_log_handle(int level, const char *fmt, ...)
+{
+	va_list	args;
+
+	va_start(args, fmt);
+	zbx_log_handle_impl(level, fmt, args);
+	va_end(args);
+}
+
+int	zbx_get_log_level(void)
+{
+	return zbx_get_log_level_impl();
 }
 
 /******************************************************************************

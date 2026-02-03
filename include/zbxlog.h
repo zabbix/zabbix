@@ -60,7 +60,7 @@ typedef struct
 
 int	zbx_open_log(const zbx_config_log_t *log_file_cfg, int level, const char *syslog_app_name,
 		const char *event_source, char **error);
-void	zabbix_log_impl(int level, const char *fmt, ...);
+void	zabbix_log_impl(int level, const char *fmt, va_list args);
 void	zbx_close_log(void);
 
 char	*zbx_strerror_from_system(zbx_syserror_t error);
@@ -83,7 +83,7 @@ int	zbx_get_log_level_impl(void);
 
 void	zbx_set_log_level(int level);
 
-const char     *zbx_get_log_component_name(void);
+const char	*zbx_get_log_component_name(void);
 
 #ifndef _WINDOWS
 void	zabbix_increase_log_level(void);
