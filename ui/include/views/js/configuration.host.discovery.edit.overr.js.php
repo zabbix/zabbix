@@ -1120,13 +1120,13 @@
 		var url = new Curl(this.$form.attr('action'));
 		url.setArgument('validate', 1);
 
-		this.$form.trimValues(['input[type="text"]', 'textarea']);
+		this.$form.trimValues(['input[type="text"]', 'textarea', 'z-textarea-flexible']);
 		this.$form.parent().find('.msg-bad, .msg-good').remove();
 
 		overlay.setLoading();
 		overlay.xhr = jQuery.ajax({
 			url: url.getUrl(),
-			data: this.$form.serialize(),
+			data: $.param(getFormFields(this.$form[0])),
 			dataType: 'json',
 			type: 'post'
 		})
