@@ -324,7 +324,9 @@ class testFormAdministrationMediaTypeWebhook extends CWebTest {
 						'Type' => 'Webhook',
 						'Script' => ''
 					],
-					'error_message' => 'Invalid parameter "/1/script": cannot be empty.'
+					'inline_errors' => [
+						'Script' => 'This field cannot be empty.'
+					]
 				]
 			],
 			// #19. Changing the value of timeout field to zero.
