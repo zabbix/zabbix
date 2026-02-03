@@ -162,7 +162,7 @@ static void	*pp_worker_entry(void *args)
 
 		if (SUCCEED != pp_task_queue_wait(queue, &error))
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "[%d] %s", worker->id, error);
+			zabbix_log(LOG_LEVEL_WARNING, "cannot wait for preprocesing tasks: %s", error);
 			zbx_free(error);
 			worker->stop = 1;
 		}

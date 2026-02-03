@@ -830,7 +830,11 @@ static void	preprocessor_add_test_request(zbx_pp_manager_t *manager, zbx_ipc_cli
 
 static void	preprocessor_reply_queue_size(zbx_pp_manager_t *manager, zbx_ipc_client_t *client)
 {
-	zbx_uint64_t	pending_num = manager->queue.pending_num;
+	zbx_uint64_t	pending_num;
+
+	pp_task_queue_lock(&manager->queue);
+	pending_num = manager->queue.pending_num;
+	pp_task_queue_unlock(&manager->queue);
 
 	zbx_ipc_client_send(client, ZBX_IPC_PREPROCESSOR_QUEUE, (unsigned char *)&pending_num, sizeof(pending_num));
 }
@@ -840,9 +844,14 @@ static void	preprocessor_reply_size(zbx_pp_manager_t *manager, zbx_ipc_client_t 
 {
 	unsigned char	*data;
 	zbx_uint32_t	data_len;
-	zbx_uint64_t	pending_num = manager->queue.pending_num;
+	zbx_uint64_t	pending_num;
+
+	pp_task_queue_lock(&manager->queue);
+	pending_num = manager->queue.pending_num;
+	pp_task_queue_unlock(&manager->queue);
 
 	data_len = zbx_preprocessor_pack_values_stats(&data, queued_num, queued_sz, direct_num, direct_sz, pending_num);
+
 
 	zbx_ipc_client_send(client, ZBX_IPC_PREPROCESSOR_SIZE, data, data_len);
 
@@ -1186,7 +1195,7 @@ void	*zbx_pp_manager_thread(void *args)
 						counter_direct_num = 0, counter_direct_sz = 0, finished_peak_num = 0,
 						pending_peak_num = 0, counter_processed_num = 0;
 	sigjmp_buf				jmp_ret;
-
+	int					shutdown = 0;
 
 #define	STAT_INTERVAL	5	/* if a process is busy and does not sleep then update status not faster than */
 				/* once in STAT_INTERVAL seconds */
@@ -1237,7 +1246,6 @@ void	*zbx_pp_manager_thread(void *args)
 
 	while (1)
 	{
-		int		shutdown = 0;
 		double		time_now = zbx_time();
 		zbx_uint64_t	direct_num = 0;
 

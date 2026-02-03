@@ -2035,6 +2035,7 @@ static void	start_processes(zbx_socket_t *listen_sock, zbx_proc_startup_t *runle
 				zbx_thread_start(zbx_poller_thread, &thread_args, &zbx_threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_PG_MANAGER:
+				threads_flags[i] = ZBX_THREAD_PRIORITY_COLLECTOR;
 				poller_args.poller_type = ZBX_PROCESS_TYPE_PG_MANAGER;
 				thread_args.args = &poller_args;
 				zbx_thread_start(pg_manager_thread, &thread_args, &zbx_threads[i]);

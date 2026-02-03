@@ -566,6 +566,5 @@ ZBX_THREAD_ENTRY(pg_manager_thread, args)
 
 	zbx_setproctitle("%s #%d [terminated]", get_process_type_string(info->process_type), info->process_num);
 
-	while (1)
-		zbx_sleep(SEC_PER_MIN);
+	zbx_exit(SUCCEED == ZBX_EXIT_STATUS() ? EXIT_SUCCESS : EXIT_FAILURE);
 }
