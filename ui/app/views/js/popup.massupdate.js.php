@@ -455,7 +455,7 @@ function submitPopup(overlay) {
 	fetch(url.getUrl(), {
 		method: 'post',
 		headers: {'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'},
-		body: $(form).serialize()
+		body: $.param(getFormFields($(form)[0]))
 	})
 	.then((response) => response.json())
 	.then((response) => {
