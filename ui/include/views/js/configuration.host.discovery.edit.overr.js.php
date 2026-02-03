@@ -1126,7 +1126,7 @@
 		overlay.setLoading();
 		overlay.xhr = jQuery.ajax({
 			url: url.getUrl(),
-			data: $.param(getFormFields(this.$form[0])),
+			data: new URLSearchParams(new FormData(this.$form[0])).toString(),
 			dataType: 'json',
 			type: 'post'
 		})
