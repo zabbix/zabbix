@@ -459,6 +459,8 @@ class CControllerPopupImportCompare extends CController {
 
 		$rows = [];
 		foreach ($blocks as $entity_type => $changes) {
+			$changes = self::sortChanges($entity_type, $changes);
+
 			$rows[] = [
 				'value' => $entity_type . ':',
 				'depth' => $depth,
@@ -494,6 +496,19 @@ class CControllerPopupImportCompare extends CController {
 		}
 
 		return $rows;
+	}
+
+	private static function sortChanges(string $entity_type, array $changes): array {
+		$order = match ($entity_type) {
+			'pages' => ['updated', 'added', 'removed'],
+			default => ['added', 'removed', 'updated']
+		};
+
+		$order = array_flip($order);
+
+		uksort($changes, fn (string $key_1, string $key_2): int => $order[$key_1] <=> $order[$key_2]);
+
+		return $changes;
 	}
 
 	private function nameForToc(string $entity_type, array $object, array $outer_names = []): string {

@@ -312,9 +312,6 @@ class CConfigurationImportcompare {
 	 * @return array
 	 */
 	protected function compareByUniqueness(array $before, array $after, bool $has_uuid, array $unique): array {
-		// Key order is important.
-		$diff = ['added' => [], 'removed' => [], 'updated' => []];
-
 		$before = $this->addUniqueIds($before, $unique);
 		$after = $this->addUniqueIds($after, $unique);
 
@@ -350,6 +347,8 @@ class CConfigurationImportcompare {
 			}
 		}
 
+		$diff = [];
+
 		$removed_entities = $before;
 		$added_entities = $after;
 
@@ -376,12 +375,6 @@ class CConfigurationImportcompare {
 			}
 		}
 
-		foreach (['added', 'removed', 'updated'] as $key) {
-			if (!$diff[$key]) {
-				unset($diff[$key]);
-			}
-		}
-
 		return $diff;
 	}
 
@@ -394,14 +387,17 @@ class CConfigurationImportcompare {
 	 * @return array
 	 */
 	protected function compareByIndex(array $before, array $after): array {
+		$diff = [];
+
 		$intersection = array_intersect_key($before, $after);
 
-		// Key order is important.
-		$diff = [
-			'updated' => [],
-			'added' => array_values(array_diff_key($after, $intersection)),
-			'removed' => array_values(array_diff_key($before, $intersection))
-		];
+		if ($added = array_values(array_diff_key($after, $intersection))) {
+			$diff['added'] = $added;
+		}
+
+		if ($removed = array_values(array_diff_key($before, $intersection))) {
+			$diff['removed'] = $removed;
+		}
 
 		foreach (array_keys($intersection) as $key) {
 			if ($before[$key] != $after[$key]) {
@@ -409,12 +405,6 @@ class CConfigurationImportcompare {
 					'before' => $before[$key],
 					'after' => $after[$key]
 				];
-			}
-		}
-
-		foreach (['added', 'removed', 'updated'] as $key) {
-			if (!$diff[$key]) {
-				unset($diff[$key]);
 			}
 		}
 
