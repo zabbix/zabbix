@@ -31,12 +31,8 @@ ZBX_GET_CONFIG_VAR2(const char*, const char*, zbx_progname, NULL)
 
 void handleZabbixLog(int level, const char *message);
 
-static void log_go_impl(int level, const char *fmt, ...)
+static void log_go_impl(int level, const char *fmt, va_list args)
 {
-	va_list args;
-
-	va_start(args, fmt);
-
 	// no need to allocate memory for message if level is set to log.None (-1)
 	if (zbx_agent_pid == getpid() && -1 != level)
 	{
@@ -56,8 +52,6 @@ static void log_go_impl(int level, const char *fmt, ...)
 		handleZabbixLog(level, message);
 		zbx_free(message);
 	}
-
-	va_end(args);
 }
 
 static int get_log_level_impl(void)
