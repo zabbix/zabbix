@@ -15,42 +15,6 @@
 
 class CFieldMenuPath extends CFieldTextBox {
 	getValueTrimmed() {
-		const value = super.getValueTrimmed();
-
-		return this.#splitPath(value)
-			.map(path_item => path_item.trim())
-			.join('/');
-	}
-
-	#splitPath(path) {
-		const path_items = [];
-		let path_item = '';
-		let escaped = false;
-
-		for (let i = 0; i < path.length; i++) {
-			const char = path[i];
-
-			if (escaped) {
-				// Take character after '\' literally.
-				path_item += '\\'+char;
-				escaped = false;
-			}
-			else if (char === '\\') {
-				// Escape the next character.
-				escaped = true;
-			}
-			else if (char === '/') {
-				// Split by non-escaped "/".
-				path_items.push(path_item);
-				path_item = '';
-			}
-			else {
-				path_item += char;
-			}
-		}
-
-		path_items.push(path_item);
-
-		return path_items;
+		return super.getValue();
 	}
 }

@@ -30,7 +30,7 @@ class CMenuPathValidator extends CValidator {
 		foreach ($folders as $num => $folder) {
 			// Allow the trailing slash.
 			if ($folder === '' && $num != ($count - 1) && $num != 0) {
-				$this->setError(_('Incorrect menu path.'));
+				$this->setError(_('Directory cannot be empty.'));
 
 				return false;
 			}
