@@ -62,6 +62,14 @@ class CDashboardImporter extends CDashboardImporterGeneral {
 				$dashboards_to_update[] = $dashboard;
 			}
 			elseif ($dashboardid === null && $this->options['dashboards']['createMissing']) {
+				foreach ($dashboard['pages'] as &$dashboard_page) {
+					// Missing referred objects will be registered while resolving widget references.
+					$dashboard_page['widgets'] = $this->resolveWidgetReferences($dashboard_page['widgets'], $name,
+						true
+					);
+				}
+				unset($dashboard_page);
+
 				$dashboards_to_create[] = $dashboard;
 			}
 		}
