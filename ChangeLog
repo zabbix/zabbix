@@ -6,6 +6,9 @@ New features:
 A.......S. [ZBXNEXT-10394] updated maximum supported TimescaleDB version to 2.24 (mprihodko)
 
 Bug fixes:
+...G...... [ZBX-26276] fixed issue with failed oracle connections causing memory leak in Zabbix agent 2 (opucka)
+A......... [ZBX-27236] improved performance of the event.get and problem.get methods when using the "suppressed" and "symptom" options (Sasha)
+.......PS. [ZBX-27447] fixed JSON error check with numeric value type (vso)
 ..F....... [ZBX-27459] updated MFA library duosecurity/duo_universal_php to version 1.1.1 (gcalenko)
 ..F....... [ZBX-22722] updated the time period format to support both single-day (d) and interval (d–d) (msnihach)
 ........S. [ZBX-25080] optimized item_discovery table sync to use copy of items table changelog (wiper)
@@ -3931,6 +3934,7 @@ New features:
 A.......S. [ZBXNEXT-10394] updated maximum supported TimescaleDB version to 2.24 (mprihodko)
 
 Bug fixes:
+...G...... [ZBX-26276] fixed issue with failed oracle connections causing memory leak in Zabbix agent 2 (opucka)
 ...G...... [ZBX-27329] fixed net.tcp.service key not working for Zabbix agent 2 (esneiders)
 ..F....... [ZBX-26485] fixed validation for "reconnect" and "autologin" parameters in "index.php" file (averza)
 
