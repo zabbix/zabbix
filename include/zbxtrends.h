@@ -17,6 +17,7 @@
 
 #include "zbxeval.h"
 #include "zbxtime.h"
+#include "zbxhistory.h"
 
 /* value_avg_t structure is used for item average value trend calculations. */
 /*                                                                          */

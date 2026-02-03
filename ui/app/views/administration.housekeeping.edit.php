@@ -133,14 +133,37 @@ $house_keeper_tab = (new CFormList())
 		(new CCheckBox('hk_history_global'))->setChecked($data['hk_history_global'] == 1),
 	)
 	->addRow(
-		(new CLabel(_('Data storage period'), 'hk_history'))
+		(new CLabel([
+			_('Data storage period'),
+			$data['hk_history_providers_enabled']
+				? makeWarningIcon(
+					_('This setting does not affect Elasticsearch and ClickHouse storage periods.')
+				)
+				: null
+		], 'hk_history'))
 			->setAsteriskMark(),
 		(new CTextBox('hk_history', $data['hk_history'], false, CSettingsSchema::getFieldLength('hk_history')))
 			->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 			->setEnabled($data['hk_history_global'] == 1)
 			->setAriaRequired()
-	)
-	->addRow((new CTag('h4', true, _('Trends')))->addClass('input-section-header'))
+	);
+
+if ($data['history_providers']) {
+	foreach ($data['history_providers'] as $provider => $types) {
+		$house_keeper_tab
+			->addRow((new CTag('p', true, $provider))->addClass('input-section-header'));
+
+		foreach ($types as $type => $ttl) {
+			$house_keeper_tab
+				->addRow(
+					new CLabel(_('Data storage period').' ('.$type.')'),
+					$ttl
+				);
+		}
+	}
+}
+
+$house_keeper_tab->addRow((new CTag('h4', true, _('Trends')))->addClass('input-section-header'))
 	->addRow(
 		new CLabel(_('Enable internal housekeeping'), 'hk_trends_mode'),
 		(new CCheckBox('hk_trends_mode'))->setChecked($data['hk_trends_mode'] == 1)

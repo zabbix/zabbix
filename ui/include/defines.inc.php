@@ -75,6 +75,7 @@ define('ZBX_DATE',				'Y-m-d'); // Time selector date without minutes and second
 // TTL timeout in seconds used to invalidate data cache of Vault response. Set 0 to disable Vault response caching.
 define('ZBX_DATA_CACHE_TTL', 60);
 
+define('ZBX_HISTORY_SOURCE_CLICKHOUSE',	'clickhouse');
 define('ZBX_HISTORY_SOURCE_ELASTIC',	'elastic');
 define('ZBX_HISTORY_SOURCE_SQL',		'sql');
 

@@ -1949,21 +1949,17 @@ function parse_period($str) {
 		return null;
 	}
 
-	foreach ($time_periods_parser->getPeriods() as $period) {
-		if (!preg_match('/^([1-7])-([1-7]),([0-9]{1,2}):([0-9]{1,2})-([0-9]{1,2}):([0-9]{1,2})$/', $period, $matches)) {
-			return null;
-		}
+	foreach ($time_periods_parser->getPeriodsParts() as $period_parts) {
+		$start_day = (int) $period_parts['wd_from'];
+		$end_day = (int) $period_parts['wd_till'];
 
-		for ($i = $matches[1]; $i <= $matches[2]; $i++) {
-			if (!isset($out[$i])) {
-				$out[$i] = [];
-			}
-			array_push($out[$i], [
-				'start_h' => $matches[3],
-				'start_m' => $matches[4],
-				'end_h' => $matches[5],
-				'end_m' => $matches[6]
-			]);
+		for ($day = $start_day; $day <= $end_day; $day++) {
+			$out[$day][] = [
+				'start_h' => $period_parts['h_from'],
+				'start_m' => $period_parts['m_from'],
+				'end_h' => $period_parts['h_till'],
+				'end_m' => $period_parts['m_till']
+			];
 		}
 	}
 
@@ -2518,4 +2514,24 @@ function zbx_mb_check_encoding(string $string, string $encoding): bool {
 	$decoded_string = iconv($encoding, $encoding, $string);
 
 	return $decoded_string === $string;
+}
+
+/**
+ * Converts a Unix timestamp in seconds and optional nanoseconds into a ClickHouse-compatible DateTime64(9) string, e.g.
+ * "2025-11-25 07:56:20.293208897".
+ *
+ * @param int      $clock   Unix timestamp in seconds.
+ * @param int|null $ns      Nanoseconds (0–999999999). If omitted, defaults to 000000000.
+ * @param bool     $quoted  Whether to wrap the result in single quotes.
+ *
+ * @return string
+ */
+function db_utc_to_datetime64(int $clock, ?int $ns = null, bool $quoted = true): string {
+	$ns_str = $ns !== null ? str_pad((string) $ns, 9, '0', STR_PAD_LEFT) : '000000000';
+
+	$date_time = zbx_date2str('Y-m-d H:i:s', $clock, CTimezoneHelper::getSystemTimezone());
+
+	$result = $date_time.'.'.$ns_str;
+
+	return $quoted ? "'".$result."'" : $result;
 }

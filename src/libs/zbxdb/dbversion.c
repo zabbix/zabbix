@@ -18,6 +18,7 @@
 #include "zbx_dbversion_constants.h"
 #include "zbxjson.h"
 #include "zbxtypes.h"
+
 #if defined(HAVE_POSTGRESQL)
 #	include "zbxstr.h"
 #endif

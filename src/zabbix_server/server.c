@@ -100,10 +100,7 @@
 #include "zbx_ha_constants.h"
 #include "zbxescalations.h"
 #include "zbxbincommon.h"
-
-#ifdef HAVE_LIBCURL
-#	include "zbxcurl.h"
-#endif
+#include "zbxcurl.h"
 
 ZBX_GET_CONFIG_VAR2(const char*, const char*, zbx_progname, NULL)
 
@@ -362,6 +359,8 @@ static char	*CONFIG_LOAD_MODULE_PATH	= NULL;
 static char	**CONFIG_LOAD_MODULE	= NULL;
 
 static char	*CONFIG_USER		= NULL;
+
+static char	**config_history_providers = NULL;
 
 /* web monitoring */
 static char	*config_ssl_ca_location = NULL;
@@ -687,7 +686,7 @@ static void	zbx_set_defaults(void)
 	if (NULL == config_ssl_key_location)
 		config_ssl_key_location = zbx_strdup(config_ssl_key_location, DEFAULT_SSL_KEY_LOCATION);
 
-	if (NULL == config_history_storage_opts)
+	if (NULL == config_history_storage_opts && NULL != config_history_storage_url)
 		config_history_storage_opts = zbx_strdup(config_history_storage_opts, "uint,dbl,str,log,text,json");
 #endif
 
@@ -879,6 +878,35 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "\"WebServiceURL\" configuration parameter must be set when "
 				" setting \"StartReportWriters\" configuration parameter");
+		err = 1;
+	}
+
+	if (NULL != *config_history_providers)
+	{
+		if (NULL != config_history_storage_url)
+		{
+			zabbix_log(LOG_LEVEL_CRIT, "\"HistoryStorageURL\" configuration parameter conflicts"
+					" with \"HistoryProvider\" configuration parameter");
+			err = 1;
+
+		}
+		else
+		{
+			if (NULL != config_history_storage_opts)
+			{
+				zabbix_log(LOG_LEVEL_CRIT, "\"HistoryStorageTypes\" configuration parameter conflicts"
+						" with \"HistoryProvider\" configuration parameter");
+				err = 1;
+
+			}
+
+			if (0 != config_history_storage_pipelines)
+			{
+				zabbix_log(LOG_LEVEL_CRIT, "\"HistoryStorageDateIndex\" configuration parameter"
+						" conflicts with \"HistoryProvider\" configuration parameter");
+				err = 1;
+			}
+		}
 	}
 
 	if (0 != err)
@@ -1185,11 +1213,15 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 				ZBX_CONF_PARM_OPT,	0,			1},
 		{"FrontendAllowedIP",		&config_frontend_allowed_ip,		ZBX_CFG_TYPE_STRING_LIST,
 			ZBX_CONF_PARM_OPT,	0,			0},
+		{"HistoryProvider",		&config_history_providers,		ZBX_CFG_TYPE_MULTISTRING,
+				ZBX_CONF_PARM_OPT,	0,			0},
 		{0}
 	};
 
 	/* initialize multistrings */
 	zbx_strarr_init(&CONFIG_LOAD_MODULE);
+	zbx_strarr_init(&config_history_providers);
+
 	zbx_parse_cfg_file(config_file, cfg, ZBX_CFG_FILE_REQUIRED, ZBX_CFG_STRICT, ZBX_CFG_EXIT_FAILURE,
 			ZBX_CFG_ENVVAR_USE);
 	zbx_set_defaults();
@@ -1214,6 +1246,7 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 static void	zbx_free_config(void)
 {
 	zbx_strarr_free(&CONFIG_LOAD_MODULE);
+	zbx_strarr_free(&config_history_providers);
 }
 
 static void	zbx_on_exit(int ret, void *on_exit_args)
@@ -1247,7 +1280,7 @@ static void	zbx_on_exit(int ret, void *on_exit_args)
 		zbx_ipc_service_free_env();
 
 		zbx_db_connect(ZBX_DB_CONNECT_EXIT);
-		zbx_free_database_cache(ZBX_SYNC_ALL, &events_cbs, config_history_storage_pipelines);
+		zbx_free_database_cache(ZBX_SYNC_ALL, &events_cbs);
 		zbx_db_close();
 
 		zbx_free_configuration_cache();
@@ -1507,12 +1540,6 @@ static int	zbx_check_db(void)
 		}
 
 		zbx_db_version_json_create(&db_version_json, &db_version_info);
-
-		if (SUCCEED == ret)
-		{
-			zbx_history_check_version(&db_version_json, &ret, config_allow_unsupported_db_versions,
-					config_history_storage_url);
-		}
 
 		zbx_db_flush_version_requirements(db_version_json.buffer);
 		zbx_json_free(&db_version_json);
@@ -1909,6 +1936,9 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 
 	zbx_set_exit_on_terminate();
 
+	/* cleanup curl before forking to avoid issues with forked initialized state */
+	zbx_curl_cleanup();
+
 	thread_args.info.program_type = zbx_program_type;
 
 	zbx_set_child_pids(zbx_threads, zbx_threads_num);
@@ -1973,6 +2003,7 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 				zbx_dc_update_maintenances(MAINTENANCE_TIMER_PENDING);
 
 				zbx_db_close();
+				zbx_curl_cleanup();
 				break;
 			case ZBX_PROCESS_TYPE_POLLER:
 				poller_args.poller_type = ZBX_POLLER_TYPE_NORMAL;
@@ -2238,7 +2269,7 @@ static void	server_teardown(zbx_rtc_t *rtc, zbx_socket_t *listen_sock)
 	zbx_vc_destroy();
 	zbx_vmware_destroy();
 	zbx_free_configuration_cache();
-	zbx_free_database_cache(ZBX_SYNC_NONE, &events_cbs, config_history_storage_pipelines);
+	zbx_free_database_cache(ZBX_SYNC_NONE, &events_cbs);
 	zbx_deinit_remote_commands_cache();
 	zbx_db_deinit();
 
@@ -2443,8 +2474,6 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		exit(EXIT_FAILURE);
 	}
 
-	zbx_free_config();
-
 	if (SUCCEED != zbx_rtc_init(&rtc, &error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize runtime control service: %s", error);
@@ -2520,6 +2549,19 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	if (SUCCEED != zbx_check_db())
 		goto out;
 
+	if (SUCCEED != zbx_history_init(config_history_storage_url, config_history_storage_opts,
+			config_history_storage_pipelines, config_history_providers, zbx_db_config->log_slow_queries,
+			zbx_config_source_ip, config_ssl_ca_location, config_ssl_cert_location, config_ssl_key_location,
+			&error))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize history storage: %s", error);
+		zbx_free(error);
+		exit(EXIT_FAILURE);
+	}
+
+	if (FAIL == zbx_history_check_version(config_allow_unsupported_db_versions, zbx_program_type))
+		exit(EXIT_FAILURE);
+
 	if (1 == config_allow_software_update_check)
 	{
 		if (SUCCEED != zbx_db_update_software_update_checkid())
@@ -2540,13 +2582,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		exit(EXIT_FAILURE);
 	}
 
-	if (SUCCEED != zbx_history_init(config_history_storage_url, config_history_storage_opts,
-			zbx_db_config->log_slow_queries, &error))
-	{
-		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize history storage: %s", error);
-		zbx_free(error);
-		exit(EXIT_FAILURE);
-	}
+	zbx_free_config();
 
 	if (SUCCEED != zbx_init_selfmon_collector(get_config_forks, &error))
 	{

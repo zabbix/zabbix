@@ -18,6 +18,8 @@
 #include "async_tcpsvc.h"
 #include "async_telnet.h"
 
+#include "zbxcommon.h"
+
 #ifdef HAVE_LIBCURL
 #	include "async_http.h"
 #endif

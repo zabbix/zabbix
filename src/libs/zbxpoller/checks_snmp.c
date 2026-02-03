@@ -1040,8 +1040,9 @@ static zbx_snmp_sess_t	zbx_snmp_open_session(unsigned char snmp_version, const c
 		char *snmp_community, char *snmpv3_securityname, char *snmpv3_contextname,
 		unsigned char snmpv3_securitylevel, unsigned char snmpv3_authprotocol, char *snmpv3_authpassphrase,
 		unsigned char snmpv3_privprotocol, char *snmpv3_privpassphrase, unsigned char *securityEngineID,
-		size_t securityEngineIDLen, char *error, size_t max_error_len,
-		int timeout, const char *config_source_ip, zbx_uint64_t itemid)
+		size_t securityEngineIDLen, unsigned char *securityAuthKey, size_t securityAuthKeyLen,
+		unsigned char *securityPrivKey, size_t securityPrivKeyLen, char *error,
+		size_t max_error_len, int timeout, const char *config_source_ip, zbx_uint64_t itemid)
 {
 /* item snmpv3 privacy protocol */
 /* SYNC WITH PHP!               */
@@ -1133,7 +1134,12 @@ static zbx_snmp_sess_t	zbx_snmp_open_session(unsigned char snmp_version, const c
 
 				session.securityAuthKeyLen = USM_AUTH_KU_LEN;
 
-				if (SNMPERR_SUCCESS != generate_Ku(session.securityAuthProto,
+				if (0 != securityAuthKeyLen)
+				{
+					memcpy(session.securityAuthKey, securityAuthKey, securityAuthKeyLen);
+					session.securityAuthKeyLen = securityAuthKeyLen;
+				}
+				else if (SNMPERR_SUCCESS != generate_Ku(session.securityAuthProto,
 						session.securityAuthProtoLen, (u_char *)snmpv3_authpassphrase,
 						strlen(snmpv3_authpassphrase), session.securityAuthKey,
 						&session.securityAuthKeyLen))
@@ -1155,7 +1161,12 @@ static zbx_snmp_sess_t	zbx_snmp_open_session(unsigned char snmp_version, const c
 
 				session.securityAuthKeyLen = USM_AUTH_KU_LEN;
 
-				if (SNMPERR_SUCCESS != generate_Ku(session.securityAuthProto,
+				if (0 != securityAuthKeyLen)
+				{
+					memcpy(session.securityAuthKey, securityAuthKey, securityAuthKeyLen);
+					session.securityAuthKeyLen = securityAuthKeyLen;
+				}
+				else if (SNMPERR_SUCCESS != generate_Ku(session.securityAuthProto,
 						session.securityAuthProtoLen, (u_char *)snmpv3_authpassphrase,
 						strlen(snmpv3_authpassphrase), session.securityAuthKey,
 						&session.securityAuthKeyLen))
@@ -1210,7 +1221,12 @@ static zbx_snmp_sess_t	zbx_snmp_open_session(unsigned char snmp_version, const c
 
 				session.securityPrivKeyLen = USM_PRIV_KU_LEN;
 
-				if (SNMPERR_SUCCESS != generate_Ku(session.securityAuthProto,
+				if (0 != securityPrivKeyLen)
+				{
+					memcpy(session.securityPrivKey, securityPrivKey, securityPrivKeyLen);
+					session.securityPrivKeyLen = securityPrivKeyLen;
+				}
+				else if (SNMPERR_SUCCESS != generate_Ku(session.securityAuthProto,
 						session.securityAuthProtoLen, (u_char *)snmpv3_privpassphrase,
 						strlen(snmpv3_privpassphrase), session.securityPrivKey,
 						&session.securityPrivKeyLen))
@@ -3608,6 +3624,10 @@ static int	async_task_process_task_snmp_cb(short event, void *data, int *fd, zbx
 		unsigned char		*securityEngineID = NULL;
 		size_t			securityEngineIDLen = 0;
 		zbx_snmp_identity_t	*identity_ptr;
+		unsigned char		*securityAuthKey = NULL;
+		size_t			securityAuthKeyLen = 0;
+		unsigned char		*securityPrivKey = NULL;
+		size_t			securityPrivKeyLen = 0;
 
 		if (ZBX_IF_SNMP_VERSION_3 == snmp_context->snmp_version &&
 				NULL != (identity_ptr = zbx_get_snmp_identity(addresses->values[0].ip,
@@ -3615,6 +3635,17 @@ static int	async_task_process_task_snmp_cb(short event, void *data, int *fd, zbx
 		{
 				securityEngineID = identity_ptr->engineid;
 				securityEngineIDLen = identity_ptr->engineid_len;
+				struct usmUser *user = usm_get_user(securityEngineID, securityEngineIDLen,
+						snmp_context->snmpv3_securityname);
+
+				if (NULL != user)
+				{
+					securityPrivKey = user->privKey;
+					securityPrivKeyLen = user->privKeyLen;
+					securityAuthKey = user->authKey;
+					securityAuthKeyLen = user->authKeyLen;
+				}
+
 				snmp_context->probe = 0;
 				zabbix_log(LOG_LEVEL_DEBUG, "itemid:" ZBX_FS_UI64 " EngineID already discovered,"
 						" skipping probe", snmp_context->item.itemid);
@@ -3626,8 +3657,9 @@ static int	async_task_process_task_snmp_cb(short event, void *data, int *fd, zbx
 				snmp_context->snmpv3_contextname, snmp_context->snmpv3_securitylevel,
 				snmp_context->snmpv3_authprotocol, snmp_context->snmpv3_authpassphrase,
 				snmp_context->snmpv3_privprotocol, snmp_context->snmpv3_privpassphrase,
-				securityEngineID, securityEngineIDLen, error, sizeof(error),
-				0, snmp_context->config_source_ip, snmp_context->item.itemid)))
+				securityEngineID, securityEngineIDLen, securityAuthKey, securityAuthKeyLen,
+				securityPrivKey, securityPrivKeyLen, error, sizeof(error), 0,
+				snmp_context->config_source_ip, snmp_context->item.itemid)))
 		{
 			snmp_context->item.ret = NOTSUPPORTED;
 			SET_MSG_RESULT(&snmp_context->item.result, zbx_dsprintf(NULL,
@@ -4331,8 +4363,8 @@ void	get_values_snmp(zbx_dc_item_t *items, AGENT_RESULT *results, int *errcodes,
 		if (NULL == (ssp = zbx_snmp_open_session(item->snmp_version, ip_addr, item->interface.port,
 			item->snmp_community, item->snmpv3_securityname, item->snmpv3_contextname,
 			item->snmpv3_securitylevel, item->snmpv3_authprotocol, item->snmpv3_authpassphrase,
-			item->snmpv3_privprotocol, item->snmpv3_privpassphrase, NULL, 0, error, sizeof(error),
-			config_timeout, config_source_ip, item->itemid)))
+			item->snmpv3_privprotocol, item->snmpv3_privpassphrase, NULL, 0, NULL, 0, NULL, 0,
+			error, sizeof(error), config_timeout, config_source_ip, item->itemid)))
 		{
 			err = NETWORK_ERROR;
 			goto exit;
@@ -4355,8 +4387,8 @@ void	get_values_snmp(zbx_dc_item_t *items, AGENT_RESULT *results, int *errcodes,
 		if (NULL == (ssp = zbx_snmp_open_session(item->snmp_version, ip_addr, item->interface.port,
 			item->snmp_community, item->snmpv3_securityname, item->snmpv3_contextname,
 			item->snmpv3_securitylevel, item->snmpv3_authprotocol, item->snmpv3_authpassphrase,
-			item->snmpv3_privprotocol, item->snmpv3_privpassphrase, NULL, 0, error, sizeof(error),
-			config_timeout, config_source_ip, item->itemid)))
+			item->snmpv3_privprotocol, item->snmpv3_privpassphrase, NULL, 0, NULL, 0, NULL, 0,
+			error, sizeof(error), config_timeout, config_source_ip, item->itemid)))
 		{
 			err = NETWORK_ERROR;
 			goto exit;
@@ -4379,8 +4411,8 @@ void	get_values_snmp(zbx_dc_item_t *items, AGENT_RESULT *results, int *errcodes,
 		if (NULL == (ssp = zbx_snmp_open_session(item->snmp_version, ip_addr, item->interface.port,
 			item->snmp_community, item->snmpv3_securityname, item->snmpv3_contextname,
 			item->snmpv3_securitylevel, item->snmpv3_authprotocol, item->snmpv3_authpassphrase,
-			item->snmpv3_privprotocol, item->snmpv3_privpassphrase, NULL, 0, error, sizeof(error),
-			config_timeout, config_source_ip, item->itemid)))
+			item->snmpv3_privprotocol, item->snmpv3_privpassphrase, NULL, 0, NULL, 0,  NULL, 0, error,
+			sizeof(error), config_timeout, config_source_ip, item->itemid)))
 		{
 			err = NETWORK_ERROR;
 			goto exit;

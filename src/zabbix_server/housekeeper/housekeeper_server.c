@@ -31,6 +31,7 @@
 #include "zbxipcservice.h"
 #include "zbxstr.h"
 #include "trigger_housekeeper.h"
+#include "zbxhistory.h"
 
 #ifdef HAVE_POSTGRESQL
 #include "zbxjson.h"
@@ -69,7 +70,7 @@ typedef struct
 	int		min_clock;
 
 	/* a reference to the housekeeping configuration mode (enable) option for this table */
-	int		*poption_mode;
+	const int	*poption_mode;
 
 	/* a reference to the settings value specifying number of seconds the records must be kept */
 	int		*phistory;
@@ -86,10 +87,7 @@ typedef struct
 	const char	*name;
 
 	/* a reference to housekeeping configuration enable value for this table */
-	int		*poption_mode;
-
-	/* a reference to the housekeeping configuration overwrite option for this table */
-	int		*poption_global;
+	const int	*poption_mode;
 }
 zbx_hk_cleanup_table_t;
 
@@ -130,13 +128,13 @@ typedef struct
 	const char				*history;
 
 	/* a reference to the housekeeping configuration mode (enable) option for this table */
-	int					*poption_mode;
+	const int				*poption_mode;
 
 	/* a reference to the housekeeping configuration overwrite option for this table */
-	int					*poption_global;
+	const int				*poption_global;
 
 	/* a reference to the housekeeping configuration history value for this table */
-	int					*poption;
+	const int				*poption;
 
 	/* type for checking which values are sent to the history storage */
 	unsigned char				type;
@@ -158,7 +156,7 @@ static int	tsdb_version = 0;
 static int	hk_period;
 
 static int	poption_mode_regular	= ZBX_HK_MODE_REGULAR;
-static int	poption_global_disabled	= ZBX_HK_OPTION_DISABLED;
+static int	poption_mode_disabled	= ZBX_HK_OPTION_DISABLED;
 
 /* global configuration data containing housekeeping configuration */
 static zbx_config_t	cfg;
@@ -167,17 +165,17 @@ static zbx_config_t	cfg;
 /* This mapping is used to exclude disabled tables from housekeeping  */
 /* cleanup procedure.                                                 */
 static zbx_hk_cleanup_table_t	hk_cleanup_tables[] = {
-	{"history",		&cfg.hk.history_mode,	&cfg.hk.history_global},
-	{"history_log",		&cfg.hk.history_mode,	&cfg.hk.history_global},
-	{"history_str",		&cfg.hk.history_mode,	&cfg.hk.history_global},
-	{"history_text",	&cfg.hk.history_mode,	&cfg.hk.history_global},
-	{"history_bin",		&cfg.hk.history_mode,	&cfg.hk.history_global},
-	{"history_json",	&cfg.hk.history_mode,	&cfg.hk.history_global},
-	{"history_uint",	&cfg.hk.history_mode,	&cfg.hk.history_global},
-	{"trends",		&cfg.hk.trends_mode,	&cfg.hk.trends_global},
-	{"trends_uint",		&cfg.hk.trends_mode,	&cfg.hk.trends_global},
+	{"history",		&cfg.hk.history_mode},
+	{"history_str",		&cfg.hk.history_mode},
+	{"history_log",		&cfg.hk.history_mode},
+	{"history_uint",	&cfg.hk.history_mode},
+	{"history_text",	&cfg.hk.history_mode},
+	{"history_bin",		&cfg.hk.history_mode},
+	{"history_json",	&cfg.hk.history_mode},
+	{"trends",		&cfg.hk.trends_mode},
+	{"trends_uint",		&cfg.hk.trends_mode},
 	/* force events housekeeping mode on to perform problem cleanup when events housekeeping is disabled */
-	{"events",		&poption_mode_regular,	&poption_global_disabled},
+	{"events",		&poption_mode_regular},
 	{0}
 };
 
@@ -1044,6 +1042,25 @@ static int	housekeep_events_by_triggerid(zbx_uint64_t triggerid, int config_max_
 	return deleted;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: find housekeeping cleanup table by name                           *
+ *                                                                            *
+ * Parameters: name - [IN] table name                                         *
+ *                                                                            *
+ * Return value: pointer to cleanup table or NULL if not found                *
+ *                                                                            *
+ ******************************************************************************/
+static zbx_hk_cleanup_table_t	*housekeeping_get_table_by_name(const char *name)
+{
+	for (zbx_hk_cleanup_table_t *table = hk_cleanup_tables; NULL != table->name; table++)
+	{
+		if (0 == strcmp(table->name, name))
+			return table;
+	}
+
+	return NULL;
+}
 
 /******************************************************************************
  *                                                                            *
@@ -1077,9 +1094,6 @@ static int	housekeeping_cleanup(int config_max_hk_delete)
 	/* assemble list of tables included in the housekeeping procedure */
 	for (zbx_hk_cleanup_table_t *table = hk_cleanup_tables; NULL != table->name; table++)
 	{
-		if (ZBX_HK_MODE_REGULAR != *table->poption_mode)
-			continue;
-
 		char	*table_name_esc = zbx_db_dyn_escape_string(table->name);
 
 		zbx_chrcpy_alloc(&sql, &sql_alloc, &sql_offset, '\'');
@@ -1101,11 +1115,19 @@ static int	housekeeping_cleanup(int config_max_hk_delete)
 
 	while (NULL != (row = zbx_db_fetch(result)))
 	{
-		int		more = 0;
-		zbx_uint64_t	housekeeperid, objectid;
+		int			more = 0;
+		zbx_uint64_t		housekeeperid, objectid;
+		zbx_hk_cleanup_table_t	*table;
 
 		ZBX_STR2UINT64(housekeeperid, row[0]);
 		ZBX_STR2UINT64(objectid, row[3]);
+
+		if (NULL != (table = housekeeping_get_table_by_name(row[1])) &&
+				ZBX_HK_MODE_REGULAR != *table->poption_mode)
+		{
+			zbx_vector_uint64_append(&housekeeperids, housekeeperid);
+			continue;
+		}
 
 		if (0 == strcmp(row[1], "events")) /* events name is used for backwards compatibility with frontend */
 		{
@@ -1133,7 +1155,9 @@ static int	housekeeping_cleanup(int config_max_hk_delete)
 			}
 		}
 		else
+		{
 			deleted += hk_table_cleanup(row[1], row[2], objectid, config_max_hk_delete, &more);
+		}
 
 		if (0 == more)
 			zbx_vector_uint64_append(&housekeeperids, housekeeperid);
@@ -1430,6 +1454,39 @@ static int	get_housekeeping_period(double time_slept)
 		return (int)time_slept;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: disable housekeeping rules based on history provider capabilities *
+ *                                                                            *
+ ******************************************************************************/
+static void	housekeeping_disable_unsupported_types(void)
+{
+	zbx_uint64_t	hk_history = zbx_history_get_housekeep_flags();
+
+	for (int i = 0; i < ITEM_VALUE_TYPE_BIN; i++)
+	{
+		if (SUCCEED != ZBX_HISTORY_CHECK_TYPE_FLAGS(hk_history, i))
+		{
+			hk_history_rules[i].poption_mode = &poption_mode_disabled;
+			hk_cleanup_tables[i].poption_mode = &poption_mode_disabled;
+		}
+	}
+
+	zbx_uint64_t	hk_trends = zbx_history_get_trends_flags();
+
+	if (SUCCEED != ZBX_HISTORY_CHECK_TYPE_FLAGS(hk_trends, ITEM_VALUE_TYPE_FLOAT))
+	{
+		hk_history_rules[HK_UPDATE_CACHE_OFFSET_TREND_FLOAT].poption_mode = &poption_mode_disabled;
+		hk_cleanup_tables[HK_UPDATE_CACHE_OFFSET_TREND_FLOAT].poption_mode = &poption_mode_disabled;
+	}
+
+	if (SUCCEED != ZBX_HISTORY_CHECK_TYPE_FLAGS(hk_trends, ITEM_VALUE_TYPE_UINT64))
+	{
+		hk_history_rules[HK_UPDATE_CACHE_OFFSET_TREND_UINT].poption_mode = &poption_mode_disabled;
+		hk_cleanup_tables[HK_UPDATE_CACHE_OFFSET_TREND_UINT].poption_mode = &poption_mode_disabled;
+	}
+}
+
 ZBX_THREAD_ENTRY(housekeeper_thread, args)
 {
 	zbx_thread_housekeeper_args	*housekeeper_args_in = (zbx_thread_housekeeper_args *)
@@ -1481,6 +1538,8 @@ ZBX_THREAD_ENTRY(housekeeper_thread, args)
 		hk_tsdb_check_config();
 	}
 #endif
+
+	housekeeping_disable_unsupported_types();
 
 	while (ZBX_IS_RUNNING())
 	{

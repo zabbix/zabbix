@@ -42,8 +42,8 @@ const ZBX_STYLE_TEXTAREA_FLEXIBLE = <?= json_encode(ZBX_STYLE_TEXTAREA_FLEXIBLE)
 window.item_edit_form = new class {
 
 	init({
-		rules, actions, field_switches, form_data, host, interface_types, inherited_timeouts, readonly, testable_item_types,
-		type_with_key_select, value_type_keys, source, return_url
+		rules, actions, field_switches, form_data, host, interface_types, inherited_timeouts, readonly,
+		testable_item_types, type_with_key_select, value_type_keys, source, return_url, provider_value_types
 	}) {
 		this.actions = actions;
 		this.form_data = form_data;
@@ -58,6 +58,7 @@ window.item_edit_form = new class {
 		this.type_with_key_select = type_with_key_select;
 		this.value_type_keys = value_type_keys;
 		this.last_inferred_type = null;
+		this.provider_value_types = provider_value_types;
 
 		for (const type in interface_types) {
 			if (interface_types[type] == INTERFACE_TYPE_OPT) {
@@ -790,6 +791,13 @@ window.item_edit_form = new class {
 		this.field.history.toggleAttribute('disabled', disabled);
 		this.field.history.classList.toggle(ZBX_STYLE_DISPLAY_NONE, disabled);
 		this.label.history_hint?.classList.toggle(ZBX_STYLE_DISPLAY_NONE, disabled);
+
+		// check selected value type if external history providers are used
+		if (Array.isArray(this.provider_value_types) && !disabled) {
+			this.label.history_hint?.classList.toggle(ZBX_STYLE_DISPLAY_NONE,
+				!this.provider_value_types.includes(parseInt(this.field.value_type.value))
+			);
+		}
 	}
 
 	#updateTrendsModeVisibility() {

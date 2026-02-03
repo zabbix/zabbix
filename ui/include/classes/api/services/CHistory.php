@@ -29,6 +29,8 @@ class CHistory extends CApiService {
 	protected $tableAlias = 'h';
 	protected $sortColumns = ['itemid', 'clock', 'ns'];
 
+	private string $history_source = ZBX_HISTORY_SOURCE_SQL;
+
 	public function __construct() {
 		// considering the quirky nature of the history API,
 		// the parent::__construct() method should not be called.
@@ -143,9 +145,15 @@ class CHistory extends CApiService {
 
 		$this->tableName = CHistoryManager::getTableName($options['history']);
 
-		switch (CHistoryManager::getDataSourceType($options['history'])) {
+		$this->history_source = CHistoryManager::getDataSourceType($options['history']);
+
+		switch ($this->history_source) {
 			case ZBX_HISTORY_SOURCE_ELASTIC:
 				$result = $this->getFromElasticsearch($options);
+				break;
+
+			case ZBX_HISTORY_SOURCE_CLICKHOUSE:
+				$result = $this->getFromClickhouse($options);
 				break;
 
 			default:
@@ -304,6 +312,7 @@ class CHistory extends CApiService {
 			$query['size'] = $options['limit'];
 		}
 
+<<<<<<< HEAD
 		if ($options['history'] === ITEM_VALUE_TYPE_JSON && $options['maxValueSize'] !== null
 				&& in_array('value', $options['output']) && !$options['countOutput']) {
 			$query['_source'] = array_values(array_diff($options['output'], ['value']));
@@ -336,11 +345,97 @@ class CHistory extends CApiService {
 		}
 
 		$endpoints = CHistoryManager::getElasticsearchEndpoints($options['history']);
+=======
+		$endpoints = CHistoryManager::getElasticsearchEndpoints([$options['history']]);
+
+>>>>>>> feature/DEV-4427-7.5
 		if ($endpoints) {
 			return CElasticsearchHelper::query('POST', reset($endpoints), $query);
 		}
 
 		return null;
+	}
+
+	/**
+	 * Clickhouse specific implementation of get.
+	 *
+	 * @see CHistory::get
+	 */
+	private function getFromClickhouse($options) {
+		$endpoints = CHistoryManager::getClickhouseEndpoints([$options['history']]);
+
+		if (!$endpoints) {
+			return null;
+		}
+
+		$endpoint = reset($endpoints);
+
+		$sql_parts = [
+			'select'	=> ['history' => 'h.itemid'],
+			'from'		=> $this->tableName.' h',
+			'where'		=> [],
+			'group'		=> [],
+			'order'		=> []
+		];
+
+		if ($options['itemids'] !== null) {
+			$sql_parts['where']['itemid'] = dbConditionId('h.itemid', $options['itemids']);
+		}
+
+		if ($options['time_from'] !== null) {
+			$sql_parts['where']['clock_from'] = 'h.clock_ns>='.db_utc_to_datetime64($options['time_from']);
+		}
+
+		if ($options['time_till'] !== null) {
+			$sql_parts['where']['clock_till'] = 'h.clock_ns<='.db_utc_to_datetime64($options['time_till']);
+		}
+
+		if ($options['filter'] !== null) {
+			$this->dbFilter($sql_parts['from']['history'], $options, $sql_parts);
+		}
+
+		if ($options['search'] !== null) {
+			zbx_db_search($sql_parts['from']['history'], $options, $sql_parts);
+		}
+
+		if ($options['output'] === API_OUTPUT_EXTEND) {
+			$options['output'] = array_keys(DB::getSchema($this->tableName)['fields']);
+		}
+
+		$sql_parts = $this->applyQueryOutputOptions($this->tableName, $this->tableAlias(), $options, $sql_parts);
+		$sql_parts = $this->applyQuerySortOptions($this->tableName, $this->tableAlias(), $options, $sql_parts);
+
+		foreach ($sql_parts['select'] as &$field) {
+			$field = match ($field) {
+				'h.clock' => 'toUnixTimestamp(h.clock_ns) AS clock',
+				'h.ns' => 'toUnixTimestamp64Nano(h.clock_ns) % 1000000000 AS ns',
+				default => $field
+			};
+		}
+		unset($field);
+
+		$query = self::createSelectQueryFromParts($sql_parts);
+
+		// limit
+		if ($options['limit'] !== null) {
+			$query .= ' LIMIT '.$options['limit'];
+		}
+
+		return CClickhouseHelper::fetch($query,
+			$endpoint['endpoint'], $endpoint['username'], $endpoint['password']
+		);
+	}
+
+	protected function applyQuerySortField($sortfield, $sortorder, $alias, array $sqlParts) {
+		if ($this->history_source === ZBX_HISTORY_SOURCE_CLICKHOUSE) {
+			$sortfield = match ($sortfield) {
+				'clock',
+				'ns' => 'clock_ns',
+				default => $sortfield
+			};
+		}
+
+		return parent::applyQuerySortField($sortfield, $sortorder, $alias, $sqlParts);
 	}
 
 	/**

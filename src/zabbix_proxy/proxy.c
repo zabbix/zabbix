@@ -73,6 +73,7 @@
 #include "zbxstr.h"
 #include "zbxtime.h"
 #include "zbxbincommon.h"
+#include "zbxcurl.h"
 
 #ifdef HAVE_OPENIPMI
 #include "zbxipmi.h"
@@ -1177,7 +1178,7 @@ static void	zbx_on_exit(int ret, void *on_exit_args)
 	zbx_ipc_service_free_env();
 
 	zbx_db_connect(ZBX_DB_CONNECT_EXIT);
-	zbx_free_database_cache(ZBX_SYNC_ALL, &events_cbs, config_history_storage_pipelines);
+	zbx_free_database_cache(ZBX_SYNC_ALL, &events_cbs);
 	zbx_pb_flush();
 	zbx_pb_destroy();
 	zbx_free_configuration_cache();
@@ -1905,6 +1906,9 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		rtc_process_request_func = rtc_process_request_ex_proxy;
 
 	zbx_set_child_pids(zbx_threads, zbx_threads_num);
+
+	/* cleanup curl before forking to avoid issues with forked initialized state */
+	zbx_curl_cleanup();
 
 	for (i = 0; i < zbx_threads_num; i++)
 	{

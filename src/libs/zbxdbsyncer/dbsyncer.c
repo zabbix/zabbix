@@ -30,6 +30,7 @@
 #include "zbxipcservice.h"
 #include "zbxlog.h"
 #include "zbxhistory.h"
+#include "zbxcurl.h"
 
 static sigset_t			orig_mask;
 
@@ -175,8 +176,7 @@ ZBX_THREAD_ENTRY(zbx_dbsyncer_thread, args)
 		zbx_block_signals(&orig_mask);
 
 		zbx_prof_start(__func__, ZBX_PROF_PROCESSING);
-		zbx_sync_history_cache(dbsyncer_args->events_cbs, &rtc, dbsyncer_args->config_history_storage_pipelines,
-				&sync_stats);
+		zbx_sync_history_cache(dbsyncer_args->events_cbs, &rtc, &sync_stats);
 		zbx_prof_end();
 
 		if (!ZBX_IS_RUNNING() && SUCCEED != zbx_db_trigger_queue_locked())
@@ -297,8 +297,8 @@ ZBX_THREAD_ENTRY(zbx_dbsyncer_thread, args)
 		zbx_export_deinit(problems_export);
 
 	zbx_ipc_async_socket_close(&rtc);
-
 	zbx_free(stats);
+	zbx_curl_cleanup();
 
 	exit(EXIT_SUCCESS);
 #undef STAT_INTERVAL

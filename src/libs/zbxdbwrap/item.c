@@ -19,7 +19,6 @@
 #include "zbxdb.h"
 #include "zbxdbhigh.h"
 #include "zbxtime.h"
-#include "zbxcacheconfig.h"
 #include "zbxcalc.h"
 
 /******************************************************************************
@@ -177,3 +176,4 @@ int	zbx_db_item_value_type_changed_category(unsigned char value_type_new, unsign
 
 	return SUCCEED;
 }
+
