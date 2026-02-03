@@ -75,7 +75,7 @@ class CMenuPathValidatorTest extends TestCase {
 		}
 		else {
 			$this->assertFalse($result, sprintf('Path "%s" should be invalid', $path));
-			$this->assertEquals($this->validator->getError());
+			$this->assertEquals($this->validator->getError(), $error);
 		}
 	}
 }
