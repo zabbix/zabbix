@@ -320,9 +320,10 @@ class CHistory extends CApiService {
 						'source' => <<<'SCRIPT'
 							def string;
 							string = params._source.value.toString();
+							int string_length = string.codePointCount(0, string.length());
 
-							if (string.length() > params.len) {
-								return string.substring(0, params.len);
+							if (string_length > params.len) {
+								return string.substring(0, string.offsetByCodePoints(0, params.len));
 							} else {
 								return string;
 							}
