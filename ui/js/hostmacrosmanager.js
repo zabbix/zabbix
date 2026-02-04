@@ -217,7 +217,7 @@ class HostMacrosManager {
 						.trigger('change');
 					$('#macros_' + num + '_value', $row)
 						.val(original_value)
-						.prop(original_value_field_state)
+						.attr(original_value_field_state)
 						.trigger('input');
 					$('#macros_' + num + '_value', $row)
 						.closest('.macro-input-group')
@@ -225,7 +225,7 @@ class HostMacrosManager {
 						.hide();
 					$('#macros_' + num + '_description')
 						.val(original_descr)
-						.prop('readonly', true)
+						.attr('readonly', true)
 						.trigger('input');
 					$('#macros_' + num + '_type_button', $row).trigger('change');
 					$discovery.val(HostMacrosManager.DISCOVERY_STATE_AUTOMATIC);
@@ -233,13 +233,13 @@ class HostMacrosManager {
 				}
 				else {
 					$('#macros_' + num + '_value', $row)
-						.prop('readonly', false)
+						.attr('readonly', false)
 						.focus();
 					$('#macros_' + num + '_value_btn', $row).prop('disabled', false);
 					$('#macros_' + num + '_type_button', $row)
 						.prop('disabled', false)
 						.attr({'aria-haspopup': true});
-					$('#macros_' + num + '_description').prop('readonly', false);
+					$('#macros_' + num + '_description').attr('readonly', false);
 					$('#macros_' + num + '_type_button', $row).trigger('change');
 					$discovery.val(HostMacrosManager.DISCOVERY_STATE_CONVERTING);
 					$('#macros_' + num + '_change_state').text(t('Revert'));
