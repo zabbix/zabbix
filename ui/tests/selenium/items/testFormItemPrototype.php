@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -21,6 +21,8 @@ require_once __DIR__.'/../../../include/classes/api/services/CItemPrototype.php'
 require_once __DIR__.'/../behaviors/CMessageBehavior.php';
 
 use Facebook\WebDriver\WebDriverBy;
+use Facebook\WebDriver\Exception\ElementClickInterceptedException;
+use Facebook\WebDriver\Exception\NoSuchElementException;
 
 /**
  * Test the creation of inheritance of new objects on a previously linked template.
@@ -2262,8 +2264,16 @@ class testFormItemPrototype extends CLegacyWebTest {
 					$this->zbxTestInputTypeOverwrite('delay_flex_'.$itemCount.'_delay', $period['flexDelay']);
 				}
 				$itemCount ++;
-				// Unstable test on Jenkins - hoverMouse() required.
-				$form->getFieldContainer('Custom intervals')->query('button:Add')->one()->hoverMouse()->click();
+
+				$add = $form->getFieldContainer('Custom intervals')->query('button:Add')->one();
+				// TODO: sometimes inline validation error appears simultaneously and intercepts the "Add" button click.
+				try {
+					$add->click();
+					$this->query('id', 'delay_flex_'.$itemCount.'_delay')->one();
+				}
+				catch (NoSuchElementException | ElementClickInterceptedException $e) {
+					$add->click();
+				}
 
 				$this->assertTrue($this->query('id', 'delay_flex_'.$itemCount.'_delay')->waitUntilVisible()->one()->isValid());
 				$this->assertTrue($this->query('id', 'delay_flex_'.$itemCount.'_period')->waitUntilVisible()->one()->isValid());

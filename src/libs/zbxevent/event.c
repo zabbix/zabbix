@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -35,18 +35,6 @@ void	zbx_eventdata_free(zbx_eventdata_t *eventdata)
 	zbx_free(eventdata->host);
 	zbx_free(eventdata->severity);
 	zbx_free(eventdata->tags);
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: compare events to sort by highest severity and host name          *
- *                                                                            *
- ******************************************************************************/
-int	zbx_eventdata_compare(const zbx_eventdata_t *d1, const zbx_eventdata_t *d2)
-{
-	ZBX_RETURN_IF_NOT_EQUAL(d2->nseverity, d1->nseverity);
-
-	return strcmp(d1->host, d2->host);
 }
 
 /******************************************************************************
@@ -300,7 +288,7 @@ void	zbx_event_get_macro_value(const char *macro, const zbx_db_event *event, cha
 	}
 	else if (EVENT_SOURCE_TRIGGERS == event->source)
 	{
-		if (0 == strcmp(macro, MVAR_EVENT_ACK_HISTORY) || 0 == strcmp(macro, MVAR_EVENT_UPDATE_HISTORY))
+		if (0 == strcmp(macro, MVAR_EVENT_UPDATE_HISTORY))
 		{
 			zbx_event_db_get_history(event, replace_to, recipient_userid, tz);
 		}

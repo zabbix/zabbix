@@ -1815,6 +1815,11 @@ msgstr "至少必须启用一个参数。"
 msgid "At least one period must be added."
 msgstr "至少需要添加一个时间段。"
 
+#: app/controllers/CControllerConnectorCreate.php:44
+#: app/controllers/CControllerConnectorUpdate.php:45
+msgid "At least one type of information must be selected."
+msgstr ""
+
 #: app/controllers/CControllerPopupAcknowledgeCreate.php:283
 msgid "At least one update operation or message is mandatory"
 msgstr "至少需要选择一个更新操作或消息"
@@ -21443,6 +21448,11 @@ msgstr "标签显示顺序"
 msgid "Tag filter"
 msgstr "标签过滤器"
 
+#: app/controllers/CControllerConnectorCreate.php:120
+#: app/controllers/CControllerConnectorUpdate.php:121
+msgid "Tag filter name, operator and value combination is not unique."
+msgstr ""
+
 #: app/partials/trigger.edit.trigger.tab.php:253
 msgid "Tag for matching"
 msgstr "匹配标记"
@@ -26960,6 +26970,11 @@ msgstr "UTF-8中无效的字节排序"
 msgid "invalid data type"
 msgstr "无效的数据类型"
 
+#: include/classes/validators/CAbsoluteTimeValidator.php:45
+#: include/classes/validators/CAbsoluteTimeValidator.php:53
+msgid "invalid date"
+msgstr ""
+
 #: include/classes/graphdraw/CLineGraphDraw.php:140 include/items.inc.php:1805
 msgid "invalid delay"
 msgstr "无效延迟"
@@ -28358,6 +28373,11 @@ msgstr "值必须介于“%1$s”和“%2$s”之间"
 msgid "value must be between \"%1$s\" and \"%2$s\", and have no more than \"%3$s\" digits after the decimal point"
 msgstr "值必须在'%1$s'到'%2$s'之间，且小数点后不超过'%3$s'位"
 
+#: include/classes/validators/CTimeUnitValidator.php:84
+#, c-format
+msgid "value must be between %1$s and %2$s"
+msgstr ""
+
 #: include/classes/validators/CApiInputValidator.php:676
 msgid "value must be empty"
 msgstr "值必须为空"
@@ -28373,6 +28393,16 @@ msgstr[0] "值必须为空或 %1$s"
 #, c-format
 msgid "value must be greater than \"%1$s\""
 msgstr "值必须大于“%1$s”"
+
+#: include/classes/validators/CAbsoluteTimeValidator.php:59
+#, c-format
+msgid "value must be greater than or equal to %1$s"
+msgstr ""
+
+#: include/classes/validators/CAbsoluteTimeValidator.php:64
+#, c-format
+msgid "value must be less than or equal to %1$s"
+msgstr ""
 
 #: app/controllers/CControllerPopupItemTest.php:1342
 #: include/classes/validators/CNewValidator.php:220

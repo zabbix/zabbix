@@ -3,7 +3,3156 @@ zabbix_export:
   template_groups:
     - uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
       name: Templates/Applications
+  host_groups:
+    - uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
+      name: Applications
   templates:
+    - uuid: 60a07fefce4f424692fee42bf1f63bd0
+      template: 'GitHub organization by HTTP'
+      name: 'GitHub organization by HTTP'
+      description: |
+        This template is designed for the effortless deployment of GitHub organization monitoring by Zabbix via GitHub REST API and doesn't require any external scripts.
+        
+        For more details about GitHub REST API, refer to the official documentation:
+        https://docs.github.com/en/rest?apiVersion=2022-11-28
+        
+        Setup:
+        
+        1. Create an access token for monitoring
+        
+        One of the simplest ways to send authenticated requests is to use a personal access token - either a classic or a fine-grained one:
+        https://docs.github.com/en/rest/authentication/authenticating-to-the-rest-api?apiVersion=2022-11-28#authenticating-with-a-personal-access-token
+        
+        You can create a new classic personal access token by following the instructions in the official documentation:
+        https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens#creating-a-personal-access-token-classic
+        
+        Additional information about OAuth scopes is available in the official documentation:
+        https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/scopes-for-oauth-apps#available-scopes
+        
+        Note that authenticated users must have admin access to the repository and the "repo" scope must be set to get information about self-hosted runners:
+        https://docs.github.com/en/rest/actions/self-hosted-runners?apiVersion=2022-11-28#list-self-hosted-runners-for-a-repository
+        
+        In order gather "security" and "analysis" metrics for a repository the authenticated user must have admin permissions for the repository or be an owner or security manager for the organization that owns the repository:
+        https://docs.github.com/en/rest/repos/repos?apiVersion=2022-11-28#list-organization-repositories
+        
+        Fine-grained personal access token
+        
+        Alternatively, you can use a fine-grained personal access token:
+        https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens#creating-a-fine-grained-personal-access-token
+        
+        In order to use fine-grained tokens to monitor organization-owned repositories, organizations must opt in to fine-grained personal access tokens and set up a personal access token policy:
+        https://docs.github.com/en/organizations/managing-programmatic-access-to-your-organization/setting-a-personal-access-token-policy-for-your-organization
+        
+        The fine-grained token needs to have the following permissions set to provide access to the organization and repository resources:
+        - "Actions" repository permissions (read);
+        - "Administration" repository permissions (read);
+        - "Contents" repository permissions (read);
+        - "Issues" repository permissions (read);
+        - "Metadata" repository permissions (read);
+        - "Pull requests" repository permissions (read).
+        
+        2. Set the access token that you've created in step 1 in the "{$GITHUB.API.TOKEN}" macro
+        3. Change the API URL in the "{$GITHUB.API.URL}" macro if needed (for self-hosted installations)
+        4. Set the organization name in the "{$GITHUB.ORG.NAME}" macro
+        5. Set the Copilot monitoring flag to "1" in the "{$GITHUB.COPILOT.USED}" macro if you want to gather Copilot metrics
+        
+        Note that the Copilot Metrics API access policy must be enabled for the organization. Only organization owners and owners and billing managers of the parent enterprise can view Copilot metrics.
+        https://docs.github.com/en/rest/copilot/copilot-metrics?apiVersion=2022-11-28#get-copilot-metrics-for-an-organization
+        
+        OAuth app tokens and personal access tokens (classic) need either the "manage_billing:copilot", "read:org", or "read:enterprise" scopes to use this endpoint.
+        
+        The fine-grained token needs to have the following permissions set to provide access to Copilot metrics:
+        - "GitHub Copilot Business" organization permissions (read);
+        - "Administration" organization permissions (read).
+        
+        6. Set the LLD rule filters if needed
+        
+        Note: Update intervals and timeouts for script items can be changed individually via "{$GITHUB.INTERVAL}" and "{$GITHUB.TIMEOUT}" macros with context. Depending on the organization being monitored, it can be adjusted if needed (if you are exceeding rate limits, you can increase update intervals for some script items to stay within per hour request limits). But be aware that it may also affect the triggers (check whether the item is used in triggers and adjust thresholds and/or evaluation periods if needed).
+        
+        Generated by official Zabbix template tool "Templator"
+      wizard_ready: 'YES'
+      readme: |
+        ## Overview
+        
+        This template is designed for the effortless deployment of GitHub organization monitoring by Zabbix via GitHub REST API and doesn't require any external scripts.
+        
+        For more details about GitHub REST API, refer to the [official documentation](https://docs.github.com/en/rest?apiVersion=2022-11-28).
+        
+        ## Setup
+        
+        Additional information is available in the official documentation:
+        - [Regarding authentication](https://docs.github.com/en/rest/authentication/authenticating-to-the-rest-api?apiVersion=2022-11-28#about-authentication)
+        - [Rate limits for the REST API](https://docs.github.com/en/rest/using-the-rest-api/rate-limits-for-the-rest-api?apiVersion=2022-11-28)
+        
+        1. **Create an access token for monitoring**
+        
+        One of the simplest ways to send authenticated requests is to use a [personal access token](https://docs.github.com/en/rest/authentication/authenticating-to-the-rest-api?apiVersion=2022-11-28#authenticating-with-a-personal-access-token) - either a classic or a fine-grained one.
+        
+        **Classic personal access token**
+        
+        You can create a new classic personal access token by following the [instructions in the official documentation](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens#creating-a-personal-access-token-classic).
+        
+        Additional information about OAuth scopes is available in the [official documentation](https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/scopes-for-oauth-apps#available-scopes).
+        
+        Note that authenticated users must have admin access to the repository and the `repo` scope must be set to get information about [self-hosted runners](https://docs.github.com/en/rest/actions/self-hosted-runners?apiVersion=2022-11-28#list-self-hosted-runners-for-a-repository).
+        
+        In order to gather [`security` and `analysis` metrics](https://docs.github.com/en/rest/repos/repos?apiVersion=2022-11-28#list-organization-repositories) for a repository the authenticated user must have admin permissions for the repository or be an owner or security manager for the organization that owns the repository.
+        
+        **Fine-grained personal access token**
+        
+        Alternatively, you can use a [fine-grained personal access token](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens#creating-a-fine-grained-personal-access-token).
+        
+        In order to use fine-grained tokens to monitor organization-owned repositories, [organizations must opt in to fine-grained personal access tokens and set up a personal access token policy](https://docs.github.com/en/organizations/managing-programmatic-access-to-your-organization/setting-a-personal-access-token-policy-for-your-organization).
+        
+        The fine-grained token needs to have the following permissions set to provide access to the organization and repository resources:
+        - "Actions" repository permissions (read);
+        - "Administration" repository permissions (read);
+        - "Contents" repository permissions (read);
+        - "Issues" repository permissions (read);
+        - "Metadata" repository permissions (read);
+        - "Pull requests" repository permissions (read).
+        
+        2. **Set the access token** that you've created in step 1 in the `Access token` host wizard configuration field
+        3. **Change the API URL** in the `API URL` host wizard configuration field if needed (for self-hosted installations)
+        4. **Set the organization name** in the `Organization name` host wizard configuration field
+        5. **Set the Copilot monitoring flag** by selecting the `Copilot monitoring` host wizard configuration checkbox
+        
+        Note that the Copilot Metrics API access policy must be enabled for the organization. Only organization owners and owners and billing managers of the parent enterprise can [view Copilot metrics](https://docs.github.com/en/rest/copilot/copilot-metrics?apiVersion=2022-11-28#get-copilot-metrics-for-an-organization).
+        
+        OAuth app tokens and personal access tokens (classic) need either the `manage_billing:copilot`, `read:org`, or `read:enterprise` scopes to use this endpoint.
+        
+        The fine-grained token needs to have the following permissions set to provide access to Copilot metrics:
+        - "GitHub Copilot Business" organization permissions (read);
+        - "Administration" organization permissions (read).
+        
+        6. **Set the LLD rule filters** if needed:
+        - Filter repositories by name: `{$GITHUB.REPO.NAME.MATCHES}`, `{$GITHUB.REPO.NAME.NOT_MATCHES}`;
+        - Filter repositories by owner: `{$GITHUB.REPO.OWNER.MATCHES}`, `{$GITHUB.REPO.OWNER.NOT_MATCHES}`;
+        - Filter Copilot IDE's by name: `{$GITHUB.COPILOT.IDE.NAME.MATCHES}`, `{$GITHUB.COPILOT.IDE.NAME.NOT_MATCHES}`;
+        - Filter Copilot models by name: `{$GITHUB.COPILOT.MODEL.NAME.MATCHES}`, `{$GITHUB.COPILOT.MODEL.NAME.NOT_MATCHES}`;
+        - Filter Copilot programming languages by name: `{$GITHUB.COPILOT.LANG.NAME.MATCHES}`, `{$GITHUB.COPILOT.LANG.NAME.NOT_MATCHES}`.
+        
+        Note: Update intervals and timeouts for script items can be changed individually via `Data update interval` and `API timeout` host wizard configuration fields with context. Depending on the organization being monitored, it can be adjusted if needed (if you are exceeding rate limits, you can increase update intervals for some script items to stay within per hour request limits). But be aware that it may also affect the triggers (check whether the item is used in triggers and adjust thresholds and/or evaluation periods if needed).
+      vendor:
+        name: Zabbix
+        version: 8.0-1
+      groups:
+        - name: Templates/Applications
+      items:
+        - uuid: d3ebb4fa5d62435fb9566478774e3376
+          name: 'Copilot active users'
+          type: DEPENDENT
+          key: github.org.copilot.active_users
+          description: 'The number of users using Copilot.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.total_active_users
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: github.org.copilot.data_get
+          tags:
+            - tag: component
+              value: copilot
+        - uuid: 4d31b8157ca64ab581cfe641ce6c51cb
+          name: 'Get copilot billing'
+          type: SCRIPT
+          key: github.org.copilot.billing_get
+          delay: '{$GITHUB.INTERVAL:"get_copilot_billing"}'
+          history: '0'
+          value_type: TEXT
+          params: |
+            var github = {
+            	params: {},
+            
+            	setParams: function (params, required) {
+            		required = required || [];
+            		required.concat(['api_url', 'user_agent', 'api_version', 'pagination_required', 'api_token']).forEach(function (field) {
+            			if (typeof params !== 'object' || typeof params[field] === 'undefined'
+            				|| params[field] === '') {
+            				throw 'Required parameter is not set: "' + field + '".';
+            			}
+            		});
+            
+            		github.params = params;
+            
+            		if (typeof github.params.api_url === 'string' && !github.params.api_url.endsWith('/')) {
+            			github.params.api_url += '/';
+            		}
+            	},
+            
+            	apiRequest: function (url, pagination_required) {
+            		const next_pattern = /<([^>]+)>;\s*rel="next"/i;
+            		var request = new HttpRequest(),
+            			response,
+            			headers,
+            			final_data = {
+            				headers: {},
+            				data: []
+            			};
+            
+            		pagination_required = (typeof pagination_required !== 'undefined') ? pagination_required : 'true';
+            
+            		request.addHeader('User-Agent: ' + github.params.user_agent);
+            		request.addHeader('Accept: application/vnd.github+json');
+            		request.addHeader('X-GitHub-Api-Version: ' + github.params.api_version);
+            		request.addHeader('Authorization: Bearer ' + github.params.api_token);
+            
+            		if (typeof github.params.http_proxy !== 'undefined' && github.params.http_proxy !== '') {
+            			request.setProxy(github.params.http_proxy);
+            			Zabbix.log(4, '[ GitHub Repo ] Using HTTP proxy: ' + github.params.http_proxy);
+            		}
+            
+            		while (url) {
+            			Zabbix.log(4, '[ GitHub Repo ] Sending request: ' + url);
+            
+            			response = request.get(url);
+            
+            			Zabbix.log(4, '[ GitHub Repo ] Received response with status code ' + request.getStatus() + ': ' + response);
+            
+            			if (request.getStatus() < 200 || request.getStatus() >= 300) {
+            				throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
+            			}
+            
+            			try {
+            				response = JSON.parse(response);
+            			}
+            			catch (error) {
+            				throw 'Failed to parse response received from API. Check debug log for more information.';
+            			}
+            
+            			var parsed_data = github.parseData(response);
+            			final_data.data = final_data.data.concat(parsed_data);
+            
+            			headers = request.getHeaders();
+            
+            			url = ((headers.link || '').match(next_pattern) || [])[1];
+            
+            			if (pagination_required === 'false') {
+            				url = '';
+            			}
+            		}
+            
+            		final_data.headers = request.getHeaders();
+            
+            		delete request;
+            
+            		return final_data;
+            	},
+            
+            	parseData: function (response_data) {
+            		if (!response_data) {
+            			return [];
+            		}
+            
+            		const normalization_required = "total_count" in response_data && !("url" in response_data);
+            		if (!normalization_required) return response_data;
+            
+            		delete response_data.incomplete_results;
+            		delete response_data.repository_selection;
+            		delete response_data.total_count;
+            
+            		const namespaceKey = Object.keys(response_data)[0];
+            		response_data = response_data[namespaceKey];
+            
+            		return response_data;
+            	},
+            
+            	itemsCount: function (response_data) {
+            		const last_page_number = /<[^>]+page=(\d+)>;\s*rel="last"/i;
+            
+            		if (response_data.headers.link){
+            			return response_data.headers.link.match(last_page_number)[1];
+            		}
+            
+            		return response_data.data.length;
+            	}
+            }
+            
+            try {
+            	if ("{$GITHUB.COPILOT.USED}" !== "1") {
+            		return '{}';
+            	}
+            
+            	github.setParams(JSON.parse(value), ['org_name', 'api_query']);
+            
+            	var result = github.apiRequest(
+            		github.params.api_url + github.params.api_query + '?' +
+            		encodeURIComponent(github.params.query_params || ''),
+            		github.params.pagination_required
+            	);
+            
+            	return JSON.stringify(result);
+            }
+            catch (error) {
+            	error += (String(error).endsWith('.')) ? '' : '.';
+            	Zabbix.log(3, '[ GitHub Org ] ERROR: ' + error);
+            	return JSON.stringify({ error: error });
+            }
+          description: |
+            Get information about an organization's Copilot subscription, including seat breakdown and feature policies.
+            
+            Information about endpoint:
+            https://docs.github.com/en/rest/copilot/copilot-user-management?apiVersion=2022-11-28#get-copilot-seat-information-and-settings-for-an-organization
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$.data[0]'
+              error_handler: DISCARD_VALUE
+          timeout: '{$GITHUB.TIMEOUT:"get_copilot_billing"}'
+          parameters:
+            - name: api_query
+              value: 'orgs/{$GITHUB.ORG.NAME}/copilot/billing'
+            - name: api_token
+              value: '{$GITHUB.API.TOKEN}'
+            - name: api_url
+              value: '{$GITHUB.API.URL}'
+            - name: api_version
+              value: '{$GITHUB.API_VERSION}'
+            - name: http_proxy
+              value: '{$GITHUB.HTTP_PROXY}'
+            - name: org_name
+              value: '{$GITHUB.ORG.NAME}'
+            - name: pagination_required
+              value: 'false'
+            - name: user_agent
+              value: '{$GITHUB.USER_AGENT}'
+          tags:
+            - tag: component
+              value: raw
+        - uuid: 6e78386c2660473a8ff626e78bf99879
+          name: 'Get copilot billing check'
+          type: DEPENDENT
+          key: github.org.copilot.billing_get.check
+          value_type: TEXT
+          description: 'Data collection check.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.error
+              error_handler: CUSTOM_VALUE
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 3h
+          master_item:
+            key: github.org.copilot.billing_get
+          tags:
+            - tag: component
+              value: status
+        - uuid: 98aff12047c64eea82410d88104232bf
+          name: 'Get copilot data'
+          type: SCRIPT
+          key: github.org.copilot.data_get
+          delay: '{$GITHUB.INTERVAL:"get_copilot_data"}'
+          history: '0'
+          value_type: TEXT
+          params: |
+            var github = {
+            	params: {},
+            
+            	setParams: function (params, required) {
+            		required = required || [];
+            		required.concat(['api_url', 'user_agent', 'api_version', 'pagination_required', 'api_token']).forEach(function (field) {
+            			if (typeof params !== 'object' || typeof params[field] === 'undefined'
+            				|| params[field] === '') {
+            				throw 'Required parameter is not set: "' + field + '".';
+            			}
+            		});
+            
+            		github.params = params;
+            
+            		if (typeof github.params.api_url === 'string' && !github.params.api_url.endsWith('/')) {
+            			github.params.api_url += '/';
+            		}
+            	},
+            
+            	apiRequest: function (url, pagination_required) {
+            		const next_pattern = /<([^>]+)>;\s*rel="next"/i;
+            		var request = new HttpRequest(),
+            			response,
+            			headers,
+            			final_data = {
+            				headers: {},
+            				data: []
+            			};
+            
+            		pagination_required = (typeof pagination_required !== 'undefined') ? pagination_required : 'true';
+            
+            		request.addHeader('User-Agent: ' + github.params.user_agent);
+            		request.addHeader('Accept: application/vnd.github+json');
+            		request.addHeader('X-GitHub-Api-Version: ' + github.params.api_version);
+            		request.addHeader('Authorization: Bearer ' + github.params.api_token);
+            
+            		if (typeof github.params.http_proxy !== 'undefined' && github.params.http_proxy !== '') {
+            			request.setProxy(github.params.http_proxy);
+            			Zabbix.log(4, '[ GitHub Repo ] Using HTTP proxy: ' + github.params.http_proxy);
+            		}
+            
+            		while (url) {
+            			Zabbix.log(4, '[ GitHub Repo ] Sending request: ' + url);
+            
+            			response = request.get(url);
+            
+            			Zabbix.log(4, '[ GitHub Repo ] Received response with status code ' + request.getStatus() + ': ' + response);
+            
+            			if (request.getStatus() < 200 || request.getStatus() >= 300) {
+            				throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
+            			}
+            
+            			try {
+            				response = JSON.parse(response);
+            			}
+            			catch (error) {
+            				throw 'Failed to parse response received from API. Check debug log for more information.';
+            			}
+            
+            			var parsed_data = github.parseData(response);
+            			final_data.data = final_data.data.concat(parsed_data);
+            
+            			headers = request.getHeaders();
+            
+            			url = ((headers.link || '').match(next_pattern) || [])[1];
+            
+            			if (pagination_required === 'false') {
+            				url = '';
+            			}
+            		}
+            
+            		final_data.headers = request.getHeaders();
+            
+            		delete request;
+            
+            		return final_data;
+            	},
+            
+            	parseData: function (response_data) {
+            		if (!response_data) {
+            			return [];
+            		}
+            
+            		const normalization_required = "total_count" in response_data && !("url" in response_data);
+            		if (!normalization_required) return response_data;
+            
+            		delete response_data.incomplete_results;
+            		delete response_data.repository_selection;
+            		delete response_data.total_count;
+            
+            		const namespaceKey = Object.keys(response_data)[0];
+            		response_data = response_data[namespaceKey];
+            
+            		return response_data;
+            	},
+            
+            	itemsCount: function (response_data) {
+            		const last_page_number = /<[^>]+page=(\d+)>;\s*rel="last"/i;
+            
+            		if (response_data.headers.link){
+            			return response_data.headers.link.match(last_page_number)[1];
+            		}
+            
+            		return response_data.data.length;
+            	}
+            }
+            
+            try {
+            	if ("{$GITHUB.COPILOT.USED}" !== "1") {
+            		return '{}';
+            	}
+            
+            	var now = new Date(),
+            	since = new Date(now.getFullYear(), now.getMonth(), now.getDate()-1, 0).toISOString();
+            
+            	github.setParams(JSON.parse(value), ['org_name', 'api_query']);
+            
+            	var result = github.apiRequest(
+            		github.params.api_url + github.params.api_query +
+            		'?since=' + encodeURIComponent(since) + '&' + encodeURIComponent(github.params.query_params || ''),
+            		github.params.pagination_required
+            	);
+            
+            	return JSON.stringify(result);
+            }
+            catch (error) {
+            	error += (String(error).endsWith('.')) ? '' : '.';
+            	Zabbix.log(3, '[ GitHub Org ] ERROR: ' + error);
+            	return JSON.stringify({ error: error });
+            }
+          description: |
+            Get a breakdown of aggregated metrics for various GitHub Copilot features.
+            
+            Information about endpoint:
+            https://docs.github.com/en/rest/copilot/copilot-metrics?apiVersion=2022-11-28#get-copilot-metrics-for-an-organization
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$.data[0]'
+              error_handler: DISCARD_VALUE
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 3h
+          timeout: '{$GITHUB.TIMEOUT:"get_copilot_data"}'
+          parameters:
+            - name: api_query
+              value: 'orgs/{$GITHUB.ORG.NAME}/copilot/metrics'
+            - name: api_token
+              value: '{$GITHUB.API.TOKEN}'
+            - name: api_url
+              value: '{$GITHUB.API.URL}'
+            - name: api_version
+              value: '{$GITHUB.API_VERSION}'
+            - name: http_proxy
+              value: '{$GITHUB.HTTP_PROXY}'
+            - name: org_name
+              value: '{$GITHUB.ORG.NAME}'
+            - name: pagination_required
+              value: 'false'
+            - name: user_agent
+              value: '{$GITHUB.USER_AGENT}'
+          tags:
+            - tag: component
+              value: raw
+        - uuid: ab0c9861d5854e7ca4b195794d011e54
+          name: 'Get copilot data check'
+          type: DEPENDENT
+          key: github.org.copilot.data_get.check
+          value_type: TEXT
+          description: 'Data collection check.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.error
+              error_handler: CUSTOM_VALUE
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 3h
+          master_item:
+            key: github.org.copilot.data_get
+          tags:
+            - tag: component
+              value: status
+        - uuid: 23ff1cb8385c43648bb7ada9f9e11ef9
+          name: 'Copilot engaged users'
+          type: DEPENDENT
+          key: github.org.copilot.engaged_users
+          description: 'The number of engaged users using Copilot.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.total_engaged_users
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: github.org.copilot.data_get
+          tags:
+            - tag: component
+              value: copilot
+        - uuid: e243201e87f84077bbcf4f64ed8e406b
+          name: 'Copilot seats active'
+          type: DEPENDENT
+          key: github.org.copilot.seats_active_this_cycle
+          description: 'The number of Copilot seats active this cycle.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.seat_breakdown.active_this_cycle
+              error_handler: DISCARD_VALUE
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: github.org.copilot.billing_get
+          tags:
+            - tag: component
+              value: copilot
+        - uuid: df7255bf200145009c115c099e828f95
+          name: 'Copilot seats added'
+          type: DEPENDENT
+          key: github.org.copilot.seats_added_this_cycle
+          description: 'The number of Copilot seats added this cycle.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.seat_breakdown.added_this_cycle
+              error_handler: DISCARD_VALUE
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: github.org.copilot.billing_get
+          tags:
+            - tag: component
+              value: copilot
+        - uuid: 6ddb446edb194f22b7f3fbe96b118799
+          name: 'Copilot seats inactive'
+          type: DEPENDENT
+          key: github.org.copilot.seats_inactive_this_cycle
+          description: 'The number of Copilot seats inactive this cycle.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.seat_breakdown.inactive_this_cycle
+              error_handler: DISCARD_VALUE
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: github.org.copilot.billing_get
+          tags:
+            - tag: component
+              value: copilot
+        - uuid: 16f0e729b647439db5b2f0d125796e26
+          name: 'Copilot seats cancelled'
+          type: DEPENDENT
+          key: github.org.copilot.seats_pending_cancellation
+          description: 'The number of Copilot seats pending cancellation.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.seat_breakdown.pending_cancellation
+              error_handler: DISCARD_VALUE
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: github.org.copilot.billing_get
+          tags:
+            - tag: component
+              value: copilot
+        - uuid: 991bc24ef1dd4ac280afa8e2f4da83d3
+          name: 'Copilot seats invited'
+          type: DEPENDENT
+          key: github.org.copilot.seats_pending_invitation
+          description: 'The number of Copilot seats pending invitation.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.seat_breakdown.pending_invitation
+              error_handler: DISCARD_VALUE
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: github.org.copilot.billing_get
+          tags:
+            - tag: component
+              value: copilot
+        - uuid: 7fcbb017cbbd4103aa28c61d0e6f5a6d
+          name: 'Copilot seats total'
+          type: DEPENDENT
+          key: github.org.copilot.seats_total
+          description: 'The total number of Copilot seats.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.seat_breakdown.total
+              error_handler: DISCARD_VALUE
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: github.org.copilot.billing_get
+          tags:
+            - tag: component
+              value: copilot
+        - uuid: 6e07f15d731b49cfb926b394e5f5395e
+          name: 'Get repositories'
+          type: SCRIPT
+          key: github.org.repo.get
+          delay: '{$GITHUB.INTERVAL:"get_repo_list"}'
+          history: '0'
+          value_type: TEXT
+          params: |
+            var github = {
+            	params: {},
+            
+            	setParams: function (params, required) {
+            		required = required || [];
+            		required.concat(['api_url', 'user_agent', 'api_version', 'pagination_required', 'api_token']).forEach(function (field) {
+            			if (typeof params !== 'object' || typeof params[field] === 'undefined'
+            				|| params[field] === '') {
+            				throw 'Required parameter is not set: "' + field + '".';
+            			}
+            		});
+            
+            		github.params = params;
+            
+            		if (typeof github.params.api_url === 'string' && !github.params.api_url.endsWith('/')) {
+            			github.params.api_url += '/';
+            		}
+            	},
+            
+            	apiRequest: function (url, pagination_required) {
+            		const next_pattern = /<([^>]+)>;\s*rel="next"/i;
+            		var request = new HttpRequest(),
+            			response,
+            			headers,
+            			final_data = {
+            				headers: {},
+            				data: []
+            			};
+            
+            		pagination_required = (typeof pagination_required !== 'undefined') ? pagination_required : 'true';
+            
+            		request.addHeader('User-Agent: ' + github.params.user_agent);
+            		request.addHeader('Accept: application/vnd.github+json');
+            		request.addHeader('X-GitHub-Api-Version: ' + github.params.api_version);
+            		request.addHeader('Authorization: Bearer ' + github.params.api_token);
+            
+            		if (typeof github.params.http_proxy !== 'undefined' && github.params.http_proxy !== '') {
+            			request.setProxy(github.params.http_proxy);
+            			Zabbix.log(4, '[ GitHub Repo ] Using HTTP proxy: ' + github.params.http_proxy);
+            		}
+            
+            		while (url) {
+            			Zabbix.log(4, '[ GitHub Repo ] Sending request: ' + url);
+            
+            			response = request.get(url);
+            
+            			Zabbix.log(4, '[ GitHub Repo ] Received response with status code ' + request.getStatus() + ': ' + response);
+            
+            			if (request.getStatus() < 200 || request.getStatus() >= 300) {
+            				throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
+            			}
+            
+            			try {
+            				response = JSON.parse(response);
+            			}
+            			catch (error) {
+            				throw 'Failed to parse response received from API. Check debug log for more information.';
+            			}
+            
+            			var parsed_data = github.parseData(response);
+            			final_data.data = final_data.data.concat(parsed_data);
+            
+            			headers = request.getHeaders();
+            
+            			url = ((headers.link || '').match(next_pattern) || [])[1];
+            
+            			if (pagination_required === 'false') {
+            				url = '';
+            			}
+            		}
+            
+            		final_data.headers = request.getHeaders();
+            
+            		delete request;
+            
+            		return final_data;
+            	},
+            
+            	parseData: function (response_data) {
+            		if (!response_data) {
+            			return [];
+            		}
+            
+            		const normalization_required = "total_count" in response_data && !("url" in response_data);
+            		if (!normalization_required) return response_data;
+            
+            		delete response_data.incomplete_results;
+            		delete response_data.repository_selection;
+            		delete response_data.total_count;
+            
+            		const namespaceKey = Object.keys(response_data)[0];
+            		response_data = response_data[namespaceKey];
+            
+            		return response_data;
+            	},
+            
+            	itemsCount: function (response_data) {
+            		const last_page_number = /<[^>]+page=(\d+)>;\s*rel="last"/i;
+            
+            		if (response_data.headers.link){
+            			return response_data.headers.link.match(last_page_number)[1];
+            		}
+            
+            		return response_data.data.length;
+            	}
+            }
+            
+            try {
+            	github.setParams(JSON.parse(value), ['org_name', 'api_query']);
+            
+            	var result = github.apiRequest(
+            		github.params.api_url + github.params.api_query + '?' +
+            		encodeURIComponent(github.params.query_params || ''),
+            		github.params.pagination_required
+            	);
+            
+            	return JSON.stringify(result);
+            }
+            catch (error) {
+            	error += (String(error).endsWith('.')) ? '' : '.';
+            	Zabbix.log(3, '[ GitHub Org ] ERROR: ' + error);
+            	return JSON.stringify({ error: error });
+            }
+          description: |
+            Get a list of repositories for the `{$GITHUB.ORG.NAME}` organization.
+            
+            Information about endpoint:
+            https://docs.github.com/en/rest/repos/repos?apiVersion=2022-11-28#list-organization-repositories
+          preprocessing:
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 3h
+          timeout: '{$GITHUB.TIMEOUT:"get_repo_list"}'
+          parameters:
+            - name: api_query
+              value: 'orgs/{$GITHUB.ORG.NAME}/repos'
+            - name: api_token
+              value: '{$GITHUB.API.TOKEN}'
+            - name: api_url
+              value: '{$GITHUB.API.URL}'
+            - name: api_version
+              value: '{$GITHUB.API_VERSION}'
+            - name: http_proxy
+              value: '{$GITHUB.HTTP_PROXY}'
+            - name: org_name
+              value: '{$GITHUB.ORG.NAME}'
+            - name: pagination_required
+              value: 'false'
+            - name: user_agent
+              value: '{$GITHUB.USER_AGENT}'
+          tags:
+            - tag: component
+              value: raw
+        - uuid: 9030b4f40c04476eaf0071b462bc5d89
+          name: 'Get repositories check'
+          type: DEPENDENT
+          key: github.org.repo.get.check
+          value_type: TEXT
+          description: 'Data collection check.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.error
+              error_handler: CUSTOM_VALUE
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 3h
+          master_item:
+            key: github.org.repo.get
+          tags:
+            - tag: component
+              value: status
+        - uuid: c9140bb893f74681a03e8ccef35aa163
+          name: 'Number of repositories'
+          type: DEPENDENT
+          key: github.org.repo.number
+          description: 'The number of repositories in the organization.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.data.length()
+              error_handler: CUSTOM_VALUE
+              error_handler_params: '0'
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 3h
+          master_item:
+            key: github.org.repo.get
+          tags:
+            - tag: component
+              value: repository
+        - uuid: b8c59be2d3ea45f88a2450f9257734e6
+          name: 'Number of archived repositories'
+          type: DEPENDENT
+          key: github.org.repo.number_archived
+          description: 'The number of archived repositories in the organization.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$.data..[?(@.archived == "true")].length()'
+              error_handler: CUSTOM_VALUE
+              error_handler_params: '0'
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 3h
+          master_item:
+            key: github.org.repo.get
+          tags:
+            - tag: component
+              value: repository
+        - uuid: 46b39494159642488c246adfa8363874
+          name: 'Number of disabled repositories'
+          type: DEPENDENT
+          key: github.org.repo.number_disabled
+          description: 'The number of disabled repositories in the organization.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$.data..[?(@.disabled == "true")].length()'
+              error_handler: CUSTOM_VALUE
+              error_handler_params: '0'
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 3h
+          master_item:
+            key: github.org.repo.get
+          tags:
+            - tag: component
+              value: repository
+        - uuid: b708ebe06f4c4bd3ad156fc5909e8b18
+          name: 'Number of private repositories'
+          type: DEPENDENT
+          key: github.org.repo.number_private
+          description: 'The number of private repositories in the organization.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$.data..[?(@.private == "true")].length()'
+              error_handler: CUSTOM_VALUE
+              error_handler_params: '0'
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 3h
+          master_item:
+            key: github.org.repo.get
+          tags:
+            - tag: component
+              value: repository
+        - uuid: 66fc7d53caa747de8afbfe05ba752c57
+          name: 'Number of repository templates'
+          type: DEPENDENT
+          key: github.org.repo.number_templates
+          description: 'The number of repository templates in the organization.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$.data..[?(@.is_template == "true")].length()'
+              error_handler: CUSTOM_VALUE
+              error_handler_params: '0'
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 3h
+          master_item:
+            key: github.org.repo.get
+          tags:
+            - tag: component
+              value: repository
+        - uuid: ae4bd3ea08544a4686cbfd9bbc44c0ed
+          name: 'Open issue count'
+          type: DEPENDENT
+          key: github.org.repo.open_issues
+          description: 'The total number of issues opened in all repositories.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.data..open_issues_count.sum()
+              error_handler: CUSTOM_VALUE
+              error_handler_params: '0'
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 3h
+          master_item:
+            key: github.org.repo.get
+          tags:
+            - tag: component
+              value: repository
+        - uuid: 94fcf84d0fa3439c8063aea4d52c4c61
+          name: 'Total size of repositories'
+          type: DEPENDENT
+          key: github.org.repo.total_size
+          units: B
+          description: 'The total size of repositories in the organization.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.data..size.sum()
+              error_handler: CUSTOM_VALUE
+              error_handler_params: '0'
+            - type: MULTIPLIER
+              parameters:
+                - '1024'
+          master_item:
+            key: github.org.repo.get
+          tags:
+            - tag: component
+              value: repository
+      discovery_rules:
+        - uuid: 157c0a7632994459840c98e7cc32ef30
+          name: 'Copilot IDE code completion discovery'
+          type: DEPENDENT
+          key: github.org.copilot_completion.discovery
+          filter:
+            evaltype: AND
+            conditions:
+              - macro: '{#IDE_NAME}'
+                value: '{$GITHUB.COPILOT.IDE.NAME.MATCHES}'
+              - macro: '{#IDE_NAME}'
+                value: '{$GITHUB.COPILOT.IDE.NAME.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+          description: 'The discovery of Copilot IDE code completions.'
+          item_prototypes:
+            - uuid: 737abc88f0ca48b7a27dea0cdbad837d
+              name: 'IDE [{#IDE_NAME}]: Engaged users'
+              type: DEPENDENT
+              key: 'github.org.copilot_completion.engaged_users[{#IDE_NAME}]'
+              description: 'The number of engaged users using Copilot in `{#IDE_NAME}`.'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$.copilot_ide_code_completions.editors[?(@.name == ''{#IDE_NAME}'')].total_engaged_users.first()'
+                  error_handler: CUSTOM_VALUE
+                  error_handler_params: '0'
+              master_item:
+                key: github.org.copilot.data_get
+              tags:
+                - tag: component
+                  value: completion
+                - tag: component
+                  value: copilot
+                - tag: component
+                  value: ide
+                - tag: ide
+                  value: '{#IDE_NAME}'
+          master_item:
+            key: github.org.copilot.data_get
+          lld_macro_paths:
+            - lld_macro: '{#IDE_NAME}'
+              path: $.name
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.copilot_ide_code_completions.editors
+              error_handler: DISCARD_VALUE
+        - uuid: 7ebdc287c68e47cd86cd704f0795431d
+          name: '{#IDE_NAME} [{#MODEL_NAME}]: Language discovery'
+          type: DEPENDENT
+          key: 'github.org.copilot_completion_language.discovery[{#IDE_NAME},{#MODEL_NAME}]'
+          filter:
+            evaltype: AND
+            conditions:
+              - macro: '{#LANG_NAME}'
+                value: '{$GITHUB.COPILOT.LANG.NAME.MATCHES}'
+              - macro: '{#LANG_NAME}'
+                value: '{$GITHUB.COPILOT.LANG.NAME.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+          description: 'The discovery of programming languages used by the `{#MODEL_NAME}` model in the `{#IDE_NAME}` Copilot chat.'
+          item_prototypes:
+            - uuid: dc47aba6408041248f66ecf9890667f3
+              name: '{#IDE_NAME} [{#MODEL_NAME}/{#LANG_NAME}]: Acceptance rate'
+              type: CALCULATED
+              key: 'github.org.copilot_completion_language.acceptance_rate[{#IDE_NAME},{#MODEL_NAME},{#LANG_NAME}]'
+              value_type: FLOAT
+              units: '%'
+              params: 'last(//github.org.copilot_completion_language.code_acceptances[{#IDE_NAME},{#MODEL_NAME},{#LANG_NAME}])/last(//github.org.copilot_completion_language.code_suggestions[{#IDE_NAME},{#MODEL_NAME},{#LANG_NAME}])*100'
+              description: 'The percentage of code acceptances in `{#LANG_NAME}` for the Copilot `{#MODEL_NAME}` model in `{#IDE_NAME}`.'
+              preprocessing:
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              tags:
+                - tag: component
+                  value: copilot
+                - tag: component
+                  value: ide
+                - tag: ide
+                  value: '{#IDE_NAME}'
+                - tag: language
+                  value: '{#LANG_NAME}'
+                - tag: model
+                  value: '{#MODEL_NAME}'
+            - uuid: 5c26002f73b34c4ea55d60f1c821fa0a
+              name: '{#IDE_NAME} [{#MODEL_NAME}/{#LANG_NAME}]: Code acceptances'
+              type: DEPENDENT
+              key: 'github.org.copilot_completion_language.code_acceptances[{#IDE_NAME},{#MODEL_NAME},{#LANG_NAME}]'
+              description: 'The number of code acceptances in `{#LANG_NAME}` by users for suggestions provided by the Copilot `{#MODEL_NAME}` model in `{#IDE_NAME}`.'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$.copilot_ide_code_completions.editors[?(@.name == ''{#IDE_NAME}'')].models[?(@.name == ''{#MODEL_NAME}'')].languages[?(@.name == ''{#LANG_NAME}'')].total_code_acceptances.first()'
+              master_item:
+                key: github.org.copilot.data_get
+              tags:
+                - tag: component
+                  value: copilot
+                - tag: component
+                  value: ide
+                - tag: ide
+                  value: '{#IDE_NAME}'
+                - tag: language
+                  value: '{#LANG_NAME}'
+                - tag: model
+                  value: '{#MODEL_NAME}'
+            - uuid: 206200b8b1544c1c87b7b2712898ce3a
+              name: '{#IDE_NAME} [{#MODEL_NAME}/{#LANG_NAME}]: Code suggestions'
+              type: DEPENDENT
+              key: 'github.org.copilot_completion_language.code_suggestions[{#IDE_NAME},{#MODEL_NAME},{#LANG_NAME}]'
+              description: 'The number of code suggestions in `{#LANG_NAME}` provided by the Copilot `{#MODEL_NAME}` model in `{#IDE_NAME}`.'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$.copilot_ide_code_completions.editors[?(@.name == ''{#IDE_NAME}'')].models[?(@.name == ''{#MODEL_NAME}'')].languages[?(@.name == ''{#LANG_NAME}'')].total_code_suggestions.first()'
+              master_item:
+                key: github.org.copilot.data_get
+              tags:
+                - tag: component
+                  value: copilot
+                - tag: component
+                  value: ide
+                - tag: ide
+                  value: '{#IDE_NAME}'
+                - tag: language
+                  value: '{#LANG_NAME}'
+                - tag: model
+                  value: '{#MODEL_NAME}'
+            - uuid: 7f1f8c11f272439ab6556cb9225c27fb
+              name: '{#IDE_NAME} [{#MODEL_NAME}/{#LANG_NAME}]: Engaged users'
+              type: DEPENDENT
+              key: 'github.org.copilot_completion_language.engaged_users[{#IDE_NAME},{#MODEL_NAME},{#LANG_NAME}]'
+              description: 'The number of engaged users using the Copilot `{#MODEL_NAME}` model in `{#IDE_NAME}` for code in `{#LANG_NAME}`.'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$.copilot_ide_code_completions.editors[?(@.name == ''{#IDE_NAME}'')].models[?(@.name == ''{#MODEL_NAME}'')].languages[?(@.name == ''{#LANG_NAME}'')].total_engaged_users.first()'
+                  error_handler: CUSTOM_VALUE
+                  error_handler_params: '0'
+              master_item:
+                key: github.org.copilot.data_get
+              tags:
+                - tag: component
+                  value: copilot
+                - tag: component
+                  value: ide
+                - tag: ide
+                  value: '{#IDE_NAME}'
+                - tag: language
+                  value: '{#LANG_NAME}'
+                - tag: model
+                  value: '{#MODEL_NAME}'
+            - uuid: 3df0e2bfff964275b105802bce9ba0f4
+              name: '{#IDE_NAME} [{#MODEL_NAME}/{#LANG_NAME}]: Total code lines accepted'
+              type: DEPENDENT
+              key: 'github.org.copilot_completion_language.lines_accepted[{#IDE_NAME},{#MODEL_NAME},{#LANG_NAME}]'
+              description: 'The total number of code lines in `{#LANG_NAME}` suggested by the Copilot `{#MODEL_NAME}` model in `{#IDE_NAME}` and accepted by users.'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$.copilot_ide_code_completions.editors[?(@.name == ''{#IDE_NAME}'')].models[?(@.name == ''{#MODEL_NAME}'')].languages[?(@.name == ''{#LANG_NAME}'')].total_code_lines_accepted.first()'
+              master_item:
+                key: github.org.copilot.data_get
+              tags:
+                - tag: component
+                  value: copilot
+                - tag: component
+                  value: ide
+                - tag: ide
+                  value: '{#IDE_NAME}'
+                - tag: language
+                  value: '{#LANG_NAME}'
+                - tag: model
+                  value: '{#MODEL_NAME}'
+            - uuid: 5109e502ef0145f480b6d2e07192eabc
+              name: '{#IDE_NAME} [{#MODEL_NAME}/{#LANG_NAME}]: Total code lines suggested'
+              type: DEPENDENT
+              key: 'github.org.copilot_completion_language.lines_suggested[{#IDE_NAME},{#MODEL_NAME},{#LANG_NAME}]'
+              description: 'The total number of code lines in `{#LANG_NAME}` suggested by the Copilot `{#MODEL_NAME}` model in `{#IDE_NAME}`.'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$.copilot_ide_code_completions.editors[?(@.name == ''{#IDE_NAME}'')].models[?(@.name == ''{#MODEL_NAME}'')].languages[?(@.name == ''{#LANG_NAME}'')].total_code_lines_suggested.first()'
+              master_item:
+                key: github.org.copilot.data_get
+              tags:
+                - tag: component
+                  value: copilot
+                - tag: component
+                  value: ide
+                - tag: ide
+                  value: '{#IDE_NAME}'
+                - tag: language
+                  value: '{#LANG_NAME}'
+                - tag: model
+                  value: '{#MODEL_NAME}'
+            - uuid: 427e0d382af24227af462f893f6d5285
+              name: '{#IDE_NAME} [{#MODEL_NAME}/{#LANG_NAME}]: Line acceptance rate'
+              type: CALCULATED
+              key: 'github.org.copilot_completion_language.line_acceptance_rate[{#IDE_NAME},{#MODEL_NAME},{#LANG_NAME}]'
+              value_type: FLOAT
+              units: '%'
+              params: 'last(//github.org.copilot_completion_language.lines_accepted[{#IDE_NAME},{#MODEL_NAME},{#LANG_NAME}])/last(//github.org.copilot_completion_language.lines_suggested[{#IDE_NAME},{#MODEL_NAME},{#LANG_NAME}])*100'
+              description: 'The percentage of code lines accepted in `{#LANG_NAME}` for the Copilot `{#MODEL_NAME}` model in `{#IDE_NAME}`.'
+              preprocessing:
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              tags:
+                - tag: component
+                  value: copilot
+                - tag: component
+                  value: ide
+                - tag: ide
+                  value: '{#IDE_NAME}'
+                - tag: language
+                  value: '{#LANG_NAME}'
+                - tag: model
+                  value: '{#MODEL_NAME}'
+          graph_prototypes:
+            - uuid: a741d88a2aa04715b9e3cfbc58266e6b
+              name: '{#IDE_NAME} [{#MODEL_NAME}/{#LANG_NAME}]: Code acceptances'
+              graph_items:
+                - color: 199C0D
+                  yaxisside: RIGHT
+                  item:
+                    host: 'GitHub organization by HTTP'
+                    key: 'github.org.copilot_completion_language.code_acceptances[{#IDE_NAME},{#MODEL_NAME},{#LANG_NAME}]'
+                - sortorder: '1'
+                  color: F63100
+                  item:
+                    host: 'GitHub organization by HTTP'
+                    key: 'github.org.copilot_completion_language.lines_accepted[{#IDE_NAME},{#MODEL_NAME},{#LANG_NAME}]'
+            - uuid: 6ddad3d69edf4fddbae6433b3840c91d
+              name: '{#IDE_NAME} [{#MODEL_NAME}/{#LANG_NAME}]: Code suggestions'
+              graph_items:
+                - color: 199C0D
+                  yaxisside: RIGHT
+                  item:
+                    host: 'GitHub organization by HTTP'
+                    key: 'github.org.copilot_completion_language.code_suggestions[{#IDE_NAME},{#MODEL_NAME},{#LANG_NAME}]'
+                - sortorder: '1'
+                  color: F63100
+                  item:
+                    host: 'GitHub organization by HTTP'
+                    key: 'github.org.copilot_completion_language.lines_suggested[{#IDE_NAME},{#MODEL_NAME},{#LANG_NAME}]'
+          parent_discovery_rule:
+            key: 'github.org.copilot_completion_model.discovery[{#IDE_NAME}]'
+          master_item:
+            key: github.org.copilot.data_get
+          lld_macro_paths:
+            - lld_macro: '{#LANG_NAME}'
+              path: $.name
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$.copilot_ide_code_completions.editors[?(@.name == ''{#IDE_NAME}'')].models[?(@.name == ''{#MODEL_NAME}'')].languages.first()'
+              error_handler: DISCARD_VALUE
+        - uuid: f8ef4833542b49aeb783a64b2b948b9f
+          name: 'IDE [{#IDE_NAME}]: Model discovery'
+          type: DEPENDENT
+          key: 'github.org.copilot_completion_model.discovery[{#IDE_NAME}]'
+          filter:
+            evaltype: AND
+            conditions:
+              - macro: '{#MODEL_NAME}'
+                value: '{$GITHUB.COPILOT.MODEL.NAME.MATCHES}'
+              - macro: '{#MODEL_NAME}'
+                value: '{$GITHUB.COPILOT.MODEL.NAME.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+          description: 'The discovery of models used in the `{#IDE_NAME}` Copilot chat.'
+          item_prototypes:
+            - uuid: b5f214a4e25c457c8c0b08b35c1af048
+              name: '{#IDE_NAME} [{#MODEL_NAME}]: Engaged users'
+              type: DEPENDENT
+              key: 'github.org.copilot_completion_model.engaged_users[{#IDE_NAME},{#MODEL_NAME}]'
+              description: 'The number of engaged users using the Copilot `{#MODEL_NAME}` model in `{#IDE_NAME}`.'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$.copilot_ide_code_completions.editors[?(@.name == ''{#IDE_NAME}'')].models[?(@.name == ''{#MODEL_NAME}'')].total_engaged_users.first()'
+                  error_handler: CUSTOM_VALUE
+                  error_handler_params: '0'
+              master_item:
+                key: github.org.copilot.data_get
+              tags:
+                - tag: component
+                  value: copilot
+                - tag: component
+                  value: ide
+                - tag: ide
+                  value: '{#IDE_NAME}'
+                - tag: model
+                  value: '{#MODEL_NAME}'
+          parent_discovery_rule:
+            key: github.org.copilot_completion.discovery
+          master_item:
+            key: github.org.copilot.data_get
+          lld_macro_paths:
+            - lld_macro: '{#CUSTOM_FLAG}'
+              path: $.is_custom_model
+            - lld_macro: '{#MODEL_NAME}'
+              path: $.name
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$.copilot_ide_code_completions.editors[?(@.name == ''{#IDE_NAME}'')].models.first()'
+              error_handler: DISCARD_VALUE
+        - uuid: 3ffabd46a6124d91963a6e9cdb653719
+          name: 'Copilot IDE chat discovery'
+          type: DEPENDENT
+          key: github.org.copilot_ide_chat.discovery
+          filter:
+            evaltype: AND
+            conditions:
+              - macro: '{#IDE_NAME}'
+                value: '{$GITHUB.COPILOT.IDE.NAME.MATCHES}'
+              - macro: '{#IDE_NAME}'
+                value: '{$GITHUB.COPILOT.IDE.NAME.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+          description: 'The discovery of Copilot IDE chats.'
+          item_prototypes:
+            - uuid: cb6e480e86f44e37b568e80ebbfe39c2
+              name: 'IDE [{#IDE_NAME}]: Engaged users'
+              type: DEPENDENT
+              key: 'github.org.copilot_ide_chat.engaged_users[{#IDE_NAME}]'
+              description: 'The number of engaged users using Copilot in `{#IDE_NAME}`.'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$.copilot_ide_chat.editors[?(@.name == ''{#IDE_NAME}'')].total_engaged_users.first()'
+                  error_handler: CUSTOM_VALUE
+                  error_handler_params: '0'
+              master_item:
+                key: github.org.copilot.data_get
+              tags:
+                - tag: component
+                  value: copilot
+                - tag: component
+                  value: ide
+                - tag: ide
+                  value: '{#IDE_NAME}'
+          master_item:
+            key: github.org.copilot.data_get
+          lld_macro_paths:
+            - lld_macro: '{#IDE_NAME}'
+              path: $.name
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.copilot_ide_chat.editors
+              error_handler: DISCARD_VALUE
+        - uuid: faee4e47d8f8499ebf88ab7b2e6abc68
+          name: 'Copilot IDE code language discovery'
+          type: DEPENDENT
+          key: github.org.copilot_ide_lang.discovery
+          filter:
+            evaltype: AND
+            conditions:
+              - macro: '{#LANG_NAME}'
+                value: '{$GITHUB.COPILOT.LANG.NAME.MATCHES}'
+              - macro: '{#LANG_NAME}'
+                value: '{$GITHUB.COPILOT.LANG.NAME.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+          description: 'The discovery of Copilot IDE code completion languages.'
+          item_prototypes:
+            - uuid: 7542e8d51e6346d790ae5fc82ff6ac3f
+              name: 'Language [{#LANG_NAME}]: Engaged users'
+              type: DEPENDENT
+              key: 'github.org.copilot_ide_lang.engaged_users[{#LANG_NAME}]'
+              description: 'The number of engaged users working with code in `{#LANG_NAME}`.'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$.copilot_ide_code_completions.languages[?(@.name == ''{#LANG_NAME}'')].total_engaged_users.first()'
+                  error_handler: CUSTOM_VALUE
+                  error_handler_params: '0'
+              master_item:
+                key: github.org.copilot.data_get
+              tags:
+                - tag: component
+                  value: copilot
+                - tag: component
+                  value: ide
+                - tag: language
+                  value: '{#LANG_NAME}'
+          master_item:
+            key: github.org.copilot.data_get
+          lld_macro_paths:
+            - lld_macro: '{#LANG_NAME}'
+              path: $.name
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.copilot_ide_code_completions.languages
+              error_handler: DISCARD_VALUE
+        - uuid: bb6fd5b269cd4943a4d76ec3806c0cc2
+          name: 'IDE [{#IDE_NAME}]: Model discovery'
+          type: DEPENDENT
+          key: 'github.org.copilot_ide_model.discovery[{#IDE_NAME}]'
+          filter:
+            evaltype: AND
+            conditions:
+              - macro: '{#MODEL_NAME}'
+                value: '{$GITHUB.COPILOT.MODEL.NAME.MATCHES}'
+              - macro: '{#MODEL_NAME}'
+                value: '{$GITHUB.COPILOT.MODEL.NAME.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+          description: 'The discovery of models used in the `{#IDE_NAME}` Copilot chat.'
+          item_prototypes:
+            - uuid: f78fda8346ff4dbb8e777d87b570fad3
+              name: 'IDE [{#IDE_NAME}/{#MODEL_NAME}]: Chat copy events'
+              type: DEPENDENT
+              key: 'github.org.copilot_ide_model.chat_copy_events[{#IDE_NAME},{#MODEL_NAME}]'
+              description: 'The number of Copilot chat copy events caused by the `{#MODEL_NAME}` model in `{#IDE_NAME}`.'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$.copilot_ide_chat.editors[?(@.name == ''{#IDE_NAME}'')].models[?(@.name == ''{#MODEL_NAME}'')].total_chat_copy_events.first()'
+              master_item:
+                key: github.org.copilot.data_get
+              tags:
+                - tag: component
+                  value: copilot
+                - tag: component
+                  value: ide
+                - tag: ide
+                  value: '{#IDE_NAME}'
+                - tag: model
+                  value: '{#MODEL_NAME}'
+            - uuid: 836f8aec7f9f4c4ea522b75050c5a477
+              name: 'IDE [{#IDE_NAME}/{#MODEL_NAME}]: Chat insertion events'
+              type: DEPENDENT
+              key: 'github.org.copilot_ide_model.chat_insertion_events[{#IDE_NAME},{#MODEL_NAME}]'
+              description: 'The number of Copilot chat insertion events caused by the `{#MODEL_NAME}` model in `{#IDE_NAME}`.'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$.copilot_ide_chat.editors[?(@.name == ''{#IDE_NAME}'')].models[?(@.name == ''{#MODEL_NAME}'')].total_chat_insertion_events.first()'
+              master_item:
+                key: github.org.copilot.data_get
+              tags:
+                - tag: component
+                  value: copilot
+                - tag: ide
+                  value: '{#IDE_NAME}'
+                - tag: model
+                  value: '{#MODEL_NAME}'
+            - uuid: 41275d39931b4474b8d846574e10cad2
+              name: 'IDE [{#IDE_NAME}/{#MODEL_NAME}]: Engaged users'
+              type: DEPENDENT
+              key: 'github.org.copilot_ide_model.engaged_users[{#IDE_NAME},{#MODEL_NAME}]'
+              description: 'The number of engaged users using the Copilot `{#MODEL_NAME}` model in `{#IDE_NAME}`.'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$.copilot_ide_chat.editors[?(@.name == ''{#IDE_NAME}'')].models[?(@.name == ''{#MODEL_NAME}'')].total_engaged_users.first()'
+                  error_handler: CUSTOM_VALUE
+                  error_handler_params: '0'
+              master_item:
+                key: github.org.copilot.data_get
+              tags:
+                - tag: component
+                  value: copilot
+                - tag: component
+                  value: ide
+                - tag: ide
+                  value: '{#IDE_NAME}'
+                - tag: model
+                  value: '{#MODEL_NAME}'
+            - uuid: 22fe53f010e04010b3279c4335546282
+              name: 'IDE [{#IDE_NAME}/{#MODEL_NAME}]: Total chats'
+              type: DEPENDENT
+              key: 'github.org.copilot_ide_model.total_chats[{#IDE_NAME},{#MODEL_NAME}]'
+              description: 'The number of Copilot chats with the `{#MODEL_NAME}` model in `{#IDE_NAME}`.'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$.copilot_ide_chat.editors[?(@.name == ''{#IDE_NAME}'')].models[?(@.name == ''{#MODEL_NAME}'')].total_chats.first()'
+              master_item:
+                key: github.org.copilot.data_get
+              tags:
+                - tag: component
+                  value: copilot
+                - tag: ide
+                  value: '{#IDE_NAME}'
+                - tag: model
+                  value: '{#MODEL_NAME}'
+          graph_prototypes:
+            - uuid: b3ec6982c2a841e0a57b18f4825a087d
+              name: 'IDE [{#IDE_NAME}/{#MODEL_NAME}]: Chat events'
+              graph_items:
+                - color: 199C0D
+                  item:
+                    host: 'GitHub organization by HTTP'
+                    key: 'github.org.copilot_ide_model.chat_copy_events[{#IDE_NAME},{#MODEL_NAME}]'
+                - sortorder: '1'
+                  color: F63100
+                  item:
+                    host: 'GitHub organization by HTTP'
+                    key: 'github.org.copilot_ide_model.chat_insertion_events[{#IDE_NAME},{#MODEL_NAME}]'
+            - uuid: b92878c57c4747a894dd670fddb8f935
+              name: 'IDE [{#IDE_NAME}/{#MODEL_NAME}]: Total chats'
+              graph_items:
+                - color: 199C0D
+                  item:
+                    host: 'GitHub organization by HTTP'
+                    key: 'github.org.copilot_ide_model.total_chats[{#IDE_NAME},{#MODEL_NAME}]'
+          parent_discovery_rule:
+            key: github.org.copilot_ide_chat.discovery
+          master_item:
+            key: github.org.copilot.data_get
+          lld_macro_paths:
+            - lld_macro: '{#CUSTOM_FLAG}'
+              path: $.is_custom_model
+            - lld_macro: '{#MODEL_NAME}'
+              path: $.name
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$.copilot_ide_chat.editors[?(@.name == ''{#IDE_NAME}'')].models.first()'
+              error_handler: DISCARD_VALUE
+        - uuid: a670dff6564749ef9587f74ee51306ef
+          name: 'Repo [{#REPO_NAME}]: Model discovery'
+          type: DEPENDENT
+          key: 'github.org.copilot_pr_model.discovery[{#REPO_NAME}]'
+          filter:
+            evaltype: AND
+            conditions:
+              - macro: '{#MODEL_NAME}'
+                value: '{$GITHUB.COPILOT.MODEL.NAME.MATCHES}'
+              - macro: '{#MODEL_NAME}'
+                value: '{$GITHUB.COPILOT.MODEL.NAME.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+          description: 'The discovery of models used for work with PRs.'
+          item_prototypes:
+            - uuid: aaafd6b0a5cb4e40b78fa7ea8ddccaeb
+              name: '{#REPO_NAME} [{#MODEL_NAME}]: Engaged users'
+              type: DEPENDENT
+              key: 'github.org.copilot_pr_model.engaged_users[{#REPO_NAME},{#MODEL_NAME}]'
+              description: 'The number of engaged users using the Copilot `{#MODEL_NAME}` model for work with PRs.'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$.copilot_dotcom_pull_requests.repositories[?(@.name == ''{#REPO_NAME}'')].models[?(@.name == ''{#MODEL_NAME}'')].total_engaged_users.first()'
+                  error_handler: CUSTOM_VALUE
+                  error_handler_params: '0'
+              master_item:
+                key: github.org.copilot.data_get
+              tags:
+                - tag: component
+                  value: copilot
+                - tag: component
+                  value: pull-requests
+                - tag: model
+                  value: '{#MODEL_NAME}'
+                - tag: repository
+                  value: '{#REPO_NAME}'
+            - uuid: 5f4e0692600140908b3dc7383ab3c2b1
+              name: '{#REPO_NAME} [{#MODEL_NAME}]: PR summaries created'
+              type: DEPENDENT
+              key: 'github.org.copilot_pr_model.summaries_created[{#REPO_NAME},{#MODEL_NAME}]'
+              description: 'The number of PR summaries created by the Copilot `{#MODEL_NAME}` model.'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$.copilot_dotcom_pull_requests.repositories[?(@.name == ''{#REPO_NAME}'')].models[?(@.name == ''{#MODEL_NAME}'')].total_pr_summaries_created.first()'
+              master_item:
+                key: github.org.copilot.data_get
+              tags:
+                - tag: component
+                  value: copilot
+                - tag: component
+                  value: pull-requests
+                - tag: model
+                  value: '{#MODEL_NAME}'
+                - tag: repository
+                  value: '{#REPO_NAME}'
+          parent_discovery_rule:
+            key: github.org.copilot_pull_request.discovery
+          master_item:
+            key: github.org.copilot.data_get
+          lld_macro_paths:
+            - lld_macro: '{#CUSTOM_FLAG}'
+              path: $.is_custom_model
+            - lld_macro: '{#MODEL_NAME}'
+              path: $.name
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$.copilot_dotcom_pull_requests.repositories[?(@.name == ''{#REPO_NAME}'')].models.first()'
+              error_handler: DISCARD_VALUE
+        - uuid: e0e6134cdeab4e3b9a76e1c2a2c05f13
+          name: 'Copilot.com PR discovery'
+          type: DEPENDENT
+          key: github.org.copilot_pull_request.discovery
+          description: 'The discovery of pull requests on copilot.com.'
+          item_prototypes:
+            - uuid: a83115163f534e93b78de162e928daa6
+              name: 'Repo [{#REPO_NAME}]: Engaged users'
+              type: DEPENDENT
+              key: 'github.org.copilot_pull_request.engaged_users[{#REPO_NAME}]'
+              description: 'The number of engaged users working with PRs on copilot.com.'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$.copilot_dotcom_pull_requests.repositories[?(@.name == ''{#REPO_NAME}'')].total_engaged_users.first()'
+                  error_handler: CUSTOM_VALUE
+                  error_handler_params: '0'
+              master_item:
+                key: github.org.copilot.data_get
+              tags:
+                - tag: component
+                  value: copilot
+                - tag: component
+                  value: pull-requests
+                - tag: repository
+                  value: '{#REPO_NAME}'
+          master_item:
+            key: github.org.copilot.data_get
+          lld_macro_paths:
+            - lld_macro: '{#REPO_NAME}'
+              path: $.name
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.copilot_dotcom_pull_requests.repositories
+              error_handler: DISCARD_VALUE
+        - uuid: e0e0c5d3e70641638a02cfc267338d5e
+          name: 'Copilot.com chat model discovery'
+          type: DEPENDENT
+          key: github.org.copilot_web_chat.discovery
+          filter:
+            evaltype: AND
+            conditions:
+              - macro: '{#MODEL_NAME}'
+                value: '{$GITHUB.COPILOT.MODEL.NAME.MATCHES}'
+              - macro: '{#MODEL_NAME}'
+                value: '{$GITHUB.COPILOT.MODEL.NAME.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+          description: 'The discovery of chats on copilot.com.'
+          item_prototypes:
+            - uuid: 656bf264169c4371b1bc3264c3bbe4b8
+              name: 'Copilot.com [{#MODEL_NAME}]: Engaged users'
+              type: DEPENDENT
+              key: 'github.org.copilot_web_model.engaged_users[{#MODEL_NAME}]'
+              description: 'The number of engaged users using the `{#MODEL_NAME}` model on copilot.com.'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$.copilot_dotcom_chat.models[?(@.name == ''{#MODEL_NAME}'')].total_engaged_users.first()'
+                  error_handler: CUSTOM_VALUE
+                  error_handler_params: '0'
+              master_item:
+                key: github.org.copilot.data_get
+              tags:
+                - tag: component
+                  value: copilot
+                - tag: model
+                  value: '{#MODEL_NAME}'
+            - uuid: 2a00540173ae4f05948a83817fc0aa5d
+              name: 'Copilot.com [{#MODEL_NAME}]: Total chats'
+              type: DEPENDENT
+              key: 'github.org.copilot_web_model.total_chats[{#MODEL_NAME}]'
+              description: 'The number of chats with the `{#MODEL_NAME}` model on copilot.com.'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$.copilot_dotcom_chat.models[?(@.name == ''{#MODEL_NAME}'')].total_chats.first()'
+              master_item:
+                key: github.org.copilot.data_get
+              tags:
+                - tag: component
+                  value: copilot
+                - tag: model
+                  value: '{#MODEL_NAME}'
+          graph_prototypes:
+            - uuid: f0c9a1ddc68e49508560e4baa97da014
+              name: 'Copilot.com [{#MODEL_NAME}]: Total chats'
+              graph_items:
+                - color: 199C0D
+                  item:
+                    host: 'GitHub organization by HTTP'
+                    key: 'github.org.copilot_web_model.total_chats[{#MODEL_NAME}]'
+          master_item:
+            key: github.org.copilot.data_get
+          lld_macro_paths:
+            - lld_macro: '{#CUSTOM_FLAG}'
+              path: $.is_custom_model
+            - lld_macro: '{#MODEL_NAME}'
+              path: $.name
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.copilot_dotcom_chat.models
+              error_handler: DISCARD_VALUE
+        - uuid: b34506be8c8f4ada82e2a5a7cba7ff5a
+          name: 'Repository discovery'
+          type: DEPENDENT
+          key: github.org.repo.discovery
+          filter:
+            evaltype: AND
+            conditions:
+              - macro: '{#REPO_DISABLED}'
+                value: ^false$
+              - macro: '{#REPO_NAME}'
+                value: '{$GITHUB.REPO.NAME.MATCHES}'
+              - macro: '{#REPO_NAME}'
+                value: '{$GITHUB.REPO.NAME.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+              - macro: '{#REPO_OWNER}'
+                value: '{$GITHUB.REPO.OWNER.MATCHES}'
+              - macro: '{#REPO_OWNER}'
+                value: '{$GITHUB.REPO.OWNER.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+          description: 'The discovery of repositories.'
+          item_prototypes:
+            - uuid: d152f9bd8ac64b969fa7b0c2f44068ae
+              name: '[{#REPO_OWNER}/{#REPO_NAME}]: Advanced Security'
+              type: DEPENDENT
+              key: 'github.org.repo.advanced_security[{#NODE_ID}]'
+              trends: '0'
+              description: 'Whether GitHub Advanced Security for the repository is enabled. For standalone Code Scanning or Secret Protection products, this value cannot be collected.'
+              valuemap:
+                name: 'Flag value'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - $.security_and_analysis.advanced_security.status
+                  error_handler: CUSTOM_VALUE
+                  error_handler_params: disabled
+                - type: JAVASCRIPT
+                  parameters:
+                    - |
+                      const idx = [
+                      	'disabled',
+                      	'enabled'
+                      ].indexOf(value);
+                      return idx !== -1 ? idx : 2;
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1d
+              master_item:
+                key: 'github.org.repo.get_data[{#NODE_ID}]'
+              tags:
+                - tag: component
+                  value: repository
+                - tag: repository
+                  value: '{#REPO_NAME}'
+            - uuid: 46c9c4f0c88b49c3bb23f7c1bd345353
+              name: '[{#REPO_OWNER}/{#REPO_NAME}]: Is archived'
+              type: DEPENDENT
+              key: 'github.org.repo.archived[{#NODE_ID}]'
+              trends: '0'
+              description: 'Whether the repository is archived.'
+              valuemap:
+                name: 'Flag value'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - $.archived
+                  error_handler: DISCARD_VALUE
+                - type: BOOL_TO_DECIMAL
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3h
+              master_item:
+                key: 'github.org.repo.get_data[{#NODE_ID}]'
+              tags:
+                - tag: component
+                  value: repository
+                - tag: repository
+                  value: '{#REPO_NAME}'
+            - uuid: 48e6b9c037f94d94a8c5ef16d6791424
+              name: '[{#REPO_OWNER}/{#REPO_NAME}]: Created at'
+              type: DEPENDENT
+              key: 'github.org.repo.created_at[{#NODE_ID}]'
+              trends: '0'
+              units: unixtime
+              description: 'The time when the repository was created.'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - $.created_at
+                - type: JAVASCRIPT
+                  parameters:
+                    - 'return Math.floor(new Date(value) / 1000);'
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1d
+              master_item:
+                key: 'github.org.repo.get_data[{#NODE_ID}]'
+              tags:
+                - tag: component
+                  value: repository
+                - tag: repository
+                  value: '{#REPO_NAME}'
+            - uuid: c86211ab4cb4459998104e701d1c94be
+              name: '[{#REPO_OWNER}/{#REPO_NAME}]: Fork count'
+              type: DEPENDENT
+              key: 'github.org.repo.forks_count[{#NODE_ID}]'
+              description: 'The number of repository forks.'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - $.forks_count
+                  error_handler: CUSTOM_VALUE
+                  error_handler_params: '0'
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3h
+              master_item:
+                key: 'github.org.repo.get_data[{#NODE_ID}]'
+              tags:
+                - tag: component
+                  value: repository
+                - tag: repository
+                  value: '{#REPO_NAME}'
+            - uuid: 40547c64c6e54058994daabcaae5df7f
+              name: '[{#REPO_OWNER}/{#REPO_NAME}]: Get data'
+              type: DEPENDENT
+              key: 'github.org.repo.get_data[{#NODE_ID}]'
+              history: '0'
+              value_type: TEXT
+              description: 'Get `{$GITHUB.REPO.NAME}` repository data.'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$.data[?(@.node_id == ''{#NODE_ID}'')].first()'
+                  error_handler: CUSTOM_VALUE
+                  error_handler_params: '{}'
+              master_item:
+                key: github.org.repo.get
+              tags:
+                - tag: component
+                  value: raw
+                - tag: repository
+                  value: '{#REPO_NAME}'
+            - uuid: 3ac50c2cfd8a44aea228aafffb63bcbb
+              name: '[{#REPO_OWNER}/{#REPO_NAME}]: Is a fork'
+              type: DEPENDENT
+              key: 'github.org.repo.is_fork[{#NODE_ID}]'
+              trends: '0'
+              description: 'Whether the repository is a fork.'
+              valuemap:
+                name: 'Flag value'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - $.fork
+                  error_handler: DISCARD_VALUE
+                - type: BOOL_TO_DECIMAL
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3h
+              master_item:
+                key: 'github.org.repo.get_data[{#NODE_ID}]'
+              tags:
+                - tag: component
+                  value: repository
+                - tag: repository
+                  value: '{#REPO_NAME}'
+            - uuid: 193095d5318b460792560449bcdc17df
+              name: '[{#REPO_OWNER}/{#REPO_NAME}]: Is private'
+              type: DEPENDENT
+              key: 'github.org.repo.is_private[{#NODE_ID}]'
+              trends: '0'
+              description: 'Whether the repository is private.'
+              valuemap:
+                name: 'Flag value'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - $.private
+                  error_handler: DISCARD_VALUE
+                - type: BOOL_TO_DECIMAL
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3h
+              master_item:
+                key: 'github.org.repo.get_data[{#NODE_ID}]'
+              tags:
+                - tag: component
+                  value: repository
+                - tag: repository
+                  value: '{#REPO_NAME}'
+            - uuid: faf0aa76035c4528a0c57e91086cda8d
+              name: '[{#REPO_OWNER}/{#REPO_NAME}]: Is a template'
+              type: DEPENDENT
+              key: 'github.org.repo.is_template[{#NODE_ID}]'
+              trends: '0'
+              description: 'Whether the repository is a template.'
+              valuemap:
+                name: 'Flag value'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - $.is_template
+                  error_handler: DISCARD_VALUE
+                - type: BOOL_TO_DECIMAL
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3h
+              master_item:
+                key: 'github.org.repo.get_data[{#NODE_ID}]'
+              tags:
+                - tag: component
+                  value: repository
+                - tag: repository
+                  value: '{#REPO_NAME}'
+            - uuid: ea721c9204d140dbb2870914f31c0087
+              name: '[{#REPO_OWNER}/{#REPO_NAME}]: Language'
+              type: DEPENDENT
+              key: 'github.org.repo.language[{#NODE_ID}]'
+              value_type: CHAR
+              description: 'The language of the repository.'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - $.language
+                  error_handler: DISCARD_VALUE
+                - type: NOT_MATCHES_REGEX
+                  parameters:
+                    - ^null$
+                  error_handler: DISCARD_VALUE
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3h
+              master_item:
+                key: 'github.org.repo.get_data[{#NODE_ID}]'
+              tags:
+                - tag: component
+                  value: repository
+                - tag: repository
+                  value: '{#REPO_NAME}'
+            - uuid: a64c94b832b94a90a97df7b32237726e
+              name: '[{#REPO_OWNER}/{#REPO_NAME}]: Open issue count'
+              type: DEPENDENT
+              key: 'github.org.repo.open_issues[{#NODE_ID}]'
+              description: 'The number of issues opened in the repository.'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - $.open_issues_count
+                  error_handler: CUSTOM_VALUE
+                  error_handler_params: '0'
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3h
+              master_item:
+                key: 'github.org.repo.get_data[{#NODE_ID}]'
+              tags:
+                - tag: component
+                  value: repository
+                - tag: repository
+                  value: '{#REPO_NAME}'
+            - uuid: d7ddd79bf2bc41f68f442692e6866354
+              name: '[{#REPO_OWNER}/{#REPO_NAME}]: Pushed at'
+              type: DEPENDENT
+              key: 'github.org.repo.pushed_at[{#NODE_ID}]'
+              trends: '0'
+              units: unixtime
+              description: 'The time when the repository was pushed.'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - $.pushed_at
+                - type: JAVASCRIPT
+                  parameters:
+                    - 'return Math.floor(new Date(value) / 1000);'
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3h
+              master_item:
+                key: 'github.org.repo.get_data[{#NODE_ID}]'
+              tags:
+                - tag: component
+                  value: repository
+                - tag: repository
+                  value: '{#REPO_NAME}'
+            - uuid: 6d60c774dd3e44a183b82cb3326fea00
+              name: '[{#REPO_OWNER}/{#REPO_NAME}]: Secret Scanning AI Detection'
+              type: DEPENDENT
+              key: 'github.org.repo.secret_ai_detection[{#NODE_ID}]'
+              trends: '0'
+              description: 'Whether GitHub Secret Scanning AI Detection for the repository is enabled.'
+              valuemap:
+                name: 'Flag value'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - $.security_and_analysis.secret_scanning_ai_detection.status
+                  error_handler: CUSTOM_VALUE
+                  error_handler_params: disabled
+                - type: JAVASCRIPT
+                  parameters:
+                    - |
+                      const idx = [
+                      	'disabled',
+                      	'enabled'
+                      ].indexOf(value);
+                      return idx !== -1 ? idx : 2;
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1d
+              master_item:
+                key: 'github.org.repo.get_data[{#NODE_ID}]'
+              tags:
+                - tag: component
+                  value: repository
+                - tag: repository
+                  value: '{#REPO_NAME}'
+            - uuid: 166aff204a83422da25e22987f7109ad
+              name: '[{#REPO_OWNER}/{#REPO_NAME}]: Secret Protection'
+              type: DEPENDENT
+              key: 'github.org.repo.secret_protection[{#NODE_ID}]'
+              trends: '0'
+              description: 'Whether GitHub Secret Protection for the repository is enabled.'
+              valuemap:
+                name: 'Flag value'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - $.security_and_analysis.secret_scanning_push_protection.status
+                  error_handler: CUSTOM_VALUE
+                  error_handler_params: disabled
+                - type: JAVASCRIPT
+                  parameters:
+                    - |
+                      const idx = [
+                      	'disabled',
+                      	'enabled'
+                      ].indexOf(value);
+                      return idx !== -1 ? idx : 2;
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1d
+              master_item:
+                key: 'github.org.repo.get_data[{#NODE_ID}]'
+              tags:
+                - tag: component
+                  value: repository
+                - tag: repository
+                  value: '{#REPO_NAME}'
+            - uuid: ac68188a36214e1f8dd0e9edfbd00b2e
+              name: '[{#REPO_OWNER}/{#REPO_NAME}]: Secret Scanning'
+              type: DEPENDENT
+              key: 'github.org.repo.secret_scanning[{#NODE_ID}]'
+              trends: '0'
+              description: 'Whether GitHub Secret Scanning for the repository is enabled.'
+              valuemap:
+                name: 'Flag value'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - $.security_and_analysis.secret_scanning.status
+                  error_handler: CUSTOM_VALUE
+                  error_handler_params: disabled
+                - type: JAVASCRIPT
+                  parameters:
+                    - |
+                      const idx = [
+                      	'disabled',
+                      	'enabled'
+                      ].indexOf(value);
+                      return idx !== -1 ? idx : 2;
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1d
+              master_item:
+                key: 'github.org.repo.get_data[{#NODE_ID}]'
+              tags:
+                - tag: component
+                  value: repository
+                - tag: repository
+                  value: '{#REPO_NAME}'
+            - uuid: 1b9cd8857b05443a86d5717a8866ce35
+              name: '[{#REPO_OWNER}/{#REPO_NAME}]: Secret Scanning non-provider patterns'
+              type: DEPENDENT
+              key: 'github.org.repo.secret_scanning_non_provider_patterns[{#NODE_ID}]'
+              trends: '0'
+              description: 'Whether GitHub Secret Scanning non-provider patterns for the repository are enabled.'
+              valuemap:
+                name: 'Flag value'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - $.security_and_analysis.secret_scanning_non_provider_patterns.status
+                  error_handler: CUSTOM_VALUE
+                  error_handler_params: disabled
+                - type: JAVASCRIPT
+                  parameters:
+                    - |
+                      const idx = [
+                      	'disabled',
+                      	'enabled'
+                      ].indexOf(value);
+                      return idx !== -1 ? idx : 2;
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1d
+              master_item:
+                key: 'github.org.repo.get_data[{#NODE_ID}]'
+              tags:
+                - tag: component
+                  value: repository
+                - tag: repository
+                  value: '{#REPO_NAME}'
+            - uuid: 7ca258ed39b648aa840472f53cfee720
+              name: '[{#REPO_OWNER}/{#REPO_NAME}]: Secret Scanning Validity Checks'
+              type: DEPENDENT
+              key: 'github.org.repo.secret_scanning_validity_checks[{#NODE_ID}]'
+              trends: '0'
+              description: 'Whether GitHub Secret Scanning validity checks for the repository are enabled.'
+              valuemap:
+                name: 'Flag value'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - $.security_and_analysis.secret_scanning_validity_checks.status
+                  error_handler: CUSTOM_VALUE
+                  error_handler_params: disabled
+                - type: JAVASCRIPT
+                  parameters:
+                    - |
+                      const idx = [
+                      	'disabled',
+                      	'enabled'
+                      ].indexOf(value);
+                      return idx !== -1 ? idx : 2;
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1d
+              master_item:
+                key: 'github.org.repo.get_data[{#NODE_ID}]'
+              tags:
+                - tag: component
+                  value: repository
+                - tag: repository
+                  value: '{#REPO_NAME}'
+            - uuid: 36fb00ed003a4c2da3d49ff33181de55
+              name: '[{#REPO_OWNER}/{#REPO_NAME}]: Size'
+              type: DEPENDENT
+              key: 'github.org.repo.size[{#NODE_ID}]'
+              units: B
+              description: 'The size of the repository, in kilobytes.'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - $.size
+                  error_handler: CUSTOM_VALUE
+                  error_handler_params: '0'
+                - type: MULTIPLIER
+                  parameters:
+                    - '1024'
+              master_item:
+                key: 'github.org.repo.get_data[{#NODE_ID}]'
+              tags:
+                - tag: component
+                  value: repository
+                - tag: repository
+                  value: '{#REPO_NAME}'
+            - uuid: cafac4f8a018493196a6e436c90dd3bd
+              name: '[{#REPO_OWNER}/{#REPO_NAME}]: Stargazer count'
+              type: DEPENDENT
+              key: 'github.org.repo.stargazers_count[{#NODE_ID}]'
+              description: 'The number of stargazers in the repository.'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - $.stargazers_count
+                  error_handler: CUSTOM_VALUE
+                  error_handler_params: '0'
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3h
+              master_item:
+                key: 'github.org.repo.get_data[{#NODE_ID}]'
+              tags:
+                - tag: component
+                  value: repository
+                - tag: repository
+                  value: '{#REPO_NAME}'
+            - uuid: 4572951f5b154039881102162772a6c4
+              name: '[{#REPO_OWNER}/{#REPO_NAME}]: Updated at'
+              type: DEPENDENT
+              key: 'github.org.repo.updated_at[{#NODE_ID}]'
+              trends: '0'
+              units: unixtime
+              description: 'The time when the repository was updated.'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - $.updated_at
+                - type: JAVASCRIPT
+                  parameters:
+                    - 'return Math.floor(new Date(value) / 1000);'
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3h
+              master_item:
+                key: 'github.org.repo.get_data[{#NODE_ID}]'
+              tags:
+                - tag: component
+                  value: repository
+                - tag: repository
+                  value: '{#REPO_NAME}'
+            - uuid: b9faee5c840e4529989fc60792a2b09d
+              name: '[{#REPO_OWNER}/{#REPO_NAME}]: Visibility'
+              type: DEPENDENT
+              key: 'github.org.repo.visibility[{#NODE_ID}]'
+              trends: '0'
+              description: 'Visibility type of the repository.'
+              valuemap:
+                name: 'Visibility type'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - $.visibility
+                  error_handler: DISCARD_VALUE
+                - type: JAVASCRIPT
+                  parameters:
+                    - |
+                      const idx = [
+                      	'private',
+                      	'public',
+                      	'internal'
+                      ].indexOf(value);
+                      return idx !== -1 ? idx : 3;
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3h
+              master_item:
+                key: 'github.org.repo.get_data[{#NODE_ID}]'
+              tags:
+                - tag: component
+                  value: repository
+                - tag: repository
+                  value: '{#REPO_NAME}'
+            - uuid: e976ecd4cda247b3a7ea45e989101c07
+              name: '[{#REPO_OWNER}/{#REPO_NAME}]: Watcher count'
+              type: DEPENDENT
+              key: 'github.org.repo.watchers_count[{#NODE_ID}]'
+              description: 'The number of watchers in the repository.'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - $.watchers_count
+                  error_handler: CUSTOM_VALUE
+                  error_handler_params: '0'
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3h
+              master_item:
+                key: 'github.org.repo.get_data[{#NODE_ID}]'
+              tags:
+                - tag: component
+                  value: repository
+                - tag: repository
+                  value: '{#REPO_NAME}'
+          graph_prototypes:
+            - uuid: 76f79d4ed592459fb863a1ca4857610a
+              name: '[{#REPO_OWNER}/{#REPO_NAME}]: Repository size'
+              graph_items:
+                - color: 199C0D
+                  item:
+                    host: 'GitHub organization by HTTP'
+                    key: 'github.org.repo.size[{#NODE_ID}]'
+          host_prototypes:
+            - uuid: 70a6212ea45f4bb0abce485eaf7ac643
+              host: 'repo_{#ID}'
+              name: '{#REPO_OWNER}/{#REPO_NAME}'
+              inventory_mode: AUTOMATIC
+              group_links:
+                - group:
+                    name: Applications
+              group_prototypes:
+                - name: 'GitHub/{#REPO_OWNER}'
+              templates:
+                - name: 'GitHub repository by HTTP'
+              macros:
+                - macro: '{$GITHUB.REPO.NAME}'
+                  value: '{#REPO_NAME}'
+                  description: 'Set the repository name here.'
+                - macro: '{$GITHUB.REPO.OWNER}'
+                  value: '{#REPO_OWNER}'
+                  description: 'Set the repository owner here.'
+              tags:
+                - tag: owner
+                  value: '{#REPO_OWNER}'
+          master_item:
+            key: github.org.repo.get
+          lld_macro_paths:
+            - lld_macro: '{#ID}'
+              path: $.id
+            - lld_macro: '{#NODE_ID}'
+              path: $.node_id
+            - lld_macro: '{#REPO_DESCR}'
+              path: $.description
+            - lld_macro: '{#REPO_DISABLED}'
+              path: $.disabled
+            - lld_macro: '{#REPO_NAME}'
+              path: $.name
+            - lld_macro: '{#REPO_OWNER}'
+              path: $.owner.login
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.data
+              error_handler: DISCARD_VALUE
+      tags:
+        - tag: class
+          value: software
+        - tag: subclass
+          value: communication
+        - tag: subclass
+          value: development
+        - tag: target
+          value: github
+        - tag: target
+          value: organization
+      macros:
+        - macro: '{$GITHUB.API.TOKEN}'
+          type: SECRET_TEXT
+          description: 'Set the access token here.'
+          config:
+            type: TEXT
+            priority: '6'
+            label: 'Access token'
+            description: 'Set the access token here.'
+            required: 'YES'
+        - macro: '{$GITHUB.API.URL}'
+          value: 'https://api.github.com/'
+          description: 'Set the API URL here.'
+          config:
+            type: TEXT
+            priority: '1'
+            label: 'API URL'
+            description: 'Set the API URL here.'
+            required: 'YES'
+        - macro: '{$GITHUB.API_VERSION}'
+          value: '2022-11-28'
+          description: 'The API version that is used in headers for HTTP requests.'
+          config:
+            type: TEXT
+            priority: '3'
+            label: 'API version'
+            description: 'The API version that is used in headers for HTTP requests.'
+        - macro: '{$GITHUB.COPILOT.IDE.NAME.MATCHES}'
+          value: .+
+          description: 'The Copilot IDE name regex filter to use in Copilot-related metric discovery - for including.'
+          config:
+            type: TEXT
+            priority: '18'
+            section_name: Filters
+            label: 'Copilot IDE name filter (include)'
+            description: 'The Copilot IDE name regex filter to use in Copilot-related metric discovery - for including.'
+        - macro: '{$GITHUB.COPILOT.IDE.NAME.NOT_MATCHES}'
+          value: CHANGE_IF_NEEDED
+          description: 'The Copilot IDE name regex filter to use in Copilot-related metric discovery - for excluding.'
+          config:
+            type: TEXT
+            priority: '19'
+            section_name: Filters
+            label: 'Copilot IDE name filter (exclude)'
+            description: 'The Copilot IDE name regex filter to use in Copilot-related metric discovery - for excluding.'
+        - macro: '{$GITHUB.COPILOT.LANG.NAME.MATCHES}'
+          value: .+
+          description: 'The Copilot programming language name regex filter to use in Copilot-related metric discovery - for including.'
+          config:
+            type: TEXT
+            priority: '22'
+            section_name: Filters
+            label: 'Copilot language filter (include)'
+            description: 'The Copilot programming language name regex filter to use in Copilot-related metric discovery - for including.'
+        - macro: '{$GITHUB.COPILOT.LANG.NAME.NOT_MATCHES}'
+          value: CHANGE_IF_NEEDED
+          description: 'The Copilot programming language name regex filter to use in Copilot-related metric discovery - for excluding.'
+          config:
+            type: TEXT
+            priority: '23'
+            section_name: Filters
+            label: 'Copilot language filter (exclude)'
+            description: 'The Copilot programming language name regex filter to use in Copilot-related metric discovery - for excluding.'
+        - macro: '{$GITHUB.COPILOT.MODEL.NAME.MATCHES}'
+          value: .+
+          description: 'The Copilot model name regex filter to use in Copilot-related metric discovery - for including.'
+          config:
+            type: TEXT
+            priority: '20'
+            section_name: Filters
+            label: 'Copilot model name filter (include)'
+            description: 'The Copilot model name regex filter to use in Copilot-related metric discovery - for including.'
+        - macro: '{$GITHUB.COPILOT.MODEL.NAME.NOT_MATCHES}'
+          value: CHANGE_IF_NEEDED
+          description: 'The Copilot model name regex filter to use in Copilot-related metric discovery - for excluding.'
+          config:
+            type: TEXT
+            priority: '21'
+            section_name: Filters
+            label: 'Copilot model name filter (exclude)'
+            description: 'The Copilot model name regex filter to use in Copilot-related metric discovery - for excluding.'
+        - macro: '{$GITHUB.COPILOT.USED}'
+          value: '0'
+          description: 'The flag for gathering Copilot metrics. If set to a value other than "1", items for Copilot will not be created. If set to "1", the `{$GITHUB.ORG.NAME}` macro is required.'
+          config:
+            type: CHECKBOX
+            priority: '4'
+            label: 'Copilot monitoring'
+            description: 'Whether it is necessary to gather Copilot metrics.'
+            options:
+              - checked: '1'
+                unchecked: '0'
+        - macro: '{$GITHUB.HTTP_PROXY}'
+          description: 'The HTTP proxy for script items (set if needed). If the macro is empty, then no proxy is used.'
+          config:
+            type: TEXT
+            priority: '12'
+            section_name: Other
+            label: 'HTTP proxy'
+            description: 'The HTTP proxy for script items (set if needed). If the macro is empty, then no proxy is used.'
+        - macro: '{$GITHUB.INTERVAL}'
+          value: 1m
+          description: 'The update interval for the script items that retrieve data from the API. Can be used with context if needed (check the context values in relevant items).'
+          config:
+            type: TEXT
+            priority: '7'
+            section_name: Other
+            label: 'Data update interval'
+            description: 'The update interval for the script items that retrieve data from the API. Can be used with context if needed (check the context values in relevant items).'
+        - macro: '{$GITHUB.INTERVAL:"get_copilot_billing"}'
+          value: 1h
+          description: 'The update interval for the script item that retrieves Copilot billing.'
+          config:
+            type: TEXT
+            priority: '10'
+            section_name: Other
+            label: 'Copilot billing update interval'
+            description: 'The update interval for the script item that retrieves Copilot billing.'
+        - macro: '{$GITHUB.INTERVAL:"get_copilot_data"}'
+          value: 1h
+          description: 'The update interval for the script item that retrieves Copilot statistics.'
+          config:
+            type: TEXT
+            priority: '9'
+            section_name: Other
+            label: 'Copilot statistics update interval'
+            description: 'The update interval for the script item that retrieves Copilot statistics.'
+        - macro: '{$GITHUB.INTERVAL:"get_repo_list"}'
+          value: 15m
+          description: 'The update interval for the script item that retrieves a list of repositories.'
+          config:
+            type: TEXT
+            priority: '8'
+            section_name: Other
+            label: 'Repository list update interval'
+            description: 'The update interval for the script item that retrieves a list of repositories.'
+        - macro: '{$GITHUB.ORG.NAME}'
+          description: 'Set the organization name here.'
+          config:
+            type: TEXT
+            priority: '5'
+            label: 'Organization name'
+            description: 'Set the organization name here, if "Copilot monitoring" is set to "1".'
+            required: 'YES'
+        - macro: '{$GITHUB.REPO.NAME.MATCHES}'
+          value: .+
+          description: 'The repository name regex filter to use in repository discovery - for including.'
+          config:
+            type: TEXT
+            priority: '14'
+            section_name: Filters
+            label: 'Repository name filter (include)'
+            description: 'The repository name regex filter to use in repository discovery - for including.'
+        - macro: '{$GITHUB.REPO.NAME.NOT_MATCHES}'
+          value: CHANGE_IF_NEEDED
+          description: 'The repository name regex filter to use in repository discovery - for excluding.'
+          config:
+            type: TEXT
+            priority: '15'
+            section_name: Filters
+            label: 'Repository name filter (exclude)'
+            description: 'The repository name regex filter to use in repository discovery - for excluding.'
+        - macro: '{$GITHUB.REPO.OWNER.MATCHES}'
+          value: .+
+          description: 'The repository owner regex filter to use in repository discovery - for including.'
+          config:
+            type: TEXT
+            priority: '16'
+            section_name: Filters
+            label: 'Repository owner filter (include)'
+            description: 'The repository owner regex filter to use in repository discovery - for including.'
+        - macro: '{$GITHUB.REPO.OWNER.NOT_MATCHES}'
+          value: CHANGE_IF_NEEDED
+          description: 'The repository owner regex filter to use in repository discovery - for excluding.'
+          config:
+            type: TEXT
+            priority: '17'
+            section_name: Filters
+            label: 'Repository owner filter (exclude)'
+            description: 'The repository owner regex filter to use in repository discovery - for excluding.'
+        - macro: '{$GITHUB.RESULTS_PER_PAGE}'
+          value: '100'
+          description: 'The number of results to fetch per page. Can be used with context and adjusted if needed (check the context values in script parameters of relevant items).'
+          config:
+            type: TEXT
+            priority: '13'
+            section_name: Other
+            label: 'Results per page'
+            description: 'The number of results to fetch per page. Can be used with context and adjusted if needed (check the context values in script parameters of relevant items).'
+            regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
+        - macro: '{$GITHUB.TIMEOUT}'
+          value: 15s
+          description: 'The timeout threshold for the script items that retrieve data from the API. Can be used with context if needed (check the context values in relevant items).'
+          config:
+            type: TEXT
+            priority: '11'
+            section_name: Other
+            label: 'API timeout'
+            description: 'The timeout threshold for the script items that retrieve data from the API. Can be used with context if needed (check the context values in relevant items).'
+        - macro: '{$GITHUB.USER_AGENT}'
+          value: Zabbix/8.0
+          description: 'The user agent that is used in headers for HTTP requests.'
+          config:
+            type: TEXT
+            priority: '2'
+            label: 'HTTP user agent'
+            description: 'The user agent that is used in headers for HTTP requests.'
+      dashboards:
+        - uuid: 0f686bf03ab54b5996f66483a831a3ac
+          name: '1. Overview'
+          pages:
+            - name: Main
+              widgets:
+                - type: item
+                  name: 'Number of repositories'
+                  width: '12'
+                  fields:
+                    - type: INTEGER
+                      name: decimal_places
+                      value: '0'
+                    - type: ITEM
+                      name: itemid.0
+                      value:
+                        host: 'GitHub organization by HTTP'
+                        key: github.org.repo.number
+                    - type: INTEGER
+                      name: show.0
+                      value: '2'
+                - type: honeycomb
+                  name: 'Repository language'
+                  'y': '2'
+                  width: '36'
+                  height: '7'
+                  fields:
+                    - type: STRING
+                      name: bg_color
+                      value: 00C48C
+                    - type: STRING
+                      name: items.0
+                      value: '[*/*]: Language'
+                    - type: INTEGER
+                      name: item_tags.0.operator
+                      value: '1'
+                    - type: STRING
+                      name: item_tags.0.tag
+                      value: component
+                    - type: STRING
+                      name: item_tags.0.value
+                      value: repository
+                    - type: STRING
+                      name: primary_label
+                      value: '{{ITEM.NAME}.regsub("\[(.*?)\/(.*?)\]", "\2")}'
+                    - type: INTEGER
+                      name: primary_label_size_type
+                      value: '1'
+                    - type: STRING
+                      name: reference
+                      value: AAAAA
+                    - type: INTEGER
+                      name: secondary_label_decimal_places
+                      value: '0'
+                    - type: INTEGER
+                      name: secondary_label_size_type
+                      value: '1'
+                - type: problems
+                  name: Problems
+                  'y': '9'
+                  width: '72'
+                  height: '6'
+                - type: item
+                  name: 'Total size of repositories'
+                  x: '12'
+                  width: '12'
+                  fields:
+                    - type: INTEGER
+                      name: decimal_places
+                      value: '0'
+                    - type: ITEM
+                      name: itemid.0
+                      value:
+                        host: 'GitHub organization by HTTP'
+                        key: github.org.repo.total_size
+                    - type: INTEGER
+                      name: show.0
+                      value: '2'
+                - type: item
+                  name: 'Number of private repositories'
+                  x: '24'
+                  width: '12'
+                  fields:
+                    - type: INTEGER
+                      name: decimal_places
+                      value: '0'
+                    - type: ITEM
+                      name: itemid.0
+                      value:
+                        host: 'GitHub organization by HTTP'
+                        key: github.org.repo.number_private
+                    - type: INTEGER
+                      name: show.0
+                      value: '2'
+                - type: item
+                  name: 'Number of archived repositories'
+                  x: '36'
+                  width: '12'
+                  fields:
+                    - type: INTEGER
+                      name: decimal_places
+                      value: '0'
+                    - type: ITEM
+                      name: itemid.0
+                      value:
+                        host: 'GitHub organization by HTTP'
+                        key: github.org.repo.number_archived
+                    - type: INTEGER
+                      name: show.0
+                      value: '2'
+                - type: honeycomb
+                  name: 'Repository size'
+                  x: '36'
+                  'y': '2'
+                  width: '36'
+                  height: '7'
+                  fields:
+                    - type: STRING
+                      name: bg_color
+                      value: FFBF59
+                    - type: STRING
+                      name: items.0
+                      value: '[*/*]: Size'
+                    - type: INTEGER
+                      name: item_tags.0.operator
+                      value: '1'
+                    - type: STRING
+                      name: item_tags.0.tag
+                      value: component
+                    - type: STRING
+                      name: item_tags.0.value
+                      value: repository
+                    - type: STRING
+                      name: primary_label
+                      value: '{{ITEM.NAME}.regsub("\[(.*?)\/(.*?)\]", "\2")}'
+                    - type: INTEGER
+                      name: primary_label_size_type
+                      value: '1'
+                    - type: STRING
+                      name: reference
+                      value: AAAAB
+                    - type: INTEGER
+                      name: secondary_label_decimal_places
+                      value: '0'
+                    - type: INTEGER
+                      name: secondary_label_size
+                      value: '40'
+                    - type: INTEGER
+                      name: secondary_label_size_type
+                      value: '1'
+                - type: item
+                  name: 'Number of disabled repositories'
+                  x: '48'
+                  width: '12'
+                  fields:
+                    - type: INTEGER
+                      name: decimal_places
+                      value: '0'
+                    - type: ITEM
+                      name: itemid.0
+                      value:
+                        host: 'GitHub organization by HTTP'
+                        key: github.org.repo.number_disabled
+                    - type: INTEGER
+                      name: show.0
+                      value: '2'
+                - type: item
+                  name: 'Number of repository templates'
+                  x: '60'
+                  width: '12'
+                  fields:
+                    - type: INTEGER
+                      name: decimal_places
+                      value: '0'
+                    - type: ITEM
+                      name: itemid.0
+                      value:
+                        host: 'GitHub organization by HTTP'
+                        key: github.org.repo.number_templates
+                    - type: INTEGER
+                      name: show.0
+                      value: '2'
+        - uuid: f616b8c2930545759ac3e3aec1eeb6f1
+          name: '2. Copilot'
+          pages:
+            - name: Main
+              widgets:
+                - type: item
+                  name: 'Active users'
+                  width: '12'
+                  fields:
+                    - type: INTEGER
+                      name: decimal_places
+                      value: '0'
+                    - type: ITEM
+                      name: itemid.0
+                      value:
+                        host: 'GitHub organization by HTTP'
+                        key: github.org.copilot.active_users
+                    - type: INTEGER
+                      name: show.0
+                      value: '2'
+                - type: honeycomb
+                  name: 'Copilot users per language'
+                  'y': '2'
+                  width: '36'
+                  height: '5'
+                  fields:
+                    - type: STRING
+                      name: bg_color
+                      value: 97AAB3
+                    - type: STRING
+                      name: items.0
+                      value: 'Language [*]: Engaged users'
+                    - type: INTEGER
+                      name: item_tags.0.operator
+                      value: '1'
+                    - type: STRING
+                      name: item_tags.0.tag
+                      value: component
+                    - type: STRING
+                      name: item_tags.0.value
+                      value: ide
+                    - type: STRING
+                      name: primary_label
+                      value: '{{ITEM.NAME}.regsub("\[(.*?)\]", "\1")}'
+                    - type: INTEGER
+                      name: primary_label_size
+                      value: '30'
+                    - type: INTEGER
+                      name: primary_label_size_type
+                      value: '1'
+                    - type: STRING
+                      name: reference
+                      value: AAAAC
+                    - type: INTEGER
+                      name: secondary_label_decimal_places
+                      value: '0'
+                    - type: INTEGER
+                      name: secondary_label_size
+                      value: '50'
+                    - type: INTEGER
+                      name: secondary_label_size_type
+                      value: '1'
+                - type: honeycomb
+                  name: 'Copilot users per IDE & model'
+                  'y': '7'
+                  width: '36'
+                  height: '5'
+                  fields:
+                    - type: STRING
+                      name: bg_color
+                      value: 00C48C
+                    - type: STRING
+                      name: items.0
+                      value: 'IDE [*/*]: Engaged users'
+                    - type: INTEGER
+                      name: item_tags.0.operator
+                      value: '1'
+                    - type: STRING
+                      name: item_tags.0.tag
+                      value: component
+                    - type: STRING
+                      name: item_tags.0.value
+                      value: ide
+                    - type: STRING
+                      name: primary_label
+                      value: '{{ITEM.NAME}.regsub("\[(.*?)\/(.*?)\]", "\1 / \2")}'
+                    - type: INTEGER
+                      name: primary_label_size
+                      value: '15'
+                    - type: INTEGER
+                      name: primary_label_size_type
+                      value: '1'
+                    - type: STRING
+                      name: reference
+                      value: AAAAE
+                    - type: INTEGER
+                      name: secondary_label_decimal_places
+                      value: '0'
+                    - type: INTEGER
+                      name: secondary_label_size
+                      value: '50'
+                    - type: INTEGER
+                      name: secondary_label_size_type
+                      value: '1'
+                - type: honeycomb
+                  name: 'Copilot.com chats per model'
+                  'y': '12'
+                  width: '36'
+                  height: '5'
+                  fields:
+                    - type: STRING
+                      name: bg_color
+                      value: FFA059
+                    - type: STRING
+                      name: items.0
+                      value: 'Copilot.com [*]: Total chats'
+                    - type: INTEGER
+                      name: item_tags.0.operator
+                      value: '1'
+                    - type: STRING
+                      name: item_tags.0.tag
+                      value: component
+                    - type: STRING
+                      name: item_tags.0.value
+                      value: copilot
+                    - type: STRING
+                      name: primary_label
+                      value: '{{ITEM.NAME}.regsub("\[(.*?)\]", "\1")}'
+                    - type: INTEGER
+                      name: primary_label_size_type
+                      value: '1'
+                    - type: STRING
+                      name: reference
+                      value: AAAAG
+                    - type: INTEGER
+                      name: secondary_label_decimal_places
+                      value: '0'
+                    - type: INTEGER
+                      name: secondary_label_size
+                      value: '50'
+                    - type: INTEGER
+                      name: secondary_label_size_type
+                      value: '1'
+                - type: honeycomb
+                  name: 'Acceptance rate per IDE & model & language'
+                  'y': '17'
+                  width: '36'
+                  height: '5'
+                  fields:
+                    - type: STRING
+                      name: bg_color
+                      value: 64B5F6
+                    - type: STRING
+                      name: items.0
+                      value: '* [*/*]: Acceptance rate'
+                    - type: INTEGER
+                      name: item_tags.0.operator
+                      value: '1'
+                    - type: STRING
+                      name: item_tags.0.tag
+                      value: component
+                    - type: STRING
+                      name: item_tags.0.value
+                      value: ide
+                    - type: INTEGER
+                      name: item_tags.1.operator
+                      value: '4'
+                    - type: STRING
+                      name: item_tags.1.tag
+                      value: language
+                    - type: STRING
+                      name: item_tags.1.value
+                      value: ''
+                    - type: STRING
+                      name: primary_label
+                      value: '{{ITEM.NAME}.regsub("^(.*?) \[(.*?)\/(.*?)\]", "\1 / \2 / \3")}'
+                    - type: INTEGER
+                      name: primary_label_size
+                      value: '15'
+                    - type: INTEGER
+                      name: primary_label_size_type
+                      value: '1'
+                    - type: STRING
+                      name: reference
+                      value: AAAAI
+                    - type: INTEGER
+                      name: secondary_label_size
+                      value: '40'
+                    - type: INTEGER
+                      name: secondary_label_size_type
+                      value: '1'
+                - type: item
+                  name: 'Engaged users'
+                  x: '12'
+                  width: '12'
+                  fields:
+                    - type: INTEGER
+                      name: decimal_places
+                      value: '0'
+                    - type: ITEM
+                      name: itemid.0
+                      value:
+                        host: 'GitHub organization by HTTP'
+                        key: github.org.copilot.engaged_users
+                    - type: INTEGER
+                      name: show.0
+                      value: '2'
+                - type: item
+                  name: 'Seats total'
+                  x: '24'
+                  width: '12'
+                  fields:
+                    - type: INTEGER
+                      name: decimal_places
+                      value: '0'
+                    - type: ITEM
+                      name: itemid.0
+                      value:
+                        host: 'GitHub organization by HTTP'
+                        key: github.org.copilot.seats_total
+                    - type: INTEGER
+                      name: show.0
+                      value: '2'
+                - type: item
+                  name: 'Seats active this cycle'
+                  x: '36'
+                  width: '12'
+                  fields:
+                    - type: INTEGER
+                      name: decimal_places
+                      value: '0'
+                    - type: ITEM
+                      name: itemid.0
+                      value:
+                        host: 'GitHub organization by HTTP'
+                        key: github.org.copilot.seats_active_this_cycle
+                    - type: INTEGER
+                      name: show.0
+                      value: '2'
+                - type: honeycomb
+                  name: 'Copilot users per IDE'
+                  x: '36'
+                  'y': '2'
+                  width: '36'
+                  height: '5'
+                  fields:
+                    - type: STRING
+                      name: bg_color
+                      value: 7499FF
+                    - type: STRING
+                      name: items.0
+                      value: 'IDE [*]: Engaged users'
+                    - type: INTEGER
+                      name: item_tags.0.operator
+                      value: '1'
+                    - type: STRING
+                      name: item_tags.0.tag
+                      value: component
+                    - type: STRING
+                      name: item_tags.0.value
+                      value: completion
+                    - type: INTEGER
+                      name: item_tags.1.operator
+                      value: '4'
+                    - type: STRING
+                      name: item_tags.1.tag
+                      value: ide
+                    - type: STRING
+                      name: item_tags.1.value
+                      value: ''
+                    - type: INTEGER
+                      name: item_tags.2.operator
+                      value: '5'
+                    - type: STRING
+                      name: item_tags.2.tag
+                      value: model
+                    - type: STRING
+                      name: item_tags.2.value
+                      value: ''
+                    - type: STRING
+                      name: primary_label
+                      value: '{{ITEM.NAME}.regsub("\[(.*?)\]", "\1")}'
+                    - type: INTEGER
+                      name: primary_label_size_type
+                      value: '1'
+                    - type: STRING
+                      name: reference
+                      value: AAAAD
+                    - type: INTEGER
+                      name: secondary_label_decimal_places
+                      value: '0'
+                    - type: INTEGER
+                      name: secondary_label_size
+                      value: '50'
+                    - type: INTEGER
+                      name: secondary_label_size_type
+                      value: '1'
+                - type: honeycomb
+                  name: 'Copilot.com users per model'
+                  x: '36'
+                  'y': '7'
+                  width: '36'
+                  height: '5'
+                  fields:
+                    - type: STRING
+                      name: bg_color
+                      value: FFBF59
+                    - type: STRING
+                      name: items.0
+                      value: 'Copilot.com [*]: Engaged users'
+                    - type: INTEGER
+                      name: item_tags.0.operator
+                      value: '4'
+                    - type: STRING
+                      name: item_tags.0.tag
+                      value: model
+                    - type: STRING
+                      name: item_tags.0.value
+                      value: ''
+                    - type: STRING
+                      name: primary_label
+                      value: '{{ITEM.NAME}.regsub("\[(.*?)\]", "\1")}'
+                    - type: INTEGER
+                      name: primary_label_size_type
+                      value: '1'
+                    - type: STRING
+                      name: reference
+                      value: AAAAF
+                    - type: INTEGER
+                      name: secondary_label_decimal_places
+                      value: '0'
+                    - type: INTEGER
+                      name: secondary_label_size
+                      value: '50'
+                    - type: INTEGER
+                      name: secondary_label_size_type
+                      value: '1'
+                - type: honeycomb
+                  name: 'PR summaries per repo & model'
+                  x: '36'
+                  'y': '12'
+                  width: '36'
+                  height: '5'
+                  fields:
+                    - type: STRING
+                      name: bg_color
+                      value: E45959
+                    - type: STRING
+                      name: items.0
+                      value: '* [*]: PR summaries created'
+                    - type: INTEGER
+                      name: item_tags.0.operator
+                      value: '1'
+                    - type: STRING
+                      name: item_tags.0.tag
+                      value: component
+                    - type: STRING
+                      name: item_tags.0.value
+                      value: pull-requests
+                    - type: STRING
+                      name: primary_label
+                      value: '{{ITEM.NAME}.regsub("^(.*?) \[(.*?)\]", "\1 / \2")}'
+                    - type: STRING
+                      name: reference
+                      value: AAAAH
+                    - type: INTEGER
+                      name: secondary_label_decimal_places
+                      value: '0'
+                    - type: INTEGER
+                      name: secondary_label_size
+                      value: '50'
+                    - type: INTEGER
+                      name: secondary_label_size_type
+                      value: '1'
+                - type: honeycomb
+                  name: 'Acceptance lines rate per IDE & model & language'
+                  x: '36'
+                  'y': '17'
+                  width: '36'
+                  height: '5'
+                  fields:
+                    - type: STRING
+                      name: bg_color
+                      value: B39DDB
+                    - type: STRING
+                      name: items.0
+                      value: '* [*/*]: Acceptance lines rate'
+                    - type: INTEGER
+                      name: item_tags.0.operator
+                      value: '1'
+                    - type: STRING
+                      name: item_tags.0.tag
+                      value: component
+                    - type: STRING
+                      name: item_tags.0.value
+                      value: ide
+                    - type: INTEGER
+                      name: item_tags.1.operator
+                      value: '4'
+                    - type: STRING
+                      name: item_tags.1.tag
+                      value: language
+                    - type: STRING
+                      name: item_tags.1.value
+                      value: ''
+                    - type: STRING
+                      name: primary_label
+                      value: '{{ITEM.NAME}.regsub("^(.*?) \[(.*?)\/(.*?)\]", "\1 / \2 / \3")}'
+                    - type: INTEGER
+                      name: primary_label_size
+                      value: '15'
+                    - type: INTEGER
+                      name: primary_label_size_type
+                      value: '1'
+                    - type: STRING
+                      name: reference
+                      value: AAAAK
+                    - type: INTEGER
+                      name: secondary_label_size
+                      value: '40'
+                    - type: INTEGER
+                      name: secondary_label_size_type
+                      value: '1'
+                - type: item
+                  name: 'Seats added this cycle'
+                  x: '48'
+                  width: '12'
+                  fields:
+                    - type: INTEGER
+                      name: decimal_places
+                      value: '0'
+                    - type: ITEM
+                      name: itemid.0
+                      value:
+                        host: 'GitHub organization by HTTP'
+                        key: github.org.copilot.seats_added_this_cycle
+                    - type: INTEGER
+                      name: show.0
+                      value: '2'
+                - type: item
+                  name: 'Seats pending cancellation'
+                  x: '60'
+                  width: '12'
+                  fields:
+                    - type: INTEGER
+                      name: decimal_places
+                      value: '0'
+                    - type: ITEM
+                      name: itemid.0
+                      value:
+                        host: 'GitHub organization by HTTP'
+                        key: github.org.copilot.seats_pending_cancellation
+                    - type: INTEGER
+                      name: show.0
+                      value: '2'
+      valuemaps:
+        - uuid: 044106454954428d92cf0a984fc79790
+          name: 'Flag value'
+          mappings:
+            - value: '0'
+              newvalue: 'false'
+            - value: '1'
+              newvalue: 'true'
+            - value: '2'
+              newvalue: unknown
+        - uuid: 3155bc32a5c643859945ac8f220a23a5
+          name: 'Visibility type'
+          mappings:
+            - value: '0'
+              newvalue: private
+            - value: '1'
+              newvalue: public
+            - value: '2'
+              newvalue: internal
+            - value: '3'
+              newvalue: unknown
     - uuid: 11144543d1144a3693aa0b97a1c20dac
       template: 'GitHub repository by HTTP'
       name: 'GitHub repository by HTTP'
@@ -116,7 +3265,7 @@ zabbix_export:
         Note: Update intervals and timeouts for script items can be changed individually via `Data update interval` and `API timeout` host wizard configuration fields with context. Depending on the repository being monitored, it can be adjusted if needed (if you are exceeding rate limits, you can increase update intervals for some script items to stay within per hour request limits). But be aware that it may also affect the triggers (check whether the item is used in triggers and adjust thresholds and/or evaluation periods if needed).
       vendor:
         name: Zabbix
-        version: 8.0-1
+        version: 8.0-2
       groups:
         - name: Templates/Applications
       items:
@@ -133,7 +3282,7 @@ zabbix_export:
             
             	setParams: function (params, required) {
             		required = required || [];
-            		required.concat(['api_url', 'user_agent', 'api_version', 'repo_owner', 'repo_name', 'pagination_required', 'api_token']).forEach(function (field) {
+            		required.concat(['api_url', 'user_agent', 'api_version', 'pagination_required', 'api_token']).forEach(function (field) {
             			if (typeof params !== 'object' || typeof params[field] === 'undefined'
             				|| params[field] === '') {
             				throw 'Required parameter is not set: "' + field + '".';
@@ -236,7 +3385,7 @@ zabbix_export:
             }
             
             try {
-            	github.setParams(JSON.parse(value), ['api_query']);
+            	github.setParams(JSON.parse(value), ['repo_owner', 'repo_name', 'api_query']);
             
             	var result = github.apiRequest(github.params.api_url + github.params.api_query + '?' + github.params.query_params || '', github.params.pagination_required);
             
@@ -310,7 +3459,7 @@ zabbix_export:
             
             	setParams: function (params, required) {
             		required = required || [];
-            		required.concat(['api_url', 'user_agent', 'api_version', 'repo_owner', 'repo_name', 'pagination_required', 'api_token']).forEach(function (field) {
+            		required.concat(['api_url', 'user_agent', 'api_version', 'pagination_required', 'api_token']).forEach(function (field) {
             			if (typeof params !== 'object' || typeof params[field] === 'undefined'
             				|| params[field] === '') {
             				throw 'Required parameter is not set: "' + field + '".';
@@ -413,7 +3562,7 @@ zabbix_export:
             }
             
             try {
-            	github.setParams(JSON.parse(value));
+            	github.setParams(JSON.parse(value), ['repo_owner', 'repo_name']);
             
             	var issues_count,
             		issues_count_result = {
@@ -589,7 +3738,7 @@ zabbix_export:
             
             	setParams: function (params, required) {
             		required = required || [];
-            		required.concat(['api_url', 'user_agent', 'api_version', 'repo_owner', 'repo_name', 'pagination_required', 'api_token']).forEach(function (field) {
+            		required.concat(['api_url', 'user_agent', 'api_version', 'pagination_required', 'api_token']).forEach(function (field) {
             			if (typeof params !== 'object' || typeof params[field] === 'undefined'
             				|| params[field] === '') {
             				throw 'Required parameter is not set: "' + field + '".';
@@ -692,7 +3841,7 @@ zabbix_export:
             }
             
             try {
-            	github.setParams(JSON.parse(value), ['api_query']);
+            	github.setParams(JSON.parse(value), ['repo_owner', 'repo_name', 'api_query']);
             
             	var result = github.apiRequest(github.params.api_url + github.params.api_query + '?' + github.params.query_params || '', github.params.pagination_required);
             
@@ -772,7 +3921,7 @@ zabbix_export:
             
             	setParams: function (params, required) {
             		required = required || [];
-            		required.concat(['api_url', 'user_agent', 'api_version', 'repo_owner', 'repo_name', 'pagination_required', 'api_token']).forEach(function (field) {
+            		required.concat(['api_url', 'user_agent', 'api_version', 'pagination_required', 'api_token']).forEach(function (field) {
             			if (typeof params !== 'object' || typeof params[field] === 'undefined'
             				|| params[field] === '') {
             				throw 'Required parameter is not set: "' + field + '".';
@@ -875,7 +4024,7 @@ zabbix_export:
             }
             
             try {
-            	github.setParams(JSON.parse(value), ['api_query']);
+            	github.setParams(JSON.parse(value), ['repo_owner', 'repo_name', 'api_query']);
             
             	var repo_data = github.apiRequest(github.params.api_url + github.params.api_query);
             
@@ -1147,7 +4296,7 @@ zabbix_export:
             
             	setParams: function (params, required) {
             		required = required || [];
-            		required.concat(['api_url', 'user_agent', 'api_version', 'repo_owner', 'repo_name', 'pagination_required', 'api_token']).forEach(function (field) {
+            		required.concat(['api_url', 'user_agent', 'api_version', 'pagination_required', 'api_token']).forEach(function (field) {
             			if (typeof params !== 'object' || typeof params[field] === 'undefined'
             				|| params[field] === '') {
             				throw 'Required parameter is not set: "' + field + '".';
@@ -1250,7 +4399,7 @@ zabbix_export:
             }
             
             try {
-            	github.setParams(JSON.parse(value), ['api_query']);
+            	github.setParams(JSON.parse(value), ['repo_owner', 'repo_name', 'api_query']);
             
             	var result = github.apiRequest(github.params.api_url + github.params.api_query + '?' + github.params.query_params || '', github.params.pagination_required);
             
@@ -1335,7 +4484,7 @@ zabbix_export:
             
             	setParams: function (params, required) {
             		required = required || [];
-            		required.concat(['api_url', 'user_agent', 'api_version', 'repo_owner', 'repo_name', 'pagination_required', 'api_token']).forEach(function (field) {
+            		required.concat(['api_url', 'user_agent', 'api_version', 'pagination_required', 'api_token']).forEach(function (field) {
             			if (typeof params !== 'object' || typeof params[field] === 'undefined'
             				|| params[field] === '') {
             				throw 'Required parameter is not set: "' + field + '".';
@@ -1438,7 +4587,7 @@ zabbix_export:
             }
             
             try {
-            	github.setParams(JSON.parse(value), ['api_query']);
+            	github.setParams(JSON.parse(value), ['repo_owner', 'repo_name', 'api_query']);
             
             	var result = github.apiRequest(github.params.api_url + github.params.api_query + '?' + github.params.query_params || '', github.params.pagination_required);
             
@@ -1501,7 +4650,7 @@ zabbix_export:
             
             	setParams: function (params, required) {
             		required = required || [];
-            		required.concat(['api_url', 'user_agent', 'api_version', 'repo_owner', 'repo_name', 'pagination_required', 'api_token']).forEach(function (field) {
+            		required.concat(['api_url', 'user_agent', 'api_version', 'pagination_required', 'api_token']).forEach(function (field) {
             			if (typeof params !== 'object' || typeof params[field] === 'undefined'
             				|| params[field] === '') {
             				throw 'Required parameter is not set: "' + field + '".';
@@ -1604,7 +4753,7 @@ zabbix_export:
             }
             
             try {
-            	github.setParams(JSON.parse(value), ['api_query']);
+            	github.setParams(JSON.parse(value), ['repo_owner', 'repo_name', 'api_query']);
             
             	var repo_data = github.apiRequest(github.params.api_url + github.params.api_query);
             
@@ -1687,7 +4836,7 @@ zabbix_export:
                 
                 	setParams: function (params, required) {
                 		required = required || [];
-                		required.concat(['api_url', 'user_agent', 'api_version', 'repo_owner', 'repo_name', 'pagination_required', 'api_token']).forEach(function (field) {
+                		required.concat(['api_url', 'user_agent', 'api_version', 'pagination_required', 'api_token']).forEach(function (field) {
                 			if (typeof params !== 'object' || typeof params[field] === 'undefined'
                 				|| params[field] === '') {
                 				throw 'Required parameter is not set: "' + field + '".';
@@ -1790,7 +4939,7 @@ zabbix_export:
                 }
                 
                 try {
-                	github.setParams(JSON.parse(value), ['api_query']);
+                	github.setParams(JSON.parse(value), ['repo_owner', 'repo_name', 'api_query']);
                 
                 	var result = github.apiRequest(github.params.api_url + github.params.api_query + '?' + github.params.query_params || '', github.params.pagination_required);
                 
@@ -2158,7 +5307,7 @@ zabbix_export:
                 
                 	setParams: function (params, required) {
                 		required = required || [];
-                		required.concat(['api_url', 'user_agent', 'api_version', 'repo_owner', 'repo_name', 'pagination_required', 'api_token']).forEach(function (field) {
+                		required.concat(['api_url', 'user_agent', 'api_version', 'pagination_required', 'api_token']).forEach(function (field) {
                 			if (typeof params !== 'object' || typeof params[field] === 'undefined'
                 				|| params[field] === '') {
                 				throw 'Required parameter is not set: "' + field + '".';
@@ -2261,7 +5410,7 @@ zabbix_export:
                 }
                 
                 try {
-                	github.setParams(JSON.parse(value), ['api_query']);
+                	github.setParams(JSON.parse(value), ['repo_owner', 'repo_name', 'api_query']);
                 
                 	var result = github.apiRequest(github.params.api_url + github.params.api_query + '?' + github.params.query_params || '', github.params.pagination_required);
                 
@@ -3342,6 +6491,17 @@ zabbix_export:
               newvalue: completed
             - value: '10'
               newvalue: unknown
+  triggers:
+    - uuid: 33ce7cc965e44a519ef57b22a6d7c3c9
+      expression: |
+        length(last(/GitHub organization by HTTP/github.org.copilot.data_get.check))>0 or length(last(/GitHub organization by HTTP/github.org.repo.get.check))>0 or 
+        length(last(/GitHub organization by HTTP/github.org.copilot.billing_get.check))>0
+      name: 'GitHub: There are errors in requests to API'
+      priority: AVERAGE
+      description: 'Errors have been received in response to API requests. Check the latest values for details.'
+      tags:
+        - tag: scope
+          value: availability
   graphs:
     - uuid: 774218efca844a978b61077f0e253ddf
       name: 'Number of issues'

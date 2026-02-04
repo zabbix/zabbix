@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -232,8 +232,10 @@ typedef struct
 	zbx_uint64_t		lastlogsize;
 	zbx_uint64_t		valuemapid;
 	char			key_orig[ZBX_ITEM_KEY_LEN * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1];
+#define ZBX_HYSTORY_SYNC_PREALOCATED_UNITS_SIZE		8
 	char			*units;
 	char			error_hash[ZBX_SHA512_BINARY_LENGTH];
+#define ZBX_HYSTORY_SYNC_PREALOCATED_PERIOD_SIZE	8
 	char			*history_period, *trends_period;
 	int			mtime;
 	int			history_sec;
@@ -857,7 +859,7 @@ void	zbx_dc_config_history_sync_get_functions_by_functionids(zbx_dc_function_t *
 void	zbx_dc_config_history_sync_get_triggers_by_itemids(zbx_hashset_t *trigger_info,
 		zbx_vector_dc_trigger_t *trigger_order, const zbx_uint64_t *itemids, const zbx_timespec_t *timespecs,
 		int itemids_num);
-void	zbx_dc_config_clean_history_sync_items(zbx_history_sync_item_t *items, int *errcodes, size_t num);
+void	zbx_dc_config_clean_history_sync_items(zbx_history_sync_item_t *items, size_t num);
 void	zbx_dc_config_history_sync_unset_existing_itemids(zbx_vector_uint64_t *itemids);
 int	zbx_dc_config_history_get_trends_sec(const char *trends_period, int trends_global, int hk_trends);
 

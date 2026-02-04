@@ -1,7 +1,7 @@
 //go:build linux && (amd64 || arm64)
 
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -17,154 +17,251 @@
 package kernel
 
 import (
-	"fmt"
-	"reflect"
+	_ "embed"
+	"os"
+	"path/filepath"
 	"testing"
 
-	"golang.zabbix.com/sdk/std"
+	"github.com/google/go-cmp/cmp"
 )
 
-var testSets = []testSet{
-	{
-		"testKernel01_empty",
-		[]testCase{
-			{1, "maxfiles", "kernel.maxfiles", []string{}, true, uint64(18446744073709551615), reflect.Uint64},
-			{2, "maxproc", "kernel.maxproc", []string{}, true, uint64(18446744073709551615), reflect.Uint64},
-			{3, "openfiles", "kernel.openfiles", []string{}, true, uint64(18446744073709551615), reflect.Uint64},
-		},
-		"",
-		"",
-	}, {
-		"testKernel02_file-max",
-		[]testCase{
-			{1, "maxfiles_no_params", "kernel.maxfiles", []string{}, false, uint64(18446744073709551615), reflect.Uint64},
-			{2, "maxfiles_empty_pram_value", "kernel.maxfiles", []string{""}, true, uint64(18446744073709551615), reflect.Uint64},
-			{3, "maxfiles_with_params", "kernel.maxfiles", []string{"param"}, true, uint64(18446744073709551615), reflect.Uint64},
-			{4, "wrong_key", "wrong.key", []string{}, true, uint64(18446744073709551615), reflect.Uint64},
-		},
-		"/proc/sys/fs/file-max",
-		"18446744073709551615\n",
-	}, {
-		"testKernel03_pid_max",
-		[]testCase{
-			{1, "maxproc_no_params", "kernel.maxproc", []string{}, false, uint64(18446744073709551615), reflect.Uint64},
-			{2, "maxproc_empty_pram_value", "kernel.maxproc", []string{""}, true, uint64(18446744073709551615), reflect.Uint64},
-			{3, "maxproc_with_params", "kernel.maxproc", []string{"param"}, true, uint64(18446744073709551615), reflect.Uint64},
-		},
-		"/proc/sys/kernel/pid_max",
-		"18446744073709551615\n",
-	}, {
-		"testKernel04_pid_max_no_new_line",
-		[]testCase{
-			{1, "maxproc_no_params", "kernel.maxproc", []string{}, false, uint64(18446744073709551615), reflect.Uint64},
-		},
-		"/proc/sys/kernel/pid_max",
-		"18446744073709551615",
-	}, {
-		"testKernel05_file-max_no_new_line",
-		[]testCase{
-			{1, "maxfiles_no_params", "kernel.maxfiles", []string{}, true, uint64(18446744073709551615), reflect.Uint64},
-		},
-		"/proc/sys/fs/file-max",
-		"18446744073709551616",
-	}, {
-		"testKernel06_pid_max_short_file",
-		[]testCase{
-			{1, "maxproc_no_params", "kernel.maxproc", []string{}, true, uint64(18446744073709551615), reflect.Uint64},
-		},
-		"/proc/sys/kernel/pid_max",
-		"abc123",
-	}, {
-		"testKernel07_file-max_empty_file",
-		[]testCase{
-			{1, "maxfiles_no_params", "kernel.maxfiles", []string{}, true, uint64(18446744073709551615), reflect.Uint64},
-		},
-		"/proc/sys/fs/file-max",
-		"",
-	}, {
-		"testKernel08_file-nr",
-		[]testCase{
-			{1, "openfiles_no_params", "kernel.openfiles", []string{}, false, uint64(18446744073709551615), reflect.Uint64},
-			{2, "openfiles_empty_pram_value", "kernel.openfiles", []string{""}, true, uint64(18446744073709551615), reflect.Uint64},
-			{3, "openfiles_with_params", "kernel.openfiles", []string{"param"}, true, uint64(18446744073709551615), reflect.Uint64},
-			{4, "wrong_key", "wrong.key", []string{}, true, uint64(18446744073709551615), reflect.Uint64},
-		},
-		"/proc/sys/fs/file-nr",
-		"18446744073709551615\n",
-	}, {
-		"testKernel09_file-nr_no_new_line",
-		[]testCase{
-			{1, "openfiles_no_params", "kernel.openfiles", []string{}, true, uint64(18446744073709551615), reflect.Uint64},
-		},
-		"/proc/sys/fs/file-nr",
-		"18446744073709551616",
-	}, {
-		"testKernel10_file-nr_empty_file",
-		[]testCase{
-			{1, "openfiles_no_params", "kernel.openfiles", []string{}, true, uint64(18446744073709551615), reflect.Uint64},
-		},
-		"/proc/sys/fs/file-nr",
-		"",
-	},
-}
+//go:embed testdata/kernel.maxfiles_valid.txt
+var maxfilesValid []byte
 
-type testCase struct {
-	id     uint
-	name   string
-	key    string
-	params []string
-	fail   bool
-	res    interface{}
-	typ    reflect.Kind
-}
+//go:embed testdata/kernel.maxfiles_invalid.txt
+var maxfilesInvalid []byte
 
-type testSet struct {
-	name        string
-	testCases   []testCase
-	fileName    string
-	fileContent string
-}
+//go:embed testdata/kernel.maxproc_valid.txt
+var maxprocValid []byte
 
-func TestKernel(t *testing.T) {
-	stdOs = std.NewMockOs()
+//go:embed testdata/kernel.maxproc_invalid.txt
+var maxprocInvalid []byte
 
-	for _, testSet := range testSets {
-		if testSet.fileName != "" {
-			stdOs.(std.MockOs).MockFile(testSet.fileName, []byte(testSet.fileContent))
-		}
+//go:embed testdata/kernel.openfiles_valid.txt
+var openfilesValid []byte
 
-		for _, testCase := range testSet.testCases {
-			if err := testCase.checkResult(); err != nil {
-				t.Errorf("Test case (%s: %s_%d) for key %s %s", testSet.name, testCase.name, testCase.id, testCase.key, err.Error())
+//go:embed testdata/kernel.openfiles_invalid.txt
+var openfilesInvalid []byte
+
+func TestPlugin_Export(t *testing.T) {
+	t.Parallel()
+
+	type args struct {
+		key    string
+		params []string
+	}
+
+	tests := []struct {
+		name           string
+		args           args
+		pidMaxContent  []byte
+		fileMaxContent []byte
+		fileNrContent  []byte
+		want           any
+		wantErr        bool
+	}{
+		// Empty file tests
+		{
+			name: "-maxfilesEmptyFile",
+			args: args{
+				key:    "kernel.maxfiles",
+				params: []string{},
+			},
+			fileMaxContent: nil,
+			want:           uint64(0),
+			wantErr:        true,
+		},
+		{
+			name: "-maxprocEmptyFile",
+			args: args{
+				key:    "kernel.maxproc",
+				params: []string{},
+			},
+			pidMaxContent: nil,
+			want:          uint64(0),
+			wantErr:       true,
+		},
+		{
+			name: "-openfilesEmptyFile",
+			args: args{
+				key:    "kernel.openfiles",
+				params: []string{},
+			},
+			fileNrContent: nil,
+			want:          uint64(0),
+			wantErr:       true,
+		},
+
+		// kernel.maxfiles tests
+		{
+			name: "+maxfilesValid",
+			args: args{
+				key:    "kernel.maxfiles",
+				params: []string{},
+			},
+			fileMaxContent: maxfilesValid,
+			want:           uint64(18446744073709551615),
+			wantErr:        false,
+		},
+		{
+			name: "-maxfilesInvalid",
+			args: args{
+				key:    "kernel.maxfiles",
+				params: []string{},
+			},
+			fileMaxContent: maxfilesInvalid,
+			want:           uint64(0),
+			wantErr:        true,
+		},
+		{
+			name: "-maxfilesWithEmptyParam",
+			args: args{
+				key:    "kernel.maxfiles",
+				params: []string{""},
+			},
+			fileMaxContent: maxfilesValid,
+			want:           nil,
+			wantErr:        true,
+		},
+		{
+			name: "-maxfilesWithParam",
+			args: args{
+				key:    "kernel.maxfiles",
+				params: []string{"param"},
+			},
+			fileMaxContent: maxfilesValid,
+			want:           nil,
+			wantErr:        true,
+		},
+
+		// kernel.maxproc tests
+		{
+			name: "+maxprocValid",
+			args: args{
+				key:    "kernel.maxproc",
+				params: []string{},
+			},
+			pidMaxContent: maxprocValid,
+			want:          uint64(18446744073709551615),
+			wantErr:       false,
+		},
+		{
+			name: "-maxprocInvalidContent",
+			args: args{
+				key:    "kernel.maxproc",
+				params: []string{},
+			},
+			pidMaxContent: maxprocInvalid,
+			want:          uint64(0),
+			wantErr:       true,
+		},
+		{
+			name: "-maxprocWithEmptyParam",
+			args: args{
+				key:    "kernel.maxproc",
+				params: []string{""},
+			},
+			pidMaxContent: maxprocValid,
+			want:          nil,
+			wantErr:       true,
+		},
+		{
+			name: "-maxprocWithWrongParam",
+			args: args{
+				key:    "kernel.maxproc",
+				params: []string{"param"},
+			},
+			pidMaxContent: maxprocValid,
+			want:          nil,
+			wantErr:       true,
+		},
+
+		// kernel.openfiles tests
+		{
+			name: "+openfilesValid",
+			args: args{
+				key:    "kernel.openfiles",
+				params: []string{},
+			},
+			fileNrContent: openfilesValid,
+			want:          uint64(3392),
+			wantErr:       false,
+		},
+		{
+			name: "-openfilesInvalidContent",
+			args: args{
+				key:    "kernel.openfiles",
+				params: []string{},
+			},
+			fileNrContent: openfilesInvalid,
+			want:          uint64(0),
+			wantErr:       true,
+		},
+		{
+			name: "-openfilesWithEmptyParam",
+			args: args{
+				key:    "kernel.openfiles",
+				params: []string{""},
+			},
+			fileNrContent: openfilesValid,
+			want:          nil,
+			wantErr:       true,
+		},
+		{
+			name: "-openfilesWithWrongParam",
+			args: args{
+				key:    "kernel.openfiles",
+				params: []string{"param"},
+			},
+			fileNrContent: openfilesValid,
+			want:          nil,
+			wantErr:       true,
+		},
+		{
+			name: "-wrongKey",
+			args: args{
+				key:    "wrong.key",
+				params: []string{},
+			},
+			want:    0,
+			wantErr: true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
+			p := &Plugin{
+				pidMaxPath:  createMockFile(t, tt.pidMaxContent),
+				fileMaxPath: createMockFile(t, tt.fileMaxContent),
+				fileNrPath:  createMockFile(t, tt.fileNrContent),
 			}
-		}
+
+			got, err := p.Export(tt.args.key, tt.args.params, nil)
+			if (err != nil) != tt.wantErr {
+				t.Fatalf("Plugin.Export() error = %v, wantErr %v", err, tt.wantErr)
+			}
+
+			if diff := cmp.Diff(tt.want, got); diff != "" {
+				t.Fatalf("Plugin.Export() mismatch (-want +got):\n%s", diff)
+			}
+		})
 	}
 }
 
-func (tc *testCase) checkResult() error {
-	var resTextOutput string
+func createMockFile(t *testing.T, content []byte) string {
+	t.Helper()
 
-	if ret, err := impl.Export(tc.key, tc.params, nil); err != nil {
-		if tc.fail != true {
-			return fmt.Errorf("returned error: %s", err)
-		}
-	} else {
-		if typ := reflect.TypeOf(ret).Kind(); typ == tc.typ {
-			if tc.typ == reflect.String {
-				resTextOutput = ret.(string)
-			} else {
-				resTextOutput = fmt.Sprint(ret)
-			}
+	var (
+		tmpDir = t.TempDir()
+		path   = filepath.Join(tmpDir, "mockfile")
+	)
 
-			if ret != tc.res && tc.fail == false {
-				return fmt.Errorf("returned invalid result: %s", resTextOutput)
-			} else if ret == tc.res && tc.fail == true {
-				return fmt.Errorf("returned valid result (%s) while not expected", resTextOutput)
-			}
-		} else if tc.fail == false {
-			return fmt.Errorf("returned unexpected value type %s", typ)
-		}
+	err := os.WriteFile(path, content, 0600)
+	if err != nil {
+		t.Fatalf("failed to write temp mock file: %v", err)
 	}
 
-	return nil
+	return path
 }

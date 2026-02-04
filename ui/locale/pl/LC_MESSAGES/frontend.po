@@ -1862,6 +1862,11 @@ msgstr "Przynajmniej jeden parametr musi być włączony."
 msgid "At least one period must be added."
 msgstr ""
 
+#: app/controllers/CControllerConnectorCreate.php:44
+#: app/controllers/CControllerConnectorUpdate.php:45
+msgid "At least one type of information must be selected."
+msgstr ""
+
 #: app/controllers/CControllerPopupAcknowledgeCreate.php:283
 msgid "At least one update operation or message is mandatory"
 msgstr "Przynajmniej jedna aktualizacja operacji jest obowiązkowa"
@@ -21784,6 +21789,11 @@ msgstr "Priorytet pokazania znacznika"
 msgid "Tag filter"
 msgstr "Filtr znacznika"
 
+#: app/controllers/CControllerConnectorCreate.php:120
+#: app/controllers/CControllerConnectorUpdate.php:121
+msgid "Tag filter name, operator and value combination is not unique."
+msgstr ""
+
 #: app/partials/trigger.edit.trigger.tab.php:253
 msgid "Tag for matching"
 msgstr "Znacznik dla dopasowania"
@@ -27351,6 +27361,11 @@ msgstr "niepoprawna sekwencja bajtów w UTF-8"
 msgid "invalid data type"
 msgstr "niewłaściwy typ danych"
 
+#: include/classes/validators/CAbsoluteTimeValidator.php:45
+#: include/classes/validators/CAbsoluteTimeValidator.php:53
+msgid "invalid date"
+msgstr ""
+
 #: include/classes/graphdraw/CLineGraphDraw.php:140 include/items.inc.php:1805
 msgid "invalid delay"
 msgstr "niepoprawne opóźnienie"
@@ -28751,6 +28766,11 @@ msgstr "wartość musi być między \"%1$s\" a \"%2$s\""
 msgid "value must be between \"%1$s\" and \"%2$s\", and have no more than \"%3$s\" digits after the decimal point"
 msgstr ""
 
+#: include/classes/validators/CTimeUnitValidator.php:84
+#, c-format
+msgid "value must be between %1$s and %2$s"
+msgstr ""
+
 #: include/classes/validators/CApiInputValidator.php:676
 msgid "value must be empty"
 msgstr "wartość musi być pusta"
@@ -28768,6 +28788,16 @@ msgstr[2] "wartość musi być pusta lub jedną z %1$s"
 #, c-format
 msgid "value must be greater than \"%1$s\""
 msgstr "wartość musi być większa niż \"%1$s\""
+
+#: include/classes/validators/CAbsoluteTimeValidator.php:59
+#, c-format
+msgid "value must be greater than or equal to %1$s"
+msgstr ""
+
+#: include/classes/validators/CAbsoluteTimeValidator.php:64
+#, c-format
+msgid "value must be less than or equal to %1$s"
+msgstr ""
 
 #: app/controllers/CControllerPopupItemTest.php:1342
 #: include/classes/validators/CNewValidator.php:220

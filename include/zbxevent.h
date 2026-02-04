@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -44,7 +44,6 @@ zbx_eventdata_t;
 ZBX_VECTOR_DECL(eventdata, zbx_eventdata_t)
 
 void	zbx_eventdata_free(zbx_eventdata_t *eventdata);
-int	zbx_eventdata_compare(const zbx_eventdata_t *d1, const zbx_eventdata_t *d2);
 int	zbx_eventdata_to_str(const zbx_vector_eventdata_t *eventdata, char **replace_to);
 
 void	zbx_event_get_macro_value(const char *macro, const zbx_db_event *event, char **replace_to,

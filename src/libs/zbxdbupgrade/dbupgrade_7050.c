@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -391,6 +391,30 @@ static int	DBpatch_7050027(void)
 
 	return SUCCEED;
 }
+
+static int	DBpatch_7050028(void)
+{
+	const zbx_db_field_t	field = {"automatic", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("trigger_tag", &field);
+}
+
+static int	DBpatch_7050029(void)
+{
+	if (ZBX_DB_OK > zbx_db_execute(
+			"update trigger_tag"
+			" set automatic=1"	/* ZBX_TAG_AUTOMATIC */
+			" where triggerid in ("
+				"select triggerid"
+				" from trigger_discovery"
+			")"))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
 #endif
 
 DBPATCH_START(7050)
@@ -425,5 +449,7 @@ DBPATCH_ADD(7050024, 0, 1)
 DBPATCH_ADD(7050025, 0, 1)
 DBPATCH_ADD(7050026, 0, 1)
 DBPATCH_ADD(7050027, 0, 1)
+DBPATCH_ADD(7050028, 0, 1)
+DBPATCH_ADD(7050029, 0, 1)
 
 DBPATCH_END()

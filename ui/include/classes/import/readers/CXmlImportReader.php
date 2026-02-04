@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -31,11 +31,6 @@ class CXmlImportReader extends CImportReader {
 		}
 
 		libxml_use_internal_errors(true);
-
-		if (PHP_VERSION_ID < 80000) {
-			// Deprecated and disabled by default since PHP 8.0.
-			libxml_disable_entity_loader();
-		}
 
 		$result = simplexml_load_string($string, null, LIBXML_IMPORT_FLAGS);
 

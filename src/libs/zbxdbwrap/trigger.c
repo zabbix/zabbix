@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -282,7 +282,7 @@ int	zbx_db_trigger_supplement_eval_resolv(zbx_token_type_t token_type, char **va
 static int	expr_macro_index(const char *macro)
 {
 	/* macros that are supported in expression macro */
-	static const char	*expr_macros[] = {MVAR_HOST_HOST, MVAR_HOSTNAME, MVAR_ITEM_KEY, NULL};
+	static const char	*expr_macros[] = {MVAR_HOST_HOST, MVAR_ITEM_KEY, NULL};
 
 	zbx_strloc_t	loc;
 	int		func_num;
