@@ -1542,7 +1542,7 @@ void	zbx_history_record_copy(zbx_history_record_t *dst, const zbx_history_record
 const char	*history_value_type_desc(unsigned char value_type)
 {
 	static char	*value_types_desc[] = {"Numeric (float)", "Character", "Log", "Numeric (unsigned)", "Text",
-			"Binary"};
+			"Binary", "JSON"};
 
 	if (value_type >= ARRSIZE(value_types_desc))
 		return "Unknown";
