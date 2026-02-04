@@ -31,7 +31,7 @@
 #include "zbxdb.h"
 #include "zbxprof.h"
 
-#ifdef HAVE_SNMP
+#ifdef HAVE_NETSNMP
 #include "zbxsnmp.h"
 #endif
 
