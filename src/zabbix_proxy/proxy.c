@@ -2015,6 +2015,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	if (0 != config_forks[ZBX_PROCESS_TYPE_DISCOVERYMANAGER])
 		zbx_discoverer_init();
 
+	zbx_unset_exit_on_terminate();
+
 	zbx_threads_num = zbx_supervisor_get_process_count(config_forks);
 	zbx_threads = (pid_t *)zbx_calloc(zbx_threads, (size_t)zbx_threads_num, sizeof(pid_t));
 	threads_flags = (int *)zbx_calloc(threads_flags, (size_t)zbx_threads_num, sizeof(int));
@@ -2100,6 +2102,12 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 						" process termination");
 				break;
 			}
+
+			if (!ZBX_IS_RUNNING())
+			{
+				zabbix_log(LOG_LEVEL_CRIT, "cannot continue proxy startup because of termination");
+				break;
+			}
 		}
 
 		zabbix_log(LOG_LEVEL_DEBUG, "starting processes at runlevel %d", i);
@@ -2108,7 +2116,6 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 
 	zbx_set_child_signal_handler();
 	zbx_supervisor_client_clear(&svc);
-	zbx_unset_exit_on_terminate();
 
 	while (ZBX_IS_RUNNING())
 	{
