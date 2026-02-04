@@ -83,7 +83,7 @@ static void	discovery_separate_host(zbx_uint64_t druleid, zbx_uint64_t dcheckid,
 		const char *ip, const char *value)
 {
 	zbx_db_result_t	result;
-	char		*ip_esc, *sql = NULL, *value_esc = NULL;
+	char		*ip_esc, *sql = NULL;
 	zbx_uint64_t	dhostid;
 	size_t		sql_alloc = 0, sql_offset = 0;
 
@@ -101,10 +101,13 @@ static void	discovery_separate_host(zbx_uint64_t druleid, zbx_uint64_t dcheckid,
 
 	if (0 != dcheckid && NULL != value)
 	{
+		char	*value_esc;
+
 		value_esc = zbx_db_dyn_escape_field("dservices", "value", value);
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " and dcheckid=" ZBX_FS_UI64, dcheckid);
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " and value" ZBX_SQL_STRCMP,
 				ZBX_SQL_STRVAL_NE(value_esc));
+		zbx_free(value_esc);
 	}
 
 	result = zbx_db_select_n(sql, 1);
@@ -135,7 +138,6 @@ static void	discovery_separate_host(zbx_uint64_t druleid, zbx_uint64_t dcheckid,
 
 	zbx_free(sql);
 	zbx_free(ip_esc);
-	zbx_free(value_esc);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
