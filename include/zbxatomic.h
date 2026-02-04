@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -12,23 +12,17 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-#ifndef ZABBIX_PG_SERVICE_H
-#define ZABBIX_PG_SERVICE_H
+#ifndef ZABBIX_ATOMIC_H
+#define ZABBIX_ATOMIC_H
 
-#include "pg_cache.h"
-#include "zbxipcservice.h"
-#include "zbxatomic.h"
+#include "zbxsysinc.h"
 
-typedef struct
-{
-	zbx_pg_cache_t		*cache;
-	zbx_ipc_service_t	service;
-	pthread_t		thread;
-	zbx_atomic_uint32_t	stop;
-}
-zbx_pg_service_t;
-
-int	pg_service_init(zbx_pg_service_t *service, zbx_pg_cache_t *cache, char **error);
-void	pg_service_destroy(zbx_pg_service_t *service);
+#if defined(HAVE_STDATOMIC_H)
+typedef _Atomic uint64_t zbx_atomic_uint64_t;
+typedef _Atomic uint32_t zbx_atomic_uint32_t;
+#else
+typedef uint64_t zbx_atomic_uint64_t;
+typedef uint32_t zbx_atomic_uint64_t;
+#endif
 
 #endif

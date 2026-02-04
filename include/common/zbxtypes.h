@@ -130,14 +130,6 @@ typedef uint32_t	zbx_uint32_t;
 
 typedef int	zbx_syserror_t;
 
-#if defined(HAVE_STDATOMIC_H)
-typedef _Atomic uint64_t	zbx_atomic_uint64_t;
-typedef _Atomic uint32_t	zbx_atomic_uint32_t;
-#else
-typedef uint64_t	zbx_atomic_uint64_t;
-typedef uint32_t	zbx_atomic_uint64_t;
-#endif
-
 #endif	/* _WINDOWS */
 
 #if defined(_WINDOWS)
