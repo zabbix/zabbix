@@ -550,8 +550,8 @@ static void	supervisor_unitset_change_loglevel(zbx_supervisor_unit_set_t *set, i
 		zabbix_log(LOG_LEVEL_INFORMATION, "Cannot change log level for %s #%d:"
 				" no such instance", get_process_type_string(set->process_type), proc_num);
 	}
-
-	zbx_change_component_log_level(&set->units[proc_num - 1].logger, direction);
+	else
+		zbx_change_component_log_level(&set->units[proc_num - 1].logger, direction);
 }
 
 /******************************************************************************
