@@ -813,7 +813,7 @@ class testFormAdministrationMediaTypes extends CWebTest {
 					]
 				]
 			],
-			// #7 Error message when authorization endpoint is empty.
+			// #7 Error message when token endpoint is empty.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -903,7 +903,7 @@ class testFormAdministrationMediaTypes extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'mediatype_tab' => [
-						'Name' => 'Empty space in SMTP server',
+						'Name' => 'Too large value in SMTP server port',
 						'SMTP server port' => '99999'
 					],
 					'inline_errors' => [
@@ -1734,10 +1734,11 @@ class testFormAdministrationMediaTypes extends CWebTest {
 			if (array_key_exists('oauth_form', $data)) {
 				$this->assertInlineError($oauth_overlay->waitUntilReady()->asForm(), $data['inline_errors']);
 				$oauth_overlay->close();
-				return;
 			}
-			$this->assertInlineError($form, $data['inline_errors']);
-			$this->assertEquals($old_hash, CDBHelper::getHash(self::$mediatype_sql));
+			else {
+				$this->assertInlineError($form, $data['inline_errors']);
+				$this->assertEquals($old_hash, CDBHelper::getHash(self::$mediatype_sql));
+			}
 		}
 		else {
 			$title = ($create) ? 'Media type added' : 'Media type updated';
