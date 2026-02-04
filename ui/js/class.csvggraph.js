@@ -110,7 +110,7 @@ class CSvgGraph {
 	/**
 	 * @type {number|null}
 	 */
-	#animation_frame_id = null;
+	#hintbox_animation_frame_id = null;
 
 	constructor(svg, widget, options) {
 		this.#svg = svg;
@@ -163,6 +163,14 @@ class CSvgGraph {
 		}
 	}
 
+	#cancelHintboxAnimationFrame() {
+		if (this.#hintbox_animation_frame_id !== null) {
+			cancelAnimationFrame(this.#hintbox_animation_frame_id);
+
+			this.#hintbox_animation_frame_id = null;
+		}
+	}
+
 	#mouseClickHandler = e => {
 		if (this.#mouse_click_handled) {
 			this.#mouse_click_handled = false;
@@ -170,24 +178,22 @@ class CSvgGraph {
 			return;
 		}
 
-		if (this.#animation_frame_id !== null) {
-			cancelAnimationFrame(this.#animation_frame_id);
-		}
-
+		this.#cancelHintboxAnimationFrame();
 		this.#showHintboxAndHighlightPoints(e, true);
 	}
 
 	#mouseMoveHandler = e => {
-		if (this.#animation_frame_id === null) {
-			this.#animation_frame_id = requestAnimationFrame(() => {
+		if (this.#hintbox_animation_frame_id === null) {
+			this.#hintbox_animation_frame_id = requestAnimationFrame(() => {
 				this.#showHintboxAndHighlightPoints(e, false);
 
-				this.#animation_frame_id = null;
+				this.#hintbox_animation_frame_id = null;
 			});
 		}
 	}
 
 	#mouseLeaveHandler = () => {
+		this.#cancelHintboxAnimationFrame();
 		this.#removeHintbox();
 		this.#hideHelper();
 	}
@@ -325,6 +331,7 @@ class CSvgGraph {
 
 			this.#is_boxing = true;
 
+			this.#cancelHintboxAnimationFrame();
 			this.#removeHintbox(true);
 			this.#hideHelper();
 		}
@@ -396,6 +403,7 @@ class CSvgGraph {
 	}
 
 	#zoomOutTime = () => {
+		this.#cancelHintboxAnimationFrame();
 		this.#removeHintbox(true);
 
 		this.#widget.updateTimeSelector({
@@ -603,7 +611,6 @@ class CSvgGraph {
 	}
 
 	#removeHintbox(is_static = false) {
-		cancelAnimationFrame(this.#animation_frame_id);
 		hintBox.hideHint(this.#svg, is_static);
 	}
 
