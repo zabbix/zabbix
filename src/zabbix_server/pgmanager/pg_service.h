@@ -17,7 +17,7 @@
 
 #include "pg_cache.h"
 #include "zbxipcservice.h"
-#include "zbxatomic.h"
+#include "zbxtypes_ext.h"
 
 typedef struct
 {

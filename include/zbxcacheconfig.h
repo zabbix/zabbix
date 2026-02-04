@@ -25,7 +25,7 @@
 #include "zbxtagfilter.h"
 #include "zbxpgservice.h"
 #include "zbxalgo.h"
-#include "zbxatomic.h"
+#include "zbxtypes_ext.h"
 
 #define	ZBX_NO_POLLER			255
 #define	ZBX_POLLER_TYPE_NORMAL		0

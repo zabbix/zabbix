@@ -12,8 +12,10 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-#ifndef ZABBIX_ATOMIC_H
-#define ZABBIX_ATOMIC_H
+#ifndef ZABBIX_TYPES_EXT_H
+#define ZABBIX_TYPES_EXT_H
+
+/* type declarations using post c99 features */
 
 #include "zbxsysinc.h"
 
