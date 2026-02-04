@@ -251,7 +251,7 @@ var jqBlink = {
  */
 const hintBox = {
 
-	is_rendering: false,
+	animation_frame_id: null,
 	show_hint_timer: null,
 
 	// Variables related to hintbox dragging.
@@ -314,36 +314,37 @@ const hintBox = {
 					break;
 				}
 
-				if (!this.is_rendering) {
-					this.is_rendering = true;
-					requestAnimationFrame(showHint);
-				}
+				if (this.animation_frame_id === null) {
+					this.animation_frame_id = requestAnimationFrame(() => {
+						showHint();
 
-				this.is_rendering = false;
+						this.animation_frame_id = null;
+					});
+				}
 				break;
 
 			case 'mouseleave':
-				requestAnimationFrame(() => {
-					hintBox.hideHint($target[0], false);
-					$target.blur();
-				});
+				if (this.animation_frame_id !== null) {
+					cancelAnimationFrame(this.animation_frame_id);
+				}
+
+				hintBox.hideHint($target[0], false);
+				$target.blur();
 				break;
 
 			case 'keydown':
 			case 'click':
+				if (this.animation_frame_id !== null) {
+					cancelAnimationFrame(this.animation_frame_id);
+				}
+
 				if ($target.data('hintbox-static') !== 1) {
 					break;
 				}
 
-				const result = hintBox.showStaticHint(e, $target[0], $target.data('hintbox-class'), false,
+				hintBox.showStaticHint(e, $target[0], $target.data('hintbox-class'), false,
 					$target.data('hintbox-style')
 				);
-
-				if (!result && $target[0].dataset.hintboxStaticReopenOnClick && $target[0].dataset.hintboxContents) {
-					hintBox.showStaticHint(e, $target[0], $target.data('hintbox-class'), false,
-						$target.data('hintbox-style')
-					);
-				}
 				break;
 		}
 	},
@@ -418,7 +419,9 @@ const hintBox = {
 			$preloader.remove();
 
 			if (target.hintBoxItem !== undefined) {
-				box.append(hintbox_contents);
+				const hintbox_container = box[0].querySelector('.hintbox-container');
+
+				hintbox_container.append(hintbox_contents);
 
 				// Reset hintbox position.
 				box.css({
@@ -463,12 +466,15 @@ const hintBox = {
 			hintText = hintText.replace(/\n/g, '<br />');
 		}
 
+		const hintbox_container = document.createElement('div');
+		hintbox_container.classList.add('hintbox-container');
+		hintbox_container.innerHTML = hintText;
+
 		if (!empty(className)) {
-			box.append(jQuery('<div>').addClass(className).html(hintText));
+			hintbox_container.classList.add(...className.split(' '));
 		}
-		else {
-			box.html(hintText);
-		}
+
+		box.append(hintbox_container);
 
 		if (isStatic) {
 			target.hintboxid = hintboxid;
@@ -541,15 +547,9 @@ const hintBox = {
 		const isStatic = target.isStatic;
 		hintBox.hideHint(target, true);
 
-		let opened = false;
-
 		if (!isStatic) {
 			if (typeof hintText === 'undefined') {
 				hintText = target.dataset.hintboxContents;
-			}
-
-			if (!target.dataset.hintboxContents && !target.dataset.hintboxPreload) {
-				return;
 			}
 
 			target.isStatic = true;
@@ -592,14 +592,10 @@ const hintBox = {
 				callback: (e) => hintBox.onScroll(target, e)
 			};
 
-			opened = true;
-
 			addEventListener('scroll', target.scroll_observer.callback, {capture: true});
 		}
 
 		addEventListener('resize', target.resizeHandler = e => hintBox.onResize(e, target));
-
-		return opened;
 	},
 
 	onScroll: function(target, e) {

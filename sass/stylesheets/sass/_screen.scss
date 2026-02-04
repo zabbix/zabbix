@@ -1966,6 +1966,7 @@ select {
 		display: flex;
 		flex-direction: column;
 		box-sizing: border-box;
+		overflow: hidden;
 
 		&.hintbox-position-fixed {
 			position: fixed;
@@ -1984,6 +1985,12 @@ select {
 				width: 100%;
 				cursor: grab;
 			}
+		}
+
+		.hintbox-container {
+			overflow: auto;
+
+			@extend %webkit-scrollbar;
 		}
 	}
 
@@ -2497,9 +2504,6 @@ select {
 	line-height: 18px;
 	white-space: nowrap;
 	min-width: 160px;
-	overflow-y: auto;
-
-	@extend %webkit-scrollbar;
 
 	.table-paging {
 		min-height: 18px;
