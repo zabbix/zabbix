@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -101,9 +101,6 @@ void	set_zbx_config_value_cache_size(zbx_uint64_t cache_size)
 }
 
 zbx_uint64_t	CONFIG_TREND_FUNC_CACHE_SIZE	= 0;
-
-/* not used in tests, defined for linking with comms.c */
-int	CONFIG_TCP_MAX_BACKLOG_SIZE	= SOMAXCONN;
 
 ZBX_GET_CONFIG_VAR2(const char *, const char *, zbx_progname, "mock_progname")
 

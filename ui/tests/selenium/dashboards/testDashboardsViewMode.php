@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -73,6 +73,9 @@ class testDashboardsViewMode extends CLegacyWebTest {
 					'No data found');
 			$this->zbxTestAssertElementText("//div[@class='dashboard-grid']/div[3]//div[@class='no-data-message']",
 					'No permissions to referred object or it does not exist!');
+
+			// Check that no bad messages are displayed.
+			$this->assertFalse($this->query('class:msg-bad')->one(false)->isValid());
 		}
 		else {
 			$this->zbxTestCheckNoRealHostnames();
@@ -88,9 +91,7 @@ class testDashboardsViewMode extends CLegacyWebTest {
 		$this->zbxTestAssertElementPresentXpath("//div[@class='dashboard-grid']/div[6]//h4[text()='Graph']");
 
 		// Logout.
-		$this->zbxTestLogout();
-		$this->zbxTestWaitForPageToLoad();
-		$this->webDriver->manage()->deleteAllCookies();
+		$this->page->logout();
 	}
 
 	public function testDashboardsViewMode_KioskMode() {

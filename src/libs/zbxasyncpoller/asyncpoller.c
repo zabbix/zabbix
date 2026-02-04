@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -332,9 +332,18 @@ void	zbx_async_poller_add_task(struct event_base *ev, zbx_channel_t *channel, st
 #ifdef HAVE_ARES
 		struct ares_addrinfo_hints	hints = {.ai_family = PF_UNSPEC, .ai_socktype = SOCK_STREAM};
 
-		if (SUCCEED == zbx_is_supported_ip(addr))
-			hints.ai_flags = AI_NUMERICHOST;
-
+		if (SUCCEED == zbx_is_ip4(addr))
+		{
+			hints.ai_flags = ARES_AI_NUMERICHOST;
+			hints.ai_family = AF_INET;
+		}
+#ifdef HAVE_IPV6
+		else if (SUCCEED == zbx_is_ip6(addr))
+		{
+			hints.ai_flags = ARES_AI_NUMERICHOST;
+			hints.ai_family = AF_INET6;
+		}
+#endif
 		ares_getaddrinfo(channel, addr, NULL, &hints, ares_addrinfo_cb, task);
 		return;
 #endif

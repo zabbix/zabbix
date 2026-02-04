@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -638,12 +638,13 @@ function check_db_fields($dbFields, &$args) {
  *
  * @param string $field_name
  * @param array  $values
- * @param bool   $not_in        Create inverse condition.
- * @param bool   $zero_to_null  Cast zero to null.
+ * @param bool   $not_in              Create inverse condition.
+ * @param bool   $zero_includes_null  ID fields may have default DB column value either null or 0. Consider them
+ *                                    equivalent for 0 in the given values.
  *
  * @return string
  */
-function dbConditionInt($field_name, array $values, $not_in = false, $zero_to_null = false) {
+function dbConditionInt($field_name, array $values, $not_in = false, $zero_includes_null = false) {
 	global $DB;
 
 	$MIN_NUM_BETWEEN = 4; // Minimum number of consecutive values for using "BETWEEN <id1> AND <idN>".
@@ -655,11 +656,10 @@ function dbConditionInt($field_name, array $values, $not_in = false, $zero_to_nu
 
 	$values = array_flip($values);
 
-	$has_zero = false;
+	$condition = '';
 
-	if ($zero_to_null && array_key_exists(0, $values)) {
-		$has_zero = true;
-		unset($values[0]);
+	if ($zero_includes_null && array_key_exists(0, $values)) {
+		$condition .= $field_name.($not_in ? ' IS NOT NULL' : ' IS NULL');
 	}
 
 	$values = array_keys($values);
@@ -698,13 +698,14 @@ function dbConditionInt($field_name, array $values, $not_in = false, $zero_to_nu
 		}, $values);
 	}
 
-	$condition = '';
+	$multiple_conditions = false;
 
 	// Process intervals.
 
 	foreach ($intervals as $interval) {
 		if ($condition !== '') {
 			$condition .= $not_in ? ' AND ' : ' OR ';
+			$multiple_conditions = true;
 		}
 
 		$condition .= ($not_in ? 'NOT ' : '').$field_name.' BETWEEN '.$interval[0].' AND '.$interval[1];
@@ -712,11 +713,12 @@ function dbConditionInt($field_name, array $values, $not_in = false, $zero_to_nu
 
 	// Process individual values.
 
-	$single_chunks = array_chunk($singles, $MAX_NUM_IN);
+	$single_chunks = $DB['TYPE'] === ZBX_DB_ORACLE ? array_chunk($singles, $MAX_NUM_IN) : [$singles];
 
 	foreach ($single_chunks as $chunk) {
 		if ($condition !== '') {
 			$condition .= $not_in ? ' AND ' : ' OR ';
+			$multiple_conditions = true;
 		}
 
 		if (count($chunk) == 1) {
@@ -727,18 +729,8 @@ function dbConditionInt($field_name, array $values, $not_in = false, $zero_to_nu
 		}
 	}
 
-	if ($has_zero) {
-		if ($condition !== '') {
-			$condition .= $not_in ? ' AND ' : ' OR ';
-		}
-
-		$condition .= $field_name.($not_in ? ' IS NOT NULL' : ' IS NULL');
-	}
-
-	if (!$not_in) {
-		if ((int) $has_zero + count($intervals) + count($single_chunks) > 1) {
-			$condition = '('.$condition.')';
-		}
+	if (!$not_in && $multiple_conditions) {
+		$condition = '('.$condition.')';
 	}
 
 	return $condition;
@@ -767,9 +759,11 @@ function dbConditionId($fieldName, array $values, $notIn = false) {
  * @return string
  */
 function dbConditionString($fieldName, array $values, $notIn = false) {
+	global $DB;
+
 	switch (count($values)) {
 		case 0:
-			return '1=0';
+			return $notIn ? '1=1' : '1=0';
 		case 1:
 			return $notIn
 				? $fieldName.'!='.zbx_dbstr(reset($values))
@@ -778,7 +772,7 @@ function dbConditionString($fieldName, array $values, $notIn = false) {
 
 	$in = $notIn ? ' NOT IN ' : ' IN ';
 	$concat = $notIn ? ' AND ' : ' OR ';
-	$items = array_chunk($values, 950);
+	$items = $DB['TYPE'] === ZBX_DB_ORACLE ? array_chunk($values, 950) : [$values];
 
 	$condition = '';
 	foreach ($items as $values) {

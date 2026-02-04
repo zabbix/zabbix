@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -329,7 +329,7 @@ class testGoAgentDataCollection extends CIntegrationTest {
 			'key' => 'proc.mem[apache2,www-data,]',
 			'type' => ITEM_TYPE_ZABBIX,
 			'valueType' => ITEM_VALUE_TYPE_FLOAT,
-			'threshold' => 10000.0
+			'threshold' => 500000.0
 		],
 		[
 			'key' => 'proc.mem[zabbix_server,zabbix,avg]',

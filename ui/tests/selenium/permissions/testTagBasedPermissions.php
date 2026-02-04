@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -730,7 +730,7 @@ class testTagBasedPermissions extends CLegacyWebTest {
 						[
 							'Host' => 'First Host for tag filter permission test',
 							'Problem' => 'Third trigger for tag filter permission check',
-							'Tags' => implode(['item OS: Linux', 'trigger OS: Windows'])
+							'Tags' => implode("\n", ['item OS: Linux', 'trigger OS: Windows'])
 						],
 						[
 
@@ -765,7 +765,7 @@ class testTagBasedPermissions extends CLegacyWebTest {
 						[
 							'Host' => 'First Host for tag filter permission test',
 							'Problem' => 'Third trigger for tag filter permission check',
-							'Tags' => implode(['item OS: Linux', 'trigger OS: Windows'])
+							'Tags' => implode("\n", ['item OS: Linux', 'trigger OS: Windows'])
 						],
 						[
 							'Host' => 'Second Host for tag filter permission test',
@@ -799,7 +799,7 @@ class testTagBasedPermissions extends CLegacyWebTest {
 						[
 							'Host' => 'First Host for tag filter permission test',
 							'Problem' => 'Third trigger for tag filter permission check',
-							'Tags' => implode(['item OS: Linux', 'trigger OS: Windows'])
+							'Tags' => implode("\n", ['item OS: Linux', 'trigger OS: Windows'])
 						],
 						[
 							'Host' => 'Second Host for tag filter permission test',

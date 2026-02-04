@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -464,6 +464,7 @@ unsigned int	zbx_tls_get_psk_usage(void);
 #define ZBX_REDIRECT_ADDRESS_LEN	255
 #define ZBX_REDIRECT_ADDRESS_LEN_MAX	(ZBX_REDIRECT_ADDRESS_LEN + 1)
 
+#define ZBX_REDIRECT_FAIL		-1
 #define ZBX_REDIRECT_NONE		0
 #define ZBX_REDIRECT_RESET		1
 #define ZBX_REDIRECT_RETRY		2

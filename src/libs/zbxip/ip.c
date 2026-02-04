@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -284,4 +284,28 @@ fail:
 		*r2 = ':';
 
 	return res;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: combines host and port into a network address "host:port"         *
+ *                                                                            *
+ * Parameters: hostport       - [IN/OUT] string formatting buffer pointer     *
+ *             hostport_sz    - [IN] size of buffer                           *
+ *             host           - [IN]                                          *
+ *             port           - [IN]                                          *
+ *                                                                            *
+ * Return value: pointer to hostport buffer                                   *
+ *                                                                            *
+ ******************************************************************************/
+char	*zbx_join_hostport(char *hostport, size_t hostport_sz, const char *host, unsigned short port)
+{
+	const char	*format = "%s:%hu";
+
+	if (NULL != strchr(host, ':'))
+		format = "[%s]:%hu";
+
+	zbx_snprintf(hostport, hostport_sz, format, host, port);
+
+	return hostport;
 }

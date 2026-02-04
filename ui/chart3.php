@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -90,6 +90,7 @@ if ($httptestid = getRequest('httptestid', false)) {
 	);
 	while ($item = DBfetch($dbItems)) {
 		$graph_items[] = $item + [
+			'preprocessing' => [],
 			'color' => ($color === false) ? reset($colors) : $color,
 			'host' => $hosts[$item['hostid']]['host'],
 			'hostname' => $hosts[$item['hostid']]['name']
@@ -115,6 +116,7 @@ elseif (hasRequest('i') || hasRequest('items')) {
 		'output' => ['itemid', 'type', 'name', 'master_itemid', 'delay', 'units', 'hostid', 'history', 'trends',
 			'value_type', 'key_', 'flags'
 		],
+		'selectPreprocessing' => ['type', 'params'],
 		'selectHosts' => ['hostid', 'name', 'host'],
 		'itemids' => array_column($items, 'itemid'),
 		'filter' => [

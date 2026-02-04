@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -32,7 +32,8 @@ class CMultifieldTableElement extends CTableElement {
 	 */
 	protected $selectors = [
 		'header' => 'xpath:./thead/tr/th',
-		'row' => 'xpath:./tbody/tr[contains(@class, "form_row") or contains(@class, "pairRow") or contains(@class, "editable_table_row")]',
+		'row' => 'xpath:./tbody/tr[contains(@class, "form_row") or contains(@class, "pairRow") or'.
+			' contains(@class, "editable_table_row") or contains(@id, "url-row")]',
 		'column' => 'xpath:./td'
 	];
 

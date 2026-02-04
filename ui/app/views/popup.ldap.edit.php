@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -96,7 +96,12 @@ $form
 					(new CPassBox('bind_password', '', DB::getFieldLength('userdirectory_ldap', 'bind_password')))
 						->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 						->addStyle('display: none;')
-						->setAttribute('disabled', 'disabled')
+						->setAttribute('disabled', 'disabled'),
+					makeWarningIcon(
+						_('The previous password was cleared due to a host change. Please enter the new password.')
+					)
+						->addStyle('display: none;')
+						->addClass('js-bind-password-warning')
 				]
 				: (new CPassBox('bind_password', '', DB::getFieldLength('userdirectory_ldap', 'bind_password')))
 					->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)

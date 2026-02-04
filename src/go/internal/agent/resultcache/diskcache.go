@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -306,9 +306,11 @@ func (c *DiskCache) upload(u Uploader) (err error) {
 	if timeout > 60 {
 		timeout = 60
 	}
-	var upload bool
 
-	if upload, errs = u.Write(data, time.Duration(timeout)*time.Second); errs != nil {
+	upload, errs := u.Write(data, time.Duration(timeout)*time.Second)
+	c.EnableUpload(upload)
+
+	if errs != nil {
 		if !reflect.DeepEqual(errs, c.lastErrors) {
 			for i := 0; i < len(errs); i++ {
 				c.Warningf("%s", errs[i])
@@ -320,8 +322,6 @@ func (c *DiskCache) upload(u Uploader) (err error) {
 
 		return
 	}
-
-	c.EnableUpload(upload)
 
 	if c.lastErrors != nil {
 		c.Warningf("history upload to [%s] [%s] is working again", u.Addr(), u.Hostname())

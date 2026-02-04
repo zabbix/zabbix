@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -738,6 +738,16 @@ static int	zbx_regexp2(const char *string, const char *pattern, int flags, char 
 
 /*************************************************************************************************
  *                                                                                               *
+ * Purpose: find a match looking line-by-line for a regular expression pattern                   *
+ *                                                                                               *
+ * Parameters: string  - [IN] input string                                                       *
+ *             pattern - [IN] regular expression pattern                                         *
+ *             len     - [OUT] length of matched string,                                         *
+ *                             0 in case of no match or                                          *
+ *                             FAIL if an error occurred.                                        *
+ *                                                                                               *
+ * Return value: pointer to the matched substring or null                                        *
+ *                                                                                               *
  *  Comments: Note, that although the input 'string' was const, the return is not, as the caller *
  *            owns it and can modify it. This is similar to strstr() and strcasestr() functions. *
  *            We may need to find a way how to silence the resulting '-Wcast-qual' warning.      *
@@ -746,6 +756,28 @@ static int	zbx_regexp2(const char *string, const char *pattern, int flags, char 
 char	*zbx_regexp_match(const char *string, const char *pattern, int *len)
 {
 	return zbx_regexp(string, pattern, ZBX_REGEXP_MULTILINE, len);
+}
+
+/*************************************************************************************************
+ *                                                                                               *
+ * Purpose: find a match looking fully for a regular expression pattern                          *
+ *                                                                                               *
+ * Parameters: string  - [IN] input string                                                       *
+ *             pattern - [IN] regular expression pattern                                         *
+ *             len     - [OUT] length of matched string,                                         *
+ *                             0 in case of no match or                                          *
+ *                             FAIL if an error occurred.                                        *
+ *                                                                                               *
+ * Return value: pointer to the matched substring or null                                        *
+ *                                                                                               *
+ *  Comments: Note, that although the input 'string' was const, the return is not, as the caller *
+ *            owns it and can modify it. This is similar to strstr() and strcasestr() functions. *
+ *            We may need to find a way how to silence the resulting '-Wcast-qual' warning.      *
+ *                                                                                               *
+ ************************************************************************************************/
+char	*zbx_regexp_match_full(const char *string, const char *pattern, int *len)
+{
+	return zbx_regexp(string, pattern, 0, len);
 }
 
 /******************************************************************************

@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -676,14 +676,20 @@ class CDBHelper {
 	public static function removeDumpFile($file) {
 		if (strstr(strtolower(PHP_OS), 'win') !== false) {
 			$file = str_replace('/', '\\', $file);
-			exec('del '.$file);
+
+			if (is_file($file)) {
+				exec('del '.$file.' /q 2>nul');
+			}
+			else {
+				exec('rd '.$file.' /q /s 2>nul');
+			}
 		}
 		else {
 			exec('rm -rf '.$file, $output, $result_code);
-		}
 
-		if ($result_code != 0) {
-			throw new Exception('Failed to remove "'.$file.'".');
+			if ($result_code != 0) {
+				throw new Exception('Failed to remove "'.$file.'".');
+			}
 		}
 	}
 }

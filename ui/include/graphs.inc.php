@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -661,7 +661,7 @@ function yieldGraphScaleInterval(float $min, float $max, string $units, int $pow
 
 	$is_binary = isBinaryUnits($units);
 
-	$base = getUnitsBase($units, $power);
+	$base = truncateFloat(getUnitsBase($units, $power));
 
 	// Expression optimized to avoid overflow.
 	$interval = truncateFloat($max / $rows - $min / $rows);

@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -100,6 +100,7 @@
 #define MVAR_HOST_TARGET_IP		"{HOST.TARGET.IP}"
 #define MVAR_HOST_TARGET_NAME		"{HOST.TARGET.NAME}"
 #define MVAR_TIME			"{TIME}"
+#define MVAR_TIMESTAMP			"{TIMESTAMP}"
 #define MVAR_ITEM_LASTVALUE		"{ITEM.LASTVALUE}"
 #define MVAR_ITEM_VALUE			"{ITEM.VALUE}"
 #define MVAR_ITEM_VALUETYPE		"{ITEM.VALUETYPE}"

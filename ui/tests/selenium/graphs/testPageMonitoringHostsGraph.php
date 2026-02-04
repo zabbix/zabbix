@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -851,22 +851,25 @@ class testPageMonitoringHostsGraph extends CWebTest {
 		}
 
 		$form = $this->query('name:zbx_filter')->asForm()->one();
-		$form->query('button:Reset')->one()->click();
+		$form->query('button:Reset')->one()->click()->waitUntilStalled();
 
 		// Filter using tags.
 		if (array_key_exists('subfilter', $data)) {
 			$table = $this->getTable();
-			$form->fill(['Hosts' => 'Host_for_monitoring_graphs_1', 'Show' => 'All graphs'])->submit();
+			$form->fill(['Hosts' => 'Host_for_monitoring_graphs_1', 'Show' => 'All graphs'])->submit()->waitUntilStalled();
 			$table->waitUntilReloaded();
 			$this->page->waitUntilReady();
 
 			// Click on subfilter.
 			foreach ($data['subfilter'] as $header => $values) {
 				foreach ($values as $value) {
-					$this->query("xpath://h3[text()=".CXPathHelper::escapeQuotes($header)."]/..//a[text()=".
-							CXPathHelper::escapeQuotes($value)."]")->waitUntilClickable()->one()->click();
-					$this->query("xpath://h3[text()=".CXPathHelper::escapeQuotes($header)."]/..//a[text()=".
-							CXPathHelper::escapeQuotes($value)."]/ancestor::span")->one()->
+					// TODO: need to figure out why the table needs to be initialized again
+					$table = $this->getTable();
+					$xpath = 'xpath://h3[text()='.CXPathHelper::escapeQuotes($header).']/..//a[text()='.
+							CXPathHelper::escapeQuotes($value).']';
+					$this->query($xpath)->waitUntilClickable()->one()->click();
+					$table->waitUntilReloaded();
+					$this->query($xpath.'/ancestor::span')->one()->
 							waitUntilAttributesPresent(['class' => 'subfilter subfilter-enabled']);
 					$this->page->waitUntilReady();
 				}
@@ -874,7 +877,7 @@ class testPageMonitoringHostsGraph extends CWebTest {
 		}
 
 		$table = $this->getTable();
-		$form->fill($data['filter'])->submit();
+		$form->fill($data['filter'])->submit()->waitUntilStalled();
 		$table->waitUntilReloaded();
 		$this->page->waitUntilReady();
 
@@ -882,7 +885,6 @@ class testPageMonitoringHostsGraph extends CWebTest {
 		if (array_key_exists('graphs_amount', $data)) {
 			$this->assertEquals($data['graphs_amount'],
 					$this->query('xpath://tbody/tr/div[@class="flickerfreescreen"]')->all()->count());
-			$this->assertTableStats($data['graphs_amount']);
 
 			// Find links with graphs and items ids.
 			$graph_sources = [];
@@ -899,6 +901,8 @@ class testPageMonitoringHostsGraph extends CWebTest {
 			if (array_key_exists('item_names', $data)) {
 				$this->checkGraphsIds($data['item_names'], $graph_sources, false);
 			}
+
+			$this->assertTableStats($data['graphs_amount']);
 		}
 		else {
 			$message = (array_key_exists('Hosts', $data['filter']) || array_key_exists('subfilter', $data))

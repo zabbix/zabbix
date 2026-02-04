@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -119,23 +119,25 @@ static const char	*help_message[] = {
 	"",
 	"      Log level control targets:",
 	"        process-type             All processes of specified type",
-	"                                 (availability manager, configuration syncer, data sender, browser poller,",
-	"                                 discovery manager, history syncer, housekeeper, http poller,",
-	"                                 icmp pinger, ipmi manager, ipmi poller, java poller,",
-	"                                 odbc poller, poller, agent poller, http agent poller,",
-	"                                 snmp poller, preprocessing manager, self-monitoring, snmp trapper,",
-	"                                 task manager, trapper, unreachable poller, vmware collector)",
+	"                                 (availability manager, browser poller, configuration syncer,",
+	"                                 data sender, discovery manager, discovery worker, history syncer,",
+	"                                 housekeeper, http poller, icmp pinger, internal poller, ipmi manager,",
+	"                                 ipmi poller, java poller, odbc poller, poller, agent poller,",
+	"                                 http agent poller, snmp poller, preprocessing manager, preprocessing worker",
+	"                                 self-monitoring, snmp trapper, task manager, trapper, unreachable poller,",
+	"                                 vmware collector)",
 	"        process-type,N           Process type and number (e.g., poller,3)",
 	"        pid                      Process identifier",
 	"",
 	"      Profiling control targets:",
 	"        process-type             All processes of specified type",
-	"                                 (availability manager, configuration syncer, data sender, browser poller,",
-	"                                 discovery manager, history syncer, housekeeper, http poller,",
-	"                                 icmp pinger, ipmi manager, ipmi poller, java poller,",
-	"                                 odbc poller, poller, agent poller, http agent poller,",
-	"                                 snmp poller, preprocessing manager, self-monitoring, snmp trapper,",
-	"                                 task manager, trapper, unreachable poller, vmware collector)",
+	"                                 (availability manager, browser poller, configuration syncer,",
+	"                                 data sender, discovery manager, discovery worker, history syncer,",
+	"                                 housekeeper, http poller, icmp pinger, internal poller, ipmi manager,",
+	"                                 ipmi poller, java poller, odbc poller, poller, agent poller,",
+	"                                 http agent poller, snmp poller, preprocessing manager, preprocessing worker",
+	"                                 self-monitoring, snmp trapper, task manager, trapper, unreachable poller,",
+	"                                 vmware collector)",
 	"        process-type,N           Process type and number (e.g., history syncer,1)",
 	"        pid                      Process identifier",
 	"        scope                    Profiling scope",
@@ -1387,6 +1389,8 @@ static void	proxy_db_init(void)
 	char		*error = NULL;
 	int		db_type, version_check;
 
+	zbx_config_dbhigh->read_only_recoverable = 1;
+
 	if (SUCCEED != zbx_db_init(zbx_dc_get_nextid, config_log_slow_queries, &error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize database: %s", error);
@@ -1515,6 +1519,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 								zbx_config_enable_remote_commands,
 								zbx_get_value_internal_ext_proxy,
 								config_ssh_key_location, config_webdriver_url,
+								.trapper_process_request_func_cb =
 								trapper_process_request_proxy,
 								zbx_autoreg_update_host_proxy};
 	zbx_thread_proxy_housekeeper_args	housekeeper_args = {zbx_config_timeout, config_housekeeping_frequency,

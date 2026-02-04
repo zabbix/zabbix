@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -628,6 +628,7 @@ class testDashboardDiscoveryStatusWidget extends CWebTest {
 			? '1 minute'
 			: CTestArrayHelper::get($data['fields'], 'Refresh interval');
 		$this->assertEquals($refresh, $widget->getRefreshInterval());
+		CPopupMenuElement::find()->one()->close();
 
 		// Check new widget form fields and values in frontend.
 		$saved_form = $widget->edit();

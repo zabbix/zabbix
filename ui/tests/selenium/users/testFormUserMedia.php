@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -41,6 +41,20 @@ class testFormUserMedia extends CWebTest {
 	 * Enable media types before test.
 	 */
 	public function prepareMediaTypeData() {
+		CDataHelper::call('mediatype.create', [
+			[
+				'type' => MEDIA_TYPE_EXEC,
+				'name' => 'Test script',
+				'exec_path' => 'selenium_test_script.sh',
+				'parameters' => [
+					[
+						'sortorder' => '0',
+						'value' => '{ALERT.SUBJECT}'
+					]
+				]
+			]
+		]);
+
 		$mediatypeids = CDBHelper::getAll("SELECT mediatypeid FROM media_type WHERE name IN ('Email', 'SMS',".
 				"'Test script', 'MS Teams', 'Slack', 'Zendesk')"
 		);
@@ -390,6 +404,7 @@ class testFormUserMedia extends CWebTest {
 				$media_form = COverlayDialogElement::find()->one()->waitUntilReady()->asForm();
 				$media_form->fill($media);
 				$media_form->submit();
+				COverlayDialogElement::ensureNotPresent();
 				$this->page->waitUntilReady();
 				$user_form->invalidate();
 				$this->assertEquals($user_form->getField('Media')->asTable()->getRows()->count(), $i + 2);

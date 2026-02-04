@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -218,4 +218,23 @@ void	zbx_pp_history_cache_history_set_and_release(zbx_pp_history_cache_t *histor
 	history_cache->history = history_out;
 
 	pthread_mutex_unlock(&history_cache->lock);
+}
+
+zbx_uint64_t	zbx_pp_history_cache_history_size(zbx_pp_history_cache_t *history_cache)
+{
+	zbx_uint64_t	history_size = 0;
+
+	if (NULL == history_cache)
+		return 0;
+
+	pthread_mutex_lock(&history_cache->lock);
+
+	if (NULL != history_cache->history)
+	{
+		for (int i = 0; i < history_cache->history->step_history.values_num; i++)
+			history_size += zbx_variant_size(&history_cache->history->step_history.values[i].value);
+	}
+	pthread_mutex_unlock(&history_cache->lock);
+
+	return history_size;
 }

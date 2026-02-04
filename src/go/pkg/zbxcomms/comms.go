@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -453,7 +453,17 @@ func ExchangeWithRedirect(addrpool AddressSet, localAddr *net.Addr, timeout time
 retry:
 	retries++
 
-	b, errs, err := Exchange(addrpool, localAddr, timeout, connectTimeout, data, args...)
+	var exchangeAddrPool AddressSet
+
+	if retries > 1 {
+		// On retries, use a temporary addrpool with only the redirect address to skip failover
+		tempAddrs := []string{addrpool.Get()}
+		exchangeAddrPool = NewAddressPool(tempAddrs)
+	} else {
+		exchangeAddrPool = addrpool
+	}
+
+	b, errs, err := Exchange(exchangeAddrPool, localAddr, timeout, connectTimeout, data, args...)
 
 	if errs != nil {
 		return b, errs, err

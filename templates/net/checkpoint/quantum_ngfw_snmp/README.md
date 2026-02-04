@@ -85,9 +85,9 @@ This template has been tested on:
 |System uptime|<p>MIB: HOST-RESOURCES-V2-MIB</p><p>Time since the network management portion of the system was last re-initialized.</p>|SNMP agent|system.uptime<p>**Preprocessing**</p><ul><li><p>Custom multiplier: `0.01`</p></li></ul>|
 |Number of CPUs|<p>MIB: CHECKPOINT-MIB</p><p>Number of processors.</p>|SNMP agent|system.cpu.num<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 |CPU utilization|<p>MIB: CHECKPOINT-MIB</p><p>CPU utilization per core in %.</p>|SNMP agent|system.cpu.util|
-|Load average (1m avg)|<p>MIB: UCD-SNMP-MIB</p><p>Average number of processes being executed or waiting over the last minute.</p>|SNMP agent|system.cpu.load.avg1|
-|Load average (5m avg)|<p>MIB: UCD-SNMP-MIB</p><p>Average number of processes being executed or waiting over the last 5 minutes.</p>|SNMP agent|system.cpu.load.avg5|
-|Load average (15m avg)|<p>MIB: UCD-SNMP-MIB</p><p>Average number of processes being executed or waiting over the last 15 minutes.</p>|SNMP agent|system.cpu.load.avg15|
+|Load average (1m avg)|<p>MIB: UCD-SNMP-MIB</p><p>Average number of processes being executed or waiting over the last minute.</p>|Dependent item|system.cpu.load.avg1<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.laName == 'Load-1')].laLoad.first()`</p></li></ul>|
+|Load average (5m avg)|<p>MIB: UCD-SNMP-MIB</p><p>Average number of processes being executed or waiting over the last 5 minutes.</p>|Dependent item|system.cpu.load.avg5<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.laName == 'Load-5')].laLoad.first()`</p></li></ul>|
+|Load average (15m avg)|<p>MIB: UCD-SNMP-MIB</p><p>Average number of processes being executed or waiting over the last 15 minutes.</p>|Dependent item|system.cpu.load.avg15<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.laName == 'Load-15')].laLoad.first()`</p></li></ul>|
 |CPU user time|<p>MIB: CHECKPOINT-MIB</p><p>Average time the CPU has spent running user processes that are not niced.</p>|SNMP agent|system.cpu.user|
 |CPU system time|<p>MIB: CHECKPOINT-MIB</p><p>Average time the CPU has spent running the kernel and its processes.</p>|SNMP agent|system.cpu.system|
 |CPU idle time|<p>MIB: CHECKPOINT-MIB</p><p>Average time the CPU has spent doing nothing.</p>|SNMP agent|system.cpu.idle|
@@ -107,6 +107,7 @@ This template has been tested on:
 |SNMP traps (fallback)|<p>Used to collect all SNMP traps unmatched by other `snmptrap` items.</p>|SNMP trap|snmptrap.fallback|
 |SNMP walk network interfaces|<p>Used for discovering interfaces from IF-MIB.</p>|SNMP agent|net.if.walk|
 |SNMP walk CPU|<p>Used for discovering CPU from CHECKPOINT-MIB.</p>|SNMP agent|system.cpu.walk|
+|SNMP walk CPU load averages|<p>MIB: UCD-SNMP-MIB</p><p>SNMP walk through laTable. The collected data used in dependent CPU load average items.</p>|SNMP agent|system.cpu.load.walk<p>**Preprocessing**</p><ul><li><p>SNMP walk to JSON</p></li></ul>|
 |SNMP walk VPN tunnels|<p>Used for discovering VPN tunnels from CHECKPOINT-MIB.</p>|SNMP agent|vpn.tunnel.walk|
 |SNMP walk disks|<p>Used for discovering storage disks from CHECKPOINT-MIB.</p>|SNMP agent|vfs.fs.walk|
 |SNMP walk temperature sensors|<p>Used for discovering temperature sensors from CHECKPOINT-MIB.</p>|SNMP agent|sensor.temp.walk|

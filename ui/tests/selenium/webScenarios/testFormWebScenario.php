@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -286,6 +286,7 @@ class testFormWebScenario extends CWebTest {
 
 		// Switch to Inherited and scenario tags and check tags table headers.
 		$tag_types->select('Inherited and scenario tags');
+		$this->query('xpath://thead/tr/th[text()="Parent templates"]')->one()->waitUntilVisible();
 		$tags_table->invalidate();
 		$this->assertEquals(['Name', 'Value', '', 'Parent templates'], $tags_table->getHeaders()->asText());
 
@@ -893,7 +894,7 @@ class testFormWebScenario extends CWebTest {
 			$table_fields[$field_name] = $form->getField($field_name)->asMultifieldTable()->getValue();
 		}
 
-		$form->query('button:Clone')->one()->click();
+		$form->query('button:Clone')->one()->click()->waitUntilNotVisible();
 		$form->invalidate();
 		$form->getField('Name')->fill('Clone of '.self::CLONE_SCENARIO);
 		$form->submit();

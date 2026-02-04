@@ -1,6 +1,6 @@
 <?php declare(strict_types=0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -669,14 +669,24 @@ class CControllerItemList extends CControllerItem {
 		$subfilters_input = [];
 
 		foreach ($schema as &$subfilter) {
-			$values = array_column($items_values, $subfilter['key']);
-			$values = array_reduce($values, 'array_merge', []);
+			$subfilter_key = $subfilter['key'];
+			$values = [];
 
-			if ($subfilter['selected']) {
-				$subfilters_input[$subfilter['key']] = array_keys($subfilter['selected']);
+			foreach ($items_values as $item_values) {
+				if (!array_key_exists($subfilter_key, $item_values)) {
+					continue;
+				}
+
+				foreach ($item_values[$subfilter_key] as $subfilter_value) {
+					$values[$subfilter_value] = 0;
+				}
 			}
 
-			$subfilter['values'] = array_fill_keys($values, 0);
+			if ($subfilter['selected']) {
+				$subfilters_input[$subfilter_key] = array_keys($subfilter['selected']);
+			}
+
+			$subfilter['values'] = $values;
 		}
 		unset($subfilter);
 

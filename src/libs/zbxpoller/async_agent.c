@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -354,6 +354,7 @@ int	zbx_async_check_agent(zbx_dc_item_t *item, AGENT_RESULT *result,  zbx_async_
 	agent_context->item.interface.addr = (item->interface.addr == item->interface.dns_orig ?
 			agent_context->item.interface.dns_orig : agent_context->item.interface.ip_orig);
 	agent_context->item.key_orig = zbx_strdup(NULL, item->key_orig);
+	agent_context->item.preprocessing = item->preprocessing;
 
 	if (item->key != item->key_orig)
 	{

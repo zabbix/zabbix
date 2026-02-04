@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -594,7 +594,6 @@ class CControllerAuthenticationUpdate extends CController {
 	 * @return bool
 	 */
 	private function invalidateSessions() {
-		$result = true;
 		$internal_auth_user_groups = API::UserGroup()->get([
 			'output' => [],
 			'filter' => [
@@ -611,13 +610,13 @@ class CControllerAuthenticationUpdate extends CController {
 		unset($internal_auth_users[CWebUser::$data['userid']]);
 
 		if ($internal_auth_users) {
-			$result = DB::update('sessions', [
+			DB::update('sessions', [
 				'values' => ['status' => ZBX_SESSION_PASSIVE],
 				'where' => ['userid' => array_keys($internal_auth_users)]
 			]);
 		}
 
-		return $result;
+		return true;
 	}
 
 	private function validateProvisionGroups(array $provision_group): bool {

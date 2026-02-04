@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -2772,12 +2772,12 @@ class testDashboardGraphWidget extends testWidgets {
 
 		$fields = ['Selected items only', 'Severity', 'Problem', 'Problem tags', 'Problem hosts'];
 		$tag_elements = [
-			'id:evaltype',				// Tag type.
-			'id:tags_0_tag',			// Tag name.
-			'id:tags_0_operator',		// Tag operator.
-			'id:tags_0_value',			// Tag value
-			'id:tags_0_remove',			// Tag remove button.
-			'id:tags_add'				// Tag add button.
+			'id:evaltype',													// Tag type.
+			'id:tags_0_tag',												// Tag name.
+			'id:tags_0_operator',											// Tag operator.
+			'id:tags_0_value',												// Tag value
+			'id:tags_0_remove',												// Tag remove button.
+			'xpath:.//table[@id="tags_table_tags"]//button[@id="tags_add"]'	// Tag add button.
 		];
 		$this->assertEnabledFields(array_merge($fields, $tag_elements), false);
 
@@ -2869,7 +2869,7 @@ class testDashboardGraphWidget extends testWidgets {
 				$this->assertFalse($this->query('id:lefty_static_units')->one()->isEnabled());
 				break;
 
-			case 'Both';
+			case 'Both':
 				$this->assertEnabledFields($lefty_fields, true);
 				$this->assertEnabledFields($righty_fields, true);
 				$this->assertFalse($this->query('id:righty_static_units')->one()->isEnabled());

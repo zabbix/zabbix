@@ -5,9 +5,9 @@ Changelog entries are prefixed with a position-based identificator, that denotes
 * API (A)
 * Documentation (D)
 * Frontend (F)
-* Agent (G)
+* Agent, Agent2 or Agent2 plugin (G)
 * Installation (I)
-* Java gateway (J)
+* Java gateway or Tools (J)
 * Appliance (L)
 * Proxy (P)
 * Server (S)
@@ -18,8 +18,8 @@ A line, referencing all components would thus be ADFGIJLPST
 API and frontend would be A.F.......
 Server and proxy would be .......PS.
 
-Commit messages that do not actually change anything (for example, creation and
- deletion of branches) have all components unset - ..........
+Commit messages that do not actually change anything (for tests, test configuration and
+ other similar changes) have all components unset - ..........
 
 See https://www.zabbix.com/documentation/guidelines/en/devel#components
  for more information

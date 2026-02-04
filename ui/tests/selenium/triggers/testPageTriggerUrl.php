@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -19,24 +19,70 @@ require_once __DIR__.'/../../include/CWebTest.php';
 /**
  * Test checks link from trigger URL field on different pages.
  *
+ * @dataSource MonitoringOverview
+ *
  * @onBefore prepareTriggerData
  *
  * @backup profiles, problem
  */
 class testPageTriggerUrl extends CWebTest {
 
-	private static $custom_name = 'URL name for menu';
+	protected static $custom_name = 'URL name for menu';
+	protected static $dashboardid;
+	protected static $triggerids;
+	protected static $eventids;
+	protected static $groupids;
+	protected static $itemids;
 
 	/**
 	 * Add URL name for trigger.
 	 */
 	public function prepareTriggerData() {
-		$response = CDataHelper::call('trigger.update', [
+		self::$triggerids = CDataHelper::get('MonitoringOverview.triggerids');
+		self::$eventids = CDataHelper::get('MonitoringOverview.eventids');
+		self::$groupids = CDataHelper::get('MonitoringOverview.groupids');
+		self::$itemids = CDataHelper::get('MonitoringOverview.itemids');
+
+		CDataHelper::call('trigger.update', [
 			[
-				'triggerid' => '100032',
+				'triggerid' => self::$triggerids['1_trigger_Not_classified'],
 				'url_name' => 'URL name for menu'
 			]
 		]);
+
+		self::$dashboardid = CDataHelper::call('dashboard.create', [
+			[
+				'name' => 'Dashboard for Trigger overview widget',
+				'userid' => '1',
+				'private' => 1,
+				'pages' => [
+					[
+						'widgets' => [
+							[
+								'type' => 'trigover',
+								'name' => 'Group to check Overview',
+								'x' => 0,
+								'y' => 0,
+								'width' => 36,
+								'height' => 12,
+								'fields' => [
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'style',
+										'value' => 1
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_GROUP,
+										'name' => 'groupids',
+										'value' => self::$groupids['Group to check Overview']
+									]
+								]
+							]
+						]
+					]
+				]
+			]
+		])['dashboardids'][0];
 	}
 
 	public function getTriggerLinkData() {
@@ -45,8 +91,8 @@ class testPageTriggerUrl extends CWebTest {
 				[
 					'trigger' => '1_trigger_High',
 					'links' => [
-						'Problems' => 'zabbix.php?action=problem.view&filter_set=1&triggerids%5B%5D=100035',
-						'History' => ['1_item' => 'history.php?action=showgraph&itemids%5B%5D=99086'],
+						'Problems' => 'zabbix.php?action=problem.view&filter_set=1&triggerids%5B%5D={trigger_id}',
+						'History' => ['1_item' => 'history.php?action=showgraph&itemids%5B%5D={item_id}'],
 						'Trigger' => 'menu-popup-item',
 						'Items' => ['1_item' => 'menu-popup-item'],
 						'Mark as cause' => '',
@@ -55,7 +101,6 @@ class testPageTriggerUrl extends CWebTest {
 						'Unique webhook url' => 'menu-popup-item',
 						'Webhook url for all' => 'menu-popup-item'
 					],
-					'expected_url' => 'tr_events.php?triggerid=100035&eventid=9003',
 					'background' => "high-bg"
 				]
 			],
@@ -63,8 +108,8 @@ class testPageTriggerUrl extends CWebTest {
 				[
 					'trigger' => '1_trigger_Not_classified',
 					'links' => [
-						'Problems' => 'zabbix.php?action=problem.view&filter_set=1&triggerids%5B%5D=100032',
-						'History' => ['1_item' => 'history.php?action=showgraph&itemids%5B%5D=99086'],
+						'Problems' => 'zabbix.php?action=problem.view&filter_set=1&triggerids%5B%5D={trigger_id}',
+						'History' => ['1_item' => 'history.php?action=showgraph&itemids%5B%5D={item_id}'],
 						'Trigger' => 'menu-popup-item',
 						'Items' => ['1_item' => 'menu-popup-item'],
 						'Mark as cause' => '',
@@ -72,7 +117,6 @@ class testPageTriggerUrl extends CWebTest {
 						'URL name for menu' => 'menu-popup-item',
 						'Webhook url for all' => 'menu-popup-item'
 					],
-					'expected_url' => 'tr_events.php?triggerid=100032&eventid=9000',
 					'background' => 'na-bg'
 				]
 			]
@@ -112,7 +156,7 @@ class testPageTriggerUrl extends CWebTest {
 		unset($data['links']['Mark as cause']);
 		unset($data['links']['Mark selected as symptoms']);
 
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=1020');
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid);
 		$dashboard = CDashboardElement::find()->one();
 		$widget = $dashboard->getWidget('Group to check Overview');
 
@@ -149,7 +193,9 @@ class testPageTriggerUrl extends CWebTest {
 	public function testPageTriggerUrl_EventDetails($data) {
 		// Prepare data provider.
 		unset($data['links']['Mark selected as symptoms']);
-		$this->page->login()->open($data['expected_url']);
+		$this->page->login()->open('tr_events.php?triggerid='.self::$triggerids[$data['trigger']].
+				'&eventid='.self::$eventids[$data['trigger']]
+		);
 		$this->query('link', $data['trigger'])->waitUntilPresent()->one()->click();
 		$this->checkTriggerUrl($data);
 	}
@@ -173,13 +219,15 @@ class testPageTriggerUrl extends CWebTest {
 			if (is_array($links)) {
 				$item_link = $trigger_popup->getItem($menu)->query('xpath:./../ul//a')->one();
 				$this->assertEquals(array_keys($links), [$item_link->getText()]);
-				$this->assertStringContainsString(array_values($links)[0],
+				$replaced_link = str_replace('{item_id}', self::$itemids['1_item'], array_values($links)[0]);
+				$this->assertStringContainsString($replaced_link,
 						$item_link->getAttribute((array_values($links)[0] === 'menu-popup-item') ? 'class' : 'href')
 				);
 			}
 			else {
 				// Check 1-level menu links.
 				if ($links !== '') {
+					$links = str_replace('{trigger_id}', self::$triggerids[$data['trigger']], $links);
 					$this->assertStringContainsString($links,
 							$trigger_popup->getItem($menu)->getAttribute($links === 'menu-popup-item' ? 'class' : 'href')
 					);
@@ -192,6 +240,7 @@ class testPageTriggerUrl extends CWebTest {
 
 		// Check opened page.
 		$this->assertEquals('Event details', $this->query('tag:h1')->waitUntilVisible()->one()->getText());
-		$this->assertStringContainsString($data['expected_url'], $this->page->getCurrentUrl());
+		$this->assertStringContainsString('tr_events.php?triggerid='.self::$triggerids[$data['trigger']].
+			'&eventid='.self::$eventids[$data['trigger']], $this->page->getCurrentUrl());
 	}
 }

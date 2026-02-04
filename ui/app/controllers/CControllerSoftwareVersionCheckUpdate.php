@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -108,8 +108,9 @@ class CControllerSoftwareVersionCheckUpdate extends CController {
 	protected function doAction(): void {
 		$lastcheck = time();
 		$versions = $this->versions;
+		$current_version = implode('.', sscanf(ZABBIX_VERSION, '%d.%d'));
 
-		if (in_array(ZABBIX_EXPORT_VERSION, array_column($versions, 'version'))) {
+		if (in_array($current_version, array_column($versions, 'version'))) {
 			$delay = self::NEXTCHECK_DELAY;
 			$lastcheck_success = $lastcheck;
 			$nextcheck = $lastcheck + $delay;
@@ -132,6 +133,7 @@ class CControllerSoftwareVersionCheckUpdate extends CController {
 			'lastcheck' => $lastcheck,
 			'lastcheck_success' => $lastcheck_success,
 			'nextcheck' => $nextcheck,
+			'lastcheck_success_version' => ZABBIX_VERSION,
 			'versions' => $versions
 		]];
 

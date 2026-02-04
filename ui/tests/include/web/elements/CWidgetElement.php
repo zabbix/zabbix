@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -95,27 +95,11 @@ class CWidgetElement extends CElement {
 	 */
 	public function edit() {
 		$button = $this->query('xpath:.//button[contains(@class, "js-widget-edit")]')->waitUntilPresent()->one();
+		$this->hoverMouse();
+		$button->hoverMouse()->click();
 
-		if ($button->isVisible(false)) {
-			$button->hoverMouse();
-		}
-
-		// Edit can sometimes fail, so we have to retry this operation.
-		for ($i = 0; $i < 4; $i++) {
-			// TODO: remove force: true parameter after DEV-2621 is fixed.
-			$button->click(true);
-
-			try {
-				// TODO: fix formatting after git-hook improvements DEV-2396.
-				return $this->query('xpath://div[@data-dialogueid="widget_properties"]//form')->waitUntilVisible()
-						->asForm()->one();
-			}
-			catch (\Exception $e) {
-				if ($i === 1) {
-					throw $e;
-				}
-			}
-		}
+		return $this->query('xpath://div[@data-dialogueid="widget_properties"]//form')->waitUntilVisible()
+				->asForm()->one();
 	}
 
 	/**
