@@ -68,32 +68,54 @@ static zbx_db_result_t	discovery_get_dhost_by_ip_port(zbx_uint64_t druleid, cons
  * Purpose: separates multiple-IP hosts                                       *
  *                                                                            *
  * Parameters:                                                                *
- *    druleid - [IN] host ip address                                          *
- *    dhost   - [OUT]                                                         *
- *    ip      - [IN]                                                          *
+ *    druleid  - [IN] host ip address                                         *
+ *    dcheckid - [IN] unique dcheck id (0 to separate by IP only)             *
+ *    dhost    - [OUT]                                                        *
+ *    ip       - [IN]                                                         *
+ *    value    - [IN] unique dcheck value (NULL to separate by IP only)       *
+ *                                                                            *
+ * Comments: Separates when dhost has services with different IPs.            *
+ *           When dcheckid!=0 and value!=NULL, separates only if different    *
+ *           IPs contain different values for the unique check.               *
  *                                                                            *
  ******************************************************************************/
-static void	discovery_separate_host(zbx_uint64_t druleid, zbx_db_dhost *dhost, const char *ip)
+static void	discovery_separate_host(zbx_uint64_t druleid, zbx_uint64_t dcheckid, zbx_db_dhost *dhost,
+		const char *ip, const char *value)
 {
 	zbx_db_result_t	result;
 	char		*ip_esc, *sql = NULL;
 	zbx_uint64_t	dhostid;
+	size_t		sql_alloc = 0, sql_offset = 0;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() ip:'%s'", __func__, ip);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() ip:'%s' value:'%s'", __func__, ip, ZBX_NULL2EMPTY_STR(value));
 
 	ip_esc = zbx_db_dyn_escape_field("dservices", "ip", ip);
 
-	sql = zbx_dsprintf(sql,
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
 			"select dserviceid"
 			" from dservices"
-			" where dhostid=" ZBX_FS_UI64
-				" and ip" ZBX_SQL_STRCMP,
-			dhost->dhostid, ZBX_SQL_STRVAL_NE(ip_esc));
+			" where dhostid=");
+
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, ZBX_FS_UI64, dhost->dhostid);
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " and ip" ZBX_SQL_STRCMP, ZBX_SQL_STRVAL_NE(ip_esc));
+
+	if (0 != dcheckid && NULL != value)
+	{
+		char	*value_esc;
+
+		value_esc = zbx_db_dyn_escape_field("dservices", "value", value);
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " and dcheckid=" ZBX_FS_UI64, dcheckid);
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " and value" ZBX_SQL_STRCMP,
+				ZBX_SQL_STRVAL_NE(value_esc));
+		zbx_free(value_esc);
+	}
 
 	result = zbx_db_select_n(sql, 1);
 
 	if (NULL != zbx_db_fetch(result))
 	{
+		zabbix_log(LOG_LEVEL_DEBUG, "separating host at ip '%s'", ip);
+
 		dhostid = zbx_db_get_maxid("dhosts");
 
 		zbx_db_execute("insert into dhosts (dhostid,druleid)"
@@ -111,6 +133,7 @@ static void	discovery_separate_host(zbx_uint64_t druleid, zbx_db_dhost *dhost, c
 		dhost->lastup = 0;
 		dhost->lastdown = 0;
 	}
+
 	zbx_db_free_result(result);
 
 	zbx_free(sql);
@@ -190,8 +213,11 @@ static void	discovery_register_host(zbx_uint64_t druleid, zbx_uint64_t dcheckid,
 		dhost->lastdown = atoi(row[3]);
 
 		if (0 == match_value)
-			discovery_separate_host(druleid, dhost, ip);
+			discovery_separate_host(druleid, 0, dhost, ip, NULL);
+		else
+			discovery_separate_host(druleid, unique_dcheckid, dhost, ip, value);
 	}
+
 	zbx_db_free_result(result);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
