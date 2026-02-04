@@ -218,7 +218,7 @@ typedef enum
 }
 zbx_item_value_type_t;
 
-#define ITEM_VALUE_TYPE_COUNT	(ITEM_VALUE_TYPE_BIN + 1)
+#define ITEM_VALUE_TYPE_COUNT	(ITEM_VALUE_TYPE_JSON + 1)
 
 const char	*zbx_item_value_type_string(zbx_item_value_type_t value_type);
 
