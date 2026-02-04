@@ -15,11 +15,21 @@
 
 
 require_once __DIR__.'/../../include/CWebTest.php';
+require_once __DIR__.'/../behaviors/CMessageBehavior.php';
 
 /**
  * @backup media_type
  */
 class testFormAdministrationMediaTypeWebhook extends CWebTest {
+
+	/**
+	 * Attach MessageBehavior to the test.
+	 *
+	 * @return array
+	 */
+	public function getBehaviors() {
+		return ['class' => CMessageBehavior::class];
+	}
 
 	// SQL query to get media_type and media_type_param tables to compare hash values.
 	private $sql = 'SELECT * FROM media_type mt INNER JOIN media_type_param mtp ON mt.mediatypeid=mtp.mediatypeid'.
@@ -27,7 +37,7 @@ class testFormAdministrationMediaTypeWebhook extends CWebTest {
 
 	public function getValidationWebhookData() {
 		return [
-			// Attempt to add a webhook media type with default values and only space in script field.
+			// #0 Attempt to add a webhook media type with default values and only space in script field.
 			[
 				[
 					'fields' => [
@@ -35,10 +45,12 @@ class testFormAdministrationMediaTypeWebhook extends CWebTest {
 						'Type' => 'Webhook',
 						'Script' => ' '
 					],
-					'error_message' => 'Invalid parameter "/1/script": cannot be empty.'
+					'inline_errors' => [
+						'Script' => 'This field cannot be empty.'
+					]
 				]
 			],
-			// Attempt to add a webhook media type with a name that is already taken.
+			// #1 Attempt to add a webhook media type with a name that is already taken.
 			[
 				[
 					'fields' => [
@@ -46,10 +58,12 @@ class testFormAdministrationMediaTypeWebhook extends CWebTest {
 						'Type' => 'Webhook',
 						'Script' => 'occupied name webhook'
 					],
-					'error_message' => 'Media type "Email" already exists.'
+					'inline_errors' => [
+						'Name' => 'This object already exists.'
+					]
 				]
 			],
-			// Attempt to add a webhook media type with a blank name.
+			// #2 Attempt to add a webhook media type with a blank name.
 			[
 				[
 					'fields' => [
@@ -57,10 +71,12 @@ class testFormAdministrationMediaTypeWebhook extends CWebTest {
 						'Type' => 'Webhook',
 						'Script' => 'blank name webhook'
 					],
-					'error_message' => 'Incorrect value for field "name": cannot be empty.'
+					'inline_errors' => [
+						'Name' => 'This field cannot be empty.'
+					]
 				]
 			],
-			// Attempt to add a webhook with a blank parameter name.
+			// #3 Attempt to add a webhook with a blank parameter name.
 			[
 				[
 					'fields' => [
@@ -74,20 +90,24 @@ class testFormAdministrationMediaTypeWebhook extends CWebTest {
 							'Value' => '{BLANK.NAME}'
 						]
 					],
-					'error_message' => 'Invalid parameter "/1/parameters/6/name": cannot be empty.'
+					'inline_errors' => [
+						'name:parameters_webhook[5][name]' => 'This field cannot be empty.'
+					]
 				]
 			],
-			// Attempt to add a webhook without specifying the script field.
+			// #4 Attempt to add a webhook without specifying the script field.
 			[
 				[
 					'fields' => [
 						'Name' => 'Webhook with empty script field',
 						'Type' => 'Webhook'
 					],
-					'error_message' => 'Invalid parameter "/1/script": cannot be empty.'
+					'inline_errors' => [
+						'Script' => 'This field cannot be empty.'
+					]
 				]
 			],
-			// Attempt to add a webhook with timeout equal to zero.
+			// #5 Attempt to add a webhook with timeout equal to zero.
 			[
 				[
 					'fields' => [
@@ -96,10 +116,12 @@ class testFormAdministrationMediaTypeWebhook extends CWebTest {
 						'Script' => 'Zero timeout',
 						'Timeout' => '0'
 					],
-					'error_message' => 'Invalid parameter "/1/timeout": value must be one of 1-60.'
+					'inline_errors' => [
+						'Timeout' => 'Value must be between 1s and 60s (1m).'
+					]
 				]
 			],
-			// Attempt to add a webhook with too large timeout.
+			// #6 Attempt to add a webhook with too large timeout.
 			[
 				[
 					'fields' => [
@@ -108,10 +130,12 @@ class testFormAdministrationMediaTypeWebhook extends CWebTest {
 						'Script' => 'Large timeout',
 						'Timeout' => '61s'
 					],
-					'error_message' => 'Invalid parameter "/1/timeout": value must be one of 1-60.'
+					'inline_errors' => [
+						'Timeout' => 'Value must be between 1s and 60s (1m).'
+					]
 				]
 			],
-			// Attempt to add a webhook with too large timeout #2.
+			// #7 Attempt to add a webhook with too large timeout #2.
 			[
 				[
 					'fields' => [
@@ -120,10 +144,12 @@ class testFormAdministrationMediaTypeWebhook extends CWebTest {
 						'Script' => 'Large timeout',
 						'Timeout' => '2m'
 					],
-					'error_message' => 'Invalid parameter "/1/timeout": value must be one of 1-60.'
+					'inline_errors' => [
+						'Timeout' => 'Value must be between 1s and 60s (1m).'
+					]
 				]
 			],
-			// Attempt to add a webhook with a string in the timeout field.
+			// #8 Attempt to add a webhook with a string in the timeout field.
 			[
 				[
 					'fields' => [
@@ -132,10 +158,12 @@ class testFormAdministrationMediaTypeWebhook extends CWebTest {
 						'Script' => 'String in timeout',
 						'Timeout' => '30seconds'
 					],
-					'error_message' => 'Invalid parameter "/1/timeout": a time unit is expected.'
+					'inline_errors' => [
+						'Timeout' => 'A time unit is expected.'
+					]
 				]
 			],
-			// Attempt to add a webhook with empty menu entry name.
+			// #9 Attempt to add a webhook with empty menu entry name.
 			[
 				[
 					'fields' => [
@@ -145,10 +173,12 @@ class testFormAdministrationMediaTypeWebhook extends CWebTest {
 						'Include event menu entry' => true,
 						'Menu entry URL' => 'https://zabbix.com/{EVENT.TAGS."Returned value"}'
 					],
-					'error_message' => 'Invalid parameter "/1/event_menu_name": cannot be empty.'
+					'inline_errors' => [
+						'Menu entry name' => 'This field cannot be empty.'
+					]
 				]
 			],
-			// Attempt to add a webhook with empty menu entry URL.
+			// #10 Attempt to add a webhook with empty menu entry URL.
 			[
 				[
 					'fields' => [
@@ -158,10 +188,12 @@ class testFormAdministrationMediaTypeWebhook extends CWebTest {
 						'Include event menu entry' => true,
 						'Menu entry name' => '{EVENT.TAGS."Returned tag"}'
 					],
-					'error_message' => 'Invalid parameter "/1/event_menu_url": cannot be empty.'
+					'inline_errors' => [
+						'Menu entry URL' => 'This field cannot be empty.'
+					]
 				]
 			],
-			// Attempt to add a webhook with empty Attempts field.
+			// #11 Attempt to add a webhook with empty Attempts field.
 			[
 				[
 					'fields' => [
@@ -172,10 +204,12 @@ class testFormAdministrationMediaTypeWebhook extends CWebTest {
 					'options' => [
 						'Attempts' => ''
 					],
-					'error_message' => 'Invalid parameter "/1/maxattempts": value must be one of 1-100.'
+					'inline_errors' => [
+						'Attempts' => 'This value must be no less than "1".'
+					]
 				]
 			],
-			// Attempt to add a webhook with 0 in Attempts field.
+			// #12 Attempt to add a webhook with 0 in Attempts field.
 			[
 				[
 					'fields' => [
@@ -186,10 +220,12 @@ class testFormAdministrationMediaTypeWebhook extends CWebTest {
 					'options' => [
 						'Attempts' => '0'
 					],
-					'error_message' => 'Invalid parameter "/1/maxattempts": value must be one of 1-100.'
+					'inline_errors' => [
+						'Attempts' => 'This value must be no less than "1".'
+					]
 				]
 			],
-			// Attempt to add a webhook with too many Attempts.
+			// #13 Attempt to add a webhook with too many Attempts.
 			[
 				[
 					'fields' => [
@@ -200,10 +236,12 @@ class testFormAdministrationMediaTypeWebhook extends CWebTest {
 					'options' => [
 						'Attempts' => '101'
 					],
-					'error_message' => 'Invalid parameter "/1/maxattempts": value must be one of 1-100.'
+					'inline_errors' => [
+						'Attempts' => 'This value must be no greater than "100".'
+					]
 				]
 			],
-			// Attempt to add a webhook with empty Attempt interval field.
+			// #14 Attempt to add a webhook with empty Attempt interval field.
 			[
 				[
 					'fields' => [
@@ -215,10 +253,12 @@ class testFormAdministrationMediaTypeWebhook extends CWebTest {
 						'Attempts' => '5',
 						'Attempt interval' => ''
 					],
-					'error_message' => 'Invalid parameter "/1/attempt_interval": cannot be empty.'
+					'inline_errors' => [
+						'Attempt interval' => 'This field cannot be empty.'
+					]
 				]
 			],
-			// Attempt to add a webhook with Attempt interval out of range.
+			// #15 Attempt to add a webhook with Attempt interval out of range.
 			[
 				[
 					'fields' => [
@@ -230,10 +270,12 @@ class testFormAdministrationMediaTypeWebhook extends CWebTest {
 						'Attempts' => '5',
 						'Attempt interval' => '3601'
 					],
-					'error_message' => 'Invalid parameter "/1/attempt_interval": value must be one of 0-3600.'
+					'inline_errors' => [
+						'Attempt interval' => 'Value must be between 0 and 3600s (1h).'
+					]
 				]
 			],
-			// Attempt to add a webhook with custom concurrent sessions number out of range.
+			// #16 Attempt to add a webhook with custom concurrent sessions number out of range.
 			[
 				[
 					'fields' => [
@@ -248,10 +290,12 @@ class testFormAdministrationMediaTypeWebhook extends CWebTest {
 					'concurrent_sessions' => [
 						'Custom' => '101'
 					],
-					'error_message' => 'Invalid parameter "/1/maxsessions": value must be one of 0-100.'
+					'inline_errors' => [
+						'id:maxsessions' => 'This value must be no greater than "100".'
+					]
 				]
 			],
-			// Adding a parameter with a blank name to the media type.
+			// #17 Adding a parameter with a blank name to the media type.
 			[
 				[
 					'update' => true,
@@ -267,10 +311,12 @@ class testFormAdministrationMediaTypeWebhook extends CWebTest {
 							'Value' => '{BLANK.NAME}'
 						]
 					],
-					'error_message' => 'Invalid parameter "/1/parameters/2/name": cannot be empty.'
+					'inline_errors' => [
+						'name:parameters_webhook[1][name]' => 'This field cannot be empty.'
+					]
 				]
 			],
-			// Removing the value of field script.
+			// #18. Removing the value of field script.
 			[
 				[
 					'update' => true,
@@ -278,10 +324,12 @@ class testFormAdministrationMediaTypeWebhook extends CWebTest {
 						'Type' => 'Webhook',
 						'Script' => ''
 					],
-					'error_message' => 'Invalid parameter "/1/script": cannot be empty.'
+					'inline_errors' => [
+						'Script' => 'This field cannot be empty.'
+					]
 				]
 			],
-			// Changing the value of timeout field to zero.
+			// #19. Changing the value of timeout field to zero.
 			[
 				[
 					'update' => true,
@@ -290,10 +338,12 @@ class testFormAdministrationMediaTypeWebhook extends CWebTest {
 						'Script' => 'Zero timeout',
 						'Timeout' => '0'
 					],
-					'error_message' => 'Invalid parameter "/1/timeout": value must be one of 1-60.'
+					'inline_errors' => [
+						'Timeout' => 'Value must be between 1s and 60s (1m).'
+					]
 				]
 			],
-			// Increasing timeout too high.
+			// #20. Increasing timeout too high.
 			[
 				[
 					'update' => true,
@@ -302,10 +352,12 @@ class testFormAdministrationMediaTypeWebhook extends CWebTest {
 						'Script' => 'Large timeout',
 						'Timeout' => '3d'
 					],
-					'error_message' => 'Invalid parameter "/1/timeout": value must be one of 1-60.'
+					'inline_errors' => [
+						'Timeout' => 'Value must be between 1s and 60s (1m).'
+					]
 				]
 			],
-			// Changing value of field timeout to a string
+			// #21 Changing value of field timeout to a string
 			[
 				[
 					'update' => true,
@@ -314,10 +366,12 @@ class testFormAdministrationMediaTypeWebhook extends CWebTest {
 						'Script' => 'String in timeout',
 						'Timeout' => '1minute'
 					],
-					'error_message' => 'Invalid parameter "/1/timeout": a time unit is expected.'
+					'inline_errors' => [
+						'Timeout' => 'A time unit is expected.'
+					]
 				]
 			],
-			// Add a menu entry URL without a menu entry name.
+			// #22 Add a menu entry URL without a menu entry name.
 			[
 				[
 					'update' => true,
@@ -327,10 +381,12 @@ class testFormAdministrationMediaTypeWebhook extends CWebTest {
 						'Include event menu entry' => true,
 						'Menu entry URL' => '{EVENT.TAGS.Address}'
 					],
-					'error_message' => 'Invalid parameter "/1/event_menu_name": cannot be empty.'
+					'inline_errors' => [
+						'Menu entry name' => 'This field cannot be empty.'
+					]
 				]
 			],
-			// Add a menu entry name without a menu entry URL.
+			// #23 Add a menu entry name without a menu entry URL.
 			[
 				[
 					'update' => true,
@@ -340,10 +396,12 @@ class testFormAdministrationMediaTypeWebhook extends CWebTest {
 						'Include event menu entry' => true,
 						'Menu entry name' => '{EVENT.TAGS."Returned tag"}'
 					],
-					'error_message' => 'Invalid parameter "/1/event_menu_url": cannot be empty.'
+					'inline_errors' => [
+						'Menu entry URL' => 'This field cannot be empty.'
+					]
 				]
 			],
-			// Remove the value of the attempts field.
+			// #24 Remove the value of the attempts field.
 			[
 				[
 					'update' => true,
@@ -354,10 +412,12 @@ class testFormAdministrationMediaTypeWebhook extends CWebTest {
 					'options' => [
 						'Attempts' => ''
 					],
-					'error_message' => 'Invalid parameter "/1/maxattempts": value must be one of 1-100.'
+					'inline_errors' => [
+						'Attempts' => 'This value must be no less than "1".'
+					]
 				]
 			],
-			// Set the value of Attempts field to 0.
+			// #25 Set the value of Attempts field to 0.
 			[
 				[
 					'update' => true,
@@ -368,10 +428,12 @@ class testFormAdministrationMediaTypeWebhook extends CWebTest {
 					'options' => [
 						'Attempts' => '0'
 					],
-					'error_message' => 'Invalid parameter "/1/maxattempts": value must be one of 1-100.'
+					'inline_errors' => [
+						'Attempts' => 'This value must be no less than "1".'
+					]
 				]
 			],
-			// Set the value of Attempts field too high.
+			// #26 Set the value of Attempts field too high.
 			[
 				[
 					'update' => true,
@@ -382,10 +444,12 @@ class testFormAdministrationMediaTypeWebhook extends CWebTest {
 					'options' => [
 						'Attempts' => '101'
 					],
-					'error_message' => 'Invalid parameter "/1/maxattempts": value must be one of 1-100.'
+					'inline_errors' => [
+						'Attempts' => 'This value must be no greater than "100".'
+					]
 				]
 			],
-			// Set the value of Attempts field to some string.
+			// #27 Set the value of Attempts field to some string.
 			[
 				[
 					'update' => true,
@@ -396,10 +460,12 @@ class testFormAdministrationMediaTypeWebhook extends CWebTest {
 					'options' => [
 						'Attempts' => 'five'
 					],
-					'error_message' => 'Invalid parameter "/1/maxattempts": value must be one of 1-100.'
+					'inline_errors' => [
+						'Attempts' => 'This value must be no less than "1".'
+					]
 				]
 			],
-			// Remove the value of the attempt interval field.
+			// #28 Remove the value of the attempt interval field.
 			[
 				[
 					'update' => true,
@@ -411,10 +477,12 @@ class testFormAdministrationMediaTypeWebhook extends CWebTest {
 						'Attempts' => '1',
 						'Attempt interval' => ''
 					],
-					'error_message' => 'Invalid parameter "/1/attempt_interval": cannot be empty.'
+					'inline_errors' => [
+						'Attempt interval' => 'This field cannot be empty.'
+					]
 				]
 			],
-			// Set a value of the attempt interval that is out of range.
+			// #29 Set a value of the attempt interval that is out of range.
 			[
 				[
 					'update' => true,
@@ -426,10 +494,12 @@ class testFormAdministrationMediaTypeWebhook extends CWebTest {
 						'Attempts' => '5',
 						'Attempt interval' => '3601'
 					],
-					'error_message' => 'Invalid parameter "/1/attempt_interval": value must be one of 0-3600.'
+					'inline_errors' => [
+						'Attempt interval' => 'Value must be between 0 and 3600s (1h).'
+					]
 				]
 			],
-			// Set a string value in the attempt interval field.
+			// #30 Set a string value in the attempt interval field.
 			[
 				[
 					'update' => true,
@@ -441,10 +511,12 @@ class testFormAdministrationMediaTypeWebhook extends CWebTest {
 						'Attempts' => '5',
 						'Attempt interval' => '10seconds'
 					],
-					'error_message' => 'Invalid parameter "/1/attempt_interval": a time unit is expected.'
+					'inline_errors' => [
+						'Attempt interval' => 'A time unit is expected.'
+					]
 				]
 			],
-			// Removing the name of a webhook media type.
+			// #31 Removing the name of a webhook media type.
 			[
 				[
 					'update' => true,
@@ -453,7 +525,9 @@ class testFormAdministrationMediaTypeWebhook extends CWebTest {
 						'Type' => 'Webhook',
 						'Script' => 'blank name webhook'
 					],
-					'error_message' => 'Incorrect value for field "name": cannot be empty.'
+					'inline_errors' => [
+						'Name' => 'This field cannot be empty.'
+					]
 				]
 			],
 			// Changing the name of a webhook media type to a name that is already taken.
@@ -465,7 +539,9 @@ class testFormAdministrationMediaTypeWebhook extends CWebTest {
 						'Type' => 'Webhook',
 						'Script' => 'blank name webhook'
 					],
-					'error_message' => 'Media type "Email" already exists.'
+					'inline_errors' => [
+						'Name' => 'This object already exists.'
+					]
 				]
 			]
 		];
@@ -497,11 +573,7 @@ class testFormAdministrationMediaTypeWebhook extends CWebTest {
 				->one()->click();
 		$this->page->waitUntilReady();
 
-		// Check media type creation or update message.
-		$message_title = CTestArrayHelper::get($data, 'update', false) ? 'Cannot update media type' : 'Cannot add media type';
-		$message = CMessageElement::find()->one();
-		$this->assertEquals($message_title, $message->getTitle());
-		$this->assertTrue($message->hasLine($data['error_message']));
+		$this->assertInlineError($form, $data['inline_errors']);
 
 		// Check that no DB changes took place.
 		$this->assertEquals($old_hash, CDBHelper::getHash($this->sql));
