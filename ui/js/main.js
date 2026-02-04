@@ -402,7 +402,7 @@ const hintBox = {
 			if ('error' in resp) {
 				const message_box = makeMessageBox('bad', resp.error.messages, resp.error.title, false, true)[0];
 
-				hintbox_contents = message_box.innerHTML;
+				hintbox_contents += message_box.innerHTML;
 			}
 			else {
 				if (resp.messages) {
@@ -425,7 +425,7 @@ const hintBox = {
 			if (target.hintBoxItem !== undefined) {
 				const hintbox_container = box[0].querySelector('.hintbox-container');
 
-				hintbox_container.append(hintbox_contents);
+				hintbox_container.innerHTML = hintbox_contents;
 
 				// Reset hintbox position.
 				box.css({
