@@ -305,6 +305,13 @@ const hintBox = {
 			}
 		};
 
+		const cancelHintboxGeneration = () => {
+			if (this.animation_frame_id !== null) {
+				cancelAnimationFrame(this.animation_frame_id);
+				this.animation_frame_id = null;
+			}
+		}
+
 		switch (e.handleObj.origType) {
 			case 'mouseenter':
 			case 'mousemove':
@@ -324,9 +331,7 @@ const hintBox = {
 				break;
 
 			case 'mouseleave':
-				if (this.animation_frame_id !== null) {
-					cancelAnimationFrame(this.animation_frame_id);
-				}
+				cancelHintboxGeneration();
 
 				hintBox.hideHint($target[0], false);
 				$target.blur();
@@ -334,9 +339,7 @@ const hintBox = {
 
 			case 'keydown':
 			case 'click':
-				if (this.animation_frame_id !== null) {
-					cancelAnimationFrame(this.animation_frame_id);
-				}
+				cancelHintboxGeneration();
 
 				if ($target.data('hintbox-static') !== 1) {
 					break;
