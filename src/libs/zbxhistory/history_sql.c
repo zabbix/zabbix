@@ -153,6 +153,8 @@ static zbx_uint64_t	history_sql_make_flush_error(zbx_history_sql_data_t *data, i
 			err |= history_make_flush_error(ret, 3);
 		else if (0 == strcmp(db_insert->table->table, "history_text"))
 			err |= history_make_flush_error(ret, 4);
+		else if (0 == strcmp(db_insert->table->table, "history_bin"))
+			err |= history_make_flush_error(ret, 5);
 		else
 			THIS_SHOULD_NEVER_HAPPEN_MSG("unknown history table: %s", db_insert->table->table);
 	}
