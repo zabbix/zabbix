@@ -2125,7 +2125,6 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "server #0 started [main process]");
 
-	zbx_set_exit_on_terminate();
 	zbx_set_child_pids(zbx_threads, zbx_threads_num);
 
 	runlevels = zbx_proc_startup_create(zbx_threads_num, get_process_info_by_thread);
@@ -2160,6 +2159,12 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 			{
 				zabbix_log(LOG_LEVEL_CRIT, "cannot continue server startup because of unexpected"
 						" process termination");
+				break;
+			}
+
+			if (!ZBX_IS_RUNNING())
+			{
+				zabbix_log(LOG_LEVEL_CRIT, "cannot continue server startup because of termination");
 				break;
 			}
 
@@ -2199,8 +2204,6 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 out:
 	if (NULL != runlevels)
 		zbx_proc_startup_free(runlevels);
-
-	zbx_unset_exit_on_terminate();
 
 	return ret;
 }

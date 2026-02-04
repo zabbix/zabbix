@@ -343,16 +343,6 @@ void	zbx_set_common_signal_handlers(zbx_on_exit_t zbx_on_exit_cb_arg)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: make main process to exit on terminate signals                    *
- *                                                                            *
- ******************************************************************************/
-void	zbx_set_exit_on_terminate(void)
-{
-	sig_exit_on_terminate = 1;
-}
-
-/******************************************************************************
- *                                                                            *
  * Purpose: make main process to set exit flag and continue to work on        *
  *          terminate signals                                                 *
  *                                                                            *
