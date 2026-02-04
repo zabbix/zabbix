@@ -308,6 +308,7 @@ const hintBox = {
 		const cancelHintboxGeneration = () => {
 			if (this.animation_frame_id !== null) {
 				cancelAnimationFrame(this.animation_frame_id);
+
 				this.animation_frame_id = null;
 			}
 		}
@@ -401,7 +402,7 @@ const hintBox = {
 			if ('error' in resp) {
 				const message_box = makeMessageBox('bad', resp.error.messages, resp.error.title, false, true)[0];
 
-				hintbox_contents += message_box.innerHTML;
+				hintbox_contents = message_box.innerHTML;
 			}
 			else {
 				if (resp.messages) {
