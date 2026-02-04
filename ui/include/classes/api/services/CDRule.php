@@ -920,7 +920,7 @@ class CDRule extends CApiService {
 
 		DBexecute('DELETE FROM dservices'.
 				' WHERE dhostid'.
-				'IN (SELECT dhostid'.
+				' IN (SELECT dhostid'.
 					' FROM dhosts'.
 					' WHERE '.dbConditionId('druleid', $druleids).
 				')'
