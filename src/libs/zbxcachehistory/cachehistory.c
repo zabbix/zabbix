@@ -2131,7 +2131,6 @@ static dc_item_value_t	*dc_local_get_history_slot(void)
 
 void	zbx_history_cache_destroy_local_cache(void)
 {
-	zabbix_log(LOG_LEVEL_ERR, "[WDN] items:%lu strings:%lu", item_values_num, string_values_offset);
 	zbx_free(item_values);
 	item_values_num = item_values_alloc = 0;
 
