@@ -451,6 +451,7 @@ Overlay.prototype.unmount = function() {
 	document.removeEventListener('debug.click', this._listeners.debug_click);
 
 	this._body_mutation_observer.disconnect();
+	this._body_resize_observer.disconnect();
 	this._cancelFixPositionOnAnimationFrame();
 
 	if (this._is_draggable) {
@@ -510,6 +511,9 @@ Overlay.prototype.mount = function() {
 			attributeFilter: ['style', 'class', 'hidden']
 		});
 	}
+
+	this._body_resize_observer = new ResizeObserver(() => this._fixPositionOnAnimationFrame());
+	this._body_resize_observer.observe(this.$dialogue.$body[0]);
 
 	this.$dialogue.$head.$close_button[0].addEventListener('click', this._listeners.close_button_click);
 	this.$dialogue.$body[0].addEventListener('submit', this._listeners.form_submit);
