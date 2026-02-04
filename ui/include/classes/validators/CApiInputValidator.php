@@ -1994,7 +1994,7 @@ class CApiInputValidator {
 		$menu_path_validator = new CMenuPathValidator();
 
 		if (!$menu_path_validator->validate($data)) {
-			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('directory cannot be empty'));
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, $menu_path_validator->getError());
 
 			return false;
 		}

@@ -49,18 +49,18 @@ class CMenuPathValidatorTest extends TestCase {
 			['\/', null],
 
 			// Invalid paths.
-			['folder1//folder2', _('Incorrect menu path.')],
-			['//folder', _('Incorrect menu path.')],
-			['/folder//sub', _('Incorrect menu path.')],
-			['///folder', _('Incorrect menu path.')],
-			['folder1///folder2', _('Incorrect menu path.')],
-			['//folder//sub', _('Incorrect menu path.')],
-			['folder//sub/', _('Incorrect menu path.')],
-			['/folder/sub//name', _('Incorrect menu path.')],
-			['//', _('Incorrect menu path.')],
-			['///', _('Incorrect menu path.')],
-			['folder/ /sub', _('Incorrect menu path.')],
-			['/ \ / /', _('Incorrect menu path.')]
+			['folder1//folder2', _('directory cannot be empty')],
+			['//folder', _('directory cannot be empty')],
+			['/folder//sub', _('directory cannot be empty')],
+			['///folder', _('directory cannot be empty')],
+			['folder1///folder2', _('directory cannot be empty')],
+			['//folder//sub', _('directory cannot be empty')],
+			['folder//sub/', _('directory cannot be empty')],
+			['/folder/sub//name', _('directory cannot be empty')],
+			['//', _('directory cannot be empty')],
+			['///', _('directory cannot be empty')],
+			['folder/ /sub', _('directory cannot be empty')],
+			['/ \ / /', _('directory cannot be empty')]
 		];
 	}
 
@@ -75,7 +75,7 @@ class CMenuPathValidatorTest extends TestCase {
 		}
 		else {
 			$this->assertFalse($result, sprintf('Path "%s" should be invalid', $path));
-			$this->assertEquals($this->validator->getError(), $error);
+			$this->assertEquals($error, $this->validator->getError());
 		}
 	}
 }
