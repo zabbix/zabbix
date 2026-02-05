@@ -1862,6 +1862,11 @@ msgstr "Должен быть включкен как минимум один п
 msgid "At least one period must be added."
 msgstr ""
 
+#: app/controllers/CControllerConnectorCreate.php:44
+#: app/controllers/CControllerConnectorUpdate.php:45
+msgid "At least one type of information must be selected."
+msgstr ""
+
 #: app/controllers/CControllerPopupAcknowledgeCreate.php:283
 msgid "At least one update operation or message is mandatory"
 msgstr "По крайней мере одна операция обновления или сообщение обязательно"
@@ -21784,6 +21789,11 @@ msgstr "Приоритет отображения тегов"
 msgid "Tag filter"
 msgstr "Фильтр тегов"
 
+#: app/controllers/CControllerConnectorCreate.php:120
+#: app/controllers/CControllerConnectorUpdate.php:121
+msgid "Tag filter name, operator and value combination is not unique."
+msgstr ""
+
 #: app/partials/trigger.edit.trigger.tab.php:253
 msgid "Tag for matching"
 msgstr "Теги для совпадения"
@@ -27351,6 +27361,11 @@ msgstr "ошибочная последовательность байт в UTF-
 msgid "invalid data type"
 msgstr "ошибочный тип данных"
 
+#: include/classes/validators/CAbsoluteTimeValidator.php:45
+#: include/classes/validators/CAbsoluteTimeValidator.php:53
+msgid "invalid date"
+msgstr ""
+
 #: include/classes/graphdraw/CLineGraphDraw.php:140 include/items.inc.php:1805
 msgid "invalid delay"
 msgstr "ошибочная задержка"
@@ -28751,6 +28766,11 @@ msgstr "значение должно быть между \"%1$s\" и \"%2$s\""
 msgid "value must be between \"%1$s\" and \"%2$s\", and have no more than \"%3$s\" digits after the decimal point"
 msgstr "значение должно быть между \"%1$s\" и \"%2$s\", и иметь не более \"%3$s\" цифр после десятичной точки"
 
+#: include/classes/validators/CTimeUnitValidator.php:84
+#, c-format
+msgid "value must be between %1$s and %2$s"
+msgstr ""
+
 #: include/classes/validators/CApiInputValidator.php:676
 msgid "value must be empty"
 msgstr "значение должно быть пустым"
@@ -28768,6 +28788,16 @@ msgstr[2] "значение должно быть пустым или одним
 #, c-format
 msgid "value must be greater than \"%1$s\""
 msgstr "значение должно быть больше \"%1$s\""
+
+#: include/classes/validators/CAbsoluteTimeValidator.php:59
+#, c-format
+msgid "value must be greater than or equal to %1$s"
+msgstr ""
+
+#: include/classes/validators/CAbsoluteTimeValidator.php:64
+#, c-format
+msgid "value must be less than or equal to %1$s"
+msgstr ""
 
 #: app/controllers/CControllerPopupItemTest.php:1342
 #: include/classes/validators/CNewValidator.php:220

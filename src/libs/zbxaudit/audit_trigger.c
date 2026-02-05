@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -297,10 +297,10 @@ void	zbx_audit_trigger_update_json_remove_dependency(int audit_context_mode, int
 }
 
 void	zbx_audit_trigger_update_json_add_tags_and_values(int audit_context_mode, zbx_uint64_t triggerid, int flags,
-		zbx_uint64_t triggertagid, const char *tag, const char *value)
+		zbx_uint64_t triggertagid, const char *tag, const char *value, int automatic)
 {
 	char	audit_key[AUDIT_DETAILS_KEY_LEN], audit_key_tag[AUDIT_DETAILS_KEY_LEN],
-		audit_key_value[AUDIT_DETAILS_KEY_LEN];
+		audit_key_value[AUDIT_DETAILS_KEY_LEN], audit_key_automatic[AUDIT_DETAILS_KEY_LEN];
 	int	resource_type;
 
 	RETURN_IF_AUDIT_OFF(audit_context_mode);
@@ -313,6 +313,8 @@ void	zbx_audit_trigger_update_json_add_tags_and_values(int audit_context_mode, z
 		zbx_snprintf(audit_key_tag, sizeof(audit_key_tag), "trigger.tags[" ZBX_FS_UI64 "].tag", triggertagid);
 		zbx_snprintf(audit_key_value, sizeof(audit_key_value), "trigger.tags[" ZBX_FS_UI64 "].value",
 				triggertagid);
+		zbx_snprintf(audit_key_automatic, sizeof(audit_key_automatic),
+				"trigger.tags[" ZBX_FS_UI64 "].automatic", triggertagid);
 	}
 	else if(ZBX_AUDIT_RESOURCE_TRIGGER_PROTOTYPE == resource_type)
 	{
@@ -321,6 +323,8 @@ void	zbx_audit_trigger_update_json_add_tags_and_values(int audit_context_mode, z
 				triggertagid);
 		zbx_snprintf(audit_key_value, sizeof(audit_key_value), "triggerprototype.tags[" ZBX_FS_UI64 "].value",
 				triggertagid);
+		zbx_snprintf(audit_key_automatic, sizeof(audit_key_automatic),
+				"triggerprototype.tags[" ZBX_FS_UI64 "].automatic", triggertagid);
 	}
 	else
 	{
@@ -335,6 +339,8 @@ void	zbx_audit_trigger_update_json_add_tags_and_values(int audit_context_mode, z
 			tag, AUDIT_TABLE_NAME, "tag");
 	zbx_audit_update_json_append_string(triggerid, AUDIT_TRIGGER_ID, AUDIT_DETAILS_ACTION_ADD, audit_key_value,
 			value, AUDIT_TABLE_NAME, "value");
+	zbx_audit_update_json_append_int(triggerid, AUDIT_TRIGGER_ID, AUDIT_DETAILS_ACTION_ADD, audit_key_automatic,
+			automatic, AUDIT_TABLE_NAME, "automatic");
 #undef AUDIT_TABLE_NAME
 }
 
@@ -391,6 +397,7 @@ void	zbx_audit_trigger_update_json_update_tag_##resource(int audit_context_mode,
 
 PREPARE_AUDIT_TRIGGER_UPDATE_TAG(tag, const char*, string)
 PREPARE_AUDIT_TRIGGER_UPDATE_TAG(value, const char*, string)
+PREPARE_AUDIT_TRIGGER_UPDATE_TAG(automatic, int, int)
 
 #undef PREPARE_AUDIT_TRIGGER_UPDATE_TAG
 

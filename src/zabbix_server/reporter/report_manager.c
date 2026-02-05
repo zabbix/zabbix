@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -224,8 +224,10 @@ static void	rm_session_close(zbx_rm_session_t *session)
 	zbx_free(session);
 }
 
-static void	rm_job_free(zbx_rm_job_t *job)
+static void	rm_job_free(void *ptr)
 {
+	zbx_rm_job_t	*job = (zbx_rm_job_t *)ptr;
+
 	if (NULL != job->client)
 		zbx_ipc_client_release(job->client);
 
@@ -242,7 +244,7 @@ static void	rm_job_free(zbx_rm_job_t *job)
 
 static void	rm_batch_clean(zbx_rm_batch_t *batch)
 {
-	zbx_vector_ptr_clear_ext(&batch->jobs, (zbx_ptr_free_func_t)rm_job_free);
+	zbx_vector_ptr_clear_ext(&batch->jobs, rm_job_free);
 	zbx_vector_ptr_destroy(&batch->jobs);
 	zbx_free(batch->info);
 }
@@ -1387,8 +1389,10 @@ typedef struct
 }
 zbx_report_dst_t;
 
-static void	zbx_report_dst_free(zbx_report_dst_t *dst)
+static void	zbx_report_dst_free(void *ptr)
 {
+	zbx_report_dst_t	*dst= (zbx_report_dst_t *)ptr;
+
 	zbx_free(dst->recipient);
 	zbx_free(dst);
 }
@@ -1567,7 +1571,7 @@ static int	rm_writer_process_job(zbx_rm_writer_t *writer, zbx_rm_job_t *job, cha
 out:
 	zbx_free(sql);
 	zbx_free(data);
-	zbx_vector_ptr_clear_ext(&dsts, (zbx_ptr_free_func_t)zbx_report_dst_free);
+	zbx_vector_ptr_clear_ext(&dsts, zbx_report_dst_free);
 	zbx_vector_ptr_destroy(&dsts);
 	zbx_vector_uint64_destroy(&mediatypeids);
 

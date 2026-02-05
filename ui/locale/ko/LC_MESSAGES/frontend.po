@@ -1812,6 +1812,11 @@ msgstr "하나 이상의 매개변수를 활성화해야 합니다."
 msgid "At least one period must be added."
 msgstr ""
 
+#: app/controllers/CControllerConnectorCreate.php:44
+#: app/controllers/CControllerConnectorUpdate.php:45
+msgid "At least one type of information must be selected."
+msgstr ""
+
 #: app/controllers/CControllerPopupAcknowledgeCreate.php:283
 msgid "At least one update operation or message is mandatory"
 msgstr "하나 이상의 업데이트 작업 또는 메시지가 필수입니다."
@@ -21441,6 +21446,11 @@ msgstr "태그 표시 우선도"
 msgid "Tag filter"
 msgstr "태그 필터"
 
+#: app/controllers/CControllerConnectorCreate.php:120
+#: app/controllers/CControllerConnectorUpdate.php:121
+msgid "Tag filter name, operator and value combination is not unique."
+msgstr ""
+
 #: app/partials/trigger.edit.trigger.tab.php:253
 msgid "Tag for matching"
 msgstr "매칭을 위한 태그"
@@ -26959,6 +26969,11 @@ msgstr "UTF-8의 바이트 시퀀스가 올바르지 않습니다"
 msgid "invalid data type"
 msgstr "잘못된 데이터 유형"
 
+#: include/classes/validators/CAbsoluteTimeValidator.php:45
+#: include/classes/validators/CAbsoluteTimeValidator.php:53
+msgid "invalid date"
+msgstr ""
+
 #: include/classes/graphdraw/CLineGraphDraw.php:140 include/items.inc.php:1805
 msgid "invalid delay"
 msgstr "갱신간격이 올바르지 않습니다"
@@ -28357,6 +28372,11 @@ msgstr "값은 \"%1$s\"에서 \"%2$s\" 사이여야 함"
 msgid "value must be between \"%1$s\" and \"%2$s\", and have no more than \"%3$s\" digits after the decimal point"
 msgstr ""
 
+#: include/classes/validators/CTimeUnitValidator.php:84
+#, c-format
+msgid "value must be between %1$s and %2$s"
+msgstr ""
+
 #: include/classes/validators/CApiInputValidator.php:676
 msgid "value must be empty"
 msgstr "값은 비어 있어야 함"
@@ -28372,6 +28392,16 @@ msgstr[0] ""
 #, c-format
 msgid "value must be greater than \"%1$s\""
 msgstr "값은 \"%1$s\"보다 커야 함"
+
+#: include/classes/validators/CAbsoluteTimeValidator.php:59
+#, c-format
+msgid "value must be greater than or equal to %1$s"
+msgstr ""
+
+#: include/classes/validators/CAbsoluteTimeValidator.php:64
+#, c-format
+msgid "value must be less than or equal to %1$s"
+msgstr ""
 
 #: app/controllers/CControllerPopupItemTest.php:1342
 #: include/classes/validators/CNewValidator.php:220
