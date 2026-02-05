@@ -1558,4 +1558,24 @@ clean:
 out:
 	return ret;
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: log outer xml string of specified node                            *
+ *                                                                            *
+ * Parameters: node      - [IN] the XML node                                  *
+ *             log_level - [IN] debug, warning etc                            *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_xml_node_dump(xmlNode *node, int log_level)
+{
+	xmlBufferPtr	buffer;
+
+	if (NULL == node || NULL == (buffer = xmlBufferCreate()))
+		return;
+
+	xmlNodeDump(buffer, node->doc, node, 0, 1);
+	zabbix_log(log_level, "outer XML:%s",(char *)xmlBufferContent(buffer));
+	xmlBufferFree(buffer);
+}
 #endif // HAVE_LIBXML2 && HAVE_LIBCURL

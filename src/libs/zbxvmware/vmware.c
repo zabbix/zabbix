@@ -1442,7 +1442,7 @@ int	vmware_service_get_alarms_data(const char *func_parent, const zbx_vmware_ser
 
 		if (NULL != (entity = zbx_xml_node_get(xdoc, nodeset->nodeTab[i], ZBX_XNN("entity"))))
 		{
-			alarm->entity_id = zbx_xml_node_read_value(xdoc, entity, ZBX_XNN("."));
+			alarm->entity_id = zbx_xml_node_read_value(xdoc, entity, ".");
 			alarm->entity_type = zbx_xml_node_read_prop(entity, "type");
 		}
 		else
@@ -1472,25 +1472,6 @@ clean:
  ******************************************************************************/
 static void	vmware_service_alarm_uuid_update(zbx_vmware_data_t *data)
 {
-#	define	UUID_UPDATE(entity, alarm)									\
-		zbx_vmware_vm_index_t	*vms;									\
-		zbx_hashset_iter_t	iter;									\
-														\
-		zbx_hashset_iter_reset(&data->vms_index, &iter);						\
-														\
-		while (NULL != (vms = (zbx_vmware_vm_index_t *)zbx_hashset_iter_next(&iter)))			\
-		{												\
-			if (0 != strcmp(vms->entity->id, alarm->entity_id) ||					\
-					FAIL == zbx_vector_str_bsearch(&vms->entity->alarm_ids, alarm->key,	\
-					ZBX_DEFAULT_STR_COMPARE_FUNC))						\
-			{											\
-				continue;									\
-			}											\
-														\
-			alarm->entity_uuid = zbx_strdup(NULL, vms->entity->uuid);				\
-			break;											\
-		}
-
 	int	i, skipped = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() alerts:%d", __func__, data->alarms.values_num);
@@ -1499,16 +1480,60 @@ static void	vmware_service_alarm_uuid_update(zbx_vmware_data_t *data)
 	{
 		zbx_vmware_alarm_t	*alarm = data->alarms.values[i];
 
+		alarm->entity_uuid = NULL;	/* we can't guarantee that we will find any uuid */
+
 		if (NULL == alarm->entity_id)
 			continue;
 
 		if (0 == strcmp(alarm->entity_type, ZBX_VMWARE_SOAP_VM))
 		{
-			UUID_UPDATE(vm, alarm);
+			zbx_hashset_iter_t	iter;
+			zbx_vmware_hv_t		*hv;
+
+			zbx_hashset_iter_reset(&data->hvs, &iter);
+
+			while (NULL != (hv = (zbx_vmware_hv_t *)zbx_hashset_iter_next(&iter)))
+			{
+				int	j;
+
+				for (j = 0; j < hv->vms.values_num; j++)
+				{
+					zbx_vmware_vm_t	*vm = hv->vms.values[j];
+
+					if (0 != strcmp(vm->id, alarm->entity_id) ||
+							FAIL == zbx_vector_str_bsearch(&vm->alarm_ids, alarm->key,
+							ZBX_DEFAULT_STR_COMPARE_FUNC))
+					{
+						continue;
+					}
+
+					alarm->entity_uuid = zbx_strdup(NULL, vm->uuid);
+					break;
+				}
+
+				if (j < hv->vms.values_num)
+					break;
+			}
 		}
 		else if (0 == strcmp(alarm->entity_type, ZBX_VMWARE_SOAP_HV))
 		{
-			UUID_UPDATE(hv, alarm);
+			zbx_hashset_iter_t	iter;
+			zbx_vmware_hv_t		*hv;
+
+			zbx_hashset_iter_reset(&data->hvs, &iter);
+
+			while (NULL != (hv = (zbx_vmware_hv_t *)zbx_hashset_iter_next(&iter)))
+			{
+				if (0 != strcmp(hv->id, alarm->entity_id) ||
+						FAIL == zbx_vector_str_bsearch(&hv->alarm_ids, alarm->key,
+						ZBX_DEFAULT_STR_COMPARE_FUNC))
+				{
+					continue;
+				}
+
+				alarm->entity_uuid = zbx_strdup(NULL, hv->uuid);
+				break;
+			}
 		}
 		else if (0 == strcmp(alarm->entity_type, ZBX_VMWARE_SOAP_DS))
 		{
@@ -1526,18 +1551,12 @@ static void	vmware_service_alarm_uuid_update(zbx_vmware_data_t *data)
 			}
 
 			alarm->entity_uuid = zbx_strdup(NULL, data->datastores.values[j]->uuid);
-
 		}
 		else
-		{
-			alarm->entity_uuid = NULL;
 			skipped++;
-		}
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() skipped uuid:%d", __func__, skipped);
-
-#	undef	UUID_UPDATE
 }
 
 /******************************************************************************
