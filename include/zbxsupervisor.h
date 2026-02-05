@@ -55,7 +55,9 @@ typedef struct
 	zbx_supervisor_unit_def_t	unit_defs[ZBX_PROCESS_TYPE_COUNT];
 	zbx_config_tls_t		*config_tls;
 	zbx_get_program_type_f		zbx_get_program_type_cb_arg;
+#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	zbx_find_psk_in_cache_f		zbx_find_psk_in_cache_cb_arg;
+#endif
 }
 zbx_thread_supervisor_args_t;
 

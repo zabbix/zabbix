@@ -1839,7 +1839,9 @@ static void	start_processes(zbx_socket_t *listen_sock, zbx_proc_startup_t *runle
 			.unit_defs = {{0}},
 			.config_tls = zbx_config_tls,
 			.zbx_get_program_type_cb_arg = get_zbx_program_type,
+#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 			.zbx_find_psk_in_cache_cb_arg = zbx_dc_get_psk_by_identity
+#endif
 		};
 
 	thread_args.info.program_type = zbx_program_type;
