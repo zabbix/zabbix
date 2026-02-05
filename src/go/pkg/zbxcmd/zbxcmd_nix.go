@@ -43,7 +43,7 @@ func InitExecutor() (Executor, error) {
 }
 
 func (*ZBXExec) execute(s string, timeout time.Duration, path string, strict bool) (string, error) {
-	//nolint:lostcancel // used only in this function to release the goroutine waiting for ctx.Done, no leaks.
+	// used only in this function to release the goroutine waiting for ctx.Done, no leaks.
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 
 	cmd := exec.Command("sh", "-c", s)
@@ -66,6 +66,7 @@ func (*ZBXExec) execute(s string, timeout time.Duration, path string, strict boo
 	go timeoutListener(ctx, cmd)
 
 	err = <-done
+
 	cancel()
 
 	// we need to check context error so we can inform the user if timeout was reached and Zabbix agent2
@@ -101,11 +102,15 @@ func (*ZBXExec) executeBackground(s string) error {
 	return nil
 }
 
-func jobDoneListener(done chan<- (error), cmd *exec.Cmd) {
+func jobDoneListener(done chan<- error, cmd *exec.Cmd) {
 	done <- cmd.Wait()
 }
 
 func timeoutListener(ctx context.Context, cmd *exec.Cmd) {
 	<-ctx.Done()
-	syscall.Kill(-cmd.Process.Pid, syscall.SIGKILL)
+
+	err := syscall.Kill(-cmd.Process.Pid, syscall.SIGKILL)
+	if err != nil {
+		log.Debugf("failed to kill cmd processes %s", err)
+	}
 }
