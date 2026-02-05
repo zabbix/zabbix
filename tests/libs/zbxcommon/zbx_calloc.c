@@ -43,9 +43,10 @@ void	*__wrap_calloc(size_t nmemb, size_t size)
 	return ret_ptr;
 }
 
-static void	zabbix_log_stub(int level, const char *fmt, ...)
+static void	zabbix_log_stub(int level, const char *fmt, va_list args)
 {
 	ZBX_UNUSED(level);
+	ZBX_UNUSED(args);
 
 	if (NULL == warning[0])
 	{

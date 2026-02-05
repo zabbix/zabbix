@@ -48,9 +48,10 @@ void	*__wrap_malloc(size_t size)
 	return __real_malloc(size);
 }
 
-static void	zabbix_log_stub(int level, const char *fmt, ...)
+static void	zabbix_log_stub(int level, const char *fmt, va_list args)
 {
 	ZBX_UNUSED(level);
+	ZBX_UNUSED(args);
 
 	if (NULL == warning[0])
 	{
