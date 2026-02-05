@@ -1486,12 +1486,12 @@ define('GEOMAP_LNG_MAX', 180);
 // Regular expressions.
 define('ZBX_PREG_NUMBER', '(?<number>-?(\d+(\.\d*)?|\.\d+)([Ee][+-]?\d+)?)');
 define('ZBX_PREG_INT', '(?<int>-?\d+)');
-define('ZBX_PREG_DEF_FONT_STRING', '/^[0-9\.:% ]+$/');
+define('ZBX_PREG_DEF_FONT_STRING', '/^[0-9.:% ]+$/');
 define('ZBX_TLS_PSK_PATTERN', '/^(.{2}){1,}$/');
-define('ZBX_PREG_HOST_FORMAT', '([0-9a-zA-Z_\. \-]+)'); // !!! Don't forget sync code with C !!!
+define('ZBX_PREG_HOST_FORMAT', '([0-9a-zA-Z_. -]+)');
 define('ZBX_PREG_PSK_IDENTITY_FORMAT', '[^`\']*');
 
-define('TRIGGER_QUERY_PLACEHOLDER', '$'); // !!! Don't forget sync code with C !!!
+define('TRIGGER_QUERY_PLACEHOLDER', '$');
 
 define('ZBX_USER_ONLINE_TIME', 600); // 10min
 define('ZBX_GUEST_USER','guest');
