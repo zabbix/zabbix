@@ -1172,8 +1172,6 @@ function getEventsSuppressions(array $events): array {
 			}
 		}
 
-		CArrayHelper::sort($event_suppressions, [['field' => 'clock', 'order' => ZBX_SORT_DOWN]]);
-
 		$suppressions[$event['eventid']] = [
 			'suppress_until' => array_values($event_suppressions),
 			'count' => count($event_suppressions)
@@ -1216,8 +1214,6 @@ function getEventsMessages(array $events): array {
 				$userids[$ack['userid']] = true;
 			}
 		}
-
-		CArrayHelper::sort($event_messages, [['field' => 'clock', 'order' => ZBX_SORT_DOWN]]);
 
 		$messages[$event['eventid']] = [
 			'messages' => array_values($event_messages),
@@ -1267,8 +1263,6 @@ function getEventsSeverityChanges(array $events, array $triggers): array {
 				$userids[$ack['userid']] = true;
 			}
 		}
-
-		CArrayHelper::sort($event_severities, [['field' => 'clock', 'order' => ZBX_SORT_DOWN]]);
 
 		$severities[$event['eventid']] = [
 			'severities' => array_values($event_severities),
@@ -1523,8 +1517,6 @@ function getEventUpdates(array $event): array {
 	foreach ($event['acknowledges'] as $ack) {
 		$userids[$ack['userid']] = true;
 	}
-
-	CArrayHelper::sort($event['acknowledges'], [['field' => 'clock', 'order' => ZBX_SORT_DOWN]]);
 
 	return [
 		'data' => array_values($event['acknowledges']),
