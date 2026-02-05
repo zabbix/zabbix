@@ -43,10 +43,10 @@ func InitExecutor() (Executor, error) {
 }
 
 func (*ZBXExec) execute(s string, timeout time.Duration, path string, strict bool) (string, error) {
+	//nolint:lostcancel // used only in this function to release the goroutine waiting for ctx.Done, no leaks.
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
-	defer cancel()
 
-	cmd := exec.CommandContext(ctx, "sh", "-c", s)
+	cmd := exec.Command("sh", "-c", s)
 	cmd.Dir = path
 
 	var b bytes.Buffer
@@ -60,7 +60,13 @@ func (*ZBXExec) execute(s string, timeout time.Duration, path string, strict boo
 		return "", errs.Errorf("cannot execute command: %s", err)
 	}
 
-	werr := cmd.Wait()
+	done := make(chan error, 1)
+
+	go jobDoneListener(done, cmd)
+	go timeoutListener(ctx, cmd)
+
+	err = <-done
+	cancel()
 
 	// we need to check context error so we can inform the user if timeout was reached and Zabbix agent2
 	// terminated the command
@@ -69,10 +75,10 @@ func (*ZBXExec) execute(s string, timeout time.Duration, path string, strict boo
 	}
 
 	// we need to check error after t.Stop so we can inform the user if timeout was reached and Zabbix agent2 terminated the command
-	if strict && werr != nil && !errors.Is(werr, syscall.ECHILD) {
-		log.Debugf("Command [%s] execution failed: %s\n%s", s, werr, b.String())
+	if strict && err != nil && !errors.Is(err, syscall.ECHILD) {
+		log.Debugf("Command [%s] execution failed: %s\n%s", s, err, b.String())
 
-		return "", errs.Errorf("command execution failed: %s", werr.Error())
+		return "", errs.Errorf("command execution failed: %s", err.Error())
 	}
 
 	if MaxExecuteOutputLenB <= len(b.String()) {
@@ -93,4 +99,13 @@ func (*ZBXExec) executeBackground(s string) error {
 	go cmd.Wait()
 
 	return nil
+}
+
+func jobDoneListener(done chan<- (error), cmd *exec.Cmd) {
+	done <- cmd.Wait()
+}
+
+func timeoutListener(ctx context.Context, cmd *exec.Cmd) {
+	<-ctx.Done()
+	syscall.Kill(-cmd.Process.Pid, syscall.SIGKILL)
 }
