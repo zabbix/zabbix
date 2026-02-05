@@ -833,7 +833,7 @@ class testDashboardPlainTextWidget extends CWebTest {
 
 	public static function getTableData() {
 		return [
-			// Simple test case with one item and one data entry.
+			// #0 Simple test case with one item and one data entry.
 			[
 				[
 					'initial_data' => [
@@ -848,7 +848,7 @@ class testDashboardPlainTextWidget extends CWebTest {
 					]
 				]
 			],
-			// Simple test case with one item and several data entries.
+			// #1 Simple test case with one item and several data entries.
 			[
 				[
 					'initial_data' => [
@@ -875,7 +875,7 @@ class testDashboardPlainTextWidget extends CWebTest {
 					]
 				]
 			],
-			// Test case with two items and several data entries.
+			// #2 Test case with two items and several data entries.
 			[
 				[
 					'initial_data' => [
@@ -914,7 +914,7 @@ class testDashboardPlainTextWidget extends CWebTest {
 					]
 				]
 			],
-			// Test case with limited lines to show.
+			// #3 Test case with limited lines to show.
 			[
 				[
 					'fields' => [
@@ -945,7 +945,7 @@ class testDashboardPlainTextWidget extends CWebTest {
 					]
 				]
 			],
-			// Test case for 'Items location' and 'Show text as HTML' options check.
+			// #4 Test case for 'Items location' and 'Show text as HTML' options check.
 			[
 				[
 					'fields' => [
@@ -985,7 +985,7 @@ class testDashboardPlainTextWidget extends CWebTest {
 						],
 						[
 							'Timestamp' =>  date('Y-m-d H:i:s', strtotime('-16 hours')),
-							'ЗАББИКС Сервер: Linux: Host name of Zabbix agent running' => 'TEST'
+							'ЗАББИКС Сервер: Linux: Host name of Zabbix agent running' => 'test'
 						],
 						[
 							'Timestamp' =>  date('Y-m-d H:i:s', strtotime('-25 hours')),
@@ -998,10 +998,11 @@ class testDashboardPlainTextWidget extends CWebTest {
 						['itemid' => '42227', 'values' => '<span style="text-transform:uppercase;">'.'test'.'</span>',
 								'time' => strtotime('-16 hours')],
 						['itemid' => '42227', 'values' => STRING_255, 'time' => strtotime('-25 hours')]
-					]
+					],
+					'screenshot' => true
 				]
 			],
-			// Test case for 'Dynamic items' check.
+			// #5 Test case for 'Dynamic items' check.
 			[
 				[
 					'host_select' => [
@@ -1059,11 +1060,61 @@ class testDashboardPlainTextWidget extends CWebTest {
 	}
 
 	/**
+	 * Get widget table data.
+	 *
+	 * @param CWidgetElement $widget    widget element
+	 *
+	 * @return array
+	 */
+	protected function getWidgetTableData($widget) {
+		$widget->waitUntilReady();
+
+		if ($widget->query('class:no-data-message')->one(false)->isVisible() || $widget->query('class:nothing-to-show')
+				->one(false)->isVisible()) {
+			return [];
+		}
+
+		$table = $widget->getContent()->asTable();
+		$table->query('xpath:.//tbody/tr')->waitUntilPresent();
+
+		$headers = $table->getHeadersText();
+		$data = [];
+
+		foreach ($table->getRows() as $row) {
+			$raw_row = [];
+			$cells = $row->query('xpath:./*')->all();
+
+			foreach ($headers as $i => $name) {
+				if ($name !== '' && $cells->exists($i)) {
+					$column = $cells->get($i);
+					$iframe = $column->query('class:js-iframe')->one(false);
+
+					if ($iframe->isValid()) {
+						$value = $iframe->getAttribute('srcdoc');
+						$value = preg_match('/<body[^>]*>(.*)<\/body>/is', $value, $m) ? $m[1] : $value;
+						$value = strip_tags(htmlspecialchars_decode($value, ENT_QUOTES));
+					}
+					else {
+						$value = $column->getText();
+					}
+
+					$raw_row[$name] = trim($value);
+				}
+			}
+
+			// Clear empty array elements.
+			$data[] = array_filter($raw_row, 'strlen');
+		}
+
+		return $data;
+	}
+
+	/**
 	 * @backup !history, !history_uint, !history_str
 	 *
 	 * @dataProvider getTableData
 	 */
-	public function  testDashboardPlainTextWidget_TableData($data) {
+	public function testDashboardPlainTextWidget_TableData($data) {
 		foreach ($data['item_data'] as $params) {
 			CDataHelper::addItemData($params['itemid'], $params['values'], $params['time']);
 		}
@@ -1071,33 +1122,39 @@ class testDashboardPlainTextWidget extends CWebTest {
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboard_data)->waitUntilReady();
 		$dashboard = CDashboardElement::find()->one();
 		$dashboard->waitUntilReady();
-		$this->assertTableData($data['initial_data']);
+
+		$widget = $dashboard->getWidget(self::DATA_WIDET);
+		$this->assertEquals($data['initial_data'], $this->getWidgetTableData($widget));
 
 		$default_values = [
 			'Show lines' => '25',
 			'Show text as HTML' => false,
 			'Items location' => 'Left'
 		];
+
 		if (array_key_exists('fields', $data)) {
 			$this->widgetConfigurationChange($data['fields'], $dashboard);
-			$this->assertTableData($data['result']);
+			$expected_result = array_key_exists('result', $data) ? $data['result'] : $data['initial_data'];
+			$this->assertEquals($expected_result, $this->getWidgetTableData($widget));
 			$this->widgetConfigurationChange($default_values, $dashboard);
+
+			if (array_key_exists('screenshot', $data)) {
+				$this->assertScreenshot($widget, 'HTML encode');
+			}
 		}
 
 		if (array_key_exists('host_select', $data)) {
-			$multiselect_field = $dashboard->getControls()->query('class:multiselect-control')->asMultiselect()->one();
-			$multiselect_field->fill($data['host_select']['without_data']);
-			$dashboard->waitUntilReady();
-			$this->assertTableData();
-			$multiselect_field->fill($data['host_select']['with_data']);
-			$dashboard->waitUntilReady();
-			$this->assertTableData($data['result']);
-			$multiselect_field->clear();
-			$dashboard->waitUntilReady();
-		}
+			$host_select = $dashboard->getControls()->query('class:multiselect-control')->asMultiselect()->one();
 
-		if (array_key_exists('result', $data)) {
-			$this->assertTableData($data['initial_data']);
+			$host_select->fill($data['host_select']['without_data']);
+			$this->assertEquals([], $this->getWidgetTableData($widget));
+			$host_select->overwrite($data['host_select']['with_data']);
+
+			$widget->getContent()->query('xpath:.//table/tbody/tr')->waitUntilPresent();
+			$this->assertEquals($data['result'], $this->getWidgetTableData($widget));
+
+			$host_select->clear();
+			$widget->waitUntilReady();
 		}
 	}
 
