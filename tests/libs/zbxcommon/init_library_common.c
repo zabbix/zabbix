@@ -19,9 +19,9 @@
 #include "zbxcommon.h"
 
 #ifndef _WINDOWS
-#       include "zbxnix.h"
+#	include "zbxnix.h"
 #else
-#       include "zbxwin32.h"
+#	include "zbxwin32.h"
 #endif
 
 static void	zbx_log_impl(int level, const char *fmt, va_list args)
