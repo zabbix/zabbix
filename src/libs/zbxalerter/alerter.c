@@ -126,10 +126,26 @@ static char	*generate_sendto_hash(const char *sendto)
 	return sendto_hash;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: create unique email Message-ID field value                        *
+ *                                                                            *
+ * Parameters: mediatypeid  - [IN]                                            *
+ *             sendto_hash  - [IN] hash of message's Send-To field            *
+ *             eventid      - [IN]                                            *
+ *             actionid     - [IN]                                            *
+ *             alertid      - [IN]                                            *
+ *             message_type - [IN]                                            *
+ *             process_num  - [IN]                                            *
+ *                                                                            *
+ * Return value: In-Reply_To field value                                      *
+ *                                                                            *
+ ******************************************************************************/
 static char	*create_email_messageid(zbx_uint64_t mediatypeid, const char *sendto_hash, zbx_uint64_t eventid,
 		zbx_uint64_t actionid, zbx_uint64_t alertid, int message_type, int process_num)
 {
 	static unsigned short	counter = 0;
+	time_t			utc_time;
 	struct tm		tm;
 	long			ms;
 	char			*str = NULL;
@@ -156,17 +172,19 @@ static char	*create_email_messageid(zbx_uint64_t mediatypeid, const char *sendto
 			}
 			break;
 		case ZBX_ALERT_MESSAGE_REPORT:
-			zbx_get_time(&tm, &ms, NULL);
+			time(&utc_time);
+			gmtime_r(&utc_time, &tm);
 
 			zbx_snprintf_alloc(&str, &str_alloc, &str_offset,
-					"<%04d%02d%02d-%02d%02d%02d-" ZBX_FS_UI64
+					"<%04d%02d%02d-%02d%02d%02d-%d-%hu"
 					".%s." ZBX_FS_UI64 ".%s@zabbix-reports>",
 					1900 + tm.tm_year, 1 + tm.tm_mon, tm.tm_mday,
-					tm.tm_hour, tm.tm_min, tm.tm_sec, eventid,
+					tm.tm_hour, tm.tm_min, tm.tm_sec, process_num, counter++,
 					sendto_hash, mediatypeid, zbx_dc_get_instanceid());
 			break;
 		default:
-			zbx_get_time(&tm, &ms, NULL);
+			time(&utc_time);
+			gmtime_r(&utc_time, &tm);
 
 			zbx_snprintf_alloc(&str, &str_alloc, &str_offset,
 					"<%04d%02d%02d-%02d%02d%02d-%d-%hu"
@@ -184,9 +202,11 @@ static char	*create_email_messageid(zbx_uint64_t mediatypeid, const char *sendto
  *                                                                            *
  * Purpose: create email In-Reply_To field value to group related messages    *
  *                                                                            *
- * Parameters: mediatypeid - [IN]                                             *
- *             sendto      - [IN] message's Send-To field                     *
- *             eventid     - [IN]                                             *
+ * Parameters: mediatypeid  - [IN]                                            *
+ *             sendto_hash  - [IN] hash of message's Send-To field            *
+ *             eventid      - [IN]                                            *
+ *             actionid     - [IN]                                            *
+ *             message_type - [IN]                                            *
  *                                                                            *
  * Return value: In-Reply_To field value                                      *
  *                                                                            *
@@ -321,17 +341,34 @@ static void	alerter_process_email(zbx_ipc_socket_t *socket, zbx_ipc_message_t *i
 
 	sendto_hash = generate_sendto_hash(sendto);
 
-	if (0 != p_eventid)
+	switch (message_type)
 	{
-		messageid = create_email_messageid(mediatypeid, sendto_hash, eventid, actionid,
-				eventid == p_eventid ? alertid : 0, message_type, process_num);
+		case ZBX_ALERT_MESSAGE_EVENT:
+			if (0 != p_eventid)
+			{
+				messageid = create_email_messageid(mediatypeid, sendto_hash, eventid, actionid,
+						alertid, message_type, 0);
 
-		inreplyto = create_email_inreplyto(mediatypeid, sendto_hash, p_eventid, actionid, message_type);
-	}
-	else
-	{
-		messageid = create_email_messageid(mediatypeid, sendto_hash, eventid, actionid,
-				0, message_type, process_num);
+				inreplyto = create_email_inreplyto(mediatypeid, sendto_hash, p_eventid, actionid,
+						message_type);
+			}
+			else
+			{
+				messageid = create_email_messageid(mediatypeid, sendto_hash, eventid, actionid,
+						0, message_type, 0);
+			}
+			break;
+		case ZBX_ALERT_MESSAGE_REPORT:
+			messageid = create_email_messageid(mediatypeid, sendto_hash, eventid, 0, 0, message_type,
+					process_num);
+
+			inreplyto = create_email_inreplyto(mediatypeid, sendto_hash, p_eventid, actionid,
+					message_type);
+			break;
+		default:
+			messageid = create_email_messageid(mediatypeid, sendto_hash, eventid, 0, 0, message_type,
+					process_num);
+			break;
 	}
 
 	ret = send_email(smtp_server, smtp_port, smtp_helo, smtp_email, sendto, messageid, inreplyto, subject, message,

@@ -139,14 +139,17 @@ static int	am_db_get_alerts(zbx_vector_am_db_alert_ptr_t *alerts)
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 			"select a.alertid,a.mediatypeid,a.sendto,a.subject,a.message,a.status,a.retries,"
 				"e.source,e.object,e.objectid,a.parameters,a.eventid,a.p_eventid,a.actionid,"
-				"(select aa.alertid from alerts aa"
-					" where aa.eventid=a.eventid and aa.actionid=a.actionid"
-					" order by aa.alertid limit 1) as min_alertid"
+				"(select min(aa.alertid)"
+					" from alerts aa"
+					" where aa.eventid = a.eventid"
+						" and aa.actionid = a.actionid"
+						" and aa.sendto=a.sendto"
+				") as min_alertid"
 			" from alerts a"
 			" left join events e"
 				" on a.eventid=e.eventid"
 			" where alerttype=%d"
-			" and",
+				" and",
 			ALERT_TYPE_MESSAGE);
 
 	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "a.status", status_filter, status_limit);
