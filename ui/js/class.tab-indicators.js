@@ -356,6 +356,9 @@ class TabIndicatorItem {
 
 		switch (this.getType()) {
 			case TAB_INDICATOR_TYPE_COUNT:
+				console.log("---------------------")
+				console.log(this.getValue().toString())
+				console.log(this)
 				this._element.setAttribute(TAB_INDICATOR_ATTR_VALUE, this.getValue().toString());
 				break;
 			case TAB_INDICATOR_TYPE_MARK:
@@ -402,7 +405,7 @@ class HostMacrosTabIndicatorItem extends TabIndicatorItem {
 			observer.observe(target_node, {
 				childList: true,
 				attributes: true,
-				attributeFilter: ['value', 'style'], // Use style because textarea don't have value attribute.
+				attributeFilter: ['value'],
 				subtree: true
 			});
 		}
@@ -444,7 +447,7 @@ class HostPrototypeMacrosTabIndicatorItem extends TabIndicatorItem {
 			observer.observe(target_node, {
 				childList: true,
 				attributes: true,
-				attributeFilter: ['value', 'style'], // Use style because textarea don't have value attribute.
+				attributeFilter: ['value'],
 				subtree: true
 			});
 		}
@@ -486,7 +489,7 @@ class TemplateMacrosTabIndicatorItem extends TabIndicatorItem {
 			observer.observe(target_node, {
 				childList: true,
 				attributes: true,
-				attributeFilter: ['value', 'style'], // Use style because textarea don't have value attribute.
+				attributeFilter: ['value'],
 				subtree: true
 			});
 		}
@@ -527,7 +530,7 @@ class TagsTabIndicatorItem extends TabIndicatorItem {
 			observer.observe(target_node, {
 				childList: true,
 				attributes: true,
-				attributeFilter: ['value', 'style'], // Use style because textarea don't have value attribute.
+				attributeFilter: ['value'],
 				subtree: true
 			});
 		}
@@ -869,10 +872,10 @@ class LldMacrosTabIndicatorItem extends TabIndicatorItem {
 	}
 
 	getValue() {
-		return document
-			.querySelectorAll(
-				'#lld_macro_paths tbody tr.form_row > td:first-child > z-textarea-flexible:not(:placeholder-shown)'
-			)
+		return [...document.querySelectorAll(
+				'#lld_macro_paths tbody tr.form_row > td:first-child > z-textarea-flexible'
+			)]
+			.filter(z_textarea_flexible => z_textarea_flexible.value.trim() !== '')
 			.length;
 	}
 
@@ -887,7 +890,7 @@ class LldMacrosTabIndicatorItem extends TabIndicatorItem {
 			observer.observe(target_node, {
 				childList: true,
 				attributes: true,
-				attributeFilter: ['value', 'style'], // Use style because textarea don't have value attribute.
+				attributeFilter: ['value'],
 				subtree: true
 			});
 		}
