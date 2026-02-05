@@ -677,7 +677,7 @@ static void	supervisor_init_libraries(const char *progname, zbx_thread_superviso
 	zbx_tls_init_child(args->config_tls, args->zbx_get_program_type_cb_arg,
 			args->zbx_find_psk_in_cache_cb_arg);
 #else
-	ZBX_UNUSED(local_args);
+	ZBX_UNUSED(args);
 #endif
 }
 
