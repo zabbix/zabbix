@@ -2383,7 +2383,6 @@ class testDashboardItemHistoryWidget extends testWidgets {
 							'Timestamp' => date('Y-m-d H:i:s', strtotime('-16 hours')),
 							'Name' => 'Host name',
 							'Value' => '<span style="text-transform:uppercase;">'.'test'.'</span>'
-
 						],
 						[
 							'Timestamp' => date('Y-m-d H:i:s', strtotime('-25 hours')),
