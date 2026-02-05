@@ -18,6 +18,7 @@
 #include "zbxcommon.h"
 #include "zbxalgo.h"
 #include "zbxnix.h"
+#include "zbxcomms.h"
 
 typedef struct
 {
@@ -52,6 +53,9 @@ typedef struct
 	unsigned char			program_type;
 
 	zbx_supervisor_unit_def_t	unit_defs[ZBX_PROCESS_TYPE_COUNT];
+	zbx_config_tls_t		*config_tls;
+	zbx_get_program_type_f		zbx_get_program_type_cb_arg;
+	zbx_find_psk_in_cache_f		zbx_find_psk_in_cache_cb_arg;
 }
 zbx_thread_supervisor_args_t;
 

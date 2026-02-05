@@ -668,6 +668,9 @@ static void	supervisor_init_libraries(const char *progname)
 	zbx_snmp_init(progname);
 #endif
 
+#ifdef HAVE_ARES_QUERY_CACHE
+	zbx_ares_library_init();
+#endif
 }
 
 static void	supervisor_clear_libraries(const char *progname)
@@ -686,6 +689,10 @@ static void	supervisor_clear_libraries(const char *progname)
 
 #ifdef HAVE_NETSNMP
 	zbx_snmp_clear(progname);
+#endif
+
+#ifdef HAVE_ARES_QUERY_CACHE
+	ares_library_cleanup();
 #endif
 }
 
@@ -737,6 +744,12 @@ ZBX_THREAD_ENTRY(zbx_supervisor_thread, args)
 			server_num, get_process_type_string(process_type), process_num);
 
 	supervisor_init_libraries(get_program_type_string(info->program_type));
+
+#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+	zbx_tls_init_child(local_args->config_tls, local_args->zbx_get_program_type_cb_arg,
+			local_args->zbx_find_psk_in_cache_cb_arg);
+#endif
+
 	zbx_supervisor_worklog_init();
 
 	if (NULL == (dbpool = zbx_dbconn_pool_create(&error)))

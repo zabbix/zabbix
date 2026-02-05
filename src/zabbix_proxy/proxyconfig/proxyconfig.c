@@ -309,14 +309,6 @@ void	*zbx_proxyconfig_thread(void *args)
 
 	ZBX_INIT_THREAD_OR_RETURN(jmp_ret);
 
-#ifdef HAVE_ARES_QUERY_CACHE
-	zbx_ares_library_init();
-#endif
-#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-	zbx_tls_init_child(proxyconfig_args_in->config_tls, proxyconfig_args_in->zbx_get_program_type_cb_arg,
-			zbx_dc_get_psk_by_identity);
-#endif
-
 	zbx_rtc_subscribe(process_type, process_num, rtc_msgs, ARRSIZE(rtc_msgs), proxyconfig_args_in->config_timeout,
 			&rtc);
 
