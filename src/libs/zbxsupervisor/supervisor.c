@@ -30,6 +30,7 @@
 #include "zbxtypes.h"
 #include "zbxdb.h"
 #include "zbxprof.h"
+#include "zbxcomms.h"
 
 #ifdef HAVE_NETSNMP
 #include "zbxsnmp.h"
