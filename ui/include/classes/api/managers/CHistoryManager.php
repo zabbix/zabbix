@@ -52,7 +52,10 @@ class CHistoryManager {
 		$grouped_items = $this->getItemsGroupedByStorage($items);
 
 		if (array_key_exists(ZBX_HISTORY_SOURCE_ELASTIC, $grouped_items)) {
-			$results += $this->getLastValuesFromElasticsearch($grouped_items[ZBX_HISTORY_SOURCE_ELASTIC], 1, $period);
+			$length = 1;
+			$results += $this->getLastValuesFromElasticsearch($grouped_items[ZBX_HISTORY_SOURCE_ELASTIC], 1,
+				$period, $length
+			);
 		}
 
 		if (array_key_exists(ZBX_HISTORY_SOURCE_SQL, $grouped_items)) {
@@ -111,7 +114,7 @@ class CHistoryManager {
 	 *
 	 * @return array  An array with items IDs as keys and arrays of history objects as values.
 	 */
-	public function getLastValues(array $items, $limit = 1, $period = null, $length = null) {
+	public function getLastValues(array $items, $limit = 1, $period = null, ?int $length = null) {
 		$results = [];
 		$grouped_items = $this->getItemsGroupedByStorage($items);
 
@@ -142,7 +145,7 @@ class CHistoryManager {
 	 *
 	 * @see CHistoryManager::getLastValues
 	 */
-	private function getLastValuesFromElasticsearch($items, $limit, $period, $length) {
+	private function getLastValuesFromElasticsearch($items, $limit, $period, ?int $length) {
 		$terms = [];
 		$results = [];
 		$filter = [];
@@ -163,15 +166,6 @@ class CHistoryManager {
 			'size' => 0
 		];
 
-		$group_by_docs = [
-			'top_hits' => [
-				'size' => $limit,
-				'sort' => [
-					'clock' => ZBX_SORT_DOWN
-				]
-			]
-		];
-
 		if ($period) {
 			$filter[] = [
 				'range' => [
@@ -188,38 +182,22 @@ class CHistoryManager {
 					'itemid' => $terms[$type]
 				]
 			]], $filter);
+			$query['aggs']['group_by_itemid']['aggs']['group_by_docs'] = [
+				'top_hits' => [
+					'size' => $limit,
+					'sort' => [
+						'clock' => ZBX_SORT_DOWN
+					]
+				]
+			];
 
-			if ($type == ITEM_VALUE_TYPE_JSON) {
-				$script_fields = [
-					'value' => [
-						'script' => [
-							'lang' => 'painless',
-							'source' => <<<'SCRIPT'
-								def string;
-								string = params._source.value.toString();
-								int string_length = string.codePointCount(0, string.length());
-
-								if (string_length > params.len) {
-									return string.substring(0, string.offsetByCodePoints(0, params.len));
-								} else {
-									return string;
-								}
-							SCRIPT,
-							'params' => [
-								'len' => (int) $length
-							]
-						]
+			if ($type == ITEM_VALUE_TYPE_JSON && $length !== null) {
+				$query['aggs']['group_by_itemid']['aggs']['group_by_docs']['top_hits'] += [
+					'_source' => ['itemid', 'clock', 'ns'],
+					'script_fields' => [
+						'value' => CElasticsearchHelper::getSubstring('value', $length)
 					]
 				];
-
-				$query['aggs']['group_by_itemid']['aggs'] = array_merge(['group_by_docs' => $group_by_docs]);
-				$query['aggs']['group_by_itemid']['aggs']['group_by_docs']['top_hits'] = [
-					'_source' => ['itemid', 'clock', 'ns'],
-					'script_fields' => $script_fields
-				];
-			}
-			else {
-				$query['aggs']['group_by_itemid']['aggs'] = array_merge(['group_by_docs' => $group_by_docs]);
 			}
 
 			// Assure that aggregations for all terms are returned.
@@ -241,15 +219,15 @@ class CHistoryManager {
 				}
 
 				foreach ($item['group_by_docs']['hits']['hits'] as $row) {
+					if (!array_key_exists('_source', $row) && !array_key_exists('fields', $row)) {
+						continue;
+					}
+
 					if (array_key_exists('fields', $row)) {
 						foreach ($row['fields'] as $name => $value) {
 							// Elasticsearch returns field values as arrays and first element holds the value.
 							$row['_source'][$name] = $value[0];
 						}
-					}
-
-					if (!array_key_exists('_source', $row) || !is_array($row['_source'])) {
-						continue;
 					}
 
 					$results[$item['key']][] = $row['_source'];
@@ -276,15 +254,16 @@ class CHistoryManager {
 		}
 
 		$period_condition = $period === null ? '' : ' AND h.clock>'.(time() - $period);
+		$value_expression = $length === null ? 'h.value' : dbSubstring('value', 1, $length);
 
 		foreach ($items as $item) {
-			$select_fields = ($length !== null
-					&& ($item['value_type'] == ITEM_VALUE_TYPE_JSON || $item['value_type'] == ITEM_VALUE_TYPE_BINARY))
-				? 'h.itemid,h.clock,h.ns, '.dbSubstring('value', 1, $length)
-				: '*';
-
+			$select_fields = DB::getSchema(self::getTableName($item['value_type']))['fields'];
+			$select_fields = array_diff(array_keys($select_fields), ['value']);
 			$db_values = DBselect(
-				'SELECT '.$select_fields.
+				'SELECT h.'.implode(',h.', $select_fields).','.
+					($item['value_type'] == ITEM_VALUE_TYPE_JSON || $item['value_type'] == ITEM_VALUE_TYPE_BINARY
+						? $value_expression
+						: 'h.value').
 				' FROM '.self::getTableName($item['value_type']).' h'.
 				' WHERE h.itemid='.zbx_dbstr($item['itemid']).
 					$period_condition.
@@ -307,6 +286,7 @@ class CHistoryManager {
 	 */
 	private function getLastValuesFromSql($items, $limit, $period, $length) {
 		$results = [];
+		$value_expression = $length === null ? 'h.value' : dbSubstring('value', 1, $length);
 
 		if (CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY_GLOBAL) == 1) {
 			$hk_history = timeUnitToSeconds(CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY));
@@ -327,42 +307,41 @@ class CHistoryManager {
 					' WHERE h.itemid='.zbx_dbstr($item['itemid']).
 						($period !== null ? ' AND h.clock>'.$period : '')
 				), false);
+				$clock_max = $clock_max ? reset($clock_max) : null;
 
-				if ($clock_max) {
-					$clock_max = reset($clock_max);
+				if ($clock_max === null) {
+					continue;
+				}
 
-					if ($clock_max !== null) {
-						$select_fields = ($length !== null && ($item['value_type'] == ITEM_VALUE_TYPE_JSON
-								|| $item['value_type'] == ITEM_VALUE_TYPE_BINARY))
-							? 'h.itemid,h.clock,h.ns, '.dbSubstring('value', 1, $length)
-							: '*';
+				$select_fields = DB::getSchema(self::getTableName($item['value_type']))['fields'];
+				$select_fields = array_diff(array_keys($select_fields), ['value']);
+				$db_values = DBfetchArray(DBselect(
+					'SELECT h.'.implode(',h.', $select_fields).','.
+						($item['value_type'] == ITEM_VALUE_TYPE_JSON || $item['value_type'] == ITEM_VALUE_TYPE_BINARY
+							? $value_expression
+							: 'h.value').
+					' FROM '.self::getTableName($item['value_type']).' h'.
+					' WHERE h.itemid='.zbx_dbstr($item['itemid']).
+						' AND h.clock='.zbx_dbstr($clock_max).
+					' ORDER BY h.ns DESC',
+					$limit
+				));
 
-						$values = DBfetchArray(DBselect(
-							'SELECT '.$select_fields.
-							' FROM '.self::getTableName($item['value_type']).' h'.
-							' WHERE h.itemid='.zbx_dbstr($item['itemid']).
-								' AND h.clock='.zbx_dbstr($clock_max).
-							' ORDER BY h.ns DESC',
-							$limit
-						));
-
-						if ($values) {
-							$results[$item['itemid']] = $values;
-						}
-					}
+				if ($db_values) {
+					$results[$item['itemid']] = $db_values;
 				}
 			}
 		}
 		else {
 			foreach ($items as $item) {
-				$select_fields = ($length !== null && ($item['value_type'] == ITEM_VALUE_TYPE_JSON
-						|| $item['value_type'] == ITEM_VALUE_TYPE_BINARY))
-					? 'h.itemid,h.clock,h.ns, '.dbSubstring('value', 1, $length)
-					: '*';
-
+				$select_fields = DB::getSchema(self::getTableName($item['value_type']))['fields'];
+				$select_fields = array_diff(array_keys($select_fields), ['value']);
 				// Cannot order by h.ns directly here due to performance issues.
 				$values = DBfetchArray(DBselect(
-					'SELECT '.$select_fields.
+					'SELECT h.'.implode(',h.', $select_fields).','.
+						($item['value_type'] == ITEM_VALUE_TYPE_JSON || $item['value_type'] == ITEM_VALUE_TYPE_BINARY
+							? $value_expression
+							: 'h.value').
 					' FROM '.self::getTableName($item['value_type']).' h'.
 					' WHERE h.itemid='.zbx_dbstr($item['itemid']).
 						($period !== null ? ' AND h.clock>'.$period : '').
@@ -370,48 +349,53 @@ class CHistoryManager {
 					$limit + 1
 				));
 
-				if ($values) {
-					$count = count($values);
-					$clock = $values[$count - 1]['clock'];
-
-					if ($count == $limit + 1 && $values[$count - 2]['clock'] == $clock) {
-						/*
-						 * The last selected entries having the same clock means the selection (not just the order)
-						 * of the last entries is possibly wrong due to unordered by nanoseconds.
-						 */
-
-						do {
-							unset($values[--$count]);
-						} while ($values && $values[$count - 1]['clock'] == $clock);
-
-						$db_values = DBselect(
-							'SELECT '.$select_fields.
-							' FROM '.self::getTableName($item['value_type']).' h'.
-							' WHERE h.itemid='.zbx_dbstr($item['itemid']).
-								' AND h.clock='.$clock.
-							' ORDER BY h.ns DESC',
-							$limit - $count
-						);
-
-						while ($db_value = DBfetch($db_values)) {
-							$values[] = $db_value;
-							$count++;
-						}
-					}
-
-					CArrayHelper::sort($values, [
-						['field' => 'clock', 'order' => ZBX_SORT_DOWN],
-						['field' => 'ns', 'order' => ZBX_SORT_DOWN]
-					]);
-
-					$values = array_values($values);
-
-					while ($count > $limit) {
-						unset($values[--$count]);
-					}
-
-					$results[$item['itemid']] = $values;
+				if (!$values) {
+					continue;
 				}
+
+				$count = count($values);
+				$clock = $values[$count - 1]['clock'];
+
+				if ($count == $limit + 1 && $values[$count - 2]['clock'] == $clock) {
+					/*
+					 * The last selected entries having the same clock means the selection (not just the order)
+					 * of the last entries is possibly wrong due to unordered by nanoseconds.
+					 */
+
+					do {
+						unset($values[--$count]);
+					} while ($values && $values[$count - 1]['clock'] == $clock);
+
+					$db_values = DBselect(
+						'SELECT h.'.implode(',h.', $select_fields).','.
+							($item['value_type'] == ITEM_VALUE_TYPE_JSON || $item['value_type'] == ITEM_VALUE_TYPE_BINARY
+								? $value_expression
+								: 'h.value').
+						' FROM '.self::getTableName($item['value_type']).' h'.
+						' WHERE h.itemid='.zbx_dbstr($item['itemid']).
+							' AND h.clock='.$clock.
+						' ORDER BY h.ns DESC',
+						$limit - $count
+					);
+
+					while ($db_value = DBfetch($db_values)) {
+						$values[] = $db_value;
+						$count++;
+					}
+				}
+
+				CArrayHelper::sort($values, [
+					['field' => 'clock', 'order' => ZBX_SORT_DOWN],
+					['field' => 'ns', 'order' => ZBX_SORT_DOWN]
+				]);
+
+				$values = array_values($values);
+
+				while ($count > $limit) {
+					unset($values[--$count]);
+				}
+
+				$results[$item['itemid']] = $values;
 			}
 		}
 

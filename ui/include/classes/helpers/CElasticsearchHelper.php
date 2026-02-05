@@ -359,4 +359,36 @@ class CElasticsearchHelper {
 
 		return $query;
 	}
+
+	/**
+	 * Returns an Elasticsearch Painless script that truncates a string field
+	 * to the given number of Unicode code points.
+	 *
+	 * @param string $field   Source field name.
+	 * @param int    $length  Maximum length in code points.
+	 *
+	 * @return array Script configuration for Elasticsearch.
+	 */
+	public static function getSubstring($field, $length): array {
+		return [
+			'script' => [
+				'lang' => 'painless',
+				'source' => <<<'SCRIPT'
+					def string;
+					string = params._source[params.field].toString();
+					int string_length = string.codePointCount(0, string.length());
+
+					if (string_length > params.len) {
+						return string.substring(0, string.offsetByCodePoints(0, params.len));
+					} else {
+						return string;
+					}
+				SCRIPT,
+				'params' => [
+					'len' => (int) $length,
+					'field' => $field
+				]
+			]
+		];
+	}
 }
