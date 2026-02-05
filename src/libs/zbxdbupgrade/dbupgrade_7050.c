@@ -417,10 +417,9 @@ static int	DBpatch_7050029(void)
 
 static int	DBpatch_7050030(void)
 {
-	const zbx_db_field_t	old_field = {"value_str", "", NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 	const zbx_db_field_t	field = {"value_str", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
 
-	return DBmodify_field_type("widget_field", &field, &old_field);
+	return DBmodify_field_type("widget_field", &field, NULL);
 }
 
 #endif
