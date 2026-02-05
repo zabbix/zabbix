@@ -378,7 +378,7 @@ class HostMacrosTabIndicatorItem extends TabIndicatorItem {
 	getValue() {
 		return [...document.querySelectorAll('#tbl_macros .form_row')]
 			.filter((row) => {
-				const macro = row.querySelector('textarea[name$="[macro]"]');
+				const macro = row.querySelector('z-textarea-flexible[name$="[macro]"]');
 				const inherited_type = row.querySelector('input[name$="[inherited_type]"]');
 
 				if (inherited_type !== null
@@ -420,7 +420,7 @@ class HostPrototypeMacrosTabIndicatorItem extends TabIndicatorItem {
 	getValue() {
 		return [...document.querySelectorAll('#tbl_macros .form_row')]
 			.filter((row) => {
-				const macro = row.querySelector('textarea[name$="[macro]"]');
+				const macro = row.querySelector('z-textarea-flexible[name$="[macro]"]');
 				const inherited_type = row.querySelector('input[name$="[inherited_type]"]');
 
 				if (inherited_type !== null
@@ -462,7 +462,7 @@ class TemplateMacrosTabIndicatorItem extends TabIndicatorItem {
 	getValue() {
 		return [...document.querySelectorAll('#tbl_macros .form_row')]
 			.filter((row) => {
-				const macro = row.querySelector('textarea[name$="[macro]"]');
+				const macro = row.querySelector('z-textarea-flexible[name$="[macro]"]');
 				const inherited_type = row.querySelector('input[name$="[inherited_type]"]');
 
 				if (inherited_type !== null
@@ -504,7 +504,7 @@ class TagsTabIndicatorItem extends TabIndicatorItem {
 	getValue() {
 		return [...document.querySelectorAll(this.getElement().getAttribute('href') + ' .tags-table .form_row')]
 			.filter((row) => {
-				const tag = row.querySelector('textarea[name$="[tag]"]');
+				const tag = row.querySelector('z-textarea-flexible[name$="[tag]"]');
 				const type = row.querySelector('input[name$="[type]"]');
 
 				if (type !== null && type.value == TagsTabIndicatorItem.ZBX_PROPERTY_INHERITED) {
@@ -870,7 +870,9 @@ class LldMacrosTabIndicatorItem extends TabIndicatorItem {
 
 	getValue() {
 		return document
-			.querySelectorAll('#lld_macro_paths tbody tr.form_row > td:first-child > textarea:not(:placeholder-shown)')
+			.querySelectorAll(
+				'#lld_macro_paths tbody tr.form_row > td:first-child > z-textarea-flexible:not(:placeholder-shown)'
+			)
 			.length;
 	}
 
