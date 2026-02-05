@@ -2371,19 +2371,24 @@ class testDashboardItemHistoryWidget extends testWidgets {
 					'result' => [
 						[
 							'Timestamp' => date('Y-m-d H:i:s', strtotime('now')),
-							'Master item' => '1' // Value rounding is expected.
+							'Name' => 'Master item',
+							'Value' => 1
 						],
 						[
 							'Timestamp' => date('Y-m-d H:i:s', strtotime('-15 hours')),
-							'Host name' => STRING_128
+							'Name' => 'Host name',
+							'Value' => '<b>'.STRING_128.'</b>'
 						],
 						[
 							'Timestamp' => date('Y-m-d H:i:s', strtotime('-16 hours')),
-							'Host name' => 'TEST'
+							'Name' => 'Host name',
+							'Value' => '<span style="text-transform:uppercase;">'.'test'.'</span>'
+
 						],
 						[
 							'Timestamp' => date('Y-m-d H:i:s', strtotime('-25 hours')),
-							'Host name' => STRING_255
+							'Name' => 'Host name',
+							'Value' => STRING_255
 						]
 					],
 					'item_data' => [
@@ -2393,7 +2398,8 @@ class testDashboardItemHistoryWidget extends testWidgets {
 								'time' => strtotime('-16 hours')
 						],
 						['itemid' => '42227', 'values' => STRING_255, 'time' => strtotime('-25 hours')]
-					]
+					],
+					'screenshot' => true
 				]
 			],
 			// #5 Test case for 'Items location' and 'Show text as Single line' options check.
@@ -2567,7 +2573,8 @@ class testDashboardItemHistoryWidget extends testWidgets {
 							'time' => strtotime('-16 hours')
 						],
 						['itemid' => '42227', 'values' => STRING_255, 'time' => strtotime('-25 hours')]
-					]
+					],
+					'screenshot' => true
 				]
 			],
 			// #8 Test case for Time period check.
@@ -2625,6 +2632,77 @@ class testDashboardItemHistoryWidget extends testWidgets {
 	}
 
 	/**
+	 * Get widget table data, including handling of HTML content in iframes.
+	 *
+	 * @param CWidgetElement $widget    widget element
+	 *
+	 * @return array
+	 */
+	protected function getWidgetTableData($widget) {
+		$widget->waitUntilReady();
+
+		// Return empty array if no data is present in the widget.
+		if ($widget->query('class:no-data-message')->one(false)->isVisible()) {
+			return [];
+		}
+
+		$table = $widget->getContent()->asTable();
+		$table->query('xpath:.//tbody')->waitUntilPresent();
+
+		$headers = $table->getHeadersText();
+		$data = [];
+
+		foreach ($table->getRows() as $row) {
+			$raw_row = [];
+			$cols = $row->query('xpath:./td')->all();
+
+			foreach ($headers as $i => $name) {
+				if ($name !== '' && $cols->exists($i)) {
+					$column = $cols->get($i);
+					$iframe = $column->query('class:js-iframe')->one(false);
+
+					if ($iframe->isValid()) {
+						// Extract HTML content from iframe's srcdoc attribute.
+						$value = $iframe->getAttribute('srcdoc');
+
+						if (preg_match('/<body[^>]*>(.*)<\/body>/is', $value, $matches)) {
+							$value = $matches[1];
+						}
+
+						$value = htmlspecialchars_decode(trim($value), ENT_QUOTES);
+					}
+					else {
+						$value = $column->getText();
+					}
+
+					$raw_row[$name] = $value;
+				}
+			}
+
+			// Format row data based on layout (Horizontal or Vertical).
+			if (!array_key_exists('Value', $raw_row) && count($raw_row) > 0) {
+				$formatted_row = ['Timestamp' => $raw_row['Timestamp'] ?? ''];
+
+				foreach ($raw_row as $key => $val) {
+					if ($key !== 'Timestamp' && $val !== '') {
+						$formatted_row['Name'] = $key;
+						$formatted_row['Value'] = $val;
+						break;
+					}
+				}
+
+				$data[] = $formatted_row;
+			}
+			else {
+				// Remove empty cells to match expected data provider format.
+				$data[] = array_filter($raw_row);
+			}
+		}
+
+		return $data;
+	}
+
+	/**
 	 * @backup !history, !history_uint, !history_str
 	 *
 	 * @dataProvider getTableData
@@ -2637,7 +2715,10 @@ class testDashboardItemHistoryWidget extends testWidgets {
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboard_data)->waitUntilReady();
 		$dashboard = CDashboardElement::find()->one();
 		$dashboard->waitUntilReady();
-		$this->assertTableData($data['initial_data']);
+		$widget = $dashboard->getWidget(self::DATA_WIDGET);
+
+		// Check initial data.
+		$this->assertEquals($data['initial_data'], $this->getWidgetTableData($widget));
 
 		$default_values = [
 			'fields' => [
@@ -2660,24 +2741,33 @@ class testDashboardItemHistoryWidget extends testWidgets {
 			$this->widgetConfigurationChange($data['fields'], $dashboard,
 					CTestArrayHelper::get($data, 'edit_columns', [])
 			);
-			$this->assertTableData($data['result']);
+
+			$this->assertEquals($data['result'], $this->getWidgetTableData($widget));
+
+			// Check HTML encode.
+			if (array_key_exists('screenshot', $data)) {
+				$this->assertScreenshot($widget, 'HTML encode');
+			}
+
 			$this->widgetConfigurationChange($default_values['fields'], $dashboard, $default_values['columns']);
 		}
 
 		if (array_key_exists('host_select', $data)) {
 			$multiselect_field = $dashboard->getControls()->query('class:multiselect-control')->asMultiselect()->one();
 			$multiselect_field->fill($data['host_select']['without_data']);
-			$dashboard->waitUntilReady();
-			$this->assertTableData();
+			$widget->waitUntilReady();
+			$this->assertEquals([], $this->getWidgetTableData($widget));
 			$multiselect_field->fill($data['host_select']['with_data']);
-			$dashboard->waitUntilReady();
-			$this->assertTableData($data['result']);
+			$widget->waitUntilReady();
+
+			$this->assertEquals($data['result'], $this->getWidgetTableData($widget));
+
 			$multiselect_field->clear();
-			$dashboard->waitUntilReady();
+			$widget->waitUntilReady();
 		}
 
 		if (array_key_exists('result', $data)) {
-			$this->assertTableData($data['initial_data']);
+			$this->assertEquals($data['initial_data'], $this->getWidgetTableData($widget));
 		}
 	}
 
