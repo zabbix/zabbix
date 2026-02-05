@@ -151,7 +151,6 @@ static void	mock_read_steps(zbx_vector_mock_step_t *steps, zbx_mock_handle_t hst
 	zbx_dc_config_t		*config = get_dc_config();
 
 	um_mock_cache_init(&mock_cache0, -1);
-
 	zbx_config_wlock_set_locked();
 	config->um_cache = um_cache_create();
 	zbx_config_wlock_set_unlocked();
