@@ -872,7 +872,7 @@ class LldMacrosTabIndicatorItem extends TabIndicatorItem {
 		return [...document.querySelectorAll(
 				'#lld_macro_paths tbody tr.form_row > td:first-child > z-textarea-flexible'
 			)]
-			.filter(z_textarea_flexible => z_textarea_flexible.value.trim() !== '')
+			.filter(z_textarea_flexible => z_textarea_flexible.value !== '')
 			.length;
 	}
 
