@@ -78,13 +78,13 @@ class CGlobalRegexpTest extends TestCase
 			// regular expressions, TRUE, case-sensitive
 			[
 				'expression' => $this->expr(EXPRESSION_TYPE_TRUE, '^\\/var\\/(log|lib)', 1),
-				'success' => ['/var/log', '/var/lib', "/var/log/messasges"],
+				'success' => ['/var/log', '/var/lib', "/var/log/messages"],
 				'fail' => [' /var/log', '/var/li', 'var/log/messages']
 			],
 			// regular expressions, TRUE, case-insensitive
 			[
 				'expression' => $this->expr(EXPRESSION_TYPE_TRUE, '^\\/var\\/(log|lib)', 0),
-				'success' => ['/vAr/lOg', '/vAr/lib', "/vAr/lOg/messasges"],
+				'success' => ['/vAr/lOg', '/vAr/lib', "/vAr/lOg/messages"],
 				'fail' => [' /vAr/lOg', '/vAr/lI', 'vAr/lOg/messages']
 			],
 			// regular expressions, FALSE, case-sensitive
