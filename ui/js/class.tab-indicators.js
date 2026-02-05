@@ -356,9 +356,6 @@ class TabIndicatorItem {
 
 		switch (this.getType()) {
 			case TAB_INDICATOR_TYPE_COUNT:
-				console.log("---------------------")
-				console.log(this.getValue().toString())
-				console.log(this)
 				this._element.setAttribute(TAB_INDICATOR_ATTR_VALUE, this.getValue().toString());
 				break;
 			case TAB_INDICATOR_TYPE_MARK:
