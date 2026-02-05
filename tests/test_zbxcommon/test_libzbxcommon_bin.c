@@ -18,7 +18,7 @@ static void	log_impl(int level, const char *fmt, va_list args)
 {
 	ZBX_UNUSED(level);
 	ZBX_UNUSED(fmt);
-	ZBX_UNUSED(fmt);
+	ZBX_UNUSED(args);
 }
 
 static int	get_log_level_impl(void)
