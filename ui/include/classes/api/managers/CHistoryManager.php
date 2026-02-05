@@ -284,7 +284,7 @@ class CHistoryManager {
 	 *
 	 * @see CHistoryManager::getLastValues
 	 */
-	private function getLastValuesFromSql($items, $limit, $period, $length) {
+	private function getLastValuesFromSql($items, $limit, $period, ?int $length) {
 		$results = [];
 		$value_expression = $length === null ? 'h.value' : dbSubstring('value', 1, $length);
 
