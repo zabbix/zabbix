@@ -1143,6 +1143,7 @@ class testUsersPasswordComplexity extends CWebTest {
 		}
 		else {
 			if ($own || $userid === 1) {
+				// If user updates their own password they will be logged out.
 				$this->assertTrue($this->query('button:Sign in')->waitUntilVisible()->one()->isClickable());
 				$this->page->assertTitle('Zabbix');
 			}

@@ -151,9 +151,9 @@ class testFormUserProfile extends CLegacyWebTest {
 			$form->query('id', $id)->waitUntilVisible()->one();
 		}
 		$form->fill([
-				'Current password' => (array_key_exists('old_password', $data)) ? $data['old_password'] : self::$old_password,
-				'Password' => $data['password1'],
-				'Password (once again)' => $data['password2']
+			'Current password' => (array_key_exists('old_password', $data)) ? $data['old_password'] : self::$old_password,
+			'Password' => $data['password1'],
+			'Password (once again)' => $data['password2']
 		]);
 		$form->submit();
 

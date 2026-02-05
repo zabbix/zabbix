@@ -122,9 +122,6 @@ class testFormUser extends CWebTest {
 					'hintbox_warning' => [
 						'Language' => 'You are not able to choose some of the languages,'.
 								' because locales for them are not installed on the web server.'
-					],
-					'inline_errors' => [
-						'Username' => 'This field cannot be empty.'
 					]
 				]
 			],
@@ -214,9 +211,9 @@ class testFormUser extends CWebTest {
 
 		// Check default values.
 		if ($user === 'Admin') {
-				$this->assertEquals(3, $this->query('id', ['current_password', 'password1', 'password2'])->all()
+			$this->assertEquals(3, $this->query('id', ['current_password', 'password1', 'password2'])->all()
 					->filter(CElementFilter::NOT_VISIBLE)->count()
-				);
+			);
 
 			$form->query('button:Change password')->one()->click();
 			$this->assertTrue($form->query('button:Change password')->one()->isVisible(false));
@@ -274,9 +271,9 @@ class testFormUser extends CWebTest {
 			}
 
 			// Activate inline validation error to be able to click on hintbox with one mouse click.
-			if (CTestArrayHelper::get($data, 'inline_errors')) {
+			if ($data['default']['Username'] === '') {
 				$this->page->removeFocus();
-				$this->assertInlineError($form, $data['inline_errors']);
+				$form->getField('Username')->waitUntilClassesPresent('has-error');
 			}
 
 			$form->getLabel('Password')->query('xpath:.//button[@data-hintbox]')->one()->click();
@@ -386,8 +383,7 @@ class testFormUser extends CWebTest {
 
 	public function getCreateData() {
 		return [
-			// #0.
-			// Username is already taken by another user.
+			// #0 Username is already taken by another user.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -403,8 +399,7 @@ class testFormUser extends CWebTest {
 					]
 				]
 			],
-			// #1.
-			// Empty 'Username' field.
+			// #1 Empty 'Username' field.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -420,8 +415,7 @@ class testFormUser extends CWebTest {
 					]
 				]
 			],
-			// #2.
-			// Space as 'Username' field value.
+			// #2 Space as 'Username' field value.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -437,8 +431,7 @@ class testFormUser extends CWebTest {
 					]
 				]
 			],
-			// #3.
-			// Empty 'Role' field.
+			// #3 Empty 'Role' field.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -453,8 +446,7 @@ class testFormUser extends CWebTest {
 					]
 				]
 			],
-			// #4.
-			// Empty mandatory fields
+			// #4 Empty mandatory fields
 			[
 				[
 					'expected' => TEST_BAD,
@@ -466,8 +458,7 @@ class testFormUser extends CWebTest {
 					]
 				]
 			],
-			// #5.
-			// 'Password' fields not specified.
+			// #5 'Password' fields not specified.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -480,8 +471,7 @@ class testFormUser extends CWebTest {
 					'error_details' => 'Incorrect value for field "Password": cannot be empty.'
 				]
 			],
-			// #6.
-			// Empty 'Password (once again)' field.
+			// #6 Empty 'Password (once again)' field.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -496,8 +486,7 @@ class testFormUser extends CWebTest {
 					'error_details' => 'Both passwords must be equal.'
 				]
 			],
-			// #7.
-			// Empty 'Password' field.
+			// #7 Empty 'Password' field.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -511,8 +500,7 @@ class testFormUser extends CWebTest {
 					'error_details' => 'Both passwords must be equal.'
 				]
 			],
-			// #8.
-			// 'Password' and 'Password (once again)' do not match.
+			// #8 'Password' and 'Password (once again)' do not match.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -527,8 +515,7 @@ class testFormUser extends CWebTest {
 					'error_details' => 'Both passwords must be equal.'
 				]
 			],
-			// #9.
-			// Empty 'Refresh' field.
+			// #9 Empty 'Refresh' field.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -545,8 +532,7 @@ class testFormUser extends CWebTest {
 					]
 				]
 			],
-			// #10.
-			// Digits in value of the 'Refresh' field.
+			// #10 Digits in value of the 'Refresh' field.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -563,8 +549,7 @@ class testFormUser extends CWebTest {
 					]
 				]
 			],
-			// #11.
-			// Value of the 'Refresh' field too large.
+			// #11 Value of the 'Refresh' field too large.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -615,8 +600,7 @@ class testFormUser extends CWebTest {
 					]
 				]
 			],
-			// #14.
-			// Non-time unit value in 'Refresh' field.
+			// #14 Non-time unit value in 'Refresh' field.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -633,8 +617,7 @@ class testFormUser extends CWebTest {
 					]
 				]
 			],
-			// #15.
-			// 'Rows per page' field equal to '0'.
+			// #15 'Rows per page' field equal to '0'.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -651,8 +634,7 @@ class testFormUser extends CWebTest {
 					]
 				]
 			],
-			// #16.
-			// Non-numeric value of 'Rows per page' field.
+			// #16 Non-numeric value of 'Rows per page' field.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -669,8 +651,7 @@ class testFormUser extends CWebTest {
 					]
 				]
 			],
-			// #17.
-			// 'Autologout' below minimal value.
+			// #17 'Autologout' below minimal value.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -710,8 +691,7 @@ class testFormUser extends CWebTest {
 					]
 				]
 			],
-			// #19.
-			// 'Autologout' above maximal value.
+			// #19 'Autologout' above maximal value.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -771,8 +751,7 @@ class testFormUser extends CWebTest {
 					]
 				]
 			],
-			// #22.
-			// 'Autologout' with a non-numeric value.
+			// #22 'Autologout' with a non-numeric value.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -792,8 +771,7 @@ class testFormUser extends CWebTest {
 					]
 				]
 			],
-			// #23.
-			// 'Autologout' with an empty value.
+			// #23 'Autologout' with an empty value.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -813,8 +791,7 @@ class testFormUser extends CWebTest {
 					]
 				]
 			],
-			// #24.
-			// URL unacceptable.
+			// #24 URL unacceptable.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -830,8 +807,7 @@ class testFormUser extends CWebTest {
 					'error_details' => 'Invalid parameter "/1/url": unacceptable URL.'
 				]
 			],
-			// #25.
-			// Incorrect URL protocol.
+			// #25 Incorrect URL protocol.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -847,8 +823,7 @@ class testFormUser extends CWebTest {
 					'error_details' => 'Invalid parameter "/1/url": unacceptable URL.'
 				]
 			],
-			// #26.
-			// Creating user by specifying only mandatory parameters.
+			// #26 Creating user by specifying only mandatory parameters.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -861,8 +836,7 @@ class testFormUser extends CWebTest {
 					'role' => 'Guest role'
 				]
 			],
-			// #27.
-			// Creating a user with optional parameters specified (including autologout) using Cyrillic characters.
+			// #27 Creating a user with optional parameters specified (including autologout) using Cyrillic characters.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -883,8 +857,7 @@ class testFormUser extends CWebTest {
 					'check_form' => true
 				]
 			],
-			// #28.
-			// Creating a user with punctuation symbols in password and optional parameters specified.
+			// #28 Creating a user with punctuation symbols in password and optional parameters specified.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -914,8 +887,7 @@ class testFormUser extends CWebTest {
 					'check_user' => true
 				]
 			],
-			// #29.
-			// Creating user without a user group.
+			// #29 Creating user without a user group.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -927,8 +899,7 @@ class testFormUser extends CWebTest {
 					'role' => 'Super admin role'
 				]
 			],
-			// #30.
-			// Verification that field password is not mandatory for users with LDAP authentication.
+			// #30 Verification that field password is not mandatory for users with LDAP authentication.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -939,8 +910,7 @@ class testFormUser extends CWebTest {
 					'role' => 'Super admin role'
 				]
 			],
-			// #31.
-			// Verification that field password is not mandatory for users with no access to frontend.
+			// #31 Verification that field password is not mandatory for users with no access to frontend.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -981,8 +951,7 @@ class testFormUser extends CWebTest {
 			if (array_key_exists('error_title', $data)) {
 				$this->assertMessage(TEST_BAD, $data['error_title'], $data['error_details']);
 			}
-			// Condition for inline validation error.
-			elseif (array_key_exists('inline_errors', $data)) {
+			else {
 				$this->assertInlineError($form, $data['inline_errors']);
 			}
 
@@ -1564,12 +1533,9 @@ class testFormUser extends CWebTest {
 
 		// Verify if the user was updated.
 		if ($data['expected'] === TEST_BAD) {
-			// Condition for old style error message.
 			if (array_key_exists('error_title', $data)) {
-					$this->assertMessage(TEST_BAD, $data['error_title'], $data['error_details']);
-
+				$this->assertMessage(TEST_BAD, $data['error_title'], $data['error_details']);
 			}
-			// Condition for inline validation error.
 			else {
 				$this->assertInlineError($form, $data['inline_errors']);
 			}

@@ -785,14 +785,10 @@ class testPermissionsWithoutCSRF extends CWebTest {
 			}
 		}
 
-		// Set user role in permissions tab to avoid inline validation errors.
+		// Fill in mandatory fields that are not editable from initial form view.
 		if (CTestArrayHelper::get($data, 'form')) {
 			$form = $this->query($data['form']['selector'])->asForm()->one();
-
-			if (CTestArrayHelper::get($data, 'form.tab')) {
-				$form->selectTab($data['form']['tab']);
-			}
-
+			$form->selectTab($data['form']['tab']);
 			$form->fill(CTestArrayHelper::get($data, 'form.fields'));
 		}
 
@@ -811,7 +807,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 
 		// Submit Update or Create form.
 		$update_button = 'xpath://div[contains(@class, "tfoot-buttons")]//button[text()="Update"] |'.
-				'//div[@class="overlay-dialogue-footer"]//button[text()="Update"] |'.
+				' //div[@class="overlay-dialogue-footer"]//button[text()="Update"] |'.
 				' //div[contains(@class, "form-actions")]//button[text()="Update"]';
 		$add_button = 'xpath://button[text()="Add" and @type="submit"] | '.
 				' //div[@class="overlay-dialogue-footer"]//button[text()="Add"]';
