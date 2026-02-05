@@ -23,6 +23,7 @@ import (
 	"path/filepath"
 	"strings"
 	"time"
+	"unsafe"
 
 	"golang.org/x/sys/windows"
 	"golang.zabbix.com/sdk/errs"
@@ -50,25 +51,60 @@ func InitExecutor() (Executor, error) {
 }
 
 func (e *ZBXExec) execute(command string, timeout time.Duration, execDir string, strict bool) (string, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), timeout)
-	defer cancel()
+	job, err := createWinJob()
+	if err != nil {
+		return "", err
+	}
 
 	var b bytes.Buffer
 
-	cmd := exec.CommandContext(ctx, e.shellPath)
+	cmd := exec.Command(e.shellPath)
 	cmd.Dir = execDir
 	cmd.Stdout = &b
 	cmd.Stderr = &b
 	cmd.SysProcAttr = &windows.SysProcAttr{
-		CmdLine: fmt.Sprintf(`/C "%s"`, command),
+		CreationFlags: windows.CREATE_BREAKAWAY_FROM_JOB,
+		CmdLine:       fmt.Sprintf(`/C "%s"`, command),
 	}
 
-	err := cmd.Start()
+	//nolint:lostcancel // used only in this function to release the goroutine waiting for ctx.Done, no leaks.
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+	err = cmd.Start()
 	if err != nil {
-		return "", fmt.Errorf("failed to start command (%s, path: %s): %s", command, execDir, err)
+		return "", errs.Errorf("failed to start command (%s, path: %s): %s", command, execDir, err)
 	}
 
-	werr := cmd.Wait()
+	procHandle, err := windows.OpenProcess(
+		windows.PROCESS_SET_QUOTA|windows.PROCESS_TERMINATE,
+		false,
+		uint32(cmd.Process.Pid),
+	)
+
+	if err != nil {
+		perr := cmd.Process.Kill()
+		if perr != nil {
+			return "", errs.Errorf("open process failed: %s and process kill failed: %s", err, perr)
+		}
+
+		return "", errs.Errorf("open process failed: %s", err)
+	}
+
+	if err := windows.AssignProcessToJobObject(job, procHandle); err != nil {
+		perr := cmd.Process.Kill()
+		if perr != nil {
+			return "", errs.Errorf("process job assignment failed: %s and process kill failed: %s", err, perr)
+		}
+
+		return "", errs.Errorf("process job assignment failed: %s", err)
+	}
+
+	done := make(chan error, 1)
+
+	go jobDoneListener(done, cmd)
+	go timeoutListener(ctx, job)
+
+	err = <-done
+	cancel()
 
 	// we need to check context error so we can inform the user if timeout was reached and Zabbix agent2
 	// terminated the command
@@ -76,8 +112,8 @@ func (e *ZBXExec) execute(command string, timeout time.Duration, execDir string,
 		return "", fmt.Errorf("command execution failed: %s", ctx.Err())
 	}
 
-	if strict && werr != nil {
-		return "", fmt.Errorf("command execution failed: %s", werr.Error())
+	if strict && err != nil {
+		return "", fmt.Errorf("command execution failed: %s", err.Error())
 	}
 
 	if MaxExecuteOutputLenB <= len(b.String()) {
@@ -100,4 +136,36 @@ func (e *ZBXExec) executeBackground(s string) (err error) {
 	go cmd.Wait()
 
 	return nil
+}
+
+func jobDoneListener(done chan<- (error), cmd *exec.Cmd) {
+	done <- cmd.Wait()
+}
+
+func timeoutListener(ctx context.Context, job windows.Handle) {
+	<-ctx.Done()
+	windows.CloseHandle(job)
+}
+
+func createWinJob() (windows.Handle, error) {
+	job, err := windows.CreateJobObject(nil, nil)
+	if err != nil {
+		return 0, errs.Errorf("failed to create win job: %s", err)
+	}
+
+	info := windows.JOBOBJECT_EXTENDED_LIMIT_INFORMATION{
+		BasicLimitInformation: windows.JOBOBJECT_BASIC_LIMIT_INFORMATION{
+			LimitFlags: windows.JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE,
+		},
+	}
+
+	if _, err := windows.SetInformationJobObject(
+		job,
+		windows.JobObjectExtendedLimitInformation,
+		uintptr(unsafe.Pointer(&info)),
+		uint32(unsafe.Sizeof(info))); err != nil {
+		return 0, errs.Errorf("failed to populate win job: %s", err)
+	}
+
+	return job, nil
 }
