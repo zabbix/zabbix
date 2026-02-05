@@ -27,6 +27,7 @@ import (
 
 	"golang.org/x/sys/windows"
 	"golang.zabbix.com/sdk/errs"
+	"golang.zabbix.com/sdk/log"
 )
 
 const cmd = "cmd.exe"
@@ -67,7 +68,7 @@ func (e *ZBXExec) execute(command string, timeout time.Duration, execDir string,
 		CmdLine:       fmt.Sprintf(`/C "%s"`, command),
 	}
 
-	//nolint:lostcancel // used only in this function to release the goroutine waiting for ctx.Done, no leaks.
+	// used only in this function to release the goroutine waiting for ctx.Done, no leaks.
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	err = cmd.Start()
 	if err != nil {
@@ -104,6 +105,7 @@ func (e *ZBXExec) execute(command string, timeout time.Duration, execDir string,
 	go timeoutListener(ctx, job)
 
 	err = <-done
+
 	cancel()
 
 	// we need to check context error so we can inform the user if timeout was reached and Zabbix agent2
@@ -138,13 +140,17 @@ func (e *ZBXExec) executeBackground(s string) (err error) {
 	return nil
 }
 
-func jobDoneListener(done chan<- (error), cmd *exec.Cmd) {
+func jobDoneListener(done chan<- error, cmd *exec.Cmd) {
 	done <- cmd.Wait()
 }
 
 func timeoutListener(ctx context.Context, job windows.Handle) {
 	<-ctx.Done()
-	windows.CloseHandle(job)
+
+	err := windows.CloseHandle(job)
+	if err != nil {
+		log.Debugf("failed to kill cmd processes %s", err)
+	}
 }
 
 func createWinJob() (windows.Handle, error) {
