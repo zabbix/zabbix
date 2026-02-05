@@ -11,13 +11,21 @@ What's included:
 * `tests` - Test cases
 
 ## Getting started
-This library requires PHP 7.3 or later
+This library requires PHP 7.4 or later
 
 To use SDK in your existing developing environment, install it from Packagist
 ```
 composer require duosecurity/duo_universal_php
 ```
 Once it's installed, see our developer documentation at https://duo.com/docs/duoweb and `sample/index.php` in this repo for guidance on integrating Duo 2FA into your web application.
+
+### TLS 1.2 and 1.3 Support
+
+Duo_universal_php uses PHP's cURL extension and OpenSSL for TLS operations.  TLS support will depend on the versions of multiple libraries:
+
+TLS 1.2 support requires PHP 5.5 or higher, curl 7.34.0 or higher, and OpenSSL 1.0.1 or higher.
+
+TLS 1.3 support requires PHP 7.3 or higher, curl 7.61.0 or higher, and OpenSSL 1.1.1 or higher.
 
 
 ## Contribute
