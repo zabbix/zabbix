@@ -1396,13 +1396,12 @@ int	net_if_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 		zbx_json_addobject(&jcfg, NULL);
 		zbx_json_addobject(&jval, NULL);
 		zbx_json_addstring(&jcfg, "name", if_name, ZBX_JSON_TYPE_STRING);
-
-		fill_net_if_get_params(if_name, "address", "mac", 0, &jcfg);
 		fill_net_if_get_params(if_name, "ifalias",  NULL, 0, &jcfg);
+		fill_net_if_get_params(if_name, "address", "mac", 0, &jcfg);
 		get_link_flags(if_name, &jcfg);
 
 		zbx_json_addstring(&jval, "name", if_name, ZBX_JSON_TYPE_STRING);
-
+		fill_net_if_get_params(if_name, "ifalias",  NULL, 0, &jval);
 		zbx_json_addobject(&jval, "in");
 		zbx_json_adduint64(&jval, "bytes", ns.ibytes);
 		zbx_json_adduint64(&jval, "packets", ns.ipackets);
@@ -1427,7 +1426,6 @@ int	net_if_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 		fill_net_if_get_params(if_name, "type",  NULL, 1, &jval);
 		fill_net_if_get_params(if_name, "address", "mac", 0, &jval);
-		fill_net_if_get_params(if_name, "ifalias",  NULL, 0, &jval);
 		fill_net_if_get_params(if_name, "carrier", NULL, 1, &jval);
 		fill_net_if_get_params(if_name, "speed", NULL, 1, &jval);
 		fill_net_if_get_params(if_name, "duplex", NULL, 0, &jval);

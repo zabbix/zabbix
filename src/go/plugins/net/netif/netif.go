@@ -48,8 +48,8 @@ type msgIfDiscovery struct {
 
 type ifConfigData struct {
 	Ifname      string  `json:"name"`
-	Ifmac       string  `json:"mac,omitempty"`
 	Ifalias     string  `json:"ifalias,omitempty"`
+	Ifmac       string  `json:"mac,omitempty"`
 	IfAdmState  *string `json:"administrative_state"`
 	IfOperState *string `json:"operational_state"`
 }
