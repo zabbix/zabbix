@@ -386,7 +386,9 @@ $cancel_button = (new CRedirectButton(_('Cancel'),
 	(new CUrl('zabbix.php'))
 		->setArgument('action', 'userrole.list')
 		->setArgument('page', CPagerHelper::loadPage('userrole.list', null))
-))->setId('cancel');
+))
+	->setId('cancel')
+	->addClass('js-cancel');
 
 $buttons = [$cancel_button];
 
