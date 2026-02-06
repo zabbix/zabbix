@@ -2677,9 +2677,11 @@ class testDashboardItemHistoryWidget extends testWidgets {
 				}
 			}
 
-			// Format row data based on layout (Horizontal or Vertical):
-			// Vertical layout has fixed "Timestamp", "Name", and "Value" columns.
-			// Horizontal layout uses item names as column headers (the "Value" key is absent).
+			/**
+			 * Format row data based on layout (Horizontal or Vertical):
+			 * Vertical layout has fixed "Timestamp", "Name", and "Value" columns;
+			 * Horizontal layout uses item names as column headers (the "Value" key is absent).
+			 */
 			if (!array_key_exists('Value', $raw_row) && count($raw_row) > 0) {
 				$formatted_row = ['Timestamp' => CTestArrayHelper::get($raw_row, 'Timestamp', '')];
 
@@ -2744,8 +2746,8 @@ class testDashboardItemHistoryWidget extends testWidgets {
 			$this->assertEquals($data['result'], $this->getWidgetTableData($widget));
 
 			// Check HTML encode.
-			if (array_key_exists('screenshot', $data)) {
-				$this->assertScreenshot($widget, 'HTML encode'.$data['screenshot']);
+			if (CTestArrayHelper::get($data, 'screenshot')) {
+				$this->assertScreenshot($widget, 'HTML encode check');
 			}
 
 			$this->widgetConfigurationChange($default_values['fields'], $dashboard, $default_values['columns']);
