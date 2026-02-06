@@ -32,7 +32,8 @@ class CHistoryManager {
 		ITEM_VALUE_TYPE_LOG => 'log',
 		ITEM_VALUE_TYPE_UINT64 => 'uint',
 		ITEM_VALUE_TYPE_TEXT => 'text',
-		ITEM_VALUE_TYPE_BINARY => 'binary'
+		ITEM_VALUE_TYPE_BINARY => 'binary',
+		ITEM_VALUE_TYPE_JSON => 'json'
 	];
 
 	private static ?array $value_type_sources = null;
@@ -1978,21 +1979,8 @@ class CHistoryManager {
 	 *
 	 * @see CHistoryManager::deleteHistory
 	 */
-<<<<<<< HEAD
-	public static function getTypeNameByTypeId($value_type) {
-		$mapping = [
-			ITEM_VALUE_TYPE_FLOAT => 'dbl',
-			ITEM_VALUE_TYPE_STR => 'str',
-			ITEM_VALUE_TYPE_LOG => 'log',
-			ITEM_VALUE_TYPE_UINT64 => 'uint',
-			ITEM_VALUE_TYPE_TEXT => 'text',
-			ITEM_VALUE_TYPE_BINARY => 'binary',
-			ITEM_VALUE_TYPE_JSON => 'json'
-		];
-=======
 	private function deleteHistoryFromClickhouse(array $itemid_types): bool {
 		$value_type_endpoints = self::getClickhouseEndpoints($itemid_types);
->>>>>>> feature/DEV-4427-7.5
 
 		if ($value_type_endpoints) {
 			$itemid_types = array_filter($itemid_types,
