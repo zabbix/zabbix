@@ -999,7 +999,7 @@ class testDashboardPlainTextWidget extends CWebTest {
 								'time' => strtotime('-16 hours')],
 						['itemid' => '42227', 'values' => STRING_255, 'time' => strtotime('-25 hours')]
 					],
-					'screenshot' => true
+					'screenshot' => '1'
 				]
 			],
 			// #5 Test case for 'Dynamic items' check.
@@ -1136,23 +1136,21 @@ class testDashboardPlainTextWidget extends CWebTest {
 			$this->widgetConfigurationChange($data['fields'], $dashboard);
 			$expected_result = array_key_exists('result', $data) ? $data['result'] : $data['initial_data'];
 			$this->assertEquals($expected_result, $this->getWidgetTableData($widget));
-			$this->widgetConfigurationChange($default_values, $dashboard);
 
+			// Compare a screenshots to check HTML encode.
 			if (array_key_exists('screenshot', $data)) {
-				$this->assertScreenshot($widget, 'HTML encode');
+				$this->assertScreenshot($widget, 'HTML encode'.$data['screenshot']);
 			}
+
+			$this->widgetConfigurationChange($default_values, $dashboard);
 		}
 
 		if (array_key_exists('host_select', $data)) {
 			$host_select = $dashboard->getControls()->query('class:multiselect-control')->asMultiselect()->one();
-
 			$host_select->fill($data['host_select']['without_data']);
 			$this->assertEquals([], $this->getWidgetTableData($widget));
 			$host_select->overwrite($data['host_select']['with_data']);
-
-			$widget->getContent()->query('xpath:.//table/tbody/tr')->waitUntilPresent();
 			$this->assertEquals($data['result'], $this->getWidgetTableData($widget));
-
 			$host_select->clear();
 			$widget->waitUntilReady();
 		}
