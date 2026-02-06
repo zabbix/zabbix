@@ -721,7 +721,7 @@ zabbix_export:
           type: DEPENDENT
           key: mariadb.created_tmp_files.rate
           value_type: FLOAT
-          description: 'How many temporary files `mariadbd` has created.'
+          description: 'How many temporary files `mariadb` has created.'
           preprocessing:
             - type: JSONPATH
               parameters:
