@@ -2360,7 +2360,7 @@ class testDashboardItemHistoryWidget extends testWidgets {
 						[
 							'Timestamp' => date('Y-m-d H:i:s', strtotime('-16 hours')),
 							'Name' => 'Host name',
-							'Value' => '<span style="text-transform:uppercase;">'.'test'.'</span>'
+							'Value' => '<span style="text-transform:uppercase;">test</span>'
 						],
 						[
 							'Timestamp' => date('Y-m-d H:i:s', strtotime('-25 hours')),
@@ -2382,7 +2382,7 @@ class testDashboardItemHistoryWidget extends testWidgets {
 						[
 							'Timestamp' => date('Y-m-d H:i:s', strtotime('-16 hours')),
 							'Name' => 'Host name',
-							'Value' => '<span style="text-transform:uppercase;">'.'test'.'</span>'
+							'Value' => '<span style="text-transform:uppercase;">test</span>'
 						],
 						[
 							'Timestamp' => date('Y-m-d H:i:s', strtotime('-25 hours')),
@@ -2393,12 +2393,12 @@ class testDashboardItemHistoryWidget extends testWidgets {
 					'item_data' => [
 						['itemid' => '99142', 'values' => '1.00001', 'time' => strtotime('now')],
 						['itemid' => '42227', 'values' => '<b>'.STRING_128.'</b>', 'time' => strtotime('-15 hours')],
-						['itemid' => '42227', 'values' => '<span style="text-transform:uppercase;">'.'test'.'</span>',
+						['itemid' => '42227', 'values' => '<span style="text-transform:uppercase;">test</span>',
 								'time' => strtotime('-16 hours')
 						],
 						['itemid' => '42227', 'values' => STRING_255, 'time' => strtotime('-25 hours')]
 					],
-					'screenshot' => '1'
+					'screenshot' => true
 				]
 			],
 			// #5 Test case for 'Items location' and 'Show text as Single line' options check.
@@ -2426,7 +2426,7 @@ class testDashboardItemHistoryWidget extends testWidgets {
 						[
 							'Timestamp' => date('Y-m-d H:i:s', strtotime('-16 hours')),
 							'Name' => 'Host name',
-							'Value' => '<span style="text-transform:uppercase;">'.'test'.'</span>'
+							'Value' => '<span style="text-transform:uppercase;">test</span>'
 						],
 						[
 							'Timestamp' => date('Y-m-d H:i:s', strtotime('-25 hours')),
@@ -2455,7 +2455,7 @@ class testDashboardItemHistoryWidget extends testWidgets {
 					'item_data' => [
 						['itemid' => '99142', 'values' => '1.00001', 'time' => strtotime('now')],
 						['itemid' => '42227', 'values' => '<b>'.STRING_128.'</b>', 'time' => strtotime('-15 hours')],
-						['itemid' => '42227', 'values' => '<span style="text-transform:uppercase;">'.'test'.'</span>',
+						['itemid' => '42227', 'values' => '<span style="text-transform:uppercase;">test</span>',
 								'time' => strtotime('-16 hours')
 						],
 						['itemid' => '42227', 'values' => STRING_255, 'time' => strtotime('-25 hours')]
@@ -2540,7 +2540,7 @@ class testDashboardItemHistoryWidget extends testWidgets {
 						[
 							'Timestamp' => date('Y-m-d H:i:s', strtotime('-16 hours')),
 							'Name' => 'Host name',
-							'Value' => '<span style="text-transform:uppercase;">'.'test'.'</span>'
+							'Value' => '<span style="text-transform:uppercase;">test</span>'
 						],
 						[
 							'Timestamp' => date('Y-m-d H:i:s', strtotime('-25 hours')),
@@ -2557,7 +2557,7 @@ class testDashboardItemHistoryWidget extends testWidgets {
 						[
 							'Timestamp' => date('Y-m-d H:i:s', strtotime('-16 hours')),
 							'Name' => 'Host name',
-							'Value' => '<span style="text-transform:uppercase;">'.'test'.'</span>'
+							'Value' => '<span style="text-transform:uppercase;">test</span>'
 						],
 						[
 							'Timestamp' => date('Y-m-d H:i:s', strtotime('-25 hours')),
@@ -2568,7 +2568,7 @@ class testDashboardItemHistoryWidget extends testWidgets {
 					'item_data' => [
 						['itemid' => '99142', 'values' => '1.00001', 'time' => strtotime('now')],
 						['itemid' => '42227', 'values' => '<b>'.STRING_128.'</b>', 'time' => strtotime('-15 hours')],
-						['itemid' => '42227', 'values' => '<span style="text-transform:uppercase;">'.'test'.'</span>',
+						['itemid' => '42227', 'values' => '<span style="text-transform:uppercase;">test</span>',
 							'time' => strtotime('-16 hours')
 						],
 						['itemid' => '42227', 'values' => STRING_255, 'time' => strtotime('-25 hours')]
@@ -2652,11 +2652,11 @@ class testDashboardItemHistoryWidget extends testWidgets {
 
 		foreach ($table->getRows() as $row) {
 			$raw_row = [];
-			$cols = $row->query('xpath:./td')->all();
+			$columns = $row->query('xpath:./td')->all();
 
 			foreach ($headers as $i => $name) {
-				if ($name !== '' && $cols->exists($i)) {
-					$column = $cols->get($i);
+				if ($name !== '' && $columns->exists($i)) {
+					$column = $columns->get($i);
 					$iframe = $column->query('class:js-iframe')->one(false);
 
 					if ($iframe->isValid()) {
@@ -2677,15 +2677,16 @@ class testDashboardItemHistoryWidget extends testWidgets {
 				}
 			}
 
-			// Format row data based on layout (Horizontal or Vertical).
+			// Format row data based on layout (Horizontal or Vertical):
+			// Vertical layout has fixed "Timestamp", "Name", and "Value" columns.
+			// Horizontal layout uses item names as column headers (the "Value" key is absent).
 			if (!array_key_exists('Value', $raw_row) && count($raw_row) > 0) {
-				$formatted_row = ['Timestamp' => $raw_row['Timestamp'] ?? ''];
+				$formatted_row = ['Timestamp' => CTestArrayHelper::get($raw_row, 'Timestamp', '')];
 
-				foreach ($raw_row as $key => $val) {
-					if ($key !== 'Timestamp' && $val !== '') {
+				foreach ($raw_row as $key => $value) {
+					if ($key !== 'Timestamp' && $value !== '') {
 						$formatted_row['Name'] = $key;
-						$formatted_row['Value'] = $val;
-						break;
+						$formatted_row['Value'] = $value;
 					}
 				}
 
