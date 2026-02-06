@@ -3,6 +3,7 @@ Changes for 7.4.7rc2
 New features:
 
 Bug fixes:
+.......P.. [ZBX-27387] fixed deadlock during auto registration and SQLite (vso)
 
 --------------------------------------------------------------------------------
 Changes for 7.4.7rc1
@@ -1257,6 +1258,7 @@ Changes for 7.0.23rc2
 New features:
 
 Bug fixes:
+.......P.. [ZBX-27387] fixed deadlock during auto registration and SQLite (vso)
 
 --------------------------------------------------------------------------------
 Changes for 7.0.23rc1
