@@ -25,13 +25,11 @@ require_once dirname(__FILE__).'/../include/CIntegrationTest.php';
  */
 class testItemDependent extends CIntegrationTest {
 
-	const ITEM_FILE_NAME = '/tmp/test.json';
+	const ITEM_FILE_NAME1 = '/tmp/test1.json';
+	const ITEM_FILE_NAME2 = '/tmp/test2.json';
 
 	private static $hostid;
 	private static $interfaceid;
-
-	private static $master_itemid;
-	private static $dep_itemid;
 
 	/**
 	 * @inheritdoc
@@ -69,42 +67,6 @@ class testItemDependent extends CIntegrationTest {
 		$this->assertArrayHasKey('interfaces', $response['result'][0]);
 		$this->assertArrayHasKey(0, $response['result'][0]['interfaces']);
 		self::$interfaceid = $response['result'][0]['interfaces'][0]['interfaceid'];
-
-		// Create master item
-		$response = $this->call('item.create', [
-			'hostid'     => self::$hostid,
-			'name'       => 'Master item',
-			'key_'       => 'vfs.file.contents['.self::ITEM_FILE_NAME.']',
-			'type'       => ITEM_TYPE_ZABBIX_ACTIVE,
-			'value_type' => ITEM_VALUE_TYPE_STR,
-			'delay'      => '1s',
-			'status' => ITEM_STATUS_DISABLED
-		]);
-		$this->assertArrayHasKey('itemids', $response['result']);
-		$this->assertEquals(1, count($response['result']['itemids']));
-
-		self::$master_itemid = $response['result']['itemids'][0];
-
-		// Create dependent item
-		$response = $this->call('item.create', [
-			'hostid'        => self::$hostid,
-			'master_itemid' => self::$master_itemid,
-			'name'          => 'Dependent item',
-			'key_'          => 'dependent_item',
-			'type'          => ITEM_TYPE_DEPENDENT,
-			'value_type'    => ITEM_VALUE_TYPE_STR,
-			'preprocessing' => [
-				[
-					'type'          => ZBX_PREPROC_ERROR_FIELD_JSON,
-					'params'        => '$.b',
-					'error_handler' => ZBX_PREPROC_FAIL_DEFAULT
-				]
-			]
-		]);
-		$this->assertArrayHasKey('itemids', $response['result']);
-		$this->assertEquals(1, count($response['result']['itemids']));
-
-		self::$dep_itemid = $response['result']['itemids'][0];
 
 		return true;
 	}
@@ -152,19 +114,17 @@ class testItemDependent extends CIntegrationTest {
 		}
 	}
 
-	protected function updateDataAndWait($data) {
+	protected function updateDataAndWait($itemid, $filename, $data) {
 		if ($data === null) {
-			$this->assertTrue(@unlink(self::ITEM_FILE_NAME) !== false);
+			$this->assertTrue(@unlink($filename) !== false);
 		} else {
-			$this->assertTrue(@file_put_contents(self::ITEM_FILE_NAME, $data) !== false);
+			$this->assertTrue(@file_put_contents($filename, $data) !== false);
 		}
 		$this->clearLog(self::COMPONENT_SERVER);
 		self::waitForLogLineToBePresent(self::COMPONENT_SERVER,
-				[',"data":[{"itemid":'.self::$master_itemid.',"value":"']
+				[',"data":[{"itemid":'.$itemid.',"value":"']
 		);
-		self::waitForLogLineToBePresent(self::COMPONENT_SERVER,
-				['In preproc_flush_value_server() itemid:'.self::$dep_itemid]
-		);
+		sleep(2);
 	}
 
 	/**
@@ -173,12 +133,13 @@ class testItemDependent extends CIntegrationTest {
 	 * @required-components server, agent
 	 */
 	public function testItemDependent_checkErrorPropagation() {
-		if (file_exists(self::ITEM_FILE_NAME)) {
-			$this->assertTrue(@unlink(self::ITEM_FILE_NAME) !== false);
-		}
-
-		$response = $this->call('item.update', [
-			'itemid' => self::$master_itemid,
+		$response = $this->call('item.create', [
+			'hostid'     => self::$hostid,
+			'name'       => 'Master item',
+			'key_'       => 'vfs.file.contents['.self::ITEM_FILE_NAME1.']',
+			'type'       => ITEM_TYPE_ZABBIX_ACTIVE,
+			'value_type' => ITEM_VALUE_TYPE_STR,
+			'delay'      => '5s',
 			'status' => ITEM_STATUS_ACTIVE,
 			'preprocessing' => [
 				[
@@ -192,9 +153,15 @@ class testItemDependent extends CIntegrationTest {
 		$this->assertArrayHasKey('itemids', $response['result']);
 		$this->assertEquals(1, count($response['result']['itemids']));
 
-		$response = $this->call('item.update', [
-			'itemid' => self::$dep_itemid,
-			'status' => ITEM_STATUS_ACTIVE,
+		$master_itemid = $response['result']['itemids'][0];
+
+		$response = $this->call('item.create', [
+			'hostid'        => self::$hostid,
+			'master_itemid' => $master_itemid,
+			'name'          => 'Dependent item',
+			'key_'          => 'dependent_item1',
+			'type'          => ITEM_TYPE_DEPENDENT,
+			'value_type'    => ITEM_VALUE_TYPE_STR,
 			'preprocessing' => [
 				[
 					'type'          => ZBX_PREPROC_JSONPATH,
@@ -206,38 +173,42 @@ class testItemDependent extends CIntegrationTest {
 		$this->assertArrayHasKey('itemids', $response['result']);
 		$this->assertEquals(1, count($response['result']['itemids']));
 
+		$dep_itemid = $response['result']['itemids'][0];
+
 		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, "finished forced reloading of the configuration cache", true, 60, 1);
 
 		// Error in master preprocessing should be propagated to dependent item
-		$this->updateDataAndWait('{"b":{}}');
+		$this->updateDataAndWait($master_itemid, self::ITEM_FILE_NAME1, '{"b":{}}');
 
-		$this->validateItems(self::$master_itemid, ITEM_STATE_NOTSUPPORTED, '', 'ERROR');
-		$this->validateItems(self::$dep_itemid, ITEM_STATE_NOTSUPPORTED, '', 'ERROR');
+		$this->validateItems($master_itemid, ITEM_STATE_NOTSUPPORTED, '', 'ERROR');
+		$this->validateItems($dep_itemid, ITEM_STATE_NOTSUPPORTED, '', 'ERROR');
 
 		// Dependent drops the value
-		$this->updateDataAndWait('{"a":{}}');
+		$this->updateDataAndWait($master_itemid, self::ITEM_FILE_NAME1, '{"a":{}}');
 
-		$this->validateItems(self::$master_itemid, ITEM_STATE_NORMAL, '{}', '');
-		$this->validateItems(self::$dep_itemid, ITEM_STATE_NORMAL, '', '');
+		$this->validateItems($master_itemid, ITEM_STATE_NORMAL, '{}', '');
+		$this->validateItems($dep_itemid, ITEM_STATE_NORMAL, '', '');
 
 		// Both items are supported and has value
-		$this->updateDataAndWait('{"a":{"sub":"sub_value"}}');
+		$this->updateDataAndWait($master_itemid, self::ITEM_FILE_NAME1, '{"a":{"sub":"sub_value"}}');
 
-		$this->validateItems(self::$master_itemid, ITEM_STATE_NORMAL, '{"sub":"sub_value"}', '');
-		$this->validateItems(self::$dep_itemid, ITEM_STATE_NORMAL, 'sub_value', '');
+		$this->validateItems($master_itemid, ITEM_STATE_NORMAL, '{"sub":"sub_value"}', '');
+		$this->validateItems($dep_itemid, ITEM_STATE_NORMAL, 'sub_value', '');
 
 		// Error in master should propagate to dependent
-		$this->updateDataAndWait('{"b":{}}');
+		$this->updateDataAndWait($master_itemid, self::ITEM_FILE_NAME1, '{"b":{}}');
 
-		$this->validateItems(self::$master_itemid, ITEM_STATE_NOTSUPPORTED, '{"sub":"sub_value"}', 'ERROR');
-		$this->validateItems(self::$dep_itemid, ITEM_STATE_NOTSUPPORTED, 'sub_value', 'ERROR');
+		$this->validateItems($master_itemid, ITEM_STATE_NOTSUPPORTED, '{"sub":"sub_value"}', 'ERROR');
+		$this->validateItems($dep_itemid, ITEM_STATE_NOTSUPPORTED, 'sub_value', 'ERROR');
 
 		// Dependent should drop the old error
-		$this->updateDataAndWait('{"a":{}}');
+		$this->updateDataAndWait($master_itemid, self::ITEM_FILE_NAME1, '{"a":{}}');
 
-		$this->validateItems(self::$master_itemid, ITEM_STATE_NORMAL, '{}', '');
-		$this->validateItems(self::$dep_itemid, ITEM_STATE_NORMAL, 'sub_value', '');
+		$this->validateItems($master_itemid, ITEM_STATE_NORMAL, '{}', '');
+		$this->validateItems($dep_itemid, ITEM_STATE_NORMAL, 'sub_value', '');
+
+		$this->updateDataAndWait($master_itemid, self::ITEM_FILE_NAME1, null);
 	}
 
 	/**
@@ -247,12 +218,13 @@ class testItemDependent extends CIntegrationTest {
 	 * @required-components server, agent
 	 */
 	public function testItemDependent_checkUnsupported() {
-		if (file_exists(self::ITEM_FILE_NAME)) {
-			$this->assertTrue(@unlink(self::ITEM_FILE_NAME) !== false);
-		}
-
-		$response = $this->call('item.update', [
-			'itemid' => self::$master_itemid,
+		$response = $this->call('item.create', [
+			'hostid'     => self::$hostid,
+			'name'       => 'Master item',
+			'key_'       => 'vfs.file.contents['.self::ITEM_FILE_NAME2.']',
+			'type'       => ITEM_TYPE_ZABBIX_ACTIVE,
+			'value_type' => ITEM_VALUE_TYPE_STR,
+			'delay'      => '5s',
 			'status' => ITEM_STATUS_ACTIVE,
 			'preprocessing' => [
 				[
@@ -271,9 +243,15 @@ class testItemDependent extends CIntegrationTest {
 		$this->assertArrayHasKey('itemids', $response['result']);
 		$this->assertEquals(1, count($response['result']['itemids']));
 
-		$response = $this->call('item.update', [
-			'itemid' => self::$dep_itemid,
-			'status' => ITEM_STATUS_ACTIVE,
+		$master_itemid = $response['result']['itemids'][0];
+
+		$response = $this->call('item.create', [
+			'hostid'        => self::$hostid,
+			'master_itemid' => $master_itemid,
+			'name'          => 'Dependent item',
+			'key_'          => 'dependent_item2',
+			'type'          => ITEM_TYPE_DEPENDENT,
+			'value_type'    => ITEM_VALUE_TYPE_STR,
 			'preprocessing' => [
 				[
 					'type'          => ZBX_PREPROC_ERROR_FIELD_JSON,
@@ -285,25 +263,27 @@ class testItemDependent extends CIntegrationTest {
 		$this->assertArrayHasKey('itemids', $response['result']);
 		$this->assertEquals(1, count($response['result']['itemids']));
 
+		$dep_itemid = $response['result']['itemids'][0];
+
 		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, "finished forced reloading of the configuration cache", true, 60, 1);
 
 		// Set both items to supported
-		$this->updateDataAndWait('{"a":{"b":{}}}');
+		$this->updateDataAndWait($master_itemid, self::ITEM_FILE_NAME2, '{"a":{"b":{}}}');
 
-		$this->validateItems(self::$master_itemid, ITEM_STATE_NORMAL, '{"b":{}}', '');
-		$this->validateItems(self::$dep_itemid, ITEM_STATE_NOTSUPPORTED, '', true);
+		$this->validateItems($master_itemid, ITEM_STATE_NORMAL, '{"b":{}}', '');
+		$this->validateItems($dep_itemid, ITEM_STATE_NOTSUPPORTED, '', true);
 
 		// Propagate error coming from master item preprocessing
-		$this->updateDataAndWait('{}');
+		$this->updateDataAndWait($master_itemid, self::ITEM_FILE_NAME2, '{}');
 
-		$this->validateItems(self::$master_itemid, ITEM_STATE_NOTSUPPORTED, '{"b":{}}', 'MASTER_PREPROC_ERROR');
-		$this->validateItems(self::$dep_itemid, ITEM_STATE_NOTSUPPORTED, '', 'MASTER_PREPROC_ERROR');
+		$this->validateItems($master_itemid, ITEM_STATE_NOTSUPPORTED, '{"b":{}}', 'MASTER_PREPROC_ERROR');
+		$this->validateItems($dep_itemid, ITEM_STATE_NOTSUPPORTED, '', 'MASTER_PREPROC_ERROR');
 
-		$this->updateDataAndWait(null);
+		$this->updateDataAndWait($master_itemid, self::ITEM_FILE_NAME2, null);
 
-		$this->validateItems(self::$master_itemid, ITEM_STATE_NORMAL, '{"b":{}}', '');
-		$this->validateItems(self::$dep_itemid, ITEM_STATE_NORMAL, '', '');
+		$this->validateItems($master_itemid, ITEM_STATE_NORMAL, '{"b":{}}', '');
+		$this->validateItems($dep_itemid, ITEM_STATE_NORMAL, '', '');
 
 		// ZBX-27406: propagation of no data to clear error should not go through preprocessing steps
 		$this->assertFalse($this->isLogLinePresent(self::COMPONENT_SERVER, '=== Backtrace: ===', false));
