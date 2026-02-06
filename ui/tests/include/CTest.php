@@ -15,7 +15,7 @@
 
 require_once 'vendor/autoload.php';
 
-require_once __DIR__.'/../../include/polyfill.inc.php';
+require_once __DIR__.'/../../include/runtime.support.inc.php';
 require_once __DIR__.'/../../include/defines.inc.php';
 require_once __DIR__.'/../../include/hosts.inc.php';
 

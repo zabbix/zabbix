@@ -386,7 +386,7 @@ class C64ImportConverter extends CConverter {
 							'name' => 'reference',
 							'value' => $reference
 						];
-						$reference = str_increment_polyfill($reference);
+						$reference = str_increment($reference);
 					}
 
 					if ($widget['type'] === 'plaintext') {
@@ -407,7 +407,7 @@ class C64ImportConverter extends CConverter {
 								'value' => $reference
 							]
 						];
-						$reference = str_increment_polyfill($reference);
+						$reference = str_increment($reference);
 
 						foreach ($old_fields as $field) {
 							switch ($field['name']) {
