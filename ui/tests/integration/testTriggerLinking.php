@@ -185,7 +185,7 @@ class testTriggerLinking extends CIntegrationTest {
 		for ($i = 0; $i < self::NUMBER_OF_TEMPLATES * self::NUMBER_OF_TRIGGERS_PER_TEMPLATE / 2; $i++)
 		{
 			array_push(self::$stringids, $z);
-			$z = str_increment_polyfill($z);
+			$z = str_increment($z);
 		}
 		sort(self::$stringids);
 
