@@ -68,8 +68,9 @@ func (e *ZBXExec) execute(command string, timeout time.Duration, execDir string,
 		CmdLine:       fmt.Sprintf(`/C "%s"`, command),
 	}
 
-	// used only in this function to release the goroutine waiting for ctx.Done, no leaks.
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+	defer cancel()
+
 	err = cmd.Start()
 	if err != nil {
 		return "", errs.Errorf("failed to start command (%s, path: %s): %s", command, execDir, err)
@@ -90,7 +91,8 @@ func (e *ZBXExec) execute(command string, timeout time.Duration, execDir string,
 		return "", errs.Errorf("open process failed: %s", err)
 	}
 
-	if err := windows.AssignProcessToJobObject(job, procHandle); err != nil {
+	err = windows.AssignProcessToJobObject(job, procHandle)
+	if err != nil {
 		perr := cmd.Process.Kill()
 		if perr != nil {
 			return "", errs.Errorf("process job assignment failed: %s and process kill failed: %s", err, perr)
@@ -105,8 +107,6 @@ func (e *ZBXExec) execute(command string, timeout time.Duration, execDir string,
 	go timeoutListener(ctx, job)
 
 	err = <-done
-
-	cancel()
 
 	// we need to check context error so we can inform the user if timeout was reached and Zabbix agent2
 	// terminated the command
