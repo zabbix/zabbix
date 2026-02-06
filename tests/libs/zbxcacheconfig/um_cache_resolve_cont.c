@@ -214,8 +214,6 @@ static void	mock_read_steps(zbx_vector_mock_step_t *steps, zbx_mock_handle_t hst
 	}
 
 	um_mock_cache_clear(mock_cache_last);
-
-	zbx_config_wlock_set_unlocked();
 }
 
 void	zbx_mock_test_entry(void **state)
