@@ -147,7 +147,6 @@ static char	*create_email_messageid(zbx_uint64_t mediatypeid, const char *sendto
 	static unsigned short	counter = 0;
 	time_t			utc_time;
 	struct tm		tm;
-	long			ms;
 	char			*str = NULL;
 	size_t			str_alloc = 0, str_offset = 0;
 
