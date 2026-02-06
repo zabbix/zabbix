@@ -999,7 +999,7 @@ class testDashboardPlainTextWidget extends CWebTest {
 								'time' => strtotime('-16 hours')],
 						['itemid' => '42227', 'values' => STRING_255, 'time' => strtotime('-25 hours')]
 					],
-					'screenshot' => '1'
+					'screenshot' => true
 				]
 			],
 			// #5 Test case for 'Dynamic items' check.
@@ -1091,7 +1091,7 @@ class testDashboardPlainTextWidget extends CWebTest {
 
 					if ($iframe->isValid()) {
 						$value = $iframe->getAttribute('srcdoc');
-						$value = preg_match('/<body[^>]*>(.*)<\/body>/is', $value, $m) ? $m[1] : $value;
+						$value = preg_match('/<body[^>]*>(.*)<\/body>/is', $value, $matches) ? $matches[1] : $value;
 						$value = strip_tags(htmlspecialchars_decode($value, ENT_QUOTES));
 					}
 					else {
