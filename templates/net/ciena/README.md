@@ -29,6 +29,7 @@ Refer to the vendor documentation.
 |----|-----------|-------|
 |{$CIENA.MEMORY.UTIL.MAX}|<p>Threshold of memory utilization expressed in %.</p>|`90`|
 |{$CIENA.CPU.UTIL.CRIT}|<p>Threshold of CPU utilization expressed in %.</p>|`90`|
+|{$CIENA.CPU.AVG.UTIL.WARN}|<p>Threshold of CPU utilization expressed in %.</p>|`100`|
 |{$SNMP.TIMEOUT}|<p>Time interval for the SNMP availability trigger.</p>|`5m`|
 |{$ICMP_LOSS_WARN}|<p>Warning threshold of ICMP packet loss in %.</p>|`20`|
 |{$ICMP_RESPONSE_TIME_WARN}|<p>Warning threshold of the average ICMP response time in seconds.</p>|`0.15`|
@@ -58,6 +59,14 @@ Refer to the vendor documentation.
 |CPU utilization|<p>MIB: WWP-LEOS-SYSTEM-CONFIG-MIB</p><p>CPU utilization over 60 seconds.</p>|SNMP agent|ciena.cpu.utilization|
 |Memory available|<p>MIB: WWP-LEOS-SYSTEM-CONFIG-MIB</p><p>Available memory in bytes.</p>|SNMP agent|ciena.memory.available<p>**Preprocessing**</p><ul><li><p>Custom multiplier: `1024`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 |Memory used|<p>MIB: WWP-LEOS-SYSTEM-CONFIG-MIB</p><p>Used memory in bytes.</p>|SNMP agent|ciena.memory.used<p>**Preprocessing**</p><ul><li><p>Custom multiplier: `1024`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Filesystem [/tmp]: Utilization|<p>MIB: WWP-LEOS-SYSTEM-CONFIG-MIB</p><p>Current utilization of the /tmp directory.</p>|SNMP agent|ciena.tmpfs.utilization<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Filesystem [/tmp]: State|<p>MIB: WWP-LEOS-SYSTEM-CONFIG-MIB</p><p>Current state of /tmp filesystem.</p>|SNMP agent|ciena.tmpfs.state<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Filesystem [/mnt/sysfs]: Utilization|<p>MIB: WWP-LEOS-SYSTEM-CONFIG-MIB</p><p>Current utilization of the /mnt/sysfs directory.</p>|SNMP agent|ciena.sysfs.utilization<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Filesystem [/mnt/sysfs]: State|<p>MIB: WWP-LEOS-SYSTEM-CONFIG-MIB</p><p>Current state of /mnt/sysfs filesystem.</p>|SNMP agent|ciena.sysfs.state<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|CPU utilization average (15m)|<p>MIB: WWP-LEOS-SYSTEM-CONFIG-MIB</p><p>CPU utilization average for last 15 minutes.</p>|SNMP agent|ciena.cpu.utilization15m<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|CPU utilization average minimum (15m)|<p>MIB: WWP-LEOS-SYSTEM-CONFIG-MIB</p><p>Minimum 15 minute CPU utilization average.</p>|SNMP agent|ciena.cpu.utilization15m.min<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|CPU utilization average maximum (15m)|<p>MIB: WWP-LEOS-SYSTEM-CONFIG-MIB</p><p>Maximum 15 minute CPU utilization average.</p>|SNMP agent|ciena.cpu.utilization15m.max<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|CPU utilization state (15m)|<p>MIB: WWP-LEOS-SYSTEM-CONFIG-MIB</p><p>CPU utilization 15-minute state.</p>|SNMP agent|ciena.cpu.utilization15m.state<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 |Memory utilization|<p>Memory utilization, in percent.</p>|Calculated|ciena.memory.utilization|
 |SNMP walk temperature sensors|<p>MIB: WWP-LEOS-CHASSIS-MIB</p><p>Used for discovering system temperature sensors.</p>|SNMP agent|system.temperature.sensor.walk|
 |SNMP walk fan|<p>MIB: WWP-LEOS-CHASSIS-MIB</p><p>Used for discovering system fans.</p>|SNMP agent|system.fan.walk|
@@ -82,6 +91,8 @@ Refer to the vendor documentation.
 |----|-----------|----------|--------|--------------------------------|
 |Ciena: Device has been replaced|<p>The Ciena device serial number has changed. Acknowledge to close the problem manually.</p>|`last(/Ciena 3906 by SNMP/system.hw.serialnumber,#1)<>last(/Ciena 3906 by SNMP/system.hw.serialnumber,#2) and length(last(/Ciena 3906 by SNMP/system.hw.serialnumber))>0`|Info|**Manual close**: Yes|
 |Ciena: High CPU utilization|<p>The CPU utilization is too high. The system might be slow to respond.</p>|`min(/Ciena 3906 by SNMP/ciena.cpu.utilization,5m)>{$CIENA.CPU.UTIL.CRIT}`|Warning||
+|Ciena: High CPU utilization (last 15m)|<p>Average CPU utilization for the last 15 minutes exceeded '{$CIENA.CPU.AVG.UTIL.WARN}%'.</p>|`min(/Ciena 3906 by SNMP/ciena.cpu.utilization15m,5m)>{$CIENA.CPU.AVG.UTIL.WARN}`|Warning||
+|Ciena: CPU utilization state abnormal (15m)|<p>The CPU utilization 15-minute state indicates an abnormal or fault condition.</p>|`last(/Ciena 3906 by SNMP/ciena.cpu.utilization15m.state)<>1`|Warning||
 |Ciena: High memory utilization|<p>The system is running out of free memory.</p>|`min(/Ciena 3906 by SNMP/ciena.memory.utilization,5m)>{$CIENA.MEMORY.UTIL.MAX}`|Average||
 |Ciena: Host has been restarted|<p>Uptime is less than 10 minutes.</p>|`(last(/Ciena 3906 by SNMP/system.hw.uptime[hrSystemUptime.0])>0 and last(/Ciena 3906 by SNMP/system.hw.uptime[hrSystemUptime.0])<10m) or (last(/Ciena 3906 by SNMP/system.hw.uptime[hrSystemUptime.0])=0 and last(/Ciena 3906 by SNMP/system.net.uptime[sysUpTime.0])<10m)`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Ciena: No SNMP data collection</li></ul>|
 |Ciena: System name has changed|<p>The name of the system has changed. Acknowledge to close the problem manually.</p>|`last(/Ciena 3906 by SNMP/system.name,#1)<>last(/Ciena 3906 by SNMP/system.name,#2) and length(last(/Ciena 3906 by SNMP/system.name))>0`|Info|**Manual close**: Yes|

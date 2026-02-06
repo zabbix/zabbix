@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -215,8 +215,8 @@ class testFormMapConstructor extends CLegacyWebTest {
 	 * @browsers chrome
 	 */
 	public function testFormMapConstructor_SimpleUpdateConstructor($map) {
-		$sql_maps_elements = 'SELECT * FROM sysmaps sm INNER JOIN sysmaps_elements sme ON'.
-				' sme.sysmapid = sm.sysmapid ORDER BY sme.selementid';
+		$sql_maps_elements = 'SELECT * FROM sysmaps sm INNER JOIN sysmaps_elements se ON'.
+				' se.sysmapid = sm.sysmapid ORDER BY se.selementid';
 		$sql_links_triggers = 'SELECT * FROM sysmaps_links sl INNER JOIN sysmaps_link_triggers slt ON'.
 				' slt.linkid = sl.linkid ORDER BY slt.linktriggerid';
 		$hash_maps_elements = CDBHelper::getHash($sql_maps_elements);

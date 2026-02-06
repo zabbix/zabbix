@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -257,6 +257,29 @@ static void	dbsync_journal_destroy(zbx_dbsync_journal_t *journal)
 	zbx_vector_dbsync_obj_changelog_destroy(&journal->changelog);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: copy sync journal                                                 *
+ *                                                                            *
+ * Parameters: dst   - [OUT] destination journal                              *
+ *             src   - [IN] source journal                                    *
+ *             flags - [IN] flags indicating which data to copy               *
+ *                          (ZBX_DBSYNC_FLAG_INSERT, ZBX_DBSYNC_FLAG_UPDATE,  *
+ *                           ZBX_DBSYNC_FLAG_DELETE)                          *
+ *                                                                            *
+ ******************************************************************************/
+static void	dbsync_journal_copy(zbx_dbsync_journal_t *dst, const zbx_dbsync_journal_t *src, zbx_uint64_t flags)
+{
+	if (0 != (flags & ZBX_DBSYNC_FLAG_INSERT))
+		zbx_vector_uint64_append_array(&dst->inserts, src->inserts.values, src->inserts.values_num);
+
+	if (0 != (flags & ZBX_DBSYNC_FLAG_UPDATE))
+		zbx_vector_uint64_append_array(&dst->updates, src->updates.values, src->updates.values_num);
+
+	if (0 != (flags & ZBX_DBSYNC_FLAG_DELETE))
+		zbx_vector_uint64_append_array(&dst->deletes, src->deletes.values, src->deletes.values_num);
+}
+
 void	zbx_dbsync_env_init(zbx_dc_config_t *cache)
 {
 	dbsync_env.cache = cache;
@@ -429,6 +452,13 @@ int	zbx_dbsync_env_prepare(unsigned char mode)
 
 			changelog_num++;
 		}
+
+		/* copy virtual changelogs */
+
+		/* since item discovery link cannot be updated - copy only inserts and deletes */
+		dbsync_journal_copy(&dbsync_env.journals[ZBX_DBSYNC_JOURNAL(ZBX_DBSYNC_OBJ_ITEM_DISCOVERY)],
+				&dbsync_env.journals[ZBX_DBSYNC_JOURNAL(ZBX_DBSYNC_OBJ_ITEM)],
+				ZBX_DBSYNC_FLAG_INSERT | ZBX_DBSYNC_FLAG_DELETE);
 	}
 	zbx_db_free_result(result);
 
@@ -1800,11 +1830,6 @@ out:
 	return ret;
 }
 
-static int	dbsync_compare_item_discovery(const ZBX_DC_ITEM_DISCOVERY *item_discovery, const zbx_db_row_t dbrow)
-{
-	return dbsync_compare_uint64(dbrow[1], item_discovery->parent_itemid);
-}
-
 /******************************************************************************
  *                                                                            *
  * Purpose: compares mapping between items, prototypes and rules with         *
@@ -1816,64 +1841,31 @@ static int	dbsync_compare_item_discovery(const ZBX_DC_ITEM_DISCOVERY *item_disco
  ******************************************************************************/
 int	zbx_dbsync_compare_item_discovery(zbx_dbsync_t *sync)
 {
-	zbx_db_row_t		dbrow;
-	zbx_db_result_t		result;
-	zbx_hashset_t		ids;
-	zbx_hashset_iter_t	iter;
-	zbx_uint64_t		rowid;
-	ZBX_DC_ITEM_DISCOVERY	*item_discovery;
-	char			**row;
+	char	*sql = NULL;
+	size_t	sql_alloc = 0, sql_offset = 0;
+	int	ret = SUCCEED;
 
 	zbx_dcsync_sql_start(sync);
 
-	if (NULL == (result = zbx_db_select("select itemid,parent_itemid from item_discovery")))
-		return FAIL;
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "select itemid,parent_itemid from item_discovery");
 
 	dbsync_prepare(sync, 2, NULL);
 
 	if (ZBX_DBSYNC_INIT == sync->mode)
 	{
-		zbx_dcsync_sql_end(sync);
-		sync->dbresult = result;
-		return SUCCEED;
+		if (NULL == (sync->dbresult = zbx_db_select("%s", sql)))
+			ret = FAIL;
+		goto out;
 	}
 
-	zbx_hashset_create(&ids, (size_t)dbsync_env.cache->item_discovery.num_data, ZBX_DEFAULT_UINT64_HASH_FUNC,
-			ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	ret = dbsync_read_journal(sync, &sql, &sql_alloc, &sql_offset, "itemid", "where", NULL,
+			&dbsync_env.journals[ZBX_DBSYNC_JOURNAL(ZBX_DBSYNC_OBJ_ITEM_DISCOVERY)]);
 
-	while (NULL != (dbrow = zbx_db_fetch(result)))
-	{
-		unsigned char	tag = ZBX_DBSYNC_ROW_NONE;
-
-		ZBX_STR2UINT64(rowid, dbrow[0]);
-		zbx_hashset_insert(&ids, &rowid, sizeof(rowid));
-
-		row = dbsync_preproc_row(sync, dbrow);
-
-		if (NULL == (item_discovery = (ZBX_DC_ITEM_DISCOVERY *)zbx_hashset_search(
-				&dbsync_env.cache->item_discovery, &rowid)))
-		{
-			tag = ZBX_DBSYNC_ROW_ADD;
-		}
-		else if (FAIL == dbsync_compare_item_discovery(item_discovery, row))
-			tag = ZBX_DBSYNC_ROW_UPDATE;
-
-		if (ZBX_DBSYNC_ROW_NONE != tag)
-			dbsync_add_row(sync, rowid, tag, row);
-	}
-
-	zbx_hashset_iter_reset(&dbsync_env.cache->item_discovery, &iter);
-	while (NULL != (item_discovery = (ZBX_DC_ITEM_DISCOVERY *)zbx_hashset_iter_next(&iter)))
-	{
-		if (NULL == zbx_hashset_search(&ids, &item_discovery->itemid))
-			dbsync_add_row(sync, item_discovery->itemid, ZBX_DBSYNC_ROW_REMOVE, NULL);
-	}
-
-	zbx_hashset_destroy(&ids);
-	zbx_db_free_result(result);
+out:
+	zbx_free(sql);
 	zbx_dcsync_sql_end(sync);
 
-	return SUCCEED;
+	return ret;
 }
 
 /******************************************************************************

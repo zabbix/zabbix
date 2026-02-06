@@ -4,8 +4,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2025-11-06 08:53+0000\n"
-"Last-Translator: Andrey <i@ashekhov.ru>\n"
+"PO-Revision-Date: 2025-12-11 09:09+0000\n"
+"Last-Translator: Alexey <alexey.pustovalov@zabbix.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: ru\n"
 "MIME-Version: 1.0\n"
@@ -4306,7 +4306,7 @@ msgstr "Невозможно задать \"Агрегирование набо�
 
 #: include/classes/db/MysqlDbBackend.php:197
 msgid "Cannot set charset."
-msgstr ""
+msgstr "Не удалось задать кодировку."
 
 #: include/classes/api/services/CItemGeneral.php:2478
 #, c-format
@@ -27035,6 +27035,11 @@ msgstr "ошибочная последовательность байт в UTF-
 msgid "invalid data type"
 msgstr "ошибочный тип данных"
 
+#: include/classes/validators/CAbsoluteTimeValidator.php:45
+#: include/classes/validators/CAbsoluteTimeValidator.php:53
+msgid "invalid date"
+msgstr ""
+
 #: include/classes/graphdraw/CLineGraphDraw.php:140 include/items.inc.php:1805
 msgid "invalid delay"
 msgstr "ошибочная задержка"
@@ -28435,6 +28440,11 @@ msgstr "значение должно быть между \"%1$s\" и \"%2$s\""
 msgid "value must be between \"%1$s\" and \"%2$s\", and have no more than \"%3$s\" digits after the decimal point"
 msgstr "значение должно быть между \"%1$s\" и \"%2$s\", и иметь не более \"%3$s\" цифр после десятичной точки"
 
+#: include/classes/validators/CTimeUnitValidator.php:84
+#, c-format
+msgid "value must be between %1$s and %2$s"
+msgstr ""
+
 #: include/classes/validators/CApiInputValidator.php:676
 msgid "value must be empty"
 msgstr "значение должно быть пустым"
@@ -28452,6 +28462,16 @@ msgstr[2] "значение должно быть пустым или одним
 #, c-format
 msgid "value must be greater than \"%1$s\""
 msgstr "значение должно быть больше \"%1$s\""
+
+#: include/classes/validators/CAbsoluteTimeValidator.php:59
+#, c-format
+msgid "value must be greater than or equal to %1$s"
+msgstr ""
+
+#: include/classes/validators/CAbsoluteTimeValidator.php:64
+#, c-format
+msgid "value must be less than or equal to %1$s"
+msgstr ""
 
 #: app/controllers/CControllerPopupItemTest.php:1342
 #: include/classes/validators/CNewValidator.php:220

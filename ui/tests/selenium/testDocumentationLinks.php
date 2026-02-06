@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -19,7 +19,7 @@ require_once __DIR__.'/../include/CWebTest.php';
 use Facebook\WebDriver\WebDriverKeys;
 
 /**
- * @dataSource Actions, Maps, Proxies
+ * @dataSource Actions, Maps, Proxies, MonitoringOverview
  *
  * @backup profiles, connector
  *
@@ -35,8 +35,12 @@ class testDocumentationLinks extends CWebTest {
 	protected static $host_prototypeid;
 	protected static $lld_prototypeid;
 	protected static $template_lld_prototypeid;
+	protected static $triggerids;
+	protected static $eventids;
 
 	public function prepareData() {
+		self::$triggerids = CDataHelper::get('MonitoringOverview.triggerids');
+		self::$eventids = CDataHelper::get('MonitoringOverview.eventids');
 		self::$version = substr(ZABBIX_VERSION, 0, 3);
 
 		// Create a service.
@@ -273,7 +277,8 @@ class testDocumentationLinks extends CWebTest {
 			// #8 Event details view.
 			[
 				[
-					'url' => 'tr_events.php?triggerid=100032&eventid=9000',
+					'replace' => true,
+					'url' => 'tr_events.php?triggerid={triggerid}&eventid={eventid}',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/monitoring/problems#viewing-details'
 				]
 			],
@@ -964,28 +969,35 @@ class testDocumentationLinks extends CWebTest {
 			// #89 Template LLD rule prototypes list view.
 			[
 				[
-					'url' => 'lld_prototype_list_template',
+					'replace' => true,
+					'url' => 'host_discovery_prototypes.php?parent_discoveryid={template_discoveryid}&context=template',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/data_collection/templates/discovery'
 				]
 			],
 			// #90 Template LLD rule prototype create form.
 			[
 				[
-					'url' => 'lld_prototype_create_template',
+					'replace' => true,
+					'url' => 'host_discovery_prototypes.php?form=create&hostid={templateid}'.
+						'&parent_discoveryid={template_discoveryid}&context=template',
 					'doc_link' => '/en/manual/discovery/low_level_discovery#discovery-rule'
 				]
 			],
 			// #91 Template LLD rule prototype edit form.
 			[
 				[
-					'url' => 'lld_prototype_update_template',
+					'replace' => true,
+					'url' => 'host_discovery_prototypes.php?form=update&itemid='.
+						'{template_item_prototypeid}&parent_discoveryid={template_discoveryid}&context=template',
 					'doc_link' => '/en/manual/discovery/low_level_discovery#discovery-rule'
 				]
 			],
 			// #92 Template LLD rule prototype test form.
 			[
 				[
-					'url' => 'lld_prototype_test_template',
+					'replace' => true,
+					'url' => 'host_discovery_prototypes.php?form=update&itemid='.
+						'{template_item_prototypeid}&parent_discoveryid={template_discoveryid}&context=template',
 					'actions' => [
 						[
 							'callback' => 'openFormWithLink',
@@ -1338,35 +1350,43 @@ class testDocumentationLinks extends CWebTest {
 			// #131 Host LLD host prototype edit form.
 			[
 				[
-					'url' => 'host_prototype',
+					'replace' => true,
+					'url' => 'host_prototypes.php?form=update&parent_discoveryid={discoveryid}&hostid={host_prototypeid}&context=host',
 					'doc_link' => '/en/manual/discovery/low_level_discovery/host_prototypes'
 				]
 			],
 			// #132 Host LLD rule prototypes list view.
 			[
 				[
-					'url' => 'lld_prototype_list_host',
+					'replace' => true,
+					'url' => 'host_discovery_prototypes.php?parent_discoveryid={discoveryid}&context=host',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/data_collection/hosts/discovery'
 				]
 			],
 			// #133 Host LLD rule prototype create form.
 			[
 				[
-					'url' => 'lld_prototype_create_host',
+					'replace' => true,
+					'url' => 'host_discovery_prototypes.php?form=create&hostid={hostid}'.
+						'&parent_discoveryid={discoveryid}&context=host',
 					'doc_link' => '/en/manual/discovery/low_level_discovery#discovery-rule'
 				]
 			],
 			// #134 Host LLD rule prototype edit form.
 			[
 				[
-					'url' => 'lld_prototype_update_host',
+					'replace' => true,
+					'url' => 'host_discovery_prototypes.php?form=update&itemid={item_prototypeid}'.
+						'&parent_discoveryid={discoveryid}&context=host',
 					'doc_link' => '/en/manual/discovery/low_level_discovery#discovery-rule'
 				]
 			],
 			// #135 Host LLD rule prototype test form.
 			[
 				[
-					'url' => 'lld_prototype_test_host',
+					'replace' => true,
+					'url' => 'host_discovery_prototypes.php?form=update&itemid={item_prototypeid}'.
+						'&parent_discoveryid={discoveryid}&context=host',
 					'actions' => [
 						[
 							'callback' => 'openFormWithLink',
@@ -2586,28 +2606,19 @@ class testDocumentationLinks extends CWebTest {
 	 * @ignoreBrowserErrors
 	 */
 	public function testDocumentationLinks_checkGeneralLinks($data) {
-		$replace_urls = [
-			'host_prototype' => 'host_prototypes.php?form=update&parent_discoveryid='.self::$lldid.'&hostid='.
-					self::$host_prototypeid.'&context=host',
-			'lld_prototype_list_template' => 'host_discovery_prototypes.php?parent_discoveryid='.self::$template_lldid.
-					'&context=template',
-			'lld_prototype_create_template' => 'host_discovery_prototypes.php?form=create&hostid='.self::$templateid.
-					'&parent_discoveryid='.self::$template_lldid.'&context=template',
-			'lld_prototype_update_template' => 'host_discovery_prototypes.php?form=update&itemid='.
-					self::$template_lld_prototypeid.'&parent_discoveryid='.self::$template_lldid.'&context=template',
-			'lld_prototype_test_template' => 'host_discovery_prototypes.php?form=update&itemid='.
-					self::$template_lld_prototypeid.'&parent_discoveryid='.self::$template_lldid.'&context=template',
-			'lld_prototype_list_host' => 'host_discovery_prototypes.php?parent_discoveryid='.self::$lldid.'&context=host',
-			'lld_prototype_create_host' => 'host_discovery_prototypes.php?form=create&hostid='.self::$hostid.
-					'&parent_discoveryid='.self::$lldid.'&context=host',
-			'lld_prototype_update_host' => 'host_discovery_prototypes.php?form=update&itemid='.self::$lld_prototypeid.
-					'&parent_discoveryid='.self::$lldid.'&context=host',
-			'lld_prototype_test_host' => 'host_discovery_prototypes.php?form=update&itemid='.self::$lld_prototypeid.
-					'&parent_discoveryid='.self::$lldid.'&context=host'
-		];
-
-		if (in_array($data['url'], array_keys($replace_urls))) {
-			$data['url'] = $replace_urls[$data['url']];
+		if (CTestArrayHelper::get($data, 'replace')) {
+			$replacements = [
+				'{triggerid}' => self::$triggerids['1_trigger_Not_classified'],
+				'{eventid}' => self::$eventids['1_trigger_Not_classified'],
+				'{hostid}' => self::$hostid,
+				'{templateid}' => self::$templateid,
+				'{host_prototypeid}' => self::$host_prototypeid,
+				'{template_item_prototypeid}' => self::$template_lld_prototypeid,
+				'{item_prototypeid}' => self::$lld_prototypeid,
+				'{template_discoveryid}' => self::$template_lldid,
+				'{discoveryid}' => self::$lldid
+			];
+			$data['url'] = str_replace(array_keys($replacements), array_values($replacements), $data['url']);
 		}
 
 		$this->page->login()->open($data['url'])->waitUntilReady();
@@ -2717,7 +2728,7 @@ class testDocumentationLinks extends CWebTest {
 			[
 				[
 					'element' => [
-						'xpath://div[contains(@style, "top: 257px")]',
+						'xpath://div[contains(@style, "top: 258px")]',
 						'xpath://div[contains(@style, "top: 82px")]'
 					],
 					'doc_link' => '/en/manual/config/visualization/maps/map#adding-shapes'
