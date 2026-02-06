@@ -1260,7 +1260,11 @@ window.host_wizard_edit = new class {
 					);
 				}
 
-				this.#dialogue.querySelector('.js-groups-description').hidden = this.#data.host === null;
+				const groups_description = this.#dialogue.querySelector('.js-groups-description');
+
+				if (groups_description) {
+					groups_description.hidden = this.#data.host === null;
+				}
 
 				break;
 
