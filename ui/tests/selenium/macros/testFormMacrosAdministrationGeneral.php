@@ -445,15 +445,20 @@ class testFormMacrosAdministrationGeneral extends testFormMacros {
 		$this->verifyHash();
 	}
 
-	public function testFormMacrosAdministrationGeneral_UpdateWrongEmptyMacroValue() {
+	/**
+	 * @backupOnce !globalmacro
+	 */
+	public function testFormMacrosAdministrationGeneral_EmptyMacroFieldValues() {
 		$this->openGlobalMacros();
 		$form = $this->query('name:macrosForm')->asForm()->one();
-		$form->fill(['id:macros_0_macro' => '']);
-sleep(1);
-		$this->page->removeFocus();
-		$this->assertInlineError($form, ['id:macros_0_macro' => 'Macro: This field cannot be empty.']);
+		$form->fill(['id:macros_0_macro' => '', 'id:macros_0_value' => '', 'id:macros_0_description' => '']);
 
-		$this->checkGlobalMacrosOrder(0);
+		$form->submit();
+		$this->page->waitUntilAlertIsPresent();
+		$this->assertEquals('Are you sure you want to delete? 1 macro(s)?', $this->page->getAlertText());
+		$this->page->acceptAlert();
+		$this->page->waitUntilReady();
+		$this->assertMessage(TEST_GOOD, 'Macros updated');
 	}
 
 	public function testFormMacrosAdministrationGeneral_Update() {
@@ -852,7 +857,7 @@ sleep(1);
 	/**
 	 * @dataProvider getCreateVaultMacrosData
 	 *
-	 * @backupOnce globalmacro
+	 * @backupOnce !globalmacro
 	 */
 	public function testFormMacrosAdministrationGeneral_CreateVaultMacros($data) {
 		$this->selectVault($data['vault']);
