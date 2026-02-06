@@ -35,6 +35,7 @@ final class CItemData {
 			'net.dns[<ip>,name,<type>,<timeout>,<count>,<protocol>]',
 			'net.if.collisions[if]',
 			'net.if.discovery',
+			'net.if.get',
 			'net.if.in[if,<mode>]',
 			'net.if.list',
 			'net.if.out[if,<mode>]',
@@ -141,6 +142,7 @@ final class CItemData {
 			'net.dns[<ip>,name,<type>,<timeout>,<count>,<protocol>]',
 			'net.if.collisions[if]',
 			'net.if.discovery',
+			'net.if.get',
 			'net.if.in[if,<mode>]',
 			'net.if.list',
 			'net.if.out[if,<mode>]',
@@ -1256,6 +1258,14 @@ final class CItemData {
 				'documentation_link' => [
 					ITEM_TYPE_ZABBIX => 'config/items/itemtypes/zabbix_agent#net.if.discovery',
 					ITEM_TYPE_ZABBIX_ACTIVE => 'config/items/itemtypes/zabbix_agent#net.if.discovery'
+				]
+			],
+			'net.if.get' => [
+				'description' => _('List of network interfaces with detailed information. Returns JSON'),
+				'value_type' => ITEM_VALUE_TYPE_TEXT,
+				'documentation_link' => [
+					ITEM_TYPE_ZABBIX => 'config/items/itemtypes/zabbix_agent#net.if.get',
+					ITEM_TYPE_ZABBIX_ACTIVE => 'config/items/itemtypes/zabbix_agent#net.if.get'
 				]
 			],
 			'net.if.in[if,<mode>]' => [
