@@ -18,7 +18,6 @@
 #include "zbxdb.h"
 #include "zbxhistory.h"
 #include "zbxtypes.h"
-#include "zbxvariant.h"
 #include "zbxalgo.h"
 #include "zbxcacheconfig.h"
 #include "zbxdbhigh.h"

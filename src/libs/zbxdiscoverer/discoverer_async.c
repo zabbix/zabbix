@@ -26,7 +26,6 @@
 #include "zbxcacheconfig.h"
 #include "zbxcomms.h"
 #include "zbxdbhigh.h"
-#include "zbxip.h"
 #include "zbxstr.h"
 #include "zbxpoller.h"
 

@@ -209,7 +209,7 @@ func Test_statusHandler(t *testing.T) {
 			"-unknownHealth",
 			args{
 				map[command][]byte{
-					cmdStatus: []byte(`{"health": {"status":"bannana"}}`),
+					cmdStatus: []byte(`{"health": {"status":"banana"}}`),
 				},
 			},
 			nil,
@@ -220,7 +220,7 @@ func Test_statusHandler(t *testing.T) {
 			args{map[command][]byte{cmdStatus: []byte(
 				`{
                     "health": {"status":"HEALTH_OK"},
-                    "pgmap": {"pgs_by_state":[{"state_name":"bannan", "count": 3}]}
+                    "pgmap": {"pgs_by_state":[{"state_name":"banana", "count": 3}]}
                  }`,
 			)}},
 			nil,

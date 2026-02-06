@@ -2039,21 +2039,17 @@ function parse_period($str) {
 		return null;
 	}
 
-	foreach ($time_periods_parser->getPeriods() as $period) {
-		if (!preg_match('/^([1-7])-([1-7]),([0-9]{1,2}):([0-9]{1,2})-([0-9]{1,2}):([0-9]{1,2})$/', $period, $matches)) {
-			return null;
-		}
+	foreach ($time_periods_parser->getPeriodsParts() as $period_parts) {
+		$start_day = (int) $period_parts['wd_from'];
+		$end_day = (int) $period_parts['wd_till'];
 
-		for ($i = $matches[1]; $i <= $matches[2]; $i++) {
-			if (!isset($out[$i])) {
-				$out[$i] = [];
-			}
-			array_push($out[$i], [
-				'start_h' => $matches[3],
-				'start_m' => $matches[4],
-				'end_h' => $matches[5],
-				'end_m' => $matches[6]
-			]);
+		for ($day = $start_day; $day <= $end_day; $day++) {
+			$out[$day][] = [
+				'start_h' => $period_parts['h_from'],
+				'start_m' => $period_parts['m_from'],
+				'end_h' => $period_parts['h_till'],
+				'end_m' => $period_parts['m_till']
+			];
 		}
 	}
 
