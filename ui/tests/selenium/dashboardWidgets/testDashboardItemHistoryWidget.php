@@ -2398,7 +2398,7 @@ class testDashboardItemHistoryWidget extends testWidgets {
 						],
 						['itemid' => '42227', 'values' => STRING_255, 'time' => strtotime('-25 hours')]
 					],
-					'screenshot' => true
+					'screenshot' => '1'
 				]
 			],
 			// #5 Test case for 'Items location' and 'Show text as Single line' options check.
@@ -2572,8 +2572,7 @@ class testDashboardItemHistoryWidget extends testWidgets {
 							'time' => strtotime('-16 hours')
 						],
 						['itemid' => '42227', 'values' => STRING_255, 'time' => strtotime('-25 hours')]
-					],
-					'screenshot' => true
+					]
 				]
 			],
 			// #8 Test case for Time period check.
@@ -2745,7 +2744,7 @@ class testDashboardItemHistoryWidget extends testWidgets {
 
 			// Check HTML encode.
 			if (array_key_exists('screenshot', $data)) {
-				$this->assertScreenshot($widget, 'HTML encode');
+				$this->assertScreenshot($widget, 'HTML encode'.$data['screenshot']);
 			}
 
 			$this->widgetConfigurationChange($default_values['fields'], $dashboard, $default_values['columns']);
