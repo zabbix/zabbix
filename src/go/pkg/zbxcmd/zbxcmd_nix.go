@@ -43,8 +43,8 @@ func InitExecutor() (Executor, error) {
 }
 
 func (*ZBXExec) execute(s string, timeout time.Duration, path string, strict bool) (string, error) {
-	// used only in this function to release the goroutine waiting for ctx.Done, no leaks.
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+	defer cancel()
 
 	cmd := exec.Command("sh", "-c", s)
 	cmd.Dir = path
@@ -67,8 +67,6 @@ func (*ZBXExec) execute(s string, timeout time.Duration, path string, strict boo
 
 	err = <-done
 
-	cancel()
-
 	// we need to check context error so we can inform the user if timeout was reached and Zabbix agent2
 	// terminated the command
 	if errors.Is(ctx.Err(), context.DeadlineExceeded) {
@@ -77,7 +75,7 @@ func (*ZBXExec) execute(s string, timeout time.Duration, path string, strict boo
 
 	// we need to check error after t.Stop so we can inform the user if timeout was reached and Zabbix agent2 terminated the command
 	if strict && err != nil && !errors.Is(err, syscall.ECHILD) {
-		log.Debugf("Command [%s] execution failed: %s\n%s", s, err, b.String())
+		log.Debugf("command [%s] execution failed: %s\n%s", s, err, b.String())
 
 		return "", errs.Errorf("command execution failed: %s", err.Error())
 	}
