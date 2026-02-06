@@ -752,11 +752,11 @@ function dbCast2Text($field) {
 }
 
 /**
- * Creates string with SQL expression that derive substring from given value.
+ * Returns a database-compatible substring expression.
  *
- * @param $field
- * @param $offset
- * @param $length
+ * @param string $field   Database field or expression to extract from.
+ * @param int    $offset  Starting position (1-based; first character is 1).
+ * @param int    $length  Number of characters to return.
  *
  * @return string
  */

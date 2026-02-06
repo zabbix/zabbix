@@ -322,24 +322,7 @@ class CHistory extends CApiService {
 			}
 
 			$query['script_fields'] = [
-				'value' => [
-					'script' => [
-						'lang' => 'painless',
-						'source' => <<<'SCRIPT'
-							def string;
-							string = params._source.value.toString();
-
-							if (string.length() > params.len) {
-								return string.substring(0, params.len);
-							} else {
-								return string;
-							}
-						SCRIPT,
-						'params' => [
-							'len' => (int) $options['maxValueSize']
-						]
-					]
-				]
+				'value' => CElasticsearchHelper::getSubstring('value', (int) $options['maxValueSize'])
 			];
 		}
 
