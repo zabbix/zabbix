@@ -1487,12 +1487,14 @@ class CMacrosResolverGeneral {
 					]);
 
 					foreach ($db_items as $db_item) {
+						if ($db_item['lastclock'] == 0) {
+							continue;
+						}
+
 						foreach ($keys[$db_item['key_']] as $macro_data) {
-							if ($db_item['lastclock']) {
-								$macro_values[$macro_data['macro']] = array_key_exists('macrofunc', $macro_data)
-									? CMacroFunction::calcMacrofunc($db_item['lastvalue'], $macro_data['macrofunc'])
-									: formatHistoryValue($db_item['lastvalue'], $db_item);
-							}
+							$macro_values[$macro_data['macro']] = array_key_exists('macrofunc', $macro_data)
+								? CMacroFunction::calcMacrofunc($db_item['lastvalue'], $macro_data['macrofunc'])
+								: formatHistoryValue($db_item['lastvalue'], $db_item);
 						}
 					}
 				}
@@ -1512,12 +1514,14 @@ class CMacrosResolverGeneral {
 							foreach ($sec_nums as $sec_num => $_macros) {
 								$value = getItemFunctionalValue($db_item, $function, $sec_num);
 
+								if ($value === null) {
+									continue;
+								}
+
 								foreach ($_macros as $macro_data) {
-									if ($value !== null) {
-										$macro_values[$macro_data['macro']] = array_key_exists('macrofunc', $macro_data)
-											? CMacroFunction::calcMacrofunc($value, $macro_data['macrofunc'])
-											: convertUnits(['value' => $value, 'units' => $db_item['units']]);
-									}
+									$macro_values[$macro_data['macro']] = array_key_exists('macrofunc', $macro_data)
+										? CMacroFunction::calcMacrofunc($value, $macro_data['macrofunc'])
+										: convertUnits(['value' => $value, 'units' => $db_item['units']]);
 								}
 							}
 						}
